@@ -12,8 +12,28 @@
 #include "debug.ch"
 #include "vxh.ch"
 
-STATIC m_cResult
+static nPageNumber
+static m_cResult
+
 //-----------------------------------------------------------------------------------------------
+#define FC_EQUALTO    "Equals to"
+#define FC_NOTEQUALTO "Is not equal to"
+#define FC_GREATEREQU "Greater than or equal"
+#define FC_LESSEQUAL  "Less than or equal"
+#define FC_BETWEEN    "Between"
+#define FC_INTHERANGE "Is in the range"
+#define FC_CONTAINS   "Contains"
+#define FC_NOTCONTAIN "Does not contain"
+#define FC_BEGWITH    "Begins with"
+#define FC_NOTBEGWITH "Does not begin with"
+#define FC_ISEMPTY    "Is empty"
+#define FC_NOTEMPTY   "Is not empty"
+#define FC_PERQUARTER "Per quarter"
+#define FC_INLAST     "Is in the last"
+#define FC_NOTINLAST  "Is not in the last"
+#define FC_TRUE       "True"
+#define FC_FALSE      "False"
+
 #define PIX_PER_INCH   1440
 
 #define  acFileSaveDefault     -1
@@ -25,8 +45,6 @@ STATIC m_cResult
 #define  acCommandToolZoomIn           53541
 #define  acCommandToolZoomOut          53542
 #define  acCommandToolPageHome         53773
-
-static nPageNumber
 
 CLASS VrReport INHERIT VrObject
    DATA PrintHeader     EXPORTED  INIT .T.
@@ -591,7 +609,7 @@ RETURN oDoc
 METHOD Run( oDoc, oWait ) CLASS VrReport
    LOCAL nHeight, hDC, nSubHeight, nTotHeight, nCount, nPer, nPos, nRow, oData, hCtrl, hData := {=>}
    LOCAL xValue, cData, oIni, cEntry
-
+   
    ::Create()
 
    IF oDoc != NIL
@@ -618,9 +636,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
              IF ! EMPTY( hCtrl:Filter )
                 hCtrl:Filter := STRTRAN( hCtrl:Filter, "@TODAY", 'CTOD("'+DTOC(DATE())+'")' )
                 oData:SetFilter( &(hCtrl:Filter) )
-                
                 m_cResult := NIL
-
              ENDIF
              IF ! EMPTY( hCtrl:Order )
                 oData:OrdSetFocus( hCtrl:Order )
@@ -862,15 +878,17 @@ FUNCTION PageNumber(); RETURN nPageNumber
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-FUNCTION AskLater( cField )
+FUNCTION AskLater( cField, cType )
    IF m_cResult == NIL
-      m_cResult := VrAskLater( NIL, cField ):cResult
+      m_cResult := VrAskLater( NIL, cField, cType ):cResult
    ENDIF
 RETURN m_cResult
 
 CLASS VrAskLater INHERIT Dialog
    DATA cResult EXPORTED INIT ""
    DATA cField  EXPORTED INIT ""
+   DATA cType   EXPORTED
+   DATA oCond   EXPORTED
 
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
@@ -885,7 +903,7 @@ CLASS VrAskLater INHERIT Dialog
    METHOD AskLater_SetTranslations()
 ENDCLASS
 
-METHOD Init( oParent, cField ) CLASS VrAskLater
+METHOD Init( oParent, cField, cType ) CLASS VrAskLater
    ::Super:Init( oParent )
    ::EventHandler[ "OnLoad" ] := "AskLater_OnLoad"
    ::Modal       := .T.
@@ -899,11 +917,14 @@ METHOD Init( oParent, cField ) CLASS VrAskLater
    ::MaximizeBox := .F.
    ::MinimizeBox := .F.
    ::Icon        := "AVR"
-   ::cField      := cField 
+   ::cField      := cField
+   ::cType       := cType
+   ::oCond       := Conditions( NIL )
    ::Create()
 RETURN Self
 
 METHOD OnInitDialog() CLASS VrAskLater
+   LOCAL cType := ::cType
    WITH OBJECT ( PictureBox( Self ) )
       :Name             := "PictureBox1"
       WITH OBJECT :Dock
@@ -947,13 +968,14 @@ METHOD OnInitDialog() CLASS VrAskLater
    END
 
    WITH OBJECT ( GroupBox( Self ) )
-      :Dock:Margins       := "20,15,20,70"
-      :Left             := 20
-      :Top              := 15
-      :Width            := 379
-      :Height           := 88
-      :Caption          := "Field name"
-      :ForeColor        := 0
+      :Dock:Margins := "20,15,20,70"
+      :Left         := 20
+      :Top          := 15
+      :Width        := 379
+      :Height       := 88
+      :Caption      := "Field name"
+      :ForeColor    := 0
+      :Caption      := ::cField    
       :EventHandler[ "OnSize" ] := "GroupBox1_OnSize"
       :Create()
       :DockToParent()
@@ -967,6 +989,8 @@ METHOD OnInitDialog() CLASS VrAskLater
          :ItemHeight      := 17
          :EventHandler[ "OnCBNSelEndOk" ] := "ComboBox1_OnCBNSelEndOk"
          :Create()
+         AEVAL( ::oCond:aCond_&cType, {|a| :AddItem(a[1]) } )
+         :SetCurSel(1)
       END
 
       WITH OBJECT ( EditBox( :this ) )
@@ -1029,4 +1053,50 @@ METHOD cmdLookup_OnClick() CLASS VrAskLater
 RETURN Self
 
 METHOD AskLater_SetTranslations() CLASS VrAskLater
+RETURN Self
+
+//------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------
+
+CLASS Conditions
+   DATA aCond_C      EXPORTED INIT {}
+   DATA aCond_N      EXPORTED INIT {}
+   DATA aCond_D      EXPORTED INIT {}
+   DATA aCond_L      EXPORTED INIT {}
+   DATA aCond_M      EXPORTED INIT {}
+   METHOD Init() CONSTRUCTOR
+ENDCLASS
+
+
+METHOD Init( oDataTable ) CLASS Conditions
+   ::aCond_N := {  { FC_EQUALTO,          {|cField,cExp,cExp2| cField + "==" + cExp} },;
+                   { FC_NOTEQUALTO,       {|cField,cExp,cExp2| "!(" + cField + "==" + cExp + ")" } },;
+                   { FC_GREATEREQU,       {|cField,cExp,cExp2| cField + ">=" + cExp} },;
+                   { FC_LESSEQUAL,        {|cField,cExp,cExp2| cField + "<=" + cExp} },;
+                   { FC_BETWEEN,          {|cField,cExp,cExp2| "(" + cField + ">= " + cExp + ".AND." + cField +"<=" + cExp2 + ")"} },;
+                   { FC_INTHERANGE,       {|cField,cExp,cExp2| cField } } }
+
+   ::aCond_C := {  { FC_CONTAINS,         {|cField,cExp,cExp2| cExp + " $ " + cField} },;
+                   { FC_NOTCONTAIN,       {|cField,cExp,cExp2| "!(" + cExp + " $ " + cField + ")"} },;
+                   { FC_BEGWITH,          {|cField,cExp,cExp2| cField + "=" + cExp} },;
+                   { FC_NOTBEGWITH,       {|cField,cExp,cExp2| cField + "!=" + cExp} },;
+                   { FC_ISEMPTY,          {|cField,cExp,cExp2| "EMPTY(" + cField + ")"} },;
+                   { FC_NOTEMPTY,         {|cField,cExp,cExp2| "! EMPTY(" + cField + ")"} },;
+                   { FC_INTHERANGE,       {|cField,cExp,cExp2| cField} } }
+
+   ::aCond_D := {  { FC_EQUALTO,          {|cField,cExp,cExp2| cField + "==" + cExp} },;
+                   { FC_NOTEQUALTO,       {|cField,cExp,cExp2| cField + "<>" + cExp} },;
+                   { FC_GREATEREQU,       {|cField,cExp,cExp2| cField + ">=" + cExp} },;
+                   { FC_LESSEQUAL,        {|cField,cExp,cExp2| cField + "<=" + cExp} },;
+                   { FC_BETWEEN,          {|cField,cExp,cExp2| "(" + cField + ">= " + cExp + ".AND." + cField +"<=" + cExp2 + ")"} },;
+                   { FC_PERQUARTER,       {|cField,cExp,cExp2| cExp } },;
+                   { FC_INLAST,           {|cField,cExp,cExp2| cField + ">=" + cExp } },;
+                   { FC_NOTINLAST,        {|cField,cExp,cExp2| cField + "<" + cExp} },;
+                   { FC_INTHERANGE,       {|cField,cExp,cExp2| cField} } }
+
+   ::aCond_L := {  { FC_TRUE,  {|cField,cExp,cExp2| cField} },;
+                   { FC_FALSE, {|cField,cExp,cExp2| "!"+cField} } }
+
+   ::aCond_M := ACLONE( ::aCond_C )
 RETURN Self

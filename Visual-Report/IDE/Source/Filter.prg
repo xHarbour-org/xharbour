@@ -31,11 +31,8 @@ CLASS FilterUI INHERIT Dialog
    DATA cFilter      EXPORTED INIT ""
    DATA BuildFilter  EXPORTED INIT {}
    DATA oDataTable   EXPORTED
-   DATA aCond_C      EXPORTED INIT {}
-   DATA aCond_N      EXPORTED INIT {}
-   DATA aCond_D      EXPORTED INIT {}
-   DATA aCond_L      EXPORTED INIT {}
-   DATA aCond_M      EXPORTED INIT {}
+   
+   DATA oCond        EXPORTED
 
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
@@ -67,37 +64,7 @@ METHOD Init( oDataTable ) CLASS FilterUI
    DEFAULT ::__xCtrlName  TO "FilterUI"
 
    ::Super:Init( ::Application:MainForm )
-
-   ::aCond_N := {  { FC_EQUALTO,          {|cField,cExp,cExp2| cField + "==" + cExp} },;
-                   { FC_NOTEQUALTO,       {|cField,cExp,cExp2| "!(" + cField + "==" + cExp + ")" } },;
-                   { FC_GREATEREQU,       {|cField,cExp,cExp2| cField + ">=" + cExp} },;
-                   { FC_LESSEQUAL,        {|cField,cExp,cExp2| cField + "<=" + cExp} },;
-                   { FC_BETWEEN,          {|cField,cExp,cExp2| "(" + cField + ">= " + cExp + ".AND." + cField +"<=" + cExp2 + ")"} },;
-                   { FC_INTHERANGE,       {|cField,cExp,cExp2| cField } } }
-
-   ::aCond_C := {  { FC_CONTAINS,         {|cField,cExp,cExp2| cExp + " $ " + cField} },;
-                   { FC_NOTCONTAIN,       {|cField,cExp,cExp2| "!(" + cExp + " $ " + cField + ")"} },;
-                   { FC_BEGWITH,          {|cField,cExp,cExp2| cField + "=" + cExp} },;
-                   { FC_NOTBEGWITH,       {|cField,cExp,cExp2| cField + "!=" + cExp} },;
-                   { FC_ISEMPTY,          {|cField,cExp,cExp2| "EMPTY(" + cField + ")"} },;
-                   { FC_NOTEMPTY,         {|cField,cExp,cExp2| "! EMPTY(" + cField + ")"} },;
-                   { FC_INTHERANGE,       {|cField,cExp,cExp2| cField} } }
-
-   ::aCond_D := {  { FC_EQUALTO,          {|cField,cExp,cExp2| cField + "==" + cExp} },;
-                   { FC_NOTEQUALTO,       {|cField,cExp,cExp2| cField + "<>" + cExp} },;
-                   { FC_GREATEREQU,       {|cField,cExp,cExp2| cField + ">=" + cExp} },;
-                   { FC_LESSEQUAL,        {|cField,cExp,cExp2| cField + "<=" + cExp} },;
-                   { FC_BETWEEN,          {|cField,cExp,cExp2| "(" + cField + ">= " + cExp + ".AND." + cField +"<=" + cExp2 + ")"} },;
-                   { FC_PERQUARTER,       {|cField,cExp,cExp2| cExp } },;
-                   { FC_INLAST,           {|cField,cExp,cExp2| cField + ">=" + cExp } },;
-                   { FC_NOTINLAST,        {|cField,cExp,cExp2| cField + "<" + cExp} },;
-                   { FC_INTHERANGE,       {|cField,cExp,cExp2| cField} } }
-
-   ::aCond_L := {  { FC_TRUE,  {|cField,cExp,cExp2| cField} },;
-                   { FC_FALSE, {|cField,cExp,cExp2| "!"+cField} } }
-
-   ::aCond_M := ACLONE( ::aCond_C )
-   
+   ::oCond := Conditions( NIL )
    ::Modal      := .T.
    ::Create()
 RETURN Self
@@ -403,7 +370,7 @@ METHOD FieldComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
       Sender:Parent:Children[ LEN(Sender:Parent:Children)-1 ]:Enabled := .T.
    ENDIF
    Sender:Parent:Children[2]:ResetContent()
-   AEVAL( ::aCond_&cType, {|a| Sender:Parent:Children[2]:AddItem(a[1]) } )
+   AEVAL( ::oCond:aCond_&cType, {|a| Sender:Parent:Children[2]:AddItem(a[1]) } )
    Sender:Parent:Children[2]:SetCurSel(1)
    ::FilterBrowse:Enabled := .T.
    ::OK:Enabled := .T.
@@ -633,8 +600,8 @@ METHOD BuildFilterExp() CLASS FilterUI
           nSel1   := oPanel:Children[1]:GetCurSel()
           nSel2   := oPanel:Children[2]:GetCurSel()
           cType   := ::oDataTable:EditCtrl:FieldType( nSel1 )
-          cExp    := oPanel:oGet1:Caption //oPanel:Children[3]:Caption
-          cExp2   := oPanel:oGet2:Caption //oPanel:Children[4]:Caption
+          cExp    := oPanel:oGet1:Caption
+          cExp2   := oPanel:oGet2:Caption
 
           cField := ::oDataTable:Alias + "->" + cFldSel
 
@@ -692,9 +659,9 @@ METHOD BuildFilterExp() CLASS FilterUI
           ENDIF
           
           IF ATAIL( oPanel:Children ):Checked
-             ::cFilter += 'AskLater( "'+cFldSel+'" )'
+             ::cFilter += 'AskLater( "'+cFldSel+'","'+cType+'")'
            ELSE
-             bExp := ::aCond_&cType[nSel2][2]
+             bExp := ::oCond:aCond_&cType[nSel2][2]
              ::cFilter += EVAL( bExp, cField, cExp, cExp2 )
           ENDIF
        ENDIF
