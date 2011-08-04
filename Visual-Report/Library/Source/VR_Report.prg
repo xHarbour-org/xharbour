@@ -13,7 +13,6 @@
 #include "vxh.ch"
 
 static nPageNumber
-static m_cResult
 
 //-----------------------------------------------------------------------------------------------
 #define FC_EQUALTO    "Equals to"
@@ -634,9 +633,8 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
              ENDIF
              oData:Create()
              IF ! EMPTY( hCtrl:Filter )
-                hCtrl:Filter := STRTRAN( hCtrl:Filter, "@TODAY", 'CTOD("'+DTOC(DATE())+'")' )
+                hCtrl:Filter := CleanFilter( hCtrl:Filter )
                 oData:SetFilter( &(hCtrl:Filter) )
-                m_cResult := NIL
              ENDIF
              IF ! EMPTY( hCtrl:Order )
                 oData:OrdSetFocus( hCtrl:Order )
@@ -879,17 +877,14 @@ FUNCTION PageNumber(); RETURN nPageNumber
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 FUNCTION AskLater( cField, cType )
-   IF m_cResult == NIL
-      m_cResult := VrAskLater( NIL, cField, cType ):cResult
-   ENDIF
-RETURN m_cResult
+RETURN VrAskLater( NIL, cField, cType ):cResult
 
 CLASS VrAskLater INHERIT Dialog
    DATA cResult EXPORTED INIT ""
    DATA cField  EXPORTED INIT ""
    DATA cType   EXPORTED
    DATA oCond   EXPORTED
-
+   DATA cEdit   EXPORTED
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
 
@@ -898,7 +893,6 @@ CLASS VrAskLater INHERIT Dialog
    METHOD OK_OnClick()
    METHOD GroupBox1_OnSize()
    METHOD ComboBox1_OnCBNSelEndOk()
-   METHOD EditBox1_OnKeyUp()
    METHOD cmdLookup_OnClick()
    METHOD AskLater_SetTranslations()
 ENDCLASS
@@ -919,6 +913,10 @@ METHOD Init( oParent, cField, cType ) CLASS VrAskLater
    ::Icon        := "AVR"
    ::cField      := cField
    ::cType       := cType
+   ::cEdit := "EditBox"
+   IF ::cType == "D"
+      ::cEdit := "DateTimePicker"
+   ENDIF
    ::oCond       := Conditions( NIL )
    ::Create()
 RETURN Self
@@ -992,27 +990,30 @@ METHOD OnInitDialog() CLASS VrAskLater
          AEVAL( ::oCond:aCond_&cType, {|a| :AddItem(a[1]) } )
          :SetCurSel(1)
       END
-
-      WITH OBJECT ( EditBox( :this ) )
-         :Name         := "EditBox1"
+      
+      WITH OBJECT ( &(::cEdit)( :this ) )
+         :Name         := ::cEdit+"1"
          :Dock:Margins := "0,0,0,0"
          :Left         := 180
          :Top          := 37
          :Width        := 150
          :Height       := 22
-         :AutoHScroll  := .T.
-         :Case         := 2
-         :EventHandler[ "OnKeyUp" ] := "EditBox1_OnKeyUp"
+         IF cType != "D"
+            :AutoHScroll := .T.
+            :Case        := 2
+         ENDIF
          :Create()
       END
 
-      WITH OBJECT ( EditBox( :this ) )
-         :Name        := "EditBox2"
+      WITH OBJECT ( &(::cEdit)( :this ) )
+         :Name        := ::cEdit+"2"
          :Left        := 256
          :Top         := 37
          :Width       := 0
          :Height      := 22
-         :AutoHScroll := .T.
+         IF cType != "D"
+            :AutoHScroll := .T.
+         ENDIF
          :Create()
       END
 
@@ -1036,7 +1037,45 @@ METHOD AskLater_OnLoad() CLASS VrAskLater
 RETURN Self
 
 METHOD OK_OnClick() CLASS VrAskLater
-   ::cResult := &(::cField) < date()
+   LOCAL cExp1, cExp2, bExp, cType, nSel, oGet1, oGet2, aExp, nNum, cExpSel, cField
+   oGet1   := ::&(::cEdit+"1")
+   oGet2   := ::&(::cEdit+"2")
+   cExp1   := oGet1:Caption
+   cExp2   := oGet2:Caption
+   cType   := ::cType
+   cExpSel := ::ComboBox1:GetSelString()
+
+   IF cType $ "CM"
+      cField := "TRIM("+cField+")"
+      cExp1 := ValToPrg( cExp1 )
+      cExp2 := ValToPrg( cExp2 )
+    ELSEIF cType == "N"
+      cExp1 := ValToPrg( VAL( cExp1 ) )
+      cExp2 := ValToPrg( VAL( cExp2 ) )
+    ELSEIF cType == "D"
+      IF cExpSel IN {FC_INLAST, FC_NOTINLAST}
+         aExp  := hb_aTokens( oGet1:Caption )
+         cExp1 := "@TODAY-"
+         nNum  := VAL( aExp[1] )
+         IF aExp[2] == "days"
+            cExp1 += aExp[1]
+          ELSEIF aExp[2] == "weeks"
+            cExp1 += AllTrim( Str( nNum*7 ) )
+          ELSEIF aExp[2] == "months"
+            cExp1 += AllTrim( Str( nNum*30 ) )
+         ENDIF
+       ELSEIF cExpSel IN {FC_PERQUARTER}
+         aExp  := hb_aTokens( oGet1:Caption )
+         cExp1 := 'MONTH(DATE())>='+aExp[2]+'.AND.MONTH(DATE())<='+aExp[4]
+       ELSE
+         cExp1 := 'STOD( "' + DTOS(oGet1:Date) + '" )'
+         cExp2 := 'STOD( "' + DTOS(oGet2:Date) + '" )'
+      ENDIF
+   ENDIF
+
+   nSel  := ::ComboBox1:GetCurSel()
+   bExp  := ::oCond:aCond_&cType[nSel][2]
+   ::cResult := EVAL( bExp, ::cField, cExp1, cExp2 )
    ::Close()
 RETURN Self
 
@@ -1044,9 +1083,6 @@ METHOD GroupBox1_OnSize() CLASS VrAskLater
 RETURN Self
 
 METHOD ComboBox1_OnCBNSelEndOk() CLASS VrAskLater
-RETURN Self
-
-METHOD EditBox1_OnKeyUp() CLASS VrAskLater
 RETURN Self
 
 METHOD cmdLookup_OnClick() CLASS VrAskLater
@@ -1100,3 +1136,16 @@ METHOD Init( oDataTable ) CLASS Conditions
 
    ::aCond_M := ACLONE( ::aCond_C )
 RETURN Self
+
+FUNCTION CleanFilter( cFilter )
+   LOCAL cCond, n, cAsk
+   cFilter := STRTRAN( cFilter, "@TODAY", 'CTOD("'+DTOC(DATE())+'")' )
+   WHILE ( n := AT( "~AskLater", cFilter ) ) > 0
+      cAsk := SUBSTR( cFilter, 2 )
+      IF ( n := AT( "~", cAsk ) ) > 0
+         cAsk := LEFT( cAsk, n-1 )
+         cCond := &cAsk
+         cFilter := STRTRAN( cFilter, "~"+cAsk+"~", cCond,,, 1 )
+      ENDIF
+   ENDDO
+RETURN cFilter

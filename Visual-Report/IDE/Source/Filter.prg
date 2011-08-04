@@ -659,7 +659,7 @@ METHOD BuildFilterExp() CLASS FilterUI
           ENDIF
           
           IF ATAIL( oPanel:Children ):Checked
-             ::cFilter += 'AskLater( "'+cFldSel+'","'+cType+'")'
+             ::cFilter += '~AskLater( "'+cFldSel+'","'+cType+'")~'
            ELSE
              bExp := ::oCond:aCond_&cType[nSel2][2]
              ::cFilter += EVAL( bExp, cField, cExp, cExp2 )
@@ -696,13 +696,8 @@ METHOD OnInitDialog() CLASS TestFilter
       IF oTable:Driver != "SQLRDD"
          :Alias := oTable:Alias
          :Create()
-         cFilter := ::Parent:cFilter
-         cFilter := STRTRAN( cFilter, "@TODAY", 'CTOD("'+DTOC(DATE())+'")' )
-         TRY
-            :SetFilter( &("{||"+cFilter+"}") )
-         CATCH
-            ::MessageBox( "The selected filter has caused an error. Please rebuild the filter expression and try again", "VR" )
-         END
+         cFilter := CleanFilter( ::Parent:cFilter )
+         :SetFilter( &("{||"+cFilter+"}") )
          IF ! EMPTY( oTable:Order )
             :OrdSetFocus( oTable:Order )
          ENDIF
