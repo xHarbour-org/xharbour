@@ -1044,9 +1044,10 @@ METHOD OK_OnClick() CLASS VrAskLater
    cExp2   := oGet2:Caption
    cType   := ::cType
    cExpSel := ::ComboBox1:GetSelString()
+   cField  := ::cField
 
    IF cType $ "CM"
-      cField := "TRIM("+cField+")"
+      cField := "TRIM("+::cField+")"
       cExp1 := ValToPrg( cExp1 )
       cExp2 := ValToPrg( cExp2 )
     ELSEIF cType == "N"
@@ -1075,7 +1076,7 @@ METHOD OK_OnClick() CLASS VrAskLater
 
    nSel  := ::ComboBox1:GetCurSel()
    bExp  := ::oCond:aCond_&cType[nSel][2]
-   ::cResult := EVAL( bExp, ::cField, cExp1, cExp2 )
+   ::cResult := EVAL( bExp, cField, cExp1, cExp2 )
    ::Close()
 RETURN Self
 
@@ -1141,7 +1142,7 @@ FUNCTION CleanFilter( cFilter )
    LOCAL cCond, n, cAsk
    cFilter := STRTRAN( cFilter, "@TODAY", 'CTOD("'+DTOC(DATE())+'")' )
    WHILE ( n := AT( "~AskLater", cFilter ) ) > 0
-      cAsk := SUBSTR( cFilter, 2 )
+      cAsk := SUBSTR( cFilter, n+1 )
       IF ( n := AT( "~", cAsk ) ) > 0
          cAsk := LEFT( cAsk, n-1 )
          cCond := &cAsk
