@@ -891,10 +891,8 @@ CLASS VrAskLater INHERIT Dialog
    // Event declaration
    METHOD AskLater_OnLoad()
    METHOD OK_OnClick()
-   METHOD GroupBox1_OnSize()
    METHOD ComboBox1_OnCBNSelEndOk()
-   METHOD cmdLookup_OnClick()
-   METHOD AskLater_SetTranslations()
+   METHOD Lookup_OnClick()
 ENDCLASS
 
 METHOD Init( oParent, cField, cType ) CLASS VrAskLater
@@ -974,7 +972,6 @@ METHOD OnInitDialog() CLASS VrAskLater
       :Caption      := "Field name"
       :ForeColor    := 0
       :Caption      := ::cField    
-      :EventHandler[ "OnSize" ] := "GroupBox1_OnSize"
       :Create()
       :DockToParent()
       WITH OBJECT ( ComboBox( :this ) )
@@ -1026,8 +1023,7 @@ METHOD OnInitDialog() CLASS VrAskLater
          :Width        := 22
          :Height       := 22
          :Caption      := "F3"
-         :EventHandler[ "OnClick" ] := "cmdLookup_OnClick"
-         :EventHandler[ "UserMethod1" ] := "AskLater_SetTranslations"
+         :EventHandler[ "OnClick" ] := "Lookup_OnClick"
          :Create()
       END
    END
@@ -1080,16 +1076,10 @@ METHOD OK_OnClick() CLASS VrAskLater
    ::Close()
 RETURN Self
 
-METHOD GroupBox1_OnSize() CLASS VrAskLater
-RETURN Self
-
 METHOD ComboBox1_OnCBNSelEndOk() CLASS VrAskLater
 RETURN Self
 
-METHOD cmdLookup_OnClick() CLASS VrAskLater
-RETURN Self
-
-METHOD AskLater_SetTranslations() CLASS VrAskLater
+METHOD Lookup_OnClick() CLASS VrAskLater
 RETURN Self
 
 //------------------------------------------------------------------------------------------
