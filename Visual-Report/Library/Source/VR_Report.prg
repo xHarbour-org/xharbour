@@ -634,7 +634,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
              oData:Create()
              IF ! EMPTY( hCtrl:Filter )
                 hCtrl:Filter := CleanFilter( hCtrl:Filter )
-                oData:SetFilter( &(hCtrl:Filter) )
+                oData:SetFilter( &("{||"+hCtrl:Filter+"}") )
              ENDIF
              IF ! EMPTY( hCtrl:Order )
                 oData:OrdSetFocus( hCtrl:Order )
@@ -885,19 +885,16 @@ CLASS VrAskLater INHERIT Dialog
    DATA cType   EXPORTED
    DATA oCond   EXPORTED
    DATA cEdit   EXPORTED
+   DATA oGet1, oGet2
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
-
-   // Event declaration
-   METHOD AskLater_OnLoad()
+   METHOD SetDateEdit()
    METHOD OK_OnClick()
    METHOD ComboBox1_OnCBNSelEndOk()
-   METHOD Lookup_OnClick()
 ENDCLASS
 
 METHOD Init( oParent, cField, cType ) CLASS VrAskLater
    ::Super:Init( oParent )
-   ::EventHandler[ "OnLoad" ] := "AskLater_OnLoad"
    ::Modal       := .T.
    ::Left        := 11
    ::Top         := 10
@@ -915,6 +912,7 @@ METHOD Init( oParent, cField, cType ) CLASS VrAskLater
    IF ::cType == "D"
       ::cEdit := "DateTimePicker"
    ENDIF
+   ::cResult     := ".T."
    ::oCond       := Conditions( NIL )
    ::Create()
 RETURN Self
@@ -988,56 +986,55 @@ METHOD OnInitDialog() CLASS VrAskLater
          :SetCurSel(1)
       END
       
-      WITH OBJECT ( &(::cEdit)( :this ) )
-         :Name         := ::cEdit+"1"
-         :Dock:Margins := "0,0,0,0"
+      WITH OBJECT EditBox( :this )
+         :Name         := "EditBox1"
          :Left         := 180
          :Top          := 37
-         :Width        := 150
+         :Width        := 160
          :Height       := 22
-         IF cType != "D"
-            :AutoHScroll := .T.
-            :Case        := 2
-         ENDIF
+         :AutoHScroll  := .T.
+         :Visible      := .F.
          :Create()
       END
 
-      WITH OBJECT ( &(::cEdit)( :this ) )
-         :Name        := ::cEdit+"2"
-         :Left        := 256
-         :Top         := 37
-         :Width       := 0
-         :Height      := 22
-         IF cType != "D"
-            :AutoHScroll := .T.
-         ENDIF
-         :Create()
-      END
-
-      WITH OBJECT ( Button( :this ) )
-         :Name         := "cmdShowFields"
-         :Dock:Right   := :Parent
-         :Dock:Margins := "0,0,20,0"
-         :Left         := 338
+      WITH OBJECT EditBox( :this )
+         :Name         := "EditBox2"
+         :Left         := 270
          :Top          := 37
-         :Width        := 22
+         :Width        := 78
          :Height       := 22
-         :Caption      := "F3"
-         :EventHandler[ "OnClick" ] := "Lookup_OnClick"
+         :AutoHScroll  := .T.
+         :Visible      := .F.
+         :Create()
+      END
+
+      WITH OBJECT DateTimePicker( :this )
+         :Name         := "DateTimePicker1"
+         :Left         := 180
+         :Top          := 37
+         :Width        := 160
+         :Height       := 22
+         :Visible      := .F.
+         :Create()
+      END
+
+      WITH OBJECT DateTimePicker( :this )
+         :Name         := "DateTimePicker2"
+         :Left         := 270
+         :Top          := 37
+         :Width        := 78
+         :Height       := 22
+         :Visible      := .F.
          :Create()
       END
    END
-RETURN Self
-
-METHOD AskLater_OnLoad() CLASS VrAskLater
+   ::SetDateEdit()
 RETURN Self
 
 METHOD OK_OnClick() CLASS VrAskLater
    LOCAL cExp1, cExp2, bExp, cType, nSel, oGet1, oGet2, aExp, nNum, cExpSel, cField
-   oGet1   := ::&(::cEdit+"1")
-   oGet2   := ::&(::cEdit+"2")
-   cExp1   := oGet1:Caption
-   cExp2   := oGet2:Caption
+   cExp1   := ::oGet1:Caption
+   cExp2   := ::oGet2:Caption
    cType   := ::cType
    cExpSel := ::ComboBox1:GetSelString()
    cField  := ::cField
@@ -1051,7 +1048,7 @@ METHOD OK_OnClick() CLASS VrAskLater
       cExp2 := ValToPrg( VAL( cExp2 ) )
     ELSEIF cType == "D"
       IF cExpSel IN {FC_INLAST, FC_NOTINLAST}
-         aExp  := hb_aTokens( oGet1:Caption )
+         aExp  := hb_aTokens( ::oGet1:Caption )
          cExp1 := "@TODAY-"
          nNum  := VAL( aExp[1] )
          IF aExp[2] == "days"
@@ -1062,11 +1059,11 @@ METHOD OK_OnClick() CLASS VrAskLater
             cExp1 += AllTrim( Str( nNum*30 ) )
          ENDIF
        ELSEIF cExpSel IN {FC_PERQUARTER}
-         aExp  := hb_aTokens( oGet1:Caption )
+         aExp  := hb_aTokens( ::oGet1:Caption )
          cExp1 := 'MONTH(DATE())>='+aExp[2]+'.AND.MONTH(DATE())<='+aExp[4]
        ELSE
-         cExp1 := 'STOD( "' + DTOS(oGet1:Date) + '" )'
-         cExp2 := 'STOD( "' + DTOS(oGet2:Date) + '" )'
+         cExp1 := 'STOD( "' + DTOS(::oGet1:Date) + '" )'
+         cExp2 := 'STOD( "' + DTOS(::oGet2:Date) + '" )'
       ENDIF
    ENDIF
 
@@ -1076,10 +1073,66 @@ METHOD OK_OnClick() CLASS VrAskLater
    ::Close()
 RETURN Self
 
-METHOD ComboBox1_OnCBNSelEndOk() CLASS VrAskLater
+METHOD ComboBox1_OnCBNSelEndOk( Sender ) CLASS VrAskLater
+   LOCAL cSel, oDlg, oPanel := Sender:Parent
+
+   cSel := Sender:GetSelString()
+   ::SetDateEdit()
+
+   ::oGet1:Enabled := .T.
+
+   IF cSel == FC_BETWEEN
+      ::oGet1:Width := 78
+      ::oGet2:Visible := .T.
+
+    ELSEIF cSel IN {FC_PERQUARTER}
+      ::SetDateEdit( "C" )
+      ::oGet1:Enabled := .F.
+      oDlg := FilterPerQuarter( Self, ::oGet1 )
+      IF oDlg:Result == IDOK
+         ::oGet1:Caption := oDlg:nNum + " " + oDlg:cSel
+      ENDIF
+      ::oGet1:Enabled := .F.
+
+    ELSEIF cSel IN {FC_INLAST, FC_NOTINLAST}
+      ::SetDateEdit( "C" )
+      ::oGet1:Enabled := .F.
+      oDlg := IsInTheLast( Self, cSel, {"days", "weeks", "months"}  )
+      IF oDlg:Result == IDOK
+         ::oGet1:Caption := oDlg:nNum + " " + oDlg:cSel
+      ENDIF
+      ::oGet1:Enabled := .F.
+
+    ELSEIF cSel IN {FC_ISEMPTY, FC_NOTEMPTY}
+      ::SetDateEdit( "C" )
+      ::oGet1:Caption := ""
+      ::oGet1:Enabled := .F.
+
+   ENDIF
 RETURN Self
 
-METHOD Lookup_OnClick() CLASS VrAskLater
+//------------------------------------------------------------------------------------------------------------------------------------------
+METHOD SetDateEdit( cType ) CLASS VrAskLater
+   DEFAULT cType TO ::cType
+   IF ::oGet1 != NIL
+      ::oGet1:Visible := .F.
+      ::oGet2:Visible := .F.
+   ENDIF
+   IF cType == "D"
+      ::oGet1 := ::DateTimePicker1
+      ::oGet2 := ::DateTimePicker2
+    ELSE
+      ::oGet1 := ::EditBox1
+      ::oGet2 := ::EditBox2
+   ENDIF
+   ::oGet1:Visible := .T.
+   ::oGet2:Visible := ::ComboBox1:GetSelString() == FC_BETWEEN
+   IF !::oGet2:Visible
+      ::oGet1:Width := 160
+      ::oGet2:Caption := ""
+    ELSE
+      ::oGet1:Width := 80
+   ENDIF
 RETURN Self
 
 //------------------------------------------------------------------------------------------
@@ -1102,7 +1155,7 @@ METHOD Init( oDataTable ) CLASS Conditions
                    { FC_GREATEREQU,       {|cField,cExp,cExp2| cField + ">=" + cExp} },;
                    { FC_LESSEQUAL,        {|cField,cExp,cExp2| cField + "<=" + cExp} },;
                    { FC_BETWEEN,          {|cField,cExp,cExp2| "(" + cField + ">= " + cExp + ".AND." + cField +"<=" + cExp2 + ")"} },;
-                   { FC_INTHERANGE,       {|cField,cExp,cExp2| cField } } }
+                   { FC_INTHERANGE,       {|cField,cExp,cExp2| cField + "="  + cExp } } }
 
    ::aCond_C := {  { FC_CONTAINS,         {|cField,cExp,cExp2| cExp + " $ " + cField} },;
                    { FC_NOTCONTAIN,       {|cField,cExp,cExp2| "!(" + cExp + " $ " + cField + ")"} },;
@@ -1110,7 +1163,7 @@ METHOD Init( oDataTable ) CLASS Conditions
                    { FC_NOTBEGWITH,       {|cField,cExp,cExp2| cField + "!=" + cExp} },;
                    { FC_ISEMPTY,          {|cField,cExp,cExp2| "EMPTY(" + cField + ")"} },;
                    { FC_NOTEMPTY,         {|cField,cExp,cExp2| "! EMPTY(" + cField + ")"} },;
-                   { FC_INTHERANGE,       {|cField,cExp,cExp2| cField} } }
+                   { FC_INTHERANGE,       {|cField,cExp,cExp2| cField + "="  + cExp} } }
 
    ::aCond_D := {  { FC_EQUALTO,          {|cField,cExp,cExp2| cField + "==" + cExp} },;
                    { FC_NOTEQUALTO,       {|cField,cExp,cExp2| cField + "<>" + cExp} },;
@@ -1119,8 +1172,8 @@ METHOD Init( oDataTable ) CLASS Conditions
                    { FC_BETWEEN,          {|cField,cExp,cExp2| "(" + cField + ">= " + cExp + ".AND." + cField +"<=" + cExp2 + ")"} },;
                    { FC_PERQUARTER,       {|cField,cExp,cExp2| cExp } },;
                    { FC_INLAST,           {|cField,cExp,cExp2| cField + ">=" + cExp } },;
-                   { FC_NOTINLAST,        {|cField,cExp,cExp2| cField + "<" + cExp} },;
-                   { FC_INTHERANGE,       {|cField,cExp,cExp2| cField} } }
+                   { FC_NOTINLAST,        {|cField,cExp,cExp2| cField + "<"  + cExp } },;
+                   { FC_INTHERANGE,       {|cField,cExp,cExp2| cField + "="  + cExp } } }
 
    ::aCond_L := {  { FC_TRUE,  {|cField,cExp,cExp2| cField} },;
                    { FC_FALSE, {|cField,cExp,cExp2| "!"+cField} } }
@@ -1140,3 +1193,298 @@ FUNCTION CleanFilter( cFilter )
       ENDIF
    ENDDO
 RETURN cFilter
+
+//----------------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FilterPerQuarter INHERIT Dialog
+   DATA oEdit EXPORTED
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   METHOD FilterPerQuarter_OnLoad()
+   METHOD RadioButton1_OnClick()
+   METHOD RadioButton2_OnClick()
+   METHOD RadioButton3_OnClick()
+   METHOD RadioButton4_OnClick()
+   METHOD RadioButton5_OnClick()
+   METHOD Button1_OnClick()
+   METHOD EditBox1_OnVertScroll()
+   METHOD EditBox1_OnChar()
+ENDCLASS
+
+METHOD Init( oParent, oEdit ) CLASS FilterPerQuarter
+   ::oEdit := oEdit
+   ::Super:Init( oParent )
+
+   ::EventHandler[ "OnLoad" ]  := "FilterPerQuarter_OnLoad"
+
+   ::Name            := "FilterPerQuarter"
+   ::VertScrollSize  := 262
+   ::HorzScrollSize  := 284
+   ::Modal           := .T.
+   ::Left            := 10
+   ::Top             := 10
+   ::Width           := 454
+   ::Height          := 253
+   ::Center          := .T.
+   ::Caption         := "WinFakt! Per quarter"
+   ::TopMost         := .T.
+   ::MaximizeBox     := .F.
+   ::MinimizeBox     := .F.
+   ::Create()
+RETURN Self
+
+METHOD OnInitDialog() CLASS FilterPerQuarter
+   WITH OBJECT ( GROUPBOX( Self ) )
+      :Name                 := "GroupBox1"
+      WITH OBJECT :Dock
+         :Left                 := "FilterPerQuarter"
+         :Top                  := "FilterPerQuarter"
+         :Bottom               := "FilterPerQuarter"
+         :Margins              := "20,15,0,70"
+      END
+
+      :Left                 := 20
+      :Top                  := 15
+      :Width                := 156
+      :Height               := 129
+      :Caption              := "Month"
+      :ForeColor            := 0
+      :Create()
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label1"
+         :Left                 := 23
+         :Top                  := 26
+         :Width                := 50
+         :Height               := 16
+         :Caption              := "From:"
+         :Rightalign           := .T.
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( EDITBOX( :this ) )
+         :Name                 := "EditBox1"
+         :Caption              := "1"
+         :Left                 := 76
+         :Top                  := 22
+         :Width                := 50
+         :Height               := 22
+         :Alignment            := 3
+         :VertScroll           := .T.
+         :EventHandler[ "OnVertScroll" ] := "EditBox1_OnVertScroll"
+         :EventHandler[ "OnChar" ]       := "EditBox1_OnChar"
+         :Number               := .T.
+         :Create()
+      END
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label2"
+         :Left                 := 23
+         :Top                  := 61
+         :Width                := 50
+         :Height               := 16
+         :Caption              := "To:"
+         :Rightalign           := .T.
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( EDITBOX( :this ) )
+         :Name                 := "EditBox2"
+         :Caption              := "3"
+         :Left                 := 76
+         :Top                  := 57
+         :Width                := 50
+         :Height               := 22
+         :Alignment            := 3
+         :VertScroll           := .T.
+         :EventHandler[ "OnVertScroll" ] := "EditBox1_OnVertScroll"
+         :EventHandler[ "OnChar" ]       := "EditBox1_OnChar"
+         :Number               := .T.
+         :Create()
+      END
+
+   END
+
+   WITH OBJECT ( GROUPBOX( Self ) )
+      :Name                 := "GroupBox2"
+      WITH OBJECT :Dock
+         :Top                  := "FilterPerQuarter"
+         :Right                := "FilterPerQuarter"
+         :Bottom               := "FilterPerQuarter"
+         :Margins              := "0,15,20,70"
+      END
+
+      :Left                 := 193
+      :Top                  := 15
+      :Width                := 223
+      :Height               := 129
+      :Caption              := "Quarter"
+      :ForeColor            := 0
+      :Create()
+      WITH OBJECT ( RADIOBUTTON( :this ) )
+         :Name                 := "RadioButton1"
+         :Left                 := 26
+         :Top                  := 25
+         :Width                := 80
+         :Height               := 15
+         :InitialState         := BST_CHECKED
+         :Caption              := "I. First"
+         :EventHandler[ "OnClick" ] := "RadioButton1_OnClick"
+         :Create()
+      END
+
+      WITH OBJECT ( RADIOBUTTON( :this ) )
+         :Name                 := "RadioButton2"
+         :Left                 := 26
+         :Top                  := 60
+         :Width                := 80
+         :Height               := 15
+         :Caption              := "II. Second"
+         :EventHandler[ "OnClick" ] := "RadioButton2_OnClick"
+         :Create()
+      END
+
+      WITH OBJECT ( RADIOBUTTON( :this ) )
+         :Name          := "RadioButton3"
+         :Left          := 124
+         :Top           := 25
+         :Width         := 80
+         :Height        := 15
+         :Caption       := "III. Third"
+         :EventHandler[ "OnClick" ] := "RadioButton3_OnClick"
+         :Create()
+      END
+
+      WITH OBJECT ( RADIOBUTTON( :this ) )
+         :Name          := "RadioButton4"
+         :Left          := 124
+         :Top           := 60
+         :Width         := 80
+         :Height        := 15
+         :Caption       := "IV. Fourth"
+         :EventHandler[ "OnClick" ] := "RadioButton4_OnClick"
+         :Create()
+      END
+
+      WITH OBJECT ( RADIOBUTTON( :this ) )
+         :Name          := "RadioButton5"
+         :Left          := 26
+         :Top           := 93
+         :Width         := 80
+         :Height        := 15
+         :Caption       := "All quarters"
+         :EventHandler[ "OnClick" ] := "RadioButton5_OnClick"
+         :Create()
+      END
+   END
+
+   WITH OBJECT ( PICTUREBOX( Self ) )
+      WITH OBJECT :Dock
+         :Left          := Self
+         :Right         := Self
+         :Bottom        := Self
+         :Margins       := "0,0,0,0"
+      END
+      :Left             := 0
+      :Top              := 165
+      :Width            := 437
+      :Height           := 50
+      :Type             := "JPG"
+      :ImageName        := "BTRIBBON"
+      :Stretch          := .T.
+      :Create()
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "Button1"
+         WITH OBJECT :Dock
+            :Right      := "PictureBox1"
+            :Margins    := "0,0,12,0"
+         END
+         :Left          := 340
+         :Top           := 12
+         :Width         := 80
+         :Height        := 25
+         :Caption       := "Save"
+         :DefaultButton := .T.
+         :EventHandler[ "OnClick" ] := "Button1_OnClick"
+         :Create()
+      END
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name          := "Button2"
+         :Left          := 12
+         :Top           := 12
+         :Width         := 80
+         :Height        := 25
+         :Caption       := "Help"
+         :Create()
+      END
+   END
+RETURN Self
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+METHOD EditBox1_OnChar( Sender ) CLASS FilterPerQuarter
+RETURN 0
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+METHOD EditBox1_OnVertScroll( Sender ) CLASS FilterPerQuarter
+   LOCAL nAdd := 1
+   IF LoWord( Sender:wParam ) == 1 .AND. VAL( Sender:Caption ) > 1
+      Sender:Caption := XSTR( VAL( Sender:Caption )-1 )
+   ELSEIF LoWord( Sender:wParam ) <= 1 .AND. VAL( Sender:Caption ) < 12
+      Sender:Caption := XSTR( VAL( Sender:Caption )+1 )
+   ENDIF
+RETURN Self
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+METHOD FilterPerQuarter_OnLoad( Sender ) CLASS FilterPerQuarter
+   
+RETURN Self
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+METHOD RadioButton1_OnClick( Sender ) CLASS FilterPerQuarter
+   ::EditBox1:Caption := "1"
+   ::EditBox2:Caption := "3"
+RETURN Self
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+METHOD RadioButton2_OnClick( Sender ) CLASS FilterPerQuarter
+   ::EditBox1:Caption := "4"
+   ::EditBox2:Caption := "6"
+RETURN Self
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+METHOD RadioButton3_OnClick( Sender ) CLASS FilterPerQuarter
+   ::EditBox1:Caption := "7"
+   ::EditBox2:Caption := "9"
+RETURN Self
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+METHOD RadioButton4_OnClick( Sender ) CLASS FilterPerQuarter
+   ::EditBox1:Caption := "10"
+   ::EditBox2:Caption := "12"
+RETURN Self
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+METHOD RadioButton5_OnClick( Sender ) CLASS FilterPerQuarter
+   ::EditBox1:Caption := "1"
+   ::EditBox2:Caption := "12"
+RETURN Self
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+METHOD Button1_OnClick( Sender ) CLASS FilterPerQuarter
+   LOCAL nMonFrom, nMonTo, mFromDt, mToDt, nYear, i, cTemp
+   nMonFrom := VAL(::EditBox1:Caption)
+   nMonTo   := VAL(::EditBox2:Caption)
+   IF nMonFrom < 1 .OR. nMonFrom > 12 .OR. nMonTo > 12
+      ::MessageBox( "Please enter valid month.", "Filter" )
+      RETURN Self
+   ENDIF
+   IF nMonFrom > nMonTo
+      ::MessageBox( "'From' month cannot be greater than 'To' month.", "Filter" )
+      RETURN Self
+   ENDIF
+   ::oEdit:Caption := "From " + XSTR( nMonFrom ) + " To " + XSTR( nMonTo )
+   ::Close()
+RETURN Self
+
