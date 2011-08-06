@@ -517,15 +517,15 @@
                [<add: ADDITIVE>] [<cur: USECURRENT>] [<cust: CUSTOM>] ;
                [<noopt: NOOPTIMIZE>] [<mem: MEMORY, TEMPORARY>] ;
                [<filter: USEFILTER>] [<ex: EXCLUSIVE>] ;
-               [CONSTRAINT <cons>];
-               [TARGET <targ> ] ;
+               [CONSTRAINT <(cons)>];
+               [TARGET <(targ)> ] ;
                [KEY <kkey> ] => ;
          ordCondSet( <"for">, <{for}>, [<.all.>], <{while}>, ;
                      <{eval}>, <every>, RECNO(), <next>, <rec>, ;
                      [<.rest.>], [<.descend.>],, ;
                      [<.add.>], [<.cur.>], [<.cust.>], [<.noopt.>], ;
                      <"while">, [<.mem.>], [<.filter.>], [<.ex.>] ) ;;
-         ordCreate( <(bag)>, <(tag)>, <"key">, <{key}>, [<.unique.>],<"cons">,<"targ"> ,{<(kkey)>})
+         ordCreate( <(bag)>, <(tag)>, <"key">, <{key}>, [<.unique.>],<(cons)>,<(targ)> ,{<(kkey)>})
 
 #command INDEX ON <key> TAG <(tag)> [TO <(bag)>] ;
                [FOR <for>] [WHILE <while>] [NEXT <next>] ;
@@ -535,15 +535,15 @@
                [<add: ADDITIVE>] [<cur: USECURRENT>] [<cust: CUSTOM>] ;
                [<noopt: NOOPTIMIZE>] [<mem: MEMORY, TEMPORARY>] ;
                [<filter: USEFILTER>] [<ex: EXCLUSIVE>]  ;
-               [CONSTRAINT <cons>];
-               [TARGET <targ> ] ;
+               [CONSTRAINT <(cons)>];
+               [TARGET <(targ)> ] ;
                [KEY <kkey> ]=> ;
          ordCondSet( <"for">, <{for}>, [<.all.>], <{while}>, ;
                      <{eval}>, <every>, RECNO(), <next>, <rec>, ;
                      [<.rest.>], [<.descend.>],, ;
                      [<.add.>], [<.cur.>], [<.cust.>], [<.noopt.>], ;
                      <"while">, [<.mem.>], [<.filter.>], [<.ex.>] ) ;;
-         ordCreate( <(bag)>, <(tag)>, <"key">, <{key}>, [<.unique.>],<"cons">,<"targ"> ,{<(kkey)>} )
+         ordCreate( <(bag)>, <(tag)>, <"key">, <{key}>, [<.unique.>],<(cons)>,<(targ)> ,{<(kkey)>} )
 
 #command INDEX ON <key> TO <(file)> [<u: UNIQUE>] => ;
             dbCreateIndex( <(file)>, <"key">, <{key}>, if( <.u.>, .t., NIL ) )

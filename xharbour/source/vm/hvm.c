@@ -344,7 +344,6 @@ extern void hb_filebufInit( void );
 void hb_vmAtInit( HB_INIT_FUNC pFunc, void * cargo )
 {
    PHB_FUNC_LIST pLst;
-
 #if ( ! defined(__BORLANDC__ ) || defined( __EXPORT__ ) )
    if( s_Do_xinit )
    {
@@ -9510,9 +9509,9 @@ static void hb_vmPushVariable( PHB_SYMB pVarSymb )
          * in a current workarea - if it is not a field (FAILURE)
          * then try the memvar variable
          */
-      if( hb_rddFieldGet( pItem, pVarSymb ) != HB_SUCCESS )
+      if( (uiAction = hb_rddFieldGet( pItem, pVarSymb )) != HB_SUCCESS )
       {
-         if( hb_memvarGet( pItem, pVarSymb ) != HB_SUCCESS )
+         if( (uiAction =hb_memvarGet( pItem, pVarSymb ) )!= HB_SUCCESS )
          {
             HB_ITEM_PTR pError;
 
