@@ -560,7 +560,7 @@ CC_CMD      =CL $(CLIBFLAGS) -Fo$@ $**
 CCC_CMD     =CL $(CLIBFLAGS) -TC -Fo$@ $**
 
 CC_CMD_ZIP  =CL\
-	$(OPTFLAGS) /GA /Gs /W3 /nologo /I"$(HBZIP_DIR)\INCLUDE" /I"include" /I"$(CC_DIR)\include"\
+	$(OPTFLAGS) /GA /Gs /W3 /nologo /I"$(HBZIP_DIR)\INCLUDE" /I"include" /I"$(CC_DIR)\include" /TP\
 	/DWIN32 /D_WIN32 /DNDEBUG /D_MBCS /D_LIB\
 	/Fp"$(OBJ_DIR)\hbzip.pch" /Fd"$(OBJ_DIR)\\"\
 	/FD /c /Fo$@ $**
