@@ -607,7 +607,7 @@ RETURN oDoc
 //-----------------------------------------------------------------------------------------------
 METHOD Run( oDoc, oWait ) CLASS VrReport
    LOCAL nHeight, hDC, nSubHeight, nTotHeight, nCount, nPer, nPos, nRow, oData, hCtrl, hData := {=>}
-   LOCAL xValue, cData, oIni, cEntry
+   LOCAL xValue, cData, oIni, cEntry, aRelation, aRelations, cRelation
    
    ::Create()
 
@@ -641,16 +641,25 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
              ENDIF
            
            ELSEIF !EMPTY( hCtrl:ConnectionFile )
-             oData:DataConnector        := SqlConnector( NIL )
-             oData:DataConnector:Server := hCtrl:Server
+             oData:BindingSource        := SqlConnector( NIL )
+             oData:BindingSource:Server := hCtrl:Server
              IF FILE( hCtrl:ConnectionFile )
                 oIni   := IniFile( hCtrl:ConnectionFile )
                 cEntry := oIni:ReadString( "SQL", "OPEN" )
-                oData:DataConnector:ConnectionString := oIni:ReadString( "SQL", cEntry )
+                oData:BindingSource:ConnectionString := oIni:ReadString( "SQL", cEntry )
               ELSE
-                oData:DataConnector:ConnectionString := hCtrl:ConnectionFile
+                oData:BindingSource:ConnectionString := hCtrl:ConnectionFile
              ENDIF
-             oData:DataConnector:Create()
+             
+             TRY
+                oData:BindingSource:Create()
+             CATCH
+                IF oWait != NIL
+                   oWait:Destroy()
+                ENDIF
+                MessageBox( GetActiveWindow(), "Error connecting to SQL server", "VR" )
+                return .f.
+             END
              oData:Create()
           ENDIF
           hData[ hCtrl:Name ] := oData
@@ -665,8 +674,14 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    FOR EACH hCtrl IN ::aComponents
        IF hCtrl:ClsName == "VRDATATABLE"
           cData := hCtrl:Name
-          IF ! EMPTY( hCtrl:RelationTable )
-             hData[cData]:SetRelation( hData[ hCtrl:RelationTable ], hCtrl:RelationExp )
+          IF ! EMPTY( hCtrl:Relation )
+             aRelations := hb_aTokens( hCtrl:Relation, "," )
+             FOR EACH cRelation IN aRelations
+                 aRelation := hb_aTokens( cRelation, "|" )
+                 IF LEN( aRelation ) == 2
+                    (hData[cData]:Alias)->( dbSetRelation( ALLTRIM(aRelation[2]), &("{||"+ALLTRIM(aRelation[1])+"}") ) )
+                 ENDIF
+             NEXT
           ENDIF
        ENDIF
    NEXT

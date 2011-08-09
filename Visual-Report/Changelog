@@ -8,6 +8,13 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2010-08-08
+   * Changed RelationExp to Relation which will contain a COMMA separated string for each relation 
+     which is a PIPE separated string which are 2 elements FIELD and ALIAS i.e.
+     Relation = First|ALIAS, Date|ALIAS2, CustID|CUSTOMERS
+     this will translate into something like this: 
+     SET RELATION TO First INTO ALIAS, Date INTO ALIAS2, CusID INTO CUSTOMERS
+
 2010-07-18
    + Finished DataTable Filter UI
 

@@ -38,8 +38,8 @@ CLASS VrDataTable INHERIT VrObject
    DATA Button           EXPORTED
 
    DATA Order            EXPORTED INIT ""
+   DATA Relation         EXPORTED INIT ""
    DATA RelationTable    EXPORTED INIT ""
-   DATA RelationExp      EXPORTED INIT ""
 
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
@@ -57,8 +57,7 @@ METHOD Init( oParent ) CLASS VrDataTable
       AADD( ::aProperties, { "Alias",            "General"  } )
       AADD( ::aProperties, { "Filter",           "General"  } )
       AADD( ::aProperties, { "BuildFilter",      "General"  } )
-      AADD( ::aProperties, { "RelationTable",    "Relation" } )
-      AADD( ::aProperties, { "RelationExp",      "Relation" } )
+      AADD( ::aProperties, { "Relation",         "Relation" } )
       AADD( ::aProperties, { "Name",             "Object"   } )
       AADD( ::aProperties, { "Driver",           "Object"   } )
       AADD( ::aProperties, { "Order",            "Index"    } )
@@ -138,9 +137,7 @@ METHOD WriteProps( oXmlControl ) CLASS VrDataTable
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Server", NIL, ::Server )
    oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "RelationTable", NIL, ::RelationTable )
-   oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "RelationExp", NIL, ::RelationExp )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Relation", NIL, ::Relation )
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ConnectionFile", NIL, ::ConnectionFile )
    oXmlControl:addBelow( oXmlValue )

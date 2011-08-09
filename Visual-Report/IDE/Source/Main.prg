@@ -898,7 +898,6 @@ METHOD Save( lSaveAs ) CLASS Report
    LOCAL oXmlReport, oXmlProp, hAttr, oXmlSource, oXmlData, oXmlValue, oXmlHeader, oXmlBody, oXmlExtra, oXmlFooter, oRep, oXmlComp
    
    DEFAULT lSaveAs TO .F.
-   view len( oApp:Props:CompObjects )
    
    IF ::FileName == "Untitled.vrt" .OR. lSaveAs
       IF ( cName := ::SaveAs() ) == NIL

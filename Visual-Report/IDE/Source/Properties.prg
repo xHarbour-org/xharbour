@@ -169,7 +169,7 @@ METHOD SetValue( xValue, cCaption ) CLASS PropEditor
    LOCAL oObj, cProp, cProp2, xVal, n, xProp, oItem
    
    oItem := FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
-   IF oItem == NIL
+   IF oItem == NIL .OR. ::ActiveObject == NIL
       RETURN Self
    ENDIF
    ::Application:Report:Modified := .T.
