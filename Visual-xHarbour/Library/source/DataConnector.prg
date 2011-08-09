@@ -92,7 +92,10 @@ METHOD Connect( cConnString ) CLASS SqlConnector
    ::Connected     := .F.
    ::ConnectionID  := 0
    ::Sql           := NIL
-
+   
+   IF VALTYPE( ::Server ) == "C"
+      ::Server := ASCAN( ::EnumServer[1], {|c| UPPER(c)==UPPER(::Server)} )
+   ENDIF
    nServer := ::Server
    IF nServer == 0
       nServer := DetectDBFromDSN( cConnString )
