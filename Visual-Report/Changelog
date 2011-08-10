@@ -8,6 +8,12 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2010-08-09
+   + Added formulas the usage is easy just drop the Formula component and set its value to whatever formula
+     you want. Values can include other Formulas as well TEST->SALARY*@Formula2. Remember to use the @ symbol
+     in front of the Formula component to point at it. DO NOT set @ as the formula name the system does it
+     automatically.
+
 2010-08-08
    * Changed RelationExp to Relation which will contain a COMMA separated string for each relation 
      which is a PIPE separated string which are 2 elements FIELD and ALIAS i.e.

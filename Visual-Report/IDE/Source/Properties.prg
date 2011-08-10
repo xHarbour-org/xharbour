@@ -400,8 +400,6 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
                   IF ::ActiveObject != NIL
                      IF oItem:ColItems[n]:ColType == "DATASOURCE" .AND. !EMPTY( ::ActiveObject:DataSource )
                         cText := ::ActiveObject:DataSource:Name
-                      ELSEIF oItem:ColItems[n]:ColType == "FORMULA"
-                        cText := ::ActiveObject:Formula
                       ELSEIF oItem:ColItems[n]:ColType == "COLUMN"
                         cText := ::ActiveObject:Column
                       ELSEIF oItem:ColItems[n]:ColType IN "GROUPBY"
@@ -782,7 +780,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :ShowDropDown()
                          END
 
-                   CASE cType IN { "DATASOURCE", "FORMULA", "COLUMN", "GROUPBY", "FIELD", "ORDER", "DATADRIVERS", "ADSDATADRIVERS", "RELATIONTABLE" }
+                   CASE cType IN { "DATASOURCE", "COLUMN", "GROUPBY", "FIELD", "ORDER", "DATADRIVERS", "ADSDATADRIVERS", "RELATIONTABLE" }
                         ::ActiveControl := ObjCombo( Self )
                         WITH OBJECT ::ActiveControl
                            :Left   := nLeft-1
@@ -1011,16 +1009,6 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
               ENDIF
           NEXT
           xValue := NIL
-        
-//         ELSEIF UPPER(cProp) == "FORMULA"
-//           aCol[1]:ColType := "FORMULA"
-//           aCol[1]:Value   := { "", { NIL } }
-//           FOR EACH Child IN ::Application:Props:Components:Children
-//               IF Child:Component:ClsName == "Formula"
-//                  AADD( aCol[1]:Value[2], Child:Component )
-//               ENDIF
-//           NEXT
-//           xValue := NIL
         
         ELSEIF UPPER(cProp) == "COLUMN"
           aCol[1]:ColType := "COLUMN"

@@ -32,6 +32,7 @@ CLASS VrLabel INHERIT VrObject
    METHOD Draw()
    METHOD WriteProps()
    METHOD Configure()
+   METHOD GetFormulas()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -155,10 +156,30 @@ METHOD WriteProps( oXmlControl ) CLASS VrLabel
    oXmlControl:addBelow( oXmlFont )
 RETURN Self
 
+METHOD GetFormulas( cText ) CLASS VrLabel
+   LOCAL i, n, cFormula, nFormula
+   WHILE ( n := AT( "@", cText ) ) > 0
+      cFormula := ""
+      FOR i := n+1 TO LEN( cText )
+          IF i == LEN( cText )
+             cFormula += cText[i]
+          ENDIF
+          IF ! ( UPPER(cText[i]) $ "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" ) .OR. i == LEN( cText )
+             IF ( nFormula := ASCAN( ::Parent:aComponents, {|h| UPPER(h:Name) == UPPER(cFormula) } ) ) > 0
+                cText := STRTRAN( cText, "@"+cFormula, ::Parent:aComponents[nFormula]:Value,,, 1 )
+             ENDIF
+             cFormula := ""
+             EXIT
+          ENDIF
+          cFormula += cText[i]
+      NEXT
+   ENDDO
+RETURN cText
+
 METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
    LOCAL nX, nY, hFont, hPrevFont, nWidth, x, y, cUnderline, cText, cItalic, cName := "Text" + AllTrim( Str( ::Parent:nText++ ) )
    LOCAL lAuto, lf := (struct LOGFONT), aTxSize, n
-   
+
    lAuto := ::AutoResize
 
    IF ::Text != NIL
@@ -174,13 +195,15 @@ METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
       ::Parent:oPDF:CreateObject( acObjectTypeText, cName )
       ::PDFCtrl := ::Parent:oPDF:GetObjectByName( cName )
       WITH OBJECT ::PDFCtrl
-         cText := ::Text
+
+         cText := ::GetFormulas( ::Text )
+
          IF ::ClsName == "VRTOTAL" .AND. !EMPTY(::Value)
             IF !EMPTY( ::Value )
                TRY
-                  cText := &(::Value)
+                  cText := &( ::GetFormulas( ::Value ) )
                CATCH
-                  cText := ::Value
+                  cText := ::GetFormulas( ::Value )
                END
             ENDIF
             IF VALTYPE( cText ) == "B"
@@ -197,9 +220,8 @@ METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
             hCtrl:Text := cText
           ELSE
             TRY
-               cText := &(::Text)
+               cText := &cText
              CATCH
-               cText := ::Text
             END
             IF VALTYPE( cText ) == "B"
                cText := EVAL( cText, ::Parent )
