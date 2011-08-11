@@ -135,7 +135,7 @@ METHOD WriteProps( oXmlControl ) CLASS VrDataTable
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Driver", NIL, ::Driver )
    oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Server", NIL, ::Server )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Server", NIL, XSTR(::Server) )
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Relation", NIL, ::Relation )
    oXmlControl:addBelow( oXmlValue )

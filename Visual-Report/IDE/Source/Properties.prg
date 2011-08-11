@@ -689,6 +689,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                                                      IF oUI != NIL .AND. oUI:Result==IDOK
                                                         ::ActiveObject:Filter := oUI:cFilter
                                                         ::ActiveObject:BuildFilter := oUI:BuildFilter
+                                                        ::ResetProperties(,,.T.)
                                                      ENDIF
                                                      RETURN NIL
                                                    >
@@ -700,6 +701,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                                                      IF oUI != NIL .AND. oUI:Result==IDOK
                                                         ::ActiveObject:Filter := oUI:cFilter
                                                         ::ActiveObject:BuildFilter := oUI:BuildFilter
+                                                        ::ResetProperties(,,.T.)
                                                      ENDIF
                                                      RETURN NIL
                                                    >

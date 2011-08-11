@@ -643,7 +643,7 @@ METHOD BuildFilterExp() CLASS FilterUI
                  ELSEIF cExpSel IN {FC_PERQUARTER}
                    ::BuildFilter += "|"+cExp
                    aExp  := hb_aTokens( oPanel:oGet1:Caption )
-                   cExp := 'MONTH(DATE())>='+aExp[2]+'.AND.MONTH(DATE())<='+aExp[4]
+                   cExp := 'MONTH('+cField+')>='+aExp[2]+'.AND.MONTH('+cField+')<='+aExp[4]
                  ELSE
                    ::BuildFilter += "|"+DTOS(oPanel:oGet1:Date)
                    IF oPanel:oGet2:Visible

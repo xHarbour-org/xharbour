@@ -658,6 +658,9 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
                    oWait:Destroy()
                 ENDIF
                 MessageBox( GetActiveWindow(), "Error connecting to SQL server", "VR" )
+                hb_gcall(.t.)
+                HEVAL( hData, {|cKey,o| IIF( o:IsOpen, o:Close(),)} )
+                ::End()
                 return .f.
              END
              oData:Create()
@@ -1054,7 +1057,12 @@ METHOD OK_OnClick() CLASS VrAskLater
    cExpSel := ::ComboBox1:GetSelString()
    cField  := ::cField
 
-   IF cType $ "CM"
+   IF cType == "A"
+      cField := "TRIM("+::cField+"[1])"
+      cExp1 := ValToPrg( cExp1 )
+      cExp2 := ValToPrg( cExp2 )
+    
+    ELSE   IF cType $ "CM"
       cField := "TRIM("+::cField+")"
       cExp1 := ValToPrg( cExp1 )
       cExp2 := ValToPrg( cExp2 )
@@ -1075,7 +1083,7 @@ METHOD OK_OnClick() CLASS VrAskLater
          ENDIF
        ELSEIF cExpSel IN {FC_PERQUARTER}
          aExp  := hb_aTokens( ::oGet1:Caption )
-         cExp1 := 'MONTH(DATE())>='+aExp[2]+'.AND.MONTH(DATE())<='+aExp[4]
+         cExp1 := 'MONTH('+cField+')>='+aExp[2]+'.AND.MONTH('+cField+')<='+aExp[4]
        ELSE
          cExp1 := 'STOD( "' + DTOS(::oGet1:Date) + '" )'
          cExp2 := 'STOD( "' + DTOS(::oGet2:Date) + '" )'

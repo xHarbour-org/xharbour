@@ -164,9 +164,16 @@ METHOD GetFormulas( cText ) CLASS VrLabel
           IF i == LEN( cText )
              cFormula += cText[i]
           ENDIF
-          IF ! ( UPPER(cText[i]) $ "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" ) .OR. i == LEN( cText )
+          IF ! ( UPPER(cText[i]) $ "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_" ) .OR. i == LEN( cText )
              IF ( nFormula := ASCAN( ::Parent:aComponents, {|h| UPPER(h:Name) == UPPER(cFormula) } ) ) > 0
-                cText := STRTRAN( cText, "@"+cFormula, ::Parent:aComponents[nFormula]:Value,,, 1 )
+                IF "@"+cFormula IN ::Parent:aComponents[nFormula]:Value
+                   cText := STRTRAN( cText, "@"+cFormula, "RECURSION DETECTED" )
+                 ELSE
+                   cText := STRTRAN( cText, "@"+cFormula, ::Parent:aComponents[nFormula]:Value,,, 1 )
+                ENDIF
+              ELSE
+                // we remove the pointer to @cFormula so it can stop processing
+                cText := STRTRAN( cText, "@"+cFormula, "Formula not found "+cFormula )
              ENDIF
              cFormula := ""
              EXIT
