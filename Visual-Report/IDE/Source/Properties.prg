@@ -124,8 +124,10 @@ RETURN Self
 
 //---------------------------------------------------------------------------------------------------
 METHOD OnSize( n, x, y ) CLASS PropEditor
-   ::Columns[1][1] := Int(::ClientWidth/2)-11
-   ::Columns[2][1] := Int(::ClientWidth/2)-7
+   LOCAL nPer := ::Application:IniFile:ReadInteger( "Properties", "ValuePercentage", 50 )
+   LOCAL nWidth := (::ClientWidth*(100-nPer))/100
+   ::Columns[1][1] := Int(nWidth)-11
+   ::Columns[2][1] := ::ClientWidth - ::Columns[1][1] - 19
    ::InvalidateRect(,.f.)
 RETURN NIL
 

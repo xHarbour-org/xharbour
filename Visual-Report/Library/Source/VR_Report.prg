@@ -1062,13 +1062,15 @@ METHOD OK_OnClick() CLASS VrAskLater
       cExp1 := ValToPrg( cExp1 )
       cExp2 := ValToPrg( cExp2 )
     
-    ELSE   IF cType $ "CM"
+    ELSEIF cType $ "CM"
       cField := "TRIM("+::cField+")"
       cExp1 := ValToPrg( cExp1 )
       cExp2 := ValToPrg( cExp2 )
+
     ELSEIF cType == "N"
       cExp1 := ValToPrg( VAL( cExp1 ) )
       cExp2 := ValToPrg( VAL( cExp2 ) )
+
     ELSEIF cType == "D"
       IF cExpSel IN {FC_INLAST, FC_NOTINLAST}
          aExp  := hb_aTokens( ::oGet1:Caption )

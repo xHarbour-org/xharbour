@@ -892,21 +892,24 @@ METHOD Generate( oCtrl, oXmlNode ) CLASS Report
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD Save( lSaveAs ) CLASS Report
+METHOD Save( lSaveAs, cTemp ) CLASS Report
    LOCAL cHrb, cName, n, nHeight, cBuffer, aCtrls, i, pHrb, xhbPath, aCtrl
-   LOCAL oFile
+   LOCAL oFile, cFile
    LOCAL oXmlReport, oXmlProp, hAttr, oXmlSource, oXmlData, oXmlValue, oXmlHeader, oXmlBody, oXmlExtra, oXmlFooter, oRep, oXmlComp
    
+   cFile := cTemp
+   DEFAULT cFile TO ::FileName
+
    DEFAULT lSaveAs TO .F.
    
-   IF ::FileName == "Untitled.vrt" .OR. lSaveAs
-      IF ( cName := ::SaveAs() ) == NIL
-         RETURN .F.
+   IF cTemp == NIL
+      IF ::FileName == "Untitled.vrt" .OR. lSaveAs
+         IF ( cName := ::SaveAs() ) == NIL
+            RETURN .F.
+         ENDIF
+         cFile := ::FileName := cName
       ENDIF
-      ::FileName := cName
    ENDIF
-
-   ::Modified := .F.
 
    ::oXMLDoc := TXmlDocument():new()
       oXmlReport := TXmlNode():new( , "Report" )
@@ -920,7 +923,7 @@ METHOD Save( lSaveAs ) CLASS Report
          ENDIF
       
          oXmlProp := TXmlNode():new( , "Properties" )
-            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, ::FileName )
+            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, cFile )
             oXmlProp:addBelow( oXmlSource )
             oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "RepHeaderHeight", NIL, XSTR( oApp:Props:RepHeader:ClientHeight ) )
             oXmlProp:addBelow( oXmlSource )
@@ -1025,14 +1028,17 @@ METHOD Save( lSaveAs ) CLASS Report
       ENDIF
 
    ::oXMLDoc:oRoot:addBelow( oXmlReport )
-   ::oXMLDoc:Write( ::FileName, MXML_STYLE_INDENT | MXML_STYLE_THREESPACES )
+   ::oXMLDoc:Write( cFile, MXML_STYLE_INDENT | MXML_STYLE_THREESPACES )
    oApp:Props:RunBttn:Enabled    := .T.
+   IF cTemp == NIL
+      ::Modified := .F.
+   ENDIF
 RETURN .T.
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Run() CLASS Report
-   LOCAL oWait, oRep, lRun
-   IF ::Save()
+   LOCAL oWait, oRep, lRun, cTemp := GetTempPath() + "vrr.xml"
+   IF ::Save(, cTemp )
       oWait := oApp:MainForm:MessageWait( "Generating Report. Please wait...", "Visual Report", .T. )
       oRep  := VrReport()
       
@@ -1041,6 +1047,7 @@ METHOD Run() CLASS Report
       IF lRun
          oRep:Preview()
       ENDIF
+      FERASE( cTemp )
    ENDIF
 RETURN Self
 
