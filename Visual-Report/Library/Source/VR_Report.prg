@@ -1513,3 +1513,112 @@ METHOD Button1_OnClick( Sender ) CLASS FilterPerQuarter
    ::Close()
 RETURN Self
 
+//----------------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS IsInTheLast INHERIT Dialog
+   DATA Text     EXPORTED
+   DATA aOptions EXPORTED
+   DATA nNum     EXPORTED
+   DATA cSel     EXPORTED
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+   METHOD OK_OnClick()
+   METHOD Help_OnClick()
+ENDCLASS
+
+METHOD Init( oParent, cText, aOptions ) CLASS IsInTheLast
+   Super:Init( oParent )
+
+   ::Width      := 300
+   ::Height     := 200
+   ::Caption    := "VR Filter"
+   ::Modal      := .T.
+   ::Center     := .T.
+   ::AutoClose  := .T.
+   ::Text       := cText
+   ::TopMost    := .T.
+   ::aOptions   := aOptions
+   ::Icon       := "AVR"
+   ::MaximizeBox:= .F.
+   ::MinimizeBox:= .F.
+   ::Create()
+
+RETURN Self
+
+METHOD OnInitDialog() CLASS IsInTheLast
+   WITH OBJECT ( PictureBox( Self ) )
+      :Name      := "BottomRibbon"
+      WITH OBJECT :Dock
+         :Left   := Self
+         :Right  := Self
+         :Bottom := Self
+      END
+      :Left      := 0
+      :Top       := 415
+      :Width     := 844
+      :Height    := 50
+      :Type      := "JPG"
+      :ImageName := "BTRIBBON"
+      :Stretch   := .T.
+      :Create()
+      WITH OBJECT ( Button( :this ) )
+         :Caption   := "Help"
+         :ID        := IDOK
+         :Left      := 10
+         :Top       := 12
+         :Width     := 80
+         :Height    := 25
+         :Action    := {||::Help_OnClick()}
+         :Create()
+      END
+      WITH OBJECT ( Button( :this ) )
+         :Caption   := "OK"
+         :Left      := :Parent:Width - 85
+         :Top       := 12
+         :Width     := 80
+         :Height    := 25
+         :DefaultButton := .T.
+         :Action    := {||::OK_OnClick()}
+         :Create()
+      END
+   END
+   
+   WITH OBJECT ( GroupBox( Self ) )
+      :Caption   := ::Text    
+      :Left      := 15
+      :Top       := 15
+      :Width     := ::ClientWidth-30
+      :Height    := 90
+      :Create()
+      WITH OBJECT ( EditBox( :this ) )
+         :Caption   := "1"
+         :Number    := .T.
+         :Left      := 15
+         :Top       := 40
+         :Width     := 100
+         :Alignment :=  3
+         :Create()
+      END
+      WITH OBJECT ( ComboBox( :this ) )
+         :Left      := 120
+         :Top       := 40
+         :Width     := 130
+         :Create()
+         AEVAL( ::aOptions, {|c| :AddItem(c) } )
+         :SetCurSel(1)
+      END
+   END
+   ::EditBox1:SetFocus()
+RETURN 0
+
+METHOD OK_OnClick() CLASS IsInTheLast
+   ::nNum := ::EditBox1:Caption
+   ::cSel := ::ComboBox1:GetSelString()
+   ::Close( IDOK )
+RETURN NIL
+
+METHOD Help_OnClick() CLASS IsInTheLast
+RETURN NIL
+
