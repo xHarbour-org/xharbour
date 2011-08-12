@@ -29,23 +29,51 @@ EXTERNAL OnlyLetter  // WinFakt related functions for opening Index files.
    REQUEST HB_GT_NUL_DEFAULT
 
    CLASS VR
+      DATA oDoc EXPORTED
       DATA oRep EXPORTED
+      METHOD Load()
       METHOD Run( cReport )
       METHOD Preview()       INLINE ::oRep:Preview()
       METHOD Print( lUI )    INLINE IIF( ::oRep != NIL .AND. ::oRep:oPDF != NIL, ::oRep:oPDF:Print( "", lUI ), )
-      METHOD Close()         INLINE ::oRep := NIL
+      METHOD Close()         INLINE ::oRep := NIL, ::oDoc := NIL
+      METHOD Property()
    ENDCLASS
 
    METHOD Run( cReport ) CLASS VR
-      LOCAL oDoc
-      ::oRep := VrReport()
-      IF !EMPTY( ::oRep )
-         oDoc := TXmlDocument():New( cReport )
-         IF !EMPTY( oDoc )
-            ::oRep:Run( oDoc )
-         ENDIF
+      IF cReport != NIL
+         ::Load( cReport )
+      ENDIF
+      IF ::oDoc != NIL
+         ::oRep:Run( ::oDoc )
       ENDIF
    RETURN Self
+   
+   METHOD Load( cReport ) CLASS VR
+      ::oRep := VrReport()
+      ::oDoc := NIL
+      IF !EMPTY( ::oRep )
+         ::oDoc := TXmlDocument():New( cReport )
+         ::oRep:PrepareArrays( ::oDoc )
+      ENDIF
+   RETURN Self
+
+   METHOD Property( cName, cProp, xValue )
+      LOCAL aPanel, n, hObj, xRet, aPanels := {::oRep:aBody,::oRep:aRepHeader,::oRep:aHeader,::oRep:aFooter,::oRep:aRepFooter,::oRep:aExtraPage,::oRep:aComponents}
+      FOR EACH aPanel IN aPanels
+          IF ( n := ASCAN( aPanel, {|h| UPPER(h:Name) == UPPER(cName) } ) ) > 0
+             hObj := aPanel[n]
+             xRet := hObj
+             IF cProp != NIL
+                xRet := hObj[cProp]
+                IF xValue != NIL
+                   aPanel[n][cProp] := xValue
+                ENDIF
+             ENDIF
+             EXIT
+          ENDIF
+      NEXT
+   RETURN xRet
+
 #else
 
 #include "vxh.ch"

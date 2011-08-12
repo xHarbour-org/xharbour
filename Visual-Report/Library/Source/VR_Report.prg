@@ -611,7 +611,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    
    ::Create()
 
-   IF oDoc != NIL
+   IF oDoc != NIL .AND. ::hProps == NIL
       ::PrepareArrays( oDoc )
    ENDIF
 
