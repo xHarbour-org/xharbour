@@ -210,8 +210,10 @@ METHOD EndPage() CLASS VrReport
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
-METHOD Preview() CLASS VrReport
-   LOCAL oPv := VrPreview( Self )
+METHOD Preview( oApp ) CLASS VrReport
+   LOCAL oPv
+   DEFAULT oApp TO __GetApplication()
+   oPv := VrPreview( Self, oApp )
    oPv:Create()
    ::oPDF:Destroy()
 RETURN Self
@@ -791,9 +793,9 @@ ENDCLASS
 
 //------------------------------------------------------------------------------------------
 
-METHOD Init( oReport ) CLASS VrPreview
+METHOD Init( oReport, oApp ) CLASS VrPreview
    ::Report := oReport
-   ::Super:Init( __GetApplication():MainForm )
+   ::Super:Init( oApp:MainForm )
    ::Modal      := .T.
    ::Top        := 300
    ::Width      := 800
