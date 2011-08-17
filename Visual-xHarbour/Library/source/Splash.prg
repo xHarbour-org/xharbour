@@ -109,7 +109,7 @@ RETURN 0
 //-------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------
 
-CLASS MsgWait
+CLASS MessageWait
    DATA hWnd            EXPORTED
    DATA xPosition       PROTECTED INIT 0
    DATA pCallBackPtr    PROTECTED
@@ -124,12 +124,12 @@ CLASS MsgWait
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------------------------------------
-METHOD Init( cText, cTitle, lProgress ) CLASS MsgWait
+METHOD Init( cText, cTitle, lProgress ) CLASS MessageWait
    ::hWnd := __MsgWait( cText, cTitle, lProgress )
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------
-METHOD SetPosition() CLASS MsgWait
+METHOD SetPosition() CLASS MessageWait
    LOCAL hTheme, aBar, aRect := _GetClientRect( ::hWnd )
    LOCAL hDC := GetDC( ::hWnd )
    aBar := {4,aRect[4]-24,aRect[3]-4,aRect[4]-4}

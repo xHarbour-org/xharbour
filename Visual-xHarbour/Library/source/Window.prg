@@ -4165,7 +4165,7 @@ RETURN Self
 METHOD MessageWait( cText, cTitle, lProgress ) CLASS Window
    LOCAL oWnd, oLabel
    DEFAULT lProgress TO .F.
-   oWnd := MsgWait( cText, cTitle, lProgress )
+   oWnd := MessageWait( cText, cTitle, lProgress )
 RETURN oWnd
 
 //----------------------------------------------------------------------------------------------------
