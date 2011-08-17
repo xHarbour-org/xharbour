@@ -44,19 +44,15 @@ static oApp
 
    METHOD Run( cReport, lShowProgress, cText, cTitle ) CLASS VR
       LOCAL oWait, oForm
-      DEFAULT lShowProgress TO .T.
+      DEFAULT lShowProgress TO .F.
       IF cReport != NIL
          ::Load( cReport )
       ENDIF
       IF ::oDoc != NIL
          IF lShowProgress
-            //DEFAULT cText  TO "Generating Report. Please wait..."
-            //DEFAULT cTitle TO "Visual Report"
-            //oForm := __VrForm( NIL )
-            //oForm:SetInstance( "VRMsgWait", Self ):Init( GetActiveWindow() )
-
-            //::oApp  := oForm:Application
-            //oWait := oForm:MessageWait( cText, cTitle, .T. )
+            DEFAULT cText  TO "Generating Report. Please wait..."
+            DEFAULT cTitle TO "Visual Report"
+            oWait := MsgWait( cText, cTitle, .T. )
          ENDIF
          ::oRep:Run( ::oDoc, oWait )
          IF lShowProgress .AND. oWait != NIL
@@ -90,30 +86,6 @@ static oApp
           ENDIF
       NEXT
    RETURN xRet
-
-   CLASS __VRMsgWait INHERIT Application
-      METHOD Init() CONSTRUCTOR
-   ENDCLASS
-   
-   METHOD Init( oParent, aParameters ) CLASS __VRMsgWait
-      ::Super:Init( oParent, aParameters )
-      ::Create()
-   RETURN Self
-
-   CLASS __VrForm INHERIT WinForm
-      METHOD Init() CONSTRUCTOR
-   ENDCLASS
-
-   METHOD Init( oParent, aParameters ) CLASS __VrForm
-      ::Super:Init( oParent, aParameters )
-      ::Left                 := 10
-      ::Top                  := 10
-      ::Width                := 300
-      ::Height               := 300
-      ::Caption              := ""
-      ::Create()
-      ::Show()
-   RETURN Self
 
 #else
 
