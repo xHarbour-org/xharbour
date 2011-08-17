@@ -46,6 +46,7 @@ static nPageNumber
 #define  acCommandToolPageHome         53773
 
 CLASS VrReport INHERIT VrObject
+   DATA oForm           EXPORTED
    DATA PrintHeader     EXPORTED  INIT .T.
    DATA PrintRepHeader  EXPORTED  INIT .T.
    DATA PrintFooter     EXPORTED  INIT .T.
@@ -155,12 +156,12 @@ METHOD InitPDF() CLASS VrReport
    LOCAL oForm
    IF ::oPDF == NIL
       #ifdef VRDLL
-         oForm := WinForm():SetInstance( "VReport" ):Init( GetActiveWindow(), {} )
-         oForm:Create()
+         ::oForm := WinForm():SetInstance( "VReport" ):Init( GetActiveWindow(), {} )
+         ::oForm:Create()
       #else
-         oForm := ::Application:MainForm
+         ::oForm := ::Application:MainForm
       #endif
-      ::oPDF := ActiveX( oForm )
+      ::oPDF := ActiveX( ::oForm )
       ::oPDF:SetChildren := .F.
 
       ::oPDF:ProgID := "PDFCreactiveX.PDFCreactiveX"
@@ -210,10 +211,8 @@ METHOD EndPage() CLASS VrReport
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
-METHOD Preview( oApp ) CLASS VrReport
-   LOCAL oPv
-   DEFAULT oApp TO __GetApplication()
-   oPv := VrPreview( Self, oApp )
+METHOD Preview() CLASS VrReport
+   LOCAL oPv := VrPreview( Self )
    oPv:Create()
    ::oPDF:Destroy()
 RETURN Self
@@ -793,9 +792,9 @@ ENDCLASS
 
 //------------------------------------------------------------------------------------------
 
-METHOD Init( oReport, oApp ) CLASS VrPreview
+METHOD Init( oReport ) CLASS VrPreview
    ::Report := oReport
-   ::Super:Init( oApp:MainForm )
+   ::Super:Init( oReport:oForm )
    ::Modal      := .T.
    ::Top        := 300
    ::Width      := 800

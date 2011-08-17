@@ -18,7 +18,7 @@ EXTERNAL OnlyLetter  // WinFakt related functions for opening Index files.
 static oApp
 
 #ifdef VRDLL
-
+   static oWait
    #include "vxh.ch"
    #include "debug.ch"
 
@@ -39,7 +39,7 @@ static oApp
       METHOD Run( cReport )
       METHOD Preview()       INLINE ::oRep:Preview( ::oApp )
       METHOD Print( lUI )    INLINE IIF( ::oRep != NIL .AND. ::oRep:oPDF != NIL, ::oRep:oPDF:Print( "", lUI ), )
-      METHOD Close()         INLINE ::oRep := NIL, ::oDoc := NIL
+      METHOD Close()
       METHOD Property()
    ENDCLASS
 
@@ -53,16 +53,27 @@ static oApp
          IF lShowProgress
             DEFAULT cText  TO "Generating Report. Please wait..."
             DEFAULT cTitle TO "Visual Report"
-            oWait := MsgWait( cText, cTitle, .T. )
+            oWait := MessageWait( cText, cTitle, .T. )
          ENDIF
          ::oRep:Run( ::oDoc, oWait )
          IF lShowProgress .AND. oWait != NIL
-            oWait:Destroy()
+            ShowWindow( oWait:hWnd, SW_HIDE )
          ENDIF
       ENDIF
    RETURN Self
    
+   METHOD Close() CLASS VR
+      ::oRep := NIL
+      ::oDoc := NIL
+      IF oWait != NIL
+         oWait:Destroy()
+      ENDIF
+   RETURN Self
+
    METHOD Load( cReport ) CLASS VR
+      IF oWait != NIL
+         oWait:Destroy()
+      ENDIF
       ::oRep := VrReport()
       ::oDoc := NIL
       IF !EMPTY( ::oRep )

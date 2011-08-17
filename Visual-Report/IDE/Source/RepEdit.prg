@@ -168,6 +168,11 @@ METHOD CreateControl( hControl, x, y, oParent ) CLASS RepEdit
       oControl:Left := x 
       oControl:Top  := y 
       oControl:Create()
+      IF VALTYPE( hControl ) == "C" .AND. UPPER( hControl ) == "VRLABEL"
+         oControl:Font:FaceName  := "Arial"
+         oControl:Font:PointSize := 10
+      ENDIF
+
 
       IF VALTYPE( hControl ) == "H"
          FOR n := 1 TO LEN( oControl:aProperties )
@@ -212,6 +217,7 @@ METHOD OnLButtonDown( nwParam, x, y ) CLASS RepEdit
          RETURN NIL
       ENDIF
       ::CreateControl( "Vr"+::Application:Props:ToolBox:ActiveItem:Caption, x, y )
+      
     ELSEIF ::Type != "ExtraPage"
       pt := (struct POINT)
       pt:x := x
