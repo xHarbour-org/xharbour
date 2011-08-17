@@ -4162,30 +4162,10 @@ METHOD MoveWindow( x, y, w, h, lRep ) CLASS Window
 RETURN Self
 //---------------------------------------------------------------------------------------------
 
-METHOD MessageWait( cText, cTitle, lProgress, nTimeOut, nColor ) CLASS Window
+METHOD MessageWait( cText, cTitle, lProgress ) CLASS Window
    LOCAL oWnd, oLabel
    DEFAULT lProgress TO .F.
-   oWnd := MsgWait( Self, lProgress )
-   oWnd:Cargo := cText
-   oWnd:Style := WS_POPUP | WS_DLGFRAME | WS_THICKFRAME | WS_CAPTION
-   IF !EMPTY( cTitle )
-//    oWnd:Style   := oWnd:Style | WS_CAPTION
-      oWnd:Caption := cTitle
-   ENDIF
-   oWnd:TopMost := .T.
-   oWnd:xLeft   := 0
-   oWnd:xTop    := 0
-   oWnd:xWidth  := Max(oWnd:Drawing:GetTextExtentPoint32( cText )[1] + 70, 300)
-
-   oWnd:xHeight := 85
-   oWnd:Center  := .T.
-   oWnd:Create()
-   oWnd:Show()
-
-   IF nTimeOut != NIL
-      oWnd:SetTimer(1, nTimeOut)
-      oWnd:OnWMTimer := {|o|o:Destroy(), oWnd:KillTimer(1)}
-   ENDIF
+   oWnd := MsgWait( cText, cTitle, lProgress )
 RETURN oWnd
 
 //----------------------------------------------------------------------------------------------------
@@ -4394,77 +4374,6 @@ FUNCTION __Evaluate( iVar, Param1, Param2, Param3, nRet )
 
 RETURN nRet
 
-//---------------------------------------------------------------------------------------------
-
-CLASS MsgWait FROM WinForm
-   DATA lProgress EXPORTED INIT .F.
-   DATA lXP       PROTECTED
-
-   DATA xPosition       PROTECTED INIT 0
-   ACCESS Position      INLINE ::xPosition PERSISTENT
-   ASSIGN Position( n ) INLINE ::xPosition := n, ::SetPosition()
-
-   METHOD Init() CONSTRUCTOR
-   METHOD OnEraseBkGnd()
-   METHOD Create()
-   METHOD SetPosition()
-ENDCLASS
-
-METHOD Init( oParent, lProgress ) CLASS MsgWait
-   ::__xCtrlName := "MessageWait"
-   ::lXP := ::Application:IsThemedXP .AND. ::Theming
-   ::lProgress := lProgress
-RETURN ::Super:Init( oParent )
-
-METHOD Create() CLASS MsgWait
-   LOCAL aAlign
-   IF ::lProgress
-      ::Height += 24
-   ENDIF
-   ::Super:Create()
-RETURN Self
-
-METHOD SetPosition() CLASS MsgWait
-   LOCAL hTheme, aBar, aRect := _GetClientRect( ::hWnd )
-   LOCAL hDC := GetDC( ::hWnd )
-   aBar := {4,::ClientHeight-24,::ClientWidth-4,::ClientHeight-4}
-   hTheme := OpenThemeData(,"PROGRESS")
-   DrawThemeBackground( hTheme, hDC, PP_BAR, 0, aBar )
-   aBar[1]+=1
-   aBar[2]+=1
-   aBar[3]-=1
-   aBar[4]-=1
-
-   aBar[3] := aBar[1] + (((aBar[3] - aBar[1]) * ::xPosition )/100)
-   DrawThemeBackground( hTheme, hDC, PP_CHUNK, 0, aBar )
-
-   CloseThemeData( hTheme )
-   ReleaseDC( ::hWnd, hDC )
-RETURN Self
-   
-METHOD OnEraseBkGnd( hDC ) CLASS MsgWait
-   LOCAL hTheme, aBar, aRect := _GetClientRect( ::hWnd )
-   _FillRect( hDC, aRect, GetSysColorBrush( COLOR_BTNFACE ) )
-   aRect[1]+=5
-   aRect[2]+=5
-   aRect[3]-=5
-   aRect[4]-=5
-   IF ::lProgress
-      aRect[4]-= 26
-
-      IF ::lXP
-         hTheme := OpenThemeData(,"PROGRESS")
-         aBar := {4,::ClientHeight-24,::ClientWidth-4,::ClientHeight-4}
-         DrawThemeBackground( hTheme, hDC, PP_BAR, 0, aBar )
-         CloseThemeData( hTheme )
-         ::Application:DoEvents()
-      ENDIF
-
-   ENDIF
-   SetBkMode( hDC, TRANSPARENT )
-   SelectObject( hDC, ::Font:Handle )
-   _DrawText( hDC, ::Cargo, @aRect, DT_LEFT+DT_CENTER+DT_VCENTER+DT_SINGLELINE )
-RETURN 1
 //---------------------------------------------------------------------------------------------
 
 CLASS __WindowDock
