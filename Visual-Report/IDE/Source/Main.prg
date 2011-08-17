@@ -22,13 +22,14 @@ static oApp
    #include "vxh.ch"
    #include "debug.ch"
 
-   #pragma BEGINDUMP
-      #define CLS_Name "Winfakt.VisualReport.1"
-      #define CLS_ID "{A46F16F6-709C-4F6A-A0DA-38335CF8DD16}"
-      #include "OleServer.h"
-   #pragma ENDDUMP
-
-   REQUEST HB_GT_NUL_DEFAULT
+   #ifndef __BuildAsOLE
+    #pragma BEGINDUMP
+       #define CLS_Name "WinFakt.VisualReport.1"
+       #define CLS_ID "{A46F16F6-709C-4F6A-A0DA-38335CF8DD16}"
+       #include "OleServer.h"
+    #pragma ENDDUMP
+    REQUEST HB_GT_NUL_DEFAULT
+   #endif
 
    CLASS VR
       DATA oDoc EXPORTED
