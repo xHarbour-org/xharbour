@@ -156,8 +156,8 @@ FUNCTION __MsgWait( cText, cTitle, lProgress )
    DEFAULT lProgress TO .F.
 
    hDC       := GetDC(0)
-   nHeight   := 85
-   nWidth    := Max( _GetTextExtentPoint32( hDC, cText )[1] + 70, 300)
+   nHeight   := 55
+   nWidth    := Max( _GetTextExtentPoint32( hDC, cText )[1] + 40, 270)
    ReleaseDC(0,hDC)
 
    IF lProgress
