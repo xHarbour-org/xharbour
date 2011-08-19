@@ -895,8 +895,8 @@ FUNCTION PageNumber(); RETURN nPageNumber
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-FUNCTION AskLater( cField, cType )
-RETURN VrAskLater( NIL, cField, cType ):cResult
+FUNCTION AskLater( cField, cType, nCond )
+RETURN VrAskLater( NIL, cField, cType, nCond ):cResult
 
 CLASS VrAskLater INHERIT Dialog
    DATA cResult EXPORTED INIT ""
@@ -904,6 +904,7 @@ CLASS VrAskLater INHERIT Dialog
    DATA cType   EXPORTED
    DATA oCond   EXPORTED
    DATA cEdit   EXPORTED
+   DATA nCond   EXPORTED
    DATA oGet1, oGet2
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
@@ -912,7 +913,7 @@ CLASS VrAskLater INHERIT Dialog
    METHOD ComboBox1_OnCBNSelEndOk()
 ENDCLASS
 
-METHOD Init( oParent, cField, cType ) CLASS VrAskLater
+METHOD Init( oParent, cField, cType, nCond ) CLASS VrAskLater
    ::Super:Init( oParent )
    ::Modal       := .T.
    ::Left        := 11
@@ -924,6 +925,7 @@ METHOD Init( oParent, cField, cType ) CLASS VrAskLater
    ::TopMost     := .T.
    ::MaximizeBox := .F.
    ::MinimizeBox := .F.
+   ::nCond       := nCond
    ::Icon        := "AVR"
    ::cField      := cField
    ::cType       := cType
@@ -1002,7 +1004,7 @@ METHOD OnInitDialog() CLASS VrAskLater
          :EventHandler[ "OnCBNSelEndOk" ] := "ComboBox1_OnCBNSelEndOk"
          :Create()
          AEVAL( ::oCond:aCond_&cType, {|a| :AddItem(a[1]) } )
-         :SetCurSel(1)
+         :SetCurSel( ::nCond )
       END
       
       WITH OBJECT EditBox( :this )

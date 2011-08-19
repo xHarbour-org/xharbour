@@ -78,107 +78,112 @@ METHOD OnInitDialog() CLASS FilterUI
    ::Width   := 634
    ::Height  := 375
    ::Caption := "Create Filter Expression"
-   WITH OBJECT ( GROUPBOX( Self ) )
-      WITH OBJECT :Dock
-         :Left              := Self
-         :Top               := Self
-         :Right             := Self
-         :Margins           := "20,15,20,0"
-      END
-      :Left                 := 20
-      :Top                  := 15
-      :Width                := 590
-      :Height               := 62
-      :Caption              := "Setting"
-      :ForeColor            := 0
+   WITH OBJECT ( TabStrip( Self ) )
+      :Multiline   := .F.
+      :Dock:Margin := 1
+      :Dock:Left   := :Parent
+      :Dock:Top    := :Parent
+      :Dock:Right  := :Parent
+      :Dock:Bottom := :Parent
       :Create()
-      WITH OBJECT ( RADIOBUTTON( :this ) )
-         :Name              := "ANDRadio"
-         :Left              := 24
-         :Top               := 27
-         :Width             := 289
-         :Height            := 15
-         :Caption           := "Match ALL of the conditions"
-         :InitialState      := 1
+      WITH OBJECT ( Tabpage( :this ) )
+         :Caption   := "Conditions"
          :Create()
-      END //RADIOBUTTON
+         WITH OBJECT ( GROUPBOX( :this ) )
+            :Dock:Left            := :this
+            :Dock:Top             := :this
+            :Dock:Right           := :this
+            :Dock:Margins         := "20,15,20,0"
+            :Left                 := 20
+            :Top                  := 15
+            :Width                := 590
+            :Height               := 62
+            :Caption              := "Setting"
+            :ForeColor            := 0
+            :Create()
+            WITH OBJECT ( RADIOBUTTON( :this ) )
+               :Name              := "ANDRadio"
+               :Left              := 24
+               :Top               := 27
+               :Width             := 289
+               :Height            := 15
+               :Caption           := "Match ALL of the conditions"
+               :InitialState      := 1
+               :Create()
+            END //RADIOBUTTON
 
-      WITH OBJECT ( RADIOBUTTON( :this ) )
-         :Name              := "ORRadio"
-         :Left              := 325
-         :Top               := 27
-         :Width             := 259
-         :Height            := 15
-         :Caption           := "Match ANY of the conditions"
-         :Create()
-      END
-   END
+            WITH OBJECT ( RADIOBUTTON( :this ) )
+               :Name              := "ORRadio"
+               :Left              := 325
+               :Top               := 27
+               :Width             := 259
+               :Height            := 15
+               :Caption           := "Match ANY of the conditions"
+               :Create()
+            END
+         END
 
-   WITH OBJECT ( GROUPBOX( Self ) )
-      :Name                 := "ConditionGroupBox"
-      :Dock:Margins         := "20,86,20,40"
-      :Left                 := 20
-      :Top                  := 86
-      :Width                := 590
-      :Height               := 224
-      :Caption              := "Conditions"
-      :ForeColor            := 0
-      :Create()
-      :DockToParent()
-      WITH OBJECT ( PANEL( :this ) )
-         :Name              := "ConditionPanel"
-         :Dock:Margins      := "2,14,2,2"
-         :VertScroll        := .T.
-         :Create()
-         :DockToParent()
-      END
-   END
-   WITH OBJECT ( BUTTON( Self ) )
-      :Name                 := "FilterBrowse"
-      WITH OBJECT :Dock
-         :Left              := Self
-         :Bottom            := Self
-         :Margins           := "20,0,20,10"
-      END
-      :Left                 := 530
-      :Top                  := 315
-      :Width                := 80
-      :Height               := 25
-      :Enabled              := .F.
-      :Caption              := "Test Filter"
-      :EventHandler[ "OnClick" ] := "FilterBrowse_OnClick"
-      :Create()
-   END
+         WITH OBJECT ( GROUPBOX( :this ) )
+            :Name                 := "ConditionGroupBox"
+            :Dock:Margins         := "20,86,20,40"
+            :Left                 := 20
+            :Top                  := 86
+            :Width                := 590
+            :Height               := 224
+            :Caption              := "Conditions"
+            :ForeColor            := 0
+            :Create()
+            :DockToParent()
+            WITH OBJECT ( PANEL( :this ) )
+               :Name              := "ConditionPanel"
+               :Dock:Margins      := "2,14,2,2"
+               :VertScroll        := .T.
+               :Create()
+               :DockToParent()
+            END
+         END
+         WITH OBJECT ( BUTTON( :this ) )
+            :Name                 := "FilterBrowse"
+            :Dock:Left            := :this
+            :Dock:Bottom          := :this
+            :Dock:Margins         := "20,0,20,10"
+            :Left                 := 530
+            :Top                  := 315
+            :Width                := 80
+            :Height               := 25
+            :Enabled              := .F.
+            :Caption              := "Test Filter"
+            :EventHandler[ "OnClick" ] := "FilterBrowse_OnClick"
+            :Create()
+         END
 
-   WITH OBJECT ( BUTTON( Self ) )
-      :Name                 := "Cancel"
-      WITH OBJECT :Dock
-         :Right                := Self
-         :Bottom               := Self
-         :Margins              := "0,0,20,10"
+         WITH OBJECT ( BUTTON( :this ) )
+            :Name                 := "Cancel"
+            :Dock:Right           := :this
+            :Dock:Bottom          := :this
+            :Dock:Margins         := "0,0,20,10"
+            :Left                 := 530
+            :Top                  := 315
+            :Width                := 80
+            :Height               := 25
+            :Caption              := "Cancel"
+            :EventHandler[ "OnClick" ] := "Cancel_OnClick"
+            :Create()
+         END
+         WITH OBJECT ( BUTTON( :this ) )
+            :Name                 := "OK"
+            :Dock:Right           := "Cancel"
+            :Dock:Bottom          := :this
+            :Dock:Margins         := "0,0,5,10"
+            :Left                 := 530
+            :Top                  := 315
+            :Width                := 80
+            :Height               := 25
+            :Caption              := "OK"
+            :EventHandler[ "OnClick" ] := "OK_OnClick"
+            :Create()
+         END
       END
-      :Left                 := 530
-      :Top                  := 315
-      :Width                := 80
-      :Height               := 25
-      :Caption              := "Cancel"
-      :EventHandler[ "OnClick" ] := "Cancel_OnClick"
-      :Create()
-   END
-   WITH OBJECT ( BUTTON( Self ) )
-      :Name                 := "OK"
-      WITH OBJECT :Dock
-         :Right                := "Cancel"
-         :Bottom               := Self
-         :Margins              := "0,0,5,10"
-      END
-      :Left                 := 530
-      :Top                  := 315
-      :Width                := 80
-      :Height               := 25
-      :Caption              := "OK"
-      :EventHandler[ "OnClick" ] := "OK_OnClick"
-      :Create()
    END
    ::AddConditionButton_OnClick()
    ::CenterWindow()
@@ -659,7 +664,7 @@ METHOD BuildFilterExp() CLASS FilterUI
              ENDIF
 
              IF ATAIL( oPanel:Children ):Checked
-                ::cFilter += '~AskLater( "'+cFldSel+'","'+cType+'")~'
+                ::cFilter += '~AskLater( "'+cFldSel+'","'+cType+'",'+xStr(nSel2)+')~'
               ELSE
                 bExp := ::oCond:aCond_&cType[nSel2][2]
                 ::cFilter += EVAL( bExp, cField, cExp, cExp2 )
