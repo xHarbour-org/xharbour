@@ -90,9 +90,9 @@ METHOD OnInitDialog() CLASS FilterUI
          :Caption   := "Conditions"
          :Create()
          WITH OBJECT ( GROUPBOX( :this ) )
-            :Dock:Left            := :this
-            :Dock:Top             := :this
-            :Dock:Right           := :this
+            :Dock:Left            := :Parent
+            :Dock:Top             := :Parent
+            :Dock:Right           := :Parent
             :Dock:Margins         := "20,15,20,0"
             :Left                 := 20
             :Top                  := 15
@@ -138,14 +138,15 @@ METHOD OnInitDialog() CLASS FilterUI
                :Name              := "ConditionPanel"
                :Dock:Margins      := "2,14,2,2"
                :VertScroll        := .T.
+               :BackColor         := RGB(255,255,255)
                :Create()
                :DockToParent()
             END
          END
          WITH OBJECT ( BUTTON( :this ) )
             :Name                 := "FilterBrowse"
-            :Dock:Left            := :this
-            :Dock:Bottom          := :this
+            :Dock:Left            := :Parent
+            :Dock:Bottom          := :Parent
             :Dock:Margins         := "20,0,20,10"
             :Left                 := 530
             :Top                  := 315
@@ -159,8 +160,8 @@ METHOD OnInitDialog() CLASS FilterUI
 
          WITH OBJECT ( BUTTON( :this ) )
             :Name                 := "Cancel"
-            :Dock:Right           := :this
-            :Dock:Bottom          := :this
+            :Dock:Right           := :Parent
+            :Dock:Bottom          := :Parent
             :Dock:Margins         := "0,0,20,10"
             :Left                 := 530
             :Top                  := 315
@@ -173,7 +174,7 @@ METHOD OnInitDialog() CLASS FilterUI
          WITH OBJECT ( BUTTON( :this ) )
             :Name                 := "OK"
             :Dock:Right           := "Cancel"
-            :Dock:Bottom          := :this
+            :Dock:Bottom          := :Parent
             :Dock:Margins         := "0,0,5,10"
             :Left                 := 530
             :Top                  := 315
@@ -181,6 +182,17 @@ METHOD OnInitDialog() CLASS FilterUI
             :Height               := 25
             :Caption              := "OK"
             :EventHandler[ "OnClick" ] := "OK_OnClick"
+            :Create()
+         END
+      END
+      WITH OBJECT ( Tabpage( :this ) )
+         :Caption   := "AskMeLater"
+         :Create()
+         WITH OBJECT ListBox( :this )
+            :Left   := 15
+            :Top    := 15
+            :Width  := 200
+            :Height := 200
             :Create()
          END
       END
@@ -239,6 +251,7 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
          :Dock:Right     := :Parent
          :Dock:Top       := IIF( LEN( ::ConditionPanel:Children ) > 0, ATAIL( ::ConditionPanel:Children ), :Parent )
          :Dock:TopMargin := 4
+         :BackColor      := RGB(255,255,255)
          :Create()
          :SetRedraw( .F. )
 
