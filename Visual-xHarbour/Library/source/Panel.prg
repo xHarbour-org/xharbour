@@ -24,7 +24,7 @@ CLASS Panel FROM Control
    DATA ImageIndex PROTECTED
    DATA oLastFocus EXPORTED
    DATA Border     EXPORTED INIT .F.
-   DATA Transparent EXPORTED INIT .F.
+   DATA Transparent PUBLISHED INIT .F.
 
    PROPERTY SmallCaption                         READ xSmallCaption WRITE __SetSmallCaption DEFAULT .T. PROTECTED
 
@@ -36,7 +36,18 @@ CLASS Panel FROM Control
    METHOD OnLButtonUp() INLINE IIF( HGetPos( ::EventHandler, "OnClick" ) != 0, ::Form:&( ::EventHandler[ "OnClick" ] )( Self ), )
 
    METHOD OnSetFocus()// INLINE IIF( !EMPTY( ::Children ), (::Children[1]:SetFocus(),0), NIL )
+   METHOD OnEraseBkGnd()
 ENDCLASS
+
+METHOD OnEraseBkGnd( hDC ) CLASS Panel
+   IF ::Transparent
+      VIEW ::__hBrush
+      IF ::__hBrush != NIL
+         _FillRect( hDC, _GetClientRect( ::hWnd ), ::__hBrush )
+         RETURN 1
+      ENDIF
+   ENDIF
+RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 
