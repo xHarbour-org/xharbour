@@ -186,13 +186,84 @@ METHOD OnInitDialog() CLASS FilterUI
          END
       END
       WITH OBJECT ( Tabpage( :this ) )
-         :Caption   := "AskMeLater"
+         :Caption   := '"Ask Me Later" settings'
          :Create()
          WITH OBJECT ListBox( :this )
-            :Left   := 15
-            :Top    := 15
-            :Width  := 200
-            :Height := 200
+            :Caption := "Ask me later filters"
+            :SmallCaption := .T.
+            :Left    := 15
+            :Top     := 15
+            :Width   := 200
+            :Height  := 200
+            :Dock:Top := :Parent
+            :Dock:Bottom := :Parent
+            :Dock:Margins := "15"
+            :Create()
+         END
+         WITH OBJECT Label( :this )
+            :Caption := "Title"
+            :Width   := 100
+            :Left    := 215
+            :Top     :=  17
+            :RightAlign:= .T.
+            :Create()
+         END
+         WITH OBJECT EditBox( :this )
+            :Caption := ""
+            :Left    := 320
+            :Width   := 280
+            :Top     :=  15
+            :Dock:Left  := "Label1"
+            :Dock:Right := :Parent
+            :Dock:Margins := "5,0,15,0"
+            :Create()
+         END
+         WITH OBJECT Label( :this )
+            :Caption := "Group caption"
+            :Width   := 100
+            :Left    := 215
+            :Top     :=  41
+            :RightAlign:= .T.
+            :Create()
+         END
+         WITH OBJECT EditBox( :this )
+            :Caption := ""
+            :Left    := 320
+            :Width   := 280
+            :Top     :=  39
+            :Dock:Left  := "Label2"
+            :Dock:Right := :Parent
+            :Dock:Margins := "5,0,15,0"
+            :Create()
+         END
+         WITH OBJECT Label( :this )
+            :Caption := "Search browse settings:"
+            :Width   := 200
+            :Left    := 230
+            :Top     :=  80
+            :Create()
+         END
+         WITH OBJECT Button( :this )
+            :Caption := "Test"
+            :Width   := 70
+            :Left    := 230
+            :Top     := 80
+            :Height  := 20
+            :Dock:Right := :Parent
+            :Dock:Margins := "0,0,15,0"
+            :Create()
+         END
+         WITH OBJECT EditBox( :this )
+            :Left         := 230
+            :Width        := 370
+            :Height       := 300
+            :Top          :=  80
+            :MultiLine    := .T.
+            :Dock:Top     := "Label3"
+            :Dock:Left    := "ListBox1"
+            :Dock:Bottom  := :Parent
+            :Dock:Right   := :Parent
+            :Dock:Margins := "10,5,15,15"
             :Create()
          END
       END
