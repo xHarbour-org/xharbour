@@ -1624,4 +1624,4 @@ typedef struct {;
   DWORD          dwContextHelpId;
   MSGBOXCALLBACK lpfnMsgBoxCallback;
   DWORD          dwLanguageId;
-} MSGBOXPARAMS, *PMSGBOXPARAMS;
+} VOID,         *PMSGBOXPARAMS;
