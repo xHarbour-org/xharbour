@@ -1613,15 +1613,3 @@ typedef struct LVTILEVIEWINFO {;
     RECT  rcLabelMargin;
 } LVTILEVIEWINFO, *PLVTILEVIEWINFO;
 
-typedef struct {;
-  UINT           cbSize;
-  HWND           hwndOwner;
-  HINSTANCE      hInstance;
-  LPCTSTR        lpszText;
-  LPCTSTR        lpszCaption;
-  DWORD          dwStyle;
-  LPCTSTR        lpszIcon;
-  DWORD          dwContextHelpId;
-  MSGBOXCALLBACK lpfnMsgBoxCallback;
-  DWORD          dwLanguageId;
-} VOID,         *PMSGBOXPARAMS;
