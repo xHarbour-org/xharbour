@@ -1621,7 +1621,7 @@ typedef struct {;
   LPCTSTR        lpszCaption;
   DWORD          dwStyle;
   LPCTSTR        lpszIcon;
-  DWORD_PTR      dwContextHelpId;
+  DWORD          dwContextHelpId;
   MSGBOXCALLBACK lpfnMsgBoxCallback;
   DWORD          dwLanguageId;
 } MSGBOXPARAMS, *PMSGBOXPARAMS;
