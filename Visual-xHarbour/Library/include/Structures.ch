@@ -1612,3 +1612,16 @@ typedef struct LVTILEVIEWINFO {;
     int   cLines;
     RECT  rcLabelMargin;
 } LVTILEVIEWINFO, *PLVTILEVIEWINFO;
+
+typedef struct {;
+  UINT           cbSize;
+  HWND           hwndOwner;
+  HINSTANCE      hInstance;
+  LPCTSTR        lpszText;
+  LPCTSTR        lpszCaption;
+  DWORD          dwStyle;
+  LPCTSTR        lpszIcon;
+  DWORD_PTR      dwContextHelpId;
+  MSGBOXCALLBACK lpfnMsgBoxCallback;
+  DWORD          dwLanguageId;
+} MSGBOXPARAMS, *PMSGBOXPARAMS;
