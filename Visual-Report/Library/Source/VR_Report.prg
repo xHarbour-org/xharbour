@@ -895,16 +895,19 @@ FUNCTION PageNumber(); RETURN nPageNumber
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-FUNCTION AskLater( cField, cType, nCond )
-RETURN VrAskLater( NIL, cField, cType, nCond ):cResult
+FUNCTION AskLater( cField, cType, nCond, cTitle, cGroupTitle, cSearch )
+RETURN VrAskLater( NIL, cField, cType, nCond, cTitle, cGroupTitle, cSearch ):cResult
 
 CLASS VrAskLater INHERIT Dialog
-   DATA cResult EXPORTED INIT ""
-   DATA cField  EXPORTED INIT ""
-   DATA cType   EXPORTED
-   DATA oCond   EXPORTED
-   DATA cEdit   EXPORTED
-   DATA nCond   EXPORTED
+   DATA cResult     EXPORTED INIT ""
+   DATA cField      EXPORTED INIT ""
+   DATA cType       EXPORTED
+   DATA oCond       EXPORTED
+   DATA cEdit       EXPORTED
+   DATA nCond       EXPORTED
+   DATA cTitle      EXPORTED
+   DATA cGroupTitle EXPORTED
+   DATA cSearch     EXPORTED
    DATA oGet1, oGet2
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
@@ -913,7 +916,7 @@ CLASS VrAskLater INHERIT Dialog
    METHOD ComboBox1_OnCBNSelEndOk()
 ENDCLASS
 
-METHOD Init( oParent, cField, cType, nCond ) CLASS VrAskLater
+METHOD Init( oParent, cField, cType, nCond, cTitle, cGroupTitle, cSearch ) CLASS VrAskLater
    ::Super:Init( oParent )
    ::Modal       := .T.
    ::Left        := 11
@@ -926,6 +929,11 @@ METHOD Init( oParent, cField, cType, nCond ) CLASS VrAskLater
    ::MaximizeBox := .F.
    ::MinimizeBox := .F.
    ::nCond       := nCond
+   
+   ::Caption     := cTitle
+   
+   ::cGroupTitle := cGroupTitle
+   ::cSearch     := cSearch
    ::Icon        := "AVR"
    ::cField      := cField
    ::cType       := cType
@@ -983,6 +991,7 @@ METHOD OnInitDialog() CLASS VrAskLater
    END
 
    WITH OBJECT ( GroupBox( Self ) )
+      :Caption      := ::cGroupTitle
       :Dock:Margins := "20,15,20,70"
       :Left         := 20
       :Top          := 15

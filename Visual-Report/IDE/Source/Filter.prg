@@ -31,7 +31,7 @@ CLASS FilterUI INHERIT Dialog
    DATA cFilter      EXPORTED INIT ""
    DATA BuildFilter  EXPORTED INIT {}
    DATA oDataTable   EXPORTED
-   
+   DATA aAskExtras   EXPORTED INIT {}
    DATA oCond        EXPORTED
 
    METHOD Init() CONSTRUCTOR
@@ -50,6 +50,7 @@ CLASS FilterUI INHERIT Dialog
    METHOD Cancel_OnClick()
    METHOD SetDateEdit()
    METHOD CheckBox_OnClick()
+   METHOD AskLaterList_OnSelChange()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------
@@ -189,50 +190,54 @@ METHOD OnInitDialog() CLASS FilterUI
          :Caption   := '"Ask Me Later" settings'
          :Create()
          WITH OBJECT ListBox( :this )
-            :Caption := "Ask me later filters"
+            :Name         := "AskLaterList"
+            :Caption      := "Ask me later filters"
             :SmallCaption := .T.
-            :Left    := 15
-            :Top     := 15
-            :Width   := 200
-            :Height  := 200
-            :Dock:Top := :Parent
-            :Dock:Bottom := :Parent
+            :Left         := 15
+            :Top          := 15
+            :Width        := 200
+            :Height       := 200
+            :Dock:Top     := :Parent
+            :Dock:Bottom  := :Parent
             :Dock:Margins := "15"
+            :EventHandler[ "OnSelChange" ] := "AskLaterList_OnSelChange"
             :Create()
          END
          WITH OBJECT Label( :this )
-            :Caption := "Title"
-            :Width   := 100
-            :Left    := 215
-            :Top     :=  17
-            :RightAlign:= .T.
+            :Caption    := "Title"
+            :Width      := 100
+            :Left       := 215
+            :Top        :=  17
+            :RightAlign := .T.
             :Create()
          END
          WITH OBJECT EditBox( :this )
-            :Caption := ""
-            :Left    := 320
-            :Width   := 280
-            :Top     :=  15
-            :Dock:Left  := "Label1"
-            :Dock:Right := :Parent
+            :Name         := "WinTitle"
+            :Caption      := ""
+            :Left         := 320
+            :Width        := 280
+            :Top          :=  15
+            :Dock:Left    := "Label1"
+            :Dock:Right   := :Parent
             :Dock:Margins := "5,0,15,0"
             :Create()
          END
          WITH OBJECT Label( :this )
-            :Caption := "Group caption"
-            :Width   := 100
-            :Left    := 215
-            :Top     :=  41
-            :RightAlign:= .T.
+            :Caption    := "Group Title"
+            :Width      := 100
+            :Left       := 215
+            :Top        :=  41
+            :RightAlign := .T.
             :Create()
          END
          WITH OBJECT EditBox( :this )
-            :Caption := ""
-            :Left    := 320
-            :Width   := 280
-            :Top     :=  39
-            :Dock:Left  := "Label2"
-            :Dock:Right := :Parent
+            :Name         := "GroupTitle"
+            :Caption      := ""
+            :Left         := 320
+            :Width        := 280
+            :Top          :=  39
+            :Dock:Left    := "Label2"
+            :Dock:Right   := :Parent
             :Dock:Margins := "5,0,15,0"
             :Create()
          END
@@ -244,12 +249,12 @@ METHOD OnInitDialog() CLASS FilterUI
             :Create()
          END
          WITH OBJECT Button( :this )
-            :Caption := "Test"
-            :Width   := 70
-            :Left    := 230
-            :Top     := 80
-            :Height  := 20
-            :Dock:Right := :Parent
+            :Caption      := "Test"
+            :Width        := 70
+            :Left         := 230
+            :Top          := 80
+            :Height       := 20
+            :Dock:Right   := :Parent
             :Dock:Margins := "0,0,15,0"
             :Create()
          END
@@ -260,7 +265,7 @@ METHOD OnInitDialog() CLASS FilterUI
             :Top          :=  80
             :MultiLine    := .T.
             :Dock:Top     := "Label3"
-            :Dock:Left    := "ListBox1"
+            :Dock:Left    := "AskLaterList"
             :Dock:Bottom  := :Parent
             :Dock:Right   := :Parent
             :Dock:Margins := "10,5,15,15"
@@ -441,9 +446,10 @@ METHOD AddButtons( oParent, lEnabled ) CLASS FilterUI
 
    IF ! lEnabled
       WITH OBJECT ( CheckBox( oParent ) )
-         :ToolTip:Text         := "Ask Later"
-         :Left                 := 560
-         :Top                  := 5
+         :ToolTip:Text  := "Ask Later"
+         :Left          := 560
+         :Top           := 5
+         :Enabled       := .F.
          :EventHandler[ "OnClick" ] := "CheckBox_OnClick"
          :Create()
       END
@@ -457,6 +463,7 @@ METHOD FieldComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
       Sender:Parent:Children[2]:Enabled := .T.
       Sender:Parent:Children[ LEN(Sender:Parent:Children)-2 ]:Enabled := .T.
       Sender:Parent:Children[ LEN(Sender:Parent:Children)-1 ]:Enabled := .T.
+      Sender:Parent:Children[ LEN(Sender:Parent:Children)-0 ]:Enabled := .T.
    ENDIF
    Sender:Parent:Children[2]:ResetContent()
    AEVAL( ::oCond:aCond_&cType, {|a| Sender:Parent:Children[2]:AddItem(a[1]) } )
@@ -478,10 +485,30 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 METHOD CheckBox_OnClick( Sender ) CLASS FilterUI
-   LOCAL oPanel := Sender:Parent
+   LOCAL n, oPanel := Sender:Parent
    oPanel:Children[ LEN(oPanel:Children)-2 ]:Enabled := .T.
    oPanel:Children[ LEN(oPanel:Children)-1 ]:Enabled := .T.
+   n := ASCAN( Sender:Parent:Parent:Children, {|o| o:hWnd == oPanel:hWnd} )
+   IF Sender:checked
+      ::AskLaterList:AddItem( Sender:Siblings[1]:GetSelString() + " (Condition " + alltrim( str( n ) ) + ")" )
+    ELSE
+      n := ::AskLaterList:FindString( -1, Sender:Siblings[1]:GetSelString() )
+      IF n > 0
+         ::AskLaterList:DeleteString(n)
+      ENDIF
+   ENDIF
 RETURN Self
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+METHOD AskLaterList_OnSelChange( Sender ) CLASS FilterUI
+   LOCAL n := Sender:GetCurSel()
+   ASIZE( ::aAskExtras, n )
+   DEFAULT ::aAskExtras[n] TO ARRAY(2)
+   DEFAULT ::aAskExtras[1][1] TO ""
+   DEFAULT ::aAskExtras[1][2] TO ""
+   ::WinTitle   := ::aAskExtras[1][1]
+   ::GroupTitle := ::aAskExtras[1][2]
+RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 METHOD SetDateEdit( Sender, cType ) CLASS FilterUI
@@ -748,6 +775,7 @@ METHOD BuildFilterExp() CLASS FilterUI
              ENDIF
 
              IF ATAIL( oPanel:Children ):Checked
+                ::BuildFilter += "|"+::aAskExtras[n][1]+"|"+::aAskExtras[n][2]
                 ::cFilter += '~AskLater( "'+cFldSel+'","'+cType+'",'+xStr(nSel2)+')~'
               ELSE
                 bExp := ::oCond:aCond_&cType[nSel2][2]
