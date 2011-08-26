@@ -55,7 +55,7 @@ CLASS ListBox FROM Control
    METHOD AddItem( cText, lSel )           INLINE ::AddString( cText, lSel )
    METHOD SetCurSel(nLine)                 INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SETCURSEL, nLine-1, 0), NIL )
    METHOD SetSel(nLine,lSel)               INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SETSEL, IIF(lSel,1,0), MAKELPARAM(nLine, 0)), NIL )
-   METHOD FindString(nStart,cStr)          INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_FINDSTRING, IFNIL(nStart,-1,nStart), cStr), NIL )
+   METHOD FindString(nStart,cStr)          INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_FINDSTRING, IFNIL(nStart,-1,nStart), cStr)+1, NIL )
    METHOD FindExact(nStart,cStr)           INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_FINDSTRINGEXACT, IFNIL(nStart,-1,nStart), cStr), NIL )
    METHOD GetCount()                       INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETCOUNT, 0, 0), NIL )
    METHOD GetCurSel()                      INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETCURSEL, 0, 0)+1, NIL )
@@ -137,7 +137,7 @@ RETURN NIL
 METHOD InsertString(nLine,cText) CLASS ListBox
    LOCAL n
    IF ::hWnd != NIL
-      ::SendMessage( LB_INSERTSTRING, nLine, cText )
+      ::SendMessage( LB_INSERTSTRING, nLine-1, cText )
       IF ::HorzScroll
          n := ::Drawing:GetTextExtentPoint32( cText )[1]
          IF n > ::__nWidth

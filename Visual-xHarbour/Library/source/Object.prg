@@ -67,7 +67,7 @@ CLASS Object
    ACCESS Form                 INLINE IIF( ::ClsName == "VXH_FORM_IDE" .OR. ::Parent == NIL, Self, ::Parent:Form )
    ACCESS This                 INLINE Self
 
-
+   ACCESS Siblings             INLINE ::Parent:Children
    METHOD HasMessage( cMsg )   INLINE __ObjHasMsg( Self, cMsg )
    METHOD HasProperty()
    METHOD __SetCtrlName()
