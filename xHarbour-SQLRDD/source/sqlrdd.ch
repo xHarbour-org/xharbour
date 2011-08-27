@@ -83,6 +83,7 @@
 #define SYSTEMID_CACHE                15
 #define SYSTEMID_OTERRO               16
 #define SYSTEMID_PERVASIVE            17
+#define SYSTEMID_AZURE                18
 
 #define LASTREC_POS             99999998
 

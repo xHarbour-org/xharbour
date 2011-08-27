@@ -264,6 +264,7 @@ typedef struct _SQLEXAREA
    char updatedMask[MAX_FIELDS]; /* Copy of updateMask in currently prepared UPDATE stmt */
    char specialMask[MAX_FIELDS]; /* Same of updateMask but for special cols (INDKEY_xx and FORKEY_xx) */
    BOOL bIndexTouchedInUpdate;   /* If any index column is affected by UPDATE */
+   BOOL bIsSelect;               /* Table open is an select statement*/
 
 } SQLEXAREA;
 

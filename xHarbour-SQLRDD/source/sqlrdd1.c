@@ -3980,14 +3980,11 @@ HB_CALL_ON_STARTUP_END( _hb_sqlrdd_rdd_init_ )
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup sqlrdd1__InitSymbols
    #pragma startup _hb_sqlrdd_rdd_init_
-#elif defined( HB_MSC_STARTUP )
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_sqlrdd1__InitSymbols = sqlrdd1__InitSymbols;
-   static HB_$INITSYM hb_vm_auto_sqlrdd_rdd_init = _hb_sqlrdd_rdd_init_;
-   #pragma data_seg()
+#elif defined( HB_DATASEG_STARTUP )
+   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( sqlrdd1__InitSymbols) \
+                              HB_DATASEG_FUNC( _hb_sqlrdd_rdd_init_)
+   #include "hbiniseg.h"
+
 #endif
 
 

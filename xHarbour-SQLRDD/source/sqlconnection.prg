@@ -36,7 +36,8 @@ CLASS SR_CONNECTION
 
    DATA cTargetDB, cSystemName, nSystemID, cSystemVers   READONLY
    DATA nFields, aFields, hEnv, hDbc, nRetCode, nVersion READONLY
-
+   // CULIK 18/10/2010 Adicionado para indicar se o indice contem cluster
+   DATA lClustered AS LOGICAL INIT .F. READONLY
    DATA oHashActiveWAs
 
    DATA aTableInfo      INIT { => }
@@ -661,6 +662,8 @@ METHOD DetectTargetDb() CLASS SR_CONNECTION
    Do Case
    Case "ORACLE" $ cTargetDB
       ::nSystemID := SYSTEMID_ORACLE
+   Case ("MICROSOFT" $ cTargetDB .and. "SQL" $ cTargetDB .and. "SERVER" $ cTargetDB .and.( "10.25" $ ::cSystemVers) )
+      ::nSystemID := SYSTEMID_AZURE
    Case "MICROSOFT" $ cTargetDB .and. "SQL" $ cTargetDB .and. "SERVER" $ cTargetDB .and. "6.5" $ ::cSystemVers
       ::nSystemID := SYSTEMID_MSSQL6
    Case ("SQL Server" $ cTargetDB .and. "00.53.0000" $ ::cSystemVers) .or. ("MICROSOFT SQL SERVER" $ cTargetDB)

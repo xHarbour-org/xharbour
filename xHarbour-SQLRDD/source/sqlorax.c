@@ -981,6 +981,7 @@ HB_FUNC(ORACLEPREPARE)
    {
       session->stmtParam = sqlo_prepare( session->dbh, szSql );
       hb_retni( 1 );
+      return;
    }
 
    hb_retni( -1 );

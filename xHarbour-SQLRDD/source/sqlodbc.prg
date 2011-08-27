@@ -400,6 +400,7 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
       SR_SetConnectAttr( hDbc, SQL_ATTR_LONGDATA_COMPAT, SQL_LD_COMPAT_YES )
       Exit
    Case SYSTEMID_MSSQL7
+   Case SYSTEMID_AZURE	
       ::exec( "select cast( @@spid as numeric )", .T., .T., @aRet )
       If len( aRet ) > 0
          ::uSid := val(str(aRet[1,1],8,0))

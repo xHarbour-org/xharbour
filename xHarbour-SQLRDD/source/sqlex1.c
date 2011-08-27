@@ -275,21 +275,38 @@ static PHB_ITEM getMessageItem( PHB_ITEM obj, char * message )
 
 static void createRecodListQuery( SQLEXAREAP thiswa )
 {
+   int ilen;	
+   
    if ( thiswa->sSql )
       memset( thiswa->sSql, 0,  MAX_SQL_QUERY_LEN * sizeof( char ) );
    if( thiswa->ulhDeleted == 0 )
    {
+	  if (thiswa->bIsSelect)
+	  {
 
-      sprintf( thiswa->sSql, "SELECT %s A.%c%s%c \nFROM %s A %s %s %s", thiswa->sLimit1,
+         sprintf( thiswa->sSql, "SELECT %s A.%c%s%c FROM (%s) A %s %s %s", thiswa->sLimit1,
+                             OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa ),
+                             thiswa->szDataFileName,
+                             thiswa->sWhere,
+                             thiswa->sOrderBy,
+                             thiswa->sLimit2 );
+      }                       
+      else 
+      {
+	     sprintf( thiswa->sSql, "SELECT %s A.%c%s%c FROM %s A %s %s %s", thiswa->sLimit1,
                              OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa ),
                              thiswa->sTable,
                              thiswa->sWhere,
                              thiswa->sOrderBy,
                              thiswa->sLimit2 );
+
+      }                       
    }
    else
    {
-      sprintf( thiswa->sSql, "SELECT %s A.%c%s%c, A.%c%s%c \nFROM %s A %s %s %s",
+      if (thiswa->bIsSelect)
+	  {
+         sprintf( thiswa->sSql, "SELECT %s A.%c%s%c, A.%c%s%c FROM (%s) A %s %s %s",
                              thiswa->sLimit1,
                              OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa ),
                              OPEN_QUALIFIER( thiswa ), thiswa->sDeletedName, CLOSE_QUALIFIER( thiswa ),
@@ -298,6 +315,19 @@ static void createRecodListQuery( SQLEXAREAP thiswa )
                              thiswa->sOrderBy,
                              thiswa->sLimit2 );
 
+   }
+      else
+      {
+ 
+         sprintf( thiswa->sSql, "SELECT %s A.%c%s%c, A.%c%s%c FROM %s A %s %s %s",
+                             thiswa->sLimit1,
+                             OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa ),
+                             OPEN_QUALIFIER( thiswa ), thiswa->sDeletedName, CLOSE_QUALIFIER( thiswa ),
+                             thiswa->sTable,
+                             thiswa->sWhere,
+                             thiswa->sOrderBy,
+                             thiswa->sLimit2 );
+      }
    }
 
 }
@@ -349,7 +379,8 @@ void getOrderByExpression( SQLEXAREAP thiswa, BOOL bUseOptimizerHints )
       }
       else
       {
-         sprintf( thiswa->sOrderBy , "\nORDER BY %c%s%c %s", OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa ), ( bDirectionFWD ? "ASC" : "DESC" ) );
+         //sprintf( thiswa->sOrderBy , "\nORDER BY %c%s%c %s", OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa ), ( bDirectionFWD ? "ASC" : "DESC" ) );
+         sprintf( thiswa->sOrderBy , "\nORDER BY A.%c%s%c %s", OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa ), ( bDirectionFWD ? "ASC" : "DESC" ) );
       }
    }
 }
@@ -378,10 +409,19 @@ static HB_ERRCODE getMissingColumn( SQLEXAREAP thiswa, PHB_ITEM pFieldData, LONG
 
       colName      = QualifyName( hb_arrayGetC( pFieldStruct, FIELD_NAME ), thiswa );
 
+      if (thiswa->bIsSelect)
+	  {
+	     sprintf( sSql, "SELECT %c%s%c FROM (%s) WHERE %c%s%c = ?", OPEN_QUALIFIER( thiswa ), colName, CLOSE_QUALIFIER( thiswa ),
+                                                               thiswa->szDataFileName,
+                                                               OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa ) );
+
+      }
+      else
+      {
       sprintf( sSql, "SELECT %c%s%c FROM %s WHERE %c%s%c = ?", OPEN_QUALIFIER( thiswa ), colName, CLOSE_QUALIFIER( thiswa ),
                                                                thiswa->sTable,
                                                                OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa ) );
-
+      }
       hb_xfree( colName );
 
       res = SQLPrepare( thiswa->colStmt[lFieldPosDB - 1], (SQLCHAR *) sSql, SQL_NTS );
@@ -1491,7 +1531,7 @@ HB_ERRCODE getWorkareaParams( SQLEXAREAP thiswa )
       }
       thiswa->bConnVerified = TRUE;
    }
-
+      thiswa->bIsSelect        = getMessageL( thiswa->oWorkArea, "LTABLEISSELECT" ); 
    return HB_SUCCESS;
 }
 
@@ -1929,13 +1969,20 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
 
    // Not found, so let's try the database...
 
-   if( getColumnList( thiswa ) )     // Check if field list has changed and if so
+   if( getColumnList( thiswa )  || thiswa->hStmtBuffer == NULL)     // Check if field list has changed and if so
                                      // creates a new one in thiswa structure
    {
 
       thiswa->bConditionChanged2 = TRUE;     // SEEK statements are no longer valid - column list has changed!
       memset(thiswa->sSqlBuffer , 0 , MAX_SQL_QUERY_LEN / 5  * sizeof( char ) );
+      if (thiswa->bIsSelect)
+	  {
+		  sprintf( thiswa->sSqlBuffer, "SELECT %s FROM (%s) A WHERE A.%c%s%c IN ( ?", thiswa->sFields, thiswa->szDataFileName, OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa ) );
+      }
+      else
+      {
       sprintf( thiswa->sSqlBuffer, "SELECT %s \nFROM %s A \nWHERE A.%c%s%c IN ( ?", thiswa->sFields, thiswa->sTable, OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa ) );
+      }
 
       for ( i = 20; i < (MAX_SQL_QUERY_LEN/5); i++ )
       {
@@ -1962,13 +2009,17 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
          res = SQLFreeStmt( thiswa->hStmtBuffer, SQL_DROP );
          if ( CHECK_SQL_N_OK( res ) )
          {
+	         
             return (HB_FAILURE);
          }
+         
+//         thiswa->hStmtBuffer = NULL;
       }
 
       res = SQLAllocStmt( ( HDBC ) thiswa->hDbc, &(thiswa->hStmtBuffer) );
       if ( CHECK_SQL_N_OK( res ) )
       {
+	  
          return (HB_FAILURE);
       }
 
@@ -1981,8 +2032,11 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
       for ( i = 0; i < pageReadSize; i++ )
       {
          res = SQLBindParameter( thiswa->hStmtBuffer, i+1, SQL_PARAM_INPUT, SQL_C_ULONG, SQL_INTEGER, 15, 0, &(thiswa->lRecordToRetrieve[i]), 0, NULL );
+      
          if ( CHECK_SQL_N_OK( res ) )
          {
+	        //thiswa->hStmtBuffer =NULL;
+            
             return (HB_FAILURE);
          }
       }
@@ -2003,7 +2057,7 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
       odbcErrorDiagRTE( thiswa->hStmtBuffer, "updateRecordBuffer", thiswa->sSqlBuffer, res, __LINE__, __FILE__ );
       SQLCloseCursor( thiswa->hStmtBuffer );
       // culik null the handle
-      thiswa->hStmtBuffer=NULL;
+      //thiswa->hStmtBuffer=NULL;
 
       return (HB_FAILURE);
    }
@@ -2027,6 +2081,8 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
       if( res == SQL_ERROR )
       {
          SQLFreeStmt( thiswa->hStmtBuffer, SQL_DROP );
+         //thiswa->hStmtBuffer =NULL;
+         
          return (HB_FAILURE);
       }
 
@@ -2043,6 +2099,9 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
             if( res == SQL_ERROR )
             {
                SQLFreeStmt( thiswa->hStmtBuffer, SQL_DROP );
+
+               //thiswa->hStmtBuffer =NULL;
+               
                return (HB_FAILURE);
             }
             else
@@ -2141,7 +2200,9 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
 
    //hb_xfree( ( PTR ) bBuffer );
    hb_itemRelease( pKey );
+   
    SQLFreeStmt( thiswa->hStmtBuffer, SQL_CLOSE );
+   thiswa->hStmtBuffer =NULL;
 
    if( res == SQL_NO_DATA_FOUND && iRow == 1 )
    {
@@ -4489,14 +4550,11 @@ HB_CALL_ON_STARTUP_END( _hb_sqlEx_rdd_init_ )
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup sqlEx1__InitSymbols
    #pragma startup _hb_sqlEx_rdd_init_
-#elif defined( HB_MSC_STARTUP )
-   #if defined( HB_OS_WIN_64 )
-      #pragma section( HB_MSC_START_SEGMENT, long, read )
-   #endif
-   #pragma data_seg( HB_MSC_START_SEGMENT )
-   static HB_$INITSYM hb_vm_auto_sqlEx1__InitSymbols = sqlEx1__InitSymbols;
-   static HB_$INITSYM hb_vm_auto_sqlEx_rdd_init = _hb_sqlEx_rdd_init_;
-   #pragma data_seg()
+#elif defined( HB_DATASEG_STARTUP )
+   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( sqlEx1__InitSymbols) \
+                              HB_DATASEG_FUNC( _hb_sqlEx_rdd_init_)
+   #include "hbiniseg.h"
+   
 #endif
 
 HB_FUNC( SR_SETPAGEREADSIZE )

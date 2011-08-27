@@ -8,6 +8,35 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2011-08-26 23:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+   ! source/sqlex.h
+     ! added bIsSelect member to SQLEXAREA structure
+   ! source/sqlex1.c
+     ! fixed createRecodListQuery function to proper generate query when using query in dbusearea function
+     ! fixed getMissingColumn function to proper generate query when using query in dbusearea function
+     ! fixed updateRecordBuffer function to proper generate query when using query in dbusearea function as also to recreate the thiswa->hStmtBuffer member if is null
+     ! updated _hb_sqlEx_rdd_init_ to use same way to register normal rdds with xharbour
+   ! source/sqlorax.c
+     ! added an missing return on ORACLEPREPARE function
+   ! source/sqlrdd0.prg
+     source;sqlodbc.prg
+     ! added test for azure database
+   ! source/sqlconnection.prg
+     ! added lclustered member to class and test for azure database
+   ! source/sqlrdd.ch
+     ! added define for azure database
+   ! source/sqlrdd1.c
+     ! updated _hb_sqlrdd_rdd_init_to use same way to register normal rdds with xharbour
+   ! source/sqlrdd2.prg
+     ! added define for azure database
+     ! fixed reset sequence for postgresql
+   ! source/utils.prg
+     ! added define for azure database
+   ! source/sqlpgs.prg
+     ! added support for postgresql 9.1
+
+
 2011-06-05 18:02 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
    ! source/sqlprototypes.h
      ! added missing prototype for sr_lSerializeArrayAsJson()
