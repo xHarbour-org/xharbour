@@ -31,8 +31,7 @@ CLASS VrDataTable INHERIT VrObject
 
    DATA BackColor        EXPORTED INIT GetSysColor( COLOR_WINDOW )
    DATA ForeColor        EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
-   DATA Filter           EXPORTED INIT ""
-   DATA BuildFilter      EXPORTED INIT ""
+   DATA Filter           EXPORTED
    DATA __ExplorerFilter EXPORTED INIT { { "DataTable *.dbf", "*.dbf" }, { "DataTable *.soc", "*.soc" } }
 
    DATA Button           EXPORTED
@@ -56,7 +55,6 @@ METHOD Init( oParent ) CLASS VrDataTable
       AADD( ::aProperties, { "FileName",         "General"  } )
       AADD( ::aProperties, { "Alias",            "General"  } )
       AADD( ::aProperties, { "Filter",           "General"  } )
-      AADD( ::aProperties, { "BuildFilter",      "General"  } )
       AADD( ::aProperties, { "Relation",         "Relation" } )
       AADD( ::aProperties, { "Name",             "Object"   } )
       AADD( ::aProperties, { "Driver",           "Object"   } )
@@ -128,8 +126,6 @@ METHOD WriteProps( oXmlControl ) CLASS VrDataTable
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Alias", NIL, ::Alias )
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Filter", NIL, ::Filter )
-   oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "BuildFilter", NIL, ::BuildFilter )
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Order", NIL, ::Order )
    oXmlControl:addBelow( oXmlValue )

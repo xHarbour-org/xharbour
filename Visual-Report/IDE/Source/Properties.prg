@@ -670,6 +670,34 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :ShowDropDown()
                          END
 
+                    CASE cType == "FILTEREXP"
+                         ::ActiveControl := Button( Self )
+                         WITH OBJECT ::ActiveControl
+                            :Caption := oItem:ColItems[nCol-1]:Value
+                            :Left    := nLeft-1
+                            :Top     := rc:top
+                            :Width   := ::Columns[ nCol ][ 1 ]+4
+                            :Height  := rc:bottom-rc:top+1
+
+                            :OnWMLButtonUp := {|o,x,y|CheckBtnClickPos(o,x,y) }
+                            :OnWMKillFocus := {|o|o:Destroy() }
+
+                            :Action := <|o,oUI| 
+                                         oUI := FilterUI( ::ActiveObject )
+                                         IF oUI != NIL .AND. oUI:Result==IDOK
+                                            ::ActiveObject:Filter := oUI:BuildFilter
+                                            ::Application:Report:Modified := .T.
+                                         ENDIF
+                                         RETURN NIL
+                                       >
+                            :SetStyle( BS_LEFT )
+                            :Create()
+                            :RemoveWindowTheme()
+                            :SendMessage( WM_LBUTTONDOWN, 0, MAKELPARAM( 2, 2 ) )
+                         END
+                         RETURN 0
+
+
                     CASE cType == "C" .OR. cType == "U" .OR. cType == "IMAGENAME"
                          ::ActiveControl := EditBox( Self )
                          WITH OBJECT ::ActiveControl
@@ -685,28 +713,6 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             IF __ObjHasMsg( ::ActiveObject, "__ExplorerFilter" ) .OR. ::ActiveItem:Caption == "ImageName"
                                IF ::ActiveItem:Caption == "FileName" .OR. ::ActiveItem:Caption == "ImageName"
                                   :ButtonAction := {|o| BrowseForFile( o, Self, ::ActiveObject ) }
-                                ELSEIF cProp == "Filter"
-                                  :ButtonAction := <|o,oUI| 
-                                                     oUI := FilterUI( ::ActiveObject )
-                                                     IF oUI != NIL .AND. oUI:Result==IDOK
-                                                        ::ActiveObject:Filter := oUI:cFilter
-                                                        ::ActiveObject:BuildFilter := oUI:BuildFilter
-                                                        ::ResetProperties(,,.T.)
-                                                     ENDIF
-                                                     RETURN NIL
-                                                   >
-                               ENDIF
-                             ELSEIF cType == "C"
-                               IF cProp == "Filter"
-                                  :ButtonAction := <|o,oUI| 
-                                                     oUI := FilterUI( ::ActiveObject )
-                                                     IF oUI != NIL .AND. oUI:Result==IDOK
-                                                        ::ActiveObject:Filter := oUI:cFilter
-                                                        ::ActiveObject:BuildFilter := oUI:BuildFilter
-                                                        ::ResetProperties(,,.T.)
-                                                     ENDIF
-                                                     RETURN NIL
-                                                   >
                                ENDIF
                             ENDIF
 
@@ -934,9 +940,6 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
    FOR EACH aProperty IN aProperties
        ::Application:Yield()
        cProp  := aProperty[1]
-       IF cProp == "BuildFilter"
-          LOOP
-       ENDIF
        xValue := ::ActiveObject:&cProp
        cType  := VALTYPE( xValue )
        nColor := NIL
@@ -1029,6 +1032,11 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
                  NEXT
               ENDIF
           NEXT
+          xValue := NIL
+
+        ELSEIF UPPER(cProp) == "FILTER"
+          aCol[1]:Value := "Edit Filter"
+          aCol[1]:ColType := "FILTEREXP"
           xValue := NIL
 
         ELSEIF UPPER(cProp) == "DRIVER" .AND. ::ActiveObject:__xCtrlName == "DataTable"
@@ -1434,4 +1442,10 @@ STATIC FUNCTION CompileValue( cVal )
       cVal := &cVal
    ENDIF
 RETURN cVal
+
+STATIC FUNCTION CheckBtnClickPos( o, x, y )
+   IF x < 0 .OR. y < 0 .OR. x > o:ClientWidth .OR. y > o:ClientHeight
+      o:Destroy()
+   ENDIF
+RETURN NIL
 

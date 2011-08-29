@@ -1231,6 +1231,39 @@ FUNCTION CleanFilter( cFilter )
    ENDDO
 RETURN cFilter
 
+FUNCTION BuildFilterExp( hFilter )
+   LOCAL cType, cExp, cExp2, nSel2, cField, cFldSel, cAndOr, hExp, n, cFilter := ""
+   LOCAL bExp, oCond := Conditions( NIL )
+   
+   cAndOr := IIF( hFilter:ANDRadio == "1", " .AND. ", " .OR. " )
+
+   FOR n := 1 TO LEN( hFilter:Expressions )
+       hExp    := hFilter:Expressions[n]
+       cFldSel := hExp:FieldName
+       cField  := hExp:Field
+       nSel2   := hExp:ExpSel
+       cExp    := hExp:Exp1
+       cExp2   := hExp:Exp2
+       cType   := hExp:FieldType
+       
+       IF hExp:AndOr != NIL
+          cAndOr := IIF( hExp:AndOr == 1, " .AND. ", " .OR. " )
+        ELSE
+          IF n > 1
+             cFilter += cAndOr
+          ENDIF
+
+          IF hExp:AskMeLater != NIL
+             cFilter += AskLater( cFldSel, cType, nSel2, hExp:AskMeLater:Title, hExp:AskMeLater:GroupText, hExp:AskMeLater:Search )
+           ELSE
+             bExp := oCond:aCond_&cType[nSel2][2]
+             cFilter += EVAL( bExp, cField, cExp, cExp2 )
+          ENDIF
+       ENDIF
+   NEXT
+   cFilter := STRTRAN( cFilter, "@TODAY", 'CTOD("'+DTOC(DATE())+'")' )
+RETURN cFilter
+
 //----------------------------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------------------------

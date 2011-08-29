@@ -45,12 +45,12 @@ CLASS FilterUI INHERIT Dialog
    METHOD FilterBrowse_OnClick()
    METHOD LoadFieldList()
    METHOD AddButtons()
-   METHOD BuildFilterExp()
    METHOD OK_OnClick()
    METHOD Cancel_OnClick()
    METHOD SetDateEdit()
    METHOD CheckBox_OnClick()
    METHOD AskLaterList_OnSelChange()
+   METHOD GetFilterExp()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------
@@ -73,7 +73,9 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD OnInitDialog() CLASS FilterUI
-   LOCAL aExps, n, i, cExp, aExp
+   LOCAL hFilter, aExps, n, i, aExp, hExp
+   LOCAL cField, cFldSel, nSel1, nSel2, cType, cExp, cExp2
+
    ::Left    := 190
    ::Top     := 20
    ::Width   := 634
@@ -276,28 +278,38 @@ METHOD OnInitDialog() CLASS FilterUI
    ::AddConditionButton_OnClick()
    ::CenterWindow()
    
-   aExps := hb_aTokens( ::oDataTable:BuildFilter, "~" )
-   IF !EMPTY( aExps )
-      IF aExps[1] == "1"
+   hFilter := ::oDataTable:Filter
+   IF VALTYPE( hFilter ) == "H"
+      IF hFilter:ANDRadio == "1"
          ::ANDRadio:SetState( BST_CHECKED )
          ::ORRadio:SetState( BST_UNCHECKED )
        ELSE
          ::ANDRadio:SetState( BST_UNCHECKED )
          ::ORRadio:SetState( BST_CHECKED )
       ENDIF
+      aExps := hFilter:Expressions
       FOR i := 2 TO LEN( aExps )
-          aExp := hb_aTokens( aExps[i], "|" )
-          IF LEN( aExp ) > 1
-             ::ConditionPanel:Children[i-1]:Children[1]:Enabled := .T.
-             ::ConditionPanel:Children[i-1]:Children[1]:SetCurSel( VAL( aExp[2] ) )
-             ::FieldComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i-1]:Children[1] )
+          hExp := aExps[i]
+
+          cField  := hExp:Field     
+          cFldSel := hExp:FieldName 
+          nSel1   := hExp:FieldSel  
+          nSel2   := hExp:ExpSel    
+          cType   := hExp:FieldType 
+          cExp    := hExp:Exp1      
+          cExp2   := hExp:Exp2      
+
+          ::ConditionPanel:Children[i-1]:Children[1]:Enabled := .T.
+          
+          ::ConditionPanel:Children[i-1]:Children[1]:SetCurSel( nSel1 )
+          ::FieldComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i-1]:Children[1] )
              
-             ::ConditionPanel:Children[i-1]:Children[2]:SetCurSel( VAL( aExp[3] ) )
-             IF LEN( aExp ) > 3
-                ::ConditionComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i-1]:Children[2], aExp[4], aExp[5], IIF(LEN(aExp)>=6,aExp[6],), aExp[1] )
-              ELSE
-                ::ConditionComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i-1]:Children[2], aExp[4] )
-             ENDIF
+          ::ConditionPanel:Children[i-1]:Children[2]:SetCurSel( nSel2 )
+
+          IF aExps[i]:AndOr == NIL
+             ::ConditionComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i-1]:Children[2], cType, cExp, cExp2, hExp:AskLater )
+           ELSE
+             ::ConditionComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i-1]:Children[2], aExps[i]:AndOr )
           ENDIF
           IF i < LEN( aExps )
              ::AddConditionButton_OnClick()
@@ -677,7 +689,10 @@ RETURN Self
 //------------------------------------------------------------------------------------------------------------------------------------------
 METHOD FilterBrowse_OnClick( Sender ) CLASS FilterUI
    LOCAL oDlg
-   ::BuildFilterExp()
+   ::GetFilterExp()
+
+   ::cFilter := BuildFilterExp( ::BuildFilter )
+
    WITH OBJECT oDlg := TestFilter( Self )
       :Caption := "Test DataTable Filter"
       :Width   := 600
@@ -689,7 +704,7 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 METHOD OK_OnClick() CLASS FilterUI
-   ::BuildFilterExp()
+   ::GetFilterExp()
    ::Close( IDOK )
 RETURN Self
 
@@ -699,20 +714,28 @@ METHOD Cancel_OnClick() CLASS FilterUI
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
-METHOD BuildFilterExp() CLASS FilterUI
-   LOCAL cAndOr, nNum, cFldSel, nDays, cExpSel, cField, cExp, cExp2, nSel1, nSel2, oPanel, n, cType,  bExp, aExp, xAnd, cAsk
-   ::cFilter := ""
-   cAndOr := IIF( ::ANDRadio:Checked, " .AND. ", " .OR. " )
-   ::BuildFilter := IIF( ::ANDRadio:Checked, "1", "2" )
+
+METHOD GetFilterExp() CLASS FilterUI
+   LOCAL cAndOr, nNum, cFldSel, cExpSel, cField, cExp, cExp2, nSel1, nSel2, oPanel, n, cType, aExp, hExp
+
+   ::BuildFilter := {=>}
+   HSetCaseMatch( ::BuildFilter, .F. )
+
+   ::BuildFilter:ANDRadio := IIF( ::ANDRadio:Checked, "1", "2" )
+   ::BuildFilter:Expressions := {}
    FOR n := 1 TO LEN( ::ConditionPanel:Children )
        oPanel := ::ConditionPanel:Children[n]
        cFldSel := oPanel:Children[1]:GetSelString()
        nSel1   := oPanel:Children[1]:GetCurSel()
        IF !EMPTY( cFldSel )
+
+          hExp := {=>}
+          HSetCaseMatch( hExp, .F. )
+          
           IF LEN( oPanel:Children ) == 4
-             cAndOr := IIF( nSel1 == 1, " .AND. ", " .OR. " )
-             ::BuildFilter += "~"+xStr( nSel1 )
+             hExp:AndOr  := nSel1
            ELSE
+             hExp:AndOr  := NIL
              cExpSel := oPanel:Children[2]:GetSelString()
              nSel2   := oPanel:Children[2]:GetCurSel()
              cType   := ::oDataTable:EditCtrl:FieldType( nSel1 )
@@ -721,31 +744,16 @@ METHOD BuildFilterExp() CLASS FilterUI
 
              cField := ::oDataTable:Alias + "->" + cFldSel
 
-             IF ATAIL( oPanel:Children ):Checked
-                cAsk := "1"
-              ELSE
-                cAsk := "0"
-             ENDIF
-
-             ::BuildFilter += "~"+cAsk+"|"+xStr(nSel1)+"|"+xStr(nSel2)+"|"+cType
-
              IF cType $ "CM"
-
-                ::BuildFilter += "|"+cExp+"|"+cExp2
-
                 cField := "TRIM("+cField+")"
                 cExp  := ValToPrg( cExp  )
                 cExp2 := ValToPrg( cExp2 )
               ELSEIF cType == "N"
-                ::BuildFilter += "|"+cExp+"|"+cExp2
 
                 cExp   := ValToPrg( VAL( cExp ) )
                 cExp2  := ValToPrg( VAL( cExp2 ) )
               ELSEIF cType == "D"
                 IF cExpSel IN {FC_INLAST, FC_NOTINLAST}
-
-                   ::BuildFilter += "|"+cExp
-
                    aExp  := hb_aTokens( oPanel:oGet1:Caption )
                    cExp  := "@TODAY-"
                    nNum  := VAL( aExp[1] )
@@ -757,34 +765,38 @@ METHOD BuildFilterExp() CLASS FilterUI
                       cExp += AllTrim( Str( nNum*30 ) )
                    ENDIF
                  ELSEIF cExpSel IN {FC_PERQUARTER}
-                   ::BuildFilter += "|"+cExp
                    aExp  := hb_aTokens( oPanel:oGet1:Caption )
                    cExp := 'MONTH('+cField+')>='+aExp[2]+'.AND.MONTH('+cField+')<='+aExp[4]
                  ELSE
-                   ::BuildFilter += "|"+DTOS(oPanel:oGet1:Date)
-                   IF oPanel:oGet2:Visible
-                      ::BuildFilter += "|"+DTOS(oPanel:oGet2:Date)
-                   ENDIF
                    cExp  := 'STOD( "' + DTOS(oPanel:oGet1:Date) + '" )'
                    cExp2 := 'STOD( "' + DTOS(oPanel:oGet2:Date) + '" )'
                 ENDIF
              ENDIF
 
-             IF n > 1
-                ::cFilter += cAndOr
-             ENDIF
+             hExp:Field      := cField
+             hExp:FieldName  := cFldSel
+             hExp:FieldSel   := nSel1
+             hExp:ExpSel     := nSel2
+             hExp:FieldType  := cType
+             hExp:Exp1       := cExp
+             hExp:Exp2       := cExp2
+             hExp:AskMeLater := NIL
 
              IF ATAIL( oPanel:Children ):Checked
-                ::BuildFilter += "|"+::aAskExtras[n][1]+"|"+::aAskExtras[n][2]
-                ::cFilter += '~AskLater( "'+cFldSel+'","'+cType+'",'+xStr(nSel2)+')~'
-              ELSE
-                bExp := ::oCond:aCond_&cType[nSel2][2]
-                ::cFilter += EVAL( bExp, cField, cExp, cExp2 )
+                hExp:AskMeLater := {=>}
+                HSetCaseMatch( hExp:AskMeLater, .F. )
+
+                hExp:AskMeLater:Title     := NIL//::aAskExtras[n][1]
+                hExp:AskMeLater:GroupText := NIL//::aAskExtras[n][2]
+                hExp:AskMeLater:Search    := NIL//::aAskExtras[n][3]
              ENDIF
           ENDIF
+
+          AADD( ::BuildFilter:Expressions, hExp )
        ENDIF
    NEXT
 RETURN Self
+
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 METHOD LoadFieldList( oComboBox ) CLASS FilterUI
@@ -814,7 +826,8 @@ METHOD OnInitDialog() CLASS TestFilter
       IF oTable:Driver != "SQLRDD"
          :Alias := oTable:Alias
          :Create()
-         cFilter := CleanFilter( ::Parent:cFilter )
+         cFilter := ::Parent:cFilter //CleanFilter( ::Parent:cFilter )
+         view cFilter
          :SetFilter( &("{||"+cFilter+"}") )
          IF ! EMPTY( oTable:Order )
             :OrdSetFocus( oTable:Order )
