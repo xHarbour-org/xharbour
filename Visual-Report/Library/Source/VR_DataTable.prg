@@ -75,9 +75,6 @@ METHOD Create( lSuper ) CLASS VrDataTable
       ENDIF
       IF :Driver != "SQLRDD"
          :Create()
-         IF ! EMPTY( ::Filter )
-            :SetFilter( &(::Filter) )
-         ENDIF
          IF ! EMPTY( ::Order )
             :OrdSetFocus( ::Order )
          ENDIF
@@ -109,34 +106,60 @@ METHOD Configure() CLASS VrDataTable
          ENDIF
 
          :Create()
-         //IF ! EMPTY( ::Filter )
-         //   :SetFilter( &(::Filter) )
-         //ENDIF
-         //IF ! EMPTY( ::Order )
-         //   :OrdSetFocus( ::Order )
-         //ENDIF
       ENDIF
    END
 RETURN Self
 
-METHOD WriteProps( oXmlControl ) CLASS VrDataTable
-   LOCAL oXmlValue, oXmlFont
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, ::FileName )
-   oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Alias", NIL, ::Alias )
-   oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Filter", NIL, ::Filter )
-   oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Order", NIL, ::Order )
-   oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Driver", NIL, ::Driver )
-   oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Server", NIL, XSTR(::Server) )
-   oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Relation", NIL, ::Relation )
-   oXmlControl:addBelow( oXmlValue )
-   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ConnectionFile", NIL, ::ConnectionFile )
-   oXmlControl:addBelow( oXmlValue )
+METHOD WriteProps( oControl ) CLASS VrDataTable
+   LOCAL oValue, oFilter, hExp, oExp, n, oAsk
+   oValue := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, ::FileName )
+   oControl:addBelow( oValue )
+   oValue := TXmlNode():new( HBXML_TYPE_TAG, "Alias", NIL, ::Alias )
+   oControl:addBelow( oValue )
+   oValue := TXmlNode():new( HBXML_TYPE_TAG, "Order", NIL, ::Order )
+   oControl:addBelow( oValue )
+   oValue := TXmlNode():new( HBXML_TYPE_TAG, "Driver", NIL, ::Driver )
+   oControl:addBelow( oValue )
+   oValue := TXmlNode():new( HBXML_TYPE_TAG, "Server", NIL, XSTR(::Server) )
+   oControl:addBelow( oValue )
+   oValue := TXmlNode():new( HBXML_TYPE_TAG, "Relation", NIL, ::Relation )
+   oControl:addBelow( oValue )
+   oValue := TXmlNode():new( HBXML_TYPE_TAG, "ConnectionFile", NIL, ::ConnectionFile )
+   oControl:addBelow( oValue )
+   IF VALTYPE( ::Filter ) == "H"
+      oFilter := TXmlNode():new( , "Filter" )
+         oValue := TXmlNode():new( HBXML_TYPE_TAG, "ANDRadio", NIL, ::Filter:ANDRadio )
+         oFilter:addBelow( oValue )
+         FOR n := 1 TO LEN( ::Filter:Expressions )
+             oExp := TXmlNode():new( , "Expression"+XSTR(n) )
+                oValue := TXmlNode():new( HBXML_TYPE_TAG, "Field", NIL, ::Filter:Expressions[n]:Field )
+                oExp:addBelow( oValue )
+                oValue := TXmlNode():new( HBXML_TYPE_TAG, "FieldName", NIL, ::Filter:Expressions[n]:FieldName )
+                oExp:addBelow( oValue )
+                oValue := TXmlNode():new( HBXML_TYPE_TAG, "FieldSel", NIL, XSTR( ::Filter:Expressions[n]:FieldSel ) )
+                oExp:addBelow( oValue )
+                oValue := TXmlNode():new( HBXML_TYPE_TAG, "ExpSel", NIL, XSTR( ::Filter:Expressions[n]:ExpSel ) )
+                oExp:addBelow( oValue )
+                oValue := TXmlNode():new( HBXML_TYPE_TAG, "FieldType", NIL, ::Filter:Expressions[n]:FieldType )
+                oExp:addBelow( oValue )
+                oValue := TXmlNode():new( HBXML_TYPE_TAG, "Exp1", NIL, ::Filter:Expressions[n]:Exp1 )
+                oExp:addBelow( oValue )
+                oValue := TXmlNode():new( HBXML_TYPE_TAG, "Exp2", NIL, ::Filter:Expressions[n]:Exp2 )
+                oExp:addBelow( oValue )
+                IF ::Filter:Expressions[n]:AskMeLater != NIL
+                   oAsk := TXmlNode():new( , "AskMeLater" )
+                      oValue := TXmlNode():new( HBXML_TYPE_TAG, "Title", NIL, ::Filter:Expressions[n]:AskMeLater:Title )
+                      oAsk:addBelow( oValue )
+                      oValue := TXmlNode():new( HBXML_TYPE_TAG, "GroupText", NIL, ::Filter:Expressions[n]:AskMeLater:GroupText )
+                      oAsk:addBelow( oValue )
+                      oValue := TXmlNode():new( HBXML_TYPE_TAG, "Search", NIL, ::Filter:Expressions[n]:AskMeLater:Search )
+                      oAsk:addBelow( oValue )
+                   oExp:addBelow( oAsk )
+                ENDIF
+             oFilter:addBelow( oExp )
+         NEXT
+      oControl:addBelow( oFilter )
+   ENDIF
 RETURN Self
 
 #pragma BEGINDUMP

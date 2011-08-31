@@ -29,9 +29,8 @@
 
 CLASS FilterUI INHERIT Dialog
    DATA cFilter      EXPORTED INIT ""
-   DATA BuildFilter  EXPORTED INIT {}
+   DATA BuildFilter  EXPORTED
    DATA oDataTable   EXPORTED
-   DATA aAskExtras   EXPORTED INIT {}
    DATA oCond        EXPORTED
 
    METHOD Init() CONSTRUCTOR
@@ -49,8 +48,8 @@ CLASS FilterUI INHERIT Dialog
    METHOD Cancel_OnClick()
    METHOD SetDateEdit()
    METHOD CheckBox_OnClick()
-   METHOD AskLaterList_OnSelChange()
    METHOD GetFilterExp()
+   METHOD AskSettings_OnClick()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------
@@ -78,207 +77,110 @@ METHOD OnInitDialog() CLASS FilterUI
 
    ::Left    := 190
    ::Top     := 20
-   ::Width   := 634
+   ::Width   := 750
    ::Height  := 375
    ::Caption := "Create Filter Expression"
-   WITH OBJECT ( TabStrip( Self ) )
-      :Multiline   := .F.
-      :Dock:Margin := 1
-      :Dock:Left   := :Parent
-      :Dock:Top    := :Parent
-      :Dock:Right  := :Parent
-      :Dock:Bottom := :Parent
+
+   WITH OBJECT ( GROUPBOX( Self ) )
+      :Dock:Left            := :Parent
+      :Dock:Top             := :Parent
+      :Dock:Right           := :Parent
+      :Dock:Margins         := "20,15,20,0"
+      :Left                 := 20
+      :Top                  := 15
+      :Width                := 590
+      :Height               := 62
+      :Caption              := "Setting"
+      :ForeColor            := 0
       :Create()
-      WITH OBJECT ( Tabpage( :this ) )
-         :Caption   := "Conditions"
+      WITH OBJECT ( RADIOBUTTON( :this ) )
+         :Name              := "ANDRadio"
+         :Left              := 24
+         :Top               := 27
+         :Width             := 289
+         :Height            := 15
+         :Caption           := "Match ALL of the conditions"
+         :InitialState      := 1
          :Create()
-         WITH OBJECT ( GROUPBOX( :this ) )
-            :Dock:Left            := :Parent
-            :Dock:Top             := :Parent
-            :Dock:Right           := :Parent
-            :Dock:Margins         := "20,15,20,0"
-            :Left                 := 20
-            :Top                  := 15
-            :Width                := 590
-            :Height               := 62
-            :Caption              := "Setting"
-            :ForeColor            := 0
-            :Create()
-            WITH OBJECT ( RADIOBUTTON( :this ) )
-               :Name              := "ANDRadio"
-               :Left              := 24
-               :Top               := 27
-               :Width             := 289
-               :Height            := 15
-               :Caption           := "Match ALL of the conditions"
-               :InitialState      := 1
-               :Create()
-            END //RADIOBUTTON
-
-            WITH OBJECT ( RADIOBUTTON( :this ) )
-               :Name              := "ORRadio"
-               :Left              := 325
-               :Top               := 27
-               :Width             := 259
-               :Height            := 15
-               :Caption           := "Match ANY of the conditions"
-               :Create()
-            END
-         END
-
-         WITH OBJECT ( GROUPBOX( :this ) )
-            :Name                 := "ConditionGroupBox"
-            :Dock:Margins         := "20,86,20,40"
-            :Left                 := 20
-            :Top                  := 86
-            :Width                := 590
-            :Height               := 224
-            :Caption              := "Conditions"
-            :ForeColor            := 0
-            :Create()
-            :DockToParent()
-            WITH OBJECT ( PANEL( :this ) )
-               :Name              := "ConditionPanel"
-               :Dock:Margins      := "2,14,2,2"
-               :VertScroll        := .T.
-               :BackColor         := RGB(255,255,255)
-               :Create()
-               :DockToParent()
-            END
-         END
-         WITH OBJECT ( BUTTON( :this ) )
-            :Name                 := "FilterBrowse"
-            :Dock:Left            := :Parent
-            :Dock:Bottom          := :Parent
-            :Dock:Margins         := "20,0,20,10"
-            :Left                 := 530
-            :Top                  := 315
-            :Width                := 80
-            :Height               := 25
-            :Enabled              := .F.
-            :Caption              := "Test Filter"
-            :EventHandler[ "OnClick" ] := "FilterBrowse_OnClick"
-            :Create()
-         END
-
-         WITH OBJECT ( BUTTON( :this ) )
-            :Name                 := "Cancel"
-            :Dock:Right           := :Parent
-            :Dock:Bottom          := :Parent
-            :Dock:Margins         := "0,0,20,10"
-            :Left                 := 530
-            :Top                  := 315
-            :Width                := 80
-            :Height               := 25
-            :Caption              := "Cancel"
-            :EventHandler[ "OnClick" ] := "Cancel_OnClick"
-            :Create()
-         END
-         WITH OBJECT ( BUTTON( :this ) )
-            :Name                 := "OK"
-            :Dock:Right           := "Cancel"
-            :Dock:Bottom          := :Parent
-            :Dock:Margins         := "0,0,5,10"
-            :Left                 := 530
-            :Top                  := 315
-            :Width                := 80
-            :Height               := 25
-            :Caption              := "OK"
-            :EventHandler[ "OnClick" ] := "OK_OnClick"
-            :Create()
-         END
       END
-      WITH OBJECT ( Tabpage( :this ) )
-         :Caption   := '"Ask Me Later" settings'
+
+      WITH OBJECT ( RADIOBUTTON( :this ) )
+         :Name              := "ORRadio"
+         :Left              := 325
+         :Top               := 27
+         :Width             := 259
+         :Height            := 15
+         :Caption           := "Match ANY of the conditions"
          :Create()
-         WITH OBJECT ListBox( :this )
-            :Name         := "AskLaterList"
-            :Caption      := "Ask me later filters"
-            :SmallCaption := .T.
-            :Left         := 15
-            :Top          := 15
-            :Width        := 200
-            :Height       := 200
-            :Dock:Top     := :Parent
-            :Dock:Bottom  := :Parent
-            :Dock:Margins := "15"
-            :EventHandler[ "OnSelChange" ] := "AskLaterList_OnSelChange"
-            :Create()
-         END
-         WITH OBJECT Label( :this )
-            :Caption    := "Title"
-            :Width      := 100
-            :Left       := 215
-            :Top        :=  17
-            :RightAlign := .T.
-            :Create()
-         END
-         WITH OBJECT EditBox( :this )
-            :Name         := "WinTitle"
-            :Caption      := ""
-            :Left         := 320
-            :Width        := 280
-            :Top          :=  15
-            :Dock:Left    := "Label1"
-            :Dock:Right   := :Parent
-            :Dock:Margins := "5,0,15,0"
-            :Create()
-         END
-         WITH OBJECT Label( :this )
-            :Caption    := "Group Title"
-            :Width      := 100
-            :Left       := 215
-            :Top        :=  41
-            :RightAlign := .T.
-            :Create()
-         END
-         WITH OBJECT EditBox( :this )
-            :Name         := "GroupTitle"
-            :Caption      := ""
-            :Left         := 320
-            :Width        := 280
-            :Top          :=  39
-            :Dock:Left    := "Label2"
-            :Dock:Right   := :Parent
-            :Dock:Margins := "5,0,15,0"
-            :Create()
-         END
-         WITH OBJECT Label( :this )
-            :Caption := "Search browse settings:"
-            :Width   := 200
-            :Left    := 230
-            :Top     :=  80
-            :Create()
-         END
-         WITH OBJECT Button( :this )
-            :Caption      := "Test"
-            :Width        := 70
-            :Left         := 230
-            :Top          := 80
-            :Height       := 20
-            :Dock:Right   := :Parent
-            :Dock:Margins := "0,0,15,0"
-            :Create()
-         END
-         WITH OBJECT EditBox( :this )
-            :Left         := 230
-            :Width        := 370
-            :Height       := 300
-            :Top          :=  80
-            :MultiLine    := .T.
-            :Dock:Top     := "Label3"
-            :Dock:Left    := "AskLaterList"
-            :Dock:Bottom  := :Parent
-            :Dock:Right   := :Parent
-            :Dock:Margins := "10,5,15,15"
-            :Create()
-         END
       END
+   END
+
+   WITH OBJECT ( GROUPBOX( Self ) )
+      :Name                 := "ConditionGroupBox"
+      :Dock:Margins         := "20,86,20,40"
+      :Left                 := 20
+      :Top                  := 86
+      :Width                := 590
+      :Height               := 224
+      :Caption              := "Conditions"
+      :ForeColor            := 0
+      :Create()
+      :DockToParent()
+      WITH OBJECT ( PANEL( :this ) )
+         :Name              := "ConditionPanel"
+         :Dock:Margins      := "2,14,2,2"
+         :VertScroll        := .T.
+         //:BackColor         := RGB(255,255,255)
+         :Create()
+         :DockToParent()
+      END
+   END
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "FilterBrowse"
+      :Dock:Left            := :Parent
+      :Dock:Bottom          := :Parent
+      :Dock:Margins         := "20,0,20,10"
+      :Left                 := 530
+      :Top                  := 315
+      :Width                := 80
+      :Height               := 25
+      :Enabled              := .F.
+      :Caption              := "Test Filter"
+      :EventHandler[ "OnClick" ] := "FilterBrowse_OnClick"
+      :Create()
+   END
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Cancel"
+      :Dock:Right           := :Parent
+      :Dock:Bottom          := :Parent
+      :Dock:Margins         := "0,0,20,10"
+      :Left                 := 530
+      :Top                  := 315
+      :Width                := 80
+      :Height               := 25
+      :Caption              := "Cancel"
+      :EventHandler[ "OnClick" ] := "Cancel_OnClick"
+      :Create()
+   END
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "OK"
+      :Dock:Right           := "Cancel"
+      :Dock:Bottom          := :Parent
+      :Dock:Margins         := "0,0,5,10"
+      :Left                 := 530
+      :Top                  := 315
+      :Width                := 80
+      :Height               := 25
+      :Caption              := "OK"
+      :EventHandler[ "OnClick" ] := "OK_OnClick"
+      :Create()
    END
    ::AddConditionButton_OnClick()
    ::CenterWindow()
    
    hFilter := ::oDataTable:Filter
+
    IF VALTYPE( hFilter ) == "H"
       IF hFilter:ANDRadio == "1"
          ::ANDRadio:SetState( BST_CHECKED )
@@ -288,29 +190,17 @@ METHOD OnInitDialog() CLASS FilterUI
          ::ORRadio:SetState( BST_CHECKED )
       ENDIF
       aExps := hFilter:Expressions
-      FOR i := 2 TO LEN( aExps )
-          hExp := aExps[i]
 
-          cField  := hExp:Field     
-          cFldSel := hExp:FieldName 
-          nSel1   := hExp:FieldSel  
-          nSel2   := hExp:ExpSel    
-          cType   := hExp:FieldType 
-          cExp    := hExp:Exp1      
-          cExp2   := hExp:Exp2      
+      FOR i := 1 TO LEN( aExps )
+          ::ConditionPanel:Children[i]:Children[1]:Enabled := .T.
 
-          ::ConditionPanel:Children[i-1]:Children[1]:Enabled := .T.
-          
-          ::ConditionPanel:Children[i-1]:Children[1]:SetCurSel( nSel1 )
-          ::FieldComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i-1]:Children[1] )
-             
-          ::ConditionPanel:Children[i-1]:Children[2]:SetCurSel( nSel2 )
+          ::ConditionPanel:Children[i]:Children[1]:SetCurSel( aExps[i]:FieldSel )
+          ::FieldComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i]:Children[1] )
 
-          IF aExps[i]:AndOr == NIL
-             ::ConditionComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i-1]:Children[2], cType, cExp, cExp2, hExp:AskLater )
-           ELSE
-             ::ConditionComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i-1]:Children[2], aExps[i]:AndOr )
-          ENDIF
+          ::ConditionPanel:Children[i]:Children[2]:SetCurSel( aExps[i]:ExpSel )
+
+          ::ConditionComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i]:Children[2], aExps[i] )
+
           IF i < LEN( aExps )
              ::AddConditionButton_OnClick()
           ENDIF
@@ -324,8 +214,8 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
    IF LEN( ::ConditionPanel:Children ) > 0
       oLastPanel := ATAIL( ::ConditionPanel:Children )
 
-      oLastPanel:Children[ LEN(oLastPanel:Children)-2 ]:Enabled := .F.
-      oLastPanel:Children[ LEN(oLastPanel:Children)-1 ]:Enabled := .F.
+      oLastPanel:Children[-2]:Enabled := .F.
+      oLastPanel:Children[-1]:Enabled := .F.
    ENDIF
    ::FilterBrowse:Enabled := .F.
    ::OK:Enabled := .F.
@@ -339,7 +229,7 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
          :Dock:Right     := :Parent
          :Dock:Top       := IIF( LEN( ::ConditionPanel:Children ) > 0, ATAIL( ::ConditionPanel:Children ), :Parent )
          :Dock:TopMargin := 4
-         :BackColor      := RGB(255,255,255)
+         //:BackColor      := RGB(255,255,255)
          :Create()
          :SetRedraw( .F. )
 
@@ -445,24 +335,40 @@ METHOD AddButtons( oParent, lEnabled ) CLASS FilterUI
    END
 
    WITH OBJECT ( BUTTON( oParent ) )
-      :ToolTip:Text         := "More..."
-      :Left                 := 535
-      :Top                  := 0
-      :Width                := 20
-      :Height               := 22
-      :Caption              := "..."
-      :Enabled              := lEnabled
+      :ToolTip:Text     := "More..."
+      :Left             := 535
+      :Top              := 0
+      :Width            := 20
+      :Height           := 22
+      :Caption          := "..."
+      :Enabled          := lEnabled
       :EventHandler[ "OnClick" ] := "MoreConditionButton_OnClick"
       :Create()
    END
 
    IF ! lEnabled
       WITH OBJECT ( CheckBox( oParent ) )
-         :ToolTip:Text  := "Ask Later"
+         :ToolTip:Text  := "Ask Me Later"
          :Left          := 560
-         :Top           := 5
+         :Top           := 4
+         :Caption       := ""
+         :Width         := 16
          :Enabled       := .F.
          :EventHandler[ "OnClick" ] := "CheckBox_OnClick"
+         :Create()
+      END
+      WITH OBJECT ( BUTTON( oParent ) )
+         :Left            := 580
+         :Top             := 0
+         :Width           := 80
+         :Height          := 22
+         :Caption         := "Ask Settings"
+         :Enabled         := .F.
+         :EventHandler[ "OnClick" ] := "AskSettings_OnClick"
+         :Cargo           := {=>}
+         :Cargo:Title     := ""
+         :Cargo:GroupText := ""
+         :Cargo:Search    := ""
          :Create()
       END
    ENDIF
@@ -473,9 +379,10 @@ METHOD FieldComboBox_OnCBNSelEndOk( Sender ) CLASS FilterUI
    LOCAL cType := ::oDataTable:EditCtrl:FieldType( Sender:GetCurSel() )
    IF !Sender:Parent:Children[2]:Enabled
       Sender:Parent:Children[2]:Enabled := .T.
-      Sender:Parent:Children[ LEN(Sender:Parent:Children)-2 ]:Enabled := .T.
-      Sender:Parent:Children[ LEN(Sender:Parent:Children)-1 ]:Enabled := .T.
-      Sender:Parent:Children[ LEN(Sender:Parent:Children)-0 ]:Enabled := .T.
+
+      Sender:Parent:Children[-2]:Enabled := .T. // checkbox
+      Sender:Parent:Children[-3]:Enabled := .T. // ...
+      Sender:Parent:Children[-4]:Enabled := .T. // +
    ENDIF
    Sender:Parent:Children[2]:ResetContent()
    AEVAL( ::oCond:aCond_&cType, {|a| Sender:Parent:Children[2]:AddItem(a[1]) } )
@@ -497,30 +404,11 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 METHOD CheckBox_OnClick( Sender ) CLASS FilterUI
-   LOCAL n, oPanel := Sender:Parent
-   oPanel:Children[ LEN(oPanel:Children)-2 ]:Enabled := .T.
-   oPanel:Children[ LEN(oPanel:Children)-1 ]:Enabled := .T.
-   n := ASCAN( Sender:Parent:Parent:Children, {|o| o:hWnd == oPanel:hWnd} )
-   IF Sender:checked
-      ::AskLaterList:AddItem( Sender:Siblings[1]:GetSelString() + " (Condition " + alltrim( str( n ) ) + ")" )
-    ELSE
-      n := ::AskLaterList:FindString( -1, Sender:Siblings[1]:GetSelString() )
-      IF n > 0
-         ::AskLaterList:DeleteString(n)
-      ENDIF
-   ENDIF
+   LOCAL oPanel := Sender:Parent
+   oPanel:Children[-3]:Enabled := .T.
+   oPanel:Children[-2]:Enabled := .T.
+   oPanel:Children[-1]:Enabled := Sender:checked
 RETURN Self
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-METHOD AskLaterList_OnSelChange( Sender ) CLASS FilterUI
-   LOCAL n := Sender:GetCurSel()
-   ASIZE( ::aAskExtras, n )
-   DEFAULT ::aAskExtras[n] TO ARRAY(2)
-   DEFAULT ::aAskExtras[1][1] TO ""
-   DEFAULT ::aAskExtras[1][2] TO ""
-   ::WinTitle   := ::aAskExtras[1][1]
-   ::GroupTitle := ::aAskExtras[1][2]
-RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 METHOD SetDateEdit( Sender, cType ) CLASS FilterUI
@@ -539,7 +427,7 @@ METHOD SetDateEdit( Sender, cType ) CLASS FilterUI
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
-METHOD ConditionComboBox_OnCBNSelEndOk( Sender, cType, cValue, cValue2, cAskLater ) CLASS FilterUI
+METHOD ConditionComboBox_OnCBNSelEndOk( Sender, hExp ) CLASS FilterUI
    LOCAL cSel, oDlg, oPanel := Sender:Parent
 
    cSel := Sender:GetSelString()
@@ -554,26 +442,26 @@ METHOD ConditionComboBox_OnCBNSelEndOk( Sender, cType, cValue, cValue2, cAskLate
     ELSEIF cSel IN {FC_PERQUARTER}
       oPanel:oGet1:Enabled := .F.
       ::SetDateEdit( Sender, "C" )
-      IF cValue == NIL
+      IF hExp == NIL
          oDlg := FilterPerQuarter( Self, oPanel:oGet1 )
          IF oDlg:Result == IDOK
             oPanel:oGet1:Caption := oDlg:nNum + " " + oDlg:cSel
          ENDIF
        ELSE
-         oPanel:oGet1:Caption := cValue
+         oPanel:oGet1:Caption := hExp:Exp1
       ENDIF
       oPanel:oGet1:Enabled := .F.
 
     ELSEIF cSel IN {FC_INLAST, FC_NOTINLAST}
       oPanel:oGet1:Enabled := .F.
       ::SetDateEdit( Sender, "C" )
-      IF cValue == NIL
+      IF hExp == NIL
          oDlg := IsInTheLast( Self, cSel, {"days", "weeks", "months"}  )
          IF oDlg:Result == IDOK
             oPanel:oGet1:Caption := oDlg:nNum + " " + oDlg:cSel
          ENDIF
        ELSE
-         oPanel:oGet1:Caption := cValue
+         oPanel:oGet1:Caption := hExp:Exp1
       ENDIF
       oPanel:oGet1:Enabled := .F.
 
@@ -586,22 +474,27 @@ METHOD ConditionComboBox_OnCBNSelEndOk( Sender, cType, cValue, cValue2, cAskLate
       oPanel:oGet2:Visible := .F.
    ENDIF
 
-   IF cValue != NIL
-      IF cType == "D" .AND. oPanel:oGet1:ClsName == DATETIMEPICK_CLASS
-         oPanel:oGet1:Date := STOD( cValue )
+   IF hExp != NIL
+      IF hExp:FieldType == "D" .AND. oPanel:oGet1:ClsName == DATETIMEPICK_CLASS
+         oPanel:oGet1:Date := STOD( hExp:Exp1 )
        ELSE
-         oPanel:oGet1:Caption := cValue
+         oPanel:oGet1:Caption := hExp:Exp1
       ENDIF
-   ENDIF
-   IF cValue2 != NIL .AND. oPanel:oGet2:Visible
-      IF cType == "D" .AND. oPanel:oGet1:ClsName == DATETIMEPICK_CLASS
-         oPanel:oGet2:Date := STOD( cValue2 )
-       ELSE
-         oPanel:oGet2:Caption := cValue2
+
+      IF oPanel:oGet2:Visible
+         IF hExp:FieldType == "D" .AND. oPanel:oGet1:ClsName == DATETIMEPICK_CLASS
+            oPanel:oGet2:Date := STOD( hExp:Exp2 )
+          ELSE
+            oPanel:oGet2:Caption := hExp:Exp2
+         ENDIF
       ENDIF
-   ENDIF
-   IF cAskLater != NIL .AND. cAskLater == "1"
-      ATAIL(oPanel:Children):Check()
+      IF HGetPos( hExp, "AskMeLater" ) > 0 .AND. hExp:AskMeLater != NIL
+         oPanel:Children[-2]:Check()
+         oPanel:Children[-1]:Enabled := .T.
+         oPanel:Children[-1]:Cargo:Title     := hExp:AskMeLater:Title
+         oPanel:Children[-1]:Cargo:GroupText := hExp:AskMeLater:GroupText
+         oPanel:Children[-1]:Cargo:Search    := hExp:AskMeLater:Search
+      ENDIF
    ENDIF
 RETURN Self
 
@@ -617,8 +510,8 @@ METHOD RemoveConditionButton_OnClick( Sender ) CLASS FilterUI
       Sender:Parent:Destroy()
       IF LEN( ::ConditionPanel:Children ) > 0
          oLastPanel := ATAIL( ::ConditionPanel:Children )
-         oLastPanel:Children[ LEN(oLastPanel:Children)-2 ]:Enabled := .T.
-         oLastPanel:Children[ LEN(oLastPanel:Children)-1 ]:Enabled := .T.
+         oLastPanel:Children[-3]:Enabled := .T.
+         oLastPanel:Children[-2]:Enabled := .T.
       ENDIF
     ELSE
       WITH OBJECT ::ConditionPanel:Children[1]
@@ -643,8 +536,8 @@ METHOD MoreConditionButton_OnClick( Sender ) CLASS FilterUI
    
    IF LEN( ::ConditionPanel:Children ) > 0
       oLastPanel := ATAIL( ::ConditionPanel:Children )
-      oLastPanel:Children[ LEN(oLastPanel:Children)-2 ]:Enabled := .F.
-      oLastPanel:Children[ LEN(oLastPanel:Children)-1 ]:Enabled := .F.
+      oLastPanel:Children[-3]:Enabled := .F.
+      oLastPanel:Children[-2]:Enabled := .F.
    ENDIF
    ::FilterBrowse:Enabled := .F.
    ::OK:Enabled := .F.
@@ -746,12 +639,7 @@ METHOD GetFilterExp() CLASS FilterUI
 
              IF cType $ "CM"
                 cField := "TRIM("+cField+")"
-                cExp  := ValToPrg( cExp  )
-                cExp2 := ValToPrg( cExp2 )
-              ELSEIF cType == "N"
 
-                cExp   := ValToPrg( VAL( cExp ) )
-                cExp2  := ValToPrg( VAL( cExp2 ) )
               ELSEIF cType == "D"
                 IF cExpSel IN {FC_INLAST, FC_NOTINLAST}
                    aExp  := hb_aTokens( oPanel:oGet1:Caption )
@@ -782,13 +670,13 @@ METHOD GetFilterExp() CLASS FilterUI
              hExp:Exp2       := cExp2
              hExp:AskMeLater := NIL
 
-             IF ATAIL( oPanel:Children ):Checked
+             IF oPanel:Children[-2]:Checked
                 hExp:AskMeLater := {=>}
                 HSetCaseMatch( hExp:AskMeLater, .F. )
 
-                hExp:AskMeLater:Title     := NIL//::aAskExtras[n][1]
-                hExp:AskMeLater:GroupText := NIL//::aAskExtras[n][2]
-                hExp:AskMeLater:Search    := NIL//::aAskExtras[n][3]
+                hExp:AskMeLater:Title     := oPanel:Children[-1]:Cargo:Title
+                hExp:AskMeLater:GroupText := oPanel:Children[-1]:Cargo:GroupText
+                hExp:AskMeLater:Search    := oPanel:Children[-1]:Cargo:Search
              ENDIF
           ENDIF
 
@@ -807,6 +695,20 @@ METHOD LoadFieldList( oComboBox ) CLASS FilterUI
        oComboBox:AddItem( aFields[n][1] )
    NEXT
 RETURN NIL
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+METHOD AskSettings_OnClick( Sender ) CLASS FilterUI
+   WITH OBJECT AskSettings( Self )
+      :Owner         := Sender:Cargo
+      :ThickFrame    := .F.
+      :DlgModalFrame := .T.
+      :Caption       := "Ask Me Later Settings"
+      :Width         := 390
+      :Height        := 295
+      :Center        := .T.
+      :Create()
+   END
+RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
@@ -827,7 +729,6 @@ METHOD OnInitDialog() CLASS TestFilter
          :Alias := oTable:Alias
          :Create()
          cFilter := ::Parent:cFilter //CleanFilter( ::Parent:cFilter )
-         view cFilter
          :SetFilter( &("{||"+cFilter+"}") )
          IF ! EMPTY( oTable:Order )
             :OrdSetFocus( oTable:Order )
@@ -868,4 +769,126 @@ CLASS ContCondPanel INHERIT Panel
    DATA oGet1      EXPORTED
    DATA oGet2      EXPORTED
 ENDCLASS
+
+//-------------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS AskSettings INHERIT Dialog
+   DATA Owner EXPORTED
+   METHOD OnInitDialog()
+   METHOD OK_OnClick()
+ENDCLASS
+
+METHOD OK_OnClick() CLASS AskSettings
+   ::Owner:Title     := ::Title:Caption
+   ::Owner:GroupText := ::GroupText:Caption
+   ::Owner:Search    := ::Search:Caption
+   ::Close( IDOK )
+RETURN Self
+
+METHOD OnInitDialog() CLASS AskSettings
+   WITH OBJECT ( PictureBox( Self ) )
+      :Name             := "PictureBox1"
+      WITH OBJECT :Dock
+         :Left          := Self
+         :Right         := Self
+         :Bottom        := Self
+         :Margins       := "0,0,0,0"
+      END
+      :Left             := 0
+      :Top              := 125
+      :Width            := 418
+      :Height           := 50
+      :Type             := "JPG"
+      :ImageName        := "BTRIBBON"
+      :Stretch          := .T.
+      :Create()
+
+      WITH OBJECT ( Button( :this ) )
+         :Dock:Right    := :Parent
+         :Dock:Margins  := "0,0,20,0"
+         :Left          := 311
+         :Top           := 13
+         :Width         := 80
+         :Height        := 25
+         :Caption       := "OK"
+         :EventHandler[ "OnClick" ] := "OK_OnClick"
+         :Create()
+      END
+
+      WITH OBJECT ( Button( :this ) )
+         :Dock:Left     := :Parent
+         :Dock:Margins  := "20,0,0,0"
+         :Left          := 14
+         :Top           := 13
+         :Width         := 80
+         :Height        := 25
+         :Caption       := "Help"
+         :Create()
+      END
+   END
+
+   WITH OBJECT Label( Self )
+      :Caption    := "Window Title"
+      :Width      := 80
+      :Left       := 10
+      :Top        := 17
+      :Create()
+   END
+   WITH OBJECT EditBox( Self )
+      :Name       := "Title"
+      :Caption    := ""
+      :Left       :=  90
+      :Width      := 280
+      :Top        :=  15
+      :Caption    := ::Owner:Title
+      :Create()
+   END
+
+   WITH OBJECT Label( Self )
+      :Caption    := "Group Text"
+      :Width      := 70
+      :Left       := 10
+      :Top        := 41
+      :Create()
+   END
+   WITH OBJECT EditBox( Self )
+      :Name       := "GroupText"
+      :Caption    := ""
+      :Left       :=  90
+      :Width      := 280
+      :Top        :=  39
+      :Caption    := ::Owner:GroupText
+      :Create()
+   END
+   WITH OBJECT Label( Self )
+      :Caption := "Search browse settings:"
+      :Width   := 200
+      :Left    :=  10
+      :Top     :=  80
+      :Create()
+   END
+   WITH OBJECT Button( Self )
+      :Caption      := "Test"
+      :Width        := 70
+      :Left         := 300
+      :Top          := 76
+      :Height       := 22
+      :Create()
+   END
+   WITH OBJECT EditBox( Self )
+      :Name         := "Search"
+      :Left         :=  10
+      :Width        := 360
+      :Height       := 100
+      :Top          := 100
+      :MultiLine    := .T.
+      :VertScroll   := .T.
+      :WantReturn   := .T.
+      :Caption      := ::Owner:Search
+      :Create()
+   END
+
+RETURN Self
 

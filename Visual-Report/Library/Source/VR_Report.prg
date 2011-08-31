@@ -494,9 +494,20 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
                  hControl[ "ParCls"  ] := cParCls
               ENDIF
 
-         CASE oNode:cName == "Font" 
+         CASE oNode:cName IN { "Font", "Filter" }
               hControl[ oNode:cName ] := {=>}
               HSetCaseMatch( hControl[ oNode:cName ], .F. )
+
+         CASE oNode:cName == "AskMeLater"
+              ATAIL( hControl:Filter:Expressions ):AskMeLater := {=>}
+              HSetCaseMatch( ATAIL( hControl:Filter:Expressions ):AskMeLater, .F. )
+
+         CASE LEFT(oNode:cName,10) == "Expression" 
+              IF HGetPos( hControl[ "Filter" ], "Expressions" ) == 0
+                 hControl[ "Filter" ][ "Expressions" ] := {}
+              ENDIF
+              AADD( hControl[ "Filter" ][ "Expressions" ], {=>} )
+              HSetCaseMatch( ATAIL( hControl[ "Filter" ][ "Expressions" ]), .F. )
 
          CASE oNode:oParent:cName == "Control"
               DEFAULT oNode:cData TO ""
@@ -508,9 +519,20 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
                  cParCls := oNode:cData
               ENDIF
 
-         CASE oNode:oParent:cName == "Font"
+         CASE oNode:oParent:cName IN { "Font", "Filter" } 
               DEFAULT oNode:cData TO ""
               hControl[ oNode:oParent:cName ][ oNode:cName ] := oNode:cData
+
+         CASE oNode:oParent:cName == "AskMeLater"
+              DEFAULT oNode:cData TO ""
+              ATAIL( hControl:Filter:Expressions ):AskMeLater[ oNode:cName ] := oNode:cData
+
+         CASE oNode:oParent:cName != NIL .AND. LEFT( oNode:oParent:cName, 10 ) == "Expression" 
+              DEFAULT oNode:cData TO ""
+              IF oNode:cName == "FieldSel"
+                 oNode:cData := VAL( oNode:cData )
+              ENDIF
+              ATAIL( hControl[ "Filter" ][ "Expressions" ] )[ oNode:cName ] := oNode:cData
 
       ENDCASE
       oNode := oDoc:Next()
