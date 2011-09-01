@@ -73,7 +73,6 @@ RETURN Self
 
 METHOD OnInitDialog() CLASS FilterUI
    LOCAL hFilter, aExps, n, i, aExp, hExp
-   LOCAL cField, cFldSel, nSel1, nSel2, cType, cExp, cExp2
 
    ::Left    := 190
    ::Top     := 20
@@ -198,7 +197,6 @@ METHOD OnInitDialog() CLASS FilterUI
           ::FieldComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i]:Children[1] )
 
           ::ConditionPanel:Children[i]:Children[2]:SetCurSel( aExps[i]:ExpSel )
-
           ::ConditionComboBox_OnCBNSelEndOk( ::ConditionPanel:Children[i]:Children[2], aExps[i] )
 
           IF i < LEN( aExps )
@@ -214,8 +212,8 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
    IF LEN( ::ConditionPanel:Children ) > 0
       oLastPanel := ATAIL( ::ConditionPanel:Children )
 
+      oLastPanel:Children[-3]:Enabled := .F.
       oLastPanel:Children[-2]:Enabled := .F.
-      oLastPanel:Children[-1]:Enabled := .F.
    ENDIF
    ::FilterBrowse:Enabled := .F.
    ::OK:Enabled := .F.
@@ -609,7 +607,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 METHOD GetFilterExp() CLASS FilterUI
-   LOCAL cAndOr, nNum, cFldSel, cExpSel, cField, cExp, cExp2, nSel1, nSel2, oPanel, n, cType, aExp, hExp
+   LOCAL cAndOr, nNum, cFldSel, cExpSel, cField, cExp1, cExp2, nSel1, nSel2, oPanel, n, cType, aExp, hExp
 
    ::BuildFilter := {=>}
    HSetCaseMatch( ::BuildFilter, .F. )
@@ -632,41 +630,82 @@ METHOD GetFilterExp() CLASS FilterUI
              cExpSel := oPanel:Children[2]:GetSelString()
              nSel2   := oPanel:Children[2]:GetCurSel()
              cType   := ::oDataTable:EditCtrl:FieldType( nSel1 )
-             cExp    := oPanel:oGet1:Caption
+             cExp1   := oPanel:oGet1:Caption
              cExp2   := oPanel:oGet2:Caption
 
              cField := ::oDataTable:Alias + "->" + cFldSel
 
-             IF cType $ "CM"
-                cField := "TRIM("+cField+")"
+
+
+
+             IF cType == "A"
+                cField := "TRIM("+cFldSel+"[1])"
+                cExp1 := ValToPrg( cExp1 )
+                cExp2 := ValToPrg( cExp2 )
+
+              ELSEIF cType $ "CM"
+                cField := "TRIM("+cFldSel+")"
+                cExp1 := ValToPrg( cExp1 )
+                cExp2 := ValToPrg( cExp2 )
+
+              ELSEIF cType == "N"
+                cExp1 := ValToPrg( VAL( cExp1 ) )
+                cExp2 := ValToPrg( VAL( cExp2 ) )
 
               ELSEIF cType == "D"
                 IF cExpSel IN {FC_INLAST, FC_NOTINLAST}
                    aExp  := hb_aTokens( oPanel:oGet1:Caption )
-                   cExp  := "@TODAY-"
+                   cExp1 := "@TODAY-"
                    nNum  := VAL( aExp[1] )
                    IF aExp[2] == "days"
-                      cExp += aExp[1]
+                      cExp1 += aExp[1]
                     ELSEIF aExp[2] == "weeks"
-                      cExp += AllTrim( Str( nNum*7 ) )
+                      cExp1 += AllTrim( Str( nNum*7 ) )
                     ELSEIF aExp[2] == "months"
-                      cExp += AllTrim( Str( nNum*30 ) )
+                      cExp1 += AllTrim( Str( nNum*30 ) )
                    ENDIF
                  ELSEIF cExpSel IN {FC_PERQUARTER}
                    aExp  := hb_aTokens( oPanel:oGet1:Caption )
-                   cExp := 'MONTH('+cField+')>='+aExp[2]+'.AND.MONTH('+cField+')<='+aExp[4]
+                   cExp1 := 'MONTH('+cField+')>='+aExp[2]+'.AND.MONTH('+cField+')<='+aExp[4]
                  ELSE
-                   cExp  := 'STOD( "' + DTOS(oPanel:oGet1:Date) + '" )'
+                   cExp1 := 'STOD( "' + DTOS( oPanel:oGet1:Date ) + '" )'
+                   cExp2 := 'STOD( "' + DTOS( oPanel:oGet:Date ) + '" )'
+                ENDIF
+             ENDIF
+/*
+             IF cType $ "CM"
+                cField := "TRIM("+cField+")"
+
+              ELSEIF cType == "A"
+                cField := "TRIM("+::cField+"[1])"
+
+              ELSEIF cType == "D"
+                IF cExpSel IN {FC_INLAST, FC_NOTINLAST}
+                   aExp  := hb_aTokens( oPanel:oGet1:Caption )
+                   cExp1 := "@TODAY-"
+                   nNum  := VAL( aExp[1] )
+                   IF aExp[2] == "days"
+                      cExp1 += aExp[1]
+                    ELSEIF aExp[2] == "weeks"
+                      cExp1 += AllTrim( Str( nNum*7 ) )
+                    ELSEIF aExp[2] == "months"
+                      cExp1 += AllTrim( Str( nNum*30 ) )
+                   ENDIF
+                 ELSEIF cExpSel IN {FC_PERQUARTER}
+                   aExp  := hb_aTokens( oPanel:oGet1:Caption )
+                   cExp1 := 'MONTH('+cField+')>='+aExp[2]+'.AND.MONTH('+cField+')<='+aExp[4]
+                 ELSE
+                   cExp1 := 'STOD( "' + DTOS(oPanel:oGet1:Date) + '" )'
                    cExp2 := 'STOD( "' + DTOS(oPanel:oGet2:Date) + '" )'
                 ENDIF
              ENDIF
-
+*/
              hExp:Field      := cField
              hExp:FieldName  := cFldSel
              hExp:FieldSel   := nSel1
              hExp:ExpSel     := nSel2
              hExp:FieldType  := cType
-             hExp:Exp1       := cExp
+             hExp:Exp1       := cExp1
              hExp:Exp2       := cExp2
              hExp:AskMeLater := NIL
 
@@ -728,7 +767,7 @@ METHOD OnInitDialog() CLASS TestFilter
       IF oTable:Driver != "SQLRDD"
          :Alias := oTable:Alias
          :Create()
-         cFilter := ::Parent:cFilter //CleanFilter( ::Parent:cFilter )
+         cFilter := ::Parent:cFilter
          :SetFilter( &("{||"+cFilter+"}") )
          IF ! EMPTY( oTable:Order )
             :OrdSetFocus( oTable:Order )

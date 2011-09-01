@@ -532,6 +532,9 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
               IF oNode:cName == "FieldSel"
                  oNode:cData := VAL( oNode:cData )
               ENDIF
+              IF oNode:cName == "ExpSel"
+                 oNode:cData := VAL( oNode:cData )
+              ENDIF
               ATAIL( hControl[ "Filter" ][ "Expressions" ] )[ oNode:cName ] := oNode:cData
 
       ENDCASE
@@ -656,8 +659,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
              ENDIF
              oData:Create()
              IF ! EMPTY( hCtrl:Filter )
-                hCtrl:Filter := CleanFilter( hCtrl:Filter )
-                oData:SetFilter( &("{||"+hCtrl:Filter+"}") )
+                oData:SetFilter( &("{||"+BuildFilterExp( hCtrl:Filter )+"}") )
              ENDIF
              IF ! EMPTY( hCtrl:Order )
                 oData:OrdSetFocus( hCtrl:Order )
@@ -917,8 +919,8 @@ FUNCTION PageNumber(); RETURN nPageNumber
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-FUNCTION AskLater( cField, cType, nCond, cTitle, cGroupTitle, cSearch )
-RETURN VrAskLater( NIL, cField, cType, nCond, cTitle, cGroupTitle, cSearch ):cResult
+FUNCTION AskLater( cField, cType, nCond, hExp )
+RETURN VrAskLater( NIL, cField, cType, nCond, hExp ):cResult
 
 CLASS VrAskLater INHERIT Dialog
    DATA cResult     EXPORTED INIT ""
@@ -927,9 +929,7 @@ CLASS VrAskLater INHERIT Dialog
    DATA oCond       EXPORTED
    DATA cEdit       EXPORTED
    DATA nCond       EXPORTED
-   DATA cTitle      EXPORTED
-   DATA cGroupTitle EXPORTED
-   DATA cSearch     EXPORTED
+   DATA hExp        EXPORTED
    DATA oGet1, oGet2
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
@@ -938,7 +938,7 @@ CLASS VrAskLater INHERIT Dialog
    METHOD ComboBox1_OnCBNSelEndOk()
 ENDCLASS
 
-METHOD Init( oParent, cField, cType, nCond, cTitle, cGroupTitle, cSearch ) CLASS VrAskLater
+METHOD Init( oParent, cField, cType, nCond, hExp ) CLASS VrAskLater
    ::Super:Init( oParent )
    ::Modal       := .T.
    ::Left        := 11
@@ -951,11 +951,8 @@ METHOD Init( oParent, cField, cType, nCond, cTitle, cGroupTitle, cSearch ) CLASS
    ::MaximizeBox := .F.
    ::MinimizeBox := .F.
    ::nCond       := nCond
-   
-   ::Caption     := cTitle
-   
-   ::cGroupTitle := cGroupTitle
-   ::cSearch     := cSearch
+   ::hExp        := hExp
+   ::Caption     := ::hExp:Title
    ::Icon        := "AVR"
    ::cField      := cField
    ::cType       := cType
@@ -1013,15 +1010,13 @@ METHOD OnInitDialog() CLASS VrAskLater
    END
 
    WITH OBJECT ( GroupBox( Self ) )
-      :Caption      := ::cGroupTitle
+      :Caption      := IIF( EMPTY( ::hExp:GroupText ), ::cField, ::hExp:GroupText )
       :Dock:Margins := "20,15,20,70"
       :Left         := 20
       :Top          := 15
       :Width        := 379
       :Height       := 88
-      :Caption      := "Field name"
       :ForeColor    := 0
-      :Caption      := ::cField    
       :Create()
       :DockToParent()
       WITH OBJECT ( ComboBox( :this ) )
@@ -1240,19 +1235,6 @@ METHOD Init( oDataTable ) CLASS Conditions
    ::aCond_M := ACLONE( ::aCond_C )
 RETURN Self
 
-FUNCTION CleanFilter( cFilter )
-   LOCAL cCond, n, cAsk
-   cFilter := STRTRAN( cFilter, "@TODAY", 'CTOD("'+DTOC(DATE())+'")' )
-   WHILE ( n := AT( "~AskLater", cFilter ) ) > 0
-      cAsk := SUBSTR( cFilter, n+1 )
-      IF ( n := AT( "~", cAsk ) ) > 0
-         cAsk := LEFT( cAsk, n-1 )
-         cCond := &cAsk
-         cFilter := STRTRAN( cFilter, "~"+cAsk+"~", cCond,,, 1 )
-      ENDIF
-   ENDDO
-RETURN cFilter
-
 FUNCTION BuildFilterExp( hFilter )
    LOCAL cType, cExp, cExp2, nSel2, cField, cFldSel, cAndOr, hExp, n, cFilter := ""
    LOCAL bExp, oCond := Conditions( NIL )
@@ -1276,7 +1258,7 @@ FUNCTION BuildFilterExp( hFilter )
           ENDIF
 
           IF hExp:AskMeLater != NIL
-             cFilter += AskLater( cFldSel, cType, nSel2, hExp:AskMeLater:Title, hExp:AskMeLater:GroupText, hExp:AskMeLater:Search )
+             cFilter += AskLater( cFldSel, cType, nSel2, hExp:AskMeLater )
            ELSE
              bExp := oCond:aCond_&cType[nSel2][2]
              cFilter += EVAL( bExp, cField, cExp, cExp2 )
