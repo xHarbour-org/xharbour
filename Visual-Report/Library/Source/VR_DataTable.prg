@@ -136,8 +136,6 @@ METHOD WriteProps( oControl ) CLASS VrDataTable
                 oExp:addBelow( oValue )
                 oValue := TXmlNode():new( HBXML_TYPE_TAG, "Field", NIL, ::Filter:Expressions[n]:Field )
                 oExp:addBelow( oValue )
-                oValue := TXmlNode():new( HBXML_TYPE_TAG, "FieldName", NIL, ::Filter:Expressions[n]:FieldName )
-                oExp:addBelow( oValue )
                 oValue := TXmlNode():new( HBXML_TYPE_TAG, "FieldSel", NIL, XSTR( ::Filter:Expressions[n]:FieldSel ) )
                 oExp:addBelow( oValue )
                 oValue := TXmlNode():new( HBXML_TYPE_TAG, "ExpSel", NIL, XSTR( ::Filter:Expressions[n]:ExpSel ) )
@@ -148,7 +146,7 @@ METHOD WriteProps( oControl ) CLASS VrDataTable
                 oExp:addBelow( oValue )
                 oValue := TXmlNode():new( HBXML_TYPE_TAG, "Exp2", NIL, ::Filter:Expressions[n]:Exp2 )
                 oExp:addBelow( oValue )
-                IF ::Filter:Expressions[n]:AskMeLater != NIL
+                IF HGetPos( ::Filter:Expressions[n], "AskMeLater" ) > 0  .AND. ::Filter:Expressions[n]:AskMeLater != NIL
                    oAsk := TXmlNode():new( , "AskMeLater" )
                       oValue := TXmlNode():new( HBXML_TYPE_TAG, "Title", NIL, ::Filter:Expressions[n]:AskMeLater:Title )
                       oAsk:addBelow( oValue )

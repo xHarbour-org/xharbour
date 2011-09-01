@@ -607,7 +607,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 METHOD GetFilterExp() CLASS FilterUI
-   LOCAL cAndOr, nNum, cFldSel, cExpSel, cField, cExp1, cExp2, nSel1, nSel2, oPanel, n, cType, aExp, hExp
+   LOCAL cAndOr, nNum, cExpSel, cField, cExp1, cExp2, nSel1, nSel2, oPanel, n, cType, aExp, hExp
 
    ::BuildFilter := {=>}
    HSetCaseMatch( ::BuildFilter, .F. )
@@ -616,9 +616,9 @@ METHOD GetFilterExp() CLASS FilterUI
    ::BuildFilter:Expressions := {}
    FOR n := 1 TO LEN( ::ConditionPanel:Children )
        oPanel := ::ConditionPanel:Children[n]
-       cFldSel := oPanel:Children[1]:GetSelString()
-       nSel1   := oPanel:Children[1]:GetCurSel()
-       IF !EMPTY( cFldSel )
+       cField := oPanel:Children[1]:GetSelString()
+       nSel1  := oPanel:Children[1]:GetCurSel()
+       IF !EMPTY( cField )
 
           hExp := {=>}
           HSetCaseMatch( hExp, .F. )
@@ -632,16 +632,14 @@ METHOD GetFilterExp() CLASS FilterUI
              cType   := ::oDataTable:EditCtrl:FieldType( nSel1 )
              cExp1   := oPanel:oGet1:Caption
              cExp2   := oPanel:oGet2:Caption
-
-             cField := ::oDataTable:Alias + "->" + cFldSel
 /*
              IF cType == "A"
-                cField := "TRIM("+cFldSel+"[1])"
+                cField := "TRIM("+cField+"[1])"
                 cExp1 := ValToPrg( cExp1 )
                 cExp2 := ValToPrg( cExp2 )
 
               ELSEIF cType $ "CM"
-                cField := "TRIM("+cFldSel+")"
+                cField := "TRIM("+cField+")"
                 cExp1 := ValToPrg( cExp1 )
                 cExp2 := ValToPrg( cExp2 )
 
@@ -697,8 +695,7 @@ METHOD GetFilterExp() CLASS FilterUI
                 ENDIF
              ENDIF
 
-             hExp:Field      := cField
-             hExp:FieldName  := cFldSel
+             hExp:Field      := oPanel:Children[1]:GetSelString()
              hExp:FieldSel   := nSel1
              hExp:ExpSel     := nSel2
              hExp:FieldType  := cType
@@ -714,8 +711,8 @@ METHOD GetFilterExp() CLASS FilterUI
                 hExp:AskMeLater:GroupText := oPanel:Children[-1]:Cargo:GroupText
                 hExp:AskMeLater:Search    := oPanel:Children[-1]:Cargo:Search
              ENDIF
-          ENDIF
 
+          ENDIF
           AADD( ::BuildFilter:Expressions, hExp )
        ENDIF
    NEXT

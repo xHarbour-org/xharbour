@@ -661,7 +661,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
                 oData:Alias := hCtrl:Alias
              ENDIF
              oData:Create()
-             IF ! EMPTY( hCtrl:Filter )
+             IF HGetPos( hCtrl, "Filter" ) > 0  .AND. ! EMPTY( hCtrl:Filter )
                 oData:SetFilter( &("{||"+BuildFilterExp( hCtrl:Filter )+"}") )
              ENDIF
              IF ! EMPTY( hCtrl:Order )
@@ -1239,7 +1239,7 @@ METHOD Init( oDataTable ) CLASS Conditions
 RETURN Self
 
 FUNCTION BuildFilterExp( hFilter )
-   LOCAL cType, cExp, cExp2, nSel2, cField, cFldSel, cAndOr, hExp, n, cFilter := ""
+   LOCAL cType, cExp, cExp2, nSel2, cField, cAndOr, hExp, n, cFilter := ""
    LOCAL bExp, oCond := Conditions( NIL )
    
    cAndOr := IIF( hFilter:ANDRadio == "1", " .AND. ", " .OR. " )
@@ -1247,14 +1247,12 @@ FUNCTION BuildFilterExp( hFilter )
    FOR n := 1 TO LEN( hFilter:Expressions )
        hExp    := hFilter:Expressions[n]
 
-       cFldSel := hExp:FieldName
        cField  := hExp:Field
        nSel2   := hExp:ExpSel
        cExp    := hExp:Exp1
        cExp2   := hExp:Exp2
        cType   := hExp:FieldType
 
-       view hExp:AndOr
        IF hExp:AndOr != NIL
           cAndOr := IIF( hExp:AndOr == 1, " .AND. ", " .OR. " )
         ELSE
@@ -1262,11 +1260,11 @@ FUNCTION BuildFilterExp( hFilter )
              cFilter += cAndOr
           ENDIF
 
-          IF hExp:AskMeLater != NIL
-             cFilter += AskLater( cFldSel, cType, nSel2, hExp:AskMeLater )
+          IF HGetPos( hExp, "AskMeLater" ) > 0 .AND. hExp:AskMeLater != NIL
+             cFilter += AskLater( cField, cType, nSel2, hExp:AskMeLater )
            ELSE
              bExp := oCond:aCond_&cType[nSel2][2]
-             cFilter += EVAL( bExp, cField, cExp, cExp2 )
+             cFilter += EVAL( bExp, cField, ValToPrg(cExp), ValToPrg(cExp2) )
           ENDIF
        ENDIF
    NEXT
