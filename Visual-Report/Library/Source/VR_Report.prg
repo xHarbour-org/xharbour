@@ -529,6 +529,9 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
 
          CASE oNode:oParent:cName != NIL .AND. LEFT( oNode:oParent:cName, 10 ) == "Expression" 
               DEFAULT oNode:cData TO ""
+              IF oNode:cName == "AndOr" .AND. EMPTY( oNode:cData )
+                 oNode:cData := NIL
+              ENDIF
               IF oNode:cName == "FieldSel"
                  oNode:cData := VAL( oNode:cData )
               ENDIF
@@ -1243,13 +1246,15 @@ FUNCTION BuildFilterExp( hFilter )
 
    FOR n := 1 TO LEN( hFilter:Expressions )
        hExp    := hFilter:Expressions[n]
+
        cFldSel := hExp:FieldName
        cField  := hExp:Field
        nSel2   := hExp:ExpSel
        cExp    := hExp:Exp1
        cExp2   := hExp:Exp2
        cType   := hExp:FieldType
-       
+
+       view hExp:AndOr
        IF hExp:AndOr != NIL
           cAndOr := IIF( hExp:AndOr == 1, " .AND. ", " .OR. " )
         ELSE

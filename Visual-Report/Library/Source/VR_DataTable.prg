@@ -132,6 +132,8 @@ METHOD WriteProps( oControl ) CLASS VrDataTable
          oFilter:addBelow( oValue )
          FOR n := 1 TO LEN( ::Filter:Expressions )
              oExp := TXmlNode():new( , "Expression"+XSTR(n) )
+                oValue := TXmlNode():new( HBXML_TYPE_TAG, "AndOr", NIL, ::Filter:Expressions[n]:AndOr )
+                oExp:addBelow( oValue )
                 oValue := TXmlNode():new( HBXML_TYPE_TAG, "Field", NIL, ::Filter:Expressions[n]:Field )
                 oExp:addBelow( oValue )
                 oValue := TXmlNode():new( HBXML_TYPE_TAG, "FieldName", NIL, ::Filter:Expressions[n]:FieldName )

@@ -623,10 +623,10 @@ METHOD GetFilterExp() CLASS FilterUI
           hExp := {=>}
           HSetCaseMatch( hExp, .F. )
           
+          hExp:AndOr  := NIL
           IF LEN( oPanel:Children ) == 4
              hExp:AndOr  := nSel1
            ELSE
-             hExp:AndOr  := NIL
              cExpSel := oPanel:Children[2]:GetSelString()
              nSel2   := oPanel:Children[2]:GetCurSel()
              cType   := ::oDataTable:EditCtrl:FieldType( nSel1 )
@@ -634,10 +634,7 @@ METHOD GetFilterExp() CLASS FilterUI
              cExp2   := oPanel:oGet2:Caption
 
              cField := ::oDataTable:Alias + "->" + cFldSel
-
-
-
-
+/*
              IF cType == "A"
                 cField := "TRIM("+cFldSel+"[1])"
                 cExp1 := ValToPrg( cExp1 )
@@ -672,7 +669,7 @@ METHOD GetFilterExp() CLASS FilterUI
                    cExp2 := 'STOD( "' + DTOS( oPanel:oGet:Date ) + '" )'
                 ENDIF
              ENDIF
-/*
+*/
              IF cType $ "CM"
                 cField := "TRIM("+cField+")"
 
@@ -699,7 +696,7 @@ METHOD GetFilterExp() CLASS FilterUI
                    cExp2 := 'STOD( "' + DTOS(oPanel:oGet2:Date) + '" )'
                 ENDIF
              ENDIF
-*/
+
              hExp:Field      := cField
              hExp:FieldName  := cFldSel
              hExp:FieldSel   := nSel1
