@@ -133,8 +133,6 @@ METHOD OnError( ... ) CLASS VrReport
    IF PCount() == 0
       IF ( n := ASCAN( ::aBody, {|h| UPPER(h:Name) == UPPER(cMsg) } ) ) > 0
          hRet := VAL( ::aBody[n]:Text )
-       ELSE
-         view cMsg
       ENDIF
    ENDIF
 RETURN hRet
@@ -655,9 +653,9 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    FOR EACH hCtrl IN ::aComponents
        IF hCtrl:ClsName == "VRDATATABLE"
           oData := DataTable( NIL )
-          oData:Driver           := hCtrl:Driver
-          oData:FileName         := hCtrl:FileName
-          
+          oData:Driver   := hCtrl:Driver
+          oData:FileName := hCtrl:FileName
+          oData:xName    := hCtrl:Name
           IF hCtrl:Driver != "SQLRDD"
              IF !EMPTY( hCtrl:Alias )
                 oData:Alias := hCtrl:Alias
@@ -1245,7 +1243,7 @@ METHOD Init( oDataTable ) CLASS Conditions
 RETURN Self
 
 FUNCTION BuildFilterExp( hFilter )
-   LOCAL cType, cExp, cExp2, nSel2, cField, cAndOr, hExp, n, cFilter := ""
+   LOCAL cType, cExp, cExp2, nSel2, cValue, cField, cAndOr, hExp, n, cFilter := ""
    LOCAL bExp, oCond := Conditions( NIL )
    
    cAndOr := IIF( hFilter:ANDRadio == "1", " .AND. ", " .OR. " )
@@ -1258,7 +1256,7 @@ FUNCTION BuildFilterExp( hFilter )
        cExp    := hExp:Exp1
        cExp2   := hExp:Exp2
        cType   := hExp:FieldType
-
+       cValue  := ""
        IF hExp:AndOr != NIL
           cAndOr := IIF( hExp:AndOr == 1, " .AND. ", " .OR. " )
         ELSE
@@ -1267,12 +1265,14 @@ FUNCTION BuildFilterExp( hFilter )
           ENDIF
 
           IF HGetPos( hExp, "AskMeLater" ) > 0 .AND. hExp:AskMeLater != NIL
-             cFilter += AskLater( cField, cType, nSel2, hExp:AskMeLater )
+             cValue := AskLater( cField, cType, nSel2, hExp:AskMeLater )
            ELSE
              bExp := oCond:aCond_&cType[nSel2][2]
-             cFilter += EVAL( bExp, cField, ValToPrg(cExp), ValToPrg(cExp2) )
+             cValue := EVAL( bExp, cField, ValToPrg(cExp), ValToPrg(cExp2) )
           ENDIF
+          cFilter += cValue
        ENDIF
+       hFilter:Expressions[n]:Value := cValue
    NEXT
    cFilter := STRTRAN( cFilter, "@TODAY", 'CTOD("'+DTOC(DATE())+'")' )
 RETURN cFilter

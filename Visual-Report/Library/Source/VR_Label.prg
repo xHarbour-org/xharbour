@@ -157,19 +157,35 @@ METHOD WriteProps( oXmlControl ) CLASS VrLabel
 RETURN Self
 
 METHOD GetFormulas( cText ) CLASS VrLabel
-   LOCAL i, n, cFormula, nFormula
+   LOCAL i, n, cFormula, nFormula, cValue, nVal, nFilter
    WHILE ( n := AT( "@", cText ) ) > 0
       cFormula := ""
       FOR i := n+1 TO LEN( cText )
           IF i == LEN( cText )
              cFormula += cText[i]
           ENDIF
-          IF ! ( UPPER(cText[i]) $ "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_" ) .OR. i == LEN( cText )
+          IF ! ( UPPER(cText[i]) $ "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_[]" ) .OR. i == LEN( cText )
              IF ( nFormula := ASCAN( ::Parent:aComponents, {|h| UPPER(h:Name) == UPPER(cFormula) } ) ) > 0
                 IF "@"+cFormula IN ::Parent:aComponents[nFormula]:Value
                    cText := STRTRAN( cText, "@"+cFormula, "RECURSION DETECTED" )
                  ELSE
                    cText := STRTRAN( cText, "@"+cFormula, ::Parent:aComponents[nFormula]:Value,,, 1 )
+                ENDIF
+              ELSEIF UPPER( LEFT( cFormula, LEN(cFormula)-1 ) ) == "FILTER"
+                IF ( nFilter := ASCAN( ::Parent:aComponents, {|h| UPPER(h:Name) == UPPER(::Parent:DataSource:xName) } ) ) > 0
+                   cValue := ::Parent:aComponents[nFilter]:Filter:Expressions[ VAL(cFormula[-1]) ]:Value
+                   cText := STRTRAN( cText, "@"+cFormula, cValue )
+                   view cText
+                 ELSE
+                   cText := STRTRAN( cText, "@"+cFormula, "Filter not found "+cFormula )
+                ENDIF
+              ELSEIF UPPER( LEFT( cFormula, LEN(cFormula)-4 ) ) == "FILTER"
+                nVal := cFormula[-2]
+                IF ( nFilter := ASCAN( ::Parent:aComponents, {|h| UPPER(h:Name) == UPPER(::Parent:DataSource:xName) } ) ) > 0
+                   cValue := ::Parent:aComponents[nFilter]:Filter:Expressions[ VAL(cFormula[-4]) ]:Exp&nVal
+                   cText := STRTRAN( cText, "@"+cFormula, cValue )
+                 ELSE
+                   cText := STRTRAN( cText, "@"+cFormula, "Filter not found "+cFormula )
                 ENDIF
               ELSE
                 // we remove the pointer to @cFormula so it can stop processing
