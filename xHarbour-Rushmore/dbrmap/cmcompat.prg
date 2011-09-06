@@ -3,14 +3,13 @@
  */
 
 /*
-  ClipMore/COMIX compatible function set
-
-  (c) copyright xHarbour.com Inc. http://www.xHarbour.com
-  Author: Przemyslaw Czerpak Przemek@xHarbour.com
- 
-  This source file is an intellectual property of xHarbour.com Inc.
-  You may NOT forward or share this file under any conditions!
-*/
+ * DBRMAP (Record Map filters) for [x]Harbour:
+ *    ClipMore/COMIX compatible function set
+ *
+ * Copyright 2004-2011 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
+ * All rights reserved.
+ *
+ */
 
 /* ************************************************************************ */
 /* cm*() functions */
@@ -41,7 +40,7 @@ function cmVersion( nDetail )
       if nDetail == 1
          cVer += ".00"
       elseif nDetail == 2
-         cVer += ".00 (xHbMore/5.2)"
+         cVer += ".00 (HbMore/5.2)"
       endif
    endif
 return cVer
@@ -195,7 +194,7 @@ function cmxVersion( nDetail )
       if nDetail == 1
          cVer += ".00"
       elseif nDetail == 2
-         cVer += ".00 (xHbComixCompat/5.2)"
+         cVer += ".00 (HbComixCompat/5.2)"
       endif
    endif
 return cVer
@@ -213,7 +212,7 @@ function cmxClrScope( nScope )
 return ordScope( nScope, nil )
 
 function cmxCount( cBag )
-return ORDCOUNT( cBag )
+return ordCount( cBag )
 
 function cmxCustom( xTag, cBag, lSet )
 return ordCustom( xTag, cBag, lSet )
@@ -225,7 +224,7 @@ function cmxFor( xTag, cBag, cCond )
 return ordFor( xTag, cBag, cCond )
 
 function cmxIndexInfo()
-   local aInfo, nOrds := ORDCOUNT(), i
+   local aInfo, nOrds := ordCount(), i
 
    aInfo := array( 6, nOrds )
    for i := 1 to nOrds

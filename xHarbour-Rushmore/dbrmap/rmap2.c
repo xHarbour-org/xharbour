@@ -3,18 +3,20 @@
  */
 
 /*
-  (c) copyright xHarbour.com Inc. http://www.xHarbour.com
-  Author: Przemyslaw Czerpak Przemek@xHarbour.com
-
-  This source file is an intellectual property of xHarbour.com Inc.
-  You may NOT forward or share this file under any conditions!
-*/
+ * DBRMAP (Record Map filters) for [x]Harbour:
+ *    Record Map - query analyzer
+ *
+ * Copyright 2004-2011 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
+ * All rights reserved.
+ *
+ */
 
 #include "hbrddrm.h"
 #include "hbapiitm.h"
 #include "hbvm.h"
 #include "hbstack.h"
 #include "hbapierr.h"
+#include "hbdate.h"
 #include "hbset.h"
 
 #ifdef __XHARBOUR__
@@ -61,12 +63,12 @@ typedef struct _HB_RMQTAG
 {
    int      iTag;             /* the tag number in AREA index list */
    char     cType;            /* type of key expression */
-   BOOL     fDescend;         /* descending order */
-   BYTE *   pKey;             /* the stripped tag expression */
-   ULONG    ulKey;            /* expression length */
-   BYTE *   pFor;             /* the stripped FOR expression */
-   ULONG    ulFor;            /* FOR expression length */
-   BOOL     fDelExp;          /* FOR is '!DELETED()' exp */
+   HB_BOOL  fDescend;         /* descending order */
+   char *   pKey;             /* the stripped tag expression */
+   HB_SIZE  nKey;             /* expression length */
+   char *   pFor;             /* the stripped FOR expression */
+   HB_SIZE  nFor;             /* FOR expression length */
+   HB_BOOL  fDelExp;          /* FOR is '!DELETED()' exp */
    struct _HB_RMQTAG * pNext; /* pointer to next expression */
 } HB_RMQTAG;
 typedef HB_RMQTAG * PHB_RMQTAG;
@@ -75,12 +77,12 @@ typedef struct _HB_RMQSTACKITM
 {
    int            iOper;      /* type of operation HB_RMQ_* */
    int            iOpt;       /* optimization level */
-   BOOL           fNeg;       /* neg the operation */
+   HB_BOOL        fNeg;       /* neg the operation */
    PHB_ITEM       pItmLo;     /* index low value */
    PHB_ITEM       pItmHi;     /* index high value */
    PHB_RMQTAG     pTag;       /* the Tag */
-   BYTE *         byExpr;     /* the expression */
-   ULONG          ulExpr;     /* length of expression */
+   char *         pszExpr;    /* the expression */
+   HB_SIZE        nExpr;      /* length of expression */
 } HB_RMQSTACKITM;
 typedef HB_RMQSTACKITM * PHB_RMQSTACKITM;
 
@@ -91,34 +93,34 @@ typedef struct _HB_RMQSTACK
    int               iCur;    /* execute stack pos */
    PHB_RMQSTACKITM   pBase;   /* the real stack items */
    PHB_RMQTAG        pTags;   /* list of area tags */
-   BYTE *            byExpr;  /* the expression */
-   ULONG             ulExpr;  /* length of expression */
+   char *            pszExpr; /* the expression */
+   HB_SIZE           nExpr;   /* length of expression */
    AREAP             pArea;   /* work area pointer */
-   ULONG             ulRecs;  /* number of records in work area */
-   BOOL              fNExpr;  /* save non optimizable expression */
+   HB_ULONG          ulRecs;  /* number of records in work area */
+   HB_BOOL           fNExpr;  /* save non optimizable expression */
 } HB_RMQSTACK;
 typedef HB_RMQSTACK * PHB_RMQSTACK;
 
-static BYTE s_byDelExp[ 10 ];
-static ULONG s_ulDelExp = 0;
+static char s_szDelExp[ 10 ];
+static HB_SIZE s_nDelExp = 0;
 
 /*
  * evaluate macro string, return the ITEM result or NULL on error
  */
-static PHB_ITEM hb_rmqMacroEval( BYTE * byMacro, ULONG ulLen )
+static PHB_ITEM hb_rmqMacroEval( const char * pszMacro, HB_SIZE nLen )
 {
    int iCurrArea = hb_rddGetCurrentWorkAreaNumber();
-   PHB_ITEM pItem = hb_itemNew( NULL );
-   char *cType;
+   PHB_ITEM pItem;
+   const char *szType;
 
-   hb_itemPutCL( pItem, ( char * ) byMacro, ulLen );
+   pItem = hb_itemPutCL( NULL, pszMacro, nLen );
    hb_rddSelectWorkAreaNumber( 0 );
 #ifdef __XHARBOUR__
-   cType = hb_macroGetType( pItem, 0 );
+   szType = hb_macroGetType( pItem, 0 );
 #else
-   cType = hb_macroGetType( pItem );
+   szType = hb_macroGetType( pItem );
 #endif
-   if( *cType == 'U' && *( cType + 1 ) != 'I' )
+   if( szType[ 0 ] == 'U' && szType[ 1 ] != 'I' )
    {
       hb_itemRelease( pItem );
       pItem = NULL;
@@ -127,25 +129,33 @@ static PHB_ITEM hb_rmqMacroEval( BYTE * byMacro, ULONG ulLen )
    {
       hb_vmPush( pItem );
       hb_macroGetValue( hb_stackItemFromTop( -1 ), 0, 0 );
-      hb_itemCopy( pItem, hb_stackItemFromTop( -1 ) );
-      hb_stackPop();
+      if( hb_vmRequestQuery() == 0 )
+      {
+         hb_itemCopy( pItem, hb_stackItemFromTop( -1 ) );
+         hb_stackPop();
+      }
+      else
+      {
+         hb_itemRelease( pItem );
+         pItem = NULL;
+      }
    }
    hb_rddSelectWorkAreaNumber( iCurrArea );
    return pItem;
 }
 
-static ULONG hb_rmqCloseBrace( BYTE * byExpr, ULONG ulLen )
+static HB_SIZE hb_rmqCloseBrace( const char * pszExpr, HB_SIZE nLen )
 {
-   BYTE bQuote = 0, b;
-   ULONG ul = 0;
+   char bQuote = 0, b;
+   HB_SIZE n = 0;
    int iB = 0;
 
-   if( ulLen == 0 )
+   if( nLen == 0 )
       return 0;
 
    do
    {
-      b = byExpr[ ul ];
+      b = pszExpr[ n ];
 
       if( bQuote )
       {
@@ -163,42 +173,41 @@ static ULONG hb_rmqCloseBrace( BYTE * byExpr, ULONG ulLen )
          else if( b == ')' )
             --iB;
       }
-      ul++;
    }
-   while( ul < ulLen && iB );
+   while( ++n < nLen && iB );
 
    if( iB )
-      ul = 0;
+      n = 0;
 
-   return ul;
+   return n;
 }
 
-static ULONG hb_rmqStripBraces( BYTE * byExpr, ULONG ulLen )
+static HB_SIZE hb_rmqStripBraces( const char * pszExpr, HB_SIZE nLen )
 {
-   ULONG ul = 0, l;
-   while( ( ul << 1 ) + 1 < ulLen )
+   HB_SIZE n = 0, l;
+   while( ( n << 1 ) + 1 < nLen )
    {
-      l = ulLen - ( ul << 1 );
-      if( hb_rmqCloseBrace( &byExpr[ ul ], l ) == l )
-         ++ul;
+      l = nLen - ( n << 1 );
+      if( hb_rmqCloseBrace( &pszExpr[ n ], l ) == l )
+         ++n;
       else
          break;
    }
-   return ul;
+   return n;
 }
 
-static ULONG hb_rmqNextExp( BYTE * byExpr, ULONG ulLen,
-                            int * piOper, ULONG * ulExp )
+static HB_SIZE hb_rmqNextExp( const char * pszExpr, HB_SIZE nLen,
+                              int * piOper, HB_SIZE * pnExp )
 {
-   BYTE bQuote = 0, b;
-   ULONG ul = 0, ulLast = 0, ulLast2 = 0;
+   char bQuote = 0, b;
+   HB_SIZE n = 0, nLast = 0, nLast2 = 0;
    int iOper, iLastOp = HB_RMQ_NONE;
 
    iOper = piOper ? *piOper : HB_RMQ_NONE;
 
-   while( ul < ulLen )
+   while( n < nLen )
    {
-      b = byExpr[ ul ];
+      b = pszExpr[ n ];
 
       if( bQuote )
       {
@@ -213,54 +222,54 @@ static ULONG hb_rmqNextExp( BYTE * byExpr, ULONG ulLen,
       {
          if( b == '(' )
          {
-            ULONG l = hb_rmqCloseBrace( &byExpr[ ul ], ulLen - ul );
+            HB_SIZE l = hb_rmqCloseBrace( &pszExpr[ n ], nLen - n );
 
             if( l == 0 )
             {
                break;
             }
-            ul += l - 1;
+            n += l - 1;
          }
          else if( b == '.' )
          {
-            if( ulLen - ul >= 5 && hb_strnicmp( ( char * ) &byExpr[ ul ], ".AND.", 5 ) == 0 )
+            if( nLen - n >= 5 && hb_strnicmp( &pszExpr[ n ], ".AND.", 5 ) == 0 )
             {
                if( iLastOp == HB_RMQ_NONE )
                {
                   iLastOp = HB_RMQ_AND;
-                  ulLast = ul + 5;
-                  ulLast2 = ul;
+                  nLast = n + 5;
+                  nLast2 = n;
                }
-               ul += 5;
+               n += 5;
                if( iOper == HB_RMQ_NONE || iOper == HB_RMQ_AND )
                   break;
                continue;
             }
-            else if( ulLen - ul >= 4 && hb_strnicmp( ( char * ) &byExpr[ ul ], ".OR.", 4 ) == 0 )
+            else if( nLen - n >= 4 && hb_strnicmp( &pszExpr[ n ], ".OR.", 4 ) == 0 )
             {
                if( iLastOp == HB_RMQ_NONE )
                {
                   iLastOp = HB_RMQ_OR;
-                  ulLast = ul + 4;
-                  ulLast2 = ul;
+                  nLast = n + 4;
+                  nLast2 = n;
                }
-               ul += 4;
+               n += 4;
                if( iOper == HB_RMQ_NONE || iOper == HB_RMQ_OR )
                   break;
                continue;
             }
          }
       }
-      ul++;
+      n++;
    }
 
    if( piOper )
       *piOper = iLastOp;
 
-   if( ulExp )
-      *ulExp = ulLast2;
+   if( pnExp )
+      *pnExp = nLast2;
 
-   return ulLast;
+   return nLast;
 }
 
 #if 1
@@ -289,9 +298,9 @@ static int hb_rmqNegOper( int iOper )
    }
 }
 
-static BOOL hb_rmqCanBeJoined( PHB_RMQSTACKITM pOp )
+static HB_BOOL hb_rmqCanBeJoined( PHB_RMQSTACKITM pOp )
 {
-   BOOL fCan = FALSE;
+   HB_BOOL fCan = HB_FALSE;
 
    if( pOp->pTag )
    {
@@ -301,22 +310,22 @@ static BOOL hb_rmqCanBeJoined( PHB_RMQSTACKITM pOp )
          case HB_RMQ_GT:
          case HB_RMQ_LE:
          case HB_RMQ_GE:
-            fCan = TRUE;
+            fCan = HB_TRUE;
             break;
       }
    }
    return fCan;
 }
 
-static BOOL hb_rmqJoinOper( BOOL fTest, PHB_RMQSTACKITM pOp1,
-                                        PHB_RMQSTACKITM pOp2, BOOL fNeg )
+static HB_BOOL hb_rmqJoinOper( HB_BOOL fTest, PHB_RMQSTACKITM pOp1,
+                               PHB_RMQSTACKITM pOp2, HB_BOOL fNeg )
 {
-   BOOL fJoined = FALSE;
+  HB_BOOL fJoined = HB_FALSE;
 
    if( hb_rmqCanBeJoined( pOp1 ) && hb_rmqCanBeJoined( pOp2 ) &&
        pOp1->pTag->iTag == pOp2->pTag->iTag )
    {
-      BOOL fCan = TRUE;
+      HB_BOOL fCan = HB_TRUE;
       int iOper1 = pOp1->iOper, iOper2 = pOp2->iOper, iOper;
       PHB_ITEM pItmLo1 = pOp1->pItmLo, pItmHi1 = pOp1->pItmHi,
                pItmLo2 = pOp2->pItmLo, pItmHi2 = pOp2->pItmHi,
@@ -329,7 +338,7 @@ static BOOL hb_rmqJoinOper( BOOL fTest, PHB_RMQSTACKITM pOp1,
       {
          iOper = hb_rmqNegOper( iOper1 );
          if( iOper == HB_RMQ_NONE )
-            fCan = FALSE;
+            fCan = HB_FALSE;
          else
          {
             iOper1 = iOper;
@@ -342,7 +351,7 @@ static BOOL hb_rmqJoinOper( BOOL fTest, PHB_RMQSTACKITM pOp1,
       {
          iOper = hb_rmqNegOper( iOper2 );
          if( iOper == HB_RMQ_NONE )
-            fCan = FALSE;
+            fCan = HB_FALSE;
          else
          {
             iOper2 = iOper;
@@ -420,7 +429,7 @@ static BOOL hb_rmqJoinOper( BOOL fTest, PHB_RMQSTACKITM pOp1,
                   hb_itemRelease( pItmHi1 );
                */
             }
-            fJoined = TRUE;
+            fJoined = HB_TRUE;
          }
       }
    }
@@ -430,19 +439,19 @@ static BOOL hb_rmqJoinOper( BOOL fTest, PHB_RMQSTACKITM pOp1,
 
 #endif
 
-static ULONG hb_rmqOper( BYTE * byExpr, ULONG ulLen,
-                         int * piOper, ULONG * ulExp )
+static HB_SIZE hb_rmqOper( const char * pszExpr, HB_SIZE nLen,
+                           int * piOper, HB_SIZE * pnExp )
 {
-   BYTE bQuote = 0, b, bLast = 0;
-   ULONG ul = 0;
+   char bQuote = 0, b, bLast = 0;
+   HB_SIZE n = 0;
    int iOper = HB_RMQ_NONE;
 
-   while( ul < ulLen )
+   while( n < nLen )
    {
-      if( ulExp )
-         *ulExp = ul;
+      if( pnExp )
+         *pnExp = n;
 
-      b = byExpr[ ul ];
+      b = pszExpr[ n ];
 
       if( bQuote )
       {
@@ -457,116 +466,120 @@ static ULONG hb_rmqOper( BYTE * byExpr, ULONG ulLen,
       {
          if( b == '(' )
          {
-            ULONG l = hb_rmqCloseBrace( &byExpr[ ul ], ulLen - ul );
+            HB_SIZE l = hb_rmqCloseBrace( &pszExpr[ n ], nLen - n );
 
             if( l == 0 )
             {
-               ul = 0;
+               n = 0;
                break;
             }
-            ul += l - 1;
+            n += l - 1;
          }
          else if( b == '.' )
          {
-            if( ulLen - ul >= 5 && hb_strnicmp( ( char * ) &byExpr[ ul ], ".AND.", 5 ) == 0 )
+            if( nLen - n >= 5 && hb_strnicmp( &pszExpr[ n ], ".AND.", 5 ) == 0 )
             {
                iOper = HB_RMQ_AND;
-               ul += 5;
+               n += 5;
                break;
             }
-            else if( ulLen - ul >= 4 && hb_strnicmp( ( char * ) &byExpr[ ul ], ".OR.", 4 ) == 0 )
+            else if( nLen - n >= 4 && hb_strnicmp( &pszExpr[ n ], ".OR.", 4 ) == 0 )
             {
                iOper = HB_RMQ_OR;
-               ul += 4;
+               n += 4;
                break;
             }
          }
          else if( b == '=' )
          {
-            if( ul == 0 || bLast != ':' )
+            if( n == 0 || bLast != ':' )
             {
-               if( ulLen - ul >= 1 && byExpr[ ul + 1 ] == '=' )
+               if( nLen - n >= 1 && pszExpr[ n + 1 ] == '=' )
                {
                   iOper = HB_RMQ_EEQU;
-                  ul += 2;
+                  n += 2;
                }
                else
                {
                   iOper = HB_RMQ_EQU;
-                  ul++;
+                  n++;
                }
                break;
             }
          }
          else if( b == '>' )
          {
-            if( ulLen - ul >= 1 && byExpr[ ul + 1 ] == '=' )
+            if( n == 0 || bLast != '-' )
             {
-               iOper = HB_RMQ_GE;
-               ul += 2;
+               if( nLen - n >= 1 && pszExpr[ n + 1 ] == '=' )
+               {
+                  iOper = HB_RMQ_GE;
+                  n += 2;
+               }
+               else
+               {
+                  iOper = HB_RMQ_GT;
+                  n++;
+               }
+               break;
             }
-            else
-            {
-               iOper = HB_RMQ_GT;
-               ul++;
-            }
-            break;
          }
          else if( b == '<' )
          {
-            if( ulLen - ul >= 1 && byExpr[ ul + 1 ] == '=' )
+            if( nLen - n >= 1 && pszExpr[ n + 1 ] == '=' )
             {
                iOper = HB_RMQ_LE;
-               ul += 2;
-            }
-            else if( ulLen - ul >= 1 && byExpr[ ul + 1 ] == '>' )
-            {
-               iOper = HB_RMQ_NEQU;
-               ul += 2;
+               n += 2;
             }
             else
             {
                iOper = HB_RMQ_LT;
-               ul++;
+               n++;
             }
+            break;
+         }
+         else if( b == '#' )
+         {
+            iOper = HB_RMQ_NEQU;
+            n++;
             break;
          }
       }
       bLast = b;
-      ul++;
+      n++;
    }
 
    if( piOper )
       *piOper = iOper;
 
-   return ( ul == ulLen ) ? 0 : ul;
+   return ( n == nLen ) ? 0 : n;
 }
 
-static void hb_rmqStripExp( BYTE ** byExpr, ULONG *ulLen, BOOL *fNeg )
+static void hb_rmqStripExp( const char ** pExprPtr, HB_SIZE *pnLen, HB_BOOL *pfNeg )
 {
-   ULONG ul;
+   HB_SIZE n;
 
    do
    {
-      ul = hb_rmqStripBraces( *byExpr, *ulLen );
-      if( ul > 0 )
+      n = hb_rmqStripBraces( *pExprPtr, *pnLen );
+      if( n > 0 )
       {
-         *byExpr += ul;
-         *ulLen -= ( ul << 1 );
+         *pExprPtr += n;
+         *pnLen -= ( n << 1 );
       }
-      else if( (*byExpr)[ 0 ] == '!' &&
-               hb_rmqNextExp( *byExpr, *ulLen, NULL, NULL ) == 0 )
+      else if( ( *pExprPtr )[ 0 ] == '!' && pfNeg &&
+               hb_rmqNextExp( *pExprPtr, *pnLen, NULL, NULL ) == 0 )
       {
-         *fNeg = !*fNeg;
-         ul = 1;
-         (*byExpr)++;
-         (*ulLen)--;
+         *pfNeg = !*pfNeg;
+         n = 1;
+         ( *pExprPtr )++;
+         ( *pnLen )--;
       }
    }
-   while( ul > 0 );
+   while( n > 0 );
 }
 
-static BOOL hb_rmqIsAbbFunc( BYTE * byExpr, int iLen, int *iNewLen )
+static HB_BOOL hb_rmqIsAbbFunc( const char * pszExpr, int iLen, int *iNewLen )
 {
    static const char * functions[] =
       { "SUBSTR", "DELETED", "REPLICATE", NULL };
@@ -579,16 +592,16 @@ static BOOL hb_rmqIsAbbFunc( BYTE * byExpr, int iLen, int *iNewLen )
       for( iFunc = 0; functions[ iFunc ]; iFunc++ )
       {
          i = 0;
-         while( i < iLen && functions[ iFunc ][ i ] == byExpr[ i ] )
+         while( i < iLen && functions[ iFunc ][ i ] == pszExpr[ i ] )
             i++;
-         if( byExpr[ i ] == '(' )
+         if( pszExpr[ i ] == '(' )
          {
             *iNewLen = 4;
-            return TRUE;
+            return HB_TRUE;
          }
       }
    }
-   return FALSE;
+   return HB_FALSE;
 }
 
 /*
@@ -596,25 +609,26 @@ static BOOL hb_rmqIsAbbFunc( BYTE * byExpr, int iLen, int *iNewLen )
  * it ignores different quotas so expressions:
  * "F1='ABC'", 'F1="ABC"' and "F1=[ABC]" are equal
  */
-static BOOL hb_rmqCmp( BYTE * bySrcExpr, ULONG ulSrcLen,
-                       BYTE * byDstExpr, ULONG ulDstLen, BOOL *fNeg, BOOL fStr )
+static HB_BOOL hb_rmqCmp( const char * pszSrcExpr, HB_SIZE nSrcLen,
+                          const char * pszDstExpr, HB_SIZE nDstLen,
+                          HB_BOOL *pfNeg, HB_BOOL fStr )
 {
-   BYTE bQuote1 = 0, bQuote2 = 0, b1, b2;
-   ULONG ul;
+   char bQuote1 = 0, bQuote2 = 0, b1, b2;
+   HB_SIZE n;
 
-   hb_rmqStripExp( &bySrcExpr, &ulSrcLen, fNeg );
-   hb_rmqStripExp( &byDstExpr, &ulDstLen, fNeg );
+   hb_rmqStripExp( &pszSrcExpr, &nSrcLen, pfNeg );
+   hb_rmqStripExp( &pszDstExpr, &nDstLen, pfNeg );
 
-   if( ulSrcLen != ulDstLen )
+   if( nSrcLen != nDstLen )
    {
-      if( !fStr || ulSrcLen > ulDstLen || byDstExpr[ ulSrcLen ] != '+' )
-         return FALSE;
+      if( !fStr || nSrcLen > nDstLen || pszDstExpr[ nSrcLen ] != '+' )
+         return HB_FALSE;
    }
 
-   for( ul = 0; ul < ulSrcLen; ul++ )
+   for( n = 0; n < nSrcLen; n++ )
    {
-      b1 = bySrcExpr[ ul ];
-      b2 = byDstExpr[ ul ];
+      b1 = pszSrcExpr[ n ];
+      b2 = pszDstExpr[ n ];
 
       if( bQuote1 )
       {
@@ -645,31 +659,57 @@ static BOOL hb_rmqCmp( BYTE * bySrcExpr, ULONG ulSrcLen,
       }
 
       if( b1 != b2 || ( ( bQuote1 != 0 ) != ( bQuote2 != 0 ) ) )
-         return FALSE;
+         return HB_FALSE;
    }
 
-   return TRUE;
+   return HB_TRUE;
+}
+
+static HB_BOOL hb_rmqFuncCmp( const char * pszKeyExpr, HB_SIZE nKeyLen,
+                              const char * pszFncExpr, HB_SIZE nFncLen,
+                              const char * pszParExpr, HB_SIZE nParLen,
+                              HB_BOOL * pfNeg, HB_BOOL fStr )
+{
+   HB_SIZE n;
+
+   hb_rmqStripExp( &pszKeyExpr, &nKeyLen, pfNeg );
+
+   if( nKeyLen > nFncLen + 2 )
+   {
+      if( memcmp( pszKeyExpr, pszFncExpr, nFncLen ) == 0 && pszKeyExpr[ nFncLen ] == '(' )
+      {
+         pszKeyExpr += nFncLen;
+         nKeyLen -= nFncLen;
+         n = hb_rmqCloseBrace( pszKeyExpr, nKeyLen );
+         if( fStr && n > 0 && pszKeyExpr[ n ] == '+' )
+            nKeyLen = n;
+         if( n == nKeyLen )
+            return hb_rmqCmp( pszKeyExpr, nKeyLen, pszParExpr, nParLen, NULL, HB_FALSE );
+      }
+   }
+
+   return HB_FALSE;
 }
 
 /*
  * strip spaces and FIELD->, _FIELD->, <ALIAS>->expressions,
- * replace '.not.' with '!' and '!=' with '<>',
+ * replace '.not.' with '!' and '!=', '<>' with '#',
  * and make all non quoted part upper
  */
-static BYTE * hb_rmqStrip( BYTE * bySrcExpr, ULONG ulLen, char * szAlias,
-                           ULONG *ulDstLen )
+static char * hb_rmqStrip( const char * pszSrcExpr, HB_SIZE nLen,
+                           const char * szAlias, HB_SIZE *pnDstLen )
 {
-   BYTE bQuote = 0, bLast = 0, * byDstExpr, b;
-   ULONG ulDst = 0, ulAlias, ul;
+   char bQuote = 0, bLast = 0, * pszDstExpr, b;
+   HB_SIZE nDst = 0, nAlias, nL;
    int iLen, iNewLen;
 
-   byDstExpr = ( BYTE * ) hb_xgrab( ulLen + 1 );
+   pszDstExpr = ( char * ) hb_xgrab( nLen + 1 );
 
-   ulAlias = szAlias ? strlen( ( char * ) szAlias ) : 0;
+   nAlias = szAlias ? strlen( szAlias ) : 0;
 
-   for( ul = 0; ul < ulLen; ul++ )
+   for( nL = 0; nL < nLen; nL++ )
    {
-      b = bySrcExpr[ ul ];
+      b = pszSrcExpr[ nL ];
 
       if( bQuote )
       {
@@ -677,68 +717,68 @@ static BYTE * hb_rmqStrip( BYTE * bySrcExpr, ULONG ulLen, char * szAlias,
          {
             bQuote = 0;
          }
-         byDstExpr[ ulDst++ ] = b;
+         pszDstExpr[ nDst++ ] = b;
       }
       else if( b == '\'' || b == '"' || b == '[' )
       {
          bQuote = ( b == '[' ) ? ']' : b;
-         byDstExpr[ ulDst++ ] = b;
+         pszDstExpr[ nDst++ ] = b;
       }
       else
       {
          if( b != ' ' )
          {
-            if( bLast == ' ' && ulDst > 0 &&
-                 HB_RMQ_ISIDCH( b ) && HB_RMQ_ISIDCH( byDstExpr[ ulDst - 1 ] ) )
+            if( bLast == ' ' && nDst > 0 &&
+                 HB_RMQ_ISIDCH( b ) && HB_RMQ_ISIDCH( pszDstExpr[ nDst - 1 ] ) )
             {
-               byDstExpr[ ulDst++ ] = bLast;
+               pszDstExpr[ nDst++ ] = bLast;
             }
-            byDstExpr[ ulDst++ ] = toupper( b );
+            pszDstExpr[ nDst++ ] = ( char ) HB_TOUPPER( b );
             if( b == '>' && bLast == '-' )
             {
-               ULONG n = 0;
+               HB_SIZE n = 0;
 
-               if( ulDst >= 7 && hb_strnicmp( ( char * ) &byDstExpr[ ulDst - 7 ], "FIELD", 5 ) == 0 )
+               if( nDst >= 7 && hb_strnicmp( &pszDstExpr[ nDst - 7 ], "FIELD", 5 ) == 0 )
                {
                   n = 7;
-                  if( ulDst >= 8 && byDstExpr[ ulDst - 8 ] == '_' )
-                     ++ n;
-                  if( n < ulDst && HB_RMQ_ISIDCH( byDstExpr[ ulDst - n - 1 ] ) )
+                  if( nDst >= 8 && pszDstExpr[ nDst - 8 ] == '_' )
+                     ++n;
+                  if( n < nDst && HB_RMQ_ISIDCH( pszDstExpr[ nDst - n - 1 ] ) )
                      n = 0;
                }
-               if( n == 0 && ulAlias && ulDst >= ulAlias + 2 )
+               if( n == 0 && nAlias && nDst >= nAlias + 2 )
                {
-                  if( hb_strnicmp( ( char * ) &byDstExpr[ ulDst - ulAlias - 2 ], ( char * ) szAlias, ulAlias ) == 0 )
+                  if( hb_strnicmp( &pszDstExpr[ nDst - nAlias - 2 ], szAlias, nAlias ) == 0 )
                   {
-                     n = ulAlias + 2;
-                     if( n < ulDst && HB_RMQ_ISIDCH( byDstExpr[ ulDst - n - 1 ] ) )
+                     n = nAlias + 2;
+                     if( n < nDst && HB_RMQ_ISIDCH( pszDstExpr[ nDst - n - 1 ] ) )
                         n = 0;
                   }
-                  else if( ulDst > 4 && byDstExpr[ ulDst - 3 ] == ')' )
+                  else if( nDst > 4 && pszDstExpr[ nDst - 3 ] == ')' )
                   {
-                     ULONG l = ulDst - 2;
+                     HB_SIZE l = nDst - 2;
                      int iB = 0;
 
                      do
                      {
                         --l;
-                        if( byDstExpr[ l ] == '(' )
+                        if( pszDstExpr[ l ] == '(' )
                            ++iB;
-                        else if( byDstExpr[ l ] == ')' )
+                        else if( pszDstExpr[ l ] == ')' )
                            --iB;
                      }
                      while( l > 0 && iB );
 
                      if( !iB )
                      {
-                        PHB_ITEM pRet = hb_rmqMacroEval( &byDstExpr[ l ], ulDst - l - 2 );
+                        PHB_ITEM pRet = hb_rmqMacroEval( &pszDstExpr[ l ], nDst - l - 2 );
                         if( pRet )
                         {
-                           char * cRet = hb_itemGetCPtr( pRet );
-                           ULONG ll = hb_itemGetCLen( pRet );
+                           const char * cRet = hb_itemGetCPtr( pRet );
+                           HB_SIZE ll = hb_itemGetCLen( pRet );
                            if( ll > 0 )
                            {
-                              while( cRet[ ll ] == ' ' )
+                              while( ll > 0 && cRet[ ll - 1 ] == ' ' )
                               {
                                  --ll;
                               }
@@ -747,9 +787,9 @@ static BYTE * hb_rmqStrip( BYTE * bySrcExpr, ULONG ulLen, char * szAlias,
                                  ++cRet;
                                  --ll;
                               }
-                              if( ll == ulAlias && hb_strnicmp( cRet, ( char * ) szAlias, ulAlias ) == 0 )
+                              if( ll == nAlias && hb_strnicmp( cRet, szAlias, nAlias ) == 0 )
                               {
-                                 n = ulDst - l;
+                                 n = nDst - l;
                               }
                            }
                            hb_itemRelease( pRet );
@@ -759,54 +799,73 @@ static BYTE * hb_rmqStrip( BYTE * bySrcExpr, ULONG ulLen, char * szAlias,
                }
                if( n > 0 )
                {
-                  ulDst -= n;
+                  nDst -= n;
                }
             }
-            else if( b == '=' && bLast == '!' )
+            else if( ( b == '=' && bLast == '!' ) || ( b == '>' && bLast == '<' ) )
             {
-               ulDst -= 2;
-               byDstExpr[ ulDst++ ] = '<';
-               byDstExpr[ ulDst++ ] = '>';
+               nDst -= 2;
+               pszDstExpr[ nDst++ ] = '#';
             }
-            else if( b == '.' && ( bLast == 't' || bLast == 'T' ) && ulDst >= 5 &&
-                     hb_strnicmp( ( char * ) &byDstExpr[ ulDst - 5 ], ".NOT.", 5 ) == 0 )
+            else if( b == '.' && nDst >= 5 )
             {
-               ulDst -= 5;
-               byDstExpr[ ulDst++ ] = b = '!';
+               if( bLast == 't' || bLast == 'T' )
+               {
+                  if( hb_strnicmp( &pszDstExpr[ nDst - 5 ], ".NOT.", 5 ) == 0 )
+                  {
+                     nDst -= 5;
+                     pszDstExpr[ nDst++ ] = b = '!';
+                  }
+                  else if( pszDstExpr[ nDst - 3 ] == '.' )
+                  {
+                     if( pszDstExpr[ nDst - 4 ] == '=' )
+                     {
+                        if( pszDstExpr[ nDst - 5 ] == '=' )
+                           nDst -= 5;
+                        else if( pszDstExpr[ nDst - 5 ] != '>' && pszDstExpr[ nDst - 5 ] != '<' )
+                           nDst -= 4;
+                     }
+                  }
+               }
+               else if( ( bLast == 'f' || bLast == 'F' ) && pszDstExpr[ nDst - 3 ] == '.' )
+               {
+                  if( pszDstExpr[ nDst - 4 ] == '#' )
+                     nDst -= 4;
+               }
             }
-            else if( b == '(' && ulDst > 1 )
+            else if( b == '(' && nDst > 1 )
             {
                iLen = 0;
-               while( ulDst - iLen >= 2 &&
-                      HB_RMQ_ISIDCH( byDstExpr[ ulDst - iLen - 2 ] ) )
+               while( nDst - iLen >= 2 &&
+                      HB_RMQ_ISIDCH( pszDstExpr[ nDst - iLen - 2 ] ) )
                {
                   ++iLen;
                }
-               if( iLen > 4 && hb_rmqIsAbbFunc( &byDstExpr[ ulDst - 1 - iLen ], iLen, &iNewLen ) )
+               if( iLen > 4 && hb_rmqIsAbbFunc( &pszDstExpr[ nDst - 1 - iLen ], iLen, &iNewLen ) )
                {
-                  ulDst = ulDst - 1 - iLen + iNewLen;
-                  byDstExpr[ ulDst++ ] = '(';
+                  nDst = nDst - 1 - iLen + iNewLen;
+                  pszDstExpr[ nDst++ ] = '(';
                }
             }
-            if( ulDst >= 2 && b == '!' && byDstExpr[ ulDst - 2 ] == '!' )
+            if( nDst >= 2 && b == '!' && pszDstExpr[ nDst - 2 ] == '!' )
             {
-               ulDst -= 2;
+               nDst -= 2;
             }
          }
       }
       bLast = b;
    }
 
-   ul = hb_rmqStripBraces( byDstExpr, ulDst );
-   if( ul > 0 )
+   nL = hb_rmqStripBraces( pszDstExpr, nDst );
+   if( nL > 0 )
    {
-      ulDst -= ( ul << 1 );
-      memmove( byDstExpr, &byDstExpr[ ul ], ulDst );
+      nDst -= ( nL << 1 );
+      memmove( pszDstExpr, &pszDstExpr[ nL ], nDst );
    }
 
-   byDstExpr[ ulDst ] = '\0';
-   *ulDstLen = ulDst;
-   return byDstExpr;
+   pszDstExpr[ nDst ] = '\0';
+   *pnDstLen = nDst;
+   return pszDstExpr;
 }
 
 static void hb_rmqDestroyTagList( PHB_RMQTAG pRMQTags )
@@ -834,9 +893,9 @@ static void hb_rmqDispTagList( PHB_RMQTAG pRMQTags )
       i++;
       printf("\n%d) iTag=%d ", i, pRMQTags->iTag);
       if( pRMQTags->pKey )
-         printf("KEY=[%s]:%ld ", pRMQTags->pKey, pRMQTags->ulKey);
+         printf("KEY=[%s]:%ld ", pRMQTags->pKey, pRMQTags->nKey);
       if( pRMQTags->pFor )
-         printf("FOR=[%s]:%ld ", pRMQTags->pFor, pRMQTags->ulFor);
+         printf("FOR=[%s]:%ld ", pRMQTags->pFor, pRMQTags->nFor);
       if( pRMQTags->fDescend )
          printf("DESCEND ");
       pRMQTags = pRMQTags->pNext;
@@ -855,7 +914,7 @@ static void hb_rmqClearOrderInfo( LPDBORDERINFO pOrderInfo )
       hb_itemRelease( pOrderInfo->itmResult );
 }
 
-static PHB_RMQTAG hb_rmqCreateTagList( AREAP pArea, char * szAlias )
+static PHB_RMQTAG hb_rmqCreateTagList( AREAP pArea, const char * szAlias )
 {
    PHB_RMQTAG pRMQTags = NULL, *pRMQTagPtr;
    DBORDERINFO OrderInfo;
@@ -871,65 +930,68 @@ static PHB_RMQTAG hb_rmqCreateTagList( AREAP pArea, char * szAlias )
    for( i = 1; i <= iCount; i++ )
    {
       OrderInfo.itmOrder = hb_itemPutNI( OrderInfo.itmOrder, i );
-      OrderInfo.itmResult = hb_itemPutL( OrderInfo.itmResult, FALSE );
+      OrderInfo.itmResult = hb_itemPutL( OrderInfo.itmResult, HB_FALSE );
       SELF_ORDINFO( pArea, DBOI_CUSTOM, &OrderInfo );
       if( ! hb_itemGetL( OrderInfo.itmResult ) )
       {
          SELF_ORDINFO( pArea, DBOI_UNIQUE, &OrderInfo );
          if( ! hb_itemGetL( OrderInfo.itmResult ) )
          {
-            BOOL fDesc, fDel;
-            BYTE * byFor = NULL, *byKey = NULL;
-            ULONG ulFor = 0, ulKey = 0, ulLen;
-            char cType, * szVal;
+            HB_BOOL fDesc, fDel;
+            char * pszFor = NULL, *pszKey = NULL;
+            HB_SIZE nFor = 0, nKey = 0, nLen;
+            const char * szVal;
+            char cType;
 
             SELF_ORDINFO( pArea, DBOI_ISDESC, &OrderInfo );
             fDesc = hb_itemGetL( OrderInfo.itmResult );
 
-            OrderInfo.itmResult = hb_itemPutC( OrderInfo.itmResult, "" );
+            OrderInfo.itmResult = hb_itemPutC( OrderInfo.itmResult, NULL );
             SELF_ORDINFO( pArea, DBOI_KEYTYPE, &OrderInfo );
             cType = hb_itemGetCPtr( OrderInfo.itmResult )[0];
-            OrderInfo.itmResult = hb_itemPutC( OrderInfo.itmResult, "" );
+            OrderInfo.itmResult = hb_itemPutC( OrderInfo.itmResult, NULL );
             SELF_ORDINFO( pArea, DBOI_CONDITION, &OrderInfo );
             szVal = hb_itemGetCPtr( OrderInfo.itmResult );
-            ulLen = hb_itemGetCLen( OrderInfo.itmResult );
-            if( ulLen && ! hb_strEmpty( szVal, ulLen ) )
+            nLen = hb_itemGetCLen( OrderInfo.itmResult );
+            if( nLen && ! hb_strEmpty( szVal, nLen ) )
             {
-               byFor = hb_rmqStrip( ( BYTE * ) szVal, ulLen, szAlias, &ulFor );
+               pszFor = hb_rmqStrip( szVal, nLen, szAlias, &nFor );
             }
-            OrderInfo.itmResult = hb_itemPutC( OrderInfo.itmResult, "" );
+            OrderInfo.itmResult = hb_itemPutC( OrderInfo.itmResult, NULL );
             SELF_ORDINFO( pArea, DBOI_EXPRESSION, &OrderInfo );
             szVal = hb_itemGetCPtr( OrderInfo.itmResult );
-            ulLen = hb_itemGetCLen( OrderInfo.itmResult );
-            if( ulLen && ! hb_strEmpty( szVal, ulLen ) )
+            nLen = hb_itemGetCLen( OrderInfo.itmResult );
+            if( nLen && ! hb_strEmpty( szVal, nLen ) )
             {
-               byKey = hb_rmqStrip( ( BYTE * ) szVal, ulLen, szAlias, &ulKey );
+               pszKey = hb_rmqStrip( szVal, nLen, szAlias, &nKey );
             }
-            if( byFor )
+            if( pszFor )
             {
-               BOOL fNeg = FALSE;
-               if( s_ulDelExp == 0 )
+               HB_BOOL fNeg = HB_FALSE;
+               if( s_nDelExp == 0 )
                {
-                  BYTE *byExp = hb_rmqStrip( ( BYTE * ) HB_RMQ_DELEXP, strlen( HB_RMQ_DELEXP ),
-                                             szAlias, &s_ulDelExp );
-                  hb_strncpy( ( char * ) s_byDelExp, ( char * ) byExp, sizeof( s_byDelExp ) - 1 );
-                  hb_xfree( byExp );
+                  HB_SIZE nDelExp = 0;
+                  char *pszExp = hb_rmqStrip( HB_RMQ_DELEXP, strlen( HB_RMQ_DELEXP ),
+                                              szAlias, &nDelExp );
+                  hb_strncpy( s_szDelExp, pszExp, sizeof( s_szDelExp ) - 1 );
+                  s_nDelExp = nDelExp;
+                  hb_xfree( pszExp );
                }
-               fDel = hb_rmqCmp( byFor, ulFor, s_byDelExp, s_ulDelExp, &fNeg, FALSE ) &&
+               fDel = hb_rmqCmp( pszFor, nFor, s_szDelExp, s_nDelExp, &fNeg, HB_FALSE ) &&
                       fNeg;
             }
             else
             {
-               fDel = FALSE;
+               fDel = HB_FALSE;
             }
             *pRMQTagPtr = ( PHB_RMQTAG ) hb_xgrab( sizeof( HB_RMQTAG ) );
             (*pRMQTagPtr)->iTag     = i;
             (*pRMQTagPtr)->cType    = cType;
             (*pRMQTagPtr)->fDescend = fDesc;
-            (*pRMQTagPtr)->pKey     = byKey;
-            (*pRMQTagPtr)->ulKey    = ulKey;
-            (*pRMQTagPtr)->pFor     = byFor;
-            (*pRMQTagPtr)->ulFor    = ulFor;
+            (*pRMQTagPtr)->pKey     = pszKey;
+            (*pRMQTagPtr)->nKey     = nKey;
+            (*pRMQTagPtr)->pFor     = pszFor;
+            (*pRMQTagPtr)->nFor     = nFor;
             (*pRMQTagPtr)->fDelExp  = fDel;
             (*pRMQTagPtr)->pNext    = NULL;
             pRMQTagPtr = &( *pRMQTagPtr )->pNext;
@@ -942,10 +1004,12 @@ static PHB_RMQTAG hb_rmqCreateTagList( AREAP pArea, char * szAlias )
    return pRMQTags;
 }
 
-static PHB_RMQTAG hb_rmqFindTag( PHB_RMQTAG pRMQTags, BOOL * pfFor,
-                                 BYTE * byExpr, ULONG ulLen, BOOL * pfNeg )
+static PHB_RMQTAG hb_rmqFindTag( PHB_RMQTAG pRMQTags, HB_BOOL * pfFor,
+                                 const char * pszExpr, HB_SIZE nLen,
+                                 HB_BOOL * pfNeg,
+                                 PHB_ITEM pItem, int * piOper )
 {
-   BOOL fNeg = FALSE;
+   HB_BOOL fNeg = HB_FALSE;
 
    while( pRMQTags )
    {
@@ -953,27 +1017,73 @@ static PHB_RMQTAG hb_rmqFindTag( PHB_RMQTAG pRMQTags, BOOL * pfFor,
       {
          if( pRMQTags->pFor )
          {
-            if( hb_rmqCmp( byExpr, ulLen, pRMQTags->pFor, pRMQTags->ulFor, &fNeg, FALSE ) )
+            if( hb_rmqCmp( pszExpr, nLen, pRMQTags->pFor, pRMQTags->nFor, &fNeg, HB_FALSE ) )
             {
-               *pfFor = TRUE;
+               *pfFor = HB_TRUE;
                break;
             }
          }
          else if( pRMQTags->cType == 'L' )
          {
-            if( hb_rmqCmp( byExpr, ulLen, pRMQTags->pKey, pRMQTags->ulKey, &fNeg, FALSE ) )
+            if( hb_rmqCmp( pszExpr, nLen, pRMQTags->pKey, pRMQTags->nKey, &fNeg, HB_FALSE ) )
             {
-               *pfFor = FALSE;
+               *pfFor = HB_FALSE;
                break;
             }
          }
-         fNeg = FALSE;
+         fNeg = HB_FALSE;
       }
-      else if( !pRMQTags->pFor /* || ( pRMQTags->fDelExp && hb_setGetDeleted() ) */ )
+      else if( pRMQTags->pFor )
       {
-         if( hb_rmqCmp( byExpr, ulLen, pRMQTags->pKey, pRMQTags->ulKey, &fNeg, pRMQTags->cType == 'C' ) )
+         if( ( hb_itemType( pItem ) & HB_IT_LOGICAL ) != 0 &&
+             ( *piOper == HB_RMQ_EQU ||
+               *piOper == HB_RMQ_NEQU ||
+               *piOper == HB_RMQ_EEQU ||
+               *piOper == HB_RMQ_NEEQU ) )
+         {
+            if( hb_rmqCmp( pszExpr, nLen, pRMQTags->pFor, pRMQTags->nFor, &fNeg, HB_FALSE ) )
+            {
+               if( !hb_itemGetL( pItem ) )
+                  fNeg = !fNeg;
+               if( *piOper == HB_RMQ_NEQU || *piOper == HB_RMQ_NEEQU )
+                  fNeg = !fNeg;
+               *piOper = HB_RMQ_TAG;
+               break;
+            }
+            fNeg = HB_FALSE;
+         }
+      }
+      else /* if( !pRMQTags->pFor || ( pRMQTags->fDelExp && hb_setGetDeleted() ) ) */
+      {
+         if( hb_rmqCmp( pszExpr, nLen, pRMQTags->pKey, pRMQTags->nKey, &fNeg, pRMQTags->cType == 'C' ) )
             break;
-         fNeg = FALSE;
+         fNeg = HB_FALSE;
+
+         if( pItem && pRMQTags->cType == 'C' &&
+             ( hb_itemType( pItem ) & HB_IT_DATETIME ) != 0 )
+         {
+            if( pRMQTags->nKey > 6 &&
+                hb_rmqFuncCmp( pRMQTags->pKey, pRMQTags->nKey, "DTOS", 4,
+                               pszExpr, nLen, &fNeg, HB_TRUE ) )
+            {
+               char szDate[ 9 ];
+               hb_itemPutCL( pItem, hb_dateDecStr( szDate, hb_itemGetDL( pItem ) ), 8 );
+               break;
+            }
+            fNeg = HB_FALSE;
+         }
+         else if( pItem && ( pRMQTags->cType == 'D' || pRMQTags->cType == 'T' ) &&
+                  ( hb_itemGetCLen( pItem ) >= 8 ) != 0 )
+         {
+            if( nLen > 6 &&
+                hb_rmqFuncCmp( pszExpr, nLen, "DTOS", 4,
+                               pRMQTags->pKey, pRMQTags->nKey, &fNeg, HB_FALSE ) )
+            {
+               hb_itemPutDL( pItem, hb_dateEncStr( hb_itemGetCPtr( pItem ) ) );
+               break;
+            }
+            fNeg = HB_FALSE;
+         }
       }
       pRMQTags = pRMQTags->pNext;
    }
@@ -984,7 +1094,8 @@ static PHB_RMQTAG hb_rmqFindTag( PHB_RMQTAG pRMQTags, BOOL * pfFor,
 }
 
 static PHB_RMQSTACK hb_rmqStackCreate( AREAP pArea, PHB_RMQTAG pRMQTags,
-                                       ULONG ulRecords, BYTE * byExpr, ULONG ulLen )
+                                       HB_ULONG ulRecords,
+                                       char * pszExpr, HB_SIZE nLen )
 {
    PHB_RMQSTACK pStack = ( PHB_RMQSTACK ) hb_xgrab( sizeof( HB_RMQSTACK ) );
 
@@ -993,8 +1104,8 @@ static PHB_RMQSTACK hb_rmqStackCreate( AREAP pArea, PHB_RMQTAG pRMQTags,
    pStack->pBase = ( PHB_RMQSTACKITM ) hb_xgrab( sizeof( HB_RMQSTACKITM ) *
                                                  HB_RMQ_STACKSIZE );
    pStack->pTags = pRMQTags;
-   pStack->byExpr = byExpr;
-   pStack->ulExpr = ulLen;
+   pStack->pszExpr = pszExpr;
+   pStack->nExpr = nLen;
    pStack->ulRecs = ulRecords;
    pStack->pArea = pArea;
 
@@ -1011,8 +1122,8 @@ static void hb_rmqStackPop( PHB_RMQSTACK pStack )
          hb_itemRelease( pItm->pItmLo );
       if( pItm->pItmHi )
          hb_itemRelease( pItm->pItmHi );
-      if( pItm->byExpr )
-         hb_xfree( pItm->byExpr );
+      if( pItm->pszExpr )
+         hb_xfree( pItm->pszExpr );
    }
 }
 
@@ -1024,12 +1135,12 @@ static void hb_rmqStackDestoy( PHB_RMQSTACK pStack )
    }
    hb_xfree( pStack->pBase );
    hb_rmqDestroyTagList( pStack->pTags );
-   if( pStack->byExpr )
-      hb_xfree( pStack->byExpr );
+   if( pStack->pszExpr )
+      hb_xfree( pStack->pszExpr );
    hb_xfree( pStack );
 }
 
-static int hb_rmqStackOptLvl( PHB_RMQSTACK pStack, BOOL fExp )
+static int hb_rmqStackOptLvl( PHB_RMQSTACK pStack, HB_BOOL fExp )
 {
    int iOpt, iOpt1, iOpt2;
 
@@ -1098,7 +1209,7 @@ static PHB_RMFILTER hb_rmqStackEval( PHB_RMQSTACK pStack )
       {
          /* update the stack counter only */
          pStack->iCur--;
-         hb_rmqStackOptLvl( pStack, FALSE );
+         hb_rmqStackOptLvl( pStack, HB_FALSE );
       }
       else if( pItm->iOper == HB_RMQ_AND )
       {
@@ -1156,8 +1267,8 @@ static PHB_RMFILTER hb_rmqStackEval( PHB_RMQSTACK pStack )
          OrderInfo.itmOrder = hb_itemPutNI( NULL, pItm->pTag->iTag );
          if( pItm->pTag->fDescend )
          {
-            OrderInfo.itmNewVal = hb_itemPutL( NULL, FALSE );
-            OrderInfo.itmResult = hb_itemPutL( NULL, FALSE );
+            OrderInfo.itmNewVal = hb_itemPutL( NULL, HB_FALSE );
+            OrderInfo.itmResult = hb_itemPutL( NULL, HB_FALSE );
             SELF_ORDINFO( pStack->pArea, DBOI_ISDESC, &OrderInfo );
          }
 #ifdef HB_RMQ_DBGDISP
@@ -1204,7 +1315,7 @@ static PHB_RMFILTER hb_rmqStackEval( PHB_RMQSTACK pStack )
          }
          if( pItm->pTag->fDescend )
          {
-            OrderInfo.itmNewVal = hb_itemPutL( OrderInfo.itmNewVal, TRUE );
+            OrderInfo.itmNewVal = hb_itemPutL( OrderInfo.itmNewVal, HB_TRUE );
             SELF_ORDINFO( pStack->pArea, DBOI_ISDESC, &OrderInfo );
          }
          hb_rmqClearOrderInfo( &OrderInfo );
@@ -1230,10 +1341,10 @@ static PHB_RMFILTER hb_rmqStackEval( PHB_RMQSTACK pStack )
    return pRM;
 }
 
-static BOOL hb_rmqStackDoOpt( BOOL fTest, PHB_RMQSTACK pStack,
-                              PHB_RMQSTACKITM pWith, BOOL fNeg )
+static HB_BOOL hb_rmqStackDoOpt( HB_BOOL fTest, PHB_RMQSTACK pStack,
+                                 PHB_RMQSTACKITM pWith, HB_BOOL fNeg )
 {
-   BOOL fOpt = FALSE, fOpt1, fOpt2;
+   HB_BOOL fOpt = HB_FALSE, fOpt1, fOpt2;
 
    if( pStack->iCur < pStack->iPos )
    {
@@ -1247,11 +1358,11 @@ static BOOL hb_rmqStackDoOpt( BOOL fTest, PHB_RMQSTACK pStack,
             {
                int iCur = pStack->iCur;
                pWith = &pStack->pBase[ pStack->iCur++ ];
-               fOpt = hb_rmqStackDoOpt( TRUE, pStack, pWith, FALSE );
+               fOpt = hb_rmqStackDoOpt( HB_TRUE, pStack, pWith, HB_FALSE );
                if( fOpt && !fTest )
                {
                   pStack->iCur = iCur + 1;
-                  fOpt = hb_rmqStackDoOpt( FALSE, pStack, pWith, FALSE );
+                  fOpt = hb_rmqStackDoOpt( HB_FALSE, pStack, pWith, HB_FALSE );
                   pStack->pBase[ iCur - 1 ].iOper = HB_RMQ_SKIP;
                   pWith->iOper = HB_RMQ_SKIP;
                }
@@ -1302,11 +1413,11 @@ static BOOL hb_rmqStackDoOpt( BOOL fTest, PHB_RMQSTACK pStack,
    Update: I decided to make it valid and return the non optimized part
            ignoring SIX behavior at all.
  */
-static BYTE * hb_rmqNonOptExpr( PHB_RMQSTACK pStack, ULONG *pulExp, BOOL fAll )
+static char * hb_rmqNonOptExpr( PHB_RMQSTACK pStack, HB_SIZE *pnExp, HB_BOOL fAll )
 {
-   BYTE  *pExp = NULL;
-   BYTE  *pExp1, *pExp2;
-   ULONG ulExp1, ulExp2, ulLen = 0;
+   char  *pExp = NULL;
+   char  *pExp1, *pExp2;
+   HB_SIZE nExp1, nExp2, nLen = 0;
 
    if( pStack->iCur < pStack->iPos )
    {
@@ -1314,104 +1425,104 @@ static BYTE * hb_rmqNonOptExpr( PHB_RMQSTACK pStack, ULONG *pulExp, BOOL fAll )
 
       if( pItm->iOpt == RM_OPT_NONE )
       {
-         fAll = TRUE;
+         fAll = HB_TRUE;
       }
 
       if( pItm->iOpt == RM_OPT_FULL && !fAll )
       {
          /* update the stack counter only */
          pStack->iCur--;
-         hb_rmqStackOptLvl( pStack, TRUE );
+         hb_rmqStackOptLvl( pStack, HB_TRUE );
       }
       else if( pItm->iOper == HB_RMQ_AND )
       {
-         pExp1 = hb_rmqNonOptExpr( pStack, &ulExp1, fAll );
-         pExp2 = hb_rmqNonOptExpr( pStack, &ulExp2, fAll );
+         pExp1 = hb_rmqNonOptExpr( pStack, &nExp1, fAll );
+         pExp2 = hb_rmqNonOptExpr( pStack, &nExp2, fAll );
          if( pExp1 && pExp2 )
          {
-            ulLen = ulExp1 + ulExp2 + 7;
-            pExp = ( BYTE * ) hb_xgrab( ulLen + 1 );
+            nLen = nExp1 + nExp2 + 7;
+            pExp = ( char * ) hb_xgrab( nLen + 1 );
             pExp[ 0 ] = '(';
-            memcpy( pExp + 1, pExp1, ulExp1 );
-            memcpy( pExp + 1 + ulExp1, ".AND.", 5 );
-            memcpy( pExp + 6 + ulExp1, pExp2, ulExp2 );
-            pExp[ ulLen - 1 ] = ')';
+            memcpy( pExp + 1, pExp1, nExp1 );
+            memcpy( pExp + 1 + nExp1, ".AND.", 5 );
+            memcpy( pExp + 6 + nExp1, pExp2, nExp2 );
+            pExp[ nLen - 1 ] = ')';
             hb_xfree( pExp1 );
             hb_xfree( pExp2 );
          }
          else if( pExp1 )
          {
-            ulLen = ulExp1;
+            nLen = nExp1;
             pExp = pExp1;
          }
          else if( pExp2 )
          {
-            ulLen = ulExp2;
+            nLen = nExp2;
             pExp = pExp2;
          }
       }
       else if( pItm->iOper == HB_RMQ_OR )
       {
-         pExp1 = hb_rmqNonOptExpr( pStack, &ulExp1, fAll );
-         pExp2 = hb_rmqNonOptExpr( pStack, &ulExp2, fAll );
+         pExp1 = hb_rmqNonOptExpr( pStack, &nExp1, fAll );
+         pExp2 = hb_rmqNonOptExpr( pStack, &nExp2, fAll );
          if( pExp1 && pExp2 )
          {
-            ulLen = ulExp1 + ulExp2 + 6;
-            pExp = ( BYTE * ) hb_xgrab( ulLen + 1 );
+            nLen = nExp1 + nExp2 + 6;
+            pExp = ( char * ) hb_xgrab( nLen + 1 );
             pExp[ 0 ] = '(';
-            memcpy( pExp + 1, pExp1, ulExp1 );
-            memcpy( pExp + 1 + ulExp1, ".OR.", 4 );
-            memcpy( pExp + 5 + ulExp1, pExp2, ulExp2 );
-            pExp[ ulLen - 1 ] = ')';
+            memcpy( pExp + 1, pExp1, nExp1 );
+            memcpy( pExp + 1 + nExp1, ".OR.", 4 );
+            memcpy( pExp + 5 + nExp1, pExp2, nExp2 );
+            pExp[ nLen - 1 ] = ')';
             hb_xfree( pExp1 );
             hb_xfree( pExp2 );
          }
          else if( pExp1 )
          {
-            ulLen = ulExp1;
+            nLen = nExp1;
             pExp = pExp1;
          }
          else if( pExp2 )
          {
-            ulLen = ulExp2;
+            nLen = nExp2;
             pExp = pExp2;
          }
       }
       else if( pItm->iOper == HB_RMQ_NOT )
       {
-         pExp1 = hb_rmqNonOptExpr( pStack, &ulExp1, fAll );
+         pExp1 = hb_rmqNonOptExpr( pStack, &nExp1, fAll );
          if( pExp1 )
          {
-            ulLen = ulExp1 + 3;
-            pExp = ( BYTE * ) hb_xgrab( ulLen + 1 );
+            nLen = nExp1 + 3;
+            pExp = ( char * ) hb_xgrab( nLen + 1 );
             pExp[ 0 ] = '!';
             pExp[ 1 ] = '(';
-            memcpy( pExp + 2, pExp1, ulExp1 );
-            pExp[ ulLen - 1 ] = ')';
+            memcpy( pExp + 2, pExp1, nExp1 );
+            pExp[ nLen - 1 ] = ')';
             hb_xfree( pExp1 );
          }
       }
       else if( pItm->iOper == HB_RMQ_SKIP )
       {
-         pExp = hb_rmqNonOptExpr( pStack, &ulLen, fAll );
+         pExp = hb_rmqNonOptExpr( pStack, &nLen, fAll );
       }
       else if( pItm->pTag && !fAll )
       {
          ;
       }
-      else if( pItm->byExpr && pItm->ulExpr )
+      else if( pItm->pszExpr && pItm->nExpr )
       {
-         ulLen = pItm->ulExpr;
-         pExp = ( BYTE * ) hb_xgrab( ulLen + 1 );
-         memcpy( pExp, pItm->byExpr, ulLen );
+         nLen = pItm->nExpr;
+         pExp = ( char * ) hb_xgrab( nLen + 1 );
+         memcpy( pExp, pItm->pszExpr, nLen );
       }
       else
       {
       }
    }
-   *pulExp = ulLen;
+   *pnExp = nLen;
    if( pExp )
-      pExp[ ulLen ] = '\0';
+      pExp[ nLen ] = '\0';
    return pExp;
 }
 
@@ -1424,12 +1535,12 @@ static void hb_rmqStackInit( PHB_RMQSTACK pStack )
 #if defined( HB_RMQ_DBGDISP ) || defined( HB_RMQ_DEBUG )
 static void hb_rmqNonOptExprDsp( PHB_RMQSTACK pStack )
 {
-   BYTE *pExpr;
-   ULONG ulLen = 0;
+   char *pExpr;
+   HB_SIZE nLen = 0;
    hb_rmqStackInit( pStack );
-   pExpr = hb_rmqNonOptExpr( pStack, &ulLen, FALSE );
+   pExpr = hb_rmqNonOptExpr( pStack, &nLen, HB_FALSE );
    printf("\n>>");
-   printf("[%s][%ld]", pExpr, ulLen);
+   printf("[%s][%ld]", pExpr, nLen);
    printf("<<\n");
    fflush(stdout);
    hb_xfree(pExpr);
@@ -1472,12 +1583,12 @@ static void hb_rmqStackDsp( PHB_RMQSTACK pStack )
                   pItm->iOper == HB_RMQ_RNGIE ||
                   pItm->iOper == HB_RMQ_RNGEE ) )
       {
-         pItm->fNeg = FALSE;
+         pItm->fNeg = HB_FALSE;
          printf(".NOT. ( ");
          pStack->iCur--;
          hb_rmqStackDsp( pStack );
          printf(" )");
-         pItm->fNeg = TRUE;
+         pItm->fNeg = HB_TRUE;
       }
       else if( pItm->iOper == HB_RMQ_RANGE )
       {
@@ -1499,9 +1610,9 @@ static void hb_rmqStackDsp( PHB_RMQSTACK pStack )
          printf( "%s>'%s' .and. %s<'%s'", pItm->pTag->pKey, hb_itemGetCPtr( pItm->pItmLo ),
                                           pItm->pTag->pKey, hb_itemGetCPtr( pItm->pItmHi ) );
       }
-      else if( pItm->byExpr )
+      else if( pItm->pszExpr )
       {
-         printf( "<%s>[%d,%d,%d,%s,%s]", pItm->byExpr,
+         printf( "<%s>[%d,%d,%d,%s,%s]", pItm->pszExpr,
             pItm->pTag != NULL, pItm->fNeg, pItm->iOper,
             hb_itemGetCPtr( pItm->pItmLo ), hb_itemGetCPtr( pItm->pItmHi ) );
       }
@@ -1517,30 +1628,32 @@ static void hb_rmqStackDisplay( PHB_RMQSTACK pStack )
    hb_rmqStackDsp( pStack );
    printf("<< ");
    hb_rmqStackInit( pStack );
-   iOpt = hb_rmqStackOptLvl( pStack, FALSE );
+   iOpt = hb_rmqStackOptLvl( pStack, HB_FALSE );
    printf("[%d]\n", iOpt );
    fflush(stdout);
 }
 #endif
 
-static void hb_rmqStackPush( PHB_RMQSTACK pStack, int iOper, BOOL fNeg,
+static void hb_rmqStackPush( PHB_RMQSTACK pStack, int iOper, HB_BOOL fNeg,
                              PHB_RMQTAG pTag, PHB_ITEM pItem,
-                             BYTE * byExpr, ULONG ulLen )
+                             char * pszExpr, HB_SIZE nLen )
 {
    PHB_RMQSTACKITM pItm;
 
    if( pTag && pStack->iPos > 0 &&
         pStack->pBase[ pStack->iPos - 1 ].iOper == HB_RMQ_NOT )
    {
-//      hb_rmqStackPop( pStack );
-//      fNeg = !fNeg;
+/*
+      hb_rmqStackPop( pStack );
+      fNeg = !fNeg;
+*/
    }
 
    if( pStack->iPos == pStack->iSize )
    {
       pStack->iSize += HB_RMQ_STACKSIZE;
       pStack->pBase = ( PHB_RMQSTACKITM ) hb_xrealloc( pStack->pBase,
-                                                       pStack->iSize );
+                                    sizeof( HB_RMQSTACKITM ) * pStack->iSize );
    }
    pItm = &pStack->pBase[ pStack->iPos++ ];
    pItm->iOper = iOper;
@@ -1588,17 +1701,17 @@ static void hb_rmqStackPush( PHB_RMQSTACK pStack, int iOper, BOOL fNeg,
             break;
       }
    }
-   if( byExpr )
+   if( pszExpr )
    {
-      pItm->byExpr = ( BYTE * ) hb_xgrab( ulLen + 1 );
-      pItm->ulExpr = ulLen;
-      memcpy( pItm->byExpr, byExpr, ulLen );
-      pItm->byExpr[ ulLen ] = '\0';
+      pItm->pszExpr = ( char * ) hb_xgrab( nLen + 1 );
+      pItm->nExpr = nLen;
+      memcpy( pItm->pszExpr, pszExpr, nLen );
+      pItm->pszExpr[ nLen ] = '\0';
    }
    else
    {
-      pItm->byExpr = NULL;
-      pItm->ulExpr = 0;
+      pItm->pszExpr = NULL;
+      pItm->nExpr = 0;
    }
 
    return;
@@ -1610,95 +1723,95 @@ static void hb_rmqStackPushNot( PHB_RMQSTACK pStack )
         pStack->pBase[ pStack->iPos - 1 ].iOper == HB_RMQ_NOT )
       hb_rmqStackPop( pStack );
    else
-      hb_rmqStackPush( pStack, HB_RMQ_NOT, FALSE, NULL, NULL, NULL, 0 );
+      hb_rmqStackPush( pStack, HB_RMQ_NOT, HB_FALSE, NULL, NULL, NULL, 0 );
 }
 
 static void hb_rmqStackPushOper( PHB_RMQSTACK rmqStack, int iOper )
 {
-   hb_rmqStackPush( rmqStack, iOper, FALSE, NULL, NULL, NULL, 0 );
+   hb_rmqStackPush( rmqStack, iOper, HB_FALSE, NULL, NULL, NULL, 0 );
 }
 
-static void hb_rmqDivide( BYTE * byExpr, ULONG ulLen, PHB_RMQSTACK rmqStack )
+static void hb_rmqDivide( char * pszExpr, HB_SIZE nLen, PHB_RMQSTACK rmqStack )
 {
    PHB_RMQTAG pTag;
-   BOOL fNeg, fFor = FALSE;
+   HB_BOOL fNeg, fFor = HB_FALSE;
    int iOper;
-   ULONG ul, ulExp;
+   HB_SIZE n, nExp;
 
-   pTag = hb_rmqFindTag( rmqStack->pTags, &fFor, byExpr, ulLen, &fNeg );
+   pTag = hb_rmqFindTag( rmqStack->pTags, &fFor, pszExpr, nLen, &fNeg, NULL, NULL );
    if( pTag )
    {
       if( fFor )
       {
          if( fNeg )
             hb_rmqStackPushNot( rmqStack );
-         hb_rmqStackPush( rmqStack, HB_RMQ_TAG, FALSE, pTag, NULL, byExpr, ulLen );
+         hb_rmqStackPush( rmqStack, HB_RMQ_TAG, HB_FALSE, pTag, NULL, pszExpr, nLen );
       }
       else
       {
-         hb_rmqStackPush( rmqStack, HB_RMQ_EQU, FALSE, pTag,
-                          hb_itemPutL( NULL, !fNeg ), byExpr, ulLen );
+         hb_rmqStackPush( rmqStack, HB_RMQ_EQU, HB_FALSE, pTag,
+                          hb_itemPutL( NULL, !fNeg ), pszExpr, nLen );
       }
       return;
    }
 
 #ifdef HB_RMQ_DBGDISP
    {
-      BYTE b = byExpr[ ulLen ];
-      byExpr[ ulLen ] = '\0';
-      printf("\n[%s]", byExpr);fflush(stdout);
-      byExpr[ ulLen ] = b;
+      char b = pszExpr[ nLen ];
+      pszExpr[ nLen ] = '\0';
+      printf("\n[%s]", pszExpr);fflush(stdout);
+      pszExpr[ nLen ] = b;
    }
 #endif
 
    iOper = HB_RMQ_OR;
-   ul = hb_rmqNextExp( byExpr, ulLen, &iOper, &ulExp );
+   n = hb_rmqNextExp( pszExpr, nLen, &iOper, &nExp );
 #ifdef HB_RMQ_DBGDISP
-   printf("[%ld,%d]\n", ul, iOper);fflush(stdout);
+   printf("[%ld,%d]\n", n, iOper);fflush(stdout);
 #endif
-   if( ul == 0 )
+   if( n == 0 )
    {
-      if( byExpr[ 0 ] == '!' )
+      if( pszExpr[ 0 ] == '!' )
       {
          hb_rmqStackPushNot( rmqStack );
-         byExpr++;
-         ulLen--;
+         pszExpr++;
+         nLen--;
       }
-      ul = hb_rmqStripBraces( byExpr, ulLen );
-      if( ul > 0 )
+      n = hb_rmqStripBraces( pszExpr, nLen );
+      if( n > 0 )
       {
-         hb_rmqDivide( &byExpr[ ul ], ulLen - ( ul << 1 ), rmqStack );
+         hb_rmqDivide( &pszExpr[ n ], nLen - ( n << 1 ), rmqStack );
       }
       else
       {
          PHB_ITEM pItem = NULL;
 
          pTag = NULL;
-         ul = hb_rmqOper( byExpr, ulLen, &iOper, &ulExp );
-         if( ul == 0 )
+         n = hb_rmqOper( pszExpr, nLen, &iOper, &nExp );
+         if( n == 0 )
          {
-            pTag = hb_rmqFindTag( rmqStack->pTags, &fFor, byExpr, ulLen, &fNeg );
+            pTag = hb_rmqFindTag( rmqStack->pTags, &fFor, pszExpr, nLen, &fNeg, NULL, NULL );
          }
          else
          {
 #ifdef HB_RMQ_DBGDISP
             {
-               BYTE b = byExpr[ ulExp ], b2 = byExpr[ ulLen ];
-               byExpr[ ulExp ] = '\0';
-               byExpr[ ulLen ] = '\0';
-               printf("\n[%ld:%ld:%ld]<%s><%s>", ulExp, ul, ulLen,
-                      byExpr, &byExpr[ ul ] );fflush(stdout);
-               byExpr[ ulExp ] = b;
-               byExpr[ ulLen ] = b2;
+               char b = pszExpr[ nExp ], b2 = pszExpr[ nLen ];
+               pszExpr[ nExp ] = '\0';
+               pszExpr[ nLen ] = '\0';
+               printf("\n[%ld:%ld:%ld]<%s><%s>", nExp, n, nLen,
+                      pszExpr, &pszExpr[ n ] );fflush(stdout);
+               pszExpr[ nExp ] = b;
+               pszExpr[ nLen ] = b2;
             }
 #endif
-            pItem = hb_rmqMacroEval( &byExpr[ ul ], ulLen - ul );
+            pItem = hb_rmqMacroEval( &pszExpr[ n ], nLen - n );
 #ifdef HB_RMQ_DBGDISP
             printf("[%s]", pItem ? hb_itemTypeStr( pItem ) : "U" );fflush(stdout);
 #endif
             if( pItem )
             {
-               pTag = hb_rmqFindTag( rmqStack->pTags, NULL, byExpr, ulExp, &fNeg );
+               pTag = hb_rmqFindTag( rmqStack->pTags, NULL, pszExpr, nExp, &fNeg, pItem, &iOper );
 #ifdef HB_RMQ_DBGDISP
                printf(" %d\n", pTag ? pTag->iTag : 0 );fflush(stdout);
 #endif
@@ -1706,23 +1819,29 @@ static void hb_rmqDivide( BYTE * byExpr, ULONG ulLen, PHB_RMQSTACK rmqStack )
          }
          if( pTag )
          {
-            if( ul == 0 )
+            if( n == 0 )
             {
                if( fFor )
-                  hb_rmqStackPush( rmqStack, HB_RMQ_TAG, fNeg, pTag, NULL, byExpr, ulLen );
+                  hb_rmqStackPush( rmqStack, HB_RMQ_TAG, fNeg, pTag, NULL, pszExpr, nLen );
                else
-                  hb_rmqStackPush( rmqStack, HB_RMQ_EQU, FALSE, pTag,
-                                   hb_itemPutL( NULL, !fNeg ), byExpr, ulLen );
+                  hb_rmqStackPush( rmqStack, HB_RMQ_EQU, HB_FALSE, pTag,
+                                   hb_itemPutL( NULL, !fNeg ), pszExpr, nLen );
+            }
+            else if( iOper == HB_RMQ_TAG )
+            {
+               if( fNeg )
+                  hb_rmqStackPushNot( rmqStack );
+               hb_rmqStackPush( rmqStack, HB_RMQ_TAG, HB_FALSE, pTag, NULL, pszExpr, nLen );
             }
             else
             {
-               hb_rmqStackPush( rmqStack, iOper, fNeg, pTag, pItem, byExpr, ulLen );
+               hb_rmqStackPush( rmqStack, iOper, fNeg, pTag, pItem, pszExpr, nLen );
                pItem = NULL;
             }
          }
          else
          {
-            hb_rmqStackPush( rmqStack, HB_RMQ_NONE, FALSE, NULL, NULL, byExpr, ulLen );
+            hb_rmqStackPush( rmqStack, HB_RMQ_NONE, HB_FALSE, NULL, NULL, pszExpr, nLen );
          }
          if( pItem )
             hb_itemRelease( pItem );
@@ -1731,8 +1850,8 @@ static void hb_rmqDivide( BYTE * byExpr, ULONG ulLen, PHB_RMQSTACK rmqStack )
    else
    {
       hb_rmqStackPushOper( rmqStack, iOper );
-      hb_rmqDivide( byExpr, ulExp, rmqStack );
-      hb_rmqDivide( &byExpr[ ul ], ulLen - ul, rmqStack );
+      hb_rmqDivide( pszExpr, nExp, rmqStack );
+      hb_rmqDivide( &pszExpr[ n ], nLen - n, rmqStack );
    }
 }
 
@@ -1744,10 +1863,10 @@ static PHB_RMQSTACK hb_rmqBuildStack( AREAP pArea, PHB_ITEM pQuery )
    {
       char szAliasBuf[ HB_RDD_MAX_ALIAS_LEN + 1 ], * szAlias;
       PHB_RMQTAG pRMQTags;
-      ULONG ulRecords;
+      HB_ULONG ulRecords;
 
-      if( SELF_ALIAS( ( AREAP ) pArea, szAliasBuf ) == FAILURE ||
-          SELF_RECCOUNT( ( AREAP ) pArea, &ulRecords ) == FAILURE )
+      if( SELF_ALIAS( ( AREAP ) pArea, szAliasBuf ) == HB_FAILURE ||
+          SELF_RECCOUNT( ( AREAP ) pArea, &ulRecords ) == HB_FAILURE )
          return NULL;
 
       szAlias = *szAliasBuf ? szAliasBuf : NULL;
@@ -1756,20 +1875,20 @@ static PHB_RMQSTACK hb_rmqBuildStack( AREAP pArea, PHB_ITEM pQuery )
       if( pRMQTags )
       {
          PHB_ITEM pExpr = hb_itemNew( pQuery );
-         BYTE * byExpr;
-         ULONG ulLen;
+         char * pszExpr;
+         HB_SIZE nLen;
 
          hb_macroTextValue( pExpr );
-         ulLen = hb_itemGetCLen( pExpr );
-         byExpr = hb_rmqStrip( ( BYTE * ) hb_itemGetCPtr( pExpr ), ulLen, szAlias, &ulLen );
+         nLen = hb_itemGetCLen( pExpr );
+         pszExpr = hb_rmqStrip( hb_itemGetCPtr( pExpr ), nLen, szAlias, &nLen );
          hb_itemRelease( pExpr );
-         if( byExpr )
+         if( pszExpr )
          {
-            pStack = hb_rmqStackCreate( pArea, pRMQTags, ulRecords, byExpr, ulLen );
+            pStack = hb_rmqStackCreate( pArea, pRMQTags, ulRecords, pszExpr, nLen );
 #ifdef HB_RMQ_DBGDISP
             hb_rmqDispTagList( pRMQTags );
 #endif
-            hb_rmqDivide( byExpr, ulLen, pStack );
+            hb_rmqDivide( pszExpr, nLen, pStack );
 #ifdef HB_RMQ_DBGDISP
             hb_rmqStackDisplay( pStack );
 #endif
@@ -1793,7 +1912,7 @@ int hb_rmqOptLevel( AREAP pArea, PHB_ITEM pQuery )
    if( pStack )
    {
       hb_rmqStackInit( pStack );
-      iOptLvl = hb_rmqStackOptLvl( pStack, FALSE );
+      iOptLvl = hb_rmqStackOptLvl( pStack, HB_FALSE );
       hb_rmqStackDestoy( pStack );
    }
 
@@ -1804,24 +1923,24 @@ PHB_ITEM hb_rmqNonOptExpression( AREAP pArea, PHB_ITEM pQuery )
 {
    int iOptLvl = RM_OPT_NONE;
    PHB_RMQSTACK pStack = hb_rmqBuildStack( pArea, pQuery );
-   BYTE * pNExpr = NULL;
-   ULONG ulNExpr = 0;
+   char * pNExpr = NULL;
+   HB_SIZE nNExpr = 0;
 
    if( pStack )
    {
       hb_rmqStackInit( pStack );
-      iOptLvl = hb_rmqStackOptLvl( pStack, TRUE );
+      iOptLvl = hb_rmqStackOptLvl( pStack, HB_TRUE );
 
       if( iOptLvl == RM_OPT_PART )
       {
          hb_rmqStackInit( pStack );
-         pNExpr = hb_rmqNonOptExpr( pStack, &ulNExpr, FALSE );
+         pNExpr = hb_rmqNonOptExpr( pStack, &nNExpr, HB_FALSE );
       }
       hb_rmqStackDestoy( pStack );
    }
    if( pNExpr )
    {
-      return hb_itemPutCPtr( NULL, ( char * ) pNExpr, ulNExpr );
+      return hb_itemPutCLPtr( NULL, pNExpr, nNExpr );
    }
    else if( iOptLvl == RM_OPT_NONE )
    {
@@ -1835,29 +1954,29 @@ PHB_RMFILTER hb_rmqBuildQRM( AREAP pArea, PHB_ITEM pQuery )
    int iOptLvl = RM_OPT_NONE;
    PHB_RMQSTACK pStack = hb_rmqBuildStack( pArea, pQuery );
    PHB_RMFILTER pRM = NULL;
-   BYTE * pNExpr = NULL;
-   ULONG ulNExpr = 0;
+   char * pNExpr = NULL;
+   HB_SIZE nNExpr = 0;
 
    if( pStack )
    {
       hb_rmqStackInit( pStack );
-      iOptLvl = hb_rmqStackOptLvl( pStack, FALSE );
+      iOptLvl = hb_rmqStackOptLvl( pStack, HB_FALSE );
 
       if( iOptLvl != RM_OPT_NONE )
       {
          hb_rmqStackInit( pStack );
-         iOptLvl = hb_rmqStackOptLvl( pStack, TRUE );
+         iOptLvl = hb_rmqStackOptLvl( pStack, HB_TRUE );
          if( iOptLvl == RM_OPT_PART )
          {
             hb_rmqStackInit( pStack );
-            pNExpr = hb_rmqNonOptExpr( pStack, &ulNExpr, FALSE );
+            pNExpr = hb_rmqNonOptExpr( pStack, &nNExpr, HB_FALSE );
          }
 
          hb_rmqStackInit( pStack );
-         hb_rmqStackDoOpt( FALSE, pStack, NULL, FALSE);
+         hb_rmqStackDoOpt( HB_FALSE, pStack, NULL, HB_FALSE);
 
          hb_rmqStackInit( pStack );
-         hb_rmqStackOptLvl( pStack, FALSE );
+         hb_rmqStackOptLvl( pStack, HB_FALSE );
 
          hb_rmqStackInit( pStack );
          pRM = hb_rmqStackEval( pStack );
@@ -1867,9 +1986,9 @@ PHB_RMFILTER hb_rmqBuildQRM( AREAP pArea, PHB_ITEM pQuery )
 
    if( ! pRM )
    {
-      ULONG ulRecords;
+      HB_ULONG ulRecords;
 
-      if( SELF_RECCOUNT( ( AREAP ) pArea, &ulRecords ) == SUCCESS )
+      if( SELF_RECCOUNT( ( AREAP ) pArea, &ulRecords ) == HB_SUCCESS )
       {
          pRM = hb_rmCreate( ulRecords );
          if( pRM )
@@ -1887,7 +2006,7 @@ PHB_RMFILTER hb_rmqBuildQRM( AREAP pArea, PHB_ITEM pQuery )
       {
          if( pNExpr )
          {
-            pRM->pNonExpr = hb_itemPutCPtr( pRM->pNonExpr, ( char * ) pNExpr, ulNExpr );
+            pRM->pNonExpr = hb_itemPutCLPtr( pRM->pNonExpr, pNExpr, nNExpr );
             pNExpr = NULL;
          }
          else if( pRM->pNonExpr == NULL )
@@ -1897,7 +2016,7 @@ PHB_RMFILTER hb_rmqBuildQRM( AREAP pArea, PHB_ITEM pQuery )
       }
       else if( pRM->pNonExpr != NULL )
       {
-         hb_itemPutC( pRM->pNonExpr, "" );
+         hb_itemPutC( pRM->pNonExpr, NULL );
       }
    }
    if( pNExpr )
@@ -1912,20 +2031,18 @@ HB_FUNC( RMQ_STRIPEXP )
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
    if( pArea && hb_parclen( 1 ) )
    {
-      PHB_ITEM pExpr = hb_itemParam( 1 );
-      PHB_RMQSTACK pStack = hb_rmqBuildStack( pArea, pExpr );
+      PHB_RMQSTACK pStack = hb_rmqBuildStack( pArea, hb_param( 1, HB_IT_STRING ) );
 
       if( pStack )
       {
-         hb_retclen( ( char * ) pStack->byExpr, pStack->ulExpr );
+         hb_retclen( pStack->pszExpr, pStack->nExpr );
          hb_rmqStackDestoy( pStack );
       }
       else
-         hb_retc( NULL );
-      hb_itemRelease( pExpr );
+         hb_retc_null();
    }
    else
-      hb_retc( NULL );
+      hb_retc_null();
 }
 
 HB_FUNC( RMQ_OPTLEVEL )
@@ -1943,20 +2060,18 @@ HB_FUNC( RMQ_OPTLEVEL )
 HB_FUNC( RMQ_ISOPT )
 {
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
-   BOOL fOpt = FALSE;
+   HB_BOOL fOpt = HB_FALSE;
 
    if( pArea && hb_parclen( 1 ) )
    {
-      PHB_ITEM pExpr = hb_itemParam( 1 );
-      PHB_RMQSTACK pStack = hb_rmqBuildStack( pArea, pExpr );
+      PHB_RMQSTACK pStack = hb_rmqBuildStack( pArea, hb_param( 1, HB_IT_STRING ) );
 
       if( pStack )
       {
          hb_rmqStackInit( pStack );
-         fOpt = hb_rmqStackDoOpt( TRUE, pStack, NULL, FALSE);
+         fOpt = hb_rmqStackDoOpt( HB_TRUE, pStack, NULL, HB_FALSE );
          hb_rmqStackDestoy( pStack );
       }
-      hb_itemRelease( pExpr );
    }
 
    hb_retl( fOpt );
@@ -1965,22 +2080,20 @@ HB_FUNC( RMQ_ISOPT )
 HB_FUNC( RMQ_DISPEXP )
 {
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
-   BOOL fOpt = FALSE;
+   HB_BOOL fOpt = HB_FALSE;
 
    if( pArea && hb_parclen( 1 ) )
    {
-      PHB_ITEM pExpr = hb_itemParam( 1 );
-      PHB_RMQSTACK pStack = hb_rmqBuildStack( pArea, pExpr );
+      PHB_RMQSTACK pStack = hb_rmqBuildStack( pArea, hb_param( 1, HB_IT_STRING ) );
 
       if( pStack )
       {
          hb_rmqStackDisplay( pStack );
          hb_rmqStackInit( pStack );
-         fOpt = hb_rmqStackDoOpt( FALSE, pStack, NULL, FALSE);
+         fOpt = hb_rmqStackDoOpt( HB_FALSE, pStack, NULL, HB_FALSE );
          hb_rmqStackDisplay( pStack );
          hb_rmqStackDestoy( pStack );
       }
-      hb_itemRelease( pExpr );
    }
 
    hb_retl( fOpt );

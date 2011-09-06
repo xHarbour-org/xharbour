@@ -3,18 +3,13 @@
  */
 
 /*
-  (c) copyright xHarbour.com Inc. http://www.xHarbour.com
-  Author: Przemyslaw Czerpak Przemek@xHarbour.com
-
-  This source file is an intellectual property of xHarbour.com Inc.
-  You may NOT forward or share this file under any conditions!
-*/
-
-#if defined( HB_RMDBFCDX )
-#  undef HB_RMDBFNTX
-#elif !defined( HB_RMDBFNTX )
-#  define HB_RMDBFCDX
-#endif
+ * DBRMAP (Record Map filters) for [x]Harbour:
+ *    RM* RDDs
+ *
+ * Copyright 2004-2011 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
+ * All rights reserved.
+ *
+ */
 
 #include "hbrddrm.h"
 #include "hbapierr.h"
@@ -23,24 +18,19 @@
 #include "hbvm.h"
 #include "rddsys.ch"
 
-#undef HB_TRACE
-#define HB_TRACE(x, y)
-
-static HB_ERRCODE hb_rmSkip( RMAREAP pArea, LONG lToSkip );
-static HB_ERRCODE hb_rmSkipFilter( RMAREAP pArea, LONG lUpDown );
-static HB_ERRCODE hb_rmPutRec( RMAREAP pArea, const BYTE * pBuffer );
+static HB_ERRCODE hb_rmSkip( RMAREAP pArea, HB_LONG lToSkip );
+static HB_ERRCODE hb_rmSkipFilter( RMAREAP pArea, HB_LONG lUpDown );
+static HB_ERRCODE hb_rmPutRec( RMAREAP pArea, const HB_BYTE * pBuffer );
 static HB_ERRCODE hb_rmSetFilter( RMAREAP pArea, LPDBFILTERINFO pFilterInfo );
 static HB_ERRCODE hb_rmClearFilter( RMAREAP pArea );
-static HB_ERRCODE hb_rmCountScope( RMAREAP pArea, void * pPtr, LONG * plRec );
-static HB_ERRCODE hb_rmInfo( RMAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
-static HB_ERRCODE hb_rmOrderInfo( RMAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrderInfo );
+static HB_ERRCODE hb_rmCountScope( RMAREAP pArea, void * pPtr, HB_LONG * plRec );
+static HB_ERRCODE hb_rmInfo( RMAREAP pArea, HB_USHORT uiIndex, PHB_ITEM pItem );
+static HB_ERRCODE hb_rmOrderInfo( RMAREAP pArea, HB_USHORT uiIndex, LPDBORDERINFO pOrderInfo );
 static HB_ERRCODE hb_rmExit( LPRDDNODE pRDD );
-static HB_ERRCODE hb_rmRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem );
-
-static USHORT s_uiRddId = ( USHORT ) -1;
+static HB_ERRCODE hb_rmRddInfo( LPRDDNODE pRDD, HB_USHORT uiIndex, HB_ULONG ulConnect, PHB_ITEM pItem );
 
 static RDDFUNCS rmSuper;
-static RDDFUNCS rmTable =
+static const RDDFUNCS rmTable =
 {
    /* Movement and positioning methods */
    ( DBENTRYP_BP )    NULL,              /* Bof        */
@@ -160,7 +150,7 @@ static RDDFUNCS rmTable =
    ( DBENTRYP_R )     hb_rmExit,         /* Exit    */
    ( DBENTRYP_RVVL )  NULL,              /* Drop    */
    ( DBENTRYP_RVVL )  NULL,              /* Exists  */
-   ( DBENTRYP_RVVVL ) NULL,              /* rename table or index */
+   ( DBENTRYP_RVVVL ) NULL,              /* Rename  */
    ( DBENTRYP_RSLV )  hb_rmRddInfo,      /* RddInfo */
 
    /* Special and reserved methods */
@@ -171,7 +161,7 @@ static RDDFUNCS rmTable =
 /*
  * get current order number
  */
-static int hb_rmOrderNum( RMAREAP pArea, int * piOrder )
+static HB_ERRCODE hb_rmOrderNum( RMAREAP pArea, int * piOrder )
 {
    DBORDERINFO OrderInfo;
    HB_ERRCODE errCode;
@@ -192,10 +182,10 @@ static int hb_rmOrderNum( RMAREAP pArea, int * piOrder )
 /*
  * check filter condition
  */
-static BOOL hb_rmEvalFilter( RMAREAP pArea, BOOL fUpdate )
+static HB_BOOL hb_rmEvalFilter( RMAREAP pArea, HB_BOOL fUpdate )
 {
-   ULONG ulRecNo = 0;
-   BOOL fResult = TRUE;
+   HB_ULONG ulRecNo = 0;
+   HB_BOOL fResult = HB_TRUE;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rmEvalFilter(%p,%d)", pArea, fUpdate));
 
@@ -204,7 +194,7 @@ static BOOL hb_rmEvalFilter( RMAREAP pArea, BOOL fUpdate )
       SELF_RECNO( ( AREAP ) pArea, &ulRecNo );
       if( !fUpdate && ! hb_rmTestRecord( SELF_RMFILTER( pArea ), ulRecNo ) )
       {
-         return FALSE;
+         return HB_FALSE;
       }
    }
 
@@ -216,7 +206,7 @@ static BOOL hb_rmEvalFilter( RMAREAP pArea, BOOL fUpdate )
    }
    if( fResult && hb_setGetDeleted() )
    {
-      BOOL fDeleted;
+      HB_BOOL fDeleted;
       SELF_DELETED( ( AREAP ) pArea, &fDeleted );
       fResult = !fDeleted;
    }
@@ -239,7 +229,7 @@ static BOOL hb_rmEvalFilter( RMAREAP pArea, BOOL fUpdate )
 /*
  * Reposition cursor relative to current position.
  */
-static HB_ERRCODE hb_rmSkip( RMAREAP pArea, LONG lToSkip )
+static HB_ERRCODE hb_rmSkip( RMAREAP pArea, HB_LONG lToSkip )
 {
    int iOrder = 0;
 
@@ -253,14 +243,14 @@ static HB_ERRCODE hb_rmSkip( RMAREAP pArea, LONG lToSkip )
 
    if( iOrder == 0 )
    {
-      ULONG ulRecNo;
-      BOOL fBottom;
+      HB_ULONG ulRecNo;
+      HB_BOOL fBottom;
 
       if( SELF_RECNO( ( AREAP ) pArea, &ulRecNo ) != HB_SUCCESS )
          return HB_FAILURE;
 
       fBottom = pArea->fBottom;
-      pArea->fTop = pArea->fBottom = FALSE;
+      pArea->fTop = pArea->fBottom = HB_FALSE;
       if( lToSkip > 0 )
       {
          while( --lToSkip >= 0 && ulRecNo )
@@ -271,9 +261,9 @@ static HB_ERRCODE hb_rmSkip( RMAREAP pArea, LONG lToSkip )
                if( SELF_GOTO( pArea, ulRecNo ) != HB_SUCCESS )
                   return HB_FAILURE;
             }
-            while( ulRecNo && !hb_rmEvalFilter( pArea, FALSE ) );
+            while( ulRecNo && !hb_rmEvalFilter( pArea, HB_FALSE ) );
          }
-         pArea->fBof = FALSE;
+         pArea->fBof = HB_FALSE;
       }
       else
       {
@@ -285,7 +275,7 @@ static HB_ERRCODE hb_rmSkip( RMAREAP pArea, LONG lToSkip )
                if( SELF_GOTO( pArea, ulRecNo ) != HB_SUCCESS )
                   return HB_FAILURE;
             }
-            while( ulRecNo && !hb_rmEvalFilter( pArea, FALSE ) );
+            while( ulRecNo && !hb_rmEvalFilter( pArea, HB_FALSE ) );
          }
          if( ulRecNo == 0 )
          {
@@ -298,9 +288,9 @@ static HB_ERRCODE hb_rmSkip( RMAREAP pArea, LONG lToSkip )
             {
                if( SELF_GOTOP( ( AREAP ) pArea ) != HB_SUCCESS )
                   return HB_FAILURE;
-               pArea->fBof = TRUE;
+               pArea->fBof = HB_TRUE;
             }
-            pArea->fEof = FALSE;
+            pArea->fEof = HB_FALSE;
          }
       }
       return HB_SUCCESS;
@@ -312,76 +302,81 @@ static HB_ERRCODE hb_rmSkip( RMAREAP pArea, LONG lToSkip )
 /*
  * Reposition cursor respecting any filter setting.
  */
-static HB_ERRCODE hb_rmSkipFilter( RMAREAP pArea, LONG lUpDown )
+static HB_ERRCODE hb_rmSkipFilter( RMAREAP pArea, HB_LONG lUpDown )
 {
-   BOOL fBottom;
-   HB_ERRCODE uiError;
+   HB_BOOL fBottom;
+   HB_ERRCODE errCode;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rmSkipFilter(%p, %ld)", pArea, lUpDown));
 
-   if( ! hb_setGetDeleted() && pArea->dbfi.itmCobExpr == NULL && ! SELF_RMFILTER( pArea ) )
+   if( !hb_setGetDeleted() && pArea->dbfi.itmCobExpr == NULL && !SELF_RMFILTER( pArea ) )
       return HB_SUCCESS;
 
    lUpDown = ( lUpDown < 0  ? -1 : 1 );
    fBottom = pArea->fBottom;
-   while( !pArea->fBof && !pArea->fEof && !hb_rmEvalFilter( pArea, FALSE ) )
+   while( !pArea->fBof && !pArea->fEof && !hb_rmEvalFilter( pArea, HB_FALSE ) )
    {
-      uiError = SELF_SKIPRAW( ( AREAP ) pArea, lUpDown );
-      if( uiError != HB_SUCCESS )
-         return uiError;
+      errCode = SELF_SKIPRAW( ( AREAP ) pArea, lUpDown );
+      if( errCode != HB_SUCCESS )
+         return errCode;
    }
 
    if( pArea->fBof && lUpDown < 0 )
    {
       if( fBottom )
       {
-         uiError = SELF_GOTO( ( AREAP ) pArea, 0 );
+         errCode = SELF_GOTO( ( AREAP ) pArea, 0 );
       }
       else
       {
-         uiError = SELF_GOTOP( ( AREAP ) pArea );
-         pArea->fBof = TRUE;
+         errCode = SELF_GOTOP( ( AREAP ) pArea );
+         pArea->fBof = HB_TRUE;
       }
    }
    else
    {
-      uiError = HB_SUCCESS;
+      errCode = HB_SUCCESS;
    }
-   return uiError;
+   return errCode;
 }
 
 /* ( DBENTRYP_P )     hb_rmPutRec */
-static HB_ERRCODE hb_rmPutRec( RMAREAP pArea, const BYTE * pBuffer )
+static HB_ERRCODE hb_rmPutRec( RMAREAP pArea, const HB_BYTE * pBuffer )
 {
-   HB_ERRCODE uiError;
+   HB_ERRCODE errCode;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rmPutRec(%p,%p)", pArea, pBuffer));
 
-   uiError = SUPER_PUTREC( ( AREAP ) pArea, pBuffer );
+   errCode = SUPER_PUTREC( ( AREAP ) pArea, pBuffer );
 
-   if( pBuffer == NULL && uiError == HB_SUCCESS && SELF_RMFILTER( pArea ) )
+   if( pBuffer == NULL && errCode == HB_SUCCESS && SELF_RMFILTER( pArea ) )
    {
-      hb_rmEvalFilter( pArea, TRUE );
+      hb_rmEvalFilter( pArea, HB_TRUE );
    }
 
-   return uiError;
+   return errCode;
 }
 
 /* ( DBENTRYP_V )     hb_rmClearFilter */
 static HB_ERRCODE hb_rmClearFilter( RMAREAP pArea )
 {
+   HB_ERRCODE errCode;
+
+   errCode = SUPER_CLEARFILTER( ( AREAP ) pArea );
+
    SELF_RMRELEASE( pArea );
-   return SUPER_CLEARFILTER( ( AREAP ) pArea );
+
+   return errCode;
 }
 
 /* ( DBENTRYP_VFI )   hb_rmSetFilter */
 static HB_ERRCODE hb_rmSetFilter( RMAREAP pArea, LPDBFILTERINFO pFilterInfo )
 {
-   HB_ERRCODE uiError;
+   HB_ERRCODE errCode;
 
-   uiError = SUPER_SETFILTER( ( AREAP ) pArea, pFilterInfo );
-   if( uiError != HB_SUCCESS )
-      return uiError;
+   errCode = SUPER_SETFILTER( ( AREAP ) pArea, pFilterInfo );
+   if( errCode != HB_SUCCESS )
+      return errCode;
 
    if( hb_setGetOptimize() )
    {
@@ -400,14 +395,14 @@ static HB_ERRCODE hb_rmSetFilter( RMAREAP pArea, LPDBFILTERINFO pFilterInfo )
 }
 
 /* ( DBENTRYP_VPLP )  hb_rmCountScope */
-static HB_ERRCODE hb_rmCountScope( RMAREAP pArea, void * pPtr, LONG * plRec )
+static HB_ERRCODE hb_rmCountScope( RMAREAP pArea, void * pPtr, HB_LONG * plRec )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_rmCountScope(%p, %p, %p)", pArea, pPtr, plRec));
 
    if( pPtr == NULL )
    {
       if( SELF_RMFILTER( pArea ) && pArea->dbfi.fFilter &&
-          ! hb_rmTestRecord( SELF_RMFILTER( pArea ), ( ULONG ) *plRec ) )
+          ! hb_rmTestRecord( SELF_RMFILTER( pArea ), ( HB_ULONG ) *plRec ) )
       {
          *plRec = 0;
       }
@@ -420,9 +415,9 @@ static HB_ERRCODE hb_rmCountScope( RMAREAP pArea, void * pPtr, LONG * plRec )
 /*
  * Retrieve information about the current driver.
  */
-static HB_ERRCODE hb_rmInfo( RMAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
+static HB_ERRCODE hb_rmInfo( RMAREAP pArea, HB_USHORT uiIndex, PHB_ITEM pItem )
 {
-   ULONG ulRecords;
+   HB_ULONG ulRecords;
    HB_ERRCODE errCode;
    PHB_RMFILTER pRM;
 
@@ -431,7 +426,7 @@ static HB_ERRCODE hb_rmInfo( RMAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    switch( uiIndex )
    {
       case DBI_RM_SUPPORTED:
-         hb_itemPutL( pItem, TRUE );
+         hb_itemPutL( pItem, HB_TRUE );
          break;
 
       case DBI_RM_CREATE:
@@ -446,18 +441,18 @@ static HB_ERRCODE hb_rmInfo( RMAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
       case DBI_RM_REMOVE:
          SELF_RMRELEASE( pArea );
-         hb_itemPutL( pItem, TRUE );
+         hb_itemPutL( pItem, HB_TRUE );
          break;
 
       case DBI_RM_CLEAR:
          if( SELF_RMFILTER( pArea ) )
          {
             hb_rmClear( SELF_RMFILTER( pArea ) );
-            hb_itemPutL( pItem, TRUE );
+            hb_itemPutL( pItem, HB_TRUE );
          }
          else
          {
-            hb_itemPutL( pItem, FALSE );
+            hb_itemPutL( pItem, HB_FALSE );
          }
          break;
 
@@ -465,11 +460,11 @@ static HB_ERRCODE hb_rmInfo( RMAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          if( SELF_RMFILTER( pArea ) )
          {
             hb_rmFill( SELF_RMFILTER( pArea ) );
-            hb_itemPutL( pItem, TRUE );
+            hb_itemPutL( pItem, HB_TRUE );
          }
          else
          {
-            hb_itemPutL( pItem, FALSE );
+            hb_itemPutL( pItem, HB_FALSE );
          }
          break;
 
@@ -477,11 +472,11 @@ static HB_ERRCODE hb_rmInfo( RMAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          if( SELF_RMFILTER( pArea ) )
          {
             hb_rmSetRecord( SELF_RMFILTER( pArea ), hb_itemGetNL( pItem ) );
-            hb_itemPutL( pItem, TRUE );
+            hb_itemPutL( pItem, HB_TRUE );
          }
          else
          {
-            hb_itemPutL( pItem, FALSE );
+            hb_itemPutL( pItem, HB_FALSE );
          }
          break;
 
@@ -489,11 +484,11 @@ static HB_ERRCODE hb_rmInfo( RMAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          if( SELF_RMFILTER( pArea ) )
          {
             hb_rmClearRecord( SELF_RMFILTER( pArea ), hb_itemGetNL( pItem ) );
-            hb_itemPutL( pItem, TRUE );
+            hb_itemPutL( pItem, HB_TRUE );
          }
          else
          {
-            hb_itemPutL( pItem, FALSE );
+            hb_itemPutL( pItem, HB_FALSE );
          }
          break;
 
@@ -501,11 +496,11 @@ static HB_ERRCODE hb_rmInfo( RMAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          if( SELF_RMFILTER( pArea ) )
          {
             hb_itemPutL( pItem, hb_rmTestRecord( SELF_RMFILTER( pArea ),
-					         hb_itemGetNL( pItem ) ) );
+                                                 hb_itemGetNL( pItem ) ) );
          }
          else
          {
-            hb_itemPutL( pItem, TRUE );
+            hb_itemPutL( pItem, HB_TRUE );
          }
          break;
 
@@ -522,7 +517,7 @@ static HB_ERRCODE hb_rmInfo( RMAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
       case DBI_RM_HANDLE:
       {
-         BOOL fSet = ( hb_itemType( pItem ) & HB_IT_NUMERIC ) != 0;
+         HB_BOOL fSet = ( hb_itemType( pItem ) & HB_IT_NUMERIC ) != 0;
          int iHandle = hb_itemGetNI( pItem );
 
          if( SELF_RMFILTER( pArea ) )
@@ -530,7 +525,7 @@ static HB_ERRCODE hb_rmInfo( RMAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             hb_itemPutNI( pItem, SELF_RMFILTER( pArea )->iHandle );
             if( SELF_RMFILTER( pArea )->iHandle == iHandle )
             {
-               fSet = FALSE;
+               fSet = HB_FALSE;
             }
             else if( fSet )
             {
@@ -559,11 +554,11 @@ static HB_ERRCODE hb_rmInfo( RMAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    return HB_SUCCESS;
 }
 
-/* ( DBENTRYP_OII )   hb_rmOrderInfo */
+/* ( DBENTRYP_SVOI )   hb_rmOrderInfo */
 /*
  * Provides information about order management.
  */
-static HB_ERRCODE hb_rmOrderInfo( RMAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrderInfo )
+static HB_ERRCODE hb_rmOrderInfo( RMAREAP pArea, HB_USHORT uiIndex, LPDBORDERINFO pOrderInfo )
 {
    PHB_RMFILTER pRM = NULL;
    PHB_ITEM pItem = NULL;
@@ -592,19 +587,24 @@ static HB_ERRCODE hb_rmOrderInfo( RMAREAP pArea, USHORT uiIndex, LPDBORDERINFO p
             {
                if( uiIndex == DBOI_KEYCOUNT )
                   pOrderInfo->itmResult = hb_itemPutNL( pOrderInfo->itmResult,
-                                hb_rmCountRecords( SELF_RMFILTER( pArea ) ) );
+                                 hb_rmCountRecords( SELF_RMFILTER( pArea ) ) );
                else
                {
-                  ULONG ulRecNo;
+                  HB_ULONG ulRecNo;
                   SELF_RECNO( ( AREAP ) pArea, &ulRecNo );
                   pOrderInfo->itmResult = hb_itemPutNL( pOrderInfo->itmResult,
-                          hb_rmRecordPos( SELF_RMFILTER( pArea ), ulRecNo ) );
+                           hb_rmRecordPos( SELF_RMFILTER( pArea ), ulRecNo ) );
                }
                return HB_SUCCESS;
             }
          }
-         pItem = pArea->dbfi.itmCobExpr;
-         pArea->dbfi.itmCobExpr = NULL;
+#ifdef OPTIMIZE_LOGICAL_POSITION /* it's not compatible with CL53 */
+         else
+#endif
+         {
+            pItem = pArea->dbfi.itmCobExpr;
+            pArea->dbfi.itmCobExpr = NULL;
+         }
          break;
 
       case DBOI_KEYNORAW:
@@ -644,7 +644,7 @@ static HB_ERRCODE hb_rmExit( LPRDDNODE pRDD )
    {
       SUPER_EXIT( pRDD );
    }
-   s_uiRddId = ( USHORT ) -1;
+   hb_rmDelRddID( pRDD->rddID );
 
    return HB_SUCCESS;
 }
@@ -653,14 +653,14 @@ static HB_ERRCODE hb_rmExit( LPRDDNODE pRDD )
 /*
  * Get/Set RDD parameters
  */
-static HB_ERRCODE hb_rmRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem )
+static HB_ERRCODE hb_rmRddInfo( LPRDDNODE pRDD, HB_USHORT uiIndex, HB_ULONG ulConnect, PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_rmRddInfo(%p, %hu, %lu, %p)", pRDD, uiIndex, ulConnect, pItem));
 
    switch( uiIndex )
    {
       case RDDI_RECORDMAP:
-         hb_itemPutL( pItem, TRUE );
+         hb_itemPutL( pItem, HB_TRUE );
          break;
 
       default:
@@ -670,124 +670,41 @@ static HB_ERRCODE hb_rmRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect,
    return HB_SUCCESS;
 }
 
-#define __PRG_SOURCE__ __FILE__
-#ifdef HB_PCODE_VER
-#  undef HB_PRG_PCODE_VER
-#  define HB_PRG_PCODE_VER HB_PCODE_VER
+#if   defined( HB_RMDBFNTX )
+#  define HB_RM_SUPER   "DBFNTX"
+#elif defined( HB_RMDBFNSX )
+#  define HB_RM_SUPER   "DBFNSX"
+#else /* HB_RMDBFCDX */
+#  define HB_RM_SUPER   "DBFCDX"
 #endif
 
-#if defined( HB_RMDBFNTX )
-
-HB_FUNC_EXTERN( DBFNTX );
-
-HB_FUNC( RMDBFNTX ) {;}
-HB_FUNC( RMDBFNTX_GETFUNCTABLE )
+HB_FUNC_STATIC( RMDBF_GETFUNCTABLE )
 {
    RDDFUNCS * pTable, * pSuperTable;
-   USHORT * uiCount, uiRddId;
+   HB_USHORT * puiCount, uiRddId, * puiSuperRddId;
 
-   uiCount = ( USHORT * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
-   pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
-   pSuperTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 3, HB_IT_POINTER ) );
-   uiRddId = hb_parni( 4 );
+   puiCount = ( HB_USHORT * ) hb_parptr( 1 );
+   pTable = ( RDDFUNCS * ) hb_parptr( 2 );
+   pSuperTable = ( RDDFUNCS * ) hb_parptr( 3 );
+   uiRddId = ( HB_USHORT ) hb_parni( 4 );
+   puiSuperRddId = ( HB_USHORT * ) hb_parptr( 5 );
 
-   HB_TRACE(HB_TR_DEBUG, ("RMDBFNTX_GETFUNCTABLE(%p, %p, %p, %hu)", uiCount, pTable, pSuperTable, uiRddId));
+   HB_TRACE(HB_TR_DEBUG, ("RM" HB_RM_SUPER "_GETFUNCTABLE(%p, %p, %p, %hu, %p)", puiCount, pTable, pSuperTable, uiRddId, puiSuperRddId));
 
    if( pTable )
    {
       HB_ERRCODE errCode;
 
-      if( uiCount )
-         * uiCount = RDDFUNCSCOUNT;
+      if( puiCount )
+         * puiCount = RDDFUNCSCOUNT;
       if( !pSuperTable )
          pSuperTable = &rmSuper;
 
-      errCode = hb_rddInherit( pTable, &rmTable, pSuperTable, (const char *) "DBFNTX" );
+      errCode = hb_rddInheritEx( pTable, &rmTable, pSuperTable, HB_RM_SUPER, puiSuperRddId );
       hb_retni( errCode );
       if( errCode == HB_SUCCESS )
       {
-         /*
-          * we HB_SUCCESSfully register our RDD so now we can initialize it
-          * You may think that this place is RDD init statement, Druzus
-          */
-         s_uiRddId = uiRddId;
-         if( pSuperTable != &rmSuper )
-            memcpy( &rmSuper, pSuperTable, sizeof( RDDFUNCS ) );
-      }
-   }
-   else
-      hb_retni( HB_FAILURE );
-}
-
-static void hb_rmRddInit( void * cargo )
-{
-   HB_SYMBOL_UNUSED( cargo );
-
-   if( hb_rddRegister( "DBF",    RDT_FULL ) <= 1 )
-   {
-      hb_rddRegister( "DBFFPT", RDT_FULL );
-      if( hb_rddRegister( "DBFNTX", RDT_FULL ) <= 1 )
-      {
-         USHORT usResult = hb_rddRegister( "RMDBFNTX", RDT_FULL );
-         if( usResult <= 1 )
-         {
-            if( usResult == 0 )
-            {
-               PHB_ITEM pItem = hb_itemPutNI( NULL, DB_MEMO_DBT );
-               SELF_RDDINFO( hb_rddGetNode( s_uiRddId ), RDDI_MEMOTYPE, 0, pItem );
-               hb_itemRelease( pItem );
-            }
-            return;
-         }
-      }
-   }
-
-   hb_errInternal( HB_EI_RDDINVALID, NULL, NULL, NULL );
-
-   /* not executed, only to force DBF RDD linking */
-   HB_FUNC_EXEC( DBFNTX );
-}
-
-HB_INIT_SYMBOLS_BEGIN( rmap1__InitSymbols )
-{ "RMDBFNTX",              {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( RMDBFNTX )}, NULL },
-{ "RMDBFNTX_GETFUNCTABLE", {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( RMDBFNTX_GETFUNCTABLE )}, NULL }
-HB_INIT_SYMBOLS_END( rmap1__InitSymbols )
-
-#else
-
-HB_FUNC_EXTERN( DBFCDX );
-
-HB_FUNC( RMDBFCDX ) {;}
-HB_FUNC( RMDBFCDX_GETFUNCTABLE )
-{
-   RDDFUNCS * pTable, * pSuperTable;
-   USHORT * uiCount, uiRddId;
-
-   uiCount = ( USHORT * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
-   pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
-   pSuperTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 3, HB_IT_POINTER ) );
-   uiRddId = hb_parni( 4 );
-
-   HB_TRACE(HB_TR_DEBUG, ("RMDBFCDX_GETFUNCTABLE(%p, %p, %p, %hu)", uiCount, pTable, pSuperTable, uiRddId));
-
-   if( pTable )
-   {
-      HB_ERRCODE errCode;
-
-      if( uiCount )
-         * uiCount = RDDFUNCSCOUNT;
-      if( !pSuperTable )
-         pSuperTable = &rmSuper;
-
-      errCode = hb_rddInherit( pTable, &rmTable, pSuperTable, (const char *) "DBFCDX" );
-      hb_retni( errCode );
-      if ( errCode == HB_SUCCESS )
-      {
-         /*
-          * we successfully register our RDD so now we can initialize it
-          * You may think that this place is RDD init statement, Druzus
-          */
-         s_uiRddId = uiRddId;
+         hb_rmSetRddID( uiRddId );
          if( pSuperTable != &rmSuper )
             memcpy( &rmSuper, pSuperTable, sizeof( RDDFUNCS ) );
       }
@@ -803,41 +720,43 @@ static void hb_rmRddInit( void * cargo )
    if( hb_rddRegister( "DBF", RDT_FULL ) <= 1 )
    {
       hb_rddRegister( "DBFFPT", RDT_FULL );
-      if( hb_rddRegister( "DBFCDX", RDT_FULL ) <= 1 &&
-          hb_rddRegister( "RMDBFCDX", RDT_FULL ) <= 1 )
-      {
-            return;
-      }
+      if( hb_rddRegister( HB_RM_SUPER, RDT_FULL ) <= 1 &&
+          hb_rddRegister( "RM" HB_RM_SUPER, RDT_FULL ) <= 1 )
+         return;
    }
 
    hb_errInternal( HB_EI_RDDINVALID, NULL, NULL, NULL );
-
-   /* not executed, only to force DBF RDD linking */
-   HB_FUNC_EXEC( DBFCDX );
 }
 
-HB_INIT_SYMBOLS_BEGIN( rmap1__InitSymbols )
+#if defined( HB_RMDBFNTX )
+HB_FUNC_EXTERN( DBFNTX ); HB_FUNC( RMDBFNTX ) { HB_FUNC_EXEC( DBFNTX ); }
+HB_INIT_SYMBOLS_BEGIN( _hb_rm_InitSymbols_ )
+{ "RMDBFNTX",              {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( RMDBFNTX )}, NULL },
+{ "RMDBFNTX_GETFUNCTABLE", {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( RMDBF_GETFUNCTABLE )}, NULL }
+HB_INIT_SYMBOLS_END( _hb_rm_InitSymbols_ )
+#elif defined( HB_RMDBFNSX )
+HB_FUNC_EXTERN( DBFNSX ); HB_FUNC( RMDBFNSX ) { HB_FUNC_EXEC( DBFNSX ); }
+HB_INIT_SYMBOLS_BEGIN( _hb_rm_InitSymbols_ )
+{ "RMDBFNSX",              {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( RMDBFNSX )}, NULL },
+{ "RMDBFNSX_GETFUNCTABLE", {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( RMDBF_GETFUNCTABLE )}, NULL }
+HB_INIT_SYMBOLS_END( _hb_rm_InitSymbols_ )
+#else /* HB_RMDBFCDX */
+HB_FUNC_EXTERN( DBFCDX ); HB_FUNC( RMDBFCDX ) { HB_FUNC_EXEC( DBFCDX ); }
+HB_INIT_SYMBOLS_BEGIN( _hb_rm_InitSymbols_ )
 { "RMDBFCDX",              {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( RMDBFCDX )}, NULL },
-{ "RMDBFCDX_GETFUNCTABLE", {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( RMDBFCDX_GETFUNCTABLE )}, NULL }
-HB_INIT_SYMBOLS_END( rmap1__InitSymbols )
-
+{ "RMDBFCDX_GETFUNCTABLE", {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( RMDBF_GETFUNCTABLE )}, NULL }
+HB_INIT_SYMBOLS_END( _hb_rm_InitSymbols_ )
 #endif
 
 HB_CALL_ON_STARTUP_BEGIN( _hb_rm_rdd_init_ )
    hb_vmAtInit( hb_rmRddInit, NULL );
 HB_CALL_ON_STARTUP_END( _hb_rm_rdd_init_ )
 
-#if defined(HB_PRAGMA_STARTUP)
-#  pragma startup rmap1__InitSymbols
+#if defined( HB_PRAGMA_STARTUP )
+#  pragma startup _hb_rm_InitSymbols_
 #  pragma startup _hb_rm_rdd_init_
-#elif defined(_MSC_VER)
-#  if _MSC_VER >= 1010
-#     pragma data_seg( ".CRT$XIY" )
-#     pragma comment( linker, "/Merge:.CRT=.data" )
-#  else
-#     pragma data_seg( "XIY" )
-#  endif
-   static HB_$INITSYM hb_vm_auto_rmap1__InitSymbols = rmap1__InitSymbols;
-   static HB_$INITSYM hb_vm_auto_rm_rdd_init = _hb_rm_rdd_init_;
-#  pragma data_seg()
+#elif defined( HB_DATASEG_STARTUP )
+   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( _hb_rm_InitSymbols_ ) \
+                              HB_DATASEG_FUNC( _hb_rm_rdd_init_ )
+   #include "hbiniseg.h"
 #endif

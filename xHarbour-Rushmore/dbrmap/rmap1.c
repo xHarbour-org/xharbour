@@ -3,27 +3,57 @@
  */
 
 /*
-  (c) copyright xHarbour.com Inc. http://www.xHarbour.com
-  Author: Przemyslaw Czerpak Przemek@xHarbour.com
-
-  This source file is an intellectual property of xHarbour.com Inc.
-  You may NOT forward or share this file under any conditions!
-*/
+ * DBRMAP (Record Map filters) for [x]Harbour:
+ *    Record Map and ClipMore/COMIX compatible function set
+ *
+ * Copyright 2004-2011 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
+ * All rights reserved.
+ *
+ */
 
 #include "hbrddrm.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
 #include "hbset.h"
 #include "hbvm.h"
+#include "hbstack.h"
 
-static int s_rlOptLevel = RM_OPT_NONE;
-static int s_rlError = M6ERR_OK;
+typedef struct
+{
+   int      rlOptLevel; /* RM_OPT_NONE */
+   int      rlError;    /* M6ERR_OK */
+   HB_ULONG rlRecords;  /* 0 */
+} HB_RMDATA, * PHB_RMDATA;
 
-/* list of RM FIlters */
+#ifdef __XHARBOUR__
+
+static HB_RMDATA  s_rm_data;
+#define HB_RM_DATA_PTR  (&s_rm_data)
+
+#define HB_RM_LOCK
+#define HB_RM_UNLOCK
+
+#else
+
+#include "hbthread.h"
+static HB_TSD_NEW( s_rmData, sizeof( HB_RMDATA ), NULL, NULL );
+#define HB_RM_DATA_PTR  ( ( PHB_RMDATA ) hb_stackGetTSD( &s_rmData ) )
+
+static HB_CRITICAL_NEW( s_rmMtx );
+#define HB_RM_LOCK      hb_threadEnterCriticalSection( &s_rmMtx );
+#define HB_RM_UNLOCK    hb_threadLeaveCriticalSection( &s_rmMtx );
+
+#endif
+
+
+/* list of RM FIlters, protected by s_rmMtx */
 static PHB_RMBAG s_RM_bag = NULL;
 
-/* table with number of bits in BYTE to speed up hb_rmCountRecords() */
-static const BYTE s_bitCount[ 256 ] =
+static HB_USHORT s_uiRdds[ RM_RDD_MAX ];
+static int s_iRddCount = 0;
+
+/* table with number of bits in HB_BYTE to speed up hb_rmCountRecords() */
+static const HB_BYTE s_bitCount[ 256 ] =
    {
       0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
       1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
@@ -48,7 +78,7 @@ static PHB_RMITEM hb_rmItemNew( void )
    PHB_RMITEM pRMItem = ( PHB_RMITEM ) hb_xgrab( sizeof( HB_RMITEM ) );
 
    pRMItem->ulTmpBlock = HB_RMITEM_DUMMY;
-   pRMItem->pRecMap = ( BYTE * ) hb_xgrab( HB_RMITEM_SIZE );
+   pRMItem->pRecMap = ( HB_BYTE * ) hb_xgrab( HB_RMITEM_SIZE );
    memset( pRMItem->pRecMap, 0x00, HB_RMITEM_SIZE );
    return pRMItem;
 }
@@ -60,7 +90,7 @@ static void hb_rmItemFree( PHB_RMITEM pRMItem )
    hb_xfree( pRMItem );
 }
 
-static BYTE * hb_rmItemBuf( PHB_RMFILTER pRM, int iItem )
+static HB_BYTE * hb_rmItemBuf( PHB_RMFILTER pRM, int iItem )
 {
    /*
     * TODO: for less memory system implement disk cache for RMITEM
@@ -72,7 +102,7 @@ static BYTE * hb_rmItemBuf( PHB_RMFILTER pRM, int iItem )
    return pRM->pRMItems[ iItem ]->pRecMap;
 }
 
-static BYTE * hb_rmItemBufMB( PHB_RMFILTER pRM, int iItem )
+static HB_BYTE * hb_rmItemBufMB( PHB_RMFILTER pRM, int iItem )
 {
    /*
     * TODO: read note above in hb_rmItemBuf()
@@ -153,16 +183,16 @@ static PHB_RMITEM * hb_rmItemLstReSize( PHB_RMITEM *pRMItems,
 }
 
 /* clear the rest of record map buffer */
-static void hb_rmClearRest( PHB_RMFILTER pRM, BOOL fMB )
+static void hb_rmClearRest( PHB_RMFILTER pRM, HB_BOOL fMB )
 {
    if( pRM->ulRecords && ( !fMB || pRM->pRMmaybe ) )
    {
-      ULONG ulRec = pRM->ulRecords - 1;
+      HB_ULONG ulRec = pRM->ulRecords - 1;
       int i = HB_RM_ITEM_POS( ulRec );
-      BYTE * pRecMap = fMB ? hb_rmItemBufMB( pRM, HB_RM_ITEM_NO( ulRec ) ) :
-                               hb_rmItemBuf( pRM, HB_RM_ITEM_NO( ulRec ) );
+      HB_BYTE * pRecMap = fMB ? hb_rmItemBufMB( pRM, HB_RM_ITEM_NO( ulRec ) ) :
+                                hb_rmItemBuf( pRM, HB_RM_ITEM_NO( ulRec ) );
 
-      pRecMap[ i++ ] &= ( BYTE ) ( ( ( int ) 1 << ( ( ulRec & 0x07 ) + 1 ) ) - 1 );
+      pRecMap[ i++ ] &= ( HB_BYTE ) ( ( ( int ) 1 << ( ( ulRec & 0x07 ) + 1 ) ) - 1 );
       if( i < HB_RMITEM_SIZE )
          memset( &pRecMap[ i ], 0x00, HB_RMITEM_SIZE - i );
    }
@@ -198,6 +228,8 @@ static int hb_rmNewHandle( PHB_RMFILTER pRM )
 {
    int iHandle = 0, i;
 
+   HB_RM_LOCK
+
    hb_rmBagInit();
 
    if( s_RM_bag->iSize > s_RM_bag->iCount )
@@ -213,26 +245,30 @@ static int hb_rmNewHandle( PHB_RMFILTER pRM )
    }
    if( iHandle == 0 )
    {
-      ULONG ulNewSize, ulOldSize;
+      HB_SIZE nNewSize, nOldSize;
 
       iHandle = s_RM_bag->iSize + 1;
-      ulOldSize = sizeof( PHB_RMFILTER * ) * s_RM_bag->iSize;
+      nOldSize = sizeof( PHB_RMFILTER * ) * s_RM_bag->iSize;
       s_RM_bag->iSize += HB_RMLST_ALLOC;
-      ulNewSize = sizeof( PHB_RMFILTER * ) * s_RM_bag->iSize;
-      if( ulOldSize != 0 )
-         s_RM_bag->pRMFilters = ( PHB_RMFILTER * ) hb_xrealloc( s_RM_bag->pRMFilters, ulNewSize );
+      nNewSize = sizeof( PHB_RMFILTER * ) * s_RM_bag->iSize;
+      if( nOldSize != 0 )
+         s_RM_bag->pRMFilters = ( PHB_RMFILTER * ) hb_xrealloc( s_RM_bag->pRMFilters, nNewSize );
       else
-         s_RM_bag->pRMFilters = ( PHB_RMFILTER * ) hb_xgrab( ulNewSize );
-      memset( &(( BYTE * ) s_RM_bag->pRMFilters)[ ulOldSize ], 0, ulNewSize - ulOldSize );
+         s_RM_bag->pRMFilters = ( PHB_RMFILTER * ) hb_xgrab( nNewSize );
+      memset( &(( HB_BYTE * ) s_RM_bag->pRMFilters)[ nOldSize ], 0, nNewSize - nOldSize );
    }
    s_RM_bag->iCount++;
    s_RM_bag->pRMFilters[ iHandle - 1 ] = pRM;
+
+   HB_RM_UNLOCK
 
    return iHandle;
 }
 
 static void hb_rmRemoveHandle( int iHandle )
 {
+   HB_RM_LOCK
+
    if( s_RM_bag && iHandle > 0 && iHandle <= s_RM_bag->iSize &&
         s_RM_bag->pRMFilters[ iHandle - 1 ] != NULL )
    {
@@ -244,13 +280,15 @@ static void hb_rmRemoveHandle( int iHandle )
          s_RM_bag = NULL;
       }
    }
+
+   HB_RM_UNLOCK
 }
 
 static void hb_rmXChangeMap( PHB_RMFILTER pRM1, PHB_RMFILTER pRM2 )
 {
-   FHANDLE     hFile     = pRM1->hFile;
+   HB_FHANDLE  hFile     = pRM1->hFile;
    int         iItems    = pRM1->iItems;
-   ULONG       ulRecords = pRM1->ulRecords;
+   HB_ULONG    ulRecords = pRM1->ulRecords;
    PHB_RMITEM  *pRMItems = pRM1->pRMItems;
    PHB_RMITEM  *pRMmaybe = pRM1->pRMmaybe;
 
@@ -267,65 +305,123 @@ static void hb_rmXChangeMap( PHB_RMFILTER pRM1, PHB_RMFILTER pRM2 )
    pRM2->pRMmaybe  = pRMmaybe;
 }
 
+void hb_rmSetRddID( HB_USHORT uiRddId )
+{
+   HB_RM_LOCK
+
+   if( s_iRddCount < RM_RDD_MAX )
+      s_uiRdds[ s_iRddCount++ ] = uiRddId;
+
+   HB_RM_UNLOCK
+}
+
+void hb_rmDelRddID( HB_USHORT uiRddId )
+{
+   int i;
+
+   HB_RM_LOCK
+
+   for( i = 0; i < s_iRddCount; ++i )
+   {
+      if( s_uiRdds[ i ] == uiRddId )
+         break;
+   }
+   if( i < s_iRddCount )
+   {
+      for( ; i < s_iRddCount - 1; ++i )
+         s_uiRdds[ i ] = s_uiRdds[ i + 1 ];
+
+      s_uiRdds[ --s_iRddCount ] = 0;
+   }
+
+   HB_RM_UNLOCK
+}
+
 void * hb_rmGetRMAreaPointer( void )
 {
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
    {
-      char pBuffer[ HB_RDD_MAX_DRIVERNAME_LEN + 1 ];
+      int i;
 
-      if( SELF_SYSNAME( pArea, pBuffer ) == HB_FAILURE )
+      for( i = 0; i < s_iRddCount; ++i )
       {
-         pArea = NULL;
+         if( hb_rddIsDerivedFrom( pArea->rddID, s_uiRdds[ i ] ) )
+            break;
       }
-      else if( strcmp( ( char * ) pBuffer, "RMDBFCDX" ) != 0 &&
-                strcmp( ( char * ) pBuffer, "RMDBFNTX" ) != 0 )
-/*
-                strcmp( ( char * ) pBuffer, "SIXCDX" ) != 0 &&
-                strcmp( ( char * ) pBuffer, "COMIX" ) != 0 )
-*/
+      if( i >= s_iRddCount )
       {
-         s_rlError = M6ERR_NOTSUPP;
+         hb_rmSetError( M6ERR_NOTSUPP );
          pArea = NULL;
       }
    }
    else
    {
-      s_rlError = M6ERR_NOTABLE;
+      hb_rmSetError( M6ERR_NOTABLE );
    }
    return pArea;
 }
 
+static int hb_rmGetOptLevel( void )
+{
+   return HB_RM_DATA_PTR->rlOptLevel;
+}
+
+static void hb_rmSetOptLevel( int iOptLevel )
+{
+   HB_RM_DATA_PTR->rlOptLevel = iOptLevel;
+}
+
 int hb_rmGetError( void )
 {
-   return s_rlError;
+   return HB_RM_DATA_PTR->rlError;
 }
 
 void hb_rmSetError( int iError )
 {
-   s_rlError = iError;
+   HB_RM_DATA_PTR->rlError = iError;
 }
 
-BOOL hb_rmIsFilter( int iHandle )
+HB_ULONG hb_rmGetRecords( void )
 {
+   return HB_RM_DATA_PTR->rlRecords;
+}
+void hb_rmSetRecords( HB_ULONG ulRecords )
+{
+   HB_RM_DATA_PTR->rlRecords = ulRecords;
+}
+
+HB_BOOL hb_rmIsFilter( int iHandle )
+{
+   HB_BOOL fOK = HB_FALSE;
+
+   HB_RM_LOCK
    if( s_RM_bag && iHandle > 0 && iHandle <= s_RM_bag->iSize )
-      return s_RM_bag->pRMFilters[ iHandle - 1 ] != NULL;
-   return FALSE;
+      fOK = s_RM_bag->pRMFilters[ iHandle - 1 ] != NULL;
+   HB_RM_UNLOCK
+
+   return fOK;
 }
 
 PHB_RMFILTER hb_rmGetFilterPtr( int iHandle )
 {
+   PHB_RMFILTER pRM = NULL;
+
+   HB_RM_LOCK
    if( s_RM_bag && iHandle > 0 && iHandle <= s_RM_bag->iSize )
-   {
-      return s_RM_bag->pRMFilters[ iHandle - 1 ];
-   }
-   s_rlError = M6ERR_BADHANDLE;
-   return NULL;
+      pRM = s_RM_bag->pRMFilters[ iHandle - 1 ];
+   HB_RM_UNLOCK
+
+   if( pRM == NULL )
+      hb_rmSetError( M6ERR_BADHANDLE );
+
+   return pRM;
 }
 
 void hb_rmDestroyAll( void )
 {
+   /* executed from RDD exit code, foes not need MT protection */
    int i = 0;
    while( s_RM_bag && s_RM_bag->iCount && i < s_RM_bag->iSize )
    {
@@ -335,7 +431,7 @@ void hb_rmDestroyAll( void )
    }
 }
 
-PHB_RMFILTER hb_rmCreate( ULONG ulRecords )
+PHB_RMFILTER hb_rmCreate( HB_ULONG ulRecords )
 {
    PHB_RMFILTER pRM;
 
@@ -344,7 +440,7 @@ PHB_RMFILTER hb_rmCreate( ULONG ulRecords )
    pRM->ulRecords = ulRecords;
    pRM->ulPos = 0;
    pRM->iArea = 0;
-   pRM->fLocked = FALSE;
+   pRM->fLocked = HB_FALSE;
    pRM->iItems = ulRecords ? HB_RM_ITEM_NO( ulRecords - 1 ) + 1 : 0;
    pRM->iType = RM_TYPE_COMPLEX;
    pRM->iOptLvl = RM_OPT_FULL;
@@ -357,12 +453,12 @@ PHB_RMFILTER hb_rmCreate( ULONG ulRecords )
    return pRM;
 }
 
-PHB_RMFILTER hb_rmReSize( PHB_RMFILTER pRM, ULONG ulRecords )
+PHB_RMFILTER hb_rmReSize( PHB_RMFILTER pRM, HB_ULONG ulRecords )
 {
    if( pRM->ulRecords != ulRecords )
    {
       int iItems = ulRecords ? HB_RM_ITEM_NO( ulRecords - 1 ) + 1 : 0;
-      BOOL fGrowUp = ( ulRecords > pRM->ulRecords );
+      HB_BOOL fGrowUp = ( ulRecords > pRM->ulRecords );
 
       if( pRM->iItems != iItems )
       {
@@ -378,8 +474,8 @@ PHB_RMFILTER hb_rmReSize( PHB_RMFILTER pRM, ULONG ulRecords )
       pRM->ulRecords = ulRecords;
       if( !fGrowUp )
       {
-         hb_rmClearRest( pRM, FALSE );
-         hb_rmClearRest( pRM, TRUE );
+         hb_rmClearRest( pRM, HB_FALSE );
+         hb_rmClearRest( pRM, HB_TRUE );
          hb_rmCheckMB( pRM );
       }
    }
@@ -473,7 +569,7 @@ void hb_rmFill( PHB_RMFILTER pRM )
 
       for( i = 0; i < pRM->iItems; i++ )
          memset( hb_rmItemBuf( pRM, i ), 0xFF, HB_RMITEM_SIZE );
-      hb_rmClearRest( pRM, FALSE );
+      hb_rmClearRest( pRM, HB_FALSE );
    }
 }
 
@@ -487,7 +583,7 @@ void hb_rmFillMB( PHB_RMFILTER pRM )
          pRM->pRMmaybe = hb_rmItemLstNew( pRM->iItems );
       for( i = 0; i < pRM->iItems; i++ )
          memset( hb_rmItemBufMB( pRM, i ), 0xFF, HB_RMITEM_SIZE );
-      hb_rmClearRest( pRM, TRUE );
+      hb_rmClearRest( pRM, HB_TRUE );
       pRM->iOptLvl = RM_OPT_NONE;
    }
 }
@@ -512,14 +608,14 @@ PHB_RMFILTER hb_rmMakeMB( PHB_RMFILTER pRM )
          pRM->pRMmaybe = hb_rmItemLstNew( pRM->iItems );
       for( i = 0; i < pRM->iItems; i++ )
       {
-         BYTE * pRecMap = hb_rmItemBuf( pRM, i );
-         BYTE * pRecMapMB = hb_rmItemBufMB( pRM, i );
+         HB_BYTE * pRecMap = hb_rmItemBuf( pRM, i );
+         HB_BYTE * pRecMapMB = hb_rmItemBufMB( pRM, i );
          for( j = 0; j < HB_RMITEM_SIZE; j++ )
             pRecMapMB[ j ] |= pRecMap[ j ];
          memset( pRecMap, 0x00, HB_RMITEM_SIZE );
       }
-      /* hb_rmClearRest( pRM, FALSE );
-         hb_rmClearRest( pRM, TRUE );
+      /* hb_rmClearRest( pRM, HB_FALSE );
+         hb_rmClearRest( pRM, HB_TRUE );
          hb_rmCheckMB( pDstRM ); */
       if( pRM->iOptLvl == RM_OPT_FULL )
          pRM->iOptLvl = RM_OPT_PART;
@@ -551,10 +647,10 @@ PHB_RMFILTER hb_rmOR( PHB_RMFILTER pRM1, PHB_RMFILTER pRM2 )
    {
       for( i = 0; i < iItems; i++ )
       {
-         BYTE * pSrcRecMap = hb_rmItemBuf( pSrcRM, i );
-         BYTE * pDstRecMap = hb_rmItemBuf( pDstRM, i );
-         BYTE * pSrcRecMapMB = hb_rmItemBufMB( pSrcRM, i );
-         BYTE * pDstRecMapMB = hb_rmItemBufMB( pDstRM, i );
+         HB_BYTE * pSrcRecMap = hb_rmItemBuf( pSrcRM, i );
+         HB_BYTE * pDstRecMap = hb_rmItemBuf( pDstRM, i );
+         HB_BYTE * pSrcRecMapMB = hb_rmItemBufMB( pSrcRM, i );
+         HB_BYTE * pDstRecMapMB = hb_rmItemBufMB( pDstRM, i );
          for( j = 0; j < HB_RMITEM_SIZE; j++ )
          {
             pDstRecMapMB[ j ] &= pSrcRecMapMB[ j ] | ~pSrcRecMap[ j ];
@@ -567,9 +663,9 @@ PHB_RMFILTER hb_rmOR( PHB_RMFILTER pRM1, PHB_RMFILTER pRM2 )
    {
       for( i = 0; i < iItems; i++ )
       {
-         BYTE * pSrcRecMap = hb_rmItemBuf( pSrcRM, i );
-         BYTE * pDstRecMap = hb_rmItemBuf( pDstRM, i );
-         BYTE * pDstRecMapMB = hb_rmItemBufMB( pDstRM, i );
+         HB_BYTE * pSrcRecMap = hb_rmItemBuf( pSrcRM, i );
+         HB_BYTE * pDstRecMap = hb_rmItemBuf( pDstRM, i );
+         HB_BYTE * pDstRecMapMB = hb_rmItemBufMB( pDstRM, i );
          for( j = 0; j < HB_RMITEM_SIZE; j++ )
          {
             pDstRecMapMB[ j ] &= ~pSrcRecMap[ j ];
@@ -589,10 +685,10 @@ PHB_RMFILTER hb_rmOR( PHB_RMFILTER pRM1, PHB_RMFILTER pRM2 )
       }
       for( i = 0; i < iItems; i++ )
       {
-         BYTE * pSrcRecMap = hb_rmItemBuf( pSrcRM, i );
-         BYTE * pDstRecMap = hb_rmItemBuf( pDstRM, i );
-         BYTE * pSrcRecMapMB = hb_rmItemBufMB( pSrcRM, i );
-         BYTE * pDstRecMapMB = hb_rmItemBufMB( pDstRM, i );
+         HB_BYTE * pSrcRecMap = hb_rmItemBuf( pSrcRM, i );
+         HB_BYTE * pDstRecMap = hb_rmItemBuf( pDstRM, i );
+         HB_BYTE * pSrcRecMapMB = hb_rmItemBufMB( pSrcRM, i );
+         HB_BYTE * pDstRecMapMB = hb_rmItemBufMB( pDstRM, i );
          for( j = 0; j < HB_RMITEM_SIZE; j++ )
          {
             pDstRecMapMB[ j ] = pSrcRecMapMB[ j ] & ~pDstRecMap[ j ];
@@ -608,8 +704,8 @@ PHB_RMFILTER hb_rmOR( PHB_RMFILTER pRM1, PHB_RMFILTER pRM2 )
    {
       for( i = 0; i < iItems; i++ )
       {
-         BYTE * pSrcRecMap = hb_rmItemBuf( pSrcRM, i );
-         BYTE * pDstRecMap = hb_rmItemBuf( pDstRM, i );
+         HB_BYTE * pSrcRecMap = hb_rmItemBuf( pSrcRM, i );
+         HB_BYTE * pDstRecMap = hb_rmItemBuf( pDstRM, i );
          for( j = 0; j < HB_RMITEM_SIZE; j++ )
          {
             pDstRecMap[ j ] |= pSrcRecMap[ j ];
@@ -634,8 +730,8 @@ PHB_RMFILTER hb_rmOR( PHB_RMFILTER pRM1, PHB_RMFILTER pRM2 )
    {
       hb_rmDestroy( pSrcRM );
    }
-   hb_rmClearRest( pDstRM, FALSE );
-   hb_rmClearRest( pDstRM, TRUE );
+   hb_rmClearRest( pDstRM, HB_FALSE );
+   hb_rmClearRest( pDstRM, HB_TRUE );
    hb_rmCheckMB( pDstRM );
 
    return pDstRM;
@@ -665,10 +761,10 @@ PHB_RMFILTER hb_rmAND( PHB_RMFILTER pRM1, PHB_RMFILTER pRM2 )
    {
       for( i = 0; i < iItems; i++ )
       {
-         BYTE * pSrcRecMap = hb_rmItemBuf( pSrcRM, i );
-         BYTE * pDstRecMap = hb_rmItemBuf( pDstRM, i );
-         BYTE * pSrcRecMapMB = hb_rmItemBufMB( pSrcRM, i );
-         BYTE * pDstRecMapMB = hb_rmItemBufMB( pDstRM, i );
+         HB_BYTE * pSrcRecMap = hb_rmItemBuf( pSrcRM, i );
+         HB_BYTE * pDstRecMap = hb_rmItemBuf( pDstRM, i );
+         HB_BYTE * pSrcRecMapMB = hb_rmItemBufMB( pSrcRM, i );
+         HB_BYTE * pDstRecMapMB = hb_rmItemBufMB( pDstRM, i );
          for( j = 0; j < HB_RMITEM_SIZE; j++ )
          {
             pDstRecMapMB[ j ] &= pSrcRecMapMB[ j ] | pSrcRecMap[ j ];
@@ -681,9 +777,9 @@ PHB_RMFILTER hb_rmAND( PHB_RMFILTER pRM1, PHB_RMFILTER pRM2 )
    {
       for( i = 0; i < iItems; i++ )
       {
-         BYTE * pSrcRecMap = hb_rmItemBuf( pSrcRM, i );
-         BYTE * pDstRecMap = hb_rmItemBuf( pDstRM, i );
-         BYTE * pDstRecMapMB = hb_rmItemBufMB( pDstRM, i );
+         HB_BYTE * pSrcRecMap = hb_rmItemBuf( pSrcRM, i );
+         HB_BYTE * pDstRecMap = hb_rmItemBuf( pDstRM, i );
+         HB_BYTE * pDstRecMapMB = hb_rmItemBufMB( pDstRM, i );
          for( j = 0; j < HB_RMITEM_SIZE; j++ )
          {
             pDstRecMapMB[ j ] &= pSrcRecMap[ j ];
@@ -703,10 +799,10 @@ PHB_RMFILTER hb_rmAND( PHB_RMFILTER pRM1, PHB_RMFILTER pRM2 )
       }
       for( i = 0; i < iItems; i++ )
       {
-         BYTE * pSrcRecMap = hb_rmItemBuf( pSrcRM, i );
-         BYTE * pDstRecMap = hb_rmItemBuf( pDstRM, i );
-         BYTE * pSrcRecMapMB = hb_rmItemBufMB( pSrcRM, i );
-         BYTE * pDstRecMapMB = hb_rmItemBufMB( pDstRM, i );
+         HB_BYTE * pSrcRecMap = hb_rmItemBuf( pSrcRM, i );
+         HB_BYTE * pDstRecMap = hb_rmItemBuf( pDstRM, i );
+         HB_BYTE * pSrcRecMapMB = hb_rmItemBufMB( pSrcRM, i );
+         HB_BYTE * pDstRecMapMB = hb_rmItemBufMB( pDstRM, i );
          for( j = 0; j < HB_RMITEM_SIZE; j++ )
          {
             pDstRecMapMB[ j ] = pSrcRecMapMB[ j ] & pDstRecMap[ j ];
@@ -722,8 +818,8 @@ PHB_RMFILTER hb_rmAND( PHB_RMFILTER pRM1, PHB_RMFILTER pRM2 )
    {
       for( i = 0; i < iItems; i++ )
       {
-         BYTE * pSrcRecMap = hb_rmItemBuf( pSrcRM, i );
-         BYTE * pDstRecMap = hb_rmItemBuf( pDstRM, i );
+         HB_BYTE * pSrcRecMap = hb_rmItemBuf( pSrcRM, i );
+         HB_BYTE * pDstRecMap = hb_rmItemBuf( pDstRM, i );
          for( j = 0; j < HB_RMITEM_SIZE; j++ )
          {
             pDstRecMap[ j ] &= pSrcRecMap[ j ];
@@ -748,8 +844,8 @@ PHB_RMFILTER hb_rmAND( PHB_RMFILTER pRM1, PHB_RMFILTER pRM2 )
    {
       hb_rmDestroy( pSrcRM );
    }
-   hb_rmClearRest( pDstRM, FALSE );
-   hb_rmClearRest( pDstRM, TRUE );
+   hb_rmClearRest( pDstRM, HB_FALSE );
+   hb_rmClearRest( pDstRM, HB_TRUE );
    hb_rmCheckMB( pDstRM );
 
    return pDstRM;
@@ -777,8 +873,8 @@ PHB_RMFILTER hb_rmXOR( PHB_RMFILTER pRM1, PHB_RMFILTER pRM2 )
 
    for( i = 0; i < iItems; i++ )
    {
-      BYTE * pSrcRecMap = hb_rmItemBuf( pSrcRM, i );
-      BYTE * pDstRecMap = hb_rmItemBuf( pDstRM, i );
+      HB_BYTE * pSrcRecMap = hb_rmItemBuf( pSrcRM, i );
+      HB_BYTE * pDstRecMap = hb_rmItemBuf( pDstRM, i );
       for( j = 0; j < HB_RMITEM_SIZE; j++ )
       {
          pDstRecMap[ j ] ^= pSrcRecMap[ j ];
@@ -800,8 +896,8 @@ PHB_RMFILTER hb_rmXOR( PHB_RMFILTER pRM1, PHB_RMFILTER pRM2 )
          }
          for( i = 0; i < iItems; i++ )
          {
-            BYTE * pSrcRecMapMB = hb_rmItemBufMB( pSrcRM, i );
-            BYTE * pDstRecMapMB = hb_rmItemBufMB( pDstRM, i );
+            HB_BYTE * pSrcRecMapMB = hb_rmItemBufMB( pSrcRM, i );
+            HB_BYTE * pDstRecMapMB = hb_rmItemBufMB( pDstRM, i );
             for( j = 0; j < HB_RMITEM_SIZE; j++ )
             {
                pDstRecMapMB[ j ] |= pSrcRecMapMB[ j ];
@@ -827,8 +923,8 @@ PHB_RMFILTER hb_rmXOR( PHB_RMFILTER pRM1, PHB_RMFILTER pRM2 )
    {
       hb_rmDestroy( pSrcRM );
    }
-   hb_rmClearRest( pDstRM, FALSE );
-   hb_rmClearRest( pDstRM, TRUE );
+   hb_rmClearRest( pDstRM, HB_FALSE );
+   hb_rmClearRest( pDstRM, HB_TRUE );
    hb_rmCheckMB( pDstRM );
 
    return pDstRM;
@@ -839,17 +935,17 @@ PHB_RMFILTER hb_rmNOT( PHB_RMFILTER pRM )
    int i, j;
    for( i = 0; i < pRM->iItems; i++ )
    {
-      BYTE * pRecMap = hb_rmItemBuf( pRM, i );
+      HB_BYTE * pRecMap = hb_rmItemBuf( pRM, i );
       for( j = 0; j < HB_RMITEM_SIZE; j++ )
       {
          pRecMap[ j ] ^= 0xff;
       }
    }
-   hb_rmClearRest( pRM, FALSE );
+   hb_rmClearRest( pRM, HB_FALSE );
    return pRM;
 }
 
-void hb_rmSetRecord( PHB_RMFILTER pRM, ULONG ulRec )
+void hb_rmSetRecord( PHB_RMFILTER pRM, HB_ULONG ulRec )
 {
    if( ulRec >= pRM->ulRecords && pRM->iArea != 0 )
    {
@@ -858,7 +954,7 @@ void hb_rmSetRecord( PHB_RMFILTER pRM, ULONG ulRec )
 
    if( --ulRec < pRM->ulRecords )
    {
-      BYTE * pRecMap = hb_rmItemBuf( pRM, HB_RM_ITEM_NO( ulRec ) );
+      HB_BYTE * pRecMap = hb_rmItemBuf( pRM, HB_RM_ITEM_NO( ulRec ) );
       pRecMap[ HB_RM_ITEM_POS( ulRec ) ] |= 1 << ( ulRec & 0x07 );
       if( pRM->pRMmaybe )
       {
@@ -867,14 +963,14 @@ void hb_rmSetRecord( PHB_RMFILTER pRM, ULONG ulRec )
       }
    }
    else
-      s_rlError = M6ERR_RECRANGE;
+      hb_rmSetError( M6ERR_RECRANGE );
 }
 
-void hb_rmClearRecord( PHB_RMFILTER pRM, ULONG ulRec )
+void hb_rmClearRecord( PHB_RMFILTER pRM, HB_ULONG ulRec )
 {
    if( --ulRec < pRM->ulRecords )
    {
-      BYTE * pRecMap = hb_rmItemBuf( pRM, HB_RM_ITEM_NO( ulRec ) );
+      HB_BYTE * pRecMap = hb_rmItemBuf( pRM, HB_RM_ITEM_NO( ulRec ) );
       pRecMap[ HB_RM_ITEM_POS( ulRec ) ] &= ~( 1 << ( ulRec & 0x07 ) );
       if( pRM->pRMmaybe )
       {
@@ -883,16 +979,16 @@ void hb_rmClearRecord( PHB_RMFILTER pRM, ULONG ulRec )
       }
    }
    else
-      s_rlError = M6ERR_RECRANGE;
+      hb_rmSetError( M6ERR_RECRANGE );
 }
 
-BOOL hb_rmTestRecord( PHB_RMFILTER pRM, ULONG ulRec )
+HB_BOOL hb_rmTestRecord( PHB_RMFILTER pRM, HB_ULONG ulRec )
 {
    if( --ulRec < pRM->ulRecords )
    {
-      BYTE * pRecMap = hb_rmItemBuf( pRM, HB_RM_ITEM_NO( ulRec ) );
+      HB_BYTE * pRecMap = hb_rmItemBuf( pRM, HB_RM_ITEM_NO( ulRec ) );
       if( ( pRecMap[ HB_RM_ITEM_POS( ulRec ) ] & ( 1 << ( ulRec & 0x07 ) ) ) != 0 )
-         return TRUE;
+         return HB_TRUE;
       if( pRM->pRMmaybe )
       {
          pRecMap = hb_rmItemBufMB( pRM, HB_RM_ITEM_NO( ulRec ) );
@@ -900,19 +996,19 @@ BOOL hb_rmTestRecord( PHB_RMFILTER pRM, ULONG ulRec )
       }
    }
    else
-      s_rlError = M6ERR_RECRANGE;
-   return FALSE;
+      hb_rmSetError( M6ERR_RECRANGE );
+   return HB_FALSE;
 }
 
-BOOL hb_rmHasMB( PHB_RMFILTER pRM )
+HB_BOOL hb_rmHasMB( PHB_RMFILTER pRM )
 {
    hb_rmCheckMB( pRM );
    return ( pRM->pRMmaybe != NULL );
 }
 
-ULONG hb_rmNextRecordMB( PHB_RMFILTER pRM, ULONG ulRec )
+HB_ULONG hb_rmNextRecordMB( PHB_RMFILTER pRM, HB_ULONG ulRec )
 {
-   ULONG ulNext = 0;
+   HB_ULONG ulNext = 0;
    if( pRM->pRMmaybe )
    {
       int i, j, l;
@@ -920,7 +1016,7 @@ ULONG hb_rmNextRecordMB( PHB_RMFILTER pRM, ULONG ulRec )
       for( i = HB_RM_ITEM_NO( ulRec ); ulNext == 0 && i < pRM->iItems &&
                                        ulRec < pRM->ulRecords; i++ )
       {
-         BYTE * pRecMap = hb_rmItemBufMB( pRM, i );
+         HB_BYTE * pRecMap = hb_rmItemBufMB( pRM, i );
          for( j = HB_RM_ITEM_POS( ulRec ); ulNext == 0 && j < HB_RMITEM_SIZE &&
                                            ulRec < pRM->ulRecords; j++ )
          {
@@ -944,15 +1040,15 @@ ULONG hb_rmNextRecordMB( PHB_RMFILTER pRM, ULONG ulRec )
    return ulNext;
 }
 
-ULONG hb_rmNextRecord( PHB_RMFILTER pRM, ULONG ulRec )
+HB_ULONG hb_rmNextRecord( PHB_RMFILTER pRM, HB_ULONG ulRec )
 {
-   ULONG ulNext = 0;
+   HB_ULONG ulNext = 0;
    int i, j, l;
 
    for( i = HB_RM_ITEM_NO( ulRec ); ulNext == 0 && i < pRM->iItems &&
                                     ulRec < pRM->ulRecords; i++ )
    {
-      BYTE * pRecMap = hb_rmItemBuf( pRM, i ), * pRecMapMB, b;
+      HB_BYTE * pRecMap = hb_rmItemBuf( pRM, i ), * pRecMapMB, b;
       pRecMapMB = pRM->pRMmaybe ? hb_rmItemBufMB( pRM, i ) : pRecMap;
       for( j = HB_RM_ITEM_POS( ulRec ); ulNext == 0 && j < HB_RMITEM_SIZE &&
                                         ulRec < pRM->ulRecords; j++ )
@@ -977,9 +1073,9 @@ ULONG hb_rmNextRecord( PHB_RMFILTER pRM, ULONG ulRec )
    return ulNext;
 }
 
-ULONG hb_rmPrevRecord( PHB_RMFILTER pRM, ULONG ulRec )
+HB_ULONG hb_rmPrevRecord( PHB_RMFILTER pRM, HB_ULONG ulRec )
 {
-   ULONG ulPrev = 0;
+   HB_ULONG ulPrev = 0;
 
    if( ulRec > pRM->ulRecords )
       ulRec = pRM->ulRecords - 1;
@@ -993,7 +1089,7 @@ ULONG hb_rmPrevRecord( PHB_RMFILTER pRM, ULONG ulRec )
       for( i = HB_RM_ITEM_NO( ulRec ); ulPrev == 0 && i >= 0 &&
                                        ulRec < pRM->ulRecords; i-- )
       {
-         BYTE * pRecMap = hb_rmItemBuf( pRM, i ), * pRecMapMB, b;
+         HB_BYTE * pRecMap = hb_rmItemBuf( pRM, i ), * pRecMapMB, b;
          pRecMapMB = pRM->pRMmaybe ? hb_rmItemBufMB( pRM, i ) : pRecMap;
          for( j = HB_RM_ITEM_POS( ulRec ); ulPrev == 0 && j >= 0 &&
                                            ulRec < pRM->ulRecords; j-- )
@@ -1019,14 +1115,14 @@ ULONG hb_rmPrevRecord( PHB_RMFILTER pRM, ULONG ulRec )
    return ulPrev;
 }
 
-ULONG hb_rmCountRecords( PHB_RMFILTER pRM )
+HB_ULONG hb_rmCountRecords( PHB_RMFILTER pRM )
 {
-   ULONG ulRec = 0, ulCount = 0;
+   HB_ULONG ulRec = 0, ulCount = 0;
    int i, j;
 
    for( i = 0; i < pRM->iItems; i++ )
    {
-      BYTE * pRecMap = hb_rmItemBuf( pRM, i ), * pRecMapMB;
+      HB_BYTE * pRecMap = hb_rmItemBuf( pRM, i ), * pRecMapMB;
       pRecMapMB = pRM->pRMmaybe ? hb_rmItemBufMB( pRM, i ) : pRecMap;
 
       for( j = 0; j < HB_RMITEM_SIZE && ulRec < pRM->ulRecords; j++ )
@@ -1038,13 +1134,13 @@ ULONG hb_rmCountRecords( PHB_RMFILTER pRM )
    return ulCount;
 }
 
-ULONG hb_rmRecordPos( PHB_RMFILTER pRM, ULONG ulRecord )
+HB_ULONG hb_rmRecordPos( PHB_RMFILTER pRM, HB_ULONG ulRecord )
 {
-   ULONG ulCount = 0;
+   HB_ULONG ulCount = 0;
 
    if( hb_rmTestRecord( pRM, ulRecord ) )
    {
-      BYTE * pRecMap, * pRecMapMB;
+      HB_BYTE * pRecMap, * pRecMapMB;
       int i, j, l;
 
       --ulRecord;
@@ -1078,7 +1174,7 @@ PHB_RMFILTER hb_rmNewQuery( AREAP pArea, PHB_ITEM pFilterText )
    PHB_RMFILTER pRM;
 
    pRM = hb_rmqBuildQRM( pArea, pFilterText );
-   s_rlOptLevel = pRM ? pRM->iOptLvl : RM_OPT_NONE;
+   hb_rmSetOptLevel( pRM ? pRM->iOptLvl : RM_OPT_NONE );
 
    return pRM;
 }
@@ -1095,20 +1191,20 @@ PHB_RMFILTER hb_rmGetAreaFilter( void )
       if( SELF_INFO( pArea, DBI_RM_HANDLE, pItem ) == HB_SUCCESS )
          pRM = hb_rmGetFilterPtr( hb_itemGetNI( pItem ) );
       else
-         s_rlError = M6ERR_NOTSUPP;
+         hb_rmSetError( M6ERR_NOTSUPP );
       hb_itemRelease( pItem );
    }
    return pRM;
 }
 
-BOOL hb_rmSetAreaFilter( PHB_RMFILTER pRM )
+HB_BOOL hb_rmSetAreaFilter( PHB_RMFILTER pRM )
 {
    AREAP pArea = ( AREAP ) hb_rmGetRMAreaPointer();
-   BOOL fResult = FALSE;
+   HB_BOOL fResult = HB_FALSE;
 
    if( pRM && pRM->iArea != 0 )
    {
-      s_rlError = M6ERR_BADRMTYPE;
+      hb_rmSetError( M6ERR_BADRMTYPE );
    }
    else if( pArea )
    {
@@ -1122,11 +1218,11 @@ BOOL hb_rmSetAreaFilter( PHB_RMFILTER pRM )
          {
             hb_rmDestroy( pRMold );
          }
-         fResult = TRUE;
+         fResult = HB_TRUE;
       }
       else
       {
-         s_rlError = M6ERR_NOTSUPP;
+         hb_rmSetError( M6ERR_NOTSUPP );
       }
       hb_itemRelease( pItem );
    }
@@ -1140,7 +1236,7 @@ PHB_RMFILTER hb_rmReplaceAreaFilter( PHB_RMFILTER pRM )
 
    if( pRM && pRM->iArea != 0 )
    {
-      s_rlError = M6ERR_BADRMTYPE;
+      hb_rmSetError( M6ERR_BADRMTYPE );
    }
    else if( pArea )
    {
@@ -1149,7 +1245,7 @@ PHB_RMFILTER hb_rmReplaceAreaFilter( PHB_RMFILTER pRM )
       if( SELF_INFO( pArea, DBI_RM_HANDLE, pItem ) == HB_SUCCESS )
          pRMold = hb_rmGetFilterPtr( hb_itemGetNI( pItem ) );
       else
-         s_rlError = M6ERR_NOTSUPP;
+         hb_rmSetError( M6ERR_NOTSUPP );
       hb_itemRelease( pItem );
    }
    return pRMold;
@@ -1160,7 +1256,7 @@ void hb_rmDoLinear( AREAP pArea )
    if( pArea )
    {
       PHB_RMFILTER pRM;
-      ULONG ulRec;
+      HB_ULONG ulRec;
       int iCurrArea = hb_rddGetCurrentWorkAreaNumber();
 
       if( iCurrArea != pArea->uiArea )
@@ -1173,8 +1269,8 @@ void hb_rmDoLinear( AREAP pArea )
 
       if( ulRec != 0 )
       {
-         BOOL fResult;
-         ULONG ulRecNo;
+         HB_BOOL fResult;
+         HB_ULONG ulRecNo;
 
          SELF_RECNO( ( AREAP ) pArea, &ulRecNo );
          do
@@ -1190,11 +1286,11 @@ void hb_rmDoLinear( AREAP pArea )
             }
             else
             {
-               fResult = TRUE;
+               fResult = HB_TRUE;
             }
             if( fResult && hb_setGetDeleted() )
             {
-               BOOL fDeleted;
+               HB_BOOL fDeleted;
                SELF_DELETED( ( AREAP ) pArea, &fDeleted );
                fResult = !fDeleted;
             }
@@ -1213,7 +1309,7 @@ void hb_rmDoLinear( AREAP pArea )
    }
 }
 
-static void hb_rmFilterMark( ULONG ulRec, BYTE * pKeyVal, ULONG ulLen, void * pParam )
+static void hb_rmFilterMark( HB_ULONG ulRec, HB_BYTE * pKeyVal, HB_ULONG ulLen, void * pParam )
 {
    HB_SYMBOL_UNUSED( pKeyVal );
    HB_SYMBOL_UNUSED( ulLen );
@@ -1221,17 +1317,17 @@ static void hb_rmFilterMark( ULONG ulRec, BYTE * pKeyVal, ULONG ulLen, void * pP
    hb_rmSetRecord( ( PHB_RMFILTER ) pParam, ulRec );
 }
 
-ULONG hb_rmMaybeEval( AREAP pArea, PHB_RMFILTER pRM, PHB_ITEM pCodeBlock )
+HB_ULONG hb_rmMaybeEval( AREAP pArea, PHB_RMFILTER pRM, PHB_ITEM pCodeBlock )
 {
-   ULONG ulCount = 0;
+   HB_ULONG ulCount = 0;
 
    if( pArea )
    {
-      ULONG ulRec = hb_rmNextRecordMB( pRM, 0 );
+      HB_ULONG ulRec = hb_rmNextRecordMB( pRM, 0 );
       if( ulRec != 0 )
       {
-         ULONG ulRecNo;
-         BOOL fResult;
+         HB_ULONG ulRecNo;
+         HB_BOOL fResult;
 
          SELF_RECNO( ( AREAP ) pArea, &ulRecNo );
          do
@@ -1253,23 +1349,23 @@ ULONG hb_rmMaybeEval( AREAP pArea, PHB_RMFILTER pRM, PHB_ITEM pCodeBlock )
    }
    else
    {
-      s_rlError = M6ERR_NOTABLE;
+      hb_rmSetError( M6ERR_NOTABLE );
    }
 
    return ulCount;
 }
 
-ULONG hb_rmDbEval( AREAP pArea, PHB_RMFILTER pRM, PHB_ITEM pCodeBlock )
+HB_ULONG hb_rmDbEval( AREAP pArea, PHB_RMFILTER pRM, PHB_ITEM pCodeBlock )
 {
-   ULONG ulCount = 0;
+   HB_ULONG ulCount = 0;
 
    if( pArea )
    {
-      ULONG ulRec = hb_rmNextRecord( pRM, 0 );
+      HB_ULONG ulRec = hb_rmNextRecord( pRM, 0 );
       if( ulRec != 0 )
       {
-         ULONG ulRecNo;
-         BOOL fResult;
+         HB_ULONG ulRecNo;
+         HB_BOOL fResult;
 
          SELF_RECNO( ( AREAP ) pArea, &ulRecNo );
          do
@@ -1285,11 +1381,11 @@ ULONG hb_rmDbEval( AREAP pArea, PHB_RMFILTER pRM, PHB_ITEM pCodeBlock )
             }
             else
             {
-               fResult = TRUE;
+               fResult = HB_TRUE;
             }
             if( fResult && hb_setGetDeleted() )
             {
-               BOOL fDeleted;
+               HB_BOOL fDeleted;
                SELF_DELETED( ( AREAP ) pArea, &fDeleted );
                fResult = !fDeleted;
             }
@@ -1307,30 +1403,34 @@ ULONG hb_rmDbEval( AREAP pArea, PHB_RMFILTER pRM, PHB_ITEM pCodeBlock )
    }
    else
    {
-      s_rlError = M6ERR_NOTABLE;
+      hb_rmSetError( M6ERR_NOTABLE );
    }
 
    return ulCount;
 }
 
-ULONG hb_rmSetLoHi( AREAP pArea, PHB_RMFILTER pRM, PHB_ITEM pItmLo, PHB_ITEM pItmHi, PHB_ITEM pTag, PHB_ITEM pBag )
+HB_ULONG hb_rmSetLoHi( AREAP pArea, PHB_RMFILTER pRM, PHB_ITEM pItmLo, PHB_ITEM pItmHi, PHB_ITEM pTag, PHB_ITEM pBag )
 {
-   ULONG ulCount = 0;
+   HB_ULONG ulCount = 0;
 
    if( pArea )
    {
       PHB_RMFILTER pRMold;
       DBORDERINFO OrderInfo;
+      union {
+         HB_EVALSCOPE_FUNC func;
+         void *            data;
+      } u;
 
+      u.func = hb_rmFilterMark;
+      memset( &OrderInfo, 0, sizeof( DBORDERINFO ) );
       OrderInfo.itmOrder    = pTag;
       OrderInfo.atomBagName = pBag;
       OrderInfo.itmResult   = hb_itemPutNI( NULL, 0 );
       OrderInfo.itmNewVal   = hb_itemNew( NULL );
       hb_arrayNew( OrderInfo.itmNewVal, DBRMI_SIZE );
-      hb_itemPutPtr( hb_arrayGetItemPtr( OrderInfo.itmNewVal, DBRMI_FUNCTION ),
-                     ( void * ) hb_rmFilterMark );
-      hb_itemPutPtr( hb_arrayGetItemPtr( OrderInfo.itmNewVal, DBRMI_PARAM ),
-                     ( void * ) pRM );
+      hb_arraySetPtr( OrderInfo.itmNewVal, DBRMI_FUNCTION, u.data );
+      hb_arraySetPtr( OrderInfo.itmNewVal, DBRMI_PARAM, ( void * ) pRM );
       if( pItmLo )
          hb_arraySet( OrderInfo.itmNewVal, DBRMI_LOVAL, pItmLo );
       if( pItmHi )
@@ -1344,99 +1444,99 @@ ULONG hb_rmSetLoHi( AREAP pArea, PHB_RMFILTER pRM, PHB_ITEM pItmLo, PHB_ITEM pIt
    }
    else
    {
-      s_rlError = M6ERR_NOTABLE;
+      hb_rmSetError( M6ERR_NOTABLE );
    }
 
    return ulCount;
 }
 
-BOOL hb_rmSave( PHB_RMFILTER pRM, const char * szFile )
+HB_BOOL hb_rmSave( PHB_RMFILTER pRM, const char * szFile )
 {
-   BOOL fResult = FALSE;
-   FHANDLE hFile = hb_fsExtOpen( (const char *) szFile, NULL, FO_READWRITE |
-                                 FO_EXCLUSIVE | FXO_TRUNCATE |
-                                 FXO_DEFAULTS | FXO_SHARELOCK, NULL, NULL );
+   HB_BOOL fResult = HB_FALSE;
+   HB_FHANDLE hFile = hb_fsExtOpen( szFile, NULL, FO_READWRITE |
+                                    FO_EXCLUSIVE | FXO_TRUNCATE |
+                                    FXO_DEFAULTS | FXO_SHARELOCK, NULL, NULL );
 
    if( hFile != FS_ERROR )
    {
       HB_RMFILE rmHeader;
-      ULONG ulExpr, ulNExpr, ulRMLen, ulTotal, ulLen;
-      BOOL fHasMaybe;
+      HB_SIZE nExpr, nNExpr, nRMLen, nTotal, nLen;
+      HB_BOOL fHasMaybe;
       int i;
 
-      ulExpr = hb_itemGetCLen( pRM->pExpr );
-      ulNExpr = hb_itemGetCLen( pRM->pNonExpr );
+      nExpr = hb_itemGetCLen( pRM->pExpr );
+      nNExpr = hb_itemGetCLen( pRM->pNonExpr );
       fHasMaybe = hb_rmHasMB( pRM );
       HB_PUT_LE_UINT32( rmHeader.hdrSig, RMFILE_SIGNATURE );
       HB_PUT_LE_UINT32( rmHeader.recNum, pRM->ulRecords );
       HB_PUT_LE_UINT32( rmHeader.currPos, pRM->ulPos );
-      HB_PUT_LE_UINT32( rmHeader.expSize, ulExpr );
-      HB_PUT_LE_UINT32( rmHeader.nExpSize, ulNExpr );
-      rmHeader.optLvl[ 0 ] = ( BYTE ) pRM->iOptLvl;
+      HB_PUT_LE_UINT32( rmHeader.expSize, nExpr );
+      HB_PUT_LE_UINT32( rmHeader.nExpSize, nNExpr );
+      rmHeader.optLvl[ 0 ] = ( HB_BYTE ) pRM->iOptLvl;
       rmHeader.hasMB[ 0 ] = fHasMaybe ? 1 : 0;
       HB_PUT_LE_UINT16( rmHeader.filler, 0 );
-      ulRMLen = ( pRM->ulRecords + 7 ) >> 3;
+      nRMLen = ( pRM->ulRecords + 7 ) >> 3;
 
-      if( hb_fsWrite( hFile, ( BYTE * ) &rmHeader, sizeof( rmHeader ) ) == sizeof( rmHeader ) )
-         fResult = TRUE;
+      if( hb_fsWrite( hFile, &rmHeader, sizeof( rmHeader ) ) == sizeof( rmHeader ) )
+         fResult = HB_TRUE;
       else
-         s_rlError = M6ERR_FWRITE;
+         hb_rmSetError( M6ERR_FWRITE );
 
-      if( fResult && ulExpr )
+      if( fResult && nExpr )
       {
-         if( hb_fsWriteLarge( hFile, ( BYTE * ) hb_itemGetCPtr( pRM->pExpr ),
-                              ulExpr ) != ulExpr )
+         if( hb_fsWriteLarge( hFile, hb_itemGetCPtr( pRM->pExpr ),
+                              nExpr ) != nExpr )
          {
-            s_rlError = M6ERR_FWRITE;
-            fResult = FALSE;
+            hb_rmSetError( M6ERR_FWRITE );
+            fResult = HB_FALSE;
          }
       }
 
-      if( fResult && ulNExpr )
+      if( fResult && nNExpr )
       {
-         if( hb_fsWriteLarge( hFile, ( BYTE * ) hb_itemGetCPtr( pRM->pNonExpr ),
-                              ulNExpr ) != ulNExpr )
+         if( hb_fsWriteLarge( hFile, hb_itemGetCPtr( pRM->pNonExpr ),
+                              nNExpr ) != nNExpr )
          {
-            s_rlError = M6ERR_FWRITE;
-            fResult = FALSE;
+            hb_rmSetError( M6ERR_FWRITE );
+            fResult = HB_FALSE;
          }
       }
 
       if( fResult )
       {
-         ulTotal = ulRMLen;
-         for( i = 0; i < pRM->iItems && ulTotal; i++ )
+         nTotal = nRMLen;
+         for( i = 0; i < pRM->iItems && nTotal; i++ )
          {
-            ulLen = HB_MIN( ulTotal, HB_RMITEM_SIZE );
-            if( hb_fsWriteLarge( hFile, hb_rmItemBuf( pRM, i ), ulLen ) != ulLen )
+            nLen = HB_MIN( nTotal, HB_RMITEM_SIZE );
+            if( hb_fsWriteLarge( hFile, hb_rmItemBuf( pRM, i ), nLen ) != nLen )
             {
-               s_rlError = M6ERR_FWRITE;
-               fResult = FALSE;
+               hb_rmSetError( M6ERR_FWRITE );
+               fResult = HB_FALSE;
                break;
             }
-            ulTotal -= ulLen;
+            nTotal -= nLen;
          }
       }
       if( fResult && fHasMaybe )
       {
-         ulTotal = ulRMLen;
-         for( i = 0; i < pRM->iItems && ulTotal; i++ )
+         nTotal = nRMLen;
+         for( i = 0; i < pRM->iItems && nTotal; i++ )
          {
-            ulLen = HB_MIN( ulTotal, HB_RMITEM_SIZE );
-            if( hb_fsWriteLarge( hFile, hb_rmItemBufMB( pRM, i ), ulLen ) != ulLen )
+            nLen = HB_MIN( nTotal, HB_RMITEM_SIZE );
+            if( hb_fsWriteLarge( hFile, hb_rmItemBufMB( pRM, i ), nLen ) != nLen )
             {
-               s_rlError = M6ERR_FWRITE;
-               fResult = FALSE;
+               hb_rmSetError( M6ERR_FWRITE );
+               fResult = HB_FALSE;
                break;
             }
-            ulTotal -= ulLen;
+            nTotal -= nLen;
          }
       }
 
       hb_fsClose( hFile );
    }
    else
-      s_rlError = M6ERR_FCREATE;
+      hb_rmSetError( M6ERR_FCREATE );
 
    return fResult;
 }
@@ -1447,83 +1547,82 @@ PHB_RMFILTER hb_rmRestore( const char * szFile )
 
    if( szFile && *szFile )
    {
-      FHANDLE hFile = hb_fsExtOpen( (const char *) szFile, NULL, FO_READ |
-                                    FO_DENYNONE | FXO_DEFAULTS | FXO_SHARELOCK,
-                                    NULL, NULL );
+      HB_FHANDLE hFile = hb_fsExtOpen( szFile, NULL, FO_READ |
+                                       FO_DENYNONE | FXO_DEFAULTS | FXO_SHARELOCK,
+                                       NULL, NULL );
 
       if( hFile != FS_ERROR )
       {
          HB_RMFILE rmHeader;
-         ULONG ulSize = hb_fsSeek( hFile, 0, FS_END );
+         HB_SIZE nSize = hb_fsSeekLarge( hFile, 0, FS_END );
 
          if( hb_fsSeek( hFile, 0, FS_SET ) == 0 &&
-             hb_fsRead( hFile, ( BYTE * ) &rmHeader, sizeof( rmHeader ) ) == sizeof( rmHeader ) )
+             hb_fsRead( hFile, &rmHeader, sizeof( rmHeader ) ) == sizeof( rmHeader ) )
          {
-            ULONG ulSig, ulRecords, ulPos, ulExp, ulNExp, ulTotal, ulRMLen;
+            HB_ULONG ulSig, ulRecords, ulPos;
+            HB_SIZE nExp, nNExp, nTotal, nRMLen;
             int iOptLvl, i;
-            BOOL fHasMaybe;
+            HB_BOOL fHasMaybe;
 
             ulSig     = HB_GET_LE_UINT32( rmHeader.hdrSig );
             ulRecords = HB_GET_LE_UINT32( rmHeader.recNum );
             ulPos     = HB_GET_LE_UINT32( rmHeader.currPos );
-            ulExp     = HB_GET_LE_UINT32( rmHeader.expSize );
-            ulNExp    = HB_GET_LE_UINT32( rmHeader.nExpSize );
+            nExp      = HB_GET_LE_UINT32( rmHeader.expSize );
+            nNExp     = HB_GET_LE_UINT32( rmHeader.nExpSize );
             iOptLvl   = rmHeader.optLvl[ 0 ];
             fHasMaybe = rmHeader.hasMB[ 0 ] != 0;
-            ulRMLen = ( ulRecords + 7 ) >> 3;
-            ulTotal = sizeof( rmHeader ) + ulExp + ulNExp +
-                      ulRMLen + ( fHasMaybe ? ulRMLen : 0 );
-            if( ulSig == RMFILE_SIGNATURE && ulTotal <= ulSize &&
-                ulExp < RMFILE_MAXEXPSIZE && ulNExp < RMFILE_MAXEXPSIZE )
+            nRMLen = ( ulRecords + 7 ) >> 3;
+            nTotal = sizeof( rmHeader ) + nExp + nNExp +
+                      nRMLen + ( fHasMaybe ? nRMLen : 0 );
+            if( ulSig == RMFILE_SIGNATURE && nTotal <= nSize &&
+                nExp < RMFILE_MAXEXPSIZE && nNExp < RMFILE_MAXEXPSIZE )
             {
                pRM = hb_rmCreate( ulRecords );
                if( pRM )
                {
                   pRM->ulPos = ulPos;
                   pRM->iOptLvl = iOptLvl;
-                  if( ulExp )
+                  if( nExp )
                   {
-                     BYTE *pExpr = ( BYTE * ) hb_xgrab( ulExp + 1 );
-                     hb_fsRead( hFile, pExpr, ulExp );
-                     pRM->pExpr = hb_itemPutCPtr( pRM->pExpr,
-                                                ( char * ) pExpr, ulExp );
+                     char *pExpr = ( char * ) hb_xgrab( nExp + 1 );
+                     hb_fsReadLarge( hFile, pExpr, nExp );
+                     pRM->pExpr = hb_itemPutCLPtr( pRM->pExpr, pExpr, nExp );
                   }
-                  if( ulNExp )
+                  if( nNExp )
                   {
-                     BYTE *pNonExpr = ( BYTE * ) hb_xgrab( ulNExp + 1 );
-                     hb_fsRead( hFile, pNonExpr, ulNExp );
-                     pRM->pNonExpr = hb_itemPutCPtr( pRM->pNonExpr,
-                                                ( char * ) pNonExpr, ulNExp );
+                     char *pNonExpr = ( char * ) hb_xgrab( nNExp + 1 );
+                     hb_fsReadLarge( hFile, pNonExpr, nNExp );
+                     pRM->pNonExpr = hb_itemPutCLPtr( pRM->pNonExpr, pNonExpr, nNExp );
                   }
-                  ulTotal = ulRMLen;
-                  for( i = 0; i < pRM->iItems && ulTotal; i++ )
+                  nTotal = nRMLen;
+                  for( i = 0; i < pRM->iItems && nTotal; i++ )
                   {
-                     ulPos = HB_MIN( ulTotal, HB_RMITEM_SIZE );
-                     if( hb_fsReadLarge( hFile, hb_rmItemBuf( pRM, i ), ulPos ) != ulPos )
+                     nSize = HB_MIN( nTotal, HB_RMITEM_SIZE );
+                     if( hb_fsReadLarge( hFile, hb_rmItemBuf( pRM, i ), nSize ) != nSize )
                      {
                         hb_rmDestroy( pRM );
                         pRM = NULL;
-                        s_rlError = M6ERR_FREAD;
+                        hb_rmSetError( M6ERR_FREAD );
                         break;
                      }
-                     ulTotal -= ulPos;
+                     nTotal -= nSize;
                   }
                   if( pRM && fHasMaybe )
                   {
-                     ulTotal = ulRMLen;
+                     nTotal = nRMLen;
                      if( !pRM->pRMmaybe )
                         pRM->pRMmaybe = hb_rmItemLstNew( pRM->iItems );
-                     for( i = 0; i < pRM->iItems && ulTotal; i++ )
+                     for( i = 0; i < pRM->iItems && nTotal; i++ )
                      {
-                        ulPos = HB_MIN( ulTotal, HB_RMITEM_SIZE );
-                        if( hb_fsReadLarge( hFile, hb_rmItemBufMB( pRM, i ), ulPos ) != ulPos )
+                        nSize = HB_MIN( nTotal, HB_RMITEM_SIZE );
+                        if( hb_fsReadLarge( hFile, hb_rmItemBufMB( pRM, i ), nSize ) != nSize )
                         {
                            hb_rmDestroy( pRM );
                            pRM = NULL;
-                           s_rlError = M6ERR_FREAD;
+                           hb_rmSetError( M6ERR_FREAD );
                            break;
                         }
-                        ulTotal -= ulPos;
+                        nTotal -= nSize;
                      }
                   }
                   /* ???
@@ -1533,18 +1632,18 @@ PHB_RMFILTER hb_rmRestore( const char * szFile )
                }
             }
             else
-               s_rlError = M6ERR_FREAD;
+               hb_rmSetError( M6ERR_FREAD );
          }
          else
-            s_rlError = M6ERR_FREAD;
+            hb_rmSetError( M6ERR_FREAD );
          hb_fsClose( hFile );
       }
       else
-         s_rlError = M6ERR_FOPEN;
+         hb_rmSetError( M6ERR_FOPEN );
    }
    else
    {
-      s_rlError = M6ERR_TYPE;
+      hb_rmSetError( M6ERR_TYPE );
    }
    return pRM;
 }
@@ -1566,20 +1665,20 @@ HB_FUNC( RLNEW )
 
    if( pItem )
    {
-      ULONG ulRecords = hb_itemGetND( pItem ) < 0 ? 0 : hb_itemGetNL( pItem );
+      HB_ULONG ulRecords = hb_itemGetND( pItem ) < 0 ? 0 : hb_itemGetNL( pItem );
       pRM = hb_rmCreate( ulRecords );
    }
    else
    {
       AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
-      ULONG ulRecords;
+      HB_ULONG ulRecords;
 
       if( !pArea )
-         s_rlError = M6ERR_NOTABLE;
+         hb_rmSetError( M6ERR_NOTABLE );
       else if( SELF_RECCOUNT( ( AREAP ) pArea, &ulRecords ) == HB_SUCCESS )
          pRM = hb_rmCreate( ulRecords );
       else
-         s_rlError = M6ERR_TYPE;
+         hb_rmSetError( M6ERR_TYPE );
    }
 
    hb_retni( pRM ? pRM->iHandle : 0 );
@@ -1590,10 +1689,7 @@ HB_FUNC( RLDESTROY )
    PHB_RMFILTER pRM = hb_rmGetFilterParPtr( 1 );
 
    if( pRM )
-   {
       hb_rmDestroy( pRM );
-   }
-   hb_ret();
 }
 
 HB_FUNC( RLRESIZE )
@@ -1606,7 +1702,7 @@ HB_FUNC( RLRESIZE )
       PHB_ITEM pItem = hb_param( 1, HB_IT_NUMERIC );
       if( pItem )
       {
-         ULONG ulRecords = hb_itemGetND( pItem ) < 0 ? 0 : hb_itemGetNL( pItem );
+         HB_ULONG ulRecords = hb_itemGetND( pItem ) < 0 ? 0 : hb_itemGetNL( pItem );
          pRM = hb_rmReSize( pRM, ulRecords );
          if( pRM )
          {
@@ -1615,7 +1711,7 @@ HB_FUNC( RLRESIZE )
       }
       else
       {
-         s_rlError = M6ERR_TYPE;
+         hb_rmSetError( M6ERR_TYPE );
       }
    }
    hb_retni( iHandle );
@@ -1667,8 +1763,7 @@ HB_FUNC( RLGETFILTER )
 
 HB_FUNC( RLSETFILTER )
 {
-   hb_rmSetAreaFilter( hb_rmGetFilterPtr( hb_parni( 1 ) ) );
-   hb_ret();
+   hb_rmSetAreaFilter( hb_rmGetFilterParPtr( 1 ) );
 }
 
 HB_FUNC( RLEXFILTER )
@@ -1687,15 +1782,12 @@ HB_FUNC( RLDOLINEAR )
 {
    AREAP pArea = ( AREAP ) hb_rmGetRMAreaPointer();
    if( pArea )
-   {
       hb_rmDoLinear( pArea );
-   }
-   hb_ret();
 }
 
 HB_FUNC( RLHASMAYBE )
 {
-   BOOL fHas = FALSE;
+   HB_BOOL fHas = HB_FALSE;
    PHB_RMFILTER pRM = hb_rmGetFilterParPtr( 1 );
 
    if( pRM )
@@ -1707,15 +1799,16 @@ HB_FUNC( RLHASMAYBE )
 
 HB_FUNC( RLMAYBEEVAL )
 {
-   ULONG ulResult = 0;
+   HB_ULONG ulResult = 0;
    PHB_RMFILTER pRM = hb_rmGetFilterParPtr( 1 );
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
+   PHB_ITEM pBlock = hb_param( 2, HB_IT_BLOCK );
 
    if( pArea )
    {
-      if( pRM && ISBLOCK( 2 ) )
+      if( pRM && pBlock )
       {
-         ulResult = hb_rmMaybeEval( pArea, pRM, hb_param( 2, HB_IT_BLOCK ) );
+         ulResult = hb_rmMaybeEval( pArea, pRM, pBlock );
       }
    }
    else
@@ -1727,7 +1820,7 @@ HB_FUNC( RLMAYBEEVAL )
 
 HB_FUNC( RLSETLOHI )
 {
-   ULONG ulResult = 0;
+   HB_ULONG ulResult = 0;
    PHB_RMFILTER pRM = hb_rmGetFilterParPtr( 1 );
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
@@ -1806,7 +1899,7 @@ HB_FUNC( RLNOT )
 
 HB_FUNC( RLLEN )
 {
-   ULONG ulLen = 0;
+   HB_ULONG ulLen = 0;
    PHB_RMFILTER pRM = hb_rmGetFilterParPtr( 1 );
 
    if( pRM )
@@ -1818,7 +1911,7 @@ HB_FUNC( RLLEN )
 
 HB_FUNC( RLCOUNT )
 {
-   ULONG ulCount = 0;
+   HB_ULONG ulCount = 0;
    PHB_RMFILTER pRM = hb_rmGetFilterParPtr( 1 );
 
    if( pRM )
@@ -1830,7 +1923,7 @@ HB_FUNC( RLCOUNT )
 
 HB_FUNC( RLPOSRECNO )
 {
-   ULONG ulPos = 0;
+   HB_ULONG ulPos = 0;
    PHB_RMFILTER pRM = hb_rmGetFilterParPtr( 1 );
 
    if( pRM )
@@ -1842,7 +1935,7 @@ HB_FUNC( RLPOSRECNO )
 
 HB_FUNC( RLNEXTRECNO )
 {
-   ULONG ulNext = 0;
+   HB_ULONG ulNext = 0;
    PHB_RMFILTER pRM = hb_rmGetFilterParPtr( 1 );
 
    if( pRM )
@@ -1854,7 +1947,7 @@ HB_FUNC( RLNEXTRECNO )
 
 HB_FUNC( RLPREVRECNO )
 {
-   ULONG ulPrev = 0;
+   HB_ULONG ulPrev = 0;
    PHB_RMFILTER pRM = hb_rmGetFilterParPtr( 1 );
 
    if( pRM )
@@ -1866,7 +1959,7 @@ HB_FUNC( RLPREVRECNO )
 
 HB_FUNC( RLTEST )
 {
-   BOOL fSet = FALSE;
+   HB_BOOL fSet = HB_FALSE;
    PHB_RMFILTER pRM = hb_rmGetFilterParPtr( 1 );
 
    if( pRM )
@@ -1881,10 +1974,7 @@ HB_FUNC( RLSET )
    PHB_RMFILTER pRM = hb_rmGetFilterParPtr( 1 );
 
    if( pRM )
-   {
       hb_rmSetRecord( pRM, hb_parnl( 2 ) );
-   }
-   hb_ret();
 }
 
 HB_FUNC( RLCLEAR )
@@ -1892,10 +1982,7 @@ HB_FUNC( RLCLEAR )
    PHB_RMFILTER pRM = hb_rmGetFilterParPtr( 1 );
 
    if( pRM )
-   {
       hb_rmClearRecord( pRM, hb_parnl( 2 ) );
-   }
-   hb_ret();
 }
 
 HB_FUNC( RLOPTLEVEL )
@@ -1909,7 +1996,7 @@ HB_FUNC( RLOPTLEVEL )
    else
    {
       PHB_RMFILTER pRM = hb_rmGetFilterParPtr( 1 );
-      hb_retni( pRM ? pRM->iOptLvl : s_rlOptLevel );
+      hb_retni( pRM ? pRM->iOptLvl : hb_rmGetOptLevel() );
    }
 }
 
@@ -1923,12 +2010,11 @@ HB_FUNC( RLNONOPT )
          PHB_ITEM pItem = hb_rmqNonOptExpression( pArea, hb_param( 1, HB_IT_STRING ) );
          if( pItem )
          {
-            hb_itemReturn( pItem );
-            hb_itemRelease( pItem );
+            hb_itemReturnRelease( pItem );
          }
          else
          {
-            hb_retc( "" );
+            hb_retc_null();
          }
       }
       else
@@ -1938,13 +2024,13 @@ HB_FUNC( RLNONOPT )
    }
    else
    {
-      hb_retc( "" );
+      hb_retc_null();
    }
 }
 
 HB_FUNC( RLERROR )
 {
-   hb_retni( s_rlError );
+   hb_retni( hb_rmGetError() );
 }
 
 
@@ -1952,8 +2038,6 @@ HB_FUNC( RLDO )
 {
    PHB_RMFILTER pRM = hb_rmGetFilterParPtr( 1 );
    int iOper = hb_parni( 2 );
-
-   hb_ret();
 
    if( pRM )
    {

@@ -3,12 +3,13 @@
  */
 
 /*
-  (c) copyright xHarbour.com Inc. http://www.xHarbour.com
-  Author: Przemyslaw Czerpak Przemek@xHarbour.com
- 
-  This source file is an intellectual property of xHarbour.com Inc.
-  You may NOT forward or share this file under any conditions!
-*/
+ * DBRMAP (Record Map filters) for [x]Harbour:
+ *    RMDBFNTX
+ *
+ * Copyright 2004-2011 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
+ * All rights reserved.
+ *
+ */
 
 #define HB_RMDBFNTX
 

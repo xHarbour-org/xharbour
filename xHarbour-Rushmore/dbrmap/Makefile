@@ -9,6 +9,7 @@ C_SOURCES=\
 	rmap2.c \
 	rmcdx1.c \
 	rmntx1.c \
+	rmnsx1.c \
 	m6funcs.c \
 
 PRG_SOURCES=\
