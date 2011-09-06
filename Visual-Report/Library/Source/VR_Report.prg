@@ -955,7 +955,7 @@ METHOD Init( oParent, cField, cType, nCond, hExp ) CLASS VrAskLater
    ::MinimizeBox := .F.
    ::nCond       := nCond
    ::hExp        := hExp
-   ::Caption     := ::hExp:Title
+   ::Caption     := hExp:Title
    ::Icon        := "AVR"
    ::cField      := cField
    ::cType       := cType
@@ -1032,7 +1032,9 @@ METHOD OnInitDialog() CLASS VrAskLater
          :ItemHeight      := 17
          :EventHandler[ "OnCBNSelEndOk" ] := "ComboBox1_OnCBNSelEndOk"
          :Create()
-         AEVAL( ::oCond:aCond_&cType, {|a| :AddItem(a[1]) } )
+         IF cType != NIL
+            AEVAL( ::oCond:aCond_&cType, {|a| :AddItem(a[1]) } )
+         ENDIF
          :SetCurSel( ::nCond )
       END
       
@@ -1083,50 +1085,52 @@ RETURN Self
 
 METHOD OK_OnClick() CLASS VrAskLater
    LOCAL cExp1, cExp2, bExp, cType, nSel, oGet1, oGet2, aExp, nNum, cExpSel, cField
-   cExp1   := ::oGet1:Caption
-   cExp2   := ::oGet2:Caption
-   cType   := ::cType
-   cExpSel := ::ComboBox1:GetSelString()
-   cField  := ::cField
+   IF ::cField != NIL
+      cExp1   := ::oGet1:Caption
+      cExp2   := ::oGet2:Caption
+      cType   := ::cType
+      cExpSel := ::ComboBox1:GetSelString()
+      cField  := ::cField
 
-   IF cType == "A"
-      cField := "TRIM("+::cField+"[1])"
-      cExp1 := ValToPrg( cExp1 )
-      cExp2 := ValToPrg( cExp2 )
-    
-    ELSEIF cType $ "CM"
-      cField := "TRIM("+::cField+")"
-      cExp1 := ValToPrg( cExp1 )
-      cExp2 := ValToPrg( cExp2 )
+      IF cType == "A"
+         cField := "TRIM("+::cField+"[1])"
+         cExp1 := ValToPrg( cExp1 )
+         cExp2 := ValToPrg( cExp2 )
 
-    ELSEIF cType == "N"
-      cExp1 := ValToPrg( VAL( cExp1 ) )
-      cExp2 := ValToPrg( VAL( cExp2 ) )
+       ELSEIF cType $ "CM"
+         cField := "TRIM("+::cField+")"
+         cExp1 := ValToPrg( cExp1 )
+         cExp2 := ValToPrg( cExp2 )
 
-    ELSEIF cType == "D"
-      IF cExpSel IN {FC_INLAST, FC_NOTINLAST}
-         aExp  := hb_aTokens( ::oGet1:Caption )
-         cExp1 := "@TODAY-"
-         nNum  := VAL( aExp[1] )
-         IF aExp[2] == "days"
-            cExp1 += aExp[1]
-          ELSEIF aExp[2] == "weeks"
-            cExp1 += AllTrim( Str( nNum*7 ) )
-          ELSEIF aExp[2] == "months"
-            cExp1 += AllTrim( Str( nNum*30 ) )
+       ELSEIF cType == "N"
+         cExp1 := ValToPrg( VAL( cExp1 ) )
+         cExp2 := ValToPrg( VAL( cExp2 ) )
+
+       ELSEIF cType == "D" .AND. ! ( cExpSel == "Is in the range" )
+         IF cExpSel IN {FC_INLAST, FC_NOTINLAST}
+            aExp  := hb_aTokens( ::oGet1:Caption )
+            cExp1 := "@TODAY-"
+            nNum  := VAL( aExp[1] )
+            IF aExp[2] == "days"
+               cExp1 += aExp[1]
+             ELSEIF aExp[2] == "weeks"
+               cExp1 += AllTrim( Str( nNum*7 ) )
+             ELSEIF aExp[2] == "months"
+               cExp1 += AllTrim( Str( nNum*30 ) )
+            ENDIF
+          ELSEIF cExpSel IN {FC_PERQUARTER}
+            aExp  := hb_aTokens( ::oGet1:Caption )
+            cExp1 := 'MONTH('+cField+')>='+aExp[2]+'.AND.MONTH('+cField+')<='+aExp[4]
+          ELSE
+            cExp1 := 'STOD( "' + DTOS(::oGet1:Date) + '" )'
+            cExp2 := 'STOD( "' + DTOS(::oGet2:Date) + '" )'
          ENDIF
-       ELSEIF cExpSel IN {FC_PERQUARTER}
-         aExp  := hb_aTokens( ::oGet1:Caption )
-         cExp1 := 'MONTH('+cField+')>='+aExp[2]+'.AND.MONTH('+cField+')<='+aExp[4]
-       ELSE
-         cExp1 := 'STOD( "' + DTOS(::oGet1:Date) + '" )'
-         cExp2 := 'STOD( "' + DTOS(::oGet2:Date) + '" )'
       ENDIF
-   ENDIF
 
-   nSel  := ::ComboBox1:GetCurSel()
-   bExp  := ::oCond:aCond_&cType[nSel][2]
-   ::cResult := EVAL( bExp, cField, cExp1, cExp2 )
+      nSel  := ::ComboBox1:GetCurSel()
+      bExp  := ::oCond:aCond_&cType[nSel][2]
+      ::cResult := EVAL( bExp, cField, cExp1, cExp2 )
+   ENDIF
    ::Close()
 RETURN Self
 
@@ -1175,7 +1179,7 @@ METHOD SetDateEdit( cType ) CLASS VrAskLater
       ::oGet1:Visible := .F.
       ::oGet2:Visible := .F.
    ENDIF
-   IF cType == "D"
+   IF cType == "D" .AND. ! ( ::ComboBox2:GetSelString() == "Is in the range" )
       ::oGet1 := ::DateTimePicker1
       ::oGet2 := ::DateTimePicker2
     ELSE

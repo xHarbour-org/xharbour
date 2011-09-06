@@ -413,7 +413,7 @@ METHOD SetDateEdit( Sender, cType ) CLASS FilterUI
    DEFAULT cType TO ::oDataTable:EditCtrl:FieldType( Sender:Parent:Children[1]:GetCurSel() )
    Sender:Parent:oGet1:Visible := .F.
    Sender:Parent:oGet2:Visible := .F.
-   IF cType == "D"
+   IF cType == "D" .AND. ! ( Sender:Parent:Children[2]:GetSelString() == "Is in the range" )
       Sender:Parent:oGet1 := Sender:Parent:Children[5]
       Sender:Parent:oGet2 := Sender:Parent:Children[6]
     ELSE
@@ -632,49 +632,13 @@ METHOD GetFilterExp() CLASS FilterUI
              cType   := ::oDataTable:EditCtrl:FieldType( nSel1 )
              cExp1   := oPanel:oGet1:Caption
              cExp2   := oPanel:oGet2:Caption
-/*
-             IF cType == "A"
-                cField := "TRIM("+cField+"[1])"
-                cExp1 := ValToPrg( cExp1 )
-                cExp2 := ValToPrg( cExp2 )
-
-              ELSEIF cType $ "CM"
-                cField := "TRIM("+cField+")"
-                cExp1 := ValToPrg( cExp1 )
-                cExp2 := ValToPrg( cExp2 )
-
-              ELSEIF cType == "N"
-                cExp1 := ValToPrg( VAL( cExp1 ) )
-                cExp2 := ValToPrg( VAL( cExp2 ) )
-
-              ELSEIF cType == "D"
-                IF cExpSel IN {FC_INLAST, FC_NOTINLAST}
-                   aExp  := hb_aTokens( oPanel:oGet1:Caption )
-                   cExp1 := "@TODAY-"
-                   nNum  := VAL( aExp[1] )
-                   IF aExp[2] == "days"
-                      cExp1 += aExp[1]
-                    ELSEIF aExp[2] == "weeks"
-                      cExp1 += AllTrim( Str( nNum*7 ) )
-                    ELSEIF aExp[2] == "months"
-                      cExp1 += AllTrim( Str( nNum*30 ) )
-                   ENDIF
-                 ELSEIF cExpSel IN {FC_PERQUARTER}
-                   aExp  := hb_aTokens( oPanel:oGet1:Caption )
-                   cExp1 := 'MONTH('+cField+')>='+aExp[2]+'.AND.MONTH('+cField+')<='+aExp[4]
-                 ELSE
-                   cExp1 := 'STOD( "' + DTOS( oPanel:oGet1:Date ) + '" )'
-                   cExp2 := 'STOD( "' + DTOS( oPanel:oGet:Date ) + '" )'
-                ENDIF
-             ENDIF
-*/
              IF cType $ "CM"
                 cField := "TRIM("+cField+")"
 
               ELSEIF cType == "A"
                 cField := "TRIM("+::cField+"[1])"
 
-              ELSEIF cType == "D"
+              ELSEIF cType == "D" .AND. ! ( cExpSel == "Is in the range" )
                 IF cExpSel IN {FC_INLAST, FC_NOTINLAST}
                    aExp  := hb_aTokens( oPanel:oGet1:Caption )
                    cExp1 := "@TODAY-"
@@ -811,6 +775,7 @@ CLASS AskSettings INHERIT Dialog
    DATA Owner EXPORTED
    METHOD OnInitDialog()
    METHOD OK_OnClick()
+   METHOD Test_OnClick()
 ENDCLASS
 
 METHOD OK_OnClick() CLASS AskSettings
@@ -819,6 +784,15 @@ METHOD OK_OnClick() CLASS AskSettings
    ::Owner:Search    := ::Search:Caption
    ::Close( IDOK )
 RETURN Self
+
+METHOD Test_OnClick() CLASS AskSettings
+   LOCAL hAsk := {=>}
+   hAsk:Title     := ::Title:Caption
+   hAsk:GroupText := ::GroupText:Caption
+   hAsk:Search    := ::Search:Caption
+   AskLater( , , 1, hAsk )
+RETURN Self
+
 
 METHOD OnInitDialog() CLASS AskSettings
    WITH OBJECT ( PictureBox( Self ) )
@@ -908,6 +882,7 @@ METHOD OnInitDialog() CLASS AskSettings
       :Left         := 300
       :Top          := 76
       :Height       := 22
+      :EventHandler[ "OnClick" ] := "Test_OnClick"
       :Create()
    END
    WITH OBJECT EditBox( Self )
