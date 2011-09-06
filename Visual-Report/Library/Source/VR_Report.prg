@@ -133,6 +133,8 @@ METHOD OnError( ... ) CLASS VrReport
    IF PCount() == 0
       IF ( n := ASCAN( ::aBody, {|h| UPPER(h:Name) == UPPER(cMsg) } ) ) > 0
          hRet := VAL( ::aBody[n]:Text )
+       ELSE
+         view cMsg
       ENDIF
    ENDIF
 RETURN hRet
@@ -1106,7 +1108,7 @@ METHOD OK_OnClick() CLASS VrAskLater
          cExp1 := ValToPrg( VAL( cExp1 ) )
          cExp2 := ValToPrg( VAL( cExp2 ) )
 
-       ELSEIF cType == "D" .AND. ! ( cExpSel == "Is in the range" )
+       ELSEIF cType == "D" .AND. ! ( cExpSel == FC_INTHERANGE )
          IF cExpSel IN {FC_INLAST, FC_NOTINLAST}
             aExp  := hb_aTokens( ::oGet1:Caption )
             cExp1 := "@TODAY-"
@@ -1179,7 +1181,7 @@ METHOD SetDateEdit( cType ) CLASS VrAskLater
       ::oGet1:Visible := .F.
       ::oGet2:Visible := .F.
    ENDIF
-   IF cType == "D" .AND. ! ( ::ComboBox2:GetSelString() == "Is in the range" )
+   IF cType == "D" .AND. ! ( ::ComboBox1:GetSelString() == FC_INTHERANGE )
       ::oGet1 := ::DateTimePicker1
       ::oGet2 := ::DateTimePicker2
     ELSE

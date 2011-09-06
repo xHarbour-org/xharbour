@@ -413,7 +413,7 @@ METHOD SetDateEdit( Sender, cType ) CLASS FilterUI
    DEFAULT cType TO ::oDataTable:EditCtrl:FieldType( Sender:Parent:Children[1]:GetCurSel() )
    Sender:Parent:oGet1:Visible := .F.
    Sender:Parent:oGet2:Visible := .F.
-   IF cType == "D" .AND. ! ( Sender:Parent:Children[2]:GetSelString() == "Is in the range" )
+   IF cType == "D" .AND. ! ( Sender:Parent:Children[2]:GetSelString() == FC_INTHERANGE )
       Sender:Parent:oGet1 := Sender:Parent:Children[5]
       Sender:Parent:oGet2 := Sender:Parent:Children[6]
     ELSE
@@ -638,7 +638,7 @@ METHOD GetFilterExp() CLASS FilterUI
               ELSEIF cType == "A"
                 cField := "TRIM("+::cField+"[1])"
 
-              ELSEIF cType == "D" .AND. ! ( cExpSel == "Is in the range" )
+              ELSEIF cType == "D" .AND. ! ( cExpSel == FC_INTHERANGE )
                 IF cExpSel IN {FC_INLAST, FC_NOTINLAST}
                    aExp  := hb_aTokens( oPanel:oGet1:Caption )
                    cExp1 := "@TODAY-"
