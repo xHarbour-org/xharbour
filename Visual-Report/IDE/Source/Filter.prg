@@ -591,6 +591,7 @@ METHOD FilterBrowse_OnClick( Sender ) CLASS FilterUI
       :Center  := .T.
       :Create()
    END
+
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -617,54 +618,22 @@ METHOD GetFilterExp() CLASS FilterUI
    FOR n := 1 TO LEN( ::ConditionPanel:Children )
        oPanel := ::ConditionPanel:Children[n]
        cField := oPanel:Children[1]:GetSelString()
-       nSel1  := oPanel:Children[1]:GetCurSel()
-       IF !EMPTY( cField )
 
+       IF !EMPTY( cField )
           hExp := {=>}
           HSetCaseMatch( hExp, .F. )
           
           hExp:AndOr  := NIL
           IF LEN( oPanel:Children ) == 4
-             hExp:AndOr  := nSel1
+             hExp:AndOr  := oPanel:Children[1]:GetCurSel()
            ELSE
-             cExpSel := oPanel:Children[2]:GetSelString()
-             nSel2   := oPanel:Children[2]:GetCurSel()
-             cType   := ::oDataTable:EditCtrl:FieldType( nSel1 )
-             cExp1   := oPanel:oGet1:Caption
-             cExp2   := oPanel:oGet2:Caption
-             IF cType $ "CM"
-                cField := "TRIM("+cField+")"
-
-              ELSEIF cType == "A"
-                cField := "TRIM("+::cField+"[1])"
-
-              ELSEIF cType == "D" .AND. ! ( cExpSel == FC_INTHERANGE )
-                IF cExpSel IN {FC_INLAST, FC_NOTINLAST}
-                   aExp  := hb_aTokens( oPanel:oGet1:Caption )
-                   cExp1 := "@TODAY-"
-                   nNum  := VAL( aExp[1] )
-                   IF aExp[2] == "days"
-                      cExp1 += aExp[1]
-                    ELSEIF aExp[2] == "weeks"
-                      cExp1 += AllTrim( Str( nNum*7 ) )
-                    ELSEIF aExp[2] == "months"
-                      cExp1 += AllTrim( Str( nNum*30 ) )
-                   ENDIF
-                 ELSEIF cExpSel IN {FC_PERQUARTER}
-                   aExp  := hb_aTokens( oPanel:oGet1:Caption )
-                   cExp1 := 'MONTH('+cField+')>='+aExp[2]+'.AND.MONTH('+cField+')<='+aExp[4]
-                 ELSE
-                   cExp1 := 'STOD( "' + DTOS(oPanel:oGet1:Date) + '" )'
-                   cExp2 := 'STOD( "' + DTOS(oPanel:oGet2:Date) + '" )'
-                ENDIF
-             ENDIF
-
              hExp:Field      := oPanel:Children[1]:GetSelString()
-             hExp:FieldSel   := nSel1
-             hExp:ExpSel     := nSel2
-             hExp:FieldType  := cType
-             hExp:Exp1       := cExp1
-             hExp:Exp2       := cExp2
+             hExp:FieldSel   := oPanel:Children[1]:GetCurSel()
+             hExp:ExpSel     := oPanel:Children[2]:GetCurSel()
+             hExp:FieldType  := ::oDataTable:EditCtrl:FieldType( hExp:FieldSel )
+             hExp:Exp1       := oPanel:oGet1:Caption
+             hExp:Exp2       := oPanel:oGet2:Caption
+
              hExp:AskMeLater := NIL
 
              IF oPanel:Children[-2]:Checked
@@ -726,6 +695,7 @@ METHOD OnInitDialog() CLASS TestFilter
          :Alias := oTable:Alias
          :Create()
          cFilter := ::Parent:cFilter
+         VIEW cFilter
          :SetFilter( &("{||"+cFilter+"}") )
          IF ! EMPTY( oTable:Order )
             :OrdSetFocus( oTable:Order )

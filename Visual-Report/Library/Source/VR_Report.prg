@@ -1243,8 +1243,8 @@ METHOD Init( oDataTable ) CLASS Conditions
 RETURN Self
 
 FUNCTION BuildFilterExp( hFilter )
-   LOCAL cType, cExp, cExp2, nSel2, cValue, cField, cAndOr, hExp, n, cFilter := ""
-   LOCAL bExp, oCond := Conditions( NIL )
+   LOCAL cType, cExp1, cExp2, nSel2, cValue, cField, cAndOr, hExp, n, cFilter := ""
+   LOCAL cExpSel, bExp, nNum, aExp, oCond := Conditions( NIL )
    
    cAndOr := IIF( hFilter:ANDRadio == "1", " .AND. ", " .OR. " )
 
@@ -1253,9 +1253,15 @@ FUNCTION BuildFilterExp( hFilter )
 
        cField  := hExp:Field
        nSel2   := hExp:ExpSel
-       cExp    := hExp:Exp1
-       cExp2   := hExp:Exp2
+       cExp1   := '"'+hExp:Exp1+'"'
+       cExp2   := '"'+hExp:Exp2+'"'
        cType   := hExp:FieldType
+       cExpSel := oCond:aCond_&cType[nSel2][1]
+
+       IF cType == "A"
+          cField := ALLTRIM(hExp:Field)+"[1]"
+          cType  := VALTYPE(cField)
+       ENDIF
        cValue  := ""
        IF hExp:AndOr != NIL
           cAndOr := IIF( hExp:AndOr == 1, " .AND. ", " .OR. " )
@@ -1264,11 +1270,39 @@ FUNCTION BuildFilterExp( hFilter )
              cFilter += cAndOr
           ENDIF
 
+          DO CASE
+             CASE cType == "N"
+                  cExp1 := hExp:Exp1
+                  cExp2 := hExp:Exp2
+
+             CASE cType == "D" .AND. ! ( cExpSel == FC_INTHERANGE )
+                  IF cExpSel IN {FC_INLAST, FC_NOTINLAST}
+                     aExp  := hb_aTokens( cExp1, "/" )
+                     cExp1 := "@TODAY-"
+                     nNum  := VAL( aExp[1] )
+                     IF aExp[2] == "days"
+                        cExp1 += aExp[1]
+                      ELSEIF aExp[2] == "weeks"
+                        cExp1 += AllTrim( Str( nNum*7 ) )
+                      ELSEIF aExp[2] == "months"
+                        cExp1 += AllTrim( Str( nNum*30 ) )
+                     ENDIF
+
+                   ELSEIF cExpSel IN {FC_PERQUARTER}
+                     aExp  := hb_aTokens( cExp1, "/" )
+                     cExp1 := 'MONTH('+cField+')>='+aExp[2]+'.AND.MONTH('+cField+')<='+aExp[4]
+
+                   ELSE
+                     cExp1 := 'CTOD( "' + DTOC( STOD( hExp:Exp1 ) ) + '" )'
+                     cExp2 := 'CTOD( "' + DTOC( STOD( hExp:Exp2 ) ) + '" )'
+                  ENDIF
+          ENDCASE
+
           IF HGetPos( hExp, "AskMeLater" ) > 0 .AND. hExp:AskMeLater != NIL
              cValue := AskLater( cField, cType, nSel2, hExp:AskMeLater )
            ELSE
              bExp := oCond:aCond_&cType[nSel2][2]
-             cValue := EVAL( bExp, cField, ValToPrg(cExp), ValToPrg(cExp2) )
+             cValue := EVAL( bExp, cField, cExp1, cExp2 )
           ENDIF
           cFilter += cValue
        ENDIF
