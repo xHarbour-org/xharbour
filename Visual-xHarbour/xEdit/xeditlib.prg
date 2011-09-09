@@ -93,6 +93,7 @@ STATIC s_aFiles := {}, s_aWorkspaces := {}
 
 #include "hbclass.ch"
 #include "xedit.ch"
+#include "debug.ch"
 
 #ifdef OLESERVER
 
@@ -9584,10 +9585,14 @@ METHOD OnKey( nKey, nCount ) CLASS Editor
                #else
                    sText := ::cClipBoard
                #endif
-
                IF ::nLineFrom == 0
                   IF ::lLine
-                     ::Action( { { ED_PASTE, ::nLine, 1, sText } }, ::aUndo )
+                     #ifdef VXH
+                        // workaround pasting after copy/cut the whole row
+                        ::Action( { { ED_PASTE, ::nLine, ::nColumn, sText } }, ::aUndo )
+                     #else
+                        ::Action( { { ED_PASTE, ::nLine, 1, sText } }, ::aUndo )
+                     #endif
                   ELSE
                      ::Action( { { ED_PASTE, ::nLine, ::nColumn, sText } }, ::aUndo )
                   ENDIF
@@ -10325,7 +10330,6 @@ METHOD Action( aActions, aReverse ) CLASS Editor
                         aAdd( aBatch, { ED_INSERTLINE, aAction[2], sLine } )
                      ENDIF
                   END
-
                   IF lOneMore
                      nLines++
                      aAdd( aBatch, { ED_INSERTLINE, aAction[2] + 1, "" } )
