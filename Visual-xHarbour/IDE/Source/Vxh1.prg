@@ -4838,7 +4838,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
 
    ::Built := .F.
 
-//   ::ResetQuickOpen( ::Properties:Path + "\" + ::Properties:Name + ".vxh" )
+   ::ResetQuickOpen( ::Properties:Path + "\" + ::Properties:Name + ".vxh" )
 
    ::Application:Props[ "RunItem"         ]:Enabled := .T.
    ::Application:Props[ "ResourceManager" ]:Enabled := .T.
@@ -5163,12 +5163,16 @@ RETURN cText
 METHOD ResetQuickOpen( cFile ) CLASS Project
    LOCAL lMems, lMembers, aEntries, n, cProject, oItem, nId, nBkHeight, oLink, x, oMenu
 
+   aEntries := ::Application:IniFile:GetEntries( "Recent" )
+   IF ! EMPTY( aEntries ) .AND. aEntries[1] == cFile
+      RETURN NIL
+   ENDIF
+
    lMems := ::Application:GenerateMembers
 
    ::Application:GenerateMembers := .F.
 
    // IniFile Recently open projects
-   aEntries := ::Application:IniFile:GetEntries( "Recent" )
 
    AEVAL( aEntries, {|c| ::Application:IniFile:DelEntry( "Recent", c ) } )
 
@@ -5193,7 +5197,6 @@ METHOD ResetQuickOpen( cFile ) CLASS Project
           oItem:Action  := {|o| ::Application:Project:Open( o:Caption ) }
           oItem:Create()
       NEXT
-
    END
 
    // Reset StartPage

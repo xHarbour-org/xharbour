@@ -164,13 +164,15 @@ RETURN SELF
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD GetControlName( cName, lIde ) CLASS Object
    LOCAL o, cProp, n := 1, oControl, lCont, lComp := .T., oForm := ::Form
-   WHILE ::Application != NIL .AND. oForm != NIL .AND. oForm:Property != NIL
-      cProp := cName + XSTR( n )
-      IF hGetPos( oForm:Property, cProp ) == 0
-         EXIT
-      ENDIF
-      n ++
-   ENDDO
+   IF ::Application:GenerateMembers
+      WHILE ::Application != NIL .AND. oForm != NIL .AND. oForm:Property != NIL
+         cProp := cName + XSTR( n )
+         IF hGetPos( oForm:Property, cProp ) == 0
+            EXIT
+         ENDIF
+         n ++
+      ENDDO
+   ENDIF
 RETURN n
 
 //-----------------------------------------------------------------------------------------------------------------------------

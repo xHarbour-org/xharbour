@@ -161,7 +161,7 @@ CLASS TabControl INHERIT Control
                                             IIF( ::VertFocusFont != NIL, ::VertFocusFont:Delete(), NIL ),;
                                             NIL
    METHOD OnWindowPaint()
-   METHOD OnMove(x,y)                INLINE IIF( LEN( ::Children ) > 0 .AND. VALTYPE(::Children[::Cursel])=="O", ::Children[::Cursel]:__OnParentSize(x,y), ), NIL
+   METHOD OnMove(x,y)                INLINE IIF( LEN( ::Children ) >= ::Cursel .AND. VALTYPE(::Children[::Cursel])=="O", ::Children[::Cursel]:__OnParentSize(x,y), ), NIL
 
    METHOD OnHScroll(x,y,n)           INLINE ::Super:OnHScroll(x,y,n)
    METHOD UnDock()
