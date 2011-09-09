@@ -4339,7 +4339,7 @@ METHOD xEditContainerWindowProc( hWnd, nMsg, nwParam, nlParam ) CLASS EditorGUID
                   CASE IDM_FILE_SAVE
                      :Save()
                      RETURN 0
-
+#ifndef VXH
                   CASE IDM_FILE_SAVE_ALL
                      FOR EACH oEditor IN s_aEditors
                         IF oEditor:lModified
@@ -4347,7 +4347,7 @@ METHOD xEditContainerWindowProc( hWnd, nMsg, nwParam, nlParam ) CLASS EditorGUID
                         ENDIF
                      NEXT
                      RETURN 0
-
+#endif
                   CASE IDM_FILE_SAVE_AS
                      ofn := (struct OPENFILENAME)
 
@@ -5057,10 +5057,10 @@ METHOD xEditWindowProc( hWnd, nMsg, nwParam, nlParam ) CLASS EditorGUIDisplay
                :OnKey( K_Ctrl[ nwParam ],  LOWORD( nlParam ) )
             ELSE
                :OnKey( nKey,  LOWORD( nlParam ) )
+               #ifdef VXH
+                  :lModified := .T.
+               #endif
             ENDIF
-            #ifdef VXH
-               :lModified := .T.
-            #endif
             RETURN 0
 
          CASE WM_SYSCHAR
