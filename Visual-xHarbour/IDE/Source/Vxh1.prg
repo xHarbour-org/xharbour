@@ -3141,9 +3141,9 @@ METHOD SetCaption( lMod ) CLASS Project
 
    ::lModified := lMod
 
-   IF lMod .AND. ::CurrentForm != NIL .AND. procname(3) != "EDITOR:ACTION"
-      ::CurrentForm:__lModified := .T.
-   ENDIF
+   //IF lMod .AND. ::CurrentForm != NIL .AND. procname(3) != "EDITOR:ACTION"
+   //   ::CurrentForm:__lModified := .T.
+   //ENDIF
 
    IF ::Properties == NIL
       #ifdef VXH_DEMO
@@ -4516,7 +4516,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    LOCAL n, cWindow := "", oFile, oForm
    LOCAL lNew := .F., aImage, aEditors, aChildEvents, nInsMetPos, cChildEvents, cEvent, cText, cPath, cBuffer, cResPath
    LOCAL aDir, x, xVersion, cType, cRc, cPrj, hFile, cLine, xPath, xName, lPro, i, cName, cResImg, cFile, cSourcePath, cPrevRes
-
+   LOCAL nSecs
    m->aChangedProps := {} // reset changed properties for bold text display
    ::Application:ObjectManager:InvalidateRect(, .F. )
 
@@ -4572,7 +4572,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    FOR n := 1 TO LEN( aEditors )
        WITH OBJECT aEditors[n]
           IF (:lModified .OR. lForce) .AND. !EMPTY( :cPath ) .AND. !EMPTY( :cFile )
-             aEditors[n]:Save()
+             :Save()
           ENDIF
        END
    NEXT
@@ -4660,8 +4660,12 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
 
        IF ::Forms[n]:__lModified .OR. lForce
 
+          //nSecs := Seconds()
+
           aChildEvents := {}
           cWindow := ::GenerateControl( ::Forms[n], "", IIF( ::Forms[n]:MDIChild, "MDIChildWindow", IIF( ::Forms[n]:Modal, "Dialog", IIF( AT( "Window", ::Forms[n]:Name ) > 0, "Window", "WinForm" ) ) ), .F., n, @aChildEvents, @nInsMetPos, ::Forms[n]:lCustom )
+
+          //view Seconds()-nSecs
 
           cChildEvents := ""
           FOR EACH cEvent IN aChildEvents
@@ -4669,6 +4673,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
                  cChildEvents += "   METHOD "+cEvent+"()" + CRLF
               ENDIF
           NEXT
+
           cText := SUBSTR( cWindow, nInsMetPos )
           cWindow := SUBSTR( cWindow, 1, nInsMetPos ) + cChildEvents + cText
 
@@ -4690,7 +4695,6 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
           ENDIF
 
           ::Forms[n]:__lModified := .F.
-
        ENDIF
    NEXT
 
@@ -4834,7 +4838,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
 
    ::Built := .F.
 
-   ::ResetQuickOpen( ::Properties:Path + "\" + ::Properties:Name + ".vxh" )
+//   ::ResetQuickOpen( ::Properties:Path + "\" + ::Properties:Name + ".vxh" )
 
    ::Application:Props[ "RunItem"         ]:Enabled := .T.
    ::Application:Props[ "ResourceManager" ]:Enabled := .T.
@@ -5573,18 +5577,6 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
 
    cText := "//------------------------------------------------------------------------------------------------------------------------------------" + CRLF
 
-//    IF oWnd:hWnd == ::Forms[1]:hWnd .AND. ::Properties:TargetType == 5
-//       cText += 'static s_cProjectName := "'+::Properties:Name+'"' + CRLF+CRLF
-//                ;
-//                '#pragma BEGINDUMP' + CRLF+;
-//                '   #define CLS_Name "'+::Properties:Name+'.'+::Properties:Name+'.'+::AppObject:Version[1]+'"' + CRLF+;
-//                '   #define CLS_ID "{'+::Properties:ClassID+'}"' + CRLF+;
-//                '   #include "OleServer.h"' + CRLF+;
-//                '#pragma ENDDUMP' + CRLF + CRLF+;
-//                ;
-//                'REQUEST HB_GT_NUL_DEFAULT'+ CRLF
-//       cText += "//------------------------------------------------------------------------------------------------------------------------------------" + CRLF
-//    ENDIF
    cText += CRLF
 
    IF !EMPTY( cPreFix ) .AND. RIGHT( cPreFix, 1 ) != "_"
@@ -5712,10 +5704,6 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
                  IF AT( ".", cResImg ) > 0
                     cResImg := STRTRAN( cResImg, " " )
                     cResImg := "_"+UPPER(STRTRAN( cResImg, "." ))
-
-                    //IF ASCAN( ::aImages, {|a|UPPER(a[2])==cResImg .AND. UPPER(a[1])==UPPER(aImg[1]) } ) == 0
-                    //   AADD( ::aImages, { aImg[1], cResImg, aImg[5] } )
-                    //ENDIF
 
                     cText += '      :AddImage( '+ValToPrgExp(cResImg)+', '+;
                                                  ValToPrgExp(aImg[2])+', '+;

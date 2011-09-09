@@ -4979,10 +4979,6 @@ METHOD xEditWindowProc( hWnd, nMsg, nwParam, nlParam ) CLASS EditorGUIDisplay
             RETURN 0
 
          CASE WM_CHAR
-            #ifdef VXH
-               :lModified := .T.
-            #endif
-
             :lAlt   := .F.
             :lCtrl  := .F.
             :lShift := .F.
@@ -5062,6 +5058,9 @@ METHOD xEditWindowProc( hWnd, nMsg, nwParam, nlParam ) CLASS EditorGUIDisplay
             ELSE
                :OnKey( nKey,  LOWORD( nlParam ) )
             ENDIF
+            #ifdef VXH
+               :lModified := .T.
+            #endif
             RETURN 0
 
          CASE WM_SYSCHAR
@@ -9691,9 +9690,9 @@ METHOD Action( aActions, aReverse ) CLASS Editor
    LOCAl nPad
    LOCAL nCursorLine
    LOCAL nDeferDisplay := 0
-
    #ifdef VXH
       LOCAL nEditorID, cText
+      LOCAL lModified := ::lModified
    #else
       #ifdef WIN
          LOCAL tvi
@@ -10592,17 +10591,19 @@ METHOD Action( aActions, aReverse ) CLASS Editor
       END
 
    #ifdef VXH
-      IF ::lModified
-         Application:Project:Modified := .T.
-      ENDIF
+      IF lModified != ::lModified
+         IF ::lModified
+            Application:Project:Modified := .T.
+         ENDIF
 
-      IF Len( s_aEditors ) > 0
-         nEditorID := aScan( s_aEditors, Self, , , .T. )
-         cText     := Application:SourceTabs:GetItemText( nEditorID )
-         cText     := ALLTRIM( STRTRAN( cText, "*" ) )
-         Application:SourceTabs:SetItemText( nEditorID, IIF( ::lModified, "   ", "" ) + cText + IIF( ::lModified, " * ", "" ), ::lModified )
-         Application:Props[ "EditUndoItem" ]:Enabled := Application:Props[ "EditUndoBttn" ]:Enabled := Len( ::aUnDo ) > 0
-         Application:Props[ "EditRedoItem" ]:Enabled := Application:Props[ "EditRedoBttn" ]:Enabled := Len( ::aReDo ) > 0
+         IF Len( s_aEditors ) > 0
+            nEditorID := aScan( s_aEditors, Self, , , .T. )
+            cText     := Application:SourceTabs:GetItemText( nEditorID )
+            cText     := ALLTRIM( STRTRAN( cText, "*" ) )
+            Application:SourceTabs:SetItemText( nEditorID, IIF( ::lModified, "   ", "" ) + cText + IIF( ::lModified, " * ", "" ), ::lModified )
+            Application:Props[ "EditUndoItem" ]:Enabled := Application:Props[ "EditUndoBttn" ]:Enabled := Len( ::aUnDo ) > 0
+            Application:Props[ "EditRedoItem" ]:Enabled := Application:Props[ "EditRedoBttn" ]:Enabled := Len( ::aReDo ) > 0
+         ENDIF
       ENDIF
    #endif
 
