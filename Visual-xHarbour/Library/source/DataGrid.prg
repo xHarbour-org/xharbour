@@ -3596,6 +3596,7 @@ CLASS GridColumn INHERIT Object
 
    DATA HeaderFont                   PUBLISHED INIT Font()
    DATA Font                         PUBLISHED INIT Font()
+   DATA Type                         PUBLISHED INIT "C"
 
    DATA HeaderBackSysColor           EXPORTED INIT __GetSystem():CurrentScheme:ToolStripPanelGradientBegin
    DATA HeaderForeSysColor           EXPORTED INIT __GetSystem():CurrentScheme:ToolStripBorder
@@ -3625,7 +3626,6 @@ CLASS GridColumn INHERIT Object
    DATA Parent                       EXPORTED
    DATA ClsName                      EXPORTED  INIT "GridColumn"
    DATA Owner                        EXPORTED
-   DATA Type                         EXPORTED  INIT "C"
 
    DATA ToolTip                      EXPORTED
    DATA Control                      EXPORTED
