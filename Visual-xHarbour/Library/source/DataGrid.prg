@@ -3934,7 +3934,11 @@ METHOD Create() CLASS GridColumn
 
    TRY
       IF ::AutoEdit
-         ::Control := {|o, n|MaskEdit( o )  }
+         IF ::Type $ "MC"
+            ::Control := {|o, n|Edit( o )  }
+         ELSE
+            ::Control := {|o, n|MaskEdit( o )  }
+         ENDIF
          ::ControlAccessKey := GRID_CHAR | GRID_LCLICK
       ENDIF
    CATCH
@@ -3946,7 +3950,11 @@ RETURN Self
 METHOD __SetAutoEdit( lEdit ) CLASS GridColumn
    IF lEdit != ::AutoEdit
       IF lEdit
-         ::Control := {|o, n|MaskEdit( o )  }
+         IF ::Type $ "MC"
+            ::Control := {|o, n|Edit( o )  }
+         ELSE
+            ::Control := {|o, n|MaskEdit( o )  }
+         ENDIF
          ::ControlAccessKey := GRID_CHAR | GRID_LCLICK
        ELSE
          ::Control := NIL

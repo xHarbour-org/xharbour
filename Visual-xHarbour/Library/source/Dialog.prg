@@ -111,7 +111,8 @@ METHOD Create( hParent ) CLASS Dialog
 
    hParent := IIF( ::Parent == NIL, hParent, ::Parent:hWnd )
    DEFAULT hParent TO GetDesktopWindow()
-   
+   DEFAULT ::EventHandler TO Hash()
+  
    ::__lOnPaint   := __ClsMsgAssigned( Self, "OnPaint" ) .OR. HGetPos( ::EventHandler, "OnPaint" ) != 0
    ::__lOnWindowPaint := __ClsMsgAssigned( Self, "OnWindowPaint" ) .OR. HGetPos( ::EventHandler, "OnWindowPaint" ) != 0
 
