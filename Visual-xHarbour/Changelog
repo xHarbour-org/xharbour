@@ -8,6 +8,19 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-09-12 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed editor to send updates to VXH only when the modified status changes
+   ! Fixed VXH Quick file menu to update only on new projects or when opening
+     a different project. if the project being openned is the same as the last time
+     it will not update causing a relieve in load speed.
+   - Removed Quick file update when saving a project causing a huge imprevement
+     in saving time.
+   + Added TAB to the list of keystrokes that cause the DataGrid edition to finish
+   + DataGrid edition: Added the ability to fire OnSave before closing edition mode
+     and returning to the grid this allows users to save the last edition if a button
+     was hit. Also added a new parameter lFocusKilled to OnSave so the user knows
+     who caused the call to OnSave.
+
 2011-07-29 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    * Renamed TopMost to AlwaysOnTop
    * Changed MessageWait to be AlwaysOnTop

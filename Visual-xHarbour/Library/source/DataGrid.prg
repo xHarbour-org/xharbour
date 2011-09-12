@@ -3420,11 +3420,12 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
       ENDIF
 
       IF ::__CurControl != NIL .AND. ::DataSource:RecLock()
-         ::__CurControl:OnWMKillFocus  := {|o|o:Parent:KeepActiveCaption := .F.,;
-                                           o:Destroy(),;
-                                           o:Parent:DataSource:UnLock(),;
-                                           o:Parent:__CurControl := NIL,;
-                                           o:Parent:__DisplayData( ::RowPos, ::ColPos, ::RowPos, ::ColPos ) }
+         ::__CurControl:OnWMKillFocus  := {|o|o:Parent:__ControlSaveData(.T.),;
+                                              o:Parent:KeepActiveCaption := .F.,;
+                                              o:Destroy(),;
+                                              o:Parent:DataSource:UnLock(),;
+                                              o:Parent:__CurControl := NIL,;
+                                              o:Parent:__DisplayData( ::RowPos, ::ColPos, ::RowPos, ::ColPos ) }
 
          ::__CurControl:Left   := aRect[1]+1
          ::__CurControl:Width  := aRect[3]-aRect[1]-IIF( ::xShowGrid, 2, 1 )
@@ -3470,8 +3471,8 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
          ::__CurControl:Caption := XSTR( xValue )
          ::__CurControl:Create()
 
-         DEFAULT ::__CurControl:OnWMKeyDown   TO {|o,n| IIF( n==27, (o:Destroy(),o:Parent:DataSource:UnLock(),0), IIF( n==13, (o:Parent:__ControlSaveData(),o:Destroy(),o:Parent:DataSource:UnLock()), NIL ) )}
-         DEFAULT ::__CurControl:OnWMKillFocus TO {|o|o:Parent:__ControlSaveData() }
+         DEFAULT ::__CurControl:OnWMKeyDown   TO {|o,n| IIF( n==27, (o:Destroy(),o:Parent:DataSource:UnLock(),0), IIF( n IN {13,9}, (o:Parent:__ControlSaveData(),o:Destroy(),o:Parent:DataSource:UnLock()), NIL ) )}
+         DEFAULT ::__CurControl:OnWMKillFocus TO {|o|o:Parent:__ControlSaveData(.T.) }
 
          ::__CurControl:BackColor     := ::Children[::ColPos]:ControlBackColor
          ::__CurControl:ForeColor     := ::Children[::ColPos]:ControlForeColor
@@ -3502,31 +3503,31 @@ RETURN aRect
 
 //----------------------------------------------------------------------------------
 
-METHOD __ControlSaveData() CLASS DataGrid
+METHOD __ControlSaveData( lFocus ) CLASS DataGrid
    LOCAL oCtrl, nPos, cField, n, lRefresh := .T.
-
+   DEFAULT lFocus TO .F.
    IF ::__CurControl:__xCtrlName == "MaskEdit" .AND. !::__CurControl:validating
       IF ::__CurControl:IsValid
          IF ( ::__CurControl:lInvalid .OR. ::Children[::ColPos]:ControlValid == NIL )
             IF ::Children[::ColPos]:OnSave != NIL
-               lRefresh := EVAL( ::Children[::ColPos]:OnSave, ::Children[::ColPos], Self, ::__CurControl:oGet:VarGet() )
+               lRefresh := EVAL( ::Children[::ColPos]:OnSave, ::Children[::ColPos], Self, ::__CurControl:oGet:VarGet(), lFocus )
             ENDIF
             IF HGetPos( ::Children[::ColPos]:EventHandler, "OnSave" ) != 0
                oCtrl := ::Children[::ColPos]
                
                ::__CurControl:VarPut( ::__CurControl:oGet:Buffer )
-               lRefresh := oCtrl:Form:&( oCtrl:EventHandler[ "OnSave" ] )( ::__CurControl, Self, ::__CurControl:oGet:VarGet() )
+               lRefresh := oCtrl:Form:&( oCtrl:EventHandler[ "OnSave" ] )( ::__CurControl, Self, ::__CurControl:oGet:VarGet(), lFocus )
             ENDIF
          ENDIF
       ENDIF
     ELSEIF ::__CurControl:__xCtrlName == "Edit" .OR. ::__CurControl:__xCtrlName == "EditBox"
       IF ::Children[::ColPos]:ControlValid == NIL
          IF ::Children[::ColPos]:OnSave != NIL
-            lRefresh := EVAL( ::Children[::ColPos]:OnSave, ::Children[::ColPos], Self, ::__CurControl:Caption )
+            lRefresh := EVAL( ::Children[::ColPos]:OnSave, ::Children[::ColPos], Self, ::__CurControl:Caption, lFocus )
          ENDIF
          IF HGetPos( ::Children[::ColPos]:EventHandler, "OnSave" ) != 0
             oCtrl := ::Children[::ColPos]
-            lRefresh := oCtrl:Form:&( oCtrl:EventHandler[ "OnSave" ] )( ::__CurControl, Self, ::__CurControl:Caption )
+            lRefresh := oCtrl:Form:&( oCtrl:EventHandler[ "OnSave" ] )( ::__CurControl, Self, ::__CurControl:Caption, lFocus )
          ENDIF
       ENDIF
    ENDIF
@@ -3898,7 +3899,7 @@ METHOD Init( oParent ) CLASS GridColumn
                   {"Object",      {;
                                   { "OnInit"             , "", "" } } },;
                   {"Data",        {;
-                                  { "OnSave"            , "", "" } } },;
+                                  { "OnSave"            , "", "oGrid, cText, lFocusKilled" } } },;
                   {"Color",       {;
                                   { "OnQueryBackColor"  , "", "" },;
                                   { "OnQueryForeColor"  , "", "" } } },;
