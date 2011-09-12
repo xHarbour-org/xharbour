@@ -212,7 +212,7 @@ METHOD Init( oParent ) CLASS EditBox
    ::BackSysColor := GetSysColor( COLOR_WINDOW )
    ::ForeSysColor := GetSysColor( COLOR_WINDOWTEXT )
 #ifdef __WINFAKT__
-   ::HorzScroll   := .T.
+   ::AutoHScroll  := .T.
 #endif
    IF ::__ClassInst != NIL
       ::__PropFilter := { "HIGHLIGHTCAPTION", "SMALLCAPTION", "ALLOWMAXIMIZE" }
