@@ -5058,9 +5058,6 @@ METHOD xEditWindowProc( hWnd, nMsg, nwParam, nlParam ) CLASS EditorGUIDisplay
                :OnKey( K_Ctrl[ nwParam ],  LOWORD( nlParam ) )
             ELSE
                :OnKey( nKey,  LOWORD( nlParam ) )
-               #ifdef VXH
-                  :lModified := .T.
-               #endif
             ENDIF
             RETURN 0
 
@@ -6537,6 +6534,13 @@ CLASS Editor
 
    VAR hHighlightColor  INIT s_DefaultColors[ "Highlight" ]
    VAR HighlightedLine
+
+   #ifdef VXH
+      VAR xlModified INIT .F.
+      ACCESS lModified INLINE ::xlModified
+      ASSIGN lModified(lVal) INLINE ::NotifyVXH( lVal ), ::xlModified := lVal
+      METHOD NotifyVXH()
+   #endif
 
    METHOD New( nTop, nLeft, nLines, nColumns, cFile, oDisplay ) CONSTRUCTOR
    METHOD Close()
@@ -9676,10 +9680,6 @@ METHOD OnKey( nKey, nCount ) CLASS Editor
       TraceLog( oError:Operation, oError:Description, oError:ProcName, oError:ProcLine )
    END
 
-   //#ifdef VXH
-      //Application:Project:EditReset(0)
-   //#endif
-
 RETURN Self
 
 METHOD Action( aActions, aReverse ) CLASS Editor
@@ -10572,9 +10572,7 @@ METHOD Action( aActions, aReverse ) CLASS Editor
             ::lModified := .T.
             //TraceLog( "YES" )
          ELSE
-            #ifndef VXH
-               ::lModified := .F.
-            #endif
+            ::lModified := .F.
             //TraceLog( "NO" )
          ENDIF
 
@@ -10594,23 +10592,6 @@ METHOD Action( aActions, aReverse ) CLASS Editor
          #endif
       END
 
-   #ifdef VXH
-      IF lModified != ::lModified
-         IF ::lModified
-            Application:Project:Modified := .T.
-         ENDIF
-
-         IF Len( s_aEditors ) > 0
-            nEditorID := aScan( s_aEditors, Self, , , .T. )
-            cText     := Application:SourceTabs:GetItemText( nEditorID )
-            cText     := ALLTRIM( STRTRAN( cText, "*" ) )
-            Application:SourceTabs:SetItemText( nEditorID, IIF( ::lModified, "   ", "" ) + cText + IIF( ::lModified, " * ", "" ), ::lModified )
-            Application:Props[ "EditUndoItem" ]:Enabled := Application:Props[ "EditUndoBttn" ]:Enabled := Len( ::aUnDo ) > 0
-            Application:Props[ "EditRedoItem" ]:Enabled := Application:Props[ "EditRedoBttn" ]:Enabled := Len( ::aReDo ) > 0
-         ENDIF
-      ENDIF
-   #endif
-
    CATCH oError
       //Alert( oError:Operation )
       TraceLog( oError:Operation, oError:Description, oError:ProcName, oError:ProcLine, ValToPrg( oError:Args ), ValToPrg( aAction ), nAction )
@@ -10620,6 +10601,27 @@ METHOD Action( aActions, aReverse ) CLASS Editor
       Application:Project:EditReset(0)
    #endif
 RETURN Self
+
+#ifdef VXH
+   METHOD NotifyVXH( lMod )
+      LOCAL nEditorID, cText
+      IF lMod != ::lModified
+         IF lMod
+            Application:Project:Modified := .T.
+         ENDIF
+
+         IF Len( s_aEditors ) > 0
+            nEditorID := aScan( s_aEditors, Self, , , .T. )
+            cText     := Application:SourceTabs:GetItemText( nEditorID )
+            cText     := ALLTRIM( STRTRAN( cText, "*" ) )
+            Application:SourceTabs:SetItemText( nEditorID, IIF( lMod, "   ", "" ) + cText + IIF( lMod, " * ", "" ), lMod )
+            Application:Props[ "EditUndoItem" ]:Enabled := Application:Props[ "EditUndoBttn" ]:Enabled := Len( ::aUnDo ) > 0
+            Application:Props[ "EditRedoItem" ]:Enabled := Application:Props[ "EditRedoBttn" ]:Enabled := Len( ::aReDo ) > 0
+         ENDIF
+      ENDIF
+   RETURN Self
+#endif
+
 
 METHOD SelectedText() CLASS Editor
 

@@ -557,7 +557,7 @@ METHOD SetChild( oChild, lInit ) CLASS CoolBarBand
       ::oStruct:hwndChild  := IIF( Valtype( oChild )=="N" .OR. oChild == NIL, oChild, oChild:hWnd )
       SendMessage( ::Parent:hWnd, RB_SETBANDINFO, ::Index, ::oStruct )
 
-      IF oChild != NIL .AND. ( oChild:__xCtrlName == "CoolMenu" .OR. ASCAN( oChild:Children, {|o|o:__xCtrlName == "ComboBox"} ) > 0 )
+      IF oChild != NIL .AND. ( oChild:__xCtrlName == "CoolMenu" .OR. ASCAN( oChild:Children, {|o|o:ClsName == "ComboBox"} ) > 0 )
          aExt := ::Parent:Drawing:GetTextExtentPoint32( "A" )
          IF aExt[2]+6 > ::MinHeight 
             ::MinHeight := aExt[2]+6

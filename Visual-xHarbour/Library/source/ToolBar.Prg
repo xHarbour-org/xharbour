@@ -308,13 +308,13 @@ RETURN SELF
 
 METHOD AddControl( oControl ) CLASS ToolBar
    LOCAL oBtn, n
-   oBtn := ToolButton( Self,,,,,,,,,,.F. )
-   oBtn:Width := oControl:Width
-   oBtn:ImageIndex := 0
-   oBtn:AutoSize := .F.
-   oBtn:Create()
-   oBtn:Disable()
-   oControl:Left := ::GetButtonsWidth( LEN( ::aItems )-1 )
+   //oBtn := ToolButton( Self,,,,,,,,,,.F. )
+   //oBtn:Width := oControl:Width
+   //oBtn:ImageIndex := 0
+   //oBtn:AutoSize := .F.
+   //oBtn:Create()
+   //oBtn:Disable()
+   //oControl:Left := ::GetButtonsWidth( LEN( ::aItems )-1 )
    IF oControl:__xCtrlName != "ComboBox"
       oControl:Dock:Bottom := Self
    ENDIF
@@ -1925,7 +1925,10 @@ METHOD Delete( lChildren, lDelProp ) CLASS ToolButton
          IF ::Parent:Parent:ClsName == "OptionBar"
             ::Parent:Parent:Children[n]:xPosition := n-1
           ELSEIF ::Parent:Children != NIL
-            ::Parent:Children[n]:xPosition := n-1
+            TRY
+               ::Parent:Children[n]:xPosition := n-1
+            CATCH
+            END
          ENDIF
       ENDIF
       aRect := ::Parent:aItems[n]:GetWindowRect()

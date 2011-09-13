@@ -911,10 +911,14 @@ METHOD Create() CLASS FontComboBox
 
    FOR n := 1 TO LEN( ::Fonts )
        ::Fonts[n][1]:lfHeight := ::Parent:Font:Height //::Owner:&cFont:Height
-       ::Fonts[n][1]:lfWeight := ::Owner:&cFont:Weight
-       ::Fonts[n][1]:lfWidth  := ::Owner:&cFont:Width
-       ::Fonts[n][1]:lfItalic := ::Owner:&cFont:nItalic
-
+       IF cFont != NIL
+          ::Fonts[n][1]:lfWeight := ::Owner:&cFont:Weight
+          ::Fonts[n][1]:lfWidth  := ::Owner:&cFont:Width
+          ::Fonts[n][1]:lfItalic := ::Owner:&cFont:nItalic
+        ELSE
+          ::Fonts[n][1]:lfWeight := ::Parent:Font:Weight
+          ::Fonts[n][1]:lfWidth  := ::Parent:Font:Width
+       ENDIF
        ::AddItem( ::Fonts[n][1]:lfFaceName:AsString() )
        ::SendMessage( CB_SETITEMHEIGHT, n-1, 15 )
    NEXT
