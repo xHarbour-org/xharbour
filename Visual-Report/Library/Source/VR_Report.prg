@@ -968,7 +968,7 @@ METHOD Init( oParent, cField, cType, nCond, hExp ) CLASS VrAskLater
    ::MinimizeBox := .F.
    ::nCond       := nCond
    ::hExp        := hExp
-   ::Caption     := hExp:Title
+   ::Caption     := hExp:AskMeLater:Title
    ::Icon        := "AVR"
    ::cField      := cField
    ::cType       := cType
@@ -1025,7 +1025,7 @@ METHOD OnInitDialog() CLASS VrAskLater
    END
 
    WITH OBJECT ( GroupBox( Self ) )
-      :Caption      := IIF( EMPTY( ::hExp:GroupText ), ::cField, ::hExp:GroupText )
+      :Caption      := IIF( EMPTY( ::hExp:AskMeLater:GroupText ), ::cField, ::hExp:AskMeLater:GroupText )
       :Dock:Margins := "20,15,20,70"
       :Left         := 20
       :Top          := 15
@@ -1051,6 +1051,7 @@ METHOD OnInitDialog() CLASS VrAskLater
       END
       
       WITH OBJECT EditBox( :this )
+         :Caption      := ::hExp:Exp1
          :Name         := "EditBox1"
          :Left         := 180
          :Top          := 37
@@ -1062,6 +1063,7 @@ METHOD OnInitDialog() CLASS VrAskLater
       END
 
       WITH OBJECT EditBox( :this )
+         :Caption      := ::hExp:Exp2
          :Name         := "EditBox2"
          :Left         := 270
          :Top          := 37
@@ -1073,6 +1075,7 @@ METHOD OnInitDialog() CLASS VrAskLater
       END
 
       WITH OBJECT DateTimePicker( :this )
+         :Caption      := ::hExp:Exp1
          :Name         := "DateTimePicker1"
          :Left         := 180
          :Top          := 37
@@ -1083,6 +1086,7 @@ METHOD OnInitDialog() CLASS VrAskLater
       END
 
       WITH OBJECT DateTimePicker( :this )
+         :Caption      := ::hExp:Exp2
          :Name         := "DateTimePicker2"
          :Left         := 270
          :Top          := 37
@@ -1315,7 +1319,7 @@ FUNCTION BuildFilterExp( hFilter )
           ENDCASE
 
           IF HGetPos( hExp, "AskMeLater" ) > 0 .AND. hExp:AskMeLater != NIL
-             cValue := AskLater( cField, cType, nSel2, hExp:AskMeLater )
+             cValue := AskLater( cField, cType, nSel2, hExp )
              IF cValue == NIL
                 RETURN NIL
              ENDIF
