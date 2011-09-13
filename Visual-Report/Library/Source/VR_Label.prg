@@ -172,7 +172,7 @@ METHOD GetFormulas( cText ) CLASS VrLabel
                    cText := STRTRAN( cText, "@"+cFormula, ::Parent:aComponents[nFormula]:Value,,, 1 )
                 ENDIF
               ELSEIF UPPER( LEFT( cFormula, LEN(cFormula)-1 ) ) == "FILTER"
-                IF ( nFilter := ASCAN( ::Parent:aComponents, {|h| UPPER(h:Name) == UPPER(::Parent:DataSource:xName) } ) ) > 0
+                IF ( nFilter := ASCAN( ::Parent:aComponents, {|h| UPPER(h:Name) == UPPER(::Parent:DataSource:xName) } ) ) > 0 .AND. HGetPos( ::Parent:aComponents[nFilter]:Filter, "Expressions" ) > 0
                    cValue := ::Parent:aComponents[nFilter]:Filter:Expressions[ VAL(cFormula[-1]) ]:Value
                    cText := STRTRAN( cText, "@"+cFormula, cValue )
                    view cText
@@ -181,7 +181,7 @@ METHOD GetFormulas( cText ) CLASS VrLabel
                 ENDIF
               ELSEIF UPPER( LEFT( cFormula, LEN(cFormula)-4 ) ) == "FILTER"
                 nVal := cFormula[-2]
-                IF ( nFilter := ASCAN( ::Parent:aComponents, {|h| UPPER(h:Name) == UPPER(::Parent:DataSource:xName) } ) ) > 0
+                IF ( nFilter := ASCAN( ::Parent:aComponents, {|h| UPPER(h:Name) == UPPER(::Parent:DataSource:xName) } ) ) > 0 .AND. HGetPos( ::Parent:aComponents[nFilter]:Filter, "Expressions" ) > 0
                    cValue := ::Parent:aComponents[nFilter]:Filter:Expressions[ VAL(cFormula[-4]) ]:Exp&nVal
                    cText := STRTRAN( cText, "@"+cFormula, cValue )
                  ELSE

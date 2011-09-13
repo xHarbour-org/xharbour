@@ -673,7 +673,9 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
                    ::End()
                    return .f.
                 ENDIF
-                oData:SetFilter( &("{||"+cFilter+"}") )
+                IF !EMPTY( cFilter )
+                   oData:SetFilter( &("{||"+cFilter+"}") )
+                ENDIF
              ENDIF
              IF ! EMPTY( hCtrl:Order )
                 oData:OrdSetFocus( hCtrl:Order )
@@ -1257,7 +1259,11 @@ FUNCTION BuildFilterExp( hFilter )
    LOCAL cExpSel, bExp, nNum, aExp, oCond := Conditions( NIL )
    
    cAndOr := IIF( hFilter:ANDRadio == "1", " .AND. ", " .OR. " )
-
+   
+   IF HGetPos( hFilter, "Expressions" ) == 0 
+      RETURN "" // returning NIL forces the report to cancel
+   ENDIF
+   
    FOR n := 1 TO LEN( hFilter:Expressions )
        hExp    := hFilter:Expressions[n]
 

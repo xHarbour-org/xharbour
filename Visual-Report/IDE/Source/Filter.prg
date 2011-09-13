@@ -583,15 +583,15 @@ METHOD FilterBrowse_OnClick( Sender ) CLASS FilterUI
    ::GetFilterExp()
 
    ::cFilter := BuildFilterExp( ::BuildFilter )
-
-   WITH OBJECT oDlg := TestFilter( Self )
-      :Caption := "Test DataTable Filter"
-      :Width   := 600
-      :Height  := 400
-      :Center  := .T.
-      :Create()
-   END
-
+   IF ::cFilter != NIL
+      WITH OBJECT oDlg := TestFilter( Self )
+         :Caption := "Test DataTable Filter"
+         :Width   := 600
+         :Height  := 400
+         :Center  := .T.
+         :Create()
+      END
+   ENDIF
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -695,8 +695,9 @@ METHOD OnInitDialog() CLASS TestFilter
          :Alias := oTable:Alias
          :Create()
          cFilter := ::Parent:cFilter
-         VIEW cFilter
-         :SetFilter( &("{||"+cFilter+"}") )
+         IF !EMPTY( cFilter )
+            :SetFilter( &("{||"+cFilter+"}") )
+         ENDIF
          IF ! EMPTY( oTable:Order )
             :OrdSetFocus( oTable:Order )
          ENDIF
