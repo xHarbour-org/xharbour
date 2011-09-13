@@ -636,7 +636,7 @@ RETURN oDoc
 //-----------------------------------------------------------------------------------------------
 METHOD Run( oDoc, oWait ) CLASS VrReport
    LOCAL nHeight, hDC, nSubHeight, nTotHeight, nCount, nPer, nPos, nRow, oData, hCtrl, hData := {=>}
-   LOCAL xValue, cData, oIni, cEntry, aRelation, aRelations, cRelation
+   LOCAL xValue, cFilter, cData, oIni, cEntry, aRelation, aRelations, cRelation
    
    ::Create()
 
@@ -662,7 +662,18 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
              ENDIF
              oData:Create()
              IF HGetPos( hCtrl, "Filter" ) > 0  .AND. ! EMPTY( hCtrl:Filter )
-                oData:SetFilter( &("{||"+BuildFilterExp( hCtrl:Filter )+"}") )
+                cFilter := BuildFilterExp( hCtrl:Filter )
+                IF cFilter == NIL
+                   IF oWait != NIL
+                      oWait:Destroy()
+                   ENDIF
+                   MessageBox( GetActiveWindow(), "Report generation cancelled", "Ask me later" )
+                   hb_gcall(.t.)
+                   HEVAL( hData, {|cKey,o| IIF( o:IsOpen, o:Close(),)} )
+                   ::End()
+                   return .f.
+                ENDIF
+                oData:SetFilter( &("{||"+cFilter+"}") )
              ENDIF
              IF ! EMPTY( hCtrl:Order )
                 oData:OrdSetFocus( hCtrl:Order )
@@ -926,7 +937,7 @@ FUNCTION AskLater( cField, cType, nCond, hExp )
 RETURN VrAskLater( NIL, cField, cType, nCond, hExp ):cResult
 
 CLASS VrAskLater INHERIT Dialog
-   DATA cResult     EXPORTED INIT ""
+   DATA cResult     EXPORTED
    DATA cField      EXPORTED INIT ""
    DATA cType       EXPORTED
    DATA oCond       EXPORTED
@@ -963,7 +974,6 @@ METHOD Init( oParent, cField, cType, nCond, hExp ) CLASS VrAskLater
    IF ::cType == "D"
       ::cEdit := "DateTimePicker"
    ENDIF
-   ::cResult     := ".T."
    ::oCond       := Conditions( NIL )
    ::Create()
 RETURN Self
@@ -1300,6 +1310,9 @@ FUNCTION BuildFilterExp( hFilter )
 
           IF HGetPos( hExp, "AskMeLater" ) > 0 .AND. hExp:AskMeLater != NIL
              cValue := AskLater( cField, cType, nSel2, hExp:AskMeLater )
+             IF cValue == NIL
+                RETURN NIL
+             ENDIF
            ELSE
              bExp := oCond:aCond_&cType[nSel2][2]
              cValue := EVAL( bExp, cField, cExp1, cExp2 )

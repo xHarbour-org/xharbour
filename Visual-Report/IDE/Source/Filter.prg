@@ -351,7 +351,7 @@ METHOD AddButtons( oParent, lEnabled ) CLASS FilterUI
          :Top           := 4
          :Caption       := ""
          :Width         := 16
-         :Enabled       := .F.
+         :Enabled       := .T.
          :EventHandler[ "OnClick" ] := "CheckBox_OnClick"
          :Create()
       END
