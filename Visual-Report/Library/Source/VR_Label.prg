@@ -175,7 +175,6 @@ METHOD GetFormulas( cText ) CLASS VrLabel
                 IF ( nFilter := ASCAN( ::Parent:aComponents, {|h| UPPER(h:Name) == UPPER(::Parent:DataSource:xName) } ) ) > 0 .AND. HGetPos( ::Parent:aComponents[nFilter]:Filter, "Expressions" ) > 0
                    cValue := ::Parent:aComponents[nFilter]:Filter:Expressions[ VAL(cFormula[-1]) ]:Value
                    cText := STRTRAN( cText, "@"+cFormula, cValue )
-                   view cText
                  ELSE
                    cText := STRTRAN( cText, "@"+cFormula, "Filter not found "+cFormula )
                 ENDIF
