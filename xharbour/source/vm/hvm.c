@@ -9497,7 +9497,7 @@ static void hb_vmPushVariable( PHB_SYMB pVarSymb )
 {
    HB_THREAD_STUB
    PHB_ITEM pItem;
-   USHORT uiAction = E_DEFAULT;
+   USHORT uiAction;
 
    HB_TRACE(HB_TR_INFO, ("(hb_vmPushVariable)"));
 
