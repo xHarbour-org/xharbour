@@ -2989,6 +2989,8 @@ METHOD SetValue( xValue ) CLASS EventManager
            IF ::ActiveObject:Events[n][2][i][1] == cProp
               oItem:ColItems[1]:Value := xValue
 
+              ::Application:Project:Modified := .T.
+              ::Application:Project:CurrentForm:__lModified := .T.
               IF Empty( xValue )
                  ::ActiveObject:Events[n][2][i][2] := ""
                ELSE
@@ -3004,9 +3006,6 @@ METHOD SetValue( xValue ) CLASS EventManager
                     ::ActiveObject:Events[n][2][i][2] := xValue
                  ENDIF
               ENDIF
-              ::Application:Project:Modified := .T.
-              ::Application:Project:CurrentForm:__lModified := .T.
-
               RETURN Self
            ENDIF
        NEXT
