@@ -1096,7 +1096,7 @@ METHOD OnInitDialog() CLASS VrAskLater
          :Create()
       END
    END
-   ::SetDateEdit()
+   ::SetDateEdit( cType )
 RETURN Self
 
 METHOD OK_OnClick() CLASS VrAskLater
@@ -1154,7 +1154,7 @@ METHOD ComboBox1_OnCBNSelEndOk( Sender ) CLASS VrAskLater
    LOCAL cSel, oDlg, oPanel := Sender:Parent
 
    cSel := Sender:GetSelString()
-   ::SetDateEdit()
+   ::SetDateEdit( ::cType )
 
    ::oGet1:Enabled := .T.
 
@@ -1210,6 +1210,7 @@ METHOD SetDateEdit( cType ) CLASS VrAskLater
     ELSE
       ::oGet1:Width := 80
    ENDIF
+   ::oGet1:SetFocus()
 RETURN Self
 
 //------------------------------------------------------------------------------------------
