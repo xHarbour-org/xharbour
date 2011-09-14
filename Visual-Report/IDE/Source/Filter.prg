@@ -211,9 +211,11 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
    LOCAL cName, n, oLastPanel
    IF LEN( ::ConditionPanel:Children ) > 0
       oLastPanel := ATAIL( ::ConditionPanel:Children )
-
+      IF LEN( oLastPanel:Children ) == 4
+         oLastPanel:Children[-1]:Enabled := .F.
+         oLastPanel:Children[-2]:Enabled := .F.
+      ENDIF
       oLastPanel:Children[-3]:Enabled := .F.
-      oLastPanel:Children[-2]:Enabled := .F.
    ENDIF
    ::FilterBrowse:Enabled := .F.
    ::OK:Enabled := .F.
@@ -403,7 +405,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------------------------------------------------------
 METHOD CheckBox_OnClick( Sender ) CLASS FilterUI
    LOCAL oPanel := Sender:Parent
-   oPanel:Children[-3]:Enabled := .T.
+   //oPanel:Children[-3]:Enabled := .T.
    oPanel:Children[-2]:Enabled := .T.
    oPanel:Children[-1]:Enabled := Sender:checked
 RETURN Self
@@ -535,7 +537,6 @@ METHOD MoreConditionButton_OnClick( Sender ) CLASS FilterUI
    IF LEN( ::ConditionPanel:Children ) > 0
       oLastPanel := ATAIL( ::ConditionPanel:Children )
       oLastPanel:Children[-3]:Enabled := .F.
-      oLastPanel:Children[-2]:Enabled := .F.
    ENDIF
    ::FilterBrowse:Enabled := .F.
    ::OK:Enabled := .F.
@@ -569,6 +570,8 @@ METHOD MoreConditionButton_OnClick( Sender ) CLASS FilterUI
          :Parent:VertScrollSize := (:Height+4)*LEN( ::ConditionPanel:Children )
 
          ::AddButtons( :this, .T. )
+
+         :Children[-1]:Enabled := .F.
 
          :SetRedraw( .T. )
          :RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
