@@ -3141,7 +3141,7 @@ LOCAL n, cS, nCol, nRow, nTokens, nCursor
 
          for n := ::nHeaderHeight to 1 step -1
             ::SetPos( nRow + n - 1, nCol )
-            DispOut( PadR( __StrToken( @cS, n, ";" ), nPadLen ), cColor )
+            DispOut( PadR( __StrToken( @cS, n + 1, ";" ), nPadLen ), cColor )
          next
 
          ::SetPos( nRow, nCol + nPadLen )

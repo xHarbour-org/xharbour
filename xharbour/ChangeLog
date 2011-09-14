@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-09-14 22:33 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/rtl/tbrowse.prg
+    ! Fixed a display problem in multiline headers (fix provided by Fabio Nery).
+
 2011-07-18 11:34 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/compiler/genc.c
     ! Reverted the following change since it broke STATIC support for first PROCEDURE/FUNCION in a source file.
