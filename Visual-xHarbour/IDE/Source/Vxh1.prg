@@ -4889,7 +4889,7 @@ METHOD GenerateChild( oCtrl, nTab, aChildEvents, cColon, cParent, nID ) CLASS Pr
          IF !Empty( oCtrl:Events )
             FOR EACH Topic IN oCtrl:Events
                 FOR EACH Event IN Topic[2]
-                    IF !(Event[2] == "")
+                    IF ! EMPTY( Event[2] )
                        AADD( aChildEvents, Event[2] )
                        cProp += SPACE( nTab+3 ) + ":EventHandler[ " + ValToPrgExp( Event[1] )+ " ] := " + ValToPrgExp( Event[2] ) + CRLF
                     ENDIF
@@ -4939,7 +4939,7 @@ METHOD GenerateChild( oCtrl, nTab, aChildEvents, cColon, cParent, nID ) CLASS Pr
          IF !Empty( oCtrl:Events )
             FOR EACH Topic IN oCtrl:Events
                 FOR EACH Event IN Topic[2]
-                    IF !(Event[2] == "")
+                    IF ! EMPTY( Event[2] )
                         AADD( aChildEvents, Event[2] )
                         cProp += SPACE( nTab+3 ) + ":EventHandler[ " + ValToPrgExp( Event[1] )+ " ] := " + ValToPrgExp( Event[2] ) + CRLF
                     ENDIF
@@ -5619,7 +5619,7 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
    TRY
       FOR EACH Topic IN oWnd:Events
           FOR EACH Event IN Topic[2]
-              IF !(Event[2] == "")
+              IF ! EMPTY( Event[2] )
                  AADD( aChildEvents, Event[2] )
               ENDIF
           NEXT
@@ -5636,7 +5636,7 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
 
    FOR EACH Topic IN oWnd:Events
        FOR EACH Event IN Topic[2]
-           IF !(Event[2] == "")
+           IF ! EMPTY( Event[2] )
                cText += SPACE( 3 ) + "::EventHandler[ " + ValToPrgExp( Event[1] )+ " ] := " + ValToPrgExp( Event[2] ) + CRLF
            ENDIF
        NEXT
@@ -5689,7 +5689,7 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
        IF !Empty( oChild:Events )
           FOR EACH Topic IN oChild:Events
               FOR EACH Event IN Topic[2]
-                  IF !(Event[2] == "")
+                  IF ! EMPTY( Event[2] )
                      AADD( aChildEvents, Event[2] )
                      cText += "      :EventHandler[ " + ValToPrgExp( Event[1] )+ " ] := " + ValToPrgExp( Event[2] ) + CRLF
                   ENDIF

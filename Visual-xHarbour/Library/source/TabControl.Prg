@@ -399,16 +399,23 @@ METHOD SetItemText( n, cText, lBold ) CLASS TabControl
    LOCAL tci := (struct TCITEM)
    TRY
       DEFAULT n TO ::CurSel
-      IF !lBold
-         lBold := NIL
-      ENDIF
-      ::Children[n] := lBold
+
       tci:mask := TCIF_TEXT
-      tci:pszText := cText
-      tci:cchTextMax := LEN( cText )
-      SendMessage( ::hWnd, TCM_SETITEM, n-1, @tci )
-      SetWindowPos( ::hWnd,, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
-      ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
+      tci:pszText := SPACE(255)
+      tci:cchTextMax := 255
+      SendMessage( ::hWnd, TCM_GETITEM, n-1, @tci )
+      IF ! ( tci:pszText == cText )
+         IF !lBold
+            lBold := NIL
+         ENDIF
+         ::Children[n] := lBold
+         tci:mask := TCIF_TEXT
+         tci:pszText := cText
+         tci:cchTextMax := LEN( cText )
+         SendMessage( ::hWnd, TCM_SETITEM, n-1, @tci )
+         SetWindowPos( ::hWnd,, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
+         ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
+      ENDIF
     catch
    END
 RETURN Self

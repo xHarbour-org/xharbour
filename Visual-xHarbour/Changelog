@@ -8,6 +8,11 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-09-13 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed events not being saved when generating events via double click to buttons
+   ! Changed editor to notify VXH of every change to lmodified so VXH knows
+     what's happening to every change in text
+   
 2011-09-12 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed editor to send updates to VXH only when the modified status changes
    ! Fixed VXH Quick file menu to update only on new projects or when opening

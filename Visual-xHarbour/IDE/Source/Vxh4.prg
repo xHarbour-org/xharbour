@@ -2968,7 +2968,7 @@ RETURN Self
 
 METHOD SetValue( xValue ) CLASS EventManager
 
-   LOCAL Topic, Event, oItem, cProp
+   LOCAL Topic, Event, oItem, cProp, n, i
 
    oItem := FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
 
@@ -2984,36 +2984,32 @@ METHOD SetValue( xValue ) CLASS EventManager
 
    cProp := oItem:ColItems[1]:Prop
 
-   FOR EACH Topic IN ::ActiveObject:Events
-      FOR EACH Event IN Topic[2]
-         IF Event[1] == cProp
-            oItem:ColItems[1]:Value := xValue
+   FOR n := 1 TO LEN( ::ActiveObject:Events )
+       FOR i := 1 TO LEN( ::ActiveObject:Events[n][2] )
+           IF ::ActiveObject:Events[n][2][i][1] == cProp
+              oItem:ColItems[1]:Value := xValue
 
-            IF Empty( xValue )
-
-               Event[2] := ""
-            ELSE
-               IF Empty( Event[2] )
-                  Event[2] := xValue
-                  ::GenerateEvent( oItem:Caption, xValue, Event )
+              IF Empty( xValue )
+                 ::ActiveObject:Events[n][2][i][2] := ""
                ELSE
-                  IF Event[2] == xValue
-                     ::GenerateEvent( oItem:Caption, xValue, Event )
-                     RETURN Self
-                  ENDIF
+                 IF Empty( ::ActiveObject:Events[n][2][i][2] )
+                    ::ActiveObject:Events[n][2][i][2] := xValue
+                    ::GenerateEvent( oItem:Caption, xValue, ::ActiveObject:Events[n][2][i] )
+                  ELSE
+                    IF ::ActiveObject:Events[n][2][i][2] == xValue
+                       ::GenerateEvent( oItem:Caption, xValue, ::ActiveObject:Events[n][2][i] )
+                       RETURN Self
+                    ENDIF
+                    ::RenameEvent( oItem:Caption, ::ActiveObject:Events[n][2][i][2], xValue )
+                    ::ActiveObject:Events[n][2][i][2] := xValue
+                 ENDIF
+              ENDIF
+              ::Application:Project:Modified := .T.
+              ::Application:Project:CurrentForm:__lModified := .T.
 
-                  // CAUTION The function name has been CHANGED !
-                  // Ron Pinkas, we must accept the user's new name.
-                  ::RenameEvent( oItem:Caption, Event[2], xValue )
-                  Event[2] := xValue
-               ENDIF
-            ENDIF
-            ::Application:Project:Modified := .T.
-            ::Application:Project:CurrentForm:__lModified := .T.
-
-            RETURN Self
-         ENDIF
-      NEXT
+              RETURN Self
+           ENDIF
+       NEXT
    NEXT
 RETURN .T.
 
@@ -3061,23 +3057,7 @@ METHOD GenerateEvent( cEvent, cFuncName, Event ) CLASS EventManager
          ENDIF
       ENDIF
       ::Application:Project:Modified := .T.
-      
-      IF ( n := aScan( xEdit_GetEditors(), hb_QWith(), , , .T. ) ) > 0
-         lForce := ::Application:SourceEditor:oEditor == HB_QWith()
-         ::Application:SourceTabs:SetItemText( n, "  " + ::Application:Project:CurrentForm:Name + ".prg * ", .T. )
-         ::Application:SourceEditor:oEditor := hb_QWith()
-         try
-            ::Application:SourceEditor:oEditor:SetDisplay( :oDisplay, .T. )
-         catch
-         end
-         ::Application:SourceTabs:SetCurSel( n )
-         lModified := :lModified
-         :Load( ,:GetBuffer(), lForce, lForce )
-         aPos := :LineColumn( nPos )
-         :GoLine( aPos[1] )
-         :GoColumn( aPos[2]+1 )
-         :lModified := lModified
-      ENDIF
+      ::Application:Project:CurrentForm:__lModified := .T.
    END
 
    IF !::Application:SourceEditor:IsWindowVisible()
@@ -3087,7 +3067,6 @@ METHOD GenerateEvent( cEvent, cFuncName, Event ) CLASS EventManager
    InvalidateRect( ::Application:SourceEditor:hWnd,, .F. )
    
    ::Application:MainForm:ToolBox1:Enabled := .F.
-   //::Application:ObjectManager:Enabled     := .F.
    ::Application:ObjectTree:Enabled        := .F.
 RETURN Self
 
@@ -3236,21 +3215,21 @@ RETURN 0
 
 METHOD EditEvent( cEvent ) CLASS EventManager
 
-   LOCAL Topic, Event, oParent, lReset := .F., cName := ""
-   
+   LOCAL Topic, Event, n, i, oParent, lReset := .F., cName := ""
+
    IF ::ActiveObject:Events != NIL
-      FOR EACH Topic IN ::ActiveObject:Events
-          FOR EACH Event IN Topic[2]
-              IF Event[1] == cEvent
-                 cName := Event[2]
+      FOR n := 1 TO LEN( ::ActiveObject:Events )
+          FOR i := 1 TO LEN( ::ActiveObject:Events[n][2] )
+              IF ::ActiveObject:Events[n][2][i][1] == cEvent
+                 cName := ::ActiveObject:Events[n][2][i][2]
 
                  IF Empty( cName )
                     lReset := .T.
                     cName := ::ActiveObject:Name + "_"+ cEvent
-                    Event[2] := cName
+                    ::ActiveObject:Events[n][2][i][2] := cName
                  ENDIF
 
-                 ::GenerateEvent( cEvent, cName, Event )
+                 ::GenerateEvent( cEvent, cName, ::ActiveObject:Events[n][2][i] )
 
                  IF lReset
                     ::ResetEvents()
@@ -3268,7 +3247,6 @@ RETURN Self
 
 CLASS ObjCombo INHERIT ComboBox
    DATA ColWidth
-   DATA ColFont
    DATA ColFont
    METHOD Init() CONSTRUCTOR
    METHOD OnParentDrawItem()

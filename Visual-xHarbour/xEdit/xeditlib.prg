@@ -4980,6 +4980,10 @@ METHOD xEditWindowProc( hWnd, nMsg, nwParam, nlParam ) CLASS EditorGUIDisplay
             RETURN 0
 
          CASE WM_CHAR
+            #ifdef VXH
+               :lModified := .T.
+            #endif
+
             :lAlt   := .F.
             :lCtrl  := .F.
             :lShift := .F.
@@ -6536,10 +6540,10 @@ CLASS Editor
    VAR HighlightedLine
 
    #ifdef VXH
-      VAR xlModified INIT .F.
-      ACCESS lModified INLINE ::xlModified
-      ASSIGN lModified(lVal) INLINE ::NotifyVXH( lVal ), ::xlModified := lVal
-      METHOD NotifyVXH()
+      DATA xModified INIT .F.
+      ACCESS lModified INLINE ::xModified
+      ASSIGN lModified( lMod ) INLINE ::NotifyVXH( lMod ), ::xModified := lMod
+      METHOD NotifyVXH( lMod )
    #endif
 
    METHOD New( nTop, nLeft, nLines, nColumns, cFile, oDisplay ) CONSTRUCTOR
@@ -9211,7 +9215,7 @@ METHOD Save( cFile, bAuto )  CLASS Editor
          Alert( "Save error: <" + cFile + ">;;I/O Error (" + Str( FError(), 2 ) + ")" )
       END
    ENDIF
-
+/*
    #ifdef VXH
       IF Len( s_aEditors ) > 0
          nEditorID := aScan( s_aEditors, Self, , , .T. )
@@ -9222,7 +9226,7 @@ METHOD Save( cFile, bAuto )  CLASS Editor
          Application:Props[ "EditRedoItem" ]:Enabled := Application:Props[ "EditRedoBttn" ]:Enabled := Len( ::aReDo ) > 0
       ENDIF
    #endif
-
+*/
    //TraceLog( "Saved" )
 
 RETURN Self
@@ -9589,6 +9593,7 @@ METHOD OnKey( nKey, nCount ) CLASS Editor
                #else
                    sText := ::cClipBoard
                #endif
+
                IF ::nLineFrom == 0
                   IF ::lLine
                      #ifdef VXH
@@ -9680,6 +9685,10 @@ METHOD OnKey( nKey, nCount ) CLASS Editor
       TraceLog( oError:Operation, oError:Description, oError:ProcName, oError:ProcLine )
    END
 
+   //#ifdef VXH
+      //Application:Project:EditReset(0)
+   //#endif
+
 RETURN Self
 
 METHOD Action( aActions, aReverse ) CLASS Editor
@@ -9695,9 +9704,9 @@ METHOD Action( aActions, aReverse ) CLASS Editor
    LOCAl nPad
    LOCAL nCursorLine
    LOCAL nDeferDisplay := 0
+
    #ifdef VXH
       LOCAL nEditorID, cText
-      LOCAL lModified := ::lModified
    #else
       #ifdef WIN
          LOCAL tvi
@@ -10330,6 +10339,7 @@ METHOD Action( aActions, aReverse ) CLASS Editor
                         aAdd( aBatch, { ED_INSERTLINE, aAction[2], sLine } )
                      ENDIF
                   END
+
                   IF lOneMore
                      nLines++
                      aAdd( aBatch, { ED_INSERTLINE, aAction[2] + 1, "" } )
@@ -10572,7 +10582,9 @@ METHOD Action( aActions, aReverse ) CLASS Editor
             ::lModified := .T.
             //TraceLog( "YES" )
          ELSE
-            ::lModified := .F.
+            #ifndef VXH
+               ::lModified := .F.
+            #endif
             //TraceLog( "NO" )
          ENDIF
 
@@ -10614,14 +10626,13 @@ RETURN Self
             nEditorID := aScan( s_aEditors, Self, , , .T. )
             cText     := Application:SourceTabs:GetItemText( nEditorID )
             cText     := ALLTRIM( STRTRAN( cText, "*" ) )
-            Application:SourceTabs:SetItemText( nEditorID, IIF( lMod, "   ", "" ) + cText + IIF( lMod, " * ", "" ), lMod )
+            Application:SourceTabs:SetItemText( nEditorID, IIF( lMod, " ", "" ) + cText + IIF( lMod, " * ", "" ), lMod )
             Application:Props[ "EditUndoItem" ]:Enabled := Application:Props[ "EditUndoBttn" ]:Enabled := Len( ::aUnDo ) > 0
             Application:Props[ "EditRedoItem" ]:Enabled := Application:Props[ "EditRedoBttn" ]:Enabled := Len( ::aReDo ) > 0
          ENDIF
       ENDIF
    RETURN Self
 #endif
-
 
 METHOD SelectedText() CLASS Editor
 
