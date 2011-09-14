@@ -1640,6 +1640,7 @@ CLASS ToolButton INHERIT Object
    METHOD Show()
    METHOD CheckButton(l) INLINE ::Parent:CheckButton( ::oStruct:idCommand, IIF( l==NIL, .T., l ) )
    METHOD Press()
+   METHOD Check()
    METHOD Release()
    METHOD GetRect()
    METHOD GetClientRect()
@@ -1959,6 +1960,17 @@ METHOD Press() CLASS ToolButton
 
    SendMessage( ::Parent:hWnd, TB_SETBUTTONINFO, ::Id, tbbi )
 
+RETURN SELF
+
+METHOD Check( lCheck ) CLASS ToolButton
+   LOCAL tbbi := (struct TBBUTTONINFO)
+   tbbi:cbSize  := tbbi:sizeof()
+   tbbi:dwMask  := TBIF_STATE
+   tbbi:fsState := TBSTATE_ENABLED
+   IF lCheck
+      tbbi:fsState += TBSTATE_CHECKED
+   ENDIF
+   SendMessage( ::Parent:hWnd, TB_SETBUTTONINFO, ::Id, tbbi )
 RETURN SELF
 
 METHOD SetState( nState, lSet ) CLASS ToolButton

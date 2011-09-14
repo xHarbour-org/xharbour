@@ -176,6 +176,7 @@ METHOD Init( oParent ) CLASS ComboBox
    ::Height     := 100
    IF !EMPTY( ::Events )
       AADD( ::Events[3][2], { "OnCBNSelEndOk" , "", "" } )
+      AADD( ::Events[3][2], { "OnSelChange" , "", "" } )
    ENDIF
 RETURN Self
 
@@ -353,6 +354,7 @@ METHOD OnParentCommand( nId, nCode, nlParam ) CLASS ComboBox
            __Evaluate( ::OnCBNSelEndCancel, Self,,,,)
 
       CASE nCode == CBN_SELCHANGE
+           nRet := ExecuteEvent( "OnSelChange", Self )
 
       CASE nCode == CBN_DBLCLK
       CASE nCode == CBN_ERRSPACE

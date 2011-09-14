@@ -3471,7 +3471,7 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
          ::__CurControl:Caption := XSTR( xValue )
          ::__CurControl:Create()
 
-         DEFAULT ::__CurControl:OnWMKeyDown   TO {|o,n| IIF( n==27, (o:Destroy(),o:Parent:DataSource:UnLock(),0), IIF( n IN {13,9}, (o:Parent:__ControlSaveData(),o:Destroy(),o:Parent:DataSource:UnLock()), NIL ) )}
+         DEFAULT ::__CurControl:OnWMKeyDown   TO {|o,n| IIF( n==27, (o:Destroy(),o:Parent:DataSource:UnLock(),0), IIF( n IN {13,9}, (o:Parent:__ControlSaveData(,n),o:Destroy(),o:Parent:DataSource:UnLock()), NIL ) )}
          DEFAULT ::__CurControl:OnWMKillFocus TO {|o|o:Parent:__ControlSaveData(.T.) }
 
          ::__CurControl:BackColor     := ::Children[::ColPos]:ControlBackColor
@@ -3503,31 +3503,31 @@ RETURN aRect
 
 //----------------------------------------------------------------------------------
 
-METHOD __ControlSaveData( lFocus ) CLASS DataGrid
+METHOD __ControlSaveData( lFocus, nKey ) CLASS DataGrid
    LOCAL oCtrl, nPos, cField, n, lRefresh := .T.
    DEFAULT lFocus TO .F.
    IF ::__CurControl:__xCtrlName == "MaskEdit" .AND. !::__CurControl:validating
       IF ::__CurControl:IsValid
          IF ( ::__CurControl:lInvalid .OR. ::Children[::ColPos]:ControlValid == NIL )
             IF ::Children[::ColPos]:OnSave != NIL
-               lRefresh := EVAL( ::Children[::ColPos]:OnSave, ::Children[::ColPos], Self, ::__CurControl:oGet:VarGet(), lFocus )
+               lRefresh := EVAL( ::Children[::ColPos]:OnSave, ::Children[::ColPos], Self, ::__CurControl:oGet:VarGet(), lFocus, nKey )
             ENDIF
             IF HGetPos( ::Children[::ColPos]:EventHandler, "OnSave" ) != 0
                oCtrl := ::Children[::ColPos]
                
                ::__CurControl:VarPut( ::__CurControl:oGet:Buffer )
-               lRefresh := oCtrl:Form:&( oCtrl:EventHandler[ "OnSave" ] )( ::__CurControl, Self, ::__CurControl:oGet:VarGet(), lFocus )
+               lRefresh := oCtrl:Form:&( oCtrl:EventHandler[ "OnSave" ] )( ::__CurControl, Self, ::__CurControl:oGet:VarGet(), lFocus, nKey )
             ENDIF
          ENDIF
       ENDIF
     ELSEIF ::__CurControl:__xCtrlName == "Edit" .OR. ::__CurControl:__xCtrlName == "EditBox"
       IF ::Children[::ColPos]:ControlValid == NIL
          IF ::Children[::ColPos]:OnSave != NIL
-            lRefresh := EVAL( ::Children[::ColPos]:OnSave, ::Children[::ColPos], Self, ::__CurControl:Caption, lFocus )
+            lRefresh := EVAL( ::Children[::ColPos]:OnSave, ::Children[::ColPos], Self, ::__CurControl:Caption, lFocus, nKey )
          ENDIF
          IF HGetPos( ::Children[::ColPos]:EventHandler, "OnSave" ) != 0
             oCtrl := ::Children[::ColPos]
-            lRefresh := oCtrl:Form:&( oCtrl:EventHandler[ "OnSave" ] )( ::__CurControl, Self, ::__CurControl:Caption, lFocus )
+            lRefresh := oCtrl:Form:&( oCtrl:EventHandler[ "OnSave" ] )( ::__CurControl, Self, ::__CurControl:Caption, lFocus, nKey )
          ENDIF
       ENDIF
    ENDIF
@@ -3899,7 +3899,7 @@ METHOD Init( oParent ) CLASS GridColumn
                   {"Object",      {;
                                   { "OnInit"             , "", "" } } },;
                   {"Data",        {;
-                                  { "OnSave"            , "", "oGrid, cText, lFocusKilled" } } },;
+                                  { "OnSave"            , "", "oGrid, cText, lFocusKilled, nLastKey" } } },;
                   {"Color",       {;
                                   { "OnQueryBackColor"  , "", "" },;
                                   { "OnQueryForeColor"  , "", "" } } },;
