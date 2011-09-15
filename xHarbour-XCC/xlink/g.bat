@@ -45,8 +45,14 @@ IF NOT EXIST MSObj MD MSObj
 IF NOT EXIST Obj MD Obj
 
 NMAKE -S > Log
+IF ERRORLEVEL 0 GOTO :NO_ERROR
 
-IF ERRORLEVEL 0 xcopy xlink.exe \xhb\bin /d /r /y
+ECHO !!! ERROR BUILDING xLink !!!
+PAUSE
+
+:NO_ERROR
+TYPE Log
+xcopy xlink.exe \xhb\bin /d /r /y
 
 SET PATH=%_PRESET_PATH%
 SET INCLUDE=%_PRESET_INCLUDE%

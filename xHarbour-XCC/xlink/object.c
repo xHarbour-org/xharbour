@@ -784,7 +784,9 @@ static void process_defined_symbol(COFF_SYMENT *se)
             else if (pub->type == resolved)
             {
                 /* It seems ok for commons to 'overlap' other types */
-                if (!pub->flags.common && !options.force_multiple)
+                /* RP 2011-09-15
+                if (!pub->flags.common && !options.force_multiple)*/
+                if (!pub->flags.common)
                 {
                     char msg[512];
 
@@ -792,13 +794,28 @@ static void process_defined_symbol(COFF_SYMENT *se)
                                   ( cur_mod->lib_file ? cur_mod->lib_file->name : "" ),
                                   cur_mod->obj_file->name,
                                   pub->name,
-                                  ( pub->def_mod->lib_file ? pub->def_mod->lib_file->name : "" ),
+                                  ( pub->def_mod && pub->def_mod->lib_file ? pub->def_mod->lib_file->name : "" ),
                                   pub->def_mod->obj_file->name );
 
-                    apperror(RCERROR(ERROR_MULTIPLE_SYMBOLS), msg);
+                    /* RP 2011-09-15
+                    apperror(RCERROR(ERROR_MULTIPLE_SYMBOLS), msg);*/
+
+                    /* RP 2011-09-15 */
+                    if (options.force_multiple)
+                    {
+                       apperror(RCWARNING(ERROR_MULTIPLE_SYMBOLS), msg);
+                    }
+                    else
+                    {
+                       apperror(RCERROR(ERROR_MULTIPLE_SYMBOLS), msg);
+                    }
+                    /* RP END 2011-09-15 */
                 }
                 return;
             }
+
+            /* RP 2011-09-15 fixed GPF */
+            pub->def_mod = cur_mod;
 
             pub->flags.function |= ISFCN(se->n_type);
             pub->value = se->n_value;
@@ -819,7 +836,8 @@ static void process_defined_symbol(COFF_SYMENT *se)
             }
             else if (pub->type == resolved)
             {
-                if (!options.force_multiple)
+                /* RP 2011-09-15
+                if (!options.force_multiple)*/
                 {
                     char msg[512];
 
@@ -827,13 +845,28 @@ static void process_defined_symbol(COFF_SYMENT *se)
                                   ( cur_mod->lib_file ? cur_mod->lib_file->name : "" ),
                                   cur_mod->obj_file->name,
                                   pub->name,
-                                  ( pub->def_mod->lib_file ? pub->def_mod->lib_file->name : "" ),
+                                  ( pub->def_mod && pub->def_mod->lib_file ? pub->def_mod->lib_file->name : "" ),
                                   pub->def_mod->obj_file->name );
 
-                    apperror(RCERROR(ERROR_MULTIPLE_SYMBOLS), msg);
+                    /* RP 2011-09-15
+                    apperror(RCERROR(ERROR_MULTIPLE_SYMBOLS), msg);*/
+
+                    /* RP 2011-09-15 */
+                    if (options.force_multiple)
+                    {
+                       apperror(RCWARNING(ERROR_MULTIPLE_SYMBOLS), msg);
+                    }
+                    else
+                    {
+                       apperror(RCERROR(ERROR_MULTIPLE_SYMBOLS), msg);
+                    }
+                    /* RP END 2011-09-15 */
                 }
                 return;
             }
+
+            /* RP 2011-09-15 fixed GPF */
+            pub->def_mod = cur_mod;
 
             pub->flags.internal = TRUE;
             pub->value = 0;
@@ -861,7 +894,8 @@ static void process_defined_symbol(COFF_SYMENT *se)
 
             if (sym->type == resolved)
             {
-                if (!options.force_multiple)
+                /* RP 2011-09-15
+                if (!options.force_multiple)*/
                 {
                     char msg[512];
 
@@ -872,7 +906,19 @@ static void process_defined_symbol(COFF_SYMENT *se)
                                   ( sym->def_mod->lib_file ? sym->def_mod->lib_file->name : "" ),
                                   sym->def_mod->obj_file->name );
 
-                    apperror(RCERROR(ERROR_MULTIPLE_SYMBOLS), msg);
+                    /* RP 2011-09-15
+                    apperror(RCERROR(ERROR_MULTIPLE_SYMBOLS), msg);*/
+
+                    /* RP 2011-09-15 */
+                    if (options.force_multiple)
+                    {
+                       apperror(RCWARNING(ERROR_MULTIPLE_SYMBOLS), msg);
+                    }
+                    else
+                    {
+                       apperror(RCERROR(ERROR_MULTIPLE_SYMBOLS), msg);
+                    }
+                    /* RP END 2011-09-15 */
                 }
                 return;
             }
@@ -904,6 +950,9 @@ static void process_defined_symbol(COFF_SYMENT *se)
                 {
                     return;
                 }
+
+                /* RP 2011-09-15 fixed GPF */
+                pub->def_mod = cur_mod;
 
                 pub->flags.internal = TRUE;
                 pub->value = 0;
@@ -945,7 +994,9 @@ static void process_absolute_symbol(COFF_SYMENT *se)
         }
         else if (pub->type == resolved)
         {
-            if ((!pub->flags.absolute || pub->value != se->n_value) && !options.force_multiple)
+            /* RP 2011-09-15
+            if ((!pub->flags.absolute || pub->value != se->n_value) && !options.force_multiple)*/
+            if (!pub->flags.absolute || pub->value != se->n_value)
             {
                 char msg[512];
 
@@ -953,13 +1004,28 @@ static void process_absolute_symbol(COFF_SYMENT *se)
                               ( cur_mod->lib_file ? cur_mod->lib_file->name : "" ),
                               cur_mod->obj_file->name,
                               pub->name,
-                              ( pub->def_mod->lib_file ? pub->def_mod->lib_file->name : "" ),
+                              ( pub->def_mod && pub->def_mod->lib_file ? pub->def_mod->lib_file->name : "" ),
                               pub->def_mod->obj_file->name );
 
-                apperror(RCERROR(ERROR_MULTIPLE_SYMBOLS), msg);
+                /* RP 2011-09-15
+                apperror(RCERROR(ERROR_MULTIPLE_SYMBOLS), msg);*/
+
+                /* RP 2011-09-15 */
+                if (options.force_multiple)
+                {
+                   apperror(RCWARNING(ERROR_MULTIPLE_SYMBOLS), msg);
+                }
+                else
+                {
+                   apperror(RCERROR(ERROR_MULTIPLE_SYMBOLS), msg);
+                }
+                /* RP END 2011-09-15 */
             }
             return;
         }
+
+        /* RP 2011-09-15 fixed GPF */
+        pub->def_mod = cur_mod;
 
         pub->flags.absolute = TRUE;
         pub->value = se->n_value;
@@ -1041,6 +1107,9 @@ static void process_common_symbol(COFF_SYMENT *se)
             /* it's ok for commons to overlap */
             if (!pub->flags.common) return;
         }
+
+        /* RP 2011-09-15 fixed GPF */
+        pub->def_mod = cur_mod;
 
         pub->flags.common = TRUE;
         pub->type = resolved;
