@@ -134,7 +134,7 @@
               WSASetLastError( 0 );
 
       #else
-          #define HB_SSL_SOCKET_SET_ERROR( s ) s->errorCode = errno; s->errorDesc = strerror( errno )
+          #define HB_SOCKET_SET_ERROR( s ) s->errorCode = errno; s->errorDesc = strerror( errno )
       #endif
 
       #define HB_SOCKET_SET_ERROR1( s, code ) s->errorCode = code; s->errorDesc = strerror( code );

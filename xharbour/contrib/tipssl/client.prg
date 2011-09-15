@@ -649,16 +649,30 @@ Return Nil
 
 /* Methods to manage buffers */
 METHOD InetRcvBufSize( SocketCon, nSizeBuff ) CLASS tIPClient
+if ::lSsl
    IF ! Empty( nSizeBuff )
       INETSSLSETRCVBUFSIZE( SocketCon, nSizeBuff )
    ENDIF
-RETURN INETSSLGETRCVBUFSIZE( SocketCon )
+   RETURN INETSSLGETRCVBUFSIZE( SocketCon )
+endif
+   IF ! Empty( nSizeBuff )
+      INETSETRCVBUFSIZE( SocketCon, nSizeBuff )
+   ENDIF
+   RETURN INETGETRCVBUFSIZE( SocketCon )
+
 
 METHOD InetSndBufSize( SocketCon, nSizeBuff ) CLASS tIPClient
+if ::lssl
    IF ! Empty( nSizeBuff )
       INETSSLSETSNDBUFSIZE( SocketCon, nSizeBuff )
    ENDIF
 RETURN INETSSLGETSNDBUFSIZE( SocketCon )
+ENDIF
+   IF ! Empty( nSizeBuff )
+      INETSETSNDBUFSIZE( SocketCon, nSizeBuff )
+   ENDIF
+RETURN INETGETSNDBUFSIZE( SocketCon )
+
 
 /* Called from another method with list of parameters and, as last parameter, return code
    of function being logged.

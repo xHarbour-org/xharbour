@@ -397,7 +397,7 @@ static int hb_selectWriteSocket( HB_SSL_SOCKET_STRUCT *Socket )
 }
 
 
-int hb_selectWriteExceptSocket( HB_SSL_SOCKET_STRUCT *Socket )
+int hb_selectWriteExceptSocketSslSsl( HB_SSL_SOCKET_STRUCT *Socket )
 {
    fd_set set, eset;
    struct timeval tv;
@@ -544,7 +544,7 @@ static int hb_socketConnect( HB_SSL_SOCKET_STRUCT *Socket )
          /* Now we wait for socket connection or timeout */
 
 #if defined( HB_OS_WIN ) || defined(HB_OS_WIN_USED )
-         iErr1 = hb_selectWriteExceptSocket( Socket );
+         iErr1 = hb_selectWriteExceptSocketSslSsl( Socket );
          if( iErr1 == 2 )
          {
             HB_SOCKET_SET_ERROR2( Socket, 2, "Connection failed" );
@@ -1031,7 +1031,7 @@ HB_FUNC( INETSSLGETSNDBUFSIZE )
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETGETSNDBUFSIZE", 1,
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSSLGETSNDBUFSIZE", 1,
          hb_paramError(1) );
    }
    else
@@ -1050,7 +1050,7 @@ HB_FUNC( INETSSLGETRCVBUFSIZE )
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETGETRCVBUFSIZE", 1,
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSSLGETRCVBUFSIZE", 1,
          hb_paramError(1) );
    }
    else
@@ -1069,7 +1069,7 @@ HB_FUNC( INETSSLSETSNDBUFSIZE )
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSETSNDBUFSIZE", 1, hb_paramError(1) );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSSLSETSNDBUFSIZE", 1, hb_paramError(1) );
    }
    else
    {
@@ -1086,7 +1086,7 @@ HB_FUNC( INETSSLSETRCVBUFSIZE )
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSETRCVBUFSIZE", 1, hb_paramError(1) );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSSLSETRCVBUFSIZE", 1, hb_paramError(1) );
    }
    else
    {
