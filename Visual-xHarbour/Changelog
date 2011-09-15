@@ -8,6 +8,14 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-09-14 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed DataGrid SortArrow property causing painting the grid on an empty device
+     context.
+   ! Added ComboBox new event OnSelChange.
+   ! Fixed TabStrip to avoid flicker when setting page name.
+   ! Fixed CoolBar to allow ComboBoxes
+   
+   
 2011-09-13 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed events not being saved when generating events via double click to buttons
    ! Changed editor to notify VXH of every change to lmodified so VXH knows

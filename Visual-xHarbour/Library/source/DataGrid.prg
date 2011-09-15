@@ -3690,7 +3690,7 @@ CLASS GridColumn INHERIT Object
    METHOD SetImageIndex()
    METHOD SetAlignment()
    METHOD SetRepresentation()
-   METHOD __SetSortArrow(n)   INLINE AEVAL( ::Parent:Children, {|o|o:xSortArrow:=0, o:DrawHeader( o:Parent:Drawing:hDC ) } ), ::xSortArrow := n, ::DrawHeader( ::Parent:Drawing:hDC )
+   METHOD __SetSortArrow()
    METHOD __SetAutoEdit()
 ENDCLASS
 
@@ -3705,6 +3705,17 @@ METHOD CreateDragImage( nLeft ) CLASS GridColumn
    DeleteObject( hMemBitmap )
 RETURN hImageList
 
+METHOD __SetSortArrow(n) CLASS GridColumn
+   LOCAL i
+   IF ::Parent:IsWindow()
+      FOR i := 1 TO LEN( ::Parent:Children )
+          ::Parent:Children[i]:xSortArrow :=0
+          ::Parent:Children[i]:DrawHeader( ::Parent:Children[i]:Parent:Drawing:hDC )
+      NEXT
+      ::xSortArrow := n
+      ::DrawHeader( ::Parent:Drawing:hDC )
+   ENDIF
+RETURN NIL
 
 METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    LOCAL aAlign, z, y, i, nColor, nShadow, hOldPen, hOldBrush, nBorder, nBackColor, hOldFont, n, aAlignment, aRect, nH := 5, nx := 0
