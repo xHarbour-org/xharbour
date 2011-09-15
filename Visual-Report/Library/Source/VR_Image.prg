@@ -39,11 +39,6 @@ METHOD Init( oParent ) CLASS VrImage
       Super:Init( oParent )
       AADD( ::aProperties, { "Name",     "Object"  } )
       AADD( ::aProperties, { "FileName", "General" } )
-
-      AADD( ::aProperties, { "Opacity", "General" } )
-      AADD( ::aProperties, { "Alignment", "General" } )
-      AADD( ::aProperties, { "KeepAspectRatio", "General" } )
-
       AADD( ::aProperties, { "Width",  "Size"  } )
       AADD( ::aProperties, { "Height", "Size" } )
    ENDIF
