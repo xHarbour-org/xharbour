@@ -8,19 +8,35 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-09-15 21:24 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+ * Library\source\ActiveX.prg
+   ! Fixed possible RTE when GetOleIcon() returns INVALID value
+
+ * xEdit\xedit.h
+   + Added: IDM_EDIT_UNDOFAST and IDM_EDIT_REDOFAST
+ * xEdit\xedit.rc
+   + Added "Undo Change | Ctrol+Shift+Z" and "Redo Change | Ctrl+Shift+Y" Context Menu Options, and EDIT Menu Options
+ * xEdit\xeditlib.prg
+   ! Removed duplicate definition of VAR lModified in VXH builds
+
+   * Modified METHOD :Action() to RETURN .T. if last action caused a MODIFICATION or .F.
+   + Added METHODS :UndoFast() and RedoFast() to service new menu options "Undo Change" and "Redo Change"
+   + Added support for new IDM_EDIT_UNDOFAST and IDM_EDIT_REDOFAST
+   * Added RESET of :lShift :lAlt and :lCtrl immediatly after using recently set value
+
 2011-09-14 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed DataGrid SortArrow property causing painting the grid on an empty device
      context.
    ! Added ComboBox new event OnSelChange.
    ! Fixed TabStrip to avoid flicker when setting page name.
    ! Fixed CoolBar to allow ComboBoxes
-   
-   
+
+
 2011-09-13 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed events not being saved when generating events via double click to buttons
    ! Changed editor to notify VXH of every change to lmodified so VXH knows
      what's happening to every change in text
-   
+
 2011-09-12 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed editor to send updates to VXH only when the modified status changes
    ! Fixed VXH Quick file menu to update only on new projects or when opening
@@ -79,7 +95,7 @@
 
 2011-03-30 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    + Added properties VertScrollSize and HorzScrollSize
-   
+
 2011-03-28 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    + Added ::MessageWait a 2nd parameter lProgress to display a ProgressBar
    + Added ::MessageWait:Position to advance the ProgressBar
@@ -94,12 +110,12 @@
    ! Reworked list of available Activex controls
    + Added Version number and path to the activex's path while browsing
    + Added ReadSection() and WriteSection() to IniFile.
-   ! Fixed Modal dialogs to close hitting the escape key when Autoclose 
+   ! Fixed Modal dialogs to close hitting the escape key when Autoclose
      is true
-   ! Fixed DataGrid to not to interrupt the closing of a Modal form 
+   ! Fixed DataGrid to not to interrupt the closing of a Modal form
      when hitting the escape key.
    ! Fixed list of ToolBox "populated" ActiveX to show the correct icon
-   
+
 2010-11-24 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed list of populated Activex controls
    ! Fixed building Executables creating compile error missing Ole.lib
@@ -125,9 +141,9 @@
 
 2010-09-13 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    + Added new PROPERTY / SET / GET clause
-   * Changed all ACCESS ImageList to new PROPERTY / SET / GET to resolve valtype "C" 
+   * Changed all ACCESS ImageList to new PROPERTY / SET / GET to resolve valtype "C"
      components.
-   
+
 2010-09-08 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed Undo deletion of a CoolMenu
    ! Fixed access to ContextMenu components
@@ -178,10 +194,10 @@
 
 2010-07-21 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed wrong docking in "Form Designer" page
-   ! FolderList and FolderTree Renamed properties RootFolder to SysFolder 
-     and InitialPath to Folder the old properties remain to avoid RTE 
+   ! FolderList and FolderTree Renamed properties RootFolder to SysFolder
+     and InitialPath to Folder the old properties remain to avoid RTE
      but users should change their code to match new properties.
-   
+
 2010-07-20 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed ColorScheme for Aero based OS
    * Replaced old flat TabControls with new TabStrip
@@ -190,7 +206,7 @@
    ! Started to prepare for 3.o
    ! Fixed FolderList update notification. Explorer notifies the folder of active
      file actions and FolderList updates the current view.
-   
+
 2010-07-18 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed ListView's ViewStyle property to allow runtime assignment.
    ! Fixed DataTable:DataConnector compatibility error to assign SqlConnector

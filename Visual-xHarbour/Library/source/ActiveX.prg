@@ -64,35 +64,35 @@ RETURN
 #define VT_ILLEGALMASKED      0xfff
 #define VT_TYPEMASK           0xfff
 
-#define OLEMISC_RECOMPOSEONRESIZE            1 
-#define OLEMISC_ONLYICONIC                   2 
-#define OLEMISC_INSERTNOTREPLACE             4 
-#define OLEMISC_STATIC                       8 
-#define OLEMISC_CANTLINKINSIDE               16 
-#define OLEMISC_CANLINKBYOLE1                32 
-#define OLEMISC_ISLINKOBJECT                 64 
-#define OLEMISC_INSIDEOUT                    128 
-#define OLEMISC_ACTIVATEWHENVISIBLE          256 
-#define OLEMISC_RENDERINGISDEVICEINDEPENDENT 512 
-#define OLEMISC_INVISIBLEATRUNTIME           1024 
-#define OLEMISC_ALWAYSRUN                    2048 
-#define OLEMISC_ACTSLIKEBUTTON               4096 
-#define OLEMISC_ACTSLIKELABEL                8192 
-#define OLEMISC_NOUIACTIVATE                 16384 
-#define OLEMISC_ALIGNABLE                    32768 
-#define OLEMISC_SIMPLEFRAME                  65536 
-#define OLEMISC_SETCLIENTSITEFIRST           131072 
-#define OLEMISC_IMEMODE                      262144 
-#define OLEMISC_IGNOREACTIVATEWHENVISIBLE    524288 
-#define OLEMISC_WANTSTOMENUMERGE             1048576 
-#define OLEMISC_SUPPORTSMULTILEVELUNDO       2097152 
+#define OLEMISC_RECOMPOSEONRESIZE            1
+#define OLEMISC_ONLYICONIC                   2
+#define OLEMISC_INSERTNOTREPLACE             4
+#define OLEMISC_STATIC                       8
+#define OLEMISC_CANTLINKINSIDE               16
+#define OLEMISC_CANLINKBYOLE1                32
+#define OLEMISC_ISLINKOBJECT                 64
+#define OLEMISC_INSIDEOUT                    128
+#define OLEMISC_ACTIVATEWHENVISIBLE          256
+#define OLEMISC_RENDERINGISDEVICEINDEPENDENT 512
+#define OLEMISC_INVISIBLEATRUNTIME           1024
+#define OLEMISC_ALWAYSRUN                    2048
+#define OLEMISC_ACTSLIKEBUTTON               4096
+#define OLEMISC_ACTSLIKELABEL                8192
+#define OLEMISC_NOUIACTIVATE                 16384
+#define OLEMISC_ALIGNABLE                    32768
+#define OLEMISC_SIMPLEFRAME                  65536
+#define OLEMISC_SETCLIENTSITEFIRST           131072
+#define OLEMISC_IMEMODE                      262144
+#define OLEMISC_IGNOREACTIVATEWHENVISIBLE    524288
+#define OLEMISC_WANTSTOMENUMERGE             1048576
+#define OLEMISC_SUPPORTSMULTILEVELUNDO       2097152
 
 #define DVASPECT_CONTENT                     1
 #define DVASPECT_THUMBNAIL                   2
 #define DVASPECT_ICON                        4
 #define DVASPECT_DOCPRINT                    8
 
-#DEFINE SECURITY_ACCESS_MASK 983103 
+#DEFINE SECURITY_ACCESS_MASK 983103
 
 #define HKEY_CLASSES_ROOT           0x80000000
 #define HKEY_LOCAL_MACHINE          0x80000002
@@ -119,7 +119,7 @@ CLASS ActiveX INHERIT ToleAuto, UserControl
    DATA __OleVars     EXPORTED
    DATA __LoadEvents  EXPORTED INIT .T.
    DATA Constants     EXPORTED
-   
+
    PROPERTY StaticEdge    INDEX WS_EX_STATICEDGE    READ xStaticEdge    WRITE SetExStyle DEFAULT .F.
    PROPERTY ClientEdge    INDEX WS_EX_CLIENTEDGE    READ xClientEdge    WRITE SetExStyle DEFAULT .F.
    PROPERTY ControlParent INDEX WS_EX_CONTROLPARENT READ xControlParent WRITE SetExStyle DEFAULT .F.
@@ -245,7 +245,7 @@ METHOD Create() CLASS ActiveX
       ::__IdeContextMenuItems := { { "Properties", {|| ::ShowPropertiesDialog( GetActiveWindow() ) } } }
       __DeleteEvents( ::Events,{ "OnLoad" } )
    ENDIF
-   
+
    IF ( nStatus := __AxGetMiscStatus( ::hObj, DVASPECT_CONTENT ) ) != NIL
       ::InvisibleAtRuntime := ( nStatus & OLEMISC_INVISIBLEATRUNTIME ) == OLEMISC_INVISIBLEATRUNTIME
    ENDIF
@@ -530,13 +530,16 @@ METHOD IsRegistered() CLASS ActiveX
       RegQueryValueEx( hKey, NIL,,, @cKey )
       RegCloseKey( hKey )
       lReg := !EMPTY(cKey) .AND. FILE(cKey)
-   ENDIF   
+   ENDIF
 RETURN lReg
 
 
 FUNCTION GetRegOleBmp( cID )
    LOCAL n, hKey, cBmp, hBmp, aBmp
    cBmp := GetOleIcon( cID )
+   IF Empty( cBmp )
+      RETURN NIL
+   ENDIF
    aBmp := hb_aTokens( cBmp, "," )
    IF LEN( aBmp ) >= 2
       hBmp := ExtractIcon( __GetApplication():Instance, aBmp[1], 0 )

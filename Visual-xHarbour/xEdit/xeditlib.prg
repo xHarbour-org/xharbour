@@ -4053,8 +4053,10 @@ METHOD xEditContainerWindowProc( hWnd, nMsg, nwParam, nlParam ) CLASS EditorGUID
                   RETURN 0
 
                CASE 1
-                  EnableMenuItem(  nwParam, IDM_EDIT_UNDO, MF_BYCOMMAND | IIF( Len( :aUnDo ) > 0 ,MF_ENABLED, MF_GRAYED ) )
-                  EnableMenuItem(  nwParam, IDM_EDIT_REDO, MF_BYCOMMAND | IIF( Len( :aReDo ) > 0 ,MF_ENABLED, MF_GRAYED ) )
+                  EnableMenuItem(  nwParam, IDM_EDIT_UNDO,     MF_BYCOMMAND | IIF( Len( :aUnDo ) > 0 ,MF_ENABLED, MF_GRAYED ) )
+                  EnableMenuItem(  nwParam, IDM_EDIT_REDO,     MF_BYCOMMAND | IIF( Len( :aReDo ) > 0 ,MF_ENABLED, MF_GRAYED ) )
+                  EnableMenuItem(  nwParam, IDM_EDIT_UNDOFAST, MF_BYCOMMAND | IIF( aScan( :aUndo, {|aAction| aAction[1] & 0xFF < ED_NOIMPACT } ) > 0, MF_ENABLED, MF_GRAYED ) )
+                  EnableMenuItem(  nwParam, IDM_EDIT_REDOFAST, MF_BYCOMMAND | IIF( aScan( :aRedo, {|aAction| aAction[1] & 0xFF < ED_NOIMPACT } ) > 0, MF_ENABLED, MF_GRAYED ) )
 
                   EnableMenuItem(  nwParam, IDM_EDIT_PASTE, MF_BYCOMMAND | IIF( IsClipboardFormatAvailable( CF_TEXT ), MF_ENABLED, MF_GRAYED ) )
 
@@ -4440,12 +4442,18 @@ METHOD xEditContainerWindowProc( hWnd, nMsg, nwParam, nlParam ) CLASS EditorGUID
                      SendMessage( hWnd, WM_CLOSE, 0, 0 )
                      RETURN 0
 
+                  CASE IDM_EDIT_UNDOFAST
+                     :lShift := .T.
                   CASE IDM_EDIT_UNDO
                      :OnKey( K_CTRL_Z, 1 )
+                     :lShift := .F.
                      RETURN 0
 
+                  CASE IDM_EDIT_REDOFAST
+                     :lShift := .T.
                   CASE IDM_EDIT_REDO
                      :OnKey( K_CTRL_Y, 1 )
+                     :lShift := .F.
                      RETURN 0
 
                   CASE IDM_EDIT_CUT
@@ -4468,6 +4476,7 @@ METHOD xEditContainerWindowProc( hWnd, nMsg, nwParam, nlParam ) CLASS EditorGUID
                      :Home()
                      :lShift := .T.
                      :End()
+                     :lShift := .F.
                      RETURN 0
 
                   CASE IDM_EDIT_FIND
@@ -4975,6 +4984,10 @@ METHOD xEditWindowProc( hWnd, nMsg, nwParam, nlParam ) CLASS EditorGUIDisplay
             //TraceLog( LOWORD( nlParam ), HIWORD( nlParam ) )
             :OnKey( nKey, nCount )
 
+            :lAlt   := .F.
+            :lCtrl  := .F.
+            :lShift := .F.
+
             ::nPreviousKey := nKey
             ::lRepeat := .T.
             RETURN 0
@@ -5063,6 +5076,11 @@ METHOD xEditWindowProc( hWnd, nMsg, nwParam, nlParam ) CLASS EditorGUIDisplay
             ELSE
                :OnKey( nKey,  LOWORD( nlParam ) )
             ENDIF
+
+            :lAlt   := .F.
+            :lCtrl  := .F.
+            :lShift := .F.
+
             RETURN 0
 
          CASE WM_SYSCHAR
@@ -5652,10 +5670,12 @@ METHOD xEditWindowProc( hWnd, nMsg, nwParam, nlParam ) CLASS EditorGUIDisplay
             hPopup := LoadMenu( s_hInstance, "EDITCONTEXT" )
             hContext := GetSubMenu( hPopup, 0 )
 
-            EnableMenuItem(  hContext, IDM_EDIT_UNDO, MF_BYCOMMAND | IIF( Len( :aUnDo ) > 0 ,MF_ENABLED, MF_GRAYED ) )
-            EnableMenuItem(  hContext, IDM_EDIT_REDO, MF_BYCOMMAND | IIF( Len( :aReDo ) > 0 ,MF_ENABLED, MF_GRAYED ) )
+            EnableMenuItem(  hContext, IDM_EDIT_UNDO,     MF_BYCOMMAND | IIF( Len( :aUnDo ) > 0 ,MF_ENABLED, MF_GRAYED ) )
+            EnableMenuItem(  hContext, IDM_EDIT_REDO,     MF_BYCOMMAND | IIF( Len( :aReDo ) > 0 ,MF_ENABLED, MF_GRAYED ) )
+            EnableMenuItem(  hContext, IDM_EDIT_UNDOFAST, MF_BYCOMMAND | IIF( aScan( :aUndo, {|aAction| aAction[1] & 0xFF < ED_NOIMPACT } ) > 0, MF_ENABLED, MF_GRAYED ) )
+            EnableMenuItem(  hContext, IDM_EDIT_REDOFAST, MF_BYCOMMAND | IIF( aScan( :aRedo, {|aAction| aAction[1] & 0xFF < ED_NOIMPACT } ) > 0, MF_ENABLED, MF_GRAYED ) )
 
-            EnableMenuItem(  hContext, IDM_EDIT_PASTE, MF_BYCOMMAND | IIF( IsClipboardFormatAvailable( CF_TEXT ), MF_ENABLED, MF_GRAYED ) )
+            EnableMenuItem(  hContext, IDM_EDIT_PASTE,    MF_BYCOMMAND | IIF( IsClipboardFormatAvailable( CF_TEXT ), MF_ENABLED, MF_GRAYED ) )
 
             IF :nLineFrom == 0
                nEnable = MF_BYCOMMAND | MF_GRAYED
@@ -5978,12 +5998,18 @@ METHOD xEditWindowProc( hWnd, nMsg, nwParam, nlParam ) CLASS EditorGUIDisplay
 
          CASE WM_COMMAND
             SWITCH LOWORD( nwParam )
+               CASE IDM_EDIT_UNDOFAST
+                  :lShift := .T.
                CASE IDM_EDIT_UNDO
                   :OnKey( K_CTRL_Z, 1 )
+                  :lShift := .F.
                   RETURN 0
 
+               CASE IDM_EDIT_REDOFAST
+                  :lShift := .T.
                CASE IDM_EDIT_REDO
                   :OnKey( K_CTRL_Y, 1 )
+                  :lShift := .F.
                   RETURN 0
 
                CASE IDM_EDIT_CUT
@@ -6006,6 +6032,7 @@ METHOD xEditWindowProc( hWnd, nMsg, nwParam, nlParam ) CLASS EditorGUIDisplay
                   :Home()
                   :lShift := .T.
                   :End()
+                  :lShift := .F.
                   RETURN 0
 
                CASE IDM_EDIT_FIND
@@ -6468,7 +6495,10 @@ CLASS Editor
 
    VAR lInsert     INIT .T.
    VAR lReadOnly   INIT .F.
-   VAR lModified   INIT .F.
+
+   #ifndef VXH
+      VAR lModified   INIT .F.
+   #endif
 
    VAR FirstLine                         READONLY
    VAR LastLine                          READONLY
@@ -6585,7 +6615,25 @@ CLASS Editor
    METHOD OnKey( nKey, nCount )
 
    METHOD Undo()                       INLINE ::Action( ::aUndo, ::aRedo )
+
+   INLINE METHOD UndoFast()
+                                       WHILE ! Empty( ::aUnDo )
+                                          IF ::Action( ::aUndo, ::aRedo )
+                                             EXIT
+                                          ENDIF
+                                       END
+         ENDMETHOD
+
    METHOD ReDo()                       INLINE ::Action( ::aRedo, ::aUnDo )
+
+   INLINE METHOD RedoFast()
+                                       WHILE ! Empty( ::aReDo )
+                                          IF ::Action( ::aRedo, ::aUndo )
+                                             EXIT
+                                          ENDIF
+                                       END
+         ENDMETHOD
+
    METHOD Action( aActions, aReverse )
 
    METHOD SelectedText()
@@ -9215,6 +9263,7 @@ METHOD Save( cFile, bAuto )  CLASS Editor
          Alert( "Save error: <" + cFile + ">;;I/O Error (" + Str( FError(), 2 ) + ")" )
       END
    ENDIF
+
 /*
    #ifdef VXH
       IF Len( s_aEditors ) > 0
@@ -9498,6 +9547,7 @@ METHOD OnKey( nKey, nCount ) CLASS Editor
                ::Home()
                ::lShift := .T.
                ::End()
+               ::lShift := .F.
                EXIT
 
             CASE K_CTRL_B
@@ -9638,11 +9688,19 @@ METHOD OnKey( nKey, nCount ) CLASS Editor
                EXIT
 
             CASE K_CTRL_Y
-               ::ReDo()
+               IF ::lShift
+                  ::ReDoFast()
+               ELSE
+                  ::ReDo()
+               ENDIF
                EXIT
 
             CASE K_CTRL_Z
-               ::UnDo()
+               IF ::lShift
+                  ::UnDoFast()
+               ELSE
+                  ::UnDo()
+               ENDIF
                EXIT
 
             CASE K_ESC
@@ -9704,6 +9762,7 @@ METHOD Action( aActions, aReverse ) CLASS Editor
    LOCAl nPad
    LOCAL nCursorLine
    LOCAL nDeferDisplay := 0
+   LOCAL lImpacted := .F.
 
    #ifdef VXH
       LOCAL nEditorID, cText
@@ -9716,7 +9775,7 @@ METHOD Action( aActions, aReverse ) CLASS Editor
    //TraceLog( aActions, aReverse )
 
    IF Empty( aActions )
-      RETURN Self
+      RETURN lImpacted
    ENDIF
 
    IF ( ! aActions == ::aRedo ) .AND. aReverse == ::aUnDo
@@ -9758,6 +9817,10 @@ METHOD Action( aActions, aReverse ) CLASS Editor
                IF :nColumn == -1
                   :nColumn := 0
                ENDIF
+            ENDIF
+
+            IF aAction[1] < ED_NOIMPACT
+               lImpacted := .T.
             ENDIF
 
             //TraceLog( nAction, aAction[2], :nBaseLine, ::nLines )
@@ -10567,7 +10630,7 @@ METHOD Action( aActions, aReverse ) CLASS Editor
          // TODO OPTIMIZE!!!
          IF nDeferDisplay > 0
             :nDeferDisplay -= nDeferDisplay
-             ASSERT( :nDeferDisplay >= 0 )
+            ASSERT( :nDeferDisplay >= 0 )
             :Display()
          ELSE
             :Status()
@@ -10612,11 +10675,13 @@ METHOD Action( aActions, aReverse ) CLASS Editor
    #ifdef VXH
       Application:Project:EditReset(0)
    #endif
-RETURN Self
+
+RETURN lImpacted
 
 #ifdef VXH
    METHOD NotifyVXH( lMod )
       LOCAL nEditorID, cText
+
       IF lMod != ::lModified
          IF lMod
             Application:Project:Modified := .T.
@@ -10631,6 +10696,7 @@ RETURN Self
             Application:Props[ "EditRedoItem" ]:Enabled := Application:Props[ "EditRedoBttn" ]:Enabled := Len( ::aReDo ) > 0
          ENDIF
       ENDIF
+
    RETURN Self
 #endif
 

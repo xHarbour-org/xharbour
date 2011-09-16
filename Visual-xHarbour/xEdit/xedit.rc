@@ -96,6 +96,8 @@ BEGIN
     BEGIN
         MENUITEM "&Undo\tCtrl+Z",               IDM_EDIT_UNDO
         MENUITEM "&Redo\tCtrl+Y",               IDM_EDIT_REDO
+        MENUITEM "Undo Change\tCtrl+Shift+Z",   IDM_EDIT_UNDOFAST
+        MENUITEM "Redo Change\tCtrl+Shift+Y",   IDM_EDIT_REDOFAST
         MENUITEM SEPARATOR
         MENUITEM "Cu&t\tCtrl+X",                IDM_EDIT_CUT
         MENUITEM "&Copy\tCtrl+C",               IDM_EDIT_COPY
@@ -144,6 +146,8 @@ BEGIN
     BEGIN
     MENUITEM "&Undo\tCtrl+Z",               IDM_EDIT_UNDO
     MENUITEM "&Redo\tCtrl+Y",               IDM_EDIT_REDO
+    MENUITEM "Undo Change\tCtrl+Shift+Z",   IDM_EDIT_UNDOFAST
+    MENUITEM "Redo Change\tCtrl+Shift+Y",   IDM_EDIT_REDOFAST
     MENUITEM SEPARATOR
     MENUITEM "Cu&t\tCtrl+X",                IDM_EDIT_CUT
     MENUITEM "&Copy\tCtrl+C",               IDM_EDIT_COPY

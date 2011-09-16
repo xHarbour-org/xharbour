@@ -44,21 +44,23 @@
 
    #define IDM_EDIT_UNDO                   30101
    #define IDM_EDIT_REDO                   30102
-   #define IDM_EDIT_CUT                    30103
-   #define IDM_EDIT_COPY                   30104
-   #define IDM_EDIT_PASTE                  30105
-   #define IDM_EDIT_CLEAR                  30106
-   #define IDM_EDIT_SELECT_ALL             30107
-   #define IDM_EDIT_FIND                   30108
-   #define IDM_EDIT_REPLACE                30109
-   #define IDM_EDIT_GOTO                   30110
+   #define IDM_EDIT_UNDOFAST               30103
+   #define IDM_EDIT_REDOFAST               30104
+   #define IDM_EDIT_CUT                    30105
+   #define IDM_EDIT_COPY                   30106
+   #define IDM_EDIT_PASTE                  30107
+   #define IDM_EDIT_CLEAR                  30108
+   #define IDM_EDIT_SELECT_ALL             30109
+   #define IDM_EDIT_FIND                   30110
+   #define IDM_EDIT_REPLACE                30111
+   #define IDM_EDIT_GOTO                   30112
 
-   #define IDM_FORMAT_FONT                  30201
+   #define IDM_FORMAT_FONT                 30201
 
-   #define IDM_VIEW_ENTITIES                30301
-   #define IDM_VIEW_BOOKMARKS               30302
-   #define IDM_VIEW_NORMAL                  30303
-   #define IDM_VIEW_COLLAPSED               30304
+   #define IDM_VIEW_ENTITIES               30301
+   #define IDM_VIEW_BOOKMARKS              30302
+   #define IDM_VIEW_NORMAL                 30303
+   #define IDM_VIEW_COLLAPSED              30304
 
 
    #define IDM_WINDOW_NEXT                 30801
