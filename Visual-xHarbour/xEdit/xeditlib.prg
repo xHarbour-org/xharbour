@@ -4993,10 +4993,6 @@ METHOD xEditWindowProc( hWnd, nMsg, nwParam, nlParam ) CLASS EditorGUIDisplay
             RETURN 0
 
          CASE WM_CHAR
-            #ifdef VXH
-               :lModified := .T.
-            #endif
-
             :lAlt   := .F.
             :lCtrl  := .F.
             :lShift := .F.
@@ -9264,20 +9260,6 @@ METHOD Save( cFile, bAuto )  CLASS Editor
       END
    ENDIF
 
-/*
-   #ifdef VXH
-      IF Len( s_aEditors ) > 0
-         nEditorID := aScan( s_aEditors, Self, , , .T. )
-         cText     := Application:SourceTabs:GetItemText( nEditorID )
-         cText     := AllTrim( StrTran( cText, "*" ) )
-         Application:SourceTabs:SetItemText( nEditorID, cText, ::lModified )
-         Application:Props[ "EditUndoItem" ]:Enabled := Application:Props[ "EditUndoBttn" ]:Enabled := Len( ::aUnDo ) > 0
-         Application:Props[ "EditRedoItem" ]:Enabled := Application:Props[ "EditRedoBttn" ]:Enabled := Len( ::aReDo ) > 0
-      ENDIF
-   #endif
-*/
-   //TraceLog( "Saved" )
-
 RETURN Self
 
 METHOD Edit() CLASS Editor
@@ -9742,10 +9724,6 @@ METHOD OnKey( nKey, nCount ) CLASS Editor
    CATCH oError
       TraceLog( oError:Operation, oError:Description, oError:ProcName, oError:ProcLine )
    END
-
-   //#ifdef VXH
-      //Application:Project:EditReset(0)
-   //#endif
 
 RETURN Self
 
@@ -10645,9 +10623,7 @@ METHOD Action( aActions, aReverse ) CLASS Editor
             ::lModified := .T.
             //TraceLog( "YES" )
          ELSE
-            #ifndef VXH
-               ::lModified := .F.
-            #endif
+            ::lModified := .F.
             //TraceLog( "NO" )
          ENDIF
 

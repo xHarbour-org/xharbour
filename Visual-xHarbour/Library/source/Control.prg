@@ -480,6 +480,7 @@ METHOD Redock() CLASS Control
       //::ExStyle     := ::BackInfo[12]
       //::SetWindowLong( GWL_STYLE, ::Style )
       //::SetWindowLong( GWL_EXSTYLE, ::ExStyle )
+      ::Hide()
 
       SetParent( ::hWnd, ::BackInfo[13] )
       ::xLeft        := ::BackInfo[ 5]
@@ -489,14 +490,6 @@ METHOD Redock() CLASS Control
 
       ::ClientWidth := ::BackInfo[ 9]
       ::ClientHeight:= ::BackInfo[10]
-      
-      TRY
-         IF ::Parent:MDIClient != NIL
-            ::Parent:MDIClient:AlignLeft   := ::BackInfo[14][1]
-            ::Parent:MDIClient:AlignBottom := ::BackInfo[14][2]
-         ENDIF
-       CATCH
-      END
       
       IF ::BackInfo[ 1] != NIL
          o := Splitter( ::Parent )
@@ -526,7 +519,6 @@ METHOD Redock() CLASS Control
          o:Position := ::BackInfo[4]:Position
          o:Create()
       ENDIF
-
       ::SetWindowPos(, ::xLeft, ::xTop, ::xWidth, ::xHeight, SWP_DRAWFRAME | SWP_FRAMECHANGED | SWP_NOSENDCHANGING )
 
       ::BackInfo := NIL
@@ -540,6 +532,20 @@ METHOD Redock() CLASS Control
       NEXT
       EndDeferWindowPos( hDef )
       ::__DockParent := NIL
+
+      TRY
+         IF ::Parent:MDIClient != NIL
+            ::Parent:MDIClient:AlignLeft   := ::BackInfo[14][1]
+            ::Parent:MDIClient:AlignTop    := ::BackInfo[14][2]
+            ::Parent:MDIClient:AlignRight  := ::BackInfo[14][3]
+            ::Parent:MDIClient:AlignBottom := ::BackInfo[14][4]
+         ENDIF
+       CATCH
+      END
+      ::Show()
+      
+
+      ExecuteEvent( "OnRedock", Self )
    ENDIF
 RETURN Self
 
@@ -563,6 +569,9 @@ METHOD Undock() CLASS Control
          ENDIF
          IF ::Parent:MDIClient:AlignBottom == Self
             ::Parent:MDIClient:AlignBottom := ::Dock:Bottom
+         ENDIF
+         IF ::Parent:MDIClient:AlignRight == Self
+            ::Parent:MDIClient:AlignRight := NIL
          ENDIF
       ENDIF
 
@@ -615,6 +624,7 @@ METHOD Undock() CLASS Control
           ENDIF
       NEXT
       EndDeferWindowPos( hDef )
+      ExecuteEvent( "OnUndock", Self )
    ENDIF
   
 RETURN Self

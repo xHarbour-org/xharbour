@@ -4984,6 +4984,8 @@ FUNCTION aEvents()
                             { "OnClick"            , "", "" },;
                             { "OnCancel"           , "", "" },;
                             { "OnClose"            , "", "" },;
+                            { "OnUndock"           , "", "" },;
+                            { "OnRedock"           , "", "" },;
                             { "OnCommand"          , "", "" },;
                             { "OnOk"               , "", "" },;
                             { "OnNotify"           , "", "" },;
