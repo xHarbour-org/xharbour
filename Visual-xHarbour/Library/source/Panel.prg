@@ -41,7 +41,6 @@ ENDCLASS
 
 METHOD OnEraseBkGnd( hDC ) CLASS Panel
    IF ::Transparent
-      VIEW ::__hBrush
       IF ::__hBrush != NIL
          _FillRect( hDC, _GetClientRect( ::hWnd ), ::__hBrush )
          RETURN 1

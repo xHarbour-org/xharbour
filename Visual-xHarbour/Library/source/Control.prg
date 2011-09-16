@@ -151,7 +151,6 @@ METHOD Create( hParent ) CLASS Control
                                   "OnChangeCbChain",;
                                   "OnDrawClipboard",;
                                   "OnCancel",;
-                                  "OnClose",;
                                   "OnCommand",;
                                   "OnOk",;
                                   "OnSysCommand",;
