@@ -85,7 +85,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 
 METHOD __SetImageName( cFile ) CLASS Animation
-   LOCAL n, cType, cPrev
+   LOCAL cType, cPrev
    IF VALTYPE( cFile ) == "A"
       cFile := IIF( ::__ClassInst != NIL .AND. VALTYPE( cFile[1] ) == "C", cFile[1], cFile[2] )
    ENDIF

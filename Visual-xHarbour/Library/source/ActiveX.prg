@@ -177,14 +177,14 @@ METHOD Init( oParent ) CLASS ActiveX
 
 RETURN Self
 
-METHOD OnGetDlgCode( msg ) CLASS ActiveX
+METHOD OnGetDlgCode() CLASS ActiveX
 RETURN DLGC_WANTMESSAGE | DLGC_WANTALLKEYS
 
 //----------------------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS ActiveX
    EXTERN CreateActiveX
 
-   LOCAL nStatus, o, cId, n, oServer, cHandle, cEvent, oApp, ProgID, hEventHandler := {=>}
+   LOCAL nStatus, cId, oServer, cHandle, cEvent, hEventHandler := {=>}
 
    DEFAULT ::ClsID TO ::ProgID
 
@@ -264,8 +264,6 @@ METHOD Create() CLASS ActiveX
 RETURN Self
 
 METHOD OnDestroy() CLASS ActiveX
-   LOCAL n
-
    IF ::oServer != NIL
       ::oServer:DisconnectEvents()
    ENDIF
@@ -303,7 +301,7 @@ METHOD __OpExactEqual( oObj ) CLASS ActiveX
 RETURN lRet
 
 METHOD __GetObjProp( oObj ) CLASS ActiveX
-   LOCAL n, Interface, cArg, Arg, cHandle, Property, Enumeration, Object, Constant, xVal, cProp, o, xVal2, lReadOnly, xVal3
+   LOCAL n, cArg, Property, xVal, cProp, o, xVal2, lReadOnly
    LOCAL __OleVars := {=>}
    WITH OBJECT oObj
       FOR EACH Property IN :Properties
@@ -353,7 +351,7 @@ METHOD __GetObjProp( oObj ) CLASS ActiveX
 RETURN __OleVars
 
 METHOD __GetEventList( lVars ) CLASS ActiveX
-   LOCAL Event, n, Interface, cArg, Arg, cHandle, Property, Enumeration, Object, Constant, xVal, cProp, o, xVal2, lReadOnly
+   LOCAL Event, Interface, cArg, Arg
    IF ::__ClassInst != NIL
 
       DEFAULT ::ClsID TO ::ProgID
@@ -406,7 +404,7 @@ METHOD __GetEventList( lVars ) CLASS ActiveX
 RETURN Self
 
 METHOD SetStyle( nStyle, lAdd ) CLASS ActiveX
-   LOCAL nSt, cStyle := "", n
+   LOCAL cStyle := ""
    DEFAULT lAdd TO .T.
    IF ::IsWindow()
       ::Style := ::GetWindowLong( GWL_STYLE )
@@ -444,8 +442,8 @@ RETURN self
 
 
 METHOD ShowPropertiesDialog( hWnd, lShow ) CLASS ActiveX
-   LOCAL n, cProp, oItem, lChanged := .F.
-   LOCAL Property, IUnknown, IDispatch, oOle, hAtl, oServer, xVal, xValue
+   LOCAL cProp, oItem, lChanged := .F.
+   LOCAL IUnknown, IDispatch, oOle, hAtl, xValue
    DEFAULT lShow TO .T.
 
    hAtl            := CreateWindowEx( 0, "AtlAxWin", ::ClsID, WS_CHILD, 0, 0, 0, 0, hWnd, 101, ::AppInstance, NIL )
@@ -535,7 +533,7 @@ RETURN lReg
 
 
 FUNCTION GetRegOleBmp( cID )
-   LOCAL n, hKey, cBmp, hBmp, aBmp
+   LOCAL cBmp, hBmp, aBmp
    cBmp := GetOleIcon( cID )
    IF Empty( cBmp )
       RETURN NIL
@@ -547,13 +545,11 @@ FUNCTION GetRegOleBmp( cID )
 RETURN hBmp
 
 FUNCTION GetRegOle()
-   LOCAL lControl, i, n, hKey, aBmp, cProg, iPos, hSub, nPos, cKey, cSub, cDes, cBmp, hBmp, cVer, hVer, hDes, cPath, hPath, aOle := {}
-   aOle := EnumRegDLL()
+   LOCAL aOle := EnumRegDLL()
    aSort( aOle,,,{|x, y| UPPER(x[1]) < UPPER(y[1])})
 RETURN aOle
 
 FUNCTION IsDotNet( cFrameworkPath, cVersion )
-   LOCAL hKey, nAt
    cVersion       := ""
 /*
    IF RegOpenKeyEx( HKEY_LOCAL_MACHINE, "Software\Microsoft\ASP.NET", 0, KEY_ALL_ACCESS, @hKey ) == 0
@@ -578,7 +574,7 @@ FUNCTION IsDotNet( cFrameworkPath, cVersion )
 RETURN .T.
 
 FUNCTION RegisterDotNetComponent( cDotNetDLL, cProgId, cError )
-   LOCAL cFrameworkPath, cVersion, lUnregister, cRun, lResult, cPath, cGAC := "C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\Bin\gacutil.exe"
+   LOCAL cFrameworkPath, lUnregister, cRun, lResult, cGAC := "C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\Bin\gacutil.exe"
 
    IF cProgId == "UNREGISTER"
       lUnregister := .T.

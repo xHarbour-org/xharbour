@@ -29,7 +29,6 @@ ENDCLASS
 //------------------------------------------------------------------------------------------
 
 METHOD Init() CLASS ResourceManager
-   LOCAL lProp
    DEFAULT ::__xCtrlName  TO "ResourceManager"
    ::Super:Init( ::Application:MainForm )
    ::Create()
@@ -50,7 +49,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD OnInitDialog() CLASS ResourceManager
-   LOCAL oItem, oSub, n, aRect, Column, cResName, cType, aFile
+   LOCAL n, cResName, cType, aFile
    ::CenterWindow( .T. )
    ::RestoreLayout(, "WindowPosition")
    DirChange( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Resource )
@@ -172,7 +171,7 @@ METHOD OnInitDialog() CLASS ResourceManager
 RETURN NIL
 
 METHOD AddResource() CLASS ResourceManager
-   LOCAL hBmp, oData, nCount, nWidth, n, cFile, lCopy, cResName, cType, oFile := CFile( "" )
+   LOCAL cFile, lCopy, cResName, cType, oFile := CFile( "" )
 
    oFile:AllowMultiSelect := .T.
    oFile:OpenDialog()
@@ -224,8 +223,6 @@ METHOD AddResource() CLASS ResourceManager
 RETURN Self
 
 METHOD DeleteResource() CLASS ResourceManager
-   LOCAL oData, nCount, nWidth, n
-   
    ::DataGrid1:DataSource:Delete()
    ::DataGrid1:Update()
 

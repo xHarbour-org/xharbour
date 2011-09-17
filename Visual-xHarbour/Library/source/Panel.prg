@@ -51,7 +51,6 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 
 METHOD Init( oParent ) CLASS Panel
-   LOCAL n
    DEFAULT ::__xCtrlName TO "Panel"
    ::ClsName      := "PanelBox"
    ::StaticEdge   := .F.

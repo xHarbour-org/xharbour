@@ -6,7 +6,6 @@
    #define VXH_PROFESSIONAL
 #endif
 
-STATIC cCurFolder
 STATIC lSplash := .F.
 
 static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
@@ -85,7 +84,6 @@ INIT PROCEDURE __VXH_Start
 RETURN
 
 PROCEDURE Main( cFile )
-   LOCAL cError
    SET CENTURY ON
    SET AUTOPEN OFF
 
@@ -168,7 +166,7 @@ CLASS IDE INHERIT Application
 ENDCLASS
 
 METHOD SetEditorPos( nLine, nColumn ) CLASS IDE
-   LOCAL cCol, cLine, oForm
+   LOCAL cCol, cLine
    cLine := "Row: "+ XSTR( nLine )
    cCol  := "Col: "+ XSTR( nColumn )
 
@@ -181,7 +179,7 @@ METHOD SetEditorPos( nLine, nColumn ) CLASS IDE
 RETURN Self
 
 METHOD Init( cFile ) CLASS IDE
-   LOCAL aEntries, x, n, aIni
+   LOCAL aEntries, n
    PUBLIC aChangedProps
 
    m->aChangedProps := {}
@@ -341,7 +339,7 @@ CLASS IDE_MainForm FROM WinForm
    METHOD OnNavigateError()
 ENDCLASS
 
-METHOD OnNavigateError( Sender, pDisp, URL, Frame, StatusCode, Cancel ) CLASS IDE_MainForm
+METHOD OnNavigateError( Sender /*, pDisp, URL, Frame, StatusCode, Cancel*/ ) CLASS IDE_MainForm
    LOCAL cBuffer := '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">' + CRLF +;
                     '<body scroll="no">'  + CRLF +;
                     '<html>' + CRLF +;
@@ -388,7 +386,7 @@ METHOD OnTimer( nId ) CLASS IDE_MainForm
 RETURN NIL
 
 METHOD OnClose() CLASS IDE_MainForm
-   LOCAL aSize, pWp, pObject, pObjParent, hKey, cName, cType, xData, n, aVal, hSub, aIni
+   LOCAL aSize, pWp, hKey, cName, cType, xData, n, aVal, hSub
    IF !::Application:Project:Close()
       RETURN 0
    ENDIF
@@ -457,6 +455,7 @@ RETURN NIL
 
 METHOD OnUserMsg( hWnd, nMsg, nwParam ) CLASS IDE_MainForm
    LOCAL nNext, aEntries
+   HB_SYMBOL_UNUSED( hWnd )
    DO CASE
       CASE nMsg == WM_USER + 3000
            nNext := MIN( nwParam + 1, LEN( ::Application:Project:Forms ) )
@@ -499,9 +498,7 @@ RETURN NIL
 
 
 METHOD Init() CLASS IDE_MainForm
-
-   LOCAL aButtons, aButton, oBtn, oSplash, o, cIcon, n, oItem, nIndex, x, oPtr, hBmp, aEntries, cProject, nId, lMembers, cVersion
-   LOCAL oDlg, lProp, lPProp, nLeft, nTop, nWidth, nHeight, nShow, oWnd, cText, aText, nIcon, nStyle, oLink, nBkHeight, oObj
+   LOCAL o, n, oItem, x, aEntries, cProject, cVersion, oLink, nBkHeight
 
    ::Super:Init()
    #ifdef VXH_DEMO
@@ -624,7 +621,7 @@ METHOD Init() CLASS IDE_MainForm
                :ShortCutKey:Ctrl  := .T.
                :ShortCutKey:Shift := .T.
                :ShortCutKey:Key   := ASC( "N" )
-               :Action            := {|o| ::Application:Project:New() }
+               :Action            := {|| ::Application:Project:New() }
                :Create()
             END
 
@@ -634,7 +631,7 @@ METHOD Init() CLASS IDE_MainForm
                :ShortCutText      := "Ctrl+N"
                :ShortCutKey:Ctrl  := .T.
                :ShortCutKey:Key   := ASC( "N" )
-               :Action            := {|o|::Application:Project:NewSource() }
+               :Action            := {||::Application:Project:NewSource() }
                :Create()
             END
 
@@ -681,7 +678,7 @@ METHOD Init() CLASS IDE_MainForm
                :ShortCutKey:Ctrl  := .T.
                :ShortCutKey:Shift := .T.
                :ShortCutKey:Key   := ASC( "O" )
-               :Action            := {|o|::Application:Project:Open() }
+               :Action            := {||::Application:Project:Open() }
                :Create()
             END
             WITH OBJECT ::Application:Props[ "FileOpenItem" ] := MenuStripItem( :this )
@@ -690,7 +687,7 @@ METHOD Init() CLASS IDE_MainForm
                :ShortCutText      := "Ctrl+O"
                :ShortCutKey:Ctrl  := .T.
                :ShortCutKey:Key   := ASC( "O" )
-               :Action            := {|o|::Application:Project:OpenSource() }
+               :Action            := {||::Application:Project:OpenSource() }
                :Create()
             END
          END
@@ -727,7 +724,7 @@ METHOD Init() CLASS IDE_MainForm
             WITH OBJECT ::Application:AddSourceMenu := MenuStripItem( :this )
                :Caption    := "&Selected Program"
                :ImageIndex := 0
-               :Action := {|o|::Application:Project:AddSource() }
+               :Action := {||::Application:Project:AddSource() }
                :Enabled    := .F.
                :Create()
             END
@@ -736,7 +733,7 @@ METHOD Init() CLASS IDE_MainForm
                :Caption    := "&Binary Files (*.lib, *.obj)"
                :ImageIndex := 0
                :BeginGroup := .T.
-               :Action     := {|o|::Application:Project:AddBinary() }
+               :Action     := {||::Application:Project:AddBinary() }
                :Create()
             END
 
@@ -744,7 +741,7 @@ METHOD Init() CLASS IDE_MainForm
                :BeginGroup := .T.
                :ImageIndex := 0
                :Caption    := "&Project Resources"
-               :Action     := {|o| ::Application:Project:ImportImages() }
+               :Action     := {|| ::Application:Project:ImportImages() }
                :Create()
             END
 
@@ -753,7 +750,7 @@ METHOD Init() CLASS IDE_MainForm
          WITH OBJECT ::Application:RemoveSourceMenu := MenuStripItem( :this )
             :Caption    := "&Remove from project"
             :ImageIndex := 0
-            :Action     := {|o|::Application:Project:RemoveSource() }
+            :Action     := {||::Application:Project:RemoveSource() }
             :Enabled    := .F.
             :Create()
          END
@@ -762,7 +759,7 @@ METHOD Init() CLASS IDE_MainForm
             :Begingroup := .T.
             :Caption    := "&Exit"
             :ImageIndex := 0
-            :Action     := {|o|::Application:MainForm:Close() }
+            :Action     := {||::Application:MainForm:Close() }
             :Create()
          END
 
@@ -931,7 +928,7 @@ METHOD Init() CLASS IDE_MainForm
             :ImageIndex   := IIF( :Parent:ImageList != NIL, :Parent:ImageList:Count, 0 )
             :BeginGroup   := .T.
             :Caption      := "Registered COM Objects"
-            :Action       := {|o| ::Application:Project:AddActiveX() }
+            :Action       := {|| ::Application:Project:AddActiveX() }
             :ShortCutText := "F11"
             :ShortCutKey:Key := VK_F11
             #ifndef VXH_PROFESSIONAL
@@ -965,7 +962,7 @@ METHOD Init() CLASS IDE_MainForm
             :ShortCutText := "Ctrl+S"
             :ShortCutKey:Ctrl := .T.
             :ShortCutKey:Key  := ASC( "S" )
-            :Action       := {|o| ::Application:Project:Save(.T.) }
+            :Action       := {|| ::Application:Project:Save(.T.) }
             :Enabled      := .F.
             :Create()
          END
@@ -976,14 +973,14 @@ METHOD Init() CLASS IDE_MainForm
             :ShortCutKey:Ctrl  := .T.
             :ShortCutKey:Shift := .T.
             :ShortCutKey:Key   := ASC( "B" )
-            :Action            := {|o| ::Application:Project:Build( .T. ) }
+            :Action            := {|| ::Application:Project:Build( .T. ) }
             :Enabled           := .F.
             :Create()
          END
          WITH OBJECT ::Application:Props[ "RunItem" ] := MenuStripItem( :this )
             :ImageIndex := 18
             :Caption    := "Run"
-            :Action     := {|o| ::Application:Project:Run( .T. ) }
+            :Action     := {|| ::Application:Project:Run( .T. ) }
             :Enabled    := .F.
             :Create()
          END
@@ -1033,7 +1030,7 @@ METHOD Init() CLASS IDE_MainForm
          :ImageIndex   := 26
          :ToolTip:Text := "New"
          :DropDown     := 2
-         :Action       := {|o| ::Application:Project:New() }
+         :Action       := {|| ::Application:Project:New() }
          :ImageList    := :Parent:ImageList
          :Create()
 
@@ -1044,7 +1041,7 @@ METHOD Init() CLASS IDE_MainForm
             :ShortCutKey:Ctrl  := .T.
             :ShortCutKey:Shift := .T.
             :ShortCutKey:Key   := ASC( "N" )
-            :Action            := {|o| ::Application:Project:New() }
+            :Action            := {|| ::Application:Project:New() }
             :Create()
          END
 
@@ -1054,7 +1051,7 @@ METHOD Init() CLASS IDE_MainForm
             :ShortCutText      := "Ctrl+N"
             :ShortCutKey:Ctrl  := .T.
             :ShortCutKey:Key   := ASC( "N" )
-            :Action            := {|o|::Application:Project:NewSource() }
+            :Action            := {||::Application:Project:NewSource() }
             :Create()
          END
 
@@ -1092,7 +1089,7 @@ METHOD Init() CLASS IDE_MainForm
       WITH OBJECT ::Application:Props[ "OpenBttn" ] := ToolStripButton( :this )
          :ImageIndex   := ::System:StdIcons:FileOpen
          :ToolTip:Text := "Open"
-         :Action       := {|o|::Application:Project:Open() }
+         :Action       := {||::Application:Project:Open() }
          :DropDown     := 2
          :Create()
          aEntries := ::Application:IniFile:GetEntries( "Recent" )
@@ -1109,7 +1106,7 @@ METHOD Init() CLASS IDE_MainForm
       WITH OBJECT ::Application:Props[ "CloseBttn" ] := ToolStripButton( :this )
          :ImageIndex   := 16
          :ToolTip:Text := "Close"
-         :Action       := {|o|::Application:Project:Close() }
+         :Action       := {||::Application:Project:Close() }
          :Enabled      := .F.
          :Create()
       END
@@ -1117,7 +1114,7 @@ METHOD Init() CLASS IDE_MainForm
       WITH OBJECT ::Application:Props[ "SaveBttn" ] := ToolStripButton( :this )
          :ImageIndex   := ::System:StdIcons:FileSave
          :ToolTip:Text := "Save"
-         :Action       := {|o|::Application:Project:Save(.T.) }
+         :Action       := {||::Application:Project:Save(.T.) }
          :Enabled      := .F.
          :Create()
       END
@@ -1134,7 +1131,7 @@ METHOD Init() CLASS IDE_MainForm
       WITH OBJECT ::Application:Props[ "EditCopyBttn" ] := ToolStripButton( :this )
          :ImageIndex   := ::System:StdIcons:Copy
          :ToolTip:Text := "Copy"
-         :Action       := {|o| ::Application:Project:EditCopy() }
+         :Action       := {|| ::Application:Project:EditCopy() }
          :Enabled      := .F.
          :Create()
       END
@@ -1142,7 +1139,7 @@ METHOD Init() CLASS IDE_MainForm
       WITH OBJECT ::Application:Props[ "EditCutBttn" ] := ToolStripButton( :this )
          :ImageIndex   := ::System:StdIcons:Cut
          :ToolTip:Text := "Cut"
-         :Action       := {|o|::Application:Project:EditCut() }
+         :Action       := {||::Application:Project:EditCut() }
          :Enabled      := .F.
          :Create()
       END
@@ -1150,7 +1147,7 @@ METHOD Init() CLASS IDE_MainForm
       WITH OBJECT ::Application:Props[ "EditPasteBttn" ] := ToolStripButton( :this )
          :ImageIndex   := ::System:StdIcons:Paste
          :ToolTip:Text := "Paste"
-         :Action       := {|o| ::Application:Project:EditPaste() }
+         :Action       := {|| ::Application:Project:EditPaste() }
          :Enabled      := .F.
          :Create()
       END
@@ -1158,7 +1155,7 @@ METHOD Init() CLASS IDE_MainForm
       WITH OBJECT ::Application:Props[ "EditDelBttn" ] := ToolStripButton( :this )
          :ImageIndex   := ::System:StdIcons:Delete
          :ToolTip:Text := "Delete"
-         :Action       := {|o| ::Application:Project:EditDelete() }
+         :Action       := {|| ::Application:Project:EditDelete() }
          :Enabled      := .F.
          :Create()
       END
@@ -1167,7 +1164,7 @@ METHOD Init() CLASS IDE_MainForm
          :ImageIndex   := ::System:StdIcons:Undo
          :ToolTip:Text := "Undo"
          :BeginGroup   := .T.
-         :Action       := {|o| ::Application:Project:UnDo() }
+         :Action       := {|| ::Application:Project:UnDo() }
          :Enabled      := .F.
          :Create()
       END
@@ -1175,7 +1172,7 @@ METHOD Init() CLASS IDE_MainForm
       WITH OBJECT ::Application:Props[ "EditRedoBttn" ] := ToolStripButton( :this )
          :ImageIndex   := ::System:StdIcons:Redo
          :ToolTip:Text := "Redo"
-         :Action       := {|o| ::Application:Project:ReDo() }
+         :Action       := {|| ::Application:Project:ReDo() }
          :Enabled      := .F.
          :Create()
       END
@@ -1195,7 +1192,7 @@ METHOD Init() CLASS IDE_MainForm
          :ImageIndex      := 18
          :ToolTip:Text    := "Save / Build & Run (F5)"
          :ShortCutKey:Key := VK_F5
-         :Action          := {|o|::Application:Project:Run() }
+         :Action          := {||::Application:Project:Run() }
          :DropDown        := 2
          :Enabled         := .F.
          :ImageList       := :Parent:ImageList
@@ -1205,27 +1202,27 @@ METHOD Init() CLASS IDE_MainForm
             :ImageIndex   := ::System:StdIcons:FileSave
             :ShortCutText := "Ctrl+S"
             :Caption      := "Save"
-            :Action       := {|o| ::Application:Project:Save() }
+            :Action       := {|| ::Application:Project:Save() }
             :Create()
          END
          WITH OBJECT ::Application:Props[ "ProjBuildItem" ] := MenuStripItem( :this )
             :ImageIndex   := 25
             :Caption      := "Build"
-            :Action       := {|o| ::Application:Project:Build() }
+            :Action       := {|| ::Application:Project:Build() }
             :Enabled      := .F.
             :Create()
          END
          WITH OBJECT ::Application:Props[ "ProjRunItem" ] := MenuStripItem( :this )
             :ImageIndex := 18
             :Caption := "Run"
-            :Action  := {|o| ::Application:Project:Run( .T. ) }
+            :Action  := {|| ::Application:Project:Run( .T. ) }
             :Create()
          END
 
       END
 
       WITH OBJECT ToolStripComboBox( :this )
-         :Action := {|o|::Application:RunMode := o:GetCurSel()-1 }
+         :Action := {||::Application:RunMode := o:GetCurSel()-1 }
          :Create()
          :AddItem( "Debug" )
          :AddItem( "Release" )
@@ -1254,7 +1251,7 @@ METHOD Init() CLASS IDE_MainForm
       WITH OBJECT ::Application:Props[ "NewFormBttn" ] := ToolStripButton( :this )
          :ImageIndex   := 2
          :ToolTip:Text := "New Form"
-         :Action       := {|o| ::Application:Project:AddWindow() }
+         :Action       := {|| ::Application:Project:AddWindow() }
          :Enabled      := .F.
          :Create()
       END
@@ -1275,21 +1272,21 @@ METHOD Init() CLASS IDE_MainForm
       WITH OBJECT ToolStripButton( :this )
          :ImageIndex   := 5
          :ToolTip:Text := "Align Lefts"
-         :Action       := {|o|::Application:Project:AlignLefts() }
+         :Action       := {||::Application:Project:AlignLefts() }
          :Enabled      := .F.
          :Create()
       END
       WITH OBJECT ToolStripButton( :this )
          :ImageIndex   := 3
          :ToolTip:Text := "Align Centers"
-         :Action       := {|o|::Application:Project:AlignCenters() }
+         :Action       := {||::Application:Project:AlignCenters() }
          :Enabled      := .F.
          :Create()
       END
       WITH OBJECT ToolStripButton( :this )
          :ImageIndex   := 6
          :ToolTip:Text := "Align Rights"
-         :Action       := {|o|::Application:Project:AlignRights() }
+         :Action       := {||::Application:Project:AlignRights() }
          :Enabled      := .F.
          :Create()
       END
@@ -1297,21 +1294,21 @@ METHOD Init() CLASS IDE_MainForm
          :BeginGroup   := .T.
          :ImageIndex   := 2
          :ToolTip:Text := "Align Tops"
-         :Action       := {|o|::Application:Project:AlignTops() }
+         :Action       := {||::Application:Project:AlignTops() }
          :Enabled      := .F.
          :Create()
       END
       WITH OBJECT ToolStripButton( :this )
          :ImageIndex   := 4
          :ToolTip:Text := "Align Middles"
-         :Action       := {|o|::Application:Project:AlignMiddles() }
+         :Action       := {||::Application:Project:AlignMiddles() }
          :Enabled      := .F.
          :Create()
       END
       WITH OBJECT ToolStripButton( :this )
          :ImageIndex   := 1
          :ToolTip:Text := "Align Bottoms"
-         :Action       := {|o|::Application:Project:AlignBottom() }
+         :Action       := {||::Application:Project:AlignBottom() }
          :Enabled      := .F.
          :Create()
       END
@@ -1320,7 +1317,7 @@ METHOD Init() CLASS IDE_MainForm
          :BeginGroup   := .T.
          :ImageIndex   := 7
          :ToolTip:Text := "Make Same Width"
-         :Action       := {|o|::Application:Project:SameWidth() }
+         :Action       := {||::Application:Project:SameWidth() }
          :Enabled      := .F.
          :Create()
       END
@@ -1328,7 +1325,7 @@ METHOD Init() CLASS IDE_MainForm
       WITH OBJECT ToolStripButton( :this )
          :ImageIndex   := 8
          :ToolTip:Text := "Make Same Height"
-         :Action       := {|o|::Application:Project:SameHeight() }
+         :Action       := {||::Application:Project:SameHeight() }
          :Enabled      := .F.
          :Create()
       END
@@ -1336,7 +1333,7 @@ METHOD Init() CLASS IDE_MainForm
       WITH OBJECT ToolStripButton( :this )
          :ImageIndex   := 9
          :ToolTip:Text := "Make Same Size"
-         :Action       := {|o|::Application:Project:SameSize() }
+         :Action       := {||::Application:Project:SameSize() }
          :Enabled      := .F.
          :Create()
       END
@@ -1345,7 +1342,7 @@ METHOD Init() CLASS IDE_MainForm
          :ImageIndex   := 11
          :BeginGroup   := .T.
          :ToolTip:Text := "Center Horizontally"
-         :Action       := {|o|::Application:Project:CenterHorizontally() }
+         :Action       := {||::Application:Project:CenterHorizontally() }
          :Enabled      := .F.
          :Create()
       END
@@ -1353,7 +1350,7 @@ METHOD Init() CLASS IDE_MainForm
       WITH OBJECT ::Application:Props[ "CenterVerBttn" ] := ToolStripButton( :this )
          :ImageIndex   := 10
          :ToolTip:Text := "Center Vertically"
-         :Action       := {|o|::Application:Project:CenterVertically() }
+         :Action       := {||::Application:Project:CenterVertically() }
          :Enabled      := .F.
          :Create()
       END
@@ -1362,7 +1359,7 @@ METHOD Init() CLASS IDE_MainForm
          :ImageIndex   := 12
          :BeginGroup   := .T.
          :ToolTip:Text := "Tab Order"
-         :Action       := {|o|::Application:Project:TabOrder(o) }
+         :Action       := {||::Application:Project:TabOrder(o) }
          :Role         := 2
          :Enabled      := .F.
          :Create()
@@ -1377,7 +1374,7 @@ METHOD Init() CLASS IDE_MainForm
       :Flat             := .T.
       :AllowUndock      := .T.
       :AllowClose       := .T.
-      :OnWMClose        := {|o| o:Redock() }
+      :OnWMClose        := {|| o:Redock() }
       :OnWMClose        := {|o| IIF( o:IsDocked, (o:Hide(), ::Application:Props[ "ViewToolBoxItem" ]:Checked := .F. ), o:Redock() ) }
 
       :Width            := Round( ( :Parent:ClientWidth*::Application:Sizes["ToolBoxWidth"])/100,0)
@@ -1689,8 +1686,6 @@ METHOD Init() CLASS IDE_MainForm
       END
 
       WITH OBJECT TabPage( :this )
-         //:BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd
-         //:OnWMThemeChanged := {|o| o:BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd}
          :Caption := "Log"
          :Create()
          WITH OBJECT ::Application:BuildLog := EditBox( :this )
@@ -1750,15 +1745,13 @@ METHOD Init() CLASS IDE_MainForm
       :Dock:Right  := ::Panel1
       :Dock:Bottom := ::Application:DebuggerPanel//::Panel2
 
-      :OnSelChanged := {|o,x,y| ::Application:Project:EditReset( IIF( y > 3, 1, 0 ) ),;
-                                ::Application:MainForm:ToolBox1:Enabled := y > 3,;
-                                ::Application:ObjectTree:Enabled := y > 3 }
+      :OnSelChanged := {|,,y| ::Application:Project:EditReset( IIF( y > 3, 1, 0 ) ),;
+                              ::Application:MainForm:ToolBox1:Enabled := y > 3,;
+                              ::Application:ObjectTree:Enabled := y > 3 }
       :Create()
 
       WITH OBJECT ::Application:Props[ "StartTabPage" ] := StartTabPage( :this )
          :Caption      := "Start Page"
-         //:BackColor    := ::System:CurrentScheme:ToolStripPanelGradientEnd
-         //:OnWMThemeChanged := {|o| o:BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd }
          :Create()
 
          WITH OBJECT StartPagePanel( :this )
@@ -1780,7 +1773,7 @@ METHOD Init() CLASS IDE_MainForm
                :Caption     := "Open a Project"
                :Left        := 30
                :Top         := :Parent:Height - 45
-               :Action      := {|o| ::Application:Project:Open() }
+               :Action      := {|| ::Application:Project:Open() }
                :Font:Bold   := .F.
                :Create()
             END
@@ -1791,7 +1784,7 @@ METHOD Init() CLASS IDE_MainForm
                :Left        := 30
                :Top         := :Parent:Height - 25
                :Transparent := .T.
-               :Action      := {|o| ::Application:Project:New() }
+               :Action      := {|| ::Application:Project:New() }
                :Font:Bold   := .F.
                :Create()
             END
@@ -1866,8 +1859,8 @@ METHOD Init() CLASS IDE_MainForm
 
       WITH OBJECT ::Application:EditorPage := TabPage( :this )
          :Caption          := "Source Code Editor"
-         :OnWMShowWindow   := {|o| OnShowEditors() }
-         :OnWMSetFocus     := {|o| ::Application:SourceEditor:SetFocus() }
+         :OnWMShowWindow   := {|| OnShowEditors() }
+         :OnWMSetFocus     := {|| ::Application:SourceEditor:SetFocus() }
 
          :Create()
 
@@ -1876,8 +1869,8 @@ METHOD Init() CLASS IDE_MainForm
             :Dock:Left        := :Parent
             :Dock:Bottom      := :Parent
             :Dock:Right       := :Parent
-            :OnSelChanged     := {|o,x,y| ::Application:Project:SourceTabChanged( x,y ) }
-            :OnWMSetFocus     := {|o| ::Application:SourceEditor:SetFocus() }
+            :OnSelChanged     := {|,x,y| ::Application:Project:SourceTabChanged( x,y ) }
+            :OnWMSetFocus     := {|| ::Application:SourceEditor:SetFocus() }
             :TabStop          := .F.
             :TabPosition      := 4
             :Visible          := .F.
@@ -1916,7 +1909,7 @@ METHOD Init() CLASS IDE_MainForm
             :Dock:Right       := :Parent
             :TabStop          := .F.
             :Visible          := .T.
-            :OnSelChanged     := {|o,x,y| ::Application:Project:SelectWindow( ::Application:Project:Forms[y],, .T. ) }
+            :OnSelChanged     := {|,,y| ::Application:Project:SelectWindow( ::Application:Project:Forms[y],, .T. ) }
             :TabPosition      := 4
             :BackColor        := ::System:CurrentScheme:ToolStripPanelGradientEnd
             :OnWMThemeChanged := {|o| o:BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd }
@@ -1975,6 +1968,7 @@ METHOD Init() CLASS IDE_MainForm
 RETURN Self
 
 METHOD KeyHook( nCode, nwParam, nlParam ) CLASS IDE_MainForm
+   HB_SYMBOL_UNUSED( nwParam )
    IF HiWord( nlParam ) & KF_UP == 0
       IF nwParam == VK_INSERT
          ::Application:InsKey := !::Application:InsKey
@@ -2011,11 +2005,14 @@ CLASS StartTabPage INHERIT TabPage
 ENDCLASS
 
 METHOD OnPaint( hDC, hMemDC ) CLASS StartTabPage
+   HB_SYMBOL_UNUSED( hDC )
    ::OnEraseBkGnd(, hMemDC )
 RETURN 0
 
 METHOD OnEraseBkGnd( hDC, hMemDC ) CLASS StartTabPage
    LOCAL hMemBitmap, hOldBitmap
+   HB_SYMBOL_UNUSED( hDC )
+
    IF hDC != NIL
       hMemDC     := CreateCompatibleDC( hDC )
       hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
@@ -2054,11 +2051,12 @@ CLASS StartPagePanel INHERIT Panel
 ENDCLASS
 
 METHOD OnPaint( hDC, hMemDC ) CLASS StartPagePanel
+   HB_SYMBOL_UNUSED( hDC )
    ::OnEraseBkGnd(, hMemDC )
 RETURN 0
 
 METHOD OnEraseBkGnd( hDC, hMemDC ) CLASS StartPagePanel
-   LOCAL oChild, hMemBitmap1, hOldBitmap1, hMemDC1
+   LOCAL oChild, hOldBitmap1, hMemDC1
    LOCAL hMemBitmap, hOldBitmap
    IF !::IsWindow()
       RETURN 0
@@ -2113,20 +2111,20 @@ RETURN 1
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
 
-FUNCTION OnShowDesigner(o)
+FUNCTION OnShowDesigner()
    LOCAL oApp := __GetApplication()
    IF oApp:Project:CurrentForm != NIL
       oApp:Project:EditReset(1)
    ENDIF
-   oApp:CloseMenu:Action  := {|o|oApp:Project:Close() }
+   oApp:CloseMenu:Action  := {||oApp:Project:Close() }
    oApp:CloseMenu:Caption := "&Close Project"
    oApp:CloseMenu:Enable()
 
-   oApp:SaveMenu:Action  := {|o|oApp:Project:Save() }
+   oApp:SaveMenu:Action  := {||oApp:Project:Save() }
    oApp:SaveMenu:Caption := "Save Project"
    oApp:SaveMenu:Enable()
 
-   oApp:SaveAsMenu:Action  := {|o|oApp:Project:SaveAs() }
+   oApp:SaveAsMenu:Action  := {||oApp:Project:SaveAs() }
    oApp:SaveAsMenu:Caption := "Save Project &As ..."
    oApp:SaveAsMenu:Enable()
 RETURN NIL
@@ -2145,19 +2143,19 @@ FUNCTION OnShowEditors()
 
       cFile := oApp:Project:CheckValidProgram()
 
-      oApp:CloseMenu:Action   := {|o|oApp:Project:CloseSource() }
+      oApp:CloseMenu:Action   := {||oApp:Project:CloseSource() }
       oApp:CloseMenu:Caption  := "Close " + cFile + " Source File"
 
-      oApp:SaveMenu:Action    := {|o|oApp:Project:SaveSource() }
+      oApp:SaveMenu:Action    := {||oApp:Project:SaveSource() }
       oApp:SaveMenu:Caption   := "Save " + cFile + " Source File"
 
-      oApp:SaveAsMenu:Action  := {|o|oApp:Project:SaveSourceAs(,.T.) }
+      oApp:SaveAsMenu:Action  := {||oApp:Project:SaveSourceAs(,.T.) }
       oApp:SaveAsMenu:Caption := "Save " + cFile + " Source File &As ..."
    ENDIF
 RETURN NIL
 
 FUNCTION SetControlCursor( oItem )
-   LOCAL cClass, n, hClass
+   LOCAL cClass, n
    LOCAL oApp := __GetApplication()
 
    oApp:MainForm:ToolBox1:ActiveItem := oItem
@@ -2201,7 +2199,6 @@ FUNCTION MakeGridTile( nxGrid, nyGrid, Width, Height)
    LOCAL cDotted
    LOCAL cEmpty
    LOCAL nBits
-   LOCAL nPos
    LOCAL i
 
    Width   := nWidth
@@ -2412,8 +2409,7 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 
 METHOD New() CLASS Project
-   LOCAL wcex, hWnd, pCallBackPtr, nProc, cProject
-   LOCAL n, o, cPath, cPro, cName, nPro, b
+   LOCAL cProject, cPath, cPro, cName, nPro
 
 //   n := 1 - b
 
@@ -2496,6 +2492,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 METHOD SourceTabChanged( nPrev, nCur ) CLASS Project
+   HB_SYMBOL_UNUSED( nPrev )
    IF nCur <= LEN( xEdit_GetEditors() )
       ::Application:SourceEditor:oEditor := xEdit_GetEditors()[ nCur ]
       ::Application:SourceEditor:oEditor:SetDisplay( ::Application:SourceEditor:oEditor:oDisplay, .T. )
@@ -2744,7 +2741,7 @@ METHOD SameSize() CLASS Project
 RETURN Self
 
 METHOD CenterHorizontally() CLASS Project
-   LOCAL x, n, aRect, nWidth, nDiff, aCenter, aCurRect := {}, aControls := {}
+   LOCAL x, n, aRect, nDiff, aCurRect := {}, aControls := {}
    aRect := ::CurrentForm:GetSelRect(.T.,.F.,.F.)
    x := aRect[1]
    aRect[1] := ( ::CurrentForm:Selected[1][1]:Parent:ClientWidth / 2 ) - ( ( aRect[3]-aRect[1] ) / 2 )
@@ -2770,7 +2767,7 @@ METHOD CenterHorizontally() CLASS Project
 RETURN Self
 
 METHOD CenterVertically() CLASS Project
-   LOCAL x, n, aRect, nWidth, nDiff, aCenter, aCurRect := {}, aControls := {}, nTop
+   LOCAL x, n, aRect, nDiff, aCurRect := {}, aControls := {}, nTop
 
    aRect := ::CurrentForm:GetSelRect(.T.,.F.,.F.)
    x := aRect[2]
@@ -2834,7 +2831,7 @@ METHOD TabOrder( oBtn ) CLASS Project
 RETURN Self
 
 METHOD ImportImages() CLASS Project
-   LOCAL oFile, cLine, hFile, aUnits, cFile
+   LOCAL oFile, cFile
    oFile := CFile( "" )
    oFile:AddFilter( "Visual xHarbour Project (*.vxh)", "*.vxh" )
    oFile:Flags := OFN_EXPLORER | OFN_FILEMUSTEXIST
@@ -2853,7 +2850,7 @@ METHOD ImportImages() CLASS Project
 RETURN Self
 
 METHOD ImportRes( cSource ) CLASS Project
-   LOCAL oFile, cLine, hFile, aUnits, cFile
+   LOCAL oFile, cFile
    DEFAULT cSource TO ""
    oFile := CFile( cSource )
    oFile:AddFilter( "Resource File (*.rc)", "*.rc" )
@@ -2871,7 +2868,7 @@ METHOD ImportRes( cSource ) CLASS Project
 RETURN Self
 
 METHOD ParseRC( cLine, aUnits ) CLASS Project
-   LOCAL n, cName, aRect, cText, aText
+   LOCAL n, cName, aRect, cText
 
    IF ( n := AT( "DIALOG", cLine ) ) > 0
       cName := ALLTRIM( LEFT( cLine, n-1 ) )
@@ -2942,7 +2939,7 @@ FUNCTION ProcessDefPaste()
 RETURN 0
 
 METHOD EditCopy() CLASS Project
-   LOCAL aSelection, oCtrl, aCtrlProps, aProperties, aProperty, cProp, xValue1, xValue2
+   LOCAL aSelection, oCtrl, aCtrlProps
    IF UPPER( GetClassName( GetFocus() ) ) == "EDIT"
       SendMessage( GetFocus(), WM_COPY, 0, 0 )
       RETURN NIL
@@ -3018,7 +3015,7 @@ FUNCTION SetCtrlProps( oObj, aProperties )
 RETURN NIL
 
 METHOD EditCut() CLASS Project
-   LOCAL aSelection, oCtrl, aCtrlProps, aProperties, aProperty, cProp, xValue1, xValue2
+   LOCAL aSelection, oCtrl, aCtrlProps
 
    IF UPPER( GetClassName( GetFocus() ) ) == "EDIT"
       SendMessage( GetFocus(), WM_CUT, 0, 0 )
@@ -3057,7 +3054,6 @@ METHOD EditCut() CLASS Project
 RETURN 0
 
 METHOD EditPaste() CLASS Project
-   LOCAL oControl, oChild, hCursor, nLeft, nTop, n, oCtrl, nX, nY, pt
    IF UPPER( GetClassName( GetFocus() ) ) == "EDIT"
       SendMessage( GetFocus(), WM_PASTE, 0, 0 )
       RETURN 0
@@ -3214,7 +3210,7 @@ RETURN 0
 //-------------------------------------------------------------------------------------------------------
 
 METHOD SelectBuffer() CLASS Project
-   LOCAL n, oModule, cBuffer, cText
+   LOCAL n
    ::Application:SourceEditor:oEditor := ::CurrentForm:Editor
    ::CurrentForm:Editor:SetDisplay( ::Application:SourceEditor:oEditor:oDisplay, .T. )
    IF ( n := aScan( xEdit_GetEditors(), ::CurrentForm:Editor, , , .T. ) ) > 0
@@ -3236,7 +3232,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 METHOD AddWindow( lReset, cFileName, lCustom ) CLASS Project
-   LOCAL n, oWin, oInst, aBeg, aEnd, nPos
+   LOCAL oWin
    DEFAULT lCustom TO .F.
    oWin := WindowEdit( ::Application:MainForm:FormEditor1, cFileName, lReset, lCustom )
 
@@ -3290,7 +3286,7 @@ RETURN oWin
 //-------------------------------------------------------------------------------------------------------
 
 METHOD Close( lCloseErrors ) CLASS Project
-   LOCAL nRes, oWnd, n, oMsg, lRem, ofn, cFile
+   LOCAL nRes, n, oMsg, lRem
    DEFAULT lCloseErrors TO .T.
 
    IF ::Modified .AND. !EMPTY( ::Properties ) .AND. lCloseErrors
@@ -3489,7 +3485,7 @@ METHOD SaveSource( oEditor ) CLASS Project
 RETURN Self
 
 METHOD SaveSourceAs( oEditor, lSetTabName ) CLASS Project
-   LOCAL ofn, cFile, cBuffer, n, x
+   LOCAL ofn, cFile, n, x
    DEFAULT oEditor TO ::Application:SourceEditor:oEditor
    DEFAULT lSetTabName TO .F.
 
@@ -3532,7 +3528,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD CloseSource() CLASS Project
-   LOCAL nPointer, nRes, n := ::Application:SourceTabs:GetCurSel()
+   LOCAL nRes, n := ::Application:SourceTabs:GetCurSel()
    nRes := IDNO
    IF ::Application:SourceEditor:oEditor:lModified
       nRes := MessageBox( 0, "Save changes before closing?", ::Application:SourceEditor:oEditor:cFile, MB_YESNOCANCEL | MB_ICONQUESTION )
@@ -3567,7 +3563,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 METHOD NewSource() CLASS Project
-   LOCAL oFile, n, oEditor
+   LOCAL oEditor
    ::Application:SourceEditor:Show()
    ::Application:SourceEditor:Enable()
    oEditor := Editor():New(,,,, , ::Application:SourceEditor:oEditor:oDisplay )
@@ -3678,7 +3674,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 METHOD AddBinary( cFile ) CLASS Project
-   LOCAL oFile, n, oEditor, c
+   LOCAL oFile, n, c
    IF cFile == NIL
       oFile := CFile( NIL )
       oFile:AddFilter( "Binary Files (*.lib,*.obj)", "*.lib;*.obj" )
@@ -3728,8 +3724,8 @@ METHOD Open( cProject ) CLASS Project
 
    EXTERN MDIChildWindow
 
-   LOCAL nStart, cStr, cBuffer, nLen, x, nPos, n, aXfm, Xfm, oFile, cToken, oWait, aChildren, oIni, lEmptyPath, aEntries, oItem, nId, cPrefix
-   LOCAL hFile, cLine, oErr, oEditor, cSource, oProject, cFile, nLine, aErrors, aEditors, aProps, aProp, cProp, cSourcePath
+   LOCAL n, Xfm, aChildren
+   LOCAL hFile, cLine, oEditor, cSource, oProject, cFile, nLine, aErrors, aEditors, cProp, cSourcePath
 
    IF cProject != NIL .AND. !FILE( cProject )
       MessageBox( GetActiveWindow(), "File Not Found", "Open Project", MB_ICONEXCLAMATION )
@@ -4004,12 +4000,13 @@ RETURN Self
 
 METHOD ParseXFM( cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors, oCC, lCustomOwner ) CLASS Project
 
-   LOCAL oErr, nRead, nPos, n, cParent, lFound, hPtr, c, nAxProp
-   LOCAL aTokens, nTokens, nToken, oFile, Topic, Event, cKey
+   LOCAL oErr, nRead, nPos, n, cParent, lFound, hPtr
+   LOCAL aTokens, nTokens, nToken, Topic, Event
    LOCAL cClassName, cObjectName, oParent, cEvent, cHandler, cProperty, cValue, xValue
-   LOCAL cWithObjName, cWithClassName, cWithProperty, cWithEvent, cWithHandler, cWithValue
-   LOCAL oWithObject, aoWithObjects := {}, cPropertyObject, lDialog := .F.
-   LOCAL oObj, nObj, oPrev, oForm, cSourcePath
+   LOCAL cWithClassName, cWithProperty, cWithEvent, cWithHandler, cWithValue
+   LOCAL aoWithObjects := {}, cPropertyObject, lDialog := .F.
+   LOCAL oObj, oPrev, oForm, cSourcePath
+   HB_SYMBOL_UNUSED( aEditors )
 
    DEFAULT lCustomOwner TO .F.
    TRY
@@ -4426,7 +4423,7 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 
 METHOD SaveAs( cName ) CLASS Project
-   LOCAL cPrevPath, cPath, n, aDir, cPrev, cCurr, cChar, oFile, lSave := .T., cSourcePath
+   LOCAL cPrevPath, cPath, cPrev, cCurr, cChar, oFile, lSave := .T., cSourcePath
 
    cPath := ::Properties:Path
    IF cName == NIL
@@ -4516,7 +4513,6 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    LOCAL n, cWindow := "", oFile, oForm
    LOCAL lNew := .F., aImage, aEditors, aChildEvents, nInsMetPos, cChildEvents, cEvent, cText, cPath, cBuffer, cResPath
    LOCAL aDir, x, xVersion, cType, cRc, cPrj, hFile, cLine, xPath, xName, lPro, i, cName, cResImg, cFile, cSourcePath, cPrevRes
-   LOCAL nSecs
    m->aChangedProps := {} // reset changed properties for bold text display
    ::Application:ObjectManager:InvalidateRect(, .F. )
 
@@ -4860,7 +4856,7 @@ RETURN Self
 
 // aResource = { { cFileName, cType, cResName } }
 FUNCTION AddResources( cExe, aResources )
-   LOCAL n, aRes, cBuffer, hFile, oFile, hResource := BeginUpdateResource( cExe, .T. )
+   LOCAL n, aRes, cBuffer, hFile, hResource := BeginUpdateResource( cExe, .T. )
    IF hResource != NIL .AND. hResource != 0
       FOR EACH aRes IN aResources
           IF FILE( aRes[1] )
@@ -4878,7 +4874,9 @@ RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD GenerateChild( oCtrl, nTab, aChildEvents, cColon, cParent, nID ) CLASS Project
-   LOCAL cText := "", oChild, Topic, Event, cProperty, cChar, n, cProp, cChild
+   LOCAL cText := "", oChild, Topic, Event, n, cProp, cChild
+   HB_SYMBOL_UNUSED( cColon )
+   HB_SYMBOL_UNUSED( nID )
    IF oCtrl:Caption != "[ Add New Item ]"
 
       IF !oCtrl:__CustomOwner
@@ -4978,8 +4976,8 @@ RETURN cText
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cText, cParent ) CLASS Project
-   LOCAL aProperties, aProperty, cProp, xValue1, xValue2, cProps, cVal
-   LOCAL oErr, lParent, cResImg, n, aIcon, cArray, x, nPos
+   LOCAL aProperties, aProperty, cProp, xValue1, xValue2, cProps
+   LOCAL lParent, cResImg, n, cArray, x
 
    DEFAULT cPrev TO ""
    DEFAULT cText TO ""
@@ -5161,7 +5159,7 @@ RETURN cText
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD ResetQuickOpen( cFile ) CLASS Project
-   LOCAL lMems, lMembers, aEntries, n, cProject, oItem, nId, nBkHeight, oLink, x, oMenu
+   LOCAL lMems, aEntries, n, cProject, oItem, nBkHeight, oLink, x
 
    aEntries := ::Application:IniFile:GetEntries( "Recent" )
    IF ! EMPTY( aEntries ) .AND. aEntries[1] == cFile
@@ -5294,9 +5292,8 @@ RETURN 0
 #define TYPE_HRB        13
 
 METHOD Build( lForce ) CLASS Project
-
-   LOCAL n, cProject, c, cExe, cResPath
-   LOCAL oProject, bErrorHandler, bProgress, oErr, oWnd, aResources, aImage, cTemp, lForm
+   LOCAL n, cProject, cExe, cResPath
+   LOCAL oProject, bErrorHandler, bProgress, oErr, oWnd, cTemp
    LOCAL lBuilt, cSource, cPath, oHrb, cControl, cBinPath, cSourcePath, cObjPath
 
    DEFAULT lForce TO .F.
@@ -5495,7 +5492,7 @@ METHOD Build( lForce ) CLASS Project
                              ::Application:MainForm:DebugBuild1:UpdateWindow(),;
                              ::Application:Yield() }
 
-      bErrorHandler := {|oError, cLog|GUI_ErrorGrid( oError, MEMOREAD( cProject + ".log" ) )}
+      bErrorHandler := {|oError|GUI_ErrorGrid( oError, MEMOREAD( cProject + ".log" ) )}
 
       lBuilt := oProject:Make( bErrorHandler, bProgress )
       IF EMPTY( ::Application:BuildLog:Caption )
@@ -5574,9 +5571,10 @@ RETURN .T.
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, nInsMetPos, lCustom ) CLASS Project
-   LOCAL aProperty, aProperties, cText, cProp, xValue1, xValue2, aProp1, aProp2, lObject, cObjProp, x, xObjVal1, xObjVal2
-   LOCAL oChild, nInst, nModule, Event, n, cResImg, Topic, oCtrl, cKey, nPos
-   LOCAL cProperty, cChar, cTempEvent, lCentered, aImg, cImg1, cImg2, cImg3, cImg4, cImg5
+   LOCAL cText
+   LOCAL oChild, Event, n, cResImg, Topic, oCtrl, nPos
+   LOCAL cProperty, cChar, aImg
+   HB_SYMBOL_UNUSED( lChildren )
 
    cText := "//------------------------------------------------------------------------------------------------------------------------------------" + CRLF
 
@@ -5790,14 +5788,13 @@ RETURN cText
 //-------------------------------------------------------------------------------------------------------
 #ifdef VXH_PROFESSIONAL
 METHOD AddActiveX() CLASS Project
-   LOCAL aActions, oDlg, n
-   oDlg := ListOle( ::Application:MainForm )
+   ListOle( ::Application:MainForm )
 RETURN Self
 #endif
 
 //-------------------------------------------------------------------------------------------------------
 METHOD SetAction( aActions, aReverse ) CLASS Project
-   LOCAL aObj, x, n, o, nPos, aChildren, aAction, aProperty, xValue1, xValue2, cProp, oCtrl, aCtrlProps, aProperties, xProp, nWidth, nHeight, nCont, aRect, oBtn
+   LOCAL x, n, o, nPos, aChildren, aAction, oCtrl, aCtrlProps, nWidth, nHeight
 
    aAction := ACLONE( aActions[ -1 ] )
    IF EMPTY( aAction )
@@ -6031,7 +6028,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 STATIC FUNCTION CollectChildren( oParent )
-   LOCAL aCtrlProps, oChild, nLen, aChild, aChildren := {}
+   LOCAL aCtrlProps, oChild, aChild, aChildren := {}
    IF oParent != NIL
       TRY
          FOR EACH oChild IN oParent:Children
@@ -6195,8 +6192,7 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Save() CLASS ProjProp
-
-   LOCAL oWnd, oFile, cFiles, cSource
+   LOCAL oWnd, oFile, cSource
 
    oFile := CFile( ::Name + ".vxh" )
 
@@ -6421,7 +6417,6 @@ METHOD Init( oParent ) CLASS ListOle
 RETURN Self
 
 METHOD OnInitDialog() CLASS ListOle
-   LOCAL n
    Super:OnInitDialog()
 
    WITH OBJECT PictureBox( Self )
@@ -6467,7 +6462,7 @@ METHOD OnInitDialog() CLASS ListOle
 RETURN 0
 
 METHOD OnOk() CLASS ListOle
-   LOCAL aActions, cClass, oFile, cText, cFile, oTypeLib, cId
+   LOCAL oTypeLib, cId
 
    ::Application:MainForm:ToolBox1:ComObjects := {}
 
@@ -6498,7 +6493,7 @@ CLASS RegOle INHERIT DataGrid
 ENDCLASS
 
 METHOD Init( oParent ) CLASS RegOle
-   LOCAL n, cClass, aField, cField, aOle, oCol, x, lEnter := .F.
+   LOCAL n, cClass, aOle, x, lEnter := .F.
    Super:Init( oParent )
    ::Height        := 300
    ::ShowGrid      := .F.
@@ -6572,6 +6567,7 @@ METHOD OnRowChanged() CLASS RegOle
 RETURN NIL
 
 METHOD OnClick( nCol, nRow ) CLASS RegOle
+   HB_SYMBOL_UNUSED( nRow )
    IF nCol == 1
       ::DataSource:Fields:Select := IIF( ::DataSource:Fields:Select == 0, 1, 0 )
       ::UpdateRow()
@@ -6819,27 +6815,12 @@ METHOD OnInitDialog() CLASS AboutVXH
             :Create()
          END
       NEXT
-/*
-      WITH OBJECT ( ::BetaLabel := LABEL( :this ) )
-         :Left           := 240
-         :Top            := 100
-         :Width          := 300
-         :Height         := 100
-         :Caption        := "Beta 2"
-         :Font:FaceName  := "Rockwell Extra Bold"
-         :Font:Bold      := .T.
-         :Font:PointSize := 48
-         :ForeColor      := C_WHITE
-         :Create()
-      END
-*/
    END
 
-   //::SetTimer( 1, 250 )
    ::SetFocus()
 RETURN 1
 
-METHOD LinkLabel1_OnClick( Sender ) CLASS AboutVXH
+METHOD LinkLabel1_OnClick() CLASS AboutVXH
    ShellExecute( ::hWnd, 'open', "http://www.xharbour.com", , , SW_SHOW )
 RETURN Self
 

@@ -112,7 +112,7 @@ METHOD Init( cMsg, aChoices, lModal, nBackColor, nForeColor, lVert, cFace, nPoin
 RETURN Self
 
 METHOD OnInitDialog() CLASS AlertDialog
-   LOCAL rc, n, i, o, nLeft, nWidth, nTop, aMsg, aSize, oButton
+   LOCAL n, i, o, nLeft, nWidth, nTop, aMsg, aSize, oButton
    
    o := Label( Self )
    o:Font:Bold := .T.

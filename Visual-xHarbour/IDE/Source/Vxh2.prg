@@ -125,7 +125,7 @@ RETURN nCnt
 //----------------------------------------------------------------------------
 
 METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
-   LOCAL cInitialBuffer, cMain, cProject, oXfm, n, oForm, cBuffer, oFile
+   LOCAL cInitialBuffer, cMain, cProject, n
    DEFAULT lNew TO .T.
    ::Super:Init( oParent )
    ::__lModified := lNew
@@ -229,7 +229,6 @@ RETURN Self
 //----------------------------------------------------------------------------
 
 METHOD OnUserMsg() CLASS WindowEdit
-   LOCAL pt, n
    SWITCH ::Msg
       CASE WM_USER + 333
            ::Application:ObjectManager:ResetProperties( ::Selected )
@@ -240,9 +239,6 @@ RETURN 0
 //----------------------------------------------------------------------------
 
 METHOD UpdateSelection( nKey, lDes ) CLASS WindowEdit
-
-   LOCAL hDC, oControl, aControl, aPoints, nLeft, nTop, nRight, nBottom, aRect, aPt, aInv := {}, aUpdt := {}
-   LOCAL n
    DEFAULT lDes TO .T.
    DEFAULT nKey TO -1
    
@@ -256,7 +252,7 @@ RETURN Self
 //----------------------------------------------------------------------------
 
 METHOD SelectControl( oControl, lFocus, lRefreshComp ) CLASS WindowEdit
-   LOCAL i, c, aControl, aCtrlPt, aRect:={,,,}, n, nInRect, lComponent := __clsParent( oControl:ClassH, "COMPONENT" )
+   LOCAL aRect:={,,,}, lComponent := __clsParent( oControl:ClassH, "COMPONENT" )
    DEFAULT lFocus TO .T.
 
    ::InRect    := -1
@@ -343,12 +339,9 @@ RETURN NIL
 //----------------------------------------------------------------------------
 
 METHOD OnWindowPaint() CLASS WindowEdit
-   LOCAL aControl, aPoints, x, aPoint, hPen, hOld, n, hBmp, hBrush, aRect
-   LOCAL nRop
-   LOCAL hMemDC, nFColor, nBColor
+   LOCAL nFColor, nBColor
    LOCAL cPaint
    LOCAL hDC
-   LOCAL hOldBmp
    LOCAL i       := 0
    LOCAL j       := 0
 
@@ -379,9 +372,9 @@ RETURN 0
 //----------------------------------------------------------------------------
 
 METHOD MaskKeyDown( o, nKey ) CLASS WindowEdit
-
-   LOCAL nLen, oChildren, pt, x, oParent, aControl, aRect, aPoint, oControl, lCtrl, lShift, n := 1, lCheck := .T.
+   LOCAL nLen, x, aControl, aRect, lCtrl, lShift, n := 1, lCheck := .T.
    LOCAL aAction
+   HB_SYMBOL_UNUSED( o )
    lShift := CheckBit( GetKeyState( VK_SHIFT ) , 32768 )
    lCtrl  := CheckBit( GetKeyState( VK_CONTROL ) , 32768 )
 
@@ -551,10 +544,9 @@ RETURN 0
 //----------------------------------------------------------------------------
 
 METHOD ControlSelect( x, y ) CLASS WindowEdit
-
-   LOCAL hPointer, oControl, aRect, aPt, aCtrlPt, n, aPoint, aControl, cProp, lChild := .F., oBand, lShift, lCtrl, Child
-   LOCAL nInRect, lMouse, oCtrl, tci, oInst, hWnd, hCtrl, z, pPtr, oComponent, oItem, oCoolMenu, pt, lToolItem := .F.
-   LOCAL oErr, xTool, yTool, nCursor, rc := (struct RECT)
+   LOCAL oControl, aRect, aPt, n, aControl, lChild := .F., lShift, lCtrl
+   LOCAL nInRect, lMouse, pt, lToolItem := .F.
+   LOCAL nCursor, rc := (struct RECT)
 
    
    IF ::Application:CurCursor != NIL .OR. ::Application:Project:PasteOn
@@ -877,7 +869,7 @@ RETURN aRect
 //----------------------------------------------------------------------------
 
 METHOD GetPoints( oControl, lPure, lMask, lConvert ) CLASS WindowEdit
-   LOCAL aControl, aRect, rc, aPt, aPoints, n := ::SelPointSize, pt := (struct POINT)
+   LOCAL aRect, rc, aPoints, n := ::SelPointSize, pt := (struct POINT)
    DEFAULT lPure TO .F.
    DEFAULT lMask TO .T.
    DEFAULT lConvert TO .T.
@@ -936,9 +928,10 @@ RETURN aPoints
 //----------------------------------------------------------------------------
 
 METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
-   LOCAL aControl, aPt := { x, y }, aPoint, n, aRect, aPoints, oControl, aCtrlPt, aSelRect, xOld, yOld, hWnd, aP, pPtr
-   LOCAL nLeft, nTop, nRight, nBottom, nWidth, nHeight, hCursor, nPlus, cClass, lLeft, lTop, lWidth, lHeight
-   LOCAL cPos, aSel, pt, pt2, oParent, nCursor, nTab, z, aControls, nCtrl, aSnap, nSnap, hDef, nFor, aSelected
+   LOCAL aControl, aPt := { x, y }, aPoint, n, aRect, aPoints, oControl, aSelRect, xOld, yOld
+   LOCAL nLeft, nTop, nRight, nBottom, nWidth, nHeight, nPlus, cClass, lLeft, lTop, lWidth, lHeight
+   LOCAL aSel, pt, pt2, oParent, nCursor, nTab, z, aControls, aSnap, nSnap, hDef, nFor, aSelected
+   HB_SYMBOL_UNUSED( nwParam )
    pt := (struct POINT)
    pt:x := x
    pt:y := y
@@ -1610,7 +1603,7 @@ METHOD DrawStickyLines() CLASS WindowEdit
 RETURN NIL
 
 METHOD StickLeft( aRect, xDif ) CLASS WindowEdit
-   LOCAL nSnap := 0, aChildren, n, oParent, aSnap, nDis, x, pt := (struct POINT)
+   LOCAL nSnap := 0, aChildren, n, oParent, nDis, x, pt := (struct POINT)
    static nDif := 0
    
    IF ::Application:ShowGrid != 2 .OR. !::Selected[1][1]:__lMoveable .OR. ::__RightSnap != NIL .OR. ::Selected[1][1]:hWnd == ::hWnd
@@ -1681,7 +1674,7 @@ METHOD StickLeft( aRect, xDif ) CLASS WindowEdit
 RETURN 0
 
 METHOD StickRight( aRect, xDif ) CLASS WindowEdit
-   LOCAL nSnap := 0, aChildren, n, oParent, aSnap, nDis, x, pt := (struct POINT)
+   LOCAL nSnap := 0, aChildren, n, oParent, nDis, x, pt := (struct POINT)
    static nDif := 0
 
    IF ::Application:ShowGrid != 2 .OR. !::Selected[1][1]:__lMoveable .OR. ::__LeftSnap != NIL .OR. ::Selected[1][1]:hWnd == ::hWnd
@@ -1752,7 +1745,7 @@ METHOD StickRight( aRect, xDif ) CLASS WindowEdit
 RETURN nSnap
 
 METHOD StickTop( aRect, yDif ) CLASS WindowEdit
-   LOCAL nSnap := 0, aChildren, n, oParent, aSnap, nDis, x, pt := (struct POINT)
+   LOCAL nSnap := 0, aChildren, n, oParent, nDis, x, pt := (struct POINT)
    static aPrev, nDif := 0
 
    IF ::Application:ShowGrid != 2 .OR. !::Selected[1][1]:__lMoveable .OR. ::__BottomSnap != NIL .OR. ::Selected[1][1]:hWnd == ::hWnd
@@ -1828,7 +1821,7 @@ METHOD StickTop( aRect, yDif ) CLASS WindowEdit
 RETURN nSnap
 
 METHOD StickBottom( aRect, yDif ) CLASS WindowEdit
-   LOCAL nSnap := 0, aChildren, n, oParent, aSnap, nDis, x, pt := (struct POINT)
+   LOCAL nSnap := 0, aChildren, n, oParent, nDis, x, pt := (struct POINT)
    static nDif := 0
    
    IF ::Application:ShowGrid != 2 .OR. !::Selected[1][1]:__lMoveable .OR. ::__TopSnap != NIL .OR. ::Selected[1][1]:hWnd == ::hWnd
@@ -1930,8 +1923,7 @@ RETURN Self
 //----------------------------------------------------------------------------
 
 METHOD OnNCPaint() CLASS WindowEdit
-   LOCAL hRegion, hdc, nState, hIcon, nCaption, cx, cy, x, y, nBorder, nColor, pOptions, hFont, hOldFont, aStyle, aRect[4], aBttn, aSize[2]
-   LOCAL pOpt
+   LOCAL hRegion, hdc, nState, hIcon, nCaption, cx, cy, x, y, nBorder, nColor, hFont, hOldFont, aStyle, aRect[4], aBttn, aSize[2]
    IF ::Application:ThemeActive .AND. ::Theming
       IF ( !::CaptionBar .AND. ::FrameStyle == 2 ) .OR. ::lCustom
          RETURN NIL

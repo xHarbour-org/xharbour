@@ -544,7 +544,7 @@ RETURN lRet
 
 //------------------------------------------------------------------------------------------------
 METHOD Run( oWnd ) CLASS Application
-   LOCAL hWnd, oObj, pPtr, msg, cClass
+   LOCAL msg, cClass
 
    IF oWnd != NIL
       ::MainForm := oWnd
@@ -658,7 +658,7 @@ RETURN .F.
 //------------------------------------------------------------------------------------------------
 
 METHOD TranslateAccelerator( Msg ) CLASS Application
-   LOCAL lRet := .F., n, hWnd, lAlt, lShift, lCtrl
+   LOCAL lRet := .F., n, hWnd
    IF Msg:message == WM_KEYDOWN
       //lAlt   := CheckBit( GetKeyState( VK_MENU ) , 32768 )
       //lShift := CheckBit( GetKeyState( VK_SHIFT ) , 32768 )
@@ -770,7 +770,7 @@ METHOD Init( cMsg, cCaption, aChoices, nIcon, nDefault ) CLASS __AlertDlg
 RETURN Self
 
 METHOD OnInitDialog() CLASS __AlertDlg
-   LOCAL rc, n, i, o, nLeft, nWidth, nTop, aMsg, aSize, oButton
+   LOCAL n, i, o, nLeft, nTop, oButton
    n := 15
    IF ::_Icon != NIL
       o := Label( Self )
@@ -849,7 +849,6 @@ STATIC FUNCTION VXH_DefError( e, lGpf )
    ENDIF
    IF e:genCode == EG_PRINT
       BREAK
-      RETURN .F.
    ENDIF
    IF ( e:genCode == EG_OPEN .AND. e:osCode == 32 .AND. e:canDefault )
       NETERR( .T. )
@@ -912,7 +911,6 @@ STATIC FUNCTION VXH_DefError( e, lGpf )
       DO CASE
          CASE aOptions[ nChoice ] == "Break"
               BREAK( e )
-              RETURN .F.
 
          CASE aOptions[ nChoice ] == "Retry"
               RETURN .T.
@@ -1210,7 +1208,7 @@ RETURN NTRIM( n ) + ": " + desc_[ n ]
 //------------------------------------------------------------------------------------------------------
 
 FUNCTION ErrDialog( e, aChoices, aStack, cProcStack )
-   LOCAL nLeft, nTop, aRect, hPar, n, ncm, dt, hDC, hFont, a := {0,0}
+   LOCAL n, ncm, dt, hDC, hFont, a := {0,0}
 
    IF !__lErrorInit
       HB_CStructureCSyntax("ERRDLGTEMPLATE",{"-4","style -4","dwExtendedStyle -2","cdit","2","x","2","y","2","cx","2","cy -2","menu -2","windowclass -2","title",},,,4 )
@@ -1259,8 +1257,8 @@ FUNCTION ErrDialog( e, aChoices, aStack, cProcStack )
 RETURN n
 
 FUNCTION __ErrorDlgProc( hWnd, nMsg, nwParam, nlParam )
-   LOCAL cText, hKey, rc, nWidth, nHeight, cCaption, hStk, hLst, ncm, aRect, a, hFont, hDC, nColor
-   LOCAL nLeft, cOpt, aStack, aLabels, aCaptions, nTop, n, oErr, hCtrl, dis, lSelected, aPar, __nWidth, x
+   LOCAL cText, hKey, rc, nWidth, nHeight, cCaption, hStk, hLst, aRect, hDC, nColor
+   LOCAL nLeft, cOpt, aLabels, aCaptions, nTop, n, hCtrl, dis, lSelected, aPar, __nWidth
    static hGpf, hBrush
    
    SWITCH nMsg
