@@ -931,7 +931,10 @@ METHOD Generate( oCtrl, oXmlNode ) CLASS Report
       oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Name", NIL, oCtrl:Name )
       oXmlControl:addBelow( oXmlValue )
       
-      oCtrl:WriteProps( @oXmlControl )
+      TRY
+         oCtrl:WriteProps( @oXmlControl )
+      CATCH
+      END
 
    oXmlNode:addBelow( oXmlControl )
 

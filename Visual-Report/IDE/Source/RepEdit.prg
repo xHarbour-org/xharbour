@@ -326,7 +326,7 @@ ENDCLASS
 //--------------------------------------------------------------------------------------------------------------------------------------
 CLASS ExtraPageEdit INHERIT RepEdit
    DATA Type INIT "ExtraPage"
-   DATA PagePosition EXPORTED
+   DATA PagePosition EXPORTED INIT -2
    DATA aProperties  EXPORTED INIT { { "PagePosition", "Position" } }
    DATA EditCtrl     EXPORTED
    DATA lUI          EXPORTED INIT .F.
