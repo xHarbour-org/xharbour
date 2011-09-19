@@ -168,7 +168,7 @@ METHOD Create() CLASS ToolBox
    AADD( ::aButtons[3][2], { "Animation", .T. } )
    AADD( ::aButtons[3][2], { "DateTimePicker", .T. } )
    AADD( ::aButtons[3][2], { "DriveComboBox", .T. } )
-   AADD( ::aButtons[3][2], { "FontComboBox", .T. } )
+   //AADD( ::aButtons[3][2], { "FontComboBox", .T. } )
    AADD( ::aButtons[3][2], { "ToolStrip", .T. } )
    AADD( ::aButtons[3][2], { "ToolStripContainer", .T. } )
    AADD( ::aButtons[3][2], { "TabStrip", lPro } )
@@ -571,7 +571,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
    EXTERN Label
    EXTERN LinkLabel
    EXTERN ListBox
-   EXTERN ComboBox, FontComboBox
+   EXTERN ComboBox//, FontComboBox
    EXTERN GroupBox
    EXTERN RadioButton
    EXTERN CheckBox
