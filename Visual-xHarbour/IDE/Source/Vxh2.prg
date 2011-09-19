@@ -374,7 +374,7 @@ RETURN 0
 METHOD MaskKeyDown( o, nKey ) CLASS WindowEdit
    LOCAL nLen, x, aControl, aRect, lCtrl, lShift, n := 1, lCheck := .T.
    LOCAL aAction
-   HB_SYMBOL_UNUSED( o )
+   ( o )
    lShift := CheckBit( GetKeyState( VK_SHIFT ) , 32768 )
    lCtrl  := CheckBit( GetKeyState( VK_CONTROL ) , 32768 )
 
@@ -931,7 +931,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
    LOCAL aControl, aPt := { x, y }, aPoint, n, aRect, aPoints, oControl, aSelRect, xOld, yOld
    LOCAL nLeft, nTop, nRight, nBottom, nWidth, nHeight, nPlus, cClass, lLeft, lTop, lWidth, lHeight
    LOCAL aSel, pt, pt2, oParent, nCursor, nTab, z, aControls, aSnap, nSnap, hDef, nFor, aSelected
-   HB_SYMBOL_UNUSED( nwParam )
+   ( nwParam )
    pt := (struct POINT)
    pt:x := x
    pt:y := y

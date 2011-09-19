@@ -455,7 +455,7 @@ RETURN NIL
 
 METHOD OnUserMsg( hWnd, nMsg, nwParam ) CLASS IDE_MainForm
    LOCAL nNext, aEntries
-   HB_SYMBOL_UNUSED( hWnd )
+   ( hWnd )
    DO CASE
       CASE nMsg == WM_USER + 3000
            nNext := MIN( nwParam + 1, LEN( ::Application:Project:Forms ) )
@@ -1968,7 +1968,7 @@ METHOD Init() CLASS IDE_MainForm
 RETURN Self
 
 METHOD KeyHook( nCode, nwParam, nlParam ) CLASS IDE_MainForm
-   HB_SYMBOL_UNUSED( nwParam )
+   ( nwParam )
    IF HiWord( nlParam ) & KF_UP == 0
       IF nwParam == VK_INSERT
          ::Application:InsKey := !::Application:InsKey
@@ -2005,13 +2005,13 @@ CLASS StartTabPage INHERIT TabPage
 ENDCLASS
 
 METHOD OnPaint( hDC, hMemDC ) CLASS StartTabPage
-   HB_SYMBOL_UNUSED( hDC )
+   ( hDC )
    ::OnEraseBkGnd(, hMemDC )
 RETURN 0
 
 METHOD OnEraseBkGnd( hDC, hMemDC ) CLASS StartTabPage
    LOCAL hMemBitmap, hOldBitmap
-   HB_SYMBOL_UNUSED( hDC )
+   ( hDC )
 
    IF hDC != NIL
       hMemDC     := CreateCompatibleDC( hDC )
@@ -2051,7 +2051,7 @@ CLASS StartPagePanel INHERIT Panel
 ENDCLASS
 
 METHOD OnPaint( hDC, hMemDC ) CLASS StartPagePanel
-   HB_SYMBOL_UNUSED( hDC )
+   ( hDC )
    ::OnEraseBkGnd(, hMemDC )
 RETURN 0
 
@@ -2492,7 +2492,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 METHOD SourceTabChanged( nPrev, nCur ) CLASS Project
-   HB_SYMBOL_UNUSED( nPrev )
+   ( nPrev )
    IF nCur <= LEN( xEdit_GetEditors() )
       ::Application:SourceEditor:oEditor := xEdit_GetEditors()[ nCur ]
       ::Application:SourceEditor:oEditor:SetDisplay( ::Application:SourceEditor:oEditor:oDisplay, .T. )
@@ -4006,7 +4006,7 @@ METHOD ParseXFM( cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors, oCC, 
    LOCAL cWithClassName, cWithProperty, cWithEvent, cWithHandler, cWithValue
    LOCAL aoWithObjects := {}, cPropertyObject, lDialog := .F.
    LOCAL oObj, oPrev, oForm, cSourcePath
-   HB_SYMBOL_UNUSED( aEditors )
+   ( aEditors )
 
    DEFAULT lCustomOwner TO .F.
    TRY
@@ -4875,8 +4875,8 @@ RETURN NIL
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD GenerateChild( oCtrl, nTab, aChildEvents, cColon, cParent, nID ) CLASS Project
    LOCAL cText := "", oChild, Topic, Event, n, cProp, cChild
-   HB_SYMBOL_UNUSED( cColon )
-   HB_SYMBOL_UNUSED( nID )
+   ( cColon )
+   ( nID )
    IF oCtrl:Caption != "[ Add New Item ]"
 
       IF !oCtrl:__CustomOwner
@@ -5574,7 +5574,7 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
    LOCAL cText
    LOCAL oChild, Event, n, cResImg, Topic, oCtrl, nPos
    LOCAL cProperty, cChar, aImg
-   HB_SYMBOL_UNUSED( lChildren )
+   ( lChildren )
 
    cText := "//------------------------------------------------------------------------------------------------------------------------------------" + CRLF
 
@@ -6567,7 +6567,7 @@ METHOD OnRowChanged() CLASS RegOle
 RETURN NIL
 
 METHOD OnClick( nCol, nRow ) CLASS RegOle
-   HB_SYMBOL_UNUSED( nRow )
+   ( nRow )
    IF nCol == 1
       ::DataSource:Fields:Select := IIF( ::DataSource:Fields:Select == 0, 1, 0 )
       ::UpdateRow()

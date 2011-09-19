@@ -230,7 +230,7 @@ static HRESULT (WINAPI *pDwmIsCompositionEnabled)(BOOL*)                        
 
 static void winapi_Exit( void * cargo )
 {
-   HB_SYMBOL_UNUSED( cargo );
+   ( cargo );
 
    /* Release system object when all finished -- usually at the end of the cleanup code */
    DeleteCriticalSection( &s_cs );
@@ -238,7 +238,7 @@ static void winapi_Exit( void * cargo )
 
 static void winapi_Init( void * cargo )
 {
-   HB_SYMBOL_UNUSED( cargo );
+   ( cargo );
 
    pHB_CSTRUCTURE = hb_dynsymFind( "HB_CSTRUCTURE" );
 
