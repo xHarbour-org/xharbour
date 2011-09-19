@@ -326,6 +326,7 @@ ENDCLASS
 //--------------------------------------------------------------------------------------------------------------------------------------
 CLASS ExtraPageEdit INHERIT RepEdit
    DATA Type INIT "ExtraPage"
+   DATA EnumPagePosition EXPORTED INIT { { "No Extra Page", "Front Page", "Watermark" }, {-2,-1,0} }
    DATA PagePosition EXPORTED INIT -2
    DATA aProperties  EXPORTED INIT { { "PagePosition", "Position" } }
    DATA EditCtrl     EXPORTED

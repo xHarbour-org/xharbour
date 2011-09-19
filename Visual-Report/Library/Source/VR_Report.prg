@@ -746,10 +746,12 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    ::StartPage()
    hDC := GetDC(0)
 #ifndef VRDLL
-   IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == -1
+   IF ::Application:Props:ExtraPage:PagePosition != NIL
       ::CreateExtraPage( hDC )
-      ::EndPage()
-      ::StartPage()
+      IF ::Application:Props:ExtraPage:PagePosition == -1
+         ::EndPage()
+         ::StartPage()
+      ENDIF
    ENDIF
 #endif
    nPageNumber := 1
@@ -787,12 +789,6 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    ::CreateRepFooter( hDC )
    ::CreateFooter( hDC )
 
-#ifndef VRDLL
-   IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
-      ::CreateExtraPage( hDC )
-   ENDIF
-#endif
-
    ReleaseDC(0, hDC)
 
    ::EndPage()
@@ -803,14 +799,14 @@ RETURN .T.
 
 METHOD ChangePage( hDC, nHeight )
    IF ::nRow + nHeight + IIF( ::PrintFooter, ::FooterHeight, 0 ) > ::oPDF:PageLength
+      ::CreateFooter( hDC )
+      ::EndPage()
+      ::StartPage()
 #ifndef VRDLL
       IF ::Application:Props:ExtraPage:PagePosition != NIL .AND. ::Application:Props:ExtraPage:PagePosition == 0
          ::CreateExtraPage( hDC )
       ENDIF
 #endif
-      ::CreateFooter( hDC )
-      ::EndPage()
-      ::StartPage()
       nPageNumber ++
       ::CreateHeader( hDC )
       RETURN .T.
