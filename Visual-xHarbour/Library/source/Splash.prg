@@ -60,7 +60,7 @@ FUNCTION Splash( hInst, cImage, cType, nTimeout, aCenter )
    CreateDialogIndirect( hInst, dt, GetActiveWindow(), __pCallBackPtr )
 RETURN NIL
 
-FUNCTION __SplashDlgProc( hWnd, nMsg, nwParam, nlParam )
+FUNCTION __SplashDlgProc( hWnd, nMsg, nwParam )
    LOCAL nLeft, nTop, aRect, aPar
    SWITCH nMsg
       CASE WM_INITDIALOG
@@ -149,7 +149,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------
 FUNCTION __MsgWait( cText, cTitle, lProgress )
-   LOCAL nTop, nWidth, nHeight, nStyle, dt, nLeft, hDC, hWnd
+   LOCAL nWidth, nHeight, nStyle, dt, hDC, hWnd
 
    DEFAULT cText  TO ""
    DEFAULT cTitle TO ""
@@ -196,7 +196,7 @@ FUNCTION __MsgWait( cText, cTitle, lProgress )
 RETURN hWnd
 
 //-------------------------------------------------------------------------------------------------------------------------------------
-FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam, nlParam )
+FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
    LOCAL nLeft, nTop, aRect, aPar, hDC
    LOCAL hTheme, aBar
    SWITCH nMsg

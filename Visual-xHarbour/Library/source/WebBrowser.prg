@@ -45,7 +45,6 @@ CLASS WebBrowser INHERIT ActiveX
 ENDCLASS
 
 METHOD Init( oParent ) CLASS WebBrowser
-   LOCAL hKey, cValue
    DEFAULT ::__xCtrlName TO "WebBrowser"
    Super:Init( oParent )
    ::ProgID  := "Shell.Explorer"

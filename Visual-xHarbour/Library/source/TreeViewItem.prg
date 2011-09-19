@@ -72,7 +72,7 @@ METHOD Init( oParent ) CLASS TreeViewItem
 RETURN Self
 
 METHOD Create( lSetOwner ) CLASS TreeViewItem
-   LOCAL nPos, tvis, cName, n, oOwner := ::Owner
+   LOCAL nPos, tvis, oOwner := ::Owner
    DEFAULT oOwner TO ::Parent
    DEFAULT nPos   TO 0
    DEFAULT lSetOwner TO .F.

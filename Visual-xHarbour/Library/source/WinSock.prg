@@ -155,7 +155,7 @@ RETURN nSent
 
 //-------------------------------------------------------------------------------------------------------
 METHOD SockControlProc() CLASS WinSock
-   LOCAL pSocket, cData, n
+   LOCAL cData, n
    KillTimer( ::Owner:hWnd, ::nRecId )
    IF ::lListener .AND. ::RemoteHandle == NIL
       ExecuteEvent( "OnAccepting", Self )
@@ -197,7 +197,6 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Listen() CLASS WinSock
-   LOCAL hRemote
    DEFAULT ::Handle TO InetCreate( 250 )
    InetServer( ::LocalPort, ::Handle )
 

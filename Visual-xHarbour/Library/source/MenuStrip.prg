@@ -61,8 +61,8 @@ METHOD Init( oParent ) CLASS MenuStrip
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnParentSysKeyDown( nwParam,nlParam ) CLASS MenuStrip
-   LOCAL n, nItem, oItem
+METHOD OnParentSysKeyDown( nwParam ) CLASS MenuStrip
+   LOCAL nItem, oItem
 
    IF nwParam != VK_MENU
       IF ( nItem := __GetHotItem( Self, 1, nwParam ) ) > 0
@@ -82,7 +82,7 @@ METHOD OnParentSysKeyDown( nwParam,nlParam ) CLASS MenuStrip
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnParentSysCommand( nwParam,nlParam ) CLASS MenuStrip
+METHOD OnParentSysCommand( nwParam ) CLASS MenuStrip
 
    IF nwParam == SC_KEYMENU .AND. !CheckBit( GetKeyState( VK_SPACE ) , 32768 ) .AND. !s_lKey
       IF s_CurrentObject != NIL
@@ -106,7 +106,7 @@ RETURN NIL
 
 
 //-------------------------------------------------------------------------------------------------------
-METHOD OnSysKeyDown( nwParam, nlParam ) CLASS MenuStrip
+METHOD OnSysKeyDown( nwParam ) CLASS MenuStrip
    LOCAL n
 
    // close the menu on ALT KEY y it is selected
@@ -147,6 +147,7 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OnSize( n, x, y ) CLASS MenuStrip
+   (n,y)
    ::__PrevSize := x
    IF ::Row > 0 //.AND. ::__PrevRow == 0 
       ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
@@ -155,8 +156,9 @@ METHOD OnSize( n, x, y ) CLASS MenuStrip
 RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
-METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove ) CLASS MenuStrip
+METHOD __OnParentSize( x, y, hDef ) CLASS MenuStrip
    LOCAL nLeft, nTop, i, n, aLines, aLine
+   (x,y)
    IF ::IsWindowVisible() .AND. ::Parent:ClientWidth > 0
       ::Width := ::Parent:ClientWidth - IIF( ::xShowGrip, (::__GripperPos + 1), 0 )
       IF ::Row > 0 .AND. ::__PrevRow == 0 

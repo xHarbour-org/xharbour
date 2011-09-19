@@ -134,7 +134,7 @@ METHOD ResetMDIMenu() CLASS MDIChildWindow
 RETURN Self
 
 METHOD Show( nShow ) CLASS MDIChildWindow
-   LOCAL hDef, oChild, nRet
+   LOCAL nRet
    DEFAULT nShow TO ::ShowMode
 
    IF nShow == SW_HIDE

@@ -97,8 +97,7 @@ METHOD SaveDialog( oParent, cTitle ) CLASS CFile
 RETURN Self
 
 METHOD OpenDialog( oParent ) CLASS CFile
-
-   LOCAL aFiles, cFile, n, x, cFilter := ""
+   LOCAL cFile, n, cFilter := ""
 
    DEFAULT oParent TO GetActiveWindow()
 
@@ -172,14 +171,13 @@ METHOD Close() CLASS CFile
 RETURN Self
 
 METHOD Save( cPath ) CLASS CFile
-   LOCAL hFile, cFile
+   LOCAL hFile
    DEFAULT cPath TO ::Path
    
    IF ( hFile := fCreate( cPath + IIF( !Empty( cPath ), "\", "" ) + ::Name ) ) <> -1
       fWrite( hFile, ::FileBuffer, Len( ::FileBuffer ) )
       fClose( hFile )
    ENDIF
-//   MEMOWRIT( cPath + "\" + ::Name, ::FileBuffer )
 RETURN .T.
 
 METHOD Load() CLASS CFile

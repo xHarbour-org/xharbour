@@ -145,7 +145,7 @@ ENDCLASS
 //---------------------------------------------------------------------------------------------------
 
 METHOD Init( oParent ) CLASS ExplorerBar
-   LOCAL n, aRect := ARRAY(4)
+   LOCAL aRect := ARRAY(4)
    ::__xCtrlName   := "ExplorerBar"
    ::ClassBrush    := GetStockObject( WHITE_BRUSH )
    ::Super:Init( oParent )
@@ -184,6 +184,7 @@ RETURN Self
 
 METHOD OnThemeChanged( oObj, lClean ) CLASS ExplorerBar
    DEFAULT lClean TO .T.
+   (oObj)
    IF lClean .AND. ::__hImageListTitle != NIL
       ImageListDestroy( ::__hImageListTitle )
    ENDIF
@@ -393,7 +394,7 @@ METHOD Expand( lExpand, lForce ) CLASS Expando
    ENDIF
 RETURN 0
 
-METHOD OnSize( x, y ) CLASS Expando
+METHOD OnSize() CLASS Expando
    LOCAL n
    ::InvalidateRect()
    IF ::__ClassInst != NIL .AND. ::__lSave
@@ -407,7 +408,7 @@ METHOD OnSize( x, y ) CLASS Expando
    NEXT
 RETURN 0
 
-METHOD __OnParentSize( x, y, hDef ) CLASS Expando
+METHOD __OnParentSize( x ) CLASS Expando
    ::xWidth := ::System:ExplorerBar:headernormal:iHeaderBmpWidth
    IF ::__ClassInst == NIL .AND. ::Parent:Height < ::Parent:OriginalRect[4] .AND. ( x - GetSystemMetrics( SM_CXVSCROLL ) ) < ::System:ExplorerBar:headernormal:iHeaderBmpWidth + ::System:ExplorerBar:headernormal:rcTLPadding:right + ::System:ExplorerBar:headernormal:rcTLPadding:left
       ::xWidth := ::System:ExplorerBar:headernormal:iHeaderBmpWidth - GetSystemMetrics( SM_CXVSCROLL )
@@ -417,6 +418,7 @@ RETURN 0
 
 METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Expando
    LOCAL lDisabled, lSelected, lFocus
+   (nwParam, nlParam)
    lDisabled := dis:itemState & ODS_DISABLED != 0
    lSelected := dis:itemState & ODS_SELECTED != 0
    lFocus    := dis:itemState & ODS_FOCUS != 0
@@ -424,6 +426,7 @@ RETURN 0
 
 METHOD OnMouseMove( nwParam, x, y ) CLASS Expando
    LOCAL nHeight := IIF( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 .AND. ::Parent:ImageList:IconHeight > ::HeaderHeight, ::Parent:ImageList:IconHeight, ::HeaderHeight )
+   (nwParam, x)
    IF !::__MouseIn .AND. y <= nHeight
       ::Cursor := ::System:Cursor:LinkSelect
       ::__MouseIn := .T.
@@ -435,7 +438,7 @@ METHOD OnMouseMove( nwParam, x, y ) CLASS Expando
    ENDIF
 RETURN NIL
 
-METHOD OnMouseLeave( nwParam, x, y ) CLASS Expando
+METHOD OnMouseLeave() CLASS Expando
    IF ::__MouseIn
       ::Cursor := NIL
       ::__MouseIn := .F.
@@ -445,8 +448,8 @@ RETURN NIL
 
 METHOD OnPaint( hDC, hMemDC ) CLASS Expando
    LOCAL x := 0, y := 0, cx, cy, nHeight := ::HeaderHeight
-   LOCAL aArrow, nArrow, hPen, hPen1, hBrush1, oHeader, aSize, hTitle, hMemBitmap, hOldBitmap, hBrush, nImage, hButton, nButton, nMargin, nState, hFont, oTask, nPart, nIconX, nIconY
-   LOCAL oChild, hMemBitmap1, hOldBitmap1, hMemDC1, hOldPen, hOldBrush, nLeft, nTop, nRight, nBottom
+   LOCAL aArrow, nArrow, hPen, hPen1, oHeader, hTitle, hMemBitmap, hOldBitmap, hBrush, nImage, hButton, nButton, nMargin, hFont, oTask, nIconX, nIconY
+   LOCAL oChild, hOldBitmap1, hMemDC1, hOldPen, hOldBrush, nLeft, nTop, nRight, nBottom
    IF !::IsWindow()
       RETURN 0
    ENDIF

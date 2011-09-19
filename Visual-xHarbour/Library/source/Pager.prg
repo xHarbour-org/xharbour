@@ -43,9 +43,6 @@ ENDCLASS
 //----------------------------------------------------------------------------------------------------
 
 METHOD Init( oParent ) CLASS PageScroller
-
-   LOCAL nProc, hClass
-
    ::ClsName      := "SysPager"
    DEFAULT ::__xCtrlName TO "PageScroller"
    InitCommonControlsEx( ICC_PAGESCROLLER_CLASS + ICC_BAR_CLASSES )
@@ -84,12 +81,11 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------
 
-METHOD __OnParentSize( nW, nH, hDef ) CLASS PageScroller
+METHOD __OnParentSize() CLASS PageScroller
    ::xLeft   := 0
    ::xTop    := 0
    ::xWidth  := ::Parent:ClientWidth
    ::xHeight := ::Parent:ClientHeight
-   //DeferWindowPos( hDef, ::hWnd, , ::Left, ::Top, ::Width, ::Height, SWP_NOACTIVATE + SWP_NOOWNERZORDER + SWP_NOZORDER + IIF( ::OsVer:dwMajorVersion < 5, SWP_DEFERERASE, 0 ) )
    SetWindowPos( ::hWnd, , ::Left, ::Top, ::Width, ::Height, SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER + IIF( ::OsVer:dwMajorVersion < 5, SWP_DEFERERASE, 0 ) )
 RETURN(self)
 
@@ -97,13 +93,12 @@ RETURN(self)
 //----------------------------------------------------------------------------------------------------
 
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS PageScroller
-
-   LOCAL sz, cBuff, pg, pgs, nHeight, nSize, nmt, aRect
+   LOCAL pg, pgs
+   (nwParam)
 
    DO CASE
 
       CASE hdr:code == NM_RELEASEDCAPTURE
-//           ::RecalSize()
            RETURN 0
 
       CASE hdr:code == PGN_SCROLL
@@ -115,7 +110,6 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS PageScroller
            RETURN 0
 
       CASE hdr:code == PGN_CALCSIZE
-           //sz := (struct SIZE)
            pg := (struct NMPGCALCSIZE*) nlParam
 
            SWITCH pg:dwFlag

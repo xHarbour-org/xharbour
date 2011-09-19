@@ -85,8 +85,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS Menu
-
-   LOCAL Popup, nPtr, xIcon
+   LOCAL Popup
 
    ::hMenu := CreateMenu()
    FOR EACH Popup IN ::aItems
@@ -98,13 +97,11 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 
 METHOD Context( hWnd, x, y ) CLASS Menu
-    LOCAL nError, nRes
     ::Application:oCurMenu := Self
     DEFAULT hWnd TO ::Parent:hWnd
     DEFAULT x    TO ::Left
     DEFAULT y    TO ::Top
-    nRes := TrackPopupMenu( ::hMenu, ::Style, x, y, 0, hWnd )
-RETURN nRes
+RETURN TrackPopupMenu( ::hMenu, ::Style, x, y, 0, hWnd )
 
 //-------------------------------------------------------------------------------------------------------
 
@@ -333,8 +330,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS MenuPopup
-   LOCAL hBrush, lpMenuInfo := (struct MENUINFO)
-   LOCAL hMemDC, hMemBitmap, hOldBitmap
+   LOCAL lpMenuInfo := (struct MENUINFO)
 
    ::hMenu := CreatePopupMenu()
 
@@ -387,8 +383,6 @@ METHOD Init( oParent ) CLASS ContextMenu
 RETURN Self
 
 METHOD Create() CLASS ContextMenu
-   LOCAL oItem
-//   ::Menu:Create()
    ::lCreated := .T.
 RETURN Self
 
@@ -438,8 +432,7 @@ RETURN nRes
 
 
 METHOD MenuDesignHook(nCode,nwParam,nlParam) CLASS ContextMenu
-
-   LOCAL n,  o, nMenu, Item, hWnd, aAction
+   LOCAL o, nMenu, Item
    LOCAL pt := (struct POINT)
    LOCAL ms := (struct MSG*) nlParam
 
@@ -542,7 +535,7 @@ RETURN oItem
 
 
 METHOD __AddNewItemMenuItem( oParent ) CLASS ContextMenu
-   LOCAL oItem, oSubItem, n
+   LOCAL oItem, oSubItem
 
    oItem := CMenuItem( oParent )
    oItem:Position := LEN( oItem:Menu:aItems )-2

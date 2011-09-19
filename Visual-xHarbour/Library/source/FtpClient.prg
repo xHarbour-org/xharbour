@@ -92,6 +92,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 FUNCTION FtpStatusCallback( hInternet, dwContext, dwInternetStatus, lpvStatusInformation, dwStatusInformationLength )
    LOCAL n
+   (hInternet,dwStatusInformationLength)
    __oFtp:Context           := dwContext
    __oFtp:InternetStatus    := dwInternetStatus
    __oFtp:StatusInformation := lpvStatusInformation
@@ -141,7 +142,7 @@ RETURN cRet
 //-------------------------------------------------------------------------------------------------------
 
 METHOD GetDirectory( cFileSpec ) CLASS FtpClient
-   LOCAL hFind, n, aFile := {}, aDir := {}
+   LOCAL hFind, aFile := {}, aDir := {}
    LOCAL pFindData := (struct WIN32_FIND_DATA)
    LOCAL pSysTime  := (struct SYSTEMTIME)
    LOCAL cBuffer

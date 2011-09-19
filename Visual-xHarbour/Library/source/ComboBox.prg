@@ -314,6 +314,8 @@ RETURN cbi
 //----------------------------------------------------------------------------------------------------------------
 METHOD DrawFrame( oDrawing, aRect, nAlign, nWidth, nStatus ) CLASS ComboBox
    LOCAL hTheme, nFlags := DFCS_SCROLLCOMBOBOX
+   (nAlign)
+   (nWidth)
    IF nStatus != NIL
       IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
          nStatus := CBXS_NORMAL
@@ -340,10 +342,10 @@ METHOD GetString(nLine) CLASS ComboBox
    nLen := SendMessage(::hWnd, CB_GETLBTEXT, nLine-1, @cBuf )
 RETURN( if(nLen == CB_ERR, nil, left(cBuf, nLen) ) )
 
-
 //----------------------------------------------------------------------------------------------------------------
-METHOD OnParentCommand( nId, nCode, nlParam ) CLASS ComboBox
+METHOD OnParentCommand( nId, nCode ) CLASS ComboBox
    LOCAL nRet := NIL
+   (nId)
    DO CASE
       CASE nCode == CBN_SELENDOK
            nRet := __Evaluate( ::OnCBNSelEndOk, Self,,,,)
@@ -371,7 +373,7 @@ RETURN nRet
 
 //----------------------------------------------------------------------------------------------------------------
 METHOD __ListCallBack( hWnd, nMsg, nwParam, nlParam ) CLASS ComboBox
-   LOCAL xPos, yPos, aPt, aRect, nCurSel
+   LOCAL aPt, aRect
    SWITCH nMsg
       CASE WM_MOUSEMOVE
            aPt := { LOWORD( nlParam ), HIWORD( nlParam ) }
@@ -469,12 +471,12 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------------------
 METHOD __ListboxMouseMove( hList, nwParam, aPt ) CLASS ComboBox
-   LOCAL hDC, hOldFont, cBuf, nLen, pt := (struct POINT)
+   LOCAL hDC, hOldFont, cBuf, pt := (struct POINT)
    LOCAL rcBounds := (struct RECT)
    LOCAL rcDraw := (struct RECT)
    LOCAL cRect := space(16)
    LOCAL nCurSel := SendMessage( hList, LB_ITEMFROMPOINT, 0, MAKELONG( aPt[1], aPt[2] ) )
-
+   (nwParam)
    IF ::__OriginalSel == nCurSel
       RETURN NIL 
    ENDIF
@@ -549,7 +551,7 @@ CLASS DriveCombobox INHERIT ComboBox
 ENDCLASS
 
 METHOD Init( oParent ) CLASS DriveCombobox
-   LOCAL cDrives, n, nType, cType, shfi, cBuffer
+   LOCAL cDrives, n, cType, shfi
    ::__xCtrlName := "DriveComboBox"
    ::Super:Init( oParent )
    ::Style     := WS_CHILD | WS_VISIBLE | WS_TABSTOP | CBS_HASSTRINGS | CBS_OWNERDRAWFIXED | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
@@ -586,7 +588,7 @@ METHOD Create() CLASS DriveCombobox
    NEXT
 RETURN Self
 
-METHOD OnParentDrawItem( nwParam, nlParam ) CLASS DriveCombobox
+METHOD OnParentDrawItem() CLASS DriveCombobox
    LOCAL n, x, lSelected, aClip, nLen, itemTxt, cText, aRect, nField, y
    IF ::Parent:DrawItemStruct != NIL .AND. ::Parent:DrawItemStruct:hwndItem == ::hWnd
       lSelected := ::Parent:DrawItemStruct:itemState & ODS_SELECTED != 0
@@ -664,10 +666,9 @@ CLASS ColorPicker INHERIT ComboBox
 ENDCLASS
 
 METHOD Init( oParent ) CLASS ColorPicker
-   LOCAL aColors, n, nType, cType, shfi, cBuffer
    ::__xCtrlName := "ColorPicker"
    ::Super:Init( oParent )
-   ::Style     := WS_CHILD | WS_TABSTOP | WS_VSCROLL | CBS_HASSTRINGS | CBS_OWNERDRAWFIXED | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style := WS_CHILD | WS_TABSTOP | WS_VSCROLL | CBS_HASSTRINGS | CBS_OWNERDRAWFIXED | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
 RETURN Self
 
 METHOD SelectColor( nColor ) CLASS ColorPicker
@@ -705,9 +706,9 @@ METHOD Create( lBlank ) CLASS ColorPicker
    ::Show()
 RETURN Self
 
-METHOD OnParentCommand( nId, nCode, nlParam ) CLASS ColorPicker
+METHOD OnParentCommand( nId, nCode ) CLASS ColorPicker
    LOCAL cSel, nColor, nRet
-
+   (nId)
    DO CASE
       CASE nCode == CBN_SELENDOK
            cSel := ::Colors[ ::GetCurSel() ][2]
@@ -751,8 +752,8 @@ METHOD OnParentCommand( nId, nCode, nlParam ) CLASS ColorPicker
    ENDCASE
 RETURN nRet
 
-METHOD OnParentDrawItem( nwParam, nlParam ) CLASS ColorPicker
-   LOCAL n, x, lSelected, aClip, nLen, itemTxt, cText, nField, hBrush, hOld, z
+METHOD OnParentDrawItem() CLASS ColorPicker
+   LOCAL n, lSelected, aClip, nLen, itemTxt, hBrush, hOld, z
    IF ::Parent:DrawItemStruct != NIL .AND. ::Parent:DrawItemStruct:hwndItem == ::hWnd
       lSelected := ::Parent:DrawItemStruct:itemState & ODS_SELECTED != 0
       aClip     := { ::Parent:DrawItemStruct:rcItem:Left+20,  ::Parent:DrawItemStruct:rcItem:Top, ;
@@ -813,6 +814,7 @@ METHOD OnParentDrawItem( nwParam, nlParam ) CLASS ColorPicker
    ENDIF
 RETURN 0
 
+
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
@@ -826,14 +828,13 @@ CLASS CursorComboBox INHERIT ComboBox
 ENDCLASS
 
 METHOD Init( oParent ) CLASS CursorComboBox
-   LOCAL cDrives, n, nType, cType, shfi, cBuffer
    ::__xCtrlName := "CursorComboBox"
    ::Super:Init( oParent )
    ::Style     := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | CBS_HASSTRINGS | CBS_OWNERDRAWFIXED | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
 RETURN Self
 
 METHOD Create() CLASS CursorComboBox
-   LOCAL n, hCursor, aSize, cKey, ii := (struct ICONINFO)
+   LOCAL n, hCursor, aSize, ii := (struct ICONINFO)
 
    ::Super:Create()
    ::Cursors := {}
@@ -847,8 +848,8 @@ METHOD Create() CLASS CursorComboBox
 RETURN Self
 
 
-METHOD OnParentDrawItem( nwParam, nlParam ) CLASS CursorComboBox
-   LOCAL n, x, y, lSelected, aClip, nLen, itemTxt, cText, aRect, nField, aSize
+METHOD OnParentDrawItem() CLASS CursorComboBox
+   LOCAL n, y, lSelected, aClip, nLen, itemTxt, aSize
    IF ::Parent:DrawItemStruct:hwndItem == ::hWnd
       lSelected := ::Parent:DrawItemStruct:itemState & ODS_SELECTED != 0
       aClip     := { ::Parent:DrawItemStruct:rcItem:Left+20,  ::Parent:DrawItemStruct:rcItem:Top, ;
@@ -885,6 +886,7 @@ METHOD OnParentDrawItem( nwParam, nlParam ) CLASS CursorComboBox
 RETURN 0
 
 
+
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
@@ -899,14 +901,13 @@ CLASS FontComboBox INHERIT ComboBox
 ENDCLASS
 
 METHOD Init( oParent ) CLASS FontComboBox
-   LOCAL cDrives, n, nType, cType, shfi, cBuffer
    ::__xCtrlName := "FontComboBox"
    ::Super:Init( oParent )
-   ::Style     := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | CBS_HASSTRINGS | CBS_OWNERDRAWFIXED | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | CBS_HASSTRINGS | CBS_OWNERDRAWFIXED | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
 RETURN Self
 
 METHOD Create() CLASS FontComboBox
-   LOCAL n, Font, aSize, cKey, nHeight, cFont := ::Cargo
+   LOCAL n, cFont := ::Cargo
    ::Super:Create()
    ::Fonts := ::Form:Drawing:EnumFonts()
    ASORT( ::Fonts,,, {|a,b| a[1]:lfFaceName:AsString() <  b[1]:lfFaceName:AsString() } )
@@ -927,8 +928,8 @@ METHOD Create() CLASS FontComboBox
    ::ItemToolTips:= .T.
 RETURN Self
 
-METHOD OnParentDrawItem( nwParam, nlParam ) CLASS FontComboBox
-   LOCAL n, x, y, lSelected, aClip, nLen, itemTxt, cText, aRect, nField, aSize, hFont, hOld
+METHOD OnParentDrawItem() CLASS FontComboBox
+   LOCAL n, y, lSelected, aClip, nLen, itemTxt, aSize, hFont, hOld
    IF ::Parent:DrawItemStruct:hwndItem == ::hWnd
       lSelected := ::Parent:DrawItemStruct:itemState & ODS_SELECTED != 0
       aClip     := { ::Parent:DrawItemStruct:rcItem:Left+20,  ::Parent:DrawItemStruct:rcItem:Top, ;
@@ -1011,7 +1012,7 @@ METHOD Create() CLASS ComboBoxEx
 RETURN Self
 
 METHOD AddItem( cText, nImage ) CLASS ComboBoxEx
-   LOCAL hDC, hFont, n, nPos, cbei := (struct COMBOBOXEXITEM)
+   LOCAL cbei := (struct COMBOBOXEXITEM)
    DEFAULT nImage TO ::GetCount()+1
    cbei:mask           := CBEIF_TEXT | CBEIF_INDENT | CBEIF_IMAGE | CBEIF_SELECTEDIMAGE
    cbei:iItem          := -1
@@ -1024,18 +1025,18 @@ METHOD AddItem( cText, nImage ) CLASS ComboBoxEx
 RETURN Self
 
 METHOD SetImageList( oList ) CLASS ComboBoxEx
-   LOCAL hChild, h
+   LOCAL hWnd
    IF ::hWnd != NIL
       ::SendMessage( CBEM_SETIMAGELIST, 0, IIF( oList != NIL, oList:Handle, NIL ) )
       IF oList != NIL
-         h := ::SendMessage( CBEM_GETCOMBOCONTROL, 0, 0 )
+         hWnd := ::SendMessage( CBEM_GETCOMBOCONTROL, 0, 0 )
          ::xItemHeight := oList:IconHeight
-         SendMessage( h, CB_SETMINVISIBLE, ::xHeight/::xItemHeight )
+         SendMessage( hWnd, CB_SETMINVISIBLE, ::xHeight/::xItemHeight )
       ENDIF
    ENDIF
 RETURN Self
 
-METHOD OnSize( nwParam, x, y ) CLASS ComboBoxEx
+METHOD OnSize() CLASS ComboBoxEx
    LOCAL n := ::GetItemHeight( 1 )
    MoveWindow( ::hControl, 0, 0, ::ClientWidth, n )
    ::BackColor := ::Parent:BackColor
@@ -1075,7 +1076,6 @@ CLASS FormComboBox INHERIT ComboBox
 ENDCLASS
 
 METHOD Init( oParent ) CLASS FormComboBox
-   LOCAL cDrives, n, nType, cType, shfi, cBuffer
    ::__xCtrlName := "FormComboBox"
    ::Super:Init( oParent )
 RETURN Self
@@ -1125,7 +1125,7 @@ METHOD Reset( oControl ) CLASS FormComboBox
 RETURN Self
 
 
-METHOD OnParentDrawItem( nwParam, nlParam ) CLASS FormComboBox
+METHOD OnParentDrawItem() CLASS FormComboBox
    LOCAL n, lSelected, nLen, itemTxt, cText, aSize, hDC, hOld
    IF ::Parent:DrawItemStruct != NIL .AND. ::Parent:DrawItemStruct:hwndItem == ::hWnd
       hDC := ::Parent:DrawItemStruct:hDC
@@ -1160,8 +1160,9 @@ METHOD OnParentDrawItem( nwParam, nlParam ) CLASS FormComboBox
    ENDIF
 RETURN 0
 
-METHOD OnParentCommand( nId, nCode, nlParam ) CLASS FormComboBox
-   LOCAL n, oSel, cStr, nSel, nRet := 0
+METHOD OnParentCommand( nId, nCode ) CLASS FormComboBox
+   LOCAL nSel, nRet := 0
+   (nId)
    DO CASE
       CASE nCode == CBN_SELENDOK
            nSel := ::GetCurSel()

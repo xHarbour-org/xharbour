@@ -95,9 +95,10 @@ METHOD GetState() CLASS RadioButton
 RETURN IIF( ( nState & BST_CHECKED ) == BST_CHECKED, BST_CHECKED, BST_UNCHECKED )
 
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS RadioButton
-   LOCAL nRet, cd, nState, aRect, lHot, lDisabled, lSelected, lFocus, nColor, nMode, lChecked, lPressed
+   LOCAL nRet, cd, nState, aRect, lHot, lDisabled, lSelected, lFocus, nColor, lChecked, lPressed
    LOCAL sz
    LOCAL hBkGnd := ::BkBrush
+   (nwParam)
    DO CASE
       CASE hdr:code==NM_CUSTOMDRAW
            nRet := CDRF_DODEFAULT
@@ -195,7 +196,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS RadioButton
    ENDCASE
 RETURN NIL
 
-METHOD OnCtlColorStatic( nwParam, nlParam ) CLASS RadioButton
+METHOD OnCtlColorStatic( nwParam ) CLASS RadioButton
    LOCAL nBack, hBkGnd := ::BkBrush
    DEFAULT hBkGnd TO ::__hBrush
    DEFAULT hBkGnd TO ::Parent:BkBrush

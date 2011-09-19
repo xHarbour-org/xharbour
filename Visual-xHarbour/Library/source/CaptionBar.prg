@@ -73,7 +73,6 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS CaptionBar
-   LOCAL aSize
    IF VALTYPE( ::Icon ) == "C"
       ::Icon := LoadIcon( ::AppInstance, ::Icon )
    ENDIF
@@ -100,8 +99,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------------
 
 METHOD OnPaint() CLASS CaptionBar
-   LOCAL x, y
-   y := (::Height/2)-(::IconSize[2]/2)
+   LOCAL y := (::Height/2)-(::IconSize[2]/2)
    ::PaintText()
    ::Drawing:DrawIcon( 5, 0, ::Icon )
    ::Drawing:DrawSpecialChar( {::LeftMargin+::TextWidth, 10, ::LeftMargin+::TextWidth+20,::ClientHeight}, ASC("u"), .F. )
@@ -147,8 +145,8 @@ RETURN 0
 
 //-----------------------------------------------------------------------------------------------------
 
-METHOD OnMouseMove(n,x,y) CLASS CaptionBar
-   LOCAL lOut
+METHOD OnMouseMove(nwParam,x) CLASS CaptionBar
+   (nwParam)
    IF x <= ::LeftMargin+::TextWidth+20
       IF !::Pushed
          ::Drawing:Draw3dRect( {0, 0, ::LeftMargin+::TextWidth+20,::ClientHeight}, GetSysColor(COLOR_3DHIGHLIGHT), GetSysColor(COLOR_3DDKSHADOW))
@@ -165,7 +163,8 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------------
 
-METHOD OnLButtonDown(n,x,y) CLASS CaptionBar
+METHOD OnLButtonDown(nwParam,x) CLASS CaptionBar
+   (nwParam)
    IF x <= ::LeftMargin+::TextWidth+20
       ::Pushed := !::Pushed
       ::InvalidateRect( {0, 0, ::LeftMargin+::TextWidth+20,::ClientHeight}, .F. )
@@ -174,7 +173,7 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------------
 
-METHOD OnLButtonUp(n,x,y) CLASS CaptionBar
+METHOD OnLButtonUp() CLASS CaptionBar
    ::InvalidateRect( {0, 0, ::LeftMargin+::TextWidth+20,::ClientHeight}, .F. )
 RETURN NIL
 

@@ -126,11 +126,8 @@ METHOD GetStatus() CLASS Service
 RETURN 0
 
 METHOD Run() CLASS Service
-   LOCAL nWinError
    ::ServiceStatusStruct := (struct SERVICE_STATUS)
-
    ::__pMainCallBackPtr := WinCallBackPointer( HB_ObjMsgPtr( Self, "__ServiceMain" ), Self )
-
    RunService( ::ServiceName, ::__pMainCallBackPtr )
 RETURN Self
 

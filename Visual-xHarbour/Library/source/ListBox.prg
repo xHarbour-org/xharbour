@@ -67,7 +67,7 @@ CLASS ListBox FROM Control
    METHOD GetSel(nLine)                    INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETSEL, nLine, 0 ), NIL )
    METHOD GetText( nLine, cBuffer )        INLINE IIF( ::hWnd != NIL, ( SendMessage( ::hWnd, LB_GETTEXT,nLine, @cBuffer ), cBuffer), NIL )
    METHOD GetTextLen( nLine )              INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETTEXTLEN, nLine, 0 ), NIL )
-   METHOD GetItemText()
+   METHOD GetItemText( nItem )             INLINE ::GetText( nItem, SPACE( ::GetTextLen( nItem )+1 ) )
    METHOD SelectString( nLine, cText )     INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SELECTSTRING, nLine, cText ), NIL )
    METHOD GetTopIndex( nLine )             INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETTOPINDEX, nLine, 0 ) , NIL )
    //METHOD GetSelItems( nMax, cBuffer )  INLINE IIF( ::hWnd != NIL, SendMessage( ::hWnd, LB_GETSELITEMS, nMax, @cBuffer ), NIL )
@@ -187,7 +187,6 @@ METHOD Init( oParent ) CLASS ListBox
 RETURN Self
 
 METHOD Create() CLASS ListBox
-   LOCAL n
    ::Super:Create()
    IF !EMPTY( ::Caption )
       IF ::Flat
@@ -195,9 +194,6 @@ METHOD Create() CLASS ListBox
       ENDIF
       ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
    ENDIF
-//   IF ::HorzScroll
-//      ::SetHorizontalExtent( n )
-//   ENDIF
 RETURN Self
 
 METHOD SetDrawStyle(n) CLASS ListBox
@@ -271,10 +267,8 @@ RETURN nRet
 
 //----------------------------------------------------------------------------------------------------------------
 
-METHOD OnCtlColorListBox( nwParam, nlParam ) CLASS ListBox
+METHOD OnCtlColorListBox( nwParam ) CLASS ListBox
    LOCAL hBkGnd := ::BkBrush
-//   DEFAULT hBkGnd TO ::Parent:BkBrush
-
    IF ::ForeColor != NIL .AND. ::ForeColor != ::ForeSysColor
       SetTextColor( nwParam, ::ForeColor )
    ENDIF
@@ -288,7 +282,3 @@ METHOD OnCtlColorListBox( nwParam, nlParam ) CLASS ListBox
       ENDIF
    ENDIF
 RETURN NIL
-
-METHOD GetItemText( nItem ) CLASS ListBox
-  LOCAL cText := ::GetText( nItem, SPACE( ::GetTextLen( nItem )+1 ) )
-RETURN cText

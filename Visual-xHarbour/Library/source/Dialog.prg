@@ -50,7 +50,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------------
 
 METHOD InitDialogBox()
-   LOCAL oCtrl, cClass, hWnd, nStyle, pPtr
+   LOCAL oCtrl, cClass, hWnd, nStyle
 
    hWnd := GetWindow( ::hWnd, GW_CHILD | GW_HWNDFIRST )
    WHILE hWnd != 0
@@ -102,8 +102,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------------
 
 METHOD Create( hParent ) CLASS Dialog
-
-   LOCAL n, i, nRet, c, cProcStack := ""
+   LOCAL nRet, cProcStack := ""
 
    IF ::__hParent != NIL
       hParent := ::__hParent
@@ -205,7 +204,7 @@ METHOD SetObject( cName, nId )
 RETURN Self
 
 METHOD SetDialogRect() CLASS Dialog
-   LOCAL i, rc, aDlgRect, aPt
+   LOCAL rc
    IF VALTYPE( ::Template ) == "C"
       RETURN ::GetWindowRect()
    ENDIF

@@ -28,7 +28,7 @@ GLOBAL s_hKeyMenuHook
 static s_nx, s_ncx, s_nmw, s_Shadow := .F., s_aPixels, s_aRect, s_mousex := 0, s_mousey := 0
 static s_oCurrMenuItem, s_PrevFocus
 static s_hMenuDialogHook
-static s_MenuhWnd, s_ActiveWnd
+static s_MenuhWnd
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
@@ -1154,6 +1154,7 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OnSize( n, x, y ) CLASS ToolStrip
+   (n, y)
    ::__PrevSize := x
    IF ::Row > 0 .AND. ::__PrevRow == 0 
       ::__SetVertex()
@@ -1470,7 +1471,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS ToolStripItem
-   LOCAL nLeft, lMember
+   LOCAL nLeft
 
    IF ::__ClassInst != NIL .AND. ::Caption != "[ Add New Item ]" .AND. ::Parent:__DesignAddNew != NIL
       ::Parent:__DesignAddNew:Destroy()
@@ -2387,8 +2388,8 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
-   LOCAL mii, pt, hWnd, oObj, pPtr, n, ms_hwnd, ms_message, ms_wParam, ms_lParam, mii_dwItemData
-   LOCAL aParams, oMenu, nItem, hMenu, oForm, oItem, i, nCurr
+   LOCAL pt, hWnd, oObj, pPtr, n, ms_hwnd, ms_message, ms_wParam, ms_lParam, mii_dwItemData
+   LOCAL aParams, oMenu, nItem, hMenu, oItem, i, nCurr
 
    aParams    := __GetMSG( nlParam )
    ms_hwnd    := aParams[1]
@@ -3059,7 +3060,7 @@ METHOD Init( oParent ) CLASS __MenuStripItemShortCut
 RETURN Self
 
 METHOD SetAccel() CLASS __MenuStripItemShortCut
-   LOCAL nAccel, nKey
+   LOCAL nAccel
    IF ::__ClassInst == NIL .AND. ::xKey <> 0
       nAccel := FVIRTKEY
       IF ::xCtrl

@@ -9154,10 +9154,6 @@ METHOD Save( cFile, bAuto )  CLASS Editor
       LOCAL hCursor
    #endif
 
-   #ifdef VXH
-      LOCAL nEditorID, cText, cBuffer
-   #endif
-
    IF bAuto == NIL
       bAuto := .F.
    ENDIF
@@ -9671,17 +9667,17 @@ METHOD OnKey( nKey, nCount ) CLASS Editor
 
             CASE K_CTRL_Y
                IF ::lShift
-                  ::ReDoFast()
-               ELSE
                   ::ReDo()
+               ELSE
+                  ::ReDoFast()
                ENDIF
                EXIT
 
             CASE K_CTRL_Z
                IF ::lShift
-                  ::UnDoFast()
-               ELSE
                   ::UnDo()
+               ELSE
+                  ::UnDoFast()
                ENDIF
                EXIT
 

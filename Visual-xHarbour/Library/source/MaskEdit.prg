@@ -130,7 +130,7 @@ RETURN nRet
 
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnUserMsg( hWnd, nMsg, nwParam, nlParam ) CLASS MaskEdit
+METHOD OnUserMsg( hWnd, nMsg, nwParam ) CLASS MaskEdit
    LOCAL coldbuff, h
    DO CASE
       CASE nMsg == WM_CARET
@@ -187,18 +187,17 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD OnUndo( nwParam, nlParam ) CLASS MaskEdit
+METHOD OnUndo() CLASS MaskEdit
    ::oGet:Undo()
    ::oGet:changed := FALSE
    ::oGet:UpdateBuffer()
    SetWindowText( ::hWnd, ::oGet:buffer )
-   //::Caption := ::oGet:buffer
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 
 METHOD OnKeyDown( nwParam, nlParam ) CLASS MaskEdit
-   LOCAL nStart, nEnd, i, lShift, lCtrl, cOldBuff, h, oChild, nCur, nPos
+   LOCAL nStart, nEnd, i, lShift, lCtrl, cOldBuff, h, nCur, nPos
    IF ::ReadOnly
       RETURN(0)
    ENDIF
@@ -422,7 +421,7 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 
 METHOD OnChar( nwParam, nlParam ) CLASS MaskEdit
-   LOCAL lShift, h, nStart, nEnd, i, nLen
+   LOCAL lShift, h, nStart, nEnd, i
 
    IF nwParam==27
       RETURN 0
@@ -549,7 +548,7 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 
 METHOD OnSetFocus() CLASS MaskEdit
-   LOCAL lShift, h, nStart, nEnd, i, nLen, coldbuff, nCur, nPos, nLas
+   LOCAL lShift, h, nStart, nEnd, coldbuff
 
    ::NoEdit := ::GetWindowLong( GWL_STYLE ) & ES_READONLY != 0
 
@@ -626,6 +625,7 @@ RETURN NIL
 
 METHOD OnPaste( nwParam, nlParam ) CLASS MaskEdit
    LOCAL nStart, nEnd, cText, i, cChar
+   (nwParam, nlParam)
    IF ::IsWindowEnabled() .AND. !::NoEdit .AND. !::ReadOnly
       nStart := LoWord( ::SendMessage( EM_GETSEL, 0, 0 ) ) + 1
       nEnd   := HiWord( ::SendMessage( EM_GETSEL, 0, 0 ) ) + 1
@@ -685,7 +685,7 @@ RETURN 0
 //-----------------------------------------------------------------------------------------------
 
 METHOD OnCopy( nwParam, nlParam ) CLASS MaskEdit
-   LOCAL nStart, nEnd, i, ctempbuff, retval
+   LOCAL nStart, nEnd, ctempbuff
    IF ::IsWindowEnabled() .AND. !::NoEdit .AND. !::ReadOnly
       nStart := LoWord( ::SendMessage( EM_GETSEL, 0, 0 ) ) + 1
       nEnd   := HiWord( ::SendMessage( EM_GETSEL, 0, 0 ) ) + 1

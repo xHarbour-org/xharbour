@@ -307,14 +307,6 @@ RETURN SELF
 //-----------------------------------------------------------------------------------------------
 
 METHOD AddControl( oControl ) CLASS ToolBar
-   LOCAL oBtn, n
-   //oBtn := ToolButton( Self,,,,,,,,,,.F. )
-   //oBtn:Width := oControl:Width
-   //oBtn:ImageIndex := 0
-   //oBtn:AutoSize := .F.
-   //oBtn:Create()
-   //oBtn:Disable()
-   //oControl:Left := ::GetButtonsWidth( LEN( ::aItems )-1 )
    IF oControl:__xCtrlName != "ComboBox"
       oControl:Dock:Bottom := Self
    ENDIF
@@ -365,7 +357,7 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD SetColorScheme( nHighlight, nShadow, nTextColor ) CLASS ToolBar
+METHOD SetColorScheme( nHighlight, nShadow ) CLASS ToolBar
    LOCAL cs := (struct COLORSCHEME)
    cs:dwSize          := cs:SizeOf()
    cs:clrBtnHighlight := nHighlight
@@ -375,7 +367,7 @@ RETURN SELF
 
 
 METHOD SetPadding( x, n ) CLASS ToolBar
-   LOCAL nPadding, lSet := .T.
+   LOCAL lSet := .T.
    IF x == 1
       ::xHorzPadding := n
     ELSE
@@ -390,9 +382,8 @@ RETURN SELF
 //-----------------------------------------------------------------------------------------------
 
 METHOD OnMeasureItem( nwParam, nlParam ) CLASS ToolBar
-
    LOCAL n, oItem, oButton, oSub
-
+   (nwParam)
    IF ::MeasureItemStruct:CtlType == ODT_MENU
 
       IF ::Chevron != NIL
@@ -427,14 +418,12 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD OnDrawItem( nwParam, nlParam ) CLASS ToolBar
-
-   LOCAL aPt, hDC, rc, n:=0, hBrush, xIcon:=0, yIcon:=0
-   LOCAL nTop, oBtn, oButton, oItem, oMenu, nOff := 0, Chk
-   LOCAL lCheck := .F., nPos, lArrow := .F., lWhole := .F., oSub, hIcon, ii, cBuffer, hOld
-   LOCAL aAccRect, lDisabled, lSelected, nIcon, lDrop := .F.
-   LOCAL hOldPen, hOldBrush, hWndDC, aShad, Rect, pt
-   STATIC nWidth
+METHOD OnDrawItem() CLASS ToolBar
+   LOCAL hDC, rc, n:=0, hBrush, xIcon:=0, yIcon:=0
+   LOCAL nTop, oButton, oItem, oMenu, nOff := 0, Chk
+   LOCAL lCheck := .F., nPos, lArrow := .F., lWhole := .F., oSub
+   LOCAL lDisabled, lSelected, nIcon, lDrop := .F.
+   LOCAL Rect, pt
 
    IF ::DrawItemStruct:CtlType == ODT_MENU
 
@@ -736,9 +725,7 @@ RETURN tbb
 //-----------------------------------------------------------------------------------------------
 
 METHOD GetButtonInfo( nBtn, nMask ) CLASS ToolBar
-
    LOCAL tbbi := (struct TBBUTTONINFO)
-   LOCAL cBuffer
 
    DEFAULT nMask TO TBIF_STATE
 
@@ -751,10 +738,7 @@ RETURN tbbi
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD OnInitMenuPopup( nwParam, nPos, nMenu ) CLASS ToolBar
-
-   LOCAL hMenuWnd, cClass, aRect, rc, aPt, nScreen, nLeft, pWndProc, hWnd
-
+METHOD OnInitMenuPopup( nwParam, nPos ) CLASS ToolBar
    IF ::Chevron!=NIL .AND. ::Chevron:hMenu == nwParam .AND. !::Chevron:CoolBar
       RETURN 0
    ENDIF
@@ -777,7 +761,7 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD OnUserMsg( hWnd, nMsg, nwParam, nlParam ) CLASS ToolBar
+METHOD OnUserMsg( hWnd, nMsg ) CLASS ToolBar
 
    DO CASE
       CASE nMsg == MBM_POPUPMENU
@@ -845,10 +829,10 @@ RETURN nRet
 
 METHOD OpenPopup( hWnd ) CLASS ToolBar
 
-   LOCAL cBuff, x, n, oBtn, nDif, aPt, aRect, nAdd, nHeight, hMonitor, mix
+   LOCAL n, oBtn, nAdd, nHeight, hMonitor, mix
    LOCAL rc := (struct RECT)
    LOCAL pt := (struct POINT)
-   LOCAL oItem, oSub
+   LOCAL oItem
    DEFAULT hWnd TO ::hWnd
 
    IF (n:=ASCAN( ::aItems,{|o| o:xPosition==::nPressed })) > 0
@@ -1027,7 +1011,7 @@ RETURN 0
 //-----------------------------------------------------------------------------------------------
 
 METHOD __AddNewItemMenuItem( oParent ) CLASS ToolBar
-   LOCAL oItem, oSubItem, n
+   LOCAL oItem, oSubItem
 
    oItem := CMenuItem( oParent )
    oItem:Position := LEN( oItem:Menu:aItems )-2
@@ -1051,9 +1035,8 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 
 METHOD OnToolTipNotify( nwParam, nlParam, hdr ) CLASS ToolBar
-
-   LOCAL n, ttdi, cText, di, c, a
-
+   LOCAL n, cText
+   (nwParam)
    IF (n:=ASCAN(::aItems,{|btn| btn:oStruct:idCommand==hdr:idFrom})) > 0 .AND. hdr:code == TTN_NEEDTEXT
       cText := ::aItems[n]:ToolTip
       IF VALTYPE( cText ) == "B" 
@@ -1070,23 +1053,10 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
-
-   LOCAL oButton
-   LOCAL oBar
-   LOCAL oBtn
-   LOCAL nDif
-   LOCAL msg
-   LOCAL aSize
-   LOCAL n, nState
-   LOCAL x, nRet
-   LOCAL hDC
-   LOCAL nItem
-   LOCAL nHot
-   LOCAL oParent, oMdi, nTop, aRect
-   LOCAL hIcon, aIcon, hTheme, nButton, hPen, hBrush
-
-   LOCAL tbcd, nmt, tbdi, nmtb, rc, pt, cr, lColor := .F.
-
+   LOCAL oButton, oBtn, nDif, n, nState, x, nRet
+   LOCAL nHot, oMdi, nTop, aRect, hIcon, hTheme, nButton, hBrush
+   LOCAL tbcd, nmt, nmtb, rc, pt, cr, lColor := .F.
+   (nwParam)
    DO CASE
       CASE hdr:code==NM_CUSTOMDRAW .AND. !::Parent:ClsName == "StatusBarPanel"
            nRet := CDRF_DODEFAULT
@@ -1360,7 +1330,7 @@ RETURN(self)
 //-----------------------------------------------------------------------------------------------
 
 METHOD UpdateMenu( lShow ) CLASS ToolBar
-   LOCAL oBtn, oItem, hSysMenu, n, mii, cBuff, aArray, cText, nId, oMdi, nTab, nStyle
+   LOCAL oBtn, oItem, hSysMenu, n, cText, nId, oMdi, nTab, nStyle
 
    oMdi := ::Form:MDIClient:GetActive()
    IF oMdi != NIL
@@ -1487,7 +1457,7 @@ METHOD UpdateMenu( lShow ) CLASS ToolBar
 RETURN Self
 
 METHOD GetGapWidth() CLASS ToolBar
-   LOCAL rc, oLast, nWidth := 0, oBtn
+   LOCAL oBtn, nWidth := 0
    FOR EACH oBtn IN ::aItems
        IF oBtn:Id <= IDM_MDI_ICON
           nWidth += oBtn:Width
@@ -1519,7 +1489,7 @@ RETURN hDef
 //-----------------------------------------------------------------------------------------------
 
 METHOD OnSize() CLASS ToolBar
-   LOCAL oBtn, n, rc, tbbi
+   LOCAL n, tbbi
 
    IF ::Parent:MdiContainer
       n := ::GetGapWidth()
@@ -1666,7 +1636,6 @@ ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS ToolButton
-   LOCAL n, aProp
    DEFAULT ::ClsName TO "ToolButton"
    DEFAULT ::__xCtrlName TO "ToolButton"
 
@@ -1688,8 +1657,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 
 METHOD Create( nPos ) CLASS ToolButton
-
-   LOCAL tbbi, aRect, x, n := -1
+   LOCAL tbbi, aRect, n := -1
 
    IF LEN( ::Parent:Children ) == 0 .AND. EMPTY( ::xCaption )
       ::xCaption := NIL
@@ -1827,8 +1795,9 @@ METHOD Create( nPos ) CLASS ToolButton
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD SetPosition( n ) CLASS ToolButton
-   LOCAL cName, x, oButton
+METHOD SetPosition(n) CLASS ToolButton
+   (n)
+//   LOCAL cName, x, oButton
 //   IF ::lCreated
 //      cName := ::xName
 //      ::Delete()
@@ -1862,7 +1831,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 
 METHOD SetText( c ) CLASS ToolButton
-   LOCAL cName, oBtn, n, aRect, tbbi := (struct TBBUTTONINFO)
+   LOCAL aRect, tbbi := (struct TBBUTTONINFO)
 
    ::xCaption   := c
 
@@ -2015,7 +1984,7 @@ METHOD GetWindowRect() CLASS ToolButton
 RETURN { rc:Left, rc:Top, rc:Right-rc:Left, rc:Bottom-rc:Top }
 
 METHOD GetRect() CLASS ToolButton
-   LOCAL tbbi, rc := (struct RECT)
+   LOCAL rc := (struct RECT)
    SendMessage( ::Parent:hWnd, TB_GETITEMRECT, ::xPosition, @rc )
 RETURN rc
 
@@ -2090,7 +2059,7 @@ RETURN oItem
 
 FUNCTION __SysVxhMenuHook( nCode, nwParam, nlParam )
 
-   LOCAL oBar, n,  o, nMenu, Item, hWnd, pt, ms, nPushPos, hSubMenu, oApp := __GetApplication()
+   LOCAL oBar, n,  o, nMenu, Item, pt, ms, nPushPos, hSubMenu, oApp := __GetApplication()
    static hMenu
    oBar := oApp:__CurCoolMenu
    IF oBar == NIL

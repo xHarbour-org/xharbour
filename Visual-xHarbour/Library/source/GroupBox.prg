@@ -59,7 +59,7 @@ CLASS GroupBox INHERIT Control
    METHOD __WindowDestroy()    INLINE ::Super:__WindowDestroy(), ::CloseThemeData(), Self
    METHOD OnEraseBkGnd()       INLINE IIF( LEN( ::Children ) == 0, ::SetWindowPos( HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE ), ), 1
    METHOD OnPaint()
-   METHOD OnSize( x, y )       INLINE ::InvalidateRect(), NIL
+   METHOD OnSize()             INLINE ::InvalidateRect(), NIL
    METHOD GetSysColor()
    METHOD SetWindowText(cText) INLINE Super:SetWindowText(cText), ::InvalidateRect()
 ENDCLASS

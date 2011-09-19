@@ -211,8 +211,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD CreateFields() CLASS DataTable
-   LOCAL n, aField
-   LOCAL hClass, cField
+   LOCAL aField, hClass, cField
 
    hClass := __ClsNew( "DATA_" + ::Alias, 0, 0, { Data():ClassH } )
 
@@ -341,16 +340,11 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 METHOD Put(xVal, cName) CLASS Data
-   LOCAL cRet
-
    IF xVal != NIL
       (::Parent:Alias)->&cName := xVal
-      //__ObjSetValueList( Self, { { "x"+cName, xVal } } )
     ELSE
       RETURN (::Parent:Alias)->&cName
-      //RETURN &("QSelf():x"+cName)
    ENDIF
-
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -462,9 +456,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Create( lIgnoreAO ) CLASS DataRdd
-
-   LOCAL nSecs, nAlias, cAlias
-   LOCAL oErr, nSelect
+   LOCAL nAlias, cAlias, oErr
    LOCAL cEvent, n, nServer, cFile, lDef := .T.
    DEFAULT lIgnoreAO TO .F.
    
@@ -613,7 +605,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
       ::Owner:Area := Select()
       ::Owner:Structure := (::Owner:Alias)->( dbStruct() )
       
-      AEVAL( ::Owner:Structure, {|a,n| ASIZE( ::Owner:Structure[n], 4 )} )
+      AEVAL( ::Owner:Structure, {|,n| ASIZE( ::Owner:Structure[n], 4 )} )
       
       ::Owner:CreateFields()
       
@@ -631,12 +623,12 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD Scatter() CLASS DataRdd
    ::Owner:aScatter := ARRAY( LEN( ::Owner:Structure ) )
-   aEval( ::Owner:aScatter, {|a,n| ::Owner:aScatter[n] := (::Owner:Alias)->( FieldGet(n) ) } )
+   aEval( ::Owner:aScatter, {|,n| ::Owner:aScatter[n] := (::Owner:Alias)->( FieldGet(n) ) } )
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD Gather( aData ) CLASS DataRdd
-   aEval( ::Owner:aScatter, {|a,n| (::Owner:Alias)->( FieldPut(n, ::Owner:aScatter[n] ) ) } )
+METHOD Gather() CLASS DataRdd
+   aEval( ::Owner:aScatter, {|,n| (::Owner:Alias)->( FieldPut(n, ::Owner:aScatter[n] ) ) } )
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -745,7 +737,7 @@ METHOD SetRelation( oData, xKey, lAdditive ) CLASS SocketRdd
 RETURN Self
 
 METHOD Request( cFuncName, aParams ) CLASS SocketRdd
-   LOCAL nSent, cData, cRecData, hSock, nSecs
+   LOCAL cData, cRecData, hSock, nSecs
    LOCAL lRet := .F., n, cSendStr := "SOCKETRDD|Request|"+::Owner:Alias+"|"+cFuncName
    DEFAULT aParams TO {}
    

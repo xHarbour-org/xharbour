@@ -180,7 +180,7 @@ METHOD EnumFonts( cFaceName ) CLASS Drawing
    EnumFonts( ::hDC, cFaceName, WinCallBackPointer( HB_ObjMsgPtr( Self, "EnumProc" ), Self ), NIL )
 RETURN ::__aFonts
 
-METHOD EnumProc( plf, ptm, nType, nlParam ) CLASS Drawing
+METHOD EnumProc( plf, ptm ) CLASS Drawing
    LOCAL lf, tm
    lf := (struct LOGFONT*) plf
    tm := (struct TEXTMETRIC*) ptm

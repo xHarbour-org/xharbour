@@ -85,7 +85,6 @@ ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS Splitter
-   LOCAL aProperties, aProperty, cProp
    ::__xCtrlName    := "Splitter"
    ::Super:Init( oParent )
    ::ClassBrush   := GetStockObject( NULL_BRUSH )
@@ -175,8 +174,8 @@ RETURN NIL
 //----------------------------------------------------------------------------------------------------------------
 
 METHOD SplitOn( x, y, lDirect )
-   LOCAL aPos, oCtrl, rc, pt, nOwnerTop, nOwnerHeight, n
-
+   LOCAL pt, nOwnerTop, nOwnerHeight, n
+   (x,y)
    DEFAULT lDirect TO .F.
 
    IF ::lDown .OR. lDirect
@@ -247,8 +246,9 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------------------
 
-METHOD OnMouseMove( n, x, y, lDirect ) CLASS Splitter
-   LOCAL pt, hDC, nPos, pt2, rc
+METHOD OnMouseMove( nwParam, x, y, lDirect ) CLASS Splitter
+   LOCAL pt, nPos, pt2, rc
+   (nwParam)
    IF ::ShowDragging
       ::SplitOn( x, y, lDirect )
       RETURN 0
@@ -305,24 +305,19 @@ RETURN NIL
 //----------------------------------------------------------------------------------------------------------------
 
 METHOD OnLButtonDown() CLASS Splitter
-   LOCAL rc
-
    ::lDown := .T.
    SetCapture( ::hWnd )
 
    IF !::ShowDragging
-
       ::hWinDC := GetDCEx( ::Parent:hWnd,, DCX_PARENTCLIP )
-
-      //::hWinDC  := GetWindowDC( ::Parent:hWnd )
-
       ::OnMouseMove()
    ENDIF
 RETURN 0
 
 //----------------------------------------------------------------------------------------------------------------
 
-METHOD OnLButtonUp(n,x,y) CLASS Splitter
+METHOD OnLButtonUp(nwParam,x,y) CLASS Splitter
+   (nwParam)
    ReleaseCapture( ::hWnd )
    ::lDown := .F.
    IF !::ShowDragging
@@ -369,7 +364,7 @@ RETURN Self
 //----------------------------------------------------------------------------------------------------------------
 
 METHOD SetSizes() CLASS Splitter
-   LOCAL aRect, aPt, oChild, nOld, lMove := .F., hWnd, hDef, n
+   LOCAL nOld, lMove := .F., n
 
    ::Owner:aPrevSize := { ::Owner:xLeft, ::Owner:xTop, ::Owner:xWidth, ::Owner:xHeight }
    SWITCH ::Position

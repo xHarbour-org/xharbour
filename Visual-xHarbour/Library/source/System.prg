@@ -116,7 +116,7 @@ METHOD GetFocus() CLASS System
 RETURN NIL
 
 METHOD Init() CLASS System
-   LOCAL cRdd, aList, cCursor, hSmall, hLarge, cBuffer := ""
+   LOCAL cRdd, aList, hSmall, hLarge, cBuffer := ""
    LOCAL cSupp := ""
 
    ::FreeImageFormats := {;
@@ -739,12 +739,12 @@ CLASS __SysTime
 ENDCLASS
 
 METHOD __GetSysTime(n) CLASS __SysTime
-   LOCAL st, ret
+   LOCAL st
    GetSystemTime( @st )
 RETURN st:Array[n]
 
 METHOD __SetSysTime(n,x) CLASS __SysTime
-   LOCAL st, st1, ret, nWinError
+   LOCAL st, st1
    GetSystemTime( @st1 )
    SWITCH n
       CASE 1

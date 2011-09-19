@@ -71,7 +71,7 @@ METHOD GetSections() CLASS IniFile
 RETURN aRet
 
 METHOD GetSectionEntries( cSection, lFixOld ) CLASS IniFile
-   LOCAL cRet, aEnt, Entry, n, aRet := {}
+   LOCAL cRet, n, aRet := {}
    IF ( cRet := GetPrivateProfileSection( cSection, ::Name ) ) != NIL
       aRet := hb_aTokens( cRet, chr(0) )
       IF lFixOld != NIL .AND. lFixOld
@@ -155,17 +155,13 @@ RETURN .T.
 
 //--------------------------------------------------------------------------------------------------
 METHOD Read( cSection, cEntry, xDefault ) CLASS IniFile
-   LOCAL cVal
    SWITCH ValType( xDefault )
       CASE "C"
            RETURN ::ReadString( cSection, cEntry, xDefault )
-           EXIT
       CASE "D"
            RETURN ::ReadDate( cSection, cEntry, xDefault )
-           EXIT
       CASE "N"
            RETURN ::ReadNumber( cSection, cEntry, xDefault )
-           EXIT
    END
 
 RETURN(NIL)

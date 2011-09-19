@@ -11,8 +11,6 @@
 //  You may NOT forward or share this file under any conditions!                                        *
 //------------------------------------------------------------------------------------------------------*
 
-static m_hWnd
-
 #include "vxh.ch"
 #include "debug.ch"
 

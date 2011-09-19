@@ -76,7 +76,7 @@ CLASS Control INHERIT Window
    ACCESS Child           INLINE ::Style & WS_CHILD != 0
    ACCESS ControlParent   INLINE ::ExStyle & WS_EX_CONTROLPARENT != 0
    ACCESS MdiContainer    INLINE ::xMdiContainer
-   ASSIGN MdiContainer(l) INLINE ::xMdiContainer
+   ASSIGN MdiContainer(l) INLINE ::xMdiContainer := l
 
    ACCESS IsDocked        INLINE ::__Docked
    METHOD Init() CONSTRUCTOR
@@ -129,7 +129,6 @@ RETURN Self
 //---------------------------------------------------------------------------------------------------
 
 METHOD Create( hParent ) CLASS Control
-   LOCAL n, nId, aDel, cDel, oInst
    ::xTop := MAX( ::xTop, ::Parent:TopMargin)
 
    IF ::IsContainer
@@ -241,7 +240,7 @@ RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 
-METHOD __SetSmallCaption( lSet ) CLASS Control
+METHOD __SetSmallCaption() CLASS Control
    IF ::hWnd != NIL
       ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
       ::RedrawWindow( , , RDW_FRAME | RDW_NOERASE | RDW_NOINTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN )
@@ -271,7 +270,8 @@ RETURN ::Super:OnMouseActivate( hWnd, nHit, nMsg )
 //---------------------------------------------------------------------------------------------------
 
 METHOD OnNCCalcSize( nwParam, nlParam ) CLASS Control
-   LOCAL tm, nccs
+   LOCAL nccs
+   (nwParam)
    ::CaptionHeight := 0
    IF ( !EMPTY( ::Caption ) .AND. ::xSmallCaption ) .OR. ::FlatBorder
       IF ::Style & WS_DLGFRAME != 0 .AND. ::Style & WS_BORDER != 0
@@ -305,8 +305,7 @@ RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 
-METHOD OnNCMouseleave( nwParam, x, y ) CLASS Control
-   LOCAL hDC, hRegion, n
+METHOD OnNCMouseleave() CLASS Control
    IF !EMPTY( ::Caption ) .AND. ::xSmallCaption .AND. ::AllowClose
       ::CloseHover  := .F.
       ::PinHover    := .F.
@@ -318,7 +317,7 @@ RETURN NIL
 //---------------------------------------------------------------------------------------------------
 
 METHOD OnNCPaint( nwParam, nlParam ) CLASS Control
-   LOCAL hOldBrush, hOldPen, hPen, hdc, hOldFont, hFont, nWidth, hRegion, aRect, hBrush, n:=0
+   LOCAL hOldBrush, hOldPen, hdc, hOldFont, nWidth, hRegion, hBrush, n:=0
    ::CallWindowProc()
    IF ::Super:OnNCPaint( nwParam, nlParam ) == NIL .AND. !EMPTY( ::Caption ) .AND. ::xSmallCaption
       ::CaptionWidth := ::xWidth
@@ -405,7 +404,7 @@ RETURN 0
 
 //---------------------------------------------------------------------------------------------------
 
-METHOD OnNCLButtonDown( nwParam, x, y ) CLASS Control
+METHOD OnNCLButtonDown( nwParam ) CLASS Control
    LOCAL hRegion, hdc, aRect, n
    IF nwParam == HTCAPTION
       IF !::HasFocus //.AND. ::ClsName != "PanelBox"
@@ -552,7 +551,7 @@ RETURN Self
 //---------------------------------------------------------------------------------------------------
 
 METHOD Undock() CLASS Control
-   LOCAL aRect, aPt, oControl, hDef, oChild, pt
+   LOCAL hDef, oChild, pt
    
    IF __Evaluate( ::OnWMUnDock,  Self ) == NIL .AND. ::AllowUnDock
       ::__Docked := .F.
@@ -612,7 +611,7 @@ METHOD Undock() CLASS Control
       SetParent( ::hWnd, ::__DockParent:hWnd )
       MoveWindow( ::hWnd, 0, 0, ::Width, ::Height )
       ::__DockParent:Show()
-      ::__DockParent:OnWMClose   := {|o| IIF( ::IsDocked, 0, ::Redock() ) }
+      ::__DockParent:OnWMClose   := {|| IIF( ::IsDocked, 0, ::Redock() ) }
 
       hDef := BeginDeferWindowPos( LEN( ::Parent:Children ) )
       FOR EACH oChild IN ::Parent:Children
@@ -631,7 +630,7 @@ RETURN Self
 
 //---------------------------------------------------------------------------------------------------
 
-METHOD OnNCHitTest( x, y, nwParam ) CLASS Control
+METHOD OnNCHitTest( x, y ) CLASS Control
    LOCAL nRes, aPt, hRegion, hdc, n
    IF !EMPTY(::CaptionRect) .AND. !EMPTY( ::Caption ) .AND. ::xSmallCaption .AND. ::Super:OnNCHitTest( x, y ) == NIL
       aPt := { x, y }

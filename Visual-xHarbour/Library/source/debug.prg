@@ -37,7 +37,6 @@ function _trace(c)
 PROCEDURE _DVIEW
 
    LOCAL no_of_param, x, dbg_array, description, half
-   LOCAL t_call_status
 
 #ifndef DEBUG
    RETURN

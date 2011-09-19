@@ -74,8 +74,8 @@ CLASS OptionBar INHERIT Control
    METHOD GetChildFromPoint()
 ENDCLASS
 
-METHOD GetChildFromPoint( pt, bAction, aSel ) CLASS OptionBar
-   LOCAL o, rc, oCtrl, Control, Band
+METHOD GetChildFromPoint( pt ) CLASS OptionBar
+   LOCAL rc, oCtrl, Control
    ScreenToClient( ::__ToolBar:hWnd, @pt )
    FOR EACH Control IN ::Children
        rc := Control:GetRect()
@@ -110,8 +110,6 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS OptionBar
-
-   LOCAL n, oButton
    ::ClassBrush := ::BkBrush
    DEFAULT ::ClassBrush TO GetSysColorBrush( COLOR_BTNSHADOW )
    ::Super:Create()
@@ -217,7 +215,7 @@ CLASS OptionBarButton INHERIT ToolButton
 ENDCLASS
 
 METHOD GetRect() CLASS OptionBarButton
-   LOCAL tbbi, rc := (struct RECT)
+   LOCAL rc := (struct RECT)
    SendMessage( ::Parent:hWnd, TB_GETITEMRECT, ::xPosition, @rc )
    rc:right := ::Parent:Width
 RETURN rc

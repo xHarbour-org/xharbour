@@ -281,8 +281,6 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Create() CLASS TabControl
-   LOCAL hFont
-   
    ::Enabled := ::ShowTabs
 
    IF ( !::Theming .OR. !IsThemeActive() ) .AND. ::ShowTabs
@@ -339,6 +337,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnUserMsg( hWnd, nMsg ) CLASS TabControl
+   (hWnd)
    IF nMsg == WM_USER + 1111
       ::xHeight++
       ::MoveWindow()
@@ -357,7 +356,7 @@ RETURN CallWindowProc( ::__nUpDnProc, hWnd, nMsg, nwParam, nlParam )
 
 //-----------------------------------------------------------------------------------------------
 METHOD RestoreTabPos() CLASS TabControl
-   LOCAL tci, n, oPage, nPos, aChildren := ARRAY( LEN( ::Children ) )
+   LOCAL tci, n, aChildren := ARRAY( LEN( ::Children ) )
    
    FOR n := 1 TO LEN( ::Children )
       aChildren[ ::Children[n]:Position ] := ::Children[n]
@@ -431,7 +430,6 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Show(n) CLASS TabControl
-   LOCAL Tab
    Super:Show(n)
    IF LEN( ::Children ) >= ::Cursel
       TRY
@@ -468,14 +466,15 @@ METHOD HitTest( x, y, nFlags ) CLASS TabControl
 RETURN SendMessage( ::hWnd, TCM_HITTEST, 0, tch )+1
 
 //-----------------------------------------------------------------------------------------------
-METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove ) CLASS TabControl
+METHOD __OnParentSize( x, y, hDef ) CLASS TabControl
    ::Super:__OnParentSize( x, y, hDef, .T., .F. )
 RETURN hDef
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnMouseMove(n,x,y) CLASS TabControl
+METHOD OnMouseMove(nwParam,x,y) CLASS TabControl
    LOCAL aItem
    static nHot := 0
+   (nwParam)
    
    IF ( ::__nHot := ::HitTest( x, y ) ) > 0
       IF ::__lMouseDown .AND. ::CurSel <> ::__nHot
@@ -510,10 +509,10 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnWindowPaint() CLASS TabControl
-   LOCAL hDC, cPaint, aRect, n, cBuffer, nSel, hBrush, lTop, nItems, nMax, aPt
-   LOCAL lVert, x, y, nTextHeight, nTop, aSpin, nStyle, nFore, nState, nPart
-   LOCAL nLeft, nRight, nBottom, aCover, aItem, aSize
-   LOCAL aBackRect, aSeleRect, aFramRect
+   LOCAL hDC, cPaint, aRect, n, nSel, hBrush, lTop, nItems
+   LOCAL lVert, x, y, nTextHeight, nTop, nState, nPart
+   LOCAL nLeft, nRight, nBottom, aCover, aItem
+   LOCAL aBackRect, aFramRect
    LOCAL rc, tci, hWnd
    LOCAL hMemDC, hMemBitmap, hOldBitmap, hOldFont, aText, sz := (struct SIZE)
    IF !::Flat
@@ -887,7 +886,7 @@ RETURN 0
 
 //-----------------------------------------------------------------------------------------------
 METHOD UnDock() CLASS TabControl
-   LOCAL oPanel, Tab, hDef, oChild, oParent := ::Parent
+   LOCAL Tab, oParent := ::Parent
 
    IF __Evaluate( ::OnWMUnDock, Self ) == NIL
       ::Super:Undock()
@@ -907,7 +906,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD ReDock() CLASS TabControl
-   LOCAL o, oPanel, Tab, hDef, oChild, lDock, oControl, oParent := ::Parent
+   LOCAL Tab, oParent := ::Parent
 
    IF __Evaluate( ::OnWMReDock, Self ) == NIL
       ::Super:Redock()
@@ -937,7 +936,7 @@ METHOD SetItemValues( nItem, cText, nImgIndex ) CLASS TabControl
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnLButtonDown( nwParam, x, y ) CLASS TabControl
+METHOD OnLButtonDown() CLASS TabControl
    ::CallWindowProc()
    IF !::__lMouseDown
       IF VALTYPE( ::Children[ ::CurSel ] ) == "O" .AND. ::Children[ ::CurSel ]:AllowDrag
@@ -949,8 +948,8 @@ RETURN 0
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TabControl
-   LOCAL nSel, lAllow, nOldSel, n, pPtr, tck, lShift, hWnd
-
+   LOCAL nSel, lAllow, nOldSel, pPtr
+   (nwParam, nlParam)
    DO CASE
       CASE hdr:code == NM_CLICK
            ::__lMouseDown := .F.
@@ -1290,7 +1289,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Create() CLASS TabPage
-   LOCAL hTab, aRect, tci, rc, Control, nX, nY, hChild, lOldStyle, n
+   LOCAL tci, rc, n
 
    IF EMPTY( ::Caption )
       ::Caption := NIL
@@ -1421,7 +1420,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Delete() CLASS TabPage
-   LOCAL o, n, nIndex
+   LOCAL o, nIndex
    Super:Destroy()
    ::Parent:SendMessage( TCM_DELETEITEM, ::Index - 1 )
    FOR nIndex := 1 TO LEN( ::Parent:Children )
@@ -1468,7 +1467,7 @@ RETURN ::Super:OnCtlColorDlg( nwParam, nlParam )
 
 //-----------------------------------------------------------------------------------------------
 METHOD __OnParentSize( x, y, hDef ) CLASS TabPage
-   LOCAL aRect, nLeft, aPt, rc
+   LOCAL rc
    ::OnParentSize( x, y, hDef )
    IF ::Index == NIL
       RETURN NIL
@@ -1583,7 +1582,6 @@ RETURN hDef
 
 //-----------------------------------------------------------------------------------------------
 METHOD Select() CLASS TabPage
-   LOCAL n
    ::Parent:Children[ ::Parent:CurSel ]:HideTab()
    IF ::Parent:Visible
       ::ShowTab()
@@ -1688,7 +1686,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD DrawClose( hDC, aRect ) CLASS TabCloseButton
-   LOCAL hBrush, hOld
+   LOCAL hOld
    IF ::CloseHover
       hOld := SelectObject( hDC, ::System:CurrentScheme:Pen:ButtonSelectedBorder )
       SelectObject( hDC, IIF( !::ClosePushed, ::System:CurrentScheme:Brush:ButtonSelectedGradientEnd, ::System:CurrentScheme:Brush:ButtonPressedGradientBegin ) )
@@ -1714,7 +1712,7 @@ METHOD DrawClose( hDC, aRect ) CLASS TabCloseButton
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnParentDrawItem( nwParam, nlParam ) CLASS TabCloseButton
+METHOD OnParentDrawItem() CLASS TabCloseButton
    IF ::Parent:DrawItemStruct:itemState & ODS_FOCUS != 0
       ::ClosePushed := .T.
    ENDIF
@@ -1765,7 +1763,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD DrawPin( hDC, aRect ) CLASS TabPinButton
-   LOCAL hBrush, hOld
+   LOCAL hOld
    LOCAL nLeft, nRight, nBottom
    IF ::CloseHover
       hOld := SelectObject( hDC, ::System:CurrentScheme:Pen:ButtonSelectedBorder )
@@ -1796,7 +1794,7 @@ METHOD DrawPin( hDC, aRect ) CLASS TabPinButton
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnParentDrawItem( nwParam, nlParam ) CLASS TabPinButton
+METHOD OnParentDrawItem() CLASS TabPinButton
    IF ::Parent:DrawItemStruct:itemState & ODS_FOCUS != 0
       ::ClosePushed := .T.
    ENDIF
@@ -1914,7 +1912,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD DrawTabStripItem( hDC, lCurSel, nSel ) CLASS TabStrip
    LOCAL d, hRgn, aRect, n := 0, aItem := ::GetItemRect( nSel )
-   LOCAL x, y, hOldFont, hBrush, hOldPen, aSize, tci, lGrad := .F., lVert := .F.
+   LOCAL x, y, hOldFont, hBrush, hOldPen, tci, lGrad := .F., lVert := .F.
    IF lCurSel
       n := 1
    ENDIF
@@ -2038,6 +2036,7 @@ METHOD __GetGradienBrush( hDC, hRgn, aItem, n, d ) CLASS TabStrip
    LOCAL nColor1, nColor2, x
    LOCAL hBrush, hOldBitmap, hMemBitmap, hMemDC
    LOCAL __aMesh, aPt := { {=>}, {=>} }
+   (hRgn)
    IF ::ColorScheme == 1
       nColor1 := ::System:CurrentScheme:ToolStripGradientBegin
       nColor2 := ::System:CurrentScheme:ToolStripGradientEnd

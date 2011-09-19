@@ -97,6 +97,7 @@ RETURN ::SendMessage( EM_SETCHARFORMAT, SCF_SELECTION, cf )
 
 //-----------------------------------------------------------------------------------------------
 METHOD EditStreamCallback( dwCookie, pbBuff, cb, pcb ) CLASS RichTextBox
+   (dwCookie, pbBuff, pcb)
 RETURN cb
 
 #endif

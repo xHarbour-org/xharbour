@@ -224,7 +224,7 @@ RETURN ::SendMessage( TVM_GETITEMSTATE, hItem, nMask )
 
 METHOD GetItemRect( hItem, lItem )
 
-   LOCAL cBuffer, rc := (struct RECT)
+   LOCAL rc := (struct RECT)
    DEFAULT lItem TO .F.
    rc:left := hItem
 
@@ -236,7 +236,7 @@ RETURN rc
 
 FUNCTION FindTreeItem( aItems, hItem )
 
-   LOCAL oItem, oReturn, n
+   LOCAL oReturn, n
 
    //TraceLog( hItem )
 
@@ -304,9 +304,8 @@ RETURN Self
 
 //----------------------------------------------------------------------------//
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TreeView
-
-   LOCAL oItem, tvht, rc
-   LOCAL tv, nmtvcd, tvkd, nState, lRet, hItem
+   LOCAL tvht, rc
+   LOCAL tvkd, nState, lRet, hItem
    DEFAULT hdr TO ::Parent:hdr
    DO CASE
       CASE hdr:code == NM_CUSTOMDRAW

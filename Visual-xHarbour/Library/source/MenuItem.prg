@@ -129,7 +129,7 @@ ENDCLASS
 //-------------------------------------------------------------------------------------------------------
 
 METHOD Init( oParent, lAdd, nPos ) CLASS CMenuItem
-   LOCAL n, cProp, x
+   LOCAL n, x
 
    DEFAULT lAdd TO .F.
    DEFAULT nPos TO -1
@@ -181,7 +181,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS CMenuItem
-   LOCAL oSubMenu, nId, xIcon, x, n, nAccel
+   LOCAL oSubMenu, x, n
 
    IF IsMenu( ::hMenu )
       DestroyMenu( ::hMenu )
@@ -378,7 +378,7 @@ RETURN .F.
 //-----------------------------------------------------------------------------------------------------
 
 METHOD CheckForDefaultItem() CLASS CMenuItem
-   LOCAL oItem, Item, nId
+   LOCAL oItem, Item
 
    FOR EACH Item IN ::aItems
        IF Item:Caption != "[ Add New Item ]"
@@ -499,7 +499,7 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 
 METHOD MeasureItem( mi, nlParam ) CLASS CMenuItem
-   LOCAL lSeparator, hOld, aRect, n, hDC, aPt, aExt
+   LOCAL lSeparator, hOld, aRect, hDC, aExt
    LOCAL xIcon := 0
    LOCAL yIcon := 0
    lSeparator  := ::MenuItemInfo:fType & MFT_SEPARATOR != 0
@@ -556,8 +556,8 @@ RETURN 1
 //-------------------------------------------------------------------------------------------------------
 
 METHOD DrawItem( dis, l3D ) CLASS CMenuItem
-   LOCAL lSeparator, xIcon:=0, yIcon:=0, aRect, hTheme
-   LOCAL hDC, hPen, nIcon, nOff, lDisabled, lRadio, lSelected, lChecked, hBrush, nTop, lCheck := .F., nWidth, oItem, x
+   LOCAL lSeparator, xIcon:=0, yIcon:=0, aRect
+   LOCAL hDC, nIcon, nOff, lDisabled, lRadio, lSelected, lChecked, hBrush, nTop, lCheck := .F., nWidth, oItem, x
 
    DEFAULT l3D TO .F.
 
@@ -654,9 +654,7 @@ RETURN aRect
 //-------------------------------------------------------------------------------------------------------
 
 METHOD DrawItemText( hDC, dis, aRect, lDisabled, nOff, xIcon ) CLASS CMenuItem
-
-   LOCAL hOld
-   LOCAL aAccRect, aAlign, x, y
+   LOCAL hOld, aAccRect
 
    IF ::Font:Handle != NIL
       hOld := SelectObject( hDC, ::Font:Handle )

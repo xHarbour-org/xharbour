@@ -77,7 +77,7 @@ CLASS CheckBox INHERIT Control
    METHOD Indeterminate() INLINE ::State := BST_INDETERMINATE
 ENDCLASS
 
-METHOD Init( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight, nStyle, lCreate ) CLASS CheckBox
+METHOD Init( oParent ) CLASS CheckBox
    DEFAULT ::__xCtrlName TO "CheckBox"
    DEFAULT ::Style TO WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::ThemeName := "button"
@@ -92,8 +92,9 @@ METHOD Init( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight, nStyle, lCrea
 RETURN Self
 
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
-   LOCAL nRet, cd, nState, hTheme, aRect, lDisabled, lSelected, lFocus, nColor, nMode
+   LOCAL nRet, cd, aRect, lDisabled, lSelected, lFocus, nColor
    LOCAL sz, nStatus, hBkGnd, nFlags := DFCS_BUTTONCHECK
+   (nwParam)
    DO CASE
       CASE hdr:code==NM_CUSTOMDRAW
            nRet := CDRF_DODEFAULT
@@ -107,8 +108,8 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
                    lFocus    := cd:uItemState & CDIS_FOCUS != 0
 
                    IF lDisabled
-                      RETURN CDRF_DODEFAULT
                       SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, CDRF_DODEFAULT )
+                      RETURN CDRF_DODEFAULT
                    ENDIF
                    nColor := NIL
                    IF ::ForeColor != NIL .AND. !( ::ForeColor == ::ForeSysColor )
@@ -184,7 +185,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
 RETURN NIL
 
 METHOD DrawFrame( oDrawing, aRect, nAlign, nWidth, nHeight, nStatus, lDraw ) CLASS CheckBox
-   LOCAL hTheme, n, nFlags := DFCS_BUTTONCHECK
+   LOCAL nFlags := DFCS_BUTTONCHECK
    DEFAULT lDraw TO TRUE
    IF nStatus != NIL
       DO CASE
@@ -248,7 +249,7 @@ METHOD SetCheckStyle( nStyle ) CLASS CheckBox
    ENDIF
 RETURN Self
 
-METHOD OnCtlColorStatic( nwParam, nlParam ) CLASS CheckBox
+METHOD OnCtlColorStatic( nwParam ) CLASS CheckBox
    LOCAL nBack, hBkGnd := ::BkBrush
    DEFAULT hBkGnd TO ::__hBrush
    DEFAULT hBkGnd TO ::Parent:BkBrush

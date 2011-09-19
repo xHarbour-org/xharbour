@@ -645,7 +645,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD RestoreLayout( cIniFile, cSection, lAllowOut ) CLASS Window
-   LOCAL c, oIni, aRect, aPos, hMonitor
+   LOCAL c, oIni, aPos
    DEFAULT lAllowOut TO .T.
    IF EMPTY( cIniFile )
       oIni := ::Application:IniFile
@@ -672,8 +672,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 
 METHOD Init( oParent ) CLASS Window
-
-   LOCAL n, aApp, aBeh, aEve, aSiz, Topic
+   LOCAL Topic
    DEFAULT ::__lInitialized  TO .F.
    DEFAULT ::DisableParent TO .F.
    IF ::__lInitialized
@@ -758,8 +757,7 @@ METHOD GetCCTL() CLASS Window
 RETURN oParent
 
 METHOD __Register( cClass ) CLASS Window
-
-   LOCAL wcex, lRet, hBrush, aSize, pCallBack
+   LOCAL wcex
 
    IF cClass == NIL
 
@@ -854,8 +852,8 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD Create( oParent ) CLASS Window
-   LOCAL hParent, nLeft, nTop, hDef, oChild, x, y, hBmp, hRgn, cClass, wc, n, aRect
-   LOCAL oObj, nSeq, err, hIcon, nError, cError, aSize, oControl, oTop, oBottom, oLeft
+   LOCAL hParent, nLeft, nTop, wc
+   LOCAL oObj, nError, cError, aSize
    LOCAL cBmpMask
 
    IF ! ::MDIContainer
@@ -1187,7 +1185,6 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD __CreateMDI( lCreate ) CLASS Window
-   LOCAL nW,nH, cc, oControl, oTop
    DEFAULT lCreate TO .T.
    ::__IdeImageIndex := 3
    IF ::hWnd != NIL
@@ -1287,7 +1284,7 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 
 METHOD SetParent( oParent ) CLASS Window
-   LOCAL hWnd, n
+   LOCAL n
    IF ::Parent != NIL
       IF ( n := ASCAN( ::Parent:Children, {|o|o:hWnd==::hWnd} ) ) > 0
          ADEL( ::Parent:Children, n, .T. )
@@ -1334,7 +1331,7 @@ RETURN pWi
 //-----------------------------------------------------------------------------------------------
 
 METHOD SetStyle( nStyle, lAdd ) CLASS Window
-   LOCAL nSt, cStyle := "", n
+   LOCAL cStyle := ""
    DEFAULT lAdd TO .T.
    IF ::__ClassInst != NIL .AND. ::ClsName == "Button" .AND. lAdd .AND. nStyle == BS_DEFPUSHBUTTON
       RETURN NIL
@@ -1440,20 +1437,13 @@ RETURN nRet
 #define WM_IDLE WM_USER + 1
 
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
-
-   LOCAL nRet, nCode, nId, n, cBuffer, oMdi, oObj
-   LOCAL nW, nH, oChild, oItem, oSub, x, y, hDef, nLeft, nTop, nWidth, nHeight, lShift, h, nLines, nDelta, nScroll, nPage
-   LOCAL lShow, lHide, hParent, pPtr, pProc, oCtrl, aRect, aPt, ps, mii, cProp
-   LOCAL Band, msg, lHandled, aComp, oControl, oMenu, mmi, oTop, oBottom, oLeft, nFiles, oForm, aChildren
-
-   LOCAL dis, si, rc, pt, hBrush, cFile, hwndFrom, idFrom, code, aParams
-   LOCAL CtlType, CtlID, itemID, itemAction, itemState, hWndItem, hDC, rcItem, itemData
-   LOCAL hMemDC, hMemBitmap, hOldBitmap, aCommand, cBmpHeader, cBmpInfo, cBmpBits, nAnimation
-   LOCAL aProperties, aProperty
+   LOCAL nRet, nCode, nId, n, cBuffer, oObj
+   LOCAL oChild, oItem, x, y, hDef, nLeft, nTop, nWidth, nHeight, nLines, nDelta, nScroll, nPage
+   LOCAL lShow, lHide, hParent, pPtr, oCtrl, aRect, aPt, mii, cProp
+   LOCAL Band, msg, lHandled, aComp, oMenu, mmi, nFiles, oForm, aChildren
+   LOCAL rc, pt, cFile, hwndFrom, idFrom, code, aParams
+   LOCAL nAnimation
    
-   LOCAL i, c, cProcStack
-   static hCursor, hPrevCursor, hPrevWnd
-
    ::Msg    := nMsg
    ::wParam := nwParam
    ::lParam := nlParam
@@ -3343,8 +3333,7 @@ RETURN ::__WinProc(hWnd, nMsg, nwParam, nlParam)
 //-----------------------------------------------------------------------------------------------
 
 METHOD __WindowDestroy() CLASS Window
-
-   LOCAL aProperty, aProperties, n, oObj, hDef, lRedraw := .F.
+   LOCAL n, lRedraw := .F.
 
    IF ::Parent != NIL .AND. !(::Parent:__xCtrlName == "CoolBar")
       IF ( n := ASCAN( ::Parent:Children, {|o|o:hWnd == ::hWnd} ) ) > 0
@@ -3480,15 +3469,10 @@ RETURN Self
 
 METHOD OnMeasureItem( nwParam, nlParam ) CLASS Window
    LOCAL n, oItem, oButton, oSub, oMenu
-
+   (nwParam)
    IF ::Application != NIL
       oMenu := ::Application:oCurMenu
    ENDIF
-
-//   IF ( n := ASCAN( ::Components, {|o| o:__xCtrlName=="ContextMenu".AND.o:Menu:hMenu==::MeasureItemStruct:itemData} ) ) > 0
-//      oMenu := ::Components[n]:Menu
-//   ENDIF
-//   DEFAULT oMenu TO ::Menu
 
    IF ::MeasureItemStruct:CtlType == ODT_MENU .AND. oMenu != NIL
       FOR EACH oButton IN oMenu:aItems
@@ -3507,16 +3491,10 @@ METHOD OnMeasureItem( nwParam, nlParam ) CLASS Window
    ENDIF
 RETURN NIL
 
-METHOD OnDrawItem( nwParam, nlParam ) CLASS Window
+METHOD OnDrawItem() CLASS Window
    LOCAL n, oItem, oButton, oSub, oMenu
 
    oMenu := ::Application:oCurMenu
-
-//   IF ( n := ASCAN( ::Components, {|o| o:__xCtrlName=="ContextMenu".AND.o:Menu:hMenu==::DrawItemStruct:itemData} ) ) > 0
-//      oMenu := ::Components[n]:Menu
-//   ENDIF
-//   DEFAULT oMenu TO ::Menu
-
    IF ::DrawItemStruct:CtlType == ODT_MENU .AND. oMenu != NIL
       IF ::DrawItemStruct:itemState > 200
          ::DrawItemStruct:itemState -= 256
@@ -3602,13 +3580,10 @@ RETURN aRect
 //-----------------------------------------------------------------------------------------------
 
 METHOD __SetScrollBars() CLASS Window
-
    STATIC lBusy := .F.
-
    LOCAL nDelta
+
    // added variables
-   LOCAL sbi
-   LOCAL cBytes
    LOCAL nWidth       := ::ClientWidth
    LOCAL nHeight      := ::ClientHeight
    LOCAL nVertSize    := ::ClientHeight
@@ -3620,20 +3595,6 @@ METHOD __SetScrollBars() CLASS Window
    ELSE
       lBusy := .T.
    ENDIF
-
-/*
-   IF ::HorzScroll
-      IF ::Height-::ClientHeight > GetSystemMetrics( SM_CYCAPTION ) + (GetSystemMetrics( SM_CYFRAME )*2)
-         nVertSize += GetSystemMetrics( SM_CXHSCROLL )
-      ENDIF
-   ENDIF
-
-   IF ::VertScroll
-      IF ::Width-::ClientWidth > (GetSystemMetrics( SM_CXFRAME )*2)
-         nHorzSize += GetSystemMetrics( SM_CYVSCROLL )
-      ENDIF
-   ENDIF
-*/
 
    IF ::HorzScroll
       IF nHorzSize > ::OriginalRect[3]
@@ -3722,7 +3683,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------------------
 
 METHOD Hide() CLASS Window
-   LOCAL hDef, oChild, oSplitter, nAnimation
+   LOCAL nAnimation
    IF ::hWnd != NIL
       IF ::AnimationStyle != NIL .AND. ::AnimationStyle <> 0 .AND. ::__ClassInst == NIL
          nAnimation := ::AnimationStyle
@@ -3767,7 +3728,6 @@ METHOD Animate( nSpeed, nFlags ) CLASS Window
 RETURN Self
 
 METHOD Show( nShow ) CLASS Window
-   LOCAL hDef, oChild, nRet
    DEFAULT nShow TO ::ShowMode
 
    IF nShow == SW_HIDE
@@ -3828,7 +3788,7 @@ METHOD __FixDocking() CLASS Window
 RETURN Self
 
 METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Window
-   LOCAL n, a, aP, nWidth, nCurLeft, nCurTop, aDock, aPt, oLeft, oTop, oRight, oBottom, lAnchor, lDock, nHeight, rc
+   LOCAL n, nCurLeft, nCurTop, oLeft, oTop, oRight, oBottom, lAnchor, lDock, nHeight, rc
 
    DEFAULT lMoveNow TO FALSE
    DEFAULT lNoMove TO FALSE
@@ -4148,7 +4108,6 @@ RETURN Self
 //---------------------------------------------------------------------------------------------
 
 METHOD MoveWindow( x, y, w, h, lRep ) CLASS Window
-   LOCAL aRect, aPt
    DEFAULT x    TO ::xLeft
    DEFAULT y    TO ::xTop
    DEFAULT w    TO ::xWidth
@@ -4163,14 +4122,14 @@ RETURN Self
 //---------------------------------------------------------------------------------------------
 
 METHOD MessageWait( cText, cTitle, lProgress ) CLASS Window
-   LOCAL oWnd, oLabel
+   LOCAL oWnd
    DEFAULT lProgress TO .F.
    oWnd := MessageWait( cText, cTitle, lProgress )
 RETURN oWnd
 
 //----------------------------------------------------------------------------------------------------
 
-METHOD OnVScroll( nSBCode, nPos, nlParam ) CLASS Window
+METHOD OnVScroll( nSBCode, nPos ) CLASS Window
 
    LOCAL nDelta
    LOCAL nMaxPos := ::OriginalRect[4]// - ::xHeight
@@ -4232,7 +4191,7 @@ RETURN 0
 
 //----------------------------------------------------------------------------------------------------
 
-METHOD OnHScroll( nSBCode, nPos, nlParam ) CLASS Window
+METHOD OnHScroll( nSBCode, nPos ) CLASS Window
 
    LOCAL nDelta
    LOCAL nMaxPos := ::OriginalRect[3]// - ::xHeight
@@ -4294,7 +4253,7 @@ METHOD GetRect() CLASS Window
 RETURN rc
 
 METHOD GetChildFromPoint( pt, bAction, aSel ) CLASS Window
-   LOCAL o, rc, oCtrl, Control, Band
+   LOCAL o, rc, oCtrl, Control
 
    FOR EACH Control IN ::Children
        IF aSel == NIL .OR. ASCAN( aSel, {|a| a[1]:hWnd == Control:hWnd} ) == 0
@@ -4424,7 +4383,7 @@ METHOD Init( oOwner ) CLASS __WindowDock
 RETURN Self
 
 METHOD SetMargins( cMargins ) CLASS __WindowDock
-   LOCAL oItem, n, aMargins := hb_atokens( cMargins, "," )
+   LOCAL n, aMargins := hb_atokens( cMargins, "," )
    ::LeftMargin   := 0
    ::TopMargin    := 0
    ::RightMargin  := 0
@@ -4472,7 +4431,7 @@ METHOD Update() CLASS __WindowDock
    ENDIF
 RETURN Self
 
-METHOD SetDock( x, oDock ) CLASS __WindowDock
+METHOD SetDock( x ) CLASS __WindowDock
    IF x != NIL
       ::Type += x
    ENDIF
@@ -4721,7 +4680,7 @@ FUNCTION StrTrim( n )
 RETURN ALLTRIM(STR(n))
 
 FUNCTION __GetIconSize( hIcon )
-   LOCAL ii, cBuffer, aSize
+   LOCAL ii, aSize
    ii := (struct ICONINFO)
    GetIconInfo( hIcon, @ii )
    aSize := GetBmpSize( ii:hbmMask )
@@ -4814,7 +4773,7 @@ FUNCTION __Proper(cStr)
 RETURN(c)
 
 FUNCTION __GetMessageFont( nWeight )
-   LOCAL cBuff, n, ncm := (struct NONCLIENTMETRICS)
+   LOCAL ncm := (struct NONCLIENTMETRICS)
    ncm:cbSize := ncm:Sizeof()
 
    SystemParametersInfo( SPI_GETNONCLIENTMETRICS, ncm:Sizeof(), @ncm, 0 )
@@ -5259,7 +5218,7 @@ ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
 METHOD Init( oParent, aParameters, cProjectName ) CLASS WinForm
-   LOCAL oApp, hInst, hPointer
+   LOCAL hInst, hPointer
    
    IF VALTYPE( oParent ) == "N"
       ::__hParent := oParent
@@ -5314,8 +5273,6 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Create( hoParent ) CLASS WinForm
-   LOCAL hIcon
-   
    IF ::__hParent != NIL
       hoParent := ::__hParent
    ENDIF
@@ -5364,7 +5321,7 @@ METHOD OnSize() CLASS WinForm
    ENDIF
 RETURN Self
 
-METHOD OnSysCommand( nwParam, nlParam ) CLASS WinForm
+METHOD OnSysCommand( nwParam ) CLASS WinForm
    LOCAL oChild, hDef
    IF nwParam IN {SC_MAXIMIZE,SC_MAXIMIZE2,SC_RESTORE,SC_RESTORE2}
       ::CallWindowProc()
@@ -5396,7 +5353,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD RestoreLayout( cIniFile, cSection, lAllowOut ) CLASS WinForm
-   LOCAL c, oIni, aRect, aPos, hMonitor
+   LOCAL c, oIni, aRect, aPos
    DEFAULT lAllowOut TO .T.
    IF EMPTY( cIniFile )
       oIni := ::Application:IniFile
@@ -5447,7 +5404,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD __PaintBakgndImage( hDC ) CLASS WinForm
-   LOCAL cPaint, hBrush, hMemDC1, hOldBitmap1, oChild
+   LOCAL hBrush, hMemDC1, hOldBitmap1, oChild
    LOCAL hMemBitmap, hOldBitmap, hMemDC
    IF ::BackgroundImage != NIL .AND. ::BackgroundImage:hDIB != NIL
       DEFAULT hDC TO ::Drawing:hDC
@@ -5498,7 +5455,7 @@ METHOD __PaintBakgndImage( hDC ) CLASS WinForm
 RETURN NIL
 
 METHOD Show( nShow ) CLASS WinForm
-   LOCAL hDef, oChild, nRet, hDC, hMemDC, hMemDC1, hOldBitmap1, hOldBitmap, hMemBitmap, hBrush, o, n
+   LOCAL oChild, nRet, hDC, hMemDC, hMemDC1, hOldBitmap1, hOldBitmap, hMemBitmap, hBrush, o, n
    DEFAULT nShow TO ::ShowMode
    IF ::__OnInitCanceled
       RETURN NIL
@@ -5872,7 +5829,7 @@ FUNCTION XStr( xValue )
 RETURN xValue
 
 FUNCTION AssociateWith( cExt, cCode, cFile, cDesc, nIcon )
-   LOCAL cKey, cVal, nErr, hKey, hSubKey, nDisp, cIcon
+   LOCAL cKey, cVal, nErr, hKey, hSubKey, cIcon
    DEFAULT nIcon TO 0
 
    cIcon := Alltrim( Str( nIcon ) )
@@ -5980,7 +5937,7 @@ FUNCTION __ResetClassInst( oObj )
 RETURN NIL
 */
 FUNCTION __ResetClassInst( oObj )
-   LOCAL aProperties, aProperty, cProperty, aObjProperties, cObjProperty, xObjValue, xValue, xObjInst, xInst
+   LOCAL aProperties, cProperty, xValue, xInst
    LOCAL cPre
    aProperties := __ClsGetPropertiesAndValues( oObj )
    FOR EACH cProperty IN aProperties
@@ -6040,7 +5997,7 @@ RETURN ocCompo
 */
 
 FUNCTION __ChkComponent( oObj, ocCompo )
-   LOCAL oForm, n
+   LOCAL oForm
 
    IF VALTYPE( ocCompo ) == "C" 
 

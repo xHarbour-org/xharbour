@@ -239,7 +239,7 @@ RETURN nCount
 
 //-------------------------------------------------------------------------------------------------------
 METHOD __SerialControlProc() CLASS SerialPort
-   LOCAL nError, cBuffer, nRead := 0
+   LOCAL nRead := 0
    ::Application:Yield()
    KillTimer( ::Owner:hWnd, ::__nTimID )
 

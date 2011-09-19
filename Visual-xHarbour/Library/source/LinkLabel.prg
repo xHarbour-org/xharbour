@@ -127,8 +127,8 @@ METHOD SetWindowText( cText ) CLASS LinkLabel
    ENDIF
 RETURN Self
 
-METHOD OnEraseBkGnd( hDC, nlParam ) CLASS LinkLabel
-   LOCAL nState, hMemDC, hMemDC1, hMemBitmap, hMemBitmap1, hOldBitmap, hOldBitmap1, pWi, rc := (struct RECT)
+METHOD OnEraseBkGnd( hDC ) CLASS LinkLabel
+   LOCAL rc := (struct RECT)
    LOCAL nColor, lFocus, hBrush := ::BkBrush
 
    lFocus := ::__lFocused

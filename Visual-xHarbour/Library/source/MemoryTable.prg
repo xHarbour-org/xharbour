@@ -179,7 +179,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD Seek( xKey, lSoft, lCaseSensitive, lPartial ) CLASS MemoryTable
    LOCAL bBlock := {|a| a[ ::FieldPos( ::Tag ) ] == xKey }
-
+   (lSoft)
    DEFAULT lCaseSensitive TO .T., lPartial TO .f.  // only affect string values
    IF valtype( xKey ) == "C"
       IF lPartial
@@ -252,7 +252,7 @@ ENDCLASS
 //-------------------------------------------------------------------------------------------------------
 
 METHOD Put( xVal, cName ) CLASS MemData
-   LOCAL cRet, n
+   LOCAL n
    IF xVal != NIL
       n := ::Parent:FieldPos( Upper( cName ) )
       IF LEN( ::Parent:Table[ ::Parent:Record ] ) < n
@@ -275,7 +275,7 @@ RETURN ::Parent:Table[ ::Parent:Record ][ nField ]
 FUNCTION Browse( nTop, nLeft, nBottom, nRight, aData, aHeaders, cCaption, bAction, oGrid )
 
    LOCAL oForm := WinForm( NIL )
-   LOCAL oDataSource, Row
+   LOCAL oDataSource
 
    IF aData == NIL .AND. ! Used()
       RETURN .F.
@@ -381,8 +381,7 @@ RETURN .T.
 
 
 FUNCTION BrowseArray( aArray, aStructure, oForm )
-
-   LOCAL aRect, n, i, aTable, nWidth, hWin := GetDeskTopWindow()
+   LOCAL oGrid, aRect, n, i, aTable, hWin := GetDeskTopWindow()
    aRect := _GetWindowRect( hWin )
    
    IF Empty(oForm)
@@ -391,7 +390,7 @@ FUNCTION BrowseArray( aArray, aStructure, oForm )
       oForm:Create()
    ENDIF   
    
-   WITH OBJECT DataGrid( oForm )
+   WITH OBJECT oGrid := DataGrid( oForm )
    
       IF aStructure == NIL
          aStructure := {}
@@ -438,12 +437,8 @@ FUNCTION BrowseArray( aArray, aStructure, oForm )
       
       oForm:CenterWindow()
       oForm:Show()
-
-      RETURN :this
-      
    END
-   
-RETURN NIL
+RETURN oGrid
 
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------

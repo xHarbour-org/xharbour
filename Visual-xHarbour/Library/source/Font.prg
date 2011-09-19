@@ -88,7 +88,7 @@ ENDCLASS
 //--------------------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS Font
-   LOCAL cBuffer, hDC, nFactor, cFont, n, cName, cChar, aFont
+   LOCAL cFont
 
    ::ncm := (struct NONCLIENTMETRICS)
    ::ncm:cbSize := ::ncm:Sizeof()
@@ -188,7 +188,7 @@ METHOD Set( o ) CLASS Font
 RETURN Self
 
 METHOD Choose( oOwner, lSet, nStyle ) CLASS Font
-   LOCAL n, cf := (struct CHOOSEFONT)
+   LOCAL cf := (struct CHOOSEFONT)
 
    DEFAULT lSet TO .T.
    cf:lStructSize := cf:sizeof()
@@ -299,7 +299,7 @@ METHOD EnumFamilies( cFamily ) CLASS Font
    EnumFontFamilies( ::Parent:Drawing:hDC, cFamily, WinCallBackPointer( HB_ObjMsgPtr( Self, "EnumFamiliesProc" ), Self ), NIL )
 RETURN Self
 
-METHOD EnumFamiliesProc( lpelf, lpntm, FontType, lParam ) CLASS Font
+METHOD EnumFamiliesProc( lpelf ) CLASS Font
    LOCAL lf := (struct ENUMLOGFONT*) lpelf
 RETURN 1
 

@@ -102,7 +102,7 @@ METHOD Show() CLASS FolderBrowserDialog
    FreeCallBackPointer( pCallBack )
 RETURN ::SelectedPath
 
-METHOD BrowseForFolderCallBack( hWnd, nMsg, lp, pData ) CLASS FolderBrowserDialog
+METHOD BrowseForFolderCallBack( hWnd, nMsg, lp ) CLASS FolderBrowserDialog
    LOCAL cBuffer
    SWITCH nMsg
       CASE BFFM_INITIALIZED
@@ -167,7 +167,7 @@ METHOD Init( oParent ) CLASS OpenFileDialog
 RETURN Self
 
 METHOD Show() CLASS OpenFileDialog
-   LOCAL aFiles, cFile, n, x, cFilter, aFilter
+   LOCAL n, cFilter
    LOCAL ofn := (struct OPENFILENAME)
 
    IF VALTYPE( ::FileName ) == "A"
@@ -267,7 +267,7 @@ METHOD Init( oParent ) CLASS SaveFileDialog
 RETURN Self
 
 METHOD Show() CLASS SaveFileDialog
-   LOCAL aFiles, cFile, n, x, cFilter, aFilter, cExt
+   LOCAL n, cFilter, aFilter, cExt
    LOCAL ofn := (struct OPENFILENAME)
 
    IF VALTYPE( ::FileName ) == "A"
@@ -493,7 +493,7 @@ METHOD Init( oParent ) CLASS PageSetup
 RETURN Self
 
 METHOD Show() CLASS PageSetup
-   LOCAL pd, nPtr, advnm, dn, nOrientation, nPaperSize, nWidth, nLenght
+   LOCAL nPtr, advnm, dn, nOrientation, nPaperSize, nWidth, nLenght
    nOrientation := ::Orientation
    nPaperSize   := ::PaperSize
    nLenght      := ::PageHeight

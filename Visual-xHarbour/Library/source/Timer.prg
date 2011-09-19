@@ -59,10 +59,10 @@ METHOD SetDelay(n) CLASS Timer
    ENDIF
 RETURN Self
 
-METHOD TimeProc( hWnd, nMsg, nId, nTime ) CLASS Timer
-   LOCAL hPointer, nRet := 0
+METHOD TimeProc() CLASS Timer
+   LOCAL nRet := 0
    IF ::__ClassInst == NIL
       ::OnTimeOut()
       nRet := ExecuteEvent( "OnTimeOut", Self )
    ENDIF
-RETURN NIL
+RETURN nRet

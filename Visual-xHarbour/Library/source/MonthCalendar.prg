@@ -115,7 +115,8 @@ METHOD Create() CLASS MonthCalendar
 RETURN Self
 
 METHOD OnParentNotify( nwParam, nlParam ) CLASS MonthCalendar
-   LOCAL st, nRet := 0
+   LOCAL nRet := 0
+   (nwParam)
    DO CASE
       CASE ::Parent:hdr:code == MCN_GETDAYSTATE
            ::NmDayState := (struct NMDAYSTATE*) nlParam
@@ -148,7 +149,7 @@ METHOD SetCurSel( dDate ) CLASS MonthCalendar
 RETURN Self
 
 METHOD SetRange( nMinMax ) CLASS MonthCalendar
-   LOCAL MinSt, MaxSt, aSysTime
+   LOCAL MinSt, MaxSt
    DEFAULT nMinMax TO GDTR_MIN | GDTR_MAX
 
    MinSt := (struct SYSTEMTIME)

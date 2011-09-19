@@ -111,10 +111,6 @@ METHOD Create() CLASS ImageList
 RETURN Self
 
 METHOD Destroy() CLASS ImageList
-   LOCAL oControl
-   //IF ::__lAdd
-   //   ::Clean( ::Form )
-   //ENDIF
    ImageListDestroy( ::Handle )
    IF ::__lAdd
       ::Super:Destroy()
@@ -144,7 +140,7 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------
 
-METHOD __RefreshHandle( nInd, nProp ) CLASS ImageList
+METHOD __RefreshHandle() CLASS ImageList
    IF ::Handle != NIL
       ImageListDestroy( ::Handle )
       ::Handle := NIL
@@ -155,7 +151,7 @@ RETURN Self
 //----------------------------------------------------------------------------------------------------
 
 METHOD AddImage( cImage, nMask, hInst, nLoad, nType, cFile, lAdd, lParser ) CLASS ImageList
-   LOCAL cResImg, i, hImage, tbab, hTool, tbb, nRet, hList, n, pImageInfo := (struct IMAGEINFO), hList1, hList2
+   LOCAL hImage, hTool, tbb, nRet, hList, pImageInfo := (struct IMAGEINFO)
    DEFAULT lAdd TO .T.
    DEFAULT nType TO IMAGE_ICON
    DEFAULT lParser TO .F.
@@ -295,13 +291,8 @@ RETURN SELF
 //----------------------------------------------------------------------------------------------------
 
 METHOD DrawImage( hDC, nIndex, x, y, nFlags, nColor ) CLASS ImageList
-   LOCAL hIcon
    DEFAULT nColor TO CLR_NONE
    ImageListDrawEx( ::Handle, nIndex-1, hDC, x, y, 0, 0, CLR_NONE, nColor, nFlags )
-   
-   //hIcon := ::GetImage( nIndex )
-   //DrawIconEx( hDC, x, y, hIcon, ::IconWidth, ::IconHeight, 0, NIL, DI_NORMAL )
-
 RETURN SELF
 
 //----------------------------------------------------------------------------------------------------
@@ -323,7 +314,6 @@ CLASS __ImageListComboBox INHERIT ComboBox
 ENDCLASS
 
 METHOD Init( oParent, oImageList ) CLASS __ImageListComboBox
-   LOCAL cDrives, n, nType, cType, shfi, cBuffer
    ::ImageList := oImageList
    ::Super:Init( oParent )
    ::Style     := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | CBS_HASSTRINGS | CBS_OWNERDRAWFIXED | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
@@ -339,8 +329,8 @@ METHOD Create() CLASS __ImageListComboBox
    NEXT
 RETURN Self
 
-METHOD OnParentDrawItem( nwParam, nlParam ) CLASS __ImageListComboBox
-   LOCAL n, x, y, lSelected,  nLen, itemTxt, cText, aRect, nField, aSize
+METHOD OnParentDrawItem() CLASS __ImageListComboBox
+   LOCAL n, y, lSelected, nLen, itemTxt, aSize
    IF ::Parent:DrawItemStruct:hwndItem == ::hWnd
       lSelected := ::Parent:DrawItemStruct:itemState & ODS_SELECTED != 0
 

@@ -73,8 +73,6 @@ ENDCLASS
 //----------------------------------------------------------------------------------------------------
 
 METHOD Init( oParent ) CLASS CoolBar
-
-   LOCAL aRect, aCnt, hClass, o
    LOCAL rbi := (struct REBARINFO)
 
    InitCommonControlsEx(ICC_COOL_CLASSES)
@@ -139,9 +137,8 @@ RETURN SELF
 
 //----------------------------------------------------------------------------------------------------
 
-METHOD OnMouseMove( n, x, y ) CLASS CoolBar
-
-   LOCAL aMouse, rc, oTool, nBand, pt, oBar, oBand
+METHOD OnMouseMove() CLASS CoolBar
+   LOCAL rc, oTool, nBand, pt
    IF ::hWnd != GetCapture() .OR. ::hwndBand == NIL
       RETURN NIL
    ENDIF
@@ -264,9 +261,8 @@ RETURN Self
 //----------------------------------------------------------------------------------------------------
 
 METHOD OnParentNotify( nwParam, nlParam ) CLASS CoolBar
-
-   LOCAL nBand, chev, aRect, hDef, oChild, nmr, rbi, aMouse, nW, nH
-   LOCAL cBuffer, n, rc
+   LOCAL nBand, chev, rbi
+   (nwParam)
 
    DO CASE
       CASE ::Parent:hdr:code==RBN_BEGINDRAG
@@ -308,7 +304,7 @@ METHOD OnParentNotify( nwParam, nlParam ) CLASS CoolBar
 RETURN NIL
 
 METHOD UpdateSize() CLASS CoolBar
-   LOCAL oChild, rc, hDef, nW, nH, oTop
+   LOCAL oChild, hDef
    IF ::Repaint
       ::xHeight:= ::GetHeight()
 
@@ -441,7 +437,7 @@ METHOD SetStyle( nStyle, Value ) CLASS CoolBarBand
    ENDIF
 RETURN Self
 
-METHOD Init( oParent, nPos ) CLASS CoolBarBand
+METHOD Init( oParent ) CLASS CoolBarBand
    ::Parent             := oParent
    ::oStruct            := (struct REBARBANDINFO)
    ::Index              := LEN( oParent:Bands )
@@ -503,7 +499,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD SetImage( cImage, hInst, nType, nLoad ) CLASS CoolBarBand
+METHOD SetImage( cImage, hInst, nType ) CLASS CoolBarBand
 
    DEFAULT nType TO IMAGE_BITMAP
    DEFAULT hInst TO ::Parent:Instance
@@ -652,7 +648,6 @@ RETURN SELF
 //--------------------------------------------------------------------------------------------------------
 
 METHOD SetChevron( lSet ) CLASS CoolBarBand
-   LOCAL n
    DEFAULT lSet TO ::xChevron
    IF lSet
       ::oStruct:fMask := RBBIM_IDEALSIZE + RBBIM_STYLE
@@ -672,7 +667,7 @@ RETURN ::oStruct:cxIdeal
 
 //--------------------------------------------------------------------------------------------------------
 METHOD GetRect() CLASS CoolBarBand
-   LOCAL rbb, rc, pt
+   LOCAL rc, pt
    rc := ::Parent:GetBandRect( ::Index )
    pt := (struct POINT)
    pt:x := rc:left
@@ -689,8 +684,7 @@ RETURN rc
 
 //--------------------------------------------------------------------------------------------------------
 METHOD GetRectangle() CLASS CoolBarBand
-   LOCAL rbb, rc, pt
-   rc := ::Parent:GetBandRect( ::Index )
+   LOCAL rc := ::Parent:GetBandRect( ::Index )
 RETURN rc:Array
 
 //--------------------------------------------------------------------------------------------------------
@@ -889,8 +883,7 @@ RETURN SELF
 //--------------------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS FloatingToolBar
-
-   LOCAL oBar, oTool, oBtn, n, aBtns, cCaption
+   LOCAL oBar, oTool
 
    //::SetStyle( WS_THICKFRAME, .F. )
    ::Width   := ::BandBuffer:MinWidth + 20
@@ -933,7 +926,7 @@ RETURN SELF
 //--------------------------------------------------------------------------------------------------------
 
 METHOD OnMove( x, y ) CLASS FloatingToolBar
-   LOCAL hWnd, aRect, n, oBand, aMouse, oChild, pt, oControl
+   LOCAL oBand, pt, oControl
    
    pt := (struct POINT)
    pt:x  := x

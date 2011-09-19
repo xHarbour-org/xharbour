@@ -197,7 +197,7 @@ METHOD Create() CLASS FolderList
 RETURN Self
 
 METHOD OnUserMsg( hWnd, nMsg, nwParam, nlParam ) CLASS FolderList
-   LOCAL wEventId, cFolder
+   (hWnd, nwParam, nlParam)
    IF /*::__ClassInst == NIL .AND.*/ nMsg == WM_USER + 15 .AND. ::__LastFolderID != NIL
       ListViewBrowsePopulateByID( ::hWnd, ::__LastFolderID, ::__LastParent )
       RETURN 0
@@ -206,7 +206,7 @@ RETURN NIL
 
 
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS FolderList
-   LOCAL nmlv, nSubItem, nId, iFile, lvi, cFile, n
+   LOCAL nSubItem, iFile, lvi, n
 
    IF hdr:code == LVN_GETDISPINFO
       ListBrowseSetDisplayInfo( nlParam )

@@ -287,6 +287,7 @@ METHOD OnLButtonDown( n, x, y ) CLASS ToolTip
 RETURN NIL
 
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolTip
+   (nwParam, nlParam)
    IF hdr:code == TTN_POP
       ::Parent:__lPopTip := .T.
       RETURN 0

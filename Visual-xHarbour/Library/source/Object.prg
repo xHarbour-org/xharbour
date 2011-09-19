@@ -87,7 +87,7 @@ ENDCLASS
 
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD OnError( ... ) CLASS Object
-   LOCAL cMsg, n, hProperty, oParent, uRet, aParams := HB_AParams()
+   LOCAL cMsg, uRet, aParams := HB_AParams()
    cMsg := __GetMessage()
    
    IF PCount() == 0 .AND. ::Property != NIL
@@ -141,7 +141,6 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD __SetCtrlName(c) CLASS Object
-   LOCAL n, cProp, nProp
    IF !(::Name == c) .AND. ::Form != NIL
       ::Form:__SetAsProperty( c, Self )
       ::xName := c
@@ -150,7 +149,7 @@ RETURN c
 
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD __CreateProperty( cBaseName ) CLASS Object
-   LOCAL n, aProp, nPos, cName
+   LOCAL n
 
    DEFAULT cBaseName TO ::__xCtrlName
    IF ::Form != NIL .AND. ::__xCtrlName != "ToolTip"
@@ -162,8 +161,8 @@ METHOD __CreateProperty( cBaseName ) CLASS Object
 RETURN SELF
 
 //-----------------------------------------------------------------------------------------------------------------------------
-METHOD GetControlName( cName, lIde ) CLASS Object
-   LOCAL o, cProp, n := 1, oControl, lCont, lComp := .T., oForm := ::Form
+METHOD GetControlName( cName ) CLASS Object
+   LOCAL cProp, n := 1, lComp := .T., oForm := ::Form
    IF ::Application:GenerateMembers
       WHILE ::Application != NIL .AND. oForm != NIL .AND. oForm:Property != NIL
          cProp := cName + XSTR( n )

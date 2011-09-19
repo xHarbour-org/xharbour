@@ -82,7 +82,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD OnCtlColorStatic( nwParam, nlParam ) CLASS Label
+METHOD OnCtlColorStatic( nwParam ) CLASS Label
    LOCAL hBkGnd := ::BkBrush
    DEFAULT hBkGnd TO ::Parent:BkBrush
 

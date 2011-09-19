@@ -49,6 +49,7 @@
    #include "hbpcode.h"
    #include "winreg.h"
 #pragma ENDDUMP
+
 //-----------------------------------------------------------------------------------------------
 
 CLASS HeaderStrip INHERIT Control
@@ -144,7 +145,7 @@ RETURN Self
 //---------------------------------------------------------------------------------------------------
 
 METHOD GetItemRect( nItem ) CLASS HeaderStrip
-   LOCAL aRect, rc := (struct RECT)
+   LOCAL rc := (struct RECT)
    SendMessage( ::hWnd, HDM_GETITEMRECT, nItem, @rc )
 RETURN rc
 
@@ -163,10 +164,8 @@ RETURN Self
 //---------------------------------------------------------------------------------------------------
 
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS HeaderStrip
-   LOCAL nRet, hTheme, pt
-   LOCAL cd, nmh, hcd, hdti
-   LOCAL aMouse, aRect, nColPos, nTrack, n, hdht
-
+   LOCAL nRet, n
+   (nwParam)
    DO CASE
       CASE hdr:code == HDN_BEGINTRACK
            nRet := __Evaluate( ::OnBeginTrack, __GetHeaderItem( nlParam ) )
@@ -247,7 +246,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 
 METHOD DrawFrame( hDC, aRect, nStatus, lDraw ) CLASS HeaderStrip
-   LOCAL hTheme, n, nFlags := DFCS_BUTTONPUSH
+   LOCAL hTheme, nFlags := DFCS_BUTTONPUSH
    DEFAULT lDraw TO .T.
 
    IF lDraw
@@ -349,13 +348,12 @@ CLASS HeaderItem INHERIT Object
    METHOD IsWindowVisible()   INLINE .T.
    METHOD GetRectangle()      INLINE { ::Left, ::Top, ::Left + ::Width, ::Top + ::Height }
    METHOD GetChildFromPoint() INLINE Self
-   METHOD SetWindowPos(h, x, y, cx, cy ) INLINE ::Width := cx
+   METHOD SetWindowPos(h, x, y, cx ) INLINE (h, x, y), ::Width := cx
    METHOD Refresh()           INLINE ::Parent:InvalidateRect()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS HeaderItem
-   LOCAL n, aProp, nPos
    IF oParent:__ClassInst != NIL
       ::__ClassInst := __ClsInst( ::ClassH )
    ENDIF

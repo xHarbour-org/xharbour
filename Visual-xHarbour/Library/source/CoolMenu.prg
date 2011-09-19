@@ -78,8 +78,6 @@ RETURN SELF
 //-------------------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS CoolMenu
-
-   LOCAL oBtn, oMenuItem
    ::hBackupColor := ::xForeColor
    DEFAULT ::hBackupColor TO GetSysColor( COLOR_BTNTEXT )
    ::Super:Create()
@@ -91,8 +89,8 @@ METHOD Create() CLASS CoolMenu
    ENDIF
 
    IF ::__ClassInst != NIL
-      ::__IdeContextMenuItems := { { "&Delete", {|o| ::Application:ObjectManager:ActiveObject:Destroy(),;
-                                                     ::Application:Project:Modified := .T. } }}
+      ::__IdeContextMenuItems := { { "&Delete", {|| ::Application:ObjectManager:ActiveObject:Destroy(),;
+                                                    ::Application:Project:Modified := .T. } }}
 
       // Loading CoolMenu BAR we need the [ Add New Item ] option for bar level Items
       WITH OBJECT CoolMenuItem()
@@ -123,7 +121,7 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 
-METHOD OnSysKeyDown( nwParam, nlParam ) CLASS Coolmenu
+METHOD OnSysKeyDown( nwParam ) CLASS Coolmenu
    LOCAL n, nHot := SendMessage( ::hWnd, TB_GETHOTITEM, 0, 0 )
 
    // close the menu on ALT KEY y it is selected
@@ -189,7 +187,7 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 
 METHOD OnMenuChar( nwParam, nlParam ) CLASS CoolMenu
-   LOCAL nItem, oMenu, n, oSub
+   LOCAL nItem, oMenu, n
    oMenu := ::oMenu:GetSubMenu( nlParam )
    nItem := -1
    IF oMenu != NIL
@@ -209,7 +207,7 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD OnSysChar( nwParam, nlParam ) CLASS CoolMenu
+METHOD OnSysChar( nwParam ) CLASS CoolMenu
    LOCAL n
 
    FOR n := 1 TO LEN( ::aItems )
@@ -260,7 +258,9 @@ RETURN SELF
 //-----------------------------------------------------------------------------------------------
 
 METHOD OnLButtonDown( nwParam,x,y,hWnd) CLASS CoolMenu
-   LOCAL n, cBuffer
+   LOCAL n
+   (x)
+   (y)
    IF nwParam != -1
       n := SendMessage( hWnd, TB_GETHOTITEM, 0, 0 )
      ELSE
@@ -301,8 +301,8 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD OnParentCommand( nId, nCode, nlParam ) CLASS CoolMenu
-   LOCAL oBtn, x, n, oItem, oSub, nRet, oMdi
+METHOD OnParentCommand( nId, nCode ) CLASS CoolMenu
+   LOCAL oBtn, n, oItem, oSub, nRet, oMdi
    IF ::Parent:MdiContainer
       oMdi := ::Parent:MDIClient:GetActive()
 
@@ -405,7 +405,7 @@ METHOD Init( oParent ) CLASS CoolMenuItem
 RETURN Self
 
 METHOD Create( nPos ) CLASS CoolMenuItem
-   LOCAL oSubItem, n, lAddDefault := .F., lMember
+   LOCAL oSubItem, lAddDefault := .F.
 
    DEFAULT ::xCaption TO ::Name
 
@@ -419,8 +419,8 @@ METHOD Create( nPos ) CLASS CoolMenuItem
 
    IF ::Caption != "[ Add New Item ]"
       IF ::__ClassInst != NIL
-         ::__IdeContextMenuItems := { { "&Delete", {|o| ::Application:ObjectManager:ActiveObject:Destroy(),;
-                                                        ::Application:Project:Modified := .T. } }}
+         ::__IdeContextMenuItems := { { "&Delete", {|| ::Application:ObjectManager:ActiveObject:Destroy(),;
+                                                       ::Application:Project:Modified := .T. } }}
       ENDIF
       IF ::SetChildren
          IF nPos < 0

@@ -43,7 +43,6 @@ ENDCLASS
 //-----------------------------------------------------------------------------------------------
 
 METHOD Init( oOwner ) CLASS Component
-   LOCAL n, aProp, cProp, nPos
    ::__IsControl  := .F.
    ::__lCopyCut   := .F.
    DEFAULT ::__xCtrlName TO "Component"
@@ -104,7 +103,6 @@ METHOD Destroy() CLASS Component
 RETURN .F.
 
 METHOD __SetCtrlName(c) CLASS Component
-   LOCAL cType
    Super:__SetCtrlName(c)
    IF !EMPTY( ::Button )
       ::Button:Parent:Reset()

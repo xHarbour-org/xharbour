@@ -190,7 +190,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 
 METHOD SetRange( nMinMax ) CLASS DateTimePicker
-   LOCAL MinSt, MaxSt, aSysTime
+   LOCAL MinSt, MaxSt
    DEFAULT nMinMax TO GDTR_MIN+GDTR_MAX
    MinSt := (struct SYSTEMTIME)
    MaxSt := (struct SYSTEMTIME)
@@ -226,7 +226,7 @@ METHOD SetCustomFormat( cCustomFormat ) CLASS DateTimePicker
 RETURN Self
 
 METHOD SetFormat( nFormat ) CLASS DateTimePicker
-   LOCAL cFormat, xValue
+   LOCAL xValue
    IF nFormat < 20
       IF ::xFormat == 20
          ::SendMessage( DTM_SETFORMAT, 0, NIL )
@@ -248,7 +248,8 @@ RETURN Self
 
 
 METHOD OnParentNotify( nwParam, nlParam ) CLASS DateTimePicker
-   LOCAL nRet, nmd, dDate, cTime, st
+   LOCAL nRet, nmd
+   (nwParam)
    DO CASE
       CASE ::Parent:hdr:code == DTN_CLOSEUP
            nRet := ::OnCloseUp( ::Parent:hdr, nlParam )

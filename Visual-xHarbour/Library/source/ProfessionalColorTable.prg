@@ -491,7 +491,7 @@ METHOD Init( oParent ) CLASS ProfessionalColorTablePen
 RETURN Self
 
 METHOD Clean() CLASS ProfessionalColorTablePen
-   LOCAL aProp, n, nColor, hPen
+   LOCAL n, nColor, hPen
    FOR n := 1 TO LEN( __aSystemPen )
        DeleteObject( __aSystemPen[n][2] )
        nColor := __objSendMsg( ::Parent, UPPER( __aSystemPen[n][1] ) )
@@ -502,7 +502,7 @@ METHOD Clean() CLASS ProfessionalColorTablePen
 RETURN Self
 
 METHOD OnError( xValue ) CLASS ProfessionalColorTablePen
-   LOCAL nColor, n, hPen, cMsg := __GetMessage()
+   LOCAL nColor, hPen, cMsg := __GetMessage()
    IF PCount() == 0 .AND. xValue == NIL
       nColor := __objSendMsg( ::Parent, UPPER( cMsg ) )
       hPen := CreatePen( PS_SOLID, 1, nColor )
@@ -529,7 +529,7 @@ METHOD Init( oParent ) CLASS ProfessionalColorTableBrush
 RETURN Self
 
 METHOD Clean() CLASS ProfessionalColorTableBrush
-   LOCAL aProp, n, nColor, hBrush
+   LOCAL n, nColor, hBrush
    FOR n := 1 TO LEN( __aSystemBrush )
        DeleteObject( __aSystemBrush[n][2] )
        nColor := __objSendMsg( ::Parent, UPPER( __aSystemBrush[n][1] ) )
@@ -540,7 +540,7 @@ METHOD Clean() CLASS ProfessionalColorTableBrush
 RETURN Self
 
 METHOD OnError( xValue ) CLASS ProfessionalColorTableBrush
-   LOCAL nColor, n, hBrush, cMsg := __GetMessage()
+   LOCAL nColor, hBrush, cMsg := __GetMessage()
    IF PCount() == 0 .AND. xValue == NIL
       nColor := __objSendMsg( ::Parent, UPPER( cMsg ) )
       hBrush := CreateSolidBrush( nColor )

@@ -31,7 +31,7 @@ ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS FreeImage
-   LOCAL aFormat, cSupp := ""
+   LOCAL cSupp := ""
    ::__xCtrlName  := "FreeImage"
    ::FreeImageRenderer:Init( Self )
    ::Panel:Init( oParent )
@@ -54,9 +54,8 @@ RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
 METHOD OnPaint( hDC, hMemDC ) CLASS FreeImage
-   LOCAL hParBitmap, hOldParBitmap, hParDC
    LOCAL hMemBitmap, hOldBitmap, hBrush
-   LOCAL oChild, hMemBitmap1, hOldBitmap1, hMemDC1, pPt := (struct POINT)
+   LOCAL oChild, hOldBitmap1, hMemDC1, pPt := (struct POINT)
 
    IF !::Transparent
       hBrush := ::BkBrush
@@ -159,7 +158,7 @@ ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------
 METHOD SetMargins( cMargins ) CLASS FreeImageRenderer
-   LOCAL oApp, oItem, n, aMargins := hb_atokens( cMargins, "," )
+   LOCAL oApp, n, aMargins := hb_atokens( cMargins, "," )
    oApp := __GetApplication()
    ::LeftMargin   := 0
    ::TopMargin    := 0
@@ -210,8 +209,6 @@ RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS FreeImageRenderer
-   LOCAL n, aFormat, cSupp
-
    IF !EMPTY( ::ImageName )
       ::__SetImageName( ::xImageName )
    ENDIF
@@ -229,8 +226,8 @@ RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
 METHOD Draw( hMemDC ) CLASS FreeImageRenderer
-   LOCAL cx, cy, hDIBMemBitmap, display_dib, hBitmap, hDib, nRatio, iy, nHeight, nWidth
-   LOCAL hMemBitmap1, hOldBitmap1, hMemDC1, hDC, x, y, hBackColor
+   LOCAL cx, cy, hDIBMemBitmap, display_dib, hDib, nRatio, iy, nHeight, nWidth
+   LOCAL hMemBitmap1, hOldBitmap1, hMemDC1, x, y
    IF ::hDIB == NIL
       RETURN NIL
    ENDIF
@@ -368,7 +365,7 @@ RETURN NIL
 
 //--------------------------------------------------------------------------------------------------------
 METHOD LoadResource( cResource, cType ) CLASS FreeImageRenderer
-   LOCAL display_dib, lOK := .F., cData, hBmp, n, hMem, hRes, hInst
+   LOCAL lOK := .F., cData, hBmp, hInst
    hInst := ::Owner:AppInstance
    IF cType != "BMP" .AND. cType != "ICO"
    
@@ -412,7 +409,7 @@ RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
 METHOD __SetImageName( cFile ) CLASS FreeImageRenderer
-   LOCAL n, cType, cPrev
+   LOCAL cType, cPrev
    IF VALTYPE( cFile ) == "A"
       cFile := IIF( ::__ClassInst != NIL .AND. VALTYPE( cFile[1] ) == "C", cFile[1], cFile[2] )
    ENDIF

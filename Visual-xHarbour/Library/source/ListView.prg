@@ -128,7 +128,6 @@ ENDCLASS
 //-------------------------------------------------------------------------------------------------------
 
 METHOD Init( oParent ) CLASS ListView
-   LOCAL n
    DEFAULT ::__xCtrlName TO "ListView"
    ::Style        := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::ClsName      := "SysListView32"
@@ -237,7 +236,7 @@ RETURN cStr
 //-------------------------------------------------------------------------------------------------------
 
 METHOD SetDataSource( oSource ) CLASS ListView
-   LOCAL aField, cField, n, nAlign
+   LOCAL aField, n, nAlign
    oSource := __ChkComponent( Self, oSource )
    
    ::xDataSource := oSource
@@ -265,21 +264,14 @@ METHOD SetDataSource( oSource ) CLASS ListView
       NEXT
       ListViewDeleteAllItems( ::hWnd )
       ListViewSetItemCount( ::hWnd, oSource:RecCount(), LVSICF_NOINVALIDATEALL | LVSICF_NOSCROLL)
-//      oSource:NotyfyChange( Self )
    ENDIF
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 
 METHOD __SetViewStyle( n ) CLASS ListView
-   LOCAL nStyle, lvti
+   LOCAL lvti
    DEFAULT n TO ::ViewStyle
-//    IF ::ViewStyle != n
-//       nStyle  := n & LVS_TYPEMASK
-//       ::Style := ::Style & NOT( LVS_TYPEMASK )
-//       ::Style := ::Style | nStyle
-//       SetWindowLong( ::hWnd, GWL_STYLE, ::Style )
-//    ENDIF
    IF IsWindow( ::hWnd  )
       SendMessage( ::hWnd, LVM_SETVIEW, n, 0 )
 
@@ -289,11 +281,6 @@ METHOD __SetViewStyle( n ) CLASS ListView
       lvti:dwFlags := LVTVIF_AUTOSIZE
       lvti:cLines  := 1
       SendMessage( ::hWnd, LVM_SETTILEVIEWINFO, 0, lvti )
-//      SetWindowTheme( ::hWnd, ToUnicode( "EXPLORER" ), ToUnicode( "EXPLORER" ) )
-      
-
-//      __ListViewSetView( ::hWnd, 0, 2, {0,1} )
-
    ENDIF
 RETURN Self
 
@@ -311,7 +298,6 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 METHOD SetLVExStyle( nStyle, lAdd ) CLASS ListView
-   LOCAL dwStyle
    DEFAULT lAdd TO .T.
    IF ::IsWindow()
       ::LvExStyle := ::SendMessage( LVM_GETEXTENDEDLISTVIEWSTYLE, 0, 0 )
@@ -393,8 +379,8 @@ RETURN cText
 //--------------------------------------------------------------------------------------------------------
 
 METHOD OnParentNotify( nwParam, nlParam ) CLASS ListView
-   LOCAL nmia, nmlvfi, pnkd, lCopy := .F., lpch, cRet, lpdi, cField, pPtr, lpnmh := (struct NMHDR*) nlParam, pnmv
-
+   LOCAL nmia, pnkd, lCopy := .F., lpnmh := (struct NMHDR*) nlParam, pnmv
+   (nwParam)
    SWITCH lpnmh:code
       CASE NM_RCLICK 
            nmia := (struct NMITEMACTIVATE*) nlParam
@@ -576,11 +562,11 @@ METHOD Destroy() CLASS ListViewGroup
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------
-METHOD SetCaption( cCaption ) CLASS ListViewGroup
+METHOD SetCaption() CLASS ListViewGroup
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------
-METHOD SetAlignment( nAlign ) CLASS ListViewGroup
+METHOD SetAlignment() CLASS ListViewGroup
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------

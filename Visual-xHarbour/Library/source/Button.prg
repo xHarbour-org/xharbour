@@ -230,8 +230,9 @@ RETURN nWidth
 //-----------------------------------------------------------------------------------------------
 
 METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
-
-   LOCAL nLeft, nTop, hDC, cPaint, aRect, nStyle, lDisabled, lSelected, lFocus, aTextRect, nTextFlags, nColor, nTxtColor, n, lDefault
+   LOCAL nLeft, nTop, aRect, nStyle, lDisabled, lSelected, lFocus, aTextRect, nTextFlags, nColor, n, lDefault
+   (nwParam)
+   (nlParam)
    IF !( ::__xCtrlName == "Button" ) .OR. ::OwnerDraw
       RETURN NIL
    ENDIF
@@ -362,9 +363,9 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
 
 RETURN NIL
 
-
 METHOD OnCtlColorBtn( nwParam, nlParam ) CLASS Button
-   LOCAL aRect, nColor, hBkGnd := ::Parent:BkBrush
+   LOCAL hBkGnd := ::Parent:BkBrush
+   (nlParam)
    IF ::Parent:ClsName == "DataGrid"
       hBkGnd := GetSysColorBrush( COLOR_HIGHLIGHT )
    ENDIF
@@ -373,6 +374,7 @@ RETURN hBkGnd
 
 METHOD OnCtlColorStatic( nwParam, nlParam ) CLASS Button
    LOCAL hBkGnd := ::BkBrush
+   (nlParam)
    DEFAULT hBkGnd TO ::Parent:BkBrush
 
    IF ::Parent:ClsName == "ToolBarWindow32"

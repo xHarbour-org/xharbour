@@ -54,7 +54,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS SqlConnector
-   LOCAL cStr, cLib, oObj
+   LOCAL cStr, cLib
    IF ::__ClassInst != NIL
       IF ::Server > 0
          cStr := ::aIncLibs[ ::Server + 1 ]
@@ -81,7 +81,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Connect( cConnString ) CLASS SqlConnector
-   LOCAL nDetected, nCnn, cEvent, nServer
+   LOCAL nCnn, cEvent, nServer
 
    DEFAULT cConnString TO ::ConnectionString
    

@@ -199,7 +199,6 @@ ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS EditBox
-   LOCAL pWi
    DEFAULT ::__xCtrlName TO "EditBox"
    ::ClsName   := "Edit"
    ::ThemeName := "EDIT"
@@ -397,7 +396,7 @@ METHOD OnGetDlgCode() CLASS EditBox
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
-METHOD __SetLayout( nLayout ) CLASS EditBox
+METHOD __SetLayout() CLASS EditBox
    IF ::IsWindow()
       ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER )
    ENDIF
@@ -465,7 +464,7 @@ METHOD SetSelColor( nFore, nColor, lRepaint ) CLASS EditBox
 RETURN SELF
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnCtlColorStatic( nwParam, nlParam )
+METHOD OnCtlColorStatic( nwParam )
    LOCAL hBkGnd, nBkColor
 
    hBkGnd   := ::BkBrush
@@ -518,6 +517,7 @@ RETURN NIL
 //---------------------------------------------------------------------------------------------------
 METHOD OnNCCalcSize( nwParam, nlParam ) CLASS EditBox
    LOCAL n, nccs
+   (nwParam)
    ::nImageSize := 0
    ::nArrowSize := 0
 
@@ -576,8 +576,8 @@ METHOD OnNCCalcSize( nwParam, nlParam ) CLASS EditBox
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnNCPaint( nwParam, nlParam ) CLASS EditBox
-   LOCAL aRect, nWidth := 0, hBrush, hdc, nLeft, nTop, hRegion, pWi, nStyle, n := 3
+METHOD OnNCPaint() CLASS EditBox
+   LOCAL aRect, nWidth := 0, hBrush, hdc, nLeft, nTop, hRegion, nStyle, n := 3
 
    IF ::Button .OR. ( ::xLayout > 1 .AND. ( ::__aArrowPos[2] > 0 .OR. ::__aImagePos[2] > 0 ) )
 
@@ -649,8 +649,8 @@ RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 METHOD OnNCLButtonDown( nwParam, x, y ) CLASS EditBox
-   LOCAL nWidth, nStyle, hRegion, hdc, aRect, n := 3
-   LOCAL nLeft, rc, pt, aPt := {x,y}
+   LOCAL nStyle, hRegion, hdc, n := 3
+   LOCAL rc, pt, aPt := {x,y}
 
    IF ::xLayout == 1 .AND. !::Button
       RETURN NIL
@@ -726,7 +726,7 @@ RETURN nwParam
 
 //---------------------------------------------------------------------------------------------------
 METHOD OnNCLButtonUp( nwParam, x, y ) CLASS EditBox
-   LOCAL nLeft, nStyle, hRegion, hdc, aRect, n := 3
+   LOCAL nStyle, hRegion, hdc, n := 3
    LOCAL aPt := {x,y}
 
    _ScreenToClient( ::hWnd, @aPt )
@@ -760,7 +760,7 @@ RETURN nwParam
 
 //---------------------------------------------------------------------------------------------------
 METHOD OnNCHitTest( x, y ) CLASS EditBox
-   LOCAL nStyle, hRegion, hdc, aPt2, aRect, aPt1, aPt := {x,y}, n := 3
+   LOCAL aPt := {x,y}, n := 3
    
    IF ::Button .OR. ::__aArrowPos[2] > 0 .OR. ::__aImagePos[2] > 0 
       _ScreenToClient( ::hWnd, @aPt )
@@ -772,8 +772,8 @@ METHOD OnNCHitTest( x, y ) CLASS EditBox
 RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
-METHOD OnCtlColorEdit( nwParam, nlParam ) CLASS EditBox
-   LOCAL hBrush, nFore, nBack, hOldParentMapMode, hOldThisMapMode, hParentDC, hMemDC, hMemBitmap, hOldBitmap, pt := (struct POINT)
+METHOD OnCtlColorEdit( nwParam ) CLASS EditBox
+   LOCAL hBrush, nFore, nBack, pt := (struct POINT)
 
    nFore := ::ForeColor
    nBack := ::BackColor
@@ -906,6 +906,8 @@ RETURN SendMessage( ::hWnd, EM_SHOWBALLOONTIP, 0, ebt )
 //-----------------------------------------------------------------------------------------------
 METHOD OnParentCommand( nId, nCode, nlParam ) CLASS EditBox
    LOCAL nRet
+   (nId)
+   (nlParam)
    DO CASE
       CASE nCode ==EN_ALIGN_LTR_EC
          nRet := ExecuteEvent( "OnEn_Align_Ltr_Ec", Self )
@@ -945,7 +947,7 @@ RETURN IIF( nRet == NIL, 0, nRet )
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnKeyDown( nKey ) CLASS EditBox
-   LOCAL h, lShift, oEdit
+   LOCAL h, lShift
    ::LastKey := nKey
    IF ::Transparent
       ::InvalidateRect(, .F.)
@@ -982,7 +984,7 @@ METHOD OnKeyDown( nKey ) CLASS EditBox
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnChar( nKey, nlParam ) CLASS EditBox
+METHOD OnChar( nKey ) CLASS EditBox
    LOCAL aKeys := {VK_BACK}
    IF ::DataSource != NIL .AND. ( ( nKey >= 32 .AND. nKey <= 168 ) .OR. ( nKey >= 224 .AND. nKey <= 253 ) .OR. ( nKey IN aKeys ) )
       ::CallWindowProc()

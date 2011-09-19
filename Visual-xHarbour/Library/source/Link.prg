@@ -81,6 +81,7 @@ RETURN Self
 
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS Link
    LOCAL n, pNmLink, cText := "", aArray
+   (nwParam)
    SWITCH hdr:code
       CASE NM_RETURN
       CASE NM_CLICK

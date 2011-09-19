@@ -85,7 +85,7 @@ RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS PictureBox
-   LOCAL hImage, aSize, cType, n
+   LOCAL aSize, cType, n
    SWITCH VALTYPE( ::ImageName )
       CASE "A"
            IF EMPTY( ::Type )
@@ -159,8 +159,8 @@ RETURN Self
 //--------------------------------------------------------------------------------------------------------
 
 METHOD Draw( hDC, x, y, hBmp ) CLASS PictureBox
-   LOCAL hMemBitmap, hOldBitmap, hMemDC, aSize, nColor, nTrans, nFill
-   LOCAL hMemBitmap1, hOldBitmap1, hMemDC1, aPixels, n, nx, ny
+   LOCAL hMemBitmap, hOldBitmap, hMemDC, aSize, nFill
+   LOCAL aPixels
    DEFAULT x TO 0
    DEFAULT y TO 0
 
@@ -224,9 +224,9 @@ METHOD Draw( hDC, x, y, hBmp ) CLASS PictureBox
 RETURN NIL
 
 METHOD OnPaint( hDC, hMemDC ) CLASS PictureBox
-   LOCAL bf, x := 0, y := 0, z, i
-   LOCAL hMemBitmap, hOldBitmap, hBrush, hScrDC, lTransparent, nWinError, nColor, nFill
-   LOCAL oChild, hMemBitmap1, hOldBitmap1, hMemDC1, hDCMask, hBmpTransMask, hBmpDefault, rgbTransparent := RGB(255,255,255)
+   LOCAL x := 0, y := 0
+   LOCAL hMemBitmap, hOldBitmap, hBrush, lTransparent, nFill
+   LOCAL oChild, hOldBitmap1, hMemDC1, rgbTransparent := RGB(255,255,255)
    LOCAL pt := (struct POINT)
 
    IF !::IsWindow()

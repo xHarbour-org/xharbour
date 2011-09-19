@@ -196,8 +196,7 @@ METHOD SetExStyle(nStyle,lAdd) CLASS MDIClient
 RETURN Self
 
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS MDIClient
-
-   LOCAL lShow, oMdi
+   LOCAL lShow
 
    SWITCH nMsg
       CASE WM_MDICHILDSIZED

@@ -17,29 +17,22 @@
 //--------------------------------------------------------------------------------------------------
 
 CLASS TaskBar FROM Window
-
    DATA BarData
 
    METHOD Init() CONSTRUCTOR
    METHOD OnWindowPosChanged()
-
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------
 
 METHOD Init() CLASS TaskBar
-
    SHAppBarMessage( ABM_GETTASKBARPOS, @::BarData )
    ::hWnd    := ::BarData:hWnd
-
 RETURN Self
 
 //--------------------------------------------------------------------------------------------------
 
 METHOD OnWindowPosChanged() CLASS TaskBar
-
-   LOCAL cAbd
-
    SHAppBarMessage( ABM_GETTASKBARPOS, @::BarData )
 
    ::Left   := ::BarData:rc:Left

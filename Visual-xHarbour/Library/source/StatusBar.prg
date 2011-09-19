@@ -76,8 +76,8 @@ METHOD Init( oParent ) CLASS StatusBar
    //::IsContainer   := .T.
    ::Super:Init( oParent )
    IF ::__ClassInst != NIL
-      ::__IdeContextMenuItems := { { "Add Panel", {|o| StatusBarPanel( Self ):Create(),;
-                                                   ::Application:Project:Modified := .T. } }}
+      ::__IdeContextMenuItems := { { "Add Panel", {|| StatusBarPanel( Self ):Create(),;
+                                                      ::Application:Project:Modified := .T. } }}
       ::Events := {}
       ::__lResizeable := {.F.,.F.,.F.,.F.,.F.,.F.,.F.,.F.}
       ::__lMoveable   := .F.
@@ -88,7 +88,7 @@ RETURN SELF
 //----------------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS StatusBar
-   LOCAL oPanel, nW, nH, n
+   LOCAL n
 
    ::Top    := ::Parent:ClientHeight - ::Height
    ::Width  := ::Parent:ClientWidth
@@ -123,7 +123,7 @@ RETURN NIL
 
 //----------------------------------------------------------------------------------------------------
 
-METHOD __OnParentSize(nW, nH, hDef ) CLASS StatusBar
+METHOD __OnParentSize() CLASS StatusBar
    ::Left   := 0
    ::Top    := ::Parent:ClientHeight-::Height
    ::Width  := ::Parent:ClientWidth
@@ -135,6 +135,7 @@ RETURN( NIL )
 
 METHOD OnMouseMove( nwParam, x, y ) CLASS StatusBar
    LOCAL n, rc, pt := (struct POINT)
+   (nwParam)
    pt:x := x
    pt:y := y
    FOR n := 1 TO LEN( ::Children )
@@ -153,7 +154,7 @@ RETURN 0
 //----------------------------------------------------------------------------------------------------
 
 METHOD GetPanelRect( nPanel ) CLASS StatusBar
-   LOCAL aRect,aPt, rc := (struct RECT)
+   LOCAL rc := (struct RECT)
    SendMessage( ::hWnd, SB_GETRECT, nPanel, @rc )
 RETURN rc
 
@@ -165,7 +166,7 @@ METHOD SetPanels( nWidth ) CLASS StatusBar
    LOCAL n, nLen, nPart
    LOCAL nParentWidth := IIF( nWidth == NIL, ::Width, nWidth )
    LOCAL nTotalPartsWidth := 0
-   LOCAL rc, hDef, nEsp, x
+   LOCAL rc
    aEval( ::Children, {|o| nTotalPartsWidth += IIF( o:Width <> -1, o:Width, 0 ) } )
    nLen := LEN( ::Children )
 
