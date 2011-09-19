@@ -74,8 +74,9 @@ CLASS ErrorListView INHERIT ListView
    METHOD ProcessErrors()
 ENDCLASS
 
-METHOD ProcessErrors( oError, aErrors, cLog ) CLASS ErrorListView
+METHOD ProcessErrors( oError, aErrors ) CLASS ErrorListView
    LOCAL n
+   ( oError )
    ::ResetContent()
    
    FOR n := 1 TO LEN( aErrors )
@@ -168,7 +169,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD AddButton( oComponent ) CLASS ComponentPanel
-   LOCAL hIcon, n, x, lExit, nBtn, aButtons, oItem, aSize, oBtn := CompButton( Self )
+   LOCAL n, x, lExit, nBtn, aButtons, aSize, oBtn := CompButton( Self )
    oComponent:Button := oBtn
    WITH OBJECT oBtn
       :Component   := oComponent
@@ -215,7 +216,7 @@ RETURN oBtn
 //------------------------------------------------------------------------------------------
 
 METHOD Reset( oOwner ) CLASS ComponentPanel
-   LOCAL n, Component, Btn, aChildren, lUpdate := .T.
+   LOCAL n, Component, aChildren, lUpdate := .T.
    
    DEFAULT oOwner TO ::Application:Project:CurrentForm
    
@@ -259,7 +260,7 @@ RETURN NIL
 //------------------------------------------------------------------------------------------
 
 METHOD Close() CLASS ComponentPanel
-   LOCAL n, Component, Btn, aChildren, lUpdate := .T.
+   LOCAL n, aChildren, lUpdate := .T.
    aChildren := {}
    FOR n := 1 TO LEN( ::Children )
        IF ::Children[n]:ClsName == "Button"
@@ -267,12 +268,6 @@ METHOD Close() CLASS ComponentPanel
        ENDIF
    NEXT
    AEVAL( aChildren, {|o| o:Destroy() } )
-//   FOR n := 1 TO LEN( ::Children )
-//       IF ::Children[n]:ClsName == "Button"
-//          ::Children[n]:Destroy()
-//          n--
-//       ENDIF
-//   NEXT
    ::Hide()
 RETURN Self
 
@@ -319,7 +314,7 @@ RETURN 0
 
 //------------------------------------------------------------------------------------------
 METHOD Delete() CLASS CompButton
-   LOCAL oBtn, Control
+   LOCAL oBtn
    ::Destroy()
    ::Parent:LeftMargin := 10
    FOR EACH oBtn IN ::Parent:Children
@@ -334,8 +329,7 @@ METHOD Delete() CLASS CompButton
    ::Parent:__SetScrollBars()
 RETURN NIL
 
-METHOD OnKeyDown( nwParam, nlParam ) CLASS CompButton
-   LOCAL oBtn, Control
+METHOD OnKeyDown( nwParam ) CLASS CompButton
    IF nwParam == VK_DELETE
       ::Application:Project:SetAction( { { DG_DELCONTROL, NIL, 0, 0, .F., ::Component:Owner, ::Component:__xCtrlName, ::Component, , 1, , Self } }, ::Application:Project:aUndo )
    ENDIF
@@ -344,9 +338,9 @@ RETURN 0
 //------------------------------------------------------------------------------------------
 
 METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS CompButton
-
-   LOCAL nLeft, nTop, hDC, cPaint, aRect, nStyle, lDisabled, lSelected, lFocus, hTheme, aTextRect, nTextFlags
-
+   LOCAL nLeft, nTop, aRect, lDisabled, lSelected, lFocus, aTextRect, nTextFlags
+   ( nwParam )
+   ( nlParam )
    IF dis:CtlType & ODT_BUTTON != 0 .AND. ( ( ::ImageList != NIL .AND. ::ImageIndex != NIL ) .OR. ::bkBrush != NIL .OR. ::ForeColor != NIL )
       nTop := 5
       nLeft:= 3

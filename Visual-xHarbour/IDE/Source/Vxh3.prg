@@ -51,7 +51,7 @@ CLASS FormEditor INHERIT Control
    METHOD Init() CONSTRUCTOR
    METHOD OnNCDestroy() INLINE DeleteObject( ::RulerFont ),;
                                DeleteObject( ::RulerVertFont ), NIL
-   METHOD OnLButtonDown(n,x,y) INLINE ::SetFocus(), 0
+   METHOD OnLButtonDown() INLINE ::SetFocus(), 0
    METHOD Create()
    METHOD OnSetFocus()  INLINE ::CtrlMask:SetFocus()
    METHOD Refresh()     INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
@@ -100,7 +100,7 @@ RETURN Self
 
 METHOD OnNCCalcSize( nwParam, nlParam ) CLASS FormEditor
    LOCAL nccs
-
+   ( nwParam )
    IF ::Application:ShowRulers
       nccs := (struct NCCALCSIZE_PARAMS)
       nccs:Pointer( nlParam )
@@ -114,9 +114,9 @@ RETURN NIL
 //---------------------------------------------------------------------------------------------------
 
 METHOD OnNCPaint( nwParam, nlParam ) CLASS FormEditor
-   LOCAL nPxI, hdc, hRegion, aChild, aPt, aRect, n := ::CtrlMask:CurForm:SelPointSize
-   LOCAL hOldMapMode, hOldPen, n5, n10, nWidth, nHeight, x, y
+   LOCAL aRect, n := ::CtrlMask:CurForm:SelPointSize
    LOCAL rc := (struct RECT)
+   ( nlParam )
    IF !EMPTY( ::CtrlMask:CurForm:Selected )
       aRect := ::CtrlMask:CurForm:GetSelRect()
       IF EMPTY(aRect)
@@ -148,6 +148,7 @@ RETURN NIL
 
 METHOD OnNCRButtonDown( n, x, y ) CLASS FormEditor
    LOCAL oMenu, oItem
+   ( n )
    IF ::Application:ShowRulers
       oMenu := MenuPopup( Self )
       oMenu:Style        := TPM_LEFTALIGN | TPM_TOPALIGN
@@ -158,9 +159,9 @@ METHOD OnNCRButtonDown( n, x, y ) CLASS FormEditor
       oItem := CMenuItem( oMenu )
       oItem:Caption := "Inches"
       oItem:Check( ::Application:RulerType == 1 )
-      oItem:Action  := {|o|::Application:RulerType := 1,;
-                           ::Application:AppIniFile:WriteInteger( "General", "RulerType", 1 ),;
-                           ::Application:MainForm:FormEditor1:Refresh() }
+      oItem:Action  := {||::Application:RulerType := 1,;
+                          ::Application:AppIniFile:WriteInteger( "General", "RulerType", 1 ),;
+                          ::Application:MainForm:FormEditor1:Refresh() }
       oItem:Create()
 
       oItem := CMenuItem( oMenu )
@@ -170,9 +171,9 @@ METHOD OnNCRButtonDown( n, x, y ) CLASS FormEditor
       oItem := CMenuItem( oMenu )
       oItem:Caption := "Centimeters"
       oItem:Check( ::Application:RulerType == 2 )
-      oItem:Action  := {|o|::Application:RulerType := 2,;
-                           ::Application:AppIniFile:WriteInteger( "General", "RulerType", 2 ),;
-                           ::Application:MainForm:FormEditor1:Refresh() }
+      oItem:Action  := {||::Application:RulerType := 2,;
+                          ::Application:AppIniFile:WriteInteger( "General", "RulerType", 2 ),;
+                          ::Application:MainForm:FormEditor1:Refresh() }
       oItem:Create()
 
       oMenu:Context()
@@ -180,7 +181,7 @@ METHOD OnNCRButtonDown( n, x, y ) CLASS FormEditor
    ENDIF
 RETURN NIL
 
-METHOD OnNCHitTest( x, y ) CLASS FormEditor
+METHOD OnNCHitTest() CLASS FormEditor
    LOCAL uHitTest := DefWindowProc( ::hWnd, WM_NCHITTEST, ::wParam, ::lParam )
 RETURN IIF( uHitTest==0, HTCAPTION, uHitTest )
 
@@ -211,19 +212,19 @@ CLASS ControlMask INHERIT Window
    DATA hCursorNo           EXPORTED
    DATA aPointsCursors      EXPORTED
 
-   ACCESS MdiContainer         INLINE    ::xMdiContainer PERSISTENT
-   DATA aPrevRect     PROTECTED
-   DATA aCursors      PROTECTED
+   ACCESS MdiContainer      INLINE    ::xMdiContainer PERSISTENT
+   DATA aPrevRect           PROTECTED
+   DATA aCursors            PROTECTED
    
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD OnEraseBkGnd()
-   METHOD OnLButtonDblClk()    INLINE ::CurForm:EditClickEvent()
+   METHOD OnLButtonDblClk() INLINE ::CurForm:EditClickEvent()
    METHOD OnMouseMove()
    METHOD OnLButtonDown()
    METHOD OnLButtonUp(n,x,y)
-   METHOD OnGetDlgCode()       INLINE DLGC_WANTMESSAGE | DLGC_WANTALLKEYS
-   METHOD OnKeyDown(nKey, nLp) INLINE IIF( ::lTimer, ( ::lTimer := .F., ::KillTimer(1) ), ), IIF( ::CurForm != NIL, ::CurForm:MaskKeyDown( Self, nKey ),)
+   METHOD OnGetDlgCode()    INLINE DLGC_WANTMESSAGE | DLGC_WANTALLKEYS
+   METHOD OnKeyDown(nKey)   INLINE IIF( ::lTimer, ( ::lTimer := .F., ::KillTimer(1) ), ), IIF( ::CurForm != NIL, ::CurForm:MaskKeyDown( Self, nKey ),)
    METHOD OnKeyUp()
    METHOD OnWindowPaint()
    METHOD OnUserMsg()
@@ -374,7 +375,7 @@ METHOD OnTimer( nId ) CLASS ControlMask
    END
 RETURN 0
 
-METHOD OnKeyUp( nKey, nLp ) CLASS ControlMask
+METHOD OnKeyUp( nKey ) CLASS ControlMask
    LOCAL aKeys := { VK_LEFT, VK_RIGHT, VK_UP, VK_DOWN }
    IF !::lTimer .AND. ASCAN( aKeys, nKey ) > 0
       ::lTimer := .T.
@@ -407,7 +408,7 @@ METHOD Clean( aRect, lPaint, lDes ) CLASS ControlMask
 RETURN Self
 
 METHOD OnLButtonUp( n, x, y ) CLASS ControlMask
-   LOCAL pt, nX, nY, oCtrl, oControl, nPos, aCtrl, aActions, nLeft, nTop, aPt
+   LOCAL nX, nY, aCtrl, aActions, nLeft, nTop, aPt
    
    IF !::lOrderMode
       ::ToolTip:Title := NIL
@@ -470,6 +471,7 @@ METHOD OnLButtonUp( n, x, y ) CLASS ControlMask
 RETURN NIL
 
 METHOD OnLButtonDown(n,x,y) CLASS ControlMask
+   ( n )
    ::SetFocus()
    IF !::lOrderMode .AND. ::CurForm != NIL .AND. ::CurForm:ControlSelect( x, y ) == -2
       ::PostMessage( WM_USER + 2222 )
@@ -504,9 +506,6 @@ METHOD OnLButtonDown(n,x,y) CLASS ControlMask
 RETURN 0
 
 METHOD OnMouseMove(n,x,y) CLASS ControlMask
-   LOCAL hDC, hMemDC, hOldBitmap, hOldBrush, hMemBitmap
-   LOCAL hDCMask, hBmpTransMask
-   
    IF ::CurForm != NIL
       ::CurForm:MouseDown := ( n == MK_LBUTTON )
       ::CurForm:CheckMouse( x, y,, n, ::lOrderMode )
@@ -520,9 +519,9 @@ METHOD OnEraseBkGnd() CLASS ControlMask
 RETURN 1
 
 METHOD OnWindowPaint() CLASS ControlMask
-   LOCAL x, y, nLeft, nTop, nRight, nBottom, nRop, lDC := .T.
-   LOCAL aControl, aPoints, aPoint, aRect, hWnd, hBrush, hPen
-   LOCAL hMemDC, hOldBitmap, aPt, hDC, cPaint, aAlign, cData, hOldFont, n, hOldPen, hOldBrush, hMemBitmap
+   LOCAL x, nLeft, nTop, nRight, nBottom, lDC := .T.
+   LOCAL aControl, aPoints, aPoint, aRect
+   LOCAL hDC, cPaint
    LOCAL i := 0
    LOCAL j := 0
 
@@ -579,7 +578,6 @@ METHOD OnWindowPaint() CLASS ControlMask
 RETURN 0
 
 METHOD DrawSelRect( lClear ) CLASS ControlMask
-   LOCAL hMemDC, hMemBitmap, hOldBitmap, hWndDC
    LOCAL hDC
    static aRect
    
@@ -679,7 +677,7 @@ METHOD OnUserMsg() CLASS ControlMask
 RETURN NIL
 
 METHOD OnContextMenu( x, y ) CLASS ControlMask
-   LOCAL aControl, aRect, aPt, oMenu, Item, oItem, n
+   LOCAL aRect, aPt, oMenu, Item, oItem, n
    IF ::CurForm != NIL .AND. LEN( ::CurForm:Selected )==1
       aRect := ::CurForm:Selected[1][1]:GetRectangle()
 

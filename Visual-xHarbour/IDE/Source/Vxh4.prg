@@ -45,7 +45,7 @@ CLASS ObjManager INHERIT TreeView
    METHOD Init() CONSTRUCTOR
    METHOD ResetProperties()
    METHOD Create()
-   METHOD OnHScroll( n, nPos ) INLINE ::nScroll := n
+   METHOD OnHScroll( n)        INLINE ::nScroll := n
    METHOD OnDestroy()          INLINE ::LevelFont:Delete(), NIL
    METHOD OnKeyDown()
    METHOD OnUserMsg()
@@ -65,7 +65,6 @@ CLASS ObjManager INHERIT TreeView
    METHOD OnGetDlgCode()
    METHOD OnSize()
    METHOD EditCaption()
-   METHOD OnRightClick()
    METHOD CheckValue()
    METHOD GetValue()
    METHOD RenameForm()
@@ -118,16 +117,10 @@ METHOD Create() CLASS ObjManager
 RETURN Self
 
 //---------------------------------------------------------------------------------------------------
-METHOD OnSize( n, x, y ) CLASS ObjManager
+METHOD OnSize() CLASS ObjManager
    ::Columns[1][1] := Int(::ClientWidth/2)-11
    ::Columns[2][1] := Int(::ClientWidth/2)-7
    ::InvalidateRect(,.f.)
-RETURN NIL
-
-//---------------------------------------------------------------------------------------------------
-
-METHOD OnRightClick() CLASS ObjManager
-   LOCAL aControl, aRect, aPt, oMenu, Item, oItem, x, y, aPos
 RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
@@ -148,7 +141,8 @@ RETURN 1
 
 //---------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ObjManager
-   LOCAL oItem, tvcd, tvkd
+   LOCAL tvcd
+   ( nwParam )
    DO CASE
       CASE hdr:code == NM_CUSTOMDRAW
            tvcd := (struct NMTVCUSTOMDRAW)
@@ -167,11 +161,11 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ObjManager
 RETURN 0
 
 METHOD DrawItem( tvcd ) CLASS ObjManager
-   LOCAL hItem, n, nState, nBack, nFore, lExpanded, rc, nWidth, nLeft, nRight, nBottom, aAlign, x, y, lHasChildren
+   LOCAL n, nState, nBack, nFore, lExpanded, rc, nWidth, nLeft, nRight, nBottom, aAlign, x, y, lHasChildren
    LOCAL aRow, aCol, hOldPen, nAlign, cType, nColor, hOld, hBrush, aRest, cText, nfHeight := ABS( ::Font:Height )+3
-   LOCAL nPos, cCap, xValue, cProp, nLevel, hDC, oItem
-   LOCAL hOldFont, hIcon, lDisabled := .F.
-   LOCAL hMemBitmap, hOldBitmap, lEnabled, nScanCode, hBoldFont
+   LOCAL nPos, cCap, cProp, nLevel, hDC, oItem
+   LOCAL hIcon, lDisabled := .F.
+   LOCAL lEnabled, hBoldFont
 
    rc       := tvcd:nmcd:rc
    oItem    := FindTreeItem( ::Items, tvcd:nmcd:dwItemSpec )
@@ -574,7 +568,7 @@ RETURN 0
 //---------------------------------------------------------------------------------------------------
 
 METHOD CheckValue( cProp, cRoot, xValue ) CLASS ObjManager
-   LOCAL xVal, lDiff, oItem := ::SearchString( cProp, cRoot )
+   LOCAL xVal, oItem := ::SearchString( cProp, cRoot )
    IF oItem != NIL
       xVal := oItem:ColItems[1]:Value
       IF !( VALTYPE( xVal ) == VALTYPE( xValue ) )
@@ -601,7 +595,7 @@ RETURN .T.
 //---------------------------------------------------------------------------------------------------
 
 METHOD GetValue( cProp, cRoot ) CLASS ObjManager
-   LOCAL lDiff, oItem := ::SearchString( cProp, cRoot )
+   LOCAL oItem := ::SearchString( cProp, cRoot )
    IF oItem != NIL
       RETURN oItem:ColItems[1]:Value
    ENDIF
@@ -609,9 +603,9 @@ RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 
-METHOD RenameForm( cOldName, cNewName, lProject, oActiveObject ) CLASS ObjManager
-   LOCAL nPos, Topic, Event, n, aFind, lForce, cLine, oForm
-   LOCAL cNewBuffer, lComment, oEditor, Line, oProps
+METHOD RenameForm( cOldName, cNewName, lProject ) CLASS ObjManager
+   LOCAL n, lForce
+   LOCAL cNewBuffer, lComment, oEditor, Line
 
    IF !( cOldName == cNewName )
       
@@ -683,7 +677,7 @@ METHOD RenameForm( cOldName, cNewName, lProject, oActiveObject ) CLASS ObjManage
 RETURN Self
 
 METHOD ChangeCtrlFont( cf, oItem, oFont ) CLASS ObjManager
-   LOCAL aFont1, aFont2, aProps, cProp, cLf
+   LOCAL aFont1, aFont2, aProps
    
    IF cf != NIL
       aProps := { "xHeight", "xWidth", "xEscapement", "xOrientation", "xWeight", "xnItalic", "xnUnderline", "xnStrikeOut",;
@@ -728,7 +722,8 @@ METHOD ChangeCtrlFont( cf, oItem, oFont ) CLASS ObjManager
 RETURN Self
 
 METHOD SetActiveObjectFont( oFont, aFont1, aFont2, oItem ) CLASS ObjManager
-   LOCAL aProp, aProps, n
+   LOCAL aProps, n
+   ( aFont2 )
    aProps := { "xFaceName", "xHeight", "xWidth", "xEscapement", "xOrientation", "xWeight", "xnItalic", "xnUnderline", "xnStrikeOut",;
                "xCharSet", "OutPrecision", "ClipPrecision", "Quality", "PitchAndFamily" }
    FOR n := 1 TO LEN( aProps )
@@ -819,8 +814,8 @@ RETURN Self
 METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
    STATIC s_bSetting := .F.
 
-   LOCAL n, cProp, cProp2, oObj, nColor, Child, cOld, cBuffer, cNew, oParent, cBak, Topic, Event, nCurr, nHost, cVal
-   LOCAL oChild, oError, oPath
+   LOCAL n, cProp, cProp2, oObj, nColor, Topic, Event, nCurr, nHost, cVal
+   LOCAL oError
    
    DEFAULT oItem TO FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
 
@@ -1154,10 +1149,8 @@ RETURN Self
 //---------------------------------------------------------------------------------------------------
 
 METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS ObjManager
-
-   LOCAL cProp, cProp2, aProp, xValue, n, oItem, cColor, nColor, aSub, aApp, aCol, aFont, oSub, oObj, xValue2, aTopics, lReadOnly, cAccel
-   LOCAL aObj, aProperties, cProperty, aProperty, aSubProp, cType, nSys, Child, aCopy, oForm, xProp, cKey, aIvars, Property, oOle, Interface
-   LOCAL nScanCode, cText, siv
+   LOCAL cProp, cProp2, aProp, xValue, n, oItem, nColor, aSub, aCol, oSub, oObj, xValue2, lReadOnly
+   LOCAL aProperties, aProperty, aSubProp, cType, Child
 
    IF ::ActiveControl != NIL .AND. ::ActiveControl:IsWindow()
       ::ActiveControl:Destroy()
@@ -1904,8 +1897,8 @@ RETURN cText
 //--------------------------------------------------------------------------------------------------------------------------------
 
 METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
-   LOCAL oItem, hItem, rc, cType, n, cProp, aFonts, pLogFont, xValue, nScanCode, cText, oFont, cFont
-
+   LOCAL oItem, rc, cType, n, cProp, cText, oFont, cFont
+   ( hWnd )
    IF nMsg == WM_USER + 4767
       IF ( oItem := ::GetSelected() ) != NIL
          oItem:ColItems[1]:Value := ::ActiveObject:Dock:Margins
@@ -1963,7 +1956,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Cargo       := ::ActiveObject:ShortcutKey:Key
 
                        :OnWMKeyDown := {|o,n,l| CheckShortCutKeyDown(o,n,l,.T.)}
-                       :OnWMChar    := {|o,n,l| 0}
+                       :OnWMChar    := {|| 0}
                        :OnWMKillFocus := {|o,cText,oPar| cText := IIF( o:Cargo == NIL, 0, o:Cargo ),;
                                                          oPar  := o:Parent,;
                                                          IIF( ::__xCtrlName == "ObjManager", oPar:SetValue( cText ), ),;
@@ -2087,7 +2080,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Owner  := ::ActiveObject
                        :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
                        :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ) }
-                       :Action := {|o, n, oPar, cSel| cSel := o:GetSelString(), oPar := o:Parent, o:Destroy(), oPar:SetValue( cSel ) }
+                       :Action := {|o, oPar, cSel| cSel := o:GetSelString(), oPar := o:Parent, o:Destroy(), oPar:SetValue( cSel ) }
                        :Create()
 
                        cFont := :Cargo
@@ -2222,10 +2215,10 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                                                    o:Destroy(),;
                                                    oPar:SetValue( HGetValueAt( ::System:WindowAnimation, n+1 )  ) }
                         ELSEIF cType == "SERVICES"
-                          :Action := {|o, n, oPar, cSel| cSel := o:GetSelString(),;
-                                                   oPar := o:Parent,;
-                                                   o:Destroy(),;
-                                                   oPar:SetValue( cSel ) }
+                          :Action := {|o, oPar, cSel| cSel := o:GetSelString(),;
+                                                      oPar := o:Parent,;
+                                                      o:Destroy(),;
+                                                      oPar:SetValue( cSel ) }
                         ELSE
                           :Action := {|o, n, oPar| n := o:GetCurSel()-1, oPar := o:Parent, o:Destroy(), oPar:SetValue( n + IIF( cType == "PAGE_POSITIONS" .OR. cType == "STATES" .OR. /*cType == "VIEWSTYLES" .OR.*/ cType == "BALLOONICONS" .OR. cType == "IMAGEINDEX", 0, 1 ) ) }
                        ENDIF
@@ -2639,7 +2632,7 @@ FUNCTION InitEditText( oForm, oMan )
       :Height      := 25
       :Dock:Right  := oForm
       :Dock:Bottom := oForm
-      :Action      := {|o| oForm:Close()}
+      :Action      := {|| oForm:Close()}
       :Create()
    END
    WITH OBJECT oOK := Button( oForm )
@@ -2647,8 +2640,8 @@ FUNCTION InitEditText( oForm, oMan )
       :Height      := 25
       :Dock:Right  := oCancel
       :Dock:Bottom := oForm
-      :Action      := {|o| oMan:SetValue( oEdit:Caption ),;
-                           oForm:Close()}
+      :Action      := {|| oMan:SetValue( oEdit:Caption ),;
+                          oForm:Close()}
       :Create()
    END
    WITH OBJECT oEdit := EditBox( oForm )
@@ -2678,8 +2671,8 @@ STATIC FUNCTION CheckBtnClickPos( o, x, y )
    ENDIF
 RETURN NIL
 
-STATIC FUNCTION CheckShortCutKeyDown( o, n, l, lDown )
-   LOCAL cChar, nScanCode, oItem, i, oPar, cText, lAsc, aSys := { VK_CONTROL, VK_SHIFT, VK_MENU, VK_CAPITAL, VK_SCROLL }
+STATIC FUNCTION CheckShortCutKeyDown( o, n )
+   LOCAL nScanCode, cText, lAsc, aSys := { VK_CONTROL, VK_SHIFT, VK_MENU, VK_CAPITAL, VK_SCROLL }
    IF ASCAN( aSys, n ) == 0
       
       nScanCode := MapVirtualKey( n, 0 )
@@ -2723,7 +2716,7 @@ STATIC FUNCTION CheckKeyDown( o, n )
    END
 RETURN NIL
 
-STATIC FUNCTION CheckCharPaste( o, n, oItem )
+STATIC FUNCTION CheckCharPaste()
 RETURN 0
 
 
@@ -2777,9 +2770,9 @@ RETURN NIL
 //------------------------------------------------------------------------------------------
 
 METHOD OnMouseMove( nwParam, x, y ) CLASS ObjManager
-   LOCAL oItem, rc, pt, aSize, aAlign, nfHeight, lHasChildren, nPlus := 0
+   LOCAL oItem, rc, pt, aAlign, nfHeight, nPlus := 0
    static cText
- 
+   ( nwParam )
    IF ( oItem := ::HitTest( x, y ) ) != NIL
       TRY
          nfHeight := ABS( ::Font:Height )
@@ -2846,9 +2839,8 @@ METHOD OnMouseMove( nwParam, x, y ) CLASS ObjManager
 RETURN NIL
 
 METHOD OnLButtonDown(n,x,y) CLASS ObjManager
-   LOCAL oItem, rc, pt, aSize, cText
-   LOCAL nCol:=0, z, nLeft
-
+   LOCAL oItem, nCol:=0, z, nLeft
+   ( n )
    IF ::ActiveControl != NIL .AND. ::ActiveControl:IsWindow()
       ::ActiveControl:Destroy()
       ::ActiveControl := NIL
@@ -2967,8 +2959,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD SetValue( xValue ) CLASS EventManager
-
-   LOCAL Topic, Event, oItem, cProp, n, i
+   LOCAL oItem, cProp, n, i
 
    oItem := FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
 
@@ -3015,8 +3006,7 @@ RETURN .T.
 //------------------------------------------------------------------------------------------
 
 METHOD GenerateEvent( cEvent, cFuncName, Event ) CLASS EventManager
-
-   LOCAL oParent, n, oModule, cBuffer, nPos, cClass, aPos, aFind, pt, aRect, aEvents, lForce, lModified
+   LOCAL nPos, aPos, aFind, aEvents
 
    WITH OBJECT ::Application:Project:CurrentForm:Editor
       aFind := :Find( " "+cFuncName, FR_FROMTOP | FR_WHOLEWORD )
@@ -3074,6 +3064,7 @@ RETURN Self
 METHOD RenameEvent( cEvent, cFuncName, cNewFuncName, lSwitch ) CLASS EventManager
    LOCAL cNewBuffer, lComment, Line, lForce
    DEFAULT lSwitch TO .T.
+   ( cEvent )
    IF !( cFuncName == cNewFuncName )
       WITH OBJECT ::ActiveObject:Form:Editor
          cNewBuffer := ""
@@ -3100,7 +3091,7 @@ METHOD RenameEvent( cEvent, cFuncName, cNewFuncName, lSwitch ) CLASS EventManage
 RETURN Self
 
 STATIC FUNCTION ChangePrgLine( cLine, cOldVal, cNewVal, lComment )
-   LOCAL n, cPrev := "", cWord := "", lRest := .T., cChar, nFor, cNewLine := ""
+   LOCAL cPrev := "", cWord := "", lRest := .T., cChar, nFor, cNewLine := ""
    nFor := 1
    FOR EACH cChar IN cLine
        IF cChar == "/" .AND. cPrev == "/"
@@ -3135,8 +3126,7 @@ RETURN cNewLine
 
 //------------------------------------------------------------------------------------------
 METHOD ResetEvents( aSel ) CLASS EventManager
-
-   LOCAL cProp, xValue, oItem, Event, Topic, aCol, oSub
+   LOCAL oItem, Event, Topic, oSub
    
    DEFAULT aSel TO { { ::ActiveObject,, } }
 
@@ -3177,9 +3167,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD GetEditBuffer( oItem, nCol ) CLASS EventManager
-
-   LOCAL oParent, cText := oItem:ColItems[nCol-1]:Value
-   LOCAL cProperty, cChar
+   LOCAL cText := oItem:ColItems[nCol-1]:Value
 
    IF Empty( cText )
       IF ::ActiveObject:__xCtrlName != "Application"
@@ -3192,8 +3180,8 @@ RETURN cText
 
 //------------------------------------------------------------------------------------------
 
-METHOD OnLButtonDblClk(n,x,y) CLASS EventManager
-   LOCAL oItem, nCol := 0, z, nLeft, xValue
+METHOD OnLButtonDblClk() CLASS EventManager
+   LOCAL oItem, nCol := 0
 
    oItem := FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
    IF oItem == NIL .OR. Empty( oItem:ColItems )
@@ -3213,8 +3201,7 @@ RETURN 0
 //------------------------------------------------------------------------------------------
 
 METHOD EditEvent( cEvent ) CLASS EventManager
-
-   LOCAL Topic, Event, n, i, oParent, lReset := .F., cName := ""
+   LOCAL n, i, lReset := .F., cName := ""
 
    IF ::ActiveObject:Events != NIL
       FOR n := 1 TO LEN( ::ActiveObject:Events )
@@ -3264,9 +3251,8 @@ METHOD Create() CLASS ObjCombo
    ::ColFont:Create()
 RETURN Self
 
-METHOD OnParentDrawItem( nwParam, nlParam ) CLASS ObjCombo
-
-   LOCAL n, x, lSelected, aRect, aClip, nLen, itemTxt, cText, nField, hBrush, hOld, z, aAlign, y
+METHOD OnParentDrawItem() CLASS ObjCombo
+   LOCAL n, x, lSelected, aRect, aClip, nLen, itemTxt, cText, nField, z, aAlign, y
 
    IF ::Parent:DrawItemStruct:hwndItem == ::hWnd
       DEFAULT ::ColWidth TO ::ClientWidth
@@ -3348,7 +3334,6 @@ ENDCLASS
 //------------------------------------------------------------------------------------------
 
 METHOD Init( oObject ) CLASS ObjectManager
-   LOCAL lProp
    #ifdef DLL
       Application := GetApplication()
    #endif
@@ -3369,7 +3354,6 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD OnInitDialog() CLASS ObjectManager
-   LOCAL oItem, oSub
    ::Caption    := "Object Manager"
    
    Image( Self )
@@ -3866,7 +3850,7 @@ STATIC FUNCTION BrowseFile( o )
 RETURN NIL
 
 STATIC FUNCTION BrowseForFile( oEdit, oMan, oObj, lIcon, aFilter )
-   LOCAL cName, oFile := CFile( oEdit:Caption )
+   LOCAL oFile := CFile( oEdit:Caption )
    oEdit:OnWMKillFocus := NIL
    
    IF aFilter == NIL
@@ -3932,7 +3916,7 @@ STATIC FUNCTION BrowseForFolder( oEdit, oMan, oItem )
    END
 RETURN NIL
 
-STATIC FUNCTION BrowseForFolderCallBack( hWnd, nMsg, lp, pData )
+STATIC FUNCTION BrowseForFolderCallBack( hWnd, nMsg, lp )
    LOCAL cBuffer
    SWITCH nMsg
       CASE BFFM_INITIALIZED

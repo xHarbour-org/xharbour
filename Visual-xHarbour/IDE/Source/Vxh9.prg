@@ -27,7 +27,6 @@ ENDCLASS
 //------------------------------------------------------------------------------------------
 
 METHOD Init( oList ) CLASS ImageManager
-   LOCAL lProp
    ::ImageList  := oList
    DEFAULT ::__xCtrlName  TO "ImageManager"
 
@@ -41,7 +40,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD OnInitDialog() CLASS ImageManager
-   LOCAL oItem, oSub, n, aRect, Column
+   LOCAL n
    ToolBar( Self )
    DirChange( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Resource )
    WITH OBJECT ::ToolBar1
@@ -462,7 +461,7 @@ RETURN n
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Set( oObj, lSelect, lChange ) CLASS ObjectTreeView
-   LOCAL n, o, cTab
+   LOCAL n, cTab
    DEFAULT lChange TO .F.
    DEFAULT lSelect TO .T.
    TRY

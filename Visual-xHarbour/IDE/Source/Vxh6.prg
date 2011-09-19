@@ -39,7 +39,7 @@ CLASS ToolBox INHERIT TreeView
    METHOD Create()
    //METHOD ShowStandard()       INLINE ::Expand( ::GetFirstVisibleItem() )
 
-   METHOD OnHScroll( n, nPos ) INLINE ::nScroll := n
+   METHOD OnHScroll( n )       INLINE ::nScroll := n
    METHOD OnNCDestroy()        INLINE ::LevelFont:Delete(), DeleteObject( ::hPen ), DeleteObject( ::hPenShadow )
    METHOD OnEraseBkGnd()
    METHOD OnParentNotify()
@@ -49,9 +49,9 @@ CLASS ToolBox INHERIT TreeView
    METHOD OnMouseLeave()
    METHOD OnMouseMove()
    METHOD SetControl()
-   METHOD OnSysCommand(n) INLINE IIF( n==SC_CLOSE, (::Hide(),0),)
-   METHOD Disable()       INLINE ::xEnabled := .F., ::InvalidateRect(,.F.)
-   METHOD Enable()        INLINE ::xEnabled := .T., ::InvalidateRect(,.F.)
+   METHOD OnSysCommand(n)      INLINE IIF( n==SC_CLOSE, (::Hide(),0),)
+   METHOD Disable()            INLINE ::xEnabled := .F., ::InvalidateRect(,.F.)
+   METHOD Enable()             INLINE ::xEnabled := .T., ::InvalidateRect(,.F.)
    METHOD UpdateComObjects()
    METHOD UpdateCustomControls()
    METHOD AddCustomControls()
@@ -62,7 +62,7 @@ ENDCLASS
 //------------------------------------------------------------------------------------------
 
 METHOD Init( oParent ) CLASS ToolBox
-   LOCAL n, cName, cType, xData, cValue, lPro
+   LOCAL lPro
    DEFAULT ::__xCtrlName  TO "ToolBox"
    ::Super:Init( oParent )
    ::Caption       := "ToolBox"
@@ -98,7 +98,7 @@ RETURN Self
 
 METHOD Create() CLASS ToolBox
    LOCAL nIndex, nIcon, o, oPtr, oItem, n, x
-   LOCAL hKey, cName, cType, xData, hSub, cValue, oTypeLib, cId, cProgID, cClsID, lPro
+   LOCAL hKey, cName, cType, xData, hSub, oTypeLib, cId, cProgID, cClsID, lPro
 
    ::VertScroll := .F.
    ::Super:Create()
@@ -284,7 +284,7 @@ METHOD Create() CLASS ToolBox
 RETURN Self
 
 METHOD FindItem( cText ) CLASS ToolBox
-   LOCAL oItem, n, i
+   LOCAL n, i
    FOR n := 2 TO LEN( ::Items )
        FOR i := 1 TO LEN( ::Items[n]:Items )
            IF ::Items[n]:Items[i]:Caption == cText
@@ -308,7 +308,7 @@ METHOD AddCustomControls(lPro) CLASS ToolBox
    END
 RETURN Self
 
-METHOD DeleteCustomControls(lPro) CLASS ToolBox
+METHOD DeleteCustomControls() CLASS ToolBox
    LOCAL n, oPtr
    IF ( n := ASCAN( ::Application:CControls, {|c| UPPER( STRTRAN( SplitFile(c)[2], ".xfm" ) ) == UPPER( ::SelectedItem:Caption ) } ) ) > 0
       ADEL( ::Application:CControls, n, .T. )
@@ -319,7 +319,7 @@ METHOD DeleteCustomControls(lPro) CLASS ToolBox
 RETURN Self
 
 METHOD UpdateCustomControls(lPro, lTree, cFileName) CLASS ToolBox
-   LOCAL oPtr, n, hIcon, o, oItem := ::Items[-1]
+   LOCAL oPtr, n, o, oItem := ::Items[-1]
 
    lPro := .F.
    #ifdef VXH_PROFESSIONAL 
@@ -393,7 +393,7 @@ METHOD OnMouseLeave() CLASS ToolBox
    ::HoverItem := NIL
 RETURN NIL
 
-METHOD OnMouseMove( x, y ) CLASS ToolBox
+METHOD OnMouseMove() CLASS ToolBox
    LOCAL oItem, pt := (struct POINT)
    GetCursorPos( @pt )
    ScreenToClient( ::hWnd, @pt )
@@ -419,7 +419,7 @@ METHOD OnEraseBkGnd( hDC ) CLASS ToolBox
 RETURN 1
 
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBox
-   LOCAL oItem, tvcd, tvkd
+   LOCAL tvcd
    Super:OnParentNotify( nwParam, nlParam, hdr )
    DO CASE
       CASE hdr:code == NM_CUSTOMDRAW
@@ -439,8 +439,8 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBox
 RETURN NIL
 
 METHOD DrawItem( tvcd ) CLASS ToolBox
-   LOCAL hItem, n, oItem, nState, nBack, nFore, lExpanded, rc, nWidth, nLeft, nRight, nBottom, aAlign, x, y, lHasChildren
-   LOCAL aRow, aCol, hOldPen, nAlign, cType, nColor, hOld, hBrush, aRest, cText, hPen, cPaint, nFlags, hBackBrush, nBackColor, hItemBrush
+   LOCAL oItem, nState, nBack, nFore, lExpanded, rc, nLeft, nRight, nBottom, aAlign, x, y
+   LOCAL hBrush, aRest, cText, hPen, nFlags, hBackBrush, nBackColor, hItemBrush
    LOCAL hBorderPen, hSelBrush, hDC
 
    hDC        := tvcd:nmcd:hdc
@@ -643,7 +643,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
    EXTERN FontDialog
    EXTERN PageSetup
    
-   LOCAL hPointer, aPt, oControl, oErr, oBand, oCoolMenu, n, aCtrl, cCC, hFile, nLine, aChildren, cLine, cFile, aErrors, aEditors
+   LOCAL hPointer, oControl, oBand, n, aCtrl, cCC
    IF EMPTY( cName )
       RETURN .F.
    ENDIF

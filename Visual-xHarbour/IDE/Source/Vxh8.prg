@@ -33,7 +33,6 @@ ENDCLASS
 //------------------------------------------------------------------------------------------
 
 METHOD Init( oGrid ) CLASS ColumnManager
-   LOCAL lProp
    ::Grid  := oGrid
    DEFAULT ::__xCtrlName  TO "ColumnManager"
 
@@ -51,7 +50,6 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD OnInitDialog() CLASS ColumnManager
-   LOCAL oItem, oSub
    ::Caption    := "DataGrid Column Manager"
    
    WITH OBJECT Image( Self )
@@ -207,6 +205,7 @@ RETURN NIL
 //------------------------------------------------------------------------------------------
 
 METHOD TabSelection( nPrev, nCur ) CLASS ColumnManager
+   ( nPrev )
    IF nCur == 1
       ::ItemEventManager:Hide()
       ::ItemManager:Show()
@@ -251,16 +250,20 @@ CLASS ColManager INHERIT ListBox
 ENDCLASS
 
 METHOD OnLButtonDown( nwParam, x, y ) CLASS ColManager
+   ( nwParam )
+   ( x )
    ::nMove := ::GetTopIndex() + Int( y / ::GetItemHeight( 0 ) )
 RETURN NIL
    
-METHOD OnLButtonUp( nwParam, x, y ) CLASS ColManager
+METHOD OnLButtonUp() CLASS ColManager
    ::Cursor := ::System:Cursor:Arrow
    ::nMove := -1
 RETURN NIL
 
 METHOD OnMouseMove( nwParam, x, y ) CLASS ColManager
-   LOCAL nSel, cText, oCol
+   LOCAL nSel, cText
+   ( nwParam )
+   ( x )
    IF ::nMove != -1
 
       IF ::Cursor == NIL .OR. ::Cursor == ::System:Cursor:Arrow
@@ -281,6 +284,7 @@ METHOD OnMouseMove( nwParam, x, y ) CLASS ColManager
 RETURN NIL
 
 METHOD OnParentMeasureItem( nwParam, nlParam, mis ) CLASS ColManager
+   ( nwParam )
    mis:itemHeight := 20
    mis:CopyTo( nlParam )
 RETURN NIL
@@ -360,7 +364,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD ResetList( lReset ) CLASS ColManager
-   LOCAL oItem, oSub, n
+   LOCAL oItem, n
    DEFAULT lReset TO .T.
    ::SetRedraw(.F.)
    ::ResetContent()
@@ -380,20 +384,6 @@ METHOD ResetList( lReset ) CLASS ColManager
 RETURN Self
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------
@@ -409,7 +399,6 @@ ENDCLASS
 //------------------------------------------------------------------------------------------
 
 METHOD Init( oData ) CLASS StructEditor
-   LOCAL lProp
    ::DataSource  := oData
    DEFAULT ::__xCtrlName  TO "StructEditor"
    
@@ -426,7 +415,6 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------
 METHOD OnInitDialog() CLASS StructEditor
-   LOCAL aField
    ::Caption    := "DataSource Structure Editor"
    
    PictureBox( Self )
@@ -489,7 +477,7 @@ METHOD OnInitDialog() CLASS StructEditor
 RETURN 0
 
 METHOD Save() CLASS StructEditor
-   LOCAL cFile, hFile, nArea, nRec, n, lDel, nPos, xData, cType, x, cOrig, aDeleted, aTable, aStruct
+   LOCAL cFile, nArea, nRec, n, lDel, nPos, xData, x, cOrig, aTable, aStruct
    LOCAL cField, oFile, aFilter := { "dbf", "adt" }
    
    IF UPPER( RIGHT( ::DataSource:__xCtrlName, 9 ) ) IN {"DATATABLE","MEMORYDATATABLE"} .AND. !::DataSource:__lMemory
@@ -670,14 +658,14 @@ METHOD Init( oParent ) CLASS StrEditor
       :Caption := "Field Name"
       :Data             := "hb_QSelf():DataSource:Fields:Name"
       :Width            := 265
-      :Control          := {|o, n, oCtrl| oCtrl := EditBox( o ),;
-                                          oCtrl:OnWMChar := {|o,nKey|ChkNameChar(o,nKey)},;
-                                          oCtrl:OnWMKeyDown := {|o,nKey|ChkNameKey(o,nKey)},;
-                                          oCtrl:OnWMDestroy := {|o|ChkNameDestroy(o)},;
-                                          oCtrl:Case := 2,;
-                                          oCtrl }
+      :Control          := {|o, oCtrl| oCtrl := EditBox( o ),;
+                                       oCtrl:OnWMChar := {|o,nKey|ChkNameChar(o,nKey)},;
+                                       oCtrl:OnWMKeyDown := {|o,nKey|ChkNameKey(o,nKey)},;
+                                       oCtrl:OnWMDestroy := {|o|ChkNameDestroy(o)},;
+                                       oCtrl:Case := 2,;
+                                       oCtrl }
       :ControlAccessKey := GRID_CHAR
-      :OnSave           := {|oCol, oGrid, xData| oGrid:DataSave( "Name", xData, {VK_RIGHT} ) }
+      :OnSave           := {|, oGrid, xData| oGrid:DataSave( "Name", xData, {VK_RIGHT} ) }
       :Create()
    END
 
@@ -686,13 +674,13 @@ METHOD Init( oParent ) CLASS StrEditor
 //      :Data             := "hb_QSelf():DataSource:Fields:Type"
       :Data             := "GetDataType(hb_QSelf():DataSource:Fields:Type)"
       :Width            := 70
-      :Control          := {|o, n, oCtrl| oCtrl := EditBox( o ),;
-                                          oCtrl:OnWMChar := {|o,nKey|ChkTypeChar(o,nKey)},;
-                                          oCtrl:Case := 2,;
-                                          oCtrl }
+      :Control          := {|o, oCtrl| oCtrl := EditBox( o ),;
+                                       oCtrl:OnWMChar := {|o,nKey|ChkTypeChar(o,nKey)},;
+                                       oCtrl:Case := 2,;
+                                       oCtrl }
       :ControlAccessKey := GRID_CHAR
       :Alignment        := 3
-      :OnSave           := {|oCol, oGrid, xData| oGrid:DataSave( "Type", xData, {VK_RIGHT,VK_RETURN} ) }
+      :OnSave           := {|, oGrid, xData| oGrid:DataSave( "Type", xData, {VK_RIGHT,VK_RETURN} ) }
       :Create()
    END
 
@@ -701,13 +689,13 @@ METHOD Init( oParent ) CLASS StrEditor
       :Data             := "hb_QSelf():DataSource:Fields:Size"
       :Width            := 70
       :Alignment        := 2
-      :Control          := {|o, n, oCtrl| IIF( !(o:DataSource:Fields:Type $"DML"), ( oCtrl := EditBox( o ),;
+      :Control          := {|o, oCtrl| IIF( !(o:DataSource:Fields:Type $"DML"), ( oCtrl := EditBox( o ),;
                                                                                   oCtrl:OnWMKeyDown := {|o,nKey| __SetEditKey( o, nKey )},;
                                                                                   oCtrl:OnWMChar := {|o,nKey|ChkNumberChar( nKey, o, 255, 1 )},;
                                                                                   oCtrl:Alignment := 3,;
                                                                                   oCtrl ),) }
       :ControlAccessKey := GRID_CHAR
-      :OnSave           := {|oCol, oGrid, xData| oGrid:DataSave( "Size", MAX( VAL(xData), 1 ), {VK_RIGHT,VK_RETURN} ) }
+      :OnSave           := {|, oGrid, xData| oGrid:DataSave( "Size", MAX( VAL(xData), 1 ), {VK_RIGHT,VK_RETURN} ) }
       :Create()
    END
 
@@ -717,13 +705,13 @@ METHOD Init( oParent ) CLASS StrEditor
       :Width            := 70
       :Alignment        := 2
 
-      :Control          := {|o, n, oCtrl| IIF( o:DataSource:Fields:Type == "N", ( oCtrl := EditBox( o ),;
-                                                                                  oCtrl:OnWMKeyDown := {|o,nKey| __SetEditKey( o, nKey )},;
-                                                                                  oCtrl:OnWMChar := {|o,nKey|ChkNumberChar( nKey, o, 15, 0 )},;
-                                                                                  oCtrl:Alignment := 3,;
-                                                                                  oCtrl ),) }
+      :Control          := {|o, oCtrl| IIF( o:DataSource:Fields:Type == "N", ( oCtrl := EditBox( o ),;
+                                                                               oCtrl:OnWMKeyDown := {|o,nKey| __SetEditKey( o, nKey )},;
+                                                                               oCtrl:OnWMChar := {|o,nKey|ChkNumberChar( nKey, o, 15, 0 )},;
+                                                                               oCtrl:Alignment := 3,;
+                                                                               oCtrl ),) }
       :ControlAccessKey := GRID_CHAR
-      :OnSave           := {|oCol, oGrid, xData| oGrid:DataSave( "Decimals", MAX( VAL(xData), 0 ), {VK_LEFT,VK_LEFT,VK_LEFT,VK_DOWN,VK_RETURN} ) }
+      :OnSave           := {|, oGrid, xData| oGrid:DataSave( "Decimals", MAX( VAL(xData), 0 ), {VK_LEFT,VK_LEFT,VK_LEFT,VK_DOWN,VK_RETURN} ) }
       :Create()
    END
    ::Create()
@@ -938,7 +926,6 @@ ENDCLASS
 //------------------------------------------------------------------------------------------
 
 METHOD Init( oData ) CLASS TableEditor
-   LOCAL lProp
    ::DataSource  := oData
    DEFAULT ::__xCtrlName  TO "TableEditor"
    ::Super:Init( ::Application:MainForm )
@@ -954,7 +941,6 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------
 METHOD OnInitDialog() CLASS TableEditor
-   LOCAL aField
    ::Caption    := "DataSource Editor"
    
    WITH OBJECT PictureBox( Self )
@@ -1078,31 +1064,31 @@ METHOD Init( oParent ) CLASS TblEditor
        oCol:Create()
 
        oCol:ControlAccessKey := GRID_CHAR
-       oCol:OnSave  := {|oCol, oGrid, xData| oGrid:DataSave( aField[1], xData ) }
+       oCol:OnSave  := {|, oGrid, xData| oGrid:DataSave( aField[1], xData ) }
        
        DO CASE
           CASE aField[2]=="C"
-               oCol:Control := {|o, n, oCtrl| oCtrl := EditBox( o ),;
-                                              oCtrl:OnWMChar := {|o,nKey|__SetEditKey( o, nKey )},;
-                                              oCtrl:OnWMKeyDown := {|o,nKey| __SetEditKey( o, nKey )},;
-                                              oCtrl }
+               oCol:Control := {|o, oCtrl| oCtrl := EditBox( o ),;
+                                           oCtrl:OnWMChar := {|o,nKey|__SetEditKey( o, nKey )},;
+                                           oCtrl:OnWMKeyDown := {|o,nKey| __SetEditKey( o, nKey )},;
+                                           oCtrl }
           CASE aField[2]=="D"
                oCol:Alignment := 3
-               oCol:Control := {|o, n, oCtrl| oCtrl := MaskEdit( o ),;
-                                              oCtrl }
+               oCol:Control := {|o, oCtrl| oCtrl := MaskEdit( o ),;
+                                           oCtrl }
 
           CASE aField[2]=="L"
                oCol:Alignment := 3
                oCol:Width := MAX( 6, LEN(oCol:Caption)+2 )*7
-               oCol:Control := {|o, n, oCtrl| oCtrl := MaskEdit( o ),;
-                                              oCtrl }
+               oCol:Control := {|o, oCtrl| oCtrl := MaskEdit( o ),;
+                                           oCtrl }
           CASE aField[2]=="N"
                oCol:Alignment := 2
-               oCol:Control := {|o, n, oCtrl| oCtrl := EditBox( o ),;
-                                              oCtrl:OnWMKeyDown := {|o,nKey| __SetEditKey( o, nKey )},;
-                                              oCtrl:OnWMChar := {|o,nKey|ChkNumberChar( nKey, o )},;
-                                              oCtrl:Alignment := 3,;
-                                              oCtrl }
+               oCol:Control := {|o, oCtrl| oCtrl := EditBox( o ),;
+                                           oCtrl:OnWMKeyDown := {|o,nKey| __SetEditKey( o, nKey )},;
+                                           oCtrl:OnWMChar := {|o,nKey|ChkNumberChar( nKey, o )},;
+                                           oCtrl:Alignment := 3,;
+                                           oCtrl }
        ENDCASE
 
    NEXT
@@ -1134,7 +1120,7 @@ FUNCTION __SetEditKey( o, nKey )
 RETURN NIL
 
 //------------------------------------------------------------------------------------------
-METHOD DataSave( cField, xData, aKeys ) CLASS TblEditor
+METHOD DataSave( cField, xData ) CLASS TblEditor
    IF !EMPTY( XSTR( xData ) )
       ::DataSource:Fields:Put( xData, cField )
       s_oSave:Enabled := .T.

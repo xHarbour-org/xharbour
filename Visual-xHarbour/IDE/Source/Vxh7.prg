@@ -38,7 +38,6 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD OnInitDialog() CLASS MenuEditor
-   LOCAL oItem, oSub
    ::ThickFrame := .T.
    ::CenterWindow()
    CoolBar( Self )
@@ -190,6 +189,7 @@ RETURN NIL
 //------------------------------------------------------------------------------------------
 
 METHOD TabSelection( nPrev, nCur ) CLASS MenuEditor
+   ( nPrev )
    IF nCur == 1
       ::ItemEventManager:Hide()
       ::ItemManager:Show()
