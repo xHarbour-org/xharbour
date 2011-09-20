@@ -1686,6 +1686,11 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
 
                     CASE "A"
                          DEFAULT nAlign TO 1
+                         WHILE VALTYPE( cData ) == "A"
+                            cData := cData[1]
+                            DEFAULT cData TO ""
+                         ENDDO
+                         cData := ALLTRIM( TRANSFORM( cData, ::Children[ i ]:Picture ) ) //ALLTRIM( cData )
                          EXIT
                  END
 
@@ -2713,23 +2718,16 @@ METHOD __FillRow( nPos ) CLASS DataGrid
        ENDIF
 
        cData := ::Children[x]:Data
-       //IF ( n := RAT( ":", cData ) ) > 0
-       //   cData := SUBSTR( cData, n+1 )
-       //   IF ( i := ASCAN( ::DataSource:Structure, {|a| a[1]==cData } ) ) > 0
-       //      cData := aData[i]
-       //   ENDIF
-       // ELSE
-          IF VALTYPE( cData ) == "B"
-             cData := EVAL( cData, Self )
-           ELSE
-             DEFAULT cData TO "' '"
-             TRY
-                cData := &cData
-               catch
-                cData := ""
-             END
-          ENDIF
-       //ENDIF
+
+       IF VALTYPE( cData ) == "B"
+          cData := EVAL( cData, Self )
+       ENDIF
+       DEFAULT cData TO "' '"
+       TRY
+          cData := &cData
+       catch
+          cData := ""
+       END
 
        IF ::ConvertOem .AND. VALTYPE( cData ) == "C"
           cData := OemToChar( cData )
