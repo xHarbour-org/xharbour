@@ -761,9 +761,12 @@ RETURN Self
 
 METHOD Test_OnClick() CLASS AskSettings
    LOCAL hAsk := {=>}
-   hAsk:Title     := ::Title:Caption
-   hAsk:GroupText := ::GroupText:Caption
-   hAsk:Search    := ::Search:Caption
+   hAsk:Exp1 := ""
+   hAsk:Exp2 := ""
+   hAsk:AskMeLater := {=>}
+   hAsk:AskMeLater:Title     := ::Title:Caption
+   hAsk:AskMeLater:GroupText := ::GroupText:Caption
+   hAsk:AskMeLater:Search    := ::Search:Caption
    AskLater( , , 1, hAsk )
 RETURN Self
 

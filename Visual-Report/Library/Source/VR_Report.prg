@@ -948,6 +948,7 @@ CLASS VrAskLater INHERIT Dialog
    METHOD SetDateEdit()
    METHOD OK_OnClick()
    METHOD ComboBox1_OnCBNSelEndOk()
+   METHOD BrowseF3_OnClick()
 ENDCLASS
 
 METHOD Init( oParent, cField, cType, nCond, hExp ) CLASS VrAskLater
@@ -1091,8 +1092,24 @@ METHOD OnInitDialog() CLASS VrAskLater
          :Visible      := .F.
          :Create()
       END
+      WITH OBJECT ( Button( :this ) )
+         :Name         := "BrowseF3"
+         :Left         := 344
+         :Top          := 35
+         :Width        := 30
+         :Height       := 25
+         :Caption      := "..."
+         :EventHandler[ "OnClick" ] := "BrowseF3_OnClick"
+         :Create()
+      END
+
    END
    ::SetDateEdit( cType )
+RETURN Self
+
+METHOD BrowseF3_OnClick() CLASS VrAskLater
+   LOCAL aTemp := HB_ATOKENS( ::hExp:AskMeLater:Search, CRLF )
+   ::oGet1:Caption  := wf_BrowseF3(aTemp, .T., ALIAS(), .F. )
 RETURN Self
 
 METHOD OK_OnClick() CLASS VrAskLater
