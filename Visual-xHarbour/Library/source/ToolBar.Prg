@@ -306,10 +306,7 @@ RETURN SELF
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD AddControl( oControl ) CLASS ToolBar
-   IF oControl:__xCtrlName != "ComboBox"
-      oControl:Dock:Bottom := Self
-   ENDIF
+METHOD AddControl() CLASS ToolBar
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------

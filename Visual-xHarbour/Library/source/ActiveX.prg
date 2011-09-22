@@ -112,7 +112,7 @@ CLASS ActiveX INHERIT ToleAuto, UserControl
    DATA Cursor        EXPORTED
    DATA ProgID        PUBLISHED
    DATA ClsID         PUBLISHED
-   DATA OleVerb      PUBLISHED INIT __GetSystem():OleVerb:Show
+   DATA OleVerb       PUBLISHED INIT __GetSystem():OleVerb:Show
    DATA hEventHandler PROTECTED
    DATA __IUnknown    EXPORTED
    DATA oTypeLib      EXPORTED
@@ -378,8 +378,10 @@ METHOD __GetEventList( lVars ) CLASS ActiveX
                             { "OnRButtonUp"        , "", "" },;
                             { "OnMouseActivate"    , "", "" } } },;
             {"Menu",        {;
-                            { "OnContextMenu"      , "", "" } } } }
-
+                            { "OnContextMenu"      , "", "" } } },;
+            {"Scroll",      {;
+                            { "OnHorzScroll"       , "", "" },;
+                            { "OnVertScroll"       , "", "" } } } }
 
          IF ::oTypeLib != NIL
             FOR EACH Interface IN ::oTypeLib:Interfaces

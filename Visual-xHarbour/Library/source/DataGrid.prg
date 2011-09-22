@@ -2191,15 +2191,15 @@ RETURN Self
 METHOD Update() CLASS DataGrid
    LOCAL n, nRec, nUse, nIns
 
-   ::IsDelIndexOn := !EMPTY( ::DataSource ) .AND. ( "DELETED()" IN UPPER( ::DataSource:OrdKey() ) )
-
    ::__DataWidth := 0
    AEVAL( ::Children, {|o| ::__DataWidth += IIF( o:Visible, o:Width, 0 ) } )
 
-   IF ::DataSource == NIL //.OR. EMPTY( ::__DisplayArray )
+   IF ::DataSource == NIL .OR. ! ::DataSource:IsOpen
       ::__DisplayData()
       RETURN Self
    ENDIF
+   ::IsDelIndexOn := !EMPTY( ::DataSource ) .AND. ( "DELETED()" IN UPPER( ::DataSource:OrdKey() ) )
+
    IF EMPTY( ::__DisplayArray )
       ::__Update(.F.)
    ENDIF
@@ -2209,23 +2209,6 @@ METHOD Update() CLASS DataGrid
    ::RowCountVisible := Ceil( ::__DataHeight/::ItemHeight )
    ::RowCountUsable  := MIN( Int(  ::__DataHeight/::ItemHeight ), ::RowCount )
    nUse := Int(  ::__DataHeight/::ItemHeight )
-
-//   IF SET( _SET_DELETED )
-//      WHILE ::DataSource:Deleted()
-//         ::DataSource:Skip()
-//         IF ::DataSource:Eof()
-//            ::DataSource:GoBottom()
-//            EXIT
-//         ENDIF
-//      ENDDO
-//      WHILE ::DataSource:Deleted()
-//         ::DataSource:Skip(-1)
-//         IF ::DataSource:Bof()
-//            ::DataSource:GoTop()
-//            EXIT
-//         ENDIF
-//      ENDDO
-//   ENDIF
 
    IF ::DataSource:Eof()
       ::DataSource:GoBottom()
