@@ -114,11 +114,24 @@ static oApp
 //-------------------------------------------------------------------------------------------------------
 
 PROCEDURE Main( cFile )
+   LOCAL oPDF
    SET CENTURY ON
    SET AUTOPEN ON
    REQUEST DBFNTX, DBFDBT, DBFCDX, DBFFPT, ADS, RMDBFCDX, SQLRDD, SR_ODBC, SR_MYSQL, SR_FIREBIRD, SQLEX
 
-   RepApp( cFile )
+   TRY
+      oPDF := GetActiveObject( "PDFCreactiveX.PDFCreactiveX" )
+   CATCH
+      TRY
+         oPDF := CreateObject( "PDFCreactiveX.PDFCreactiveX" )
+      CATCH
+      END
+   END
+   IF oPDF == NIL
+      MessageBox( 0, "Missing internal components. Please contact customer service support." )
+    ELSE
+      RepApp( cFile )
+   ENDIF
    QUIT
 RETURN
 
