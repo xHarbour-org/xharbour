@@ -291,31 +291,31 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
           nAlign := TA_LEFT
 
           IF oItem:ColItems[n]:ColType == "ANIMATIONSTYLE"
-             IF ( nPos := hScan( ::System:WindowAnimation, ::ActiveObject:AnimationStyle ) ) > 0
+             IF ( nPos := hScan( ::System:WindowAnimation, ::ActiveObject:AnimationStyle ) ) > 0 .AND. LEN( cText ) >= nPos
                 cText := cText[ nPos ]
              ENDIF
           ENDIF
 
           IF oItem:ColItems[n]:ColType == "STOPBITS"
-             IF ( nPos := hScan( ::System:StopBits, ::ActiveObject:StopBits ) ) > 0
+             IF ( nPos := hScan( ::System:StopBits, ::ActiveObject:StopBits ) ) > 0 .AND. LEN( cText ) >= nPos
                 cText := cText[ nPos ]
              ENDIF
           ENDIF
 
           IF oItem:ColItems[n]:ColType == "PARITY"
-             IF ( nPos := hScan( ::System:Parity, ::ActiveObject:Parity ) ) > 0
+             IF ( nPos := hScan( ::System:Parity, ::ActiveObject:Parity ) ) > 0 .AND. LEN( cText ) >= nPos
                 cText := cText[ nPos ]
              ENDIF
           ENDIF
 
           IF oItem:ColItems[n]:ColType == "HANDSHAKE"
-             IF ( nPos := hScan( ::System:HandShake, ::ActiveObject:HandShake ) ) > 0
+             IF ( nPos := hScan( ::System:HandShake, ::ActiveObject:HandShake ) ) > 0 .AND. LEN( cText ) >= nPos
                 cText := cText[ nPos ]
              ENDIF
           ENDIF
 
           IF oItem:ColItems[n]:ColType == "OLEVERB"
-             IF ( nPos := hScan( ::System:OleVerb, ::ActiveObject:OleVerb ) ) > 0
+             IF ( nPos := hScan( ::System:OleVerb, ::ActiveObject:OleVerb ) ) > 0 .AND. LEN( cText ) >= nPos
                 cText := cText[ nPos ]
              ENDIF
           ENDIF
@@ -329,13 +329,13 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
           ENDIF
 
           IF oItem:ColItems[n]:ColType == "SYSFOLDERS"
-             IF ( nPos := hScan( ::System:Folders, ::ActiveObject:SysFolder ) ) > 0
+             IF ( nPos := hScan( ::System:Folders, ::ActiveObject:SysFolder ) ) > 0 .AND. LEN( cText ) >= nPos
                 cText := cText[ nPos ]
              ENDIF
           ENDIF
 
           IF oItem:ColItems[n]:ColType == "CBDROPDOWN"
-             IF ( nPos := hScan( ::System:DropDownStyle, ::ActiveObject:DropDownStyle ) ) > 0
+             IF ( nPos := hScan( ::System:DropDownStyle, ::ActiveObject:DropDownStyle ) ) > 0 .AND. LEN( cText ) >= nPos
                 cText := cText[ nPos ]
              ENDIF
           ENDIF
@@ -345,43 +345,43 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
           ENDIF
 
           IF oItem:ColItems[n]:ColType == "TEXTALIGNMENT"
-             IF ( nPos := hScan( ::System:TextAlignment, ::ActiveObject:ImageAlign ) ) > 0
+             IF ( nPos := hScan( ::System:TextAlignment, ::ActiveObject:ImageAlign ) ) > 0 .AND. LEN( cText ) >= nPos
                 cText := cText[ nPos ]
              ENDIF
           ENDIF
 
           IF oItem:ColItems[n]:ColType == "DTSFORMATS"
-             IF ( nPos := hScan( ::System:DateTimeFormat, ::ActiveObject:Format ) ) > 0
+             IF ( nPos := hScan( ::System:DateTimeFormat, ::ActiveObject:Format ) ) > 0 .AND. LEN( cText ) >= nPos
                 cText := cText[ nPos ]
              ENDIF
           ENDIF
 
           IF oItem:ColItems[n]:ColType == "LVGALIGNMENT"
-             IF ( nPos := hScan( ::System:ListViewGroupAlign, ::ActiveObject:Alignment ) ) > 0
+             IF ( nPos := hScan( ::System:ListViewGroupAlign, ::ActiveObject:Alignment ) ) > 0 .AND. LEN( cText ) >= nPos
                 cText := cText[ nPos ]
              ENDIF
           ENDIF
 
           IF oItem:ColItems[n]:ColType == "ADSDATADRIVERS"
-             IF ( nPos := hScan( ::System:AdsDataDrivers, ::ActiveObject:Driver ) ) > 0
+             IF ( nPos := hScan( ::System:AdsDataDrivers, ::ActiveObject:Driver ) ) > 0 .AND. LEN( cText ) >= nPos
                 cText := cText[ nPos ]
              ENDIF
           ENDIF
 
           IF oItem:ColItems[n]:ColType == "DATADRIVERS"
-             IF ( nPos := hScan( ::System:DataDrivers, ::ActiveObject:Driver ) ) > 0
+             IF ( nPos := hScan( ::System:DataDrivers, ::ActiveObject:Driver ) ) > 0 .AND. LEN( cText ) >= nPos
                 cText := cText[ nPos ]
              ENDIF
           ENDIF
 
           IF oItem:ColItems[n]:ColType == "CURSORS"
-             IF ( nPos := ASCAN( ::ActiveObject:__CursorValues, ::ActiveObject:Cursor ) ) > 0
+             IF ( nPos := ASCAN( ::ActiveObject:__CursorValues, ::ActiveObject:Cursor ) ) > 0 .AND. LEN( cText ) >= nPos
                 cText := cText[ nPos ]
              ENDIF
           ENDIF
 
           IF oItem:ColItems[n]:ColType == "SERVICES"
-             IF ( nPos := ASCAN( oItem:ColItems[n]:Value, ::ActiveObject:ServiceName ) ) > 0
+             IF ( nPos := ASCAN( oItem:ColItems[n]:Value, ::ActiveObject:ServiceName ) ) > 0 .AND. LEN( cText ) >= nPos
                 cText := cText[ nPos ]
              ENDIF
           ENDIF

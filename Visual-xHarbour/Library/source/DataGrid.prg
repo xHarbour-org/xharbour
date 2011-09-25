@@ -1539,10 +1539,10 @@ RETURN 0
 METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
    LOCAL n, i, cData, x, y, nY, nRec, nRecno, lHide, aText, lSelected, nHScroll, iRight, iLeft, zLeft
    LOCAL nLeft, nTop, nRight, nBottom, hOldFont, hOldPen, nWImg, nHImg, nInd, nAlign, aAlign, aGrid, lFreeze, nHeaderRight
-   LOCAL nBkCol, nTxCol, xLeft, nStatus
+   LOCAL nBkCol, nTxCol, xLeft, nStatus, lDeleted
    LOCAL nDif, nAve, aTextExt, nFocRow, aData, z, lDrawControl, nCtrl, nRep, aRect, lDis := !::IsWindowEnabled()
    LOCAL iLen, lHighLight, lBorder, hBrush, nLine, nRecPos := 0, hPen, nImgX
-   IF LEN( ::Children ) == 0 .OR. ::hWnd == NIL .OR. !IsWindow( ::hWnd ) .OR. ::hWnd == 0
+   IF LEN( ::Children ) == 0 .OR. ::hWnd == NIL .OR. !IsWindow( ::hWnd ) .OR. ::hWnd == 0 
       RETURN .F.
    ENDIF
 
@@ -1640,11 +1640,11 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                     nBkCol := DarkenColor( nBkCol, 25 )
                  ENDIF
 
-                 nTxCol := ::__DisplayArray[nLine][1][i][ 8]
-                 nStatus:= ::__DisplayArray[nLine][1][i][10]
-                 nRep   := ::__DisplayArray[nLine][1][i][11]
-
+                 nTxCol   := ::__DisplayArray[nLine][1][i][ 8]
+                 nStatus  := ::__DisplayArray[nLine][1][i][10]
+                 nRep     := ::__DisplayArray[nLine][1][i][11]
                  hOldFont := SelectObject( hMemDC, ::__DisplayArray[nLine][1][i][12] )
+                 lDeleted := ::__DisplayArray[nLine][1][i][13]
 
                  zLeft := nLeft
                  IF lFreeze .AND. i <= ::FreezeColumn
@@ -1704,7 +1704,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                  ENDIF
 
                  lHighLight := .F.
-                 IF ::DataSource:Deleted()
+                 IF lDeleted
                     IF lSelected .AND. ( i == ::ColPos .OR. ::FullRowSelect )
 
                        lHighLight := ::HasFocus .OR. ::__CurControl != NIL
@@ -2726,7 +2726,8 @@ METHOD __FillRow( nPos ) CLASS DataGrid
                                          ::Children[x]:Width,;
                                          nStatus,;
                                          ::Children[x]:Representation,;
-                                         ::Children[x]:Font:Handle }
+                                         ::Children[x]:Font:Handle,;
+                                         ::DataSource:Deleted() }
        IF ::Children[x]:Visible
           ::__DataWidth += ::Children[x]:Width
        ENDIF

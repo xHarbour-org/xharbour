@@ -4775,13 +4775,17 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
        cType := aImage[3]
 
        IF VALTYPE( aImage[3] ) == "C"
-          IF aImage[3] == "ICO"
+          IF aImage[3] == "CUR"
+             cType := "CURSOR"
+           ELSEIF aImage[3] == "ICO"
              cType := "ICON"
            ELSEIF aImage[3] == "BMP"
              cType := "BITMAP"
           ENDIF
         ELSEIF VALTYPE( aImage[3] ) != "C"
-          IF aImage[3] == IMAGE_ICON
+          IF aImage[3] == IMAGE_CURSOR
+             cType := "CURSOR"
+           ELSEIF aImage[3] == IMAGE_ICON
              cType := "ICON"
            ELSE
              cType := "BITMAP"
@@ -4818,7 +4822,9 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
           cResImg := "_"+UPPER(STRTRAN( cResImg, "." ))
 
           cType := UPPER( SUBSTR( cFile, RAT( ".", cFile )+1 ) )
-          IF cType == "ICO"
+          IF cType == "CUR"
+             cType := "CURSOR"
+           ELSEIF cType == "ICO"
              cBuffer += cResImg+" "+ cType +" "+ValToPrgExp( STRTRAN( cFile, "\", "\\" )) + CRLF
              cType := "ICON"
            ELSEIF cType == "BMP"

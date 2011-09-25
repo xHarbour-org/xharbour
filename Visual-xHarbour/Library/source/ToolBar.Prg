@@ -1584,6 +1584,7 @@ CLASS ToolButton INHERIT Object
    PROPERTY Separator     INDEX BTNS_SEP            READ xSeparator     WRITE SetStyle DEFAULT .F.
 
    ACCESS IsChecked      INLINE ::Parent:GetButtonInfo( ::Id, TBIF_STATE ):fsState & TBSTATE_CHECKED == TBSTATE_CHECKED
+   ACCESS IsPressed      INLINE ::Parent:GetButtonInfo( ::Id, TBIF_STATE ):fsState & TBSTATE_PRESSED == TBSTATE_PRESSED
 
    DATA xPosition          EXPORTED
    ACCESS Position         INLINE ::xPosition PERSISTENT
@@ -1922,7 +1923,7 @@ METHOD Press() CLASS ToolButton
 
    tbbi:cbSize  := tbbi:sizeof()
    tbbi:dwMask  := TBIF_STATE
-   tbbi:fsState := TBSTATE_ENABLED + TBSTATE_PRESSED
+   tbbi:fsState := TBSTATE_ENABLED | TBSTATE_PRESSED
 
    SendMessage( ::Parent:hWnd, TB_SETBUTTONINFO, ::Id, tbbi )
 

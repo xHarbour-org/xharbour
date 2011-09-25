@@ -39,10 +39,13 @@ CLASS DataTable INHERIT Component
    DATA Shared             PUBLISHED INIT .T.
    DATA ReadOnly           PUBLISHED INIT .F.
    DATA AutoOpen           PUBLISHED INIT .T.
-   DATA SqlConnector       PUBLISHED
+   
+   DATA xSqlConnector      EXPORTED
+   ACCESS SqlConnector     INLINE __ChkComponent( Self, ::xSqlConnector ) PERSISTENT
+   ASSIGN SqlConnector(o)  INLINE ::xSqlConnector := o
+   
    DATA Path               PUBLISHED INIT ""
    DATA CodePage           PUBLISHED
-   
    DATA Socket             PUBLISHED
 
    DATA __lMemory          EXPORTED  INIT .F.
