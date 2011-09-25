@@ -991,8 +991,7 @@ METHOD OnInitDialog() CLASS VrAskLater
       :Top              := 125
       :Width            := 418
       :Height           := 50
-      :Type             := "JPG"
-      :ImageName        := "BTRIBBON"
+      :ImageName        := "_BOTTOMRIBBOJPG"
       :Stretch          := .T.
       :Create()
 
@@ -1099,6 +1098,7 @@ METHOD OnInitDialog() CLASS VrAskLater
          :Width        := 30
          :Height       := 25
          :Caption      := "..."
+         :Enabled      := ! EMPTY( ::hExp:AskMeLater:Search )
          :EventHandler[ "OnClick" ] := "BrowseF3_OnClick"
          :Create()
       END
@@ -1545,8 +1545,7 @@ METHOD OnInitDialog() CLASS FilterPerQuarter
       :Top              := 165
       :Width            := 437
       :Height           := 50
-      :Type             := "JPG"
-      :ImageName        := "BTRIBBON"
+      :ImageName        := "_BOTTOMRIBBOJPG"
       :Stretch          := .T.
       :Create()
       WITH OBJECT ( BUTTON( :this ) )
@@ -1688,8 +1687,7 @@ METHOD OnInitDialog() CLASS IsInTheLast
       :Top       := 415
       :Width     := 844
       :Height    := 50
-      :Type      := "JPG"
-      :ImageName := "BTRIBBON"
+      :ImageName := "_BOTTOMRIBBOJPG"
       :Stretch   := .T.
       :Create()
       WITH OBJECT ( Button( :this ) )

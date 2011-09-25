@@ -104,8 +104,11 @@ METHOD Configure() CLASS VrDataTable
                :Alias := cAlias + "_desMode"
             ENDIF
          ENDIF
-
-         :Create()
+         IF ! FILE( ::FileName )
+            MessageBox( 0, "File not found", ::FileName )
+          ELSE
+            :Create()
+         ENDIF
       ENDIF
    END
 RETURN Self

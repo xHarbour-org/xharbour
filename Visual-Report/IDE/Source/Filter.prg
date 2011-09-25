@@ -785,7 +785,7 @@ METHOD OnInitDialog() CLASS AskSettings
       :Width            := 418
       :Height           := 50
       :Type             := "JPG"
-      :ImageName        := "BTRIBBON"
+      :ImageName        := "_BOTTOMRIBBOJPG"
       :Stretch          := .T.
       :Create()
 
