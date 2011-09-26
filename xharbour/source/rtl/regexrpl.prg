@@ -63,26 +63,29 @@ FUNCTION hb_RegexReplace( cRegex, cString, cReplace, lCaseSensitive, lNewLine, n
    LOCAL nOffSet := 0
    LOCAL cSearch, nStart, nEnd, nLenSearch, nLenReplace
 
-   IF !HB_ISREGEXSTRING( cRegex )
-     pRegex := HB_RegExComp( cRegEx )
-   ELSE
+   IF HB_ISREGEXSTRING( cRegex )
      pRegex := cRegEx
+   ELSE
+     pRegex := HB_RegExComp( cRegEx )
    ENDIF
 
    aMatches := HB_RegExAll( pRegEx, cString, lCaseSensitive, lNewLine, nMaxMatches, nGetMatch, .F. )
 
    IF !( aMatches == NIL )
       cReturn := cString
+
       FOR EACH aMatch IN aMatches
           //TraceLog( "ValToPrg( aMatch ), cReturn", ValToPrg( aMatch ), cReturn )
-          IF Len( aMatch ) == 3 // if regex matches I must have an array of 3 elements
-             cSearch := aMatch[ MATCH_STRING ]
-             nStart  := aMatch[ MATCH_START ]
-             nEnd    := aMatch[ MATCH_END ]
+          IF Len( aMatch ) == 1 .AND. Len( aMatch[1] ) == 3 // if regex matches I must have an array of 3 elements
+             cSearch := aMatch[1][ MATCH_STRING ]
+             nStart  := aMatch[1][ MATCH_START ]
+             nEnd    := aMatch[1][ MATCH_END ]
+
              nLenSearch  := Len( cSearch ) //nEnd - nStart + 1
              nLenReplace := Len( cReplace )
              //TraceLog( "SubStr( cString, nStart, nLenSearch )", ;
              //          SubStr( cString, nStart - nOffSet, nLenSearch ) )
+
              cReturn := Stuff( cReturn, nStart - nOffSet, nLenSearch, cReplace )
              nOffSet += nLenSearch - nLenReplace
              //TraceLog( "cSearch, nStart, nEnd, nLenSearch, nLenReplace, nOffSet, cReturn",;
