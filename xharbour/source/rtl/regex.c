@@ -229,7 +229,7 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
    }
 
    pReg = hb_getregex( pRegEx,
-                       pCaseSensitive != NULL && !pCaseSensitive->item.asLogical.value,
+                       pCaseSensitive && ! pCaseSensitive->item.asLogical.value,
                        pNewLine != NULL && pNewLine->item.asLogical.value,
                        &fFree );
 

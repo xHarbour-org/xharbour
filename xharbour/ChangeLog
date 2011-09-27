@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-09-19 18:45 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * source/rtl/regex.c
+    * Minute synthetic simplification
+
+  * source/rtl/regexrpl.prg
+    ! Fixed returned value of hb_RegexReplace() when no matches are found
+    ! Fixed support of lCaseSensitive and lNewLine arguments of hb_RegexReplace()
+
 2011-09-18 15:30 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/rtl/regexrpl.prg
     ! Adjusted hb_RegexReplace() to array structure returned by hb_RegExAll()

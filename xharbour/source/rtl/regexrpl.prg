@@ -66,14 +66,15 @@ FUNCTION hb_RegexReplace( cRegex, cString, cReplace, lCaseSensitive, lNewLine, n
    IF HB_ISREGEXSTRING( cRegex )
      pRegex := cRegEx
    ELSE
-     pRegex := HB_RegExComp( cRegEx )
+     pRegex := HB_RegExComp( cRegEx, lCaseSensitive, lNewLine )
    ENDIF
 
-   aMatches := HB_RegExAll( pRegEx, cString, lCaseSensitive, lNewLine, nMaxMatches, nGetMatch, .F. )
+   cReturn := cString
 
-   IF !( aMatches == NIL )
-      cReturn := cString
+   // lCaseSensitive and lNewLine already defined by HB_RegExComp()!
+   aMatches := HB_RegExAll( pRegEx, cString, /* lCaseSensitive */, /*lNewLine*/, nMaxMatches, nGetMatch, .F. )
 
+   IF ! ( aMatches == NIL )
       FOR EACH aMatch IN aMatches
           //TraceLog( "ValToPrg( aMatch ), cReturn", ValToPrg( aMatch ), cReturn )
           IF Len( aMatch ) == 1 .AND. Len( aMatch[1] ) == 3 // if regex matches I must have an array of 3 elements
@@ -92,7 +93,6 @@ FUNCTION hb_RegexReplace( cRegex, cString, cReplace, lCaseSensitive, lNewLine, n
              //          cSearch, nStart, nEnd, nLenSearch, nLenReplace, nOffSet, cReturn )
           ENDIF
       NEXT
-
    ENDIF
 
 RETURN cReturn
