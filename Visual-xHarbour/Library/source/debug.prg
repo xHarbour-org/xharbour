@@ -36,25 +36,23 @@ function _trace(c)
 *------------------------------------------------------------------------------*
 PROCEDURE _DVIEW
 
-   LOCAL no_of_param, x, dbg_array, description, half
+   #ifdef DEBUG
+    LOCAL no_of_param, x, dbg_array, description, half
 
-#ifndef DEBUG
-   RETURN
-#endif
+    PARAM p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18
 
-   PARAM p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18
+    no_of_param := PCOUNT( )
+    half := no_of_param / 2
 
-   no_of_param := PCOUNT( )
-   half := no_of_param / 2
-
-   OutputDebugString( '------------------------------' +CRLF)
-   BEGIN SEQUENCE
-      FOR x := 1 TO half
-         dbg_array = "p" + lTrim( STR( x, 2, 0 ) )
-         description = "p" + lTrim( STR( x + half, 2, 0 ) )
-         DLIST( &dbg_array, &description )
-      NEXT
-   END
+    OutputDebugString( '------------------------------' +CRLF)
+    BEGIN SEQUENCE
+       FOR x := 1 TO half
+          dbg_array = "p" + lTrim( STR( x, 2, 0 ) )
+          description = "p" + lTrim( STR( x + half, 2, 0 ) )
+          DLIST( &dbg_array, &description )
+       NEXT
+    END
+   #endif
 
    RETURN
 
@@ -181,7 +179,7 @@ LOCAL aStack:={},n:=2
 WHILE ( n < 74 )
     IF !Empty(ProcName( n ) )
        AAdd( aStack, Trim( ProcName( n ) ) + "(" + LTrim(Str( ProcLine( n ) ) ) + ")" )
-    endif
+    ENDIF
     n++
 ENDDO
 

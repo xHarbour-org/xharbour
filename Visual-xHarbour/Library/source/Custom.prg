@@ -49,11 +49,12 @@ METHOD Init( oParent, cReference ) CLASS CustomControl
 RETURN Self
 
 METHOD Create() CLASS CustomControl
-   LOCAL hFile, nLine, aChildren, cLine, cFile, aErrors, aEditors, nLeft, nTop, cName, cReference, nWidth, nHeight
+   #ifdef VXH_PROFESSIONAL
+    LOCAL hFile, nLine, aChildren, cLine, cFile, aErrors, aEditors, nLeft, nTop, cName, cReference, nWidth, nHeight
+   #endif
    ::Super:Create()
 
-   #ifdef VXH_PROFESSIONAL 
-
+   #ifdef VXH_PROFESSIONAL
    IF ::__ClassInst != NIL
       IF ::__ChgRef != NIL
          ::Reference := ::__ChgRef
@@ -71,18 +72,18 @@ METHOD Create() CLASS CustomControl
          nHeight := ::Height
          cName   := ::Name
          cReference := ::Reference
-         
+
          hFile       := FOpen( ::Reference, FO_READ )
          nLine       := 1
          aChildren   := {}
          aErrors     := {}
-         
+
          ::SetRedraw( .F. )
          WHILE HB_FReadLine( hFile, @cLine, XFM_EOL ) == 0
             ::Application:Project:ParseXFM( cLine, hFile, @aChildren, cFile, @nLine, @aErrors, @aEditors, Self, .T. )
             nLine++
          END
-         
+
          FClose( hFile )
          ::__DockChildren := ::Children
 
@@ -92,7 +93,7 @@ METHOD Create() CLASS CustomControl
          ::__ClassInst:Reference := ""
 
          ::xLeft   := nLeft
-         ::xTop    := nTop 
+         ::xTop    := nTop
          ::xWidth  := nWidth
          ::xHeight := nHeight
 
@@ -102,7 +103,7 @@ METHOD Create() CLASS CustomControl
 
          ::Name   := cName
       ENDIF
-      
+
    ENDIF
    #endif
 RETURN Self

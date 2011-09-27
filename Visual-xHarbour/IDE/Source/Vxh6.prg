@@ -28,13 +28,13 @@ CLASS ToolBox INHERIT TreeView
    DATA LevelFont    PROTECTED
    DATA hPen         PROTECTED
    DATA nImage       PROTECTED
-   
+
    DATA ActiveItem   EXPORTED
    DATA HoverItem    EXPORTED
    DATA aButtons     EXPORTED
    DATA ComObjects   EXPORTED INIT {}
    DATA hPenShadow   EXPORTED
-   
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    //METHOD ShowStandard()       INLINE ::Expand( ::GetFirstVisibleItem() )
@@ -70,9 +70,9 @@ METHOD Init( oParent ) CLASS ToolBox
    ::TrackSelect   := .T.
 
    lPro := .F.
-   #ifdef VXH_PROFESSIONAL 
+   #ifdef VXH_PROFESSIONAL
       lPro := .T.
-   
+
       WITH OBJECT ::ContextMenu := ContextMenu( Self )
          :Create()
          WITH OBJECT CMenuItem( :this )
@@ -97,8 +97,11 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS ToolBox
-   LOCAL nIndex, nIcon, o, oPtr, oItem, n, x
-   LOCAL hKey, cName, cType, xData, hSub, oTypeLib, cId, cProgID, cClsID, lPro
+   LOCAL nIndex, nIcon, o, oPtr, oItem, n, x, lPro
+
+   #ifdef VXH_PROFESSIONAL
+    LOCAL hKey, cName, cType, xData, hSub, oTypeLib, cId, cProgID, cClsID
+   #endif
 
    ::VertScroll := .F.
    ::Super:Create()
@@ -122,7 +125,7 @@ METHOD Create() CLASS ToolBox
                    { "Custom Controls",      {} } }
 
    lPro := .F.
-   #ifdef VXH_PROFESSIONAL 
+   #ifdef VXH_PROFESSIONAL
       lPro := .T.
    #endif
    //Standard
@@ -184,7 +187,7 @@ METHOD Create() CLASS ToolBox
    AADD( ::aButtons[4][2], { "FtpClient", lPro } )
    AADD( ::aButtons[4][2], { "ServiceController", lPro } )
    AADD( ::aButtons[4][2], { "WinSock", lPro } )
-   
+
    //Data
    //AADD( ::aButtons[5][2], { "BindingSource", .T. } )
    AADD( ::aButtons[5][2], { "SqlConnector", .T. } )
@@ -193,10 +196,10 @@ METHOD Create() CLASS ToolBox
    //AADD( ::aButtons[5][2], { "SqlTable", .T. } )
    AADD( ::aButtons[5][2], { "AdsDataTable", .T. } )
    AADD( ::aButtons[5][2], { "MemoryDataTable", lPro } )
-                            
-   //Dialogs                
+
+   //Dialogs
    AADD( ::aButtons[6][2], { "ColorDialog", .T. } )
-   AADD( ::aButtons[6][2], { "FolderBrowserDialog", .T. } ) 
+   AADD( ::aButtons[6][2], { "FolderBrowserDialog", .T. } )
    AADD( ::aButtons[6][2], { "OpenFileDialog", .T. } )
    AADD( ::aButtons[6][2], { "SaveFileDialog", .T. } )
    AADD( ::aButtons[6][2], { "PrintDialog", .T. } )
@@ -210,12 +213,12 @@ METHOD Create() CLASS ToolBox
 
    FOR n := 2 TO LEN( ::aButtons )
        aSort(::aButtons[n][2],,,{|x, y| x[1] < y[1]})
-       
+
        // Add to "All Windows Controls"
        AEVAL( ::aButtons[n][2], {|a| AADD( ::aButtons[1][2], { a[1], a[2] } ) } )
    NEXT
    aSort(::aButtons[1][2],,,{|x, y| x[1] < y[1]})
-   
+
    ::ImageList := ImageList( Self, 16, 16 ):Create()
    ::ImageList:AddIcon( "ICO_Pointer" )
 
@@ -224,18 +227,18 @@ METHOD Create() CLASS ToolBox
 
        oItem := ::AddItem( ::aButtons[n][1] )
        oItem:Cargo := .T.
-       
+
        oPtr := oItem:AddItem( "Pointer", 1 )
        oPtr:Action := {|o|IIF( o:Parent:Enabled, SetControlCursor(o),) }
        oPtr:Cargo := .T.
 
        FOR x := 1 TO LEN( ::aButtons[n][2] )
-           
+
            nIcon := ::ImageList:AddImage( "ICO_" + UPPER( ::aButtons[n][2][x][1] ) )
-           
+
            o := oItem:AddItem( ::aButtons[n][2][x][1], IIF( nIcon != NIL, nIndex, -1 ) )
            o:Cargo := ::aButtons[n][2][x][2]
-           
+
            o:PointerItem := oPtr
            IF nIcon != NIL
               nIndex ++
@@ -245,36 +248,35 @@ METHOD Create() CLASS ToolBox
    ::nImage := ::ImageList:Count
    ::ImageList:AddImage( "ICO_COMOBJECT" )
 
-   #ifdef VXH_PROFESSIONAL 
-   ::ComObjects    := {}
-   IF RegOpenKeyEx( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\ComObjects", 0, KEY_ALL_ACCESS, @hKey ) == 0
-      n := 0
-      WHILE RegEnumKey( hKey, n, @cName, @cType, @xData ) == 0
-         IF RegOpenKeyEx( hKey, cName, 0, KEY_ALL_ACCESS, @hSub ) == 0
-            RegQueryValueEx( hSub,"ProgID",,,@cProgID )
-            RegQueryValueEx( hSub,"ClsID",,,@cClsID )
-            IF cProgID == NIL
-               RegQueryValueEx( hSub,,,,@cProgID )
-            ENDIF
-            DEFAULT cClsID TO cProgID
-            TRY
-               oTypeLib := LoadTypeLib( cClsID, .F. )
-               cId := oTypeLib:Objects[1]:Name
-             CATCH
-               cId := STRTRAN( cProgID, "." )
-            END
-            AADD( ::ComObjects, { cId, cName, cProgID, cClsID } )
-            RegCloseKey( hSub )
-         ENDIF
-         n++
-      ENDDO
-      RegCloseKey( hKey )
-      ::UpdateComObjects()
-   ENDIF
-
-   ::UpdateCustomControls(lPro,.T.)
-  
+   #ifdef VXH_PROFESSIONAL
+    ::ComObjects    := {}
+    IF RegOpenKeyEx( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\ComObjects", 0, KEY_ALL_ACCESS, @hKey ) == 0
+       n := 0
+       WHILE RegEnumKey( hKey, n, @cName, @cType, @xData ) == 0
+          IF RegOpenKeyEx( hKey, cName, 0, KEY_ALL_ACCESS, @hSub ) == 0
+             RegQueryValueEx( hSub,"ProgID",,,@cProgID )
+             RegQueryValueEx( hSub,"ClsID",,,@cClsID )
+             IF cProgID == NIL
+                RegQueryValueEx( hSub,,,,@cProgID )
+             ENDIF
+             DEFAULT cClsID TO cProgID
+             TRY
+                oTypeLib := LoadTypeLib( cClsID, .F. )
+                cId := oTypeLib:Objects[1]:Name
+              CATCH
+                cId := STRTRAN( cProgID, "." )
+             END
+             AADD( ::ComObjects, { cId, cName, cProgID, cClsID } )
+             RegCloseKey( hSub )
+          ENDIF
+          n++
+       ENDDO
+       RegCloseKey( hKey )
+       ::UpdateComObjects()
+    ENDIF
+    ::UpdateCustomControls(lPro,.T.)
    #endif
+
    ::SetImageList()
    ::ExpandAll()
    ::Items[1]:Toggle()
@@ -322,7 +324,7 @@ METHOD UpdateCustomControls(lPro, lTree, cFileName) CLASS ToolBox
    LOCAL oPtr, n, o, oItem := ::Items[-1]
 
    lPro := .F.
-   #ifdef VXH_PROFESSIONAL 
+   #ifdef VXH_PROFESSIONAL
       lPro := .T.
    #endif
 
@@ -332,7 +334,7 @@ METHOD UpdateCustomControls(lPro, lTree, cFileName) CLASS ToolBox
           n--
       NEXT
    ENDIF
-   
+
    oItem:Items := {}
 
    oPtr := oItem:AddItem( "Pointer", 1 )
@@ -340,7 +342,7 @@ METHOD UpdateCustomControls(lPro, lTree, cFileName) CLASS ToolBox
    oPtr:Action := {|o|IIF( o:Parent:Enabled, SetControlCursor(o),) }
 
    aSort( ::Application:CControls,,,{|x, y| x < y})
-   
+
    FOR n := 1 TO LEN( ::Application:CControls )
        o := oItem:AddItem( STRTRAN( SplitFile( ::Application:CControls[n] )[2], ".xfm" ), ::nImage+1 )
        o:Cargo := lPro
@@ -355,10 +357,10 @@ RETURN Self
 METHOD UpdateComObjects() CLASS ToolBox
    LOCAL oPtr, hIcon, n,o, oItem := ::Items[-2], lPro
    lPro := .F.
-   #ifdef VXH_PROFESSIONAL 
+   #ifdef VXH_PROFESSIONAL
       lPro := .T.
    #endif
-   
+
    IF oItem != NIL
       FOR n := 1 TO LEN( oItem:Items )
           oItem:Items[n]:Delete()
@@ -366,7 +368,7 @@ METHOD UpdateComObjects() CLASS ToolBox
           n--
       NEXT
       oItem:Items := {}
-      
+
       oPtr := oItem:AddItem( "Pointer", 1 )
       oPtr:Cargo := .T.
       oPtr:Action := {|o|IIF( o:Parent:Enabled, SetControlCursor(o),) }
@@ -433,7 +435,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBox
               CASE tvcd:nmcd:dwDrawStage == CDDS_ITEMPREPAINT
                    ::DrawItem( tvcd )
                    SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, CDRF_SKIPDEFAULT  )
-                   RETURN CDRF_SKIPDEFAULT 
+                   RETURN CDRF_SKIPDEFAULT
            ENDCASE
    ENDCASE
 RETURN NIL
@@ -484,9 +486,9 @@ METHOD DrawItem( tvcd ) CLASS ToolBox
    IF oItem:Level > 0
       x += 5
    ENDIF
-   
+
    _FillRect( hDC, { rc:left, rc:top, rc:right, rc:bottom }, hBackBrush )
-   
+
    IF oItem:Level == 0
       rc:top ++
       //FillGradient( hDC, rc, GetSysColor( COLOR_BTNSHADOW ), GetSysColor( COLOR_BTNFACE ) )
@@ -514,7 +516,7 @@ METHOD DrawItem( tvcd ) CLASS ToolBox
          SetBkColor( hDC, ::System:CurrentScheme:MenuItemSelected )
       ENDIF
    ENDIF
-   
+
    nFlags := ETO_CLIPPED | ETO_OPAQUE
    IF oItem:Level == 0
       SetBkMode( hDC, TRANSPARENT )
@@ -589,7 +591,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
    EXTERN TabControl
    EXTERN CoolBar
    EXTERN ToolBar
-   #ifdef VXH_PROFESSIONAL 
+   #ifdef VXH_PROFESSIONAL
       EXTERN ExplorerBar
       EXTERN MonthCalendar
       EXTERN OptionBar
@@ -616,7 +618,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
    EXTERN ImageList
    EXTERN ContextMenu
    EXTERN NotifyIcon
-   #ifdef VXH_PROFESSIONAL 
+   #ifdef VXH_PROFESSIONAL
       EXTERN SerialPort
       EXTERN MemoryTable
       EXTERN FtpClient
@@ -625,7 +627,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
       EXTERN CustomControl
       EXTERN MemoryDataTable
    #endif
-   
+
    //Data
    EXTERN Database
    EXTERN BindingSource
@@ -633,16 +635,16 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
    EXTERN DataTable
    EXTERN AdsDataTable
    EXTERN SqlTable
-   
+
    //Dialogs
    EXTERN ColorDialog
-   EXTERN FolderBrowserDialog 
+   EXTERN FolderBrowserDialog
    EXTERN OpenFileDialog
    EXTERN SaveFileDialog
    EXTERN PrintDialog
    EXTERN FontDialog
    EXTERN PageSetup
-   
+
    LOCAL hPointer, oControl, oBand, n, aCtrl, cCC
    IF EMPTY( cName )
       RETURN .F.
@@ -659,20 +661,20 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
    IF UPPER( cName ) == "FORM"
       RETURN ::Application:Project:AddWindow()
    ENDIF
-   
+
    DEFAULT lSelect TO .T.
 
    IF cName == "Band"
       cName := "CoolBarBand"
    ENDIF
-   
+
    IF AT( "\", cName ) > 0
       cCC := cName
       cName := "CustomControl"
    ENDIF
-   
+
    hPointer := HB_FuncPtr( cName )
-   
+
    IF hPointer != NIL .AND. oParent != NIL
       ::Application:Project:Modified := .T.
 
@@ -696,17 +698,17 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
          //oControl := HB_Exec( hPointer, , IIF( cName == "BindingSource", ::Application:Project:AppObject, oParent ) )
 
          IF cCC != NIL
-         
+
             oControl := CustomControl()
             oControl:Reference   := cCC
             oControl:__xCtrlName := STRTRAN( SplitFile( cCC )[2], ".xfm" )
             oControl:Init( oParent )
-            
+
           ELSE
             oControl := HB_Exec( hPointer, , oParent )
 
          ENDIF
-      
+
 
          IF nWidth != NIL
             IF oControl:__xCtrlName == "GridColumn"
@@ -721,9 +723,9 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
 
       IF !__clsParent( oControl:ClassH, "COMPONENT" )
 
-         oControl:Left    := x 
-         oControl:Top     := y 
-         
+         oControl:Left    := x
+         oControl:Top     := y
+
          IF aProps == NIL
             oControl:Caption := oControl:Name
          ENDIF
@@ -778,7 +780,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
                  ENDIF
                  oControl:Create()
 
-                 IF oControl:ClsName == "MenuStripItem" 
+                 IF oControl:ClsName == "MenuStripItem"
                     WITH OBJECT MenuStripItem()
                        :GenerateMember := .F.
                        :Init( oControl )
@@ -815,11 +817,11 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
          END
          ::Application:Project:CurrentForm:CtrlMask:SetMouseShape( 0 )
       ENDIF
-      
+
       IF lSelect
          ::Application:Project:CurrentForm:SelectControl( oControl )
       ENDIF
-      
+
       ::Application:Project:CurrentForm:RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
 
       ::Application:Project:EditReset(1)

@@ -3390,9 +3390,12 @@ METHOD xEditFindDialogProc( hWnd, nMsg, nwParam, nlParam ) CLASS EditorGUIDispla
    LOCAL sFind, nFind, RegEx, oError, aFound
    LOCAL lReplace, sReplace, lMore
    LOCAL nLineFrom, nColumnFrom, nLineTo, nColumnTo, lSquare, nDirection
-   LOCAL Point, nX, nY
    LOCAL aActions := {}, nFound := 0., nPos
    LOCAL lGlobal := IsDlgButtonChecked( hWnd, ID_Global ) & BST_CHECKED != 0
+   #ifndef VXH
+    LOCAL Point, nX, nY
+   #endif
+
 
    (nlParam)
 
@@ -8413,11 +8416,14 @@ METHOD Load( cFile, sText, lResetDisplay, lDisplay ) CLASS Editor
    LOCAL aEol := { Chr(13) + Chr(10), Chr(10) }
 
    #ifdef WIN
-      LOCAL hCursor := SetCursor( LoadCursor( NIL, IDC_WAIT ) )
-      LOCAL oError
+    LOCAL hCursor := SetCursor( LoadCursor( NIL, IDC_WAIT ) )
    #endif
-
-   LOCAL hRecent, sRecentFile
+   #ifndef VXH
+    #ifdef WIN
+     LOCAL oError
+     LOCAL hRecent, sRecentFile
+    #endif
+   #endif
 
    //TraceLog( cFile, sText, lResetDisplay )
 
@@ -9149,9 +9155,14 @@ METHOD Save( cFile, bAuto )  CLASS Editor
    LOCAL nAt
    LOCAL hFile, Line
 
+   #ifndef VXH
+    #ifdef WIN
+       LOCAL tvi
+    #endif
+   #endif
+
    #ifdef WIN
-      LOCAL tvi
-      LOCAL hCursor
+     LOCAL hCursor
    #endif
 
    IF bAuto == NIL
@@ -9725,7 +9736,7 @@ RETURN Self
 
 METHOD Action( aActions, aReverse ) CLASS Editor
 
-   LOCAl aAction, sSelected, nAction, nLine := ::nLine, nColumn := ::nColumn, nLen, nExtraActions := 0
+   LOCAL aAction, sSelected, nAction, nLine := ::nLine, nColumn := ::nColumn, nLen, nExtraActions := 0
    LOCAL aBatch, nLines, sLine
    LOCAL nLineFrom, nColumnFrom, nLineTo, nColumnTo
    LOCAL lOneMore
@@ -9733,14 +9744,12 @@ METHOD Action( aActions, aReverse ) CLASS Editor
    LOCAL lSquare
    LOCAL nFunc
    LOCAL nDirection
-   LOCAl nPad
+   LOCAL nPad
    LOCAL nCursorLine
    LOCAL nDeferDisplay := 0
    LOCAL lImpacted := .F.
 
-   #ifdef VXH
-      LOCAL nEditorID, cText
-   #else
+   #ifndef VXH
       #ifdef WIN
          LOCAL tvi
       #endif
