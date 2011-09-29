@@ -1378,9 +1378,9 @@ METHOD __SetVisible( lVisible, lForce ) CLASS TabPage
    DEFAULT lForce TO .F.
    IF ( lVisible != ::Visible .OR. lForce ) .AND. ::__ClassInst == NIL .AND. ::hWnd != NIL
       IF !lVisible
-         ::Hide()
+         ::__Hide()
        ELSE
-         ::Show()
+         ::__Show()
       ENDIF
    ENDIF
 RETURN Self
