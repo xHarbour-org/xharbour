@@ -25,6 +25,7 @@ CLASS VrLabel INHERIT VrObject
    DATA BackColor     EXPORTED  INIT GetSysColor( COLOR_WINDOW )
    DATA ForeColor     EXPORTED  INIT GetSysColor( COLOR_BTNTEXT )
    DATA EnumType      EXPORTED  INIT {{"Header","Record","Footer"},{1,2,3}}
+   DATA TextAngle     EXPORTED  INIT 0
 
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
@@ -44,6 +45,7 @@ METHOD Init( oParent ) CLASS VrLabel
       AADD( ::aProperties, { "ForeColor",  "Color"   } )
       AADD( ::aProperties, { "Font",       "General" } )
       AADD( ::aProperties, { "Text",       "General" } )
+      AADD( ::aProperties, { "TextAngle",  "General" } )
       AADD( ::aProperties, { "Picture",    "General" } )
       AADD( ::aProperties, { "Width",      "Size"    } )
       AADD( ::aProperties, { "AutoResize", "Size"    } )
@@ -124,6 +126,8 @@ RETURN Self
 METHOD WriteProps( oXmlControl ) CLASS VrLabel
    LOCAL oXmlValue, oXmlFont
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Text", NIL, ::Text )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "TextAngle", NIL, xStr(::TextAngle) )
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Picture", NIL, ::Picture )
    oXmlControl:addBelow( oXmlValue )
@@ -304,6 +308,10 @@ METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
          ENDIF
          IF ::BackColor != ::SysBackColor
             :Attribute( "BackColor", PADL( DecToHexa( ::BackColor ), 6, "0" ) )
+         ENDIF
+         
+         IF ::TextAngle <> 0
+            :Attribute( "TextAngle", ::TextAngle*10 )
          ENDIF
       END
    ENDIF
