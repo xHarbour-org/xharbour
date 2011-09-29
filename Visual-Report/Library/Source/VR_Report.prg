@@ -1098,7 +1098,7 @@ METHOD OnInitDialog() CLASS VrAskLater
          :Width        := 30
          :Height       := 25
          :Caption      := "..."
-         :Enabled      := ! EMPTY( ::hExp:AskMeLater:Search )
+         :Visible      := ! EMPTY( ::hExp:AskMeLater:Search )
          :EventHandler[ "OnClick" ] := "BrowseF3_OnClick"
          :Create()
       END
