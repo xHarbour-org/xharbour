@@ -21,8 +21,9 @@
 #include "sqlprototypes.h"
 #include "sqlodbc.ch"
 
-#include "firebird.h"
-
+//#include "firebird.h"
+#include "ibase.h"
+#include "firebird.ch"
 #if TIME_WITH_SYS_TIME
 # include <sys/time.h>
 # include <time.h>
@@ -65,7 +66,7 @@ typedef struct _FB_SESSION
    isc_tr_handle transac;
    XSQLDA ISC_FAR * sqlda;
    isc_stmt_handle stmt;
-   char msgerror[512];
+   char *msgerror;
    long errorcode;
    int transactionPending;
 } FB_SESSION;
@@ -83,12 +84,26 @@ const double divider[19] = { 1, 1E1, 1E2, 1E3, 1E4,   1E5, 1E6, 1E7, 1E8, 1E9, 1
 
 void fb_log_status( PFB_SESSION session, char * from )
 {
-   long * pVect = session->status;
-   isc_interprete( session->msgerror, &pVect );
+   const ISC_STATUS * pVect = session->status;
+   //char * temp=(char*) hb_xgrab(8192);
+   if ( session->msgerror )
+      hb_xfree(session->msgerror);
+   session->msgerror=(char*) hb_xgrab(8192+1);
+   hb_xmemset( session->msgerror, '\0', 8192 );
+   //isc_interprete( session->msgerror, &pVect );
+      SCHAR s[1024];
+
+                while (fb_interpret(s, sizeof(s), &pVect))
+                {
+                        //const char* nl = (s[0] ? s[strlen(s) - 1] != '\n' : true) ? "\n" : "";
+                        strcat( session->msgerror,s);   
+                        strcat(session->msgerror,"\n");
+                        //util_output("%s%s", s, nl);
+                }
+           
    session->errorcode = session->status[1];
    HB_SYMBOL_UNUSED( from );
-
-//   TraceLog( LOGFILE, "FireBird Error: %s - %s - code: %i (see iberr.h)\n", from, session->msgerror, session->status[1] );
+   
    if (session->transac)
    {
       isc_rollback_transaction( session->status, &(session->transac) );
@@ -98,7 +113,7 @@ void fb_log_status( PFB_SESSION session, char * from )
       }
       else
       {
-         session->transac = NULL;
+	     session->transac = NULL;
          session->transactionPending = 0;
       }
    }
@@ -161,7 +176,9 @@ HB_FUNC( FBCONNECT )  // FBConnect( cDatabase, cUser, cPassword, [charset], @hEn
    if ( isc_attach_database( session->status, 0, db_connect, &(session->db), i, dpb ) )
    {
       fb_log_status(session, "FBCONNECT");
-      TraceLog( LOGFILE, "FireBird Error: %s - code: %i (see iberr.h)\n", session->msgerror, session->status[1] );
+      if ( session->msgerror )
+         hb_xfree(session->msgerror);
+      
       hb_xfree( session->sqlda );
       hb_xfree( session );
       hb_retnl(SQL_ERROR);
@@ -205,6 +222,9 @@ HB_FUNC( FBCLOSE )   // FBClose( hEnv )
             hb_xfree( var->sqlind );
          }
       }
+      if ( session->msgerror )
+         hb_xfree(session->msgerror);
+
       hb_xfree( session->sqlda );
       hb_xfree( session );
    }
@@ -226,7 +246,7 @@ HB_FUNC( FBBEGINTRANSACTION )  // FBBeginTransaction( hEnv )
       }
       else
       {
-         session->transac = NULL;
+	     session->transac = NULL;
          session->transactionPending = 0;
       }
    }
@@ -243,7 +263,10 @@ HB_FUNC( FBBEGINTRANSACTION )  // FBBeginTransaction( hEnv )
             ERRORLOGANDEXIT( session, "FBBEGINTRANSACTION1_1" );
          }
 
-         if (isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short) sizeof(isc_tpb), isc_tpb))
+
+//          if (isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short) sizeof(isc_tpb), isc_tpb))
+         isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short) sizeof(isc_tpb), isc_tpb);
+         if ( CHECK_ERROR(session) )
          {
             ERRORLOGANDEXIT( session, "FBBEGINTRANSACTION1_2" );
          }
@@ -263,14 +286,18 @@ HB_FUNC( FBBEGINTRANSACTION )  // FBBeginTransaction( hEnv )
          {
             ERRORLOGANDEXIT( session, "FBBEGINTRANSACTION2" );
          }
+         
       }
 
-      if (isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short) sizeof(isc_tpb), isc_tpb))
+      //if (isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short) sizeof(isc_tpb), isc_tpb))
+      isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short) sizeof(isc_tpb), isc_tpb);
+      if ( CHECK_ERROR(session) )
       {
          ERRORLOGANDEXIT( session, "FBBEGINTRANSACTION3" );
       }
       else
       {
+	     session->transactionPending = 0;	       
          hb_retni( SQL_SUCCESS );
       }
    }
@@ -291,6 +318,7 @@ HB_FUNC( FBCOMMITTRANSACTION )  // FBBeginTransaction( hEnv )
       }
       else
       {
+	      
          session->transac = NULL;
          session->transactionPending = 0;
          hb_retni( SQL_SUCCESS );
@@ -313,6 +341,7 @@ HB_FUNC( FBROLLBACKTRANSACTION )  // FBRollBackTransaction( hEnv )
       }
       else
       {
+	      
          session->transac = NULL;
          session->transactionPending = 0;
          hb_retni( SQL_SUCCESS );
@@ -328,6 +357,7 @@ HB_FUNC( FBEXECUTE ) // FBExecute( hEnv, cCmd, nDialect )
    const char * command = hb_parcx(2);
    int i, dtype;
    XSQLVAR * var;
+   ISC_STATUS r;
 
    if (session->stmt)
    {
@@ -338,14 +368,18 @@ HB_FUNC( FBEXECUTE ) // FBExecute( hEnv, cCmd, nDialect )
      session->stmt = NULL;
    }
 
-   if (isc_dsql_allocate_statement( session->status, &(session->db), &(session->stmt) ))
+//   if (isc_dsql_allocate_statement( session->status, &(session->db), &(session->stmt) )
+   isc_dsql_allocate_statement( session->status, &(session->db), &(session->stmt)) ;
+   if ( CHECK_ERROR(session) )
    {
       ERRORLOGANDEXIT( session, "FBEXECUTE2" );
    }
 
    if (!session->transac)
    {
-      if (isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short) sizeof(isc_tpb), isc_tpb))
+      //if (isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short) sizeof(isc_tpb), isc_tpb))
+      isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short) sizeof(isc_tpb), isc_tpb);
+      if ( CHECK_ERROR(session) )      
       {
          ERRORLOGANDEXIT( session, "FBBEGINTRANSACTION1_3" );
       }
@@ -355,7 +389,9 @@ HB_FUNC( FBEXECUTE ) // FBExecute( hEnv, cCmd, nDialect )
       }
    }
    //printf( "isc_dsql_prepare %p %p %p %s %p\n", session->status, session->transac, session->stmt, command, session->sqlda );
-   if (isc_dsql_prepare( session->status, &(session->transac), &(session->stmt), 0, command, hb_parni(3), session->sqlda ))
+   //if (isc_dsql_prepare( session->status, &(session->transac), &(session->stmt), 0, command, hb_parni(3), session->sqlda ))
+   isc_dsql_prepare( session->status, &(session->transac), &(session->stmt), 0, command, hb_parni(3), session->sqlda );
+   if ( CHECK_ERROR(session) )      
    {
       ERRORLOGANDEXIT( session, (char *) command );
    }
@@ -419,17 +455,23 @@ HB_FUNC( FBEXECUTE ) // FBExecute( hEnv, cCmd, nDialect )
 
    if ( !session->sqlda->sqld )
    {
-      if ( isc_dsql_execute( session->status, &(session->transac), &(session->stmt), hb_parni(3), NULL ) )
+//      if ( isc_dsql_execute( session->status, &(session->transac), &(session->stmt), hb_parni(3), NULL ) )
+      r=isc_dsql_execute( session->status, &(session->transac), &(session->stmt), hb_parni(3), NULL ); 
+      if ( CHECK_ERROR(session) )
       {
          ERRORLOGANDEXIT( session, "FBEXECUTE4" );
       }
+      
    }
    else
    {
-      if ( isc_dsql_execute( session->status, &(session->transac), &(session->stmt), hb_parni(3), session->sqlda ) )
+      //if ( isc_dsql_execute( session->status, &(session->transac), &(session->stmt), hb_parni(3), session->sqlda ) )
+      r= isc_dsql_execute( session->status, &(session->transac), &(session->stmt), hb_parni(3), session->sqlda ) ;
+      if ( CHECK_ERROR(session) )
       {
          ERRORLOGANDEXIT( session, "FBEXECUTE5" );
       }
+      
    }
 
    hb_retni( SQL_SUCCESS );
@@ -441,10 +483,13 @@ HB_FUNC( FBEXECUTEIMMEDIATE ) // FBExecuteImmediate( hEnv, cCmd, nDialect )
 {
    PFB_SESSION session  = ( PFB_SESSION ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
    const char * command = hb_parcx(2);
+   ISC_STATUS r;
 
    if (!session->transac)
    {
-      if (isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short) sizeof(isc_tpb), isc_tpb))
+	  //if (isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short) sizeof(isc_tpb), isc_tpb))
+	  isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short) sizeof(isc_tpb), isc_tpb);
+	  if ( CHECK_ERROR(session) )             
       {
          ERRORLOGANDEXIT( session, "FBBEGINTRANSACTION1_4" );
       }
@@ -454,7 +499,13 @@ HB_FUNC( FBEXECUTEIMMEDIATE ) // FBExecuteImmediate( hEnv, cCmd, nDialect )
       }
    }
 
-   if (isc_dsql_execute_immediate( session->status, &(session->db), &(session->transac), 0, command, hb_parni(3), NULL ))
+//    if (isc_dsql_execute_immediate( session->status, &(session->db), &(session->transac), 0, command, hb_parni(3), NULL ))
+//    {
+//       ERRORLOGANDEXIT( session, (char *) command );
+//    }
+   r=isc_dsql_execute_immediate( session->status, &(session->db), &(session->transac), 0, command, hb_parni(3), NULL );
+   
+   if ( CHECK_ERROR(session) )
    {
       ERRORLOGANDEXIT( session, (char *) command );
    }
@@ -539,7 +590,7 @@ HB_FUNC( FBDESCRIBECOL )   // FBDescribeCol( hStmt, nCol, @cName, @nType, @nLen,
          break;
       default:      
 
-         TraceLog( LOGFILE, "Unrecognized data type returned in query: %i\n", dtype );
+         
          rettype = SQL_CHAR;
          hb_storni( var->sqllen, 5 );
          hb_storni( var->sqlscale, 6 );
@@ -547,7 +598,7 @@ HB_FUNC( FBDESCRIBECOL )   // FBDescribeCol( hStmt, nCol, @cName, @nType, @nLen,
          break;
       }
 //      hb_storclen( (char *) var->sqlname, var->sqlname_length, 3 );
-         //TraceLog("size.log","%s %lu %lu\r \n",var->aliasname,var->sqllen, -var->sqlscale);
+
       hb_storclen( (char *) var->aliasname, var->aliasname_length, 3 );
       hb_storni( rettype, 4 );
 
@@ -943,7 +994,7 @@ static void firebird_info_cb(void *arg, char const *s)
 
 HB_FUNC( FBVERSION )
 {
-   SLONG num_version = 0L;
+   ISC_LONG num_version = 0L;
    char tmp[1000];
 
    PFB_SESSION session  = ( PFB_SESSION ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );

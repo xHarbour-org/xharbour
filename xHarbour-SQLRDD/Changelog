@@ -8,6 +8,23 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-09-30 15:00  UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+   ! dll\fbclient.dll
+     ! updated to firebird 2.1 dll
+   ! lib\fbclient_ms.lib
+     ! updated to firebird 2.1 
+   ! lib\fbclient_bc.lib
+     ! updated to firebird 2.1   
+   ! source\firebird.c
+     ! updated to use firebird 2.x fb_interpret insted on unsafe isc_interprete as per firebird 2.x docs
+   ! source\ibase.h
+   ! source\iberror.h
+     ! updated to firebird 2.1 header files
+   ! source\sqlfirebird.prg
+     ! fixes commit method that sometime was not commiting properly
+   ! source\sqlrdd0.prg
+     ! added an missed commit in SR_ExistTable() function
+
 
 2011-08-26 23:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
    ! source/sqlex.h

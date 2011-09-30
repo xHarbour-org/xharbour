@@ -255,6 +255,7 @@ return Super:End()
 
 METHOD Commit() CLASS SR_FIREBIRD
    Super:Commit()
+   ::nRetCode := FBCOMMITTRANSACTION(::hEnv )  
 Return ( ::nRetCode := FBBeginTransaction( ::hEnv ) )
 
 /*------------------------------------------------------------------------*/

@@ -1179,6 +1179,7 @@ Function SR_ExistTable( cTableName, cOwner, oCnn )
 
    If oCnn:oSqlTransact == NIL
       nRet := oCnn:exec( "SELECT * FROM " + cOwner + SR_DBQUALIFY( cFileName , oCnn:nSystemID) + " WHERE 0 = 2",.F. )
+      oCnn:Commit()
    Else
       nRet := oCnn:oSqlTransact:exec( "SELECT * FROM " + cOwner + SR_DBQUALIFY( cFileName , oCnn:nSystemID) + " WHERE 0 = 2",.F. )
       oCnn:oSqlTransact:Commit()
