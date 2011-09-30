@@ -116,8 +116,9 @@ METHOD Open( cUrl ) CLASS tIPClientSMTP
    ELSE
       InetSetTimeout( ::SocketCon, ::nConnTimeout )
    ENDIF
-   IF .not. Empty ( ::oUrl:cServer )
-      ::InetSENDall( ::SocketCon, "HELO " +  ::oUrl:cServer + ::cCRLF )
+
+   IF .not. Empty ( ::oUrl:cUserID )
+      ::InetSENDall( ::SocketCon, "HELO " +  ::oUrl:cuserid + ::cCRLF )
    ELSE
       ::InetSENDall( ::SocketCon, "HELO tipClientSMTP" + ::cCRLF )
    ENDIF
@@ -200,12 +201,9 @@ METHOD OpenSecure( cUrl ) CLASS tIPClientSMTP
       ::getok()
    ENDIF
 
+   cUser := ::oUrl:cuserid
 
-
-
-   cUser := ::oUrl:cServer
-
-   IF .not. Empty ( ::oUrl:cServer )
+   IF .not. Empty ( ::oUrl:cuserid )
       ::InetSENDall( ::SocketCon, "EHLO " +  cUser + ::cCRLF )
    ELSE
       ::InetSENDall( ::SocketCon, "EHLO tipClientSMTP" + ::cCRLF )
@@ -223,7 +221,6 @@ METHOD AUTH( cUser, cPass) CLASS tIPClientSMTP
 
    cEncodedUser := alltrim(HB_BASE64(cuser,len(cuser)))
    cEncodedPAss :=alltrim(HB_BASE64(cPass,len(cpass)))
-   Tracelog(cEncodedUser,cEncodedPAss)
 
 
    ::InetSENDall( ::SocketCon, "AUTH LOGIN" +::ccrlf )
