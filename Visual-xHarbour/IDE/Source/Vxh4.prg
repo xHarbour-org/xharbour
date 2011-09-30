@@ -3633,6 +3633,8 @@ STATIC FUNCTION GetPropArray()
                     { "OleVerb",                 "ActiveX", },;
                     { "MenuArrow",               "Appearance", },;
                     { "BoldSelection",           "Appearance", },;
+                    { "FlatBorder",              "Appearance", },;
+                    { "FlatCaption",             "Appearance", },;
                     { "ColorInactiveHeader",     "Appearance", },;
                     { "HorzPadding",             "Appearance", },;
                     { "VertPadding",             "Appearance", },;

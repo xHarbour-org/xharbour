@@ -33,7 +33,9 @@ CLASS Control INHERIT Window
    PROPERTY Enabled                  READ xEnabled      WRITE __Enable          DEFAULT .T.
 
    DATA AllowMaximize     PUBLISHED INIT .F.
-
+   DATA FlatCaption       PUBLISHED INIT .T.
+   
+   DATA FlatBorder        EXPORTED INIT .F.
    DATA IsContainer       EXPORTED INIT .F.
    DATA Value             EXPORTED
    DATA Options           EXPORTED
@@ -56,9 +58,6 @@ CLASS Control INHERIT Window
    DATA OnWMUnDock        EXPORTED
    DATA OnWMReDock        EXPORTED
 
-   DATA FlatCaption       EXPORTED INIT .F.
-   DATA FlatBorder        EXPORTED INIT .F.
-   
    DATA CaptionRect       PROTECTED
    DATA PinPushed         PROTECTED INIT .F.
    DATA PinHover          PROTECTED INIT .F.
@@ -479,7 +478,7 @@ METHOD OnNCLButtonUp( nwParam, x, y ) CLASS Control
             IF ::ContextMenu != NIL
                pt := (struct POINT)
                pt:x := ::Left
-               pt:y := ::Top+::CaptionHeight+1
+               pt:y := ::Top+::CaptionHeight
                ClientToScreen( ::Parent:hWnd, @pt )
                ::ContextMenu:Show( pt:x, pt:y )
             // ELSE
