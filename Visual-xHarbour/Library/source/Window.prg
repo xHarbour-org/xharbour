@@ -4913,6 +4913,15 @@ STATIC FUNCTION cTypes2aTypes(cTypes)
    enddo
 RETURN(aTypes)
 
+FUNCTION __AddEvent( aEvents, cNode, cEvent )
+   LOCAL n := ASCAN( aEvents, {|a|a[1]==cNode} )
+   IF n > 0
+      AADD( aEvents[n][2], { cEvent, "", "" } )
+    ELSE
+      AADD( aEvents, { cNode, { cEvent, "", "" } } )
+   ENDIF
+RETURN aEvents
+
 FUNCTION __DeleteEvents( aEvents, aDelEvents )
    LOCAL n, x, cEvent
    FOR EACH cEvent IN aDelEvents

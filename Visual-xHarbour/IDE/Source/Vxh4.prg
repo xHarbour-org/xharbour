@@ -3631,6 +3631,7 @@ STATIC FUNCTION GetPropArray()
                     { "CenterImage",             "Image", },;
                     { "Stretch",                 "Image", },;
                     { "OleVerb",                 "ActiveX", },;
+                    { "MenuArrow",               "Appearance", },;
                     { "BoldSelection",           "Appearance", },;
                     { "ColorInactiveHeader",     "Appearance", },;
                     { "HorzPadding",             "Appearance", },;

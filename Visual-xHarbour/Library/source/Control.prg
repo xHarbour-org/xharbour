@@ -22,6 +22,7 @@ CLASS Control INHERIT Window
    DATA Dock              PUBLISHED
    DATA Anchor            PUBLISHED
    DATA AllowClose        PUBLISHED INIT FALSE
+   DATA MenuArrow         PUBLISHED INIT FALSE
    DATA HighlightCaption  PUBLISHED INIT .T.
    DATA Transparent       EXPORTED INIT .F.
 
@@ -65,6 +66,7 @@ CLASS Control INHERIT Window
    DATA ClosePushed       PROTECTED INIT .F.
    DATA CloseHover        PROTECTED INIT .F.
    DATA CloseRect         PROTECTED
+   DATA ArrowRect         PROTECTED
    DATA BackInfo          PROTECTED
    DATA Center            PROTECTED INIT .F.
    DATA __DockParent      PROTECTED
@@ -97,6 +99,7 @@ CLASS Control INHERIT Window
    METHOD OnSysKeyDown()
    METHOD DrawClose()
    METHOD DrawPin()
+   METHOD DrawArrow()
    METHOD OnKillFocus()
    METHOD OnSetFocus()
    METHOD Undock()
@@ -124,6 +127,9 @@ METHOD Init( oParent ) CLASS Control
    ::__IsStandard := .T.
    ::Super:Init( oParent )
    ::Id := ::Form:GetNextControlId()
+   //IF ::__ClassInst != NIL
+   //   __AddEvent( ::Events, "Command", "OnArrowClick" )
+   //ENDIF
 RETURN Self
 
 //---------------------------------------------------------------------------------------------------
@@ -183,12 +189,11 @@ METHOD Create( hParent ) CLASS Control
       ::Parent:__UpdateWidth()
    ENDIF
    IF ::__xCtrlName != "Button"
-
       IF !::xEnabled
          EnableWindow( ::hWnd, .F.  )
       ENDIF
-      
    ENDIF
+   
 RETURN Self
 
 //---------------------------------------------------------------------------------------------------
@@ -362,14 +367,20 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS Control
 
       hOldFont := SelectObject( hDC, ::Font:handle )
       SetBkMode( hDC, TRANSPARENT )
-      
-      _DrawText( hDC, ::Caption, { ::CaptionRect[1]+5, ::CaptionRect[2], ::CaptionRect[3], ::CaptionRect[4] }, DT_LEFT | DT_SINGLELINE | DT_VCENTER | DT_WORD_ELLIPSIS )
 
-      nWidth := 0
       n := 0
       IF !::IsChild
          n := 1
       ENDIF
+      
+      IF ::MenuArrow
+         ::ArrowRect := { 0, ::CaptionRect[2]+n+1, 20, ::CaptionRect[4]-2 }
+         ::DrawArrow( hDC, n )
+      ENDIF
+
+      _DrawText( hDC, ::Caption, { IIF( ::MenuArrow .AND. ::ArrowRect != NIL, ::ArrowRect[3]+2, ::CaptionRect[1]+5 ), ::CaptionRect[2], ::CaptionRect[3], ::CaptionRect[4] }, DT_LEFT | DT_SINGLELINE | DT_VCENTER | DT_WORD_ELLIPSIS )
+
+      nWidth := 0
       IF ::AllowClose
          ::CloseRect := { ::CaptionRect[3]-::CaptionRect[4]+n+1, ::CaptionRect[2]+n+1, ::CaptionRect[3]-2, ::CaptionRect[4]-2 }
          ::DrawClose( hDC, n )
@@ -379,7 +390,6 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS Control
          ::PinRect := { (::CaptionRect[3]-::CaptionRect[4])+n-nWidth+1, ::CaptionRect[2]+n+1, ::CaptionRect[3]-2-nWidth, ::CaptionRect[4]-2 }
          ::DrawPin( hDC, n )
       ENDIF
-
       SelectObject( hDC, hOldFont )
       //DeleteObject( hFont )
       ReleaseDC(::hWnd, hdc)
@@ -446,7 +456,7 @@ RETURN NIL //nwParam
 //---------------------------------------------------------------------------------------------------
 
 METHOD OnNCLButtonUp( nwParam, x, y ) CLASS Control
-   LOCAL aPt := {x,y}
+   LOCAL pt, aPt := {x,y}
    IF ::xSmallCaption
       ::CloseHover  := .F.
       ::PinHover    := .F.
@@ -461,6 +471,20 @@ METHOD OnNCLButtonUp( nwParam, x, y ) CLASS Control
             ::PostMessage( WM_CLOSE )
           ELSEIF ::PinRect != NIL .AND. _PtInRect( ::PinRect, aPt ) .AND. ::PinPushed
             ::Undock()
+         ENDIF
+       ELSEIF nwParam == HTMENU
+         _ScreenToClient( ::hWnd, @aPt )
+         aPt[2]+=::CaptionRect[4]
+         IF ::ArrowRect != NIL .AND. _PtInRect( ::ArrowRect, aPt )
+            IF ::ContextMenu != NIL
+               pt := (struct POINT)
+               pt:x := ::Left
+               pt:y := ::Top+::CaptionHeight+1
+               ClientToScreen( ::Parent:hWnd, @pt )
+               ::ContextMenu:Show( pt:x, pt:y )
+            // ELSE
+            //   RETURN ExecuteEvent( "OnArrowClick", Self )
+            ENDIF
          ENDIF
       ENDIF
       ::ClosePushed := .F.
@@ -679,6 +703,11 @@ METHOD OnNCHitTest( x, y ) CLASS Control
          ReleaseDC(::hWnd, hdc)
          DeleteObject( hRegion )
       ENDIF
+      IF ::MenuArrow
+         IF _PtInRect( ::ArrowRect, aPt )
+            nRes := HTMENU
+         ENDIF
+      ENDIF
       IF !::AllowUnDock .AND. !::AllowClose .AND. !::AllowMaximize .AND. nRes == NIL .AND. _PtInRect( ::CaptionRect, aPt )
          RETURN HTNOWHERE
       ENDIF
@@ -760,6 +789,37 @@ METHOD DrawClose( hDC ) CLASS Control
 
 RETURN Self
 
+METHOD DrawArrow( hDC, n ) CLASS Control
+   LOCAL nShadow, nColor, hPenShadow, hPenLight, hOldPen, z, i, aRect, x, y, nArrow := 1, nH := 5, nBackColor
+   
+   aRect  := ::ArrowRect
+
+   nBackColor := GetSysColor( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, COLOR_ACTIVECAPTION, COLOR_BTNFACE ) )
+
+   nColor  := LightenColor( nBackColor, 100 )
+   nShadow := DarkenColor( nBackColor, 100 )
+
+   hPenShadow := CreatePen( PS_SOLID, 0, nShadow )
+   hPenLight  := CreatePen( PS_SOLID, 0, nColor )
+
+   hOldPen := SelectObject( hDC, hPenLight )
+   z := 1
+   FOR i := 1 TO 2
+       FOR n := 1 TO nH
+           x := IIF( nArrow == 1,n,nH-n+1)
+           y := (aRect[4]-nH)/2
+
+           MoveTo( hDC, aRect[3] - (15-x), y+n+z )
+           LineTo( hDC, aRect[3] - ( 4+x), y+n+z )
+       NEXT
+       SelectObject( hDC, hPenShadow )
+       z := 0
+       aRect[3]--
+   NEXT
+   SelectObject( hDC, hOldPen )
+   DeleteObject( hPenShadow )
+   DeleteObject( hPenLight )
+RETURN Self
 
 METHOD DrawPin( hDC, n ) CLASS Control
    LOCAL hBrush, hOld, nLeft, nRight, nBottom
