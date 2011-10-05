@@ -498,7 +498,7 @@ RETURN NIL
 
 
 METHOD Init() CLASS IDE_MainForm
-   LOCAL o, n, oItem, x, aEntries, cProject, cVersion, oLink, nBkHeight
+   LOCAL o, cVersion
 
    ::Super:Init()
    #ifdef VXH_DEMO
@@ -1092,15 +1092,6 @@ METHOD Init() CLASS IDE_MainForm
          :Action       := {||::Application:Project:Open() }
          :DropDown     := 2
          :Create()
-         aEntries := ::Application:IniFile:GetEntries( "Recent" )
-
-         FOR EACH cProject IN aEntries
-             oItem := MenuStripItem( :this )
-             oItem:GenerateMember := .F.
-             oItem:Caption := cProject
-             oItem:Action  := {|o| ::Application:Project:Open( o:Caption ) }
-             oItem:Create()
-         NEXT
       END
 
       WITH OBJECT ::Application:Props[ "CloseBttn" ] := ToolStripButton( :this )
@@ -1788,32 +1779,6 @@ METHOD Init() CLASS IDE_MainForm
                :Font:Bold   := .F.
                :Create()
             END
-
-            aEntries := ::Application:IniFile:GetEntries( "Recent" )
-            nBkHeight := 35
-            FOR n := 1 TO LEN( aEntries )
-                x := RAT( "\", aEntries[n] )
-                oLink := LinkLabel( :this )
-                WITH OBJECT oLink
-                   :GenerateMember := .F.
-                   :ImageIndex     := 32
-                   :Caption        := SUBSTR( aEntries[n], x + 1, LEN( aEntries[n] )-x-4 )
-                   :Left           := 30
-                   :Top            := nBkHeight + 2
-                   :Url            := aEntries[n]
-                   :Action         := {|o| ::Application:Project:Open( o:Url ) }
-                   :Font:Bold      := .T.
-                   :Create()
-                   nBkHeight := :Top + :Height
-                END
-
-                AADD( ::Application:aoLinks, oLink )
-
-                IF nBkHeight > :Height-( (oLink:Height*3 )*1.5)
-                   EXIT
-                ENDIF
-            NEXT
-
          END
 
          WITH OBJECT StartPagePanel( :this )
@@ -1951,6 +1916,7 @@ METHOD Init() CLASS IDE_MainForm
    END
 
    ::ShowMode:= ::Application:IniFile:ReadNumber( "Position", "Show", SW_SHOWMAXIMIZED )
+   ::Application:Project:ResetQuickOpen()
    ::Show()
 
 //   EVAL( ::TabControl4:OnSelChanged, NIL, NIL, 1)
@@ -5165,10 +5131,10 @@ RETURN cText
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD ResetQuickOpen( cFile ) CLASS Project
-   LOCAL lMems, aEntries, n, cProject, oItem, nBkHeight, oLink, x
+   LOCAL lMems, aEntries, n, oItem, nBkHeight, oLink, x
 
    aEntries := ::Application:IniFile:GetEntries( "Recent" )
-   IF ! EMPTY( aEntries ) .AND. aEntries[1] == cFile
+   IF ! EMPTY( aEntries ) .AND. cFile != NIL .AND. aEntries[1] == cFile
       RETURN NIL
    ENDIF
 
@@ -5180,10 +5146,10 @@ METHOD ResetQuickOpen( cFile ) CLASS Project
 
    AEVAL( aEntries, {|c| ::Application:IniFile:DelEntry( "Recent", c ) } )
 
-   IF ( n := ASCAN( aEntries, {|c| c == cFile } ) ) > 0
+   IF cFile != NIL .AND. ( n := ASCAN( aEntries, {|c| c == cFile } ) ) > 0
       ADEL( aEntries, n, .T. )
    ENDIF
-   IF FILE( cFile )
+   IF cFile != NIL .AND. FILE( cFile )
       aIns( aEntries, 1, cFile, .T. )
       IF LEN( aEntries )>=20
          ASIZE( aEntries, 20 )
@@ -5194,39 +5160,40 @@ METHOD ResetQuickOpen( cFile ) CLASS Project
 
    // Reset Open Dropdown menu
    WITH OBJECT ::Application:Props[ "OpenBttn" ]   // Open Button
-      :Children := {}
-      FOR EACH cProject IN aEntries
-          oItem := MenuStripItem( :this )
-          oItem:Caption := cProject
+      FOR n := 1 TO LEN( aEntries )
+          IF LEN( :Children ) < n
+             oItem := MenuStripItem( :this )
+             oItem:Create()
+           ELSE
+             oItem := :Children[n]
+          ENDIF
+          oItem:Caption := aEntries[n]
           oItem:Action  := {|o| ::Application:Project:Open( o:Caption ) }
-          oItem:Create()
       NEXT
    END
 
    // Reset StartPage
-
-   AEVAL( ::Application:aoLinks, {|o| o:Destroy() } )
-   ::Application:aoLinks := {}
-
    nBkHeight := 35
    FOR n := 1 TO LEN( aEntries )
        x := RAT( "\", aEntries[n] )
-       oLink := LinkLabel( ::Application:MainForm:Panel4 )
-
-       WITH OBJECT oLink
-          :ImageIndex  := 32
-          :Caption     := SUBSTR( aEntries[n], x + 1, LEN( aEntries[n] )-x-4 )
-          :Left        := 30
-          :Top         := nBkHeight + 2
-          :Url         := aEntries[n]
-          :Action      := {|o| ::Application:Project:Open( o:Url ) }
-          :Font:Bold   := .T.
-          :Create()
-          nBkHeight := :Top + :Height
-       END
-
-       AADD( ::Application:aoLinks, oLink )
-
+       IF LEN( ::Application:aoLinks ) < n
+          oLink := LinkLabel( ::Application:MainForm:Panel4 )
+          oLink:ImageIndex  := 32
+          oLink:Caption     := SUBSTR( aEntries[n], x + 1, LEN( aEntries[n] )-x-4 )
+          oLink:Left        := 30
+          oLink:Top         := nBkHeight + 2
+          oLink:Url         := aEntries[n]
+          oLink:Action      := {|o| ::Application:Project:Open( o:Url ) }
+          oLink:Font:Bold   := .T.
+          oLink:Create()
+          AADD( ::Application:aoLinks, oLink )
+        ELSE
+          oLink := ::Application:aoLinks[n]
+          oLink:Caption     := SUBSTR( aEntries[n], x + 1, LEN( aEntries[n] )-x-4 )
+          oLink:Url         := aEntries[n]
+          oLink:Action      := {|o| ::Application:Project:Open( o:Url ) }
+       ENDIF
+       nBkHeight := oLink:Top + oLink:Height
        IF nBkHeight > oLink:Parent:Height-( (oLink:Height*3 )*1.5)
           EXIT
        ENDIF
