@@ -3691,6 +3691,7 @@ STATIC FUNCTION GetPropArray()
                     { "PaperSize",               "Appearance", },;
                     { "ItemToolTips",            "Appearance", },;
                     { "AlwaysOnTop",             "Behavior", },;
+                    { "AnchorColumn",            "Behavior", },;
                     { "AllowDragRecords",        "Behavior", },;
                     { "VertScrollSize",          "Behavior", },;
                     { "HorzScrollSize",          "Behavior", },;

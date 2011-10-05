@@ -4625,6 +4625,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
           //nSecs := Seconds()
 
           aChildEvents := {}
+          
           cWindow := ::GenerateControl( ::Forms[n], "", IIF( ::Forms[n]:MDIChild, "MDIChildWindow", IIF( ::Forms[n]:Modal, "Dialog", IIF( AT( "Window", ::Forms[n]:Name ) > 0, "Window", "WinForm" ) ) ), .F., n, @aChildEvents, @nInsMetPos, ::Forms[n]:lCustom )
 
           //view Seconds()-nSecs

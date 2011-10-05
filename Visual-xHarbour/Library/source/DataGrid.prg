@@ -65,6 +65,7 @@ CLASS DataGrid INHERIT Control
    DATA HeaderHeight            PUBLISHED INIT 20
    DATA ShowSelection           PUBLISHED INIT .T.
    DATA ShowSelectionBorder     PUBLISHED INIT .T.
+   DATA AnchorColumn            PUBLISHED INIT 0
 
    PROPERTY ImageList  GET __ChkComponent( Self, ::xImageList )
    PROPERTY DataSource GET __ChkComponent( Self, ::xDataSource ) SET __SetDataSource 
@@ -802,6 +803,13 @@ METHOD __OnSize() CLASS DataGrid
       RETURN 0
    ENDIF
 
+   IF ::AnchorColumn > 0 .AND. LEN( ::Children ) >= ::AnchorColumn .AND. ( ::__DataWidth <> ::ClientWidth )
+      ::Children[ ::AnchorColumn ]:xWidth := ( ::ClientWidth - ::__DataWidth ) + ::Children[ ::AnchorColumn ]:xWidth
+      ::__DataWidth := 0
+      AEVAL( ::Children, {|o| ::__DataWidth += IIF( o:Visible, o:Width, 0 ) } )
+      ::__DisplayData()
+   ENDIF
+
    ::__DataHeight   := ::ClientHeight - ::__GetHeaderHeight()
 
    IF EMPTY( ::__DisplayArray )
@@ -817,6 +825,7 @@ METHOD __OnSize() CLASS DataGrid
          ::InvalidateRect( { ::__DataWidth, 0, ::ClientWidth, ::ClientHeight } )
       ENDIF
    ENDIF
+
    ::__UpdateHScrollBar( lRefresh )
    ::__UpdateVScrollBar( lRefresh )
 
@@ -837,7 +846,7 @@ METHOD __OnSize() CLASS DataGrid
       ::__DisplayData()
       ::ValidateRect()
    ENDIF
-
+   
 RETURN NIL
 
 //----------------------------------------------------------------------------------
@@ -1337,7 +1346,9 @@ METHOD __OnParentSysCommand()
       ::DataSource:UnLock()
       ::__CurControl:=NIL
    ENDIF
-   ::__DisplayData( ::RowPos,, ::RowPos )
+   IF ::Parent:wParam != SC_SIZE
+      ::__DisplayData( ::RowPos,, ::RowPos )
+   ENDIF
 RETURN NIL
 
 METHOD OnKillFocus() CLASS DataGrid
