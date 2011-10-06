@@ -7,6 +7,11 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2011-10-05 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added DataGrid:AnchorColum (numeric) property to identify if a column should shrink or 
+     stretch to force all columns fit in the client area. A value of zero disables it.
+   + Added missing DataTable:dbEval( codeblock ) method
+   
 2011-09-24 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed CURSORS not being loaded in resource manager.
    ! Fixed component display in property manager to avoid empty arrays when users can't collect
