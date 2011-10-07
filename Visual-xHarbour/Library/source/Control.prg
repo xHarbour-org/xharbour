@@ -374,7 +374,7 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS Control
       
       IF ::MenuArrow
          ::ArrowRect := { 0, ::CaptionRect[2]+n+1, 20, ::CaptionRect[4]-2 }
-         ::DrawArrow( hDC, n )
+         ::DrawArrow( hDC, ::ArrowRect )
       ENDIF
 
       _DrawText( hDC, ::Caption, { IIF( ::MenuArrow .AND. ::ArrowRect != NIL, ::ArrowRect[3]+2, ::CaptionRect[1]+5 ), ::CaptionRect[2], ::CaptionRect[3], ::CaptionRect[4] }, DT_LEFT | DT_SINGLELINE | DT_VCENTER | DT_WORD_ELLIPSIS )
@@ -788,11 +788,9 @@ METHOD DrawClose( hDC ) CLASS Control
 
 RETURN Self
 
-METHOD DrawArrow( hDC, n ) CLASS Control
-   LOCAL nShadow, nColor, hPenShadow, hPenLight, hOldPen, z, i, aRect, x, y, nArrow := 1, nH := 5, nBackColor
+METHOD DrawArrow( hDC, aRect ) CLASS Control
+   LOCAL nShadow, nColor, hPenShadow, hPenLight, hOldPen, z, i, n, x, y, nArrow := 1, nH := 5, nBackColor
    
-   aRect  := ::ArrowRect
-
    nBackColor := GetSysColor( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, COLOR_ACTIVECAPTION, COLOR_BTNFACE ) )
 
    nColor  := LightenColor( nBackColor, 100 )

@@ -3690,6 +3690,8 @@ STATIC FUNCTION GetPropArray()
                     { "TabStripStyle",           "Appearance", },;
                     { "PaperSize",               "Appearance", },;
                     { "ItemToolTips",            "Appearance", },;
+                    { "CheckGroup",              "Behavior", },;
+                    { "BtnCheck",                "Behavior", },;
                     { "AlwaysOnTop",             "Behavior", },;
                     { "AnchorColumn",            "Behavior", },;
                     { "AllowDragRecords",        "Behavior", },;

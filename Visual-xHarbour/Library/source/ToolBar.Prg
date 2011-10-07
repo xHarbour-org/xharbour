@@ -1574,7 +1574,7 @@ CLASS ToolButton INHERIT Object
 
    PROPERTY ImageIndex                              READ xImageIndex    WRITE SetImageIndex DEFAULT 0
 
-   PROPERTY Check         INDEX BTNS_CHECK          READ xCheck         WRITE SetStyle DEFAULT .F.
+   PROPERTY BtnCheck      INDEX BTNS_CHECK          READ xBtnCheck      WRITE SetStyle DEFAULT .F.
    PROPERTY CheckGroup    INDEX TBSTYLE_CHECKGROUP  READ xCheckGroup    WRITE __Dummy DEFAULT .F.
 
    PROPERTY Enabled                                 READ xEnabled       WRITE Enable DEFAULT .T.
@@ -1583,8 +1583,8 @@ CLASS ToolButton INHERIT Object
    PROPERTY Wrap          INDEX TBSTATE_WRAP        READ xWrap          WRITE SetState DEFAULT .F.
    PROPERTY Separator     INDEX BTNS_SEP            READ xSeparator     WRITE SetStyle DEFAULT .F.
 
-   ACCESS IsChecked      INLINE ::Parent:GetButtonInfo( ::Id, TBIF_STATE ):fsState & TBSTATE_CHECKED == TBSTATE_CHECKED
-   ACCESS IsPressed      INLINE ::Parent:GetButtonInfo( ::Id, TBIF_STATE ):fsState & TBSTATE_PRESSED == TBSTATE_PRESSED
+   ACCESS IsChecked      INLINE ( ::Parent:GetButtonInfo( ::Id, TBIF_STATE ):fsState & TBSTATE_CHECKED ) != TBSTATE_CHECKED
+   ACCESS IsPressed      INLINE ( ::Parent:GetButtonInfo( ::Id, TBIF_STATE ):fsState & TBSTATE_PRESSED ) == TBSTATE_PRESSED
 
    DATA xPosition          EXPORTED
    ACCESS Position         INLINE ::xPosition PERSISTENT
@@ -1629,6 +1629,7 @@ CLASS ToolButton INHERIT Object
    METHOD OnClick()        VIRTUAL
    METHOD SetImageIndex()
    METHOD SetState()
+   METHOD GetState() INLINE ::Parent:GetButtonInfo( ::Id, TBIF_STATE ):fsState
    METHOD SetPosition()
 ENDCLASS
 
@@ -1923,7 +1924,7 @@ METHOD Press() CLASS ToolButton
 
    tbbi:cbSize  := tbbi:sizeof()
    tbbi:dwMask  := TBIF_STATE
-   tbbi:fsState := TBSTATE_ENABLED | TBSTATE_PRESSED
+   tbbi:fsState := IIF( ::Enabled, TBSTATE_ENABLED, 0 ) | TBSTATE_PRESSED
 
    SendMessage( ::Parent:hWnd, TB_SETBUTTONINFO, ::Id, tbbi )
 
@@ -1931,11 +1932,12 @@ RETURN SELF
 
 METHOD Check( lCheck ) CLASS ToolButton
    LOCAL tbbi := (struct TBBUTTONINFO)
+   DEFAULT lCheck TO .T.
    tbbi:cbSize  := tbbi:sizeof()
    tbbi:dwMask  := TBIF_STATE
-   tbbi:fsState := TBSTATE_ENABLED
+   tbbi:fsState := IIF( ::Enabled, TBSTATE_ENABLED, 0 )
    IF lCheck
-      tbbi:fsState += TBSTATE_CHECKED
+      tbbi:fsState := tbbi:fsState | TBSTATE_CHECKED
    ENDIF
    SendMessage( ::Parent:hWnd, TB_SETBUTTONINFO, ::Id, tbbi )
 RETURN SELF
@@ -1965,7 +1967,7 @@ METHOD Release() CLASS ToolButton
 
    tbbi:cbSize  := tbbi:sizeof()
    tbbi:dwMask  := TBIF_STATE
-   tbbi:fsState := TBSTATE_ENABLED
+   tbbi:fsState := IIF( ::Enabled, TBSTATE_ENABLED, 0 )
 
    SendMessage( ::Parent:hWnd, TB_SETBUTTONINFO, ::Id, tbbi )
 

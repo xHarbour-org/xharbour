@@ -68,6 +68,7 @@ CLASS Button INHERIT Control
    METHOD SetImageIndex()
    METHOD OnMouseHover()
    METHOD OnMouseLeave()
+   METHOD OnParentCommand()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -132,6 +133,9 @@ METHOD Create() CLASS Button
    
    IF !(::Style & BS_OWNERDRAW) == BS_OWNERDRAW
       ::DefaultButton := ::xDefaultButton
+   ENDIF
+   IF ::MenuArrow .AND. ::ContextMenu != NIL 
+      ::SetStyle( BS_OWNERDRAW, .T. )
    ENDIF
 RETURN Self
 
@@ -236,10 +240,10 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
    IF !( ::__xCtrlName == "Button" ) .OR. ::OwnerDraw
       RETURN NIL
    ENDIF
-   IF dis:CtlType & ODT_BUTTON != 0 .AND. ( ( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 ) .OR. ( ::ForeColor != NIL .AND. ( ::ForeColor != ::ForeSysColor .OR. ::__ClassInst != NIL) ) .OR. ( ::BackColor != NIL .AND. ::BackColor != ::BackSysColor )  .OR. ::Parent:__xCtrlName == "GroupBox" .OR. ::__ForceSysColor )
-
-      nTop := 5
-      nLeft:= 3
+   IF dis:CtlType & ODT_BUTTON != 0 .AND. ( ( ::MenuArrow .AND. ::ContextMenu != NIL ) .OR. ( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 ) .OR. ( ::ForeColor != NIL .AND. ( ::ForeColor != ::ForeSysColor .OR. ::__ClassInst != NIL) ) .OR. ( ::BackColor != NIL .AND. ::BackColor != ::BackSysColor )  .OR. ::Parent:__xCtrlName == "GroupBox" .OR. ::__ForceSysColor )
+      nTop  := 5
+      nLeft := 3
+      
       aRect := { dis:rcItem:Left, dis:rcItem:Top, dis:rcItem:Right, dis:rcItem:Bottom }
 
       lDisabled := dis:itemState & ODS_DISABLED != 0
@@ -340,7 +344,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
             ::Parent:ImageList:DrawImage( dis:hDC, ::ImageIndex, nLeft, nTop )
          ENDIF
       ENDIF
-      IF lFocus .AND. ::DrawFocus
+      IF lFocus .AND. ::DrawFocus .AND. ! ::MenuArrow
          SetTextColor( dis:hDC, RGB(0,0,0) )
          SetBkColor( dis:hDC, ::BackColor )
          _DrawFocusRect( dis:hDC, { dis:rcItem:Left + 4, dis:rcItem:Top + 4, dis:rcItem:Right - 4, dis:rcItem:Bottom - 4 } )
@@ -358,9 +362,27 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
        ELSE
          SetTextColor( dis:hDC, ::ForeColor )
       ENDIF
+      IF ::MenuArrow .AND. ::ContextMenu != NIL 
+         ::DrawArrow( dis:hDC, {aTextRect[1],aTextRect[2],aTextRect[1]+22,aTextRect[4]} )
+      ENDIF
       _DrawText( dis:hDC, ::Caption, aTextRect, nTextFlags )
    ENDIF
 
+RETURN NIL
+
+METHOD OnParentCommand( nId, nCode, nlParam ) CLASS Button
+   LOCAL pt
+   (nId, nCode)
+   IF ::MenuArrow .AND. ::ContextMenu != NIL .AND. nlParam == ::hWnd
+      pt := (struct POINT)
+      pt:x := ::Left
+      pt:y := ::Top+::Height
+      ClientToScreen( ::Parent:hWnd, @pt )
+      ::InvalidateRect()
+      ::ContextMenu:Show( pt:x, pt:y )
+      ::InvalidateRect()
+      RETURN 0
+   ENDIF
 RETURN NIL
 
 METHOD OnCtlColorBtn( nwParam, nlParam ) CLASS Button
