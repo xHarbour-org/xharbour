@@ -363,7 +363,9 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
          SetTextColor( dis:hDC, ::ForeColor )
       ENDIF
       IF ::MenuArrow .AND. ::ContextMenu != NIL 
-         ::DrawArrow( dis:hDC, {aTextRect[1],aTextRect[2],aTextRect[1]+22,aTextRect[4]} )
+         ::DrawArrow( dis:hDC, {aTextRect[3]-22,aTextRect[2],aTextRect[3],aTextRect[4]} )
+         aTextRect[1] := 6
+         nTextFlags := DT_LEFT + DT_VCENTER + DT_SINGLELINE
       ENDIF
       _DrawText( dis:hDC, ::Caption, aTextRect, nTextFlags )
    ENDIF
