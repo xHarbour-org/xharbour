@@ -26,7 +26,9 @@ CLASS VrLabel INHERIT VrObject
    DATA ForeColor     EXPORTED  INIT GetSysColor( COLOR_BTNTEXT )
    DATA EnumType      EXPORTED  INIT {{"Header","Record","Footer"},{1,2,3}}
    DATA TextAngle     EXPORTED  INIT 0
-
+   DATA xSingleLine   EXPORTED  INIT .T.
+   ACCESS SingleLine    INLINE ::xSingleLine
+   ASSIGN SingleLine(l) INLINE ::xSingleLine := l, ::EditCtrl:aSize := IIF( ! l, {.F.,.T.,.T.,.T.,.T.,.T.,.F.,.F.}, {.F.,.T.,.F.,.F.,.F.,.T.,.F.,.F.} ), ::EditCtrl:InvalidateRect()
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
    METHOD SetText()
@@ -47,7 +49,9 @@ METHOD Init( oParent ) CLASS VrLabel
       AADD( ::aProperties, { "Text",       "General" } )
       AADD( ::aProperties, { "TextAngle",  "General" } )
       AADD( ::aProperties, { "Picture",    "General" } )
+      AADD( ::aProperties, { "SingleLine", "General" } )
       AADD( ::aProperties, { "Width",      "Size"    } )
+      AADD( ::aProperties, { "Height",     "Size"    } )
       AADD( ::aProperties, { "AutoResize", "Size"    } )
       AADD( ::aProperties, { "Name",       "Object"  } )
    ENDIF
@@ -144,6 +148,8 @@ METHOD WriteProps( oXmlControl ) CLASS VrLabel
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Alignment", NIL, XSTR( ::Alignment ) )
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "AutoResize", NIL, IIF( ::AutoResize, "True", "False" ) )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "SingleLine", NIL, IIF( ::SingleLine, "True", "False" ) )
    oXmlControl:addBelow( oXmlValue )
 
    oXmlFont := TXmlNode():new( , "Font" )
@@ -296,7 +302,7 @@ METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
           ELSE
             :Attribute( "AutoResize", 1 )
          ENDIF
-         :Attribute( "Single Line", 1 )
+         :Attribute( "Single Line", IIF( ::SingleLine, 1, 0 ) )
          :Attribute( "Left",   x )
          :Attribute( "Top",    y )
          :Attribute( "TextFont", Alltrim( ::Font:FaceName ) + "," +Alltrim( Str( ::Font:PointSize ) ) + "," + Alltrim( Str( ::Font:Weight ) ) +","+cItalic+","+cUnderline )
