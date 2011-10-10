@@ -70,9 +70,7 @@ CLASS TabControl INHERIT Control
    DATA __nHot           PROTECTED INIT 0
    DATA __nPrevHot       PROTECTED INIT 0
    
-   DATA __UpDn           PROTECTED
    DATA __pUpDnPtr       PROTECTED
-   DATA __nUpDnProc      PROTECTED
    DATA __lMouseDown     PROTECTED INIT .F.
    DATA __ColorTable     PROTECTED 
 
@@ -179,7 +177,6 @@ CLASS TabControl INHERIT Control
    METHOD OnLButtonDown()
    
    METHOD __OnParentSize()
-   METHOD __UpDnProc()
    METHOD __SetTheming()
    METHOD __SetTabPosition()
 ENDCLASS
@@ -346,13 +343,6 @@ METHOD OnUserMsg( hWnd, nMsg ) CLASS TabControl
    ENDIF
 RETURN NIL
 
-//-----------------------------------------------------------------------------------------------
-METHOD __UpDnProc( hWnd, nMsg, nwParam, nlParam ) CLASS TabControl
-   SWITCH nMsg
-      CASE WM_PAINT
-         RETURN 0
-   END
-RETURN CallWindowProc( ::__nUpDnProc, hWnd, nMsg, nwParam, nlParam )
 
 //-----------------------------------------------------------------------------------------------
 METHOD RestoreTabPos() CLASS TabControl
@@ -513,28 +503,12 @@ METHOD OnWindowPaint() CLASS TabControl
    LOCAL lVert, x, y, nTextHeight, nTop, nState, nPart
    LOCAL nLeft, nRight, nBottom, aCover, aItem
    LOCAL aBackRect, aFramRect
-   LOCAL rc, tci, hWnd
+   LOCAL rc, tci, oChild, hMemDC1, hOldBitmap1
    LOCAL hMemDC, hMemBitmap, hOldBitmap, hOldFont, aText, sz := (struct SIZE)
    IF !::Flat
       IF ( !::Theming .OR. !IsThemeActive() ) .AND. ::ShowTabs
          RETURN NIL
       ENDIF
-   ENDIF
-   
-   IF !::ShowTabs .AND. ::__UpDn == NIL
-      hWnd := GetWindow( ::hWnd, GW_CHILD | GW_HWNDFIRST )
-      WHILE hWnd <> 0
-         IF GetClassName( hWnd ) == "msctls_updown32" 
-            ::__UpDn := hWnd
-            
-            DestroyWindow( hWnd )
-            //::__pUpDnPtr  := WinCallBackPointer( HB_ObjMsgPtr( Self, "__UpDnProc" ), Self )
-            //::__nUpDnProc := SetWindowLong( ::hWnd, GWL_WNDPROC, ::__pUpDnPtr )
-
-            EXIT
-         ENDIF
-         hWnd := GetWindow( hWnd, GW_HWNDNEXT )
-      ENDDO
    ENDIF
    
    rc  := (struct RECT)
@@ -655,6 +629,20 @@ METHOD OnWindowPaint() CLASS TabControl
          ENDIF
 
       ENDIF
+
+      FOR EACH oChild IN ::Children[ ::CurSel ]:Children
+          IF oChild:__hBrush != NIL
+             DeleteObject( oChild:__hBrush )
+          ENDIF
+          DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( oChild:Drawing:hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
+          hMemDC1      := CreateCompatibleDC( oChild:Drawing:hDC )
+          hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
+          BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin+oChild:CaptionHeight, SRCCOPY )
+          oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
+          SelectObject( hMemDC1,  hOldBitmap1 )
+          DeleteDC( hMemDC1 )
+      NEXT
+
       _EndPaint( ::hWnd, cPaint)
       RETURN 0
    ENDIF 
@@ -873,8 +861,23 @@ METHOD OnWindowPaint() CLASS TabControl
 
           ENDIF
        ENDIF
-
    NEXT
+
+   IF hMemBitmap != NIL
+      FOR EACH oChild IN ::Children
+          IF oChild:__hBrush != NIL
+             DeleteObject( oChild:__hBrush )
+          ENDIF
+          DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
+          hMemDC1      := CreateCompatibleDC( hDC )
+          hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
+          BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin+oChild:CaptionHeight, SRCCOPY )
+          oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
+          SelectObject( hMemDC1,  hOldBitmap1 )
+          DeleteDC( hMemDC1 )
+      NEXT
+   ENDIF
+
    BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
 
    SelectObject( hMemDC,  hOldBitmap )
@@ -1844,32 +1847,37 @@ METHOD OnEraseBkGnd( hDC ) CLASS TabStrip
    DEFAULT hBrush TO ::Parent:BkBrush
    IF hBrush != NIL
       _FillRect( hDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
-      RETURN 1
    ENDIF
-RETURN NIL
+RETURN 1
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnWindowPaint() CLASS TabStrip
-   LOCAL hOldPen, hWnd, aRect, nSel, aItem, hDC, cPaint, nItems, n
-   
-   IF !::ShowTabs .AND. ::__UpDn == NIL
-      hWnd := GetWindow( ::hWnd, GW_CHILD | GW_HWNDFIRST )
-      WHILE hWnd <> 0
-         IF GetClassName( hWnd ) == "msctls_updown32" 
-            ::__UpDn := hWnd            
-            DestroyWindow( hWnd )
-            EXIT
-         ENDIF
-         hWnd := GetWindow( hWnd, GW_HWNDNEXT )
-      ENDDO
-   ENDIF
-   
+   LOCAL hOldPen, aRect, nSel, aItem, hDC, cPaint, nItems, n
+   LOCAL hMemDC, hMemBitmap, hOldBitmap, hBrush//, hMemDC1, hOldBitmap1
+
    aRect := _GetClientRect( ::hWnd )
    nSel  := TabCtrl_GetCurSel( ::hWnd )+1
    IF nSel == 0
       ::SetCurSel(1)
    ENDIF
    hDC   := _BeginPaint( ::hWnd, @cPaint )
+
+   hMemDC     := CreateCompatibleDC( hDC )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
+   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+
+   //---------------------------------------------------------------------------
+   hBrush := ::BkBrush
+   DEFAULT hBrush TO ::__hBrush
+   DEFAULT hBrush TO ::Parent:BkBrush
+   DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
+
+   
+   IF hBrush != NIL
+      _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
+   ENDIF
+   //---------------------------------------------------------------------------
+
 
    aItem := ::GetItemRect( 1 )
 
@@ -1887,20 +1895,27 @@ METHOD OnWindowPaint() CLASS TabStrip
            aRect[4] -= ( aRect[4]-aItem[2] )
    ENDCASE
 
-   hOldPen := SelectObject( hDC, CreatePen( PS_SOLID, 0, RGB(128,128,128) ) )
-   Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
-   DeleteObject( SelectObject( hDC, hOldPen ) )
+   hOldPen := SelectObject( hMemDC, CreatePen( PS_SOLID, 0, RGB(128,128,128) ) )
+   Rectangle( hMemDC, aRect[1], aRect[2], aRect[3], aRect[4] )
+   DeleteObject( SelectObject( hMemDC, hOldPen ) )
    
    IF LEN( ::Children ) > 0 .AND. ::ShowTabs
       IF ( nItems := ::GetItemCount() ) > 0
          FOR n := nItems TO 1 STEP -1
              IF n != nSel
-                ::DrawTabStripItem( hDC, .F., n )
+                ::DrawTabStripItem( hMemDC, .F., n )
              ENDIF
          NEXT
-         ::DrawTabStripItem( hDC, .T., nSel )
+         ::DrawTabStripItem( hMemDC, .T., nSel )
       ENDIF
    ENDIF
+
+   BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
+
+   SelectObject( hMemDC, hOldBitmap )
+   DeleteDC( hMemDC )
+   DeleteObject( hMemBitmap )
+
    _EndPaint( ::hWnd, cPaint)
 RETURN 0
 
