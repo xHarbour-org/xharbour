@@ -1198,8 +1198,29 @@ CLASS TabPage INHERIT Dialog
    METHOD __SetPosition()
    METHOD __OnParentSize()
    METHOD __SetVisible()
+   METHOD OnPaint()
    METHOD __ResetHandle()  INLINE ::hWnd := NIL, ::__nProc := NIL, ::Template := NIL
 ENDCLASS
+
+//-----------------------------------------------------------------------------------------------
+METHOD OnPaint( hDC ) CLASS TabPage
+   LOCAL oChild, hOldBitmap1, hMemDC1
+   hMemDC1 := CreateCompatibleDC( hDC )
+   FOR EACH oChild IN ::Children
+       TRY
+          IF oChild:__hBrush != NIL
+             DeleteObject( oChild:__hBrush )
+          ENDIF
+          DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
+          hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
+          BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin+oChild:CaptionHeight, SRCCOPY )
+          oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
+          SelectObject( hMemDC1,  hOldBitmap1 )
+       CATCH
+       END
+   NEXT
+   DeleteDC( hMemDC1 )
+RETURN 0
 
 //-----------------------------------------------------------------------------------------------
 METHOD Init( oParent, acResource ) CLASS TabPage
