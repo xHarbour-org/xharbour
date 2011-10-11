@@ -27,8 +27,11 @@ CLASS VrLabel INHERIT VrObject
    DATA EnumType      EXPORTED  INIT {{"Header","Record","Footer"},{1,2,3}}
    DATA TextAngle     EXPORTED  INIT 0
    DATA xSingleLine   EXPORTED  INIT .T.
+   DATA Height        EXPORTED  INIT 16
+
    ACCESS SingleLine    INLINE ::xSingleLine
-   ASSIGN SingleLine(l) INLINE ::xSingleLine := l, ::EditCtrl:aSize := IIF( ! l, {.F.,.T.,.T.,.T.,.T.,.T.,.F.,.F.}, {.F.,.T.,.F.,.F.,.F.,.T.,.F.,.F.} ), ::EditCtrl:InvalidateRect()
+   ASSIGN SingleLine(l) INLINE ::xSingleLine := l, IIF( ::EditCtrl != NIL, ( ::EditCtrl:aSize := IIF( ! l, {.F.,.T.,.T.,.T.,.T.,.T.,.F.,.F.}, {.F.,.T.,.F.,.F.,.F.,.T.,.F.,.F.} ), ::EditCtrl:Redraw() ), )
+
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
    METHOD SetText()
@@ -114,9 +117,9 @@ METHOD SetText( cText ) CLASS VrLabel
                SetWindowText( :hWnd, cText )
             ENDIF
             
-            aSize := :Drawing:GetTextExtentPoint32( cText )
-            :xWidth := aSize[1]+4
-            :xHeight := aSize[2]+2
+            //aSize  := :Drawing:GetTextExtentPoint32( cText )
+            :xWidth  := ::Width //aSize[1]+4
+            :xHeight := ::Height //aSize[2]+2
             :MoveWindow()
 
             aRect := :GetRectangle()
@@ -144,6 +147,8 @@ METHOD WriteProps( oXmlControl ) CLASS VrLabel
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Top", NIL, XSTR( ::Top ) )
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Width", NIL, XSTR( ::Width ) )
+   oXmlControl:addBelow( oXmlValue )
+   oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Height", NIL, XSTR( ::Height ) )
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Alignment", NIL, XSTR( ::Alignment ) )
    oXmlControl:addBelow( oXmlValue )
@@ -286,7 +291,7 @@ METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
             
             aTxSize := _GetTextExtentPoint32( hDC, cText )
             DEFAULT aTxSize TO {0,0}
-            IF aTxSize[1] > ::Width
+            IF ::SingleLine .AND. aTxSize[1] > ::Width
                WHILE aTxSize[1] > ::Width
                   cText := LEFT( cText, LEN(cText)-1 )
                   aTxSize := _GetTextExtentPoint32( hDC, cText + "..." )
@@ -297,7 +302,7 @@ METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
             SelectObject( hDC, hPrevFont )
             DeleteObject( hFont )
             :Attribute( "Right",   x + ( (::nPixPerInch / nX) * ::Width ) )
-            :Attribute( "Bottom",  y + ( (::nPixPerInch / nY) * (aTxSize[2]+2) ) )
+            :Attribute( "Bottom",  y + ( (::nPixPerInch / nY) * IIF( ::SingleLine, (aTxSize[2]+2), ::Height ) ) )
 
           ELSE
             :Attribute( "AutoResize", 1 )
@@ -392,8 +397,11 @@ RETURN NIL
 
 FUNCTION PaintMarkers( hDC, oCtrl )
    LOCAL nColor, i, aPt, hBrush, aPts := GetPoints( oCtrl )
-   local r,g,b, hOld
-
+   local r,g,b, hOld, lDC := hDC != NIL
+   
+   IF !lDC
+      hDC := GetDCEx( oCtrl:Parent:hWnd )
+   ENDIF
    r = 255-GetRValue( oCtrl:BackColor )
    g = 255-GetGValue( oCtrl:BackColor )
    b = 255-GetBValue( oCtrl:BackColor )
@@ -417,6 +425,9 @@ FUNCTION PaintMarkers( hDC, oCtrl )
    NEXT
    SelectObject( hDC, hOld )
    DeleteObject( hBrush )
+   IF !lDC
+      ReleaseDC( oCtrl:Parent:hWnd, hDC )
+   ENDIF
 RETURN NIL
 
 FUNCTION DecToHexa(nNumber)
