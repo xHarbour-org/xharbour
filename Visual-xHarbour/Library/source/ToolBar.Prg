@@ -1924,7 +1924,7 @@ METHOD Press() CLASS ToolButton
 
    tbbi:cbSize  := tbbi:sizeof()
    tbbi:dwMask  := TBIF_STATE
-   tbbi:fsState := IIF( ::Enabled, TBSTATE_ENABLED, 0 ) | TBSTATE_PRESSED
+   tbbi:fsState := IIF( ::Enabled, TBSTATE_ENABLED, 0 ) + TBSTATE_PRESSED
 
    SendMessage( ::Parent:hWnd, TB_SETBUTTONINFO, ::Id, tbbi )
 
@@ -1937,7 +1937,7 @@ METHOD Check( lCheck ) CLASS ToolButton
    tbbi:dwMask  := TBIF_STATE
    tbbi:fsState := IIF( ::Enabled, TBSTATE_ENABLED, 0 )
    IF lCheck
-      tbbi:fsState := tbbi:fsState | TBSTATE_CHECKED
+      tbbi:fsState := tbbi:fsState + TBSTATE_CHECKED
    ENDIF
    SendMessage( ::Parent:hWnd, TB_SETBUTTONINFO, ::Id, tbbi )
 RETURN SELF

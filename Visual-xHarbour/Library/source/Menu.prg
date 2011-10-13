@@ -392,12 +392,14 @@ METHOD Show( x, y ) CLASS ContextMenu
    ::Menu:Create()
 
    FOR EACH oItem IN ::Menu:aItems
-       IF ::__ClassInst != NIL
-          IF oItem:Caption != "[ Add New Item ]"
-             oItem:CheckForDefaultItem()
+       IF oItem:Visible .OR. ::__ClassInst != NIL
+          IF ::__ClassInst != NIL
+             IF oItem:Caption != "[ Add New Item ]"
+                oItem:CheckForDefaultItem()
+             ENDIF
           ENDIF
+          oItem:Create()
        ENDIF
-       oItem:Create()
    NEXT
 
    IF ::__ClassInst != NIL // For CONTEXT MENU

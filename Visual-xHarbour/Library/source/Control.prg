@@ -350,7 +350,7 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS Control
          hOldPen   := SelectObject( hDC, ::System:CurrentScheme:Pen:MenuBorder )
          hBrush    := CreateSolidBrush( GetSysColor( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, COLOR_ACTIVECAPTION, COLOR_INACTIVECAPTION ) ) )
          hOldBrush := SelectObject( hDC, hBrush )
-         Rectangle( hDC, 0, 0, ::CaptionWidth, ::CaptionHeight )
+         Rectangle( hDC, ::CaptionRect[1], ::CaptionRect[2], ::CaptionRect[3], ::CaptionRect[4] )
          DeleteObject( SelectObject( hDC, hOldBrush ) )
          SelectObject( hDC, hOldPen )
          
