@@ -503,7 +503,7 @@ METHOD OnWindowPaint() CLASS TabControl
    LOCAL lVert, x, y, nTextHeight, nTop, nState, nPart
    LOCAL nLeft, nRight, nBottom, aCover, aItem
    LOCAL aBackRect, aFramRect
-   LOCAL rc, tci, oChild, hMemDC1, hOldBitmap1
+   LOCAL rc, tci//, oChild, hMemDC1, hOldBitmap1
    LOCAL hMemDC, hMemBitmap, hOldBitmap, hOldFont, aText, sz := (struct SIZE)
    IF !::Flat
       IF ( !::Theming .OR. !IsThemeActive() ) .AND. ::ShowTabs
@@ -629,20 +629,20 @@ METHOD OnWindowPaint() CLASS TabControl
          ENDIF
 
       ENDIF
-
+/*
       FOR EACH oChild IN ::Children[ ::CurSel ]:Children
           IF oChild:__hBrush != NIL
              DeleteObject( oChild:__hBrush )
           ENDIF
-          DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( oChild:Drawing:hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
-          hMemDC1      := CreateCompatibleDC( oChild:Drawing:hDC )
+          DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
+          hMemDC1      := CreateCompatibleDC( hDC )
           hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
           BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin+oChild:CaptionHeight, SRCCOPY )
           oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
           SelectObject( hMemDC1,  hOldBitmap1 )
           DeleteDC( hMemDC1 )
       NEXT
-
+*/
       _EndPaint( ::hWnd, cPaint)
       RETURN 0
    ENDIF 
@@ -862,7 +862,7 @@ METHOD OnWindowPaint() CLASS TabControl
           ENDIF
        ENDIF
    NEXT
-
+/*
    IF hMemBitmap != NIL
       FOR EACH oChild IN ::Children
           IF oChild:__hBrush != NIL
@@ -877,7 +877,7 @@ METHOD OnWindowPaint() CLASS TabControl
           DeleteDC( hMemDC1 )
       NEXT
    ENDIF
-
+*/
    BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
 
    SelectObject( hMemDC,  hOldBitmap )
@@ -1198,30 +1198,33 @@ CLASS TabPage INHERIT Dialog
    METHOD __SetPosition()
    METHOD __OnParentSize()
    METHOD __SetVisible()
-   METHOD OnPaint()
+   //METHOD OnPaint()
    METHOD __ResetHandle()  INLINE ::hWnd := NIL, ::__nProc := NIL, ::Template := NIL
 ENDCLASS
-
+/*
 //-----------------------------------------------------------------------------------------------
-METHOD OnPaint( hDC ) CLASS TabPage
+METHOD OnPaint( hDC, hMemDC ) CLASS TabPage
    LOCAL oChild, hOldBitmap1, hMemDC1
-   hMemDC1 := CreateCompatibleDC( hDC )
-   FOR EACH oChild IN ::Children
-       TRY
-          IF oChild:__hBrush != NIL
-             DeleteObject( oChild:__hBrush )
-          ENDIF
-          DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
-          hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
-          BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin+oChild:CaptionHeight, SRCCOPY )
-          oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
-          SelectObject( hMemDC1,  hOldBitmap1 )
-       CATCH
-       END
-   NEXT
-   DeleteDC( hMemDC1 )
+   (hMemDC)
+   IF hDC != NIL
+      FOR EACH oChild IN ::Children
+          TRY
+             IF oChild:__hBrush != NIL
+                DeleteObject( oChild:__hBrush )
+             ENDIF
+             hMemDC1 := CreateCompatibleDC( hDC )
+             DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
+             hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
+             BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin+oChild:CaptionHeight, SRCCOPY )
+             oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
+             SelectObject( hMemDC1,  hOldBitmap1 )
+             DeleteDC( hMemDC1 )
+          CATCH
+          END
+      NEXT
+   ENDIF
 RETURN 0
-
+*/
 //-----------------------------------------------------------------------------------------------
 METHOD Init( oParent, acResource ) CLASS TabPage
    DEFAULT ::__xCtrlName TO "TabPage"
@@ -1866,6 +1869,7 @@ METHOD OnEraseBkGnd( hDC ) CLASS TabStrip
    LOCAL hBrush := ::BkBrush
    DEFAULT hBrush TO ::__hBrush
    DEFAULT hBrush TO ::Parent:BkBrush
+   DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
    IF hBrush != NIL
       _FillRect( hDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
    ENDIF

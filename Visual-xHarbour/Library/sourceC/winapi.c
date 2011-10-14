@@ -27,6 +27,7 @@
 #pragma comment( lib, "wincore.lib" )
 #pragma comment( lib, "version.lib")
 #pragma comment( lib, "Rpcrt4.lib")
+#pragma comment( lib, "Crypt32.lib")
 
 
 #define _WIN32_WINNT 0x0500
@@ -65,6 +66,7 @@
 #include <shlwapi.h>
 #include <Rpc.h>
 #include <ole2.h>
+#include <Wincrypt.h>
 
 typedef struct _DWM_BLURBEHIND {
     DWORD dwFlags;
@@ -81,7 +83,7 @@ typedef struct _MARGINS {
 } MARGINS, *PMARGINS;
 
 static PHB_DYNS pHB_CSTRUCTURE = NULL, pPOINTER, pVALUE, pDEVALUE;
-static HINSTANCE hUser32 = NULL, hShell32 = NULL, hGdi32 = NULL, hNetAPI32 = NULL, hWinmm = NULL, hAdvApi32 = NULL, hHtmlHelp = NULL, hMAPI = NULL, hOleDlg = NULL, hAviCap = NULL, hWininet = NULL, hPSAPI = NULL, hshlwapi = NULL, hKernel32 = NULL, hdwmapi = NULL;
+static HINSTANCE hWinTrust = NULL, hUser32 = NULL, hShell32 = NULL, hGdi32 = NULL, hNetAPI32 = NULL, hWinmm = NULL, hAdvApi32 = NULL, hHtmlHelp = NULL, hMAPI = NULL, hOleDlg = NULL, hAviCap = NULL, hWininet = NULL, hPSAPI = NULL, hshlwapi = NULL, hKernel32 = NULL, hdwmapi = NULL;
 
 static CRITICAL_SECTION s_cs; /* This is the critical section object -- once initialized, it cannot be moved in memory */
 
@@ -175,6 +177,8 @@ static BOOL (WINAPI *pQueryServiceStatus)(SC_HANDLE,LPSERVICE_STATUS)           
 static BOOL (WINAPI *pQueryServiceConfig)(SC_HANDLE,LPQUERY_SERVICE_CONFIG,DWORD,LPDWORD)                      = NULL;
 static BOOL (WINAPI *pQueryServiceConfig2)(SC_HANDLE,DWORD,LPBYTE,DWORD,LPDWORD)                               = NULL;
 static BOOL (WINAPI *pChangeServiceConfig2)(SC_HANDLE,DWORD,LPVOID)                                            = NULL;
+
+static BOOL (WINAPI *pOpenPersonalTrustDBDialog)(HWND)                                                         = NULL;
 
 static BOOL (WINAPI *pEndTask)(HWND,BOOL,BOOL)                                                                 = NULL;
 static BOOL (WINAPI *pIsHungAppWindow)(HWND)                                                                   = NULL;
@@ -329,6 +333,11 @@ void OutputDebugValues( const char *sFormat, ... )
 HB_FUNC_INIT( _INITSYMBOLS_ )
 {
    //TraceLog( NULL, "_INITSYMBOLS_" );
+   if( hWinTrust == NULL )
+   {
+      hWinTrust = LoadLibrary( "WinTrust.dll" );
+   }
+
    if( hUser32 == NULL )
    {
       hUser32 = LoadLibrary( "User32.dll" );
@@ -403,6 +412,10 @@ HB_FUNC_INIT( _INITSYMBOLS_ )
       hdwmapi = LoadLibrary( "dwmapi.dll" );
    }
 
+   if( hWinTrust )
+   {
+      pOpenPersonalTrustDBDialog  = (BOOL (WINAPI *)(HWND))                      GetProcAddress( hWinTrust, "OpenPersonalTrustDBDialog" );
+   }
 
    if( hUser32 )
    {
@@ -507,6 +520,11 @@ HB_FUNC_INIT( _INITSYMBOLS_ )
 HB_FUNC_EXIT( _CLEANUP_ )
 {
    //TraceLog( NULL, "_CLEANUP_" );
+
+   if( hWinTrust )
+   {
+      FreeLibrary( hWinTrust );
+   }
 
    if( hUser32 )
    {
@@ -10154,3 +10172,38 @@ HB_FUNC( SHOWCURSOR )
    hb_retl( ShowCursor( hb_parl( 1 ) ) );
 }
 
+//HCERTSTORE WINAPI CertOpenStore(
+//  __in  LPCSTR lpszStoreProvider,
+//  __in  DWORD dwMsgAndCertEncodingType,
+//  __in  HCRYPTPROV hCryptProv,
+//  __in  DWORD dwFlags,
+//  __in  const void *pvPara
+
+HB_FUNC( CERTOPENSTORE )
+{
+   const void *pvPara;
+   hb_retnl( (LONG) CertOpenStore( (LPCSTR) hb_parc(1), (DWORD) hb_parnl(2), (HCRYPTPROV) hb_parnl(3), (DWORD) hb_parnl(4), pvPara ) );
+}
+
+HB_FUNC( CERTCLOSESTORE )
+{
+   hb_retl( CertCloseStore( (HCERTSTORE) hb_parnl(1), (DWORD) hb_parnl(2) ) );
+}
+
+HB_FUNC( CERTOPENSYSTEMSTORE )
+{
+   hb_retnl( (LONG) CertOpenSystemStore( (HCRYPTPROV) hb_parnl(1), (LPTSTR) hb_parc(2) ) );
+}
+
+
+HB_FUNC( OPENPERSONALTRUSTDBDIALOG )
+{
+   if( pOpenPersonalTrustDBDialog )
+   {
+      hb_retl( pOpenPersonalTrustDBDialog( (HWND) hb_parnl(1) ) );
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 6999, NULL, "OPENPERSONALTRUSTDBDIALOG", 1, hb_paramError(1) );
+   }
+}

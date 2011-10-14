@@ -1350,7 +1350,7 @@ METHOD Init() CLASS IDE_MainForm
          :ImageIndex   := 12
          :BeginGroup   := .T.
          :ToolTip:Text := "Tab Order"
-         :Action       := {||::Application:Project:TabOrder(o) }
+         :Action       := {|o|::Application:Project:TabOrder(o) }
          :Role         := 2
          :Enabled      := .F.
          :Create()
