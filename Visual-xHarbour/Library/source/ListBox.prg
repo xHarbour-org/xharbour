@@ -18,12 +18,17 @@
 
 CLASS ListBox FROM Control
 
-   DATA ImageList  EXPORTED
-   DATA ImageIndex PROTECTED
-   DATA __nWidth   PROTECTED INIT 0
+   ACCESS CurSel       INLINE    ::GetCurSel()
 
-   DATA OnChange  EXPORTED
-   ACCESS CurSel  INLINE ::GetCurSel()
+   DATA ImageList      EXPORTED
+   DATA OnChange       EXPORTED
+
+   DATA ImageIndex     PROTECTED
+   DATA __nWidth       PROTECTED INIT 0
+   DATA __nItemTip     PROTECTED INIT 0
+   DATA __tipWnd       PROTECTED
+   DATA __OriginalSel  PROTECTED INIT LB_ERR
+   DATA __isEnter      PROTECTED INIT .F.
 
    PROPERTY VertScroll        INDEX WS_VSCROLL            READ xVertScroll        WRITE SetStyle          DEFAULT .F. PROTECTED
    PROPERTY HorzScroll        INDEX WS_HSCROLL            READ xHorzScroll        WRITE SetStyle          DEFAULT .F. PROTECTED
@@ -65,8 +70,8 @@ CLASS ListBox FROM Control
    METHOD SelItemRangeEx(nFirst, nLast)    INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SELITEMRANGEEX, nFirst, nLast ), NIL )
    METHOD ResetContent()                   INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_RESETCONTENT, 0, 0 ) , NIL )
    METHOD GetSel(nLine)                    INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETSEL, nLine, 0 ), NIL )
-   METHOD GetText( nLine, cBuffer )        INLINE IIF( ::hWnd != NIL, ( SendMessage( ::hWnd, LB_GETTEXT,nLine, @cBuffer ), cBuffer), NIL )
-   METHOD GetTextLen( nLine )              INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETTEXTLEN, nLine, 0 ), NIL )
+   METHOD GetText( nLine, cBuffer )        INLINE IIF( ::hWnd != NIL, ( SendMessage( ::hWnd, LB_GETTEXT,nLine-1, @cBuffer ), cBuffer), NIL )
+   METHOD GetTextLen( nLine )              INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETTEXTLEN, nLine-1, 0 ), NIL )
    METHOD GetItemText( nItem )             INLINE ::GetText( nItem, SPACE( ::GetTextLen( nItem )+1 ) )
    METHOD SelectString( nLine, cText )     INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SELECTSTRING, nLine, cText ), NIL )
    METHOD GetTopIndex( nLine )             INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETTOPINDEX, nLine, 0 ) , NIL )
@@ -113,8 +118,95 @@ CLASS ListBox FROM Control
    METHOD OnVScroll() INLINE NIL
    METHOD OnCtlColorListBox()
    METHOD SetIntegralHeight( n, lSet ) INLINE ::SetStyle( n, !lSet )
-
+   METHOD OnMouseMove()
+   METHOD __SetItemToolTips()
+   METHOD __ListCallBack()
 ENDCLASS
+
+METHOD __SetItemToolTips( lTips ) CLASS ListBox
+   LOCAL wcex
+   IF lTips
+
+      IF IsWindow( ::hWnd )
+         ::cbi := ::GetComboBoxInfo()
+         IF IsWindow( ::cbi:hwndList )
+            ::__pListCallBack := WinCallBackPointer( HB_ObjMsgPtr( Self, "__ListCallBack" ), Self )
+            ::__nListProc := SetWindowLong( ::cbi:hwndList, GWL_WNDPROC, ::__pListCallBack )
+         ENDIF
+         wcex := (struct WNDCLASSEX)
+         wcex:cbSize         := wcex:SizeOf()
+         wcex:style          := CS_OWNDC | CS_DBLCLKS | CS_SAVEBITS | CS_DROPSHADOW
+         wcex:hInstance      := ::AppInstance
+         wcex:hbrBackground  := COLOR_BTNFACE+1
+         wcex:lpszClassName  := "CBTT"
+         wcex:hCursor        := LoadCursor(, IDC_ARROW )
+         wcex:lpfnWndProc    := DefWindowProcAddress()
+         RegisterClassEx( wcex )
+
+         ::__tipWnd := CreateWindowEx( WS_EX_TOOLWINDOW, "CBTT", "", WS_POPUP, 0, 0, 0, 0, 0, 0, ::AppInstance )
+
+         IF IsWindow( ::__tipWnd )
+            ::__pTipCallBack := WinCallBackPointer( HB_ObjMsgPtr( Self, "__TipCallBack" ), Self )
+            ::__nTipProc := SetWindowLong( ::__tipWnd, GWL_WNDPROC, ::__pTipCallBack )
+         ENDIF
+      ENDIF
+
+    ELSE
+
+      IF IsWindow( ::__tipWnd ) .AND. ::__nTipProc != NIL
+         SetWindowLong( ::__tipWnd, GWL_WNDPROC, ::__nTipProc )
+         ::__nTipProc := NIL
+         FreeCallBackPointer( ::__pTipCallBack )
+         ::__pTipCallBack := NIL
+
+         DestroyWindow( ::__tipWnd )
+
+         IF IsWindow( ::cbi:hwndList ) .AND. ::__nListProc != NIL
+            SetWindowLong( ::cbi:hwndList, GWL_WNDPROC, ::__nListProc )
+            ::__nListProc := NIL
+            FreeCallBackPointer( ::__pListCallBack )
+            ::__pListCallBack := NIL
+         ENDIF
+      ENDIF
+
+   ENDIF
+RETURN Self
+
+METHOD __ListCallBack( hWnd, nMsg, nwParam, nlParam ) CLASS ComboBox
+   LOCAL aPt, aRect
+   SWITCH nMsg
+      CASE WM_MOUSEMOVE
+           aPt := { LOWORD( nlParam ), HIWORD( nlParam ) }
+           aRect := _GetClientRect( hWnd )
+           IF _PtInRect( aRect, aPt )
+              ::__ListboxMouseMove( hWnd, nwParam, aPt )
+            ELSE
+              SendMessage( hWnd, WM_MOUSELEAVE, nwParam, nlParam )
+           ENDIF
+           
+           IF ! ::__isEnter
+              ::__TrackMouseEvent( hWnd, TME_HOVER|TME_LEAVE )
+           ENDIF
+           EXIT
+
+      CASE WM_MOUSELEAVE
+           ::__OriginalSel := LB_ERR
+           ::__isEnter := .F.
+           ShowWindow( ::__tipWnd, SW_HIDE )
+           EXIT
+   END
+RETURN CallWindowProc( ::__nListProc, hWnd, nMsg, nwParam, nlParam )
+
+METHOD __TipCallBack( hWnd, nMsg, nwParam, nlParam ) CLASS ListBox
+   SWITCH nMsg
+      CASE WM_PAINT
+           RETURN ::__HandleOnPaint( hWnd )
+           
+      CASE WM_TIMER
+           ::__HandleOnTimer( nwParam )
+           EXIT
+   END
+RETURN CallWindowProc( ::__nTipProc, hWnd, nMsg, nwParam, nlParam )
 
 METHOD AddString( cText, lSel ) CLASS ListBox
    LOCAL n
@@ -154,7 +246,7 @@ METHOD DeleteString(nLine) CLASS ListBox
       ::SendMessage( LB_DELETESTRING, nLine-1, 0)
       ::__nWidth := 0
       FOR x := 1 TO ::GetCount()
-         n := ::Drawing:GetTextExtentPoint32( ::GetItemText(x-1) )[1]
+         n := ::Drawing:GetTextExtentPoint32( ::GetItemText(x) )[1]
          IF n > ::__nWidth
             ::__nWidth := n
          ENDIF
@@ -227,10 +319,8 @@ RETURN( IIF(nLen == LB_ERR, nil, left(cBuf, nLen) ) )
 
 METHOD GetItemRect( nLine) CLASS ListBox
    LOCAL rc := (struct RECT)
-   LOCAL cRect := space(16)
-   SendMessage( ::hWnd, LB_GETITEMRECT, nLine, @cRect)
-   rc:Buffer( cRect )
-RETURN(rc:Value)
+   SendMessage( ::hWnd, LB_GETITEMRECT, nLine+1, @rc)
+RETURN rc:Array
 
 //----------------------------------------------------------------------------------------------------------------
 
@@ -266,7 +356,25 @@ METHOD OnParentCommand( nId, nCode, nlParam ) CLASS ListBox
 RETURN nRet
 
 //----------------------------------------------------------------------------------------------------------------
+METHOD OnMouseMove( nwParam, x, y ) CLASS ListBox
+   LOCAL nItem, aText, cText, aSize, oTip
+   (nwParam)
+   nItem := ::ItemFromPoint( x, y )
 
+   IF ::__OriginalSel == nItem .OR. nItem == LB_ERR .OR. nItem < 0
+      RETURN NIL 
+   ENDIF
+   ::__OriginalSel := nItem
+   
+   aText := ::GetItemRect( nItem+1 )
+   cText := ::GetItemText( nItem+1 )
+   aSize := ::Drawing:GetTextExtentPoint32( cText )
+   IF aSize[1] > ::ClientWidth
+      VIEW cText, nItem
+   ENDIF
+RETURN NIL
+
+//----------------------------------------------------------------------------------------------------------------
 METHOD OnCtlColorListBox( nwParam ) CLASS ListBox
    LOCAL hBkGnd := ::BkBrush
    IF ::ForeColor != NIL .AND. ::ForeColor != ::ForeSysColor
