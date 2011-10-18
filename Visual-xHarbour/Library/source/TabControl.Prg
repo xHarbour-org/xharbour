@@ -1877,7 +1877,7 @@ RETURN 1
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnWindowPaint() CLASS TabStrip
-   LOCAL hOldPen, aRect, nSel, aItem, hDC, cPaint, nItems, n
+   LOCAL hOldPen, aRect, nSel, aItem, hDC, cPaint, nItems, n, nColor
    LOCAL hMemDC, hMemBitmap, hOldBitmap, hBrush//, hMemDC1, hOldBitmap1
 
    aRect := _GetClientRect( ::hWnd )
@@ -1893,8 +1893,13 @@ METHOD OnWindowPaint() CLASS TabStrip
 
    //---------------------------------------------------------------------------
    hBrush := ::BkBrush
-   DEFAULT hBrush TO ::__hBrush
+   //DEFAULT hBrush TO ::__hBrush
    DEFAULT hBrush TO ::Parent:BkBrush
+   IF hBrush == NIL
+      nColor := GetPixel( ::Parent:Drawing:hDC, 2,2 )
+      ::BkBrush := CreateSolidBrush( nColor )
+      hBrush := ::BkBrush
+   ENDIF
    DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
 
    
