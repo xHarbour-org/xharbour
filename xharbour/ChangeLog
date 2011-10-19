@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-10-20 05:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/pcre/config.h
+  * source/rtl/pcre/config.h.generic
+  * source/rtl/pcre/pcre.h
+  * source/rtl/pcre/pcre.h.generic
+  * source/rtl/pcre/pcre_chartables.c.dist
+    ! assign file SVN properties
+
 2011-10-20 05:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbhpdf/hpdf_image_png.c
     ! use private header file: #include "png.h" -> #include "pngpriv.h"
