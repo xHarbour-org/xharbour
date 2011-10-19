@@ -4056,7 +4056,7 @@ BOOL CALLBACK StepPagesProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
                      BrowseInfo.pidlRoot = NULL;
                      BrowseInfo.pszDisplayName = szDisplayName;
                      BrowseInfo.lpszTitle = "Please select location of the Project's ROOT Folder.";
-                     BrowseInfo.ulFlags = BIF_NEWDIALOGSTYLE | BIF_RETURNONLYFSDIRS | BIF_RETURNFSANCESTORS | BIF_SHAREABLE;
+                     BrowseInfo.ulFlags = BIF_NEWDIALOGSTYLE | BIF_RETURNONLYFSDIRS | BIF_RETURNFSANCESTORS /*| BIF_SHAREABLE*/;
                      BrowseInfo.lpfn = NULL;
                      BrowseInfo.lParam = 0;
                      BrowseInfo.iImage = 0;
@@ -4146,7 +4146,7 @@ BOOL CALLBACK StepPagesProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
                      BrowseInfo.pidlRoot = NULL;
                      BrowseInfo.pszDisplayName = szDisplayName;
                      BrowseInfo.lpszTitle = "Please select location of additional default search folder for Library files.";
-                     BrowseInfo.ulFlags = BIF_NEWDIALOGSTYLE | BIF_RETURNONLYFSDIRS | BIF_RETURNFSANCESTORS | BIF_SHAREABLE;
+                     BrowseInfo.ulFlags = BIF_NEWDIALOGSTYLE | BIF_RETURNONLYFSDIRS | BIF_RETURNFSANCESTORS /*| BIF_SHAREABLE*/;
                      BrowseInfo.lpfn = NULL;
                      BrowseInfo.lParam = 0;
                      BrowseInfo.iImage = 0;
@@ -4179,7 +4179,7 @@ BOOL CALLBACK StepPagesProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
                      BrowseInfo.pidlRoot = NULL;
                      BrowseInfo.pszDisplayName = szDisplayName;
                      BrowseInfo.lpszTitle = "Please select location of additional default search folder for Include files.";
-                     BrowseInfo.ulFlags = BIF_NEWDIALOGSTYLE | BIF_RETURNONLYFSDIRS | BIF_RETURNFSANCESTORS | BIF_SHAREABLE;
+                     BrowseInfo.ulFlags = BIF_NEWDIALOGSTYLE | BIF_RETURNONLYFSDIRS | BIF_RETURNFSANCESTORS /*| BIF_SHAREABLE*/;
                      BrowseInfo.lpfn = NULL;
                      BrowseInfo.lParam = 0;
                      BrowseInfo.iImage = 0;
@@ -4809,7 +4809,7 @@ BOOL CALLBACK SettingsProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
                      BrowseInfo.pidlRoot = NULL;
                      BrowseInfo.pszDisplayName = szDisplayName;
                      BrowseInfo.lpszTitle = "Please select the Root Folder of your xHarbour installation.";
-                     BrowseInfo.ulFlags = BIF_NEWDIALOGSTYLE | BIF_RETURNONLYFSDIRS | BIF_RETURNFSANCESTORS | BIF_SHAREABLE;
+                     BrowseInfo.ulFlags = BIF_NEWDIALOGSTYLE | BIF_RETURNONLYFSDIRS | BIF_RETURNFSANCESTORS /*| BIF_SHAREABLE*/;
                      BrowseInfo.lpfn = NULL;
                      BrowseInfo.lParam = 0;
                      BrowseInfo.iImage = 0;
@@ -4864,7 +4864,7 @@ BOOL CALLBACK SettingsProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
                      BrowseInfo.pidlRoot = s_xHB_RootID;
                      BrowseInfo.pszDisplayName = szDisplayName;
                      BrowseInfo.lpszTitle = "Please select the LIB Folder of your xHarbour installation.";
-                     BrowseInfo.ulFlags = BIF_NEWDIALOGSTYLE | BIF_RETURNONLYFSDIRS | BIF_RETURNFSANCESTORS | BIF_SHAREABLE;
+                     BrowseInfo.ulFlags = BIF_NEWDIALOGSTYLE | BIF_RETURNONLYFSDIRS | BIF_RETURNFSANCESTORS /*| BIF_SHAREABLE*/;
                      BrowseInfo.lpfn = NULL;
                      BrowseInfo.lParam = 0;
                      BrowseInfo.iImage = 0;
@@ -4915,7 +4915,7 @@ BOOL CALLBACK SettingsProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
                      BrowseInfo.pidlRoot = NULL;
                      BrowseInfo.pszDisplayName = szDisplayName;
                      BrowseInfo.lpszTitle = "Please select the Root Folder of your C Compiler installation.";
-                     BrowseInfo.ulFlags = BIF_NEWDIALOGSTYLE | BIF_RETURNONLYFSDIRS | BIF_RETURNFSANCESTORS | BIF_SHAREABLE;
+                     BrowseInfo.ulFlags = BIF_NEWDIALOGSTYLE | BIF_RETURNONLYFSDIRS | BIF_RETURNFSANCESTORS /*| BIF_SHAREABLE*/;
                      BrowseInfo.lpfn = NULL;
                      BrowseInfo.lParam = 0;
                      BrowseInfo.iImage = 0;
@@ -4952,7 +4952,7 @@ BOOL CALLBACK SettingsProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
                      BrowseInfo.pidlRoot = NULL;
                      BrowseInfo.pszDisplayName = szDisplayName;
                      BrowseInfo.lpszTitle = "Please select the Root Folder of your FWH installation.";
-                     BrowseInfo.ulFlags = BIF_NEWDIALOGSTYLE | BIF_RETURNONLYFSDIRS | BIF_RETURNFSANCESTORS | BIF_SHAREABLE;
+                     BrowseInfo.ulFlags = BIF_NEWDIALOGSTYLE | BIF_RETURNONLYFSDIRS | BIF_RETURNFSANCESTORS /*| BIF_SHAREABLE*/;
                      BrowseInfo.lpfn = NULL;
                      BrowseInfo.lParam = 0;
                      BrowseInfo.iImage = 0;
@@ -4994,7 +4994,7 @@ BOOL CALLBACK SettingsProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
                      BrowseInfo.pidlRoot = s_FWH_RootID;
                      BrowseInfo.pszDisplayName = szDisplayName;
                      BrowseInfo.lpszTitle = "Please select the desired LIB Folder of your FWH installation.";
-                     BrowseInfo.ulFlags = BIF_NEWDIALOGSTYLE | BIF_RETURNONLYFSDIRS | BIF_RETURNFSANCESTORS | BIF_SHAREABLE;
+                     BrowseInfo.ulFlags = BIF_NEWDIALOGSTYLE | BIF_RETURNONLYFSDIRS | BIF_RETURNFSANCESTORS /*| BIF_SHAREABLE*/;
                      BrowseInfo.lpfn = NULL;
                      BrowseInfo.lParam = 0;
                      BrowseInfo.iImage = 0;
@@ -5030,7 +5030,7 @@ BOOL CALLBACK SettingsProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
                      BrowseInfo.pidlRoot = NULL;
                      BrowseInfo.pszDisplayName = szDisplayName;
                      BrowseInfo.lpszTitle = "Please select the Start Folder when running your executable.";
-                     BrowseInfo.ulFlags = BIF_NEWDIALOGSTYLE | BIF_RETURNONLYFSDIRS | BIF_RETURNFSANCESTORS | BIF_SHAREABLE;
+                     BrowseInfo.ulFlags = BIF_NEWDIALOGSTYLE | BIF_RETURNONLYFSDIRS | BIF_RETURNFSANCESTORS /*| BIF_SHAREABLE*/;
                      BrowseInfo.lpfn = NULL;
                      BrowseInfo.lParam = 0;
                      BrowseInfo.iImage = 0;
