@@ -93,17 +93,17 @@ void fb_log_status( PFB_SESSION session, char * from )
    //isc_interprete( session->msgerror, &pVect );
       SCHAR s[1024];
 
-                while (fb_interpret(s, sizeof(s), &pVect))
+                while (fb_interpret((ISC_SCHAR *) s, sizeof(s), &pVect))
                 {
                         //const char* nl = (s[0] ? s[strlen(s) - 1] != '\n' : true) ? "\n" : "";
-                        strcat( session->msgerror,s);   
+                        strcat( session->msgerror, (const char *)s);
                         strcat(session->msgerror,"\n");
                         //util_output("%s%s", s, nl);
                 }
-           
+
    session->errorcode = session->status[1];
    HB_SYMBOL_UNUSED( from );
-   
+
    if (session->transac)
    {
       isc_rollback_transaction( session->status, &(session->transac) );
@@ -178,7 +178,7 @@ HB_FUNC( FBCONNECT )  // FBConnect( cDatabase, cUser, cPassword, [charset], @hEn
       fb_log_status(session, "FBCONNECT");
       if ( session->msgerror )
          hb_xfree(session->msgerror);
-      
+
       hb_xfree( session->sqlda );
       hb_xfree( session );
       hb_retnl(SQL_ERROR);
@@ -286,7 +286,7 @@ HB_FUNC( FBBEGINTRANSACTION )  // FBBeginTransaction( hEnv )
          {
             ERRORLOGANDEXIT( session, "FBBEGINTRANSACTION2" );
          }
-         
+
       }
 
       //if (isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short) sizeof(isc_tpb), isc_tpb))
@@ -297,7 +297,7 @@ HB_FUNC( FBBEGINTRANSACTION )  // FBBeginTransaction( hEnv )
       }
       else
       {
-	     session->transactionPending = 0;	       
+	     session->transactionPending = 0;
          hb_retni( SQL_SUCCESS );
       }
    }
@@ -318,7 +318,7 @@ HB_FUNC( FBCOMMITTRANSACTION )  // FBBeginTransaction( hEnv )
       }
       else
       {
-	      
+
          session->transac = NULL;
          session->transactionPending = 0;
          hb_retni( SQL_SUCCESS );
@@ -341,7 +341,7 @@ HB_FUNC( FBROLLBACKTRANSACTION )  // FBRollBackTransaction( hEnv )
       }
       else
       {
-	      
+
          session->transac = NULL;
          session->transactionPending = 0;
          hb_retni( SQL_SUCCESS );
@@ -379,7 +379,7 @@ HB_FUNC( FBEXECUTE ) // FBExecute( hEnv, cCmd, nDialect )
    {
       //if (isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short) sizeof(isc_tpb), isc_tpb))
       isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short) sizeof(isc_tpb), isc_tpb);
-      if ( CHECK_ERROR(session) )      
+      if ( CHECK_ERROR(session) )
       {
          ERRORLOGANDEXIT( session, "FBBEGINTRANSACTION1_3" );
       }
@@ -391,7 +391,7 @@ HB_FUNC( FBEXECUTE ) // FBExecute( hEnv, cCmd, nDialect )
    //printf( "isc_dsql_prepare %p %p %p %s %p\n", session->status, session->transac, session->stmt, command, session->sqlda );
    //if (isc_dsql_prepare( session->status, &(session->transac), &(session->stmt), 0, command, hb_parni(3), session->sqlda ))
    isc_dsql_prepare( session->status, &(session->transac), &(session->stmt), 0, command, hb_parni(3), session->sqlda );
-   if ( CHECK_ERROR(session) )      
+   if ( CHECK_ERROR(session) )
    {
       ERRORLOGANDEXIT( session, (char *) command );
    }
@@ -407,45 +407,45 @@ HB_FUNC( FBEXECUTE ) // FBExecute( hEnv, cCmd, nDialect )
       switch ( dtype )
       {
       case IB_SQL_TEXT:
-         var->sqldata = (SCHAR *) hb_xgrab( (sizeof ( char ) * var->sqllen ) + 1 );
+         var->sqldata = (ISC_SCHAR *) hb_xgrab( (sizeof ( char ) * var->sqllen ) + 1 );
          break;
       case IB_SQL_VARYING:
-         var->sqldata = (SCHAR *) hb_xgrab( (sizeof ( char ) * var->sqllen ) + 3 );
+         var->sqldata = (ISC_SCHAR *) hb_xgrab( (sizeof ( char ) * var->sqllen ) + 3 );
          break;
       case IB_SQL_LONG:
-         var->sqldata = (SCHAR *) hb_xgrab( sizeof ( long ) );
+         var->sqldata = (ISC_SCHAR *) hb_xgrab( sizeof ( long ) );
          break;
       case IB_SQL_SHORT:
-         var->sqldata = (SCHAR *) hb_xgrab( sizeof ( short ) );
+         var->sqldata = (ISC_SCHAR *) hb_xgrab( sizeof ( short ) );
          break;
       case IB_SQL_FLOAT:
-         var->sqldata = (SCHAR *) hb_xgrab( sizeof ( float ) );
+         var->sqldata = (ISC_SCHAR *) hb_xgrab( sizeof ( float ) );
          break;
       case IB_SQL_DOUBLE:
-         var->sqldata = (SCHAR *) hb_xgrab( sizeof ( double ) );
+         var->sqldata = (ISC_SCHAR *) hb_xgrab( sizeof ( double ) );
          break;
       case IB_SQL_D_FLOAT:
-         var->sqldata = (SCHAR *) hb_xgrab( sizeof ( float ) * 2 );
+         var->sqldata = (ISC_SCHAR *) hb_xgrab( sizeof ( float ) * 2 );
          break;
       case IB_SQL_TIMESTAMP:
-         var->sqldata = (SCHAR *) hb_xgrab( sizeof ( ISC_TIMESTAMP ) + 10 );
+         var->sqldata = (ISC_SCHAR *) hb_xgrab( sizeof ( ISC_TIMESTAMP ) + 10 );
          break;
       case IB_SQL_ARRAY:
       case IB_SQL_QUAD:
       case IB_SQL_BLOB:
-         var->sqldata = (SCHAR *) hb_xgrab( sizeof ( ISC_QUAD ) );
+         var->sqldata = (ISC_SCHAR *) hb_xgrab( sizeof ( ISC_QUAD ) );
          break;
       case IB_SQL_TYPE_TIME:
-         var->sqldata = (SCHAR *) hb_xgrab( sizeof ( ISC_TIME ) + 10 );
+         var->sqldata = (ISC_SCHAR *) hb_xgrab( sizeof ( ISC_TIME ) + 10 );
          break;
       case IB_SQL_TYPE_DATE:
-         var->sqldata = (SCHAR *) hb_xgrab( sizeof ( ISC_DATE ) );
+         var->sqldata = (ISC_SCHAR *) hb_xgrab( sizeof ( ISC_DATE ) );
          break;
       case IB_SQL_INT64:
-         var->sqldata = (SCHAR *) hb_xgrab( sizeof ( ISC_INT64 ) * var->sqllen );
+         var->sqldata = (ISC_SCHAR *) hb_xgrab( sizeof ( ISC_INT64 ) * var->sqllen );
          break;
       default:
-        var->sqldata = (SCHAR *) hb_xgrab( sizeof ( char ) * var->sqllen );
+        var->sqldata = (ISC_SCHAR *) hb_xgrab( sizeof ( char ) * var->sqllen );
         break;
       }
       var->sqlind = ( short * ) hb_xgrab( sizeof ( short ) );
@@ -456,12 +456,12 @@ HB_FUNC( FBEXECUTE ) // FBExecute( hEnv, cCmd, nDialect )
    if ( !session->sqlda->sqld )
    {
 //      if ( isc_dsql_execute( session->status, &(session->transac), &(session->stmt), hb_parni(3), NULL ) )
-      r=isc_dsql_execute( session->status, &(session->transac), &(session->stmt), hb_parni(3), NULL ); 
+      r=isc_dsql_execute( session->status, &(session->transac), &(session->stmt), hb_parni(3), NULL );
       if ( CHECK_ERROR(session) )
       {
          ERRORLOGANDEXIT( session, "FBEXECUTE4" );
       }
-      
+
    }
    else
    {
@@ -471,7 +471,7 @@ HB_FUNC( FBEXECUTE ) // FBExecute( hEnv, cCmd, nDialect )
       {
          ERRORLOGANDEXIT( session, "FBEXECUTE5" );
       }
-      
+
    }
 
    hb_retni( SQL_SUCCESS );
@@ -489,7 +489,7 @@ HB_FUNC( FBEXECUTEIMMEDIATE ) // FBExecuteImmediate( hEnv, cCmd, nDialect )
    {
 	  //if (isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short) sizeof(isc_tpb), isc_tpb))
 	  isc_start_transaction(session->status, &(session->transac), 1, &(session->db), (unsigned short) sizeof(isc_tpb), isc_tpb);
-	  if ( CHECK_ERROR(session) )             
+	  if ( CHECK_ERROR(session) )
       {
          ERRORLOGANDEXIT( session, "FBBEGINTRANSACTION1_4" );
       }
@@ -504,7 +504,7 @@ HB_FUNC( FBEXECUTEIMMEDIATE ) // FBExecuteImmediate( hEnv, cCmd, nDialect )
 //       ERRORLOGANDEXIT( session, (char *) command );
 //    }
    r=isc_dsql_execute_immediate( session->status, &(session->db), &(session->transac), 0, command, hb_parni(3), NULL );
-   
+
    if ( CHECK_ERROR(session) )
    {
       ERRORLOGANDEXIT( session, (char *) command );
@@ -527,7 +527,7 @@ HB_FUNC( FBDESCRIBECOL )   // FBDescribeCol( hStmt, nCol, @cName, @nType, @nLen,
    {
       var = session->sqlda->sqlvar;
       for ( i = 0; i < icol-1; i++, var++ ){}
-      
+
       dtype = ( ( (XSQLVAR *) var )->sqltype & ~1 );
 
       switch ( dtype )
@@ -547,32 +547,32 @@ HB_FUNC( FBDESCRIBECOL )   // FBDescribeCol( hStmt, nCol, @cName, @nType, @nLen,
          break;
       case IB_SQL_TIMESTAMP:
          rettype = SQL_CHAR;
-         
+
          hb_storni( 24, 5 );
          hb_storni( 0, 6 );
          break;
       case IB_SQL_SHORT:
-      
+
          rettype = SQL_SMALLINT;
          hb_storni( var->sqllen, 1 );
          hb_storni( var->sqlscale, 0 );
          break;
 
       case IB_SQL_LONG:
-      case IB_SQL_INT64:      
+      case IB_SQL_INT64:
 
          rettype = SQL_NUMERIC;
          hb_storni( 20, 5 );
          hb_storni( -var->sqlscale, 6 );
          break;
-      
+
       case IB_SQL_FLOAT:
       case IB_SQL_DOUBLE:
       case IB_SQL_D_FLOAT:
          rettype = SQL_DOUBLE;
          hb_storni( 23, 5 );
          hb_storni( 3, 6 );
-         
+
          break;
       case IB_SQL_BLOB:
       case IB_SQL_ARRAY:
@@ -588,13 +588,13 @@ HB_FUNC( FBDESCRIBECOL )   // FBDescribeCol( hStmt, nCol, @cName, @nType, @nLen,
          hb_storni( 8L, 5 );
          hb_storni( 0L, 6 );
          break;
-      default:      
+      default:
 
-         
+
          rettype = SQL_CHAR;
          hb_storni( var->sqllen, 5 );
          hb_storni( var->sqlscale, 6 );
-         
+
          break;
       }
 //      hb_storclen( (char *) var->sqlname, var->sqlname_length, 3 );
@@ -960,19 +960,19 @@ HB_FUNC( FBCREATEDB )
       sprintf(create_db, "CREATE DATABASE '%s' USER '%s' PASSWORD '%s'", db_name, username, passwd, page, charset );
    }
 
-   if (isc_dsql_execute_immediate(status, &newdb, &trans, 0, create_db, dialect, NULL))
+   if (isc_dsql_execute_immediate((ISC_STATUS *)status, &newdb, &trans, 0, create_db, dialect, NULL))
    {
       hb_retni( SQL_ERROR );
       TraceLog( LOGFILE, "FireBird Error: %s - code: %i (see iberr.h)\n", "create database", status[1] );
    }
    else
    {
-	 if ( isc_detach_database ( status, &newdb ) )
+     if ( isc_detach_database ( (ISC_STATUS *)status, &newdb ) )
 	 {
 		 hb_retni( SQL_ERROR );
 		 return ;
-     }	 
-  
+     }
+
       hb_retni( SQL_SUCCESS );
    }
 }
@@ -1120,7 +1120,7 @@ void FBFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff,
                   hb_dynsymLock();
                   s_pSym_SR_FROMJSON = hb_dynsymFindName( "HB_JSONDECODE" );
                   hb_dynsymUnlock();
-                  if ( s_pSym_SR_FROMJSON  == NULL ) printf( "Could not find Symbol HB_JSONDECODE\n" );            
+                  if ( s_pSym_SR_FROMJSON  == NULL ) printf( "Could not find Symbol HB_JSONDECODE\n" );
                }
                hb_vmPushSymbol( s_pSym_SR_FROMJSON->pSymbol );
                hb_vmPushNil();
@@ -1128,7 +1128,7 @@ void FBFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff,
                pTemp = hb_itemNew( NULL );
                hb_vmPush(pTemp);
                hb_vmDo( 2 );
-               hb_itemForwardValue( pItem, pTemp );              
+               hb_itemForwardValue( pItem, pTemp );
                hb_itemRelease( pTemp );
 
             }
