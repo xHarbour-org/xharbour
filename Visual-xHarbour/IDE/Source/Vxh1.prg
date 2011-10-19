@@ -4496,17 +4496,22 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
 
    cPath := ::Properties:Path
 
-   IF lNew  .OR. ! IsDirectory( cPath )
-      MakeDir( cPath )
-   ENDIF
-   DirChange( cPath )
+   CreateDirectory( cPath + "\" + ::Properties:Binary )
+   CreateDirectory( cPath + "\" + ::Properties:Objects )
+   CreateDirectory( cPath + "\" + ::Properties:Source )
+   CreateDirectory( cPath + "\" + ::Properties:Resource )
 
-   IF lNew .OR. ! IsDirectory( ::Properties:Binary )
-      MakeDir( ::Properties:Binary )
-      MakeDir( ::Properties:Objects )
-      MakeDir( ::Properties:Source )
-      MakeDir( ::Properties:Resource )
-   ENDIF
+   //IF lNew  .OR. ! IsDirectory( cPath )
+   //   MakeDir( cPath )
+   //ENDIF
+   //DirChange( cPath )
+
+   //IF lNew .OR. ! IsDirectory( ::Properties:Binary )
+   //   MakeDir( ::Properties:Binary )
+   //   MakeDir( ::Properties:Objects )
+   //   MakeDir( ::Properties:Source )
+   //   MakeDir( ::Properties:Resource )
+   //ENDIF
 
    IF cPrevPath != NIL
       cPrevRes := ::FixPath( cPrevPath, "Resource" )
