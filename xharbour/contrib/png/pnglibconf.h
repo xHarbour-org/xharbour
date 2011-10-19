@@ -1,6 +1,9 @@
 /*
  * $Id$
  */
+/*
+ * $Id$
+ */
 
 /* libpng STANDARD API DEFINITION */
 

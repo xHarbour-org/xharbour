@@ -8,7 +8,7 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng 1.5.0 [January 6, 2011]
+ * Last changed in libpng 1.5.5 [September 22, 2011]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -32,11 +32,13 @@
 struct png_struct_def
 {
 #ifdef PNG_SETJMP_SUPPORTED
-   jmp_buf png_jmpbuf;            /* used in png_error */
+   jmp_buf longjmp_buffer;    /* used in png_error */
    png_longjmp_ptr longjmp_fn;/* setjmp non-local goto function. */
 #endif
    png_error_ptr error_fn;    /* function for printing errors and aborting */
+#ifdef PNG_WARNINGS_SUPPORTED
    png_error_ptr warning_fn;  /* function for printing warnings */
+#endif
    png_voidp error_ptr;       /* user supplied struct for error functions */
    png_rw_ptr write_data_fn;  /* function for writing output data */
    png_rw_ptr read_data_fn;   /* function for reading input data */
@@ -67,11 +69,36 @@ struct png_struct_def
    z_stream zstream;          /* pointer to decompression structure (below) */
    png_bytep zbuf;            /* buffer for zlib */
    uInt zbuf_size;            /* size of zbuf (typically 65536) */
+#ifdef PNG_WRITE_SUPPORTED
+
+/* Added in 1.5.4: state to keep track of whether the zstream has been
+ * initialized and if so whether it is for IDAT or some other chunk.
+ */
+#define PNG_ZLIB_UNINITIALIZED 0
+#define PNG_ZLIB_FOR_IDAT      1
+#define PNG_ZLIB_FOR_TEXT      2 /* anything other than IDAT */
+#define PNG_ZLIB_USE_MASK      3 /* bottom two bits */
+#define PNG_ZLIB_IN_USE        4 /* a flag value */
+
+   png_uint_32 zlib_state;       /* State of zlib initialization */
+/* End of material added at libpng 1.5.4 */
+
    int zlib_level;            /* holds zlib compression level */
    int zlib_method;           /* holds zlib compression method */
    int zlib_window_bits;      /* holds zlib compression window bits */
    int zlib_mem_level;        /* holds zlib compression memory level */
    int zlib_strategy;         /* holds zlib compression strategy */
+#endif
+/* Added at libpng 1.5.4 */
+#if defined(PNG_WRITE_COMPRESSED_TEXT_SUPPORTED) || \
+    defined(PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED)
+   int zlib_text_level;            /* holds zlib compression level */
+   int zlib_text_method;           /* holds zlib compression method */
+   int zlib_text_window_bits;      /* holds zlib compression window bits */
+   int zlib_text_mem_level;        /* holds zlib compression memory level */
+   int zlib_text_strategy;         /* holds zlib compression strategy */
+#endif
+/* End of material added at libpng 1.5.4 */
 
    png_uint_32 width;         /* width of image in pixels */
    png_uint_32 height;        /* height of image in pixels */
@@ -87,6 +114,7 @@ struct png_struct_def
    png_bytep avg_row;         /* buffer to save "avg" row when filtering */
    png_bytep paeth_row;       /* buffer to save "Paeth" row when filtering */
    png_row_info row_info;     /* used for transformation routines */
+   png_size_t info_rowbytes;  /* Added in 1.5.4: cache of updated row bytes */
 
    png_uint_32 idat_size;     /* current IDAT size for read */
    png_uint_32 crc;           /* current chunk CRC value */
@@ -111,7 +139,8 @@ struct png_struct_def
    png_uint_16 filler;           /* filler bytes for pixel expansion */
 #endif
 
-#ifdef PNG_bKGD_SUPPORTED
+#if defined(PNG_bKGD_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED) ||\
+   defined(PNG_READ_ALPHA_MODE_SUPPORTED)
    png_byte background_gamma_type;
    png_fixed_point background_gamma;
    png_color_16 background;   /* background color in screen gamma space */
@@ -212,7 +241,7 @@ struct png_struct_def
 #endif
 
 #ifdef PNG_TIME_RFC1123_SUPPORTED
-   png_charp time_buffer; /* String to hold RFC 1123 time text */
+   char time_buffer[29]; /* String to hold RFC 1123 time text */
 #endif
 
 /* New members added in libpng-1.0.6 */
@@ -229,13 +258,20 @@ struct png_struct_def
    png_bytep chunk_list;
 #endif
 
+#ifdef PNG_READ_sRGB_SUPPORTED
+   /* Added in 1.5.5 to record an sRGB chunk in the png. */
+   png_byte is_sRGB;
+#endif
+
 /* New members added in libpng-1.0.3 */
 #ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
    png_byte rgb_to_gray_status;
+   /* Added in libpng 1.5.5 to record setting of coefficients: */
+   png_byte rgb_to_gray_coefficients_set;
    /* These were changed from png_byte in libpng-1.0.6 */
    png_uint_16 rgb_to_gray_red_coeff;
    png_uint_16 rgb_to_gray_green_coeff;
-   png_uint_16 rgb_to_gray_blue_coeff;
+   /* deleted in 1.5.5: rgb_to_gray_blue_coeff; */
 #endif
 
 /* New member added in libpng-1.0.4 (renamed in 1.0.9) */

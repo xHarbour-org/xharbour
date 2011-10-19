@@ -4,7 +4,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * Last changed in libpng 1.5.2 [March 31, 2011]
+ * Last changed in libpng 1.5.4 [July 7, 2011]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -445,7 +445,11 @@ png_do_strip_channel(png_row_infop row_info, png_bytep row, int at_start)
    /* At the start sp will point to the first byte to copy and dp to where
     * it is copied to.  ep always points just beyond the end of the row, so
     * the loop simply copies (channels-1) channels until sp reaches ep.
+    *
+    * at_start:        0 -- convert AG, XG, ARGB, XRGB, AAGG, XXGG, etc.
+    *            nonzero -- convert GA, GX, RGBA, RGBX, GGAA, RRGGBBXX, etc.
     */
+
    /* GA, GX, XG cases */
    if (row_info->channels == 2)
    {
@@ -453,7 +457,7 @@ png_do_strip_channel(png_row_infop row_info, png_bytep row, int at_start)
       {
          if (at_start) /* Skip initial filler */
             ++sp;
-         else          /* Skip initial channels and, for sp, the filler */
+         else          /* Skip initial channel and, for sp, the filler */
             sp += 2, ++dp;
 
          /* For a 1 pixel wide image there is nothing to do */
@@ -465,9 +469,9 @@ png_do_strip_channel(png_row_infop row_info, png_bytep row, int at_start)
 
       else if (row_info->bit_depth == 16)
       {
-         if (at_start)
+         if (at_start) /* Skip initial filler */
             sp += 2;
-         else
+         else          /* Skip initial channel and, for sp, the filler */
             sp += 4, dp += 2;
 
          while (sp < ep)
@@ -505,9 +509,9 @@ png_do_strip_channel(png_row_infop row_info, png_bytep row, int at_start)
 
       else if (row_info->bit_depth == 16)
       {
-         if (at_start)
+         if (at_start) /* Skip initial filler */
             sp += 2;
-         else
+         else          /* Skip initial channels and, for sp, the filler */
             sp += 8, dp += 6;
 
          while (sp < ep)

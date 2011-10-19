@@ -8,6 +8,63 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-10-20 05:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/pcre/config.h
+  * source/rtl/pcre/config.h.generic
+  * source/rtl/pcre/pcre.h
+  * source/rtl/pcre/pcre.h.generic
+  * source/rtl/pcre/pcreposix.c
+  * source/rtl/pcre/pcreposix.h
+  * source/rtl/pcre/pcre_chartables.c
+  * source/rtl/pcre/pcre_chartables.c.dist
+  * source/rtl/pcre/pcre_compile.c
+  * source/rtl/pcre/pcre_config.c
+  * source/rtl/pcre/pcre_dfa_exec.c
+  * source/rtl/pcre/pcre_exec.c
+  * source/rtl/pcre/pcre_fullinfo.c
+  * source/rtl/pcre/pcre_get.c
+  * source/rtl/pcre/pcre_globals.c
+  * source/rtl/pcre/pcre_info.c
+  * source/rtl/pcre/pcre_internal.h
+  * source/rtl/pcre/pcre_maketables.c
+  * source/rtl/pcre/pcre_newline.c
+  * source/rtl/pcre/pcre_ord2utf8.c
+  * source/rtl/pcre/pcre_printint.src
+  * source/rtl/pcre/pcre_refcount.c
+  * source/rtl/pcre/pcre_scanner.h
+  * source/rtl/pcre/pcre_study.c
+  * source/rtl/pcre/pcre_tables.c
+  * source/rtl/pcre/pcre_try_flipped.c
+  * source/rtl/pcre/pcre_ucd.c
+  * source/rtl/pcre/pcre_valid_utf8.c
+  * source/rtl/pcre/pcre_version.c
+  * source/rtl/pcre/pcre_xclass.c
+    ! updated to version 8.13
+
+  * contrib/png/png.c
+  * contrib/png/png.h
+  * contrib/png/pngconf.h
+  * contrib/png/pngdebug.h
+  * contrib/png/pngerror.c
+  * contrib/png/pngget.c
+  * contrib/png/pnginfo.h
+  * contrib/png/pnglibconf.h
+  * contrib/png/pngmem.c
+  * contrib/png/pngpread.c
+  * contrib/png/pngpriv.h
+  * contrib/png/pngread.c
+  * contrib/png/pngrio.c
+  * contrib/png/pngrtran.c
+  * contrib/png/pngrutil.c
+  * contrib/png/pngset.c
+  * contrib/png/pngstruct.h
+  * contrib/png/pngtrans.c
+  * contrib/png/pngwio.c
+  * contrib/png/pngwrite.c
+  * contrib/png/pngwtran.c
+  * contrib/png/pngwutil.c
+    ! updated to version 1.5.5
+
 2011-10-20 04:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rdd/dbf1.c
     ! fix error when appending datime value as per Ella's report.
