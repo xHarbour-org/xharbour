@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-10-20 04:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rdd/dbf1.c
+    ! fix error when appending datime value as per Ella's report.
+
 2011-09-30 11:23 Luiz Rafael Culik <luiz at xharbour.com.br>
   * contrib/tipssl/smtpcln.prg
     ! minor fix to open and opensecure methods
