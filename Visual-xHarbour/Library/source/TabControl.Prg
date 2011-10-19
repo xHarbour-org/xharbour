@@ -1403,6 +1403,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD __SetVisible( lVisible, lForce ) CLASS TabPage
    DEFAULT lForce TO .F.
+   view procname(1), procline(1)
    IF ( lVisible != ::Visible .OR. lForce ) .AND. ::__ClassInst == NIL .AND. ::hWnd != NIL
       IF !lVisible
          ::__Hide()
