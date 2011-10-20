@@ -75,7 +75,8 @@ CLASS TabControl INHERIT Control
    DATA __ColorTable     PROTECTED 
 
    DATA __aDel           PROTECTED INIT {}
-   
+   DATA __UpDn           PROTECTED
+
    PROPERTY TabPosition  READ xTabPosition WRITE __SetTabPosition DEFAULT 2 INVERT
    DATA EnumTabPosition  EXPORTED INIT { { "Left", "Top", "Right", "Bottom" }, {1,2,3,4} }
 
@@ -502,7 +503,7 @@ METHOD OnWindowPaint() CLASS TabControl
    LOCAL hDC, cPaint, aRect, n, nSel, hBrush, lTop, nItems
    LOCAL lVert, x, y, nTextHeight, nTop, nState, nPart
    LOCAL nLeft, nRight, nBottom, aCover, aItem
-   LOCAL aBackRect, aFramRect
+   LOCAL aBackRect, aFramRect, hWnd
    LOCAL rc, tci//, oChild, hMemDC1, hOldBitmap1
    LOCAL hMemDC, hMemBitmap, hOldBitmap, hOldFont, aText, sz := (struct SIZE)
    IF !::Flat
@@ -510,7 +511,20 @@ METHOD OnWindowPaint() CLASS TabControl
          RETURN NIL
       ENDIF
    ENDIF
+
+   IF !::ShowTabs .AND. ::__UpDn == NIL
+      hWnd := GetWindow( ::hWnd, GW_CHILD | GW_HWNDFIRST )
+      WHILE hWnd <> 0
+         IF GetClassName( hWnd ) == "msctls_updown32" 
+            ::__UpDn := hWnd
+            DestroyWindow( hWnd )
+            EXIT
+         ENDIF
+         hWnd := GetWindow( hWnd, GW_HWNDNEXT )
+      ENDDO
+   ENDIF
    
+
    rc  := (struct RECT)
    tci := (struct TCITEM)
 
@@ -1403,7 +1417,6 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD __SetVisible( lVisible, lForce ) CLASS TabPage
    DEFAULT lForce TO .F.
-   view procname(1), procline(1)
    IF ( lVisible != ::Visible .OR. lForce ) .AND. ::__ClassInst == NIL .AND. ::hWnd != NIL
       IF !lVisible
          ::__Hide()
