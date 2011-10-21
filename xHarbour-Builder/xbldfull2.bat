@@ -181,8 +181,8 @@ REM  ===============================================
 REM  IF NOT "%_XB_Compiler%"=="xcc" GOTO No_xBuild
 
         REM - Can not build inplace because file is in-use!
-        \xhb\bin\xbuild.exe \xharbour\bin\xBuild.exe \xharbour.com\xharbour-xbuild\xBuild.prg \xharbour.com\xharbour-xbuild\tproject.prg -New -x\xhb -NoXbp -o\xbp\%_XB_Compiler%\xBuild-1.exe
-        \xharbour\bin\xbuild.exe \xhb\bin\xBuild.exe \xharbour.com\xharbour-xbuild\xBuild.prg \xharbour.com\xharbour-xbuild\tproject.prg -New -x\xhb -NoXbp -o\xbp\%_XB_Compiler%\xBuild-2.exe
+        \xhb\bin\xbuild.exe \xharbour\bin\xBuild.exe \xharbour.com\xharbour-xbuild\xBuild.prg \xharbour.com\xharbour-xbuild\tproject.prg \xharbour.com\xharbour-xbuild\tproject-c.prg -New -x\xhb -NoXbp -o\xbp\%_XB_Compiler%\xBuild-1.exe
+        \xharbour\bin\xbuild.exe \xhb\bin\xBuild.exe \xharbour.com\xharbour-xbuild\xBuild.prg \xharbour.com\xharbour-xbuild\tproject.prg \xharbour.com\xharbour-xbuild\tproject-c.prg -New -x\xhb -NoXbp -o\xbp\%_XB_Compiler%\xBuild-2.exe
         IF EXIST \xharbour\bin\xBuild.exe DEL \xharbour\bin\xBuild.exe
 
         IF "%_BUILD_DEMO%"=="NO" GOTO No_xBuild_Demo

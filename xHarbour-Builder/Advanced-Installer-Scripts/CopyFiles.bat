@@ -167,6 +167,11 @@ REM ===============================================
     COPY "C:\xHB\Lib\WVW.lib" "%RC_To%"
     COPY "C:\xHB\Lib\XDO.lib" "%RC_To%"
 
+REM TipSSL:
+    COPY "C:\xHB\Lib\TipSSL.lib" "%RC_To%"
+    COPY "C:\OpenSSL\lib\libeay32.lib" "%RC_To%"
+    COPY "C:\OpenSSL\lib\SSLeay32.lib" "%RC_To%"
+
     COPY "W:\xHarbour.com\xHarbour-Builder\bgd.lib" "%RC_To%"
     COPY "W:\xHarbour.com\FreeImage\FreeImage.lib" "%RC_To%"
     COPY "W:\xHarbour.com\xHarbour-SQLRDD\lib\*.lib" "%RC_To%"
@@ -187,6 +192,10 @@ REM ===============================================
     ROBOCOPY "W:\xHarbour.com\xHarbour-SQLRDD\dll" "%RC_To%\SQLRDD" *.* /NS /NC /NP /S /XD %RC_Exclude_Folder%
     ROBOCOPY "W:\xHarbour.com\xHarbour-ApolloRDD\dll" "%RC_To%\ApolloRDD" *.* /NS /NC /NP /S /XD %RC_Exclude_Folder%
 
+REM TipSSL:
+    COPY C:\OpenSSL\Libeay32.dll "%RC_To%"
+	COPY C:\OpenSSL\SSLeay32.dll "%RC_To%"
+	
 
 REM ===============================================
 REM                /Common/sample
