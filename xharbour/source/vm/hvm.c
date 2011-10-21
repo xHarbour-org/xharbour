@@ -4180,7 +4180,7 @@ static void hb_vmAddInt( HB_ITEM_PTR pResult, LONG lAdd )
          dNewVal = ( double ) lResult;
       }
    }
-   else if( HB_IS_DATE( pResult ) )
+   else if( HB_IS_DATETIME( pResult ) )
    {
       pResult->item.asDate.value += lAdd;
       return;
