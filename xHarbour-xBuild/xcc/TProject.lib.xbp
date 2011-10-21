@@ -29,3 +29,8 @@ TARGETFOLDER = \xhb\lib
 MYC_FLAGS = 
 MYDEFINES =
 MYPRG_FLAGS = 
+
+[\xHarbour.com\xHarbour-xBuild\tproject-c.prg]
+MYC_FLAGS = 
+MYDEFINES =
+MYPRG_FLAGS = 
