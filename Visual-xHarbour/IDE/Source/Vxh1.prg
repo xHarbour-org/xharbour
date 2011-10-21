@@ -4498,21 +4498,16 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
 
    cPath := ::Properties:Path
 
-   //CreateDirectory( cPath + "\" + ::Properties:Binary )
-   //CreateDirectory( cPath + "\" + ::Properties:Objects )
-   //CreateDirectory( cPath + "\" + ::Properties:Source )
-   //CreateDirectory( cPath + "\" + ::Properties:Resource )
-
    IF lNew  .OR. ! IsDirectory( cPath )
       MakeDir( cPath )
    ENDIF
-   DirChange( cPath )
+   //DirChange( cPath )
 
    IF lNew .OR. ! IsDirectory( ::Properties:Binary )
-      MakeDir( ::Properties:Binary )
-      MakeDir( ::Properties:Objects )
-      MakeDir( ::Properties:Source )
-      MakeDir( ::Properties:Resource )
+      MakeDir( cPath + "\" + ::Properties:Binary )
+      MakeDir( cPath + "\" + ::Properties:Objects )
+      MakeDir( cPath + "\" + ::Properties:Source )
+      MakeDir( cPath + "\" + ::Properties:Resource )
    ENDIF
 
    IF cPrevPath != NIL
@@ -4857,6 +4852,7 @@ METHOD GenerateChild( oCtrl, nTab, aChildEvents, cColon, cParent, nID ) CLASS Pr
    LOCAL cText := "", oChild, Topic, Event, n, cProp, cChild
    ( cColon )
    ( nID )
+   oCtrl:Application:Yield()
    IF oCtrl:Caption != "[ Add New Item ]"
 
       IF !oCtrl:__CustomOwner
@@ -5139,7 +5135,7 @@ RETURN cText
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD ResetQuickOpen( cFile ) CLASS Project
-   LOCAL lMems, aEntries, n, oItem, nBkHeight, oLink, x
+   LOCAL lMems, aEntries, n, oItem, nBkHeight, oLink, x, lLink := .T.
 
    aEntries := ::Application:IniFile:GetEntries( "Recent" )
    IF ! EMPTY( aEntries ) .AND. cFile != NIL .AND. aEntries[1] == cFile
@@ -5164,48 +5160,49 @@ METHOD ResetQuickOpen( cFile ) CLASS Project
       ENDIF
    ENDIF
 
-   AEVAL( aEntries, {|c| ::Application:IniFile:WriteString( "Recent", c, "" ) } )
+   nBkHeight := 35
+   // Reset StartPage and Open Dropdown menu
 
-   // Reset Open Dropdown menu
-   WITH OBJECT ::Application:Props[ "OpenBttn" ]   // Open Button
-      FOR n := 1 TO LEN( aEntries )
+   FOR n := 1 TO LEN( aEntries )
+       ::Application:IniFile:WriteString( "Recent", aEntries[n], "" )
+
+       WITH OBJECT ::Application:Props[ "OpenBttn" ]   // Open Button
           IF LEN( :Children ) < n
              oItem := MenuStripItem( :this )
              oItem:Create()
            ELSE
              oItem := :Children[n]
           ENDIF
-          oItem:Caption := aEntries[n]
-          oItem:Action  := {|o| ::Application:Project:Open( o:Caption ) }
-      NEXT
-   END
+       END
+       oItem:Caption := aEntries[n]
+       oItem:Action  := {|o| ::Application:Project:Open( o:Caption ) }
 
-   // Reset StartPage
-   nBkHeight := 35
-   FOR n := 1 TO LEN( aEntries )
-       x := RAT( "\", aEntries[n] )
-       IF LEN( ::Application:aoLinks ) < n
-          oLink := LinkLabel( ::Application:MainForm:Panel4 )
-          oLink:ImageIndex  := 32
-          oLink:Caption     := SUBSTR( aEntries[n], x + 1, LEN( aEntries[n] )-x-4 )
-          oLink:Left        := 30
-          oLink:Top         := nBkHeight + 2
-          oLink:Url         := aEntries[n]
-          oLink:Action      := {|o| ::Application:Project:Open( o:Url ) }
-          oLink:Font:Bold   := .T.
-          oLink:Create()
-          AADD( ::Application:aoLinks, oLink )
-        ELSE
-          oLink := ::Application:aoLinks[n]
-          oLink:Caption     := SUBSTR( aEntries[n], x + 1, LEN( aEntries[n] )-x-4 )
-          oLink:Url         := aEntries[n]
-          oLink:Action      := {|o| ::Application:Project:Open( o:Url ) }
+       IF lLink
+          x := RAT( "\", aEntries[n] )
+          IF LEN( ::Application:aoLinks ) < n
+             oLink := LinkLabel( ::Application:MainForm:Panel4 )
+             oLink:ImageIndex  := 32
+             oLink:Caption     := SUBSTR( aEntries[n], x + 1, LEN( aEntries[n] )-x-4 )
+             oLink:Left        := 30
+             oLink:Top         := nBkHeight + 2
+             oLink:Url         := aEntries[n]
+             oLink:Action      := {|o| ::Application:Project:Open( o:Url ) }
+             oLink:Font:Bold   := .T.
+             oLink:Create()
+             AADD( ::Application:aoLinks, oLink )
+           ELSE
+             oLink := ::Application:aoLinks[n]
+             oLink:Caption     := SUBSTR( aEntries[n], x + 1, LEN( aEntries[n] )-x-4 )
+             oLink:Url         := aEntries[n]
+             oLink:Action      := {|o| ::Application:Project:Open( o:Url ) }
+          ENDIF
        ENDIF
        nBkHeight := oLink:Top + oLink:Height
        IF nBkHeight > oLink:Parent:Height-( (oLink:Height*3 )*1.5)
-          EXIT
+          lLink := .F.  
        ENDIF
    NEXT
+
    ::Application:GenerateMembers := lMems
 
 RETURN Self
@@ -5314,7 +5311,7 @@ METHOD Build( lForce ) CLASS Project
 
       cPath := ::Properties:Path
 
-      DirChange( cPath )
+      //DirChange( cPath )
 
       cProject := cPath + "\" + ::Properties:Name + aTargetTypes[ ::Properties:TargetType ]
       IF !EMPTY( ::Properties:TargetName ) //.AND. ::Properties:TargetType < 4
@@ -5333,8 +5330,8 @@ METHOD Build( lForce ) CLASS Project
          :RunArguments     := ::Properties:Parameters
          :lNoAutoFWH       := .T.
 
-         CreateDirectory( cObjPath )
-         CreateDirectory( cBinPath )
+         //CreateDirectory( cObjPath )
+         //CreateDirectory( cBinPath )
 
          IF !EMPTY( ::Properties:Definitions )
             ::Properties:Definitions := "; " + ::Properties:Definitions
