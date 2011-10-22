@@ -636,7 +636,7 @@ RETURN oDoc
 //-----------------------------------------------------------------------------------------------
 METHOD Run( oDoc, oWait ) CLASS VrReport
    LOCAL nHeight, hDC, nSubHeight, nTotHeight, nCount, nPer, nPos, nRow, oData, hCtrl, hData := {=>}
-   LOCAL xValue, cFilter, cData, oIni, cEntry, aRelation, aRelations, cRelation
+   LOCAL xValue, cFilter, cData, oIni, cEntry, aRelation, aRelations, cRelation, e
    
    ::Create()
 
@@ -660,7 +660,16 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
              IF !EMPTY( hCtrl:Alias )
                 oData:Alias := hCtrl:Alias
              ENDIF
-             oData:Create()
+             TRY
+                oData:Create()
+             CATCH e
+                MessageBox( GetActiveWindow(), "An error has ocurred opening the main file please check the correct driver has been set for this file" + CRLF + CRLF +;
+                                                                                                                       "Description: " + e:Description + CRLF +;
+                                                                                                                       "Operation: " + e:Operation + CRLF +;
+                                                                                                                       "Code: " + xStr(e:GenCode) + CRLF +;
+                                                                                                                       "SubCode: " + xStr(e:SubCode), "Error Opening " + hCtrl:FileName )
+                RETURN .F.
+             END
              IF HGetPos( hCtrl, "Filter" ) > 0  .AND. ! EMPTY( hCtrl:Filter )
                 cFilter := BuildFilterExp( hCtrl:Filter )
                 IF cFilter == NIL

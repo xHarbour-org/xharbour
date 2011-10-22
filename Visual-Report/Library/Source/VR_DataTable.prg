@@ -86,7 +86,7 @@ METHOD Create( lSuper ) CLASS VrDataTable
 RETURN Self
 
 METHOD Configure() CLASS VrDataTable
-   LOCAL cAlias, nCnn, oIni, cEntry
+   LOCAL cAlias, nCnn, oIni, cEntry, e
    WITH OBJECT ::EditCtrl
       :xFileName := ::FileName
       :Driver   := ::Driver
@@ -107,7 +107,18 @@ METHOD Configure() CLASS VrDataTable
          IF ! FILE( ::FileName )
             MessageBox( 0, "File not found", ::FileName )
           ELSE
-            :Create()
+
+             TRY
+                :Create()
+             CATCH e
+                MessageBox( GetActiveWindow(), "An error has ocurred opening the main file please check the correct driver has been set for this file" + CRLF + CRLF +;
+                                                                                                                      "Description: " + e:Description + CRLF +;
+                                                                                                                      "Operation: " + e:Operation + CRLF +;
+                                                                                                                      "Code: " + xStr(e:GenCode) + CRLF +;
+                                                                                                                      "SubCode: " + xStr(e:SubCode), "Error Opening " + ::FileName )
+                RETURN .F.
+             END
+
          ENDIF
       ENDIF
    END

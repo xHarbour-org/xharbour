@@ -257,7 +257,10 @@ METHOD SetValue( xValue, cCaption ) CLASS PropEditor
    ENDIF
 
    IF UPPER(cProp) == "DRIVER"
-      ::ActiveObject:Create(.F.)
+      TRY
+         ::ActiveObject:Create(.F.)
+      CATCH
+      END
       ::ResetProperties(,,.T.)
    ENDIF
 
@@ -967,7 +970,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
                                                  oPar:SetValue( ::ActiveObject:Enum&c[2][n+1] ) }
           xValue := NIL
 
-        ELSEIF UPPER(cProp) IN {"ORDER"} .AND. ::ActiveObject:ClsName == "DataTable" .AND. ::ActiveObject:Driver != "SQLRDD"
+        ELSEIF UPPER(cProp) IN {"ORDER"} .AND. ::ActiveObject:ClsName == "DataTable" .AND. ::ActiveObject:Driver != "SQLRDD" .AND. ! ( ::ActiveObject:Driver == "DBF" )
           aCol[1]:ColType := "ORDER"
           aCol[1]:Value   := { "", { NIL } }
           IF ::ActiveObject:EditCtrl:IsOpen
