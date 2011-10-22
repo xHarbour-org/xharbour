@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-10-22 09:26 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/common/hbver.c
+    ! Intel C++ version 12.1 Build 6: __ICL returns 9999 while as documented
+      it should return 1210. Apply work around to display correct compiler
+      version.
+
+2011-10-22 08:44 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * ChangeLog
+    ! correction on log entry to my latest commit
+
 2011-10-22 08:36 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/pcre/config.h
   * source/rtl/pcre/config.h.generic

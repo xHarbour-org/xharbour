@@ -529,8 +529,16 @@ char * hb_verCompiler( void )
       hb_strncpy( szSub, "++", sizeof( szSub ) - 1 );
    #endif
 
-   iVerMajor = __ICL / 100;
-   iVerMinor = __ICL % 100;
+   if ( (__ICL==9999) && (__INTEL_COMPILER_BUILD_DATE==20110811) )
+   {
+      iVerMajor = 12;
+      iVerMinor = 1;
+   }
+   else
+   {
+      iVerMajor = __ICL / 100;
+      iVerMinor = __ICL % 100;
+   }
    iVerPatch = 0;
 
 #elif defined(_MSC_VER)
