@@ -1,7 +1,6 @@
 /*
  * $Id$
  */
-
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
 *************************************************/
@@ -168,7 +167,8 @@ static const uschar coptable[] = {
   0,                             /* Assert not                             */
   0,                             /* Assert behind                          */
   0,                             /* Assert behind not                      */
-  0, 0, 0, 0, 0, 0,              /* ONCE, BRA, BRAPOS, CBRA, CBRAPOS, COND */
+  0, 0,                          /* ONCE, ONCE_NC                          */
+  0, 0, 0, 0, 0,                 /* BRA, BRAPOS, CBRA, CBRAPOS, COND       */
   0, 0, 0, 0, 0,                 /* SBRA, SBRAPOS, SCBRA, SCBRAPOS, SCOND  */
   0, 0,                          /* CREF, NCREF                            */
   0, 0,                          /* RREF, NRREF                            */
@@ -236,7 +236,8 @@ static const uschar poptable[] = {
   0,                             /* Assert not                             */
   0,                             /* Assert behind                          */
   0,                             /* Assert behind not                      */
-  0, 0, 0, 0, 0, 0,              /* ONCE, BRA, BRAPOS, CBRA, CBRAPOS, COND */
+  0, 0,                          /* ONCE, ONCE_NC                          */
+  0, 0, 0, 0, 0,                 /* BRA, BRAPOS, CBRA, CBRAPOS, COND       */
   0, 0, 0, 0, 0,                 /* SBRA, SBRAPOS, SCBRA, SCBRAPOS, SCOND  */
   0, 0,                          /* CREF, NCREF                            */
   0, 0,                          /* RREF, NRREF                            */
@@ -772,7 +773,7 @@ for (;;)
                 current_subject > start_subject + md->start_offset)))
           {
           if (match_count < 0) match_count = (offsetcount >= 2)? 1 : 0;
-            else if (match_count > 0 && ++match_count * 2 >= offsetcount)
+            else if (match_count > 0 && ++match_count * 2 > offsetcount)
               match_count = 0;
           count = ((match_count == 0)? offsetcount : match_count * 2) - 2;
           if (count > 0) memmove(offsets + 2, offsets, count * sizeof(int));
@@ -2793,6 +2794,7 @@ for (;;)
 
       /*-----------------------------------------------------------------*/
       case OP_ONCE:
+      case OP_ONCE_NC:
         {
         int local_offsets[2];
         int local_workspace[1000];
@@ -3331,7 +3333,7 @@ for (;;)
     disabling is explicitly requested (and of course, by the test above, this
     code is not obeyed when restarting after a partial match). */
 
-    if ((options & PCRE_NO_START_OPTIMIZE) == 0 &&
+    if (((options | re->options) & PCRE_NO_START_OPTIMIZE) == 0 &&
         (options & (PCRE_PARTIAL_HARD|PCRE_PARTIAL_SOFT)) == 0)
       {
       /* If the pattern was studied, a minimum subject length may be set. This

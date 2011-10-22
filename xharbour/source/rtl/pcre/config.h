@@ -3,7 +3,7 @@
  */
 #ifndef _CONFIG_H
    #define _CONFIG_H
-   
+
    #include "hbsetup.h"
 
    #define SUPPORT_UTF8
@@ -12,6 +12,9 @@
    #if defined( _MSC_VER )
       #pragma warning( disable: 4018 )
       #pragma warning( disable: 4065 )
+      #if ( _MSC_VER >= 1400 )
+         #define _CRT_SECURE_NO_WARNINGS
+      #endif
    #endif
 
    #if defined( __BORLANDC__ )
