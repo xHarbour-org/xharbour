@@ -5736,7 +5736,7 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
              cText += ::GenerateChild( oChild, 3, @aChildEvents, "::", "Self", nPos )
           ENDIF
           nPos++
-          view oChild:Name, Seconds()-nSecs
+          //view oChild:Name, Seconds()-nSecs
       NEXT
       IF UPPER(cClsName) == "WINDOW" .OR. UPPER(cClsName) == "MDICHILDWINDOW" .OR. UPPER(cClsName) == "WINFORM"
          cText += "   ::Show()" + CRLF + CRLF
