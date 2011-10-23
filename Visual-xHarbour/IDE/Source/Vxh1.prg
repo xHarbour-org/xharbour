@@ -4624,13 +4624,9 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
 
        IF ::Forms[n]:__lModified .OR. lForce
 
-          //nSecs := Seconds()
-
           aChildEvents := {}
           
           cWindow := ::GenerateControl( ::Forms[n], "", IIF( ::Forms[n]:MDIChild, "MDIChildWindow", IIF( ::Forms[n]:Modal, "Dialog", IIF( AT( "Window", ::Forms[n]:Name ) > 0, "Window", "WinForm" ) ) ), .F., n, @aChildEvents, @nInsMetPos, ::Forms[n]:lCustom )
-
-          //view Seconds()-nSecs
 
           cChildEvents := ""
           FOR EACH cEvent IN aChildEvents
@@ -5551,7 +5547,7 @@ RETURN .T.
 METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, nInsMetPos, lCustom ) CLASS Project
    LOCAL cText
    LOCAL oChild, Event, n, cResImg, Topic, oCtrl, nPos
-   LOCAL cProperty, cChar, aImg
+   LOCAL cProperty, cChar, aImg, nSecs
    ( lChildren )
 
    cText := "//------------------------------------------------------------------------------------------------------------------------------------" + CRLF
@@ -5721,6 +5717,7 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
    IF !oWnd:Modal
       nPos := 1
       FOR EACH oChild IN oWnd:Children
+          nSecs := Seconds()
           IF oChild:ClsName == "CMenuItem"
              cProperty := ""
 
@@ -5739,6 +5736,7 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
              cText += ::GenerateChild( oChild, 3, @aChildEvents, "::", "Self", nPos )
           ENDIF
           nPos++
+          view oChild:Name, Seconds()-nSecs
       NEXT
       IF UPPER(cClsName) == "WINDOW" .OR. UPPER(cClsName) == "MDICHILDWINDOW" .OR. UPPER(cClsName) == "WINFORM"
          cText += "   ::Show()" + CRLF + CRLF
