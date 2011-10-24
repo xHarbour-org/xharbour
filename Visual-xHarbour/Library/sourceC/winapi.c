@@ -9005,7 +9005,6 @@ HB_FUNC ( INTERNETATTEMPTCONNECT )
    hb_retnl( (ULONG) InternetAttemptConnect( 0 ) );
 }
 
-
 //void CALLBACK InternetStatusCallback( HINTERNET hInternet, DWORD dwContext, DWORD dwInternetStatus, LPVOID lpvStatusInformation, DWORD dwStatusInformationLength )
 //{
 //}
