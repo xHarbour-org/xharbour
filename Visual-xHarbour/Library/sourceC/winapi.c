@@ -27,7 +27,6 @@
 #pragma comment( lib, "wincore.lib" )
 #pragma comment( lib, "version.lib")
 #pragma comment( lib, "Rpcrt4.lib")
-#pragma comment( lib, "Crypt32.lib")
 
 
 #define _WIN32_WINNT 0x0500
@@ -66,7 +65,6 @@
 #include <shlwapi.h>
 #include <Rpc.h>
 #include <ole2.h>
-#include <Wincrypt.h>
 
 typedef struct _DWM_BLURBEHIND {
     DWORD dwFlags;
