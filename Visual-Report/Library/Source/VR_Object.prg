@@ -66,6 +66,7 @@ CLASS VrObject
    METHOD Configure()      VIRTUAL
    METHOD Delete()
    METHOD __GetDataSource()
+   METHOD GetProps()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS VrObject
@@ -114,6 +115,19 @@ METHOD Delete() CLASS VrObject
       ADEL( ::Application:aNames, n, .T. )
    ENDIF
 RETURN Self
+
+METHOD GetProps() CLASS VrObject
+   LOCAL xVal, n, cProp, aProps := {}
+   FOR n := 1 TO LEN( ::aProperties )
+       cProp := ::aProperties[n][1]
+       xVal  := ::&cProp
+       IF VALTYPE( xVal ) $ "NCLD"
+          AADD( aProps, { cProp, xVal } )
+       ENDIF
+   NEXT
+   AINS( aProps, 1, { "ClsName", ::ClassName } )
+   AINS( aProps, 2, { "Parent", ::Parent } )
+RETURN aProps
 
 METHOD SetControlName( cProp ) CLASS VrObject
    LOCAL n := 1

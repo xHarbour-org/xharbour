@@ -271,24 +271,36 @@ METHOD Init() CLASS MainForm
          :ImageList := :Parent:ImageList
          :Create()
 
-         WITH OBJECT MenuStripItem( :this )
+         WITH OBJECT ::Application:Props[ "EditMenuCopy" ] := MenuStripItem( :this )
             :ImageIndex := ::System:StdIcons:Copy
-            :Enabled := .F.
+            :Enabled := .T.
             :Caption := "&Copy"
+            :Action  := <||
+                           ::Application:Report:aCopy := ::Application:Props:PropEditor:ActiveObject:GetProps()
+                        >
             :Create()
          END
 
-         WITH OBJECT MenuStripItem( :this )
+         WITH OBJECT ::Application:Props[ "EditMenuCut" ] := MenuStripItem( :this )
             :ImageIndex := ::System:StdIcons:Cut
             :Enabled := .F.
             :Caption := "&Cut"
             :Create()
          END
 
-         WITH OBJECT MenuStripItem( :this )
+         WITH OBJECT ::Application:Props[ "EditMenuPaste" ] := MenuStripItem( :this )
             :ImageIndex := ::System:StdIcons:Paste
-            :Enabled := .F.
+            :Enabled := .T.
             :Caption := "&Paste"
+            :Action  := <|n, oObj, cProp|
+                           oObj := ::Application:Report:aCopy[2][2]:CreateControl( ::Application:Report:aCopy[1][2], 0, 0 )
+                           FOR n := 3 TO LEN( ::Application:Report:aCopy )
+                               cProp := ::Application:Report:aCopy[n][1]
+                               oObj:&cProp := ::Application:Report:aCopy[n][2]
+                               view cProp
+                           NEXT
+                           ::Application:Report:aCopy := NIL
+                        >
             :Create()
          END
 
@@ -679,6 +691,7 @@ CLASS Report
    DATA xModified     EXPORTED INIT .F.
    DATA xFileName     EXPORTED INIT ""
    DATA oXMLDoc       EXPORTED
+   DATA aCopy         EXPORTED
    
    ACCESS Modified    INLINE ::xModified
    ASSIGN Modified(l) INLINE oApp:MainForm:Caption := "Visual Report [" + ::GetName() + "]" + IIF( l, " *", "" ), ::xModified := l
