@@ -292,16 +292,25 @@ METHOD Init() CLASS MainForm
             :ImageIndex := ::System:StdIcons:Paste
             :Enabled := .T.
             :Caption := "&Paste"
-            :Action  := <|n, oObj, cProp, hPointer|
+            :Action  := <|n, oObj, cProp, hPointer, i|
                            hPointer := HB_FuncPtr( ::Application:Report:aCopy[1][2] )
                            oObj := HB_Exec( hPointer,, ::Application:Report:aCopy[2][2] )
                            oObj:__ClsInst := __ClsInst( oObj:ClassH )
-
+                           oObj:Create()
                            FOR n := 3 TO LEN( ::Application:Report:aCopy )
                                cProp := ::Application:Report:aCopy[n][1]
-                               __objSendMsg( oObj, "_" + cProp, ::Application:Report:aCopy[n][2] )
+                               IF cProp != "Name"
+                                  IF VALTYPE( ::Application:Report:aCopy[n][2] ) != "O"
+                                     __objSendMsg( oObj, "_" + cProp, ::Application:Report:aCopy[n][2] )
+                                   ELSEIF UPPER( ::Application:Report:aCopy[n][1] ) == "FONT"
+                                     oObj:Font:FaceName  := ::Application:Report:aCopy[n][2]:FaceName
+                                     oObj:Font:PointSize := ::Application:Report:aCopy[n][2]:PointSize
+                                     oObj:Font:Italic    := ::Application:Report:aCopy[n][2]:Italic
+                                     oObj:Font:Bold      := ::Application:Report:aCopy[n][2]:Bold
+                                     oObj:Font:Underline := ::Application:Report:aCopy[n][2]:Underline
+                                  ENDIF
+                               ENDIF
                            NEXT
-                           oObj:Create()
                         >
             :Create()
          END

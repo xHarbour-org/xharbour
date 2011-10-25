@@ -121,9 +121,7 @@ METHOD GetProps() CLASS VrObject
    FOR n := 1 TO LEN( ::aProperties )
        cProp := ::aProperties[n][1]
        xVal  := ::&cProp
-       IF VALTYPE( xVal ) $ "NCLD"
-          AADD( aProps, { cProp, xVal } )
-       ENDIF
+       AADD( aProps, { cProp, xVal } )
    NEXT
    AINS( aProps, 1, { "ClsName", ::ClassName } )
    AINS( aProps, 2, { "Parent", ::Parent } )
