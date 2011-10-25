@@ -273,45 +273,25 @@ METHOD Init() CLASS MainForm
 
          WITH OBJECT ::Application:Props[ "EditMenuCopy" ] := MenuStripItem( :this )
             :ImageIndex := ::System:StdIcons:Copy
-            :Enabled := .T.
-            :Caption := "&Copy"
-            :Action  := <||
-                           ::Application:Report:aCopy := ::Application:Props:PropEditor:ActiveObject:GetProps()
-                        >
+            :Enabled    := .T.
+            :Caption    := "&Copy"
+            :Action     := {|| ::Application:Report:EditCopy() }
             :Create()
          END
 
          WITH OBJECT ::Application:Props[ "EditMenuCut" ] := MenuStripItem( :this )
             :ImageIndex := ::System:StdIcons:Cut
-            :Enabled := .F.
-            :Caption := "&Cut"
+            :Enabled    := .F.
+            :Caption    := "&Cut"
+            :Action     := {|| ::Application:Report:EditCut() }
             :Create()
          END
 
          WITH OBJECT ::Application:Props[ "EditMenuPaste" ] := MenuStripItem( :this )
             :ImageIndex := ::System:StdIcons:Paste
-            :Enabled := .T.
-            :Caption := "&Paste"
-            :Action  := <|n, oObj, cProp, hPointer, i|
-                           hPointer := HB_FuncPtr( ::Application:Report:aCopy[1][2] )
-                           oObj := HB_Exec( hPointer,, ::Application:Report:aCopy[2][2] )
-                           oObj:__ClsInst := __ClsInst( oObj:ClassH )
-                           oObj:Create()
-                           FOR n := 3 TO LEN( ::Application:Report:aCopy )
-                               cProp := ::Application:Report:aCopy[n][1]
-                               IF cProp != "Name"
-                                  IF VALTYPE( ::Application:Report:aCopy[n][2] ) != "O"
-                                     __objSendMsg( oObj, "_" + cProp, ::Application:Report:aCopy[n][2] )
-                                   ELSEIF UPPER( ::Application:Report:aCopy[n][1] ) == "FONT"
-                                     oObj:Font:FaceName  := ::Application:Report:aCopy[n][2]:FaceName
-                                     oObj:Font:PointSize := ::Application:Report:aCopy[n][2]:PointSize
-                                     oObj:Font:Italic    := ::Application:Report:aCopy[n][2]:Italic
-                                     oObj:Font:Bold      := ::Application:Report:aCopy[n][2]:Bold
-                                     oObj:Font:Underline := ::Application:Report:aCopy[n][2]:Underline
-                                  ENDIF
-                               ENDIF
-                           NEXT
-                        >
+            :Enabled    := .T.
+            :Caption    := "&Paste"
+            :Action     := {|| ::Application:Report:EditPaste() }
             :Create()
          END
 
@@ -451,6 +431,60 @@ METHOD Init() CLASS MainForm
          :Create()
       END
    END
+
+   WITH OBJECT ToolStrip( ::ToolStripContainer1 )
+      :Caption := "Edit"
+      :Row     := 2
+      :Create()
+      :ImageList := ImageList( :this, 16, 16 ):Create()
+      :ImageList:AddImage( IDB_STD_SMALL_COLOR )
+
+      WITH OBJECT ::Application:Props[ "EditCopyBttn" ] := ToolStripButton( :this )
+         :ImageIndex   := ::System:StdIcons:Copy
+         :ToolTip:Text := "Copy"
+         :Action       := {|| ::Application:Report:EditCopy() }
+         :Create()
+      END
+
+      WITH OBJECT ::Application:Props[ "EditCutBttn" ] := ToolStripButton( :this )
+         :ImageIndex   := ::System:StdIcons:Cut
+         :ToolTip:Text := "Cut"
+         :Action       := {||::Application:Report:EditCut() }
+         :Create()
+      END
+
+      WITH OBJECT ::Application:Props[ "EditPasteBttn" ] := ToolStripButton( :this )
+         :ImageIndex   := ::System:StdIcons:Paste
+         :ToolTip:Text := "Paste"
+         :Action       := {|| ::Application:Report:EditPaste() }
+         :Create()
+      END
+
+      WITH OBJECT ::Application:Props[ "EditDelBttn" ] := ToolStripButton( :this )
+         :ImageIndex   := ::System:StdIcons:Delete
+         :ToolTip:Text := "Delete"
+         :Action       := {|| ::Application:Report:EditDelete() }
+         :Create()
+      END
+
+      WITH OBJECT ::Application:Props[ "EditUndoBttn" ] := ToolStripButton( :this )
+         :ImageIndex   := ::System:StdIcons:Undo
+         :ToolTip:Text := "Undo"
+         :BeginGroup   := .T.
+         :Action       := {|| ::Application:Report:UnDo() }
+         :Enabled      := .F.
+         :Create()
+      END
+
+      WITH OBJECT ::Application:Props[ "EditRedoBttn" ] := ToolStripButton( :this )
+         :ImageIndex   := ::System:StdIcons:Redo
+         :ToolTip:Text := "Redo"
+         :Action       := {|| ::Application:Report:ReDo() }
+         :Enabled      := .F.
+         :Create()
+      END
+   END
+
 
    WITH OBJECT ToolStrip( ::ToolStripContainer1 )
       :Row := 2
@@ -718,11 +752,14 @@ CLASS Report
    METHOD ResetQuickOpen()
    METHOD GetName()
    METHOD GetRectangle() INLINE {0,0,0,0}
-   METHOD EditReset() INLINE NIL
+   METHOD EditReset()    INLINE NIL
    METHOD Generate()
    METHOD Run()
    METHOD PageSetup()
    METHOD SetScrollArea()
+   METHOD EditCopy()     INLINE ::aCopy := ACLONE( oApp:Props:PropEditor:ActiveObject:GetProps() )
+   METHOD EditCut()      INLINE ::EditCopy(), oApp:Props:PropEditor:ActiveObject:Delete()
+   METHOD EditPaste()
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -760,6 +797,36 @@ METHOD NewReport() CLASS Report
    oApp:Props:RepFooter:InvalidateRect()
    oApp:Props:ExtraPage:InvalidateRect()
 RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+
+METHOD EditPaste() CLASS Report
+   LOCAL n, oObj, cProp, hPointer
+   hPointer := HB_FuncPtr( ::aCopy[1][2] )
+   oObj := HB_Exec( hPointer,, ::aCopy[2][2] )
+   oObj:__ClsInst := __ClsInst( oObj:ClassH )
+   oObj:Create()
+   FOR n := 3 TO LEN( ::aCopy )
+       cProp := ::aCopy[n][1]
+       IF cProp != "Name"
+          IF VALTYPE( ::aCopy[n][2] ) != "O"
+             __objSendMsg( oObj, "_" + cProp, ::aCopy[n][2] )
+           ELSEIF UPPER( ::aCopy[n][1] ) == "FONT"
+             oObj:Font:FaceName  := ::aCopy[n][2]:FaceName
+             oObj:Font:PointSize := ::aCopy[n][2]:PointSize
+             oObj:Font:Italic    := ::aCopy[n][2]:Italic
+             oObj:Font:Bold      := ::aCopy[n][2]:Bold
+             oObj:Font:Underline := ::aCopy[n][2]:Underline
+          ENDIF
+       ENDIF
+   NEXT
+   oObj:Configure()
+   ::Modified := .T.
+   ::Application:Props:PropEditor:ResetProperties( {{ oObj }} )
+   IF ! oObj:lUI
+      ::Application:Props:Components:AddButton( oObj )
+   ENDIF
+RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD PageSetup() CLASS Report
