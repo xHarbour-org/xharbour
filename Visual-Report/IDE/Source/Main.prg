@@ -292,14 +292,16 @@ METHOD Init() CLASS MainForm
             :ImageIndex := ::System:StdIcons:Paste
             :Enabled := .T.
             :Caption := "&Paste"
-            :Action  := <|n, oObj, cProp|
-                           oObj := ::Application:Report:aCopy[2][2]:CreateControl( ::Application:Report:aCopy[1][2], 0, 0 )
+            :Action  := <|n, oObj, cProp, hPointer|
+                           hPointer := HB_FuncPtr( ::Application:Report:aCopy[1][2] )
+                           oObj := HB_Exec( hPointer,, ::Application:Report:aCopy[2][2] )
+                           oObj:__ClsInst := __ClsInst( oObj:ClassH )
+
                            FOR n := 3 TO LEN( ::Application:Report:aCopy )
                                cProp := ::Application:Report:aCopy[n][1]
-                               oObj:&cProp := ::Application:Report:aCopy[n][2]
-                               view cProp
+                               __objSendMsg( oObj, "_" + cProp, ::Application:Report:aCopy[n][2] )
                            NEXT
-                           ::Application:Report:aCopy := NIL
+                           oObj:Create()
                         >
             :Create()
          END
