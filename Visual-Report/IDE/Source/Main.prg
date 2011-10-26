@@ -737,6 +737,7 @@ CLASS Report
    DATA xFileName     EXPORTED INIT ""
    DATA oXMLDoc       EXPORTED
    DATA aCopy         EXPORTED
+   DATA aUndo         EXPORTED INIT {}
    
    ACCESS Modified    INLINE ::xModified
    ASSIGN Modified(l) INLINE oApp:MainForm:Caption := "Visual Report [" + ::GetName() + "]" + IIF( l, " *", "" ), ::xModified := l

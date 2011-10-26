@@ -167,7 +167,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS PropEditor
 RETURN 0
 
 //------------------------------------------------------------------------------------------
-METHOD SetValue( xValue, cCaption ) CLASS PropEditor
+METHOD SetValue( xValue, cCaption, cProp, cProp2 ) CLASS PropEditor
    LOCAL oObj, cProp, cProp2, xVal, n, xProp, oItem
    
    oItem := FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
@@ -181,9 +181,13 @@ METHOD SetValue( xValue, cCaption ) CLASS PropEditor
       ::ActiveControl:Destroy()
       ::ActiveControl := NIL
    ENDIF
-   cProp := oItem:ColItems[1]:Prop
-   cProp2:= oItem:ColItems[1]:Prop2
+   
+   IF cProp == NIL
+      cProp  := oItem:ColItems[1]:Prop
+      cProp2 := oItem:ColItems[1]:Prop2
 
+      AADD( ::Application:Report:aUndo, { cProp, cProp2, xValue } )
+   ENDIF
    IF cProp IN {"Column"}
       __objSendMsg( ::ActiveObject, "_" + UPPER( cProp ), cCaption )
       RETURN NIL
