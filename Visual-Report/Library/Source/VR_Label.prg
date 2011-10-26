@@ -117,9 +117,9 @@ METHOD SetText( cText ) CLASS VrLabel
                SetWindowText( :hWnd, cText )
             ENDIF
             
-            //aSize  := :Drawing:GetTextExtentPoint32( cText )
+            aSize  := :Drawing:GetTextExtentPoint32( cText )
             :xWidth  := ::Width //aSize[1]+4
-            :xHeight := ::Height //aSize[2]+2
+            :xHeight := MAX( ::Height, aSize[2]+2 )
             :MoveWindow()
 
             aRect := :GetRectangle()

@@ -123,8 +123,8 @@ METHOD GetProps() CLASS VrObject
        xVal  := ::&cProp
        AADD( aProps, { cProp, xVal } )
    NEXT
-   AINS( aProps, 1, { "ClsName", ::ClassName } )
-   AINS( aProps, 2, { "Parent", ::Parent } )
+   AINS( aProps, 1, { "Parent", ::Parent }, .T. )
+   AINS( aProps, 1, { "ClsName", ::ClassName }, .T. )
 RETURN aProps
 
 METHOD SetControlName( cProp ) CLASS VrObject

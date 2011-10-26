@@ -984,9 +984,12 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
           aCol[1]:ColType := UPPER(cProp)
           aCol[1]:Value   := { "", { NIL } }
           IF !EMPTY( ::ActiveObject:DataSource )
-             FOR EACH aField IN ::ActiveObject:DataSource:EditCtrl:Struct()
-                 AADD( aCol[1]:Value[2], aField[1] )
-             NEXT
+             TRY
+                FOR EACH aField IN ::ActiveObject:DataSource:EditCtrl:Struct()
+                    AADD( aCol[1]:Value[2], aField[1] )
+                NEXT
+             CATCH
+             END
           ENDIF
           xValue := NIL
 

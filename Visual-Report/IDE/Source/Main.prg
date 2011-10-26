@@ -297,8 +297,8 @@ METHOD Init() CLASS MainForm
 
          WITH OBJECT MenuStripItem( :this )
             :ImageIndex := ::System:StdIcons:Delete
-            :Caption := "&Delete"
-            :Action  := {||KeyDown( oApp:Props:PropEditor:ActiveObject:EditCtrl, VK_DELETE ) }
+            :Caption    := "&Delete"
+            :Action     := {|| ::Application:Report:EditDelete() }
             :Create()
          END
 
@@ -758,8 +758,9 @@ CLASS Report
    METHOD PageSetup()
    METHOD SetScrollArea()
    METHOD EditCopy()     INLINE ::aCopy := ACLONE( oApp:Props:PropEditor:ActiveObject:GetProps() )
-   METHOD EditCut()      INLINE ::EditCopy(), oApp:Props:PropEditor:ActiveObject:Delete()
+   METHOD EditCut()      INLINE ::EditCopy(), ::EditDelete()
    METHOD EditPaste()
+   METHOD EditDelete()   INLINE oApp:Props:PropEditor:ActiveObject:Delete()
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -809,6 +810,7 @@ METHOD EditPaste() CLASS Report
    FOR n := 3 TO LEN( ::aCopy )
        cProp := ::aCopy[n][1]
        IF cProp != "Name"
+          VIEW cProp
           IF VALTYPE( ::aCopy[n][2] ) != "O"
              __objSendMsg( oObj, "_" + cProp, ::aCopy[n][2] )
            ELSEIF UPPER( ::aCopy[n][1] ) == "FONT"
@@ -822,9 +824,9 @@ METHOD EditPaste() CLASS Report
    NEXT
    oObj:Configure()
    ::Modified := .T.
-   ::Application:Props:PropEditor:ResetProperties( {{ oObj }} )
+   oApp:Props:PropEditor:ResetProperties( {{ oObj }} )
    IF ! oObj:lUI
-      ::Application:Props:Components:AddButton( oObj )
+      oApp:Props:Components:AddButton( oObj )
    ENDIF
 RETURN NIL
 
