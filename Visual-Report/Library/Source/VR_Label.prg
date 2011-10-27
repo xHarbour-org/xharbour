@@ -30,7 +30,7 @@ CLASS VrLabel INHERIT VrObject
    DATA Height        EXPORTED  INIT 16
 
    ACCESS SingleLine    INLINE ::xSingleLine
-   ASSIGN SingleLine(l) INLINE ::xSingleLine := l, IIF( ::EditCtrl != NIL, ( ::EditCtrl:aSize := IIF( ! l, {.F.,.T.,.T.,.T.,.T.,.T.,.F.,.F.}, {.F.,.T.,.F.,.F.,.F.,.T.,.F.,.F.} ), ::EditCtrl:Redraw() ), )
+   ASSIGN SingleLine(l) INLINE ::xSingleLine := l, IIF( ::EditCtrl != NIL, ( ::EditCtrl:aSize := IIF( ! l, {.T.,.T.,.T.,.T.,.T.,.T.,.T.,.T.}, {.F.,.T.,.F.,.F.,.F.,.T.,.F.,.F.} ), ::EditCtrl:Redraw() ), )
 
    METHOD Init()  CONSTRUCTOR
    METHOD Create()

@@ -188,9 +188,10 @@ METHOD SetPropValue( xValue, cCaption, oObject, cProp, cProp2 ) CLASS PropEditor
       cProp   := oItem:ColItems[1]:Prop
       cProp2  := oItem:ColItems[1]:Prop2
       
-      xVal := __objSendMsg( oObject, cProp )
       IF cProp2 != NIL
-         xVal := __objSendMsg( xVal, cProp2 )
+         xVal := oObject:&cProp2:&cProp
+       ELSE
+         xVal := __objSendMsg( oObject, cProp )
       ENDIF
       AINS( ::Application:Report:aUndo, 1, { xVal, cCaption, oObject, cProp, cProp2 }, .T. )
 

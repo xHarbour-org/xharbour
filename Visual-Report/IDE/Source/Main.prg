@@ -470,7 +470,7 @@ METHOD Init() CLASS MainForm
       WITH OBJECT ::Application:Props[ "EditUndoBttn" ] := ToolStripButton( :this )
          :ImageIndex   := ::System:StdIcons:Undo
          :ToolTip:Text := "Undo"
-         :BeginGroup   := .T.
+         :BeginGroup   := .F.
          :Action       := {|| ::Application:Report:EditUndo() }
          :Enabled      := .F.
          :Create()
@@ -479,7 +479,7 @@ METHOD Init() CLASS MainForm
       WITH OBJECT ::Application:Props[ "EditRedoBttn" ] := ToolStripButton( :this )
          :ImageIndex   := ::System:StdIcons:Redo
          :ToolTip:Text := "Redo"
-         :Action       := {|| ::Application:Report:ReDo() }
+         :Action       := {|| ::Application:Report:EditRedo() }
          :Enabled      := .F.
          :Create()
       END
@@ -738,6 +738,7 @@ CLASS Report
    DATA oXMLDoc       EXPORTED
    DATA aCopy         EXPORTED
    DATA aUndo         EXPORTED INIT {}
+   DATA aRedo         EXPORTED INIT {}
    
    ACCESS Modified    INLINE ::xModified
    ASSIGN Modified(l) INLINE oApp:MainForm:Caption := "Visual Report [" + ::GetName() + "]" + IIF( l, " *", "" ), ::xModified := l
@@ -761,25 +762,89 @@ CLASS Report
    METHOD EditCopy()     INLINE ::aCopy := ACLONE( oApp:Props:PropEditor:ActiveObject:GetProps() )
    METHOD EditCut()      INLINE ::EditCopy(), ::EditDelete()
    METHOD EditPaste()
-   METHOD EditDelete()   INLINE oApp:Props:PropEditor:ActiveObject:Delete()
+   METHOD EditDelete()
    METHOD EditUndo()
+   METHOD EditRedo()
 ENDCLASS
 
+//-------------------------------------------------------------------------------------------------------
+METHOD EditDelete() CLASS Report
+   AINS( ::aUndo, 1, { ACLONE( oApp:Props:PropEditor:ActiveObject:GetProps() ), "__DELETE", oApp:Props:PropEditor:ActiveObject }, .T. )
+   oApp:Props:EditUndoBttn:Enabled := .T.
+   oApp:Props:PropEditor:ActiveObject:Delete()
+RETURN NIL
+
+//-------------------------------------------------------------------------------------------------------
 METHOD EditUndo() CLASS Report
+   LOCAL n, oObj, xVal, cProp, cProp2
    IF VALTYPE( ::aUndo[1][1] ) == "A" .AND. ::aUndo[1][2] == "__MOVESIZE"
       WITH OBJECT ::aUndo[1][3]
+         AINS( ::aRedo, 1, { { :Left, :Top, :Width, :Height }, "__MOVESIZE", ::aUndo[1][3] }, .T. )
          :Left   := ::aUndo[1][1][1]
          :Top    := ::aUndo[1][1][2]
          :Width  := ::aUndo[1][1][3]
          :Height := ::aUndo[1][1][4]
       END
+    ELSEIF ::aUndo[1][2] == "__DELETE"
+      AINS( ::aRedo, 1, ACLONE( ::aUndo[1] ), .T. )
+      oObj := ::EditPaste( ::aUndo[1][1] )
+      IF oObj:lUI
+         n := ASCAN( ::aUndo[1][1], {|a|a[1]=="Left"} )
+         oObj:EditCtrl:Left := ::aUndo[1][1][n][2]
+         n := ASCAN( ::aUndo[1][1], {|a|a[1]=="Top"} )
+         oObj:EditCtrl:Top  := ::aUndo[1][1][n][2]
+         oObj:EditCtrl:MoveWindow()
+      ENDIF
     ELSE
+      cProp  := ::aUndo[1][4]
+      cProp2 := ::aUndo[1][5]
+      IF cProp2 != NIL
+         xVal := ::aUndo[1][3]:&cProp2:&cProp
+       ELSE
+         xVal := __objSendMsg( ::aUndo[1][3], cProp )
+      ENDIF
+      AINS( ::aRedo, 1, { xVal, ::aUndo[1][2], ::aUndo[1][3], cProp, cProp2 }, .T. )
       oApp:Props:PropEditor:SetPropValue( ::aUndo[1][1], ::aUndo[1][2], ::aUndo[1][3], ::aUndo[1][4], ::aUndo[1][5] )
    ENDIF
-   oApp:Props:PropEditor:ResetProperties( {{ ::aUndo[1][3]:Cargo }} )
+   oApp:Props:PropEditor:ResetProperties( {{ IIF( ::aUndo[1][2]=="__MOVESIZE", ::aUndo[1][3]:Cargo, ::aUndo[1][3] ) }} )
    ::aUndo[1][3]:Parent:InvalidateRect()
+
    ADEL( ::aUndo, 1, .T. )
    oApp:Props:EditUndoBttn:Enabled := LEN( ::aUndo ) > 0
+   oApp:Props:EditRedoBttn:Enabled := LEN( ::aRedo ) > 0
+RETURN NIL
+
+//-------------------------------------------------------------------------------------------------------
+METHOD EditRedo() CLASS Report
+   LOCAL n, oObj, xVal, cProp, cProp2
+   IF VALTYPE( ::aRedo[1][1] ) == "A" .AND. ::aRedo[1][2] == "__MOVESIZE"
+      WITH OBJECT ::aRedo[1][3]
+         AINS( ::aUndo, 1, { { :Left, :Top, :Width, :Height }, "__MOVESIZE", ::aRedo[1][3] }, .T. )
+         :Left   := ::aRedo[1][1][1]
+         :Top    := ::aRedo[1][1][2]
+         :Width  := ::aRedo[1][1][3]
+         :Height := ::aRedo[1][1][4]
+      END
+    ELSEIF ::aRedo[1][2] == "__DELETE"
+      AINS( ::aUndo, 1, ACLONE( ::aRedo[1] ), .T. )
+      ::aRedo[1][3]:Delete()
+    ELSE
+      cProp  := ::aRedo[1][4]
+      cProp2 := ::aRedo[1][5]
+      IF cProp2 != NIL
+         xVal := ::aRedo[1][3]:&cProp2:&cProp
+       ELSE
+         xVal := __objSendMsg( ::aRedo[1][3], cProp )
+      ENDIF
+      AINS( ::aUndo, 1, { xVal, ::aRedo[1][2], ::aRedo[1][3], cProp, cProp2 }, .T. )
+      oApp:Props:PropEditor:SetPropValue( ::aRedo[1][1], ::aRedo[1][2], ::aRedo[1][3], ::aRedo[1][4], ::aRedo[1][5] )
+   ENDIF
+   oApp:Props:PropEditor:ResetProperties( {{ IIF( ::aRedo[1][2]=="__MOVESIZE", ::aRedo[1][3]:Cargo, ::aRedo[1][3] ) }} )
+   ::aRedo[1][3]:Parent:InvalidateRect()
+
+   ADEL( ::aRedo, 1, .T. )
+   oApp:Props:EditUndoBttn:Enabled := LEN( ::aUndo ) > 0
+   oApp:Props:EditRedoBttn:Enabled := LEN( ::aRedo ) > 0
 RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
@@ -820,24 +885,24 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 
-METHOD EditPaste() CLASS Report
+METHOD EditPaste( aProps ) CLASS Report
    LOCAL n, oObj, cProp, hPointer
-   hPointer := HB_FuncPtr( ::aCopy[1][2] )
-   oObj := HB_Exec( hPointer,, ::aCopy[2][2] )
+   DEFAULT aProps TO ::aCopy
+   hPointer := HB_FuncPtr( aProps[1][2] )
+   oObj := HB_Exec( hPointer,, aProps[2][2] )
    oObj:__ClsInst := __ClsInst( oObj:ClassH )
    oObj:Create()
-   FOR n := 3 TO LEN( ::aCopy )
-       cProp := ::aCopy[n][1]
+   FOR n := 3 TO LEN( aProps )
+       cProp := aProps[n][1]
        IF cProp != "Name"
-          VIEW cProp
-          IF VALTYPE( ::aCopy[n][2] ) != "O"
-             __objSendMsg( oObj, "_" + cProp, ::aCopy[n][2] )
-           ELSEIF UPPER( ::aCopy[n][1] ) == "FONT"
-             oObj:Font:FaceName  := ::aCopy[n][2]:FaceName
-             oObj:Font:PointSize := ::aCopy[n][2]:PointSize
-             oObj:Font:Italic    := ::aCopy[n][2]:Italic
-             oObj:Font:Bold      := ::aCopy[n][2]:Bold
-             oObj:Font:Underline := ::aCopy[n][2]:Underline
+          IF VALTYPE( aProps[n][2] ) != "O"
+             __objSendMsg( oObj, "_" + cProp, aProps[n][2] )
+           ELSEIF UPPER( aProps[n][1] ) == "FONT"
+             oObj:Font:FaceName  := aProps[n][2]:FaceName
+             oObj:Font:PointSize := aProps[n][2]:PointSize
+             oObj:Font:Italic    := aProps[n][2]:Italic
+             oObj:Font:Bold      := aProps[n][2]:Bold
+             oObj:Font:Underline := aProps[n][2]:Underline
           ENDIF
        ENDIF
    NEXT
@@ -847,7 +912,7 @@ METHOD EditPaste() CLASS Report
    IF ! oObj:lUI
       oApp:Props:Components:AddButton( oObj )
    ENDIF
-RETURN NIL
+RETURN oObj
 
 //-------------------------------------------------------------------------------------------------------
 METHOD PageSetup() CLASS Report
