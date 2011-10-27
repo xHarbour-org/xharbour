@@ -60,11 +60,11 @@
 #include <mapi.h>
 #include <oledlg.h>
 #include <wininet.h>
-//#include <pdh.h>
 #include <psapi.h>
 #include <shlwapi.h>
 #include <Rpc.h>
 #include <ole2.h>
+#include <wincrypt.h>
 
 typedef struct _DWM_BLURBEHIND {
     DWORD dwFlags;
@@ -81,7 +81,7 @@ typedef struct _MARGINS {
 } MARGINS, *PMARGINS;
 
 static PHB_DYNS pHB_CSTRUCTURE = NULL, pPOINTER, pVALUE, pDEVALUE;
-static HINSTANCE hWinTrust = NULL, hUser32 = NULL, hShell32 = NULL, hGdi32 = NULL, hNetAPI32 = NULL, hWinmm = NULL, hAdvApi32 = NULL, hHtmlHelp = NULL, hMAPI = NULL, hOleDlg = NULL, hAviCap = NULL, hWininet = NULL, hPSAPI = NULL, hshlwapi = NULL, hKernel32 = NULL, hdwmapi = NULL;
+static HINSTANCE hCryptUI = NULL, hCrypt32 = NULL, hUser32 = NULL, hShell32 = NULL, hGdi32 = NULL, hNetAPI32 = NULL, hWinmm = NULL, hAdvApi32 = NULL, hHtmlHelp = NULL, hMAPI = NULL, hOleDlg = NULL, hAviCap = NULL, hWininet = NULL, hPSAPI = NULL, hshlwapi = NULL, hKernel32 = NULL, hdwmapi = NULL;
 
 static CRITICAL_SECTION s_cs; /* This is the critical section object -- once initialized, it cannot be moved in memory */
 
@@ -170,13 +170,25 @@ typedef struct _PERFORMANCE_INFORMATION {
    #endif
 #endif
 
+#define CRYPTUI_SELECT_ISSUEDTO_COLUMN  0x000000001
+#define CRYPTUI_SELECT_ISSUEDBY_COLUMN  0x000000002
+#define CRYPTUI_SELECT_INTENDEDUSE_COLUMN  0x000000004
+#define CRYPTUI_SELECT_FRIENDLYNAME_COLUMN  0x000000008
+#define CRYPTUI_SELECT_LOCATION_COLUMN  0x000000010
+#define CRYPTUI_SELECT_EXPIRATION_COLUMN  0x000000020
+
 static BOOL (WINAPI *pQueryServiceStatusEx)(SC_HANDLE,SC_STATUS_TYPE,LPBYTE,DWORD,LPDWORD)                     = NULL;
 static BOOL (WINAPI *pQueryServiceStatus)(SC_HANDLE,LPSERVICE_STATUS)                                          = NULL;
 static BOOL (WINAPI *pQueryServiceConfig)(SC_HANDLE,LPQUERY_SERVICE_CONFIG,DWORD,LPDWORD)                      = NULL;
 static BOOL (WINAPI *pQueryServiceConfig2)(SC_HANDLE,DWORD,LPBYTE,DWORD,LPDWORD)                               = NULL;
 static BOOL (WINAPI *pChangeServiceConfig2)(SC_HANDLE,DWORD,LPVOID)                                            = NULL;
 
-static BOOL (WINAPI *pOpenPersonalTrustDBDialog)(HWND)                                                         = NULL;
+static HCERTSTORE (WINAPI *pCertOpenSystemStore)(HCRYPTPROV,LPCSTR)                                            = NULL;
+
+static PCCERT_CONTEXT (WINAPI *pCryptUIDlgSelectCertificateFromStore)(HCERTSTORE,HWND,LPCWSTR,LPCWSTR,DWORD,DWORD,LPVOID) = NULL;
+static BOOL (WINAPI* pCertFreeCertificateContext)(PCCERT_CONTEXT)                                              = NULL;
+static BOOL (WINAPI* pCertCloseStore)(HCERTSTORE,DWORD)                                                        = NULL;
+static DWORD (WINAPI* pCertNameToStr)(DWORD,PCERT_NAME_BLOB,DWORD,LPTSTR,DWORD)                                = NULL;
 
 static BOOL (WINAPI *pEndTask)(HWND,BOOL,BOOL)                                                                 = NULL;
 static BOOL (WINAPI *pIsHungAppWindow)(HWND)                                                                   = NULL;
@@ -331,9 +343,14 @@ void OutputDebugValues( const char *sFormat, ... )
 HB_FUNC_INIT( _INITSYMBOLS_ )
 {
    //TraceLog( NULL, "_INITSYMBOLS_" );
-   if( hWinTrust == NULL )
+   if( hCryptUI == NULL )
    {
-      hWinTrust = LoadLibrary( "WinTrust.dll" );
+      hCryptUI = LoadLibrary( "CryptUI.dll" );
+   }
+
+   if( hCrypt32 == NULL )
+   {
+      hCrypt32 = LoadLibrary( "Crypt32.dll" );
    }
 
    if( hUser32 == NULL )
@@ -410,9 +427,17 @@ HB_FUNC_INIT( _INITSYMBOLS_ )
       hdwmapi = LoadLibrary( "dwmapi.dll" );
    }
 
-   if( hWinTrust )
+   if( hCryptUI )
    {
-      pOpenPersonalTrustDBDialog  = (BOOL (WINAPI *)(HWND))                      GetProcAddress( hWinTrust, "OpenPersonalTrustDBDialog" );
+      pCryptUIDlgSelectCertificateFromStore = (PCCERT_CONTEXT (WINAPI *)(HCERTSTORE,HWND,LPCWSTR,LPCWSTR,DWORD,DWORD,LPVOID)) GetProcAddress( hCryptUI, "CryptUIDlgSelectCertificateFromStore" );
+   }
+
+   if( hCrypt32 )
+   {
+      pCertOpenSystemStore        = (HCERTSTORE (WINAPI *)(HCRYPTPROV,LPCSTR))                   GetProcAddress( hCrypt32, "CertOpenSystemStoreA" );
+      pCertFreeCertificateContext = (BOOL (WINAPI *)(PCCERT_CONTEXT))                            GetProcAddress( hCrypt32, "CertFreeCertificateContext" );
+      pCertCloseStore             = (BOOL (WINAPI *)(HCERTSTORE,DWORD))                          GetProcAddress( hCrypt32, "CertCloseStore" );
+      pCertNameToStr              = (DWORD (WINAPI *)(DWORD,PCERT_NAME_BLOB,DWORD,LPTSTR,DWORD)) GetProcAddress( hCrypt32, "CertNameToStrA" );
    }
 
    if( hUser32 )
@@ -519,9 +544,14 @@ HB_FUNC_EXIT( _CLEANUP_ )
 {
    //TraceLog( NULL, "_CLEANUP_" );
 
-   if( hWinTrust )
+   if( hCryptUI )
    {
-      FreeLibrary( hWinTrust );
+      FreeLibrary( hCryptUI );
+   }
+
+   if( hCrypt32 )
+   {
+      FreeLibrary( hCrypt32 );
    }
 
    if( hUser32 )
@@ -10169,3 +10199,52 @@ HB_FUNC( SHOWCURSOR )
    hb_retl( ShowCursor( hb_parl( 1 ) ) );
 }
 
+//------------------------------------------------------------------------------------------------
+//HB_FUNC( CRYPTUIDLGSELECTCERTIFICATEFROMSTORE )
+//{
+//   if( pCryptUIDlgSelectCertificateFromStore )
+//   {
+//      void *pvReserved;
+//      HCERTSTORE hcert;
+//      LPCWSTR pwszTitle = hb_oleAnsiToWide( (LPSTR) hb_parc(3) );
+//      LPCWSTR pwszDisplayString = hb_oleAnsiToWide( (LPSTR) hb_parc(4) );
+//      hb_retl( pCryptUIDlgSelectCertificateFromStore( (HCERTSTORE) hb_parnl(1), (HWND) hb_parnl(2), pwszTitle, pwszDisplayString, (DWORD) hb_parnl(5), (DWORD) hb_parnl(6), pvReserved ) );
+//   }
+//   else
+//   {
+//      hb_errRT_BASE( EG_ARG, 6999, NULL, "CryptUIDlgSelectCertificateFromStore", 1, hb_paramError(1) );
+//   }
+//}
+
+HB_FUNC( CERTIFICATEDIALOG )
+{
+   HCERTSTORE       hCertStore = NULL;        
+   PCCERT_CONTEXT   pCertContext = NULL;      
+   
+   if( pCertOpenSystemStore )
+   {
+      TCHAR * pszStoreName = TEXT("MY");
+      if( hCertStore = pCertOpenSystemStore( NULL, pszStoreName ))
+      {
+         if( pCertContext = pCryptUIDlgSelectCertificateFromStore( hCertStore, (HWND) hb_parnl(1), NULL, NULL, CRYPTUI_SELECT_LOCATION_COLUMN, 0, NULL ) )
+         {
+            if( pCertNameToStr )
+            {
+               DWORD dwSize = 0;
+               CERT_NAME_BLOB NameBlob;
+
+               NameBlob = pCertContext->pCertInfo->Issuer;
+               dwSize = pCertNameToStr( pCertContext->dwCertEncodingType, &NameBlob, CERT_SIMPLE_NAME_STR, NULL, 0);
+               if( dwSize > 2 )
+               {
+                  char *cBuffer = (char *) hb_xgrab( (int)dwSize + 1 );
+                  pCertNameToStr( pCertContext->dwCertEncodingType, &NameBlob, CERT_SIMPLE_NAME_STR, cBuffer, dwSize );
+                  hb_retcAdopt( cBuffer );
+               }
+               pCertFreeCertificateContext(pCertContext);
+            }
+         }
+         pCertCloseStore(hCertStore,0);
+      }
+   }
+}
