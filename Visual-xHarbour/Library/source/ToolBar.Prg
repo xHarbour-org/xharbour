@@ -1583,7 +1583,8 @@ CLASS ToolButton INHERIT Object
    PROPERTY Wrap          INDEX TBSTATE_WRAP        READ xWrap          WRITE SetState DEFAULT .F.
    PROPERTY Separator     INDEX BTNS_SEP            READ xSeparator     WRITE SetStyle DEFAULT .F.
 
-   ACCESS IsChecked      INLINE ( ::Parent:GetButtonInfo( ::Id, TBIF_STATE ):fsState & TBSTATE_CHECKED ) != TBSTATE_CHECKED
+   ACCESS IsChecked      INLINE ::Parent:IsButtonChecked( ::ID )
+
    ACCESS IsPressed      INLINE ( ::Parent:GetButtonInfo( ::Id, TBIF_STATE ):fsState & TBSTATE_PRESSED ) == TBSTATE_PRESSED
 
    DATA xPosition          EXPORTED
