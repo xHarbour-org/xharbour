@@ -471,7 +471,7 @@ METHOD Init() CLASS MainForm
          :ImageIndex   := ::System:StdIcons:Undo
          :ToolTip:Text := "Undo"
          :BeginGroup   := .T.
-         :Action       := {|| ::Application:Report:UnDo() }
+         :Action       := {|| ::Application:Report:EditUndo() }
          :Enabled      := .F.
          :Create()
       END
@@ -762,7 +762,25 @@ CLASS Report
    METHOD EditCut()      INLINE ::EditCopy(), ::EditDelete()
    METHOD EditPaste()
    METHOD EditDelete()   INLINE oApp:Props:PropEditor:ActiveObject:Delete()
+   METHOD EditUndo()
 ENDCLASS
+
+METHOD EditUndo() CLASS Report
+   IF VALTYPE( ::aUndo[1][1] ) == "A" .AND. ::aUndo[1][2] == "__MOVESIZE"
+      WITH OBJECT ::aUndo[1][3]
+         :Left   := ::aUndo[1][1][1]
+         :Top    := ::aUndo[1][1][2]
+         :Width  := ::aUndo[1][1][3]
+         :Height := ::aUndo[1][1][4]
+      END
+    ELSE
+      oApp:Props:PropEditor:SetPropValue( ::aUndo[1][1], ::aUndo[1][2], ::aUndo[1][3], ::aUndo[1][4], ::aUndo[1][5] )
+   ENDIF
+   oApp:Props:PropEditor:ResetProperties( {{ ::aUndo[1][3]:Cargo }} )
+   ::aUndo[1][3]:Parent:InvalidateRect()
+   ADEL( ::aUndo, 1, .T. )
+   oApp:Props:EditUndoBttn:Enabled := LEN( ::aUndo ) > 0
+RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD NewReport() CLASS Report

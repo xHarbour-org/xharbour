@@ -47,7 +47,7 @@ CLASS PropEditor INHERIT TreeView
    METHOD EditText()
    
    METHOD GetEditBuffer()
-   METHOD SetValue()
+   METHOD SetPropValue()
    METHOD OnGetDlgCode()
    METHOD OnSize()
    METHOD GetValue()
@@ -167,29 +167,40 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS PropEditor
 RETURN 0
 
 //------------------------------------------------------------------------------------------
-METHOD SetValue( xValue, cCaption, cProp, cProp2 ) CLASS PropEditor
-   LOCAL oObj, cProp, cProp2, xVal, n, xProp, oItem
+METHOD SetPropValue( xValue, cCaption, oObject, cProp, cProp2 ) CLASS PropEditor
+   LOCAL oObj, xVal, n, xProp, oItem, lUndo
    
-   oItem := FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
-   IF oItem == NIL .OR. ::ActiveObject == NIL
-      RETURN Self
+   lUndo := oObject != NIL
+
+   IF ! lUndo
+      oItem := FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
+      IF oItem == NIL .OR. ::ActiveObject == NIL
+         RETURN Self
+      ENDIF
+
+      IF ::ActiveControl != NIL .AND. ::ActiveControl:IsWindow()
+         ::ActiveControl:OnWMKillFocus := NIL
+         ::ActiveControl:Destroy()
+         ::ActiveControl := NIL
+      ENDIF
+
+      oObject := ::ActiveObject
+      cProp   := oItem:ColItems[1]:Prop
+      cProp2  := oItem:ColItems[1]:Prop2
+      
+      xVal := __objSendMsg( oObject, cProp )
+      IF cProp2 != NIL
+         xVal := __objSendMsg( xVal, cProp2 )
+      ENDIF
+      AINS( ::Application:Report:aUndo, 1, { xVal, cCaption, oObject, cProp, cProp2 }, .T. )
+
+      ::Application:Props:EditUndoBttn:Enabled := .T.
    ENDIF
+
    ::Application:Report:Modified := .T.
 
-   IF ::ActiveControl != NIL .AND. ::ActiveControl:IsWindow()
-      ::ActiveControl:OnWMKillFocus := NIL
-      ::ActiveControl:Destroy()
-      ::ActiveControl := NIL
-   ENDIF
-   
-   IF cProp == NIL
-      cProp  := oItem:ColItems[1]:Prop
-      cProp2 := oItem:ColItems[1]:Prop2
-
-      AADD( ::Application:Report:aUndo, { cProp, cProp2, xValue } )
-   ENDIF
    IF cProp IN {"Column"}
-      __objSendMsg( ::ActiveObject, "_" + UPPER( cProp ), cCaption )
+      __objSendMsg( oObject, "_" + UPPER( cProp ), cCaption )
       RETURN NIL
    ENDIF
    IF cProp IN {"DataSource", "RelationTable" }
@@ -207,67 +218,69 @@ METHOD SetValue( xValue, cCaption, cProp, cProp2 ) CLASS PropEditor
       IF cProp == "RelationTable" .AND. ! EMPTY( xValue )
          xValue := xValue:Name
       ENDIF
-      __objSendMsg( ::ActiveObject, "_" + UPPER( cProp ), xValue )
+      __objSendMsg( oObject, "_" + UPPER( cProp ), xValue )
       ::ResetProperties(,,.T.)
       RETURN NIL
    ENDIF
 
    IF !EMPTY( cProp2 )
-      IF ::ActiveObject:lUI
-         oObj := __objSendMsg( ::ActiveObject:EditCtrl, cProp2 )
+      IF oObject:lUI
+         oObj := __objSendMsg( oObject:EditCtrl, cProp2 )
          __objSendMsg( oObj, "_" + UPPER( cProp ), xValue )
       ENDIF
-      oObj := __objSendMsg( ::ActiveObject, cProp2 )
+      oObj := __objSendMsg( oObject, cProp2 )
       __objSendMsg( oObj, "_" + UPPER( cProp ), xValue )
 
-      IF cProp2 == "Font" .AND. ::ActiveObject:lUI
-         ::ActiveObject:EditCtrl:Font:Set( ::ActiveObject:EditCtrl )
-         ::ActiveObject:SetText( ::ActiveObject:Text )
+      IF cProp2 == "Font" .AND. oObject:lUI
+         oObject:EditCtrl:Font:Set( oObject:EditCtrl )
+         oObject:SetText( oObject:Text )
       ENDIF
     ELSE
       xProp := cProp
       IF xProp == "Text"
          xProp := "Caption"
-       ELSEIF xProp == "FileName" .AND. ::ActiveObject:ClsName == "Image"
+       ELSEIF xProp == "FileName" .AND. oObject:ClsName == "Image"
          xProp := "ImageName"
       ENDIF
       IF cProp IN {"GroupBy","Field","Order"}
-         IF cProp != "Order" .OR. ::ActiveObject:Driver != "SQLRDD"
+         IF cProp != "Order" .OR. oObject:Driver != "SQLRDD"
             xValue := cCaption
          ENDIF
       ENDIF
-      __objSendMsg( ::ActiveObject, "_" + UPPER( cProp ), xValue )
+      view oObject:Name, cProp, xValue
+      __objSendMsg( oObject, "_" + UPPER( cProp ), xValue )
 
-      IF ::ActiveObject:lUI
-         IF ! ( UPPER( xProp ) == "WIDTH" .AND. UPPER( ::ActiveObject:ClassName ) == "VRLABEL" )
+      IF oObject:lUI
+         IF ! ( UPPER( xProp ) == "WIDTH" .AND. UPPER( oObject:ClassName ) == "VRLABEL" )
             TRY
-               __objSendMsg( ::ActiveObject:EditCtrl, "_" + UPPER( xProp ), xValue )
+               __objSendMsg( oObject:EditCtrl, "_" + UPPER( xProp ), xValue )
             CATCH
             END
          ENDIF
-         ::ActiveObject:Parent:InvalidateRect( , .F. )
+         oObject:Parent:InvalidateRect( , .F. )
       ENDIF
 
    ENDIF
-   IF ( VALTYPE( oItem:ColItems[1]:Value ) == VALTYPE( xValue ) )
-      oItem:ColItems[1]:Value := xValue
-   ENDIF
-   
-   IF cProp == "BackColor" .OR. cProp == "ForeColor"
-      oItem:ColItems[1]:Color := xValue
-      n := hScan( ::System:Color, xValue )
-      oItem:ColItems[1]:Value := IIF( n > 0, ::System:Color:Keys[n], "Custom..." )
-      _InvalidateRect( ::hWnd, oItem:GetItemRect():Array() ,.F.)
-   ENDIF
+   IF ! lUndo
+      IF ( VALTYPE( oItem:ColItems[1]:Value ) == VALTYPE( xValue ) )
+         oItem:ColItems[1]:Value := xValue
+      ENDIF
 
-   IF UPPER(cProp) == "DRIVER"
-      TRY
-         ::ActiveObject:Create(.F.)
-      CATCH
-      END
-      ::ResetProperties(,,.T.)
-   ENDIF
+      IF cProp == "BackColor" .OR. cProp == "ForeColor"
+         oItem:ColItems[1]:Color := xValue
+         n := hScan( ::System:Color, xValue )
+         oItem:ColItems[1]:Value := IIF( n > 0, ::System:Color:Keys[n], "Custom..." )
+         _InvalidateRect( ::hWnd, oItem:GetItemRect():Array() ,.F.)
+      ENDIF
 
+      IF UPPER(cProp) == "DRIVER"
+         TRY
+            oObject:Create(.F.)
+         CATCH
+         END
+         ::ResetProperties(,,.T.)
+      ENDIF
+   ENDIF
 
 RETURN Self
 
@@ -634,7 +647,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :Owner  := ::ActiveObject
                             :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
                             :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ) }
-                            :Action := {|o, n, oPar, cSel| cSel := o:GetSelString(), oPar := o:Parent, o:Destroy(), oPar:SetValue( cSel ) }
+                            :Action := {|o, n, oPar, cSel| cSel := o:GetSelString(), oPar := o:Parent, o:Destroy(), oPar:SetPropValue( cSel ) }
                             :Create()
 
                             cFont := :Cargo
@@ -664,7 +677,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :ColorSelected := ::ActiveItem:ColItems[nCol-1]:Color
 
                             :Create()
-                            :Action := {|o, c, oPar| c := o:ColorSelected, oPar := o:Parent, o:Destroy(), oPar:SetValue( c ) }
+                            :Action := {|o, c, oPar| c := o:ColorSelected, oPar := o:Parent, o:Destroy(), oPar:SetPropValue( c ) }
                             :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ) }
                             :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
 
@@ -729,7 +742,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
 
                             :OnWMKillFocus := {|o,cText,oPar| cText := o:Caption,;
                                                               oPar  := o:Parent,;
-                                                              oPar:SetValue( cText ),;
+                                                              oPar:SetPropValue( cText ),;
                                                               o:Destroy(), 0 }
                             :OnWMKeyDown   := {|o,n| CheckKeyDown(o,n)}
 
@@ -756,7 +769,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :Cargo       := :Caption
                             :OnWMKillFocus := {|o,cText,oPar| cText := o:Caption,;
                                                                              oPar  := o:Parent,;
-                                                                             IIF( ::__xCtrlName == "PropEditor", oPar:SetValue( VAL( cText ) ), ),;
+                                                                             IIF( ::__xCtrlName == "PropEditor", oPar:SetPropValue( VAL( cText ) ), ),;
                                                                              o:Destroy(), 0 }
 
                             :OnWMKeyDown  := {|o,n| CheckChar( o, n, ::ActiveItem )}
@@ -784,7 +797,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :Action := {|o, c, oPar| c := o:GetSelString(),;
                                                           oPar := o:Parent,;
                                                           o:Destroy(),;
-                                                          oPar:SetValue( IIF( c == "True", .T., .F. ), o ) }
+                                                          oPar:SetPropValue( IIF( c == "True", .T., .F. ), o ) }
                             :AddItem( "True" )
                             :AddItem( "False" )
                             IF ::ActiveItem:ColItems[nCol-1]:Value
@@ -813,15 +826,15 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                               :Action := {|o, n, oPar| n    := o:GetCurSel(),;
                                                        oPar := o:Parent,;
                                                        o:Destroy(),;
-                                                       oPar:SetValue( HGetValueAt( ::System:AdsDataDrivers, n )  ) }
+                                                       oPar:SetPropValue( HGetValueAt( ::System:AdsDataDrivers, n )  ) }
 
                             ELSEIF cType == "DATADRIVERS"
                               :Action := {|o, n, oPar| n    := o:GetCurSel(),;
                                                        oPar := o:Parent,;
                                                        o:Destroy(),;
-                                                       oPar:SetValue( HGetValueAt( ::System:DataDrivers, n )  ) }
+                                                       oPar:SetPropValue( HGetValueAt( ::System:DataDrivers, n )  ) }
                             ELSE
-                              :Action := {|o, n, oPar, c| c := o:GetSelString(), n := o:GetCurSel()-1, oPar := o:Parent, o:Destroy(), oPar:SetValue( n + 1, c ) }
+                              :Action := {|o, n, oPar, c| c := o:GetSelString(), n := o:GetCurSel()-1, oPar := o:Parent, o:Destroy(), oPar:SetPropValue( n + 1, c ) }
                            ENDIF
                            :Create()
 
@@ -886,7 +899,7 @@ FUNCTION InitEditText( oForm, oMan )
       :Height      := 25
       :Dock:Right  := oCancel
       :Dock:Bottom := oForm
-      :Action      := {|o| oMan:SetValue( oEdit:Caption ),;
+      :Action      := {|o| oMan:SetPropValue( oEdit:Caption ),;
                            oForm:Close()}
       :Create()
    END
@@ -971,7 +984,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
                                                  o:Destroy(),;
                                                  c := o:Cargo[1],;
                                                  o:Cargo[2]:ColItems[1]:SetValue := n+1,;
-                                                 oPar:SetValue( ::ActiveObject:Enum&c[2][n+1] ) }
+                                                 oPar:SetPropValue( ::ActiveObject:Enum&c[2][n+1] ) }
           xValue := NIL
 
         ELSEIF UPPER(cProp) IN {"ORDER"} .AND. ::ActiveObject:ClsName == "DataTable" .AND. ::ActiveObject:Driver != "SQLRDD" .AND. ! ( ::ActiveObject:Driver == "DBF" )
@@ -1077,7 +1090,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
           aCol[1]:Action   := {|o, n, oPar, c| oPar := o:Parent,;
                                                o:Destroy(),;
                                                c := o:Cargo[1],;
-                                               oPar:SetValue( c ) }
+                                               oPar:SetPropValue( c ) }
        ENDIF
 
        oSub := oItem:AddItem( cProp, 0, aCol )
@@ -1333,9 +1346,9 @@ STATIC FUNCTION BrowseForFile( oEdit, oMan, oObj, lIcon, aFilter )
       
       IF __ObjHasMsg( oMan:ActiveObject, "Path" )
          oMan:ActiveObject:Path := oFile:Path
-         oMan:SetValue( oFile:Name )
+         oMan:SetPropValue( oFile:Name )
        ELSE
-         oMan:SetValue( oFile:Path + "\" + oFile:Name )
+         oMan:SetPropValue( oFile:Path + "\" + oFile:Name )
       ENDIF
 
       oMan:InvalidateRect(,.F.)
@@ -1358,7 +1371,7 @@ STATIC FUNCTION BrowseForFolder( oEdit, oMan, oItem )
          RETURN NIL
        ELSE
          oEdit:Destroy()
-         oMan:SetValue( cDir )
+         oMan:SetPropValue( cDir )
       ENDIF
       oMan:InvalidateRect(,.F.)
     ELSE
@@ -1385,7 +1398,7 @@ STATIC FUNCTION CheckKeyDown( o, n )
       CASE 13
          cText := o:Caption
          oPar  := o:Parent
-         oPar:SetValue( cText )
+         oPar:SetPropValue( cText )
          o:Destroy()
          EXIT
 
@@ -1402,7 +1415,7 @@ STATIC FUNCTION CheckChar( o, n, oItem )
       CASE 13
          cText := o:Caption
          oPar  := o:Parent
-         oPar:SetValue( CompileValue( cText ) )
+         oPar:SetPropValue( CompileValue( cText ) )
          o:Destroy()
          EXIT
 

@@ -128,6 +128,8 @@ METHOD OnLButtonDown(n,x,y) CLASS __VrImage
             aRect := {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1}
             ::Parent:InvalidateRect( aRect, .F. )
             ::Parent:nDownPos := {x,y}
+             AINS( ::Application:Report:aUndo, 1, { { oCtrl:Left, oCtrl:Top, oCtrl:Width, oCtrl:Height }, "__MOVESIZE", oCtrl }, .T. )
+            ::Application:Props:EditUndoBttn:Enabled := .T.
          ENDIF
       CATCH
       END
