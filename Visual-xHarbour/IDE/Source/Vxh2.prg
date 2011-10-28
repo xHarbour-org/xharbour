@@ -440,6 +440,7 @@ METHOD MaskKeyDown( o, nKey ) CLASS WindowEdit
                  ENDIF
               ENDIF
               ::Application:Project:Modified := .T.
+              ::__lModified := .T.
            ENDIF
 
            nLen := LEN( ::Selected )
@@ -529,6 +530,7 @@ METHOD MaskKeyDown( o, nKey ) CLASS WindowEdit
          ENDIF
       ENDIF
       ::Application:Project:Modified := .T.
+      ::__lModified := .T.
       ::UpdateSelection( nKey )
 
       aRect := ::GetSelRect(.T.)
@@ -1082,6 +1084,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
             EndDeferWindowPos( hDef )
          ENDIF
          ::Application:Project:Modified := .T.
+         ::__lModified := .T.
       ENDIF
 
       IF ( !lLeft .OR. !lTop .OR. !lWidth .OR. !lHeight ) .AND. ::__SelMoved
@@ -1095,6 +1098,8 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
              AADD( aRect, { nLeft, nTop, nWidth, nHeight } )
              AADD( aControls, ::Selected[n][1] )
          NEXT
+         ::__lModified := .T.
+   
          ::Application:Project:SetAction( { { DG_MOVESELECTION,;
                                             aControls,;
                                             aRect,;
@@ -1329,6 +1334,9 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
 
          DEFAULT ::CtrlOldPt TO { x, y }
          IF ::CtrlOldPt[1] != x .OR. ::CtrlOldPt[2] != y
+
+            ::__lModified := .T.
+            ::Application:Project:Modified := .T.
 
             IF !::__SelMoved
                ::__PrevSelRect := {}
@@ -1896,6 +1904,7 @@ METHOD EditClickEvent() CLASS WindowEdit
    IF LEN( ::Selected ) > 0 .AND. !::CtrlMask:lOrderMode
       ::Application:EventManager:EditEvent( IIF( ::Selected[1][1]:hWnd==::hWnd, "OnLoad", "OnClick" ) )
       ::Application:Project:Modified := .T.
+      ::__lModified := .T.
    ENDIF
 RETURN Self
 
@@ -1918,6 +1927,7 @@ METHOD AddDefaultMenuItem( oParent ) CLASS WindowEdit
    oSubItem:Create()
 
    ::Application:Project:Modified := .T.
+   ::__lModified := .T.
 RETURN Self
 
 //----------------------------------------------------------------------------

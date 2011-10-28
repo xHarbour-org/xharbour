@@ -4501,13 +4501,13 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    IF lNew  .OR. ! IsDirectory( cPath )
       MakeDir( cPath )
    ENDIF
-   //DirChange( cPath )
+   DirChange( cPath )
 
    IF lNew .OR. ! IsDirectory( ::Properties:Binary )
-      MakeDir( cPath + "\" + ::Properties:Binary )
-      MakeDir( cPath + "\" + ::Properties:Objects )
-      MakeDir( cPath + "\" + ::Properties:Source )
-      MakeDir( cPath + "\" + ::Properties:Resource )
+      MakeDir( ::Properties:Binary )
+      MakeDir( ::Properties:Objects )
+      MakeDir( ::Properties:Source )
+      MakeDir( ::Properties:Resource )
    ENDIF
 
    IF cPrevPath != NIL
@@ -5519,6 +5519,8 @@ FUNCTION GUI_ErrorGrid( oError, cLog )
 
    IF EMPTY( aErrors )
       cDesc := oError:Description
+      view cLog, aErrors
+
       cFile := ""
       IF LEFT( cDesc, 28 ) == "couldn't find required file:"
          cFile := STRTRAN( SUBSTR( cDesc, 29 ), "'" )
@@ -5773,14 +5775,14 @@ METHOD SetAction( aActions, aReverse ) CLASS Project
    LOCAL x, n, o, nPos, aChildren, aAction, oCtrl, aCtrlProps, nWidth, nHeight
 
    aAction := ACLONE( aActions[ -1 ] )
-   IF EMPTY( aAction )
-      RETURN Self
-   ENDIF
    ::Modified := .T.
    IF ::CurrentForm != NIL
       ::CurrentForm:__lModified := .T.
    ENDIF
 
+   IF EMPTY( aAction )
+      RETURN Self
+   ENDIF
    SWITCH aAction[1]
 
       CASE DG_ADDCONTROL
