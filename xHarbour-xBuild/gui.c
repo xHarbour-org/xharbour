@@ -109,7 +109,7 @@ HB_EXTERN_BEGIN
    int _getdrive( void );
 HB_EXTERN_END
 
-void Process_SetContinueFlag( BOOL bWaitContinue );
+extern void Process_SetContinueFlag( BOOL bWaitContinue );
 
 BOOL Process_SetContinue( BOOL );
 
