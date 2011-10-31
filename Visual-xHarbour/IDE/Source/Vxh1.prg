@@ -4503,10 +4503,16 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    ENDIF
    DirChange( cPath )
 
-   IF lNew .OR. ! IsDirectory( ::Properties:Binary )
+   IF ! IsDirectory( ::Properties:Binary )
       MakeDir( ::Properties:Binary )
+   ENDIF
+   IF ! IsDirectory( ::Properties:Objects )
       MakeDir( ::Properties:Objects )
+   ENDIF
+   IF ! IsDirectory( ::Properties:Source )
       MakeDir( ::Properties:Source )
+   ENDIF
+   IF ! IsDirectory( ::Properties:Resource )
       MakeDir( ::Properties:Resource )
    ENDIF
 

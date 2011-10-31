@@ -12,6 +12,7 @@
    ! Reduced Save time by 70%
    + Added garbage collector at the end of every form to allow recycling large 
      amounts of unused memory after closing forms with lots of resources.
+   * Forced sub-directory creation if they were deleted
 
 2011-10-05 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Added DataGrid:AnchorColum (numeric) property to identify if a column should shrink or 
