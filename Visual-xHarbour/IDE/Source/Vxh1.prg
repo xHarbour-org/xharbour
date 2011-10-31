@@ -2466,7 +2466,6 @@ METHOD SourceTabChanged( nPrev, nCur ) CLASS Project
       ::Application:SourceEditor:oEditor:SetDisplay( ::Application:SourceEditor:oEditor:oDisplay, .T. )
    ENDIF
    OnShowEditors()
-   //hb_gcall(.t.)
 RETURN Self
 
 METHOD CheckValidProgram() CLASS Project
@@ -3315,7 +3314,6 @@ METHOD Close( lCloseErrors ) CLASS Project
        n--
    NEXT
    ::Application:SourceTabs:Visible := .F.
-   ::Application:FormsTabs:DeleteAllTabs()
 
    FOR n := 1 TO LEN( ::Forms )
        IF ::Forms[n]:Editor != NIL
@@ -3326,12 +3324,11 @@ METHOD Close( lCloseErrors ) CLASS Project
        ENDIF
    NEXT
    ::Forms := {}
+   ::Application:FormsTabs:DeleteAllTabs()
 
    IF ::DesignPage == NIL
       RETURN .T.
    ENDIF
-
-   //UnregisterClass( "VXH_FORM_IDE", GetModuleHandle() )
 
    ::Application:MainForm:ToolBox1:Disable()
 
@@ -3385,7 +3382,6 @@ METHOD Close( lCloseErrors ) CLASS Project
    ::Application:SourceEditor:Hide()
 
    ::Application:DesignPage:Disable()
-   //::Application:EditorPage:Select()
    ::Application:Props[ "StartTabPage" ]:Select()
 
    ::Application:Props[ "ComboSelect" ]:ResetContent()
@@ -3411,6 +3407,7 @@ METHOD Close( lCloseErrors ) CLASS Project
    ::CurrentForm := NIL
    
    IF IsWindow( ::Application:MainForm:hWnd )
+      EVAL( ::Application:MainTab:OnSelChanged, NIL, NIL, 1)
       ::EditReset(1)
 
       ::Application:SourceEditor:Caption := ""
@@ -3419,8 +3416,8 @@ METHOD Close( lCloseErrors ) CLASS Project
          ::Application:DebugWindow:Hide()
       ENDIF
       ::Application:Components:Close()
-      HB_GCALL(.T.)
-      EVAL( ::Application:MainTab:OnSelChanged, NIL, NIL, 1)
+      VIEW "Project closed"
+      hb_gcall( .T. )
    ENDIF
 RETURN .T.
 
@@ -3737,7 +3734,7 @@ METHOD Open( cProject ) CLASS Project
       ENDIF
 
    ENDIF
-
+   
    ::Application:Cursor := ::System:Cursor:Busy
    SetCursor( ::Application:Cursor )
 
@@ -3809,6 +3806,7 @@ METHOD Open( cProject ) CLASS Project
       aChildren   := {}
       WHILE HB_FReadLine( hFile, @cLine, XFM_EOL ) == 0
          ::ParseXFM( cLine, hFile, @aChildren, cFile, @nLine, @aErrors, @aEditors )
+         hb_gcall()
          nLine++
       END
       FClose( hFile )
@@ -3833,6 +3831,7 @@ METHOD Open( cProject ) CLASS Project
 
        WHILE HB_FReadLine( hFile, @cLine, XFM_EOL ) == 0
           ::ParseXFM( cLine, hFile, @aChildren, cFile, @nLine, @aErrors, @aEditors )
+          hb_gcall()
           nLine++
        END
        FClose( hFile )
@@ -3961,7 +3960,6 @@ METHOD Open( cProject ) CLASS Project
    ::Application:Cursor := NIL
    SetCursor( ::System:Cursor:Arrow )
    ::Built := .F.
-   HB_GCALL(.T.)
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -4485,6 +4483,8 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    ::Application:ObjectManager:InvalidateRect(, .F. )
 
    ::__ExtraLibs := {}
+   
+   hb_gcall(.T.)
 
    DEFAULT lProj TO .F.
    DEFAULT lForce TO .F.
@@ -4845,12 +4845,11 @@ RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD GenerateChild( oCtrl, nTab, aChildEvents, cColon, cParent, nID ) CLASS Project
-   LOCAL cText := "", oChild, Topic, Event, n, cProp, cChild
+   LOCAL cText := "", oChild, Topic, Event, n, cProp, cChild, nSecs
    ( cColon )
    ( nID )
-   oCtrl:Application:Yield()
    IF oCtrl:Caption != "[ Add New Item ]"
-
+      nSecs := Seconds()
       IF !oCtrl:__CustomOwner
          cText := SPACE( nTab ) + "WITH OBJECT ( " + IIF( oCtrl:ClassName == "CUSTOMCONTROL", UPPER( oCtrl:__xCtrlName ), oCtrl:ClassName ) + "( " + cParent + " ) )" + CRLF
 
@@ -4942,6 +4941,8 @@ METHOD GenerateChild( oCtrl, nTab, aChildEvents, cColon, cParent, nID ) CLASS Pr
          NEXT
 
       ENDIF
+      OutputDebugString( oCtrl:Name + ": " + xStr( Seconds()-nSecs ) )
+      hb_gcStep()
 
    ENDIF
 RETURN cText
@@ -5549,7 +5550,7 @@ RETURN .T.
 METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, nInsMetPos, lCustom ) CLASS Project
    LOCAL cText
    LOCAL oChild, Event, n, cResImg, Topic, oCtrl, nPos
-   LOCAL cProperty, cChar, aImg, nSecs
+   LOCAL cProperty, cChar, aImg
    ( lChildren )
 
    cText := "//------------------------------------------------------------------------------------------------------------------------------------" + CRLF
@@ -5719,7 +5720,6 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
    IF !oWnd:Modal
       nPos := 1
       FOR EACH oChild IN oWnd:Children
-          nSecs := Seconds()
           IF oChild:ClsName == "CMenuItem"
              cProperty := ""
 
@@ -5738,7 +5738,6 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
              cText += ::GenerateChild( oChild, 3, @aChildEvents, "::", "Self", nPos )
           ENDIF
           nPos++
-          //view oChild:Name, Seconds()-nSecs
       NEXT
       IF UPPER(cClsName) == "WINDOW" .OR. UPPER(cClsName) == "MDICHILDWINDOW" .OR. UPPER(cClsName) == "WINFORM"
          cText += "   ::Show()" + CRLF + CRLF
@@ -5826,7 +5825,6 @@ METHOD SetAction( aActions, aReverse ) CLASS Project
            ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := LEN( ::aRedo ) > 0
 
            ::Application:Props[ "ComboSelect" ]:Reset(oCtrl)
-           //HB_GCALL(.T.)
            RETURN Self
 
       CASE DG_DELCONTROL
@@ -5936,27 +5934,9 @@ METHOD SetAction( aActions, aReverse ) CLASS Project
             CATCH
            END
            ::Application:Project:Modified := .T.
-           //HB_GCALL(.T.)
            RETURN Self
-/*
-      CASE DG_ALIGNSELECTION
-           aControls := {}
-           FOR EACH oCtrl IN aAction[2]
-               AADD( aControls, oCtrl )
-               oCtrl:Left :=
-               oCtrl:MoveWindow()
-           NEXT
-           ADEL( aActions, LEN( aActions ), .T. )
-           ::Application:Props[ "EditUndoItem"  ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := LEN( ::aUndo ) > 0
-           ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := LEN( ::aRedo ) > 0
 
-           ::CurrentForm:UpdateSelection()
-
-           AADD( aReverse, { DG_ALIGNSELECTION, aControls } )
-           EXIT
-*/
       CASE DG_MOVESELECTION
-
            TRY
               IF aAction[5] == 1
                  IF aAction[6] != NIL .AND. !(aAction[6]==aAction[2][1]:Parent)

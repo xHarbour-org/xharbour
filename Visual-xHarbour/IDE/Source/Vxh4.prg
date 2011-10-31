@@ -1306,7 +1306,8 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
        IF cProp == "MDICONTAINER" .AND. LEN( ::Application:Project:Forms ) > 0 .AND. !( ::ActiveObject:hWnd == ::Application:Project:Forms[1]:hWnd )
           LOOP
        ENDIF
-       
+       hb_gcStep()
+
        TRY
          xValue := ::ActiveObject:&cProp
        CATCH

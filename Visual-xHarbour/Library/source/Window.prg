@@ -395,7 +395,8 @@ CLASS Window INHERIT Object
    METHOD __SetSizePos()
    METHOD __GetBrush()         VIRTUAL
    METHOD __PaintBakgndImage() VIRTUAL
-
+   METHOD __GC()               VIRTUAL
+   
    METHOD EnableThemeDialogTexture( nFlags ) INLINE EnableThemeDialogTexture( ::hWnd, nFlags )
    METHOD SetInvStyle( n, l )     INLINE ::SetStyle( n, !l )
    METHOD DragAcceptFiles(l)      INLINE IIF( ::hWnd != NIL, DragAcceptFiles( ::hWnd, l ), NIL )
@@ -2058,6 +2059,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               DestroyWindow( ::__TaskBarParent )
            ENDIF
            ::hWnd := NIL
+           ::__GC()
            EXIT
 
 /*
@@ -5216,6 +5218,8 @@ CLASS WinForm INHERIT Window
    METHOD __SetBitmapMaskColor()
    METHOD __PaintBakgndImage()
    METHOD __PrcMdiMenu()
+   METHOD __GC()           INLINE IIF( ::__ClassInst == NIL, hb_gcAll(),)
+
    METHOD SetImageList()
 
    METHOD SetBackColor( nColor, lRepaint ) INLINE ::Super:SetBackColor( nColor, lRepaint ), IIF( ::BackgroundImage != NIL .AND. ::BackgroundImage:hDIB != NIL, ::BackgroundImage:__SetImageName( ::BackgroundImage:xImageName ), )
