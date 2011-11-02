@@ -88,7 +88,7 @@ PROCEDURE Main( cFile )
    //RegisterDotNetComponent( "c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\System.Windows.Forms.dll", "DotNet.Forms.1", @cError )
 
    AssociateWith( ".xfm", "vxh_project_component", "c:\windows\notepad.exe", "Visual xHarbour file", 1 )
-   AssociateWith( ".vxh", "vxh_project_file", GetModuleFileName(), "Visual xHarbour Project", 1 )
+   AssociateWith( ".vxh", "vxh_project_file", GetModuleFileName(), "Visual xHarbour Project", 0 )
 
    //AssociateWith( ".prg", "prg_file", "c:\Program Files\TextPad 5\TextPad.exe", "xHarbour file", 0 )
 
@@ -178,8 +178,8 @@ METHOD SetEditorPos( nLine, nColumn ) CLASS IDE
    END
 RETURN Self
 
-METHOD Init( cFile ) CLASS IDE
-   LOCAL aEntries, n
+METHOD Init( ... ) CLASS IDE
+   LOCAL aEntries, n, cFile
    PUBLIC aChangedProps
 
    m->aChangedProps := {}
@@ -196,6 +196,14 @@ METHOD Init( cFile ) CLASS IDE
    ::Super:Init( NIL )
 
    ::IdeActive := TRUE
+   
+   IF HB_ArgC() > 0
+      cFile := ""
+      FOR n := 1 TO HB_ArgC()
+          cFile += HB_ArgV(n) + " "
+      NEXT
+      cFile := ALLTRIM( cFile )
+   ENDIF
 
    IF ::Running
       IF cFile != NIL
@@ -4465,7 +4473,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    LOCAL n, cWindow := "", oFile, oForm
-   LOCAL lNew := .F., aImage, aEditors, aChildEvents, nInsMetPos, cChildEvents, cEvent, cText, cPath, cBuffer, cResPath
+   LOCAL lNew := .F., aImage, aEditors, aChildEvents, nInsMetPos, cChildEvents, cEvent, cText, cPath, cBuffer, cResPath, nSecs
    LOCAL aDir, x, xVersion, cType, cRc, cPrj, hFile, cLine, xPath, xName, lPro, i, cName, cResImg, cFile, cSourcePath, cPrevRes//, oWait
 
    //oWait := ::Application:MainForm:MessageWait( "Saving Project " + ::Properties:Name )
@@ -4476,6 +4484,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    ::__ExtraLibs := {}
    
    hb_gcall(.T.)
+   nSecs := Seconds()
 
    DEFAULT lProj TO .F.
    DEFAULT lForce TO .F.
@@ -4799,6 +4808,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
 
    oFile:FileBuffer := cBuffer
    oFile:Save()
+   OutputDebugString( " Saving finished: " + xStr( Seconds()-nSecs ) )
 
    ::Built := .F.
 
@@ -4843,11 +4853,10 @@ RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD GenerateChild( oCtrl, nTab, aChildEvents, cColon, cParent, nID ) CLASS Project
-   LOCAL cText := "", oChild, Topic, Event, n, cProp, cChild, nSecs
+   LOCAL cText := "", oChild, Topic, Event, n, cProp, cChild
    ( cColon )
    ( nID )
    IF oCtrl:Caption != "[ Add New Item ]"
-      nSecs := Seconds()
       IF !oCtrl:__CustomOwner
          cText := SPACE( nTab ) + "WITH OBJECT ( " + IIF( oCtrl:ClassName == "CUSTOMCONTROL", UPPER( oCtrl:__xCtrlName ), oCtrl:ClassName ) + "( " + cParent + " ) )" + CRLF
 
@@ -4939,8 +4948,7 @@ METHOD GenerateChild( oCtrl, nTab, aChildEvents, cColon, cParent, nID ) CLASS Pr
          NEXT
 
       ENDIF
-      OutputDebugString( oCtrl:Name + " - " + xStr( Seconds()-nSecs ) )
-      hb_gcStep()
+      //hb_gcStep()
    ENDIF
 RETURN cText
 
