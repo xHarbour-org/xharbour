@@ -185,6 +185,7 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
       cProject += "RETURN NIL"+ CRLF+ CRLF
       cMain := STRTRAN( cMain, "RETURN NIL"+ CRLF, cProject )
       ::Application:ProjectPrgEditor:Load( , cMain, .F., .F. )
+      ::Application:ProjectPrgEditor:lModified := .T.
    ENDIF
 
    IF !::Application:Project:DesignPage
@@ -1098,6 +1099,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
              AADD( aRect, { nLeft, nTop, nWidth, nHeight } )
              AADD( aControls, ::Selected[n][1] )
          NEXT
+         ::Application:Project:Modified := .T.
          ::__lModified := .T.
    
          ::Application:Project:SetAction( { { DG_MOVESELECTION,;

@@ -42,7 +42,6 @@ RETURN Self
 METHOD OnInitDialog() CLASS ImageManager
    LOCAL n
    ToolBar( Self )
-   DirChange( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Resource )
    WITH OBJECT ::ToolBar1
       :Create()
       :AddBitmap( -1, IDB_STD_SMALL_COLOR )
@@ -233,9 +232,8 @@ METHOD AddImage() CLASS ImageManager
       WITH OBJECT ::DataGrid1
          FOR EACH cFile IN oFile:Name
              IF lCopy
-                DirChange( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Resource )
                 CopyFile( oFile:Path + "\" + cFile, ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Resource + "\" + cFile )
-                :ImageList:AddImage( cFile,,, LR_LOADFROMFILE, IIF( UPPER( RIGHT( cFile, 4 ) ) == ".ICO", IMAGE_ICON, IMAGE_BITMAP ) )
+                :ImageList:AddImage( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Resource + "\" + cFile,,, LR_LOADFROMFILE, IIF( UPPER( RIGHT( cFile, 4 ) ) == ".ICO", IMAGE_ICON, IMAGE_BITMAP ) )
                ELSE
                 :ImageList:AddImage( oFile:Path + "\" + cFile,,, LR_LOADFROMFILE, IIF( UPPER( RIGHT( cFile, 4 ) ) == ".ICO", IMAGE_ICON, IMAGE_BITMAP ) )
              ENDIF

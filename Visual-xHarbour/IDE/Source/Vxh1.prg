@@ -34,10 +34,8 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 #define XFM_EOL Chr(13) + Chr(10)
 #define HKEY_LOCAL_MACHINE           (0x80000002)
 
-//#define __OLDGEN__
-
-#define VXH_Version      "2.5"
-#define VXH_BuildVersion "231"
+#define VXH_Version      "3.0"
+#define VXH_BuildVersion "1"
 
 #define MCS_ARROW    10
 #define MCS_PASTE    11
@@ -89,7 +87,9 @@ PROCEDURE Main( cFile )
 
    //RegisterDotNetComponent( "c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\System.Windows.Forms.dll", "DotNet.Forms.1", @cError )
 
-   AssociateWith( ".xfm", "vxh_project", "c:\windows\notepad.exe", "Visual xHarbour file", 1 )
+   AssociateWith( ".xfm", "vxh_project_component", "c:\windows\notepad.exe", "Visual xHarbour file", 1 )
+   AssociateWith( ".vxh", "vxh_project_file", GetModuleFileName(), "Visual xHarbour Project", 1 )
+
    //AssociateWith( ".prg", "prg_file", "c:\Program Files\TextPad 5\TextPad.exe", "xHarbour file", 0 )
 
    IDE( cFile )
@@ -2320,7 +2320,6 @@ CLASS Project
    METHOD AddImage()
    METHOD RemoveImage()
    METHOD AddControl()
-   METHOD FixPath()
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -3104,9 +3103,9 @@ METHOD SetCaption( lMod ) CLASS Project
 
    ::lModified := lMod
 
-   //IF lMod .AND. ::CurrentForm != NIL .AND. procname(3) != "EDITOR:ACTION"
-   //   ::CurrentForm:__lModified := .T.
-   //ENDIF
+   IF lMod .AND. ::CurrentForm != NIL .AND. procname(3) IN {"PROJECT:SETACTION", "EVENTMANAGER:SETVALUE", "EVENTMANAGER:GENERATEEVENT" }
+      ::CurrentForm:__lModified := .T.
+   ENDIF
 
    IF ::Properties == NIL
       #ifdef VXH_DEMO
@@ -3416,7 +3415,6 @@ METHOD Close( lCloseErrors ) CLASS Project
          ::Application:DebugWindow:Hide()
       ENDIF
       ::Application:Components:Close()
-      VIEW "Project closed"
       hb_gcall( .T. )
    ENDIF
 RETURN .T.
@@ -3675,16 +3673,6 @@ METHOD AddBinary( cFile ) CLASS Project
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD FixPath( cPath, cSubDir ) CLASS Project
-   DEFAULT cPath TO ::Properties:Path
-   IF AT( ":", ::Properties:&cSubDir ) > 0 .OR. AT( "\\", ::Properties:&cSubDir ) > 0 // full drive path or network path
-      cPath := ::Properties:&cSubDir
-    ELSE
-      cPath += "\" + ::Properties:&cSubDir
-   ENDIF
-RETURN cPath
-
-//-------------------------------------------------------------------------------------------------------
 METHOD Open( cProject ) CLASS Project
 
    EXTERN MDIChildWindow
@@ -3743,7 +3731,7 @@ METHOD Open( cProject ) CLASS Project
    ::Properties := ProjProp( ::ProjectFile:Path + "\" + ::ProjectFile:Name )
 
    // Open Project.prg
-   cSourcePath := ::FixPath(, "Source" )
+   cSourcePath := ::Properties:Path + "\" + ::Properties:Source
 
    IF !FILE( cSourcePath +"\" + ::Properties:Name +"_Main.prg" )
 
@@ -4004,7 +3992,7 @@ METHOD ParseXFM( cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors, oCC, 
                // Initialize Form Designer
                oObj := ::AddWindow(.F., cObjectName + ".prg", cClassName == "CUSTOMCONTROL" )
                DEFAULT oForm TO oObj
-               cSourcePath := ::FixPath(, "Source" )
+               cSourcePath := ::Properties:Path + "\" + ::Properties:Source
                oObj:Editor:Load( cSourcePath + "\" + cObjectName + ".prg",, .F., .F. )
                ::Application:SourceEditor:oEditor := oObj:Editor
                AADD( aChildren, { cObjectName, oObj } )
@@ -4158,11 +4146,11 @@ METHOD ParseXFM( cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors, oCC, 
 
             ELSEIF cLine HAS "(?i)^END"
                // Finish object type PROPERTY / Control, return to previous parent
-               IF __clsParent( oObj:ClassH, "COMPONENT" ) .OR. oObj:ClsName == "Anchor" .OR. oObj:ClsName == "Dock" .OR. oObj:ClsName == "FreeImageRenderer"
+               IF __clsParent( oObj:ClassH, "COMPONENT" ) .OR. UPPER( oObj:ClsName ) IN { "ANCHOR", "DOCK", "FREEIMAGERENDERER" }
                   oObj := oObj:Owner
                 ELSE
                   TRY
-                     oObj := IIF( oObj:__xCtrlName == "OptionBarButton", oObj:Parent:Parent, oObj:Parent )
+                     oObj := IIF( UPPER( oObj:__xCtrlName ) == "OPTIONBARBUTTON", oObj:Parent:Parent, oObj:Parent )
                   CATCH
                      oObj := oObj:Parent
                   END
@@ -4219,7 +4207,7 @@ METHOD ParseXFM( cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors, oCC, 
                   oObj:BackgroundImage := FreeImageRenderer( oObj )
                ENDIF
 
-            ELSEIF cLine HAS "(?i)^:EventHandler\["
+            ELSEIF UPPER( cLine ) HAS "(?i)^:EVENTHANDLER\["
 
                IF oCC == NIL .AND. oObj:ClsName != "CCTL"
                   // Handle WITH OBJECT Events.
@@ -4306,10 +4294,10 @@ METHOD ParseXFM( cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors, oCC, 
                   xValue := oObj:Form
 
                 ELSE
-                  IF cWithProperty == "Caption" .AND. LEFT( cWithValue, 1 ) == "(" .AND. RIGHT( ALLTRIM( cWithValue ), 1 ) == ")"
+                  IF UPPER( cWithProperty ) == "CAPTION" .AND. LEFT( cWithValue, 1 ) == "(" .AND. RIGHT( ALLTRIM( cWithValue ), 1 ) == ")"
                      xValue := cWithValue
-                   ELSEIF cWithProperty == "Owner"
-                     IF AT( ":Parent:", cWithValue ) > 0
+                   ELSEIF UPPER( cWithProperty ) == "OWNER"
+                     IF AT( ":PARENT:", UPPER( cWithValue ) ) > 0
                         cWithValue := STRTRAN( cWithValue, ":Parent:" )
                         IF ( n := ASCAN( oObj:Parent:Children, {|o| o:Name == cWithValue } ) ) > 0
                            xValue := oObj:Parent:Children[n]
@@ -4318,7 +4306,7 @@ METHOD ParseXFM( cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors, oCC, 
                         ENDIF
 
                         //xValue := oObj:Parent:&cWithValue
-                      ELSEIF AT( ":Form:", cWithValue ) > 0
+                      ELSEIF AT( ":FORM:", UPPER( cWithValue ) ) > 0
                         cWithValue := STRTRAN( cWithValue, ":Form:" )
                         xValue := oObj:Form:&cWithValue
                       ELSE
@@ -4337,14 +4325,14 @@ METHOD ParseXFM( cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors, oCC, 
                 ELSE
                   __objSendMsg( oObj, "_" + cWithProperty, xValue )
                ENDIF
-            ELSEIF cLine HAS "(?i)^:AddImage\("
+            ELSEIF UPPER( cLine ) HAS "(?i)^:ADDIMAGE\("
                // Add saved Images to ImageList component
                cLine := STRTRAN( cLine, ":AddImage(" )
                cLine := STRTRAN( cLine, ")" )+", .T., .T. "
                hPtr := HB_ObjMsgPtr( oObj, "AddImage" )
                HB_Exec( hPtr, oObj, &cLine )
 
-            ELSEIF cLine HAS "(?i)^:Create\(\)"
+            ELSEIF UPPER( cLine ) HAS "(?i)^:CREATE\(\)"
                // Create Object
                oObj:Create()
 
@@ -4419,7 +4407,7 @@ METHOD SaveAs( cName ) CLASS Project
          ::Application:ObjectManager:RenameForm( "__"+cPrev, "__"+STRTRAN( cCurr, " ","_" ), .T. )
       ENDIF
 
-      cSourcePath := ::FixPath(, "Source" )
+      cSourcePath := ::Properties:Path + "\" + ::Properties:Source
       IF FILE( cSourcePath + "\" + cPrev +"_XFM.prg" )
          FRENAME( cSourcePath + "\" + cCurr +"_XFM.prg",;
                   cSourcePath + "\" + STRTRAN( cCurr," ","_") +"_XFM.prg" )
@@ -4478,7 +4466,10 @@ RETURN Self
 METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    LOCAL n, cWindow := "", oFile, oForm
    LOCAL lNew := .F., aImage, aEditors, aChildEvents, nInsMetPos, cChildEvents, cEvent, cText, cPath, cBuffer, cResPath
-   LOCAL aDir, x, xVersion, cType, cRc, cPrj, hFile, cLine, xPath, xName, lPro, i, cName, cResImg, cFile, cSourcePath, cPrevRes
+   LOCAL aDir, x, xVersion, cType, cRc, cPrj, hFile, cLine, xPath, xName, lPro, i, cName, cResImg, cFile, cSourcePath, cPrevRes//, oWait
+
+   //oWait := ::Application:MainForm:MessageWait( "Saving Project " + ::Properties:Name )
+
    m->aChangedProps := {} // reset changed properties for bold text display
    ::Application:ObjectManager:InvalidateRect(, .F. )
 
@@ -4501,24 +4492,24 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    IF lNew  .OR. ! IsDirectory( cPath )
       MakeDir( cPath )
    ENDIF
-   DirChange( cPath )
 
-   IF ! IsDirectory( ::Properties:Binary )
-      MakeDir( ::Properties:Binary )
+   IF ! IsDirectory( cPath + "\" + ::Properties:Binary )
+      MakeDir( cPath + "\" + ::Properties:Binary )
    ENDIF
-   IF ! IsDirectory( ::Properties:Objects )
-      MakeDir( ::Properties:Objects )
+   IF ! IsDirectory( cPath + "\" + ::Properties:Objects )
+      MakeDir( cPath + "\" + ::Properties:Objects )
    ENDIF
-   IF ! IsDirectory( ::Properties:Source )
-      MakeDir( ::Properties:Source )
+   IF ! IsDirectory( cPath + "\" + ::Properties:Source )
+      MakeDir( cPath + "\" + ::Properties:Source )
    ENDIF
-   IF ! IsDirectory( ::Properties:Resource )
-      MakeDir( ::Properties:Resource )
+   IF ! IsDirectory( cPath + "\" + ::Properties:Resource )
+      MakeDir( cPath + "\" + ::Properties:Resource )
    ENDIF
 
    IF cPrevPath != NIL
-      cPrevRes := ::FixPath( cPrevPath, "Resource" )
-      cResPath := ::FixPath( , "Resource" )
+      cPrevRes := cPrevPath + "\" + ::Properties:Source
+      cResPath := ::Properties:Path + "\" + ::Properties:Resource
+
       aDir := directory( cPrevRes + "\*.*", "D", .F.,.f. )
 
       FOR n := 1 TO LEN( aDir )
@@ -4547,7 +4538,8 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
        END
    NEXT
 
-   cSourcePath := ::FixPath(, "Source" )
+   cSourcePath := cPath + "\" + ::Properties:Source
+
    IF ::Application:ProjectPrgEditor:lModified .OR. lForce .OR. !FILE( cSourcePath + "\" + ::Properties:Name +"_Main.prg" )
       ::Application:ProjectPrgEditor:Save( cSourcePath + "\" + ::Properties:Name +"_Main.prg" )
    ENDIF
@@ -4667,8 +4659,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
 
    IF ::Properties:ThemeActive
       oFile := CFile( ::Properties:Name + ".XML" )
-      oFile:Path := ::FixPath( cPath, "Resource" )
-
+      oFile:Path := cPath + "\" + ::Properties:Resource
       oFile:FileBuffer := ;
          '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'                    + CRLF +;
          '<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">'  + CRLF +;
@@ -4697,7 +4688,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    ENDIF
    // Generate Resource file
    oFile := CFile( ::Properties:Name + ".rc" )
-   oFile:Path := ::FixPath( cPath, "Resource" )
+   oFile:Path := cPath + "\" + ::Properties:Resource
 
    IF ::Properties:ThemeActive
       cBuffer := 'IDOK MANIFEST "' + ::Properties:Name + '.XML"' + CRLF
@@ -4823,6 +4814,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    WinSetCursor( ::System:Cursor:Arrow )
 
    ::Modified := .F.
+   //oWait:Destroy()
 RETURN Self
 
 #define LANG_NEUTRAL       0x00
@@ -4947,9 +4939,8 @@ METHOD GenerateChild( oCtrl, nTab, aChildEvents, cColon, cParent, nID ) CLASS Pr
          NEXT
 
       ENDIF
-      OutputDebugString( oCtrl:Name + ": " + xStr( Seconds()-nSecs ) )
+      OutputDebugString( oCtrl:Name + " - " + xStr( Seconds()-nSecs ) )
       hb_gcStep()
-
    ENDIF
 RETURN cText
 
@@ -4962,7 +4953,6 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
    DEFAULT cText TO ""
 
    IF oCtrl:__ClassInst != NIL
-
       IF hOleVars == NIL
          aProperties := __ClsGetPropertiesAndValues( oCtrl )
        ELSE
@@ -5131,6 +5121,7 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
           IF cProperty != NIL
              EXIT
           ENDIF
+          */
       NEXT
    ENDIF
 
@@ -5217,7 +5208,8 @@ METHOD Run( lRunOnly ) CLASS Project
    DEFAULT lRunOnly TO .F.
    TRY
       cPath := ::Properties:Path
-      cBinPath := ::FixPath(, "Binary" )
+      cBinPath := cPath + "\" + ::Properties:Binary
+
       cExe := cBinPath + "\" + IIF( !EMPTY( ::Properties:TargetName ), ::Properties:TargetName, ::Properties:Name ) + aTargetTypes[ ::Properties:TargetType ]
 
       IF ::Modified .AND. !lRunOnly
@@ -5284,9 +5276,17 @@ METHOD Build( lForce ) CLASS Project
    ENDIF
    cPath := ::Properties:Path
 
-   cBinPath    := ::FixPath( cPath, "Binary" )
-   cSourcePath := ::FixPath( cPath, "Source" )
-   cObjPath    := ::FixPath( cPath, "Objects" )
+   cBinPath    := cPath + "\" + ::Properties:Binary
+   cSourcePath := cPath + "\" + ::Properties:Source
+   cObjPath    := cPath + "\" + ::Properties:Objects
+
+   IF ! IsDirectory( cBinPath )
+      MakeDir( cBinPath )
+   ENDIF
+   IF ! IsDirectory( cObjPath )
+      MakeDir( cObjPath )
+   ENDIF
+
 
    cExe  := cBinPath + "\" + IIF( !EMPTY( ::Properties:TargetName ), ::Properties:TargetName, ::Properties:Name ) + aTargetTypes[ ::Properties:TargetType ]
    IF lForce .AND. FILE( cExe )
@@ -5311,10 +5311,7 @@ METHOD Build( lForce ) CLASS Project
       // TODO: Add support for XHB_* settings.
       //oProject := LoadProject( cProject, NIL, xHB_Root, PRG_Flags, xHB_LibFolder, xHB_Exe )
 
-
       cPath := ::Properties:Path
-
-      //DirChange( cPath )
 
       cProject := cPath + "\" + ::Properties:Name + aTargetTypes[ ::Properties:TargetType ]
       IF !EMPTY( ::Properties:TargetName ) //.AND. ::Properties:TargetType < 4
@@ -5423,7 +5420,7 @@ METHOD Build( lForce ) CLASS Project
 
          :lGUI := ::Properties:GUI
 
-         cResPath := ::FixPath( cPath, "Resource" )
+         cResPath := cPath + "\" + ::Properties:Resource
          :AddFiles( cResPath + "\" + ::Properties:Name + ".rc" )
 
          IF ::Properties:TargetType IN {1,3,5} // EXE, DLL, DLL OLE SERVER

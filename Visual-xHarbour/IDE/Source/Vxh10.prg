@@ -52,7 +52,6 @@ METHOD OnInitDialog() CLASS ResourceManager
    LOCAL n, cResName, cType, aFile
    ::CenterWindow( .T. )
    ::RestoreLayout(, "WindowPosition")
-   DirChange( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Resource )
    WITH OBJECT ToolStrip( Self )
       :ImageList := ImageList( :this, 16, 16 ):Create()
       :ImageList:AddImage( IDB_STD_SMALL_COLOR )
@@ -190,7 +189,6 @@ METHOD AddResource() CLASS ResourceManager
       WITH OBJECT ::DataGrid1
          FOR EACH cFile IN oFile:Name
              IF lCopy
-                DirChange( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Resource )
                 CopyFile( oFile:Path + "\" + cFile, ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Resource + "\" + cFile )
                 oFile:Path := ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Resource
              ENDIF

@@ -7,6 +7,16 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2011-11-01 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Forced creating missing directories during build process to avoid I/O errors
+   * Changed main array of property names to be separated alphabet hashes to allow
+     fastest access when saving projects and showing properties in Object Manager.
+     the biggest project I have saves in about 2.96 seconds.
+   * Changed the entire system to use relative paths to avoid changing directories. This
+     makes VXH more dynamic, faster and safer.
+   ! Forced association of file type VXH to vxh.exe
+   * Changed current version to 3.0
+
 2011-10-31 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Reduced project loading time by 80%
    ! Reduced Save time by 70%

@@ -6,6 +6,8 @@
 static aGroupProp
 static cCurFolder
 
+static __aProps := {=>}
+
 #include "vxh.ch"
 #include "cstruct.ch"
 #include "colors.ch"
@@ -87,7 +89,6 @@ RETURN DLGC_WANTALLKEYS + DLGC_WANTARROWS + DLGC_WANTCHARS
 METHOD Init( oParent ) CLASS ObjManager
    LOCAL cColor
    ::ReleaseEditSelection := .F.
-   GetPropArray()
 
    DEFAULT ::__xCtrlName  TO "ObjManager"
    ::Super:Init( oParent )
@@ -1258,6 +1259,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
 
    FOR EACH aProperty IN aProperties
        ::Application:Yield()
+       hb_gcAll()
        cProp  := aProperty[1]
 
        IF cProp == "RESOURCES" .AND. ::ActiveObject:ClsName == "Application"
@@ -1378,7 +1380,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
           END
        ENDIF
 
-       aProp := GetProperCase( __Proper( cProp ) )
+       aProp := GetProperCase( cProp )
        cProp := aProp[1]
 
 
@@ -1394,7 +1396,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
           oItem:Create()
        ENDIF
 
-       aCol := { TreeColItem( IIF( VALTYPE(xValue)=="O", "", xValue ), cType, , nColor, cProp, , ,aProp[3] ) }
+       aCol := { TreeColItem( IIF( VALTYPE(xValue)=="O", "", xValue ), cType, , nColor, cProp, , ,/*aProp[3]*/ ) }
 
        IF __ObjHasMsg( ::ActiveObject, "Enum"+cProp )
           aCol[1]:Value    := ::ActiveObject:Enum&cProp[1]
@@ -1778,7 +1780,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                  ENDIF
               ENDIF
 
-              cProp2  := GetProperCase( __Proper( cProp2 ) )[1]
+              cProp2  := GetProperCase( cProp2 )[1]
               aCol    := { TreeColItem( IIF( VALTYPE(xValue2)=="O", "", xValue2 ), cType, , nColor, cProp2, cProp ) }
 
               IF cProp == "Dock"
@@ -3166,7 +3168,7 @@ METHOD ResetEvents( aSel ) CLASS EventManager
           FOR EACH Event IN Topic[2]
               oSub := oItem:AddItem( Event[1], 0, { TreeColItem( Event[2], "C", ,NIL , Event[1]) } )
           NEXT
-
+          hb_gcall()
       NEXT
       ::ExpandAll()
       IF LEN( ::Items ) > 0
@@ -3426,443 +3428,464 @@ ENDCLASS
 
 
 FUNCTION GetProperCase( cProp )
-   LOCAL n := ASCAN( aGroupProp, {|a| UPPER( a[1] ) == UPPER( cProp ) } )
+   LOCAL n := ASCAN( __aProps[ UPPER( cProp[1] ) ], {|a| UPPER( a[1] ) == UPPER( cProp ) } )
    IF n > 0
-      RETURN aGroupProp[n]
+      RETURN __aProps[ UPPER( cProp[1] ) ][n]
    ENDIF
-RETURN { cProp, "", NIL }
+RETURN { __Proper( cProp ), "" }
 
-STATIC FUNCTION GetPropArray()
-   LOCAL aStyle, aGeneral
-   LOCAL aSet := { { "SetAlternate",               "Set", },;
-                   { "SetCentury",                 "Set", },;
-                   { "SetCancel",                  "Set", },;
-                   { "SetDeleted",                 "Set", },;
-                   { "SetDefault",                 "Set", },;
-                   { "SetDecimals",                "Set", },;
-                   { "SetDateFormat",              "Set", },;
-                   { "SetEpoch",                   "Set", },;
-                   { "SetExact",                   "Set", },;
-                   { "SetExclusive",               "Set", },;
-                   { "SetFixed",                   "Set", },;
-                   { "SetPath",                    "Set", },;
-                   { "SetSoftseek",                "Set", },;
-                   { "SetUnique",                  "Set", },;
-                   { "SetDebug",                   "Set", },;
-                   { "SetTypeahead",               "Set", },;
-                   { "SetCursor",                  "Set", },;
-                   { "SetConsole",                 "Set", },;
-                   { "SetAltfile",                 "Set", },;
-                   { "SetDevice",                  "Set", },;
-                   { "SetExtra",                   "Set", },;
-                   { "SetExtrafile",               "Set", },;
-                   { "SetPrinter",                 "Set", },;
-                   { "SetPrintfile",               "Set", },;
-                   { "SetMargin",                  "Set", },;
-                   { "SetBell",                    "Set", },;
-                   { "SetConfirm",                 "Set", },;
-                   { "SetEscape",                  "Set", },;
-                   { "SetInsert",                  "Set", },;
-                   { "SetExit",                    "Set", },;
-                   { "SetIntensity",               "Set", },;
-                   { "SetScoreboard",              "Set", },;
-                   { "SetDelimiters",              "Set", },;
-                   { "SetDelimchars",              "Set", },;
-                   { "SetWrap",                    "Set", },;
-                   { "SetMessage",                 "Set", },;
-                   { "SetMcenter",                 "Set", },;
-                   { "SetScrollbreak",             "Set", },;
-                   { "SetEventmask",               "Set", },;
-                   { "SetVideomode",               "Set", },;
-                   { "SetMblocksize",              "Set", },;
-                   { "SetMfileext",                "Set", },;
-                   { "SetStrictread",              "Set", },;
-                   { "SetOptimize",                "Set", },;
-                   { "SetAutopen",                 "Set", },;
-                   { "SetAutorder",                "Set", },;
-                   { "SetAutoshare",               "Set", },;
-                   { "SetCount",                   "Set", },;
-                   { "SetLanguage",                "Set", },;
-                   { "SetIdlerepeat",              "Set", },;
-                   { "SetTrace",                   "Set", },;
-                   { "SetTracefile",               "Set", },;
-                   { "SetTracestack",              "Set", },;
-                   { "SetFilecase",                "Set", },;
-                   { "SetDircase",                 "Set", },;
-                   { "SetDirseparator",            "Set", },;
-                   { "SetErrorloop",               "Set", },;
-                   { "SetOutputsafety",            "Set", },;
-                   { "SetDbflockscheme",           "Set", },;
-                   { "SetBackgroundtasks",         "Set", },;
-                   { "SetTrimfilename",            "Set", },;
-                   { "SetGtmode",                  "Set", },;
-                   { "SetBackgroundtick",          "Set", },;
-                   { "SetPrinterjob",              "Set", },;
-                   { "SetHardcommit",              "Set", },;
-                   { "SetForceopt",                "Set", },;
-                   { "SetEol",                     "Set", },;
-                   { "SetErrorlog",                "Set", } }
+INIT PROCEDURE GetPropArray()
+__aProps["A"] := { { "AutoHScroll",             "Style"     },;
+                   { "AutoVScroll",             "Style"     },;
+                   { "Alias",                   ""          },;
+                   { "Animate",                 ""          },;
+                   { "AutoRun",                 ""          },;
+                   { "AlwaysOnTop",             "Behavior"  },;
+                   { "AnchorColumn",            "Behavior"  },;
+                   { "AllowDragRecords",        "Behavior"  },;
+                   { "AllowCurrentPage",        "Behavior"  },;
+                   { "AllowPrintFile",          "Behavior"  },;
+                   { "AllowSelection",          "Behavior"  },;
+                   { "AllowSomePages",          "Behavior"  },;
+                   { "AnimationStyle",          "Behavior"  },;
+                   { "AddExtension",            "Behavior"  },;
+                   { "AllowMaximize",           "Behavior"  },;
+                   { "AutoOpen",                "Behavior"  },;
+                   { "AlignLeft",               "Behavior"  },;
+                   { "AlignTop",                "Behavior"  },; 
+                   { "AlignRight",              "Behavior"  },; 
+                   { "AlignBottom",             "Behavior"  },;
+                   { "AlignMask",               "Behavior"  },;
+                   { "AlignTop",                "Behavior"   },;
+                   { "AutoArrange",             "Behavior"   },;
+                   { "AutoClose",               "Behavior"   },;
+                   { "AutoColumns",             "Behavior"   },;
+                   { "AutoHorzScroll",          "Behavior"   },;
+                   { "AutoEditHorzScroll",      "Behavior"   },;
+                   { "AutoVertScroll",          "Behavior"   },;
+                   { "AcceptFiles",             "Behavior"   },;
+                   { "AnyColor",                "Colors"     },;
+                   { "ActiveLinkColor",         "Colors"     },;
+                   { "AllowClose",              "Position"   },;
+                   { "AllowUnDock",             "Position"   },;
+                   { "AutoLeft",                "Position"   },;
+                   { "AutoTop",                 "Position"   },;
+                   { "AutoSize",                "Size"       },;
+                   { "AdjustX",                 "Size"       },;
+                   { "AdjustY",                 "Size"       },;
+                   { "Anchor",                  "Size"       },;
+                   { "AutoHeight",              "Size"       },;
+                   { "AutoConnect",             "Connection" },;
+                   { "AutoWidth",               "Size"       } }
 
-   aStyle     := { { "AutoHScroll",             "Style", },;
-                   { "AutoVScroll",             "Style", },;
-                   { "CaptionBar",              "Style", },;
-                   { "ClientEdge",              "Style", },;
-                   { "ClipChildren",            "Style", },;
-                   { "ClipSiblings",            "Style", },;
-                   { "ControlParent",           "Style", },;
-                   { "DisableNoScroll",         "Style", },;
-                   { "EditLabels",              "Style", },;
-                   { "FullRow",                 "Style", },;
-                   { "Grid",                    "Style", },;
-                   { "HasStrings",              "Style", },;
-                   { "Hidden",                  "Style", },;
-                   { "Icons",                   "Style", },;
-                   { "List",                    "Style", },;
-                   { "LowerCase",               "Style", },;
-                   { "MaximizeBox",             "Style", },;
-                   { "MDIChild",                "Style", },;
-                   { "MDIClient",               "Style", },;
-                   { "MDIContainer",            "Style", },;
-                   { "MinimizeBox",             "Style", },;
-                   { "MultiLine",               "Style", },;
-                   { "NoHideSel",               "Style", },;
-                   { "NoLabelWrap",             "Style", },;
-                   { "NoRedraw",                "Style", },;
-                   { "NoScroll",                "Style", },;
-                   { "NoSortHeader",            "Style", },;
-                   { "Notify",                  "Style", },;
-                   { "OemConvert",              "Style", },;
-                   { "OwnerData",               "Style", },;
-                   { "OwnerDraw",               "Style", },;
-                   { "OwnerDrawFixed",          "Style", },;
-                   { "PopUp",                   "Style", },;
-                   { "RadioCheck",              "Style", },;
-                   { "ReadOnly",                "Style", },;
-                   { "Report",                  "Style", },;
-                   { "SmallIcon",               "Style", },;
-                   { "Sort",                    "Style", },;
-                   { "StaticEdge",              "Style", },;
-                   { "SysMenu",                 "Style", },;
-                   { "TabStop",                 "Style", },;
-                   { "ThickFrame",              "Style", },;
-                   { "Transparent",             "Style", },;
-                   { "UpperCase",               "Style", },;
-                   { "UseTabStops",             "Style", },;
-                   { "Vertical",                "Style", },;
-                   { "Visible",                 "Style", },;
-                   { "WantKeyboardInput",       "Style", },;
-                   { "DlgModalFrame",           "Style", },;
-                   { "DrawArrows",              "Style", },;
-                   { "MixedButtons",            "Style", },;
-                   { "HideClippedButtons",      "Style", },;
-                   { "NoActivate",              "Style", },;
-                   { "ToolWindow",              "Style", },;
-                   { "TopMost",                 "Style", },;
-                   { "WantReturn",              "Style", } }
+__aProps["B"] := { { "BandChild",               ""           },;
+                   { "BaudRate",                ""           },;
+                   { "BoldSelection",           "Appearance" },;
+                   { "BalloonTipIcon",          "Appearance" },;
+                   { "BalloonTipText",          "Appearance" },;
+                   { "BalloonTipTitle",         "Appearance" },;
+                   { "Border",                  "Appearance" },;
+                   { "BackgroundImage",         "Appearance" },;
+                   { "BitmapMask",              "Appearance" },;
+                   { "BitmapMaskColor",         "Appearance" },;
+                   { "BtnCheck",                "Behavior"   },;
+                   { "BindingSource",           "Connection" },;
+                   { "BlackAndWhite",           "Colors"     },;
+                   { "BackColor",               "Colors"     },;
+                   { "Binary",                  "Target Folder" },;
+                   { "Band",                    "Position"   },;
+                   { "BitmapWidth",             "Size"       },;
+                   { "BitmapHeight",            "Size"       },;
+                   { "Balloon",                 ""           },;
+                   { "Bottom",                  ""           },;
+                   { "BottomMargin",            ""           } }
 
+__aProps["C"] := { { "ContextMenu",             "Behavior" },;
+                   { "CheckPathExists",         "Behavior" },;
+                   { "CheckFileExists",         "Behavior" },;
+                   { "CaptionBar",              "Style" },;
+                   { "ClientEdge",              "Style" },;
+                   { "ClipChildren",            "Style" },;
+                   { "ClipSiblings",            "Style" },;
+                   { "ControlParent",           "Style" },;
+                   { "Cargo",                   "" },;
+                   { "CloseButton",             "" },;
+                   { "CloseOnClick",            "" },;
+                   { "ConnectionString",        "Connection" },;
+                   { "ContextArrow",            "" },;
+                   { "CompilerFlags",           "Build" },;
+                   { "Caption",                 "Appearance" },;
+                   { "CheckBoxes",              "Appearance" },;
+                   { "Cursor",                  "Appearance" },;
+                   { "CleanBuild",              "Build" },;
+                   { "ConvertOem",              "Appearance" },;
+                   { "CenterImage",             "Image" },;
+                   { "ColorInactiveHeader",     "Appearance" },;
+                   { "CustomFormat",            "Appearance" },;
+                   { "CheckGroup",              "Behavior" },;
+                   { "CreatePrompt",            "Behavior" },;
+                   { "CheckStyle",              "Behavior" },;
+                   { "CurSel",                  "Behavior" },;
+                   { "Color",                   "Colors" },;
+                   { "ColorScheme",             "Colors", } }
    
-   aGeneral   :=  { { "Alias",                   "", },;
-                    { "Animate",                 "", },;
-                    { "Balloon",                 "", },;
-                    { "Bottom",                  "", },;
-                    { "BottomMargin",            "", },;
-                    { "Cargo",                   "", },;
-                    { "CloseButton",             "", },;
-                    { "CloseOnClick",            "", },;
-                    { "ConnectionString",        "Connection", },;
-                    { "DataSource",              "", },;
-                    { "DataSearchField",         "", },;
-                    { "DataSearchWidth",         "", },;
-                    { "DataSearchRecords",       "", },;
-                    { "Driver",                  "", },;
-                    { "Escapement",              "", },;
-                    { "FaceName",                "", },;
-                    { "Filter",                  "", },;
-                    { "FirstChild",              "", },;
-                    { "Italic",                  "", },;
-                    { "LeftMargin",              "", },;
-                    { "MaskType",                "", },;
-                    { "Orientation",             "", },;
-                    { "ReadOnly",                "", },;
-                    { "Right",                   "", },;
-                    { "RightMargin",             "", },;
-                    { "Shared",                  "", },;
-                    { "StrikeOut",               "", },;
-                    { "Text",                    "", },;
-                    { "Title",                   "", },;
-                    { "TopMargin",               "", },;
-                    { "Underline",               "", },;
-                    { "Weight",                  "", },;
-                    { "WindowMenu",              "", },;
-                    { "BandChild",               "", },;
-                    { "PageChild",               "", },;
-                    { "AutoRun",                 "", },;
-                    { "SystemCursor",            "", },;
-                    { "ServerType",              "", },;
-                    { "ServiceName",             "", },;
-                    { "PortName",                "", },;
-                    { "BaudRate",                "", },;
-                    { "DiscardNull",             "", },;
-                    { "DtrEnabled",              "", },;
-                    { "HandShake",               "", },;
-                    { "Parity",                  "", },;
-                    { "ParityReplace",           "", },;
-                    { "ReadBufferSize",          "", },;
-                    { "ReadTimeOut",             "", },;
-                    { "ReceivedBytesThreshold",  "", },;
-                    { "RtsEnabled",              "", },;
-                    { "StopBits",                "", },;
-                    { "WriteBufferSize",         "", },;
-                    { "WriteTimeOut",            "", },;
-                    { "HideInvert",              "", },;
-                    { "ContextArrow",            "", },;
-                    { "DataBits",                "", } }
-                    
-    aGroupProp := { { "CompilerFlags",           "Build", },;
-                    { "Definitions",             "Build", },;
-                    { "TargetName",              "Build", },;
-                    { "ThemeActive",             "Build", },;
-                    { "CleanBuild",              "Build", },;
-                    { "UseDLL",                  "Build", },;
-                    { "TargetType",              "Build", },;
-                    { "LoadFromFile",            "Image", },;
-                    { "ImageType",               "Image", },;
-                    { "ImageName",               "Image", },;
-                    { "KeepAspectRatio",         "Image", },;
-                    { "CenterImage",             "Image", },;
-                    { "Stretch",                 "Image", },;
-                    { "OleVerb",                 "ActiveX", },;
-                    { "MenuArrow",               "Appearance", },;
-                    { "BoldSelection",           "Appearance", },;
-                    { "FlatBorder",              "Appearance", },;
-                    { "FlatCaption",             "Appearance", },;
-                    { "ColorInactiveHeader",     "Appearance", },;
-                    { "HorzPadding",             "Appearance", },;
-                    { "VertPadding",             "Appearance", },;
-                    { "ConvertOem",              "Appearance", },;
-                    { "OfficeXPLook",            "Appearance", },;
-                    { "BalloonTipIcon",          "Appearance", },;
-                    { "BalloonTipText",          "Appearance", },;
-                    { "BalloonTipTitle",         "Appearance", },;
-                    { "Border",                  "Appearance", },;
-                    { "ShowGrid",                "Appearance", },;
-                    { "Theming",                 "Appearance", },;
-                    { "Caption",                 "Appearance", },;
-                    { "CheckBoxes",              "Appearance", },;
-                    { "Cursor",                  "Appearance", },;
-                    { "Flat",                    "Appearance", },;
-                    { "Font",                    "Appearance", },;
-                    { "HeaderFont",              "Appearance", },;
-                    { "FrameStyle",              "Appearance", },;
-                    { "FullRowSelect",           "Appearance", },;
-                    { "HasButtons",              "Appearance", },;
-                    { "HasLines",                "Appearance", },;
-                    { "HotImageList",            "Appearance", },;
-                    { "ImageListSmall",          "Appearance", },;
-                    { "Icon",                    "Appearance", },;
-                    { "ImageIndex",              "Appearance", },;
-                    { "ImageList",               "Appearance", },;
-                    { "LinesAtRoot",             "Appearance", },;
-                    { "Message",                 "Appearance", },;
-                    { "MultiColumn",             "Appearance", },;
-                    { "NoColumnHeader",          "Appearance", },;
-                    { "ShortCutText",            "Appearance", },;
-                    { "SmallCaption",            "Appearance", },;
-                    { "HighlightCaption",        "Appearance", },;
-                    { "Smooth",                  "Appearance", },;
-                    { "ToolTip",                 "Appearance", },;
-                    { "ToolTipText",             "Appearance", },;
-                    { "ToolTipTitle",            "Appearance", },;
-                    { "WholeDropDown",           "Appearance", },;
-                    { "ShadowRow",               "Appearance", },;
-                    { "Format",                  "Appearance", },;
-                    { "CustomFormat",            "Appearance", },;
-                    { "WindowsMenu",             "Appearance", },;
-                    { "ShowChevron",             "Appearance", },;
-                    { "ShowHeaders",             "Appearance", },;
-                    { "BackgroundImage",         "Appearance", },;
-                    { "ShowTabs",                "Appearance", },;
-                    { "BitmapMask",              "Appearance", },;
-                    { "BitmapMaskColor",         "Appearance", },;
-                    { "ShowSelection",           "Appearance", },;
-                    { "InitialState",            "Appearance", },;
-                    { "ShowSelectionBorder",     "Appearance", },;
-                    { "Striping",                "Appearance", },;
-                    { "TabStripStyle",           "Appearance", },;
-                    { "PaperSize",               "Appearance", },;
-                    { "ItemToolTips",            "Appearance", },;
-                    { "CheckGroup",              "Behavior", },;
-                    { "BtnCheck",                "Behavior", },;
-                    { "AlwaysOnTop",             "Behavior", },;
-                    { "AnchorColumn",            "Behavior", },;
-                    { "AllowDragRecords",        "Behavior", },;
-                    { "VertScrollSize",          "Behavior", },;
-                    { "HorzScrollSize",          "Behavior", },;
-                    { "AllowCurrentPage",        "Behavior", },;
-                    { "AllowPrintFile",          "Behavior", },;
-                    { "AllowSelection",          "Behavior", },;
-                    { "AllowSomePages",          "Behavior", },;
-                    { "FromPage",                "Behavior", },;
-                    { "ToPage",                  "Behavior", },;
-                    { "AnimationStyle",          "Behavior", },;
-                    { "ShowInTaskBar",           "Behavior", },;
-                    { "SystemAnimation",         "Behavior", },;
-                    { "InitialDirectory",        "Behavior", },;
-                    { "ShowPlacesBar",           "Behavior", },;
-                    { "ShortcutKey",             "Behavior", },;
-                    { "Title",                   "Behavior", },;
-                    { "Filter",                  "Behavior", },;
-                    { "FilterIndex",             "Behavior", },;
-                    { "AddExtension",            "Behavior", },;
-                    { "DefaultExt",              "Behavior", },;
-                    { "CheckPathExists",         "Behavior", },;
-                    { "CheckFileExists",         "Behavior", },;
-                    { "CreatePrompt",            "Behavior", },;
-                    { "DeferenceLinks",          "Behavior", },;
-                    { "EnterNext",               "Behavior", },;
-                    { "RestoreDirectory",        "Behavior", },;
-                    { "ShowHelp",                "Behavior", },;
-                    { "AllowMaximize",           "Behavior", },;
-                    { "ShowNewFolderButton",     "Behavior", },;
-                    { "ShowDragging",            "Behavior", },;
-                    { "AutoOpen",                "Behavior", },;
-                    { "DropDownStyle",           "Behavior", },;
-                    { "DropDown",                "Behavior", },;
-                    { "Expanded",                "Behavior", },;
-                    { "AlignLeft",               "Behavior", },;
-                    { "AlignTop",                "Behavior", },; 
-                    { "AlignRight",              "Behavior", },; 
-                    { "AlignBottom",             "Behavior", },;
-                    { "AlignMask",               "Behavior", },;
-                    { "AlignTop",                "Behavior", },;
-                    { "AutoArrange",             "Behavior", },;
-                    { "AutoClose",               "Behavior", },;
-                    { "AutoColumns",             "Behavior", },;
-                    { "AutoHorzScroll",          "Behavior", },;
-                    { "AutoEditHorzScroll",      "Behavior", },;
-                    { "AutoVertScroll",          "Behavior", },;
-                    { "ExtVertScrollBar",        "Behavior", },;
-                    { "ContextMenu",             "Behavior", },;
-                    { "DisableParent",           "Behavior", },;
-                    { "DefaultButton",           "Behavior", },;
-                    { "ExtendedSel",             "Behavior", },;
-                    { "HorzScroll",              "Behavior", },;
-                    { "Id",                      "Behavior", },;
-                    { "NoHScroll",               "Behavior", },;
-                    { "NoToolTips",              "Behavior", },;
-                    { "OwnerDrawFixed",          "Behavior", },;
-                    { "OwnerDrawVariable",       "Behavior", },;
-                    { "ShowMode",                "Behavior", },;
-                    { "ShowSelAlways",           "Behavior", },;
-                    { "ShortCut",                "Behavior", },;
-                    { "VertScroll",              "Behavior", },;
-                    { "CheckStyle",              "Behavior", },;
-                    { "Enabled",                 "Behavior", },;
-                    { "Wrap",                    "Behavior", },;
-                    { "State",                   "Behavior", },;
-                    { "CurSel",                  "Behavior", },;
-                    { "FullOpen",                "Behavior", },;
-                    { "PreventFullOpen",         "Behavior", },;
-                    { "ShowHelp",                "Behavior", },;
-                    { "AcceptFiles",             "Behavior", },;
-                    { "MultiSelect",             "Behavior", },;
-                    { "ShowReadOnly",            "Behavior", },;
-                    { "ReadOnlyChecked",         "Behavior", },;
-                    { "FullSelectOnClick",       "Behavior", },;
-                    { "LocalPort",               "Connection", },;
-                    { "RemoteIP",                "Connection", },;
-                    { "RemotePort",              "Connection", },;
-                    { "BindingSource",           "Connection", },;
-                    { "AutoConnect",             "Connection", },;
-                    { "SqlConnector",            "Connection", },;
-                    { "Color",                   "Colors", },;
-                    { "AnyColor",                "Colors", },;
-                    { "SolidColor",              "Colors", },;
-                    { "LinkColor",               "Colors", },;
-                    { "HighlightColor",          "Colors", },;
-                    { "HighlightTextColor",      "Colors", },;
-                    { "TransparentColor",        "Colors", },;
-                    { "BlackAndWhite",           "Colors", },;
-                    { "VisitedColor",            "Colors", },;
-                    { "ActiveLinkColor",         "Colors", },;
-                    { "BackColor",               "Colors", },;
-                    { "MaskColor",               "Colors", },;
-                    { "TitleBackColor",          "Colors", },;
-                    { "TrailingTextColor",       "Colors", },;
-                    { "TitleForeColor",          "Colors", },;
-                    { "ForeColor",               "Colors", },;
-                    { "SelBackColor",            "Colors", },;
-                    { "SelForeColor",            "Colors", },;
-                    { "GridColor",               "Colors", },;
-                    { "InvertedColors",          "Colors", },;
-                    { "ColorScheme",             "Colors", },;
-                    { "ProportionalLeft",        "Dock", },;
-                    { "ProportionalTop",         "Dock", },;
-                    { "Name",                    "Object", },;
-                    { "UserVariables",           "Object", },;
-                    { "GenerateMembers",         "Object", },;
-                    { "GenerateMember",          "Object", },;
-                    { "ViewStyle",               "Layout", },;
-                    { "Vertical",                "Layout", },;
-                    { "VerticalGripper",         "Layout", },;
-                    { "ImageAlign",              "Layout", },;
-                    { "ImageAlignment",          "Layout", },;
-                    { "DefaultPath",             "Path", },;
-                    { "Folder",                  "Path", },;
-                    { "Path",                    "Path", },;
-                    { "FileName",                "Path", },;
-                    { "SysFolder",               "Path", },;
-                    { "SelectedPath",            "Path", },;
-                    { "SourcePath",              "Path", },;
-                    { "IncludePath",             "Path", },;
-                    { "Binary",                  "Target Folder", },;
-                    { "Source",                  "Target Folder", },;
-                    { "Objects",                 "Target Folder", },;
-                    { "Source",                  "Target Folder", },;
-                    { "Resource",                "Target Folder", },;
-                    { "DebugInfo",               "Debugger", },;
-                    { "AllowClose",              "Position", },;
-                    { "AllowUnDock",             "Position", },;
-                    { "AutoLeft",                "Position", },;
-                    { "AutoTop",                 "Position", },;
-                    { "Band",                    "Position", },;
-                    { "Dock",                    "Position", },;
-                    { "Left",                    "Position", },;
-                    { "MaxRange",                "Position", },;
-                    { "MinRange",                "Position", },;
-                    { "Position",                "Position", },;
-                    { "Step",                    "Position", },;
-                    { "Top",                     "Position", },;
-                    { "TabPosition",             "Position", },;
-                    { "BitmapWidth",             "Size", },;
-                    { "BitmapHeight",            "Size", },;
-                    { "AutoSize",                "Size", },;
-                    { "AdjustX",                 "Size", },;
-                    { "AdjustY",                 "Size", },;
-                    { "Anchor",                  "Size", },;
-                    { "AutoHeight",              "Size", },;
-                    { "AutoWidth",               "Size", },;
-                    { "Height",                  "Size", },;
-                    { "IntegralHeight",          "Size", },;
-                    { "SelectionHeight",         "Size", },;
-                    { "Width",                   "Size", },;
-                    { "ItemHeight",              "Size", },;
-                    { "MaxHeight",               "Size", },;
-                    { "MaxWidth",                "Size", },;
-                    { "MinHeight",               "Size", },;
-                    { "MinWidth",                "Size", },;
-                    { "Resizable",               "Size", },;
-                    { "HeaderBackColor",         "Header", },;
-                    { "HeaderForeColor",         "Header", },;
-                    { "HeaderImageIndex",        "Header", },;
-                    { "HeaderHeight",            "Header", } }
+__aProps["D"] := { { "DisableNoScroll",         "Style" },;
+                   { "DlgModalFrame",           "Style" },;
+                   { "DrawArrows",              "Style" },;
+                   { "DataSource",              "" },;
+                   { "DataSearchField",         "" },;
+                   { "DataSearchWidth",         "" },;
+                   { "DataSearchRecords",       "" },;
+                   { "Driver",                  "" },;
+                   { "DiscardNull",             "" },;
+                   { "DtrEnabled",              "" },;
+                   { "DataBits",                "" },;
+                   { "Definitions",             "Build" },;
+                   { "DefaultExt",              "Behavior" },;
+                   { "DeferenceLinks",          "Behavior" },;
+                   { "DropDownStyle",           "Behavior" },;
+                   { "DropDown",                "Behavior" },;
+                   { "DisableParent",           "Behavior" },;
+                   { "DefaultButton",           "Behavior" },;
+                   { "DefaultPath",             "Path" },;
+                   { "DebugInfo",               "Debugger" },;
+                   { "Dock",                    "Position", } }
 
-   AEVAL( aGeneral, {|a| AADD( aGroupProp, ACLONE( a ) ) } )
-   AEVAL( aStyle, {|a| AADD( aGroupProp, ACLONE( a ) ) } )
-   AEVAL( aSet, {|a| AADD( aGroupProp, ACLONE( a ) ) } )
-   aSort( aGroupProp,,,{|x, y| x[2] < y[2]})   
-   aSort( aSet,,,{|x, y| x[1] < y[1]})   
-RETURN NIL
+__aProps["E"] := { { "EditLabels",              "Style" },;
+                   { "Escapement",              "" },;
+                   { "EnterNext",               "Behavior" },;
+                   { "Expanded",                "Behavior" },;
+                   { "ExtVertScrollBar",        "Behavior" },;
+                   { "ExtendedSel",             "Behavior" },;
+                   { "Enabled",                 "Behavior", } }
+
+__aProps["F"] := { { "FullRow",                 "Style" },;
+                   { "FaceName",                "" },;
+                   { "Filter",                  "" },;
+                   { "FirstChild",              "" },;
+                   { "FlatBorder",              "Appearance" },;
+                   { "FlatCaption",             "Appearance" },;
+                   { "Flat",                    "Appearance" },;
+                   { "Font",                    "Appearance" },;
+                   { "FrameStyle",              "Appearance" },;
+                   { "FullRowSelect",           "Appearance" },;
+                   { "Format",                  "Appearance" },;
+                   { "FromPage",                "Behavior" },;
+                   { "Filter",                  "Behavior" },;
+                   { "FilterIndex",             "Behavior" },;
+                   { "FullOpen",                "Behavior" },;
+                   { "FullSelectOnClick",       "Behavior" },;
+                   { "ForeColor",               "Colors" },;
+                   { "Folder",                  "Path" },;
+                   { "FileName",                "Path", } }
+
+__aProps["G"] := { { "Grid",                    "Style" },;
+                   { "GridColor",               "Colors" },;
+                   { "GenerateMembers",         "Object" },;
+                   { "GenerateMember",          "Object", } }
+
+__aProps["H"] := { { "HasStrings",              "Style" },;
+                   { "Hidden",                  "Style" },;
+                   { "HideClippedButtons",      "Style" },;
+                   { "HandShake",               "" },;
+                   { "HideInvert",              "" },;
+                   { "HorzPadding",             "Appearance" },;
+                   { "HeaderFont",              "Appearance" },;
+                   { "HasButtons",              "Appearance" },;
+                   { "HasLines",                "Appearance" },;
+                   { "HotImageList",            "Appearance" },;
+                   { "HighlightCaption",        "Appearance" },;
+                   { "HorzScrollSize",          "Behavior" },;
+                   { "HorzScroll",              "Behavior" },;
+                   { "HighlightColor",          "Colors" },;
+                   { "HighlightTextColor",      "Colors" },;
+                   { "Height",                  "Size" },;
+                   { "HeaderBackColor",         "Header" },;
+                   { "HeaderForeColor",         "Header" },;
+                   { "HeaderImageIndex",        "Header" },;
+                   { "HeaderHeight",            "Header" } }
+
+__aProps["I"] := { { "Icons",                   "Style" },;
+                   { "Italic",                  "" },;
+                   { "ImageType",               "Image" },;
+                   { "ImageName",               "Image" },;
+                   { "IconWidth",               "Size" },;
+                   { "IconHeight",              "Size" },;
+                   { "ImageListSmall",          "Appearance" },;
+                   { "Icon",                    "Appearance" },;
+                   { "ImageIndex",              "Appearance" },;
+                   { "ImageList",               "Appearance" },;
+                   { "InitialState",            "Appearance" },;
+                   { "ItemToolTips",            "Appearance" },;
+                   { "InitialDirectory",        "Behavior" },;
+                   { "Id",                      "Behavior" },;
+                   { "InvertedColors",          "Colors" },;
+                   { "ImageAlign",              "Layout" },;
+                   { "ImageAlignment",          "Layout" },;
+                   { "IncludePath",             "Path" },;
+                   { "IntegralHeight",          "Size" },;
+                   { "ItemHeight",              "Size" } }
+
+__aProps["J"] := {}
+   
+__aProps["K"] := { { "KeepAspectRatio",         "Image" } }
+
+__aProps["L"] := { { "List",                    "Style" },;
+                   { "LowerCase",               "Style" },;
+                   { "LeftMargin",              "" },;
+                   { "LoadFromFile",            "Image" },;
+                   { "LinesAtRoot",             "Appearance" },;
+                   { "LocalPort",               "Connection" },;
+                   { "LinkColor",               "Colors" },;
+                   { "Left",                    "Position" } }
+
+__aProps["M"] := { { "MaximizeBox",             "Style" },;
+                   { "MDIChild",                "Style" },;
+                   { "MDIClient",               "Style" },;
+                   { "MDIContainer",            "Style" },;
+                   { "MinimizeBox",             "Style" },;
+                   { "MultiLine",               "Style" },;
+                   { "MixedButtons",            "Style" },;
+                   { "MaskType",                "" },;
+                   { "MenuArrow",               "Appearance" },;
+                   { "Message",                 "Appearance" },;
+                   { "MultiColumn",             "Appearance" },;
+                   { "MultiSelect",             "Behavior" },;
+                   { "MaskColor",               "Colors" },;
+                   { "MaxRange",                "Position" },;
+                   { "MinRange",                "Position" },;
+                   { "MaxHeight",               "Size" },;
+                   { "MaxWidth",                "Size" },;
+                   { "MinHeight",               "Size" },;
+                   { "MinWidth",                "Size" } }
+
+__aProps["N"] := { { "NoHideSel",               "Style" },;
+                   { "NoLabelWrap",             "Style" },;
+                   { "NoRedraw",                "Style" },;
+                   { "NoScroll",                "Style" },;
+                   { "NoSortHeader",            "Style" },;
+                   { "Notify",                  "Style" },;
+                   { "NoActivate",              "Style" },;
+                   { "NoColumnHeader",          "Appearance" },;
+                   { "NoHScroll",               "Behavior" },;
+                   { "NoToolTips",              "Behavior" },;
+                   { "Name",                    "Object" } }
+
+__aProps["O"] := { { "OemConvert",              "Style" },;
+                   { "OwnerData",               "Style" },;
+                   { "OwnerDraw",               "Style" },;
+                   { "OwnerDrawFixed",          "Style" },;
+                   { "Orientation",             "" },;
+                   { "OleVerb",                 "ActiveX" },;
+                   { "OfficeXPLook",            "Appearance" },;
+                   { "OwnerDrawFixed",          "Behavior" },;
+                   { "OwnerDrawVariable",       "Behavior" },;
+                   { "Objects",                 "Target Folder" } }
+
+__aProps["P"] := { { "PopUp",                   "Style" },;
+                   { "PageChild",               "" },;
+                   { "PortName",                "" },;
+                   { "Parity",                  "" },;
+                   { "ParityReplace",           "" },;
+                   { "PaperSize",               "Appearance" },;
+                   { "PreventFullOpen",         "Behavior" },;
+                   { "ProportionalLeft",        "Dock" },;
+                   { "ProportionalTop",         "Dock" },;
+                   { "Path",                    "Path" },;
+                   { "Position",                "Position" } }
+
+__aProps["Q"] := {} 
+   
+__aProps["R"] := { { "RadioCheck",              "Style" },;
+                   { "ReadOnly",                "Style" },;
+                   { "Report",                  "Style" },;
+                   { "ReadOnly",                "" },;
+                   { "Right",                   "" },;
+                   { "RightMargin",             "" },;
+                   { "ReadBufferSize",          "" },;
+                   { "ReadTimeOut",             "" },;
+                   { "ReceivedBytesThreshold",  "" },;
+                   { "RtsEnabled",              "" },;
+                   { "RestoreDirectory",        "Behavior" },;
+                   { "ReadOnlyChecked",         "Behavior" },;
+                   { "RemoteIP",                "Connection" },;
+                   { "RemotePort",              "Connection" },;
+                   { "Resource",                "Target Folder" },;
+                   { "Resizable",               "Size" } }
+
+__aProps["S"] := { { "SetAlternate",            "Set" },;
+                   { "SetCentury",              "Set" },;
+                   { "SetCancel",               "Set" },;
+                   { "SetDeleted",              "Set" },;
+                   { "SetDefault",              "Set" },;
+                   { "SetDecimals",             "Set" },;
+                   { "SetDateFormat",           "Set" },;
+                   { "SetEpoch",                "Set" },;
+                   { "SetExact",                "Set" },;
+                   { "SetExclusive",            "Set" },;
+                   { "SetFixed",                "Set" },;
+                   { "SetPath",                 "Set" },;
+                   { "SetSoftseek",             "Set" },;
+                   { "SetUnique",               "Set" },;
+                   { "SetDebug",                "Set" },;
+                   { "SetTypeahead",            "Set" },;
+                   { "SetCursor",               "Set" },;
+                   { "SetConsole",              "Set" },;
+                   { "SetAltfile",              "Set" },;
+                   { "SetDevice",               "Set" },;
+                   { "SetExtra",                "Set" },;
+                   { "SetExtrafile",            "Set" },;
+                   { "SetPrinter",              "Set" },;
+                   { "SetPrintfile",            "Set" },;
+                   { "SetMargin",               "Set" },;
+                   { "SetBell",                 "Set" },;
+                   { "SetConfirm",              "Set" },;
+                   { "SetEscape",               "Set" },;
+                   { "SetInsert",               "Set" },;
+                   { "SetExit",                 "Set" },;
+                   { "SetIntensity",            "Set" },;
+                   { "SetScoreboard",           "Set" },;
+                   { "SetDelimiters",           "Set" },;
+                   { "SetDelimchars",           "Set" },;
+                   { "SetWrap",                 "Set" },;
+                   { "SetMessage",              "Set" },;
+                   { "SetMcenter",              "Set" },;
+                   { "SetScrollbreak",          "Set" },;
+                   { "SetEventmask",            "Set" },;
+                   { "SetVideomode",            "Set" },;
+                   { "SetMblocksize",           "Set" },;
+                   { "SetMfileext",             "Set" },;
+                   { "SetStrictread",           "Set" },;
+                   { "SetOptimize",             "Set" },;
+                   { "SetAutopen",              "Set" },;
+                   { "SetAutorder",             "Set" },;
+                   { "SetAutoshare",            "Set" },;
+                   { "SetCount",                "Set" },;
+                   { "SetLanguage",             "Set" },;
+                   { "SetIdlerepeat",           "Set" },;
+                   { "SetTrace",                "Set" },;
+                   { "SetTracefile",            "Set" },;
+                   { "SetTracestack",           "Set" },;
+                   { "SetFilecase",             "Set" },;
+                   { "SetDircase",              "Set" },;
+                   { "SetDirseparator",         "Set" },;
+                   { "SetErrorloop",            "Set" },;
+                   { "SetOutputsafety",         "Set" },;
+                   { "SetDbflockscheme",        "Set" },;
+                   { "SetBackgroundtasks",      "Set" },;
+                   { "SetTrimfilename",         "Set" },;
+                   { "SetGtmode",               "Set" },;
+                   { "SetBackgroundtick",       "Set" },;
+                   { "SetPrinterjob",           "Set" },;
+                   { "SetHardcommit",           "Set" },;
+                   { "SetForceopt",             "Set" },;
+                   { "SetEol",                  "Set" },;
+                   { "SetErrorlog",             "Set" },;
+                   { "SmallIcon",               "Style" },;
+                   { "Sort",                    "Style" },;
+                   { "StaticEdge",              "Style" },;
+                   { "SysMenu",                 "Style" },;
+                   { "Shared",                  "" },;
+                   { "StrikeOut",               "" },;
+                   { "SystemCursor",            "" },;
+                   { "ServerType",              "" },;
+                   { "ServiceName",             "" },;
+                   { "StopBits",                "" },;
+                   { "Stretch",                 "Image" },;
+                   { "ShowGrid",                "Appearance" },;
+                   { "ShortCutText",            "Appearance" },;
+                   { "SmallCaption",            "Appearance" },;
+                   { "Smooth",                  "Appearance" },;
+                   { "ShadowRow",               "Appearance" },;
+                   { "ShowChevron",             "Appearance" },;
+                   { "ShowHeaders",             "Appearance" },;
+                   { "ShowTabs",                "Appearance" },;
+                   { "ShowSelection",           "Appearance" },;
+                   { "ShowSelectionBorder",     "Appearance" },;
+                   { "Striping",                "Appearance" },;
+                   { "ShowInTaskBar",           "Behavior" },;
+                   { "SystemAnimation",         "Behavior" },;
+                   { "ShowPlacesBar",           "Behavior" },;
+                   { "ShortcutKey",             "Behavior" },;
+                   { "ShowHelp",                "Behavior" },;
+                   { "ShowNewFolderButton",     "Behavior" },;
+                   { "ShowDragging",            "Behavior" },;
+                   { "ShowMode",                "Behavior" },;
+                   { "ShowSelAlways",           "Behavior" },;
+                   { "ShortCut",                "Behavior" },;
+                   { "ShowHelp",                "Behavior" },;
+                   { "ShowReadOnly",            "Behavior" },;
+                   { "SqlConnector",            "Connection" },;
+                   { "SolidColor",              "Colors" },;
+                   { "SelBackColor",            "Colors" },;
+                   { "SelForeColor",            "Colors" },;
+                   { "SysFolder",               "Path" },;
+                   { "SelectedPath",            "Path" },;
+                   { "SourcePath",              "Path" },;
+                   { "Source",                  "Target Folder" },;
+                   { "Source",                  "Target Folder" },;
+                   { "Step",                    "Position" },;
+                   { "State",                   "Behavior" },;
+                   { "SelectionHeight",         "Size" } }
+   
+__aProps["T"] := { { "TabStop",                 "Style" },;
+                   { "ThickFrame",              "Style" },;
+                   { "Transparent",             "Style" },;
+                   { "ToolWindow",              "Style" },;
+                   { "TopMost",                 "Style" },;
+                   { "Text",                    "" },;
+                   { "Title",                   "" },;
+                   { "TopMargin",               "" },;
+                   { "TargetName",              "Build" },;
+                   { "ThemeActive",             "Build" },;
+                   { "TargetType",              "Build" },;
+                   { "Theming",                 "Appearance" },;
+                   { "ToolTip",                 "Appearance" },;
+                   { "ToolTipText",             "Appearance" },;
+                   { "ToolTipTitle",            "Appearance" },;
+                   { "TabStripStyle",           "Appearance" },;
+                   { "ToPage",                  "Behavior" },;
+                   { "Title",                   "Behavior" },;
+                   { "TransparentColor",        "Colors" },;
+                   { "TitleBackColor",          "Colors" },;
+                   { "TrailingTextColor",       "Colors" },;
+                   { "TitleForeColor",          "Colors" },;
+                   { "Top",                     "Position" },;
+                   { "TabPosition",             "Position" } }
+
+__aProps["U"] := { { "UpperCase",               "Style" },;
+                   { "UseTabStops",             "Style" },;
+                   { "Underline",               "" },;
+                   { "UseDLL",                  "Build" },;
+                   { "UserVariables",           "Object" } }
+
+__aProps["V"] := { { "Vertical",                "Style" },;
+                   { "Visible",                 "Style" },;
+                   { "VertPadding",             "Appearance" },;
+                   { "VertScrollSize",          "Behavior" },;
+                   { "VertScroll",              "Behavior" },;
+                   { "VisitedColor",            "Colors" },;
+                   { "ViewStyle",               "Layout" },;
+                   { "Vertical",                "Layout" },;
+                   { "VerticalGripper",         "Layout" } }
+
+__aProps["W"] := { { "WantKeyboardInput",       "Style" },;
+                   { "WantReturn",              "Style" },;
+                   { "Weight",                  "" },;
+                   { "WindowMenu",              "" },;
+                   { "WriteBufferSize",         "" },;
+                   { "WriteTimeOut",            "" },;
+                   { "WholeDropDown",           "Appearance" },;
+                   { "WindowsMenu",             "Appearance" },;
+                   { "Wrap",                    "Behavior" },;
+                   { "Width",                   "Size" } }
+
+__aProps["X"] := {}
+__aProps["Y"] := {}
+__aProps["Z"] := {}
+   
+   //aSort( aSet,,,{|x, y| x[1] < y[1]})   
+RETURN
 
 STATIC FUNCTION BrowseFile( o )
    LOCAL n := o:GetCurSel()-1
