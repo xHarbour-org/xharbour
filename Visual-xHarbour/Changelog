@@ -7,6 +7,11 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2011-11-02 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed DataGrid RTE produced by mouse wheel when usable records are less
+     than visible records.
+   
 2011-11-01 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Forced creating missing directories during build process to avoid I/O errors
    * Changed main array of property names to be separated alphabet hashes to allow

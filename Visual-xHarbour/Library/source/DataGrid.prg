@@ -846,7 +846,8 @@ METHOD __OnSize() CLASS DataGrid
       ::__DisplayData()
       ::ValidateRect()
    ENDIF
-   
+   ::__ResetRecordPos(.F.)
+
 RETURN NIL
 
 //----------------------------------------------------------------------------------
