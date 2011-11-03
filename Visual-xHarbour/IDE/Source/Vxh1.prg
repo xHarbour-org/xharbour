@@ -5477,9 +5477,7 @@ METHOD Build( lForce ) CLASS Project
       //-----------------------------------------------------
       cCurDir := GetCurrentDirectory()
       DirChange( cPath )
-      
       lBuilt := oProject:Make( bErrorHandler, bProgress )
-      
       DirChange( cCurDir )
       //-----------------------------------------------------
 
@@ -5499,6 +5497,9 @@ METHOD Build( lForce ) CLASS Project
 
    IF !lBuilt
       RETURN .F.
+   ENDIF
+   IF FILE( cProject + ".log" )
+      FERASE( cProject + ".log" )
    ENDIF
 
    ::Application:MainForm:DebugBuild1:AddItem( STRTRAN( ::Properties:Name, aTargetTypes[ ::Properties:TargetType ] + ".xbp" )+ " Built", .T. )
@@ -5529,7 +5530,7 @@ RETURN Self
 FUNCTION GUI_ErrorGrid( oError, cLog )
 
    LOCAL cFile, cDesc, aErrors := GetLogErrors( cLog ), oApp := __GetApplication()
-
+//view cLog
    oApp:BuildLog:Caption := cLog
 
    IF EMPTY( aErrors )
