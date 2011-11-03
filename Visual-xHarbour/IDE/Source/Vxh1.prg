@@ -5275,7 +5275,7 @@ RETURN 0
 METHOD Build( lForce ) CLASS Project
    LOCAL n, cProject, cExe, cResPath
    LOCAL oProject, bErrorHandler, bProgress, oErr, oWnd, cTemp
-   LOCAL lBuilt, cSource, cPath, oHrb, cControl, cBinPath, cSourcePath, cObjPath
+   LOCAL lBuilt, cSource, cPath, oHrb, cControl, cBinPath, cSourcePath, cObjPath, cCurDir
 
    DEFAULT lForce TO .F.
 
@@ -5287,6 +5287,7 @@ METHOD Build( lForce ) CLASS Project
    cBinPath    := cPath + "\" + ::Properties:Binary
    cSourcePath := cPath + "\" + ::Properties:Source
    cObjPath    := cPath + "\" + ::Properties:Objects
+   cResPath    := cPath + "\" + ::Properties:Resource
 
    IF ! IsDirectory( cBinPath )
       MakeDir( cBinPath )
@@ -5316,13 +5317,10 @@ METHOD Build( lForce ) CLASS Project
    n := 1
    lBuilt := .F.
    TRY
-      // TODO: Add support for XHB_* settings.
-      //oProject := LoadProject( cProject, NIL, xHB_Root, PRG_Flags, xHB_LibFolder, xHB_Exe )
-
       cPath := ::Properties:Path
-
+      
       cProject := cPath + "\" + ::Properties:Name + aTargetTypes[ ::Properties:TargetType ]
-      IF !EMPTY( ::Properties:TargetName ) //.AND. ::Properties:TargetType < 4
+      IF !EMPTY( ::Properties:TargetName )
          cProject := cPath + "\" + ::Properties:TargetName + aTargetTypes[ ::Properties:TargetType ]
       ENDIF
 
@@ -5334,12 +5332,9 @@ METHOD Build( lForce ) CLASS Project
          :lXBP             := .F.
          :lINI             := .F.
          :OutputFolder     := cObjPath
-         :TargetFolder     := cBinPath //::Properties:Binary
+         :TargetFolder     := cBinPath
          :RunArguments     := ::Properties:Parameters
          :lNoAutoFWH       := .T.
-
-         //CreateDirectory( cObjPath )
-         //CreateDirectory( cBinPath )
 
          IF !EMPTY( ::Properties:Definitions )
             ::Properties:Definitions := "; " + ::Properties:Definitions
@@ -5428,7 +5423,6 @@ METHOD Build( lForce ) CLASS Project
 
          :lGUI := ::Properties:GUI
 
-         cResPath := cPath + "\" + ::Properties:Resource
          :AddFiles( cResPath + "\" + ::Properties:Name + ".rc" )
 
          IF ::Properties:TargetType IN {1,3,5} // EXE, DLL, DLL OLE SERVER
@@ -5480,7 +5474,16 @@ METHOD Build( lForce ) CLASS Project
 
       bErrorHandler := {|oError|GUI_ErrorGrid( oError, MEMOREAD( cProject + ".log" ) )}
 
+      //-----------------------------------------------------
+      cCurDir := GetCurrentDirectory()
+      DirChange( cPath )
+      
       lBuilt := oProject:Make( bErrorHandler, bProgress )
+      
+      DirChange( cCurDir )
+      //-----------------------------------------------------
+
+
       IF EMPTY( ::Application:BuildLog:Caption )
          ::Application:BuildLog:Caption := MEMOREAD( cProject + ".log" )
       ENDIF
@@ -5531,8 +5534,6 @@ FUNCTION GUI_ErrorGrid( oError, cLog )
 
    IF EMPTY( aErrors )
       cDesc := oError:Description
-      view cLog, aErrors
-
       cFile := ""
       IF LEFT( cDesc, 28 ) == "couldn't find required file:"
          cFile := STRTRAN( SUBSTR( cDesc, 29 ), "'" )
