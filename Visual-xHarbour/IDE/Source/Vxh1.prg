@@ -2328,6 +2328,7 @@ CLASS Project
    METHOD AddImage()
    METHOD RemoveImage()
    METHOD AddControl()
+   METHOD FixPath( cPath, cSubDir ) INLINE IIF( AT(":",cSubDir)>0 .OR. AT("\\",cSubDir)>0, cSubDir, cPath + "\" + cSubDir )
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -4502,17 +4503,17 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
       MakeDir( cPath )
    ENDIF
 
-   IF ! IsDirectory( cPath + "\" + ::Properties:Binary )
-      MakeDir( cPath + "\" + ::Properties:Binary )
+   IF ! IsDirectory( ::FixPath( cPath, ::Properties:Binary ) )
+      MakeDir( ::FixPath( cPath, ::Properties:Binary ) )
    ENDIF
-   IF ! IsDirectory( cPath + "\" + ::Properties:Objects )
-      MakeDir( cPath + "\" + ::Properties:Objects )
+   IF ! IsDirectory( ::FixPath( cPath, ::Properties:Objects ) )
+      MakeDir( ::FixPath( cPath, ::Properties:Objects ) )
    ENDIF
-   IF ! IsDirectory( cPath + "\" + ::Properties:Source )
-      MakeDir( cPath + "\" + ::Properties:Source )
+   IF ! IsDirectory( ::FixPath( cPath, ::Properties:Source ) )
+      MakeDir( ::FixPath( cPath, ::Properties:Source ) )
    ENDIF
-   IF ! IsDirectory( cPath + "\" + ::Properties:Resource )
-      MakeDir( cPath + "\" + ::Properties:Resource )
+   IF ! IsDirectory( ::FixPath( cPath, ::Properties:Resource ) )
+      MakeDir( ::FixPath( cPath, ::Properties:Resource ) )
    ENDIF
 
    IF cPrevPath != NIL
@@ -5216,7 +5217,7 @@ METHOD Run( lRunOnly ) CLASS Project
    DEFAULT lRunOnly TO .F.
    TRY
       cPath := ::Properties:Path
-      cBinPath := cPath + "\" + ::Properties:Binary
+      cBinPath := ::FixPath( cPath, ::Properties:Binary )
 
       cExe := cBinPath + "\" + IIF( !EMPTY( ::Properties:TargetName ), ::Properties:TargetName, ::Properties:Name ) + aTargetTypes[ ::Properties:TargetType ]
 
@@ -5284,10 +5285,10 @@ METHOD Build( lForce ) CLASS Project
    ENDIF
    cPath := ::Properties:Path
 
-   cBinPath    := cPath + "\" + ::Properties:Binary
-   cSourcePath := cPath + "\" + ::Properties:Source
-   cObjPath    := cPath + "\" + ::Properties:Objects
-   cResPath    := cPath + "\" + ::Properties:Resource
+   cBinPath    := ::FixPath( cPath, ::Properties:Binary )
+   cSourcePath := ::FixPath( cPath, ::Properties:Source )
+   cObjPath    := ::FixPath( cPath, ::Properties:Objects )
+   cResPath    := ::FixPath( cPath, ::Properties:Resource )
 
    IF ! IsDirectory( cBinPath )
       MakeDir( cBinPath )
