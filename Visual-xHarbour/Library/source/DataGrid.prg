@@ -846,7 +846,6 @@ METHOD __OnSize() CLASS DataGrid
       ::__DisplayData()
       ::ValidateRect()
    ENDIF
-   ::__ResetRecordPos(.F.)
 
 RETURN NIL
 
@@ -940,7 +939,8 @@ METHOD __SizeUpdate( x, y ) CLASS DataGrid
    ENDIF
    ::RowCountVisible := nRowsV
    ::RowCountUsable  := MIN( nRowsU, ::RowCount )
-RETURN 0
+   ::__ResetRecordPos(.F.)
+ RETURN 0
 
 //----------------------------------------------------------------------------------
 
