@@ -35,7 +35,8 @@ CLASS TreeView FROM Control
    DATA PreviousItem     EXPORTED
    DATA DragImage        EXPORTED
    DATA ClickedItem      EXPORTED   
-   
+   DATA __lResetting     PROTECTED INIT .F.
+
    PROPERTY HasLines        INDEX TVS_HASLINES        READ xHasLines        WRITE SetStyle   DEFAULT .T. PROTECTED
    PROPERTY HasButtons      INDEX TVS_HASBUTTONS      READ xHasButtons      WRITE SetStyle   DEFAULT .T. PROTECTED
    PROPERTY LinesAtRoot     INDEX TVS_LINESATROOT     READ xLinesAtRoot     WRITE SetStyle   DEFAULT .T. PROTECTED
@@ -274,14 +275,16 @@ RETURN NIL
 //----------------------------------------------------------------------------//
 
 METHOD ResetContent() CLASS TreeView
-   LOCAL n
+   //LOCAL n
+   ::__lResetting := .T.
    SendMessage( ::hWnd, TVM_DELETEITEM, 0, TVI_ROOT  )
-   FOR n := 1 TO LEN( ::Items )
-      ::Items[n]:Cargo := NIL
-      ::Items[n]:ColItems := NIL
-      ::Items[n]:Delete()
-   NEXT
+   //FOR n := 1 TO LEN( ::Items )
+   //   ::Items[n]:Cargo := NIL
+   //   ::Items[n]:ColItems := NIL
+   //   ::Items[n]:Delete()
+   //NEXT
    ::Items := {}
+   ::__lResetting := .F.
 RETURN Self
 
 //----------------------------------------------------------------------------//
@@ -307,6 +310,11 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TreeView
    LOCAL tvht, rc
    LOCAL tvkd, nState, lRet, hItem
    DEFAULT hdr TO ::Parent:hdr
+   
+   IF ::__lResetting
+      RETURN 0
+   ENDIF
+
    DO CASE
       CASE hdr:code == NM_CUSTOMDRAW
            ::SelectedItem := FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )

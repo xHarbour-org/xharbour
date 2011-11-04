@@ -10233,7 +10233,7 @@ HB_FUNC( CERTIFICATEDIALOG )
                DWORD dwSize = 0;
                CERT_NAME_BLOB NameBlob;
 
-               NameBlob = pCertContext->pCertInfo->Issuer;
+               NameBlob = pCertContext->pCertInfo->Subject;
                dwSize = pCertNameToStr( pCertContext->dwCertEncodingType, &NameBlob, CERT_SIMPLE_NAME_STR, NULL, 0);
                if( dwSize > 2 )
                {

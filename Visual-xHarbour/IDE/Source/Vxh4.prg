@@ -1258,8 +1258,8 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
    aSort( aProperties,,,{|x, y| x[1] < y[1]})
 
    FOR EACH aProperty IN aProperties
-       ::Application:Yield()
-       hb_gcAll()
+       //::Application:Yield()
+       //hb_gcAll()
        cProp  := aProperty[1]
 
        IF cProp == "RESOURCES" .AND. ::ActiveObject:ClsName == "Application"
