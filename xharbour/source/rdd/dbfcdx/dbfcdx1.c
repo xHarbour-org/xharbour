@@ -3333,7 +3333,7 @@ static BOOL hb_cdxCheckRecordFilter( CDXAREAP pArea, ULONG ulRecNo )
          SELF_GOTO( ( AREAP ) pArea, ulRecNo );
 
       if( fDeleted )
-         SUPER_DELETED( ( AREAP ) pArea, &lResult );
+         SELF_DELETED( ( AREAP ) pArea, &lResult );
 
       if( !lResult && pArea->dbfarea.area.dbfi.itmCobExpr )
       {

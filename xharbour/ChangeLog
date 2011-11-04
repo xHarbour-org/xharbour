@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-11-04 11:23 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * source/rdd/dbfcdx/dbfcdx.c
+    ! fixed wrongly used SUPER_DELETED() instead of SELF_DELETED()
+    ! borrow from harbour
+
 2011-11-03 19:01 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/png/png.c
   * contrib/png/png.h
