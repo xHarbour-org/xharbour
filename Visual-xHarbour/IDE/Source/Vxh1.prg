@@ -5330,7 +5330,6 @@ METHOD Build( lForce ) CLASS Project
       WITH OBJECT oProject
          :lMT              := ::Properties:MultiThread
          :lGUI             := ::Properties:GUI
-         :lXBP             := .F.
          :lINI             := .F.
          :OutputFolder     := cObjPath
          :TargetFolder     := cBinPath
@@ -5457,11 +5456,8 @@ METHOD Build( lForce ) CLASS Project
 
          ENDIF
          :lUseDLL := ::Properties:UseDll
+         :lXBP    := ::Application:IniFile:ReadInteger( "General", "SaveXBP", 0 )==1
       END
-
-      IF ::Application:IniFile:ReadInteger( "General", "SaveXBP", 0 )==1
-         GenerateProjectFile( oProject )
-      ENDIF
 
       ::Application:Yield()
 
