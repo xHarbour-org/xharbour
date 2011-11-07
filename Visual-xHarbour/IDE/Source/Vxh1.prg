@@ -506,7 +506,7 @@ RETURN NIL
 
 
 METHOD Init() CLASS IDE_MainForm
-   LOCAL o, cVersion
+   LOCAL cVersion
 
    ::Super:Init()
    #ifdef VXH_DEMO
@@ -1221,7 +1221,7 @@ METHOD Init() CLASS IDE_MainForm
       END
 
       WITH OBJECT ToolStripComboBox( :this )
-         :Action := {||::Application:RunMode := o:GetCurSel()-1 }
+         :Action := {|o|::Application:RunMode := o:GetCurSel()-1 }
          :Create()
          :AddItem( "Debug" )
          :AddItem( "Release" )
@@ -1373,7 +1373,7 @@ METHOD Init() CLASS IDE_MainForm
       :Flat             := .T.
       :AllowUndock      := .T.
       :AllowClose       := .T.
-      :OnWMClose        := {|| o:Redock() }
+      :OnWMClose        := {|o| o:Redock() }
       :OnWMClose        := {|o| IIF( o:IsDocked, (o:Hide(), ::Application:Props[ "ViewToolBoxItem" ]:Checked := .F. ), o:Redock() ) }
 
       :Width            := Round( ( :Parent:ClientWidth*::Application:Sizes["ToolBoxWidth"])/100,0)
