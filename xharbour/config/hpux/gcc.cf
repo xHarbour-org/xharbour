@@ -22,29 +22,32 @@ CC_IN = -c
 CC_OUT = -o
 CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
 
-CFLAGS = -DHB_OS_HPUX -Wall -W
+# We are under linux
+CFLAGS = -DHB_OS_UNIX -Wall -W
+
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS += -DSIMPLEX
 endif
-LDFLAGS =
-
-# uncomment this if you want to farce relocateable code for .so libs
-# it's necessary on some platforms but can reduce performance
-#CFLAGS += -fPIC
-
-# uncomment this if you want to force creating 64bit binaries on IA64
-#CFLAGS += -mlp64
-#LDFLAGS = -mlp64
+CFLAGS += -mlp64
+LDFLAGS = -mlp64
 
 ifeq ($(HB_LIBCOMP_MT),)
 #always add thread support if not compiling a lib and using vmmt
 ifeq ($(findstring vmmt,$(LIBS)),vmmt)
-CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE -pthread
+CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE
 endif
 else
+# force relocateable code for .so libs
+# it's necessary on some platforms but can reduce performance
+#ifeq ($(shell sh -c 'uname -m 2>/dev/null'),x86_64)
+USE_FPIC = no
+#endif
+ifeq ($(USE_FPIC),yes)
+CFLAGS += -fPIC
+endif
 #Add thread support to lib compilation only if compiling a _mt lib
 ifeq ($(HB_LIBCOMP_MT),YES)
-CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE -pthread
+CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE
 HB_MT_FLAGS = -DHB_THREAD_SUPPORT
 endif
 endif
@@ -65,11 +68,16 @@ endif
 else
 LINKPATHS += -L$(HB_LIB_COMPILE)
 endif
+
+# our libs have a lot of cross references now and we have to group them
+# until we clean them
+#LINKLIBS += -Wl,--start-group
+
 # Add all libraries specified in HB_USER_LIBS.
 LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
 LINKLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
 
-LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(lib))
+LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(subst lib,,$(lib)))
 LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 
 # If LIBS specifies the rdd library, add all DB drivers.
@@ -101,7 +109,7 @@ LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv))
 endif
 endif
 
-# Add the specified GT driver library
+# Add the specified GT driver library and other RTLs
 ifeq ($(findstring rtl,$(LIBS)),rtl)
 
 LINKPATHS += $(foreach gt, $(HB_GT_LIBS), -L$(TOP)$(ROOT)source/rtl/$(gt)/$(ARCH_DIR))
@@ -125,18 +133,35 @@ LINKLIBS += -lX11
 #LINKPATHS += -L/usr/X11R6/lib64
 LINKPATHS += -L/usr/X11R6/lib
 endif
+
+# HB_GPM_MOUSE: use gpm mouse driver
+ifeq ($(HB_GPM_MOUSE),yes)
+LINKLIBS += -lgpm
 endif
 
+endif
+
+#it never hurts if MT is enabled.
+#ifeq ($(HB_MT),MT) - hurts because it force linking with this lib, try ldd
+ifeq ($(findstring vmmt,$(LIBS)),vmmt)
+LINKLIBS += -lpthread
+endif
+
+# New pcrepos library
+ifeq ($(findstring rtl,$(LIBS)),rtl)
+LINKLIBS += -lrtl
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH_DIR)
 LINKLIBS += -lpcrepos
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/zlib/$(ARCH_DIR)
+LINKLIBS += -lzlib
 endif
 
 LINKLIBS += -lm -lrt
 
-LDFLAGS += $(LINKPATHS)
+LDFLAGS = $(LINKPATHS)
 
 AR = ar
 ARFLAGS = $(A_USR)
-AR_RULE = $(AR) $(ARFLAGS) r $@ $(^F) && $(RANLIB) $@ || ( $(RM) $@ && false )
+AR_RULE = $(AR) $(ARFLAGS) cru $@ $(^F) && $(RANLIB) $@ || ( $(RM) $@ && false )
 
 include $(TOP)$(ROOT)config/rules.cf

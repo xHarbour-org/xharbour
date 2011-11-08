@@ -38,6 +38,7 @@ LIBS=\
 	pp \
 	lang \
 	common \
+	rtl \
 
 include $(TOP)$(ROOT)config/bin.cf
 

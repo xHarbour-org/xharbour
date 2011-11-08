@@ -177,10 +177,15 @@ void hb_releaseCPU( BOOL bIndefinite )
    #elif defined(HB_OS_UNIX)
    {
 
+      //struct timeval tv;
+      //tv.tv_sec = 0;
+      //tv.tv_usec = 1000;
+//      select( 0, NULL, NULL, NULL, &tv );
       struct timeval tv;
       tv.tv_sec = 0;
-      tv.tv_usec = 1000;
+      tv.tv_usec = 20000;
       select( 0, NULL, NULL, NULL, &tv );
+
 
    }
    #else

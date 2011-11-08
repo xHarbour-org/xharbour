@@ -200,14 +200,14 @@ typedef struct __FUNCALL
 } _FUNCALL, * PFUNCALL;
 
 /* structure to hold an INLINE block of source */
-typedef struct __INLINE
+typedef struct __PINLINE
 {
    char *       szName;                   /* name of a inline function */
    BYTE *       pCode;                    /* pointer to a memory block where pcode is stored */
    ULONG        lPCodeSize;               /* total memory size for pcode */
    char *       szFileName;               /* Source file name */
    int          iLine;                    /* Source line number */
-   struct __INLINE * pNext;               /* pointer to the next defined inline */
+   struct __PINLINE * pNext;               /* pointer to the next defined inline */
 } _INLINE, * PINLINE;
 
 /* structure to control all Clipper defined functions */

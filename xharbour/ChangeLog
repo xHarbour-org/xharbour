@@ -8,6 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-11-08 15:30 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * source/rtl/filesys.c
+    % removed unnecessary PID setting in POSIX file lock function. borrow from harbour
+  * source/rtl/idle.c
+    hb_releaseCPU() updated to use 20000 micro secs under *nixes
+  * config/hpux/gcc.cf
+    config/hpux/global.cf
+    ! updated to work properly in hpux
+  * include/hbcomp.h
+    * renamed structure __INLINE  TO __PINLINE. __INLINE name give compile error on hpux
+  * utils/hbfilere/Makefile
+    utils/hbmake/Makefile
+    ! updated lib list to properly compile in hpux
+         
 2011-11-04 11:23 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/rdd/dbfcdx/dbfcdx.c
     ! fixed wrongly used SUPER_DELETED() instead of SELF_DELETED()
