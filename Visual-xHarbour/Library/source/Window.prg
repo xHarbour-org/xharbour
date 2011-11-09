@@ -3384,12 +3384,10 @@ METHOD __WindowDestroy() CLASS Window
          END
       ENDIF
     ELSE
-      IF ::Parent != NIL .AND. ::Name != NIL
-         TRY
-            HDel( ::Parent:Property, ::xName )
-         CATCH
-         END
-      ENDIF
+      TRY
+         HDel( ::Application:Property, ::xName )
+      CATCH
+      END
    ENDIF
    IF !EMPTY( ::__hIcon )
       DestroyIcon( ::__hIcon )

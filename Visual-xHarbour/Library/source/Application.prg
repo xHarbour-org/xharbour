@@ -400,8 +400,42 @@ CLASS Application
    
    METHOD LoadResource( cName, cType ) INLINE __ResourceToString( Application:Instance, cName, cType )
    METHOD SaveResource()
+   METHOD __SetAsProperty()
+   METHOD __InvalidMember()
+   error HANDLER OnError()
 ENDCLASS
 
+//-----------------------------------------------------------------------------------------------------------------------------
+METHOD OnError( ... ) CLASS Application
+   LOCAL cMsg, uRet, aParams := HB_AParams()
+   cMsg := __GetMessage()
+   
+   IF PCount() == 0 .AND. ::Property != NIL
+      IF hGetPos( ::Property, cMsg ) > 0
+         uRet := ::Property[ cMsg ]
+       ELSE
+         uRet := ::__InvalidMember( cMsg )
+      ENDIF
+   ENDIF
+RETURN uRet
+
+//-----------------------------------------------------------------------------------------------------------------------------
+METHOD __InvalidMember( cMsg ) CLASS Application
+   LOCAL uRet, oErr := ErrorNew()
+   oErr:Args          := { Self, cMsg,  }
+   oErr:CanDefault    := .F.
+   oErr:CanRetry      := .F.
+   oErr:CanSubstitute := .T.
+   oErr:Description   := "Invalid Class Member"
+   oErr:GenCode       := EG_NOVARMETHOD
+   oErr:Operation     := cMsg
+   oErr:Severity      := ES_ERROR
+   oErr:SubCode       := -1
+   oErr:SubSystem     := ::classname
+   uRet := Eval( ErrorBlock(), oErr )
+RETURN uRet
+
+//-----------------------------------------------------------------------------------------------------------------------------
 METHOD Init( lIde, __hDllInstance ) CLASS Application
    LOCAL cName, hPrevInstance
    DEFAULT lIde TO .F.
@@ -454,6 +488,24 @@ METHOD Init( lIde, __hDllInstance ) CLASS Application
       InitUxTheme()
    ENDIF
    ::Instance := GetModuleHandle( ::FileName )
+RETURN Self
+
+//-----------------------------------------------------------------------------------------------------------------------------
+METHOD __SetAsProperty( cName, oObj ) CLASS Application
+   LOCAL n
+   IF ::Property == NIL .OR. ! ::GenerateMembers
+      RETURN Self
+   ENDIF
+   IF oObj:ClsName == "AtlAxWin" .AND. oObj:xName != NIL .AND. ! ( oObj:xName == cName )
+      cName := oObj:xName
+   ENDIF
+   IF !( oObj == Self ) 
+      IF !EMPTY( oObj:xName ) .AND. ( n := hGetPos( ::Property, oObj:xName ) ) > 0
+         HDelAt( ::Property, n )
+      ENDIF
+      ::Property[ cName ] := oObj
+   ENDIF
+   oObj:xName := cName
 RETURN Self
 
 //------------------------------------------------------------------------------------------------
