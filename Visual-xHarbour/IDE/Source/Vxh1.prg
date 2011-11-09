@@ -2276,6 +2276,7 @@ CLASS Project
    METHOD Debug()
    METHOD DebugStop()
    METHOD ParseXFM()
+   METHOD LoadForm()
    METHOD ParseRC()
    METHOD New()
    METHOD OpenDesigner()
@@ -3802,7 +3803,7 @@ METHOD Open( cProject ) CLASS Project
       nLine       := 1
       aChildren   := {}
       WHILE HB_FReadLine( hFile, @cLine, XFM_EOL ) == 0
-         ::ParseXFM( cLine, hFile, @aChildren, cFile, @nLine, @aErrors, @aEditors )
+         ::ParseXFM(, cLine, hFile, @aChildren, cFile, @nLine, @aErrors, @aEditors )
          hb_gcall()
          nLine++
       END
@@ -3812,26 +3813,11 @@ METHOD Open( cProject ) CLASS Project
    aEditors := {}
 
    FOR EACH Xfm IN ::Properties:Files
-       cFile := Xfm
-       Xfm := cSourcePath +"\" + Xfm
-
-       hFile := FOpen( Xfm, FO_READ )
-
-       IF hFile == -1
-          MessageBox( GetActiveWindow(), "The File " + cFile + " is missing, the project will now close", "Visual xHarbour - Open Project", MB_ICONERROR )
+       IF ! ::LoadForm( Xfm, @aErrors, @aEditors )
+          MessageBox( GetActiveWindow(), "The File " + Xfm + " is missing, the project will now close", "Visual xHarbour - Open Project", MB_ICONERROR )
           ::Application:Cursor := NIL
           RETURN ::Close()
        ENDIF
-       nLine     := 1
-       aChildren := {}
-       //aErrors   := {}
-
-       WHILE HB_FReadLine( hFile, @cLine, XFM_EOL ) == 0
-          ::ParseXFM( cLine, hFile, @aChildren, cFile, @nLine, @aErrors, @aEditors )
-          hb_gcall()
-          nLine++
-       END
-       FClose( hFile )
    NEXT
 
    ::Application:SourceTabs:Visible := .T.
@@ -3960,15 +3946,51 @@ METHOD Open( cProject ) CLASS Project
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
+METHOD LoadForm( cFile, aErrors, aEditors ) CLASS Project
+   LOCAL cObjectName, cXfm, cLine, nLine, aChildren, hFile, oForm, cClassName, aTokens
+   LOCAL cSourcePath := ::Properties:Path + "\" + ::Properties:Source
+   cXfm := cSourcePath +"\" + cFile
 
-METHOD ParseXFM( cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors, oCC, lCustomOwner ) CLASS Project
+   hFile := FOpen( cXfm, FO_READ )
+   IF hFile == -1
+      RETURN .F.
+   ENDIF
+   nLine       := 1
+   aChildren   := {}
+   cObjectName := Token( cFile, ".", 1 )
+   cClassName  := ""
 
+   WHILE HB_FReadLine( hFile, @cLine, XFM_EOL ) == 0
+      IF cLine HAS "(?i)^CLASS +[_A-Z|a-z|0-9]+ +INHERIT +"
+         aTokens     := HB_aTokens( cLine )
+         cClassName  := UPPER( aTokens[-1] )
+         cObjectName := aTokens[2]
+         EXIT
+      ENDIF
+   ENDDO
+   FSeek( hFile, 0, 0 )
+
+   oForm := ::AddWindow( .F., cObjectName + ".prg", cClassName == "CUSTOMCONTROL" )
+   cSourcePath := ::Properties:Path + "\" + ::Properties:Source
+   oForm:Editor:Load( cSourcePath + "\" + cObjectName + ".prg",, .F., .F. )
+   ::Application:SourceEditor:oEditor := oForm:Editor
+
+   WHILE HB_FReadLine( hFile, @cLine, XFM_EOL ) == 0
+      ::ParseXFM( oForm, cLine, hFile, @aChildren, cFile, @nLine, @aErrors, @aEditors )
+      hb_gcall()
+      nLine++
+   END
+   FClose( hFile )
+RETURN .T.
+
+//-------------------------------------------------------------------------------------------------------
+METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors, oCC, lCustomOwner ) CLASS Project
    LOCAL oErr, nRead, nPos, n, cParent, lFound, hPtr
    LOCAL aTokens, nTokens, nToken, Topic, Event
    LOCAL cClassName, cObjectName, oParent, cEvent, cHandler, cProperty, cValue, xValue
    LOCAL cWithClassName, cWithProperty, cWithEvent, cWithHandler, cWithValue
    LOCAL aoWithObjects := {}, cPropertyObject, lDialog := .F.
-   LOCAL oObj, oPrev, oForm, cSourcePath
+   LOCAL oObj, oPrev
    ( aEditors )
 
    DEFAULT lCustomOwner TO .F.
@@ -3997,14 +4019,15 @@ METHOD ParseXFM( cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors, oCC, 
          IF cClassName == "WINDOW" .OR. cClassName == "MDICHILDWINDOW" .OR. cClassName == "WINFORM" .OR. cClassName == "FORM" .OR. cClassName == "CUSTOMCONTROL"
             IF oCC != NIL
                oObj := oCC
-             ELSE
+             ELSEIF oForm != NIL
                // Initialize Form Designer
-               oObj := ::AddWindow(.F., cObjectName + ".prg", cClassName == "CUSTOMCONTROL" )
-               DEFAULT oForm TO oObj
-               cSourcePath := ::Properties:Path + "\" + ::Properties:Source
-               oObj:Editor:Load( cSourcePath + "\" + cObjectName + ".prg",, .F., .F. )
-               ::Application:SourceEditor:oEditor := oObj:Editor
-               AADD( aChildren, { cObjectName, oObj } )
+               oObj := oForm
+//                oObj := ::AddWindow(.F., cObjectName + ".prg", cClassName == "CUSTOMCONTROL" )
+//                DEFAULT oForm TO oObj
+//                cSourcePath := ::Properties:Path + "\" + ::Properties:Source
+//                oObj:Editor:Load( cSourcePath + "\" + cObjectName + ".prg",, .F., .F. )
+//                ::Application:SourceEditor:oEditor := oObj:Editor
+               AADD( aChildren, { cObjectName, oForm } )
             ENDIF
           ELSEIF cClassName == "APPLICATION"
             oObj := ::AppObject

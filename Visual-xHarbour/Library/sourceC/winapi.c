@@ -189,6 +189,7 @@ static PCCERT_CONTEXT (WINAPI *pCryptUIDlgSelectCertificateFromStore)(HCERTSTORE
 static BOOL (WINAPI* pCertFreeCertificateContext)(PCCERT_CONTEXT)                                              = NULL;
 static BOOL (WINAPI* pCertCloseStore)(HCERTSTORE,DWORD)                                                        = NULL;
 static DWORD (WINAPI* pCertNameToStr)(DWORD,PCERT_NAME_BLOB,DWORD,LPTSTR,DWORD)                                = NULL;
+static DWORD (WINAPI* pCertGetNameString)(PCCERT_CONTEXT,DWORD,DWORD,LPVOID,LPTSTR,DWORD)                      = NULL;
 
 static BOOL (WINAPI *pEndTask)(HWND,BOOL,BOOL)                                                                 = NULL;
 static BOOL (WINAPI *pIsHungAppWindow)(HWND)                                                                   = NULL;
@@ -434,10 +435,11 @@ HB_FUNC_INIT( _INITSYMBOLS_ )
 
    if( hCrypt32 )
    {
-      pCertOpenSystemStore        = (HCERTSTORE (WINAPI *)(HCRYPTPROV,LPCSTR))                   GetProcAddress( hCrypt32, "CertOpenSystemStoreA" );
-      pCertFreeCertificateContext = (BOOL (WINAPI *)(PCCERT_CONTEXT))                            GetProcAddress( hCrypt32, "CertFreeCertificateContext" );
-      pCertCloseStore             = (BOOL (WINAPI *)(HCERTSTORE,DWORD))                          GetProcAddress( hCrypt32, "CertCloseStore" );
-      pCertNameToStr              = (DWORD (WINAPI *)(DWORD,PCERT_NAME_BLOB,DWORD,LPTSTR,DWORD)) GetProcAddress( hCrypt32, "CertNameToStrA" );
+      pCertOpenSystemStore        = (HCERTSTORE (WINAPI *)(HCRYPTPROV,LPCSTR))                         GetProcAddress( hCrypt32, "CertOpenSystemStoreA" );
+      pCertFreeCertificateContext = (BOOL (WINAPI *)(PCCERT_CONTEXT))                                  GetProcAddress( hCrypt32, "CertFreeCertificateContext" );
+      pCertCloseStore             = (BOOL (WINAPI *)(HCERTSTORE,DWORD))                                GetProcAddress( hCrypt32, "CertCloseStore" );
+      pCertNameToStr              = (DWORD (WINAPI *)(DWORD,PCERT_NAME_BLOB,DWORD,LPTSTR,DWORD))       GetProcAddress( hCrypt32, "CertNameToStrA" );
+      pCertGetNameString          = (DWORD (WINAPI *)(PCCERT_CONTEXT,DWORD,DWORD,LPVOID,LPTSTR,DWORD)) GetProcAddress( hCrypt32, "CertGetNameStringA" );
    }
 
    if( hUser32 )
@@ -10231,14 +10233,14 @@ HB_FUNC( CERTIFICATEDIALOG )
             if( pCertNameToStr )
             {
                DWORD dwSize = 0;
-               CERT_NAME_BLOB NameBlob;
-
-               NameBlob = pCertContext->pCertInfo->Subject;
-               dwSize = pCertNameToStr( pCertContext->dwCertEncodingType, &NameBlob, CERT_SIMPLE_NAME_STR, NULL, 0);
-               if( dwSize > 2 )
+               //CERT_NAME_BLOB NameBlob = pCertContext->pCertInfo->Subject;
+               //dwSize = pCertNameToStr( pCertContext->dwCertEncodingType, &NameBlob, CERT_SIMPLE_NAME_STR, NULL, 0);
+               dwSize = pCertGetNameString(pCertContext, CERT_NAME_SIMPLE_DISPLAY_TYPE,0, NULL, NULL, 0 );
+               if( dwSize > 1 )
                {
                   char *cBuffer = (char *) hb_xgrab( (int)dwSize + 1 );
-                  pCertNameToStr( pCertContext->dwCertEncodingType, &NameBlob, CERT_SIMPLE_NAME_STR, cBuffer, dwSize );
+                  //pCertNameToStr( pCertContext->dwCertEncodingType, &NameBlob, CERT_SIMPLE_NAME_STR, cBuffer, dwSize );
+                  pCertGetNameString(pCertContext, CERT_NAME_SIMPLE_DISPLAY_TYPE,0, NULL, cBuffer, dwSize );
                   hb_retcAdopt( cBuffer );
                }
                pCertFreeCertificateContext(pCertContext);
@@ -10248,3 +10250,4 @@ HB_FUNC( CERTIFICATEDIALOG )
       }
    }
 }
+
