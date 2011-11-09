@@ -3376,11 +3376,20 @@ METHOD __WindowDestroy() CLASS Window
          ENDIF
       ENDIF
    ENDIF
-   IF ::Form != NIL .AND. ::Name != NIL
-      TRY
-         HDel( ::Form:Property, ::xName )
-      CATCH
-      END
+   IF ::Form:hWnd != ::hWnd
+      IF ::Form != NIL .AND. ::Name != NIL
+         TRY
+            HDel( ::Form:Property, ::xName )
+         CATCH
+         END
+      ENDIF
+    ELSE
+      IF ::Parent != NIL .AND. ::Name != NIL
+         TRY
+            HDel( ::Parent:Property, ::xName )
+         CATCH
+         END
+      ENDIF
    ENDIF
    IF !EMPTY( ::__hIcon )
       DestroyIcon( ::__hIcon )
