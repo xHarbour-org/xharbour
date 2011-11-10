@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-11-10 13:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/gencc.c
+    + function HB_GENC_FUNC( hb_p_pushdatetime ) to use LONG value instead of int;
+      this correct DATETIME value when compiling a PRG with -gc3 with certain C compilers.
+      This bug has been there for ages.
+      Example:
+      previously: {^ 2011/11/09 12:30:00 } returns 11/09/11 00:00:02.455
+      now:        {^ 2011/11/09 12:30:00 } returns 11/09/11 12:30:00.000
+
 2011-11-10 09:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbdate.h
     + defined constants: HB_MINUTES_PER_DAY, HB_SECONDS_PER_DAY and HB_MILLISECS_PER_DAY
