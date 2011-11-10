@@ -8,6 +8,13 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-11-09 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Application the ability to hold the forms as properties.
+     i.e cText := ::Application:Form2:Caption
+     ::Application:Form3:Left := 100
+     ::Application:Form2:Close()
+     Forms MUST be open to access them, once closed the property is released.
+
 2011-11-04 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed DataGrid issue not showing single record database introduced by previous
      fix to mouse wheel RTE.
