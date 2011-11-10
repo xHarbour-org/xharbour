@@ -777,6 +777,25 @@ PHB_ITEM hb_itemPutDT( PHB_ITEM pItem, int iYear, int iMonth, int iDay, int iHou
    return pItem;
 }
 
+PHB_ITEM hb_itemPutTDT( PHB_ITEM pItem, long lJulian, long lMilliSec )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutTDT(%p, %ld, %ld)", pItem, lJulian, lMilliSec));
+
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+         hb_itemClear( pItem );
+   }
+   else
+      pItem = hb_itemNew( NULL );
+
+   pItem->type = HB_IT_TIMEFLAG;
+   pItem->item.asDate.value = lJulian;
+   pItem->item.asDate.time = lMilliSec;
+
+   return pItem;
+}
+
 PHB_ITEM hb_itemPutDL( PHB_ITEM pItem, LONG lJulian )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutDL(%p, %ld)", pItem, lJulian));

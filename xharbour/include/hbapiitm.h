@@ -116,6 +116,8 @@ extern HB_EXPORT PHB_ITEM   hb_itemParam    ( USHORT uiParam );
    extern HB_EXPORT HB_ITEM hb_itemParamStack   ( USHORT uiParam ) ;
 #endif
 
+extern HB_EXPORT PHB_ITEM   hb_itemPutTDT( PHB_ITEM pItem, long lJulian, long lMilliSec );
+
 extern HB_EXPORT PHB_ITEM   hb_itemPutDTsec( PHB_ITEM pItem, double dDateTime );
 extern HB_EXPORT PHB_ITEM   hb_itemPutDate( PHB_ITEM pItem, LONG lDate );
 
@@ -123,11 +125,11 @@ extern HB_EXPORT PHB_ITEM   hb_itemPutC       ( PHB_ITEM pItem, const char * szT
 extern HB_EXPORT PHB_ITEM   hb_itemPutCPtr    ( PHB_ITEM pItem, char * szText, ULONG ulLen );
 
 #if 0
-   extern HB_EXPORT PHB_ITEM   hb_itemPutCLPtr   ( PHB_ITEM pItem, char * szText, ULONG ulLen );
-   extern HB_EXPORT PHB_ITEM   hb_itemPutCPtr2   ( PHB_ITEM pItem, char * szText );
+  extern HB_EXPORT PHB_ITEM   hb_itemPutCLPtr   ( PHB_ITEM pItem, char * szText, ULONG ulLen );
+  extern HB_EXPORT PHB_ITEM   hb_itemPutCPtr2   ( PHB_ITEM pItem, char * szText );
 #else
-   #define hb_itemPutCLPtr( pItem, szText, ulLen ) hb_itemPutCPtr( pItem, szText, ulLen )
-   #define hb_itemPutCPtr2( pItem, szText ) hb_itemPutC( pItem, szText )
+  #define hb_itemPutCLPtr( pItem, szText, ulLen ) hb_itemPutCPtr( pItem, szText, ulLen )
+  #define hb_itemPutCPtr2( pItem, szText ) hb_itemPutC( pItem, szText )
 #endif
 
 extern HB_EXPORT PHB_ITEM   hb_itemPutCRaw    ( PHB_ITEM pItem, char * szText, ULONG ulLen );

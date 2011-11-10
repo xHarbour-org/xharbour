@@ -4381,7 +4381,8 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
          }
       }
    }
-   else if( ( HB_IS_DATE( pLeft ) || HB_IS_DATE( pRight ) ) && ( HB_IS_NUMERIC( pLeft ) && HB_IS_NUMERIC( pRight ) ) )
+   else if( ( HB_IS_DATETIME( pLeft ) && ( HB_IS_DATETIME( pRight ) || HB_IS_NUMERIC( pRight ) ) ) ||
+            ( HB_IS_NUMERIC( pLeft ) && HB_IS_DATETIME( pRight ) ) )
    {
       hb_vmSumDate( pLeft, pRight, pResult );
    }
@@ -8694,63 +8695,108 @@ static void hb_vmRetValue( void )
    hb_stackReturnItem()->type &= ~HB_IT_MEMOFLAG;
 }
 
+static void hb_vmTimeStampPut( HB_ITEM_PTR pItem, long lJulian, long lMilliSec )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmTimeStampPut(%p,%ld,%ld)", pItem, lJulian, lMilliSec));
+
+   /* timestamp normalization */
+   if( lJulian < 0 )
+   {
+      if( lMilliSec <= -HB_MILLISECS_PER_DAY )
+      {
+         lMilliSec += HB_MILLISECS_PER_DAY;
+         --lJulian;
+      }
+      else if( lMilliSec > 0 )
+      {
+         lMilliSec -= HB_MILLISECS_PER_DAY;
+         ++lJulian;
+         if( lMilliSec > 0 )
+         {
+            lMilliSec -= HB_MILLISECS_PER_DAY;
+            ++lJulian;
+         }
+      }
+   }
+   else
+   {
+      if( lMilliSec >= HB_MILLISECS_PER_DAY )
+      {
+         lMilliSec -= HB_MILLISECS_PER_DAY;
+         ++lJulian;
+      }
+      else if( lMilliSec < 0 )
+      {
+         lMilliSec += HB_MILLISECS_PER_DAY;
+         --lJulian;
+         if( lMilliSec < 0 )
+         {
+            lMilliSec += HB_MILLISECS_PER_DAY;
+            --lJulian;
+         }
+      }
+   }
+
+   hb_itemPutTDT( pItem, lJulian, lMilliSec );
+}
+
+static void hb_vmTimeStampAdd( HB_ITEM_PTR pResult, HB_ITEM_PTR pItem, double dValue )
+{
+   long lJulian, lMilliSec;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmTimeStampAdd(%p,%p,%lf)", pResult, pItem, dValue));
+
+   hb_timeStampUnpackDT( dValue, &lJulian, &lMilliSec );
+
+   lJulian += pItem->item.asDate.value;
+   lMilliSec += pItem->item.asDate.time;
+
+   hb_vmTimeStampPut( pResult, lJulian, lMilliSec );
+}
+
 static void hb_vmSumDate( PHB_ITEM pItem1, PHB_ITEM pItem2, PHB_ITEM pResult )
 {
-   PHB_ITEM pDate = pItem2;
-   PHB_ITEM pOther = pItem1;
-   LONG lDate = 0;
-   LONG lTime = 0;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmSumDate(%p,%p)", pItem1, pItem2));
-
-   if( HB_IS_DATE( pItem1 ) )
+   if( HB_IS_DATETIME( pItem1 ) && HB_IS_DATETIME( pItem2 ) )
    {
-      pDate  = pItem1;
-      pOther = pItem2;
+      if( HB_IS_TIMEFLAG( pItem1 ) || HB_IS_TIMEFLAG( pItem2 ) )
+         hb_vmTimeStampPut( pResult, pItem1->item.asDate.value +
+                                     pItem2->item.asDate.value,
+                                     pItem1->item.asDate.time +
+                                     pItem2->item.asDate.time );
+      else
+         /* NOTE: This is not a bug. CA-Cl*pper does exactly that for DATEs. */
+         hb_itemPutDL( pResult, pItem1->item.asDate.value +
+                                pItem2->item.asDate.value );
    }
-
-   if( HB_IS_DATETIME( pOther ) )
+   else if( HB_IS_DATETIME( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
-      lDate = pDate->item.asDate.value + pOther->item.asDate.value;
-      if( pDate->item.asDate.time != 0 || pOther->item.asDate.time != 0 )
+      if( HB_IS_TIMEFLAG( pItem1 ) )
       {
-         div_t result = div( (int) ( pDate->item.asDate.time + pOther->item.asDate.time ), (int) (86400 * HB_DATETIMEINSEC) );
-         lTime = result.rem;
-         lDate += result.quot;
+         if( HB_IS_NUMINT( pItem2 ) )
+            hb_vmTimeStampPut( pResult, pItem1->item.asDate.value +
+                                        ( long ) HB_ITEM_GET_NUMINTRAW( pItem2 ),
+                                        pItem1->item.asDate.time );
+         else
+            hb_vmTimeStampAdd( pResult, pItem1, pItem2->item.asDouble.value );
       }
+      else
+         hb_itemPutDL( pResult, hb_itemGetDL( pItem1 ) + hb_itemGetNL( pItem2 ) );
    }
-   else if( HB_IS_NUMINT( pOther ) )
+   else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_DATETIME( pItem2 ) )
    {
-      lTime = pDate->item.asDate.time;
-      lDate = pDate->item.asDate.value + hb_itemGetNL( pOther );
-   }
-   else if( HB_IS_NUMERIC( pOther ) )
-   {
-      double dDate = 0.0;
-      div_t result;
-
-      lTime = pDate->item.asDate.time +
-              (LONG) (modf( hb_itemGetND( pOther ), &dDate ) * (double)(86400 * HB_DATETIMEINSEC));
-
-      if( lTime < 0 )
+      if( HB_IS_TIMEFLAG( pItem2 ) )
       {
-         lTime += (86400 * HB_DATETIMEINSEC);
-         dDate -= 1;
+         if( HB_IS_NUMINT( pItem1 ) )
+            hb_vmTimeStampPut( pResult, ( long ) HB_ITEM_GET_NUMINTRAW( pItem1 ) +
+                                        pItem2->item.asDate.value,
+                                        pItem2->item.asDate.time );
+         else
+            hb_vmTimeStampAdd( pResult, pItem2, pItem1->item.asDouble.value );
       }
-
-      result = div( (int) lTime, (int) (86400 * HB_DATETIMEINSEC) );
-      lTime  = result.rem;
-      lDate  = pDate->item.asDate.value + (LONG)dDate + result.quot;
+      else
+         hb_itemPutDL( pResult, hb_itemGetNL( pItem1 ) + hb_itemGetDL( pItem2 ) );
    }
-
-   if( HB_IS_COMPLEX( pResult ) )
-   {
-      hb_itemClear( pResult );
-   }
-
-   pResult->type = lTime ? HB_IT_TIMEFLAG : HB_IT_DATE;
-   pResult->item.asDate.time  = lTime;
-   pResult->item.asDate.value = lDate;
 
    return;
 }

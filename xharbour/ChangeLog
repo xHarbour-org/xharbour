@@ -8,6 +8,22 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-11-10 09:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbdate.h
+    + defined constants: HB_MINUTES_PER_DAY, HB_SECONDS_PER_DAY and HB_MILLISECS_PER_DAY
+
+  * source/common/hbdate.c
+    + function hb_timeStampUnpackDT()
+
+  * source/vm/hvm.c
+    ! modified function related to summing DATETIME
+
+  * source/vm/itemapi.c
+  * include/hbapiitm.h
+    + function hb_itemPutTDT()
+
+    /* borrowed from Harbour */
+
 2011-11-08 15:30 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/rtl/filesys.c
     % removed unnecessary PID setting in POSIX file lock function. borrow from harbour

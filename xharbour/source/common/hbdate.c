@@ -1230,6 +1230,30 @@ void hb_datetimeUnpack( double dDateTime, LONG * plDate, LONG * plTime )
 #define hb_datetimePack( lJulian, lTime )   (double)((double) lJulian + ((double)lTime / (double) (86400 * HB_DATETIMEINSEC)))
 #define hb_datetimePackInSec( lJulian, lTime )   (double)((double) (lJulian * 86400 ) + ((double)lTime / (double) (HB_DATETIMEINSEC)))
 
+void hb_timeStampUnpackDT( double dTimeStamp,
+                           long * plJulian, long * plMilliSec )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_timeStampUnpackDT(%f, %p, %p)", dTimeStamp, plJulian, plMilliSec));
+
+   {
+#if defined( HB_LONG_LONG_OFF )
+      double dJulian, dTime;
+
+      dTime = modf( dTimeStamp + 0.5 / HB_MILLISECS_PER_DAY, &dJulian );
+      if( plJulian )
+         *plJulian = ( long ) dJulian;
+      if( plMilliSec )
+         *plMilliSec = ( long ) ( dTime * HB_MILLISECS_PER_DAY );
+#else
+      LONGLONG llMilliSec = ( LONGLONG ) ( dTimeStamp * HB_MILLISECS_PER_DAY + 0.5 );
+      if( plJulian )
+         *plJulian = ( long ) ( llMilliSec / HB_MILLISECS_PER_DAY );
+      if( plMilliSec )
+         *plMilliSec = ( long ) ( llMilliSec % HB_MILLISECS_PER_DAY );
+#endif
+   }
+}
+
 /*-------------------------------------------------------------------------------*/
 
 double hb_comp_datetimeEncStr( const char * szDateTime )
