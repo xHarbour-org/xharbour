@@ -1,0 +1,69 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form2 INHERIT Dialog
+   // Components declaration
+   // User variables definitions
+   VAR nPos, cFile
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD Form2_OnLoad()
+   METHOD PSProcess()
+   METHOD PSTimer_OnTimeOut()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form2
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "Form2_OnLoad"
+   ::EventHandler[ "UserMethod1" ] := "PSProcess"
+
+   // Populate Components
+   WITH OBJECT ( Timer( Self ) )
+      :Name                 := "PSTimer"
+      :AutoRun              := .F.
+      :Delay                := 300
+      :EventHandler[ "OnTimeOut" ] := "PSTimer_OnTimeOut"
+      :Create()
+   END //PSTimer
+
+   // Properties declaration
+   ::Name                 := "Form2"
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 327
+   ::Height               := 144
+   ::Center               := .T.
+   ::VertScrollSize       := 264
+   ::HorzScrollSize       := 284
+   ::Caption              := "PowerShell is working..."
+   ::ThickFrame           := .F.
+   ::SysMenu              := .F.
+   ::FrameStyle           := 2
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS Form2
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( PROGRESSBAR( Self ) )
+      :Name                 := "Proggy"
+      :Left                 := 44
+      :Top                  := 44
+      :Width                := 222
+      :Height               := 20
+      :VertScrollSize       := 20
+      :HorzScrollSize       := 150
+      :Step                 := 1
+      :Create()
+   END //PROGRESSBAR
+
+RETURN Self
+

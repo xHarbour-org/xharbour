@@ -1,0 +1,300 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form1 INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form1_OnCreate()
+   METHOD ButtonProcs_OnClick()
+   METHOD ButtonServ_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form1
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnCreate" ] := "Form1_OnCreate"
+
+   // Populate Components
+   WITH OBJECT ( ImageList( Self ) )
+      :Name                 := "SmallImageList"
+      :AddImage( "_REDICO", NIL, 4194304, NIL,1, "red.ico" )
+      :AddImage( "_BLUEICO", NIL, 4194304, NIL,1, "blue.ico" )
+      :Create()
+   END //SmallImageList
+
+   // Properties declaration
+   ::Name                 := "Form1"
+   ::Left                 := 14
+   ::Top                  := 11
+   ::Width                := 297
+   ::Height               := 352
+   ::Center               := .T.
+   ::VertScrollSize       := 264
+   ::HorzScrollSize       := 284
+   ::Caption              := "PowerShell-Board"
+   ::ThickFrame           := .F.
+   ::ImageList            := "MyImageList"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( TABSTRIP( Self ) )
+      :Name                 := "TabStrip1"
+      WITH OBJECT :Font
+         :Pointsize            := 14
+      END
+
+      WITH OBJECT :Dock
+         :Left                 := "Form1"
+         :Top                  := "Form1"
+         :Right                := "Form1"
+         :Bottom               := "Form1"
+      END
+
+      :Left                 := 5
+      :Top                  := 3
+      :Width                := 280
+      :Height               := 320
+      :VertScrollSize       := 200
+      :HorzScrollSize       := 200
+      :BackColor            := 16777215
+      :FlatCaption          := .F.
+      :ImageList            := "SmallImageList"
+      :Create()
+      WITH OBJECT ( TABPAGE( :this ) )
+         :Name                 := "TabPage1"
+         :Caption              := "Processes"
+         :ForeColor            := 17919
+         :ImageList            := "SmallImageList"
+         :ImageIndex           := 1
+         :Create()
+         WITH OBJECT ( BUTTON( :this ) )
+            :Name                 := "ButtonProcs"
+            :Left                 := 99
+            :Top                  := 240
+            :Width                := 80
+            :Height               := 24
+            :VertScrollSize       := 25
+            :HorzScrollSize       := 80
+            :Caption              := "Display"
+            :ImageAlign           := 0
+            :ImageIndex           := 1
+            :EventHandler[ "OnClick" ] := "ButtonProcs_OnClick"
+            :Create()
+         END //BUTTON
+
+         WITH OBJECT ( CHECKBOX( :this ) )
+            :Name                 := "CheckId"
+            WITH OBJECT :Font
+               :Pointsize            := 11
+            END
+
+            :Left                 := 35
+            :Top                  := 54
+            :Width                := 154
+            :Height               := 15
+            :VertScrollSize       := 15
+            :HorzScrollSize       := 100
+            :Caption              := "Id"
+            :State                := 1
+            :Create()
+         END //CHECKBOX
+
+         WITH OBJECT ( CHECKBOX( :this ) )
+            :Name                 := "CheckHandle"
+            WITH OBJECT :Font
+               :Pointsize            := 11
+            END
+
+            :Left                 := 35
+            :Top                  := 88
+            :Width                := 154
+            :Height               := 15
+            :VertScrollSize       := 15
+            :HorzScrollSize       := 100
+            :Caption              := "Handle"
+            :State                := 1
+            :Create()
+         END //CHECKBOX
+
+         WITH OBJECT ( CHECKBOX( :this ) )
+            :Name                 := "CheckStart"
+            WITH OBJECT :Font
+               :Pointsize            := 11
+            END
+
+            :Left                 := 35
+            :Top                  := 123
+            :Width                := 154
+            :Height               := 15
+            :VertScrollSize       := 15
+            :HorzScrollSize       := 100
+            :Caption              := "Start time"
+            :State                := 1
+            :Create()
+         END //CHECKBOX
+
+         WITH OBJECT ( CHECKBOX( :this ) )
+            :Name                 := "CheckExit"
+            WITH OBJECT :Font
+               :Pointsize            := 11
+            END
+
+            :Left                 := 35
+            :Top                  := 159
+            :Width                := 126
+            :Height               := 17
+            :VertScrollSize       := 15
+            :HorzScrollSize       := 100
+            :Caption              := "Exit time"
+            :Create()
+         END //CHECKBOX
+
+         WITH OBJECT ( CHECKBOX( :this ) )
+            :Name                 := "CheckUser"
+            WITH OBJECT :Font
+               :Pointsize            := 11
+            END
+
+            :Left                 := 35
+            :Top                  := 196
+            :Width                := 165
+            :Height               := 15
+            :VertScrollSize       := 15
+            :HorzScrollSize       := 100
+            :Caption              := "User processor time"
+            :State                := 1
+            :Create()
+         END //CHECKBOX
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label1"
+            WITH OBJECT :Font
+               :Pointsize            := 11
+            END
+
+            :Left                 := 17
+            :Top                  := 13
+            :Width                := 219
+            :Height               := 27
+            :VertScrollSize       := 16
+            :HorzScrollSize       := 80
+            :Caption              := "Show the following data:"
+            :Create()
+         END //LABEL
+
+      END //TABPAGE
+
+      WITH OBJECT ( TABPAGE( :this ) )
+         :Name                 := "TabPage2"
+         :Caption              := "Services"
+         :ForeColor            := 16748574
+         :ImageList            := "SmallImageList"
+         :ImageIndex           := 2
+         :Create()
+         WITH OBJECT ( BUTTON( :this ) )
+            :Name                 := "ButtonServ"
+            :Left                 := 99
+            :Top                  := 240
+            :Width                := 80
+            :Height               := 24
+            :VertScrollSize       := 25
+            :HorzScrollSize       := 80
+            :Caption              := "Display"
+            :ImageAlign           := 0
+            :ImageIndex           := 2
+            :EventHandler[ "OnClick" ] := "ButtonServ_OnClick"
+            :Create()
+         END //BUTTON
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label2"
+            WITH OBJECT :Font
+               :Pointsize            := 11
+            END
+
+            :Left                 := 22
+            :Top                  := 20
+            :Width                := 173
+            :Height               := 22
+            :VertScrollSize       := 16
+            :HorzScrollSize       := 80
+            :Caption              := "Select service type:"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( RADIOBUTTON( :this ) )
+            :Name                 := "RadioRunning"
+            WITH OBJECT :Font
+               :Pointsize            := 11
+            END
+
+            :Left                 := 41
+            :Top                  := 57
+            :Width                := 134
+            :Height               := 19
+            :VertScrollSize       := 15
+            :HorzScrollSize       := 100
+            :Caption              := "Running"
+            :Group                := .T.
+            :InitialState         := 1
+            :Create()
+         END //RADIOBUTTON
+
+         WITH OBJECT ( RADIOBUTTON( :this ) )
+            :Name                 := "RadioStopped"
+            WITH OBJECT :Font
+               :Pointsize            := 11
+            END
+
+            :Left                 := 41
+            :Top                  := 92
+            :Width                := 130
+            :Height               := 19
+            :VertScrollSize       := 15
+            :HorzScrollSize       := 100
+            :Caption              := "Stopped"
+            :Create()
+         END //RADIOBUTTON
+
+         WITH OBJECT ( RADIOBUTTON( :this ) )
+            :Name                 := "RadioAll"
+            WITH OBJECT :Font
+               :Pointsize            := 11
+            END
+
+            :Left                 := 41
+            :Top                  := 128
+            :Width                := 100
+            :Height               := 19
+            :VertScrollSize       := 15
+            :HorzScrollSize       := 100
+            :Caption              := "All"
+            :Create()
+         END //RADIOBUTTON
+
+         WITH OBJECT ( CHECKBOX( :this ) )
+            :Name                 := "CheckDeps"
+            WITH OBJECT :Font
+               :Pointsize            := 11
+            END
+
+            :Left                 := 22
+            :Top                  := 172
+            :Width                := 169
+            :Height               := 27
+            :VertScrollSize       := 15
+            :HorzScrollSize       := 100
+            :Caption              := "Dependent services"
+            :Create()
+         END //CHECKBOX
+
+      END //TABPAGE
+
+   END //TABSTRIP
+
+   ::Show()
+
+RETURN Self
