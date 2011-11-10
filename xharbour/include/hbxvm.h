@@ -186,7 +186,8 @@ extern HB_EXPORT void   hb_xvmPushLongLong( LONGLONG llNumber );
 #define hb_xvmPushStringConst( psz, ul )  hb_itemPushStaticString( psz, ul )
 #define hb_xvmPushSymbol( p )             hb_vmPushSymbol( p )
 #define hb_xvmPushDate( l )               hb_vmPushDate( l )
-#define hb_xvmPushDateTime( l1, l2 )      hb_vmPushDateTime( l1, (double)(l1) / HB_DATETIMEINSEC )
+/* #define hb_xvmPushDateTime( l1, l2 )      hb_vmPushDateTime( l1, (double)(l2) / HB_DATETIMEINSEC ) */
+#define hb_xvmPushDateTime( l1, l2 )      hb_vmPushDateTime( l1, l2 )
 
 extern HB_EXPORT void   hb_xvmLocalSetInt( int iLocal, int iVal );
 extern HB_EXPORT void   hb_xvmLocalSetStr( int iLocal, const char * pVal, ULONG ulLen );

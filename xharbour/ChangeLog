@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-11-10 21:53 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbxvm.h
+    ! bug fix on definition og hb_vmPushDateTime()
+
 2011-11-10 13:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/gencc.c
     + function HB_GENC_FUNC( hb_p_pushdatetime ) to use LONG value instead of int;
