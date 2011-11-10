@@ -8,9 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-11-11 02:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * ChangeLog
+    ! minor correction on my previous log of: 2011-11-10 21:53 UTC+0700
+
+  * source/vm/hvm.c
+    ! bug fix on substraction of DATETIME value
+
 2011-11-10 21:53 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbxvm.h
-    ! bug fix on definition og hb_vmPushDateTime()
+    ! bug fix on definition of hb_xvmPushDateTime()
 
 2011-11-10 13:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/gencc.c

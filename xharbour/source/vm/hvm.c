@@ -4513,7 +4513,7 @@ static void hb_vmMinus( void )
          hb_errRT_BASE( EG_STROVERFLOW, 1210, NULL, "-", 2, pItem1, pItem2 );
       }
    }
-   else if( HB_IS_DATE( pItem1 ) && HB_IS_NUMBER( pItem2 ) )
+   else if( HB_IS_DATETIME( pItem1 ) && HB_IS_NUMBER( pItem2 ) )
    {
       hb_vmSubDate( pItem1, pItem2 );
    }
@@ -8756,6 +8756,7 @@ static void hb_vmTimeStampAdd( HB_ITEM_PTR pResult, HB_ITEM_PTR pItem, double dV
 
 static void hb_vmSumDate( PHB_ITEM pItem1, PHB_ITEM pItem2, PHB_ITEM pResult )
 {
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmSumDate(%p,%p,%p)", pItem1, pItem2, pResult ));
 
    if( HB_IS_DATETIME( pItem1 ) && HB_IS_DATETIME( pItem2 ) )
    {
