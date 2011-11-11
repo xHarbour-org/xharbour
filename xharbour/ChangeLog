@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-11-12 04:38 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/fm.c
+    ! HB_MT_VM -> HB_THREAD_SUPPORT
+  * source/vm/dlmalloc.c
+    ! updated to version 2.8.5
+  - source/vm/dlmalloc_version_284.c
+    ! removed
+
 2011-11-11 02:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * ChangeLog
     ! minor correction on my previous log of: 2011-11-10 21:53 UTC+0700

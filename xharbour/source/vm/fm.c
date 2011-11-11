@@ -85,6 +85,13 @@
 #include "hbmemory.ch"
 #include "hbinit.h"
 
+#if ( defined( __BORLANDC__ ) && ( __BORLANDC__ == 1568 ) )
+   /* Disabled: Borland C 6.2 internal error when compiling dlmalloc.c */
+   #if defined( HB_FM_DL_ALLOC )
+      #undef HB_FM_DL_ALLOC
+   #endif
+#endif
+
 #if defined( HB_FM_DL_ALLOC )
    #undef HB_FM_STD_ALLOC
    #undef HB_FM_WIN32_ALLOC
@@ -109,8 +116,10 @@
 /* #  define INSECURE */
 /* #  define USE_DL_PREFIX */
 #  define REALLOC_ZERO_BYTES_FREES
-#  if defined( HB_MT_VM )
+#  if defined( HB_THREAD_SUPPORT )
 #     define USE_LOCKS  1
+#else
+#     define USE_LOCKS  0
 #  endif
 #  if defined( __BORLANDC__ )
 #     pragma warn -aus
@@ -119,8 +128,13 @@
 #     pragma warn -ngu
 #     pragma warn -prc
 #     pragma warn -rch
-#  elif defined( _MSC_VER ) || defined( __WATCOMC__ )
+#     pragma warn -inl
+#  elif defined( _MSC_VER ) || defined( __DMC__ ) || defined( __WATCOMC__ )
 #     define USE_DL_PREFIX
+#  endif
+#  include "errno.h"
+#  if defined( _MSC_VER ) && ( _MSC_VER < 1600 ) && ! defined( __POCC__ )
+#     include "intsafe.h"
 #  endif
 #  include "dlmalloc.c"
 #  if defined( __BORLANDC__ )
@@ -130,6 +144,7 @@
 #     pragma warn +ngu
 #     pragma warn +prc
 #     pragma warn +rch
+#     pragma warn +inl
 #  endif
 #  if defined( USE_DL_PREFIX )
 #     define malloc( n )         dlmalloc( ( n ) )
