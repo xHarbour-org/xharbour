@@ -523,7 +523,6 @@ METHOD Show() CLASS PageSetup
          ENDIF
          GlobalFree( ::psd:hDevNames )
       ENDIF
-      VIEW FormatMessage( ,,GetLastError() )
       ::Orientation  := nOrientation
       ::PaperSize    := nPaperSize
       
