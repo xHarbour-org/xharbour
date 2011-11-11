@@ -203,6 +203,9 @@ RETURN Self
 //----------------------------------------------------------------------------
 
 METHOD Create() CLASS WindowEdit
+   IF IsWindow( ::hWnd )
+      RETURN Self
+   ENDIF
    ::Style := ::Style & NOT( WS_OVERLAPPED )
    ::Style := ::Style & NOT( WS_POPUP )
    ::Style := ::Style | WS_CHILD
@@ -211,11 +214,13 @@ METHOD Create() CLASS WindowEdit
    IF !::__lModified
       ::Hide()
    ENDIF
-   ::Application:FormsTabs:InsertTab( ::Name,,, .F. )
-   ::Application:FormsTabs:SetCurSel( ::Application:FormsTabs:GetItemCount() )
-   ::Application:FormsTabs:Redraw()
+   IF ::Cargo == NIL
+      ::Application:FormsTabs:InsertTab( ::Name,,, .F. )
+      ::Application:FormsTabs:SetCurSel( ::Application:FormsTabs:GetItemCount() )
+      ::Application:FormsTabs:Redraw()
+      ::Application:ObjectTree:Set( Self )
+   ENDIF
 
-   ::Application:ObjectTree:Set( Self )
 RETURN Self
 
 //----------------------------------------------------------------------------

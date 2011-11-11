@@ -3155,18 +3155,20 @@ METHOD SetCaption( lMod ) CLASS Project
    ENDIF
    ::Application:MainForm:Caption := cCaption
 
-   //IF lMod
-      //::Application:SourceTabs:SetItemText(, ::Application:SourceTabs:GetItemText()+" *" )
-   //ENDIF
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 
 METHOD SelectWindow( oWin, hTree, lFromTab ) CLASS Project
-
    LOCAL n, oWnd := ::CurrentForm
    DEFAULT hTree TO 0
    DEFAULT lFromTab TO .F.
+   
+   IF oWin:Cargo != NIL
+      ::LoadForm( oWin:Cargo,,, .T., oWin )
+      oWin:Cargo := NIL
+      oWin:MoveWindow()
+   ENDIF
    ::CurrentForm := oWin
    IF !lFromTab
       n := ASCAN( ::Application:Project:Forms, ::CurrentForm,,, .T. )
@@ -3207,7 +3209,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 
-METHOD AddWindow( lReset, cFileName, lCustom ) CLASS Project
+METHOD AddWindow( lReset, cFileName, lCustom, nPos ) CLASS Project
    LOCAL oWin
    DEFAULT lCustom TO .F.
    oWin := WindowEdit( ::Application:MainForm:FormEditor1, cFileName, lReset, lCustom )
@@ -3215,8 +3217,12 @@ METHOD AddWindow( lReset, cFileName, lCustom ) CLASS Project
    ::Properties:GUI := .T. // Force GUI so vxh.lib gets linked in
 
    DEFAULT lReset TO .T.
-
-   AADD( ::Forms, oWin )
+   
+   IF nPos != NIL
+      AINS( ::Forms, nPos, oWin, .T. )
+    ELSE
+      AADD( ::Forms, oWin )
+   ENDIF
 
    WITH OBJECT oWin
       :__ClassInst:Caption := ""
@@ -3813,7 +3819,7 @@ METHOD Open( cProject ) CLASS Project
    aEditors := {}
 
    FOR EACH Xfm IN ::Properties:Files
-       IF ! ::LoadForm( Xfm, @aErrors, @aEditors )
+       IF ! ::LoadForm( Xfm, @aErrors, @aEditors, HB_EnumIndex()==1 )
           MessageBox( GetActiveWindow(), "The File " + Xfm + " is missing, the project will now close", "Visual xHarbour - Open Project", MB_ICONERROR )
           ::Application:Cursor := NIL
           RETURN ::Close()
@@ -3946,10 +3952,11 @@ METHOD Open( cProject ) CLASS Project
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD LoadForm( cFile, aErrors, aEditors ) CLASS Project
-   LOCAL cObjectName, cXfm, cLine, nLine, aChildren, hFile, oForm, cClassName, aTokens
+METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
+   LOCAL cObjectName, cXfm, cLine, nLine, aChildren, hFile, cClassName, aTokens
    LOCAL cSourcePath := ::Properties:Path + "\" + ::Properties:Source
    cXfm := cSourcePath +"\" + cFile
+   DEFAULT lLoadProps TO .T.
 
    hFile := FOpen( cXfm, FO_READ )
    IF hFile == -1
@@ -3969,17 +3976,27 @@ METHOD LoadForm( cFile, aErrors, aEditors ) CLASS Project
       ENDIF
    ENDDO
    FSeek( hFile, 0, 0 )
-
-   oForm := ::AddWindow( .F., cObjectName + ".prg", cClassName == "CUSTOMCONTROL" )
-   cSourcePath := ::Properties:Path + "\" + ::Properties:Source
-   oForm:Editor:Load( cSourcePath + "\" + cObjectName + ".prg",, .F., .F. )
-   ::Application:SourceEditor:oEditor := oForm:Editor
-
-   WHILE HB_FReadLine( hFile, @cLine, XFM_EOL ) == 0
-      ::ParseXFM( oForm, cLine, hFile, @aChildren, cFile, @nLine, @aErrors, @aEditors )
+   
+   IF oForm == NIL
+      oForm := ::AddWindow( .F., cObjectName + ".prg", cClassName == "CUSTOMCONTROL" )
+      cSourcePath := ::Properties:Path + "\" + ::Properties:Source
+      oForm:Editor:Load( cSourcePath + "\" + cObjectName + ".prg",, .F., .F. )
+      ::Application:SourceEditor:oEditor := oForm:Editor
+   ENDIF
+   IF lLoadProps
+      nLine := 1
+      DEFAULT aErrors  TO {}
+      DEFAULT aEditors TO {}
       hb_gcall()
-      nLine++
-   END
+      WHILE HB_FReadLine( hFile, @cLine, XFM_EOL ) == 0
+         ::ParseXFM( oForm, cLine, hFile, @aChildren, cFile, @nLine, @aErrors, @aEditors )
+         nLine++
+      END
+    ELSEIF aErrors != NIL
+      oForm:Name := cObjectName
+      oForm:Cargo := cFile
+      ::Application:FormsTabs:InsertTab( cObjectName,,, .F. )
+   ENDIF
    FClose( hFile )
 RETURN .T.
 
@@ -4022,11 +4039,6 @@ METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors
              ELSEIF oForm != NIL
                // Initialize Form Designer
                oObj := oForm
-//                oObj := ::AddWindow(.F., cObjectName + ".prg", cClassName == "CUSTOMCONTROL" )
-//                DEFAULT oForm TO oObj
-//                cSourcePath := ::Properties:Path + "\" + ::Properties:Source
-//                oObj:Editor:Load( cSourcePath + "\" + cObjectName + ".prg",, .F., .F. )
-//                ::Application:SourceEditor:oEditor := oObj:Editor
                AADD( aChildren, { cObjectName, oForm } )
             ENDIF
           ELSEIF cClassName == "APPLICATION"
@@ -4634,59 +4646,60 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
       lPro := .T.
    #endif
    FOR n := 1 TO LEN( ::Forms )
-
-       IF ::Forms[n]:lCustom
-          cName := ::Forms[n]:Name
-          IF ::Forms[n]:__OldName != NIL
-             cName := ::Forms[n]:__OldName
-             FERASE( cSourcePath + "\" + cName + ".xfm" )
-             FERASE( cSourcePath + "\" + cName + ".prg" )
-          ENDIF
-
-          IF ( i := ASCAN( ::Application:CControls, {|cCC| UPPER(cName) == UPPER( STRTRAN( SplitFile(cCC)[2], ".xfm" ) ) } ) ) > 0
-             ADEL( ::Application:CControls, i, .T. )
-          ENDIF
-
-          IF ASCAN( ::Application:CControls, cSourcePath + "\" + ::Forms[n]:Name + ".xfm",,, .T. ) == 0
-             AADD( ::Application:CControls, cSourcePath + "\" + ::Forms[n]:Name + ".xfm" )
-          ENDIF
-
-       ENDIF
-
-       IF ::Forms[n]:__lModified .OR. lForce
-
-          aChildEvents := {}
-          
-          cWindow := ::GenerateControl( ::Forms[n], "", IIF( ::Forms[n]:MDIChild, "MDIChildWindow", IIF( ::Forms[n]:Modal, "Dialog", IIF( AT( "Window", ::Forms[n]:Name ) > 0, "Window", "WinForm" ) ) ), .F., n, @aChildEvents, @nInsMetPos, ::Forms[n]:lCustom )
-
-          cChildEvents := ""
-          FOR EACH cEvent IN aChildEvents
-              IF AT( "METHOD "+cEvent+"()", cWindow+cChildEvents ) == 0
-                 cChildEvents += "   METHOD "+cEvent+"()" + CRLF
-              ENDIF
-          NEXT
-
-          cText := SUBSTR( cWindow, nInsMetPos )
-          cWindow := SUBSTR( cWindow, 1, nInsMetPos ) + cChildEvents + cText
-
-          oFile := CFile( ::Forms[n]:Name + ".xfm" )
-          oFile:Path := cSourcePath
-          IF x == 2
-             oFile:Path := ::Forms[n]:PathName
-          ENDIF
-          oFile:FileBuffer := cWindow
-          oFile:Save()
-
-          IF ::Forms[n]:Editor:lModified .OR. lForce .OR. !FILE( cSourcePath + "\" + ::Forms[n]:Name + ".prg" )
-             xPath := cSourcePath
-             xName := ::Forms[n]:Name + ".prg"
-             IF x == 2
-                xPath := oFile:Path
+       IF ::Forms[n]:Cargo == NIL
+          IF ::Forms[n]:lCustom
+             cName := ::Forms[n]:Name
+             IF ::Forms[n]:__OldName != NIL
+                cName := ::Forms[n]:__OldName
+                FERASE( cSourcePath + "\" + cName + ".xfm" )
+                FERASE( cSourcePath + "\" + cName + ".prg" )
              ENDIF
-             ::Forms[n]:Editor:Save( xPath + "\" + xName )
+
+             IF ( i := ASCAN( ::Application:CControls, {|cCC| UPPER(cName) == UPPER( STRTRAN( SplitFile(cCC)[2], ".xfm" ) ) } ) ) > 0
+                ADEL( ::Application:CControls, i, .T. )
+             ENDIF
+
+             IF ASCAN( ::Application:CControls, cSourcePath + "\" + ::Forms[n]:Name + ".xfm",,, .T. ) == 0
+                AADD( ::Application:CControls, cSourcePath + "\" + ::Forms[n]:Name + ".xfm" )
+             ENDIF
+
           ENDIF
 
-          ::Forms[n]:__lModified := .F.
+          IF ::Forms[n]:__lModified .OR. lForce
+
+             aChildEvents := {}
+
+             cWindow := ::GenerateControl( ::Forms[n], "", IIF( ::Forms[n]:MDIChild, "MDIChildWindow", IIF( ::Forms[n]:Modal, "Dialog", IIF( AT( "Window", ::Forms[n]:Name ) > 0, "Window", "WinForm" ) ) ), .F., n, @aChildEvents, @nInsMetPos, ::Forms[n]:lCustom )
+
+             cChildEvents := ""
+             FOR EACH cEvent IN aChildEvents
+                 IF AT( "METHOD "+cEvent+"()", cWindow+cChildEvents ) == 0
+                    cChildEvents += "   METHOD "+cEvent+"()" + CRLF
+                 ENDIF
+             NEXT
+
+             cText := SUBSTR( cWindow, nInsMetPos )
+             cWindow := SUBSTR( cWindow, 1, nInsMetPos ) + cChildEvents + cText
+
+             oFile := CFile( ::Forms[n]:Name + ".xfm" )
+             oFile:Path := cSourcePath
+             IF x == 2
+                oFile:Path := ::Forms[n]:PathName
+             ENDIF
+             oFile:FileBuffer := cWindow
+             oFile:Save()
+
+             IF ::Forms[n]:Editor:lModified .OR. lForce .OR. !FILE( cSourcePath + "\" + ::Forms[n]:Name + ".prg" )
+                xPath := cSourcePath
+                xName := ::Forms[n]:Name + ".prg"
+                IF x == 2
+                   xPath := oFile:Path
+                ENDIF
+                ::Forms[n]:Editor:Save( xPath + "\" + xName )
+             ENDIF
+
+             ::Forms[n]:__lModified := .F.
+          ENDIF
        ENDIF
    NEXT
 
@@ -4972,7 +4985,6 @@ METHOD GenerateChild( oCtrl, nTab, aChildEvents, cColon, cParent, nID ) CLASS Pr
          NEXT
 
       ENDIF
-      //hb_gcStep()
    ENDIF
 RETURN cText
 

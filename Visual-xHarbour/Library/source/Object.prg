@@ -142,10 +142,9 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD __SetCtrlName(c) CLASS Object
    IF !(::Name == c) .AND. ::Form != NIL
+      ::Form:__SetAsProperty( c, Self )
       IF ::Form:hWnd == ::hWnd
          ::Application:__SetAsProperty( c, Self )
-       ELSE
-         ::Form:__SetAsProperty( c, Self )
       ENDIF
       ::xName := c
    ENDIF
@@ -159,10 +158,9 @@ METHOD __CreateProperty( cBaseName ) CLASS Object
    IF ::Form != NIL .AND. ::__xCtrlName != "ToolTip"
       IF !( ::Caption == "[ Add New Item ]" )
          n := ::GetControlName( cBaseName )
+         ::Form:__SetAsProperty( cBaseName + ALLTRIM( STR( n ) ), Self )
          IF ::Form:hWnd == ::hWnd
             ::Application:__SetAsProperty( cBaseName + ALLTRIM( STR( n ) ), Self )
-          ELSE
-            ::Form:__SetAsProperty( cBaseName + ALLTRIM( STR( n ) ), Self )
          ENDIF
       ENDIF
    ENDIF

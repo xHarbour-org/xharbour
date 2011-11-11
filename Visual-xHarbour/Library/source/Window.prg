@@ -3376,14 +3376,13 @@ METHOD __WindowDestroy() CLASS Window
          ENDIF
       ENDIF
    ENDIF
-   IF ::Form:hWnd != ::hWnd
-      IF ::Form != NIL .AND. ::Name != NIL
-         TRY
-            HDel( ::Form:Property, ::xName )
-         CATCH
-         END
-      ENDIF
-    ELSE
+   IF ::Form != NIL .AND. ::Name != NIL
+      TRY
+         HDel( ::Form:Property, ::xName )
+      CATCH
+      END
+   ENDIF
+   IF ::Form:hWnd == ::hWnd
       TRY
          HDel( ::Application:Property, ::xName )
       CATCH

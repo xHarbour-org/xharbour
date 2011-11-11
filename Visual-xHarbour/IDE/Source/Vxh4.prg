@@ -3143,8 +3143,9 @@ RETURN cNewLine
 
 //------------------------------------------------------------------------------------------
 METHOD ResetEvents( aSel ) CLASS EventManager
+
    LOCAL oItem, Event, Topic, oSub
-   
+
    DEFAULT aSel TO { { ::ActiveObject,, } }
 
    IF EMPTY( aSel[1] ) .OR. aSel[1][1] == NIL
