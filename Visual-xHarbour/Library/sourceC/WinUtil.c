@@ -4181,15 +4181,17 @@ HB_FUNC( GETOLEICON )
    }
 }
 
-typedef struct LVTILEINFO {
-  UINT  cbSize;
-  int   iItem;
-  UINT  cColumns;
-  PUINT puColumns;
-#if (_WIN32_WINNT >= 0x0600)
-  int   *piColFmt;
-#endif 
-} LVTILEINFO, *PLVTILEINFO;
+#ifndef LVTILEINFO
+   typedef struct LVTILEINFO {
+     UINT  cbSize;
+     int   iItem;
+     UINT  cColumns;
+     PUINT puColumns;
+   #if (_WIN32_WINNT >= 0x0600)
+     int   *piColFmt;
+   #endif 
+   } LVTILEINFO, *PLVTILEINFO;
+#endif
 
 #define LVM_SETVIEW             (LVM_FIRST + 142)
 #define LVM_SETTILEINFO         (LVM_FIRST + 164)
