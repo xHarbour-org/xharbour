@@ -4181,17 +4181,15 @@ HB_FUNC( GETOLEICON )
    }
 }
 
-#ifndef LVTILEINFO
-   typedef struct LVTILEINFO {
-     UINT  cbSize;
-     int   iItem;
-     UINT  cColumns;
-     PUINT puColumns;
+typedef struct XCCLVTILEINFO {
+   UINT  cbSize;
+   int   iItem;
+   UINT  cColumns;
+   PUINT puColumns;
    #if (_WIN32_WINNT >= 0x0600)
      int   *piColFmt;
    #endif 
-   } LVTILEINFO, *PLVTILEINFO;
-#endif
+} XCCLVTILEINFO, *PXCCLVTILEINFO;
 
 #define LVM_SETVIEW             (LVM_FIRST + 142)
 #define LVM_SETTILEINFO         (LVM_FIRST + 164)
@@ -4199,8 +4197,8 @@ HB_FUNC( GETOLEICON )
 HB_FUNC( __LISTVIEWSETVIEW )
 {
    PHB_ITEM aParam;
-   LVTILEINFO lvti;
-   lvti.cbSize = sizeof( LVTILEINFO );
+   XCCLVTILEINFO lvti;
+   lvti.cbSize = sizeof( XCCLVTILEINFO );
    lvti.iItem = hb_parni(2);
    lvti.cColumns = (UINT) hb_parni(3);
 

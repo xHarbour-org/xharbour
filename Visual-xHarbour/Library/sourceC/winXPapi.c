@@ -16,25 +16,25 @@ HB_EXTERN_BEGIN
    extern HB_EXPORT LPWSTR hb_oleAnsiToWide( const char *cString );
 HB_EXTERN_END
 
-//#if defined( __XCC__ )
-typedef struct _DTTOPTS {
-    DWORD dwSize;
-    DWORD dwFlags;
-    COLORREF crText;
-    COLORREF crBorder;
-    COLORREF crShadow;
-    int iTextShadowType;
-    POINT ptShadowOffset;
-    int iBorderSize;
-    int iFontPropId;
-    int iColorPropId;
-    int iStateId;
-    BOOL fApplyOverlay;
-    int iGlowSize;
-    DWORD pfnDrawTextCallback;
-    LPARAM lParam;
-} DTTOPTS, *PDTTOPTS;
-//#endif
+#if defined( __XCC__ )
+   typedef struct _DTTOPTS {
+       DWORD dwSize;
+       DWORD dwFlags;
+       COLORREF crText;
+       COLORREF crBorder;
+       COLORREF crShadow;
+       int iTextShadowType;
+       POINT ptShadowOffset;
+       int iBorderSize;
+       int iFontPropId;
+       int iColorPropId;
+       int iStateId;
+       BOOL fApplyOverlay;
+       int iGlowSize;
+       DWORD pfnDrawTextCallback;
+       LPARAM lParam;
+   } DTTOPTS, *PDTTOPTS;
+#endif
 
 BOOL Array2Rect(PHB_ITEM aRect, RECT *rc );
 void Rect2ArrayEx( RECT *rc ,PHB_ITEM aRect );
