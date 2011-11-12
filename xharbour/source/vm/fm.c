@@ -115,10 +115,14 @@
 /* #  define NO_MALLINFO 1 */
 /* #  define INSECURE */
 /* #  define USE_DL_PREFIX */
+#  undef FORCEINLINE
+#  if !defined( FORCEINLINE )
+#     define FORCEINLINE HB_FORCEINLINE
+#  endif
 #  define REALLOC_ZERO_BYTES_FREES
 #  if defined( HB_THREAD_SUPPORT )
 #     define USE_LOCKS  1
-#else
+#  else
 #     define USE_LOCKS  0
 #  endif
 #  if defined( __BORLANDC__ )

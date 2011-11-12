@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-11-12 07:54 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbsetup.h
+    ! native xHarbour definition for HB_FORCEINLINE
+
+  * source/vm/fm.c
+    ! using native HB_FORCEINLINE for dlmalloc routines
+
+    /* Borrowed from Harbour */
+
 2011-11-12 04:38 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/fm.c
     ! HB_MT_VM -> HB_THREAD_SUPPORT

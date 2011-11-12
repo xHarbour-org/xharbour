@@ -632,5 +632,26 @@
    #endif
 #endif
 
+#if defined( __GNUC__ ) || defined( __SUNPRO_C )
+   #define _HB_INLINE_  __inline__
+#elif defined( __BORLANDC__ ) || defined( _MSC_VER ) || \
+      defined( __WATCOMC__ ) || defined( __POCC__ ) || defined( __XCC__ ) || \
+      defined( __LCC__ ) || defined( __DMC__ )
+   #define _HB_INLINE_  __inline
+#else /* __cplusplus */
+   #define _HB_INLINE_  inline
+#endif
+
+#if defined( __GNUC__ ) && \
+    ( ( __GNUC__ > 3 ) || ( ( __GNUC__ == 3 ) && ( __GNUC_MINOR__ >= 2 ) ) )
+   #define HB_FORCEINLINE     __inline__ __attribute__((always_inline))
+#elif ( defined( _MSC_VER ) && ( _MSC_VER >= 1200 ) ) || \
+      ( defined( __POCC__ ) && ( __POCC__ >= 300 ) )
+   #define HB_FORCEINLINE     __forceinline
+#elif defined( FORCEINLINE )
+   #define HB_FORCEINLINE     FORCEINLINE
+#else
+   #define HB_FORCEINLINE     _HB_INLINE_
+#endif
 
 #endif /* HB_SETUP_H_ */
