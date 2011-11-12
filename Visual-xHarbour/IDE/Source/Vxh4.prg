@@ -473,7 +473,7 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
                   EXIT
 
              CASE "A"
-                  cText  := cText[1]
+                  cText  := IIF( LEN(cText)>0, cText[1], "" )
                   EXIT
              CASE "N"
                   cText  := StrTrim( cText )
