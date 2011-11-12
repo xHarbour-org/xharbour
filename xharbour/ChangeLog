@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-11-12 15:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/dlmalloc.c
+    ! file re-uploaded (seems corrupt)
+
 2011-11-12 15:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/dlmalloc.c
     ! some castings
