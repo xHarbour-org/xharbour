@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-11-13 06:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/common/expropt1.c
+    ! fix bug for DATETIME with empty date.
+      Example: { ^ 12:30 } -> previously 30/12/1899 12:30:00.000
+               { ^ 12:30 } -> now          /  /     12:30:00.000
+
 2011-11-12 15:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/dlmalloc.c
     ! file re-uploaded (seems corrupt)

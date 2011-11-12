@@ -310,6 +310,7 @@ HB_EXPR_PTR hb_compExprNewDateTime( HB_EXPR_PTR pYear, HB_EXPR_PTR pMonth, HB_EX
                            1899, 12, 30,
                            (int) pHour->value.asNum.lVal, (int) pMinute->value.asNum.lVal, ( double ) 0, iAmPm, piOk );
       }
+      pExpr->value.asDate.date = 0;
    }
    pExpr->value.asDate.type = HB_ET_DDATETIME;
 
