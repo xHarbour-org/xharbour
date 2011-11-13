@@ -5071,6 +5071,19 @@ static void hb_vmEqual( BOOL bExact )
    {
       hb_vmPushLogical( hb_vmPopNumber() == hb_vmPopNumber() );
    }
+   else if( HB_IS_DATETIME( pItem1 ) && HB_IS_DATETIME( pItem2 ) )
+   {
+      if( HB_IS_TIMEFLAG( pItem1 ) && HB_IS_TIMEFLAG( pItem2 ) )
+         pItem1->item.asLogical.value = ( pItem1->item.asDate.value ==
+                                          pItem2->item.asDate.value ) &&
+                                        ( pItem1->item.asDate.time ==
+                                          pItem2->item.asDate.time );
+      else
+         pItem1->item.asLogical.value = ( pItem1->item.asDate.value ==
+                                          pItem2->item.asDate.value );
+      pItem1->type = HB_IT_LOGICAL;
+      hb_stackDec();
+   }
    else if( HB_IS_LOGICAL( pItem1 ) && HB_IS_LOGICAL( pItem2 ) )
    {
       pItem1->item.asLogical.value = ( pItem1->item.asLogical.value ==
