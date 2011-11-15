@@ -302,7 +302,7 @@ METHOD OnParentDrawItem() CLASS ColManager
       
       FillRect( ::Parent:DrawItemStruct:hDC, ::Parent:DrawItemStruct:rcItem, hBrush )
       
-      cText := ::GetItemText( ::Parent:DrawItemStruct:ItemID )
+      cText := ::GetItemText( ::Parent:DrawItemStruct:ItemID+1 )
       ::Parent:DrawItemStruct:rcItem:Left += 5
       DrawText( ::Parent:DrawItemStruct:hDC, cText, ::Parent:DrawItemStruct:rcItem, DT_SINGLELINE | DT_VCENTER )
 
