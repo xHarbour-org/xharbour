@@ -23,6 +23,12 @@
 #define BP_GROUPBOX              4
 #define BP_USERBUTTON            5
 
+#define PBS_NORMAL       1
+#define PBS_HOT          2
+#define PBS_PRESSED      3
+#define PBS_DISABLED     4
+#define PBS_DEFAULTED    5
+
 #define CBS_UNCHECKEDNORMAL      1
 #define CBS_UNCHECKEDHOT         2
 #define CBS_UNCHECKEDPRESSED     3
@@ -60,7 +66,6 @@ CLASS DataGrid INHERIT Control
    DATA AutoHorzScroll          PUBLISHED INIT TRUE
    DATA AutoVertScroll          PUBLISHED INIT TRUE
    DATA FreezeColumn            PUBLISHED INIT 0
-   DATA IsDelIndexOn            EXPORTED INIT .F.
    DATA ShowHeaders             PUBLISHED INIT .T.
    DATA HeaderHeight            PUBLISHED INIT 20
    DATA ShowSelection           PUBLISHED INIT .T.
@@ -102,11 +107,12 @@ CLASS DataGrid INHERIT Control
    ACCESS AutoUpdate            INLINE IIF( ::__nUpdtTimer==0, .F., .T. )
    ASSIGN AutoUpdate(n)         INLINE ::__nUpdtTimer := n, IIF( n>0, ::SetTimer( 15, n*1000 ), ::KillTimer(15) )
    ACCESS Record                INLINE ::__GetPosition()
-
+   ACCESS IsDelIndexOn          INLINE !EMPTY( ::DataSource ) .AND. ( "DELETED()" IN UPPER( ::DataSource:OrdKey() ) )
+   
+   DATA CurPos                  EXPORTED INIT 1
    DATA __HScrollUnits          PROTECTED INIT 15
    DATA __HorzScroll            PROTECTED INIT FALSE
    DATA __VertScroll            PROTECTED INIT FALSE
-   DATA __PrevSource            PROTECTED
    DATA __lCreated              PROTECTED INIT .F.
    DATA __bGoTop                PROTECTED
    DATA __bGoBottom             PROTECTED
@@ -127,6 +133,7 @@ CLASS DataGrid INHERIT Control
    DATA __nUpdtTimer            PROTECTED INIT 0
    DATA __CheckPos              PROTECTED
    DATA __nScrolled             PROTECTED INIT 0
+   DATA __lMouseDown            PROTECTED INIT .F.
    DATA __lSizeMouseDown        PROTECTED INIT .F.
    DATA __lMoveMouseDown        PROTECTED INIT .F.
    DATA __SelCol                PROTECTED INIT 0
@@ -320,17 +327,34 @@ METHOD Create() CLASS DataGrid
 RETURN Self
 
 METHOD __GetPosition() CLASS DataGrid
-   LOCAL nPos := 0
+   LOCAL nRec, lDeleted, nKeyNo, nDel := 0, nPos := 0
    IF ::DataSource != NIL
       IF ::DataSource:ClsName == "MemoryTable" .OR. ::DataSource:Driver IN { "SQLRDD", "SQLEX" } .OR. ::ExtVertScrollBar
-         nPos := ::DataSource:OrdKeyNo()
-         IF !::IsDelIndexOn .AND. nPos > 1 
+         nRec   := ::DataSource:Recno()
+         nKeyNo := ::DataSource:OrdKeyNo()
+         nPos   := nKeyNo
+         IF ! ::IsDelIndexOn .AND. nKeyNo > 1 
             ::DataSource:Skip(-1)
             IF ::DataSource:Bof()
                ::DataSource:GoTop()
                nPos := 1
              ELSE
-               ::DataSource:Skip()
+               lDeleted := Set( _SET_DELETED, .F. )
+               IF ! lDeleted
+                  ::DataSource:Goto( nRec )
+                  nPos := nKeyNo
+                ELSE
+                  ::DataSource:Gotop()
+                  WHILE ! ::DataSource:eof() .AND. ::DataSource:recno() != nRec
+                     IF ::DataSource:Deleted()
+                        nDel++
+                     ENDIF
+                     ::DataSource:Skip()
+                  ENDDO
+                  ::DataSource:Goto( nRec )
+                  nPos := nKeyNo - nDel
+               ENDIF
+               Set( _SET_DELETED, lDeleted )
             ENDIF
          ENDIF
        ELSE
@@ -595,7 +619,7 @@ METHOD __SetDataSource( oSource ) CLASS DataGrid
       ::__DataWidth := 0
       ::__UpdateHScrollBar( .T., .T. )
    ENDIF
-   //::__PrevSource := oSource
+   ::__ResetRecordPos(.F.)
 RETURN Self
 
 METHOD __ResetDataSource( oSource ) CLASS DataGrid
@@ -846,7 +870,6 @@ METHOD __OnSize() CLASS DataGrid
       ::__DisplayData()
       ::ValidateRect()
    ENDIF
-
 RETURN NIL
 
 //----------------------------------------------------------------------------------
@@ -940,7 +963,7 @@ METHOD __SizeUpdate( x, y ) CLASS DataGrid
    ::RowCountVisible := nRowsV
    ::RowCountUsable  := MIN( nRowsU, ::RowCount )
    ::__ResetRecordPos(.F.)
- RETURN 0
+RETURN 0
 
 //----------------------------------------------------------------------------------
 
@@ -970,9 +993,11 @@ RETURN 0
 
 //----------------------------------------------------------------------------------
 METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
-   LOCAL nPos, nClickCol := 1, aDrag, aMove, i, nRec, aData := {}
+   LOCAL nPos, aDrag, aMove, i, nRec, aData := {}
    (nwParam)
    (xPos)
+   ::__lMouseDown := .F.
+
    ::ReleaseCapture()
    IF ::__hDragImageList != NIL
       ImageListDestroy( ::__hDragImageList )
@@ -1034,6 +1059,11 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
          ::DataSource:Unlock()
       ENDIF
       ::Update()
+    ELSE
+      ::UpdateRow()
+      IF nPos == ::RowPos .AND. ::Children[ ::ColPos ]:Representation == 4
+         ExecuteEvent( "ButtonClicked", ::Children[ ::ColPos ] )
+      ENDIF
    ENDIF
 
    IF ::__lMoveMouseDown .AND. ::__DragColumn > 0 .AND. LEN( ::Children ) > 0
@@ -1092,6 +1122,7 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    LOCAL nClickCol, lShift, lCtrl
    LOCAL lLineChange:=.F.
    (nwParam)
+   ::__lMouseDown := .T.
    ::RowCountUsable  := MIN( Int(  ::__DataHeight/::ItemHeight ), ::RowCount )
 
    nClickRow  := Ceiling((yPos-::__GetHeaderHeight()) /::ItemHeight)
@@ -1245,21 +1276,8 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
       ENDIF
    ENDIF
 
-//   nClickCol  := aScan( ::__DisplayArray[ 1 ][1], {|a| a[6] > xPos-::__HorzScrolled} )-1
-
    ::RowPos := ASCAN( ::__DisplayArray, {|a|a[2]==::DataSource:Recno()} )
    nRow := ::RowPos
-/*
-   IF ::hWnd != GetFocus()
-      ::SetFocus()
-
-      IF ::IsCovered
-         ::__DisplayData()
-       ELSE
-         ::__DisplayData( ::RowPos,, ::RowPos )
-      ENDIF
-   ENDIF
-*/
    IF nClickCol == -1
       nClickCol := ::ColCount
    ENDIF
@@ -1271,11 +1289,7 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
       lLineChange := TRUE
    ENDIF
 
-   //::Record := ::__DisplayArray[ nClickRow ][2]
-   //::__GoToRec( ::Record )
-
    ::__GoToRec( ::__DisplayArray[ nClickRow ][2] )
-   //::Record := ::__DisplayArray[ nClickRow ][2]
 
    ::RowPos := nClickRow
    
@@ -1473,27 +1487,34 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS DataGrid
       CASE nwParam==VK_UP
            nKey := GRID_UP
            ::Up( nCount )
+           ::CurPos--
+           ::CurPos := MAX( 1, ::CurPos )
            lVUpdate := .T.
 
       CASE nwParam==VK_DOWN
            nKey := GRID_DOWN
            ::Down( nCount )
+           ::CurPos++
            lVUpdate := .T.
 
       CASE nwParam == VK_NEXT
            ::PageDown( nCount )
+           ::CurPos += ::RowCountUsable
            lVUpdate := .T.
 
       CASE nwParam == VK_PRIOR
            ::PageUp( nCount )
+           ::CurPos -= ::RowCountUsable
            lVUpdate := .T.
 
       CASE nwParam == VK_END
            ::End( .F. )
+           ::CurPos := ::GetRecordCount()
            lVUpdate := .T.
 
       CASE nwParam == VK_HOME
            ::Home()
+           ::CurPos := 1
            lVUpdate := .T.
 
       CASE nwParam == VK_LEFT
@@ -1734,8 +1755,8 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                      ELSE
                        IF lSelected .AND. ( i == ::ColPos .OR. ::FullRowSelect ) //.AND. nRecno == nRec
                           lHighLight := ::HasFocus .OR. ::__CurControl != NIL
-                          SetBkColor( hMemDC, IIF( ::HasFocus .OR. ::__CurControl != NIL, ::HighlightColor, IIF( ::ShadowRow, ::__InactiveHighlight, nBkCol ) ) )
-                          SetTextColor( hMemDC, IIF( ::HasFocus .OR. ::__CurControl != NIL, ::HighlightTextColor, IIF( ::ShadowRow, ::__InactiveHighlightText, nTxCol ) ) )
+                          SetBkColor( hMemDC, IIF( (::HasFocus .OR. ::__CurControl != NIL).AND.nRep<>4, ::HighlightColor, IIF( ::ShadowRow, ::__InactiveHighlight, nBkCol ) ) )
+                          SetTextColor( hMemDC, IIF( (::HasFocus .OR. ::__CurControl != NIL).AND.nRep<>4, ::HighlightTextColor, IIF( ::ShadowRow, ::__InactiveHighlightText, nTxCol ) ) )
                         ELSE
                           IF lSelected .AND. !::FullRowSelect .AND. i != ::ColPos .AND. ::ShadowRow
                              SetBkColor( hMemDC, ::__InactiveHighlight )
@@ -1750,7 +1771,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
 
                  nHeaderRight := nRight-1
                  aText := { zLeft, nTop, nRight-IIF( ( lSelected .AND. ::FullRowSelect .AND. i<nColEnd ) .OR. !::xShowGrid, 0, 1 ), nBottom+IIF(::xShowGrid,0,1) }
-
+                 
                  IF lFreeze .AND. i > ::FreezeColumn .AND. zLeft < iRight
                     aText[1] := iRight
                     aText[3] += iRight - zLeft
@@ -1799,9 +1820,10 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                     lHide := EVAL( ::Children[i]:ControlHide, Self, nRec )
                  ENDIF
 
+
                  nCtrl := 0
                  lDrawControl := .F.
-                 IF nRep == 1 .OR. nRep == 3
+                 IF nRep <> 2 //== 1 .OR. nRep == 3
 
                     TRY
                        IF ( lSelected .OR. ::Children[i]:ShowControls ) .AND. ::Children[i]:Control != NIL
@@ -1819,7 +1841,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                     CATCH
                     END
 
-                    IF nRep == 1
+                    IF nRep == 1 .OR. nRep == 4
                        FOR z := 1 TO LEN( aData )
                            aAlign := _GetTextExtentExPoint( hMemDC, ALLTRIM(aData[z]), aText[3]-aText[1], @iLen )
                            IF aAlign != NIL
@@ -1836,6 +1858,9 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                      ELSE
                       _ExtTextOut( hMemDC, x, y, ETO_CLIPPED | ETO_OPAQUE, aText, " ")
                     ENDIF
+                 ENDIF
+                 IF nRep == 4 .AND. !lSelected
+                    nRep := 1
                  ENDIF
                  // Draw Grid
                  IF ::xShowGrid
@@ -1885,7 +1910,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                     IF nRep == 3
                        aRect := {zLeft+IIF(::Children[i]:ControlAlign==DT_LEFT,1,0),nTop+1,nRight-2,MAX(nBottom-1,nTop+::ItemHeight)}
                     ENDIF
-                    ::__DrawRepresentation( hMemDC, nRep, aText, aData[1], nBkCol, nTxCol, x, y, aAlign, ::__DisplayArray[nLine][1][i][ 1] )
+                    ::__DrawRepresentation( hMemDC, nRep, aText, aData[1], nBkCol, nTxCol, x, y, aAlign, ::__DisplayArray[nLine][1][i][ 1], i )
 
                  ENDIF
 
@@ -1916,7 +1941,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                  ENDIF
 
 
-                 IF !::FullRowSelect .AND. lBorder 
+                 IF !::FullRowSelect .AND. lBorder .AND. nRep <> 4
                     _DrawFocusRect( hMemDC, aText )
                  ENDIF
 
@@ -2039,7 +2064,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
    SelectObject( hMemDC, hOldPen )
 RETURN .T.
 
-METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, x, y, aMetrics, xVal ) CLASS DataGrid
+METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, x, y, aMetrics, xVal, i ) CLASS DataGrid
    LOCAL nWidth, aClip, nFore, nBack, hPen, hOP, hOB, hBrush, hTheme, nStatus, nFlags, lXP
 
    lXP    := ::Application:IsThemedXP .AND. ::Theming
@@ -2081,7 +2106,7 @@ METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, x, y, aMet
       SelectObject( hDC, hOP )
       SelectObject( hDC, hOB )
       DeleteObject( hPen )
-    ELSE
+    ELSEIF nRep == 3
       IF VALTYPE( xVal ) == "L"
          IF xVal
             xVal := BST_CHECKED
@@ -2127,6 +2152,19 @@ METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, x, y, aMet
          aRect[4] := aRect[2] + 15
 
          _DrawFrameControl( hDC, aRect, DFC_BUTTON, nFlags )
+      ENDIF
+
+    ELSEIF nRep == 4 .AND. ::Children[i]:Representation == 4 
+      nStatus := PBS_NORMAL
+      IF ::__lMouseDown  .AND. i == ::ColPos
+         nStatus := PBS_PRESSED
+      ENDIF
+
+      IF lXP
+         hTheme := OpenThemeData(,"button")
+         DrawThemeBackground( hTheme, hDC, BP_PUSHBUTTON, nStatus, aRect, aRect )
+         CloseThemeData( hTheme )
+         _DrawText( hDC, cText, aRect, DT_CENTER | DT_VCENTER | DT_SINGLELINE )
       ENDIF
 
    ENDIF
@@ -2198,8 +2236,10 @@ METHOD __Update( lDisplay ) CLASS DataGrid
          ::InvalidateRect( { ::__DataWidth, 0, ::ClientWidth, ::ClientHeight } )
       ENDIF
    ENDIF
+   ::CurPos := ::Record
 RETURN Self
 
+//----------------------------------------------------------------------------------
 METHOD Update() CLASS DataGrid
    LOCAL n, nRec, nUse, nIns
 
@@ -2210,7 +2250,6 @@ METHOD Update() CLASS DataGrid
       ::__DisplayData()
       RETURN Self
    ENDIF
-   ::IsDelIndexOn := !EMPTY( ::DataSource ) .AND. ( "DELETED()" IN UPPER( ::DataSource:OrdKey() ) )
 
    IF EMPTY( ::__DisplayArray )
       ::__Update(.F.)
@@ -2276,7 +2315,6 @@ METHOD Update() CLASS DataGrid
 
    ::__UpdateVScrollBar(.T.)
    ::__UpdateHScrollBar( .T. )
-
 
    ::__DisplayData()
 RETURN Self
@@ -3616,7 +3654,7 @@ CLASS GridColumn INHERIT Object
    DATA __TempRect                   EXPORTED
    DATA __IsControl                  EXPORTED INIT .F.
    DATA __PropFilter                 EXPORTED INIT {}
-   DATA __Representation             EXPORTED  INIT { "Normal", "ProgressBar", "CheckBox" }
+   DATA __Representation             EXPORTED  INIT { "Normal", "ProgressBar", "CheckBox", "Button" }
 
    DATA __Alignments                 EXPORTED  INIT { "Left", "Right", "Center" }
    DATA Parent                       EXPORTED
@@ -3905,7 +3943,8 @@ METHOD Init( oParent ) CLASS GridColumn
                   {"Object",      {;
                                   { "OnInit"             , "", "" } } },;
                   {"Data",        {;
-                                  { "OnSave"            , "", "oGrid, cText, lFocusKilled, nLastKey" } } },;
+                                  { "OnSave"            , "", "oGrid, cText, lFocusKilled, nLastKey" },;
+                                  { "ButtonClicked"     , "", "" } } },;
                   {"Color",       {;
                                   { "OnQueryBackColor"  , "", "" },;
                                   { "OnQueryForeColor"  , "", "" } } },;

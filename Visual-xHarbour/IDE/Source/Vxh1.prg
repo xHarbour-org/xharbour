@@ -4845,7 +4845,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
 
    oFile:FileBuffer := cBuffer
    oFile:Save()
-   OutputDebugString( " Saving finished: " + xStr( Seconds()-nSecs ) )
+   //OutputDebugString( " Saving finished: " + xStr( Seconds()-nSecs ) )
 
    ::Built := .F.
 

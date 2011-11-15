@@ -164,7 +164,10 @@ CLASS DataTable INHERIT Component
 
    METHOD OrdKeyRelPos(n)                     INLINE ::Connector:OrdKeyRelPos( n )
    METHOD OrdKeyNo()                          INLINE ::Connector:OrdKeyNo()
+   METHOD OrdKeyVal()                         INLINE ::Connector:OrdKeyVal()
 
+   METHOD OrdKeyNoRaw()                       INLINE ::Connector:OrdKeyNoRaw()
+   
    METHOD Connectorescend(cnOrder,cFile,lDescend ) INLINE ::Connector:OrdDescend( cnOrder, cFile, lDescend )
    
    METHOD CheckAlias()
@@ -416,7 +419,8 @@ CLASS DataRdd
    METHOD Scatter( aData )
    METHOD OrdKeyRelPos(n)
    METHOD OrdKeyNo()
-
+   METHOD OrdkeyNoRaw()
+   METHOD OrdKeyVal()                         INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdKeyVal() ),)
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -435,6 +439,13 @@ METHOD OrdKeyNo() CLASS DataRdd
    LOCAL nPos := (::Owner:Alias)->( OrdKeyNo() )
    DEFAULT nPos TO (::Owner:Alias)->( Recno() )
 RETURN nPos
+
+//-------------------------------------------------------------------------------------------------------
+METHOD OrdKeyNoRaw() CLASS DataRdd
+   LOCAL nPos := (::Owner:Alias)->( dbOrderInfo( DBOI_KEYNORAW ) )
+   DEFAULT nPos TO ::OrdKeyNo()
+RETURN nPos
+   
 
 //-------------------------------------------------------------------------------------------------------
 METHOD SetRelation( oData, xKey, lAdditive ) CLASS DataRdd
@@ -700,6 +711,8 @@ CLASS SocketRdd
    METHOD Request()
    METHOD OrdKeyRelPos(n)                     INLINE ::Request( "OrdKeyRelPos", {n} ) 
    METHOD OrdKeyNo()                          INLINE ::Request( "OrdKeyNo" ) 
+   METHOD OrdKeyRaw()                         INLINE ::Request( "OrdKeyNoRaw" ) 
+   METHOD OrdKeyVal()                         INLINE ::Request( "OrdKeyVal" ) 
 ENDCLASS
 
 METHOD Init( oOwner ) CLASS SocketRdd

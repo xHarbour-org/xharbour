@@ -8,6 +8,29 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-11-14 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Added new DataGrid Column "Button" representation which simulates an in-cell
+     Button. This pseudo button fires a Column event called ButtonClicked specific for
+     all columns ie:
+     METHOD GridColumn4_ButtonClicked( Sender ) CLASS Form1
+        Alert( "Button con Column 4" ) 
+     RETURN Self
+     METHOD GridColumn5_ButtonClicked( Sender ) CLASS Form1
+        Alert( "Button con Column 5" ) 
+     RETURN Self
+     This event doesn't provide or pass any information to the user all the information
+     needed is in DataGrid:DataSource or by using normal database commands:
+
+     METHOD GridColumn4_ButtonClicked( Sender ) CLASS Form1
+        Alert( ::DataGrid1:DataSource:Fields:CITY ) 
+     RETURN Self
+     
+     METHOD GridColumn5_ButtonClicked( Sender ) CLASS Form1
+        Alert( ::DataGrid1:DataSource:Fields:STATE ) 
+     RETURN Self
+   ! Fixed DataGrid's Extended scrollbar to match real position
+   ! Added DataBase method OrdKeyVal()
+
 2011-11-10 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed RTE dropping ServiceControler component with standard users logged on
    
