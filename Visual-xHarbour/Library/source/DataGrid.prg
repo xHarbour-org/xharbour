@@ -1122,7 +1122,6 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    LOCAL nClickCol, lShift, lCtrl
    LOCAL lLineChange:=.F.
    (nwParam)
-   ::__lMouseDown := .T.
    ::RowCountUsable  := MIN( Int(  ::__DataHeight/::ItemHeight ), ::RowCount )
 
    nClickRow  := Ceiling((yPos-::__GetHeaderHeight()) /::ItemHeight)
@@ -1277,6 +1276,7 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    ENDIF
 
    ::RowPos := ASCAN( ::__DisplayArray, {|a|a[2]==::DataSource:Recno()} )
+
    nRow := ::RowPos
    IF nClickCol == -1
       nClickCol := ::ColCount
@@ -1336,7 +1336,9 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    ExecuteEvent( "OnRowChanged", Self )
    ExecuteEvent( "OnClick", Self )
 
-   ::__DisplayData( ::RowPos, , nClickRow,  )
+   ::__DisplayData( ::RowPos, , ::RowPos,  )
+   ::__lMouseDown := .T.
+   ::__DisplayData( nClickRow, , nClickRow,  )
    ::__Edit( 1, xPos, yPos, GRID_LCLICK )
 RETURN NIL
 
@@ -1823,45 +1825,40 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
 
                  nCtrl := 0
                  lDrawControl := .F.
-                 IF nRep <> 2 //== 1 .OR. nRep == 3
 
-                    TRY
-                       IF ( lSelected .OR. ::Children[i]:ShowControls ) .AND. ::Children[i]:Control != NIL
-                          DEFAULT ::Children[i]:ControlObject TO EVAL( ::Children[i]:Control, Self, nRec, i )
-
-                          IF !lHide .AND. ::Children[i]:ControlObject != NIL .AND. RIGHT( ::Children[i]:ControlObject:ClsName, 4 ) != "Edit" .AND. VALTYPE( nStatus ) != "B"
-                             IF ::Children[i]:ControlAlign == DT_LEFT
-                                nCtrl += ::Children[i]:ControlWidth + 1
-                                x+=::Children[i]:ControlWidth+1
-                             ENDIF
-                             lDrawControl := .T.
-                          ENDIF
-
-                       ENDIF
-                    CATCH
-                    END
-
-                    IF nRep == 1 .OR. nRep == 4
-                       FOR z := 1 TO LEN( aData )
-                           aAlign := _GetTextExtentExPoint( hMemDC, ALLTRIM(aData[z]), aText[3]-aText[1], @iLen )
-                           IF aAlign != NIL
-                              IF nAlign == 1
-                                 nDif := (aAlign[1]+nWImg) - (aText[3]-aText[1])
-                                 IF nDif > 0 .AND. !EMPTY( ALLTRIM( aData[z] ) )
-                                    aData[z] := ALLTRIM( LEFT( aData[z], iLen - 3 ) )+ "..."
-                                 ENDIF
-                              ENDIF
-                              _ExtTextOut( hMemDC, x, y, ETO_CLIPPED+IIF( z==1,ETO_OPAQUE,0), aText,aData[z])
-                              y += aAlign[2]
-                           ENDIF
-                       NEXT
-                     ELSE
-                      _ExtTextOut( hMemDC, x, y, ETO_CLIPPED | ETO_OPAQUE, aText, " ")
-                    ENDIF
-                 ENDIF
-                 IF nRep == 4 .AND. !lSelected
+                 IF ::Children[i]:SelOnlyRep .AND. !lSelected
                     nRep := 1
                  ENDIF
+
+                 IF ( lSelected .OR. ::Children[i]:ShowControls ) .AND. ::Children[i]:Control != NIL
+                    DEFAULT ::Children[i]:ControlObject TO EVAL( ::Children[i]:Control, Self, nRec, i )
+                    IF !lHide .AND. ::Children[i]:ControlObject != NIL .AND. RIGHT( ::Children[i]:ControlObject:ClsName, 4 ) != "Edit" .AND. VALTYPE( nStatus ) != "B"
+                       IF ::Children[i]:ControlAlign == DT_LEFT
+                          nCtrl += ::Children[i]:ControlWidth + 1
+                          x+=::Children[i]:ControlWidth+1
+                       ENDIF
+                       lDrawControl := .T.
+                    ENDIF
+                 ENDIF
+
+                 IF nRep > 1
+                    _ExtTextOut( hMemDC, x, y, ETO_CLIPPED | ETO_OPAQUE, aText, " ")
+                  ELSE
+                    FOR z := 1 TO LEN( aData )
+                        aAlign := _GetTextExtentExPoint( hMemDC, ALLTRIM(aData[z]), aText[3]-aText[1], @iLen )
+                        IF aAlign != NIL
+                           IF nAlign == 1
+                              nDif := (aAlign[1]+nWImg) - (aText[3]-aText[1])
+                              IF nDif > 0 .AND. !EMPTY( ALLTRIM( aData[z] ) )
+                                 aData[z] := ALLTRIM( LEFT( aData[z], iLen - 3 ) )+ "..."
+                              ENDIF
+                           ENDIF
+                           _ExtTextOut( hMemDC, x, y, ETO_CLIPPED+IIF( z==1,ETO_OPAQUE,0), aText,aData[z])
+                           y += aAlign[2]
+                        ENDIF
+                    NEXT
+                 ENDIF
+
                  // Draw Grid
                  IF ::xShowGrid
                     aGrid := { {zLeft,nBottom}, {nRight,nBottom}, {nRight-1,nBottom}, {nRight-1,nTop-1} }
@@ -3627,7 +3624,8 @@ CLASS GridColumn INHERIT Object
    PROPERTY HeaderImageIndex  READ xHeaderImageIndex WRITE SetHeaderImageIndex DEFAULT 0
    PROPERTY Representation    READ xRepresentation   WRITE SetRepresentation   DEFAULT 1
    PROPERTY AutoEdit          READ xAutoEdit         WRITE __SetAutoEdit       DEFAULT .F. INVERT
-
+   
+   DATA SelOnlyRep                   PUBLISHED INIT .T.
    DATA HeaderFont                   PUBLISHED INIT Font()
    DATA Font                         PUBLISHED INIT Font()
    DATA Type                         PUBLISHED INIT "C"

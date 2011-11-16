@@ -3793,6 +3793,7 @@ __aProps["S"] := { { "SetAlternate",            "Set" },;
                    { "ServiceName",             "" },;
                    { "StopBits",                "" },;
                    { "Stretch",                 "Image" },;
+                   { "SelOnlyRep",              "Behavior" },;
                    { "ShowGrid",                "Appearance" },;
                    { "ShortCutText",            "Appearance" },;
                    { "SmallCaption",            "Appearance" },;
