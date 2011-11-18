@@ -619,7 +619,7 @@ METHOD __SetDataSource( oSource ) CLASS DataGrid
       ::__DataWidth := 0
       ::__UpdateHScrollBar( .T., .T. )
    ENDIF
-   ::__ResetRecordPos(.F.)
+   //::__ResetRecordPos(.F.)
 RETURN Self
 
 METHOD __ResetDataSource( oSource ) CLASS DataGrid
@@ -993,9 +993,11 @@ RETURN 0
 
 //----------------------------------------------------------------------------------
 METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
-   LOCAL nPos, aDrag, aMove, i, nRec, aData := {}
+   LOCAL lMouse, nPos, aDrag, aMove, i, nRec, aData := {}
    (nwParam)
    (xPos)
+
+   lMouse := ::__lMouseDown
    ::__lMouseDown := .F.
 
    ::ReleaseCapture()
@@ -1061,7 +1063,7 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
       ::Update()
     ELSE
       ::UpdateRow()
-      IF nPos == ::RowPos .AND. ::Children[ ::ColPos ]:Representation == 4
+      IF lMouse .AND. nPos == ::RowPos .AND. ::Children[ ::ColPos ]:Representation == 4
          ExecuteEvent( "ButtonClicked", ::Children[ ::ColPos ] )
       ENDIF
    ENDIF
@@ -1370,6 +1372,7 @@ RETURN NIL
 
 METHOD OnKillFocus() CLASS DataGrid
    ::Super:OnKillFocus()
+   ::__lMouseDown := .F.
    IF ::__CurControl != NIL .AND. GetFocus()!=::__CurControl:hWnd
       IF ::__CurControl:Validating
          RETURN 0
