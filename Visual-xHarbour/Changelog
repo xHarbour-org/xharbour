@@ -8,6 +8,11 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-11-17 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed DataGrid first record not showing.
+   ! Fixed RTE caused by clicking empty DataGrids
+   ! Fixed double click on other forms causing DataGrid OnLButtonUp to be fired.
+
 2011-11-14 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Added new DataGrid Column "Button" representation which simulates an in-cell
      Button. This pseudo button fires a Column event called ButtonClicked specific for

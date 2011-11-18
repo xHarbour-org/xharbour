@@ -1061,7 +1061,7 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
          ::DataSource:Unlock()
       ENDIF
       ::Update()
-    ELSE
+    ELSEIF LEN( ::__DisplayArray ) > 0
       ::UpdateRow()
       IF lMouse .AND. nPos == ::RowPos .AND. ::Children[ ::ColPos ]:Representation == 4
          ExecuteEvent( "ButtonClicked", ::Children[ ::ColPos ] )

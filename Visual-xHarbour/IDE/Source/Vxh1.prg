@@ -2770,11 +2770,11 @@ METHOD CenterVertically() CLASS Project
    ::Application:Props[ "EditRedoItem" ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := LEN( ::aRedo ) > 0
 RETURN Self
 
+
 METHOD TabOrder( oBtn ) CLASS Project
    ::CurrentForm:CtrlMask:lOrderMode       := oBtn:Checked
    ::Application:MainForm:ToolBox1:Enabled := !oBtn:Checked
    ::Application:ObjectTab:Enabled         := !oBtn:Checked
-   //::Application:ObjectManager:Enabled     := !oBtn:Checked
    ::Application:EventManager:Enabled      := !oBtn:Checked
    ::Application:ObjectTree:Enabled        := !oBtn:Checked
    ::Application:FileTree:Enabled          := !oBtn:Checked
