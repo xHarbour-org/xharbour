@@ -35,7 +35,7 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 #define HKEY_LOCAL_MACHINE           (0x80000002)
 
 #define VXH_Version      "3.0"
-#define VXH_BuildVersion "1"
+#define VXH_BuildVersion "001"
 
 #define MCS_ARROW    10
 #define MCS_PASTE    11
@@ -5566,7 +5566,7 @@ RETURN Self
 FUNCTION GUI_ErrorGrid( oError, cLog )
 
    LOCAL cFile, cDesc, aErrors := GetLogErrors( cLog ), oApp := __GetApplication()
-//view cLog
+
    oApp:BuildLog:Caption := cLog
 
    IF EMPTY( aErrors )
