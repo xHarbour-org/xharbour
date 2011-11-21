@@ -5248,11 +5248,14 @@ RETURN Self
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Run( lRunOnly ) CLASS Project
 
-   LOCAL cExe, cPath, oFile, pHrb, cBinPath
+   LOCAL cExe, cPath, oFile, pHrb, cBinPath, cCurDir
    DEFAULT lRunOnly TO .F.
    TRY
       cPath := ::Properties:Path
       cBinPath := ::FixPath( cPath, ::Properties:Binary )
+      
+      cCurDir := GetCurrentDirectory()
+      DirChange( cPath )
 
       cExe := cBinPath + "\" + IIF( !EMPTY( ::Properties:TargetName ), ::Properties:TargetName, ::Properties:Name ) + aTargetTypes[ ::Properties:TargetType ]
 
@@ -5284,6 +5287,7 @@ METHOD Run( lRunOnly ) CLASS Project
             __hrbDo( pHrb, ::Application:MainForm )
          ENDIF
       ENDIF
+      DirChange( cCurDir )
    CATCH
    END
 RETURN 0
