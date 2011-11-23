@@ -191,7 +191,7 @@ HB_ERRCODE hb_gtBoxS( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right )
    pGT = hb_gt_Base();
    if( pGT )
    {
-      HB_GTSELF_BOXD( pGT, Top, Left, Bottom, Right, ( BYTE * ) _B_SINGLE, HB_GTSELF_GETCOLOR( pGT ) );
+      HB_GTSELF_BOXS( pGT, Top, Left, Bottom, Right, ( BYTE * ) _B_SINGLE, HB_GTSELF_GETCOLOR( pGT ) );
       HB_GTSELF_SETPOS( pGT, Top + 1, Left + 1 );
       HB_GTSELF_FLUSH( pGT );
       return SUCCESS;

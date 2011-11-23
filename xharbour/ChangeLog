@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-11-23 11:27 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * include/hbdefs.h
+    ! minor fix to correct set memory aligment on hpux
+  * config/hpux/gcc.cf
+    ! minor fix
+  * source/rtl/gtapi.c
+    minor fix to hb_gtBoxS, borrowed from harbour
+
 2011-11-13 07:36 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/hvm.c
     ! hb_vmEqual() add routine for comparison of DATETIME
