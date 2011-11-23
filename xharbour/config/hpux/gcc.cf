@@ -22,34 +22,27 @@ CC_IN = -c
 CC_OUT = -o
 CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
 
-# We are under linux
-CFLAGS = -DHB_OS_UNIX -Wall -W
+# -fno-common enables building .dylib files
+CFLAGS = -Wall -W
 
 ifeq ($(HB_LEX),SIMPLEX)
-CFLAGS += -DSIMPLEX
+  CFLAGS += -DSIMPLEX
 endif
+CFLAGS += -DHB_OS_UNIX
 CFLAGS += -mlp64
 LDFLAGS = -mlp64
 
 ifeq ($(HB_LIBCOMP_MT),)
-#always add thread support if not compiling a lib and using vmmt
-ifeq ($(findstring vmmt,$(LIBS)),vmmt)
-CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE
-endif
+  # always add thread support if not compiling a lib and using vmmt
+  ifeq ($(findstring vmmt,$(LIBS)),vmmt)
+    CFLAGS += -DHB_THREAD_SUPPORT -D_THREAD_SAFE -pthread
+  endif
 else
-# force relocateable code for .so libs
-# it's necessary on some platforms but can reduce performance
-#ifeq ($(shell sh -c 'uname -m 2>/dev/null'),x86_64)
-USE_FPIC = no
-#endif
-ifeq ($(USE_FPIC),yes)
-CFLAGS += -fPIC
-endif
-#Add thread support to lib compilation only if compiling a _mt lib
-ifeq ($(HB_LIBCOMP_MT),YES)
-CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE
-HB_MT_FLAGS = -DHB_THREAD_SUPPORT
-endif
+  # Add thread support to lib compilation only if compiling a _mt lib
+  ifeq ($(HB_LIBCOMP_MT),YES)
+    CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE
+    HB_MT_FLAGS = -DHB_THREAD_SUPPORT
+  endif
 endif
 
 LD = $(HB_CCACHE) $(HB_CMP)
@@ -57,56 +50,52 @@ LD_OUT = -o
 
 # Add all libraries specified in CONTRIBS and LIBS.
 ifeq ($(HB_LIB_COMPILE),)
-LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/$(lib)/$(ARCH_DIR))
-LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
+  LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/$(lib)/$(ARCH_DIR))
+  LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
 
-#Adding MT libs on need
-ifeq ($(findstring vmmt,$(LIBS)),vmmt)
-LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(patsubst %mt,%,$(lib))/$(ARCH_DIR)_mt)
-endif
+  # Adding MT libs on need
+  ifeq ($(findstring vmmt,$(LIBS)),vmmt)
+    LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(patsubst %mt,%,$(lib))/$(ARCH_DIR)_mt)
+  endif
 
 else
 LINKPATHS += -L$(HB_LIB_COMPILE)
 endif
 
-# our libs have a lot of cross references now and we have to group them
-# until we clean them
-#LINKLIBS += -Wl,--start-group
-
 # Add all libraries specified in HB_USER_LIBS.
 LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
 LINKLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
 
-LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(subst lib,,$(lib)))
+LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(lib))
 LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 
 # If LIBS specifies the rdd library, add all DB drivers.
 ifeq ($(findstring rddmt,$(LIBS)),rddmt)
-#DBFNTX and DBFCDX are MTzed
-ifeq ($(findstring dbfcdx,$(HB_DB_DRIVERS)),dbfcdx)
-LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfcdx/$(ARCH_DIR)_mt
-LINKLIBS += -ldbfcdxmt
-endif
-ifeq ($(findstring dbfntx,$(HB_DB_DRIVERS)),dbfntx)
-LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfntx/$(ARCH_DIR)_mt
-LINKLIBS += -ldbfntxmt
-endif
+  #DBFNTX and DBFCDX are MTzed
+  ifeq ($(findstring dbfcdx,$(HB_DB_DRIVERS)),dbfcdx)
+    LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfcdx/$(ARCH_DIR)_mt
+    LINKLIBS += -ldbfcdxmt
+  endif
+  ifeq ($(findstring dbfntx,$(HB_DB_DRIVERS)),dbfntx)
+    LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfntx/$(ARCH_DIR)_mt
+    LINKLIBS += -ldbfntxmt
+  endif
 
-#DBFDBT and DBFFTP are not MTzed
-ifeq ($(findstring dbfdbt,$(HB_DB_DRIVERS)),dbfdbt)
-LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfdbt/$(ARCH_DIR)
-LINKLIBS += -ldbfdbt
-endif
-ifeq ($(findstring dbffpt,$(HB_DB_DRIVERS)),dbffpt)
-LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbffpt/$(ARCH_DIR)
-LINKLIBS += -ldbffpt
-endif
+  # DBFDBT and DBFFPT are not MTzed
+  ifeq ($(findstring dbfdbt,$(HB_DB_DRIVERS)),dbfdbt)
+    LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfdbt/$(ARCH_DIR)
+    LINKLIBS += -ldbfdbt
+  endif
+  ifeq ($(findstring dbffpt,$(HB_DB_DRIVERS)),dbffpt)
+    LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbffpt/$(ARCH_DIR)
+    LINKLIBS += -ldbffpt
+  endif
 
 else
-ifeq ($(findstring rdd,$(LIBS)),rdd)
-LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH_DIR))
-LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv))
-endif
+  ifeq ($(findstring rdd,$(LIBS)),rdd)
+    LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH_DIR))
+    LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv))
+  endif
 endif
 
 # Add the specified GT driver library and other RTLs
@@ -117,17 +106,25 @@ LINKLIBS += $(foreach gt, $(HB_GT_LIBS), -l$(gt))
 
 # screen driver libraries
 ifeq ($(HB_CRS_LIB),)
-HB_CRS_LIB=ncurses
+#HB_CRS_LIB=ncurses
 endif
+
 ifneq ($(findstring gtcrs, $(HB_GT_LIBS)),)
-LINKLIBS += -l$(HB_CRS_LIB)
+#LINKLIBS += -l$(HB_CRS_LIB)
 endif
+
 ifneq ($(findstring gtsln, $(HB_GT_LIBS)),)
 LINKLIBS += -lslang
+# In BSD, slang still needs curses :(
+ifeq ($(findstring gtcrs, $(HB_GT_LIBS)),)
+LINKLIBS += -l$(HB_CRS_LIB)
 endif
+endif
+
 ifneq ($(findstring gtalleg, $(HB_GT_LIBS)),)
 LINKLIBS += `allegro-config --static`
 endif
+
 ifneq ($(findstring gtxwc, $(HB_GT_LIBS)),)
 LINKLIBS += -lX11
 #LINKPATHS += -L/usr/X11R6/lib64
@@ -135,30 +132,25 @@ LINKPATHS += -L/usr/X11R6/lib
 endif
 
 # HB_GPM_MOUSE: use gpm mouse driver
+# Actually, there is no gpm on BSD.
 ifeq ($(HB_GPM_MOUSE),yes)
 LINKLIBS += -lgpm
 endif
 
 endif
 
-#it never hurts if MT is enabled.
-#ifeq ($(HB_MT),MT) - hurts because it force linking with this lib, try ldd
-ifeq ($(findstring vmmt,$(LIBS)),vmmt)
-LINKLIBS += -lpthread
-endif
-
 # New pcrepos library
 ifeq ($(findstring rtl,$(LIBS)),rtl)
-LINKLIBS += -lrtl
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH_DIR)
 LINKLIBS += -lpcrepos
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/zlib/$(ARCH_DIR)
 LINKLIBS += -lzlib
 endif
 
-LINKLIBS += -lm -lrt
+LINKLIBS += -lm
 
 LDFLAGS = $(LINKPATHS)
+LD_RULE = $(LD) $(CFLAGS) $(LD_OUT) $@ $(^F) $(LDFLAGS) $(L_USR) $(LINKLIBS) $(LINKLIBS)
 
 AR = ar
 ARFLAGS = $(A_USR)
