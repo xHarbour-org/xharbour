@@ -684,7 +684,7 @@ void hb_dateToday( int * piYear, int * piMonth, int * piDay )
    *piMonth = st.wMonth;
    *piDay   = st.wDay;
 
-#elif defined( HB_OS_LINUX ) && !defined( __WATCOMC__ )
+#elif defined( HB_OS_UNIX ) && !defined( __WATCOMC__ )
 
    time_t t;
    struct tm st;
@@ -721,7 +721,7 @@ void hb_dateTimeStr( char * pszTime )
       GetLocalTime( &st );
       hb_snprintf( pszTime, 9, "%02d:%02d:%02d", st.wHour, st.wMinute, st.wSecond );
    }
-#elif defined( HB_OS_LINUX ) && !defined( __WATCOMC__ )
+#elif defined( HB_OS_UNIX ) && !defined( __WATCOMC__ )
    {
       time_t t;
       struct tm st;
@@ -756,7 +756,7 @@ void hb_dbaselockEncode( char * pszTimeDate )
       hb_snprintf( pszTimeDate, 6, "%c%c%c%c%c%c",
                    st.wHour, st.wMinute, st.wSecond, st.wYear - 1900, st.wMonth, st.wDay );
    }
-#elif defined( HB_OS_LINUX ) && !defined( __WATCOMC__ )
+#elif defined( HB_OS_UNIX ) && !defined( __WATCOMC__ )
    {
       time_t t;
       struct tm st;

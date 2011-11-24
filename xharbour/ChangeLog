@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-11-24 15:30 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * source/rtl/filesys.c
+    % removed unnecessary PID setting in POSIX file lock function. borrow from harbour
+  * source/common/hbdate.c
+    * HB_OS_LINUX -> HB_OS_UNIX  
+  * source/rtl/fstemp.c
+    * HB_OS_LINUX -> HB_OS_UNIX  
+  * source/rtl/seconds.c
+    * added test for HB_OS_UNIX on line with test for HB_OS_LINUX
+    
 2011-11-23 11:27 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * include/hbdefs.h
     ! minor fix to correct set memory aligment on hpux

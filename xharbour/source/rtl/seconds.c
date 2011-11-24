@@ -60,7 +60,7 @@
 
 #include <time.h>
 
-#if ( defined( HB_OS_BSD ) || defined( HB_OS_LINUX ) ) && !defined( __WATCOMC__ )
+#if ( defined( HB_OS_BSD ) || defined( HB_OS_LINUX ) || defined(HB_OS_UNIX) ) && !defined( __WATCOMC__ )
    #include <sys/time.h>
 #elif !( defined( HB_OS_WIN_CE ) && defined( _MSC_VER ) )
    #include <sys/timeb.h>
@@ -95,7 +95,7 @@ void hb_dateTimeStamp( LONG * plJulian, LONG * plMilliSec )
    *plJulian = hb_dateEncode( st.wYear, st.wMonth, st.wDay );
    *plMilliSec = ( ( st.wHour * 60 + st.wMinute ) * 60 + st.wSecond ) * 1000 +
                  st.wMilliseconds;
-#elif defined( HB_OS_LINUX ) && !defined( __WATCOMC__ )
+#elif (defined( HB_OS_LINUX )|| defined(HB_OS_UNIX)) && !defined( __WATCOMC__ )
    struct timeval tv;
    struct tm st;
    time_t seconds;
@@ -150,7 +150,7 @@ HB_ULONG hb_dateMilliSeconds( void )
    return ( HB_ULONG ) hb_dateEncode( st.wYear, st.wMonth, st.wDay ) * 86400000L +
           ( ( st.wHour * 60 + st.wMinute ) * 60 + st.wSecond ) * 1000 +
           st.wMilliseconds;
-#elif ( defined( HB_OS_LINUX ) || defined( HB_OS_BSD ) ) && !defined( __WATCOMC__ )
+#elif ( defined( HB_OS_LINUX ) || defined( HB_OS_BSD ) || defined(HB_OS_UNIX) ) && !defined( __WATCOMC__ )
    struct timeval tv;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dateMilliSeconds()"));
@@ -182,7 +182,7 @@ double hb_dateSeconds( void )
           ( SystemTime.wMinute * 60 ) +
             SystemTime.wSecond +
           ( ( double ) SystemTime.wMilliseconds / 1000.0 );
-#elif defined( HB_OS_LINUX ) && !defined( __WATCOMC__ )
+#elif (defined( HB_OS_LINUX ) || defined(HB_OS_UNIX)) && !defined( __WATCOMC__ )
    struct timeval tv;
    struct tm oTime;
    time_t seconds;

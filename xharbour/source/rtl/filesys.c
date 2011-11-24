@@ -3114,7 +3114,7 @@ BOOL hb_fsLock( HB_FHANDLE hFileHandle, ULONG ulStart,
             lock_info.l_start  = ulStart;
             lock_info.l_len    = ulLength;
             lock_info.l_whence = SEEK_SET;   /* start from the beginning of the file */
-            lock_info.l_pid    = getpid();
+            lock_info.l_pid    = 0;
 
             bResult = ( fcntl( hFileHandle,
                                (uiMode & FLX_WAIT) ? F_SETLKW: F_SETLK,
@@ -3127,7 +3127,7 @@ BOOL hb_fsLock( HB_FHANDLE hFileHandle, ULONG ulStart,
             lock_info.l_start  = ulStart;
             lock_info.l_len    = ulLength;
             lock_info.l_whence = SEEK_SET;
-            lock_info.l_pid    = getpid();
+            lock_info.l_pid    = 0;
 
             bResult = ( fcntl( hFileHandle, F_SETLK, &lock_info ) >= 0 );
             break;
@@ -3264,7 +3264,7 @@ BOOL hb_fsLockLarge( HB_FHANDLE hFileHandle, HB_FOFFSET ulStart,
             lock_info.l_start  = ulStart;
             lock_info.l_len    = ulLength;
             lock_info.l_whence = SEEK_SET;   /* start from the beginning of the file */
-            lock_info.l_pid    = getpid();
+            lock_info.l_pid    = 0;
 
             bResult = ( fcntl( hFileHandle,
                                (uiMode & FLX_WAIT) ? F_SETLKW64: F_SETLK64,
@@ -3277,7 +3277,7 @@ BOOL hb_fsLockLarge( HB_FHANDLE hFileHandle, HB_FOFFSET ulStart,
             lock_info.l_start  = ulStart;
             lock_info.l_len    = ulLength;
             lock_info.l_whence = SEEK_SET;
-            lock_info.l_pid    = getpid();
+            lock_info.l_pid    = 0;
 
             bResult = ( fcntl( hFileHandle, F_SETLK64, &lock_info ) != -1 );
             break;

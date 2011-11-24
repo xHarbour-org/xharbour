@@ -150,7 +150,7 @@ static HB_FHANDLE hb_fsCreateTempLow( const char * pszDir, const char * pszPrefi
       if( iLen > ( HB_PATH_MAX - 1 ) - 6 )
          return FS_ERROR;
 
-#if !defined(__WATCOMC__) && ( defined( HB_OS_LINUX ) || defined( HB_OS_BSD ) )
+#if !defined(__WATCOMC__) && ( defined( HB_OS_UNIX ) || defined( HB_OS_BSD ))
       if( hb_setGetFileCase() != HB_SET_CASE_LOWER &&
           hb_setGetFileCase() != HB_SET_CASE_UPPER &&
           hb_setGetDirCase() != HB_SET_CASE_LOWER &&
