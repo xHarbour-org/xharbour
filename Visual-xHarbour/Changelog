@@ -12,6 +12,7 @@
    + Added Column:ButtonMenu property that will display any ContextMenu asociated to it at
      the current cell position.
    ! Fixed DataGrid displaying phantom record after zapping its DataSource
+   ! Fixed control Caption not repainting when changing its text
 
 2011-11-17 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed DataGrid first record not showing.

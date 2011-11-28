@@ -32,6 +32,8 @@ CLASS Control INHERIT Window
    PROPERTY SmallCaption             READ xSmallCaption WRITE __SetSmallCaption DEFAULT .F.
    PROPERTY Enabled                  READ xEnabled      WRITE __Enable          DEFAULT .T.
 
+   PROPERTY Caption                  READ xCaption      WRITE __SetSmallCaption DEFAULT ""
+   
    DATA AllowMaximize     PUBLISHED INIT .F.
    DATA FlatCaption       PUBLISHED INIT .T.
    
@@ -80,6 +82,7 @@ CLASS Control INHERIT Window
    ASSIGN MdiContainer(l) INLINE ::xMdiContainer := l
 
    ACCESS IsDocked        INLINE ::__Docked
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
 
@@ -244,10 +247,14 @@ RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 
-METHOD __SetSmallCaption() CLASS Control
+METHOD __SetSmallCaption(lSet) CLASS Control
    IF ::hWnd != NIL
-      ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
-      ::RedrawWindow( , , RDW_FRAME | RDW_NOERASE | RDW_NOINTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN )
+      IF VALTYPE( lSet ) == "L"
+         ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
+      ENDIF
+      IF ::SmallCaption
+         ::RedrawWindow( , , RDW_FRAME | RDW_NOERASE | RDW_NOINTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN )
+      ENDIF
    ENDIF
 RETURN Self
 
