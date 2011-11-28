@@ -55,7 +55,7 @@
 #include "hbapiitm.h"
 #include "hbapifs.h"
 
-#if defined(HB_OS_UNIX_COMPATIBLE)
+#if defined(HB_OS_UNIX)
    #include <sys/stat.h>
    #include <unistd.h>
 #elif ( defined( HB_OS_WIN ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
@@ -100,7 +100,7 @@ static BOOL hb_fsCopy( const char * szSource, const char * szDest, PHB_ITEM bloc
 
       if( fhndDest != FS_ERROR )
       {
-#if defined(HB_OS_UNIX_COMPATIBLE)
+#if defined(HB_OS_UNIX)
          struct stat struFileInfo;
          int iSuccess = fstat( fhndSource, &struFileInfo );
 #elif ( defined( HB_OS_WIN ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
@@ -145,7 +145,7 @@ static BOOL hb_fsCopy( const char * szSource, const char * szDest, PHB_ITEM bloc
             hb_evalRelease( &info );
          }
 
-#if defined(HB_OS_UNIX_COMPATIBLE)
+#if defined(HB_OS_UNIX)
          if( iSuccess == 0 )
             fchmod( fhndDest, struFileInfo.st_mode );
 #elif ( defined( HB_OS_WIN ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )

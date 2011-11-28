@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2011-11-27 22:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+   * source/ct/files.c
+   * source/rtl/console.c
+   * source/rtl/copyfile.c
+   * source/rtl/filenet.c
+   * source/rtl/filestat.c
+   * source/rtl/filesys.c
+   * source/rtl/fssize.c
+   * source/rtl/gtpca/gtpca.c
+   * source/rtl/gtstd/gtstd.c
+   * source/rtl/gttrm/gttrm.c
+   * source/rtl/hbffind.c
+   * source/rtl/hbserv.c
+   * source/rtl/memofile.c
+   * source/rtl/net.c
+   * source/rtl/seconds.c
+   * source/rtl/set.c
+   * source/vm/dbgentry.c
+   * source/vm/inet.c
+     * changed HB_OS_UNIX_COMPATIBLE to HB_OS_UNIX
+   * source/ct/settime.c  
+   * source/ct/dattime3.c
+   * source/rtl/filenet.c
+   * source/vm/dynlibhb.c     
+     * changed HB_OS_LINUX to HB_OS_UNIX
 
 2011-11-24 15:30 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/rtl/filesys.c

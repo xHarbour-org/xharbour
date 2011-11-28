@@ -65,7 +65,7 @@
 #include "classes.h"
 
 
-#if defined( HB_OS_UNIX_COMPATIBLE )
+#if defined( HB_OS_UNIX )
 #define FILENAME_EQUAL(s1, s2) ( !strcmp( (s1), (s2) ) )
 #else
 #define FILENAME_EQUAL(s1, s2) ( !hb_stricmp( (s1), (s2) ) )

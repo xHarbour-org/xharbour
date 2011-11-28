@@ -63,7 +63,7 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#if defined( HB_OS_UNIX ) || defined( HB_OS_UNIX_COMPATIBLE ) || defined( HB_OS_BSD ) || defined(HB_OS_OS2)
+#if defined( HB_OS_UNIX ) || defined( HB_OS_UNIX ) || defined( HB_OS_BSD ) || defined(HB_OS_OS2)
    #include <sys/time.h>
 #endif
 

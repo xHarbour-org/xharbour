@@ -103,7 +103,7 @@
 
 void hb_netname( char * pszNetName, BOOL bGetUser )
 {
-#if defined(HB_OS_OS2) || defined(HB_OS_UNIX_COMPATIBLE)
+#if defined(HB_OS_OS2) || defined(HB_OS_UNIX)
 
    #if defined(__WATCOMC__)
       pszNetName = hb_getenv( "HOSTNAME" );

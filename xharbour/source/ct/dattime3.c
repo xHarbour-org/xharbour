@@ -58,7 +58,7 @@
 #if defined( HB_OS_WIN )
 #   include <windows.h>
 #   include <winbase.h>
-#elif defined( HB_OS_LINUX )
+#elif defined( HB_OS_UNIX )
    /* stime exists only in SVr4, SVID, X/OPEN and Linux */
 #   ifndef _SVID_SOURCE
 #      define _SVID_SOURCE
@@ -306,7 +306,7 @@ HB_FUNC( SETTIME )
       st.wSecond       = iTime[2];
       st.wMilliseconds = iTime[3] * 10;
       fResult = SetLocalTime( &st );
-#elif defined( HB_OS_LINUX ) && !defined( __WATCOMC__ )
+#elif defined( HB_OS_UNIX ) && !defined( __WATCOMC__ )
 /* stime exists only in SVr4, SVID, X/OPEN and Linux */
       ULONG lNewTime;
       time_t tm;
@@ -392,7 +392,7 @@ HB_FUNC( SETDATE )
          st.wDay       = iDay;
          st.wDayOfWeek = hb_dateJulianDOW( lDate );
          fResult = SetLocalTime( &st );
-#elif defined( HB_OS_LINUX ) && !defined( __WATCOMC__ )
+#elif defined( HB_OS_UNIX ) && !defined( __WATCOMC__ )
 /* stime exists only in SVr4, SVID, X/OPEN and Linux */
          long lNewDate;
          time_t tm;

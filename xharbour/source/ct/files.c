@@ -63,7 +63,7 @@
 #include "hbapiitm.h"
 #include "hbdate.h"
 
-#if !defined( HB_USE_LARGEFILE64 ) && defined( HB_OS_UNIX_COMPATIBLE )
+#if !defined( HB_USE_LARGEFILE64 ) && defined( HB_OS_UNIX  )
    #if defined( __USE_LARGEFILE64 )
       /*
        * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
@@ -105,7 +105,7 @@
       #include <dir.h>
     #endif
 #endif
-#if defined(HB_OS_UNIX_COMPATIBLE) || (defined(__GNUC__) && !defined(__MINGW32__))
+#if defined(HB_OS_UNIX) || (defined(__GNUC__) && !defined(__MINGW32__))
    #include <sys/types.h>
    #include <sys/stat.h>
    #include <fcntl.h>
@@ -154,7 +154,7 @@
    #define FA_VOLCOMP      32768   /* M */
 #endif
 
-#if defined( HB_OS_UNIX_COMPATIBLE ) || defined(HB_OS_OS2)
+#if defined( HB_OS_UNIX ) || defined(HB_OS_OS2)
 static USHORT osToHarbourMask(  USHORT usMask  )
 {
    USHORT usRetMask;
@@ -167,7 +167,7 @@ static USHORT osToHarbourMask(  USHORT usMask  )
    if(  usMask == ( USHORT ) -1  )
       return 0;
 
-   #if defined( HB_OS_UNIX_COMPATIBLE )
+   #if defined( HB_OS_UNIX  )
       /* The use of any particular FA_ define here is meaningless */
       /* they are essentially placeholders */
       usRetMask = 0;
@@ -575,7 +575,7 @@ HB_FUNC( FILESIZE )
    }
 }
 
-#elif defined( HB_OS_UNIX_COMPATIBLE ) || defined(HB_OS_OS2)
+#elif defined( HB_OS_UNIX  ) || defined(HB_OS_OS2)
 
 {
    if ( hb_pcount( ) > 0 )
@@ -707,7 +707,7 @@ HB_FUNC( FILEDATE )
       hb_retd( ( LONG ) ( fsOldFiles.ff_fdate >> 9 ) +1980, ( LONG ) ( ( fsOldFiles.ff_fdate & ~0xFE00 ) >> 5 ), ( LONG )fsOldFiles.ff_fdate & ~0xFFE0 );
     }
 
-#elif defined( HB_OS_UNIX_COMPATIBLE ) || defined(HB_OS_OS2)
+#elif defined( HB_OS_UNIX  ) || defined(HB_OS_OS2)
 
    {
       if ( hb_pcount(  ) >0 )
@@ -848,7 +848,7 @@ HB_FUNC( FILETIME )
    }
 }
 
-#elif defined( HB_OS_UNIX_COMPATIBLE ) || defined(HB_OS_OS2)
+#elif defined( HB_OS_UNIX  ) || defined(HB_OS_OS2)
 
 {
    const char *szFile = hb_parcx( 1 );
@@ -1030,7 +1030,7 @@ HB_FUNC( SETFDATI )
          hb_retl( ulrc == NO_ERROR );
          return;
       }
-#elif defined( HB_OS_UNIX_COMPATIBLE ) || defined( __DJGPP__ )
+#elif defined( HB_OS_UNIX  ) || defined( __DJGPP__ )
 
       if( !pDate && !pTime )
       {

@@ -58,7 +58,7 @@
 #include "hbdate.h"
 #include "hbapierr.h"
 
-#if defined( HB_OS_UNIX_COMPATIBLE )
+#if defined( HB_OS_UNIX )
    #include <unistd.h>
    #include <sys/types.h>
    #include <time.h>
@@ -81,7 +81,7 @@ static BOOL hb_fsFileStats(
 {
    BOOL fResult = FALSE;
 
-#if defined( HB_OS_UNIX_COMPATIBLE )
+#if defined( HB_OS_UNIX )
 
    struct stat statbuf;
 

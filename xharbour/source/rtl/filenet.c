@@ -1821,7 +1821,7 @@ static BOOL hb_FileNetCopyTo( const char * szSource, const char * szDest, PHB_IT
       if( pfDest )
       {
 /*
-#if defined(HB_OS_UNIX_COMPATIBLE)
+#if defined(HB_OS_UNIX)
          struct stat struFileInfo;
          int iSuccess = fstat( fhndSource, &struFileInfo );
 #elif ( defined( HB_OS_WIN ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )

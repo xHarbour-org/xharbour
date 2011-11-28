@@ -65,7 +65,7 @@
 #elif !( defined( HB_OS_WIN_CE ) && defined( _MSC_VER ) )
    #include <sys/timeb.h>
 #endif
-#if defined( HB_OS_UNIX_COMPATIBLE )
+#if defined( HB_OS_UNIX )
    #include <sys/times.h>
    #include <unistd.h>
 #endif
@@ -266,7 +266,7 @@ HB_FUNC( HB_CLOCKS2SECS )
 double hb_secondsCPU( int n )
 {
    double d = 0.0;
-#if defined( HB_OS_WIN ) && !defined( HB_OS_UNIX_COMPATIBLE )
+#if defined( HB_OS_WIN ) && !defined( HB_OS_UNIX )
    FILETIME Create, Exit, Kernel, User;
    static BOOL s_fInit = FALSE, s_fWinNT = FALSE;
 
@@ -286,7 +286,7 @@ double hb_secondsCPU( int n )
    if( ( n < 1 || n > 3 ) && ( n < 11 || n > 13 ) )
       n = 3;
 
-#if defined( HB_OS_UNIX_COMPATIBLE )
+#if defined( HB_OS_UNIX )
    {
       struct tms tm;
 

@@ -720,7 +720,7 @@ static int s_translateSignal( UINT sig, UINT subsig )
 
 static void s_signalHandlersInit()
 {
-   #if defined( HB_THREAD_SUPPORT ) && ( defined( HB_OS_UNIX ) || defined( HB_OS_UNIX_COMPATIBLE ) )
+   #if defined( HB_THREAD_SUPPORT ) && ( defined( HB_OS_UNIX ) || defined( HB_OS_UNIX ) )
       pthread_t res;
       PHB_STACK pStack;
 

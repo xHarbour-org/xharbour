@@ -62,7 +62,7 @@
 #include "hbstack.h"
 #include "hbvm.h"
 
-#if defined(HB_OS_LINUX) && !defined(__WATCOMC__)
+#if defined(HB_OS_HPUX) && !defined(__WATCOMC__)
 #include <dlfcn.h>
 #endif
 
