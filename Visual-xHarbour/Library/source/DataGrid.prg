@@ -315,6 +315,7 @@ METHOD Create() CLASS DataGrid
 
    ::RowCountVisible := Ceil( ::__DataHeight/::ItemHeight )
    ::RowCountUsable  := MIN( Int(  ::__DataHeight/::ItemHeight ), ::RowCount )
+   
    ::__Update()
 
    ::AutoUpdate := ::__nUpdtTimer
@@ -2293,7 +2294,7 @@ METHOD Update() CLASS DataGrid
    ENDIF
    ::__DisplayArray := {}
    
-   IF ::RowCountUsable > 0
+   IF ::RowCountUsable > 0 .AND. ! ( ::DataSource:Bof() .AND. ::DataSource:Eof() )
       nIns := 0
 
       FOR n := 1 TO ::RowCountVisible
