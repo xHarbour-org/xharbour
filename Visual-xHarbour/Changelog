@@ -8,6 +8,10 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-11-28 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Column:ButtonMenu property that will display any ContextMenu asociated to it at
+     the current cell position.
+
 2011-11-17 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed DataGrid first record not showing.
    ! Fixed RTE caused by clicking empty DataGrids

@@ -807,7 +807,7 @@ METHOD SetValue( xValue, cCaption, oItem ) CLASS ObjManager
 
    IF cProp2 != NIL .AND. cProp2 == "Dock" .AND. AT( "Margin", cProp ) == 0
       xValue := oItem:ColItems[1]:Value[2][ xValue ]
-    ELSEIF cProp IN {"ImageList","HotImageList","BandChild","DataSource","ImageListSmall","ContextMenu","PageChild","Socket","BindingSource","SqlConnector"}
+    ELSEIF cProp IN {"ImageList","HotImageList","BandChild","DataSource","ImageListSmall","HeaderMenu","ButtonMenu","ContextMenu","PageChild","Socket","BindingSource","SqlConnector"}
       xValue := oItem:ColItems[1]:Value[2][ xValue ]
    ENDIF
 
@@ -883,7 +883,7 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
          oItem:ColItems[1]:Value[2][1] := NIL
       ENDIF
 
-    ELSEIF cProp IN {"ImageList","HotImageList","BandChild","DataSource","ImageListSmall","ContextMenu","PageChild","Socket","BindingSource","SqlConnector"}
+    ELSEIF cProp IN {"ImageList","HotImageList","BandChild","DataSource","ImageListSmall","HeaderMenu","ButtonMenu","ContextMenu","PageChild","Socket","BindingSource","SqlConnector"}
       TRY
          IF VALTYPE( xValue ) == "O" .AND. xValue:ComponentType == "DataSource" .AND. !xValue:IsOpen
             xValue:Create()
@@ -1165,7 +1165,7 @@ RETURN Self
 
 METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS ObjManager
    LOCAL cProp, cProp2, aProp, xValue, n, oItem, nColor, aSub, aCol, oSub, oObj, xValue2, lReadOnly
-   LOCAL aProperties, aProperty, aSubProp, cType, Child
+   LOCAL aProperties, aProperty, aSubProp, cType, Child, xProp
 
    IF ::ActiveControl != NIL .AND. ::ActiveControl:IsWindow()
       ::ActiveControl:Destroy()
@@ -1472,9 +1472,12 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                   NEXT
                   aCol[1]:ColType := "SERVICES"
 
-             CASE cProp IN {"BindingSource","DataSource","ImageList","HotImageList","ImageListSmall","ContextMenu","Socket","SqlConnector"}
+             CASE cProp IN {"BindingSource","DataSource","ImageList","HotImageList","ImageListSmall","HeaderMenu","ButtonMenu","ContextMenu","Socket","SqlConnector"}
                   aCol[1]:Value := { "", { NIL } }
-
+                  IF cProp IN {"HeaderMenu","ButtonMenu"}
+                     xProp := cProp
+                     cProp := "ContextMenu"
+                  ENDIF
                   IF ::ActiveObject:Form:hWnd != ::Application:Project:Forms[1]:hWnd
                      FOR EACH Child IN ::Application:Project:Forms[1]:Components
                          IF Child:ComponentType IN cProp .AND. ( Child:lCreated .OR. Child:ComponentType == "DataSource" .OR. Child:ClsName == "ImageList"  )
@@ -1506,6 +1509,10 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                   aCol[1]:ColType  := UPPER( STRTRAN( UPPER( cProp ), "HOT" ) )
                   aCol[1]:ColType  := UPPER( STRTRAN( aCol[1]:ColType, "SMALL" ) )
                   xValue := NIL
+                  IF xProp != NIL
+                     cProp := xProp
+                     xProp := NIL
+                  ENDIF
 
              CASE cProp == "PageChild"
 
@@ -2367,7 +2374,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :ShowDropDown()
                     END
 
-               CASE cType IN { "IMAGELIST","BANDCHILD","DATASOURCE","CONTEXTMENU","SOCKET","BINDINGSOURCE","SQLCONNECTOR" }
+               CASE cType IN { "IMAGELIST","BANDCHILD","DATASOURCE","HEADERMENU","BUTTONMENU","CONTEXTMENU","SOCKET","BINDINGSOURCE","SQLCONNECTOR" }
                     ::ActiveControl := ObjCombo( Self )
                     WITH OBJECT ::ActiveControl
                        :Left   := nLeft-1
@@ -3481,6 +3488,7 @@ __aProps["A"] := { { "AutoHScroll",             "Style"     },;
 
 __aProps["B"] := { { "BandChild",               ""           },;
                    { "BaudRate",                ""           },;
+                   { "ButtonMenu",              "Behavior" },;
                    { "BoldSelection",           "Appearance" },;
                    { "BalloonTipIcon",          "Appearance" },;
                    { "BalloonTipText",          "Appearance" },;
@@ -3588,6 +3596,7 @@ __aProps["G"] := { { "Grid",                    "Style" },;
 __aProps["H"] := { { "HasStrings",              "Style" },;
                    { "Hidden",                  "Style" },;
                    { "HideClippedButtons",      "Style" },;
+                   { "HeaderMenu",              "Behavior" },;
                    { "HandShake",               "" },;
                    { "HideInvert",              "" },;
                    { "HorzPadding",             "Appearance" },;

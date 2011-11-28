@@ -3701,6 +3701,11 @@ METHOD Open( cProject ) CLASS Project
       ::ResetQuickOpen( cProject )
       RETURN Self
    ENDIF
+   
+   IF ::Application:DebugWindow:Visible
+      ::Application:ErrorView:ResetContent()
+      ::Application:DebugWindow:Visible := .F.
+   ENDIF
 
    DEFAULT cProject TO ""
    oProject := CFile( cProject )

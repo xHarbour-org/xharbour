@@ -1121,7 +1121,7 @@ RETURN Self
 METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    LOCAL nCol, nRow, n, lRes, i
    LOCAL nClickRow, lUpdt := .F.
-   LOCAL nClickCol, lShift, lCtrl
+   LOCAL nClickCol, lShift, lCtrl, pt
    LOCAL lLineChange:=.F.
    (nwParam)
    ::RowCountUsable  := MIN( Int(  ::__DataHeight/::ItemHeight ), ::RowCount )
@@ -1313,9 +1313,9 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
          ENDIF
        ELSE
          ::ColPos := nClickCol
-//         ::ColPos := ASCAN( ::__DisplayArray[1][1], {|a|a[6]> xPos} )-1
       ENDIF
    ENDIF
+
    IF nRow > 0
       ::__DisplayData( nRow, , nRow, )
    ENDIF
@@ -1328,6 +1328,7 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    IF ::hWnd != GetFocus()
       ::SetFocus()
    ENDIF
+
    ::OnClick( ::ColPos, ::RowPos )
    IF nRow != ::RowPos
       IF ::bRowChanged != NIL
@@ -1341,6 +1342,17 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    ::__DisplayData( ::RowPos, , ::RowPos,  )
    ::__lMouseDown := .T.
    ::__DisplayData( nClickRow, , nClickRow,  )
+
+   IF ::Children[ ::ColPos ]:ButtonMenu != NIL
+      pt := (struct POINT)
+      pt:x := ::Children[::ColPos]:aSelRect[1]
+      pt:y := ::Children[::ColPos]:aSelRect[4]
+      ClientToScreen( ::hWnd, @pt )
+      ::Children[ ::ColPos ]:ButtonMenu:Show( pt:x, pt:y )
+      ::__lMouseDown := .F.
+      ::__DisplayData( ::RowPos, , ::RowPos,  )
+   ENDIF
+
    ::__Edit( 1, xPos, yPos, GRID_LCLICK )
 RETURN NIL
 
@@ -1832,7 +1844,9 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                  IF ::Children[i]:SelOnlyRep .AND. !lSelected
                     nRep := 1
                  ENDIF
-
+                 IF lSelected
+                    ::Children[i]:aSelRect := { zLeft, nTop, nRight, nBottom }
+                 ENDIF
                  IF ( lSelected .OR. ::Children[i]:ShowControls ) .AND. ::Children[i]:Control != NIL
                     DEFAULT ::Children[i]:ControlObject TO EVAL( ::Children[i]:Control, Self, nRec, i )
                     IF !lHide .AND. ::Children[i]:ControlObject != NIL .AND. RIGHT( ::Children[i]:ControlObject:ClsName, 4 ) != "Edit" .AND. VALTYPE( nStatus ) != "B"
@@ -3587,6 +3601,8 @@ RETURN .T.
 //----------------------------------------------------------------------------------
 
 CLASS GridColumn INHERIT Object
+   DATA aSelRect      EXPORTED
+
    DATA xLeft         EXPORTED
    ACCESS Left        INLINE ::GetSize(1)
    ASSIGN Left(n)     INLINE ::xLeft := n
@@ -3615,6 +3631,7 @@ CLASS GridColumn INHERIT Object
    DATA EnumImageAlignment    EXPORTED INIT { {"Left", "Center", "Right"}, {1,2,3} }
 
    PROPERTY ContextMenu GET __ChkComponent( Self, ::xContextMenu )
+   PROPERTY ButtonMenu  GET __ChkComponent( Self, ::xButtonMenu )
 
    PROPERTY ImageAlignment    READ xImageAlignment   WRITE Refresh DEFAULT 1
    PROPERTY Alignment         READ xAlignment        WRITE SetAlignment  DEFAULT 1
