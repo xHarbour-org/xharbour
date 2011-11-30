@@ -32,8 +32,10 @@ CLASS Control INHERIT Window
    PROPERTY SmallCaption             READ xSmallCaption WRITE __SetSmallCaption DEFAULT .F.
    PROPERTY Enabled                  READ xEnabled      WRITE __Enable          DEFAULT .T.
 
-   PROPERTY Caption                  READ xCaption      WRITE __SetSmallCaption DEFAULT ""
-   
+   DATA xCaption               EXPORTED  INIT ""
+   ACCESS Caption              INLINE    IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xCaption, _GetWindowText( ::hWnd ) ) PERSISTENT
+   ASSIGN Caption(c)           INLINE    ::SetWindowText( c ), IIF( ::SmallCaption, ::RedrawWindow( , , RDW_FRAME | RDW_NOERASE | RDW_NOINTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN ), )
+
    DATA AllowMaximize     PUBLISHED INIT .F.
    DATA FlatCaption       PUBLISHED INIT .T.
    
@@ -247,14 +249,10 @@ RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 
-METHOD __SetSmallCaption(lSet) CLASS Control
+METHOD __SetSmallCaption() CLASS Control
    IF ::hWnd != NIL
-      IF VALTYPE( lSet ) == "L"
-         ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
-      ENDIF
-      IF ::SmallCaption
-         ::RedrawWindow( , , RDW_FRAME | RDW_NOERASE | RDW_NOINTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN )
-      ENDIF
+      ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
+      ::RedrawWindow( , , RDW_FRAME | RDW_NOERASE | RDW_NOINTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN )
    ENDIF
 RETURN Self
 

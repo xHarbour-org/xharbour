@@ -28,7 +28,7 @@ CLASS CFile
    DATA Lines            EXPORTED INIT 0
    DATA AllowMultiSelect EXPORTED INIT .F.
    DATA Modified         EXPORTED
-   DATA Flags            EXPORTED
+   DATA Flags            EXPORTED INIT OFN_EXPLORER
    DATA FilterIndex      EXPORTED
    DATA DefaultExtention EXPORTED
    DATA FileExtension    EXPORTED
@@ -64,12 +64,7 @@ METHOD SaveDialog( oParent, cTitle ) CLASS CFile
    ::ofn:lpstrFile       := PadR( ::Name, MAX_PATH )
    ::ofn:lpstrDefExt     := ::DefaultExtention
    ::ofn:lpstrTitle      := cTitle
-
-   IF Empty( ::Flags )
-      ::ofn:Flags := OFN_EXPLORER
-   ELSE
-      ::ofn:Flags := ::Flags
-   ENDIF
+   ::ofn:Flags           := ::Flags
 
    FOR n := 1 TO LEN( ::Filter )
        cFilter += ::Filter[n][1] + chr( 0 ) + ::Filter[n][2] + chr( 0 )
@@ -108,12 +103,7 @@ METHOD OpenDialog( oParent ) CLASS CFile
    ::ofn:hwndOwner       := IIF( VALTYPE( oParent ) == "O", oParent:hWnd, oParent )
    ::ofn:lpstrInitialDir := ::Path
    ::ofn:lpstrFile       := PadR( ::Name, 1024 )
-
-   IF Empty( ::Flags )
-      ::ofn:Flags := OFN_EXPLORER
-   ELSE
-      ::ofn:Flags := ::Flags
-   ENDIF
+   ::ofn:Flags           := ::Flags
 
    IF ::AllowMultiSelect
       ::ofn:Flags := ::ofn:Flags | OFN_ALLOWMULTISELECT
