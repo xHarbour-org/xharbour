@@ -506,7 +506,7 @@ RETURN NIL
 
 
 METHOD Init() CLASS IDE_MainForm
-   LOCAL cVersion
+   LOCAL cVersion, rc
 
    ::Super:Init()
    #ifdef VXH_DEMO
@@ -518,8 +518,10 @@ METHOD Init() CLASS IDE_MainForm
    ::BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd
    ::OnWMThemeChanged := {|o| o:BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd }
 
+   rc := (struct RECT)
+   SystemParametersInfo( SPI_GETWORKAREA, , @rc )
 
-   ::Left    := ::Application:IniFile:ReadNumber( "Position", "Left", 0 )
+   ::Left    := ::Application:IniFile:ReadNumber( "Position", "Left", 0 )+rc:Left
    ::Top     := ::Application:IniFile:ReadNumber( "Position", "Top", 0 )
    ::Width   := ::Application:IniFile:ReadNumber( "Position", "Width", 800 )
    ::Height  := ::Application:IniFile:ReadNumber( "Position", "Height", 600 )
