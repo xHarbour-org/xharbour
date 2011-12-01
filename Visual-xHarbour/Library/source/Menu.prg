@@ -46,7 +46,8 @@ CLASS Menu INHERIT Object
    DATA ImageList     EXPORTED
    DATA HotImageList  EXPORTED
    DATA Property      EXPORTED
-   
+   DATA ItemID        EXPORTED INIT 0
+
    METHOD Init()      CONSTRUCTOR
    //DESTRUCTOR MenuDest
    METHOD Create()
@@ -101,6 +102,7 @@ METHOD Context( hWnd, x, y ) CLASS Menu
     DEFAULT hWnd TO ::Parent:hWnd
     DEFAULT x    TO ::Left
     DEFAULT y    TO ::Top
+    ::ItemID := 0
 RETURN TrackPopupMenu( ::hMenu, ::Style, x, y, 0, hWnd )
 
 //-------------------------------------------------------------------------------------------------------
@@ -299,7 +301,6 @@ RETURN oItem
 //-------------------------------------------------------------------------------------------------------
 
 CLASS MenuPopup FROM Menu
-   DATA ByPos EXPORTED INIT .T.
    METHOD Init()      CONSTRUCTOR
    METHOD Create()
 ENDCLASS
@@ -331,9 +332,7 @@ METHOD Create() CLASS MenuPopup
 
    lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
    lpMenuInfo:fMask  := MIM_STYLE
-   IF ::ByPos
-      lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
-   ENDIF
+   lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
    SetMenuInfo( ::hMenu, lpMenuInfo )
 RETURN Self
 
@@ -350,7 +349,6 @@ CLASS ContextMenu INHERIT Component
    DATA Caption         EXPORTED INIT "ContextMenu"
    DATA Result          EXPORTED
    DATA xImageList      EXPORTED
-   DATA ByPos           EXPORTED INIT .T.
    ACCESS ImageList     INLINE __ChkComponent( Self, ::xImageList ) PERSISTENT
    ASSIGN ImageList(o)  INLINE ::xImageList := o
    
@@ -373,11 +371,9 @@ METHOD Init( oParent ) CLASS ContextMenu
    Super:Init( oParent )
    ::Parent := oParent
    ::Menu := MenuPopup( ::Owner )
-   ::Menu:Style := TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD
+   ::Menu:Style := TPM_LEFTALIGN | TPM_TOPALIGN
    IF ::__ClassInst != NIL
       ::Menu:Style := TPM_CENTERALIGN | TPM_LEFTBUTTON
-   ELSE
-      ::Menu:ByPos := ::ByPos
    ENDIF
    ::lCreated := .T.
 RETURN Self
@@ -389,7 +385,6 @@ RETURN Self
 METHOD Show( x, y ) CLASS ContextMenu
    LOCAL nRes := 0, oItem, rc, pt := (struct POINT)
 
-   ::Menu:ByPos := ::ByPos
    ::Menu:Create()
 
    FOR EACH oItem IN ::Menu:aItems
