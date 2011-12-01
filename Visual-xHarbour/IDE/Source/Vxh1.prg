@@ -6543,6 +6543,7 @@ METHOD Init( oParent ) CLASS RegOle
    ::Form:GridColumn1:Caption := ""
    ::Form:GridColumn1:Width   := 20
    ::Form:GridColumn1:Representation := 3
+   ::Form:GridColumn1:SelOnlyRep := .F.
    ::Update()
 
    ::SetFocus()

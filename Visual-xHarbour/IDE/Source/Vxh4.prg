@@ -1924,7 +1924,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
    LOCAL oItem, rc, cType, n, cProp, cText, oFont, cFont
    ( hWnd )
    IF nMsg == WM_USER + 4767
-      IF ( oItem := ::GetSelected() ) != NIL
+      IF ( oItem := ::GetSelected() ) != NIL .AND. ::ActiveObject:HasMessage( "Dock" )
          oItem:ColItems[1]:Value := ::ActiveObject:Dock:Margins
          ::InvalidateRect(,.F.)
       ENDIF

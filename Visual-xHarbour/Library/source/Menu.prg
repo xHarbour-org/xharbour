@@ -51,9 +51,7 @@ CLASS Menu INHERIT Object
    //DESTRUCTOR MenuDest
    METHOD Create()
    METHOD Context()
-   METHOD Destroy()         INLINE DestroyMenu( ::hMenu )
    METHOD EnableItem()
-   METHOD DisableItem(nId ) INLINE ::EnableItem( nId, .F. )
    METHOD GetSubMenu()
    METHOD GetMenuByHandle()
    METHOD GetMenuById()
@@ -63,7 +61,9 @@ CLASS Menu INHERIT Object
    METHOD ODProc()
    METHOD GetItem()
 
-   METHOD Set()
+   METHOD Set()             INLINE SetMenu( ::Parent:hWnd, ::hMenu )
+   METHOD Destroy()         INLINE DestroyMenu( ::hMenu )
+   METHOD DisableItem(nId ) INLINE ::EnableItem( nId, .F. )
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -104,12 +104,6 @@ METHOD Context( hWnd, x, y ) CLASS Menu
 RETURN TrackPopupMenu( ::hMenu, ::Style, x, y, 0, hWnd )
 
 //-------------------------------------------------------------------------------------------------------
-
-METHOD Set( oWnd )
-   DEFAULT oWnd TO ::Parent
-RETURN SetMenu( ::Parent:hWnd, ::hMenu )
-
-//-----------------------------------------------------------------------------------------------------
 
 METHOD OdProc( hWnd,nMsg,nwParam,nlParam ) CLASS Menu
 
@@ -305,6 +299,7 @@ RETURN oItem
 //-------------------------------------------------------------------------------------------------------
 
 CLASS MenuPopup FROM Menu
+   DATA ByPos EXPORTED INIT .T.
    METHOD Init()      CONSTRUCTOR
    METHOD Create()
 ENDCLASS
@@ -336,7 +331,9 @@ METHOD Create() CLASS MenuPopup
 
    lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
    lpMenuInfo:fMask  := MIM_STYLE
-   lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
+   IF ::ByPos
+      lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
+   ENDIF
    SetMenuInfo( ::hMenu, lpMenuInfo )
 RETURN Self
 
@@ -345,14 +342,15 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 CLASS ContextMenu INHERIT Component
-   DATA hMenuHook     EXPORTED
-   DATA Parent        EXPORTED
-   DATA Menu          EXPORTED
-   DATA SelPopup      PROTECTED INIT .F.
-   DATA MenuWnd       PROTECTED
-   DATA Caption       EXPORTED INIT "ContextMenu"
-
+   DATA hMenuHook       EXPORTED
+   DATA Parent          EXPORTED
+   DATA Menu            EXPORTED
+   DATA SelPopup        PROTECTED INIT .F.
+   DATA MenuWnd         PROTECTED
+   DATA Caption         EXPORTED INIT "ContextMenu"
+   DATA Result          EXPORTED
    DATA xImageList      EXPORTED
+   DATA ByPos           EXPORTED INIT .T.
    ACCESS ImageList     INLINE __ChkComponent( Self, ::xImageList ) PERSISTENT
    ASSIGN ImageList(o)  INLINE ::xImageList := o
    
@@ -375,9 +373,11 @@ METHOD Init( oParent ) CLASS ContextMenu
    Super:Init( oParent )
    ::Parent := oParent
    ::Menu := MenuPopup( ::Owner )
-   ::Menu:Style := TPM_LEFTALIGN | TPM_TOPALIGN
+   ::Menu:Style := TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD
    IF ::__ClassInst != NIL
       ::Menu:Style := TPM_CENTERALIGN | TPM_LEFTBUTTON
+   ELSE
+      ::Menu:ByPos := ::ByPos
    ENDIF
    ::lCreated := .T.
 RETURN Self
@@ -389,6 +389,7 @@ RETURN Self
 METHOD Show( x, y ) CLASS ContextMenu
    LOCAL nRes := 0, oItem, rc, pt := (struct POINT)
 
+   ::Menu:ByPos := ::ByPos
    ::Menu:Create()
 
    FOR EACH oItem IN ::Menu:aItems

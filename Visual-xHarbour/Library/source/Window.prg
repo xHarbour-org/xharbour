@@ -1014,11 +1014,17 @@ METHOD Create( oParent ) CLASS Window
       ::OriginalRect[4] := ::VertScrollSize
     ELSE
       ::VertScrollSize := ::ClientHeight
+      IF ::__ClassInst != NIL
+         ::__ClassInst:VertScrollSize := ::ClientHeight
+      ENDIF
    ENDIF
    IF ::HorzScrollSize > 0
       ::OriginalRect[3] := ::HorzScrollSize
     ELSE
       ::HorzScrollSize := ::ClientWidth
+      IF ::__ClassInst != NIL
+         ::__ClassInst:HorzScrollSize := ::ClientWidth
+      ENDIF
    ENDIF
    ::Font:Set( Self )
 

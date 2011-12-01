@@ -8,6 +8,15 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-11-30 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed activex browse to show all check boxes
+   ! Fixed RTE selecting objects without a DOCK property
+   ! Fixed DataGrid ButtonMenu to display only when the button is fully visible not on the
+     first clock of the row
+   ! Fixed ContextMenu to return the selected ID instead of the selected position by setting
+     ByPos=true/false.
+   ! Fixed multiple generation of properties HorzScrollSize and VertScrollSize
+
 2011-11-29 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed GPF assigning a DataTable filename
    ! Fixed bug in character properties not being initialized with current values

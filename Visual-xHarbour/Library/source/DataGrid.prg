@@ -134,6 +134,7 @@ CLASS DataGrid INHERIT Control
    DATA __CheckPos              PROTECTED
    DATA __nScrolled             PROTECTED INIT 0
    DATA __lMouseDown            PROTECTED INIT .F.
+   DATA __MenuReturn            PROTECTED INIT 1
    DATA __lSizeMouseDown        PROTECTED INIT .F.
    DATA __lMoveMouseDown        PROTECTED INIT .F.
    DATA __SelCol                PROTECTED INIT 0
@@ -1124,6 +1125,7 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    LOCAL nClickRow, lUpdt := .F.
    LOCAL nClickCol, lShift, lCtrl, pt
    LOCAL lLineChange:=.F.
+   LOCAL lSameRow := .F.
    (nwParam)
    ::RowCountUsable  := MIN( Int(  ::__DataHeight/::ItemHeight ), ::RowCount )
 
@@ -1294,6 +1296,8 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
 
    ::__GoToRec( ::__DisplayArray[ nClickRow ][2] )
 
+   lSameRow := nClickRow == ::RowPos
+
    ::RowPos := nClickRow
    
    IF nCol > 0
@@ -1341,17 +1345,26 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    ExecuteEvent( "OnClick", Self )
 
    ::__DisplayData( ::RowPos, , ::RowPos,  )
-   ::__lMouseDown := .T.
+
+   ::__lMouseDown := lSameRow
+
    ::__DisplayData( nClickRow, , nClickRow,  )
 
-   IF ::Children[ ::ColPos ]:ButtonMenu != NIL
-      pt := (struct POINT)
-      pt:x := ::Children[::ColPos]:aSelRect[1]
-      pt:y := ::Children[::ColPos]:aSelRect[4]
-      ClientToScreen( ::hWnd, @pt )
-      ::Children[ ::ColPos ]:ButtonMenu:Show( pt:x, pt:y )
+   IF ::__lMouseDown .AND. ::Children[ ::ColPos ]:ButtonMenu != NIL
+      IF ::__MenuReturn > 0
+         pt := (struct POINT)
+         pt:x := ::Children[::ColPos]:aSelRect[1]
+         pt:y := ::Children[::ColPos]:aSelRect[4]
+         ClientToScreen( ::hWnd, @pt )
+         ::Children[ ::ColPos ]:ButtonMenu:ByPos := .F.
+         ::__MenuReturn := ::Children[ ::ColPos ]:ButtonMenu:Show( pt:x, pt:y )
+       ELSE
+         ::__MenuReturn := 1
+      ENDIF
       ::__lMouseDown := .F.
       ::__DisplayData( ::RowPos, , ::RowPos,  )
+    ELSE
+      ::__MenuReturn := 1
    ENDIF
 
    ::__Edit( 1, xPos, yPos, GRID_LCLICK )
