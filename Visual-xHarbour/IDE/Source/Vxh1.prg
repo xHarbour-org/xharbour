@@ -4653,60 +4653,62 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
       lPro := .T.
    #endif
    FOR n := 1 TO LEN( ::Forms )
-       IF ::Forms[n]:Cargo == NIL
-          IF ::Forms[n]:lCustom
-             cName := ::Forms[n]:Name
-             IF ::Forms[n]:__OldName != NIL
-                cName := ::Forms[n]:__OldName
-                FERASE( cSourcePath + "\" + cName + ".xfm" )
-                FERASE( cSourcePath + "\" + cName + ".prg" )
-             ENDIF
-
-             IF ( i := ASCAN( ::Application:CControls, {|cCC| UPPER(cName) == UPPER( STRTRAN( SplitFile(cCC)[2], ".xfm" ) ) } ) ) > 0
-                ADEL( ::Application:CControls, i, .T. )
-             ENDIF
-
-             IF ASCAN( ::Application:CControls, cSourcePath + "\" + ::Forms[n]:Name + ".xfm",,, .T. ) == 0
-                AADD( ::Application:CControls, cSourcePath + "\" + ::Forms[n]:Name + ".xfm" )
-             ENDIF
-
+       IF ::Forms[n]:Cargo != NIL
+          ::LoadForm( ::Forms[n]:Cargo,,, .T., ::Forms[n] )
+          ::Forms[n]:Cargo := NIL
+       ENDIF
+       IF ::Forms[n]:lCustom
+          cName := ::Forms[n]:Name
+          IF ::Forms[n]:__OldName != NIL
+             cName := ::Forms[n]:__OldName
+             FERASE( cSourcePath + "\" + cName + ".xfm" )
+             FERASE( cSourcePath + "\" + cName + ".prg" )
           ENDIF
 
-          IF ::Forms[n]:__lModified .OR. lForce
+          IF ( i := ASCAN( ::Application:CControls, {|cCC| UPPER(cName) == UPPER( STRTRAN( SplitFile(cCC)[2], ".xfm" ) ) } ) ) > 0
+             ADEL( ::Application:CControls, i, .T. )
+          ENDIF
 
-             aChildEvents := {}
+          IF ASCAN( ::Application:CControls, cSourcePath + "\" + ::Forms[n]:Name + ".xfm",,, .T. ) == 0
+             AADD( ::Application:CControls, cSourcePath + "\" + ::Forms[n]:Name + ".xfm" )
+          ENDIF
 
-             cWindow := ::GenerateControl( ::Forms[n], "", IIF( ::Forms[n]:MDIChild, "MDIChildWindow", IIF( ::Forms[n]:Modal, "Dialog", IIF( AT( "Window", ::Forms[n]:Name ) > 0, "Window", "WinForm" ) ) ), .F., n, @aChildEvents, @nInsMetPos, ::Forms[n]:lCustom )
+       ENDIF
 
-             cChildEvents := ""
-             FOR EACH cEvent IN aChildEvents
-                 IF AT( "METHOD "+cEvent+"()", cWindow+cChildEvents ) == 0
-                    cChildEvents += "   METHOD "+cEvent+"()" + CRLF
-                 ENDIF
-             NEXT
+       IF ::Forms[n]:__lModified .OR. lForce
 
-             cText := SUBSTR( cWindow, nInsMetPos )
-             cWindow := SUBSTR( cWindow, 1, nInsMetPos ) + cChildEvents + cText
+          aChildEvents := {}
 
-             oFile := CFile( ::Forms[n]:Name + ".xfm" )
-             oFile:Path := cSourcePath
+          cWindow := ::GenerateControl( ::Forms[n], "", IIF( ::Forms[n]:MDIChild, "MDIChildWindow", IIF( ::Forms[n]:Modal, "Dialog", IIF( AT( "Window", ::Forms[n]:Name ) > 0, "Window", "WinForm" ) ) ), .F., n, @aChildEvents, @nInsMetPos, ::Forms[n]:lCustom )
+
+          cChildEvents := ""
+          FOR EACH cEvent IN aChildEvents
+              IF AT( "METHOD "+cEvent+"()", cWindow+cChildEvents ) == 0
+                 cChildEvents += "   METHOD "+cEvent+"()" + CRLF
+              ENDIF
+          NEXT
+
+          cText := SUBSTR( cWindow, nInsMetPos )
+          cWindow := SUBSTR( cWindow, 1, nInsMetPos ) + cChildEvents + cText
+
+          oFile := CFile( ::Forms[n]:Name + ".xfm" )
+          oFile:Path := cSourcePath
+          IF x == 2
+             oFile:Path := ::Forms[n]:PathName
+          ENDIF
+          oFile:FileBuffer := cWindow
+          oFile:Save()
+
+          IF ::Forms[n]:Editor:lModified .OR. lForce .OR. !FILE( cSourcePath + "\" + ::Forms[n]:Name + ".prg" )
+             xPath := cSourcePath
+             xName := ::Forms[n]:Name + ".prg"
              IF x == 2
-                oFile:Path := ::Forms[n]:PathName
+                xPath := oFile:Path
              ENDIF
-             oFile:FileBuffer := cWindow
-             oFile:Save()
-
-             IF ::Forms[n]:Editor:lModified .OR. lForce .OR. !FILE( cSourcePath + "\" + ::Forms[n]:Name + ".prg" )
-                xPath := cSourcePath
-                xName := ::Forms[n]:Name + ".prg"
-                IF x == 2
-                   xPath := oFile:Path
-                ENDIF
-                ::Forms[n]:Editor:Save( xPath + "\" + xName )
-             ENDIF
-
-             ::Forms[n]:__lModified := .F.
+             ::Forms[n]:Editor:Save( xPath + "\" + xName )
           ENDIF
+
+          ::Forms[n]:__lModified := .F.
        ENDIF
    NEXT
 
@@ -5365,6 +5367,8 @@ METHOD Build( lForce ) CLASS Project
    lBuilt := .F.
    TRY
       cPath := ::Properties:Path
+      cCurDir := GetCurrentDirectory()
+      DirChange( cPath )
       
       cProject := cPath + "\" + ::Properties:Name + aTargetTypes[ ::Properties:TargetType ]
       IF !EMPTY( ::Properties:TargetName )
@@ -5518,8 +5522,6 @@ METHOD Build( lForce ) CLASS Project
       bErrorHandler := {|oError|GUI_ErrorGrid( oError, MEMOREAD( cProject + ".log" ) )}
 
       //-----------------------------------------------------
-      cCurDir := GetCurrentDirectory()
-      DirChange( cPath )
       lBuilt := oProject:Make( bErrorHandler, bProgress )
       DirChange( cCurDir )
       //-----------------------------------------------------
