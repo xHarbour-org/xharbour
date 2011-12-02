@@ -2279,6 +2279,7 @@ CLASS Project
    METHOD DebugStop()
    METHOD ParseXFM()
    METHOD LoadForm()
+   METHOD LoadUnloadedImages()
    METHOD ParseRC()
    METHOD New()
    METHOD OpenDesigner()
@@ -3959,6 +3960,30 @@ METHOD Open( cProject ) CLASS Project
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
+METHOD LoadUnloadedImages( cFile ) CLASS Project
+   LOCAL n, aImage, cLine, hFile := FOpen( cFile, FO_READ )
+   WHILE HB_FReadLine( hFile, @cLine, XFM_EOL ) == 0
+      cLine := ALLTRIM( cLine )
+      IF UPPER( LEFT( cLine, 6 ) ) == "::ICON" .OR. UPPER( LEFT( cLine, 10 ) ) == ":IMAGENAME" 
+         IF ( n := AT( "{", cLine ) ) > 0
+            aImage := &(SUBSTR( cLine, n ))
+            IF ASCAN( ::aImages, {|a| a[2] == aImage[2] } ) == 0
+               AADD( ::aImages, { aImage[1], aImage[2], UPPER(RIGHT(aImage[1],3)), NIL } )
+            ENDIF
+         ENDIF
+       ELSEIF UPPER( cLine ) HAS "(?i)^:ADDIMAGE\("
+         cLine := STRTRAN( cLine, ":AddImage(" )
+         cLine := STRTRAN( cLine, ")" )
+         aImage := hb_aTokens( cLine, "," )
+         IF ASCAN( ::aImages, {|a| a[2] == &(aImage[1]) } ) == 0
+            AADD( ::aImages, { &(aImage[6]), &(aImage[1]), UPPER(RIGHT(&(aImage[6]),3)), NIL } )
+         ENDIF
+      ENDIF
+   ENDDO
+   FClose( hFile )
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
 METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
    LOCAL cObjectName, cXfm, cLine, nLine, aChildren, hFile, cClassName, aTokens
    LOCAL cSourcePath := ::Properties:Path + "\" + ::Properties:Source
@@ -4653,12 +4678,10 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
       lPro := .T.
    #endif
    FOR n := 1 TO LEN( ::Forms )
-
-       // For as much as it hurts we need to load the unloaded forms to load their resources or they 
-       // won't be generated in the resource file
+      
+       // Unloaded forms need to report resources to be generated in RC file!!!
        IF ::Forms[n]:Cargo != NIL
-          ::LoadForm( ::Forms[n]:Cargo,,, .T., ::Forms[n] )
-          ::Forms[n]:Cargo := NIL
+          ::LoadUnloadedImages( cSourcePath + "\" + ::Forms[n]:Cargo )
        ENDIF
        //-------------------------------------------------------------------------------------------
 
