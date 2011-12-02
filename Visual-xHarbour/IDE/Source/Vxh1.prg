@@ -4653,10 +4653,15 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
       lPro := .T.
    #endif
    FOR n := 1 TO LEN( ::Forms )
+
+       // For as much as it hurts we need to load the unloaded forms to load their resources or they 
+       // won't be generated in the resource file
        IF ::Forms[n]:Cargo != NIL
           ::LoadForm( ::Forms[n]:Cargo,,, .T., ::Forms[n] )
           ::Forms[n]:Cargo := NIL
        ENDIF
+       //-------------------------------------------------------------------------------------------
+
        IF ::Forms[n]:lCustom
           cName := ::Forms[n]:Name
           IF ::Forms[n]:__OldName != NIL
