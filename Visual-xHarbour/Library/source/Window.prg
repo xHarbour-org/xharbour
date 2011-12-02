@@ -3192,7 +3192,10 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               ENDIF
            ENDIF
            IF oItem != NIL
-              oItem:Menu:ItemID := oItem:id
+              TRY
+                 oItem:Menu:ItemID := oItem:id
+              CATCH
+              END
               IF HGetPos( oItem:EventHandler, "OnClick" ) != 0
                  oForm := oItem:Form
                  IF ::ClsName == "CCTL"
