@@ -53,6 +53,11 @@
 #define HIS_HOT     2
 #define HIS_PRESSED 3
 
+#define CREP_NORMAL      1
+#define CREP_PROGRESSBAR 2
+#define CREP_CHECKBOX    3
+#define CREP_BUTTON      4
+
 #define HEADERSIZEGAP  5
 
 #xtranslate CEIL( <x> ) => ( if( <x> - Int( <x> ) > 0 , Int( <x> )+1, Int( <x> ) ) )
@@ -995,7 +1000,7 @@ RETURN 0
 
 //----------------------------------------------------------------------------------
 METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
-   LOCAL lMouse, nPos, aDrag, aMove, i, nRec, aData := {}
+   LOCAL lMouse, nPos, pt, aDrag, aMove, i, nRec, aData := {}
    (nwParam)
    (xPos)
 
@@ -1065,7 +1070,7 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
       ::Update()
     ELSEIF LEN( ::__DisplayArray ) > 0
       ::UpdateRow()
-      IF lMouse .AND. nPos == ::RowPos .AND. ::Children[ ::ColPos ]:Representation == 4
+      IF lMouse .AND. nPos == ::RowPos .AND. ::Children[ ::ColPos ]:Representation == CREP_BUTTON
          ExecuteEvent( "ButtonClicked", ::Children[ ::ColPos ] )
       ENDIF
    ENDIF
@@ -1078,7 +1083,17 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
    ENDIF
    
    IF !::__lSizeMouseDown .AND. ::__DragColumn == 0 .AND. ::__SelCol > 0
-      ::OnHeaderClick( ::__SelCol )
+      IF ::Children[ ::__SelCol ]:HeaderMenu != NIL
+         pt := (struct POINT)
+         pt:x := ::Children[::__SelCol]:aSelRect[1]
+         pt:y := ::HeaderHeight
+         ClientToScreen( ::hWnd, @pt )
+         ::Children[ ::__SelCol ]:DrawHeader( , , , , .T. )
+         ::Children[ ::__SelCol ]:HeaderMenu:Show( pt:x, pt:y )
+         ::Children[ ::__SelCol ]:DrawHeader( , , , , .F. )
+       ELSE
+         ::OnHeaderClick( ::__SelCol )
+      ENDIF      
    ENDIF
    ::__lSizeMouseDown := .F.
    ::__lMoveMouseDown := .F.
@@ -1346,27 +1361,30 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
 
    ::__DisplayData( ::RowPos, , ::RowPos,  )
 
-   ::__lMouseDown := lSameRow
-
+   ::__lMouseDown := .T.
+   IF ::Children[ ::ColPos ]:Representation == CREP_BUTTON
+      ::__lMouseDown := lSameRow
+   ENDIF
    ::__DisplayData( nClickRow, , nClickRow,  )
-
-   IF ::__lMouseDown .AND. ::Children[ ::ColPos ]:ButtonMenu != NIL
-      IF ::__MenuReturn > 0
-         pt := (struct POINT)
-         pt:x := ::Children[::ColPos]:aSelRect[1]
-         pt:y := ::Children[::ColPos]:aSelRect[4]
-         ClientToScreen( ::hWnd, @pt )
-         ::Children[ ::ColPos ]:ButtonMenu:Show( pt:x, pt:y )
-         ::__MenuReturn := ::Children[ ::ColPos ]:ButtonMenu:Menu:ItemID
+   
+   IF ::Children[ ::ColPos ]:Representation == CREP_BUTTON
+      IF ::__lMouseDown .AND. ::Children[ ::ColPos ]:ButtonMenu != NIL
+         IF ::__MenuReturn > 0
+            pt := (struct POINT)
+            pt:x := ::Children[::ColPos]:aSelRect[1]
+            pt:y := ::Children[::ColPos]:aSelRect[4]
+            ClientToScreen( ::hWnd, @pt )
+            ::Children[ ::ColPos ]:ButtonMenu:Show( pt:x, pt:y )
+            ::__MenuReturn := ::Children[ ::ColPos ]:ButtonMenu:Menu:ItemID
+          ELSE
+            ::__MenuReturn := 1
+         ENDIF
+         ::__lMouseDown := .F.
+         ::__DisplayData( ::RowPos, , ::RowPos,  )
        ELSE
          ::__MenuReturn := 1
       ENDIF
-      ::__lMouseDown := .F.
-      ::__DisplayData( ::RowPos, , ::RowPos,  )
-    ELSE
-      ::__MenuReturn := 1
    ENDIF
-
    ::__Edit( 1, xPos, yPos, GRID_LCLICK )
 RETURN NIL
 
@@ -3646,6 +3664,7 @@ CLASS GridColumn INHERIT Object
 
    PROPERTY ContextMenu GET __ChkComponent( Self, ::xContextMenu )
    PROPERTY ButtonMenu  GET __ChkComponent( Self, ::xButtonMenu )
+   PROPERTY HeaderMenu  GET __ChkComponent( Self, ::xHeaderMenu )
 
    PROPERTY ImageAlignment    READ xImageAlignment   WRITE Refresh DEFAULT 1
    PROPERTY Alignment         READ xAlignment        WRITE SetAlignment  DEFAULT 1

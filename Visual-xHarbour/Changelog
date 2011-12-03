@@ -11,6 +11,7 @@
 2011-12-01 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed menu item property name generation being duplicted in design mode because of the
      [Add New Item] item.
+   ! Added DataGrid columns HeaderMenu that will show upon clicking on it
 
 2011-11-30 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed activex browse to show all check boxes
