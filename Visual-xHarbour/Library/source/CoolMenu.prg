@@ -387,8 +387,12 @@ CLASS CoolMenuItem INHERIT ToolButton
 ENDCLASS
 
 METHOD Init( oParent ) CLASS CoolMenuItem
+   LOCAL oSubItem
    IF oParent:__ClassInst != NIL .AND. oParent:__xCtrlName == "CoolMenuItem"
-      RETURN CMenuItem( oParent )
+      oSubItem:CMenuItem()
+      oSubItem:GenerateMember := .F.
+      oSubItem:Init( oParent )
+      RETURN oSubItem
    ENDIF
    ::IsMenuItem := .T.
    ::__IsControl  := .F.
