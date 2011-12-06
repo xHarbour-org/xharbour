@@ -1876,9 +1876,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                  IF ::Children[i]:SelOnlyRep .AND. !lSelected
                     nRep := 1
                  ENDIF
-                 IF lSelected
-                    ::Children[i]:aSelRect := { zLeft, nTop, nRight, nBottom }
-                 ENDIF
+                 ::Children[i]:aSelRect := { zLeft, nTop, nRight, nBottom }
                  IF ( lSelected .OR. ::Children[i]:ShowControls ) .AND. ::Children[i]:Control != NIL
                     DEFAULT ::Children[i]:ControlObject TO EVAL( ::Children[i]:Control, Self, nRec, i )
                     IF !lHide .AND. ::Children[i]:ControlObject != NIL .AND. RIGHT( ::Children[i]:ControlObject:ClsName, 4 ) != "Edit" .AND. VALTYPE( nStatus ) != "B"
@@ -2067,6 +2065,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                     ::Children[i]:DrawHeader( hMemDC, aText[1], nHeaderRight, x )
                  ENDIF
 
+                 ::Children[i]:aSelRect := { zLeft, nTop, nRight, nBottom }
 
                  nLeft  += ::Children[i]:Width
                  iLeft  += ::Children[i]:Width
