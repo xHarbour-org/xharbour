@@ -3488,7 +3488,8 @@ __aProps["A"] := { { "AutoHScroll",             "Style"     },;
 
 __aProps["B"] := { { "BandChild",               ""           },;
                    { "BaudRate",                ""           },;
-                   { "ButtonMenu",              "Behavior" },;
+                   { "ButtonMenu",              "Behavior"   },;
+                   { "ButtonText",              "Appearance" },;
                    { "BoldSelection",           "Appearance" },;
                    { "BalloonTipIcon",          "Appearance" },;
                    { "BalloonTipText",          "Appearance" },;

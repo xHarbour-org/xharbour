@@ -2209,6 +2209,9 @@ METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, x, y, aMet
          hTheme := OpenThemeData(,"button")
          DrawThemeBackground( hTheme, hDC, BP_PUSHBUTTON, nStatus, aRect, aRect )
          CloseThemeData( hTheme )
+         IF ::Children[i]:ButtonText != NIL
+            cText := ::Children[i]:ButtonText
+         ENDIF
          _DrawText( hDC, cText, aRect, DT_CENTER | DT_VCENTER | DT_SINGLELINE )
       ENDIF
 
@@ -3660,6 +3663,8 @@ CLASS GridColumn INHERIT Object
    DATA Data                         PUBLISHED
    
    DATA EnumImageAlignment    EXPORTED INIT { {"Left", "Center", "Right"}, {1,2,3} }
+
+   DATA ButtonText                   PUBLISHED
 
    PROPERTY ContextMenu GET __ChkComponent( Self, ::xContextMenu )
    PROPERTY ButtonMenu  GET __ChkComponent( Self, ::xButtonMenu )
