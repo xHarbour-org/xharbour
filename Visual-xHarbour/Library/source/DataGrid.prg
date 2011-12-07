@@ -2200,20 +2200,29 @@ METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, x, y, aMet
       ENDIF
 
     ELSEIF nRep == 4 .AND. ::Children[i]:Representation == 4 
-      nStatus := PBS_NORMAL
-      IF ::__lMouseDown  .AND. i == ::ColPos
-         nStatus := PBS_PRESSED
-      ENDIF
 
       IF lXP
+         nStatus := PBS_NORMAL
+         IF ::__lMouseDown  .AND. i == ::ColPos
+            nStatus := PBS_PRESSED
+         ENDIF
          hTheme := OpenThemeData(,"button")
          DrawThemeBackground( hTheme, hDC, BP_PUSHBUTTON, nStatus, aRect, aRect )
          CloseThemeData( hTheme )
-         IF ! EMPTY( ::Children[i]:ButtonText )
-            cText := ::Children[i]:ButtonText
+       ELSE
+         nStatus := DFCS_BUTTONPUSH
+         IF ::__lMouseDown  .AND. i == ::ColPos
+            nStatus := nStatus | DFCS_PUSHED
          ENDIF
-         _DrawText( hDC, cText, aRect, DT_CENTER | DT_VCENTER | DT_SINGLELINE )
+         _DrawFrameControl( hDC, aRect, DFC_BUTTON, nStatus )
       ENDIF
+      IF ::ShowSelectionBorder .AND. i == ::ColPos
+         _DrawFocusRect( hDC, {aRect[1]+3, aRect[2]+3, aRect[3]-3, aRect[4]-3} )
+      ENDIF
+      IF ! EMPTY( ::Children[i]:ButtonText )
+         cText := ::Children[i]:ButtonText
+      ENDIF
+      _DrawText( hDC, cText, aRect, DT_CENTER | DT_VCENTER | DT_SINGLELINE )
 
    ENDIF
 
