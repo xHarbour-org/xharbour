@@ -2209,7 +2209,7 @@ METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, x, y, aMet
          hTheme := OpenThemeData(,"button")
          DrawThemeBackground( hTheme, hDC, BP_PUSHBUTTON, nStatus, aRect, aRect )
          CloseThemeData( hTheme )
-         IF ::Children[i]:ButtonText != NIL
+         IF ! EMPTY( ::Children[i]:ButtonText )
             cText := ::Children[i]:ButtonText
          ENDIF
          _DrawText( hDC, cText, aRect, DT_CENTER | DT_VCENTER | DT_SINGLELINE )
