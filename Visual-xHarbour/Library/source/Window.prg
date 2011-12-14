@@ -3129,11 +3129,9 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                  pt := (struct POINT)
                  pt:x := LOWORD(nlparam)
                  pt:y := 0
-                 ClientToScreen( oObj:Form:hWnd, @pt ) // BUG, it has to test for HWND
                  ScreenToClient( nwParam, @pt )
                  
                  IF ( n := oObj:ColFromPos( pt:x ) ) > 0
-
                     nRet := ExecuteEvent( "OnContextMenu", oObj:Children[ n ] )
 
                     IF VALTYPE( nRet ) $ "UO" .AND. oObj:Children[ n ]:ContextMenu != NIL
