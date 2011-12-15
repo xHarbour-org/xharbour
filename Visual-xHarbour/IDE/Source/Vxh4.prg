@@ -951,7 +951,7 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
          oObj:Set( oActiveObject )
       ENDIF
       
-      IF cProp $ "LeftTopWidthHeight"
+      IF cProp IN {"Left","Top","Width","Height"}
          oActiveObject:MoveWindow()
          oActiveObject:Parent:InvalidateRect()
       ENDIF
@@ -3434,7 +3434,6 @@ ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------------------------------
 
-
 FUNCTION GetProperCase( cProp )
    LOCAL n := ASCAN( __aProps[ UPPER( cProp[1] ) ], {|a| UPPER( a[1] ) == UPPER( cProp ) } )
    IF n > 0
@@ -3600,6 +3599,7 @@ __aProps["H"] := { { "HasStrings",              "Style" },;
                    { "HeaderMenu",              "Behavior" },;
                    { "HandShake",               "" },;
                    { "HideInvert",              "" },;
+                   { "HTMLBody",                "" },;
                    { "HorzPadding",             "Appearance" },;
                    { "HeaderFont",              "Appearance" },;
                    { "HasButtons",              "Appearance" },;
@@ -3802,6 +3802,13 @@ __aProps["S"] := { { "SetAlternate",            "Set" },;
                    { "ServerType",              "" },;
                    { "ServiceName",             "" },;
                    { "StopBits",                "" },;
+                   { "SendUsing",               "" },;
+                   { "SMTPServer",              "" },;
+                   { "SMTPServerPort",          "" },;
+                   { "SMTPAuthenticate",        "" },;
+                   { "SMTPUseSSL",              "" },;
+                   { "SendUserName",            "" },;
+                   { "SendPassword",            "" },;
                    { "Stretch",                 "Image" },;
                    { "SelOnlyRep",              "Behavior" },;
                    { "ShowGrid",                "Appearance" },;
@@ -3848,6 +3855,7 @@ __aProps["T"] := { { "TabStop",                 "Style" },;
                    { "Text",                    "" },;
                    { "Title",                   "" },;
                    { "TopMargin",               "" },;
+                   { "TextBody",                "" },;
                    { "TargetName",              "Build" },;
                    { "ThemeActive",             "Build" },;
                    { "TargetType",              "Build" },;

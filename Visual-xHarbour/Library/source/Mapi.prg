@@ -17,20 +17,20 @@
 #include "fileio.ch"
 
 CLASS eMail INHERIT Component
-   DATA To                EXPORTED
-   DATA From              EXPORTED
+   DATA To                PUBLISHED
+   DATA From              PUBLISHED
    DATA Subject           EXPORTED
    DATA HTMLBody          EXPORTED
    DATA TextBody          EXPORTED
+
+   DATA SendUsing         PUBLISHED INIT 2
+   DATA SMTPServer        PUBLISHED
+   DATA SMTPServerPort    PUBLISHED
+   DATA SMTPAuthenticate  PUBLISHED INIT .T.
+   DATA SMTPUseSSL        PUBLISHED INIT .F.
    
-   DATA SendUsing         EXPORTED INIT 2
-   DATA SMTPServer        EXPORTED
-   DATA SMTPServerPort    EXPORTED
-   DATA SMTPAuthenticate  EXPORTED INIT .T.
-   DATA SMTPUseSSL        EXPORTED INIT .F.
-   
-   DATA SendUserName      EXPORTED
-   DATA SendPassword      EXPORTED
+   DATA SendUserName      PUBLISHED
+   DATA SendPassword      PUBLISHED
    METHOD Init() CONSTRUCTOR
    METHOD Send()
 ENDCLASS

@@ -160,7 +160,6 @@ METHOD Create() CLASS ToolBox
    AADD( ::aButtons[3][2], { "RichTextBox", lPro } )
    AADD( ::aButtons[3][2], { "WebBrowser", lPro } )
    AADD( ::aButtons[3][2], { "FreeImage", lPro } )
-   AADD( ::aButtons[3][2], { "eMail", lPro } )
 
    AADD( ::aButtons[3][2], { "PageScroller", .T. } )
    AADD( ::aButtons[3][2], { "FolderTree", .T. } )
@@ -188,6 +187,7 @@ METHOD Create() CLASS ToolBox
    AADD( ::aButtons[4][2], { "FtpClient", lPro } )
    AADD( ::aButtons[4][2], { "ServiceController", lPro } )
    AADD( ::aButtons[4][2], { "WinSock", lPro } )
+   AADD( ::aButtons[4][2], { "eMail", lPro } )
 
    //Data
    //AADD( ::aButtons[5][2], { "BindingSource", .T. } )

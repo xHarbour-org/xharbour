@@ -7,6 +7,10 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2011-14-05 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added new eMail component
+
 2011-12-05 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed HeaderMenu error displaying on empty DataGrids.
    + Added column property "ButtonText" if the representation is a button it will draw 
