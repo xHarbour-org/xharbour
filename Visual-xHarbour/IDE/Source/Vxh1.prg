@@ -3242,7 +3242,7 @@ METHOD AddWindow( lReset, cFileName, lCustom, nPos ) CLASS Project
          :Height      := 300
          :Create()
          :Parent:Parent:OnParentSize()
-         ::CurrentForm := :this
+         ::CurrentForm := oWin
 
          :Parent:InvalidateRect()
 
@@ -4011,6 +4011,7 @@ METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
    
    IF oForm == NIL
       oForm := ::AddWindow( .F., cObjectName + ".prg", cClassName == "CUSTOMCONTROL" )
+      ::CurrentForm := oForm
       cSourcePath := ::Properties:Path + "\" + ::Properties:Source
       oForm:Editor:Load( cSourcePath + "\" + cObjectName + ".prg",, .F., .F. )
       ::Application:SourceEditor:oEditor := oForm:Editor

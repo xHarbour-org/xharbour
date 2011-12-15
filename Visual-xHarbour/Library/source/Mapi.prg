@@ -16,6 +16,72 @@
 #include "vxh.ch"
 #include "fileio.ch"
 
+CLASS eMail INHERIT Component
+   DATA To                EXPORTED
+   DATA From              EXPORTED
+   DATA Subject           EXPORTED
+   DATA HTMLBody          EXPORTED
+   DATA TextBody          EXPORTED
+   
+   DATA SendUsing         EXPORTED INIT 2
+   DATA SMTPServer        EXPORTED
+   DATA SMTPServerPort    EXPORTED
+   DATA SMTPAuthenticate  EXPORTED INIT .T.
+   DATA SMTPUseSSL        EXPORTED INIT .F.
+   
+   DATA SendUserName      EXPORTED
+   DATA SendPassword      EXPORTED
+   METHOD Init() CONSTRUCTOR
+   METHOD Send()
+ENDCLASS
+
+METHOD Init( oOwner ) CLASS eMail
+   ::__xCtrlName   := "eMail"
+   ::ClsName       := "eMail"
+   ::ComponentType := "eMail"
+   ::Super:Init( oOwner )
+RETURN Self
+
+METHOD Send() CLASS eMail
+   LOCAL oMsg, oConf, oFlds, cSchema
+   TRY
+      oMsg := GetActiveObject( "CDO.Message" )
+    CATCH
+      oMsg := CreateObject( "CDO.Message" )
+   END
+   TRY
+      oConf := GetActiveObject( "CDO.Configuration" )
+    CATCH
+      oConf := CreateObject("CDO.Configuration")
+   END
+   oFlds := oConf:Fields
+
+   cSchema := "http://schemas.microsoft.com/cdo/configuration/"
+   oFlds:Item( cSchema + "sendusing",        ::SendUsing )
+   oFlds:Item( cSchema + "smtpserver",       ::SMTPServer )
+   oFlds:Item( cSchema + "smtpserverport",   ::SMTPServerPort )
+   oFlds:Item( cSchema + "smtpauthenticate", ::SMTPAuthenticate )
+   oFlds:Item( cSchema + "sendusername",     ::SendUserName )
+   oFlds:Item( cSchema + "sendpassword",     ::SendPassword )
+   oFlds:Item( cSchema + "smtpusessl",       ::SMTPUseSSL )
+   oFlds:Update()
+
+   WITH OBJECT oMsg
+      :To       := ::To
+      :From     := ::From
+      :Subject  := ::Subject
+      :HTMLBody := ::HTMLBody
+      :TextBody := ::TextBody
+      :Configuration := oConf
+      :Send()
+   END
+   oMsg  := NIL
+   OConf := NIL
+   oFlds := NIL
+RETURN NIL
+
+//------------------------------------------------------------------------------------------------
+
 #define MAPI_ORIG  0
 #define MAPI_TO    1
 #define MAPI_CC    2
@@ -142,3 +208,4 @@ RETURN MAPISendMail( 0, 0, pMsg, ::__Flags, 0, IIF( LEN( aAttach ) > 1, aAttach,
 #define MAPI_E_INVALID_RECIPS  25
 #define MAPI_E_NOT_SUPPORTED  26
 */
+
