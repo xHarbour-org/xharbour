@@ -255,7 +255,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
          ENDDO
 
          IF lAuthLogin
-            IF !oInMail:Auth( cUser, cPass )
+            IF !oInMail:Auth( Strtran( cUser, "&at;", "@" ), cPass )
                lConnect := .F.
             ELSE
                lConnectPlain  := .T.
@@ -263,7 +263,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
          ENDIF
 
          IF lAuthPlain .AND. !lConnect
-            IF !oInMail:AuthPlain( cUser, cPass )
+            IF !oInMail:AuthPlain( Strtran( cUser, "&at;", "@" ), cPass )
                lConnect := .F.
             ENDIF
          ELSE
@@ -330,7 +330,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    NEXT
 
    IF lRead
-      oMail:hHeaders[ "Disposition-Notification-To" ] := cUser
+      oMail:hHeaders[ "Disposition-Notification-To" ] := Strtran( cUser, "&at;", "@" )
    ENDIF
 
    IF nPriority != 3

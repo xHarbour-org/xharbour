@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2011-12-15 10:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+   * source/típ/sendmail.prg
+     ! fixed Disposition-Notification-To field
+     
 2011-11-27 22:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
    * source/ct/files.c
    * source/rtl/console.c
