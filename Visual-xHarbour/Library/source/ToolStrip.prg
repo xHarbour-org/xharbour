@@ -110,9 +110,6 @@ METHOD Create() CLASS ToolStripContainer
    Super:Create()
    ::__SetVertex()
    ::__SetPosition()
-   IF ::__ClassInst != NIL .AND. PROCNAME(2) != "PROJECT:OPEN" 
-      ::__AddToolStrip( "ToolStrip" )
-   ENDIF
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------

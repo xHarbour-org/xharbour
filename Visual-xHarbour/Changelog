@@ -8,6 +8,9 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-12-16 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed ToolStrip creation to not to auto-append a new bar in design mode.
+
 2011-12-15 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Added Attachment property to eMail component. Each attachment must include the full path
      the Attachment property can be a string of files separated by semi-colons.
