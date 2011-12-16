@@ -19,18 +19,24 @@
 CLASS eMail INHERIT Component
    DATA To                PUBLISHED
    DATA From              PUBLISHED
+   DATA CC                PUBLISHED
+   DATA BCC               PUBLISHED
+   DATA ReplyTo           PUBLISHED
+    
    DATA Subject           EXPORTED
    DATA HTMLBody          EXPORTED
    DATA TextBody          EXPORTED
-
+   DATA EnumSendUsing     EXPORTED  INIT {{"Pickup","Port"},{1,2}}
    DATA SendUsing         PUBLISHED INIT 2
    DATA SMTPServer        PUBLISHED
-   DATA SMTPServerPort    PUBLISHED
+   DATA MimeFormatted     PUBLISHED INIT .F.
+   DATA SMTPServerPort    PUBLISHED INIT 0
    DATA SMTPAuthenticate  PUBLISHED INIT .T.
    DATA SMTPUseSSL        PUBLISHED INIT .F.
    
    DATA SendUserName      PUBLISHED
    DATA SendPassword      PUBLISHED
+   DATA Attachments       PUBLISHED
    METHOD Init() CONSTRUCTOR
    METHOD Send()
 ENDCLASS
@@ -43,7 +49,7 @@ METHOD Init( oOwner ) CLASS eMail
 RETURN Self
 
 METHOD Send() CLASS eMail
-   LOCAL oMsg, oConf, oFlds, cSchema
+   LOCAL oMsg, oConf, oFlds, cSchema, aFiles, cFile
    TRY
       oMsg := GetActiveObject( "CDO.Message" )
     CATCH
@@ -59,25 +65,40 @@ METHOD Send() CLASS eMail
    cSchema := "http://schemas.microsoft.com/cdo/configuration/"
    oFlds:Item( cSchema + "sendusing",        ::SendUsing )
    oFlds:Item( cSchema + "smtpserver",       ::SMTPServer )
-   oFlds:Item( cSchema + "smtpserverport",   ::SMTPServerPort )
+   oFlds:Item( cSchema + "smtpserverport",   IIF( VALTYPE( ::SMTPServerPort ) == "C", VAL( ::SMTPServerPort ), ::SMTPServerPort ) )
    oFlds:Item( cSchema + "smtpauthenticate", ::SMTPAuthenticate )
    oFlds:Item( cSchema + "sendusername",     ::SendUserName )
    oFlds:Item( cSchema + "sendpassword",     ::SendPassword )
    oFlds:Item( cSchema + "smtpusessl",       ::SMTPUseSSL )
+
    oFlds:Update()
 
    WITH OBJECT oMsg
-      :To       := ::To
-      :From     := ::From
-      :Subject  := ::Subject
-      :HTMLBody := ::HTMLBody
-      :TextBody := ::TextBody
+      :To            := ::To
+      :From          := ::From
+      :Subject       := ::Subject
+      :HTMLBody      := ::HTMLBody
+      :TextBody      := ::TextBody
       :Configuration := oConf
+
+      IF ! EMPTY( ::Attachments )
+         IF VALTYPE( ::Attachments ) == "C"
+            aFiles := hb_aTokens( ::Attachments, ";" )
+          ELSE
+            aFiles := ::Attachments
+         ENDIF
+         FOR EACH cFile IN aFiles
+             IF ! FILE( cFile )
+                cFile := ::Application:Path + "\" + cFile
+             ENDIF
+             IF FILE( cFile )
+                :AddAttachment( cFile )
+             ENDIF
+         NEXT
+      ENDIF
+      
       :Send()
    END
-   oMsg  := NIL
-   OConf := NIL
-   oFlds := NIL
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------
