@@ -184,7 +184,7 @@ METHOD AddImage( cImage, nMask, hInst, nLoad, nType, cFile, lAdd, lParser ) CLAS
          //   ::Form:Create()
          //ENDIF
 
-         hTool := CreateWindowEx( WS_EX_TOOLWINDOW, "ToolBarWindow32", "", WS_CHILD, 0, 0, 1500, ::IconHeight, IIF( ::Owner:Parent != NIL, ::Owner:Parent:hWnd, ::Owner:hWnd ), 0, ::AppInstance )
+         hTool := CreateWindowEx( WS_EX_TOOLWINDOW, "ToolBarWindow32", "", WS_CHILD, 0, 0, 1500, ::IconHeight, IIF( ::Owner != NIL, IIF( ::Owner:Parent != NIL, ::Owner:Parent:hWnd, ::Owner:hWnd ), GetDesktopWindow()), 0, ::AppInstance )
          //hTool := CreateWindowEx( WS_EX_TOOLWINDOW, "ToolBarWindow32", "", WS_CHILD, 0, 0, 1500, ::IconHeight, ::Form:hWnd, 0, ::AppInstance )
 
          tbb := (struct TBBUTTON)

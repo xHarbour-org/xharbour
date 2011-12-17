@@ -3796,7 +3796,10 @@ METHOD __FixDocking() CLASS Window
                 oObj:Dock:Right  := IIF( oObj:Dock:Right == oObj:Parent:Name, oObj:Parent, ::Property[ oObj:Dock:Right ] )
              ENDIF
              IF VALTYPE( oObj:Dock:Bottom ) == "C"
-                oObj:Dock:Bottom := IIF( oObj:Dock:Bottom == oObj:Parent:Name, oObj:Parent, ::Property[ oObj:Dock:Bottom ] )
+                TRY
+                  oObj:Dock:Bottom := IIF( oObj:Dock:Bottom == oObj:Parent:Name, oObj:Parent, ::Property[ oObj:Dock:Bottom ] )
+                CATCH
+                END
              ENDIF
           ENDIF
       NEXT

@@ -862,11 +862,12 @@ METHOD OnPaint( hDC, hMemDC ) CLASS ToolStrip
       IF ::xShowChevron
          ::__DrawChevron( hMemDC, ::__ChevronWidth, ::System:CurrentScheme:OverflowButtonGradientBegin,,,::System:CurrentScheme:OverflowButtonGradientEnd )
       ENDIF
-      SetPixel( hMemDC, 0,           0,            aRect[1] )
-      SetPixel( hMemDC, 0,           ::Height - 1, aRect[1] )
-      SetPixel( hMemDC, ::Width - 1, 0,            aRect[2] )
-      SetPixel( hMemDC, ::Width - 1, ::Height - 1, aRect[2] )
-
+      IF ::Parent:ClsName == "ToolStripContainer"
+         SetPixel( hMemDC, 0,           0,            aRect[1] )
+         SetPixel( hMemDC, 0,           ::Height - 1, aRect[1] )
+         SetPixel( hMemDC, ::Width - 1, 0,            aRect[2] )
+         SetPixel( hMemDC, ::Width - 1, ::Height - 1, aRect[2] )
+      ENDIF
       // Gripper
       IF ::ShowGrip
          y := 4

@@ -2732,27 +2732,13 @@ METHOD __FillRow( nPos ) CLASS DataGrid
    LOCAL nImageWidth, nImageHeight, nImageIndex, x, nColBkColor, nColTxColor, nStatus, nAlign, cData, nRet
 
    LOCAL nBack, nFore
-   
+
    ::__DataWidth := 0
    DEFAULT nPos TO ::RowPos
-   
-   //aData := ::DataSource:Gather()
 
    nBack := ExecuteEvent( "OnQueryBackColor", Self )
    nFore := ExecuteEvent( "OnQueryForeColor", Self )
-/*
-   nHeight := ExecuteEvent( "GetItemHeight", Self )
-   IF VALTYPE( nHeight ) != "N"
-      nHeight := ::ItemHeight
-   ENDIF
-   IF LEN( ::__DisplayArray[ nPos ] ) < 3
-      AADD( ::__DisplayArray[ nPos ], NIL )
-   ENDIF
-   ::__DisplayArray[ nPos ][3] := nHeight
 
-   ::RowCountVisible := Ceil( (::__DataHeight-::ItemHeight+nHeight)/::ItemHeight )
-   ::RowCountUsable  := MIN( Int(  (::__DataHeight-::ItemHeight+nHeight)/::ItemHeight ), ::RowCount )
-*/
    FOR x := 1 TO LEN( ::Children )
        nImageWidth := 0
        nImageHeight:= 0
@@ -2760,7 +2746,7 @@ METHOD __FillRow( nPos ) CLASS DataGrid
        nRet := ExecuteEvent( "OnQueryImageIndex", ::Children[x] )
 
        IF VALTYPE( nRet ) == "N"
-          nImageIndex :=  nRet
+          nImageIndex := nRet
        ENDIF
 
        IF nImageIndex > 0 .AND. ::ImageList != NIL
@@ -2770,7 +2756,7 @@ METHOD __FillRow( nPos ) CLASS DataGrid
 
        nColBkColor := ::Children[x]:BackColor
        nColTxColor := ::Children[x]:ForeColor
-       
+
        DEFAULT nColBkColor TO nBack
 
        nRet := ExecuteEvent( "OnQueryBackColor", ::Children[x] )
@@ -3692,8 +3678,8 @@ CLASS GridColumn INHERIT Object
    PROPERTY AutoEdit          READ xAutoEdit         WRITE __SetAutoEdit       DEFAULT .F. INVERT
    
    DATA SelOnlyRep                   PUBLISHED INIT .T.
-   DATA HeaderFont                   PUBLISHED INIT Font()
-   DATA Font                         PUBLISHED INIT Font()
+   DATA HeaderFont                   PUBLISHED
+   DATA Font                         PUBLISHED
    DATA Type                         PUBLISHED INIT "C"
 
    DATA HeaderBackSysColor           EXPORTED INIT __GetSystem():CurrentScheme:ToolStripPanelGradientBegin
@@ -3985,9 +3971,6 @@ RETURN rc
 METHOD Init( oParent ) CLASS GridColumn
 //   DEFAULT bData    TO {||""}
 
-   ::Font:Parent       := Self
-   ::HeaderFont:Parent := Self
-   
    ::Children    := {}
    ::Parent      := oParent
    ::xImageIndex := 0
@@ -3996,7 +3979,23 @@ METHOD Init( oParent ) CLASS GridColumn
       ::__ClassInst := __ClsInst( ::ClassH )
    ENDIF
    //::Form       := oParent:Form
+   
+   ::HeaderFont := Font()
+   ::Font       := Font()
 
+   ::Font:Parent       := Self
+   ::HeaderFont:Parent := Self
+
+   IF ::__ClassInst != NIL
+      ::Font:__ClassInst := __ClsInst( ::Font:ClassH )
+      ::Font:__ClassInst:__IsInstance := .T.
+      ::HeaderFont:__ClassInst := __ClsInst( ::HeaderFont:ClassH )
+      ::HeaderFont:__ClassInst:__IsInstance := .T.
+   ENDIF
+
+   ::Font:Create()
+   ::HeaderFont:Create()
+ 
    ::EventHandler := Hash()
    HSetCaseMatch( ::EventHandler, .F. )
    ::__xCtrlName := "GridColumn"
@@ -4030,9 +4029,6 @@ METHOD Create() CLASS GridColumn
    IF VALTYPE( ::xImageIndex ) == "N"
       ::xImageIndex := MAX( 0, ::xImageIndex )
    ENDIF
-
-   ::Font:Create():Modify()
-   ::HeaderFont:Create():Modify()
 
    ExecuteEvent( "OnInit", Self )
    AADD( ::Parent:Children, Self )

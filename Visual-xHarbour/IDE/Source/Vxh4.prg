@@ -1497,6 +1497,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                      AADD( aCol[1]:Value[2], ::System:ImageList:Cursors )
                      AADD( aCol[1]:Value[2], ::System:ImageList:Small )
                      AADD( aCol[1]:Value[2], ::System:ImageList:Large )
+                     AADD( aCol[1]:Value[2], ::System:ImageList:StdSmall )
                   ENDIF
 
                   TRY

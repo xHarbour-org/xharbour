@@ -33,13 +33,29 @@ CLASS Component INHERIT Object
    DATA Caption                EXPORTED INIT ""
    
    ACCESS Form                 INLINE IIF( ::Owner != NIL, ::Owner:Form, NIL )
-   ACCESS AppInstance          INLINE IIF( ::Form:DllInstance != NIL, ::Form:DllInstance, ::Application:Instance )
+   ACCESS AppInstance          INLINE ::__GetInstance()
 
    METHOD Init()               CONSTRUCTOR
    METHOD Destroy()
    METHOD __SetCtrlName()
+   METHOD __GetInstance()
 ENDCLASS
 
+//-----------------------------------------------------------------------------------------------
+
+METHOD __GetInstance() CLASS Component
+   LOCAL hInstance
+   IF ::Owner != NIL
+      IF ::Form:DllInstance != NIL
+         hInstance := ::Form:DllInstance
+      ELSE
+         hInstance := ::Application:Instance
+      ENDIF
+    ELSE
+      hInstance := GetModuleHandle()
+   ENDIF
+RETURN hInstance
+ 
 //-----------------------------------------------------------------------------------------------
 
 METHOD Init( oOwner ) CLASS Component

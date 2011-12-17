@@ -631,7 +631,6 @@ METHOD Init( oParent ) CLASS StrEditor
    ::Dock:Left     := ::Parent
    ::Dock:Top      := ::Parent:PictureBox1
    ::Dock:Right    := ::Parent
-//   ::Dock:Bottom   := ::Parent:StatusBar1
    
    IF !::Parent:DataSource:IsOpen
       ::Parent:DataSource:Create()
@@ -642,7 +641,6 @@ METHOD Init( oParent ) CLASS StrEditor
       :Structure := { {"NAME", "C", 100 }, {"TYPE", "C", 100 }, {"SIZE", "N", 3 }, {"DECIMALS", "N", 2 } }
       :Table     := ACLONE( ::Parent:DataSource:Structure )
       :Create()
-
       IF :Reccount() == 0
          lEnter := .T.
          :Append()
@@ -671,7 +669,6 @@ METHOD Init( oParent ) CLASS StrEditor
 
    WITH OBJECT GridColumn( Self )
       :Caption          := "Data Type"
-//      :Data             := "hb_QSelf():DataSource:Fields:Type"
       :Data             := "GetDataType(hb_QSelf():DataSource:Fields:Type)"
       :Width            := 70
       :Control          := {|o, oCtrl| oCtrl := EditBox( o ),;
@@ -704,7 +701,6 @@ METHOD Init( oParent ) CLASS StrEditor
       :Data             := "hb_QSelf():DataSource:Fields:Decimals"
       :Width            := 70
       :Alignment        := 2
-
       :Control          := {|o, oCtrl| IIF( o:DataSource:Fields:Type == "N", ( oCtrl := EditBox( o ),;
                                                                                oCtrl:OnWMKeyDown := {|o,nKey| __SetEditKey( o, nKey )},;
                                                                                oCtrl:OnWMChar := {|o,nKey|ChkNumberChar( nKey, o, 15, 0 )},;

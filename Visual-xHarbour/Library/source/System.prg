@@ -34,6 +34,10 @@ INIT PROCEDURE __InitSystem
    oSystem := System( NIL )
 RETURN
 
+EXIT PROCEDURE __SystemCleanup
+   oSystem:ImageList[ "StdSmall" ]:Destroy()
+RETURN
+
 FUNCTION __GetSystem(); RETURN oSystem
 
 CLASS System
@@ -679,7 +683,7 @@ METHOD Init() CLASS System
       ImageListAddIcon( :Handle, ::Cursor[ "LinkSelect" ]  )
    END
 
-   SYSGETIMAGELIST( @hLarge, @hSmall )
+   SysGetImageList( @hLarge, @hSmall )
    ::ImageList[ "Small" ] := ImageList()
    ::ImageList[ "Small" ]:Handle := hSmall
    ::ImageList[ "Small" ]:xName  := "::System:ImageList:Small"
@@ -689,6 +693,10 @@ METHOD Init() CLASS System
    ::ImageList[ "Large" ]:xIconWidth  := 32
    ::ImageList[ "Large" ]:xIconHeight := 32
    ::ImageList[ "Large" ]:xName       := "::System:ImageList:Large"
+
+   ::ImageList[ "StdSmall" ] := ImageList( NIL, 16, 16 ):Create()
+   ::ImageList[ "StdSmall" ]:AddImage( IDB_STD_SMALL_COLOR )
+   ::ImageList[ "StdSmall" ]:xName := "::System:ImageList:StdSmall"
 
    ::ExplorerBar := (struct EXPBARINFO)
    cBuffer := ::ExplorerBar:Value()

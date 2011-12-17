@@ -24,6 +24,7 @@
 //------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------
+
 CLASS DebugTab INHERIT TabStrip
    METHOD OnSysCommand(n) INLINE IIF( n==SC_CLOSE, (::Hide(),0),)
    METHOD Close() INLINE ::Hide()
@@ -32,13 +33,13 @@ ENDCLASS
 //------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------
+
 CLASS DebugBuild INHERIT ListBox
    METHOD Init() CONSTRUCTOR
    METHOD Create()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------
-
 METHOD Init( oParent ) CLASS DebugBuild
 
    DEFAULT ::__xCtrlName  TO "DebugBuild"
@@ -57,12 +58,10 @@ METHOD Init( oParent ) CLASS DebugBuild
    ::HasStrings   := .T.
    ::Border       := .F.
 RETURN Self
-//------------------------------------------------------------------------------------------
 
+//------------------------------------------------------------------------------------------
 METHOD Create() CLASS DebugBuild
    ::Super:Create()
-//   ::HorzScroll   := .T.
-//   ::InvalidateRect()
 RETURN Self
 
 //------------------------------------------------------------------------------------------
@@ -74,6 +73,7 @@ CLASS ErrorListView INHERIT ListView
    METHOD ProcessErrors()
 ENDCLASS
 
+//------------------------------------------------------------------------------------------
 METHOD ProcessErrors( oError, aErrors ) CLASS ErrorListView
    LOCAL n
    ( oError )
@@ -91,8 +91,8 @@ METHOD ProcessErrors( oError, aErrors ) CLASS ErrorListView
    ::EnsureVisible( 3, .F. )
 RETURN Self
 
+//------------------------------------------------------------------------------------------
 METHOD OnParentNotify() CLASS ErrorListView
-
    LOCAL iFile, lvi, nLine, cFile, oEditor, nFor
 
    SWITCH ::Parent:hdr:code
@@ -116,7 +116,6 @@ METHOD OnParentNotify() CLASS ErrorListView
             SendMessage( ::hWnd, LVM_GETITEMTEXT, iFile, @lvi )
             nLine := Val( Left( lvi:pszText, At( Chr(0), lvi:pszText ) - 1 ) )
 
-            //PopupEditor( ::Application:MainForm, 0, 0, 700, 400, cFile, nLine )
             nFor := 1
             FOR EACH oEditor IN xEdit_GetEditors()
                IF Upper( oEditor:cPath + oEditor:cFile ) == cFile
@@ -135,7 +134,6 @@ METHOD OnParentNotify() CLASS ErrorListView
    END
 RETURN 0
 
-
 //------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------
@@ -152,7 +150,6 @@ CLASS ComponentPanel INHERIT Panel
 ENDCLASS
 
 //------------------------------------------------------------------------------------------
-
 METHOD Init( oParent ) CLASS ComponentPanel
 
    DEFAULT ::__xCtrlName  TO "ComponentPanel"
@@ -162,28 +159,26 @@ METHOD Init( oParent ) CLASS ComponentPanel
    ::TopMargin    := 10
    ::Width        := 200
    ::AllowUndock  := .T.
-   //::StaticEdge   := .T.
    ::HorzScroll   := .T.
    ::TabStop      := .T.
 RETURN Self
-//------------------------------------------------------------------------------------------
 
+//------------------------------------------------------------------------------------------
 METHOD AddButton( oComponent ) CLASS ComponentPanel
    LOCAL n, x, lExit, nBtn, aButtons, aSize, oBtn := CompButton( Self )
    oComponent:Button := oBtn
    WITH OBJECT oBtn
-      :Component   := oComponent
-      :Left        := :Parent:LeftMargin - :Parent:HorzScrollPos
-      :OwnerDraw   := .T.
-      :Caption     := oComponent:Name
-      :ImageList   := ::Application:MainForm:ToolBox1:ImageList
-      :Action      := {|o| o:SelectComponent()}
+      :Component := oComponent
+      :Left      := :Parent:LeftMargin - :Parent:HorzScrollPos
+      :OwnerDraw := .T.
+      :Caption   := oComponent:Name
+      :ImageList := ::Application:MainForm:ToolBox1:ImageList
+      :Action    := {|o| o:SelectComponent()}
+
+      aButtons   := ::Application:MainForm:ToolBox1:aButtons
+      nBtn       := 1
+      lExit      := .F.
       
-      aButtons := ::Application:MainForm:ToolBox1:aButtons
-      nBtn  := 1
-      lExit := .F.
-      
-     
       FOR n := 1 TO LEN( aButtons )
           FOR x := 1 TO LEN( aButtons[n][2] )
               nBtn ++
@@ -195,12 +190,11 @@ METHOD AddButton( oComponent ) CLASS ComponentPanel
       NEXT
 
       :ImageIndex  := nBtn //oComponent:ImageIndex
-
       :ImageAlign  := DT_LEFT
       :ImageIndent := 8
       :DrawTheme   := .F.
 
-      :Font:Bold     := .T.
+      :Font:Bold   := .T.
 
       aSize        := :Drawing:GetTextExtentPoint32( oComponent:Name )
       :Width       := aSize[1] + :ImageList:IconWidth + 15
@@ -214,7 +208,6 @@ METHOD AddButton( oComponent ) CLASS ComponentPanel
 RETURN oBtn
 
 //------------------------------------------------------------------------------------------
-
 METHOD Reset( oOwner ) CLASS ComponentPanel
    LOCAL n, Component, aChildren, lUpdate := .T.
    
@@ -245,6 +238,7 @@ METHOD Reset( oOwner ) CLASS ComponentPanel
    ENDIF
 RETURN Self
 
+//------------------------------------------------------------------------------------------
 METHOD Refresh() CLASS ComponentPanel
    LOCAL oBtn
    IF ::Current != NIL
@@ -258,7 +252,6 @@ METHOD Refresh() CLASS ComponentPanel
 RETURN NIL
 
 //------------------------------------------------------------------------------------------
-
 METHOD Close() CLASS ComponentPanel
    LOCAL n, aChildren, lUpdate := .T.
    aChildren := {}
@@ -290,7 +283,6 @@ CLASS CompButton INHERIT Button
 ENDCLASS
 
 //------------------------------------------------------------------------------------------
-
 METHOD Select() CLASS CompButton
    IF ::Parent:Current != NIL
       ::Parent:Current:Selected := .F.
@@ -302,10 +294,12 @@ METHOD Select() CLASS CompButton
    ::Application:Project:EditReset(1)
 RETURN Self
 
+//------------------------------------------------------------------------------------------
 METHOD OnLButtonDown() CLASS CompButton
    ::Select()
 RETURN NIL
 
+//------------------------------------------------------------------------------------------
 METHOD SelectComponent() CLASS CompButton
    ::Application:MainForm:FormEditor1:InvalidateRect()
    ::Application:Project:CurrentForm:SelectControl( ::Component, .F., .F. )
@@ -329,6 +323,7 @@ METHOD Delete() CLASS CompButton
    ::Parent:__SetScrollBars()
 RETURN NIL
 
+//------------------------------------------------------------------------------------------
 METHOD OnKeyDown( nwParam ) CLASS CompButton
    IF nwParam == VK_DELETE
       ::Application:Project:SetAction( { { DG_DELCONTROL, NIL, 0, 0, .F., ::Component:Owner, ::Component:__xCtrlName, ::Component, , 1, , Self } }, ::Application:Project:aUndo )
@@ -336,7 +331,6 @@ METHOD OnKeyDown( nwParam ) CLASS CompButton
 RETURN 0
 
 //------------------------------------------------------------------------------------------
-
 METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS CompButton
    LOCAL nLeft, nTop, aRect, lDisabled, lSelected, lFocus, aTextRect, nTextFlags
    ( nwParam )
@@ -391,7 +385,4 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS CompButton
 
       _DrawText( dis:hDC, ::Caption, aTextRect, nTextFlags )
    ENDIF
-
 RETURN NIL
-
-

@@ -10,6 +10,12 @@
 
 2011-12-16 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed ToolStrip creation to not to auto-append a new bar in design mode.
+   + Added new System imagelist StdSmall
+   ! Fixed error accessing application instance from components
+   ! Fixed ImageList creation with no owner
+   ! Fixed ToolStrip to not to paint container's corners when it's created on a form
+   ! Fixed RTE docking on deleted controls
+   ! Fixed saving DataGrid columns fonts
 
 2011-12-15 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Added Attachment property to eMail component. Each attachment must include the full path
