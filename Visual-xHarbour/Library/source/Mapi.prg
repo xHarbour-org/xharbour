@@ -53,12 +53,22 @@ METHOD Send() CLASS eMail
    TRY
       oMsg := GetActiveObject( "CDO.Message" )
     CATCH
+    TRY
       oMsg := CreateObject( "CDO.Message" )
+    CATCH
+     MessageBox( , "Sorry, could not initialise mail object (CDO.Message)", "Visual xHarbour", MB_OK | MB_ICONEXCLAMATION )
+     RETURN NIL
+    END
    END
    TRY
       oConf := GetActiveObject( "CDO.Configuration" )
     CATCH
+    TRY
       oConf := CreateObject("CDO.Configuration")
+    CATCH
+     MessageBox( , "Sorry, could not initialise mail object (CDO.Configuration)", "Visual xHarbour", MB_OK | MB_ICONEXCLAMATION )
+     RETURN NIL
+    END
    END
    oFlds := oConf:Fields
 
