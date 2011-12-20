@@ -1408,29 +1408,29 @@ FUNCTION CheckControlName( oParent, cName, oExclude )
 RETURN lRet
 
 //-----------------------------------------------------------------------------------------------
-FUNCTION ExecuteEvent( cEvent, oObj )
+FUNCTION ExecuteEvent( cEvent, oObj, xParam1, xParam2, xParam3, xParam4, xParam5 )
    LOCAL cFormEvent, nRet
 
    IF HGetPos( oObj:EventHandler, cEvent ) != 0
       cFormEvent := oObj:EventHandler[ cEvent ]
       IF !( oObj:ClassH == oObj:Form:ClassH )
          IF __objHasMsg( oObj, cFormEvent )
-            nRet := oObj:&cFormEvent( oObj )
+            nRet := oObj:&cFormEvent( oObj, @xParam1, @xParam2, @xParam3, @xParam4, @xParam5 )
             RETURN nRet
          ENDIF
          IF __objHasMsg( oObj:Form, cFormEvent )
-            nRet := oObj:Form:&cFormEvent( oObj )
+            nRet := oObj:Form:&cFormEvent( oObj, @xParam1, @xParam2, @xParam3, @xParam4, @xParam5 )
             RETURN nRet
          ENDIF
          IF __objHasMsg( oObj:Parent, cFormEvent )
-            nRet := oObj:Parent:&cFormEvent( oObj )
+            nRet := oObj:Parent:&cFormEvent( oObj, @xParam1, @xParam2, @xParam3, @xParam4, @xParam5 )
             RETURN nRet
          ENDIF
          IF oObj:Parent != NIL .AND. oObj:Parent:__xCtrlName == "TabPage"
-            nRet := oObj:Parent:Parent:Form:&cFormEvent( oObj )
+            nRet := oObj:Parent:Parent:Form:&cFormEvent( oObj, @xParam1, @xParam2, @xParam3, @xParam4, @xParam5 )
          ENDIF
        ELSE
-         nRet := oObj:&cFormEvent( oObj )
+         nRet := oObj:&cFormEvent( oObj, @xParam1, @xParam2, @xParam3, @xParam4, @xParam5 )
       ENDIF
    ENDIF
 RETURN nRet

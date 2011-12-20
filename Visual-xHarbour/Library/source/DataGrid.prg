@@ -2730,8 +2730,7 @@ RETURN 0
 METHOD __FillRow( nPos ) CLASS DataGrid
    EXTERN hb_QSelf
    LOCAL nImageWidth, nImageHeight, nImageIndex, x, nColBkColor, nColTxColor, nStatus, nAlign, cData, nRet
-
-   LOCAL nBack, nFore
+   LOCAL nBack, nFore, hFont, oFont
 
    ::__DataWidth := 0
    DEFAULT nPos TO ::RowPos
@@ -2808,19 +2807,27 @@ METHOD __FillRow( nPos ) CLASS DataGrid
        IF ::ConvertOem .AND. VALTYPE( cData ) == "C"
           cData := OemToChar( cData )
        ENDIF
+      
+       hFont := ::Children[x]:Font:Handle
+       oFont := ExecuteEvent( "OnCellFont", ::Children[x] )
+
+       IF VALTYPE(oFont) == "O" .AND. UPPER( oFont:ClassName ) == "FONT"
+          hFont := oFont:Handle
+       ENDIF
+
        ::__DisplayArray[ nPos ][1][x] := { cData,;
-                                         nImageIndex,;
-                                         nImageWidth + 2,;
-                                         nAlign,;
-                                         nImageHeight,;
-                                         ::__DataWidth,;
-                                         nColBkColor,;
-                                         nColTxColor,;
-                                         ::Children[x]:Width,;
-                                         nStatus,;
-                                         ::Children[x]:Representation,;
-                                         ::Children[x]:Font:Handle,;
-                                         ::DataSource:Deleted() }
+                                           nImageIndex,;
+                                           nImageWidth + 2,;
+                                           nAlign,;
+                                           nImageHeight,;
+                                           ::__DataWidth,;
+                                           nColBkColor,;
+                                           nColTxColor,;
+                                           ::Children[x]:Width,;
+                                           nStatus,;
+                                           ::Children[x]:Representation,;
+                                           hFont,;
+                                           ::DataSource:Deleted() }
        IF ::Children[x]:Visible
           ::__DataWidth += ::Children[x]:Width
        ENDIF
@@ -4016,6 +4023,7 @@ METHOD Init( oParent ) CLASS GridColumn
                   {"General",     {;
                                   { "OnCreate"          , "", "" },;
                                   { "OnContextMenu"     , "", "" },;
+                                  { "OnCellFont"        , "", "" },;
                                   { "OnHeaderClick"     , "", "" } } } }
    ENDIF
 RETURN Self

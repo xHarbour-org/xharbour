@@ -8,6 +8,39 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-12-19 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added GridColumn event "OnCellFont" to receive the font object that will be used to 
+     display the cell. Make sure the font objects to be used are created **BEFORE**
+     data is displayed for the first time which happens while the form is still hidden so
+     if these objects are created in the OnLoad() event, make sure you UPDATE the datagrid 
+     (DataGrid1:Update()) or simply create them in the OnInit event of the form.
+      
+      static oMyFont
+      ...
+      
+      METHOD Form1_OnInit( Sender ) CLASS Form1
+         oMyFont := Font()
+         oMyFont:Italic := .T.
+         oMyFont:Bold   := .T.
+         oMyFont:PointSize := 14
+         oMyFont:Create()
+      RETURN Self
+
+      ...
+
+      METHOD GridColumn3_OnCellFont( Sender ) CLASS Form1
+         
+         *****************************************
+         **** DO NOT CREATE FONT OBJECTS HERE ****
+         *****************************************
+         
+         IF ::AdsDataTable1:Recno() < 50
+            RETURN oMyFont // Return the previously created font
+         ENDIF
+      RETURN Self
+
+
+
 2011-12-16 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed ToolStrip creation to not to auto-append a new bar in design mode.
    + Added new System imagelist StdSmall
