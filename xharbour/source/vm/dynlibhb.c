@@ -62,7 +62,7 @@
 #include "hbstack.h"
 #include "hbvm.h"
 
-#if defined(HB_OS_HPUX) && !defined(__WATCOMC__)
+#if defined(HB_OS_UNIX) && !defined(__WATCOMC__)
 #include <dlfcn.h>
 #endif
 
@@ -122,7 +122,7 @@ HB_FUNC( LIBLOAD )
 
 HB_FUNC( LIBFREE )
 {
-#if defined(HB_OS_WIN) || ( defined(HB_OS_LINUX) && !defined(__WATCOMC__) ) || defined(HB_OS_OS2)
+#if defined(HB_OS_WIN) || ( defined(HB_OS_UNIX) && !defined(__WATCOMC__) ) || defined(HB_OS_OS2)
 
    void * hDynLib = hb_parptr( 1 );
 
@@ -132,7 +132,7 @@ HB_FUNC( LIBFREE )
 
       #if defined(HB_OS_WIN)
       hb_retl( FreeLibrary( ( HMODULE ) hDynLib ) );
-      #elif defined(HB_OS_LINUX) && !defined(__WATCOMC__)
+      #elif defined(HB_OS_UNIX) && !defined(__WATCOMC__)
       hb_retl( dlclose( hDynLib ) == 0 );
       #elif defined(HB_OS_OS2)
       hb_retl( DosFreeModule( (HMODULE) hDynLib ) == NO_ERROR );
@@ -150,7 +150,7 @@ HB_FUNC( LIBFREE )
 
 HB_FUNC( LIBERROR )
 {
-#if defined(HB_OS_LINUX) && !defined(__WATCOMC__)
+#if defined(HB_OS_UNIX) && !defined(__WATCOMC__)
    hb_retc( dlerror() );
 #else
    hb_retc( NULL );
