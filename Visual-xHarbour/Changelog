@@ -8,6 +8,10 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-12-20 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed DataGrid field edition gto inherit the Column picture when editing.
+   ! Fixed DataGrid FreezeColumn display problem.
+
 2011-12-19 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Added GridColumn event "OnCellFont" to receive the font object that will be used to 
      display the cell. Make sure the font objects to be used are created **BEFORE**

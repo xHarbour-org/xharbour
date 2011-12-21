@@ -1667,7 +1667,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
    
    SetBkMode( hMemDC, TRANSPARENT )
    DEFAULT nRowEnd TO 0
-   
+
    aTextExt := _GetTextExtentPoint32( hMemDC, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' )
    FOR nLine := nRow TO nRowEnd
        IF nLine <= LEN( ::__DisplayArray ) .AND. ::__DisplayArray[nLine] == NIL
@@ -1675,7 +1675,11 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
        ENDIF
        nLeft   := xLeft
        iLeft   := 0
-       
+
+       FOR n := 1 TO nCol-1
+           iLeft += ::Children[n]:Width
+       NEXT
+
        nTop    := ::__GetHeaderHeight() + ( ( nLine-1 ) * ::ItemHeight )
        nBottom := nTop + ::ItemHeight - 1
        lSelected := .F.
@@ -3509,7 +3513,9 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
                                               o:Parent:DataSource:UnLock(),;
                                               o:Parent:__CurControl := NIL,;
                                               o:Parent:__DisplayData( ::RowPos, ::ColPos, ::RowPos, ::ColPos ) }
-
+         IF ::__CurControl:HasMessage( "Picture" )
+            ::__CurControl:Picture := ::Children[::ColPos]:Picture
+         ENDIF
          ::__CurControl:Left   := aRect[1]+1
          ::__CurControl:Width  := aRect[3]-aRect[1]-IIF( ::xShowGrid, 2, 1 )
          ::__CurControl:Top    := aRect[2]+1
