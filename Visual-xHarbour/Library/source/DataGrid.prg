@@ -1738,10 +1738,12 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                  ENDIF
                  nRight := zLeft + ::Children[i]:xWidth
 
-                 IF lFreeze .AND. i > ::FreezeColumn .AND. nRight < iRight
-                    nLeft  += ::Children[i]:Width
-                    iLeft  += ::Children[i]:Width
-                    LOOP
+                 IF lFreeze .AND. i > ::FreezeColumn 
+                    IF nRight < iRight
+                       nLeft  += ::Children[i]:Width
+                       //iLeft  += ::Children[i]:Width
+                       LOOP
+                    ENDIF
                  ENDIF
 
                  SWITCH VALTYPE( cData )
@@ -1994,7 +1996,9 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                  ENDIF
 
                  nLeft  += ::Children[i]:Width
-                 iLeft  += ::Children[i]:Width
+                 IF lFreeze .AND. i <= ::FreezeColumn
+                    iLeft  += ::Children[i]:Width
+                 ENDIF
               ENDIF
           NEXT
 
@@ -2842,7 +2846,7 @@ RETURN Self
 //----------------------------------------------------------------------------------
 
 METHOD ArrowLeft( lMove ) CLASS DataGrid
-   LOCAL lRes, nScroll, nCol, nCur, nPos := 0
+   LOCAL lRes, nScroll, nCol, nCur, nPos := 0, nWidth, n
    DEFAULT lMove TO .T.
    IF ::FullRowSelect .OR. ::ColPos == 0
       nPos := MIN( ::__HorzScrolled + ( ::__HScrollUnits * IIF( CheckBit( GetKeyState( VK_CONTROL ) ), 5, 1 ) ), 0 )
@@ -2868,6 +2872,20 @@ METHOD ArrowLeft( lMove ) CLASS DataGrid
          ENDIF
          ::ColPos := nCol
       ENDIF
+
+      IF ::FreezeColumn > 0 .AND. ::ColPos > ::FreezeColumn
+         nWidth := 0
+         FOR n := 1 TO ::FreezeColumn
+             nWidth += ::Children[n]:Width
+         NEXT
+
+         IF ( ::Children[::ColPos]:Left-ABS( ::__HorzScrolled) ) < nWidth
+            ::__HorzScrolled += ( nWidth - ( ::Children[::ColPos]:Left-ABS( ::__HorzScrolled) ) )
+            ::__UpdateHScrollBar(.T.)
+            ::__DisplayData( , ::ColPos, , )
+         ENDIF
+      ENDIF
+
       nScroll := ::__DisplayArray[1][1][::ColPos][6] - ABS(::__HorzScrolled)
       IF nScroll < 0
          ::OnHorzScroll( SB_THUMBTRACK, ABS(::__HorzScrolled) - ABS(nScroll),, FALSE )

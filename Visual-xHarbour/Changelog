@@ -8,6 +8,11 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2011-12-21 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed DataGrid FreezeColumn display problem when selecting a column hidden underneath
+     the frozen column now the hidden column recovers full visibility and restores
+     horizontal scroll position. Both selections left key and mouse are fixed.
+
 2011-12-20 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed DataGrid field edition gto inherit the Column picture when editing.
    ! Fixed DataGrid FreezeColumn display problem.
