@@ -2910,10 +2910,8 @@ METHOD ArrowRight( lMove ) CLASS DataGrid
    DEFAULT lMove TO .T.
 
    IF ::FullRowSelect .OR. ::ColPos == 0
-      IF ::sih != NIL .AND. ::sih:nMax <> 0
-         nPos := MAX( ::__HorzScrolled - ( ::__HScrollUnits * IIF( CheckBit( GetKeyState( VK_CONTROL ) ), 5, 1 ) ), -(::__DataWidth - ::ClientWidth) )
-         ::OnHorzScroll( SB_THUMBTRACK, -nPos )
-      ENDIF
+      nPos := ABS( ::__HorzScrolled )+ ( ::__HScrollUnits * IIF( CheckBit( GetKeyState( VK_CONTROL ) ), 5, 1 ) )
+      ::OnHorzScroll( SB_THUMBTRACK, MIN( nPos, ::__DataWidth-::ClientWidth  ) )
       RETURN .F.
     ELSE
       lRes := ::OnColChanging()

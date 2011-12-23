@@ -1,8 +1,6 @@
 /*
  * $Id$
  */
-static s_oSave
-
 #include "vxh.ch"
 #include "cstruct.ch"
 #include "colors.ch"
@@ -11,11 +9,6 @@ static s_oSave
 
 #define DG_ADDCONTROL      1
 #define DG_DELCONTROL      2
-
-EXIT PROCEDURE __CleanVxh8()
-   s_oSave := NIL
-RETURN
-
 
 //------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------
@@ -390,6 +383,7 @@ RETURN Self
 
 CLASS StructEditor INHERIT Dialog
    DATA DataSource  EXPORTED
+   DATA oSave       EXPORTED
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
    METHOD Save()
@@ -437,14 +431,14 @@ METHOD OnInitDialog() CLASS StructEditor
       :DockIt()
    END
    
-   s_oSave := Button( Self )
+   ::oSave := Button( Self )
    WITH OBJECT ::Button1
       :Caption := "&Save Changes"
       :Left    := 6
       :Top     := 510
       :Width   := 109
       :Height  := 30
-      :Action  := {|o| o:Parent:Save(o)}
+      :Action  := {|| ::Save() }
       :Enabled := .F.
       :Create()
    END
@@ -479,8 +473,8 @@ RETURN 0
 METHOD Save() CLASS StructEditor
    LOCAL cFile, nArea, nRec, n, lDel, nPos, xData, x, cOrig, aTable, aStruct
    LOCAL cField, oFile, aFilter := { "dbf", "adt" }
-   
-   IF UPPER( RIGHT( ::DataSource:__xCtrlName, 9 ) ) IN {"DATATABLE","MEMORYDATATABLE"} .AND. !::DataSource:__lMemory
+   ::DataSource:Form:__lModified := .T.
+   IF UPPER( ::DataSource:__xCtrlName ) IN {"DATATABLE","ADSDATATABLE"} .AND. !::DataSource:__lMemory
 
       IF ::DataSource:IsOpen
          FOR n := 1 TO LEN( ::DataSource:Structure )
@@ -588,17 +582,17 @@ METHOD Save() CLASS StructEditor
       NEXT n
 
    ENDIF
-   s_oSave:Enabled := .F.
+   ::oSave:Enabled := .F.
    ::Application:Project:Modified := .T.
 RETURN .T.
 
 METHOD OnCancel() CLASS StructEditor
    LOCAL nRet
-   IF s_oSave:Enabled
-      nRet := s_oSave:Parent:MessageBox( "Structure is changed, Save before closing?", "Structure Editor", MB_YESNOCANCEL | MB_ICONQUESTION )
+   IF ::oSave:Enabled
+      nRet := ::MessageBox( "Structure is changed, Save before closing?", "Structure Editor", MB_YESNOCANCEL | MB_ICONQUESTION )
       SWITCH nRet
          CASE IDYES
-            IF !s_oSave:Parent:Save()
+            IF !::Save()
                RETURN 0
             ENDIF
             EXIT
@@ -752,7 +746,7 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS StrEditor
          ::DataSource:Append()
       ENDIF
       ::Update()
-      s_oSave:Enabled := .T.
+      ::Parent:oSave:Enabled := .T.
       RETURN 0
       
     ELSEIF nwParam == VK_RETURN .AND. ::ColPos == 2
@@ -772,7 +766,7 @@ METHOD DataSave( cField, xData, aKeys ) CLASS StrEditor
       IF EMPTY( ::DataSource:Fields:Name )
          RETURN .F.
       ENDIF
-      s_oSave:Enabled := .T.
+      ::Parent:oSave:Enabled := .T.
       AEVAL( aKeys, {|n| ::PostMessage( WM_KEYDOWN, n )} )
    ENDIF
 RETURN .T.
@@ -913,6 +907,7 @@ RETURN cType
 
 CLASS TableEditor INHERIT Dialog
    DATA DataSource  EXPORTED
+   DATA oSave       EXPORTED
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
    METHOD Save()
@@ -957,7 +952,7 @@ METHOD OnInitDialog() CLASS TableEditor
       :DockIt()
    END
    
-   WITH OBJECT s_oSave := Button( Self )
+   WITH OBJECT ::oSave := Button( Self )
       :Caption := "&Save Changes"
       :Left    := 6
       :Top     := 510
@@ -993,19 +988,20 @@ METHOD OnInitDialog() CLASS TableEditor
 RETURN 0
 
 METHOD Save() CLASS TableEditor
+   ::DataSource:Form:__lModified := .T.
    ::DataSource:Table := ACLONE( ::DataGrid1:DataSource:Table )
    ::DataSource:GoTop()
    ::Application:Project:Modified := .T.
-   s_oSave:Enabled := .F.
+   ::oSave:Enabled := .F.
 RETURN Self
 
 METHOD OnCancel() CLASS TableEditor
    LOCAL nRet
-   IF s_oSave:Enabled
-      nRet := s_oSave:Parent:MessageBox( "Table is changed, Save before closing?", "DataSource Editor", MB_YESNOCANCEL | MB_ICONQUESTION )
+   IF ::oSave:Enabled
+      nRet := ::MessageBox( "Table is changed, Save before closing?", "DataSource Editor", MB_YESNOCANCEL | MB_ICONQUESTION )
       SWITCH nRet
          CASE IDYES
-            s_oSave:Parent:Save()
+            ::Save()
             EXIT
          CASE IDCANCEL
             RETURN 0
@@ -1054,7 +1050,7 @@ METHOD Init( oParent ) CLASS TblEditor
        oCol := GridColumn( Self )
        oCol:xCaption  := __Proper( aField[1] )
        oCol:Data      := "hb_QSelf():DataSource:Fields:" + aField[1]
-       oCol:xWidth    := MAX( aField[3], LEN(oCol:Caption)+2 )*7
+       oCol:xWidth    := aField[3]*::Font:PointSize
        oCol:AllowSize := .T.
        oCol:AllowDrag := .T.
        oCol:Create()
@@ -1069,14 +1065,16 @@ METHOD Init( oParent ) CLASS TblEditor
                                            oCtrl:OnWMKeyDown := {|o,nKey| __SetEditKey( o, nKey )},;
                                            oCtrl }
           CASE aField[2]=="D"
-               oCol:Alignment := 3
+               oCol:Alignment := 2
+               oCol:Picture   := "@K"
                oCol:Control := {|o, oCtrl| oCtrl := MaskEdit( o ),;
                                            oCtrl }
 
           CASE aField[2]=="L"
                oCol:Alignment := 3
-               oCol:Width := MAX( 6, LEN(oCol:Caption)+2 )*7
-               oCol:Control := {|o, oCtrl| oCtrl := MaskEdit( o ),;
+               oCol:Picture   := "@K!"
+               oCol:Width     := 6 * ::Font:PointSize
+               oCol:Control   := {|o, oCtrl| oCtrl := MaskEdit( o ),;
                                            oCtrl }
           CASE aField[2]=="N"
                oCol:Alignment := 2
@@ -1117,9 +1115,13 @@ RETURN NIL
 
 //------------------------------------------------------------------------------------------
 METHOD DataSave( cField, xData ) CLASS TblEditor
+   LOCAL cType := VALTYPE( ::DataSource:Fields:&cField )
    IF !EMPTY( XSTR( xData ) )
+      IF VALTYPE( xData ) != cType
+         xData := CStrToVal( xStr( xData ), cType )
+      ENDIF
       ::DataSource:Fields:Put( xData, cField )
-      s_oSave:Enabled := .T.
+      ::Parent:oSave:Enabled := .T.
    ENDIF
 RETURN .T.
 
@@ -1143,7 +1145,7 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS TblEditor
          ::DataSource:Unlock()
       ENDIF
       ::Update()
-      s_oSave:Enabled := .T.
+      ::Parent:oSave:Enabled := .T.
       RETURN 0
    ENDIF
    Super:OnKeyDown( nwParam, nlParam )
