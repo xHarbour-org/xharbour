@@ -90,7 +90,9 @@ METHOD Send() CLASS eMail
       :HTMLBody      := ::HTMLBody
       :TextBody      := ::TextBody
       :Configuration := oConf
-
+      :CC            := ::CC
+      :BCC           := ::BCC
+      :ReplyTo       := ::ReplyTo
       IF ! EMPTY( ::Attachments )
          IF VALTYPE( ::Attachments ) == "C"
             aFiles := hb_aTokens( ::Attachments, ";" )

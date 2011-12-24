@@ -14,6 +14,7 @@
    ! Fixed DataSource and Structure editors to mark the parent form as modified
      to allow saving.
    ! Fixed DataGrid Right arrow failing to scroll data in FullRowSelect mode.
+   ! Fixed eMail component to include properties CC, BCC and ReplyTo.
 
 2011-12-21 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed DataGrid FreezeColumn display problem when selecting a column hidden underneath
