@@ -1714,13 +1714,6 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
 
-CLASS ContextStrip
-ENDCLASS
-
-//-------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------
-
 CLASS ToolStripButton INHERIT ToolStripItem
    PROPERTY ImageList  READ xImageList     WRITE __SetImageList              PROTECTED
    PROPERTY ImageIndex READ xImageIndex    WRITE __SetImageIndex DEFAULT  0  PROTECTED
@@ -2135,6 +2128,9 @@ RETURN Self
 
 //--------------------------------------------------------------------------------------------------------------------------------
 METHOD __OpenMenu() CLASS ToolStripButton
+RETURN ___OpenMenu( Self )
+
+FUNCTION ___OpenMenu( Self )
    LOCAL hMonitor, mix, lChildren, aPt
    
    s_PrevFocus := NIL
@@ -2209,7 +2205,6 @@ METHOD __OpenMenu() CLASS ToolStripButton
    
    ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
    ::PostMessage( WM_USER + 1027, 0, 0 )
-   
 RETURN Self
 
 METHOD __CloseMenu() CLASS ToolStripButton
@@ -3144,3 +3139,38 @@ FUNCTION __GradientFill( hDC, aVertex, nVertex, aMesh, nCount, ulMode )
    aVertex := NIL
    aMesh   := NIL
 RETURN NIL
+
+//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------
+
+CLASS ContextStrip INHERIT ToolStripButton
+   DATA hMenu EXPORTED
+   METHOD Init() CONSTRUCTOR
+   METHOD Create()
+   METHOD Show()
+ENDCLASS
+
+METHOD Init( oParent ) CLASS ContextStrip
+   DEFAULT ::__xCtrlName   TO "ContextStrip"
+   DEFAULT ::ComponentType TO "ContextStrip"
+   DEFAULT ::ClsName       TO "ContextStrip"
+   Super:Init( oParent )
+   ::Parent := oParent
+RETURN Self
+
+METHOD Create() CLASS ContextStrip
+   LOCAL lpMenuInfo := (struct MENUINFO)
+   ::hMenu := CreatePopupMenu()
+   lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
+   lpMenuInfo:fMask  := MIM_STYLE
+   lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
+   SetMenuInfo( ::hMenu, lpMenuInfo )
+   ::__SetSubMenu( ::hMenu )
+RETURN Self
+
+METHOD Show( x, y ) CLASS ContextStrip
+   LOCAL nRes
+(x, y)
+RETURN nRes
+
