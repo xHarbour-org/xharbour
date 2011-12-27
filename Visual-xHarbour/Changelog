@@ -7,6 +7,8 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2011-12-26 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed small bug in DataGrid scrolling data when scrollbar is off.
 
 2011-12-23 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed error editing a table in the DataSource editor.
