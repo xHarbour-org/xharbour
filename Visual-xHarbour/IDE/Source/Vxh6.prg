@@ -181,7 +181,7 @@ METHOD Create() CLASS ToolBox
    AADD( ::aButtons[4][2], { "ImageList", .T. } )
    AADD( ::aButtons[4][2], { "ContextMenu", .T. } )
    AADD( ::aButtons[4][2], { "NotifyIcon", .T. } )
-
+   AADD( ::aButtons[4][2], { "ContextStrip", lPro } )
    AADD( ::aButtons[4][2], { "SerialPort", lPro } )
    AADD( ::aButtons[4][2], { "MemoryTable", lPro } )
    AADD( ::aButtons[4][2], { "FtpClient", lPro } )
@@ -621,6 +621,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
    EXTERN ContextMenu
    EXTERN NotifyIcon
    #ifdef VXH_PROFESSIONAL
+      EXTERN ContextStrip
       EXTERN SerialPort
       EXTERN MemoryTable
       EXTERN FtpClient

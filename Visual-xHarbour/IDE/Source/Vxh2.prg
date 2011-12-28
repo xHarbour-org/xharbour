@@ -323,7 +323,7 @@ METHOD SelectControl( oControl, lFocus, lRefreshComp ) CLASS WindowEdit
          oControl:Button:Select()
       ENDIF
 
-      IF oControl:__xCtrlName == "ContextMenu"
+      IF oControl:__xCtrlName IN { "ContextMenu", "ContextStrip" }
          oControl:Show()
       ENDIF
    ENDIF

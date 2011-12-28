@@ -1262,19 +1262,19 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
        //hb_gcAll()
        cProp  := aProperty[1]
 
+       IF cProp == "SHORTCUTKEY" .AND. ::ActiveObject:ClsName == "ContextStrip"
+          LOOP
+       ENDIF
        IF cProp == "RESOURCES" .AND. ::ActiveObject:ClsName == "Application"
           LOOP
        ENDIF
        IF cProp == "WIDTH" .AND. ::ActiveObject:ClsName == "ExplorerBar"
           LOOP
        ENDIF
-       IF ::ActiveObject:__CustomOwner .AND. ( cProp == "LEFT" .OR. cProp == "TOP" .OR. cProp == "WIDTH" .OR. cProp == "HEIGHT" )
+       IF ::ActiveObject:__CustomOwner .AND. cProp IN {"LEFT","TOP","WIDTH","HEIGHT"}
           LOOP
        ENDIF
        IF __ObjHasMsg( ::ActiveObject, "__PROPFILTER" ) .AND. ASCAN( ::ActiveObject:__PropFilter, cProp ) > 0
-          LOOP
-       ENDIF
-       IF cProp == "PROGID" .OR. cProp == "CLSID"
           LOOP
        ENDIF
        IF cProp == "MDICLIENT" .AND. ( !::ActiveObject:MDIContainer .OR. ::ActiveObject:MDIChild )
@@ -1286,7 +1286,8 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
        IF cProp == "MDICONTAINER" .AND. ::ActiveObject:MDIChild
           LOOP
        ENDIF
-       IF cProp == "PANEHEIGHT" .OR. cProp == "OWNER"
+
+       IF cProp IN { "PANEHEIGHT","OWNER","PROGID","CLSID" }
           LOOP
        ENDIF
        IF cProp == "POSITION" .AND. ::ActiveObject:ClsName == "ToolButton"
@@ -1472,7 +1473,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                   NEXT
                   aCol[1]:ColType := "SERVICES"
 
-             CASE cProp IN {"BindingSource","DataSource","ImageList","HotImageList","ImageListSmall","HeaderMenu","ButtonMenu","ContextMenu","Socket","SqlConnector"}
+             CASE cProp IN {"BindingSource","DataSource","ImageList","HotImageList","ImageListSmall","HeaderMenu","ButtonMenu","ContextMenu","Socket","SqlConnector","ContextStrip"}
                   aCol[1]:Value := { "", { NIL } }
                   IF cProp IN {"HeaderMenu","ButtonMenu"}
                      xProp := cProp
@@ -2375,7 +2376,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :ShowDropDown()
                     END
 
-               CASE cType IN { "IMAGELIST","BANDCHILD","DATASOURCE","HEADERMENU","BUTTONMENU","CONTEXTMENU","SOCKET","BINDINGSOURCE","SQLCONNECTOR" }
+               CASE cType IN { "IMAGELIST","BANDCHILD","DATASOURCE","HEADERMENU","BUTTONMENU","CONTEXTMENU","SOCKET","BINDINGSOURCE","SQLCONNECTOR","CONTEXTSTRIP" }
                     ::ActiveControl := ObjCombo( Self )
                     WITH OBJECT ::ActiveControl
                        :Left   := nLeft-1
