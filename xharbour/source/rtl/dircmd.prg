@@ -116,7 +116,7 @@ STATIC PROCEDURE PutDBF( aDirEntry )
 
    ENDIF
 
-   QOut( PadR( aDirEntry[ F_NAME ], 15 ) +;
+   QOut( PadR( aDirEntry[ F_NAME ], 21 ) +;
          Str( nRecCount, 12 ) + "    " +;
          DToC( dLastUpdate ) +;
          Str( aDirEntry[ F_SIZE ], 12 ) )
@@ -129,9 +129,9 @@ STATIC PROCEDURE PutNormal( aDirEntry )
 
    hb_FNameSplit( aDirEntry[ F_NAME ], NIL, @cName, @cExt )
 
-   cName := PADR(cName+cExt,12)
+   cName := PADR(cName+cExt, 21 )
    QOut( cName + " " + ;
-         Str( aDirEntry[ F_SIZE ], 8 ) + "  " +;
+         Str( aDirEntry[ F_SIZE ], 12 ) + "  " +;
          DToC( aDirEntry[ F_DATE ] ) )
 
    RETURN
