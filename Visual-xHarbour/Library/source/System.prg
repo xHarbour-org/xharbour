@@ -74,6 +74,7 @@ CLASS System
    
    ACCESS LocalTime     INLINE ::GetLocalTime()
    ACCESS RootFolders   INLINE ::Folders
+   ACCESS LastError     INLINE STRTRAN( FormatMessage( , , GetLastError() ), CRLF )
    
    METHOD Init() CONSTRUCTOR
    METHOD Update()

@@ -7,6 +7,10 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2011-12-30 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added ContextStrip component, it must be assigned to the control's ContextMenu
+     property.
+
 2011-12-26 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed small bug in DataGrid scrolling data when scrollbar is off.
 

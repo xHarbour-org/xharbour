@@ -2074,11 +2074,11 @@ STATIC FUNCTION __SetSubMenu( Self, hMenu )
        IF oItem:__pObjPtr != NIL
           EXIT
        ENDIF
-       oItem:__pObjPtr  := ArrayPointer( oItem )
        
        IF ::__ClassInst != NIL .AND. oItem:Caption != "[ Add New Item ]" .AND. ASCAN( oItem:Children, {|o| o:Caption == "[ Add New Item ]"} ) == 0
           WITH OBJECT MenuStripItem()
              :Caption   := "[ Add New Item ]"
+             :GenerateMember := .F.
              :Init( oItem )
              :Font:Bold := .T.
              :Events    := {}
@@ -2103,7 +2103,7 @@ STATIC FUNCTION __SetSubMenu( Self, hMenu )
        mii:hbmpUnchecked := 0
        mii:dwTypeData    := oItem:Caption
        mii:hBmpItem      := NIL
-       mii:dwItemData    := oItem:__pObjPtr
+       mii:dwItemData    := oItem:__pObjPtr := ArrayPointer( oItem )
 
        __InsertMenuStripItem( hMenu, -1, .T., mii:fMask, mii:hSubMenu, mii:wID, mii:dwTypeData, mii:dwItemData, mii:fState )
    NEXT
@@ -3140,14 +3140,32 @@ ENDCLASS
 
 METHOD Init( oParent ) CLASS ContextStrip
    DEFAULT ::__xCtrlName   TO "ContextStrip"
-   DEFAULT ::ComponentType TO "ContextStrip"
+   DEFAULT ::ComponentType TO "ContextMenu"
    DEFAULT ::ClsName       TO "ContextStrip"
    Super:Init( oParent )
    ::Parent := oParent
 RETURN Self
 
 METHOD Create() CLASS ContextStrip
+   LOCAL lpMenuInfo := (struct MENUINFO)
    Super:Create()
+   ::__hMenu := CreatePopupMenu()
+   lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
+   lpMenuInfo:fMask  := MIM_STYLE
+   lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
+   SetMenuInfo( ::__hMenu, lpMenuInfo )
+   ::lCreated := .T.
+   IF ::__ClassInst != NIL
+      WITH OBJECT MenuStripItem()
+         :GenerateMember := .F.
+         :Caption     := "[ Add New Item ]"
+         :Init( Self )
+         :Events      := {}
+         :Font:Bold   := .T.
+         :Action      := {|o| o:Parent:__AddMenuStripItem() }
+         :Create()
+      END
+   ENDIF
 RETURN Self
 
 METHOD __AddMenuStripItem() CLASS ContextStrip
@@ -3157,13 +3175,8 @@ RETURN Self
 METHOD Show( x, y ) CLASS ContextStrip
    LOCAL nStyle, nRes := 0, rc, pt := (struct POINT)
    LOCAL aPt
-   LOCAL lpMenuInfo := (struct MENUINFO)
 
-   ::__hMenu := CreatePopupMenu()
-   lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
-   lpMenuInfo:fMask  := MIM_STYLE
-   lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
-   SetMenuInfo( ::__hMenu, lpMenuInfo )
+   __ReleaseMenu( Self, ::__hMenu )
 
    nStyle := TPM_LEFTALIGN | TPM_TOPALIGN
    IF ::__ClassInst != NIL
@@ -3171,17 +3184,6 @@ METHOD Show( x, y ) CLASS ContextStrip
       x := ( rc:left + rc:right ) / 2
       y := ( rc:top + rc:bottom ) / 2
       nStyle := TPM_CENTERALIGN | TPM_LEFTBUTTON
-      IF EMPTY( ::Children )
-         WITH OBJECT MenuStripItem()
-            :GenerateMember := .F.
-            :Caption     := "[ Add New Item ]"
-            :Init( Self )
-            :Events      := {}
-            :Font:Bold   := .T.
-            :Action      := {|o| Alert("xxxx"), o:Parent:__AddMenuStripItem() }
-            :Create()
-         END
-      ENDIF
    ENDIF
 
    __SetSubMenu( Self, ::__hMenu )
@@ -3205,8 +3207,5 @@ METHOD Show( x, y ) CLASS ContextStrip
       s_hKeyMenuHook    := NIL
    ENDIF
 
-   __ReleaseMenu( Self, ::__hMenu )
-
-   DestroyMenu( ::__hMenu )
 RETURN nRes
 

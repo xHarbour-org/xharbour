@@ -1262,9 +1262,6 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
        //hb_gcAll()
        cProp  := aProperty[1]
 
-       IF cProp == "SHORTCUTKEY" .AND. ::ActiveObject:ClsName == "ContextStrip"
-          LOOP
-       ENDIF
        IF cProp == "RESOURCES" .AND. ::ActiveObject:ClsName == "Application"
           LOOP
        ENDIF
@@ -1473,7 +1470,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                   NEXT
                   aCol[1]:ColType := "SERVICES"
 
-             CASE cProp IN {"BindingSource","DataSource","ImageList","HotImageList","ImageListSmall","HeaderMenu","ButtonMenu","ContextMenu","Socket","SqlConnector","ContextStrip"}
+             CASE cProp IN {"BindingSource","DataSource","ImageList","HotImageList","ImageListSmall","HeaderMenu","ButtonMenu","ContextMenu","Socket","SqlConnector"}
                   aCol[1]:Value := { "", { NIL } }
                   IF cProp IN {"HeaderMenu","ButtonMenu"}
                      xProp := cProp
@@ -2376,7 +2373,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :ShowDropDown()
                     END
 
-               CASE cType IN { "IMAGELIST","BANDCHILD","DATASOURCE","HEADERMENU","BUTTONMENU","CONTEXTMENU","SOCKET","BINDINGSOURCE","SQLCONNECTOR","CONTEXTSTRIP" }
+               CASE cType IN { "IMAGELIST","BANDCHILD","DATASOURCE","HEADERMENU","BUTTONMENU","CONTEXTMENU","SOCKET","BINDINGSOURCE","SQLCONNECTOR" }
                     ::ActiveControl := ObjCombo( Self )
                     WITH OBJECT ::ActiveControl
                        :Left   := nLeft-1
