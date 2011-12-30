@@ -31,7 +31,8 @@ CLASS Component INHERIT Object
    DATA __IdeImageIndex        EXPORTED INIT 7
    DATA __PropFilter           EXPORTED INIT {}
    DATA Caption                EXPORTED INIT ""
-   
+   DATA lComponent             EXPORTED INIT .T.
+
    ACCESS Form                 INLINE IIF( ::Owner != NIL, ::Owner:Form, NIL )
    ACCESS AppInstance          INLINE ::__GetInstance()
 

@@ -53,6 +53,7 @@ CLASS Object
    DATA Property               EXPORTED
 
    DATA EventHandler           EXPORTED
+   DATA lComponent             EXPORTED INIT .F.
    DATA __OnInitCanceled       EXPORTED INIT .F.
    DATA __InstApp              EXPORTED
    DATA xName                  EXPORTED

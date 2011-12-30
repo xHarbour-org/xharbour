@@ -3151,17 +3151,25 @@ METHOD Init( oParent ) CLASS ContextStrip
 RETURN Self
 
 METHOD Create() CLASS ContextStrip
+   LOCAL lpMenuInfo := (struct MENUINFO)
+   ::Component:Create()
    IF ::__ClassInst != NIL
-       WITH OBJECT MenuStripItem()
-          :Caption   := "[ Add New Item ]"
-          :Init( Self )
-          :Font:Bold := .T.
-          :Events    := {}
-          :Action    := {|o| ::Application:Project:SetAction( { { DG_ADDCONTROL, 0, 0, 0, .T., o:Parent, "MenuStripItem",,,1, {}, } }, ::Application:Project:aUndo ) }
-          :Create()
-       END
+/*
+      ::__hMenu := CreatePopupMenu()
+      lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
+      lpMenuInfo:fMask  := MIM_STYLE
+      lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
+      SetMenuInfo( ::__hMenu, lpMenuInfo )
+*/
+      WITH OBJECT MenuStripItem()
+         :Caption   := "[ Add New Item ]"
+         :Init( Self )
+         :Font:Bold := .T.
+         :Events    := {}
+         :Action    := {|o| ::Application:Project:SetAction( { { DG_ADDCONTROL, 0, 0, 0, .T., o:Parent, "MenuStripItem",,,1, {}, } }, ::Application:Project:aUndo ) }
+         :Create()
+      END
    ENDIF
-
    view len( ::Children )
 RETURN Self
 
@@ -3169,6 +3177,10 @@ METHOD Show( x, y ) CLASS ContextStrip
    LOCAL nStyle, nRes := 0, rc, pt := (struct POINT)
    LOCAL aPt
    LOCAL lpMenuInfo := (struct MENUINFO)
+
+//   IF IsMenu( ::__hMenu )
+//      DestroyMenu( ::__hMenu )
+//   ENDIF
 
    ::__hMenu := CreatePopupMenu()
    lpMenuInfo:cbSize := lpMenuInfo:SizeOf()

@@ -947,7 +947,7 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
          ::Application:ObjectTree:Set( oActiveObject )
       ENDIF
       
-      IF cProp2 != NIL .AND. cProp2 == "Font" .AND. __clsParent( oActiveObject:ClassH, "COMPONENT" )
+      IF cProp2 != NIL .AND. cProp2 == "Font" .AND. oActiveObject:lComponent
          oObj:Set( oActiveObject )
       ENDIF
       
@@ -1210,7 +1210,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
    ENDIF
 
    IF ::ActiveObject != NIL
-      IF __clsParent( ::ActiveObject:ClassH, "COMPONENT" )
+      IF ::ActiveObject:lComponent
          ::Application:Components:InvalidateRect()
        ELSE
          //::Application:MainForm:FormEditor1:InvalidateRect()
@@ -2423,7 +2423,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        oFont := ::ActiveObject:&cProp
                        IF cType == "CHOOSEFONT"
 
-                          IF __clsParent( ::ActiveObject:ClassH, "COMPONENT" )
+                          IF ::ActiveObject:lComponent
                              :Action := {|o, cf| cf := o:Parent:ActiveObject:Show(o),;
                                                        o:Destroy(),;
                                                        ::Application:Project:Modified := .T.}

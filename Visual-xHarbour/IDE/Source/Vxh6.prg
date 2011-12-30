@@ -724,7 +724,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
          ENDIF
       ENDIF
 
-      IF !__clsParent( oControl:ClassH, "COMPONENT" )
+      IF !oControl:lComponent
 
          oControl:Left    := x
          oControl:Top     := y
