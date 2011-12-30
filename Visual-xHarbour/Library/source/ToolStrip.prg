@@ -3136,6 +3136,7 @@ CLASS ContextStrip INHERIT Component
    METHOD Create()
    METHOD __DrawShadow() INLINE NIL
    METHOD __AddMenuStripItem
+   METHOD Destroy() INLINE __ReleaseMenu( Self, ::__hMenu ), DestroyMenu( ::__hMenu )
 ENDCLASS
 
 METHOD Init( oParent ) CLASS ContextStrip
