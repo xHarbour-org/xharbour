@@ -2074,7 +2074,7 @@ STATIC FUNCTION __SetSubMenu( Self, hMenu )
        IF oItem:__pObjPtr != NIL
           EXIT
        ENDIF
-       
+
        IF ::__ClassInst != NIL .AND. oItem:Caption != "[ Add New Item ]" .AND. ASCAN( oItem:Children, {|o| o:Caption == "[ Add New Item ]"} ) == 0
           WITH OBJECT MenuStripItem()
              :Caption   := "[ Add New Item ]"
@@ -2452,6 +2452,13 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
               RETURN 0
            ENDIF
            EXIT
+      CASE WM_LBUTTONUP
+           IF s_oCurrMenuItem != NIL .AND. s_oCurrMenuItem:Caption == "[ Add New Item ]"
+              EVAL( s_oCurrMenuItem:Action, s_oCurrMenuItem )
+              __ReleaseMenu( s_CurrentObject, s_CurrentObject:__hMenu )
+              __SetSubMenu( s_CurrentObject, s_CurrentObject:__hMenu )
+              RETURN 1
+           ENDIF
 
       CASE WM_SYSKEYDOWN
            IF ms_wParam == VK_MENU
@@ -3167,6 +3174,7 @@ METHOD Create() CLASS ContextStrip
          :Create()
       END
    ENDIF
+   ::hWnd := ::Form:hWnd
 RETURN Self
 
 METHOD __AddMenuStripItem() CLASS ContextStrip
