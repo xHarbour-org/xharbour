@@ -465,7 +465,7 @@ METHOD Set( oObj, lSelect, lChange ) CLASS ObjectTreeView
    TRY
       IF !::lSetting .AND. oObj != NIL .AND. oObj:Caption != "[ Add New Item ]" //.AND. !oObj:__CustomOwner
          IF oObj:TreeItem == NIL
-            IF !oObj:lComponent
+            IF ! __clsParent( oObj:ClassH, "COMPONENT" )
 
                DEFAULT oObj:Parent TO ::Application:Project:CurrentForm
                DEFAULT oObj:Parent:TreeItem TO ::Set( oObj:Parent )

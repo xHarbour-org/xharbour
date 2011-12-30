@@ -258,7 +258,7 @@ RETURN Self
 //----------------------------------------------------------------------------
 
 METHOD SelectControl( oControl, lFocus, lRefreshComp ) CLASS WindowEdit
-   LOCAL aRect:={,,,}, lComponent := oControl:lComponent
+   LOCAL aRect:={,,,}, lComponent := __clsParent( oControl:ClassH, "COMPONENT" )
    DEFAULT lFocus TO .T.
 
    ::InRect    := -1
@@ -421,7 +421,7 @@ METHOD MaskKeyDown( o, nKey ) CLASS WindowEdit
       CASE nKey == VK_DELETE
            lCheck := .F.
 
-           IF ::Application:ObjectManager:ActiveObject:lComponent
+           IF __clsParent( ::Application:ObjectManager:ActiveObject:ClassH, "COMPONENT" )
               WITH OBJECT ::Application:ObjectManager:ActiveObject
                  ::Application:Project:SetAction( { { DG_DELCONTROL, NIL, 0, 0, .F., :Owner, :__xCtrlName, hb_qWith(), , 1, , ::Application:Components:Current } }, ::Application:Project:aUndo )
               END
@@ -713,7 +713,7 @@ METHOD ControlSelect( x, y ) CLASS WindowEdit
          ENDIF
 
          IF lCtrl
-            IF LEN( ::Selected ) > 0 .AND. ( ::Selected[1][1]:lComponent .OR. oControl:lComponent )
+            IF LEN( ::Selected ) > 0 .AND. ( __clsParent( ::Selected[1][1]:ClassH, "COMPONENT" ) .OR. __clsParent( oControl:ClassH, "COMPONENT" ) )
                lCtrl := .F.
             ENDIF
          ENDIF
@@ -1003,7 +1003,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
       RETURN 0
    ENDIF
 
-   IF LEN( ::Selected ) > 0 .AND. lRealUp .AND. !::Selected[1][1]:lComponent
+   IF LEN( ::Selected ) > 0 .AND. lRealUp .AND. ! __clsParent( ::Selected[1][1]:ClassH, "COMPONENT" )
       IF ::Selected[1][1]:__Temprect != NIL
          nLeft := ::Selected[1][1]:__Temprect[1]
          nTop  := ::Selected[1][1]:__Temprect[2]
@@ -1138,7 +1138,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
       
       nFor := 1
       FOR EACH aControl IN ::Selected
-          IF aControl[1]:Parent != NIL .AND. !aControl[1]:lComponent .AND. !aControl[1]:ClassName == "CMENUITEM"
+          IF aControl[1]:Parent != NIL .AND. ! __clsParent( aControl[1]:ClassH, "COMPONENT" ) .AND. !aControl[1]:ClassName == "CMENUITEM"
              aPoints := ::GetPoints( aControl[1] )
              FOR x := 1 TO LEN( aPoints )
 

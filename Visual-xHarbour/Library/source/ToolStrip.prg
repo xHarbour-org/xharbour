@@ -2104,8 +2104,8 @@ STATIC FUNCTION __SetSubMenu( Self, hMenu )
        mii:dwTypeData    := oItem:Caption
        mii:hBmpItem      := NIL
        mii:dwItemData    := oItem:__pObjPtr
-       
-       TOOLSTRIPBUTTON_INSERTMENUITEM( hMenu, -1, .T., mii:fMask, mii:hSubMenu, mii:wID, mii:dwTypeData, mii:dwItemData, mii:fState )
+
+       __InsertMenuStripItem( hMenu, -1, .T., mii:fMask, mii:hSubMenu, mii:wID, mii:dwTypeData, mii:dwItemData, mii:fState )
    NEXT
 RETURN Self
 
@@ -3133,7 +3133,9 @@ CLASS ContextStrip INHERIT Component
    DATA Left, Top, Width EXPORTED INIT 0
    METHOD Init() CONSTRUCTOR
    METHOD Show()
+   METHOD Create()
    METHOD __DrawShadow() INLINE NIL
+   METHOD __AddMenuStripItem
 ENDCLASS
 
 METHOD Init( oParent ) CLASS ContextStrip
@@ -3142,6 +3144,14 @@ METHOD Init( oParent ) CLASS ContextStrip
    DEFAULT ::ClsName       TO "ContextStrip"
    Super:Init( oParent )
    ::Parent := oParent
+RETURN Self
+
+METHOD Create() CLASS ContextStrip
+   Super:Create()
+RETURN Self
+
+METHOD __AddMenuStripItem() CLASS ContextStrip
+   ::Application:Project:SetAction( { { DG_ADDCONTROL, 0, 0, 0, .T., Self, "MenuStripItem",,,1, {}, } }, ::Application:Project:aUndo )
 RETURN Self
 
 METHOD Show( x, y ) CLASS ContextStrip
@@ -3161,16 +3171,17 @@ METHOD Show( x, y ) CLASS ContextStrip
       x := ( rc:left + rc:right ) / 2
       y := ( rc:top + rc:bottom ) / 2
       nStyle := TPM_CENTERALIGN | TPM_LEFTBUTTON
-
+      IF EMPTY( ::Children )
          WITH OBJECT MenuStripItem()
-            :Caption   := "[ Add New Item ]"
+            :GenerateMember := .F.
+            :Caption     := "[ Add New Item ]"
             :Init( Self )
-            :Font:Bold := .T.
-            :Events    := {}
-            :Action    := {|o| ::Application:Project:SetAction( { { DG_ADDCONTROL, 0, 0, 0, .T., o:Parent, "MenuStripItem",,,1, {}, } }, ::Application:Project:aUndo ) }
+            :Events      := {}
+            :Font:Bold   := .T.
+            :Action      := {|o| Alert("xxxx"), o:Parent:__AddMenuStripItem() }
             :Create()
          END
-
+      ENDIF
    ENDIF
 
    __SetSubMenu( Self, ::__hMenu )

@@ -4223,7 +4223,7 @@ METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors
 
             ELSEIF cLine HAS "(?i)^END"
                // Finish object type PROPERTY / Control, return to previous parent
-               IF oObj:lComponent .OR. UPPER( oObj:ClsName ) IN { "ANCHOR", "DOCK", "FREEIMAGERENDERER" }
+               IF __clsParent( oObj:ClassH, "COMPONENT" ) .OR. UPPER( oObj:ClsName ) IN { "ANCHOR", "DOCK", "FREEIMAGERENDERER" }
                   oObj := oObj:Owner
                 ELSE
                   TRY
@@ -5136,7 +5136,7 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
                             cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := ::" + xValue1:Name + CRLF
                           ELSE
                             lParent := .F.
-                            IF xValue1:lComponent .OR. xValue1:ClsName == "FreeImageRenderer"
+                            IF __clsParent( xValue1:ClassH, "COMPONENT" ) .OR. xValue1:ClsName == "FreeImageRenderer"
                                IF xValue1:Owner == oCtrl
                                   lParent := .T.
                                ENDIF
@@ -6319,7 +6319,7 @@ METHOD FillData( oWnd ) CLASS ControlObjCombo
 
    cObj := ""
    cCaption := ""
-   IF oWnd:lComponent 
+   IF __clsParent( oWnd:ClassH, "COMPONENT" )
       cObj += oWnd:Owner:Name+":"
     ELSEIF oWnd:ClsName != "VXH_FORM_IDE"
       cObj += oWnd:Parent:Name+":"
