@@ -525,7 +525,7 @@ RETURN nRet
 //-------------------------------------------------------------------------------------------------------
 METHOD OnDestroy() CLASS ToolStrip
    IF s_CurrentObject != NIL
-      s_CurrentObject:__ReleaseMenu( s_CurrentObject:__hMenu )
+      __ReleaseMenu( s_CurrentObject, s_CurrentObject:__hMenu )
       s_CurrentObject := NIL
    ENDIF
    IF s_hKeyMenuHook != NIL
@@ -1742,11 +1742,8 @@ CLASS ToolStripButton INHERIT ToolStripItem
    // Private methods
    METHOD __OpenMenu()
    METHOD __CloseMenu()
-   METHOD __SetSubMenu()
-   METHOD __ReleaseMenu()
    METHOD __SetImageIndex()
    METHOD __DrawStripe()
-   METHOD __MenuDialogProc()
    METHOD __SetDropDown()
    METHOD __DrawShadow()
    METHOD __SetImageList()    INLINE IIF( ::hWnd != NIL, AEVAL( ::Children, {|o| o:InvalidateRect() } ),)
@@ -2043,7 +2040,7 @@ METHOD SetWindowText( cText ) CLASS ToolStripButton
 RETURN Self
 
 //--------------------------------------------------------------------------------------------------------------------------------
-METHOD __ReleaseMenu( hMenu ) CLASS ToolStripButton
+static FUNCTION __ReleaseMenu( Self, hMenu )
    LOCAL oItem
    FOR EACH oItem IN ::Children
        IF oItem:__hSubMenu != NIL
@@ -2057,12 +2054,12 @@ METHOD __ReleaseMenu( hMenu ) CLASS ToolStripButton
           ReleaseArrayPointer( oItem:__pObjPtr )
           oItem:__pObjPtr := NIL
        ENDIF
-       oItem:__ReleaseMenu( oItem:__hSubMenu )
+       __ReleaseMenu( oItem, oItem:__hSubMenu )
    NEXT
 RETURN Self
 
 //--------------------------------------------------------------------------------------------------------------------------------
-METHOD __SetSubMenu( hMenu ) CLASS ToolStripButton
+STATIC FUNCTION __SetSubMenu( Self, hMenu )
    LOCAL n, mii, oItem
    
    IF ::__ClassInst != NIL 
@@ -2142,7 +2139,7 @@ FUNCTION ___OpenMenu( Self )
    ::SetCapture()
    s_lExecuting := .T.
    
-   ::__SetSubMenu( ::__hMenu )
+   __SetSubMenu( Self, ::__hMenu )
 
    aPt := { ::Left, ::Top + ::Height - 1 }
    _ClientToScreen( ::Parent:hWnd, @aPt )
@@ -2201,7 +2198,7 @@ RETURN Self
 METHOD OnUserMsg() CLASS ToolStripButton
    DO CASE
       CASE ::Msg == WM_USER + 1027
-           ::__ReleaseMenu( ::__hMenu )
+           __ReleaseMenu( Self, ::__hMenu )
            
       CASE ::Msg == WM_USER + 1028
            ::__OpenMenu()
@@ -2262,8 +2259,8 @@ METHOD __DrawStripe( hDC, x, y, cx, cy ) CLASS ToolStripButton
 RETURN Self
 
 //--------------------------------------------------------------------------------------------------------------------------------
-METHOD __MenuDialogProc( hWnd, nMsg, nwParam, nlParam ) CLASS ToolStripButton
-   LOCAL aPt, aRect, hdc, pProc, hOldBrush, hOldPen, n
+STATIC FUNCTION __MenuDialogProc( hWnd, nMsg, nwParam, nlParam )
+   LOCAL aPt, aRect, hdc, pProc, hOldBrush, hOldPen, n, Self := s_CurrentObject
    
    pProc := GetProp( hWnd, "PROP_WND_PROC" )
 
@@ -2389,7 +2386,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
            mii_dwItemData := MENUITEMINFOITEMDATA( ms_lParam, LOWORD( ms_wParam ), ( HIWORD( ms_wParam ) & MF_POPUP ) == MF_POPUP )
 
            IF mii_dwItemData != NIL .AND. mii_dwItemData <> 0 .AND. ( s_oCurrMenuItem := ArrayFromPointer( mii_dwItemData ) ) != NIL
-              s_oCurrMenuItem:__SetSubMenu( s_oCurrMenuItem:__hSubMenu )
+              __SetSubMenu( s_oCurrMenuItem, s_oCurrMenuItem:__hSubMenu )
            ENDIF
            EXIT
 
@@ -2736,7 +2733,7 @@ FUNCTION __MenuDialogHook( nCode, nwParam, nlParam )
               IF pCallBack != NIL
                  FreeCallBackPointer( pCallBack )
               ENDIF
-              pCallBack := WinCallBackPointer( HB_ObjMsgPtr( s_CurrentObject, "__MenuDialogProc" ), s_CurrentObject )
+              pCallBack := WinCallBackPointer( @__MenuDialogProc() )
               IF SetWindowLong( cwp_hwnd, GWL_WNDPROC, pCallBack ) == 0
                  RemoveProp( cwp_hwnd, "PROP_WND_PROC" )
                  EXIT
@@ -3131,56 +3128,26 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
 
-CLASS ContextStrip INHERIT Component, MenuStripItem
-   DATA __lIsMenu       EXPORTED  INIT .T.
-   DATA __hMenu         EXPORTED
-   DATA ToolStripButton EXPORTED
-   DATA __DesignAddNew  EXPORTED
+CLASS ContextStrip INHERIT Component
+   DATA __hMenu   EXPORTED
+   DATA Left, Top, Width EXPORTED INIT 0
    METHOD Init() CONSTRUCTOR
-   METHOD Create()
    METHOD Show()
-   METHOD Destroy() INLINE ::Component:Destroy()
+   METHOD __DrawShadow() INLINE NIL
 ENDCLASS
 
 METHOD Init( oParent ) CLASS ContextStrip
    DEFAULT ::__xCtrlName   TO "ContextStrip"
    DEFAULT ::ComponentType TO "ContextStrip"
    DEFAULT ::ClsName       TO "ContextStrip"
-   ::Component:Init( oParent )
+   Super:Init( oParent )
    ::Parent := oParent
-RETURN Self
-
-METHOD Create() CLASS ContextStrip
-   LOCAL lpMenuInfo := (struct MENUINFO)
-   ::Component:Create()
-   IF ::__ClassInst != NIL
-/*
-      ::__hMenu := CreatePopupMenu()
-      lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
-      lpMenuInfo:fMask  := MIM_STYLE
-      lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
-      SetMenuInfo( ::__hMenu, lpMenuInfo )
-*/
-      WITH OBJECT MenuStripItem()
-         :Caption   := "[ Add New Item ]"
-         :Init( Self )
-         :Font:Bold := .T.
-         :Events    := {}
-         :Action    := {|o| ::Application:Project:SetAction( { { DG_ADDCONTROL, 0, 0, 0, .T., o:Parent, "MenuStripItem",,,1, {}, } }, ::Application:Project:aUndo ) }
-         :Create()
-      END
-   ENDIF
-   view len( ::Children )
 RETURN Self
 
 METHOD Show( x, y ) CLASS ContextStrip
    LOCAL nStyle, nRes := 0, rc, pt := (struct POINT)
    LOCAL aPt
    LOCAL lpMenuInfo := (struct MENUINFO)
-
-//   IF IsMenu( ::__hMenu )
-//      DestroyMenu( ::__hMenu )
-//   ENDIF
 
    ::__hMenu := CreatePopupMenu()
    lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
@@ -3194,9 +3161,19 @@ METHOD Show( x, y ) CLASS ContextStrip
       x := ( rc:left + rc:right ) / 2
       y := ( rc:top + rc:bottom ) / 2
       nStyle := TPM_CENTERALIGN | TPM_LEFTBUTTON
+
+         WITH OBJECT MenuStripItem()
+            :Caption   := "[ Add New Item ]"
+            :Init( Self )
+            :Font:Bold := .T.
+            :Events    := {}
+            :Action    := {|o| ::Application:Project:SetAction( { { DG_ADDCONTROL, 0, 0, 0, .T., o:Parent, "MenuStripItem",,,1, {}, } }, ::Application:Project:aUndo ) }
+            :Create()
+         END
+
    ENDIF
 
-   ::__SetSubMenu( ::__hMenu )
+   __SetSubMenu( Self, ::__hMenu )
 
    aPt := { x, y }
 
@@ -3209,10 +3186,6 @@ METHOD Show( x, y ) CLASS ContextStrip
    TrackPopupMenu( ::__hMenu, nStyle, aPt[1], aPt[2], 0, ::Form:hWnd )
    s_nmw := 0
 
-   IF !( "Aero" $ ::System:CurrentScheme:Theme )
-      RestoreShadow()
-   ENDIF
-   
    UnhookWindowsHookEx( s_hMenuDialogHook )
    s_hMenuDialogHook := NIL
    
@@ -3221,7 +3194,7 @@ METHOD Show( x, y ) CLASS ContextStrip
       s_hKeyMenuHook    := NIL
    ENDIF
 
-   ::__ReleaseMenu( ::__hMenu )
+   __ReleaseMenu( Self, ::__hMenu )
 
    DestroyMenu( ::__hMenu )
 RETURN nRes
