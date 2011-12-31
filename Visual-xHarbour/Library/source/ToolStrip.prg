@@ -3187,25 +3187,6 @@ METHOD Show( x, y ) CLASS ContextStrip
 
    __ReleaseMenu( Self, ::__hMenu )
    
-   IF ! IsMenu( ::__hMenu )
-      ::__hMenu := CreatePopupMenu()
-      lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
-      lpMenuInfo:fMask  := MIM_STYLE
-      lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
-      SetMenuInfo( ::__hMenu, lpMenuInfo )
-   ENDIF      
-   IF ::__ClassInst != NIL .AND. EMPTY( ::Children )
-      WITH OBJECT MenuStripItem()
-         :GenerateMember := .F.
-         :Caption     := "[ Add New Item ]"
-         :Init( Self )
-         :Events      := {}
-         :Font:Bold   := .T.
-         :Action      := {|o| o:Parent:__AddMenuStripItem() }
-         :Create()
-      END
-   ENDIF
-
    nStyle := TPM_LEFTALIGN | TPM_TOPALIGN
    IF ::__ClassInst != NIL
       GetWindowRect( ::Application:MainForm:FormEditor1:hWnd, @rc )
