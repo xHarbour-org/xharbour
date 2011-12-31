@@ -2452,6 +2452,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
               RETURN 0
            ENDIF
            EXIT
+/*
       CASE WM_LBUTTONUP
            IF s_oCurrMenuItem != NIL .AND. s_oCurrMenuItem:Caption == "[ Add New Item ]"
               EVAL( s_oCurrMenuItem:Action, s_oCurrMenuItem )
@@ -2459,7 +2460,8 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
               __SetSubMenu( s_CurrentObject, s_CurrentObject:__hMenu )
               RETURN 1
            ENDIF
-
+           EXIT
+*/
       CASE WM_SYSKEYDOWN
            IF ms_wParam == VK_MENU
               SendMessage( s_CurrentObject:Form:hWnd, WM_CANCELMODE, 0, 0 )
