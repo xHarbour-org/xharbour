@@ -3183,9 +3183,28 @@ RETURN Self
 
 METHOD Show( x, y ) CLASS ContextStrip
    LOCAL nStyle, nRes := 0, rc, pt := (struct POINT)
-   LOCAL aPt
+   LOCAL lpMenuInfo := (struct MENUINFO)
 
    __ReleaseMenu( Self, ::__hMenu )
+   
+   IF ! IsMenu( ::__hMenu )
+      ::__hMenu := CreatePopupMenu()
+      lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
+      lpMenuInfo:fMask  := MIM_STYLE
+      lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
+      SetMenuInfo( ::__hMenu, lpMenuInfo )
+   ENDIF      
+   IF ::__ClassInst != NIL .AND. EMPTY( ::Children )
+      WITH OBJECT MenuStripItem()
+         :GenerateMember := .F.
+         :Caption     := "[ Add New Item ]"
+         :Init( Self )
+         :Events      := {}
+         :Font:Bold   := .T.
+         :Action      := {|o| o:Parent:__AddMenuStripItem() }
+         :Create()
+      END
+   ENDIF
 
    nStyle := TPM_LEFTALIGN | TPM_TOPALIGN
    IF ::__ClassInst != NIL
@@ -3197,15 +3216,13 @@ METHOD Show( x, y ) CLASS ContextStrip
 
    __SetSubMenu( Self, ::__hMenu )
 
-   aPt := { x, y }
-
    s_CurrFocus     := NIL
    s_CurrentObject := Self
 
    s_hMenuDialogHook := SetWindowsHookEx( WH_CALLWNDPROC, ( @__MenuDialogHook() ), NIL, GetCurrentThreadId() )
    DEFAULT s_hKeyMenuHook TO SetWindowsHookEx( WH_MSGFILTER, ( @__KeyMenuHook() ), NIL, GetCurrentThreadId() )
 
-   TrackPopupMenu( ::__hMenu, nStyle, aPt[1], aPt[2], 0, ::Form:hWnd )
+   TrackPopupMenu( ::__hMenu, nStyle, X, Y, 0, ::Form:hWnd )
    s_nmw := 0
 
    UnhookWindowsHookEx( s_hMenuDialogHook )
