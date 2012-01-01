@@ -1,0 +1,71 @@
+CINI = ..\xbuild.vc9.ini
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS = ..\..\library\include;\xHb\include\w32;..\..\..\xedit
+LAUTORUN = .T.
+LDEBUG = .F.
+LGUI = .T.
+LIBFOLDERS = \xhb\lib\vc9; $(XHB_VC9)\Lib
+LMT = .F.
+LNOAUTOFWH = .F.
+LPRG_CLASSICDEBUG = .F.
+LPRG_DEBUG = .F.
+LUSEDLL = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES = WIN ;WIN32 ;VXH ;VXH_ADS ;VXH_ENTERPRISE 
+MYLINK_FLAGS =
+MYPRG_FLAGS = 
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\vc9\vxh-exe.exe
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+RUNARGUMENTS =
+SLY_OUTPUTFOLDER =
+STARTIN =
+TARGETFOLDER = \xhb\bin\vc9
+
+[..\..\source\vxh1.prg]
+MYC_FLAGS =
+MYDEFINES =
+MYPRG_FLAGS =
+
+[..\..\source\*.prg]
+MYC_FLAGS =
+MYDEFINES =
+MYPRG_FLAGS =
+
+[..\..\resource\vxh.rc]
+MYDEFINES =
+MYRC_FLAGS =
+
+[filemem.lib]
+
+[\xhb\lib\vc8\vxh.lib]
+
+[\xhb\lib\vc8\xEditVXH.lib]
+
+[\xhb\lib\vc8\vxhd.lib]
+
+[\xhb\lib\vc8\tproject.lib]
+
+[\xhb\lib\vc8\sql.lib]
+
+[\xhb\lib\vc8\rmdbfcdx.lib]
+
+[\xhb\lib\vc8\ads.lib]
+
+[\xhb\lib\vc8\ace32.lib]
+
+[\xhb\lib\vc8\Ole.lib]
+
+[\xhb\lib\vc8\ActiveX.lib]
+
+[\xhb\lib\libmysql.lib]
+
+[\xhb\lib\fbclient_ms.lib]
+
+[\xhb\lib\libpq.lib]
+
+[\xhb\lib\oci.lib]
