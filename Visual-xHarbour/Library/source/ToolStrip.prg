@@ -2082,7 +2082,7 @@ STATIC FUNCTION __SetSubMenu( Self, hMenu )
              :Init( oItem )
              :Font:Bold := .T.
              :Events    := {}
-             :Action    := {|o| ::Application:Project:SetAction( { { DG_ADDCONTROL, 0, 0, 0, .T., o:Parent, "MenuStripItem",,,1, {}, } }, ::Application:Project:aUndo ) }
+             //:Action    := {|o| ::Application:Project:SetAction( { { DG_ADDCONTROL, 0, 0, 0, .T., o:Parent, "MenuStripItem",,,1, {}, } }, ::Application:Project:aUndo ) }
              :Create()
           END
        ENDIF
@@ -3150,7 +3150,6 @@ CLASS ContextStrip INHERIT Component
    METHOD Show()
    METHOD Create()
    METHOD __DrawShadow() INLINE NIL
-   METHOD __AddMenuStripItem
    METHOD Destroy() INLINE __ReleaseMenu( Self, ::__hMenu ), DestroyMenu( ::__hMenu )
 ENDCLASS
 
@@ -3178,15 +3177,10 @@ METHOD Create() CLASS ContextStrip
          :Init( Self )
          :Events      := {}
          :Font:Bold   := .T.
-         :Action      := {|o| o:Parent:__AddMenuStripItem() }
          :Create()
       END
    ENDIF
    ::hWnd := ::Form:hWnd
-RETURN Self
-
-METHOD __AddMenuStripItem() CLASS ContextStrip
-   ::Application:Project:SetAction( { { DG_ADDCONTROL, 0, 0, 0, .T., Self, "MenuStripItem",,,1, {}, } }, ::Application:Project:aUndo )
 RETURN Self
 
 METHOD Show( x, y ) CLASS ContextStrip
@@ -3260,12 +3254,7 @@ FUNCTION __AddNewMenuItem( Self, oParent )
       __InsertMenuStripItem( :__hMenu, -1, .T., mii:fMask, NIL, mii:wID, :Caption, NIL, mii:fState )
    END
 
-
-   ::Application:ObjectManager:ActiveObject := oItem
-   ::Application:ObjectManager:ResetProperties()
-
-   ::Application:EventManager:ResetEvents()
-
    ::Application:Project:Modified := .T.
 
+   ::Application:Props[ "ComboSelect" ]:Reset()
 RETURN NIL
