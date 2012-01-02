@@ -4328,7 +4328,7 @@ METHOD __SetFrameStyle(n) CLASS Window
    IF ::hWnd != NIL .AND. ::__ClassInst == NIL
       SetWindowLong( ::hWnd, GWL_STYLE, ::Style )
       SetWindowPos( ::hWnd,, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
-      RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
+      ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
    ENDIF
 RETURN Self
 

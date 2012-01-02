@@ -1726,7 +1726,7 @@ CLASS ToolStripButton INHERIT ToolStripItem
    DATA __DropDown          EXPORTED INIT { "None", "Partial", "Full" }
 
    DATA __pObjPtr       PROTECTED
-   DATA __hSubMenu      PROTECTED
+   DATA __hMenu         PROTECTED
    DATA __nDropDown     PROTECTED INIT 0
    DATA __hMenu         EXPORTED
    
@@ -2043,9 +2043,9 @@ RETURN Self
 static FUNCTION __ReleaseMenu( Self, hMenu )
    LOCAL oItem
    FOR EACH oItem IN ::Children
-       IF oItem:__hSubMenu != NIL
-          DestroyMenu( oItem:__hSubMenu )
-          oItem:__hSubMenu := NIL
+       IF oItem:__hMenu != NIL
+          DestroyMenu( oItem:__hMenu )
+          oItem:__hMenu := NIL
        ENDIF
        IF IsMenu( hMenu )
           DeleteMenu( hMenu, 0, MF_BYPOSITION )
@@ -2054,7 +2054,7 @@ static FUNCTION __ReleaseMenu( Self, hMenu )
           ReleaseArrayPointer( oItem:__pObjPtr )
           oItem:__pObjPtr := NIL
        ENDIF
-       __ReleaseMenu( oItem, oItem:__hSubMenu )
+       __ReleaseMenu( oItem, oItem:__hMenu )
    NEXT
 RETURN Self
 
@@ -2087,12 +2087,12 @@ STATIC FUNCTION __SetSubMenu( Self, hMenu )
           END
        ENDIF
        IF LEN( oItem:Children ) > 0
-          oItem:__hSubMenu := CreateMenu()
+          oItem:__hMenu := CreateMenu()
        ENDIF
 
        mii := {=>}
        mii:fMask         := MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_TYPE
-       mii:hSubMenu      := oItem:__hSubMenu
+       mii:hSubMenu      := oItem:__hMenu
        IF LEN( oItem:Children ) > 0
           mii:fMask      := mii:fMask | MIIM_SUBMENU
        ENDIF
@@ -2279,7 +2279,7 @@ STATIC FUNCTION __MenuDialogProc( hWnd, nMsg, nwParam, nlParam )
 
            
       CASE WM_NCPAINT
-           IF nwParam == 1
+           //IF nwParam == 1
               aRect := _GetWindowRect( hWnd )
 
               hdc       := GetWindowDC( hWnd )
@@ -2301,7 +2301,7 @@ STATIC FUNCTION __MenuDialogProc( hWnd, nMsg, nwParam, nlParam )
               
               SelectObject( hDC, hOldPen )
               ReleaseDC( hWnd, hdc)
-           ENDIF
+           //ENDIF
            RETURN 0
 
       CASE WM_ERASEBKGND
@@ -2384,9 +2384,11 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
    SWITCH ms_message
       CASE WM_MENUSELECT
            mii_dwItemData := MENUITEMINFOITEMDATA( ms_lParam, LOWORD( ms_wParam ), ( HIWORD( ms_wParam ) & MF_POPUP ) == MF_POPUP )
-
+           s_oCurrMenuItem := NIL
            IF mii_dwItemData != NIL .AND. mii_dwItemData <> 0 .AND. ( s_oCurrMenuItem := ArrayFromPointer( mii_dwItemData ) ) != NIL
-              __SetSubMenu( s_oCurrMenuItem, s_oCurrMenuItem:__hSubMenu )
+              __SetSubMenu( s_oCurrMenuItem, s_oCurrMenuItem:__hMenu )
+              //__GetApplication():Project:CurrentForm:SelectControl( s_oCurrMenuItem, .F. )
+              //__GetApplication():ObjectTree:Set( s_oCurrMenuItem )
            ENDIF
            EXIT
 
@@ -2452,16 +2454,15 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
               RETURN 0
            ENDIF
            EXIT
-/*
+
       CASE WM_LBUTTONUP
            IF s_oCurrMenuItem != NIL .AND. s_oCurrMenuItem:Caption == "[ Add New Item ]"
-              EVAL( s_oCurrMenuItem:Action, s_oCurrMenuItem )
-              __ReleaseMenu( s_CurrentObject, s_CurrentObject:__hMenu )
-              __SetSubMenu( s_CurrentObject, s_CurrentObject:__hMenu )
+              __AddNewMenuItem( s_CurrentObject, s_oCurrMenuItem:Parent )
+              RedrawWindow( hWnd, , , RDW_FRAME | RDW_UPDATENOW | RDW_INTERNALPAINT )
               RETURN 1
            ENDIF
            EXIT
-*/
+
       CASE WM_SYSKEYDOWN
            IF ms_wParam == VK_MENU
               SendMessage( s_CurrentObject:Form:hWnd, WM_CANCELMODE, 0, 0 )
@@ -2515,7 +2516,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
                        NEXT
                     ENDIF
 
-                    hMenu := oMenu:__hSubMenu
+                    hMenu := oMenu:__hMenu
                     DEFAULT hMenu TO oMenu:__hMenu
 
                     IF oItem:Enabled
@@ -2837,7 +2838,8 @@ CLASS MenuStripItem INHERIT ToolStripButton
    DATA Checked      PUBLISHED INIT .F.
    DATA ShortCutText PUBLISHED
    DATA RadioCheck   PUBLISHED INIT .F.
-   
+   DATA Position     EXPORTED
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD __OnParentSize() INLINE NIL
@@ -2862,7 +2864,11 @@ METHOD Create() CLASS MenuStripItem
    IF ::Parent:ClsName != ::ClsName .AND. ! ::Parent:ClsName IN { "ToolStripButton", "ContextStrip" }
       Super:Create()
     ELSE
-      AADD( ::Parent:Children, Self )
+      IF ::Position != NIL
+         AINS( ::Parent:Children, ::Position, Self, .T. )
+       ELSE
+         AADD( ::Parent:Children, Self )
+      ENDIF
       ::ShortCutKey:SetAccel()
       ::Object:Create()
    ENDIF
@@ -3218,3 +3224,48 @@ METHOD Show( x, y ) CLASS ContextStrip
 
 RETURN nRes
 
+FUNCTION __AddNewMenuItem( Self, oParent )
+   LOCAL oItem, mii
+
+   oItem := MenuStripItem( oParent )
+   oItem:Position := LEN( oParent:Children )
+   oItem:Caption := oItem:Name
+   oItem:Create()
+
+   oItem:__hMenu := CreateMenu()
+
+   mii := {=>}
+   mii:fMask         := MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_TYPE | MIIM_SUBMENU
+   mii:hSubMenu      := oItem:__hMenu
+   mii:wID           := oItem:Id
+   mii:fType         := MFT_OWNERDRAW
+   mii:fState        := IIF( oItem:Enabled, MFS_ENABLED, MFS_DISABLED )
+   mii:dwItemData    := oItem:__pObjPtr := ArrayPointer( oItem )
+
+   __InsertMenuStripItem( oParent:__hMenu, oItem:Position-1, .T., mii:fMask, mii:hSubMenu, mii:wID, oItem:Caption, mii:dwItemData, mii:fState )
+
+   WITH OBJECT MenuStripItem()
+      :Caption   := "[ Add New Item ]"
+      :GenerateMember := .F.
+      :Init( oItem )
+      :Font:Bold := .T.
+      :Events    := {}
+      :Create()
+
+      mii := {=>}
+      mii:fMask         := MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_TYPE
+      mii:wID           := :Id
+      mii:fState        := MFS_ENABLED
+
+      __InsertMenuStripItem( :__hMenu, -1, .T., mii:fMask, NIL, mii:wID, :Caption, NIL, mii:fState )
+   END
+
+
+   ::Application:ObjectManager:ActiveObject := oItem
+   ::Application:ObjectManager:ResetProperties()
+
+   ::Application:EventManager:ResetEvents()
+
+   ::Application:Project:Modified := .T.
+
+RETURN NIL
