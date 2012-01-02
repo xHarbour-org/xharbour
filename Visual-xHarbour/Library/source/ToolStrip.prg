@@ -3219,7 +3219,7 @@ METHOD Show( x, y ) CLASS ContextStrip
 RETURN nRes
 
 FUNCTION __AddNewMenuItem( Self, oParent )
-   LOCAL oItem, mii
+   LOCAL oItem, mii, cText
 
    oItem := MenuStripItem( oParent )
    oItem:Position := LEN( oParent:Children )
@@ -3253,8 +3253,12 @@ FUNCTION __AddNewMenuItem( Self, oParent )
 
       __InsertMenuStripItem( :__hMenu, -1, .T., mii:fMask, NIL, mii:wID, :Caption, NIL, mii:fState )
    END
-
+   
    ::Application:Project:Modified := .T.
 
-   ::Application:Props[ "ComboSelect" ]:Reset()
+   cText := oItem:ClassName
+   WITH OBJECT ::Application:Props[ "ComboSelect" ]
+      :AddItem( oItem:Name + CHR(9) + Upper( cText[1] ) + SubStr( Lower( cText ), 2 ) )
+      AADD( :aItems, oItem )
+   END
 RETURN NIL

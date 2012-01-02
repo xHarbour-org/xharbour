@@ -1095,6 +1095,7 @@ RETURN Self
 METHOD Reset( oControl ) CLASS FormComboBox
    LOCAL cCtrl, oForm, cText
    ::aItems := {}
+   ::SetRedraw(.F.)
    ::ResetContent()
    IF ::Application:Project:Properties != NIL
       ::AddItem( "Application" + CHR(9) + "Visual xHarbour" )
@@ -1115,13 +1116,14 @@ METHOD Reset( oControl ) CLASS FormComboBox
             NEXT
          ENDIF
       ENDIF
-      ::Application:Yield()
       IF oControl != NIL
+         ::Application:Yield()
          ::SelectControl( oControl )
        ELSE
          ::SetCurSel(1)
       ENDIF
    ENDIF
+   ::SetRedraw(.T.)
 RETURN Self
 
 
