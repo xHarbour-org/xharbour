@@ -52,6 +52,8 @@ GLOBAL lShutDown           := .F.
 GLOBAL lUseDeleteds        := .T.
 // Culik added new global to tell if we will serialize arrays as json or xml
 GLOBAL lSerializeArrayAsJson := .F.
+// Culik added new global to tell if we are using sqlverser 2008 or newer
+GLOBAL lSql2008newTypes      := .F.
 
 /*------------------------------------------------------------------------*/
 
@@ -2117,6 +2119,11 @@ BOOL HB_EXPORT sr_lSerializeArrayAsJson( void )
    return LSERIALIZEARRAYASJSON.item.asLogical.value;
 }
 
+BOOL HB_EXPORT sr_lsql2008newTypes( void )
+{
+   return LSQL2008NEWTYPES.item.asLogical.value; 
+}   
+
 #pragma ENDDUMP
 
 /*------------------------------------------------------------------------*/
@@ -2132,3 +2139,14 @@ Exit Proc SQLRDD_ShutDown()
 Return
 
 /*------------------------------------------------------------------------*/
+
+
+FUNCTION SR_Getsql2008newTypes( l ) 
+RETURN lSql2008newTypes 
+FUNCTION SR_Setsql2008newTypes( l ) 
+   Local lOld  := l
+   If l != NIL
+      lSql2008newTypes := l
+   EndIf
+   
+Return lOld

@@ -18,7 +18,7 @@ BOOL HB_EXPORT sr_isMultilang(void);
 BOOL HB_EXPORT sr_isShutdownProcess(void);
 BOOL HB_EXPORT sr_UseDeleteds(void);
 BOOL HB_EXPORT sr_lSerializeArrayAsJson( void );
-
+BOOL HB_EXPORT sr_lsql2008newTypes( void );
 #ifdef SQLRDD_COMPAT_PRE_1_1
    BOOL hb_arraySetNL( PHB_ITEM pArray, ULONG ulIndex, LONG ulVal );
    BOOL hb_arraySetL( PHB_ITEM pArray, ULONG ulIndex, BOOL lVal );

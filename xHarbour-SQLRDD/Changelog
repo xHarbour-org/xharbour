@@ -8,6 +8,39 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-01-03 19:10   UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+
+   ! dll\libeay32.dll
+   ! dll\libiconv-2.dll
+   ! dll\libpq.dll
+   ! dll\ssleay32.dll
+     ! updated postgresql client dll to version 9.0.4
+   ! lib\BC5\libpq.lib
+     ! updated import library to reflect dll change
+   ! source\pgs.c
+   ! source\sqlorax.c     
+     ! fixes to timestamp support
+   ! source\firebird.c
+   ! source\mysql.c
+   ! source\sqlex1.c
+   ! source\sqlex2.c
+   ! source\sqlex3.c
+   ! source\sqlsrodbc.c
+     ! added support to timestamp fields for firebird, mysql and sqlserver 2008 or newer 
+   
+   ! source\sqlact.c
+     ! added support to timestamp fields to SR_itemEmpty function
+   ! source\sqlconnection.prg
+     ! fixes SQLType function to correct return the field type for date and datetime fields
+   ! source\sqlfirebird.prg
+   ! source\sqlodbc.prg      
+   ! source\sqlrdd0.prg
+   ! source\sqlrdd2.prg
+   
+   ! source\sqlprototypes.h
+     ! added new prototypes 
+
+
 2011-09-30 15:00  UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
    ! dll\fbclient.dll
      ! updated to firebird 2.1 dll

@@ -392,14 +392,14 @@ HB_ERRCODE FeedSeekKeyToBindings( SQLEXAREAP thiswa, PHB_ITEM pKey, int * queryL
                break;
             }
             case SQL_C_TYPE_TIMESTAMP:
-            {
+            {	            
                int iPos;
                HB_LONG lVal;
                double dVal;
 
                char datemask[9] = "10000101";
                char * mask = datemask;
-
+//DebugBreak();
                size  = lenKey > (int)(BindStructure->ColumnSize) ? ((int) (BindStructure->ColumnSize)) : lenKey;
 
                // Must fix partial date seek
@@ -481,6 +481,8 @@ HB_ERRCODE FeedSeekKeyToBindings( SQLEXAREAP thiswa, PHB_ITEM pKey, int * queryL
       else if( HB_IS_DATE( pKey ) )
       {
          int iYear, iMonth, iDay;
+         int  iHour,  iMinute;
+         double dSeconds;
          hb_dateDecode( pKey->item.asDate.value, &iYear, &iMonth, &iDay );
 
          if( BindStructure->iCType == SQL_C_TYPE_DATE )
@@ -491,12 +493,15 @@ HB_ERRCODE FeedSeekKeyToBindings( SQLEXAREAP thiswa, PHB_ITEM pKey, int * queryL
          }
          else if( BindStructure->iCType == SQL_C_TYPE_TIMESTAMP )
          {
+	         ////DebugBreak();
+	         hb_timeDecode(pKey->item.asDate.time, &iHour, &iMinute, &dSeconds ); 
+	         
             BindStructure->asTimestamp.year  = (SQLSMALLINT) iYear;
             BindStructure->asTimestamp.month = (SQLUINTEGER) iMonth;
             BindStructure->asTimestamp.day   = (SQLUINTEGER) iDay;
-            BindStructure->asTimestamp.hour     = 0;
-            BindStructure->asTimestamp.minute   = 0;
-            BindStructure->asTimestamp.second   = 0;
+            BindStructure->asTimestamp.hour     = (SQLUINTEGER)iHour;    ;
+            BindStructure->asTimestamp.minute   = (SQLUINTEGER)iMinute;  ;
+            BindStructure->asTimestamp.second   = (SQLUSMALLINT)dSeconds;
             BindStructure->asTimestamp.fraction = 0;
          }
          else
@@ -569,6 +574,7 @@ void BindSeekStmt( SQLEXAREAP thiswa, int queryLevel )
             }
             case SQL_C_TYPE_TIMESTAMP:
             {
+	            //DebugBreak();
                res = SQLBindParameter( hStmt, iBind, SQL_PARAM_INPUT,
                                        SQL_C_TYPE_DATE,
                                        SQL_TYPE_DATE,

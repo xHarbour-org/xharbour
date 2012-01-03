@@ -4936,7 +4936,15 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
 
       Case (aCreate[i,FIELD_TYPE] == "C") .and. (::oSql:nSystemID == SYSTEMID_MSSQL6 .OR. ::oSql:nSystemID == SYSTEMID_MSSQL7  .OR. ::oSql:nSystemID == SYSTEMID_AZURE .or. ::oSql:nSystemID == SYSTEMID_POSTGR .or. ::oSql:nSystemID == SYSTEMID_CACHE  .or. ::oSql:nSystemID == SYSTEMID_ADABAS )
          If ::oSql:nSystemID == SYSTEMID_MSSQL7 .or. ::oSql:nSystemID == SYSTEMID_AZURE
-            cSql := cSql + "CHAR (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") " + if(!Empty(SR_SetCollation()), "COLLATE " + SR_SetCollation() + " " , "")  + IF(lNotNull, " NOT NULL", "")
+               IF  ::OSQL:lSqlServer2008 .AND. SR_Getsql2008newTypes()
+                  IF  aCreate[i,FIELD_LEN] > 10
+                     cSql := cSql + "VARCHAR (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") " + if(!Empty(SR_SetCollation()), "COLLATE " + SR_SetCollation() + " " , "")  + IF(lNotNull, " NOT NULL", "")
+                  ELSE
+                     cSql := cSql + "CHAR (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") " + if(!Empty(SR_SetCollation()), "COLLATE " + SR_SetCollation() + " " , "")  + IF(lNotNull, " NOT NULL", "")
+                  ENDIF
+               ELSE      
+                  cSql := cSql + "CHAR (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") " + if(!Empty(SR_SetCollation()), "COLLATE " + SR_SetCollation() + " " , "")  + IF(lNotNull, " NOT NULL", "")
+               ENDIF
          ElseIf ::oSql:nSystemID == SYSTEMID_POSTGR .and. aCreate[i,FIELD_LEN] > 10
             cSql := cSql + "VARCHAR (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") " + IF(lNotNull, " NOT NULL", "")
          Else
@@ -5005,7 +5013,12 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
          cSql := cSql + "DATE"
 
       Case (aCreate[i,FIELD_TYPE] == "D") .and. (::oSql:nSystemID == SYSTEMID_ACCESS .or. ::oSql:nSystemID == SYSTEMID_MSSQL6 .OR. ::oSql:nSystemID == SYSTEMID_MSSQL7 .or. ::oSql:nSystemID == SYSTEMID_AZURE)
+         IF (::oSql:nSystemID == SYSTEMID_MSSQL7  )  .AND. ::OSQL:lSqlServer2008 .AND. SR_Getsql2008newTypes()
+            cSql := cSql + 'DATE NULL '   
+         ELSE   
+
          cSql := cSql + "DATETIME NULL"
+         ENDIF
 
       Case (aCreate[i,FIELD_TYPE] == "D") .and. ::oSql:nSystemID == SYSTEMID_SQLANY
          cSql := cSql + "TIMESTAMP"
@@ -5151,8 +5164,12 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
       Case (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_POSTGR  )
          cSql := cSql + 'timestamp without time zone '
       // oracle datetime
-      Case (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_ORACLE  )
+      Case (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_ORACLE   .or. ::oSql:nSystemID == SYSTEMID_FIREBR)
          cSql := cSql + 'TIMESTAMP '   
+      CASE (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_MSSQL7  )  .AND. ::OSQL:lSqlServer2008 .AND. SR_Getsql2008newTypes()
+         cSql := cSql + 'DATETIME NULL '   
+      CASE (aCreate[i,FIELD_TYPE] == "T") .and. ::oSql:nSystemID == SYSTEMID_MYSQL  
+         cSql := cSql + 'DATETIME '   
 
       
       OtherWise
@@ -9873,3 +9890,6 @@ RETURN lUseJSONField
 FUNCTION SR_SetUseJSON( l )
    lUseJSONField := l
 RETURN NIL
+
+
+   

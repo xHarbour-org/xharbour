@@ -232,6 +232,12 @@ void MSQLFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
             break;
          }
 #endif
+         case SQL_DATETIME:
+         {
+	         hb_itemPutDT( pItem, 0, 0, 0, 0, 0, 0, 0 );
+	         break;
+     	 }    
+
          default:
             TraceLog( "mysql.log", "Invalid data type detected: %i\n", lType );
       }
@@ -350,6 +356,31 @@ void MSQLFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
             break;
          }
 #endif
+         case SQL_DATETIME:
+         {
+	         //hb_retdts(bBuffer);
+	         
+	        char dt[17]={0};
+	        dt[0] = bBuffer[0];
+	        dt[1] = bBuffer[1];
+	        dt[2] = bBuffer[2];
+	        dt[3] = bBuffer[3];
+	        dt[4] = bBuffer[5];
+	        dt[5] = bBuffer[6];
+	        dt[6] = bBuffer[8];
+            dt[7] = bBuffer[9];
+            dt[8] = bBuffer[11];
+            dt[9] = bBuffer[12];	         
+            dt[10] = bBuffer[14];	                     
+            dt[11] = bBuffer[15];	         
+            dt[12] = bBuffer[17];	         
+            dt[13] = bBuffer[18];	         
+            dt[14] = '\0';	         	         
+	        
+	        hb_itemPutDTS( pItem, dt );
+	        break;
+     	 }    
+
          default:
             TraceLog( "mysql.log", "Invalid data type detected: %i\n", lType );
       }
@@ -588,7 +619,7 @@ HB_FUNC( MYSQUERYATTR )
       {
       case MYSQL_STRING_TYPE:
       case MYSQL_VAR_STRING_TYPE:
-      case MYSQL_DATETIME_TYPE:
+      //case MYSQL_DATETIME_TYPE:
       case MYSQL_TIMESTAMP_TYPE:
       case MYSQL_TIME_TYPE:
          hb_arraySetForward( atemp, FIELD_TYPE, hb_itemPutC( temp, "C" ) );
@@ -617,6 +648,13 @@ HB_FUNC( MYSQUERYATTR )
          hb_arraySetForward( atemp, FIELD_DEC, hb_itemPutNI( temp, 0 ) );
          hb_arraySetForward( atemp, FIELD_DOMAIN, hb_itemPutNI( temp, SQL_DATE ) );
          break;
+      case MYSQL_DATETIME_TYPE:   
+         hb_arraySetForward( atemp, FIELD_TYPE, hb_itemPutC( temp, "T" ) );
+         hb_arraySetForward( atemp, FIELD_LEN, hb_itemPutNI( temp, 8 ) );
+         hb_arraySetForward( atemp, FIELD_DEC, hb_itemPutNI( temp, 0 ) );
+         hb_arraySetForward( atemp, FIELD_DOMAIN, hb_itemPutNI( temp, SQL_DATETIME ) );
+         break;
+      
       case MYSQL_SHORT_TYPE:
          hb_arraySetForward( atemp, FIELD_TYPE, hb_itemPutC( temp, "N" ) );
          hb_arraySetForward( atemp, FIELD_LEN, hb_itemPutNI( temp, 6 ) );
@@ -715,7 +753,7 @@ HB_FUNC( MYSTABLEATTR )
       {
       case MYSQL_STRING_TYPE:
       case MYSQL_VAR_STRING_TYPE:
-      case MYSQL_DATETIME_TYPE:
+      //case MYSQL_DATETIME_TYPE:
       case MYSQL_TIMESTAMP_TYPE:
       case MYSQL_TIME_TYPE:
          hb_itemPutC( temp, "C" );
@@ -748,6 +786,13 @@ HB_FUNC( MYSTABLEATTR )
          hb_arraySetForward( atemp, FIELD_DEC, hb_itemPutNI( temp, 0 ) );
          hb_arraySetForward( atemp, FIELD_DOMAIN, hb_itemPutNI( temp, SQL_DATE ) );
          break;
+      case MYSQL_DATETIME_TYPE:   
+         hb_arraySetForward( atemp, FIELD_TYPE, hb_itemPutC( temp, "T" ) );
+         hb_arraySetForward( atemp, FIELD_LEN, hb_itemPutNI( temp, 8 ) );
+         hb_arraySetForward( atemp, FIELD_DEC, hb_itemPutNI( temp, 0 ) );
+         hb_arraySetForward( atemp, FIELD_DOMAIN, hb_itemPutNI( temp, SQL_DATETIME ) );
+         break;
+         
       case MYSQL_SHORT_TYPE:
          hb_itemPutC( temp, "N" );
          hb_arraySetForward( atemp, FIELD_TYPE, temp );

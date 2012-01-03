@@ -1090,7 +1090,8 @@ BOOL SR_itemEmpty( PHB_ITEM pItem )
 #else
          return( pItem->item.asDate.value == 0 && pItem->item.asDate.time == 0 );
 #endif
-
+      case HB_IT_TIMEFLAG:
+         return( pItem->item.asDate.value == 0 && pItem->item.asDate.time == 0 );
       case HB_IT_POINTER:
          return( pItem->item.asPointer.value == NULL );
 

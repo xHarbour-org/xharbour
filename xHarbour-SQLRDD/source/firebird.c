@@ -85,13 +85,14 @@ const double divider[19] = { 1, 1E1, 1E2, 1E3, 1E4,   1E5, 1E6, 1E7, 1E8, 1E9, 1
 void fb_log_status( PFB_SESSION session, char * from )
 {
    const ISC_STATUS * pVect = session->status;
+      SCHAR s[1024] = {0};
    //char * temp=(char*) hb_xgrab(8192);
    if ( session->msgerror )
       hb_xfree(session->msgerror);
    session->msgerror=(char*) hb_xgrab(8192+1);
    hb_xmemset( session->msgerror, '\0', 8192 );
    //isc_interprete( session->msgerror, &pVect );
-      SCHAR s[1024];
+
 
                 while (fb_interpret((ISC_SCHAR *) s, sizeof(s), &pVect))
                 {
@@ -132,7 +133,7 @@ HB_FUNC( FBCONNECT )  // FBConnect( cDatabase, cUser, cPassword, [charset], @hEn
    int  i, len;
 
    PFB_SESSION session = (PFB_SESSION) hb_xgrab( sizeof( FB_SESSION ) );
-
+   memset( session, 0, sizeof( FB_SESSION ) );
    session->db = NULL;
    session->transac = NULL;
    session->sqlda    = ( XSQLDA ISC_FAR * ) hb_xgrab( XSQLDA_LENGTH ( MAX_COLUMNS_IN_QUERY ) );
@@ -546,9 +547,10 @@ HB_FUNC( FBDESCRIBECOL )   // FBDescribeCol( hStmt, nCol, @cName, @nType, @nLen,
 
          break;
       case IB_SQL_TIMESTAMP:
-         rettype = SQL_CHAR;
+         //rettype = SQL_CHAR;
+         rettype = SQL_DATETIME;
 
-         hb_storni( 24, 5 );
+         hb_storni( 8L, 5 );
          hb_storni( 0, 6 );
          break;
       case IB_SQL_SHORT:
@@ -697,7 +699,7 @@ HB_FUNC( FBGETDATA )    // FBGetData( hEnv, nField, @uData )
    BOOL bEnd = 0;
    XSQLVAR * var;
    VARY * vary;
-
+   char dt[17]={0};
    if ( session && session->sqlda->sqld >= (icol) )
    {
       var = session->sqlda->sqlvar;
@@ -721,6 +723,7 @@ HB_FUNC( FBGETDATA )    // FBGetData( hEnv, nField, @uData )
             hb_storc( (char *) vary->vary_string, 3 );
             break;
          case IB_SQL_TIMESTAMP:
+
             isc_decode_timestamp( ( ISC_TIMESTAMP ISC_FAR * ) var->sqldata, &times );
             sprintf ( date_s, "%04d-%02d-%02d %02d:%02d:%02d.%04lu",
                   times.tm_year + 1900,
@@ -731,8 +734,27 @@ HB_FUNC( FBGETDATA )    // FBGetData( hEnv, nField, @uData )
                   times.tm_sec,
                   ( ( ISC_TIMESTAMP * ) var->sqldata )->timestamp_time % 10000 );
 
-//            sprintf ( p, "%*s ", 24, date_s );
-            hb_storc( date_s, 3 );
+	            dt[0] = date_s[0];
+	            dt[1] = date_s[1];
+	            dt[2] = date_s[2];
+	            dt[3] = date_s[3];
+	            dt[4] = date_s[5];
+	            dt[5] = date_s[6];
+	            dt[6] = date_s[8];
+	            dt[7] = date_s[9];
+	            dt[8] = date_s[10];
+	            dt[9] = date_s[11];	         
+	            dt[10] = date_s[12];	                     
+	            dt[11] = date_s[13];	         
+	            dt[12] = date_s[14];	         
+	            dt[13] = date_s[15];	         
+	            dt[14] = date_s[16];	                     
+	            dt[15] = date_s[17];	         
+	            dt[16] = date_s[18];	         
+	            dt[17] = '\0';
+
+            hb_stordts( dt, 3 );              
+            //hb_storc( date_s, 3 );
             break;
 
          case IB_SQL_TYPE_TIME:
@@ -1068,6 +1090,12 @@ void FBFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff,
             break;
          }
 #endif
+         case SQL_DATETIME:
+         {
+	         hb_itemPutDT( pItem, 0, 0, 0, 0, 0, 0, 0 );
+	         break;
+     	 }    
+
          default:
             TraceLog( LOGFILE, "Invalid data type detected: %i\n", lType );
       }
@@ -1189,6 +1217,35 @@ void FBFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff,
             break;
          }
 #endif
+         case SQL_DATETIME:
+         {
+	         //hb_retdts(bBuffer);
+	         
+            char dt[17]={0};
+            dt[0] = bBuffer[0];
+            dt[1] = bBuffer[1];
+            dt[2] = bBuffer[2];
+            dt[3] = bBuffer[3];
+            dt[4] = bBuffer[5];
+            dt[5] = bBuffer[6];
+            dt[6] = bBuffer[8];
+            dt[7] = bBuffer[9];
+            dt[8] = bBuffer[10];
+            dt[9] = bBuffer[11];	         
+            dt[10] = bBuffer[12];	                     
+            dt[11] = bBuffer[13];	         
+            dt[12] = bBuffer[14];	         
+            dt[13] = bBuffer[15];	         
+            dt[14] = bBuffer[16];	                     
+            dt[15] = bBuffer[17];	         
+            dt[16] = bBuffer[18];	         
+            dt[17] = '\0';
+	         
+
+	         hb_itemPutDTS( pItem, dt );
+	         break;
+     	 }    
+
          default:
             TraceLog( LOGFILE, "Invalid data type detected: %i\n", lType );
       }

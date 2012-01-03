@@ -837,17 +837,13 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff
             dt[5] = bBuffer[6];
             dt[6] = bBuffer[8];
             dt[7] = bBuffer[9];
-            dt[8] = bBuffer[10];
-            dt[9] = bBuffer[11];	         
-            dt[10] = bBuffer[12];	                     
-            dt[11] = bBuffer[13];	         
-            dt[12] = bBuffer[14];	         
-            dt[13] = bBuffer[15];	         
-            dt[14] = bBuffer[16];	                     
-            dt[15] = bBuffer[17];	         
-            dt[16] = bBuffer[18];	         
-            dt[17] = '\0';
-	         
+            dt[8] = bBuffer[11];
+            dt[9] = bBuffer[12];	         
+            dt[10] = bBuffer[14];	                     
+            dt[11] = bBuffer[15];	         
+            dt[12] = bBuffer[17];	         
+            dt[13] = bBuffer[18];	         
+            dt[14] = '\0';	         	         
 
 	         hb_itemPutDTS( pItem, dt );
 	         break;

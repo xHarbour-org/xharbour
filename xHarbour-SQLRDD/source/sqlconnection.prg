@@ -38,6 +38,8 @@ CLASS SR_CONNECTION
    DATA nFields, aFields, hEnv, hDbc, nRetCode, nVersion READONLY
    // CULIK 18/10/2010 Adicionado para indicar se o indice contem cluster
    DATA lClustered AS LOGICAL INIT .F. READONLY
+   //culik 30/12/2011 adicionado para indicar se e  sqlserver versao 2008 ou superior
+   DATA lSqlServer2008 AS LOGICAL INIT .F. 
    DATA oHashActiveWAs
 
    DATA aTableInfo      INIT { => }
@@ -100,6 +102,9 @@ CLASS SR_CONNECTION
    DATA sslcrl   
    // CULIK 21/3/2011 Adicionado para indicar se o indice contem cluster
    DATA lClustered AS LOGICAL INIT .F. READONLY
+   //culik 30/12/2011 adicionado para indicar se e  sqlserver versao 2008 ou superior
+   DATA lSqlServer2008 AS LOGICAL INIT .F. 
+   
    PROTECTED:
 
    DATA cConnect, cDSN, cUser, cPassword
@@ -672,7 +677,12 @@ METHOD DetectTargetDb() CLASS SR_CONNECTION
       IF val(aVers[1]) >= 8
          ::lClustered := .T.
       ENDIF         
-   Case ("MICROSOFT" $ cTargetDB .and. "SQL" $ cTargetDB .and. "SERVER" $ cTargetDB .and.( "7.0" $ ::cSystemVers .or. "8.0" $ ::cSystemVers )) //.or. ( "SQL SERVER" $ cTargetDB .and. !("SYBASE" $ cTargetDB))
+         //culik 30/12/2011 adicionado para indicar se e  sqlserver versao 2008 ou superior
+      IF val(aVers[1]) >= 10   
+         ::lSqlServer2008 := .T.
+      ENDIF   
+
+   Case ("MICROSOFT" $ cTargetDB .and. "SQL" $ cTargetDB .and. "SERVER" $ cTargetDB .and.( "7.0" $ ::cSystemVers .or. "8.0" $ ::cSystemVers .or. "9.0" $ ::cSystemVers .or. "10.00" $ ::cSystemVers .or. "10.50" $ ::cSystemVers   )) //.or. ( "SQL SERVER" $ cTargetDB .and. !("SYBASE" $ cTargetDB))
       ::nSystemID := SYSTEMID_MSSQL7
       aVers := hb_atokens( ::cSystemVers , '.' ) 
       IF val(aVers[1]) >= 8
@@ -1072,13 +1082,14 @@ METHOD SQLType( nType, cName, nLen ) CLASS SR_CONNECTION
       nType == SQL_FLOAT .OR. nType == SQL_REAL .OR. ;
       nType == SQL_DOUBLE
       cType = "N"
-   case nType == SQL_DATE .or. nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP .or. nType == SQL_TYPE_DATE
+   //case nType == SQL_DATE .or. nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP .or. nType == SQL_TYPE_DATE
+   case nType == SQL_DATE .or. nType == SQL_TYPE_DATE
       cType = "D"
    case nType == SQL_TIME
       cType = "C"
    case nType == SQL_LONGVARCHAR .or. nType == SQL_LONGVARBINARY .or. nType == SQL_DB2_CLOB .or. nType == SQL_FAKE_LOB
       cType = "M"
-   case nType == SQL_DATETIME
+   case nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP  .or. nType == SQL_DATETIME
       cType := 'T'   
    endcase
 

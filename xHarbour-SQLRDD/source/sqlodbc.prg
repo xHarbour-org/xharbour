@@ -275,14 +275,13 @@ METHOD IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cD
       nDec := 0
       nSoma:= 0
 
-      if ( ::nRetCode := SR_Describ( ::hStmt, n, @cName, 255, @nNameLen, @nType, @nLen, @nDec, @nNull ) ) != SQL_SUCCESS
+      if ( ::nRetCode := SR_Describ( ::hStmt, n, @cName, 255, @nNameLen, @nType, @nLen, @nDec, @nNull,::nSystemID ) ) != SQL_SUCCESS
          ::RunTimeErr("", "SQLDescribeCol Error" + chr(13)+chr(10)+ ::LastError() + chr(13)+chr(10)+;
                           "Last command sent to database : " + ::cLastComm )
          return nil
       else
          _nLen := nLen
          _nDec := nDec
-
          if ( nType == SQL_DOUBLE .or. nType == SQL_FLOAT ) .and. nDec == 0
             nDec = 6
             nSoma= 6
@@ -295,7 +294,6 @@ METHOD IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cD
          cName     := upper(alltrim( cName ))
          cType     := ::SQLType( nType, cName, nLen )
          nLenField := ::SQLLen( nType, nLen, @nDec ) + nSoma
-
          If ::nSystemID == SYSTEMID_ORACLE .and. (!::lQueryOnly) .and. cType == "N" .and. nLenField == 38 .and. nDec == 0
             cType     := "L"
             nLenField := 1

@@ -653,8 +653,10 @@ HB_ERRCODE SetBindValue( PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT h
       case SQL_C_TYPE_TIMESTAMP:
       {
          int iYear, iMonth, iDay;
+         int  iHour,  iMinute;
+         double dSeconds;
          BOOL bEmpty = SR_itemEmpty( pFieldData );
-
+//DebugBreak();
          if( (!bEmpty) && BindStructure->isBoundNULL && hStmt )     // Param was NULL, should be re-bound
          {
             BindStructure->isBoundNULL  = FALSE;
@@ -671,13 +673,18 @@ HB_ERRCODE SetBindValue( PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT h
             break;
          }
 
-         hb_dateDecode( pFieldData->item.asDate.value, &iYear, &iMonth, &iDay );
+        // hb_dateDecode( pFieldData->item.asDate.value, &iYear, &iMonth, &iDay );
+         //hb_timeDecode( pFieldData->item.asDate.time, piHour, piMin, pdSec );         
+         //DebugBreak();
+          hb_datetimeDecode(pFieldData->item.asDate.value,  pFieldData->item.asDate.time, &iYear, &iMonth, &iDay,
+                                                    &iHour, &iMinute, &dSeconds );
+         
          BindStructure->asTimestamp.year     = (SQLSMALLINT) iYear;
          BindStructure->asTimestamp.month    = (SQLUINTEGER) iMonth;
          BindStructure->asTimestamp.day      = (SQLUINTEGER) iDay;
-         BindStructure->asTimestamp.hour     = 0;
-         BindStructure->asTimestamp.minute   = 0;
-         BindStructure->asTimestamp.second   = 0;
+         BindStructure->asTimestamp.hour     = (SQLUINTEGER)iHour;
+         BindStructure->asTimestamp.minute   = (SQLUINTEGER)iMinute;
+         BindStructure->asTimestamp.second   = (SQLUSMALLINT)dSeconds;
          BindStructure->asTimestamp.fraction = 0;
          break;
       }
@@ -715,6 +722,7 @@ HB_ERRCODE SetBindEmptylValue( COLUMNBINDP BindStructure )
       }
       case SQL_C_TYPE_TIMESTAMP:
       {
+	      //DebugBreak();
          if( !BindStructure->isBoundNULL )
          {
             BindStructure->lIndPtr     = SQL_NULL_DATA;
@@ -952,6 +960,7 @@ static void BindAllIndexStmts( SQLEXAREAP thiswa )
                   }
                   case SQL_C_TYPE_TIMESTAMP:
                   {
+	                  //DebugBreak();
                      res = SQLBindParameter( hStmt, iBind, SQL_PARAM_INPUT,
                                              SQL_C_TYPE_TIMESTAMP,
                                              SQL_TYPE_TIMESTAMP,
@@ -1095,18 +1104,26 @@ void SolveFilters( SQLEXAREAP thiswa, BOOL bWhere )
    if( thiswa->sqlfilter )
    {
       char * sFilter = getMessageC( thiswa->oWorkArea, "CFILTER" );
-      if( bWhere )
-      {
-         temp = hb_strdup( (const char *) thiswa->sWhere );
-         sprintf( thiswa->sWhere, "%s AND ( %s )", temp, sFilter );
-         hb_xfree( temp );
+	  if ( sFilter )
+	  {
+	     if ( sFilter[0] )
+	     {
+      
+            if( bWhere )
+            {
+               temp = hb_strdup( (const char *) thiswa->sWhere );
+               sprintf( thiswa->sWhere, "%s AND ( %s )", temp, sFilter );
+               hb_xfree( temp );
+            }
+            else
+            {
+               sprintf( thiswa->sWhere, "\nWHERE ( %s )", sFilter );
+               bWhere = TRUE;
+            }
+            hb_xfree( sFilter  );
+         }
       }
-      else
-      {
-         sprintf( thiswa->sWhere, "\nWHERE ( %s )", sFilter );
-         bWhere = TRUE;
-      }
-      hb_xfree( sFilter  );
+      
    }
    else
    {
@@ -1138,18 +1155,22 @@ void SolveFilters( SQLEXAREAP thiswa, BOOL bWhere )
    if ( thiswa->hOrdCurrent > 0 )
    {
       PHB_ITEM pIndexRef = hb_arrayGetItemPtr( thiswa->aOrders, ( ULONG ) thiswa->hOrdCurrent );
-      if( hb_arrayGetCPtr( pIndexRef, SCOPE_SQLEXPR ) )
+      char * sFilter = hb_arrayGetCPtr( pIndexRef, SCOPE_SQLEXPR );
+      if(  sFilter )
       {
-         if( bWhere )
-         {
-            temp = hb_strdup( (const char *) thiswa->sWhere );
-            sprintf( thiswa->sWhere, "%s AND ( %s )", temp, hb_arrayGetCPtr( pIndexRef, SCOPE_SQLEXPR ) );
-            hb_xfree( temp );
-         }
-         else
-         {
-            sprintf( thiswa->sWhere, "\nWHERE ( %s )", hb_arrayGetCPtr( pIndexRef, SCOPE_SQLEXPR ) );
-            bWhere = TRUE;
+	     if ( sFilter[ 0 ] )
+	     { 
+            if( bWhere )
+            {
+               temp = hb_strdup( (const char *) thiswa->sWhere );
+               sprintf( thiswa->sWhere, "%s AND ( %s )", temp, hb_arrayGetCPtr( pIndexRef, SCOPE_SQLEXPR ) );
+               hb_xfree( temp );
+            }
+            else
+            {
+               sprintf( thiswa->sWhere, "\nWHERE ( %s )", hb_arrayGetCPtr( pIndexRef, SCOPE_SQLEXPR ) );
+               bWhere = TRUE;
+            }
          }
       }
    }
@@ -3582,7 +3603,8 @@ static HB_ERRCODE sqlExPutValue( SQLEXAREAP thiswa, USHORT fieldNum, PHB_ITEM va
    /* test compatible datatypes */
 
    if( (HB_IS_NUMBER( pDest ) && HB_IS_NUMBER( value )) || (HB_IS_STRING( pDest ) && HB_IS_STRING( value )) ||
-       (HB_IS_LOGICAL( pDest ) && HB_IS_LOGICAL( value )) || (HB_IS_DATE( pDest ) && HB_IS_DATE( value )) )
+       (HB_IS_LOGICAL( pDest ) && HB_IS_LOGICAL( value )) || (HB_IS_DATE( pDest ) && HB_IS_DATE( value )) ||
+       (HB_IS_DATETIME( pDest ) && HB_IS_DATETIME( value )) )
    {
 
       if( pField->uiType == HB_FT_STRING )

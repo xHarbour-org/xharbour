@@ -160,7 +160,6 @@ METHOD IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cD
          nPos := aScan( aLocalPrecision, { |x| rtrim(x[1]) == cName } )
          cType     := ::SQLType( nType, cName, nLen )
          nLenField := ::SQLLen( nType, nLen, @nDec )
-
          If nPos > 0 .and. aLocalPrecision[nPos,2] > 0
             nLenField := aLocalPrecision[nPos,2]
          ElseIf ( nType == SQL_DOUBLE .or. nType == SQL_FLOAT .or. nType == SQL_NUMERIC )

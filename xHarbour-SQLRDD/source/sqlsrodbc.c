@@ -331,8 +331,15 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
             }
             else
             {
+	           if  ( ( ulSystemID == SYSTEMID_POSTGR ) || ( ulSystemID == SYSTEMID_ORACLE )|| ( ulSystemID == SYSTEMID_FIREBR )||( ulSystemID == SYSTEMID_MYSQL )  || (  ulSystemID ==SYSTEMID_MSSQL7  && sr_lsql2008newTypes() ) )  
+	           {
+		         hb_itemPutDT( pItem, 0, 0, 0, 0, 0, 0, 0 );   
+	           }
+	           else
+	           {
                char dt[9] = {' ',' ',' ',' ',' ',' ',' ',' ','\0'};
                hb_itemPutDS( pItem, dt );
+               }
             }
             break;
          }
@@ -420,7 +427,9 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
          case SQL_TYPE_TIMESTAMP:
          case SQL_TYPE_DATE:
          {
+	        
             char dt[9];
+            
             if( ulSystemID == SYSTEMID_OTERRO )
             {
                dt[0] = bBuffer[6];
@@ -436,6 +445,32 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
             {
                hb_itemPutCL( pItem, bBuffer, (ULONG) lLenBuff );
                break;
+            }
+            else if ( ( (ulSystemID == SYSTEMID_POSTGR ) || ( ulSystemID == SYSTEMID_ORACLE ) || ( ulSystemID == SYSTEMID_FIREBR )||( ulSystemID == SYSTEMID_MYSQL )  || (  ulSystemID ==SYSTEMID_MSSQL7  && sr_lsql2008newTypes() ) ) && (lType == SQL_TIMESTAMP|| lType == SQL_TYPE_TIMESTAMP) )
+            {
+               char dt1[17]={0};
+               dt1[0] = bBuffer[0];
+               dt1[1] = bBuffer[1];
+               dt1[2] = bBuffer[2];
+               dt1[3] = bBuffer[3];
+               dt1[4] = bBuffer[5];
+               dt1[5] = bBuffer[6];
+               dt1[6] = bBuffer[8];
+               dt1[7] = bBuffer[9];
+               dt1[8] = bBuffer[11];
+               dt1[9] = bBuffer[12];	         
+               dt1[10] = bBuffer[14];	                     
+               dt1[11] = bBuffer[15];	         
+               dt1[12] = bBuffer[17];	         
+               dt1[13] = bBuffer[18];	         
+               dt1[14] = '\0';	         
+              // dt1[14] = bBuffer[16];	                     
+               //dt1[15] = bBuffer[17];	         
+               //dt1[16] = bBuffer[18];	         
+               //dt1[17] = '\0';	         
+	           hb_itemPutDTS( pItem, dt1 );
+	           break;
+	            
             }
             else
             {
@@ -911,8 +946,8 @@ HB_FUNC( SR_DESCRIB )
                                             (unsigned char*) bBuffer, hb_parni( 4 ), &wBufLen,
                                             &wDataType, &wColSize, &wDecimals,
                                             &wNullable );
-
-    if( wDataType == -8 )     // MySQL ODBC Bug
+    ULONG ulSystemID = hb_parnl( 10 ) ;
+    if( wDataType == -8  && ulSystemID == SYSTEMID_MYSQL)     // MySQL ODBC Bug
     {
       odbcErrorDiagRTE( ( HSTMT ) hb_parptr( 1 ), "SQLCONNECT", "MySQL Driver version 5 is not compatible with SQLRDD", 0, __LINE__, __FILE__ );
     }
@@ -926,6 +961,7 @@ HB_FUNC( SR_DESCRIB )
        hb_stornl( ( LONG ) wColSize, 7 );
        hb_stornl( ( LONG ) wDecimals, 8 );
        hb_stornl( ( LONG ) wNullable, 9 );
+
     }
 
     hb_xfree( ( PTR ) bBuffer );

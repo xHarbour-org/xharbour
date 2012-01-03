@@ -292,6 +292,12 @@ void CreateInsertStmt( SQLEXAREAP thiswa )
             InsertRecord->iCType          = lType;        // May be DATE or TIMESTAMP
             break;
          }
+         case 'T':
+         {
+	         //DebugBreak();
+            InsertRecord->iCType          = SQL_C_TYPE_TIMESTAMP;        // May be DATE or TIMESTAMP
+            break;
+         }         
          case 'L':
          {
             InsertRecord->iCType          = SQL_C_BIT;
@@ -446,6 +452,7 @@ HB_ERRCODE BindInsertColumns( SQLEXAREAP thiswa )
             }
             case SQL_C_TYPE_TIMESTAMP:
             {
+	            //DebugBreak();
                InsertRecord->lIndPtr = 0;
                res = SQLBindParameter( thiswa->hStmtInsert, iBind, SQL_PARAM_INPUT,
                                        SQL_C_TYPE_TIMESTAMP,
@@ -780,6 +787,7 @@ HB_ERRCODE CreateUpdateStmt( SQLEXAREAP thiswa )
             }
             case SQL_C_TYPE_TIMESTAMP:
             {
+	           //DebugBreak();
                CurrRecord->lIndPtr = 0;
                res = SQLBindParameter( thiswa->hStmtUpdate, iBind, SQL_PARAM_INPUT,
                                        SQL_C_TYPE_TIMESTAMP,
