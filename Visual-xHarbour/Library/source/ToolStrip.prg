@@ -3146,6 +3146,7 @@ RETURN NIL
 CLASS ContextStrip INHERIT Component
    DATA __hMenu   EXPORTED
    DATA Left, Top, Width EXPORTED INIT 0
+   DATA ImageList PUBLISHED
    METHOD Init() CONSTRUCTOR
    METHOD Show()
    METHOD Create()

@@ -348,7 +348,7 @@ METHOD DeleteString(nLine) CLASS ListBox
 RETURN NIL
 
 METHOD SetHorizontalExtent( nWidth ) CLASS ListBox
-   LOCAL x, nCnt
+   LOCAL x, nCnt, n
    IF ::hWnd != NIL
       IF nWidth == NIL
          nWidth := 0
