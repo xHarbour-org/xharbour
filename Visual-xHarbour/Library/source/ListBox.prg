@@ -84,7 +84,7 @@ CLASS ListBox FROM Control
    //METHOD GetSelItems( nMax, cBuffer )  INLINE IIF( ::hWnd != NIL, SendMessage( ::hWnd, LB_GETSELITEMS, nMax, @cBuffer ), NIL )
    METHOD SetTabStops( nTabs, abTabs )     INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SETTABSTOPS, nTabs, abTabs ) , NIL )
    METHOD GetHorizontalExtent()            INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETHORIZONTALEXTENT, 0, 0 ) , NIL )
-   METHOD SetHorizontalExtent(nWidth)      INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SETHORIZONTALEXTENT, nWidth, 0 ) , NIL )
+   METHOD SetHorizontalExtent(nWidth)
    METHOD SetColumnWidth( nWidth )         INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SETCOLUMNWIDTH, nWidth, 0 ) , NIL )
    METHOD AddFile( cFile )                 INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_ADDFILE, 0, cFile ), NIL )
    METHOD SetTopIndex( nLine )             INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SETTOPINDEX, nLine, 0 ), NIL )
@@ -342,17 +342,25 @@ METHOD InsertString(nLine,cText) CLASS ListBox
 RETURN NIL
 
 METHOD DeleteString(nLine) CLASS ListBox
-   LOCAL n, x
    IF ::hWnd != NIL
       ::SendMessage( LB_DELETESTRING, nLine-1, 0)
-      ::__nWidth := 0
-      FOR x := 1 TO ::GetCount()
-         n := ::Drawing:GetTextExtentPoint32( ::GetItemText(x) )[1]
-         IF n > ::__nWidth
-            ::__nWidth := n
-         ENDIF
-      NEXT
-      ::SetHorizontalExtent( ::__nWidth + 3 )
+   ENDIF
+RETURN NIL
+
+METHOD SetHorizontalExtent( nWidth ) CLASS ListBox
+   LOCAL x, nCnt
+   IF ::hWnd != NIL
+      IF nWidth == NIL
+         nWidth := 0
+         nCnt := ::GetCount()
+         FOR x := 1 TO nCnt
+             n := ::Drawing:GetTextExtentPoint32( ::GetItemText(x) )[1]
+             IF n > nWidth
+                nWidth := n
+             ENDIF
+         NEXT
+      ENDIF
+      ::SendMessage( LB_SETHORIZONTALEXTENT, nWidth, 0 )
    ENDIF
 RETURN NIL
 
