@@ -76,14 +76,14 @@ CLASS ListBox FROM Control
    METHOD SelItemRangeEx(nFirst, nLast)    INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SELITEMRANGEEX, nFirst, nLast ), NIL )
    METHOD ResetContent()                   INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_RESETCONTENT, 0, 0 ) , NIL )
    METHOD GetSel(nLine)                    INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETSEL, nLine, 0 ), NIL )
-   METHOD GetText( nLine, cBuffer )        INLINE IIF( ::hWnd != NIL, ( SendMessage( ::hWnd, LB_GETTEXT,nLine-1, @cBuffer ), cBuffer), NIL )
    METHOD GetTextLen( nLine )              INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETTEXTLEN, nLine-1, 0 ), NIL )
-   METHOD GetItemText( nItem )             INLINE ::GetText( nItem, SPACE( ::GetTextLen( nItem )+1 ) )
    METHOD SelectString( nLine, cText )     INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SELECTSTRING, nLine, cText ), NIL )
    METHOD GetTopIndex( nLine )             INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETTOPINDEX, nLine, 0 ) , NIL )
    //METHOD GetSelItems( nMax, cBuffer )  INLINE IIF( ::hWnd != NIL, SendMessage( ::hWnd, LB_GETSELITEMS, nMax, @cBuffer ), NIL )
    METHOD SetTabStops( nTabs, abTabs )     INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SETTABSTOPS, nTabs, abTabs ) , NIL )
    METHOD GetHorizontalExtent()            INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETHORIZONTALEXTENT, 0, 0 ) , NIL )
+   METHOD GetText( nLine, cBuffer )
+   METHOD GetItemText( nItem )             INLINE ::GetText( nItem )
    METHOD SetHorizontalExtent(nWidth)
    METHOD SetColumnWidth( nWidth )         INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SETCOLUMNWIDTH, nWidth, 0 ) , NIL )
    METHOD AddFile( cFile )                 INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_ADDFILE, 0, cFile ), NIL )
@@ -134,6 +134,14 @@ CLASS ListBox FROM Control
    METHOD __HandleOnTimer()
    METHOD __TrackMouseEvent()
 ENDCLASS
+
+METHOD GetText( nItem ) CLASS ListBox
+   LOCAL cBuffer
+   IF ::hWnd != NIL
+      cBuffer := SPACE( ::GetTextLen( nItem )+1 )
+      ::SendMessage( LB_GETTEXT, nItem-1, @cBuffer )
+   ENDIF
+RETURN cBuffer
 
 //----------------------------------------------------------------------------------------------------------------
 METHOD __SetItemToolTips( lTips ) CLASS ListBox
