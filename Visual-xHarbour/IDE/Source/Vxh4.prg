@@ -3660,6 +3660,7 @@ __aProps["M"] := { { "MaximizeBox",             "Style" },;
                    { "MDIContainer",            "Style" },;
                    { "MinimizeBox",             "Style" },;
                    { "MultiLine",               "Style" },;
+                   { "MimeFormatted",           "" },;
                    { "MixedButtons",            "Style" },;
                    { "MaskType",                "" },;
                    { "MenuArrow",               "Appearance" },;

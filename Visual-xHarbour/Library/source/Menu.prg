@@ -557,4 +557,6 @@ METHOD __AddNewItemMenuItem( oParent ) CLASS ContextMenu
    ::Application:EventManager:ResetEvents()
 
    ::Application:Project:Modified := .T.
+   ::Form:__lModified := .T.
+
 RETURN Self

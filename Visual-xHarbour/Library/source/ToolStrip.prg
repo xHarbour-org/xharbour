@@ -3256,6 +3256,7 @@ FUNCTION __AddNewMenuItem( Self, oParent )
    END
    
    ::Application:Project:Modified := .T.
+   ::Form:__lModified := .T.
 
    cText := oItem:ClassName
    WITH OBJECT ::Application:Props[ "ComboSelect" ]

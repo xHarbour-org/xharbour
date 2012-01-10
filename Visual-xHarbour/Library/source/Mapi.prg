@@ -17,25 +17,25 @@
 #include "fileio.ch"
 
 CLASS eMail INHERIT Component
-   DATA To                PUBLISHED
-   DATA From              PUBLISHED
-   DATA CC                PUBLISHED
-   DATA BCC               PUBLISHED
-   DATA ReplyTo           PUBLISHED
+   DATA To                PUBLISHED INIT ""
+   DATA From              PUBLISHED INIT ""
+   DATA CC                PUBLISHED INIT ""
+   DATA BCC               PUBLISHED INIT ""
+   DATA ReplyTo           PUBLISHED INIT ""
     
-   DATA Subject           EXPORTED
-   DATA HTMLBody          EXPORTED
-   DATA TextBody          EXPORTED
+   DATA Subject           EXPORTED  INIT ""
+   DATA HTMLBody          EXPORTED  INIT ""
+   DATA TextBody          EXPORTED  INIT ""
    DATA EnumSendUsing     EXPORTED  INIT {{"Pickup","Port"},{1,2}}
    DATA SendUsing         PUBLISHED INIT 2
-   DATA SMTPServer        PUBLISHED
-   DATA MimeFormatted     PUBLISHED INIT .F.
+   DATA SMTPServer        PUBLISHED INIT ""
+   DATA MimeFormatted     PUBLISHED INIT .T.
    DATA SMTPServerPort    PUBLISHED INIT 0
    DATA SMTPAuthenticate  PUBLISHED INIT .T.
    DATA SMTPUseSSL        PUBLISHED INIT .F.
    
-   DATA SendUserName      PUBLISHED
-   DATA SendPassword      PUBLISHED
+   DATA SendUserName      PUBLISHED INIT ""
+   DATA SendPassword      PUBLISHED INIT ""
    DATA Attachments       PUBLISHED
    METHOD Init() CONSTRUCTOR
    METHOD Send()
@@ -53,29 +53,29 @@ METHOD Send() CLASS eMail
    TRY
       oMsg := GetActiveObject( "CDO.Message" )
     CATCH
-    TRY
-      oMsg := CreateObject( "CDO.Message" )
-    CATCH
-     MessageBox( , "Sorry, could not initialise mail object (CDO.Message)", "Visual xHarbour", MB_OK | MB_ICONEXCLAMATION )
-     RETURN NIL
-    END
+      TRY
+         oMsg := CreateObject( "CDO.Message" )
+      CATCH
+         ::Application:MainForm:MessageBox( "Cannot initialize mail interface (Message)", "Visual xHarbour", MB_OK | MB_ICONEXCLAMATION )
+         RETURN NIL
+      END
    END
    TRY
       oConf := GetActiveObject( "CDO.Configuration" )
     CATCH
-    TRY
-      oConf := CreateObject("CDO.Configuration")
-    CATCH
-     MessageBox( , "Sorry, could not initialise mail object (CDO.Configuration)", "Visual xHarbour", MB_OK | MB_ICONEXCLAMATION )
-     RETURN NIL
-    END
+      TRY
+         oConf := CreateObject("CDO.Configuration")
+       CATCH
+         ::Application:MainForm:MessageBox( "Cannot initialize mail interface (Configuration)", "Visual xHarbour", MB_OK | MB_ICONEXCLAMATION )
+         RETURN NIL
+      END
    END
    oFlds := oConf:Fields
 
    cSchema := "http://schemas.microsoft.com/cdo/configuration/"
    oFlds:Item( cSchema + "sendusing",        ::SendUsing )
    oFlds:Item( cSchema + "smtpserver",       ::SMTPServer )
-   oFlds:Item( cSchema + "smtpserverport",   IIF( VALTYPE( ::SMTPServerPort ) == "C", VAL( ::SMTPServerPort ), ::SMTPServerPort ) )
+   oFlds:Item( cSchema + "smtpserverport",   ::SMTPServerPort )
    oFlds:Item( cSchema + "smtpauthenticate", ::SMTPAuthenticate )
    oFlds:Item( cSchema + "sendusername",     ::SendUserName )
    oFlds:Item( cSchema + "sendpassword",     ::SendPassword )
@@ -84,15 +84,18 @@ METHOD Send() CLASS eMail
    oFlds:Update()
 
    WITH OBJECT oMsg
+      :Configuration := oConf
+
       :To            := ::To
       :From          := ::From
       :Subject       := ::Subject
       :HTMLBody      := ::HTMLBody
       :TextBody      := ::TextBody
-      :Configuration := oConf
       :CC            := ::CC
       :BCC           := ::BCC
       :ReplyTo       := ::ReplyTo
+      :MimeFormatted := ::MimeFormatted
+
       IF ! EMPTY( ::Attachments )
          IF VALTYPE( ::Attachments ) == "C"
             aFiles := hb_aTokens( ::Attachments, ";" )
@@ -108,8 +111,11 @@ METHOD Send() CLASS eMail
              ENDIF
          NEXT
       ENDIF
-      
-      :Send()
+      TRY
+         :Send()
+      CATCH
+         ::Application:MainForm:MessageBox( "Error sending email", "Visual xHarbour", MB_OK | MB_ICONEXCLAMATION )
+      END
    END
 RETURN NIL
 
