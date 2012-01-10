@@ -434,7 +434,7 @@ METHOD Init() CLASS System
    ::Folders["Favorites"]             := CSIDL_FAVORITES
    ::Folders["History"]               := CSIDL_HISTORY
    ::Folders["InternetCache"]         := CSIDL_INTERNET_CACHE
-   ::Folders["LocalApplicaitonData"]  := CSIDL_LOCAL_APPDATA
+   ::Folders["LocalApplicationData"]  := CSIDL_LOCAL_APPDATA
    ::Folders["MyComputer"]            := CSIDL_DRIVES
    ::Folders["MyMusic"]               := CSIDL_MYMUSIC
    ::Folders["MyPictures"]            := CSIDL_MYPICTURES

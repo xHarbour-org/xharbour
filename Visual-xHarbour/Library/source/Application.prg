@@ -756,7 +756,7 @@ METHOD Init( cMsg, cCaption, aChoices, nIcon, nDefault ) CLASS __AlertDlg
    Local n, aMsg, hFont, hOldFont, i, x
    Local hWnd, hDC
    Local nWidth, nMsgHeight
-   LOCAL aSize, oParent
+   LOCAL aSize
    
    nButWidth := 0
    
@@ -805,9 +805,8 @@ METHOD Init( cMsg, cCaption, aChoices, nIcon, nDefault ) CLASS __AlertDlg
 
    nWidth  := Max( nWidth, (nButWidth*n)+5  )
    hWnd    := GetFocus()
-   oParent := NIL
 
-   Super:Init( NIL )
+   Super:Init( Application:MainForm )
    ::Style    := DS_MODALFRAME | WS_VISIBLE | WS_POPUP | DS_SETFONT | WS_CAPTION
    ::ExStyle  := IIF( cCaption == NIL, WS_EX_TOOLWINDOW, 0 )
    ::Caption  := cCaption
@@ -816,6 +815,7 @@ METHOD Init( cMsg, cCaption, aChoices, nIcon, nDefault ) CLASS __AlertDlg
    ::aChoices := aChoices
    ::Width    := nWidth + IIF( ::_Icon != NIL, 60, 20 )
    ::Height   := nMsgHeight + 100
+   ::Modal    := .T.
    ::Create() 
  
    SetFocus( hWnd )

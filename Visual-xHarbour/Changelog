@@ -9,6 +9,10 @@
 */
 
 2012-01-06 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed Application:MessageBox() to be modal.
+   ! Fixed typo in System:Folders
+
+2012-01-06 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    * Limited Object name lenght to 25 chars because events are methods and methods add up
      the class name as part of the function name and it's always duplicated causing
      the compiler to not to recognize it as a function.
