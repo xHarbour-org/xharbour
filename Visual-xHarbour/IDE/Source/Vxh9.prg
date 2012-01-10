@@ -222,7 +222,7 @@ METHOD AddImage() CLASS ImageManager
       ENDIF
       
       lCopy := .F.
-      IF !( oFile:Path == ::Application:Project:Properties:Resource )
+      IF !( oFile:Path == ::Application:Project:Properties:path + "\" + ::Application:Project:Properties:Resource )
          IF ::MessageBox( "Selected files are not in the project path, would you like to copy them to the resource folder?", "Resources", MB_ICONEXCLAMATION | MB_YESNO ) == IDYES
             ::Application:Project:Save()
             lCopy := .T.
@@ -331,6 +331,7 @@ METHOD OnOk() CLASS ImageManager
    ENDIF
    ::ImageList:Create()
    ::Application:Project:Modified := .T.
+   ::Application:Project:CurrentForm:__lModified := .T.
    ::Close( IDOK )
 RETURN NIL
 

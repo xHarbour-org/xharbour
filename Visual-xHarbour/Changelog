@@ -11,6 +11,7 @@
 2012-01-06 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed Application:MessageBox() to be modal.
    ! Fixed typo in System:Folders
+   ! Fixed ImageList editor not saving images in XFM
 
 2012-01-06 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    * Limited Object name lenght to 25 chars because events are methods and methods add up
