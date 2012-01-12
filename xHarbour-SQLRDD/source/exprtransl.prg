@@ -1,3 +1,4 @@
+#include "compat.ch"
 #include "dbinfo.ch"
 #include "hbclass.ch"
 #include "sqlrdd.ch"
@@ -232,7 +233,7 @@ METHOD Translate( oExpression, x ) CLASS ExpressionTranslator
 					do while (len(aInitRelations)>0)
 						lProgress = .F.
 						for i:=1 to len(aInitRelations)
-							if(len(aWhere(aInitRelations[i]:aDependingContexts, {|x| ! lower(x) in addedAliases })) == 1)
+							if(len(aWhere(aInitRelations[i]:aDependingContexts, {|x| ! lower(x) $ addedAliases })) == 1)
 								aadd(addedAliases, lower(aInitRelations[i]:oWorkArea2:cAlias))
 								aadd(aSortedRelations, aInitRelations[i]) 
 								adel(aInitRelations, i, .T.)
@@ -490,7 +491,7 @@ METHOD new(pWorkarea, pFixVariables, pSimplifyCondition, pIndexExpression) CLASS
 RETURN ::super:new(pWorkarea, pFixVariables, pSimplifyCondition, pIndexExpression)
 
 METHOD TranslateComparison(oComparison) CLASS MSSQLExpressionTranslator
-	LOCAL bLike := {|x| iif(x like "^\'.*\'$", " like '%" + substr(x, 2, len(x)-2) + "%'", " like '%'+" + x + "+'") }
+	LOCAL bLike := {|x| iif((x like "^\'.*\'$"), " like '%" + substr(x, 2, len(x)-2) + "%'", " like '%'+" + x + "+'") }
 		
 	if(oComparison:oOperator:cName == "included")
 		RETURN ::TranslateExpression(oComparison:oOperand2) + eval(bLike, ::TranslateExpression(oComparison:oOperand1))

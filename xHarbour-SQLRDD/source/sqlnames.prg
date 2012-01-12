@@ -9,6 +9,7 @@
 #include "sqlrdd.ch"
 #include "msg.ch"
 
+#ifdef __XHARBOUR__
 #ifndef SQLRDD_COMPAT_2007
 
 NAMESPACE SQLRDD
@@ -21,4 +22,5 @@ Return SR_dbStruct()
 
 END
 
+#endif
 #endif

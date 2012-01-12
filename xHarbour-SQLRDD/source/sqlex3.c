@@ -4,20 +4,11 @@
 * All Rights Reserved
 */
 
-#include "hbapi.h"
-#include "hbvm.h"
-#include "hbstack.h"
-#include "hbapiitm.h"
+#include "compat.h"
 #include "hbinit.h"
-#include "hbapierr.h"
-#include "hbapilng.h"
-#include "hbdate.h"
-#include "hbset.h"
+
 #include "msg.ch"
-#include "hbfast.h"
-#include "hashapi.h"
 #include "rddsys.ch"
-#include "hbtrace.h"
 #include "hbdbferr.h"
 #include "sqlrddsetup.ch"
 #include "sqlprototypes.h"
@@ -25,7 +16,7 @@
 #include <ctype.h>
 #include <assert.h>
 
-#if defined(HB_OS_WIN_32) || defined(HB_OS_WIN_64) || defined( HB_OS_WIN ) 
+#if defined(HB_OS_WIN_32) || defined(HB_OS_WIN_64) || defined( HB_OS_WIN )
    #include <windows.h>
    #include <odbcinst.h>
 #else
@@ -39,15 +30,9 @@
    #define SQL_C_WCHAR  SQL_WCHAR
 #endif
 
-#include <limits.h>
-#include <math.h>
-#include <stdlib.h>
-#include <ctype.h>
 #include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
-#include <assert.h>
-#include <string.h>
 
 #include "sqlex.h"
 
@@ -267,7 +252,7 @@ HB_ERRCODE FeedSeekKeyToBindings( SQLEXAREAP thiswa, PHB_ITEM pKey, int * queryL
    INDEXBINDP SeekBind;
    COLUMNBINDP BindStructure;
    int i, lenKey, size, iCol;
-   char * szKey;
+   const char * szKey;
 
    SeekBind   = thiswa->IndexBindings[ thiswa->hOrdCurrent ];
 
@@ -394,7 +379,7 @@ HB_ERRCODE FeedSeekKeyToBindings( SQLEXAREAP thiswa, PHB_ITEM pKey, int * queryL
             case SQL_C_TYPE_TIMESTAMP:
             {	            
                int iPos;
-               HB_LONG lVal;
+               HB_MAXINT lVal;
                double dVal;
 
                char datemask[9] = "10000101";
@@ -425,7 +410,7 @@ HB_ERRCODE FeedSeekKeyToBindings( SQLEXAREAP thiswa, PHB_ITEM pKey, int * queryL
             case SQL_C_TYPE_DATE:
             {
                int iPos;
-               HB_LONG lVal;
+               HB_MAXINT lVal;
                double dVal;
 
                char datemask[9] = "10000101";
@@ -478,12 +463,12 @@ HB_ERRCODE FeedSeekKeyToBindings( SQLEXAREAP thiswa, PHB_ITEM pKey, int * queryL
          }
          BindStructure->asNumeric = (SQLDOUBLE) hb_itemGetND( pKey );
       }
-      else if( HB_IS_DATE( pKey ) )
+      else if( HB_IS_DATE( pKey ) || HB_IS_DATETIME( pKey ) )
       {
          int iYear, iMonth, iDay;
-         int  iHour,  iMinute;
-         double dSeconds;
-         hb_dateDecode( pKey->item.asDate.value, &iYear, &iMonth, &iDay );
+         int iHour, iMinute;
+
+         hb_dateDecode( hb_itemGetDL( pKey ), &iYear, &iMonth, &iDay );
 
          if( BindStructure->iCType == SQL_C_TYPE_DATE )
          {
@@ -493,15 +478,22 @@ HB_ERRCODE FeedSeekKeyToBindings( SQLEXAREAP thiswa, PHB_ITEM pKey, int * queryL
          }
          else if( BindStructure->iCType == SQL_C_TYPE_TIMESTAMP )
          {
-	         ////DebugBreak();
-	         hb_timeDecode(pKey->item.asDate.time, &iHour, &iMinute, &dSeconds ); 
-	         
+#ifdef __XHARBOUR__
+            double seconds;
+            hb_timeDecode( pKey->item.asDate.time, &iHour, &iMinute, &seconds ); 
+#else
+            long lJulian, lMilliSec;
+            int seconds, millisec;
+            hb_itemGetTDT( pKey, &lJulian, &lMilliSec );
+            hb_timeDecode( lMilliSec, &iHour, &iMinute, &seconds, &millisec ); 
+#endif
+
             BindStructure->asTimestamp.year  = (SQLSMALLINT) iYear;
             BindStructure->asTimestamp.month = (SQLUINTEGER) iMonth;
             BindStructure->asTimestamp.day   = (SQLUINTEGER) iDay;
             BindStructure->asTimestamp.hour     = (SQLUINTEGER)iHour;    ;
             BindStructure->asTimestamp.minute   = (SQLUINTEGER)iMinute;  ;
-            BindStructure->asTimestamp.second   = (SQLUSMALLINT)dSeconds;
+            BindStructure->asTimestamp.second   = (SQLUSMALLINT)seconds;
             BindStructure->asTimestamp.fraction = 0;
          }
          else

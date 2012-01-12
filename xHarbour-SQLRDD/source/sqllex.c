@@ -5,14 +5,12 @@
 * All Rights Reserved
 */
 
+#include "compat.h"
+
 #include "hbsql.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+
 #include <ctype.h>
 
-#include "hbapi.h"
-#include "hbapiitm.h"
 #include "sqly.h"          /* Bison-generated include */
 #include "msg.ch"
 
@@ -44,8 +42,8 @@ int sqlyylex(YYSTYPE* lvalp, void* s) {
    char szDate[9];
    sql_stmt* stmt = (sql_stmt*) s;
 
-   char* queryPtr = stmt->queryPtr;
-   char* queryEnd = stmt->query + stmt->queryLen;
+   const char* queryPtr = stmt->queryPtr;
+   const char* queryEnd = stmt->query + stmt->queryLen;
 
    /* Remove starting spaces */
 
@@ -140,7 +138,7 @@ int sqlyylex(YYSTYPE* lvalp, void* s) {
          }
          else if (c == quoteChar) {
             lvalp->item_val = hb_itemNew( NULL );
-            hb_itemPutCL( (PHB_ITEM)lvalp->item_val, (char *)stmt->queryPtr+1, (ULONG) (queryPtr - stmt->queryPtr-2) );
+            hb_itemPutCL( lvalp->item_val, stmt->queryPtr+1, ( queryPtr - stmt->queryPtr - 2 ) );
             stmt->queryPtr = queryPtr;
             return STRINGVAL;
          }
@@ -161,7 +159,7 @@ int sqlyylex(YYSTYPE* lvalp, void* s) {
          if (c == quoteChar)
          {
             lvalp->item_val = hb_itemNew( NULL );
-            hb_itemPutCL( (PHB_ITEM)lvalp->item_val, (char *)stmt->queryPtr + 1, (ULONG) (queryPtr - stmt->queryPtr - 2) );
+            hb_itemPutCL( lvalp->item_val, stmt->queryPtr + 1, ( queryPtr - stmt->queryPtr - 2 ) );
             stmt->queryPtr = queryPtr;
             return QUOTED_IDENT;
          }
@@ -175,10 +173,10 @@ int sqlyylex(YYSTYPE* lvalp, void* s) {
    if (*queryPtr == '[') {
       /*  This is a string  */
       if (queryPtr + 9 < queryEnd && queryPtr[9] == ']' ) {
-         memcpy( szDate, (char *)stmt->queryPtr + 1, 8 );
+         memcpy( szDate, stmt->queryPtr + 1, 8 );
          szDate[8] = 0;
          lvalp->item_val = hb_itemNew( NULL );
-         hb_itemPutDS( (PHB_ITEM)lvalp->item_val, szDate );
+         hb_itemPutDS( lvalp->item_val, szDate );
          stmt->queryPtr = stmt->queryPtr + 10;
          return DATEVAL;
       }
@@ -735,7 +733,7 @@ int sqlyylex(YYSTYPE* lvalp, void* s) {
       }
 
       lvalp->item_val = hb_itemNew( NULL );
-      hb_itemPutCL( (PHB_ITEM)lvalp->item_val, (char *)stmt->queryPtr, (ULONG) (queryPtr - stmt->queryPtr) );
+      hb_itemPutCL( lvalp->item_val, stmt->queryPtr, ( queryPtr - stmt->queryPtr ) );
 
       stmt->queryPtr = queryPtr;
       return IDENT;

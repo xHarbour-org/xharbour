@@ -8,8 +8,144 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2012-01-03 19:10   UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+2012-01-12 10:53 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  + xHarbour-SQLRDD/source/compat.h
+    + added header file which includes commonly used Harbour and xHarbour
+      core header files and defines some macros to hide diferences between
+      both compilers.
 
+  + xHarbour-SQLRDD/source/compat.c
+    + added file with some missing functions necessary for compatibility
+      (Now only TraceLog() for Harbour was added).
+
+  * xHarbour-SQLRDD/source/compat.ch
+    + added #include "hbcompat.ch"
+
+  * xHarbour-SQLRDD/source/exprobjs.prg
+  * xHarbour-SQLRDD/source/exprparser.prg
+  * xHarbour-SQLRDD/source/exprsimpl.prg
+  * xHarbour-SQLRDD/source/exprtransl.prg
+  * xHarbour-SQLRDD/source/exprudf.prg
+  * xHarbour-SQLRDD/source/sqlgen1.prg
+  * xHarbour-SQLRDD/source/sqlrdd2.prg
+  * xHarbour-SQLRDD/source/utils.prg
+    + added #include "compat.ch"
+    * enclose in parentheses expressions with LIKE operator for
+      compatibility with hbcompat.ch PP rules.
+    * replaced IN operator with $
+
+  * xHarbour-SQLRDD/source/sqlgen1.prg
+    * replaced GLOBALs bTableInfo and bIndexInfo with STATICs
+      They were used only locally - have you documented these vars
+      as public API
+
+  * xHarbour-SQLRDD/source/sqlprototypes.h
+  * xHarbour-SQLRDD/source/sqlrdd0.prg
+  * xHarbour-SQLRDD/source/utilslang.prg
+    * eliminated GLOBAL variables
+    * changed sr_get*()/sr_set*() PRG and C functions to work without
+      global items
+    ; this modification fixed potential RTE or even GPF when wrong
+      parameters are passed to SR_SET*() functions
+
+  * xHarbour-SQLRDD/source/sqlconnection.prg
+    * renamed PUBLIC: => EXPORTED:
+
+  * xHarbour-SQLRDD/source/exprrelation.prg
+    + added #include "compat.ch"
+    + added #include "xhbcls.ch" in Harbour builds
+
+  * xHarbour-SQLRDD/source/sqlnames.prg
+    * disabled in Harbour builds
+
+  * xHarbour-SQLRDD/source/hbsql.h
+    % added missing 'const' to some char* declarations
+      It fixes warnings in code using them and allows to eliminate
+      unnecessary castings.
+
+  * xHarbour-SQLRDD/source/firebird.c
+  * xHarbour-SQLRDD/source/mysql.c
+  * xHarbour-SQLRDD/source/pgs.c
+  * xHarbour-SQLRDD/source/sqlact.c
+  * xHarbour-SQLRDD/source/sqlex.h
+  * xHarbour-SQLRDD/source/sqlex1.c
+  * xHarbour-SQLRDD/source/sqlex2.c
+  * xHarbour-SQLRDD/source/sqlex3.c
+  * xHarbour-SQLRDD/source/sqllex.c
+  * xHarbour-SQLRDD/source/sqlora.h
+  * xHarbour-SQLRDD/source/sqlora.c
+  * xHarbour-SQLRDD/source/sqlorax.c
+  * xHarbour-SQLRDD/source/sqlrdd1.c
+  * xHarbour-SQLRDD/source/sqlsrodbc.c
+    * use compat.h instead of hb*.h files
+      (BTW some of the should not be included explicitly)
+    - removed some old compatibility macros which are not longer
+      necessary (they are covered by macros in compat.h)
+    ! replaced NULL(s) wrongly used instead of 0
+    ! fixed and synced with format strings parameters passed to sprintf()
+      functions
+    ! fixed buffer overflow in datetime buffer
+      I do not know what is the format of datetime strings returned by FB
+      but for me the conversion code is wrong - I do not believe that there
+      is no delimiter between day and hour numbers
+    + added support for datetime/timstamp conversions in Harbour builds
+    % added missing 'const' to some char* declarations
+    * updated to work with modified sr_get*Lang() C functions
+    * updated to compile with Harbour and xHarbour
+    * removed some unnecessary castings - redundant casting does not help
+      but can hide serious problems or even create some new ones
+    * use API functions to eliminate direct access to HVM internals like
+      HB_ITEM structures - still it's a work in progress
+    % eliminated some unnecessary item allocations
+    * use hb_objSendMessage() instead of hb_objSendSymbol()
+    * added support for CP translations in Harbour builds
+      Warning: some of xHarbour only code has to be fixed because
+               it may corrupt internal HVM strings changing directly
+               HB_ITEM string buffers.
+    ! do not redefine __STDC__ in GCC builds - IMHO it's fatal idea in
+      any builds because it may strongly interact with system header files
+
+  * xHarbour-SQLRDD/source/sqlrdd.h
+    ! removed unnecessary static function declarations from commonly used
+      header file
+
+   ; all these modifications allow to compile SQLRDD using xHarbour and
+     Harbour compilers. I made only compile time tests so now please try
+     to make runtime tests with real RDBMS using Harbour and xHarbour
+     (to test potential regression problems).
+     Harbour applications have to be linked yet with XHB and HBCT
+     libraries and it should be eliminated from the final product.
+   ; TODO:
+      - update code to work without hbvmint.h Harbour header files.
+        This header allows to access HVM internals and should not be
+        used by RDD libraries. Using HVM internals directly causes
+        that library has to be recompiled after each modification
+        touching HVM structures.
+      - eliminate HBCT dependencies: ATREPL(), CHARLIST()
+      - move support for HBXML from sqlrdd2.prg to separate file and
+        make it fully optional so it can be replaced by other low level
+        XML engine, i.e. Harbour supports EXPAT and MINIXML which seems
+        to be better alternatives then TXML class which in Harbour is
+        part of XHB library.
+      - update PRG code so it can work without xHarbour extenssions which
+        are not covered by hbcompat.ch. Mostly [] used to access string
+        items. This will allow to eliminate XHB library from Harbour
+        builds.
+
+  + xHarbour-SQLRDD/source/sqlrdd.hbp
+    + added HBMK2 build/make file
+  + xHarbour-SQLRDD/source/hbmk2_bison.hbs
+    + added HBMK2 plugin for bison files - thanks to Viktor.
+
+  + xHarbour-SQLRDD/source/sqlrdd.hbx
+    + added automatically generated by HBMK2 list of PRG level functions
+      which allows to create dynamic libraries which automatically
+      register all PRG level functions in HVM. This file can be used also
+      to force linking all SQLRDD functions with final executbale and
+      crate HRB or dynamic libraries (.DLL/.so/...) which uses dynamic
+      bindings to SQLRDD functions.
+
+2012-01-03 19:10   UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
    ! dll\libeay32.dll
    ! dll\libiconv-2.dll
    ! dll\libpq.dll

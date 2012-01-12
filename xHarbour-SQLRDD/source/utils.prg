@@ -1277,7 +1277,7 @@ Alert() copied as SQLBINDBYVAL() -> DEMO banner protection
 
 */
 
-#include "hbsetup.ch"
+//#include "hbsetup.ch"
 #include "box.ch"
 #include "common.ch"
 #include "inkey.ch"
@@ -1406,7 +1406,7 @@ FUNCTION SQLBINDBYVAL( xMessage, aOptions, cColorNorm, nDelay )
 
          IF ( nLen := Len( xMessage ) ) > 58
             FOR nPos := 58 TO 1 STEP -1
-               IF xMessage[nPos] IN ( " " + Chr( 9 ) )
+               IF xMessage[nPos] $ ( " " + Chr( 9 ) )
                   EXIT
                ENDIF
             NEXT
@@ -1627,7 +1627,7 @@ FUNCTION SQLBINDBYVAL( xMessage, aOptions, cColorNorm, nDelay )
                EXIT
 
             DEFAULT
-               IF Upper( Chr( nKey ) ) IN aHotkey
+               IF Upper( Chr( nKey ) ) $ aHotkey
                   nChoice := aScan( aHotkey, {| x | x == Upper( Chr( nKey ) ) } )
                   lWhile  := .F.
                ENDIF
@@ -1737,7 +1737,7 @@ FUNCTION SQLBINDBYVAL( xMessage, aOptions, cColorNorm, nDelay )
                EXIT
 
             DEFAULT
-               IF Upper( Chr( nKey ) ) IN aHotkey
+               IF Upper( Chr( nKey ) ) $ aHotkey
 
                   nChoice := aScan( aHotkey, {| x | x == Upper( Chr( nKey ) ) } )
                   lWhile  := .F.
@@ -1864,6 +1864,8 @@ Return .F.
 
 #PRAGMA BEGINDUMP
 
+#include "compat.h"
+
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbapiitm.h"
@@ -1878,7 +1880,7 @@ Return .F.
 HB_FUNC( SR_PHFILE )
 {
    PHB_ITEM pFile = hb_param( 1, HB_IT_STRING );
-   hb_retl( ( pFile && hb_itemGetCLen( pFile ) < HB_PATH_MAX - 1 ) ? hb_spFile( hb_itemGetCPtr( pFile ), NULL ) : FALSE );
+   hb_retl( ( pFile && hb_itemGetCLen( pFile ) < HB_PATH_MAX - 1 ) ? hb_spFile( hb_itemGetCPtr( pFile ), NULL ) : HB_FALSE );
 }
 
 #PRAGMA ENDDUMP

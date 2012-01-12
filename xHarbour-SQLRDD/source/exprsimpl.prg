@@ -1,3 +1,4 @@
+#include "compat.ch"
 #include "hbclass.ch"
 
 **************************************************

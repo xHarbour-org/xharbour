@@ -11,6 +11,9 @@
 #include "sqlrdd.ch"
 #include "sqlodbc.ch"
 #include "msg.ch"
+#ifndef __XHARBOUR__
+   #include "xhb.ch"
+#endif
 
 #define DEMO_NOTICE    "54686973206170706C69636174696F6E20776173206275696C64207769746820612064656D6F206F662053514C5244442C2064697374726962757465642062792078486172626F75722E636F6D2E0D0A0D0A457374612061706C69636163616F20E920666569746120636F6D20756D612076657273616F2044454D4F4E5354524143414F20646F2053514C5244442C2065207365752075736F20E9207065726D697469646F204150454E415320504152412046494E53204445204156414C4941C7C34F2E204120646973747269627569E7E36F20656D2070726F6475E7E36F2064657374612061706C696361E7E36F20E92070726F696269646120652073756A6569746120E0732070656E616C6964616465732070726576697374617320656D206C65692E204D61697320696E666F726D61E7F5657320656D207777772E78686172626F75722E636F6D2E62722E0D0A"
 
@@ -42,18 +45,6 @@ Static hMultilangColumns
 Static nSyntheticIndexMinimun      := 3
 
 Static lErrorOnGotoToInvalidRecord := .F.
-
-GLOBAL lHideRecno          := .T.
-GLOBAL lHideHistoric       := .F.
-GLOBAL lMultiLang          := .F.
-GLOBAL lGoTopOnScope       := .T.
-GLOBAL lSerializedAsString := .F.
-GLOBAL lShutDown           := .F.
-GLOBAL lUseDeleteds        := .T.
-// Culik added new global to tell if we will serialize arrays as json or xml
-GLOBAL lSerializeArrayAsJson := .F.
-// Culik added new global to tell if we are using sqlverser 2008 or newer
-GLOBAL lSql2008newTypes      := .F.
 
 /*------------------------------------------------------------------------*/
 
@@ -534,7 +525,7 @@ Return NIL
 Static Function SR_SetEnvSQLRDD( oConnect )
 
    Local aRet := {}, cRet := "", i, oCnn, cStartingVersion
-   Local cSql, lOld := lUseDeleteds
+   Local cSql, lOld
 
    For i = 1 to 2
 
@@ -868,7 +859,7 @@ Static Function SR_SetEnvSQLRDD( oConnect )
 
    If cStartingVersion < "MGMNT 1.72"
 
-      lUseDeleteds := .F.
+      lOld := SR_UseDeleteds( .F. )
 
       dbCreate( "SR_MGMNTLOGCHG", { { "SPID_",        "N", 12, 0 },;
                                     { "WPID_",        "N", 12, 0 },;
@@ -888,7 +879,7 @@ Static Function SR_SetEnvSQLRDD( oConnect )
 //      ordCreate( "SR_MGMNTLOGCHG", "004", "TYPE_ + SPID_" )
       USE
 
-      lUseDeleteds := lOld
+      SR_UseDeleteds( lOld )
 
 /*
 
@@ -1062,33 +1053,6 @@ Return lOld
 
 /*------------------------------------------------------------------------*/
 
-Function SR_SetGoTopOnScope( l )
-   Local lOld  := lGoTopOnScope
-   If l != NIL
-      lGoTopOnScope := l
-   EndIf
-Return lOld
-
-/*------------------------------------------------------------------------*/
-
-Function SR_SetMultiLang( l )
-   Local lOld  := lMultiLang
-   If l != NIL
-      lMultiLang := l
-   EndIf
-Return lOld
-
-/*------------------------------------------------------------------------*/
-
-Function SR_SetSerializedString( l )
-   Local lOld  := lSerializedAsString
-   If l != NIL
-      lSerializedAsString := l
-   EndIf
-Return lOld
-
-/*------------------------------------------------------------------------*/
-
 Function SR_TblMgmnt()
 Return lTblMgmnt
 
@@ -1105,15 +1069,6 @@ Function SR_EvalFilters( lEval )
    Local lOld  := EvalFilters
    If lEval != NIL
       EvalFilters := lEval
-   EndIf
-Return lOld
-
-/*------------------------------------------------------------------------*/
-
-Function SR_UseDeleteds( lDeleteds )
-   Local lOld  := lUseDeleteds
-   If lDeleteds != NIL
-      lUseDeleteds := lDeleteds
    EndIf
 Return lOld
 
@@ -1477,28 +1432,6 @@ Function SR_SetCollation( cName )
    EndIf
 
 Return cOld
-
-/*------------------------------------------------------------------------*/
-
-Function SR_SetHideRecno( lOpt )
-
-   Local lOld := lHideRecno
-   If valtype( lOpt ) == "L"
-      lHideRecno := lOpt
-   EndIf
-
-Return lOld
-
-/*------------------------------------------------------------------------*/
-
-Function SR_SetHideHistoric( lOpt )
-
-   Local lOld := lHideHistoric
-   If valtype( lOpt ) == "L"
-      lHideHistoric := lOpt
-   EndIf
-
-Return lOld
 
 /*------------------------------------------------------------------------*/
 
@@ -2065,64 +1998,136 @@ Function SR_DetectDBFromDSN( cConnect )
 Return SYSTEMID_UNKNOW
 
 
-Function SR_SetSerializeArrayAsJson( l )
-   Local lOld  := lSerializeArrayAsJson
-   If l != NIL
-      lSerializeArrayAsJson := l
-   EndIf
-Return lOld
-
-
-
 /*------------------------------------------------------------------------*/
 
 #pragma BEGINDUMP
 
-BOOL HB_EXPORT sr_isMultilang( void )
+#include "compat.h"
+
+static HB_BOOL s_fMultiLang               = HB_FALSE;
+static HB_BOOL s_fShutDown                = HB_FALSE;
+static HB_BOOL s_fGoTopOnScope            = HB_TRUE;
+static HB_BOOL s_fSerializedAsString      = HB_FALSE;
+static HB_BOOL s_fHideRecno               = HB_TRUE;
+static HB_BOOL s_fHideHistoric            = HB_FALSE;
+static HB_BOOL s_fUseDeleteds             = HB_TRUE;
+/* Culik added new global to tell if we will serialize arrays as json or xml */
+static HB_BOOL s_fSerializeArrayAsJson    = HB_FALSE;
+/* Culik added new global to tell if we are using sqlverser 2008 or newer */
+static HB_BOOL s_fSql2008newTypes         = HB_FALSE;
+
+HB_BOOL HB_EXPORT sr_isMultilang( void )
 {
-   return LMULTILANG.item.asLogical.value;
+   return s_fMultiLang;
 }
 
-BOOL HB_EXPORT sr_isShutdownProcess( void )
+HB_FUNC( SR_SETMULTILANG )
 {
-   return LSHUTDOWN.item.asLogical.value;
+   hb_retl( s_fMultiLang );
+   if( HB_ISLOG( 1 ) )
+      s_fMultiLang = hb_parl( 1 );
 }
 
-
-BOOL HB_EXPORT sr_GoTopOnScope( void )
+HB_BOOL HB_EXPORT sr_isShutdownProcess( void )
 {
-   return LGOTOPONSCOPE.item.asLogical.value;
+   return s_fShutDown;
 }
 
-BOOL HB_EXPORT sr_lSerializedAsString( void )
+HB_FUNC( SR_SETSHUTDOWN )
 {
-   return LSERIALIZEDASSTRING.item.asLogical.value;
+   hb_retl( s_fShutDown );
+   if( HB_ISLOG( 1 ) )
+      s_fShutDown = hb_parl( 1 );
 }
 
-BOOL HB_EXPORT sr_lHideRecno( void )
+HB_BOOL HB_EXPORT sr_GoTopOnScope( void )
 {
-   return LHIDERECNO.item.asLogical.value;
+   return s_fGoTopOnScope;
 }
 
-BOOL HB_EXPORT sr_lHideHistoric( void )
+HB_FUNC( SR_SETGOTOPONSCOPE )
 {
-   return LHIDEHISTORIC.item.asLogical.value;
+   hb_retl( s_fGoTopOnScope );
+   if( HB_ISLOG( 1 ) )
+      s_fGoTopOnScope = hb_parl( 1 );
 }
 
-BOOL HB_EXPORT sr_UseDeleteds( void )
+HB_BOOL HB_EXPORT sr_lSerializedAsString( void )
 {
-   return LUSEDELETEDS.item.asLogical.value;
+   return s_fSerializedAsString;
 }
 
-BOOL HB_EXPORT sr_lSerializeArrayAsJson( void )
+HB_FUNC( SR_SETSERIALIZEDSTRING )
 {
-   return LSERIALIZEARRAYASJSON.item.asLogical.value;
+   hb_retl( s_fSerializedAsString );
+   if( HB_ISLOG( 1 ) )
+      s_fSerializedAsString = hb_parl( 1 );
+}
+
+HB_BOOL HB_EXPORT sr_lHideRecno( void )
+{
+   return s_fHideRecno;
+}
+
+HB_FUNC( SR_SETHIDERECNO )
+{
+   hb_retl( s_fHideRecno );
+   if( HB_ISLOG( 1 ) )
+      s_fHideRecno = hb_parl( 1 );
+}
+
+HB_BOOL HB_EXPORT sr_lHideHistoric( void )
+{
+   return s_fHideHistoric;
+}
+
+HB_FUNC( SR_SETHIDEHISTORIC )
+{
+   hb_retl( s_fHideHistoric );
+   if( HB_ISLOG( 1 ) )
+      s_fHideHistoric = hb_parl( 1 );
+}
+
+HB_BOOL HB_EXPORT sr_UseDeleteds( void )
+{
+   return s_fUseDeleteds;
+}
+
+HB_FUNC( SR_USEDELETEDS )
+{
+   hb_retl( s_fUseDeleteds );
+   if( HB_ISLOG( 1 ) )
+      s_fUseDeleteds = hb_parl( 1 );
+}
+
+HB_BOOL HB_EXPORT sr_lSerializeArrayAsJson( void )
+{
+   return s_fSerializeArrayAsJson;
+}
+
+HB_FUNC( SR_SETSERIALIZEARRAYASJSON )
+{
+   hb_retl( s_fSerializeArrayAsJson );
+   if( HB_ISLOG( 1 ) )
+      s_fSerializeArrayAsJson = hb_parl( 1 );
 }
 
 BOOL HB_EXPORT sr_lsql2008newTypes( void )
 {
-   return LSQL2008NEWTYPES.item.asLogical.value; 
-}   
+   return s_fSql2008newTypes;
+}
+
+HB_FUNC( SR_GETSQL2008NEWTYPES )
+{
+   hb_retl( s_fSql2008newTypes );
+}
+
+HB_FUNC( SR_SETSQL2008NEWTYPES )
+{
+   hb_retl( s_fSql2008newTypes );
+   if( HB_ISLOG( 1 ) )
+      s_fSql2008newTypes = hb_parl( 1 );
+}
 
 #pragma ENDDUMP
 
@@ -2135,18 +2140,7 @@ Return HB_SR__VERSION_STRING + ", Build " + alltrim(strzero(HB_SQLRDD_BUILD,4)) 
 /*------------------------------------------------------------------------*/
 
 Exit Proc SQLRDD_ShutDown()
-   lShutDown := .T.
+   sr_setShutDown( .T. )
 Return
 
 /*------------------------------------------------------------------------*/
-
-
-FUNCTION SR_Getsql2008newTypes( l ) 
-RETURN lSql2008newTypes 
-FUNCTION SR_Setsql2008newTypes( l ) 
-   Local lOld  := l
-   If l != NIL
-      lSql2008newTypes := l
-   EndIf
-   
-Return lOld

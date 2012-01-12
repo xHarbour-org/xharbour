@@ -5,18 +5,10 @@
 * All Rights Reserved
 */
 
+#include "compat.h"
 #include "hbsql.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
 
-#include "hbapi.h"
-#include "hbdate.h"
-#include "hbapiitm.h"
-#include "hbfast.h"
-#include "hbapierr.h"
-#include "hashapi.h"
+#include <ctype.h>
 
 #include "sqly.h"          /* Bison-generated include */
 #include "msg.ch"
@@ -88,9 +80,9 @@ int SqlParse( sql_stmt* stmt, const char* query, int queryLen )
       queryLen = strlen( query )+1;
    }
 
-   stmt->query = (char *) query;
+   stmt->query = query;
    stmt->queryLen = queryLen;
-   stmt->queryPtr = stmt->errPtr = (char *) query;
+   stmt->queryPtr = stmt->errPtr = query;
    stmt->errMsg = 0;
 
    if( sql_yyparse( (void*) stmt ) || stmt->errMsg || stmt->command == -1 )
@@ -191,24 +183,22 @@ PHB_ITEM SQLpCodeGenIntItem2( int code, PHB_ITEM value, int code2, PHB_ITEM valu
 
 PHB_ITEM SQLpCodeGenArrayJoin( PHB_ITEM pArray1, PHB_ITEM pArray2 )
 {
-   USHORT n;
-   PHB_ITEM pToCopy;
+   HB_SIZE nLen, n;
 
-   if ( !HB_IS_ARRAY(pArray1) )
+   if( !HB_IS_ARRAY( pArray1 ) )
    {
       printf( "SQLpCodeGenArrayJoin Invalid param 1\n" );
    }
 
-   if ( !HB_IS_ARRAY(pArray2) )
+   if( !HB_IS_ARRAY( pArray2 ) )
    {
       printf( "SQLpCodeGenArrayJoin Invalid param 2\n" );
    }
 
-   for (n=1;n <= (USHORT) pArray2->item.asArray.value->ulLen; n++)
+   nLen = hb_arrayLen( pArray2 );
+   for( n = 1; n <= nLen; n++ )
    {
-      pToCopy = hb_itemArrayGet( pArray2, n );
-      hb_arrayAddForward( pArray1, pToCopy);
-      hb_itemRelease( pToCopy );
+      hb_arrayAddForward( pArray1, hb_arrayGetItemPtr( pArray2, n ) );
    }
    hb_itemRelease( pArray2 );
    return pArray1;
@@ -329,7 +319,7 @@ HB_FUNC( SR_STRTOHEX )
    hb_xfree( outbuff );
 }
 
-char * sr_Hex2Str( char * cStr, int len, int * lenOut )
+char * sr_Hex2Str( const char * cStr, int len, int * lenOut )
 {
    char *outbuff;
    char c;
@@ -406,7 +396,7 @@ HB_FUNC( SR_HEXTOSTR )
       return;
    }
 
-   outbuff = sr_Hex2Str( (char *) hb_parc( 1 ), hb_parclen( 1 ), &nalloc );
+   outbuff = sr_Hex2Str( hb_parc( 1 ), hb_parclen( 1 ), &nalloc );
    hb_retclenAdopt( outbuff, nalloc );
 }
 
@@ -1068,6 +1058,7 @@ BOOL SR_itemEmpty( PHB_ITEM pItem )
 {
    switch( hb_itemType( pItem ) )
    {
+#ifdef __XHARBOUR__
       case HB_IT_ARRAY:
          return( pItem->item.asArray.value->ulLen == 0 );
 
@@ -1092,6 +1083,7 @@ BOOL SR_itemEmpty( PHB_ITEM pItem )
 #endif
       case HB_IT_TIMEFLAG:
          return( pItem->item.asDate.value == 0 && pItem->item.asDate.time == 0 );
+
       case HB_IT_POINTER:
          return( pItem->item.asPointer.value == NULL );
 
@@ -1104,6 +1096,53 @@ BOOL SR_itemEmpty( PHB_ITEM pItem )
       case HB_IT_HASH:
          return( pItem->item.asHash.value->ulTotalLen == 0 );
 
+#else
+      case HB_IT_ARRAY:
+         return hb_arrayLen( pItem ) == 0;
+
+      case HB_IT_HASH:
+         return hb_hashLen( pItem ) == 0;
+
+      case HB_IT_STRING:
+      case HB_IT_MEMO:
+         return hb_strEmpty( hb_itemGetCPtr( pItem ), hb_itemGetCLen( pItem ) );
+
+      case HB_IT_INTEGER:
+         return hb_itemGetNI( pItem ) == 0;
+
+      case HB_IT_LONG:
+         return hb_itemGetNInt( pItem ) == 0;
+
+      case HB_IT_DOUBLE:
+         return hb_itemGetND( pItem ) == 0.0;
+
+      case HB_IT_DATE:
+         return hb_itemGetDL( pItem ) == 0;
+
+      case HB_IT_TIMESTAMP:
+      {
+         long lDate, lTime;
+         hb_itemGetTDT( pItem, &lDate, &lTime );
+         return lDate == 0 && lTime == 0;
+      }
+      case HB_IT_LOGICAL:
+         return ! hb_itemGetL( pItem );
+
+      case HB_IT_BLOCK:
+         return HB_FALSE;
+
+      case HB_IT_POINTER:
+         return hb_itemGetPtr( pItem ) == NULL;
+
+      case HB_IT_SYMBOL:
+      {
+         PHB_SYMB pSym = hb_itemGetSymbol( pItem );
+         if( pSym && ( pSym->scope.value & HB_FS_DEFERRED ) && \
+             pSym->pDynSym )
+            pSym = hb_dynsymSymbol( pSym->pDynSym );
+         return pSym == NULL || pSym->value.pFunPtr == NULL;
+      }
+#endif
       default:
          return( TRUE );
    }
@@ -1192,13 +1231,13 @@ char * quotedNull( PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, 
    }
    else if( HB_IS_DATE( pFieldData ) )
    {
-      hb_dateDecStr( sDate, pFieldData->item.asDate.value );
+      hb_dateDecStr( sDate, hb_itemGetDL( pFieldData ) );
       sValue = (char *) hb_xgrab( 30 );
-      switch ( nSystemID )
+      switch( nSystemID )
       {
          case SYSTEMID_ORACLE:
          {
-            if (!bMemo)
+            if( !bMemo )
             {
                sprintf( sValue, "TO_DATE(\'%s\',\'YYYYMMDD\')", sDate );
                return (sValue);

@@ -14,21 +14,13 @@ Quick to do list, 2009 feb 23:
 
 */
 
-#include "hbapi.h"
-#include "hbvm.h"
-#include "hbstack.h"
-#include "hbapiitm.h"
+#include "compat.h"
 #include "hbinit.h"
-#include "hbapierr.h"
-#include "hbapilng.h"
-#include "hbdate.h"
-#include "hbset.h"
+
 #include "msg.ch"
-#include "hbfast.h"
-#include "hashapi.h"
 #include "rddsys.ch"
-#include "hbtrace.h"
 #include "hbdbferr.h"
+
 #include "sqlrddsetup.ch"
 #include "sqlprototypes.h"
 
@@ -49,15 +41,9 @@ Quick to do list, 2009 feb 23:
    #define SQL_C_WCHAR  SQL_WCHAR
 #endif
 
-#include <limits.h>
-#include <math.h>
-#include <stdlib.h>
-#include <ctype.h>
 #include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
-#include <assert.h>
-#include <string.h>
 
 #include "sqlex.h"
 
@@ -103,7 +89,7 @@ static char * sqlSolveRestrictors( SQLEXAREAP thiswa )
 {
    if( s_pSym_SOLVERESTRICTORS )
    {
-      hb_objSendSymbol( thiswa->oWorkArea, s_pSym_SOLVERESTRICTORS->pSymbol, 0 );
+      hb_objSendMessage( thiswa->oWorkArea, s_pSym_SOLVERESTRICTORS, 0 );
       return ( hb_itemGetCPtr( hb_stackReturnItem() ) );
    } else
       return "";
@@ -159,15 +145,15 @@ static HB_ERRCODE ConcludeSkipraw( SQLEXAREAP thiswa )
 
 static void sqlGetCleanBuffer( SQLEXAREAP thiswa )
 {
-   ULONG ulPos;
+   HB_SIZE nPos, nLen;
    PHB_ITEM pCol;
 
    pCol = hb_itemNew( NULL );
-   for( ulPos = 1; ulPos <= thiswa->aEmptyBuff->item.asArray.value->ulLen; ulPos++ )
+   for( nPos = 1, nLen = hb_arrayLen( thiswa->aEmptyBuff ); nPos <= nLen; nPos++ )
    {
-      hb_arrayGet( thiswa->aEmptyBuff, ulPos, pCol );
-      hb_arraySet( thiswa->aOldBuffer, ulPos, pCol );
-      hb_arraySetForward( thiswa->aBuffer, ulPos, pCol );
+      hb_arrayGet( thiswa->aEmptyBuff, nPos, pCol );
+      hb_arraySet( thiswa->aOldBuffer, nPos, pCol );
+      hb_arraySetForward( thiswa->aBuffer, nPos, pCol );
    }
 
    hb_itemRelease( pCol );
@@ -644,7 +630,7 @@ HB_ERRCODE SetBindValue( PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT h
             break;
          }
 
-         hb_dateDecode( pFieldData->item.asDate.value, &iYear, &iMonth, &iDay );
+         hb_dateDecode( hb_itemGetDL( pFieldData ), &iYear, &iMonth, &iDay );
          BindStructure->asDate.year  = (SQLSMALLINT) iYear;
          BindStructure->asDate.month = (SQLUINTEGER) iMonth;
          BindStructure->asDate.day   = (SQLUINTEGER) iDay;
@@ -653,8 +639,7 @@ HB_ERRCODE SetBindValue( PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT h
       case SQL_C_TYPE_TIMESTAMP:
       {
          int iYear, iMonth, iDay;
-         int  iHour,  iMinute;
-         double dSeconds;
+         int iHour, iMinute;
          BOOL bEmpty = SR_itemEmpty( pFieldData );
 //DebugBreak();
          if( (!bEmpty) && BindStructure->isBoundNULL && hStmt )     // Param was NULL, should be re-bound
@@ -673,19 +658,30 @@ HB_ERRCODE SetBindValue( PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT h
             break;
          }
 
-        // hb_dateDecode( pFieldData->item.asDate.value, &iYear, &iMonth, &iDay );
-         //hb_timeDecode( pFieldData->item.asDate.time, piHour, piMin, pdSec );         
-         //DebugBreak();
-          hb_datetimeDecode(pFieldData->item.asDate.value,  pFieldData->item.asDate.time, &iYear, &iMonth, &iDay,
-                                                    &iHour, &iMinute, &dSeconds );
-         
-         BindStructure->asTimestamp.year     = (SQLSMALLINT) iYear;
-         BindStructure->asTimestamp.month    = (SQLUINTEGER) iMonth;
-         BindStructure->asTimestamp.day      = (SQLUINTEGER) iDay;
-         BindStructure->asTimestamp.hour     = (SQLUINTEGER)iHour;
-         BindStructure->asTimestamp.minute   = (SQLUINTEGER)iMinute;
-         BindStructure->asTimestamp.second   = (SQLUSMALLINT)dSeconds;
-         BindStructure->asTimestamp.fraction = 0;
+         {
+#ifdef __XHARBOUR__
+            // hb_dateDecode( pFieldData->item.asDate.value, &iYear, &iMonth, &iDay );
+            //hb_timeDecode( pFieldData->item.asDate.time, piHour, piMin, pdSec );         
+            //DebugBreak();
+            double seconds;
+            hb_datetimeDecode(pFieldData->item.asDate.value,  pFieldData->item.asDate.time,
+                              &iYear, &iMonth, &iDay,
+                              &iHour, &iMinute, &seconds );
+#else
+            long lJulian, lMilliSec;
+            int seconds, millisec;
+            hb_itemGetTDT( pFieldData, &lJulian, &lMilliSec );
+            hb_dateDecode( lJulian, &iYear, &iMonth, &iDay );
+            hb_timeDecode( lMilliSec, &iHour, &iMinute, &seconds, &millisec ); 
+#endif
+            BindStructure->asTimestamp.year     = (SQLSMALLINT) iYear;
+            BindStructure->asTimestamp.month    = (SQLUINTEGER) iMonth;
+            BindStructure->asTimestamp.day      = (SQLUINTEGER) iDay;
+            BindStructure->asTimestamp.hour     = (SQLUINTEGER) iHour;
+            BindStructure->asTimestamp.minute   = (SQLUINTEGER) iMinute;
+            BindStructure->asTimestamp.second   = (SQLUSMALLINT)seconds;
+            BindStructure->asTimestamp.fraction = 0;
+         }
          break;
       }
       case SQL_C_BIT:
@@ -1155,22 +1151,19 @@ void SolveFilters( SQLEXAREAP thiswa, BOOL bWhere )
    if ( thiswa->hOrdCurrent > 0 )
    {
       PHB_ITEM pIndexRef = hb_arrayGetItemPtr( thiswa->aOrders, ( ULONG ) thiswa->hOrdCurrent );
-      char * sFilter = hb_arrayGetCPtr( pIndexRef, SCOPE_SQLEXPR );
-      if(  sFilter )
+      const char * szFilter = hb_arrayGetCPtr( pIndexRef, SCOPE_SQLEXPR );
+      if( szFilter && szFilter[ 0 ] )
       {
-	     if ( sFilter[ 0 ] )
-	     { 
-            if( bWhere )
-            {
-               temp = hb_strdup( (const char *) thiswa->sWhere );
-               sprintf( thiswa->sWhere, "%s AND ( %s )", temp, hb_arrayGetCPtr( pIndexRef, SCOPE_SQLEXPR ) );
-               hb_xfree( temp );
-            }
-            else
-            {
-               sprintf( thiswa->sWhere, "\nWHERE ( %s )", hb_arrayGetCPtr( pIndexRef, SCOPE_SQLEXPR ) );
-               bWhere = TRUE;
-            }
+         if( bWhere )
+         {
+            temp = hb_strdup( (const char *) thiswa->sWhere );
+            sprintf( thiswa->sWhere, "%s AND ( %s )", temp, szFilter );
+            hb_xfree( temp );
+         }
+         else
+         {
+            sprintf( thiswa->sWhere, "\nWHERE ( %s )", szFilter );
+            bWhere = TRUE;
          }
       }
    }
@@ -1982,7 +1975,7 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
 
    // Check for maximum buffer pool size
 
-   if( ((LONG) ((thiswa->hBufferPool)->item.asHash.value->ulTotalLen)) > bufferPoolSize )
+   if( ((LONG) hb_hashLen(thiswa->hBufferPool)) > bufferPoolSize )
    {
       hb_hashNew( thiswa->hBufferPool );
       hb_hashPreallocate( thiswa->hBufferPool, ( ULONG ) ( bufferPoolSize * 1.2 ) );
@@ -2208,7 +2201,11 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
       }
 
       // Add new array to Buffer Pool
+#ifdef __XHARBOUR__
       hb_hashAdd( thiswa->hBufferPool, ULONG_MAX, pKey, aRecord );
+#else
+      hb_hashAdd( thiswa->hBufferPool, pKey, aRecord );
+#endif
 
       // Feeds current record when it is found
       if ( ((LONG) (thiswa->recordList[thiswa->recordListPos])) == lCurrRecord )
@@ -2753,6 +2750,7 @@ static HB_ERRCODE sqlExSeek( SQLEXAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, B
    int queryLevel;
    USHORT iIndex, i;
    HB_ERRCODE res, retvalue = HB_SUCCESS;
+   PHB_ITEM pNewKey = NULL;
    HSTMT hStmt;
 
    thiswa->lpdbPendingRel = NULL;
@@ -2776,10 +2774,23 @@ static HB_ERRCODE sqlExSeek( SQLEXAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, B
 #ifndef HB_CDP_SUPPORT_OFF
    if( HB_IS_STRING( pKey ) )
    {
+#  ifdef __XHARBOUR__
+      /* TOFIX: this code may corrupt internal HVM strings and also change
+                string passed by user */
       if( thiswa->cdPageCnv )
          hb_cdpTranslate( hb_itemGetCPtr( pKey ), thiswa->cdPageCnv, thiswa->area.cdPage );
       else
          hb_cdpTranslate( hb_itemGetCPtr( pKey ), hb_cdppage(), thiswa->area.cdPage );
+#  else
+      PHB_CODEPAGE cdpSrc = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP();
+      if( thiswa->area.cdPage && thiswa->area.cdPage != cdpSrc )
+      {
+         HB_SIZE nLen = hb_itemGetCLen( pKey );
+         char * pszVal = hb_cdpnDup( hb_itemGetCPtr( pKey ), &nLen,
+                                     cdpSrc, thiswa->area.cdPage );
+         pKey = pNewKey = hb_itemPutCLPtr( NULL, pszVal, nLen );
+      }
+#  endif
    }
 #endif
 
@@ -2800,6 +2811,8 @@ static HB_ERRCODE sqlExSeek( SQLEXAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, B
 
    if( FeedSeekKeyToBindings( thiswa, pKey, &queryLevel ) != HB_SUCCESS )
    {
+      if( pNewKey )
+         hb_itemRelease( pNewKey );
       return HB_FAILURE;
    }
 
@@ -2829,7 +2842,7 @@ static HB_ERRCODE sqlExSeek( SQLEXAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, B
       bBuffer = hb_xgrab( COLUMN_BLOCK_SIZE + 1 );
       for( i=1; i <= thiswa->area.uiFieldCount; i++ )
       {
-	  //   bBuffer = hb_xgrab( COLUMN_BLOCK_SIZE + 1 );
+         //bBuffer = hb_xgrab( COLUMN_BLOCK_SIZE + 1 );
          memset( bBuffer, 0, lLen ) ;
          bOut       = NULL;
          lInitBuff  = lLen;
@@ -2949,6 +2962,9 @@ static HB_ERRCODE sqlExSeek( SQLEXAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, B
       sqlGetCleanBuffer( thiswa );
       thiswa->area.fFound = FALSE;
    }
+
+   if( pNewKey )
+      hb_itemRelease( pNewKey );
 
    if( thiswa->area.lpdbRelations && retvalue == HB_SUCCESS )
    {
@@ -3374,7 +3390,6 @@ static HB_ERRCODE sqlExGetValue( SQLEXAREAP thiswa, USHORT fieldNum, PHB_ITEM va
    PHB_ITEM itemTemp, itemTemp3;
    HB_ITEM itemTemp2;
    ULONG ulPos;
-   USHORT uiLen;
 
    itemTemp2.type = HB_IT_NIL;
 
@@ -3405,9 +3420,13 @@ static HB_ERRCODE sqlExGetValue( SQLEXAREAP thiswa, USHORT fieldNum, PHB_ITEM va
 
    if (HB_IS_ARRAY( itemTemp ))
    {
+#ifdef __XHARBOUR__
       itemTemp3 = hb_arrayClone( itemTemp, NULL );
       hb_itemForwardValue( value, itemTemp3 );
       hb_itemRelease( itemTemp3 );
+#else
+      hb_arrayCloneTo( value, itemTemp );
+#endif
    }
    else if(HB_IS_HASH( itemTemp ) && sr_isMultilang() )
    {
@@ -3415,52 +3434,63 @@ static HB_ERRCODE sqlExGetValue( SQLEXAREAP thiswa, USHORT fieldNum, PHB_ITEM va
 
       if( pField->uiType == HB_FT_MEMO )
       {
-         if( hb_hashScan( itemTemp, sr_getCurrentLang(), &ulPos ) ||
-             hb_hashScan( itemTemp, sr_getSecondLang(), &ulPos ) ||
-             hb_hashScan( itemTemp, sr_getRootLang(), &ulPos ) )
+         PHB_ITEM pLangItem = hb_itemNew( NULL );
+
+         if( hb_hashScan( itemTemp, sr_getBaseLang( pLangItem ), &ulPos ) ||
+             hb_hashScan( itemTemp, sr_getSecondLang( pLangItem ), &ulPos ) ||
+             hb_hashScan( itemTemp, sr_getRootLang( pLangItem ), &ulPos ) )
          {
             hb_itemCopy( value, hb_hashGetValueAt( itemTemp, ulPos ) );
          }
          else
          {
-            hb_itemPutCPtr( &itemTemp2, '\0', 0 );
+            hb_itemPutC( &itemTemp2, NULL );
             hb_itemForwardValue( value, &itemTemp2 );
          }
+         hb_itemRelease( pLangItem );
       }
       else
       {
-         char * empty = (char *) hb_xgrab( pField->uiLen + 1 );
+         PHB_ITEM pLangItem = hb_itemNew( NULL );
+         HB_SIZE nLen = pField->uiLen, nSrcLen;
+         char * empty = ( char * ) hb_xgrab( nLen + 1 );
 
-         if( hb_hashScan( itemTemp, sr_getCurrentLang(), &ulPos ) ||
-             hb_hashScan( itemTemp, sr_getSecondLang(), &ulPos ) ||
-             hb_hashScan( itemTemp, sr_getRootLang(), &ulPos ) )
+         if( hb_hashScan( itemTemp, sr_getBaseLang( pLangItem ), &ulPos ) ||
+             hb_hashScan( itemTemp, sr_getSecondLang( pLangItem ), &ulPos ) ||
+             hb_hashScan( itemTemp, sr_getRootLang( pLangItem ), &ulPos ) )
          {
             itemTemp3 = hb_hashGetValueAt( itemTemp, ulPos );
-            uiLen = (USHORT) hb_itemGetCLen( itemTemp3 );
-            hb_xmemcpy( empty, hb_itemGetCPtr( itemTemp3 ), uiLen > pField->uiLen ? pField->uiLen : uiLen );
-            if( pField->uiLen > uiLen )
-   			{
-   			   memset( empty + uiLen, ' ', pField->uiLen - uiLen );
-   			}
-            empty[pField->uiLen] = '\0';
+            nSrcLen = hb_itemGetCLen( itemTemp3 );
+            hb_xmemcpy( empty, hb_itemGetCPtr( itemTemp3 ), HB_MIN( nLen, nSrcLen ) );
+            if( nLen > nSrcLen )
+            {
+               memset( empty + nSrcLen, ' ', nLen - nSrcLen );
+            }
+#ifndef HB_CDP_SUPPORT_OFF
+            if( pField->uiType == HB_FT_STRING  )
+            {
+#  ifdef __XHARBOUR__
+               hb_cdpnTranslate( empty, thiswa->area.cdPage,
+                                 thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_cdppage(), nLen );
+#  else
+               PHB_CODEPAGE cdpDest = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP();
+               if( thiswa->area.cdPage && thiswa->area.cdPage != cdpDest )
+               {
+                  char * pszVal = hb_cdpnDup( empty, &nLen, thiswa->area.cdPage, cdpDest );
+                  hb_xfree( empty );
+                  empty = pszVal;
+               }
+#  endif
+            }
+#endif
          }
          else
          {
-            memset( empty, ' ', pField->uiLen );
-            empty[pField->uiLen] = '\0';
+            memset( empty, ' ', nLen );
          }
-#ifndef HB_CDP_SUPPORT_OFF
-         if( pField->uiType == HB_FT_STRING  )
-         {
-            if( thiswa->cdPageCnv )
-               hb_cdpnTranslate( empty, thiswa->area.cdPage, thiswa->cdPageCnv, pField->uiLen );
-            else
-               hb_cdpnTranslate( empty, thiswa->area.cdPage, hb_cdppage(), pField->uiLen );
-         }
-#endif
-         hb_itemPutCPtr( &itemTemp2, empty, pField->uiLen );
-         hb_itemForwardValue( value, &itemTemp2 );
-
+         empty[ nLen ] = '\0';
+         hb_itemPutCLPtr( value, empty, nLen );
+         hb_itemRelease( pLangItem );
       }
    }
    else
@@ -3559,7 +3589,6 @@ static HB_ERRCODE sqlExPutValue( SQLEXAREAP thiswa, USHORT fieldNum, PHB_ITEM va
 {
    PHB_ITEM pDest;
    LPFIELD pField;
-   USHORT uiCount;
    char * cfield;
    double dNum;
    USHORT len, dec, fieldindex;
@@ -3609,24 +3638,32 @@ static HB_ERRCODE sqlExPutValue( SQLEXAREAP thiswa, USHORT fieldNum, PHB_ITEM va
 
       if( pField->uiType == HB_FT_STRING )
       {
-         uiCount = ( USHORT ) hb_itemGetCLen( value );
+         HB_SIZE nSize = hb_itemGetCLen( value ), nLen = pField->uiLen;
 
-         if( uiCount > pField->uiLen )
+         cfield  = (char *) hb_xgrab( nLen + 1 );
+#ifdef __XHARBOUR__
+         if( nSize > nLen )
          {
-            uiCount = pField->uiLen;
+            nSize = nLen;
          }
-
-         cfield  = (char *) hb_xgrab( pField->uiLen + 1 );
-         hb_xmemcpy( cfield, hb_itemGetCPtr( value ), uiCount );
-#ifndef HB_CDP_SUPPORT_OFF
+         hb_xmemcpy( cfield, hb_itemGetCPtr( value ), nSize );
+#  ifndef HB_CDP_SUPPORT_OFF
          if( thiswa->cdPageCnv )
-             hb_cdpnTranslate( (char *) cfield, thiswa->cdPageCnv, thiswa->area.cdPage, uiCount );
-         else
-             hb_cdpnTranslate( (char *) cfield, hb_cdppage(), thiswa->area.cdPage, uiCount );
+            hb_cdpnTranslate( cfield, thiswa->cdPageCnv, thiswa->area.cdPage, nSize );
+         else if( thiswa->area.cdPage )
+            hb_cdpnTranslate( cfield, hb_cdppage(), thiswa->area.cdPage, nSize );
+#  endif
+#else
+         hb_cdpnDup2( hb_itemGetCPtr( value ), nSize,
+                      cfield, &nLen,
+                      thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP(), thiswa->area.cdPage );
+         nSize = nLen;
+         nLen = pField->uiLen;
 #endif
-         memset( cfield + uiCount, ' ', pField->uiLen - uiCount);
-         cfield[pField->uiLen] =  '\0';
-         hb_itemPutCPtr( value, cfield, pField->uiLen );
+         if( nLen > nSize )
+            memset( cfield + nSize, ' ', nLen - nSize );
+         cfield[ nLen ] =  '\0';
+         hb_itemPutCLPtr( value, cfield, nLen );
       }
       else if( pField->uiType == HB_FT_LONG )
       {
@@ -3644,7 +3681,13 @@ static HB_ERRCODE sqlExPutValue( SQLEXAREAP thiswa, USHORT fieldNum, PHB_ITEM va
    }
    else if(HB_IS_STRING( value ) && HB_IS_HASH( pDest ) && sr_isMultilang() )
    {
-      hb_hashAdd( pDest, ULONG_MAX, sr_getCurrentLang(), value );
+      PHB_ITEM pLangItem = hb_itemNew( NULL );
+#ifdef __XHARBOUR__
+      hb_hashAdd( pDest, ULONG_MAX, sr_getBaseLang( pLangItem ), value );
+#else
+      hb_hashAdd( pDest, sr_getBaseLang( pLangItem ), value );
+#endif
+      hb_itemRelease( pLangItem );
    }
    else if( pField->uiType == HB_FT_MEMO )    // Memo fields can hold ANY datatype
    {
@@ -4601,9 +4644,8 @@ static int sqlKeyCompareEx( SQLEXAREAP thiswa, PHB_ITEM pKey, BOOL fExact )
    PHB_ITEM pTag, pKeyVal, itemTemp;
    int iLimit, iResult = 0;
    BYTE len1, len2;
-   char * val1;
-   char * val2;
-   PHB_ITEM pKey1;
+   const char * val1, * val2;
+   char * valbuf = NULL;
 
    // TraceLog( NULL, "sqlKeyCompare\n" );
 
@@ -4649,13 +4691,13 @@ static int sqlKeyCompareEx( SQLEXAREAP thiswa, PHB_ITEM pKey, BOOL fExact )
    if( HB_IS_DATE( pKey ) )
    {
       len2 = 8;
-      val2 = ( char * ) hb_xgrab( 9 );
-      val2 = hb_itemGetDS( pKey, val2 );
+      valbuf = ( char * ) hb_xgrab( 9 );
+      val2 = hb_itemGetDS( pKey, valbuf );
    }
    else if( HB_IS_NUMBER( pKey ) )
    {
       PHB_ITEM pLen = hb_itemPutNL( NULL, (const LONG) len1 );
-      val2 = hb_itemStr( pKey, pLen, NULL );
+      val2 = valbuf = hb_itemStr( pKey, pLen, NULL );
       len2 = strlen( val2 );
       hb_itemRelease( pLen );
    }
@@ -4698,8 +4740,8 @@ static int sqlKeyCompareEx( SQLEXAREAP thiswa, PHB_ITEM pKey, BOOL fExact )
       }
    }
 
-   if( HB_IS_DATE( pKey ) || HB_IS_NUMBER( pKey ) )
-      hb_xfree( val2 );
+   if( valbuf )
+      hb_xfree( valbuf );
 
    hb_itemRelease( pKeyVal );
 

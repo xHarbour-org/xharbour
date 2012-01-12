@@ -8,6 +8,8 @@
                           IF <v1> == NIL ; <v1> := <x1> ; END ;
                           [; IF <vn> == NIL ; <vn> := <xn> ; END ]
 
-#define CRLF		        chr(13)+chr(10)
-#define CR_LF		        chr(13)+chr(10)
+#define CRLF      ( chr( 13 ) + chr( 10 ) )
+#define CR_LF     ( chr( 13 ) + chr( 10 ) )
 
+
+#include "hbcompat.ch"

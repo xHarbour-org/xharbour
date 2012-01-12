@@ -1,5 +1,9 @@
+#include "compat.ch"
 #include "sqlrdd.ch"
 #include "hbclass.ch"
+#ifndef __XHARBOUR__
+   #include "xhbcls.ch"
+#endif
 
 **************************************************
 Function NewDbSetRelation(cAlias, bRelation, cRelation, lScoped)

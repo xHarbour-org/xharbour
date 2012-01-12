@@ -4,21 +4,13 @@
 * All Rights Reserved
 */
 
-#include "hbapi.h"
-#include "hbvm.h"
-#include "hbstack.h"
-#include "hbapiitm.h"
+#include "compat.h"
 #include "hbinit.h"
-#include "hbapierr.h"
-#include "hbapilng.h"
-#include "hbdate.h"
-#include "hbset.h"
+
 #include "msg.ch"
-#include "hbfast.h"
-#include "hashapi.h"
 #include "rddsys.ch"
-#include "hbtrace.h"
 #include "hbdbferr.h"
+
 #include "sqlrddsetup.ch"
 #include "sqlprototypes.h"
 
@@ -39,15 +31,9 @@
    #define SQL_C_WCHAR  SQL_WCHAR
 #endif
 
-#include <limits.h>
-#include <math.h>
-#include <stdlib.h>
-#include <ctype.h>
 #include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
-#include <assert.h>
-#include <string.h>
 
 #include "sqlex.h"
 
@@ -166,7 +152,11 @@ static void SerializeMemo( PHB_ITEM pFieldData )
    }
    hb_vmPushSymbol( s_pSym_Serial1->pSymbol );
    hb_vmPushNil();
+#ifdef __XHARBOUR__
    hb_itemPushForward( pFieldData );
+#else
+   hb_vmPush( pFieldData );
+#endif
    hb_vmDo( 1 );
    hb_itemForwardValue( pFieldData, hb_stackReturnItem() );
 }
@@ -542,8 +532,14 @@ HB_ERRCODE FeedRecordCols( SQLEXAREAP thiswa, BOOL bUpdate )
                if( InsertRecord->isMultiLang && HB_IS_STRING( pFieldData ) )
                {
                   // Transform multilang field in HASH
+                  PHB_ITEM pLangItem = hb_itemNew( NULL );
                   pTemp = hb_hashNew( NULL );
-                  hb_hashAdd( pTemp, ULONG_MAX, sr_getCurrentLang(), pFieldData );
+#ifdef __XHARBOUR__
+                  hb_hashAdd( pTemp, ULONG_MAX, sr_getBaseLang( pLangItem ), pFieldData );
+#else
+                  hb_hashAdd( pTemp, sr_getBaseLang( pLangItem ), pFieldData );
+#endif
+                  hb_itemRelease( pLangItem );
                   hb_itemForwardValue( pFieldData, pTemp );
                   hb_itemRelease( pTemp );
                }

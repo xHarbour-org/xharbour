@@ -8,6 +8,8 @@
 
 #define SQLRDD_H
 
+#include "compat.h"
+
 #include "hbsetup.h"
 #include "hbapi.h"
 #include "hbapirdd.h"
@@ -33,10 +35,10 @@ typedef struct _SQLAREA
    PHB_CODEPAGE cdPageCnv; /* Area's codepage convert pointer */
    char * szDataFileName;  /* file name */
    LONG hOrdCurrent;       /* current index order */
-	BOOL shared;
-	BOOL readonly;          /* only SELECT allowed */
-	BOOL creating;          /* TRUE when creating table */
-	BOOL firstinteract;     /* TRUE when workarea was not used yet */
+   BOOL shared;
+   BOOL readonly;          /* only SELECT allowed */
+   BOOL creating;          /* TRUE when creating table */
+   BOOL firstinteract;     /* TRUE when workarea was not used yet */
    BOOL isam;              /* ISAM Simulator ? */
    BOOL wasdel;
    BOOL initialized;       /* Workarea Initialization done */
@@ -73,9 +75,6 @@ typedef SQLAREA * LPSQLAREA;
 #endif
 
 /* prototypes */
-
-static BOOL ProcessFields( SQLAREAP ThisDb );
-static BOOL SetFields( SQLAREAP ThisDb );
 
 void commonError( AREAP ThisDb, USHORT uiGenCode, USHORT uiSubCode, char* filename );
 

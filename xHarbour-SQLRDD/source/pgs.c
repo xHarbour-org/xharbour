@@ -4,14 +4,8 @@
 * All Rights Reserved
 */
 
-#include "hbapi.h"
-#include "hbvm.h"
-#include "hbstack.h"
-#include "hbapiitm.h"
-#include "hbdefs.h"
-#include "hbapierr.h"
-#include "hashapi.h"
-#include "hbfast.h"
+#include "compat.h"
+
 #include "libpq-fe.h"
 
 #include "sqlrddsetup.ch"
@@ -19,9 +13,6 @@
 #include "pgs.ch"
 #include "sqlodbc.ch"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <assert.h>
 
 static PHB_DYNS s_pSym_SR_DESERIALIZE = NULL;
@@ -634,14 +625,14 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff
          {
             char * szResult = ( char * ) hb_xgrab( lLen + 1 );
             hb_xmemset( szResult, ' ', lLen );
-            hb_itemPutCPtr( pItem, szResult, (ULONG) lLen );
+            hb_itemPutCLPtr( pItem, szResult, lLen );
             break;
          }
          case SQL_NUMERIC:
          case SQL_FAKE_NUM:
          {
             char szResult[2] = { ' ', '\0' };
-            sr_escapeNumber( szResult, (ULONG) lLen, (ULONG) lDec, pItem );
+            sr_escapeNumber( szResult, lLen, lDec, pItem );
             break;
          }
          case SQL_DATE:
@@ -670,9 +661,13 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff
 #endif
          case SQL_DATETIME:
          {
-	         hb_itemPutDT( pItem, 0, 0, 0, 0, 0, 0, 0 );
-	         break;
-     	 }    
+#ifdef __XHARBOUR__
+            hb_itemPutDT( pItem, 0, 0, 0, 0, 0, 0, 0 );
+#else
+            hb_itemPutTDT( pItem, 0, 0 );
+#endif
+            break;
+         }
 
          default:
             TraceLog( "oci.log", "Invalid data type detected: %i\n", lType );
@@ -692,12 +687,12 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff
             {
                szResult[ lPos ] = ' ';
             }
-            hb_itemPutCPtr( pItem, szResult, (ULONG) lLen );
+            hb_itemPutCLPtr( pItem, szResult, lLen );
             break;
          }
          case SQL_NUMERIC:
          {
-            sr_escapeNumber( bBuffer, (ULONG) lLen, (ULONG) lDec, pItem );
+            sr_escapeNumber( bBuffer, lLen, lDec, pItem );
             break;
          }
          case SQL_DATE:
@@ -759,13 +754,15 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff
 
                if( HB_IS_HASH( pTemp ) && sr_isMultilang() && bTranslate )
                {
+                  PHB_ITEM pLangItem = hb_itemNew( NULL );
                   ULONG ulPos;
-                  if( hb_hashScan( pTemp, sr_getCurrentLang(), &ulPos ) ||
-                      hb_hashScan( pTemp, sr_getSecondLang(), &ulPos ) ||
-                      hb_hashScan( pTemp, sr_getRootLang(), &ulPos ) )
+                  if( hb_hashScan( pTemp, sr_getBaseLang( pLangItem ), &ulPos ) ||
+                      hb_hashScan( pTemp, sr_getSecondLang( pLangItem ), &ulPos ) ||
+                      hb_hashScan( pTemp, sr_getRootLang( pLangItem ), &ulPos ) )
                   {
                      hb_itemCopy( pItem, hb_hashGetValueAt( pTemp, ulPos ) );
                   }
+                  hb_itemRelease( pLangItem );
                }
                else
                {
@@ -826,9 +823,11 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff
 #endif
          case SQL_DATETIME:
          {
-	         //hb_retdts(bBuffer);
-	         
-            char dt[17]={0};
+#ifdef __XHARBOUR__
+            //hb_retdts(bBuffer);
+
+            char dt[18];
+
             dt[0] = bBuffer[0];
             dt[1] = bBuffer[1];
             dt[2] = bBuffer[2];
@@ -838,16 +837,21 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff
             dt[6] = bBuffer[8];
             dt[7] = bBuffer[9];
             dt[8] = bBuffer[11];
-            dt[9] = bBuffer[12];	         
-            dt[10] = bBuffer[14];	                     
-            dt[11] = bBuffer[15];	         
-            dt[12] = bBuffer[17];	         
-            dt[13] = bBuffer[18];	         
-            dt[14] = '\0';	         	         
+            dt[9] = bBuffer[12];
+            dt[10] = bBuffer[14];
+            dt[11] = bBuffer[15];
+            dt[12] = bBuffer[17];
+            dt[13] = bBuffer[18];
+            dt[14] = '\0';
 
-	         hb_itemPutDTS( pItem, dt );
-	         break;
-     	 }    
+            hb_itemPutDTS( pItem, dt );
+#else
+            long lJulian, lMilliSec;
+            hb_timeStampStrGetDT( bBuffer, &lJulian, &lMilliSec );
+            hb_itemPutTDT( pItem, lJulian, lMilliSec );
+#endif
+            break;
+         }
          default:
             TraceLog( "oci.log", "Invalid data type detected: %i\n", lType );
       }
@@ -874,7 +878,7 @@ HB_FUNC( PGSLINEPROCESSED )
 
    if( session )
    {
-      cols = pFields->item.asArray.value->ulLen;
+      cols = hb_arrayLen( pFields );
 
       for( i=0; i < cols; i++ )
       {

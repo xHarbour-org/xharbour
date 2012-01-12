@@ -1,3 +1,4 @@
+#include "compat.ch"
 #include "hbclass.ch"
 		
 **************************************************
@@ -318,7 +319,7 @@ method GetOperands(cExpression, cAlias, oOperand1, oConnector, oOperand2) class 
             if (HB_RegExMatch(::_cRegOperator, cExpression, .F.))
 		    	aGroups = HB_RegExAtX(::_cRegOperator, cExpression)
 		    	
-                oComparisonOperator = xFirst(::aClipperComparisonOperators, {|y| aGroups[3,1] in y:aSymbols})
+                oComparisonOperator = xFirst(::aClipperComparisonOperators, {|y| aGroups[3,1] $ y:aSymbols})
 				
                 oOperand1 = Comparison():new(cAlias, ::RestoreParenthesis(cExpression), oExpressionParser:Parse(::RestoreParenthesis(aGroups[2,1])),;
                                             oComparisonOperator,;

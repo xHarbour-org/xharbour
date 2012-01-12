@@ -4,6 +4,7 @@
 * All Rights Reserved
 */
 
+#include "compat.ch"
 #include "error.ch"
 #include "sqlrdd.ch"
 #include "msg.ch"
@@ -27,7 +28,6 @@
 #define  FIX_PRE_WHERE      if(nContext==SQL_CONTEXT_SELECT_PRE_WHERE,(nContext:=SQL_CONTEXT_SELECT_WHERE,cSql+=" WHERE "),if(nContext==SQL_CONTEXT_SELECT_PRE_WHERE2,(nContext:=SQL_CONTEXT_SELECT_WHERE,cSql+=" AND "),))
 #define  PASSTHROUGH        nIP++;Exit
 #define  IDENTSPACE         space(nSpaces)
-#define  CRLF               chr(13)+chr(10)
 //#define  TABLE_OPTIMIZER    if(nSystemId==SYSTEMID_MSSQL7,if(lLocking," WITH (UPDLOCK)", " WITH (NOLOCK)"),"")
 #define  TABLE_OPTIMIZER    if(nSystemId==SYSTEMID_MSSQL7,if(lLocking," WITH (UPDLOCK)", ""),"")
 #define  COMMAND_OPTIMIZER  if(nSystemId==SYSTEMID_SYBASE,if(lLocking,"", " AT ISOLATION READ UNCOMMITTED "),"")
@@ -37,7 +37,7 @@
 
 #xtranslate Default( <Var>, <xVal> ) => IIF( <Var> == NIL, <Var> := <xVal>, )
 
-GLOBAL bTableInfo, bIndexInfo
+Static bTableInfo, bIndexInfo
 
 Static nRecordNum := 0
 Static bNextRecord

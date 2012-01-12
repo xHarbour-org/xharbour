@@ -6,21 +6,14 @@
 * Copyright (c) 2004-2005 - Luiz Rafael Culik Guimaraes <luiz@xharbour.com.br>
 */
 
-#include "hbapi.h"
-#include "hbvm.h"
-#include "hbstack.h"
-#include "hbapiitm.h"
-#include "hbdefs.h"
-#include "hbapierr.h"
-#include "hashapi.h"
-#include "hbfast.h"
+#include "compat.h"
 
 #include "sqlrddsetup.ch"
 #include "sqlprototypes.h"
 #include "sqlodbc.ch"
 #include "sqlora.h"
 
-#if defined(WIN32)
+#if !defined(__GNUC__) && defined(WIN32)
 #define inline __inline
 #define __STDC__
 #endif
@@ -500,7 +493,7 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBu
          {
             char * szResult = ( char * ) hb_xgrab( lLen + 1 );
             hb_xmemset( szResult, ' ', lLen );
-            hb_itemPutCPtr( pItem, szResult, (ULONG) lLen );
+            hb_itemPutCLPtr( pItem, szResult, (ULONG) lLen );
             break;
          }
          case SQL_NUMERIC:
@@ -536,9 +529,13 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBu
 #endif
          case SQL_DATETIME:
          {
-	         hb_itemPutDT( pItem, 0, 0, 0, 0, 0, 0, 0 );
-	         break;
-     	 }    
+#ifdef __XHARBOUR__
+            hb_itemPutDT( pItem, 0, 0, 0, 0, 0, 0, 0 );
+#else
+            hb_itemPutTDT( pItem, 0, 0 );
+#endif
+            break;
+         }
 
          default:
             TraceLog( "oci.log", "Invalid data type detected: %i\n", lType );
@@ -558,7 +555,7 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBu
             {
                szResult[ lPos ] = ' ';
             }
-            hb_itemPutCPtr( pItem, szResult, (ULONG) lLen );
+            hb_itemPutCLPtr( pItem, szResult, (ULONG) lLen );
             break;
          }
          case SQL_NUMERIC:
@@ -622,13 +619,15 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBu
 
                if( HB_IS_HASH( pTemp ) && sr_isMultilang() && bTranslate )
                {
+                  PHB_ITEM pLangItem = hb_itemNew( NULL );
                   ULONG ulPos;
-                  if( hb_hashScan( pTemp, sr_getCurrentLang(), &ulPos ) ||
-                      hb_hashScan( pTemp, sr_getSecondLang(), &ulPos ) ||
-                      hb_hashScan( pTemp, sr_getRootLang(), &ulPos ) )
+                  if( hb_hashScan( pTemp, sr_getBaseLang( pLangItem ), &ulPos ) ||
+                      hb_hashScan( pTemp, sr_getSecondLang( pLangItem ), &ulPos ) ||
+                      hb_hashScan( pTemp, sr_getRootLang( pLangItem ), &ulPos ) )
                   {
                      hb_itemCopy( pItem, hb_hashGetValueAt( pTemp, ulPos ) );
                   }
+                  hb_itemRelease( pLangItem );
                }
                else
                {
@@ -658,9 +657,10 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBu
 #endif
          case SQL_DATETIME:
          {
-	         //hb_retdts(bBuffer);
-	         
-            char dt[17]={0};
+#ifdef __XHARBOUR__
+            //hb_retdts(bBuffer);
+            char dt[18];
+
             dt[0] = bBuffer[0];
             dt[1] = bBuffer[1];
             dt[2] = bBuffer[2];
@@ -670,16 +670,21 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBu
             dt[6] = bBuffer[8];
             dt[7] = bBuffer[9];
             dt[8] = bBuffer[11];
-            dt[9] = bBuffer[12];	         
-            dt[10] = bBuffer[14];	                     
-            dt[11] = bBuffer[15];	         
-            dt[12] = bBuffer[17];	         
-            dt[13] = bBuffer[18];	         
-            dt[14] = '\0';	         	         	         
+            dt[9] = bBuffer[12];
+            dt[10] = bBuffer[14];
+            dt[11] = bBuffer[15];
+            dt[12] = bBuffer[17];
+            dt[13] = bBuffer[18];
+            dt[14] = '\0';
 
-	         hb_itemPutDTS( pItem, dt );
-	         break;
-     	 }    
+            hb_itemPutDTS( pItem, dt );
+#else
+            long lJulian, lMilliSec;
+            hb_timeStampStrGetDT( bBuffer, &lJulian, &lMilliSec );
+            hb_itemPutTDT( pItem, lJulian, lMilliSec );
+#endif
+            break;
+         }
 
          default:
             TraceLog( "oci.log", "Invalid data type detected: %i\n", lType );
@@ -737,7 +742,7 @@ HB_FUNC( SQLO_LINEPROCESSED )
       line = sqlo_values(session->stmt, NULL, 0);
       lens = sqlo_value_lens(session->stmt, NULL);
 
-      cols = pFields->item.asArray.value->ulLen;
+      cols = hb_arrayLen( pFields );
 
       for( i=0; i < cols; i++ )
       {
@@ -768,8 +773,9 @@ HB_FUNC( ORACLEWRITEMEMO )
 
    PHB_ITEM pArray = hb_param( 5, HB_IT_ARRAY );
 
-   ULONG uiLen,uiSize;
-   uiLen =  pArray->item.asArray.value->ulLen;
+   ULONG uiLen, uiSize;
+
+   uiLen = hb_arrayLen( pArray );
 
    if (( !session ) || uiLen == 0 )
    {
@@ -782,8 +788,8 @@ HB_FUNC( ORACLEWRITEMEMO )
       {
          PHB_ITEM pFieldDesc = hb_arrayGetItemPtr( pArray, uiSize + 1 );
          char szSql[256] = {0};
-         char * sMemo  = hb_arrayGetCPtr(pFieldDesc, 2 );
-         char * sField = (char*) hb_arrayGetCPtr(pFieldDesc,1 );
+         const char * sMemo  = hb_arrayGetCPtr( pFieldDesc, 2 );
+         const char * sField = hb_arrayGetCPtr( pFieldDesc, 1 );
          sprintf( szSql, "UPDATE %s SET %s = EMPTY_CLOB() WHERE %s = %lu RETURNING %s INTO :b1", sTable, sField, sRecnoName, ulRecno, sField );
          //TraceLog( "memo.log", "len %i de %i, frase: %s\n", uiSize, uiLen, szSql );
          sth = sqlo_prepare( session->dbh, szSql );

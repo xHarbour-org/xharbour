@@ -25,10 +25,10 @@ typedef struct sql_stmt_s {
    int numParam;
    int errMsg;
    int where;
-   char* query;
+   const char* query;
    int queryLen;
-   char* queryPtr;
-   char* errPtr;
+   const char* queryPtr;
+   const char* errPtr;
    PHB_ITEM pArray;
    PHB_ITEM pTemp;
 } sql_stmt;

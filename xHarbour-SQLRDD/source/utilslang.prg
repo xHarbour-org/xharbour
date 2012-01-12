@@ -4,17 +4,14 @@
 * All Rights Reserved
 */
 
+#include "compat.ch"
 #include "hbclass.ch"
 #include "common.ch"
 #include "msg.ch"
 
-Static nMessages   := 32
+Static s_nMessages   := 32
 
-GLOBAL nBaseLang   := 1
-GLOBAL nSecondLang := LANG_EN_US
-GLOBAL nRootLang   := LANG_PT_BR    // Root since I do it on Brazil
-
-Static aMsg1 := ;
+Static s_aMsg1 := ;
 { ;
    "Attempt to write to an empty table without a previous Append Blank",;
    "Undefined SQL datatype: ",;
@@ -50,7 +47,7 @@ Static aMsg1 := ;
    "Table or View does not exist";
 }
 
-Static aMsg2 := ;
+Static s_aMsg2 := ;
 { ;
    "Tentativa de gravar um registro em tabela vazia sem antes adicionar uma linha",;
    "Tipo de dado SQL indefinido : ",;
@@ -86,7 +83,7 @@ Static aMsg2 := ;
    "Tabela ou View não existente";
 }
 
-Static aMsg3 := ;
+Static s_aMsg3 := ;
 { ;
    "Attempt to write to an empty table without a previous Append Blank",;
    "Undefined SQL datatype: ",;
@@ -122,7 +119,7 @@ Static aMsg3 := ;
    "Table or View does not exist";
 }
 
-Static aMsg4 := ;
+Static s_aMsg4 := ;
 { ;
    "Attempt to write to an empty table without a previous Append Blank",;
    "Undefined SQL datatype: ",;
@@ -158,7 +155,7 @@ Static aMsg4 := ;
    "Table or View does not exist";
 }
 
-Static aMsg5 := ;
+Static s_aMsg5 := ;
 { ;
    "Attempt to write to an empty table without a previous Append Blank",;
    "Undefined SQL datatype: ",;
@@ -194,7 +191,7 @@ Static aMsg5 := ;
    "Table or View does not exist";
 }
 
-Static aMsg6 := ;
+Static s_aMsg6 := ;
 { ;
    "Attempt to write to an empty table without a previous Append Blank",;
    "Undefined SQL datatype: ",;
@@ -230,7 +227,7 @@ Static aMsg6 := ;
    "Table or View does not exist";
 }
 
-Static aMsg7 := ;
+Static s_aMsg7 := ;
 { ;
    "Attempt to write to an empty table without a previous Append Blank",;
    "Undefined SQL datatype: ",;
@@ -266,96 +263,100 @@ Static aMsg7 := ;
    "Table or View does not exist";
 };
 
-Static aMsg
+Static s_aMsg
 
 /*------------------------------------------------------------------------*/
 INIT PROCEDURE SR_Init2
 
-  aMSg := { aMsg1, aMsg2, aMsg3, aMsg4, aMsg5, aMsg6, aMsg7 }
+  s_aMsg := { s_aMsg1, s_aMsg2, s_aMsg3, s_aMsg4, s_aMsg5, s_aMsg6, s_aMsg7 }
+
+  SR_SetMsgCount( len( s_aMsg ) )
+
+  SR_SetBaseLang( 1 )
+  SR_SetSecondLang( LANG_EN_US )
+  SR_SetRootLang( LANG_PT_BR )      // Root since I do it on Brazil
 
 RETURN
 
 /*------------------------------------------------------------------------*/
 
-Function SR_Msg(nMsg)
+Function SR_Msg( nMsg )
+   Local nBaseLang := SR_SetBaseLang()
 
-   If nMsg > 0 .and. nMsg <= len( aMsg[nBaseLang] )
-      Return aMsg[nBaseLang, nMsg]
+   If nMsg > 0 .and. nMsg <= len( s_aMsg[ nBaseLang ] )
+      Return s_aMsg[ nBaseLang, nMsg ]
    EndIf
 
 Return ""
 
 /*------------------------------------------------------------------------*/
 
-Function SR_SetBaseLang(nLang)
-
-   Local nOldLang := nBaseLang
-
-   If nLang == NIL
-      nLang := 0
-   EndIf
-
-   If nLang > 0 .and. nLang <= Len( aMsg )
-      nBaseLang := nLang
-   EndIf
-
-Return nOldLang
-
-/*------------------------------------------------------------------------*/
-
-Function SR_SetSecondLang(nLang)
-
-   Local nOldLang := nSecondLang
-
-   If nLang == NIL
-      nLang := 0
-   EndIf
-
-   If nLang > 0 .and. nLang <= Len( aMsg )
-      nSecondLang := nLang
-   EndIf
-
-Return nOldLang
-
-/*------------------------------------------------------------------------*/
-
-Function SR_SetRootLang(nLang)
-
-   Local nOldLang := nRootLang
-
-   If nLang == NIL
-      nLang := 0
-   EndIf
-
-   If nLang > 0 .and. nLang <= Len( aMsg )
-      nRootLang := nLang
-   EndIf
-
-Return nOldLang
-
-/*------------------------------------------------------------------------*/
-
 Function SR_GetErrMessageMax()
 
-Return nMessages
+Return s_nMessages
 
 /*------------------------------------------------------------------------*/
 
 #pragma BEGINDUMP
 
-PHB_ITEM HB_EXPORT sr_getCurrentLang( void )
+#include "compat.h"
+
+static int s_iMsgCount = 0;
+
+static int s_iBaseLang   = 0;
+static int s_iSecondLang = 0;
+static int s_iRootLang   = 0;
+
+PHB_ITEM HB_EXPORT sr_getBaseLang( PHB_ITEM pLangItm )
 {
-   return &NBASELANG;
+   return hb_itemPutNI( pLangItm, s_iBaseLang );
 }
 
-PHB_ITEM HB_EXPORT sr_getSecondLang( void )
+PHB_ITEM HB_EXPORT sr_getSecondLang( PHB_ITEM pLangItm )
 {
-   return &NSECONDLANG;
+   return hb_itemPutNI( pLangItm, s_iSecondLang );
 }
 
-PHB_ITEM HB_EXPORT sr_getRootLang( void )
+PHB_ITEM HB_EXPORT sr_getRootLang( PHB_ITEM pLangItm )
 {
-   return &NROOTLANG;
+   return hb_itemPutNI( pLangItm, s_iRootLang );
+}
+
+HB_FUNC_STATIC( SR_SETMSGCOUNT )
+{
+   hb_retni( s_iMsgCount );
+   if( HB_ISNUM( 1 ) )
+      s_iMsgCount = hb_parni( 1 );
+}
+
+HB_FUNC( SR_SETBASELANG )
+{
+   int iLang = hb_parni( 1 );
+
+   hb_retni( s_iBaseLang );
+
+   if( iLang > 0 && iLang <= s_iMsgCount )
+      s_iBaseLang = iLang;
+}
+
+HB_FUNC( SR_SETSECONDLANG )
+{
+   int iLang = hb_parni( 1 );
+
+   hb_retni( s_iSecondLang );
+
+   if( iLang > 0 && iLang <= s_iMsgCount )
+      s_iSecondLang = iLang;
+}
+
+HB_FUNC( SR_SETROOTLANG )
+{
+   int iLang = hb_parni( 1 );
+
+   hb_retni( s_iRootLang );
+
+   if( iLang > 0 && iLang <= s_iMsgCount )
+      s_iRootLang = iLang;
 }
 
 #pragma ENDDUMP

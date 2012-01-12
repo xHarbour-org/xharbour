@@ -28,28 +28,6 @@
 #define DEFAULT_INDEX_COLUMN_MAX_LEN         200
 #define INITIAL_MEMO_ALLOC                  1024
 
-// Support for old xHarbour versions
-
-#ifndef HB_FT_STRING
-#define HB_FT_STRING HB_IT_STRING
-#endif
-
-#ifndef HB_FT_MEMO
-#define HB_FT_MEMO HB_IT_MEMO
-#endif
-
-#ifndef HB_FT_LONG
-#define HB_FT_LONG HB_IT_LONG
-#endif
-
-#ifndef HB_FT_LOGICAL
-#define HB_FT_LOGICAL HB_IT_LOGICAL
-#endif
-
-#ifndef HB_FT_DATE
-#define HB_FT_DATE HB_IT_DATE
-#endif
-
 //                           0 1 2 34 5 6 7 8 9 0 1 23 4 5 67 8 9
 static char * openQuotes  = "\"\"\"[\"\"\"\"\"\"\"\"`\"\"\"`\"\"\"";
 static char * closeQuotes = "\"\"\"]\"\"\"\"\"\"\"\"`\"\"\"`\"\"\"";
@@ -59,18 +37,6 @@ static char * closeQuotes = "\"\"\"]\"\"\"\"\"\"\"\"`\"\"\"`\"\"\"";
 #define CLOSE_QUALIFIER( thiswa ) ( closeQuotes[thiswa->nSystemID] )
 #define RESULTSET_OK      HB_SUCCESS + 10
 #define RESULTSET_NOK     HB_SUCCESS + 11
-
-#ifdef SQLRDD_COMPAT_PRE_1_1
-#ifndef HB_RDD_MAX_ALIAS_LEN
-   #define HB_RDD_MAX_ALIAS_LEN            32
-#endif
-#define hb_setGetDeleted() hb_set.HB_SET_DELETED
-#define hb_setGetAutOpen() hb_set.HB_SET_AUTOPEN
-#define hb_cdppage()       hb_cdp_page
-#define HB_ERRCODE ERRCODE
-#define HB_SUCCESS SUCCESS
-#define HB_FAILURE FAILURE
-#endif
 
 #undef HB_TRACE
 #define HB_TRACE(x, y)

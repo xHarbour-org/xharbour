@@ -1690,7 +1690,7 @@ int sqlo_free_lob_desc __P((sqlo_db_handle_t dbh, sqlo_lob_desc_t *loblpp));
  * @include ex13b.c
  */
 int sqlo_lob_write_buffer __P((sqlo_db_handle_t dbh, sqlo_lob_desc_t loblp, unsigned int loblen,
-                               void *bufp, unsigned int bufl, unsigned int piece));
+                               const void *bufp, unsigned int bufl, unsigned int piece));
 
 
 

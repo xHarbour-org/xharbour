@@ -4,18 +4,12 @@
 * All Rights Reserved
 */
 
-#if !defined(__GNUC__)
-#include "windows.h"
-#endif
+#include "compat.h"
 
-#include "hbapi.h"
-#include "hbvm.h"
-#include "hbstack.h"
-#include "hbapiitm.h"
-#include "hbdefs.h"
-#include "hbapierr.h"
-#include "hashapi.h"
-#include "hbfast.h"
+#if defined(HB_OS_WIN_32) || defined( HB_OS_WIN )
+   #include <windows.h>
+   #include <winsock.h>
+#endif
 
 #include "sqlrddsetup.ch"
 #include "sqlprototypes.h"
@@ -23,13 +17,9 @@
 #include "mysql.ch"
 #include "mysql.h"
 #include "mysqld_error.h"
-#include "hbfast.h"
 #include "errmsg.h"
 #include "sqlodbc.ch"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <assert.h>
 
 #define MYSQL_OK     0
@@ -197,15 +187,14 @@ void MSQLFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
          {
             char * szResult = ( char * ) hb_xgrab( lLen + 1 );
             hb_xmemset( szResult, ' ', lLen );
-            hb_itemPutCPtr( pItem, szResult, (ULONG) lLen );
-//            hb_xfree(szResult);
+            hb_itemPutCLPtr( pItem, szResult, lLen );
             break;
          }
          case SQL_NUMERIC:
          case SQL_FAKE_NUM:
          {
             char szResult[2] = { ' ', '\0' };
-            sr_escapeNumber( szResult, (ULONG) lLen, (ULONG) lDec, pItem );
+            sr_escapeNumber( szResult, lLen, lDec, pItem );
             break;
          }
          case SQL_DATE:
@@ -234,9 +223,13 @@ void MSQLFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
 #endif
          case SQL_DATETIME:
          {
-	         hb_itemPutDT( pItem, 0, 0, 0, 0, 0, 0, 0 );
-	         break;
-     	 }    
+#ifdef __XHARBOUR__
+            hb_itemPutDT( pItem, 0, 0, 0, 0, 0, 0, 0 );
+#else
+            hb_itemPutTDT( pItem, 0, 0 );
+#endif
+            break;
+         }
 
          default:
             TraceLog( "mysql.log", "Invalid data type detected: %i\n", lType );
@@ -257,8 +250,7 @@ void MSQLFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
             {
                szResult[ lPos ] = ' ';
             }
-            hb_itemPutCPtr( pItem, szResult, (ULONG) lLen );
-//            hb_xfreen(szResult);
+            hb_itemPutCLPtr( pItem, szResult, lLen );
             break;
          }
          case SQL_NUMERIC:
@@ -322,13 +314,15 @@ void MSQLFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
 
                if( HB_IS_HASH( pTemp ) && sr_isMultilang() && bTranslate )
                {
+                  PHB_ITEM pLangItem = hb_itemNew( NULL );
                   ULONG ulPos;
-                  if( hb_hashScan( pTemp, sr_getCurrentLang(), &ulPos ) ||
-                      hb_hashScan( pTemp, sr_getSecondLang(), &ulPos ) ||
-                      hb_hashScan( pTemp, sr_getRootLang(), &ulPos ) )
+                  if( hb_hashScan( pTemp, sr_getBaseLang( pLangItem ), &ulPos ) ||
+                      hb_hashScan( pTemp, sr_getSecondLang( pLangItem ), &ulPos ) ||
+                      hb_hashScan( pTemp, sr_getRootLang( pLangItem ), &ulPos ) )
                   {
                      hb_itemCopy( pItem, hb_hashGetValueAt( pTemp, ulPos ) );
                   }
+                  hb_itemRelease( pLangItem );
                }
                else
                {
@@ -358,28 +352,33 @@ void MSQLFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
 #endif
          case SQL_DATETIME:
          {
-	         //hb_retdts(bBuffer);
-	         
-	        char dt[17]={0};
-	        dt[0] = bBuffer[0];
-	        dt[1] = bBuffer[1];
-	        dt[2] = bBuffer[2];
-	        dt[3] = bBuffer[3];
-	        dt[4] = bBuffer[5];
-	        dt[5] = bBuffer[6];
-	        dt[6] = bBuffer[8];
+#ifdef __XHARBOUR__
+            //hb_retdts(bBuffer);
+            char dt[17];
+            dt[0] = bBuffer[0];
+            dt[1] = bBuffer[1];
+            dt[2] = bBuffer[2];
+            dt[3] = bBuffer[3];
+            dt[4] = bBuffer[5];
+            dt[5] = bBuffer[6];
+            dt[6] = bBuffer[8];
             dt[7] = bBuffer[9];
             dt[8] = bBuffer[11];
-            dt[9] = bBuffer[12];	         
-            dt[10] = bBuffer[14];	                     
-            dt[11] = bBuffer[15];	         
-            dt[12] = bBuffer[17];	         
-            dt[13] = bBuffer[18];	         
-            dt[14] = '\0';	         	         
-	        
-	        hb_itemPutDTS( pItem, dt );
-	        break;
-     	 }    
+            dt[9] = bBuffer[12];
+            dt[10] = bBuffer[14];
+            dt[11] = bBuffer[15];
+            dt[12] = bBuffer[17];
+            dt[13] = bBuffer[18];
+            dt[14] = '\0';
+
+            hb_itemPutDTS( pItem, dt );
+#else
+            long lJulian, lMilliSec;
+            hb_timeStampStrGetDT( bBuffer, &lJulian, &lMilliSec );
+            hb_itemPutTDT( pItem, lJulian, lMilliSec );
+#endif
+            break;
+         }
 
          default:
             TraceLog( "mysql.log", "Invalid data type detected: %i\n", lType );
@@ -418,7 +417,7 @@ HB_FUNC( MYSLINEPROCESSED )
    {
       if ( session->ifetch >= -1 )
       {
-         cols = pFields->item.asArray.value->ulLen;
+         cols = hb_arrayLen( pFields );
 
          mysql_data_seek( session->stmt, session->ifetch );
          thisrow = mysql_fetch_row( session->stmt );

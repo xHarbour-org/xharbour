@@ -109,7 +109,7 @@ CLASS SR_CONNECTION
 
    DATA cConnect, cDSN, cUser, cPassword
 
-   PUBLIC:
+   EXPORTED:
 
    METHOD Connect( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit, nTimeout ) CONSTRUCTOR
    METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace, cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit, nTimeout ) VIRTUAL

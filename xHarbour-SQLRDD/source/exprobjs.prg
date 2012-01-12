@@ -1,3 +1,4 @@
+#include "compat.ch"
 #include "hbclass.ch"
                                                
 **************************************************          
@@ -317,7 +318,7 @@ method new(pContext, pValue)
 	
 	if(aScan(::oWorkArea:aNames, {|x| x == upper(pValue)} ) > 0)
 		::ValueType := "field"
-	elseif(pValue like "\w+" .and. !pValue like "\d+" .and. !lower(pValue) == "nil")
+	elseif((pValue like "\w+") .and. (!pValue like "\d+") .and. !lower(pValue) == "nil")
 		::ValueType := "variable"
 	else
 		::ValueType := "value"

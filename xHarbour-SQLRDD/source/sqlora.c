@@ -43,13 +43,10 @@ const char * _sqlo_sqloraID="$Id$";
 #include "config.h"
 #endif
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include "compat.h"
+
 #include <limits.h>
 #include <errno.h>
-
-#include "hbapi.h"
 
 #ifdef HAVE_UNISTD_H            /* for my windows friends  */
 #    include <unistd.h>
@@ -65,7 +62,7 @@ const char * _sqlo_sqloraID="$Id$";
 # endif
 #endif
 
-#if defined(WIN32) || defined(__BORLANDC__)
+#if !defined(__GNUC__) && (defined(WIN32) || defined(__BORLANDC__))
 #define inline __inline
 #define __STDC__ 1
 #endif
@@ -129,14 +126,18 @@ const char * _sqlo_sqloraID="$Id$";
 
 #ifdef DEBUG_XGRAB
 #define XFREE(p,i) \
-        if(p) { TraceLog( "oci.log", "Pointer %p freed in line %i\n", p, i ); hb_xfree(p); } \
-        else \
-        TraceLog("free.log", "NULL pointer free at sqlora.c line %i \n", i);
+         do { \
+            if(p) { TraceLog( "oci.log", "Pointer %p freed in line %i\n", p, i ); hb_xfree(p); } \
+            else \
+            TraceLog("free.log", "NULL pointer free at sqlora.c line %i \n", i); \
+         } while( 0 )
 #else
 #define XFREE(p,i) \
-        if(p) hb_xfree(p); \
-        else \
-        TraceLog("free.log", "NULL pointer free at sqlora.c line %i \n", i);
+         do { \
+            if(p) hb_xfree(p); \
+            else \
+            TraceLog("free.log", "NULL pointer free at sqlora.c line %i \n", i); \
+         } while( 0 )
 #endif
 
 #if defined(ENABLE_PTHREADS) || defined(ENABLE_ORATHREADS) || defined(ENABLE_WINTHREADS)
@@ -4248,7 +4249,7 @@ DEFUN(_close_all_db_cursors, (dbp), const_sqlo_db_struct_ptr_t dbp)
     }
     if( stp->ocol_namev )
     {
-      XFREE( stp->ocol_namev, __LINE__ )
+      XFREE( stp->ocol_namev, __LINE__ );
     }
     if( stp->ocol_namev_size )
     {
@@ -7552,7 +7553,7 @@ DEFUN(sqlo_lob_write_buffer, (dbh, loblp, loblen, bufp, bufl, piece),
       sqlo_db_handle_t       dbh     AND
       sqlo_lob_desc_t        loblp   AND
       unsigned int           loblen  AND
-      void *                 bufp    AND
+      const void *           bufp    AND
       unsigned int           bufl    AND
       unsigned int           piece )
 {
@@ -7690,7 +7691,7 @@ DEFUN(sqlo_lob_write_stream, (dbh, loblp, filelen, fp),
     nbytes = filelen;
 
   /* get a chunk of data */
-  if (fread( (void*) buf, (size_t)nbytes, 1, fp) != 1 ) {
+  if (fread( buf, (size_t)nbytes, 1, fp) != 1 ) {
     strcpy(dbp->errmsg, "sqlo_lob_write_stream: I/O error. Could not get data from stream");
     dbp->status = SQLO_ERROR;
     return (dbp->status);
@@ -7712,7 +7713,7 @@ DEFUN(sqlo_lob_write_stream, (dbh, loblp, filelen, fp),
         ;
       }
 
-      sqlo_lob_write_buffer(dbh, loblp, nbytes, (void *)buf, nbytes, piece);
+      sqlo_lob_write_buffer(dbh, loblp, nbytes, buf, nbytes, piece);
     } while (SQLO_STILL_EXECUTING == dbp->status);
 
     return dbp->status;
@@ -7747,7 +7748,7 @@ DEFUN(sqlo_lob_write_stream, (dbh, loblp, filelen, fp),
         ;
       }
 
-      sqlo_lob_write_buffer(dbh, loblp, filelen, (void *)buf, nbytes, piece);
+      sqlo_lob_write_buffer(dbh, loblp, filelen, buf, nbytes, piece);
 
     } while (SQLO_STILL_EXECUTING == dbp->status);
 
@@ -7799,7 +7800,7 @@ DEFUN(sqlo_lob_write_stream, (dbh, loblp, filelen, fp),
           ;
         }
 
-        sqlo_lob_write_buffer(dbh, loblp, filelen, (void *)buf, nbytes, piece);
+        sqlo_lob_write_buffer(dbh, loblp, filelen, buf, nbytes, piece);
 
       } while (SQLO_STILL_EXECUTING == dbp->status);
 

@@ -3646,9 +3646,9 @@ METHOD sqlSeek( uKey, lSoft, lLast ) CLASS SR_WORKAREA
                AADD( ::aDat, if( uKey, 'T', ' ' ) )
             EndIf
          Else
-            if "INDKEY_" IN ::aNames[::aIndex[ ::aInfo[ AINFO_INDEXORD ],INDEX_FIELDS,1,2 ] ] .and. valtype( uKey ) == "N"
+            if "INDKEY_" $ ::aNames[::aIndex[ ::aInfo[ AINFO_INDEXORD ],INDEX_FIELDS,1,2 ] ] .and. valtype( uKey ) == "N"
                cField :=  UPPER( ::aIndex[ ::aInfo[ AINFO_INDEXORD ],INDEX_KEY ] )
-               IF "VAL(" IN CFIELD
+               IF "VAL(" $ CFIELD
                
                   CfIELD := STRTRAN( CfIELD, 'VAL(', '' )
                   CfIELD := STRTRAN( CfIELD, ')', '' )
@@ -3906,9 +3906,9 @@ METHOD sqlSeek( uKey, lSoft, lLast ) CLASS SR_WORKAREA
 
          cRet  := " WHERE (( "
          
-         if "INDKEY_" IN ::aNames[::aIndex[ ::aInfo[ AINFO_INDEXORD ],INDEX_FIELDS,1,2 ] ] .and. valtype( uKey ) == "N"
+         if "INDKEY_" $ ::aNames[::aIndex[ ::aInfo[ AINFO_INDEXORD ],INDEX_FIELDS,1,2 ] ] .and. valtype( uKey ) == "N"
             cField :=  UPPER( ::aIndex[ ::aInfo[ AINFO_INDEXORD ],INDEX_KEY ] )
-            IF "VAL(" IN CFIELD
+            IF "VAL(" $ CFIELD
             
                CfIELD := STRTRAN(CfIELD,'VAL(','')
                CfIELD := STRTRAN(CfIELD,')','')
@@ -9819,11 +9819,11 @@ Local CurPos
 Local nStart :=0
 
 
-  if nLen == -1 .and. !'<Array' in c
+  if nLen == -1 .and. !'<Array' $ c
      aRet :={}
      return {}
   ENDIF
-  if nLen == -1 .and. !"<?xml" in c
+  if nLen == -1 .and. !"<?xml" $ c
   c:=[<?xml version="1.0" encoding="utf-8"?>]+c
   endif
   if oDoc == NIL
@@ -9890,6 +9890,3 @@ RETURN lUseJSONField
 FUNCTION SR_SetUseJSON( l )
    lUseJSONField := l
 RETURN NIL
-
-
-   

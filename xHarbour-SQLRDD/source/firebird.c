@@ -4,18 +4,7 @@
 * All Rights Reserved
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
-#include "hbapi.h"
-#include "hbvm.h"
-#include "hbstack.h"
-#include "hbapiitm.h"
-#include "hbdefs.h"
-#include "hbapierr.h"
-#include "hashapi.h"
-#include "hbfast.h"
+#include "compat.h"
 
 #include "sqlrddsetup.ch"
 #include "sqlprototypes.h"
@@ -85,7 +74,7 @@ const double divider[19] = { 1, 1E1, 1E2, 1E3, 1E4,   1E5, 1E6, 1E7, 1E8, 1E9, 1
 void fb_log_status( PFB_SESSION session, char * from )
 {
    const ISC_STATUS * pVect = session->status;
-      SCHAR s[1024] = {0};
+   SCHAR s[1024] = {0};
    //char * temp=(char*) hb_xgrab(8192);
    if ( session->msgerror )
       hb_xfree(session->msgerror);
@@ -105,16 +94,16 @@ void fb_log_status( PFB_SESSION session, char * from )
    session->errorcode = session->status[1];
    HB_SYMBOL_UNUSED( from );
 
-   if (session->transac)
+   if( session->transac )
    {
       isc_rollback_transaction( session->status, &(session->transac) );
-      if ( CHECK_ERROR(session) )
+      if( CHECK_ERROR(session) )
       {
          ERRORLOGANDEXIT( session, "FBROLLBACKTRANSACTION ON ERROR" );
       }
       else
       {
-	     session->transac = NULL;
+         session->transac = 0;
          session->transactionPending = 0;
       }
    }
@@ -133,13 +122,14 @@ HB_FUNC( FBCONNECT )  // FBConnect( cDatabase, cUser, cPassword, [charset], @hEn
    int  i, len;
 
    PFB_SESSION session = (PFB_SESSION) hb_xgrab( sizeof( FB_SESSION ) );
+
    memset( session, 0, sizeof( FB_SESSION ) );
-   session->db = NULL;
-   session->transac = NULL;
-   session->sqlda    = ( XSQLDA ISC_FAR * ) hb_xgrab( XSQLDA_LENGTH ( MAX_COLUMNS_IN_QUERY ) );
+   session->db = 0;
+   session->transac = 0;
+   session->sqlda = ( XSQLDA ISC_FAR * ) hb_xgrab( XSQLDA_LENGTH ( MAX_COLUMNS_IN_QUERY ) );
    session->sqlda->sqln = MAX_COLUMNS_IN_QUERY;
    session->sqlda->version = SQLDA_VERSION1;
-   session->stmt = NULL;
+   session->stmt = 0;
    session->transactionPending = 0;
 
    for ( i = 0, var = session->sqlda->sqlvar; i < MAX_COLUMNS_IN_QUERY; i++, var++ )
@@ -247,7 +237,7 @@ HB_FUNC( FBBEGINTRANSACTION )  // FBBeginTransaction( hEnv )
       }
       else
       {
-	     session->transac = NULL;
+         session->transac = 0;
          session->transactionPending = 0;
       }
    }
@@ -319,8 +309,7 @@ HB_FUNC( FBCOMMITTRANSACTION )  // FBBeginTransaction( hEnv )
       }
       else
       {
-
-         session->transac = NULL;
+         session->transac = 0;
          session->transactionPending = 0;
          hb_retni( SQL_SUCCESS );
       }
@@ -342,8 +331,7 @@ HB_FUNC( FBROLLBACKTRANSACTION )  // FBRollBackTransaction( hEnv )
       }
       else
       {
-
-         session->transac = NULL;
+         session->transac = 0;
          session->transactionPending = 0;
          hb_retni( SQL_SUCCESS );
       }
@@ -366,7 +354,7 @@ HB_FUNC( FBEXECUTE ) // FBExecute( hEnv, cCmd, nDialect )
       {
           ERRORLOGANDEXIT( session, "FBEXECUTE1" );
       }
-     session->stmt = NULL;
+      session->stmt = 0;
    }
 
 //   if (isc_dsql_allocate_statement( session->status, &(session->db), &(session->stmt) )
@@ -689,7 +677,7 @@ HB_FUNC( FBGETDATA )    // FBGetData( hEnv, nField, @uData )
    char date_s[30];
    struct tm times;
    ISC_QUAD * blob_id;
-   isc_blob_handle blob_handle = NULL;
+   isc_blob_handle blob_handle = 0;
    short blob_seg_len;
    char * resp, item, * read_blob;
    char blob_items[] = { isc_info_blob_total_length, isc_info_blob_num_segments };
@@ -699,7 +687,7 @@ HB_FUNC( FBGETDATA )    // FBGetData( hEnv, nField, @uData )
    BOOL bEnd = 0;
    XSQLVAR * var;
    VARY * vary;
-   char dt[17]={0};
+
    if ( session && session->sqlda->sqld >= (icol) )
    {
       var = session->sqlda->sqlvar;
@@ -723,46 +711,57 @@ HB_FUNC( FBGETDATA )    // FBGetData( hEnv, nField, @uData )
             hb_storc( (char *) vary->vary_string, 3 );
             break;
          case IB_SQL_TIMESTAMP:
-
             isc_decode_timestamp( ( ISC_TIMESTAMP ISC_FAR * ) var->sqldata, &times );
-            sprintf ( date_s, "%04d-%02d-%02d %02d:%02d:%02d.%04lu",
+            sprintf ( date_s, "%04d-%02d-%02d %02d:%02d:%02d.%04d",
                   times.tm_year + 1900,
                   times.tm_mon + 1,
                   times.tm_mday,
                   times.tm_hour,
                   times.tm_min,
                   times.tm_sec,
-                  ( ( ISC_TIMESTAMP * ) var->sqldata )->timestamp_time % 10000 );
+                  ( int ) ( ( ( ISC_TIMESTAMP * ) var->sqldata )->timestamp_time % 10000 ) );
+#ifdef __XHARBOUR__
+            {
+               char dt[18];
 
-	            dt[0] = date_s[0];
-	            dt[1] = date_s[1];
-	            dt[2] = date_s[2];
-	            dt[3] = date_s[3];
-	            dt[4] = date_s[5];
-	            dt[5] = date_s[6];
-	            dt[6] = date_s[8];
-	            dt[7] = date_s[9];
-	            dt[8] = date_s[10];
-	            dt[9] = date_s[11];	         
-	            dt[10] = date_s[12];	                     
-	            dt[11] = date_s[13];	         
-	            dt[12] = date_s[14];	         
-	            dt[13] = date_s[15];	         
-	            dt[14] = date_s[16];	                     
-	            dt[15] = date_s[17];	         
-	            dt[16] = date_s[18];	         
-	            dt[17] = '\0';
+               dt[0] = date_s[0];
+               dt[1] = date_s[1];
+               dt[2] = date_s[2];
+               dt[3] = date_s[3];
+               dt[4] = date_s[5];
+               dt[5] = date_s[6];
+               dt[6] = date_s[8];
+               dt[7] = date_s[9];
+               dt[8] = date_s[10];
+               dt[9] = date_s[11];
+               dt[10] = date_s[12];
+               dt[11] = date_s[13];
+               dt[12] = date_s[14];
+               dt[13] = date_s[15];
+               dt[14] = date_s[16];
+               dt[15] = date_s[17];
+               dt[16] = date_s[18];
+               dt[17] = '\0';
 
-            hb_stordts( dt, 3 );              
-            //hb_storc( date_s, 3 );
+               hb_stordts( dt, 3 );
+               //hb_storc( date_s, 3 );
+            }
+#else
+            {
+               long lJulian, lMilliSec;
+               hb_timeStampStrGetDT( date_s, &lJulian, &lMilliSec );
+               hb_stortdt( lJulian, lMilliSec, 3 );
+            }
+#endif
             break;
 
          case IB_SQL_TYPE_TIME:
             isc_decode_sql_time( ( ISC_TIME ISC_FAR * ) var->sqldata, &times );
-            sprintf ( date_s, "%02d:%02d:%02d.%04lu",
+            sprintf ( date_s, "%02d:%02d:%02d.%04d",
                   times.tm_hour,
                   times.tm_min,
-                  times.tm_sec, ( *( ( ISC_TIME * ) var->sqldata ) ) % 10000 );
+                  times.tm_sec,
+                  ( int ) ( ( *( ( ISC_TIME * ) var->sqldata ) ) % 10000 ) );
             hb_storc( date_s, 3 );
             break;
 
@@ -936,8 +935,8 @@ HB_FUNC( FBGETDATA )    // FBGetData( hEnv, nField, @uData )
 
 HB_FUNC( FBCREATEDB )
 {
-   isc_db_handle newdb = NULL;
-   isc_tr_handle trans = NULL;
+   isc_db_handle newdb = 0;
+   isc_tr_handle trans = 0;
    long status[20];
    char create_db[1024];
    const char * db_name;
@@ -975,11 +974,11 @@ HB_FUNC( FBCREATEDB )
    {
       sprintf(create_db,
          "CREATE DATABASE '%s' USER '%s' PASSWORD '%s' PAGE_SIZE = %i",
-         db_name, username, passwd, page, charset );
+         db_name, username, passwd, page /*, charset*/ );
    }
    else
    {
-      sprintf(create_db, "CREATE DATABASE '%s' USER '%s' PASSWORD '%s'", db_name, username, passwd, page, charset );
+      sprintf(create_db, "CREATE DATABASE '%s' USER '%s' PASSWORD '%s'", db_name, username, passwd /*, page, charset*/ );
    }
 
    if (isc_dsql_execute_immediate((ISC_STATUS *)status, &newdb, &trans, 0, create_db, dialect, NULL))
@@ -1053,7 +1052,7 @@ void FBFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff,
          {
             char * szResult = ( char * ) hb_xgrab( lLen + 1 );
             hb_xmemset( szResult, ' ', lLen );
-            hb_itemPutCPtr( pItem, szResult, (ULONG) lLen );
+            hb_itemPutCLPtr( pItem, szResult, lLen );
             break;
          }
          case SQL_NUMERIC:
@@ -1062,7 +1061,7 @@ void FBFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff,
          case SQL_FLOAT:
          {
             char szResult[2] = { ' ', '\0' };
-            sr_escapeNumber( szResult, (ULONG) lLen, (ULONG) lDec, pItem );
+            sr_escapeNumber( szResult, lLen, lDec, pItem );
             break;
          }
          case SQL_DATE:
@@ -1092,9 +1091,13 @@ void FBFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff,
 #endif
          case SQL_DATETIME:
          {
-	         hb_itemPutDT( pItem, 0, 0, 0, 0, 0, 0, 0 );
-	         break;
-     	 }    
+#ifdef __XHARBOUR__
+            hb_itemPutDT( pItem, 0, 0, 0, 0, 0, 0, 0 );
+#else
+            hb_itemPutTDT( pItem, 0, 0 );
+#endif
+            break;
+         }
 
          default:
             TraceLog( LOGFILE, "Invalid data type detected: %i\n", lType );
@@ -1110,18 +1113,18 @@ void FBFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff,
             char * szResult = ( char * ) hb_xgrab( lLen + 1 );
             hb_xmemcpy( szResult, bBuffer, ( LONG ) (lLen < lLenBuff ? lLen : lLenBuff ) );
 
-            for( lPos = ( LONG ) lLenBuff; lPos < lLen; lPos++ )
+            for( lPos = lLenBuff; lPos < lLen; lPos++ )
             {
                szResult[ lPos ] = ' ';
             }
-            hb_itemPutCPtr( pItem, szResult, (ULONG) lLen );
+            hb_itemPutCLPtr( pItem, szResult, lLen );
             break;
          }
          case SQL_DOUBLE:
          case SQL_FLOAT:
          case SQL_NUMERIC:
          {
-            sr_escapeNumber( bBuffer, (ULONG) lLen, (ULONG) lDec, pItem );
+            sr_escapeNumber( bBuffer, lLen, lDec, pItem );
             break;
          }
          case SQL_DATE:
@@ -1180,13 +1183,15 @@ void FBFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff,
 
                if( HB_IS_HASH( pTemp ) && sr_isMultilang() && bTranslate )
                {
+                  PHB_ITEM pLangItem = hb_itemNew( NULL );
                   ULONG ulPos;
-                  if( hb_hashScan( pTemp, sr_getCurrentLang(), &ulPos ) ||
-                      hb_hashScan( pTemp, sr_getSecondLang(), &ulPos ) ||
-                      hb_hashScan( pTemp, sr_getRootLang(), &ulPos ) )
+                  if( hb_hashScan( pTemp, sr_getBaseLang( pLangItem ), &ulPos ) ||
+                      hb_hashScan( pTemp, sr_getSecondLang( pLangItem ), &ulPos ) ||
+                      hb_hashScan( pTemp, sr_getRootLang( pLangItem ), &ulPos ) )
                   {
                      hb_itemCopy( pItem, hb_hashGetValueAt( pTemp, ulPos ) );
                   }
+                  hb_itemRelease( pLangItem );
                }
                else
                {
@@ -1219,9 +1224,9 @@ void FBFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff,
 #endif
          case SQL_DATETIME:
          {
-	         //hb_retdts(bBuffer);
-	         
-            char dt[17]={0};
+#ifdef __XHARBOUR__
+            //hb_retdts(bBuffer);
+            char dt[18];
             dt[0] = bBuffer[0];
             dt[1] = bBuffer[1];
             dt[2] = bBuffer[2];
@@ -1231,20 +1236,24 @@ void FBFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff,
             dt[6] = bBuffer[8];
             dt[7] = bBuffer[9];
             dt[8] = bBuffer[10];
-            dt[9] = bBuffer[11];	         
-            dt[10] = bBuffer[12];	                     
-            dt[11] = bBuffer[13];	         
-            dt[12] = bBuffer[14];	         
-            dt[13] = bBuffer[15];	         
-            dt[14] = bBuffer[16];	                     
-            dt[15] = bBuffer[17];	         
-            dt[16] = bBuffer[18];	         
+            dt[9] = bBuffer[11];
+            dt[10] = bBuffer[12];
+            dt[11] = bBuffer[13];
+            dt[12] = bBuffer[14];
+            dt[13] = bBuffer[15];
+            dt[14] = bBuffer[16];
+            dt[15] = bBuffer[17];
+            dt[16] = bBuffer[18];
             dt[17] = '\0';
-	         
 
-	         hb_itemPutDTS( pItem, dt );
-	         break;
-     	 }    
+            hb_itemPutDTS( pItem, dt );
+#else
+            long lJulian, lMilliSec;
+            hb_timeStampStrGetDT( bBuffer, &lJulian, &lMilliSec );
+            hb_itemPutTDT( pItem, lJulian, lMilliSec );
+#endif
+            break;
+         }
 
          default:
             TraceLog( LOGFILE, "Invalid data type detected: %i\n", lType );
@@ -1263,7 +1272,7 @@ HB_FUNC( FBLINEPROCESSED )
    char date_s[30];
    struct tm times;
    ISC_QUAD * blob_id;
-   isc_blob_handle blob_handle = NULL;
+   isc_blob_handle blob_handle = 0;
    short blob_seg_len;
    char * resp, item, * read_blob;
    char blob_items[] = { isc_info_blob_total_length, isc_info_blob_num_segments };
@@ -1284,7 +1293,7 @@ HB_FUNC( FBLINEPROCESSED )
 
    if( session )
    {
-      cols = pFields->item.asArray.value->ulLen;
+      cols = hb_arrayLen( pFields );
 
       for( icol = 1; icol <= cols; icol++ )
       {
@@ -1322,14 +1331,14 @@ HB_FUNC( FBLINEPROCESSED )
                   break;
                case IB_SQL_TIMESTAMP:
                   isc_decode_timestamp( ( ISC_TIMESTAMP ISC_FAR * ) var->sqldata, &times );
-                  sprintf ( date_s, "%04d-%02d-%02d %02d:%02d:%02d.%04lu",
+                  sprintf ( date_s, "%04d-%02d-%02d %02d:%02d:%02d.%04d",
                         times.tm_year + 1900,
                         times.tm_mon + 1,
                         times.tm_mday,
                         times.tm_hour,
                         times.tm_min,
                         times.tm_sec,
-                        ( ( ISC_TIMESTAMP * ) var->sqldata )->timestamp_time % 10000 );
+                        ( int ) ( ( ( ISC_TIMESTAMP * ) var->sqldata )->timestamp_time % 10000 ) );
 
       //            sprintf ( p, "%*s ", 24, date_s );
 
@@ -1339,10 +1348,11 @@ HB_FUNC( FBLINEPROCESSED )
 
                case IB_SQL_TYPE_TIME:
                   isc_decode_sql_time( ( ISC_TIME ISC_FAR * ) var->sqldata, &times );
-                  sprintf ( date_s, "%02d:%02d:%02d.%04lu",
+                  sprintf ( date_s, "%02d:%02d:%02d.%04d",
                         times.tm_hour,
                         times.tm_min,
-                        times.tm_sec, ( *( ( ISC_TIME * ) var->sqldata ) ) % 10000 );
+                        times.tm_sec,
+                        ( int ) ( ( *( ( ISC_TIME * ) var->sqldata ) ) % 10000 ) );
 
                   FBFieldGet( hb_arrayGetItemPtr( pFields, icol ), temp, (char * ) date_s, strlen( date_s ), bQueryOnly, ulSystemID, bTranslate );
                   hb_arraySetForward( pRet, icol , temp );
