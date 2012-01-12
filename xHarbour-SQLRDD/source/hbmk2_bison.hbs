@@ -1,0 +1,176 @@
+/*
+ * $Id$
+ */
+
+/*
+ * hbmk2 plugin script, implementing support for bison
+ *
+ * Copyright 2011 Viktor Szakats (harbour.01 syenar.hu)
+ * www - http://harbour-project.org
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA (or visit
+ * their web site at http://www.gnu.org/).
+ *
+ */
+
+#pragma warninglevel=3
+#pragma -km+
+#pragma -ko+
+
+#define I_( x )                 hb_i18n_gettext( x )
+
+FUNCTION hbmk2_plugin_bison( hbmk2 )
+   LOCAL cRetVal := ""
+
+   LOCAL cSrc
+   LOCAL cDst
+   LOCAL tSrc
+   LOCAL tDst
+
+   LOCAL cCommand
+   LOCAL nError
+   LOCAL lBuildIt
+
+   SWITCH hbmk2[ "cSTATE" ]
+   CASE "init"
+
+      hbmk2_Register_Input_File_Extension( hbmk2, ".y" )
+
+      EXIT
+
+   CASE "pre_all"
+
+      /* Gather input parameters */
+
+      hbmk2[ "vars" ][ "aBIS_Src" ] := {}
+      FOR EACH cSrc IN hbmk2[ "params" ]
+         IF Left( cSrc, Len( "-bisonflag=" ) ) == "-bisonflag="
+            /* TODO: process bison flags */
+         ELSE
+            SWITCH Lower( hb_FNameExt( cSrc ) )
+            CASE ".y"
+               AAdd( hbmk2[ "vars" ][ "aBIS_Src" ], cSrc )
+               EXIT
+            ENDSWITCH
+         ENDIF
+      NEXT
+
+      /* Create output file lists */
+
+      hbmk2[ "vars" ][ "aBIS_Dst" ] := {}
+      FOR EACH cSrc IN hbmk2[ "vars" ][ "aBIS_Src" ]
+         cDst := hbmk2_FNameDirExtSet( hb_FNameName( cSrc ) + "y", hbmk2[ "cWorkDir" ], ".c" )
+         AAdd( hbmk2[ "vars" ][ "aBIS_Dst" ], cDst )
+         hbmk2_AddInput_C( hbmk2, cDst )
+      NEXT
+
+      /* Detect tool locations */
+
+      IF ! hbmk2[ "lCLEAN" ]
+         IF ! Empty( hbmk2[ "vars" ][ "aBIS_Src" ] )
+            hbmk2[ "vars" ][ "cBIS_BIN" ] := tool_detect( hbmk2, "bison", "BISON_BIN" )
+            IF Empty( hbmk2[ "vars" ][ "cBIS_BIN" ] )
+               cRetVal := I_( "Required 'bison' tool not found" )
+            ENDIF
+         ENDIF
+      ENDIF
+
+      EXIT
+
+   CASE "pre_prg"
+
+      EXIT
+
+   CASE "pre_c"
+
+      IF ! hbmk2[ "lCLEAN" ] .AND. ;
+         ! Empty( hbmk2[ "vars" ][ "aBIS_Src" ] )
+
+         IF ! Empty( hbmk2[ "vars" ][ "cBIS_BIN" ] )
+
+            /* Execute 'bison' commands on input files */
+
+            FOR EACH cSrc, cDst IN hbmk2[ "vars" ][ "aBIS_Src" ], hbmk2[ "vars" ][ "aBIS_Dst" ]
+
+               IF hbmk2[ "lINC" ] .AND. ! hbmk2[ "lREBUILD" ]
+                  lBuildIt := ! hb_FGetDateTime( cDst, @tDst ) .OR. ;
+                              ! hb_FGetDateTime( cSrc, @tSrc ) .OR. ;
+                              tSrc > tDst
+               ELSE
+                  lBuildIt := .T.
+               ENDIF
+
+               IF lBuildIt
+
+                  cCommand := hbmk2[ "vars" ][ "cBIS_BIN" ] +;
+                              " -d -p hb_comp" +;
+                              " -o " + hbmk2_FNameEscape( hbmk2_PathSepToTarget( hbmk2, cDst ), hbmk2[ "nCmd_Esc" ], hbmk2[ "nCmd_FNF" ] ) +;
+                              " " + hbmk2_FNameEscape( hbmk2_PathSepToTarget( hbmk2, cSrc ), hbmk2[ "nCmd_Esc" ], hbmk2[ "nCmd_FNF" ] )
+
+                  IF hbmk2[ "lTRACE" ]
+                     IF ! hbmk2[ "lQUIET" ]
+                        hbmk2_OutStd( hbmk2, I_( "'bison' command:" ) )
+                     ENDIF
+                     hbmk2_OutStdRaw( cCommand )
+                  ENDIF
+
+                  IF ! hbmk2[ "lDONTEXEC" ] .AND. ( nError := hb_processRun( cCommand ) ) != 0
+                     hbmk2_OutErr( hbmk2, hb_StrFormat( I_( "Error: Running 'bison' executable. %1$s" ), hb_ntos( nError ) ) )
+                     IF ! hbmk2[ "lQUIET" ]
+                        hbmk2_OutErrRaw( cCommand )
+                     ENDIF
+                     IF ! hbmk2[ "lIGNOREERROR" ]
+                        cRetVal := "error"
+                        EXIT
+                     ENDIF
+                  ENDIF
+               ENDIF
+            NEXT
+         ENDIF
+      ENDIF
+
+      EXIT
+
+   CASE "post_all"
+
+      IF ! hbmk2[ "lINC" ] .OR. hbmk2[ "lCLEAN" ]
+         AEval( hbmk2[ "vars" ][ "aBIS_Dst" ], {| tmp | FErase( tmp ),;
+                                                        FErase( HB_FNameExtSet( tmp, ".h" ) ) } )
+      ENDIF
+
+      EXIT
+
+   ENDSWITCH
+
+   RETURN cRetVal
+
+STATIC FUNCTION tool_detect( hbmk2, cName, cEnvQT )
+   LOCAL cBIN
+   LOCAL aEnvList := { "HB_BISONPATH" }
+
+   IF Empty( cBIN := GetEnv( cEnvQT ) )
+
+      cName += hbmk2[ "cCCEXT" ]
+
+      IF Empty( cBIN )
+         cBIN := hbmk2_FindInPath( cName, GetEnv( "PATH" ) )
+         IF Empty( cBIN )
+            hbmk2_OutErr( hbmk2, hb_StrFormat( "%1$s not set, could not autodetect '%2$s' executable", hbmk2_ArrayToList( aEnvList, ", " ), cName ) )
+            RETURN NIL
+         ENDIF
+      ENDIF
+   ENDIF
+
+   RETURN cBIN
