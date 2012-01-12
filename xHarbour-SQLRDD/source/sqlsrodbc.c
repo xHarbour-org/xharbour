@@ -1138,7 +1138,7 @@ HB_FUNC( SR_ODBCWRITEMEMO )
 
          cbSize = strlen(sMemo);
 
-         retcode = SQLBindParameter(hStmt, 1, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_LONGVARCHAR, cbSize, 0, sMemo, cbSize, &cbSize);
+         retcode = SQLBindParameter(hStmt, 1, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_LONGVARCHAR, cbSize, 0, (void*) sMemo, cbSize, &cbSize);
 
          if (!(retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO))
          {

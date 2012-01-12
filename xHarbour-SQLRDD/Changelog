@@ -8,6 +8,13 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-01-12 14:52 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xHarbour-SQLRDD/source/sqlrdd0.prg
+    * replaced #include "xhb.ch" with REQUEST XHB_LIB
+
+  * xHarbour-SQLRDD/source/sqlsrodbc.c
+    * casting to pacify warning
+
 2012-01-12 10:53 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   + xHarbour-SQLRDD/source/compat.h
     + added header file which includes commonly used Harbour and xHarbour
