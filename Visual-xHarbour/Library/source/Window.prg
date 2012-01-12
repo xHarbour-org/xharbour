@@ -3175,9 +3175,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                  mii:fMask  := MIIM_DATA
                  _GetMenuItemInfo( nlParam, nwParam, .T., mii:Value )
                  mii:Devalue()
-
-                 VIEW ::System:LastError
-
                  IF mii:dwItemData != NIL .AND. mii:dwItemData <> 0
                     oItem := ArrayFromPointer( mii:dwItemData )
                  ENDIF
