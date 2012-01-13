@@ -1788,33 +1788,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
 
       CASE WM_MOVE
            ::__lReqBrush := .T.
-           IF ::ClsName != TOOLTIPS_CLASS
-
-              IF ::Parent != NIL
-
-                 rc := (struct RECT)
-                 GetWindowRect( hWnd, @rc )
-
-                 pt := (struct POINT)
-                 pt:x := rc:left
-                 pt:y := rc:top
-                 ScreenToClient( ::Parent:hWnd, @pt )
-
-                 ::xLeft   := pt:x //+ ::Parent:HorzScrollPos
-                 ::xTop    := pt:y //+ ::Parent:VertScrollPos
-                 x := pt:x
-                 y := pt:y
-
-               ELSE
-                 ::xLeft := GETXPARAM( nlParam )
-                 ::xTop  := GETYPARAM( nlParam )
-                 x := GETXPARAM( nlParam )
-                 y := GETYPARAM( nlParam )
-              ENDIF
-            ELSE
-              x := GETXPARAM( nlParam )
-              y := GETYPARAM( nlParam )
-           ENDIF
 
            nRet := ExecuteEvent( "OnMove", Self )
            ODEFAULT nRet TO ::OnMove( x, y )
@@ -2921,32 +2894,27 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
            ::WindowPos:cy              := aParams[6]
            ::WindowPos:flags           := aParams[7]
 
-           //::WindowPos := (struct WINDOWPOS)
-           //::WindowPos:Pointer( nlParam )
+           ::xLeft   := ::WindowPos:x
+           ::xTop    := ::WindowPos:y
+           ::xWidth  := ::WindowPos:cx
+           IF ::ClsName != "ComboBox"
+              ::xHeight := ::WindowPos:cy
+           ENDIF
 
            IF ::Parent != NIL
-              rc := (struct RECT)
-
-              aRect := _GetWindowRect( hWnd )
-
-              rc:Left   := aRect[1]
-              rc:Top    := aRect[2]
-              rc:Right  := aRect[3]
-              rc:Bottom := aRect[4]
+              aRect := _GetWindowRect( ::hWnd )
 
               // Temporary workaround with Fast API
-              aPt := { rc:left, rc:top }
+              aPt := { aRect[1], aRect[2] }
 
-              IF ::__ClassInst != NIL .AND. ::Parent:hWnd != GetParent( hWnd )
-                 _ScreenToClient( GetParent( hWnd ), aPt )
+              IF ::__ClassInst != NIL .AND. ::Parent:hWnd != GetParent( ::hWnd )
+                 _ScreenToClient( GetParent( ::hWnd ), @aPt )
                  ::__TempRect := { aPt[1], aPt[2], aPt[1]+::WindowPos:cx, aPt[2]+::WindowPos:cy }
                  RETURN NIL
               ENDIF
 
-              _ScreenToClient( ::Parent:hWnd, aPt )
+              _ScreenToClient( ::Parent:hWnd, @aPt )
               ::__TempRect := { aPt[1], aPt[2], aPt[1]+::WindowPos:cx, aPt[2]+::WindowPos:cy }
-              ::xLeft   := aPt[1] //+ ::Parent:HorzScrollPos
-              ::xTop    := aPt[2] //+ ::Parent:VertScrollPos
 
               IF ::ClsName == "ListBox"
                  IF ::WindowPos:cy != ::xHeight
@@ -2955,15 +2923,8 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               ENDIF
               //-----------------------------------
 
-            ELSE
-              ::xLeft   := ::WindowPos:x
-              ::xTop    := ::WindowPos:y
            ENDIF
-           ::xWidth  := ::WindowPos:cx
 
-           IF ::ClsName != "ComboBox"
-              ::xHeight := ::WindowPos:cy
-           ENDIF
 
            nRet := ExecuteEvent( "OnWindowPosChanged", Self )
            ODEFAULT nRet TO ::OnWindowPosChanged( nwParam, nlParam )
@@ -3007,9 +2968,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
            EXIT
 
       CASE WM_WINDOWPOSCHANGING
-           //::WindowPos := NIL
-           //::WindowPos := (struct WINDOWPOS*) nlParam
-
            aParams := __GetWINDOWPOS( nlParam )
            ::WindowPos:hwnd            := aParams[1]
            ::WindowPos:hwndInsertAfter := aParams[2]

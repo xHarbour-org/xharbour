@@ -5564,8 +5564,8 @@ METHOD Build( lForce ) CLASS Project
       OutputDebugString(ValToPrg(oErr))
       ::Application:MainForm:StatusBarPanel2:Caption := "ERRORS!"
       ::Application:MainForm:DebugBuild1:AddItem( "ERRORS!", .T. )
-//    ::Application:MainForm:DebugBuild1:AddItem( oErr:Description+" "+oErr:Operation, .T. )
-//    ::Application:MainForm:DebugBuild1:AddItem( oErr:Modulename+ " ("+LTrim(Str(oErr:ProcLine))+")", .T. )
+    ::Application:MainForm:DebugBuild1:AddItem( oErr:Description+" "+oErr:Operation, .T. )
+    ::Application:MainForm:DebugBuild1:AddItem( oErr:Modulename+ " ("+LTrim(Str(oErr:ProcLine))+")", .T. )
       RETURN .F.
    END
 

@@ -66,6 +66,8 @@
 #include <ole2.h>
 #include <wincrypt.h>
 
+#include "TaskDialog.h"
+
 typedef struct _DWM_BLURBEHIND {
     DWORD dwFlags;
     BOOL fEnable;
@@ -81,7 +83,7 @@ typedef struct _MARGINS {
 } MARGINS, *PMARGINS;
 
 static PHB_DYNS pHB_CSTRUCTURE = NULL, pPOINTER, pVALUE, pDEVALUE;
-static HINSTANCE hCryptUI = NULL, hCrypt32 = NULL, hUser32 = NULL, hShell32 = NULL, hGdi32 = NULL, hNetAPI32 = NULL, hWinmm = NULL, hAdvApi32 = NULL, hHtmlHelp = NULL, hMAPI = NULL, hOleDlg = NULL, hAviCap = NULL, hWininet = NULL, hPSAPI = NULL, hshlwapi = NULL, hKernel32 = NULL, hdwmapi = NULL;
+static HINSTANCE hCryptUI = NULL, hCrypt32 = NULL, hUser32 = NULL, hShell32 = NULL, hGdi32 = NULL, hNetAPI32 = NULL, hWinmm = NULL, hAdvApi32 = NULL, hHtmlHelp = NULL, hMAPI = NULL, hOleDlg = NULL, hAviCap = NULL, hWininet = NULL, hPSAPI = NULL, hshlwapi = NULL, hKernel32 = NULL, hdwmapi = NULL, hComctl32 = NULL;
 
 static CRITICAL_SECTION s_cs; /* This is the critical section object -- once initialized, it cannot be moved in memory */
 
@@ -237,6 +239,9 @@ static HRESULT (WINAPI *pDwmEnableBlurBehindWindow)(HWND,const DWM_BLURBEHIND*) 
 static HRESULT (WINAPI *pDwmExtendFrameIntoClientArea)(HWND,const MARGINS*)                                    = NULL;
 static HRESULT (WINAPI *pDwmGetColorizationColor)(DWORD*,BOOL*)                                                = NULL;
 static HRESULT (WINAPI *pDwmIsCompositionEnabled)(BOOL*)                                                       = NULL;
+
+static HRESULT (WINAPI *pTaskDialogIndirect)(const TASKDIALOGCONFIG*,int*,int*,BOOL*)                          = NULL;
+
 
 
 #ifdef TRACE_ARRAYPOINTER
@@ -428,6 +433,11 @@ HB_FUNC_INIT( _INITSYMBOLS_ )
       hdwmapi = LoadLibrary( "dwmapi.dll" );
    }
 
+   if( hComctl32 == NULL )
+   {
+      hComctl32 = LoadLibrary( "Comctl32.dll" );
+   }
+
    if( hCryptUI )
    {
       pCryptUIDlgSelectCertificateFromStore = (PCCERT_CONTEXT (WINAPI *)(HCERTSTORE,HWND,LPCWSTR,LPCWSTR,DWORD,DWORD,LPVOID)) GetProcAddress( hCryptUI, "CryptUIDlgSelectCertificateFromStore" );
@@ -539,6 +549,10 @@ HB_FUNC_INIT( _INITSYMBOLS_ )
       pDwmGetColorizationColor = (HRESULT (WINAPI *)(DWORD*,BOOL*))                 GetProcAddress( hdwmapi, "DwmGetColorizationColor");
       pDwmIsCompositionEnabled = (HRESULT (WINAPI *)(BOOL*))                        GetProcAddress( hdwmapi, "DwmIsCompositionEnabled");
    }
+   if( hComctl32 )
+   {
+      pTaskDialogIndirect = (HRESULT (WINAPI *)(const TASKDIALOGCONFIG,int,int,BOOL*)) GetProcAddress( hComctl32, "TaskDialogIndirect");
+   }
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -621,6 +635,10 @@ HB_FUNC_EXIT( _CLEANUP_ )
    if( hdwmapi )
    {
       FreeLibrary( hdwmapi );
+   }
+   if( hComctl32 )
+   {
+      FreeLibrary( hComctl32 );
    }
 
 }
@@ -10251,3 +10269,25 @@ HB_FUNC( CERTIFICATEDIALOG )
    }
 }
 
+
+HB_FUNC( TASKDIALOG )
+{
+   int nButtonPressed                  = 0;
+   TASKDIALOGCONFIG config             = {0};
+   const TASKDIALOG_BUTTON buttons[]   = { 
+                                           { IDOK, L"Change password" }
+                                         };
+   if( pTaskDialogIndirect )
+   {
+      config.cbSize                       = sizeof(TASKDIALOGCONFIG);
+      config.hInstance                    = GetModuleHandle( NULL );
+      config.dwCommonButtons              = TDCBF_CANCEL_BUTTON;
+      config.pszMainIcon                  = TD_WARNING_ICON;
+      config.pszMainInstruction           = L"Change Password";
+      config.pszContent                   = L"Remember your changed password.";
+      config.pButtons                     = buttons;
+      config.cButtons                     = 1;
+
+      pTaskDialogIndirect(&config, &nButtonPressed, NULL, NULL);
+   }
+}

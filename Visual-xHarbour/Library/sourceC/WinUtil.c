@@ -4221,3 +4221,4 @@ HB_FUNC( __LISTVIEWSETVIEW )
       hb_xfree(puColumn);
    }
 }
+

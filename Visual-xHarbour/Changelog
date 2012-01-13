@@ -7,6 +7,8 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2012-01-12 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed bug retrieving form coordinates after moving them.
 
 2012-01-10 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed eMail:MimeFormatted property and defaulted to TRUE.
