@@ -49,7 +49,7 @@ METHOD Init( oOwner ) CLASS eMail
 RETURN Self
 
 METHOD Send() CLASS eMail
-   LOCAL oMsg, oConf, oFlds, cSchema, aFiles, cFile
+   LOCAL oMsg, oConf, oFlds, cSchema, aFiles, cFile, lReturn := .T.
    TRY
       oMsg := GetActiveObject( "CDO.Message" )
     CATCH
@@ -57,7 +57,7 @@ METHOD Send() CLASS eMail
          oMsg := CreateObject( "CDO.Message" )
       CATCH
          ::Application:MainForm:MessageBox( "Cannot initialize mail interface (Message)", "Visual xHarbour", MB_OK | MB_ICONEXCLAMATION )
-         RETURN NIL
+         RETURN .F.
       END
    END
    TRY
@@ -67,7 +67,7 @@ METHOD Send() CLASS eMail
          oConf := CreateObject("CDO.Configuration")
        CATCH
          ::Application:MainForm:MessageBox( "Cannot initialize mail interface (Configuration)", "Visual xHarbour", MB_OK | MB_ICONEXCLAMATION )
-         RETURN NIL
+         RETURN .F.
       END
    END
    oFlds := oConf:Fields
@@ -114,10 +114,10 @@ METHOD Send() CLASS eMail
       TRY
          :Send()
       CATCH
-         ::Application:MainForm:MessageBox( "Error sending email", "Visual xHarbour", MB_OK | MB_ICONEXCLAMATION )
+         lReturn := .F.
       END
    END
-RETURN NIL
+RETURN lReturn
 
 //------------------------------------------------------------------------------------------------
 
