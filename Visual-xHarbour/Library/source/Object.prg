@@ -143,7 +143,6 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD __SetCtrlName(c) CLASS Object
    IF !(::Name == c) .AND. ::Form != NIL
-      c := LEFT( c, 25 ) // Truncate at 25
       ::Form:__SetAsProperty( c, Self )
       IF ::Form:hWnd == ::hWnd
          ::Application:__SetAsProperty( c, Self )
