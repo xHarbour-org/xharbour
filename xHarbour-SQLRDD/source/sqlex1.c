@@ -2777,10 +2777,19 @@ static HB_ERRCODE sqlExSeek( SQLEXAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, B
 #  ifdef __XHARBOUR__
       /* TOFIX: this code may corrupt internal HVM strings and also change
                 string passed by user */
-      if( thiswa->cdPageCnv )
-         hb_cdpTranslate( hb_itemGetCPtr( pKey ), thiswa->cdPageCnv, thiswa->area.cdPage );
-      else
-         hb_cdpTranslate( hb_itemGetCPtr( pKey ), hb_cdppage(), thiswa->area.cdPage );
+//       if( thiswa->cdPageCnv )
+//          hb_cdpTranslate( hb_itemGetCPtr( pKey ), thiswa->cdPageCnv, thiswa->area.cdPage );
+//       else
+//          hb_cdpTranslate( hb_itemGetCPtr( pKey ), hb_cdppage(), thiswa->area.cdPage );
+      PHB_CODEPAGE cdpSrc = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_cdppage();
+      if( thiswa->area.cdPage && thiswa->area.cdPage != cdpSrc )
+      {
+         HB_SIZE nLen = hb_itemGetCLen( pKey );
+         char * pszVal = hb_cdpnDup( hb_itemGetCPtr( pKey ), &nLen,
+                                     cdpSrc, thiswa->area.cdPage );
+         pKey = pNewKey = hb_itemPutCLPtr( NULL, pszVal, nLen );
+      }
+
 #  else
       PHB_CODEPAGE cdpSrc = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP();
       if( thiswa->area.cdPage && thiswa->area.cdPage != cdpSrc )
@@ -3470,8 +3479,16 @@ static HB_ERRCODE sqlExGetValue( SQLEXAREAP thiswa, USHORT fieldNum, PHB_ITEM va
             if( pField->uiType == HB_FT_STRING  )
             {
 #  ifdef __XHARBOUR__
-               hb_cdpnTranslate( empty, thiswa->area.cdPage,
-                                 thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_cdppage(), nLen );
+//                hb_cdpnTranslate( empty, thiswa->area.cdPage,
+//                                  thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_cdppage(), nLen );
+               PHB_CODEPAGE cdpDest = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_cdppage();
+               if( thiswa->area.cdPage && thiswa->area.cdPage != cdpDest )
+               {
+                  char * pszVal = hb_cdpnDup( empty, &nLen, thiswa->area.cdPage, cdpDest );
+                  hb_xfree( empty );
+                  empty = pszVal;
+               }
+
 #  else
                PHB_CODEPAGE cdpDest = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP();
                if( thiswa->area.cdPage && thiswa->area.cdPage != cdpDest )
@@ -3642,17 +3659,23 @@ static HB_ERRCODE sqlExPutValue( SQLEXAREAP thiswa, USHORT fieldNum, PHB_ITEM va
 
          cfield  = (char *) hb_xgrab( nLen + 1 );
 #ifdef __XHARBOUR__
-         if( nSize > nLen )
-         {
-            nSize = nLen;
-         }
-         hb_xmemcpy( cfield, hb_itemGetCPtr( value ), nSize );
-#  ifndef HB_CDP_SUPPORT_OFF
-         if( thiswa->cdPageCnv )
-            hb_cdpnTranslate( cfield, thiswa->cdPageCnv, thiswa->area.cdPage, nSize );
-         else if( thiswa->area.cdPage )
-            hb_cdpnTranslate( cfield, hb_cdppage(), thiswa->area.cdPage, nSize );
-#  endif
+//          if( nSize > nLen )
+//          {
+//             nSize = nLen;
+//          }
+//          hb_xmemcpy( cfield, hb_itemGetCPtr( value ), nSize );
+// #  ifndef HB_CDP_SUPPORT_OFF
+//          if( thiswa->cdPageCnv )
+//             hb_cdpnTranslate( cfield, thiswa->cdPageCnv, thiswa->area.cdPage, nSize );
+//          else if( thiswa->area.cdPage )
+//             hb_cdpnTranslate( cfield, hb_cdppage(), thiswa->area.cdPage, nSize );
+// #  endif
+         hb_cdpnDup2( hb_itemGetCPtr( value ), nSize,
+                      cfield, &nLen,
+                      thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_cdppage(), thiswa->area.cdPage );
+         nSize = nLen;
+         nLen = pField->uiLen;
+
 #else
          hb_cdpnDup2( hb_itemGetCPtr( value ), nSize,
                       cfield, &nLen,

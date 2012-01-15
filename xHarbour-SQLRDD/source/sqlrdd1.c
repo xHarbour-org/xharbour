@@ -695,12 +695,15 @@ static HB_ERRCODE sqlSeek( SQLAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, BOOL 
    if( HB_IS_STRING( pKey ) )
    {
 #  ifdef __XHARBOUR__
-      /* TOFIX: this code may corrupt internal HVM strings and also change
-                string passed by user */
-      if( thiswa->cdPageCnv )
-         hb_cdpTranslate( hb_itemGetCPtr( pKey ), thiswa->cdPageCnv, thiswa->area.cdPage );
-      else
-         hb_cdpTranslate( hb_itemGetCPtr( pKey ), hb_cdppage(), thiswa->area.cdPage );
+      PHB_CODEPAGE cdpSrc = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_cdppage();
+      if( thiswa->area.cdPage && thiswa->area.cdPage != cdpSrc )
+      {
+         HB_SIZE nLen = hb_itemGetCLen( pKey );
+         char * pszVal = hb_cdpnDup( hb_itemGetCPtr( pKey ), &nLen,
+                                     cdpSrc, thiswa->area.cdPage );
+         pKey = pNewKey = hb_itemPutCLPtr( NULL, pszVal, nLen );
+      }
+         
 #  else
       PHB_CODEPAGE cdpSrc = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP();
       if( thiswa->area.cdPage && thiswa->area.cdPage != cdpSrc )
@@ -1356,8 +1359,16 @@ static HB_ERRCODE sqlGetValue( SQLAREAP thiswa, USHORT fieldNum, PHB_ITEM value 
             if( pField->uiType == HB_FT_STRING  )
             {
 #  ifdef __XHARBOUR__
-               hb_cdpnTranslate( empty, thiswa->area.cdPage,
-                                 thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_cdppage(), nLen );
+//               hb_cdpnTranslate( empty, thiswa->area.cdPage,
+//                                 thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_cdppage(), nLen );
+               PHB_CODEPAGE cdpDest = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_cdppage();
+               if( thiswa->area.cdPage && thiswa->area.cdPage != cdpDest )
+               {
+                  char * pszVal = hb_cdpnDup( empty, &nLen, thiswa->area.cdPage, cdpDest );
+                  hb_xfree( empty );
+                  empty = pszVal;
+               }
+                                 
 #  else
                PHB_CODEPAGE cdpDest = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP();
                if( thiswa->area.cdPage && thiswa->area.cdPage != cdpDest )
@@ -1393,10 +1404,18 @@ static HB_ERRCODE sqlGetValue( SQLAREAP thiswa, USHORT fieldNum, PHB_ITEM value 
       {
 #ifdef __XHARBOUR__
          /* TOFIX: this code corrupts internal HVM strings */
-         if( thiswa->cdPageCnv )
-            hb_cdpnTranslate( hb_itemGetCPtr( itemTemp ), thiswa->area.cdPage, thiswa->cdPageCnv, pField->uiLen );
-         else
-            hb_cdpnTranslate( hb_itemGetCPtr( itemTemp ), thiswa->area.cdPage, hb_cdppage(), pField->uiLen );
+//          if( thiswa->cdPageCnv )
+//             hb_cdpnTranslate( hb_itemGetCPtr( itemTemp ), thiswa->area.cdPage, thiswa->cdPageCnv, pField->uiLen );
+//          else
+//             hb_cdpnTranslate( hb_itemGetCPtr( itemTemp ), thiswa->area.cdPage, hb_cdppage(), pField->uiLen );
+         PHB_CODEPAGE cdpDest = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_cdppage();
+         if( thiswa->area.cdPage && thiswa->area.cdPage != cdpDest )
+         {
+            HB_SIZE nLen = hb_itemGetCLen( itemTemp );
+            char * pszVal = hb_cdpnDup( hb_itemGetCPtr( itemTemp ), &nLen, thiswa->area.cdPage, cdpDest );
+            hb_itemPutCLPtr( itemTemp, pszVal, nLen );
+         }
+            
 #else
          PHB_CODEPAGE cdpDest = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP();
          if( thiswa->area.cdPage && thiswa->area.cdPage != cdpDest )
@@ -1513,17 +1532,23 @@ static HB_ERRCODE sqlPutValue( SQLAREAP thiswa, USHORT fieldNum, PHB_ITEM value 
 
          cfield  = (char *) hb_xgrab( nLen + 1 );
 #ifdef __XHARBOUR__
-         if( nSize > nLen )
-         {
-            nSize = nLen;
-         }
-         hb_xmemcpy( cfield, hb_itemGetCPtr( value ), nSize );
-#  ifndef HB_CDP_SUPPORT_OFF
-         if( thiswa->cdPageCnv )
-            hb_cdpnTranslate( cfield, thiswa->cdPageCnv, thiswa->area.cdPage, nSize );
-         else if( thiswa->area.cdPage )
-            hb_cdpnTranslate( cfield, hb_cdppage(), thiswa->area.cdPage, nSize );
-#  endif
+//          if( nSize > nLen )
+//          {
+//             nSize = nLen;
+//          }
+//          hb_xmemcpy( cfield, hb_itemGetCPtr( value ), nSize );
+// #  ifndef HB_CDP_SUPPORT_OFF
+//          if( thiswa->cdPageCnv )
+//             hb_cdpnTranslate( cfield, thiswa->cdPageCnv, thiswa->area.cdPage, nSize );
+//          else if( thiswa->area.cdPage )
+//             hb_cdpnTranslate( cfield, hb_cdppage(), thiswa->area.cdPage, nSize );
+// #  endif
+         hb_cdpnDup2( hb_itemGetCPtr( value ), nSize,
+                      cfield, &nLen,
+                      thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_cdppage(), thiswa->area.cdPage );
+         nSize = nLen;
+         nLen = pField->uiLen;
+
 #else
          hb_cdpnDup2( hb_itemGetCPtr( value ), nSize,
                       cfield, &nLen,
@@ -3291,10 +3316,19 @@ static HB_ERRCODE sqlSetScope( SQLAREAP thiswa, LPDBORDSCOPEINFO sInfo )
 #  ifdef __XHARBOUR__
          /* TOFIX: this code may corrupt internal HVM strings and also change
                    string passed by user */
-         if( thiswa->cdPageCnv )
-            hb_cdpTranslate( hb_itemGetCPtr( scopeval ), thiswa->cdPageCnv, thiswa->area.cdPage );
-         else
-            hb_cdpTranslate( hb_itemGetCPtr( scopeval ), hb_cdppage(), thiswa->area.cdPage );
+//          if( thiswa->cdPageCnv )
+//             hb_cdpTranslate( hb_itemGetCPtr( scopeval ), thiswa->cdPageCnv, thiswa->area.cdPage );
+//          else
+//             hb_cdpTranslate( hb_itemGetCPtr( scopeval ), hb_cdppage(), thiswa->area.cdPage );
+         PHB_CODEPAGE cdpSrc = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_cdppage();
+         if( thiswa->area.cdPage && thiswa->area.cdPage != cdpSrc )
+         {
+            HB_SIZE nLen = hb_itemGetCLen( scopeval );
+            char * pszVal = hb_cdpnDup( hb_itemGetCPtr( scopeval ), &nLen,
+                                        cdpSrc, thiswa->area.cdPage );
+            hb_itemPutCLPtr( scopeval, pszVal, nLen );
+         }
+
 #  else
          PHB_CODEPAGE cdpSrc = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP();
          if( thiswa->area.cdPage && thiswa->area.cdPage != cdpSrc )

@@ -8,6 +8,11 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-01-15 20:45 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+  * source/sqlrdd1.c
+    source /sqlex1.c
+     ! hb_cdpnTranslate and hb_cdpTranslate  changes to hb_cdpndup2 and hb_cdpnDup
+     
 2012-01-12 14:52 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xHarbour-SQLRDD/source/sqlrdd0.prg
     * replaced #include "xhb.ch" with REQUEST XHB_LIB
@@ -152,7 +157,7 @@
       crate HRB or dynamic libraries (.DLL/.so/...) which uses dynamic
       bindings to SQLRDD functions.
 
-2012-01-03 19:10   UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+2012-01-03 19:10  UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
    ! dll\libeay32.dll
    ! dll\libiconv-2.dll
    ! dll\libpq.dll
