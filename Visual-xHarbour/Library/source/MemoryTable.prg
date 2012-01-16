@@ -453,7 +453,6 @@ CLASS MemoryDataTable INHERIT DataTable
    ACCESS FileName         INLINE ::xFileName
    ASSIGN FileName(c)      INLINE ::xFileName := c
 
-   DATA Driver             EXPORTED
    DATA ReadOnly           EXPORTED INIT .F.
    DATA AutoOpen           EXPORTED INIT .T.
    DATA SqlConnector       EXPORTED 

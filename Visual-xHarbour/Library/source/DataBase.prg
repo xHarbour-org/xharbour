@@ -47,6 +47,9 @@ CLASS DataTable INHERIT Component
    DATA Path               PUBLISHED INIT ""
    DATA CodePage           PUBLISHED
    DATA Socket             PUBLISHED
+   
+   DATA EnumMemoType       EXPORTED INIT { { "None", "DBT", "FTP", "SMT" }, { DB_MEMO_NONE, DB_MEMO_DBT, DB_MEMO_FPT, DB_MEMO_SMT } }
+   PROPERTY MemoType READ xMemoType WRITE __SetMemoType DEFAULT RddInfo( RDDI_MEMOTYPE )
 
    DATA __lMemory          EXPORTED  INIT .F.
    DATA Structure          PUBLISHED
@@ -167,8 +170,11 @@ CLASS DataTable INHERIT Component
    METHOD OrdKeyVal()                         INLINE ::Connector:OrdKeyVal()
 
    METHOD OrdKeyNoRaw()                       INLINE ::Connector:OrdKeyNoRaw()
-   
-   METHOD Connectorescend(cnOrder,cFile,lDescend ) INLINE ::Connector:OrdDescend( cnOrder, cFile, lDescend )
+
+   METHOD RddInfo( nType, nSetting )          INLINE ::Connector:RddInfo( nType, nSetting )
+   METHOD DbInfo( nType, nSetting )           INLINE ::Connector:DbInfo( nType, nSetting )
+
+   METHOD OrdDescend(cnOrder,cFile,lDescend ) INLINE ::Connector:OrdDescend( cnOrder, cFile, lDescend )
    
    METHOD CheckAlias()
    METHOD AdsSetServerType(n)   VIRTUAL
@@ -180,6 +186,7 @@ CLASS DataTable INHERIT Component
    ACCESS IsOpen INLINE ::Structure != NIL //Select( ::Area ) > 0
    METHOD FromAlias()
    METHOD Insert() INLINE ::Append()
+   METHOD __SetMemoType( nMemo )              INLINE ::RddInfo( RDDI_MEMOTYPE, nMemo )
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -421,6 +428,8 @@ CLASS DataRdd
    METHOD OrdKeyNo()
    METHOD OrdkeyNoRaw()
    METHOD OrdKeyVal()                         INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdKeyVal() ),)
+   METHOD RddInfo( nType, nSetting )          INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( RddInfo( nType, nSetting, ::Owner:Driver ) ), )
+   METHOD DbInfo( nType, nSetting )           INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( DbInfo( nType, nSetting ) ), )
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -614,6 +623,10 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
 
       IF !::Owner:__lMemory .AND. nServer != NIL
          ::Owner:AdsSetServerType( nServer )
+      ENDIF
+
+      IF ! ::Owner:MemoType > 0
+         ::Owner:__SetMemoType( ::Owner:MemoType )
       ENDIF
 
       DEFAULT ::Owner:xAlias TO Alias()

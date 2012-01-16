@@ -3,7 +3,6 @@
  */
 
 
-static aGroupProp
 static cCurFolder
 
 static __aProps := {=>}
@@ -3653,6 +3652,7 @@ __aProps["M"] := { { "MaximizeBox",             "Style" },;
                    { "MDIChild",                "Style" },;
                    { "MDIClient",               "Style" },;
                    { "MDIContainer",            "Style" },;
+                   { "MemoType",                "" },;
                    { "MinimizeBox",             "Style" },;
                    { "MultiLine",               "Style" },;
                    { "MimeFormatted",           "" },;
