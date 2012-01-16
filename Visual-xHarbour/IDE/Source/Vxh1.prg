@@ -5709,7 +5709,7 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
 
    // Generate Components
    FOR EACH oChild IN oWnd:Components
-       IF ( oChild:__xCtrlName == "DataTable" .OR. oChild:__xCtrlName == "AdsDataTable" ) .AND. ! Empty( oChild:Driver ) .AND. Empty( oChild:Socket )
+       IF ( oChild:__xCtrlName IN {"DataTable","AdsDataTable","MemoryDataTable"} ) .AND. ! Empty( oChild:Driver ) .AND. Empty( oChild:Socket )
           DO CASE
              CASE Upper( oChild:Driver ) == "DBFNTX"
 
