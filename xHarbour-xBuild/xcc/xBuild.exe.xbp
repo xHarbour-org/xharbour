@@ -27,3 +27,4 @@ TARGETFOLDER = \xhb\bin
 
 [\xHarbour.com\xHarbour-xBuild\xbuild.prg]
 [\xHarbour.com\xHarbour-xBuild\tproject.prg]
+[\xHarbour.com\xHarbour-xBuild\tproject-c.prg]
