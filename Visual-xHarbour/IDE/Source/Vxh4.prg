@@ -537,8 +537,13 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
 
           SelectObject( hDC, ::Font:Handle )
 
-          IF oItem:ColItems[n]:ColType == "ICONS" .AND. ::ActiveObject:__hIcon != NIL
-             DrawIconEx( hDC, x-20, y, ::ActiveObject:__hIcon, 16, 16,,,DI_NORMAL )
+          IF oItem:ColItems[n]:ColType == "ICONS" 
+             IF ::ActiveObject:__hIcon == NIL .AND. VALTYPE( ::ActiveObject:Icon ) == "C"
+                ::ActiveObject:__hIcon := LoadImage( ::AppInstance, ::ActiveObject:Icon, IMAGE_ICON,,, LR_LOADFROMFILE )
+             ENDIF
+             IF ::ActiveObject:__hIcon != NIL 
+                DrawIconEx( hDC, x-20, y, ::ActiveObject:__hIcon, 16, 16,,,DI_NORMAL )
+             ENDIF
           ENDIF
           IF oItem:ColItems[n]:ColType == "IMAGEINDEX" .AND. ::ActiveObject:Parent:ImageList != NIL .AND. ::ActiveObject:&cCap != NIL .AND. ::ActiveObject:&cCap > 0
              hIcon := ::ActiveObject:Parent:ImageList:GetImage( ::ActiveObject:&cCap )
@@ -2517,12 +2522,12 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :SetExStyle( WS_EX_CLIENTEDGE, .F. )
                        :Style := :Style | ES_AUTOHSCROLL | ES_MULTILINE & NOT( WS_BORDER )
                        
-                       IF oItem:Caption == "Path" .OR. oItem:Caption == "SelectedPath" .OR. oItem:Caption == "DefaultPath" .OR. oItem:Caption == "Default" .OR. oItem:Caption == "IncludePath"  .OR. oItem:Caption == "SourcePath" .OR. oItem:Owner:Caption == "Target Folder"
+                       IF oItem:Caption == "Path" .OR. oItem:Caption IN {"SelectedPath","DefaultPath","Default","IncludePath","SourcePath"} .OR. oItem:Owner:Caption == "Target Folder"
                           :Button := .T.
                           :ButtonAction := {|o| BrowseForFolder(o, Self, oItem)}
                           
-                        ELSEIF __ObjHasMsg( ::ActiveObject, "__ExplorerFilter" ) .OR. oItem:Caption == "FileName" .OR. oItem:Owner:Caption == "Font" .OR. oItem:Caption == "Icon" .OR. oItem:Caption == "ImageName"
-                          IF oItem:Caption == "FileName" .OR. oItem:Caption == "ImageName" .OR. oItem:Caption == "Icon"
+                        ELSEIF __ObjHasMsg( ::ActiveObject, "__ExplorerFilter" ) .OR. oItem:Caption IN {"FileName","Icon","ImageName"} .OR. oItem:Owner:Caption == "Font"
+                          IF oItem:Caption IN {"FileName","Icon","ImageName"}
                              :Button := .T.
                              :ButtonAction := {|o| BrowseForFile( o, Self, IIF( oItem:Owner:Caption == "Font", ::ActiveObject:Font, ::ActiveObject ), oItem:Caption == "Icon" ) }
                           ENDIF
@@ -3937,7 +3942,7 @@ STATIC FUNCTION BrowseForFile( oEdit, oMan, oObj, lIcon, aFilter )
     ELSE
       oFile:AddFilter( aFilter[1], aFilter[2] )
    ENDIF
-   IF __ObjHasMsg( oMan:ActiveObject, "Path" ) .AND. !EMPTY( oMan:ActiveObject:Path )
+   IF __ObjHasMsg( oMan:ActiveObject, "Path" ) .AND. !EMPTY( oMan:ActiveObject:Path ) .AND. oMan:ActiveObject:ClsName != "Application"
       oFile:Path := oMan:ActiveObject:Path
    ENDIF
    oFile:OpenDialog()
@@ -3945,7 +3950,7 @@ STATIC FUNCTION BrowseForFile( oEdit, oMan, oObj, lIcon, aFilter )
    IF oFile:Result != IDCANCEL
       oEdit:Destroy()
       
-      IF __ObjHasMsg( oMan:ActiveObject, "Path" )
+      IF oMan:ActiveObject:ClsName != "Application" .AND. __ObjHasMsg( oMan:ActiveObject, "Path" )
          oMan:ActiveObject:Path := oFile:Path
          oMan:SetValue( oFile:Name )
        ELSE

@@ -213,6 +213,8 @@ RETURN EXCEPTION_EXECUTE_HANDLER
 //------------------------------------------------------------------------------------------------
 
 CLASS Application
+   DATA Icon          PUBLISHED INIT ""
+   
    ACCESS System INLINE __GetSystem() 
    DATA Version       PUBLISHED INIT "1.0.0.0"
    DATA Company       PUBLISHED INIT ""

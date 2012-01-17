@@ -10291,3 +10291,21 @@ HB_FUNC( TASKDIALOG )
       pTaskDialogIndirect(&config, &nButtonPressed, NULL, NULL);
    }
 }
+
+HB_FUNC( MULTIBYTETOWIDECHAR )
+{
+   const char *cString = (const char *) hb_parc(3);
+   int nConvertedLen = MultiByteToWideChar( (UINT) hb_parni(1), (DWORD) hb_parnl(2), cString, -1, NULL, 0 );
+   if( nConvertedLen )
+   {
+      LPWSTR wString = (LPWSTR) hb_xgrab( nConvertedLen * 2 );
+      if( MultiByteToWideChar( (UINT) hb_parni(1), (DWORD) hb_parnl(2), cString, -1, wString, nConvertedLen ) )
+      {
+         hb_retclenAdopt( (char*) wString, nConvertedLen );
+      }
+      else
+      {
+         hb_xfree( wString );
+      }
+   }
+}

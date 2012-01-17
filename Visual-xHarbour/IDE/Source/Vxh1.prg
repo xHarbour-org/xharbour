@@ -4816,6 +4816,9 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
       cBuffer += '}'                                                                  + CRLF
    #endif
 
+   IF ! EMPTY( ::AppObject:Icon )
+       cBuffer += "_0APPICON ICON "+ValToPrgExp( STRTRAN( ::AppObject:Icon, "\", "\\" )) + CRLF
+   ENDIF
 
    FOR EACH aImage IN ::aImages
        cType := aImage[3]
@@ -5103,7 +5106,7 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
                       cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := " + xValue1:Name + CRLF
                    ENDIF
 
-                 ELSEIF ( cProp == "Icon" .OR. cProp == "ImageName" .OR. cProp == "BitmapMask") .AND. VALTYPE( xValue1 ) == "C"
+                 ELSEIF ( cProp == "Icon" .OR. cProp == "ImageName" .OR. cProp == "BitmapMask") .AND. VALTYPE( xValue1 ) == "C" .AND. ! oCtrl == ::AppObject
                  
                    IF !EMPTY( xValue1 )
                       n := RAT( "\", xValue1 ) + 1
