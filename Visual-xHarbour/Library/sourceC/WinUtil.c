@@ -4222,3 +4222,54 @@ HB_FUNC( __LISTVIEWSETVIEW )
    }
 }
 
+
+HB_FUNC( SETFILETIME )
+{
+   FILETIME ft;
+   FILETIME lft;
+   SYSTEMTIME st;
+   HANDLE hFile ;
+
+   char pTime[6];
+   char pDate[9];
+
+   char szYear[5];
+   char szMonth[3];
+   char szDay[3];
+
+   char szHour[3];
+   char szMinute[3];
+
+   ZeroMemory( &st, sizeof( SYSTEMTIME ) );
+   hFile = CreateFile( hb_parc(1), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
+
+   if (hFile == INVALID_HANDLE_VALUE)
+      hb_retl( FALSE );
+   else
+   {
+      strcpy(pTime, hb_parc(2));
+      strcpy(pDate, ISDATE(3) ? hb_pards(3): hb_parc(3) );
+      if( pTime )
+      {
+         strcpy(szMinute, pTime+3);
+         szHour[0] = pTime[0]; szHour[1] = pTime[1]; szHour[2] = 0;
+         st.wHour  = ( WORD ) atoi(szHour) ;
+         st.wMinute= ( WORD ) atoi(szMinute);
+      }
+
+      if( pDate )
+      {
+         szDay[0] = pDate[6]; szDay[1] = pDate[7]; szDay[2] = 0;
+         szMonth[0] = pDate[4]; szMonth[1] = pDate[5]; szMonth[2] = 0;
+         szYear[0] = pDate[0]; szYear[1] = pDate[1]; szYear[2] = pDate[2]; szYear[3] = pDate[3]; szYear[4] = 0;
+         st.wYear  = ( WORD ) atoi(szYear)   ;
+         st.wMonth = ( WORD ) atoi(szMonth)  ;
+         st.wDay   = ( WORD ) atoi(szDay)    ;
+      }
+
+      SystemTimeToFileTime(&st, &ft);
+      LocalFileTimeToFileTime(&ft, &lft) ;
+      hb_retl( SetFileTime(hFile, &lft, (LPFILETIME) NULL, &lft) );
+      CloseHandle( hFile );
+   }
+}

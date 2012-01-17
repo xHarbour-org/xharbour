@@ -9,7 +9,9 @@
 */
 2012-01-17 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Added Application:Icon property. This icon shows in the explorer instead of the window icon.
-
+   + Added API SetFileTime( cFile, cTime, dDate )
+   + Added API wString := MultiByteToWideChar( nCodePage, nFlags, cString )
+   
 2012-01-13 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed load error when components/forms name was larger than 25 chars (removed limitation)
    + Added logical return value to eMail:Send()
