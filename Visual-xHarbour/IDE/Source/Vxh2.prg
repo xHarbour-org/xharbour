@@ -1003,7 +1003,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
       RETURN 0
    ENDIF
 
-   IF LEN( ::Selected ) > 0 .AND. lRealUp .AND. ! __clsParent( ::Selected[1][1]:ClassH, "COMPONENT" )
+   IF LEN( ::Selected ) > 0 .AND. lRealUp .AND. ! __clsParent( ::Selected[1][1]:ClassH, "COMPONENT" ) .AND. aSelected[1][1]:__xCtrlName == "Application"
       IF ::Selected[1][1]:__Temprect != NIL
          nLeft := ::Selected[1][1]:__Temprect[1]
          nTop  := ::Selected[1][1]:__Temprect[2]
@@ -1272,7 +1272,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
             aSelected := { { aSelected[1][1]:GetCCTL() } }
          ENDIF
          
-         IF ( aSelected[1][1]:__xCtrlName == "CoolMenu" .AND. aSelected[1][1]:Owner != NIL ) .OR. aSelected[1][1]:__xCtrlName == "ToolButton" .OR. aSelected[1][1]:__xCtrlName == "Application"
+         IF ( aSelected[1][1]:__xCtrlName == "CoolMenu" .AND. aSelected[1][1]:Owner != NIL ) .OR. aSelected[1][1]:__xCtrlName == "ToolButton"
             RETURN NIL
          ENDIF
          IF aSelected[1][1]:__xCtrlName == "DataTable" .AND. ::InRect > 0
