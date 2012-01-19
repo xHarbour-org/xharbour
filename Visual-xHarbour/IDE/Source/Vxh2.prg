@@ -946,6 +946,10 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
 
    pt2 := (struct POINT)
 
+   IF LEN( ::Selected ) > 0 .AND. ::Selected[1][1]:__xCtrlName != "Application"
+      RETURN NIL
+   ENDIF
+
    DEFAULT lOrderMode TO .F.
    DEFAULT lRealUp TO .F.
    IF ::Application:CurCursor != NIL .or. ::Application:Project:PasteOn .OR. lOrderMode
