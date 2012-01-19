@@ -1272,7 +1272,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
             aSelected := { { aSelected[1][1]:GetCCTL() } }
          ENDIF
          
-         IF ( aSelected[1][1]:__xCtrlName == "CoolMenu" .AND. aSelected[1][1]:Owner != NIL ) .OR. aSelected[1][1]:__xCtrlName == "ToolButton"
+         IF ( aSelected[1][1]:__xCtrlName == "CoolMenu" .AND. aSelected[1][1]:Owner != NIL ) .OR. aSelected[1][1]:__xCtrlName == "ToolButton" .OR. aSelected[1][1]:__xCtrlName == "Application"
             RETURN NIL
          ENDIF
          IF aSelected[1][1]:__xCtrlName == "DataTable" .AND. ::InRect > 0
