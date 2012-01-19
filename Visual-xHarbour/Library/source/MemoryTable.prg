@@ -445,6 +445,7 @@ RETURN oGrid
 //-------------------------------------------------------------------------------------------------------
 
 CLASS MemoryDataTable INHERIT DataTable
+   DATA Table              EXPORTED  INIT {}
    DATA Structure          PUBLISHED
    DATA Shared             PUBLISHED INIT .T.
 

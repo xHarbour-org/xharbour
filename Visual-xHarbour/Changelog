@@ -7,6 +7,11 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2012-01-18 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed DataTable structure editor keystrokes
+   ! Fixed DataTable editor to save changes
+   - Removed Table property and Datatable editor from MemoryDatatable (not to confuse with MemoryTable)
+
 2012-01-17 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Added Application:Icon property. This icon shows in the explorer instead of the window icon.
    + Added API SetFileTime( cFile, cTime, dDate )

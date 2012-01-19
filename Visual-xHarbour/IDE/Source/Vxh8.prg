@@ -584,6 +584,7 @@ METHOD Save() CLASS StructEditor
    ENDIF
    ::oSave:Enabled := .F.
    ::Application:Project:Modified := .T.
+   ::Application:Project:CurrentForm:__lModified := .T.
 RETURN .T.
 
 METHOD OnCancel() CLASS StructEditor
@@ -657,7 +658,7 @@ METHOD Init( oParent ) CLASS StrEditor
                                        oCtrl:Case := 2,;
                                        oCtrl }
       :ControlAccessKey := GRID_CHAR
-      :OnSave           := {|, oGrid, xData| oGrid:DataSave( "Name", xData, {VK_RIGHT} ) }
+      :OnSave           := {|, oGrid, xData, lFocus| oGrid:DataSave( "Name", xData, lFocus, {VK_RIGHT} ) }
       :Create()
    END
 
@@ -671,7 +672,7 @@ METHOD Init( oParent ) CLASS StrEditor
                                        oCtrl }
       :ControlAccessKey := GRID_CHAR
       :Alignment        := 3
-      :OnSave           := {|, oGrid, xData| oGrid:DataSave( "Type", xData, {VK_RIGHT,VK_RETURN} ) }
+      :OnSave           := {|, oGrid, xData, lFocus| oGrid:DataSave( "Type", xData, lFocus, {VK_RIGHT,VK_RETURN} ) }
       :Create()
    END
 
@@ -686,7 +687,7 @@ METHOD Init( oParent ) CLASS StrEditor
                                                                                   oCtrl:Alignment := 3,;
                                                                                   oCtrl ),) }
       :ControlAccessKey := GRID_CHAR
-      :OnSave           := {|, oGrid, xData| oGrid:DataSave( "Size", MAX( VAL(xData), 1 ), {VK_RIGHT,VK_RETURN} ) }
+      :OnSave           := {|, oGrid, xData, lFocus| oGrid:DataSave( "Size", MAX( VAL(xData), 1 ), lFocus, {VK_RIGHT,VK_RETURN} ) }
       :Create()
    END
 
@@ -701,7 +702,7 @@ METHOD Init( oParent ) CLASS StrEditor
                                                                                oCtrl:Alignment := 3,;
                                                                                oCtrl ),) }
       :ControlAccessKey := GRID_CHAR
-      :OnSave           := {|, oGrid, xData| oGrid:DataSave( "Decimals", MAX( VAL(xData), 0 ), {VK_LEFT,VK_LEFT,VK_LEFT,VK_DOWN,VK_RETURN} ) }
+      :OnSave           := {|, oGrid, xData, lFocus| oGrid:DataSave( "Decimals", MAX( VAL(xData), 0 ), lFocus, {VK_LEFT,VK_LEFT,VK_LEFT,VK_DOWN,VK_RETURN} ) }
       :Create()
    END
    ::Create()
@@ -757,8 +758,9 @@ RETURN NIL
 
 
 //------------------------------------------------------------------------------------------
-METHOD DataSave( cField, xData, aKeys ) CLASS StrEditor
-   IF !EMPTY( XSTR( xData ) )
+METHOD DataSave( cField, xData, lFocus, aKeys ) CLASS StrEditor
+   (aKeys)
+   IF !lFocus .AND. !EMPTY( XSTR( xData ) )
       IF cField == "Type"
          xData := LEFT( xData, 1 )
       ENDIF
@@ -767,7 +769,16 @@ METHOD DataSave( cField, xData, aKeys ) CLASS StrEditor
          RETURN .F.
       ENDIF
       ::Parent:oSave:Enabled := .T.
-      AEVAL( aKeys, {|n| ::PostMessage( WM_KEYDOWN, n )} )
+      IF ::ColPos < 4
+         ::ColPos++
+       ELSE
+         ::ColPos := 1
+         ::PostMessage( WM_KEYDOWN, VK_DOWN )
+      ENDIF
+      ::UpdateRow()
+      IF ::ColPos > 2
+         ::PostMessage( WM_KEYDOWN, VK_RETURN )
+      ENDIF
    ENDIF
 RETURN .T.
 
@@ -992,6 +1003,7 @@ METHOD Save() CLASS TableEditor
    ::DataSource:Table := ACLONE( ::DataGrid1:DataSource:Table )
    ::DataSource:GoTop()
    ::Application:Project:Modified := .T.
+   ::Application:Project:CurrentForm:__lModified := .T.
    ::oSave:Enabled := .F.
 RETURN Self
 
