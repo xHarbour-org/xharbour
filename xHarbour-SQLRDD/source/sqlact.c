@@ -106,32 +106,21 @@ int SqlParse( sql_stmt* stmt, const char* query, int queryLen )
 
 PHB_ITEM SQLpCodeGenInt( int code )
 {
-   HB_ITEM intItem;
    PHB_ITEM pArray;
 
-   pArray = hb_itemArrayNew(0);
-   intItem.type = HB_IT_INTEGER;
-   intItem.item.asInteger.value  = (int)code;
-   intItem.item.asInteger.length = 6;
-   hb_arrayAddForward( pArray, &intItem );
+   pArray = hb_itemArrayNew( 1 );
+   hb_itemPutNILen( hb_arrayGetItemPtr( pArray, 1 ), code, 6 );
 
    return pArray;
 }
 
 PHB_ITEM SQLpCodeGenIntItem( int code, PHB_ITEM value )
 {
-   HB_ITEM intItem;
    PHB_ITEM pArray;
 
-   pArray = hb_itemArrayNew(0);
-
-   intItem.type = HB_IT_INTEGER;
-   intItem.item.asInteger.value  = (int)code;
-   intItem.item.asInteger.length = 6;
-
-   hb_arrayAddForward( pArray, &intItem );
-   hb_arrayAddForward( pArray, value );
-
+   pArray = hb_itemArrayNew( 2 );
+   hb_itemPutNILen( hb_arrayGetItemPtr( pArray, 1 ), code, 6 );
+   hb_arraySetForward( pArray, 2, value );
    hb_itemRelease( value );
 
    return pArray;
@@ -139,41 +128,26 @@ PHB_ITEM SQLpCodeGenIntItem( int code, PHB_ITEM value )
 
 PHB_ITEM SQLpCodeGenItemInt( PHB_ITEM value, int code )
 {
-   HB_ITEM intItem;
    PHB_ITEM pArray;
 
-   pArray = hb_itemArrayNew(0);
-
-   intItem.type = HB_IT_INTEGER;
-   intItem.item.asInteger.value  = (int)code;
-   intItem.item.asInteger.length = 6;
-
-   hb_arrayAddForward( pArray, value );
-   hb_arrayAddForward( pArray, &intItem );
+   pArray = hb_itemArrayNew( 2 );
+   hb_arraySetForward( pArray, 1, value );
+   hb_itemPutNILen( hb_arrayGetItemPtr( pArray, 2 ), code, 6 );
+   // TOCHECK: hb_itemRelease( value );
 
    return pArray;
 }
 
 PHB_ITEM SQLpCodeGenIntItem2( int code, PHB_ITEM value, int code2, PHB_ITEM value2 )
 {
-   HB_ITEM intItem;
-   HB_ITEM intItem2;
    PHB_ITEM pArray;
 
-   pArray = hb_itemArrayNew(0);
+   pArray = hb_itemArrayNew( 4 );
 
-   intItem.type = HB_IT_INTEGER;
-   intItem.item.asInteger.value  = (int)code;
-   intItem.item.asInteger.length = 6;
-
-   intItem2.type = HB_IT_INTEGER;
-   intItem2.item.asInteger.value  = (int)code2;
-   intItem2.item.asInteger.length = 6;
-
-   hb_arrayAddForward( pArray, &intItem );
-   hb_arrayAddForward( pArray, value );
-   hb_arrayAddForward( pArray, &intItem2 );
-   hb_arrayAddForward( pArray, value2 );
+   hb_itemPutNILen( hb_arrayGetItemPtr( pArray, 1 ), code, 6 );
+   hb_arraySetForward( pArray, 2, value );
+   hb_itemPutNILen( hb_arrayGetItemPtr( pArray, 3 ), code2, 6 );
+   hb_arraySetForward( pArray, 4, value );
 
    hb_itemRelease( value );
    hb_itemRelease( value2 );
@@ -213,51 +187,37 @@ PHB_ITEM SQLpCodeGenArrayItem( PHB_ITEM pArray, PHB_ITEM value )
 
 PHB_ITEM SQLpCodeGenArrayInt( PHB_ITEM pArray, int code )
 {
-   HB_ITEM intItem;
+   PHB_ITEM pItem = hb_itemPutNILen( NULL, code, 6 );
 
-   intItem.type = HB_IT_INTEGER;
-   intItem.item.asInteger.value  = (int)code;
-   intItem.item.asInteger.length = 6;
-
-   hb_arrayAddForward( pArray, &intItem );
+   hb_arrayAddForward( pArray, pItem );
+   hb_itemRelease( pItem );
 
    return pArray;
 }
 
 PHB_ITEM SQLpCodeGenArrayIntInt( PHB_ITEM pArray, int code, int code2 )
 {
-   HB_ITEM intItem;
-   HB_ITEM intItem2;
+   PHB_ITEM pItem;
 
-   intItem.type = HB_IT_INTEGER;
-   intItem.item.asInteger.value  = (int)code;
-   intItem.item.asInteger.length = 6;
-
-   intItem2.type = HB_IT_INTEGER;
-   intItem2.item.asInteger.value  = (int)code2;
-   intItem2.item.asInteger.length = 6;
-
-   hb_arrayAddForward( pArray, &intItem );
-   hb_arrayAddForward( pArray, &intItem2 );
+   pItem = hb_itemPutNILen( NULL, code, 6 );
+   hb_arrayAddForward( pArray, pItem );
+   hb_itemPutNILen( pItem, code2, 6 );
+   hb_arrayAddForward( pArray, pItem );
+   hb_itemRelease( pItem );
 
    return pArray;
 }
 
 PHB_ITEM SQLpCodeGenIntArray( int code, PHB_ITEM pArray )
 {
-   HB_ITEM intItem;
-   PHB_ITEM newItem;
+   PHB_ITEM pItem;
 
-   intItem.type = HB_IT_INTEGER;
-   intItem.item.asInteger.value  = (int)code;
-   intItem.item.asInteger.length = 6;
-
-   newItem = hb_itemNew(NULL);
-
-   hb_arrayAdd( pArray, newItem );
+   pItem = hb_itemNew( NULL );
+   hb_arrayAdd( pArray, pItem );
    hb_arrayIns( pArray, 1 );
-   hb_arraySetForward( pArray, 1, &intItem );
-   hb_itemRelease( newItem );
+   hb_itemPutNILen( pItem, code, 6 );
+   hb_arraySetForward( pArray, 1, pItem );
+   hb_itemRelease( pItem );
 
    return pArray;
 }
@@ -621,11 +581,11 @@ HB_FUNC( SR_ESCAPESTRING )
    }
 }
 
-char * QuoteTrimEscapeString( char * FromBuffer, ULONG iSize, int idatabase, BOOL bRTrim, ULONG * iSizeOut )
+char * QuoteTrimEscapeString( const char * FromBuffer, ULONG iSize, int idatabase, BOOL bRTrim, ULONG * iSizeOut )
 {
    char * ToBuffer;
 
-   ToBuffer = (char *) hb_xgrab( ( iSize*2 ) + 3 );
+   ToBuffer = ( char * ) hb_xgrab( ( iSize*2 ) + 3 );
 
    ToBuffer[0] = '\'';
    ToBuffer++;
@@ -951,12 +911,12 @@ HB_FUNC( SR_DBQUALIFY )
    if( pText )
    {
       char * szOut;
-      char * pszBuffer;
+      const char * pszBuffer;
       ULONG ulLen, i;
 
-      pszBuffer = pText->item.asString.value;
-      ulLen = pText->item.asString.length;
-      szOut = (char * ) hb_xgrab( ulLen + 3 );
+      pszBuffer = hb_itemGetCPtr( pText );
+      ulLen = hb_itemGetCLen( pText );
+      szOut = ( char * ) hb_xgrab( ulLen + 3 );
 
       // Firebird, DB2, ADABAS and Oracle must be uppercase
       // Postgres, MySQL and Ingres must be lowercase
@@ -1181,8 +1141,8 @@ char * quotedNull( PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, 
       {
          if( HB_IS_STRING( pFieldData ) && bTCCompat )
          {
-            sValue = QuoteTrimEscapeString( pFieldData->item.asString.value,
-                                            pFieldData->item.asString.length,
+            sValue = QuoteTrimEscapeString( hb_itemGetCPtr( pFieldData ),
+                                            hb_itemGetCLen( pFieldData ),
                                             nSystemID, FALSE, &iSizeOut );
             return (sValue);
          }
@@ -1207,8 +1167,8 @@ char * quotedNull( PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, 
 
    if( HB_IS_STRING( pFieldData ) )
    {
-      sValue = QuoteTrimEscapeString( pFieldData->item.asString.value,
-                                      pFieldData->item.asString.length,
+      sValue = QuoteTrimEscapeString( hb_itemGetCPtr( pFieldData ),
+                                      hb_itemGetCLen( pFieldData ),
                                       nSystemID, !bTCCompat, &iSizeOut );
    }
    else if( HB_IS_NUMBER( pFieldData ) )

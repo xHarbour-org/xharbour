@@ -10,17 +10,11 @@
 #ifndef _SQL_RDD_COMPAT_H
 #define _SQL_RDD_COMPAT_H
 
-#ifndef HB_VMPUB_H_
-   #include "hbdefs.h"
-   #ifndef __XHARBOUR__
-      #include "hbvmint.h"
-   #endif
-#endif
-
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapirdd.h"
 #include "hbapierr.h"
+#include "hbset.h"
 #include "hbvm.h"
 #include "hbstack.h"
 #include "hbdate.h"
@@ -31,8 +25,9 @@
    #include "hashapi.h"
 
    #ifndef hb_itemPutCLPtr
-      #define hb_itemPutCLPtr( i, s, l )      hb_itemPutCPtr( i, s, l )
+      #define hb_itemPutCLPtr( i, s, l )           hb_itemPutCPtr( i, s, l )
    #endif
+   #define hb_vmCDP()                           hb_cdppage()
 
    #define HB_FALSE           0
    #define HB_TRUE            (!0)

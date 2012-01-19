@@ -1153,12 +1153,16 @@ void FBFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff,
                   hb_dynsymUnlock();
                   if ( s_pSym_SR_FROMJSON  == NULL ) printf( "Could not find Symbol HB_JSONDECODE\n" );
                }
-               hb_vmPushSymbol( s_pSym_SR_FROMJSON->pSymbol );
+               hb_vmPushDynSym( s_pSym_SR_FROMJSON );
                hb_vmPushNil();
                hb_vmPushString( bBuffer, lLenBuff );
                pTemp = hb_itemNew( NULL );
                hb_vmPush(pTemp);
                hb_vmDo( 2 );
+               /* TOFIX: What this code should do ???
+                * Now it's a dummy code which does not make anything usable.
+                * [druzus]
+                */
                hb_itemForwardValue( pItem, pTemp );
                hb_itemRelease( pTemp );
 
@@ -1173,7 +1177,7 @@ void FBFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff,
                   hb_dynsymUnlock();
                   if ( s_pSym_SR_DESERIALIZE  == NULL ) printf( "Could not find Symbol SR_DESERIALIZE\n" );
                }
-               hb_vmPushSymbol( s_pSym_SR_DESERIALIZE->pSymbol );
+               hb_vmPushDynSym( s_pSym_SR_DESERIALIZE );
                hb_vmPushNil();
                hb_vmPushString( bBuffer, lLenBuff );
                hb_vmDo( 1 );

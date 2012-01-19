@@ -8,6 +8,45 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-01-19 02:35 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xHarbour-SQLRDD/source/compat.h
+    * added hbset.h and eliminated hbvmint.h from Harbour builds
+    + added few new macros to hide differences in CDP API.
+
+  * xHarbour-SQLRDD/source/firebird.c
+  * xHarbour-SQLRDD/source/mysql.c
+  * xHarbour-SQLRDD/source/pgs.c
+  * xHarbour-SQLRDD/source/sqlex1.c
+  * xHarbour-SQLRDD/source/sqlex2.c
+  * xHarbour-SQLRDD/source/sqlorax.c
+  * xHarbour-SQLRDD/source/sqlrdd1.c
+  * xHarbour-SQLRDD/source/sqlsrodbc.c
+  * xHarbour-SQLRDD/source/sqlact.c
+    * replaced hb_vmPushSymbol() with hb_vmPushDynSym()
+    * replaced code directly accessed HB_ITEM internals with
+      macros and functions from official [x]Harbour API
+    % eliminated some unused C stack HB_ITEM variables.
+    ! eliminated rest of C stack HB_ITEM variables. Some of them
+      were used for complex items like array with inter memory
+      allocation calls what should cause GPF when GC is
+      automatically activated by MM.
+    % eliminated unnecessary __HARBOUR__/__XHARBOUR__ branches
+      which can be covered by macros defined in compat.h
+    * pacified few warnings
+    ; added TOFIX note before code calling HB_JSONDECODE().
+      Without any doubts this code does not work correctly.
+      It has to be fixed by implementing proper passing
+      by reference in C code or by small PRG function used
+      as wrapper, i.e.:
+         func SR_FROMJSON( cText )
+            local xResult
+            HB_JSONDECODE( cText, @xResult )
+         return xResult
+
+  * xHarbour-SQLRDD/source/sqlrdd.hbx
+    * regenerated automatically with new PRG functions added
+      after my last commit
+
 2012-01-15 20:45 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
   * source/sqlrdd1.c
     source /sqlex1.c

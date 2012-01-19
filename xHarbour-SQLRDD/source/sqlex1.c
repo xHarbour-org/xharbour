@@ -261,37 +261,34 @@ static PHB_ITEM getMessageItem( PHB_ITEM obj, char * message )
 
 static void createRecodListQuery( SQLEXAREAP thiswa )
 {
-   int ilen;	
-   
    if ( thiswa->sSql )
       memset( thiswa->sSql, 0,  MAX_SQL_QUERY_LEN * sizeof( char ) );
    if( thiswa->ulhDeleted == 0 )
    {
-	  if (thiswa->bIsSelect)
-	  {
-
+      if (thiswa->bIsSelect)
+      {
          sprintf( thiswa->sSql, "SELECT %s A.%c%s%c FROM (%s) A %s %s %s", thiswa->sLimit1,
                              OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa ),
                              thiswa->szDataFileName,
                              thiswa->sWhere,
                              thiswa->sOrderBy,
                              thiswa->sLimit2 );
-      }                       
-      else 
+      }
+      else
       {
-	     sprintf( thiswa->sSql, "SELECT %s A.%c%s%c FROM %s A %s %s %s", thiswa->sLimit1,
+         sprintf( thiswa->sSql, "SELECT %s A.%c%s%c FROM %s A %s %s %s", thiswa->sLimit1,
                              OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa ),
                              thiswa->sTable,
                              thiswa->sWhere,
                              thiswa->sOrderBy,
                              thiswa->sLimit2 );
 
-      }                       
+      }
    }
    else
    {
       if (thiswa->bIsSelect)
-	  {
+      {
          sprintf( thiswa->sSql, "SELECT %s A.%c%s%c, A.%c%s%c FROM (%s) A %s %s %s",
                              thiswa->sLimit1,
                              OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa ),
@@ -301,10 +298,9 @@ static void createRecodListQuery( SQLEXAREAP thiswa )
                              thiswa->sOrderBy,
                              thiswa->sLimit2 );
 
-   }
+      }
       else
       {
- 
          sprintf( thiswa->sSql, "SELECT %s A.%c%s%c, A.%c%s%c FROM %s A %s %s %s",
                              thiswa->sLimit1,
                              OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa ),
@@ -315,7 +311,6 @@ static void createRecodListQuery( SQLEXAREAP thiswa )
                              thiswa->sLimit2 );
       }
    }
-
 }
 
 /*------------------------------------------------------------------------*/
@@ -323,7 +318,7 @@ static void createRecodListQuery( SQLEXAREAP thiswa )
 static void createCountQuery( SQLEXAREAP thiswa )
 {
    if ( thiswa->sSql )
-   memset( thiswa->sSql, 0,  MAX_SQL_QUERY_LEN * sizeof( char ) );
+      memset( thiswa->sSql, 0,  MAX_SQL_QUERY_LEN * sizeof( char ) );
    sprintf( thiswa->sSql, "SELECT COUNT( A.%c%s%c ) \nFROM %s A %s",
                           OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa ),
                           thiswa->sTable,
@@ -481,14 +476,15 @@ HB_ERRCODE SetBindValue( PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT h
       {
          int nTrim, i;
          int size = (int) hb_itemGetCLen( pFieldData );
+         const char * pszText = hb_itemGetCPtr( pFieldData );
 
          nTrim = size;
 
          // RTrim() the string value
 
-         for (i = (size -1); i >= 0; i-- )
+         for (i = (size - 1); i >= 0; i-- )
          {
-            if( pFieldData->item.asString.value[i] == '\0' || pFieldData->item.asString.value[i] != ' ' )
+            if( pszText[i] == '\0' || pszText[i] != ' ' )
             {
                nTrim = i+1;
                break;
@@ -510,7 +506,7 @@ HB_ERRCODE SetBindValue( PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT h
          }
          else
          {
-            hb_xmemcpy( BindStructure->asChar.value, pFieldData->item.asString.value, nTrim );
+            hb_xmemcpy( BindStructure->asChar.value, pszText, nTrim );
             BindStructure->asChar.value[ nTrim ] = '\0';
 
             if( BindStructure->isBoundNULL )
@@ -526,6 +522,7 @@ HB_ERRCODE SetBindValue( PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT h
       {
          int nTrim, i;
          int size = (int) hb_itemGetCLen( pFieldData );
+         const char * pszText = hb_itemGetCPtr( pFieldData );
 
          nTrim = size;
 
@@ -533,7 +530,7 @@ HB_ERRCODE SetBindValue( PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT h
 
          for (i = (size -1); i >= 0; i-- )
          {
-            if( pFieldData->item.asString.value[i] == '\0' || pFieldData->item.asString.value[i] != ' ' )
+            if( pszText[i] == '\0' || pszText[i] != ' ' )
             {
                nTrim = i+1;
                break;
@@ -553,7 +550,7 @@ HB_ERRCODE SetBindValue( PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT h
 
          if( nTrim >= BindStructure->asChar.size_alloc || nTrim > BindStructure->asChar.size )
          {
-            hb_xmemcpy( BindStructure->asChar.value, pFieldData->item.asString.value, nTrim );
+            hb_xmemcpy( BindStructure->asChar.value, pszText, nTrim );
             BindStructure->asChar.value[ nTrim ] = '\0';
             BindStructure->lIndPtr               = SQL_NTS;
 
@@ -583,7 +580,7 @@ HB_ERRCODE SetBindValue( PHB_ITEM pFieldData, COLUMNBINDP BindStructure, HSTMT h
          }
          else
          {
-            hb_xmemcpy( BindStructure->asChar.value, pFieldData->item.asString.value, nTrim );
+            hb_xmemcpy( BindStructure->asChar.value, pszText, nTrim );
             BindStructure->asChar.value[ nTrim ] = '\0';
          }
          BindStructure->asChar.size = nTrim;
@@ -2774,23 +2771,6 @@ static HB_ERRCODE sqlExSeek( SQLEXAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, B
 #ifndef HB_CDP_SUPPORT_OFF
    if( HB_IS_STRING( pKey ) )
    {
-#  ifdef __XHARBOUR__
-      /* TOFIX: this code may corrupt internal HVM strings and also change
-                string passed by user */
-//       if( thiswa->cdPageCnv )
-//          hb_cdpTranslate( hb_itemGetCPtr( pKey ), thiswa->cdPageCnv, thiswa->area.cdPage );
-//       else
-//          hb_cdpTranslate( hb_itemGetCPtr( pKey ), hb_cdppage(), thiswa->area.cdPage );
-      PHB_CODEPAGE cdpSrc = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_cdppage();
-      if( thiswa->area.cdPage && thiswa->area.cdPage != cdpSrc )
-      {
-         HB_SIZE nLen = hb_itemGetCLen( pKey );
-         char * pszVal = hb_cdpnDup( hb_itemGetCPtr( pKey ), &nLen,
-                                     cdpSrc, thiswa->area.cdPage );
-         pKey = pNewKey = hb_itemPutCLPtr( NULL, pszVal, nLen );
-      }
-
-#  else
       PHB_CODEPAGE cdpSrc = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP();
       if( thiswa->area.cdPage && thiswa->area.cdPage != cdpSrc )
       {
@@ -2799,7 +2779,6 @@ static HB_ERRCODE sqlExSeek( SQLEXAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, B
                                      cdpSrc, thiswa->area.cdPage );
          pKey = pNewKey = hb_itemPutCLPtr( NULL, pszVal, nLen );
       }
-#  endif
    }
 #endif
 
@@ -3397,10 +3376,7 @@ static HB_ERRCODE sqlExFlush( SQLEXAREAP thiswa )
 static HB_ERRCODE sqlExGetValue( SQLEXAREAP thiswa, USHORT fieldNum, PHB_ITEM value  )
 {
    PHB_ITEM itemTemp, itemTemp3;
-   HB_ITEM itemTemp2;
    ULONG ulPos;
-
-   itemTemp2.type = HB_IT_NIL;
 
    if( thiswa->lpdbPendingRel )
    {
@@ -3453,8 +3429,8 @@ static HB_ERRCODE sqlExGetValue( SQLEXAREAP thiswa, USHORT fieldNum, PHB_ITEM va
          }
          else
          {
-            hb_itemPutC( &itemTemp2, NULL );
-            hb_itemForwardValue( value, &itemTemp2 );
+            hb_itemPutC( pLangItem, NULL );
+            hb_itemForwardValue( value, pLangItem );
          }
          hb_itemRelease( pLangItem );
       }
@@ -3478,18 +3454,6 @@ static HB_ERRCODE sqlExGetValue( SQLEXAREAP thiswa, USHORT fieldNum, PHB_ITEM va
 #ifndef HB_CDP_SUPPORT_OFF
             if( pField->uiType == HB_FT_STRING  )
             {
-#  ifdef __XHARBOUR__
-//                hb_cdpnTranslate( empty, thiswa->area.cdPage,
-//                                  thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_cdppage(), nLen );
-               PHB_CODEPAGE cdpDest = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_cdppage();
-               if( thiswa->area.cdPage && thiswa->area.cdPage != cdpDest )
-               {
-                  char * pszVal = hb_cdpnDup( empty, &nLen, thiswa->area.cdPage, cdpDest );
-                  hb_xfree( empty );
-                  empty = pszVal;
-               }
-
-#  else
                PHB_CODEPAGE cdpDest = thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP();
                if( thiswa->area.cdPage && thiswa->area.cdPage != cdpDest )
                {
@@ -3497,7 +3461,6 @@ static HB_ERRCODE sqlExGetValue( SQLEXAREAP thiswa, USHORT fieldNum, PHB_ITEM va
                   hb_xfree( empty );
                   empty = pszVal;
                }
-#  endif
             }
 #endif
          }
@@ -3657,31 +3620,15 @@ static HB_ERRCODE sqlExPutValue( SQLEXAREAP thiswa, USHORT fieldNum, PHB_ITEM va
       {
          HB_SIZE nSize = hb_itemGetCLen( value ), nLen = pField->uiLen;
 
-         cfield  = (char *) hb_xgrab( nLen + 1 );
-#ifdef __XHARBOUR__
-//          if( nSize > nLen )
-//          {
-//             nSize = nLen;
-//          }
-//          hb_xmemcpy( cfield, hb_itemGetCPtr( value ), nSize );
-// #  ifndef HB_CDP_SUPPORT_OFF
-//          if( thiswa->cdPageCnv )
-//             hb_cdpnTranslate( cfield, thiswa->cdPageCnv, thiswa->area.cdPage, nSize );
-//          else if( thiswa->area.cdPage )
-//             hb_cdpnTranslate( cfield, hb_cdppage(), thiswa->area.cdPage, nSize );
-// #  endif
-         hb_cdpnDup2( hb_itemGetCPtr( value ), nSize,
-                      cfield, &nLen,
-                      thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_cdppage(), thiswa->area.cdPage );
-         nSize = nLen;
-         nLen = pField->uiLen;
-
-#else
+         cfield = (char *) hb_xgrab( nLen + 1 );
+#ifndef HB_CDP_SUPPORT_OFF
          hb_cdpnDup2( hb_itemGetCPtr( value ), nSize,
                       cfield, &nLen,
                       thiswa->cdPageCnv ? thiswa->cdPageCnv : hb_vmCDP(), thiswa->area.cdPage );
          nSize = nLen;
          nLen = pField->uiLen;
+#else
+         memcpy( cfield, hb_itemGetCPtr( value ), HB_MIN( nLen, nSize ) );
 #endif
          if( nLen > nSize )
             memset( cfield + nSize, ' ', nLen - nSize );
@@ -3723,7 +3670,7 @@ static HB_ERRCODE sqlExPutValue( SQLEXAREAP thiswa, USHORT fieldNum, PHB_ITEM va
       return ( HB_SUCCESS );
 #else
       char type_err[128];
-      sprintf( type_err, "data type origin: %i - data type target %i", value->type, pDest->type );
+      sprintf( type_err, "data type origin: %i - data type target %i", hb_itemType( value ), hb_itemType( pDest ) );
       commonError( (AREAP) thiswa, EG_DATATYPE, ESQLRDD_DATATYPE, type_err );
       return ( HB_FAILURE );
 #endif
@@ -3963,7 +3910,7 @@ static HB_ERRCODE sqlExCreate( SQLEXAREAP thiswa, LPDBOPENINFO OpenInfo )
 static HB_ERRCODE sqlExNewArea( SQLEXAREAP thiswa )
 {
    HB_ERRCODE errCode;
-   int i;
+   //int i;
 
    errCode = SUPER_NEW( ( AREAP ) thiswa );
 
@@ -4609,9 +4556,9 @@ static void hb_sqlExRddInit( void * cargo )
 
             pDynSym = hb_dynsymFind( "__SR_STARTSQL" );
 
-            if( pDynSym && pDynSym->pSymbol->value.pFunPtr )
+            if( pDynSym && hb_dynsymIsFunction( pDynSym ) )
             {
-               hb_vmPushSymbol( pDynSym->pSymbol );
+               hb_vmPushDynSym( pDynSym );
                hb_vmPushNil();
                hb_vmDo(0);
             }

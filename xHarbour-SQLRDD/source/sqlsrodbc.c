@@ -183,12 +183,12 @@ HB_FUNC( SR_DRIVERC )
    #if defined(HB_OS_WIN_32) || defined( HB_OS_WIN )
       RETCODE ret =  SQLDriverConnect( ( HDBC ) hb_parptr( 1 ),
                              GetDesktopWindow(),
-                             (unsigned char *) hb_parcx( 2 ), strlen(hb_parcx(2)),
+                             (SQLCHAR *) hb_parcx( 2 ), strlen(hb_parcx(2)),
                              bBuffer1, 1024, &wLen, SQL_DRIVER_NOPROMPT ); // SQL_DRIVER_COMPLETE ) ;
    #elif defined(HB_OS_UNIX)
       RETCODE ret =  SQLDriverConnect( ( HDBC ) hb_parptr( 1 ),
                              0,
-                             hb_parcx( 2 ), strlen(hb_parcx(2)),
+                             (SQLCHAR *) hb_parcx( 2 ), strlen(hb_parcx(2)),
                              bBuffer1, 1024, &wLen, SQL_DRIVER_COMPLETE ) ;
 
    #endif
@@ -494,15 +494,15 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
                   hb_dynsymUnlock();
                   if ( s_pSym_SR_FROMJSON  == NULL ) printf( "Could not find Symbol HB_JSONDECODE\n" );            
                }
-               hb_vmPushSymbol( s_pSym_SR_FROMJSON->pSymbol );
+               hb_vmPushDynSym( s_pSym_SR_FROMJSON );
                hb_vmPushNil();
                hb_vmPushString( bBuffer, lLenBuff );
                pTemp = hb_itemNew( NULL );
                hb_vmPush(pTemp);
                hb_vmDo( 2 );
-               hb_itemForwardValue( pItem, pTemp );              
+               /* TOFIX: */
+               hb_itemForwardValue( pItem, pTemp );
                hb_itemRelease( pTemp );
-
             }
 
             else if( lLenBuff > 10 && strncmp( bBuffer, SQL_SERIALIZED_SIGNATURE, 10 ) == 0 && (!sr_lSerializedAsString()) )
@@ -514,7 +514,7 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
                   hb_dynsymUnlock();
                   if ( s_pSym_SR_DESERIALIZE  == NULL ) printf( "Could not find Symbol SR_DESERIALIZE\n" );
                }
-               hb_vmPushSymbol( s_pSym_SR_DESERIALIZE->pSymbol );
+               hb_vmPushDynSym( s_pSym_SR_DESERIALIZE );
                hb_vmPushNil();
                hb_vmPushString( bBuffer, lLenBuff );
                hb_vmDo( 1 );

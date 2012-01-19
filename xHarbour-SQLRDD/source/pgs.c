@@ -723,13 +723,14 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff
                   hb_dynsymUnlock();
                   if ( s_pSym_SR_FROMJSON  == NULL ) printf( "Could not find Symbol HB_JSONDECODE\n" );            
                }
-               hb_vmPushSymbol( s_pSym_SR_FROMJSON->pSymbol );
+               hb_vmPushDynSym( s_pSym_SR_FROMJSON );
                hb_vmPushNil();
                hb_vmPushString( bBuffer, lLenBuff );
                pTemp = hb_itemNew( NULL );
                hb_vmPush(pTemp);
                hb_vmDo( 2 );
-               hb_itemForwardValue( pItem, pTemp );              
+               /* TOFIX: */
+               hb_itemForwardValue( pItem, pTemp );
                hb_itemRelease( pTemp );
 
             }
@@ -743,7 +744,7 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff
                   hb_dynsymUnlock();
                   if ( s_pSym_SR_DESERIALIZE  == NULL ) printf( "Could not find Symbol SR_DESERIALIZE\n" );
                }
-               hb_vmPushSymbol( s_pSym_SR_DESERIALIZE->pSymbol );
+               hb_vmPushDynSym( s_pSym_SR_DESERIALIZE );
                hb_vmPushNil();
                hb_vmPushString( bBuffer, lLenBuff );
 
@@ -789,7 +790,7 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff
                   if ( s_pSym_SR_FROMXML  == NULL ) printf( "Could not find Symbol SR_DESERIALIZE\n" );
                }
                pTemp1 = hb_itemArrayNew(0);
-               hb_vmPushSymbol( s_pSym_SR_FROMXML->pSymbol );
+               hb_vmPushDynSym( s_pSym_SR_FROMXML );
                hb_vmPushNil();
                hb_vmPushNil();
                hb_vmPush( pTemp1);

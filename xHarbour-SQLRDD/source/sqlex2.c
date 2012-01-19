@@ -150,13 +150,9 @@ static void SerializeMemo( PHB_ITEM pFieldData )
    {
       s_pSym_Serial1 = hb_dynsymFindName( "SR_SERIALIZE1" );
    }
-   hb_vmPushSymbol( s_pSym_Serial1->pSymbol );
+   hb_vmPushDynSym( s_pSym_Serial1 );
    hb_vmPushNil();
-#ifdef __XHARBOUR__
-   hb_itemPushForward( pFieldData );
-#else
    hb_vmPush( pFieldData );
-#endif
    hb_vmDo( 1 );
    hb_itemForwardValue( pFieldData, hb_stackReturnItem() );
 }
@@ -176,7 +172,7 @@ void CreateInsertStmt( SQLEXAREAP thiswa )
    int iCols, i;
    PHB_ITEM pFieldStruct, pFieldLen, pFieldDec;
    LONG lFieldPosWA, lType;
-   char * colName, * sFields, * sParams, * temp, *Recname;
+   char * colName, * sFields, * sParams, * temp;
    char ident[200] = {0};
    char tablename[100] = {0};
    char declare[200] = {0};
