@@ -1003,7 +1003,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
       RETURN 0
    ENDIF
 
-   IF LEN( ::Selected ) > 0 .AND. lRealUp .AND. ! __clsParent( ::Selected[1][1]:ClassH, "COMPONENT" ) .AND. ::Selected[1][1]:__xCtrlName == "Application"
+   IF LEN( ::Selected ) > 0 .AND. lRealUp .AND. ! __clsParent( ::Selected[1][1]:ClassH, "COMPONENT" ) .AND. ::Selected[1][1]:__xCtrlName != "Application"
       IF ::Selected[1][1]:__Temprect != NIL
          nLeft := ::Selected[1][1]:__Temprect[1]
          nTop  := ::Selected[1][1]:__Temprect[2]
