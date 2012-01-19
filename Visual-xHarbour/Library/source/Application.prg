@@ -372,9 +372,13 @@ CLASS Application
    DATA __hIcon                        EXPORTED
    DATA __lCopyCut                     EXPORTED  INIT .F.
    DATA __hMenuHook                    EXPORTED
-   DATA __CustomOwner                  EXPORTED  INIT .F.
    DATA __PropFilter                   EXPORTED  INIT {}
    DATA __FileOkMsg                    EXPORTED
+
+   DATA __CustomOwner                  EXPORTED  INIT .F.
+   DATA __lMoveable                    EXPORTED  INIT .F.
+   DATA __lResizeable                  EXPORTED  INIT .F.
+
    //DATA RemoteSocket                   EXPORTED
    
    ACCESS aPath INLINE ::Path
