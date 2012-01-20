@@ -8,18 +8,22 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-01-20 15:12 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * source/vm/arrayshb.c
+    ! Fixed ASPLICE() shifting of remaining item to not skip first item
+
 2011-12-28 11:01 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
    * source/rtl/dircmd.prg
      ! Ajusted display size of file name and file size
-     
+
 2011-12-21 16:11 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
    * source/vm/dynlibhb.c
      ! Minox Fix im compilation under linux
-   
+
 2011-12-15 10:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
    * source/típ/sendmail.prg
      ! fixed Disposition-Notification-To field
-     
+
 2011-11-27 22:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
    * source/ct/files.c
    * source/rtl/console.c
@@ -40,22 +44,22 @@
    * source/vm/dbgentry.c
    * source/vm/inet.c
      * changed HB_OS_UNIX_COMPATIBLE to HB_OS_UNIX
-   * source/ct/settime.c  
+   * source/ct/settime.c
    * source/ct/dattime3.c
    * source/rtl/filenet.c
-   * source/vm/dynlibhb.c     
+   * source/vm/dynlibhb.c
      * changed HB_OS_LINUX to HB_OS_UNIX
 
 2011-11-24 15:30 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/rtl/filesys.c
     % removed unnecessary PID setting in POSIX file lock function. borrow from harbour
   * source/common/hbdate.c
-    * HB_OS_LINUX -> HB_OS_UNIX  
+    * HB_OS_LINUX -> HB_OS_UNIX
   * source/rtl/fstemp.c
-    * HB_OS_LINUX -> HB_OS_UNIX  
+    * HB_OS_LINUX -> HB_OS_UNIX
   * source/rtl/seconds.c
     * added test for HB_OS_UNIX on line with test for HB_OS_LINUX
-    
+
 2011-11-23 11:27 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * include/hbdefs.h
     ! minor fix to correct set memory aligment on hpux
@@ -151,7 +155,7 @@
   * utils/hbfilere/Makefile
     utils/hbmake/Makefile
     ! updated lib list to properly compile in hpux
-         
+
 2011-11-04 11:23 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/rdd/dbfcdx/dbfcdx.c
     ! fixed wrongly used SUPER_DELETED() instead of SELF_DELETED()

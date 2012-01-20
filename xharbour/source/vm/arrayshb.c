@@ -2226,7 +2226,7 @@ HB_FUNC( ASPLICE )
             hb_arraySize( pArray, ulLen + ulMore );
 
             /* Shift right BEFORE adding, so that new items will not override existing values. */
-            for( ulIndex = ulLen; ulIndex && --ulShift; --ulIndex )
+            for( ulIndex = ulLen; ulIndex && ulShift--; --ulIndex )
             {
                hb_itemForwardValue( hb_arrayGetItemPtr( pArray, ulIndex + ulMore ),
                                     hb_arrayGetItemPtr( pArray, ulIndex ) );
