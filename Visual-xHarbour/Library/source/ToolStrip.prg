@@ -2162,8 +2162,6 @@ FUNCTION ___OpenMenu( Self )
    s_hMenuDialogHook := SetWindowsHookEx( WH_CALLWNDPROC, ( @__MenuDialogHook() ), NIL, GetCurrentThreadId() )
    DEFAULT s_hKeyMenuHook TO SetWindowsHookEx( WH_MSGFILTER, ( @__KeyMenuHook() ), NIL, GetCurrentThreadId() )
 
-//TPM_RECURSE
-
    TrackPopupMenu( ::__hMenu, TPM_LEFTALIGN | TPM_TOPALIGN, aPt[1], aPt[2], 0, ::Form:hWnd )
    s_nmw := 0
 
