@@ -16,7 +16,7 @@ HB_EXTERN_BEGIN
    extern HB_EXPORT LPWSTR hb_oleAnsiToWide( const char *cString );
 HB_EXTERN_END
 
-#if defined( __XCC__ )
+//#if defined( __XCC__ )
    typedef struct _DTTOPTS {
        DWORD dwSize;
        DWORD dwFlags;
@@ -34,7 +34,7 @@ HB_EXTERN_END
        DWORD pfnDrawTextCallback;
        LPARAM lParam;
    } DTTOPTS, *PDTTOPTS;
-#endif
+//#endif
 
 BOOL Array2Rect(PHB_ITEM aRect, RECT *rc );
 void Rect2ArrayEx( RECT *rc ,PHB_ITEM aRect );
