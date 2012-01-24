@@ -551,7 +551,7 @@ HB_FUNC_INIT( _INITSYMBOLS_ )
    }
    if( hComctl32 )
    {
-      pTaskDialogIndirect = (HRESULT (WINAPI *)(const TASKDIALOGCONFIG,int,int,BOOL*)) GetProcAddress( hComctl32, "TaskDialogIndirect");
+      pTaskDialogIndirect = (HRESULT (WINAPI *)(const TASKDIALOGCONFIG*,int*,int*,BOOL*)) GetProcAddress( hComctl32, "TaskDialogIndirect");
    }
 }
 
