@@ -743,9 +743,11 @@ FUNCTION WrapTypeLib( oTypeLib, cID, xSuper, ProgID )
       RETURN NIL
    ENDIF
 
-   IF oServer == NIL
-      //TraceLog( "Could not locate:", cID, ProgID )
-   ENDIF
+   #if 0
+      IF oServer == NIL
+         TraceLog( "Could not locate:", cID, ProgID )
+      ENDIF
+   #endif
 
 RETURN oServer
 
@@ -783,7 +785,7 @@ STATIC FUNCTION WrapInterface( xSuper, oInterface, cProgID, cGUID, lInstance, oT
             {
                #ifdef _DEBUG
                   void OutputDebugValues( const char *sFormat, ... );
-                  OutputDebugValues( "Oops! Property: '%s' of Interface: '%s' has no MemberID.\n", hb_parc(1), hb_parc(2) );
+                  OutputDebugValues( "Oops! Property: '%s' of Interface: '%s' has no MemberID.\n", hb_parcx(1), hb_parcx(2) );
                #endif
             }
 
@@ -814,7 +816,7 @@ STATIC FUNCTION WrapInterface( xSuper, oInterface, cProgID, cGUID, lInstance, oT
             {
                #ifdef _DEBUG
                   void OutputDebugValues( const char *sFormat, ... );
-                  OutputDebugValues( "Oops! Method: '%s' of Interface: '%s' has no MemberID.\n", hb_parc(1), hb_parc(2) );
+                  OutputDebugValues( "Oops! Method: '%s' of Interface: '%s' has no MemberID.\n", hb_parcx(1), hb_parcx(2) );
                #endif
             }
 
