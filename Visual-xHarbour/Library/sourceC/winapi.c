@@ -10288,11 +10288,11 @@ HB_FUNC( TASKDIALOGPROC )
       int nButtonPressed                  = 0;
       int nRadioButton                    = 0;
       BOOL pfVerificationFlagChecked      = FALSE;
-      TASKDIALOGCONFIG config             = {0};
+      TASKDIALOGCONFIG tdc                = {0};
       int i;
       int iCount = 0;
       TASKDIALOG_BUTTON *buttons;
-      PHB_ITEM pArray = hb_pureparam( 1, HB_IT_ARRAY );
+      PHB_ITEM pArray = hb_pureparam( 3, HB_IT_ARRAY );
 
       if( pArray )
       {
@@ -10314,30 +10314,30 @@ HB_FUNC( TASKDIALOGPROC )
          }
       }
  
-      config.cbSize                       = sizeof(TASKDIALOGCONFIG);
-      config.hInstance                    = GetModuleHandle( NULL );
-      config.dwCommonButtons              = TDCBF_CANCEL_BUTTON;
-      config.pszMainIcon                  = TD_WARNING_ICON;
-      config.pszMainInstruction           = hb_oleAnsiToWide( hb_parc(2) );
-      config.pszContent                   = hb_oleAnsiToWide( hb_parc(3) );
-      config.pButtons                     = buttons;
-      config.cButtons                     = iCount;
-      config.dwFlags                      = (DWORD) hb_parnl(4);
+      tdc.cbSize             = sizeof(TASKDIALOGCONFIG);
+      tdc.hwndParent         = (HWND) hb_parnl(1);
+      tdc.hInstance          = (HINSTANCE) hb_parnl(2);
+      tdc.pszMainIcon        = TD_WARNING_ICON;
+      tdc.pszMainInstruction = hb_oleAnsiToWide( hb_parc(4) );
+      tdc.pszContent         = hb_oleAnsiToWide( hb_parc(5) );
+      tdc.pButtons           = buttons;
+      tdc.cButtons           = iCount;
+      tdc.dwFlags            = (DWORD) hb_parnl(6);
+      tdc.dwCommonButtons    = (DWORD) hb_parnl(7);
 
-      hRes = pTaskDialogIndirect(&config, &nButtonPressed, &nRadioButton, &pfVerificationFlagChecked);
+      hRes = pTaskDialogIndirect(&tdc, &nButtonPressed, &nRadioButton, &pfVerificationFlagChecked);
+      if( hRes == S_OK )
+      {
+         if( ISBYREF(5) )
+            hb_storni( nButtonPressed, 8 );
+         if( ISBYREF(6) )
+            hb_storni( nRadioButton, 9 );
+         if( ISBYREF(7) )
+            hb_storl( pfVerificationFlagChecked, 10 );
+      }
       if( pArray )
       {
          hb_xfree(buttons);
-      }
-      if( hRes == S_OK )
-      {
-         //OutputDebugValues( "Button: %i Radio: %i\n", nButtonPressed, nRadioButton );
-         if( ISBYREF(5) )
-            hb_storni( nButtonPressed, 5 );
-         if( ISBYREF(6) )
-            hb_storni( nRadioButton, 6 );
-         if( ISBYREF(7) )
-            hb_storl( pfVerificationFlagChecked, 7 );
       }
       hb_retnl( (long) hRes );
    }

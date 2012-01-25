@@ -3506,6 +3506,8 @@ __aProps["B"] := { { "BandChild",               ""           },;
 __aProps["C"] := { { "ContextMenu",             "Behavior" },;
                    { "CheckPathExists",         "Behavior" },;
                    { "CheckFileExists",         "Behavior" },;
+                   { "CLOSE_Button",            "CommonButtons" },;
+                   { "CANCEL_Button",           "CommonButtons" },;
                    { "CaptionBar",              "Style" },;
                    { "ClientEdge",              "Style" },;
                    { "ClipChildren",            "Style" },;
@@ -3682,6 +3684,7 @@ __aProps["N"] := { { "NoHideSel",               "Style" },;
                    { "NoHScroll",               "Behavior" },;
                    { "NoToolTips",              "Behavior" },;
                    { "NoDefaultRadioButton",    "Behavior" },;
+                   { "NO_Button",               "CommonButtons" },;
                    { "Name",                    "Object" } }
 
 __aProps["O"] := { { "OemConvert",              "Style" },;
@@ -3693,6 +3696,7 @@ __aProps["O"] := { { "OemConvert",              "Style" },;
                    { "OfficeXPLook",            "Appearance" },;
                    { "OwnerDrawFixed",          "Behavior" },;
                    { "OwnerDrawVariable",       "Behavior" },;
+                   { "OK_Button",               "CommonButtons" },;
                    { "Objects",                 "Target Folder" } }
 
 __aProps["P"] := { { "PopUp",                   "Style" },;
@@ -3720,6 +3724,7 @@ __aProps["R"] := { { "RadioCheck",              "Style" },;
                    { "ReadTimeOut",             "" },;
                    { "ReceivedBytesThreshold",  "" },;
                    { "RtsEnabled",              "" },;
+                   { "RETRY_Button",            "CommonButtons" },;
                    { "RestoreDirectory",        "Behavior" },;
                    { "RTLLayout",               "Behavior" },;
                    { "ReadOnlyChecked",         "Behavior" },;
@@ -3912,7 +3917,7 @@ __aProps["W"] := { { "WantKeyboardInput",       "Style" },;
                    { "Width",                   "Size" } }
 
 __aProps["X"] := {}
-__aProps["Y"] := {}
+__aProps["Y"] := { { "YES_Button",              "CommonButtons" } }
 __aProps["Z"] := {}
    
    //aSort( aSet,,,{|x, y| x[1] < y[1]})   

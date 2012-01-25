@@ -559,8 +559,17 @@ RETURN .F.
 #define TDF_NO_DEFAULT_RADIO_BUTTON         0x4000
 #define TDF_CAN_BE_MINIMIZED                0x8000
 
+#define TDCBF_OK_BUTTON                     0x0001
+#define TDCBF_YES_BUTTON                    0x0002
+#define TDCBF_NO_BUTTON                     0x0004
+#define TDCBF_CANCEL_BUTTON                 0x0008
+#define TDCBF_RETRY_BUTTON                  0x0010
+#define TDCBF_CLOSE_BUTTON                  0x0020
+   
+
 CLASS TaskDialog INHERIT CommonDialogs
    DATA __Flags         PROTECTED INIT 0
+   DATA __ComBttns      PROTECTED INIT 0
    
    DATA ButtonPressed           EXPORTED
    DATA RadioButton             EXPORTED
@@ -586,10 +595,18 @@ CLASS TaskDialog INHERIT CommonDialogs
    PROPERTY RTLLayout                INDEX TDF_RTL_LAYOUT                  READ xRTLLayout                WRITE __SetFlags DEFAULT .F.
    PROPERTY NoDefaultRadioButton     INDEX TDF_NO_DEFAULT_RADIO_BUTTON     READ xNoDefaultRadioButton     WRITE __SetFlags DEFAULT .F.   
    PROPERTY CanBeMinimized           INDEX TDF_CAN_BE_MINIMIZED            READ xCanBeMinimized           WRITE __SetFlags DEFAULT .F.   
-   
+
+   PROPERTY OK_Button                INDEX TDCBF_OK_BUTTON                 READ xOK_Button                WRITE __SetBttns DEFAULT .F.   
+   PROPERTY YES_Button               INDEX TDCBF_YES_BUTTON                READ xYES_Button               WRITE __SetBttns DEFAULT .F.   
+   PROPERTY NO_Button                INDEX TDCBF_NO_BUTTON                 READ xNO_Button                WRITE __SetBttns DEFAULT .F.   
+   PROPERTY CANCEL_Button            INDEX TDCBF_CANCEL_BUTTON             READ xCANCEL_Button            WRITE __SetBttns DEFAULT .F.   
+   PROPERTY RETRY_Button             INDEX TDCBF_RETRY_BUTTON              READ xRETRY_Button             WRITE __SetBttns DEFAULT .F.   
+   PROPERTY CLOSE_Button             INDEX TDCBF_CLOSE_BUTTON              READ xCLOSE_Button             WRITE __SetBttns DEFAULT .F.   
+
    METHOD Init() CONSTRUCTOR
    METHOD Show()
    METHOD __SetFlags()
+   METHOD __SetBttns()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS TaskDialog
@@ -608,7 +625,14 @@ METHOD Show() CLASS TaskDialog
           ::Buttons[n][1] := VAL(::Buttons[n][1])
       NEXT
    ENDIF
-   nRet := TaskDialogProc( ::Buttons, ::MainInstruction, ::Content, ::__Flags, @nButton, @nRadio, @lChecked )
+   nRet := TaskDialogProc( GetActiveWindow(),;
+                           GetModuleHandle(),;
+                           ::Buttons,;
+                           ::MainInstruction,;
+                           ::Content,;
+                           ::__Flags,;
+                           ::__ComBttns,;
+                           @nButton, @nRadio, @lChecked )
    ::ButtonPressed := nButton
    ::RadioButton   := nRadio
    ::VerificationFlagChecked := lChecked
@@ -622,3 +646,13 @@ METHOD __SetFlags( nFlags, lAdd ) CLASS TaskDialog
       ::__Flags := ::__Flags & NOT( nFlags )
    ENDIF
 RETURN self
+
+METHOD __SetBttns( nButton, lAdd ) CLASS TaskDialog
+   DEFAULT lAdd TO .T.
+   IF lAdd
+      ::__ComBttns := ::__ComBttns | nButton
+    ELSE
+      ::__ComBttns := ::__ComBttns & NOT( nButton )
+   ENDIF
+RETURN self
+
