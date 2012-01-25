@@ -10269,26 +10269,66 @@ HB_FUNC( CERTIFICATEDIALOG )
    }
 }
 
-
-HB_FUNC( TASKDIALOG )
+BOOL Array2Button(PHB_ITEM aButton, TASKDIALOG_BUTTON *tdb )
 {
-   int nButtonPressed                  = 0;
-   TASKDIALOGCONFIG config             = {0};
-   const TASKDIALOG_BUTTON buttons[]   = { 
-                                           { IDOK, L"Change password" }
-                                         };
+   if (HB_IS_ARRAY(aButton) && hb_arrayLen(aButton) == 2)
+   {
+      tdb->nButtonID = hb_arrayGetNL(aButton,1);
+      tdb->pszButtonText = hb_oleAnsiToWide( hb_arrayGetCPtr(aButton,2) );
+      return TRUE ;
+   }
+   return FALSE;
+}
+
+HB_FUNC( TASKDIALOGPROC )
+{
    if( pTaskDialogIndirect )
    {
+      int nButtonPressed                  = 0;
+      TASKDIALOGCONFIG config             = {0};
+      int i;
+      TASKDIALOG_BUTTON *buttons;
+
+      PHB_ITEM pArray = hb_pureparam( 1, HB_IT_ARRAY );
+      if( pArray )
+      {
+         int iCount = pArray->item.asArray.value->ulLen;
+         int i;
+         PHB_ITEM aSub;
+
+         buttons = (TASKDIALOG_BUTTON *) hb_xgrab( iCount * sizeof(TASKDIALOG_BUTTON) );
+
+         for ( i = 0; i < iCount; i++ )
+         {
+            TASKDIALOG_BUTTON tdb;
+            aSub = hb_itemArrayGet( pArray, i+1 );
+
+            if ( Array2Button(aSub, &tdb ))
+            {
+                 *(buttons+i) = tdb ;
+                 hb_itemRelease( aSub );
+            }
+         }
+      }
+ 
       config.cbSize                       = sizeof(TASKDIALOGCONFIG);
       config.hInstance                    = GetModuleHandle( NULL );
       config.dwCommonButtons              = TDCBF_CANCEL_BUTTON;
       config.pszMainIcon                  = TD_WARNING_ICON;
-      config.pszMainInstruction           = L"Change Password";
+      config.pszMainInstruction           = hb_oleAnsiToWide( hb_parc(3) );
       config.pszContent                   = L"Remember your changed password.";
       config.pButtons                     = buttons;
-      config.cButtons                     = 1;
+      config.cButtons                     = hb_parni(2);
+      config.dwFlags                      = TDF_USE_COMMAND_LINKS;
 
       pTaskDialogIndirect(&config, &nButtonPressed, NULL, NULL);
+
+      hb_retni( nButtonPressed );
+
+      if( pArray )
+      {
+         hb_xfree(buttons);
+      }
    }
 }
 

@@ -127,6 +127,11 @@ RETURN nCnt
 METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
    LOCAL cInitialBuffer, cMain, cProject, n
    DEFAULT lNew TO .T.
+   IF !lCustom
+      ::ClsName := "VXH_FORM_IDE"
+    ELSE
+      ::ClsName := "CCTL"
+   ENDIF
    ::Super:Init( oParent )
    ::__lModified := lNew
    ::__IdeImageIndex := 1
@@ -137,10 +142,11 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
    
    ::lCustom     := lCustom
    IF !lCustom
+      ::ClsName := "VXH_FORM_IDE"
       ::Style   := WS_CHILD | WS_CAPTION | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_THICKFRAME | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
       ::xName   := "Form" + XSTR( LEN( ::Application:Project:Forms )+1 )
-      ::ClsName := "VXH_FORM_IDE"
     ELSE
+      ::ClsName := "CCTL"
       ::Style   := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
 
       n := 1
@@ -148,7 +154,6 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
          n++
       ENDDO
       ::xName   := "CustomControl" + XSTR( n )
-      ::ClsName := "CCTL"
       ::__lResizeable :=  {.F.,.F.,.F.,.T.,.T.,.T.,.F.,.F.}
    ENDIF
    ::AutoClose := .F.

@@ -1235,12 +1235,8 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
    ENDIF
    
    ::lPaint := .F.
-
    ::SetRedraw( .F. )
-
-   //EnableScrollBar( ::hWnd, SB_VERT, ESB_DISABLE_BOTH )
    ::ResetContent()
-   //EnableScrollBar( ::hWnd, SB_VERT, ESB_ENABLE_BOTH )
    
    TRY
       WITH OBJECT ::Form
@@ -3158,6 +3154,10 @@ METHOD ResetEvents( aSel ) CLASS EventManager
 
    DEFAULT aSel TO { { ::ActiveObject,, } }
 
+   IF !::lPaint
+      RETURN NIL
+   ENDIF
+
    IF EMPTY( aSel[1] ) .OR. aSel[1][1] == NIL
       ::ResetContent()
       RETURN NIL
@@ -3166,30 +3166,25 @@ METHOD ResetEvents( aSel ) CLASS EventManager
    ::ActiveObject := aSel[1][1]
 
    ::lPaint := .F.
-
    ::SetRedraw( .F. )
-   //EnableScrollBar( ::hWnd, SB_VERT, ESB_DISABLE_BOTH )
    ::ResetContent()
 
    IF ::ActiveObject:Events != NIL
-      ::Application:Yield()
       FOR EACH Topic IN ::ActiveObject:Events
-          ::Application:Yield()
           oItem := ::AddItem( Topic[1] )
           FOR EACH Event IN Topic[2]
               oSub := oItem:AddItem( Event[1], 0, { TreeColItem( Event[2], "C", ,NIL , Event[1]) } )
           NEXT
-          hb_gcall()
+          oItem:Expand()
       NEXT
-      ::ExpandAll()
       IF LEN( ::Items ) > 0
          ::Items[1]:EnsureVisible()
       ENDIF
    ENDIF
-   //EnableScrollBar( ::hWnd, SB_VERT, ESB_ENABLE_BOTH )
    ::lPaint := .T.
    ::SetRedraw( .T. )
-
+   ::Application:Yield()
+   hb_gcall()
 RETURN Self
 
 //------------------------------------------------------------------------------------------
@@ -3335,11 +3330,6 @@ METHOD OnParentDrawItem() CLASS ObjCombo
 
              cText += SubStr( itemTxt, n, 1 )
          NEXT
-
-
-
-         //_ExtTextOut( ::Parent:DrawItemStruct:hDC, 24, y, ETO_OPAQUE + ETO_CLIPPED, { ::Parent:DrawItemStruct:rcItem:Left, ::Parent:DrawItemStruct:rcItem:Top, ::Parent:DrawItemStruct:rcItem:Right, ::Parent:DrawItemStruct:rcItem:Bottom }, itemTxt )
-
       ENDIF
 
       IF ::Parent:DrawItemStruct:itemState & ODS_COMBOBOXEDIT == 0

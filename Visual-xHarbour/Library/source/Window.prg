@@ -12,6 +12,164 @@
 //------------------------------------------------------------------------------------------------------*
 static aDef := {"BMP","ICO"}
 
+static s_aEvents := { ;
+                  {"Clipboard",   {;
+                                  { "OnChangeCbChain"    , "", "" },;
+                                  { "OnDrawClipboard"    , "", "" } } },;
+                  {"Command",     {;
+                                  { "OnClick"            , "", "" },;
+                                  { "OnCancel"           , "", "" },;
+                                  { "OnClose"            , "", "" },;
+                                  { "OnUndock"           , "", "" },;
+                                  { "OnRedock"           , "", "" },;
+                                  { "OnCommand"          , "", "" },;
+                                  { "OnOk"               , "", "" },;
+                                  { "OnNotify"           , "", "" },;
+                                  { "OnParentCommand"    , "", "" },;
+                                  { "OnSysCommand"       , "", "" },;
+                                  { "OnToolTipNotify"    , "", "" } } },;
+                  {"Color",       {;
+                                  { "OnCtlColorBtn"      , "", "" },;
+                                  { "OnCtlColorDlg"      , "", "" },;
+                                  { "OnCtlColorEdit"     , "", "" },;
+                                  { "OnCtlColorListBox"  , "", "" },;
+                                  { "OnCtlColorScrollBar", "", "" },;
+                                  { "OnCtlColorStatic"   , "", "" },;
+                                  { "OnSysColorChange"   , "", "" } } },;
+                  {"Drag & Drop", {;
+                                  { "OnDropFiles"        , "", "" } } },;
+                  {"Drawing",     {;
+                                  { "OnDrawItem"         , "", "" },;
+                                  { "OnEraseBkGnd"       , "", "" },;
+                                  { "OnPaint"            , "", "" } } },;
+                  {"Editing",     {;
+                                  { "OnClear"            , "", "" },;
+                                  { "OnCopy"             , "", "" },;
+                                  { "OnCut"              , "", "" },;
+                                  { "OnPaste"            , "", "" },;
+                                  { "OnUndo"             , "", "" } } },;
+                  {"Keyboard",    {;
+                                  { "OnChar"             , "", "" },;
+                                  { "OnChildChar"        , "", "" },;
+                                  { "OnChildGetDlgCode"  , "", "" },;
+                                  { "OnChildKeyDown"     , "", "" },;
+                                  { "OnGetDlgCode"       , "", "" },;
+                                  { "OnHelp"             , "", "" },;
+                                  { "OnKeyDown"          , "", "" },;
+                                  { "OnKeyUp"            , "", "" },;
+                                  { "OnHotKey"           , "", "" },;
+                                  { "OnSysChar"          , "", "" },;
+                                  { "OnSysKeyDown"       , "", "" },;
+                                  { "OnSysKeyUp"         , "", "" } } },;
+                  {"Layout",      { ;
+                                  { "OnEnterSizeMove"    , "", "" },;
+                                  { "OnExitSizeMove"     , "", "" },;
+                                  { "OnGetMinMaxInfo"    , "", "" },;
+                                  { "OnMeasureItem"      , "", "" },;
+                                  { "OnMove"             , "", "" },;
+                                  { "OnMoving"           , "", "" },;
+                                  { "OnParentMove"       , "", "" },;
+                                  { "OnParentSize"       , "", "" },;
+                                  { "OnSize"             , "", "" },;
+                                  { "OnSizing"           , "", "" },;
+                                  { "OnWindowPaint"      , "", "" },;
+                                  { "OnWindowPosChanged" , "", "" },;
+                                  { "OnWindowPosChanging", "", "" } } },;
+                  {"Menu",        {;
+                                  { "OnCancelMode"       , "", "" },;
+                                  { "OnContextMenu"      , "", "" },;
+                                  { "OnEnterMenuLoop"    , "", "" },;
+                                  { "OnExitMenuLoop"     , "", "" },;
+                                  { "OnInitMenuPopup"    , "", "" },;
+                                  { "OnMenuChar"         , "", "" },;
+                                  { "OnMenuCommand"      , "", "" },;
+                                  { "OnMenuSelect"       , "", "" },;
+                                  { "OnNextMenu"         , "", "" } } },;
+                  {"Mouse",       {;
+                                  { "OnLButtonDblClk"    , "", "" },;
+                                  { "OnLButtonDown"      , "", "" },;
+                                  { "OnLButtonUp"        , "", "" },;
+                                  { "OnMButtonDown"      , "", "" },;
+                                  { "OnMButtonUp"        , "", "" },;
+                                  { "OnMouseActivate"    , "", "" },;
+                                  { "OnMouseHover"       , "", "" },;
+                                  { "OnMouseLeave"       , "", "" },;
+                                  { "OnMouseMove"        , "", "" },;
+                                  { "OnRButtonDown"      , "", "" },;
+                                  { "OnRButtonUp"        , "", "" },;
+                                  { "OnMouseWheel"       , "", "" } } },;
+                  {"Non Client",  { ;
+                                  { "OnNCActivate"       , "", "" },;
+                                  { "OnNCCalcSize"       , "", "" },;
+                                  { "OnNCCreate"         , "", "" },;
+                                  { "OnNCDestroy"        , "", "" },;
+                                  { "OnNCHitTest"        , "", "" },;
+                                  { "OnNCLButtonDown"    , "", "" },;
+                                  { "OnNCLButtonUp"      , "", "" },;
+                                  { "OnNCLButtonDblClk"  , "", "" },;
+                                  { "OnNCRButtonUp"      , "", "" },;
+                                  { "OnNCRButtonDown"    , "", "" },;
+                                  { "OnNCRButtonDblClk"  , "", "" },;
+                                  { "OnNCMButtonUp"      , "", "" },;
+                                  { "OnNCMButtonDown"    , "", "" },;
+                                  { "OnNCMButtonDblClk"  , "", "" },;
+                                  { "OnNCXButtonUp"      , "", "" },;
+                                  { "OnNCXButtonDown"    , "", "" },;
+                                  { "OnNCXButtonDblClk"  , "", "" },;
+                                  { "OnNCMouseHover"     , "", "" },;
+                                  { "OnNCMouseLeave"     , "", "" },;
+                                  { "OnNCMouseMove"      , "", "" },;
+                                  { "OnNCPaint"          , "", "" } } },;
+                  {"Object",      {;
+                                  { "OnInit"             , "", "" } } },;
+                  {"Parent",      {;
+                                  { "OnParentDrawItem"   , "", "" },;
+                                  { "OnParentMeasureItem", "", "" },;
+                                  { "OnParentNotify"     , "", "" },;
+                                  { "OnParentSysCommand" , "", "" } } },;
+                  {"Scroll",      {;
+                                  { "OnHorzScroll"       , "", "" },;
+                                  { "OnVertScroll"       , "", "" } } },;
+                  {"Timer",       {;
+                                  { "OnTimer"            , "", "" } } },;
+                  {"Interface",   {;
+                                  { "OnLoad"             , "", "" },;
+                                  { "OnActivate"         , "", "" },;
+                                  { "OnCreate"           , "", "" },;
+                                  { "OnDestroy"          , "", "" },;
+                                  { "OnEnable"           , "", "" },;
+                                  { "OnHideWindow"       , "", "" },;
+                                  { "OnInitDialog"       , "", "" },;
+                                  { "OnKillFocus"        , "", "" },;
+                                  { "OnMessage"          , "", "" },;
+                                  { "OnSetCursor"        , "", "" },;
+                                  { "OnSetFocus"         , "", "" },;
+                                  { "OnSetFont"          , "", "" },;
+                                  { "OnSetText"          , "", "" },;
+                                  { "OnShowWindow"       , "", "" },;
+                                  { "OnUserMsg"          , "", "" } } },;
+                  {"User",        {;
+                                  { "UserMethod1"        , "", "" },;
+                                  { "UserMethod2"        , "", "" },;
+                                  { "UserMethod3"        , "", "" },;
+                                  { "UserMethod4"        , "", "" },;
+                                  { "UserMethod5"        , "", "" },;
+                                  { "UserMethod6"        , "", "" },;
+                                  { "UserMethod7"        , "", "" },;
+                                  { "UserMethod8"        , "", "" },;
+                                  { "UserMethod9"        , "", "" },;
+                                  { "UserMethod10"       , "", "" },;
+                                  { "UserMethod11"       , "", "" },;
+                                  { "UserMethod12"       , "", "" },;
+                                  { "UserMethod13"       , "", "" },;
+                                  { "UserMethod14"       , "", "" },;
+                                  { "UserMethod15"       , "", "" },;
+                                  { "UserMethod16"       , "", "" },;
+                                  { "UserMethod17"       , "", "" },;
+                                  { "UserMethod18"       , "", "" },;
+                                  { "UserMethod19"       , "", "" } } } }
+
+
 #include "vxh.ch"
 #include "colors.ch"
 #include "debug.ch"
@@ -724,16 +882,16 @@ METHOD Init( oParent ) CLASS Window
          ENDIF
       ENDIF
    ENDIF
-
    DEFAULT ::EventHandler TO Hash()
 
-   IF ::Application != NIL .AND. ::Application:IdeActive //.AND. ::__ClassInst != NIL
-      DEFAULT ::Events TO aEvents()
+   IF oParent != NIL .AND. oParent:__ClassInst != NIL .OR. ::ClsName IN { "VXH_FORM_IDE", "CCTL" }
+      DEFAULT ::Events TO ACLONE( s_aEvents )
       aSort( ::Events,,,{|x, y| x[1] < y[1]})
       FOR EACH Topic IN ::Events
           aSort( Topic[2],,,{|x, y| x[1] < y[1]})
       NEXT
    ENDIF
+
 RETURN SELF
 
 //-----------------------------------------------------------------------------------------------
@@ -4918,165 +5076,6 @@ FUNCTION __DeleteEvents( aEvents, aDelEvents )
       END
    NEXT
 RETURN NIL
-
-
-FUNCTION aEvents()
-   RETURN { ;
-            {"Clipboard",   {;
-                            { "OnChangeCbChain"    , "", "" },;
-                            { "OnDrawClipboard"    , "", "" } } },;
-            {"Command",     {;
-                            { "OnClick"            , "", "" },;
-                            { "OnCancel"           , "", "" },;
-                            { "OnClose"            , "", "" },;
-                            { "OnUndock"           , "", "" },;
-                            { "OnRedock"           , "", "" },;
-                            { "OnCommand"          , "", "" },;
-                            { "OnOk"               , "", "" },;
-                            { "OnNotify"           , "", "" },;
-                            { "OnParentCommand"    , "", "" },;
-                            { "OnSysCommand"       , "", "" },;
-                            { "OnToolTipNotify"    , "", "" } } },;
-            {"Color",       {;
-                            { "OnCtlColorBtn"      , "", "" },;
-                            { "OnCtlColorDlg"      , "", "" },;
-                            { "OnCtlColorEdit"     , "", "" },;
-                            { "OnCtlColorListBox"  , "", "" },;
-                            { "OnCtlColorScrollBar", "", "" },;
-                            { "OnCtlColorStatic"   , "", "" },;
-                            { "OnSysColorChange"   , "", "" } } },;
-            {"Drag & Drop", {;
-                            { "OnDropFiles"        , "", "" } } },;
-            {"Drawing",     {;
-                            { "OnDrawItem"         , "", "" },;
-                            { "OnEraseBkGnd"       , "", "" },;
-                            { "OnPaint"            , "", "" } } },;
-            {"Editing",     {;
-                            { "OnClear"            , "", "" },;
-                            { "OnCopy"             , "", "" },;
-                            { "OnCut"              , "", "" },;
-                            { "OnPaste"            , "", "" },;
-                            { "OnUndo"             , "", "" } } },;
-            {"Keyboard",    {;
-                            { "OnChar"             , "", "" },;
-                            { "OnChildChar"        , "", "" },;
-                            { "OnChildGetDlgCode"  , "", "" },;
-                            { "OnChildKeyDown"     , "", "" },;
-                            { "OnGetDlgCode"       , "", "" },;
-                            { "OnHelp"             , "", "" },;
-                            { "OnKeyDown"          , "", "" },;
-                            { "OnKeyUp"            , "", "" },;
-                            { "OnHotKey"           , "", "" },;
-                            { "OnSysChar"          , "", "" },;
-                            { "OnSysKeyDown"       , "", "" },;
-                            { "OnSysKeyUp"         , "", "" } } },;
-            {"Layout",      { ;
-                            { "OnEnterSizeMove"    , "", "" },;
-                            { "OnExitSizeMove"     , "", "" },;
-                            { "OnGetMinMaxInfo"    , "", "" },;
-                            { "OnMeasureItem"      , "", "" },;
-                            { "OnMove"             , "", "" },;
-                            { "OnMoving"           , "", "" },;
-                            { "OnParentMove"       , "", "" },;
-                            { "OnParentSize"       , "", "" },;
-                            { "OnSize"             , "", "" },;
-                            { "OnSizing"           , "", "" },;
-                            { "OnWindowPaint"      , "", "" },;
-                            { "OnWindowPosChanged" , "", "" },;
-                            { "OnWindowPosChanging", "", "" } } },;
-            {"Menu",        {;
-                            { "OnCancelMode"       , "", "" },;
-                            { "OnContextMenu"      , "", "" },;
-                            { "OnEnterMenuLoop"    , "", "" },;
-                            { "OnExitMenuLoop"     , "", "" },;
-                            { "OnInitMenuPopup"    , "", "" },;
-                            { "OnMenuChar"         , "", "" },;
-                            { "OnMenuCommand"      , "", "" },;
-                            { "OnMenuSelect"       , "", "" },;
-                            { "OnNextMenu"         , "", "" } } },;
-            {"Mouse",       {;
-                            { "OnLButtonDblClk"    , "", "" },;
-                            { "OnLButtonDown"      , "", "" },;
-                            { "OnLButtonUp"        , "", "" },;
-                            { "OnMButtonDown"      , "", "" },;
-                            { "OnMButtonUp"        , "", "" },;
-                            { "OnMouseActivate"    , "", "" },;
-                            { "OnMouseHover"       , "", "" },;
-                            { "OnMouseLeave"       , "", "" },;
-                            { "OnMouseMove"        , "", "" },;
-                            { "OnRButtonDown"      , "", "" },;
-                            { "OnRButtonUp"        , "", "" },;
-                            { "OnMouseWheel"       , "", "" } } },;
-            {"Non Client",  { ;
-                            { "OnNCActivate"       , "", "" },;
-                            { "OnNCCalcSize"       , "", "" },;
-                            { "OnNCCreate"         , "", "" },;
-                            { "OnNCDestroy"        , "", "" },;
-                            { "OnNCHitTest"        , "", "" },;
-                            { "OnNCLButtonDown"    , "", "" },;
-                            { "OnNCLButtonUp"      , "", "" },;
-                            { "OnNCLButtonDblClk"  , "", "" },;
-                            { "OnNCRButtonUp"      , "", "" },;
-                            { "OnNCRButtonDown"    , "", "" },;
-                            { "OnNCRButtonDblClk"  , "", "" },;
-                            { "OnNCMButtonUp"      , "", "" },;
-                            { "OnNCMButtonDown"    , "", "" },;
-                            { "OnNCMButtonDblClk"  , "", "" },;
-                            { "OnNCXButtonUp"      , "", "" },;
-                            { "OnNCXButtonDown"    , "", "" },;
-                            { "OnNCXButtonDblClk"  , "", "" },;
-                            { "OnNCMouseHover"     , "", "" },;
-                            { "OnNCMouseLeave"     , "", "" },;
-                            { "OnNCMouseMove"      , "", "" },;
-                            { "OnNCPaint"          , "", "" } } },;
-            {"Object",      {;
-                            { "OnInit"             , "", "" } } },;
-            {"Parent",      {;
-                            { "OnParentDrawItem"   , "", "" },;
-                            { "OnParentMeasureItem", "", "" },;
-                            { "OnParentNotify"     , "", "" },;
-                            { "OnParentSysCommand" , "", "" } } },;
-            {"Scroll",      {;
-                            { "OnHorzScroll"       , "", "" },;
-                            { "OnVertScroll"       , "", "" } } },;
-            {"Timer",       {;
-                            { "OnTimer"            , "", "" } } },;
-            {"Interface",   {;
-                            { "OnLoad"             , "", "" },;
-                            { "OnActivate"         , "", "" },;
-                            { "OnCreate"           , "", "" },;
-                            { "OnDestroy"          , "", "" },;
-                            { "OnEnable"           , "", "" },;
-                            { "OnHideWindow"       , "", "" },;
-                            { "OnInitDialog"       , "", "" },;
-                            { "OnKillFocus"        , "", "" },;
-                            { "OnMessage"          , "", "" },;
-                            { "OnSetCursor"        , "", "" },;
-                            { "OnSetFocus"         , "", "" },;
-                            { "OnSetFont"          , "", "" },;
-                            { "OnSetText"          , "", "" },;
-                            { "OnShowWindow"       , "", "" },;
-                            { "OnUserMsg"          , "", "" } } },;
-            {"User",        {;
-                            { "UserMethod1"        , "", "" },;
-                            { "UserMethod2"        , "", "" },;
-                            { "UserMethod3"        , "", "" },;
-                            { "UserMethod4"        , "", "" },;
-                            { "UserMethod5"        , "", "" },;
-                            { "UserMethod6"        , "", "" },;
-                            { "UserMethod7"        , "", "" },;
-                            { "UserMethod8"        , "", "" },;
-                            { "UserMethod9"        , "", "" },;
-                            { "UserMethod10"       , "", "" },;
-                            { "UserMethod11"       , "", "" },;
-                            { "UserMethod12"       , "", "" },;
-                            { "UserMethod13"       , "", "" },;
-                            { "UserMethod14"       , "", "" },;
-                            { "UserMethod15"       , "", "" },;
-                            { "UserMethod16"       , "", "" },;
-                            { "UserMethod17"       , "", "" },;
-                            { "UserMethod18"       , "", "" },;
-                            { "UserMethod19"       , "", "" } } } }
 
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------

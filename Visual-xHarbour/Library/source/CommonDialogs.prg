@@ -537,3 +537,32 @@ METHOD Show() CLASS PageSetup
    ENDIF
 RETURN .F.
 
+//------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------
+
+CLASS TaskDialog INHERIT CommonDialogs
+   DATA Buttons        PUBLISHED INIT ""
+   DATA MainInstruction PUBLISHED INIT ""
+   
+   METHOD Init() CONSTRUCTOR
+   METHOD Show()
+ENDCLASS
+
+METHOD Init( oParent ) CLASS TaskDialog
+   ::__xCtrlName   := "TaskDialog"
+   ::ClsName       := "TaskDialog"
+   ::ComponentType := "CommonDialog"
+   Super:Init( oParent )
+RETURN Self
+
+METHOD Show() CLASS TaskDialog
+   LOCAL n
+   IF VALTYPE( ::Buttons ) == "C"
+      ::Buttons := hb_aTokens( ::Buttons, "|" )
+      FOR n := 1 TO LEN( ::Buttons )
+          ::Buttons[n] := hb_aTokens( ::Buttons[n], "," )
+          ::Buttons[n][1] := VAL(::Buttons[n][1])
+      NEXT
+   ENDIF
+RETURN TaskDialogProc( ::Buttons, LEN( ::Buttons ), ::MainInstruction )
