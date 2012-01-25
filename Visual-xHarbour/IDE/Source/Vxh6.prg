@@ -206,6 +206,7 @@ METHOD Create() CLASS ToolBox
    AADD( ::aButtons[6][2], { "PrintDialog", .T. } )
    AADD( ::aButtons[6][2], { "FontDialog", .T. } )
    AADD( ::aButtons[6][2], { "PageSetup", .T. } )
+   AADD( ::aButtons[6][2], { "TaskDialog", .T. } )
 
    //COM
    FOR n := 1 TO LEN( ::ComObjects )
@@ -629,6 +630,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
       EXTERN WinSock
       EXTERN CustomControl
       EXTERN MemoryDataTable
+      EXTERN TaskDialog
    #endif
 
    //Data

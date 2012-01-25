@@ -3464,6 +3464,7 @@ __aProps["A"] := { { "AutoHScroll",             "Style"     },;
                    { "AutoEditHorzScroll",      "Behavior"   },;
                    { "AutoVertScroll",          "Behavior"   },;
                    { "AcceptFiles",             "Behavior"   },;
+                   { "AllowDialogCancellation", "Behavior"   },;
                    { "AnyColor",                "Colors"     },;
                    { "ActiveLinkColor",         "Colors"     },;
                    { "AllowClose",              "Position"   },;
@@ -3525,6 +3526,8 @@ __aProps["C"] := { { "ContextMenu",             "Behavior" },;
                    { "ColorInactiveHeader",     "Appearance" },;
                    { "CustomFormat",            "Appearance" },;
                    { "CheckGroup",              "Behavior" },;
+                   { "CanBeMinimized",          "Behavior" },;
+                   { "CallbackTimer",           "Behavior" },;
                    { "CreatePrompt",            "Behavior" },;
                    { "CheckStyle",              "Behavior" },;
                    { "CurSel",                  "Behavior" },;
@@ -3559,6 +3562,9 @@ __aProps["E"] := { { "EditLabels",              "Style" },;
                    { "Expanded",                "Behavior" },;
                    { "ExtVertScrollBar",        "Behavior" },;
                    { "ExtendedSel",             "Behavior" },;
+                   { "EnableHyperlinks",        "Behavior" },;
+                   { "ExpandFooterArea",        "Behavior" },;
+                   { "ExpandedByDefault",       "Behavior" },;
                    { "Enabled",                 "Behavior", } }
 
 __aProps["F"] := { { "FullRow",                 "Style" },;
@@ -3675,6 +3681,7 @@ __aProps["N"] := { { "NoHideSel",               "Style" },;
                    { "NoColumnHeader",          "Appearance" },;
                    { "NoHScroll",               "Behavior" },;
                    { "NoToolTips",              "Behavior" },;
+                   { "NoDefaultRadioButton",    "Behavior" },;
                    { "Name",                    "Object" } }
 
 __aProps["O"] := { { "OemConvert",              "Style" },;
@@ -3695,6 +3702,7 @@ __aProps["P"] := { { "PopUp",                   "Style" },;
                    { "ParityReplace",           "" },;
                    { "PaperSize",               "Appearance" },;
                    { "PreventFullOpen",         "Behavior" },;
+                   { "PositionRelativeToWindow","Behavior" },;
                    { "ProportionalLeft",        "Dock" },;
                    { "ProportionalTop",         "Dock" },;
                    { "Path",                    "Path" },;
@@ -3713,6 +3721,7 @@ __aProps["R"] := { { "RadioCheck",              "Style" },;
                    { "ReceivedBytesThreshold",  "" },;
                    { "RtsEnabled",              "" },;
                    { "RestoreDirectory",        "Behavior" },;
+                   { "RTLLayout",               "Behavior" },;
                    { "ReadOnlyChecked",         "Behavior" },;
                    { "RemoteIP",                "Connection" },;
                    { "RemotePort",              "Connection" },;
@@ -3829,6 +3838,8 @@ __aProps["S"] := { { "SetAlternate",            "Set" },;
                    { "ShortCut",                "Behavior" },;
                    { "ShowHelp",                "Behavior" },;
                    { "ShowReadOnly",            "Behavior" },;
+                   { "ShowProgressBar",         "Behavior" },;
+                   { "ShowMarqueeProgressBar",  "Behavior" },;
                    { "SqlConnector",            "Connection" },;
                    { "SolidColor",              "Colors" },;
                    { "SelBackColor",            "Colors" },;
@@ -3872,6 +3883,10 @@ __aProps["U"] := { { "UpperCase",               "Style" },;
                    { "UseTabStops",             "Style" },;
                    { "Underline",               "" },;
                    { "UseDLL",                  "Build" },;
+                   { "UseIconMain",             "Behavior" },;
+                   { "UseIconFooter",           "Behavior" },;
+                   { "UseCommandLinks",         "Behavior" },;
+                   { "UseCommandLinksNoIcon",   "Behavior" },;
                    { "UserVariables",           "Object" } }
 
 __aProps["V"] := { { "Vertical",                "Style" },;
@@ -3882,6 +3897,7 @@ __aProps["V"] := { { "Vertical",                "Style" },;
                    { "VisitedColor",            "Colors" },;
                    { "ViewStyle",               "Layout" },;
                    { "Vertical",                "Layout" },;
+                   { "VerificationFlagChecked", "Behavior" },;
                    { "VerticalGripper",         "Layout" } }
 
 __aProps["W"] := { { "WantKeyboardInput",       "Style" },;

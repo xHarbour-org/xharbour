@@ -1501,11 +1501,11 @@ HB_FUNC( SENDMESSAGE )
       }
       else if( HB_IS_NUMERIC( pLPARAM ) )
       {
-         hb_stornl( 4, lParam );
+         hb_stornl( lParam, 4 );
       }
       else if( HB_IS_NIL( pLPARAM ) )
       {
-         hb_stornl( 4, lParam );
+         hb_stornl( lParam, 4 );
       }
       else
       {
@@ -10284,17 +10284,20 @@ HB_FUNC( TASKDIALOGPROC )
 {
    if( pTaskDialogIndirect )
    {
+      HRESULT hRes;
       int nButtonPressed                  = 0;
+      int nRadioButton                    = 0;
+      BOOL pfVerificationFlagChecked      = FALSE;
       TASKDIALOGCONFIG config             = {0};
       int i;
+      int iCount = 0;
       TASKDIALOG_BUTTON *buttons;
-
       PHB_ITEM pArray = hb_pureparam( 1, HB_IT_ARRAY );
+
       if( pArray )
       {
-         int iCount = pArray->item.asArray.value->ulLen;
-         int i;
          PHB_ITEM aSub;
+         iCount = pArray->item.asArray.value->ulLen;
 
          buttons = (TASKDIALOG_BUTTON *) hb_xgrab( iCount * sizeof(TASKDIALOG_BUTTON) );
 
@@ -10315,20 +10318,28 @@ HB_FUNC( TASKDIALOGPROC )
       config.hInstance                    = GetModuleHandle( NULL );
       config.dwCommonButtons              = TDCBF_CANCEL_BUTTON;
       config.pszMainIcon                  = TD_WARNING_ICON;
-      config.pszMainInstruction           = hb_oleAnsiToWide( hb_parc(3) );
-      config.pszContent                   = L"Remember your changed password.";
+      config.pszMainInstruction           = hb_oleAnsiToWide( hb_parc(2) );
+      config.pszContent                   = hb_oleAnsiToWide( hb_parc(3) );
       config.pButtons                     = buttons;
-      config.cButtons                     = hb_parni(2);
-      config.dwFlags                      = TDF_USE_COMMAND_LINKS;
+      config.cButtons                     = iCount;
+      config.dwFlags                      = (DWORD) hb_parnl(4);
 
-      pTaskDialogIndirect(&config, &nButtonPressed, NULL, NULL);
-
-      hb_retni( nButtonPressed );
-
+      hRes = pTaskDialogIndirect(&config, &nButtonPressed, &nRadioButton, &pfVerificationFlagChecked);
       if( pArray )
       {
          hb_xfree(buttons);
       }
+      if( hRes == S_OK )
+      {
+         //OutputDebugValues( "Button: %i Radio: %i\n", nButtonPressed, nRadioButton );
+         if( ISBYREF(5) )
+            hb_storni( nButtonPressed, 5 );
+         if( ISBYREF(6) )
+            hb_storni( nRadioButton, 6 );
+         if( ISBYREF(7) )
+            hb_storl( pfVerificationFlagChecked, 7 );
+      }
+      hb_retnl( (long) hRes );
    }
 }
 

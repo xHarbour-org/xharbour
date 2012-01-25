@@ -541,12 +541,55 @@ RETURN .F.
 //------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------
 
+#define TDF_ENABLE_HYPERLINKS               0x0001
+#define TDF_USE_HICON_MAIN                  0x0002
+#define TDF_USE_HICON_FOOTER                0x0004
+#define TDF_ALLOW_DIALOG_CANCELLATION       0x0008
+#define TDF_USE_COMMAND_LINKS               0x0010
+#define TDF_USE_COMMAND_LINKS_NO_ICON       0x0020
+#define TDF_EXPAND_FOOTER_AREA              0x0040
+
+#define TDF_EXPANDED_BY_DEFAULT             0x0080
+#define TDF_VERIFICATION_FLAG_CHECKED       0x0100
+#define TDF_SHOW_PROGRESS_BAR               0x0200
+#define TDF_SHOW_MARQUEE_PROGRESS_BAR       0x0400
+#define TDF_CALLBACK_TIMER                  0x0800
+#define TDF_POSITION_RELATIVE_TO_WINDOW     0x1000
+#define TDF_RTL_LAYOUT                      0x2000
+#define TDF_NO_DEFAULT_RADIO_BUTTON         0x4000
+#define TDF_CAN_BE_MINIMIZED                0x8000
+
 CLASS TaskDialog INHERIT CommonDialogs
-   DATA Buttons        PUBLISHED INIT ""
+   DATA __Flags         PROTECTED INIT 0
+   
+   DATA ButtonPressed           EXPORTED
+   DATA RadioButton             EXPORTED
+   DATA VerificationFlagChecked EXPORTED
+   
+   DATA Buttons         PUBLISHED INIT ""
    DATA MainInstruction PUBLISHED INIT ""
+   DATA Content         PUBLISHED INIT ""
+
+   PROPERTY EnableHyperlinks         INDEX TDF_ENABLE_HYPERLINKS           READ xEnableHyperlinks         WRITE __SetFlags DEFAULT .F.
+   PROPERTY UseIconMain              INDEX TDF_USE_HICON_MAIN              READ xUseIconMain              WRITE __SetFlags DEFAULT .F.
+   PROPERTY UseIconFooter            INDEX TDF_USE_HICON_FOOTER            READ xUseIconFooter            WRITE __SetFlags DEFAULT .F.
+   PROPERTY AllowDialogCancellation  INDEX TDF_ALLOW_DIALOG_CANCELLATION   READ xAllowDialogCancellation  WRITE __SetFlags DEFAULT .F.
+   PROPERTY UseCommandLinks          INDEX TDF_USE_COMMAND_LINKS           READ xUseCommandLinks          WRITE __SetFlags DEFAULT .F.
+   PROPERTY UseCommandLinksNoIcon    INDEX TDF_USE_COMMAND_LINKS_NO_ICON   READ xUseCommandLinksNoIcon    WRITE __SetFlags DEFAULT .F.
+   PROPERTY ExpandFooterArea         INDEX TDF_EXPAND_FOOTER_AREA          READ xExpandFooterArea         WRITE __SetFlags DEFAULT .F.
+   PROPERTY ExpandedByDefault        INDEX TDF_EXPANDED_BY_DEFAULT         READ xExpandedByDefault        WRITE __SetFlags DEFAULT .F.
+   PROPERTY VerificationFlagChecked  INDEX TDF_VERIFICATION_FLAG_CHECKED   READ xVerificationFlagChecked  WRITE __SetFlags DEFAULT .F.
+   PROPERTY ShowProgressBar          INDEX TDF_SHOW_PROGRESS_BAR           READ xShowProgressBar          WRITE __SetFlags DEFAULT .F.
+   PROPERTY ShowMarqueeProgressBar   INDEX TDF_SHOW_MARQUEE_PROGRESS_BAR   READ xShowMarqueeProgressBar   WRITE __SetFlags DEFAULT .F.
+   PROPERTY CallbackTimer            INDEX TDF_CALLBACK_TIMER              READ xCallbackTimer            WRITE __SetFlags DEFAULT .F.
+   PROPERTY PositionRelativeToWindow INDEX TDF_POSITION_RELATIVE_TO_WINDOW READ xPositionRelativeToWindow WRITE __SetFlags DEFAULT .F.
+   PROPERTY RTLLayout                INDEX TDF_RTL_LAYOUT                  READ xRTLLayout                WRITE __SetFlags DEFAULT .F.
+   PROPERTY NoDefaultRadioButton     INDEX TDF_NO_DEFAULT_RADIO_BUTTON     READ xNoDefaultRadioButton     WRITE __SetFlags DEFAULT .F.   
+   PROPERTY CanBeMinimized           INDEX TDF_CAN_BE_MINIMIZED            READ xCanBeMinimized           WRITE __SetFlags DEFAULT .F.   
    
    METHOD Init() CONSTRUCTOR
    METHOD Show()
+   METHOD __SetFlags()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS TaskDialog
@@ -557,7 +600,7 @@ METHOD Init( oParent ) CLASS TaskDialog
 RETURN Self
 
 METHOD Show() CLASS TaskDialog
-   LOCAL n
+   LOCAL n, nRet, nButton := 0, nRadio := 0, lChecked := .F.
    IF VALTYPE( ::Buttons ) == "C"
       ::Buttons := hb_aTokens( ::Buttons, "|" )
       FOR n := 1 TO LEN( ::Buttons )
@@ -565,4 +608,17 @@ METHOD Show() CLASS TaskDialog
           ::Buttons[n][1] := VAL(::Buttons[n][1])
       NEXT
    ENDIF
-RETURN TaskDialogProc( ::Buttons, LEN( ::Buttons ), ::MainInstruction )
+   nRet := TaskDialogProc( ::Buttons, ::MainInstruction, ::Content, ::__Flags, @nButton, @nRadio, @lChecked )
+   ::ButtonPressed := nButton
+   ::RadioButton   := nRadio
+   ::VerificationFlagChecked := lChecked
+RETURN nButton != IDCANCEL
+
+METHOD __SetFlags( nFlags, lAdd ) CLASS TaskDialog
+   DEFAULT lAdd TO .T.
+   IF lAdd
+      ::__Flags := ::__Flags | nFlags
+    ELSE
+      ::__Flags := ::__Flags & NOT( nFlags )
+   ENDIF
+RETURN self
