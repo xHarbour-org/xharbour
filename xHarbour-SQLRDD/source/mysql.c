@@ -4,12 +4,17 @@
 * All Rights Reserved
 */
 
-#include "compat.h"
-
-#if defined(HB_OS_WIN_32) || defined( HB_OS_WIN )
+/* this is workaround for problems with xHarbour core header files which
+ * define _WINSOCKAPI_ what effectively breaks compilation of code using
+ * sockets. It means that we have to include windows.h before xHarbour
+ * header files.
+ */
+#if defined( WINNT ) || defined( _Windows ) || defined( __NT__ ) || defined( _WIN32 ) || \
+    defined( _WINDOWS_ ) || defined( __WINDOWS_386__ ) || defined( __WIN32__ )
    #include <windows.h>
-   #include <winsock.h>
 #endif
+
+#include "compat.h"
 
 #include "sqlrddsetup.ch"
 #include "sqlprototypes.h"

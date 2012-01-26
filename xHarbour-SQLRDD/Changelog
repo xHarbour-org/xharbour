@@ -8,6 +8,13 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-01-26 11:05 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xHarbour-SQLRDD/source/mysql.c
+    ! added workaround for problems with xHarbour core header files which
+      define _WINSOCKAPI_ what effectively breaks compilation of code using
+      sockets. It means that it's necessary to include windows.h before
+      xHarbour header files.
+
 2012-01-19 02:35 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xHarbour-SQLRDD/source/compat.h
     * added hbset.h and eliminated hbvmint.h from Harbour builds
