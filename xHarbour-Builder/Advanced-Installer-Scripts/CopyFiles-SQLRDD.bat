@@ -1,3 +1,5 @@
+DEL C:\xHB-SetupFiles\xHB.back*.aip /Q
+
     SET XHBTO=C:\xHB-SetupFiles\xHB-Files
 
     C:
@@ -72,10 +74,10 @@ REM ===============================================
     IF "%1" == "BCC-DEMO" SET RC_To=%XHBTO%\Lib\Bcc
 
     IF "%1" == "XHB-DEMO" SET RC_Include=SQL.lib
-    IF "%1" == "BCC-DEMO" SET RC_Include=SQLDEMOBCC55.lib SQLDEMOBCC58.lib
+    IF "%1" == "BCC-DEMO" SET RC_Include=SQLBCC55.lib SQLBCC58.lib
 
-    IF "%1" == "XHB-DEMO" ROBOCOPY "W:\xHB\Lib\Demo" "%RC_To%" %RC_Include% /NS /NC /NP
-    IF "%1" == "BCC-DEMO" ROBOCOPY "W:\xHB\Lib\Bcc"  "%RC_To%" %RC_Include% /NS /NC /NP
+    IF "%1" == "XHB-DEMO" ROBOCOPY "W:\xHB\Lib\Demo"     "%RC_To%" %RC_Include% /NS /NC /NP
+    IF "%1" == "BCC-DEMO" ROBOCOPY "W:\xHB\Lib\Demo\Bcc" "%RC_To%" %RC_Include% /NS /NC /NP
 
 IF "%1" == "Demo" GOTO :EOF
 

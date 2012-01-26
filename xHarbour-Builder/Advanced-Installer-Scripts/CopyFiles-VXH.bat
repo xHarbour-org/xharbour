@@ -1,3 +1,5 @@
+DEL C:\xHB-SetupFiles\xHB.back*.aip /Q
+
     SET XHBTO=C:\xHB-SetupFiles\xHB-Files
 
     C:

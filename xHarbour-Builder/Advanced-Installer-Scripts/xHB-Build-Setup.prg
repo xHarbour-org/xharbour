@@ -15,25 +15,10 @@ FUNCTION Build_xHB_Setup(cEdition, cOFw, cRevision)
    ENDIF
 
    DO CASE
-      CASE IsDirectory("W:\Program Files\Caphyon\Advanced Installer 7.7")
-                  cAI:="W:\Program Files\Caphyon\Advanced Installer 7.7\bin\x86\"
-      CASE IsDirectory("C:\Program Files\Caphyon\Advanced Installer 7.7")
-                  cAI:="C:\Program Files\Caphyon\Advanced Installer 7.7\bin\x86\"
-
-      CASE IsDirectory("W:\Program Files\Caphyon\Advanced Installer 7.6.1")
-                  cAI:="W:\Program Files\Caphyon\Advanced Installer 7.6.1\bin\x86\"
-      CASE IsDirectory("C:\Program Files\Caphyon\Advanced Installer 7.6.1")
-                  cAI:="C:\Program Files\Caphyon\Advanced Installer 7.6.1\bin\x86\"
-
-      CASE IsDirectory("W:\Program Files\Caphyon\Advanced Installer 7.5.2")
-                  cAI:="W:\Program Files\Caphyon\Advanced Installer 7.5.2\"
-      CASE IsDirectory("C:\Program Files\Caphyon\Advanced Installer 7.5.2")
-                  cAI:="C:\Program Files\Caphyon\Advanced Installer 7.5.2\"
-
-      CASE IsDirectory("W:\Program Files\Caphyon\Advanced Installer 7.5")
-                  cAI:="W:\Program Files\Caphyon\Advanced Installer 7.5\"
-      CASE IsDirectory("C:\Program Files\Caphyon\Advanced Installer 7.5")
-                  cAI:="C:\Program Files\Caphyon\Advanced Installer 7.5\"
+      CASE IsDirectory("W:\Program Files\Caphyon\Advanced Installer 8.7")
+                  cAI:="W:\Program Files\Caphyon\Advanced Installer 8.7\bin\x86\"
+      CASE IsDirectory("C:\Program Files\Caphyon\Advanced Installer 8.7")
+                  cAI:="C:\Program Files\Caphyon\Advanced Installer 8.7\bin\x86\"
 
    ENDCASE
 

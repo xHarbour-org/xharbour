@@ -9,6 +9,6 @@
    @call W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles-SQLRDD.bat BCC-RELEASE
    W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-SQLRDD-Setup.exe W BCC-RELEASE
 
-REM @call W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles-SQLRDD.bat BCC-DEMO
-REM W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-SQLRDD-Setup.exe W BCC-DEMO
+   @call W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles-SQLRDD.bat BCC-DEMO
+   W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-SQLRDD-Setup.exe W BCC-DEMO
 
