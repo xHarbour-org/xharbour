@@ -334,16 +334,13 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS Control
       hRegion := CreateRectRgn( 0, 0, ::Width, ::Height )
       hdc := GetDCEx( ::hWnd, hRegion, DCX_WINDOW + DCX_PARENTCLIP + DCX_CLIPSIBLINGS + DCX_VALIDATE )
 
-      //IF ::Style & WS_BORDER != 0
-      //   n ++
-      //ENDIF
-      IF ::ExStyle & WS_EX_CLIENTEDGE != 0
+      IF ::ExStyle & WS_EX_CLIENTEDGE == WS_EX_CLIENTEDGE
          n += 2
       ENDIF
-      IF ::ExStyle & WS_EX_STATICEDGE != 0
+      IF ::ExStyle & WS_EX_STATICEDGE == WS_EX_STATICEDGE
          n += 1
       ENDIF
-      ::CaptionRect := {n, n, ::CaptionWidth-n, ::CaptionHeight + n }
+      ::CaptionRect := { n, n, ::CaptionWidth-n, ::CaptionHeight + n + IIF( ::Style & WS_BORDER == WS_BORDER, 1, 0 ) }
 
       IF ::FlatCaption
          hOldPen   := SelectObject( hDC, ::System:CurrentScheme:Pen:MenuBorder )
