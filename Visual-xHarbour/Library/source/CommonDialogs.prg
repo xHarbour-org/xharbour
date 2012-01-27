@@ -578,6 +578,8 @@ CLASS TaskDialog INHERIT CommonDialogs
    DATA Buttons         PUBLISHED INIT ""
    DATA MainInstruction PUBLISHED INIT ""
    DATA Content         PUBLISHED INIT ""
+   DATA WindowTitle     PUBLISHED INIT ""
+   DATA Footer          PUBLISHED INIT ""
 
    PROPERTY EnableHyperlinks         INDEX TDF_ENABLE_HYPERLINKS           READ xEnableHyperlinks         WRITE __SetFlags DEFAULT .F.
    PROPERTY UseIconMain              INDEX TDF_USE_HICON_MAIN              READ xUseIconMain              WRITE __SetFlags DEFAULT .F.
@@ -625,13 +627,15 @@ METHOD Show() CLASS TaskDialog
           ::Buttons[n][1] := VAL(::Buttons[n][1])
       NEXT
    ENDIF
-   nRet := TaskDialogProc( GetActiveWindow(),;
-                           GetModuleHandle(),;
+   nRet := TaskDialogProc( ::Form:hWnd,;
+                           ::Form:AppInstance,;
                            ::Buttons,;
                            ::MainInstruction,;
                            ::Content,;
                            ::__Flags,;
                            ::__ComBttns,;
+                           ::WindowTitle,;
+                           ::Footer,;
                            @nButton, @nRadio, @lChecked )
    ::ButtonPressed := nButton
    ::RadioButton   := nRadio

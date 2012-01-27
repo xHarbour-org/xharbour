@@ -7,6 +7,9 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2012-01-27 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed controls bad border leaving artifacts when Border is set to true.
+   
 2012-01-24 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Optimized Events manager to avoid flicker.
    * Changed internal array of events to clone from a static array and avoid memory leaks.

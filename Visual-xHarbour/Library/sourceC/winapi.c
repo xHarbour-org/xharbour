@@ -10324,16 +10324,18 @@ HB_FUNC( TASKDIALOGPROC )
       tdc.cButtons           = iCount;
       tdc.dwFlags            = (DWORD) hb_parnl(6);
       tdc.dwCommonButtons    = (DWORD) hb_parnl(7);
+      tdc.pszWindowTitle     = hb_oleAnsiToWide( hb_parc(8) );
+      tdc.pszFooter          = hb_oleAnsiToWide( hb_parc(9) );
 
       hRes = pTaskDialogIndirect(&tdc, &nButtonPressed, &nRadioButton, &pfVerificationFlagChecked);
       if( hRes == S_OK )
       {
          if( ISBYREF(5) )
-            hb_storni( nButtonPressed, 8 );
+            hb_storni( nButtonPressed, 10 );
          if( ISBYREF(6) )
-            hb_storni( nRadioButton, 9 );
+            hb_storni( nRadioButton, 11 );
          if( ISBYREF(7) )
-            hb_storl( pfVerificationFlagChecked, 10 );
+            hb_storl( pfVerificationFlagChecked, 12 );
       }
       if( pArray )
       {
