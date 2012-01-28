@@ -3574,7 +3574,6 @@ __aProps["F"] := { { "FullRow",                 "Style" },;
                    { "Filter",                  "" },;
                    { "FirstChild",              "" },;
                    { "FlatBorder",              "Appearance" },;
-                   { "FlatCaption",             "Appearance" },;
                    { "Flat",                    "Appearance" },;
                    { "Font",                    "Appearance" },;
                    { "FrameStyle",              "Appearance" },;

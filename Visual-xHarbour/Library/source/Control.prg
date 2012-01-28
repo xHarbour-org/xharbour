@@ -37,7 +37,6 @@ CLASS Control INHERIT Window
    ASSIGN Caption(c)           INLINE    ::SetWindowText( c ), IIF( ::SmallCaption, ::RedrawWindow( , , RDW_FRAME | RDW_NOERASE | RDW_NOINTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN ), )
 
    DATA AllowMaximize     PUBLISHED INIT .F.
-   DATA FlatCaption       PUBLISHED INIT .T.
    
    DATA FlatBorder        EXPORTED INIT .F.
    DATA IsContainer       EXPORTED INIT .F.
@@ -73,7 +72,7 @@ CLASS Control INHERIT Window
    DATA BackInfo          PROTECTED
    DATA Center            PROTECTED INIT .F.
    DATA __DockParent      PROTECTED
-
+   Data FlatCaption       EXPORTED INIT .F. //backward compatibility
    DATA __hBorderBtnPen   PROTECTED
    DATA __hSelectBtnBrush PROTECTED
    DATA __hPushedBtnBrush PROTECTED
@@ -295,7 +294,7 @@ METHOD OnNCCalcSize( nwParam, nlParam ) CLASS Control
          ::CaptionHeight := IIF( ::Font != NIL, ABS( ::Font:Height ), ABS( ::Form:Font:Height ) ) + 8
 
          nccs:rgrc[1]:Left += ::EmptyLeft
-         nccs:rgrc[1]:Top  += ::CaptionHeight - IIF( !::IsChild .AND. !::FlatCaption, 2, 0 )
+         nccs:rgrc[1]:Top  += ::CaptionHeight
       ENDIF      
       IF ::FlatBorder .AND. ::__xCtrlName != "ToolBox"
          nccs:rgrc[1]:Left   += 1
@@ -308,7 +307,7 @@ METHOD OnNCCalcSize( nwParam, nlParam ) CLASS Control
       
       nccs:CopyTo( nlParam )
 
-      ::CaptionWidth := nccs:rgrc[1]:Right //- nccs:rgrc[1]:Left
+      ::CaptionWidth := nccs:rgrc[1]:Right
    ENDIF
 RETURN NIL
 
@@ -340,25 +339,16 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS Control
       IF ::ExStyle & WS_EX_STATICEDGE == WS_EX_STATICEDGE
          n += 1
       ENDIF
-      ::CaptionRect := { n, n, ::CaptionWidth-n, ::CaptionHeight + n + IIF( ::Style & WS_BORDER == WS_BORDER, 1, 0 ) }
+      ::CaptionRect := { n, n, ::CaptionWidth - n, ::CaptionHeight + n + IIF( ::Style & WS_BORDER == WS_BORDER, 1, 0 ) }
 
-      IF ::FlatCaption
-         hOldPen   := SelectObject( hDC, ::System:CurrentScheme:Pen:MenuBorder )
-         hBrush    := CreateSolidBrush( GetSysColor( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, COLOR_ACTIVECAPTION, COLOR_INACTIVECAPTION ) ) )
-         hOldBrush := SelectObject( hDC, hBrush )
-         Rectangle( hDC, ::CaptionRect[1], ::CaptionRect[2], ::CaptionRect[3], ::CaptionRect[4] )
-         DeleteObject( SelectObject( hDC, hOldBrush ) )
-         SelectObject( hDC, hOldPen )
-         
-         SetTextColor( hDC, GetSysColor( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, COLOR_CAPTIONTEXT, COLOR_INACTIVECAPTIONTEXT) ) )
-         
-       ELSE
-         _FillRect( hDC, ::CaptionRect, GetSysColorBrush( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, COLOR_ACTIVECAPTION, COLOR_BTNFACE ) ) )
-         IF ( !::HasFocus .AND. !::KeepActiveCaption ) .OR. !::HighlightCaption
-            __Draw3dRect( hDC, ::CaptionRect, GetSysColor(COLOR_3DHIGHLIGHT), GetSysColor(COLOR_3DDKSHADOW))
-         ENDIF
-         SetTextColor( hDC, GetSysColor( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, COLOR_WINDOW, COLOR_WINDOWTEXT ) ) )
-      ENDIF
+      hOldPen   := SelectObject( hDC, ::System:CurrentScheme:Pen:MenuBorder )
+      hBrush    := CreateSolidBrush( GetSysColor( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, COLOR_ACTIVECAPTION, COLOR_INACTIVECAPTION ) ) )
+      hOldBrush := SelectObject( hDC, hBrush )
+      Rectangle( hDC, ::CaptionRect[1], ::CaptionRect[2], ::CaptionRect[3], ::CaptionRect[4] )
+      DeleteObject( SelectObject( hDC, hOldBrush ) )
+      SelectObject( hDC, hOldPen )
+      
+      SetTextColor( hDC, GetSysColor( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, COLOR_CAPTIONTEXT, COLOR_INACTIVECAPTIONTEXT) ) )
 
       hOldFont := SelectObject( hDC, ::Font:handle )
       SetBkMode( hDC, TRANSPARENT )
@@ -367,7 +357,7 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS Control
       IF !::IsChild
          n := 1
       ENDIF
-      
+
       IF ::MenuArrow
          ::ArrowRect := { 0, ::CaptionRect[2]+n+1, 20, ::CaptionRect[4]-2 }
          ::DrawArrow( hDC, ::ArrowRect )
@@ -386,7 +376,6 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS Control
          ::DrawPin( hDC, n )
       ENDIF
       SelectObject( hDC, hOldFont )
-      //DeleteObject( hFont )
       ReleaseDC(::hWnd, hdc)
       DeleteObject( hRegion )
    ENDIF
@@ -396,7 +385,7 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS Control
       hdc := GetDCEx( ::hWnd, hRegion, DCX_WINDOW + DCX_PARENTCLIP + DCX_CLIPSIBLINGS + DCX_VALIDATE )
 
       hOldPen   := SelectObject( hDC, ::System:CurrentScheme:Pen:MenuBorder )
-      hOldBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) ) //IIF( ::BkBrush != NIL, ::BkBrush, GetStockObject( NULL_BRUSH ) ) )
+      hOldBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
       Rectangle( hDC, 0, 0, ::Width, ::Height )
       SelectObject( hDC, hOldBrush )
       SelectObject( hDC, hOldPen )
@@ -749,19 +738,12 @@ METHOD DrawClose( hDC ) CLASS Control
       SelectObject( hDC, IIF( !::ClosePushed, ::System:CurrentScheme:Brush:ButtonCheckedGradientEnd, ::System:CurrentScheme:Brush:MenuItemSelected ) )
       Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
     ELSE
-      IF ::FlatCaption
-         hBrush := CreateSolidBrush( GetSysColor( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, COLOR_ACTIVECAPTION, COLOR_INACTIVECAPTION ) ) )
-         _FillRect( hDC, aRect, hBrush )
-         DeleteObject( hBrush )
-       ELSE
-         _FillRect( hDC, aRect, GetSysColorBrush( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, COLOR_ACTIVECAPTION, COLOR_BTNFACE ) ) )
-         SelectObject( hDC, GetStockObject( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, WHITE_PEN, BLACK_PEN ) ) )
-      ENDIF
+      hBrush := CreateSolidBrush( GetSysColor( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, COLOR_ACTIVECAPTION, COLOR_INACTIVECAPTION ) ) )
+      _FillRect( hDC, aRect, hBrush )
+      DeleteObject( hBrush )
    ENDIF
    SelectObject( hDC, hOld )
-   IF !::FlatCaption .AND. (( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption) .AND. !::CloseHover
-      SelectObject( hDC, GetStockObject( WHITE_PEN ) )
-   ENDIF
+
    aRect[1]+=4
    aRect[2]+=4
    aRect[3]-=4
@@ -823,21 +805,12 @@ METHOD DrawPin( hDC, n ) CLASS Control
       SelectObject( hDC, IIF( !::PinPushed, ::System:CurrentScheme:Brush:ButtonCheckedGradientEnd, ::System:CurrentScheme:Brush:MenuItemSelected ) )
       Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
     ELSE
-      IF ::FlatCaption
-         hBrush := CreateSolidBrush( GetSysColor( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, COLOR_ACTIVECAPTION, COLOR_INACTIVECAPTION ) ) )
-         _FillRect( hDC, aRect, hBrush )
-         DeleteObject( hBrush )
-       ELSE
-         _FillRect( hDC, aRect, GetSysColorBrush( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, COLOR_ACTIVECAPTION, COLOR_BTNFACE ) ) )
-         SelectObject( hDC, GetSysColorBrush( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, COLOR_ACTIVECAPTION, COLOR_BTNFACE ) ) )
-         SelectObject( hDC, GetStockObject( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, WHITE_PEN, BLACK_PEN ) ) )
-      ENDIF
+      hBrush := CreateSolidBrush( GetSysColor( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, COLOR_ACTIVECAPTION, COLOR_INACTIVECAPTION ) ) )
+      _FillRect( hDC, aRect, hBrush )
+      DeleteObject( hBrush )
    ENDIF
    SelectObject( hDC, hOld )
    
-   IF !::FlatCaption .AND. (( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption) .AND. !::PinHover
-      SelectObject( hDC, GetStockObject( WHITE_PEN ) )
-   ENDIF
    aRect[1] += 4
    aRect[2] += (3-n)
    aRect[3] -= 4

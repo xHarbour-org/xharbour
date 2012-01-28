@@ -1408,7 +1408,6 @@ METHOD Init() CLASS IDE_MainForm
       :AllowUndock      := .T.
       :AllowClose       := .T.
       :OnWMClose        := {|o| IIF( o:IsDocked, (o:Hide(), ::Application:Props[ "ViewObjectManagerItem" ]:Checked := .F. ), o:Redock() ) }
-      :FlatCaption      := .T.
       :Width            := Round( ( :Parent:ClientWidth*::Application:Sizes["ObjectManagerWidth"])/100,0)
       :Height           := 300
       :Dock:Margin      := 2
