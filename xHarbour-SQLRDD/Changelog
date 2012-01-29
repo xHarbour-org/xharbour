@@ -8,6 +8,29 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-01-29 17:12 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xHarbour-SQLRDD/source/compat.h
+    * do not redefine TRUE and FALSE macros if they already exists
+
+  * xHarbour-SQLRDD/source/firebird.c
+  * xHarbour-SQLRDD/source/sqlex2.c
+  * xHarbour-SQLRDD/source/sqlex3.c
+  * xHarbour-SQLRDD/source/sqlsrodbc.c
+    * pacified warnings with uninitialized variables
+
+  * xHarbour-SQLRDD/source/sqlact.c
+    ! fixed potential GPF traps and memory corruption due to
+      uninitialized variables
+
+  * xHarbour-SQLRDD/source/sqlex1.c
+    * pacified warnings with uninitialized variables
+    * removed redundant bPrepare parameter of getWhereExpression()
+      function and modified the code to always initialize index
+      when it's necessary for given action.
+
+  * xHarbour-SQLRDD/source/sqlrdd.hbx
+    * updated automatically
+
 2012-01-26 11:05 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xHarbour-SQLRDD/source/mysql.c
     ! added workaround for problems with xHarbour core header files which

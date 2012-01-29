@@ -95,8 +95,12 @@
 
    #define EVALINFO           HB_EVALINFO
 
-   #define FALSE              0
-   #define TRUE               (!0)
+   #ifndef FALSE
+      #define FALSE           0
+   #endif
+   #ifndef TRUE
+      #define TRUE               (!0)
+   #endif
 
    #define ISBYREF(x)         HB_ISBYREF(x)
    #define ISCHAR(x)          HB_ISCHAR(x)

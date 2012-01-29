@@ -770,8 +770,8 @@ HB_FUNC( FBGETDATA )    // FBGetData( hEnv, nField, @uData )
          case IB_SQL_SHORT:
             p = data;
             {
-               ISC_INT64  value;
-               short field_width, dscale;
+               ISC_INT64 value = 0;
+               short field_width = 0, dscale;
                switch (dtype)
                {
                case IB_SQL_SHORT:
@@ -1367,8 +1367,8 @@ HB_FUNC( FBLINEPROCESSED )
                case IB_SQL_SHORT:
                   p = data;
                   {
-                     ISC_INT64  value;
-                     short field_width, dscale;
+                     ISC_INT64 value = 0;
+                     short field_width = 0, dscale;
                      switch (dtype)
                      {
                      case IB_SQL_SHORT:

@@ -686,7 +686,7 @@ HB_FUNC( SR_ODBCGETLINES ) // ( ::hStmt, nLenBuff, aFields, aCache, nSystemID, l
 {
    LONG lLen, lLenOut, lInitBuff, lIndex;
    PTR  bBuffer, bOut;
-   RETCODE wResult, wReturn;
+   RETCODE wResult, wReturn = SQL_ERROR;
    int iReallocs;
    PHB_ITEM pLine, temp;
    int i, cols, line;

@@ -27,40 +27,37 @@ int sql_yyparse( void* stmt );
 HB_FUNC( SR_SQLPARSE )     /* SqlParse( cCommand, @nError, @nErrorPos ) */
 {
    ULONG uLenPhrase = hb_parclen( 1 );
-   sql_stmt * stmt;
-   const char * sqlPhrase;
-   const char * sqlIniPos;
 
    if( uLenPhrase )
    {
-      stmt   = (sql_stmt *) hb_xgrab( sizeof( sql_stmt ) );
+      sql_stmt * stmt = (sql_stmt *) hb_xgrab( sizeof( sql_stmt ) );
+      const char * sqlPhrase;
+      const char * sqlIniPos;
 
-      stmt->numParam = 0;
-      stmt->pTemp = NULL;
+      memset( stmt, 0, sizeof( sql_stmt ) );
+      sqlIniPos = sqlPhrase = hb_parc( 1 );
 
-      sqlPhrase = hb_parc( 1 );
-      sqlIniPos = sqlPhrase;
-
-      if (SqlParse( stmt, sqlPhrase, PARSE_ALL_QUERY ))
+      if( SqlParse( stmt, sqlPhrase, PARSE_ALL_QUERY ) )
       {
          // printf("Parse OK. Retornado array de %i posicoes.\n", stmt->pArray->item.asArray.value->ulLen );
       }
       else
       {
-         stmt->pArray = hb_itemArrayNew(0);
+         stmt->pArray = hb_itemArrayNew( 0 );
          // printf("Parse ERROR. Retornado array de %i posicoes.\n", stmt->pArray->item.asArray.value->ulLen );
 
-         if ( ISBYREF( 2 ) ) {
+         if( ISBYREF( 2 ) )
+         {
             hb_itemPutNI( (PHB_ITEM) hb_param( 2, HB_IT_ANY ), stmt->errMsg );
          }
-
-         if ( ISBYREF( 3 ) ) {
-            hb_itemPutNI( (PHB_ITEM) hb_param( 3, HB_IT_ANY ), (int) ( stmt->queryPtr - sqlIniPos ) );
-        }
+         if( ISBYREF( 3 ) )
+         {
+            hb_itemPutNI( (PHB_ITEM) hb_param( 3, HB_IT_ANY ), ( int ) ( stmt->queryPtr - sqlIniPos ) );
+         }
       }
+      hb_itemRelease( hb_itemReturnForward( stmt->pArray ) );
+      hb_xfree( stmt );
    }
-   hb_itemRelease( hb_itemReturnForward( stmt->pArray ) );
-   hb_xfree( stmt );
 }
 
 /*

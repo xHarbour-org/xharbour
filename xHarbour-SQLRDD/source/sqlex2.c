@@ -384,7 +384,7 @@ HB_ERRCODE BindInsertColumns( SQLEXAREAP thiswa )
 {
    int iCol, iCols, iBind;
    COLUMNBINDP InsertRecord;
-   SQLRETURN res;
+   SQLRETURN res = SQL_ERROR;
 
    iCols        = hb_arrayLen( thiswa->aFields );
    InsertRecord = thiswa->InsertRecord;
@@ -438,7 +438,7 @@ HB_ERRCODE BindInsertColumns( SQLEXAREAP thiswa )
             }
             case SQL_C_TYPE_TIMESTAMP:
             {
-	            //DebugBreak();
+               //DebugBreak();
                InsertRecord->lIndPtr = 0;
                res = SQLBindParameter( thiswa->hStmtInsert, iBind, SQL_PARAM_INPUT,
                                        SQL_C_TYPE_TIMESTAMP,

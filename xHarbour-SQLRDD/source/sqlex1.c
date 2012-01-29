@@ -888,7 +888,7 @@ static void BindAllIndexStmts( SQLEXAREAP thiswa )
    INDEXBINDP IndexBind, IndexBindParam;
    COLUMNBINDP BindStructure;
    int iCol, iBind, iLoop;
-   SQLRETURN res;
+   SQLRETURN res = SQL_ERROR;
    char * sSql;
 
    if( thiswa->hOrdCurrent == 0 )
@@ -953,7 +953,7 @@ static void BindAllIndexStmts( SQLEXAREAP thiswa )
                   }
                   case SQL_C_TYPE_TIMESTAMP:
                   {
-	                  //DebugBreak();
+                     //DebugBreak();
                      res = SQLBindParameter( hStmt, iBind, SQL_PARAM_INPUT,
                                              SQL_C_TYPE_TIMESTAMP,
                                              SQL_TYPE_TIMESTAMP,
@@ -1351,7 +1351,7 @@ void SetCurrRecordStructure( SQLEXAREAP thiswa )
 
 /*------------------------------------------------------------------------*/
 
-static HB_ERRCODE getWhereExpression( SQLEXAREAP thiswa, int iListType, BOOL bPrepare )
+static HB_ERRCODE getWhereExpression( SQLEXAREAP thiswa, int iListType )
 {
    // This function creates WHERE expression to some workarea movment methods,
    // including dbGoTop()/dbGobottom() and dbSkip()
@@ -1361,7 +1361,6 @@ static HB_ERRCODE getWhereExpression( SQLEXAREAP thiswa, int iListType, BOOL bPr
    PHB_ITEM pFieldData, pTemp;
    BOOL bArgumentIsNull;
    BOOL bDirectionFWD;
-   INDEXBINDP IndexBind;
    COLUMNBINDP BindStructure;
    char * temp;
    // Culik Let Clear all memorym this is more eficient and safe the adding an \0 to position 0
@@ -1369,15 +1368,12 @@ static HB_ERRCODE getWhereExpression( SQLEXAREAP thiswa, int iListType, BOOL bPr
    //thiswa->sWhere[0] = '\0';
    thiswa->bConditionChanged1 = FALSE;
 
-   if (bPrepare)
-   {
-      IndexBind = thiswa->IndexBindings[ thiswa->hOrdCurrent ];
-   }
-
    // Resolve record or index navigation
 
    if( iListType == LIST_SKIP_FWD || iListType == LIST_SKIP_BWD )
    {
+      INDEXBINDP IndexBind = thiswa->IndexBindings[ thiswa->hOrdCurrent ];
+
       thiswa->recordListDirection = ( iListType == LIST_SKIP_FWD ? LIST_FORWARD : LIST_BACKWARD );
       bDirectionFWD               = iListType == LIST_SKIP_FWD;
 
@@ -1986,15 +1982,16 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
 
       thiswa->bConditionChanged2 = TRUE;     // SEEK statements are no longer valid - column list has changed!
       memset(thiswa->sSqlBuffer , 0 , MAX_SQL_QUERY_LEN / 5  * sizeof( char ) );
-      if (thiswa->bIsSelect)
-	  {
-		  sprintf( thiswa->sSqlBuffer, "SELECT %s FROM (%s) A WHERE A.%c%s%c IN ( ?", thiswa->sFields, thiswa->szDataFileName, OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa ) );
+      if( thiswa->bIsSelect )
+      {
+         sprintf( thiswa->sSqlBuffer, "SELECT %s FROM (%s) A WHERE A.%c%s%c IN ( ?", thiswa->sFields, thiswa->szDataFileName, OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa ) );
       }
       else
       {
-      sprintf( thiswa->sSqlBuffer, "SELECT %s \nFROM %s A \nWHERE A.%c%s%c IN ( ?", thiswa->sFields, thiswa->sTable, OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa ) );
+         sprintf( thiswa->sSqlBuffer, "SELECT %s \nFROM %s A \nWHERE A.%c%s%c IN ( ?", thiswa->sFields, thiswa->sTable, OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa ) );
       }
 
+      iEnd = ( USHORT ) strlen( thiswa->sSqlBuffer );
       for ( i = 20; i < (MAX_SQL_QUERY_LEN/5); i++ )
       {
          if( thiswa->sSqlBuffer[i] == '?' )
@@ -2414,7 +2411,7 @@ static BOOL CreateSkipStmt( SQLEXAREAP thiswa )
 
       for ( i=1; i <= thiswa->indexColumns; i++ )
       {
-         getWhereExpression( thiswa, thiswa->recordListDirection == LIST_FORWARD ? LIST_SKIP_FWD : LIST_SKIP_BWD, TRUE );
+         getWhereExpression( thiswa, thiswa->recordListDirection == LIST_FORWARD ? LIST_SKIP_FWD : LIST_SKIP_BWD );
          createRecodListQuery( thiswa );
          prepareRecordListQuery( thiswa );
          thiswa->indexLevel--;
@@ -2504,7 +2501,7 @@ static HB_ERRCODE sqlExGoBottom( SQLEXAREAP thiswa )
       {
          thiswa->recordListDirection = LIST_BACKWARD;
          getOrderByExpression( thiswa, FALSE );
-         getWhereExpression( thiswa, LIST_FROM_BOTTOM, FALSE );
+         getWhereExpression( thiswa, LIST_FROM_BOTTOM );
          setResultSetLimit( thiswa, RECORD_LIST_SIZE / 10 );
          createRecodListQuery( thiswa );
 
@@ -2522,7 +2519,7 @@ static HB_ERRCODE sqlExGoBottom( SQLEXAREAP thiswa )
       thiswa->recordListDirection = LIST_BACKWARD;
 
       getOrderByExpression( thiswa, FALSE );
-      getWhereExpression( thiswa, LIST_FROM_BOTTOM, FALSE );
+      getWhereExpression( thiswa, LIST_FROM_BOTTOM );
       setResultSetLimit( thiswa, RECORD_LIST_SIZE / 10 );
       createRecodListQuery( thiswa );
 
@@ -2677,7 +2674,7 @@ static HB_ERRCODE sqlExGoTop( SQLEXAREAP thiswa )
       {
 	     thiswa->recordListDirection = LIST_FORWARD;
          getOrderByExpression( thiswa, FALSE );
-         getWhereExpression( thiswa, LIST_FROM_TOP, FALSE );
+         getWhereExpression( thiswa, LIST_FROM_TOP );
          setResultSetLimit( thiswa, RECORD_LIST_SIZE / 10 );
          createRecodListQuery( thiswa );
 
@@ -2694,7 +2691,7 @@ static HB_ERRCODE sqlExGoTop( SQLEXAREAP thiswa )
    {
       thiswa->recordListDirection = LIST_FORWARD;
       getOrderByExpression( thiswa, FALSE );
-      getWhereExpression( thiswa, LIST_FROM_TOP, FALSE );
+      getWhereExpression( thiswa, LIST_FROM_TOP );
       setResultSetLimit( thiswa, RECORD_LIST_SIZE / 10 );
       createRecodListQuery( thiswa );
 
@@ -4178,7 +4175,7 @@ static HB_ERRCODE sqlExOrderInfo( SQLEXAREAP thiswa, USHORT uiIndex, LPDBORDERIN
          case DBOI_KEYCOUNT:
          {
             long lValue;
-            getWhereExpression( thiswa, LIST_FROM_TOP, FALSE );
+            getWhereExpression( thiswa, LIST_FROM_TOP );
             createCountQuery( thiswa );
 
             if ( getFirstColumnAsLong( thiswa, &lValue ) == HB_FAILURE )

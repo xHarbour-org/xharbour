@@ -311,6 +311,7 @@ HB_ERRCODE FeedSeekKeyToBindings( SQLEXAREAP thiswa, PHB_ITEM pKey, int * queryL
       for( i=1; i <= thiswa->indexColumns; i++ )
       {
          BindStructure   = GetBindStruct( thiswa, SeekBind );
+         size = 0;
 
          switch ( BindStructure->iCType )
          {
@@ -524,7 +525,7 @@ void BindSeekStmt( SQLEXAREAP thiswa, int queryLevel )
    INDEXBINDP SeekBind, SeekBindParam;
    COLUMNBINDP BindStructure;
    int iBind, iLoop;
-   SQLRETURN res;
+   SQLRETURN res = SQL_ERROR;
    char * sSql;
 
    SeekBind = thiswa->IndexBindings[ thiswa->hOrdCurrent ];
@@ -619,6 +620,7 @@ HB_ERRCODE getPreparedSeek( SQLEXAREAP thiswa, int queryLevel, USHORT * iIndex, 
    SeekBind = thiswa->IndexBindings[ thiswa->hOrdCurrent ];
    //this line bellow make the last field current
    //SeekBind += ( queryLevel -1 );         // place offset
+   HB_SYMBOL_UNUSED( queryLevel );
 
    * hStmt = thiswa->recordListDirection == LIST_FORWARD ? SeekBind->SeekFwdStmt : SeekBind->SeekBwdStmt;
 
