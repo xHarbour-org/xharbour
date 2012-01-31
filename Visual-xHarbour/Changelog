@@ -7,6 +7,17 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2012-01-30 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed memory overload creating array of events.
+   + Added new METHOD System:GetRunningProcs()
+     It returns an array of running processes with 3 sub-elements
+
+     1) Process Name
+     2) Command Line
+     3) Creation Date
+
+     { "vxh.exe", "\xhb\bin\vxh.exe", 01/30/12 }
+
 2012-01-27 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed controls bad border leaving artifacts when Border is set to true.
    

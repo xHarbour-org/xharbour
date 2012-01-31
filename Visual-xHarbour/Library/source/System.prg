@@ -82,6 +82,8 @@ CLASS System
    METHOD GetPathFromFolder()
    METHOD GetLocalTime()
    METHOD GetFocus()
+   METHOD GetRunningProcs()
+   
    METHOD UpdateColorSchemes() INLINE ::CurrentScheme:Load()
    ACCESS Services             INLINE __ENUMSERVICES()
 
@@ -704,6 +706,24 @@ METHOD Init() CLASS System
    ExplorerBarInfo( @cBuffer )
    ::ExplorerBar:Buffer( cBuffer )
 RETURN Self
+
+METHOD GetRunningProcs() CLASS System
+   LOCAL oLocator, oProcess, aProcessList, oWMIService, aProcess := {}
+   TRY
+      oLocator := GetActiveObject("WbemScripting.SWbemLocator") 
+    CATCH
+      oLocator := CreateObject("WbemScripting.SWbemLocator") 
+   END
+   TRY
+      oWMIService  := oLocator:ConnectServer( , "root\CIMV2", , , "MS_409", ) 
+      aProcessList := oWMIService:ExecQuery("SELECT * FROM Win32_Process")
+      
+      FOR EACH oProcess IN aProcessList
+          AADD( aProcess, { oProcess:Name, oProcess:CommandLine, IIF( !EMPTY(oProcess:CreationDate), STOD( LEFT( oProcess:CreationDate, 8 ) ),"") } )
+      NEXT
+   CATCH
+   END
+RETURN aProcess
 
 FUNCTION GC2RGB( p_nColor )
    LOCAL l_nRed, l_nGreen, l_nBlue 
