@@ -481,6 +481,8 @@ ZLIB_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)compress$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)crc32$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)deflate$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)gzread$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)gzclose$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)gzlib$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)gzwrite$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)infback$(OBJEXT)\

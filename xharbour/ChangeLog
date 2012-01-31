@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-01-31 15:50 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  - source/rtl/zlib/zconf.in.h
+  + source/rtl/zlib/gzread.c
+  + source/rtl/zlib/gzclose.c
+  * winmake/common.mak
+  * winmake/compile.mak
+    ! added missing files to and deleted file no longer required for zlib library
+
 2012-01-31 10:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/zlib/adler32.c
   * source/rtl/zlib/compress.c
