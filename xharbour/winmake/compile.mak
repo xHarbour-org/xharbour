@@ -1492,7 +1492,10 @@ $(OBJ_DIR)$(DIR_SEP)crc32$(OBJEXT) : $(ZLIB_DIR)$(DIR_SEP)crc32.c
 $(OBJ_DIR)$(DIR_SEP)deflate$(OBJEXT) : $(ZLIB_DIR)$(DIR_SEP)deflate.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)gzio$(OBJEXT) : $(ZLIB_DIR)$(DIR_SEP)gzio.c
+$(OBJ_DIR)$(DIR_SEP)gzlib$(OBJEXT) : $(ZLIB_DIR)$(DIR_SEP)gzlib.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)gzwrite$(OBJEXT) : $(ZLIB_DIR)$(DIR_SEP)gzwrite.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)infback$(OBJEXT) : $(ZLIB_DIR)$(DIR_SEP)infback.c

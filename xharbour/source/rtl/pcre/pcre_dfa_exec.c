@@ -2784,7 +2784,7 @@ for (;;)
             {
             const uschar *p = ptr;
             const uschar *pp = local_ptr;
-            charcount = pp - p;
+            charcount = (int)(pp - p);
             while (p < pp) if ((*p++ & 0xc0) == 0x80) charcount--;
             ADD_NEW_DATA(-next_state_offset, 0, (charcount - 1));
             }

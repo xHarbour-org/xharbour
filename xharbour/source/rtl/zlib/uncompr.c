@@ -1,7 +1,6 @@
 /*
  * $Id$
  */
-
 /* uncompr.c -- decompress a memory buffer
  * Copyright (C) 1995-2003, 2010 Jean-loup Gailly.
  * For conditions of distribution and use, see copyright notice in zlib.h
@@ -29,7 +28,7 @@ int ZEXPORT uncompress (
     Bytef *dest,
     uLongf *destLen,
     const Bytef *source,
-    uLong sourceLen )
+    uLong sourceLen)
 {
     z_stream stream;
     int err;

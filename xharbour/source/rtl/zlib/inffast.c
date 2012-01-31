@@ -1,7 +1,6 @@
 /*
  * $Id$
  */
-
 /* inffast.c -- fast decoding
  * Copyright (C) 1995-2008, 2010 Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
@@ -70,7 +69,7 @@
  */
 void ZLIB_INTERNAL inflate_fast(
 z_streamp strm,
-unsigned start )         /* inflate()'s starting value for strm->avail_out */
+unsigned start)         /* inflate()'s starting value for strm->avail_out */
 {
     struct inflate_state FAR *state;
     unsigned char FAR *in;      /* local strm->next_in */

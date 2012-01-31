@@ -1,7 +1,6 @@
 /*
  * $Id$
  */
-
 /* compress.c -- compress a memory buffer
  * Copyright (C) 1995-2005 Jean-loup Gailly.
  * For conditions of distribution and use, see copyright notice in zlib.h
@@ -28,7 +27,7 @@ int ZEXPORT compress2 (
     uLongf *destLen,
     const Bytef *source,
     uLong sourceLen,
-    int level )
+    int level)
 {
     z_stream stream;
     int err;
@@ -79,7 +78,7 @@ int ZEXPORT compress (
    this function needs to be updated.
  */
 uLong ZEXPORT compressBound (
-    uLong sourceLen )
+    uLong sourceLen)
 {
     return sourceLen + (sourceLen >> 12) + (sourceLen >> 14) +
            (sourceLen >> 25) + 13;

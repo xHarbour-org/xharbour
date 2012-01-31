@@ -159,5 +159,5 @@ void hb_compPrintCredits( void )
 void hb_compPrintLogo( void )
 {
    printf( "xHarbour Compiler build %d.%d.%d (%s) (Rev. %d)\n", HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX, hb_verCvsID() );
-   printf( "Copyright 1999-2011, http://www.xharbour.org http://www.harbour-project.org/\n" );
+   printf( "Copyright 1999-2012, http://www.xharbour.org http://www.harbour-project.org/\n" );
 }
