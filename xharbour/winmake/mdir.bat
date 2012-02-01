@@ -226,6 +226,7 @@ if exist lib\%LIBPREFIX%gtstd%LIBEXT%                del lib\%LIBPREFIX%gtstd%LI
 if exist lib\%LIBPREFIX%gtwin%LIBEXT%                del lib\%LIBPREFIX%gtwin%LIBEXT%
 if exist lib\%LIBPREFIX%gtwvg%LIBEXT%                del lib\%LIBPREFIX%gtwvg%LIBEXT%
 if exist lib\%LIBPREFIX%gtwvt%LIBEXT%                del lib\%LIBPREFIX%gtwvt%LIBEXT%
+if exist lib\%LIBPREFIX%gtwvw%LIBEXT%                del lib\%LIBPREFIX%gtwvw%LIBEXT%
 if exist lib\%LIBPREFIX%hbodbc%LIBEXT%               del lib\%LIBPREFIX%hbodbc%LIBEXT%
 if exist lib\%LIBPREFIX%hbodbcmt%LIBEXT%             del lib\%LIBPREFIX%hbodbcmt%LIBEXT%
 if exist lib\%LIBPREFIX%hbsix%LIBEXT%                del lib\%LIBPREFIX%hbsix%LIBEXT%
@@ -250,6 +251,7 @@ if exist lib\%LIBPREFIX%samples%LIBEXT%              del lib\%LIBPREFIX%samples%
 if exist lib\%LIBPREFIX%samplesmt%LIBEXT%            del lib\%LIBPREFIX%samplesmt%LIBEXT%
 if exist lib\%LIBPREFIX%sixcdx%LIBEXT%               del lib\%LIBPREFIX%sixcdx%LIBEXT%
 if exist lib\%LIBPREFIX%sixcdxmt%LIBEXT%             del lib\%LIBPREFIX%sixcdxmt%LIBEXT%
+if exist lib\%LIBPREFIX%sevenzip%LIBEXT%             del lib\%LIBPREFIX%sevenzip%LIBEXT%
 if exist lib\%LIBPREFIX%tip%LIBEXT%                  del lib\%LIBPREFIX%tip%LIBEXT%
 if exist lib\%LIBPREFIX%tipmt%LIBEXT%                del lib\%LIBPREFIX%tipmt%LIBEXT%
 if exist lib\%LIBPREFIX%use_dll%LIBEXT%              del lib\%LIBPREFIX%use_dll%LIBEXT%
