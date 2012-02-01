@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-02-01 11:32 UTC-0800 Luis Krause <kaddath at shaw dot ca>
+  * contrib/rdd_ads/adsexternal.ch
+    ! added AdsSetIndexDirection & AdsSkipUnique for ADS >= 9
+
 2012-02-01 10:50 UTC-0800 Luis Krause <kaddath at shaw dot ca>
   * winmake/mdir.bat
     ! added gtwvw and sevenzip when called with CLEAN param 
