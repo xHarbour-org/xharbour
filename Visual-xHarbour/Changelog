@@ -19,6 +19,17 @@
      
      The second parameter indicates whether **ALL INSTANCES** of the process should be terminated.
 
+     OR simply use both methods in conjuction:
+     
+     ::System:IsProcRunning( "iexplorer.exe", .T. )  // kills all vxh.exe (if any)
+     lVXH := ::System:IsProcRunning( "iexplorer.exe" ) // must return false
+
+     Or killing another process based on the existance of another one:
+     In this case iexplorer will be killed if vxh is running:
+
+     ::System:IsProcRunning( "iexplorer.exe", ::System:IsProcRunning( "vxh.exe" ) )
+
+     
 2012-01-30 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed memory overload creating array of events.
    + Added new METHOD System:GetRunningProcs()

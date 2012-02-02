@@ -736,11 +736,11 @@ METHOD IsProcRunning( cProcName, lTerminate ) CLASS System
    oWMIService  := oLocator:ConnectServer( , "root\CIMV2", , , "MS_409", ) 
    aProcessList := oWMIService:ExecQuery("SELECT * FROM Win32_Process WHERE Name = '"+cProcName+"'")
       
-   FOR EACH oProcess IN aProcessList
-       IF lTerminate
+   IF lTerminate
+      FOR EACH oProcess IN aProcessList
           oProcess:Terminate()
-       ENDIF
-   NEXT
+      NEXT
+   ENDIF
 RETURN aProcessList:Count > 0
 
 FUNCTION GC2RGB( p_nColor )
