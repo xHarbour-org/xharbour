@@ -644,7 +644,7 @@ UNSIGNED32 ENTRYPOINT AdsCreateIndex90( ADSHANDLE hObj, UNSIGNED8 *pucFileName, 
     return pFunc( hObj, pucFileName, pucTag, pucExpr, pucCondition, pucWhile, ulOptions, ulPageSize, pucCollation, phIndex );
 }
 
-UNSIGNED32 ENTRYPOINT AdsCreateFTSIndex( ADSHANDLE hTable, UNSIGNED8 *pucFileName, UNSIGNED8 *pucTag, UNSIGNED8 *pucField, UNSIGNED32 ulPageSize, UNSIGNED32 ulMinWordLen, UNSIGNED32 ulMaxWordLen, UNSIGNED16 usUseDefaultDelim, UNSIGNED8 *pucDelimiters, UNSIGNED16 usUseDefaultNoise, UNSIGNED8 *pucNoiseWords, UNSIGNED16 usUseDefaultDrop, UNSIGNED8 *pucDropChars, UNSIGNED16 usUseDefaultConditionals, UNSIGNED8 *pucConditionalChars, UNSIGNED8 *pucCollation, UNSIGNED8 *pucReserved1, UNSIGNED32 ulOptions )
+UNSIGNED32 ENTRYPOINT AdsCreateFTSIndex( ADSHANDLE hTable, UNSIGNED8 *pucFileName, UNSIGNED8 *pucTag, UNSIGNED8 *pucField, UNSIGNED32 ulPageSize, UNSIGNED32 ulMinWordLen, UNSIGNED32 ulMaxWordLen, UNSIGNED16 usUseDefaultDelim, VOID *pvDelimiters, UNSIGNED16 usUseDefaultNoise, VOID *pvNoiseWords, UNSIGNED16 usUseDefaultDrop, VOID *pvDropChars, UNSIGNED16 usUseDefaultConditionals, VOID *pvConditionalChars, UNSIGNED8 *pucCollation, UNSIGNED8 *pucReserved1, UNSIGNED32 ulOptions )
 {
 #if defined(__cplusplus)
     static ADSCREATEFTSINDEX_PTR
@@ -654,7 +654,7 @@ UNSIGNED32 ENTRYPOINT AdsCreateFTSIndex( ADSHANDLE hTable, UNSIGNED8 *pucFileNam
 #endif
        pFunc = (ADSCREATEFTSINDEX_PTR) Ace32_GetProcAddress( "AdsCreateFTSIndex" );
 
-    return pFunc( hTable, pucFileName, pucTag, pucField, ulPageSize, ulMinWordLen, ulMaxWordLen, usUseDefaultDelim, pucDelimiters, usUseDefaultNoise, pucNoiseWords, usUseDefaultDrop, pucDropChars, usUseDefaultConditionals, pucConditionalChars, pucCollation, pucReserved1, ulOptions );
+    return pFunc( hTable, pucFileName, pucTag, pucField, ulPageSize, ulMinWordLen, ulMaxWordLen, usUseDefaultDelim, pvDelimiters, usUseDefaultNoise, pvNoiseWords, usUseDefaultDrop, pvDropChars, usUseDefaultConditionals, pvConditionalChars, pucCollation, pucReserved1, ulOptions );
 }
 
 UNSIGNED32 ENTRYPOINT AdsCreateTable( ADSHANDLE hConnection, UNSIGNED8 *pucName, UNSIGNED8 *pucAlias, UNSIGNED16 usTableType, UNSIGNED16 usCharType, UNSIGNED16 usLockType, UNSIGNED16 usCheckRights, UNSIGNED16 usMemoSize, UNSIGNED8 *pucFields, ADSHANDLE *phTable )
