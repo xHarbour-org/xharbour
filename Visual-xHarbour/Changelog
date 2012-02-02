@@ -7,6 +7,18 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2012-02-01 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added System:IsProcRunning( cProcName, lTerminate ) it will let users know
+     whether a process is running or not and will allow termination of it at the same time.
+     usage: 
+     
+     lVXH := ::System:IsProcRunning( "vxh.exe" ) (NO PATH)
+     or
+     ::System:IsProcRunning( "vxh.exe", .T. ) 
+     
+     The second parameter indicates whether **ALL INSTANCES** of the process should be terminated.
+
 2012-01-30 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed memory overload creating array of events.
    + Added new METHOD System:GetRunningProcs()

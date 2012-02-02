@@ -83,7 +83,7 @@ CLASS System
    METHOD GetLocalTime()
    METHOD GetFocus()
    METHOD GetRunningProcs()
-   
+   METHOD IsProcRunning()
    METHOD UpdateColorSchemes() INLINE ::CurrentScheme:Load()
    ACCESS Services             INLINE __ENUMSERVICES()
 
@@ -724,6 +724,24 @@ METHOD GetRunningProcs() CLASS System
    CATCH
    END
 RETURN aProcess
+
+METHOD IsProcRunning( cProcName, lTerminate ) CLASS System
+   LOCAL oLocator, oProcess, aProcessList, oWMIService
+   DEFAULT lTerminate := .F.
+   TRY
+      oLocator := GetActiveObject("WbemScripting.SWbemLocator") 
+    CATCH
+      oLocator := CreateObject("WbemScripting.SWbemLocator") 
+   END
+   oWMIService  := oLocator:ConnectServer( , "root\CIMV2", , , "MS_409", ) 
+   aProcessList := oWMIService:ExecQuery("SELECT * FROM Win32_Process WHERE Name = '"+cProcName+"'")
+      
+   FOR EACH oProcess IN aProcessList
+       IF lTerminate
+          oProcess:Terminate()
+       ENDIF
+   NEXT
+RETURN aProcessList:Count > 0
 
 FUNCTION GC2RGB( p_nColor )
    LOCAL l_nRed, l_nGreen, l_nBlue 
