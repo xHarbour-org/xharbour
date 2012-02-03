@@ -727,7 +727,7 @@ RETURN aProcess
 
 METHOD IsProcRunning( cProcName, lTerminate ) CLASS System
    LOCAL oLocator, oProcess, aProcessList, oWMIService
-   DEFAULT lTerminate := .F.
+   DEFAULT lTerminate TO .F.
    TRY
       oLocator := GetActiveObject("WbemScripting.SWbemLocator") 
     CATCH
