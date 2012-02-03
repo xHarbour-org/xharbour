@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-02-03 09:50 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * source/rtl/fssize.c
+    ! fixed hb_fsFSize to properly return correct file size under windows 
+    
 2012-02-02 08:03 UTC-0800 Luis Krause <kaddath at shaw dot ca>
   * contrib/rdd_ads/ace32.c
     ! updated AdsCreateFTSIndex params to v10.x that are now type VOID
