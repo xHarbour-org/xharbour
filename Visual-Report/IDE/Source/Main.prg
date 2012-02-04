@@ -443,6 +443,7 @@ METHOD Init() CLASS MainForm
          :ImageIndex   := ::System:StdIcons:Copy
          :ToolTip:Text := "Copy"
          :Action       := {|| ::Application:Report:EditCopy() }
+         :Enabled      := .F.
          :Create()
       END
 
@@ -450,6 +451,7 @@ METHOD Init() CLASS MainForm
          :ImageIndex   := ::System:StdIcons:Cut
          :ToolTip:Text := "Cut"
          :Action       := {||::Application:Report:EditCut() }
+         :Enabled      := .F.
          :Create()
       END
 
@@ -457,6 +459,7 @@ METHOD Init() CLASS MainForm
          :ImageIndex   := ::System:StdIcons:Paste
          :ToolTip:Text := "Paste"
          :Action       := {|| ::Application:Report:EditPaste() }
+         :Enabled      := .F.
          :Create()
       END
 
@@ -464,6 +467,7 @@ METHOD Init() CLASS MainForm
          :ImageIndex   := ::System:StdIcons:Delete
          :ToolTip:Text := "Delete"
          :Action       := {|| ::Application:Report:EditDelete() }
+         :Enabled      := .F.
          :Create()
       END
 
@@ -1201,7 +1205,11 @@ METHOD Save( lSaveAs, cTemp ) CLASS Report
             oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "PrintRepFooter", NIL, IIF( ::VrReport:PrintRepFooter, "1", "0" ) )
             oXmlProp:addBelow( oXmlSource )
 
-            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "GroupBy", NIL, ::VrReport:GroupBy )
+            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "GroupBy1", NIL, ::VrReport:GroupBy1 )
+            oXmlProp:addBelow( oXmlSource )
+            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "GroupBy2", NIL, ::VrReport:GroupBy2 )
+            oXmlProp:addBelow( oXmlSource )
+            oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "GroupBy3", NIL, ::VrReport:GroupBy3 )
             oXmlProp:addBelow( oXmlSource )
 
             oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "DataSource", NIL, IIF( ::VrReport:DataSource != NIL, ::VrReport:DataSource:Name, "" ) )

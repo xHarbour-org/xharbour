@@ -51,7 +51,9 @@ CLASS VrReport INHERIT VrObject
    DATA PrintRepHeader  EXPORTED  INIT .T.
    DATA PrintFooter     EXPORTED  INIT .T.
    DATA PrintRepFooter  EXPORTED  INIT .T.
-   DATA GroupBy         EXPORTED  INIT ""
+   DATA GroupBy1        EXPORTED  INIT ""
+   DATA GroupBy2        EXPORTED  INIT ""
+   DATA GroupBy3        EXPORTED  INIT ""
 
    DATA ClsName         EXPORTED  INIT "Report"
    DATA Name            EXPORTED  INIT "Report"
@@ -147,7 +149,9 @@ METHOD Init() CLASS VrReport
    AADD( ::aProperties, { "PrintRepHeader", "Print"   } )
    AADD( ::aProperties, { "PrintFooter",    "Print"   } )
    AADD( ::aProperties, { "PrintRepFooter", "Print"   } )
-   AADD( ::aProperties, { "GroupBy",        "General" } )
+   AADD( ::aProperties, { "GroupBy1",       "General" } )
+   AADD( ::aProperties, { "GroupBy2",       "General" } )
+   AADD( ::aProperties, { "GroupBy3",       "General" } )
    ::InitPDF()
 RETURN Self
 
@@ -607,7 +611,24 @@ METHOD Load( cReport ) CLASS VrReport
    ::PrintRepHeader := ::hProps:PrintRepHeader == "1"
    ::PrintFooter    := ::hProps:PrintFooter    == "1"
    ::PrintRepFooter := ::hProps:PrintRepFooter == "1"
-   ::GroupBy        := ::hProps:GroupBy
+   TRY
+      ::GroupBy1 := ::hProps:GroupBy1
+   CATCH
+      ::hProps:GroupBy1 := NIL
+      ::GroupBy1 := ::hProps:GroupBy1
+   END
+   TRY
+      ::GroupBy2 := ::hProps:GroupBy2
+   CATCH
+      ::hProps:GroupBy2 := NIL
+      ::GroupBy2 := ::hProps:GroupBy2
+   END
+   TRY
+      ::GroupBy3 := ::hProps:GroupBy3
+   CATCH
+      ::hProps:GroupBy3 := NIL
+      ::GroupBy3 := ::hProps:GroupBy3
+   END
    
    FOR EACH hCtrl IN ::aRepHeader
        ::CreateControl( hCtrl,, ::Application:Props:RepHeader )
@@ -636,7 +657,7 @@ RETURN oDoc
 //-----------------------------------------------------------------------------------------------
 METHOD Run( oDoc, oWait ) CLASS VrReport
    LOCAL nHeight, hDC, nSubHeight, nTotHeight, nCount, nPer, nPos, nRow, oData, hCtrl, hData := {=>}
-   LOCAL xValue, cFilter, cData, oIni, cEntry, aRelation, aRelations, cRelation, e
+   LOCAL xValue1, xValue2, xValue3, cFilter, cData, oIni, cEntry, aRelation, aRelations, cRelation, e
    
    ::Create()
 
@@ -648,7 +669,9 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    ::PrintRepHeader := ::hProps:PrintRepHeader == "1"
    ::PrintFooter    := ::hProps:PrintFooter    == "1"
    ::PrintRepFooter := ::hProps:PrintRepFooter == "1"
-   ::GroupBy        := ::hProps:GroupBy
+   ::GroupBy1       := ::hProps:GroupBy1
+   ::GroupBy2       := ::hProps:GroupBy2
+   ::GroupBy3       := ::hProps:GroupBy3
 
    FOR EACH hCtrl IN ::aComponents
        IF hCtrl:ClsName == "VRDATATABLE"
@@ -775,13 +798,23 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       nPos := 0
 
       nHeight := ::CreateGroupHeaders( hDC )
-      IF !EMPTY(::GroupBy)
-         xValue := ::DataSource:Fields:&(::GroupBy)
+      IF !EMPTY(::GroupBy1)
+         xValue1 := ::DataSource:Fields:&(::GroupBy1)
+      ENDIF
+      IF !EMPTY(::GroupBy2)
+         xValue2 := ::DataSource:Fields:&(::GroupBy2)
+      ENDIF
+      IF !EMPTY(::GroupBy3)
+         xValue3 := ::DataSource:Fields:&(::GroupBy3)
       ENDIF
       WHILE ! ::DataSource:Eof()
          nHeight := ::CreateRecord( hDC )
-         IF xValue != NIL .AND. ::DataSource:Fields:&(::GroupBy) != xValue
-            xValue  := ::DataSource:Fields:&(::GroupBy)
+         IF ( xValue1 != NIL .AND. ::DataSource:Fields:&(::GroupBy1) != xValue1 ) .OR.;
+            ( xValue2 != NIL .AND. ::DataSource:Fields:&(::GroupBy2) != xValue2 ) .OR.;
+            ( xValue3 != NIL .AND. ::DataSource:Fields:&(::GroupBy3) != xValue3 )
+            xValue1 := ::DataSource:Fields:&(::GroupBy1)
+            xValue2 := ::DataSource:Fields:&(::GroupBy2)
+            xValue3 := ::DataSource:Fields:&(::GroupBy3)
             ::nRow += 100
             nHeight := ::CreateGroupFooters( hDC )
             ::nRow += 500

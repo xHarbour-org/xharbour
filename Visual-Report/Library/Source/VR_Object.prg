@@ -109,11 +109,19 @@ METHOD Delete() CLASS VrObject
          ::Parent:InvalidateRect()
       ENDIF
    ENDIF
-
+   
+   TRY
+      ::Button:Delete()
+   CATCH
+   END
    n := ASCAN( ::Application:aNames, ::Name,,, .T. )
    IF n > 0
       ADEL( ::Application:aNames, n, .T. )
    ENDIF
+   ::Application:Props:EditCopyBttn:Enabled := .F.
+   ::Application:Props:EditCutBttn:Enabled  := .F.
+   ::Application:Props:EditDelBttn:Enabled  := .F.
+
 RETURN Self
 
 METHOD GetProps() CLASS VrObject

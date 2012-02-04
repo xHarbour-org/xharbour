@@ -243,7 +243,7 @@ METHOD SetPropValue( xValue, cCaption, oObject, cProp, cProp2 ) CLASS PropEditor
        ELSEIF xProp == "FileName" .AND. oObject:ClsName == "Image"
          xProp := "ImageName"
       ENDIF
-      IF cProp IN {"GroupBy","Field","Order"}
+      IF cProp IN {"Field","Order"} .OR. LEFT( cProp, 7 ) == "GroupBy"
          IF cProp != "Order" .OR. oObject:Driver != "SQLRDD"
             xValue := cCaption
          ENDIF
@@ -425,11 +425,11 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
                         cText := ::ActiveObject:DataSource:Name
                       ELSEIF oItem:ColItems[n]:ColType == "COLUMN"
                         cText := ::ActiveObject:Column
-                      ELSEIF oItem:ColItems[n]:ColType IN "GROUPBY"
-                        cText := ::ActiveObject:GroupBy
-                      ELSEIF oItem:ColItems[n]:ColType IN "FIELD"
+                      ELSEIF oItem:ColItems[n]:ColType == "GROUPBY"
+                        cText := ::ActiveObject:&(oItem:ColItems[n]:Prop)
+                      ELSEIF oItem:ColItems[n]:ColType == "FIELD"
                         cText := ::ActiveObject:Field
-                      ELSEIF oItem:ColItems[n]:ColType IN "ORDER"
+                      ELSEIF oItem:ColItems[n]:ColType == "ORDER"
                         cText := ::ActiveObject:Order
                       ELSEIF oItem:ColItems[n]:ColType == "ADSDATADRIVERS"
                         IF ( nPos := HGetPos( ::System:AdsDataDrivers, ::ActiveObject:Driver ) ) > 0
@@ -950,6 +950,11 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
    ENDIF
 
    ::ActiveObject := aSel[1][1]
+
+   ::Application:Props:EditCopyBttn:Enabled := ::ActiveObject:ClsName != "Report"
+   ::Application:Props:EditCutBttn:Enabled  := ::ActiveObject:ClsName != "Report"
+   ::Application:Props:EditDelBttn:Enabled  := ::ActiveObject:ClsName != "Report"
+
    ::lPaint := .F.
    ::SetRedraw( .F. )
    ::ResetContent()
@@ -998,8 +1003,8 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
           ENDIF
           xValue := NIL
 
-        ELSEIF UPPER(cProp) IN {"GROUPBY"}
-          aCol[1]:ColType := UPPER(cProp)
+        ELSEIF UPPER(LEFT(cProp,7)) IN {"GROUPBY"}
+          aCol[1]:ColType := "GROUPBY"
           aCol[1]:Value   := { "", { NIL } }
           IF !EMPTY( ::ActiveObject:DataSource )
              TRY
