@@ -1528,6 +1528,9 @@ $(OBJ_DIR)$(DIR_SEP)zutil$(OBJEXT) : $(ZLIB_DIR)$(DIR_SEP)zutil.c
 #===============================================================================
 # PCREPOS.LIB rules
 #===============================================================================
+$(OBJ_DIR)$(DIR_SEP)pcre_byte_order$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_byte_order.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)pcre_chartables$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_chartables.c
 	$(CC_CMD)
 
@@ -1555,9 +1558,6 @@ $(OBJ_DIR)$(DIR_SEP)pcre_get$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_get.c
 $(OBJ_DIR)$(DIR_SEP)pcre_globals$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_globals.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)pcre_info$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_info.c
-	$(CC_CMD)
-
 $(OBJ_DIR)$(DIR_SEP)pcre_maketables$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_maketables.c
 	$(CC_CMD)
 
@@ -1574,9 +1574,6 @@ $(OBJ_DIR)$(DIR_SEP)pcre_study$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_study.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_tables$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_tables.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)pcre_try_flipped$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_try_flipped.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_valid_utf8$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_valid_utf8.c

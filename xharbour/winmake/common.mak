@@ -451,6 +451,7 @@ RTL_LIB_OBJS=\
 # PCREPOS.LIB rules
 #===============================================================================
 PCREPOS_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)pcre_byte_order$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_chartables$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_compile$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_config$(OBJEXT)\
@@ -459,14 +460,12 @@ PCREPOS_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)pcre_fullinfo$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_get$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_globals$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)pcre_info$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_maketables$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_newline$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_ord2utf8$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_refcount$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_study$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_tables$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)pcre_try_flipped$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_valid_utf8$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_version$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcre_ucd$(OBJEXT)\
