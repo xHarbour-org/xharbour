@@ -696,6 +696,10 @@
 [\xbp\vc8\xhbmt.lib\trees.obj]
 [\xbp\vc8\xhbmt.lib\uncompr.obj]
 [\xbp\vc8\xhbmt.lib\zutil.obj]
+[\xbp\vc8\xhbmt.lib\gzlib.obj]
+[\xbp\vc8\xhbmt.lib\gzwrite.obj]
+[\xbp\vc8\xhbmt.lib\gzread.obj]
+[\xbp\vc8\xhbmt.lib\gzclose.obj]
 
 # *** hbSix ***
 [\xbp\vc8\dbfmt.lib\sxcompr.obj]

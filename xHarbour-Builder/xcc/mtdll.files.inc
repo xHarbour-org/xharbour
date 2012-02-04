@@ -692,7 +692,6 @@
 [\xbp\xcc\xhbmt.lib\compress.obj]
 [\xbp\xcc\xhbmt.lib\crc32.obj]
 [\xbp\xcc\xhbmt.lib\deflate.obj]
-[\xbp\xcc\xhbmt.lib\gzio.obj]
 [\xbp\xcc\xhbmt.lib\infback.obj]
 [\xbp\xcc\xhbmt.lib\inffast.obj]
 [\xbp\xcc\xhbmt.lib\inflate.obj]
@@ -700,6 +699,11 @@
 [\xbp\xcc\xhbmt.lib\trees.obj]
 [\xbp\xcc\xhbmt.lib\uncompr.obj]
 [\xbp\xcc\xhbmt.lib\zutil.obj]
+[\xbp\xcc\xhbmt.lib\gzlib.obj]
+[\xbp\xcc\xhbmt.lib\gzwrite.obj]
+[\xbp\xcc\xhbmt.lib\gzread.obj]
+[\xbp\xcc\xhbmt.lib\gzclose.obj]
+
 
 # *** hbSix ***
 [\xbp\xcc\dbfmt.lib\sxcompr.obj]

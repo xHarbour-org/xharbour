@@ -688,7 +688,6 @@
 [\xbp\vc8\xhb.lib\compress.obj]
 [\xbp\vc8\xhb.lib\crc32.obj]
 [\xbp\vc8\xhb.lib\deflate.obj]
-[\xbp\vc8\xhb.lib\gzio.obj]
 [\xbp\vc8\xhb.lib\infback.obj]
 [\xbp\vc8\xhb.lib\inffast.obj]
 [\xbp\vc8\xhb.lib\inflate.obj]
@@ -696,6 +695,11 @@
 [\xbp\vc8\xhb.lib\trees.obj]
 [\xbp\vc8\xhb.lib\uncompr.obj]
 [\xbp\vc8\xhb.lib\zutil.obj]
+[\xbp\vc8\xhb.lib\gzlib.obj]
+[\xbp\vc8\xhb.lib\gzwrite.obj]
+[\xbp\vc8\xhb.lib\gzread.obj]
+[\xbp\vc8\xhb.lib\gzclose.obj]
+
 
 # *** hbSix ***
 [\xbp\vc8\dbf.lib\sxcompr.obj]

@@ -709,7 +709,6 @@ MYDEFINES = HAVE_CONFIG_H
 [source\rtl\zlib\compress.c]
 [source\rtl\zlib\crc32.c]
 [source\rtl\zlib\deflate.c]
-[source\rtl\zlib\gzio.c]
 [source\rtl\zlib\infback.c]
 [source\rtl\zlib\inffast.c]
 [source\rtl\zlib\inflate.c]
@@ -717,4 +716,7 @@ MYDEFINES = HAVE_CONFIG_H
 [source\rtl\zlib\trees.c]
 [source\rtl\zlib\uncompr.c]
 [source\rtl\zlib\zutil.c]
-
+[source\rtl\zlib\gzlib.c]
+[source\rtl\zlib\gzwrite.c]
+[source\rtl\zlib\gzread.c]
+[source\rtl\zlib\gzclose.c]
