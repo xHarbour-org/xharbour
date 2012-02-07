@@ -7,7 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
+2012-02-07 13:30 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * source/rtl/pcre/Makefile
+    ! updated due depencendie changes
+    
 2012-02-05 03:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/pcre/config.h
   * source/rtl/pcre/config.h.generic
