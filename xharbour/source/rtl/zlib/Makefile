@@ -9,7 +9,10 @@ C_SOURCES=\
 	compress.c \
 	crc32.c \
 	deflate.c \
-	gzio.c \
+   gzlib.c \
+   gzwrite.c \	
+   gzread.c \
+   gzclose.c \
 	infback.c \
 	inffast.c \
 	inflate.c \
@@ -17,6 +20,7 @@ C_SOURCES=\
 	trees.c \
 	uncompr.c \
 	zutil.c \
+
 
 LIBNAME=zlib
 
