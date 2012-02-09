@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2012-02-09 07:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  ! include/hbdate.h
+    + definition of HB_TIMEDIFF_DEC (borrowed from Harbour )
+  ! source/vm/hvm.c
+    ! fixed bug on substraction related to DATETIME value
+
 2012-02-07 13:30 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/rtl/pcre/Makefile
     ! updated due depencendie changes

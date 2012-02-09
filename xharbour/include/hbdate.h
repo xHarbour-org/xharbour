@@ -113,5 +113,6 @@ HB_EXTERN_END
 #define HB_MINUTES_PER_DAY    ( 24 * 60 )
 #define HB_SECONDS_PER_DAY    ( HB_MINUTES_PER_DAY * 60 )
 #define HB_MILLISECS_PER_DAY  ( HB_SECONDS_PER_DAY * 1000 )
+#define HB_TIMEDIFF_DEC       6
 
 #endif /* HB_DATE_H_ */
