@@ -5124,6 +5124,19 @@ static void hb_vmEqual( BOOL bExact )
       pItem1->type = HB_IT_LOGICAL;
       hb_stackDec();
    }
+   else if( HB_IS_DATETIME( pItem1 ) && HB_IS_DATETIME( pItem2 ) )
+   {
+      if( HB_IS_TIMEFLAG( pItem1 ) && HB_IS_TIMEFLAG( pItem2 ) )
+         pItem1->item.asLogical.value = ( pItem1->item.asDate.value ==
+                                          pItem2->item.asDate.value ) &&
+                                        ( pItem1->item.asDate.time ==
+                                          pItem2->item.asDate.time );
+      else
+         pItem1->item.asLogical.value = ( pItem1->item.asDate.value ==
+                                          pItem2->item.asDate.value );
+      pItem1->type = HB_IT_LOGICAL;
+      hb_stackDec();
+   }
    else if( HB_IS_LOGICAL( pItem1 ) && HB_IS_LOGICAL( pItem2 ) )
    {
       pItem1->item.asLogical.value = ( pItem1->item.asLogical.value ==
@@ -5246,6 +5259,19 @@ static void hb_vmNotEqual( void )
       pItem2->type = HB_IT_NIL;
       hb_stackDec();
    }
+   else if( HB_IS_DATETIME( pItem1 ) && HB_IS_DATETIME( pItem2 ) )
+   {
+      if( HB_IS_TIMEFLAG( pItem1 ) && HB_IS_TIMEFLAG( pItem2 ) )
+         pItem1->item.asLogical.value = ( pItem1->item.asDate.value !=
+                                          pItem2->item.asDate.value ) ||
+                                        ( pItem1->item.asDate.time !=
+                                          pItem2->item.asDate.time );
+      else
+         pItem1->item.asLogical.value = ( pItem1->item.asDate.value !=
+                                          pItem2->item.asDate.value );
+      pItem1->type = HB_IT_LOGICAL;
+      hb_stackDec();
+   }
    else if( HB_IS_POINTER( pItem1 ) && HB_IS_POINTER( pItem2 ) )
    {
       BOOL bResult = ( pItem1->item.asPointer.value != pItem2->item.asPointer.value );
@@ -5320,6 +5346,21 @@ static void hb_vmLess( void )
       double dNumber1 = hb_vmPopNumber();
       hb_vmPushLogical( dNumber1 < dNumber2 );
    }
+   else if( HB_IS_DATETIME( pItem1 ) && HB_IS_DATETIME( pItem2 ) )
+   {
+      if( HB_IS_TIMEFLAG( pItem1 ) && HB_IS_TIMEFLAG( pItem2 ) )
+         pItem1->item.asLogical.value = ( pItem1->item.asDate.value <
+                                          pItem2->item.asDate.value ) ||
+                                        ( pItem1->item.asDate.value ==
+                                          pItem2->item.asDate.value &&
+                                          pItem1->item.asDate.time <
+                                          pItem2->item.asDate.time );
+      else
+         pItem1->item.asLogical.value = ( pItem1->item.asDate.value <
+                                          pItem2->item.asDate.value );
+      pItem1->type = HB_IT_LOGICAL;
+      hb_stackDec();
+   }
    else if( HB_IS_LOGICAL( pItem1 ) && HB_IS_LOGICAL( pItem2 ) )
    {
       pItem1->item.asLogical.value = ( pItem1->item.asLogical.value <
@@ -5378,6 +5419,21 @@ static void hb_vmLessEqual( void )
       double dNumber2 = hb_vmPopNumber();
       double dNumber1 = hb_vmPopNumber();
       hb_vmPushLogical( dNumber1 <= dNumber2 );
+   }
+   else if( HB_IS_DATETIME( pItem1 ) && HB_IS_DATETIME( pItem2 ) )
+   {
+      if( HB_IS_TIMEFLAG( pItem1 ) && HB_IS_TIMEFLAG( pItem2 ) )
+         pItem1->item.asLogical.value = ( pItem1->item.asDate.value <
+                                          pItem2->item.asDate.value ) ||
+                                        ( pItem1->item.asDate.value ==
+                                          pItem2->item.asDate.value &&
+                                          pItem1->item.asDate.time <=
+                                          pItem2->item.asDate.time );
+      else
+         pItem1->item.asLogical.value = ( pItem1->item.asDate.value <=
+                                          pItem2->item.asDate.value );
+      pItem1->type = HB_IT_LOGICAL;
+      hb_stackDec();
    }
    else if( HB_IS_LOGICAL( pItem1 ) && HB_IS_LOGICAL( pItem2 ) )
    {
@@ -5438,6 +5494,21 @@ static void hb_vmGreater( void )
       double dNumber1 = hb_vmPopNumber();
       hb_vmPushLogical( dNumber1 > dNumber2 );
    }
+   else if( HB_IS_DATETIME( pItem1 ) && HB_IS_DATETIME( pItem2 ) )
+   {
+      if( HB_IS_TIMEFLAG( pItem1 ) && HB_IS_TIMEFLAG( pItem2 ) )
+         pItem1->item.asLogical.value = ( pItem1->item.asDate.value >
+                                          pItem2->item.asDate.value ) ||
+                                        ( pItem1->item.asDate.value ==
+                                          pItem2->item.asDate.value &&
+                                          pItem1->item.asDate.time >
+                                          pItem2->item.asDate.time );
+      else
+         pItem1->item.asLogical.value = ( pItem1->item.asDate.value >
+                                          pItem2->item.asDate.value );
+      pItem1->type = HB_IT_LOGICAL;
+      hb_stackDec();
+   }
    else if( HB_IS_LOGICAL( pItem1 ) && HB_IS_LOGICAL( pItem2 ) )
    {
       pItem1->item.asLogical.value = ( pItem1->item.asLogical.value >
@@ -5496,6 +5567,21 @@ static void hb_vmGreaterEqual( void )
       double dNumber2 = hb_vmPopNumber();
       double dNumber1 = hb_vmPopNumber();
       hb_vmPushLogical( dNumber1 >= dNumber2 );
+   }
+   else if( HB_IS_DATETIME( pItem1 ) && HB_IS_DATETIME( pItem2 ) )
+   {
+      if( HB_IS_TIMEFLAG( pItem1 ) && HB_IS_TIMEFLAG( pItem2 ) )
+         pItem1->item.asLogical.value = ( pItem1->item.asDate.value >
+                                          pItem2->item.asDate.value ) ||
+                                        ( pItem1->item.asDate.value ==
+                                          pItem2->item.asDate.value &&
+                                          pItem1->item.asDate.time >=
+                                          pItem2->item.asDate.time );
+      else
+         pItem1->item.asLogical.value = ( pItem1->item.asDate.value >=
+                                          pItem2->item.asDate.value );
+      pItem1->type = HB_IT_LOGICAL;
+      hb_stackDec();
    }
    else if( HB_IS_LOGICAL( pItem1 ) && HB_IS_LOGICAL( pItem2 ) )
    {

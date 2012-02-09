@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-02-10 02:25 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  ! source/vm/hvm.c
+    ! fixed the comparison logic related to DATETIME values
+      ( <, >, <=, >=, =, ==, != )
+
 2012-02-09 13:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/rtl/zlib/Makefile
     ! updated due depencendie changes
