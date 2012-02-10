@@ -412,7 +412,6 @@ HB_EXPORT void hb_oleItemToVariant( VARIANT *pVariant, PHB_ITEM pItem )
          break;
 
       case HB_IT_DATE:
-      case HB_IT_DATE | HB_IT_TIMEFLAG:
         if( pItem->item.asDate.value == 0 )
         {
            pVariant->n1.n2.vt = VT_NULL;
@@ -429,6 +428,28 @@ HB_EXPORT void hb_oleItemToVariant( VARIANT *pVariant, PHB_ITEM pItem )
         {
            pVariant->n1.n2.vt = VT_DATE;
            pVariant->n1.n2.n3.dblVal = hb_itemGetDTD( pItem ) - (double) 2415019;
+        }
+        break;
+
+      case HB_IT_TIMEFLAG:
+        if( pItem->item.asDate.value == 0 )
+        {
+           pVariant->n1.n2.vt = VT_NULL;
+        }
+        else if( bByRef )
+        {
+           pItem->item.asDouble.value =
+              (double) pItem->item.asDate.value + (double) pItem->item.asDate.time / HB_MILLISECS_PER_DAY - (double) 2415019;
+           pItem->type = HB_IT_DOUBLE;
+
+           pVariant->n1.n2.vt = VT_BYREF | VT_DATE;
+           pVariant->n1.n2.n3.pdblVal = &( pItem->item.asDouble.value ) ;
+        }
+        else
+        {
+           pVariant->n1.n2.vt = VT_DATE;
+           pVariant->n1.n2.n3.dblVal =
+              (double) pItem->item.asDate.value + (double) pItem->item.asDate.time / HB_MILLISECS_PER_DAY - (double) 2415019;
         }
         break;
 
