@@ -7,6 +7,9 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2012-02-09 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed 1 pixel shifting in checkbox text when being disabled. In fact the one that was
+     shifted was the enabled text.
 
 2012-02-01 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Added System:IsProcRunning( cProcName, lTerminate ) it will let users know

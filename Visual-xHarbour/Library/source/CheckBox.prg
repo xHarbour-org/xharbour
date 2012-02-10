@@ -155,7 +155,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
                          _DrawFrameControl( cd:hDC, aRect, DFC_BUTTON, nFlags )
                       ENDIF
                    ENDIF
-                   cd:rc:left += 17
+                   cd:rc:left += 16
 
                    DrawText( cd:hDC, ::Caption, cd:rc, DT_LEFT | DT_VCENTER | DT_SINGLELINE )
                    IF nColor != NIL
