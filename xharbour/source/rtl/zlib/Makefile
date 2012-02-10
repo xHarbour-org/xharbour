@@ -10,7 +10,7 @@ C_SOURCES=\
 	crc32.c \
 	deflate.c \
    gzlib.c \
-   gzwrite.c \	
+   gzwrite.c \
    gzread.c \
    gzclose.c \
 	infback.c \
