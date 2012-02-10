@@ -3382,7 +3382,9 @@ METHOD __WindowDestroy() CLASS Window
    ::wParam            := NIL
    ::lParam            := NIL
    ::Drawing           := NIL
-
+   IF ::__ClassInst != NIL
+      ::Events := NIL
+   ENDIF
    IF ::__ClassInst != NIL .AND. ::Parent != NIL
       TRY
          FOR n := 1 TO LEN( ::Parent:Children )
