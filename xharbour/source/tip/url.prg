@@ -83,7 +83,7 @@ CLASS tURL
 
 HIDDEN:
    CLASSDATA   cREuri   INIT HB_RegexComp("(?:(.*)://)?([^?/]*)(/[^?]*)?\??(.*)")
-   CLASSDATA   cREServ  INIT HB_RegexComp("(?:([^:@]*):?([^@:]*)@|)([^:]+):?(.*)")
+   CLASSDATA   cREServ  INIT HB_RegexComp("(?:([^:]*):?([^@:]*)@|)([^:]+):?(.*)")
    CLASSDATA   cREFile  INIT HB_RegexComp("^((?:/.*/)|/)*(.*)$")
 
 ENDCLASS
@@ -138,6 +138,8 @@ METHOD SetAddress( cUrl ) CLASS tURL
    aMatch := HB_Regex( ::cREFile, cPath )
    ::cPath := aMatch[2]
    ::cFile := aMatch[3]
+
+   ::BuildAddress()
 
 RETURN .T.
 

@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-02-11 11:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/tip/url.prg
+    ! fixed regular expression to Classdata cREServ to allow use of
+      UserID format <user@domain.com> on pop/smtp protocol.
+    * added call to Buildaddres() method from SetAddress() method.
+
 2012-02-11 03:25 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   ! source/rtl/hbwinole.c
     ! fixed handling DATETIME values (bug report by Rick Lipkin)
