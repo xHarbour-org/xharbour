@@ -7,8 +7,9 @@
  */
 
 #include "gzguts.h"
+#ifdef __TURBOC__
 #include "io.h"
-
+#endif
 #if defined(_WIN32) && !defined(__BORLANDC__) && !defined(__POCC__) && !defined(__DMC__)
 #  define LSEEK _lseeki64
 #else

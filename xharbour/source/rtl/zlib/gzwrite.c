@@ -7,7 +7,9 @@
  */
 
 #include "gzguts.h"
+#ifdef __TURBOC__
 #include "io.h"
+#endif
 
 /* Local functions */
 local int gz_init OF((gz_statep));
