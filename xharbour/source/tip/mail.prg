@@ -401,6 +401,10 @@ METHOD FromString( cMail, cBoundary, nPos ) CLASS TipMail
       nPos := 1
    ENDIF
 
+   IF cMail == NIL
+      cMail := ""
+   ENDIF
+
    nLinePos := At( e"\r\n", cMail, nPos )
    DO WHILE nLinePos > nPos
       // going on with last field?
