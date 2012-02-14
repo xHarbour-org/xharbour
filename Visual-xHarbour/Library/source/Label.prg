@@ -33,6 +33,7 @@ CLASS Label INHERIT Control
    METHOD Init()  CONSTRUCTOR
    METHOD OnCtlColorStatic()
    METHOD SetParent( oParent ) INLINE IIF( ::__hBrush != NIL, ( DeleteObject( ::__hBrush ), ::__hBrush := NIL ), ), ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
+   METHOD OnSize()  INLINE  ::InvalidateRect(, .F. ), NIL
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------

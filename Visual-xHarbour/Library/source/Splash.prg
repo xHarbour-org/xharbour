@@ -168,9 +168,13 @@ FUNCTION __MsgWait( cText, cTitle, lProgress )
    s_cText     := cText
    
    nStyle := WS_POPUP | WS_DLGFRAME | WS_THICKFRAME
+
    IF !EMPTY( cTitle )
       nStyle := nStyle | WS_CAPTION
    ENDIF
+   #ifdef __WINFAKT__
+      nStyle := nStyle | WS_CAPTION
+   #endif
 
    __aCenter   := NIL
    
