@@ -159,6 +159,7 @@ CLASS DataGrid INHERIT Control
    DATA __hDragRecImage         PROTECTED
    DATA __nDragTop              PROTECTED INIT 0
    DATA __aSel                  PROTECTED INIT {}
+   //DATA __nDragRec              PROTECTED INIT 0
    DATA aTagged                 EXPORTED  INIT {}
 
    METHOD Init() CONSTRUCTOR
@@ -374,7 +375,7 @@ METHOD GetPosition() CLASS DataGrid
 RETURN ASCAN( ::__DisplayArray, {|a|a[2]==::DataSource:Recno()} )
 
 METHOD OnMouseWheel( nwParam, nlParam ) CLASS DataGrid
-   LOCAL nLines, nScroll, nDelta, nPage, pt, rc, n
+   LOCAL nLines, nScroll, nDelta, nPage, pt, rc, n, si, cBuffer
    pt := (struct POINT)
    pt:x := LOWORD(nlParam)
    pt:y := HIWORD(nlParam)
@@ -387,7 +388,7 @@ METHOD OnMouseWheel( nwParam, nlParam ) CLASS DataGrid
    rc:bottom := ::Height
 
    SystemParametersInfo( SPI_GETWHEELSCROLLLINES, 0, @nLines, 0)
-   IF nLines == 0 .AND. ::__xCtrlName == "DataGrid"
+   IF nLines == 0
       nLines := 3
    ENDIF
    
@@ -399,25 +400,28 @@ METHOD OnMouseWheel( nwParam, nlParam ) CLASS DataGrid
          nScroll := WM_HSCROLL
          nPage   := ::__nHPage
       ENDIF
-
-      IF nLines == WHEEL_PAGESCROLL
-         IF nDelta > 0
-            ::SendMessage( nScroll, SB_PAGEUP, 0 )
-          ELSEIF nDelta < 0
-            ::SendMessage( nScroll, SB_PAGEDOWN, 0 )
-         ENDIF
-       ELSE
-         IF nDelta > 0
-            FOR n := 1 TO nLines * ABS( nDelta )
-                ::SendMessage( nScroll, SB_LINEUP, 0 )
-            NEXT
+      si := (struct SCROLLINFO)
+      cBuffer := _GetScrollInfo( ::hWnd, SB_VERT )
+      si:Buffer( cBuffer, .T. )
+      IF si:nPage < si:nMax 
+         IF nLines == WHEEL_PAGESCROLL
+            IF nDelta > 0
+               ::SendMessage( nScroll, SB_PAGEUP, 0 )
+             ELSEIF nDelta < 0
+               ::SendMessage( nScroll, SB_PAGEDOWN, 0 )
+            ENDIF
           ELSE
-            FOR n := 1 TO nLines * ABS( nDelta )
-                ::SendMessage( nScroll, SB_LINEDOWN, 0 )
-            NEXT
+            IF nDelta > 0
+               FOR n := 1 TO nLines * ABS( nDelta )
+                   ::SendMessage( nScroll, SB_LINEUP, 0 )
+               NEXT
+             ELSE
+               FOR n := 1 TO nLines * ABS( nDelta )
+                   ::SendMessage( nScroll, SB_LINEDOWN, 0 )
+               NEXT
+            ENDIF
          ENDIF
       ENDIF
-
    ENDIF
 RETURN 0
 
@@ -1018,6 +1022,7 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
    nPos := MIN( nPos, ::RowCountUsable )
    nPos := MAX( nPos, 1 )
    IF nPos <> ::RowPos .AND. ::__hDragRecImage != NIL
+      //::__nDragRec := 0
    
       ImageListDestroy( ::__hDragRecImage )
       ::__hDragRecImage := NIL
@@ -1207,9 +1212,15 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
          RETURN NIL
       ENDIF
     ELSEIF nClickRow == ::RowPos .AND. ::AllowDragRecords
+      //::__nDragRec := ::__DisplayArray[ nClickRow ][2]
+      
       ::__hDragRecImage := ::CreateDragImage(yPos)
+
+      ::__DisplayData( nClickRow, , nClickRow, )
+
       ImageListBeginDrag( ::__hDragRecImage, 0, 0, 0 )
       ImageListDragEnter( ::hWnd, 0, ::__GetHeaderHeight() + ( ::ItemHeight*(::RowPos) )+1 )
+      ::Application:Yield()
    ENDIF
 
    IF LEN( ::__DisplayArray ) == 0 .OR. ::__DisplayArray[1] == NIL
@@ -1707,6 +1718,11 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                 lSelected := lSelected .OR. ASCAN( ::aTagged, nRec ) > 0
              ENDIF
           ENDIF
+          
+          //IF nRec == ::__nDragRec
+          //   _FillRect( hMemDC, { nLeft, nTop, ::Width, nBottom }, GetSysColorBrush( COLOR_WINDOW ) )
+          //   LOOP
+          //ENDIF
 
           FOR i := nCol TO nColEnd
               IF nLeft > ::ClientWidth .OR. LEN(::__DisplayArray[nLine][1])<i // avoid painting non-visible columns

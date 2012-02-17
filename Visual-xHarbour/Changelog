@@ -7,6 +7,8 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2012-02-16 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed DataGrid mousewheel event to not to process if scrollbar is not present.
 
 2012-02-13 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    * Changed MessageWait initial frame.
