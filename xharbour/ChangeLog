@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-02-18 19:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * utils/hbmake/hbmake.prg
+    ! some changes to detect xharbour when instaled in /usr/local
+    
 2012-02-14 12:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/tip/mail.prg
     ! fixed <cMail> default value to avoid run time error on At() function.

@@ -1710,8 +1710,8 @@ FUNCTION CreateScript( cFile, lCreateAndCompile )
    #ENDIF
 
    #ifndef __PLATFORM__Windows
-       LOCAL lHashhso := File("/usr/lib/libxharbour.so")
-       LOCAL lusexhb := FILE("/usr/bin/xhb-build")
+       LOCAL lHashhso := File("/usr/lib/libxharbour.so")  .or. File("/usr/lib64/libxharbour.so") .or. File("/usr/local/lib/libxharbour.so") .or. File("/usr/local/lib64/libxharbour.so")
+       LOCAL lusexhb := FILE("/usr/bin/xhb-build") .or. FILE("/usr/local/bin/xhb-build")
    #ELSE
        LOCAL lusexhb := .F.
    #ENDIF
@@ -2362,12 +2362,12 @@ Endif // Create and compile
       IF  ("linux" IN Lower(Getenv( "HB_ARCHITECTURE" ) )  .OR. cOS == "Linux" ) .or.;
           ("unix" IN Lower(Getenv( "HB_ARCHITECTURE" ) )  .OR. cOS == "Unix" .OR. cOS == "HP-UX" )
          AAdd( s_aCommands, { ".cpp.o:", "gcc $(CFLAG1) $(CFLAG2) -o$* $**" } )
-         AAdd( s_aCommands, { ".c.o:", "gcc -I/usr/include/xharbour $(CFLAG1) $(CFLAG2) -I. -g -o$* $**" } )
+         AAdd( s_aCommands, { ".c.o:", "gcc -I/usr/include/xharbour  -I/usr/local/include/xharbour  $(CFLAG1) $(CFLAG2) -I. -g -o$* $**" } )
 
          IF s_lExtended
-            AAdd( s_aCommands, { ".prg.o:", "harbour -D__EXPORT__  -n"+if(s_lasdll,"1","")+"  -go" + if(s_lGenCsource,"3","") + " -I/usr/include/xharbour $(HARBOURFLAGS) -I.  -o$* $**" } )
+            AAdd( s_aCommands, { ".prg.o:", "harbour -D__EXPORT__  -n"+if(s_lasdll,"1","")+"  -go" + if(s_lGenCsource,"3","") + " -I/usr/include/xharbour  -I/usr/local/include/xharbour  $(HARBOURFLAGS) -I.  -o$* $**" } )
          ELSE
-            AAdd( s_aCommands, { ".prg.c:", "harbour -n -I/usr/include/xharbour $(HARBOURFLAGS) -I.  -o$* $**" } )
+            AAdd( s_aCommands, { ".prg.c:", "harbour -n -I/usr/include/xharbour  -I/usr/local/include/xharbour  $(HARBOURFLAGS) -I.  -o$* $**" } )
          ENDIF
 
       ELSE
@@ -3130,7 +3130,7 @@ Endif // Create and compile
 
    ELSEIF s_lGcc
 
-      FWrite( nSFhandle, "CFLAG1 = $(SHELL) " +IIF( !EMPTY(s_cUserInclude ) ," -I" + Alltrim( s_cUserInclude )  ,"") + IIF( "Unix" in cOs , " -I/usr/include/xharbour ", "" ) + IIF(  "Linux" IN cOS, "-I/usr/include/xharbour", " -I$(HB_DIR)/include" ) + " -c -Wall" + IIF( s_lMt, " -DHB_THREAD_SUPPORT " , "" )  + if(s_lmingw, " -mno-cygwin "," " )+ CRLF )
+      FWrite( nSFhandle, "CFLAG1 = $(SHELL) " +IIF( !EMPTY(s_cUserInclude ) ," -I" + Alltrim( s_cUserInclude )+ " "  ,"") + IIF( "Unix" in cOs , " -I/usr/include/xharbour ", "" ) + IIF(  "Linux" IN cOS, "-I/usr/include/xharbour -I/usr/local/include/xharbour ", " -I$(HB_DIR)/include" ) + " -c -Wall" + IIF( s_lMt, " -DHB_THREAD_SUPPORT " , "" )  + if(s_lmingw, " -mno-cygwin "," " )+ CRLF )
       FWrite( nSFhandle, "CFLAG2 = " + IIF(  "Linux" IN cOS, "-L$(HB_LIB_INSTALL)", " -L$(HB_DIR)/lib  -L$(CC_DIR)/lib" ) +  IIF( "Unix" in cOs , " -L/usr/lib/xharbour ", "" ) + IIF( lHwgui, " -L$(HWGUI)\lib","" ) + CRLF )
       FWrite( nSFhandle, "RFLAGS = " + CRLF )
       FWrite( nSFhandle, "LFLAGS = " + if(!s_lLinux," ","-Wl,--noinhibit-exec ") + IIF(lUseXhb ,IIF(lUseXharbourDll,"","-static ") + if(lXwt .or. lhwgui ,"-gtcgi " , "-gtcrs "), "$(CFLAG2)") + iif(lXwt,"`pkg-config --libs gtk+-2.0` -lxwt -lxwt_gtk -lxwt","") + iif( lxHGtk, "`pkg-config --libs gtk+-2.0 libglade-2.0` -lxhgtk ","") + iif( lhwgui .and. !s_lMinGW, " `pkg-config --libs gtk+-2.0 libglade-2.0 libgnomeprint-2.2` -hwgui ","")  + iif(lhwgui .and. s_lMinGW," -mwindows " ,"" )+  iif(s_lLinux .and. s_lmt ," -mt "," "  ) +CRLF )
@@ -4290,9 +4290,9 @@ FUNCTION CreateScriptLib( cFile )
          AAdd( s_aCommands, { ".c.o:", "gcc -I/usr/include/xharbour $(CFLAG1) $(CFLAG2) -I. -o$* $**" } )
 
          IF s_lExtended
-            AAdd( s_aCommands, { ".prg.o:", "harbour -n $(HARBOURFLAGS) -I/usr/include/xharbour -I. -go" + if(s_lGenCsource,"3","") + "  -o$* $**" } )
+            AAdd( s_aCommands, { ".prg.o:", "harbour -n $(HARBOURFLAGS) -I/usr/include/xharbour  -I/usr/local/include/xharbour  -I. -go" + if(s_lGenCsource,"3","") + "  -o$* $**" } )
          ELSE
-            AAdd( s_aCommands, { ".prg.c:", "harbour -n $(HARBOURFLAGS) -I/usr/include/xharbour -I.  -o$* $**" } )
+            AAdd( s_aCommands, { ".prg.c:", "harbour -n $(HARBOURFLAGS) -I/usr/include/xharbour  -I/usr/local/include/xharbour -I.  -o$* $**" } )
          ENDIF
 
       ELSE
@@ -4572,7 +4572,7 @@ FUNCTION CreateScriptLib( cFile )
 
    ELSEIF s_lGcc
 
-      FWrite( nSFhandle, "CFLAG1 = " + IIF( s_lLinux , "-I/usr/include/xharbour", " -I$(HB_DIR)/include " ) + " $(SHELL)  -c -Wall" + CRLF )
+      FWrite( nSFhandle, "CFLAG1 = " + IIF( s_lLinux , "-I/usr/include/xharbour  -I/usr/local/include/xharbour ", " -I$(HB_DIR)/include " ) + " $(SHELL)  -c -Wall" + CRLF )
       FWrite( nSFhandle, "CFLAG2 = " + IIF( s_lLinux , "-L /usr/lib/xharbour", " -L $(HB_DIR)/lib" ) + CRLF )
       FWrite( nSFhandle, "RFLAGS = " + CRLF )
       FWrite( nSFhandle, "LFLAGS = " + CRLF )
