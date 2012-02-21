@@ -184,6 +184,7 @@ static BOOL (WINAPI *pQueryServiceStatus)(SC_HANDLE,LPSERVICE_STATUS)           
 static BOOL (WINAPI *pQueryServiceConfig)(SC_HANDLE,LPQUERY_SERVICE_CONFIG,DWORD,LPDWORD)                      = NULL;
 static BOOL (WINAPI *pQueryServiceConfig2)(SC_HANDLE,DWORD,LPBYTE,DWORD,LPDWORD)                               = NULL;
 static BOOL (WINAPI *pChangeServiceConfig2)(SC_HANDLE,DWORD,LPVOID)                                            = NULL;
+static BOOL (WINAPI *pChangeServiceConfig)(SC_HANDLE,DWORD,DWORD,DWORD,LPCTSTR,LPCTSTR,LPDWORD,LPCTSTR,LPCTSTR,LPCTSTR,LPCTSTR) = NULL;
 
 static HCERTSTORE (WINAPI *pCertOpenSystemStore)(HCRYPTPROV,LPCSTR)                                            = NULL;
 
@@ -501,6 +502,7 @@ HB_FUNC_INIT( _INITSYMBOLS_ )
       pQueryServiceConfig    = (BOOL (WINAPI *)(SC_HANDLE,LPQUERY_SERVICE_CONFIG,DWORD,LPDWORD)) GetProcAddress( hAdvApi32, "QueryServiceConfig" );
       pQueryServiceConfig2   = (BOOL (WINAPI *)(SC_HANDLE,DWORD,LPBYTE,DWORD,LPDWORD)) GetProcAddress( hAdvApi32, "QueryServiceConfig2" );
       pChangeServiceConfig2  = (BOOL (WINAPI *)(SC_HANDLE,DWORD,LPVOID)) GetProcAddress( hAdvApi32, "ChangeServiceConfig2" );
+      pChangeServiceConfig   = (BOOL (WINAPI *)(SC_HANDLE,DWORD,DWORD,DWORD,LPCTSTR,LPCTSTR,LPDWORD,LPCTSTR,LPCTSTR,LPCTSTR,LPCTSTR)) GetProcAddress( hAdvApi32, "ChangeServiceConfigA" );
    }
 
    if( hHtmlHelp )
@@ -10360,5 +10362,22 @@ HB_FUNC( MULTIBYTETOWIDECHAR )
       {
          hb_xfree( wString );
       }
+   }
+}
+
+HB_FUNC( CHANGESERVICECONFIG )
+{
+   LPCTSTR lpBinaryPathName   = (LPCTSTR) hb_parc(5);
+   LPCTSTR lpLoadOrderGroup   = (LPCTSTR) hb_parc(6);
+   LPCTSTR lpDependencies     = (LPCTSTR) hb_parc(7);
+   LPCTSTR lpServiceStartName = (LPCTSTR) hb_parc(8);
+   LPCTSTR lpPassword         = (LPCTSTR) hb_parc(9);
+   LPCTSTR lpDisplayName      = (LPCTSTR) hb_parc(10);
+   if( pChangeServiceConfig )
+   {
+      hb_retl( pChangeServiceConfig( (SC_HANDLE) hb_parnl(1), (DWORD) hb_parnl(2), (DWORD) hb_parnl(3), (DWORD) hb_parnl(4),
+                                      ISNIL(5)?NULL:lpBinaryPathName, ISNIL(6)?NULL:lpLoadOrderGroup, NULL,
+                                      ISNIL(7)?NULL:lpDependencies, ISNIL(8)?NULL:lpServiceStartName,
+                                      ISNIL(9)?NULL:lpPassword, ISNIL(10)?NULL:lpDisplayName ) );
    }
 }

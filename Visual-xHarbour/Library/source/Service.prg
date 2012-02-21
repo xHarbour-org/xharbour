@@ -22,6 +22,10 @@
 #include "colors.ch"
 #include "Service.ch"
 
+#define SERVICE_NO_CHANGE     0xffffffff 
+#define SERVICE_DEMAND_START  0x00000003
+#define SERVICE_DISABLED      0x00000004 
+
 //-----------------------------------------------------------------------------------------------
 
 CLASS Service
@@ -53,6 +57,8 @@ CLASS Service
    
    METHOD Install()
    METHOD Run()
+   METHOD Enable()      INLINE ChangeServiceConfig( ::hService, SERVICE_NO_CHANGE, SERVICE_AUTO_START, SERVICE_NO_CHANGE )
+   METHOD Disable()     INLINE ChangeServiceConfig( ::hService, SERVICE_NO_CHANGE, SERVICE_DISABLED, SERVICE_NO_CHANGE )
    METHOD Start()       INLINE StartService( ::hService, 0 )
    METHOD Stop( nTime ) INLINE StopService( ::hServiceManager, ::hService, .T., IIF( nTime != NIL, nTime, 60000 ) ), Self
    METHOD Delete()      INLINE DeleteService( ::hService ),;
