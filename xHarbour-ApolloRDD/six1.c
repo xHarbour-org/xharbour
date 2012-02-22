@@ -52,6 +52,39 @@ BOOL fMemoBinary = TRUE;
 
 RDDFUNCS sixSuper;
 
+static HB_ERRCODE commonError( SIXAREAP pArea, USHORT uiGenCode, USHORT uiSubCode,
+                               USHORT uiOsCode, const char * szFileName,
+                               USHORT uiFlags, PHB_ITEM * pErrorPtr )
+{
+   PHB_ITEM pError;
+   HB_ERRCODE errCode = HB_FAILURE;
+
+   if( hb_vmRequestQuery() == 0 )
+   {
+      if( pErrorPtr )
+      {
+         if( ! *pErrorPtr )
+            *pErrorPtr = hb_errNew();
+         pError = *pErrorPtr;
+      }
+      else
+         pError = hb_errNew();
+      hb_errPutGenCode( pError, uiGenCode );
+      hb_errPutSubCode( pError, uiSubCode );
+      hb_errPutDescription( pError, hb_langDGetErrorDesc( uiGenCode ) );
+      if( uiOsCode )
+         hb_errPutOsCode( pError, uiOsCode );
+      if( szFileName )
+         hb_errPutFileName( pError, szFileName );
+      if( uiFlags )
+         hb_errPutFlags( pError, uiFlags );
+      errCode = SUPER_ERROR( ( AREAP ) pArea, pError );
+      if( !pErrorPtr )
+         hb_itemRelease( pError );
+   }
+   return errCode;
+}
+
 static BOOL FindFile( char * pFilename, char * path )
 {
    BOOL bIsFile = FALSE;
@@ -521,10 +554,20 @@ static SHORT sixEvalTest( char * szExpr )
 
 static HB_ERRCODE hb_sixUpdateAreaFlags( SIXAREAP pArea, BOOL bFound )
 {
-   pArea->area.fBof = sx_Bof();
-   pArea->area.fEof = sx_Eof();
-   pArea->area.fFound = bFound ? sx_Found() : 0 ;
+   BOOL lBof, lEof, lFound;
 
+   lBof   = sx_Bof();
+   lEof   = sx_Eof();
+   if (bFound ) 
+       lFound = sx_Found();
+   else
+       lFound = 0;
+	
+   pArea->area.fBof =  lBof != 0;
+   pArea->area.fEof =  lEof != 0;	
+   
+   pArea->area.fFound = lFound != 0;
+   pArea->fPositioned = !pArea->area.fBof && !pArea->area.fEof;
    return HB_SUCCESS;
 }
 
@@ -895,6 +938,7 @@ static HB_ERRCODE sixGoBottom( SIXAREAP pArea )
 
 static HB_ERRCODE sixGoTo( SIXAREAP pArea, ULONG ulRecNo )
 {
+   ULONG ulRecCount;
    HB_TRACE(HB_TR_DEBUG, ("sixGoTo(%p, %lu)", pArea, ulRecNo));
 
    if( iSxCurrArea != pArea->uiSxArea )
@@ -902,12 +946,22 @@ static HB_ERRCODE sixGoTo( SIXAREAP pArea, ULONG ulRecNo )
       iSxCurrArea = pArea->uiSxArea;
       sx_Select( iSxCurrArea );
    }
-
+   
    pArea->lpdbPendingRel = NULL;
-   pArea->area.fFound = FALSE;
-   sx_Go( ulRecNo );
-
-   hb_sixUpdateAreaFlags( pArea, 0 );
+  
+   sx_Go( ulRecNo );  
+   hb_sixUpdateAreaFlags( pArea,0 );
+   pArea->ulRecNo = ulRecNo;
+   if( !pArea->fPositioned )
+   {
+      /* set our record number value */
+      SELF_RECCOUNT( ( AREAP ) pArea, &ulRecCount );
+      /* eliminate posible race condition in this operation */
+      if( ulRecNo != 0 && ulRecNo <= ulRecCount )
+         pArea->ulRecNo = ulRecNo;
+      else
+         pArea->ulRecNo = ulRecCount + 1;
+   }   
    /* Force relational movement in child WorkAreas */
    if( pArea->area.lpdbRelations )
       SELF_SYNCCHILDREN( ( AREAP ) pArea );
@@ -1008,8 +1062,7 @@ static HB_ERRCODE sixSeek( SIXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL b
          pArea->area.fFound = sx_Seek( (unsigned char *) ( hb_itemGetL( pKey )?  "T" : "F" ) );
       }
    }
-
-   hb_sixUpdateAreaFlags( pArea, 1 );
+      hb_sixUpdateAreaFlags( pArea, 1 );
    /* Force relational movement in child WorkAreas */
    if( pArea->area.lpdbRelations )
       SELF_SYNCCHILDREN( ( AREAP ) pArea );
@@ -1053,7 +1106,7 @@ static HB_ERRCODE sixSkip( SIXAREAP pArea, LONG lToSkip )
       /* TODO: fix this - it will not work as expected when filter is not
          recognized by SDE */
       sx_Skip( lToSkip );
-
+     
       hb_sixUpdateAreaFlags( pArea, 0 );
       /* Force relational movement in child WorkAreas */
       if( pArea->area.lpdbRelations )
@@ -1079,7 +1132,7 @@ static HB_ERRCODE sixSkipRaw( SIXAREAP pArea, LONG toSkip )
    }
 
    sx_Skip( toSkip );
-
+  
    hb_sixUpdateAreaFlags( pArea,0  );
    /* Force relational movement in child WorkAreas */
    if( pArea->area.lpdbRelations )
@@ -1102,7 +1155,7 @@ static HB_ERRCODE sixAddField( SIXAREAP pArea, LPDBFIELDINFO pFieldInfo )
 static HB_ERRCODE sixAppend( SIXAREAP pArea, BOOL fUnLockAll )
 {
    BOOL fResult;
-
+   SHORT sResult;
    HB_TRACE(HB_TR_DEBUG, ("sixAppend(%p, %d)", pArea, (int) fUnLockAll));
 
    if( !sxTriggerCall( pArea, EVENT_APPEND, pArea->area.uiArea, 0, NULL ) )
@@ -1118,18 +1171,46 @@ static HB_ERRCODE sixAppend( SIXAREAP pArea, BOOL fUnLockAll )
    if( fUnLockAll )
       sx_Unlock( 0 );
 
-   fResult = sx_AppendBlankEx();
-
+   sResult = sx_AppendBlankEx() ;
+   fResult = sResult == -1;
    /*
     * Apollo SDE does not report appended records in rlocklist, so we lock it
     * ourself
     */
-   if( fResult )
-      sx_Rlock( sx_RecNo() );
+   //if( fResult )
+   //   sx_Rlock( sx_RecNo() );
+   //pArea->area.fFound = 0;   
+   //hb_sixUpdateAreaFlags( pArea,0 );
+   if( fResult)
+   {
+      if( pArea->fShared && !pArea->fFLocked )
+      {
+         ULONG ulRecNo;
 
-   hb_sixUpdateAreaFlags( pArea,0 );
+         if( SELF_RECNO( ( AREAP ) pArea, &ulRecNo ) == HB_SUCCESS )
+         {
+            /* to avoid unnecessary record refreshing after locking */
+            pArea->fPositioned = TRUE;
+            SELF_RAWLOCK( ( AREAP ) pArea, REC_LOCK, ulRecNo );
+         }
+      }
+      pArea->area.fBof = FALSE;
+      pArea->area.fEof = FALSE;
+      pArea->area.fFound = FALSE;
+      pArea->fPositioned = TRUE;
+      return HB_SUCCESS;
+   }   
+   else if (sResult == 5 )
+   {
+         commonError( pArea, EG_READONLY, EDBF_READONLY, 0, NULL, 0, NULL );
+   }
+   else
+   {
+	     USHORT uiOsCOde = sResult == 1  ? 32 : 0;
+	     commonError( pArea, EG_APPENDLOCK, ( USHORT ) sResult, uiOsCOde, NULL, EF_CANDEFAULT, NULL );
+   }
 
-   return fResult ? HB_SUCCESS : HB_FAILURE;
+   return HB_FAILURE;
 }
 
 static HB_ERRCODE sixCreateFields( SIXAREAP pArea, PHB_ITEM pStruct )
@@ -2353,12 +2434,13 @@ static HB_ERRCODE sixForceRel( SIXAREAP pArea )
          SELF_RELEVAL( ( AREAP ) pArea, lpdbPendingRel );
       }
 
-      if( iSxCurrArea != pArea->uiSxArea )
-      {
-         iSxCurrArea = pArea->uiSxArea;
-         sx_Select( iSxCurrArea );
-      }
-      hb_sixUpdateAreaFlags( pArea,0 );
+       if( iSxCurrArea != pArea->uiSxArea )
+       {
+          iSxCurrArea = pArea->uiSxArea;
+          sx_Select( iSxCurrArea );
+       }
+      //pArea->area.fFound= 0;   
+      hb_sixUpdateAreaFlags( pArea,1 );
    }
    return HB_SUCCESS;
 }

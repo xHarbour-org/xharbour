@@ -6,7 +6,7 @@
  */
 
 #include <windows.h>
-#include "Sde7.h"
+#include "Sde61.h"
 #include "hbapirdd.h"
 
 # if !defined( EVAL_DATE)
@@ -60,9 +60,11 @@ typedef struct _SIXAREA_
    USHORT uiSxArea;              /* Internal area number */
    char * szDataFileName;        /* Name of data file */
    USHORT uiRecordLen;           /* Size of record */
+   ULONG    ulRecNo;             /* Current record */
    USHORT * pFieldOffset;        /* Pointer to field offset array */
    BYTE * pRecord;               /* Buffer of record data */
    LPDBRELINFO lpdbPendingRel;   /* Pointer to parent rel struct */
+   BOOL fPositioned;         /* TRUE if we are not at phantom record */
    BOOL fShared;                 /* Shared file */
    BOOL fReadonly;               /* Read only file */
    BOOL fFLocked;                /* TRUE if file is locked */
@@ -77,3 +79,13 @@ typedef struct _SIXAREA_
 } SIXAREA;
 
 typedef SIXAREA * SIXAREAP;
+
+#define SELF_RESETREL( p )    if( (p)->lpdbPendingRel ) \
+                              { \
+                                 if( (p)->lpdbPendingRel->isScoped && \
+                                    !(p)->lpdbPendingRel->isOptimized ) \
+                                    SELF_FORCEREL( &(p)->area ); \
+                                 else \
+                                    (p)->lpdbPendingRel = NULL; \
+                              }
+
