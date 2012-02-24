@@ -2408,7 +2408,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
 
                        IF pPtr != NIL .AND. pPtr != 0
                           oObj := ArrayFromPointer( pPtr )
-                          IF VALTYPE( oObj ) == "O"
+                          IF VALTYPE( oObj ) == "O" .AND. oObj:Parent:HasMessage("__lIsMenu")
 
                              IF s_PrevFocus != NIL
                                 s_PrevFocus:__lSelected := .F.
@@ -2656,7 +2656,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
                       s_lKey       := .F.
                       s_lOpenMenu  := .T.
                       
-                    ELSE
+                    ELSEIF s_CurrentObject:ClsName != "ContextStrip"
                       SendMessage( s_CurrentObject:Form:hWnd, WM_CANCELMODE, 0, 0 )
                       s_CurrFocus  := s_CurrentObject
                       s_lOpenMenu  := .F.

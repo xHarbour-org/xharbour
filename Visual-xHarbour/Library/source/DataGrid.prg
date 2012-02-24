@@ -1386,7 +1386,11 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
             pt:y := ::Children[::ColPos]:aSelRect[4]
             ClientToScreen( ::hWnd, @pt )
             ::Children[ ::ColPos ]:ButtonMenu:Show( pt:x, pt:y )
-            ::__MenuReturn := ::Children[ ::ColPos ]:ButtonMenu:Menu:ItemID
+            TRY
+               ::__MenuReturn := ::Children[ ::ColPos ]:ButtonMenu:Menu:ItemID
+            CATCH
+               ::__MenuReturn := 1
+            END
           ELSE
             ::__MenuReturn := 1
          ENDIF
