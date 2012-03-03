@@ -163,7 +163,7 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
 
    ::BackgroundImage := FreeImageRenderer( Self ):Create()
 
-   ::Editor := Editor():New(,,,,, ::Application:SourceEditor:oEditor:oDisplay )
+   ::Editor := ::Application:SourceEditor:CreateDocument() //Editor():New(,,,,, ::Application:SourceEditor:oEditor:oDisplay )
 
    IF cFileName != NIL
       ::Application:SourceTabs:InsertTab( cFileName )
@@ -177,20 +177,19 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
                         '#include "' + ::Name + '.xfm"' + CRLF +;
                         "//---------------------------------------- End of system code ----------------------------------------//" + CRLF + CRLF
 
-      ::Editor:Load( , cInitialBuffer, .F., .F. )
-      ::Editor:lModified := .T.
+      ::Application:SourceEditor:SetDocText( ::Editor, cInitialBuffer )
+      //::Editor:lModified := .T.
    ENDIF
-   ::Editor:SetExtension( "prg" )
+   //::Editor:SetExtension( "prg" )
 
-   cMain := ::Application:ProjectPrgEditor:GetBuffer()
+   cMain := ::Application:ProjectPrgEditor:GetText()
    IF AT( "[BEGIN SYSTEM CODE]", cMain ) == 0
       cProject := "//----------------------------------- [BEGIN SYSTEM CODE] ------------------------------------//" + CRLF
       cProject += "   __" + STRTRAN( ::Application:Project:Properties:Name, " ", "_" ) + "( NIL ):Run( "+::Name+"( NIL ) )" + CRLF
       cProject += "//------------------------------------ [END SYSTEM CODE] -------------------------------------//" + CRLF + CRLF
       cProject += "RETURN NIL"+ CRLF+ CRLF
       cMain := STRTRAN( cMain, "RETURN NIL"+ CRLF, cProject )
-      ::Application:ProjectPrgEditor:Load( , cMain, .F., .F. )
-      ::Application:ProjectPrgEditor:lModified := .T.
+      ::Application:ProjectPrgEditor:SetDocText( ::Application:ProjectPrgEditor, cMain )
    ENDIF
 
    IF !::Application:Project:DesignPage

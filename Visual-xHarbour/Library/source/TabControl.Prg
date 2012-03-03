@@ -414,7 +414,9 @@ RETURN Self
 METHOD Hide() CLASS TabControl
    LOCAL Tab
    FOR EACH Tab IN ::Children
-       Tab:HideTab()
+       IF VALTYPE(Tab) == "O"
+          Tab:HideTab()
+       ENDIF
    NEXT
    Super:Hide()
 RETURN Self

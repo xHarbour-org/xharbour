@@ -23,6 +23,7 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 #include "hbexcept.ch"
 #include "error.ch"
 #include "ole.ch"
+#include "Scintilla.ch"
 
 #include "inkey.ch"
 #include "commdlg.ch"
@@ -2363,7 +2364,8 @@ METHOD EditReset(n) CLASS Project
       ENDIF
     ELSE
       lCopied   := IsClipboardFormatAvailable( CF_TEXT )
-      lSelected := ::Application:SourceEditor:oEditor:nLineFrom > 0
+      lSelected := ::Application:SourceEditor:SelectionStart > 0//oEditor:nLineFrom > 0
+      
    ENDIF
    ::Application:Props[ "EditPasteItem" ]:Enabled := lCopied
    ::Application:Props[ "EditPasteBttn" ]:Enabled := lCopied
@@ -2434,15 +2436,13 @@ METHOD New() CLASS Project
    cProject := "FUNCTION Main( ... )" + CRLF + CRLF
    cProject += "RETURN NIL" + CRLF
 
-   ::Application:ProjectPrgEditor := Editor():New( cProject,,,,  , ::Application:SourceEditor:oEditor:oDisplay )
-   ::Application:ProjectPrgEditor:Load( , cProject, .F., .F. )
-   ::Application:ProjectPrgEditor:lModified := .T.
-   ::Application:ProjectPrgEditor:SetExtension( "prg" )
+   ::Application:ProjectPrgEditor := ::Application:SourceEditor:CreateDocument()
+   
+   ::Application:SourceEditor:SetDocText( ::Application:ProjectPrgEditor, cProject )
 
    ::Application:SourceTabs:Visible := .T.
    ::Application:SourceTabs:InsertTab( "  " + ::Properties:Name +"_Main.prg * ",,, .T. )
 
-   ::Application:SourceEditor:oEditor := ::Application:ProjectPrgEditor
 
    ::Application:Props[ "NewFormProjItem"   ]:Enabled := .T.
    ::Application:Props[ "NewFormBttn"       ]:Enabled := .T.
@@ -2483,18 +2483,18 @@ METHOD CheckValidProgram() CLASS Project
    ::Application:SaveMenu:Enable()
    ::Application:SaveAsMenu:Enable()
    ::cFileRemove := NIL
-   IF EMPTY( ::Application:SourceEditor:oEditor:cFile )
+   IF EMPTY( ::Application:SourceEditor:GetDocFileName() )
       ::Application:AddSourceMenu:Disable()
       RETURN "Untitled"
     ELSE
       ::Application:CloseMenu:Enable()
       IF ::Properties != NIL
-         IF ASCAN( ::Properties:Sources, ::Application:SourceEditor:oEditor:cPath + ::Application:SourceEditor:oEditor:cFile ) > 0
+         IF ASCAN( ::Properties:Sources, ::Application:SourceEditor:GetDocFileName() ) > 0
             ::Application:AddSourceMenu:Disable()
-            ::cSourceRemove := ::Application:SourceEditor:oEditor:cPath + ::Application:SourceEditor:oEditor:cFile
+            ::cSourceRemove := ::Application:SourceEditor:GetDocFileName()
             ::Application:RemoveSourceMenu:Enable()
-          ELSEIF ASCAN( ::Forms, {|o| o:Editor:cPath+o:Editor:cFile == ::Application:SourceEditor:oEditor:cPath + ::Application:SourceEditor:oEditor:cFile } ) > 0 .OR.;
-                 ::Application:SourceEditor:oEditor:cPath + ::Application:SourceEditor:oEditor:cFile == ::Application:ProjectPrgEditor:cPath + ::Application:ProjectPrgEditor:cFile
+          ELSEIF ASCAN( ::Forms, {|o| ::Application:SourceEditor:GetDocFileName(o:Editor) == ::Application:SourceEditor:GetDocFileName() } ) > 0 .OR.;
+                 ::Application:SourceEditor:GetDocFileName() == ::Application:SourceEditor:GetDocFileName(::Application:ProjectPrgEditor)
             ::Application:AddSourceMenu:Disable()
             ::Application:RemoveSourceMenu:Disable()
             ::cSourceRemove := NIL
@@ -2504,7 +2504,7 @@ METHOD CheckValidProgram() CLASS Project
             ::Application:RemoveSourceMenu:Disable()
          ENDIF
       ENDIF
-      RETURN ::Application:SourceEditor:oEditor:cFile
+      RETURN ::Application:SourceEditor:GetDocFileName()
    ENDIF
 RETURN ""
 
@@ -3191,9 +3191,8 @@ RETURN 0
 
 METHOD SelectBuffer() CLASS Project
    LOCAL n
-   ::Application:SourceEditor:oEditor := ::CurrentForm:Editor
-   ::CurrentForm:Editor:SetDisplay( ::Application:SourceEditor:oEditor:oDisplay, .T. )
-   IF ( n := aScan( xEdit_GetEditors(), ::CurrentForm:Editor, , , .T. ) ) > 0
+   ::Application:SourceEditor:SelectDocument( ::CurrentForm:Editor )
+   IF ( n := aScan( ::Application:SourceEditor:aDocs, {|a| a[1]==::CurrentForm:Editor} ) ) > 0
       ::Application:SourceTabs:SetCurSel( n )
    ENDIF
 RETURN Self
@@ -3766,10 +3765,12 @@ METHOD Open( cProject ) CLASS Project
 
    ENDIF
    IF FILE( cSourcePath +"\" + ::Properties:Name +"_Main.prg" )
-      ::Application:ProjectPrgEditor := Editor():New(,,,, cSourcePath +"\" + ::Properties:Name +"_Main.prg", ::Application:SourceEditor:oEditor:oDisplay )
-      ::Application:ProjectPrgEditor:SetExtension( "prg" )
+      ::Application:ProjectPrgEditor := ::Application:SourceEditor:OpenFile( cSourcePath +"\" + ::Properties:Name +"_Main.prg" )
+      
+      //::Application:ProjectPrgEditor := Editor():New(,,,, cSourcePath +"\" + ::Properties:Name +"_Main.prg", ::Application:SourceEditor:oEditor:oDisplay )
+      //::Application:ProjectPrgEditor:SetExtension( "prg" )
       ::Application:SourceTabs:InsertTab( ::Properties:Name +"_Main.prg" )
-      ::Application:SourceEditor:oEditor := ::Application:ProjectPrgEditor
+      //::Application:SourceEditor:oEditor := ::Application:ProjectPrgEditor
     ELSEIF ::Properties:TargetType == 1
       n := ::Application:MainForm:MessageBox( "Mising main file " + cSourcePath +"\" + ::Properties:Name +"_Main.prg", "Open Project", MB_ICONQUESTION | MB_OKCANCEL )
       IF n == IDCANCEL
@@ -4012,8 +4013,9 @@ METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
       oForm := ::AddWindow( .F., cObjectName + ".prg", cClassName == "CUSTOMCONTROL" )
       ::CurrentForm := oForm
       cSourcePath := ::Properties:Path + "\" + ::Properties:Source
-      oForm:Editor:Load( cSourcePath + "\" + cObjectName + ".prg",, .F., .F. )
-      ::Application:SourceEditor:oEditor := oForm:Editor
+      
+      ::Application:SourceEditor:SelectDocument( oForm:Editor )
+      ::Application:SourceEditor:OpenFile( cSourcePath + "\" + cObjectName + ".prg" )
    ENDIF
    IF lLoadProps
       nLine := 1
@@ -6368,75 +6370,69 @@ RETURN Self
 //------------------------------------------------------------------------------------------------------------------------------------
 
 CLASS SourceEditor INHERIT Control
-   VAR oEditor
-   DATA oObj
-   DATA cWord   EXPORTED INIT ""
+   CLASSDATA hLib
+   DATA aDocs EXPORTED INIT {}
+   ACCESS SelectionStart INLINE ::SendMessage( SCI_GETSELECTIONSTART, 0, 0 )
+
    METHOD Init() CONSTRUCTOR
-   ACCESS Caption INLINE ::GetText()
    METHOD Create()
-   METHOD FindText( cText, nOpt )
-   METHOD SetSel( nStart, nEnd )
+
+   METHOD OpenFile()
+   METHOD CreateDocument()
+   METHOD SetText( cText )        INLINE ::SendMessage( SCI_SETTEXT, 0, cText )
+   METHOD GotoPosition( nPos )    INLINE ::SendMessage( SCI_GOTOPOS, nPos, 0 )
+   METHOD SelectDocument( pDoc )  INLINE ::SendMessage( SCI_SETDOCPOINTER, 0, pDoc )
+   METHOD GetCurDoc()             INLINE ::SendMessage( SCI_GETDOCPOINTER, 0, 0 )
+   METHOD ReleaseDocument( pDoc ) INLINE ::SendMessage( SCI_RELEASEDOCUMENT, 0, pDoc )
+   METHOD OnDestroy()             INLINE aEval( ::aDocs, {|aDoc| hb_qSelf():ReleaseDocument( aDoc[1] ) } ), FreeLibrary( ::hLib ), NIL
    METHOD GetText()
-//   METHOD OnKeyDown()
+   METHOD GetDocFileName()
+   METHOD SetDocText( pDoc, cText ) INLINE ::SelectDocument( pDoc ), ::SetText( cText )
 ENDCLASS
 
+METHOD CreateDocument() CLASS SourceEditor
+   LOCAL pDoc := ::SendMessage( SCI_CREATEDOCUMENT, 0, 0 )
+   AADD( ::aDocs, {pDoc,} )
+RETURN pDoc
+
+METHOD GetText() CLASS SourceEditor
+   LOCAL cText, nLen := ::SendMessage( SCI_GETLENGTH, 0, 0 )
+   cText := SPACE( nLen )
+   ::SendMessage( SCI_GETTEXT, nLen, @cText )
+RETURN cText
+
+METHOD GetDocFileName( pDoc ) CLASS SourceEditor
+   LOCAL cFile, n
+   DEFAULT pDoc TO ::GetCurDoc()
+   IF ( n := ASCAN( ::aDocs, {|a| a[1]==pDoc} ) ) > 0
+      cFile := ::aDocs[n][2]
+   ENDIF
+RETURN cFile
+
+METHOD OpenFile( cFile ) CLASS SourceEditor
+   LOCAL n, cText := MEMOREAD( cFile )
+   ::SetText( cText )
+   ::SendMessage( SCI_SETSAVEPOINT, 0, 0 )
+   ::GotoPosition( 0 )
+   IF ( n := ASCAN( ::aDocs, {|a| a[1]==::GetCurDoc()} ) ) > 0
+      ::aDocs[n][2] := cFile
+   ENDIF
+RETURN Self
+
 METHOD Init( oParent ) CLASS SourceEditor
+   DEFAULT ::hLib TO LoadLibrary( ::Application:Path + "\SciLexer.dll" )
    ::__xCtrlName   := "SourceEditor"
-   ::ClsName       := "xEdit"
+   ::ClsName       := "Scintilla"
    ::Super:Init( oParent )
    ::Font:FaceName := "Courier New"
    ::Font:Height   := -12
-   ::Style         := WS_CHILD | WS_TABSTOP | ES_WANTRETURN | ES_MULTILINE | ES_AUTOHSCROLL | ES_AUTOVSCROLL | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE
+   ::Style         := WS_CHILD | WS_TABSTOP
    ::__lSubClass   := .F.
 RETURN Self
-/*
-METHOD OnKeyDown( nKey, nlParam ) CLASS SourceEditor
-   cKey := CHR( nKey )
-   SWITCH cKey
-      CASE ":"
-         ::oObj :=
-         EXIT
-      DEFAULT
-           cWord += cKey
-   END
-RETURN NIL
-*/
+
 METHOD Create() CLASS SourceEditor
-   LOCAL nPointer
    ::Super:Create()
-//   ::SetTimer( 1, 500 )
-   IF ::hWnd != NIL
-      nPointer := SendMessage( ::hWnd, EN_GETEDITOR )
-      IF nPointer != 0
-         ::oEditor := ArrayFromPointer( nPointer, .T. )
-      ENDIF
-      IF ::oEditor != NIL
-         ::oEditor:SetExtension( "prg" )
-      ENDIF
-   ENDIF
 RETURN Self
-
-METHOD FindText( cText, nOpt ) CLASS SourceEditor
-   LOCAL aPos
-   DEFAULT nOpt TO FR_FROMTOP
-   WITH OBJECT ::oEditor
-      IF ( aPos := :Find( cText, nOpt ) )[1] > 0
-         RETURN :Position( aPos[1], aPos[2] )
-      ENDIF
-   END
-RETURN -1
-
-METHOD SetSel( nStart, nEnd ) CLASS SourceEditor
-   IF ::oEditor != NIL
-      ::oEditor:SetSel( nStart, nEnd )
-   ENDIF
-RETURN 0
-
-METHOD GetText() CLASS SourceEditor
-   IF ::oEditor != NIL
-      RETURN ::oEditor:GetBuffer()
-   ENDIF
-RETURN ""
 
 //------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------
