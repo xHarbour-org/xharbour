@@ -2437,7 +2437,6 @@ METHOD New() CLASS Project
    cProject += "RETURN NIL" + CRLF
 
    ::Application:ProjectPrgEditor := ::Application:SourceEditor:CreateDocument()
-   
    ::Application:SourceEditor:SetDocText( ::Application:ProjectPrgEditor, cProject )
 
    ::Application:SourceTabs:Visible := .T.
@@ -2472,9 +2471,10 @@ RETURN Self
 
 METHOD SourceTabChanged( nPrev, nCur ) CLASS Project
    ( nPrev )
-   IF nCur <= LEN( xEdit_GetEditors() )
-      ::Application:SourceEditor:oEditor := xEdit_GetEditors()[ nCur ]
-      ::Application:SourceEditor:oEditor:SetDisplay( ::Application:SourceEditor:oEditor:oDisplay, .T. )
+   view nCur, ::Application:SourceEditor:DocCount
+   IF nCur <= ::Application:SourceEditor:DocCount
+      ::Application:SourceEditor:SelDocByPos( nCur )
+      view ::Application:SourceEditor:aDocs[nCur][1]
    ENDIF
    OnShowEditors()
 RETURN Self
@@ -3333,7 +3333,7 @@ METHOD Close( lCloseErrors ) CLASS Project
 
    FOR n := 1 TO LEN( ::Forms )
        IF ::Forms[n]:Editor != NIL
-          ::Forms[n]:Editor:Close()
+          ::Application:SourceEditor:CloseDoc( ::Forms[n]:Editor )
           ::Forms[n]:Editor := NIL
           ::Forms[n]:Destroy()
           ::Application:Yield()
@@ -3551,7 +3551,7 @@ METHOD NewSource() CLASS Project
    ::Application:SourceTabs:Visible := .T.
    ::Application:SourceTabs:InsertTab( "  Untitled Source * ",,,.T. )
    ::Application:SourceTabs:SetCurSel( LEN( xEdit_GetEditors() ) )
-   ::SourceTabChanged(, LEN( xEdit_GetEditors() ) )
+   ::SourceTabChanged(, ::Application:SourceEditor:DocCount )
    IF !::Application:SourceEditor:IsWindowVisible()
       ::Application:EditorPage:Select()
    ENDIF
@@ -3765,7 +3765,9 @@ METHOD Open( cProject ) CLASS Project
 
    ENDIF
    IF FILE( cSourcePath +"\" + ::Properties:Name +"_Main.prg" )
-      ::Application:ProjectPrgEditor := ::Application:SourceEditor:OpenFile( cSourcePath +"\" + ::Properties:Name +"_Main.prg" )
+      ::Application:ProjectPrgEditor := ::Application:SourceEditor:CreateDocument()
+      ::Application:SourceEditor:SelectDocument( ::Application:ProjectPrgEditor )
+      ::Application:SourceEditor:OpenFile( cSourcePath +"\" + ::Properties:Name +"_Main.prg" )
       
       //::Application:ProjectPrgEditor := Editor():New(,,,, cSourcePath +"\" + ::Properties:Name +"_Main.prg", ::Application:SourceEditor:oEditor:oDisplay )
       //::Application:ProjectPrgEditor:SetExtension( "prg" )
@@ -6373,32 +6375,53 @@ CLASS SourceEditor INHERIT Control
    CLASSDATA hLib
    DATA aDocs EXPORTED INIT {}
    ACCESS SelectionStart INLINE ::SendMessage( SCI_GETSELECTIONSTART, 0, 0 )
-
+   ACCESS DocCount       INLINE LEN( ::aDocs )
    METHOD Init() CONSTRUCTOR
    METHOD Create()
 
    METHOD OpenFile()
    METHOD CreateDocument()
-   METHOD SetText( cText )        INLINE ::SendMessage( SCI_SETTEXT, 0, cText )
-   METHOD GotoPosition( nPos )    INLINE ::SendMessage( SCI_GOTOPOS, nPos, 0 )
-   METHOD SelectDocument( pDoc )  INLINE ::SendMessage( SCI_SETDOCPOINTER, 0, pDoc )
-   METHOD GetCurDoc()             INLINE ::SendMessage( SCI_GETDOCPOINTER, 0, 0 )
-   METHOD ReleaseDocument( pDoc ) INLINE ::SendMessage( SCI_RELEASEDOCUMENT, 0, pDoc )
-   METHOD OnDestroy()             INLINE aEval( ::aDocs, {|aDoc| hb_qSelf():ReleaseDocument( aDoc[1] ) } ), FreeLibrary( ::hLib ), NIL
+   METHOD SetText( cText )          INLINE ::SendMessage( SCI_SETTEXT, 0, cText )
+   METHOD GotoPosition( nPos )      INLINE ::SendMessage( SCI_GOTOPOS, nPos, 0 )
+   METHOD SelectDocument( pDoc )    INLINE ::SendMessage( SCI_SETDOCPOINTER, 0, pDoc )
+   METHOD GetCurDoc()               INLINE ::SendMessage( SCI_GETDOCPOINTER, 0, 0 )
+   METHOD ReleaseDocument( pDoc )   INLINE ::SendMessage( SCI_RELEASEDOCUMENT, 0, pDoc )
+   METHOD OnDestroy()               INLINE aEval( ::aDocs, {|aDoc| hb_qSelf():ReleaseDocument( aDoc[1] ) } ), FreeLibrary( ::hLib ), NIL
    METHOD GetText()
    METHOD GetDocFileName()
    METHOD SetDocText( pDoc, cText ) INLINE ::SelectDocument( pDoc ), ::SetText( cText )
+   METHOD SelDocByPos( nPos )       INLINE ::SelectDocument( ::aDocs[nPos][1] )
+   METHOD CloseDoc()
+   METHOD Close(n)                  INLINE ::CloseDoc( ::aDocs[n][1] )
 ENDCLASS
+
+METHOD CloseDoc( pDoc ) CLASS SourceEditor
+   LOCAL n, lRet
+   n := ASCAN( ::aDocs, {|a| a[1]==pDoc} )
+   lRet := n > 0
+   IF lRet
+      ::ReleaseDocument( pDoc )
+      ADEL( ::aDocs, n, .T. )
+   ENDIF
+RETURN lRet
 
 METHOD CreateDocument() CLASS SourceEditor
    LOCAL pDoc := ::SendMessage( SCI_CREATEDOCUMENT, 0, 0 )
    AADD( ::aDocs, {pDoc,} )
 RETURN pDoc
 
-METHOD GetText() CLASS SourceEditor
-   LOCAL cText, nLen := ::SendMessage( SCI_GETLENGTH, 0, 0 )
+METHOD GetText( pDoc ) CLASS SourceEditor
+   LOCAL pCur, cText, nLen
+   IF pDoc != NIL
+      pCur := ::GetCurDoc()
+      ::SelectDocument( pDoc )
+   ENDIF
+   nLen := ::SendMessage( SCI_GETLENGTH, 0, 0 )
    cText := SPACE( nLen )
    ::SendMessage( SCI_GETTEXT, nLen, @cText )
+   IF pDoc != NIL
+      ::SelectDocument( pCur )
+   ENDIF
 RETURN cText
 
 METHOD GetDocFileName( pDoc ) CLASS SourceEditor

@@ -181,8 +181,9 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
       //::Editor:lModified := .T.
    ENDIF
    //::Editor:SetExtension( "prg" )
+   
+   cMain := ::Application:SourceEditor:GetText( ::Application:ProjectPrgEditor )
 
-   cMain := ::Application:ProjectPrgEditor:GetText()
    IF AT( "[BEGIN SYSTEM CODE]", cMain ) == 0
       cProject := "//----------------------------------- [BEGIN SYSTEM CODE] ------------------------------------//" + CRLF
       cProject += "   __" + STRTRAN( ::Application:Project:Properties:Name, " ", "_" ) + "( NIL ):Run( "+::Name+"( NIL ) )" + CRLF
