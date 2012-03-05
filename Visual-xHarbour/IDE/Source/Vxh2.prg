@@ -163,7 +163,7 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
 
    ::BackgroundImage := FreeImageRenderer( Self ):Create()
 
-   ::Editor := ::Application:SourceEditor:CreateDocument() //Editor():New(,,,,, ::Application:SourceEditor:oEditor:oDisplay )
+   ::Editor := ::Application:SourceEditor:CreateDocument()
 
    IF cFileName != NIL
       ::Application:SourceTabs:InsertTab( cFileName )
@@ -201,7 +201,7 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
    ::Selected := {{Self}}
 
    ::Application:ObjectTree:Set( Self, lNew )
-
+   ::Application:SourceEditor:EmptyUndoBuffer()
 RETURN Self
 
 

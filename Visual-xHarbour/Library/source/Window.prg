@@ -2845,7 +2845,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
            //::hdr:Pointer( nlParam )
 
            nRet := ExecuteEvent( "OnNotify", Self )
-           ODEFAULT nRet TO ::OnNotify( nwParam, nlParam, ::hdr )
+           nRet := ::OnNotify( nwParam, nlParam, code )
 
            IF nRet == NIL
               pPtr := GetProp( ::hdr:hwndFrom, "PROP_CLASSOBJECT" )
