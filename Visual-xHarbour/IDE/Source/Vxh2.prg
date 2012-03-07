@@ -190,7 +190,7 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
       cProject += "//------------------------------------ [END SYSTEM CODE] -------------------------------------//" + CRLF + CRLF
       cProject += "RETURN NIL"+ CRLF+ CRLF
       cMain := STRTRAN( cMain, "RETURN NIL"+ CRLF, cProject )
-      ::Application:ProjectPrgEditor:SetDocText( ::Application:ProjectPrgEditor, cMain )
+      ::Application:SourceEditor:SetDocText( ::Application:ProjectPrgEditor, cMain )
    ENDIF
 
    IF !::Application:Project:DesignPage
