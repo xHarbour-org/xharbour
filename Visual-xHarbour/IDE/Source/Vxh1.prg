@@ -9,7 +9,7 @@
 STATIC lSplash := .F.
 
 static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
-static __hSciLib
+
 //  Link ALL xHarbour functions!!!
 #ifndef HB_CDP_SUPPORT_ON
    #define HB_CDP_SUPPORT_OFF
@@ -79,11 +79,6 @@ INIT PROCEDURE __VXH_Start
       ENDIF
       RegCloseKey( hKey )
    ENDIF
-   __hSciLib := LoadLibrary( "SciLexer.dll" )
-RETURN
-
-EXIT PROCEDURE __VXH_End
-   FreeLibrary( __hSciLib )
 RETURN
 
 PROCEDURE Main( cFile )
@@ -6345,7 +6340,9 @@ RETURN Self
 //------------------------------------------------------------------------------------------------------------------------------------
 
 CLASS SourceEditor INHERIT Control
-   DATA aDocs EXPORTED INIT {}
+   DATA aDocs   EXPORTED INIT {}
+   DATA hSciLib PROTECTED
+
    ACCESS SelectionStart INLINE ::SendMessage( SCI_GETSELECTIONSTART, 0, 0 )
    ACCESS DocCount       INLINE LEN( ::aDocs )
    METHOD Init() CONSTRUCTOR
@@ -6361,7 +6358,7 @@ CLASS SourceEditor INHERIT Control
    METHOD ReleaseDocument( pDoc )   INLINE ::SendMessage( SCI_RELEASEDOCUMENT, 0, pDoc )
    METHOD EmptyUndoBuffer()         INLINE ::SendMessage( SCI_EMPTYUNDOBUFFER, 0, 0 )
 
-   METHOD OnDestroy()               INLINE aEval( ::aDocs, {|aDoc| hb_qSelf():ReleaseDocument( aDoc[1] ) } ), NIL
+   METHOD OnDestroy()               INLINE aEval( ::aDocs, {|aDoc| hb_qSelf():ReleaseDocument( aDoc[1] ) } ), FreeLibrary( ::hSciLib ), NIL
    METHOD SetDocText( pDoc, cText ) INLINE ::SelectDocument( pDoc ), ::SetText( cText )
    METHOD SelDocByPos( nPos )       INLINE ::SelectDocument( ::aDocs[nPos][1] )
    METHOD Close(n)                  INLINE ::CloseDoc( ::aDocs[n][1] )
@@ -6378,6 +6375,7 @@ ENDCLASS
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS SourceEditor
+   ::hSciLib := LoadLibrary( "SciLexer.dll" )
    ::__xCtrlName := "SourceEditor"
    ::ClsName := "Scintilla"
    ::Super:Init( oParent )
@@ -6409,16 +6407,24 @@ RETURN nMod > 0
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD SaveDoc( pDoc, cFile ) CLASS SourceEditor
-   LOCAL n, pPrev
+   LOCAL n, pPrev, hFile, cText
    IF ( n := ASCAN( ::aDocs, {|a| a[1]==pDoc} ) ) > 0
       IF cFile != NIL
          ::aDocs[n][2] := cFile
       ENDIF
-      MEMOWRIT( ::aDocs[n][2], ::GetText( pDoc ), .F. )
-      pPrev := ::GetCurDoc()
-      ::SelectDocument( pDoc )
-      ::SendMessage( SCI_SETSAVEPOINT, 0, 0 )
-      ::SelectDocument( pPrev )
+      IF !EMPTY( ::aDocs[n][2] )
+
+         IF ( hFile := fCreate( ::aDocs[n][2] ) ) <> -1
+            cText := ::GetText( pDoc )
+            fWrite( hFile, cText, Len(cText) )
+            fClose( hFile )
+         ENDIF
+
+         pPrev := ::GetCurDoc()
+         ::SelectDocument( pDoc )
+         ::SendMessage( SCI_SETSAVEPOINT, 0, 0 )
+         ::SelectDocument( pPrev )
+      ENDIF
    ENDIF
 RETURN Self
 
@@ -6447,9 +6453,11 @@ METHOD GetText( pDoc ) CLASS SourceEditor
       pCur := ::GetCurDoc()
       ::SelectDocument( pDoc )
    ENDIF
-   nLen := ::SendMessage( SCI_GETLENGTH, 0, 0 )
+
+   nLen := ::SendMessage( SCI_GETLENGTH, 0, 0 )+1
    cText := SPACE( nLen )
    ::SendMessage( SCI_GETTEXT, nLen, @cText )
+   cText := STRTRAN( cText, CHR(0) )
    IF pDoc != NIL
       ::SelectDocument( pCur )
    ENDIF
