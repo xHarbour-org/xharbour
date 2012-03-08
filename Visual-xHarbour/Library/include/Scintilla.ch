@@ -892,34 +892,3 @@
 #define SCN_AUTOCCANCELLED 2025
 #define SCN_AUTOCCHARDELETED 2026
 #define SCN_HOTSPOTRELEASECLICK 2027
-/*
-typedef struct {;
-   void *hwndFrom;
-   uptr_t idFrom;
-   unsigned int code;
-}NOTIFYHEADER
-
-typedef struct {;
-   struct Sci_NotifyHeader nmhdr;
-   int position;
-   int ch;
-   int modifiers;
-   int modificationType;
-   const char *text;
-   int length;
-   int linesAdded;
-   int message;
-   uptr_t wParam;
-   sptr_t lParam;
-   int line;
-   int foldLevelNow;
-   int foldLevelPrev;
-   int margin;
-   int listType;
-   int x;
-   int y;
-   int token;
-   int annotationLinesAdded;
-   int updated;
-}SCNOTIFICATION
-*/

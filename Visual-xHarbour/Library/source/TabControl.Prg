@@ -1631,7 +1631,7 @@ METHOD Select() CLASS TabPage
    ENDIF
    ::Parent:SetCurSel( ::Index )
    ::Parent:Redraw()
-   ::Application:DoEvents()
+   //::Application:DoEvents()
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------

@@ -30,8 +30,6 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 #include "winuser.ch"
 #include "fileio.ch"
 
-#include "xedit.ch"
-
 #define XFM_EOL Chr(13) + Chr(10)
 #define HKEY_LOCAL_MACHINE           (0x80000002)
 
@@ -2900,8 +2898,7 @@ METHOD EditCopy() CLASS Project
       NEXT
       ::EditReset(1)
     ELSEIF ::Application:SourceEditor:IsWindowVisible()
-      //PostMessage( ::Application:SourceEditor:hWnd, WM_COMMAND, 30104 )
-      ::Application:SourceEditor:oEditor:OnKey( K_CTRL_C, 1 )
+      ::Application:SourceEditor:Copy()
    ENDIF
 RETURN 0
 
@@ -2987,12 +2984,11 @@ METHOD EditCut() CLASS Project
 
       ::EditReset(1)
     ELSEIF ::Application:SourceEditor:IsWindowVisible()
-      ::Application:SourceEditor:oEditor:OnKey( K_CTRL_X, 1 )
+      ::Application:SourceEditor:Cut()
 
-      //::Application:SourceEditor:oEditor:lModified := .T.
       ::Modified := .T.
-      ::Application:Props[ "EditUndoItem" ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := Len( ::Application:SourceEditor:oEditor:aUnDo ) > 0
-      ::Application:Props[ "EditRedoItem" ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := Len( ::Application:SourceEditor:oEditor:aReDo ) > 0
+      ::Application:Props[ "EditUndoItem" ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := ::Application:SourceEditor:CanUndo()
+      ::Application:Props[ "EditRedoItem" ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := ::Application:SourceEditor:CanRedo()
 
    ENDIF
 RETURN 0
@@ -3011,12 +3007,11 @@ METHOD EditPaste() CLASS Project
       ENDIF
       ::EditReset(1)
     ELSEIF ::Application:SourceEditor:IsWindowVisible()
-      ::Application:SourceEditor:oEditor:OnKey( K_CTRL_V, 1 )
+      ::Application:SourceEditor:Paste()
 
-      //::Application:SourceEditor:oEditor:lModified := .T.
       ::Modified := .T.
-      ::Application:Props[ "EditUndoItem" ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := Len( ::Application:SourceEditor:oEditor:aUnDo ) > 0
-      ::Application:Props[ "EditRedoItem" ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := Len( ::Application:SourceEditor:oEditor:aReDo ) > 0
+      ::Application:Props[ "EditUndoItem" ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := ::Application:SourceEditor:CanUndo()
+      ::Application:Props[ "EditRedoItem" ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := ::Application:SourceEditor:CanRedo()
    ENDIF
 RETURN 0
 
@@ -3028,12 +3023,11 @@ METHOD EditDelete() CLASS Project
    IF ::Application:DesignPage:IsWindowVisible()
       ::CurrentForm:MaskKeyDown(, VK_DELETE )
     ELSEIF ::Application:SourceEditor:IsWindowVisible()
-      ::Application:SourceEditor:oEditor:OnKey( K_DEL, 1 )
+      ::Application:SourceEditor:SendMessage( WM_KEYDOWN, VK_DELETE )
 
-      //::Application:SourceEditor:oEditor:lModified := .T.
       ::Modified := .T.
-      ::Application:Props[ "EditUndoItem"  ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := Len( ::Application:SourceEditor:oEditor:aUnDo ) > 0
-      ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := Len( ::Application:SourceEditor:oEditor:aReDo ) > 0
+      ::Application:Props[ "EditUndoItem"  ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := ::Application:SourceEditor:CanUndo()
+      ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := ::Application:SourceEditor:CanRedo()
    ENDIF
 RETURN 0
 
@@ -3046,12 +3040,12 @@ METHOD Undo() CLASS Project
    IF ::Application:DesignPage:IsWindowVisible()
       ::SetAction( ::aUndo, ::aRedo )
     ELSEIF ::Application:SourceEditor:IsWindowVisible()
-      ::Application:SourceEditor:oEditor:OnKey( K_CTRL_Z, 1 )
+      ::Application:SourceEditor:Undo()
 
       //::Application:SourceEditor:oEditor:lModified := .T.
       ::Modified := .T.
-      ::Application:Props[ "EditUndoItem"  ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := Len( ::Application:SourceEditor:oEditor:aUnDo ) > 0
-      ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := Len( ::Application:SourceEditor:oEditor:aReDo ) > 0
+      ::Application:Props[ "EditUndoItem"  ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := ::Application:SourceEditor:CanUndo()
+      ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := ::Application:SourceEditor:CanRedo()
    ENDIF
 RETURN 0
 
@@ -3063,12 +3057,12 @@ METHOD ReDo() CLASS Project
    IF ::Application:DesignPage:IsWindowVisible()
       ::SetAction( ::aRedo, ::aUnDo )
     ELSEIF ::Application:SourceEditor:IsWindowVisible()
-      ::Application:SourceEditor:oEditor:OnKey( K_CTRL_Y, 1 )
+      ::Application:SourceEditor:Redo()
 
       //::Application:SourceEditor:oEditor:lModified := .T.
       ::Modified := .T.
-      ::Application:Props[ "EditUndoItem"  ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := Len( ::Application:SourceEditor:oEditor:aUnDo ) > 0
-      ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := Len( ::Application:SourceEditor:oEditor:aReDo ) > 0
+      ::Application:Props[ "EditUndoItem"  ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := ::Application:SourceEditor:CanUndo()
+      ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := ::Application:SourceEditor:CanRedo()
    ENDIF
 RETURN 0
 
@@ -3364,34 +3358,31 @@ METHOD Close( lCloseErrors ) CLASS Project
    ::Application:SourceEditor:Hide()
 
    ::Application:DesignPage:Disable()
-   IF ! ::Application:Props[ "StartTabPage" ]:IsWindow()
-      RETURN .T.
-   ENDIF
-   ::Application:Props[ "StartTabPage" ]:Select()
-
-   ::Application:Props[ "ComboSelect" ]:ResetContent()
-
-   ::aUndo := {}
-   ::aRedo := {}
-
-   ::Application:Props[ "EditUndoItem"  ]:Enabled := .F.
-   ::Application:Props[ "EditUndoBttn"  ]:Enabled := .F.
-   ::Application:Props[ "EditRedoItem"  ]:Enabled := .F.
-   ::Application:Props[ "EditRedoBttn"  ]:Enabled := .F.
-
-   ::CopyBuffer  := {}
-   ::PasteOn     := .F.
-
-   ::DesignPage  := .F.
-   ::ProjectFile := NIL
-   ::Forms       := {}
-   ::Modified    := .F.
-   ::Properties  := NIL
-   ::Modified    := .F.
-
-   ::CurrentForm := NIL
    
    IF IsWindow( ::Application:MainForm:hWnd )
+      ::Application:Props[ "StartTabPage" ]:Select()
+      ::Application:Props[ "ComboSelect" ]:ResetContent()
+
+      ::aUndo := {}
+      ::aRedo := {}
+
+      ::Application:Props[ "EditUndoItem"  ]:Enabled := .F.
+      ::Application:Props[ "EditUndoBttn"  ]:Enabled := .F.
+      ::Application:Props[ "EditRedoItem"  ]:Enabled := .F.
+      ::Application:Props[ "EditRedoBttn"  ]:Enabled := .F.
+
+      ::CopyBuffer  := {}
+      ::PasteOn     := .F.
+
+      ::DesignPage  := .F.
+      ::ProjectFile := NIL
+      ::Forms       := {}
+      ::Modified    := .F.
+      ::Properties  := NIL
+      ::Modified    := .F.
+
+      ::CurrentForm := NIL
+   
       EVAL( ::Application:MainTab:OnSelChanged, NIL, NIL, 1)
       ::EditReset(1)
 
@@ -5934,9 +5925,9 @@ METHOD SetAction( aActions, aReverse ) CLASS Project
                      ::Application:MainForm:PostMessage( WM_USER + 3000, x - 1 )
                   ENDIF
 
-                  IF ( x := ASCAN( xEdit_GetEditors(), {|o| o == aAction[8]:Editor } ) ) > 0
+                  IF ( x := ASCAN( ::Application:SourceEditor:aDocs, {|a| a[1] == aAction[8]:Editor } ) ) > 0
                      ::Application:SourceTabs:DeleteTab( x )
-                     xEdit_GetEditors()[x]:Close()
+                     ::Application:SourceEditor:Close(x)
                   ENDIF
 
                ENDIF
@@ -6350,13 +6341,21 @@ CLASS SourceEditor INHERIT Control
 
    METHOD OpenFile()
    METHOD CreateDocument()
-   METHOD SetSavePoint()            INLINE ::SendMessage( SCI_SETSAVEPOINT, 0, 0 )
+   METHOD SetSavePoint()
    METHOD SetText( cText )          INLINE ::SendMessage( SCI_SETTEXT, 0, cText )
    METHOD GotoPosition( nPos )      INLINE ::SendMessage( SCI_GOTOPOS, nPos, 0 )
    METHOD SelectDocument( pDoc )    INLINE ::SendMessage( SCI_SETDOCPOINTER, 0, pDoc )
    METHOD GetCurDoc()               INLINE ::SendMessage( SCI_GETDOCPOINTER, 0, 0 )
    METHOD ReleaseDocument( pDoc )   INLINE ::SendMessage( SCI_RELEASEDOCUMENT, 0, pDoc )
    METHOD EmptyUndoBuffer()         INLINE ::SendMessage( SCI_EMPTYUNDOBUFFER, 0, 0 )
+   METHOD CanUndo()                 INLINE ::SendMessage( SCI_CANUNDO, 0, 0 )==1
+   METHOD CanRedo()                 INLINE ::SendMessage( SCI_CANREDO, 0, 0 )==1
+   METHOD Undo()                    INLINE ::SendMessage( SCI_UNDO, 0, 0 )
+   METHOD Redo()                    INLINE ::SendMessage( SCI_REDO, 0, 0 )
+   METHOD Copy()                    INLINE ::SendMessage( SCI_COPY, 0, 0 )
+   METHOD Paste()                   INLINE ::SendMessage( SCI_PASTE, 0, 0 )
+   METHOD Cut()                     INLINE ::SendMessage( SCI_CUT, 0, 0 )
+   METHOD CanPaste()                INLINE ::SendMessage( SCI_CANPASTE, 0, 0 )==1
 
    METHOD OnDestroy()               INLINE aEval( ::aDocs, {|aDoc| hb_qSelf():ReleaseDocument( aDoc[1] ) } ), FreeLibrary( ::hSciLib ), NIL
    METHOD SetDocText( pDoc, cText ) INLINE ::SelectDocument( pDoc ), ::SetText( cText )
@@ -6370,7 +6369,7 @@ CLASS SourceEditor INHERIT Control
    METHOD SaveDoc()
    METHOD GetText()
    METHOD GetDocFileName()
-   METHOD OnNotify()
+   METHOD OnParentNotify()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -6379,7 +6378,7 @@ METHOD Init( oParent ) CLASS SourceEditor
    ::__xCtrlName := "SourceEditor"
    ::ClsName := "Scintilla"
    ::Super:Init( oParent )
-   ::Style := WS_CHILD | WS_TABSTOP | LBS_NOTIFY
+   ::Style := WS_CHILD | WS_TABSTOP | WS_CLIPCHILDREN
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -6388,8 +6387,36 @@ METHOD Create() CLASS SourceEditor
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
-METHOD OnNotify( nwParam, nlParam ) CLASS SourceEditor
-   view nwParam, nlParam
+METHOD SetSavePoint() CLASS SourceEditor
+   LOCAL cText, n
+   ::SendMessage( SCI_SETSAVEPOINT, 0, 0 )
+   cText := ::Application:SourceTabs:GetItemText()
+   cText := ALLTRIM( STRTRAN( cText, "*" ) )
+   ::Application:SourceTabs:SetItemText( , cText, .F. )
+   IF ( n := ASCAN( ::aDocs, {|a| a[1]==::GetCurDoc() } ) ) > 0
+      ::aDocs[n][3] := .F.
+   ENDIF
+RETURN Self
+
+//------------------------------------------------------------------------------------------------------------------------------------
+METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
+   LOCAL cText, n, scn
+   (nwParam, nlParam)
+   DO CASE
+      CASE hdr:code == SCN_MODIFIED
+           IF ( n := ASCAN( ::aDocs, {|a| a[1]==::GetCurDoc() .AND. !a[3] } ) ) > 0
+              scn := (struct SCNOTIFICATION*) nlParam
+              view scn:line
+              
+              ::aDocs[n][3] := .T.
+              cText := ::Application:SourceTabs:GetItemText()
+              cText := ALLTRIM( STRTRAN( cText, "*" ) )
+              ::Application:SourceTabs:SetItemText( , " " + cText + " * ", .T. )
+
+              ::Application:Props:EditUndoItem:Enabled := ::Application:Props:EditUndoBttn:Enabled := ::CanUndo()
+              ::Application:Props:EditRedoItem:Enabled := ::Application:Props:EditRedoBttn:Enabled := ::CanRedo()
+           ENDIF
+   ENDCASE
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -6422,7 +6449,7 @@ METHOD SaveDoc( pDoc, cFile ) CLASS SourceEditor
 
          pPrev := ::GetCurDoc()
          ::SelectDocument( pDoc )
-         ::SendMessage( SCI_SETSAVEPOINT, 0, 0 )
+         ::SetSavePoint()
          ::SelectDocument( pPrev )
       ENDIF
    ENDIF
@@ -6442,7 +6469,7 @@ RETURN lRet
 METHOD CreateDocument() CLASS SourceEditor
    LOCAL pDoc := ::SendMessage( SCI_CREATEDOCUMENT, 0, 0 )
    ::SelectDocument( pDoc )
-   ::SendMessage( SCI_SETSAVEPOINT, 0, 0 )
+   ::SetSavePoint()
    AADD( ::aDocs, {pDoc,,.F.} )
 RETURN pDoc
 
@@ -6476,7 +6503,7 @@ RETURN cFile
 METHOD OpenFile( cFile ) CLASS SourceEditor
    LOCAL n, cText := MEMOREAD( cFile )
    ::SetText( cText )
-   ::SendMessage( SCI_SETSAVEPOINT, 0, 0 )
+   ::SetSavePoint()
    ::GotoPosition( 0 )
    IF ( n := ASCAN( ::aDocs, {|a| a[1]==::GetCurDoc()} ) ) > 0
       ::aDocs[n][2] := cFile

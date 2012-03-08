@@ -1613,3 +1613,26 @@ typedef struct LVTILEVIEWINFO {;
     RECT  rcLabelMargin;
 } LVTILEVIEWINFO, *PLVTILEVIEWINFO;
 
+typedef struct {;
+   NMHDR nmhdr;
+   int position;
+   int ch;
+   int modifiers;
+   int modificationType;
+   char *text;
+   int length;
+   int linesAdded;
+   int message;
+   WPARAM wParam;
+   LPARAM lParam;
+   int line;
+   int foldLevelNow;
+   int foldLevelPrev;
+   int margin;
+   int listType;
+   int x;
+   int y;
+   int token;
+   int annotationLinesAdded;
+   int updated;
+}SCNOTIFICATION
