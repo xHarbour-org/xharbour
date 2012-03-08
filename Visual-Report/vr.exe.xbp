@@ -64,12 +64,10 @@ MYRC_FLAGS =
 
 [fbclient_ms.lib]
 
-[C:\wf.8.4\Prg\Build\Lib\wf.8.4-SQL\wf.8.4-SQL-Level0_VXH.Lib]
+[W:\wf.8.5\Build\Lib\wf.8.5-SQL\wf.8.5-SQL-Level0_VXH.Lib]
 
-[C:\wf.8.4\Prg\Build\Lib\wf.8.4-SQL\wf.8.4-SQL-Level1_VXH.Lib]
+[W:\wf.8.5\Build\Lib\wf.8.5-SQL\wf.8.5-SQL-Level1_VXH.Lib]
 
-[C:\wf.8.4\Prg\Build\Lib\wf.8.4-SQL\wf.8.4-SQL-Level2_VXH.Lib]
+[W:\wf.8.5\Build\Lib\wf.8.5-SQL\wf.8.5-SQL-Level2_VXH.Lib]
 
-[C:\wf.8.4\Prg\Build\Lib\wf.8.4-SQL\wf.8.4-SQL-Level5_VXH.Lib]
-
-[C:\wf.8.4\Prg\Build\Lib\VXH\wf_Dialogs.lib]
+[W:\wf.8.5\Build\Lib\VXH\wf_Dialogs.lib]
