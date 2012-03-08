@@ -665,6 +665,7 @@
 [\xbp\xcc\xhbmt.lib\misc3.obj]
 
 # *** pcre.lib ***
+[\xbp\xcc\xhbmt.lib\pcre_byte_order.obj]
 [\xbp\xcc\xhbmt.lib\pcreposix.obj]
 [\xbp\xcc\xhbmt.lib\pcre_compile.obj]
 [\xbp\xcc\xhbmt.lib\pcre_config.obj]
@@ -673,13 +674,11 @@
 [\xbp\xcc\xhbmt.lib\pcre_fullinfo.obj]
 [\xbp\xcc\xhbmt.lib\pcre_get.obj]
 [\xbp\xcc\xhbmt.lib\pcre_globals.obj]
-[\xbp\xcc\xhbmt.lib\pcre_info.obj]
 [\xbp\xcc\xhbmt.lib\pcre_maketables.obj]
 [\xbp\xcc\xhbmt.lib\pcre_ord2utf8.obj]
 [\xbp\xcc\xhbmt.lib\pcre_refcount.obj]
 [\xbp\xcc\xhbmt.lib\pcre_study.obj]
 [\xbp\xcc\xhbmt.lib\pcre_tables.obj]
-[\xbp\xcc\xhbmt.lib\pcre_try_flipped.obj]
 [\xbp\xcc\xhbmt.lib\pcre_valid_utf8.obj]
 [\xbp\xcc\xhbmt.lib\pcre_version.obj]
 [\xbp\xcc\xhbmt.lib\pcre_xclass.obj]

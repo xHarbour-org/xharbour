@@ -7,16 +7,16 @@ LIBFOLDERS =
 LMT = .F.
 MAPFILE =
 MYC_FLAGS =
-MYDEFINES = WIN32;__EXPORT__;ADS_LIB_VERSION=710
+MYDEFINES = WIN32;__EXPORT__;ADS_LIB_VERSION=810
 MYLINK_FLAGS =
 MYPRG_FLAGS =
 MYRC_FLAGS =
 MYSLY_FLAGS =
-OUTPUTFOLDER = \xbp\xcc\ads7.lib
+OUTPUTFOLDER = \xbp\xcc\ads8.lib
 PRG_OUTPUTFOLDER =
 RC_OUTPUTFOLDER =
 SLY_OUTPUTFOLDER =
-TARGETFOLDER = \xhb\lib\ads7
+TARGETFOLDER = \xhb\lib\ads8
 
 [\xHarbour\contrib\rdd_ads\adsmgmnt.c]
 [\xHarbour\contrib\rdd_ads\adsfunc.c]

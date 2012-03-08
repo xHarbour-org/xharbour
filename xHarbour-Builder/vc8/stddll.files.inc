@@ -661,6 +661,7 @@
 [\xbp\vc8\xhb.lib\misc3.obj]
 
 # *** pcre.lib ***
+[\xbp\vc8\xhb.lib\pcre_byte_order.obj]
 [\xbp\vc8\xhb.lib\pcreposix.obj]
 [\xbp\vc8\xhb.lib\pcre_compile.obj]
 [\xbp\vc8\xhb.lib\pcre_config.obj]
@@ -669,13 +670,11 @@
 [\xbp\vc8\xhb.lib\pcre_fullinfo.obj]
 [\xbp\vc8\xhb.lib\pcre_get.obj]
 [\xbp\vc8\xhb.lib\pcre_globals.obj]
-[\xbp\vc8\xhb.lib\pcre_info.obj]
 [\xbp\vc8\xhb.lib\pcre_maketables.obj]
 [\xbp\vc8\xhb.lib\pcre_ord2utf8.obj]
 [\xbp\vc8\xhb.lib\pcre_refcount.obj]
 [\xbp\vc8\xhb.lib\pcre_study.obj]
 [\xbp\vc8\xhb.lib\pcre_tables.obj]
-[\xbp\vc8\xhb.lib\pcre_try_flipped.obj]
 [\xbp\vc8\xhb.lib\pcre_valid_utf8.obj]
 [\xbp\vc8\xhb.lib\pcre_version.obj]
 [\xbp\vc8\xhb.lib\pcre_xclass.obj]

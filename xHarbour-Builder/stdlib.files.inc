@@ -662,6 +662,8 @@
 
 
 # *** pcre.lib ***
+[source\rtl\pcre\pcre_byte_order.c]
+MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcreposix.c]
 MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_compile.c]
@@ -678,8 +680,6 @@ MYDEFINES = HAVE_CONFIG_H
 MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_globals.c]
 MYDEFINES = HAVE_CONFIG_H
-[source\rtl\pcre\pcre_info.c]
-MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_maketables.c]
 MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_ord2utf8.c]
@@ -689,8 +689,6 @@ MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_study.c]
 MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_tables.c]
-MYDEFINES = HAVE_CONFIG_H
-[source\rtl\pcre\pcre_try_flipped.c]
 MYDEFINES = HAVE_CONFIG_H
 [source\rtl\pcre\pcre_valid_utf8.c]
 MYDEFINES = HAVE_CONFIG_H
