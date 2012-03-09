@@ -3282,7 +3282,7 @@ METHOD Close( lCloseErrors ) CLASS Project
                    nRes := NIL
                 ENDIF
              ENDIF
-             //xEdit_GetEditors()[n]:lModified := .F.
+             ::Application:SourceEditor:aDocs[n][3] := .F.
           ENDIF
        ENDIF
        ::Application:SourceEditor:Close( n )
@@ -3414,13 +3414,12 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD SaveSource( oEditor ) CLASS Project
-   DEFAULT oEditor TO ::Application:SourceEditor:oEditor
-   IF EMPTY( oEditor:cFile )
+   DEFAULT oEditor TO ::Application:SourceEditor:GetCurDoc()
+   IF EMPTY( ::Application:SourceEditor:GetDocFileName( oEditor ) )
       ::SaveSourceAs( oEditor )
     ELSE
-      oEditor:Save()
+      ::Application:SourceEditor:SaveDoc( oEditor )
    ENDIF
-   oEditor:lModified := .F.
    OnShowEditors()
 RETURN Self
 
@@ -3567,8 +3566,8 @@ METHOD OpenSource( cSource ) CLASS Project
    ENDIF
    ::Application:SourceEditor:Show()
 
-   oEditor := Editor():New(,,,, oFile:Path+"\"+oFile:Name, ::Application:SourceEditor:oEditor:oDisplay )
-   oEditor:SetExtension( "prg" )
+   oEditor := ::Application:SourceEditor:CreateDocument( oFile:Path+"\"+oFile:Name )
+
    ::Application:SourceTabs:Visible := .T.
    ::Application:SourceTabs:InsertTab( oFile:Name )
    ::Application:SourceTabs:SetCurSel( ::Application:SourceEditor:DocCount )
@@ -3656,7 +3655,7 @@ METHOD Open( cProject ) CLASS Project
    EXTERN MDIChildWindow
 
    LOCAL n, Xfm, aChildren
-   LOCAL hFile, cLine, oEditor, cSource, oProject, cFile, nLine, aErrors, aEditors, cProp, cSourcePath
+   LOCAL hFile, cLine, cSource, oProject, cFile, nLine, aErrors, aEditors, cProp, cSourcePath
 
    IF cProject != NIL .AND. !FILE( cProject )
       MessageBox( GetActiveWindow(), "File Not Found", "Open Project", MB_ICONEXCLAMATION )
@@ -3801,8 +3800,9 @@ METHOD Open( cProject ) CLASS Project
    FOR EACH cSource IN ::Properties:Sources
        n := RAT( "\", cSource )
        IF FILE( cSource )
-          oEditor := Editor():New(,,,, cSource, ::Application:SourceEditor:oEditor:oDisplay )
-          oEditor:SetExtension( "prg" )
+          ::Application:SourceEditor:CreateDocument()
+          ::Application:SourceEditor:OpenFile( cSource )
+
           ::Application:SourceTabs:InsertTab( SUBSTR( cSource, n+1 ) )
           ::Application:SourceTabs:SetCurSel( ::Application:SourceEditor:DocCount )
           ::SourceTabChanged(, ::Application:SourceEditor:DocCount )
@@ -6344,6 +6344,7 @@ CLASS SourceEditor INHERIT Control
    METHOD SetSavePoint()
    METHOD SetText( cText )          INLINE ::SendMessage( SCI_SETTEXT, 0, cText )
    METHOD GotoPosition( nPos )      INLINE ::SendMessage( SCI_GOTOPOS, nPos, 0 )
+   METHOD GotoLine( nLine )         INLINE ::SendMessage( SCI_GOTOLINE, nLine, 0 )
    METHOD SelectDocument( pDoc )    INLINE ::SendMessage( SCI_SETDOCPOINTER, 0, pDoc )
    METHOD GetCurDoc()               INLINE ::SendMessage( SCI_GETDOCPOINTER, 0, 0 )
    METHOD ReleaseDocument( pDoc )   INLINE ::SendMessage( SCI_RELEASEDOCUMENT, 0, pDoc )
@@ -6356,6 +6357,7 @@ CLASS SourceEditor INHERIT Control
    METHOD Paste()                   INLINE ::SendMessage( SCI_PASTE, 0, 0 )
    METHOD Cut()                     INLINE ::SendMessage( SCI_CUT, 0, 0 )
    METHOD CanPaste()                INLINE ::SendMessage( SCI_CANPASTE, 0, 0 )==1
+   METHOD SetReadOnly( lSet )       INLINE ::SendMessage( SCI_SETREADONLY, lSet, 0 )
 
    METHOD OnDestroy()               INLINE aEval( ::aDocs, {|aDoc| hb_qSelf():ReleaseDocument( aDoc[1] ) } ), FreeLibrary( ::hSciLib ), NIL
    METHOD SetDocText( pDoc, cText ) INLINE ::SelectDocument( pDoc ), ::SetText( cText )
@@ -6452,6 +6454,7 @@ METHOD SaveDoc( pDoc, cFile ) CLASS SourceEditor
          ::SetSavePoint()
          ::SelectDocument( pPrev )
       ENDIF
+      ::aDocs[n][3] := .F.
    ENDIF
 RETURN Self
 
@@ -6466,11 +6469,11 @@ METHOD CloseDoc( pDoc ) CLASS SourceEditor
 RETURN lRet
 
 //------------------------------------------------------------------------------------------------------------------------------------
-METHOD CreateDocument() CLASS SourceEditor
+METHOD CreateDocument( cFile ) CLASS SourceEditor
    LOCAL pDoc := ::SendMessage( SCI_CREATEDOCUMENT, 0, 0 )
    ::SelectDocument( pDoc )
    ::SetSavePoint()
-   AADD( ::aDocs, {pDoc,,.F.} )
+   AADD( ::aDocs, { pDoc, cFile, .F. } )
 RETURN pDoc
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -7018,3 +7021,47 @@ RETURN NIL
       ENDIF
    RETURN Self
 #endif
+
+FUNCTION GetLogErrors( sText )
+   LOCAL nID := 0, aaErrors := {}, sLine, aMatch, sFile
+   LOCAL s_TraceLog := HB_RegExComp( "Type: . >>>(.*)(<<<)?" )
+   LOCAL s_ErrorLine := HB_RegExComp( "(?i)(?:[0-9]+00\r+)*(.+)\(([0-9]+)?\):? *(error:|Error [EF][0-9]+) (.+)" )
+   LOCAL s_WarningLine := HB_RegExComp( "(?i)(?:[0-9]+00\r+)*(.+)\(([0-9]+)\):? *(warning:|Warning [A-Z][0-9]+) (.+)" )
+   LOCAL s_MissingExternal := HB_RegExComp( "(?i)(xLink)(:) *(error:|Error [EF][0-9]+) (.+)" )
+
+   WHILE NextLine( @sText, @sLine )
+      IF Empty( sLine )
+         LOOP
+      ENDIF
+
+      sLine := LTrim( sLine )
+      aMatch := HB_Regex( s_TraceLog, sLine )
+
+      IF Empty( aMatch )
+         aMatch := HB_Regex( s_ErrorLine, sLine )
+
+         IF Empty( aMatch )
+            aMatch := HB_Regex( s_WarningLine, sLine )
+         ENDIF
+
+         IF Empty( aMatch )
+            aMatch := HB_Regex( s_MissingExternal, sLine )
+         ENDIF
+
+         IF ! Empty( aMatch )
+            aAdd( aaErrors, aDel( aMatch, 1, .T. )  )
+         ENDIF
+      ELSE
+         IF aMatch[2] = "Couldn't"
+            sFile := HB_aTokens( sLine, " " )[-1]
+            sFile := Left( sFile, Len( sFile ) - 3 )
+            aAdd( aaErrors, { sFile, "", "Error", "Couldn't build" } )
+         ELSEIF aMatch[2] = "[In use?]"
+            sFile := HB_aTokens( sLine, " " )[-1]
+            sFile := Left( sFile, Len( sFile ) - 3 )
+            aAdd( aaErrors, { sFile, "", "Error", "[In use?] couldn't erase" } )
+         ENDIF
+      ENDIF
+   END
+RETURN aaErrors
+

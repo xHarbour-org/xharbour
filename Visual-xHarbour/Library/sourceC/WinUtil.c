@@ -4273,3 +4273,53 @@ HB_FUNC( SETFILETIME )
       CloseHandle( hFile );
    }
 }
+
+HB_FUNC( NEXTLINE )
+{
+   PHB_ITEM pBuffer = hb_param( 1, HB_IT_BYREF );
+   PHB_ITEM pLine = hb_param( 2, HB_IT_BYREF );
+   unsigned long ulPos = 0;
+
+   if( pBuffer && pLine && HB_IS_STRING( pBuffer ) && pBuffer->item.asString.length )
+   {
+      hb_retl( TRUE );
+      while( ulPos < pBuffer->item.asString.length && ( pBuffer->item.asString.value[ ulPos ] != 10 ) )
+      {
+         ulPos++;
+      }
+      if( ulPos == pBuffer->item.asString.length )
+      {
+         if( pBuffer->item.asString.value[ ulPos - 1 ] == 13 )
+         {
+            hb_itemPutCL( pLine, pBuffer->item.asString.value, ulPos - 1 );
+         }
+         else
+         {
+            hb_itemForwardValue( pLine, pBuffer );
+         }
+         hb_storc( NULL, 1 );
+         return;
+      }
+      else if( ulPos )
+      {
+         if( pBuffer->item.asString.value[ ulPos - 1 ] == 13 )
+         {
+            hb_itemPutCL( pLine, pBuffer->item.asString.value, ulPos - 1 );
+         }
+         else
+         {
+            hb_itemPutCL( pLine, pBuffer->item.asString.value, ulPos );
+         }
+      }
+      else
+      {
+         hb_storc( NULL, 2 );
+      }
+      hb_itemPutCRaw( pBuffer, hb_strdup( pBuffer->item.asString.value + ulPos + 1 ), pBuffer->item.asString.length - ( ulPos + 1 ) );
+   }
+   else
+   {
+      hb_storc( NULL, 1 );
+      hb_retl( FALSE );
+   }
+}

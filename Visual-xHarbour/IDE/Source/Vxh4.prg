@@ -680,7 +680,7 @@ METHOD RenameForm( cOldName, cNewName, lProject ) CLASS ObjManager
       
       IF lProject .OR. ::ActiveObject:ClsName == "VXH_FORM_IDE" .OR. ::ActiveObject:ClsName == "CCTL" 
          TRY
-            IF ( n := aScan( xEdit_GetEditors(), oEditor, , , .T. ) ) > 0
+            IF ( n := aScan( ::Application:SourceEditor:aDocs, {|a| a[1]==oEditor} ) ) > 0
                ::Application:SourceTabs:SetItemText( n, cNewName +".prg", .F. )
             ENDIF
             IF ::ActiveObject:ClsName == "VXH_FORM_IDE" .OR. ::ActiveObject:ClsName == "CCTL" 
