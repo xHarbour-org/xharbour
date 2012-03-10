@@ -7065,3 +7065,8 @@ FUNCTION GetLogErrors( sText )
    END
 RETURN aaErrors
 
+FUNCTION PopupEditor()
+RETURN NIL
+
+FUNCTION xEditListView()
+RETURN NIL
