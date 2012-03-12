@@ -1942,8 +1942,12 @@ METHOD Quoted( uData, trim, nLen, nDec, nTargetDB, lSynthetic )   CLASS SR_WORKA
    EndIf
 
    Do Case
+   Case cType $ "CM" .and. nSystemID == SYSTEMID_POSTGR .and. (!trim)
+      return [E'] + rtrim(SR_ESCAPESTRING(uData, nSystemID)) + [']   
    Case cType $ "CM" .and. (!trim)
       return ['] + SR_ESCAPESTRING(uData, ::oSql:nSystemID) + [']
+   Case cType $ "CM" .and. nSystemID == SYSTEMID_POSTGR .and. trim
+      return [E'] + rtrim(SR_ESCAPESTRING(uData, ::oSql:nSystemID)) + [']      
    Case cType $ "CM" .and. trim
       return ['] + rtrim(SR_ESCAPESTRING(uData, ::oSql:nSystemID)) + [']
    Case cType == "D" .and. ::oSql:nSystemID == SYSTEMID_ORACLE
@@ -2025,8 +2029,13 @@ METHOD QuotedNull( uData, trim, nLen, nDec, nTargetDB, lNull, lMemo )   CLASS SR
    EndIf
 
    Do Case
+   Case cType $ "CM" .and. nTargetDB == SYSTEMID_POSTGR .and. (!trim)
+      return [E'] + SR_ESCAPESTRING(uData, nTargetDB) + [']   
+   
    Case cType $ "CM" .and. (!trim)
       return ['] + SR_ESCAPESTRING(uData, nTargetDB) + [']
+   Case cType $ "CM" .and. nTargetDB == SYSTEMID_POSTGR .and. (trim)
+      return [E'] + rtrim(SR_ESCAPESTRING(uData, nTargetDB)) + [']            
    Case cType $ "CM" .and. trim
       return ['] + rtrim(SR_ESCAPESTRING(uData, nTargetDB)) + [']
    Case cType == "D" .and. nTargetDB == SYSTEMID_ORACLE .and. (!lMemo)
@@ -5877,7 +5886,7 @@ METHOD sqlZap() CLASS SR_WORKAREA
       EndIf
       If ::oSql:nSystemID == SYSTEMID_POSTGR .and. ::oSql:lUseSequences .and. ::lUseSequences
          ::oSql:Commit()
-         ::oSql:exec( "select setval('" +::cOwner + LimitLen(::cFileName,3) + "_SQ'  , 0)" )
+         ::oSql:exec( "select setval('" +::cOwner + LimitLen(::cFileName,3) + "_SQ'  , 1)" )
          ::oSql:Commit()
       EndIf
       

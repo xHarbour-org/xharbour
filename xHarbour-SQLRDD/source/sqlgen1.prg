@@ -1170,7 +1170,8 @@ Function SR_SQLQuotedString( uData, nSystemID, lNotNull )
    Endif
 
    Do Case
-
+   Case cType $ "CM" .and. nSystemID == SYSTEMID_POSTGR
+      return [E'] + rtrim(SR_ESCAPESTRING(uData, nSystemID)) + [']
    Case cType $ "CM"
       return ['] + rtrim(SR_ESCAPESTRING(uData, nSystemID)) + [']
    Case cType == "D" .and. nSystemID == SYSTEMID_ORACLE
