@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-03-12 14:32 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
+  * source\rtl\zlib\gzlib.c
+  * source\rtl\zlib\gzread.c
+  * source\rtl\zlib\gzwrite.c
+    ! Fixed compilation for MSVC and POCC
+
 2012-02-18 19:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * utils/hbmake/hbmake.prg
     ! some changes to detect xharbour when instaled in /usr/local

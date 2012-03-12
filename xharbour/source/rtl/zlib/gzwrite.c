@@ -10,6 +10,9 @@
 #ifdef __TURBOC__
 #include "io.h"
 #endif
+#if defined( _MSC_VER )
+#include "io.h"
+#endif
 
 /* Local functions */
 local int gz_init OF((gz_statep));
