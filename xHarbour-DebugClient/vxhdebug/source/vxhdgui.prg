@@ -4,6 +4,9 @@
 
 #include "colors.ch"
 #include "vxh.ch"
+#include "DEBUG.ch"
+
+#define SCI_MARKERADD 2043
 
 CLASS XHDebuggerGUI FROM XHDebugger
   DATA oEditor
@@ -39,8 +42,12 @@ ENDCLASS
 
 METHOD New() CLASS XHDebuggerGUI
   LOCAL lSysColor := ::oApp:DebuggerPanel:BackColor == __GetSystem():CurrentScheme:ToolStripPanelGradientEnd
+#ifdef VXH
+  ::oEditor := ::oApp:SourceEditor:Source
+#else
   ::oEditor := ::oApp:SourceEditor:oEditor
-   
+#endif
+
   WITH OBJECT ::oToolBar := ToolStrip( ::oApp:DebuggerPanel )
     :Dock:Left   := :Parent
     :Dock:Top    := :Parent
@@ -106,7 +113,7 @@ METHOD New() CLASS XHDebuggerGUI
     END
   
   END /* ::oToolBar */
-  
+
   ::oTab := TabControl( ::oApp:DebuggerPanel )
   WITH OBJECT ::oTab
     :Dock:Top    := ::oToolBar
@@ -158,6 +165,7 @@ METHOD New() CLASS XHDebuggerGUI
   IF !::oApp:IdeActive
      ::hHook := SetWindowsHookEx( WH_KEYBOARD, HB_ObjMsgPtr( Self, "DebugHookKeys" ), NIL, GetCurrentThreadId(), Self )
   ENDIF
+
 RETURN Self
 
 
@@ -171,19 +179,35 @@ RETURN Self
 
 
 METHOD GetUnavailableEditor( cFile ) CLASS XHDebuggerGUI
-  LOCAL n := AScan( ::oApp:SourceEditor:aDocs, {|a| Empty( a[2] ) } )
-
+#ifdef VXH
+  LOCAL n := AScan( ::oApp:SourceEditor:aDocs, {|o| Empty( o:File ) } )
   IF n == 0
-    ::oEditor := ::oApp:SourceEditor:CreateDocument()
+    ::oEditor := Source( ::oApp:SourceEditor )
     ::oApp:SourceTabs:InsertTab( "Unavailable code" )
     n := ::oApp:SourceEditor:DocCount
   ENDIF
+  ::oEditor := ::oApp:SourceEditor:aDocs[ n ]
   ::oApp:SourceTabs:SetCurSel( n )
   ::oApp:Project:SourceTabChanged( , n )
 
-  ::oApp:SourceEditor:SelDocByPos(n)
-  ::oApp:SourceEditor:SetText( "CODE NOT AVAILABLE FOR " + cFile )
-  ::oApp:SourceEditor:SetReadOnly(.T.)
+  ::oEditor:Select()
+  ::oEditor:SetText( "CODE NOT AVAILABLE FOR " + cFile )
+  ::oEditor:SetReadOnly(.T.)
+#else
+  LOCAL n := AScan( xEdit_GetEditors(), {|o| Empty( o:cFile ) } )
+
+  IF n == 0
+    ::oEditor := Editor():New( , , , , /*cFile*/, ::oApp:SourceEditor:oEditor:oDisplay )
+    ::oApp:SourceTabs:InsertTab( "Unavailable code" )
+    n := Len( xEdit_GetEditors() )
+  ENDIF
+  ::oEditor := xEdit_GetEditors()[ n ]
+  ::oApp:SourceTabs:SetCurSel( n )
+  ::oApp:Project:SourceTabChanged( , n )
+  
+  ::oEditor:Load( , "CODE NOT AVAILABLE FOR " + cFile, .T. )
+  ::oEditor:lReadOnly := .T.
+#endif
 RETURN n
 
 
@@ -361,22 +385,31 @@ RETURN CallNextHookEx( ::hHook, nCode, nwParam, nlParam)
 
 
 METHOD RunToCursor() CLASS XHDebuggerGUI
+#ifdef VXH
+  WITH OBJECT ::oApp:SourceEditor:Source
+    IF ::IsValidStopLine( :FileName, :GetCurLine() )
+      ::Super:Until( :FileName, :GetCurLine() )
+    ENDIF
+  END
+#else
   WITH OBJECT ::oApp:SourceEditor:oEditor
     IF ::IsValidStopLine( :cFile, :nLine )
       ::Super:Until( :cFile, :nLine )
     ENDIF
   END
+#endif
 RETURN Self
 
 
 METHOD Stop() CLASS XHDebuggerGUI
   ::Super:Stop()
 
+#ifndef VXH
   WITH OBJECT ::oEditor
     :HighlightedLine := NIL
     :oDisplay:Display()
   END
-
+#endif
   IF ::oApp:ClassName != "DEBUGGER"
      ::oApp:DebuggerPanel:Hide()
      IF ::oApp:IdeActive
@@ -443,8 +476,8 @@ METHOD Sync() CLASS XHDebuggerGUI
 #ifdef VXH
   nDocs := ::oApp:SourceEditor:DocCount
   IF ( n := AScan( ::oApp:SourceEditor:aDocs, ;
-                   {|a| Lower(a[2])==Lower( cFile ) } ) ) > 0
-    ::oEditor := ::oApp:SourceEditor:aDocs[n][1]
+                   {|o| Lower(o:File)==Lower( cFile ) } ) ) > 0
+    ::oEditor := ::oApp:SourceEditor:aDocs[n]
 #else
   nDocs := Len( xEdit_GetEditors() )
   IF ( n := AScan( xEdit_GetEditors(), ;
@@ -469,14 +502,17 @@ METHOD Sync() CLASS XHDebuggerGUI
 
     IF File( cFile )
    #ifdef VXH
-      ::oEditor := ::oApp:SourceEditor:CreateDocument()
-      ::oApp:SourceEditor:OpenFile( cFile )
+      ::oEditor := Source( ::oApp:SourceEditor )
+      ::oEditor:Open( cFile )
+      IF RIGHT( UPPER( cFile ), 4 ) == ".XFM"
+         ::oEditor:SetReadOnly(1)
+      ENDIF
    #else
       ::oEditor := Editor():New( , , , , cFile, ::oApp:SourceEditor:oEditor:oDisplay )
-   #endif
       IF RIGHT( UPPER( cFile ), 4 ) == ".XFM"
          ::oEditor:lReadOnly := .T.
       ENDIF
+   #endif
       ::oApp:SourceTabs:InsertTab( ::cModule )
       ::oApp:SourceTabs:SetCurSel( nDocs )
       ::oApp:Project:SourceTabChanged( , nDocs )
@@ -498,8 +534,8 @@ METHOD Sync() CLASS XHDebuggerGUI
       #ifdef VXH
         nDocs := ::oApp:SourceEditor:DocCount
         IF ( n := AScan( ::oApp:SourceEditor:aDocs, ;
-                         {|a| Lower(a[2])==Lower( cFile ) } ) ) > 0
-          ::oEditor := ::oApp:SourceEditor:aDocs[n][1]
+                   {|o| Lower(o:File)==Lower( cFile ) } ) ) > 0
+          ::oEditor := ::oApp:SourceEditor:aDocs[n]
       #else
         nDocs := Len( xEdit_GetEditors() )
         IF ( n := AScan( xEdit_GetEditors(), ;
@@ -519,8 +555,12 @@ METHOD Sync() CLASS XHDebuggerGUI
     ENDIF
   ENDIF
 
+#ifdef VXH
+  ::oEditor:GoToLine( ::nLine )
+#else
   ::oEditor:GoLine( ::nLine )
   ::oEditor:Highlight()
+#endif
 RETURN Self
 
 
