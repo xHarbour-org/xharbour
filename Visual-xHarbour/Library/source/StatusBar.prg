@@ -365,6 +365,7 @@ RETURN rc
 
 METHOD SetText( cText ) CLASS StatusBarPanel
    IF ::Index != NIL .AND. ::Parent:IsWindow()
+      DEFAULT cText TO ""
       ::Parent:SendMessage( SB_SETTEXT, ::Index, XSTR( cText ) )
    ENDIF
    ::Parent:InvalidateRect()

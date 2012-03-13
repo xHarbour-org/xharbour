@@ -165,8 +165,8 @@ ENDCLASS
 
 METHOD SetEditorPos( nLine, nColumn ) CLASS IDE
    LOCAL cCol, cLine
-   cLine := "Row: "+ XSTR( nLine )
-   cCol  := "Col: "+ XSTR( nColumn )
+   cLine := STR( nLine )
+   cCol  := STR( nColumn )
 
    WITH OBJECT ::Application:MainForm
       :StatusBarPanel3:Width   := :Drawing:GetTextExtentPoint32( cLine )[1] + 10
@@ -2107,7 +2107,7 @@ FUNCTION OnShowEditors()
    LOCAL oApp := __GetApplication()
 
    IF oApp:SourceEditor != NIL .AND. oApp:SourceEditor:DocCount > 0
-      IF oApp:SourceEditor:GetCurDoc() == oApp:ProjectPrgEditor .OR. ASCAN( oApp:Project:Forms, {|o| o:Editor == oApp:SourceEditor:GetCurDoc()} ) > 0
+      IF oApp:SourceEditor:Source == oApp:ProjectPrgEditor .OR. ASCAN( oApp:Project:Forms, {|o| o:Editor == oApp:SourceEditor:Source} ) > 0
          OnShowDesigner( oApp:DesignPage )
          RETURN NIL
       ENDIF
@@ -2361,8 +2361,7 @@ METHOD EditReset(n) CLASS Project
       ENDIF
     ELSE
       lCopied   := IsClipboardFormatAvailable( CF_TEXT )
-      lSelected := ::Application:SourceEditor:SelectionStart > 0//oEditor:nLineFrom > 0
-      
+      lSelected := ::Application:SourceEditor:Source:GetSelectionStart() > 0
    ENDIF
    ::Application:Props[ "EditPasteItem" ]:Enabled := lCopied
    ::Application:Props[ "EditPasteBttn" ]:Enabled := lCopied
@@ -2433,8 +2432,9 @@ METHOD New() CLASS Project
    cProject := "FUNCTION Main( ... )" + CRLF + CRLF
    cProject += "RETURN NIL" + CRLF
 
-   ::Application:ProjectPrgEditor := ::Application:SourceEditor:CreateDocument()
-   ::Application:SourceEditor:SetDocText( ::Application:ProjectPrgEditor, cProject )
+   ::Application:ProjectPrgEditor := Source( ::Application:SourceEditor )
+   ::Application:ProjectPrgEditor:SetText( cProject )
+   ::Application:ProjectPrgEditor:Modified := .T.
 
    ::Application:SourceTabs:Visible := .T.
    ::Application:SourceTabs:InsertTab( "  " + ::Properties:Name +"_Main.prg * ",,, .T. )
@@ -2469,7 +2469,7 @@ RETURN Self
 METHOD SourceTabChanged( nPrev, nCur ) CLASS Project
    ( nPrev )
    IF nCur <= ::Application:SourceEditor:DocCount
-      ::Application:SourceEditor:SelDocByPos( nCur )
+      ::Application:SourceEditor:Source := ::Application:SourceEditor:aDocs[ nCur ]
    ENDIF
    OnShowEditors()
 RETURN Self
@@ -2478,18 +2478,18 @@ METHOD CheckValidProgram() CLASS Project
    ::Application:SaveMenu:Enable()
    ::Application:SaveAsMenu:Enable()
    ::cFileRemove := NIL
-   IF EMPTY( ::Application:SourceEditor:GetDocFileName() )
+   IF EMPTY( ::Application:SourceEditor:Source:File )
       ::Application:AddSourceMenu:Disable()
       RETURN "Untitled"
     ELSE
       ::Application:CloseMenu:Enable()
       IF ::Properties != NIL
-         IF ASCAN( ::Properties:Sources, ::Application:SourceEditor:GetDocFileName() ) > 0
+         IF ASCAN( ::Properties:Sources, ::Application:SourceEditor:Source:File ) > 0
             ::Application:AddSourceMenu:Disable()
-            ::cSourceRemove := ::Application:SourceEditor:GetDocFileName()
+            ::cSourceRemove := ::Application:SourceEditor:Source:File
             ::Application:RemoveSourceMenu:Enable()
-          ELSEIF ASCAN( ::Forms, {|o| ::Application:SourceEditor:GetDocFileName(o:Editor) == ::Application:SourceEditor:GetDocFileName() } ) > 0 .OR.;
-                 ::Application:SourceEditor:GetDocFileName() == ::Application:SourceEditor:GetDocFileName(::Application:ProjectPrgEditor)
+          ELSEIF ASCAN( ::Forms, {|o| o:Editor:File == ::Application:SourceEditor:Source:File } ) > 0 .OR.;
+                 ::Application:SourceEditor:Source:File == ::Application:ProjectPrgEditor:File
             ::Application:AddSourceMenu:Disable()
             ::Application:RemoveSourceMenu:Disable()
             ::cSourceRemove := NIL
@@ -2499,7 +2499,7 @@ METHOD CheckValidProgram() CLASS Project
             ::Application:RemoveSourceMenu:Disable()
          ENDIF
       ENDIF
-      RETURN ::Application:SourceEditor:GetDocFileName()
+      RETURN ::Application:SourceEditor:Source:FileName
    ENDIF
 RETURN ""
 
@@ -2898,7 +2898,7 @@ METHOD EditCopy() CLASS Project
       NEXT
       ::EditReset(1)
     ELSEIF ::Application:SourceEditor:IsWindowVisible()
-      ::Application:SourceEditor:Copy()
+      ::Application:SourceEditor:Source:Copy()
    ENDIF
 RETURN 0
 
@@ -2984,11 +2984,12 @@ METHOD EditCut() CLASS Project
 
       ::EditReset(1)
     ELSEIF ::Application:SourceEditor:IsWindowVisible()
-      ::Application:SourceEditor:Cut()
+      ::Application:SourceEditor:Source:Cut()
+      ::Application:SourceEditor:Source:Modified := .T.
 
       ::Modified := .T.
-      ::Application:Props[ "EditUndoItem" ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := ::Application:SourceEditor:CanUndo()
-      ::Application:Props[ "EditRedoItem" ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := ::Application:SourceEditor:CanRedo()
+      ::Application:Props[ "EditUndoItem" ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := ::Application:SourceEditor:Source:CanUndo()
+      ::Application:Props[ "EditRedoItem" ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := ::Application:SourceEditor:Source:CanRedo()
 
    ENDIF
 RETURN 0
@@ -3007,11 +3008,12 @@ METHOD EditPaste() CLASS Project
       ENDIF
       ::EditReset(1)
     ELSEIF ::Application:SourceEditor:IsWindowVisible()
-      ::Application:SourceEditor:Paste()
+      ::Application:SourceEditor:Source:Paste()
+      ::Application:SourceEditor:Source:Modified := .T.
 
       ::Modified := .T.
-      ::Application:Props[ "EditUndoItem" ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := ::Application:SourceEditor:CanUndo()
-      ::Application:Props[ "EditRedoItem" ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := ::Application:SourceEditor:CanRedo()
+      ::Application:Props[ "EditUndoItem" ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := ::Application:SourceEditor:Source:CanUndo()
+      ::Application:Props[ "EditRedoItem" ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := ::Application:SourceEditor:Source:CanRedo()
    ENDIF
 RETURN 0
 
@@ -3024,10 +3026,11 @@ METHOD EditDelete() CLASS Project
       ::CurrentForm:MaskKeyDown(, VK_DELETE )
     ELSEIF ::Application:SourceEditor:IsWindowVisible()
       ::Application:SourceEditor:SendMessage( WM_KEYDOWN, VK_DELETE )
+      ::Application:SourceEditor:Source:Modified := .T.
 
       ::Modified := .T.
-      ::Application:Props[ "EditUndoItem"  ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := ::Application:SourceEditor:CanUndo()
-      ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := ::Application:SourceEditor:CanRedo()
+      ::Application:Props[ "EditUndoItem"  ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := ::Application:SourceEditor:Source:CanUndo()
+      ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := ::Application:SourceEditor:Source:CanRedo()
    ENDIF
 RETURN 0
 
@@ -3040,12 +3043,12 @@ METHOD Undo() CLASS Project
    IF ::Application:DesignPage:IsWindowVisible()
       ::SetAction( ::aUndo, ::aRedo )
     ELSEIF ::Application:SourceEditor:IsWindowVisible()
-      ::Application:SourceEditor:Undo()
+      ::Application:SourceEditor:Source:Undo()
+      ::Application:SourceEditor:Source:Modified := .T.
 
-      //::Application:SourceEditor:oEditor:lModified := .T.
       ::Modified := .T.
-      ::Application:Props[ "EditUndoItem"  ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := ::Application:SourceEditor:CanUndo()
-      ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := ::Application:SourceEditor:CanRedo()
+      ::Application:Props[ "EditUndoItem"  ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := ::Application:SourceEditor:Source:CanUndo()
+      ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := ::Application:SourceEditor:Source:CanRedo()
    ENDIF
 RETURN 0
 
@@ -3057,12 +3060,12 @@ METHOD ReDo() CLASS Project
    IF ::Application:DesignPage:IsWindowVisible()
       ::SetAction( ::aRedo, ::aUnDo )
     ELSEIF ::Application:SourceEditor:IsWindowVisible()
-      ::Application:SourceEditor:Redo()
-
-      //::Application:SourceEditor:oEditor:lModified := .T.
+      ::Application:SourceEditor:Source:Redo()
+      ::Application:SourceEditor:Source:Modified := .T.
+      
       ::Modified := .T.
-      ::Application:Props[ "EditUndoItem"  ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := ::Application:SourceEditor:CanUndo()
-      ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := ::Application:SourceEditor:CanRedo()
+      ::Application:Props[ "EditUndoItem"  ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := ::Application:SourceEditor:Source:CanUndo()
+      ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := ::Application:SourceEditor:Source:CanRedo()
    ENDIF
 RETURN 0
 
@@ -3070,9 +3073,7 @@ RETURN 0
 //-------------------------------------------------------------------------------------------------------
 
 METHOD SetCaption( lMod ) CLASS Project
-
    LOCAL cCaption
-
    ::lModified := lMod
 
    IF lMod .AND. ::CurrentForm != NIL .AND. procname(3) IN {"PROJECT:SETACTION", "EVENTMANAGER:SETVALUE", "EVENTMANAGER:GENERATEEVENT" }
@@ -3151,8 +3152,8 @@ RETURN 0
 
 METHOD SelectBuffer() CLASS Project
    LOCAL n
-   ::Application:SourceEditor:SelectDocument( ::CurrentForm:Editor )
-   IF ( n := aScan( ::Application:SourceEditor:aDocs, {|a| a[1]==::CurrentForm:Editor} ) ) > 0
+   ::CurrentForm:Editor:Select()
+   IF ( n := aScan( ::Application:SourceEditor:aDocs, {|o| o==::CurrentForm:Editor} ) ) > 0
       ::Application:SourceTabs:SetCurSel( n )
    ENDIF
 RETURN Self
@@ -3252,12 +3253,12 @@ METHOD Close( lCloseErrors ) CLASS Project
 
    FOR n := 1 TO ::Application:SourceEditor:DocCount
        IF lCloseErrors
-          IF ( ( ::Application:ProjectPrgEditor == NIL .OR. !( ::Application:ProjectPrgEditor == ::Application:SourceEditor:aDocs[n][1] ) ) .AND. ASCAN( ::Forms, {|o| o:Editor == ::Application:SourceEditor:aDocs[n][1] } ) == 0 ) .AND.;
-               ( EMPTY( ::Application:SourceEditor:GetFileName(n) ) .OR. ( ::Properties != NIL .AND. ASCAN( ::Properties:Sources, ::Application:SourceEditor:GetFileName(n) ) == 0 ) )
+          IF ( ( ::Application:ProjectPrgEditor == NIL .OR. !( ::Application:ProjectPrgEditor == ::Application:SourceEditor:aDocs[n] ) ) .AND. ASCAN( ::Forms, {|o| o:Editor == ::Application:SourceEditor:aDocs[n] } ) == 0 ) .AND.;
+               ( EMPTY( ::Application:SourceEditor:aDocs[n]:File ) .OR. ( ::Properties != NIL .AND. ASCAN( ::Properties:Sources, ::Application:SourceEditor:aDocs[n]:File ) == 0 ) )
 
-             IF ::Application:SourceEditor:Modified( n )
-                IF nRes == NIL .AND. !EMPTY( ::Application:SourceEditor:GetFileName( n ) )
-                   oMsg := MsgBoxEx( ::Application:MainForm, "Save changes to "+::Application:SourceEditor:GetFileName(n)+" before closing?", "Source File", IDI_QUESTION )
+             IF ::Application:SourceEditor:aDocs[n]:Modified
+                IF nRes == NIL .AND. !EMPTY( ::Application:SourceEditor:aDocs[n]:FileName )
+                   oMsg := MsgBoxEx( ::Application:MainForm, "Save changes to "+::Application:SourceEditor:aDocs[n]:FileName+" before closing?", "Source File", IDI_QUESTION )
                    nRes := oMsg:Result
                    IF nRes == 4002 // No to All
                       lRem := .T.
@@ -3268,10 +3269,10 @@ METHOD Close( lCloseErrors ) CLASS Project
                 ENDIF
                 SWITCH nRes
                    CASE IDYES
-                        IF EMPTY( ::Application:SourceEditor:GetFileName( n ) )
-                           ::SaveSourceAs( ::Application:SourceEditor:aDocs[n][1] )
+                        IF EMPTY( ::Application:SourceEditor:aDocs[n]:File )
+                           ::SaveSourceAs( ::Application:SourceEditor:aDocs[n] )
                          ELSE
-                           ::Application:SourceEditor:Save(n)
+                           ::Application:SourceEditor:aDocs[n]:Save()
                         ENDIF
                         EXIT
 
@@ -3282,10 +3283,10 @@ METHOD Close( lCloseErrors ) CLASS Project
                    nRes := NIL
                 ENDIF
              ENDIF
-             ::Application:SourceEditor:aDocs[n][3] := .F.
+             ::Application:SourceEditor:aDocs[n]:Modified := .F.
           ENDIF
        ENDIF
-       ::Application:SourceEditor:Close( n )
+       ::Application:SourceEditor:aDocs[n]:Close()
        ::Application:SourceTabs:DeleteTab(n)
        n--
    NEXT
@@ -3293,7 +3294,7 @@ METHOD Close( lCloseErrors ) CLASS Project
 
    FOR n := 1 TO LEN( ::Forms )
        IF ::Forms[n]:Editor != NIL
-          ::Application:SourceEditor:CloseDoc( ::Forms[n]:Editor )
+          ::Forms[n]:Editor:Close()
           ::Forms[n]:Editor := NIL
           ::Forms[n]:Destroy()
           ::Application:Yield()
@@ -3414,18 +3415,19 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD SaveSource( oEditor ) CLASS Project
-   DEFAULT oEditor TO ::Application:SourceEditor:GetCurDoc()
-   IF EMPTY( ::Application:SourceEditor:GetDocFileName( oEditor ) )
+   DEFAULT oEditor TO ::Application:SourceEditor:Source
+   IF EMPTY( oEditor:FileName )
       ::SaveSourceAs( oEditor )
     ELSE
-      ::Application:SourceEditor:SaveDoc( oEditor )
+      oEditor:Save()
    ENDIF
+   oEditor:Modified := .F.
    OnShowEditors()
 RETURN Self
 
-METHOD SaveSourceAs( hEditor, lSetTabName ) CLASS Project
+METHOD SaveSourceAs( oEditor, lSetTabName ) CLASS Project
    LOCAL ofn, cFile, n, x
-   DEFAULT hEditor TO ::Application:SourceEditor:GetCurDoc()
+   DEFAULT oEditor TO ::Application:SourceEditor:Source
    DEFAULT lSetTabName TO .F.
 
    WHILE .T.
@@ -3450,15 +3452,15 @@ METHOD SaveSourceAs( hEditor, lSetTabName ) CLASS Project
 
       IF GetSaveFileName( @ofn )
          cFile := Left( ofn:lpstrFile, At( Chr(0), ofn:lpstrFile ) - 1 )
-         n := ASCAN( ::Application:SourceEditor:aDocs, {|a| a[1] == hEditor} )
-         IF ( x := ASCAN( ::Application:SourceEditor:aDocs, {|a| a[2] != NIL .AND. a[2]==cFile } ) ) > 0 .AND. x != n
+         n := ASCAN( ::Application:SourceEditor:aDocs, {|o| o == oEditor} )
+         IF ( x := ASCAN( ::Application:SourceEditor:aDocs, {|o| o:File == cFile } ) ) > 0 .AND. x != n
             MessageBox( 0, cFile +" cannot be saved because it's being edited, please select another path and / or name", "Save As", MB_ICONEXCLAMATION )
             ::Application:Yield()
             LOOP
          ENDIF
-         ::Application:SourceEditor:SaveDoc( hEditor, cFile )
+         oEditor:Save( cFile )
          IF lSetTabName
-            ::Application:SourceTabs:SetItem( n, ::Application:SourceEditor:GetDocFileName( hEditor ) )
+            ::Application:SourceTabs:SetItem( n, oEditor:FileName )
          ENDIF
       ENDIF
       EXIT
@@ -3502,12 +3504,11 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 METHOD NewSource() CLASS Project
-   LOCAL hEditor
+   LOCAL oEditor
    ::Application:SourceEditor:Show()
    ::Application:SourceEditor:Enable()
-   hEditor := ::Application:SourceEditor:CreateDocument()
-   ::Application:SourceEditor:SelectDocument( hEditor )
-   //oEditor:SetExtension( "prg" )
+   oEditor := Source( ::Application:SourceEditor )
+
    ::Application:SourceTabs:Visible := .T.
    ::Application:SourceTabs:InsertTab( "  Untitled Source * ",,,.T. )
    ::Application:SourceTabs:SetCurSel( ::Application:SourceEditor:DocCount )
@@ -3552,7 +3553,7 @@ METHOD OpenSource( cSource ) CLASS Project
       ENDIF
    ENDIF
 
-   IF ( n := ASCAN( ::Application:SourceEditor:aDocs, {|a| a[2]!=NIL .AND. a[2]==oFile:Path+"\"+oFile:Name } ) ) > 0
+   IF ( n := ASCAN( ::Application:SourceEditor:aDocs, {|o| lower(o:File) == lower(oFile:Path+"\"+oFile:Name) } ) ) > 0
       // File is open, just re-show
 
       ::Application:SourceTabs:SetCurSel( n )
@@ -3566,7 +3567,7 @@ METHOD OpenSource( cSource ) CLASS Project
    ENDIF
    ::Application:SourceEditor:Show()
 
-   oEditor := ::Application:SourceEditor:CreateDocument( oFile:Path+"\"+oFile:Name )
+   oEditor := Source( ::Application:SourceEditor, oFile:Path+"\"+oFile:Name )
 
    ::Application:SourceTabs:Visible := .T.
    ::Application:SourceTabs:InsertTab( oFile:Name )
@@ -3655,7 +3656,7 @@ METHOD Open( cProject ) CLASS Project
    EXTERN MDIChildWindow
 
    LOCAL n, Xfm, aChildren
-   LOCAL hFile, cLine, cSource, oProject, cFile, nLine, aErrors, aEditors, cProp, cSourcePath
+   LOCAL hFile, cLine, oEditor, cSource, oProject, cFile, nLine, aErrors, aEditors, cProp, cSourcePath
 
    IF cProject != NIL .AND. !FILE( cProject )
       MessageBox( GetActiveWindow(), "File Not Found", "Open Project", MB_ICONEXCLAMATION )
@@ -3725,14 +3726,11 @@ METHOD Open( cProject ) CLASS Project
 
    ENDIF
    IF FILE( cSourcePath +"\" + ::Properties:Name +"_Main.prg" )
-      ::Application:ProjectPrgEditor := ::Application:SourceEditor:CreateDocument()
-      ::Application:SourceEditor:SelectDocument( ::Application:ProjectPrgEditor )
-      ::Application:SourceEditor:OpenFile( cSourcePath +"\" + ::Properties:Name +"_Main.prg" )
-      
-      //::Application:ProjectPrgEditor := Editor():New(,,,, cSourcePath +"\" + ::Properties:Name +"_Main.prg", ::Application:SourceEditor:oEditor:oDisplay )
-      //::Application:ProjectPrgEditor:SetExtension( "prg" )
+      ::Application:ProjectPrgEditor := Source( ::Application:SourceEditor )
+      ::Application:ProjectPrgEditor:Open( cSourcePath +"\" + ::Properties:Name +"_Main.prg" )
+
       ::Application:SourceTabs:InsertTab( ::Properties:Name +"_Main.prg" )
-      //::Application:SourceEditor:oEditor := ::Application:ProjectPrgEditor
+
     ELSEIF ::Properties:TargetType == 1
       n := ::Application:MainForm:MessageBox( "Mising main file " + cSourcePath +"\" + ::Properties:Name +"_Main.prg", "Open Project", MB_ICONQUESTION | MB_OKCANCEL )
       IF n == IDCANCEL
@@ -3800,8 +3798,8 @@ METHOD Open( cProject ) CLASS Project
    FOR EACH cSource IN ::Properties:Sources
        n := RAT( "\", cSource )
        IF FILE( cSource )
-          ::Application:SourceEditor:CreateDocument()
-          ::Application:SourceEditor:OpenFile( cSource )
+          oEditor := Source( ::Application:SourceEditor )
+          oEditor:Open( cSource )
 
           ::Application:SourceTabs:InsertTab( SUBSTR( cSource, n+1 ) )
           ::Application:SourceTabs:SetCurSel( ::Application:SourceEditor:DocCount )
@@ -3976,9 +3974,9 @@ METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
       oForm := ::AddWindow( .F., cObjectName + ".prg", cClassName == "CUSTOMCONTROL" )
       ::CurrentForm := oForm
       cSourcePath := ::Properties:Path + "\" + ::Properties:Source
-      
-      ::Application:SourceEditor:SelectDocument( oForm:Editor )
-      ::Application:SourceEditor:OpenFile( cSourcePath + "\" + cObjectName + ".prg" )
+
+      ::Application:SourceEditor:Source := oForm:Editor
+      oForm:Editor:Open( cSourcePath + "\" + cObjectName + ".prg" )
    ENDIF
    IF lLoadProps
       nLine := 1
@@ -4508,7 +4506,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    LOCAL n, cWindow := "", oFile, oForm
    LOCAL lNew := .F., aImage, aEditors, aChildEvents, nInsMetPos, cChildEvents, cEvent, cText, cPath, cBuffer, cResPath, nSecs
    LOCAL aDir, x, xVersion, cType, cRc, cPrj, hFile, cLine, xPath, xName, lPro, i, cName, cResImg, cFile, cSourcePath, cPrevRes//, oWait
-   LOCAL oEdit := ::Application:SourceEditor
+
    //oWait := ::Application:MainForm:MessageWait( "Saving Project " + ::Properties:Name )
 
    m->aChangedProps := {} // reset changed properties for bold text display
@@ -4570,18 +4568,20 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
 
    //::aImages := {}
 
-   aEditors := oEdit:aDocs
+   aEditors := ::Application:SourceEditor:aDocs
 
    FOR n := 1 TO LEN( aEditors )
-       IF (oEdit:GetModified( aEditors[n][1] ) .OR. lForce) .AND. !EMPTY( oEdit:GetDocFileName( aEditors[n][1] ) )
-           oEdit:SaveDoc( aEditors[n][1] )
-       ENDIF
+       WITH OBJECT aEditors[n]
+          IF (:Modified .OR. lForce) .AND. !EMPTY( :Path ) .AND. !EMPTY( :File )
+             :Save()
+          ENDIF
+       END
    NEXT
 
    cSourcePath := cPath + "\" + ::Properties:Source
 
-   IF oEdit:GetModified( ::Application:ProjectPrgEditor ) .OR. lForce .OR. !FILE( cSourcePath + "\" + ::Properties:Name +"_Main.prg" )
-      oEdit:SaveDoc( ::Application:ProjectPrgEditor, cSourcePath + "\" + ::Properties:Name +"_Main.prg" )
+   IF ::Application:ProjectPrgEditor:Modified .OR. lForce .OR. !FILE( cSourcePath + "\" + ::Properties:Name +"_Main.prg" )
+      ::Application:ProjectPrgEditor:Save( cSourcePath + "\" + ::Properties:Name +"_Main.prg" )
    ENDIF
 
    ::AppObject:Resources := {}
@@ -4690,16 +4690,16 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
           oFile:FileBuffer := cWindow
           oFile:Save()
 
-          IF oEdit:GetModified( ::Forms[n]:Editor ).OR. lForce .OR. !FILE( cSourcePath + "\" + ::Forms[n]:Name + ".prg" )
+          IF ::Forms[n]:Editor:Modified .OR. lForce .OR. !FILE( cSourcePath + "\" + ::Forms[n]:Name + ".prg" )
              xPath := cSourcePath
              xName := ::Forms[n]:Name + ".prg"
              IF x == 2
                 xPath := oFile:Path
              ENDIF
-             oEdit:SaveDoc( ::Forms[n]:Editor, xPath + "\" + xName )
+             ::Forms[n]:Editor:Save( xPath + "\" + xName )
           ENDIF
 
-          //::Forms[n]:__lModified := .F.
+          ::Forms[n]:__lModified := .F.
        ENDIF
    NEXT
 
@@ -5925,9 +5925,9 @@ METHOD SetAction( aActions, aReverse ) CLASS Project
                      ::Application:MainForm:PostMessage( WM_USER + 3000, x - 1 )
                   ENDIF
 
-                  IF ( x := ASCAN( ::Application:SourceEditor:aDocs, {|a| a[1] == aAction[8]:Editor } ) ) > 0
+                  IF ( x := ASCAN( ::Application:SourceEditor:aDocs, {|o| o == aAction[8]:Editor } ) ) > 0
                      ::Application:SourceTabs:DeleteTab( x )
-                     ::Application:SourceEditor:Close(x)
+                     ::Application:SourceEditor:aDocs[x]:Close()
                   ENDIF
 
                ENDIF
@@ -6331,46 +6331,26 @@ RETURN Self
 //------------------------------------------------------------------------------------------------------------------------------------
 
 CLASS SourceEditor INHERIT Control
+   DATA xSource PROTECTED
+   ASSIGN Source(o) INLINE IIF( ::xSource != NIL, ::xSource:SavePos(),), o:Select()
+   ACCESS Source    INLINE ::xSource
+   
    DATA aDocs   EXPORTED INIT {}
    DATA hSciLib PROTECTED
 
-   ACCESS SelectionStart INLINE ::SendMessage( SCI_GETSELECTIONSTART, 0, 0 )
    ACCESS DocCount       INLINE LEN( ::aDocs )
    METHOD Init() CONSTRUCTOR
    METHOD Create()
-
-   METHOD OpenFile()
-   METHOD CreateDocument()
-   METHOD SetSavePoint()
-   METHOD SetText( cText )          INLINE ::SendMessage( SCI_SETTEXT, 0, cText )
-   METHOD GotoPosition( nPos )      INLINE ::SendMessage( SCI_GOTOPOS, nPos, 0 )
-   METHOD GotoLine( nLine )         INLINE ::SendMessage( SCI_GOTOLINE, nLine, 0 )
-   METHOD SelectDocument( pDoc )    INLINE ::SendMessage( SCI_SETDOCPOINTER, 0, pDoc )
    METHOD GetCurDoc()               INLINE ::SendMessage( SCI_GETDOCPOINTER, 0, 0 )
-   METHOD ReleaseDocument( pDoc )   INLINE ::SendMessage( SCI_RELEASEDOCUMENT, 0, pDoc )
-   METHOD EmptyUndoBuffer()         INLINE ::SendMessage( SCI_EMPTYUNDOBUFFER, 0, 0 )
-   METHOD CanUndo()                 INLINE ::SendMessage( SCI_CANUNDO, 0, 0 )==1
-   METHOD CanRedo()                 INLINE ::SendMessage( SCI_CANREDO, 0, 0 )==1
-   METHOD Undo()                    INLINE ::SendMessage( SCI_UNDO, 0, 0 )
-   METHOD Redo()                    INLINE ::SendMessage( SCI_REDO, 0, 0 )
-   METHOD Copy()                    INLINE ::SendMessage( SCI_COPY, 0, 0 )
-   METHOD Paste()                   INLINE ::SendMessage( SCI_PASTE, 0, 0 )
-   METHOD Cut()                     INLINE ::SendMessage( SCI_CUT, 0, 0 )
-   METHOD CanPaste()                INLINE ::SendMessage( SCI_CANPASTE, 0, 0 )==1
-   METHOD SetReadOnly( lSet )       INLINE ::SendMessage( SCI_SETREADONLY, lSet, 0 )
+   METHOD SelectDocument()
 
-   METHOD OnDestroy()               INLINE aEval( ::aDocs, {|aDoc| hb_qSelf():ReleaseDocument( aDoc[1] ) } ), FreeLibrary( ::hSciLib ), NIL
-   METHOD SetDocText( pDoc, cText ) INLINE ::SelectDocument( pDoc ), ::SetText( cText )
-   METHOD SelDocByPos( nPos )       INLINE ::SelectDocument( ::aDocs[nPos][1] )
-   METHOD Close(n)                  INLINE ::CloseDoc( ::aDocs[n][1] )
-   METHOD Save(n)                   INLINE ::SaveDoc( ::aDocs[n][1] )
-   METHOD GetFileName(n)            INLINE ::GetDocFileName( ::aDocs[n][1] )
-   METHOD Modified(n)               INLINE ::GetModified( ::aDocs[n][1] )
-   METHOD CloseDoc()
-   METHOD GetModified() 
-   METHOD SaveDoc()
-   METHOD GetText()
-   METHOD GetDocFileName()
+   METHOD StyleSetFont( cFont )     INLINE ::SendMessage( SCI_STYLESETFONT, STYLE_DEFAULT, cFont )
+   METHOD StyleGetFont( cFont )     INLINE cFont := SPACE(255), ::SendMessage( SCI_STYLEGETFONT, STYLE_DEFAULT, @cFont ), ALLTRIM(cFont)
+
+   METHOD StyleSetSize( nSize )     INLINE ::SendMessage( SCI_STYLESETSIZE, STYLE_DEFAULT, nSize )
+   METHOD StyleGetSize( nSize )     INLINE ::SendMessage( SCI_STYLEGETSIZE, STYLE_DEFAULT, @nSize ), nSize
+
+   METHOD OnDestroy()               INLINE aEval( ::aDocs, {|oDoc| oDoc:Close() } ), FreeLibrary( ::hSciLib ), NIL
    METHOD OnParentNotify()
 ENDCLASS
 
@@ -6386,130 +6366,172 @@ RETURN Self
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS SourceEditor
    ::Super:Create()
-RETURN Self
-
-//------------------------------------------------------------------------------------------------------------------------------------
-METHOD SetSavePoint() CLASS SourceEditor
-   LOCAL cText, n
-   ::SendMessage( SCI_SETSAVEPOINT, 0, 0 )
-   cText := ::Application:SourceTabs:GetItemText()
-   cText := ALLTRIM( STRTRAN( cText, "*" ) )
-   ::Application:SourceTabs:SetItemText( , cText, .F. )
-   IF ( n := ASCAN( ::aDocs, {|a| a[1]==::GetCurDoc() } ) ) > 0
-      ::aDocs[n][3] := .F.
-   ENDIF
+   ::StyleSetFont( "Courier New" )
+   ::StyleSetSize( 10 )
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
-   LOCAL cText, n, scn
+   LOCAL cText, n//, scn
    (nwParam, nlParam)
    DO CASE
+      CASE hdr:code == SCN_UPDATEUI
+           n := ::Source:GetCurrentPos()
+           ::Application:SetEditorPos( ::Source:LineFromPosition(n), ::Source:GetColumn(n) )
+
       CASE hdr:code == SCN_MODIFIED
-           IF ( n := ASCAN( ::aDocs, {|a| a[1]==::GetCurDoc() .AND. !a[3] } ) ) > 0
-              scn := (struct SCNOTIFICATION*) nlParam
-              view scn:line
-              
-              ::aDocs[n][3] := .T.
+           IF ( n := ASCAN( ::aDocs, {|o| o==::Source .AND. !o:Modified .AND. !o:FirstOpen } ) ) > 0
+              //scn := (struct SCNOTIFICATION*) nlParam
+
+              ::aDocs[n]:Modified := .T.
               cText := ::Application:SourceTabs:GetItemText()
               cText := ALLTRIM( STRTRAN( cText, "*" ) )
               ::Application:SourceTabs:SetItemText( , " " + cText + " * ", .T. )
 
-              ::Application:Props:EditUndoItem:Enabled := ::Application:Props:EditUndoBttn:Enabled := ::CanUndo()
-              ::Application:Props:EditRedoItem:Enabled := ::Application:Props:EditRedoBttn:Enabled := ::CanRedo()
+              ::Application:Props:EditUndoItem:Enabled := ::Application:Props:EditUndoBttn:Enabled := ::aDocs[n]:CanUndo()
+              ::Application:Props:EditRedoItem:Enabled := ::Application:Props:EditRedoBttn:Enabled := ::aDocs[n]:CanRedo()
+              
+              ::Application:Project:Modified := .T.
            ENDIF
    ENDCASE
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
-METHOD GetModified( pDoc ) CLASS SourceEditor
-   LOCAL pCur, nMod
-   IF pDoc != NIL
-      pCur := ::GetCurDoc()
-      ::SelectDocument( pDoc )
+METHOD SelectDocument( pDoc ) CLASS SourceEditor
+   LOCAL n
+   IF ( n := ASCAN( ::aDocs, {|a| a[1]==::GetCurDoc() } ) ) > 0
+      ::aDocs[n][5] := ::GetCurrentPos()
    ENDIF
-   nMod := ::SendMessage( SCI_GETMODIFY, 0, 0 )
-   IF pDoc != NIL
-      ::SelectDocument( pCur )
+   ::SendMessage( SCI_SETDOCPOINTER, 0, pDoc )
+   IF ( n := ASCAN( ::aDocs, {|a| a[1]==pDoc } ) ) > 0
+      ::GoToPos( ::aDocs[n][5] )
    ENDIF
-RETURN nMod > 0
+RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
-METHOD SaveDoc( pDoc, cFile ) CLASS SourceEditor
-   LOCAL n, pPrev, hFile, cText
-   IF ( n := ASCAN( ::aDocs, {|a| a[1]==pDoc} ) ) > 0
-      IF cFile != NIL
-         ::aDocs[n][2] := cFile
-      ENDIF
-      IF !EMPTY( ::aDocs[n][2] )
+//------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------
 
-         IF ( hFile := fCreate( ::aDocs[n][2] ) ) <> -1
-            cText := ::GetText( pDoc )
-            fWrite( hFile, cText, Len(cText) )
-            fClose( hFile )
-         ENDIF
+CLASS Source
+   ACCESS Application INLINE ::Owner:Application
+   DATA pDoc      EXPORTED
+   DATA Owner     EXPORTED
+   DATA Path      EXPORTED
+   DATA FileName  EXPORTED
+   DATA File      EXPORTED INIT ""
+   DATA Modified  EXPORTED INIT .F.
+   DATA FirstOpen EXPORTED INIT .T.
+   DATA SavedPos  EXPORTED INIT 0
+   DATA Extension EXPORTED INIT "prg"
 
-         pPrev := ::GetCurDoc()
-         ::SelectDocument( pDoc )
-         ::SetSavePoint()
-         ::SelectDocument( pPrev )
-      ENDIF
-      ::aDocs[n][3] := .F.
+   METHOD Init( oOwner, cFile ) CONSTRUCTOR
+
+   METHOD Open()
+   METHOD Close()
+   METHOD Save()
+   METHOD GetText()
+
+   METHOD SavePos()                 INLINE ::SavedPos := ::GetCurrentPos()
+   METHOD Select()                  INLINE ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pDoc ), ::Owner:xSource := Self, ::GotoPosition( ::SavedPos )
+   METHOD SetText( cText )          INLINE ::Owner:SendMessage( SCI_SETTEXT, 0, cText )
+   METHOD GotoPosition( nPos )      INLINE ::Owner:SendMessage( SCI_GOTOPOS, nPos, 0 )
+   METHOD GotoLine( nLine )         INLINE ::Owner:SendMessage( SCI_GOTOLINE, nLine, 0 )
+   METHOD GetCurDoc()               INLINE ::Owner:SendMessage( SCI_GETDOCPOINTER, 0, 0 )
+   METHOD ReleaseDocument( pDoc )   INLINE ::Owner:SendMessage( SCI_RELEASEDOCUMENT, 0, pDoc )
+   METHOD EmptyUndoBuffer()         INLINE ::Owner:SendMessage( SCI_EMPTYUNDOBUFFER, 0, 0 )
+   METHOD CanUndo()                 INLINE ::Owner:SendMessage( SCI_CANUNDO, 0, 0 )==1
+   METHOD CanRedo()                 INLINE ::Owner:SendMessage( SCI_CANREDO, 0, 0 )==1
+   METHOD Undo()                    INLINE ::Owner:SendMessage( SCI_UNDO, 0, 0 )
+   METHOD Redo()                    INLINE ::Owner:SendMessage( SCI_REDO, 0, 0 )
+   METHOD Copy()                    INLINE ::Owner:SendMessage( SCI_COPY, 0, 0 )
+   METHOD Paste()                   INLINE ::Owner:SendMessage( SCI_PASTE, 0, 0 )
+   METHOD Cut()                     INLINE ::Owner:SendMessage( SCI_CUT, 0, 0 )
+   METHOD CanPaste()                INLINE ::Owner:SendMessage( SCI_CANPASTE, 0, 0 )==1
+   METHOD SetReadOnly( nSet )       INLINE ::Owner:SendMessage( SCI_SETREADONLY, nSet, 0 )
+   METHOD GetCurrentPos()           INLINE ::Owner:SendMessage( SCI_GETCURRENTPOS, 0, 0 )
+   METHOD SetCurrentPos( nPos )     INLINE ::Owner:SendMessage( SCI_SETCURRENTPOS, nPos, 0 )
+   METHOD GoToPos( nPos )           INLINE ::Owner:SendMessage( SCI_GOTOPOS, nPos, 0 )
+   METHOD GetColumn( nPos )         INLINE ::Owner:SendMessage( SCI_GETCOLUMN, nPos, 0 )+1
+   METHOD LineFromPosition( nPos )  INLINE ::Owner:SendMessage( SCI_LINEFROMPOSITION, nPos, 0 )+1
+   METHOD GetCurLine()              INLINE ::Owner:SendMessage( SCI_LINEFROMPOSITION, ::GetCurrentPos(), 0 )+1
+   METHOD GetSelectionStart()       INLINE ::Owner:SendMessage( SCI_GETSELECTIONSTART, 0, 0 )
+   METHOD CreateDocument()          INLINE ::Owner:SendMessage( SCI_CREATEDOCUMENT, 0, 0 )
+   METHOD SetSavePoint()            INLINE ::Owner:SendMessage( SCI_SETSAVEPOINT, 0, 0 )
+ENDCLASS
+
+//------------------------------------------------------------------------------------------------------------------------------------
+METHOD Init( oOwner, cFile ) CLASS Source
+   LOCAL n
+   ::Owner := oOwner
+   ::pDoc  := ::CreateDocument()
+   IF cFile != NIL
+      n := RAT( "\", cFile )
+      ::FileName := SUBSTR( cFile, n+1 )
+      ::Path     := SUBSTR( cFile, 1, n-1 )
+      ::File     := cFile
    ENDIF
+   ::Select()
+   ::SetSavePoint()
+   AADD( ::Owner:aDocs, Self )
 RETURN Self
 
-METHOD CloseDoc( pDoc ) CLASS SourceEditor
-   LOCAL n, lRet
-   n := ASCAN( ::aDocs, {|a| a[1]==pDoc} )
-   lRet := n > 0
-   IF lRet
-      ::ReleaseDocument( pDoc )
-      ADEL( ::aDocs, n, .T. )
+//------------------------------------------------------------------------------------------------------------------------------------
+METHOD Close() CLASS Source
+   LOCAL n
+   IF ( n := ASCAN( ::Owner:aDocs, {|o| o:pDoc==::pDoc} ) ) > 0
+      ::ReleaseDocument( ::pDoc )
+      ADEL( ::Owner:aDocs, n, .T. )
+      RETURN .T.
    ENDIF
-RETURN lRet
+RETURN .F.
 
 //------------------------------------------------------------------------------------------------------------------------------------
-METHOD CreateDocument( cFile ) CLASS SourceEditor
-   LOCAL pDoc := ::SendMessage( SCI_CREATEDOCUMENT, 0, 0 )
-   ::SelectDocument( pDoc )
-   ::SetSavePoint()
-   AADD( ::aDocs, { pDoc, cFile, .F. } )
-RETURN pDoc
-
-//------------------------------------------------------------------------------------------------------------------------------------
-METHOD GetText( pDoc ) CLASS SourceEditor
-   LOCAL pCur, cText, nLen
-   IF pDoc != NIL
-      pCur := ::GetCurDoc()
-      ::SelectDocument( pDoc )
-   ENDIF
-
-   nLen := ::SendMessage( SCI_GETLENGTH, 0, 0 )+1
-   cText := SPACE( nLen )
-   ::SendMessage( SCI_GETTEXT, nLen, @cText )
-   cText := STRTRAN( cText, CHR(0) )
-   IF pDoc != NIL
-      ::SelectDocument( pCur )
-   ENDIF
-RETURN cText
-
-//------------------------------------------------------------------------------------------------------------------------------------
-METHOD GetDocFileName( pDoc ) CLASS SourceEditor
-   LOCAL cFile, n
-   DEFAULT pDoc TO ::GetCurDoc()
-   IF ( n := ASCAN( ::aDocs, {|a| a[1]==pDoc} ) ) > 0
-      cFile := ::aDocs[n][2]
-   ENDIF
-RETURN cFile
-
-//------------------------------------------------------------------------------------------------------------------------------------
-METHOD OpenFile( cFile ) CLASS SourceEditor
+METHOD Open( cFile ) CLASS Source
    LOCAL n, cText := MEMOREAD( cFile )
    ::SetText( cText )
    ::SetSavePoint()
    ::GotoPosition( 0 )
-   IF ( n := ASCAN( ::aDocs, {|a| a[1]==::GetCurDoc()} ) ) > 0
-      ::aDocs[n][2] := cFile
+   ::EmptyUndoBuffer()
+   ::Modified  := .F.
+   ::FirstOpen := .F.
+   n := RAT( "\", cFile )
+   ::FileName := SUBSTR( cFile, n+1 )
+   ::Path     := SUBSTR( cFile, 1, n-1 )
+   ::File     := cFile
+RETURN Self
+
+//------------------------------------------------------------------------------------------------------------------------------------
+METHOD GetText() CLASS Source
+   LOCAL cText, nLen := ::Owner:SendMessage( SCI_GETLENGTH, 0, 0 )+1
+   cText := SPACE( nLen )
+   ::Owner:SendMessage( SCI_GETTEXT, nLen, @cText )
+   cText := STRTRAN( cText, CHR(0) )
+RETURN cText
+
+//------------------------------------------------------------------------------------------------------------------------------------
+METHOD Save( cFile ) CLASS Source
+   LOCAL pPrev, hFile, cText, n
+   IF cFile != NIL
+      ::File := cFile
+   ENDIF
+   IF !EMPTY( ::File )
+      pPrev := ::Owner:GetCurDoc()
+      ::Owner:SelectDocument( ::pDoc )
+      IF ( hFile := fCreate( ::File ) ) <> -1
+         cText := ::GetText()
+         fWrite( hFile, cText, Len(cText) )
+         fClose( hFile )
+      ENDIF
+      ::Owner:SelectDocument( pPrev )
+      ::Modified := .F.
+
+      n := RAT( "\", ::File )
+      ::FileName := SUBSTR( ::File, n+1 )
+      ::Path     := SUBSTR( ::File, 1, n-1 )
+
+      cText := ::Application:SourceTabs:GetItemText()
+      cText := ALLTRIM( STRTRAN( cText, "*" ) )
+      ::Application:SourceTabs:SetItemText( , cText, .F. )
    ENDIF
 RETURN Self
 

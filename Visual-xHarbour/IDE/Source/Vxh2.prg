@@ -163,7 +163,7 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
 
    ::BackgroundImage := FreeImageRenderer( Self ):Create()
 
-   ::Editor := ::Application:SourceEditor:CreateDocument()
+   ::Editor := Source( ::Application:SourceEditor )
 
    IF cFileName != NIL
       ::Application:SourceTabs:InsertTab( cFileName )
@@ -177,20 +177,20 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
                         '#include "' + ::Name + '.xfm"' + CRLF +;
                         "//---------------------------------------- End of system code ----------------------------------------//" + CRLF + CRLF
 
-      ::Application:SourceEditor:SetDocText( ::Editor, cInitialBuffer )
-      //::Editor:lModified := .T.
+      ::Editor:SetText( cInitialBuffer )
+      ::Editor:Modified := .T.
    ENDIF
    //::Editor:SetExtension( "prg" )
    
-   cMain := ::Application:SourceEditor:GetText( ::Application:ProjectPrgEditor )
-
+   cMain := ::Application:ProjectPrgEditor:GetText()
    IF AT( "[BEGIN SYSTEM CODE]", cMain ) == 0
       cProject := "//----------------------------------- [BEGIN SYSTEM CODE] ------------------------------------//" + CRLF
       cProject += "   __" + STRTRAN( ::Application:Project:Properties:Name, " ", "_" ) + "( NIL ):Run( "+::Name+"( NIL ) )" + CRLF
       cProject += "//------------------------------------ [END SYSTEM CODE] -------------------------------------//" + CRLF + CRLF
       cProject += "RETURN NIL"+ CRLF+ CRLF
       cMain := STRTRAN( cMain, "RETURN NIL"+ CRLF, cProject )
-      ::Application:SourceEditor:SetDocText( ::Application:ProjectPrgEditor, cMain )
+      ::Application:ProjectPrgEditor:Open( cMain )
+      ::Application:ProjectPrgEditor:Modified := .T.
    ENDIF
 
    IF !::Application:Project:DesignPage
@@ -201,7 +201,7 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
    ::Selected := {{Self}}
 
    ::Application:ObjectTree:Set( Self, lNew )
-   ::Application:SourceEditor:EmptyUndoBuffer()
+
 RETURN Self
 
 

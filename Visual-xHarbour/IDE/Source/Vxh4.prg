@@ -668,7 +668,7 @@ METHOD RenameForm( cOldName, cNewName, lProject ) CLASS ObjManager
                    Line := Line[ ED_COLLAPSED_START ]
                 ENDIF
              ENDDO
-             lForce := ::Application:SourceEditor:oEditor == oEditor .AND. n == ::Application:SourceTabs:CurSel
+             lForce := ::Application:SourceEditor:Source == oEditor .AND. n == ::Application:SourceTabs:CurSel
              oEditor:Load( ,cNewBuffer, lForce, lForce )
              oEditor:lModified := .T.
              
@@ -680,7 +680,7 @@ METHOD RenameForm( cOldName, cNewName, lProject ) CLASS ObjManager
       
       IF lProject .OR. ::ActiveObject:ClsName == "VXH_FORM_IDE" .OR. ::ActiveObject:ClsName == "CCTL" 
          TRY
-            IF ( n := aScan( ::Application:SourceEditor:aDocs, {|a| a[1]==oEditor} ) ) > 0
+            IF ( n := aScan( ::Application:SourceEditor:aDocs, {|o| o==oEditor} ) ) > 0
                ::Application:SourceTabs:SetItemText( n, cNewName +".prg", .F. )
             ENDIF
             IF ::ActiveObject:ClsName == "VXH_FORM_IDE" .OR. ::ActiveObject:ClsName == "CCTL" 
@@ -3051,7 +3051,7 @@ METHOD GenerateEvent( cEvent, cFuncName, Event ) CLASS EventManager
          :AddLine( { "RETURN Self", NIL, NIL, 0 } )
          :lModified := .T.
          TRY
-         IF ::Application:SourceEditor:oEditor == HB_QWith()
+         IF ::Application:SourceEditor:Source == HB_QWith()
             :GoLine( :nLines - 1 )
             :GoColumn( 4 )
           ELSE
@@ -3060,7 +3060,7 @@ METHOD GenerateEvent( cEvent, cFuncName, Event ) CLASS EventManager
          CATCH
          END
        ELSE
-         IF ::Application:SourceEditor:oEditor == HB_QWith()
+         IF ::Application:SourceEditor:Source == HB_QWith()
             aPos := :LineColumn( nPos )
             :GoLine( aPos[1] )
             :GoColumn( aPos[2]+1 )
@@ -3101,7 +3101,7 @@ METHOD RenameEvent( cEvent, cFuncName, cNewFuncName, lSwitch ) CLASS EventManage
                Line := Line[ ED_COLLAPSED_START ]
             ENDIF
          ENDDO
-         lForce := ::Application:SourceEditor:oEditor == HB_QWith()
+         lForce := ::Application:SourceEditor:Source == HB_QWith()
          :Load( ,cNewBuffer, lForce, lForce )
          :lModified := .T.
       END

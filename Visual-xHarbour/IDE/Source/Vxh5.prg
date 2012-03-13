@@ -93,7 +93,7 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------
 METHOD OnParentNotify() CLASS ErrorListView
-   LOCAL iFile, lvi, nLine, cFile, aEditor, nFor
+   LOCAL iFile, lvi, nLine, cFile, oEditor, nFor
 
    SWITCH ::Parent:hdr:code
       CASE NM_DBLCLK
@@ -117,13 +117,13 @@ METHOD OnParentNotify() CLASS ErrorListView
             nLine := Val( Left( lvi:pszText, At( Chr(0), lvi:pszText ) - 1 ) )
 
             nFor := 1
-            FOR EACH aEditor IN ::Application:SourceEditor:aDocs
-               IF aEditor[2] == cFile
+
+            FOR EACH oEditor IN ::Application:SourceEditor:aDocs
+               IF Upper( oEditor:File ) == cFile
                   ::Application:EditorPage:Select()
                   ::Application:SourceTabs:SetCurSel( nFor )
-
-                  ::Application:SourceEditor:SelectDocument( aEditor[1] )
-                  ::Application:SourceEditor:GoToLine( nLine )
+                  ::Application:SourceEditor:Source := oEditor
+                  oEditor:GoToLine( nLine-1 )
                   ::Application:SourceEditor:SetFocus()
                   EXIT
                ENDIF
