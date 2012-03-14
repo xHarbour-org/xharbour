@@ -13,6 +13,7 @@
 static Application
 
 static nWinError
+static s_lExit := .F.
 
 static __lErrorInit := .F.
 
@@ -552,7 +553,7 @@ METHOD Exit() CLASS Application
    FreeLibrary( ::hRich20 )
    
    IF ::DllInstance == NIL
-      ::lExit := .T.
+      s_lExit := .T.
       PostQuitMessage(0)
       #ifdef VXH_PROFESSIONAL
          FreeExplorerBarInfo()
@@ -610,7 +611,7 @@ METHOD Run( oWnd ) CLASS Application
    ::MainForm:__InstMsg := ::__InstMsg
    
    IF !::MainForm:Modal
-      DO WHILE GetMessage( @Msg, 0, 0, 0 ) .AND. !::lExit
+      DO WHILE GetMessage( @Msg, 0, 0, 0 ) .AND. ! s_lExit .AND. VALTYPE( Self ) == "O" .AND. ::MainForm:IsWindow()
          cClass := GetClassName( Msg:hWnd )
          IF !::AxTranslate( Msg, cClass )
             IF !::TranslateAccelerator( Msg )

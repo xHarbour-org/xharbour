@@ -6406,7 +6406,7 @@ RETURN NIL
 //------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------
 
-// Compatibility with xedit debugger ----------------------------------------------------
+// Compatibility with xedit for debugger ------------------------------------------------
 FUNCTION xEdit_GetEditors(); RETURN __GetApplication():SourceEditor:aDocs
 
 CLASS Editor 
@@ -6424,7 +6424,6 @@ RETURN oSource
 CLASS EditorDisplay
    METHOD Display() INLINE NIL
 ENDCLASS
-
 // --------------------------------------------------------------------------------------
 
 CLASS Source
@@ -6439,7 +6438,7 @@ CLASS Source
    DATA SavedPos  EXPORTED INIT 0
    DATA Extension EXPORTED INIT "prg"
 
-   // Compatibility with xedit debugger ----------------------------------------------------
+   // Compatibility with xedit for debugger ------------------------------------------------
    ACCESS cFile             INLINE ::FileName
    ACCESS cPath             INLINE IIF( ! EMPTY(::Path), ::Path + "\", "" )
    ACCESS nLine             INLINE ::GetCurLine()
