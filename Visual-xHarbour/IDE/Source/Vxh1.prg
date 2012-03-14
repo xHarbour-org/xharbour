@@ -3355,10 +3355,9 @@ METHOD Close( lCloseErrors ) CLASS Project
     ::Application:MainForm:Caption := "Visual xHarbour " + VXH_Version
    #endif
 
-   ::Application:SourceEditor:Disable()
-   ::Application:SourceEditor:Hide()
-
-   ::Application:DesignPage:Disable()
+   ::Application:SourceEditor:Enabled := .F.
+   ::Application:SourceEditor:Visible := .F.
+   ::Application:DesignPage:Enabled   := .F.
    
    IF IsWindow( ::Application:MainForm:hWnd )
       ::Application:Props[ "StartTabPage" ]:Select()
@@ -6339,10 +6338,16 @@ CLASS SourceEditor INHERIT Control
    DATA hSciLib PROTECTED
 
    ACCESS DocCount       INLINE LEN( ::aDocs )
+
+
+   // Compatibility with xedit debugger ----------------------------------------------------
+   ACCESS oEditor    INLINE ::xSource
+   ASSIGN oEditor(o) INLINE ::Source(o)
+   //---------------------------------------------------------------------------------------
+
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
-   METHOD GetCurDoc()               INLINE ::SendMessage( SCI_GETDOCPOINTER, 0, 0 )
-   METHOD SelectDocument()
 
    METHOD StyleSetFont( cFont )     INLINE ::SendMessage( SCI_STYLESETFONT, STYLE_DEFAULT, cFont )
    METHOD StyleGetFont( cFont )     INLINE cFont := SPACE(255), ::SendMessage( SCI_STYLEGETFONT, STYLE_DEFAULT, @cFont ), ALLTRIM(cFont)
@@ -6396,25 +6401,35 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
    ENDCASE
 RETURN NIL
 
-//------------------------------------------------------------------------------------------------------------------------------------
-METHOD SelectDocument( pDoc ) CLASS SourceEditor
-   LOCAL n
-   IF ( n := ASCAN( ::aDocs, {|a| a[1]==::GetCurDoc() } ) ) > 0
-      ::aDocs[n][5] := ::GetCurrentPos()
-   ENDIF
-   ::SendMessage( SCI_SETDOCPOINTER, 0, pDoc )
-   IF ( n := ASCAN( ::aDocs, {|a| a[1]==pDoc } ) ) > 0
-      ::GoToPos( ::aDocs[n][5] )
-   ENDIF
-RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------
+
+// Compatibility with xedit debugger ----------------------------------------------------
+FUNCTION xEdit_GetEditors(); RETURN __GetApplication():SourceEditor:aDocs
+
+CLASS Editor 
+   METHOD New( nTop, nLeft, nLines, nColumns, cFile, oDisplay )
+ENDCLASS
+
+METHOD New( nTop, nLeft, nLines, nColumns, cFile, oDisplay ) CLASS Editor 
+   LOCAL oSource := Source( __GetApplication():SourceEditor )
+   (nTop, nLeft, nLines, nColumns, oDisplay)
+   IF ! EMPTY( cFile )
+      oSource:Open( cFile )
+   ENDIF
+RETURN oSource
+
+CLASS EditorDisplay
+   METHOD Display() INLINE NIL
+ENDCLASS
+
+// --------------------------------------------------------------------------------------
 
 CLASS Source
    ACCESS Application INLINE ::Owner:Application
-   DATA pDoc      EXPORTED
+   DATA pSource   EXPORTED
    DATA Owner     EXPORTED
    DATA Path      EXPORTED
    DATA FileName  EXPORTED
@@ -6424,6 +6439,19 @@ CLASS Source
    DATA SavedPos  EXPORTED INIT 0
    DATA Extension EXPORTED INIT "prg"
 
+   // Compatibility with xedit debugger ----------------------------------------------------
+   ACCESS cFile             INLINE ::FileName
+   ACCESS cPath             INLINE IIF( ! EMPTY(::Path), ::Path + "\", "" )
+   ACCESS nLine             INLINE ::GetCurLine()
+   ACCESS lReadOnly         INLINE ::GetReadOnly()
+   ASSIGN lReadOnly(lSet)   INLINE ::SetReadOnly(lSet)
+   DATA HighlightedLine     EXPORTED
+   DATA oDisplay            EXPORTED INIT EditorDisplay()
+   METHOD Load(cFile,cText) INLINE IIF( ! EMPTY(cFile), ::Open(cFile), ::SetText(cText) )
+   METHOD GoLine(n)         INLINE ::GoToLine(n)
+   METHOD Highlight()       INLINE ::HighlightedLine := ::GetCurLine()
+   // --------------------------------------------------------------------------------------
+
    METHOD Init( oOwner, cFile ) CONSTRUCTOR
 
    METHOD Open()
@@ -6432,12 +6460,12 @@ CLASS Source
    METHOD GetText()
 
    METHOD SavePos()                 INLINE ::SavedPos := ::GetCurrentPos()
-   METHOD Select()                  INLINE ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pDoc ), ::Owner:xSource := Self, ::GotoPosition( ::SavedPos )
+   METHOD Select()                  INLINE ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource ), ::Owner:xSource := Self, ::GotoPosition( ::SavedPos )
    METHOD SetText( cText )          INLINE ::Owner:SendMessage( SCI_SETTEXT, 0, cText )
    METHOD GotoPosition( nPos )      INLINE ::Owner:SendMessage( SCI_GOTOPOS, nPos, 0 )
    METHOD GotoLine( nLine )         INLINE ::Owner:SendMessage( SCI_GOTOLINE, nLine, 0 )
    METHOD GetCurDoc()               INLINE ::Owner:SendMessage( SCI_GETDOCPOINTER, 0, 0 )
-   METHOD ReleaseDocument( pDoc )   INLINE ::Owner:SendMessage( SCI_RELEASEDOCUMENT, 0, pDoc )
+   METHOD ReleaseDocument()         INLINE ::Owner:SendMessage( SCI_RELEASEDOCUMENT, 0, ::pSource )
    METHOD EmptyUndoBuffer()         INLINE ::Owner:SendMessage( SCI_EMPTYUNDOBUFFER, 0, 0 )
    METHOD CanUndo()                 INLINE ::Owner:SendMessage( SCI_CANUNDO, 0, 0 )==1
    METHOD CanRedo()                 INLINE ::Owner:SendMessage( SCI_CANREDO, 0, 0 )==1
@@ -6448,6 +6476,7 @@ CLASS Source
    METHOD Cut()                     INLINE ::Owner:SendMessage( SCI_CUT, 0, 0 )
    METHOD CanPaste()                INLINE ::Owner:SendMessage( SCI_CANPASTE, 0, 0 )==1
    METHOD SetReadOnly( nSet )       INLINE ::Owner:SendMessage( SCI_SETREADONLY, nSet, 0 )
+   METHOD GetReadOnly()             INLINE ::Owner:SendMessage( SCI_GETREADONLY, 0, 0 )
    METHOD GetCurrentPos()           INLINE ::Owner:SendMessage( SCI_GETCURRENTPOS, 0, 0 )
    METHOD SetCurrentPos( nPos )     INLINE ::Owner:SendMessage( SCI_SETCURRENTPOS, nPos, 0 )
    METHOD GoToPos( nPos )           INLINE ::Owner:SendMessage( SCI_GOTOPOS, nPos, 0 )
@@ -6457,13 +6486,14 @@ CLASS Source
    METHOD GetSelectionStart()       INLINE ::Owner:SendMessage( SCI_GETSELECTIONSTART, 0, 0 )
    METHOD CreateDocument()          INLINE ::Owner:SendMessage( SCI_CREATEDOCUMENT, 0, 0 )
    METHOD SetSavePoint()            INLINE ::Owner:SendMessage( SCI_SETSAVEPOINT, 0, 0 )
+   METHOD ChkDoc()                  INLINE IIF( ::GetCurDoc() != ::pSource, ::Select(),)
 ENDCLASS
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Init( oOwner, cFile ) CLASS Source
    LOCAL n
-   ::Owner := oOwner
-   ::pDoc  := ::CreateDocument()
+   ::Owner   := oOwner
+   ::pSource := ::CreateDocument()
    IF cFile != NIL
       n := RAT( "\", cFile )
       ::FileName := SUBSTR( cFile, n+1 )
@@ -6478,8 +6508,8 @@ RETURN Self
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Close() CLASS Source
    LOCAL n
-   IF ( n := ASCAN( ::Owner:aDocs, {|o| o:pDoc==::pDoc} ) ) > 0
-      ::ReleaseDocument( ::pDoc )
+   ::ReleaseDocument()
+   IF ( n := ASCAN( ::Owner:aDocs, {|o| o:pSource==::pSource} ) ) > 0
       ADEL( ::Owner:aDocs, n, .T. )
       RETURN .T.
    ENDIF
@@ -6516,7 +6546,7 @@ METHOD Save( cFile ) CLASS Source
    ENDIF
    IF !EMPTY( ::File )
       pPrev := ::Owner:GetCurDoc()
-      ::Owner:SelectDocument( ::pDoc )
+      ::Owner:SelectDocument( ::pSource )
       IF ( hFile := fCreate( ::File ) ) <> -1
          cText := ::GetText()
          fWrite( hFile, cText, Len(cText) )
