@@ -42,11 +42,7 @@ ENDCLASS
 
 METHOD New() CLASS XHDebuggerGUI
   LOCAL lSysColor := ::oApp:DebuggerPanel:BackColor == __GetSystem():CurrentScheme:ToolStripPanelGradientEnd
-#ifdef VXH
-  ::oEditor := ::oApp:SourceEditor:Source
-#else
   ::oEditor := ::oApp:SourceEditor:oEditor
-#endif
 
   WITH OBJECT ::oToolBar := ToolStrip( ::oApp:DebuggerPanel )
     :Dock:Left   := :Parent
@@ -179,23 +175,7 @@ RETURN Self
 
 
 METHOD GetUnavailableEditor( cFile ) CLASS XHDebuggerGUI
-#ifdef VXH
-  LOCAL n := AScan( ::oApp:SourceEditor:aDocs, {|o| Empty( o:File ) } )
-  IF n == 0
-    ::oEditor := Source( ::oApp:SourceEditor )
-    ::oApp:SourceTabs:InsertTab( "Unavailable code" )
-    n := ::oApp:SourceEditor:DocCount
-  ENDIF
-  ::oEditor := ::oApp:SourceEditor:aDocs[ n ]
-  ::oApp:SourceTabs:SetCurSel( n )
-  ::oApp:Project:SourceTabChanged( , n )
-
-  ::oEditor:Select()
-  ::oEditor:SetText( "CODE NOT AVAILABLE FOR " + cFile )
-  ::oEditor:SetReadOnly(.T.)
-#else
   LOCAL n := AScan( xEdit_GetEditors(), {|o| Empty( o:cFile ) } )
-
   IF n == 0
     ::oEditor := Editor():New( , , , , /*cFile*/, ::oApp:SourceEditor:oEditor:oDisplay )
     ::oApp:SourceTabs:InsertTab( "Unavailable code" )
@@ -207,7 +187,6 @@ METHOD GetUnavailableEditor( cFile ) CLASS XHDebuggerGUI
   
   ::oEditor:Load( , "CODE NOT AVAILABLE FOR " + cFile, .T. )
   ::oEditor:lReadOnly := .T.
-#endif
 RETURN n
 
 
@@ -385,31 +364,22 @@ RETURN CallNextHookEx( ::hHook, nCode, nwParam, nlParam)
 
 
 METHOD RunToCursor() CLASS XHDebuggerGUI
-#ifdef VXH
-  WITH OBJECT ::oApp:SourceEditor:Source
-    IF ::IsValidStopLine( :FileName, :GetCurLine() )
-      ::Super:Until( :FileName, :GetCurLine() )
-    ENDIF
-  END
-#else
   WITH OBJECT ::oApp:SourceEditor:oEditor
     IF ::IsValidStopLine( :cFile, :nLine )
       ::Super:Until( :cFile, :nLine )
     ENDIF
   END
-#endif
 RETURN Self
 
 
 METHOD Stop() CLASS XHDebuggerGUI
   ::Super:Stop()
 
-#ifndef VXH
   WITH OBJECT ::oEditor
     :HighlightedLine := NIL
     :oDisplay:Display()
   END
-#endif
+
   IF ::oApp:ClassName != "DEBUGGER"
      ::oApp:DebuggerPanel:Hide()
      IF ::oApp:IdeActive
@@ -473,18 +443,13 @@ METHOD Sync() CLASS XHDebuggerGUI
   SetForegroundWindow( ::oApp:MainWindow:hWnd )
   //SetActiveWindow( ::oApp:MainWindow:hWnd )
   //SetFocus( ::oApp:MainWindow:hWnd )
-#ifdef VXH
-  nDocs := ::oApp:SourceEditor:DocCount
-  IF ( n := AScan( ::oApp:SourceEditor:aDocs, ;
-                   {|o| Lower(o:File)==Lower( cFile ) } ) ) > 0
-    ::oEditor := ::oApp:SourceEditor:aDocs[n]
-#else
+
   nDocs := Len( xEdit_GetEditors() )
   IF ( n := AScan( xEdit_GetEditors(), ;
                    {|o| Lower( IIF( '\' IN cFile, o:cPath, "" ) + o:cFile ) ;
                         == Lower( cFile ) } ) ) > 0
     ::oEditor := xEdit_GetEditors()[ n ]
-#endif
+
     ::oApp:SourceTabs:SetCurSel( n )
     ::oApp:Project:SourceTabChanged( , n )
 
@@ -501,18 +466,11 @@ METHOD Sync() CLASS XHDebuggerGUI
     ENDIF
 
     IF File( cFile )
-   #ifdef VXH
-      ::oEditor := Source( ::oApp:SourceEditor )
-      ::oEditor:Open( cFile )
-      IF RIGHT( UPPER( cFile ), 4 ) == ".XFM"
-         ::oEditor:SetReadOnly(1)
-      ENDIF
-   #else
       ::oEditor := Editor():New( , , , , cFile, ::oApp:SourceEditor:oEditor:oDisplay )
       IF RIGHT( UPPER( cFile ), 4 ) == ".XFM"
          ::oEditor:lReadOnly := .T.
       ENDIF
-   #endif
+
       ::oApp:SourceTabs:InsertTab( ::cModule )
       ::oApp:SourceTabs:SetCurSel( nDocs )
       ::oApp:Project:SourceTabChanged( , nDocs )
@@ -531,18 +489,11 @@ METHOD Sync() CLASS XHDebuggerGUI
         ::oApp:Project:OpenSource( cFile )
 
 
-      #ifdef VXH
-        nDocs := ::oApp:SourceEditor:DocCount
-        IF ( n := AScan( ::oApp:SourceEditor:aDocs, ;
-                   {|o| Lower(o:File)==Lower( cFile ) } ) ) > 0
-          ::oEditor := ::oApp:SourceEditor:aDocs[n]
-      #else
         nDocs := Len( xEdit_GetEditors() )
         IF ( n := AScan( xEdit_GetEditors(), ;
                          {|o| Lower( IIF( '\' IN cFile, o:cPath, "" ) + o:cFile ) ;
                               == Lower( cFile ) } ) ) > 0
           ::oEditor := xEdit_GetEditors()[ n ]
-      #endif
 
           IF RIGHT( UPPER( cFile ), 4 ) == ".XFM"
             ::oEditor:lReadOnly := .T.
@@ -555,12 +506,8 @@ METHOD Sync() CLASS XHDebuggerGUI
     ENDIF
   ENDIF
 
-#ifdef VXH
-  ::oEditor:GoToLine( ::nLine )
-#else
   ::oEditor:GoLine( ::nLine )
   ::oEditor:Highlight()
-#endif
 RETURN Self
 
 
