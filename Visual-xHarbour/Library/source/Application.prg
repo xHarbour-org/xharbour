@@ -551,7 +551,6 @@ METHOD Exit() CLASS Application
    ENDIF
    ::MainForm := NIL
    FreeLibrary( ::hRich20 )
-   
    IF ::DllInstance == NIL
       s_lExit := .T.
       PostQuitMessage(0)
@@ -566,7 +565,6 @@ METHOD Exit() CLASS Application
       IF ::__SocketInit
          InetCleanUp()
       ENDIF
-      QUIT
    ENDIF
 RETURN NIL
 
@@ -628,24 +626,24 @@ METHOD Run( oWnd ) CLASS Application
 
       ENDDO
    ENDIF
-   PostQuitMessage(0)
 
    #ifdef VXH_PROFESSIONAL
       FreeExplorerBarInfo()
    #endif
+   TRY
+      FreeLibrary( ::hRich20 )
+      ::OnExit()
    
-   AEVAL( ::ImageLists, {|o|o:Destroy()} )
-   ::OnExit()
-   FreeLibrary( ::hRich20 )
-
-   IF ::__hMenuHook != NIL
-      UnhookWindowsHookEx( ::__hMenuHook )
-   ENDIF
-   IF ::__SocketInit
-      InetCleanUp()
-   ENDIF
-   ::MainForm := NIL
-
+      IF ::__hMenuHook != NIL
+         UnhookWindowsHookEx( ::__hMenuHook )
+      ENDIF
+      IF ::__SocketInit
+         InetCleanUp()
+      ENDIF
+      ::MainForm := NIL
+      AEVAL( ::ImageLists, {|o|o:Destroy()} )
+   CATCH
+   END
 RETURN 0
 
 //------------------------------------------------------------------------------------------------

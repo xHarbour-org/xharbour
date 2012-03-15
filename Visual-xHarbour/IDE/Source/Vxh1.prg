@@ -393,7 +393,7 @@ RETURN NIL
 
 METHOD OnClose() CLASS IDE_MainForm
    LOCAL aSize, pWp, hKey, cName, cType, xData, n, aVal, hSub
-   IF !::Application:Project:Close()
+   IF !::Application:Project:Close(,.T.)
       RETURN 0
    ENDIF
 
@@ -3137,7 +3137,6 @@ METHOD SelectWindow( oWin, hTree, lFromTab ) CLASS Project
       n := ASCAN( ::Application:Project:Forms, ::CurrentForm,,, .T. )
       ::Application:FormsTabs:SetCurSel( n )
       ::Application:FormsTabs:InvalidateRect(,.F.)
-      ::Application:Yield()
    ENDIF
 
    IF oWnd:hWnd != ::CurrentForm:hWnd
@@ -3229,9 +3228,10 @@ RETURN oWin
 
 //-------------------------------------------------------------------------------------------------------
 
-METHOD Close( lCloseErrors ) CLASS Project
+METHOD Close( lCloseErrors, lClosing ) CLASS Project
    LOCAL nRes, n, oMsg, lRem
    DEFAULT lCloseErrors TO .T.
+   DEFAULT lClosing TO .F.
 
    IF ::Modified .AND. !EMPTY( ::Properties ) .AND. lCloseErrors
       nRes := ::Application:MainForm:MessageBox( "Save changes before closing?", IIF( EMPTY(::Properties:Name), "Untitled", ::Properties:Name ), MB_YESNOCANCEL | MB_ICONQUESTION )
@@ -3297,13 +3297,12 @@ METHOD Close( lCloseErrors ) CLASS Project
           ::Forms[n]:Editor:Close()
           ::Forms[n]:Editor := NIL
           ::Forms[n]:Destroy()
-          ::Application:Yield()
        ENDIF
    NEXT
    ::Forms := {}
    ::Application:FormsTabs:DeleteAllTabs()
 
-   IF ::DesignPage == NIL
+   IF ::DesignPage == NIL .OR. lClosing
       RETURN .T.
    ENDIF
 
@@ -3359,41 +3358,39 @@ METHOD Close( lCloseErrors ) CLASS Project
    ::Application:SourceEditor:Visible := .F.
    ::Application:DesignPage:Enabled   := .F.
    
-   IF IsWindow( ::Application:MainForm:hWnd )
-      ::Application:Props[ "StartTabPage" ]:Select()
-      ::Application:Props[ "ComboSelect" ]:ResetContent()
+   ::Application:Props[ "StartTabPage" ]:Select()
+   ::Application:Props[ "ComboSelect" ]:ResetContent()
 
-      ::aUndo := {}
-      ::aRedo := {}
+   ::aUndo := {}
+   ::aRedo := {}
 
-      ::Application:Props[ "EditUndoItem"  ]:Enabled := .F.
-      ::Application:Props[ "EditUndoBttn"  ]:Enabled := .F.
-      ::Application:Props[ "EditRedoItem"  ]:Enabled := .F.
-      ::Application:Props[ "EditRedoBttn"  ]:Enabled := .F.
+   ::Application:Props[ "EditUndoItem"  ]:Enabled := .F.
+   ::Application:Props[ "EditUndoBttn"  ]:Enabled := .F.
+   ::Application:Props[ "EditRedoItem"  ]:Enabled := .F.
+   ::Application:Props[ "EditRedoBttn"  ]:Enabled := .F.
 
-      ::CopyBuffer  := {}
-      ::PasteOn     := .F.
+   ::CopyBuffer  := {}
+   ::PasteOn     := .F.
 
-      ::DesignPage  := .F.
-      ::ProjectFile := NIL
-      ::Forms       := {}
-      ::Modified    := .F.
-      ::Properties  := NIL
-      ::Modified    := .F.
+   ::DesignPage  := .F.
+   ::ProjectFile := NIL
+   ::Forms       := {}
+   ::Modified    := .F.
+   ::Properties  := NIL
+   ::Modified    := .F.
 
-      ::CurrentForm := NIL
+   ::CurrentForm := NIL
    
-      EVAL( ::Application:MainTab:OnSelChanged, NIL, NIL, 1)
-      ::EditReset(1)
+   EVAL( ::Application:MainTab:OnSelChanged, NIL, NIL, 1)
+   ::EditReset(1)
 
-      ::Application:SourceEditor:Caption := ""
-      IF lCloseErrors
-         ::Application:MainForm:DebugBuild1:ResetContent()
-         ::Application:DebugWindow:Hide()
-      ENDIF
-      ::Application:Components:Close()
-      hb_gcall( .T. )
+   ::Application:SourceEditor:Caption := ""
+   IF lCloseErrors
+      ::Application:MainForm:DebugBuild1:ResetContent()
+      ::Application:DebugWindow:Hide()
    ENDIF
+   ::Application:Components:Close()
+   hb_gcall( .T. )
 RETURN .T.
 
 //-------------------------------------------------------------------------------------------------------
@@ -3897,7 +3894,6 @@ METHOD Open( cProject ) CLASS Project
       ::Application:EditorPage:Select()
    ENDIF
    ::Application:FileTree:UpdateView()
-   ::Application:DoEvents()
    ::ResetQuickOpen( ::ProjectFile:Path + "\" + ::ProjectFile:Name )
    IF LEN( ::Forms ) > 0 .AND. !FILE( cSourcePath +"\" + ::Properties:Name +"_XFM.prg" )
       n := ::Application:MainForm:MessageBox( ::Properties:Name + " was created with a previous version of Visual xHarbour, would you like to convert it to current version", "Open Project", MB_ICONQUESTION | MB_YESNOCANCEL )
@@ -5502,8 +5498,6 @@ METHOD Build( lForce ) CLASS Project
          :lXBP    := ::Application:IniFile:ReadInteger( "General", "SaveXBP", 0 )==1
       END
 
-      ::Application:Yield()
-
       ::Application:BuildLog:Caption := ""
 
       bProgress := {|Module| ::Application:MainForm:DebugBuild1:AddItem( IIF( Module:nType != ::Properties:TargetType + 9, "Compiling "+Module:cFile+"...", "Linking "+Module:cFile ), .T. ),;
@@ -6355,6 +6349,7 @@ CLASS SourceEditor INHERIT Control
    METHOD StyleSetSize( nSize )     INLINE ::SendMessage( SCI_STYLESETSIZE, STYLE_DEFAULT, nSize )
    METHOD StyleGetSize( nSize )     INLINE ::SendMessage( SCI_STYLEGETSIZE, STYLE_DEFAULT, @nSize ), nSize
 
+   METHOD SelectDocument( pDoc )    INLINE ::SendMessage( SCI_SETDOCPOINTER, 0, pDoc )
    METHOD OnDestroy()               INLINE aEval( ::aDocs, {|oDoc| oDoc:Close() } ), FreeLibrary( ::hSciLib ), NIL
    METHOD OnParentNotify()
 ENDCLASS
@@ -6544,7 +6539,7 @@ METHOD Save( cFile ) CLASS Source
       ::File := cFile
    ENDIF
    IF !EMPTY( ::File )
-      pPrev := ::Owner:GetCurDoc()
+      pPrev := ::GetCurDoc()
       ::Owner:SelectDocument( ::pSource )
       IF ( hFile := fCreate( ::File ) ) <> -1
          cText := ::GetText()

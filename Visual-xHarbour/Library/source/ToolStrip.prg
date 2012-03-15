@@ -2260,7 +2260,7 @@ RETURN Self
 
 //--------------------------------------------------------------------------------------------------------------------------------
 STATIC FUNCTION __MenuDialogProc( hWnd, nMsg, nwParam, nlParam )
-   LOCAL aPt, aRect, hdc, pProc, hOldBrush, hOldPen, n, Self := s_CurrentObject
+   LOCAL aPt, aRect, hdc, pProc, hOldBrush, hOldPen, n, o := s_CurrentObject
    
    pProc := GetProp( hWnd, "PROP_WND_PROC" )
 
@@ -2283,21 +2283,21 @@ STATIC FUNCTION __MenuDialogProc( hWnd, nMsg, nwParam, nlParam )
               aRect := _GetWindowRect( hWnd )
 
               hdc       := GetWindowDC( hWnd )
-              hOldPen   := SelectObject( hDC, ::System:CurrentScheme:Pen:MenuBorder )
-              hOldBrush := SelectObject( hDC, ::System:CurrentScheme:Brush:ToolStripDropDownBackground )
+              hOldPen   := SelectObject( hDC, o:System:CurrentScheme:Pen:MenuBorder )
+              hOldBrush := SelectObject( hDC, o:System:CurrentScheme:Brush:ToolStripDropDownBackground )
               
               Rectangle( hDC, 0, 0, aRect[3]-aRect[1], aRect[4]-aRect[2] )
               
               SelectObject( hDC, hOldPen )
               SelectObject( hDC, hOldBrush )
 
-              aPt := { ::Left + 1, ::Top }
-              _ClientToScreen( ::Parent:hWnd, @aPt )
+              aPt := { o:Left + 1, o:Top }
+              _ClientToScreen( o:Parent:hWnd, @aPt )
               _ScreenToClient( hWnd, @aPt )
               
               // merge menu to strip item
-              hOldPen   := SelectObject( hDC, ::System:CurrentScheme:Pen:ToolStripDropDownBackground )
-              Rectangle( hDC, aPt[1] + 1, 0, aPt[1] + ::Width - 1, 1 )
+              hOldPen   := SelectObject( hDC, o:System:CurrentScheme:Pen:ToolStripDropDownBackground )
+              Rectangle( hDC, aPt[1] + 1, 0, aPt[1] + o:Width - 1, 1 )
               
               SelectObject( hDC, hOldPen )
               ReleaseDC( hWnd, hdc)
@@ -2305,8 +2305,8 @@ STATIC FUNCTION __MenuDialogProc( hWnd, nMsg, nwParam, nlParam )
            RETURN 0
 
       CASE WM_ERASEBKGND
-           IF !( "Aero" $ ::System:CurrentScheme:Theme )
-              ::__DrawShadow()
+           IF !( "Aero" $ o:System:CurrentScheme:Theme )
+              o:__DrawShadow()
            ENDIF
            RETURN 1
 
