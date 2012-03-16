@@ -664,55 +664,72 @@ RETURN self
 //------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------
 
-CLASS FindTextDialog INHERIT CommonDialogs
-   DATA pfr EXPORTED
-   METHOD Init() CONSTRUCTOR
-   METHOD Show()
-ENDCLASS
-
-METHOD Init( oOwner ) CLASS FindTextDialog
-   ::__xCtrlName    := "FindTextDialog"
-   ::ClsName        := "FindTextDialog"
-   ::ComponentType  := "CommonDialog"
-   Super:Init( oOwner )
-   ::pfr := (struct FINDREPLACE)
-RETURN Self
-
-METHOD Show( oOwner ) CLASS FindTextDialog
-   DEFAULT oOwner TO ::Owner
-   ::pfr:hwndOwner     := oOwner:hWnd
-   ::pfr:lStructSize   := ::pfr:sizeOf()
-   ::pfr:lpstrFindWhat := ""
-   ::pfr:wFindWhatLen  := 255
-   ::pfr:Flags         := 0
-RETURN FindText( @::pfr )
-
-//------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------
-
 CLASS ReplaceTextDialog INHERIT CommonDialogs
-   DATA pfr EXPORTED
+   PROPERTY HideUpDown    INDEX FR_HIDEUPDOWN    READ xHideUpDown    WRITE SetStyle DEFAULT .F. PROTECTED
+   PROPERTY HideMatchCase INDEX FR_HIDEMATCHCASE READ xHideMatchCase WRITE SetStyle DEFAULT .F. PROTECTED
+   PROPERTY HideWholeWord INDEX FR_HIDEWHOLEWORD READ xHideWholeWord WRITE SetStyle DEFAULT .F. PROTECTED
+
+   DATA hDlg           PROTECTED
+   DATA __pCallBackPtr PROTECTED
+   DATA __nProc        PROTECTED
+
    METHOD Init() CONSTRUCTOR
    METHOD Show()
+   METHOD __WndProc()
 ENDCLASS
 
 METHOD Init( oOwner ) CLASS ReplaceTextDialog
    ::__xCtrlName    := "ReplaceTextDialog"
    ::ClsName        := "ReplaceTextDialog"
    ::ComponentType  := "CommonDialog"
+   ::Style          := FR_ENABLEHOOK
    Super:Init( oOwner )
-   ::pfr := (struct FINDREPLACE)
 RETURN Self
 
 METHOD Show( oOwner ) CLASS ReplaceTextDialog
+   LOCAL pfr := (struct FINDREPLACE)
    DEFAULT oOwner TO ::Owner
-   ::pfr:hwndOwner        := oOwner:hWnd
-   ::pfr:lStructSize      := ::pfr:sizeOf()
-   ::pfr:lpstrFindWhat    := ""
-   ::pfr:lpstrReplaceWith := ""
-   ::pfr:wFindWhatLen     := 255
-   ::pfr:wReplaceWithLen  := 255
-   ::pfr:Flags            := 0
-RETURN ReplaceText( @::pfr )
 
+   ::__pCallBackPtr := WinCallBackPointer( HB_ObjMsgPtr( Self, "__WndProc" ), Self )
+   ::hDlg  := ReplaceText( oOwner:hWnd, ::Style, ::__pCallBackPtr )
+RETURN NIL
+
+METHOD __WndProc( hWnd, nMsg, nwParam, nlParam ) CLASS ReplaceTextDialog
+   LOCAL pfr
+   (hWnd, nlParam)
+   DO CASE
+      CASE nMsg == WM_INITDIALOG
+           pfr = (struct FINDREPLACE*) nlParam
+           ShowWindow( hWnd, SW_SHOWNORMAL )
+           UpdateWindow( hWnd )
+           RETURN 1
+
+      CASE nMsg == WM_COMMAND
+           IF nwParam == IDCANCEL
+              VIEW FreeCallBackPointer( ::__pCallBackPtr )
+           ENDIF
+   ENDCASE
+RETURN 0
+
+//------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------
+
+CLASS FindTextDialog INHERIT ReplaceTextDialog
+   METHOD Init() CONSTRUCTOR
+ENDCLASS
+
+METHOD Init( oOwner ) CLASS FindTextDialog
+   ::__xCtrlName    := "FindTextDialog"
+   ::ClsName        := "FindTextDialog"
+   ::ComponentType  := "CommonDialog"
+   ::Style          := FR_ENABLEHOOK
+   Super:Init( oOwner )
+RETURN Self
+
+METHOD Show( oOwner ) CLASS FindTextDialog
+   LOCAL pfr := (struct FINDREPLACE)
+   DEFAULT oOwner TO ::Owner
+   ::__pCallBackPtr := WinCallBackPointer( HB_ObjMsgPtr( Self, "__WndProc" ), Self )
+   ::hDlg  := FindText( oOwner:hWnd, ::Style, ::__pCallBackPtr )
+RETURN NIL
