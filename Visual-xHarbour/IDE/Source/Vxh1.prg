@@ -834,6 +834,18 @@ METHOD Init() CLASS IDE_MainForm
             :Action           := {|o| IIF( o:Enabled, ::Application:Project:Redo(), ) }
             :Create()
          END
+
+         WITH OBJECT ::Application:Props[ "EditFindItem" ] := MenuStripItem( :this )
+            :Caption          := "&Find Text"
+            :ImageIndex       := ::System:StdIcons:Find
+            :ShortCutText     := "Ctrl+F"
+            :ShortCutKey:Ctrl := .T.
+            :ShortCutKey:Key  := ASC( "F" )
+            :Enabled          := .T.
+            :BeginGroup       := .T.
+            :Action           := {|o| IIF( o:Enabled, ::Application:Project:Find(), ) }
+            :Create()
+         END
       END
       //------------------------------------------------------------------
       WITH OBJECT ::Application:ViewMenu := MenuStripItem( :this )
@@ -2318,6 +2330,7 @@ CLASS Project
 
    METHOD Undo()
    METHOD ReDo()
+   METHOD Find()
 
    METHOD SetAction()
 #ifdef VXH_PROFESSIONAL
@@ -3069,6 +3082,13 @@ METHOD ReDo() CLASS Project
    ENDIF
 RETURN 0
 
+METHOD Find() CLASS Project
+   IF ::Application:SourceEditor:IsWindowVisible()
+      WITH OBJECT ReplaceTextDialog( ::Application:SourceEditor )
+         :Show()
+      END
+   ENDIF
+RETURN 0
 
 //-------------------------------------------------------------------------------------------------------
 
@@ -6352,6 +6372,7 @@ CLASS SourceEditor INHERIT Control
    METHOD SelectDocument( pDoc )    INLINE ::SendMessage( SCI_SETDOCPOINTER, 0, pDoc )
    METHOD OnDestroy()               INLINE aEval( ::aDocs, {|oDoc| oDoc:Close() } ), FreeLibrary( ::hSciLib ), NIL
    METHOD OnParentNotify()
+   METHOD OnSetFocus()              INLINE ::SendMessage( SCI_SETFOCUS, 1, 0 )
 ENDCLASS
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -6372,7 +6393,7 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
-   LOCAL cText, n//, scn
+   LOCAL cText, n, scn
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == SCN_UPDATEUI
@@ -6381,8 +6402,6 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
 
       CASE hdr:code == SCN_MODIFIED
            IF ( n := ASCAN( ::aDocs, {|o| o==::Source .AND. !o:Modified .AND. !o:FirstOpen } ) ) > 0
-              //scn := (struct SCNOTIFICATION*) nlParam
-
               ::aDocs[n]:Modified := .T.
               cText := ::Application:SourceTabs:GetItemText()
               cText := ALLTRIM( STRTRAN( cText, "*" ) )
@@ -6393,9 +6412,16 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
               
               ::Application:Project:Modified := .T.
            ENDIF
+
+      CASE hdr:code == SCN_CHARADDED
+           scn := (struct SCNOTIFICATION*) nlParam
+           VIEW scn:ch, scn:modifiers 
    ENDCASE
 RETURN NIL
 
+//METHOD OnKeyDown( nKey ) CLASS SourceEditor
+//   view nKey
+//RETURN 0
 
 //------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------

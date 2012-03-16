@@ -10238,6 +10238,7 @@ HB_FUNC( SHOWCURSOR )
 //   }
 //}
 
+//-------------------------------------------------------------------------------------------------
 HB_FUNC( CERTIFICATEDIALOG )
 {
    HCERTSTORE       hCertStore = NULL;        
@@ -10271,6 +10272,7 @@ HB_FUNC( CERTIFICATEDIALOG )
    }
 }
 
+//-------------------------------------------------------------------------------------------------
 BOOL Array2Button(PHB_ITEM aButton, TASKDIALOG_BUTTON *tdb )
 {
    if (HB_IS_ARRAY(aButton) && hb_arrayLen(aButton) == 2)
@@ -10282,6 +10284,7 @@ BOOL Array2Button(PHB_ITEM aButton, TASKDIALOG_BUTTON *tdb )
    return FALSE;
 }
 
+//-------------------------------------------------------------------------------------------------
 HB_FUNC( TASKDIALOGPROC )
 {
    if( pTaskDialogIndirect )
@@ -10347,6 +10350,7 @@ HB_FUNC( TASKDIALOGPROC )
    }
 }
 
+//-------------------------------------------------------------------------------------------------
 HB_FUNC( MULTIBYTETOWIDECHAR )
 {
    const char *cString = (const char *) hb_parc(3);
@@ -10365,6 +10369,7 @@ HB_FUNC( MULTIBYTETOWIDECHAR )
    }
 }
 
+//-------------------------------------------------------------------------------------------------
 HB_FUNC( CHANGESERVICECONFIG )
 {
    LPCTSTR lpBinaryPathName   = (LPCTSTR) hb_parc(5);
@@ -10379,5 +10384,119 @@ HB_FUNC( CHANGESERVICECONFIG )
                                       ISNIL(5)?NULL:lpBinaryPathName, ISNIL(6)?NULL:lpLoadOrderGroup, NULL,
                                       ISNIL(7)?NULL:lpDependencies, ISNIL(8)?NULL:lpServiceStartName,
                                       ISNIL(9)?NULL:lpPassword, ISNIL(10)?NULL:lpDisplayName ) );
+   }
+}
+
+//-------------------------------------------------------------------------------------------------
+HB_FUNC( FINDTEXT )
+{
+   PHB_ITEM pStructure = hb_param( 1, HB_IT_BYREF );
+   LPFINDREPLACE pfr;
+
+   if( pStructure )
+   {
+      hb_vmPushSymbol( pVALUE->pSymbol );
+      hb_vmPush( pStructure );
+      hb_vmSend(0);
+
+      pfr = (LPFINDREPLACE) hb_parc(-1);
+
+      if( FindText( pfr ) )
+      {
+         PHB_ITEM pByRef;
+
+         if( HB_IS_OBJECT( pStructure ) )
+         {
+            pByRef = NULL;
+         }
+         else
+         {
+            hb_vmPushSymbol( pHB_CSTRUCTURE->pSymbol );
+            hb_vmPushNil();
+            hb_itemPushStaticString( "FINDREPLACE", 11 );
+            hb_vmDo(1);
+
+            pByRef = pStructure;
+            pStructure = hb_stackReturnItem();
+
+            hb_itemPutCRaw( pStructure->item.asArray.value->pItems + pStructure->item.asArray.value->ulLen - 1, (char *) pfr, sizeof( FINDREPLACE ) );
+         }
+
+         hb_vmPushSymbol( pDEVALUE->pSymbol );
+         hb_vmPush( pStructure );
+         hb_vmSend(0);
+
+         if( pByRef )
+         {
+            hb_itemForwardValue( pByRef, pStructure );
+         }
+
+         hb_retl( TRUE );
+      }
+      else
+      {
+         hb_retl( FALSE );
+      }
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 6001, NULL, "FINDTEXT", 1, hb_paramError(1) );
+   }
+}
+
+//-------------------------------------------------------------------------------------------------
+HB_FUNC( REPLACETEXT )
+{
+   PHB_ITEM pStructure = hb_param( 1, HB_IT_BYREF );
+   LPFINDREPLACE pfr;
+
+   if( pStructure )
+   {
+      hb_vmPushSymbol( pVALUE->pSymbol );
+      hb_vmPush( pStructure );
+      hb_vmSend(0);
+
+      pfr = (LPFINDREPLACE) hb_parc(-1);
+
+      if( ReplaceText( pfr ) )
+      {
+         PHB_ITEM pByRef;
+
+         if( HB_IS_OBJECT( pStructure ) )
+         {
+            pByRef = NULL;
+         }
+         else
+         {
+            hb_vmPushSymbol( pHB_CSTRUCTURE->pSymbol );
+            hb_vmPushNil();
+            hb_itemPushStaticString( "FINDREPLACE", 11 );
+            hb_vmDo(1);
+
+            pByRef = pStructure;
+            pStructure = hb_stackReturnItem();
+
+            hb_itemPutCRaw( pStructure->item.asArray.value->pItems + pStructure->item.asArray.value->ulLen - 1, (char *) pfr, sizeof( FINDREPLACE ) );
+         }
+
+         hb_vmPushSymbol( pDEVALUE->pSymbol );
+         hb_vmPush( pStructure );
+         hb_vmSend(0);
+
+         if( pByRef )
+         {
+            hb_itemForwardValue( pByRef, pStructure );
+         }
+
+         hb_retl( TRUE );
+      }
+      else
+      {
+         hb_retl( FALSE );
+      }
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 6001, NULL, "REPLACETEXT", 1, hb_paramError(1) );
    }
 }

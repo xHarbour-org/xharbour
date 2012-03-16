@@ -1636,3 +1636,17 @@ typedef struct {;
    int annotationLinesAdded;
    int updated;
 }SCNOTIFICATION
+
+typedef struct {;
+   DWORD        lStructSize;
+   HWND         hwndOwner;
+   HINSTANCE    hInstance;
+   DWORD        Flags;
+   LPTSTR       lpstrFindWhat;
+   LPTSTR       lpstrReplaceWith;
+   WORD         wFindWhatLen;
+   WORD         wReplaceWithLen;
+   LPARAM       lCustData;
+   LPFRHOOKPROC lpfnHook;
+   LPCTSTR      lpTemplateName;
+} FINDREPLACE, *LPFINDREPLACE;

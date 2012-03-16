@@ -660,3 +660,59 @@ METHOD __SetBttns( nButton, lAdd ) CLASS TaskDialog
    ENDIF
 RETURN self
 
+//------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------
+
+CLASS FindTextDialog INHERIT CommonDialogs
+   DATA pfr EXPORTED
+   METHOD Init() CONSTRUCTOR
+   METHOD Show()
+ENDCLASS
+
+METHOD Init( oOwner ) CLASS FindTextDialog
+   ::__xCtrlName    := "FindTextDialog"
+   ::ClsName        := "FindTextDialog"
+   ::ComponentType  := "CommonDialog"
+   Super:Init( oOwner )
+   ::pfr := (struct FINDREPLACE)
+RETURN Self
+
+METHOD Show( oOwner ) CLASS FindTextDialog
+   DEFAULT oOwner TO ::Owner
+   ::pfr:hwndOwner     := oOwner:hWnd
+   ::pfr:lStructSize   := ::pfr:sizeOf()
+   ::pfr:lpstrFindWhat := ""
+   ::pfr:wFindWhatLen  := 255
+   ::pfr:Flags         := 0
+RETURN FindText( @::pfr )
+
+//------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------
+
+CLASS ReplaceTextDialog INHERIT CommonDialogs
+   DATA pfr EXPORTED
+   METHOD Init() CONSTRUCTOR
+   METHOD Show()
+ENDCLASS
+
+METHOD Init( oOwner ) CLASS ReplaceTextDialog
+   ::__xCtrlName    := "ReplaceTextDialog"
+   ::ClsName        := "ReplaceTextDialog"
+   ::ComponentType  := "CommonDialog"
+   Super:Init( oOwner )
+   ::pfr := (struct FINDREPLACE)
+RETURN Self
+
+METHOD Show( oOwner ) CLASS ReplaceTextDialog
+   DEFAULT oOwner TO ::Owner
+   ::pfr:hwndOwner        := oOwner:hWnd
+   ::pfr:lStructSize      := ::pfr:sizeOf()
+   ::pfr:lpstrFindWhat    := ""
+   ::pfr:lpstrReplaceWith := ""
+   ::pfr:wFindWhatLen     := 255
+   ::pfr:wReplaceWithLen  := 255
+   ::pfr:Flags            := 0
+RETURN ReplaceText( @::pfr )
+
