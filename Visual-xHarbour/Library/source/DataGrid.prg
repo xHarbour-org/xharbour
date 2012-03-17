@@ -1359,7 +1359,9 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    IF ::hWnd != GetFocus()
       ::SetFocus()
    ENDIF
-
+   IF ::ColPos == 0
+      RETURN .F.
+   ENDIF
    ::OnClick( ::ColPos, ::RowPos )
    IF nRow != ::RowPos
       IF ::bRowChanged != NIL
