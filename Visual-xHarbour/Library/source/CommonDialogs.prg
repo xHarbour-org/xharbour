@@ -669,6 +669,18 @@ CLASS ReplaceTextDialog INHERIT CommonDialogs
    PROPERTY HideMatchCase INDEX FR_HIDEMATCHCASE READ xHideMatchCase WRITE SetStyle DEFAULT .F. PROTECTED
    PROPERTY HideWholeWord INDEX FR_HIDEWHOLEWORD READ xHideWholeWord WRITE SetStyle DEFAULT .F. PROTECTED
 
+   DATA FindWhat      EXPORTED  INIT ""
+   DATA ReplaceWith   EXPORTED  INIT ""
+
+   DATA WholeWord     EXPORTED  INIT .F.
+   DATA MatchCase     EXPORTED  INIT .F.
+
+   DATA Events        EXPORTED  INIT {;
+                                       {"General", { { "OnFindNext",   "", "" },;
+                                                     { "OnReplace",    "", "" },;
+                                                     { "OnReplaceAll", "", "" } } };
+                                     }
+
    DATA hDlg           PROTECTED
    DATA __pCallBackPtr PROTECTED
    DATA __nProc        PROTECTED
@@ -676,12 +688,13 @@ CLASS ReplaceTextDialog INHERIT CommonDialogs
    METHOD Init() CONSTRUCTOR
    METHOD Show()
    METHOD __WndProc()
+   METHOD ExecuteEvent()
 ENDCLASS
 
 METHOD Init( oOwner ) CLASS ReplaceTextDialog
-   ::__xCtrlName    := "ReplaceTextDialog"
-   ::ClsName        := "ReplaceTextDialog"
-   ::ComponentType  := "CommonDialog"
+   DEFAULT ::__xCtrlName   TO "ReplaceTextDialog"
+   DEFAULT ::ClsName       TO "ReplaceTextDialog"
+   DEFAULT ::ComponentType TO "CommonDialog"
    ::Style          := FR_ENABLEHOOK
    Super:Init( oOwner )
 RETURN Self
@@ -689,9 +702,16 @@ RETURN Self
 METHOD Show( oOwner ) CLASS ReplaceTextDialog
    LOCAL pfr := (struct FINDREPLACE)
    DEFAULT oOwner TO ::Owner
-
-   ::__pCallBackPtr := WinCallBackPointer( HB_ObjMsgPtr( Self, "__WndProc" ), Self )
-   ::hDlg  := ReplaceText( oOwner:hWnd, ::Style, ::__pCallBackPtr )
+   IF IsWindow( ::hDlg )
+      SetActiveWindow( ::hDlg )
+   ELSE
+      ::__pCallBackPtr := WinCallBackPointer( HB_ObjMsgPtr( Self, "__WndProc" ), Self )
+      IF ::ClsName == "ReplaceTextDialog"
+         ::hDlg := ReplaceText( oOwner:hWnd, ::Style, ::__pCallBackPtr )
+       ELSE
+         ::hDlg := FindText( oOwner:hWnd, ::Style, ::__pCallBackPtr )
+      ENDIF
+   ENDIF
 RETURN NIL
 
 METHOD __WndProc( hWnd, nMsg, nwParam, nlParam ) CLASS ReplaceTextDialog
@@ -702,14 +722,43 @@ METHOD __WndProc( hWnd, nMsg, nwParam, nlParam ) CLASS ReplaceTextDialog
            pfr = (struct FINDREPLACE*) nlParam
            ShowWindow( hWnd, SW_SHOWNORMAL )
            UpdateWindow( hWnd )
-           RETURN 1
 
       CASE nMsg == WM_COMMAND
-           IF nwParam == IDCANCEL
-              VIEW FreeCallBackPointer( ::__pCallBackPtr )
-           ENDIF
+           DO CASE
+              CASE nwParam == IDOK
+                   ::ExecuteEvent( "OnFindNext", hWnd )
+
+              CASE nwParam == 1024
+                   ::ExecuteEvent( "OnReplace", hWnd )
+
+              CASE nwParam == 1025
+                   ::ExecuteEvent( "OnReplaceAll", hWnd )
+
+              CASE nwParam == 1040
+                   ::WholeWord := ( SendMessage( GetDlgItem( hWnd, nwParam ), BM_GETSTATE, 0, 0 ) & BST_CHECKED ) != 0
+
+              CASE nwParam == 1041
+                   ::MatchCase := ( SendMessage( GetDlgItem( hWnd, nwParam ), BM_GETSTATE, 0, 0 ) & BST_CHECKED ) != 0
+
+              CASE nwParam == IDCANCEL
+                   FreeCallBackPointer( ::__pCallBackPtr )
+           ENDCASE
    ENDCASE
 RETURN 0
+
+METHOD ExecuteEvent( cEvent, hWnd ) CLASS ReplaceTextDialog
+   ::FindWhat    := GetDlgItemText( hWnd, 1152 )
+   ::ReplaceWith := GetDlgItemText( hWnd, 1153 )
+
+   IF HGetPos( ::Owner:EventHandler, cEvent ) != 0
+      cEvent := ::Owner:EventHandler[ cEvent ]
+      IF __objHasMsg( ::Owner:Form, cEvent )
+         ::Owner:Form:&cEvent( Self )
+      ELSEIF __objHasMsg( ::Owner, cEvent )
+         ::Owner:&cEvent( Self )
+      ENDIF
+   ENDIF
+RETURN NIL
 
 //------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------
@@ -726,10 +775,3 @@ METHOD Init( oOwner ) CLASS FindTextDialog
    ::Style          := FR_ENABLEHOOK
    Super:Init( oOwner )
 RETURN Self
-
-METHOD Show( oOwner ) CLASS FindTextDialog
-   LOCAL pfr := (struct FINDREPLACE)
-   DEFAULT oOwner TO ::Owner
-   ::__pCallBackPtr := WinCallBackPointer( HB_ObjMsgPtr( Self, "__WndProc" ), Self )
-   ::hDlg  := FindText( oOwner:hWnd, ::Style, ::__pCallBackPtr )
-RETURN NIL

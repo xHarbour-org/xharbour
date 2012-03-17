@@ -1650,3 +1650,19 @@ typedef struct {;
    LPFRHOOKPROC lpfnHook;
    LPCTSTR      lpTemplateName;
 } FINDREPLACE, *LPFINDREPLACE;
+
+typedef struct {;
+    LONG cpMin;
+    LONG cpMax;
+}SCI_CHARACTERRANGE;
+
+typedef struct {;
+    SCI_CHARACTERRANGE chrg;
+    char *lpstrText;
+}SCI_TEXTRANGE;
+
+typedef struct Sci_TextToFind {;
+    SCI_CHARACTERRANGE chrg;     // range to search
+    char *lpstrText;             // the search pattern (zero terminated)
+    SCI_CHARACTERRANGE chrgText; // returned as position of matching text
+}SCI_TEXTTOFIND;

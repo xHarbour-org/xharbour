@@ -10388,63 +10388,6 @@ HB_FUNC( CHANGESERVICECONFIG )
 }
 
 //-------------------------------------------------------------------------------------------------
-HB_FUNC( FINDTEXT )
-{
-   PHB_ITEM pStructure = hb_param( 1, HB_IT_BYREF );
-   LPFINDREPLACE pfr;
-
-   if( pStructure )
-   {
-      hb_vmPushSymbol( pVALUE->pSymbol );
-      hb_vmPush( pStructure );
-      hb_vmSend(0);
-
-      pfr = (LPFINDREPLACE) hb_parc(-1);
-
-      if( FindText( pfr ) )
-      {
-         PHB_ITEM pByRef;
-
-         if( HB_IS_OBJECT( pStructure ) )
-         {
-            pByRef = NULL;
-         }
-         else
-         {
-            hb_vmPushSymbol( pHB_CSTRUCTURE->pSymbol );
-            hb_vmPushNil();
-            hb_itemPushStaticString( "FINDREPLACE", 11 );
-            hb_vmDo(1);
-
-            pByRef = pStructure;
-            pStructure = hb_stackReturnItem();
-
-            hb_itemPutCRaw( pStructure->item.asArray.value->pItems + pStructure->item.asArray.value->ulLen - 1, (char *) pfr, sizeof( FINDREPLACE ) );
-         }
-
-         hb_vmPushSymbol( pDEVALUE->pSymbol );
-         hb_vmPush( pStructure );
-         hb_vmSend(0);
-
-         if( pByRef )
-         {
-            hb_itemForwardValue( pByRef, pStructure );
-         }
-
-         hb_retl( TRUE );
-      }
-      else
-      {
-         hb_retl( FALSE );
-      }
-   }
-   else
-   {
-      hb_errRT_BASE( EG_ARG, 6001, NULL, "FINDTEXT", 1, hb_paramError(1) );
-   }
-}
-
-//-------------------------------------------------------------------------------------------------
 
 #define MAX_STRING_LEN   256
 
@@ -10468,3 +10411,20 @@ HB_FUNC( REPLACETEXT )
    hb_retnl( (long) ReplaceText (&fr) );
 }
 
+//-------------------------------------------------------------------------------------------------
+HB_FUNC( FINDTEXT )
+{
+   static FINDREPLACE fr;       // must be static for modeless dialog!!!
+   fr.lStructSize      = sizeof (FINDREPLACE) ;
+   fr.hwndOwner        = (HWND) hb_parnl(1);
+   fr.hInstance        = NULL;
+   fr.Flags            = (DWORD) hb_parnl(2);
+   fr.lpstrFindWhat    = szFindText;
+   fr.lpstrReplaceWith = NULL;
+   fr.wFindWhatLen     = sizeof (szFindText);
+   fr.wReplaceWithLen  = 0;
+   fr.lCustData        = 0;
+   fr.lpfnHook         = (UINT_PTR) hb_parnl(3);
+   fr.lpTemplateName   = NULL;
+   hb_retnl( (long) FindText(&fr) );
+}

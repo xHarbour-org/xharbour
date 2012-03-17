@@ -834,19 +834,35 @@ METHOD Init() CLASS IDE_MainForm
             :Action           := {|o| IIF( o:Enabled, ::Application:Project:Redo(), ) }
             :Create()
          END
-
-         WITH OBJECT ::Application:Props[ "EditFindItem" ] := MenuStripItem( :this )
-            :Caption          := "&Find Text"
+      END
+      //------------------------------------------------------------------
+      ::Application:EditMenu := MenuStripItem( :this )
+      WITH OBJECT ::Application:EditMenu
+         :ImageList := :Parent:ImageList
+         :Caption := "S&earch"
+         :Create()
+         WITH OBJECT ::Application:Props[ "SearchFindItem" ] := MenuStripItem( :this )
+            :Caption          := "&Find"
             :ImageIndex       := ::System:StdIcons:Find
             :ShortCutText     := "Ctrl+F"
             :ShortCutKey:Ctrl := .T.
             :ShortCutKey:Key  := ASC( "F" )
             :Enabled          := .T.
-            :BeginGroup       := .T.
             :Action           := {|o| IIF( o:Enabled, ::Application:Project:Find(), ) }
             :Create()
          END
+         WITH OBJECT ::Application:Props[ "SearchReplaceItem" ] := MenuStripItem( :this )
+            :Caption          := "&Replace"
+            :ImageIndex       := ::System:StdIcons:Replace
+            :ShortCutText     := "Ctrl+H"
+            :ShortCutKey:Ctrl := .T.
+            :ShortCutKey:Key  := ASC( "H" )
+            :Enabled          := .T.
+            :Action           := {|o| IIF( o:Enabled, ::Application:Project:Replace(), ) }
+            :Create()
+         END
       END
+
       //------------------------------------------------------------------
       WITH OBJECT ::Application:ViewMenu := MenuStripItem( :this )
          :Caption := "&View"
@@ -2331,6 +2347,7 @@ CLASS Project
    METHOD Undo()
    METHOD ReDo()
    METHOD Find()
+   METHOD Replace()
 
    METHOD SetAction()
 #ifdef VXH_PROFESSIONAL
@@ -3084,7 +3101,17 @@ RETURN 0
 
 METHOD Find() CLASS Project
    IF ::Application:SourceEditor:IsWindowVisible()
+      WITH OBJECT FindTextDialog( ::Application:SourceEditor )
+         :Owner := ::Application:SourceEditor
+         :Show()
+      END
+   ENDIF
+RETURN 0
+
+METHOD Replace() CLASS Project
+   IF ::Application:SourceEditor:IsWindowVisible()
       WITH OBJECT ReplaceTextDialog( ::Application:SourceEditor )
+         :Owner := ::Application:SourceEditor
          :Show()
       END
    ENDIF
@@ -6373,6 +6400,10 @@ CLASS SourceEditor INHERIT Control
    METHOD OnDestroy()               INLINE aEval( ::aDocs, {|oDoc| oDoc:Close() } ), FreeLibrary( ::hSciLib ), NIL
    METHOD OnParentNotify()
    METHOD OnSetFocus()              INLINE ::SendMessage( SCI_SETFOCUS, 1, 0 )
+
+   METHOD OnFindNext()
+   METHOD OnReplace()
+   METHOD OnReplaceAll()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -6382,6 +6413,9 @@ METHOD Init( oParent ) CLASS SourceEditor
    ::ClsName := "Scintilla"
    ::Super:Init( oParent )
    ::Style := WS_CHILD | WS_TABSTOP | WS_CLIPCHILDREN
+   ::EventHandler[ "OnFindNext" ]   := "OnFindNext"
+   ::EventHandler[ "OnReplace" ]    := "OnReplace"
+   ::EventHandler[ "OnReplaceAll" ] := "OnReplaceAll"
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -6422,6 +6456,26 @@ RETURN NIL
 //METHOD OnKeyDown( nKey ) CLASS SourceEditor
 //   view nKey
 //RETURN 0
+
+METHOD OnFindNext( Sender ) CLASS SourceEditor
+   LOCAL nFlags := 0
+   IF Sender:MatchCase
+      nFlags := nFlags | SCFIND_MATCHCASE
+   ENDIF
+   IF Sender:WholeWord
+      nFlags := nFlags | SCFIND_WHOLEWORD
+   ENDIF
+   ::Source:SearchNext( nFlags, Sender:FindWhat )
+RETURN NIL
+
+METHOD OnReplace( Sender ) CLASS SourceEditor
+   view "Replace " + Sender:FindWhat + " - " + Sender:ReplaceWith
+RETURN NIL
+
+METHOD OnReplaceAll( Sender ) CLASS SourceEditor
+   view "ReplaceAll " + Sender:FindWhat + " - " + Sender:ReplaceWith
+RETURN NIL
+
 
 //------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -6506,7 +6560,11 @@ CLASS Source
    METHOD GetSelectionStart()       INLINE ::Owner:SendMessage( SCI_GETSELECTIONSTART, 0, 0 )
    METHOD CreateDocument()          INLINE ::Owner:SendMessage( SCI_CREATEDOCUMENT, 0, 0 )
    METHOD SetSavePoint()            INLINE ::Owner:SendMessage( SCI_SETSAVEPOINT, 0, 0 )
+   
    METHOD ChkDoc()                  INLINE IIF( ::GetCurDoc() != ::pSource, ::Select(),)
+
+   METHOD FindText( nFlags, ttf )   INLINE ::Owner:SendMessage( SCI_FINDTEXT, nFlags, ttf )
+   METHOD SearchNext( nFlags,cText) INLINE ::Owner:SendMessage( SCI_SEARCHNEXT, nFlags, cText )
 ENDCLASS
 
 //------------------------------------------------------------------------------------------------------------------------------------
