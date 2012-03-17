@@ -460,7 +460,7 @@ HB_FUNC( TRANSFORM )
       /* Handle DATE values                                      */
       /* ======================================================= */
 
-      else if( HB_IS_DATE( pValue ) )
+      else if( HB_IS_DATE( pValue ) || HB_IS_TIMEFLAG( pValue ) )
       {
          char szPicDate[ 11 ];
          char szDate[ 9 ];
@@ -605,6 +605,17 @@ HB_FUNC( TRANSFORM )
                }
             }
          }
+
+         if( HB_IS_TIMEFLAG( pValue ) )
+         {
+            char *szTimeStampStr = ( char* ) hb_xgrab( 13 );
+            hb_timeStampStr( szTimeStampStr, hb_itemGetT( pValue ) );
+            szResult = ( char * ) hb_xrealloc( szResult, 29 );
+            hb_xstrcat( szResult, " ", szTimeStampStr, 0 );
+            ulResultPos = strlen( szResult );
+            hb_xfree( szTimeStampStr );
+         }
+
       }
 
 

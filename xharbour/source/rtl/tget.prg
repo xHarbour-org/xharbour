@@ -334,6 +334,18 @@ METHOD ParsePict( cPicture ) CLASS Get
 
       endif
 
+      if "T" IN ::cPicFunc
+
+         ::cPicMask := Upper( Set( _SET_TIMEFORMAT ) )
+         ::cPicMask := StrTran( ::cPicmask, "Y", "9" )
+         ::cPicMask := StrTran( ::cPicmask, "M", "9" )
+         ::cPicMask := StrTran( ::cPicmask, "D", "9" )
+         ::cPicMask := StrTran( ::cPicmask, "H", "9" )
+         ::cPicMask := StrTran( ::cPicmask, "S", "9" )
+         ::cPicMask := StrTran( ::cPicmask, "C", "9" )
+
+      endif
+
       if ( nAt := At( "S", ::cPicFunc ) ) > 0
 
          for nFor := nAt + 1 to Len( ::cPicFunc )
@@ -414,7 +426,7 @@ METHOD ParsePict( cPicture ) CLASS Get
       ::lDispLen   := .f.
    endif
 
-   if ::type == "D"
+   if ::type == "D" .OR. ::type == "T"
       // ::cPicMask := LTrim( ::cPicMask )
       // avoid user date picture to force default date picture in
       // accordance with set date format. See below.
@@ -445,6 +457,26 @@ METHOD ParsePict( cPicture ) CLASS Get
          ::cPicMask := StrTran( ::cPicmask, "Y", "9" )
          ::cPicMask := StrTran( ::cPicmask, "M", "9" )
          ::cPicMask := StrTran( ::cPicmask, "D", "9" )
+
+         exit
+
+      case "T"
+         if Hb_IsLogical( ::lForceCentury )
+            __SetCentury( if(::lForceCentury,"ON","OFF") )
+         endif
+
+         ::cPicMask := Upper( Set( _SET_DATEFORMAT ) + " " + Set( _SET_TIMEFORMAT ) )
+
+         if Hb_IsLogical( ::lForceCentury )
+            __SetCentury( if(::lCentury,"ON","OFF") )
+         endif
+
+         ::cPicMask := StrTran( ::cPicmask, "Y", "9" )
+         ::cPicMask := StrTran( ::cPicmask, "M", "9" )
+         ::cPicMask := StrTran( ::cPicmask, "D", "9" )
+         ::cPicMask := StrTran( ::cPicmask, "H", "9" )
+         ::cPicMask := StrTran( ::cPicmask, "S", "9" )
+         ::cPicMask := StrTran( ::cPicmask, "C", "9" )
 
          exit
 
@@ -917,7 +949,7 @@ METHOD SetFocus() CLASS Get
       endif
 
 
-      if ::type == "D"
+      if ::type == "D" .OR. ::type == "T"
          ::BadDate := IsBadDate( ::buffer, ::cPicFunc )
       else
          ::BadDate := .f.
@@ -1171,6 +1203,10 @@ METHOD Untransform( cBuffer ) CLASS Get
          for nFor := ::FirstEditable( ) to ::LastEditable( )
             cMaskDel += if( ::IsEditable( nFor ), " ", "X" )
          next
+      elseif "T" IN ::cPicFunc
+         for nFor := ::FirstEditable( ) to ::LastEditable( )
+            cMaskDel += if( ::IsEditable( nFor ), " ", "X" )
+         next
       else
          if "E" IN ::cPicFunc .or. ::lDecRev
             cBuffer := Left( cBuffer, ::FirstEditable() - 1 ) + ;
@@ -1306,6 +1342,25 @@ METHOD Untransform( cBuffer ) CLASS Get
 
       exit
 
+   case "T"
+
+      if Hb_IsLogical( ::lForceCentury )
+         __SetCentury( if(::lForceCentury,"ON","OFF") )
+      endif
+
+      if "E" IN ::cPicFunc
+         //cBuffer := SubStr( cBuffer, 4, 3 ) + SubStr( cBuffer, 1, 3 ) + SubStr( cBuffer, 7 )
+         cBuffer := InvertDwM( cBuffer )
+      endif
+
+      xValue := CToT( cBuffer )
+
+      if Hb_IsLogical( ::lForceCentury )
+         __SetCentury( if(::lCentury,"ON","OFF") )
+      endif
+
+      exit
+
    end
 
 return xValue
@@ -1371,7 +1426,7 @@ METHOD overstrike( cChar ) CLASS Get
       ::nPasswordLen := Min(::nPasswordLen+1,::nMaxLen )
    endif
 
-   if ::type == "D"
+   if ::type == "D" .OR. ::type == "T"
       ::BadDate := IsBadDate( ::buffer, ::cPicFunc )
    else
       ::BadDate := .f.
@@ -1458,7 +1513,7 @@ METHOD Insert( cChar ) CLASS Get
       ::nPasswordLen := Min(::nPasswordLen+1,::nMaxLen)
    endif
 
-   if ::type == "D"
+   if ::type == "D" .OR. ::type == "T"
       ::BadDate := IsBadDate( ::buffer, ::cPicFunc )
    else
       ::BadDate := .f.
@@ -1691,7 +1746,8 @@ METHOD IsEditable( nPos ) CLASS Get
    case "N"
       return cChar IN "9#$*"
    case "D"
-      return cChar IN "9"
+   case "T"
+      return ( cChar == "9" )
    case "L"
       return cChar IN "LY"
    end
@@ -1747,6 +1803,7 @@ METHOD Input( cChar ) CLASS Get
       exit
 
    case "D"
+   case "T"
 
       if !( cChar IN "0123456789" )
          return ""
@@ -1883,13 +1940,13 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
       endif
    endif
 
-   if ::Type == "D" .and. Hb_IsLogical( ::lForceCentury )
+   if ( ::Type == "D" .OR. ::Type == "T" ) .and. Hb_IsLogical( ::lForceCentury )
       __SetCentury( if(::lForceCentury,"ON","OFF") )
    endif
 
    cBuffer := Transform( xValue, if( Empty( cPicFunc ), if( ::lCleanZero .and. !::HasFocus, "@Z ", "" ), cPicFunc + if( ::lCleanZero .and. !::HasFocus, "Z", "" ) + " " ) + cMask )
 
-   if ::Type == "D" .and. Hb_IsLogical( ::lForceCentury )
+   if ( ::Type == "D" .OR. ::Type == "T" ) .and. Hb_IsLogical( ::lForceCentury )
       __SetCentury( if(::lCentury,"ON","OFF") )
    endif
 
@@ -1985,14 +2042,14 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
     *    cBuffer := ::Buffer
     * Endif
     */
-   elseif ::type == "D"
+   elseif ::type == "D" .OR. ::type == "T"
       If ::BadDate .and. ::Buffer != nil
          cBuffer := ::Buffer
       Elseif ::Buffer == NIL .and. "E" IN ::cPicFunc
          if Hb_IsLogical( ::lForceCentury )
             __SetCentury( if(::lForceCentury,"ON","OFF") )
          endif
-         cBuffer := InvertDwM( DtoC( xValue ) )
+         cBuffer := InvertDwM( if ( ::type == "D", DtoC( xValue ), TtoC( xValue ) ) )
          if Hb_IsLogical( ::lForceCentury )
             __SetCentury( if(::lCentury,"ON","OFF") )
          endif
@@ -2106,7 +2163,7 @@ METHOD _Delete( lDisplay ) CLASS Get
       endif   
    endif
 
-   if ::type == "D"
+   if ::type == "D" .OR. ::type == "T"
       ::BadDate := IsBadDate( ::buffer, ::cPicFunc )
    else
       ::BadDate := .f.
@@ -2144,6 +2201,10 @@ METHOD DeleteAll() CLASS Get
       exit
    case "D"
       xValue := CToD( "" )
+      ::BadDate := .f.
+      exit
+   case "T"
+      xValue := CToT( "" )
       ::BadDate := .f.
       exit
    case "L"
