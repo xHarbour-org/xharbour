@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-03-18 20:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/tip/encoding/base64.c
+    ! Fix bug in function HB_BASE64DECODE which returned NULL terminated
+      string incorrectly.
+
 2012-03-17 20:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/transfrm.c
   * source/rtl/tget.prg

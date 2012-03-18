@@ -131,8 +131,9 @@ HB_FUNC( HB_BASE64DECODE )
 
    szBase64Encode = Base64Decode( pcCode , &uCodeLen );
 
-   hb_retc( szBase64Encode );
-   hb_xfree( szBase64Encode );
+   hb_retclenAdopt( szBase64Encode, uCodeLen );
+   // hb_retc( szBase64Encode );
+   // hb_xfree( szBase64Encode );
 }
 
 
