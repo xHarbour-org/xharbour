@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-03-19 06:03 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/tip/encoding/base64.c
+  * source/tip/encoding/uuencode.c
+    ! remove not-required inclusion of "thread.h" which caused non-compilation
+      with BCC63/64
+
 2012-03-19 05:52 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/tip/encoding/base64.c
     ! castings

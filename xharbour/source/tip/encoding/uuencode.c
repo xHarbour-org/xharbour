@@ -4,7 +4,7 @@
 
 #define HB_THREAD_OPTIMIZE_STACK
 
-#include "thread.h"
+// #include "thread.h"
 #include "uuencode.h"
 #include "hbapi.h"
 #include "hbapifs.h"
