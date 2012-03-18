@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 #ifndef _uuencode_h_
 #define _uuencode_h_
 #include <string.h>
@@ -15,4 +19,3 @@ unsigned char *UUDecode( const char *pszInput, unsigned int *pOutLen );
 #endif
 
 #endif
-

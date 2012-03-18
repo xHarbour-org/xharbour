@@ -1,8 +1,13 @@
+/*
+ * $Id$
+ */
+
+#define HB_THREAD_OPTIMIZE_STACK
+
 #include "thread.h"
 #include "base64.h"
 #include "hbapi.h"
 #include "hbapifs.h"
-#define HB_THREAD_OPTIMIZE_STACK
 
 #define XTY62  '+'
 #define XTY63  '/'
@@ -18,7 +23,7 @@ static char Base64Table[64] = {
 char *Base64Encode(const unsigned char *pcCode, unsigned int uCodeLen)
 {
    unsigned int i, j=0, uOutLen=4*((uCodeLen+2)/3)+1;
-   char *pRet= hb_xgrab(uOutLen+1);
+   char *pRet= (char*) hb_xgrab(uOutLen+1);
    unsigned int tailCnt;
 
    for(i=0; i<uCodeLen/3; i++,pcCode+=3) //codeLen/3 segments.
@@ -54,7 +59,7 @@ char *Base64Encode(const unsigned char *pcCode, unsigned int uCodeLen)
 unsigned char *Base64Decode(const char *pcszInput, unsigned int *puOutLen)
 {
    int iSize = strlen(pcszInput)+1 ;
-   char map[256], i, c, *pBuf = hb_xgrab(iSize);
+   char map[256], i, c, *pBuf = (char*) hb_xgrab(iSize);
    unsigned int j, uBufLen;
    unsigned int uSegCnt;
    unsigned int uTailCnt;
@@ -80,7 +85,7 @@ unsigned char *Base64Decode(const char *pcszInput, unsigned int *puOutLen)
 
    uSegCnt=uBufLen/4;
 //  unsigned char *pRet=new unsigned char[(uSegCnt+1)*3], *pTmp=pRet;
-   pRet =  hb_xgrab((uSegCnt+1)*3),pTmp=pRet;
+   pRet =  (unsigned char *) hb_xgrab((uSegCnt+1)*3),pTmp=pRet;
 
    //full segments.
    ptr=pBuf;
@@ -114,7 +119,7 @@ unsigned char *Base64Decode(const char *pcszInput, unsigned int *puOutLen)
 HB_FUNC( HB_BASE64ENCODE )
 {
    HB_THREAD_STUB
-   const unsigned char *pcCode = hb_parcx( 1 ) ;
+   const unsigned char *pcCode = (const unsigned char *) hb_parcx( 1 ) ;
    unsigned int uCodeLen = hb_parni( 2 );
    char * szBase64Encode ;
 
@@ -131,11 +136,8 @@ HB_FUNC( HB_BASE64DECODE )
 
    szBase64Encode = Base64Decode( pcCode , &uCodeLen );
 
-   hb_retclenAdopt( szBase64Encode, uCodeLen );
-   // hb_retc( szBase64Encode );
-   // hb_xfree( szBase64Encode );
+   hb_retclenAdopt( (char*) szBase64Encode, uCodeLen );
 }
-
 
 static long filelength( int handle )
 {
@@ -149,7 +151,7 @@ static char *filetoBuff( char *f, const char *s )
 {
 
    int i;
-   int fh = hb_fsOpen( ( BYTE * ) s , 2 );
+   int fh = hb_fsOpen( s , 2 );
    i = hb_fsReadLarge( fh , ( BYTE * ) f , filelength( fh ) );
    f[ i ] = '\0';
    hb_fsClose( fh );
@@ -167,12 +169,12 @@ HB_FUNC( HB_BASE64ENCODEFILE )
    int iSize;
    char * szBase64Encode ;
 
-   fh = hb_fsOpen( ( BYTE * ) szInFile , 2 );
+   fh = hb_fsOpen( szInFile , 2 );
    iSize = filelength( fh );
    FromBuffer = ( char * ) hb_xgrab( iSize + 1 );
    hb_fsClose(fh);
    pcCode = (char*) filetoBuff( FromBuffer , szInFile ) ;
-   szBase64Encode = Base64Encode( pcCode , iSize );
+   szBase64Encode = Base64Encode( (const unsigned char *) pcCode , iSize );
    fh = hb_fsCreate( szOutFile,0) ;
    hb_fsWriteLarge( fh, szBase64Encode, strlen( szBase64Encode ));
    hb_fsClose( fh );
@@ -188,15 +190,15 @@ HB_FUNC( HB_BASE64DECODEFILE )
    const char *pcCode ;
    char *FromBuffer;
    int fh;
-   int iSize;
+   unsigned int iSize;
    char * szBase64Encode ;
 
-   fh = hb_fsOpen( ( BYTE * ) szInFile , 2 );
+   fh = hb_fsOpen( szInFile , 2 );
    iSize = filelength( fh );
    FromBuffer = ( char * ) hb_xgrab( iSize + 1 );
    hb_fsClose(fh);
    pcCode = (char*) filetoBuff( FromBuffer , szInFile ) ;
-   szBase64Encode = Base64Decode( pcCode , &iSize  );
+   szBase64Encode = (char *) Base64Decode( pcCode , &iSize  );
    fh = hb_fsCreate( szOutFile,0) ;
    hb_fsWriteLarge( fh, szBase64Encode, strlen( szBase64Encode ));
    hb_fsClose( fh );

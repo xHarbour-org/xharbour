@@ -8,6 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-03-19 05:52 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/tip/encoding/base64.c
+    ! castings
+
+  * source/tip/encoding/uuencode.c
+    ! castings
+    ! Fix bug in function HB_UUDECODE which returned NULL terminated
+      string incorrectly.
+    ! thanks to Mario for reporting in comp.lang.xharbour
+
+  * source/tip/encoding/*.*
+    ! minor formatting
+    ! added SVN file header
+
 2012-03-18 20:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/tip/encoding/base64.c
     ! Fix bug in function HB_BASE64DECODE which returned NULL terminated

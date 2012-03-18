@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 #ifndef _base64_h_
 #define _base64_h_
 #include <string.h>

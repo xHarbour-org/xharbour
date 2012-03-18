@@ -1,9 +1,13 @@
+/*
+ * $Id$
+ */
+
+#define HB_THREAD_OPTIMIZE_STACK
+
 #include "thread.h"
 #include "uuencode.h"
 #include "hbapi.h"
 #include "hbapifs.h"
-
-#define HB_THREAD_OPTIMIZE_STACK
 
 //Assume pInput!=NULL, iInputLen>0.
 char *UUEncode( const unsigned char *pInput, unsigned int iInputLen)
@@ -90,8 +94,7 @@ HB_FUNC( HB_UUDECODE )
 
    szUUEncode = UUDecode( pcCode , &uCodeLen );
 
-   hb_retc( szUUEncode );
-   hb_xfree( szUUEncode );
+   hb_retclenAdopt( (char *) szUUEncode, uCodeLen );
 }
 
 static long filelength( int handle )
@@ -102,11 +105,10 @@ static long filelength( int handle )
    return nEnd - nStart;
 }
 
-
 static char *filetoBuff( char *f, const char *s )
 {
    int i;
-   int fh = hb_fsOpen( ( BYTE * ) s , 2 );
+   int fh = hb_fsOpen( s , 2 );
 
    i = hb_fsReadLarge( fh , ( BYTE * ) f , filelength( fh ) );
    f[ i ] = '\0';
@@ -126,7 +128,7 @@ HB_FUNC( HB_UUENCODEFILE )
    int iSize;
    char * szUUEncode ;
 
-   fh = hb_fsOpen( ( BYTE * ) szInFile , 2 );
+   fh = hb_fsOpen( szInFile , 2 );
    iSize = filelength( fh );
    FromBuffer = ( char * ) hb_xgrab( iSize + 1 );
    hb_fsClose(fh);
@@ -150,12 +152,12 @@ HB_FUNC( HB_UUDECODEFILE )
    unsigned int iSize;
    char * szUUEncode ;
 
-   fh = hb_fsOpen( ( BYTE * ) szInFile , 2 );
+   fh = hb_fsOpen( szInFile , 2 );
    iSize = filelength( fh );
    FromBuffer = ( char * ) hb_xgrab( iSize + 1 );
    hb_fsClose(fh);
-   pcCode = (char*) filetoBuff( FromBuffer , szInFile ) ;
-   szUUEncode = UUDecode( pcCode , &iSize  );
+   pcCode = (unsigned char*) filetoBuff( FromBuffer , szInFile ) ;
+   szUUEncode = (char*) UUDecode( (const char *) pcCode , &iSize  );
    fh = hb_fsCreate( szOutFile,0) ;
    hb_fsWriteLarge( fh, szUUEncode, strlen( szUUEncode ));
    hb_fsClose( fh );
