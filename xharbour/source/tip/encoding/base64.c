@@ -3,6 +3,9 @@
  */
 
 #define HB_THREAD_OPTIMIZE_STACK
+#ifndef HB_THREAD_SUPPORT
+#define HB_THREAD_STUB
+#endif
 
 // #include "thread.h"
 #include "base64.h"
