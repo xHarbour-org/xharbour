@@ -275,6 +275,8 @@
 #define ADS_DD_DFV_NONE                   2
 #define ADS_DD_DFV_VALUES_STORED          3
 
+#define RDDI_REFRESHCOUNT     101
+
 /* Commands */
 
 #command SET FILETYPE TO <x:NTX,CDX,ADT,VFP>                              ;

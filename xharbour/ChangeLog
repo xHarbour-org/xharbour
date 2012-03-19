@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-03-19 18:55 UTC+0200 Pavel Tsarenko (tpe2/at/mail.ru)
+  * contrib/rdd_ads/ads.ch
+  * contrib/rdd_ads/ads1.c
+  * contrib/rdd_ads/rddads.h
+    * added new flag for RddInfo: RDDI_REFRESHCOUNT. By default, this flag is set to true.
+      This flag is used for management of ADS_REFRESHCOUNT flag in adsRecCount function.
+
 2012-03-19 06:11 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/tip/encoding/base64.c
   * source/tip/encoding/uuencode.c

@@ -83,6 +83,7 @@ static USHORT s_uiRddIdADSCDX = ( USHORT ) -1;
 #if ADS_LIB_VERSION >= 900
 static USHORT s_uiRddIdADSVFP = ( USHORT ) -1;
 #endif
+static BOOL s_bRefreshCount = TRUE;
 
 static RDDFUNCS adsSuper;
 
@@ -2557,7 +2558,7 @@ static HB_ERRCODE adsRecCount( ADSAREAP pArea, ULONG * pRecCount )
 
    HB_TRACE(HB_TR_DEBUG, ("adsRecCount(%p, %p)", pArea, pRecCount));
 
-   u32Result = AdsGetRecordCount( pArea->hTable, ADS_IGNOREFILTERS | ADS_REFRESHCOUNT, &u32RecCount );
+   u32Result = AdsGetRecordCount( pArea->hTable, ADS_IGNOREFILTERS | ( s_bRefreshCount ? ADS_REFRESHCOUNT : 0 ), &u32RecCount );
    *pRecCount = ( ULONG ) u32RecCount;
 
    return u32Result == AE_SUCCESS ? HB_SUCCESS : HB_FAILURE;
@@ -4820,6 +4821,16 @@ static HB_ERRCODE adsRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, P
       case RDDI_ORDSTRUCTEXT:
          hb_itemPutC( pItem, adsIndexExt( adsGetFileType( pRDD->rddID ) ) );
          break;
+
+      case RDDI_REFRESHCOUNT:
+      {
+         BOOL bSet = HB_IS_LOGICAL( pItem );
+         BOOL bRefresh = hb_itemGetL( pItem );
+         hb_itemPutL( pItem, s_bRefreshCount );
+         if( bSet )
+            s_bRefreshCount = bRefresh;
+         break;
+      }
 
       default:
          return SUPER_RDDINFO( pRDD, uiIndex, ulConnect, pItem );

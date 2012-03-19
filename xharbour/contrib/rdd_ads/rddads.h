@@ -135,6 +135,8 @@
    #define ADS_MODTIME              22    /* 8 byte timestamp, updated when record is updated (>= 8.00) */
 #endif
 
+#define RDDI_REFRESHCOUNT     101
+
 HB_EXTERN_BEGIN
 
 /*
