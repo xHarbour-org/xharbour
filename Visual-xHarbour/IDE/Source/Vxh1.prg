@@ -98,6 +98,8 @@ RETURN
 
 CLASS IDE INHERIT Application
    DATA Props            EXPORTED INIT {=>}
+
+   DATA ToolBox          EXPORTED
    DATA ObjectManager    EXPORTED
    DATA EventManager     EXPORTED
 
@@ -113,6 +115,7 @@ CLASS IDE INHERIT Application
 
    DATA Components       EXPORTED
    DATA ShowGrid         EXPORTED
+   DATA WrapSearch       EXPORTED
    DATA ShowRulers       EXPORTED INIT .T.
    DATA ShowDocking      EXPORTED INIT .F.
 
@@ -125,6 +128,7 @@ CLASS IDE INHERIT Application
    DATA BuildLog         EXPORTED
 
    DATA FileMenu         EXPORTED
+   DATA SearchMenu       EXPORTED
    DATA ProjectMenu      EXPORTED
    DATA EditMenu         EXPORTED
    DATA ViewMenu         EXPORTED
@@ -229,8 +233,6 @@ METHOD Init( ... ) CLASS IDE
       RETURN NIL
    ENDIF
 
-   ::RulerType   := 0
-   ::ShowGrid    := 0
    ::ShowTip     := .T.
    ::ShowRulers  := .T.
    ::ShowDocking := .F.
@@ -246,12 +248,9 @@ METHOD Init( ... ) CLASS IDE
       ::ShowDocking := .T.
    ENDIF
 
-   ::ShowGrid  := ::IniFile:ReadInteger( "General", "ShowGrid", 0 )
-   ::RulerType := ::IniFile:ReadInteger( "General", "RulerType", 1 )
-
-   IF VALTYPE( ::ShowGrid ) == "L"
-      ::Application:IniFile:WriteInteger( "General", "ShowGrid", IIF( ::ShowGrid, 1, 0 ) )
-   ENDIF
+   ::ShowGrid   := ::IniFile:ReadInteger( "General", "ShowGrid", 0 )
+   ::WrapSearch := ::IniFile:ReadInteger( "General", "WrapSearch", 0 )
+   ::RulerType  := ::IniFile:ReadInteger( "General", "RulerType", 1 )
 
    IF( n := ::IniFile:ReadInteger( "General", "ShowTip", 1 ) ) == 0
       ::ShowTip := .F.
@@ -393,7 +392,7 @@ RETURN NIL
 
 METHOD OnClose() CLASS IDE_MainForm
    LOCAL aSize, pWp, hKey, cName, cType, xData, n, aVal, hSub
-   IF !::Application:Project:Close(,.T.)
+   IF ! ::Application:Project:Close(,.T.)
       RETURN 0
    ENDIF
 
@@ -767,15 +766,14 @@ METHOD Init() CLASS IDE_MainForm
             :Begingroup := .T.
             :Caption    := "&Exit"
             :ImageIndex := 0
-            :Action     := {||::Application:MainForm:Close() }
+            :Action     := {||::Application:MainForm:PostMessage( WM_CLOSE ) }
             :Create()
          END
 
       END
 
       //------------------------------------------------------------------
-      ::Application:EditMenu := MenuStripItem( :this )
-      WITH OBJECT ::Application:EditMenu
+      WITH OBJECT ::Application:EditMenu := MenuStripItem( :this )
          :ImageList := :Parent:ImageList
          :Caption := "&Edit"
          :Create()
@@ -836,10 +834,9 @@ METHOD Init() CLASS IDE_MainForm
          END
       END
       //------------------------------------------------------------------
-      ::Application:EditMenu := MenuStripItem( :this )
-      WITH OBJECT ::Application:EditMenu
+      WITH OBJECT ::Application:SearchMenu := MenuStripItem( :this )
          :ImageList := :Parent:ImageList
-         :Caption := "S&earch"
+         :Caption := "Search"
          :Create()
          WITH OBJECT ::Application:Props[ "SearchFindItem" ] := MenuStripItem( :this )
             :Caption          := "&Find"
@@ -859,6 +856,17 @@ METHOD Init() CLASS IDE_MainForm
             :ShortCutKey:Key  := ASC( "H" )
             :Enabled          := .T.
             :Action           := {|o| IIF( o:Enabled, ::Application:Project:Replace(), ) }
+            :Create()
+         END
+         WITH OBJECT ::Application:Props[ "WrapSearches" ] := MenuStripItem( :this )
+            :Caption    := "&Wrap Searches"
+            :BeginGroup := .T.
+            :Checked    := ( ::Application:WrapSearch == 1 )
+            :Action     := <|o|
+                             o:Checked := ! o:Checked
+                             ::Application:WrapSearch := IIF( o:Checked, 1, 0 )
+                             ::Application:IniFile:WriteInteger( "General", "WrapSearch", ::Application:WrapSearch )
+                           >
             :Create()
          END
       END
@@ -1394,7 +1402,7 @@ METHOD Init() CLASS IDE_MainForm
    END
 
 
-   WITH OBJECT ToolBox( Self )
+   WITH OBJECT ::Application:ToolBox := ToolBox( Self )
       :Caption          := "ToolBox"
 
       :StaticEdge       := .F.
@@ -3281,6 +3289,7 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    DEFAULT lClosing TO .F.
 
    IF ::Modified .AND. !EMPTY( ::Properties ) .AND. lCloseErrors
+      view GetClassName( GetFocus() )
       nRes := ::Application:MainForm:MessageBox( "Save changes before closing?", IIF( EMPTY(::Properties:Name), "Untitled", ::Properties:Name ), MB_YESNOCANCEL | MB_ICONQUESTION )
       SWITCH nRes
          CASE IDYES
@@ -6371,13 +6380,17 @@ RETURN Self
 //------------------------------------------------------------------------------------------------------------------------------------
 
 CLASS SourceEditor INHERIT Control
-   DATA xSource PROTECTED
+   DATA hSciLib  PROTECTED
+   DATA xSource  PROTECTED
+
    ASSIGN Source(o) INLINE IIF( ::xSource != NIL, ::xSource:SavePos(),), o:Select()
    ACCESS Source    INLINE ::xSource
    
-   DATA aDocs   EXPORTED INIT {}
-   DATA hSciLib PROTECTED
-   DATA WrapFind EXPORTED INIT .T.
+   DATA aDocs        EXPORTED INIT {}
+   DATA PosFind      EXPORTED INIT -1
+   DATA FindInStyle  EXPORTED INIT .F.
+   DATA FindStyle    EXPORTED INIT 0
+   DATA InSelection  EXPORTED INIT .F.
    ACCESS DocCount       INLINE LEN( ::aDocs )
 
 
@@ -6406,6 +6419,10 @@ CLASS SourceEditor INHERIT Control
    METHOD OnReplaceAll()
    
    METHOD GetSearchFlags()
+   METHOD FindInTarget()
+   METHOD SetStyle()
+   METHOD FindNext()
+   METHOD EnsureRangeVisible()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -6429,7 +6446,7 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
-   LOCAL cText, n, scn
+   LOCAL cText, n, scn, nLineNumber, nStartPos
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == SCN_UPDATEUI
@@ -6450,15 +6467,23 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
            ENDIF
 
       CASE hdr:code == SCN_CHARADDED
+           //scn := (struct SCNOTIFICATION*) nlParam
+
+      CASE hdr:code == SCN_STYLENEEDED
            scn := (struct SCNOTIFICATION*) nlParam
-           VIEW scn:ch, scn:modifiers 
+
+           nLineNumber := ::Source:LineFromPosition( ::Source:GetEndStyled() )
+           nStartPos   := ::Source:PositionFromLine( nLineNumber )
+           ::SetStyle( nStartPos, scn:position )
    ENDCASE
 RETURN NIL
 
-//METHOD OnKeyDown( nKey ) CLASS SourceEditor
-//   view nKey
-//RETURN 0
+//------------------------------------------------------------------------------------------------------------------------------------
+METHOD SetStyle( nStartPos, nPos ) CLASS SourceEditor
+   (nStartPos, nPos)
+RETURN NIL
 
+//------------------------------------------------------------------------------------------------------------------------------------
 METHOD GetSearchFlags( oFind ) CLASS SourceEditor
    LOCAL nFlags := 0
    IF oFind:MatchCase
@@ -6469,13 +6494,69 @@ METHOD GetSearchFlags( oFind ) CLASS SourceEditor
    ENDIF
 RETURN nFlags
 
+//------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnFindNext( oFind ) CLASS SourceEditor
    ::Source:SetSearchFlags( ::GetSearchFlags( oFind ) )
-   ::Source:SearchNext( ::GetSearchFlags( oFind ), oFind:FindWhat )
+   ::FindNext( oFind:FindWhat, oFind:Direction == 0 )
 RETURN NIL
 
+//------------------------------------------------------------------------------------------------------------------------------------
+METHOD FindNext( cFindWhat, lReverseDirection ) CLASS SourceEditor
+   LOCAL lFound, nStartPos, nEndPos
+   LOCAL nStart, nEnd
+
+   lFound := .F.
+
+   IF LEN( cFindWhat ) == 0
+      return lFound
+   ENDIF
+
+   nStartPos := ::Source:GetSelectionEnd()
+   nEndPos   := ::Source:GetTextLen()
+
+   IF lReverseDirection
+      nStartPos := ::Source:GetSelectionStart()
+      nEndPos   := 0
+   ENDIF
+
+   ::PosFind := ::FindInTarget( cFindWhat, nStartPos, nEndPos )
+
+   IF ::PosFind == -1 .AND. ::Application:WrapSearch==1
+      IF lReverseDirection
+         nStartPos := ::Source:GetTextLen()
+         nEndPos   := 0
+       ELSE
+         nStartPos := 0
+         nEndPos   := ::Source:GetTextLen()
+      ENDIF
+      ::PosFind := ::FindInTarget( cFindWhat, nStartPos, nEndPos )
+   ENDIF
+
+   IF ( lFound := ::PosFind != -1 )
+      nStart := ::Source:GetTargetStart()
+      nEnd   := ::Source:GetTargetEnd()
+
+      ::EnsureRangeVisible( nStart, nEnd, .T. )
+      ::Source:SetSelection( nStart, nEnd )
+   ENDIF
+RETURN lFound
+
+//------------------------------------------------------------------------------------------------------------------------------------
+METHOD EnsureRangeVisible( nPosStart, nPosEnd, lEnforcePolicy ) CLASS SourceEditor
+   LOCAL nLine, nLineStart, nLineEnd
+   nLineStart := ::Source:LineFromPosition( MIN( nPosStart, nPosEnd ) )
+   nLineEnd   := ::Source:LineFromPosition( MAX( nPosStart, nPosEnd ) )
+   FOR nLine := nLineStart TO nLineEnd
+       IF lEnforcePolicy
+          ::Source:EnsureVisibleEnforcePolicy( nLine )
+        ELSE
+          ::Source:EnsureVisible( nLine )
+       ENDIF
+   NEXT
+RETURN NIL
+
+//------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnReplace( oFind ) CLASS SourceEditor
-   ::Source:SetSearchFlags( ::GetSearchFlags( oFind ) )
    IF ::Source:GetSelText()-1 == 0
       IF ! EMPTY( oFind:FindWhat )
          ::Source:SearchNext( ::GetSearchFlags( oFind ), oFind:FindWhat )
@@ -6485,47 +6566,32 @@ METHOD OnReplace( oFind ) CLASS SourceEditor
    ENDIF
 RETURN NIL
 
+//------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnReplaceAll( oFind ) CLASS SourceEditor
-   (oFind)
-/*
-   local nStartPos, nEndPos, nFlags, ttf, nDif, cFind, nLen, nCountSel, nSelType
-   local nStarLine, nEndLine, lInSelection := .F.
-
-   cFind := oFind:FindWhat
-   nFlags := ::GetSearchFlags( oFind )
-   ::Source:SetSearchFlags( nFlags )
-
-   ttf := (struct SCI_TEXTTOFIND)
-   ttf:lpstrText := oFind:FindWhat
+   local nStartPos, nEndPos, nFlags, cFind, nLen, nCountSel, nSelType
+   local nRepLen, cReplace, nStarLine, nEndLine
+   local nLastMatch, nReplacements, nLenTarget, linsideASel, i, nMovePastEOL, nChrNext
+   local nLenReplaced, nCurPos
    
+   cFind     := oFind:FindWhat
+   cReplace  := oFind:ReplaceWith
 
-
-
-   ::Source:BeginUndoAction()
-   nStartPos := 1
-   nEndPos   := ::Source:GetTextLen()
-   nDif   := nEndPos - LEN( oFind:FindWhat )
-   SendMessage( ::hWnd, SCI_FINDTEXT, nFlags, @ttf )
-
-
-
-
-   ::Source:EndUndoAction()
-
-   nLen := LEN( cFind )
-   if nLen == 0)
+   IF ( nLen := LEN( cFind ) ) == 0
       return -1
-   endif
+   ENDIF
 
    nCountSel := ::Source:GetSelections()
-   IF lInSelection
-      nSelType := ::Source:GetSelectionMode()
+
+   IF ::InSelection
+      nStartPos := ::Source:GetSelectionStart()
+      nEndPos   := ::Source:GetSelectionEnd()
+      nSelType  := ::Source:GetSelectionMode()
       IF nSelType == SC_SEL_LINES
          // Take care to replace in whole lines
          nStarLine := ::Source:LineFromPosition( nStartPos )
          nStartPos := ::Source:PositionFromLine( nStarLine )
-         nEndLine  := ::Source:LineFromPosition) nEndPos )
-         nEndPos   := ::Source:PositionFromLine) nEndLine+1 )
+         nEndLine  := ::Source:LineFromPosition( nEndPos )
+         nEndPos   := ::Source:PositionFromLine( nEndLine+1 )
        ELSE
          FOR i := 1 TO nCountSel
             nStartPos := MIN( nStartPos, ::Source:GetSelectionNStart(i) )
@@ -6533,101 +6599,113 @@ METHOD OnReplaceAll( oFind ) CLASS SourceEditor
          NEXT
       ENDIF
       IF nStartPos == nEndPos
-         return -2;
+         return -2
       ENDIF
     ELSE
       nEndPos := ::Source:GetTextLen()
-      IF ::WrapFind
-         // Whole document
+      IF ::Application:WrapSearch==1
          nStartPos := 0
       ENDIF
       // If not wrapFind, replace all only from caret to end of document
    ENDIF
 
-   SString replaceTarget = EncodeString(replaceWhat);
-   int replaceLen = UnSlashAsNeeded(replaceTarget, unSlash, regExp);
-   int flags = (wholeWord ? SCFIND_WHOLEWORD : 0) |
-           (matchCase ? SCFIND_MATCHCASE : 0) |
-           (regExp ? SCFIND_REGEXP : 0) |
-           (props.GetInt("find.replace.regexp.posix") ? SCFIND_POSIX : 0);
-   wEditor.Call(SCI_SETSEARCHFLAGS, flags);
-   int posFind = FindInTarget(findTarget.c_str(), nLen, startPosition, endPosition);
-   if ((nLen == 1) && regExp && (findTarget[0] == '^')) {
-      // Special case for replace all start of line so it hits the first line
-      posFind = startPosition;
-      wEditor.Call(SCI_SETTARGETSTART, startPosition);
-      wEditor.Call(SCI_SETTARGETEND, startPosition);
-   }
-   if ((posFind != -1) && (posFind <= endPosition)) {
-      int lastMatch = posFind;
-      int replacements = 0;
-      wEditor.Call(SCI_BEGINUNDOACTION);
+   nFlags  := ::GetSearchFlags( oFind )
+   nRepLen := LEN( cReplace )
+
+   ::Source:SetSearchFlags( nFlags )
+   ::PosFind := ::FindInTarget( cFind, nStartPos, nEndPos )
+
+   IF ::PosFind != -1 .AND. ::PosFind <= nEndPos
+      nLastMatch := ::PosFind
+      nReplacements := 0
+
+      nCurPos := ::Source:GetCurrentPos()
+      ::Source:BeginUndoAction()
+
       // Replacement loop
-      while (posFind != -1) {
-         int lenTarget = wEditor.Call(SCI_GETTARGETEND) - wEditor.Call(SCI_GETTARGETSTART);
-         if (inSelection && countSelections > 1) {
+      DO WHILE ::PosFind != -1
+         nLenTarget := ::Source:GetTargetEnd() - ::Source:GetTargetStart()
+         IF ::InSelection .AND. nCountSel > 1
             // We must check that the found target is entirely inside a selection
-            bool insideASelection = false;
-            for (int i=0; i<countSelections && !insideASelection; i++) {
-               int startPos= wEditor.Call(SCI_GETSELECTIONNSTART, i);
-               int endPos = wEditor.Call(SCI_GETSELECTIONNEND, i);
-               if (posFind >= startPos && posFind + lenTarget <= endPos)
-                  insideASelection = true;
-            }
-            if (!insideASelection) {
+            linsideASel := .F.
+            FOR i := 1 TO nCountSel
+               IF ! linsideASel
+                  EXIT
+               ENDIF
+               nStartPos := ::Source:GetSelectionNStart(i)
+               nEndPos   := ::Source:GetSelectionNEnd(i)
+               IF ::PosFind >= nStartPos .AND. ::PosFind + nLenTarget <= nEndPos
+                  linsideASel := .T.
+               ENDIF
+            NEXT
+            IF ! linsideASel
                // Found target is totally or partly outside the selections
-               lastMatch = posFind + 1;
-               if (lastMatch >= endPosition) {
+               nLastMatch := ::PosFind + 1
+               
+               IF nLastMatch >= nEndPos
                   // Run off the end of the document/selection with an empty match
-                  posFind = -1;
-               } else {
-                  posFind = FindInTarget(findTarget.c_str(), nLen, lastMatch, endPosition);
-               }
-               continue;   // No replacement
-            }
-         }
-         int movepastEOL = 0;
-         if (lenTarget <= 0) {
-            char chNext = static_cast<char>(wEditor.Call(SCI_GETCHARAT, wEditor.Call(SCI_GETTARGETEND)));
-            if (chNext == '\r' || chNext == '\n') {
-               movepastEOL = 1;
-            }
-         }
-         int lenReplaced = replaceLen;
-         if (regExp) {
-            lenReplaced = wEditor.CallString(SCI_REPLACETARGETRE, replaceLen, replaceTarget.c_str());
-         } else {
-            wEditor.CallString(SCI_REPLACETARGET, replaceLen, replaceTarget.c_str());
-         }
-         // Modify for change caused by replacement
-         endPosition += lenReplaced - lenTarget;
-         // For the special cases of start of line and end of line
-         // something better could be done but there are too many special cases
-         lastMatch = posFind + lenReplaced + movepastEOL;
-         if (lenTarget == 0) {
-            lastMatch = wEditor.Call(SCI_POSITIONAFTER, lastMatch);
-         }
-         if (lastMatch >= endPosition) {
+                  ::PosFind := -1
+                ELSE
+                  ::PosFind := ::FindInTarget( cFind, nLastMatch, nEndPos )
+               ENDIF
+               LOOP   // No replacement
+            ENDIF
+         ENDIF
+
+         nMovePastEOL := 0
+         IF nLenTarget <= 0
+            nChrNext := ::Source:GetCharAt( SCI_GETCHARAT, ::Source:GetTargetEnd() )
+            IF nChrNext == CHR(13) .OR. nChrNext == CHR(10)
+               nMovePastEOL := 1
+            ENDIF
+         ENDIF
+
+         nLenReplaced := nRepLen
+         ::Source:ReplaceTarget( nRepLen, cReplace ) 
+         nEndPos += nLenReplaced - nLenTarget
+         nLastMatch := ::PosFind + nLenReplaced + nMovePastEOL
+         IF nLenTarget == 0
+            nLastMatch := ::Source:PositionAfter( nLastMatch )
+         ENDIF
+
+         IF nLastMatch >= nEndPos
             // Run off the end of the document/selection with an empty match
-            posFind = -1;
-         } else {
-            posFind = FindInTarget(findTarget.c_str(), nLen, lastMatch, endPosition);
-         }
-         replacements++;
-      }
-      if (inSelection) {
-         if (countSelections == 1)
-            SetSelection(startPosition, endPosition);
-      } else {
-         SetSelection(lastMatch, lastMatch);
-      }
-      wEditor.Call(SCI_ENDUNDOACTION);
-      return replacements;
-   }
-   return 0;
-}
-*/
-RETURN NIL
+            ::PosFind := -1
+          ELSE
+            ::PosFind := ::FindInTarget( cFind, nLastMatch, nEndPos )
+         ENDIF
+         nReplacements++
+      ENDDO
+      IF ::InSelection
+         IF nCountSel == 1
+            ::Source:SetSelection( nStartPos, nEndPos )
+         ENDIF
+       ELSE
+         //::Source:SetSelection( nLastMatch, nLastMatch )
+      ENDIF
+      ::Source:SetCurrentPos( nCurPos )
+      ::Source:EndUndoAction()
+      RETURN nReplacements
+   ENDIF
+RETURN 0
+
+//------------------------------------------------------------------------------------------------------------------------------------
+METHOD FindInTarget( cText, nStartPos, nEndPos ) CLASS SourceEditor
+   LOCAL nLen := LEN( cText )
+   ::Source:SetTargetStart( nStartPos )
+   ::Source:SetTargetEnd( nEndPos )
+   ::PosFind := ::Source:SearchInTarget( nLen, cText )
+   WHILE ::FindInStyle .AND. ::PosFind != -1 && ::FindStyle != ::Source:GetStyleAt( ::PosFind )
+      IF nStartPos < nEndPos
+         ::Source:SetTargetStart( ::PosFind + 1 )
+         ::Source:SetTargetEnd( nEndPos )
+       ELSE
+         ::Source:SetTargetStart( nStartPos )
+         ::Source:SetTargetEnd( ::PosFind + 1 )
+      ENDIF
+      ::PosFind := ::Source:SearchInTarget( nLen, cText )
+   ENDDO
+RETURN ::PosFind
 
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -6686,57 +6764,72 @@ CLASS Source
    METHOD Save()
    METHOD GetText()
 
-   METHOD SavePos()                   INLINE ::SavedPos := ::GetCurrentPos()
-   METHOD Select()                    INLINE ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource ), ::Owner:xSource := Self, ::GotoPosition( ::SavedPos )
-   METHOD SetText( cText )            INLINE ::Owner:SendMessage( SCI_SETTEXT, 0, cText )
-   METHOD GotoPosition( nPos )        INLINE ::Owner:SendMessage( SCI_GOTOPOS, nPos, 0 )
-   METHOD GotoLine( nLine )           INLINE ::Owner:SendMessage( SCI_GOTOLINE, nLine, 0 )
-   METHOD GetCurDoc()                 INLINE ::Owner:SendMessage( SCI_GETDOCPOINTER, 0, 0 )
-   METHOD ReleaseDocument()           INLINE ::Owner:SendMessage( SCI_RELEASEDOCUMENT, 0, ::pSource )
-   METHOD EmptyUndoBuffer()           INLINE ::Owner:SendMessage( SCI_EMPTYUNDOBUFFER, 0, 0 )
-   METHOD CanUndo()                   INLINE ::Owner:SendMessage( SCI_CANUNDO, 0, 0 )==1
-   METHOD CanRedo()                   INLINE ::Owner:SendMessage( SCI_CANREDO, 0, 0 )==1
-   METHOD Undo()                      INLINE ::Owner:SendMessage( SCI_UNDO, 0, 0 )
-   METHOD Redo()                      INLINE ::Owner:SendMessage( SCI_REDO, 0, 0 )
-   METHOD Copy()                      INLINE ::Owner:SendMessage( SCI_COPY, 0, 0 )
-   METHOD Paste()                     INLINE ::Owner:SendMessage( SCI_PASTE, 0, 0 )
-   METHOD Cut()                       INLINE ::Owner:SendMessage( SCI_CUT, 0, 0 )
-   METHOD CanPaste()                  INLINE ::Owner:SendMessage( SCI_CANPASTE, 0, 0 )==1
-   METHOD SetReadOnly( nSet )         INLINE ::Owner:SendMessage( SCI_SETREADONLY, nSet, 0 )
-   METHOD GetReadOnly()               INLINE ::Owner:SendMessage( SCI_GETREADONLY, 0, 0 )
-   METHOD GetCurrentPos()             INLINE ::Owner:SendMessage( SCI_GETCURRENTPOS, 0, 0 )
-   METHOD SetCurrentPos( nPos )       INLINE ::Owner:SendMessage( SCI_SETCURRENTPOS, nPos, 0 )
-   METHOD GoToPos( nPos )             INLINE ::Owner:SendMessage( SCI_GOTOPOS, nPos, 0 )
-   METHOD GetColumn( nPos )           INLINE ::Owner:SendMessage( SCI_GETCOLUMN, nPos, 0 )+1
+   METHOD SavePos()                           INLINE ::SavedPos := ::GetCurrentPos()
+   METHOD Select()                            INLINE ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource ), ::Owner:xSource := Self, ::GotoPosition( ::SavedPos )
+   METHOD SetText( cText )                    INLINE ::Owner:SendMessage( SCI_SETTEXT, 0, cText )
+   METHOD GotoPosition( nPos )                INLINE ::Owner:SendMessage( SCI_GOTOPOS, nPos, 0 )
+   METHOD GotoLine( nLine )                   INLINE ::Owner:SendMessage( SCI_GOTOLINE, nLine, 0 )
+   METHOD GetCurDoc()                         INLINE ::Owner:SendMessage( SCI_GETDOCPOINTER, 0, 0 )
+   METHOD ReleaseDocument()                   INLINE ::Owner:SendMessage( SCI_RELEASEDOCUMENT, 0, ::pSource )
+   METHOD EmptyUndoBuffer()                   INLINE ::Owner:SendMessage( SCI_EMPTYUNDOBUFFER, 0, 0 )
+   METHOD CanUndo()                           INLINE ::Owner:SendMessage( SCI_CANUNDO, 0, 0 )==1
+   METHOD CanRedo()                           INLINE ::Owner:SendMessage( SCI_CANREDO, 0, 0 )==1
+   METHOD Undo()                              INLINE ::Owner:SendMessage( SCI_UNDO, 0, 0 )
+   METHOD Redo()                              INLINE ::Owner:SendMessage( SCI_REDO, 0, 0 )
+   METHOD Copy()                              INLINE ::Owner:SendMessage( SCI_COPY, 0, 0 )
+   METHOD Paste()                             INLINE ::Owner:SendMessage( SCI_PASTE, 0, 0 )
+   METHOD Cut()                               INLINE ::Owner:SendMessage( SCI_CUT, 0, 0 )
+   METHOD CanPaste()                          INLINE ::Owner:SendMessage( SCI_CANPASTE, 0, 0 )==1
+   METHOD SetReadOnly( nSet )                 INLINE ::Owner:SendMessage( SCI_SETREADONLY, nSet, 0 )
+   METHOD GetReadOnly()                       INLINE ::Owner:SendMessage( SCI_GETREADONLY, 0, 0 )
+   METHOD GetCurrentPos()                     INLINE ::Owner:SendMessage( SCI_GETCURRENTPOS, 0, 0 )
+   METHOD SetCurrentPos( nPos )               INLINE ::Owner:SendMessage( SCI_SETCURRENTPOS, nPos, 0 )
+   METHOD GoToPos( nPos )                     INLINE ::Owner:SendMessage( SCI_GOTOPOS, nPos, 0 )
+   METHOD GetColumn( nPos )                   INLINE ::Owner:SendMessage( SCI_GETCOLUMN, nPos, 0 )+1
 
-   METHOD LineFromPosition( nPos )    INLINE ::Owner:SendMessage( SCI_LINEFROMPOSITION, nPos, 0 )+1
-   METHOD PositionFromLine( nPos )    INLINE ::Owner:SendMessage( SCI_POSITIONFROMLINE, nPos, 0 )+1
+   METHOD LineFromPosition( nPos )            INLINE ::Owner:SendMessage( SCI_LINEFROMPOSITION, nPos, 0 )+1
+   METHOD PositionFromLine( nPos )            INLINE ::Owner:SendMessage( SCI_POSITIONFROMLINE, nPos, 0 )+1
 
-   METHOD GetCurLine()                INLINE ::Owner:SendMessage( SCI_LINEFROMPOSITION, ::GetCurrentPos(), 0 )+1
-   METHOD GetSelectionMode()          INLINE ::Owner:SendMessage( SCI_GETSELECTIONMODE, 0, 0 )
-   METHOD GetSelections()             INLINE ::Owner:SendMessage( SCI_GETSELECTIONS, 0, 0 )
+   METHOD GetCurLine()                        INLINE ::Owner:SendMessage( SCI_LINEFROMPOSITION, ::GetCurrentPos(), 0 )+1
+   METHOD GetSelectionMode()                  INLINE ::Owner:SendMessage( SCI_GETSELECTIONMODE, 0, 0 )
+   METHOD GetSelections()                     INLINE ::Owner:SendMessage( SCI_GETSELECTIONS, 0, 0 )
 
-   METHOD GetSelectionStart()         INLINE ::Owner:SendMessage( SCI_GETSELECTIONSTART, 0, 0 )
-   METHOD GetSelectionEnd()           INLINE ::Owner:SendMessage( SCI_GETSELECTIONEND, 0, 0 )
-   METHOD GetSelectionNStart( nSel )  INLINE ::Owner:SendMessage( SCI_GETSELECTIONNSTART, nSel, 0 )
-   METHOD GetSelectionNEnd( nSel )    INLINE ::Owner:SendMessage( SCI_GETSELECTIONNEND, nSel, 0 )
+   METHOD GetSelectionStart()                 INLINE ::Owner:SendMessage( SCI_GETSELECTIONSTART, 0, 0 )
+   METHOD GetSelectionEnd()                   INLINE ::Owner:SendMessage( SCI_GETSELECTIONEND, 0, 0 )
+   METHOD GetSelectionNStart( nSel )          INLINE ::Owner:SendMessage( SCI_GETSELECTIONNSTART, nSel, 0 )
+   METHOD GetSelectionNEnd( nSel )            INLINE ::Owner:SendMessage( SCI_GETSELECTIONNEND, nSel, 0 )
 
-   METHOD CreateDocument()            INLINE ::Owner:SendMessage( SCI_CREATEDOCUMENT, 0, 0 )
-   METHOD SetSavePoint()              INLINE ::Owner:SendMessage( SCI_SETSAVEPOINT, 0, 0 )
-   METHOD GetTextLen()                INLINE ::Owner:SendMessage( SCI_GETTEXTLENGTH, 0, 0 )
-   METHOD BeginUndoAction()           INLINE ::Owner:SendMessage( SCI_BEGINUNDOACTION, 0, 0 )
-   METHOD EndUndoAction()             INLINE ::Owner:SendMessage( SCI_ENDUNDOACTION, 0, 0 )
-   
-   METHOD ChkDoc()                    INLINE IIF( ::GetCurDoc() != ::pSource, ::Select(),)
+   METHOD CreateDocument()                    INLINE ::Owner:SendMessage( SCI_CREATEDOCUMENT, 0, 0 )
+   METHOD SetSavePoint()                      INLINE ::Owner:SendMessage( SCI_SETSAVEPOINT, 0, 0 )
+   METHOD GetTextLen()                        INLINE ::Owner:SendMessage( SCI_GETTEXTLENGTH, 0, 0 )
+   METHOD BeginUndoAction()                   INLINE ::Owner:SendMessage( SCI_BEGINUNDOACTION, 0, 0 )
+   METHOD EndUndoAction()                     INLINE ::Owner:SendMessage( SCI_ENDUNDOACTION, 0, 0 )
 
-   METHOD FindText( nFlags, ttf )     INLINE ::Owner:SendMessage( SCI_FINDTEXT, nFlags, ttf )
-   METHOD SearchNext( nFlags, cText ) INLINE ::Owner:SendMessage( SCI_SEARCHNEXT, nFlags, cText )
-   METHOD ReplaceSel( cText )         INLINE ::Owner:SendMessage( SCI_REPLACESEL, 0, cText )
-   METHOD GetSelText( cBuffer )       INLINE ::Owner:SendMessage( SCI_GETSELTEXT, 0, cBuffer )
-   METHOD SetSearchFlags( nFlags )    INLINE ::Owner:SendMessage( SCI_SEARCHNEXT, nFlags )
-   METHOD SetTargetStart( nStart )    INLINE ::Owner:SendMessage( SCI_SETTARGETSTART, nStart )
-   METHOD SetTargetEnd( nEnd )        INLINE ::Owner:SendMessage( SCI_SETTARGETSTART, nEnd )
-   METHOD ReplaceTarget( nLen, cText) INLINE ::Owner:SendMessage( SCI_REPLACETARGET, nLen, cText )
+   METHOD ChkDoc()                            INLINE IIF( ::GetCurDoc() != ::pSource, ::Select(),)
+
+   METHOD FindText( nFlags, ttf )             INLINE ::Owner:SendMessage( SCI_FINDTEXT, nFlags, ttf )
+   METHOD SearchNext( nFlags, cText )         INLINE ::Owner:SendMessage( SCI_SEARCHNEXT, nFlags, cText )
+   METHOD SearchPrev( nFlags, cText )         INLINE ::Owner:SendMessage( SCI_SEARCHPREV, nFlags, cText )
+   METHOD ReplaceSel( cText )                 INLINE ::Owner:SendMessage( SCI_REPLACESEL, 0, cText )
+   METHOD GetSelText( cBuffer )               INLINE ::Owner:SendMessage( SCI_GETSELTEXT, 0, cBuffer )
+   METHOD SetSearchFlags( nFlags )            INLINE ::Owner:SendMessage( SCI_SETSEARCHFLAGS, nFlags )
+   METHOD SetTargetStart( nStart )            INLINE ::Owner:SendMessage( SCI_SETTARGETSTART, nStart )
+   METHOD SetTargetEnd( nEnd )                INLINE ::Owner:SendMessage( SCI_SETTARGETEND, nEnd )
+   METHOD ReplaceTarget( nLen, cText)         INLINE ::Owner:SendMessage( SCI_REPLACETARGET, nLen, cText )
+   METHOD SearchInTarget( nLen, cText)        INLINE ::Owner:SendMessage( SCI_SEARCHINTARGET, nLen, cText )
+   METHOD GetTargetStart()                    INLINE ::Owner:SendMessage( SCI_GETTARGETSTART, 0, 0 )
+   METHOD GetTargetEnd()                      INLINE ::Owner:SendMessage( SCI_GETTARGETEND, 0, 0 )
+   METHOD GetCharAt( nPos )                   INLINE ::Owner:SendMessage( SCI_GETCHARAT, nPos, 0 )
+   METHOD PositionAfter( nPos )               INLINE ::Owner:SendMessage( SCI_POSITIONAFTER, nPos, 0 )
+   METHOD SetSelection( nCaret, nEnd )        INLINE ::Owner:SendMessage( SCI_SETSELECTION, nCaret, nEnd )
+   METHOD GetStyleAt( nPos )                  INLINE ::Owner:SendMessage( SCI_GETSTYLEAT, nPos, 0 )
+   METHOD GetEndStyled()                      INLINE ::Owner:SendMessage( SCI_GETENDSTYLED, 0, 0 )
+   METHOD EnsureVisible( nLine )              INLINE ::Owner:SendMessage( SCI_ENSUREVISIBLE, nLine, 0 )
+   METHOD EnsureVisibleEnforcePolicy( nLine ) INLINE ::Owner:SendMessage( SCI_ENSUREVISIBLEENFORCEPOLICY, nLine, 0 )
+
+   METHOD SetTabWidth( nChars )               INLINE ::Owner:SendMessage( SCI_SETTABWIDTH, nChars, 0 )
+   METHOD GetTabWidth()                       INLINE ::Owner:SendMessage( SCI_GETTABWIDTH, 0, 0 )
+   METHOD SetUseTabs( nUseTabs )              INLINE ::Owner:SendMessage( SCI_SETUSETABS, nUseTabs, 0 )
 ENDCLASS
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -6752,6 +6845,8 @@ METHOD Init( oOwner, cFile ) CLASS Source
    ENDIF
    ::Select()
    ::SetSavePoint()
+   ::SetUseTabs(0)
+   ::SetTabWidth(3)
    AADD( ::Owner:aDocs, Self )
 RETURN Self
 

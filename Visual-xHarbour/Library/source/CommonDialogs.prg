@@ -674,7 +674,7 @@ CLASS ReplaceTextDialog INHERIT CommonDialogs
 
    DATA WholeWord     EXPORTED  INIT .F.
    DATA MatchCase     EXPORTED  INIT .F.
-
+   DATA Direction     EXPORTED  INIT 0
    DATA Events        EXPORTED  INIT {;
                                        {"General", { { "OnFindNext",   "", "" },;
                                                      { "OnReplace",    "", "" },;
@@ -722,6 +722,9 @@ METHOD __WndProc( hWnd, nMsg, nwParam, nlParam ) CLASS ReplaceTextDialog
            pfr = (struct FINDREPLACE*) nlParam
            ShowWindow( hWnd, SW_SHOWNORMAL )
            UpdateWindow( hWnd )
+           SendMessage( GetDlgItem(hWnd,1056), BM_SETCHECK, BST_UNCHECKED, 0 )
+           SendMessage( GetDlgItem(hWnd,1057), BM_SETCHECK, BST_CHECKED, 0 )
+           ::Direction := 1
 
       CASE nMsg == WM_COMMAND
            DO CASE
@@ -739,6 +742,12 @@ METHOD __WndProc( hWnd, nMsg, nwParam, nlParam ) CLASS ReplaceTextDialog
 
               CASE nwParam == 1041
                    ::MatchCase := ( SendMessage( GetDlgItem( hWnd, nwParam ), BM_GETSTATE, 0, 0 ) & BST_CHECKED ) != 0
+
+              CASE nwParam == 1056
+                   ::Direction := 0
+
+              CASE nwParam == 1057
+                   ::Direction := 1
 
               CASE nwParam == IDCANCEL
                    FreeCallBackPointer( ::__pCallBackPtr )
