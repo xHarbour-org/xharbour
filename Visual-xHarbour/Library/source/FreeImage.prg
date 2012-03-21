@@ -112,6 +112,7 @@ CLASS FreeImageRenderer
    PROPERTY Opacity          READ xOpacity          WRITE Update DEFAULT 100
    PROPERTY Alignment        READ xAlignment        WRITE Update DEFAULT 1
    PROPERTY KeepAspectRatio  READ xKeepAspectRatio  WRITE Update DEFAULT .F.
+   PROPERTY Stretch          READ xStretch          WRITE Update DEFAULT .F.
 
    DATA LeftMargin   EXPORTED INIT 0
    DATA TopMargin    EXPORTED INIT 0
@@ -248,61 +249,66 @@ METHOD Draw( hMemDC ) CLASS FreeImageRenderer
          nWidth := cx * nRatio
       ENDIF
       cy := nHeight 
-      cx := nWidth  
+      cx := nWidth
+
+    ELSEIF ::Stretch
+      cy := ::Owner:ClientHeight
+      cx := ::Owner:ClientWidth
    ENDIF
    x := 0
    y := 0
-   SWITCH ::xAlignment
-      CASE 2 // Center
-         x := ( ::Owner:ClientWidth - cx ) / 2
-         y := ( ::Owner:ClientHeight - cy ) / 2
-         EXIT
+   IF ! ::Stretch
+      SWITCH ::xAlignment
+         CASE 2 // Center
+            x := ( ::Owner:ClientWidth - cx ) / 2
+            y := ( ::Owner:ClientHeight - cy ) / 2
+            EXIT
 
-      CASE 3 // Left Top
-         x := ::LeftMargin
-         y := ::TopMargin
-         EXIT
+         CASE 3 // Left Top
+            x := ::LeftMargin
+            y := ::TopMargin
+            EXIT
 
-      CASE 4 // Top - Center
-         x := ( ::Owner:ClientWidth - cx ) / 2
-         y := ::TopMargin
-         EXIT
+         CASE 4 // Top - Center
+            x := ( ::Owner:ClientWidth - cx ) / 2
+            y := ::TopMargin
+            EXIT
 
-      CASE 5 // Top - Right
-         x := ::Owner:ClientWidth - cx - ::RightMargin
-         y := ::TopMargin
-         EXIT
+         CASE 5 // Top - Right
+            x := ::Owner:ClientWidth - cx - ::RightMargin
+            y := ::TopMargin
+            EXIT
 
-      CASE 6 // Right - Center
-         x := ::Owner:ClientWidth - cx - ::RightMargin
-         y := ( ::Owner:ClientHeight - cy ) / 2
-         EXIT
+         CASE 6 // Right - Center
+            x := ::Owner:ClientWidth - cx - ::RightMargin
+            y := ( ::Owner:ClientHeight - cy ) / 2
+            EXIT
 
-      CASE 7 // Right - Bottom
-         x := ::Owner:ClientWidth  - cx - ::RightMargin
-         y := ::Owner:ClientHeight - cy - ::BottomMargin
-         EXIT
+         CASE 7 // Right - Bottom
+            x := ::Owner:ClientWidth  - cx - ::RightMargin
+            y := ::Owner:ClientHeight - cy - ::BottomMargin
+            EXIT
 
-      CASE 8 // Bottom - Center
-         x := ( ::Owner:ClientWidth - cx ) / 2
-         y := ::Owner:ClientHeight - cy - ::BottomMargin
-         EXIT
+         CASE 8 // Bottom - Center
+            x := ( ::Owner:ClientWidth - cx ) / 2
+            y := ::Owner:ClientHeight - cy - ::BottomMargin
+            EXIT
 
-      CASE 9 // Bottom - Left
-         x := ::LeftMargin
-         y := ::Owner:ClientHeight - cy - ::BottomMargin
-         EXIT
+         CASE 9 // Bottom - Left
+            x := ::LeftMargin
+            y := ::Owner:ClientHeight - cy - ::BottomMargin
+            EXIT
 
-      CASE 10 // "Left - Center
-         x := ::LeftMargin
-         y := ( ::Owner:ClientHeight - cy ) / 2
-         EXIT
-   END
-   
+         CASE 10 // "Left - Center
+            x := ::LeftMargin
+            y := ( ::Owner:ClientHeight - cy ) / 2
+            EXIT
+      END
+   ENDIF
    IF !::lTransparentSet
       ::lTransparentSet := .T.
       IF FreeImageIsTransparent( ::hDIB ) .OR. FreeImageHasBackgroundColor( ::hDIB )
-         IF !::KeepAspectRatio
+         IF ! ::KeepAspectRatio .AND. ! ::Stretch
             hMemDC1     := CreateCompatibleDC( hMemDC )
             hMemBitmap1 := CreateCompatibleBitmap( hMemDC, cx, cy )
             hOldBitmap1 := SelectObject( hMemDC1, hMemBitmap1 )

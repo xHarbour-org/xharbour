@@ -12,6 +12,7 @@ static __aProps := {=>}
 #include "colors.ch"
 #include "debug.ch"
 #include "commdlg.ch"
+#include "scintilla.ch"
 
 #include "xEditConstants.ch"
 
@@ -3029,48 +3030,33 @@ RETURN .T.
 //------------------------------------------------------------------------------------------
 
 METHOD GenerateEvent( cEvent, cFuncName, Event ) CLASS EventManager
-   LOCAL nPos, aPos, aFind, aEvents
+   LOCAL nPos, aEvents
 
    WITH OBJECT ::Application:Project:CurrentForm:Editor
-      aFind := :Find( " "+cFuncName, FR_FROMTOP | FR_WHOLEWORD )
-      nPos  := :Position( aFind[1], aFind[2] )
-      IF nPos == 0
-         :AddLine( { "//----------------------------------------------------------------------------------------------------//", NIL, NIL, 0 })
-         :AddLine( { "METHOD " + cFuncName + "( Sender" + IIF( ! Empty( Event[3] ), ", " + Event[3] + " ", " " ) + ") CLASS "+::ActiveObject:Form:Name, NIL, NIL, 0 } )
-         
+
+      :SetSearchFlags( SCFIND_WHOLEWORD )
+
+      nPos := :FindInPos( "METHOD "+cFuncName, 1 )
+      IF nPos == -1
+         :AppendText( CRLF + "//----------------------------------------------------------------------------------------------------" + CRLF +;
+                      "METHOD " + cFuncName + "( Sender" + IIF( ! Empty( Event[3] ), ", " + Event[3] + " ", " " ) + ") CLASS "+::ActiveObject:Form:Name + CRLF )
+
          aEvents := { "ONCHAR", "ONKEYDOWN", "ONKEYUP", "ONSYSKEYDOWN", "ONSYSKEYUP", "ONCHILDCHAR", "ONCHILDKEYDOWN", "ONSYSCHAR" }
 
          IF ASCAN( aEvents, UPPER( cEvent ) ) > 0
-            :AddLine( { "   LOCAL nKey := Sender:wParam", NIL, NIL, 0  } )
-            :AddLine( { "", NIL, NIL, 0  } )
-           ELSE
-            :AddLine( { "   " + IIF( ::ActiveObject:__xCtrlName == "LinkLabel", "ShellExecute( ::hWnd, 'open', Sender:Url, , , SW_SHOW )", "" ), NIL , NIL, 0 } )
-         ENDIF
-         
-         nPos := Len( :GetBuffer() )
-         :AddLine( { "RETURN Self", NIL, NIL, 0 } )
-         :lModified := .T.
-         TRY
-         IF ::Application:SourceEditor:Source == HB_QWith()
-            :GoLine( :nLines - 1 )
-            :GoColumn( 4 )
+            :AppendText( "   LOCAL nKey := Sender:wParam" + CRLF + CRLF )
           ELSE
-            :SetPosSilent( nPos )
+            :AppendText( "   " + IIF( ::ActiveObject:__xCtrlName == "LinkLabel", "ShellExecute( ::hWnd, 'open', Sender:Url, , , SW_SHOW )", "" ) + CRLF )
          ENDIF
-         CATCH
-         END
-       ELSE
-         IF ::Application:SourceEditor:Source == HB_QWith()
-            aPos := :LineColumn( nPos )
-            :GoLine( aPos[1] )
-            :GoColumn( aPos[2]+1 )
-          ELSE
-            :SetPosSilent( nPos )
-         ENDIF
+
+         nPos := :GetTextLen()-2
+         :AppendText( "RETURN Self" + CRLF )
+         :Modified := .T.
       ENDIF
-      ::Application:Project:Modified := .T.
-      ::Application:Project:CurrentForm:__lModified := .T.
+      :GotoPosition( nPos )
    END
+   ::Application:Project:Modified := .T.
+   ::Application:Project:CurrentForm:__lModified := .T.
 
    IF !::Application:SourceEditor:IsWindowVisible()
       ::Application:EditorPage:Select()
@@ -3085,30 +3071,16 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD RenameEvent( cEvent, cFuncName, cNewFuncName, lSwitch ) CLASS EventManager
-   LOCAL cNewBuffer, lComment, Line, lForce
+   (cEvent)
    DEFAULT lSwitch TO .T.
-   ( cEvent )
+
    IF !( cFuncName == cNewFuncName )
-      WITH OBJECT ::ActiveObject:Form:Editor
-         cNewBuffer := ""
-         lComment   := .F.
-         Line := :FirstLine
-         WHILE Line != NIL
-            cNewBuffer += ChangePrgLine( Line[ ED_BUFFER ], cFuncName, cNewFuncName, @lComment  ) + CHR(13) + CHR(10)
-            IF Len( Line ) == 4
-               Line := Line[ ED_NEXTLINE ]
-             ELSE
-               Line := Line[ ED_COLLAPSED_START ]
-            ENDIF
-         ENDDO
-         lForce := ::Application:SourceEditor:Source == HB_QWith()
-         :Load( ,cNewBuffer, lForce, lForce )
-         :lModified := .T.
-      END
-      ::Application:Project:Modified := .T.
-      IF lSwitch
-         ::Application:EditorPage:Select()
-         ::Application:SourceEditor:SetFocus()
+      IF ::ActiveObject:Form:Editor:ReplaceAll( cFuncName, cNewFuncName, SCFIND_WHOLEWORD ) > 0
+         ::Application:Project:Modified := .T.
+         IF lSwitch
+            ::Application:EditorPage:Select()
+            ::Application:SourceEditor:SetFocus()
+         ENDIF
       ENDIF
    ENDIF
 RETURN Self
