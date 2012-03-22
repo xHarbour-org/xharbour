@@ -2293,8 +2293,10 @@ CLASS Project
    DATA cSourceRemove    EXPORTED
 
    DATA __CustomOwner    EXPORTED INIT .F.
-
    DATA __ExtraLibs      EXPORTED INIT {}
+   
+   DATA FindDialog       EXPORTED
+   DATA ReplaceDialog    EXPORTED
    
    ASSIGN Modified(lMod) INLINE ::SetCaption( lMod )
    ACCESS Modified       INLINE ::lModified
@@ -2370,6 +2372,7 @@ CLASS Project
    METHOD RemoveImage()
    METHOD AddControl()
    METHOD FixPath( cPath, cSubDir ) INLINE IIF( AT(":",cSubDir)>0 .OR. AT("\\",cSubDir)>0, cSubDir, cPath + "\" + cSubDir )
+   METHOD SetEditMenuItems()
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -3028,9 +3031,7 @@ METHOD EditCut() CLASS Project
       ::Application:SourceEditor:Source:Modified := .T.
 
       ::Modified := .T.
-      ::Application:Props[ "EditUndoItem" ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := ::Application:SourceEditor:Source:CanUndo()
-      ::Application:Props[ "EditRedoItem" ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := ::Application:SourceEditor:Source:CanRedo()
-
+      ::SetEditMenuItems()
    ENDIF
 RETURN 0
 
@@ -3052,8 +3053,7 @@ METHOD EditPaste() CLASS Project
       ::Application:SourceEditor:Source:Modified := .T.
 
       ::Modified := .T.
-      ::Application:Props[ "EditUndoItem" ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := ::Application:SourceEditor:Source:CanUndo()
-      ::Application:Props[ "EditRedoItem" ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := ::Application:SourceEditor:Source:CanRedo()
+      ::SetEditMenuItems()
    ENDIF
 RETURN 0
 
@@ -3069,8 +3069,7 @@ METHOD EditDelete() CLASS Project
       ::Application:SourceEditor:Source:Modified := .T.
 
       ::Modified := .T.
-      ::Application:Props[ "EditUndoItem"  ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := ::Application:SourceEditor:Source:CanUndo()
-      ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := ::Application:SourceEditor:Source:CanRedo()
+      ::SetEditMenuItems()
    ENDIF
 RETURN 0
 
@@ -3087,8 +3086,7 @@ METHOD Undo() CLASS Project
       ::Application:SourceEditor:Source:Modified := .T.
 
       ::Modified := .T.
-      ::Application:Props[ "EditUndoItem"  ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := ::Application:SourceEditor:Source:CanUndo()
-      ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := ::Application:SourceEditor:Source:CanRedo()
+      ::SetEditMenuItems()
    ENDIF
 RETURN 0
 
@@ -3104,26 +3102,34 @@ METHOD ReDo() CLASS Project
       ::Application:SourceEditor:Source:Modified := .T.
       
       ::Modified := .T.
-      ::Application:Props[ "EditUndoItem"  ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := ::Application:SourceEditor:Source:CanUndo()
-      ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := ::Application:SourceEditor:Source:CanRedo()
+      ::SetEditMenuItems()
    ENDIF
 RETURN 0
 
+METHOD SetEditMenuItems() CLASS Project
+   ::Application:Props:EditUndoItem:Enabled := ::Application:Props:EditUndoBttn:Enabled := ::Application:SourceEditor:Source:CanUndo()
+   ::Application:Props:EditRedoItem:Enabled := ::Application:Props:EditRedoBttn:Enabled := ::Application:SourceEditor:Source:CanRedo()
+RETURN Self
+
 METHOD Find() CLASS Project
    IF ::Application:SourceEditor:IsWindowVisible()
-      WITH OBJECT FindTextDialog( ::Application:SourceEditor )
-         :Owner := ::Application:SourceEditor
-         :Show()
-      END
+      IF ::ReplaceDialog != NIL
+         ::ReplaceDialog:Close()
+      ENDIF
+      ::FindDialog := FindTextDialog( ::Application:SourceEditor )
+      ::FindDialog:Owner := ::Application:SourceEditor
+      ::FindDialog:Show()
    ENDIF
 RETURN 0
 
 METHOD Replace() CLASS Project
    IF ::Application:SourceEditor:IsWindowVisible()
-      WITH OBJECT ReplaceTextDialog( ::Application:SourceEditor )
-         :Owner := ::Application:SourceEditor
-         :Show()
-      END
+      IF ::FindDialog != NIL
+         ::FindDialog:Close()
+      ENDIF
+      ::ReplaceDialog := ReplaceTextDialog( ::Application:SourceEditor )
+      ::ReplaceDialog:Owner := ::Application:SourceEditor
+      ::ReplaceDialog:Show()
    ENDIF
 RETURN 0
 
@@ -6447,8 +6453,9 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
-   LOCAL cText, n, scn, nLineNumber, nStartPos
+   LOCAL cText, n//, scn, nLineNumber, nStartPos
    (nwParam, nlParam)
+   view hdr:code
    DO CASE
       CASE hdr:code == SCN_UPDATEUI
            n := ::Source:GetCurrentPos()
@@ -6470,12 +6477,12 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
       CASE hdr:code == SCN_CHARADDED
            //scn := (struct SCNOTIFICATION*) nlParam
 
-      CASE hdr:code == SCN_STYLENEEDED
-           scn := (struct SCNOTIFICATION*) nlParam
+//       CASE hdr:code == SCN_STYLENEEDED
+//            scn := (struct SCNOTIFICATION*) nlParam
 
-           nLineNumber := ::Source:LineFromPosition( ::Source:GetEndStyled() )
-           nStartPos   := ::Source:PositionFromLine( nLineNumber )
-           ::SetStyle( nStartPos, scn:position )
+//            nLineNumber := ::Source:LineFromPosition( ::Source:GetEndStyled() )
+//            nStartPos   := ::Source:PositionFromLine( nLineNumber )
+//            ::SetStyle( nStartPos, scn:position )
    ENDCASE
 RETURN NIL
 
@@ -6696,7 +6703,8 @@ CLASS Source
    METHOD GetTabWidth()                       INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETTABWIDTH, 0, 0 )
    METHOD SetUseTabs( nUseTabs )              INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SETUSETABS, nUseTabs, 0 )
    METHOD AppendText( cText )                 INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_APPENDTEXT, Len(cText), cText )
-
+   METHOD UsePopUp( n )                       INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_USEPOPUP, n )
+   
    METHOD SetText()
    METHOD FindInPos()
    METHOD ReplaceAll()
@@ -6717,6 +6725,7 @@ METHOD Init( oOwner, cFile ) CLASS Source
    ::Select()
    ::SetUseTabs(0)
    ::SetTabWidth(3)
+   ::UsePopUp(0)
    AADD( ::Owner:aDocs, Self )
 RETURN Self
 
