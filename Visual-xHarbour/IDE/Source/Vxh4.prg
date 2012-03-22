@@ -624,58 +624,24 @@ RETURN NIL
 //---------------------------------------------------------------------------------------------------
 
 METHOD RenameForm( cOldName, cNewName, lProject ) CLASS ObjManager
-   LOCAL n, lForce
-   LOCAL cNewBuffer, lComment, oEditor, Line
+   LOCAL n, oEditor
 
    IF !( cOldName == cNewName )
       
       DEFAULT lProject TO .F.
       
+      oEditor := ::Application:ProjectPrgEditor
+      ::Application:ProjectPrgEditor:ReplaceAll( cOldName, cNewName, SCFIND_WHOLEWORD )
+
       IF lProject
-         oEditor := ::Application:ProjectPrgEditor
-         cNewBuffer := ""
-         lComment   := .F.
-         Line := oEditor:FirstLine
-         WHILE Line != NIL
-            cNewBuffer += ChangePrgLine( Line[ ED_BUFFER ], cOldName, cNewName, @lComment  ) + CHR(13) + CHR(10)
-            IF Len( Line ) == 4
-               Line := Line[ ED_NEXTLINE ]
-             ELSE
-               Line := Line[ ED_COLLAPSED_START ]
-            ENDIF
-         ENDDO
-         lForce := ::Application:SourceTabs:CurSel == 1 .AND. IsWindowVisible( oEditor:oDisplay:hWnd )
-         oEditor:Load( ,cNewBuffer, .T., .T. )
-         oEditor:lModified := .T.
          cNewName := ::Application:Project:properties:Name
          ::Application:SourceTabs:SetCurSel( 1 )
        ELSE
-         oEditor := ::Application:ProjectPrgEditor
-
          IF ::ActiveObject:lCustom
             ::ActiveObject:__NewName := cNewName
             ::ActiveObject:__OldName := cOldName
          ENDIF
-
-         FOR n := 1 TO 2
-             cNewBuffer := ""
-             lComment   := .F.
-             Line := oEditor:FirstLine
-             WHILE Line != NIL
-                cNewBuffer += ChangePrgLine( Line[ ED_BUFFER ], cOldName, cNewName, @lComment  ) + CHR(13) + CHR(10)
-                IF Len( Line ) == 4
-                   Line := Line[ ED_NEXTLINE ]
-                 ELSE
-                   Line := Line[ ED_COLLAPSED_START ]
-                ENDIF
-             ENDDO
-             lForce := ::Application:SourceEditor:Source == oEditor .AND. n == ::Application:SourceTabs:CurSel
-             oEditor:Load( ,cNewBuffer, lForce, lForce )
-             oEditor:lModified := .T.
-             
-             // Loop to rename the caller __Project( NIL ):Run( RenamedForm( NIL ) )
-             oEditor := ::ActiveObject:Form:Editor
-         NEXT
+         ::ActiveObject:Form:Editor:ReplaceAll( cOldName, cNewName, SCFIND_WHOLEWORD )
          oEditor := ::ActiveObject:Form:Editor
       ENDIF
       
