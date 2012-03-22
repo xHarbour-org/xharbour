@@ -3297,7 +3297,6 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    DEFAULT lClosing TO .F.
 
    IF ::Modified .AND. !EMPTY( ::Properties ) .AND. lCloseErrors
-      view GetClassName( GetFocus() )
       nRes := ::Application:MainForm:MessageBox( "Save changes before closing?", IIF( EMPTY(::Properties:Name), "Untitled", ::Properties:Name ), MB_YESNOCANCEL | MB_ICONQUESTION )
       SWITCH nRes
          CASE IDYES
@@ -6455,21 +6454,24 @@ RETURN Self
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
    LOCAL cText, n//, scn, nLineNumber, nStartPos
    (nwParam, nlParam)
-   view hdr:code
    DO CASE
       CASE hdr:code == SCN_UPDATEUI
            n := ::Source:GetCurrentPos()
            ::Application:SetEditorPos( ::Source:LineFromPosition(n), ::Source:GetColumn(n) )
 
       CASE hdr:code == SCN_MODIFIED
-           IF ( n := ASCAN( ::aDocs, {|o| o==::Source .AND. !o:Modified .AND. !o:FirstOpen } ) ) > 0
-              ::aDocs[n]:Modified := .T.
-              cText := ::Application:SourceTabs:GetItemText()
+      
+           IF ! ::Source:Modified .AND. ! ::Source:FirstOpen
+              ::Source:Modified := .T.
+              n := aScan( ::aDocs, ::Source,,, .T. )
+              
+              cText := ::Application:SourceTabs:GetItemText(n)
               cText := ALLTRIM( STRTRAN( cText, "*" ) )
-              ::Application:SourceTabs:SetItemText( , " " + cText + " * ", .T. )
 
-              ::Application:Props:EditUndoItem:Enabled := ::Application:Props:EditUndoBttn:Enabled := ::aDocs[n]:CanUndo()
-              ::Application:Props:EditRedoItem:Enabled := ::Application:Props:EditRedoBttn:Enabled := ::aDocs[n]:CanRedo()
+              ::Application:SourceTabs:SetItemText( n, " " + cText + " * ", .T. )
+
+              ::Application:Props:EditUndoItem:Enabled := ::Application:Props:EditUndoBttn:Enabled := ::Source:CanUndo()
+              ::Application:Props:EditRedoItem:Enabled := ::Application:Props:EditRedoBttn:Enabled := ::Source:CanRedo()
               
               ::Application:Project:Modified := .T.
            ENDIF

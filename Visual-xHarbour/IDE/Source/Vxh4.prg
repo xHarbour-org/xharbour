@@ -631,7 +631,7 @@ METHOD RenameForm( cOldName, cNewName, lProject ) CLASS ObjManager
       DEFAULT lProject TO .F.
       
       oEditor := ::Application:ProjectPrgEditor
-      ::Application:ProjectPrgEditor:ReplaceAll( cOldName, cNewName, SCFIND_WHOLEWORD )
+      ::Application:ProjectPrgEditor:ReplaceAll( cOldName, cNewName, 0 )
 
       IF lProject
          cNewName := ::Application:Project:properties:Name
@@ -641,7 +641,7 @@ METHOD RenameForm( cOldName, cNewName, lProject ) CLASS ObjManager
             ::ActiveObject:__NewName := cNewName
             ::ActiveObject:__OldName := cOldName
          ENDIF
-         ::ActiveObject:Form:Editor:ReplaceAll( cOldName, cNewName, SCFIND_WHOLEWORD )
+         ::ActiveObject:Form:Editor:ReplaceAll( cOldName, cNewName, 0 )
          oEditor := ::ActiveObject:Form:Editor
       ENDIF
       
@@ -3042,6 +3042,8 @@ METHOD RenameEvent( cEvent, cFuncName, cNewFuncName, lSwitch ) CLASS EventManage
 
    IF !( cFuncName == cNewFuncName )
       IF ::ActiveObject:Form:Editor:ReplaceAll( cFuncName, cNewFuncName, SCFIND_WHOLEWORD ) > 0
+         ::ActiveObject:Form:Editor:Modified := .T.
+
          ::Application:Project:Modified := .T.
          IF lSwitch
             ::Application:EditorPage:Select()
