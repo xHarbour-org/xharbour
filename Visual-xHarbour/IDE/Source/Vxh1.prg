@@ -6409,6 +6409,8 @@ CLASS SourceEditor INHERIT Control
    DATA InSelection  EXPORTED INIT .F.
    ACCESS DocCount       INLINE LEN( ::aDocs )
 
+   DATA Color_Fore   EXPORTED
+   DATA Color_Back   EXPORTED
 
    // Compatibility with xedit debugger ----------------------------------------------------
    ACCESS oEditor    INLINE ::xSource
@@ -6459,19 +6461,30 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS SourceEditor
-   ::Super:Create()
-   ::SetLexer( SCLEX_CONTAINER )
-   ::StyleSetBack( STYLE_DEFAULT, RGB(255,255,255) )
-   ::StyleSetFore( STYLE_DEFAULT, RGB(  0,  0,  0) )
 
-   ::SendMessage( SCI_STYLESETFORE, SCE_STYLE_BLACK,  RGB(   0,   0,   0 ) )
+   ::Color_Fore := RGB(  0,  0,  0)
+   ::Color_Back := RGB(255,255,255)
+
+   ::Super:Create()
+
+   ::SetLexer( SCLEX_CONTAINER )
+   ::StyleSetBack( STYLE_DEFAULT, ::Color_Back )
+   ::StyleSetFore( STYLE_DEFAULT, ::Color_Fore )
+
+   ::SendMessage( SCI_SETCARETFORE, ::Color_Fore )
+   ::SendMessage( SCI_SETCARETPERIOD, 500 )
+   ::SendMessage( SCI_SETCARETWIDTH, 2 )
+   ::SendMessage( SCI_SETCARETSTYLE, 1 )
+
+   ::SendMessage( SCI_STYLESETFORE, SCE_STYLE_BLACK,  ::Color_Fore )
    ::SendMessage( SCI_STYLESETFORE, SCE_STYLE_ORANGE, RGB( 255, 128,   0 ) )
    ::SendMessage( SCI_STYLESETFORE, SCE_STYLE_PURPLE, RGB( 255,   0, 255 ) )
    ::SendMessage( SCI_STYLESETFORE, SCE_STYLE_BLUE,   RGB(   0,   0, 255 ) )
 
-
    ::StyleSetFont( "Courier New" )
    ::StyleSetSize( 10 )
+
+   ::SendMessage( SCI_STYLECLEARALL, 0, 0 )
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -6509,25 +6522,28 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
             nLineNumber := ::Source:LineFromPosition( ::Source:GetEndStyled() )
             nStartPos   := ::Source:PositionFromLine( nLineNumber )
             nEndPos     := scn:position
-            
+VIEW nEndPos
+//            nEndPos :=  ::SendMessage( EM_LINEINDEX,  nLineNumber )
             nLineLen    := ::SendMessage( SCI_LINELENGTH, nLineNumber )
+view nLineNumber, nLineLen, nEndPos
+
             IF nLineLen > 0
                cChar := CHR( ::SendMessage( SCI_GETCHARAT, nStartPos, 0 ) )
                ::SendMessage( SCI_STARTSTYLING, nStartPos, 31 )
+//view cChar, nStartPos, nEndPos
 
-               SWITCH cChar
-                  CASE "-"
+               DO CASE
+                  CASE cChar == "-"
                        ::SendMessage( SCI_SETSTYLING, nLineLen, SCE_STYLE_ORANGE )
-                       EXIT
-                  CASE "/"
+                  CASE cChar == "/"
                        ::SendMessage( SCI_SETSTYLING, nLineLen, SCE_STYLE_PURPLE )
-                       EXIT
-                  CASE "*"
+                  CASE cChar == "*"
                        ::SendMessage( SCI_SETSTYLING, nLineLen, SCE_STYLE_BLUE )
-                       EXIT
-                  DEFAULT
+                  OTHERWISE
                        ::SendMessage( SCI_SETSTYLING, nLineLen, SCE_STYLE_BLACK )
                END
+             ELSE
+               ::SendMessage( SCI_SETSTYLING, nLineLen, SCE_STYLE_BLACK )
             ENDIF
 
    ENDCASE
