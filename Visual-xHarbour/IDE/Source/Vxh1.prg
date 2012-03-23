@@ -40,6 +40,7 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 #define MCS_PASTE    11
 #define MCS_DRAGGING 12
 
+#define SCE_STYLE_BLACK   10
 #define SCE_STYLE_ORANGE  11
 #define SCE_STYLE_PURPLE  12
 #define SCE_STYLE_BLUE    13
@@ -6424,7 +6425,7 @@ CLASS SourceEditor INHERIT Control
    METHOD StyleSetSize( nSize )           INLINE ::SendMessage( SCI_STYLESETSIZE, STYLE_DEFAULT, nSize )
    METHOD StyleGetSize( nSize )           INLINE ::SendMessage( SCI_STYLEGETSIZE, STYLE_DEFAULT, @nSize ), nSize
 
-   METHOD SetLexer( nLexer )              INLINE ::SendMessage( SCI_SETLEXER, nLexer )   
+   METHOD SetLexer( nLexer )              INLINE ::SendMessage( SCI_SETLEXER, nLexer, 0 )   
 
    METHOD SelectDocument( pDoc )          INLINE ::SendMessage( SCI_SETDOCPOINTER, 0, pDoc )
    METHOD OnDestroy()                     INLINE aEval( ::aDocs, {|oDoc| oDoc:Close() } ), FreeLibrary( ::hSciLib ), NIL
@@ -6460,8 +6461,14 @@ RETURN Self
 METHOD Create() CLASS SourceEditor
    ::Super:Create()
    ::SetLexer( SCLEX_CONTAINER )
-   ::StyleSetFore( STYLE_DEFAULT, RGB(255,255,255) )
-   ::StyleSetBack( STYLE_DEFAULT, RGB(  0,  0,  0) )
+   ::StyleSetBack( STYLE_DEFAULT, RGB(255,255,255) )
+   ::StyleSetFore( STYLE_DEFAULT, RGB(  0,  0,  0) )
+
+   ::SendMessage( SCI_STYLESETFORE, SCE_STYLE_BLACK,  RGB(   0,   0,   0 ) )
+   ::SendMessage( SCI_STYLESETFORE, SCE_STYLE_ORANGE, RGB( 255, 128,   0 ) )
+   ::SendMessage( SCI_STYLESETFORE, SCE_STYLE_PURPLE, RGB( 255,   0, 255 ) )
+   ::SendMessage( SCI_STYLESETFORE, SCE_STYLE_BLUE,   RGB(   0,   0, 255 ) )
+
 
    ::StyleSetFont( "Courier New" )
    ::StyleSetSize( 10 )
@@ -6469,7 +6476,7 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
-   LOCAL cText, n, scn, nLineNumber, nStartPos, nLineLen
+   LOCAL cText, n, scn, nLineNumber, nStartPos, nLineLen, nEndPos, cChar
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == SCN_UPDATEUI
@@ -6498,12 +6505,31 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
 
        CASE hdr:code == SCN_STYLENEEDED
             scn := (struct SCNOTIFICATION*) nlParam
-            nLineNumber := ::Source:LineFromPosition( ::Source:GetEndStyled() )
-            nLineLen    := ::SendMessage( SCI_LINELENGTH, nLineNumber )
-            nStartPos   := ::Source:PositionFromLine( nLineNumber )
 
-            ::SendMessage( SCI_STARTSTYLING, nStartPos, 0x1f )
-            ::SendMessage( SCI_SETSTYLING, nLineLen, SCE_STYLE_ORANGE )
+            nLineNumber := ::Source:LineFromPosition( ::Source:GetEndStyled() )
+            nStartPos   := ::Source:PositionFromLine( nLineNumber )
+            nEndPos     := scn:position
+            
+            nLineLen    := ::SendMessage( SCI_LINELENGTH, nLineNumber )
+            IF nLineLen > 0
+               cChar := CHR( ::SendMessage( SCI_GETCHARAT, nStartPos, 0 ) )
+               ::SendMessage( SCI_STARTSTYLING, nStartPos, 31 )
+
+               SWITCH cChar
+                  CASE "-"
+                       ::SendMessage( SCI_SETSTYLING, nLineLen, SCE_STYLE_ORANGE )
+                       EXIT
+                  CASE "/"
+                       ::SendMessage( SCI_SETSTYLING, nLineLen, SCE_STYLE_PURPLE )
+                       EXIT
+                  CASE "*"
+                       ::SendMessage( SCI_SETSTYLING, nLineLen, SCE_STYLE_BLUE )
+                       EXIT
+                  DEFAULT
+                       ::SendMessage( SCI_SETSTYLING, nLineLen, SCE_STYLE_BLACK )
+               END
+            ENDIF
+
    ENDCASE
 RETURN NIL
 
