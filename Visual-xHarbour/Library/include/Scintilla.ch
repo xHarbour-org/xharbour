@@ -892,3 +892,35 @@
 #define SCN_AUTOCCANCELLED 2025
 #define SCN_AUTOCCHARDELETED 2026
 #define SCN_HOTSPOTRELEASECLICK 2027
+
+#define SCLEX_CONTAINER    0
+#define SCLEX_NULL         1
+#define SCLEX_PYTHON       2
+#define SCLEX_CPP          3
+#define SCLEX_HTML         4
+#define SCLEX_XML          5
+#define SCLEX_PERL         6
+#define SCLEX_SQL          7
+#define SCLEX_VB           8
+#define SCLEX_PROPERTIES   9
+#define SCLEX_ERRORLIST   10
+#define SCLEX_MAKEFILE    11
+#define SCLEX_BATCH       12
+#define SCLEX_LATEX       14
+#define SCLEX_LUA         15
+#define SCLEX_DIFF        16
+#define SCLEX_PASCAL      18
+#define SCLEX_TCL         25
+#define SCLEX_VBSCRIPT    28
+#define SCLEX_ASP         29
+#define SCLEX_PHP         30
+#define SCLEX_CPPNOCASE   35
+#define SCLEX_OBJC        36
+#define SCLEX_CSS         38
+#define SCLEX_NFO         39
+#define SCLEX_USER        40
+
+#define SCLEX_M30         41
+#define SCLEX_PCOM        42
+
+#define SCLEX_AUTOMATIC 1000

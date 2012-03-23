@@ -6413,17 +6413,22 @@ CLASS SourceEditor INHERIT Control
    METHOD Init() CONSTRUCTOR
    METHOD Create()
 
-   METHOD StyleSetFont( cFont )     INLINE ::SendMessage( SCI_STYLESETFONT, STYLE_DEFAULT, cFont )
-   METHOD StyleGetFont( cFont )     INLINE cFont := SPACE(255), ::SendMessage( SCI_STYLEGETFONT, STYLE_DEFAULT, @cFont ), ALLTRIM(cFont)
+   METHOD StyleSetFont( cFont )           INLINE ::SendMessage( SCI_STYLESETFONT, STYLE_DEFAULT, cFont )
+   METHOD StyleGetFont( cFont )           INLINE cFont := SPACE(255), ::SendMessage( SCI_STYLEGETFONT, STYLE_DEFAULT, @cFont ), ALLTRIM(cFont)
 
-   METHOD StyleSetSize( nSize )     INLINE ::SendMessage( SCI_STYLESETSIZE, STYLE_DEFAULT, nSize )
-   METHOD StyleGetSize( nSize )     INLINE ::SendMessage( SCI_STYLEGETSIZE, STYLE_DEFAULT, @nSize ), nSize
+   METHOD StyleSetSize( nSize )           INLINE ::SendMessage( SCI_STYLESETSIZE, STYLE_DEFAULT, nSize )
+   METHOD StyleGetSize( nSize )           INLINE ::SendMessage( SCI_STYLEGETSIZE, STYLE_DEFAULT, @nSize ), nSize
 
-   METHOD SelectDocument( pDoc )    INLINE ::SendMessage( SCI_SETDOCPOINTER, 0, pDoc )
-   METHOD OnDestroy()               INLINE aEval( ::aDocs, {|oDoc| oDoc:Close() } ), FreeLibrary( ::hSciLib ), NIL
+   METHOD SetLexer( nLexer )              INLINE ::SendMessage( SCI_SETLEXER, nLexer )   
+
+   METHOD SelectDocument( pDoc )          INLINE ::SendMessage( SCI_SETDOCPOINTER, 0, pDoc )
+   METHOD OnDestroy()                     INLINE aEval( ::aDocs, {|oDoc| oDoc:Close() } ), FreeLibrary( ::hSciLib ), NIL
    METHOD OnParentNotify()
-   METHOD OnSetFocus()              INLINE ::SendMessage( SCI_SETFOCUS, 1, 0 )
+   METHOD OnSetFocus()                    INLINE ::SendMessage( SCI_SETFOCUS, 1, 0 )
 
+   METHOD StyleSetFore( nStyle, nColor )  INLINE ::SendMessage( SCI_STYLESETFORE, nStyle, nColor )
+   METHOD StyleSetBack( nStyle, nColor )  INLINE ::SendMessage( SCI_STYLESETBACK, nStyle, nColor )
+  
    METHOD OnFindNext()
    METHOD OnReplace()
    METHOD OnReplaceAll()
@@ -6449,6 +6454,10 @@ RETURN Self
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS SourceEditor
    ::Super:Create()
+   ::SetLexer( SCLEX_CONTAINER )
+   ::StyleSetFore( STYLE_DEFAULT, RGB(255,255,255) )
+   ::StyleSetBack( STYLE_DEFAULT, RGB(  0,  0,  0) )
+
    ::StyleSetFont( "Courier New" )
    ::StyleSetSize( 10 )
 RETURN Self
@@ -6482,7 +6491,8 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
 //      CASE hdr:code == SCN_CHARADDED
            //scn := (struct SCNOTIFICATION*) nlParam
 
-//       CASE hdr:code == SCN_STYLENEEDED
+       CASE hdr:code == SCN_STYLENEEDED
+           view "SCN_STYLENEEDED"
 //            scn := (struct SCNOTIFICATION*) nlParam
 
 //            nLineNumber := ::Source:LineFromPosition( ::Source:GetEndStyled() )
@@ -6709,7 +6719,8 @@ CLASS Source
    METHOD SetUseTabs( nUseTabs )              INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SETUSETABS, nUseTabs, 0 )
    METHOD AppendText( cText )                 INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_APPENDTEXT, Len(cText), cText )
    METHOD UsePopUp( n )                       INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_USEPOPUP, n )
-   
+   METHOD Colorise( nStart, nEnd )            INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_COLOURISE, if(nStart==nil,0,nStart), if(nEnd==nil,::GetTextLen(),nEnd) )
+
    METHOD SetText()
    METHOD FindInPos()
    METHOD ReplaceAll()
@@ -6812,6 +6823,7 @@ RETURN ::SearchInTarget( Len( cText ), cText )
 METHOD SetText( cText ) CLASS Source
    ::ChkDoc()
    ::Owner:SendMessage( SCI_SETTEXT, 0, cText )
+   ::Colorise()
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
