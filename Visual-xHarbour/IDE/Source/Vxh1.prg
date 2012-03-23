@@ -40,6 +40,11 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 #define MCS_PASTE    11
 #define MCS_DRAGGING 12
 
+#define SCE_STYLE_ORANGE  11
+#define SCE_STYLE_PURPLE  12
+#define SCE_STYLE_BLUE    13
+
+
 #define DG_ADDCONTROL      1
 #define DG_DELCONTROL      2
 #define DG_PROPERTYCHANGED 3
@@ -6464,7 +6469,7 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
-   LOCAL cText, n//, scn, nLineNumber, nStartPos
+   LOCAL cText, n, scn, nLineNumber, nStartPos, nLineLen
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == SCN_UPDATEUI
@@ -6492,18 +6497,20 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
            //scn := (struct SCNOTIFICATION*) nlParam
 
        CASE hdr:code == SCN_STYLENEEDED
-           view "SCN_STYLENEEDED"
-//            scn := (struct SCNOTIFICATION*) nlParam
+            scn := (struct SCNOTIFICATION*) nlParam
+            nLineNumber := ::Source:LineFromPosition( ::Source:GetEndStyled() )
+            nLineLen    := ::SendMessage( SCI_LINELENGTH, nLineNumber )
+            nStartPos   := ::Source:PositionFromLine( nLineNumber )
 
-//            nLineNumber := ::Source:LineFromPosition( ::Source:GetEndStyled() )
-//            nStartPos   := ::Source:PositionFromLine( nLineNumber )
-//            ::SetStyle( nStartPos, scn:position )
+            ::SendMessage( SCI_STARTSTYLING, nStartPos, 0x1f )
+            ::SendMessage( SCI_SETSTYLING, nLineLen, SCE_STYLE_ORANGE )
    ENDCASE
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD SetStyle( nStartPos, nPos ) CLASS SourceEditor
    (nStartPos, nPos)
+   
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
