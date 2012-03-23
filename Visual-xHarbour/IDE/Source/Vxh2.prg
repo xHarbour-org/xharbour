@@ -178,6 +178,7 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
                         "//---------------------------------------- End of system code ----------------------------------------//" + CRLF + CRLF
 
       ::Editor:SetText( cInitialBuffer )
+      ::Editor:EmptyUndoBuffer()
       ::Editor:Modified := .T.
    ENDIF
    //::Editor:SetExtension( "prg" )
@@ -191,6 +192,7 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
       cMain := STRTRAN( cMain, "RETURN NIL"+ CRLF, cProject )
 
       ::Application:ProjectPrgEditor:SetText( cMain )
+      ::Application:ProjectPrgEditor:EmptyUndoBuffer()
       ::Application:ProjectPrgEditor:Modified := .T.
    ENDIF
 

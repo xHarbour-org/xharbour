@@ -394,6 +394,7 @@ RETURN NIL
 
 METHOD OnClose() CLASS IDE_MainForm
    LOCAL aSize, pWp, hKey, cName, cType, xData, n, aVal, hSub
+   ::Application:Yield()
    IF ! ::Application:Project:Close(,.T.)
       RETURN 0
    ENDIF
@@ -630,7 +631,7 @@ METHOD Init() CLASS IDE_MainForm
                :ShortCutKey:Ctrl  := .T.
                :ShortCutKey:Shift := .T.
                :ShortCutKey:Key   := ASC( "N" )
-               :Action            := {|| ::Application:Project:New() }
+               :Action            := {|| ::Application:Project:NewProject() }
                :Create()
             END
 
@@ -1076,7 +1077,7 @@ METHOD Init() CLASS IDE_MainForm
          :ImageIndex   := 26
          :ToolTip:Text := "New"
          :DropDown     := 2
-         :Action       := {|| ::Application:Project:New() }
+         :Action       := {|| ::Application:Project:NewProject() }
          :ImageList    := :Parent:ImageList
          :Create()
 
@@ -1087,7 +1088,7 @@ METHOD Init() CLASS IDE_MainForm
             :ShortCutKey:Ctrl  := .T.
             :ShortCutKey:Shift := .T.
             :ShortCutKey:Key   := ASC( "N" )
-            :Action            := {|| ::Application:Project:New() }
+            :Action            := {|| ::Application:Project:NewProject() }
             :Create()
          END
 
@@ -1820,7 +1821,7 @@ METHOD Init() CLASS IDE_MainForm
                :Left        := 30
                :Top         := :Parent:Height - 25
                :Transparent := .T.
-               :Action      := {|| ::Application:Project:New() }
+               :Action      := {|| ::Application:Project:NewProject() }
                :Font:Bold   := .F.
                :Create()
             END
@@ -2318,7 +2319,7 @@ CLASS Project
    METHOD LoadForm()
    METHOD LoadUnloadedImages()
    METHOD ParseRC()
-   METHOD New()
+   METHOD NewProject()
    METHOD OpenDesigner()
    METHOD SetCaption( lMod )
    METHOD SelectWindow()
@@ -2428,7 +2429,7 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 
-METHOD New() CLASS Project
+METHOD NewProject() CLASS Project
    LOCAL cProject, cPath, cPro, cName, nPro
 
 //   n := 1 - b
@@ -2477,6 +2478,7 @@ METHOD New() CLASS Project
 
    ::Application:ProjectPrgEditor := Source( ::Application:SourceEditor )
    ::Application:ProjectPrgEditor:SetText( cProject )
+   ::Application:ProjectPrgEditor:EmptyUndoBuffer()
    ::Application:ProjectPrgEditor:Modified := .T.
 
    ::Application:SourceTabs:Visible := .T.
@@ -2497,6 +2499,7 @@ METHOD New() CLASS Project
    ::Modified := .T.
 
    ::Application:EditorPage:Select()
+   ::Application:SourceEditor:SetFocus()
    ::EditReset(1)
    EVAL( ::Application:MainTab:OnSelChanged, NIL, NIL, 3)
 
@@ -6390,7 +6393,7 @@ CLASS SourceEditor INHERIT Control
    DATA hSciLib  PROTECTED
    DATA xSource  PROTECTED
 
-   ASSIGN Source(o) INLINE IIF( ::xSource != NIL, ::xSource:SavePos(),), o:Select()
+   ASSIGN Source(o) INLINE IIF( ::xSource != NIL, ::xSource:SavePos(),), IIF( o != NIL, o:Select(),)
    ACCESS Source    INLINE ::xSource
    
    DATA aDocs        EXPORTED INIT {}
@@ -6476,7 +6479,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
               ::Application:Project:Modified := .T.
            ENDIF
 
-      CASE hdr:code == SCN_CHARADDED
+//      CASE hdr:code == SCN_CHARADDED
            //scn := (struct SCNOTIFICATION*) nlParam
 
 //       CASE hdr:code == SCN_STYLENEEDED
@@ -6724,19 +6727,24 @@ METHOD Init( oOwner, cFile ) CLASS Source
       ::Path     := SUBSTR( cFile, 1, n-1 )
       ::File     := cFile
    ENDIF
+   AADD( ::Owner:aDocs, Self )
    ::Select()
    ::SetUseTabs(0)
    ::SetTabWidth(3)
    ::UsePopUp(0)
-   AADD( ::Owner:aDocs, Self )
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Close() CLASS Source
    LOCAL n
-   ::ReleaseDocument()
    IF ( n := ASCAN( ::Owner:aDocs, {|o| o:pSource==::pSource} ) ) > 0
+      ::ReleaseDocument()
       ADEL( ::Owner:aDocs, n, .T. )
+      IF ( n := ASCAN( ::Owner:aDocs, {|o| o:pSource==::GetCurDoc() } ) ) > 0
+         ::Owner:Source := ::Owner:aDocs[n]
+      ELSE
+         ::Owner:Source := NIL
+      ENDIF
       RETURN .T.
    ENDIF
 RETURN .F.
