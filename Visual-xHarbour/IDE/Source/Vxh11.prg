@@ -41,6 +41,44 @@ CLASS SourceEditor INHERIT Control
    ASSIGN oEditor(o) INLINE ::Source(o)
    //---------------------------------------------------------------------------------------
 
+   DATA fn           EXPORTED
+   DATA ptr          EXPORTED
+   
+   DATA cExp0        EXPORTED INIT  "a abbr acronym address applet area b base basefont "+;
+                                    "bdo big blockquote body br button caption center "+;
+                                    "cite code col colgroup dd del dfn dir div dl dt em "+;
+                                    "fieldset font form frame frameset h1 h2 h3 h4 h5 h6 "+;
+                                    "head hr html i iframe img input ins isindex kbd label "+;
+                                    "legend li link map menu meta noframes noscript "+;
+                                    "object ol optgroup option p param pre q s samp "+;
+                                    "script select small span strike strong style sub sup "+;
+                                    "table tbody td textarea tfoot th thead title tr tt u ul "+;
+                                    "var xmlns "+;
+                                    "abbr accept-charset accept accesskey action align alink "+;
+                                    "alt archive axis background bgcolor border "+;
+                                    "cellpadding cellspacing char charoff charset checked cite "+;
+                                    "class classid clear codebase codetype color cols colspan "+;
+                                    "compact content coords "+;
+                                    "data datafld dataformatas datapagesize datasrc datetime "+;
+                                    "declare defer dir disabled enctype "+;
+                                    "face for frame frameborder "+;
+                                    "headers height href hreflang hspace http-equiv "+;
+                                    "id ismap label lang language link longdesc "+;
+                                    "marginwidth marginheight maxlength media method multiple "+;
+                                    "name nohref noresize noshade nowrap "+;
+                                    "object onblur onchange onclick ondblclick onfocus "+;
+                                    "onkeydown onkeypress onkeyup onload onmousedown "+;
+                                    "onmousemove onmouseover onmouseout onmouseup "+;
+                                    "onreset onselect onsubmit onunload "+;
+                                    "profile prompt readonly rel rev rows rowspan rules "+;
+                                    "scheme scope shape size span src standby start style "+;
+                                    "summary tabindex target text title type usemap "+;
+                                    "valign value valuetype version vlink vspace width "+;
+                                    "text password checkbox radio submit reset "+;
+                                    "file hidden image "+;
+                                    "public !doctype xml"
+
+   DATA cExp1        EXPORTED INIT "DO CASE ENDDO ENDCASE WHILE IF ENDIF"
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -91,7 +129,15 @@ METHOD Create() CLASS SourceEditor
 
    ::Super:Create()
 
-   ::SetLexer( SCLEX_CONTAINER )
+   ::fn  := ::SendMessage( SCI_GETDIRECTFUNCTION, 0, 0 )
+   ::ptr := ::SendMessage( SCI_GETDIRECTPOINTER, 0, 0 )
+
+   ::SetLexer( SCLEX_HTML/*SCLEX_CONTAINER*/ )
+   ::SendMessage( SCI_SETSTYLEBITS, 7 )
+
+   ::SendMessage( SCI_SETKEYWORDS, 0, ::cExp0 )
+   ::SendMessage( SCI_SETKEYWORDS, 1, ::cExp1 )
+
    ::StyleSetBack( STYLE_DEFAULT, ::Color_Back )
    ::StyleSetFore( STYLE_DEFAULT, ::Color_Fore )
 
@@ -105,10 +151,14 @@ METHOD Create() CLASS SourceEditor
    ::SendMessage( SCI_STYLESETFORE, SCE_STYLE_PURPLE, RGB( 255,   0, 255 ) )
    ::SendMessage( SCI_STYLESETFORE, SCE_STYLE_BLUE,   RGB(   0,   0, 255 ) )
 
+   ::SendMessage( SCI_SETMODEVENTMASK, SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT )
+
    ::StyleSetFont( "Courier New" )
    ::StyleSetSize( 10 )
 
    ::SendMessage( SCI_STYLECLEARALL, 0, 0 )
+
+
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -148,7 +198,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
             nEndPos     := scn:position
 VIEW nEndPos
 //            nEndPos :=  ::SendMessage( EM_LINEINDEX,  nLineNumber )
-            nLineLen    := ::SendMessage( SCI_LINELENGTH, nLineNumber )
+            nLineLen    := ::SendMessage( SCI_LINELENGTH, nLineNumber-1 )
 view nLineNumber, nLineLen, nEndPos
 
             IF nLineLen > 0
@@ -445,6 +495,7 @@ METHOD Open( cFile ) CLASS Source
    ::FileName := SUBSTR( cFile, n+1 )
    ::Path     := SUBSTR( cFile, 1, n-1 )
    ::File     := cFile
+   ::SetSavePoint()
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
