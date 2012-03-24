@@ -121,7 +121,7 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
-   LOCAL cText, n, scn, nLineNumber, nStartPos, nLineLen, nEndPos, cChar
+   LOCAL cText, n, scn, nLineNumber, nStartPos, nLineLen, nEndPos, cWord
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == SCN_UPDATEUI
@@ -139,9 +139,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
 
               ::Application:SourceTabs:SetItemText( n, " " + cText + " * ", .T. )
 
-              ::Application:Props:EditUndoItem:Enabled := ::Application:Props:EditUndoBttn:Enabled := ::Source:CanUndo()
-              ::Application:Props:EditRedoItem:Enabled := ::Application:Props:EditRedoBttn:Enabled := ::Source:CanRedo()
-              
+              ::Application:Project:SetEditMenuItems()
               ::Application:Project:Modified := .T.
            ENDIF
 
@@ -149,15 +147,27 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
             scn := (struct SCNOTIFICATION*) nlParam
 
             nLineNumber := ::Source:LineFromPosition( ::Source:GetEndStyled() )
-            nStartPos   := ::Source:PositionFromLine( nLineNumber )
+            nStartPos   := ::Source:GetEndStyled()//::Source:PositionFromLine( nLineNumber )
             nEndPos     := scn:position
 
             nLineLen    := ::SendMessage( SCI_LINELENGTH, nLineNumber )
 
             IF nLineLen > 0
-               cChar := CHR( ::SendMessage( SCI_GETCHARAT, nStartPos, 0 ) )
+
+               //cChar := CHR( ::SendMessage( SCI_GETCHARAT, nStartPos, 0 ) )
+               //cWord := SPACE(n)+1
+               //::SendMessage( SCI_GETLINE, nLineNumber, cWord )
+               cWord := SUBSTR( ::Source:GetText(), nStartPos, nEndPos )
+
                ::SendMessage( SCI_STARTSTYLING, nStartPos, 31 )
 
+               IF cWord+" " IN ::cExp1
+                  ::SendMessage( SCI_SETSTYLING, LEN(cWord), SCE_STYLE_ORANGE )
+
+               ELSEIF cWord[-1] == " " .OR. ::SendMessage( SCI_GETCHARAT, nEndPos-1, 0 )==10
+                  ::SendMessage( SCI_SETSTYLING, LEN(cWord)+1, SCE_STYLE_BLACK )
+               ENDIF
+/*
                DO CASE
                   CASE cChar == "-"
                        ::SendMessage( SCI_SETSTYLING, nLineLen, SCE_STYLE_ORANGE )
@@ -168,6 +178,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                   OTHERWISE
                        ::SendMessage( SCI_SETSTYLING, nLineLen, SCE_STYLE_BLACK )
                END
+*/
             ENDIF
 
    ENDCASE
