@@ -121,7 +121,7 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
-   LOCAL cText, n, scn, nLineNumber, nStartPos, nLineLen, nEndPos, cWord
+   LOCAL cText, n, scn, nLineNumber, nStartPos, nLineLen, nEndPos, aWords, cAllText, cWord
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == SCN_UPDATEUI
@@ -147,40 +147,35 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
             scn := (struct SCNOTIFICATION*) nlParam
 
             nLineNumber := ::Source:LineFromPosition( ::Source:GetEndStyled() )
-            nStartPos   := ::Source:GetEndStyled()//::Source:PositionFromLine( nLineNumber )
+            nStartPos   := ::Source:GetEndStyled()
             nEndPos     := scn:position
 
             nLineLen    := ::SendMessage( SCI_LINELENGTH, nLineNumber )
 
             IF nLineLen > 0
+               cAllText := ::Source:GetText()
 
-               //cChar := CHR( ::SendMessage( SCI_GETCHARAT, nStartPos, 0 ) )
-               //cWord := SPACE(n)+1
-               //::SendMessage( SCI_GETLINE, nLineNumber, cWord )
-               cWord := SUBSTR( ::Source:GetText(), nStartPos, nEndPos )
+               cText := SUBSTR( cAllText, nStartPos, nEndPos )
+               
+               cText  := StrTran( cText, CRLF, "  ")
+               cText  := StrTran( cText, " ", "|")
+               aWords := hb_aTokens( cText, "|" )
+               
+               FOR EACH cWord IN aWords
+                   IF ! EMPTY( cWord )
+                      ::SendMessage( SCI_STARTSTYLING, nStartPos, 31 )
+                      IF cWord IN ::cExp1
+                         ::SendMessage( SCI_SETSTYLING, LEN( cWord )+1, SCE_STYLE_ORANGE )
+                       ELSE
+                         ::SendMessage( SCI_SETSTYLING, LEN( cWord )+1, SCE_STYLE_BLACK )
+                      ENDIF
+                      nStartPos += LEN( cWord )+1
+                    ELSE
+                      nStartPos++
+                   ENDIF
+               NEXT
 
-               ::SendMessage( SCI_STARTSTYLING, nStartPos, 31 )
-
-               IF cWord+" " IN ::cExp1
-                  ::SendMessage( SCI_SETSTYLING, LEN(cWord), SCE_STYLE_ORANGE )
-
-               ELSEIF cWord[-1] == " " .OR. ::SendMessage( SCI_GETCHARAT, nEndPos-1, 0 )==10
-                  ::SendMessage( SCI_SETSTYLING, LEN(cWord)+1, SCE_STYLE_BLACK )
-               ENDIF
-/*
-               DO CASE
-                  CASE cChar == "-"
-                       ::SendMessage( SCI_SETSTYLING, nLineLen, SCE_STYLE_ORANGE )
-                  CASE cChar == "/"
-                       ::SendMessage( SCI_SETSTYLING, nLineLen, SCE_STYLE_PURPLE )
-                  CASE cChar == "*"
-                       ::SendMessage( SCI_SETSTYLING, nLineLen, SCE_STYLE_BLUE )
-                  OTHERWISE
-                       ::SendMessage( SCI_SETSTYLING, nLineLen, SCE_STYLE_BLACK )
-               END
-*/
             ENDIF
-
    ENDCASE
 RETURN NIL
 
