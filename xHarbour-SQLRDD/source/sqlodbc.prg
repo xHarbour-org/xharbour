@@ -290,6 +290,10 @@ METHOD IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cD
          If (nLen == 2000 .or. nLen == 4000) .and. SR_SetNwgCompat()
             nType := SQL_FAKE_LOB
          EndIf
+         
+         if  ::nSystemID == SYSTEMID_ORACLE  .and. nLen == 19 .and. (nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP  .or. nType == SQL_DATETIME)
+             nType := SQL_DATE
+         ENDIF    
 
          cName     := upper(alltrim( cName ))
          cType     := ::SQLType( nType, cName, nLen )

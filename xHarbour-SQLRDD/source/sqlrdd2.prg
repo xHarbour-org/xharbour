@@ -1942,11 +1942,11 @@ METHOD Quoted( uData, trim, nLen, nDec, nTargetDB, lSynthetic )   CLASS SR_WORKA
    EndIf
 
    Do Case
-   Case cType $ "CM" .and. nSystemID == SYSTEMID_POSTGR .and. (!trim)
-      return [E'] + rtrim(SR_ESCAPESTRING(uData, nSystemID)) + [']   
+   Case cType $ "CM" .and. ::oSql:nSystemID == SYSTEMID_POSTGR .and. (!trim)
+      return [E'] + rtrim(SR_ESCAPESTRING(uData, ::oSql:nSystemID)) + [']   
    Case cType $ "CM" .and. (!trim)
       return ['] + SR_ESCAPESTRING(uData, ::oSql:nSystemID) + [']
-   Case cType $ "CM" .and. nSystemID == SYSTEMID_POSTGR .and. trim
+   Case cType $ "CM" .and. ::oSql:nSystemID == SYSTEMID_POSTGR .and. trim
       return [E'] + rtrim(SR_ESCAPESTRING(uData, ::oSql:nSystemID)) + [']      
    Case cType $ "CM" .and. trim
       return ['] + rtrim(SR_ESCAPESTRING(uData, ::oSql:nSystemID)) + [']

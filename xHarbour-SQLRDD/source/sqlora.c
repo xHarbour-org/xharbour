@@ -938,10 +938,10 @@ void * hb_xreallocDebug( int iline, void * p, ULONG ulSize )
  */
 
 #ifdef _MSC_VER
-#define strdupx _strdup
+#define strdupx hb_strdup
 #else
 extern char * strdup __P((const char *s));
-#define strdupx strdup
+#define strdupx hb_strdup
 #endif
 
 #else

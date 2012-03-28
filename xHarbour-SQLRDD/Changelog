@@ -8,10 +8,14 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2012-03-12  06:13 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+2012-03-28  06:13 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
   * source\sqlgen1.prg
   * source\sqlrdd2.prg   
     ! updated SR_SQLQuotedString and and methods Quoted and QuotedNull to escape character as per postgresql docs ( Added E on from os string)
+  * source\sqlodbc.prg
+    ! redirect (nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP  .or. nType == SQL_DATETIME) to SQL_DATE under oracle when nlen == 19
+  * source\sqlora.c
+    ! strdup    -> hb_strdup
     
 2012-01-29 17:12 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xHarbour-SQLRDD/source/compat.h
