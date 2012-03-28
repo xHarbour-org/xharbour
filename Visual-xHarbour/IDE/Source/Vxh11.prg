@@ -8,22 +8,13 @@
 #include "debug.ch"
 #include "commdlg.ch"
 #include "Scintilla.ch"
+#include "SciLexer.ch"
 #include "fileio.ch"
 
-#define XFM_EOL Chr(13) + Chr(10)
+#define MARGIN_SCRIPT_FOLD_INDEX  2
 
-#define SCE_STYLE_NORMALTEXT   10
-#define SCE_STYLE_KEYWORDS_1   11
-#define SCE_STYLE_KEYWORDS_2   12
-#define SCE_STYLE_KEYWORDS_3   13
-#define SCE_STYLE_KEYWORDS_4   14
-#define SCE_STYLE_KEYWORDS_5   15
-#define SCE_STYLE_KEYWORDS_6   16
-#define SCE_STYLE_KEYWORDS_7   17
-#define SCE_STYLE_OPERATORS    18
-#define SCE_STYLE_COMMENTS     19
-#define SCE_STYLE_STRINGS      20
-#define SCE_STYLE_BRACKETS     21
+
+#define EOL Chr(13) + Chr(10)
 
 //------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -48,31 +39,24 @@ CLASS SourceEditor INHERIT Control
    ASSIGN oEditor(o) INLINE ::Source(o)
    //---------------------------------------------------------------------------------------
 
-   DATA aSeps        EXPORTED INIT {32}
-   DATA aOperators   EXPORTED INIT {"+", "-", "*", "/", "=", "%", "$", "^", "&", ":"}
-   DATA aBrackets    EXPORTED INIT {"{", "}", "(", ")", "[", "]"}
-   DATA aKeyWords1   EXPORTED INIT {"SendMessage"}
-   DATA aKeyWords2   EXPORTED INIT {"DO", "CASE", "ENDDO", "ENDCASE", "WHILE", "IF", "ENDIF", "ELSE", "FOR", "NEXT", "ELSEIF", "WITH", "OBJECT"}
-   DATA aKeyWords3   EXPORTED INIT {}
-   DATA aKeyWords4   EXPORTED INIT {}
-   DATA aKeyWords5   EXPORTED INIT {}
-   DATA aKeyWords6   EXPORTED INIT {}
-   DATA aKeyWords7   EXPORTED INIT {}
+   DATA KeyWords1         EXPORTED INIT ""
+   DATA KeyWords2         EXPORTED INIT ""
+   DATA KeyWords3         EXPORTED INIT ""
+   DATA KeyWords4         EXPORTED INIT ""
 
-   DATA ColorNormalText  EXPORTED INIT RGB( 255, 255, 255 )
-   DATA ColorBackGround  EXPORTED INIT RGB(   0,   0,   0 )
+   DATA ColorNormalText   EXPORTED
+   DATA ColorBackGround   EXPORTED
 
-   DATA ColorStrings     EXPORTED INIT RGB(   0, 128, 128 )
-   DATA ColorBrackets    EXPORTED INIT RGB(   0,   0, 255 )
-   DATA ColorComments    EXPORTED INIT RGB( 255, 255,   0 )
-   DATA ColorOperators   EXPORTED INIT RGB( 255,   0,   0 )
-   DATA ColorKeyWords1   EXPORTED INIT RGB( 255, 128,   0 )
-   DATA ColorKeyWords2   EXPORTED INIT RGB( 255,   0, 255 )
-   DATA ColorKeyWords3   EXPORTED INIT RGB(   0,   0, 255 )
-   DATA ColorKeyWords4   EXPORTED
-   DATA ColorKeyWords5   EXPORTED
-   DATA ColorKeyWords6   EXPORTED
-   DATA ColorKeyWords7   EXPORTED
+   DATA ColorNumbers      EXPORTED
+   DATA ColorStrings      EXPORTED
+   DATA ColorComments     EXPORTED
+   DATA ColorOperators    EXPORTED
+   DATA ColorPreprocessor EXPORTED
+
+   DATA ColorKeywords1    EXPORTED
+   DATA ColorKeywords2    EXPORTED
+   DATA ColorKeywords3    EXPORTED
+   DATA ColorKeywords4    EXPORTED
 
 
    METHOD Init() CONSTRUCTOR
@@ -87,26 +71,28 @@ CLASS SourceEditor INHERIT Control
    METHOD SetLexer( nLexer )              INLINE ::SendMessage( SCI_SETLEXER, nLexer, 0 )   
 
    METHOD SelectDocument( pDoc )          INLINE ::SendMessage( SCI_SETDOCPOINTER, 0, pDoc )
-   METHOD OnDestroy()                     INLINE aEval( ::aDocs, {|oDoc| oDoc:Close() } ), FreeLibrary( ::hSciLib ), NIL
+   METHOD OnDestroy()
    METHOD OnParentNotify()
    METHOD OnSetFocus()                    INLINE ::SendMessage( SCI_SETFOCUS, 1, 0 )
 
    METHOD StyleSetFore( nStyle, nColor )  INLINE ::SendMessage( SCI_STYLESETFORE, nStyle, nColor )
    METHOD StyleSetBack( nStyle, nColor )  INLINE ::SendMessage( SCI_STYLESETBACK, nStyle, nColor )
+   METHOD OnTimer()                       INLINE ::CallWindowProc(), 0
   
    METHOD OnFindNext()
    METHOD OnReplace()
    METHOD OnReplaceAll()
    
    METHOD GetSearchFlags()
-   METHOD SetTextStyle()
    METHOD FindNext()
    METHOD EnsureRangeVisible()
-   METHOD FormatText()
+   METHOD OnLButtonUp()
+   METHOD OnKeyUp()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS SourceEditor
+   LOCAL nKey, cKey, n, cText, cSyntax := ::Application:Path + "\vxh.syn"
    ::hSciLib := LoadLibrary( "SciLexer.dll" )
    ::__xCtrlName := "SourceEditor"
    ::ClsName := "Scintilla"
@@ -115,206 +101,206 @@ METHOD Init( oParent ) CLASS SourceEditor
    ::EventHandler[ "OnFindNext" ]   := "OnFindNext"
    ::EventHandler[ "OnReplace" ]    := "OnReplace"
    ::EventHandler[ "OnReplaceAll" ] := "OnReplaceAll"
+   
+   IF FILE( cSyntax )
+      cText := MemoRead( cSyntax )
+      nKey  := 2
+      WHILE ( n := AT( "[Keywords"+xStr(nKey)+"]", cText ) ) > 0
+         cKey := "Keywords"+xStr(nKey-1)
+         __objSendMsg( Self, "_"+cKey, SUBSTR( cText, 13, n-1 ) )
+         nKey++
+      ENDDO
+   ENDIF
+
+   ::ColorNormalText   := ::Application:IniFile:ReadInteger( "Colors", "NormalText",   ::System:Color:Black          )
+   ::ColorBackGround   := ::Application:IniFile:ReadInteger( "Colors", "BackGround",   ::System:Color:White          ) 
+
+   ::ColorNumbers      := ::Application:IniFile:ReadInteger( "Colors", "Numbers",      ::System:Color:Green          )
+   ::ColorStrings      := ::Application:IniFile:ReadInteger( "Colors", "Strings",      ::System:Color:Teal           )
+   ::ColorComments     := ::Application:IniFile:ReadInteger( "Colors", "Comments",     ::System:Color:Gray           )
+   ::ColorOperators    := ::Application:IniFile:ReadInteger( "Colors", "Operators",    ::System:Color:DarkOliveGreen )
+   ::ColorPreprocessor := ::Application:IniFile:ReadInteger( "Colors", "Preprocessor", ::System:Color:Tomato         )
+
+   ::ColorKeywords1    := ::Application:IniFile:ReadInteger( "Colors", "Keywords1",    ::System:Color:Maroon         )
+   ::ColorKeywords2    := ::Application:IniFile:ReadInteger( "Colors", "Keywords2",    ::System:Color:DarkCyan       )
+   ::ColorKeywords3    := ::Application:IniFile:ReadInteger( "Colors", "Keywords3",    ::System:Color:SteelBlue      )
+   ::ColorKeywords4    := ::Application:IniFile:ReadInteger( "Colors", "Keywords4",    ::System:Color:DarkSlateGray  ) 
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS SourceEditor
    ::Super:Create()
 
-   ::SetLexer( SCLEX_CONTAINER )
+   ::SendMessage( SCI_SETLEXER, SCLEX_FLAGSHIP )
+
+   ::SendMessage( SCI_SETSTYLEBITS, 7)
 
    ::StyleSetBack( STYLE_DEFAULT, ::ColorBackground )
    ::StyleSetFore( STYLE_DEFAULT, ::ColorNormalText )
 
-   ::StyleSetFont( "Courier New" )
+   ::StyleSetFont( "FixedSys" )
    ::StyleSetSize( 10 )
 
    ::SendMessage( SCI_STYLECLEARALL, 0, 0 )
 
+   ::SendMessage( SCI_SETKEYWORDS, 0, ::Keywords1 )
+   ::SendMessage( SCI_SETKEYWORDS, 1, ::Keywords2 )
+   ::SendMessage( SCI_SETKEYWORDS, 2, ::Keywords3 )
+   ::SendMessage( SCI_SETKEYWORDS, 3, ::Keywords4 )
+
+   ::SendMessage( SCI_STYLESETFORE, SCE_FS_KEYWORD,        ::ColorKeywords1 )
+   ::SendMessage( SCI_STYLESETFORE, SCE_FS_KEYWORD2,       ::ColorKeywords2 )
+   ::SendMessage( SCI_STYLESETFORE, SCE_FS_KEYWORD3,       ::ColorKeywords3 )
+   ::SendMessage( SCI_STYLESETFORE, SCE_FS_KEYWORD4,       ::ColorKeywords4 )
+
+
+   ::SendMessage( SCI_STYLESETFORE, SCE_FS_COMMENT,        ::ColorComments  )
+   ::SendMessage( SCI_STYLESETFORE, SCE_FS_COMMENTLINE,    ::ColorComments  )
+   ::SendMessage( SCI_STYLESETFORE, SCE_FS_COMMENTDOC,     ::ColorComments  )
+   ::SendMessage( SCI_STYLESETFORE, SCE_FS_COMMENTLINEDOC, ::ColorComments  )
+   ::SendMessage( SCI_STYLESETFORE, SCE_FS_OPERATOR,       ::ColorOperators )
+   ::SendMessage( SCI_STYLESETFORE, SCE_FS_STRING,         ::ColorStrings   )
+   ::SendMessage( SCI_STYLESETFORE, SCE_FS_NUMBER,         ::ColorNumbers   )
+   ::SendMessage( SCI_STYLESETFORE, SCE_FS_PREPROCESSOR,   ::ColorPreprocessor )
+
    ::SendMessage( SCI_SETCARETFORE, ::ColorNormalText )
-   ::SendMessage( SCI_SETCARETPERIOD, 700 )
+   ::SendMessage( SCI_SETCARETPERIOD, 500, 0 )
+   
    ::SendMessage( SCI_SETCARETWIDTH, 2 )
    ::SendMessage( SCI_SETCARETSTYLE, 1 )
 
-   ::SendMessage( SCI_STYLESETFORE, SCE_STYLE_NORMALTEXT, ::ColorNormalText )
-   ::SendMessage( SCI_STYLESETFORE, SCE_STYLE_OPERATORS,  ::ColorOperators )
-   ::SendMessage( SCI_STYLESETFORE, SCE_STYLE_COMMENTS,   ::ColorComments )
-   ::SendMessage( SCI_STYLESETFORE, SCE_STYLE_STRINGS,    ::ColorStrings )
-   ::SendMessage( SCI_STYLESETFORE, SCE_STYLE_BRACKETS,   ::ColorBrackets )
-   ::SendMessage( SCI_STYLESETFORE, SCE_STYLE_KEYWORDS_1, ::ColorKeyWords1 )
-   ::SendMessage( SCI_STYLESETFORE, SCE_STYLE_KEYWORDS_2, ::ColorKeyWords2 )
-   ::SendMessage( SCI_STYLESETFORE, SCE_STYLE_KEYWORDS_3, ::ColorKeyWords3 )
+   __SetFolding( ::hWnd, "fold", "1" )
+   __SetFolding( ::hWnd, "fold.compact", "0" )
+   __SetFolding( ::hWnd, "fold.comment", "0" )
+   __SetFolding( ::hWnd, "fold.preprocessor", "0" )
+   __SetFolding( ::hWnd, "fold.directive", "0" )
 
-   ::SendMessage( SCI_SETMODEVENTMASK, SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT )
+   ::SendMessage( SCI_COLOURISE, 0, -1 )
 
+   ::SendMessage( SCI_SETMARGINWIDTHN, 1, 15 )
+   ::SendMessage( SCI_SETMARGINTYPEN,  MARGIN_SCRIPT_FOLD_INDEX, SC_MARGIN_SYMBOL )
+   ::SendMessage( SCI_SETMARGINWIDTHN, MARGIN_SCRIPT_FOLD_INDEX, 14 )
+   ::SendMessage( SCI_SETMARGINMASKN,  MARGIN_SCRIPT_FOLD_INDEX, SC_MASK_FOLDERS )
+
+
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDER,        SC_MARK_BOXPLUS  )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEROPEN,    SC_MARK_BOXMINUS )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERSUB,     SC_MARK_VLINE    )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEROPENMID, SC_MARK_VLINE    )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERMIDTAIL, SC_MARK_VLINE    )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERTAIL,    SC_MARK_VLINE    )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEREND,     SC_MARK_LCORNER  )
+
+   ::SendMessage( SCI_MARKERSETFORE, SC_MARKNUM_FOLDER,        RGB( 255, 255, 255 ) )
+   ::SendMessage( SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPEN,    RGB( 255, 255, 255 ) )
+   ::SendMessage( SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPENMID, RGB( 255, 255, 255 ) )
+   ::SendMessage( SCI_MARKERSETFORE, SC_MARKNUM_FOLDERSUB,     RGB( 255, 255, 255 ) )
+   ::SendMessage( SCI_MARKERSETFORE, SC_MARKNUM_FOLDERMIDTAIL, RGB( 255, 255, 255 ) )
+   ::SendMessage( SCI_MARKERSETFORE, SC_MARKNUM_FOLDERTAIL,    RGB( 255, 255, 255 ) )
+   ::SendMessage( SCI_MARKERSETFORE, SC_MARKNUM_FOLDEREND,     RGB( 255, 255, 255 ) )
+
+   ::SendMessage( SCI_MARKERSETBACK, SC_MARKNUM_FOLDER,        RGB( 128, 128, 128 ) )
+   ::SendMessage( SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPEN,    RGB( 128, 128, 128 ) )
+   ::SendMessage( SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPENMID, RGB( 128, 128, 128 ) )
+   ::SendMessage( SCI_MARKERSETBACK, SC_MARKNUM_FOLDERSUB,     RGB( 128, 128, 128 ) )
+   ::SendMessage( SCI_MARKERSETBACK, SC_MARKNUM_FOLDERMIDTAIL, RGB( 128, 128, 128 ) )
+   ::SendMessage( SCI_MARKERSETBACK, SC_MARKNUM_FOLDERTAIL,    RGB( 128, 128, 128 ) )
+   ::SendMessage( SCI_MARKERSETBACK, SC_MARKNUM_FOLDEREND,     RGB( 128, 128, 128 ) )
+
+   ::SendMessage( SCI_SETFOLDFLAGS, 16, 0)
+   ::SendMessage( SCI_SETMARGINSENSITIVEN, MARGIN_SCRIPT_FOLD_INDEX, 1 )
+
+   ::SendMessage( SCI_SETINDENTATIONGUIDES, 1, 0)
+   ::SendMessage( SCI_SETHIGHLIGHTGUIDE, 30, 0)
+
+   ::SendMessage( SCI_SETMODEVENTMASK, SC_MOD_CHANGEFOLD | SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT | SC_PERFORMED_UNDO | SC_PERFORMED_REDO )
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
+METHOD OnLButtonUp() CLASS SourceEditor
+   ::Application:Project:EditReset()
+RETURN NIL
+
+METHOD OnKeyUp( nKey ) CLASS SourceEditor
+   IF nKey == VK_SHIFT
+      ::Application:Project:EditReset()
+    ELSEIF ::Application:Props:EditCopyItem:Enabled
+      ::Application:Props:EditCopyItem:Enabled := .F.
+      ::Application:Props:EditCopyBttn:Enabled := .F.
+      ::Application:Props:EditCutItem:Enabled := .F.
+      ::Application:Props:EditCutBttn:Enabled := .F.
+      ::Application:Props:EditDelBttn:Enabled := .F.
+   ENDIF
+RETURN NIL
+
+//------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
-   LOCAL scn, n, cText, nStartLine, nEndLine
+   LOCAL scn, n, cText, nLine//, endStyled, lineEndStyled
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == SCN_UPDATEUI
            scn := (struct SCNOTIFICATION*) nlParam
-           //IF scn:updated == SC_UPDATE_V_SCROLL
-           //ENDIF
            n := ::Source:GetCurrentPos()
            ::Application:SetEditorPos( ::Source:LineFromPosition(n)+1, ::Source:GetColumn(n)+1 )
 
       CASE hdr:code == SCN_MODIFIED
            scn := (struct SCNOTIFICATION*) nlParam
-           IF ! ::Source:FirstOpen
-              IF scn:linesadded > 0 // Paste can only do that
-                 nStartLine := ::Source:LineFromPosition( scn:position )
-                 nEndLine   := nStartLine + scn:linesadded
-                 ::FormatText( nStartLine, nEndLine )
-              ENDIF
+           IF ( scn:modificationType & SC_MOD_CHANGEFOLD ) == 0
+              IF ! ::Source:FirstOpen
+                 IF ! ::Source:Modified
+                    ::Source:Modified := .T.
+                    n := aScan( ::aDocs, ::Source,,, .T. )
 
-              IF ! ::Source:Modified
-                 ::Source:Modified := .T.
-                 n := aScan( ::aDocs, ::Source,,, .T. )
+                    cText := ::Application:SourceTabs:GetItemText(n)
+                    cText := ALLTRIM( STRTRAN( cText, "*" ) )
 
-                 cText := ::Application:SourceTabs:GetItemText(n)
-                 cText := ALLTRIM( STRTRAN( cText, "*" ) )
-
-                 ::Application:SourceTabs:SetItemText( n, " " + cText + " * ", .T. )
-
-                 ::Application:Project:SetEditMenuItems()
-                 ::Application:Project:Modified := .T.
-              ENDIF
-           ENDIF
-
-      CASE hdr:code == SCN_STYLENEEDED
-           scn := (struct SCNOTIFICATION*) nlParam
-           nStartLine := ::Source:LineFromPosition( ::Source:GetEndStyled() )
-           nEndLine   := ::Source:LineFromPosition( scn:position )
-           IF nStartLine == ::Source:GetCurLine()
-              ::FormatText( nStartLine, nEndLine )
-           ENDIF
-   ENDCASE
-RETURN 0
-
-//------------------------------------------------------------------------------------------------------------------------------------
-METHOD FormatText( nStartLine, nEndLine ) CLASS SourceEditor
-   LOCAL i, cLast, nLineLen, lString1, lString2, cWord, nPos, nChar
-   LOCAL nStartPos, nEndPos, cText, cLine, nDif //, aWords
-
-   FOR i := nStartLine TO nEndLine
-       nLineLen  := ::Source:LineLength( i )-1
-       nStartPos := ::Source:PositionFromLine( i )
-       nEndPos   := nStartPos + nLineLen
-       
-       cWord    := ""
-       cLast    := ""
-       lString1 := .F.
-       lString2 := .F.
-
-       cLine := STRTRAN( ::Source:GetLine(i), CRLF )
-       cText := LTRIM( cLine )
-       nDif  := LEN( cLine ) - LEN( cText )
-       //IF nDif > 0
-       //   ::SetTextStyle( nStartPos, space(nDif), SCE_STYLE_NORMALTEXT )
-          //nStartPos += nDif
-       //ENDIF
-
-       FOR nPos := nStartPos+nDif TO nEndPos
-           nChar := ::Source:GetCharAt(nPos)
-
-           IF ! lString1 .AND. ! lString2
-              // Format spaces
-              IF nChar IN ::aSeps
-                 ::SetTextStyle( nPos, cWord, SCE_STYLE_NORMALTEXT )
-                 cWord := ""
-                 cLast := ""
-                 LOOP
-              ENDIF
-           ENDIF
-
-           // Strings
-           IF CHR(nChar) == '"'
-              lString1 := ! lString1
-              cWord := ""
-              IF ! lString1
-                 ::SendMessage( SCI_STARTSTYLING, nPos, 31 )
-                 ::SendMessage( SCI_SETSTYLING, 1, SCE_STYLE_STRINGS )
-                 LOOP
-              ENDIF
-           ENDIF
-           IF CHR(nChar) == "'"
-              lString2 := ! lString2
-              cWord := ""
-              IF ! lString2
-                 ::SendMessage( SCI_STARTSTYLING, nPos, 31 )
-                 ::SendMessage( SCI_SETSTYLING, 1, SCE_STYLE_STRINGS )
-                 LOOP
-              ENDIF
-           ENDIF
-
-           // Comments
-           IF ! lString1 .AND. ! lString2 .AND. CHR(nChar) == "/" .AND. CHR( ::Source:GetCharAt(nPos+1) ) == "/"
-              // Comment out the rest of the line
-              ::SendMessage( SCI_STARTSTYLING, nPos, 31 )
-              ::SendMessage( SCI_SETSTYLING, nLineLen - (nPos-nStartPos)+1, SCE_STYLE_COMMENTS )
-              EXIT
-           ENDIF
-           // Operators
-           IF ! lString1 .AND. ! lString2 .AND. ASCAN( ::aOperators, CHR(nChar),,, .T. ) > 0
-              ::SetTextStyle( nPos, CHR(nChar), SCE_STYLE_OPERATORS )
-              cWord := ""
-              cLast := ""
-            ELSEIF ! lString1 .AND. ! lString2 .AND. ASCAN( ::aBrackets, CHR(nChar),,, .T. ) > 0
-              ::SetTextStyle( nPos, CHR(nChar), SCE_STYLE_BRACKETS )
-              cWord := ""
-              cLast := ""
-            ELSE
-              // Format words
-              cWord += CHR(nChar)
-              IF lString1 .OR. lString2
-                 ::SendMessage( SCI_STARTSTYLING, nPos-LEN(cWord)+1, 31 )
-                 ::SendMessage( SCI_SETSTYLING, LEN(cWord), SCE_STYLE_STRINGS )
-               ELSE
-                 IF ::SetTextStyle( nPos, cWord, NIL )
-                    cLast := cWord
-                    cWord := ""
-
-                  ELSEIF ! EMPTY( cLast ) .AND. ! EMPTY( cWord )
-                    cWord := cLast + cWord
-                    ::SetTextStyle( nPos, cWord, SCE_STYLE_NORMALTEXT )
-                    cLast := ""
-
-                  ELSEIF ! EMPTY( cWord )
-                    ::SetTextStyle( nPos, cWord, SCE_STYLE_NORMALTEXT )
+                    ::Application:SourceTabs:SetItemText( n, " " + cText + " * ", .T. )
+                    ::Application:Project:Modified := .T.
                  ENDIF
               ENDIF
+              ::Application:Project:SetEditMenuItems()
            ENDIF
-       NEXT
 
-   NEXT
+      CASE hdr:code == SCN_MARGINCLICK
+           scn := (struct SCNOTIFICATION*) nlParam
+           IF scn:margin == MARGIN_SCRIPT_FOLD_INDEX
+              nLine := ::Source:LineFromPosition( scn:position )
+              ::SendMessage( SCI_TOGGLEFOLD, nLine, 0 )
+              ::SendMessage( SCI_ENSUREVISIBLEENFORCEPOLICY, nLine )
+              ::SendMessage( SCI_GOTOLINE, nLine )
+           ENDIF
+
+      //CASE hdr:code == SCN_STYLENEEDED
+           //scn := (struct SCNOTIFICATION*) nlParam
+           //IF hdr:idFrom  ==  IDM_SRCWIN
+           //   endStyled  :=  ::SendMessage( SCI_GETENDSTYLED, 0, 0 )
+           //   lineEndStyled := ::SendMessage( EM_LINEFROMCHAR, endStyled, 0 )
+           //   endStyled  :=  ::SendMessage( EM_LINEINDEX,  lineEndStyled, 0 )
+           //   ::SendMessage( SCI_COLOURISE, endStyled, scn:position )
+           //ENDIF
+   ENDCASE
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
-METHOD SetTextStyle( nPos, cWord, nColorStyle ) CLASS SourceEditor
-   IF nColorStyle == NIL
-      IF ASCAN( ::aKeyWords1, {|c| lower(c)==lower(cWord) } ) > 0
-         nColorStyle := SCE_STYLE_KEYWORDS_1
-       ELSEIF ASCAN( ::aKeyWords2, {|c| lower(c)==lower(cWord) } ) > 0
-         nColorStyle := SCE_STYLE_KEYWORDS_2
-       ELSEIF ASCAN( ::aKeyWords3, {|c| lower(c)==lower(cWord) } ) > 0
-         nColorStyle := SCE_STYLE_KEYWORDS_3
-       ELSEIF ASCAN( ::aKeyWords4, {|c| lower(c)==lower(cWord) } ) > 0
-         nColorStyle := SCE_STYLE_KEYWORDS_4
-       ELSEIF ASCAN( ::aKeyWords5, {|c| lower(c)==lower(cWord) } ) > 0
-         nColorStyle := SCE_STYLE_KEYWORDS_5
-       ELSEIF ASCAN( ::aKeyWords6, {|c| lower(c)==lower(cWord) } ) > 0
-         nColorStyle := SCE_STYLE_KEYWORDS_6
-       ELSEIF ASCAN( ::aKeyWords7, {|c| lower(c)==lower(cWord) } ) > 0
-         nColorStyle := SCE_STYLE_KEYWORDS_7
-      ENDIF
-   ENDIF
-   ::SendMessage( SCI_STARTSTYLING, nPos-LEN(cWord)+1, 31 )
-   ::SendMessage( SCI_SETSTYLING, LEN(cWord), nColorStyle )
-RETURN nColorStyle != NIL
+METHOD OnDestroy() CLASS SourceEditor
+   ::Application:IniFile:WriteInteger( "Settings", "WrapSearch", ::Application:EditorProps:WrapSearch )
 
+   ::Application:IniFile:WriteInteger( "Colors", "NormalText",   ::ColorNormalText )
+   ::Application:IniFile:WriteInteger( "Colors", "BackGround",   ::ColorBackGround )
+
+   ::Application:IniFile:WriteInteger( "Colors", "Numbers",      ::ColorNumbers )
+   ::Application:IniFile:WriteInteger( "Colors", "Strings",      ::ColorStrings )
+   ::Application:IniFile:WriteInteger( "Colors", "Comments",     ::ColorComments )
+   ::Application:IniFile:WriteInteger( "Colors", "Operators",    ::ColorOperators )
+   ::Application:IniFile:WriteInteger( "Colors", "Preprocessor", ::ColorPreprocessor )
+
+   ::Application:IniFile:WriteInteger( "Colors", "Keywords1",    ::ColorKeywords1 )
+   ::Application:IniFile:WriteInteger( "Colors", "Keywords2",    ::ColorKeywords2 )
+   ::Application:IniFile:WriteInteger( "Colors", "Keywords3",    ::ColorKeywords3 )
+   ::Application:IniFile:WriteInteger( "Colors", "Keywords4",    ::ColorKeywords4 )
+   aEval( ::aDocs, {|oDoc| oDoc:Close() } )
+   FreeLibrary( ::hSciLib )
+RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD GetSearchFlags( oFind ) CLASS SourceEditor
@@ -440,7 +426,7 @@ CLASS Source
    DATA FirstOpen EXPORTED INIT .T.
    DATA SavedPos  EXPORTED INIT 0
    DATA Extension EXPORTED INIT "prg"
-   DATA lStyled   EXPORTED INIT .F.
+   DATA lStyled   EXPORTED INIT .T.
    // Compatibility with xedit for debugger ------------------------------------------------
    ACCESS cFile             INLINE ::FileName
    ACCESS cPath             INLINE IIF( ! EMPTY(::Path), ::Path + "\", "" )
@@ -472,11 +458,11 @@ CLASS Source
    METHOD EmptyUndoBuffer()                   INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_EMPTYUNDOBUFFER, 0, 0 )
    METHOD CanUndo()                           INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_CANUNDO, 0, 0 )==1
    METHOD CanRedo()                           INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_CANREDO, 0, 0 )==1
-   METHOD Undo()                              INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_UNDO, 0, 0 )
-   METHOD Redo()                              INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_REDO, 0, 0 )
+   METHOD Undo()                              INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_UNDO, 0, 0 )//, ::Application:Project:SetEditMenuItems()
+   METHOD Redo()                              INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_REDO, 0, 0 )//, ::Application:Project:SetEditMenuItems()
    METHOD Copy()                              INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_COPY, 0, 0 )
-   METHOD Paste()                             INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_PASTE, 0, 0 )
-   METHOD Cut()                               INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_CUT, 0, 0 )
+   METHOD Paste()                             INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_PASTE, 0, 0 )//, ::Application:Project:SetEditMenuItems()
+   METHOD Cut()                               INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_CUT, 0, 0 )//, ::Application:Project:SetEditMenuItems()
    METHOD CanPaste()                          INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_CANPASTE, 0, 0 )==1
    METHOD SetReadOnly( nSet )                 INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SETREADONLY, nSet, 0 )
    METHOD GetReadOnly()                       INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETREADONLY, 0, 0 )
@@ -509,7 +495,9 @@ CLASS Source
    METHOD SearchNext( nFlags, cText )         INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SEARCHNEXT, nFlags, cText )
    METHOD SearchPrev( nFlags, cText )         INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SEARCHPREV, nFlags, cText )
    METHOD ReplaceSel( cText )                 INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_REPLACESEL, 0, cText )
-   METHOD GetSelText( cBuffer )               INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETSELTEXT, 0, cBuffer )
+   METHOD GetSelText( cBuffer )               INLINE ::ChkDoc(), cBuffer := SPACE( ::Owner:SendMessage( SCI_GETSELTEXT, 0, 0 ) ),;
+                                                                 ::Owner:SendMessage( SCI_GETSELTEXT, 0, cBuffer ),;
+                                                                 ALLTRIM(LEFT(cBuffer,LEN(cBuffer)-1))
    METHOD SetSearchFlags( nFlags )            INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SETSEARCHFLAGS, nFlags )
    METHOD SetTargetStart( nStart )            INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SETTARGETSTART, nStart )
    METHOD SetTargetEnd( nEnd )                INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SETTARGETEND, nEnd )
@@ -575,16 +563,9 @@ RETURN .F.
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Open( cFile ) CLASS Source
-   LOCAL n, cLine, hFile
+   LOCAL n
+   ::SetText( MemoRead( cFile, .F. ) )
 
-   hFile := FOpen( cFile, FO_READ )
-   n := 0
-   WHILE HB_FReadLine( hFile, @cLine, XFM_EOL ) == 0
-      ::AppendText( cLine + CRLF )
-      ::Owner:FormatText( n, n )
-      n++
-   ENDDO
-   FClose( hFile )
    ::SetSavePoint()
    ::GotoPosition( 0 )
    ::EmptyUndoBuffer()
@@ -595,7 +576,7 @@ METHOD Open( cFile ) CLASS Source
    ::Path     := SUBSTR( cFile, 1, n-1 )
    ::File     := cFile
    ::SetSavePoint()
-   hb_gcAll(.T.)
+   ::Owner:SendMessage( SCI_COLOURISE, 0, -1 )
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -795,3 +776,7 @@ METHOD FindInTarget( cText, nStartPos, nEndPos ) CLASS Source
       nPos := ::SearchInTarget( nLen, cText )
    ENDDO
 RETURN nPos
+
+function view( cView )
+   VIEW cView
+RETURN NIL

@@ -248,7 +248,7 @@ METHOD Init( ... ) CLASS IDE
       ::ShowDocking := .T.
    ENDIF
 
-   ::EditorProps[ "WrapSearch" ] := ::IniFile:ReadInteger( "Editor", "WrapSearch", 0 )
+   ::EditorProps[ "WrapSearch" ] := ::IniFile:ReadInteger( "Settings", "WrapSearch", 0 )
 
    ::ShowGrid   := ::IniFile:ReadInteger( "General", "ShowGrid", 0 )
    ::RulerType  := ::IniFile:ReadInteger( "General", "RulerType", 1 )
@@ -867,7 +867,7 @@ METHOD Init() CLASS IDE_MainForm
             :Action     := <|o|
                              o:Checked := ! o:Checked
                              ::Application:EditorProps:WrapSearch := IIF( o:Checked, 1, 0 )
-                             ::Application:IniFile:WriteInteger( "Editor", "WrapSearch", ::Application:EditorProps:WrapSearch )
+                             ::Application:IniFile:WriteInteger( "Settings", "WrapSearch", ::Application:EditorProps:WrapSearch )
                            >
             :Create()
          END
@@ -2404,7 +2404,7 @@ METHOD EditReset(n) CLASS Project
       ENDIF
     ELSE
       lCopied   := IsClipboardFormatAvailable( CF_TEXT )
-      lSelected := ::Application:SourceEditor:Source:GetSelectionStart() > 0
+      lSelected := LEN( ::Application:SourceEditor:Source:GetSelText() ) > 0
    ENDIF
    ::Application:Props[ "EditPasteItem" ]:Enabled := lCopied
    ::Application:Props[ "EditPasteBttn" ]:Enabled := lCopied
@@ -3085,12 +3085,8 @@ METHOD Undo() CLASS Project
       ::SetAction( ::aUndo, ::aRedo )
     ELSEIF ::Application:SourceEditor:IsWindowVisible()
       ::Application:SourceEditor:Source:Undo()
-      ::Application:SourceEditor:Source:Modified := .T.
-
-      ::Modified := .T.
-      ::SetEditMenuItems()
    ENDIF
-RETURN 0
+RETURN NIL
 
 METHOD ReDo() CLASS Project
    IF UPPER( GetClassName( GetFocus() ) ) == "EDIT"
@@ -3101,12 +3097,8 @@ METHOD ReDo() CLASS Project
       ::SetAction( ::aRedo, ::aUnDo )
     ELSEIF ::Application:SourceEditor:IsWindowVisible()
       ::Application:SourceEditor:Source:Redo()
-      ::Application:SourceEditor:Source:Modified := .T.
-      
-      ::Modified := .T.
-      ::SetEditMenuItems()
    ENDIF
-RETURN 0
+RETURN NIL
 
 METHOD SetEditMenuItems() CLASS Project
    ::Application:Props:EditUndoItem:Enabled := ::Application:Props:EditUndoBttn:Enabled := ::Application:SourceEditor:Source:CanUndo()

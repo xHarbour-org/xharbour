@@ -62,7 +62,7 @@ METHOD GetSections() CLASS IniFile
    ELSE
       cRet := GetPrivateProfileString( NIL, NIL, NIL, ::Name )
    ENDIF
-   aSec := __str2a( cRet, chr(0) )
+   aSec := hb_aTokens( cRet, chr(0) )
    FOR EACH Section IN aSec
        IF !EMPTY( Section )
           AADD( aRet, Section )
@@ -94,7 +94,7 @@ METHOD GetEntries( cSection ) CLASS IniFile
    ENDIF
    cRet := GetPrivateProfileString( cSection, NIL, NIL, ::Name )
    IF cRet != NIL
-      aEnt := __str2a( cRet, chr(0) )
+      aEnt := hb_aTokens( cRet, chr(0) )
       FOR EACH Entry IN aEnt
           IF !EMPTY( Entry )
              AADD( aRet, Entry )

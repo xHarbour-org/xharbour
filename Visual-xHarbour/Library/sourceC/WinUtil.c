@@ -4323,3 +4323,9 @@ HB_FUNC( NEXTLINE )
       hb_retl( FALSE );
    }
 }
+
+HB_FUNC( __SETFOLDING )
+{
+   SendMessage( (HWND) hb_parnl(1), 4004, (WPARAM) hb_parc(2), (LPARAM) hb_parc(3));
+}
+
