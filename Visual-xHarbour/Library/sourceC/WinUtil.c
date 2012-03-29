@@ -86,6 +86,8 @@ extern char * hb_oleWideToAnsi( LPWSTR wString );
 HB_EXTERN_END
 
 static IDispatch *pDispPtr;
+static int (*fSci)(void*,int,int,int);
+static void *pSci;
 
 HB_FUNC( BITMAPTOREGION )
 {
@@ -4324,8 +4326,39 @@ HB_FUNC( NEXTLINE )
    }
 }
 
-HB_FUNC( __SETFOLDING )
+HB_FUNC( SCISETPROPERTY )
 {
-   SendMessage( (HWND) hb_parnl(1), 4004, (WPARAM) hb_parc(2), (LPARAM) hb_parc(3));
+   SendMessage( (HWND) hb_parnl(1), 4004, (WPARAM) hb_parc(2), (LPARAM)(LPCTSTR) hb_parc(3) );
 }
 
+HB_FUNC( SCIGETFOLD )
+{
+   SendMessage( (HWND) hb_parnl(1), 4008, (WPARAM) hb_parc(2), (LPARAM)(LPCTSTR) hb_parc(3) );
+}
+
+HB_FUNC( SCISETKEYWORDS )
+{
+   SendMessage( (HWND) hb_parnl(1), 4005, (WPARAM) hb_parni(2), (LPARAM)(LPCTSTR) hb_parc(3) );
+}
+
+#define SCI_GETDIRECTFUNCTION 2184
+#define SCI_PRIVATELEXERCALL 4013
+#define SCI_SETDOCPOINTER 2358
+#define SCI_GETDIRECTPOINTER 2185
+#define SCI_CANUNDO 2174
+#define SCI_SETPROPERTY 4004
+/*
+HB_FUNC( SCIINITFUNC )
+{
+   HWND hwndScintilla = (HWND)hb_parnl(1);
+   fSci = (int (__cdecl *)(void *,int,WPARAM,LPARAM))SendMessage( hwndScintilla, SCI_GETDIRECTFUNCTION, 0, 0 );
+   pSci = (void *) SendMessage( hwndScintilla, SCI_GETDIRECTPOINTER, 0, 0);
+   SendMessage( hwndScintilla, SCI_PRIVATELEXERCALL, SCI_GETDIRECTFUNCTION, fSci);
+   SendMessage( hwndScintilla, SCI_PRIVATELEXERCALL, SCI_SETDOCPOINTER, hwndScintilla );
+}  
+
+HB_FUNC( SCISETFOLD )
+{
+   hb_retni( fSci(pSci, SCI_SETPROPERTY, (WPARAM) hb_parc(1), (LPARAM) hb_parc(2) ) );
+}
+*/

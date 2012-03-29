@@ -88,12 +88,14 @@ CLASS SourceEditor INHERIT Control
    METHOD EnsureRangeVisible()
    METHOD OnLButtonUp()
    METHOD OnKeyUp()
+   
+   METHOD InitLexer()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS SourceEditor
    LOCAL nKey, cKey, n, cText, cSyntax := ::Application:Path + "\vxh.syn"
-   ::hSciLib := LoadLibrary( "SciLexer.dll" )
+   ::hSciLib := LoadLibrary( "SciLexer212.dll" )
    ::__xCtrlName := "SourceEditor"
    ::ClsName := "Scintilla"
    ::Super:Init( oParent )
@@ -132,8 +134,9 @@ METHOD Create() CLASS SourceEditor
    ::Super:Create()
 
    ::SendMessage( SCI_SETLEXER, SCLEX_FLAGSHIP )
-
    ::SendMessage( SCI_SETSTYLEBITS, 7)
+   
+   //SciInitFunc( ::hWnd )
 
    ::StyleSetBack( STYLE_DEFAULT, ::ColorBackground )
    ::StyleSetFore( STYLE_DEFAULT, ::ColorNormalText )
@@ -142,11 +145,25 @@ METHOD Create() CLASS SourceEditor
    ::StyleSetSize( 10 )
 
    ::SendMessage( SCI_STYLECLEARALL, 0, 0 )
+   ::InitLexer()
+RETURN Self
 
-   ::SendMessage( SCI_SETKEYWORDS, 0, ::Keywords1 )
-   ::SendMessage( SCI_SETKEYWORDS, 1, ::Keywords2 )
-   ::SendMessage( SCI_SETKEYWORDS, 2, ::Keywords3 )
-   ::SendMessage( SCI_SETKEYWORDS, 3, ::Keywords4 )
+//------------------------------------------------------------------------------------------------------------------------------------
+METHOD InitLexer() CLASS SourceEditor
+   local cFold := space(1)
+
+   SciSetProperty( ::hWnd, "fold", "1" )
+   SciSetProperty( ::hWnd, "fold.compact", "0" )
+   SciSetProperty( ::hWnd, "fold.comment", "1" )
+   SciSetProperty( ::hWnd, "fold.preprocessor", "0" )
+   SciSetProperty( ::hWnd, "fold.directive", "0" )
+
+   //SciSetFold( ::hWnd, "fold", "0" )
+
+   SciSetKeywords( ::hWnd, 0, ::Keywords1 )
+   SciSetKeywords( ::hWnd, 1, ::Keywords2 )
+   SciSetKeywords( ::hWnd, 2, ::Keywords3 )
+   SciSetKeywords( ::hWnd, 3, ::Keywords4 )
 
    ::SendMessage( SCI_STYLESETFORE, SCE_FS_KEYWORD,        ::ColorKeywords1 )
    ::SendMessage( SCI_STYLESETFORE, SCE_FS_KEYWORD2,       ::ColorKeywords2 )
@@ -169,19 +186,13 @@ METHOD Create() CLASS SourceEditor
    ::SendMessage( SCI_SETCARETWIDTH, 2 )
    ::SendMessage( SCI_SETCARETSTYLE, 1 )
 
-   __SetFolding( ::hWnd, "fold", "1" )
-   __SetFolding( ::hWnd, "fold.compact", "0" )
-   __SetFolding( ::hWnd, "fold.comment", "0" )
-   __SetFolding( ::hWnd, "fold.preprocessor", "0" )
-   __SetFolding( ::hWnd, "fold.directive", "0" )
-
-   ::SendMessage( SCI_COLOURISE, 0, -1 )
-
    ::SendMessage( SCI_SETMARGINWIDTHN, 1, 15 )
    ::SendMessage( SCI_SETMARGINTYPEN,  MARGIN_SCRIPT_FOLD_INDEX, SC_MARGIN_SYMBOL )
-   ::SendMessage( SCI_SETMARGINWIDTHN, MARGIN_SCRIPT_FOLD_INDEX, 14 )
+   ::SendMessage( SCI_SETMARGINWIDTHN, MARGIN_SCRIPT_FOLD_INDEX, 15 )
    ::SendMessage( SCI_SETMARGINMASKN,  MARGIN_SCRIPT_FOLD_INDEX, SC_MASK_FOLDERS )
+   ::SendMessage( SCI_SETMARGINSENSITIVEN, MARGIN_SCRIPT_FOLD_INDEX, 1 )
 
+   //::SendMessage( SCI_SETEDGEMODE, 1 )
 
    ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDER,        SC_MARK_BOXPLUS  )
    ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEROPEN,    SC_MARK_BOXMINUS )
@@ -208,13 +219,12 @@ METHOD Create() CLASS SourceEditor
    ::SendMessage( SCI_MARKERSETBACK, SC_MARKNUM_FOLDEREND,     RGB( 128, 128, 128 ) )
 
    ::SendMessage( SCI_SETFOLDFLAGS, 16, 0)
-   ::SendMessage( SCI_SETMARGINSENSITIVEN, MARGIN_SCRIPT_FOLD_INDEX, 1 )
 
-   ::SendMessage( SCI_SETINDENTATIONGUIDES, 1, 0)
-   ::SendMessage( SCI_SETHIGHLIGHTGUIDE, 30, 0)
+   //::SendMessage( SCI_SETINDENTATIONGUIDES, 1, 0)
+   //::SendMessage( SCI_SETHIGHLIGHTGUIDE, 30, 0)
 
    ::SendMessage( SCI_SETMODEVENTMASK, SC_MOD_CHANGEFOLD | SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT | SC_PERFORMED_UNDO | SC_PERFORMED_REDO )
-RETURN Self
+RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnLButtonUp() CLASS SourceEditor
@@ -533,6 +543,7 @@ METHOD Init( oOwner, cFile ) CLASS Source
    LOCAL n
    ::Owner   := oOwner
    ::pSource := ::CreateDocument()
+   
    IF cFile != NIL
       n := RAT( "\", cFile )
       ::FileName := SUBSTR( cFile, n+1 )
@@ -576,7 +587,6 @@ METHOD Open( cFile ) CLASS Source
    ::Path     := SUBSTR( cFile, 1, n-1 )
    ::File     := cFile
    ::SetSavePoint()
-   ::Owner:SendMessage( SCI_COLOURISE, 0, -1 )
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
