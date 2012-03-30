@@ -194,13 +194,13 @@ METHOD InitLexer() CLASS SourceEditor
 
    //::SendMessage( SCI_SETEDGEMODE, 1 )
 
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDER,        SC_MARK_BOXPLUS  )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEROPEN,    SC_MARK_BOXMINUS )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERSUB,     SC_MARK_VLINE    )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEROPENMID, SC_MARK_VLINE    )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERMIDTAIL, SC_MARK_VLINE    )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERTAIL,    SC_MARK_VLINE    )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEREND,     SC_MARK_LCORNER  )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDER,        SC_MARK_PLUS  )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEROPEN,    SC_MARK_MINUS )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERSUB,     SC_MARK_EMPTY    )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEROPENMID, SC_MARK_EMPTY    )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERMIDTAIL, SC_MARK_EMPTY    )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERTAIL,    SC_MARK_EMPTY    )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEREND,     SC_MARK_EMPTY  )
 
    ::SendMessage( SCI_MARKERSETFORE, SC_MARKNUM_FOLDER,        RGB( 255, 255, 255 ) )
    ::SendMessage( SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPEN,    RGB( 255, 255, 255 ) )
@@ -245,7 +245,7 @@ RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
-   LOCAL scn, n, cText, nLine//, endStyled, lineEndStyled
+   LOCAL scn, n, cText, nLine, cObj, nChar, nPosStart, nPosEnd
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == SCN_UPDATEUI
@@ -280,14 +280,35 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
               ::SendMessage( SCI_GOTOLINE, nLine )
            ENDIF
 
-      //CASE hdr:code == SCN_STYLENEEDED
-           //scn := (struct SCNOTIFICATION*) nlParam
-           //IF hdr:idFrom  ==  IDM_SRCWIN
-           //   endStyled  :=  ::SendMessage( SCI_GETENDSTYLED, 0, 0 )
-           //   lineEndStyled := ::SendMessage( EM_LINEFROMCHAR, endStyled, 0 )
-           //   endStyled  :=  ::SendMessage( EM_LINEINDEX,  lineEndStyled, 0 )
-           //   ::SendMessage( SCI_COLOURISE, endStyled, scn:position )
-           //ENDIF
+      CASE hdr:code == SCN_CHARADDED
+           scn := (struct SCNOTIFICATION*) nlParam
+           IF scn:ch == 58
+              IF ::SendMessage( SCI_AUTOCACTIVE ) > 0
+                 ::SendMessage( SCI_AUTOCCANCEL )
+              ENDIF
+              nPosEnd   := ::Source:GetCurrentPos()-2
+              nPosStart := ::Source:PositionFromLine( ::Source:LineFromPosition( nPosEnd ) )
+              cObj := ""
+              FOR n := nPosEnd TO nPosStart STEP -1
+                 nChar := ::Source:GetCharAt(n)
+                 IF nChar == 32
+                    EXIT
+                 ENDIF
+                 cObj := CHR(nChar) + cObj
+              NEXT
+              
+              VIEW cObj
+
+/*
+                 aProperties := ::GetPropertiesAndValues( ::ActiveObject )
+                 aSort( aProperties,,,{|x, y| x[1] < y[1]})
+
+                 FOR EACH aProperty IN aProperties
+                     aProp := GetProperCase( aProperty[1] )
+                     cProp := aProp[1]
+                 NEXT
+*/
+           ENDIF
    ENDCASE
 RETURN NIL
 
@@ -437,6 +458,7 @@ CLASS Source
    DATA SavedPos  EXPORTED INIT 0
    DATA Extension EXPORTED INIT "prg"
    DATA lStyled   EXPORTED INIT .T.
+   DATA cObj      EXPORTED INIT ""
    // Compatibility with xedit for debugger ------------------------------------------------
    ACCESS cFile             INLINE ::FileName
    ACCESS cPath             INLINE IIF( ! EMPTY(::Path), ::Path + "\", "" )

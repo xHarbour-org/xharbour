@@ -44,6 +44,8 @@ CLASS ObjManager INHERIT TreeView
    DATA ReleaseEditSelection EXPORTED INIT .F.
    DATA ActiveControl EXPORTED
    DATA lPaint        EXPORTED INIT .T.
+   DATA cSubPropList  EXPORTED INIT ""
+   DATA cEventList    EXPORTED INIT ""
    METHOD Init() CONSTRUCTOR
    METHOD ResetProperties()
    METHOD Create()
@@ -1347,7 +1349,6 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
 
        aProp := GetProperCase( cProp )
        cProp := aProp[1]
-
 
        IF Empty( aProp[2] )
           aProp[2] := "General"
@@ -3109,11 +3110,14 @@ METHOD ResetEvents( aSel ) CLASS EventManager
    ::SetRedraw( .F. )
    ::ResetContent()
 
+   ::cEventList := ""
+ 
    IF ::ActiveObject:Events != NIL
       FOR EACH Topic IN ::ActiveObject:Events
           oItem := ::AddItem( Topic[1] )
           FOR EACH Event IN Topic[2]
               oSub := oItem:AddItem( Event[1], 0, { TreeColItem( Event[2], "C", ,NIL , Event[1]) } )
+              ::cEventList += Event[1] + " "
           NEXT
           oItem:Expand()
       NEXT
