@@ -316,6 +316,9 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                        cObj := "WinForm()"
                     ENDIF
                  ENDIF
+                 IF cObj[-1] == ":"
+                    cObj := LEFT( cObj, LEN(cObj)-1 )
+                 ENDIF
                  oObj := &cObj
 
                  aProperties := __ClsGetPropertiesAndValues( oObj )

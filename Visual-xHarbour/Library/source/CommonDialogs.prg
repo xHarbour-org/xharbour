@@ -684,6 +684,7 @@ CLASS ReplaceTextDialog INHERIT CommonDialogs
    DATA hDlg           PROTECTED
    DATA __pCallBackPtr PROTECTED
    DATA __nProc        PROTECTED
+   DATA cInit          PROTECTED
 
    METHOD Init() CONSTRUCTOR
    METHOD Show()
@@ -700,9 +701,11 @@ METHOD Init( oOwner ) CLASS ReplaceTextDialog
    Super:Init( oOwner )
 RETURN Self
 
-METHOD Show( oOwner ) CLASS ReplaceTextDialog
+METHOD Show( oOwner, cInit ) CLASS ReplaceTextDialog
    LOCAL pfr := (struct FINDREPLACE)
    DEFAULT oOwner TO ::Owner
+   DEFAULT cInit  TO ""
+   ::cInit := cInit
    IF IsWindow( ::hDlg )
       SetActiveWindow( ::hDlg )
    ELSE
@@ -722,6 +725,7 @@ METHOD __WndProc( hWnd, nMsg, nwParam, nlParam ) CLASS ReplaceTextDialog
       CASE nMsg == WM_INITDIALOG
            pfr = (struct FINDREPLACE*) nlParam
            ShowWindow( hWnd, SW_SHOWNORMAL )
+           SetDlgItemText( hWnd, 1152, ::cInit )
            UpdateWindow( hWnd )
            SendMessage( GetDlgItem(hWnd,1056), BM_SETCHECK, BST_UNCHECKED, 0 )
            SendMessage( GetDlgItem(hWnd,1057), BM_SETCHECK, BST_CHECKED, 0 )
