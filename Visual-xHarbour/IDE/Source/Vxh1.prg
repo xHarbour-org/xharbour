@@ -3112,7 +3112,7 @@ METHOD Find() CLASS Project
       ENDIF
       ::FindDialog := FindTextDialog( ::Application:SourceEditor )
       ::FindDialog:Owner := ::Application:SourceEditor
-      ::FindDialog:Show()
+      ::FindDialog:Show(, ::Application:SourceEditor:Source:GetSelText() )
    ENDIF
 RETURN 0
 
@@ -3123,7 +3123,7 @@ METHOD Replace() CLASS Project
       ENDIF
       ::ReplaceDialog := ReplaceTextDialog( ::Application:SourceEditor )
       ::ReplaceDialog:Owner := ::Application:SourceEditor
-      ::ReplaceDialog:Show()
+      ::ReplaceDialog:Show(, ::Application:SourceEditor:Source:GetSelText())
    ENDIF
 RETURN 0
 

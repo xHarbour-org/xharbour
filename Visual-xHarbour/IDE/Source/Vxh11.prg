@@ -58,6 +58,8 @@ CLASS SourceEditor INHERIT Control
    DATA ColorKeywords3    EXPORTED
    DATA ColorKeywords4    EXPORTED
 
+   DATA cFindWhat         EXPORTED
+   DATA nDirection        EXPORTED
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -88,7 +90,7 @@ CLASS SourceEditor INHERIT Control
    METHOD EnsureRangeVisible()
    METHOD OnLButtonUp()
    METHOD OnKeyUp()
-   
+   METHOD OnKeyDown()
    METHOD InitLexer()
 ENDCLASS
 
@@ -231,6 +233,15 @@ METHOD OnLButtonUp() CLASS SourceEditor
    ::Application:Project:EditReset()
 RETURN NIL
 
+METHOD OnKeyDown( nKey ) CLASS SourceEditor
+   IF nKey == VK_F3
+      IF ::Source:GetSelLen() > 1
+         ::cFindWhat := ::Source:GetSelText()
+      ENDIF
+      ::FindNext( ::cFindWhat, CheckBit( GetKeyState( VK_SHIFT ), 32768 ) )
+   ENDIF
+RETURN NIL
+
 METHOD OnKeyUp( nKey ) CLASS SourceEditor
    IF nKey == VK_SHIFT
       ::Application:Project:EditReset()
@@ -245,7 +256,7 @@ RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
-   LOCAL scn, n, cText, nLine, cObj, nChar, nPosStart, nPosEnd
+   LOCAL scn, n, cText, nLine, cObj, nChar, nPosStart, nPosEnd, oObj, aProperties, aProperty, aProp, cList
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == SCN_UPDATEUI
@@ -286,28 +297,37 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
               IF ::SendMessage( SCI_AUTOCACTIVE ) > 0
                  ::SendMessage( SCI_AUTOCCANCEL )
               ENDIF
-              nPosEnd   := ::Source:GetCurrentPos()-2
+              nPosEnd   := ::Source:GetCurrentPos()-1
               nPosStart := ::Source:PositionFromLine( ::Source:LineFromPosition( nPosEnd ) )
               cObj := ""
               FOR n := nPosEnd TO nPosStart STEP -1
-                 nChar := ::Source:GetCharAt(n)
-                 IF nChar == 32
-                    EXIT
-                 ENDIF
-                 cObj := CHR(nChar) + cObj
+                  nChar := ::Source:GetCharAt(n)
+                  IF nChar == 32 .OR. ::Source:GetColumn(n)==0
+                     EXIT
+                  ENDIF
+                  cObj := CHR(nChar) + cObj
               NEXT
-              
-              VIEW cObj
 
-/*
-                 aProperties := ::GetPropertiesAndValues( ::ActiveObject )
+              IF LEN( cObj ) >= 2
+                 IF LEFT(cObj,2) == "::"
+                    IF LEN(cObj) > 2
+                       cObj := "WinForm():"+SUBSTR(cObj,3)
+                     ELSE
+                       cObj := "WinForm()"
+                    ENDIF
+                 ENDIF
+                 oObj := &cObj
+
+                 aProperties := __ClsGetPropertiesAndValues( oObj )
                  aSort( aProperties,,,{|x, y| x[1] < y[1]})
 
+                 cList := ""
                  FOR EACH aProperty IN aProperties
-                     aProp := GetProperCase( aProperty[1] )
-                     cProp := aProp[1]
+                     aProp := GetProperCase( __Proper( aProperty[1] ) )
+                     cList += aProp[1]+" "
                  NEXT
-*/
+                 ::SendMessage( SCI_AUTOCSHOW, 0, cList )
+              ENDIF
            ENDIF
    ENDCASE
 RETURN NIL
@@ -346,6 +366,9 @@ RETURN nFlags
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnFindNext( oFind ) CLASS SourceEditor
+   ::cFindWhat  := oFind:FindWhat
+   ::nDirection := oFind:Direction
+
    ::Source:SetSearchFlags( ::GetSearchFlags( oFind ) )
    ::FindNext( oFind:FindWhat, oFind:Direction == 0 )
 RETURN NIL
@@ -354,6 +377,12 @@ RETURN NIL
 METHOD FindNext( cFindWhat, lReverseDirection ) CLASS SourceEditor
    LOCAL lFound, nStartPos, nEndPos
    LOCAL nStart, nEnd
+
+   DEFAULT cFindWhat TO ::cFindWhat
+   DEFAULT lReverseDirection TO ::nDirection == 0
+
+   DEFAULT cFindWhat TO ""
+   DEFAULT lReverseDirection TO .F.
 
    lFound := .F.
 
@@ -407,11 +436,11 @@ RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnReplace( oFind ) CLASS SourceEditor
-   IF ::Source:GetSelText()-1 == 0
+   IF ::Source:GetSelLen()-1 == 0
       IF ! EMPTY( oFind:FindWhat )
          ::Source:SearchNext( ::GetSearchFlags( oFind ), oFind:FindWhat )
       ENDIF
-    ELSEIF ::Source:GetSelText()-1 > 0
+    ELSEIF ::Source:GetSelLen()-1 > 0
       ::Source:ReplaceSel( oFind:ReplaceWith )
    ENDIF
 RETURN NIL
@@ -527,6 +556,7 @@ CLASS Source
    METHOD SearchNext( nFlags, cText )         INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SEARCHNEXT, nFlags, cText )
    METHOD SearchPrev( nFlags, cText )         INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SEARCHPREV, nFlags, cText )
    METHOD ReplaceSel( cText )                 INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_REPLACESEL, 0, cText )
+   METHOD GetSelLen()                         INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETSELTEXT, 0, 0 )
    METHOD GetSelText( cBuffer )               INLINE ::ChkDoc(), cBuffer := SPACE( ::Owner:SendMessage( SCI_GETSELTEXT, 0, 0 ) ),;
                                                                  ::Owner:SendMessage( SCI_GETSELTEXT, 0, cBuffer ),;
                                                                  ALLTRIM(LEFT(cBuffer,LEN(cBuffer)-1))
@@ -633,12 +663,13 @@ RETURN cText
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Save( cFile ) CLASS Source
-   LOCAL pPrev, hFile, cText, n
+   LOCAL pPrev, hFile, cText, n, nPos
    IF cFile != NIL
       ::File := cFile
    ENDIF
    IF !EMPTY( ::File )
       pPrev := ::GetCurDoc()
+      nPos := ::GetCurrentPos()
       ::Owner:SelectDocument( ::pSource )
       IF ( hFile := fCreate( ::File ) ) <> -1
          cText := ::GetText()
@@ -647,6 +678,8 @@ METHOD Save( cFile ) CLASS Source
       ENDIF
       ::Owner:SelectDocument( pPrev )
       ::Modified := .F.
+
+      ::GoToPosition( nPos )
 
       n := RAT( "\", ::File )
       ::FileName := SUBSTR( ::File, n+1 )
