@@ -256,7 +256,7 @@ RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
-   LOCAL scn, n, cText, nLine, cObj, nChar, nPosStart, nPosEnd, oObj, aProperties, aProperty, aProp, cList
+   LOCAL scn, n, cText, nLine, cObj, nChar, nPosStart, nPosEnd, oObj, aObj, aProperties, aProperty, aProp, cList
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == SCN_UPDATEUI
@@ -311,25 +311,37 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
               IF LEN( cObj ) >= 2
                  IF LEFT(cObj,2) == "::"
                     IF LEN(cObj) > 2
-                       cObj := "WinForm():"+SUBSTR(cObj,3)
+                       cObj := "WinForm:"+SUBSTR(cObj,3)
                      ELSE
-                       cObj := "WinForm()"
+                       cObj := "WinForm"
                     ENDIF
                  ENDIF
                  IF cObj[-1] == ":"
                     cObj := LEFT( cObj, LEN(cObj)-1 )
                  ENDIF
-                 oObj := &cObj
-
-                 aProperties := __ClsGetPropertiesAndValues( oObj )
-                 aSort( aProperties,,,{|x, y| x[1] < y[1]})
-
-                 cList := ""
-                 FOR EACH aProperty IN aProperties
-                     aProp := GetProperCase( __Proper( aProperty[1] ) )
-                     cList += aProp[1]+" "
+                 aObj := hb_aTokens( cObj, ":" )
+                 IF aObj[1] == "WinForm"
+                    oObj := ::Source:Form
+                  ELSE
+                    oObj := &(aObj[1])
+                 ENDIF
+                 FOR n := 2 TO LEN( aObj )
+                     oObj := oObj:&(aObj[n])
                  NEXT
-                 ::SendMessage( SCI_AUTOCSHOW, 0, cList )
+                 
+                 IF oObj != NIL
+                    aProperties := __ClsGetPropertiesAndValues( oObj )
+                    
+                    aSort( aProperties,,,{|x, y| x[1] < y[1]})
+
+                    cList := ""
+
+                    FOR EACH aProperty IN aProperties
+                        aProp := GetProperCase( __Proper( aProperty[1] ) )
+                        cList += aProp[1]+" "
+                    NEXT
+                    ::SendMessage( SCI_AUTOCSHOW, 0, cList )
+                 ENDIF
               ENDIF
            ENDIF
    ENDCASE
@@ -491,6 +503,7 @@ CLASS Source
    DATA Extension EXPORTED INIT "prg"
    DATA lStyled   EXPORTED INIT .T.
    DATA cObj      EXPORTED INIT ""
+   DATA Form      EXPORTED
    // Compatibility with xedit for debugger ------------------------------------------------
    ACCESS cFile             INLINE ::FileName
    ACCESS cPath             INLINE IIF( ! EMPTY(::Path), ::Path + "\", "" )

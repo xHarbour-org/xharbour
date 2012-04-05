@@ -164,6 +164,7 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
    ::BackgroundImage := FreeImageRenderer( Self ):Create()
 
    ::Editor := Source( ::Application:SourceEditor )
+   ::Editor:Form := Self // Will be needed in IntelliSense
 
    IF cFileName != NIL
       ::Application:SourceTabs:InsertTab( cFileName )
