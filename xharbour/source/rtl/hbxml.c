@@ -1246,7 +1246,9 @@ static void mxml_node_read_cdata( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM pDoc
    int iStatus = 0;
    PHB_ITEM pItem;
 
-   pItem = hb_itemPutNI( NULL, MXML_TYPE_CDATA );
+   /* Read node as DATA not CDATA to recognizes tag name: CNAME
+   pItem = hb_itemPutNI( NULL, MXML_TYPE_CDATA ); */
+   pItem = hb_itemPutNI( NULL, MXML_TYPE_DATA );
    hb_objSendMsg( pNode,"_NTYPE", 1, pItem );
 
    /* we'll put all the cdata into the data member, up to ]]>
@@ -1788,10 +1790,26 @@ static MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style 
       break;
 
       case MXML_TYPE_CDATA:
-            mxml_output_string_len( out, "<![CDATA[ ", 9 );
+
+            /* write tag name for  <![CDATA[..]]> section */
+            mxml_output_char( out, '<' );
+            hb_objSendMsg( pNode,"CNAME", 0 );
+            mxml_output_string_len( out, hb_parc( -1 ), hb_parclen( -1 ) );
+            mxml_output_char( out, '>' );
+
+            /* write CDATA section without spaces
+            mxml_output_string_len( out, "<![CDATA[ ", 9 ); */
+            mxml_output_string_len( out, "<![CDATA[", 9 );
             hb_objSendMsg( pNode, "CDATA", 0 );
             mxml_output_string_len( out, hb_parc( -1 ), hb_parclen( -1 ) );
-            mxml_output_string_len( out, " ]]>", 4 );
+            /*mxml_output_string_len( out, " ]]>", 4 ); */
+            mxml_output_string_len( out, "]]>", 3 );
+
+            mxml_output_string_len( out, "</", 2 );
+            hb_objSendMsg( pNode, "CNAME", 0 );
+            mxml_output_string_len( out, hb_parc( -1 ), hb_parclen( -1 ) );
+            mxml_output_char( out, '>' );
+
             if( bnewline )
             {
             mxml_output_string( out, hb_conNewLine() );

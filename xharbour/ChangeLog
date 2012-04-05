@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-04-05 08:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/hbxml.c
+    ! fixed mxml_node_write() to write CDATA section between tag names:
+      <tagname><![CDATA[...]]></tagname>
+    ! fixed to write CDATA section without spaces before/after of the textual data.
+    ! fixed mxml_node_read_cdata() to read CDATA section within of tag names,
+      by changing MXML_TYPE_CDATA to MXML_TYPE_DATA.
+
 2012-03-19 18:55 UTC+0200 Pavel Tsarenko (tpe2/at/mail.ru)
   * contrib/rdd_ads/ads.ch
   * contrib/rdd_ads/ads1.c
