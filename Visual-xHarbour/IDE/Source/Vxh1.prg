@@ -3524,8 +3524,8 @@ RETURN Self
 METHOD CloseSource() CLASS Project
    LOCAL nRes, n := ::Application:SourceTabs:GetCurSel()
    nRes := IDNO
-   IF ::Application:SourceEditor:oEditor:lModified
-      nRes := MessageBox( 0, "Save changes before closing?", ::Application:SourceEditor:oEditor:cFile, MB_YESNOCANCEL | MB_ICONQUESTION )
+   IF ::Application:SourceEditor:Source:Modified
+      nRes := MessageBox( 0, "Save changes before closing?", ::Application:SourceEditor:Source:FileName, MB_YESNOCANCEL | MB_ICONQUESTION )
       IF nRes == IDCANCEL
          RETURN Self
       ENDIF
@@ -3534,7 +3534,7 @@ METHOD CloseSource() CLASS Project
    IF nRes == IDYES
       ::SaveSource()
    ENDIF
-   ::Application:SourceEditor:oEditor:Close()
+   ::Application:SourceEditor:Source:Close()
    n := MIN( n, ::Application:SourceEditor:DocCount )
    IF n > 0
       ::Application:SourceTabs:SetCurSel( n )
@@ -3638,7 +3638,7 @@ METHOD AddSource( cFile ) CLASS Project
    IF cFile != NIL
       ::OpenSource( cFile )
    ENDIF
-   DEFAULT cFile TO ::Application:SourceEditor:oEditor:cPath + ::Application:SourceEditor:oEditor:cFile
+   DEFAULT cFile TO ::Application:SourceEditor:Source:File
    AADD( ::Properties:Sources, cFile )
    ::Application:RemoveSourceMenu:Enable()
    ::Application:AddSourceMenu:Disable()
@@ -3653,7 +3653,6 @@ METHOD RemoveSource() CLASS Project
          ADEL( ::Properties:Binaries, n, .T. )
       ENDIF
     ELSE
-      //IF ( n := ASCAN( ::Properties:Sources, ::Application:SourceEditor:oEditor:cPath + ::Application:SourceEditor:oEditor:cFile ) ) > 0
       IF ( n := ASCAN( ::Properties:Sources, ::cSourceRemove ) ) > 0
          ADEL( ::Properties:Sources, n, .T. )
       ENDIF

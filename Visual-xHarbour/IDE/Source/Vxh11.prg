@@ -45,7 +45,8 @@ CLASS SourceEditor INHERIT Control
    DATA KeyWords4         EXPORTED INIT ""
 
    DATA ColorNormalText   EXPORTED
-   DATA ColorBackGround   EXPORTED
+   DATA ColorBackground   EXPORTED
+   DATA ColorSelectedLine EXPORTED
 
    DATA ColorNumbers      EXPORTED
    DATA ColorStrings      EXPORTED
@@ -117,7 +118,8 @@ METHOD Init( oParent ) CLASS SourceEditor
    ENDIF
 
    ::ColorNormalText   := ::Application:IniFile:ReadInteger( "Colors", "NormalText",   ::System:Color:Black          )
-   ::ColorBackGround   := ::Application:IniFile:ReadInteger( "Colors", "BackGround",   ::System:Color:White          ) 
+   ::ColorBackground   := ::Application:IniFile:ReadInteger( "Colors", "BackGround",   ::System:Color:White          ) 
+   ::ColorSelectedLine := ::Application:IniFile:ReadInteger( "Colors", "SelectedLine", RGB( 240, 240, 240 )          ) 
 
    ::ColorNumbers      := ::Application:IniFile:ReadInteger( "Colors", "Numbers",      ::System:Color:Green          )
    ::ColorStrings      := ::Application:IniFile:ReadInteger( "Colors", "Strings",      ::System:Color:Teal           )
@@ -171,6 +173,10 @@ METHOD InitLexer() CLASS SourceEditor
    ::SendMessage( SCI_STYLESETFORE, SCE_FS_KEYWORD2,       ::ColorKeywords2 )
    ::SendMessage( SCI_STYLESETFORE, SCE_FS_KEYWORD3,       ::ColorKeywords3 )
    ::SendMessage( SCI_STYLESETFORE, SCE_FS_KEYWORD4,       ::ColorKeywords4 )
+
+   ::SendMessage( SCI_SETCARETLINEBACK, ::ColorSelectedLine )
+   ::SendMessage( SCI_SETCARETLINEVISIBLE, 1 )
+   //::SendMessage( SCI_SETCARETLINEBACKALPHA, 1 )
 
 
    ::SendMessage( SCI_STYLESETFORE, SCE_FS_COMMENT,        ::ColorComments  )
@@ -352,7 +358,7 @@ METHOD OnDestroy() CLASS SourceEditor
    ::Application:IniFile:WriteInteger( "Settings", "WrapSearch", ::Application:EditorProps:WrapSearch )
 
    ::Application:IniFile:WriteInteger( "Colors", "NormalText",   ::ColorNormalText )
-   ::Application:IniFile:WriteInteger( "Colors", "BackGround",   ::ColorBackGround )
+   ::Application:IniFile:WriteInteger( "Colors", "BackGround",   ::ColorBackground )
 
    ::Application:IniFile:WriteInteger( "Colors", "Numbers",      ::ColorNumbers )
    ::Application:IniFile:WriteInteger( "Colors", "Strings",      ::ColorStrings )
