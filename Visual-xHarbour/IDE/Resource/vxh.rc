@@ -1,3 +1,32 @@
-#include "..\..\xedit\xedit.rc"
+#include "winver.h"
+1 VERSIONINFO
+FILEVERSION       4,0,0,0
+PRODUCTVERSION    4,0,0,0
+FILEFLAGS         0
+FILEFLAGSMASK     VS_FFI_FILEFLAGSMASK
+FILEOS            VOS__WINDOWS32
+FILETYPE          VFT_APP
+FILESUBTYPE       0
+{
+   BLOCK "StringFileInfo"
+   {
+      BLOCK "040904E4"
+      {
+         VALUE "CompanyName",      "xHarbour.com, Inc"
+         VALUE "FileDescription",  "Integrated development environment"
+         VALUE "FileVersion",      "4.0"
+         VALUE "InternalName",     "vxh"
+         VALUE "LegalCopyright",   "2012 xHarbour.com, Inc"
+         VALUE "OriginalFilename", "vxh.exe"
+         VALUE "ProductName",      "Visual xHarbour"
+         VALUE "ProductVersion",   "4.0"
+      }
+   }
+   BLOCK "VarFileInfo"
+   {
+      VALUE "Translation", 0x409, 1252
+   }
+}
+
 #include "vxhres.rc"
 
