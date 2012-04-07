@@ -38,7 +38,9 @@ CLASS IniFile
    METHOD WriteNumber( cSection, cEntry, xValue )   INLINE ::Write( cSection, cEntry, xValue )
    METHOD WriteInteger( cSection, cEntry, xValue )  INLINE ::Write( cSection, cEntry, Int( xValue ) )
    METHOD WriteLogical( cSection, cEntry, xValue )  INLINE ::Write( cSection, cEntry, IIF( xValue, "Yes","No" ) )
+   METHOD WriteColor( cSection, cEntry, xValue )    INLINE ::Write( cSection, cEntry, xStr(GetRvalue( xValue ))+","+xStr(GetGvalue( xValue ))+","+xStr(GetBvalue( xValue )) )
 
+   METHOD ReadColor( cSection, cEntry, xDefault )
    METHOD ReadString( cSection, cEntry, xDefault )
    METHOD ReadDate( cSection, cEntry, xDefault )
    METHOD ReadNumber( cSection, cEntry, xDefault )
@@ -153,6 +155,7 @@ METHOD Write( cSection, acEntry, xValue ) CLASS IniFile
    ENDIF
 RETURN .T.
 
+   
 //--------------------------------------------------------------------------------------------------
 METHOD Read( cSection, cEntry, xDefault ) CLASS IniFile
    SWITCH ValType( xDefault )
@@ -165,6 +168,23 @@ METHOD Read( cSection, cEntry, xDefault ) CLASS IniFile
    END
 
 RETURN(NIL)
+
+//--------------------------------------------------------------------------------------------------
+METHOD ReadColor( cSection, cEntry, xDefault )
+   LOCAL aColor, cColor
+   DEFAULT xDefault TO ""
+   IF Empty( ::Name )
+      RETURN GetProfileString( cSection, cEntry, xDefault )
+   ENDIF
+   cColor := GetPrivateProfileString( cSection, cEntry, xDefault, ::Name )
+   IF EMPTY(cColor)
+      RETURN xDefault
+   ENDIF
+   aColor := hb_aTokens( cColor, "," )
+   IF LEN(aColor) < 3
+      RETURN VAL(cColor)
+   ENDIF
+RETURN RGB( VAL(aColor[1]), VAL(aColor[2]), VAL(aColor[3]) )
 
 //--------------------------------------------------------------------------------------------------
 METHOD ReadString( cSection, cEntry, xDefault ) CLASS IniFile

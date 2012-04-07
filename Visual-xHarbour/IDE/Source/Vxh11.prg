@@ -117,20 +117,20 @@ METHOD Init( oParent ) CLASS SourceEditor
       ENDDO
    ENDIF
 
-   ::ColorNormalText   := ::Application:IniFile:ReadInteger( "Colors", "NormalText",   ::System:Color:Black          )
-   ::ColorBackground   := ::Application:IniFile:ReadInteger( "Colors", "BackGround",   ::System:Color:White          ) 
-   ::ColorSelectedLine := ::Application:IniFile:ReadInteger( "Colors", "SelectedLine", RGB( 240, 240, 240 )          ) 
+   ::ColorNormalText   := ::Application:IniFile:ReadColor( "Colors", "NormalText",   ::System:Color:Black          )
+   ::ColorBackground   := ::Application:IniFile:ReadColor( "Colors", "BackGround",   ::System:Color:White          ) 
+   ::ColorSelectedLine := ::Application:IniFile:ReadColor( "Colors", "SelectedLine", RGB( 240, 240, 240 )          ) 
 
-   ::ColorNumbers      := ::Application:IniFile:ReadInteger( "Colors", "Numbers",      ::System:Color:Green          )
-   ::ColorStrings      := ::Application:IniFile:ReadInteger( "Colors", "Strings",      ::System:Color:Teal           )
-   ::ColorComments     := ::Application:IniFile:ReadInteger( "Colors", "Comments",     ::System:Color:Gray           )
-   ::ColorOperators    := ::Application:IniFile:ReadInteger( "Colors", "Operators",    ::System:Color:DarkOliveGreen )
-   ::ColorPreprocessor := ::Application:IniFile:ReadInteger( "Colors", "Preprocessor", ::System:Color:Tomato         )
+   ::ColorNumbers      := ::Application:IniFile:ReadColor( "Colors", "Numbers",      ::System:Color:Green          )
+   ::ColorStrings      := ::Application:IniFile:ReadColor( "Colors", "Strings",      ::System:Color:Teal           )
+   ::ColorComments     := ::Application:IniFile:ReadColor( "Colors", "Comments",     ::System:Color:Gray           )
+   ::ColorOperators    := ::Application:IniFile:ReadColor( "Colors", "Operators",    ::System:Color:DarkOliveGreen )
+   ::ColorPreprocessor := ::Application:IniFile:ReadColor( "Colors", "Preprocessor", ::System:Color:Tomato         )
 
-   ::ColorKeywords1    := ::Application:IniFile:ReadInteger( "Colors", "Keywords1",    ::System:Color:Maroon         )
-   ::ColorKeywords2    := ::Application:IniFile:ReadInteger( "Colors", "Keywords2",    ::System:Color:DarkCyan       )
-   ::ColorKeywords3    := ::Application:IniFile:ReadInteger( "Colors", "Keywords3",    ::System:Color:SteelBlue      )
-   ::ColorKeywords4    := ::Application:IniFile:ReadInteger( "Colors", "Keywords4",    ::System:Color:DarkSlateGray  ) 
+   ::ColorKeywords1    := ::Application:IniFile:ReadColor( "Colors", "Keywords1",    ::System:Color:Maroon         )
+   ::ColorKeywords2    := ::Application:IniFile:ReadColor( "Colors", "Keywords2",    ::System:Color:DarkCyan       )
+   ::ColorKeywords3    := ::Application:IniFile:ReadColor( "Colors", "Keywords3",    ::System:Color:SteelBlue      )
+   ::ColorKeywords4    := ::Application:IniFile:ReadColor( "Colors", "Keywords4",    ::System:Color:DarkSlateGray  ) 
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -357,19 +357,20 @@ RETURN NIL
 METHOD OnDestroy() CLASS SourceEditor
    ::Application:IniFile:WriteInteger( "Settings", "WrapSearch", ::Application:EditorProps:WrapSearch )
 
-   ::Application:IniFile:WriteInteger( "Colors", "NormalText",   ::ColorNormalText )
-   ::Application:IniFile:WriteInteger( "Colors", "BackGround",   ::ColorBackground )
+   ::Application:IniFile:WriteColor( "Colors", "NormalText",   ::ColorNormalText )
+   ::Application:IniFile:WriteColor( "Colors", "BackGround",   ::ColorBackground )
+   ::Application:IniFile:WriteColor( "Colors", "SelectedLine", ::ColorSelectedLine ) 
 
-   ::Application:IniFile:WriteInteger( "Colors", "Numbers",      ::ColorNumbers )
-   ::Application:IniFile:WriteInteger( "Colors", "Strings",      ::ColorStrings )
-   ::Application:IniFile:WriteInteger( "Colors", "Comments",     ::ColorComments )
-   ::Application:IniFile:WriteInteger( "Colors", "Operators",    ::ColorOperators )
-   ::Application:IniFile:WriteInteger( "Colors", "Preprocessor", ::ColorPreprocessor )
+   ::Application:IniFile:WriteColor( "Colors", "Numbers",      ::ColorNumbers )
+   ::Application:IniFile:WriteColor( "Colors", "Strings",      ::ColorStrings )
+   ::Application:IniFile:WriteColor( "Colors", "Comments",     ::ColorComments )
+   ::Application:IniFile:WriteColor( "Colors", "Operators",    ::ColorOperators )
+   ::Application:IniFile:WriteColor( "Colors", "Preprocessor", ::ColorPreprocessor )
 
-   ::Application:IniFile:WriteInteger( "Colors", "Keywords1",    ::ColorKeywords1 )
-   ::Application:IniFile:WriteInteger( "Colors", "Keywords2",    ::ColorKeywords2 )
-   ::Application:IniFile:WriteInteger( "Colors", "Keywords3",    ::ColorKeywords3 )
-   ::Application:IniFile:WriteInteger( "Colors", "Keywords4",    ::ColorKeywords4 )
+   ::Application:IniFile:WriteColor( "Colors", "Keywords1",    ::ColorKeywords1 )
+   ::Application:IniFile:WriteColor( "Colors", "Keywords2",    ::ColorKeywords2 )
+   ::Application:IniFile:WriteColor( "Colors", "Keywords3",    ::ColorKeywords3 )
+   ::Application:IniFile:WriteColor( "Colors", "Keywords4",    ::ColorKeywords4 )
    aEval( ::aDocs, {|oDoc| oDoc:Close() } )
    FreeLibrary( ::hSciLib )
 RETURN NIL
