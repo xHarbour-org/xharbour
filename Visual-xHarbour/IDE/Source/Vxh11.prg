@@ -155,8 +155,6 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD InitLexer() CLASS SourceEditor
-   local cFold := space(1)
-
    SciSetProperty( ::hWnd, "fold", "1" )
    SciSetProperty( ::hWnd, "fold.compact", "0" )
    SciSetProperty( ::hWnd, "fold.comment", "1" )
@@ -230,6 +228,15 @@ METHOD InitLexer() CLASS SourceEditor
    //::SendMessage( SCI_SETINDENTATIONGUIDES, 1, 0)
    //::SendMessage( SCI_SETHIGHLIGHTGUIDE, 30, 0)
 
+   ::SendMessage( SCI_CLEARREGISTEREDIMAGES, 0, 0 )
+   //::SendMessage( SCI_RGBAIMAGESETWIDTH, 16, 0 )
+   //::SendMessage( SCI_RGBAIMAGESETHEIGHT, 16, 0 )
+
+   SciRegisterImage( ::hWnd, 8 )
+
+   //SciRegisterImage( ::hWnd, 2, "ICO_METHOD" )
+   //SciRegisterImage( ::hWnd, 3, "ICO_EVENT" )
+
    ::SendMessage( SCI_SETMODEVENTMASK, SC_MOD_CHANGEFOLD | SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT | SC_PERFORMED_UNDO | SC_PERFORMED_REDO )
 RETURN NIL
 
@@ -261,7 +268,7 @@ RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
-   LOCAL scn, n, cText, nLine, cObj, nChar, nPosStart, nPosEnd, oObj, aObj, aProperties, aProperty, aProp, cList
+   LOCAL scn, n, cText, nLine, cObj, nChar, nPosStart, nPosEnd, oObj, aObj, aProperties, aProp, cList
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == SCN_UPDATEUI
@@ -334,23 +341,30 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                  IF aObj[1] == "WinForm"
                     oObj := ::Source:Form
                   ELSE
-                    oObj := &(aObj[1])
+                    TRY
+                       oObj := &(aObj[1])
+                    CATCH
+                    END
                  ENDIF
                  FOR n := 2 TO LEN( aObj )
-                     oObj := oObj:&(aObj[n])
+                     TRY
+                        oObj := oObj:&(aObj[n])
+                     CATCH
+                     END
                  NEXT
                  
-                 IF oObj != NIL
+                 IF VALTYPE(oObj) == "O"
                     aProperties := __ClsGetPropertiesAndValues( oObj )
                     
                     aSort( aProperties,,,{|x, y| x[1] < y[1]})
 
                     cList := ""
 
-                    FOR EACH aProperty IN aProperties
-                        aProp := GetProperCase( __Proper( aProperty[1] ) )
-                        cList += aProp[1]+" "
+                    FOR n := 1 TO LEN( aProperties )
+                        aProp := GetProperCase( __Proper( aProperties[n][1] ) )
+                        cList += aProp[1]+ IIF( n<LEN(aProperties),"?8 ","" )
                     NEXT
+                    ::SendMessage( SCI_AUTOCSETMAXHEIGHT, 15 )
                     ::SendMessage( SCI_AUTOCSETIGNORECASE, 1 )
                     ::SendMessage( SCI_AUTOCSHOW, 0, cList )
                  ENDIF
