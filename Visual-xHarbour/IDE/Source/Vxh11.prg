@@ -93,6 +93,7 @@ CLASS SourceEditor INHERIT Control
    METHOD OnKeyUp()
    METHOD OnKeyDown()
    METHOD InitLexer()
+   METHOD AutoIndent()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -176,8 +177,6 @@ METHOD InitLexer() CLASS SourceEditor
 
    ::SendMessage( SCI_SETCARETLINEBACK, ::ColorSelectedLine )
    ::SendMessage( SCI_SETCARETLINEVISIBLE, 1 )
-   //::SendMessage( SCI_SETCARETLINEBACKALPHA, 1 )
-
 
    ::SendMessage( SCI_STYLESETFORE, SCE_FS_COMMENT,        ::ColorComments  )
    ::SendMessage( SCI_STYLESETFORE, SCE_FS_COMMENTLINE,    ::ColorComments  )
@@ -299,7 +298,10 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
 
       CASE hdr:code == SCN_CHARADDED
            scn := (struct SCNOTIFICATION*) nlParam
-           IF scn:ch == 58
+           IF scn:ch == 13 // indent
+              ::AutoIndent()
+              
+            ELSEIF scn:ch == 58
               IF ::SendMessage( SCI_AUTOCACTIVE ) > 0
                  ::SendMessage( SCI_AUTOCCANCEL )
               ENDIF
@@ -308,10 +310,13 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
               cObj := ""
               FOR n := nPosEnd TO nPosStart STEP -1
                   nChar := ::Source:GetCharAt(n)
-                  IF nChar == 32 .OR. ::Source:GetColumn(n)==0
+                  IF nChar == 32
                      EXIT
                   ENDIF
                   cObj := CHR(nChar) + cObj
+                  IF ::Source:GetColumn(n)==0
+                     EXIT
+                  ENDIF
               NEXT
 
               IF LEN( cObj ) >= 2
@@ -346,11 +351,20 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                         aProp := GetProperCase( __Proper( aProperty[1] ) )
                         cList += aProp[1]+" "
                     NEXT
+                    ::SendMessage( SCI_AUTOCSETIGNORECASE, 1 )
                     ::SendMessage( SCI_AUTOCSHOW, 0, cList )
                  ENDIF
               ENDIF
            ENDIF
    ENDCASE
+RETURN NIL
+
+//------------------------------------------------------------------------------------------------------------------------------------
+METHOD AutoIndent() CLASS SourceEditor
+   LOCAL nCurLine     := ::Source:GetCurLine()
+   LOCAL nIndentation := ::Source:GetLineIndentation( nCurLine - 1 )
+   ::Source:SetLineIndentation( nCurLine, nIndentation )
+   ::Source:GotoPosition( ::Source:GetCurrentPos() + nIndentation ) 
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -605,6 +619,8 @@ CLASS Source
    METHOD AppendText( cText )                 INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_APPENDTEXT, Len(cText), cText )
    METHOD UsePopUp( n )                       INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_USEPOPUP, n )
    METHOD GetLineState( n )                   INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETLINESTATE, n )
+   METHOD GetLineIndentation( nLine )         INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETLINEINDENTATION, nLine )
+   METHOD SetLineIndentation( nLine, nInd )   INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SETLINEINDENTATION, nLine, nInd )
 
    METHOD SetText()
    METHOD GetLine()
