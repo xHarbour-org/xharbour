@@ -141,13 +141,11 @@ METHOD Create() CLASS SourceEditor
    ::SendMessage( SCI_SETLEXER, SCLEX_FLAGSHIP )
    ::SendMessage( SCI_SETSTYLEBITS, 7)
    
-   //SciInitFunc( ::hWnd )
-
    ::StyleSetBack( STYLE_DEFAULT, ::ColorBackground )
    ::StyleSetFore( STYLE_DEFAULT, ::ColorNormalText )
 
-   ::StyleSetFont( "FixedSys" )
-   ::StyleSetSize( 10 )
+   ::StyleSetFont( ::Application:IniFile:ReadString( "Font", "FaceName", "FixedSys" ) )
+   ::StyleSetSize( ::Application:IniFile:ReadInteger( "Font", "Size", 10 ) )
 
    ::SendMessage( SCI_STYLECLEARALL, 0, 0 )
    ::InitLexer()
@@ -160,8 +158,6 @@ METHOD InitLexer() CLASS SourceEditor
    SciSetProperty( ::hWnd, "fold.comment", "1" )
    SciSetProperty( ::hWnd, "fold.preprocessor", "0" )
    SciSetProperty( ::hWnd, "fold.directive", "0" )
-
-   //SciSetFold( ::hWnd, "fold", "0" )
 
    SciSetKeywords( ::hWnd, 0, ::Keywords1 )
    SciSetKeywords( ::hWnd, 1, ::Keywords2 )
