@@ -4326,6 +4326,11 @@ HB_FUNC( NEXTLINE )
    }
 }
 
+HB_FUNC( SENDEDITOR )
+{
+   SendMessage( (HWND) hb_parnl(1), hb_parni(2), (WPARAM) hb_parnl(3), (LPARAM)hb_parnl(4) );
+}
+
 HB_FUNC( SCISETPROPERTY )
 {
    SendMessage( (HWND) hb_parnl(1), 4004, (WPARAM) hb_parc(2), (LPARAM)(LPCTSTR) hb_parc(3) );

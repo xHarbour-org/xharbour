@@ -59,8 +59,13 @@ CLASS SourceEditor INHERIT Control
    DATA ColorKeywords3    EXPORTED
    DATA ColorKeywords4    EXPORTED
 
+   DATA FontFaceName      EXPORTED
+   DATA FontSize          EXPORTED
+
    DATA cFindWhat         EXPORTED
    DATA nDirection        EXPORTED
+   DATA CaretLineVisible  EXPORTED
+   DATA AutoIndent        EXPORTED
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -93,13 +98,13 @@ CLASS SourceEditor INHERIT Control
    METHOD OnKeyUp()
    METHOD OnKeyDown()
    METHOD InitLexer()
-   METHOD AutoIndent()
+   METHOD AutoIndentText()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS SourceEditor
    LOCAL nKey, cKey, n, cText, cSyntax := ::Application:Path + "\vxh.syn"
-   ::hSciLib := LoadLibrary( "SciLexer212.dll" )
+   ::hSciLib := LoadLibrary( "SciLexer.dll" )
    ::__xCtrlName := "SourceEditor"
    ::ClsName := "Scintilla"
    ::Super:Init( oParent )
@@ -132,6 +137,11 @@ METHOD Init( oParent ) CLASS SourceEditor
    ::ColorKeywords2    := ::Application:IniFile:ReadColor( "Colors", "Keywords2",    ::System:Color:DarkCyan       )
    ::ColorKeywords3    := ::Application:IniFile:ReadColor( "Colors", "Keywords3",    ::System:Color:SteelBlue      )
    ::ColorKeywords4    := ::Application:IniFile:ReadColor( "Colors", "Keywords4",    ::System:Color:DarkSlateGray  ) 
+   
+   ::FontFaceName      := ::Application:IniFile:ReadString( "Font", "FaceName", "FixedSys" )
+   ::FontSize          := ::Application:IniFile:ReadInteger( "Font", "Size", 10 )
+   ::CaretLineVisible  := ::Application:IniFile:ReadInteger( "Settings", "CaretLineVisible", 1 )
+   ::AutoIndent        := ::Application:IniFile:ReadInteger( "Settings", "AutoIndent", 1 )
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -139,13 +149,13 @@ METHOD Create() CLASS SourceEditor
    ::Super:Create()
 
    ::SendMessage( SCI_SETLEXER, SCLEX_FLAGSHIP )
-   ::SendMessage( SCI_SETSTYLEBITS, 7)
+   ::SendMessage( SCI_SETSTYLEBITS, ::SendMessage( SCI_GETSTYLEBITSNEEDED ) )
    
    ::StyleSetBack( STYLE_DEFAULT, ::ColorBackground )
    ::StyleSetFore( STYLE_DEFAULT, ::ColorNormalText )
 
-   ::StyleSetFont( ::Application:IniFile:ReadString( "Font", "FaceName", "FixedSys" ) )
-   ::StyleSetSize( ::Application:IniFile:ReadInteger( "Font", "Size", 10 ) )
+   ::StyleSetFont( ::FontFaceName )
+   ::StyleSetSize( ::FontSize )
 
    ::SendMessage( SCI_STYLECLEARALL, 0, 0 )
    ::InitLexer()
@@ -170,7 +180,7 @@ METHOD InitLexer() CLASS SourceEditor
    ::SendMessage( SCI_STYLESETFORE, SCE_FS_KEYWORD4,       ::ColorKeywords4 )
 
    ::SendMessage( SCI_SETCARETLINEBACK, ::ColorSelectedLine )
-   ::SendMessage( SCI_SETCARETLINEVISIBLE, 1 )
+   ::SendMessage( SCI_SETCARETLINEVISIBLE, ::CaretLineVisible )
 
    ::SendMessage( SCI_STYLESETFORE, SCE_FS_COMMENT,        ::ColorComments  )
    ::SendMessage( SCI_STYLESETFORE, SCE_FS_COMMENTLINE,    ::ColorComments  )
@@ -195,13 +205,13 @@ METHOD InitLexer() CLASS SourceEditor
 
    //::SendMessage( SCI_SETEDGEMODE, 1 )
 
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDER,        SC_MARK_PLUS  )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEROPEN,    SC_MARK_MINUS )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERSUB,     SC_MARK_EMPTY    )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEROPENMID, SC_MARK_EMPTY    )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERMIDTAIL, SC_MARK_EMPTY    )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERTAIL,    SC_MARK_EMPTY    )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEREND,     SC_MARK_EMPTY  )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEROPEN,    SC_MARK_BOXMINUS )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDER,        SC_MARK_BOXPLUS  )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERSUB,     SC_MARK_VLINE    )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERTAIL,    SC_MARK_LCORNER    )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEREND,     SC_MARK_BOXPLUSCONNECTED  )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEROPENMID, SC_MARK_BOXMINUSCONNECTED    )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERMIDTAIL, SC_MARK_TCORNER    )
 
    ::SendMessage( SCI_MARKERSETFORE, SC_MARKNUM_FOLDER,        RGB( 255, 255, 255 ) )
    ::SendMessage( SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPEN,    RGB( 255, 255, 255 ) )
@@ -304,8 +314,10 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
       CASE hdr:code == SCN_CHARADDED
            scn := (struct SCNOTIFICATION*) nlParam
            IF scn:ch == 13 // indent
-              ::AutoIndent()
-              
+              IF ::AutoIndent == 1
+                 ::AutoIndentText()
+              ENDIF
+
             ELSEIF scn:ch == 58
               IF ::SendMessage( SCI_AUTOCACTIVE ) > 0
                  ::SendMessage( SCI_AUTOCCANCEL )
@@ -387,7 +399,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
-METHOD AutoIndent() CLASS SourceEditor
+METHOD AutoIndentText() CLASS SourceEditor
    LOCAL nCurLine     := ::Source:GetCurLine()
    LOCAL nIndentation := ::Source:GetLineIndentation( nCurLine - 1 )
    ::Source:SetLineIndentation( nCurLine, nIndentation )
@@ -412,6 +424,12 @@ METHOD OnDestroy() CLASS SourceEditor
    ::Application:IniFile:WriteColor( "Colors", "Keywords2",    ::ColorKeywords2 )
    ::Application:IniFile:WriteColor( "Colors", "Keywords3",    ::ColorKeywords3 )
    ::Application:IniFile:WriteColor( "Colors", "Keywords4",    ::ColorKeywords4 )
+
+   ::Application:IniFile:WriteString( "Font", "FaceName", ::FontFaceName )
+   ::Application:IniFile:WriteInteger( "Font", "Size", ::FontSize )
+   ::Application:IniFile:WriteInteger( "Settings", "CaretLineVisible", ::CaretLineVisible )
+   ::Application:IniFile:WriteInteger( "Settings", "AutoIndent", ::AutoIndent )
+
    aEval( ::aDocs, {|oDoc| oDoc:Close() } )
    FreeLibrary( ::hSciLib )
 RETURN NIL
