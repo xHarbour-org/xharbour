@@ -232,7 +232,9 @@ METHOD InitLexer() CLASS SourceEditor
    //::SendMessage( SCI_RGBAIMAGESETWIDTH, 16, 0 )
    //::SendMessage( SCI_RGBAIMAGESETHEIGHT, 16, 0 )
 
-   SciRegisterImage( ::hWnd, 8 )
+   SciRegisterPropertyImage( ::hWnd, 8 )
+   SciRegisterMethodImage( ::hWnd, 7 )
+   SciRegisterEventImage( ::hWnd, 6 )
 
    //SciRegisterImage( ::hWnd, 2, "ICO_METHOD" )
    //SciRegisterImage( ::hWnd, 3, "ICO_EVENT" )
@@ -268,7 +270,7 @@ RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
-   LOCAL scn, n, cText, nLine, cObj, nChar, nPosStart, nPosEnd, oObj, aObj, aProperties, aProp, cList
+   LOCAL scn, n, cText, nLine, cObj, nChar, nPosStart, nPosEnd, oObj, aObj, aProperties, aProp, cList, aMethods, Topic, Event, aList
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == SCN_UPDATEUI
@@ -354,16 +356,31 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                  NEXT
                  
                  IF VALTYPE(oObj) == "O"
+                    aList := {}
+
                     aProperties := __ClsGetPropertiesAndValues( oObj )
-                    
-                    aSort( aProperties,,,{|x, y| x[1] < y[1]})
-
-                    cList := ""
-
                     FOR n := 1 TO LEN( aProperties )
                         aProp := GetProperCase( __Proper( aProperties[n][1] ) )
-                        cList += aProp[1]+ IIF( n<LEN(aProperties),"?8 ","" )
+                        AADD( aList, aProp[1]+"?8" )
                     NEXT
+
+                    aMethods := __objGetMethodList( oObj )
+                    FOR n := 1 TO LEN( aProperties )
+                        AADD( aList, __Proper( aMethods[n] )+"?7" )
+                    NEXT
+
+                    FOR EACH Topic IN oObj:Events
+                        FOR EACH Event IN Topic[2]
+                            AADD( aList, Event[1]+"?6" )
+                        NEXT
+                    NEXT
+
+                    aSort( aList,,,{|x, y| x[1] < y[1]})
+                    cList := ""
+                    FOR n := 1 TO LEN( aList )
+                        cList += aList[n]+ IIF( n<LEN(aList)," ", "" )
+                    NEXT
+
                     ::SendMessage( SCI_AUTOCSETMAXHEIGHT, 15 )
                     ::SendMessage( SCI_AUTOCSETIGNORECASE, 1 )
                     ::SendMessage( SCI_AUTOCSHOW, 0, cList )
