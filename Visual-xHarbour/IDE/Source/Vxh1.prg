@@ -834,6 +834,21 @@ METHOD Init() CLASS IDE_MainForm
             :Action           := {|o| IIF( o:Enabled, ::Application:Project:Redo(), ) }
             :Create()
          END
+
+         WITH OBJECT ::Application:Props[ "RectSelect" ] := MenuStripItem( :this )
+            :Caption           := "&Toggle Rectangle Selection"
+            :BeginGroup        := .T.
+            :ImageIndex        := 0
+            :ShortCutText      := "Ctrl+Shift+F8"
+            :ShortCutKey:Ctrl  := .T.
+            :ShortCutKey:Shift := .T.
+            :ShortCutKey:Key   := VK_F8
+            :Enabled           := .T.
+            :Action            := {|| ::Application:SourceEditor:ToggleRectSel() }
+            :Create()
+         END
+
+
       END
       //------------------------------------------------------------------
       WITH OBJECT ::Application:SearchMenu := MenuStripItem( :this )

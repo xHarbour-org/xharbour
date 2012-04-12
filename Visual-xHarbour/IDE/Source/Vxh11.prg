@@ -99,6 +99,7 @@ CLASS SourceEditor INHERIT Control
    METHOD OnKeyDown()
    METHOD InitLexer()
    METHOD AutoIndentText()
+   METHOD ToggleRectSel()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -251,6 +252,10 @@ RETURN NIL
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnLButtonUp() CLASS SourceEditor
    ::Application:Project:EditReset()
+RETURN NIL
+
+METHOD ToggleRectSel() CLASS SourceEditor
+   ::SendMessage( SCI_SETSELECTIONMODE, SC_SEL_RECTANGLE, 0 )
 RETURN NIL
 
 METHOD OnKeyDown( nKey ) CLASS SourceEditor
