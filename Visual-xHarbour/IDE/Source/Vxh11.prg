@@ -378,7 +378,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                     NEXT
 
                     aMethods := __objGetMethodList( oObj )
-                    FOR n := 1 TO LEN( aProperties )
+                    FOR n := 1 TO LEN( aMethods )
                         AADD( aList, __Proper( aMethods[n] )+"?7" )
                     NEXT
 

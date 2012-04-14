@@ -39,6 +39,7 @@
 
 #include <stdio.h>
 #include <olectl.h>
+#include <Awesomium\awesomium_capi.h>
 
 #define __strcpy            _tcscpy
 #define __strcat            _tcscat
@@ -4635,3 +4636,67 @@ HB_FUNC( SCIREGISTERPROPERTYIMAGE )
    "                "};
    SendMessage( (HWND) hb_parnl(1), SCI_REGISTERIMAGE, (WPARAM) hb_parni(2), Property_xpm );
 }
+
+HB_FUNC( AWE_WEBCORE_INITIALIZE )
+{
+   BOOL enable_plugins = TRUE;
+   BOOL enable_javascript = TRUE;
+   BOOL enable_databases = TRUE;
+   const awe_string* package_path;
+   const awe_string* locale_path;
+   const awe_string* user_data_path;
+   const awe_string* plugin_path;
+   const awe_string* log_path;
+   awe_loglevel log_level;
+   BOOL force_single_process = TRUE;
+   const awe_string* child_process_path;
+   BOOL enable_auto_detect_encoding = TRUE;
+   const awe_string* accept_language_override;
+   const awe_string* default_charset_override;
+   const awe_string* user_agent_override;
+   const awe_string* proxy_server;
+   const awe_string* proxy_config_script;
+   const awe_string* auth_server_whitelist;
+   BOOL save_cache_and_cookies = TRUE;
+   int max_cache_size;
+   BOOL disable_same_origin_policy = TRUE;
+   BOOL disable_win_message_pump = TRUE;
+   const awe_string* custom_css;
+                              
+   awe_webcore_initialize( enable_plugins,
+                           enable_javascript,
+                           enable_databases,
+                           package_path,
+                           locale_path,
+                           user_data_path,
+                           plugin_path,
+                           log_path,
+                           log_level,
+                           force_single_process,
+                           child_process_path,
+                           enable_auto_detect_encoding,
+                           accept_language_override,
+                           default_charset_override,
+                           user_agent_override,
+                           proxy_server,
+                           proxy_config_script,
+                           auth_server_whitelist,
+                           save_cache_and_cookies,
+                           max_cache_size,
+                           disable_same_origin_policy,
+                           disable_win_message_pump,
+                           custom_css );
+}
+
+HB_FUNC( AWE_WEBCORE_INITIALIZE_DEFAULT )
+{
+   awe_webcore_initialize_default();
+}
+
+HB_FUNC( AWE_WEBCORE_CREATE_WEBVIEW )
+{
+   hb_retc( (char*) awe_webcore_create_webview( hb_parni(1), hb_parni(2), hb_parl(3) ) );
+}
+
+#pragma comment( lib, "Awesomium.lib" )
+

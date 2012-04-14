@@ -79,9 +79,6 @@ INIT PROCEDURE __VXH_Start
 RETURN
 
 PROCEDURE Main( cFile )
-   SET CENTURY ON
-   SET AUTOPEN OFF
-
    //RegisterDotNetComponent( "c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\System.Windows.Forms.dll", "DotNet.Forms.1", @cError )
 
    AssociateWith( ".xfm", "vxh_project_component", "c:\windows\notepad.exe", "Visual xHarbour file", 1 )
