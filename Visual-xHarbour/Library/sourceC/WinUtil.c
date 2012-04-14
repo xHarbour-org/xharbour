@@ -39,7 +39,7 @@
 
 #include <stdio.h>
 #include <olectl.h>
-#include <Awesomium\awesomium_capi.h>
+//#include <Awesomium\awesomium_capi.h>
 
 #define __strcpy            _tcscpy
 #define __strcat            _tcscat
@@ -4636,7 +4636,7 @@ HB_FUNC( SCIREGISTERPROPERTYIMAGE )
    "                "};
    SendMessage( (HWND) hb_parnl(1), SCI_REGISTERIMAGE, (WPARAM) hb_parni(2), Property_xpm );
 }
-
+/*
 HB_FUNC( AWE_WEBCORE_INITIALIZE )
 {
    BOOL enable_plugins = TRUE;
@@ -4699,4 +4699,4 @@ HB_FUNC( AWE_WEBCORE_CREATE_WEBVIEW )
 }
 
 #pragma comment( lib, "Awesomium.lib" )
-
+*/
