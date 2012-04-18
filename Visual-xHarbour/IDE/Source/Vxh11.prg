@@ -16,12 +16,22 @@
 
 #define EOL Chr(13) + Chr(10)
 
+static hSciLib
+
+INIT PROCEDURE StartSci
+   hSciLib := LoadLibrary( "SciLexer.dll" )
+RETURN
+
+EXIT PROCEDURE FreeSci
+   FreeLibrary( hSciLib )
+   hSciLib := NIL
+RETURN
+
 //------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------
 
 CLASS SourceEditor INHERIT Control
-   DATA hSciLib  PROTECTED
    DATA xSource  PROTECTED
 
    ASSIGN Source(o) INLINE IIF( ::xSource != NIL, ::xSource:SavePos(),), IIF( o != NIL, o:Select(),)
@@ -105,7 +115,6 @@ ENDCLASS
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS SourceEditor
    LOCAL nKey, cKey, n, cText, cSyntax := ::Application:Path + "\vxh.syn"
-   ::hSciLib := LoadLibrary( "SciLexer.dll" )
    ::__xCtrlName := "SourceEditor"
    ::ClsName := "Scintilla"
    ::Super:Init( oParent )
@@ -415,7 +424,6 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                         EXIT
                      ENDIF
                  NEXT
-                 VIEW cFind
                  SendEditorString( ::hWnd, SCI_AUTOCSELECT, cFind )
               ENDIF
            ENDIF
@@ -432,6 +440,8 @@ RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnDestroy() CLASS SourceEditor
+   aEval( ::aDocs, {|oDoc| oDoc:Close() } )
+
    ::Application:IniFile:WriteInteger( "Settings", "WrapSearch", ::Application:EditorProps:WrapSearch )
 
    ::Application:IniFile:WriteColor( "Colors", "NormalText",   ::ColorNormalText )
@@ -453,9 +463,6 @@ METHOD OnDestroy() CLASS SourceEditor
    ::Application:IniFile:WriteInteger( "Font", "Size", ::FontSize )
    ::Application:IniFile:WriteInteger( "Settings", "CaretLineVisible", ::CaretLineVisible )
    ::Application:IniFile:WriteInteger( "Settings", "AutoIndent", ::AutoIndent )
-
-   aEval( ::aDocs, {|oDoc| oDoc:Close() } )
-   //FreeLibrary( ::hSciLib )
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
