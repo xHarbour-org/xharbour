@@ -455,7 +455,7 @@ METHOD OnDestroy() CLASS SourceEditor
    ::Application:IniFile:WriteInteger( "Settings", "AutoIndent", ::AutoIndent )
 
    aEval( ::aDocs, {|oDoc| oDoc:Close() } )
-   FreeLibrary( ::hSciLib )
+   //FreeLibrary( ::hSciLib )
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
