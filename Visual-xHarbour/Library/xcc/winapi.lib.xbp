@@ -1,7 +1,7 @@
 CINI = 
 C_OUTPUTFOLDER = 
 DEFFILE = 
-INCLUDEFOLDERS =
+INCLUDEFOLDERS = ..\include;\xhb\include\w32
 LAUTORUN = 
 LDEBUG = .T.
 LGUI = .F.
