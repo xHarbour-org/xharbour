@@ -440,7 +440,17 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD OrdKeyRelPos(n) CLASS DataRdd
    LOCAL nRelPos := (::Owner:Alias)->( OrdKeyRelPos(n) )
+   IF VALTYPE(nRelPos)=="C"
+      IF EMPTY(nRelPos)
+         nRelPos := NIL
+       ELSE
+         nRelPos := VAL(nRelPos)
+      ENDIF
+   ENDIF
    DEFAULT nRelPos TO (::Owner:Alias)->( OrdKeyNo() )
+   IF VALTYPE(nRelPos)=="C"
+      nRelPos := VAL(nRelPos)
+   ENDIF
 RETURN nRelPos
 
 //-------------------------------------------------------------------------------------------------------

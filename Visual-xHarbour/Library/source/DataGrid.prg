@@ -3867,7 +3867,7 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    aRect := {nLeft, 0, nRight+1, ::Parent:__GetHeaderHeight()}
 
    IF ::SortArrow > 0
-      nx := 13
+      nx := 18
    ENDIF
    
    nTxColor   := ::HeaderForeColor
@@ -3908,7 +3908,7 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    n := ::Alignment
    
    IF n == 2
-      x := x - nx
+      x -= nx
     ELSEIF n == 3
       x := x - (nx/2)
    ENDIF
@@ -3947,7 +3947,7 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    IF !::Parent:xEnabled
       SetTextColor( hDC, GetSysColor( COLOR_GRAYTEXT ) )
    ENDIF
-   
+   SetBkMode( hDC, TRANSPARENT )
    _ExtTextOut( hDC, x, y, ETO_CLIPPED, aRect, ::Caption )
    SetTextColor( hDC, nColor )
 

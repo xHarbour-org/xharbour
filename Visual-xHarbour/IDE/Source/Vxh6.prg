@@ -159,6 +159,7 @@ METHOD Create() CLASS ToolBox
    AADD( ::aButtons[3][2], { "OptionBar", lPro } )
    AADD( ::aButtons[3][2], { "RichTextBox", lPro } )
    AADD( ::aButtons[3][2], { "WebBrowser", lPro } )
+   //AADD( ::aButtons[3][2], { "WebControl", lPro } )
    AADD( ::aButtons[3][2], { "FreeImage", lPro } )
 
    AADD( ::aButtons[3][2], { "PageScroller", .T. } )
@@ -599,6 +600,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
       EXTERN OptionBar
       EXTERN RichTextBox
       EXTERN WebBrowser
+      //EXTERN WebControl
       EXTERN FreeImage
       EXTERN eMail
    #endif

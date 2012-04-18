@@ -4327,6 +4327,11 @@ HB_FUNC( NEXTLINE )
    }
 }
 
+HB_FUNC( SENDEDITORSTRING )
+{
+   SendMessage( (HWND) hb_parnl(1), hb_parni(2), 0, (LPARAM)(LPCTSTR) hb_parc(3) );
+}
+
 HB_FUNC( SENDEDITOR )
 {
    SendMessage( (HWND) hb_parnl(1), hb_parni(2), (WPARAM) hb_parnl(3), (LPARAM)hb_parnl(4) );
@@ -4636,6 +4641,7 @@ HB_FUNC( SCIREGISTERPROPERTYIMAGE )
    "                "};
    SendMessage( (HWND) hb_parnl(1), SCI_REGISTERIMAGE, (WPARAM) hb_parni(2), Property_xpm );
 }
+
 /*
 HB_FUNC( AWE_WEBCORE_INITIALIZE )
 {
