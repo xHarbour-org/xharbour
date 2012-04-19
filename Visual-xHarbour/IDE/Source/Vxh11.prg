@@ -290,7 +290,8 @@ RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
-   LOCAL cFind, scn, n, cObj, cText, nLine, nChar, nPosStart, nPosEnd, oObj, aObj, aProperties, aProp, cList, aMethods, Topic, Event, aList
+   LOCAL scn, nPos, n, cObj, cText, nLine, nChar, nPosStart, nPosEnd, oObj, aObj, aProperties, aProp, cList, aMethods, Topic, Event, aList//, cFind
+   LOCAL nWith, nWrap
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == SCN_UPDATEUI
@@ -349,7 +350,26 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                      EXIT
                   ENDIF
               NEXT
-
+              IF cObj == ":" 
+                 nWrap := ::Application:EditorProps:WrapSearch
+                 ::Application:EditorProps:WrapSearch := 0
+                 nPos := ::Source:GetCurrentPos()
+                 IF ::FindNext( "WITH OBJECT", .T. )
+                    nWith := ::PosFind
+                    ::Source:GotoPosition( nPos ) 
+                    IF ! ::FindNext( "END", .T. ) .OR. ::PosFind < nWith // END is before WITH OBJECT
+                       ::PosFind := nWith+11
+                       cObj := ""
+                       WHILE ( nChar := ::Source:GetCharAt(::PosFind) ) != 13
+                          cObj += CHR(nChar)
+                          ::PosFind++
+                       ENDDO
+                       cObj := ALLTRIM(cObj)+":"
+                    ENDIF
+                 ENDIF
+                 ::Application:EditorProps:WrapSearch := nWrap
+                 ::Source:GotoPosition( nPos ) 
+              ENDIF
               IF LEN( cObj ) >= 2
                  IF LEFT(cObj,2) == "::"
                     IF LEN(cObj) > 2
@@ -409,23 +429,23 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                     ::SendMessage( SCI_AUTOCSHOW, 0, cList )
                  ENDIF
               ENDIF
-            ELSE
-              IF ::SendMessage( SCI_AUTOCACTIVE ) > 0
-                 cFind := ""
-                 nPosEnd   := ::Source:GetCurrentPos()-1
-                 nPosStart := ::Source:PositionFromLine( ::Source:LineFromPosition( nPosEnd ) )
-                 FOR n := nPosEnd TO nPosStart STEP -1
-                     nChar := ::Source:GetCharAt(n)
-                     IF nChar IN {32,58}
-                        EXIT
-                     ENDIF
-                     cFind := CHR(nChar) + cFind
-                     IF ::Source:GetColumn(n)==0
-                        EXIT
-                     ENDIF
-                 NEXT
-                 SendEditorString( ::hWnd, SCI_AUTOCSELECT, cFind )
-              ENDIF
+//             ELSE
+//               IF ::SendMessage( SCI_AUTOCACTIVE ) > 0
+//                  cFind := ""
+//                  nPosEnd   := ::Source:GetCurrentPos()-1
+//                  nPosStart := ::Source:PositionFromLine( ::Source:LineFromPosition( nPosEnd ) )
+//                  FOR n := nPosEnd TO nPosStart STEP -1
+//                      nChar := ::Source:GetCharAt(n)
+//                      IF nChar IN {32,58}
+//                         EXIT
+//                      ENDIF
+//                      cFind := CHR(nChar) + cFind
+//                      IF ::Source:GetColumn(n)==0
+//                         EXIT
+//                      ENDIF
+//                  NEXT
+//                  SendEditorString( ::hWnd, SCI_AUTOCSELECT, cFind )
+//               ENDIF
            ENDIF
    ENDCASE
 RETURN NIL
