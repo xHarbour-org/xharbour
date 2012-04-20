@@ -110,6 +110,7 @@ CLASS SourceEditor INHERIT Control
    METHOD InitLexer()
    METHOD AutoIndentText()
    METHOD ToggleRectSel()
+   METHOD GetWithObject()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -291,7 +292,7 @@ RETURN NIL
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
    LOCAL scn, nPos, n, cObj, cText, nLine, nChar, nPosStart, nPosEnd, oObj, aObj, aProperties, aProp, cList, aMethods, Topic, Event, aList//, cFind
-   LOCAL nWith, nWrap
+   LOCAL nWrap
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == SCN_UPDATEUI
@@ -354,19 +355,9 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                  nWrap := ::Application:EditorProps:WrapSearch
                  ::Application:EditorProps:WrapSearch := 0
                  nPos := ::Source:GetCurrentPos()
-                 IF ::FindNext( "WITH OBJECT", .T. )
-                    nWith := ::PosFind
-                    ::Source:GotoPosition( nPos ) 
-                    IF ! ::FindNext( "END", .T. ) .OR. ::PosFind < nWith // END is before WITH OBJECT
-                       ::PosFind := nWith+11
-                       cObj := ""
-                       WHILE ( nChar := ::Source:GetCharAt(::PosFind) ) != 13
-                          cObj += CHR(nChar)
-                          ::PosFind++
-                       ENDDO
-                       cObj := ALLTRIM(cObj)+":"
-                    ENDIF
-                 ENDIF
+                  
+                 cObj := ::GetWithObject()
+
                  ::Application:EditorProps:WrapSearch := nWrap
                  ::Source:GotoPosition( nPos ) 
               ENDIF
@@ -411,11 +402,13 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                         AADD( aList, __Proper( aMethods[n] )+"?7" )
                     NEXT
 
-                    FOR EACH Topic IN oObj:Events
-                        FOR EACH Event IN Topic[2]
-                            AADD( aList, Event[1]+"?6" )
-                        NEXT
-                    NEXT
+                    IF __ObjHasMsg( oObj, "Events" )
+                       FOR EACH Topic IN oObj:Events
+                           FOR EACH Event IN Topic[2]
+                               AADD( aList, Event[1]+"?6" )
+                           NEXT
+                       NEXT
+                    ENDIF
 
                     aSort( aList,,,{|x, y| x[1] < y[1]})
                     cList := ""
@@ -449,6 +442,34 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
            ENDIF
    ENDCASE
 RETURN NIL
+
+METHOD GetWithObject() CLASS SourceEditor
+   LOCAL cObj, nWith, nChar, nPos := ::Source:GetCurrentPos()
+   cObj := ""
+   IF ::FindNext( "WITH OBJECT", .T. )
+      nWith := ::PosFind
+      ::Source:GotoPosition( nPos ) 
+      IF ! ::FindNext( "END", .T. ) .OR. ::PosFind < nWith // END is before WITH OBJECT
+         ::Source:GotoPosition( nPos ) 
+         IF ! ::FindNext( "METHOD", .T. ) .OR. ::PosFind < nWith
+            ::Source:GotoPosition( nPos ) 
+            IF ! ::FindNext( "FUNCTION", .T. ) .OR. ::PosFind < nWith
+               ::PosFind := nWith+11
+               WHILE ( nChar := ::Source:GetCharAt(::PosFind) ) != 13
+                  cObj += CHR(nChar)
+                  ::PosFind++
+               ENDDO
+               cObj := ALLTRIM(cObj)+":"
+               IF cObj[1] == ":"
+                  ::Source:GotoPosition( nWith-1 ) 
+                  cObj := ::GetWithObject() + cObj
+               ENDIF
+            ENDIF
+         ENDIF
+      ENDIF
+   ENDIF
+   ::Source:GotoPosition( nPos ) 
+RETURN cObj
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD AutoIndentText() CLASS SourceEditor
