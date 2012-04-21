@@ -1906,8 +1906,8 @@ METHOD Init() CLASS IDE_MainForm
             :Top              := 100
             :Width            := 200
             :Height           := 250
-            :Dock:TopMargin   := 1
-            :Dock:BottomMargin:= 1
+            //:Dock:TopMargin   := 1
+            //:Dock:BottomMargin:= 1
             :Dock:Left        := :Parent
             :Dock:Bottom      := ::Application:SourceTabs
             :Dock:Right       := :Parent
