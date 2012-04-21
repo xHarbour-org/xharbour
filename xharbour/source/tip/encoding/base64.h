@@ -5,6 +5,9 @@
 #ifndef _base64_h_
 #define _base64_h_
 #include <string.h>
+#ifdef HB_THREAD_SUPPORT
+#include "thread.h"
+#endif
 
 #ifdef __cplusplus    
 extern "C"{

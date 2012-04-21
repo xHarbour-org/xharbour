@@ -6,6 +6,9 @@
 #ifndef HB_THREAD_SUPPORT
 #define HB_THREAD_STUB
 #endif
+#ifdef HB_THREAD_SUPPORT
+#include "thread.h"
+#endif
 
 // #include "thread.h"
 #include "uuencode.h"
