@@ -120,9 +120,9 @@ CLASS ComboBox FROM Control
    METHOD GetCurSel()                       INLINE IIF( ::hWnd != NIL, ::SendMessage( CB_GETCURSEL, 0, 0)+1, NIL )
    METHOD Dir(nAttr, cFileSpec)             INLINE IIF( ::hWnd != NIL, ::SendMessage( CB_DIR, nAttr, cFileSpec), NIL )
    METHOD GetDroppedWidth()                 INLINE IIF( ::hWnd != NIL, ::SendMessage( CB_GETDROPPEDWIDTH, 0, 0), NIL )
-
+   METHOD GetEditText()
    METHOD ResetContent()                    INLINE IIF( ::hWnd != NIL, ::SendMessage( CB_RESETCONTENT, 0, 0 ) , NIL )
-   METHOD GetEditSel(nLine)                 INLINE IIF( ::hWnd != NIL, ::SendMessage( CB_GETEDITSEL, nLine-1, 0 ), NIL )
+   METHOD GetEditSel(nStart,nEnd)           INLINE IIF( ::hWnd != NIL, ::SendMessage( CB_GETEDITSEL, nStart,nEnd ), NIL )
    METHOD GetLBText( nLine, cBuffer )       INLINE IIF( ::hWnd != NIL, ::SendMessage( CB_GETLBTEXT,nLine-1, @cBuffer ), NIL )
    METHOD GetLBTextLen( nLine )             INLINE IIF( ::hWnd != NIL, ::SendMessage( CB_GETLBTEXTLEN, nLine-1, 0 ), NIL )
    METHOD SelectString( nLine, cText )      INLINE IIF( ::hWnd != NIL, ::SendMessage( CB_SELECTSTRING, nLine-1, cText ), NIL )
@@ -179,6 +179,14 @@ METHOD Init( oParent ) CLASS ComboBox
       AADD( ::Events[3][2], { "OnSelChange" , "", "" } )
    ENDIF
 RETURN Self
+
+//----------------------------------------------------------------------------------------------------------------
+METHOD GetEditText() CLASS ComboBox
+   LOCAL cText, hWnd := FindWindowEx( ::hwnd, 0, NIL, NIL )
+   IF IsWindow( hWnd )
+      cText := _GetWindowText( hWnd )
+   ENDIF
+RETURN cText
 
 //----------------------------------------------------------------------------------------------------------------
 METHOD SetDropDownStyle( nDrop ) CLASS ComboBox
