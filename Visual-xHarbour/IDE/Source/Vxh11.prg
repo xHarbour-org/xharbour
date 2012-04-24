@@ -79,11 +79,12 @@ CLASS SourceEditor INHERIT Control
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
-
-   METHOD StyleSetFont( cFont )           INLINE ::SendMessage( SCI_STYLESETFONT, STYLE_DEFAULT, cFont )
+   
+   METHOD StyleClearAll()                 INLINE ::SendMessage( SCI_STYLECLEARALL, 0, 0 ), Self
+   METHOD StyleSetFont( cFont )           INLINE ::FontFaceName := cFont, SendEditorString( ::hWnd, SCI_STYLESETFONT, STYLE_DEFAULT, cFont ), Self
    METHOD StyleGetFont( cFont )           INLINE cFont := SPACE(255), ::SendMessage( SCI_STYLEGETFONT, STYLE_DEFAULT, @cFont ), ALLTRIM(cFont)
 
-   METHOD StyleSetSize( nSize )           INLINE ::SendMessage( SCI_STYLESETSIZE, STYLE_DEFAULT, nSize )
+   METHOD StyleSetSize( nSize )           INLINE ::FontSize := nSize, ::SendMessage( SCI_STYLESETSIZE, STYLE_DEFAULT, nSize )
    METHOD StyleGetSize( nSize )           INLINE ::SendMessage( SCI_STYLEGETSIZE, STYLE_DEFAULT, @nSize ), nSize
 
    METHOD SetLexer( nLexer )              INLINE ::SendMessage( SCI_SETLEXER, nLexer, 0 )   
@@ -92,6 +93,8 @@ CLASS SourceEditor INHERIT Control
    METHOD OnDestroy()
    METHOD OnParentNotify()
    METHOD OnSetFocus()                    INLINE ::SendMessage( SCI_SETFOCUS, 1, 0 )
+
+   METHOD Colorise( nStart, nEnd )        INLINE ::SendMessage( SCI_COLOURISE, nStart, nEnd )
 
    METHOD StyleSetFore( nStyle, nColor )  INLINE ::SendMessage( SCI_STYLESETFORE, nStyle, nColor )
    METHOD StyleSetBack( nStyle, nColor )  INLINE ::SendMessage( SCI_STYLESETBACK, nStyle, nColor )
@@ -153,6 +156,13 @@ METHOD Init( oParent ) CLASS SourceEditor
    ::FontSize          := ::Application:IniFile:ReadInteger( "Font", "Size", 10 )
    ::CaretLineVisible  := ::Application:IniFile:ReadInteger( "Settings", "CaretLineVisible", 1 )
    ::AutoIndent        := ::Application:IniFile:ReadInteger( "Settings", "AutoIndent", 1 )
+
+   IF ( n := ::Application:Props:FontList:FindString(, ::FontFaceName ) ) > 0
+      ::Application:Props:FontList:SetCurSel(n)
+   ENDIF
+   IF ( n := ::Application:Props:FontSize:FindString(, xStr(::FontSize) ) ) > 0
+      ::Application:Props:FontSize:SetCurSel(n)
+   ENDIF
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -168,7 +178,7 @@ METHOD Create() CLASS SourceEditor
    ::StyleSetFont( ::FontFaceName )
    ::StyleSetSize( ::FontSize )
 
-   ::SendMessage( SCI_STYLECLEARALL, 0, 0 )
+   ::StyleClearAll()
    ::InitLexer()
 RETURN Self
 
@@ -440,7 +450,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
 //                         EXIT
 //                      ENDIF
 //                  NEXT
-//                  SendEditorString( ::hWnd, SCI_AUTOCSELECT, cFind )
+//                  SendEditorString( ::hWnd, SCI_AUTOCSELECT, 0, cFind )
 //               ENDIF
            ENDIF
    ENDCASE

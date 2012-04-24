@@ -502,7 +502,7 @@ RETURN NIL
 
 
 METHOD Init() CLASS IDE_MainForm
-   LOCAL cVersion, rc
+   LOCAL cVersion, rc, aFonts, n
 
    ::Super:Init()
    #ifdef VXH_DEMO
@@ -1415,6 +1415,68 @@ METHOD Init() CLASS IDE_MainForm
       END
    END
 
+   WITH OBJECT ::Application:Props[ "FontBar" ] := ToolStrip( ::ToolStripContainer1 )
+      //:ShowChevron := .F.
+      :Row       := 3
+      :Caption   := "Alignment"
+      :ImageList := ImageList( :this, 16, 16 ):Create()
+      :ImageList:AddIcon( "ICO_BOLD" )
+      :ImageList:AddIcon( "ICO_ITALIC" )
+      :ImageList:AddIcon( "ICO_UNDERLINE" )
+      :Enabled := .F.
+      :Create()
+
+      WITH OBJECT ::Application:Props[ "FontList" ] := ToolStripComboBox( :this )
+         :Action  := {|o| OutputDebugString(o:GetSelString()),::Application:SourceEditor:StyleSetFont( o:GetSelString() ):StyleClearAll():InitLexer() }
+         :DropDownStyle := ::System:DropDownStyle:DropDown
+         :ComboBox:VertScroll := .T.
+         :Height  := 336
+         :Width   := 217
+         :Create()
+         aFonts := ::Drawing:EnumFonts()
+         ASORT( aFonts,,, {|a,b| a[1]:lfFaceName:AsString() <  b[1]:lfFaceName:AsString() } )
+         FOR n := 1 TO LEN( aFonts )
+             :AddItem( aFonts[n][1]:lfFaceName:AsString() )
+         NEXT
+      END
+
+      WITH OBJECT ::Application:Props[ "FontSize" ] := ToolStripComboBox( :this )
+         :Action  := {|o| OutputDebugString(o:GetSelString()),::Application:SourceEditor:StyleSetSize( VAL(o:GetSelString()) ):StyleClearAll():InitLexer() }
+         :DropDownStyle := ::System:DropDownStyle:DropDown
+         :ComboBox:VertScroll := .T.
+         :Height  := 336
+         :Width   := 50
+         :Create()
+         aFonts := {8,9,10,11,12,14,16,18,20,22,24,26,28,36,48,72}
+         FOR n := 1 TO LEN( aFonts )
+             :AddItem( AllTrim( Str(aFonts[n]) ) )
+         NEXT
+      END
+
+
+      WITH OBJECT ::Application:Props[ "FontBold" ] := ToolStripButton( :this )
+         :ImageIndex   := 1
+         :BeginGroup   := .T.
+         :ToolTip:Text := "Bold"
+         :Action       := {||::Application:Project:CenterHorizontally() }
+         :Create()
+      END
+
+      WITH OBJECT ::Application:Props[ "FontItalic" ] := ToolStripButton( :this )
+         :ImageIndex   := 2
+         :ToolTip:Text := "Italic"
+         :Action       := {||::Application:Project:CenterVertically() }
+         :Create()
+      END
+
+      WITH OBJECT ::Application:Props[ "FontUnderline" ] := ToolStripButton( :this )
+         :ImageIndex   := 3
+         :ToolTip:Text := "Underline"
+         :Action       := {|o|::Application:Project:TabOrder(o) }
+         :Create()
+      END
+
+   END
 
    WITH OBJECT ::Application:ToolBox := ToolBox( Self )
       :Caption          := "ToolBox"
@@ -1795,6 +1857,7 @@ METHOD Init() CLASS IDE_MainForm
 
       :OnSelChanged := {|,,y| ::Application:Project:EditReset( IIF( y > 3, 1, 0 ) ),;
                               ::Application:MainForm:ToolBox1:Enabled := y > 3,;
+                              ::Application:Props:FontBar:Enabled := y == 3,;
                               ::Application:ObjectTree:Enabled := y > 3 }
       :Create()
 
@@ -1906,8 +1969,6 @@ METHOD Init() CLASS IDE_MainForm
             :Top              := 100
             :Width            := 200
             :Height           := 250
-            //:Dock:TopMargin   := 1
-            //:Dock:BottomMargin:= 1
             :Dock:Left        := :Parent
             :Dock:Bottom      := ::Application:SourceTabs
             :Dock:Right       := :Parent
