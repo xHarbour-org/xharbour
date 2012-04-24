@@ -98,11 +98,14 @@ CLASS ComboBox FROM Control
    DATA __nListProc       EXPORTED
    DATA __nTipProc        EXPORTED
    DATA __OriginalSel     EXPORTED INIT LB_ERR
+   DATA hEdit             EXPORTED
 
-   DATA __nWidth   PROTECTED INIT 0
-   DATA __aCustom  PROTECTED
-   DATA __tipWnd   PROTECTED
-   DATA __isEnter  PROTECTED INIT .F.
+   DATA __nWidth        PROTECTED INIT 0
+   DATA __aCustom       PROTECTED
+   DATA __tipWnd        PROTECTED
+   DATA __isEnter       PROTECTED INIT .F.
+   DATA __pCallBackEdit PROTECTED
+   DATA __nProcEdit     PROTECTED
 
    METHOD Init()  CONSTRUCTOR
 
@@ -152,7 +155,7 @@ CLASS ComboBox FROM Control
    METHOD SetItemHeight()
    METHOD __SetScrollBars()                INLINE Self
    METHOD SetDropDownStyle()
-   METHOD OnDestroy()                      INLINE ::__SetItemToolTips(.F.), NIL
+   METHOD OnDestroy()                      INLINE ::__SetItemToolTips(.F.), ::__ResetEdit(), NIL
    METHOD OnWindowPosChanged()             INLINE ::CallWindowProc(), ::SetItemHeight( -1, ::xSelectionHeight ), ::SetItemHeight( 2, ::xItemHeight ), 0
    METHOD OnKillFocus()                    INLINE IIF( ::DropDownStyle <> CBS_DROPDOWNLIST, 0, NIL )
    METHOD __ListCallBack()
@@ -162,6 +165,8 @@ CLASS ComboBox FROM Control
    METHOD __HandleOnPaint()
    METHOD __HandleOnTimer()
    METHOD __SetItemToolTips()
+   METHOD __ComboBoxEditProc()
+   METHOD __ResetEdit()
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------------
@@ -203,6 +208,7 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS ComboBox
+   LOCAL cbi
    ::Super:Create()
    ::SetItemHeight( -1, ::xSelectionHeight )
    ::SetItemHeight( 2, ::xItemHeight )
@@ -213,7 +219,32 @@ METHOD Create() CLASS ComboBox
    IF ::ItemToolTips
       ::__SetItemToolTips( .T. )
    ENDIF
+
+   cbi := ::GetComboBoxInfo()
+   ::hEdit := cbi:hwndItem
+   IF IsWindow( ::hEdit )
+      ::__pCallBackEdit := WinCallBackPointer( HB_ObjMsgPtr( Self, "__ComboBoxEditProc" ), Self )
+      ::__nProcEdit    := SetWindowLong( ::hEdit, GWL_WNDPROC, ::__pCallBackEdit )
+   ENDIF
 RETURN Self
+
+//----------------------------------------------------------------------------------------------------------------
+METHOD __ResetEdit() CLASS ComboBox
+   IF IsWindow( ::hEdit )
+      SetWindowLong( ::hEdit, GWL_WNDPROC, ::__nProcEdit )
+      FreeCallBackPointer( ::__pCallBackEdit )
+   ENDIF
+RETURN Self
+
+//----------------------------------------------------------------------------------------------------------------
+METHOD __ComboBoxEditProc( hWnd, nMsg, nwParam, nlParam ) CLASS ComboBox
+   DO CASE
+      CASE nMsg == WM_KEYUP
+         IF nwParam == VK_RETURN
+            __Evaluate( ::Action, Self, _GetWindowText(::hEdit),,,)
+         ENDIF
+   ENDCASE
+RETURN CallWindowProc( ::__nProcEdit, hWnd, nMsg, nwParam, nlParam )
 
 //----------------------------------------------------------------------------------------------------------------
 METHOD __SetItemToolTips( lTips ) CLASS ComboBox

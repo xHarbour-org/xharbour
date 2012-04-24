@@ -1427,7 +1427,16 @@ METHOD Init() CLASS IDE_MainForm
       :Create()
 
       WITH OBJECT ::Application:Props[ "FontList" ] := ToolStripComboBox( :this )
-         :Action  := {|o,cText| cText := o:GetSelString(), IIF( !EMPTY(cText), ::Application:SourceEditor:StyleSetFont( cText ):StyleClearAll():InitLexer(),) }
+         :Action  := <|o,cText|
+                       DEFAULT cText TO o:GetSelString()
+                       IF !EMPTY(cText)
+                          WITH OBJECT ::Application:SourceEditor
+                             :StyleSetFont( cText )
+                             :StyleClearAll()
+                             :InitLexer()
+                          END
+                       ENDIF
+                     >
          :DropDownStyle := ::System:DropDownStyle:DropDown
          :ComboBox:VertScroll := .T.
          :Height  := 336
@@ -1441,7 +1450,17 @@ METHOD Init() CLASS IDE_MainForm
       END
 
       WITH OBJECT ::Application:Props[ "FontSize" ] := ToolStripComboBox( :this )
-         :Action  := {|o,cText| cText := o:GetSelString(), IIF( !EMPTY(cText), ::Application:SourceEditor:StyleSetSize( VAL(cText) ):StyleClearAll():InitLexer(),) }
+         :Action  := <|o,cText|
+                       DEFAULT cText TO o:GetSelString()
+                       IF !EMPTY(cText)
+                          WITH OBJECT ::Application:SourceEditor
+                             :StyleSetSize( VAL(cText) )
+                             :StyleClearAll()
+                             :InitLexer()
+                          END
+                       ENDIF
+                     >
+
          :DropDownStyle := ::System:DropDownStyle:DropDown
          :ComboBox:VertScroll := .T.
          :Height  := 336
