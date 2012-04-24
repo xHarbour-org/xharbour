@@ -4329,7 +4329,7 @@ HB_FUNC( NEXTLINE )
 
 HB_FUNC( SENDEDITORSTRING )
 {
-   hb_retnl( (long) SendMessage( (HWND) hb_parnl(1), hb_parni(2), 0, (LPARAM)(LPCTSTR) hb_parc(3) ) );
+   hb_retnl( (long) SendMessage( (HWND) hb_parnl(1), hb_parni(2), hb_parni(3), (LPARAM)(LPCTSTR) hb_parc(4) ) );
 }
 
 HB_FUNC( SENDEDITOR )
