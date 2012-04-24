@@ -1427,13 +1427,16 @@ METHOD Init() CLASS IDE_MainForm
       :Create()
 
       WITH OBJECT ::Application:Props[ "FontList" ] := ToolStripComboBox( :this )
-         :Action  := <|o,cText|
+         :Action  := <|o,cText,n|
                        DEFAULT cText TO o:GetSelString()
                        IF !EMPTY(cText)
                           WITH OBJECT ::Application:SourceEditor
                              :StyleSetFont( cText )
                              :StyleClearAll()
                              :InitLexer()
+                             IF ( n := o:FindString(, cText ) ) > 0
+                                o:SetCurSel(n)
+                             ENDIF
                           END
                        ENDIF
                      >
@@ -1457,6 +1460,9 @@ METHOD Init() CLASS IDE_MainForm
                              :StyleSetSize( VAL(cText) )
                              :StyleClearAll()
                              :InitLexer()
+                             IF ( n := o:FindString(, cText ) ) > 0
+                                o:SetCurSel(n)
+                             ENDIF
                           END
                        ENDIF
                      >

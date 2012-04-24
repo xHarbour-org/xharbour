@@ -2786,8 +2786,10 @@ RETURN Self
 
 METHOD Create() CLASS ToolStripComboBox
    ::ToolStripItem:Create()
+   ::Super:Create()
    ::Top := ((::Parent:Height-5) - ::SelectionHeight)/2
    ::SelectionHeight := ::SelectionHeight//::Parent:Height - 10
+
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
