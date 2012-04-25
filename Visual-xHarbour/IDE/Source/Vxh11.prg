@@ -1014,3 +1014,182 @@ RETURN nPos
 function view( cView )
    VIEW cView
 RETURN NIL
+
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Settings INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD DefBack_OnClick()
+   METHOD DefFore_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Settings
+   ::Super:Init( oParent, aParameters )
+
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "Settings"
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 471
+   ::Height               := 458
+   ::Center               := .T.
+   ::Caption              := "Source Editor Settings"
+   ::DlgModalFrame        := .T.
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS Settings
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( TABSTRIP( Self ) )
+      :Name                 := "TabStrip1"
+      WITH OBJECT :Dock
+         :Left                 := "Settings"
+         :Top                  := "Settings"
+         :Right                := "Settings"
+         :Bottom               := "Button3"
+         :Margins              := "5,5,5,5"
+      END
+
+      :Left                 := 5
+      :Top                  := 5
+      :Width                := 453
+      :Height               := 389
+      :Create()
+      WITH OBJECT ( TABPAGE( :this ) )
+         :Name                 := "EditorSettings"
+         :Caption              := "&Editor"
+         :Create()
+         WITH OBJECT ( GROUPBOX( :this ) )
+            :Name                 := "GroupBox1"
+            :Left                 := 10
+            :Top                  := 3
+            :Width                := 431
+            :Height               := 225
+            :Caption              := "Colors"
+            :ForeColor            := 0
+            :Create()
+            WITH OBJECT ( BUTTON( :this ) )
+               :Name                 := "DefBack"
+               :Left                 := 215
+               :Top                  := 21
+               :Width                := 77
+               :Height               := 22
+               :Caption              := "Background"
+               :EventHandler[ "OnClick" ] := "DefBack_OnClick"
+               :Create()
+            END //BUTTON
+
+            WITH OBJECT ( BUTTON( :this ) )
+               :Name                 := "DefFore"
+               :Left                 := 297
+               :Top                  := 21
+               :Width                := 77
+               :Height               := 22
+               :Caption              := "Foreground"
+               :EventHandler[ "OnClick" ] := "DefFore_OnClick"
+               :Create()
+            END //BUTTON
+
+            WITH OBJECT ( LABEL( :this ) )
+               :Name                 := "Label1"
+               :Left                 := 25
+               :Top                  := 24
+               :Width                := 42
+               :Height               := 16
+               :Caption              := "Default"
+               :Create()
+            END //LABEL
+
+            WITH OBJECT ( EDITBOX( :this ) )
+               :Name                 := "DefColor"
+               :Left                 := 76
+               :Top                  := 22
+               :Width                := 129
+               :Height               := 22
+               :StaticEdge           := .T.
+               :ClientEdge           := .F.
+               :Caption              := "Normal Text"
+               :BackColor            := ::Application:SourceEditor:ColorBackground
+               :ForeColor            := ::Application:SourceEditor:ColorNormalText
+               :ReadOnly             := .T.
+               :Create()
+            END //EDITBOX
+
+         END //GROUPBOX
+
+      END //TABPAGE
+
+   END //TABSTRIP
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button3"
+      WITH OBJECT :Dock
+         :Right                := "Button4"
+         :Bottom               := "Settings"
+         :Margins              := "5,5,5,5"
+      END
+
+      :Left                 := 226
+      :Top                  := 399
+      :Width                := 75
+      :Height               := 24
+      :Caption              := "OK"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button4"
+      WITH OBJECT :Dock
+         :Right                := "Button5"
+         :Bottom               := "Settings"
+         :Margins              := "5,5,5,5"
+      END
+
+      :Left                 := 304
+      :Top                  := 399
+      :Width                := 75
+      :Height               := 24
+      :Caption              := "Cancel"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button5"
+      WITH OBJECT :Dock
+         :Right                := "Settings"
+         :Bottom               := "Settings"
+         :Margins              := "5,5,5,5"
+      END
+
+      :Left                 := 383
+      :Top                  := 399
+      :Width                := 75
+      :Height               := 24
+      :Caption              := "&Apply"
+      :Create()
+   END //BUTTON
+
+RETURN Self
+
+//----------------------------------------------------------------------------------------------------
+METHOD DefBack_OnClick() CLASS Settings
+   
+RETURN Self
+
+//----------------------------------------------------------------------------------------------------
+METHOD DefFore_OnClick() CLASS Settings
+   
+RETURN Self

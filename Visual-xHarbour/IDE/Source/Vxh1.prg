@@ -1060,6 +1060,12 @@ METHOD Init() CLASS IDE_MainForm
          :Create()
 
          WITH OBJECT MenuStripItem( :this )
+            :Caption := "&Settings"
+            :Action  := {|| Settings( Self ) }
+            :Create()
+         END
+
+         WITH OBJECT MenuStripItem( :this )
             :Caption := "&Help"
             :Action  := {|| MessageBox( , "Sorry, no help available yet.", "Visual xHarbour", MB_OK | MB_ICONEXCLAMATION ) }
             :Create()
