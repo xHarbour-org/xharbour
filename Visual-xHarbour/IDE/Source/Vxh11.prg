@@ -118,7 +118,7 @@ ENDCLASS
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS SourceEditor
-   LOCAL nKey, cKey, n, cText, cSyntax := ::Application:Path + "\vxh.syn"
+   LOCAL n, cSyntax := ::Application:Path + "\\vxh.syn"
    ::__xCtrlName := "SourceEditor"
    ::ClsName := "Scintilla"
    ::Super:Init( oParent )
@@ -128,13 +128,10 @@ METHOD Init( oParent ) CLASS SourceEditor
    ::EventHandler[ "OnReplaceAll" ] := "OnReplaceAll"
    
    IF FILE( cSyntax )
-      cText := MemoRead( cSyntax )
-      nKey  := 2
-      WHILE ( n := AT( "[Keywords"+xStr(nKey)+"]", cText ) ) > 0
-         cKey := "Keywords"+xStr(nKey-1)
-         __objSendMsg( Self, "_"+cKey, SUBSTR( cText, 13, n-1 ) )
-         nKey++
-      ENDDO
+      ::Keywords1 := STRTRAN( GetPrivateProfileSection( "Keywords1", cSyntax ), CHR(0), " " )
+      ::Keywords2 := STRTRAN( GetPrivateProfileSection( "Keywords2", cSyntax ), CHR(0), " " )
+      ::Keywords3 := STRTRAN( GetPrivateProfileSection( "Keywords3", cSyntax ), CHR(0), " " )
+      ::Keywords4 := STRTRAN( GetPrivateProfileSection( "Keywords4", cSyntax ), CHR(0), " " )
    ENDIF
 
    ::ColorNormalText   := ::Application:IniFile:ReadColor( "Colors", "NormalText",   ::System:Color:Black          )
@@ -1023,6 +1020,7 @@ CLASS Settings INHERIT Dialog
    METHOD OnInitDialog()
 
    // Event declaration
+   METHOD Settings_OnLoad()
    METHOD DefBack_OnClick()
    METHOD DefFore_OnClick()
 
@@ -1031,8 +1029,14 @@ ENDCLASS
 METHOD Init( oParent, aParameters ) CLASS Settings
    ::Super:Init( oParent, aParameters )
 
+   ::EventHandler[ "OnLoad" ] := "Settings_OnLoad"
 
    // Populate Components
+   WITH OBJECT ( ColorDialog( Self ) )
+      :Name                 := "ColorDialog1"
+      :Create()
+   END //ColorDialog1
+
    // Properties declaration
    ::Name                 := "Settings"
    ::Modal                := .T.
@@ -1075,15 +1079,15 @@ METHOD OnInitDialog() CLASS Settings
          WITH OBJECT ( GROUPBOX( :this ) )
             :Name                 := "GroupBox1"
             :Left                 := 10
-            :Top                  := 3
+            :Top                  := 7
             :Width                := 431
-            :Height               := 225
+            :Height               := 347
             :Caption              := "Colors"
             :ForeColor            := 0
             :Create()
             WITH OBJECT ( BUTTON( :this ) )
-               :Name                 := "DefBack"
-               :Left                 := 215
+               :Name                 := "Background"
+               :Left                 := 263
                :Top                  := 21
                :Width                := 77
                :Height               := 22
@@ -1093,8 +1097,8 @@ METHOD OnInitDialog() CLASS Settings
             END //BUTTON
 
             WITH OBJECT ( BUTTON( :this ) )
-               :Name                 := "DefFore"
-               :Left                 := 297
+               :Name                 := "NormalText"
+               :Left                 := 345
                :Top                  := 21
                :Width                := 77
                :Height               := 22
@@ -1105,28 +1109,237 @@ METHOD OnInitDialog() CLASS Settings
 
             WITH OBJECT ( LABEL( :this ) )
                :Name                 := "Label1"
-               :Left                 := 25
+               :Left                 := 15
                :Top                  := 24
-               :Width                := 42
+               :Width                := 96
                :Height               := 16
                :Caption              := "Default"
+               :Rightalign           := .T.
                :Create()
             END //LABEL
 
             WITH OBJECT ( EDITBOX( :this ) )
-               :Name                 := "DefColor"
-               :Left                 := 76
+               :Name                 := "NormalTextEdit"
+               :Left                 := 124
                :Top                  := 22
                :Width                := 129
                :Height               := 22
                :StaticEdge           := .T.
                :ClientEdge           := .F.
                :Caption              := "Normal Text"
-               :BackColor            := ::Application:SourceEditor:ColorBackground
-               :ForeColor            := ::Application:SourceEditor:ColorNormalText
                :ReadOnly             := .T.
                :Create()
             END //EDITBOX
+
+            WITH OBJECT ( BUTTON( :this ) )
+               :Name                 := "SelectedLine"
+               :Left                 := 263
+               :Top                  := 48
+               :Width                := 77
+               :Height               := 22
+               :Caption              := "Background"
+               :EventHandler[ "OnClick" ] := "DefBack_OnClick"
+               :Create()
+            END //BUTTON
+
+            WITH OBJECT ( EDITBOX( :this ) )
+               :Name                 := "SelectedLineEdit"
+               :Left                 := 124
+               :Top                  := 49
+               :Width                := 129
+               :Height               := 22
+               :StaticEdge           := .T.
+               :ClientEdge           := .F.
+               :Caption              := "Normal Text"
+               :ReadOnly             := .T.
+               :Create()
+            END //EDITBOX
+
+            WITH OBJECT ( LABEL( :this ) )
+               :Name                 := "Label2"
+               :Left                 := 10
+               :Top                  := 51
+               :Width                := 101
+               :Height               := 16
+               :Caption              := "Current Line"
+               :Rightalign           := .T.
+               :Create()
+            END //LABEL
+
+            WITH OBJECT ( BUTTON( :this ) )
+               :Name                 := "Numbers"
+               :Left                 := 345
+               :Top                  := 75
+               :Width                := 77
+               :Height               := 22
+               :Caption              := "Foreground"
+               :EventHandler[ "OnClick" ] := "DefFore_OnClick"
+               :Create()
+            END //BUTTON
+
+            WITH OBJECT ( EDITBOX( :this ) )
+               :Name                 := "NumbersEdit"
+               :Left                 := 124
+               :Top                  := 76
+               :Width                := 129
+               :Height               := 22
+               :StaticEdge           := .T.
+               :ClientEdge           := .F.
+               :Caption              := "12345678"
+               :ReadOnly             := .T.
+               :Create()
+            END //EDITBOX
+
+            WITH OBJECT ( LABEL( :this ) )
+               :Name                 := "Label3"
+               :Left                 := 16
+               :Top                  := 79
+               :Width                := 96
+               :Height               := 16
+               :Caption              := "Numbers"
+               :Rightalign           := .T.
+               :Create()
+            END //LABEL
+
+            WITH OBJECT ( BUTTON( :this ) )
+               :Name                 := "Strings"
+               :Left                 := 345
+               :Top                  := 101
+               :Width                := 77
+               :Height               := 22
+               :Caption              := "Foreground"
+               :EventHandler[ "OnClick" ] := "DefFore_OnClick"
+               :Create()
+            END //BUTTON
+
+            WITH OBJECT ( EDITBOX( :this ) )
+               :Name                 := "StringsEdit"
+               :Left                 := 124
+               :Top                  := 102
+               :Width                := 129
+               :Height               := 22
+               :StaticEdge           := .T.
+               :ClientEdge           := .F.
+               :Caption              := '"This is text"'
+               :ReadOnly             := .T.
+               :Create()
+            END //EDITBOX
+
+            WITH OBJECT ( LABEL( :this ) )
+               :Name                 := "Label4"
+               :Left                 := 16
+               :Top                  := 105
+               :Width                := 96
+               :Height               := 16
+               :Caption              := "Strings"
+               :Rightalign           := .T.
+               :Create()
+            END //LABEL
+
+            WITH OBJECT ( BUTTON( :this ) )
+               :Name                 := "Comments"
+               :Left                 := 345
+               :Top                  := 128
+               :Width                := 77
+               :Height               := 22
+               :Caption              := "Foreground"
+               :EventHandler[ "OnClick" ] := "DefFore_OnClick"
+               :Create()
+            END //BUTTON
+
+            WITH OBJECT ( EDITBOX( :this ) )
+               :Name                 := "CommentsEdit"
+               :Left                 := 124
+               :Top                  := 129
+               :Width                := 129
+               :Height               := 22
+               :StaticEdge           := .T.
+               :ClientEdge           := .F.
+               :Caption              := "// Comment"
+               :ReadOnly             := .T.
+               :Create()
+            END //EDITBOX
+
+            WITH OBJECT ( LABEL( :this ) )
+               :Name                 := "Label5"
+               :Left                 := 16
+               :Top                  := 132
+               :Width                := 96
+               :Height               := 16
+               :Caption              := "Comments"
+               :Rightalign           := .T.
+               :Create()
+            END //LABEL
+
+            WITH OBJECT ( BUTTON( :this ) )
+               :Name                 := "Operators"
+               :Left                 := 345
+               :Top                  := 154
+               :Width                := 77
+               :Height               := 22
+               :Caption              := "Foreground"
+               :EventHandler[ "OnClick" ] := "DefFore_OnClick"
+               :Create()
+            END //BUTTON
+
+            WITH OBJECT ( EDITBOX( :this ) )
+               :Name                 := "OperatorsEdit"
+               :Left                 := 124
+               :Top                  := 155
+               :Width                := 129
+               :Height               := 22
+               :StaticEdge           := .T.
+               :ClientEdge           := .F.
+               :Caption              := ":="
+               :ReadOnly             := .T.
+               :Create()
+            END //EDITBOX
+
+            WITH OBJECT ( LABEL( :this ) )
+               :Name                 := "Label6"
+               :Left                 := 16
+               :Top                  := 158
+               :Width                := 96
+               :Height               := 16
+               :Caption              := "Operators"
+               :Rightalign           := .T.
+               :Create()
+            END //LABEL
+
+            WITH OBJECT ( BUTTON( :this ) )
+               :Name                 := "Preprocessors"
+               :Left                 := 345
+               :Top                  := 180
+               :Width                := 77
+               :Height               := 22
+               :Caption              := "Foreground"
+               :EventHandler[ "OnClick" ] := "DefFore_OnClick"
+               :Create()
+            END //BUTTON
+
+            WITH OBJECT ( EDITBOX( :this ) )
+               :Name                 := "PreprocessorEdit"
+               :Left                 := 124
+               :Top                  := 181
+               :Width                := 129
+               :Height               := 22
+               :StaticEdge           := .T.
+               :ClientEdge           := .F.
+               :Caption              := "#include"
+               :ReadOnly             := .T.
+               :Create()
+            END //EDITBOX
+
+            WITH OBJECT ( LABEL( :this ) )
+               :Name                 := "Label7"
+               :Left                 := 16
+               :Top                  := 184
+               :Width                := 96
+               :Height               := 16
+               :Caption              := "Preprocessor"
+               :Rightalign           := .T.
+               :Create()
+            END //LABEL
 
          END //GROUPBOX
 
@@ -1185,11 +1398,31 @@ METHOD OnInitDialog() CLASS Settings
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------
-METHOD DefBack_OnClick() CLASS Settings
-   
+METHOD DefBack_OnClick( Sender ) CLASS Settings
+   ::ColorDialog1:Color := ::Application:SourceEditor:&(Sender:Name)
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------
-METHOD DefFore_OnClick() CLASS Settings
-   
+METHOD DefFore_OnClick( Sender ) CLASS Settings
+   ::ColorDialog1:Color := ::Application:SourceEditor:&(Sender:Name)
+RETURN Self
+
+//----------------------------------------------------------------------------------------------------
+METHOD Settings_OnLoad() CLASS Settings
+   LOCAL nBackground := ::Application:SourceEditor:ColorBackground
+   ::NormalTextEdit:BackColor   := nBackground
+   ::SelectedLineEdit:BackColor := ::Application:SourceEditor:ColorSelectedLine
+   ::NumbersEdit:BackColor      := nBackground
+   ::StringsEdit:BackColor      := nBackground
+   ::CommentsEdit:BackColor     := nBackground
+   ::OperatorsEdit:BackColor    := nBackground
+   ::PreprocessorEdit:BackColor := nBackground
+
+   ::NormalTextEdit:ForeColor   := ::Application:SourceEditor:ColorNormalText
+   ::SelectedLineEdit:ForeColor := ::Application:SourceEditor:ColorNormalText
+   ::NumbersEdit:ForeColor      := ::Application:SourceEditor:ColorNumbers
+   ::StringsEdit:ForeColor      := ::Application:SourceEditor:ColorStrings
+   ::CommentsEdit:ForeColor     := ::Application:SourceEditor:ColorComments
+   ::OperatorsEdit:ForeColor    := ::Application:SourceEditor:ColorOperators
+   ::PreprocessorEdit:ForeColor := ::Application:SourceEditor:ColorPreprocessor
 RETURN Self
