@@ -1399,12 +1399,30 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------
 METHOD DefBack_OnClick( Sender ) CLASS Settings
-   ::ColorDialog1:Color := ::Application:SourceEditor:&(Sender:Name)
+   LOCAL cColor := "Color"+Sender:Name
+   LOCAL cEdit := IIF( Sender:Name == "Background", "NormalText", Sender:Name ) + "Edit"
+   ::ColorDialog1:Color := ::Application:SourceEditor:&cColor
+   IF ::ColorDialog1:Show()
+      ::&cEdit:BackColor := ::ColorDialog1:Color
+      IF Sender:Name != "SelectedLineEdit"
+         ::NormalTextEdit:BackColor   := ::ColorDialog1:Color
+         ::NumbersEdit:BackColor      := ::ColorDialog1:Color
+         ::StringsEdit:BackColor      := ::ColorDialog1:Color
+         ::CommentsEdit:BackColor     := ::ColorDialog1:Color
+         ::OperatorsEdit:BackColor    := ::ColorDialog1:Color
+         ::PreprocessorEdit:BackColor := ::ColorDialog1:Color
+      ENDIF
+   ENDIF
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------
 METHOD DefFore_OnClick( Sender ) CLASS Settings
-   ::ColorDialog1:Color := ::Application:SourceEditor:&(Sender:Name)
+   LOCAL cColor := "Color"+Sender:Name
+   LOCAL cEdit := Sender:Name + "Edit"
+   ::ColorDialog1:Color := ::Application:SourceEditor:&cColor
+   IF ::ColorDialog1:Show()
+      ::&cEdit:ForeColor := ::ColorDialog1:Color
+   ENDIF
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------

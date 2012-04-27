@@ -68,8 +68,7 @@ RETURN Self
 
 METHOD Show() CLASS ColorDialog
    DEFAULT ::aCustom TO ARRAY(16)
-   _ChooseColor( ::Owner:hWnd, @::Color, ::aCustom, ::Style )
-RETURN Self
+RETURN _ChooseColor( ::Owner:hWnd, @::Color, ::aCustom, ::Style )
 
 //------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------
