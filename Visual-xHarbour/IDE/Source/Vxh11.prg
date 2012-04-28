@@ -114,6 +114,7 @@ CLASS SourceEditor INHERIT Control
    METHOD AutoIndentText()
    METHOD ToggleRectSel()
    METHOD GetWithObject()
+   METHOD SetColors()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -180,18 +181,7 @@ METHOD Create() CLASS SourceEditor
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
-METHOD InitLexer() CLASS SourceEditor
-   SciSetProperty( ::hWnd, "fold", "1" )
-   SciSetProperty( ::hWnd, "fold.compact", "0" )
-   SciSetProperty( ::hWnd, "fold.comment", "1" )
-   SciSetProperty( ::hWnd, "fold.preprocessor", "0" )
-   SciSetProperty( ::hWnd, "fold.directive", "0" )
-
-   SciSetKeywords( ::hWnd, 0, ::Keywords1 )
-   SciSetKeywords( ::hWnd, 1, ::Keywords2 )
-   SciSetKeywords( ::hWnd, 2, ::Keywords3 )
-   SciSetKeywords( ::hWnd, 3, ::Keywords4 )
-
+METHOD SetColors() CLASS SourceEditor
    ::SendMessage( SCI_STYLESETFORE, SCE_FS_KEYWORD,        ::ColorKeywords1 )
    ::SendMessage( SCI_STYLESETFORE, SCE_FS_KEYWORD2,       ::ColorKeywords2 )
    ::SendMessage( SCI_STYLESETFORE, SCE_FS_KEYWORD3,       ::ColorKeywords3 )
@@ -213,26 +203,6 @@ METHOD InitLexer() CLASS SourceEditor
    ::SendMessage( SCI_SETFOLDMARGINHICOLOUR, 1, ::ColorBackground )
 
    ::SendMessage( SCI_SETCARETFORE, ::ColorNormalText )
-   ::SendMessage( SCI_SETCARETPERIOD, 500, 0 )
-   
-   ::SendMessage( SCI_SETCARETWIDTH, 2 )
-   ::SendMessage( SCI_SETCARETSTYLE, 1 )
-
-   ::SendMessage( SCI_SETMARGINWIDTHN, 1, 15 )
-   ::SendMessage( SCI_SETMARGINTYPEN,  MARGIN_SCRIPT_FOLD_INDEX, SC_MARGIN_SYMBOL )
-   ::SendMessage( SCI_SETMARGINWIDTHN, MARGIN_SCRIPT_FOLD_INDEX, 15 )
-   ::SendMessage( SCI_SETMARGINMASKN,  MARGIN_SCRIPT_FOLD_INDEX, SC_MASK_FOLDERS )
-   ::SendMessage( SCI_SETMARGINSENSITIVEN, MARGIN_SCRIPT_FOLD_INDEX, 1 )
-
-   //::SendMessage( SCI_SETEDGEMODE, 1 )
-
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEROPEN,    SC_MARK_MINUS )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDER,        SC_MARK_PLUS  )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERSUB,     SC_MARK_EMPTY )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERTAIL,    SC_MARK_EMPTY )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEREND,     SC_MARK_EMPTY )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEROPENMID, SC_MARK_EMPTY )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERMIDTAIL, SC_MARK_EMPTY )
 
    ::SendMessage( SCI_MARKERSETFORE, SC_MARKNUM_FOLDER,        ::ColorBackground )
    ::SendMessage( SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPEN,    ::ColorBackground )
@@ -249,24 +219,50 @@ METHOD InitLexer() CLASS SourceEditor
    ::SendMessage( SCI_MARKERSETBACK, SC_MARKNUM_FOLDERMIDTAIL, ::ColorNormalText )
    ::SendMessage( SCI_MARKERSETBACK, SC_MARKNUM_FOLDERTAIL,    ::ColorNormalText )
    ::SendMessage( SCI_MARKERSETBACK, SC_MARKNUM_FOLDEREND,     ::ColorNormalText )
+RETURN Self
+
+//------------------------------------------------------------------------------------------------------------------------------------
+METHOD InitLexer() CLASS SourceEditor
+   SciSetProperty( ::hWnd, "fold", "1" )
+   SciSetProperty( ::hWnd, "fold.compact", "0" )
+   SciSetProperty( ::hWnd, "fold.comment", "1" )
+   SciSetProperty( ::hWnd, "fold.preprocessor", "0" )
+   SciSetProperty( ::hWnd, "fold.directive", "0" )
+
+   SciSetKeywords( ::hWnd, 0, ::Keywords1 )
+   SciSetKeywords( ::hWnd, 1, ::Keywords2 )
+   SciSetKeywords( ::hWnd, 2, ::Keywords3 )
+   SciSetKeywords( ::hWnd, 3, ::Keywords4 )
+
+   ::SendMessage( SCI_SETCARETPERIOD, 500, 0 )
+   
+   ::SendMessage( SCI_SETCARETWIDTH, 2 )
+   ::SendMessage( SCI_SETCARETSTYLE, 1 )
+
+   ::SendMessage( SCI_SETMARGINWIDTHN, 1, 15 )
+   ::SendMessage( SCI_SETMARGINTYPEN,  MARGIN_SCRIPT_FOLD_INDEX, SC_MARGIN_SYMBOL )
+   ::SendMessage( SCI_SETMARGINWIDTHN, MARGIN_SCRIPT_FOLD_INDEX, 15 )
+   ::SendMessage( SCI_SETMARGINMASKN,  MARGIN_SCRIPT_FOLD_INDEX, SC_MASK_FOLDERS )
+   ::SendMessage( SCI_SETMARGINSENSITIVEN, MARGIN_SCRIPT_FOLD_INDEX, 1 )
+
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEROPEN,    SC_MARK_MINUS )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDER,        SC_MARK_PLUS  )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERSUB,     SC_MARK_EMPTY )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERTAIL,    SC_MARK_EMPTY )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEREND,     SC_MARK_EMPTY )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEROPENMID, SC_MARK_EMPTY )
+   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERMIDTAIL, SC_MARK_EMPTY )
 
    ::SendMessage( SCI_SETFOLDFLAGS, 16, 0)
 
-   //::SendMessage( SCI_SETINDENTATIONGUIDES, 1, 0)
-   //::SendMessage( SCI_SETHIGHLIGHTGUIDE, 30, 0)
-
    ::SendMessage( SCI_CLEARREGISTEREDIMAGES, 0, 0 )
-   //::SendMessage( SCI_RGBAIMAGESETWIDTH, 16, 0 )
-   //::SendMessage( SCI_RGBAIMAGESETHEIGHT, 16, 0 )
 
    SciRegisterPropertyImage( ::hWnd, 8 )
    SciRegisterMethodImage( ::hWnd, 7 )
    SciRegisterEventImage( ::hWnd, 6 )
 
-   //SciRegisterImage( ::hWnd, 2, "ICO_METHOD" )
-   //SciRegisterImage( ::hWnd, 3, "ICO_EVENT" )
-
    ::SendMessage( SCI_SETMODEVENTMASK, SC_MOD_CHANGEFOLD | SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT | SC_PERFORMED_UNDO | SC_PERFORMED_REDO )
+   ::SetColors()
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -1023,7 +1019,8 @@ CLASS Settings INHERIT Dialog
    METHOD Settings_OnLoad()
    METHOD DefBack_OnClick()
    METHOD DefFore_OnClick()
-
+   METHOD Button3_OnClick()
+   METHOD Apply()
 ENDCLASS
 
 METHOD Init( oParent, aParameters ) CLASS Settings
@@ -1081,7 +1078,7 @@ METHOD OnInitDialog() CLASS Settings
             :Left                 := 10
             :Top                  := 7
             :Width                := 431
-            :Height               := 347
+            :Height               := 314
             :Caption              := "Colors"
             :ForeColor            := 0
             :Create()
@@ -1341,6 +1338,146 @@ METHOD OnInitDialog() CLASS Settings
                :Create()
             END //LABEL
 
+            WITH OBJECT ( BUTTON( :this ) )
+               :Name                 := "Keywords1"
+               :Left                 := 345
+               :Top                  := 206
+               :Width                := 77
+               :Height               := 22
+               :Caption              := "Foreground"
+               :EventHandler[ "OnClick" ] := "DefFore_OnClick"
+               :Create()
+            END //BUTTON
+
+            WITH OBJECT ( EDITBOX( :this ) )
+               :Name                 := "Keywords1Edit"
+               :Left                 := 124
+               :Top                  := 207
+               :Width                := 129
+               :Height               := 22
+               :StaticEdge           := .T.
+               :ClientEdge           := .F.
+               :Caption              := "DO CASE"
+               :ReadOnly             := .T.
+               :Create()
+            END //EDITBOX
+
+            WITH OBJECT ( LABEL( :this ) )
+               :Name                 := "Label8"
+               :Left                 := 16
+               :Top                  := 210
+               :Width                := 96
+               :Height               := 16
+               :Caption              := "Keywords 1"
+               :Rightalign           := .T.
+               :Create()
+            END //LABEL
+
+            WITH OBJECT ( BUTTON( :this ) )
+               :Name                 := "Keywords2"
+               :Left                 := 345
+               :Top                  := 231
+               :Width                := 77
+               :Height               := 22
+               :Caption              := "Foreground"
+               :EventHandler[ "OnClick" ] := "DefFore_OnClick"
+               :Create()
+            END //BUTTON
+
+            WITH OBJECT ( EDITBOX( :this ) )
+               :Name                 := "Keywords2Edit"
+               :Left                 := 124
+               :Top                  := 232
+               :Width                := 129
+               :Height               := 22
+               :StaticEdge           := .T.
+               :ClientEdge           := .F.
+               :Caption              := "Function / Method"
+               :ReadOnly             := .T.
+               :Create()
+            END //EDITBOX
+
+            WITH OBJECT ( LABEL( :this ) )
+               :Name                 := "Label9"
+               :Left                 := 16
+               :Top                  := 235
+               :Width                := 96
+               :Height               := 16
+               :Caption              := "Keywords 2"
+               :Rightalign           := .T.
+               :Create()
+            END //LABEL
+
+            WITH OBJECT ( BUTTON( :this ) )
+               :Name                 := "Keywords3"
+               :Left                 := 345
+               :Top                  := 256
+               :Width                := 77
+               :Height               := 22
+               :Caption              := "Foreground"
+               :EventHandler[ "OnClick" ] := "DefFore_OnClick"
+               :Create()
+            END //BUTTON
+
+            WITH OBJECT ( EDITBOX( :this ) )
+               :Name                 := "Keywords3Edit"
+               :Left                 := 124
+               :Top                  := 257
+               :Width                := 129
+               :Height               := 22
+               :StaticEdge           := .T.
+               :ClientEdge           := .F.
+               :Caption              := "SendMessage"
+               :ReadOnly             := .T.
+               :Create()
+            END //EDITBOX
+
+            WITH OBJECT ( LABEL( :this ) )
+               :Name                 := "Label10"
+               :Left                 := 16
+               :Top                  := 260
+               :Width                := 96
+               :Height               := 16
+               :Caption              := "Keywords 3"
+               :Rightalign           := .T.
+               :Create()
+            END //LABEL
+
+            WITH OBJECT ( BUTTON( :this ) )
+               :Name                 := "Keywords4"
+               :Left                 := 345
+               :Top                  := 281
+               :Width                := 77
+               :Height               := 22
+               :Caption              := "Foreground"
+               :EventHandler[ "OnClick" ] := "DefFore_OnClick"
+               :Create()
+            END //BUTTON
+
+            WITH OBJECT ( EDITBOX( :this ) )
+               :Name                 := "Keywords4Edit"
+               :Left                 := 124
+               :Top                  := 282
+               :Width                := 129
+               :Height               := 22
+               :StaticEdge           := .T.
+               :ClientEdge           := .F.
+               :Caption              := "dbEval"
+               :ReadOnly             := .T.
+               :Create()
+            END //EDITBOX
+
+            WITH OBJECT ( LABEL( :this ) )
+               :Name                 := "Label11"
+               :Left                 := 16
+               :Top                  := 285
+               :Width                := 96
+               :Height               := 16
+               :Caption              := "Keywords 4"
+               :Rightalign           := .T.
+               :Create()
+            END //LABEL
+
          END //GROUPBOX
 
       END //TABPAGE
@@ -1360,6 +1497,7 @@ METHOD OnInitDialog() CLASS Settings
       :Width                := 75
       :Height               := 24
       :Caption              := "OK"
+      :EventHandler[ "OnClick" ] := "Button3_OnClick"
       :Create()
    END //BUTTON
 
@@ -1376,6 +1514,7 @@ METHOD OnInitDialog() CLASS Settings
       :Width                := 75
       :Height               := 24
       :Caption              := "Cancel"
+      :EventHandler[ "OnClick" ] := "Close"
       :Create()
    END //BUTTON
 
@@ -1392,6 +1531,7 @@ METHOD OnInitDialog() CLASS Settings
       :Width                := 75
       :Height               := 24
       :Caption              := "&Apply"
+      :EventHandler[ "OnClick" ] := "Apply"
       :Create()
    END //BUTTON
 
@@ -1411,6 +1551,10 @@ METHOD DefBack_OnClick( Sender ) CLASS Settings
          ::CommentsEdit:BackColor     := ::ColorDialog1:Color
          ::OperatorsEdit:BackColor    := ::ColorDialog1:Color
          ::PreprocessorEdit:BackColor := ::ColorDialog1:Color
+         ::Keywords1Edit:BackColor    := ::ColorDialog1:Color
+         ::Keywords2Edit:BackColor    := ::ColorDialog1:Color
+         ::Keywords3Edit:BackColor    := ::ColorDialog1:Color
+         ::Keywords4Edit:BackColor    := ::ColorDialog1:Color
       ENDIF
    ENDIF
 RETURN Self
@@ -1435,6 +1579,10 @@ METHOD Settings_OnLoad() CLASS Settings
    ::CommentsEdit:BackColor     := nBackground
    ::OperatorsEdit:BackColor    := nBackground
    ::PreprocessorEdit:BackColor := nBackground
+   ::Keywords1Edit:BackColor    := nBackground
+   ::Keywords2Edit:BackColor    := nBackground
+   ::Keywords3Edit:BackColor    := nBackground
+   ::Keywords4Edit:BackColor    := nBackground
 
    ::NormalTextEdit:ForeColor   := ::Application:SourceEditor:ColorNormalText
    ::SelectedLineEdit:ForeColor := ::Application:SourceEditor:ColorNormalText
@@ -1443,4 +1591,41 @@ METHOD Settings_OnLoad() CLASS Settings
    ::CommentsEdit:ForeColor     := ::Application:SourceEditor:ColorComments
    ::OperatorsEdit:ForeColor    := ::Application:SourceEditor:ColorOperators
    ::PreprocessorEdit:ForeColor := ::Application:SourceEditor:ColorPreprocessor
+   ::Keywords1Edit:ForeColor    := ::Application:SourceEditor:ColorKeywords1
+   ::Keywords2Edit:ForeColor    := ::Application:SourceEditor:ColorKeywords2
+   ::Keywords3Edit:ForeColor    := ::Application:SourceEditor:ColorKeywords3
+   ::Keywords4Edit:ForeColor    := ::Application:SourceEditor:ColorKeywords4
+RETURN Self
+
+//----------------------------------------------------------------------------------------------------
+METHOD Button3_OnClick() CLASS Settings
+   ::Apply()
+   ::Close()
+RETURN Self
+
+//----------------------------------------------------------------------------------------------------
+METHOD Apply() CLASS Settings
+   WITH OBJECT ::Application:SourceEditor
+      :ColorBackground   := ::NormalTextEdit:BackColor
+      :ColorSelectedLine := ::SelectedLineEdit:BackColor
+
+      :ColorNormalText   := ::NormalTextEdit:ForeColor
+      :ColorNumbers      := ::NumbersEdit:ForeColor
+      :ColorStrings      := ::StringsEdit:ForeColor
+      :ColorComments     := ::CommentsEdit:ForeColor
+      :ColorOperators    := ::OperatorsEdit:ForeColor
+      :ColorPreprocessor := ::PreprocessorEdit:ForeColor
+      :ColorKeywords1    := ::Keywords1Edit:ForeColor
+      :ColorKeywords2    := ::Keywords2Edit:ForeColor
+      :ColorKeywords3    := ::Keywords3Edit:ForeColor
+      :ColorKeywords4    := ::Keywords4Edit:ForeColor
+
+      :StyleSetBack( STYLE_DEFAULT, :ColorBackground )
+      :StyleSetFore( STYLE_DEFAULT, :ColorNormalText )
+
+      :StyleClearAll()
+
+
+      :SetColors()
+   END
 RETURN Self
