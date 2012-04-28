@@ -298,7 +298,7 @@ RETURN NIL
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
    LOCAL scn, nPos, n, cObj, cText, nLine, nChar, nPosStart, nPosEnd, oObj, aObj, aProperties, aProp, cList, aMethods, Topic, Event, aList//, cFind
-   LOCAL nWrap
+   LOCAL nWrap, cCtrl
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == SCN_UPDATEUI
@@ -407,6 +407,12 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                     FOR n := 1 TO LEN( aMethods )
                         AADD( aList, __Proper( aMethods[n] )+"?7" )
                     NEXT
+
+                    IF __ObjHasMsg( oObj, "Property" ) .AND. oObj:Property != NIL
+                       FOR EACH cCtrl IN oObj:Property:Keys
+                           AADD( aList, oObj:Property[ cCtrl ]:Name+"?8" )
+                       NEXT
+                    ENDIF
 
                     IF __ObjHasMsg( oObj, "Events" )
                        FOR EACH Topic IN oObj:Events
