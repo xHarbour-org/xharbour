@@ -1046,9 +1046,9 @@ METHOD Init( oParent, aParameters ) CLASS Settings
    ::Left                 := 10
    ::Top                  := 10
    ::Width                := 471
-   ::Height               := 458
+   ::Height               := 632
    ::Center               := .T.
-   ::Caption              := "Source Editor Settings"
+   ::Caption              := "Settings"
    ::DlgModalFrame        := .T.
 
    ::Create()
@@ -1057,9 +1057,7 @@ METHOD Init( oParent, aParameters ) CLASS Settings
 RETURN Self
 
 METHOD OnInitDialog() CLASS Settings
-   // Properties declaration
-
-   // Populate Children
+   LOCAL aFonts, n
    WITH OBJECT ( TABSTRIP( Self ) )
       :Name                 := "TabStrip1"
       WITH OBJECT :Dock
@@ -1073,7 +1071,7 @@ METHOD OnInitDialog() CLASS Settings
       :Left                 := 5
       :Top                  := 5
       :Width                := 453
-      :Height               := 389
+      :Height               := 560
       :Create()
       WITH OBJECT ( TABPAGE( :this ) )
          :Name                 := "EditorSettings"
@@ -1084,14 +1082,14 @@ METHOD OnInitDialog() CLASS Settings
             :Left                 := 10
             :Top                  := 7
             :Width                := 431
-            :Height               := 314
+            :Height               := 309
             :Caption              := "Colors"
             :ForeColor            := 0
             :Create()
             WITH OBJECT ( BUTTON( :this ) )
                :Name                 := "Background"
                :Left                 := 263
-               :Top                  := 21
+               :Top                  := 16
                :Width                := 77
                :Height               := 22
                :Caption              := "Background"
@@ -1102,7 +1100,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( BUTTON( :this ) )
                :Name                 := "NormalText"
                :Left                 := 345
-               :Top                  := 21
+               :Top                  := 16
                :Width                := 77
                :Height               := 22
                :Caption              := "Foreground"
@@ -1113,7 +1111,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( LABEL( :this ) )
                :Name                 := "Label1"
                :Left                 := 15
-               :Top                  := 24
+               :Top                  := 19
                :Width                := 96
                :Height               := 16
                :Caption              := "Default"
@@ -1124,7 +1122,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( EDITBOX( :this ) )
                :Name                 := "NormalTextEdit"
                :Left                 := 124
-               :Top                  := 22
+               :Top                  := 17
                :Width                := 129
                :Height               := 22
                :StaticEdge           := .T.
@@ -1137,7 +1135,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( BUTTON( :this ) )
                :Name                 := "SelectedLine"
                :Left                 := 263
-               :Top                  := 48
+               :Top                  := 43
                :Width                := 77
                :Height               := 22
                :Caption              := "Background"
@@ -1148,7 +1146,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( EDITBOX( :this ) )
                :Name                 := "SelectedLineEdit"
                :Left                 := 124
-               :Top                  := 49
+               :Top                  := 44
                :Width                := 129
                :Height               := 22
                :StaticEdge           := .T.
@@ -1161,7 +1159,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( LABEL( :this ) )
                :Name                 := "Label2"
                :Left                 := 10
-               :Top                  := 51
+               :Top                  := 46
                :Width                := 101
                :Height               := 16
                :Caption              := "Current Line"
@@ -1172,7 +1170,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( BUTTON( :this ) )
                :Name                 := "Numbers"
                :Left                 := 345
-               :Top                  := 75
+               :Top                  := 70
                :Width                := 77
                :Height               := 22
                :Caption              := "Foreground"
@@ -1183,7 +1181,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( EDITBOX( :this ) )
                :Name                 := "NumbersEdit"
                :Left                 := 124
-               :Top                  := 76
+               :Top                  := 71
                :Width                := 129
                :Height               := 22
                :StaticEdge           := .T.
@@ -1196,7 +1194,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( LABEL( :this ) )
                :Name                 := "Label3"
                :Left                 := 16
-               :Top                  := 79
+               :Top                  := 74
                :Width                := 96
                :Height               := 16
                :Caption              := "Numbers"
@@ -1207,7 +1205,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( BUTTON( :this ) )
                :Name                 := "Strings"
                :Left                 := 345
-               :Top                  := 101
+               :Top                  := 96
                :Width                := 77
                :Height               := 22
                :Caption              := "Foreground"
@@ -1218,7 +1216,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( EDITBOX( :this ) )
                :Name                 := "StringsEdit"
                :Left                 := 124
-               :Top                  := 102
+               :Top                  := 97
                :Width                := 129
                :Height               := 22
                :StaticEdge           := .T.
@@ -1231,7 +1229,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( LABEL( :this ) )
                :Name                 := "Label4"
                :Left                 := 16
-               :Top                  := 105
+               :Top                  := 100
                :Width                := 96
                :Height               := 16
                :Caption              := "Strings"
@@ -1242,7 +1240,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( BUTTON( :this ) )
                :Name                 := "Comments"
                :Left                 := 345
-               :Top                  := 128
+               :Top                  := 123
                :Width                := 77
                :Height               := 22
                :Caption              := "Foreground"
@@ -1253,7 +1251,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( EDITBOX( :this ) )
                :Name                 := "CommentsEdit"
                :Left                 := 124
-               :Top                  := 129
+               :Top                  := 124
                :Width                := 129
                :Height               := 22
                :StaticEdge           := .T.
@@ -1266,7 +1264,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( LABEL( :this ) )
                :Name                 := "Label5"
                :Left                 := 16
-               :Top                  := 132
+               :Top                  := 127
                :Width                := 96
                :Height               := 16
                :Caption              := "Comments"
@@ -1277,7 +1275,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( BUTTON( :this ) )
                :Name                 := "Operators"
                :Left                 := 345
-               :Top                  := 154
+               :Top                  := 149
                :Width                := 77
                :Height               := 22
                :Caption              := "Foreground"
@@ -1288,7 +1286,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( EDITBOX( :this ) )
                :Name                 := "OperatorsEdit"
                :Left                 := 124
-               :Top                  := 155
+               :Top                  := 150
                :Width                := 129
                :Height               := 22
                :StaticEdge           := .T.
@@ -1301,7 +1299,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( LABEL( :this ) )
                :Name                 := "Label6"
                :Left                 := 16
-               :Top                  := 158
+               :Top                  := 153
                :Width                := 96
                :Height               := 16
                :Caption              := "Operators"
@@ -1312,7 +1310,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( BUTTON( :this ) )
                :Name                 := "Preprocessors"
                :Left                 := 345
-               :Top                  := 180
+               :Top                  := 175
                :Width                := 77
                :Height               := 22
                :Caption              := "Foreground"
@@ -1323,7 +1321,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( EDITBOX( :this ) )
                :Name                 := "PreprocessorEdit"
                :Left                 := 124
-               :Top                  := 181
+               :Top                  := 176
                :Width                := 129
                :Height               := 22
                :StaticEdge           := .T.
@@ -1336,7 +1334,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( LABEL( :this ) )
                :Name                 := "Label7"
                :Left                 := 16
-               :Top                  := 184
+               :Top                  := 179
                :Width                := 96
                :Height               := 16
                :Caption              := "Preprocessor"
@@ -1347,7 +1345,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( BUTTON( :this ) )
                :Name                 := "Keywords1"
                :Left                 := 345
-               :Top                  := 206
+               :Top                  := 201
                :Width                := 77
                :Height               := 22
                :Caption              := "Foreground"
@@ -1358,7 +1356,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( EDITBOX( :this ) )
                :Name                 := "Keywords1Edit"
                :Left                 := 124
-               :Top                  := 207
+               :Top                  := 202
                :Width                := 129
                :Height               := 22
                :StaticEdge           := .T.
@@ -1371,7 +1369,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( LABEL( :this ) )
                :Name                 := "Label8"
                :Left                 := 16
-               :Top                  := 210
+               :Top                  := 205
                :Width                := 96
                :Height               := 16
                :Caption              := "Keywords 1"
@@ -1382,7 +1380,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( BUTTON( :this ) )
                :Name                 := "Keywords2"
                :Left                 := 345
-               :Top                  := 231
+               :Top                  := 226
                :Width                := 77
                :Height               := 22
                :Caption              := "Foreground"
@@ -1393,7 +1391,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( EDITBOX( :this ) )
                :Name                 := "Keywords2Edit"
                :Left                 := 124
-               :Top                  := 232
+               :Top                  := 227
                :Width                := 129
                :Height               := 22
                :StaticEdge           := .T.
@@ -1406,7 +1404,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( LABEL( :this ) )
                :Name                 := "Label9"
                :Left                 := 16
-               :Top                  := 235
+               :Top                  := 230
                :Width                := 96
                :Height               := 16
                :Caption              := "Keywords 2"
@@ -1417,7 +1415,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( BUTTON( :this ) )
                :Name                 := "Keywords3"
                :Left                 := 345
-               :Top                  := 256
+               :Top                  := 251
                :Width                := 77
                :Height               := 22
                :Caption              := "Foreground"
@@ -1428,7 +1426,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( EDITBOX( :this ) )
                :Name                 := "Keywords3Edit"
                :Left                 := 124
-               :Top                  := 257
+               :Top                  := 252
                :Width                := 129
                :Height               := 22
                :StaticEdge           := .T.
@@ -1441,7 +1439,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( LABEL( :this ) )
                :Name                 := "Label10"
                :Left                 := 16
-               :Top                  := 260
+               :Top                  := 255
                :Width                := 96
                :Height               := 16
                :Caption              := "Keywords 3"
@@ -1452,7 +1450,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( BUTTON( :this ) )
                :Name                 := "Keywords4"
                :Left                 := 345
-               :Top                  := 281
+               :Top                  := 276
                :Width                := 77
                :Height               := 22
                :Caption              := "Foreground"
@@ -1463,7 +1461,7 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( EDITBOX( :this ) )
                :Name                 := "Keywords4Edit"
                :Left                 := 124
-               :Top                  := 282
+               :Top                  := 277
                :Width                := 129
                :Height               := 22
                :StaticEdge           := .T.
@@ -1476,13 +1474,200 @@ METHOD OnInitDialog() CLASS Settings
             WITH OBJECT ( LABEL( :this ) )
                :Name                 := "Label11"
                :Left                 := 16
-               :Top                  := 285
+               :Top                  := 280
                :Width                := 96
                :Height               := 16
                :Caption              := "Keywords 4"
                :Rightalign           := .T.
                :Create()
             END //LABEL
+
+         END //GROUPBOX
+
+         WITH OBJECT ( GROUPBOX( :this ) )
+            :Name                 := "GroupBox4"
+            :Left                 := 10
+            :Top                  := 476
+            :Width                := 431
+            :Height               := 52
+            :Caption              := "Misc"
+            :ForeColor            := 0
+            :Create()
+            WITH OBJECT ( CHECKBOX( :this ) )
+               :Name                 := "CheckBox5"
+               :Left                 := 10
+               :Top                  := 22
+               :Width                := 100
+               :Height               := 15
+               :Caption              := "Wrap Search"
+               :Create()
+            END //CHECKBOX
+
+            WITH OBJECT ( CHECKBOX( :this ) )
+               :Name                 := "CheckBox6"
+               :Left                 := 112
+               :Top                  := 22
+               :Width                := 114
+               :Height               := 15
+               :Caption              := "Caret Line Visible"
+               :Create()
+            END //CHECKBOX
+
+            WITH OBJECT ( CHECKBOX( :this ) )
+               :Name                 := "CheckBox7"
+               :Left                 := 251
+               :Top                  := 22
+               :Width                := 86
+               :Height               := 15
+               :Caption              := "Auto Indent"
+               :Create()
+            END //CHECKBOX
+
+         END //GROUPBOX
+
+         WITH OBJECT ( GROUPBOX( :this ) )
+            :Name                 := "GroupBox5"
+            :Left                 := 10
+            :Top                  := 316
+            :Width                := 431
+            :Height               := 159
+            :Caption              := "Font"
+            :ForeColor            := 0
+            :Create()
+            WITH OBJECT ( COMBOBOX( :this ) )
+               :Name                 := "ComboBox1"
+               :Left                 := 10
+               :Top                  := 17
+               :Width                := 166
+               :Height               := 105
+               :DropDownStyle        := 1
+               :Create()
+               aFonts := ::Drawing:EnumFonts()
+               ASORT( aFonts,,, {|a,b| a[1]:lfFaceName:AsString() <  b[1]:lfFaceName:AsString() } )
+               FOR n := 1 TO LEN( aFonts )
+                   :AddItem( aFonts[n][1]:lfFaceName:AsString() )
+               NEXT
+
+            END //COMBOBOX
+
+            WITH OBJECT ( COMBOBOX( :this ) )
+               :Name                 := "ComboBox2"
+               :Left                 := 191
+               :Top                  := 17
+               :Width                := 157
+               :Height               := 105
+               :DropDownStyle        := 1
+               :ItemHeight           := 15
+               :Create()
+            END //COMBOBOX
+
+            WITH OBJECT ( COMBOBOX( :this ) )
+               :Name                 := "ComboBox3"
+               :Left                 := 362
+               :Top                  := 17
+               :Width                := 56
+               :Height               := 105
+               :DropDownStyle        := 1
+               :ItemHeight           := 15
+               :Create()
+            END //COMBOBOX
+
+            WITH OBJECT ( LABEL( :this ) )
+               :Name                 := "FontSample"
+               :Left                 := 10
+               :Top                  := 127
+               :Width                := 408
+               :Height               := 25
+               :Create()
+            END //LABEL
+
+         END //GROUPBOX
+
+      END //TABPAGE
+
+      WITH OBJECT ( TABPAGE( :this ) )
+         :Name                 := "TabPage1"
+         :Caption              := "Designer"
+         :Create()
+         WITH OBJECT ( GROUPBOX( :this ) )
+            :Name                 := "GroupBox2"
+            :Left                 := 11
+            :Top                  := 9
+            :Width                := 428
+            :Height               := 99
+            :Caption              := "Show"
+            :ForeColor            := 0
+            :Create()
+            WITH OBJECT ( CHECKBOX( :this ) )
+               :Name                 := "CheckBox1"
+               :Left                 := 9
+               :Top                  := 17
+               :Width                := 100
+               :Height               := 15
+               :Caption              := "Grid"
+               :Create()
+            END //CHECKBOX
+
+            WITH OBJECT ( CHECKBOX( :this ) )
+               :Name                 := "CheckBox4"
+               :Left                 := 9
+               :Top                  := 71
+               :Width                := 100
+               :Height               := 17
+               :Caption              := "Docking"
+               :Create()
+            END //CHECKBOX
+
+            WITH OBJECT ( CHECKBOX( :this ) )
+               :Name                 := "CheckBox2"
+               :Left                 := 9
+               :Top                  := 36
+               :Width                := 100
+               :Height               := 15
+               :Caption              := "Rulers"
+               :Create()
+            END //CHECKBOX
+
+            WITH OBJECT ( CHECKBOX( :this ) )
+               :Name                 := "CheckBox3"
+               :Left                 := 9
+               :Top                  := 54
+               :Width                := 123
+               :Height               := 15
+               :Caption              := "OLE Source"
+               :Create()
+            END //CHECKBOX
+
+         END //GROUPBOX
+
+         WITH OBJECT ( GROUPBOX( :this ) )
+            :Name                 := "GroupBox3"
+            :Left                 := 11
+            :Top                  := 109
+            :Width                := 428
+            :Height               := 50
+            :Caption              := "Ruller Type"
+            :ForeColor            := 0
+            :Create()
+            WITH OBJECT ( RADIOBUTTON( :this ) )
+               :Name                 := "RadioButton1"
+               :Left                 := 10
+               :Top                  := 22
+               :Width                := 57
+               :Height               := 15
+               :Caption              := "Inches"
+               :Create()
+            END //RADIOBUTTON
+
+            WITH OBJECT ( RADIOBUTTON( :this ) )
+               :Name                 := "RadioButton2"
+               :Left                 := 99
+               :Top                  := 22
+               :Width                := 100
+               :Height               := 15
+               :Caption              := "Centimeters"
+               :Create()
+            END //RADIOBUTTON
 
          END //GROUPBOX
 
@@ -1614,7 +1799,6 @@ METHOD Apply() CLASS Settings
    WITH OBJECT ::Application:SourceEditor
       :ColorBackground   := ::NormalTextEdit:BackColor
       :ColorSelectedLine := ::SelectedLineEdit:BackColor
-
       :ColorNormalText   := ::NormalTextEdit:ForeColor
       :ColorNumbers      := ::NumbersEdit:ForeColor
       :ColorStrings      := ::StringsEdit:ForeColor
@@ -1625,13 +1809,9 @@ METHOD Apply() CLASS Settings
       :ColorKeywords2    := ::Keywords2Edit:ForeColor
       :ColorKeywords3    := ::Keywords3Edit:ForeColor
       :ColorKeywords4    := ::Keywords4Edit:ForeColor
-
       :StyleSetBack( STYLE_DEFAULT, :ColorBackground )
       :StyleSetFore( STYLE_DEFAULT, :ColorNormalText )
-
       :StyleClearAll()
-
-
       :SetColors()
    END
 RETURN Self
