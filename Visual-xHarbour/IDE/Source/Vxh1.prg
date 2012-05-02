@@ -845,11 +845,58 @@ METHOD Init() CLASS IDE_MainForm
             :Create()
          END
 
+         WITH OBJECT MenuStripItem( :this )
+            :Caption           := "&Change Case"
+            :BeginGroup        := .T.
+            :ImageIndex        := 0
+            :Create()
+            WITH OBJECT ::Application:Props[ "EditUpperCase" ] := MenuStripItem( :this )
+               :Caption          := "&Upper Case"
+               :ImageIndex       := 0
+               :ShortCutText     := "Ctrl+U"
+               :ShortCutKey:Ctrl := .T.
+               :ShortCutKey:Key  := ASC( "U" )
+               :Action           := {|| ::Application:SourceEditor:UpperCase() }
+               :Create()
+            END
+            WITH OBJECT ::Application:Props[ "EditLowerCase" ] := MenuStripItem( :this )
+               :Caption          := "&Lower Case"
+               :ImageIndex       := 0
+               :ShortCutText     := "Ctrl+L"
+               :ShortCutKey:Ctrl := .T.
+               :ShortCutKey:Key  := ASC( "L" )
+               :Action           := {|| ::Application:SourceEditor:LowerCase() }
+               :Create()
+            END
+            WITH OBJECT ::Application:Props[ "EditInvCase" ] := MenuStripItem( :this )
+               :Caption          := "&Invert Case"
+               :ImageIndex       := 0
+               :ShortCutText     := "Ctrl+K"
+               :ShortCutKey:Ctrl := .T.
+               :ShortCutKey:Key  := ASC( "K" )
+               :Action           := {|| ::Application:SourceEditor:InvertCase() }
+               :Create()
+            END
+            WITH OBJECT ::Application:Props[ "EditCapitalize" ] := MenuStripItem( :this )
+               :Caption          := "&Capitalize"
+               :ImageIndex       := 0
+               :ShortCutText     := "Ctrl+Shift+U"
+               :ShortCutKey:Ctrl := .T.
+               :ShortCutKey:Shift:= .T.
+               :ShortCutKey:Key  := ASC( "U" )
+               :Action           := {|| ::Application:SourceEditor:Capitalize() }
+               :Create()
+            END
+         END
 
       END
       //------------------------------------------------------------------
       WITH OBJECT ::Application:SearchMenu := MenuStripItem( :this )
-         :ImageList := :Parent:ImageList
+         :ImageList := ImageList( :this, 16, 16 ):Create()
+         :ImageList:AddImage( IDB_STD_SMALL_COLOR )
+         :ImageList:AddIcon( "ICO_TOGGBM" )
+         :ImageList:AddIcon( "ICO_NEXTBM" )
+         :ImageList:AddIcon( "ICO_PREVBM" )
          :Caption := "Search"
          :Create()
          WITH OBJECT ::Application:Props[ "SearchFindItem" ] := MenuStripItem( :this )
@@ -883,6 +930,45 @@ METHOD Init() CLASS IDE_MainForm
                            >
             :Create()
          END
+
+         WITH OBJECT ::Application:Props[ "TogBookmark" ] := MenuStripItem( :this )
+            :Caption           := "&Toggle Bookmark"
+            :ImageIndex        := 16
+            :ShortCutText      := "Ctrl+F2"
+            :ShortCutKey:Ctrl  := .T.
+            :ShortCutKey:Key   := VK_F2
+            :Enabled           := .T.
+            :Action            := {|| ::Application:SourceEditor:ToggleBookmark() }
+            :Create()
+         END
+         WITH OBJECT ::Application:Props[ "NextBookmark" ] := MenuStripItem( :this )
+            :Caption           := "&Next Bookmark"
+            :ImageIndex        := 17
+            :ShortCutText      := "F2"
+            :ShortCutKey:Key   := VK_F2
+            :Enabled           := .T.
+            :Action            := <|n|
+                                    IF ( n := ::Application:SourceEditor:BookmarkNext() ) >= 0
+                                       ::Application:SourceEditor:Source:GoToLine(n)
+                                    ENDIF
+                                  >
+            :Create()
+         END
+         WITH OBJECT ::Application:Props[ "PrevBookmark" ] := MenuStripItem( :this )
+            :Caption           := "&Previous Bookmark"
+            :ImageIndex        := 18
+            :ShortCutText      := "Shift+F2"
+            :ShortCutKey:Key   := VK_F2
+            :ShortCutKey:Shift := .T.
+            :Enabled           := .T.
+            :Action            := <|n|
+                                    IF ( n := ::Application:SourceEditor:BookmarkPrev() ) >= 0
+                                       ::Application:SourceEditor:Source:GoToLine(n)
+                                    ENDIF
+                                  >
+            :Create()
+         END
+
       END
 
       //------------------------------------------------------------------

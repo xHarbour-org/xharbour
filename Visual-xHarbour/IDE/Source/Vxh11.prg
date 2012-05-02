@@ -12,6 +12,7 @@
 #include "fileio.ch"
 
 #define MARGIN_SCRIPT_FOLD_INDEX  2
+#define MARKER_MASK 0 //1 | (1 << 1) | (1 << 2) | (1 << 3)
 
 
 #define EOL Chr(13) + Chr(10)
@@ -102,10 +103,24 @@ CLASS SourceEditor INHERIT Control
 
    METHOD Colorise( nStart, nEnd )        INLINE ::SendMessage( SCI_COLOURISE, nStart, nEnd )
 
+   METHOD BookmarkAdd()                   INLINE ::SendMessage( SCI_MARKERADD, ::Source:GetCurLine(), MARKER_MASK )
+   METHOD BookmarkGet()                   INLINE ::SendMessage( SCI_MARKERGET, ::Source:GetCurLine(), MARKER_MASK )
+   METHOD BookmarkDel()                   INLINE ::SendMessage( SCI_MARKERDELETE, ::Source:GetCurLine(), MARKER_MASK )
+
+   METHOD ToggleBookmark()                INLINE IIF( ::BookmarkGet() > 0, ::BookmarkDel(), ::BookmarkAdd() )
+
+   METHOD BookmarkNext()                  INLINE ::SendMessage( SCI_MARKERNEXT, ::Source:GetCurLine()+1, 1<<MARKER_MASK )
+   METHOD BookmarkPrev()                  INLINE ::SendMessage( SCI_MARKERPREVIOUS, ::Source:GetCurLine()-1, 1<<MARKER_MASK )
+
    METHOD StyleSetFore( nStyle, nColor )  INLINE ::SendMessage( SCI_STYLESETFORE, nStyle, nColor )
    METHOD StyleSetBack( nStyle, nColor )  INLINE ::SendMessage( SCI_STYLESETBACK, nStyle, nColor )
    METHOD OnTimer()                       INLINE ::CallWindowProc(), 0
-  
+
+   METHOD InvertCase()
+   METHOD UpperCase()
+   METHOD LowerCase()
+   METHOD Capitalize()
+
    METHOD OnFindNext()
    METHOD OnReplace()
    METHOD OnReplaceAll()
@@ -202,6 +217,8 @@ METHOD SetColors() CLASS SourceEditor
    ::SendMessage( SCI_SETCARETLINEVISIBLE, ::CaretLineVisible )
 
    ::SendMessage( SCI_STYLESETFORE, SCE_FS_COMMENT,        ::ColorComments  )
+
+   ::SendMessage( SCI_STYLESETFORE, SCE_FS_COMMENT,        ::ColorComments  )
    ::SendMessage( SCI_STYLESETFORE, SCE_FS_COMMENTLINE,    ::ColorComments  )
    ::SendMessage( SCI_STYLESETFORE, SCE_FS_COMMENTDOC,     ::ColorComments  )
    ::SendMessage( SCI_STYLESETFORE, SCE_FS_COMMENTLINEDOC, ::ColorComments  )
@@ -235,6 +252,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD InitLexer() CLASS SourceEditor
    SciSetProperty( ::hWnd, "fold", "1" )
+   SciSetProperty( ::hWnd, "fold", "1" )
    SciSetProperty( ::hWnd, "fold.compact", "0" )
    SciSetProperty( ::hWnd, "fold.comment", "1" )
    SciSetProperty( ::hWnd, "fold.preprocessor", "0" )
@@ -251,6 +269,13 @@ METHOD InitLexer() CLASS SourceEditor
    ::SendMessage( SCI_SETCARETSTYLE, 1 )
 
    ::SendMessage( SCI_SETMARGINWIDTHN, 1, 15 )
+   ::SendMessage( SCI_SETMARGINTYPEN,  1, SC_MARGIN_BACK )
+
+   // Bookmark markers
+   ::SendMessage( SCI_MARKERDEFINE,  MARKER_MASK, SC_MARK_ARROW )
+   ::SendMessage( SCI_MARKERSETFORE, MARKER_MASK, RGB( 255, 0, 0 ) )
+   ::SendMessage( SCI_MARKERSETBACK, MARKER_MASK, RGB( 255, 0, 0 ) )
+
    ::SendMessage( SCI_SETMARGINTYPEN,  MARGIN_SCRIPT_FOLD_INDEX, SC_MARGIN_SYMBOL )
    ::SendMessage( SCI_SETMARGINWIDTHN, MARGIN_SCRIPT_FOLD_INDEX, 15 )
    ::SendMessage( SCI_SETMARGINMASKN,  MARGIN_SCRIPT_FOLD_INDEX, SC_MASK_FOLDERS )
@@ -281,10 +306,64 @@ METHOD OnLButtonUp() CLASS SourceEditor
    ::Application:Project:EditReset()
 RETURN NIL
 
+//------------------------------------------------------------------------------------------------------------------------------------
+METHOD InvertCase() CLASS SourceEditor
+   LOCAL cSel, cInv, cChar, nStartPos, nEndPos
+   IF ::Source:GetSelLen() > 1
+      nStartPos := ::Source:GetSelectionStart()
+      nEndPos   := ::Source:GetSelectionEnd()
+      cSel := ::Source:GetSelText()
+      cInv := ""
+      FOR EACH cChar IN cSel
+          cInv += IIF( IsLower(cChar), UPPER(cChar), lower(cChar) )
+      NEXT
+      ::Source:ReplaceSel( cInv )
+      ::Source:SetSelection( nStartPos, nEndPos )
+   ENDIF
+RETURN NIL
+
+//------------------------------------------------------------------------------------------------------------------------------------
+METHOD UpperCase() CLASS SourceEditor
+   LOCAL cInv, nStartPos, nEndPos
+   IF ::Source:GetSelLen() > 1
+      nStartPos := ::Source:GetSelectionStart()
+      nEndPos   := ::Source:GetSelectionEnd()
+      cInv := UPPER( ::Source:GetSelText() )
+      ::Source:ReplaceSel( cInv )
+      ::Source:SetSelection( nStartPos, nEndPos )
+   ENDIF
+RETURN NIL
+
+//------------------------------------------------------------------------------------------------------------------------------------
+METHOD LowerCase() CLASS SourceEditor
+   LOCAL cInv, nStartPos, nEndPos
+   IF ::Source:GetSelLen() > 1
+      nStartPos := ::Source:GetSelectionStart()
+      nEndPos   := ::Source:GetSelectionEnd()
+      cInv := LOWER( ::Source:GetSelText() )
+      ::Source:ReplaceSel( cInv )
+      ::Source:SetSelection( nStartPos, nEndPos )
+   ENDIF
+RETURN NIL
+
+//------------------------------------------------------------------------------------------------------------------------------------
+METHOD Capitalize() CLASS SourceEditor
+   LOCAL cSel, nStartPos, nEndPos
+   IF ::Source:GetSelLen() > 1
+      nStartPos := ::Source:GetSelectionStart()
+      nEndPos   := ::Source:GetSelectionEnd()
+      cSel      := ::Source:GetSelText()
+      ::Source:ReplaceSel( UPPER(cSel[1])+LOWER(SUBSTR(cSel,2)) )
+      ::Source:SetSelection( nStartPos, nEndPos )
+   ENDIF
+RETURN NIL
+
+//------------------------------------------------------------------------------------------------------------------------------------
 METHOD ToggleRectSel() CLASS SourceEditor
    ::SendMessage( SCI_SETSELECTIONMODE, SC_SEL_RECTANGLE, 0 )
 RETURN NIL
 
+//------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnKeyDown( nKey ) CLASS SourceEditor
    IF nKey == VK_F3
       IF ::Source:GetSelLen() > 1
@@ -294,6 +373,7 @@ METHOD OnKeyDown( nKey ) CLASS SourceEditor
    ENDIF
 RETURN NIL
 
+//------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnKeyUp( nKey ) CLASS SourceEditor
    IF nKey == VK_SHIFT
       ::Application:Project:EditReset()
