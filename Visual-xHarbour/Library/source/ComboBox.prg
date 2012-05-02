@@ -210,12 +210,15 @@ RETURN Self
 METHOD Create() CLASS ComboBox
    LOCAL cbi
    ::Super:Create()
-   ::SetItemHeight( -1, ::xSelectionHeight )
-   ::SetItemHeight( 2, ::xItemHeight )
+
    DEFAULT ::xItemHeight TO ::SendMessage( CB_GETITEMHEIGHT, 0, 0 )
-   ::SendMessage( CB_SETMINVISIBLE, ::xHeight/::xItemHeight )
-   ::ClientEdge := ::xClientEdge
-   
+   IF ::DropDownStyle <> CBS_SIMPLE
+      ::SetItemHeight( -1, ::xSelectionHeight )
+      ::SetItemHeight( 2, ::xItemHeight )
+      ::SendMessage( CB_SETMINVISIBLE, ::xHeight/::xItemHeight )
+      ::ClientEdge := ::xClientEdge
+   ENDIF
+
    IF ::ItemToolTips
       ::__SetItemToolTips( .T. )
    ENDIF

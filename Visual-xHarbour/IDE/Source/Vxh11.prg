@@ -71,6 +71,8 @@ CLASS SourceEditor INHERIT Control
 
    DATA FontFaceName      EXPORTED
    DATA FontSize          EXPORTED
+   DATA FontBold          EXPORTED
+   DATA FontItalic        EXPORTED
 
    DATA cFindWhat         EXPORTED
    DATA nDirection        EXPORTED
@@ -81,7 +83,11 @@ CLASS SourceEditor INHERIT Control
    METHOD Create()
    
    METHOD StyleClearAll()                 INLINE ::SendMessage( SCI_STYLECLEARALL, 0, 0 ), Self
+
    METHOD StyleSetFont( cFont )           INLINE ::FontFaceName := cFont, SendEditorString( ::hWnd, SCI_STYLESETFONT, STYLE_DEFAULT, cFont ), Self
+   METHOD StyleSetBold( lBold )           INLINE ::FontBold := lBold, SendMessage( ::hWnd, SCI_STYLESETBOLD, STYLE_DEFAULT, lBold ), Self
+   METHOD StyleSetItalic( lItalic )       INLINE ::FontItalic := lItalic, SendMessage( ::hWnd, SCI_STYLESETITALIC, STYLE_DEFAULT, lItalic ), Self
+
    METHOD StyleGetFont( cFont )           INLINE cFont := SPACE(255), ::SendMessage( SCI_STYLEGETFONT, STYLE_DEFAULT, @cFont ), ALLTRIM(cFont)
 
    METHOD StyleSetSize( nSize )           INLINE ::FontSize := nSize, ::SendMessage( SCI_STYLESETSIZE, STYLE_DEFAULT, nSize ), Self
@@ -119,7 +125,7 @@ ENDCLASS
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS SourceEditor
-   LOCAL n, cSyntax := ::Application:Path + "\\vxh.syn"
+   LOCAL cSyntax := ::Application:Path + "\\vxh.syn"
    ::__xCtrlName := "SourceEditor"
    ::ClsName := "Scintilla"
    ::Super:Init( oParent )
@@ -152,15 +158,18 @@ METHOD Init( oParent ) CLASS SourceEditor
    
    ::FontFaceName      := ::Application:IniFile:ReadString( "Font", "FaceName", "FixedSys" )
    ::FontSize          := ::Application:IniFile:ReadInteger( "Font", "Size", 10 )
+   ::FontBold          := ::Application:IniFile:ReadInteger( "Font", "Bold", 0 ) == 1
+   ::FontItalic        := ::Application:IniFile:ReadInteger( "Font", "Italic", 0 ) == 1
+
    ::CaretLineVisible  := ::Application:IniFile:ReadInteger( "Settings", "CaretLineVisible", 1 )
    ::AutoIndent        := ::Application:IniFile:ReadInteger( "Settings", "AutoIndent", 1 )
 
-   IF ( n := ::Application:Props:FontList:FindString(, ::FontFaceName ) ) > 0
-      ::Application:Props:FontList:SetCurSel(n)
-   ENDIF
-   IF ( n := ::Application:Props:FontSize:FindString(, xStr(::FontSize) ) ) > 0
-      ::Application:Props:FontSize:SetCurSel(n)
-   ENDIF
+   //IF ( n := ::Application:Props:FontList:FindString(, ::FontFaceName ) ) > 0
+   //   ::Application:Props:FontList:SetCurSel(n)
+   //ENDIF
+   //IF ( n := ::Application:Props:FontSize:FindString(, xStr(::FontSize) ) ) > 0
+   //   ::Application:Props:FontSize:SetCurSel(n)
+   //ENDIF
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -175,6 +184,8 @@ METHOD Create() CLASS SourceEditor
 
    ::StyleSetFont( ::FontFaceName )
    ::StyleSetSize( ::FontSize )
+   ::StyleSetBold( ::FontBold )
+   ::StyleSetItalic( ::FontItalic )
 
    ::StyleClearAll()
    ::InitLexer()
@@ -512,8 +523,11 @@ METHOD OnDestroy() CLASS SourceEditor
    ::Application:IniFile:WriteColor( "Colors", "Keywords3",    ::ColorKeywords3 )
    ::Application:IniFile:WriteColor( "Colors", "Keywords4",    ::ColorKeywords4 )
 
-   ::Application:IniFile:WriteString( "Font", "FaceName", ::FontFaceName )
-   ::Application:IniFile:WriteInteger( "Font", "Size", ::FontSize )
+   ::Application:IniFile:WriteString( "Font", "FaceName",      ::FontFaceName )
+   ::Application:IniFile:WriteInteger( "Font", "Size",         ::FontSize )
+   ::Application:IniFile:WriteInteger( "Font", "Bold",         IIF( ::FontBold, 1, 0 ) )
+   ::Application:IniFile:WriteInteger( "Font", "Italic",       IIF( ::FontItalic, 1, 0 ) )
+
    ::Application:IniFile:WriteInteger( "Settings", "CaretLineVisible", ::CaretLineVisible )
    ::Application:IniFile:WriteInteger( "Settings", "AutoIndent", ::AutoIndent )
 RETURN NIL
@@ -1017,43 +1031,34 @@ RETURN NIL
 //------------------------------------------------------------------------------------------------------------------------------------
 
 CLASS Settings INHERIT Dialog
-   // Components declaration
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
 
-   // Event declaration
    METHOD Settings_OnLoad()
    METHOD DefBack_OnClick()
    METHOD DefFore_OnClick()
    METHOD Button3_OnClick()
    METHOD Apply()
+   METHOD SetFonts()
 ENDCLASS
 
 METHOD Init( oParent, aParameters ) CLASS Settings
    ::Super:Init( oParent, aParameters )
-
    ::EventHandler[ "OnLoad" ] := "Settings_OnLoad"
-
-   // Populate Components
    WITH OBJECT ( ColorDialog( Self ) )
-      :Name                 := "ColorDialog1"
+      :Name := "ColorDialog1"
       :Create()
-   END //ColorDialog1
-
-   // Properties declaration
-   ::Name                 := "Settings"
-   ::Modal                := .T.
-   ::Left                 := 10
-   ::Top                  := 10
-   ::Width                := 471
-   ::Height               := 632
-   ::Center               := .T.
-   ::Caption              := "Settings"
-   ::DlgModalFrame        := .T.
-
+   END
+   ::Name          := "Settings"
+   ::Modal         := .T.
+   ::Left          := 10
+   ::Top           := 10
+   ::Width         := 471
+   ::Height        := 632
+   ::Center        := .T.
+   ::Caption       := "Settings"
+   ::DlgModalFrame := .T.
    ::Create()
-
-   // Populate Children
 RETURN Self
 
 METHOD OnInitDialog() CLASS Settings
@@ -1064,8 +1069,8 @@ METHOD OnInitDialog() CLASS Settings
          :Left                 := "Settings"
          :Top                  := "Settings"
          :Right                := "Settings"
-         :Bottom               := "Button3"
-         :Margins              := "5,5,5,5"
+         :Bottom               := "Settings"
+         :Margins              := "5,5,5,35"
       END
 
       :Left                 := 5
@@ -1535,51 +1540,77 @@ METHOD OnInitDialog() CLASS Settings
             :ForeColor            := 0
             :Create()
             WITH OBJECT ( COMBOBOX( :this ) )
-               :Name                 := "ComboBox1"
-               :Left                 := 10
-               :Top                  := 17
-               :Width                := 166
-               :Height               := 105
-               :DropDownStyle        := 1
+               :Name           := "ComboFontName"
+               :Left           := 10
+               :Top            := 17
+               :Width          := 166
+               :Height         := 135
+               :DropDownStyle  := 1
+               :Action         := {|| ::SetFonts() }
+               :VertScroll     := .T.
                :Create()
+
                aFonts := ::Drawing:EnumFonts()
                ASORT( aFonts,,, {|a,b| a[1]:lfFaceName:AsString() <  b[1]:lfFaceName:AsString() } )
                FOR n := 1 TO LEN( aFonts )
                    :AddItem( aFonts[n][1]:lfFaceName:AsString() )
                NEXT
+               IF ( n := :FindString(, ::Application:SourceEditor:FontFaceName ) ) > 0
+                  :SetCurSel(n)
+               ENDIF
 
             END //COMBOBOX
 
             WITH OBJECT ( COMBOBOX( :this ) )
-               :Name                 := "ComboBox2"
-               :Left                 := 191
-               :Top                  := 17
-               :Width                := 157
-               :Height               := 105
-               :DropDownStyle        := 1
-               :ItemHeight           := 15
+               :Name          := "ComboFontStyle"
+               :Left          := 191
+               :Top           := 17
+               :Width         := 157
+               :Height        := 135
+               :DropDownStyle := 1
+               :ItemHeight    := 15
+               :Action        := {|| ::SetFonts() }
                :Create()
+               :AddItem( "Regular" )
+               :AddItem( "Italic" )
+               :AddItem( "Bold" )
+               :AddItem( "Bold Italic" )
+               n := 1
+               IF ::Application:SourceEditor:FontItalic
+                  n := 2
+               ENDIF
+               IF ::Application:SourceEditor:FontBold
+                  n := 3
+               ENDIF
+               IF ::Application:SourceEditor:FontItalic .AND. ::Application:SourceEditor:FontBold
+                  n := 4
+               ENDIF
+               :SetCurSel(n)
             END //COMBOBOX
 
             WITH OBJECT ( COMBOBOX( :this ) )
-               :Name                 := "ComboBox3"
-               :Left                 := 362
-               :Top                  := 17
-               :Width                := 56
-               :Height               := 105
-               :DropDownStyle        := 1
-               :ItemHeight           := 15
+               :Name          := "ComboFontSize"
+               :Left          := 362
+               :Top           := 17
+               :Width         := 56
+               :Height        := 135
+               :DropDownStyle := 1
+               :ItemHeight    := 15
+               :VertScroll    := .T.
+               :Action        := {|o,cText| IIF(cText==NIL, cText := o:GetSelString(),),;
+                                            ::SetFonts(,,,VAL(cText) ) }
                :Create()
-            END //COMBOBOX
+               aFonts := {8,9,10,11,12,14,16,18,20,22,24,26,28,36,48,72}
+               FOR n := 1 TO LEN( aFonts )
+                   :AddItem( xStr(aFonts[n]) )
+               NEXT
 
-            WITH OBJECT ( LABEL( :this ) )
-               :Name                 := "FontSample"
-               :Left                 := 10
-               :Top                  := 127
-               :Width                := 408
-               :Height               := 25
-               :Create()
-            END //LABEL
+               IF ( n := :FindString(, xStr(::Application:SourceEditor:FontSize) ) ) > 0
+                  :SetCurSel(n)
+                ELSE
+                  SetWindowText( :hEdit, xStr(::Application:SourceEditor:FontSize) )
+               ENDIF
+            END //COMBOBOX
 
          END //GROUPBOX
 
@@ -1786,6 +1817,26 @@ METHOD Settings_OnLoad() CLASS Settings
    ::Keywords2Edit:ForeColor    := ::Application:SourceEditor:ColorKeywords2
    ::Keywords3Edit:ForeColor    := ::Application:SourceEditor:ColorKeywords3
    ::Keywords4Edit:ForeColor    := ::Application:SourceEditor:ColorKeywords4
+   ::SetFonts()
+RETURN Self
+
+//----------------------------------------------------------------------------------------------------
+METHOD SetFonts( cName, lBold, lItalic, nSize ) CLASS Settings
+   LOCAL oCtrl, aStyle := { {.F.,.F.}, {.T.,.F.}, {.F.,.T.}, {.T.,.T.}}
+
+   DEFAULT cName   TO ::ComboFontName:GetSelString()
+   DEFAULT lItalic TO aStyle[::ComboFontStyle:CurSel][1]
+   DEFAULT lBold   TO aStyle[::ComboFontStyle:CurSel][2]
+   DEFAULT nSize   TO VAL( _GetWindowText( ::ComboFontSize:hEdit ) )
+
+   FOR EACH oCtrl IN ::GroupBox1:Children
+       IF oCtrl:__xCtrlName == "EditBox"
+          oCtrl:Font:FaceName  := cName
+          oCtrl:Font:PointSize := nSize
+          oCtrl:Font:Bold      := lBold
+          oCtrl:Font:Italic    := lItalic
+       ENDIF
+   NEXT
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------
@@ -1797,6 +1848,11 @@ RETURN Self
 //----------------------------------------------------------------------------------------------------
 METHOD Apply() CLASS Settings
    WITH OBJECT ::Application:SourceEditor
+      :StyleSetFont( ::NormalTextEdit:Font:FaceName )
+      :StyleSetSize( ::NormalTextEdit:Font:PointSize )
+      :StyleSetBold( ::NormalTextEdit:Font:Bold )
+      :StyleSetItalic( ::NormalTextEdit:Font:Italic )
+
       :ColorBackground   := ::NormalTextEdit:BackColor
       :ColorSelectedLine := ::SelectedLineEdit:BackColor
       :ColorNormalText   := ::NormalTextEdit:ForeColor

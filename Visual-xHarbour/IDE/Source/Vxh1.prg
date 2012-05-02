@@ -502,7 +502,7 @@ RETURN NIL
 
 
 METHOD Init() CLASS IDE_MainForm
-   LOCAL cVersion, rc, aFonts, n
+   LOCAL cVersion, rc//, aFonts, n
 
    ::Super:Init()
    #ifdef VXH_DEMO
@@ -1421,6 +1421,7 @@ METHOD Init() CLASS IDE_MainForm
       END
    END
 
+/*
    WITH OBJECT ::Application:Props[ "FontBar" ] := ToolStrip( ::ToolStripContainer1 )
       //:ShowChevron := .F.
       :Row       := 3
@@ -1508,7 +1509,7 @@ METHOD Init() CLASS IDE_MainForm
       END
 
    END
-
+*/
    WITH OBJECT ::Application:ToolBox := ToolBox( Self )
       :Caption          := "ToolBox"
 
@@ -1886,10 +1887,13 @@ METHOD Init() CLASS IDE_MainForm
       :Dock:Right  := ::Panel1
       :Dock:Bottom := ::Application:DebuggerPanel//::Panel2
 
-      :OnSelChanged := {|,,y| ::Application:Project:EditReset( IIF( y > 3, 1, 0 ) ),;
-                              ::Application:MainForm:ToolBox1:Enabled := y > 3,;
-                              ::Application:Props:FontBar:Enabled := y == 3,;
-                              ::Application:ObjectTree:Enabled := y > 3 }
+      :OnSelChanged := <|n,x,y|
+                        (n,x)
+                        ::Application:Project:EditReset( IIF( y > 3, 1, 0 ) )
+                        ::Application:MainForm:ToolBox1:Enabled := y > 3
+                        //::Application:Props:FontBar:Enabled := y == 3
+                        ::Application:ObjectTree:Enabled := y > 3
+                       >
       :Create()
 
       WITH OBJECT ::Application:Props[ "StartTabPage" ] := StartTabPage( :this )
