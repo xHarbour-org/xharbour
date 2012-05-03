@@ -251,6 +251,9 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD InitLexer() CLASS SourceEditor
+   //LOCAL nKey := 9 + ( SCMOD_CTRL << 16 )
+   //::SendMessage( SCI_ASSIGNCMDKEY, nKey, SCN_CHARADDED )
+
    SciSetProperty( ::hWnd, "fold", "1" )
    SciSetProperty( ::hWnd, "fold", "1" )
    SciSetProperty( ::hWnd, "fold.compact", "0" )
@@ -365,11 +368,27 @@ RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnKeyDown( nKey ) CLASS SourceEditor
+   LOCAL nPos
    IF nKey == VK_F3
       IF ::Source:GetSelLen() > 1
          ::cFindWhat := ::Source:GetSelText()
       ENDIF
       ::FindNext( ::cFindWhat, CheckBit( GetKeyState( VK_SHIFT ), 32768 ) )
+
+    ELSEIF nKey == VK_TAB .AND. CheckBit( GetKeyState( VK_CONTROL ), 32768 )
+      IF CheckBit( GetKeyState( VK_SHIFT ), 32768 )
+         nPos := ::Application:SourceTabs:Cursel-1
+         IF nPos < 0
+            nPos := ::Application:SourceTabs:GetItemCount()
+         ENDIF
+       ELSE
+         nPos := ::Application:SourceTabs:Cursel+1
+         IF nPos > ::Application:SourceTabs:GetItemCount()
+            nPos := 1
+         ENDIF
+      ENDIF
+      ::Application:SourceTabs:SetCurSel( nPos )
+      ::Application:Project:SourceTabChanged(, nPos )
    ENDIF
 RETURN NIL
 
