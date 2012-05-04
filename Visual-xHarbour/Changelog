@@ -7,6 +7,9 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2012-05-02 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added GridColumn property "HeaderToolTip"
+
 2012-03-20 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Added property "Stretch" to BackgroundImage.
 

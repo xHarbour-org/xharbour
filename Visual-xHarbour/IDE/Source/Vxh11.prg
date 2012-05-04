@@ -389,6 +389,7 @@ METHOD OnKeyDown( nKey ) CLASS SourceEditor
       ENDIF
       ::Application:SourceTabs:SetCurSel( nPos )
       ::Application:Project:SourceTabChanged(, nPos )
+      ::Application:SourceTabs:InvalidateRect(,.F.)
    ENDIF
 RETURN NIL
 

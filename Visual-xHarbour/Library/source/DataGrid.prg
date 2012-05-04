@@ -159,6 +159,7 @@ CLASS DataGrid INHERIT Control
    DATA __hDragRecImage         PROTECTED
    DATA __nDragTop              PROTECTED INIT 0
    DATA __aSel                  PROTECTED INIT {}
+   DATA __cTip                  PROTECTED 
    //DATA __nDragRec              PROTECTED INIT 0
    DATA aTagged                 EXPORTED  INIT {}
 
@@ -443,7 +444,6 @@ METHOD OnMouseMove(wParam,x,y) CLASS DataGrid
    ENDIF
 
    IF ::ShowHeaders 
-
       IF !::__lSizeMouseDown .AND. !::__lMoveMouseDown
          IF ( n := Ceiling( (y-::__GetHeaderHeight() ) / ::ItemHeight ) ) <= 0
             nWidth := 0
@@ -478,8 +478,21 @@ METHOD OnMouseMove(wParam,x,y) CLASS DataGrid
              ELSE
                ::Cursor := NIL//::System:Cursor:LinkSelect
             ENDIF
-
+            IF ::Cursor == NIL
+               IF n+1 > 0 .AND. n+1 <= LEN(::Children)
+                  IF ! EMPTY( ::Children[n+1]:HeaderTooltip ) .AND. ::Tooltip:Text != ::Children[n+1]:HeaderTooltip
+                     IF ::__cTip == NIL
+                        ::__cTip := ::Tooltip:Text
+                     ENDIF
+                     ::Tooltip:Text := ::Children[n+1]:HeaderTooltip
+                  ENDIF
+               ENDIF
+            ENDIF
           ELSE
+            IF ::__cTip != NIL
+               ::Tooltip:Text := ::__cTip
+               ::__cTip := NIL
+            ENDIF
             IF wParam == MK_LBUTTON .AND. ::AllowDragRecords .AND. ::__hDragRecImage != NIL
                nTop := y + ::__GetHeaderHeight() - ::__nDragTop
                ImageListDragMove( 0, nTop )
@@ -3731,6 +3744,7 @@ CLASS GridColumn INHERIT Object
    PROPERTY AutoEdit          READ xAutoEdit         WRITE __SetAutoEdit       DEFAULT .F. INVERT
    
    DATA SelOnlyRep                   PUBLISHED INIT .T.
+   DATA HeaderTooltip                PUBLISHED
    DATA HeaderFont                   PUBLISHED
    DATA Font                         PUBLISHED
    DATA Type                         PUBLISHED INIT "C"
