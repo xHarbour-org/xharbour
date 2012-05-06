@@ -160,7 +160,8 @@ CLASS DataGrid INHERIT Control
    DATA __nDragTop              PROTECTED INIT 0
    DATA __aSel                  PROTECTED INIT {}
    DATA __cTip                  PROTECTED 
-   //DATA __nDragRec              PROTECTED INIT 0
+   DATA __nDragRec              PROTECTED INIT -1
+   DATA __hDragBrush            PROTECTED
    DATA aTagged                 EXPORTED  INIT {}
 
    METHOD Init() CONSTRUCTOR
@@ -307,6 +308,7 @@ METHOD Create() CLASS DataGrid
 
    ::__SetBlocks()
    ::__LinePen := CreatePen( PS_SOLID, 0, ::GridColor )
+   ::__hDragBrush := CreateSolidBrush( DarkenColor( ::BackColor, 10 ) )
 
    ::xWidth  := MIN( ::xWidth,  ::Parent:ClientWidth  - ::Left - 5 )
    ::xHeight := MIN( ::xHeight, ::Parent:ClientHeight - ::Top - 5 )
@@ -437,7 +439,7 @@ METHOD CreateDragImage(y) CLASS DataGrid
 RETURN hImageList
 
 METHOD OnMouseMove(wParam,x,y) CLASS DataGrid
-   LOCAL n, nWidth, nDrag, nTop
+   LOCAL n, nWidth, nDrag, nTop, nDragPos, nDragRec
    ::Super:OnMouseMove(wParam,x,y)
    IF ::__CurControl != NIL .AND. ::__CurControl:ClsName == "Edit" .AND. ::__CurControl:Button
       ::__CurControl:RedrawWindow(,, RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW )
@@ -495,7 +497,20 @@ METHOD OnMouseMove(wParam,x,y) CLASS DataGrid
             ENDIF
             IF wParam == MK_LBUTTON .AND. ::AllowDragRecords .AND. ::__hDragRecImage != NIL
                nTop := y + ::__GetHeaderHeight() - ::__nDragTop
+               
+               nDragPos := Int( Ceiling((y-::__GetHeaderHeight()) /::ItemHeight) )
+               nDragRec := ::__DisplayArray[ nDragPos ][2]
+               
+               IF nDragRec != ::__nDragRec
+                  ::__nDragRec := nDragRec
+                  ImageListDragShowNolock(.F.)
+                  ::__DisplayData( nDragPos-1, , nDragPos+1,  )
+                  ImageListDragShowNolock(.T.)
+               ENDIF
+
                ImageListDragMove( 0, nTop )
+             ELSE
+               ::__nDragRec := -1
             ENDIF
             ::Cursor := NIL
          ENDIF
@@ -1035,7 +1050,7 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
    nPos := MIN( nPos, ::RowCountUsable )
    nPos := MAX( nPos, 1 )
    IF nPos <> ::RowPos .AND. ::__hDragRecImage != NIL
-      //::__nDragRec := 0
+      ::__nDragRec := -1
    
       ImageListDestroy( ::__hDragRecImage )
       ::__hDragRecImage := NIL
@@ -1087,6 +1102,10 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
       ENDIF
       ::Update()
     ELSEIF LEN( ::__DisplayArray ) > 0
+      IF ::__nDragRec != -1
+         ::__nDragRec := -1
+         ::__DisplayData()
+      ENDIF
       ::UpdateRow()
       IF lMouse .AND. nPos == ::RowPos .AND. ::Children[ ::ColPos ]:Representation == CREP_BUTTON
          ExecuteEvent( "ButtonClicked", ::Children[ ::ColPos ] )
@@ -1225,7 +1244,7 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
          RETURN NIL
       ENDIF
     ELSEIF nClickRow == ::RowPos .AND. ::AllowDragRecords
-      //::__nDragRec := ::__DisplayArray[ nClickRow ][2]
+      ::__nDragRec := ::__DisplayArray[ nClickRow ][2]
       
       ::__hDragRecImage := ::CreateDragImage(yPos)
 
@@ -1737,11 +1756,11 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                 lSelected := lSelected .OR. ASCAN( ::aTagged, nRec ) > 0
              ENDIF
           ENDIF
-          
-          //IF nRec == ::__nDragRec
-          //   _FillRect( hMemDC, { nLeft, nTop, ::Width, nBottom }, GetSysColorBrush( COLOR_WINDOW ) )
-          //   LOOP
-          //ENDIF
+
+          IF nRec == ::__nDragRec
+             _FillRect( hMemDC, { nLeft, nTop, ::Width, nBottom }, ::__hDragBrush )
+             LOOP
+          ENDIF
 
           FOR i := nCol TO nColEnd
               IF nLeft > ::ClientWidth .OR. LEN(::__DisplayArray[nLine][1])<i // avoid painting non-visible columns
@@ -3193,9 +3212,6 @@ METHOD OnDestroy() CLASS DataGrid
    WHILE LEN( ::Children ) > 0
        ATAIL( ::Children ):Destroy()
    ENDDO
-   IF ::__LinePen != NIL
-      DeleteObject(::__LinePen)
-   ENDIF
 RETURN NIL
 
 METHOD OnNCDestroy() CLASS DataGrid
@@ -3203,6 +3219,7 @@ METHOD OnNCDestroy() CLASS DataGrid
    IF ::__LinePen != NIL
       DeleteObject(::__LinePen)
    ENDIF
+   DeleteObject( ::__hDragBrush )
 RETURN NIL
 
 //----------------------------------------------------------------------------------

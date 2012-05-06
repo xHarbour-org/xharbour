@@ -32,7 +32,7 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 #define XFM_EOL Chr(13) + Chr(10)
 #define HKEY_LOCAL_MACHINE           (0x80000002)
 
-#define VXH_Version      "3.0"
+#define VXH_Version      "4"
 #define VXH_BuildVersion "001"
 
 #define MCS_ARROW    10
@@ -763,6 +763,13 @@ METHOD Init() CLASS IDE_MainForm
 
          WITH OBJECT MenuStripItem( :this )
             :Begingroup := .T.
+            :Caption    := "&Settings"
+            :Action     := {|| Settings( Self ) }
+            :Create()
+         END
+
+         WITH OBJECT MenuStripItem( :this )
+            :Begingroup := .T.
             :Caption    := "&Exit"
             :ImageIndex := 0
             :Action     := {||::Application:MainForm:PostMessage( WM_CLOSE ) }
@@ -1146,14 +1153,10 @@ METHOD Init() CLASS IDE_MainForm
          :Create()
 
          WITH OBJECT MenuStripItem( :this )
-            :Caption := "&Settings"
-            :Action  := {|| Settings( Self ) }
-            :Create()
-         END
-
-         WITH OBJECT MenuStripItem( :this )
             :Caption := "&Help"
-            :Action  := {|| MessageBox( , "Sorry, no help available yet.", "Visual xHarbour", MB_OK | MB_ICONEXCLAMATION ) }
+            :Action  := {|| IIF( FILE( ::Application:Path + "\Visual xHarbour.chm" ),;
+                                 HTMLHelp( GetDesktopWindow(), ::Application:Path + "\Visual xHarbour.chm", 0, 0 ),;
+                                 MessageBox( , "Sorry, no help available yet.", "Visual xHarbour", MB_OK | MB_ICONEXCLAMATION ) ) }
             :Create()
          END
 
@@ -2598,7 +2601,7 @@ METHOD EditReset(n) CLASS Project
       ENDIF
     ELSE
       lCopied   := IsClipboardFormatAvailable( CF_TEXT )
-      lSelected := LEN( ::Application:SourceEditor:Source:GetSelText() ) > 0
+      lSelected := ::Application:SourceEditor:Source != NIL .AND. LEN( ::Application:SourceEditor:Source:GetSelText() ) > 0
    ENDIF
    ::Application:Props[ "EditPasteItem" ]:Enabled := lCopied
    ::Application:Props[ "EditPasteBttn" ]:Enabled := lCopied
