@@ -327,6 +327,7 @@ CLASS Application
    DATA UserVariables                  EXPORTED
    DATA Modal                          EXPORTED  INIT .F.
    DATA InsKey                         EXPORTED  INIT .T.
+   DATA UserVariables                  PUBLISHED INIT ""
    DATA Cursor                         PUBLISHED
    DATA GenerateMembers                PUBLISHED INIT .T.
    DATA __Cursors                      EXPORTED  INIT { "None",;

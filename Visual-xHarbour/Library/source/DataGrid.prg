@@ -161,6 +161,7 @@ CLASS DataGrid INHERIT Control
    DATA __aSel                  PROTECTED INIT {}
    DATA __cTip                  PROTECTED 
    DATA __nDragRec              PROTECTED INIT -1
+   DATA __nDragPos              PROTECTED INIT -1
    DATA __hDragBrush            PROTECTED
    DATA aTagged                 EXPORTED  INIT {}
 
@@ -503,14 +504,14 @@ METHOD OnMouseMove(wParam,x,y) CLASS DataGrid
                
                IF nDragRec != ::__nDragRec
                   ::__nDragRec := nDragRec
+                  ::__nDragPos := nDragPos
+
                   ImageListDragShowNolock(.F.)
                   ::__DisplayData( nDragPos-1, , nDragPos+1,  )
                   ImageListDragShowNolock(.T.)
                ENDIF
 
                ImageListDragMove( 0, nTop )
-             ELSE
-               ::__nDragRec := -1
             ENDIF
             ::Cursor := NIL
          ENDIF
@@ -1051,7 +1052,7 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
    nPos := MAX( nPos, 1 )
    IF nPos <> ::RowPos .AND. ::__hDragRecImage != NIL
       ::__nDragRec := -1
-   
+      ::__nDragPos := -1
       ImageListDestroy( ::__hDragRecImage )
       ::__hDragRecImage := NIL
       ImageListEndDrag()
@@ -1243,16 +1244,6 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
          ENDIF
          RETURN NIL
       ENDIF
-    ELSEIF nClickRow == ::RowPos .AND. ::AllowDragRecords
-      ::__nDragRec := ::__DisplayArray[ nClickRow ][2]
-      
-      ::__hDragRecImage := ::CreateDragImage(yPos)
-
-      ::__DisplayData( nClickRow, , nClickRow, )
-
-      ImageListBeginDrag( ::__hDragRecImage, 0, 0, 0 )
-      ImageListDragEnter( ::hWnd, 0, ::__GetHeaderHeight() + ( ::ItemHeight*(::RowPos) )+1 )
-      ::Application:Yield()
    ENDIF
 
    IF LEN( ::__DisplayArray ) == 0 .OR. ::__DisplayArray[1] == NIL
@@ -1315,6 +1306,17 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
           nClickCol := n
        ENDIF
    NEXT
+
+   IF nClickRow == ::RowPos .AND. nClickCol == ::ColPos .AND. ::AllowDragRecords
+      ::__nDragRec := ::__DisplayArray[ nClickRow ][2]
+      ::__hDragRecImage := ::CreateDragImage(yPos)
+      ::__DisplayData( nClickRow, , nClickRow, )
+
+      ImageListBeginDrag( ::__hDragRecImage, 0, 0, 0 )
+      ImageListDragEnter( ::hWnd, 0, ::__GetHeaderHeight() + ( ::ItemHeight*(::RowPos) )+1 )
+      ImageListDragShowNolock(.T.)
+      ::Application:Yield()
+   ENDIF
 
    nCol := ::ColPos
    nRow := ::RowPos
@@ -1670,7 +1672,7 @@ RETURN 0
 METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
    LOCAL n, i, cData, x, y, nY, nRec, nRecno, lHide, aText, lSelected, nHScroll, iRight, iLeft, zLeft
    LOCAL nLeft, nTop, nRight, nBottom, hOldFont, hOldPen, nWImg, nHImg, nInd, nAlign, aAlign, aGrid, lFreeze, nHeaderRight
-   LOCAL nBkCol, nTxCol, xLeft, nStatus, lDeleted
+   LOCAL nBkCol, nTxCol, xLeft, nStatus, lDeleted, nPos
    LOCAL nDif, nAve, aTextExt, nFocRow, aData, z, lDrawControl, nCtrl, nRep, aRect, lDis := !::IsWindowEnabled()
    LOCAL iLen, lHighLight, lBorder, hBrush, nLine, nRecPos := 0, hPen, nImgX
    IF LEN( ::Children ) == 0 .OR. ::hWnd == NIL .OR. !IsWindow( ::hWnd ) .OR. ::hWnd == 0 
@@ -1756,10 +1758,23 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                 lSelected := lSelected .OR. ASCAN( ::aTagged, nRec ) > 0
              ENDIF
           ENDIF
-
           IF nRec == ::__nDragRec
              _FillRect( hMemDC, { nLeft, nTop, ::Width, nBottom }, ::__hDragBrush )
              LOOP
+          ENDIF
+
+          nPos := nLine
+          IF ::__nDragPos > -1
+             IF nLine < ::__nDragPos 
+                IF ::__nDragPos > ::RowPos
+                   nPos := ::__nDragPos
+                ENDIF
+              ELSE 
+                IF ::__nDragPos <= ::RowPos
+                   nPos := ::__nDragPos
+                ENDIF
+             ENDIF
+             lSelected := .F.
           ENDIF
 
           FOR i := nCol TO nColEnd
@@ -1768,23 +1783,23 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
               ENDIF
               IF ::Children[ i ]:Visible
 
-                 cData  := ::__DisplayArray[nLine][1][i][ 1]
-                 nInd   := ::__DisplayArray[nLine][1][i][ 2]
-                 nWImg  := IIF( ::ImageList != NIL, ::__DisplayArray[nLine][1][i][ 3], 2 )
-                 nAlign := ::__DisplayArray[nLine][1][i][ 4]
-                 nHImg  := ::__DisplayArray[nLine][1][i][ 5]
+                 cData  := ::__DisplayArray[nPos][1][i][ 1]
+                 nInd   := ::__DisplayArray[nPos][1][i][ 2]
+                 nWImg  := IIF( ::ImageList != NIL, ::__DisplayArray[nPos][1][i][ 3], 2 )
+                 nAlign := ::__DisplayArray[nPos][1][i][ 4]
+                 nHImg  := ::__DisplayArray[nPos][1][i][ 5]
 
-                 nBkCol := ::__DisplayArray[nLine][1][i][ 7]
+                 nBkCol := ::__DisplayArray[nPos][1][i][ 7]
 
                  IF ::Striping .AND. ( nRecPos / 2 ) > Int( nRecPos / 2 )
                     nBkCol := DarkenColor( nBkCol, 25 )
                  ENDIF
 
-                 nTxCol   := ::__DisplayArray[nLine][1][i][ 8]
-                 nStatus  := ::__DisplayArray[nLine][1][i][10]
-                 nRep     := ::__DisplayArray[nLine][1][i][11]
-                 hOldFont := SelectObject( hMemDC, ::__DisplayArray[nLine][1][i][12] )
-                 lDeleted := ::__DisplayArray[nLine][1][i][13]
+                 nTxCol   := ::__DisplayArray[nPos][1][i][ 8]
+                 nStatus  := ::__DisplayArray[nPos][1][i][10]
+                 nRep     := ::__DisplayArray[nPos][1][i][11]
+                 hOldFont := SelectObject( hMemDC, ::__DisplayArray[nPos][1][i][12] )
+                 lDeleted := ::__DisplayArray[nPos][1][i][13]
 
                  zLeft := nLeft
                  IF lFreeze .AND. i <= ::FreezeColumn
@@ -1973,7 +1988,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                  ENDIF
 
                  IF ::ShowSelectionBorder .AND. ( lHighLight .OR. ( !::ShowSelection .AND. nRec == nRecno .AND. ( i == ::ColPos .OR. ::FullRowSelect ) ) )
-                    nFocRow := nLine
+                    nFocRow := nPos
                  ENDIF
 
                  IF nRep == 1
@@ -2014,7 +2029,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                     IF nRep == 3
                        aRect := {zLeft+IIF(::Children[i]:ControlAlign==DT_LEFT,1,0),nTop+1,nRight-2,MAX(nBottom-1,nTop+::ItemHeight)}
                     ENDIF
-                    ::__DrawRepresentation( hMemDC, nRep, aText, aData[1], nBkCol, nTxCol, x, y, aAlign, ::__DisplayArray[nLine][1][i][ 1], i )
+                    ::__DrawRepresentation( hMemDC, nRep, aText, aData[1], nBkCol, nTxCol, x, y, aAlign, ::__DisplayArray[nPos][1][i][ 1], i )
 
                  ENDIF
 

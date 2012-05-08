@@ -1771,11 +1771,15 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS ToolStripButton
-   LOCAL lpMenuInfo, nAdd, aSize := ::Drawing:GetTextExtentPoint32( STRTRAN( ::Caption, "&" ) )
+   LOCAL lpMenuInfo, nAdd, aSize
    nAdd := 12
    IF !::Parent:__lIsMenu
       nAdd := ::Parent:ImagePadding * 2
    ENDIF
+   IF LEFT( ::xCaption, 2 ) == '{|' .AND. ::__ClassInst == NIL 
+      ::xCaption := EVAL( &(::xCaption) )
+   ENDIF
+   aSize := ::Drawing:GetTextExtentPoint32( STRTRAN( ::Caption, "&" ) )
    ::xWidth := aSize[1]+nAdd
    IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 
       IF ::ImageAlign != DT_CENTER
@@ -2866,6 +2870,9 @@ METHOD Create() CLASS MenuStripItem
    IF ::Parent:ClsName != ::ClsName .AND. ! ::Parent:ClsName IN { "ToolStripButton", "ContextStrip" }
       Super:Create()
     ELSE
+      IF LEFT( ::xCaption, 2 ) == '{|' .AND. ::__ClassInst == NIL 
+         ::xCaption := EVAL( &(::xCaption) )
+      ENDIF
       IF ::Position != NIL
          AINS( ::Parent:Children, ::Position, Self, .T. )
        ELSE
