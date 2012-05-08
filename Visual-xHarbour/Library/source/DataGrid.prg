@@ -487,6 +487,9 @@ METHOD OnMouseMove(wParam,x,y) CLASS DataGrid
                      IF ::__cTip == NIL
                         ::__cTip := ::Tooltip:Text
                      ENDIF
+                     IF ! ::ToolTip:IsWindow()
+                        ::ToolTip:Create()
+                     ENDIF
                      ::Tooltip:Text := ::Children[n+1]:HeaderTooltip
                   ENDIF
                ENDIF
