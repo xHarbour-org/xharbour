@@ -95,6 +95,7 @@ CLASS SourceEditor INHERIT Control
    METHOD StyleGetSize( nSize )           INLINE ::SendMessage( SCI_STYLEGETSIZE, STYLE_DEFAULT, @nSize ), nSize
 
    METHOD SetLexer( nLexer )              INLINE ::SendMessage( SCI_SETLEXER, nLexer, 0 )   
+   METHOD GetCurDoc()                     INLINE ::SendMessage( SCI_GETDOCPOINTER, 0, 0 )
 
    METHOD SelectDocument( pDoc )          INLINE ::SendMessage( SCI_SETDOCPOINTER, 0, pDoc )
    METHOD OnDestroy()
@@ -789,7 +790,6 @@ CLASS Source
    METHOD GetText()
 
    METHOD SavePos()                           INLINE ::SavedPos := ::GetCurrentPos()
-   METHOD GetCurDoc()                         INLINE ::Owner:SendMessage( SCI_GETDOCPOINTER, 0, 0 )
    METHOD ReleaseDocument()                   INLINE ::Owner:SendMessage( SCI_RELEASEDOCUMENT, 0, ::pSource )
    METHOD Select()                            INLINE ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource ), ::Owner:xSource := Self, ::GotoPosition( ::SavedPos )
    METHOD CreateDocument()                    INLINE ::Owner:SendMessage( SCI_CREATEDOCUMENT, 0, 0 )
@@ -830,7 +830,7 @@ CLASS Source
    METHOD BeginUndoAction()                   INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_BEGINUNDOACTION, 0, 0 )
    METHOD EndUndoAction()                     INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_ENDUNDOACTION, 0, 0 )
 
-   METHOD ChkDoc()                            INLINE IIF( ::GetCurDoc() != ::pSource, ::Select(),)
+   METHOD ChkDoc()                            INLINE IIF( ::Owner:GetCurDoc() != ::pSource, ::Select(),)
 
    METHOD FindText( nFlags, ttf )             INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_FINDTEXT, nFlags, ttf )
    METHOD SearchNext( nFlags, cText )         INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SEARCHNEXT, nFlags, cText )
@@ -897,7 +897,7 @@ METHOD Close() CLASS Source
    IF ( n := ASCAN( ::Owner:aDocs, {|o| o:pSource==::pSource} ) ) > 0
       ::ReleaseDocument()
       ADEL( ::Owner:aDocs, n, .T. )
-      IF ( n := ASCAN( ::Owner:aDocs, {|o| o:pSource==::GetCurDoc() } ) ) > 0
+      IF ( n := ASCAN( ::Owner:aDocs, {|o| o:pSource==::Owner:GetCurDoc() } ) ) > 0
          ::Owner:Source := ::Owner:aDocs[n]
       ELSE
          ::Owner:Source := NIL
@@ -950,16 +950,17 @@ METHOD Save( cFile ) CLASS Source
       ::File := cFile
    ENDIF
    IF !EMPTY( ::File )
-      pPrev := ::GetCurDoc()
+      pPrev := ::Owner:GetCurDoc()
       nPos := ::GetCurrentPos()
+
       ::Owner:SelectDocument( ::pSource )
       IF ( hFile := fCreate( ::File ) ) <> -1
          cText := ::GetText()
          fWrite( hFile, cText, Len(cText) )
          fClose( hFile )
+         ::Modified := .F.
       ENDIF
       ::Owner:SelectDocument( pPrev )
-      ::Modified := .F.
 
       ::GoToPosition( nPos )
 
@@ -967,9 +968,11 @@ METHOD Save( cFile ) CLASS Source
       ::FileName := SUBSTR( ::File, n+1 )
       ::Path     := SUBSTR( ::File, 1, n-1 )
 
-      cText := ::Application:SourceTabs:GetItemText()
+      n := aScan( ::Owner:aDocs, Self,,, .T. )
+
+      cText := ::Application:SourceTabs:GetItemText(n)
       cText := ALLTRIM( STRTRAN( cText, "*" ) )
-      ::Application:SourceTabs:SetItemText( , cText, .F. )
+      ::Application:SourceTabs:SetItemText( n, cText, .F. )
    ENDIF
 RETURN Self
 

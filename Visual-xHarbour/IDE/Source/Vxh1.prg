@@ -4751,11 +4751,13 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
-   LOCAL n, cWindow := "", oFile, oForm
+   LOCAL n, cWindow := "", oFile, oForm, nCurDoc
    LOCAL lNew := .F., aImage, aEditors, aChildEvents, nInsMetPos, cChildEvents, cEvent, cText, cPath, cBuffer, cResPath, nSecs
    LOCAL aDir, x, xVersion, cType, cRc, cPrj, hFile, cLine, xPath, xName, lPro, i, cName, cResImg, cFile, cSourcePath, cPrevRes//, oWait
 
    //oWait := ::Application:MainForm:MessageWait( "Saving Project " + ::Properties:Name )
+
+   nCurDoc := ::Application:SourceTabs:Cursel
 
    m->aChangedProps := {} // reset changed properties for bold text display
    ::Application:ObjectManager:InvalidateRect(, .F. )
@@ -4813,8 +4815,6 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    ENDIF
 
    ::Properties:Save()
-
-   //::aImages := {}
 
    aEditors := ::Application:SourceEditor:aDocs
 
@@ -5110,6 +5110,10 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
 
    ::Application:Cursor := NIL
    WinSetCursor( ::System:Cursor:Arrow )
+
+   ::Application:SourceTabs:SetCurSel( nCurDoc )
+   ::Application:Project:SourceTabChanged(, nCurDoc )
+   ::Application:SourceTabs:InvalidateRect(,.F.)
 
    ::Modified := .F.
    //oWait:Destroy()
@@ -5416,7 +5420,7 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
           IF cProperty != NIL
              EXIT
           ENDIF
-          */
+
       NEXT
    ENDIF
 
