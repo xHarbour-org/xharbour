@@ -33,6 +33,10 @@ RETURN
 //------------------------------------------------------------------------------------------------------------------------------------
 
 CLASS SourceEditor INHERIT Control
+   DATA xTabWidth  PROTECTED INIT 3
+   ASSIGN TabWidth(n) INLINE ::xTabWidth := n, AEVAL( ::aDocs, {|o| o:SetTabWidth(o:Owner:TabWidth)} ), IIF( ::Source != NIL, ::Source:Select(),)
+   ACCESS TabWidth    INLINE ::xTabWidth
+   
    DATA xSource  PROTECTED
 
    ASSIGN Source(o) INLINE IIF( ::xSource != NIL, ::xSource:SavePos(),), IIF( o != NIL, o:Select(),)
@@ -112,6 +116,8 @@ CLASS SourceEditor INHERIT Control
 
    METHOD BookmarkNext()                  INLINE ::SendMessage( SCI_MARKERNEXT, ::Source:GetCurLine()+1, 1<<MARKER_MASK )
    METHOD BookmarkPrev()                  INLINE ::SendMessage( SCI_MARKERPREVIOUS, ::Source:GetCurLine()-1, 1<<MARKER_MASK )
+
+   METHOD GetTabWidth()                   INLINE ::SendMessage( SCI_GETTABWIDTH, 0, 0 )
 
    METHOD StyleSetFore( nStyle, nColor )  INLINE ::SendMessage( SCI_STYLESETFORE, nStyle, nColor )
    METHOD StyleSetBack( nStyle, nColor )  INLINE ::SendMessage( SCI_STYLESETBACK, nStyle, nColor )
@@ -205,6 +211,8 @@ METHOD Create() CLASS SourceEditor
 
    ::StyleClearAll()
    ::InitLexer()
+   ::xTabWidth := ::Application:IniFile:ReadInteger( "Settings", "TabSpacing", ::xTabWidth )
+   
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -631,6 +639,7 @@ METHOD OnDestroy() CLASS SourceEditor
 
    ::Application:IniFile:WriteInteger( "Settings", "CaretLineVisible", ::CaretLineVisible )
    ::Application:IniFile:WriteInteger( "Settings", "AutoIndent", ::AutoIndent )
+   ::Application:IniFile:WriteInteger( "Settings", "TabSpacing", ::TabWidth )
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -856,14 +865,13 @@ CLASS Source
    METHOD EnsureVisibleEnforcePolicy( nLine ) INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_ENSUREVISIBLEENFORCEPOLICY, nLine, 0 )
    METHOD GetLineCount()                      INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETLINECOUNT, 0, 0 )
 
-   METHOD SetTabWidth( nChars )               INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SETTABWIDTH, nChars, 0 )
-   METHOD GetTabWidth()                       INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETTABWIDTH, 0, 0 )
    METHOD SetUseTabs( nUseTabs )              INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SETUSETABS, nUseTabs, 0 )
    METHOD AppendText( cText )                 INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_APPENDTEXT, Len(cText), cText )
    METHOD UsePopUp( n )                       INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_USEPOPUP, n )
    METHOD GetLineState( n )                   INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETLINESTATE, n )
    METHOD GetLineIndentation( nLine )         INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETLINEINDENTATION, nLine )
    METHOD SetLineIndentation( nLine, nInd )   INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SETLINEINDENTATION, nLine, nInd )
+   METHOD SetTabWidth( nChars )               INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SETTABWIDTH, nChars, 0 )
 
    METHOD SetText()
    METHOD GetLine()
@@ -887,8 +895,8 @@ METHOD Init( oOwner, cFile ) CLASS Source
    AADD( ::Owner:aDocs, Self )
    ::Select()
    ::SetUseTabs(0)
-   ::SetTabWidth(3)
    ::UsePopUp(0)
+   ::SetTabWidth( ::Owner:TabWidth )
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -1595,41 +1603,74 @@ METHOD OnInitDialog() CLASS Settings
          WITH OBJECT ( GROUPBOX( :this ) )
             :Name                 := "GroupBox4"
             :Left                 := 10
-            :Top                  := 476
+            :Top                  := 450
             :Width                := 431
-            :Height               := 52
+            :Height               := 76
             :Caption              := "Misc"
             :ForeColor            := 0
             :Create()
+
             WITH OBJECT ( CHECKBOX( :this ) )
-               :Name                 := "CheckBox5"
+               :Name                 := "WrapSearch"
                :Left                 := 10
                :Top                  := 22
-               :Width                := 100
+               :Width                := 83
                :Height               := 15
                :Caption              := "Wrap Search"
                :Create()
             END //CHECKBOX
 
             WITH OBJECT ( CHECKBOX( :this ) )
-               :Name                 := "CheckBox6"
-               :Left                 := 112
+               :Name                 := "CaretLine"
+               :Left                 := 107
                :Top                  := 22
-               :Width                := 114
+               :Width                := 109
                :Height               := 15
                :Caption              := "Caret Line Visible"
                :Create()
             END //CHECKBOX
 
             WITH OBJECT ( CHECKBOX( :this ) )
-               :Name                 := "CheckBox7"
-               :Left                 := 251
+               :Name                 := "AutoIndent"
+               :Left                 := 233
                :Top                  := 22
                :Width                := 86
                :Height               := 15
                :Caption              := "Auto Indent"
                :Create()
             END //CHECKBOX
+
+            WITH OBJECT ( LABEL( :this ) )
+               :Left                 := 12
+               :Top                  := 49
+               :Width                := 71
+               :Height               := 16
+               :Caption              := "Tab Spacing"
+               :Create()
+            END //LABEL
+
+            WITH OBJECT ( UPDOWN( :this ) )
+               :Name                 := "UpDown1"
+               :Left                 := 128
+               :Top                  := 46
+               :Width                := 18
+               :Height               := 22
+               :Caption              := "UpDown1"
+               :Buddy                := "TabSpacing"
+               :Create()
+            END //UPDOWN
+
+            WITH OBJECT ( EDITBOX( :this ) )
+               :Name                 := "TabSpacing"
+               :Left                 := 90
+               :Top                  := 46
+               :Width                := 40
+               :Height               := 22
+               :Alignment            := 3
+               :Number               := .T.
+               :Caption := xStr(::Application:SourceEditor:TabWidth)
+               :Create()
+            END //EDITBOX
 
          END //GROUPBOX
 
@@ -1638,7 +1679,7 @@ METHOD OnInitDialog() CLASS Settings
             :Left                 := 10
             :Top                  := 316
             :Width                := 431
-            :Height               := 159
+            :Height               := 132
             :Caption              := "Font"
             :ForeColor            := 0
             :Create()
@@ -1647,7 +1688,7 @@ METHOD OnInitDialog() CLASS Settings
                :Left           := 10
                :Top            := 17
                :Width          := 166
-               :Height         := 135
+               :Height         := 105
                :DropDownStyle  := 1
                :Action         := {|| ::SetFonts() }
                :VertScroll     := .T.
@@ -1669,7 +1710,7 @@ METHOD OnInitDialog() CLASS Settings
                :Left          := 191
                :Top           := 17
                :Width         := 157
-               :Height        := 135
+               :Height        := 105
                :DropDownStyle := 1
                :ItemHeight    := 15
                :Action        := {|| ::SetFonts() }
@@ -1696,7 +1737,7 @@ METHOD OnInitDialog() CLASS Settings
                :Left          := 362
                :Top           := 17
                :Width         := 56
-               :Height        := 135
+               :Height        := 105
                :DropDownStyle := 1
                :ItemHeight    := 15
                :VertScroll    := .T.
@@ -1968,6 +2009,8 @@ METHOD Apply() CLASS Settings
       :ColorKeywords2    := ::Keywords2Edit:ForeColor
       :ColorKeywords3    := ::Keywords3Edit:ForeColor
       :ColorKeywords4    := ::Keywords4Edit:ForeColor
+      :TabWidth          := VAL( ::TabSpacing:Caption )
+
       :StyleSetBack( STYLE_DEFAULT, :ColorBackground )
       :StyleSetFore( STYLE_DEFAULT, :ColorNormalText )
       :StyleClearAll()

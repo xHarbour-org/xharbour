@@ -6606,7 +6606,7 @@ HB_FUNC( GETPROFILESECTION )
 HB_FUNC( GETPRIVATEPROFILESECTION )
 {
 
-   DWORD  nSize   = 4096;
+   DWORD  nSize   = 32767;
    LPTSTR bBuffer = (LPTSTR) hb_xgrab( nSize );
    DWORD  dwLen;
    const char * lpSection  = ISNIL(1) ? NULL : hb_parc(1 );
