@@ -172,9 +172,7 @@ FUNCTION __MsgWait( cText, cTitle, lProgress )
    IF !EMPTY( cTitle )
       nStyle := nStyle | WS_CAPTION
    ENDIF
-   #ifdef __WINFAKT__
       nStyle := nStyle | WS_CAPTION
-   #endif
 
    __aCenter   := NIL
    
