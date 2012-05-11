@@ -2050,6 +2050,7 @@ METHOD Init( oParent, aParameters ) CLASS GotoDialog
    ::MaximizeBox          := .F.
    ::MinimizeBox          := .F.
    ::DlgModalFrame        := .T.
+   ::ThickFrame           := .F.
    ::Center               := .T.
    ::Create()
 RETURN Self
@@ -2092,12 +2093,15 @@ METHOD OnInitDialog() CLASS GotoDialog
 
    WITH OBJECT ( BUTTON( Self ) )
       :Name                 := "Go"
-      :Left                 := 8
-      :Top                  := 70
+      :Left                 := 6
+      :Top                  := 67
       :Width                := 70
       :Height               := 25
       :Caption              := "&Go to"
       :DefaultButton        := .T.
+      :Dock:Bottom          := Self
+      :Dock:Left            := Self
+      :Dock:Margin          := 3
       :EventHandler[ "OnClick" ] := "Go_OnClick"
       :Create()
    END //BUTTON
@@ -2105,11 +2109,14 @@ METHOD OnInitDialog() CLASS GotoDialog
    WITH OBJECT ( BUTTON( Self ) )
       :Name                 := "Button2"
       :Left                 := 94
-      :Top                  := 70
+      :Top                  := 67
       :Width                := 70
       :Height               := 25
       :Caption              := "&Cancel"
       :EventHandler[ "OnClick" ] := "Close"
+      :Dock:Bottom          := Self
+      :Dock:Right           := Self
+      :Dock:Margin          := 3
       :Create()
    END //BUTTON
 RETURN Self
