@@ -127,7 +127,7 @@ CLASS SourceEditor INHERIT Control
    METHOD UpperCase()
    METHOD LowerCase()
    METHOD Capitalize()
-
+   METHOD GotoDialog()                    INLINE GotoDialog( Self )
    METHOD OnFindNext()
    METHOD OnReplace()
    METHOD OnReplaceAll()
@@ -778,6 +778,7 @@ CLASS Source
    DATA lStyled   EXPORTED INIT .T.
    DATA cObj      EXPORTED INIT ""
    DATA Form      EXPORTED
+   DATA nPrevLine EXPORTED
    // Compatibility with xedit for debugger ------------------------------------------------
    ACCESS cFile             INLINE ::FileName
    ACCESS cPath             INLINE IIF( ! EMPTY(::Path), ::Path + "\", "" )
@@ -792,7 +793,7 @@ CLASS Source
    // --------------------------------------------------------------------------------------
 
    METHOD Init( oOwner, cFile ) CONSTRUCTOR
-
+   METHOD SendEditor()
    METHOD Open()
    METHOD Close()
    METHOD Save()
@@ -803,75 +804,75 @@ CLASS Source
    METHOD Select()                            INLINE ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource ), ::Owner:xSource := Self, ::GotoPosition( ::SavedPos )
    METHOD CreateDocument()                    INLINE ::Owner:SendMessage( SCI_CREATEDOCUMENT, 0, 0 )
 
-   METHOD GotoPosition( nPos )                INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GOTOPOS, nPos, 0 )
-   METHOD GotoLine( nLine )                   INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GOTOLINE, nLine, 0 )
-   METHOD EmptyUndoBuffer()                   INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_EMPTYUNDOBUFFER, 0, 0 )
-   METHOD CanUndo()                           INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_CANUNDO, 0, 0 )==1
-   METHOD CanRedo()                           INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_CANREDO, 0, 0 )==1
-   METHOD Undo()                              INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_UNDO, 0, 0 )//, ::Application:Project:SetEditMenuItems()
-   METHOD Redo()                              INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_REDO, 0, 0 )//, ::Application:Project:SetEditMenuItems()
-   METHOD Copy()                              INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_COPY, 0, 0 )
-   METHOD Paste()                             INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_PASTE, 0, 0 )//, ::Application:Project:SetEditMenuItems()
-   METHOD Cut()                               INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_CUT, 0, 0 )//, ::Application:Project:SetEditMenuItems()
-   METHOD CanPaste()                          INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_CANPASTE, 0, 0 )==1
-   METHOD SetReadOnly( nSet )                 INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SETREADONLY, nSet, 0 )
-   METHOD GetReadOnly()                       INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETREADONLY, 0, 0 )
-   METHOD GetCurrentPos()                     INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETCURRENTPOS, 0, 0 )
-   METHOD SetCurrentPos( nPos )               INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SETCURRENTPOS, nPos, 0 )
-   METHOD GoToPos( nPos )                     INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GOTOPOS, nPos, 0 )
-   METHOD GetColumn( nPos )                   INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETCOLUMN, nPos, 0 )
+   METHOD GotoPosition( nPos )                INLINE ::SendEditor( SCI_GOTOPOS, nPos, 0 )
+   METHOD GotoLine( nLine )                   INLINE ::nPrevLine := ::GetCurLine()+1, ::SendEditor( SCI_GOTOLINE, nLine, 0 )
+   METHOD EmptyUndoBuffer()                   INLINE ::SendEditor( SCI_EMPTYUNDOBUFFER, 0, 0 )
+   METHOD CanUndo()                           INLINE ::SendEditor( SCI_CANUNDO, 0, 0 )==1
+   METHOD CanRedo()                           INLINE ::SendEditor( SCI_CANREDO, 0, 0 )==1
+   METHOD Undo()                              INLINE ::SendEditor( SCI_UNDO, 0, 0 )
+   METHOD Redo()                              INLINE ::SendEditor( SCI_REDO, 0, 0 )
+   METHOD Copy()                              INLINE ::SendEditor( SCI_COPY, 0, 0 )
+   METHOD Paste()                             INLINE ::SendEditor( SCI_PASTE, 0, 0 )
+   METHOD Cut()                               INLINE ::SendEditor( SCI_CUT, 0, 0 )
+   METHOD CanPaste()                          INLINE ::SendEditor( SCI_CANPASTE, 0, 0 )==1
+   METHOD SetReadOnly( nSet )                 INLINE ::SendEditor( SCI_SETREADONLY, nSet, 0 )
+   METHOD GetReadOnly()                       INLINE ::SendEditor( SCI_GETREADONLY, 0, 0 )
+   METHOD GetCurrentPos()                     INLINE ::SendEditor( SCI_GETCURRENTPOS, 0, 0 )
+   METHOD SetCurrentPos( nPos )               INLINE ::SendEditor( SCI_SETCURRENTPOS, nPos, 0 )
+   METHOD GoToPos( nPos )                     INLINE ::SendEditor( SCI_GOTOPOS, nPos, 0 )
+   METHOD GetColumn( nPos )                   INLINE ::SendEditor( SCI_GETCOLUMN, nPos, 0 )
 
-   METHOD LineFromPosition( nPos )            INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_LINEFROMPOSITION, nPos, 0 )
-   METHOD PositionFromLine( nLine )           INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_POSITIONFROMLINE, nLine, 0 )
-   METHOD LineLength( nLine )                 INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_LINELENGTH, nLine, 0 )
+   METHOD LineFromPosition( nPos )            INLINE ::SendEditor( SCI_LINEFROMPOSITION, nPos, 0 )
+   METHOD PositionFromLine( nLine )           INLINE ::SendEditor( SCI_POSITIONFROMLINE, nLine, 0 )
+   METHOD LineLength( nLine )                 INLINE ::SendEditor( SCI_LINELENGTH, nLine, 0 )
 
-   METHOD GetCurLine()                        INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_LINEFROMPOSITION, ::GetCurrentPos(), 0 )
-   METHOD GetSelectionMode()                  INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETSELECTIONMODE, 0, 0 )
-   METHOD GetSelections()                     INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETSELECTIONS, 0, 0 )
+   METHOD GetCurLine()                        INLINE ::SendEditor( SCI_LINEFROMPOSITION, ::GetCurrentPos(), 0 )
+   METHOD GetSelectionMode()                  INLINE ::SendEditor( SCI_GETSELECTIONMODE, 0, 0 )
+   METHOD GetSelections()                     INLINE ::SendEditor( SCI_GETSELECTIONS, 0, 0 )
 
-   METHOD GetSelectionStart()                 INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETSELECTIONSTART, 0, 0 )
-   METHOD GetSelectionEnd()                   INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETSELECTIONEND, 0, 0 )
-   METHOD GetSelectionNStart( nSel )          INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETSELECTIONNSTART, nSel, 0 )
-   METHOD GetSelectionNEnd( nSel )            INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETSELECTIONNEND, nSel, 0 )
+   METHOD GetSelectionStart()                 INLINE ::SendEditor( SCI_GETSELECTIONSTART, 0, 0 )
+   METHOD GetSelectionEnd()                   INLINE ::SendEditor( SCI_GETSELECTIONEND, 0, 0 )
+   METHOD GetSelectionNStart( nSel )          INLINE ::SendEditor( SCI_GETSELECTIONNSTART, nSel, 0 )
+   METHOD GetSelectionNEnd( nSel )            INLINE ::SendEditor( SCI_GETSELECTIONNEND, nSel, 0 )
 
-   METHOD SetSavePoint()                      INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SETSAVEPOINT, 0, 0 )
-   METHOD GetTextLen()                        INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETTEXTLENGTH, 0, 0 )
-   METHOD BeginUndoAction()                   INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_BEGINUNDOACTION, 0, 0 )
-   METHOD EndUndoAction()                     INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_ENDUNDOACTION, 0, 0 )
+   METHOD SetSavePoint()                      INLINE ::SendEditor( SCI_SETSAVEPOINT, 0, 0 )
+   METHOD GetTextLen()                        INLINE ::SendEditor( SCI_GETTEXTLENGTH, 0, 0 )
+   METHOD BeginUndoAction()                   INLINE ::SendEditor( SCI_BEGINUNDOACTION, 0, 0 )
+   METHOD EndUndoAction()                     INLINE ::SendEditor( SCI_ENDUNDOACTION, 0, 0 )
 
    METHOD ChkDoc()                            INLINE IIF( ::Owner:GetCurDoc() != ::pSource, ::Select(),)
 
-   METHOD FindText( nFlags, ttf )             INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_FINDTEXT, nFlags, ttf )
-   METHOD SearchNext( nFlags, cText )         INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SEARCHNEXT, nFlags, cText )
-   METHOD SearchPrev( nFlags, cText )         INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SEARCHPREV, nFlags, cText )
-   METHOD ReplaceSel( cText )                 INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_REPLACESEL, 0, cText )
-   METHOD GetSelLen()                         INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETSELTEXT, 0, 0 )
+   METHOD FindText( nFlags, ttf )             INLINE ::SendEditor( SCI_FINDTEXT, nFlags, ttf )
+   METHOD SearchNext( nFlags, cText )         INLINE ::SendEditor( SCI_SEARCHNEXT, nFlags, cText )
+   METHOD SearchPrev( nFlags, cText )         INLINE ::SendEditor( SCI_SEARCHPREV, nFlags, cText )
+   METHOD ReplaceSel( cText )                 INLINE ::SendEditor( SCI_REPLACESEL, 0, cText )
+   METHOD GetSelLen()                         INLINE ::SendEditor( SCI_GETSELTEXT, 0, 0 )
    METHOD GetSelText( cBuffer )               INLINE ::ChkDoc(), cBuffer := SPACE( ::Owner:SendMessage( SCI_GETSELTEXT, 0, 0 ) ),;
                                                                  ::Owner:SendMessage( SCI_GETSELTEXT, 0, cBuffer ),;
                                                                  ALLTRIM(LEFT(cBuffer,LEN(cBuffer)-1))
-   METHOD SetSearchFlags( nFlags )            INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SETSEARCHFLAGS, nFlags )
-   METHOD SetTargetStart( nStart )            INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SETTARGETSTART, nStart )
-   METHOD SetTargetEnd( nEnd )                INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SETTARGETEND, nEnd )
-   METHOD ReplaceTarget( nLen, cText)         INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_REPLACETARGET, nLen, cText )
-   METHOD SearchInTarget( nLen, cText)        INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SEARCHINTARGET, nLen, cText )
-   METHOD GetTargetStart()                    INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETTARGETSTART, 0, 0 )
-   METHOD GetTargetEnd()                      INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETTARGETEND, 0, 0 )
-   METHOD GetCharAt( nPos )                   INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETCHARAT, nPos, 0 )
-   METHOD PositionAfter( nPos )               INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_POSITIONAFTER, nPos, 0 )
-   METHOD SetSelection( nCaret, nEnd )        INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SETSELECTION, nCaret, nEnd )
-   METHOD GetStyleAt( nPos )                  INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETSTYLEAT, nPos, 0 )
-   METHOD GetEndStyled()                      INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETENDSTYLED, 0, 0 )
-   METHOD EnsureVisible( nLine )              INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_ENSUREVISIBLE, nLine, 0 )
-   METHOD EnsureVisibleEnforcePolicy( nLine ) INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_ENSUREVISIBLEENFORCEPOLICY, nLine, 0 )
-   METHOD GetLineCount()                      INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETLINECOUNT, 0, 0 )
+   METHOD SetSearchFlags( nFlags )            INLINE ::SendEditor( SCI_SETSEARCHFLAGS, nFlags )
+   METHOD SetTargetStart( nStart )            INLINE ::SendEditor( SCI_SETTARGETSTART, nStart )
+   METHOD SetTargetEnd( nEnd )                INLINE ::SendEditor( SCI_SETTARGETEND, nEnd )
+   METHOD ReplaceTarget( nLen, cText)         INLINE ::SendEditor( SCI_REPLACETARGET, nLen, cText )
+   METHOD SearchInTarget( nLen, cText)        INLINE ::SendEditor( SCI_SEARCHINTARGET, nLen, cText )
+   METHOD GetTargetStart()                    INLINE ::SendEditor( SCI_GETTARGETSTART, 0, 0 )
+   METHOD GetTargetEnd()                      INLINE ::SendEditor( SCI_GETTARGETEND, 0, 0 )
+   METHOD GetCharAt( nPos )                   INLINE ::SendEditor( SCI_GETCHARAT, nPos, 0 )
+   METHOD PositionAfter( nPos )               INLINE ::SendEditor( SCI_POSITIONAFTER, nPos, 0 )
+   METHOD SetSelection( nCaret, nEnd )        INLINE ::SendEditor( SCI_SETSELECTION, nCaret, nEnd )
+   METHOD GetStyleAt( nPos )                  INLINE ::SendEditor( SCI_GETSTYLEAT, nPos, 0 )
+   METHOD GetEndStyled()                      INLINE ::SendEditor( SCI_GETENDSTYLED, 0, 0 )
+   METHOD EnsureVisible( nLine )              INLINE ::SendEditor( SCI_ENSUREVISIBLE, nLine, 0 )
+   METHOD EnsureVisibleEnforcePolicy( nLine ) INLINE ::SendEditor( SCI_ENSUREVISIBLEENFORCEPOLICY, nLine, 0 )
+   METHOD GetLineCount()                      INLINE ::SendEditor( SCI_GETLINECOUNT, 0, 0 )
 
-   METHOD SetUseTabs( nUseTabs )              INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SETUSETABS, nUseTabs, 0 )
-   METHOD AppendText( cText )                 INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_APPENDTEXT, Len(cText), cText )
-   METHOD UsePopUp( n )                       INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_USEPOPUP, n )
-   METHOD GetLineState( n )                   INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETLINESTATE, n )
-   METHOD GetLineIndentation( nLine )         INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_GETLINEINDENTATION, nLine )
-   METHOD SetLineIndentation( nLine, nInd )   INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SETLINEINDENTATION, nLine, nInd )
-   METHOD SetTabWidth( nChars )               INLINE ::ChkDoc(), ::Owner:SendMessage( SCI_SETTABWIDTH, nChars, 0 )
+   METHOD SetUseTabs( nUseTabs )              INLINE ::SendEditor( SCI_SETUSETABS, nUseTabs, 0 )
+   METHOD AppendText( cText )                 INLINE ::SendEditor( SCI_APPENDTEXT, Len(cText), cText )
+   METHOD UsePopUp( n )                       INLINE ::SendEditor( SCI_USEPOPUP, n )
+   METHOD GetLineState( n )                   INLINE ::SendEditor( SCI_GETLINESTATE, n )
+   METHOD GetLineIndentation( nLine )         INLINE ::SendEditor( SCI_GETLINEINDENTATION, nLine )
+   METHOD SetLineIndentation( nLine, nInd )   INLINE ::SendEditor( SCI_SETLINEINDENTATION, nLine, nInd )
+   METHOD SetTabWidth( nChars )               INLINE ::SendEditor( SCI_SETTABWIDTH, nChars, 0 )
 
    METHOD SetText()
    METHOD GetLine()
@@ -879,6 +880,17 @@ CLASS Source
    METHOD ReplaceAll()
    METHOD FindInTarget()
 ENDCLASS
+
+METHOD SendEditor( nMsg, wParam, lParam ) CLASS Source
+   LOCAL xReturn, pSource := ::Owner:GetCurDoc()
+   IF pSource != ::pSource
+      ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
+   ENDIF
+   xReturn := ::Owner:SendMessage( nMsg, wParam, lParam )
+   IF pSource != ::pSource
+      ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, pSource )
+   ENDIF
+RETURN xReturn
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Init( oOwner, cFile ) CLASS Source
@@ -2016,4 +2028,93 @@ METHOD Apply() CLASS Settings
       :StyleClearAll()
       :SetColors()
    END
+RETURN Self
+
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS GotoDialog INHERIT Dialog
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+   METHOD Go_OnClick()
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS GotoDialog
+   ::Super:Init( oParent, aParameters )
+   ::Name                 := "GotoDialog"
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 181
+   ::Height               := 130
+   ::Caption              := "Go To"
+   ::MaximizeBox          := .F.
+   ::MinimizeBox          := .F.
+   ::DlgModalFrame        := .T.
+   ::Center               := .T.
+   ::Create()
+RETURN Self
+
+METHOD OnInitDialog() CLASS GotoDialog
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label1"
+      :Left                 := 10
+      :Top                  := 18
+      :Width                := 72
+      :Height               := 16
+      :Caption              := "Line Number"
+      :Create()
+   END //LABEL
+   
+   DEFAULT ::Application:SourceEditor:Source:nPrevLine TO ::Application:SourceEditor:Source:GetCurLine()+1
+
+   WITH OBJECT ( EDITBOX( Self ) )
+      :Name                 := "LineNum"
+      :Left                 := 90
+      :Top                  := 15
+      :Width                := 55
+      :Height               := 22
+      :Alignment            := 3
+      :Number               := .T.
+      :Caption              := xStr(::Application:SourceEditor:Source:nPrevLine)
+      :Create()
+   END //EDITBOX
+
+   WITH OBJECT ( UPDOWN( Self ) )
+      :Name                 := "UpDown1"
+      :Left                 := 143
+      :Top                  := 15
+      :Width                := 18
+      :Height               := 22
+      :Caption              := ""
+      :Buddy                := "LineNum"
+      :Create()
+   END //UPDOWN
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Go"
+      :Left                 := 8
+      :Top                  := 70
+      :Width                := 70
+      :Height               := 25
+      :Caption              := "&Go to"
+      :DefaultButton        := .T.
+      :EventHandler[ "OnClick" ] := "Go_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button2"
+      :Left                 := 94
+      :Top                  := 70
+      :Width                := 70
+      :Height               := 25
+      :Caption              := "&Cancel"
+      :EventHandler[ "OnClick" ] := "Close"
+      :Create()
+   END //BUTTON
+RETURN Self
+
+METHOD Go_OnClick() CLASS GotoDialog
+   ::Application:SourceEditor:Source:GoToLine( VAL( ::LineNum:Caption )-1 )
+   ::Close()
 RETURN Self

@@ -976,6 +976,16 @@ METHOD Init() CLASS IDE_MainForm
             :Create()
          END
 
+         WITH OBJECT ::Application:Props[ "SearchGoto" ] := MenuStripItem( :this )
+            :Caption           := "&Go To"
+            :BeginGroup        := .T.
+            :ShortCutText      := "Ctrl+G"
+            :ShortCutKey:Key   := ASC("G")
+            :ShortCutKey:Ctrl  := .T.
+            :Enabled           := .F.
+            :Action            := {|o| IIF( o:Enabled, ::Application:SourceEditor:GotoDialog(), ) }
+            :Create()
+         END
       END
 
       //------------------------------------------------------------------
@@ -1980,6 +1990,7 @@ METHOD Init() CLASS IDE_MainForm
                         (n,x)
                         ::Application:Project:EditReset( IIF( y > 3, 1, 0 ) )
                         ::Application:MainForm:ToolBox1:Enabled := y > 3
+                        ::Application:Props:SearchGoto:Enabled := y == 3
                         //::Application:Props:FontBar:Enabled := y == 3
                         ::Application:ObjectTree:Enabled := y > 3
                        >
@@ -4751,13 +4762,11 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
-   LOCAL n, cWindow := "", oFile, oForm, nCurDoc
+   LOCAL n, cWindow := "", oFile, oForm
    LOCAL lNew := .F., aImage, aEditors, aChildEvents, nInsMetPos, cChildEvents, cEvent, cText, cPath, cBuffer, cResPath, nSecs
    LOCAL aDir, x, xVersion, cType, cRc, cPrj, hFile, cLine, xPath, xName, lPro, i, cName, cResImg, cFile, cSourcePath, cPrevRes//, oWait
 
    //oWait := ::Application:MainForm:MessageWait( "Saving Project " + ::Properties:Name )
-
-   nCurDoc := ::Application:SourceTabs:Cursel
 
    m->aChangedProps := {} // reset changed properties for bold text display
    ::Application:ObjectManager:InvalidateRect(, .F. )
@@ -5110,10 +5119,6 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
 
    ::Application:Cursor := NIL
    WinSetCursor( ::System:Cursor:Arrow )
-
-   ::Application:SourceTabs:SetCurSel( nCurDoc )
-   ::Application:Project:SourceTabChanged(, nCurDoc )
-   ::Application:SourceTabs:InvalidateRect(,.F.)
 
    ::Modified := .F.
    //oWait:Destroy()
