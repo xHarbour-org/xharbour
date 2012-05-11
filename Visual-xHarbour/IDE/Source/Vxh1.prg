@@ -986,6 +986,8 @@ METHOD Init() CLASS IDE_MainForm
             :Action            := {|o| IIF( o:Enabled, ::Application:SourceEditor:GotoDialog(), ) }
             :Create()
          END
+         ::AddAccelerator( FVIRTKEY | FCONTROL, 66, 0 )
+
       END
 
       //------------------------------------------------------------------

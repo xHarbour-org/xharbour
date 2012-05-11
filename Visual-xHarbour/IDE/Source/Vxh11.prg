@@ -2044,8 +2044,8 @@ METHOD Init( oParent, aParameters ) CLASS GotoDialog
    ::Modal                := .T.
    ::Left                 := 10
    ::Top                  := 10
-   ::Width                := 181
-   ::Height               := 130
+   ::Width                := 160
+   ::Height               := 120
    ::Caption              := "Go To"
    ::MaximizeBox          := .F.
    ::MinimizeBox          := .F.
