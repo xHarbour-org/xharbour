@@ -166,10 +166,10 @@ FUNCTION __MsgWait( cText, cTitle, lProgress )
    s_lProgress := lProgress
    s_cText     := cText
    
-   nStyle := WS_POPUP | WS_DLGFRAME | WS_THICKFRAME
+   nStyle := WS_POPUP | WS_DLGFRAME
 
    IF cTitle != NIL
-      nStyle := nStyle | WS_CAPTION
+      nStyle := nStyle | WS_CAPTION | WS_THICKFRAME
    ENDIF
 
    __aCenter   := NIL
