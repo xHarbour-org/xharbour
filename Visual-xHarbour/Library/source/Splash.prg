@@ -152,7 +152,6 @@ FUNCTION __MsgWait( cText, cTitle, lProgress )
    LOCAL nWidth, nHeight, nStyle, dt, hDC, hWnd
 
    DEFAULT cText  TO ""
-   DEFAULT cTitle TO ""
    DEFAULT lProgress TO .F.
 
    hDC       := GetDC(0)
