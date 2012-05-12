@@ -976,6 +976,18 @@ METHOD Init() CLASS IDE_MainForm
             :Create()
          END
 
+         WITH OBJECT ::Application:Props[ "PrevBookmark" ] := MenuStripItem( :this )
+            :Caption           := "&Clear All Bookmarks"
+            :ImageIndex        := 0
+            :ShortCutText      := "Ctrl+Shift+F2"
+            :ShortCutKey:Key   := VK_F2
+            :ShortCutKey:Shift := .T.
+            :ShortCutKey:Ctrl  := .T.
+            :Enabled           := .T.
+            :Action            := {|| ::Application:SourceEditor:BookmarkDelAll()}
+            :Create()
+         END
+
          WITH OBJECT ::Application:Props[ "SearchGoto" ] := MenuStripItem( :this )
             :Caption           := "&Go To"
             :BeginGroup        := .T.

@@ -108,11 +108,12 @@ CLASS SourceEditor INHERIT Control
 
    METHOD Colorise( nStart, nEnd )        INLINE ::SendMessage( SCI_COLOURISE, nStart, nEnd )
 
-   METHOD BookmarkAdd()                   INLINE ::SendMessage( SCI_MARKERADD, ::Source:GetCurLine(), MARKER_MASK )
-   METHOD BookmarkGet()                   INLINE ::SendMessage( SCI_MARKERGET, ::Source:GetCurLine(), MARKER_MASK )
-   METHOD BookmarkDel()                   INLINE ::SendMessage( SCI_MARKERDELETE, ::Source:GetCurLine(), MARKER_MASK )
+   METHOD BookmarkAdd(nLine)              INLINE ::SendMessage( SCI_MARKERADD, nLine, MARKER_MASK )
+   METHOD BookmarkGet(nLine)              INLINE ::SendMessage( SCI_MARKERGET, nLine, MARKER_MASK )
+   METHOD BookmarkDel(nLine)              INLINE ::SendMessage( SCI_MARKERDELETE, nLine, MARKER_MASK )
+   METHOD BookmarkDelAll()                INLINE ::SendMessage( SCI_MARKERDELETEALL, MARKER_MASK, 0 )
 
-   METHOD ToggleBookmark()                INLINE IIF( ::BookmarkGet() > 0, ::BookmarkDel(), ::BookmarkAdd() )
+   METHOD ToggleBookmark()
 
    METHOD BookmarkNext()                  INLINE ::SendMessage( SCI_MARKERNEXT, ::Source:GetCurLine()+1, 1<<MARKER_MASK )
    METHOD BookmarkPrev()                  INLINE ::SendMessage( SCI_MARKERPREVIOUS, ::Source:GetCurLine()-1, 1<<MARKER_MASK )
@@ -144,6 +145,19 @@ CLASS SourceEditor INHERIT Control
    METHOD GetWithObject()
    METHOD SetColors()
 ENDCLASS
+
+METHOD ToggleBookmark() CLASS SourceEditor
+   LOCAL nLineStart, nLineEnd, n
+   nLineStart := ::Source:LineFromPosition( ::Source:GetSelectionStart() )
+   nLineEnd   := ::Source:LineFromPosition( ::Source:GetSelectionEnd() )
+   FOR n := nLineStart TO nLineEnd
+       IF ::BookmarkGet(n) > 0
+          ::BookmarkDel(n)
+        ELSE
+          ::BookmarkAdd(n)
+       ENDIF
+   NEXT
+RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS SourceEditor
