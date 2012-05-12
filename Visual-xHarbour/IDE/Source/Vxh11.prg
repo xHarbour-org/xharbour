@@ -83,6 +83,8 @@ CLASS SourceEditor INHERIT Control
    DATA nDirection        EXPORTED
    DATA CaretLineVisible  EXPORTED
    DATA AutoIndent        EXPORTED
+   
+   DATA EditMenuItems     EXPORTED
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -226,7 +228,52 @@ METHOD Create() CLASS SourceEditor
    ::StyleClearAll()
    ::InitLexer()
    ::xTabWidth := ::Application:IniFile:ReadInteger( "Settings", "TabSpacing", ::xTabWidth )
-   
+
+   ::EditMenuItems := {=>}
+   HSetCaseMatch( ::EditMenuItems, .F. )
+
+   WITH OBJECT ( ::ContextMenu := ContextStrip( Self ) )
+      :Create()
+      WITH OBJECT ( ::EditMenuItems[ "Undo" ]   := MENUSTRIPITEM( :this ) )
+         :Caption      := "&Undo"
+         :ShortCutText := "Ctrl+Z"
+         :Action       := {|| ::Source:Undo() }
+         :Create()
+      END
+      WITH OBJECT ( ::EditMenuItems[ "Cut" ]    := MENUSTRIPITEM( :this ) )
+         :Caption      := "C&ut"
+         :ShortCutText := "Ctrl+X"
+         :Begingroup   := .T.
+         :Action       := {|| ::Source:Cut() }
+         :Create()
+      END
+      WITH OBJECT ( ::EditMenuItems[ "Copy" ]   := MENUSTRIPITEM( :this ) )
+         :Caption      := "&Copy"
+         :ShortCutText := "Ctrl+C"
+         :Action       := {|| ::Source:Copy() }
+         :Create()
+      END
+      WITH OBJECT ( ::EditMenuItems[ "Paste" ]  := MENUSTRIPITEM( :this ) )
+         :Caption      := "&Paste"
+         :ShortCutText := "Ctrl+V"
+         :Action       := {|| ::Source:Paste() }
+         :Create()
+      END
+      WITH OBJECT ( ::EditMenuItems[ "Delete" ] := MENUSTRIPITEM( :this ) )
+         :Caption      := "&Delete"
+         :ShortCutText := "Del"
+         :Action       := {|| ::Source:Delete() }
+         :Create()
+      END
+      WITH OBJECT ( ::EditMenuItems[ "SelAll" ] := MENUSTRIPITEM( :this ) )
+         :Caption      := "Select &All"
+         :ShortCutText := "Ctrl+A"
+         :Action       := {|| ::Source:SelectAll() }
+         :Begingroup   := .T.
+         :Create()
+      END
+   END
+
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -314,6 +361,7 @@ METHOD InitLexer() CLASS SourceEditor
    ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEREND,     SC_MARK_EMPTY )
    ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEROPENMID, SC_MARK_EMPTY )
    ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERMIDTAIL, SC_MARK_EMPTY )
+   ::SendMessage( SCI_USEPOPUP, 0 )
 
    ::SendMessage( SCI_SETFOLDFLAGS, 16, 0)
 
@@ -825,6 +873,8 @@ CLASS Source
    METHOD CanRedo()                           INLINE ::SendEditor( SCI_CANREDO, 0, 0 )==1
    METHOD Undo()                              INLINE ::SendEditor( SCI_UNDO, 0, 0 )
    METHOD Redo()                              INLINE ::SendEditor( SCI_REDO, 0, 0 )
+   METHOD Delete()                            INLINE ::SendEditor( SCI_DELETEBACK, 0, 0 )
+   METHOD SelectAll()                         INLINE ::SendEditor( SCI_SELECTALL, 0, 0 )
    METHOD Copy()                              INLINE ::SendEditor( SCI_COPY, 0, 0 )
    METHOD Paste()                             INLINE ::SendEditor( SCI_PASTE, 0, 0 )
    METHOD Cut()                               INLINE ::SendEditor( SCI_CUT, 0, 0 )

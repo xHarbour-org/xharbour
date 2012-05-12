@@ -3158,6 +3158,7 @@ CLASS ContextStrip INHERIT Component
    DATA ImageList PUBLISHED
    METHOD Init() CONSTRUCTOR
    METHOD Show()
+   METHOD __UpdateWidth()     INLINE NIL // Dummy
    METHOD Create()
    METHOD __DrawShadow() INLINE NIL
    METHOD Destroy() INLINE __ReleaseMenu( Self, ::__hMenu ), DestroyMenu( ::__hMenu )
