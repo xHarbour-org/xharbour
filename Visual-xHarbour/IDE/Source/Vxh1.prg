@@ -3392,6 +3392,7 @@ METHOD SetCaption( lMod ) CLASS Project
 
       ::Application:Props[ "SaveBttn" ]:Enabled     := lMod
       ::Application:Props[ "SaveItem" ]:Enabled     := lMod
+      ::Application:SaveMenu:Enabled                := lMod
       ::Application:Props[ "ProjSaveItem" ]:Enabled := lMod
 
    ENDIF
