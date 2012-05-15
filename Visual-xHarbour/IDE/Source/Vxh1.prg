@@ -6408,6 +6408,7 @@ CLASS ProjProp INHERIT Component
 
    DATA ClassID       EXPORTED INIT ""
    DATA Files         EXPORTED
+   DATA Bookmarks     EXPORTED INIT {}
    DATA Sources       EXPORTED INIT {}
    DATA Binaries      EXPORTED INIT {}
    DATA ExtImages     EXPORTED INIT {}
@@ -6471,7 +6472,7 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Save() CLASS ProjProp
-   LOCAL oWnd, oFile, cSource
+   LOCAL oWnd, oFile, cSource, oEditor
 
    oFile := CFile( ::Name + ".vxh" )
 
@@ -6500,6 +6501,11 @@ METHOD Save() CLASS ProjProp
 
    FOR EACH oWnd IN ::Application:Project:Forms
        oFile:FileBuffer += CRLF + oWnd:Name + ".xfm="
+   NEXT
+
+   oFile:FileBuffer += CRLF + "[Bookmarks]"
+   FOR EACH oEditor IN ::Application:SourceEditor:aDocs
+       oFile:FileBuffer += CRLF + oEditor:File + "=" + oEditor:GetBookmarks()
    NEXT
 
    oFile:FileBuffer += CRLF + "[Sources]"

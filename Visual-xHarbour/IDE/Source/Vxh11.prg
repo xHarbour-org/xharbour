@@ -116,7 +116,6 @@ CLASS SourceEditor INHERIT Control
    METHOD BookmarkDelAll()                INLINE ::SendMessage( SCI_MARKERDELETEALL, MARKER_MASK, 0 )
 
    METHOD ToggleBookmark()
-
    METHOD BookmarkNext()                  INLINE ::SendMessage( SCI_MARKERNEXT, ::Source:GetCurLine()+1, 1<<MARKER_MASK )
    METHOD BookmarkPrev()                  INLINE ::SendMessage( SCI_MARKERPREVIOUS, ::Source:GetCurLine()-1, 1<<MARKER_MASK )
 
@@ -864,7 +863,7 @@ CLASS Source
    METHOD SavePos()                           INLINE ::SavedPos := ::GetCurrentPos()
    METHOD ReleaseDocument()                   INLINE ::Owner:SendMessage( SCI_RELEASEDOCUMENT, 0, ::pSource )
    METHOD Select()                            INLINE ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource ), ::Owner:xSource := Self, ::GotoPosition( ::SavedPos )
-   METHOD CreateDocument()                    INLINE ::FirstOpen := .F., ::Owner:SendMessage( SCI_CREATEDOCUMENT, 0, 0 )
+   METHOD CreateDocument()                    INLINE ::Owner:SendMessage( SCI_CREATEDOCUMENT, 0, 0 )
 
    METHOD GotoPosition( nPos )                INLINE ::SendEditor( SCI_GOTOPOS, nPos, 0 )
    METHOD GotoLine( nLine )                   INLINE ::nPrevLine := ::GetCurLine()+1, ::SendEditor( SCI_GOTOLINE, nLine, 0 )
@@ -943,8 +942,29 @@ CLASS Source
    METHOD FindInPos()
    METHOD ReplaceAll()
    METHOD FindInTarget()
+   METHOD GetBookmarks()
 ENDCLASS
 
+//------------------------------------------------------------------------------------------------------------------------------------
+METHOD GetBookmarks() CLASS Source
+   LOCAL n, cMarks := "", nLine, pSource := ::Owner:GetCurDoc()
+   IF pSource != ::pSource
+      ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
+   ENDIF
+   FOR n := 0 TO ::GetLineCount()
+       IF ( nLine := ::Owner:SendMessage( SCI_MARKERNEXT, n+1, 1<<MARKER_MASK ) ) > 0
+          cMarks += IIF( ! EMPTY(cMarks),"|","") + xStr(nLine)
+          n := nLine
+        ELSE
+          EXIT
+       ENDIF
+   NEXT
+   IF pSource != ::pSource
+      ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, pSource )
+   ENDIF
+RETURN cMarks
+
+//------------------------------------------------------------------------------------------------------------------------------------
 METHOD SendEditor( nMsg, wParam, lParam ) CLASS Source
    LOCAL xReturn, pSource := ::Owner:GetCurDoc()
    IF pSource != ::pSource
@@ -1057,6 +1077,7 @@ METHOD Save( cFile ) CLASS Source
       cText := ::Application:SourceTabs:GetItemText(n)
       cText := ALLTRIM( STRTRAN( cText, "*" ) )
       ::Application:SourceTabs:SetItemText( n, cText, .F. )
+      ::FirstOpen := .F.
    ENDIF
 RETURN Self
 
@@ -1693,6 +1714,7 @@ METHOD OnInitDialog() CLASS Settings
                :Width                := 83
                :Height               := 15
                :Caption              := "Wrap Search"
+               :State                := ::Application:EditorProps:WrapSearch
                :Create()
             END //CHECKBOX
 
@@ -1703,6 +1725,7 @@ METHOD OnInitDialog() CLASS Settings
                :Width                := 109
                :Height               := 15
                :Caption              := "Caret Line Visible"
+               :State                := ::Application:SourceEditor:CaretLineVisible
                :Create()
             END //CHECKBOX
 
@@ -1713,6 +1736,7 @@ METHOD OnInitDialog() CLASS Settings
                :Width                := 86
                :Height               := 15
                :Caption              := "Auto Indent"
+               :State                := ::Application:SourceEditor:AutoIndent
                :Create()
             END //CHECKBOX
 
@@ -1835,7 +1859,7 @@ METHOD OnInitDialog() CLASS Settings
          END //GROUPBOX
 
       END //TABPAGE
-
+/*
       WITH OBJECT ( TABPAGE( :this ) )
          :Name                 := "TabPage1"
          :Caption              := "Designer"
@@ -1923,7 +1947,7 @@ METHOD OnInitDialog() CLASS Settings
          END //GROUPBOX
 
       END //TABPAGE
-
+*/
    END //TABSTRIP
 
    WITH OBJECT ( BUTTON( Self ) )
@@ -1986,7 +2010,7 @@ METHOD DefBack_OnClick( Sender ) CLASS Settings
    ::ColorDialog1:Color := ::Application:SourceEditor:&cColor
    IF ::ColorDialog1:Show()
       ::&cEdit:BackColor := ::ColorDialog1:Color
-      IF Sender:Name != "SelectedLineEdit"
+      IF Sender:Name != "SelectedLine"
          ::NormalTextEdit:BackColor   := ::ColorDialog1:Color
          ::NumbersEdit:BackColor      := ::ColorDialog1:Color
          ::StringsEdit:BackColor      := ::ColorDialog1:Color
@@ -2086,7 +2110,11 @@ METHOD Apply() CLASS Settings
       :ColorKeywords3    := ::Keywords3Edit:ForeColor
       :ColorKeywords4    := ::Keywords4Edit:ForeColor
       :TabWidth          := VAL( ::TabSpacing:Caption )
-
+      :CaretLineVisible  := ::CaretLine:GetState()
+      :AutoIndent        := ::AutoIndent:GetState()
+      ::Application:EditorProps:WrapSearch := ::WrapSearch:GetState()
+      ::Application:Props:WrapSearchItem:Checked := ::WrapSearch:GetState()==1
+      
       :StyleSetBack( STYLE_DEFAULT, :ColorBackground )
       :StyleSetFore( STYLE_DEFAULT, :ColorNormalText )
       :StyleClearAll()

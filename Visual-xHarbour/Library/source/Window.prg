@@ -433,7 +433,7 @@ CLASS Window INHERIT Object
    METHOD ScrollWindow( x, y, rRect, rClip ) INLINE _ScrollWindow( ::hWnd, x, y, rRect, rClip )
    METHOD SetActiveWindow()       INLINE SetActiveWindow( ::hWnd )
    METHOD GetClientRect()
-   METHOD SetWindowText(cText)    INLINE ::xCaption := cText, IIF( ::hWnd != NIL, SetWindowText( ::hWnd, cText ),)
+   METHOD SetWindowText()
    METHOD BringWindowToTop()      INLINE BringWindowToTop( ::hWnd )
    METHOD ScreenToClient( pt )    INLINE ScreenToClient( ::hWnd, @pt )
    METHOD ClientToScreen( pt )    INLINE ClientToScreen( ::hWnd, @pt )
@@ -642,6 +642,22 @@ METHOD SaveLayout( cIniFile, cSection ) CLASS Window
    ENDIF
    DEFAULT cSection TO "Forms"
    oIni:WriteString( cSection, ::Application:Name + "_" + ::Name, xSTR( ::Left ) + ", " + xSTR( ::Top ) + ", " + xSTR( ::Width ) + ", " + xSTR( ::Height ) )
+RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+METHOD SetWindowText( cText ) CLASS Window
+   IF ::__ClassInst == NIL .AND. ! ::Application:__Vxh
+      IF LEFT(cText,2)=="{|"
+         cText := &cText
+      ENDIF
+      IF VALTYPE(cText)=="B"
+         cText := EVAL(cText)
+      ENDIF
+   ENDIF
+   ::xCaption := cText
+   IF ::hWnd != NIL
+      SetWindowText( ::hWnd, cText )
+   ENDIF
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -965,6 +981,15 @@ METHOD Create( oParent ) CLASS Window
    IF ::ClsName != "__VideoCapture"
       IF ::Parent != NIL .AND. ::Parent:ClsName == "StatusBarPanel"
          hParent := ::Parent:Parent:hWnd
+      ENDIF
+
+      IF ::__ClassInst == NIL .AND. ! ::Application:__Vxh
+         IF LEFT(::xCaption,2)=="{|"
+            ::xCaption := &(::xCaption)
+         ENDIF
+         IF VALTYPE(::xCaption)=="B"
+            ::xCaption := EVAL(::xCaption)
+         ENDIF
       ENDIF
       ::hWnd := CreateWindowEx( ::ExStyle, ::ClsName, ::Caption, ::Style, ::Left, ::Top, ::Width, ::Height, hParent, ::Id, ::AppInstance, ::__ClientStruct )
     ELSE
