@@ -290,8 +290,13 @@ METHOD Create() CLASS EditBox
    ::__BackMargin += pWi:cxWindowBorders
    ::SetWindowPos(, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
    //::__UnSubclass()
-   IF ::__ClassInst == NIL .AND. ( n := ASCAN( ::Parent:Children, {|o| o:ClsName == UPDOWN_CLASS .AND. o:Buddy != NIL .AND. o:Buddy == Self} ) ) > 0
-      ::Parent:Children[n]:__SetBuddy()
+   IF ::__ClassInst == NIL 
+      IF ( n := ASCAN( ::Parent:Children, {|o| o:ClsName == UPDOWN_CLASS .AND. VALTYPE(o:Buddy)=="C" .AND. o:Buddy == ::Name } ) ) > 0
+         ::Parent:Children[n]:xBuddy := Self
+      ENDIF
+      IF ( n := ASCAN( ::Parent:Children, {|o| o:ClsName == UPDOWN_CLASS .AND. o:Buddy != NIL .AND. o:Buddy == Self} ) ) > 0
+         ::Parent:Children[n]:__SetBuddy()
+      ENDIF
    ENDIF
 RETURN Self
 
