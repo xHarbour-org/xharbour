@@ -1913,8 +1913,10 @@ METHOD OnWindowPaint() CLASS TabStrip
    DEFAULT hBrush TO ::Parent:BkBrush
    IF hBrush == NIL
       nColor := GetPixel( ::Parent:Drawing:hDC, 2,2 )
-      ::BkBrush := CreateSolidBrush( nColor )
-      hBrush := ::BkBrush
+      IF nColor == CLR_INVALID
+         ::BkBrush := CreateSolidBrush( nColor )
+         hBrush := ::BkBrush
+      ENDIF
    ENDIF
    DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
 

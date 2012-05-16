@@ -595,7 +595,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                        NEXT
                     ENDIF
 
-                    IF __ObjHasMsg( oObj, "Events" )
+                    IF __ObjHasMsg( oObj, "Events" ) .AND. oObj:Events != NIL
                        FOR EACH Topic IN oObj:Events
                            FOR EACH Event IN Topic[2]
                                AADD( aList, Event[1]+"?6" )

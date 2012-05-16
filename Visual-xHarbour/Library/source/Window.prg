@@ -647,7 +647,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD SetWindowText( cText ) CLASS Window
    IF ::__ClassInst == NIL .AND. ! ::Application:__Vxh
-      IF LEFT(cText,2)=="{|"
+      IF VALTYPE(cText)=="C" .AND. LEFT(cText,2)=="{|"
          cText := &cText
       ENDIF
       IF VALTYPE(cText)=="B"
@@ -984,7 +984,7 @@ METHOD Create( oParent ) CLASS Window
       ENDIF
 
       IF ::__ClassInst == NIL .AND. ! ::Application:__Vxh
-         IF LEFT(::xCaption,2)=="{|"
+         IF VALTYPE(::xCaption)=="C" .AND. LEFT(::xCaption,2)=="{|"
             ::xCaption := &(::xCaption)
          ENDIF
          IF VALTYPE(::xCaption)=="B"
