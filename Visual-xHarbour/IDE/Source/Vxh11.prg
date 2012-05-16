@@ -591,7 +591,9 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
 
                     IF __ObjHasMsg( oObj, "Property" ) .AND. oObj:Property != NIL
                        FOR EACH cCtrl IN oObj:Property:Keys
-                           AADD( aList, oObj:Property[ cCtrl ]:Name+"?8" )
+                           IF oObj:Property[ cCtrl ]:Name != NIL
+                              AADD( aList, oObj:Property[ cCtrl ]:Name+"?8" )
+                           ENDIF
                        NEXT
                     ENDIF
 
