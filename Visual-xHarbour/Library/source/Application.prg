@@ -548,7 +548,11 @@ RETURN lRet
 
 METHOD Exit() CLASS Application
    IF VALTYPE( ::MainForm ) == "O" .AND. IsWindow( ::MainForm:hWnd )
-      ::MainForm:Destroy()
+      IF ::MainForm:Modal
+         ::MainForm:Close()
+       ELSE
+         ::MainForm:Destroy()
+      ENDIF
    ENDIF
    ::MainForm := NIL
    FreeLibrary( ::hRich20 )

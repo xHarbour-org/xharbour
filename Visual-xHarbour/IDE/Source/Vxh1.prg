@@ -4220,7 +4220,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
-   LOCAL cObjectName, cXfm, cLine, nLine, aChildren, hFile, cClassName, aTokens
+   LOCAL cObjectName, cXfm, cLine, nLine, aChildren, hFile, cClassName, aTokens, cBkMk
    LOCAL cSourcePath := ::Properties:Path + "\" + ::Properties:Source
    cXfm := cSourcePath +"\" + cFile
    DEFAULT lLoadProps TO .T.
@@ -4246,12 +4246,15 @@ METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
    
    IF oForm == NIL
       oForm := ::AddWindow( .F., cObjectName + ".prg", cClassName == "CUSTOMCONTROL" )
+      cBkMk := GetPrivateProfileString( "Files", cFile, "", ::Properties:Path + "\" + ::Properties:Name + ".vxh")
+
       ::CurrentForm := oForm
       cSourcePath := ::Properties:Path + "\" + ::Properties:Source
 
       ::Application:SourceEditor:Source := oForm:Editor
-      oForm:Editor:Open( cSourcePath + "\" + cObjectName + ".prg" )
+      oForm:Editor:Open( cSourcePath + "\" + cObjectName + ".prg", cBkMk )
    ENDIF
+
    IF lLoadProps
       nLine := 1
       DEFAULT aErrors  TO {}
@@ -6473,7 +6476,7 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Save() CLASS ProjProp
-   LOCAL oWnd, oFile, cSource, oEditor
+   LOCAL oWnd, oFile, cSource, cBkMk, n
 
    oFile := CFile( ::Name + ".vxh" )
 
@@ -6501,17 +6504,16 @@ METHOD Save() CLASS ProjProp
                        "[Files]"
 
    FOR EACH oWnd IN ::Application:Project:Forms
-       oFile:FileBuffer += CRLF + oWnd:Name + ".xfm="
-   NEXT
-
-   oFile:FileBuffer += CRLF + "[Bookmarks]"
-   FOR EACH oEditor IN ::Application:SourceEditor:aDocs
-       oFile:FileBuffer += CRLF + oEditor:File + "=" + oEditor:GetBookmarks()
+       oFile:FileBuffer += CRLF + oWnd:Name + ".xfm=" + oWnd:Editor:GetBookmarks()
    NEXT
 
    oFile:FileBuffer += CRLF + "[Sources]"
    FOR EACH cSource IN ::Sources
-       oFile:FileBuffer += CRLF + cSource +"="
+       cBkMk := ""
+       IF ( n := ASCAN( ::Application:SourceEditor:aDocs, {|o| UPPER(o:File)==UPPER(cSource)} ) ) > 0
+          cBkMk := ::Application:SourceEditor:aDocs[n]:GetBookmarks()
+       ENDIF
+       oFile:FileBuffer += CRLF + cSource +"=" + cBkMk
    NEXT
 
    oFile:FileBuffer += CRLF + "[Binaries]"

@@ -954,7 +954,7 @@ METHOD GetBookmarks() CLASS Source
       ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
    ENDIF
    FOR n := 0 TO ::GetLineCount()
-       IF ( nLine := ::Owner:SendMessage( SCI_MARKERNEXT, n+1, 1<<MARKER_MASK ) ) > 0
+       IF ( nLine := ::Owner:SendMessage( SCI_MARKERNEXT, n, 1<<MARKER_MASK ) ) > 0
           cMarks += IIF( ! EMPTY(cMarks),"|","") + xStr(nLine)
           n := nLine
         ELSE
@@ -1013,8 +1013,8 @@ METHOD Close() CLASS Source
 RETURN .F.
 
 //------------------------------------------------------------------------------------------------------------------------------------
-METHOD Open( cFile ) CLASS Source
-   LOCAL n
+METHOD Open( cFile, cBookmarks ) CLASS Source
+   LOCAL n, aBookmarks
    ::SetText( MemoRead( cFile, .F. ) )
 
    ::SetSavePoint()
@@ -1027,6 +1027,10 @@ METHOD Open( cFile ) CLASS Source
    ::Path     := SUBSTR( cFile, 1, n-1 )
    ::File     := cFile
    ::SetSavePoint()
+   IF ! EMPTY( cBookmarks )
+      aBookmarks := hb_aTokens( cBookmarks, "|" )
+      AEVAL( aBookmarks, {|c| ::Owner:BookmarkAdd(VAL(c))} )
+   ENDIF
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
