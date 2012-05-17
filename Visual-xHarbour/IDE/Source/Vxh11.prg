@@ -949,7 +949,9 @@ ENDCLASS
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD GetBookmarks() CLASS Source
-   LOCAL n, cMarks := "", nLine, pSource := ::Owner:GetCurDoc()
+   LOCAL n, nPos, cMarks := "", nLine, pSource := ::Owner:GetCurDoc()
+   nPos := ::Owner:SendMessage( SCI_GETCURRENTPOS, 0, 0 )
+
    IF pSource != ::pSource
       ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
    ENDIF
@@ -964,6 +966,7 @@ METHOD GetBookmarks() CLASS Source
    IF pSource != ::pSource
       ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, pSource )
    ENDIF
+   ::Owner:SendMessage( SCI_GOTOPOS, nPos, 0 )
 RETURN cMarks
 
 //------------------------------------------------------------------------------------------------------------------------------------

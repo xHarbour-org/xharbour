@@ -1332,7 +1332,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Create() CLASS TabPage
-   LOCAL tci, rc, n
+   LOCAL tci, rc, n, cText
 
    IF EMPTY( ::Caption )
       ::Caption := NIL
@@ -1344,7 +1344,19 @@ METHOD Create() CLASS TabPage
 
    tci := (struct TCITEM)
    tci:mask    := TCIF_IMAGE | TCIF_TEXT
-   tci:pszText := ::Caption
+   
+   cText := ::Caption
+
+   IF ::__ClassInst == NIL
+      IF VALTYPE(cText)=="C" .AND. LEFT(cText,2)=="{|"
+         cText := &cText
+      ENDIF
+      IF VALTYPE(cText)=="B"
+         cText := EVAL(cText)
+      ENDIF
+   ENDIF
+
+   tci:pszText := cText
    tci:iImage  := IIF( ::ImageIndex > 0, ::ImageIndex-1, -1 )
    IF ::Parent:hWnd == NIL
       ::Parent:Create()
@@ -1367,7 +1379,7 @@ METHOD Create() CLASS TabPage
       IF ::__ClassInst != NIL .AND. ::__CustomOwner
 
          __ResetClassInst( Self )
-         ::__ClassInst:Caption    := ::Caption
+         ::__ClassInst:Caption    := cText
          ::__ClassInst:ImageIndex := ::ImageIndex
 
          IF ::BackSysColor != ::xBackColor .AND. ::xBackColor != NIL
@@ -1386,8 +1398,8 @@ METHOD Create() CLASS TabPage
 
       IF ::__ClassInst == NIL
          SetParent( ::hWnd, ::Parent:Parent:hWnd )
-         IF !EMPTY( ::Caption ) .AND. ( n := AT( "&", ::Caption ) ) > 0
-            RegisterHotKey( ::hWnd, ::Id, MOD_ALT, ASC( ::Caption[n+1] ) )
+         IF !EMPTY( cText ) .AND. ( n := AT( "&", cText ) ) > 0
+            RegisterHotKey( ::hWnd, ::Id, MOD_ALT, ASC( cText[n+1] ) )
          ENDIF
       ENDIF
 
