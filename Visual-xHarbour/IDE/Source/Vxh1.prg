@@ -851,7 +851,6 @@ METHOD Init() CLASS IDE_MainForm
             :Action            := {|| ::Application:SourceEditor:ToggleRectSel() }
             :Create()
          END
-
          WITH OBJECT MenuStripItem( :this )
             :Caption           := "&Change Case"
             :BeginGroup        := .T.
@@ -937,7 +936,6 @@ METHOD Init() CLASS IDE_MainForm
                            >
             :Create()
          END
-
          WITH OBJECT ::Application:Props[ "TogBookmark" ] := MenuStripItem( :this )
             :Caption           := "&Toggle Bookmark"
             :ImageIndex        := 16
@@ -976,7 +974,7 @@ METHOD Init() CLASS IDE_MainForm
             :Create()
          END
 
-         WITH OBJECT ::Application:Props[ "PrevBookmark" ] := MenuStripItem( :this )
+         WITH OBJECT ::Application:Props[ "ClearBookmark" ] := MenuStripItem( :this )
             :Caption           := "&Clear All Bookmarks"
             :ImageIndex        := 0
             :ShortCutText      := "Ctrl+Shift+F2"
@@ -2003,10 +2001,21 @@ METHOD Init() CLASS IDE_MainForm
       :OnSelChanged := <|n,x,y|
                         (n,x)
                         ::Application:Project:EditReset( IIF( y > 3, 1, 0 ) )
-                        ::Application:MainForm:ToolBox1:Enabled := y > 3
-                        ::Application:Props:SearchGoto:Enabled := y == 3
-                        //::Application:Props:FontBar:Enabled := y == 3
-                        ::Application:ObjectTree:Enabled := y > 3
+                        ::Application:MainForm:ToolBox1:Enabled       := y > 3
+                        ::Application:ObjectTree:Enabled              := y > 3
+                        ::Application:Props:SearchGoto:Enabled        := y == 3
+                        ::Application:Props:TogBookmark:Enabled       := y == 3
+                        ::Application:Props:NextBookmark:Enabled      := y == 3
+                        ::Application:Props:PrevBookmark:Enabled      := y == 3
+                        ::Application:Props:ClearBookmark:Enabled     := y == 3
+                        ::Application:Props:WrapSearchItem:Enabled    := y == 3
+                        ::Application:Props:SearchReplaceItem:Enabled := y == 3
+                        ::Application:Props:SearchFindItem:Enabled    := y == 3
+                        ::Application:Props:EditUpperCase:Enabled     := y == 3
+                        ::Application:Props:EditLowerCase:Enabled     := y == 3
+                        ::Application:Props:EditInvCase:Enabled       := y == 3
+                        ::Application:Props:EditCapitalize:Enabled    := y == 3
+                        ::Application:Props:RectSelect:Enabled        := y == 3
                        >
       :Create()
 
@@ -2355,7 +2364,7 @@ FUNCTION OnShowDesigner()
 
    oApp:SaveMenu:Action  := {||oApp:Project:Save() }
    oApp:SaveMenu:Caption := "Save Project"
-   oApp:SaveMenu:Enable()
+//   oApp:SaveMenu:Enable()
 
    oApp:SaveAsMenu:Action  := {||oApp:Project:SaveAs() }
    oApp:SaveAsMenu:Caption := "Save Project &As ..."
@@ -2742,7 +2751,7 @@ METHOD SourceTabChanged( nPrev, nCur ) CLASS Project
 RETURN Self
 
 METHOD CheckValidProgram() CLASS Project
-   ::Application:SaveMenu:Enable()
+   //::Application:SaveMenu:Enable()
    ::Application:SaveAsMenu:Enable()
    ::cFileRemove := NIL
    IF EMPTY( ::Application:SourceEditor:Source:File )
