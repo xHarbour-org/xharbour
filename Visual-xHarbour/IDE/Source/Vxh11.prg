@@ -370,7 +370,7 @@ METHOD InitLexer() CLASS SourceEditor
    SciRegisterMethodImage( ::hWnd, 7 )
    SciRegisterEventImage( ::hWnd, 6 )
 
-   ::SendMessage( SCI_SETMODEVENTMASK, SC_MOD_CHANGEFOLD | SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT | SC_PERFORMED_UNDO | SC_PERFORMED_REDO )
+   ::SendMessage( SCI_SETMODEVENTMASK, SC_MOD_CHANGEFOLD | SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT | SC_PERFORMED_UNDO | SC_PERFORMED_REDO | SC_MOD_CHANGEMARKER )
    ::SetColors()
 RETURN NIL
 
@@ -1024,16 +1024,18 @@ METHOD Open( cFile, cBookmarks ) CLASS Source
    ::GotoPosition( 0 )
    ::EmptyUndoBuffer()
    ::Modified  := .F.
+
+   IF ! EMPTY( cBookmarks )
+      aBookmarks := hb_aTokens( cBookmarks, "|" )
+      AEVAL( aBookmarks, {|c| ::Owner:BookmarkAdd(VAL(c))} )
+   ENDIF
+
    ::FirstOpen := .F.
    n := RAT( "\", cFile )
    ::FileName := SUBSTR( cFile, n+1 )
    ::Path     := SUBSTR( cFile, 1, n-1 )
    ::File     := cFile
    ::SetSavePoint()
-   IF ! EMPTY( cBookmarks )
-      aBookmarks := hb_aTokens( cBookmarks, "|" )
-      AEVAL( aBookmarks, {|c| ::Owner:BookmarkAdd(VAL(c))} )
-   ENDIF
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
