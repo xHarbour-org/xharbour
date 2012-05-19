@@ -153,6 +153,7 @@ CLASS DataTable INHERIT Component
    METHOD Zap()                               INLINE ::Connector:Zap()
    METHOD OrdCount()                          INLINE ::Connector:OrdCount()
    METHOD OrdName(n)                          INLINE ::Connector:OrdName(n)
+   METHOD OrdNumber(cOrd,cBag)                INLINE ::Connector:OrdNumber(cOrd,cBag)
    METHOD OrdBagName(n)                       INLINE ::Connector:OrdBagName(n)
    METHOD OrdKey(n)                           INLINE ::Connector:OrdKey(n)
    METHOD Struct()                            INLINE ::Connector:Struct()
@@ -187,6 +188,8 @@ CLASS DataTable INHERIT Component
    METHOD FromAlias()
    METHOD Insert() INLINE ::Append()
    METHOD __SetMemoType( nMemo )              INLINE ::RddInfo( RDDI_MEMOTYPE, nMemo )
+
+   METHOD CreateTable()
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -224,6 +227,15 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
+METHOD CreateTable( aStruc, cFile ) CLASS DataTable
+   DEFAULT cFile  TO ::FileName
+   DEFAULT aStruc TO ::Structure
+   IF !File( cFile ) .AND. !Empty( aStruc )
+      ::Connector:CreateTable( cFile, aStruc, ::Driver )
+   ENDIF
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
 METHOD CreateFields() CLASS DataTable
    LOCAL aField, hClass, cField
 
@@ -242,8 +254,10 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD CreateOrder( cOrderBagName, cTag, cKey, cFor, bFor, bWhile, bEval, nEvery, nRecNo, nNext, nRecord, lRest, lUnique, lAll )
-   (::Area)->( OrdCondSet( cFor, bFor, lAll, bWhile, bEval, nEvery, nRecNo, nNext, nRecord, lRest ) )
-   (::Area)->( OrdCreate( cOrderBagName, cTag, cKey,, lUnique ) )
+   IF (::Area)->( OrdNumber( cTag, cOrderBagName ) ) == 0
+      (::Area)->( OrdCondSet( cFor, bFor, lAll, bWhile, bEval, nEvery, nRecNo, nNext, nRecord, lRest ) )
+      (::Area)->( OrdCreate( cOrderBagName, cTag, cKey,, lUnique ) )
+   ENDIF
 RETURN Self
    
 //-------------------------------------------------------------------------------------------------------
@@ -409,6 +423,7 @@ CLASS DataRdd
    METHOD Zap()                               INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( __dbZap() ),)
    METHOD OrdCount()                          INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdCount() ),)
    METHOD OrdName(n)                          INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdName(n) ),)
+   METHOD OrdNumber(cOrd,cBag)                INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdNumber(cOrd,cBag) ),)
    METHOD OrdBagName(n)                       INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdBagName(n) ),)
    METHOD OrdKey(n)                           INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdKey(n) ), )
    METHOD Struct()                            INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbStruct() ),)
@@ -421,7 +436,7 @@ CLASS DataRdd
    METHOD FieldPut( nField, xVal )            INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( FieldPut( nField, xVal ) ),)
    METHOD FieldGet( nField )                  INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( FieldGet( nField ) ),)
    METHOD FieldType( nField )                 INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( FieldType( nField ) ),)
-   METHOD CreateTable()                       INLINE dbCreate( ::Owner:File, ::Owner:Structure, ::Owner:Driver )
+   METHOD CreateTable( cFile, aStru, cDriver) INLINE dbCreate( cFile, aStru, cDriver )
    METHOD Gather()
    METHOD Scatter( aData )
    METHOD OrdKeyRelPos(n)
@@ -713,6 +728,7 @@ CLASS SocketRdd
    METHOD Zap()                               INLINE ::Request( "__dbZap" )
    METHOD OrdCount()                          INLINE ::Request( "OrdCount" )
    METHOD OrdName(n)                          INLINE ::Request( "OrdName", {n} )
+   METHOD OrdNumber(cOrd,cBag)                INLINE ::Request( "OrdNumber", {cOrd,cBag} )
    METHOD OrdBagName(n)                       INLINE ::Request( "OrdBagName", {n} )
    METHOD OrdKey(n)                           INLINE ::Request( "OrdKey", {n} )
    METHOD Struct()                            INLINE ::Request( "dbStruct" )
