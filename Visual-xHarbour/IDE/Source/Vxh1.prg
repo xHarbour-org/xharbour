@@ -3352,9 +3352,12 @@ METHOD Replace() CLASS Project
       IF ::FindDialog != NIL
          ::FindDialog:Close()
       ENDIF
-      ::ReplaceDialog := ReplaceTextDialog( ::Application:SourceEditor )
-      ::ReplaceDialog:Owner := ::Application:SourceEditor
-      ::ReplaceDialog:Show(, ::Application:SourceEditor:Source:GetSelText())
+      IF ::ReplaceDialog != NIL .AND. ::ReplaceDialog:IsWindowVisible()
+         ::ReplaceDialog:FindWhat:Caption := ::Application:SourceEditor:Source:GetSelText()
+         ::ReplaceDialog:FindWhat:SetFocus()
+       ELSE
+         ::ReplaceDialog := FindReplace( ::Application:SourceEditor )
+      ENDIF
    ENDIF
 RETURN 0
 

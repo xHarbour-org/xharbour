@@ -70,11 +70,11 @@ CLASS CheckBox INHERIT Control
    METHOD OnCtlColorStatic()
    METHOD OnParentNotify()
    METHOD SetState()
-   METHOD OnEraseBkGnd() INLINE 1
-   METHOD GetState() INLINE ::SendMessage( BM_GETSTATE, 0, 0 )
-   METHOD Checked()  INLINE ( ::SendMessage( BM_GETSTATE, 0, 0 ) & BST_CHECKED ) != 0
-   METHOD Check()    INLINE ::State := BST_CHECKED
-   METHOD UnCheck()  INLINE ::State := BST_UNCHECKED
+   METHOD OnEraseBkGnd()  INLINE 1
+   METHOD GetState()      INLINE ::SendMessage( BM_GETSTATE, 0, 0 )
+   METHOD Checked()       INLINE ( ::SendMessage( BM_GETSTATE, 0, 0 ) & BST_CHECKED ) != 0
+   METHOD Check()         INLINE ::State := BST_CHECKED
+   METHOD UnCheck()       INLINE ::State := BST_UNCHECKED
    METHOD Indeterminate() INLINE ::State := BST_INDETERMINATE
 ENDCLASS
 

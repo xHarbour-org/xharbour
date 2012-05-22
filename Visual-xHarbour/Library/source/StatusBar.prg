@@ -195,8 +195,8 @@ METHOD SetPanels( nWidth ) CLASS StatusBar
 
          ::Children[n]:Children[1]:Left   := rc:Left + IIF( !::Application:IsThemedXP .OR. !::Theming, 1, 2 )
          ::Children[n]:Children[1]:Top    := rc:Top  + IIF( !::Application:IsThemedXP .OR. !::Theming, 1, 2 )
-         ::Children[n]:Children[1]:Width  := ::Children[n]:Width - IIF( !::Application:IsThemedXP .OR. !::Theming, 2, 4 )
-         ::Children[n]:Children[1]:Height := rc:Bottom - rc:Top  - IIF( !::Application:IsThemedXP .OR. !::Theming, 2, 4 )
+         ::Children[n]:Children[1]:Width  := ::Children[n]:Width - IIF( !::Application:IsThemedXP .OR. !::Theming, 2, 6 )
+         ::Children[n]:Children[1]:Height := rc:Bottom - rc:Top  - IIF( !::Application:IsThemedXP .OR. !::Theming, 2, 6 )
 
          IF ::Application:IsThemedXP .AND. ::Children[n]:Children[1]:__xCtrlName == "ToolBar"
             ::Children[n]:Children[1]:Top    := 0

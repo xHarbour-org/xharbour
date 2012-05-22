@@ -2228,3 +2228,189 @@ METHOD Go_OnClick() CLASS GotoDialog
    ::Application:SourceEditor:Source:GoToLine( VAL( ::LineNum:Caption )-1 )
    ::Close()
 RETURN Self
+
+CLASS FindReplace INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Next_OnClick()
+   METHOD Replace_OnClick()
+   METHOD All_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FindReplace
+   LOCAL aRect
+
+   ::Super:Init( oParent, aParameters )
+
+   aRect := _GetWindowRect( oParent:hWnd )
+
+   ::Name                 := "Form1"
+   ::Left                 := aRect[1] + 16
+   ::Top                  := aRect[2] + 17
+   ::Width                := 446
+   ::Height               := 153
+   ::Caption              := "Replace"
+   ::Resizable            := .F.
+   ::MaximizeBox          := .F.
+   ::MinimizeBox          := .F.
+   ::DlgModalFrame        := .T.
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( EDITBOX( Self ) )
+      :Name                 := "FindWhat"
+      :Left                 := 93
+      :Top                  := 9
+      :Width                := 244
+      :Caption              := ::Parent:Source:GetSelText()
+      :OnWMKeyUp            := <|o,nKey|
+                                 IF nKey == 27
+                                    o:Parent:Close()
+                                  ELSE
+                                    o:Parent:Next:Enabled := ;
+                                    o:Parent:Replace:Enabled := ;
+                                    o:Parent:All:Enabled := ! Empty(o:Caption)
+                                 ENDIF
+                               >
+      :Create()
+      :SetFocus()
+   END //COMBOBOX
+
+   WITH OBJECT ( EDITBOX( Self ) )
+      :Name                 := "ReplaceWith"
+      :Left                 := 93
+      :Top                  := 34
+      :Width                := 244
+      :OnWMKeyUp            := {|o,nKey| IIF( nKey==27, o:Parent:Close(),)}
+      :Create()
+   END //COMBOBOX
+
+   WITH OBJECT ( CHECKBOX( Self ) )
+      :Name                 := "WholeWord"
+      :Left                 := 15
+      :Top                  := 62
+      :Width                := 150
+      :Height               := 15
+      :Caption              := "Match Whole &Word"
+      :Create()
+   END //CHECKBOX
+
+   WITH OBJECT ( CHECKBOX( Self ) )
+      :Name                 := "MatchCase"
+      :Left                 := 15
+      :Top                  := 81
+      :Width                := 100
+      :Height               := 15
+      :Caption              := "Match &Case"
+      :Create()
+   END //CHECKBOX
+
+   WITH OBJECT ( CHECKBOX( Self ) )
+      :Name                 := "Global"
+      :Left                 := 15
+      :Top                  := 100
+      :Width                := 100
+      :Height               := 15
+      :Caption              := "Global &Search"
+      :Create()
+   END //CHECKBOX
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Next"
+      :Left                 := 346
+      :Top                  := 8
+      :Width                := 80
+      :Height               := 24
+      :Enabled              := .F.
+      :Caption              := "Find &Next"
+      :DefaultButton        := .T.
+      :EventHandler[ "OnClick" ] := "Next_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Replace"
+      :Left                 := 346
+      :Top                  := 34
+      :Width                := 80
+      :Enabled              := .F.
+      :Height               := 24
+      :Caption              := "&Replace"
+      :EventHandler[ "OnClick" ] := "Replace_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "All"
+      :Left                 := 346
+      :Top                  := 60
+      :Width                := 80
+      :Height               := 24
+      :Enabled              := .F.
+      :Caption              := "Replace &All"
+      :EventHandler[ "OnClick" ] := "All_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Cancel"
+      :Left                 := 346
+      :Top                  := 86
+      :Width                := 80
+      :Height               := 24
+      :Caption              := "Cancel"
+      :EventHandler[ "OnClick" ] := "Close"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label1"
+      :Left                 := 15
+      :Top                  := 12
+      :Width                := 72
+      :Height               := 16
+      :Caption              := "&Find"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label2"
+      :Left                 := 15
+      :Top                  := 37
+      :Width                := 70
+      :Height               := 16
+      :Caption              := "&Replace with"
+      :Create()
+   END //LABEL
+
+   ::Show()
+RETURN Self
+
+//----------------------------------------------------------------------------------------------------
+METHOD Next_OnClick() CLASS FindReplace
+   LOCAL nFlags := 0
+   ::Parent:cFindWhat  := ::FindWhat:Caption
+
+   IF ::MatchCase:Checked()
+      nFlags := nFlags | SCFIND_MATCHCASE
+   ENDIF
+   IF ::WholeWord:Checked()
+      nFlags := nFlags | SCFIND_WHOLEWORD
+   ENDIF
+   ::Parent:Source:SetSearchFlags( nFlags )
+   ::Parent:FindNext( ::FindWhat:Caption, .F. )
+RETURN Self
+
+//----------------------------------------------------------------------------------------------------
+METHOD Replace_OnClick() CLASS FindReplace
+   
+RETURN Self
+
+//----------------------------------------------------------------------------------------------------
+METHOD All_OnClick() CLASS FindReplace
+   
+RETURN Self

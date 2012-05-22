@@ -160,7 +160,7 @@ METHOD OnEraseBkGnd( hDC ) CLASS LinkLabel
    nColor := IIF( !::xLinkVisited, ::xLinkColor, ::xVisitedColor )
    nColor := IIF( ::__lSelected, ::ActiveLinkColor, nColor )
    
-   IF !::IsWindowEnabled() .OR. !::Parent:IsWindowEnabled()
+   IF ( ! ::IsWindowEnabled() .OR. ! ::Parent:IsWindowEnabled() ) .AND. ! ::Parent:ClsName IN {"StatusBarPanel"}
       nColor := ::System:Colors:GrayText
    ENDIF
    

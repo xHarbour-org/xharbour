@@ -7,6 +7,11 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2012-05-21 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Fixed LinkLabel forground color inside a StatusBarPanel.
+   + Fixed StatusBarPanel overlapped by child control.
+   + Changed Replace dialog and added "Global Search" option (work in progress)
+
 2012-05-02 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Added GridColumn property "HeaderToolTip"
 
