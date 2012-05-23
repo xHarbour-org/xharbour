@@ -2296,6 +2296,7 @@ METHOD Init( oParent, aParameters ) CLASS FindReplace
       :Width                := 150
       :Height               := 15
       :Caption              := "Match Whole &Word"
+      :OnWMKeyUp            := {|o,nKey| IIF( nKey==27, o:Parent:Close(),)}
       :Create()
    END //CHECKBOX
 
@@ -2306,6 +2307,7 @@ METHOD Init( oParent, aParameters ) CLASS FindReplace
       :Width                := 100
       :Height               := 15
       :Caption              := "Match &Case"
+      :OnWMKeyUp            := {|o,nKey| IIF( nKey==27, o:Parent:Close(),)}
       :Create()
    END //CHECKBOX
 
@@ -2315,7 +2317,8 @@ METHOD Init( oParent, aParameters ) CLASS FindReplace
       :Top                  := 100
       :Width                := 100
       :Height               := 15
-      :Caption              := "Global &Search"
+      :Caption              := "&Global Search"
+      :OnWMKeyUp            := {|o,nKey| IIF( nKey==27, o:Parent:Close(),)}
       :Create()
    END //CHECKBOX
 
@@ -2329,6 +2332,7 @@ METHOD Init( oParent, aParameters ) CLASS FindReplace
       :Caption              := "Find &Next"
       :DefaultButton        := .T.
       :EventHandler[ "OnClick" ] := "Next_OnClick"
+      :OnWMKeyUp            := {|o,nKey| IIF( nKey==27, o:Parent:Close(),)}
       :Create()
    END //BUTTON
 
@@ -2341,6 +2345,7 @@ METHOD Init( oParent, aParameters ) CLASS FindReplace
       :Height               := 24
       :Caption              := "&Replace"
       :EventHandler[ "OnClick" ] := "Replace_OnClick"
+      :OnWMKeyUp            := {|o,nKey| IIF( nKey==27, o:Parent:Close(),)}
       :Create()
    END //BUTTON
 
@@ -2353,6 +2358,7 @@ METHOD Init( oParent, aParameters ) CLASS FindReplace
       :Enabled              := .F.
       :Caption              := "Replace &All"
       :EventHandler[ "OnClick" ] := "All_OnClick"
+      :OnWMKeyUp            := {|o,nKey| IIF( nKey==27, o:Parent:Close(),)}
       :Create()
    END //BUTTON
 
@@ -2364,6 +2370,7 @@ METHOD Init( oParent, aParameters ) CLASS FindReplace
       :Height               := 24
       :Caption              := "Cancel"
       :EventHandler[ "OnClick" ] := "Close"
+      :OnWMKeyUp            := {|o,nKey| IIF( nKey==27, o:Parent:Close(),)}
       :Create()
    END //BUTTON
 
@@ -2407,10 +2414,39 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------
 METHOD Replace_OnClick() CLASS FindReplace
-   
+   LOCAL nFlags := 0
+   IF ::MatchCase:Checked()
+      nFlags := nFlags | SCFIND_MATCHCASE
+   ENDIF
+   IF ::WholeWord:Checked()
+      nFlags := nFlags | SCFIND_WHOLEWORD
+   ENDIF
+   IF ::Parent:Source:GetSelLen()-1 == 0
+      IF ! EMPTY( ::FindWhat:Caption )
+         ::Parent:Source:SearchNext( nFlags, ::FindWhat:Caption )
+      ENDIF
+    ELSEIF ::Parent:Source:GetSelLen()-1 > 0
+      ::Parent:Source:ReplaceSel( ::ReplaceWith:Caption )
+   ENDIF
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------
 METHOD All_OnClick() CLASS FindReplace
-   
+   LOCAL oSource, n, nFlags := 0
+   IF ::MatchCase:Checked()
+      nFlags := nFlags | SCFIND_MATCHCASE
+   ENDIF
+   IF ::WholeWord:Checked()
+      nFlags := nFlags | SCFIND_WHOLEWORD
+   ENDIF
+   IF ::Global:Checked()
+      oSource := ::Parent:Source
+      FOR n := 1 TO LEN( ::Parent:aDocs )
+          ::Parent:aDocs[n]:Select()
+          ::Parent:aDocs[n]:ReplaceAll( ::FindWhat:Caption, ::ReplaceWith:Caption, nFlags, ::Parent:InSelection )
+      NEXT
+      oSource:Select()
+    ELSE
+      ::Parent:Source:ReplaceAll( ::FindWhat:Caption, ::ReplaceWith:Caption, nFlags, ::Parent:InSelection )
+   ENDIF
 RETURN Self
