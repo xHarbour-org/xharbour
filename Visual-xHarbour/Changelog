@@ -7,6 +7,7 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
 2012-05-22 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Fixed UpDown control inversed behavior.
    + Added UpDown control properties 
@@ -15,7 +16,20 @@
      Alignment: (Left, Right) Position where the updown is placed within the "Buddy"
      DisplayThousands: Will display system thousand separator.
      ArrowKeys: Allows user to use the keyboard arrows up and down.
-
+   + Added DataTable method OrdNumber()
+   ! Fixed DataTable method CreateTable() to check if the the file doesn't exist and aStruc is a valid array
+   ! Fixed DataTable method CreateOrder() to check if the index tag doesn't already exist
+   + Added TabPage the ability to set the text as a codeblock that will be evaluated when setting the text.
+   ! Fixed TabStrip to not to create a background brush if the color is invalid.
+   + Added UserVariables to Application. Now users can add ivars to it.
+   ! Fixed Application:Exit() not closing the MainForm if it was Modal.
+   + Added EditBox the ability to set the text as a codeblock that will be evaluated when setting the text.
+   ! Fixed Method SetWindowText() to convert Captions starting with "{|" in the string into a codeblock
+     i.e EditBox1:Caption := "{|| MyTranslator('This Text')}"
+   ! Fixed ContextStrip RTE when called from Modal windows.
+   + Added DataGrid the ability to show the record being dragged and showing a hole where
+     the record will be dropped.
+   
 2012-05-21 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Fixed LinkLabel forground color inside a StatusBarPanel.
    + Fixed StatusBarPanel overlapped by child control.
