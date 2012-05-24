@@ -702,7 +702,13 @@ RETURN FError() == 0
 
 
 METHOD getFileName() CLASS TipMail
-RETURN StrTran( ::getFieldOption( "Content-Type", "name" ), '"', '' )
+LOCAl cName := ''
+    IF "attachment" $ Lower( ::getFieldPart( "Content-Disposition" ) )
+       cName := ::getFieldOption( "Content-Disposition","filename" )
+    ELSE
+       cName := ::getFieldOption( "Content-Type", "name" )
+    ENDIF
+RETURN STRTRAN( cName, '"','' )
 
 
 METHOD isMultiPart CLASS TipMail

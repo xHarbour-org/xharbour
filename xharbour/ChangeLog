@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-05-24 08:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/tip/mail.prg
+    ! fixed getFileName() method to include "Content-Disposition" as 
+      suggested by Fabio Nery from xharbour news.
+
 2012-04-21 16:43 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
   * source/tip/encoding/uuencode.c
   * source/tip/encoding/base64.c
