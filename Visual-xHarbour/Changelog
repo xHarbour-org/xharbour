@@ -8,6 +8,9 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-05-23 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed Editor first line visibility after saving.
+
 2012-05-22 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Fixed UpDown control inversed behavior.
    + Added UpDown control properties 
@@ -29,7 +32,7 @@
    ! Fixed ContextStrip RTE when called from Modal windows.
    + Added DataGrid the ability to show the record being dragged and showing a hole where
      the record will be dropped.
-   
+
 2012-05-21 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Fixed LinkLabel forground color inside a StatusBarPanel.
    + Fixed StatusBarPanel overlapped by child control.
