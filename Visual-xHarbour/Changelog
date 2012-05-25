@@ -8,6 +8,10 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-05-24 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Application:Quit() to shutdown the exe inmediately. Unlike method Exit(), Quit() 
+     destroys all resources and closes the exe without returning to the previous Form.
+
 2012-05-23 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed Editor first line visibility after saving.
 

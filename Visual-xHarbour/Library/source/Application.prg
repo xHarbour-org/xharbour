@@ -410,6 +410,7 @@ CLASS Application
    METHOD SaveResource()
    METHOD __SetAsProperty()
    METHOD __InvalidMember()
+   METHOD Quit()
    error HANDLER OnError()
 ENDCLASS
 
@@ -545,7 +546,26 @@ METHOD SaveResource( ncRes, cFileName ) CLASS Application
 RETURN lRet
 
 //------------------------------------------------------------------------------------------------
+METHOD Quit() CLASS Application
+   FreeLibrary( ::hRich20 )
+   IF ::DllInstance == NIL
+      s_lExit := .T.
+      PostQuitMessage(0)
+      #ifdef VXH_PROFESSIONAL
+         FreeExplorerBarInfo()
+      #endif
+      AEVAL( ::ImageLists, {|o|o:Destroy()} )
+      IF ::__hMenuHook != NIL
+         UnhookWindowsHookEx( ::__hMenuHook )
+      ENDIF
+      IF ::__SocketInit
+         InetCleanUp()
+      ENDIF
+      QUIT
+   ENDIF
+RETURN NIL
 
+//------------------------------------------------------------------------------------------------
 METHOD Exit() CLASS Application
    IF VALTYPE( ::MainForm ) == "O" .AND. IsWindow( ::MainForm:hWnd )
       IF ::MainForm:Modal
