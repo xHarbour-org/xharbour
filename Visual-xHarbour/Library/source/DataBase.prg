@@ -79,6 +79,7 @@ CLASS DataTable INHERIT Component
    DATA StaticEdge         EXPORTED
    DATA Transparent        EXPORTED
    DATA Visible            EXPORTED
+
    DATA Events             EXPORTED  INIT { ;
                                           {"Object",  {;
                                                       { "OnInit"       , "", "" },;
@@ -105,6 +106,8 @@ CLASS DataTable INHERIT Component
    ACCESS Driver           INLINE ::xDriver PERSISTENT
    ASSIGN Driver(c)        INLINE ::xDriver := IIF( !EMPTY( c ), c, NIL )
    ACCESS Exists           INLINE ::IsOpen
+
+   DATA __aTmpStruct       PROTECTED
 
    METHOD Init() CONSTRUCTOR
 
@@ -169,6 +172,7 @@ CLASS DataTable INHERIT Component
    METHOD OrdKeyRelPos(n)                     INLINE ::Connector:OrdKeyRelPos( n )
    METHOD OrdKeyNo()                          INLINE ::Connector:OrdKeyNo()
    METHOD OrdKeyVal()                         INLINE ::Connector:OrdKeyVal()
+   METHOD OrdBagExt()                         INLINE ::Connector:OrdBagExt()
 
    METHOD OrdKeyNoRaw()                       INLINE ::Connector:OrdKeyNoRaw()
 
@@ -217,21 +221,64 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Create( lIgnoreAO ) CLASS DataTable
-   IF VALTYPE( ::Socket ) == "C" .AND. ASCAN( ::Form:Property:Keys, {|c| UPPER(c) == UPPER(::Socket) } ) > 0
+   LOCAL lChanged, n, cFileName, cPath, nServer
+   IF ValType( ::Socket ) == "C" .AND. Ascan( ::Form:Property:Keys, {|c| Upper(c) == Upper(::Socket) } ) > 0
       ::Socket := ::Form:Property[ ::Socket ]
       IF ::__ClassInst == NIL
          ::Connector := SocketRdd( Self )
       ENDIF
    ENDIF
    ::Connector:Create( lIgnoreAO )
+   IF ! Empty( ::__aTmpStruct )
+      lChanged := LEN(::__aTmpStruct) <> LEN(::Structure) 
+      IF ! lChanged
+         FOR n := 1 TO LEN( ::__aTmpStruct )
+             IF ::__aTmpStruct[n][1] != ::Structure[n][1] .OR.;
+                ::__aTmpStruct[n][2] != ::Structure[n][2] .OR.;
+                ::__aTmpStruct[n][3] != ::Structure[n][3] .OR.;
+                ::__aTmpStruct[n][4] != ::Structure[n][4]
+                lChanged := .T.
+             ENDIF
+         NEXT
+      ENDIF
+      IF lChanged
+         cFileName  := ::FileName
+         n := RAT( "\", cFileName )
+         cPath     := SUBSTR( cFileName, 1, n-1 )
+         cFileName := SUBSTR( cFileName, n+1 )
+
+         dbCreate( cPath + "\__" + cFileName, ::__aTmpStruct, ::Driver )
+
+         IF FILE( cPath + "\__" + cFileName )
+            IF ::__xCtrlName == "AdsDataTable"
+               nServer := ::Owner:AdsSetServerType( 1 )
+            ENDIF
+            ::Close()
+            dbUseArea( ! ::__lMemory, ::Driver, cPath + "\__" + cFileName, "modstru", .F., .F. )
+            SELECT "modstru"
+            APPEND FROM (cPath + "\" + cFileName) VIA (::Driver)
+            modstru->( dbCloseArea() )
+            FERASE( cPath + "\" + cFileName )
+            FRENAME( cPath + "\__" + cFileName, cPath + "\" + cFileName )
+            IF nServer != NIL
+               ::Owner:AdsSetServerType( nServer )
+            ENDIF
+            ::Connector:Create( lIgnoreAO )
+         ENDIF
+      ENDIF
+   ENDIF
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD CreateTable( aStruc, cFile ) CLASS DataTable
    DEFAULT cFile  TO ::FileName
    DEFAULT aStruc TO ::Structure
-   IF !File( cFile ) .AND. !Empty( aStruc )
+   IF ! File( cFile ) .AND. ! Empty( aStruc )
       ::Connector:CreateTable( cFile, aStruc, ::Driver )
+
+    ELSEIF File( cFile ) .AND. ! Empty( aStruc )
+      ::__aTmpStruct := aClone( aStruc )
+
    ENDIF
 RETURN Self
 
@@ -242,13 +289,13 @@ METHOD CreateFields() CLASS DataTable
    hClass := __ClsNew( "DATA_" + ::Alias, 0, 0, { Data():ClassH } )
 
    FOR EACH aField IN ::Structure
-      cField := aField[1]
-      __clsAddMsg( hClass,       cField, &( "{|Self| ::FieldGet( " + Str( HB_EnumIndex() ) + " ) }" ), HB_OO_MSG_INLINE, NIL, 1 )
-      __clsAddMsg( hClass, "_" + cField, &( "{|Self, xVal| ::FieldPut( " + Str( HB_EnumIndex() ) + ", xVal ) }" ), HB_OO_MSG_INLINE, NIL, 1 )
+       cField := aField[1]
+       __clsAddMsg( hClass,       cField, &( "{|Self| ::FieldGet( " + Str( HB_EnumIndex() ) + " ) }" ), HB_OO_MSG_INLINE, NIL, 1 )
+       __clsAddMsg( hClass, "_" + cField, &( "{|Self, xVal| ::FieldPut( " + Str( HB_EnumIndex() ) + ", xVal ) }" ), HB_OO_MSG_INLINE, NIL, 1 )
    NEXT
 
    ::CheckAlias()
-   
+
    ::Fields := __clsInst( hClass ):Init( Self )
 RETURN Self
 
@@ -280,8 +327,8 @@ METHOD CheckAlias() CLASS DataTable
          IF !::__lMemory
             ::xFileName  := (::Area)->( dbInfo( DBI_FULLPATH ) )
             n := RAT( "\", ::xFileName )
+            ::Path      := SUBSTR( ::xFileName, 1, n-1 )
             ::xFileName := SUBSTR( ::xFileName, n+1 )
-            ::Path     := SUBSTR( ::xFileName, 1, n-1 )
          ENDIF
          
          ::Structure  := ::Struct()
@@ -289,10 +336,9 @@ METHOD CheckAlias() CLASS DataTable
          hClass := __ClsNew( "DATA_" + ::Alias, 0, 0, { Data():ClassH } )
 
          FOR EACH aField IN ::Structure
-            cField := aField[1]
-
-            __clsAddMsg( hClass,       cField, &( "{|Self| ::FieldGet( " + Str( HB_EnumIndex() ) + " ) }" ), HB_OO_MSG_INLINE, NIL, 1 )
-            __clsAddMsg( hClass, "_" + cField, &( "{|Self, xVal| ::FieldPut( " + Str( HB_EnumIndex() ) + ", xVal ) }" ), HB_OO_MSG_INLINE, NIL, 1 )
+             cField := aField[1]
+             __clsAddMsg( hClass,       cField, &( "{|Self| ::FieldGet( " + Str( HB_EnumIndex() ) + " ) }" ), HB_OO_MSG_INLINE, NIL, 1 )
+             __clsAddMsg( hClass, "_" + cField, &( "{|Self, xVal| ::FieldPut( " + Str( HB_EnumIndex() ) + ", xVal ) }" ), HB_OO_MSG_INLINE, NIL, 1 )
          NEXT
 
          ::Fields := __clsInst( hClass ):Init( ::Fields:Parent )
@@ -436,6 +482,8 @@ CLASS DataRdd
    METHOD FieldPut( nField, xVal )            INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( FieldPut( nField, xVal ) ),)
    METHOD FieldGet( nField )                  INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( FieldGet( nField ) ),)
    METHOD FieldType( nField )                 INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( FieldType( nField ) ),)
+   METHOD OrdBagExt()                         INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdBagExt() ),)
+
    METHOD CreateTable( cFile, aStru, cDriver) INLINE dbCreate( cFile, aStru, cDriver )
    METHOD Gather()
    METHOD Scatter( aData )
@@ -752,6 +800,7 @@ CLASS SocketRdd
    METHOD OrdKeyNo()                          INLINE ::Request( "OrdKeyNo" ) 
    METHOD OrdKeyRaw()                         INLINE ::Request( "OrdKeyNoRaw" ) 
    METHOD OrdKeyVal()                         INLINE ::Request( "OrdKeyVal" ) 
+   METHOD OrdBagExt()                         INLINE ::Request( "OrdBagExt" ) 
 ENDCLASS
 
 METHOD Init( oOwner ) CLASS SocketRdd
