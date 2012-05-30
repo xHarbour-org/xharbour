@@ -2246,9 +2246,9 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               nId := nwParam
            ENDIF
            IF nId == IDOK
-              IF ( n := ASCAN( ::Children, {|o| o:__xCtrlName == "Button" .AND. o:DefaultButton } ) ) > 0
-                 nId := ::Children[n]:Id
-                 nlParam := ::Children[n]:hWnd
+              IF ( n := HSCAN( ::Form:Property, {|,o| o:__xCtrlName == "Button" .AND. o:DefaultButton } ) ) > 0
+                 nId := HGetValueAt( ::Form:Property, n ):Id
+                 nlParam := HGetValueAt( ::Form:Property, n ):hWnd
               ENDIF
            ENDIF
 
