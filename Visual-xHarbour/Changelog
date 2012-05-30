@@ -8,6 +8,12 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-05-29 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added DateTimePicker:AutoChange (L) to allow moving to the next field without having to press\
+     the right-arrow key or the tab key. One char only fields MUST be started with a zero or the field
+     won't assume the field has changed. ie. if the date to be entered is [ 7/ 7/2012] then [07/07/2012]
+     must be typed in in order to see the change.
+
 2012-05-28 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed DataTable:CreateDataTable() to modify the structure if the passed in structure array
      doesn't match the current structure.

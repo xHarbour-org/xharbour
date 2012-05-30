@@ -18,6 +18,7 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS DateTimePicker INHERIT Control
+   DATA AutoChange            PUBLISHED INIT .F.
 
    DATA OnDTNCloseUp          EXPORTED
    DATA OnDTNDateTimeChange   EXPORTED
@@ -54,6 +55,7 @@ CLASS DateTimePicker INHERIT Control
    PROPERTY CustomFormat                     READ xCustomFormat WRITE SetCustomFormat       PROTECTED
    PROPERTY Border       INDEX WS_BORDER      READ xBorder     WRITE SetStyle  DEFAULT .F.  PROTECTED
 
+   DATA __nLast   PROTECTED INIT 0
    METHOD Init() CONSTRUCTOR
    METHOD Create()
 
@@ -77,6 +79,8 @@ CLASS DateTimePicker INHERIT Control
    METHOD SetTitleBackColor( nColor )      INLINE ::SetCalendarColor( MCSC_TITLEBK,   nColor )
    METHOD SetMonthBackColor( nColor )      INLINE ::SetCalendarColor( MCSC_MONTHBK,   nColor )
    METHOD SetTrailingTextColor( nColor )   INLINE ::SetCalendarColor( MCSC_TRAILINGTEXT, nColor )
+
+   METHOD OnChar()
 
    METHOD OnParentNotify()
    METHOD OnCloseUp()         VIRTUAL
@@ -246,6 +250,9 @@ METHOD SetFormat( nFormat ) CLASS DateTimePicker
    ENDIF
 RETURN Self
 
+METHOD OnChar( nKey ) CLASS DateTimePicker
+   ::__nLast := nKey
+RETURN Self
 
 METHOD OnParentNotify( nwParam, nlParam ) CLASS DateTimePicker
    LOCAL nRet, nmd
@@ -264,38 +271,11 @@ METHOD OnParentNotify( nwParam, nlParam ) CLASS DateTimePicker
 
            ::xDate := STOD( STRZERO(nmd:st:wYear,4) + STRZERO(nmd:st:wMonth,2) + STRZERO(nmd:st:wDay,2) )
            ::xTime := STRZERO(nmd:st:wHour,2) +":"+ STRZERO(nmd:st:wMinute,2) +":"+ STRZERO(nmd:st:wSecond,2)
-/*
-           IF ::MinDate != NIL .AND. VAL(DTOS(dDate)) <= VAL(DTOS(::MinDate))
 
-              st := (struct SYSTEMTIME)
-              st:wYear  := YEAR( ::MinDate )
-              st:wMonth := MONTH( ::MinDate )
-              st:wDay   := DAY( ::MinDate )
-
-              st:wDayOfWeek    := nmd:st:wDayOfWeek
-              st:wHour         := nmd:st:wHour
-              st:wMinute       := nmd:st:wMinute
-              st:wSecond       := nmd:st:wSecond
-              st:wMilliseconds := nmd:st:wMilliseconds
-              Application:Yield()
-              RETURN ::SetSystemTime( st )
-
-            ELSEIF ::MaxDate != NIL .AND. dDate > ::MaxDate
-
-              st := (struct SYSTEMTIME)
-              st:wYear  := YEAR( ::MaxDate )
-              st:wMonth := MONTH( ::MaxDate )
-              st:wDay   := DAY( ::MaxDate )
-
-              st:wDayOfWeek    := nmd:st:wDayOfWeek
-              st:wHour         := nmd:st:wHour
-              st:wMinute       := nmd:st:wMinute
-              st:wSecond       := nmd:st:wSecond
-              st:wMilliseconds := nmd:st:wMilliseconds
-              ::SetSystemTime( st )
-              ::SetSystemTime( st )
+           IF ::AutoChange .AND. CHR(::__nLast) $ "0123456789"
+              ::PostMessage( WM_KEYDOWN, VK_RIGHT, 0 )
+              ::__nLast := 0
            ENDIF
-*/
 
       CASE ::Parent:hdr:code == DTN_DROPDOWN
            nRet := ::OnDropDown( ::Parent:hdr, nlParam )
