@@ -169,7 +169,8 @@ CLASS DataTable INHERIT Component
    METHOD Used()                              INLINE ::Connector:Used()
 
    METHOD FieldPut( nField, xVal )            INLINE IIF( ::__lNew, ::__aData[nField] := xVal, ::Connector:FieldPut( nField, xVal ) )
-   METHOD FieldGet( nField )                  INLINE ::Connector:FieldGet( nField )
+   METHOD FieldGet( nField )                  INLINE IIF( ! Empty(::__aData), ::__aData[nField], ::Connector:FieldGet( nField ) )
+  
    METHOD FieldType( nField )                 INLINE ::Connector:FieldType( nField )
 
    METHOD OrdKeyRelPos(n)                     INLINE ::Connector:OrdKeyRelPos( n )
@@ -301,7 +302,7 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
 
          IF FILE( cPath + "\__" + cFileName )
             IF ::__xCtrlName == "AdsDataTable"
-               nServer := ::Owner:AdsSetServerType( 1 )
+               nServer := ::AdsSetServerType( 1 )
             ENDIF
             ::Close()
             dbUseArea( ! ::__lMemory, ::Driver, cPath + "\__" + cFileName, "modstru", .F., .F. )
@@ -311,7 +312,7 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
             FERASE( cPath + "\" + cFileName )
             FRENAME( cPath + "\__" + cFileName, cPath + "\" + cFileName )
             IF nServer != NIL
-               ::Owner:AdsSetServerType( nServer )
+               ::AdsSetServerType( nServer )
             ENDIF
             ::Connector:Create( lIgnoreAO )
          ENDIF
