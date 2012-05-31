@@ -108,6 +108,8 @@ CLASS DataTable INHERIT Component
    ACCESS Exists           INLINE ::IsOpen
 
    DATA __aTmpStruct       PROTECTED
+   DATA __lNew             PROTECTED INIT .F.
+   DATA __aData            PROTECTED INIT {}
 
    METHOD Init() CONSTRUCTOR
 
@@ -126,6 +128,7 @@ CLASS DataTable INHERIT Component
    METHOD UnLock()                            INLINE ::Connector:UnLock()    
    METHOD dbEval(b)                           INLINE ::Connector:dbEval(b)
    METHOD UnLockAll()                         INLINE ::Connector:UnLockAll() 
+   METHOD FCount()                            INLINE ::Connector:FCount()       
    METHOD Bof()                               INLINE ::Connector:Bof()       
    METHOD Eof()                               INLINE ::Connector:Eof()       
    METHOD Deleted()                           INLINE ::Connector:Deleted()   
@@ -165,7 +168,7 @@ CLASS DataTable INHERIT Component
    METHOD OrdKeyCount()                       INLINE ::Connector:OrdKeyCount()
    METHOD Used()                              INLINE ::Connector:Used()
 
-   METHOD FieldPut( nField, xVal )            INLINE ::Connector:FieldPut( nField, xVal )
+   METHOD FieldPut( nField, xVal )            INLINE IIF( ::__lNew, ::__aData[nField] := xVal, ::Connector:FieldPut( nField, xVal ) )
    METHOD FieldGet( nField )                  INLINE ::Connector:FieldGet( nField )
    METHOD FieldType( nField )                 INLINE ::Connector:FieldType( nField )
 
@@ -194,7 +197,48 @@ CLASS DataTable INHERIT Component
    METHOD __SetMemoType( nMemo )              INLINE ::RddInfo( RDDI_MEMOTYPE, nMemo )
 
    METHOD CreateTable()
+
+   METHOD Blank()
+   METHOD Load()
+   METHOD Save()
 ENDCLASS
+
+//-------------------------------------------------------------------------------------------------------
+METHOD Blank() CLASS DataTable
+   LOCAL xValue, n
+   ::__lNew  := .T.
+   ::__aData := {}
+   FOR n := 1 TO LEN( ::Structure )
+       DO CASE
+          CASE ::Structure[n][2] == "C"
+               xValue := SPACE( ::Structure[n][3] )
+          CASE ::Structure[n][2] == "N"
+               xValue := 0
+          CASE ::Structure[n][2] == "L"
+               xValue := .F.
+          CASE ::Structure[n][2] == "D"
+               xValue := CTOD("")
+          CASE ::Structure[n][2] == "N"
+               xValue := ""
+       ENDCASE
+       AADD( ::__aData, xValue )
+   NEXT
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+METHOD Save() CLASS DataTable
+   ::__lNew := .F.
+
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+METHOD Load() CLASS DataTable
+   LOCAL n
+   ::__aData := {}
+   FOR n := 1 TO LEN( ::Structure )
+       AADD( ::__aData, ::FieldGet(n) )
+   NEXT
+RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Init( oOwner ) CLASS DataTable
@@ -444,6 +488,7 @@ CLASS DataRdd
    METHOD UnLockAll()                         INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbUnlockAll() ),)
    METHOD dbEval(b)                           INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbEval(b) ),)
    METHOD Bof()                               INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( Bof() ),)
+   METHOD FCount()                            INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( FCount() ),)
    METHOD Eof()                               INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( Eof() ),)
    METHOD Deleted()                           INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( Deleted() ),)
    METHOD RecCount()                          INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( Reccount() ),)
@@ -751,6 +796,7 @@ CLASS SocketRdd
    METHOD UnLock()                            INLINE ::Request( "dbUnlock" )
    METHOD UnLockAll()                         INLINE ::Request( "dbUnlockAll" )
    METHOD Bof()                               INLINE ::Request( "Bof" )
+   METHOD FCount()                            INLINE ::Request( "FCount" )
    METHOD Eof()                               INLINE ::Request( "Eof" )
    METHOD Deleted()                           INLINE ::Request( "Deleted" )
    METHOD RecCount()                          INLINE ::Request( "Reccount" )

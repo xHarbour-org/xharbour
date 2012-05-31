@@ -479,7 +479,7 @@ RETURN NIL
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
    LOCAL scn, nPos, n, cObj, cText, nLine, nChar, nPosStart, nPosEnd, oObj, aObj, aProperties, aProp, cList, aMethods, Topic, Event, aList//, cFind
-   LOCAL nWrap, cCtrl
+   LOCAL nWrap, cCtrl, nVisLine
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == SCN_UPDATEUI
@@ -541,12 +541,15 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
               IF cObj == ":" 
                  nWrap := ::Application:EditorProps:WrapSearch
                  ::Application:EditorProps:WrapSearch := 0
-                 nPos := ::Source:GetCurrentPos()
-                  
+                 nPos     := ::SendMessage( SCI_GETCURRENTPOS, 0, 0 )
+                 nVisLine := ::SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
+
                  cObj := ::GetWithObject()
 
                  ::Application:EditorProps:WrapSearch := nWrap
-                 ::Source:GotoPosition( nPos ) 
+
+                 ::SendMessage( SCI_GOTOPOS, nPos, 0 )
+                 ::SendMessage( SCI_SETFIRSTVISIBLELINE, nVisLine, 0 )
               ENDIF
               IF LEN( cObj ) >= 2
                  IF LEFT(cObj,2) == "::"
