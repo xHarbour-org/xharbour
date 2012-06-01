@@ -40,7 +40,8 @@ REM ===============================================
     COPY "C:\xHB\Dll\SQLRDD\fbclient.dll" "%RC_To%"
     COPY "C:\xHB\Dll\SQLRDD\libmysql.dll" "%RC_To%"
     COPY "C:\xHB\Dll\FreeImage.dll"       "%RC_To%"
-    COPY "C:\xHB\Dll\SciLexer.dll"        "%RC_To%"
+    COPY "C:\xHB\Bin\SciLexer.dll"        "%RC_To%"
+    COPY "C:\xHB\Bin\vxh.syn"             "%RC_To%"
 
 REM ===============================================
 REM                /Common/c_include
