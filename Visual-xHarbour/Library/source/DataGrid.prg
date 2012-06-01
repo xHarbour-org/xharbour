@@ -3755,12 +3755,14 @@ CLASS GridColumn INHERIT Object
    ACCESS Position    INLINE ::xPosition
    ASSIGN Position(n) INLINE ::SetPosition( n )
 
+   ACCESS Caption     INLINE ::Text
+   ASSIGN Caption(c)  INLINE ::Text := c
+
    DATA IsContainer EXPORTED INIT .F.
    DATA AllowSize                    PUBLISHED INIT .F.
    DATA AllowDrag                    PUBLISHED INIT .F.
    DATA Locked                       PUBLISHED INIT FALSE
    DATA Picture                      PUBLISHED
-   DATA Caption                      PUBLISHED
    DATA Visible                      PUBLISHED INIT .T.
    DATA Data                         PUBLISHED
    
@@ -3775,7 +3777,7 @@ CLASS GridColumn INHERIT Object
    PROPERTY ImageAlignment    READ xImageAlignment   WRITE Refresh DEFAULT 1
    PROPERTY Alignment         READ xAlignment        WRITE SetAlignment  DEFAULT 1
    PROPERTY Width             READ xWidth            WRITE SetWidth
-   PROPERTY Caption           READ xCaption          WRITE SetCaption
+   PROPERTY Text              READ xText             WRITE SetText
    PROPERTY BackColor INDEX 1 READ xBackColor        WRITE SetColor
    PROPERTY ForeColor INDEX 2 READ xForeColor        WRITE SetColor
    PROPERTY ImageIndex        READ xImageIndex       WRITE SetImageIndex
@@ -3863,7 +3865,7 @@ CLASS GridColumn INHERIT Object
    METHOD IsWindow()          INLINE .T.
    METHOD SetWidth( n )       INLINE ::Parent:__SetColWidth( ::xPosition, n )
 
-   METHOD SetCaption()        INLINE NIL
+   METHOD SetText()           INLINE NIL
    METHOD SetPosition( n )    INLINE ::Parent:__SetColPos( ::xPosition, n )
    METHOD GetRectangle()      INLINE { ::Left, ::Top, ::Left + ::Width, ::Top + ::Height }
    METHOD GetChildFromPoint() INLINE Self

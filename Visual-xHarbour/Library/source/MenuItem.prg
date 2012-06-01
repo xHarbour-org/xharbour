@@ -27,7 +27,10 @@ CLASS CMenuItem INHERIT Object
    DATA __IdeImageIndex          EXPORTED INIT 8
    DATA __TempRect               EXPORTED
 
-   DATA Caption                  PUBLISHED
+   DATA Text                     PUBLISHED
+   ACCESS Caption     INLINE ::Text
+   ASSIGN Caption(c)  INLINE ::Text := c
+
    DATA ImageIndex               PUBLISHED INIT -1
    DATA RadioCheck               PUBLISHED INIT .F.
    DATA ShortCutText             PUBLISHED

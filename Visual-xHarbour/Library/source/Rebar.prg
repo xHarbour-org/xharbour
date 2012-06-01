@@ -971,7 +971,10 @@ CLASS Bitmap
    DATA Width     EXPORTED
    DATA Height    EXPORTED
    DATA nLoad     PROTECTED
-   DATA Caption   EXPORTED
+   DATA Text      EXPORTED
+
+   ACCESS Caption     INLINE ::Text
+   ASSIGN Caption(c)  INLINE ::Text := c
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()

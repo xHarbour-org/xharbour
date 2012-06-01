@@ -36,7 +36,11 @@ CLASS MDIClient INHERIT Window
    DATA Tooltip         EXPORTED
    DATA __ClientStruct  EXPORTED
    DATA TabStop         EXPORTED INIT .F.
-   DATA Caption         EXPORTED
+   DATA Text            EXPORTED
+
+   ACCESS Caption     INLINE ::Text
+   ASSIGN Caption(c)  INLINE ::Text := c
+
    DATA Enabled         EXPORTED INIT .T.
    DATA Theming         EXPORTED INIT .T.
    DATA Cursor          EXPORTED

@@ -61,7 +61,11 @@ CLASS DataTable INHERIT Component
 
    DATA Table              PUBLISHED  INIT {}
    DATA Border             EXPORTED
-   DATA Caption            EXPORTED
+   DATA Text               EXPORTED
+
+   ACCESS Caption     INLINE ::Text
+   ASSIGN Caption(c)  INLINE ::Text := c
+
    DATA Font               EXPORTED
    DATA ToolTip            EXPORTED
    DATA Id                 EXPORTED

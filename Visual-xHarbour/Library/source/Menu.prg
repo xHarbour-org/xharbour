@@ -346,12 +346,15 @@ CLASS ContextMenu INHERIT Component
    DATA Menu            EXPORTED
    DATA SelPopup        PROTECTED INIT .F.
    DATA MenuWnd         PROTECTED
-   DATA Caption         EXPORTED INIT "ContextMenu"
+   DATA Text            EXPORTED INIT "ContextMenu"
    DATA Result          EXPORTED
    DATA xImageList      EXPORTED
    ACCESS ImageList     INLINE __ChkComponent( Self, ::xImageList ) PERSISTENT
    ASSIGN ImageList(o)  INLINE ::xImageList := o
    
+   ACCESS Caption     INLINE ::Text
+   ASSIGN Caption(c)  INLINE ::Text := c
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD Show()

@@ -449,12 +449,15 @@ ENDCLASS
 
 CLASS ListViewColumn INHERIT Object
    DATA Parent     EXPORTED
-   DATA Caption    EXPORTED
+   DATA Text       EXPORTED
    DATA Width      EXPORTED
    DATA Align      EXPORTED
    DATA ImageIndex EXPORTED INIT 0
    DATA Name       EXPORTED
    DATA Index      EXPORTED
+
+   ACCESS Caption     INLINE ::Text
+   ASSIGN Caption(c)  INLINE ::Text := c
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD Destroy()
