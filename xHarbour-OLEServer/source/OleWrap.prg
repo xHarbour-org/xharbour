@@ -181,19 +181,19 @@ METHOD ConnectEvents( xHandler, Interfaces ) CLASS OleWrapper
 
    #if 0
       FOR EACH Interface IN ::TypeLib:Interfaces
-         TraceLog( "Interface:", Interface:Name, Interface:GUID, Interface:Flags, Interface:HelpString )
+//       TraceLog( "Interface:", Interface:Name, Interface:GUID, Interface:Flags, Interface:HelpString )
       NEXT
    #endif
 
    IF Empty( xHandler )
-      TraceLog( "No EventHandler found!", __OBJGETCLSNAME( Self ), ::GUID )
+//    TraceLog( "No EventHandler found!", __OBJGETCLSNAME( Self ), ::GUID )
       RETURN Self
    ENDIF
 
    nIndex := aScan( ::TypeLib:Objects, {|oObject| /*TraceLog( oObject:Name, oObject:GUID, ::GUID ),*/ oObject:GUID == ::GUID .OR. oObject:Interfaces[1]:GUID == ::GUID } )
 
    IF nIndex == 0
-      TraceLog( "Not connectable!", __OBJGETCLSNAME( Self ), ::GUID )
+//    TraceLog( "Not connectable!", __OBJGETCLSNAME( Self ), ::GUID )
       RETURN Self
    ENDIF
 
