@@ -244,7 +244,7 @@ CLASS DataGrid INHERIT Control
    METHOD OnKillFocus()
    METHOD OnSetFocus()
    METHOD OnGetDlgCode() INLINE DLGC_WANTMESSAGE
-//   METHOD OnGetDlgCode( msg ) INLINE IIF( msg != NIL .AND. msg:message == WM_KEYDOWN .AND. msg:wParam IN {VK_ESCAPE}, NIL, DLGC_WANTMESSAGE )
+   METHOD OnGetDlgCode( msg ) INLINE IIF( ! ::Children[ ::ColPos ]:AutoEdit .AND. msg != NIL .AND. msg:message == WM_KEYDOWN .AND. msg:wParam==VK_RETURN, NIL, DLGC_WANTMESSAGE )
    METHOD OnLButtonDblClk()
    METHOD OnItemChanged()
    METHOD OnEraseBkGnd()
@@ -1011,8 +1011,14 @@ RETURN 0
 //----------------------------------------------------------------------------------
 
 METHOD OnChar( nKey ) CLASS DataGrid
+   IF EMPTY( ::__DisplayArray )
+      RETURN NIL
+   ENDIF
    IF nKey != 27 .AND. nKey != 9
       ::__Edit(1, 0, 0, GRID_CHAR, nKey )
+      IF ::__CurControl != NIL
+         RETURN 0
+      ENDIF
    ENDIF
    IF nKey == 13 .AND. ::__CurControl == NIL .AND. ::Action != NIL
       __Evaluate( ::Action, Self )

@@ -1096,6 +1096,7 @@ RETURN .T.
 
 METHOD EditCaption() CLASS ObjManager
    LOCAL oItem := ::SearchString( "Caption" )
+   DEFAULT oItem TO ::SearchString( "Text" )
    IF oItem != NIL
       oItem:Select()
       ::PostMessage( WM_USER+4768 )
@@ -1896,7 +1897,7 @@ RETURN NIL
 METHOD GetEditBuffer( oItem, nCol ) CLASS ObjManager
    LOCAL cProp, cText := oItem:ColItems[nCol-1]:Value
    cProp := oItem:ColItems[1]:Prop
-   IF cProp == "Caption" .AND. cText == NIL .AND. ::ActiveObject:ClsName == "ToolButton"
+   IF cProp IN {"Caption","Text"} .AND. cText == NIL .AND. ::ActiveObject:ClsName == "ToolButton"
       cText := ""
    ENDIF
 RETURN cText
@@ -3822,7 +3823,7 @@ __aProps["T"] := { { "TabStop",                 "Style" },;
                    { "Transparent",             "Style" },;
                    { "ToolWindow",              "Style" },;
                    { "TopMost",                 "Style" },;
-                   { "Text",                    "" },;
+                   { "Text",                    "Appearance" },;
                    { "Title",                   "" },;
                    { "TopMargin",               "" },;
                    { "TextBody",                "" },;

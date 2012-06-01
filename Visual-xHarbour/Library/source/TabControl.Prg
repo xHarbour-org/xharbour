@@ -1171,6 +1171,10 @@ CLASS TabPage INHERIT Dialog
    ACCESS Caption          INLINE ::xCaption PERSISTENT
    ASSIGN Caption( c )     INLINE ::SetCaption(c)
 
+   DATA xText              PROTECTED
+   ACCESS Text             INLINE ::xText PERSISTENT
+   ASSIGN Text( c )        INLINE ::SetCaption(c)
+
    ACCESS ControlParent    INLINE ::ExStyle & WS_EX_CONTROLPARENT != 0
    ACCESS MdiContainer     INLINE ::xMdiContainer
 

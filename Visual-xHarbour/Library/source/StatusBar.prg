@@ -33,9 +33,12 @@ CLASS StatusBar INHERIT Control
                                    ::InvalidateRect()
 
    DATA xCaption         EXPORTED  INIT ""
-   ACCESS Caption        INLINE    ::xCaption PERSISTENT
+   ACCESS Caption        INLINE    ::xCaption
    ASSIGN Caption(cText) INLINE    ::xCaption := cText, IIF( ::IsWindow(), ( ::SendMessage( SB_SIMPLE, LEN( ::Children ) == 0, 0 ), ::SendMessage( SB_SETTEXT, SB_SIMPLEID, cText ) ), )
 
+   DATA xText            EXPORTED  INIT ""
+   ACCESS Text           INLINE    ::xText PERSISTENT
+   ASSIGN Text(cText)    INLINE    ::xText := cText, IIF( ::IsWindow(), ( ::SendMessage( SB_SIMPLE, LEN( ::Children ) == 0, 0 ), ::SendMessage( SB_SETTEXT, SB_SIMPLEID, cText ) ), )
 
    EXPORTED:
       //DATA Height        INIT 0
@@ -262,7 +265,9 @@ CLASS StatusBarPanel INHERIT Control
 
    //ACCESS hWnd                INLINE IIF( ::Parent != NIL, ::Parent:hWnd, 0 ) // Will use statusbar HANDLE for children
   
-   PROPERTY Caption    READ xCaption    WRITE SetText
+   PROPERTY Caption    READ xCaption    WRITE SetText HIDDEN
+   PROPERTY Text       READ xText       WRITE SetText
+
    PROPERTY ImageIndex READ xImageIndex WRITE SetImageIndex
 
    DATA ToolTipText  PUBLISHED

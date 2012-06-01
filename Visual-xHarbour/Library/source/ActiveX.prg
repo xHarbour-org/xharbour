@@ -137,6 +137,10 @@ CLASS ActiveX INHERIT ToleAuto, UserControl
    ACCESS Caption              INLINE    ::xCaption
    ASSIGN Caption(c)           INLINE    ::xCaption := c
 
+   DATA xText                  EXPORTED  INIT ""
+   ACCESS Text                 INLINE    ::xText
+   ASSIGN Text(c)              INLINE    ::xText := c
+
    DATA oServer PROTECTED
 
    //ACCESS hWnd INLINE IIF( __objHasMsg( ::TOleAuto, "HWND" ), ::TOleAuto:hWnd, ::hWnd )

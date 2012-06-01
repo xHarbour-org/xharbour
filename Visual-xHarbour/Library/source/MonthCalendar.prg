@@ -42,8 +42,12 @@ CLASS MonthCalendar INHERIT Control
    PROPERTY Border            INDEX WS_BORDER         READ xBorder            WRITE SetStyle         DEFAULT .F. PROTECTED
 
    DATA xCaption               EXPORTED  INIT ""
-   ACCESS Caption              INLINE    ::xCaption PERSISTENT
+   ACCESS Caption              INLINE    ::xCaption
    ASSIGN Caption(c)           INLINE    ::xCaption := c, IIF( ::IsWindow(), ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER),)
+
+   DATA xText                  EXPORTED  INIT ""
+   ACCESS Text                 INLINE    ::xText
+   ASSIGN Text(c)              INLINE    ::xText := c, IIF( ::IsWindow(), ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER),)
 
    DATA NmDayState   EXPORTED
    DATA NmSelChange  EXPORTED

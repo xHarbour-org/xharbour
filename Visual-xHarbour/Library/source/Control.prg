@@ -33,8 +33,12 @@ CLASS Control INHERIT Window
    PROPERTY Enabled                  READ xEnabled      WRITE __Enable          DEFAULT .T.
 
    DATA xCaption               EXPORTED  INIT ""
-   ACCESS Caption              INLINE    IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xCaption, _GetWindowText( ::hWnd ) ) PERSISTENT
+   ACCESS Caption              INLINE    IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xCaption, _GetWindowText( ::hWnd ) )
    ASSIGN Caption(c)           INLINE    ::SetWindowText( c ), IIF( ::SmallCaption, ::RedrawWindow( , , RDW_FRAME | RDW_NOERASE | RDW_NOINTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN ), )
+
+   DATA xText                  EXPORTED  INIT ""
+   ACCESS Text                 INLINE    IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xText, _GetWindowText( ::hWnd ) ) PERSISTENT
+   ASSIGN Text(c)              INLINE    ::SetWindowText( c ), IIF( ::SmallCaption, ::RedrawWindow( , , RDW_FRAME | RDW_NOERASE | RDW_NOINTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN ), )
 
    DATA AllowMaximize     PUBLISHED INIT .F.
    

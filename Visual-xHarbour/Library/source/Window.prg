@@ -147,9 +147,12 @@ CLASS Window INHERIT Object
 
 
    DATA xCaption               EXPORTED  INIT ""
-   ACCESS Caption              INLINE    IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xCaption, _GetWindowText( ::hWnd ) ) PERSISTENT
+   ACCESS Caption              INLINE    IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xCaption, _GetWindowText( ::hWnd ) )
    ASSIGN Caption(c)           INLINE    ::SetWindowText( c )
 
+   DATA xText                  EXPORTED  INIT ""
+   ACCESS Text                 INLINE    IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xText, _GetWindowText( ::hWnd ) ) PERSISTENT
+   ASSIGN Text(c)              INLINE    ::SetWindowText( c )
 
    DATA Font                   PUBLISHED
    DATA ToolTip                PUBLISHED
