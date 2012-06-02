@@ -701,13 +701,21 @@ METHOD __SetBlocks() CLASS DataGrid
    ::HitTop    := ::DataSource:Bof()
    ::HitBottom := ::DataSource:eof()
    ::__VertScrolled := ::Record
-   ::__bGoTop    :={|| ::DataSource:Gotop(),;
-                       ::HitTop   := ::DataSource:Bof(),;
-                       ::HitBottom:= ::DataSource:eof() }
+   ::__bGoTop    := <|| 
+                      IF ::DataSource != NIL
+                         ::DataSource:Gotop()
+                         ::HitTop   := ::DataSource:Bof()
+                         ::HitBottom:= ::DataSource:eof()
+                      ENDIF
+                    >
 
-   ::__bGoBottom :={|| ::DataSource:GoBottom(),;
-                       ::HitTop    := ::DataSource:Bof(),;
-                       ::HitBottom := ::DataSource:eof() }
+   ::__bGoBottom := <|| 
+                      IF ::DataSource != NIL
+                         ::DataSource:GoBottom()
+                         ::HitTop    := ::DataSource:Bof()
+                         ::HitBottom := ::DataSource:eof()
+                      ENDIF
+                    >
 
    ::__bRecNo    := {|| ::DataSource:RecNo() }
 RETURN Self
@@ -1128,8 +1136,8 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
       ENDIF
       ::Children[ ::__DragColumn ]:DrawHeader( ::Drawing:hDC )
    ENDIF
-   
-   IF !::__lSizeMouseDown .AND. ::__DragColumn == 0 .AND. ::__SelCol > 0
+   view len(::Children)
+   IF !::__lSizeMouseDown .AND. ::__DragColumn == 0 .AND. ::__SelCol > 0 .AND. Len( ::Children ) >= ::__SelCol
       IF ::Children[ ::__SelCol ]:HeaderMenu != NIL
          pt := (struct POINT)
          pt:x := ::Children[::__SelCol]:aSelRect[1]
@@ -3755,8 +3763,11 @@ CLASS GridColumn INHERIT Object
    ACCESS Position    INLINE ::xPosition
    ASSIGN Position(n) INLINE ::SetPosition( n )
 
-   ACCESS Caption     INLINE ::Text
-   ASSIGN Caption(c)  INLINE ::Text := c
+   ACCESS xCaption    INLINE ::xText
+   ASSIGN xCaption(c) INLINE ::xText := c
+
+   ACCESS Caption     INLINE ::xText
+   ASSIGN Caption(c)  INLINE ::xText := c
 
    DATA IsContainer EXPORTED INIT .F.
    DATA AllowSize                    PUBLISHED INIT .F.
@@ -3777,10 +3788,10 @@ CLASS GridColumn INHERIT Object
    PROPERTY ImageAlignment    READ xImageAlignment   WRITE Refresh DEFAULT 1
    PROPERTY Alignment         READ xAlignment        WRITE SetAlignment  DEFAULT 1
    PROPERTY Width             READ xWidth            WRITE SetWidth
-   PROPERTY Text              READ xText             WRITE SetText
    PROPERTY BackColor INDEX 1 READ xBackColor        WRITE SetColor
    PROPERTY ForeColor INDEX 2 READ xForeColor        WRITE SetColor
    PROPERTY ImageIndex        READ xImageIndex       WRITE SetImageIndex
+   PROPERTY Text              READ xText             WRITE SetText
    PROPERTY SortArrow         READ xSortArrow        WRITE __SetSortArrow      DEFAULT 0
    PROPERTY HeaderImageIndex  READ xHeaderImageIndex WRITE SetHeaderImageIndex DEFAULT 0
    PROPERTY Representation    READ xRepresentation   WRITE SetRepresentation   DEFAULT 1
@@ -3945,7 +3956,7 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
 
    hOldFont := SelectObject( hDC, ::HeaderFont:Handle )
 
-   aAlign := _GetTextExtentPoint32( hDC, ::Caption )
+   aAlign := _GetTextExtentPoint32( hDC, ::xText )
    y := (::Parent:__GetHeaderHeight() - aAlign[2] ) / 2
 
 
@@ -4005,7 +4016,7 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
       SetTextColor( hDC, GetSysColor( COLOR_GRAYTEXT ) )
    ENDIF
    SetBkMode( hDC, TRANSPARENT )
-   _ExtTextOut( hDC, x, y, ETO_CLIPPED, aRect, ::Caption )
+   _ExtTextOut( hDC, x, y, ETO_CLIPPED, aRect, ::xText )
    SetTextColor( hDC, nColor )
 
    IF ::SortArrow > 0 .AND. aRect[3]-15 > nLeft .AND. aRect[3]-15 > x + aAlign[1]
@@ -4134,15 +4145,31 @@ RETURN Self
 //----------------------------------------------------------------------------------
 
 METHOD Create() CLASS GridColumn
+   LOCAL cText
    IF ::hWnd != NIL
       RETURN Self
    ENDIF
+
+   IF ::__ClassInst == NIL .AND. ! ::Application:__Vxh
+      cText := ::Text
+
+      IF VALTYPE(cText)=="C" .AND. LEFT(cText,2)=="{|"
+         cText := &cText
+      ENDIF
+      IF VALTYPE(cText)=="B"
+         cText := EVAL(cText)
+      ENDIF
+      ::xText := cText
+   ENDIF
+view ::xText
    IF VALTYPE( ::xImageIndex ) == "N"
       ::xImageIndex := MAX( 0, ::xImageIndex )
    ENDIF
 
    ExecuteEvent( "OnInit", Self )
+
    AADD( ::Parent:Children, Self )
+
    ::xPosition := LEN( ::Parent:Children )
    ::hWnd := Seconds()
    DEFAULT ::xWidth TO 10 * LEN( ::Caption )

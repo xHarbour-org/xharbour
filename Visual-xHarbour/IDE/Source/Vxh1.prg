@@ -4622,7 +4622,7 @@ METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors
                   xValue := oObj:Form
 
                 ELSE
-                  IF UPPER( cWithProperty ) == "CAPTION" .AND. LEFT( cWithValue, 1 ) == "(" .AND. RIGHT( ALLTRIM( cWithValue ), 1 ) == ")"
+                  IF UPPER( cWithProperty ) IN {"CAPTION","TEXT"} .AND. LEFT( cWithValue, 1 ) == "(" .AND. RIGHT( ALLTRIM( cWithValue ), 1 ) == ")"
                      xValue := cWithValue
                    ELSEIF UPPER( cWithProperty ) == "OWNER"
                      IF AT( ":PARENT:", UPPER( cWithValue ) ) > 0
@@ -5413,7 +5413,7 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
                          ENDIF
                       ENDIF
                     ELSE
-                      IF cProp == "Caption"
+                      IF cProp IN {"Caption","Text"}
                          IF xValue1 != NIL .AND. Left( xValue1, 1 ) == "\"
                             cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := " + ValToPrgExp( SubStr( xValue1, 2 ) ) + CRLF
                          ELSEIF xValue1 != NIL .AND. Left( xValue1, 1 ) == "("
