@@ -470,8 +470,14 @@ typedef struct  _sqlo_col_struct {
   char * col_name;              /**< The column name */
   ub4 col_name_size;       /**< The max allocated length of col_name */
   ub2  dbsize;                  /**< The size in the database */
+#if defined(HB_OS_HPUX) || defined( HB_OS_AIX)
+  ub2  prec;                    /**< The precision */
+  ub2  scale;                   /** The scale */
+
+#else
   ub1  prec;                    /**< The precision */
   ub1  scale;                   /** The scale */
+#endif  
   ub1  nullok;                  /**< Flag: Null allowed */
   sqlo_lob_desc_t loblp;        /**< The LOB descriptor - if column is MEMO */
   struct _sqlo_stmt_struct_t * stp;    /**< link to the stmt structure (see @ref sqlo_stmt_struct_t) */
@@ -7080,6 +7086,81 @@ DEFUN(sqlo_execute, (sth, iterations),
   return (dbp->status);
 }
 
+int
+DEFUN(sqlo_executeselect, (sth, iterations), 
+      sqlo_stmt_handle_t     sth          AND
+      unsigned int           iterations )
+{
+  register sqlo_stmt_struct_ptr_t  stp;
+  sqlo_db_struct_ptr_t dbp;
+  int Ret;
+
+  CHECK_STHANDLE(stp, sth, "sqlo_execute", SQLO_INVALID_STMT_HANDLE);
+  assert( stp->dbp != NULL);
+  dbp = stp->dbp;
+
+  TRACE(3, fprintf(_get_trace_fp(dbp),
+                   "sqlo_execute [%2d]: iter=%u, stmt=%.80s\n",
+                   sth, iterations, _get_stmt_string(stp)););
+
+  /* For REF CURSORS and NESTED TABLES, we determine the statement type and
+   * define the output here
+   */
+  if (DEFAULT != stp->cursor_type && 0 == stp->num_executions ) {
+    /* REF CURSOR or NESTED TABLE */
+    dbp->status = OCIAttrGet( (dvoid*) stp->stmthp,
+                              (ub4) OCI_HTYPE_STMT,
+                              (dvoid*) &(stp->stype),
+                              (ub4 *) 0,
+                              (ub4) OCI_ATTR_STMT_TYPE,
+                              (OCIError *) dbp->errhp
+                              );
+
+    CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_execute", "GetStmtType");
+    dbp->status = _define_output(stp);
+    CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_execute", "_define_output");
+
+  } else if ( _is_prepared(stp) ) {
+    
+//     dbp->status = OCIStmtExecute( dbp->svchp,
+//                                   stp->stmthp,
+//                                   dbp->errhp,
+//                                   (ub4) iterations,
+//                                   (ub4) 0,
+//                                   (OCISnapshot *) 0,
+//                                   (OCISnapshot *) 0,
+//                                   dbp->exec_flags
+//                                   );
+    dbp->status = _define_output(stp); 
+//     CHECK_OCI_STATUS_RETURN(dbp, Ret, "sqlo_execute", "_define_output");
+    if (OCI_SUCCESS != dbp->status && OCI_NO_DATA != dbp->status) {
+      if (OCI_STILL_EXECUTING == dbp->status) {
+        stp->still_executing = TRUE;
+        stp->opened          = TRUE;
+      } else {
+
+        _save_oci_status(dbp, "sqlo_execute",
+                         _get_stmt_string(stp), __LINE__);
+      }
+    } else {
+      stp->opened          = TRUE;
+      stp->still_executing = FALSE;
+
+      _bindpv_reset(stp);       /* reset the number of elements in the bindpv.
+                                 * The next sqlo_bind_by_name will not have to
+                                 * to allocate again memory
+                                 */
+    } /* end if OCI_SUCCESS != status  */
+  } else {
+    dbp->status = SQLO_STMT_NOT_PARSED;
+    CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_execute", "");
+  }
+
+  TRACE(3, fprintf(_get_trace_fp(dbp),
+                   "sqlo_execute returns %d\n", dbp->status););
+
+  return (dbp->status);
+}
 
 
 /*---------------------------------------------------------------------------

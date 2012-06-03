@@ -8,6 +8,40 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-05-27 12:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+  * source/sqlrdd2.prg
+    * aaded support to create index for datetime fields
+    * added support to seek datetime fields( total or partial)
+    
+  * source/sqlpgs.prg
+    * change ConnectRaw method to better detection for postgresql version
+  * source/pgs.c
+    ! fixed return of datetime fields  
+  * source/sqlora.h
+    ! Added prototype for int sqlo_executeselect __P((sqlo_stmt_handle_t sth, unsigned int iterations));
+  * source/sqlora.c
+    ! added function int sqlo_executeselect __P((sqlo_stmt_handle_t sth, unsigned int iterations))
+  * source/sqlconnection.prg
+    ! added lPostgresql8 member to class to use for an better detection of postgresql versions
+    ! added lBind  to inform if we are in bind mode ( oracle only work in progress)
+    ! added cSqlPrepare to hold the prepared sql( oracle only work in progress)
+    ! added aBindParameters to hold the variables to be binded ( oracle only work in progress)
+    ! added new parameter to IniFields to inform that we are with an ref cursor
+    ! added METHOD ExecSPRC(  cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMaxRecords, lNoRecno, cRecnoName, cDeletedName, lTranslate, nLogMode  )
+    ! added    METHOD ExecSP( cComm, aReturn, nParam )                                                                                                   
+  * source/utils.prg
+    ! updated SR_SubQuoted function to return correct value for datetime fields
+  * source/sqlorax.c
+    ! added iValue and sDate[7] members to ORA_BIND_COLS structure
+    ! added stmtParamRes to OCI_SESSION structure
+    ! changed SQLO_CONNECT function to initialize    stmtParamRes on OCI_SESSION structure
+    ! updated ORACLEINBINDPARAM and ORACLEGETBINDDATA to properly set and get date,datetime and bool variable
+    ! added ORACLE_PROCCURSOR function
+    ! added ORACLE_BINDCURSOR function
+    ! added ORACLE_EXECCURSOR function
+    ! added CLOSECURSOR function
+    ! fixed return of datetime fields  
+     
 2012-03-28  06:13 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
   * source\sqlgen1.prg
   * source\sqlrdd2.prg   

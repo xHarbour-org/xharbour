@@ -456,6 +456,7 @@ return SR_SubQuoted( valtype( uData ), uData, nSystemID )
 Static Function SR_SubQuoted( cType, uData, nSystemID )
 
    local cRet
+   lOCAL cOldSet := SET(_SET_DATEFORMAT)   
 
    Do Case
    Case cType $ "CM" .and. nSystemID == SYSTEMID_ORACLE
@@ -488,8 +489,28 @@ Static Function SR_SubQuoted( cType, uData, nSystemID )
       return if(uData,"true","false")
    Case cType == "L" .and. nSystemID == SYSTEMID_INFORM
       return if(uData,"'t'","'f'")      
-   Case cType == "L"
+   Case cType == "L"   
       return if(uData,"1","0")
+   case ctype == "T"  .and. nSystemID == SYSTEMID_POSTGR  
+      IF Empty( uData) 
+         RETURN 'NULL'
+      ENDIF 
+
+      return ['] + transform(ttos(uData), '@R 9999-99-99 99:99:99') + [']      
+   case ctype == "T" .and. nSystemID == SYSTEMID_ORACLE
+      IF Empty( uData) 
+         RETURN 'NULL'
+      ENDIF       
+      return [ TIMESTAMP '] + transform(ttos(uData), '@R 9999-99-99 99:99:99') + [']        
+   Case cType == 'T'
+      IF Empty( uData) 
+         RETURN 'NULL'
+      ENDIF 
+      Set( _SET_DATEFORMAT,  "yyyy-mm-dd") 
+      cRet := ttoc( uData )
+      Set( _SET_DATEFORMAT,cOldSet)
+      RETURN [']+cRet+[']
+      
    OtherWise
       cRet := SR_STRTOHEX(HB_Serialize( uData ))
       return SR_SubQuoted( "C", SQL_SERIALIZED_SIGNATURE + str(len(cRet),10) + cRet, nSystemID )
@@ -658,6 +679,8 @@ Function SR_Val2CharQ( uData )
       Return alltrim(Str(uData))
    Case cType == "D"
       Return dtoc(uData)
+   Case cType == "T"
+      Return ttoc(uData)      
    Case cType == "L"
       Return if(uData,".T.",".F.")
    Case cType == "A"
@@ -1378,6 +1401,10 @@ FUNCTION SQLBINDBYVAL( xMessage, aOptions, cColorNorm, nDelay )
 
          CASE "D"
             xMessage := DToC( xMessage )
+            EXIT
+            
+         CASE "T"
+            xMessage := TToC( xMessage )
             EXIT
 
          CASE "L"

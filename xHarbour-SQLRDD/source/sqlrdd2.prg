@@ -1422,11 +1422,9 @@ METHOD sqlOpenAllIndexes() CLASS SR_WORKAREA
             EndIf
             exit
          Case  SYSTEMID_POSTGR
-            if ( substr( ::oSql:cSystemVers, at( "8.", ::oSql:cSystemVers )+2, 1 ) >= "3"  .or. at( "9.", ::oSql:cSystemVers ) > 0 )
+            if ::osql:lPostgresql8
                cSqlA += [ A.] + SR_DBQUALIFY( cCol, ::oSql:nSystemID ) + [ NULLS FIRST,]
-               cSqlD += [ A.] + SR_DBQUALIFY( cCol, ::oSql:nSystemID ) + [ DESC NULLS LAST,]
-   
-
+               cSqlD += [ A.] + SR_DBQUALIFY( cCol, ::oSql:nSystemID ) + [ DESC NULLS LAST,]   
             else
 
                cSqlA += [ A.] + SR_DBQUALIFY( cCol, ::oSql:nSystemID ) + [,]
@@ -1450,6 +1448,8 @@ METHOD sqlOpenAllIndexes() CLASS SR_WORKAREA
                   cXBase += ::aNames[nPos] + " + "
                Case ::aFields[nPos,2] = "D"
                   cXBase += "DTOS(" + ::aNames[nPos] + ") + "
+               Case ::aFields[nPos,2] = "T"
+                  cXBase += "TTOS(" + ::aNames[nPos] + ") + "                  
                Case ::aFields[nPos,2] = "N"
                   cXBase += "STR(" + ::aNames[nPos] + ", " + alltrim(str(::aFields[nPos,3])) + ", " +;
                             alltrim(str(::aFields[nPos,4])) + ") + "
@@ -1964,8 +1964,12 @@ METHOD Quoted( uData, trim, nLen, nDec, nTargetDB, lSynthetic )   CLASS SR_WORKA
       return ['] + SR_dtoDot(uData) + [']
    Case cType == "D" .and. ::oSql:nSystemID == SYSTEMID_CACHE
       return [{d ']+transform(DtoS(if(year(uData)<1850,stod("18500101"),uData)) ,'@R 9999-99-99')+['}]
-   Case cType == "D"
+   Case cType == "D" 
       return ['] + dtos(uData) + [']
+   case ctype == "T"  .and. ::oSql:nSystemID == SYSTEMID_POSTGR  
+      return ['] + transform(ttos(uData), '@R 9999-99-99 99:99:99') + [']
+   case ctype == "T" .and.  ::oSql:nSystemID == SYSTEMID_ORACLE
+      return [ TIMESTAMP '] + transform(ttos(uData), '@R 9999-99-99 99:99:99') + [']
    Case cType == "N" .and. nLen == NIL
       return ltrim(str(uData))
    Case cType == "N" .and. nLen != NIL
@@ -1999,14 +2003,14 @@ METHOD QuotedNull( uData, trim, nLen, nDec, nTargetDB, lNull, lMemo )   CLASS SR
    DEFAULT lNull     := .T.
    DEFAULT lMemo     := .F.
 
-   If empty( uData ) .and. (!cType $ "AOH") .and. ((nTargetDB = SYSTEMID_POSTGR .and. cType $ "DCMN" .and. cType != "L" ) .or. ( nTargetDB != SYSTEMID_POSTGR .and. cType != "L" ))
+   If empty( uData ) .and. (!cType $ "AOH") .and. ((nTargetDB = SYSTEMID_POSTGR .and. cType $ "DCMNT" .and. cType != "L" ) .or. ( nTargetDB != SYSTEMID_POSTGR .and. cType != "L" ))
 
 
       If lNull
          Return 'NULL'
       Else
          Do Case
-         Case cType == "D"
+         Case cType $ "DT"
             Return 'NULL'
          Case cType $ "CM" .and. ::nTCCompat > 0
             Return "'" + uData + "'"
@@ -2054,6 +2058,18 @@ METHOD QuotedNull( uData, trim, nLen, nDec, nTargetDB, lNull, lMemo )   CLASS SR
       return [{d ']+transform(DtoS(if(year(uData)<1850,stod("18500101"),uData)) ,'@R 9999-99-99')+['}]
    Case cType == "D" .and. (!lMemo)
       return ['] + dtos(uData) + [']
+   case ctype == "T"  .and. ::oSql:nSystemID == SYSTEMID_POSTGR  
+      IF Empty( uData) 
+         RETURN 'NULL'
+      ENDIF 
+
+      return ['] + transform(ttos(uData), '@R 9999-99-99 99:99:99') + [']      
+   case ctype == "T" .and.  ::oSql:nSystemID == SYSTEMID_ORACLE
+      IF Empty( uData) 
+         RETURN 'NULL'
+      ENDIF 
+
+      return [ TIMESTAMP '] + transform(ttos(uData), '@R 9999-99-99 99:99:99') + [']   
    Case cType == "N" .and. nLen != NIL .and. (!lMemo)
       return ltrim(str(uData, nLen+1, nDec))
    Case cType == "N" .and. (!lMemo)
@@ -3599,6 +3615,8 @@ METHOD sqlSeek( uKey, lSoft, lLast ) CLASS SR_WORKAREA
                   ::aInfo[ AINFO_FOUND ] := ( ::aLocalBuffer[::aPosition[i]] = stod(::aDat[i]) )
                Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "D" .and. valtype( ::aDat[i] ) == "D" .and. ::nPartialDateSeek > 0 .and. i == len( ::aQuoted )
                   ::aInfo[ AINFO_FOUND ] := ( Left( dtos( ::aLocalBuffer[::aPosition[i]]), ::nPartialDateSeek ) == Left( dtos(::aDat[i]), ::nPartialDateSeek ) )
+               Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "T" .and. valtype( ::aDat[i] ) == "T" .and. ::nPartialDateSeek > 0 .and. i == len( ::aQuoted )
+                  ::aInfo[ AINFO_FOUND ] := ( Left( ttos( ::aLocalBuffer[::aPosition[i]]), ::nPartialDateSeek ) == Left( ttos(::aDat[i]), ::nPartialDateSeek ) )                     
                Case valtype( ::aLocalBuffer[::aPosition[i]] ) != valtype( ::aDat[i] )
                   ::RuntimeErr( "28" )
                   Set( _SET_EXACT, uSet )
@@ -3638,7 +3656,7 @@ METHOD sqlSeek( uKey, lSoft, lLast ) CLASS SR_WORKAREA
 
    ElseIf ::lISAM .and. ::oSql:nSystemID != SYSTEMID_POSTGR
 
-      If valtype(uKey) $ "NDL"       /* One field seek, piece of cake! */
+      If valtype(uKey) $ "NDLT"       /* One field seek, piece of cake! */
 
          lNull := ::aFields[::aIndex[ ::aInfo[ AINFO_INDEXORD ],INDEX_FIELDS,1,2 ],5]
          nFDec := ::aFields[::aIndex[ ::aInfo[ AINFO_INDEXORD ],INDEX_FIELDS,1,2 ],4]
@@ -3868,6 +3886,8 @@ METHOD sqlSeek( uKey, lSoft, lLast ) CLASS SR_WORKAREA
                   ::aInfo[ AINFO_FOUND ] := ( ::aLocalBuffer[::aPosition[i]] = stod(::aDat[i]) )
                Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "D" .and. valtype( ::aDat[i] ) == "D" .and. ::nPartialDateSeek > 0 .and. i == len( ::aQuoted )
                   ::aInfo[ AINFO_FOUND ] := ( Left( dtos( ::aLocalBuffer[::aPosition[i]]), ::nPartialDateSeek ) == Left( dtos(::aDat[i]), ::nPartialDateSeek ) )
+               Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "T" .and. valtype( ::aDat[i] ) == "T" .and. ::nPartialDateSeek > 0 .and. i == len( ::aQuoted )
+                  ::aInfo[ AINFO_FOUND ] := ( Left( ttos( ::aLocalBuffer[::aPosition[i]]), ::nPartialDateSeek ) == Left( ttos(::aDat[i]), ::nPartialDateSeek ) )                     
                Case valtype( ::aLocalBuffer[::aPosition[i]] ) != valtype( ::aDat[i] )
                   ::RuntimeErr( "28" )
                   Set( _SET_EXACT, uSet )
@@ -3907,7 +3927,7 @@ METHOD sqlSeek( uKey, lSoft, lLast ) CLASS SR_WORKAREA
 
    ElseIf ::lISAM .and. ::oSql:nSystemID == SYSTEMID_POSTGR
 
-      If valtype(uKey) $ "NDL"       /* One field seek, piece of cake! */
+      If valtype(uKey) $ "NDLT"       /* One field seek, piece of cake! */
 
          lNull := ::aFields[::aIndex[ ::aInfo[ AINFO_INDEXORD ],INDEX_FIELDS,1,2 ],5]
          nFDec := ::aFields[::aIndex[ ::aInfo[ AINFO_INDEXORD ],INDEX_FIELDS,1,2 ],4]
@@ -4016,6 +4036,7 @@ METHOD sqlSeek( uKey, lSoft, lLast ) CLASS SR_WORKAREA
             If ::aIndex[ ::aInfo[ AINFO_INDEXORD ], SYNTH_INDEX_COL_POS ] > 0
                AADD( ::aQuoted, ::Quoted(::ConvType( cPart, cType, @lPartialSeek, nThis ),.F.,,,, .T. ) )
             Else
+
                AADD( ::aQuoted, ::Quoted(::ConvType( cPart, cType, @lPartialSeek, nThis ),!lSoft,,,, .F. ) )
             EndIf
             AADD( ::aDat,    ::ConvType( cPart, cType, , nThis ) )
@@ -4086,8 +4107,12 @@ METHOD sqlSeek( uKey, lSoft, lLast ) CLASS SR_WORKAREA
                   ::aInfo[ AINFO_FOUND ] := ( ::aLocalBuffer[::aPosition[i]] = str(::aDat[i]) )
                Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "D" .and. valtype( ::aDat[i] ) == "C"
                   ::aInfo[ AINFO_FOUND ] := ( ::aLocalBuffer[::aPosition[i]] = stod(::aDat[i]) )
+               Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "T" .and. valtype( ::aDat[i] ) == "C"
+                  ::aInfo[ AINFO_FOUND ] := ( ::aLocalBuffer[::aPosition[i]] = stot(::aDat[i]) )                  
                Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "D" .and. valtype( ::aDat[i] ) == "D" .and. ::nPartialDateSeek > 0 .and. i == len( ::aQuoted )
                   ::aInfo[ AINFO_FOUND ] := ( Left( dtos( ::aLocalBuffer[::aPosition[i]]), ::nPartialDateSeek ) == Left( dtos(::aDat[i]), ::nPartialDateSeek ) )
+               Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "T" .and. valtype( ::aDat[i] ) == "T" .and. ::nPartialDateSeek > 0 .and. i == len( ::aQuoted )
+                  ::aInfo[ AINFO_FOUND ] := ( Left( ttos( ::aLocalBuffer[::aPosition[i]]), ::nPartialDateSeek ) == Left( ttos(::aDat[i]), ::nPartialDateSeek ) )   
                Case valtype( ::aLocalBuffer[::aPosition[i]] ) != valtype( ::aDat[i] )
                   ::RuntimeErr( "28" )
                   Set( _SET_EXACT, uSet )
@@ -4140,6 +4165,7 @@ Return NIL
 Method ConvType( cData, cType, lPartialSeek, nThis, lLike )
 
    Local dRet, cD := "19600101"
+   Local cD1 := "19600101 000000"
 
    DEFAULT lLike := .F.
 
@@ -4162,6 +4188,19 @@ Method ConvType( cData, cType, lPartialSeek, nThis, lLike )
       EndIf
       dRet := stod( cData )
       Return dRet
+   case ctype =="T"
+   If len(cData) < 15 .and. !empty( cData ) 
+         ::nPartialDateSeek := len(cData)
+         cData += SubStr( cD1, len(cData) + 1, 15 - len(cData) )
+         lPartialSeek     := .T.
+         lLike        := .F.
+      Else
+         lPartialSeek := .F.
+         lLike        := .F.
+      EndIf
+      dRet := stot( cData )
+      Return dRet
+         
    Case cType = "L"
       Return cData $ "SY.T."
    EndCase
@@ -6073,6 +6112,15 @@ METHOD sqlOrderListAdd( cBagName, cTag ) CLASS SR_WORKAREA
             cSqlA += [ A.] + SR_DBQUALIFY( cCol, ::oSql:nSystemID ) + [ NULLS FIRST,]
             cSqlD += [ A.] + SR_DBQUALIFY( cCol, ::oSql:nSystemID ) + [ DESC NULLS LAST,]
             exit
+         case SYSTEMID_POSTGR 
+         if ::osql:lPostgresql8
+            cSqlA += [ A.] + SR_DBQUALIFY( cCol, ::oSql:nSystemID ) + [ NULLS FIRST,]
+            cSqlD += [ A.] + SR_DBQUALIFY( cCol, ::oSql:nSystemID ) + [ DESC NULLS LAST,]
+         else
+            cSqlA += [ A.] + SR_DBQUALIFY( cCol, ::oSql:nSystemID ) + [,]
+            cSqlD += [ A.] + SR_DBQUALIFY( cCol, ::oSql:nSystemID ) + [ DESC,]
+
+         endif   
          Case SYSTEMID_IBMDB2
             If "08.0" $ ::oSql:cSystemVers .and. (!"08.00" $ ::oSql:cSystemVers)
                cSqlA += [ A.] + SR_DBQUALIFY( cCol, ::oSql:nSystemID ) + [ NULLS FIRST,]
@@ -6099,6 +6147,8 @@ METHOD sqlOrderListAdd( cBagName, cTag ) CLASS SR_WORKAREA
                   cXBase += ::aNames[nPos] + " + "
                Case ::aFields[nPos,2] = "D"
                   cXBase += "DTOS(" + ::aNames[nPos] + ") + "
+               Case ::aFields[nPos,2] = "T"   
+                  cXBase += "TTOS(" + ::aNames[nPos] + ") + "
                Case ::aFields[nPos,2] = "N"
                   cXBase += "STR(" + ::aNames[nPos] + ", " + alltrim(str(::aFields[nPos,3])) + ", " +;
                             alltrim(str(::aFields[nPos,4])) + ") + "
@@ -6831,7 +6881,7 @@ METHOD sqlOrderCreate( cIndexName, cColumns, cTag, cConstraintName, cTargetTable
          (::cAlias)->( dbSetOrder( nOldOrd ) )
       EndIf
 
-      If ::oSql:nSystemID == SYSTEMID_POSTGR .and. ( substr( ::oSql:cSystemVers, at( "8.", ::oSql:cSystemVers )+2, 1 ) >= "3"  .or.  at( "9.", ::oSql:cSystemVers ) > 0 )
+      If ::oSql:nSystemID == SYSTEMID_POSTGR .and.  ::osql:lPostgresql8
                // PGS 8.3 will use it once released
          For i = 1 to len( aCols )
             cList += SR_DBQUALIFY( aCols[i], ::oSql:nSystemID ) + " NULLS FIRST"

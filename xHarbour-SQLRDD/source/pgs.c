@@ -900,5 +900,8 @@ HB_FUNC( PGSLINEPROCESSED )
 //-----------------------------------------------------------------------------//
 HB_FUNC(SETPGSOLDBEHAVIOR)
 {
-   iOldBehavior = hb_parl( 1 ) ;
+	int iOld = iOldBehavior;
+	if (ISLOG( 1 ) ) 
+       iOldBehavior= hb_parl( 1 ) ;
+    hb_retni( iOld ) ;   
 }

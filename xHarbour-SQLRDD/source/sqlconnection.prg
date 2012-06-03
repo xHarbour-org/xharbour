@@ -40,6 +40,7 @@ CLASS SR_CONNECTION
    DATA lClustered AS LOGICAL INIT .F. READONLY
    //culik 30/12/2011 adicionado para indicar se e  sqlserver versao 2008 ou superior
    DATA lSqlServer2008 AS LOGICAL INIT .F. 
+   DATA lPostgresql8   AS LOGICAL INIT .F.  // do we have postgressql >= 8.3
    DATA oHashActiveWAs
 
    DATA aTableInfo      INIT { => }
@@ -105,6 +106,10 @@ CLASS SR_CONNECTION
    //culik 30/12/2011 adicionado para indicar se e  sqlserver versao 2008 ou superior
    DATA lSqlServer2008 AS LOGICAL INIT .F. 
    
+   DATA lBind Init .f.
+   DATA cSqlPrepare INIT ""
+   DATA aBindParameters INIT {}
+   
    PROTECTED:
 
    DATA cConnect, cDSN, cUser, cPassword
@@ -122,10 +127,12 @@ CLASS SR_CONNECTION
    METHOD LastError()
    METHOD Commit()
    METHOD RollBack()
-   METHOD IniFields( lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName ) VIRTUAL
+   METHOD IniFields( lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName, lRefCursor ) VIRTUAL
    METHOD ExecuteRaw() VIRTUAL
    METHOD Execute( cCommand, lErrMsg, nLogMode, cType )
    METHOD Exec( cCommand, lMsg, lFetch, aArray, cFile, cAlias, nMaxRecords, lNoRecno, cRecnoName, cDeletedName, lTranslate, nLogMode, cType )
+   METHOD ExecSPRC(  cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMaxRecords, lNoRecno, cRecnoName, cDeletedName, lTranslate, nLogMode  )
+   METHOD ExecSP( cComm, aReturn, nParam )
    METHOD AllocStatement()
    METHOD SetStmtOptions( nType, uBuffer )
    METHOD RuntimeErr( cOperation, cErr )
@@ -310,7 +317,282 @@ METHOD SetNextOpt( nSet, nOpt )  CLASS SR_CONNECTION
    ::nSetValue := nOpt
 Return NIL
 
+
+METHOD ExecSP( cComm, aReturn, nParam, aType )  CLASS SR_CONNECTION
+   Local i, n
+   Local nError := 0
+   
+   DEFAULT aReturn to {}
+   DEFAULT aType to   {}
+   DEFAULT nParam to   1
+   
+   oracleprePARE( ::hdbc, cComm )
+   
+   oraclebindalloc( ::hdbc, nParam )
+   
+   For i:= 1 to nParam 
+      n := -1
+      If Len( aType ) > 0
+         If aType[i]=="N"
+            n  := 5
+         EndIf
+      EndIF      
+      OracleinBindParam( ::hdbc, i, n, 12, 0 )      
+   Next
+    
+   TRY
+      nError := OracleExecDir( ::hDbc )
+   CATCH 
+      nerror := - 1
+   End
+   
+   If nError < 0
+      ::RunTimeErr("", str( SQLO_GETERRORCODE( ::hDbc ), 4 ) + " - " + SQLO_GETERRORDESCR( ::hDbc ) ) 
+   Else
+   //If nError >= 0
+   	  
+   	  
+      For i:=1 to nParam
+        AADD( aReturn, ORACLEGETBINDDATA( ::hdbc, i ) )          
+      Next
+   EndIf      
+
+   ORACLEFREEBIND( ::hdbc )
+   CLOSECURSOR( ::hDbc )
+   
+Return nError
+   
 /*------------------------------------------------------------------------*/
+METHOD ExecSPRC(  cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMaxRecords, lNoRecno, cRecnoName, cDeletedName, lTranslate, nLogMode  ) CLASS SR_CONNECTION
+   Local i
+   Local n, nAllocated := 0
+   Local nBlocks   
+   Local nError
+   Local aFields
+   Local nCols 
+   Local aDb
+   Local nFieldRec
+   Local aMemo
+   Local cFileTemp      
+   Local cEste     
+   Local nLenMemo  
+   Local nLinesMemo        
+   Local cCampo
+   Local j 
+   
+   DEFAULT nMaxRecords TO 999999999999
+   DEFAULT cVar To ":c1"
+     
+   ::AllocStatement()
+
+   DEFAULT lMsg          := .T.
+   DEFAULT lFetch        := .F.
+   DEFAULT nMaxRecords   := 99999999999999
+   DEFAULT lNoRecno      := .F.
+   DEFAULT cRecnoName    := SR_RecnoName()
+   DEFAULT cDeletedName  := SR_DeletedName()
+   
+   TRY
+      nError := ORACLE_PROCCURSOR( ::hDbc, cComm, cVar )  
+      //nError := ORACLE_BINDCURSOR( ::hDbc, cComm, cVar )
+      ::cLastComm := cComm
+   CATCH  
+      nError := - 1
+   End               
+   
+   If nError < 0
+      If lFetch
+       //  ::RunTimeErr("", "SQLExecDirect Error Erro na STORE PROCEDURE" ) 
+       ::RunTimeErr("", str( SQLO_GETERRORCODE( ::hDbc ), 4 ) + " - " + SQLO_GETERRORDESCR( ::hDbc ) + ::cLastComm ) 
+      EndIf  
+   EndIf      
+    
+   If !Empty( cFile )
+      HB_FNameSplit( cFile,, @cFileTemp )
+      DEFAULT cAlias        := cFileTemp
+   EndIf
+
+   //nCols := SQLO_NUMCOLS( ::hDbc )
+ 
+   //For i := 1 to nCols
+   //   ORACLEBINDALLOC( ::hDbc, i  )
+   //Next
+
+   aFields := ::iniFields(.f.) 
+
+   If lFetch
+      If !Empty( cFile )
+       
+         aFields := ::IniFields(.F.,,,,,cRecnoName, cDeletedName )
+
+         if Select( cAlias ) == 0
+            aDb := {}
+            If lNoRecno
+               For i = 1 to len( aFields )
+                  If aFields[i,1] != cRecnoName
+                     AADD( aDb, aFields[i] )
+                  Else
+                     nFieldRec := i
+                  EndIf
+               Next
+               dbCreate( cFile, SR_AdjustNum(aDb), SR_SetRDDTemp() )
+            Else
+               dbCreate( cFile, SR_AdjustNum(aFields), SR_SetRDDTemp() )
+            EndIf
+
+            dbUseArea( .t., SR_SetRDDTemp(), cFile, cAlias, .F. )
+         else
+            dbSelectArea( cAlias )
+         EndIf
+
+         n := 1
+
+         While n <= nMaxRecords .and. ((::nRetCode := ::Fetch( ,lTranslate )) == SQL_SUCCESS )
+
+            Append Blank
+
+            If nFieldRec == NIL
+               For i = 1 to len( aFields )
+                  FieldPut( i, ::FieldGet( i, aFields, lTranslate ) )
+               Next
+            Else
+               For i = 1 to len( aFields )
+                  Do Case
+                  Case i = nFieldRec
+                     ::FieldGet( i, aFields, lTranslate )
+                  Case i > nFieldRec
+                     FieldPut( i-1, ::FieldGet( i, aFields, lTranslate ) )
+                  Case i < nFieldRec
+                     FieldPut( i, ::FieldGet( i, aFields, lTranslate ) )
+                  EndCase
+               Next
+            EndIf
+
+            n ++
+
+         EndDo
+
+         dbGoTop()
+
+      ElseIf aArray == NIL
+
+         ::cResult := ""
+         n         := 0
+         aFields   := ::IniFields(.F.,,,,,cRecnoName, cDeletedName,.t.)
+ 
+         For i = 1 to len(aFields)
+            ::cResult += PadR( aFields[i,1], If( aFields[i,2] == "M", Max( len( aFields[i,1] ), if( ::lShowTxtMemo, 79, 30 ) ) , Max( len( aFields[i,1] ), aFields[i,3] ) ), "-" ) + " "
+         Next
+
+         ::cResult += chr(13) + chr(10)
+         aMemo     := Array( len( aFields ) )
+
+         While n <= ::nMaxTextLines .and. ((::nRetCode := ::Fetch( ,lTranslate )) == SQL_SUCCESS )
+
+            cEste      := ""
+            nLenMemo   := 0
+            nLinesMemo := 0
+
+            For i = 1 to len( aFields )
+               cCampo := ::FieldGet( i, aFields, lTranslate )
+               If aFields[i,2] == "M"
+                  nLenMemo   := Max( len( aFields[i,1] ), if( ::lShowTxtMemo, 79, 30 ) )
+                  nLinesMemo := Max( mlCount( cCampo, nLenMemo ), nLinesMemo )
+                  cEste += memoline(cCampo,nLenMemo,1) + " "
+                  aMemo[i] := cCampo
+               Else
+                  cEste += PadR( SR_Val2Char( cCampo ), Max( len( aFields[i,1] ), aFields[i,3] ) ) + " "
+               EndIf
+            Next
+
+            ::cResult += cEste + chr(13) + chr(10)
+            n ++
+
+            If ::lShowTxtMemo .and. nLinesMemo > 1
+               For j = 2 to nLinesMemo
+                  cEste    := ""
+                  For i = 1 to len( aFields )
+                     If aFields[i,2] == "M"
+                        cEste += memoline(aMemo[i],nLenMemo,j) + " "
+                     Else
+                        cEste += Space( Max( len( aFields[i,1] ), aFields[i,3] ) ) + " "
+                     EndIf
+                  Next
+                  ::cResult += cEste + chr(13) + chr(10)
+                  n ++
+               Next
+            EndIf
+
+         EndDo
+
+      Else      && Retorno deve ser para Array !
+
+         AsizeAlloc( aArray, 300 )
+
+         If valtype( aArray ) == "A"
+            If len( aArray ) = 0
+               aSize( aArray, ARRAY_BLOCK1 )
+               nAllocated := ARRAY_BLOCK1
+            Else
+               nAllocated := len( aArray )
+            EndIf
+         Else
+            aArray  := Array(ARRAY_BLOCK1)
+            nAllocated := ARRAY_BLOCK1
+         EndIf
+
+         nBlocks := 1
+         n       := 0
+         aFields := ::IniFields( .F.,,,,,cRecnoName, cDeletedName )
+
+         While (::nRetCode := ::Fetch( ,lTranslate )) = SQL_SUCCESS
+            n ++
+            If n > nAllocated
+               Switch nAllocated
+               Case ARRAY_BLOCK1
+                  nAllocated := ARRAY_BLOCK2
+                  Exit
+               Case ARRAY_BLOCK2
+                  nAllocated := ARRAY_BLOCK3
+                  Exit
+               Case ARRAY_BLOCK3
+                  nAllocated := ARRAY_BLOCK4
+                  Exit
+               Case ARRAY_BLOCK4
+                  nAllocated := ARRAY_BLOCK5
+                  Exit
+               Default
+                  nAllocated += ARRAY_BLOCK5
+               End
+
+               aSize( aArray, nAllocated )
+            EndIf
+
+            aArray[n] := array(len( aFields ))
+            For i = 1 to len( aFields )
+               aArray[n,i] := ::FieldGet( i, aFields, lTranslate )
+            Next
+            If n > nMaxRecords
+               Exit
+            EndIf
+         EndDo
+         aSize( aArray, n )
+      EndIf
+   
+   Endif
+ 
+   nerror:=SQLO_CLOSESTMT( ::hDbc )
+   
+   If nError < 0
+      If lFetch
+         ::RunTimeErr("", "SQLExecDirect Error in close cursor Statement" ) 
+      EndIf      
+   endif   
+
+  ::freestatement()
+ 
+return  0  
+
 
 METHOD Exec( cCommand, lMsg, lFetch, aArray, cFile, cAlias, nMaxRecords, lNoRecno, cRecnoName, cDeletedName, lTranslate, nLogMode, cType ) CLASS SR_CONNECTION
 
@@ -1196,3 +1478,33 @@ Function SR_AllInCache( lSet )
 Return lOld
 
 /*------------------------------------------------------------------------*/
+
+
+function  ExecuteSP( cComm, aReturn  )  //CLASS SR_CONNECTION
+   Local i, n
+   Local nError := 0
+   local oConn := SR_GetConnection()
+   
+   DEFAULT aReturn to {}
+   
+   oracleprePARE( oConn:hdbc, cComm )
+   
+   oraclebindalloc( oConn:hdbc, 1 )
+   
+   OracleinBindParam( oConn:hdbc, 1, -1, 12, 0 )      
+ 
+   TRY
+      nError := OracleExecDir( oConn:hDbc )
+   CATCH 
+      nerror := - 1
+   End
+   
+   if nError >=0
+      AADD( aReturn, ORACLEGETBINDDATA( oConn:hdbc, 1 ) )           
+   EndIf
+   
+  
+   ORACLEFREEBIND( oConn:hdbc )
+   CLOSECURSOR( oConn:hDbc )
+    
+Return nError

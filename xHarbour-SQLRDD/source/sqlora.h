@@ -1619,6 +1619,7 @@ int sqlo_define_ntable __P((sqlo_stmt_handle_t sth, unsigned int pos, int * sth2
  * @see sqlo_prepare, sqlo_define_by_pos, sqlo_define_by_pos2, sqlo_bind_by_name
  */
 int sqlo_execute __P((sqlo_stmt_handle_t sth, unsigned int iterations));
+int sqlo_executeselect __P((sqlo_stmt_handle_t sth, unsigned int iterations));
 
 /** @} */
 

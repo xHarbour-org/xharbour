@@ -182,6 +182,10 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
    local hEnv := 0, hDbc := 0
    local nret, cVersion := "", cSystemVers := "", cBuff := ""
    Local aRet := {}
+   Local aVersion
+   Local cmatch,nstart,nlen,s_reEnvVar := HB_RegexComp( "(\d+\.\d+\.\d+)" )
+   Local cString
+   
    
    (cDSN)
    (cUser)
@@ -217,11 +221,19 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
       ::hStmt    = NIL
       ::hDbc     = hDbc
       cTargetDB  = "PostgreSQL Native"
-      ::exec( "select version()",.t.,.t.,@aRet )
+      ::exec( "select version()", .t., .t., @aRet )
       If len (aRet) > 0
          cSystemVers := aRet[1,1]
+         cString := aRet[1,1]          
+         cMatch := HB_AtX( s_reEnvVar, cString, , @nStart, @nLen )         
+         if !empty(cMatch )
+            aVersion      := hb_atokens( cMatch, "." )
+         else
+            aVersion      := hb_atokens( strtran(Upper(aRet[1,1]),"POSTGRESQL ",""), "." )
+         endif
       Else
          cSystemVers= "??"
+         aVersion      := {"6","0"}
       EndIf
    EndIf
 
@@ -229,14 +241,21 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
    ::cSystemVers := cSystemVers
    ::nSystemID   := SYSTEMID_POSTGR
    ::cTargetDB   := Upper( cTargetDB )
+   
 
-   If ! ("7.3" $ cSystemVers .or. "7.4" $ cSystemVers .or. "8.0" $ cSystemVers .or. "8.1" $ cSystemVers .or. "8.2" $ cSystemVers .or. "8.3" $ cSystemVers .or. "8.4" $ cSystemVers .or. "9.0" $ cSystemVers .or. "9.1" $ cSystemVers)
+*    If ! ("7.3" $ cSystemVers .or. "7.4" $ cSystemVers .or. "8.0" $ cSystemVers .or. "8.1" $ cSystemVers .or. "8.2" $ cSystemVers .or. "8.3" $ cSystemVers .or. "8.4" $ cSystemVers .or. "9.0" $ cSystemVers or. "9.1" $ cSystemVers)
+
+     if !(( Val( aversion[ 1 ] ) == 7 .and. Val( aversion[ 2 ] ) >= 3) .or. ( Val( aversion[ 1 ] ) >= 8 ))
       ::End()
       ::nRetCode  := SQL_ERROR
       ::nSystemID := NIL
       SR_MsgLogFile( "Unsupported Postgres version: " + cSystemVers )
+   else
+      ::lPostgresql8 := (( Val( aversion[ 1 ] ) == 8 .and. Val( aversion[ 2 ] ) >= 3) .or. ( Val( aversion[ 1 ] ) >= 9 ))
    EndIf
-
+   
+   
+   
    ::exec( "select pg_backend_pid()", .T., .T., @aRet )
 
    If len( aRet ) > 0
