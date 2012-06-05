@@ -46,21 +46,16 @@
 CLASS WindowEdit INHERIT WinForm
    DATA InActive            EXPORTED INIT .F.
    DATA PathName            EXPORTED
-   DATA GridColor           PROTECTED INIT C_WHITE//C_BLACK
-   DATA CtrlMask            EXPORTED
-   DATA Control             PROTECTED
    DATA CtrlOldPt           EXPORTED
    DATA MouseDown           EXPORTED  INIT FALSE
    DATA InRect              EXPORTED  INIT 0
    DATA Selected            EXPORTED  INIT {}
-   DATA CtrlHover           PROTECTED INIT 0
    DATA SelInitPoint        EXPORTED
    DATA SelEndPoint         EXPORTED
    DATA SelPointSize        EXPORTED  INIT 7
    DATA CtrlParent          EXPORTED
    DATA NewParent           EXPORTED
    DATA OldParent           EXPORTED
-   DATA CtrlPos             PROTECTED
    DATA CtrlSizedMoved      EXPORTED INIT .F.
    DATA CurObj              EXPORTED
    DATA Editor              EXPORTED
@@ -72,6 +67,11 @@ CLASS WindowEdit INHERIT WinForm
    DATA __lModified         EXPORTED INIT .F.
    DATA __OldName           EXPORTED
    DATA __NewName           EXPORTED
+
+   DATA Control             PROTECTED
+   DATA GridColor           PROTECTED INIT C_WHITE//C_BLACK
+   DATA CtrlHover           PROTECTED INIT 0
+   DATA CtrlPos             PROTECTED
    DATA __LeftSnap          PROTECTED
    DATA __TopSnap           PROTECTED
    DATA __RightSnap         PROTECTED

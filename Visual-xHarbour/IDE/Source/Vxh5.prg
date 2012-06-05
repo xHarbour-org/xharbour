@@ -321,6 +321,7 @@ METHOD Delete() CLASS CompButton
    ::Parent:OriginalRect[3] := ::Parent:LeftMargin + 10
    ::Parent:MoveWindow(,,,,.T.)
    ::Parent:__SetScrollBars()
+   ::Parent:Reset()
 RETURN NIL
 
 //------------------------------------------------------------------------------------------

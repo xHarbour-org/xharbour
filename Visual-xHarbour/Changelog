@@ -8,6 +8,17 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-04 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added "View" menu item "Build Panel" to show/hide the build panel.
+   ! Fixed Showing/hiding Object manager.
+   ! Fixed designer to WAIT for the running exe and CLOSE the build panel after the execution has finished.
+   ! Fixed CTRL+C not working correctly in editor. Fixed menuitem being disabled when clicking CTRL+ARROWS.
+   ! Fixed IntelliSense to show EXPORTED ivars also and not to show methods and properties from the designer class.
+   ! Fixed IntelliSense list to sort correctly and allow finding words correctly.
+   ! Fixed Components panel to hide when last component is deleted.
+   + Added API FlatSB_SetScrollProp though it's obsolete in OS higher than XP.
+   ! Fixed some internal methods to have __ and allow IntelliSense to filter them.
+   
 2012-05-30 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed editor line shifting bug when hitting : 
    + Added DataTable Blank(), Load() and Save()

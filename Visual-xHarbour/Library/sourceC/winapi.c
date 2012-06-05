@@ -5848,6 +5848,12 @@ HB_FUNC( INITIALIZEFLATSB )
 }
 
 //-----------------------------------------------------------------------------
+HB_FUNC( FLATSB_SETSCROLLPROP )
+{
+   hb_retl( FlatSB_SetScrollProp( (HWND) hb_parnl(1), (UINT) hb_parnl(2), (UINT_PTR) hb_parnl(3), hb_parl(4) ) );
+}
+
+//-----------------------------------------------------------------------------
 HB_FUNC( FLATSB_ENABLESCROLLBAR )
 {
    hb_retl( FlatSB_EnableScrollBar( (HWND) hb_parnl(1), (int) hb_parni(2), (UINT) hb_parnl(3) ) );

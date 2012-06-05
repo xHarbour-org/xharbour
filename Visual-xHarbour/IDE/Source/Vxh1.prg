@@ -33,7 +33,7 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 #define HKEY_LOCAL_MACHINE           (0x80000002)
 
 #define VXH_Version      "4"
-#define VXH_BuildVersion "Beta 1"
+#define VXH_BuildVersion "Beta 2"
 
 #define MCS_ARROW    10
 #define MCS_PASTE    11
@@ -1060,12 +1060,17 @@ METHOD Init() CLASS IDE_MainForm
             :Create()
          END
 
+         WITH OBJECT ::Application:Props[ "ViewDebugBuildItem" ] := MenuStripItem( :this )
+            :Caption    := "&Build Panel"
+            :Checked    := .F.
+            :Action     := {|o| o:Checked := ! o:Checked, ::Application:DebugWindow:Visible := o:Checked }
+            :Create()
+         END
+
          WITH OBJECT ::Application:Props[ "ViewObjectManagerItem" ] := MenuStripItem( :this )
             :Caption    := "&Object Manager"
             :Checked    := .T.
-            :Action     := {|o| IIF( o:Checked,;
-                                   ( o:Checked := .F., ::Application:Props[ "ObjectManagerPanel" ]:Hide() ),;
-                                   ( o:Checked := .T., ::Application:Props[ "ObjectManagerPanel" ]:Show() ) ) }
+            :Action     := {|o| o:Checked := ! o:Checked, ::Application:Props[ "ObjectManagerPanel" ]:Visible := o:Checked }
             :Create()
          END
 
@@ -3680,6 +3685,7 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    IF lCloseErrors
       ::Application:MainForm:DebugBuild1:ResetContent()
       ::Application:DebugWindow:Hide()
+      ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .F.
    ENDIF
    ::Application:Components:Close()
    hb_gcall( .T. )
@@ -3954,6 +3960,7 @@ METHOD Open( cProject ) CLASS Project
    IF ::Application:DebugWindow:Visible
       ::Application:ErrorView:ResetContent()
       ::Application:DebugWindow:Visible := .F.
+      ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .F.
    ENDIF
 
    DEFAULT cProject TO ""
@@ -4098,6 +4105,7 @@ METHOD Open( cProject ) CLASS Project
 
    IF !EMPTY( aErrors )
       ::Application:DebugWindow:Show()
+      ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .T.
       ::Application:ErrorView:ProcessErrors( , aErrors )
       ::Application:ErrorView:Parent:Select()
       ::Application:Yield()
@@ -4683,7 +4691,7 @@ METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors
    CATCH oErr
       IF oErr != NIL
          ::Application:DebugWindow:Visible := .T.
-
+         ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .T.
          IF Empty( oErr:ProcName )
             AADD( aErrors, { cFile, NTRIM( nLine ), "PARSER", IIF( VALTYPE( oErr:Description ) == "C", oErr:Description, "" ) } )
           ELSE
@@ -5563,11 +5571,16 @@ METHOD Run( lRunOnly ) CLASS Project
             ::Build()
          ENDIF
          IF ::Properties:TargetType == 1
-            ShellExecute( GetActiveWindow(), "open", cExe, ::Properties:Parameters + IIF( ::Application:RunMode == 0, " //DEBUG", "" ), , SW_SHOW )
             IF ::Application:RunMode == 0
+               ShellExecute( GetActiveWindow(), "open", cExe, ::Properties:Parameters + " //DEBUG", , SW_SHOW )
                ::Debug()
             ELSE
                ::Application:DebuggerPanel:Hide()
+
+               WaitExecute( cExe, ::Properties:Parameters, SW_SHOW )
+
+               ::Application:DebugWindow:Hide()
+               ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .F.
             ENDIF
 
           ELSEIF ::Properties:TargetType == 4
@@ -5634,6 +5647,7 @@ METHOD Build( lForce ) CLASS Project
    ENDIF
 
    ::Application:DebugWindow:Visible := .T.
+   ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .T.
 
    ::Application:ErrorView:ResetContent()
 

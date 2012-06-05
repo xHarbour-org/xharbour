@@ -131,11 +131,11 @@ CLASS OpenFileDialog INHERIT CommonDialogs
    PROPERTY CheckFileExists  INDEX OFN_FILEMUSTEXIST      READ xCheckFileExists  WRITE SetStyle    DEFAULT .T. PROTECTED
    PROPERTY CheckPathExists  INDEX OFN_PATHMUSTEXIST      READ xCheckPathExists  WRITE SetStyle    DEFAULT .T. PROTECTED
    PROPERTY Multiselect      INDEX OFN_ALLOWMULTISELECT   READ xMultiselect      WRITE SetStyle    DEFAULT .T. PROTECTED
-   PROPERTY DeferenceLinks   INDEX OFN_NODEREFERENCELINKS READ xDeferenceLinks   WRITE SetInvStyle DEFAULT .T. PROTECTED
+   PROPERTY DeferenceLinks   INDEX OFN_NODEREFERENCELINKS READ xDeferenceLinks   WRITE __SetInvStyle DEFAULT .T. PROTECTED
    PROPERTY ReadOnlyChecked  INDEX OFN_READONLY           READ xReadOnlyChecked  WRITE SetStyle    DEFAULT .F. PROTECTED
    PROPERTY RestoreDirectory INDEX OFN_NOCHANGEDIR        READ xRestoreDirectory WRITE SetStyle    DEFAULT .F. PROTECTED
    PROPERTY ShowHelp         INDEX OFN_SHOWHELP           READ xShowHelp         WRITE SetStyle    DEFAULT .F. PROTECTED
-   PROPERTY ShowReadOnly     INDEX OFN_HIDEREADONLY       READ xShowReadOnly     WRITE SetInvStyle DEFAULT .F. PROTECTED
+   PROPERTY ShowReadOnly     INDEX OFN_HIDEREADONLY       READ xShowReadOnly     WRITE __SetInvStyle DEFAULT .F. PROTECTED
 
    DATA AddExtension     INIT .T. PUBLISHED
    DATA CheckFileExists  INIT .T. PUBLISHED
@@ -151,7 +151,7 @@ CLASS OpenFileDialog INHERIT CommonDialogs
    DATA __PrevFilter  PROTECTED
    METHOD Init() CONSTRUCTOR
    METHOD Show()
-   METHOD SetInvStyle( n, l ) INLINE ::SetStyle( n, !l )
+   METHOD __SetInvStyle( n, l ) INLINE ::SetStyle( n, !l )
 ENDCLASS
 
 METHOD Init( oParent ) CLASS OpenFileDialog
@@ -245,13 +245,13 @@ CLASS SaveFileDialog INHERIT CommonDialogs
    PROPERTY CheckPathExists  INDEX OFN_PATHMUSTEXIST      READ xCheckPathExists  WRITE SetStyle    DEFAULT .T. PROTECTED
    PROPERTY CheckFileExists  INDEX OFN_FILEMUSTEXIST      READ xCheckFileExists  WRITE SetStyle    DEFAULT .F. PROTECTED
    PROPERTY CreatePrompt     INDEX OFN_CREATEPROMPT       READ xCreatePrompt     WRITE SetStyle    DEFAULT .T. PROTECTED
-   PROPERTY DeferenceLinks   INDEX OFN_NODEREFERENCELINKS READ xDeferenceLinks   WRITE SetInvStyle DEFAULT .T. PROTECTED
+   PROPERTY DeferenceLinks   INDEX OFN_NODEREFERENCELINKS READ xDeferenceLinks   WRITE __SetInvStyle DEFAULT .T. PROTECTED
    PROPERTY RestoreDirectory INDEX OFN_NOCHANGEDIR        READ xRestoreDirectory WRITE SetStyle    DEFAULT .F. PROTECTED
    PROPERTY ShowHelp         INDEX OFN_SHOWHELP           READ xShowHelp         WRITE SetStyle    DEFAULT .F. PROTECTED
 
    METHOD Init() CONSTRUCTOR
    METHOD Show()
-   METHOD SetInvStyle( n, l ) INLINE ::SetStyle( n, !l )
+   METHOD __SetInvStyle( n, l ) INLINE ::SetStyle( n, !l )
 ENDCLASS
 
 METHOD Init( oParent ) CLASS SaveFileDialog
@@ -331,10 +331,10 @@ RETURN .F.
 //------------------------------------------------------------------------------------------------
 
 CLASS PrintDialog INHERIT CommonDialogs
-   PROPERTY AllowCurrentPage INDEX PD_NOCURRENTPAGE       READ xAllowCurrentPage WRITE SetInvStyle DEFAULT .F. PROTECTED
-   PROPERTY AllowPrintFile   INDEX PD_DISABLEPRINTTOFILE  READ xAllowPrintFile   WRITE SetInvStyle DEFAULT .F. PROTECTED
-   PROPERTY AllowSelection   INDEX PD_NOSELECTION         READ xAllowSelection   WRITE SetInvStyle DEFAULT .F. PROTECTED
-   PROPERTY AllowSomePages   INDEX PD_NOPAGENUMS          READ xAllowSomePages   WRITE SetInvStyle DEFAULT .F. PROTECTED
+   PROPERTY AllowCurrentPage INDEX PD_NOCURRENTPAGE       READ xAllowCurrentPage WRITE __SetInvStyle DEFAULT .F. PROTECTED
+   PROPERTY AllowPrintFile   INDEX PD_DISABLEPRINTTOFILE  READ xAllowPrintFile   WRITE __SetInvStyle DEFAULT .F. PROTECTED
+   PROPERTY AllowSelection   INDEX PD_NOSELECTION         READ xAllowSelection   WRITE __SetInvStyle DEFAULT .F. PROTECTED
+   PROPERTY AllowSomePages   INDEX PD_NOPAGENUMS          READ xAllowSomePages   WRITE __SetInvStyle DEFAULT .F. PROTECTED
 
    DATA FromPage         INIT 0 PUBLISHED
    DATA ToPage           INIT 0 PUBLISHED
@@ -347,7 +347,7 @@ CLASS PrintDialog INHERIT CommonDialogs
 
    METHOD Init() CONSTRUCTOR
    METHOD Show()
-   METHOD SetInvStyle( n, l ) INLINE ::SetStyle( n, !l )
+   METHOD __SetInvStyle( n, l ) INLINE ::SetStyle( n, !l )
 ENDCLASS
 
 METHOD Init( oParent ) CLASS PrintDialog
@@ -471,7 +471,7 @@ CLASS PageSetup INHERIT CommonDialogs
    DATA psd          EXPORTED
    METHOD Init() CONSTRUCTOR
    METHOD Show()
-   METHOD SetInvStyle( n, l ) INLINE ::SetStyle( n, !l )
+   METHOD __SetInvStyle( n, l ) INLINE ::SetStyle( n, !l )
 ENDCLASS
 
 METHOD Init( oParent ) CLASS PageSetup

@@ -465,14 +465,15 @@ RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnKeyUp( nKey ) CLASS SourceEditor
+   LOCAL lSel := ::Source:GetSelLen() > 0
    IF nKey == VK_SHIFT
       ::Application:Project:EditReset()
     ELSEIF ::Application:Props:EditCopyItem:Enabled
-      ::Application:Props:EditCopyItem:Enabled := .F.
-      ::Application:Props:EditCopyBttn:Enabled := .F.
-      ::Application:Props:EditCutItem:Enabled := .F.
-      ::Application:Props:EditCutBttn:Enabled := .F.
-      ::Application:Props:EditDelBttn:Enabled := .F.
+      ::Application:Props:EditCopyItem:Enabled := lSel
+      ::Application:Props:EditCopyBttn:Enabled := lSel
+      ::Application:Props:EditCutItem:Enabled  := lSel
+      ::Application:Props:EditCutBttn:Enabled  := lSel
+      ::Application:Props:EditDelBttn:Enabled  := lSel
    ENDIF
 RETURN NIL
 
@@ -564,7 +565,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                  ENDIF
                  aObj := hb_aTokens( cObj, ":" )
                  IF aObj[1] == "WinForm"
-                    oObj := ::Source:Form
+                    oObj := WinForm() //::Source:Form
                   ELSE
                     TRY
                        oObj := &(aObj[1])
@@ -580,14 +581,17 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                  
                  IF VALTYPE(oObj) == "O"
                     aList := {}
-
-                    aProperties := __ClsGetPropertiesAndValues( oObj )
+                      
+                    aProperties := __GetMembers( oObj,,HB_OO_CLSTP_EXPORTED | HB_OO_CLSTP_PUBLISHED, HB_OO_MSG_DATA )
                     FOR n := 1 TO LEN( aProperties )
-                        aProp := GetProperCase( __Proper( aProperties[n][1] ) )
-                        AADD( aList, aProp[1]+"?8" )
+                        IF ! aProperties[n][1][1] $ "_X"
+                           aProp := GetProperCase( __Proper( aProperties[n] ) )
+                           AADD( aList, aProp[1]+"?8" )
+                        ENDIF
                     NEXT
 
                     aMethods := __objGetMethodList( oObj )
+                    //aMethods := __GetMembers( oObj,,HB_OO_CLSTP_SYMBOL, HB_OO_MSG_METHOD )
                     FOR n := 1 TO LEN( aMethods )
                         AADD( aList, __Proper( aMethods[n] )+"?7" )
                     NEXT
@@ -608,13 +612,13 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                        NEXT
                     ENDIF
 
-                    aSort( aList,,,{|x, y| x[1] < y[1]})
+                    aSort( aList,,,{|x, y| x < y})
                     cList := ""
                     FOR n := 1 TO LEN( aList )
                         cList += aList[n]+ IIF( n<LEN(aList)," ", "" )
                     NEXT
                     ::SendMessage( SCI_AUTOCSETCANCELATSTART, 0 )
-                    ::SendMessage( SCI_AUTOCSETAUTOHIDE, 0 )
+                    //::SendMessage( SCI_AUTOCSETAUTOHIDE, 0 )
                     ::SendMessage( SCI_AUTOCSETMAXHEIGHT, 15 )
                     ::SendMessage( SCI_AUTOCSETIGNORECASE, 1 )
                     ::SendMessage( SCI_AUTOCSHOW, 0, cList )
@@ -1248,7 +1252,7 @@ METHOD FindInTarget( cText, nStartPos, nEndPos ) CLASS Source
    ENDDO
 RETURN nPos
 
-function view( cView )
+function dview( cView )
    VIEW cView
 RETURN NIL
 
