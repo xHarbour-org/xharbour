@@ -3638,6 +3638,11 @@ HB_FUNC( GETKEYSTATE )
    hb_retni( GetKeyState( hb_parni(1) ) );
 }
 
+HB_FUNC( ISKEYDOWN )
+{
+   hb_retl( GetKeyState( hb_parni(1) ) & ( 1 << ( 32767 ) ) );
+}
+
 //-----------------------------------------------------------------------------
 HB_FUNC( CHECKBIT )
 {

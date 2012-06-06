@@ -78,7 +78,8 @@ CLASS Object
    METHOD __SetTheming()
 
    METHOD SetWindowTheme( cSubAppName, cSubIdList ) INLINE SetWindowTheme( ::hWnd, cSubAppName, cSubIdList )
-   METHOD RemoveWindowTheme()                       INLINE SetWindowTheme( ::hWnd, NIL, NIL )
+   METHOD RemoveWindowTheme()                       INLINE SetWindowTheme( ::hWnd, "", "" )
+
    METHOD Create()
    METHOD __InvalidMember()
    METHOD RemoveProperty()
@@ -134,7 +135,7 @@ METHOD __SetTheming( lSet ) CLASS Object
       IF !lSet
          ::RemoveWindowTheme()
        ELSEIF ::ThemeName != NIL
-         ::SetWindowTheme( , ::ThemeName )
+         ::SetWindowTheme()
       ENDIF
    ENDIF
    AEVAL( ::Children, {|o|o:Theming := lSet } )

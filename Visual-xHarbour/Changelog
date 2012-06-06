@@ -8,6 +8,16 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-05 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed property "Enabled" to repaint controls
+   * Renamed some internal methods to not to be shown in IntelliSense.
+   ! Fixed bug in DataTable:SetRelation() using Alias instead of Area.
+   ! Fixed DataGrid to allow closing a dialog with the Escape key and allow translating Enter 
+     key to the default button.
+   * Changed DataGrid to draw items grayed when disabled.
+   ! Fixed bug in "Theming" property.
+   + Added function IsKeyDown( nKey ) (returns logical)
+
 2012-06-04 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Added "View" menu item "Build Panel" to show/hide the build panel.
    ! Fixed Showing/hiding Object manager.

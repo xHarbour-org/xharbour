@@ -243,8 +243,8 @@ CLASS DataGrid INHERIT Control
    METHOD OnChar()
    METHOD OnKillFocus()
    METHOD OnSetFocus()
-   METHOD OnGetDlgCode() INLINE DLGC_WANTMESSAGE
-   METHOD OnGetDlgCode( msg ) INLINE IIF( Len(::Children) == 0 .OR. ! ::Children[ ::ColPos ]:AutoEdit .AND. msg != NIL .AND. msg:message == WM_KEYDOWN .AND. msg:wParam==VK_RETURN, NIL, DLGC_WANTMESSAGE )
+   //METHOD OnGetDlgCode() INLINE DLGC_WANTMESSAGE
+   METHOD OnGetDlgCode()// msg ) INLINE IIF( Len(::Children) == 0 .OR. ! ::Children[ ::ColPos ]:AutoEdit .AND. msg != NIL .AND. msg:message == WM_KEYDOWN .AND. msg:wParam IN {VK_RETURN,VK_ESCAPE}, NIL, DLGC_WANTMESSAGE )
    METHOD OnLButtonDblClk()
    METHOD OnItemChanged()
    METHOD OnEraseBkGnd()
@@ -259,6 +259,17 @@ CLASS DataGrid INHERIT Control
 ENDCLASS
 
 //----------------------------------------------------------------------------------
+
+METHOD OnGetDlgCode( msg ) CLASS DataGrid
+   IF msg != NIL
+      IF Len(::Children) == 0 .OR. ! ::Children[ ::ColPos ]:AutoEdit .AND. msg != NIL .AND. msg:message == WM_KEYDOWN .AND. msg:wParam == VK_RETURN
+         RETURN NIL
+      ENDIF
+      IF msg:message == WM_KEYDOWN .AND. msg:wParam == VK_ESCAPE
+         RETURN NIL
+      ENDIF
+   ENDIF
+RETURN DLGC_WANTMESSAGE
 
 METHOD Init( oParent ) CLASS DataGrid
    DEFAULT ::__xCtrlName TO "DataGrid"
@@ -1136,7 +1147,7 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
       ENDIF
       ::Children[ ::__DragColumn ]:DrawHeader( ::Drawing:hDC )
    ENDIF
-   view len(::Children)
+
    IF !::__lSizeMouseDown .AND. ::__DragColumn == 0 .AND. ::__SelCol > 0 .AND. Len( ::Children ) >= ::__SelCol
       IF ::Children[ ::__SelCol ]:HeaderMenu != NIL
          pt := (struct POINT)
@@ -1889,8 +1900,8 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                        SetBkColor( hMemDC, nBkCol )
                        SetTextColor( hMemDC, nTxCol )
                     ENDIF
-                  ELSE
-                    IF lDis .OR. ( GetFocus() != ::hWnd .AND. ::FullRowSelect .AND. lSelected ) .OR. ( lSelected .AND. nRec <> nRecno )
+                  ELSEIF ! lDis
+                    IF ( GetFocus() != ::hWnd .AND. ::FullRowSelect .AND. lSelected ) .OR. ( lSelected .AND. nRec <> nRecno )
                        SetBkColor( hMemDC, IIF( ::ShadowRow, ::__InactiveHighlight, nBkCol ) )
                        SetTextColor( hMemDC, nTxCol /*::__InactiveHighlightText*/ )
                      ELSE
@@ -1908,6 +1919,8 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                           ENDIF
                        ENDIF
                     ENDIF
+                  ELSE
+                    SetTextColor( hMemDC, ::System:Color:Gray )
                  ENDIF
 
                  nHeaderRight := nRight-1
@@ -4161,7 +4174,7 @@ METHOD Create() CLASS GridColumn
       ENDIF
       ::xText := cText
    ENDIF
-view ::xText
+
    IF VALTYPE( ::xImageIndex ) == "N"
       ::xImageIndex := MAX( 0, ::xImageIndex )
    ENDIF

@@ -32,9 +32,11 @@ CLASS Control INHERIT Window
    PROPERTY SmallCaption             READ xSmallCaption WRITE __SetSmallCaption DEFAULT .F.
    PROPERTY Enabled                  READ xEnabled      WRITE __Enable          DEFAULT .T.
 
-   DATA xCaption               EXPORTED  INIT ""
-   ACCESS Caption              INLINE    IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xCaption, _GetWindowText( ::hWnd ) )
-   ASSIGN Caption(c)           INLINE    ::SetWindowText( c ), IIF( ::SmallCaption, ::RedrawWindow( , , RDW_FRAME | RDW_NOERASE | RDW_NOINTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN ), )
+   ACCESS xCaption       INLINE ::xText
+   ASSIGN xCaption(c)    INLINE ::xText := c
+
+   ACCESS Caption        INLINE ::Text
+   ASSIGN Caption(c)     INLINE ::Text := c
 
    DATA xText                  EXPORTED  INIT ""
    ACCESS Text                 INLINE    IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xText, _GetWindowText( ::hWnd ) ) PERSISTENT
@@ -123,6 +125,7 @@ ENDCLASS
 METHOD __Enable( lEnable ) CLASS Control
    IF ::hWnd != NIL .AND. ::__xCtrlName != "Button"
       EnableWindow( ::hWnd, lEnable )
+      ::InvalidateRect( , .F. )
    ENDIF
 RETURN lEnable
 

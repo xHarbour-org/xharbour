@@ -2008,19 +2008,19 @@ METHOD Init() CLASS IDE_MainForm
                         ::Application:Project:EditReset( IIF( y > 3, 1, 0 ) )
                         ::Application:MainForm:ToolBox1:Enabled       := y > 3
                         ::Application:ObjectTree:Enabled              := y > 3
-                        ::Application:Props:SearchGoto:Enabled        := y == 3
-                        ::Application:Props:TogBookmark:Enabled       := y == 3
-                        ::Application:Props:NextBookmark:Enabled      := y == 3
-                        ::Application:Props:PrevBookmark:Enabled      := y == 3
-                        ::Application:Props:ClearBookmark:Enabled     := y == 3
-                        ::Application:Props:WrapSearchItem:Enabled    := y == 3
-                        ::Application:Props:SearchReplaceItem:Enabled := y == 3
-                        ::Application:Props:SearchFindItem:Enabled    := y == 3
-                        ::Application:Props:EditUpperCase:Enabled     := y == 3
-                        ::Application:Props:EditLowerCase:Enabled     := y == 3
-                        ::Application:Props:EditInvCase:Enabled       := y == 3
-                        ::Application:Props:EditCapitalize:Enabled    := y == 3
-                        ::Application:Props:RectSelect:Enabled        := y == 3
+                        ::Application:Props:SearchGoto:Enabled        := ( y == 3 )
+                        ::Application:Props:TogBookmark:Enabled       := ( y == 3 )
+                        ::Application:Props:NextBookmark:Enabled      := ( y == 3 )
+                        ::Application:Props:PrevBookmark:Enabled      := ( y == 3 )
+                        ::Application:Props:ClearBookmark:Enabled     := ( y == 3 )
+                        ::Application:Props:WrapSearchItem:Enabled    := ( y == 3 )
+                        ::Application:Props:SearchReplaceItem:Enabled := ( y == 3 )
+                        ::Application:Props:SearchFindItem:Enabled    := ( y == 3 )
+                        ::Application:Props:EditUpperCase:Enabled     := ( y == 3 )
+                        ::Application:Props:EditLowerCase:Enabled     := ( y == 3 )
+                        ::Application:Props:EditInvCase:Enabled       := ( y == 3 )
+                        ::Application:Props:EditCapitalize:Enabled    := ( y == 3 )
+                        ::Application:Props:RectSelect:Enabled        := ( y == 3 )
                        >
       :Create()
 

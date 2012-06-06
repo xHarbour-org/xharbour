@@ -148,7 +148,7 @@ CLASS DataTable INHERIT Component
    METHOD Append()                            INLINE ::Connector:Append()
    METHOD OrdSetFocus( cOrder )               INLINE IIF( cOrder != NIL, ::IndexOrder := ::IndexOrd(),), ::Connector:OrdSetFocus( cOrder )
    METHOD SetIndex( cIndex )                  INLINE ::IndexOrder := ::IndexOrd(), ::Connector:SetIndex( cIndex )
-   METHOD SetRelation()                       INLINE ::Connector:SetRelation()
+   METHOD SetRelation( oData,xKey,lAdditive ) INLINE ::Connector:SetRelation( oData, xKey, lAdditive )
    METHOD SetOrder( nOrder )                  INLINE ::Connector:SetOrder( nOrder )
    METHOD Select()                            INLINE ::Connector:Select()
    METHOD SelectArea()                        INLINE ::Connector:SelectArea()
@@ -206,6 +206,7 @@ CLASS DataTable INHERIT Component
    METHOD Blank()
    METHOD Load()
    METHOD Save()
+   METHOD Cancel() INLINE ::__lNew := .F., ::__aData := {}
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -240,6 +241,7 @@ METHOD Save() CLASS DataTable
       ::Unlock()
    ENDIF
    ::__lNew := .F.
+   ::__aData := {}
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -513,7 +515,7 @@ CLASS DataRdd
    METHOD OrdSetFocus( cOrder )               INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdSetFocus( cOrder ) ),)
    METHOD SetIndex( cIndex )                  INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbSetIndex( cIndex ) ),)
    METHOD SetOrder( nOrder )                  INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbSetOrder( nOrder ) ),)
-   METHOD Select()                            INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( Select() ),)
+   METHOD Select( cAlias )                    INLINE IIF( cAlias != NIL, Select(cAlias), dbSelectArea( ::Owner:Area ) )
    METHOD SelectArea()                        INLINE dbSelectArea( ::Owner:Area )
    METHOD Delete()                            INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbDelete() ),)
    METHOD Recall()                            INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbRecall() ),)
@@ -591,7 +593,7 @@ METHOD SetRelation( oData, xKey, lAdditive ) CLASS DataRdd
    DEFAULT lAdditive TO FALSE
    
    IF !lAdditive
-      (::Owner:Alias)->( dbClearRel() )
+      (::Owner:Area)->( dbClearRel() )
    ENDIF
 
    IF oData != NIL
@@ -603,7 +605,8 @@ METHOD SetRelation( oData, xKey, lAdditive ) CLASS DataRdd
        ELSE
          cKey := NIL
       ENDIF
-      (::Owner:Alias)->( dbSetRelation( oData:Alias, bKey, cKey ) )
+
+      (::Owner:Area)->( dbSetRelation( oData:Alias(), bKey, cKey ) )
    ENDIF
 
 RETURN Self
