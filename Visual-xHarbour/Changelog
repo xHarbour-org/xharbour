@@ -8,6 +8,13 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-06 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed EditBox Search list to accept ENTER as a confirmation key.
+   ! Fixed StatusBarPanel Text property compatibility with old Caption property.
+   ! Hidden more private properties and methods.
+   ! Fixed method Save/RestoreLayout to default ini file section to [Main]
+   + Upgraded to Beta 3.
+   
 2012-06-05 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed property "Enabled" to repaint controls
    * Renamed some internal methods to not to be shown in IntelliSense.

@@ -121,6 +121,7 @@ CLASS Window INHERIT Object
    PROPERTY Top           INDEX 2                   READ xTop            WRITE __SetSizePos
    PROPERTY Width         INDEX 3                   READ xWidth          WRITE __SetSizePos
    PROPERTY Height        INDEX 4                   READ xHeight         WRITE __SetSizePos
+
    PROPERTY Cursor                                  READ xCursor         WRITE __SetWindowCursor DEFAULT IDC_ARROW PROTECTED
    PROPERTY StaticEdge    INDEX WS_EX_STATICEDGE    READ xStaticEdge     WRITE SetExStyle        DEFAULT .F.       PROTECTED
    PROPERTY ClientEdge    INDEX WS_EX_CLIENTEDGE    READ xClientEdge     WRITE SetExStyle        DEFAULT .F.       PROTECTED
@@ -146,9 +147,11 @@ CLASS Window INHERIT Object
 //   ASSIGN Text(c)              INLINE    ::SetWindowText( c )
 
 
-   DATA xCaption               EXPORTED  INIT ""
-   ACCESS Caption              INLINE    IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xCaption, _GetWindowText( ::hWnd ) )
-   ASSIGN Caption(c)           INLINE    ::SetWindowText( c )
+   ACCESS xCaption       INLINE ::xText
+   ASSIGN xCaption(c)    INLINE ::xText := c
+
+   ACCESS Caption        INLINE ::Text
+   ASSIGN Caption(c)     INLINE ::Text := c
 
    DATA xText                  EXPORTED  INIT ""
    ACCESS Text                 INLINE    IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xText, _GetWindowText( ::hWnd ) ) PERSISTENT
@@ -207,7 +210,7 @@ CLASS Window INHERIT Object
    DATA MaxWidth               EXPORTED  INIT 0
    DATA MaxHeight              EXPORTED  INIT 0
 
-   DATA SetChildren            EXPORTED  INIT .T.
+   DATA __SetChildren          EXPORTED  INIT .T.
 
    DATA ClassBrush             EXPORTED  INIT COLOR_BTNFACE+1
    DATA Style                  EXPORTED
@@ -401,7 +404,7 @@ CLASS Window INHERIT Object
    METHOD __GC()               VIRTUAL
    
    METHOD EnableThemeDialogTexture( nFlags ) INLINE EnableThemeDialogTexture( ::hWnd, nFlags )
-   METHOD SetInvStyle( n, l )     INLINE ::SetStyle( n, !l )
+   METHOD __SetInvStyle( n, l )   INLINE ::SetStyle( n, !l )
    METHOD DragAcceptFiles(l)      INLINE IIF( ::hWnd != NIL, DragAcceptFiles( ::hWnd, l ), NIL )
 
    METHOD CenterWindow()
@@ -1015,8 +1018,8 @@ METHOD Create( oParent ) CLASS Window
       ::Application:AddAccelerators( ::hWnd, ::__hAccelTable )
    ENDIF
 
-   IF !::Theming
-      ::RemoveWindowTheme()
+   IF ! ::Theming
+      SetWindowTheme( ::hWnd, "", "" )
    ENDIF
    IF ::Center
       ::CenterWindow()
@@ -1067,7 +1070,7 @@ METHOD Create( oParent ) CLASS Window
       IF ::DisableParent .AND. ::__ClassInst == NIL
          ::Parent:Disable()
       ENDIF
-      IF ::SetChildren .AND. ( !(::Parent:ClsName == WC_TABCONTROL) .OR. ::__xCtrlName == "TabPage" .OR. ::__ClassInst != NIL )
+      IF ::__SetChildren .AND. ( !(::Parent:ClsName == WC_TABCONTROL) .OR. ::__xCtrlName == "TabPage" .OR. ::__ClassInst != NIL )
          IF ::Parent:ClsName != "DataGrid" .OR. ::ClsName == "GridColumn"
             AADD( ::Parent:Children, Self )
          ENDIF
@@ -2120,7 +2123,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
            ODEFAULT nRet TO __Evaluate( ::OnWMInitDialog, Self, nwParam, nlParam, nRet )
 
            ODEFAULT nRet TO 0
-           IF ::Parent != NIL .AND. ::SetChildren
+           IF ::Parent != NIL .AND. ::__SetChildren
               AADD( ::Parent:Children, Self )
            ENDIF
 
@@ -5219,6 +5222,7 @@ METHOD RestoreLayout( cIniFile, cSection, lAllowOut ) CLASS WinForm
     ELSE
       oIni := IniFile( cIniFile )
    ENDIF
+   DEFAULT cSection TO "Main"
    c := oIni:ReadString( cSection, ::Application:Name + "_" + ::Name, "" )
    IF !EMPTY(c)
       aPos := {&c}
@@ -6044,3 +6048,7 @@ RETURN { ;
                                   { "UserMethod17"       , "", "" },;
                                   { "UserMethod18"       , "", "" },;
                                   { "UserMethod19"       , "", "" } } } }
+function dview( cView )
+   VIEW cView
+RETURN NIL
+

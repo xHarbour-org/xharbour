@@ -332,6 +332,7 @@ METHOD __UpdateDataGrid() CLASS EditBox
          :ShowSelectionBorder := .F.
 
          :OnWMKeyDown := {|o, nKey| ::__ChkGridKeys( o, nKey ) }
+         :OnWMGetDlgCode := {|| DLGC_WANTALLKEYS }
          :OnWMLButtonDblClk := {|o| ::__ChkGridKeys( o, VK_RETURN ), 0 }
          :Create()
          :BringWindowToTop()

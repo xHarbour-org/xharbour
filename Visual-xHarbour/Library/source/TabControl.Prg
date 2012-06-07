@@ -1738,7 +1738,7 @@ METHOD Init( oParent ) CLASS TabCloseButton
    ::Style  := WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::Width  := 20
    ::Height := 18
-   ::SetChildren := .F.
+   ::__SetChildren := .F.
    ::Tooltip:Text := "Close"
    ::Create()
 RETURN Self
@@ -1815,7 +1815,7 @@ METHOD Init( oParent ) CLASS TabPinButton
    ::Style  := WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::Width  := 20
    ::Height := 18
-   ::SetChildren := .F.
+   ::__SetChildren := .F.
    ::Tooltip:Text := "Undock"
    ::Create()
 RETURN Self

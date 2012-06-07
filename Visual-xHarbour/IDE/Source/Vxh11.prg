@@ -1252,10 +1252,6 @@ METHOD FindInTarget( cText, nStartPos, nEndPos ) CLASS Source
    ENDDO
 RETURN nPos
 
-function dview( cView )
-   VIEW cView
-RETURN NIL
-
 //------------------------------------------------------------------------------------------------------------------------------------
 
 CLASS Settings INHERIT Dialog

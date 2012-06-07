@@ -32,9 +32,11 @@ CLASS StatusBar INHERIT Control
                                    ::SendMessage( SB_SETBKCOLOR, 0, n ),;
                                    ::InvalidateRect()
 
-   DATA xCaption         EXPORTED  INIT ""
-   ACCESS Caption        INLINE    ::xCaption
-   ASSIGN Caption(cText) INLINE    ::xCaption := cText, IIF( ::IsWindow(), ( ::SendMessage( SB_SIMPLE, LEN( ::Children ) == 0, 0 ), ::SendMessage( SB_SETTEXT, SB_SIMPLEID, cText ) ), )
+   ACCESS xCaption       INLINE ::xText
+   ASSIGN xCaption(c)    INLINE ::xText := c
+
+   ACCESS Caption        INLINE ::Text
+   ASSIGN Caption(c)     INLINE ::Text := c
 
    DATA xText            EXPORTED  INIT ""
    ACCESS Text           INLINE    ::xText PERSISTENT
@@ -265,7 +267,12 @@ CLASS StatusBarPanel INHERIT Control
 
    //ACCESS hWnd                INLINE IIF( ::Parent != NIL, ::Parent:hWnd, 0 ) // Will use statusbar HANDLE for children
   
-   PROPERTY Caption    READ xCaption    WRITE SetText HIDDEN
+   ACCESS xCaption       INLINE ::xText
+   ASSIGN xCaption(c)    INLINE ::xText := c
+
+   ACCESS Caption        INLINE ::Text
+   ASSIGN Caption(c)     INLINE ::Text := c
+
    PROPERTY Text       READ xText       WRITE SetText
 
    PROPERTY ImageIndex READ xImageIndex WRITE SetImageIndex

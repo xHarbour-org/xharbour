@@ -33,7 +33,7 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 #define HKEY_LOCAL_MACHINE           (0x80000002)
 
 #define VXH_Version      "4"
-#define VXH_BuildVersion "Beta 2"
+#define VXH_BuildVersion "Beta 3"
 
 #define MCS_ARROW    10
 #define MCS_PASTE    11
