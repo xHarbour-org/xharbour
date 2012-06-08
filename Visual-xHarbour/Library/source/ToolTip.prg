@@ -152,7 +152,7 @@ METHOD Init( oParent ) CLASS ToolTip
 RETURN( self )
 
 METHOD Create() CLASS ToolTip
-   ::__SetChildren := .F.
+   ::SetChildren := .F.
    IF ::__ClassInst == NIL
       ::Super:Create()
 

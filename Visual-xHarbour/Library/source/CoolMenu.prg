@@ -372,7 +372,7 @@ CLASS CoolMenuItem INHERIT ToolButton
    DATA WholeDropDown         EXPORTED
    DATA ToolTip               EXPORTED
    DATA Components            EXPORTED INIT {}
-   DATA __SetChildren         EXPORTED INIT .T.
+   DATA SetChildren           EXPORTED INIT .T.
    DATA Font                  EXPORTED
    DATA MixedButtons          EXPORTED
    DATA AutoSize              EXPORTED INIT .T.
@@ -426,7 +426,7 @@ METHOD Create( nPos ) CLASS CoolMenuItem
          ::__IdeContextMenuItems := { { "&Delete", {|| ::Application:ObjectManager:ActiveObject:Destroy(),;
                                                        ::Application:Project:Modified := .T. } }}
       ENDIF
-      IF ::__SetChildren
+      IF ::SetChildren
          IF nPos < 0
             AADD( ::Parent:Children, Self )
           ELSE

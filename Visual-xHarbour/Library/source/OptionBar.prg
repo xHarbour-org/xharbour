@@ -119,7 +119,7 @@ METHOD Create() CLASS OptionBar
 
    ::__ToolBar := ToolBar( Self )
    WITH OBJECT ::__ToolBar
-      :__SetChildren    := .F.
+      :SetChildren      := .F.
       :ClipSiblings     := .T.
       :Width            := ::Width
       :Height           := 0
@@ -145,7 +145,7 @@ METHOD Create() CLASS OptionBar
    //---------------------------------------------------------------------------------------------
    ::__oPage := PageScroller( Self )
    WITH OBJECT ::__oPage
-      :__SetChildren    := .F.
+      :SetChildren    := .F.
       :Width  := ::ClientWidth
       :Height := ::ClientHeight
       :PageChild := ::__ToolBar

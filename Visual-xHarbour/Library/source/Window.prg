@@ -210,7 +210,7 @@ CLASS Window INHERIT Object
    DATA MaxWidth               EXPORTED  INIT 0
    DATA MaxHeight              EXPORTED  INIT 0
 
-   DATA __SetChildren          EXPORTED  INIT .T.
+   DATA SetChildren            EXPORTED  INIT .T.
 
    DATA ClassBrush             EXPORTED  INIT COLOR_BTNFACE+1
    DATA Style                  EXPORTED
@@ -1070,7 +1070,7 @@ METHOD Create( oParent ) CLASS Window
       IF ::DisableParent .AND. ::__ClassInst == NIL
          ::Parent:Disable()
       ENDIF
-      IF ::__SetChildren .AND. ( !(::Parent:ClsName == WC_TABCONTROL) .OR. ::__xCtrlName == "TabPage" .OR. ::__ClassInst != NIL )
+      IF ::SetChildren .AND. ( !(::Parent:ClsName == WC_TABCONTROL) .OR. ::__xCtrlName == "TabPage" .OR. ::__ClassInst != NIL )
          IF ::Parent:ClsName != "DataGrid" .OR. ::ClsName == "GridColumn"
             AADD( ::Parent:Children, Self )
          ENDIF
@@ -2123,7 +2123,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
            ODEFAULT nRet TO __Evaluate( ::OnWMInitDialog, Self, nwParam, nlParam, nRet )
 
            ODEFAULT nRet TO 0
-           IF ::Parent != NIL .AND. ::__SetChildren
+           IF ::Parent != NIL .AND. ::SetChildren
               AADD( ::Parent:Children, Self )
            ENDIF
 

@@ -78,7 +78,7 @@ CLASS CMenuItem INHERIT Object
    DATA __IdeContextMenuItems    EXPORTED INIT {}
    DATA __PropFilter             EXPORTED INIT {}
    DATA Components               EXPORTED INIT {}
-   DATA __SetChildren            EXPORTED INIT .T.
+   DATA SetChildren              EXPORTED INIT .T.
 
    DATA EventHandler             EXPORTED
    DATA HorzScrollPos            EXPORTED INIT 0
