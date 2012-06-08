@@ -9,6 +9,10 @@
 */
 
 2012-06-06 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   * Reverted changes to SetChildren since that was OK to be published by IntelliSense.
+   + Added Interface events to TreeView.
+
+2012-06-06 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed EditBox Search list to accept ENTER as a confirmation key.
    ! Fixed StatusBarPanel Text property compatibility with old Caption property.
    ! Hidden more private properties and methods.

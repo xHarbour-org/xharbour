@@ -134,6 +134,16 @@ METHOD Init( oParent ) CLASS TreeView
                             { "OnMouseMove"      , "", "" },;
                             { "OnRButtonDown"    , "", "" },;
                             { "OnRButtonUp"      , "", "" } } },;
+            {"Interface",   {;
+                            { "OnActivate"       , "", "" },;
+                            { "OnCreate"         , "", "" },;
+                            { "OnDestroy"        , "", "" },;
+                            { "OnEnable"         , "", "" },;
+                            { "OnHideWindow"     , "", "" },;
+                            { "OnKillFocus"      , "", "" },;
+                            { "OnSetFocus"       , "", "" },;
+                            { "OnShowWindow"     , "", "" },;
+                            { "OnUserMsg"        , "", "" } } },;
             {"Keyboard",    {;
                             { "OnChar"           , "", "" },;
                             { "OnChildChar"      , "", "" },;
@@ -147,7 +157,7 @@ METHOD Init( oParent ) CLASS TreeView
                             { "OnSysChar"        , "", "" },;
                             { "OnSysKeyDown"     , "", "" },;
                             { "OnSysKeyUp"       , "", "" } } },;
-            {"Notifications", {;
+          {"Notifications", {;
                             { "Click"            , "", "" },;
                             { "RightClick"       , "", "" },;
                             { "CustomDraw"       , "", "" },;
