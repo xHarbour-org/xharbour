@@ -145,6 +145,7 @@ CLASS SourceEditor INHERIT Control
    METHOD ToggleRectSel()
    METHOD GetWithObject()
    METHOD SetColors()
+   METHOD OnSetFocus()                    INLINE ::Application:MainForm:EnableSearchMenu( .T. ), NIL
 ENDCLASS
 
 METHOD ToggleBookmark() CLASS SourceEditor

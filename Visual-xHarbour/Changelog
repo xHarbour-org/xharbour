@@ -8,6 +8,10 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-08 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed Search menu not being enabled after auto-activating OnClick event.
+   ! Fixed Edit functions (Copy,Paste,etc) when editing a text property.
+
 2012-06-06 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    * Reverted changes to SetChildren since that was OK to be published by IntelliSense.
    + Added Interface events to TreeView.

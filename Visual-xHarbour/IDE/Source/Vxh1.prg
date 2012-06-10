@@ -340,6 +340,7 @@ CLASS IDE_MainForm FROM WinForm
    METHOD OnSetFocus()
    METHOD OnNCActivate(n) INLINE IIF( ::Application:Project:CurrentForm != NIL, (::CallWindowProc(), ::Application:Project:CurrentForm:InActive := n==0, IIF( n <> 0, ::Application:Project:CurrentForm:UpdateSelection(),), ::Application:Project:CurrentForm:RedrawWindow(,, RDW_FRAME|RDW_INVALIDATE|RDW_UPDATENOW ) ), ),  ::SetKeyStatus( VK_CAPITAL ), NIL
    METHOD OnNavigateError()
+   METHOD EnableSearchMenu()
 ENDCLASS
 
 METHOD OnNavigateError( Sender /*, pDisp, URL, Frame, StatusCode, Cancel*/ ) CLASS IDE_MainForm
@@ -790,7 +791,7 @@ METHOD Init() CLASS IDE_MainForm
             :ShortCutText     := "Ctrl+C"
             :ShortCutKey:Ctrl := .T.
             :ShortCutKey:Key  := ASC( "C" )
-            :Action           := {|o| IIF( o:Enabled, ::Application:Project:EditCopy(), ) }
+            :Action           := {|o| IIF( o:Enabled .OR. UPPER( GetClassName( GetFocus() ) ) == "EDIT", ::Application:Project:EditCopy(), ) }
             :Enabled          := .F.
             :Create()
          END
@@ -801,7 +802,7 @@ METHOD Init() CLASS IDE_MainForm
             :ShortCutText     := "Ctrl+X"
             :ShortCutKey:Ctrl := .T.
             :ShortCutKey:Key  := ASC( "X" )
-            :Action           := {|o| IIF( o:Enabled, ::Application:Project:EditCut(), ) }
+            :Action           := {|o| IIF( o:Enabled .OR. UPPER( GetClassName( GetFocus() ) ) == "EDIT", ::Application:Project:EditCut(), ) }
             :Enabled          := .F.
             :Create()
          END
@@ -812,7 +813,7 @@ METHOD Init() CLASS IDE_MainForm
             :ShortCutText     := "Ctrl+V"
             :ShortCutKey:Ctrl := .T.
             :ShortCutKey:Key  := ASC( "V" )
-            :Action           := {|o| IIF( o:Enabled, ::Application:Project:EditPaste(), ) }
+            :Action           := {|o| IIF( o:Enabled .OR. UPPER( GetClassName( GetFocus() ) ) == "EDIT", ::Application:Project:EditPaste(), ) }
             :Enabled          := .F.
             :Create()
          END
@@ -824,7 +825,7 @@ METHOD Init() CLASS IDE_MainForm
             :ShortCutKey:Alt  := .T.
             :ShortCutKey:Key  := VK_BACK
             :Enabled          := .F.
-            :Action           := {|o| IIF( o:Enabled, ::Application:Project:Undo(), ) }
+            :Action           := {|o| IIF( o:Enabled .OR. UPPER( GetClassName( GetFocus() ) ) == "EDIT", ::Application:Project:Undo(), ) }
             :Create()
          END
 
@@ -835,7 +836,7 @@ METHOD Init() CLASS IDE_MainForm
             :ShortCutKey:Ctrl := .T.
             :ShortCutKey:Key  := ASC( "Y" )
             :Enabled          := .F.
-            :Action           := {|o| IIF( o:Enabled, ::Application:Project:Redo(), ) }
+            :Action           := {|o| IIF( o:Enabled .OR. UPPER( GetClassName( GetFocus() ) ) == "EDIT", ::Application:Project:Redo(), ) }
             :Create()
          END
 
@@ -2008,19 +2009,7 @@ METHOD Init() CLASS IDE_MainForm
                         ::Application:Project:EditReset( IIF( y > 3, 1, 0 ) )
                         ::Application:MainForm:ToolBox1:Enabled       := y > 3
                         ::Application:ObjectTree:Enabled              := y > 3
-                        ::Application:Props:SearchGoto:Enabled        := ( y == 3 )
-                        ::Application:Props:TogBookmark:Enabled       := ( y == 3 )
-                        ::Application:Props:NextBookmark:Enabled      := ( y == 3 )
-                        ::Application:Props:PrevBookmark:Enabled      := ( y == 3 )
-                        ::Application:Props:ClearBookmark:Enabled     := ( y == 3 )
-                        ::Application:Props:WrapSearchItem:Enabled    := ( y == 3 )
-                        ::Application:Props:SearchReplaceItem:Enabled := ( y == 3 )
-                        ::Application:Props:SearchFindItem:Enabled    := ( y == 3 )
-                        ::Application:Props:EditUpperCase:Enabled     := ( y == 3 )
-                        ::Application:Props:EditLowerCase:Enabled     := ( y == 3 )
-                        ::Application:Props:EditInvCase:Enabled       := ( y == 3 )
-                        ::Application:Props:EditCapitalize:Enabled    := ( y == 3 )
-                        ::Application:Props:RectSelect:Enabled        := ( y == 3 )
+                        ::EnableSearchMenu( y == 3 )
                        >
       :Create()
 
@@ -2212,6 +2201,22 @@ METHOD Init() CLASS IDE_MainForm
                                   ,"Visual xHarbour Demo", MB_OK | MB_ICONINFORMATION )
    #endif
 
+RETURN Self
+
+METHOD EnableSearchMenu( lEnabled ) CLASS IDE_MainForm
+   ::Application:Props:SearchGoto:Enabled        := lEnabled
+   ::Application:Props:TogBookmark:Enabled       := lEnabled
+   ::Application:Props:NextBookmark:Enabled      := lEnabled
+   ::Application:Props:PrevBookmark:Enabled      := lEnabled
+   ::Application:Props:ClearBookmark:Enabled     := lEnabled
+   ::Application:Props:WrapSearchItem:Enabled    := lEnabled
+   ::Application:Props:SearchReplaceItem:Enabled := lEnabled
+   ::Application:Props:SearchFindItem:Enabled    := lEnabled
+   ::Application:Props:EditUpperCase:Enabled     := lEnabled
+   ::Application:Props:EditLowerCase:Enabled     := lEnabled
+   ::Application:Props:EditInvCase:Enabled       := lEnabled
+   ::Application:Props:EditCapitalize:Enabled    := lEnabled
+   ::Application:Props:RectSelect:Enabled        := lEnabled
 RETURN Self
 
 METHOD KeyHook( nCode, nwParam, nlParam ) CLASS IDE_MainForm
