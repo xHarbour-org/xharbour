@@ -33,21 +33,24 @@ CLASS MaskEdit INHERIT EditBox
    ACCESS PreBlock       INLINE ::oGet:preblock
    ASSIGN PreBlock(b)    INLINE ::oGet:preblock  := b
 
-   ACCESS PostBlock       INLINE ::oGet:postblock
-   ASSIGN PostBlock(b)    INLINE ::oGet:postblock  := b
+   ACCESS PostBlock      INLINE ::oGet:postblock
+   ASSIGN PostBlock(b)   INLINE ::oGet:postblock  := b
 
-   ACCESS Picture    INLINE ::oGet:picture
-   ASSIGN Picture(c) INLINE ::oGet:picture   := c
+   ACCESS Picture        INLINE ::oGet:picture
+   ASSIGN Picture(c)     INLINE ::oGet:picture   := c
 
 
    PROPERTY Picture         INDEX "Picture"             READ xPicture         WRITE SetGetProp     DEFAULT NIL PROTECTED
 
    METHOD SetGetProp()
 
-   ACCESS VarGet     INLINE ::oGet:VarGet()
+   ACCESS VarGet         INLINE ::oGet:VarGet()
 
-   ACCESS Caption    INLINE IIF( ::oGet != NIL, ::oGet:VarGet(), ::xCaption ) PERSISTENT
-   ASSIGN Caption(c) INLINE IIF( ::oGet != NIL, ( ::oGet:VarPut(c), ::oGet:updatebuffer(), ::SetWindowText( ::oGet:Buffer ) ), ::xCaption := c )
+   ACCESS xCaption       INLINE ::xText
+   ASSIGN xCaption(c)    INLINE ::xText := c
+
+   ACCESS Text           INLINE IIF( ::oGet != NIL, ::oGet:VarGet(), ::xText ) PERSISTENT
+   ASSIGN Text(c)        INLINE IIF( ::oGet != NIL, ( ::oGet:VarPut(c), ::oGet:updatebuffer(), ::SetWindowText( ::oGet:Buffer ) ), ::xText := c )
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -93,10 +96,10 @@ RETURN xVal
 METHOD Create() CLASS MaskEdit
    LOCAL aTextExt := ::Drawing:GetTextExtentPoint32( 'X' )
 
-   IF ::Caption == NIL
-      ::Caption := SPACE( ::Width / aTextExt[1] )
+   IF ::Text == NIL
+      ::Text := SPACE( ::Width / aTextExt[1] )
    ENDIF
-   ::oGet:cargo   := ::Caption
+   ::oGet:cargo   := ::Text
    ::oGet:Picture := ::Picture
    ::oGet:SetFocus()
    ::oGet:Clear   := .T.
@@ -109,11 +112,11 @@ METHOD Create() CLASS MaskEdit
 
    ::NoEdit := ::GetWindowLong( GWL_STYLE ) & ES_READONLY != 0
 
-   ::SendMessage( EM_LIMITTEXT, MAX( LEN( TRANSFORM( ::Caption, ::oGet:Picture ) ), LEN( ::oGet:buffer ) ) , 0 )
+   ::SendMessage( EM_LIMITTEXT, MAX( LEN( TRANSFORM( ::Text, ::oGet:Picture ) ), LEN( ::oGet:buffer ) ) , 0 )
 
    IF ::__ClassInst == NIL
       SetWindowText( ::hWnd, ::oGet:buffer )
-      //::Caption := ::oGet:buffer
+      //::Text := ::oGet:buffer
    ENDIF
    IF ValType( ::oGet:preblock ) == 'B' .AND. ! eval( ::oGet:preblock, Self, .F. )
       EnableWindow( ::hWnd, .F. )
@@ -165,7 +168,7 @@ METHOD OnUserMsg( hWnd, nMsg, nwParam ) CLASS MaskEdit
                     ENDIF
                     IF !( coldbuff == ::oGet:buffer )
                        SetWindowText( ::hWnd, ::oGet:buffer )
-                       //::Caption := ::oGet:buffer
+                       //::Text := ::oGet:buffer
                     ENDIF
 
                     IF !::IsValid
@@ -232,7 +235,7 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS MaskEdit
                     ::oGet:buffer:=dtoc(ctod( "" ))
                  ENDIF
                  SetWindowText( ::hWnd, ::oGet:buffer )
-                 //::Caption := ::oGet:buffer
+                 //::Text := ::oGet:buffer
                  cOldBuff := ::oGet:buffer
                  h:=GetFocus()
                  HideCaret(h)
@@ -252,7 +255,7 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS MaskEdit
                  ENDIF
                  IF !( cOldBuff == ::oGet:buffer )
                     SetWindowText( ::hWnd, ::oGet:buffer )
-                    //::Caption := ::oGet:buffer
+                    //::Text := ::oGet:buffer
                  ENDIF
                  ::InvalidateRect()
                  IF !::IsValid
@@ -310,7 +313,7 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS MaskEdit
                     ::oGet:buffer := dtoc(CTOD( "" ))
                  ENDIF
                  SetWindowText( ::hWnd, ::oGet:buffer )
-                 //::Caption := ::oGet:buffer
+                 //::Text := ::oGet:buffer
                  ::__Validate := .T.
                  ::SendMessage( WM_INVALID, nwParam, 0 )
                  ::InvalidateRect()
@@ -408,7 +411,7 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS MaskEdit
                  ENDIF
               ENDIF
               SetWindowText( ::hWnd, ::oGet:buffer )
-              //::Caption := ::oGet:buffer
+              //::Text := ::oGet:buffer
 
               ::SendMessage( EM_SETSEL, ( ::oGet:pos - 1 ) , ( ::oGet:pos - 1 ) )
               ::ScrollCaret()
@@ -471,7 +474,7 @@ METHOD OnChar( nwParam, nlParam ) CLASS MaskEdit
                  ::oGet:backspace()
               ENDIF
               SetWindowText( ::hWnd, ::oGet:buffer )
-              //::Caption := ::oGet:buffer
+              //::Text := ::oGet:buffer
               ::SendMessage( EM_SETSEL, ( ::oGet:pos - 1 ) , ( ::oGet:pos - 1 ) )
               ::ScrollCaret()
               RETURN 0
@@ -536,7 +539,7 @@ METHOD OnChar( nwParam, nlParam ) CLASS MaskEdit
               ENDIF
 
               SetWindowText( ::hWnd, ::oGet:buffer )
-              //::Caption := ::oGet:buffer
+              //::Text := ::oGet:buffer
               ::SendMessage( EM_SETSEL, ( ::oGet:pos - 1 ) , ( ::oGet:pos - 1 ) )
               ::ScrollCaret()
               RETURN 0
@@ -577,10 +580,10 @@ METHOD OnSetFocus() CLASS MaskEdit
 
    IF !( coldbuff == ::oGet:buffer )
       IF ::oGet:BadDate()
-         ::Caption := CTOD( "" )
+         ::Text := CTOD( "" )
       Else
          SetWindowText( ::hWnd, ::oGet:buffer )
-         //::Caption := ::oGet:buffer
+         //::Text := ::oGet:buffer
       ENDIF
    ENDIF
 
@@ -608,7 +611,7 @@ METHOD OnKillFocus( nwParam ) CLASS MaskEdit
       ::oget:buffer:=dtoc(ctod( "" ))
    ENDIF
    SetWindowText( ::hWnd, ::oGet:buffer )
-   //::Caption := ::oget:buffer
+   //::Text := ::oget:buffer
    IF ::__Validate
       IF ( ValType( ::oget:postblock ) == 'B' .OR. HGetPos( ::EventHandler, "Valid" ) != 0 ) .AND. !::lInValid .AND. ::TabValidate
          ::PostMessage( WM_INVALID, nwParam, 0 )
@@ -724,7 +727,7 @@ METHOD OnCut( nwParam, nlParam ) CLASS MaskEdit
       ENDIF
       ctempbuff := ::oget:buffer
       retval := CallWindowProc( ::__nproc, ::hWnd, WM_CUT, nwParam, nlParam )
-      ::Caption := ctempbuff
+      ::Text := ctempbuff
       ::SendMessage( EM_SETSEL, ( ::oget:pos - 1 ) , ( ::oget:pos - 1 ) )
     ELSE
       RETURN 0
