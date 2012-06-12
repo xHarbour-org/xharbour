@@ -98,13 +98,15 @@ RETURN Self
 
 METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
    LOCAL oChild, hFont, hMemDC1, hOldBitmap1, hBrush, hMemBitmap, hOldBitmap, rc := (struct RECT), rcalc := (struct RECT), sz := (struct SIZE)
+   LOCAL hParBrush := ::Parent:BkBrush
    IF !::IsWindow()
       RETURN 0
    ENDIF
    hBrush := ::BkBrush
    DEFAULT hBrush TO ::Parent:BkBrush
    DEFAULT hBrush TO ::__hBrush
-
+   DEFAULT hParBrush TO ::__hBrush
+   DEFAULT hParBrush TO GetSysColorBrush( COLOR_BTNFACE )
    rc:left   := 0
    rc:top    := 0
    rc:right  := ::Width
@@ -121,7 +123,17 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
          hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
          hOldBitmap := SelectObject( hMemDC, hMemBitmap)
          DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
+         FillRect( hMemDC, rc, hParBrush )
+         rc:top    := 9
+         rc:left   += 2
+         rc:right  -= 2
+         rc:bottom -= 2
          FillRect( hMemDC, rc, hBrush )
+   
+         rc:left   := 0
+         rc:top    := 0
+         rc:right  := ::Width
+         rc:bottom := ::Height
       ENDIF
    ENDIF
 
@@ -136,11 +148,11 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
       DrawEdge( hMemDC, rc, EDGE_ETCHED, BF_RECT )
    ENDIF
    rcalc:left   := 7
-   rcalc:top    := 0
+   rcalc:top    := 9
    rcalc:right  := sz:cx + 12
    rcalc:bottom := sz:cy
-   
    FillRect( hMemDC, rcalc, hBrush )
+   _FillRect( hMemDC, {rcalc:left,rcalc:top-9,rcalc:right,rcalc:top}, hParBrush )
 
    IF ::ForeColor != NIL
       SetTextColor( hMemDC, ::ForeColor )

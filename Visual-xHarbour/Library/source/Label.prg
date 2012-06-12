@@ -91,7 +91,7 @@ METHOD OnCtlColorStatic( nwParam ) CLASS Label
       SetTextColor( nwParam, ::ForeColor )
    ENDIF
 
-   IF ::__hBrush != NIL
+   IF ::__hBrush != NIL .AND. ::BkBrush == NIL
       SetBkMode( nwParam, TRANSPARENT )
       RETURN ::__hBrush
    ENDIF
@@ -101,9 +101,10 @@ METHOD OnCtlColorStatic( nwParam ) CLASS Label
       RETURN GetStockObject( NULL_BRUSH )
    ENDIF
 
-   IF hBkGnd != NIL .OR. ::Transparent
+   IF hBkGnd != NIL
       SetBkMode( nwParam, TRANSPARENT )
       RETURN hBkGnd
+
     ELSEIF ::ForeColor != NIL .AND. ::ForeColor != ::ForeSysColor
       SetBkMode( nwParam, TRANSPARENT )
       IF ::BackColor == ::BackSysColor
