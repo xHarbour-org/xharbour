@@ -54,7 +54,7 @@ CLASS MaskEdit INHERIT EditBox
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
-   METHOD OnGetDlgCode()
+   //METHOD OnGetDlgCode()
    METHOD OnUserMsg()
    METHOD OnUndo()
    METHOD OnKeyDown()
@@ -124,13 +124,14 @@ METHOD Create() CLASS MaskEdit
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
+/*
 METHOD OnGetDlgCode() CLASS MaskEdit
    LOCAL nRet
 //   IF ::wParam > 0
       nRet := DLGC_WANTMESSAGE | DLGC_WANTALLKEYS
 //   ENDIF
 RETURN nRet
-
+*/
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnUserMsg( hWnd, nMsg, nwParam ) CLASS MaskEdit

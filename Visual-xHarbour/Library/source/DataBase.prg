@@ -290,11 +290,12 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
       lChanged := LEN(::__aTmpStruct) <> LEN(::Structure) 
       IF ! lChanged
          FOR n := 1 TO LEN( ::__aTmpStruct )
-             IF ::__aTmpStruct[n][1] != ::Structure[n][1] .OR.;
-                ::__aTmpStruct[n][2] != ::Structure[n][2] .OR.;
-                ::__aTmpStruct[n][3] != ::Structure[n][3] .OR.;
-                ::__aTmpStruct[n][4] != ::Structure[n][4]
-                lChanged := .T.
+             lChanged := ::__aTmpStruct[n][1] != ::Structure[n][1] .OR.;
+                         ::__aTmpStruct[n][2] != ::Structure[n][2] .OR.;
+                         ::__aTmpStruct[n][3] != ::Structure[n][3] .OR.;
+                         ::__aTmpStruct[n][4] != ::Structure[n][4]
+             IF lChanged
+                EXIT
              ENDIF
          NEXT
       ENDIF
@@ -312,8 +313,10 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
             ENDIF
             ::Close()
             dbUseArea( ! ::__lMemory, ::Driver, cPath + "\__" + cFileName, "modstru", .F., .F. )
+
             SELECT "modstru"
             APPEND FROM (cPath + "\" + cFileName) VIA (::Driver)
+
             modstru->( dbCloseArea() )
             FERASE( cPath + "\" + cFileName )
             FRENAME( cPath + "\__" + cFileName, cPath + "\" + cFileName )
