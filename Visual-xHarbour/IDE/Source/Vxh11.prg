@@ -861,6 +861,7 @@ CLASS Source
    METHOD Load(cFile,cText) INLINE IIF( ! EMPTY(cFile), ::Open(cFile), ::SetText(cText) )
    METHOD GoLine(n)         INLINE ::GoToLine(n)
    METHOD Highlight()       INLINE ::HighlightedLine := ::GetCurLine()
+   METHOD SetDisplay()      INLINE ::Select()
    // --------------------------------------------------------------------------------------
 
    METHOD Init( oOwner, cFile ) CONSTRUCTOR
