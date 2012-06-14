@@ -33,7 +33,7 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 #define HKEY_LOCAL_MACHINE           (0x80000002)
 
 #define VXH_Version      "4"
-#define VXH_BuildVersion "Beta 3"
+#define VXH_BuildVersion "4.0.0"
 
 #define MCS_ARROW    10
 #define MCS_PASTE    11
@@ -6972,6 +6972,7 @@ METHOD OnInitDialog() CLASS AboutVXH
          :ForeColor      := C_GREY
          :Create()
       END
+      /*
       WITH OBJECT ( LABEL( :this ) )
          :Left           := 363
          :Top            := 61
@@ -6984,6 +6985,7 @@ METHOD OnInitDialog() CLASS AboutVXH
          :ForeColor      := C_DARKBLUE
          :Create()
       END
+      */
    END
 
    WITH OBJECT ( oBtn := Button( Self ) )
