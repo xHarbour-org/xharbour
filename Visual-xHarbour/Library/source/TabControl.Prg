@@ -1877,7 +1877,7 @@ CLASS TabStrip INHERIT TabControl
    DATA ItemHeight       EXPORTED INIT 19
    METHOD Init()  CONSTRUCTOR
    METHOD Create() 
-   METHOD OnWindowPaint()
+   METHOD OnPaint()
    METHOD DrawTabStripItem()
    METHOD __SetColorScheme()
    METHOD __GetGradienBrush()
@@ -1897,19 +1897,19 @@ METHOD Create() CLASS TabStrip
    ENDIF
 RETURN Self
 //-----------------------------------------------------------------------------------------------
-METHOD OnEraseBkGnd( hDC ) CLASS TabStrip
-   LOCAL hBrush := ::BkBrush
-   DEFAULT hBrush TO ::__hBrush
-   DEFAULT hBrush TO ::Parent:BkBrush
-   DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
-   IF hBrush != NIL
-      _FillRect( hDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
-   ENDIF
+METHOD OnEraseBkGnd( /*hDC*/ ) CLASS TabStrip
+//   LOCAL hBrush := ::BkBrush
+//   DEFAULT hBrush TO ::__hBrush
+//   DEFAULT hBrush TO ::Parent:BkBrush
+//   DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
+//   IF hBrush != NIL
+//      _FillRect( hDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
+//   ENDIF
 RETURN 1
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnWindowPaint() CLASS TabStrip
-   LOCAL hOldPen, aRect, nSel, aItem, hDC, cPaint, nItems, n, nColor
+METHOD OnPaint( hDC ) CLASS TabStrip
+   LOCAL hOldPen, aRect, nSel, aItem, nItems, n, nColor
    LOCAL hMemDC, hMemBitmap, hOldBitmap, hBrush//, hMemDC1, hOldBitmap1
 
    aRect := _GetClientRect( ::hWnd )
@@ -1917,7 +1917,6 @@ METHOD OnWindowPaint() CLASS TabStrip
    IF nSel == 0
       ::SetCurSel(1)
    ENDIF
-   hDC   := _BeginPaint( ::hWnd, @cPaint )
 
    hMemDC     := CreateCompatibleDC( hDC )
    hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
@@ -1979,8 +1978,6 @@ METHOD OnWindowPaint() CLASS TabStrip
    SelectObject( hMemDC, hOldBitmap )
    DeleteDC( hMemDC )
    DeleteObject( hMemBitmap )
-
-   _EndPaint( ::hWnd, cPaint)
 RETURN 0
 
 //-----------------------------------------------------------------------------------------------
