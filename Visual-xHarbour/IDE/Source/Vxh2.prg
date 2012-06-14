@@ -927,8 +927,8 @@ METHOD GetPoints( oControl, lPure, lMask, lConvert ) CLASS WindowEdit
       ENDIF
    ENDIF
 
-   aRect[1] := pt:x - IIF( oControl:hWnd != ::hWnd, oControl:Parent:HorzScrollPos, 0 )
-   aRect[2] := pt:y - IIF( oControl:hWnd != ::hWnd, oControl:Parent:VertScrollPos, 0 )
+   aRect[1] := pt:x - IIF( oControl:hWnd != ::hWnd, oControl:Parent:HorzScrollPos, ::Parent:HorzScrollPos )
+   aRect[2] := pt:y - IIF( oControl:hWnd != ::hWnd, oControl:Parent:VertScrollPos, ::Parent:VertScrollPos )
    aRect[3] := aRect[1] + oControl:Width
    aRect[4] := aRect[2] + oControl:Height
 
