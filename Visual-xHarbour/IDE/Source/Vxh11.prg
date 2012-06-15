@@ -566,7 +566,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                  ENDIF
                  aObj := hb_aTokens( cObj, ":" )
                  IF aObj[1] == "WinForm"
-                    oObj := WinForm() //::Source:Form
+                    oObj := ::Source:Form
                   ELSE
                     TRY
                        oObj := &(aObj[1])

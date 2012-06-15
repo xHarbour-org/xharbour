@@ -8,7 +8,10 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2013-06-12 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+2013-06-14 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed IntelliSense not showing the controls in the current form.
+
+2013-06-13 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed designer rectangle selection handlers position when scrolling current form.
    ! Fixed Flicker in TabStrip when moving its parent.
 
