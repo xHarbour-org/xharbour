@@ -70,7 +70,7 @@ int ZEXPORT compress (
     int iLevel )
 {
     return compress2(dest, destLen, source, sourceLen, iLevel );
-    // return compress2(dest, destLen, source, sourceLen, Z_DEFAULT_COMPRESSION);
+    /* return compress2(dest, destLen, source, sourceLen, Z_DEFAULT_COMPRESSION); */
 }
 
 /* ===========================================================================

@@ -234,7 +234,7 @@ local void send_bits(
 /* ===========================================================================
  * Initialize the various 'constant' tables.
  */
-local void tr_static_init()
+local void tr_static_init( void )
 {
 #if defined(GEN_TREES_H) || !defined(STDC)
     static int static_init_done = 0;

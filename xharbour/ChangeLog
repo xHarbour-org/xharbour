@@ -8,6 +8,59 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-16 06:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/zlib/adler32.c
+  * source/rtl/zlib/compress.c
+  * source/rtl/zlib/crc32.c
+  * source/rtl/zlib/crc32.h
+  * source/rtl/zlib/deflate.c
+  * source/rtl/zlib/deflate.h
+  * source/rtl/zlib/gzclose.c
+  * source/rtl/zlib/gzguts.h
+  * source/rtl/zlib/gzlib.c
+  * source/rtl/zlib/gzread.c
+  * source/rtl/zlib/gzwrite.c
+  * source/rtl/zlib/infback.c
+  * source/rtl/zlib/inffast.c
+  * source/rtl/zlib/inffast.h
+  * source/rtl/zlib/inffixed.h
+  * source/rtl/zlib/inflate.c
+  * source/rtl/zlib/inflate.h
+  * source/rtl/zlib/inftrees.c
+  * source/rtl/zlib/inftrees.h
+  * source/rtl/zlib/trees.c
+  * source/rtl/zlib/trees.h
+  * source/rtl/zlib/uncompr.c
+  * source/rtl/zlib/zconf.h
+  * source/rtl/zlib/zlib.h
+  * source/rtl/zlib/zutil.c
+  * source/rtl/zlib/zutil.h
+    ! updated to version 1.27
+
+  * contrib/png/png.c
+  * contrib/png/png.h
+  * contrib/png/pngconf.h
+  * contrib/png/pngdebug.h
+  * contrib/png/pngerror.c
+  * contrib/png/pngget.c
+  * contrib/png/pnginfo.h
+  * contrib/png/pnglibconf.h
+  * contrib/png/pngmem.c
+  * contrib/png/pngpread.c
+  * contrib/png/pngpriv.h
+  * contrib/png/pngread.c
+  * contrib/png/pngrio.c
+  * contrib/png/pngrtran.c
+  * contrib/png/pngrutil.c
+  * contrib/png/pngset.c
+  * contrib/png/pngstruct.h
+  * contrib/png/pngtrans.c
+  * contrib/png/pngwio.c
+  * contrib/png/pngwrite.c
+  * contrib/png/pngwtran.c
+  * contrib/png/pngwutil.c
+    ! updated to version 1.5.11
+
 2012-05-24 08:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/tip/mail.prg
     ! fixed getFileName() method to include "Content-Disposition" as 

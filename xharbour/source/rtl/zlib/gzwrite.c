@@ -7,12 +7,6 @@
  */
 
 #include "gzguts.h"
-#ifdef __TURBOC__
-#include "io.h"
-#endif
-#if defined( _MSC_VER )
-#include "io.h"
-#endif
 
 /* Local functions */
 local int gz_init OF((gz_statep));
@@ -28,7 +22,7 @@ local int gz_init(
     z_streamp strm = &(state->strm);
 
     /* allocate input buffer */
-    state->in = (unsigned char*) malloc(state->want);
+    state->in = (unsigned char*)malloc(state->want);
     if (state->in == NULL) {
         gz_error(state, Z_MEM_ERROR, "out of memory");
         return -1;
@@ -37,7 +31,7 @@ local int gz_init(
     /* only need output buffer and deflate state if compressing */
     if (!state->direct) {
         /* allocate output buffer */
-        state->out = (unsigned char*) malloc(state->want);
+        state->out = (unsigned char*)malloc(state->want);
         if (state->out == NULL) {
             free(state->in);
             gz_error(state, Z_MEM_ERROR, "out of memory");
@@ -238,8 +232,7 @@ int ZEXPORT gzwrite(
 
         /* directly compress user buffer to file */
         strm->avail_in = len;
-        /* trm->next_in = (voidp)buf; */
-        strm->next_in = (Bytef *)buf;
+        strm->next_in = (Bytef*)buf;
         state->x.pos += len;
         if (gz_comp(state, Z_NO_FLUSH) == -1)
             return 0;
@@ -348,19 +341,19 @@ int ZEXPORTVA gzprintf (gzFile file, const char *format, ...)
     va_start(va, format);
 #ifdef NO_vsnprintf
 #  ifdef HAS_vsprintf_void
-    (void)vsprintf(state->in, format, va);
+    (void)vsprintf((char *)(state->in), format, va);
     va_end(va);
     for (len = 0; len < size; len++)
         if (state->in[len] == 0) break;
 #  else
-    len = vsprintf(state->in, format, va);
+    len = vsprintf((char *)(state->in), format, va);
     va_end(va);
 #  endif
 #else
 #  ifdef HAS_vsnprintf_void
-    (void)vsnprintf(state->in, size, format, va);
+    (void)vsnprintf((char *)(state->in), size, format, va);
     va_end(va);
-    len = strlen(state->in);
+    len = strlen((char *)(state->in));
 #  else
     len = vsnprintf((char *)(state->in), size, format, va);
     va_end(va);
@@ -385,7 +378,7 @@ int ZEXPORTVA gzprintf (
     gzFile file,
     const char *format,
     int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10,
-        int a11, int a12, int a13, int a14, int a15, int a16, int a17, int a18, int a19, int a20)
+    int a11, int a12, int a13, int a14, int a15, int a16, int a17, int a18, int a19, int a20)
 {
     int size, len;
     gz_statep state;
@@ -425,22 +418,23 @@ int ZEXPORTVA gzprintf (
     state->in[size - 1] = 0;
 #ifdef NO_snprintf
 #  ifdef HAS_sprintf_void
-    sprintf(state->in, format, a1, a2, a3, a4, a5, a6, a7, a8,
+    sprintf((char *)(state->in), format, a1, a2, a3, a4, a5, a6, a7, a8,
             a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20);
     for (len = 0; len < size; len++)
         if (state->in[len] == 0) break;
 #  else
-    len = sprintf(state->in, format, a1, a2, a3, a4, a5, a6, a7, a8,
-                a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20);
+    len = sprintf((char *)(state->in), format, a1, a2, a3, a4, a5, a6, a7, a8,
+                  a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20);
 #  endif
 #else
 #  ifdef HAS_snprintf_void
-    snprintf(state->in, size, format, a1, a2, a3, a4, a5, a6, a7, a8,
+    snprintf((char *)(state->in), size, format, a1, a2, a3, a4, a5, a6, a7, a8,
              a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20);
-    len = strlen(state->in);
+    len = strlen((char *)(state->in));
 #  else
-    len = snprintf(state->in, size, format, a1, a2, a3, a4, a5, a6, a7, a8,
-                 a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20);
+    len = snprintf((char *)(state->in), size, format, a1, a2, a3, a4, a5, a6,
+                   a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18,
+                   a19, a20);
 #  endif
 #endif
 
@@ -533,7 +527,7 @@ int ZEXPORT gzsetparams(
 
 /* -- see zlib.h -- */
 int ZEXPORT gzclose_w(
-    gzFile file)
+    gzFile file )
 {
     int ret = Z_OK;
     gz_statep state;
@@ -555,48 +549,19 @@ int ZEXPORT gzclose_w(
     }
 
     /* flush, free memory, and close file */
-    if (gz_comp(state, Z_FINISH) == -1)
-        ret = state->err;
-    if (!state->direct) {
-        (void)deflateEnd(&(state->strm));
-        free(state->out);
+    if (state->size) {
+        if (gz_comp(state, Z_FINISH) == -1)
+            ret = state->err;
+        if (!state->direct) {
+            (void)deflateEnd(&(state->strm));
+            free(state->out);
+        }
+        free(state->in);
     }
-    free(state->in);
     gz_error(state, Z_OK, NULL);
     free(state->path);
     if (close(state->fd) == -1)
         ret = Z_ERRNO;
     free(state);
     return ret;
-}
-
-/* used by zlibVersion() to get the vsnprintf story from the horse's mouth */
-unsigned long ZEXPORT gzflags()
-{
-    unsigned long flags = 0;
-#if defined(STDC) || defined(Z_HAVE_STDARG_H)
-#  ifdef NO_vsnprintf
-    flags += 1L << 25;
-#    ifdef HAS_vsprintf_void
-    flags += 1L << 26;
-#    endif
-#  else
-#    ifdef HAS_vsnprintf_void
-    flags += 1L << 26;
-#    endif
-#  endif
-#else
-    flags += 1L << 24;
-#  ifdef NO_snprintf
-    flags += 1L << 25;
-#    ifdef HAS_sprintf_void
-    flags += 1L << 26;
-#    endif
-#  else
-#    ifdef HAS_snprintf_void
-    flags += 1L << 26;
-#    endif
-#  endif
-#endif
-    return flags;
 }

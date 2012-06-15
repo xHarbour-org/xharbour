@@ -1,9 +1,8 @@
 /*
  * $Id$
  */
-
 /* zutil.h -- internal interface and configuration of the compression library
- * Copyright (C) 1995-2011 Jean-loup Gailly.
+ * Copyright (C) 1995-2012 Jean-loup Gailly.
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
@@ -17,7 +16,7 @@
 #ifndef ZUTIL_H
 #define ZUTIL_H
 
-#if ((__GNUC__-0) * 10 + __GNUC_MINOR__-0 >= 33) && !defined(NO_VIZ)
+#ifdef HAVE_HIDDEN
 #  define ZLIB_INTERNAL __attribute__((visibility ("hidden")))
 #else
 #  define ZLIB_INTERNAL
@@ -153,9 +152,7 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #  define fdopen(fd,mode) NULL /* No fdopen() */
 #endif
 
-#if defined( __XCC__ )
-#  define fdopen(fd,mode) NULL /* No fdopen() */
-#elif (defined(_MSC_VER) && (_MSC_VER > 600)) && !defined __INTERIX
+#if (defined(_MSC_VER) && (_MSC_VER > 600)) && !defined __INTERIX
 #  if defined(_WIN32_WCE)
 #    define fdopen(fd,mode) NULL /* No fdopen() */
 #    ifndef _PTRDIFF_T_DEFINED
@@ -171,6 +168,7 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
   #pragma warn -8004
   #pragma warn -8008
   #pragma warn -8066
+  #pragma warn -8012
 #endif
 
 /* provide prototypes for these when building zlib without LFS */
@@ -250,5 +248,9 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
            (*((strm)->zalloc))((strm)->opaque, (items), (size))
 #define ZFREE(strm, addr)  (*((strm)->zfree))((strm)->opaque, (voidpf)(addr))
 #define TRY_FREE(s, p) {if (p) ZFREE(s, p);}
+
+/* Reverse the bytes in a 32-bit value */
+#define ZSWAP32(q) ((((q) >> 24) & 0xff) + (((q) >> 8) & 0xff00) + \
+                    (((q) & 0xff00) << 8) + (((q) & 0xff) << 24))
 
 #endif /* ZUTIL_H */

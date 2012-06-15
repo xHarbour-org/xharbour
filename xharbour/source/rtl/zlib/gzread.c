@@ -2,17 +2,11 @@
  * $Id$
  */
 /* gzread.c -- zlib functions for reading gzip files
- * Copyright (C) 2004, 2005, 2010, 2011 Mark Adler
+ * Copyright (C) 2004, 2005, 2010, 2011, 2012 Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
 #include "gzguts.h"
-#ifdef __TURBOC__
-#include "io.h"
-#endif
-#if defined( _MSC_VER )
-#include "io.h"
-#endif
 
 /* Local functions */
 local int gz_load OF((gz_statep, unsigned char *, unsigned, unsigned *));
@@ -66,8 +60,13 @@ local int gz_avail(
     if (state->err != Z_OK && state->err != Z_BUF_ERROR)
         return -1;
     if (state->eof == 0) {
-        if (strm->avail_in)
-            memmove(state->in, strm->next_in, strm->avail_in);
+        if (strm->avail_in) {       /* copy what's there to the start */
+            unsigned char *p = state->in, *q = strm->next_in;
+            unsigned n = strm->avail_in;
+            do {
+                *p++ = *q++;
+            } while (--n);
+        }
         if (gz_load(state, state->in + strm->avail_in,
                     state->size - strm->avail_in, &got) == -1)
             return -1;
@@ -94,8 +93,8 @@ local int gz_look(
     /* allocate read buffers and inflate memory */
     if (state->size == 0) {
         /* allocate buffers */
-        state->in = (unsigned char *)malloc(state->want);
-        state->out = (unsigned char *)malloc(state->want << 1);
+        state->in = (unsigned char*)malloc(state->want);
+        state->out = (unsigned char*)malloc(state->want << 1);
         if (state->in == NULL || state->out == NULL) {
             if (state->out != NULL)
                 free(state->out);
@@ -173,7 +172,7 @@ local int gz_look(
    the next gzip stream or raw data, once state->x.have is depleted.  Returns 0
    on success, -1 on failure. */
 local int gz_decomp(
-    gz_statep state)
+    gz_statep state )
 {
     int ret = Z_OK;
     unsigned had;
@@ -227,7 +226,7 @@ local int gz_decomp(
    otherwise 0.  gz_fetch() will leave state->how as COPY or GZIP unless the
    end of the input file has been reached and all data has been processed.  */
 local int gz_fetch(
-    gz_statep state)
+    gz_statep state )
 {
     z_streamp strm = &(state->strm);
 
@@ -349,21 +348,21 @@ int ZEXPORT gzread(
             /* get more output, looking for header if required */
             if (gz_fetch(state) == -1)
                 return -1;
-            continue;       /* no progress yet -- go back to memcpy() above */
+            continue;       /* no progress yet -- go back to copy above */
             /* the copy above assures that we will leave with space in the
                output buffer, allowing at least one gzungetc() to succeed */
         }
 
         /* large len -- read directly into user buffer */
         else if (state->how == COPY) {      /* read directly */
-            if (gz_load(state, (unsigned char *)buf, len, &n) == -1)
+            if (gz_load(state, (unsigned char*)buf, len, &n) == -1)
                 return -1;
         }
 
         /* large len -- decompress directly into user buffer */
         else {  /* state->how == GZIP */
             strm->avail_out = len;
-            strm->next_out = (Bytef *)buf;
+            strm->next_out = (Bytef*)buf;
             if (gz_decomp(state) == -1)
                 return -1;
             n = state->x.have;
@@ -382,7 +381,8 @@ int ZEXPORT gzread(
 }
 
 /* -- see zlib.h -- */
-int ZEXPORT gzgetc_(
+#undef gzgetc
+int ZEXPORT gzgetc(
     gzFile file)
 {
     int ret;
@@ -411,11 +411,10 @@ int ZEXPORT gzgetc_(
     return ret < 1 ? -1 : buf[0];
 }
 
-#undef gzgetc
-int ZEXPORT gzgetc(
+int ZEXPORT gzgetc_(
 gzFile file)
 {
-    return gzgetc_(file);
+    return gzgetc(file);
 }
 
 /* -- see zlib.h -- */
@@ -522,7 +521,7 @@ char * ZEXPORT gzgets(
 
         /* look for end-of-line in current output buffer */
         n = state->x.have > left ? left : state->x.have;
-        eol = (unsigned char *)memchr(state->x.next, '\n', n);
+        eol = (unsigned char*)memchr(state->x.next, '\n', n);
         if (eol != NULL)
             n = (unsigned)(eol - state->x.next) + 1;
 
