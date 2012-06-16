@@ -10,11 +10,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "hbapifs.h"
+#include "hbapi.h"
+// #include "hbapifs.h"
 #include "hbzlib.h"
 #include "ioapi.h"
-
-
 
 /* I've found an old Unix (a SunOS 4.1.3_U1) without all SEEK_* defined.... */
 

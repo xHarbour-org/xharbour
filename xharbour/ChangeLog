@@ -8,7 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2012-06-16 11:52 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+2012-06-16 11:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * ChangeLog
+    ! error typo in time of previous commit: 11:52 -> 10:52
+
+  * contrib/hbmzip/ioapi.c
+    ! hbapifs.h -> hbapi.h, to enable compilation with BCC 6.4
+
+2012-06-16 10:52 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbzlib/ziparchive.cpp
   * contrib/hbzlib/include/ziparchive.h
     ! functions prototypes to be in accordance with zlib v. 1.27
