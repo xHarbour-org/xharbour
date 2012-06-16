@@ -1265,7 +1265,7 @@ public:
 	\return	the pointer to the static CRC table in the zlib library
 
 */
-	static const DWORD* GetCRCTable()
+	static const z_crc_t* GetCRCTable()
 	{
 			return get_crc_table();
 	}

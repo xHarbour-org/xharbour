@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-16 11:52 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbzlib/ziparchive.cpp
+  * contrib/hbzlib/include/ziparchive.h
+    ! functions prototypes to be in accordance with zlib v. 1.27
+
+  * contrib/hbmzip/zip.c
+  * contrib/hbmzip/unzip.c
+  * contrib/hbmzip/hbmzip.c
+    ! castings
+
 2012-06-16 08:25 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/harbour.c
   * contrib/sevenzip/sevenzip.c

@@ -1966,7 +1966,7 @@ CZipString CZipArchive::GetPassword()const
 
 DWORD CZipArchive::CryptCRC32(DWORD l, char c)
 {
-	const DWORD *CRC_TABLE = get_crc_table();
+	const z_crc_t *CRC_TABLE = get_crc_table();
 	return CRC_TABLE[(l ^ c) & 0xff] ^ (l >> 8);
 }
 
