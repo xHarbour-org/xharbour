@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-16 11:17 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbmzip/ioapi.c
+    + #include "hbapifs.h" after "hbapi.h"
+
 2012-06-16 11:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * ChangeLog
     ! error typo in time of previous commit: 11:52 -> 10:52
