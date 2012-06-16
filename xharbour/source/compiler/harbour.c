@@ -2908,7 +2908,7 @@ void hb_compNOOPadd( PFUNCTION pFunc, ULONG ulPos )
    }
 }
 
-void hb_compPrepareOptimize()
+void hb_compPrepareOptimize( void )
 {
    if( HB_COMP_ISSUPPORTED(HB_COMPFLAG_OPTJUMP) )
    {
@@ -5013,7 +5013,7 @@ void hb_compFieldSetAlias( char * szAlias, int iField )
 /* This functions counts the number of FIELD declaration in a function
  * We will required this information in hb_compFieldSetAlias function
  */
-int hb_compFieldsCount()
+int hb_compFieldsCount( void )
 {
    int iFields = 0;
    PVAR pVar = hb_comp_functions.pLast->pFields;
@@ -5173,7 +5173,7 @@ static void hb_compLineNumberDefEnd( void )
 /*
  * Start a new fake-function that will hold pcodes for a codeblock
  */
-void hb_compCodeBlockStart()
+void hb_compCodeBlockStart( void )
 {
    PFUNCTION pBlock;
 

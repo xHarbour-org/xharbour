@@ -120,7 +120,7 @@ HB_FUNC( INIT7ZIPDLL )
 }
 
 //------------------------------------------------------------------------------
-UINT hb_7zipmessage()
+UINT hb_7zipmessage( void )
 {
    return s_7ZipWindowMessage;
 }
