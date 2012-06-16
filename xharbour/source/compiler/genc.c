@@ -1833,7 +1833,7 @@ static void hb_compGenCCheckInLineStatic( const char *sInline )
 /*
   Grab the content of in-line-c codes to be parse for function names
 */
-static void hb_compGenCInLineSymbol()
+static void hb_compGenCInLineSymbol( void )
 {
    PINLINE pInline = hb_comp_inlines.pFirst;
 

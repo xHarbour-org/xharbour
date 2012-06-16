@@ -75,6 +75,10 @@
 #include <ole2.h>
 #include <oleauto.h>
 
+#if defined( __POCC__ )
+   #include "wchar.h"
+#endif
+
 #ifndef __MINGW32__
    // Missing in Mingw V 2.
    //#include <OleDB.h>

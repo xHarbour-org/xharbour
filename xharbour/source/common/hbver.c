@@ -1009,7 +1009,7 @@ char *hb_verBuildInfo( BOOL bOut )
 
 }
 
-char * hb_builddate()
+char * hb_builddate( void )
 {
    char* sz_Date = (char* ) hb_xgrab( 64 );
    hb_xmemset( sz_Date, '\0', 64 );
@@ -1018,7 +1018,7 @@ char * hb_builddate()
    return  sz_Date;
 }
 
-char *hb_credits()
+char *hb_credits( void )
 {
    char *szCredits =
           "Alejandro de Garate <alex_degarate@hotmail.com>\n"

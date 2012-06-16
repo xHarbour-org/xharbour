@@ -94,14 +94,14 @@ HB_HASH_FUNC( hb_comp_IdentComp )
 }
 
 /* initialize the hash table for identifiers */
-void hb_compIdentifierOpen( )
+void hb_compIdentifierOpen( void )
 {
    s_comp_Identifiers = hb_hashTableCreate( HB_IDENT_TABLE_SIZE, hb_comp_IdentKey,
                            hb_comp_IdentDel, hb_comp_IdentComp );
 }
 
 /* release identifiers table */
-void hb_compIdentifierClose( )
+void hb_compIdentifierClose( void )
 {
    hb_hashTableKill( s_comp_Identifiers );
 }

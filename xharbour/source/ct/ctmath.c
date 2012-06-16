@@ -58,13 +58,13 @@
 /* ---------------- */
 /*  initialization  */
 /* ---------------- */
-int ct_math_init()
+int ct_math_init( void )
 {
   HB_TRACE(HB_TR_DEBUG, ("ct_math_init()"));
   return (1);
 }
 
-int ct_math_exit()
+int ct_math_exit( void )
 {
   HB_TRACE(HB_TR_DEBUG, ("ct_math_exit()"));
   return (1);

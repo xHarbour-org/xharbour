@@ -56,6 +56,10 @@
 #define HB_OS_WIN_USED
 #include "hbgtcore.h"
 
+#if defined( __POCC__ )
+#include "wchar.h"
+#endif
+
 /* TODO: add protection for MT mode */
 static char *     s_szClipboardData;
 static ULONG      s_ulClipboardLen;

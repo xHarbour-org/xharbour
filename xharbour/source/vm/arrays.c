@@ -2258,7 +2258,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
    }
 #endif
 
-int hb_arrayMode()
+int hb_arrayMode( void )
 {
    #ifdef HB_ARRAY_USE_COUNTER
       return 0;

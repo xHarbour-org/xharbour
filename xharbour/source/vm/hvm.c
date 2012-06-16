@@ -11937,7 +11937,7 @@ static BOOL hb_xvmActionRequest( void )
    return FALSE;
 }
 
-void hb_xvmExitProc()
+void hb_xvmExitProc( void )
 {
    HB_THREAD_STUB_STACK
 

@@ -2216,7 +2216,7 @@ static void mxml_refill_from_handle_func( MXML_REFIL *ref )
 * Creates a new self growing string, with buffer set to
 * minimal buffer length
 */
-static MXML_SGS *mxml_sgs_new()
+static MXML_SGS *mxml_sgs_new( void )
 {
    MXML_SGS * ret = (MXML_SGS* ) MXML_ALLOCATOR( sizeof( MXML_SGS ) );
 

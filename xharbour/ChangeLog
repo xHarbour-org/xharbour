@@ -8,6 +8,26 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-16 07:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/gtclip.c
+  * source/rtl/hbwinole.c
+    + #include "wchar.h" for wcslen() -> to pacify PellesC 7 warnings
+
+  * source/common/hbver.c
+  * source/compiler/hbident.c
+  * source/compiler/genc.c
+  * source/vm/hvm.c
+  * source/vm/arrays.c
+  * source/vm/dlmalloc.c
+  * source/rtl/hbrandom.c
+  * source/rtl/hbserv.c
+  * source/rtl/hbxml.c
+  * source/rtl/session.c
+  * source/ct/ctmath.c
+  * contrib/libnf/dispc.c
+  * contrib/libnf/fttext.c
+    ! pacify PellesC 7 warnings eg. function() -> function( void )
+
 2012-06-16 06:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/zlib/adler32.c
   * source/rtl/zlib/compress.c

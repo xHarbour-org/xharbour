@@ -51,10 +51,8 @@
  *
  */
 
-
 /* NOTE: we need this to prevent base types redefinition */
 #define _CLIPDEFS_H
-
 
 #include "hbdefs.h"
 #include "hbapi.h"
@@ -111,8 +109,7 @@ char *buffer;               /* file buffer pointer                 */
 char *lbuff;                /* line buffer pointer                 */
 char *vseg;                 /* video segment variable              */
 
-    /* prototypes */
-
+/* prototypes */
 
 static int           keyin(void);
 static void          chattr(int x, int y, int len, int attr);
@@ -127,8 +124,6 @@ static void          lineup(void);
 static void          filetop(void);
 static void          filebot(void);
 static void          strcpyn(char *dest, const char *source, int len);
-
-
 
 /*
  * chattr() replace the color attribute with a new one starting at
@@ -147,9 +142,6 @@ static void chattr(int x, int y, int len, int attr)
     for (i = 0; i <= len; i++, vmem += 2)   /* write the new attribute value */
         *vmem = (char) attr;
 }
-
-
-
 
 /*
  * function getblock() reads the text file and returns the a block.
@@ -197,18 +189,13 @@ static long getblock(long offset)
     return( hb_fsSeek( infile, 0L, FS_RELATIVE ) - buffbot);
 }
 
-
-
-
-
-
 /*
  * buff_align makes sure the buffer top and bottom variables point
  * to actual complete lines of text.
  *
  */
 
-static void buff_align()
+static void buff_align( void )
 {
     int i;
 
@@ -253,10 +240,6 @@ static void buff_align()
     }
 }
 
-
-
-
-
 /*
  * win_align takes the value for wintop and then figures out where
  * winbot would be.  if winbot would extend past the end of the
@@ -265,7 +248,7 @@ static void buff_align()
  *
  */
 
-static void win_align()
+static void win_align( void )
 {
     int i;
 
@@ -299,10 +282,6 @@ static void win_align()
             wintop += 2;
     }
 }
-
-
-
-
 
 /*
  * this routine displays the actual text in the window.  This is done
@@ -367,10 +346,6 @@ static void disp_update(int offset)
     hb_gtRest( sline, scol, eline, ecol, vseg );
 }
 
-
-
-
-
 /*
  * move the window pointers so that a new window's worth of information
  * is visible.  it adjusts the pointers within the buffer and if necessary
@@ -378,7 +353,7 @@ static void disp_update(int offset)
  *
  */
 
-static void winup()
+static void winup( void )
 {
     int  k;
     long i, j;
@@ -418,10 +393,6 @@ static void winup()
         }
 }
 
-
-
-
-
 /*
  * move the window pointers so that a new window's worth of information
  * is visible.  it adjusts the pointers within the buffer and if necessary
@@ -429,7 +400,7 @@ static void winup()
  *
  */
 
-static void windown()
+static void windown( void )
 {
     int  k;
     long i, j;
@@ -471,13 +442,9 @@ static void windown()
         }
 }
 
-
-
-
-
 /* move the cursor one line down */
 
-static void linedown()
+static void linedown( void )
 {
     if ( winrow < eline )       /* if cursor not at last line */
         winrow += 1;
@@ -485,13 +452,9 @@ static void linedown()
         windown();
 }
 
-
-
-
-
 /* move the cursor one line up */
 
-static void lineup()
+static void lineup( void )
 {
     if ( winrow > sline )
         winrow -= 1;
@@ -499,13 +462,9 @@ static void lineup()
         winup();
 }
 
-
-
-
-
 /* go to the top of the file */
 
-static void filetop()
+static void filetop( void )
 {
     if ( buffoffset != 0 )
     {
@@ -522,13 +481,9 @@ static void filetop()
     win_align();
 }
 
-
-
-
-
 /* goto the bottom of the file */
 
-static void filebot()
+static void filebot( void )
 {
     if ( (((long) buffbot) + buffoffset) < fsize && fsize > buffsize )
     {
@@ -544,7 +499,6 @@ static void filebot()
 
     win_align();
 }
-
 
 HB_FUNC( _FT_DFINIT )
 {
@@ -896,8 +850,6 @@ HB_FUNC( FT_DISPFILE )
        hb_retni( ch );
 }
 
-
-
 /*
  *  keyin() gets the next key typed and does any translation needed.
  *  Some keys are converted to a common name - like the up arrow is
@@ -908,7 +860,7 @@ HB_FUNC( FT_DISPFILE )
  *
  */
 
-static int keyin()
+static int keyin( void )
 {
     return hb_inkey( TRUE, 0.0, INKEY_ALL );
 }

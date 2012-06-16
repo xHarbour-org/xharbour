@@ -128,7 +128,7 @@ HB_FUNC( HB_RANDOMSEED )
 }
 
 /* Returns a double value between 0 and 1 */
-double hb_random_num()
+double hb_random_num( void )
 {
    double d1, d2;
 

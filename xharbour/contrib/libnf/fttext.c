@@ -1119,7 +1119,7 @@ static PFT_FFILE ft_fseekAlias( int iSeek )
 }
 
 //------------------------------------------------------------------------------
-static BOOL ft_fseekActive()
+static BOOL ft_fseekActive( void )
 {
    BOOL bFound = FALSE;
 

@@ -718,7 +718,8 @@ static int s_translateSignal( UINT sig, UINT subsig )
 * Initializes signal handler system
 */
 
-static void s_signalHandlersInit()
+static void s_signalHandlersInit( void )
+        )
 {
    #if defined( HB_THREAD_SUPPORT ) && ( defined( HB_OS_UNIX ) || defined( HB_OS_UNIX ) )
       pthread_t res;
@@ -813,7 +814,7 @@ HB_FUNC( HB_STARTSERVICE )
 * Been called. C version useful for internal api
 */
 
-BOOL hb_isService()
+BOOL hb_isService( void )
 {
    return sb_isService;
 }
@@ -823,7 +824,7 @@ BOOL hb_isService()
 * Called from hb_vmQuit()
 */
 
-void hb_serviceExit()
+void hb_serviceExit( void )
 {
    if( sp_hooks != NULL )
    {

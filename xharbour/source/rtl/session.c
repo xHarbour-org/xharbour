@@ -169,13 +169,13 @@ BOOL hb_sessionRegister( PHB_SESSION session )
 HB_FUNC( HB_SESSIONNEW )
 {
    PHB_SESSION session = ( PHB_SESSION ) hb_xalloc( sizeof( PHB_SESSION ) );
-   
+
    session->id = 0;
    if( ISCHAR( 1 ) )
       session->username = hb_parc( 1 );
    else
       session->username = "XHARBOUR";
-      
+
    hb_retl( hb_sessionRegister( session ) );
 }
 
@@ -198,3 +198,4 @@ HB_FUNC( HB_SETSESSION )
 {
    HB_FUNC_EXEC( HB_SESSIONSELECT );
 }
+
