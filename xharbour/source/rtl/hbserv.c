@@ -719,7 +719,6 @@ static int s_translateSignal( UINT sig, UINT subsig )
 */
 
 static void s_signalHandlersInit( void )
-        )
 {
    #if defined( HB_THREAD_SUPPORT ) && ( defined( HB_OS_UNIX ) || defined( HB_OS_UNIX ) )
       pthread_t res;
