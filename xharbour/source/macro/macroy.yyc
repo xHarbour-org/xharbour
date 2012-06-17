@@ -158,6 +158,17 @@
 /* to pacify some warnings in BCC */
 #if defined( __BORLANDC__ ) && !defined( __STDC__ )
 #  define __STDC__
+   #if defined( __BORLANDC__ )
+      #pragma warn -aus
+      #pragma warn -ccc
+      #pragma warn -rch
+   #endif
+#endif
+
+#if defined( __BORLANDC__ )
+   #pragma warn -aus
+   #pragma warn -ccc
+   #pragma warn -rch
 #endif
 
 /* NOTE: these symbols are used internally in bison.simple
