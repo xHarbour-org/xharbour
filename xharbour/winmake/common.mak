@@ -47,6 +47,7 @@ MISC_DIR      =source$(DIR_SEP)misc
 TIP_DIR       =source$(DIR_SEP)tip
 ODBC_DIR      =source$(DIR_SEP)odbc
 
+HBSQLIT3_DIR  =contrib$(DIR_SEP)hbsqlit3
 SEVENZIP_DIR  =contrib$(DIR_SEP)sevenzip
 HBHPDF_DIR    =contrib$(DIR_SEP)hbhpdf
 PNG_DIR       =contrib$(DIR_SEP)png
@@ -76,6 +77,7 @@ INCLUDE_DIR2  =include
 #===============================================================================
 # Macros For Standard Libraries
 #===============================================================================
+HBSQLIT3_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbsqlit3$(LIBEXT)
 SEVENZIP_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sevenzip$(LIBEXT)
 COMPILER_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)compiler$(LIBEXT)
 COMMON_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)common$(LIBEXT)
@@ -207,6 +209,14 @@ HARBOUR_LIBS=\
 #===============================================================================
 # List Of Library and Executable Dependencies
 #===============================================================================
+
+#===============================================================================
+# HBSQLIT3.LIB rules
+#===============================================================================
+HBSQLIT3_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)sqlite3$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)strapi$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xhbsqlite3$(OBJEXT)
 
 #===============================================================================
 # SEVENZIP.LIB rules
@@ -1934,4 +1944,5 @@ CONTRIB_PROJECT=\
 	$(HBCC_LIB)\
 	$(PNG_LIB)\
 	$(HBHPDF_LIB)\
-	$(SEVENZIP_LIB)
+	$(SEVENZIP_LIB)\
+	$(HBSQLIT3_LIB)

@@ -119,6 +119,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%gtwvt%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%libharu%LIBEXT%  copy lib\%SUB_DIR%\%LIBPREFIX%libharu%LIBEXT%  lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%sevenzip%LIBEXT% copy lib\%SUB_DIR%\%LIBPREFIX%sevenzip%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%xwt%LIBEXT%      copy lib\%SUB_DIR%\%LIBPREFIX%xwt%LIBEXT%      lib >NUL
+if exist lib\%SUB_DIR%\%LIBPREFIX%hbsqlit3%LIBEXT% copy lib\%SUB_DIR%\%LIBPREFIX%hbsqlit3%LIBEXT% lib >NUL
 
 ECHO Done ...
 ECHO.
@@ -493,6 +494,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%telepath%LIBEXT%  del lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbcc%LIBEXT%      del lib\%SUB_DIR%\%LIBPREFIX%hbcc%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%what32%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%what32%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%xwt%LIBEXT%       del lib\%SUB_DIR%\%LIBPREFIX%xwt%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%hbsqlit3%LIBEXT%  del lib\%SUB_DIR%\%LIBPREFIX%hbsqlit3%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%gtwvg%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%gtwvg%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%gtwvt%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%gtwvt%LIBEXT%
 
@@ -510,6 +512,7 @@ if exist lib\%LIBPREFIX%telepath%LIBEXT%            del lib\%LIBPREFIX%telepath%
 if exist lib\%LIBPREFIX%hbcc%LIBEXT%                del lib\%LIBPREFIX%hbcc%LIBEXT%
 if exist lib\%LIBPREFIX%what32%LIBEXT%              del lib\%LIBPREFIX%what32%LIBEXT%
 if exist lib\%LIBPREFIX%xwt%LIBEXT%                 del lib\%LIBPREFIX%xwt%LIBEXT%
+if exist lib\%LIBPREFIX%hbsqlit3%LIBEXT%            del lib\%LIBPREFIX%hbsqlit3%LIBEXT%
 if exist lib\%LIBPREFIX%gtwvg%LIBEXT%               del lib\%LIBPREFIX%gtwvg%LIBEXT%
 if exist lib\%LIBPREFIX%gtwvt%LIBEXT%               del lib\%LIBPREFIX%gtwvt%LIBEXT%
 

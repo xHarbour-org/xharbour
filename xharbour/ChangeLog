@@ -8,6 +8,34 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-17 17:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + contrib/hbsqlit3
+  + contrib/hbsqlit3/config.h
+  + contrib/hbsqlit3/hbapistr.h
+  + contrib/hbsqlit3/sqlite3.c
+  + contrib/hbsqlit3/sqlite3.h
+  + contrib/hbsqlit3/sqlite3ext.h
+  + contrib/hbsqlit3/strapi.c
+  + contrib/hbsqlit3/xhbsqlite3.c
+  + contrib/hbsqlit3/tests
+  + contrib/hbsqlit3/tests/authorizer.prg
+  + contrib/hbsqlit3/tests/blob.prg
+  + contrib/hbsqlit3/tests/pngtest.png
+  + contrib/hbsqlit3/tests/sqlite3.ch
+  + contrib/hbsqlit3/tests/sqlite3_test.prg
+    + xHarbour interface to SQLLite3. Thanks to Richard Visscher <richard@irvis.nl>
+      for converting this tool from Harbour (thus hereby borrowed)
+
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/contrib.pc
+  * winmake/makefile.bc
+  * winmake/makefile.gc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+  * winmake/mdir.bat
+    ! modification to include hbsqlit3.lib as per above
+
 2012-06-16 11:17 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbmzip/ioapi.c
     + #include "hbapifs.h" after "hbapi.h"

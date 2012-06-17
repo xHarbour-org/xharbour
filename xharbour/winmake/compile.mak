@@ -76,6 +76,18 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
 	$(MT_CMD)
 
 #===============================================================================
+# HBSQLIT3.LIB Dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)sqlite3$(OBJEXT) : $(HBSQLIT3_DIR)$(DIR_SEP)sqlite3.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)strapi$(OBJEXT) : $(HBSQLIT3_DIR)$(DIR_SEP)strapi.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xhbsqlite3$(OBJEXT) : $(HBSQLIT3_DIR)$(DIR_SEP)xhbsqlite3.c
+	$(CC_CMD)
+
+#===============================================================================
 # SEVENZIP.LIB rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)sevenzip$(OBJEXT) : $(SEVENZIP_DIR)$(DIR_SEP)sevenzip.c
@@ -308,7 +320,7 @@ $(OBJ_DIR)$(DIR_SEP)dbf1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbf1.c
 	$(CC_CMD)
    
 $(OBJ_DIR)$(DIR_SEP)dbf1net$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbf1net.c
-	$(CC_CMD)   
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbtotal.c : $(RDD_DIR)$(DIR_SEP)dbtotal.prg
 	$(HB_CMD)

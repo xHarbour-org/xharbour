@@ -43,7 +43,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 INCLUDE_DIR =include
 INCLUDE_DIR =-i=$(INCLUDE_DIR) -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt
-CLIBFLAGS   =$(CLIBFLAGS) $(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dWIN32 -dHAVE_CONFIG_H
+CLIBFLAGS   =$(CLIBFLAGS) $(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dWIN32 -dHAVE_CONFIG_H -d_HAVE_SQLITE_CONFIG_H
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 
 !ifdef HB_THREAD_SUPPORT
@@ -513,6 +513,9 @@ $(LIBHARU_LIB) : $(LIBHARU_LIB_OBJS)
 	$(LIB_CMD)
 
 $(SEVENZIP_LIB) : $(SEVENZIP_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBSQLIT3_LIB) : $(HBSQLIT3_LIB_OBJS)
 	$(LIB_CMD)
 !endif
 

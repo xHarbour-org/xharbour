@@ -51,7 +51,7 @@ CLIBFLAGS   +=
 #===============================================================================
 INCLUDE_DIR  =include
 HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
-CLIBFLAGS   +=-DHAVE_CONFIG_H -D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c -fomit-frame-pointer -march=i586 -fno-strict-aliasing -I$(INCLUDE_DIR) -I$(OBJ_DIR)
+CLIBFLAGS   +=-DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c -fomit-frame-pointer -march=i586 -fno-strict-aliasing -I$(INCLUDE_DIR) -I$(OBJ_DIR)
 
 ifeq ($(HB_THREAD_SUPPORT),1)
 	CLIBFLAGS+=-DHB_THREAD_SUPPORT -mthreads
@@ -522,6 +522,9 @@ $(LIBHARU_LIB) : $(LIBHARU_LIB_OBJS)
 	$(LIB_CMD)
 
 $SEVENZIP_LIB) : $(SEVENZIP_LIB_OBJS)
+	$(LIB_CMD)
+
+$HBSQLIT3_LIB) : $(HBSQLIT3_LIB_OBJS)
 	$(LIB_CMD)
 
 endif
