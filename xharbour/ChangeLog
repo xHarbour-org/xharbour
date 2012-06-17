@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-17 20:16 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/makefile.bc
+    ! missing -D_HAVE_SQLITE_CONFIG_H when building contribs
+
 2012-06-17 17:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   + contrib/hbsqlit3
   + contrib/hbsqlit3/config.h
