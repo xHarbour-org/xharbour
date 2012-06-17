@@ -3,14 +3,22 @@
  */
 #ifndef _INCLUDE_HPDF_CONFIG_H
 #define _INCLUDE_HPDF_CONFIG_H 1
- 
+
+#if defined( __BORLANDC__ )
+   #pragma warn -aus
+   #pragma warn -ccc
+   #pragma warn -rch
+   #pragma warn -csu
+   #pragma warn -par
+#endif
+
 /* include/hpdf_config.h. Generated automatically at end of configure. */
 /* include/config.h.  Generated from config.h.in by configure.  */
 /* include/config.h.in.  Generated from configure.in by autoheader.  */
 
 /* debug build */
-#ifndef LIBHPDF_DEBUG 
-#define LIBHPDF_DEBUG  /**/ 
+#ifndef LIBHPDF_DEBUG
+#define LIBHPDF_DEBUG  /**/
 #endif
 
 /* debug trace enabled */
@@ -58,8 +66,8 @@
 #endif
 
 /* Define to 1 if you have the <strings.h> header file. */
-#ifndef LIBHPDF_HAVE_STRINGS_H 
-#define LIBHPDF_HAVE_STRINGS_H  1 
+#ifndef LIBHPDF_HAVE_STRINGS_H
+#define LIBHPDF_HAVE_STRINGS_H  1
 #endif
 
 /* Define to 1 if you have the <string.h> header file. */
@@ -104,8 +112,8 @@
 #endif
 
 /* Define to the one symbol short name of this package. */
-#ifndef LIBHPDF_PACKAGE_TARNAME 
-#define LIBHPDF_PACKAGE_TARNAME  "libhpdf" 
+#ifndef LIBHPDF_PACKAGE_TARNAME
+#define LIBHPDF_PACKAGE_TARNAME  "libhpdf"
 #endif
 
 /* Define to the home page for this package. */

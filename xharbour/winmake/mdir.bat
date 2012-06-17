@@ -497,6 +497,11 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%xwt%LIBEXT%       del lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbsqlit3%LIBEXT%  del lib\%SUB_DIR%\%LIBPREFIX%hbsqlit3%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%gtwvg%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%gtwvg%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%gtwvt%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%gtwvt%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%compiler%LIBEXT%  del lib\%SUB_DIR%\%LIBPREFIX%compiler%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%gtwvw%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%gtwvw%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%libharu%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%libharu%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%sevenzip%LIBEXT%  del lib\%SUB_DIR%\%LIBPREFIX%sevenzip%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%harbour%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%harbour%LIBEXT%
 
 if exist lib\%LIBPREFIX%mysql%LIBEXT%               del lib\%LIBPREFIX%mysql%LIBEXT%
 if exist lib\%LIBPREFIX%filemem%LIBEXT%             del lib\%LIBPREFIX%firemem%LIBEXT%

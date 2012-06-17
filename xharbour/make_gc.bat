@@ -19,6 +19,9 @@ IF "%BISON_DIR%"=="" SET BISON_DIR=C:/MSYS/1.0/bin
 SET _PATH=%PATH%
 SET PATH=%CC_DIR%\bin;%BISON_DIR%;%PATH%
 
+rem Added for MinGW 4.70 -mno-cygwin is no longer valid
+rem SET NO_CYGWIN=1
+
 rem ============================================================================
 rem The followings should never change
 rem Do not hard-code in makefile because there are needed for clean build

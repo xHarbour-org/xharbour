@@ -8,9 +8,16 @@
 # version, changes should only be made on your local copy.(AJ: 2008-04-26)
 #
 #===============================================================================
+# GCC is using Bison by default
+HB_USE_BISON=1
+
 TYPE=cat
 DEL=RM -f
 COPY=cp
+
+ifneq ($(NO_CYGWIN),1)
+NOCYGWIN=-mno-cygwin
+endif
 
 ifneq ($(HB_HAS_LINENO),1)
 LINEFLAGS=-l
@@ -51,7 +58,7 @@ CLIBFLAGS   +=
 #===============================================================================
 INCLUDE_DIR  =include
 HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
-CLIBFLAGS   +=-DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c -fomit-frame-pointer -march=i586 -fno-strict-aliasing -I$(INCLUDE_DIR) -I$(OBJ_DIR)
+CLIBFLAGS   +=-DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -D__WIN32__ -Wall $(NOCYGWIN) -O3 -mtune=pentium -c -fomit-frame-pointer -march=i586 -fno-strict-aliasing -I$(INCLUDE_DIR) -I$(OBJ_DIR)
 
 ifeq ($(HB_THREAD_SUPPORT),1)
 	CLIBFLAGS+=-DHB_THREAD_SUPPORT -mthreads
@@ -111,9 +118,9 @@ COMPILERLIBS=\
 	-luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr\
 	-lole32 -luuid -loleaut32 -lws2_32
 EXE_LIBS=$(HARBOUR_LIBS) $(COMPILERLIBS)
-HRB_LIBS=-L$(LIB_DIR) -lpp -lcommon $(COMPILERLIBS)
+HRB_LIBS=-L$(LIB_DIR) -Wl,--start-group -lpp -lcommon -lcompiler -Wl,--end-group $(COMPILERLIBS)
 CMN_LIBS=-L$(LIB_DIR) -lcommon $(COMPILERLIBS)
-LINK_CMD=GCC -Wall -o $@ $^ -mno-cygwin
+LINK_CMD=GCC -Wall -o $@ $^ $(NOCYGWIN)
 
 #===============================================================================
 # The Project
@@ -133,6 +140,9 @@ ALL: $(PROJECT)
 #===============================================================================
 # Libraries dependencies and build rules (ST)
 #===============================================================================
+$(COMPILER_LIB) : $(COMPILER_LIB_OBJS)
+	$(LIB_CMD)
+
 $(RTL_LIB) : $(RTL_LIB_OBJS)
 	$(LIB_CMD)
 
@@ -335,7 +345,7 @@ ifdef HB_DIR_ADS
 ACEH_DIR    =-I"$(HB_DIR_ADS)"
 endif
 INCLUDE_DIR =include
-CLIBFLAGS   +=-DHAVE_CONFIG_H -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -Wall -mdll -fomit-frame-pointer -march=i586 -mno-cygwin -O3 -c -fno-strict-aliasing $(ACEH_DIR) -I$(INCLUDE_DIR) -I$(OBJ_DIR)
+CLIBFLAGS   +=-DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -Wall -mdll -fomit-frame-pointer -march=i586 $(NOCYGWIN) -O3 -c -fno-strict-aliasing $(ACEH_DIR) -I$(INCLUDE_DIR) -I$(OBJ_DIR)
 HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)/ -w2 -es2 -gc2
 CC_CMD      =GCC $(CLIBFLAGS) -o $@ $^
 CCC_CMD     =$(CC_CMD)
@@ -344,7 +354,7 @@ HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(LINEFLAGS) -d_USE_APPMAIN_ $(HARBOURFLAGS) -o$
 BISON_CMD1  =bison -v -p yy -d -o $@ $^
 BISON_CMD2  =bison -v -p hb_comp -d -o $@ $^
 DLL_LINK_CMD=GCC -shared -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1)
-DLLEXE_LINK_CMD=GCC -WAll -mno-cygwin -o $@ $^ $(HARBOUR_DLL) $(USE_DLL_LIB) $(COMPILERLIBS)
+DLLEXE_LINK_CMD=GCC -Wall $(NOCYGWIN) -o $@ $^ $(HARBOUR_DLL) $(USE_DLL_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # The Project
@@ -386,8 +396,8 @@ CLIBFLAGS   +=
 ifdef HB_DIR_ADS
 ACEH_DIR    =-I"$(HB_DIR_ADS)"
 endif
-HARBOURFLAGS+=-iinclude;$(GDLIB_DIR)/include;$(WHAT32_DIR)/include;$(XWT_DIR)/include -q0 -w2 -es2 -gc2
-CLIBFLAGS   +=-D__WIN32__ -Wall -mno-cygwin -O3 -fomit-frame-pointer -march=i586 -mtune=pentium -c -fno-strict-aliasing
+HARBOURFLAGS+=-iinclude -i$(GDLIB_DIR)/include -i$(WHAT32_DIR)/include -i$(XWT_DIR)/include -q0 -w2 -es2 -gc2
+CLIBFLAGS   +=-D__WIN32__ -D_HAVE_SQLITE_CONFIG_H -Wall $(NOCYGWIN) -O3 -fomit-frame-pointer -march=i586 -mtune=pentium -c -fno-strict-aliasing
 CLIBFLAGS   +=$(ACEH_DIR) -Iinclude -I$(FREEIMAGE_DIR)/include -I$(GDLIB_DIR)/include -I$(XWT_DIR)/include -I$(XWT_DIR)/src/xwt_win -I$(ZLIB_DIR) -I$(PNG_DIR)
 
 ifeq ($(HB_THREAD_SUPPORT),1)
@@ -417,9 +427,10 @@ ifeq ($(HB_MZIP), 1)
 CONTRIB_PROJECT+=$(HBMZIP_LIB)
 endif
 
-ifeq ($(HB_ZIP), 1)
-CONTRIB_PROJECT+=$(HBZIP_LIB)
-endif
+# HBZIP_LIB is broken under GCC
+# ifeq ($(HB_ZIP), 1)
+# CONTRIB_PROJECT+=$(HBZIP_LIB)
+# endif
 
 ifeq ($(HB_XWT), 1)
 CONTRIB_PROJECT+=$(XWT_LIB)
@@ -458,6 +469,18 @@ ALL: $(CONTRIB_PROJECT)
 #===============================================================================
 # Libraries dependencies and build rules (ST)
 #===============================================================================
+$(HBSQLIT3_LIB) : $(HBSQLIT3_LIB_OBJS)
+	$(LIB_CMD)
+
+$(SEVENZIP_LIB) : $(SEVENZIP_LIB_OBJS)
+	$(LIB_CMD)
+
+$(GTWVG_LIB) : $(GTWVG_LIB_OBJS)
+	$(LIB_CMD)
+
+$(FILEMEM_LIB) : $(FILEMEM_LIB_OBJS)
+	$(LIB_CMD)
+
 $(FIREBIRD_LIB) : $(FIREBIRD_LIB_OBJS)
 	$(LIB_CMD)
 

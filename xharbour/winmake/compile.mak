@@ -4201,7 +4201,7 @@ $(OBJ_DIR)$(DIR_SEP)win32$(OBJEXT) : $(TELEPATH_DIR)$(DIR_SEP)win32.c
 $(OBJ_DIR)$(DIR_SEP)telepath$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)telepath.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)telepath.C : $(TELEPATH_DIR)$(DIR_SEP)telepath.PRG
+$(OBJ_DIR)$(DIR_SEP)telepath.c : $(TELEPATH_DIR)$(DIR_SEP)telepath.prg
 	$(HB_CMD)
 
 #===============================================================================

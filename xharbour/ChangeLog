@@ -8,6 +8,43 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-18 03:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/compile.mak
+    ! fixed name case caused GCC failed to compile
+
+  * winmake/common.mak
+    ! recursive CONTRIB_PROJECT var caused MinGW contribs not built, fixed.
+
+  * winmake/msvcerr.vc
+    ! change message "ERROR" -> "WARNING" to avoid misleading
+
+  * winmake/makefile.gc
+    + this was broken long ago, fixed.
+
+  * winmake/makefile.gc
+  * make_gc.bat
+    + option to not using -mno-cygwin flag which is no longer recognized by
+      MinGW 4.70
+
+  * winmake/makefile.bc
+  * winmake/makefile.vc
+  * winmake/makefile.gc
+    ! missing configuration flag for SQLite3
+
+  * winmake/mdir.bat
+    ! clean make did not delete all library, fixed.
+
+  * contrib/hbhpdf/hpdf_conf.h
+  * contrib/hbhpdf/hpdf_config.h
+    ! supress BCC warnings
+
+  * source/compiler/harbour.yyc
+  * source/compiler/harbour.sly
+  * source/macro/macro.yyc
+  * source/macro/macro.y
+  * source/rtl/pcre/config.h
+    ! supress BCC warnings
+
 2012-06-17 20:16 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.bc
     ! missing -D_HAVE_SQLITE_CONFIG_H when building contribs

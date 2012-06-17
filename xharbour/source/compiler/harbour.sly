@@ -43,6 +43,12 @@
 #  define __STDC__
 #endif
 
+#if defined( __BORLANDC__ )
+   #pragma warn -aus
+   #pragma warn -ccc
+   #pragma warn -rch
+#endif
+
 #undef alloca
 #define alloca  malloc
 

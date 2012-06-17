@@ -3,7 +3,7 @@
 # MSVC MAKEFILE ERROR CHECKER
 #===============================================================================
 !if ("$(__MSC__)"=="")
-!message ERROR: __MSC__ is not defined
+!message WARNING: __MSC__ is not defined
 !if ("$(USE_MSVCRT)"=="1")
 !message Compiling with -MD required __MSC__ defined
 !message __MSC__ must be set as follows:

@@ -79,6 +79,12 @@
 #  define __STDC__
 #endif
 
+#if defined( __BORLANDC__ )
+   #pragma warn -aus
+   #pragma warn -ccc
+   #pragma warn -rch
+#endif
+
 /* NOTE: these symbols are used internally in bison.simple
  */
 #ifndef hb_xgrab

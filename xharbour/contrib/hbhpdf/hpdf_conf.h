@@ -29,6 +29,14 @@
 #define __USE_XOPEN /* for M_PI */
 #include <math.h>
 
+#if defined( __BORLANDC__ )
+   #pragma warn -aus
+   #pragma warn -ccc
+   #pragma warn -rch
+   #pragma warn -csu
+   #pragma warn -par
+#endif
+
 /*----------------------------------------------------------------------------*/
 /*----- standard C library functions -----------------------------------------*/
 
