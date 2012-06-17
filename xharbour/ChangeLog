@@ -8,9 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-18 03:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * ChangeLog
+    ! typo: harbour.yyc -> harboury.yyc
+      typo: macro.yyc   -> macroy.yyc
+
 2012-06-18 03:14 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
-  * source/compiler/harbour.yyc
-  * source/macro/macro.yyc
+  * source/compiler/harboury.yyc
+  * source/macro/macroy.yyc
     ! missing from previous commit
 
 2012-06-18 03:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
@@ -43,9 +48,9 @@
   * contrib/hbhpdf/hpdf_config.h
     ! supress BCC warnings
 
-  * source/compiler/harbour.yyc
+  * source/compiler/harboury.yyc
   * source/compiler/harbour.sly
-  * source/macro/macro.yyc
+  * source/macro/macroy.yyc
   * source/macro/macro.y
   * source/rtl/pcre/config.h
     ! supress BCC warnings
