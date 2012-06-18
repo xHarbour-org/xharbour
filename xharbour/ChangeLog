@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-18 22:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * make_gc.bat
+    - remove spurious blank space in makefile argument
+
 2012-06-18 21:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/gtwvw/gtwvw.c
     ! more BCC warnings are pacified
