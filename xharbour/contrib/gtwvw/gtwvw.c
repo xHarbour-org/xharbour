@@ -314,8 +314,10 @@ static void   hb_wvw_vmouse_SetPos( WIN_DATA * pWindowData, USHORT usRow, USHORT
 static int    hb_gt_wvw_usDispCount( WIN_DATA * pWindowData );
 static void   hb_gt_wvw_vDispBegin( WIN_DATA * pWindowData );
 static void   hb_gt_wvw_vDispEnd( WIN_DATA * pWindowData );
+#if 0
 static void  hb_gt_wvw_vGetText( WIN_DATA * pWindowData, USHORT top, USHORT left, USHORT bottom, USHORT right, BYTE * sBuffer);
 static void  hb_gt_wvw_vPuts( WIN_DATA * pWindowData, int iRow, int iCol, BYTE byColor, BYTE byAttr, BYTE *pbyStr, ULONG ulLen );
+#endif
 static void  hb_gt_wvw_vReplicate( WIN_DATA * pWindowData, int iRow, int iCol, BYTE bColor, BYTE bAttr, USHORT usChar, ULONG ulLen );
 static void  hb_gt_wvw_vPutText( WIN_DATA * pWindowData, USHORT top, USHORT left, USHORT bottom, USHORT right, BYTE * sBuffer, BYTE bColor );
 static void  hb_gt_wvw_vSetAttribute( WIN_DATA * pWindowData, int iTop, int iLeft, int iBottom, int iRight, BYTE bColor );
@@ -2210,7 +2212,8 @@ WIN_DATA *    pWindowData = s_pWvwData->s_pWindows[ s_pWvwData->s_usCurWindow ];
          return 1;
       case HB_GFX_MAKECOLOR:
          ReleaseDC(pWindowData->hWnd, hdc);
-         return (int) ( iTop << 16 | iLeft << 8 | iBottom );
+         return (int) ( ( iTop << 16 ) | ( iLeft << 8 ) | iBottom );
+         // return (int) ( iTop << 16 | iLeft << 8 | iBottom );
       case HB_GFX_PUTPIXEL:
          color = RGB( iBottom >> 16, ( iBottom & 0xFF00 ) >> 8, iBottom & 0xFF );
          SetGFXContext();
@@ -6287,6 +6290,7 @@ static void   hb_gt_wvw_vDispEnd( WIN_DATA * pWindowData )
   }
 }
 
+#if 0
 static void hb_gt_wvw_vGetText( WIN_DATA * pWindowData, USHORT top, USHORT left, USHORT bottom, USHORT right, BYTE * sBuffer )
 {
   USHORT irow, icol, index, j;
@@ -6318,6 +6322,7 @@ static void  hb_gt_wvw_vPuts( WIN_DATA * pWindowData, int iRow, int iCol, BYTE b
   nCountPuts++;
 #endif
 }
+#endif
 
 static void  hb_gt_wvw_vReplicate( WIN_DATA * pWindowData, int iRow, int iCol, BYTE bColor, BYTE bAttr, USHORT usChar, ULONG ulLen )
 {
@@ -12144,4 +12149,4 @@ static BOOL hb_gt_wvw_KeyEvent( WIN_DATA * pWindowData, UINT message, WPARAM wPa
       }
    }    
    return( 0 );
-}    
+}
