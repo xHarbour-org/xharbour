@@ -23,6 +23,9 @@
 #include "hpdf_utils.h"
 #include "hpdf_fontdef.h"
 
+#if defined(__BORLANDC__)
+   #pragma warn -prc
+#endif
 
 #define HPDF_TTF_MAX_MEM_SIZ    10000
 

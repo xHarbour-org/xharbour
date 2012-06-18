@@ -449,7 +449,8 @@ LoadPngData  (HPDF_Dict     image,
 	}
 
 	png_set_sig_bytes (png_ptr, HPDF_PNG_BYTES_TO_CHECK);
-	png_set_read_fn (png_ptr, (void *)png_data, (png_rw_ptr)&PngReadFunc);
+	png_set_read_fn (png_ptr, (void *)png_data, PngReadFunc);
+	// png_set_read_fn (png_ptr, (void *)png_data, (png_rw_ptr)&PngReadFunc);
 
 	/* reading info structure. */
 	png_read_info(png_ptr, info_ptr);

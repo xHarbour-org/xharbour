@@ -22,6 +22,9 @@
 #include "hpdf_utils.h"
 #include "hpdf.h"
 
+#if defined(__BORLANDC__)
+   #pragma warn -use
+#endif
 /*----------------------------------------------------------------------------*/
 
 static const HPDF_CID_Width DotumChe_W_ARRAY[] = {

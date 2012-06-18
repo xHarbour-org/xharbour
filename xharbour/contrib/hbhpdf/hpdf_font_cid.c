@@ -22,6 +22,11 @@
 #include "hpdf_utils.h"
 #include "hpdf_font.h"
 
+
+#if defined(__BORLANDC__)
+   #pragma warn -prc
+#endif
+
 static HPDF_Font
 CIDFontType0_New (HPDF_Font parent,
                   HPDF_Xref xref);

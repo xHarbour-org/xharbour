@@ -8,6 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-18 20:57 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbhpdf/hpdf_image_png.c
+    ! remove not-required casting
+
+  * contrib/hbhpdf/hpdf_fontdef_jp.c
+  * contrib/hbhpdf/hpdf_fontdef_kr.c
+  * contrib/hbhpdf/hpdf_fontdef_tt.c
+  * contrib/hbhpdf/hpdf_font_cid.c
+  * contrib/hbhpdf/hpdf_pages.c
+    ! pacify BCC warnings
+
+  * contrib/gtwvw/gtwvw.c
+    ! commented unused function hb_gt_wvw_Scroll()
+
 2012-06-18 08:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.wc
     ! changed: -oi+ -> -oi ( -oi+ only work in C++ mode )

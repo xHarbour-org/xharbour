@@ -1006,6 +1006,7 @@ static void hb_gt_wvw_SetAttribute( PHB_GT pGT, int iTop, int iLeft, int iBottom
 /*    copied from gtwin...                                           */
 /*                                                                   */
 
+#if 0
 static void hb_gt_wvw_Scroll(PHB_GT pGT, int iTop, int iLeft, int iBottom, int iRight, BYTE bColor, BYTE bChar, int iRows, int iCols )
 {
   LONG         usSaveRow, usSaveCol;
@@ -1134,6 +1135,8 @@ static void hb_gt_wvw_Scroll(PHB_GT pGT, int iTop, int iLeft, int iBottom, int i
   nCountScroll++;
 #endif
 }
+
+#endif
 
 /*-------------------------------------------------------------------*/
 /*                                                                   */
