@@ -88,6 +88,9 @@ HARBOUR_LIBS=\
 	$(LIB_DIR)\pdflib.lib
 !endif
 
+# overwrite HB_GT_LIBS because some modules did not compile
+HB_GT_LIBS  =$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTGUI_LIB)
+
 !ifdef HB_GTALLEG
 HB_GT_LIBS=\
 	$(HB_GT_LIBS)\
@@ -246,13 +249,46 @@ $(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
 # Uncomment this line when including RDDADS
 # HB_RDDADS=1
 
-# Uncomment this line when including WVTGUI
-# HB_WVTGUI=1
-
 #===============================================================================
 # Macro Definitions
 #===============================================================================
 !include winmake\common.mak
+
+# overwrite HARBOUR_DLL_OBJS as some modules are not compilable
+HARBOUR_DLL_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)maindllh$(OBJEXT)\
+	\
+	$(RTL_LIB_OBJS)\
+	$(PCREPOS_LIB_OBJS)\
+	$(ZLIB_LIB_OBJS)\
+	$(LANG_LIB_OBJS)\
+	$(MACRO_LIB_OBJS)\
+	$(RDD_LIB_OBJS)\
+	$(DBFFPT_LIB_OBJS)\
+	$(REDBFFPT_LIB_OBJS)\
+	$(DBFNTX_LIB_OBJS)\
+	$(DBFNSX_LIB_OBJS)\
+	$(DBFCDX_LIB_OBJS)\
+	$(DBFMDX_LIB_OBJS)\
+	$(BMDBFCDX_LIB_OBJS)\
+	$(REDBFCDX_LIB_OBJS)\
+	$(SIXCDX_LIB_OBJS)\
+	$(BMSIXCDX_LIB_OBJS)\
+	$(HBSIX_LIB_OBJS)\
+	$(HSX_LIB_OBJS)\
+	$(USRRDD_LIB_OBJS)\
+	$(RDDS_LIB_OBJS)\
+	$(PP_LIB_OBJS)\
+	$(DEBUG_LIB_OBJS)\
+	$(COMMON_LIB_OBJS)\
+	$(VM_LIB_OBJS)\
+	$(TIP_LIB_OBJS)\
+	$(CODEPAGE_LIB_OBJS)\
+	$(CT_LIB_OBJS)\
+	$(MISC_LIB_OBJS)\
+	\
+	$(GTWIN_LIB_OBJS)\
+	$(GTGUI_LIB_OJS)
 
 #===============================================================================
 # RDDADS
@@ -267,15 +303,6 @@ COMPILERLIBS=\
 HARBOUR_DLL_OBJS=\
 	$(HARBOUR_DLL_OBJS)\
 	$(RDDADS_LIB_OBJS)
-!endif
-
-#===============================================================================
-# WVTGUI
-#===============================================================================
-!ifdef HB_WVTGUI
-HARBOUR_DLL_OBJS=\
-	$(HARBOUR_DLL_OBJS)\
-	$(WVTGUI_LIB_OBJS)
 !endif
 
 #===============================================================================
@@ -364,7 +391,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 ACEH_DIR     =-I"$(HB_DIR_ADS)"
 !endif
 INCLUDE_DIR=include;$(CC_DIR)\include\win32;$(CC_DIR)\include;$(FREEIMAGE_DIR)\include;$(GDLIB_DIR)\include;$(XWT_DIR)\include;$(XWT_DIR)\src\xwt_win;$(ZLIB_DIR);$(PNG_DIR)
-CLIBFLAGS=$(CLIBFLAGS) -cpp -mn $(ACEH_DIR) -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf"
+CLIBFLAGS=$(CLIBFLAGS) -cpp -mn $(ACEH_DIR) -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -D"_HAVE_SQLITE_CONFIG_H"
 HB_CMD=$(HARBOUR_EXE) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -n1 -q0 -w2 -es2 -gc2 $** -o$@
 CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
 CCC_CMD=$(CC_CMD)
@@ -374,6 +401,19 @@ LIB_CMD=LIB -c -n $@ $**
 # Macro Definitions
 #===============================================================================
 !include winmake\common.mak
+
+# over write CONTRIB_PROJECT as some modules are not compile
+CONTRIB_PROJECT=\
+	$(FILEMEM_LIB)\
+	$(GDLIB_LIB)\
+	$(LIBNF_LIB)\
+	$(PDFLIB_LIB)\
+	$(TELEPATH_LIB)\
+	$(HBCC_LIB)\
+	$(PNG_LIB)\
+	$(HBHPDF_LIB)\
+	$(LIBHARU_LIB)\
+	$(SEVENZIP_LIB)
 
 !ifdef HB_FREEIMAGE
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(FREEIMAGE_LIB)
@@ -432,10 +472,19 @@ $**
 !
 #endif
 
+$(HBSQLIT3_LIB) : $(HBSQLIT3_LIB_OBJS)
+	$(LIB_CMD)
+
+$(FILEMEM_LIB) : $(FILEMEM_LIB_OBJS)
+	$(LIB_CMD)
+
 $(FIREBIRD_LIB) : $(FIREBIRD_LIB_OBJS)
 	$(LIB_CMD)
 
 $(FREEIMAGE_LIB) : $(FREEIMAGE_LIB_OBJS)
+	$(LIB_CMD)
+
+$(GTWVG_LIB) : $(GTWVG_LIB_OBJS)
 	$(LIB_CMD)
 
 $(GDLIB_LIB) : $(GDLIB_LIB_OBJS)
@@ -483,9 +532,6 @@ WHAT32_LIB_OBJS=\
 	$(WHAT32_LIB_OBJS)\
 	$(OBJ_DIR)\_wincall.obj
 $(WHAT32_LIB) : $(WHAT32_LIB_OBJS)
-	$(LIB_CMD)
-
-$(WVTGUI_LIB) : $(WVTGUI_LIB_OBJS)
 	$(LIB_CMD)
 
 $(PNG_LIB) : $(PNG_LIB_OBJS)

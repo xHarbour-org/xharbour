@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-18 08:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/makefile.wc
+    ! changed: -oi+ -> -oi ( -oi+ only work in C++ mode )
+    ! commented some contrib modules which are not compilable
+
+  * winmake/makefile.dc
+    ! commented some contrib modules which are not compilable
+
 2012-06-18 03:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * ChangeLog
     ! typo: harbour.yyc -> harboury.yyc
