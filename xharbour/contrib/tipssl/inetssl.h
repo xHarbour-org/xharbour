@@ -71,7 +71,13 @@
        #define HB_NO_DEFAULT_INET
    #else
       #if defined( HB_OS_WIN ) || defined( HB_OS_WIN_USED )
+         #if defined( __BORLANDC__ )
+            #pragma warn -aus
+            #pragma warn -prc
+            #pragma warn -use
+         #endif
          #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
+         #define _WINSOCK2API_ /* Prevents inclusion of Winsock.h in Windows.h */
          #define _WINSOCK2_H
          #define HB_SOCKET_T SOCKET
          #include <winsock2.h>
@@ -130,14 +136,14 @@
       #if defined( HB_OS_WIN ) || defined( HB_OS_WIN_USED )
           #define HB_SOCKET_SET_ERROR( s ) \
               s->errorCode = WSAGetLastError(); \
-              s->errorDesc = strerror( s->errorCode );\
+              s->errorDesc = hb_strerror( s->errorCode );\
               WSASetLastError( 0 );
 
       #else
           #define HB_SOCKET_SET_ERROR( s ) s->errorCode = errno; s->errorDesc = strerror( errno )
       #endif
 
-      #define HB_SOCKET_SET_ERROR1( s, code ) s->errorCode = code; s->errorDesc = strerror( code );
+      #define HB_SOCKET_SET_ERROR1( s, code ) s->errorCode = code; s->errorDesc = hb_strerror( code );
       #define HB_SOCKET_SET_ERROR2( s, code, desc ) s->errorCode = code; s->errorDesc = desc;
 
       #define HB_SSL_SOCKET_INIT( s, p ) \

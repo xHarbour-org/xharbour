@@ -8,6 +8,31 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-20 06:52 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/what32/source/_wintree.c
+    ! commented out: __BORLANDC__ < 1424, to enable compilation with BCC 5.9
+      and above
+
+  * contrib/tipssl/inetssl.c
+  * contrib/tipssl/inetssl.h
+    ! minor modification and formatting
+
+  * winmake/common.mak
+    ! minor formatting: spaces -> tab
+
+  * winmake/contrib.pc
+  * winmake/makefile.bc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+    - remove no longer valid flag: HB_OS_WIN_32_USED
+
+  - contrib/what32/winrbar.prg
+  - contrib/what32/wintabs.prg
+  - contrib/what32/wintbar.prg
+  - contrib/what32/_wintbar.c
+  - contrib/what32/_wintree.c
+    ! remove unused files
+
 2012-06-18 22:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * make_gc.bat
     - remove spurious blank space in makefile argument

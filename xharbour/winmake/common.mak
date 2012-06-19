@@ -1840,15 +1840,14 @@ LIBHARU_LIB_OBJS=\
 # TIPSSL.LIB rules
 #===============================================================================
 TIPSSL_LIB_OBJS=\
-   $(OBJ_DIR)$(DIR_SEP)inetssl$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)inetssl$(OBJEXT)\
 	\
-   $(OBJ_DIR)$(DIR_SEP)client1$(OBJEXT)\
-   $(OBJ_DIR)$(DIR_SEP)httpcln1$(OBJEXT)\
-   $(OBJ_DIR)$(DIR_SEP)mail1$(OBJEXT)\
-   $(OBJ_DIR)$(DIR_SEP)popcln1$(OBJEXT)\
-   $(OBJ_DIR)$(DIR_SEP)smtpcln1$(OBJEXT)\
-   $(OBJ_DIR)$(DIR_SEP)sendmail1$(OBJEXT)
-
+	$(OBJ_DIR)$(DIR_SEP)client1$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)httpcln1$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)mail1$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)popcln1$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)smtpcln1$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)sendmail1$(OBJEXT)
 
 #===============================================================================
 # Build Target

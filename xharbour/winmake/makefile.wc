@@ -374,7 +374,7 @@ ACEH_DIR    =-i=$(HB_DIR_ADS)"
 !endif
 INCLUDE_DIR =include
 INCLUDE_DIR =$(ACEH_DIR) -i=$(INCLUDE_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt -i=$(FREEIMAGE_DIR)\include -i=$(GDLIB_DIR)\include -i=$(XWT_DIR)\include -i=$(XWT_DIR)\src\xwt_win -i=$(ZLIB_DIR) -i=$(PNG_DIR)
-CLIBFLAGS   =$(CLIBFLAGS) $(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dWIN32 -DHB_OS_WIN_32_USED -d_HAVE_SQLITE_CONFIG_H
+CLIBFLAGS   =$(CLIBFLAGS) $(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dWIN32 -d_HAVE_SQLITE_CONFIG_H
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -q0 -w2 -es2 -gc2
 !ifdef HB_THREAD_SUPPORT
 CLIBFLAGS   =$(CLIBFLAGS) -bm -DHB_THREAD_SUPPORT

@@ -13,7 +13,7 @@ HB_FUNC( TVINSERTITEM )
    is.hParent      = ( HTREEITEM ) hb_parnl( 3 );
    is.hInsertAfter = TVI_LAST;
 
-   #if (_WIN32_IE >= 0x0400) && !defined(_MSC_VER) &&   ( __BORLANDC__ < 1424)
+   #if (_WIN32_IE >= 0x0400) && !defined(_MSC_VER) // && ( __BORLANDC__ < 1424)
       is.DUMMYUNIONNAME.item.pszText = ( LPTSTR ) hb_parcx( 2 );
       is.DUMMYUNIONNAME.item.mask    = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
       is.DUMMYUNIONNAME.item.iImage  = hb_parnl( 4 );
