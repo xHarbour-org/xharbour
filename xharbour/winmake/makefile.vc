@@ -543,7 +543,7 @@ CLIBFLAGS=$(CLIBFLAGS) -MD
 !if ("$(CPLUSPLUS)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
-CLIBFLAGS   =$(CLIBFLAGS) -c $(OPTFLAGS) -GA -Gs -W3 -nologo $(OPENSSL_DIR) $(ACEH_DIR) $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H
+CLIBFLAGS   =$(CLIBFLAGS) -c $(OPTFLAGS) -GA -Gs -W3 -nologo $(OPENSSL_DIR) $(ACEH_DIR) $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H
 CLIBFLAGS   =$(CLIBFLAGS) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(ZLIB_DIR)
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -q0 -w2 -es2 -gc2
 
@@ -663,10 +663,10 @@ $(OBJ_DIR)\macroy.c : $(MACRO_DIR)\macro.y
 $(OBJ_DIR)\macroy$(OBJEXT) : $(OBJ_DIR)\macroy.c
 	$(CC_CMD)
 !else
-$(OBJ_DIR)\harboury$(OBJEXT) : $(COMPILER_DIR)\harboury.yyc
+$(OBJ_DIR)\harboury$(OBJEXT) : $(COMPILER_DIR)\harboury.c
 	$(CC_CMD)
 
-$(OBJ_DIR)\macroy$(OBJEXT) : $(MACRO_DIR)\macroy.yyc
+$(OBJ_DIR)\macroy$(OBJEXT) : $(MACRO_DIR)\macroy.c
 	$(CC_CMD)
 !endif
 !include winmake\compile.mak

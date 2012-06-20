@@ -1,4 +1,3 @@
-
 /*
 * $Id$
  */
@@ -7418,9 +7417,11 @@ IPicture * hb_gt_wvwLoadPicture( const char * image )
         if ( ReadFile( hFile, hGlobal, nFileSize, &nReadByte, NULL ) )
         {
           CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
-
+#if defined( __DMC__ )
           OleLoadPicture( iStream, nFileSize, TRUE, (REFIID) &IID_IPicture, &iPicture );
-
+#else
+          OleLoadPicture( iStream, nFileSize, TRUE, (REFIID) &IID_IPicture, &iPicture );
+#endif
         }
         GlobalFree( hGlobal );
       }
@@ -9470,7 +9471,11 @@ HB_EXPORT IPicture * rr_LoadPictureFromResource( const char * resname,UINT iresi
           picd.cbSizeofstruct=sizeof(PICTDESC);
           picd.picType=PICTYPE_BITMAP;
           picd.bmp.hbitmap=hbmpx;
+#if defined( __DMC__ )
+          OleCreatePictureIndirect(&picd,(REFIID) &IID_IPicture,TRUE,(LPVOID*) &iPicture);
+#else
           OleCreatePictureIndirect(&picd,&IID_IPicture,TRUE,(LPVOID*) &iPicture);
+#endif
           AddPictureHandle(resname != NULL ? resname : szResname, iPicture, iWidth, iHeight);
         }
      }
@@ -9506,7 +9511,11 @@ HB_EXPORT IPicture * rr_LoadPicture( const char * filename,LONG * lwidth,LONG * 
           GlobalFree(hGlobal);
           return NULL;
        }
+#if defined( __DMC__ )
+    OleLoadPicture(iStream, nFileSize, TRUE, (REFIID) &IID_IPicture, (LPVOID*)&iPicture);
+#else
     OleLoadPicture(iStream, nFileSize, TRUE, &IID_IPicture, (LPVOID*)&iPicture);
+#endif
     GlobalUnlock(hGlobal);
     GlobalFree(hGlobal);
     iStream->lpVtbl->Release(iStream);

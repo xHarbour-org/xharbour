@@ -8,6 +8,37 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-20 09:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  - source/compiler/harboury.yyc
+  - source/macro/macroy.yyc
+  + source/compiler/harboury.c
+  + source/macro/macroy.c
+    ! files were renamed to make it possible for MinGW to not using Bison parser
+
+  * winmake/mdir.bat
+    ! tipssl.lib was not copied to LIB dir, fixed
+    ! clean make did not erase tipssl.lib, fixed
+
+  * winmake/compile.mak
+    ! do not compile contrib/gtwvw/wvwfuncs.c in C++ mode
+
+  * winmake/makefile.gc
+  * winmake/makefile.bc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+  * winmake/makefile.pc
+  * winmake/makefile.dc
+    ! modified to reflect the above changes
+      Now, by default, all Windows builds no longer require Bison parser, thus
+      it is just enough to set compiler directory (eg. SET CC_DIR=C:\BORLAND)
+
+  * contrib/gtwvw/gtwvw.c
+  * contrib/gtwvw/wvwfuncs.c
+    ! fix compilation under Digital Mars
+
+  - contrib/rdd_ads/ace620.prg
+    ! remove unused file
+
 2012-06-20 06:52 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/what32/source/_wintree.c
     ! commented out: __BORLANDC__ < 1424, to enable compilation with BCC 5.9

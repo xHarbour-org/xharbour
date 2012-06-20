@@ -3434,7 +3434,7 @@ $(OBJ_DIR)$(DIR_SEP)wvwedit$(OBJEXT) : $(GTWVW_DIR)$(DIR_SEP)wvwedit.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)wvwfuncs$(OBJEXT) : $(GTWVW_DIR)$(DIR_SEP)wvwfuncs.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 #===============================================================================
 # HBMLIB_LIB.LIB dependencies

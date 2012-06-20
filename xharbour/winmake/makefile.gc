@@ -8,8 +8,8 @@
 # version, changes should only be made on your local copy.(AJ: 2008-04-26)
 #
 #===============================================================================
-# GCC is using Bison by default
-HB_USE_BISON=1
+# Using Bison parser is an option
+# HB_USE_BISON=1
 
 TYPE=cat
 DEL=RM -f
@@ -568,10 +568,10 @@ $(OBJ_DIR)/macroy.c : $(MACRO_DIR)/macro.y
 $(OBJ_DIR)/macroy$(OBJEXT) : $(OBJ_DIR)/macroy.c
 	$(CC_CMD)
 else
-$(OBJ_DIR)/harboury$(OBJEXT) : $(COMPILER_DIR)/harboury.yyc
+$(OBJ_DIR)/harboury$(OBJEXT) : $(COMPILER_DIR)/harboury.c
 	$(CC_CMD)
 
-$(OBJ_DIR)/macroy$(OBJEXT) : $(MACRO_DIR)/macroy.yyc
+$(OBJ_DIR)/macroy$(OBJEXT) : $(MACRO_DIR)/macroy.c
 	$(CC_CMD)
 endif
 include winmake/compile.mak
