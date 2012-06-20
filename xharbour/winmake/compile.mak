@@ -78,12 +78,6 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
 #===============================================================================
 # HBCURL.LIB Dependencies
 #===============================================================================
-$(OBJ_DIR)$(DIR_SEP)ftpupload$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)ftpupload.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)ftpupload.c : $(HBCURL_DIR)$(DIR_SEP)ftpupload.prg
-	$(HB_CMD)
-
 $(OBJ_DIR)$(DIR_SEP)gauge$(OBJEXT) : $(HBCURL_DIR)$(DIR_SEP)gauge.c
 	$(CC_CMD)
 

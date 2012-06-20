@@ -216,7 +216,6 @@ HARBOUR_LIBS=\
 # HBCURL.LIB rules
 #===============================================================================
 HBCURL_LIB_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)ftpupload$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)gauge$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbcurl$(OBJEXT)
 
