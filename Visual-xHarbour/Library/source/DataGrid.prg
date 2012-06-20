@@ -76,17 +76,7 @@ CLASS DataGrid INHERIT Control
    DATA ShowSelection           PUBLISHED INIT .T.
    DATA ShowSelectionBorder     PUBLISHED INIT .T.
    DATA AnchorColumn            PUBLISHED INIT 0
-
-   PROPERTY ImageList  GET __ChkComponent( Self, ::xImageList )
-   PROPERTY DataSource GET __ChkComponent( Self, ::xDataSource ) SET __SetDataSource 
-
-   PROPERTY ShowGrid      READ xShowGrid    WRITE InvalidateRect    DEFAULT .T.
-   PROPERTY Striping      READ xStriping    WRITE InvalidateRect    DEFAULT .F.
-
    DATA ConvertOem              PUBLISHED INIT .F.
-   DATA HighlightSysColor       EXPORTED
-   DATA HighlightTextSysColor   EXPORTED
-   DATA GridSysColor            EXPORTED
    DATA HighlightColor          PUBLISHED
    DATA HighlightTextColor      PUBLISHED
    DATA Columns                 PUBLISHED
@@ -95,6 +85,17 @@ CLASS DataGrid INHERIT Control
    DATA MultipleSelection       PUBLISHED INIT .F.
    DATA TagRecords              PUBLISHED INIT .F.
    DATA ClearColumns            PUBLISHED INIT .T.
+
+
+   PROPERTY ImageList  GET __ChkComponent( Self, ::xImageList )
+   PROPERTY DataSource GET __ChkComponent( Self, ::xDataSource ) SET __SetDataSource 
+
+   PROPERTY ShowGrid      READ xShowGrid    WRITE InvalidateRect    DEFAULT .T.
+   PROPERTY Striping      READ xStriping    WRITE InvalidateRect    DEFAULT .F.
+
+   DATA HighlightSysColor       EXPORTED
+   DATA HighlightTextSysColor   EXPORTED
+   DATA GridSysColor            EXPORTED
    DATA ColPos                  EXPORTED INIT 1
    DATA RowPos                  EXPORTED INIT 1
    DATA HitTop                  EXPORTED
@@ -104,6 +105,8 @@ CLASS DataGrid INHERIT Control
    DATA RowHeight               EXPORTED
    DATA bRowChanged             EXPORTED
    DATA aSelected               EXPORTED INIT {}
+   DATA aTagged                 EXPORTED  INIT {}
+   DATA CurPos                  EXPORTED INIT 1
 
    ACCESS RowCount              INLINE LEN( ::__DisplayArray )
    ACCESS ColCount              INLINE LEN( ::Children )
@@ -114,7 +117,6 @@ CLASS DataGrid INHERIT Control
    ACCESS Record                INLINE ::__GetPosition()
    ACCESS IsDelIndexOn          INLINE !EMPTY( ::DataSource ) .AND. ( "DELETED()" IN UPPER( ::DataSource:OrdKey() ) )
    
-   DATA CurPos                  EXPORTED INIT 1
    DATA __HScrollUnits          PROTECTED INIT 15
    DATA __HorzScroll            PROTECTED INIT FALSE
    DATA __VertScroll            PROTECTED INIT FALSE
@@ -163,7 +165,7 @@ CLASS DataGrid INHERIT Control
    DATA __nDragRec              PROTECTED INIT -1
    DATA __nDragPos              PROTECTED INIT -1
    DATA __hDragBrush            PROTECTED
-   DATA aTagged                 EXPORTED  INIT {}
+   DATA __hPrevCursor           PROTECTED
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -347,6 +349,7 @@ METHOD Create() CLASS DataGrid
    ENDIF
    ::__UpdateHScrollBar()
    ::__UpdateVScrollBar()
+   ::__hPrevCursor := ::Cursor
 RETURN Self
 
 METHOD __GetPosition() CLASS DataGrid
@@ -527,7 +530,7 @@ METHOD OnMouseMove(wParam,x,y) CLASS DataGrid
 
                ImageListDragMove( 0, nTop )
             ENDIF
-            ::Cursor := NIL
+            ::Cursor := ::__hPrevCursor
          ENDIF
 
        ELSEIF ::__lSizeMouseDown
@@ -1075,10 +1078,9 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
       ImageListEndDrag()
    ENDIF
 
-   nPos := Ceiling( (yPos-::__GetHeaderHeight() ) / ::ItemHeight )
+   nPos := Int( Ceiling( (yPos-::__GetHeaderHeight() ) / ::ItemHeight ) )
    nPos := MIN( nPos, ::RowCountUsable )
-   nPos := MAX( nPos, 1 )
-   IF nPos <> ::RowPos .AND. ::__hDragRecImage != NIL
+   IF nPos <> ::RowPos .AND. ::__hDragRecImage != NIL .AND. nPos > 0
       ::__nDragRec := -1
       ::__nDragPos := -1
       ImageListDestroy( ::__hDragRecImage )
@@ -1130,7 +1132,7 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
          ::DataSource:Unlock()
       ENDIF
       ::Update()
-    ELSEIF LEN( ::__DisplayArray ) > 0
+    ELSEIF LEN( ::__DisplayArray ) > 0 .AND. nPos > 0
       IF ::__nDragRec != -1
          ::__nDragRec := -1
          ::__DisplayData()

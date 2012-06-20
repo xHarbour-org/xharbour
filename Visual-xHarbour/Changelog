@@ -10,6 +10,8 @@
 
 2013-06-19 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed deleting TabPage to show the contents of the new current page.
+   ! Fixed DataGrid HeaderOnClick error.
+   ! Fixed DataGrid to keep the assigned cursor even if it has to be changed by the system.
 
 2013-06-14 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed IntelliSense not showing the controls in the current form.
