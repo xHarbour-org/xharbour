@@ -55,6 +55,10 @@ $(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
 	$(EXE_LINK_CMD)
 	$(MT_CMD)
 
+$(HBFORMAT_EXE) : $(HBFORMAT_EXE_OBJS)
+	$(EXE_LINK_CMD)
+	$(MT_CMD)
+
 $(HBDOCDLL_EXE) : $(HBDOCDLL_EXE_OBJS)
 	$(DLLEXE_LINK_CMD)
 	$(MT_CMD)
@@ -3053,6 +3057,24 @@ $(OBJ_DIR)$(DIR_SEP)util.c : $(CT_DIR)$(DIR_SEP)util.prg
 	$(HB_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)util$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)util.c
+	$(CC_CMD)
+
+#===============================================================================
+# HBFORMAT.EXE rules
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)hbformat$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hbformat.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbformat.c : $(HBFORMAT_DIR)$(DIR_SEP)hbformat.prg
+	$(HB_CMD_MAIN)
+
+$(OBJ_DIR)$(DIR_SEP)hbfmtcls$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hbfmtcls.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbfmtcls.c : $(HBFORMAT_DIR)$(DIR_SEP)hbfmtcls.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)filereadHBFORMAT$(OBJEXT) : $(HBFORMAT_DIR)$(DIR_SEP)fileread.c
 	$(CC_CMD)
 
 #===============================================================================

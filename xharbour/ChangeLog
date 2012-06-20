@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-21 05:50 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + utils/hbformat
+  + utils/fileread.c
+  + utils/hbfmtcls.prg
+  + utils/hbformat.ini
+  + utils/hbformat.prg
+  * winmake/mdir.bat
+  * winmake/common.mak
+  * winmake/compile.mak
+    ! PRG source code formatter borrowed from Harbour
+
 2012-06-20 20:09 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * ChangeLog
     ! typo:        - contrib/hbcurl/tests/ftpupload.prg

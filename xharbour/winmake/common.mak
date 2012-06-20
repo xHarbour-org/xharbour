@@ -39,6 +39,7 @@ HBTEST_DIR    =utils$(DIR_SEP)hbtest
 HBDOC_DIR     =utils$(DIR_SEP)hbdoc
 HBPP_DIR      =utils$(DIR_SEP)hbpp
 HBMAKE_DIR    =utils$(DIR_SEP)hbmake
+HBFORMAT_DIR  =utils$(DIR_SEP)hbformat
 XBSCRIPT_DIR  =utils$(DIR_SEP)xbscript
 HBFILERE_DIR  =utils$(DIR_SEP)hbfilere
 
@@ -175,6 +176,7 @@ HBRUN_EXE   =$(BIN_DIR)$(DIR_SEP)hbrun$(HB_MT).exe
 HBTEST_EXE  =$(BIN_DIR)$(DIR_SEP)hbtest$(HB_MT).exe
 HBDOC_EXE   =$(BIN_DIR)$(DIR_SEP)hbdoc.exe
 HBMAKE_EXE  =$(BIN_DIR)$(DIR_SEP)hbmake.exe
+HBFORMAT_EXE=$(BIN_DIR)$(DIR_SEP)hbformat.exe
 XBSCRIPT_EXE=$(BIN_DIR)$(DIR_SEP)xbscript.exe
 
 #===============================================================================
@@ -1166,6 +1168,14 @@ CT_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)util$(OBJEXT)
 
 #===============================================================================
+# HBFORMAT.EXE rules
+#===============================================================================
+HBFORMAT_EXE_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)hbformat$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)filereadHBFORMAT$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbfmtcls$(OBJEXT)
+
+#===============================================================================
 # HBPP.EXE rules
 #===============================================================================
 HBPP_EXE_OBJS=\
@@ -1904,7 +1914,8 @@ ST_PROJECT=\
 	$(HBMAKE_EXE)\
 	$(XBSCRIPT_EXE)\
 	$(HBTEST_EXE)\
-	$(HBRUN_EXE)
+	$(HBRUN_EXE)\
+	$(HBFORMAT_EXE)
 
 MT_PROJECT=\
 	$(PP_LIB)\

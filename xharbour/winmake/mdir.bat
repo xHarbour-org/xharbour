@@ -173,6 +173,7 @@ if exist bin\hbrunmt.map    del bin\hbrunmt.map
 if exist bin\hbrunmt.cgl    del bin\hbrunmt.cgl
 
 if exist bin\hbtest.exe     del bin\hbtest.exe
+if exist bin\hbformat.exe   del bin\hbformat.exe
 if exist bin\hbtest.tds     del bin\hbtest.tds
 if exist bin\hbtest.map     del bin\hbtest.map
 if exist bin\hbtest.cgl     del bin\hbtest.cgl
@@ -284,6 +285,7 @@ if exist bin\%SUB_DIR%\hbpp.exe                      del bin\%SUB_DIR%\hbpp.exe
 if exist bin\%SUB_DIR%\hbrun.exe                     del bin\%SUB_DIR%\hbrun.exe
 if exist bin\%SUB_DIR%\hbrunmt.exe                   del bin\%SUB_DIR%\hbrunmt.exe
 if exist bin\%SUB_DIR%\hbtest.exe                    del bin\%SUB_DIR%\hbtest.exe
+if exist bin\%SUB_DIR%\hbformat.exe                  del bin\%SUB_DIR%\hbformat.exe
 if exist bin\%SUB_DIR%\hbtestmt.exe                  del bin\%SUB_DIR%\hbtestmt.exe
 if exist bin\%SUB_DIR%\ppgen.exe                     del bin\%SUB_DIR%\ppgen.exe
 if exist bin\%SUB_DIR%\xbscript.exe                  del bin\%SUB_DIR%\xbscript.exe
