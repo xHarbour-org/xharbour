@@ -1491,6 +1491,9 @@ METHOD Delete() CLASS TabPage
        ENDIF
    NEXT
    ::Parent:SetCurSel( MIN( ::Parent:CurSel, LEN( ::Parent:Children ) ) )
+   IF ::Parent:CurSel > 0 .AND. LEN( ::Parent:Children ) >= ::Parent:CurSel
+      ::Parent:Children[ ::Parent:CurSel ]:ShowTab()
+   ENDIF
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
