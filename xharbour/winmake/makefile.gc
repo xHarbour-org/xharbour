@@ -346,7 +346,7 @@ ACEH_DIR    =-I"$(HB_DIR_ADS)"
 endif
 INCLUDE_DIR =include
 CLIBFLAGS   +=-DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -Wall -mdll -fomit-frame-pointer -march=i586 $(NOCYGWIN) -O3 -c -fno-strict-aliasing $(ACEH_DIR) -I$(INCLUDE_DIR) -I$(OBJ_DIR)
-HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)/ -w2 -es2 -gc2
+HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)/ -w2 -es2 -gc0
 CC_CMD      =GCC $(CLIBFLAGS) -o $@ $^
 CCC_CMD     =$(CC_CMD)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) -o$@ $^
@@ -396,9 +396,18 @@ CLIBFLAGS   +=
 ifdef HB_DIR_ADS
 ACEH_DIR    =-I"$(HB_DIR_ADS)"
 endif
-HARBOURFLAGS+=-iinclude -i$(GDLIB_DIR)/include -i$(WHAT32_DIR)/include -i$(XWT_DIR)/include -q0 -w2 -es2 -gc2
+
+ifdef HB_DIR_OPENSSL
+OPENSSL_DIR =-I"$(HB_DIR_OPENSSL)/include"
+endif
+
+ifdef HB_DIR_CURL
+CURL_DIR    =-I"$(HB_DIR_CURL)/include"
+endif
+
+HARBOURFLAGS+=-iinclude -i$(GDLIB_DIR)/include -i$(WHAT32_DIR)/include -i$(XWT_DIR)/include -q0 -w2 -es2 -gc0
 CLIBFLAGS   +=-D__WIN32__ -D_HAVE_SQLITE_CONFIG_H -Wall $(NOCYGWIN) -O3 -fomit-frame-pointer -march=i586 -mtune=pentium -c -fno-strict-aliasing
-CLIBFLAGS   +=$(ACEH_DIR) -Iinclude -I$(FREEIMAGE_DIR)/include -I$(GDLIB_DIR)/include -I$(XWT_DIR)/include -I$(XWT_DIR)/src/xwt_win -I$(ZLIB_DIR) -I$(PNG_DIR)
+CLIBFLAGS   +=$(ACEH_DIR) -Iinclude -I$(FREEIMAGE_DIR)/include -I$(GDLIB_DIR)/include -I$(XWT_DIR)/include -I$(XWT_DIR)/src/xwt_win -I$(ZLIB_DIR) -I$(PNG_DIR) $(OPENSSL_DIR) $(CURL_DIR)
 
 ifeq ($(HB_THREAD_SUPPORT),1)
 	CLIBFLAGS+=-DHB_THREAD_SUPPORT -mthreads
@@ -460,6 +469,14 @@ ifeq ($(HB_LIBHARU), 1)
 CONTRIB_PROJECT+=$(LIBHARU_LIB)
 endif
 
+ifneq ($(HB_DIR_OPENSSL),)
+CONTRIB_PROJECT+=$(TIPSSL_LIB)
+endif
+
+ifneq ($(HB_DIR_CURL),)
+CONTRIB_PROJECT+=$(HBCURL_LIB)
+endif
+
 ALL: $(CONTRIB_PROJECT)
 
 #===============================================================================
@@ -469,6 +486,12 @@ ALL: $(CONTRIB_PROJECT)
 #===============================================================================
 # Libraries dependencies and build rules (ST)
 #===============================================================================
+$(TIPSSL_LIB) : $(TIPSSL_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBCURL_LIB) : $(HBCURL_LIB_OBJS)
+	$(LIB_CMD)
+
 $(HBSQLIT3_LIB) : $(HBSQLIT3_LIB_OBJS)
 	$(LIB_CMD)
 

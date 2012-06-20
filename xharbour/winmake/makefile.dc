@@ -322,7 +322,7 @@ DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) -D"HB_NO_DUPLICATE_HVMPROCESSSYMBOL" -D"HAVE_CONFIG_H" -D"__EXPORT__" -cpp -mn $(ACEH_DIR) -I"$(INCLUDE_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"UINT_PTR=UINT"
 CLIBFLAGS_C =$(CLIBFLAGS) -D"HB_NO_DUPLICATE_HVMPROCESSSYMBOL" -D"HAVE_CONFIG_H" -D"__EXPORT__" -mn $(ACEH_DIR) -I"$(INCLUDE_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"UINT_PTR=UINT"
-HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc2
+HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 CC_CMD      =SCPPN $(CLIBFLAGS) -o$@ $**
 CCC_CMD     =SCPPN $(CLIBFLAGS_C) -o$@ $**
 HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
@@ -393,11 +393,15 @@ ACEH_DIR     =-I"$(HB_DIR_ADS)"
 !endif
 INCLUDE_DIR=-Iinclude -I$(CC_DIR)\include\win32 -I$(CC_DIR)\include -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(ZLIB_DIR) -I$(PNG_DIR)
 !ifdef HB_DIR_OPENSSL
-INCLUDE_DIR  = $(INCLUDE_DIR) -I$(HB_DIR_OPENSSL)\include
+INCLUDE_DIR  =$(INCLUDE_DIR) -I$(HB_DIR_OPENSSL)\include
 !endif
-CLIBFLAGS=$(CLIBFLAGS) -cpp -mn $(ACEH_DIR) $(INCLUDE_DIR) -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -D"_HAVE_SQLITE_CONFIG_H"
-CLIBFLAGS_C=-mn $(ACEH_DIR) -I"$(INCLUDE_DIR)" -I"$(OBJ_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -D"_HAVE_SQLITE_CONFIG_H"
-HB_CMD=$(HARBOUR_EXE) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -n1 -q0 -w2 -es2 -gc2 $** -o$@
+!ifdef HB_DIR_CURL
+# __DMC__ is not defined in curl configuration, we use __TURBOC__ here
+INCLUDE_DIR  =$(INCLUDE_DIR) -I$(HB_DIR_CURL)\include -D__TURBOC__
+!endif
+CLIBFLAGS=$(CLIBFLAGS) -cpp -mn $(ACEH_DIR) $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -D"_HAVE_SQLITE_CONFIG_H"
+CLIBFLAGS_C=-mn $(ACEH_DIR) $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -D"_HAVE_SQLITE_CONFIG_H"
+HB_CMD=$(HARBOUR_EXE) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -n1 -q0 -w2 -es2 -gc0 $** -o$@
 CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
 CCC_CMD=SCPPN $(CLIBFLAGS_C) -o$@ $**
 LIB_CMD=LIB -c -n $@ $**
@@ -463,6 +467,10 @@ CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(PGSQL_LIB)
 
 !ifdef HB_LIBHARU
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(LIBHARU_LIB)
+!endif
+
+!ifdef HB_DIR_CURL
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBCURL_LIB)
 !endif
 
 ALL: $(CONTRIB_PROJECT)
@@ -557,6 +565,9 @@ $(LIBHARU_LIB) : $(LIBHARU_LIB_OBJS)
 	$(LIB_CMD)
 
 $(SEVENZIP_LIB) : $(SEVENZIP_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBCURL_LIB) : $(HBCURL_LIB_OBJS)
 	$(LIB_CMD)
 !endif
 

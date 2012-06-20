@@ -47,6 +47,7 @@ MISC_DIR      =source$(DIR_SEP)misc
 TIP_DIR       =source$(DIR_SEP)tip
 ODBC_DIR      =source$(DIR_SEP)odbc
 
+HBCURL_DIR    =contrib$(DIR_SEP)hbcurl
 HBSQLIT3_DIR  =contrib$(DIR_SEP)hbsqlit3
 SEVENZIP_DIR  =contrib$(DIR_SEP)sevenzip
 HBHPDF_DIR    =contrib$(DIR_SEP)hbhpdf
@@ -77,8 +78,6 @@ INCLUDE_DIR2  =include
 #===============================================================================
 # Macros For Standard Libraries
 #===============================================================================
-HBSQLIT3_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbsqlit3$(LIBEXT)
-SEVENZIP_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sevenzip$(LIBEXT)
 COMPILER_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)compiler$(LIBEXT)
 COMMON_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)common$(LIBEXT)
 CODEPAGE_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)codepage$(LIBEXT)
@@ -127,6 +126,9 @@ HB_GT_LIBS  =$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTWVT_LIB) $(
 #===============================================================================
 # Contrib Library Names
 #===============================================================================
+HBCURL_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbcurl$(LIBEXT)
+HBSQLIT3_LIB =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbsqlit3$(LIBEXT)
+SEVENZIP_LIB =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sevenzip$(LIBEXT)
 FILEMEM_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)filemem$(LIBEXT)
 FIREBIRD_LIB =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)firebird$(LIBEXT)
 FREEIMAGE_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)fi_lib$(LIBEXT)
@@ -209,6 +211,14 @@ HARBOUR_LIBS=\
 #===============================================================================
 # List Of Library and Executable Dependencies
 #===============================================================================
+
+#===============================================================================
+# HBCURL.LIB rules
+#===============================================================================
+HBCURL_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)ftpupload$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)gauge$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbcurl$(OBJEXT)
 
 #===============================================================================
 # HBSQLIT3.LIB rules

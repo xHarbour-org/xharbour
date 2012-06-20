@@ -8,6 +8,30 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-20 19:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/mdir.bat
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/contrib.pc
+  * winmake/hrbdll.pc
+  * winmake/makefile.pc
+  * winmake/makefile.dc
+  * winmake/makefile.vc
+  * winmake/makefile.bc
+  * winmake/makefile.gc
+  * winmake/makefile.wc
+    ! -gc2 -> -gc0 for a bit of speed when compiling PRG files
+    + enable creation of hbcurl.lib by setting (for example):
+      SET HB_DIR_CURL=C:\CURL
+      whereby C:\CURL is the folder containing CURL package
+
+  * contrib/hbcurl/ftpupload.prg
+  * contrib/hbcurl/gauge.c
+  * contrib/hbcurl/hbcurl.c
+  * contrib/hbcurl/hbcurl.ch
+    ! fixed to be compilable without testing functionality
+    + add SVN file header
+
 2012-06-20 15:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/gtwvw/gtwvw.c
     ! missing from previous commit
