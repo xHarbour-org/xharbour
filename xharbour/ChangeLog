@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-20 20:09 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * ChangeLog
+    ! typo:        - contrib/hbcurl/tests/ftpupload.prg
+      should read: - contrib/hbcurl/ftpupload.prg
+
 2012-06-20 20:02 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/common.mak
   * winmake/compile.mak
@@ -15,7 +20,7 @@
 
   + contrib/hbcurl/tests
   + contrib/hbcurl/tests/ftpupload.prg
-  - contrib/hbcurl/tests/ftpupload.prg
+  - contrib/hbcurl/ftpupload.prg
     ! move ftpupload.prg to tests folder
 
 2012-06-20 19:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
