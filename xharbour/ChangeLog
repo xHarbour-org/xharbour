@@ -8,6 +8,23 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-20 14:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/makefile.vc
+    ! pacify MSVC warning on overriding /TP with /TC
+
+  * contrib/wtwvw/gtwvw.c
+  * contrib/gtwvw/wvwdraw.c
+  * contrib/gtwvw/wvwmenu.c
+  * contrib/gtwvw/wvwstbar.c
+  * contrib/gtwvw/wvwpush.c
+  * contrib/gtwvw/wvwcheck.c
+  * contrib/gtwvw/wvwedit.c
+  * contrib/libnf/getenvrn.c
+  * contrib/libnf/fttext.c
+  * contrib/xwt/src/xwt_win/xwt_win.c
+  * contrib/hbhpdf/hpdf_streams.c
+    + -D_CRT_SECURE_NO_WARNINGS, to pacify MSVS8+ warnings
+
 2012-06-20 09:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   - source/compiler/harboury.yyc
   - source/macro/macroy.yyc

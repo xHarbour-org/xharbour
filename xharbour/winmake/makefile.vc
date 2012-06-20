@@ -79,6 +79,7 @@ ALL: $(PROJECT)
 #===============================================================================
 HARBOURFLAGS=$(HARBOURFLAGS)
 CLIBFLAGS   =$(CLIBFLAGS)
+CLIBFLAGS_C =$(CLIBFLAGS_C)
 
 #===============================================================================
 # Option to use MSVCRT rather than LIBC*.LIB
@@ -92,12 +93,15 @@ INCLUDE_DIR =include
 INCLUDE_DIR =-I$(INCLUDE_DIR) -I$(OBJ_DIR) -I"$(CC_DIR)\include"
 !if ("$(USE_MSVCRT)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -MD
+CLIBFLAGS_C=$(CLIBFLAGS_C) -MD
 !else
 CLIBFLAGS=$(CLIBFLAGS) -MT
+CLIBFLAGS_C=$(CLIBFLAGS_C) -MT
 !endif
 !if ("$(CPLUSPLUS)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
+CLIBFLAGS_C =$(CLIBFLAGS_C) -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H -c $(OPTFLAGS) -GA -Gs -W3 -nologo $(INCLUDE_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H -c $(OPTFLAGS) -GA -Gs -W3 -nologo $(INCLUDE_DIR)
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 !if ("$(HB_THREAD_SUPPORT)"=="1")
@@ -112,7 +116,8 @@ LINKERFLAGS=$(LINKERFLAGS) /FORCE:MULTIPLE
 !endif
 
 # User flags should be able to override everything!
-CLIBFLAGS   =$(CLIBFLAGS)  $(CFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS) $(CFLAGS)
+CLIBFLAGS_C =$(CLIBFLAGS_C) $(CFLAGS_C)
 LINKERFLAGS =$(LINKERFLAGS) $(LFLAGS)
 
 #-------------------------------------------------------------------------------
@@ -135,7 +140,7 @@ MANIFESTFLAGS=/MANIFEST:NO
 !endif
 !endif
 CC_CMD       =CL $(CLIBFLAGS) -Fo$@ $**
-CCC_CMD      =CL $(CLIBFLAGS) -TC -Fo$@ $**
+CCC_CMD      =CL $(CLIBFLAGS_C) -Fo$@ $**
 CC_CMD_FMSTAT=CL $(CLIBFLAGS) -DHB_FM_STATISTICS -Fo$@ $**
 LIB_CMD      =LIB /NOLOGO /OUT:$@ $**
 LINK_CMD     =LINK /NOLOGO /OUT:$@ $** $(LINKERFLAGS) $(MANIFESTFLAGS)
@@ -343,6 +348,7 @@ HARBOUR_DLL_OBJS=\
 #===============================================================================
 HARBOURFLAGS=$(HARBOURFLAGS)
 CLIBFLAGS   =$(CLIBFLAGS)
+CLIBFLAGS_C =$(CLIBFLAGS_C)
 
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
@@ -356,9 +362,11 @@ OPTFLAGS=-Otyb1
 CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
 !if ("$(DLL_MT)"=="mt")
+CLIBFLAGS_C =$(CLIBFLAGS_C) -DHB_THREAD_SUPPORT
 CLIBFLAGS   =$(CLIBFLAGS) -DHB_THREAD_SUPPORT
 !if ("$(USE_MSVCRT)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -MD
+CLIBFLAGS_C=$(CLIBFLAGS_C) -MD
 !if ("$(__MSC__)"=="8") || ("$(__MSC__)"=="9") || ("$(__MSC__)"=="10")
 MANIFESTFLAGS=/MANIFEST /MANIFESTFILE:"$(OBJ_DIR)\intermediate.manifest"
 MT_CMD_DLL  =MT -nologo -manifest "$(OBJ_DIR)\intermediate.manifest" -outputresource:$@;2
@@ -366,6 +374,7 @@ MT_CMD      =MT -nologo -manifest "$(OBJ_DIR)\intermediate.manifest" -outputreso
 !endif
 !else
 CLIBFLAGS=$(CLIBFLAGS) -MT
+CLIBFLAGS_C=$(CLIBFLAGS_C) -MT
 !endif
 !endif
 
@@ -396,10 +405,11 @@ EXEFLAGS=\
 	/SUBSYSTEM:CONSOLE
 
 CLIBFLAGS   =$(CLIBFLAGS) -c -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H $(ACEH_DIR) $(OPENSSL_DIR) -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -DWIN32 -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ $(OPTFLAGS) -Gs -W3 -DOPENSSL_NO_DEPRECATED -nologo $(CFLAGS)
+CLIBFLAGS_C =$(CLIBFLAGS_C) -c -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H $(ACEH_DIR) $(OPENSSL_DIR) -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -DWIN32 -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ $(OPTFLAGS) -Gs -W3 -DOPENSSL_NO_DEPRECATED -nologo $(CFLAGS)
 HARBOURFLAGS=$(HARBOURFLAGS) -i$(INCLUDE_DIR) -q0 -w2 -es2 -gc2
 
 CC_CMD     =CL $(CLIBFLAGS) -Fo$@ $**
-CCC_CMD    =CL $(CLIBFLAGS) -TC -Fo$@ $**
+CCC_CMD    =CL $(CLIBFLAGS_C) -Fo$@ $**
 HB_CMD     =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN=$(HARBOUR_EXE) -n0 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 BISON_CMD1 =bison -v -d $** -o$@
@@ -518,6 +528,7 @@ ALL: $(CONTRIB_PROJECT)
 #===============================================================================
 HARBOURFLAGS=$(HARBOURFLAGS)
 CLIBFLAGS   =$(CLIBFLAGS)
+CLIBFLAGS_C =$(CLIBFLAGS_C)
 
 #===============================================================================
 # Option to use MSVCRT rather than LIBC*.LIB
@@ -539,25 +550,31 @@ INCLUDE_DIR =include
 INCLUDE_DIR =-I$(INCLUDE_DIR) -I"$(CC_DIR)\include"
 !if ("$(USE_MSVCRT)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -MD
+CLIBFLAGS_C=$(CLIBFLAGS_C) -MD
 !endif
 !if ("$(CPLUSPLUS)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
 CLIBFLAGS   =$(CLIBFLAGS) -c $(OPTFLAGS) -GA -Gs -W3 -nologo $(OPENSSL_DIR) $(ACEH_DIR) $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H
 CLIBFLAGS   =$(CLIBFLAGS) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(ZLIB_DIR)
+CLIBFLAGS_C =$(CLIBFLAGS_C) -c $(OPTFLAGS) -GA -Gs -W3 -nologo $(OPENSSL_DIR) $(ACEH_DIR) $(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H
+CLIBFLAGS_C =$(CLIBFLAGS_C) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(ZLIB_DIR)
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -q0 -w2 -es2 -gc2
 
 !if ("$(HB_THREAD_SUPPORT)"=="1")
 CLIBFLAGS   =$(CLIBFLAGS) -DHB_THREAD_SUPPORT
+CLIBFLAGS_C =$(CLIBFLAGS_C) -DHB_THREAD_SUPPORT
 !if !("$(USE_MSVCRT)"=="1")
 CLIBFLAGS   =$(CLIBFLAGS) -MT
+CLIBFLAGS_C =$(CLIBFLAGS_C) -MT
 !endif
 !endif
 
-CLIBFLAGS   =$(CLIBFLAGS)  $(CFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS) $(CFLAGS)
+CLIBFLAGS_C =$(CLIBFLAGS_C) $(CFLAGS)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 CC_CMD      =CL $(CLIBFLAGS) -Fo$@ $**
-CCC_CMD     =CL $(CLIBFLAGS) -TC -Fo$@ $**
+CCC_CMD     =CL $(CLIBFLAGS_C) -Fo$@ $**
 
 CC_CMD_ZIP  =CL\
 	$(OPTFLAGS) /GA /Gs /W3 /nologo /I"$(HBZIP_DIR)\INCLUDE" /I"include" /I"$(CC_DIR)\include" /TP\

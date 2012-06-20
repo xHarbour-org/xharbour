@@ -53,6 +53,12 @@
  *
  */
 
+#if defined( _MSC_VER ) && ( _MSC_VER >= 1400 )
+   #if !defined( _CRT_SECURE_NO_WARNINGS )
+      #define _CRT_SECURE_NO_WARNINGS
+   #endif
+#endif
+
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbapiitm.h"
