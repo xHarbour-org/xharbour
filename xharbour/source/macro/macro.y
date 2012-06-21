@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.40 2009/09/18 17:41:41 ronpinkas Exp $
+ * $Id$
  */
 
 /*

@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-21 18:11 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+   * source/macro/macro.slx
+   * source/macro/macro.y
+   * source/compiler/harbour.sly
+   * source/compiler/harbour.slx
+     + add SVN file properties
+
 2012-06-21 17:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.dc
   * winmake/makefile.wc
