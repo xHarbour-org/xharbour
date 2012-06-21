@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-21 17:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/makefile.dc
+  * winmake/makefile.wc
+    + hbzebra.lib for Digital Mars and Open Watcom not created, fixed.
+
 2012-06-21 16:27 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   - contrib/hbcairo/hbapistr.h
     ! remove redundant hbapistr.h
