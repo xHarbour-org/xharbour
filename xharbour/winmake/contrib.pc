@@ -39,6 +39,9 @@ INCLUDE_DIR =$(INCLUDE_DIR) /I"$(HB_DIR_OPENSSL)\include"
 !ifdef HB_DIR_CURL
 INCLUDE_DIR =$(INCLUDE_DIR) /I"$(HB_DIR_CURL)\include"
 !endif
+!ifdef HB_DIR_CAIRO
+INCLUDE_DIR =$(INCLUDE_DIR) /I"$(HB_DIR_CAIRO)\include\cairo"
+!endif
 HARBOURFLAGS=$(HARBOURFLAGS) $(INCLUDE_DIR) -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc0
 HB_CMD      =$(HARBOUR_EXE) /n1 $(HARBOURFLAGS) $** -o$@
 CLIBFLAGS   =$(CLIBFLAGS) /Ze /Zx /Tx86-coff /Go $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"WIN32" /D"NULL=0" /D"_HAVE_SQLITE_CONFIG_H"
@@ -99,6 +102,10 @@ CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(TIPSSL_LIB)
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBCURL_LIB)
 !endif
 
+!ifdef HB_DIR_CAIRO
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBCAIRO_LIB)
+!endif
+
 !ifdef LIBHARU
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(LIBHARU_LIB)
 !endif
@@ -108,6 +115,12 @@ ALL: $(CONTRIB_PROJECT)
 #===============================================================================
 # Library dependencies and build rules
 #===============================================================================
+$(HBZEBRA_LIB) : $(HBZEBRA_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBCAIRO_LIB) : $(HBCAIRO_LIB_OBJS)
+	$(LIB_CMD)
+
 $(FIREBIRD_LIB) : $(FIREBIRD_LIB_OBJS)
 	$(LIB_CMD)
 

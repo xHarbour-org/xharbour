@@ -8,6 +8,86 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-21 16:12 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + contrib/hbzebra
+  + contrib/hbzebra/tests
+  + contrib/hbzebra/codabar.c
+  + contrib/hbzebra/code11.c
+  + contrib/hbzebra/code128.c
+  + contrib/hbzebra/code39.c
+  + contrib/hbzebra/code93.c
+  + contrib/hbzebra/core.c
+  + contrib/hbzebra/coredraw.c
+  + contrib/hbzebra/datamtrx.c
+  + contrib/hbzebra/eanupc.c
+  + contrib/hbzebra/hbzebra.ch
+  + contrib/hbzebra/hbzebra.h
+  + contrib/hbzebra/itf.c
+  + contrib/hbzebra/msi.c
+  + contrib/hbzebra/pdf417.c
+  + contrib/hbzebra/qrcode.c
+  + contrib/hbzebra/tests/testcair.prg
+  + contrib/hbzebra/tests/testhpdf.prg
+    ! hbzebra library borrowed from harbour
+
+  + contrib/hbcairo
+  + contrib/hbcairo/tests
+  + contrib/hbcairo/context.c
+  + contrib/hbcairo/core.c
+  + contrib/hbcairo/hbapistr.h
+  + contrib/hbcairo/hbcairo.ch
+  + contrib/hbcairo/hbcairo.h
+  + contrib/hbcairo/image.c
+  + contrib/hbcairo/paths.c
+  + contrib/hbcairo/pdf.c
+  + contrib/hbcairo/png.c
+  + contrib/hbcairo/ps.c
+  + contrib/hbcairo/surface.c
+  + contrib/hbcairo/text.c
+  + contrib/hbcairo/transfor.c
+  + contrib/hbcairo/util.c
+  + contrib/hbcairo/tests/fancytxt.prg
+  + contrib/hbcairo/tests/glyphdbg.prg
+  + contrib/hbcairo/tests/hellow.prg
+  + contrib/hbcairo/tests/lightning.prg
+  + contrib/hbcairo/tests/table.prg
+    ! hbcairo library borrowed from Harbour
+
+  - contrib/hbsqlit3/hbapistr.h
+  - contrib/hbsqlit3/strapi.c
+  + include/hbapistr.h
+  + source/vm/strapi.c
+    ! move strapi files to core folder
+
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/contrib.pc
+  * winmake/makefile.bc
+  * winmake/makefile.dc
+  * winmake/makefile.gc
+  * winmake/makefile.pc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+  * winmake/mdir.bat
+    ! inclusion of hbzebra.lib and hbcairo.lib
+      /*
+      NOTE:
+      The above stuffs are very good codebar libraries, thanks to Harbour Team.
+      hbzebra.lib is built by default.
+      hbcairo.lib will be built with an envar (for example):
+         SET HB_DIR_CAIRO=C:\CAIRO
+      where cairo package is installed in C:\CAIRO
+      To run hbcairo example, you need the following external RT:
+      -> freetype6.dll
+      -> libcairo-2.dll
+      -> libexpat-1.dll
+      -> libfontconfig-1.dll
+      -> libpng14-14.dll
+      -> zlib1.dll
+      -> download the binaries at: http://www.gtk.org/download/win32.php
+      -> create an import lib of libcairo-2.dll and link it to application
+      */
+
 2012-06-21 09:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rdd/dbdelim.prg
     ! fixed to honor SET DEFAULT value as per Clipper's behavior.

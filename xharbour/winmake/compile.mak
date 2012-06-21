@@ -80,6 +80,81 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
 	$(MT_CMD)
 
 #===============================================================================
+# HBCAIRO.LIB Dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)context$(OBJEXT) : $(HBCAIRO_DIR)$(DIR_SEP)context.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)coreHBCAIRO$(OBJEXT) : $(HBCAIRO_DIR)$(DIR_SEP)core.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)imageHBCAIRO$(OBJEXT) : $(HBCAIRO_DIR)$(DIR_SEP)image.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)paths$(OBJEXT) : $(HBCAIRO_DIR)$(DIR_SEP)paths.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pdf$(OBJEXT) : $(HBCAIRO_DIR)$(DIR_SEP)pdf.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pngHBCAIRO$(OBJEXT) : $(HBCAIRO_DIR)$(DIR_SEP)png.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)surface$(OBJEXT) : $(HBCAIRO_DIR)$(DIR_SEP)surface.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)textHBCAIRO$(OBJEXT) : $(HBCAIRO_DIR)$(DIR_SEP)text.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)transfor$(OBJEXT) : $(HBCAIRO_DIR)$(DIR_SEP)transfor.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)utilHBCAIRO$(OBJEXT) : $(HBCAIRO_DIR)$(DIR_SEP)util.c
+	$(CC_CMD)
+
+#===============================================================================
+# HBZEBRA.LIB Dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)codabar$(OBJEXT) : $(HBZEBRA_DIR)$(DIR_SEP)codabar.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)qrcode$(OBJEXT) : $(HBZEBRA_DIR)$(DIR_SEP)qrcode.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)code11$(OBJEXT) : $(HBZEBRA_DIR)$(DIR_SEP)code11.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)code128$(OBJEXT) : $(HBZEBRA_DIR)$(DIR_SEP)code128.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)code39$(OBJEXT) : $(HBZEBRA_DIR)$(DIR_SEP)code39.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)code93$(OBJEXT) : $(HBZEBRA_DIR)$(DIR_SEP)code93.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)coreHBZEBRA$(OBJEXT) : $(HBZEBRA_DIR)$(DIR_SEP)core.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)coredraw$(OBJEXT) : $(HBZEBRA_DIR)$(DIR_SEP)coredraw.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)datamtrx$(OBJEXT) : $(HBZEBRA_DIR)$(DIR_SEP)datamtrx.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)eanupc$(OBJEXT) : $(HBZEBRA_DIR)$(DIR_SEP)eanupc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)itf$(OBJEXT) : $(HBZEBRA_DIR)$(DIR_SEP)itf.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)msi$(OBJEXT) : $(HBZEBRA_DIR)$(DIR_SEP)msi.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pdf417$(OBJEXT) : $(HBZEBRA_DIR)$(DIR_SEP)pdf417.c
+	$(CC_CMD)
+
+#===============================================================================
 # HBCURL.LIB Dependencies
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)gauge$(OBJEXT) : $(HBCURL_DIR)$(DIR_SEP)gauge.c
@@ -93,9 +168,6 @@ $(OBJ_DIR)$(DIR_SEP)hbcurl$(OBJEXT) : $(HBCURL_DIR)$(DIR_SEP)hbcurl.c
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)sqlite3$(OBJEXT) : $(HBSQLIT3_DIR)$(DIR_SEP)sqlite3.c
 	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)strapi$(OBJEXT) : $(HBSQLIT3_DIR)$(DIR_SEP)strapi.c
-	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)xhbsqlite3$(OBJEXT) : $(HBSQLIT3_DIR)$(DIR_SEP)xhbsqlite3.c
 	$(CC_CMD)
@@ -570,6 +642,9 @@ $(OBJ_DIR)$(DIR_SEP)pvalue$(OBJEXT) : $(VM_DIR)$(DIR_SEP)pvalue.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)runner$(OBJEXT) : $(VM_DIR)$(DIR_SEP)runner.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)strapi$(OBJEXT) : $(VM_DIR)$(DIR_SEP)strapi.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)usedll$(OBJEXT) : $(VM_DIR)$(DIR_SEP)usedll.c

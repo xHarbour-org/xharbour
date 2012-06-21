@@ -584,9 +584,13 @@ OPENSSL_DIR    =-I$(HB_DIR_OPENSSL)\include
 CURL_DIR    =-I$(HB_DIR_CURL)\include
 !endif
 
+!ifdef HB_DIR_CAIRO
+CAIRO_DIR   =-I$(HB_DIR_CAIRO)\include\cairo
+!endif
+
 INCLUDE_DIR  =include
 INCLUDE_DIR  =$(INCLUDE_DIR)
-CLIBFLAGS    =$(CLIBFLAGS) -c -q $(ACEH_DIR) $(CURL_DIR) $(OPENSSL_DIR) -I$(INCLUDE_DIR) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(HBHPDF_DIR) -I$(ZLIB_DIR) -d -5 -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H
+CLIBFLAGS    =$(CLIBFLAGS) -c -q $(ACEH_DIR) $(CAIRO_DIR) $(CURL_DIR) $(OPENSSL_DIR) -I$(INCLUDE_DIR) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(HBHPDF_DIR) -I$(ZLIB_DIR) -d -5 -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H
 HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -i$(GDLIB_DIR)\include -i$(WHAT32_DIR)\include -i$(XWT_DIR)\include -q0 -w2 -es2 -gc0
 !if $d(HB_THREAD_SUPPORT)
 CLIBFLAGS    =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT
@@ -653,6 +657,10 @@ CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(TIPSSL_LIB)
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBCURL_LIB)
 !endif
 
+!ifdef HB_DIR_CAIRO
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBCAIRO_LIB)
+!endif
+
 !ifdef HB_LIBHARU
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(LIBHARU_LIB)
 !endif
@@ -662,6 +670,20 @@ ALL: $(CONTRIB_PROJECT)
 #===============================================================================
 # Library dependencies and build rules
 #===============================================================================
+$(HBCAIRO_LIB) : $(HBCAIRO_LIB_OBJS)
+	IF EXIST "$(HBCAIRO_LIB)" $(DEL) "$(HBCAIRO_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
+$(HBZEBRA_LIB) : $(HBZEBRA_LIB_OBJS)
+	IF EXIST "$(HBZEBRA_LIB)" $(DEL) "$(HBZEBRA_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
 $(HBCURL_LIB) : $(HBCURL_LIB_OBJS)
 	IF EXIST "$(HBCURL_LIB)" $(DEL) "$(HBCURL_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!

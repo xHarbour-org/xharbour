@@ -48,6 +48,8 @@ MISC_DIR      =source$(DIR_SEP)misc
 TIP_DIR       =source$(DIR_SEP)tip
 ODBC_DIR      =source$(DIR_SEP)odbc
 
+HBCAIRO_DIR   =contrib$(DIR_SEP)hbcairo
+HBZEBRA_DIR   =contrib$(DIR_SEP)hbzebra
 HBCURL_DIR    =contrib$(DIR_SEP)hbcurl
 HBSQLIT3_DIR  =contrib$(DIR_SEP)hbsqlit3
 SEVENZIP_DIR  =contrib$(DIR_SEP)sevenzip
@@ -127,6 +129,8 @@ HB_GT_LIBS  =$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTWVT_LIB) $(
 #===============================================================================
 # Contrib Library Names
 #===============================================================================
+HBCAIRO_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbcairo$(LIBEXT)
+HBZEBRA_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbzebra$(LIBEXT)
 HBCURL_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbcurl$(LIBEXT)
 HBSQLIT3_LIB =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbsqlit3$(LIBEXT)
 SEVENZIP_LIB =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sevenzip$(LIBEXT)
@@ -215,10 +219,42 @@ HARBOUR_LIBS=\
 #===============================================================================
 
 #===============================================================================
+# HBCAIRO.LIB rules
+#===============================================================================
+HBCAIRO_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)coreHBCAIRO$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)imageHBCAIRO$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)paths$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pdf$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pngHBCAIRO$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)surface$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)textHBCAIRO$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)transfor$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)utilHBCAIRO$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)context$(OBJEXT)
+
+#===============================================================================
+# HBZEBRA.LIB rules
+#===============================================================================
+HBZEBRA_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)codabar$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)code11$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)code128$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)code39$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)code93$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)coreHBZEBRA$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)coredraw$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)datamtrx$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)eanupc$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)itf$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)msi$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pdf417$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)qrcode$(OBJEXT)
+
+#===============================================================================
 # HBCURL.LIB rules
 #===============================================================================
 HBCURL_LIB_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)gauge$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbcurl$(OBJEXT)
 
 #===============================================================================
@@ -226,7 +262,6 @@ HBCURL_LIB_OBJS=\
 #===============================================================================
 HBSQLIT3_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)sqlite3$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)strapi$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)xhbsqlite3$(OBJEXT)
 
 #===============================================================================
@@ -835,6 +870,7 @@ VM_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)proc$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pvalue$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)runner$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)strapi$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)thread$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)throw$(OBJEXT)\
 	\
@@ -1963,4 +1999,5 @@ CONTRIB_PROJECT=\
 	$(PNG_LIB)\
 	$(HBHPDF_LIB)\
 	$(SEVENZIP_LIB)\
-	$(HBSQLIT3_LIB)
+	$(HBSQLIT3_LIB)\
+	$(HBZEBRA_LIB)

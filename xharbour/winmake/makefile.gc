@@ -405,9 +405,14 @@ ifdef HB_DIR_CURL
 CURL_DIR    =-I"$(HB_DIR_CURL)/include"
 endif
 
+ifdef HB_DIR_CAIRO
+CAIRO_DIR   =-I"$(HB_DIR_CAIRO)/include/cairo"
+endif
+
 HARBOURFLAGS+=-iinclude -i$(GDLIB_DIR)/include -i$(WHAT32_DIR)/include -i$(XWT_DIR)/include -q0 -w2 -es2 -gc0
 CLIBFLAGS   +=-D__WIN32__ -D_HAVE_SQLITE_CONFIG_H -Wall $(NOCYGWIN) -O3 -fomit-frame-pointer -march=i586 -mtune=pentium -c -fno-strict-aliasing
 CLIBFLAGS   +=$(ACEH_DIR) -Iinclude -I$(FREEIMAGE_DIR)/include -I$(GDLIB_DIR)/include -I$(XWT_DIR)/include -I$(XWT_DIR)/src/xwt_win -I$(ZLIB_DIR) -I$(PNG_DIR) $(OPENSSL_DIR) $(CURL_DIR)
+CLIBFLAGS   +=$(CAIRO_DIR)
 
 ifeq ($(HB_THREAD_SUPPORT),1)
 	CLIBFLAGS+=-DHB_THREAD_SUPPORT -mthreads
@@ -477,6 +482,10 @@ ifneq ($(HB_DIR_CURL),)
 CONTRIB_PROJECT+=$(HBCURL_LIB)
 endif
 
+ifneq ($(HB_DIR_CAIRO),)
+CONTRIB_PROJECT+=$(HBCAIRO_LIB)
+endif
+
 ALL: $(CONTRIB_PROJECT)
 
 #===============================================================================
@@ -489,7 +498,13 @@ ALL: $(CONTRIB_PROJECT)
 $(TIPSSL_LIB) : $(TIPSSL_LIB_OBJS)
 	$(LIB_CMD)
 
+$(HBZEBRA_LIB) : $(HBZEBRA_LIB_OBJS)
+	$(LIB_CMD)
+
 $(HBCURL_LIB) : $(HBCURL_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBCAIRO_LIB) : $(HBCAIRO_LIB_OBJS)
 	$(LIB_CMD)
 
 $(HBSQLIT3_LIB) : $(HBSQLIT3_LIB_OBJS)

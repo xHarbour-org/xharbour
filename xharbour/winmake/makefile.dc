@@ -396,8 +396,10 @@ INCLUDE_DIR=-Iinclude -I$(CC_DIR)\include\win32 -I$(CC_DIR)\include -I$(FREEIMAG
 INCLUDE_DIR  =$(INCLUDE_DIR) -I$(HB_DIR_OPENSSL)\include
 !endif
 !ifdef HB_DIR_CURL
-# __DMC__ is not defined in curl configuration, we use __TURBOC__ here
-INCLUDE_DIR  =$(INCLUDE_DIR) -I$(HB_DIR_CURL)\include -D__TURBOC__
+INCLUDE_DIR  =$(INCLUDE_DIR) -I$(HB_DIR_CURL)\include
+!endif
+!ifdef HB_DIR_CAIRO
+INCLUDE_DIR   =$(INCLUDE_DIR) -I$(HB_DIR_CAIRO)\include\cairo
 !endif
 CLIBFLAGS=$(CLIBFLAGS) -cpp -mn $(ACEH_DIR) $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -D"_HAVE_SQLITE_CONFIG_H"
 CLIBFLAGS_C=-mn $(ACEH_DIR) $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -D"_HAVE_SQLITE_CONFIG_H"
@@ -471,6 +473,10 @@ CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(LIBHARU_LIB)
 
 !ifdef HB_DIR_CURL
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBCURL_LIB)
+!endif
+
+!ifdef HB_DIR_CAIRO
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBCAIRO_LIB)
 !endif
 
 ALL: $(CONTRIB_PROJECT)
@@ -568,6 +574,12 @@ $(SEVENZIP_LIB) : $(SEVENZIP_LIB_OBJS)
 	$(LIB_CMD)
 
 $(HBCURL_LIB) : $(HBCURL_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBZEBRA_LIB) : $(HBZEBRA_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBCAIRO_LIB) : $(HBCAIRO_LIB_OBJS)
 	$(LIB_CMD)
 !endif
 
