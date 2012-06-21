@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-21 08:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/common.mak
+  * winmake/compile.mak
+  - contrib/hbcurl/gauge.c
+    ! removed gauge.obj dependency
+
+  * contrib/hbcurl/hbcurl.c
+  * contrib/hbcurl/hbcurl.ch
+  * contrib/hbcurl/tests/ftpupload.prg
+    ! borrowed updates from Harbour
+
 2012-06-21 05:50 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   + utils/hbformat
   + utils/fileread.c
