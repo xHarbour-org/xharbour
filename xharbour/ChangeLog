@@ -8,6 +8,26 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-21 09:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rdd/dbdelim.prg
+    ! fixed to honor SET DEFAULT value as per Clipper's behavior.
+      (bug report from Scott Coffey in comp.lang.xharbour)
+
+      /*
+      Example:
+
+      SET DEFAULT TO C:\POS\DATA
+      USE TEST.DBF NEW
+      COPY TO TEXT.TXT DELIMITED // will create TEXT.TXT in C:\POS\DATA
+
+      but:
+
+      SET DEFAULT TO C:\POS\DATA
+      USE TEST.DBF NEW
+      COPY TO E:\TEMP\TEXT.TXT DELIMITED // will create TEXT.TXT in E:\TEMP
+      (file name contains explicit path, SET DEFAULT is overidden )
+      */
+
 2012-06-21 08:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/common.mak
   * winmake/compile.mak

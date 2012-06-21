@@ -68,6 +68,16 @@ FUNCTION __dbDelim( lExport, cFile, cDelimArg, aFields, bFor, bWhile, nNext, nRe
    LOCAL nDstArea
    LOCAL aStruct
    LOCAL cRDD := "DELIM"
+   LOCAL cDefault := Set( _SET_DEFAULT )
+   LOCAL cSep := hb_ospathseparator()
+   LOCAL cPath
+
+   hb_FNameSplit( cFile, @cPath )
+
+   IF Empty( cPath ) .AND. !Empty( cDefault ) .AND. !( Right( cDefault, 1 ) == cSep )
+      cDefault += cSep
+      cFile    := cDefault + cFile
+   ENDIF
 
    IF lExport
       nSrcArea := Select()
@@ -112,6 +122,17 @@ FUNCTION __dbDelim( lExport, cFile, cDelimArg, aFields, bFor, bWhile, nNext, nRe
    RETURN .T.
 
 #else
+
+   LOCAL cDefault := Set( _SET_DEFAULT )
+   LOCAL cSep := hb_ospathseparator()
+   LOCAL cPath
+
+   hb_FNameSplit( cFile, @cPath )
+
+   IF Empty( cPath ) .AND. !Empty( cDefault ) .AND. !( Right( cDefault, 1 ) == cSep )
+      cDefault += cSep
+      cFile    := cDefault + cFile
+   ENDIF
 
    RETURN iif( lExport,;
       __dbCopy( cFile, aFields, bFor, bWhile, nNext, nRecord, lRest, "DELIM", cCdp, , cDelimArg ) ,;
