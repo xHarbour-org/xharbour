@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * Harbour Project source code:
  * HTML Classes
  *

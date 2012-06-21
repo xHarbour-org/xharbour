@@ -1,4 +1,8 @@
 /*
+ * $Id$
+ */
+
+/*
 *
 *  SQL.CH
 *  (Not Ready) Headers for ODBC

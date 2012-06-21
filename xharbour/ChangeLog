@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-21 19:14 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/tip/thtml.prg
+  * source/odbc/sql.ch
+  * source/lang/msgsv.c
+  * source/lang/msgsvwin.c
+    + add SVN file headers
+
 2012-06-21 18:41 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/hbsyslog.c
   * source/rtl/stream.prg
