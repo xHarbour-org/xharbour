@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 #ifndef _OLEERR_CH
 
 #define NOERROR  0

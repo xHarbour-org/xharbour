@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 #ifndef EXCEPT_H
    #define EXCEPT_H
 

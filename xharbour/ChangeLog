@@ -8,6 +8,28 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-21 20:25 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/wintypes.ch
+  * include/vt.ch
+  * include/vm.api
+  * include/rdd.api
+  * include/oleerr.ch
+  * include/local.h
+  * include/item.api
+  * include/hrbbdll.h
+  * include/hbundoc.api
+  * include/hbexcept.ch
+  * include/hbdll.ch
+  * include/gt.api
+  * include/fm.api
+  * include/filesys.api
+  * include/extend.api
+  * include/error.api
+  * include/divert.ch
+  * include/ctwin.ch
+  * include/assocarr.ch
+    + add SVN file headers and/or SVN file properties
+
 2012-06-21 19:14 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/tip/thtml.prg
   * source/odbc/sql.ch

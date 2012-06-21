@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 #ifndef _VT_CH
    #define _VT_CH
 

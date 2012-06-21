@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 #ifndef __DLL_CH
    #define __DLL_CH
 

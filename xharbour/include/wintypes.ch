@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 #ifndef __WINTYPES_CH
 
    #define __WINTYPES_CH
