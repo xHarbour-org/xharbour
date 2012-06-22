@@ -2844,8 +2844,8 @@ CLASS MenuStripItem INHERIT ToolStripButton
    DATA Checked      PUBLISHED INIT .F.
    DATA ShortCutText PUBLISHED
    DATA RadioCheck   PUBLISHED INIT .F.
+   DATA Position     EXPORTED
 
-   
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD __OnParentSize() INLINE NIL
@@ -2866,15 +2866,15 @@ METHOD Init( oParent ) CLASS MenuStripItem
 RETURN Self
 
 //--------------------------------------------------------------------------------------------------------------------------------
-METHOD Create( nPos ) CLASS MenuStripItem
+METHOD Create() CLASS MenuStripItem
    IF ::Parent:ClsName != ::ClsName .AND. ! ::Parent:ClsName IN { "ToolStripButton", "ContextStrip" }
       Super:Create()
     ELSE
       IF LEFT( ::xCaption, 2 ) == '{|' .AND. ::__ClassInst == NIL 
          ::xCaption := EVAL( &(::xCaption) )
       ENDIF
-      IF nPos != NIL
-         AINS( ::Parent:Children, nPos, Self, .T. )
+      IF ::Position != NIL
+         AINS( ::Parent:Children, ::Position, Self, .T. )
        ELSE
          AADD( ::Parent:Children, Self )
       ENDIF
