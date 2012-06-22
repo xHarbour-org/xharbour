@@ -43,6 +43,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 INCLUDE_DIR =include
 INCLUDE_DIR =-i=$(INCLUDE_DIR) -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt
+INCLUDE_DIR =$(INCLUDE_DIR) -i=$(ZLIB_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) $(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dWIN32 -dHAVE_CONFIG_H -d_HAVE_SQLITE_CONFIG_H
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 
@@ -321,7 +322,7 @@ EXEFLAGS=\
 !ifdef HB_DIR_ADS
 ACEH_DIR    =-i="$(HB_DIR_ADS)"
 !endif
-INCLUDE_DIR =-i=include -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt
+INCLUDE_DIR =-i=include -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt -i=$(ZLIB_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) $(ACEH_DIR) $(INCLUDE_DIR) -bd -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dWIN32 -dHB_NO_DUPLICATE_HVMPROCESSSYMBOL -d__EXPORT__ -dHAVE_CONFIG_H
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc2
 CC_CMD      =WCC386 $(CLIBFLAGS) -fo$@ $**
@@ -414,6 +415,9 @@ CONTRIB_PROJECT=\
 	$(PNG_LIB)\
 	$(HBHPDF_LIB)\
 	$(HBZEBRA_LIB)\
+	$(HBBZ2_LIB)\
+	$(HBLZF_LIB)\
+	$(HBMLZO_LIB)\
 	$(SEVENZIP_LIB)\
 	$(HBSQLIT3_LIB)
 
@@ -572,6 +576,16 @@ $(HBZEBRA_LIB) : $(HBZEBRA_LIB_OBJS)
 
 $(HBCAIRO_LIB) : $(HBCAIRO_LIB_OBJS)
 	$(LIB_CMD)
+
+$(HBBZ2_LIB) : $(HBBZ2_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBLZF_LIB) : $(HBLZF_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBMLZO_LIB) : $(HBMLZO_LIB_OBJS)
+	$(LIB_CMD)
+
 !endif
 
 #===============================================================================

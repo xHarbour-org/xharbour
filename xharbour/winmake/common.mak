@@ -48,6 +48,9 @@ MISC_DIR      =source$(DIR_SEP)misc
 TIP_DIR       =source$(DIR_SEP)tip
 ODBC_DIR      =source$(DIR_SEP)odbc
 
+HBMLZO_DIR    =contrib$(DIR_SEP)hbmlzo
+HBLZF_DIR     =contrib$(DIR_SEP)hblzf
+HBBZ2_DIR     =contrib$(DIR_SEP)hbbz2
 HBCAIRO_DIR   =contrib$(DIR_SEP)hbcairo
 HBZEBRA_DIR   =contrib$(DIR_SEP)hbzebra
 HBCURL_DIR    =contrib$(DIR_SEP)hbcurl
@@ -129,6 +132,9 @@ HB_GT_LIBS  =$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTWVT_LIB) $(
 #===============================================================================
 # Contrib Library Names
 #===============================================================================
+HBMLZO_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbmlzo$(LIBEXT)
+HBLZF_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hblzf$(LIBEXT)
+HBBZ2_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbbz2$(LIBEXT)
 HBCAIRO_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbcairo$(LIBEXT)
 HBZEBRA_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbzebra$(LIBEXT)
 HBCURL_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbcurl$(LIBEXT)
@@ -217,6 +223,34 @@ HARBOUR_LIBS=\
 #===============================================================================
 # List Of Library and Executable Dependencies
 #===============================================================================
+
+#===============================================================================
+# HBMLZO.LIB rules
+#===============================================================================
+HBMLZO_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)coreHBMLZO$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)minilzoHBMLZO$(OBJEXT)
+
+#===============================================================================
+# HBLZF.LIB rules
+#===============================================================================
+HBLZF_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)coreHBLZF$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)lzf_cHBLZF$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)lzf_dHBLZF$(OBJEXT)
+
+#===============================================================================
+# HBBZ2.LIB rules
+#===============================================================================
+HBBZ2_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)blocksorHBBZ2$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)bzlibHBBZ2$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)compressHBBZ2$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)coreHBBZ2$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)crctableHBBZ2$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)decompreHBBZ2$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)huffmanHBBZ2$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)randtablHBBZ2$(OBJEXT)
 
 #===============================================================================
 # HBCAIRO.LIB rules
@@ -327,6 +361,7 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hbbitf$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbchksum$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbcomprs$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbzlibgz$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbcrc32$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbcrypt$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbffind$(OBJEXT)\
@@ -2000,4 +2035,7 @@ CONTRIB_PROJECT=\
 	$(HBHPDF_LIB)\
 	$(SEVENZIP_LIB)\
 	$(HBSQLIT3_LIB)\
-	$(HBZEBRA_LIB)
+	$(HBZEBRA_LIB)\
+	$(HBMLZO_LIB)\
+	$(HBLZF_LIB)\
+	$(HBBZ2_LIB)

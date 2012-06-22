@@ -9,6 +9,9 @@
  * Copyright 2006 Francesco Saverio Giudice <info/at/fsgiudice.com>
  * www - http://www.xharbour.org
  *
+ * HB_REGEXSTRTRAN()
+ * Copyright 2010 Adam L. <niechcespamu/domena.pl>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2, or (at your option)
@@ -99,3 +102,141 @@ RETURN cReturn
 
 //--------------------------------------------------------------//
 
+/**************************************************************************
+*  Regular expression version of function STRTRAN()
+*  --------------------------------------------------
+*  hb_RegExStrTran(<cString>,<cpSearch>,[cReplace],[nStart],[nCount],[lCase],[lNewLine])  --> cReturn
+*  <cString>  The main string to search
+*  <cpSearch> The string/regexp to locate in the main string
+*  <cReplace> The string to replace
+*  <nStart>   The first occurence to be replaced  (defaut 1)
+*  <nCount>   Number of occurence to replace      (default ALL)
+*  <lCase> ,<lNewLine> Options for regular expression
+*  DESCRIPTION:
+*  In <cReplace> sign '$' is extra token: for iclude backreferences
+*   '$&' or '$0' - insert whole regex match
+*   '$1'..'$99'  - insert group 1 .. 99  (if group exist)
+*   '$10'..'$99' but not exist group > 9 - try group 1..9 + 'digit'
+*   '$1'..'$9' but group not exist  -  insert as empty string (remove '$n')
+*   '$$' - as single '$' (sample to insert '$2', use '$$2' )
+*   '$x' where x is not digit or '&' -  insert as is
+* SAMPLE:
+* hb_RegExStrTran("xxxA1yyyB2zzz",".\d","QQ") --> "xxxQQyyyQQzzz"
+* hb_RegExStrTran("xxxA1yyyB2zzz",".\d","Q$&Q") --> "xxxQA1QyyyQB2Qzzz"
+* hb_RegExStrTran("xxxA1yyyB2zzz",".(\d)","Q$1") --> "xxxQ1yyyQ2zzz"
+* hb_RegExStrTran("xxxA1yyyB2zzz",".\d","$$0") --> "xxx$0yyy$0zzz"
+* hb_RegExStrTran("xxxA1yyyB2zzz",".(\d)","Q$3") --> "xxxQyyyQzzz"
+* hb_RegExStrTran("xxxA1yyyB2zzz",".\d","Q$Q") --> "xxxQ$QyyyQ$Qzzz"
+*
+* Adam
+* PS.
+* Please correct the descriptions and comments in "English" :)
+*************************************************************************/
+
+FUNCTION hb_RegExStrTran(cString,cpSearch,cReplace,nStart,nCount,lCase,lNewLine)
+
+   LOCAL aMatch, nFind := 0, cRet := ""
+   LOCAL cRep :="", cRep0, pos, xG1, xG2, lAll
+
+   IF !ValType(cString)$"CM"
+      // do error ???
+      RETURN nil  // or ""
+   ENDIF
+
+   IF !ValType(cpSearch)$"CM"
+      // IF !HB_ISREGEX(cpSearch)
+      IF !HB_ISREGEXSTRING( cpSearch )
+         // do error ???
+         RETURN nil // or ""
+      ENDIF
+   ENDIF
+
+   IF !ValType(cReplace)$"CM"
+     cReplace := ""
+   ENDIF
+
+   IF !ValType(nStart) == "N"
+     nStart := 1
+   ENDIF
+
+   IF !ValType(nCount) == "N"
+     nCount := 0
+     lAll   := .T.
+   ELSE
+     lAll   := .F.
+   ENDIF
+
+   //  StrTran() work this way:
+   IF !lAll .AND. nCount == 0
+       RETURN ""
+   ENDIF
+   IF nCount < 0
+       RETURN cString
+   ENDIF
+   IF nStart < 1
+      RETURN cString
+   ENDIF
+
+   // START SEARCH
+   DO WHILE lAll .OR. nCount > 0
+      aMatch := HB_REGEXATX( cpSearch, cString, lCase, lNewLine )
+      //aMatch: { {Find,Start,End} [,{FindGr1,StartGr1,EndGr1},...] }
+      IF EMPTY( aMatch )   //not found
+         EXIT
+      ENDIF
+      nFind++
+      IF nFind >= nStart
+         // now change in cReplace "$..."
+         cRep0 := cReplace
+         cRep  := ""
+         DO WHILE ( pos := AT( "$", cRep0 ) ) > 0
+            xG1 := SUBSTR( cRep0, pos+1, 1 )
+            xG2 := SUBSTR( cRep0, pos+2, 1 )
+            IF xG1 == "$"                         // '$$' -> '$'
+               cRep  += LEFT( cRep0, pos )
+               cRep0 := SUBSTR( cRep0, pos + 2 )
+            ELSEIF xG1$"&0"                     // all found text
+               cRep  += LEFT( cRep0, pos - 1 ) + aMatch[ 1, 1 ]
+               cRep0 := SUBSTR( cRep0, pos + 2 )
+            ELSEIF xG1$"123456789"             // $1 .. $9
+               IF xG2$"0123456789"             // test $10 .. $99
+                  IF (xG2  := VAL( xG1 + xG2 ) + 1 ) <= LEN( aMatch )   //try group > 9
+                     cRep  += LEFT( cRep0, pos - 1 ) + aMatch[ xG2, 1 ]
+                     cRep0 := SUBSTR( cRep0, pos + 3 )
+                  ELSEIF (xG1 := VAL( xG1 ) + 1 ) <= LEN( aMatch )   //try '$xy'- >GroupX+'y'
+                     cRep  += LEFT( cRep0, pos - 1 ) + aMatch[ xG1, 1 ]
+                     cRep0 := SUBSTR( cRep0, pos + 2 )
+                  ELSE                           //group not exist ->remove
+                     cRep  += LEFT( cRep0, pos - 1 )
+                     cRep0 := SUBSTR( cRep0, pos + 2 )
+                     //  *** OR as is ???  ***
+                     // cRep  += LEFT( cRep0, pos + 1 )
+                     // cRep0 := SUBSTR( cRep0, pos + 2 )
+                  ENDIF
+               ELSE                            // not $10..$99
+                  IF (xG1 := VAL( xG1 ) + 1 ) <= LEN( aMatch )   //gropu exist
+                     cRep  += LEFT( cRep0, pos - 1 ) + aMatch[ xG1, 1 ]
+                     cRep0 := SUBSTR( cRep0, pos + 2 )
+                  ELSE                         //group not exist-> remove
+                     cRep  += LEFT( cRep0, pos -1 )
+                     cRep0 := SUBSTR( cRep0, pos + 2 )
+                     //  *** OR as is ???  ***
+                     // cRep  += LEFT( cRep0, pos + 1 )
+                     // cRep0 := SUBSTR( cRep0, pos + 2 )
+                  ENDIF
+               ENDIF
+            ELSE                          // '$x' -> copy as is
+               cRep  += LEFT( cRep0, pos + 1 )
+               cRep0 := SUBSTR( cRep0, pos + 2 )
+            ENDIF
+         ENDDO
+         cRep    += cRep0
+         cRet    += LEFT( cString, aMatch[ 1, 2 ] - 1 ) + cRep
+         cString := SUBSTR( cString, aMatch[ 1, 3 ] + 1 )
+         nCount--
+      ENDIF
+   ENDDO
+   cRet += cString
+
+   RETURN cRet
+// ****** END *********

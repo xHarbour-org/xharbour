@@ -37,7 +37,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
-INCLUDE_DIR=include;$(CC_DIR)\include\win32;$(CC_DIR)\include
+INCLUDE_DIR=include;$(CC_DIR)\include\win32;$(CC_DIR)\include;$(ZLIB_DIR)
 
 !if ("$(HB_MT)"=="mt")
 CLIBFLAGS   =-D_MT -DHB_THREAD_SUPPORT
@@ -317,7 +317,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 !ifdef HB_DIR_ADS
 ACEH_DIR    =-I"$(HB_DIR_ADS)"
 !endif
-INCLUDE_DIR =include;$(CC_DIR)\include\win32;$(CC_DIR)\include;$(OBJ_DIR)
+INCLUDE_DIR =include;$(CC_DIR)\include\win32;$(CC_DIR)\include;$(OBJ_DIR);$(ZLIB_DIR)
 DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) -D"HB_NO_DUPLICATE_HVMPROCESSSYMBOL" -D"HAVE_CONFIG_H" -D"__EXPORT__" -cpp -mn $(ACEH_DIR) -I"$(INCLUDE_DIR)" -c -6 -WD -D"__WIN32__" -D"WIN32" -D"UINT_PTR=UINT"
@@ -426,6 +426,9 @@ CONTRIB_PROJECT=\
 	$(HBHPDF_LIB)\
 	$(LIBHARU_LIB)\
 	$(HBZEBRA_LIB)\
+	$(HBBZ2_LIB)\
+	$(HBLZF_LIB)\
+	$(HBMLZO_LIB)\
 	$(SEVENZIP_LIB)
 
 !ifdef HB_DIR_OPENSSL
@@ -582,6 +585,16 @@ $(HBZEBRA_LIB) : $(HBZEBRA_LIB_OBJS)
 
 $(HBCAIRO_LIB) : $(HBCAIRO_LIB_OBJS)
 	$(LIB_CMD)
+
+$(HBBZ2_LIB) : $(HBBZ2_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBLZF_LIB) : $(HBLZF_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBMLZO_LIB) : $(HBMLZO_LIB_OBJS)
+	$(LIB_CMD)
+
 !endif
 
 #===============================================================================

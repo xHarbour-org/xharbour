@@ -47,7 +47,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
 INCLUDE_DIR  =$(INCLUDE_DIR);include
-INCLUDE_DIR  =$(INCLUDE_DIR);$(OBJ_DIR)
+INCLUDE_DIR  =$(INCLUDE_DIR);$(OBJ_DIR);$(ZLIB_DIR)
 CLIBFLAGS    =$(CLIBFLAGS) -q -c -I$(INCLUDE_DIR) -d -5 -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H
 HARBOURFLAGS =$(HARBOURFLAGS) -i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
 LINK_CMD     =ILINK32 -ap -Tpe -x -Gn -C -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" -Llib\b32 $(LFLAGS) "$(CC_DIR)\lib\c0x32.obj" $**,$@,,
@@ -495,7 +495,7 @@ ACEH_DIR    =-I"$(HB_DIR_ADS)"
 OPENSSL_DIR    =-I"$(HB_DIR_OPENSSL)\include"
 !endif
 
-INCLUDE_DIR =$(INCLUDE_DIR);include;$(OBJ_DIR)
+INCLUDE_DIR =$(INCLUDE_DIR);include;$(OBJ_DIR);$(ZLIB_DIR)
 DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) -DHAVE_CONFIG_H -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -q -a8 -OS -O2 -6 -c $(ACEH_DIR) $(OPENSSL_DIR) -I$(INCLUDE_DIR) -d -w3 -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H
@@ -670,6 +670,27 @@ ALL: $(CONTRIB_PROJECT)
 #===============================================================================
 # Library dependencies and build rules
 #===============================================================================
+$(HBBZ2_LIB) : $(HBBZ2_LIB_OBJS)
+	IF EXIST "$(HBBZ2_LIB)" $(DEL) "$(HBBZ2_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
+$(HBLZF_LIB) : $(HBLZF_LIB_OBJS)
+	IF EXIST "$(HBLZF_LIB)" $(DEL) "$(HBLZF_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
+$(HBMLZO_LIB) : $(HBMLZO_LIB_OBJS)
+	IF EXIST "$(HBMLZO_LIB)" $(DEL) "$(HBMLZO_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
 $(HBCAIRO_LIB) : $(HBCAIRO_LIB_OBJS)
 	IF EXIST "$(HBCAIRO_LIB)" $(DEL) "$(HBCAIRO_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!

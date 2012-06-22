@@ -59,6 +59,7 @@ CLIBFLAGS   +=
 INCLUDE_DIR  =include
 HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
 CLIBFLAGS   +=-DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -D__WIN32__ -Wall $(NOCYGWIN) -O3 -mtune=pentium -c -fomit-frame-pointer -march=i586 -fno-strict-aliasing -I$(INCLUDE_DIR) -I$(OBJ_DIR)
+CLIBFLAGS   +=-I$(ZLIB_DIR)
 
 ifeq ($(HB_THREAD_SUPPORT),1)
 	CLIBFLAGS+=-DHB_THREAD_SUPPORT -mthreads
@@ -346,7 +347,8 @@ ACEH_DIR    =-I"$(HB_DIR_ADS)"
 endif
 INCLUDE_DIR =include
 CLIBFLAGS   +=-DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -Wall -mdll -fomit-frame-pointer -march=i586 $(NOCYGWIN) -O3 -c -fno-strict-aliasing $(ACEH_DIR) -I$(INCLUDE_DIR) -I$(OBJ_DIR)
-HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -po$(OBJ_DIR)/ -w2 -es2 -gc0
+CLIBFLAGS   +=-I$(ZLIB_DIR)
+HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
 CC_CMD      =GCC $(CLIBFLAGS) -o $@ $^
 CCC_CMD     =$(CC_CMD)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) -o$@ $^
@@ -586,6 +588,15 @@ $SEVENZIP_LIB) : $(SEVENZIP_LIB_OBJS)
 	$(LIB_CMD)
 
 $HBSQLIT3_LIB) : $(HBSQLIT3_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBBZ2_LIB) : $(HBBZ2_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBLZF_LIB) : $(HBLZF_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBMLZO_LIB) : $(HBMLZO_LIB_OBJS)
 	$(LIB_CMD)
 
 endif

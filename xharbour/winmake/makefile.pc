@@ -38,6 +38,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
 INCLUDE_DIR =/I"INCLUDE" /I"$(CC_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE\WIN" /I"$(OBJ_DIR)"
+INCLUDE_DIR =$(INCLUDE_DIR) /I"$(ZLIB_DIR)"
 HARBOURFLAGS=$(HARBOURFLAGS) $(INCLUDE_DIR) -q0 -w2 -es2 -gc0
 #-------------------------------------------------------------------------------
 # AJ: 2008-04-26

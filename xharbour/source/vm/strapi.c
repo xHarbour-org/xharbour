@@ -217,3 +217,4 @@ BOOL hb_arraySetStrUTF8( PHB_ITEM pArray, ULONG nIndex, const char * pStr)
    else
      return FALSE;
 }
+

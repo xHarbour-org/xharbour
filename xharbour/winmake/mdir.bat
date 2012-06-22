@@ -122,6 +122,9 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%xwt%LIBEXT%      copy lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbsqlit3%LIBEXT% copy lib\%SUB_DIR%\%LIBPREFIX%hbsqlit3%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%tipssl%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%tipssl%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbcurl%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%hbcurl%LIBEXT% lib >NUL
+if exist lib\%SUB_DIR%\%LIBPREFIX%hbbz2%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%hbbz2%LIBEXT% lib >NUL
+if exist lib\%SUB_DIR%\%LIBPREFIX%hblzf%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%hblzf%LIBEXT% lib >NUL
+if exist lib\%SUB_DIR%\%LIBPREFIX%hbmlzo%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%hbmlzo%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbcairo%LIBEXT%  copy lib\%SUB_DIR%\%LIBPREFIX%hbcairo%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbzebra%LIBEXT%  copy lib\%SUB_DIR%\%LIBPREFIX%hbzebra%LIBEXT% lib >NUL
 
@@ -263,6 +266,9 @@ if exist lib\%LIBPREFIX%tip%LIBEXT%                  del lib\%LIBPREFIX%tip%LIBE
 if exist lib\%LIBPREFIX%tipmt%LIBEXT%                del lib\%LIBPREFIX%tipmt%LIBEXT%
 if exist lib\%LIBPREFIX%tipssl%LIBEXT%               del lib\%LIBPREFIX%tipssl%LIBEXT%
 if exist lib\%LIBPREFIX%hbcurl%LIBEXT%               del lib\%LIBPREFIX%hbcurl%LIBEXT%
+if exist lib\%LIBPREFIX%hbmlzo%LIBEXT%               del lib\%LIBPREFIX%hbmlzo%LIBEXT%
+if exist lib\%LIBPREFIX%hblzf%LIBEXT%                del lib\%LIBPREFIX%hblzf%LIBEXT%
+if exist lib\%LIBPREFIX%hbbz2%LIBEXT%                del lib\%LIBPREFIX%hbbz2%LIBEXT%
 if exist lib\%LIBPREFIX%hbcairo%LIBEXT%              del lib\%LIBPREFIX%hbcairo%LIBEXT%
 if exist lib\%LIBPREFIX%hbzebra%LIBEXT%              del lib\%LIBPREFIX%hbzebra%LIBEXT%
 if exist lib\%LIBPREFIX%use_dll%LIBEXT%              del lib\%LIBPREFIX%use_dll%LIBEXT%
@@ -507,6 +513,9 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%xwt%LIBEXT%       del lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbsqlit3%LIBEXT%  del lib\%SUB_DIR%\%LIBPREFIX%hbsqlit3%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%tipssl%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%tipssl%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbcurl%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%hbcurl%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%hbbz2%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%hbbz2%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%hblzf%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%hblzf%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%hbmlzo%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%hbmlzo%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbcairo%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%hbcairo%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbzebra%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%hbzebra%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%gtwvg%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%gtwvg%LIBEXT%

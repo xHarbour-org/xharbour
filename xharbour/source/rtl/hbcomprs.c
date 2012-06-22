@@ -10,6 +10,9 @@
  * www - http://www.xharbour.org
  * SEE ALSO COPYRIGHT NOTICE FOR ZLIB BELOW.
  *
+ * Copyright 2007 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
+ * www - http://harbour-project.org
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2, or (at your option)
@@ -65,13 +68,265 @@
  */
 
 #include "hbzlib.h"
+int s_hb_compress_error;
+
+
+#define hb_parnidef( n1, n2 )      ( ISNUM( n1 ) ? hb_parni( n1 ) : n2 )
+
+static int hb_gz_compress( char ** pDstPtr, ULONG * pnDst,
+                           const char * pSrc, ULONG nSrc, int level )
+{
+   z_stream stream;
+   int iResult;
+
+   memset( &stream, 0, sizeof( z_stream ) );
+   stream.next_in   = ( Bytef* ) pSrc;
+   stream.avail_in  = ( uInt ) nSrc;
+   iResult = deflateInit2( &stream, level, Z_DEFLATED, 15 + 16, 8,
+                           Z_DEFAULT_STRATEGY );
+   if( iResult == Z_OK )
+   {
+      if( *pDstPtr == NULL )
+      {
+         if( *pnDst == 0 )
+            *pnDst = deflateBound( &stream, nSrc );
+         *pDstPtr = ( char * ) hb_xalloc( *pnDst + 1 );
+         if( *pDstPtr == NULL )
+            iResult = Z_MEM_ERROR;
+      }
+   }
+
+   if( iResult == Z_OK )
+   {
+      stream.next_out  = ( Bytef* ) *pDstPtr;
+      stream.avail_out = ( uInt ) *pnDst;
+
+      do
+      {
+         iResult = deflate( &stream, Z_FINISH );
+      }
+      while( iResult == Z_OK );
+
+      if( iResult == Z_STREAM_END )
+      {
+         *pnDst = stream.total_out;
+         iResult = Z_OK;
+      }
+      deflateEnd( &stream );
+   }
+
+   return iResult;
+}
+
+static ULONG hb_zlibUncompressedSize( const char * szSrc, ULONG nLen,
+                                        int * piResult )
+{
+   Byte buffer[ 1024 ];
+   z_stream stream;
+   ULONG nDest = 0;
+
+   memset( &stream, 0, sizeof( z_stream ) );
+
+   stream.next_in   = ( Bytef * ) szSrc;
+   stream.avail_in  = ( uInt ) nLen;
+/*
+   stream.zalloc    = Z_NULL;
+   stream.zfree     = Z_NULL;
+   stream.opaque    = NULL;
+*/
+
+   *piResult = inflateInit2( &stream, 15 + 32 );
+   if( *piResult == Z_OK )
+   {
+      do
+      {
+         stream.next_out  = buffer;
+         stream.avail_out = sizeof( buffer );
+         *piResult = inflate( &stream, Z_NO_FLUSH );
+      }
+      while( *piResult == Z_OK );
+
+      if( *piResult == Z_STREAM_END )
+      {
+         nDest = stream.total_out;
+         *piResult = Z_OK;
+      }
+      inflateEnd( &stream );
+   }
+
+   return nDest;
+}
+
+static int hb_zlibUncompress( char * pDst, ULONG * pnDst,
+                              const char * pSrc, ULONG nSrc )
+{
+   z_stream stream;
+   int iResult;
+
+   memset( &stream, 0, sizeof( z_stream ) );
+   stream.next_in   = ( Bytef* ) pSrc;
+   stream.avail_in  = ( uInt ) nSrc;
+   iResult = inflateInit2( &stream, 15 + 32 );
+
+   if( iResult == Z_OK )
+   {
+      stream.next_out  = ( Bytef* ) pDst;
+      stream.avail_out = ( uInt ) *pnDst;
+
+      do
+      {
+         iResult = inflate( &stream, Z_FINISH );
+      }
+      while( iResult == Z_OK );
+
+      if( iResult == Z_STREAM_END )
+      {
+         *pnDst = stream.total_out;
+         iResult = Z_OK;
+      }
+      inflateEnd( &stream );
+   }
+
+   return iResult;
+}
+/*
+ * HB_ZUNCOMPRESS( <cCompressedData>, [<nDstBufLen>|<@cBuffer>], [<@nResult>] )
+ *    => <cUnCompressedData> or NIL on Error
+ */
+HB_FUNC( HB_ZUNCOMPRESS )
+{
+   PHB_ITEM pBuffer = ISBYREF( 2 ) ? hb_param( 2, HB_IT_STRING ) : NULL;
+   const char * szData = hb_parc( 1 );
+
+   if( szData )
+   {
+      ULONG nLen = hb_parclen( 1 );
+
+      if( nLen )
+      {
+         ULONG nDstLen;
+         char * pDest = NULL;
+         int iResult = Z_OK;
+
+         if( pBuffer )
+         {
+            if( !hb_itemGetWriteCL( pBuffer, &pDest, &nDstLen ) )
+               iResult = Z_MEM_ERROR;
+         }
+         else
+         {
+            nDstLen = ISNUM( 2 ) ? ( ULONG ) hb_parnl( 2 ) :
+                           hb_zlibUncompressedSize( szData, nLen, &iResult );
+            if( iResult == Z_OK )
+            {
+               pDest = ( char * ) hb_xalloc( nDstLen + 1 );
+               if( !pDest )
+                  iResult = Z_MEM_ERROR;
+            }
+         }
+
+         if( iResult == Z_OK )
+         {
+            iResult = hb_zlibUncompress( pDest, &nDstLen, szData, nLen );
+
+            if( !pBuffer )
+            {
+               if( iResult == Z_OK )
+                  hb_retclen_buffer( pDest, nDstLen );
+               else
+                  hb_xfree( pDest );
+            }
+            else if( iResult == Z_OK )
+               hb_retclen( pDest, nDstLen );
+         }
+         hb_storni( iResult, 3 );
+      }
+      else
+      {
+         hb_retc_null();
+         hb_storni( Z_OK, 3 );
+      }
+   }
+   else
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
+}
+
+/*
+ * HB_GZCOMPRESS( <cData>, [<nDstBufLen>|<@cBuffer>], [<@nResult>], [<nLevel>] )
+ *    => <cCompressedData> or NIL on Error
+ *
+ * Note: this function does not create any references to gz* ZLIB functions
+ *       so it's intentionally here not in hbzlibgz.c file.
+ */
+HB_FUNC( HB_GZCOMPRESS )
+{
+   const char * szData = hb_parc( 1 );
+   if( szData )
+   {
+      ULONG nLen = hb_parclen( 1 );
+
+      if( nLen )
+      {
+         PHB_ITEM pBuffer = ISBYREF( 2 ) ? hb_param( 2, HB_IT_STRING ) : NULL;
+         BOOL fAlloc = FALSE;
+         ULONG nDstLen;
+         char * pDest;
+         int iResult;
+
+         if( pBuffer )
+         {
+            if( !hb_itemGetWriteCL( pBuffer, &pDest, &nDstLen ) )
+               pDest = NULL;
+         }
+         else
+         {
+            if( ISNUM( 2 ) )
+            {
+               nDstLen = hb_parnl( 2 );
+               pDest = ( char * ) hb_xalloc( nDstLen + 1 );
+            }
+            else
+            {
+               pDest = NULL;
+               nDstLen = 0;
+               fAlloc = TRUE;
+            }
+         }
+
+         if( pDest || fAlloc )
+         {
+            iResult = hb_gz_compress( &pDest, &nDstLen, szData, nLen,
+                                      hb_parnidef( 4, Z_DEFAULT_COMPRESSION ) );
+            if( !pBuffer )
+            {
+               if( iResult == Z_OK )
+                  hb_retclen_buffer( pDest, nDstLen );
+               else if( pDest )
+                  hb_xfree( pDest );
+            }
+            else if( iResult == Z_OK )
+               hb_retclen( pDest, nDstLen );
+         }
+         else
+            iResult = Z_MEM_ERROR;
+
+         hb_storni( iResult, 3 );
+      }
+      else
+      {
+         hb_retc_null();
+         hb_storni( Z_OK, 3 );
+      }
+   }
+   else
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
+}
+
 
 /*******************************************************************
 * Giancarlo Niccolai:
 * Calculates the minimum length of destination buffer
 */
-
-int s_hb_compress_error;
 
 ULONG hb_destBuflen( ULONG srclen )
 {

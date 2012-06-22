@@ -42,7 +42,8 @@ INCLUDE_DIR =$(INCLUDE_DIR) /I"$(HB_DIR_CURL)\include"
 !ifdef HB_DIR_CAIRO
 INCLUDE_DIR =$(INCLUDE_DIR) /I"$(HB_DIR_CAIRO)\include\cairo"
 !endif
-HARBOURFLAGS=$(HARBOURFLAGS) $(INCLUDE_DIR) -q0 -po$(OBJ_DIR)\ -w2 -es2 -gc0
+INCLUDE_DIR =$(INCLUDE_DIR) /I"$(ZLIB_DIR)"
+HARBOURFLAGS=$(HARBOURFLAGS) $(INCLUDE_DIR) -q0 -w2 -es2 -gc0
 HB_CMD      =$(HARBOUR_EXE) /n1 $(HARBOURFLAGS) $** -o$@
 CLIBFLAGS   =$(CLIBFLAGS) /Ze /Zx /Tx86-coff /Go $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"WIN32" /D"NULL=0" /D"_HAVE_SQLITE_CONFIG_H"
 CC_CMD      =POCC $(__MT__) $(CLIBFLAGS) /Fo$@ $**
@@ -195,6 +196,16 @@ $(HBSQLIT3_LIB) : $(HBSQLIT3_LIB_OBJS)
 
 $(HBCURL_LIB) : $(HBCURL_LIB_OBJS)
 	$(LIB_CMD)
+
+$(HBBZ2_LIB) : $(HBBZ2_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBLZF_LIB) : $(HBLZF_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBMLZO_LIB) : $(HBMLZO_LIB_OBJS)
+	$(LIB_CMD)
+
 #===============================================================================
 # Building rules of Object files
 #===============================================================================

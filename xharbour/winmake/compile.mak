@@ -80,6 +80,54 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
 	$(MT_CMD)
 
 #===============================================================================
+# HBMLZO.LIB Dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)coreHBMLZO$(OBJEXT) : $(HBMLZO_DIR)$(DIR_SEP)core.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)minilzoHBMLZO$(OBJEXT) : $(HBMLZO_DIR)$(DIR_SEP)minilzo.c
+	$(CC_CMD)
+
+#===============================================================================
+# HBLZF.LIB Dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)coreHBLZF$(OBJEXT) : $(HBLZF_DIR)$(DIR_SEP)core.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)lzf_cHBLZF$(OBJEXT) : $(HBLZF_DIR)$(DIR_SEP)lzf_c.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)lzf_dHBLZF$(OBJEXT) : $(HBLZF_DIR)$(DIR_SEP)lzf_d.c
+	$(CCC_CMD)
+
+#===============================================================================
+# HBBZ2.LIB Dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)blocksorHBBZ2$(OBJEXT) : $(HBBZ2_DIR)$(DIR_SEP)blocksor.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)bzlibHBBZ2$(OBJEXT) : $(HBBZ2_DIR)$(DIR_SEP)bzlib.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)compressHBBZ2$(OBJEXT) : $(HBBZ2_DIR)$(DIR_SEP)compress.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)coreHBBZ2$(OBJEXT) : $(HBBZ2_DIR)$(DIR_SEP)core.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)crctableHBBZ2$(OBJEXT) : $(HBBZ2_DIR)$(DIR_SEP)crctable.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)decompreHBBZ2$(OBJEXT) : $(HBBZ2_DIR)$(DIR_SEP)decompre.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)huffmanHBBZ2$(OBJEXT) : $(HBBZ2_DIR)$(DIR_SEP)huffman.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)randtablHBBZ2$(OBJEXT) : $(HBBZ2_DIR)$(DIR_SEP)randtabl.c
+	$(CC_CMD)
+
+#===============================================================================
 # HBCAIRO.LIB Dependencies
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)context$(OBJEXT) : $(HBCAIRO_DIR)$(DIR_SEP)context.c
@@ -966,6 +1014,9 @@ $(OBJ_DIR)$(DIR_SEP)hbbitf$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbbitf.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hbcomprs$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbcomprs.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbzlibgz$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbzlibgz.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hbchksum$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbchksum.c
