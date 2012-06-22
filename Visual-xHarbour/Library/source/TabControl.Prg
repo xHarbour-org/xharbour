@@ -344,7 +344,6 @@ METHOD OnUserMsg( hWnd, nMsg ) CLASS TabControl
    ENDIF
 RETURN NIL
 
-
 //-----------------------------------------------------------------------------------------------
 METHOD RestoreTabPos() CLASS TabControl
    LOCAL tci, n, aChildren := ARRAY( LEN( ::Children ) )
@@ -525,7 +524,6 @@ METHOD OnWindowPaint() CLASS TabControl
          hWnd := GetWindow( hWnd, GW_HWNDNEXT )
       ENDDO
    ENDIF
-   
 
    rc  := (struct RECT)
    tci := (struct TCITEM)
