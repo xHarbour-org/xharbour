@@ -516,7 +516,7 @@ METHOD OnMouseMove(wParam,x,y) CLASS DataGrid
             IF wParam == MK_LBUTTON .AND. ::AllowDragRecords .AND. ::__hDragRecImage != NIL
                nTop := y + ::__GetHeaderHeight() - ::__nDragTop
                
-               nDragPos := Int( Ceiling((y-::__GetHeaderHeight()) /::ItemHeight) )
+               nDragPos := MIN( LEN( ::__DisplayArray ), Int( Ceiling((y-::__GetHeaderHeight()) /::ItemHeight) ) )
                nDragRec := ::__DisplayArray[ nDragPos ][2]
                
                IF nDragRec != ::__nDragRec

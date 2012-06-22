@@ -659,6 +659,7 @@ METHOD Init() CLASS System
    ::Cursor[ "SizeAll" ]     := LoadCursor(, IDC_SIZEALL     )
    ::Cursor[ "UpArrow" ]     := LoadCursor(, IDC_UPARROW     )
    ::Cursor[ "LinkSelect" ]  := LoadCursor(, IDC_HAND        )
+   ::Cursor[ "Hand" ]        := LoadCursor(, IDC_HAND        )
 
    ::ImageList := Hash()
    HSetCaseMatch( ::ImageList, .F. )

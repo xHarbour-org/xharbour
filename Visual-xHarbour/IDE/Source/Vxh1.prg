@@ -2366,7 +2366,7 @@ RETURN 1
 FUNCTION OnShowDesigner()
    LOCAL oApp := __GetApplication()
    IF oApp:Project:CurrentForm != NIL
-      oApp:Project:EditReset(1)
+      oApp:Project:EditReset(0)
    ENDIF
    oApp:CloseMenu:Action  := {||oApp:Project:Close() }
    oApp:CloseMenu:Caption := "&Close Project"
@@ -2645,7 +2645,7 @@ METHOD EditReset(n) CLASS Project
       ENDIF
     ELSE
       lCopied   := IsClipboardFormatAvailable( CF_TEXT )
-      lSelected := ::Application:SourceEditor:Source != NIL .AND. LEN( ::Application:SourceEditor:Source:GetSelText() ) > 0
+      lSelected := ::Application:SourceEditor:Source != NIL .AND. ::Application:SourceEditor:Source:GetSelLen() > 0
    ENDIF
    ::Application:Props[ "EditPasteItem" ]:Enabled := lCopied
    ::Application:Props[ "EditPasteBttn" ]:Enabled := lCopied
@@ -2756,6 +2756,7 @@ METHOD SourceTabChanged( nPrev, nCur ) CLASS Project
    ( nPrev )
    IF nCur <= ::Application:SourceEditor:DocCount
       ::Application:SourceEditor:Source := ::Application:SourceEditor:aDocs[ nCur ]
+      ::Application:Project:EditReset()
    ENDIF
    OnShowEditors()
 RETURN Self

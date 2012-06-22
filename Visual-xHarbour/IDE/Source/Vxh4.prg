@@ -3480,6 +3480,7 @@ __aProps["C"] := { { "ContextMenu",             "Behavior" },;
                    { "ConnectionString",        "Connection" },;
                    { "ContextArrow",            "" },;
                    { "CompilerFlags",           "Build" },;
+                   { "CueBanner",               "Appearance" },;
                    { "Caption",                 "Appearance" },;
                    { "CheckBoxes",              "Appearance" },;
                    { "Cursor",                  "Appearance" },;

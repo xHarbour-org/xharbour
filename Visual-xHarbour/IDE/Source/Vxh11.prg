@@ -383,7 +383,7 @@ RETURN NIL
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD InvertCase() CLASS SourceEditor
    LOCAL cSel, cInv, cChar, nStartPos, nEndPos
-   IF ::Source:GetSelLen() > 1
+   IF ::Source:GetSelLen() > 0
       nStartPos := ::Source:GetSelectionStart()
       nEndPos   := ::Source:GetSelectionEnd()
       cSel := ::Source:GetSelText()
@@ -399,7 +399,7 @@ RETURN NIL
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD UpperCase() CLASS SourceEditor
    LOCAL cInv, nStartPos, nEndPos
-   IF ::Source:GetSelLen() > 1
+   IF ::Source:GetSelLen() > 0
       nStartPos := ::Source:GetSelectionStart()
       nEndPos   := ::Source:GetSelectionEnd()
       cInv := UPPER( ::Source:GetSelText() )
@@ -411,7 +411,7 @@ RETURN NIL
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD LowerCase() CLASS SourceEditor
    LOCAL cInv, nStartPos, nEndPos
-   IF ::Source:GetSelLen() > 1
+   IF ::Source:GetSelLen() > 0
       nStartPos := ::Source:GetSelectionStart()
       nEndPos   := ::Source:GetSelectionEnd()
       cInv := LOWER( ::Source:GetSelText() )
@@ -423,7 +423,7 @@ RETURN NIL
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Capitalize() CLASS SourceEditor
    LOCAL cSel, nStartPos, nEndPos
-   IF ::Source:GetSelLen() > 1
+   IF ::Source:GetSelLen() > 0
       nStartPos := ::Source:GetSelectionStart()
       nEndPos   := ::Source:GetSelectionEnd()
       cSel      := ::Source:GetSelText()
@@ -441,7 +441,7 @@ RETURN NIL
 METHOD OnKeyDown( nKey ) CLASS SourceEditor
    LOCAL nPos
    IF nKey == VK_F3
-      IF ::Source:GetSelLen() > 1
+      IF ::Source:GetSelLen() > 0
          ::cFindWhat := ::Source:GetSelText()
       ENDIF
       ::FindNext( ::cFindWhat, CheckBit( GetKeyState( VK_SHIFT ), 32768 ) )
@@ -465,11 +465,12 @@ METHOD OnKeyDown( nKey ) CLASS SourceEditor
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
-METHOD OnKeyUp( nKey ) CLASS SourceEditor
+METHOD OnKeyUp() CLASS SourceEditor
    LOCAL lSel := ::Source:GetSelLen() > 0
-   IF nKey == VK_SHIFT
-      ::Application:Project:EditReset()
-    ELSEIF ::Application:Props:EditCopyItem:Enabled
+
+   ::Application:Project:EditReset()
+   IF ::Application:Props:EditCopyItem:Enabled
+
       ::Application:Props:EditCopyItem:Enabled := lSel
       ::Application:Props:EditCopyBttn:Enabled := lSel
       ::Application:Props:EditCutItem:Enabled  := lSel
@@ -796,11 +797,11 @@ RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnReplace( oFind ) CLASS SourceEditor
-   IF ::Source:GetSelLen()-1 == 0
+   IF ::Source:GetSelLen() == 0
       IF ! EMPTY( oFind:FindWhat )
          ::Source:SearchNext( ::GetSearchFlags( oFind ), oFind:FindWhat )
       ENDIF
-    ELSEIF ::Source:GetSelLen()-1 > 0
+    ELSEIF ::Source:GetSelLen() > 0
       ::Source:ReplaceSel( oFind:ReplaceWith )
    ENDIF
 RETURN NIL
@@ -920,7 +921,7 @@ CLASS Source
    METHOD SearchNext( nFlags, cText )         INLINE ::SendEditor( SCI_SEARCHNEXT, nFlags, cText )
    METHOD SearchPrev( nFlags, cText )         INLINE ::SendEditor( SCI_SEARCHPREV, nFlags, cText )
    METHOD ReplaceSel( cText )                 INLINE ::SendEditor( SCI_REPLACESEL, 0, cText )
-   METHOD GetSelLen()                         INLINE ::SendEditor( SCI_GETSELTEXT, 0, 0 )
+   METHOD GetSelLen()                         INLINE ::SendEditor( SCI_GETSELTEXT, 0, 0 )-1
    METHOD GetSelText( cBuffer )               INLINE ::ChkDoc(), cBuffer := SPACE( ::Owner:SendMessage( SCI_GETSELTEXT, 0, 0 ) ),;
                                                                  ::Owner:SendMessage( SCI_GETSELTEXT, 0, cBuffer ),;
                                                                  ALLTRIM(LEFT(cBuffer,LEN(cBuffer)-1))
@@ -2428,11 +2429,11 @@ METHOD Replace_OnClick() CLASS FindReplace
    IF ::WholeWord:Checked()
       nFlags := nFlags | SCFIND_WHOLEWORD
    ENDIF
-   IF ::Parent:Source:GetSelLen()-1 == 0
+   IF ::Parent:Source:GetSelLen() == 0
       IF ! EMPTY( ::FindWhat:Caption )
          ::Parent:Source:SearchNext( nFlags, ::FindWhat:Caption )
       ENDIF
-    ELSEIF ::Parent:Source:GetSelLen()-1 > 0
+    ELSEIF ::Parent:Source:GetSelLen() > 0
       ::Parent:Source:ReplaceSel( ::ReplaceWith:Caption )
    ENDIF
 RETURN Self

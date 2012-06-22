@@ -57,7 +57,7 @@ CLASS EditBox INHERIT Control
    PROPERTY ClientEdge    INDEX WS_EX_CLIENTEDGE        READ xClientEdge       WRITE SetExStyle   DEFAULT .T. PROTECTED
 
    PROPERTY ContextMenu                                 GET __ChkComponent( Self, ::xContextMenu ) SET __SetContextMenu
-   
+   PROPERTY CueBanner                                   READ xCueBanner        WRITE SetCueBanner
    PROPERTY ContextArrow                                READ xContextArrow     WRITE __SetContextMenu DEFAULT .F. PROTECTED
    PROPERTY ImageIndex                                  READ xImageIndex       WRITE __SetImageIndex  DEFAULT 0   PROTECTED
 
@@ -150,7 +150,7 @@ CLASS EditBox INHERIT Control
    METHOD ReplaceSel(l, c )            INLINE ::SendMessage( EM_REPLACESEL, l, c )
    METHOD Scroll( nSB )                INLINE ::SendMessage( EM_SCROLL, nSB, 0 )
    METHOD ScrollCaret()                INLINE ::SendMessage( EM_SCROLLCARET, 0, 0 )
-   METHOD SetCueBanner(cText,lFocus)   INLINE EditSetCueBannerText( ::hWnd, IIF( lFocus == NIL, .F., lFocus ), cText ) //XP only
+   METHOD SetCueBanner()
    METHOD SetHandle(h)                 INLINE ::SendMessage( EM_SETHANDLE, h, 0 )
    METHOD SetImeStatus(nType, nStatus) INLINE ::SendMessage( EM_SETIMESTATUS,IF( nType==NIL,EMSIS_COMPOSITIONSTRING ,nType), nStatus )
    METHOD SetLimitText(n)              INLINE ::SendMessage( EM_SETLIMITTEXT, n, 0 ) // RE different
@@ -298,7 +298,27 @@ METHOD Create() CLASS EditBox
          ::Parent:Children[n]:__SetBuddy()
       ENDIF
    ENDIF
+   IF ! Empty( ::xCueBanner )
+      ::SetCueBanner()
+   ENDIF
 RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+METHOD SetCueBanner( cText, lFocus ) CLASS EditBox
+   DEFAULT cText TO ::xCueBanner
+   IF ::__ClassInst == NIL
+      IF VALTYPE( cText )=="C" .AND. LEFT( cText, 2 ) == "{|"
+         cText := &cText
+      ENDIF
+      IF VALTYPE( cText ) == "B"
+         cText := EVAL(cText)
+      ENDIF
+   ENDIF
+   IF ::IsWindow()
+      EditSetCueBannerText( ::hWnd, IIF( lFocus == NIL, .F., lFocus ), cText )
+   ENDIF
+RETURN Self 
+
 
 //-----------------------------------------------------------------------------------------------
 METHOD __SetAutoScroll( nIndex, lSet ) CLASS EditBox
