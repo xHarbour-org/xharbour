@@ -5237,6 +5237,7 @@ static HB_ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
                break;
 
             case 0xF5: /* FoxPro w. memo file */
+               pArea->bTableType = DB_DBF_VFP;
                pArea->fHasMemo = TRUE;
                pArea->bMemoType = DB_MEMO_FPT;
                break;

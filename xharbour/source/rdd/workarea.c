@@ -315,7 +315,7 @@ static HB_ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
       uiDec = ( USHORT ) iData;
       pFieldInfo.uiDec = 0;
 #ifdef HB_COMPAT_FOXPRO
-      pFieldInfo.uiFlags = hb_arrayGetNI( pFieldDesc, DBS_FLAG );
+      pFieldInfo.uiFlags = ( ( USHORT ) hb_arrayLen( pFieldDesc ) ) >= DBS_FLAG ? hb_arrayGetNI( pFieldDesc, DBS_FLAG ): 0;
 #else
       pFieldInfo.uiFlags = 0;
 #endif

@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-22 09:22 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * source\rdd\dbf1.c
+  * source\rdd\workarea.c
+    ! Minor fix under HB_COMPAT_FOXPRO flag, fixed open tables for f3 type with fields autoincremental flags.
+
 2012-06-22 12:47 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   + contrib/hbbz2
   + contrib/hbbz2/tests
