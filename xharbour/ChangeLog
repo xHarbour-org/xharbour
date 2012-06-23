@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-23 22:21 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/rddsql/hbrddsql.h
+    - redundant definition oh HB_I64
+
 2012-06-23 22:03 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbapistr.h
   * source/vm/strapi.c

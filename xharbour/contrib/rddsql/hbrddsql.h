@@ -89,7 +89,6 @@
    #define D_HB_ITEMPUTSTR( itm, str )             hb_itemPutC( itm, str )
    #define D_HB_ITEMPUTSTRLEN( itm, str, len )     hb_itemPutCL( itm, str, len )
    #define D_HB_CHAR   char
-   #define HB_I64      INT64
 
    #define HB_FT_IMAGE HB_FT_PICTURE
 
