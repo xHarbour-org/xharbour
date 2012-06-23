@@ -1195,6 +1195,9 @@ extern HB_EXPORT void         hb_rddReleaseCurrentArea( void );
 
 extern HB_EXPORT int          hb_rddRegister( const char * szDriver, USHORT uiType );
 extern HB_EXPORT HB_ERRCODE   hb_rddInherit( RDDFUNCS * pTable, const RDDFUNCS * pSubTable, RDDFUNCS * pSuperTable, const char * szDrvName );
+extern HB_EXPORT HB_ERRCODE   hb_rddInheritEx( RDDFUNCS * pTable, const RDDFUNCS * pSubTable,
+                              RDDFUNCS * pSuperTable, const char * szDrvName,
+                              USHORT * puiSupperRddId );
 extern HB_EXPORT LPRDDNODE    hb_rddGetNode( USHORT uiNode );
 extern HB_EXPORT LPRDDNODE    hb_rddFindNode( const char * szDriver, USHORT * uiIndex );
 extern HB_EXPORT USHORT       hb_rddFieldIndex( AREAP pArea, const char * szName );

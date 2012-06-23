@@ -3,10 +3,9 @@
  */
 
 /*
- * Harbour Project source code:
- *    string API functions
+ * SQL Database Driver include file
  *
- * Copyright 2009 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
+ * Copyright 2009 Mindaugas Kavaliauskas <dbtopas at dbtopas.lt>
  * www - http://harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,33 +49,21 @@
  *
  */
 
-/*  
+/* NOTE: This file is also used by C code. */
 
-   Used parts from Harbour for use with SQLite3 lib
-   November 18, 2011 by R.Visscher <richard@irvis.com>
-*/
+#ifndef HB_RDDSQL_CH_
+#define HB_RDDSQL_CH_
 
-#ifndef HB_APISTR_H_
-#define HB_APISTR_H_
+/* New ...INFO_ constants */
+#define DBI_QUERY             1001
 
-#include "hbapi.h"
-#include "hbapicdp.h"
+#define RDDI_CONNECT          1001
+#define RDDI_DISCONNECT       1002
+#define RDDI_EXECUTE          1003
+#define RDDI_ERROR            1004
+#define RDDI_ERRORNO          1005
+#define RDDI_NEWID            1006
+#define RDDI_AFFECTEDROWS     1007
+#define RDDI_QUERY            1008
 
-HB_EXTERN_BEGIN
-
-extern HB_EXPORT const char * hb_parstr_utf8( int iParam, void ** phString, ULONG * pnLen );
-extern HB_EXPORT void hb_retstrlen_utf8( const char * szText, ULONG nLen );
-extern HB_EXPORT void hb_retstr_utf8( const char * szText );
-extern HB_EXPORT void hb_strfree( void * hString );
-extern HB_EXPORT const char * hb_strnull( const char * str );
-extern HB_EXPORT const char * hb_itemGetStrUTF8( PHB_ITEM pItem, void ** phString, ULONG * pnLen );
-extern HB_EXPORT PHB_ITEM hb_itemPutStrLenUTF8( PHB_ITEM pItem, const char * pStr, ULONG nLen );
-extern HB_EXPORT PHB_ITEM hb_itemPutStrUTF8( PHB_ITEM pItem, const char * pStr );
-extern HB_EXPORT BOOL hb_arraySetStrUTF8( PHB_ITEM pArray, ULONG nIndex, const char * pStr);
-extern HB_EXPORT const char * hb_arrayGetStrUTF8( PHB_ITEM pArray, ULONG nIndex, void ** phString, ULONG * pnLen );
-extern HB_EXPORT const char * hb_strget( PHB_ITEM pItem, void ** phStr, ULONG * pnLen );
-
-HB_EXTERN_END
-
-#endif /* HB_APISTR_H_ */
-
+#endif

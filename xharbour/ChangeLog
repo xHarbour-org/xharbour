@@ -8,6 +8,92 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-23 20:51 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbapistr.h
+  * source/vm/strapi.c
+    + function hb_arrayGetStrUTF8() borrowed from Harbour
+    + function hb_strget() borrowed from HWGui
+
+  * include/hbdefs.h
+    + HB_SIZEOFARRAY() macro borrowed from Harbour
+
+  * source/vm/fm.c
+    ! do not use external memory manager if HB_FM_STATISTICS is defined
+
+  * include/hbapirdd.h
+  * source/rdd/workarea.c
+    + added new C function hb_rddInheritEx() which allows to retrieve
+      super RDD ID during registration (borrowed from Harbour)
+
+  + contrib/rddsql
+  + contrib/rddsql/tests
+  + contrib/rddsql/hbrddsql.ch
+  + contrib/rddsql/hbrddsql.h
+  + contrib/rddsql/readme.txt
+  + contrib/rddsql/sqlbase.c
+  + contrib/rddsql/sqlmix.c
+  + contrib/rddsql/tests.arrayrdd.prg
+    ! SQL Database Driver borrowed from Harbour
+
+  + contrib/sddsqlt3
+  + contrib/sddsqlt3/tests
+  + contrib/sddsqlt3/sddsqlt3.c
+  + contrib/sddsqlt3/tests/test.sq3
+  + contrib/sddsqlt3/tests/test1.prg
+    ! SQLite3 Database Driver borrowed from Harbour
+
+  + contrib/sddpg
+  + contrib/sddpg/sddpg.c
+    ! Postgre SQL Database Driver borrowed from Harbour
+      This will only be built with envar as follows (example):
+         SET HB_DIR_POSTGRESQL=C:\POSTGRESQL\9.0
+      where PostGreSQL package was installed in C:\POSTGRESQL\9.0
+
+  + contrib/sddodbc
+  + contrib/sddodbc/tests
+  + contrib/sddodbc/sddodbc.c
+  + contrib/sddodbc/tests/test1.prg
+  + contrib/sddodbc/tests/test2.prg
+    ! ODBC Database Driver borrowed from Harbour
+
+  + contrib/sddoci
+  + contrib/sddoci/tests
+  + contrib/sddoci/sddoci.c
+  + contrib/sddoci/tests/test.prg
+    ! Oracle (via OCILIB) Database Driver borrowed from Harbour
+      This will only be built with envar as follows (example):
+         SET HB_DIR_OCILIB=C:\OCILIB
+      where OCILIB package was installed in C:\OCILIB
+
+  + contrib\sddmy
+  + contrib\sddmy\tests
+  + contrib\sddmy\sddmy.c
+  + contrib\sddmy\tests\test1.prg
+    ! MySql Database Driver borrowed from Harbour
+      This will only be built with envar as follows (example):
+         SET HB_DIR_MYSQL=C:\MYSQL
+      where MYSQL package was installed in C:\MYSQL
+
+  + contrib\sddfb
+  + contrib\sddfb\sddfb.c
+    ! Firebird Database Driver borrowed from Harbour
+      This will only be built with envar as follows (example):
+         SET HB_DIR_FIREBIRD=C:\FIREBIRD\2.5.0
+      where Firebird package was installed in C:\FIREBIRD\2.5.0
+
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/contrib.pc
+  * winmake/makefile.bc
+  * winmake/makefile.dc
+  * winmake/makefile.gc
+  * winmake/makefile.pc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+  * winmake/mdir.bat
+    + inclusion of rddsql.lib, sddsqlt3.lib, sddpg.lib, sddodbc.lib, sddoci.lib
+      sddmy.lib and sddfb.lib
+
 2012-06-22 09:22 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * source\rdd\dbf1.c
   * source\rdd\workarea.c

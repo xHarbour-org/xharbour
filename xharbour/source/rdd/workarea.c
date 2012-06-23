@@ -2246,6 +2246,65 @@ int hb_rddRegister( const char * szDriver, USHORT uiType )
  * pSuperTable - a current table in a RDDNODE
  * szDrvName - a driver name that will be inherited
  */
+HB_ERRCODE hb_rddInheritEx( RDDFUNCS * pTable, const RDDFUNCS * pSubTable,
+                            RDDFUNCS * pSuperTable, const char * szDrvName,
+                            USHORT * puiSupperRddId )
+{
+   LPRDDNODE pRddNode;
+   USHORT uiCount;
+   DBENTRYP_V * pFunction;
+   const DBENTRYP_V * pSubFunction;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_rddInheritEx(%p, %p, %p, %s, %p)", pTable, pSubTable, pSuperTable, szDrvName, puiSupperRddId));
+
+   if( !pTable )
+   {
+      return HB_FAILURE;
+   }
+
+   /* Copy the pSuperTable into pTable */
+   if( !szDrvName || ! *szDrvName )
+   {
+      /* no name for inherited driver - use the default one */
+      memcpy( pTable, &waTable, sizeof( RDDFUNCS ) );
+      memcpy( pSuperTable, &waTable, sizeof( RDDFUNCS ) );
+      if( puiSupperRddId )
+         * puiSupperRddId = ( USHORT ) -1;
+   }
+   else
+   {
+      char szSuperName[ HB_RDD_MAX_DRIVERNAME_LEN + 1 ];
+      hb_strncpyUpper( szSuperName, szDrvName, sizeof( szSuperName ) - 1 );
+      pRddNode = hb_rddFindNode( szSuperName, NULL );
+
+      if( ! pRddNode )
+         return HB_FAILURE;
+
+      memcpy( pTable, &pRddNode->pTable, sizeof( RDDFUNCS ) );
+      memcpy( pSuperTable, &pRddNode->pTable, sizeof( RDDFUNCS ) );
+      if( puiSupperRddId )
+         * puiSupperRddId = pRddNode->rddID;
+   }
+
+   /* Copy the non NULL entries from pSubTable into pTable */
+   pFunction = ( DBENTRYP_V * ) pTable;
+   pSubFunction = ( const DBENTRYP_V * ) pSubTable;
+   for( uiCount = 0; uiCount < RDDFUNCSCOUNT; uiCount++ )
+   {
+      if( * pSubFunction )
+         * pFunction = * pSubFunction;
+      pFunction ++;
+      pSubFunction ++;
+   }
+   return HB_SUCCESS;
+}
+
+/*
+ * pTable - a table in new RDDNODE that will be filled
+ * pSubTable - a table with a list of supported functions
+ * pSuperTable - a current table in a RDDNODE
+ * szDrvName - a driver name that will be inherited
+ */
 HB_ERRCODE hb_rddInherit( RDDFUNCS * pTable, const RDDFUNCS * pSubTable, RDDFUNCS * pSuperTable, const char * szDrvName )
 {
    LPRDDNODE pRddNode;

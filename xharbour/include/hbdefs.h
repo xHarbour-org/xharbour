@@ -1149,6 +1149,8 @@ typedef unsigned long HB_COUNTER;
 
 #define HB_SYMBOL_UNUSED( symbol )  ( void ) symbol
 
+#define HB_SIZEOFARRAY( var )       ( sizeof( var ) / sizeof( *var ) )
+
 /* ***********************************************************************
  * The name of starting procedure
  * Note: You have to define it in case when Harbour cannot find the proper

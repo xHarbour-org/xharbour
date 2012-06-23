@@ -92,6 +92,11 @@
    #endif
 #endif
 
+#if defined( HB_FM_STATISTICS )
+   /* Disable external memory manager when debugging */
+   #undef HB_FM_DL_ALLOC
+#endif
+
 #if defined( HB_FM_DL_ALLOC )
    #undef HB_FM_STD_ALLOC
    #undef HB_FM_WIN32_ALLOC

@@ -47,7 +47,13 @@ CT_DIR        =source$(DIR_SEP)ct
 MISC_DIR      =source$(DIR_SEP)misc
 TIP_DIR       =source$(DIR_SEP)tip
 ODBC_DIR      =source$(DIR_SEP)odbc
-
+SDDFB_DIR     =contrib$(DIR_SEP)sddfb
+SDDMY_DIR     =contrib$(DIR_SEP)sddmy
+SDDOCI_DIR    =contrib$(DIR_SEP)sddoci
+SDDODBC_DIR   =contrib$(DIR_SEP)sddodbc
+SDDSQLT3_DIR  =contrib$(DIR_SEP)sddsqlt3
+SDDPG_DIR     =contrib$(DIR_SEP)sddpg
+RDDSQL_DIR    =contrib$(DIR_SEP)rddsql
 HBMLZO_DIR    =contrib$(DIR_SEP)hbmlzo
 HBLZF_DIR     =contrib$(DIR_SEP)hblzf
 HBBZ2_DIR     =contrib$(DIR_SEP)hbbz2
@@ -132,6 +138,13 @@ HB_GT_LIBS  =$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTWVT_LIB) $(
 #===============================================================================
 # Contrib Library Names
 #===============================================================================
+SDDFB_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sddfb$(LIBEXT)
+SDDOCI_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sddoci$(LIBEXT)
+SDDMY_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sddmy$(LIBEXT)
+SDDPG_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sddpg$(LIBEXT)
+SDDODBC_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sddodbc$(LIBEXT)
+SDDSQLT3_LIB =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sddsqlt3$(LIBEXT)
+RDDSQL_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)rddsql$(LIBEXT)
 HBMLZO_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbmlzo$(LIBEXT)
 HBLZF_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hblzf$(LIBEXT)
 HBBZ2_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbbz2$(LIBEXT)
@@ -223,6 +236,49 @@ HARBOUR_LIBS=\
 #===============================================================================
 # List Of Library and Executable Dependencies
 #===============================================================================
+
+#===============================================================================
+# SDDMY.LIB Deoendencies
+#===============================================================================
+SDDMY_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)sddmy$(OBJEXT)
+
+#===============================================================================
+# SDDOCI.LIB Dependencies
+#===============================================================================
+SDDOCI_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)sddoci$(OBJEXT)
+
+#===============================================================================
+# SDDODBC.LIB Dependencies
+#===============================================================================
+SDDODBC_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)sddodbc$(OBJEXT)
+
+#===============================================================================
+# SDDSQLT3.LIB Dependencies
+#===============================================================================
+SDDSQLT3_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)sddsqlt3$(OBJEXT)
+
+#===============================================================================
+# SDDPG.LIB Dependencies
+#===============================================================================
+SDDPG_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)sddpg$(OBJEXT)
+
+#===============================================================================
+# RDDSQL.LIB rules
+#===============================================================================
+RDDSQL_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)sqlbase$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)sqlmix$(OBJEXT)
+
+#===============================================================================
+# SDDFB.LIB Dependencies
+#===============================================================================
+SDDFB_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)sddfb$(OBJEXT)
 
 #===============================================================================
 # HBMLZO.LIB rules
@@ -2038,4 +2094,7 @@ CONTRIB_PROJECT=\
 	$(HBZEBRA_LIB)\
 	$(HBMLZO_LIB)\
 	$(HBLZF_LIB)\
-	$(HBBZ2_LIB)
+	$(HBBZ2_LIB)\
+	$(RDDSQL_LIB)\
+	$(SDDSQLT3_LIB)\
+	$(SDDODBC_LIB)

@@ -67,9 +67,9 @@ ECHO System Files Succesfully Built ...
 ECHO Copying System Files to BIN and LIB Folders ...
 if exist bin\ppgen.exe           del   bin\ppgen.exe
 if exist bin\%SUB_DIR%\ppgen.exe del   bin\%SUB_DIR%\ppgen.exe
-if exist bin\%SUB_DIR%\*.exe xcopy     bin\%SUB_DIR%\*.exe bin /D /Y > nul
-if exist lib\%SUB_DIR%\*%LIBEXT% xcopy lib\%SUB_DIR%\*%LIBEXT% lib /D /Y > nul
-if exist bin\%SUB_DIR%\*.tds     xcopy bin\%SUB_DIR%\*.tds bin /D /Y > nul
+if exist bin\%SUB_DIR%\*.exe     copy  bin\%SUB_DIR%\*.exe bin /D /Y > nul
+if exist lib\%SUB_DIR%\*%LIBEXT% copy  lib\%SUB_DIR%\*%LIBEXT% lib /D /Y > nul
+if exist bin\%SUB_DIR%\*.tds     copy  bin\%SUB_DIR%\*.tds bin /D /Y > nul
 if exist lib\%SUB_DIR%\*.bak     del   lib\%SUB_DIR%\*.bak
 ECHO Done ...
 ECHO.
@@ -116,6 +116,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%png%LIBEXT%      copy lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbhpdf%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%hbhpdf%LIBEXT%   lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%gtwvg%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%gtwvg%LIBEXT%    lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%gtwvt%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%gtwvt%LIBEXT%    lib >NUL
+if exist lib\%SUB_DIR%\%LIBPREFIX%gtwvw%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%gtwvw%LIBEXT%    lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%libharu%LIBEXT%  copy lib\%SUB_DIR%\%LIBPREFIX%libharu%LIBEXT%  lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%sevenzip%LIBEXT% copy lib\%SUB_DIR%\%LIBPREFIX%sevenzip%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%xwt%LIBEXT%      copy lib\%SUB_DIR%\%LIBPREFIX%xwt%LIBEXT%      lib >NUL
@@ -127,6 +128,13 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%hblzf%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbmlzo%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%hbmlzo%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbcairo%LIBEXT%  copy lib\%SUB_DIR%\%LIBPREFIX%hbcairo%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbzebra%LIBEXT%  copy lib\%SUB_DIR%\%LIBPREFIX%hbzebra%LIBEXT% lib >NUL
+if exist lib\%SUB_DIR%\%LIBPREFIX%rddsql%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%rddsql%LIBEXT% lib >NUL
+if exist lib\%SUB_DIR%\%LIBPREFIX%sddoci%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%sddoci%LIBEXT% lib >NUL
+if exist lib\%SUB_DIR%\%LIBPREFIX%sddfb%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%sddfb%LIBEXT% lib >NUL
+if exist lib\%SUB_DIR%\%LIBPREFIX%sddpg%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%sddpg%LIBEXT% lib >NUL
+if exist lib\%SUB_DIR%\%LIBPREFIX%sddodbc%LIBEXT%  copy lib\%SUB_DIR%\%LIBPREFIX%sddodbc%LIBEXT% lib >NUL
+if exist lib\%SUB_DIR%\%LIBPREFIX%sddsqlt3%LIBEXT% copy lib\%SUB_DIR%\%LIBPREFIX%sddsqlt3%LIBEXT% lib >NUL
+if exist lib\%SUB_DIR%\%LIBPREFIX%sddmy%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%sddmy%LIBEXT% lib >NUL
 
 ECHO Done ...
 ECHO.
@@ -281,12 +289,17 @@ if exist lib\%LIBPREFIX%png%LIBEXT%                  del lib\%LIBPREFIX%png%LIBE
 if exist lib\%LIBPREFIX%hbhpdf%LIBEXT%               del lib\%LIBPREFIX%hbhpdf%LIBEXT%
 if exist lib\%LIBPREFIX%compiler%LIBEXT%             del lib\%LIBPREFIX%compiler%LIBEXT%
 if exist lib\%LIBPREFIX%libharu%LIBEXT%              del lib\%LIBPREFIX%libharu%LIBEXT%
+if exist lib\%LIBPREFIX%sddfb%LIBEXT%                del lib\%LIBPREFIX%sddfb%LIBEXT%
+if exist lib\%LIBPREFIX%sddmy%LIBEXT%                del lib\%LIBPREFIX%sddmy%LIBEXT%
+if exist lib\%LIBPREFIX%rddsql%LIBEXT%               del lib\%LIBPREFIX%rddsql%LIBEXT%
+if exist lib\%LIBPREFIX%sddsqlt3%LIBEXT%             del lib\%LIBPREFIX%sddsqlt3%LIBEXT%
+if exist lib\%LIBPREFIX%sddoci%LIBEXT%               del lib\%LIBPREFIX%sddoci%LIBEXT%
+if exist lib\%LIBPREFIX%sddpg%LIBEXT%                del lib\%LIBPREFIX%sddpg%LIBEXT%
 if exist lib\%LIBPREFIX%*.bak                        del lib\%LIBPREFIX%*.bak
 if exist lib\%LIBPREFIX%*%OBJEXT%                    del lib\%LIBPREFIX%*%OBJEXT%
 
 if exist bin\*.tds del bin\*.tds
 if exist bin\*.map del bin\*.map
-
 if exist bin\%SUB_DIR%\harbour.exe                   del bin\%SUB_DIR%\harbour.exe
 if exist bin\%SUB_DIR%\hbdoc.exe                     del bin\%SUB_DIR%\hbdoc.exe
 if exist bin\%SUB_DIR%\hbfilere.exe                  del bin\%SUB_DIR%\hbfilere.exe
@@ -370,8 +383,6 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%use_dll%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFI
 if exist lib\%SUB_DIR%\%LIBPREFIX%vm%LIBEXT%         del lib\%SUB_DIR%\%LIBPREFIX%vm%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%vmmt%LIBEXT%       del lib\%SUB_DIR%\%LIBPREFIX%vmmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%zlib%LIBEXT%       del lib\%SUB_DIR%\%LIBPREFIX%zlib%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%hbhpdf%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%hbhpdf%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%png%LIBEXT%        del lib\%SUB_DIR%\%LIBPREFIX%png%LIBEXT%
 
 if exist obj\%SUB_DIR%\*.bak                         del obj\%SUB_DIR%\*.bak
 if exist obj\%SUB_DIR%\*%OBJEXT%                     del obj\%SUB_DIR%\*%OBJEXT%
@@ -525,7 +536,21 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%gtwvw%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%libharu%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%libharu%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%sevenzip%LIBEXT%  del lib\%SUB_DIR%\%LIBPREFIX%sevenzip%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%harbour%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%harbour%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%hbhpdf%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%hbhpdf%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%png%LIBEXT%       del lib\%SUB_DIR%\%LIBPREFIX%png%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%sddfb%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%sddfb%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%sddmy%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%sddmy%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%sddoci%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%sddoci%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%sddodbc%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%sddodbc%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%rddsql%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%rddsql%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%sddsqlt3%LIBEXT%  del lib\%SUB_DIR%\%LIBPREFIX%sddsqlt3%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%sddpg%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%sddpg%LIBEXT%
 
+if exist lib\%LIBPREFIX%sddodbc%LIBEXT%             del lib\%LIBPREFIX%sddodbc%LIBEXT%
+if exist lib\%LIBPREFIX%sddfb%LIBEXT%               del lib\%LIBPREFIX%sddfb%LIBEXT%
+if exist lib\%LIBPREFIX%sddmy%LIBEXT%               del lib\%LIBPREFIX%sddmy%LIBEXT%
+if exist lib\%LIBPREFIX%sddoci%LIBEXT%              del lib\%LIBPREFIX%sddoci%LIBEXT%
+if exist lib\%LIBPREFIX%sddpg%LIBEXT%               del lib\%LIBPREFIX%sddpg%LIBEXT%
 if exist lib\%LIBPREFIX%mysql%LIBEXT%               del lib\%LIBPREFIX%mysql%LIBEXT%
 if exist lib\%LIBPREFIX%filemem%LIBEXT%             del lib\%LIBPREFIX%firemem%LIBEXT%
 if exist lib\%LIBPREFIX%firebird%LIBEXT%            del lib\%LIBPREFIX%firebird%LIBEXT%

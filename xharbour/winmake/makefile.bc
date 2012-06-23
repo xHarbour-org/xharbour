@@ -572,6 +572,8 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
+RDDSQL_INCLUDE=-I$(RDDSQL_DIR) -I$(HBSQLIT3_DIR)
+
 !ifdef HB_DIR_ADS
 ACEH_DIR     =-I"$(HB_DIR_ADS)"
 !endif
@@ -588,9 +590,24 @@ CURL_DIR    =-I$(HB_DIR_CURL)\include
 CAIRO_DIR   =-I$(HB_DIR_CAIRO)\include\cairo
 !endif
 
-INCLUDE_DIR  =include
-INCLUDE_DIR  =$(INCLUDE_DIR)
-CLIBFLAGS    =$(CLIBFLAGS) -c -q $(ACEH_DIR) $(CAIRO_DIR) $(CURL_DIR) $(OPENSSL_DIR) -I$(INCLUDE_DIR) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(HBHPDF_DIR) -I$(ZLIB_DIR) -d -5 -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H
+!ifdef HB_DIR_POSTGRESQL
+RDDSQL_INCLUDE=-I$(HB_DIR_POSTGRESQL)\include $(RDDSQL_INCLUDE)
+!endif
+
+!ifdef HB_DIR_OCILIB
+RDDSQL_INCLUDE=-I$(HB_DIR_OCILIB)\include $(RDDSQL_INCLUDE)
+!endif
+
+!ifdef HB_DIR_MYSQL
+RDDSQL_INCLUDE=-I$(HB_DIR_MYSQL)\include $(RDDSQL_INCLUDE)
+!endif
+
+!ifdef HB_DIR_FIREBIRD
+RDDSQL_INCLUDE=-I$(HB_DIR_FIREBIRD)\include $(RDDSQL_INCLUDE)
+!endif
+
+INCLUDE_DIR  =-Iinclude $(RDDSQL_INCLUDE)
+CLIBFLAGS    =$(CLIBFLAGS) -c -q $(ACEH_DIR) $(CAIRO_DIR) $(CURL_DIR) $(OPENSSL_DIR) $(INCLUDE_DIR) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(HBHPDF_DIR) -I$(ZLIB_DIR) -d -5 -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H
 HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -i$(GDLIB_DIR)\include -i$(WHAT32_DIR)\include -i$(XWT_DIR)\include -q0 -w2 -es2 -gc0
 !if $d(HB_THREAD_SUPPORT)
 CLIBFLAGS    =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT
@@ -665,11 +682,76 @@ CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBCAIRO_LIB)
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(LIBHARU_LIB)
 !endif
 
+!ifdef HB_DIR_POSTGRESQL
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(SDDPG_LIB)
+!endif
+
+!ifdef HB_DIR_OCILIB
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(SDDOCI_LIB)
+!endif
+
+!ifdef HB_DIR_MYSQL
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(SDDMY_LIB)
+!endif
+
+!ifdef HB_DIR_FIREBIRD
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(SDDFB_LIB)
+!endif
+
 ALL: $(CONTRIB_PROJECT)
 
 #===============================================================================
 # Library dependencies and build rules
 #===============================================================================
+$(SDDFB_LIB) : $(SDDFB_LIB_OBJS)
+	IF EXIST "$(SDDFB_LIB)" $(DEL) "$(SDDFB_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
+$(SDDMY_LIB) : $(SDDMY_LIB_OBJS)
+	IF EXIST "$(SDDMY_LIB)" $(DEL) "$(SDDMY_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
+$(SDDOCI_LIB) : $(SDDOCI_LIB_OBJS)
+	IF EXIST "$(SDDOCI_LIB)" $(DEL) "$(SDDOCI_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
+$(SDDODBC_LIB) : $(SDDODBC_LIB_OBJS)
+	IF EXIST "$(SDDODBC_LIB)" $(DEL) "$(SDDODBC_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
+$(SDDSQLT3_LIB) : $(SDDSQLT3_LIB_OBJS)
+	IF EXIST "$(SDDSQLT3_LIB)" $(DEL) "$(SDDSQLT3_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
+$(SDDPG_LIB) : $(SDDPG_LIB_OBJS)
+	IF EXIST "$(SDDPG_LIB)" $(DEL) "$(SDDPG_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
+$(RDDSQL_LIB) : $(RDDSQL_LIB_OBJS)
+	IF EXIST "$(RDDSQL_LIB)" $(DEL) "$(RDDSQL_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
 $(HBBZ2_LIB) : $(HBBZ2_LIB_OBJS)
 	IF EXIST "$(HBBZ2_LIB)" $(DEL) "$(HBBZ2_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!

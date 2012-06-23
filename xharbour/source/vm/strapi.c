@@ -63,9 +63,30 @@
 #include "hbstack.h"
 
 /*----------------------------------------------------------------------------------
- String functions 
+ String functions
 ----------------------------------------------------------------------------------*/
 static const wchar_t s_szConstStr[ 1 ] = { 0 };
+
+const char * hb_strget( PHB_ITEM pItem, void ** phStr, ULONG * pnLen )
+{
+   const char * pStr;
+
+   if( pItem && HB_IS_STRING( pItem ) )
+   {
+      *phStr = ( void * ) s_szConstStr;
+      pStr = hb_itemGetCPtr( pItem );
+      if( pnLen )
+         *pnLen = hb_itemGetCLen( pItem );
+   }
+   else
+   {
+      *phStr = NULL;
+      pStr = NULL;
+      if( pnLen )
+         *pnLen = 0;
+   }
+   return pStr;
+}
 
 const char * hb_strnull( const char * str )
 {
@@ -80,7 +101,6 @@ void hb_retstrlen_utf8( const char * szText, ULONG nLen )
 
    hb_itemPutStrLenUTF8( hb_stackReturnItem(), szText, nLen );
 }
-
 
 const char * hb_parstr_utf8( int iParam, void ** phString, ULONG * pnLen )
 {
@@ -122,7 +142,6 @@ void hb_retstr_utf8( const char * szText )
    hb_itemPutStrLenUTF8( hb_stackReturnItem(), szText,
                          szText ? strlen( szText ) : 0 );
 }
-
 
 PHB_ITEM hb_itemPutStrLenUTF8( PHB_ITEM pItem, const char * pStr, ULONG nLen )
 {
@@ -195,7 +214,7 @@ PHB_ITEM hb_itemPutStrUTF8( PHB_ITEM pItem, const char * pStr )
    if( pStr == NULL )
       return hb_itemPutC( pItem, NULL );
 
-   cdp = hb_cdppage(); 
+   cdp = hb_cdppage();
    nLen = strlen( pStr );
    nDest = hb_cdpStringInUTF8Length( cdp, FALSE, pStr, nLen );
    pszDest = ( char * ) hb_xgrab( nDest + 1 );
@@ -203,7 +222,6 @@ PHB_ITEM hb_itemPutStrUTF8( PHB_ITEM pItem, const char * pStr )
 
    return hb_itemPutCLPtr( pItem, pszDest, nDest );
 }
-
 
 BOOL hb_arraySetStrUTF8( PHB_ITEM pArray, ULONG nIndex, const char * pStr)
 {
@@ -217,4 +235,3 @@ BOOL hb_arraySetStrUTF8( PHB_ITEM pArray, ULONG nIndex, const char * pStr)
    else
      return FALSE;
 }
-

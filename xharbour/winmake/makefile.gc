@@ -395,6 +395,8 @@ CLIBFLAGS   +=
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
+RDDSQL_INCLUDE=-I$(RDDSQL_DIR) -I$(HBSQLIT3_DIR)
+
 ifdef HB_DIR_ADS
 ACEH_DIR    =-I"$(HB_DIR_ADS)"
 endif
@@ -411,9 +413,25 @@ ifdef HB_DIR_CAIRO
 CAIRO_DIR   =-I"$(HB_DIR_CAIRO)/include/cairo"
 endif
 
+ifdef HB_DIR_POSTGRESQL
+RDDSQL_INCLUDE+=-I$(HB_DIR_POSTGRESQL)/include
+endif
+
+ifdef HB_DIR_OCILIB
+RDDSQL_INCLUDE+=-I$(HB_DIR_OCILIB)/include
+endif
+
+ifdef HB_DIR_MYSQL
+RDDSQL_INCLUDE+=-I$(HB_DIR_MYSQL)/include
+endif
+
+ifdef HB_DIR_FIREBIRD
+RDDSQL_INCLUDE+=-I$(HB_DIR_FIREBIRD)/include
+endif
+
 HARBOURFLAGS+=-iinclude -i$(GDLIB_DIR)/include -i$(WHAT32_DIR)/include -i$(XWT_DIR)/include -q0 -w2 -es2 -gc0
 CLIBFLAGS   +=-D__WIN32__ -D_HAVE_SQLITE_CONFIG_H -Wall $(NOCYGWIN) -O3 -fomit-frame-pointer -march=i586 -mtune=pentium -c -fno-strict-aliasing
-CLIBFLAGS   +=$(ACEH_DIR) -Iinclude -I$(FREEIMAGE_DIR)/include -I$(GDLIB_DIR)/include -I$(XWT_DIR)/include -I$(XWT_DIR)/src/xwt_win -I$(ZLIB_DIR) -I$(PNG_DIR) $(OPENSSL_DIR) $(CURL_DIR)
+CLIBFLAGS   +=$(RDDSQL_INCLUDE) $(ACEH_DIR) -Iinclude -I$(FREEIMAGE_DIR)/include -I$(GDLIB_DIR)/include -I$(XWT_DIR)/include -I$(XWT_DIR)/src/xwt_win -I$(ZLIB_DIR) -I$(PNG_DIR) $(OPENSSL_DIR) $(CURL_DIR)
 CLIBFLAGS   +=$(CAIRO_DIR)
 
 ifeq ($(HB_THREAD_SUPPORT),1)
@@ -488,6 +506,22 @@ ifneq ($(HB_DIR_CAIRO),)
 CONTRIB_PROJECT+=$(HBCAIRO_LIB)
 endif
 
+ifdef HB_DIR_POSTGRESQL
+CONTRIB_PROJECT+=$(SDDPG_LIB)
+endif
+
+ifdef HB_DIR_OCILIB
+CONTRIB_PROJECT+=$(SDDOCI_LIB)
+endif
+
+ifdef HB_DIR_MYSQL
+CONTRIB_PROJECT+=$(SDDMY_LIB)
+endif
+
+ifdef HB_DIR_FIREBIRD
+CONTRIB_PROJECT+=$(SDDFB_LIB)
+endif
+
 ALL: $(CONTRIB_PROJECT)
 
 #===============================================================================
@@ -497,6 +531,27 @@ ALL: $(CONTRIB_PROJECT)
 #===============================================================================
 # Libraries dependencies and build rules (ST)
 #===============================================================================
+$(SDDFB_LIB) : $(SDDFB_LIB_OBJS)
+	$(LIB_CMD)
+
+$(SDDMY_LIB) : $(SDDMY_LIB_OBJS)
+	$(LIB_CMD)
+
+$(SDDOCI_LIB) : $(SDDOCI_LIB_OBJS)
+	$(LIB_CMD)
+
+$(SDDODBC_LIB) : $(SDDODBC_LIB_OBJS)
+	$(LIB_CMD)
+
+$(SDDSQLT3_LIB) : $(SDDSQLT3_LIB_OBJS)
+	$(LIB_CMD)
+
+$(SDDPG_LIB) : $(SDDPG_LIB_OBJS)
+	$(LIB_CMD)
+
+$(RDDSQL_LIB) : $(RDDSQL_LIB_OBJS)
+	$(LIB_CMD)
+
 $(TIPSSL_LIB) : $(TIPSSL_LIB_OBJS)
 	$(LIB_CMD)
 
