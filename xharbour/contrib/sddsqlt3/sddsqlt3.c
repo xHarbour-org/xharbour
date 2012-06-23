@@ -59,12 +59,6 @@
 
 #include <sqlite3.h>
 
-#define S_HB_ARRAYGETSTR( arr, n, phstr, plen ) hb_arrayGetStrUTF8( arr, n, phstr, plen )
-#define S_HB_ITEMCOPYSTR( itm, str, len )       hb_itemCopyStrUTF8( itm, str, len )
-#define S_HB_ITEMGETSTR( itm, phstr, plen )     hb_itemGetStrUTF8( itm, phstr, plen )
-#define S_HB_ITEMPUTSTR( itm, str )             hb_itemPutStrUTF8( itm, str )
-#define S_HB_ITEMPUTSTRLEN( itm, str, len )     hb_itemPutStrLenUTF8( itm, str, len )
-
 typedef struct
 {
    sqlite3 * pDb;

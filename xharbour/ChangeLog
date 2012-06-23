@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-23 22:03 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbapistr.h
+  * source/vm/strapi.c
+    + function hb_strcopy() borrowed from HWGui
+
+  * contrib/rddsql/hbrddsql.h
+    + macros moved from sddsqlt3.c
+
+  * contrib/sddsqlt3/sddsqlt3.c
+    ! macros moved to common include file
+
 2012-06-23 21:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbapistr.h
     - function prototype hb_arrayGetStrUTF8() whose incorporation has been

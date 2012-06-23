@@ -67,6 +67,31 @@
 ----------------------------------------------------------------------------------*/
 static const wchar_t s_szConstStr[ 1 ] = { 0 };
 
+ULONG hb_strcopy( PHB_ITEM pItem, char * pStr, ULONG nLen )
+{
+   if( pItem && HB_IS_STRING( pItem ) )
+   {
+      ULONG size = hb_itemGetCLen( pItem );
+
+      if( pStr )
+      {
+         if( size > nLen )
+            size = nLen;
+         if( size )
+            memcpy( pStr, hb_itemGetCPtr( pItem ), size );
+         if( size < nLen )
+            pStr[ size ] = '\0';
+      }
+      else if( nLen && size > nLen )
+         size = nLen;
+      return size;
+   }
+   else if( pStr && nLen )
+      pStr[ 0 ] = '\0';
+
+   return 0;
+}
+
 const char * hb_strget( PHB_ITEM pItem, void ** phStr, ULONG * pnLen )
 {
    const char * pStr;
