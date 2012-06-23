@@ -80,6 +80,39 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
 	$(MT_CMD)
 
 #===============================================================================
+# CGILIB.LIB Dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)cgiconfig$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)cgiconfig.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cgifunc$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)cgifunc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)thtmlbase$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)thtmlbase.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)thtmldoc$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)thtmldoc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tsession$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)tsession.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cgiconfig.c : $(CGILIB_DIR)$(DIR_SEP)cgiconfig.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cgifunc.c : $(CGILIB_DIR)$(DIR_SEP)cgifunc.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)thtmlbase.c : $(CGILIB_DIR)$(DIR_SEP)thtmlbase.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)thtmldoc.c : $(CGILIB_DIR)$(DIR_SEP)thtmldoc.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tsession.c : $(CGILIB_DIR)$(DIR_SEP)tsession.prg
+	$(HB_CMD)
+
+#===============================================================================
 # SDDFB.LIB Dependencies
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)sddfb$(OBJEXT) : $(SDDFB_DIR)$(DIR_SEP)sddfb.c

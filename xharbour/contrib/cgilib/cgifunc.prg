@@ -34,9 +34,10 @@
  *
  */
 
-
 #include "common.ch"
+#include "error.ch"
 
+GLOBAL oCGI
 
 /*
   SplitUrl( cUrl ) --> hUrl

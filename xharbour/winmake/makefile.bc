@@ -703,6 +703,13 @@ ALL: $(CONTRIB_PROJECT)
 #===============================================================================
 # Library dependencies and build rules
 #===============================================================================
+$(CGILIB_LIB) : $(CGILIB_LIB_OBJS)
+	IF EXIST "$(CGILIB_LIB)" $(DEL) "$(CGILIB_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
 $(SDDFB_LIB) : $(SDDFB_LIB_OBJS)
 	IF EXIST "$(SDDFB_LIB)" $(DEL) "$(SDDFB_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!

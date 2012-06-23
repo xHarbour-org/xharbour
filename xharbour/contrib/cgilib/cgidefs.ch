@@ -1,3 +1,6 @@
+/*
+ * $Id$
+ */
 
 #xtranslate DEFAULT( <p>, <v> ) => ( <p> := IIF( <p> == NIL, <v>, <p> ) )
 #xtranslate SetNewValueReturnOld( <p>, <v> ) => LOCAL xOld, xOld := <p>, IIF( <v> <> NIL, <p> := <v>,  ), xOld

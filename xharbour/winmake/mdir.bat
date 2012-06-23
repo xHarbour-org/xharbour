@@ -135,6 +135,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%sddpg%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%sddodbc%LIBEXT%  copy lib\%SUB_DIR%\%LIBPREFIX%sddodbc%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%sddsqlt3%LIBEXT% copy lib\%SUB_DIR%\%LIBPREFIX%sddsqlt3%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%sddmy%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%sddmy%LIBEXT% lib >NUL
+if exist lib\%SUB_DIR%\%LIBPREFIX%cgilib%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%cgilib%LIBEXT% lib >NUL
 
 ECHO Done ...
 ECHO.
@@ -291,6 +292,7 @@ if exist lib\%LIBPREFIX%compiler%LIBEXT%             del lib\%LIBPREFIX%compiler
 if exist lib\%LIBPREFIX%libharu%LIBEXT%              del lib\%LIBPREFIX%libharu%LIBEXT%
 if exist lib\%LIBPREFIX%sddfb%LIBEXT%                del lib\%LIBPREFIX%sddfb%LIBEXT%
 if exist lib\%LIBPREFIX%sddmy%LIBEXT%                del lib\%LIBPREFIX%sddmy%LIBEXT%
+if exist lib\%LIBPREFIX%cgilib%LIBEXT%               del lib\%LIBPREFIX%cgilib%LIBEXT%
 if exist lib\%LIBPREFIX%rddsql%LIBEXT%               del lib\%LIBPREFIX%rddsql%LIBEXT%
 if exist lib\%LIBPREFIX%sddsqlt3%LIBEXT%             del lib\%LIBPREFIX%sddsqlt3%LIBEXT%
 if exist lib\%LIBPREFIX%sddoci%LIBEXT%               del lib\%LIBPREFIX%sddoci%LIBEXT%
@@ -540,6 +542,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%hbhpdf%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%png%LIBEXT%       del lib\%SUB_DIR%\%LIBPREFIX%png%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%sddfb%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%sddfb%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%sddmy%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%sddmy%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%cgilib%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%cgilib%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%sddoci%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%sddoci%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%sddodbc%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%sddodbc%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%rddsql%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%rddsql%LIBEXT%
@@ -549,6 +552,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%sddpg%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%LIBPREFIX%sddodbc%LIBEXT%             del lib\%LIBPREFIX%sddodbc%LIBEXT%
 if exist lib\%LIBPREFIX%sddfb%LIBEXT%               del lib\%LIBPREFIX%sddfb%LIBEXT%
 if exist lib\%LIBPREFIX%sddmy%LIBEXT%               del lib\%LIBPREFIX%sddmy%LIBEXT%
+if exist lib\%LIBPREFIX%cgilib%LIBEXT%              del lib\%LIBPREFIX%cgilib%LIBEXT%
 if exist lib\%LIBPREFIX%sddoci%LIBEXT%              del lib\%LIBPREFIX%sddoci%LIBEXT%
 if exist lib\%LIBPREFIX%sddpg%LIBEXT%               del lib\%LIBPREFIX%sddpg%LIBEXT%
 if exist lib\%LIBPREFIX%mysql%LIBEXT%               del lib\%LIBPREFIX%mysql%LIBEXT%

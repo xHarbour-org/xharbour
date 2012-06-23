@@ -531,6 +531,9 @@ ALL: $(CONTRIB_PROJECT)
 #===============================================================================
 # Libraries dependencies and build rules (ST)
 #===============================================================================
+$(CGILIB_LIB) : $(CGILIB_LIB_OBJS)
+	$(LIB_CMD)
+
 $(SDDFB_LIB) : $(SDDFB_LIB_OBJS)
 	$(LIB_CMD)
 

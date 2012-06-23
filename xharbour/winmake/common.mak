@@ -84,6 +84,7 @@ WHAT32_DIR    =contrib$(DIR_SEP)what32
 XWT_DIR       =contrib$(DIR_SEP)xwt
 XWT2_DIR      =contrib$(DIR_SEP)xwt2
 TIPSSL_DIR    =contrib$(DIR_SEP)tipssl
+CGILIB_DIR    =contrib$(DIR_SEP)cgilib
 
 INCLUDE_DIR2  =include
 
@@ -176,6 +177,7 @@ PNG_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)png$(LIBEXT)
 HBHPDF_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbhpdf$(LIBEXT)
 LIBHARU_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)libharu$(LIBEXT)
 TIPSSL_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)tipssl$(HB_MT)$(LIBEXT)
+CGILIB_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)cgilib$(LIBEXT)
 
 #===============================================================================
 # Macros For DLL Build
@@ -238,7 +240,17 @@ HARBOUR_LIBS=\
 #===============================================================================
 
 #===============================================================================
-# SDDMY.LIB Deoendencies
+# CGILIB.LIB Dependencies
+#===============================================================================
+CGILIB_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)cgiconfig$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cgifunc$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)thtmlbase$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)thtmldoc$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tsession$(OBJEXT)
+
+#===============================================================================
+# SDDMY.LIB Dependencies
 #===============================================================================
 SDDMY_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)sddmy$(OBJEXT)
@@ -2097,4 +2109,5 @@ CONTRIB_PROJECT=\
 	$(HBBZ2_LIB)\
 	$(RDDSQL_LIB)\
 	$(SDDSQLT3_LIB)\
-	$(SDDODBC_LIB)
+	$(SDDODBC_LIB)\
+	$(CGILIB_LIB)

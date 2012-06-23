@@ -639,6 +639,9 @@ LIB_CMD     =LIB /NOLOGO /OUT:$@ $**
 #===============================================================================
 # Libraries dependencies and build rules
 #===============================================================================
+$(CGILIB_LIB) : $(CGILIB_LIB_OBJS)
+	$(LIB_CMD)
+
 $(SDDFB_LIB) : $(SDDFB_LIB_OBJS)
 	$(LIB_CMD)
 

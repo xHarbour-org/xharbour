@@ -8,6 +8,38 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-24 05:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  - contrib/cgilib/include/cgidefs.ch
+  - contrib/cgilib/include
+  + contrib/cgilib/cgidefs.ch
+  - contrib/cgilib/source/cgiconfig.prg
+  - contrib/cgilib/source/cgifunc.prg
+  - contrib/cgilib/source/THTMLBase.prg
+  - contrib/cgilib/source/THTMLDoc.prg
+  - contrib/cgilib/source/TSession.prg
+  - contrib/cgilib/source
+  + contrib/cgilib/cgiconfig.prg
+  + contrib/cgilib/cgifunc.prg
+  + contrib/cgilib/thtmlbase.prg
+  + contrib/cgilib/thtmldoc.prg
+  + contrib/cgilib/tsession.prg
+  - contrib/cgilib/test/tstspliturl.prg
+  - contrib/cgilib/test
+  + contrib/cgilib/tests
+  + contrib/cgilib/tests/tstspliturl.prg
+    ! rearranged cgilib folders structure, lower-cased files names
+
+  * winmake/mdir.bat
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/contrib.pc
+  * winmake/makefile.dc
+  * winmake/makefile.bc
+  * winmake/makefile.vc
+  * winmake/makefile.gc
+  * winmake/makefile.wc
+    + create cgi.lib when building contrib
+
 2012-06-23 22:21 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/rddsql/hbrddsql.h
     - redundant definition oh HB_I64

@@ -49,7 +49,6 @@
  *
  */
 
-
 #include "cgidefs.ch"
 #include "common.ch"
 #include "hbclass.ch"
@@ -63,10 +62,7 @@
 #define BASE_KEY_STRING "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 #define CRC_KEY_STRING  "Ak3yStR1Ng"  // Max Length must be 10 chars
 
-#define
-
 // -------------------------------- //
-
 
 GLOBAL EXTERNAL oCGI
 
@@ -534,7 +530,8 @@ RETURN HB_Serialize( aSerial )
 METHOD Decode( cData ) CLASS TSession
   LOCAL lOk := TRUE
   LOCAL cSerial := HB_DeserialBegin( cData )
-  LOCAL xVal, cKey, aElem
+  // LOCAL xVal, cKey, aElem
+  LOCAL xVal, aElem
 
   DO WHILE ( xVal := HB_DeserialNext( cSerial ) ) <> NIL
 

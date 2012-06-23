@@ -444,6 +444,7 @@ CONTRIB_PROJECT=\
 	$(HBLZF_LIB)\
 	$(HBMLZO_LIB)\
 	$(SEVENZIP_LIB)\
+	$(CGILIB_LIB)\
 	\
 	$(RDDSQL_LIB)\
 	$(SDDSQLT3_LIB)\
@@ -517,6 +518,9 @@ $(CT_LIB) : $(CT_LIB_OBJS)
 $**
 !
 #endif
+
+$(CGILIB_LIB) : $(CGILIB_LIB_OBJS)
+	$(LIB_CMD)
 
 $(SDDFB_LIB) : $(SDDFB_LIB_OBJS)
 	$(LIB_CMD)
