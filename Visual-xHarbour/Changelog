@@ -8,6 +8,19 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-06-22 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed StatusBar unnecesary processing in a effort to remove flckering.
+   ! Fixed Edit->Paste not being enabled when changing source code.
+   ! Fixed bug when selecting text whouldn't enable the Copy command so users
+     think text has been copied when if didn't happen.
+   + Added EditBox:CueBanner property: Grayed text showing when EditBox is empty and
+     has no focus. i.e. "Enter your name here"
+   * Restored causing RTE previously removed Position property from ToolStrip.
+   ! Fixed removing TabPage to SHOW the next available page in the TabControl.
+   ! Fixed DataGrid dragging and dropping records so if the record is dropped on
+     the empty white space it assumes the last record.
+   + Added System:Cursor:Hand cursor.
+
 2013-06-19 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed deleting TabPage to show the contents of the new current page.
    ! Fixed DataGrid HeaderOnClick error.

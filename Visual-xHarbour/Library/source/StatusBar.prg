@@ -168,14 +168,14 @@ RETURN rc
 METHOD SetPanels( nWidth ) CLASS StatusBar
    LOCAL cSizes := ""
    LOCAL nX     := 0
-   LOCAL n, nLen, nPart
+   LOCAL n, nPart
    LOCAL nParentWidth := IIF( nWidth == NIL, ::Width, nWidth )
    LOCAL nTotalPartsWidth := 0
-   LOCAL rc
+   LOCAL rc, nLen
+
    aEval( ::Children, {|o| nTotalPartsWidth += IIF( o:Width <> -1, o:Width, 0 ) } )
    nLen := LEN( ::Children )
-
-   FOR n := 1 TO nLen
+   FOR n := 1 TO LEN( ::Children )
       nPart := ::Children[ n ]:Width
 
       IF nPart == -1
@@ -190,28 +190,26 @@ METHOD SetPanels( nWidth ) CLASS StatusBar
       ENDIF
 
       cSizes += L2BIN( nX )
-   NEXT
-   ::SendMessage( SB_SETPARTS, nLen, cSizes )
 
-   FOR n := 1 TO nLen
       IF LEN( ::Children[n]:Children ) > 0
 
          rc := ::GetPanelRect( n-1 )
 
-         ::Children[n]:Children[1]:Left   := rc:Left + IIF( !::Application:IsThemedXP .OR. !::Theming, 1, 2 )
-         ::Children[n]:Children[1]:Top    := rc:Top  + IIF( !::Application:IsThemedXP .OR. !::Theming, 1, 2 )
-         ::Children[n]:Children[1]:Width  := ::Children[n]:Width - IIF( !::Application:IsThemedXP .OR. !::Theming, 2, 6 )
-         ::Children[n]:Children[1]:Height := rc:Bottom - rc:Top  - IIF( !::Application:IsThemedXP .OR. !::Theming, 2, 6 )
+         ::Children[n]:Children[1]:xLeft   := rc:Left + IIF( !::Application:IsThemedXP .OR. !::Theming, 1, 2 )
+         ::Children[n]:Children[1]:xTop    := rc:Top  + IIF( !::Application:IsThemedXP .OR. !::Theming, 1, 2 )
+         ::Children[n]:Children[1]:xWidth  := ::Children[n]:Width - IIF( !::Application:IsThemedXP .OR. !::Theming, 2, 6 )
+         ::Children[n]:Children[1]:xHeight := rc:Bottom - rc:Top  - IIF( !::Application:IsThemedXP .OR. !::Theming, 2, 6 )
 
          IF ::Application:IsThemedXP .AND. ::Children[n]:Children[1]:__xCtrlName == "ToolBar"
-            ::Children[n]:Children[1]:Top    := 0
-            ::Children[n]:Children[1]:Height := rc:Bottom
+            ::Children[n]:Children[1]:xTop    := 0
+            ::Children[n]:Children[1]:xHeight := rc:Bottom
          ENDIF
 
          ::Children[n]:Children[1]:MoveWindow()
       ENDIF
    NEXT
 
+   ::SendMessage( SB_SETPARTS, nLen, cSizes )
 RETURN Self
 
 
