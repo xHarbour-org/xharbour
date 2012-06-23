@@ -1,3 +1,6 @@
+/*
+ * $Id$
+ */
 
 PROCEDURE Main()
   LOCAL cUrl, hUrl
