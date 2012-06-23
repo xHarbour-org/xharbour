@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-23 21:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbapistr.h
+    - function prototype hb_arrayGetStrUTF8() whose incorporation has been
+    replaced by hb_strget(), hence removed.
+
 2012-06-23 20:51 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbapistr.h
   * source/vm/strapi.c
@@ -65,17 +70,17 @@
          SET HB_DIR_OCILIB=C:\OCILIB
       where OCILIB package was installed in C:\OCILIB
 
-  + contrib\sddmy
-  + contrib\sddmy\tests
-  + contrib\sddmy\sddmy.c
-  + contrib\sddmy\tests\test1.prg
+  + contrib/sddmy
+  + contrib/sddmy/tests
+  + contrib/sddmy/sddmy.c
+  + contrib/sddmy/tests/test1.prg
     ! MySql Database Driver borrowed from Harbour
       This will only be built with envar as follows (example):
          SET HB_DIR_MYSQL=C:\MYSQL
       where MYSQL package was installed in C:\MYSQL
 
-  + contrib\sddfb
-  + contrib\sddfb\sddfb.c
+  + contrib/sddfb
+  + contrib/sddfb/sddfb.c
     ! Firebird Database Driver borrowed from Harbour
       This will only be built with envar as follows (example):
          SET HB_DIR_FIREBIRD=C:\FIREBIRD\2.5.0
@@ -95,8 +100,8 @@
       sddmy.lib and sddfb.lib
 
 2012-06-22 09:22 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
-  * source\rdd\dbf1.c
-  * source\rdd\workarea.c
+  * source/rdd/dbf1.c
+  * source/rdd/workarea.c
     ! Minor fix under HB_COMPAT_FOXPRO flag, fixed open tables for f3 type with fields autoincremental flags.
 
 2012-06-22 12:47 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>

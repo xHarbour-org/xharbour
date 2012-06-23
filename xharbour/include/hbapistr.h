@@ -73,7 +73,6 @@ extern HB_EXPORT const char * hb_itemGetStrUTF8( PHB_ITEM pItem, void ** phStrin
 extern HB_EXPORT PHB_ITEM hb_itemPutStrLenUTF8( PHB_ITEM pItem, const char * pStr, ULONG nLen );
 extern HB_EXPORT PHB_ITEM hb_itemPutStrUTF8( PHB_ITEM pItem, const char * pStr );
 extern HB_EXPORT BOOL hb_arraySetStrUTF8( PHB_ITEM pArray, ULONG nIndex, const char * pStr);
-extern HB_EXPORT const char * hb_arrayGetStrUTF8( PHB_ITEM pArray, ULONG nIndex, void ** phString, ULONG * pnLen );
 extern HB_EXPORT const char * hb_strget( PHB_ITEM pItem, void ** phStr, ULONG * pnLen );
 
 HB_EXTERN_END
