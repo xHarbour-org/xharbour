@@ -56,8 +56,6 @@
 
 #define HB_IS_FUNCTION( x ) ( __dynsGetIndex( x ) > 0 )
 
-GLOBAL EXTERNAL oCGI
-
 FUNCTION Configure( cKey, xNewValue )
   STATIC oConf
   LOCAL xValue
