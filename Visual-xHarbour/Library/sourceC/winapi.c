@@ -3640,7 +3640,7 @@ HB_FUNC( GETKEYSTATE )
 
 HB_FUNC( ISKEYDOWN )
 {
-   hb_retl( GetKeyState( hb_parni(1) ) & ( 1 << ( 32767 ) ) );
+   hb_retl( GetKeyState( hb_parni(1) ) & (SHORT) ( 1 << ( 15 ) ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -7801,7 +7801,7 @@ HB_FUNC( PAGESETUPDLG )
 
       pPd = (PAGESETUPDLG *) ( pStructure->item.asArray.value->pItems + pStructure->item.asArray.value->ulLen - 1 )->item.asString.value;
       pPd->lStructSize = sizeof( PAGESETUPDLG );
-      
+
       if( pPd->Flags & PSD_RETURNDEFAULT )
       {
          pPd->hDevMode = NULL;
@@ -7838,7 +7838,7 @@ HB_FUNC( PAGESETUPDLG )
          hb_stornl( (ULONG) pDevMode->dmPaperWidth, 4 );
          hb_stornl( (ULONG) pDevMode->dmPaperLength, 5 );
          GlobalUnlock( pPd->hDevMode );
-         
+
          hb_retl( TRUE );
       }
       else
@@ -9687,7 +9687,7 @@ HB_FUNC( QUERYSERVICESTATUS )
    {
       DWORD dRes;
       SERVICE_STATUS *ss = (SERVICE_STATUS *) hb_xgrab( sizeof( SERVICE_STATUS ) );
-      
+
       dRes = pQueryServiceStatus( (SC_HANDLE) hb_parnl(1), ss );
 
       if( dRes )
@@ -10252,9 +10252,9 @@ HB_FUNC( SHOWCURSOR )
 //-------------------------------------------------------------------------------------------------
 HB_FUNC( CERTIFICATEDIALOG )
 {
-   HCERTSTORE       hCertStore = NULL;        
-   PCCERT_CONTEXT   pCertContext = NULL;      
-   
+   HCERTSTORE       hCertStore = NULL;
+   PCCERT_CONTEXT   pCertContext = NULL;
+
    if( pCertOpenSystemStore )
    {
       TCHAR * pszStoreName = TEXT("MY");
@@ -10329,7 +10329,7 @@ HB_FUNC( TASKDIALOGPROC )
             }
          }
       }
- 
+
       tdc.cbSize             = sizeof(TASKDIALOGCONFIG);
       tdc.hwndParent         = (HWND) hb_parnl(1);
       tdc.hInstance          = (HINSTANCE) hb_parnl(2);
@@ -10417,7 +10417,7 @@ HB_FUNC( REPLACETEXT )
    fr.wFindWhatLen     = MAX_STRING_LEN;
    fr.wReplaceWithLen  = MAX_STRING_LEN;
    fr.lCustData        = 0;
-   fr.lpfnHook         = (UINT_PTR) hb_parnl(3);
+   fr.lpfnHook         = (LPFRHOOKPROC) hb_parnl(3);
    fr.lpTemplateName   = NULL;
    hb_retnl( (long) ReplaceText (&fr) );
 }
@@ -10435,7 +10435,7 @@ HB_FUNC( FINDTEXT )
    fr.wFindWhatLen     = sizeof (szFindText);
    fr.wReplaceWithLen  = 0;
    fr.lCustData        = 0;
-   fr.lpfnHook         = (UINT_PTR) hb_parnl(3);
+   fr.lpfnHook         = (LPFRHOOKPROC) hb_parnl(3);
    fr.lpTemplateName   = NULL;
    hb_retnl( (long) FindText(&fr) );
 }

@@ -4191,7 +4191,7 @@ typedef struct XCCLVTILEINFO {
    PUINT puColumns;
    #if (_WIN32_WINNT >= 0x0600)
      int   *piColFmt;
-   #endif 
+   #endif
 } XCCLVTILEINFO, *PXCCLVTILEINFO;
 
 #define LVM_SETVIEW             (LVM_FIRST + 142)
@@ -4209,7 +4209,7 @@ HB_FUNC( __LISTVIEWSETVIEW )
    {
       int iCount, i;
       PUINT puColumn;
-      
+
       iCount = (int) hb_parinfa( 4, 0 );
       puColumn = (UINT*) hb_xgrab( iCount * sizeof(UINT) );
       aParam = hb_param(4,HB_IT_ARRAY);
@@ -4413,7 +4413,7 @@ HB_FUNC( SCIREGISTEREVENTIMAGE )
    "     9          ",
    "                ",
    "                "};
-   SendMessage( (HWND) hb_parnl(1), SCI_REGISTERIMAGE, (WPARAM) hb_parni(2), Event_xpm );
+   SendMessage( (HWND) hb_parnl(1), SCI_REGISTERIMAGE, (WPARAM) hb_parni(2), (LPARAM) Event_xpm );
 }
 
 HB_FUNC( SCIREGISTERMETHODIMAGE )
@@ -4494,7 +4494,7 @@ HB_FUNC( SCIREGISTERMETHODIMAGE )
    "                ",
    "                ",
    "                "};
-   SendMessage( (HWND) hb_parnl(1), SCI_REGISTERIMAGE, (WPARAM) hb_parni(2), Method_xpm );
+   SendMessage( (HWND) hb_parnl(1), SCI_REGISTERIMAGE, (WPARAM) hb_parni(2), (LPARAM) Method_xpm );
 }
 
 HB_FUNC( SCIREGISTERPROPERTYIMAGE )
@@ -4639,7 +4639,7 @@ HB_FUNC( SCIREGISTERPROPERTYIMAGE )
    ")EPP!!!~{]^V    ",
    "/(___:<[}[|V    ",
    "                "};
-   SendMessage( (HWND) hb_parnl(1), SCI_REGISTERIMAGE, (WPARAM) hb_parni(2), Property_xpm );
+   SendMessage( (HWND) hb_parnl(1), SCI_REGISTERIMAGE, (WPARAM) hb_parni(2), (LPARAM) Property_xpm );
 }
 
 /*
@@ -4668,7 +4668,7 @@ HB_FUNC( AWE_WEBCORE_INITIALIZE )
    BOOL disable_same_origin_policy = TRUE;
    BOOL disable_win_message_pump = TRUE;
    const awe_string* custom_css;
-                              
+
    awe_webcore_initialize( enable_plugins,
                            enable_javascript,
                            enable_databases,
