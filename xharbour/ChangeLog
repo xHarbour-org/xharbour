@@ -8,12 +8,46 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-24 14:17 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  - contrib/mysql/animal.dbf
+  - contrib/mysql/dbf2mysql.prg
+  - contrib/mysql/test.prg
+  - contrib/mysql/testes.prg
+  - contrib/mysql/tstmysqlrdd.prg
+  + contrib/mysql/tests
+  + contrib/mysql/tests/animal.dbf
+  + contrib/mysql/tests/dbf2mysql.prg
+  + contrib/mysql/tests/test.prg
+  + contrib/mysql/tests/testes.prg
+  + contrib/mysql/tests/tstmysqlrdd.prg
+    ! moved test stuff to tests folder
+
+  * contrib/mysql/mysql.c
+  * contrib/mysql/mysql.ch
+  * contrib/mysql/tmysql.prg
+  * contrib/mysql/tsqlbrw.prg
+    ! borrowed updates from Harbour
+
+  - contrib/mysql/makefile.bc
+  - contrib/mysql/makefile.vc
+  - contrib/mysql/make_b32.bat
+  - contrib/mysql/make_vc.bat
+    ! remove makefile stuffs as it is covered in central makefile
+
+  * winmake/contrib.pc
+  * winmake/makefile.dc
+  * winmake/makefile.gc
+  * winmake/makefile.bc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+    + build mysql.lib if HB_DIR_MYSQL envar is set
+
 2012-06-24 07:36 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/cgilib/cgiconfig.prg
     * missing from previous commit
 
   * winmake/makefile.dc
-    + missing from precious commit re: firebird.lib
+    + missing from previous commit re: firebird.lib
 
 2012-06-24 07:32 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/cgilib/cgifonfig.prg

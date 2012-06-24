@@ -350,7 +350,6 @@ $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 #*******************************************************************************
 # Uncomment this section if you have want to build the libraries.
 HB_GTWVW=1
-# HB_MYSQL=1
 # HB_PGSQL=1
 # HB_WHAT32=1
 # HB_ZIP=1
@@ -478,10 +477,6 @@ CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(WHAT32_LIB)
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(GTWVW_LIB)
 !endif
 
-!ifdef HB_MYSQL
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(MYSQL_LIB)
-!endif
-
 !ifdef HB_PGSQL
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(PGSQL_LIB)
 !endif
@@ -511,7 +506,7 @@ CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(SDDOCI_LIB)
 !endif
 
 !ifdef HB_DIR_MYSQL
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(SDDMY_LIB)
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(MYSQL_LIB) $(SDDMY_LIB)
 !endif
 
 !ifdef HB_DIR_FIREBIRD
