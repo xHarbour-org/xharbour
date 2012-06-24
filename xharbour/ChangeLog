@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-24 14:59 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * ChangeLog
+    ! just to note that the just committed common.mak was previously missing
+    obj dependencies for mysql.lib.
+
 2012-06-24 14:57 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/common.mak
     ! missing from previous commit
