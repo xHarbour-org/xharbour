@@ -8,6 +8,27 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-24 07:32 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/cgilib/cgifonfig.prg
+    - remove unused variable
+
+  * contrib/firebird/README
+  * contrib/firebird/firebird.c
+  * contrib/firebird/tfirebird.prg
+  * contrib/firebird/tests/README
+  * contrib/firebird/tests/simple.prg
+  * contrib/firebird/tests/stress.prg
+  * contrib/firebird/tests/test.prg
+  * contrib/firebird/tests/testapi.c
+    + add SVN file header
+
+  * winmake/contrib.pc
+  * winmake/makefile.gc
+  * winmake/makefile.bc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+    + build firebird.lib if HB_DIR_FIREBIRD envar is set
+
 2012-06-24 05:52 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/cgilib/tests/tstspliturl.prg
     ! add SVN file header
@@ -42,7 +63,7 @@
   * winmake/makefile.vc
   * winmake/makefile.gc
   * winmake/makefile.wc
-    + create cgi.lib when building contrib
+    + create cgilib.lib when building contrib
 
 2012-06-23 22:21 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/rddsql/hbrddsql.h

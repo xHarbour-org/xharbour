@@ -1,4 +1,8 @@
 /*
+ * $Id$
+ */
+
+/*
  * xHarbour Project source code:
  * Firebird RDBMS low level (client api) interface code.
  *

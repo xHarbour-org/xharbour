@@ -1,4 +1,8 @@
 /*
+ * $Id$
+ */
+
+/*
  * xHarbour Project source code:
  * Firebird RDBMS low level (client api) interface code.
  *
@@ -67,12 +71,18 @@
 */
 /*
   Original code from Harbour Project by Viktor Szakats copied by M rson de Paula
-  
+
   NOTE: Ugly hack to avoid this error when compiler with BCC 5.8.2 and above:
          Error E2238 C:\...\Firebird-2.1.1\include\ibase.h 82: Multiple declaration for 'intptr_t' */
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ >= 1410 )
    /* Prevent inclusion of <stdint.h> from hbdefs.h */
    #define __STDINT_H
+#endif
+
+#if defined(_MSC_VER) && (_MSC_VER>=1400)
+   #if !defined(_CRT_SECURE_NO_WARNINGS)
+      #define _CRT_SECURE_NO_WARNINGS
+   #endif
 #endif
 
 #define _CLIPDEFS_H
@@ -94,7 +104,7 @@
 #define MAX_LEN              256
 #define MAX_BUFFER          1024
 
-#define ERREXIT(status) { _retnl(isc_sqlcode(status)); return; }
+#define ERREXIT(status) { _retnl(isc_sqlcode((const ISC_STATUS *)status)); return; }
 
 #ifndef ISC_INT64_FORMAT
 
@@ -107,22 +117,19 @@
 
 static isc_svc_handle service_handle = NULL;
 
-HB_EXTERN_BEGIN
-   static UINT AttachService( const char * cConnectioService, const char * cUser, const char * cPassWord );
-   static UINT DetachService( FB_API_HANDLE svc_handle );
-HB_EXTERN_END
+static UINT AttachService( const char * cConnectioService, const char * cUser, const char * cPassWord );
+static void DetachService( FB_API_HANDLE svc_handle );
 
 HB_FUNC(FBCREATEDB)
 {
     isc_db_handle   newdb = NULL;
     isc_tr_handle   trans = NULL;
-    long            status[20];
+    ISC_STATUS      status[20];
     char            create_db[MAX_BUFFER];
-
-    char            *db_name;
-    char            *user;
-    char            *pass;
-    char            *charset;
+    const char      *db_name;
+    const char      *user;
+    const char      *pass;
+    const char      *charset;
     int             page;
     int             dialect;
 
@@ -169,9 +176,9 @@ HB_FUNC(FBDROPDB)
   short           dbp_lenght;
 
   db     = 0L;
-  dbname = hb_parcx(1);
-  user   = hb_parcx(2);
-  passw  = hb_parcx(3);
+  dbname = (char*) hb_parcx(1);
+  user   = (char*) hb_parcx(2);
+  passw  = (char*) hb_parcx(3);
 
   // make DBP string with USER and PASSWORD
   dbp = dbp_buffer;
@@ -211,20 +218,20 @@ HB_FUNC(FBCONNECT)
     char            *db_connect = NULL;
     char            *user = NULL;
     char            *passwd = NULL;
-    char            *p;
+    // char            *p;
     char            dpb[128];
     int             i = 0, len;
 
     PHB_ITEM db_handle;
 
     if (hb_parinfo(1))
-        db_connect = hb_parcx(1);
+        db_connect = (char*) hb_parcx(1);
 
     if (hb_parinfo(2))
-        user = hb_parcx(2);
+        user = (char*) hb_parcx(2);
 
     if (hb_parinfo(3))
-        passwd = hb_parcx(3);
+        passwd = (char*) hb_parcx(3);
 
     dpb[i++] = isc_dpb_version1;
 
@@ -252,7 +259,7 @@ HB_FUNC(FBCONNECT)
 HB_FUNC(FBCLOSE)
 {
     isc_db_handle   db = NULL;
-    long            status[20];
+    ISC_STATUS      status[20];
 
     db = ( isc_db_handle ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
 
@@ -265,12 +272,12 @@ HB_FUNC(FBCLOSE)
 
 HB_FUNC(FBERROR)
 {
-    long sqlcode;
-    char msg[MAX_BUFFER];
+    LONG  sqlcode;
+    char  msg[MAX_BUFFER];
 
     sqlcode = hb_parnl(1);
 
-    isc_sql_interprete(sqlcode, msg, 512);
+    isc_sql_interprete((short)sqlcode, msg, 512);
 
     _retc(msg);
 }
@@ -279,8 +286,7 @@ HB_FUNC(FBSTARTTRANSACTION)
 {
     isc_db_handle   db = NULL;
     isc_tr_handle   trans = NULL;
-    long            status[MAX_FIELDS];
-
+    ISC_STATUS      status[MAX_FIELDS];
     PHB_ITEM        var;
 
     db = ( isc_db_handle ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
@@ -297,7 +303,7 @@ HB_FUNC(FBSTARTTRANSACTION)
 HB_FUNC(FBCOMMIT)
 {
     isc_tr_handle   trans = NULL;
-    long status[MAX_FIELDS];
+    ISC_STATUS      status[MAX_FIELDS];
 
     trans = ( isc_db_handle ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
 
@@ -311,7 +317,7 @@ HB_FUNC(FBCOMMIT)
 HB_FUNC(FBROLLBACK)
 {
     isc_tr_handle   trans = NULL;
-    long status[MAX_FIELDS];
+    ISC_STATUS      status[MAX_FIELDS];
 
     trans = ( isc_db_handle ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
 
@@ -327,9 +333,9 @@ HB_FUNC(FBEXECUTE)
 {
     isc_db_handle   db = NULL;
     isc_tr_handle   trans = NULL;
-    char            *exec_str;
-    long            status[20];
-    long            status_rollback[20];
+    const char      *exec_str;
+    ISC_STATUS      status[20];
+    ISC_STATUS      status_rollback[20];
     int             dialect;
 
     db = ( isc_db_handle ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
@@ -762,7 +768,7 @@ HB_FUNC(FBGETBLOB)
     isc_tr_handle       trans = NULL;
     isc_blob_handle     blob_handle = NULL;
     short               blob_seg_len;
-    char                *blob_segment;
+    char                *blob_segment = NULL;
     ISC_QUAD            *blob_id;
     char                p[MAX_BUFFER];
     long                blob_stat;
@@ -837,20 +843,19 @@ HB_FUNC(FBBACKUPDB)
    char           request[MAX_BUFFER];
    char           *x;
    char           *p = request;
+   long           local_return;
 
-   long           *local_return;
-
-   unsigned long  options;
+   // unsigned long  options;
    isc_svc_handle local_service_handle;
 
    local_service_handle = NULL;
 
-   service_name         = ISNULL(1) ? "localhost" : hb_parcx(1);
-   user                 = ISNULL(4) ? "SYSDBA" : hb_parcx(4);
-   password             = ISNULL(5) ? "masterkey" : hb_parcx(5);
+   service_name         = ISNULL(1) ? "localhost" : (char*) hb_parcx(1);
+   user                 = ISNULL(4) ? "SYSDBA" : (char*) hb_parcx(4);
+   password             = ISNULL(5) ? "masterkey" : (char*) hb_parcx(5);
 
-   cdbname              = hb_parcx(2);
-   cbkpname             = hb_parcx(3);
+   cdbname              = (char*) hb_parcx(2);
+   cbkpname             = (char*) hb_parcx(3);
 
    local_return = AttachService(service_name, user, password);
 
@@ -901,19 +906,19 @@ HB_FUNC(FBRESTOREDB)
    char           *x;
    char           *p = request;
 
-   long           *local_return;
+   long           local_return;
 
    unsigned long  options;
    isc_svc_handle local_service_handle;
 
    local_service_handle = NULL;
 
-   service_name   = ISNULL(1) ? "localhost" : hb_parcx(1);
-   user           = ISNULL(4) ? "SYSDBA" : hb_parcx(4);
-   password       = ISNULL(5) ? "masterkey" : hb_parcx(5);
+   service_name   = ISNULL(1) ? "localhost" : (char*) hb_parcx(1);
+   user           = ISNULL(4) ? "SYSDBA" : (char*) hb_parcx(4);
+   password       = ISNULL(5) ? "masterkey" : (char*) hb_parcx(5);
 
-   cbkpname       = hb_parcx(2);
-   cdbname        = hb_parcx(3);
+   cbkpname       = (char*) hb_parcx(2);
+   cdbname        = (char*) hb_parcx(3);
 
    local_return = AttachService(service_name, user, password);
 
@@ -961,7 +966,7 @@ HB_FUNC(FBSERVICEISRUNNING)
 
    char           request[] = { isc_info_svc_running };
    char           result[MAX_BUFFER];
-   char           *p = result;
+   char           *p;
 
    isc_svc_handle local_service_handle;
 
@@ -1051,7 +1056,8 @@ static UINT AttachService( const char * cConnectioService, const char * cUser, c
    isc_service_attach(status, 0, srv_connection, &local_srv_hnd, spb_length, spb_buffer);
 
    if (status[0] == 1 && status[1])
-      return((int) status);
+      return(0);
+      // return((int) status);
 
    service_handle = ( isc_svc_handle * ) local_srv_hnd;
 
@@ -1060,7 +1066,7 @@ static UINT AttachService( const char * cConnectioService, const char * cUser, c
 
 //   (C) 2011 M rson Lu¡s Oliveira de Paula <marsonluis@gmail.com> - 23/Mar/2011
 //   Dettach from service
-static UINT DetachService( FB_API_HANDLE p_svc_handle )
+static void DetachService( FB_API_HANDLE p_svc_handle )
 {
    ISC_STATUS     status[20];
    isc_svc_handle local_service_handle;
@@ -1070,7 +1076,7 @@ static UINT DetachService( FB_API_HANDLE p_svc_handle )
       if(service_handle){
          local_service_handle = ( isc_svc_handle * ) service_handle;
       }else{
-         return 0;
+         return;
       }
    }else{
       local_service_handle = ( isc_svc_handle * ) p_svc_handle;
@@ -1082,6 +1088,4 @@ static UINT DetachService( FB_API_HANDLE p_svc_handle )
    {
       ERREXIT(status);
    }
-
-   _retni(1);
 }

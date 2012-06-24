@@ -374,7 +374,6 @@ else ifeq ($(__BLD__),CONTRIB_BLD)
 #*******************************************************************************
 # Uncomment this section if you have want to build the libraries.
 HB_GTWVW=1
-# HB_FIREBIRD=1
 # HB_MYSQL=1
 # HB_PGSQL=1
 
@@ -478,10 +477,6 @@ ifeq ($(HB_GTWVW), 1)
 CONTRIB_PROJECT+=$(GTWVW_LIB)
 endif
 
-ifeq ($(HB_FIREBIRD), 1)
-CONTRIB_PROJECT+=$(FIREBIRD_LIB)
-endif
-
 ifeq ($(HB_MYSQL), 1)
 CONTRIB_PROJECT+=$(MYSQL_LIB)
 endif
@@ -519,7 +514,7 @@ CONTRIB_PROJECT+=$(SDDMY_LIB)
 endif
 
 ifdef HB_DIR_FIREBIRD
-CONTRIB_PROJECT+=$(SDDFB_LIB)
+CONTRIB_PROJECT+=$(FIREBIRD_LIB) $(SDDFB_LIB)
 endif
 
 ALL: $(CONTRIB_PROJECT)

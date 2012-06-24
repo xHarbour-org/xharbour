@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 /* VERY IMPORTANT: Don't use this querys as sample, they are used for stress tests !!! */
 
 Function Main()
