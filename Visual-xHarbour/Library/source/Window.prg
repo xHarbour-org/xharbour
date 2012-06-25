@@ -375,6 +375,7 @@ CLASS Window INHERIT Object
    DATA __IsForm               PROTECTED INIT .F.
    DATA __ArrayPointer         PROTECTED
    DATA __lSubClass            EXPORTED  INIT .T.
+   DATA __aHotKey              PROTECTED INIT {}
    ACCESS AppInstance          INLINE IIF( ::Form:DllInstance != NIL, ::Form:DllInstance, ::Application:Instance )
 
 
@@ -2259,7 +2260,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
            ENDIF
 
            nRet  := ::OnCommand( nId, nCode, nlParam )
-           IF nRet == NIL .AND. ::AutoClose .AND. ::Style & WS_CHILD == 0 .AND. ::Modal
+           IF nRet == NIL .AND. ::Style & WS_CHILD == 0 .AND. ::Parent != NIL .AND. ( ::Modal .OR. ::AutoClose )
               IF nwParam == IDCANCEL
 
                  nRet := ExecuteEvent( "OnCancel", Self )
@@ -2272,6 +2273,9 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                  ENDIF
                  IF nRet == 1
                     ::Close( IDCANCEL )
+                    IF ! ::Modal
+                       ::Parent:SetActiveWindow()
+                    ENDIF
                     RETURN 1
                  ENDIF
                 ELSEIF nwParam == IDOK
@@ -2410,6 +2414,9 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
            EXIT
 
       CASE WM_HOTKEY
+           IF ( n := ASCAN( ::__aHotKey, {|a| a[2]==LOWORD( nlParam ) .AND. a[3]==HIWORD( nlParam ) } ) ) > 0
+              ::PostMessage( WM_COMMAND, MAKELONG(::__aHotKey[n][1],1) )
+           ENDIF
            nRet := ExecuteEvent( "OnHotKey", Self )
            ODEFAULT nRet TO ::OnHotKey( nwParam, nlParam )
            EXIT
@@ -5076,6 +5083,7 @@ CLASS WinForm INHERIT Window
    METHOD OnSysCommand()
    METHOD SetInstance()
    METHOD Redraw() INLINE ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),::UpdateWindow()
+   METHOD RegisterHotKey( nId, nMod, nKey ) INLINE IIF( RegisterHotKey( ::hWnd, nId, nMod, nKey ), AADD( ::__aHotKey, { nId, nMod, nKey } ),)
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------

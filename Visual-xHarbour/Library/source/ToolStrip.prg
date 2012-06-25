@@ -1513,7 +1513,6 @@ METHOD Create() CLASS ToolStripItem
          :Action      := {|o| o:Parent:__AddToolStripItem( ::ClsName ) }
          :Create()
       END
-
    ENDIF
 
 RETURN Self
@@ -1771,13 +1770,17 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS ToolStripButton
-   LOCAL lpMenuInfo, nAdd, aSize
+   LOCAL lpMenuInfo, nAdd, aSize, n
    nAdd := 12
    IF !::Parent:__lIsMenu
       nAdd := ::Parent:ImagePadding * 2
    ENDIF
    IF LEFT( ::xCaption, 2 ) == '{|' .AND. ::__ClassInst == NIL 
-      ::xCaption := EVAL( &(::xCaption) )
+      ::xText := EVAL( &(::xText) )
+
+      IF ( n := AT( "&", ::xText ) ) > 0
+         ::Form:RegisterHotKey( ::Id, MOD_ALT, ASC( Upper(::xText[n+1]) ) )
+      ENDIF
    ENDIF
    aSize := ::Drawing:GetTextExtentPoint32( STRTRAN( ::Caption, "&" ) )
    ::xWidth := aSize[1]+nAdd
@@ -1800,6 +1803,7 @@ METHOD Create() CLASS ToolStripButton
    lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
    SetMenuInfo( ::__hMenu, lpMenuInfo )
    lpMenuInfo := NIL
+
 RETURN Self
 
 //--------------------------------------------------------------------------------------------------------------------------------

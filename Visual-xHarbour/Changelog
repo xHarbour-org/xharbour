@@ -8,6 +8,15 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-06-25 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed ToolStripButtons to fire the OnClick event based on the HotKey assigned
+     in the Text via &.
+   ! Fixed Forms to intercept ToolStripButtons HotKeys and fire the corresponding 
+     command.
+   ! Fixed Modeless Forms to CLOSE upon receiving OnClose from other controls if
+     AutoClose is set to true.
+
+   
 2013-06-22 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed StatusBar unnecesary processing in a effort to remove flckering.
    ! Fixed Edit->Paste not being enabled when changing source code.
