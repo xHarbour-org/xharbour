@@ -4666,7 +4666,7 @@ $(OBJ_DIR)$(DIR_SEP)_wintbar$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_
 $(OBJ_DIR)$(DIR_SEP)_wintext$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_wintext.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)_winTree$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winTree.c
+$(OBJ_DIR)$(DIR_SEP)_wintree$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_wintree.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)_winview$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winview.c
@@ -4678,64 +4678,64 @@ $(OBJ_DIR)$(DIR_SEP)_winwnd$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_w
 $(OBJ_DIR)$(DIR_SEP)_winserial$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winserial.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)DebugWHAT32$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)DebugWHAT32.c
+$(OBJ_DIR)$(DIR_SEP)debugWHAT32$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)debugWHAT32.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)ErrorSysWHAT32$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)ErrorSysWHAT32.c
+$(OBJ_DIR)$(DIR_SEP)errorsysWHAT32$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)errorsysWHAT32.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)WhatUtil$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)WhatUtil.c
+$(OBJ_DIR)$(DIR_SEP)whatutil$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)whatutil.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)WinCDlg$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)WinCDlg.c
+$(OBJ_DIR)$(DIR_SEP)wincdlg$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)wincdlg.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)WinComm$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)WinComm.c
+$(OBJ_DIR)$(DIR_SEP)wincomm$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)wincomm.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)WinCore$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)WinCore.c
+$(OBJ_DIR)$(DIR_SEP)wincore$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)wincore.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)winini$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)winini.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)WinIni$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)WinIni.c
+$(OBJ_DIR)$(DIR_SEP)winrbar$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)winrbar.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)WinRBar$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)WinRBar.c
+$(OBJ_DIR)$(DIR_SEP)wintbar$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)wintbar.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)WinTBar$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)WinTBar.c
+$(OBJ_DIR)$(DIR_SEP)wintabs$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)wintabs.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)WinTabs$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)WinTabs.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)DebugWHAT32.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)Debug.prg
+$(OBJ_DIR)$(DIR_SEP)debugWHAT32.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)debug.prg
 	$(HB_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)ErrorSysWHAT32.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)ErrorSys.prg
+$(OBJ_DIR)$(DIR_SEP)errorsysWHAT32.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)errorsys.prg
 	$(HB_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)WhatUtil.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)WhatUtil.prg
+$(OBJ_DIR)$(DIR_SEP)whatutil.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)whatutil.prg
 	$(HB_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)WinCDlg.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)WinCDlg.prg
+$(OBJ_DIR)$(DIR_SEP)wincdlg.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)wincdlg.prg
 	$(HB_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)WinComm.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)WinComm.prg
+$(OBJ_DIR)$(DIR_SEP)wincomm.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)wincomm.prg
 	$(HB_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)WinCore.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)WinCore.prg
+$(OBJ_DIR)$(DIR_SEP)wincore.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)wincore.prg
 	$(HB_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)WinIni.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)WinIni.prg
+$(OBJ_DIR)$(DIR_SEP)winini.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)winini.prg
 	$(HB_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)WinRBar.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)WinRBar.prg
+$(OBJ_DIR)$(DIR_SEP)winrbar.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)winrbar.prg
 	$(HB_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)WinTBar.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)WinTBar.prg
+$(OBJ_DIR)$(DIR_SEP)wintbar.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)wintbar.prg
 	$(HB_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)WinTabs.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)WinTabs.prg
+$(OBJ_DIR)$(DIR_SEP)wintabs.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)wintabs.prg
 	$(HB_CMD)
 
 #===============================================================================

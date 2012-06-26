@@ -77,12 +77,12 @@ static ULONG uiLen;
 static ULONG uiCount;
 static BOOL bTItems;
 static BOOL bFItems;
-static float fCurRow, fCurCol = 0 ,fCurLastCol, fLastRow;
+static float /* fCurRow, */ fCurCol = 0 ,fCurLastCol, fLastRow;
 static float fStartCol, fStartCol2;
 static HB_ITEM pArray = { 0 };
 static BOOL bInitArray = 0;
 static float hb_checkStringWidth( const char * szString );
-static float hb_pdfGetHeight( const char *szText );
+/* static float hb_pdfGetHeight( const char *szText ); */
 static void hb_ProcessTableItem( PHB_ITEM p1, PHB_ITEM p2, PHB_ITEM p3, PHB_ITEM p4 );
 float getText( PDF *p, const char *szText, int iFont, float frow, float fcol, float iw);
 void  setText( PDF *p, const char *szText, float frow, float fcol, float h, float iw);
@@ -196,8 +196,8 @@ HB_FUNC(HB_PDFCLOSE)
    PDF_close( szPDFFile );               /* close PDF document   */
    PDF_delete( szPDFFile );             /* delete the PDF object */
    szPDFFile=NULL;
-   sziFontBold=NULL;
-   sziFont=NULL;
+   sziFontBold=0;
+   sziFont=0;
 }
 
 HB_FUNC(HB_PDFWRITEARG)
@@ -344,6 +344,7 @@ HB_FUNC(HB_GETPAGE)
    hb_retni( iPage );
 }
 
+#if 0
 static  BOOL hb_checkRow( float iLine )
 {
    if ( iLine <= 20 )
@@ -357,6 +358,7 @@ static  BOOL hb_checkRow( float iLine )
 
    return FALSE;
 }
+#endif
 
 static  float hb_checkStringWidth(const char *szString)
 {
@@ -448,8 +450,9 @@ static void hb_ProcessTableItem( PHB_ITEM p1, PHB_ITEM p2, PHB_ITEM p3, PHB_ITEM
 {
    ULONG ulTempPos;
    ULONG ulLen;
+   /*
    float fHeight;
-   float fI;
+   float fI; */
    float iitem, iitem1, iitem2,iitem3;
 
    ulLen = hb_arrayLen( p1 );
@@ -581,7 +584,7 @@ static void hb_ProcessTableItem( PHB_ITEM p1, PHB_ITEM p2, PHB_ITEM p3, PHB_ITEM
 float getText( PDF *p, const char *szText, int iFont, float frow, float fcol, float iw )
 {
      float h;
-     float w;
+     /* float w; */
      int c;
      h = FONTSIZETABLE * 2;
      PDF_setfont( p, iFont, 7.0);

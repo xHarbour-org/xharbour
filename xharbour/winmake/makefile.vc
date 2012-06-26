@@ -444,20 +444,6 @@ $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 # Comment this line if use of C-Mode is preferred
 CPLUSPLUS=1
 
-# Uncomment this section if you have want to build the libraries.
-# HB_GTWVG=1
-HB_GTWVW=1
-HB_FILEMEM=1
-# HB_PGSQL=1
-# HB_FREEIMAGE=1
-# HB_WHAT32=1
-# TIPSSL=1
-
-HB_LIBHARU=1
-HB_XWT=1
-HB_MZIP=1
-HB_ZIP=1
-
 #===============================================================================
 # Macro Definitions
 #===============================================================================
@@ -465,41 +451,14 @@ HB_ZIP=1
 
 RDDSQL_INCLUDE=-I"$(RDDSQL_DIR)" -I"$(HBSQLIT3_DIR)"
 
-!ifdef HB_FREEIMAGE
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(FREEIMAGE_LIB)
-!endif
-
-!ifdef HB_MZIP
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBMZIP_LIB)
-!endif
-
-!ifdef HB_ZIP
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBZIP_LIB)
-!endif
-
-!ifdef HB_XWT
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(XWT_LIB)
-!endif
-
-!ifdef HB_WHAT32
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(WHAT32_LIB)
-!endif
-
-!ifdef HB_GTWVG
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(GTWVG_LIB)
-!endif
-
-!ifdef HB_FILEMEM
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(FILEMEM_LIB)
-!endif
-
-!ifdef HB_GTWVW
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(GTWVW_LIB)
-!endif
-
-!ifdef HB_PGSQL
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(PGSQL_LIB)
-!endif
+CONTRIB_PROJECT=\
+	$(CONTRIB_PROJECT)\
+	$(FREEIMAGE_LIB)\
+	$(WHAT32_LIB)\
+	$(LIBHARU_LIB)\
+	$(XWT_LIB)\
+	$(HBMZIP_LIB)\
+	$(HBZIP_LIB)
 
 !ifdef HB_DIR_ADS
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(RDDADS_LIB)
@@ -517,12 +476,8 @@ CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBCURL_LIB)
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBCAIRO_LIB)
 !endif
 
-!ifdef HB_LIBHARU
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(LIBHARU_LIB)
-!endif
-
 !ifdef HB_DIR_POSTGRESQL
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(SDDPG_LIB)
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(PGSQL_LIB) $(SDDPG_LIB)
 !endif
 
 !ifdef HB_DIR_OCILIB
@@ -627,7 +582,7 @@ CC_CMD_ZIP  =CL\
 	$(OPTFLAGS) /GA /Gs /W3 /nologo /I"$(HBZIP_DIR)\INCLUDE" /I"include" /I"$(CC_DIR)\include" /TP\
 	/DWIN32 /D_WIN32 /DNDEBUG /D_MBCS /D_LIB\
 	/Fp"$(OBJ_DIR)\hbzip.pch" /Fd"$(OBJ_DIR)\\"\
-	/FD /c /Fo$@ $**
+	/FD /EHsc /D_CRT_SECURE_NO_WARNINGS /c /Fo$@ $**
 LIB_CMD     =LIB /NOLOGO /OUT:$@ $**
 
 #===============================================================================

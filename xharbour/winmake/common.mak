@@ -1848,7 +1848,7 @@ WHAT32_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)_winhead$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)_winicon$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)_winilst$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winINet$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_wininet$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)_winini$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)_winkbrd$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)_winlv$(OBJEXT)\
@@ -1873,21 +1873,21 @@ WHAT32_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)_wintab$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)_wintbar$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)_wintext$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winTree$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)_wintree$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)_winview$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)_winwnd$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)_winserial$(OBJEXT)\
 	\
-	$(OBJ_DIR)$(DIR_SEP)DebugWHAT32$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)ErrorSysWHAT32$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)WhatUtil$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)WinCDlg$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)WinComm$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)WinCore$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)WinIni$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)WinRBar$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)WinTBar$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)WinTabs$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)debugWHAT32$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)errorsysWHAT32$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)whatutil$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)wincdlg$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)wincomm$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)wincore$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)winini$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)winrbar$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)wintbar$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)wintabs$(OBJEXT)
 
 #===============================================================================
 # TELEPATH.LIB dependencies

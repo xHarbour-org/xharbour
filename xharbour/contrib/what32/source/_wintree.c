@@ -19,7 +19,7 @@ HB_FUNC( TVINSERTITEM )
       is.DUMMYUNIONNAME.item.iImage  = hb_parnl( 4 );
       is.DUMMYUNIONNAME.item.iSelectedImage = hb_parnl( 4 );
    #else
-      is.item.pszText = hb_parcx( 2 );
+      is.item.pszText = (LPSTR) hb_parcx( 2 );
       is.item.mask    = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
       is.item.iImage  = hb_parnl( 4 );
       is.item.iSelectedImage = hb_parnl( 4 );

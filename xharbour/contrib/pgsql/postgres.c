@@ -50,6 +50,12 @@
  *
  */
 
+#if defined(_MSC_VER) && (_MSC_VER>=1400)
+   #if !defined(_CRT_SECURE_NO_WARNINGS)
+      #define _CRT_SECURE_NO_WARNINGS
+   #endif
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <hbapi.h>
@@ -524,7 +530,7 @@ HB_FUNC(PQESCAPESTRING)
     char *dest;
     size_t size;
 
-    source = hb_parcx(1);
+    source = (char*) hb_parcx(1);
     dest = (char *) hb_xgrab( strlen(source) * 2 + 1);
     size = strlen(source);
 

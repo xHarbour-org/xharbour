@@ -49,17 +49,13 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
+#define HB_OS_WIN_USED
+
 #include "hbapi.h"
+#include "hbapierr.h"
 #include "hbvm.h"
 #include "hbinit.h"
-
-#ifdef HB_OS_WIN
-   #if !defined(WIN32)
-      #define WIN32
-   #endif
-   #include <windows.h>
-#endif
-
 #include "pdflib.h"
 
 typedef size_t (*writeproc_t)(PDF *p1, void *data, size_t size);
@@ -239,10 +235,6 @@ typedef int    (PDFLIB_CALL *PDF_GET_MINORVERSION)(void);
 #endif
 
 static HMODULE hModule = NULL;
-
-HB_EXTERN_BEGIN
-extern HB_EXPORT void hb_errInternal( ULONG ulIntCode, const char * szText, const char * szPar1, const char * szPar2 );
-HB_EXTERN_END
 
 static FARPROC PDFLib_GetProcAddress( char* szFuncName )
 {
