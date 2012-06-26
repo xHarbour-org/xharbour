@@ -36,7 +36,7 @@ $(HBPP_EXE) : $(HBPP_EXE_OBJS)
 	$(MT_CMD)
 
 $(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
-	$(EXE_LINK_CMD)
+	$(EXE_LINK_CMD) $(HBDOC_PDFLIB_LIB)
 	$(MT_CMD)
 
 $(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
@@ -3509,7 +3509,7 @@ $(OBJ_DIR)$(DIR_SEP)genpdf1.c : $(HBDOC_DIR)$(DIR_SEP)genpdf1.prg
 $(OBJ_DIR)$(DIR_SEP)genpdf1$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)genpdf1.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)pdfhbdoc$(OBJEXT) : $(HBPDF_DIR)$(DIR_SEP)pdfhbdoc.c
+$(OBJ_DIR)$(DIR_SEP)pdfhbdoc$(OBJEXT) : $(PDFLIB_DIR)$(DIR_SEP)pdfhbdoc.c
 	$(CC_CMD)
 
 #===============================================================================
@@ -4411,6 +4411,9 @@ $(OBJ_DIR)$(DIR_SEP)pdfhbdocs$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)pdfhbdocs.c
 
 $(OBJ_DIR)$(DIR_SEP)pdf1.c : $(PDFLIB_DIR)$(DIR_SEP)pdf1.prg
 	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pdflib$(OBJEXT) : $(PDFLIB_DIR)$(DIR_SEP)pdflib.c
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pdfhbdocs.c : $(PDFLIB_DIR)$(DIR_SEP)pdfhbdocs.prg
 	$(HB_CMD)

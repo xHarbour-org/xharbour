@@ -8,6 +8,39 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-26 08:25 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/gencc.c
+    ! pacify MinGW warnings
+
+  + contrib/pdflib/pdflib.c
+    + functions to replace PDFLib import lib (using pdflib5.dll)
+
+  * contrib/pdflib/pdflib.h
+    ! file updated to current version
+
+  * utils/hbdoc/genpdf1.prg
+    ! fixed compilation
+
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/contrib.pc
+  * winmake/hrbdll.pc
+  * winmake/makefile.bc
+  * winmake/makefile.dc
+  * winmake/makefile.gc
+  * winmake/makefile.pc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+    + missing pdfhbdoc.obj dependency.
+    + pdflib.lib now created by default
+    In order to use this library, we have to download PDFLib Lite Runtime from
+    http://gnuwin32.sourceforge.net/packages/pdflib-lite.htm. To integrate PDF
+    functionalities into HBDOC.EXE, please set: SET HB_DOC_PDF=yes
+
+  - contrib/pdflib/Makefile.bc
+    ! removed makefile stuff as the lib now created by default via central
+      makefile
+
 2012-06-24 14:59 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * ChangeLog
     ! just to note that the just committed common.mak was previously missing

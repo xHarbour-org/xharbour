@@ -1789,7 +1789,7 @@ static HB_GENC_FUNC( hb_p_pushdatetime )
 
    HB_GENC_LABEL();
 
-   fprintf( cargo->yyc, "\thb_xvmPushDateTime( %d, %d );\n", lVal1, lVal2 );
+   fprintf( cargo->yyc, "\thb_xvmPushDateTime( %ld, %ld );\n", lVal1, lVal2 );
    return 9;
 }
 

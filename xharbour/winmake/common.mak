@@ -64,7 +64,6 @@ HBSQLIT3_DIR  =contrib$(DIR_SEP)hbsqlit3
 SEVENZIP_DIR  =contrib$(DIR_SEP)sevenzip
 HBHPDF_DIR    =contrib$(DIR_SEP)hbhpdf
 PNG_DIR       =contrib$(DIR_SEP)png
-HBPDF_DIR     =contrib$(DIR_SEP)pdflib
 FILEMEM_DIR   =contrib$(DIR_SEP)filemem
 FIREBIRD_DIR  =contrib$(DIR_SEP)firebird
 FREEIMAGE_DIR =contrib$(DIR_SEP)freeimage
@@ -1774,6 +1773,7 @@ MYQSL_LIB_OBJS=\
 #===============================================================================
 PDFLIB_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)pdf1$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pdflib$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pdfhbdocs$(OBJEXT)
 
 #===============================================================================
@@ -2057,6 +2057,7 @@ ST_PROJECT=\
 	$(USE_DLL_LIB)\
 	$(ODBC_LIB)\
 	$(MISC_LIB)\
+	$(PDFLIB_LIB)\
 	$(HBPP_EXE)\
 	$(HBDOC_EXE)\
 	$(HBMAKE_EXE)\
@@ -2105,7 +2106,6 @@ CONTRIB_PROJECT=\
 	$(GTWVG_LIB)\
 	$(GTWVW_LIB)\
 	$(LIBNF_LIB)\
-	$(PDFLIB_LIB)\
 	$(TELEPATH_LIB)\
 	$(HBCC_LIB)\
 	$(PNG_LIB)\

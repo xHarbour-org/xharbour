@@ -46,10 +46,9 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
-INCLUDE_DIR  =$(INCLUDE_DIR);include
-INCLUDE_DIR  =$(INCLUDE_DIR);$(OBJ_DIR);$(ZLIB_DIR)
-CLIBFLAGS    =$(CLIBFLAGS) -q -c -I$(INCLUDE_DIR) -d -5 -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H
-HARBOURFLAGS =$(HARBOURFLAGS) -i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
+INCLUDE_DIR  =$(INCLUDE_DIR) -Iinclude -I$(OBJ_DIR) -I$(ZLIB_DIR)
+CLIBFLAGS    =$(CLIBFLAGS) -q -c $(INCLUDE_DIR) -d -5 -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H
+HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 LINK_CMD     =ILINK32 -ap -Tpe -x -Gn -C -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" -Llib\b32 $(LFLAGS) "$(CC_DIR)\lib\c0x32.obj" $**,$@,,
 !if $d(HB_THREAD_SUPPORT)
 CLIBFLAGS    =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT
@@ -97,15 +96,12 @@ CMN_LIBS=$(COMMON_LIB) $(COMPILERLIBS)
 #===============================================================================
 !include winmake\common.mak
 
-!if $d(HB_DOC_PDF)
-HARBOURFLAGS=$(HARBOURFLAGS) -dPDF
+!if !("$(HB_DOC_PDF)"=="")
+HBDOC_PDFLIB_LIB=$(PDFLIB_LIB)
 HBDOC_EXE_OBJS=\
 	$(HBDOC_EXE_OBJS)\
 	$(OBJ_DIR)\genpdf1.obj\
 	$(OBJ_DIR)\pdfhbdoc.obj
-HARBOUR_LIBS=\
-	$(HARBOUR_LIBS)\
-	$(LIB_DIR)\pdflib.lib
 !endif
 
 !ifdef HB_GTALLEG
@@ -424,6 +420,13 @@ $(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
 +)
 !
 
+$(PDFLIB_LIB) : $(PDFLIB_LIB_OBJS)
+	IF EXIST "$(PDFLIB_LIB)" $(DEL) "$(PDFLIB_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
 #*******************************************************************************
 !elif ("$(__BLD__)"=="DLL_BLD")
 #*******************************************************************************
@@ -494,11 +497,18 @@ ACEH_DIR    =-I"$(HB_DIR_ADS)"
 !ifdef HB_DIR_OPENSSL
 OPENSSL_DIR    =-I"$(HB_DIR_OPENSSL)\include"
 !endif
+!if !("$(HB_DOC_PDF)"=="")
+HBDOC_PDFLIB_LIB=$(PDFLIB_LIB)
+HBDOC_EXE_OBJS=\
+	$(HBDOC_EXE_OBJS)\
+	$(OBJ_DIR)\genpdf1.obj\
+	$(OBJ_DIR)\pdfhbdoc.obj
+!endif
 
-INCLUDE_DIR =$(INCLUDE_DIR);include;$(OBJ_DIR);$(ZLIB_DIR)
+INCLUDE_DIR =-I"include" -I"$(OBJ_DIR)" -I"$(ZLIB_DIR)"
 DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
-CLIBFLAGS   =$(CLIBFLAGS) -DHAVE_CONFIG_H -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -q -a8 -OS -O2 -6 -c $(ACEH_DIR) $(OPENSSL_DIR) -I$(INCLUDE_DIR) -d -w3 -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H
+CLIBFLAGS   =$(CLIBFLAGS) -DHAVE_CONFIG_H -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -q -a8 -OS -O2 -6 -c $(ACEH_DIR) $(OPENSSL_DIR) $(INCLUDE_DIR) -d -w3 -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 
 # User flags should be able to override everything!
@@ -514,7 +524,7 @@ HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
 DLL_LINK_CMD=ILINK32 $(LINKERFLAGS) -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" "$(CC_DIR)\lib\c0d32.obj" $**,$@,,$(COMPILERLIBS)
-DLLEXE_LINK_CMD=ILINK32 $(LINKERFLAGS) -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" "$(CC_DIR)\lib\c0x32.obj" $**,$@,,$(USE_DLL_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+DLLEXE_LINK_CMD=ILINK32 $(LINKERFLAGS) -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" "$(CC_DIR)\lib\c0x32.obj" $**,$@,,$(USE_DLL_LIB) $(HBDOC_PDFLIB_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # Compiler and 3rd Party libraries need to be linked
@@ -551,9 +561,6 @@ $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 
 # Uncomment this section if you have want to build the libraries.
 HB_GTWVW=1
-# HB_PGSQL=1
-# TIPSSL=1
-
 HB_LIBHARU=1
 HB_FREEIMAGE=1
 HB_WHAT32=1
@@ -842,13 +849,6 @@ $(HBZIP_LIB) : $(HBZIP_LIB_OBJS)
 
 $(LIBNF_LIB) : $(LIBNF_LIB_OBJS)
 	IF EXIST "$(LIBNF_LIB)" $(DEL) "$(LIBNF_LIB)" > NUL
-	TLIB $@ $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-!
-
-$(PDFLIB_LIB) : $(PDFLIB_LIB_OBJS)
-	IF EXIST "$(PDFLIB_LIB)" $(DEL) "$(PDFLIB_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)

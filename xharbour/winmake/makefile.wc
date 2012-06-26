@@ -93,16 +93,12 @@ CMN_LIBS=$(COMMON_LIB)
 #===============================================================================
 !include winmake\common.mak
 
-
-!ifdef HB_DOC_PDF
-HARBOURFLAGS=$(HARBOURFLAGS) -dPDF
+!if !("$(HB_DOC_PDF)"=="")
+HBDOC_PDFLIB_LIB=$(PDFLIB_LIB)
 HBDOC_EXE_OBJS=\
 	$(HBDOC_EXE_OBJS)\
 	$(OBJ_DIR)\genpdf1.obj\
 	$(OBJ_DIR)\pdfhbdoc.obj
-HARBOUR_LIBS=\
-	$(HARBOUR_LIBS)\
-	$(LIB_DIR)\pdflib.lib
 !endif
 
 !ifdef HB_GTALLEG
@@ -256,6 +252,9 @@ $(DLL_MAIN_LIB) : $(DLL_MAIN_LIB_OBJS)
 $(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
 	$(LIB_CMD)
 
+$(PDFLIB_LIB) : $(PDFLIB_LIB_OBJS)
+	$(LIB_CMD)
+
 #*******************************************************************************
 !elseif ("$(__BLD__)"=="DLL_BLD")
 #*******************************************************************************
@@ -269,6 +268,14 @@ $(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
 # Macro Definitions
 #===============================================================================
 !include winmake\common.mak
+
+!if !("$(HB_DOC_PDF)"=="")
+HBDOC_PDFLIB_LIB=$(PDFLIB_LIB)
+HBDOC_EXE_OBJS=\
+	$(HBDOC_EXE_OBJS)\
+	$(OBJ_DIR)\genpdf1.obj\
+	$(OBJ_DIR)\pdfhbdoc.obj
+!endif
 
 #===============================================================================
 # RDDADS
@@ -332,7 +339,7 @@ HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
 DLL_LINK_CMD=LINK386 $(DLLFLAGS)
-DLLEXE_LINK_CMD=LINK386 $(EXEFLAGS) /OUT:$@ $** $(USE_DLL_LIB) $(HARBOUR_DLL_LIB)
+DLLEXE_LINK_CMD=LINK386 $(EXEFLAGS) /OUT:$@ $** $(USE_DLL_LIB) $(HBDOC_PDFLIB_LIB) $(HARBOUR_DLL_LIB)
 
 #===============================================================================
 # The Project
@@ -425,7 +432,6 @@ LIB_CMD     =LIB386 /nologo /out:$@ $**
 
 CONTRIB_PROJECT=\
 	$(LIBNF_LIB)\
-	$(PDFLIB_LIB)\
 	$(TELEPATH_LIB)\
 	$(HBCC_LIB)\
 	$(PNG_LIB)\
@@ -561,9 +567,6 @@ $(HBZIP_LIB) : $(HBZIP_LIB_OBJS)
 	$(LIB_CMD)
 
 $(LIBNF_LIB) : $(LIBNF_LIB_OBJS)
-	$(LIB_CMD)
-
-$(PDFLIB_LIB) : $(PDFLIB_LIB_OBJS)
 	$(LIB_CMD)
 
 $(MYSQL_LIB) : $(MYSQL_LIB_OBJS)

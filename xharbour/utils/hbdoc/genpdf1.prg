@@ -121,9 +121,9 @@ FUNCTION ProcessPdf(lMemory)
 
    LOCAL lData         := .F.
    LOCAL lMethod       := .F.
-   LOCAL cBuffEnd
+   // LOCAL cBuffEnd
    LOCAL nPos
-   LOCAL nPosEND
+   // LOCAL nPosEND
    LOCAL lIsDataLink   := .F.
    LOCAL lIsMethodLink := .F.
 
@@ -212,7 +212,7 @@ local hhh
       @ INFILELINE, 33 CLEAR TO INFILELINE, MAXCOL()
       @ INFILELINE, 33 SAY PAD( aDirList[ i, F_NAME ], 47 )         
       @ MODULELINE, 33 CLEAR TO LINELINE, MAXCOL()
-      @ LINELINE, 27   SAY "Line:"                                  
+      @ LINELINE, 27   SAY "Line:"
 
       nLineCnt := 0
 
@@ -296,14 +296,14 @@ local hhh
                   FOR nAlso := 1 TO LEN( aalso )
 
                      IF nAlso == 1
-                        nPos:=ascan(awww,{|a,b| Upper(a[1])== upper(aAlso[nAlso])})
+                        nPos:=ascan(awww,{|a| Upper(a[1])== upper(aAlso[nAlso])})
                         if nPos>0
                            HB_PDFADDLINK(awww[ npos,1 ],aWww[nPos,2] )
                         else
                            HB_PDFADDLINK(awww[ 1,1 ],aWww[1,2] )
                         endif
                      ELSE
-                          nPos:=ascan(awww,{|a,b| Upper(a[1])== upper(aAlso[nAlso])})
+                          nPos:=ascan(awww,{|a| Upper(a[1])== upper(aAlso[nAlso])})
                         if nPos>0
                            HB_PDFADDLINK(awww[ npos,1 ],aWww[nPos,2] )
                         else
@@ -332,9 +332,9 @@ local hhh
                cBuffer := ReadLN( @lEof )
                nLineCnt ++
                //  Save the function name
-               cFuncName :=  ALLTRIM( SUBSTR( cBuffer, nCommentLen ) ) 
+               cFuncName :=  ALLTRIM( SUBSTR( cBuffer, nCommentLen ) )
                @ MODULELINE, 33 CLEAR TO MODULELINE, MAXCOL()
-               @ MODULELINE, 33 SAY cFuncName         
+               @ MODULELINE, 33 SAY cFuncName
 
                nMode := D_NORMAL
 
@@ -771,6 +771,8 @@ FUNCTION ProcStatusPdf( nWriteHandle, cBuffer )
       hb_pdfWriteText( "       Not Started" )
    ENDIF
 
+   nWriteHandle := nWriteHandle
+
 RETURN nil
 
 *+北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北
@@ -796,7 +798,7 @@ hb_pdfWriteText( " " )
 HB_PDFTABLE(aFitable,aSitable,aTitable,aFoiTable)
 endif
 
-      
+   oPdf      := oPdf
    afiTable  := {}
    asitable  := {}
    atitable  := {}
@@ -821,7 +823,7 @@ FUNCTION ProcPdfTable( cBuffer, nNum )
    LOCAL cItem2    := ''
    LOCAL cItem3    := ''
    LOCAL cItem4    := ''
-   LOCAL xtype
+   // LOCAL xtype
    LOCAL nColorpos
    LOCAL cColor
    cBuffer := ALLTRIM( cBuffer )
@@ -836,7 +838,7 @@ FUNCTION ProcPdfTable( cBuffer, nNum )
       cBuffer   := STRTRAN( cbuffer, "<color:", "" )
       cBuffer   := STRTRAN( cbuffer, ">", "" )
       cBuffer   := STRTRAN( cBuffer, ccolor, '' )
-      nColorpos := ASCAN( aColorTable, { | x, y | UPPER( x[ 1 ] ) == UPPER( ccolor ) } )
+      nColorpos := ASCAN( aColorTable, { | x | UPPER( x[ 1 ] ) == UPPER( ccolor ) } )
       cColor    := aColortable[ nColorPos, 2 ]
    ENDIF
    IF !EMPTY( cBuffer )
@@ -903,7 +905,7 @@ FUNCTION ProcPdfDesc( cBuffer, oPdf, cStyle )
    LOCAL nColorPos
    LOCAL ccolor      := ''
    LOCAL cReturn     := ''
-   LOCAL ncolorend
+   // LOCAL ncolorend
    LOCAL nIdentLevel
    LOCAL cOldLine
    LOCAL lEndPar     := .F.
@@ -1179,7 +1181,7 @@ FUNCTION ProcPdfDesc( cBuffer, oPdf, cStyle )
          ENDIF
       ENDDO
       IF lEndTable
-         GenPdfTable( oPdf ,nNumTableItems) 
+         GenPdfTable( oPdf ,nNumTableItems)
          LFstTableItem:=.T.
       ENDIF
    ENDIF
@@ -1212,7 +1214,7 @@ FUNC CheckPdfColor( cbuffer, ncolorpos )
       cOldColorString := SUBSTR( cbuffer, ncolorpos )
       nColorend       := AT( ">", cOldColorString )
       cOldColorString := SUBSTR( cOldColorString, 1, nColorEnd )
-      nreturn         := ASCAN( acolortable, { | x, y | UPPER( x[ 1 ] ) == UPPER( ccolor ) } )
+      nreturn         := ASCAN( acolortable, { | x | UPPER( x[ 1 ] ) == UPPER( ccolor ) } )
       IF nreturn > 0
          cReturn := "^a" + acolortable[ nreturn, 2 ]
       ENDIF
@@ -1236,7 +1238,7 @@ FUNC MaxElemPdf( a )
    LOCAL tam     := 0
    LOCAL nMax2   := 0
    LOCAL nPos    := 1
-   LOCAL cString
+   // LOCAL cString
 
    LOCAL nCount
    FOR nCount := 1 TO nSize
@@ -1266,9 +1268,11 @@ FUNCTION FormatPdfBuff( cBuffer, cStyle, oPdf )
    LOCAL cBuffEnd      := ''
    LOCAL lEndBuffer    := .f.
    LOCAL nPos
-   LOCAL nPosend
+   // LOCAL nPosend
    LOCAL lArgBold      := .f.
    LOCAL LFstTableItem := .t.
+
+   oPdf    := oPdf
    cReturn := cBuffer + ' '
    IF AT( '</par>', cReturn ) > 0 .OR. EMPTY( cBuffer )
       IF EMPTY( cbuffer )
@@ -1367,7 +1371,7 @@ STATIC FUNCTION ReadFromTop( nh )
    LOCAL cClassDoc := DELIM + "CLASSDOC" + DELIM
    LOCAL cBuffer   := ''
    LOCAL NPOS      := 0
-   LOCAL nlenpos
+   // LOCAL nlenpos
    LOCAL aLocDoc   := {}
    DO WHILE FREADline( nH, @cBuffer, 4096 )
       cBuffer := TRIM( SUBSTR( cBuffer, nCommentLen ) )
@@ -1395,10 +1399,10 @@ STATIC FUNCTION GetItem( cItem, nCurdoc )
    LOCAL nPos
    LOCAL cCuritem
    LOCAL lReturn
-   LOCAL x
+   // LOCAL x
    LOCAL xPos
    xPos := aCurdoc[ nCurdoc ]
-   nPos := ASCAN( xPos, { | x, y | UPPER( ALLTRIM( x ) ) == UPPER( ALLTRIM( cItem ) ) } )
+   nPos := ASCAN( xPos, { | x | UPPER( ALLTRIM( x ) ) == UPPER( ALLTRIM( cItem ) ) } )
    IF nPos > 0
       cCuritem := xPos[ nPos ]
       IF AT( "$", xPos[ nPos + 1 ] ) > 0

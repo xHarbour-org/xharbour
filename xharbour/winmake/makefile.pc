@@ -88,6 +88,14 @@ CMN_LIBS=$(COMMON_LIB) $(COMPILERLIBS)
 #===============================================================================
 !include winmake\common.mak
 
+!if !("$(HB_DOC_PDF)"=="")
+HBDOC_PDFLIB_LIB=$(PDFLIB_LIB)
+HBDOC_EXE_OBJS=\
+	$(HBDOC_EXE_OBJS)\
+	$(OBJ_DIR)\genpdf1.obj\
+	$(OBJ_DIR)\pdfhbdoc.obj
+!endif
+
 #===============================================================================
 # The Project
 #===============================================================================
@@ -228,6 +236,9 @@ $(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
 
 $(FMSTAT_LIB) : $(FMSTAT_LIB_OBJS)
 	$(LIB_CMD)
+
+$(PDFLIB_LIB) : $(PDFLIB_LIB_OBJS)
+        $(LIB_CMD)
 
 #===============================================================================
 # Building rules of Object files

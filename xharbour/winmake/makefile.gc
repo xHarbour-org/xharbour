@@ -33,13 +33,11 @@ include winmake/common.mak
 
 HBFILERE_EXE=
 
-ifeq ($(HB_DOC_PDF),yes)
-HARBOURFLAGS+=-dPDF
+ifneq ($(HB_DOC_PDF),)
+HBDOC_PDFLIB_LIB=$(PDFLIB_LIB)
 HBDOC_EXE_OBJS+=\
 	$(OBJ_DIR)/genpdf1.o\
 	$(OBJ_DIR)/pdfhbdoc.o
-COMPILERLIBS=+\
-	-lpdflib
 endif
 
 ifeq ($(HB_GTALLEG),yes)
@@ -267,6 +265,9 @@ $(HSX_LIB) : $(HSX_LIB_OBJS)
 $(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
 	$(LIB_CMD)
 
+$(PDFLIB_LIB) : $(PDFLIB_LIB_OBJS)
+	$(LIB_CMD)
+
 #*******************************************************************************
 else ifeq ($(__BLD__),DLL_BLD)
 #*******************************************************************************
@@ -283,6 +284,13 @@ DLL_MT=mt
 # Macro Definitions
 #===============================================================================
 include winmake/common.mak
+
+ifneq ($(HB_DOC_PDF),)
+HBDOC_PDFLIB_LIB=$(PDFLIB_LIB)
+HBDOC_EXE_OBJS+=\
+	$(OBJ_DIR)/genpdf1.o\
+	$(OBJ_DIR)/pdfhbdoc.o
+endif
 
 #===============================================================================
 # Compiler and 3rd Party libraries need to be linked
@@ -356,7 +364,7 @@ HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(LINEFLAGS) -d_USE_APPMAIN_ $(HARBOURFLAGS) -o$
 BISON_CMD1  =bison -v -p yy -d -o $@ $^
 BISON_CMD2  =bison -v -p hb_comp -d -o $@ $^
 DLL_LINK_CMD=GCC -shared -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1)
-DLLEXE_LINK_CMD=GCC -Wall $(NOCYGWIN) -o $@ $^ $(HARBOUR_DLL) $(USE_DLL_LIB) $(COMPILERLIBS)
+DLLEXE_LINK_CMD=GCC -Wall $(NOCYGWIN) -o $@ $^ $(HARBOUR_DLL) $(USE_DLL_LIB) $(HBDOC_PDFLIB_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # The Project
@@ -585,9 +593,6 @@ $(HBZIP_LIB) : $(HBZIP_LIB_OBJS)
 	$(LIB_CMD)
 
 $(LIBNF_LIB) : $(LIBNF_LIB_OBJS)
-	$(LIB_CMD)
-
-$(PDFLIB_LIB) : $(PDFLIB_LIB_OBJS)
 	$(LIB_CMD)
 
 $(MYSQL_LIB) : $(MYSQL_LIB_OBJS)

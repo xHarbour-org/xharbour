@@ -17,6 +17,14 @@
 #===============================================================================
 !include winmake\common.mak
 
+!if !("$(HB_DOC_PDF)"=="")
+HBDOC_PDFLIB_LIB=$(PDFLIB_LIB)
+HBDOC_EXE_OBJS=\
+	$(HBDOC_EXE_OBJS)\
+	$(OBJ_DIR)\genpdf1.obj\
+	$(OBJ_DIR)\pdfhbdoc.obj
+!endif
+
 #===============================================================================
 # Compiler and 3rd Party libraries need to be linked
 #===============================================================================
@@ -71,7 +79,7 @@ HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
 DLL_LINK_CMD=POLINK $(DLLFLAGS)
-DLLEXE_LINK_CMD=POLINK $(EXEFLAGS) /OUT:$@ $** $(USE_DLL_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+DLLEXE_LINK_CMD=POLINK $(EXEFLAGS) /OUT:$@ $** $(USE_DLL_LIB) $(HARBOUR_DLL_LIB) $(HBDOC_PDFLIB_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # The Project
