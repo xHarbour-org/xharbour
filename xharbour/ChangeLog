@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-28 09:04 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  - contrib/xwt/makefile.bc
+  - contrib/xwt/makefile.nt
+  - contrib/xwt/makefile.vc
+  - contrib/xwt/makef_gtk.bc
+  - contrib/xwt/make_b32.bat
+  - contrib/xwt/make_vc.bat
+    ! removed Windows make stuffs as it is covered in central makefiles
+
 2012-06-28 08:58 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   - contrib/what32/makefile.bc
   - contrib/what32/makefile.nt
