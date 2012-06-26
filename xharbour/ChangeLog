@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-27 04:36 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/compile.mak
+    ! some filenames lower casing
+
+  * winmake/makefile.gc
+    + force-build libhbzip.a
+
 2012-06-27 03:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/mdir.bat
     + libhbpg.lib not copied to lib dir, fixed.

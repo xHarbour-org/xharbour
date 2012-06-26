@@ -437,7 +437,7 @@ endif
 HB_CMD =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) -o$@ $^
 CC_CMD =GCC $(CLIBFLAGS) -o $@ $^
 CCC_CMD =$(CC_CMD)
-CC_CMD_ZIP=G++ $(CLIBFLAGS) -I$(HBZIP_DIR)\include -DWIN32 -D_WIN32 -DNDEBUG -o $@ $^
+CC_CMD_ZIP=G++ -Iinclude -I$(HBZIP_DIR)/include -DWIN32 -D_WIN32 -DNDEBUG -fpermissive -c -o $@ $^
 LIB_CMD=\
 	RM -f $@ &&\
 	AR cru $@ $^ &&\
@@ -454,12 +454,8 @@ CONTRIB_PROJECT+=\
 	$(HBMZIP_LIB)\
 	$(XWT_LIB)\
 	$(WHAT32_LIB)\
-	$(LIBHARU_LIB)
-
-# HBZIP_LIB is broken under GCC
-# ifeq ($(HB_ZIP), 1)
-# CONTRIB_PROJECT+=$(HBZIP_LIB)
-# endif
+	$(LIBHARU_LIB)\
+	$(HBZIP_LIB)
 
 ifneq ($(HB_DIR_OPENSSL),)
 CONTRIB_PROJECT+=$(TIPSSL_LIB)

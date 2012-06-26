@@ -4450,10 +4450,10 @@ $(OBJ_DIR)$(DIR_SEP)pdfhbdocs.c : $(PDFLIB_DIR)$(DIR_SEP)pdfhbdocs.prg
 $(OBJ_DIR)$(DIR_SEP)postgres$(OBJEXT) : $(PGSQL_DIR)$(DIR_SEP)postgres.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)TPostgres$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)TPostgres.c
+$(OBJ_DIR)$(DIR_SEP)tpostgres$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)tpostgres.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)TPostgres.c : $(PGSQL_DIR)$(DIR_SEP)TPostgres.prg
+$(OBJ_DIR)$(DIR_SEP)tpostgres.c : $(PGSQL_DIR)$(DIR_SEP)tpostgres.prg
 	$(HB_CMD)
 
 #===============================================================================
