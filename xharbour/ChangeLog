@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-28 08:58 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  - contrib/what32/makefile.bc
+  - contrib/what32/makefile.nt
+  - contrib/what32/makefile.pc
+  - contrib/what32/makefile.vc
+  - contrib/what32/make_b32.bat
+  - contrib/what32/make_pc.bat
+  - contrib/what32/make_vc.bat
+  - contrib/what32/what32.bc
+    ! removed Windows make stuffs as it is covered in central makefiles
+
 2012-06-26 08:25 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/gencc.c
     ! pacify MinGW warnings
