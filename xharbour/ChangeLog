@@ -8,6 +8,27 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-26 09:37 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  - source/cgi/makefile.bc
+  - source/rtl/gtalleg/makefile.bc
+  - source/rtl/gtalleg/makefile.vc
+  - source/cgi/makefile.pc
+  - contrib/firebird/make_b32.bat
+  - contrib/freeimage/MAKE_B32.BAT
+  - contrib/gtwvw/make_b32.bat
+  - contrib/hbmzip/make_b32.bat
+  - contrib/hbzlib/make_b32.bat
+  - contrib/libnf/make_b32.bat
+  - contrib/libnf/make_w32.bat
+  - contrib/pgsql/make_b32.bat
+  - contrib/rdd_ads/make_b32.bat
+  - contrib/tp_/make_b32.bat
+  - contrib/unicode/make_b32.bat
+  - source/cgi/make_b32.bat
+  - source/rtl/gtalleg/make_b32.bat
+  - source/rtl/gtalleg/make_vc.bat
+    ! removed Windows make stuffs as it is covered in central makefiles
+
 2012-06-26 09:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * ChangeLog
     ! the last 3 logs was dated 2012-06-28 whilst is should be 2012-06-26
