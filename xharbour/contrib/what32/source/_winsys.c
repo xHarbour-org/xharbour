@@ -43,6 +43,7 @@
 #endif
 
 #if defined(__DMC__)
+#if 0
 typedef struct _OSVERSIONINFOEX {
     DWORD dwOSVersionInfoSize;
     DWORD dwMajorVersion;
@@ -56,6 +57,7 @@ typedef struct _OSVERSIONINFOEX {
     BYTE  wProductType;
     BYTE  wReserved;
 } OSVERSIONINFOEX, *POSVERSIONINFOEX, *LPOSVERSIONINFOEX;
+#endif
 #endif
 
 #include "hbapi.h"

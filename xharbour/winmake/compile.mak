@@ -4694,7 +4694,7 @@ $(OBJ_DIR)$(DIR_SEP)wincomm$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)wincomm.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)wincore$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)wincore.c
-	$(CCC_CMD)
+	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)winini$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)winini.c
 	$(CC_CMD)
@@ -4737,6 +4737,9 @@ $(OBJ_DIR)$(DIR_SEP)wintbar.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)wintbar.p
 
 $(OBJ_DIR)$(DIR_SEP)wintabs.c : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)wintabs.prg
 	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)wincorec$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)wincorec.c
+	$(CC_CMD)
 
 #===============================================================================
 # XWT.LIB dependencies

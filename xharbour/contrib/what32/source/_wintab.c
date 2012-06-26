@@ -14,13 +14,15 @@
 #include "hbapiitm.h"
 
 #if defined(__DMC__)
-#define CCM_FIRST               0x2000
+#if 0
 #define TC_HITTESTINFO          TCHITTESTINFO
 typedef struct tagTCHITTESTINFO
 {
     POINT pt;
     UINT flags;
 } TCHITTESTINFO, FAR * LPTCHITTESTINFO;
+#endif
+#define CCM_FIRST               0x2000
 #define TCM_SETMINTABWIDTH      (TCM_FIRST + 49)
 #define TabCtrl_SetMinTabWidth(hwnd, x) \
         (int)SNDMSG((hwnd), TCM_SETMINTABWIDTH, 0, x)

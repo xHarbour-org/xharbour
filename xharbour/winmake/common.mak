@@ -1884,6 +1884,7 @@ WHAT32_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)wincdlg$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)wincomm$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)wincore$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)wincorec$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)winini$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)winrbar$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)wintbar$(OBJEXT)\

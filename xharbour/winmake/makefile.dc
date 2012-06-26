@@ -43,8 +43,8 @@ CLIBFLAGS   =-D_MT -DHB_THREAD_SUPPORT
 CLIBFLAGS_C =-D_MT -DHB_THREAD_SUPPORT
 !endif
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
-CLIBFLAGS=$(CLIBFLAGS) -cpp -mn $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"UINT_PTR=UINT" -D"HAVE_CONFIG_H"
-CLIBFLAGS_C=$(CLIBFLAGS_C) -mn $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"UINT_PTR=UINT" -D"HAVE_CONFIG_H"
+CLIBFLAGS=$(CLIBFLAGS) -cpp -mn $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"HAVE_CONFIG_H"
+CLIBFLAGS_C=$(CLIBFLAGS_C) -mn $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"HAVE_CONFIG_H"
 HB_CMD=$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN=$(HARBOUR_EXE) -n $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
@@ -74,7 +74,7 @@ CMN_LIBS=$(COMMON_LIB)
 #===============================================================================
 !include winmake\common.mak
 
-ODBC_LIB=
+#ODBC_LIB=
 
 # overwrite HB_GT_LIBS because some modules did not compile
 HB_GT_LIBS  =$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTGUI_LIB)
@@ -327,8 +327,8 @@ ACEH_DIR    =-I"$(HB_DIR_ADS)"
 INCLUDE_DIR =-I"include" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(OBJ_DIR)" -I"$(ZLIB_DIR)" $(ACEH_DIR)
 DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
-CLIBFLAGS   =$(CLIBFLAGS) -D"HB_NO_DUPLICATE_HVMPROCESSSYMBOL" -D"HAVE_CONFIG_H" -D"__EXPORT__" -cpp -mn $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"WIN32" -D"UINT_PTR=UINT"
-CLIBFLAGS_C =$(CLIBFLAGS) -D"HB_NO_DUPLICATE_HVMPROCESSSYMBOL" -D"HAVE_CONFIG_H" -D"__EXPORT__" -mn $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"WIN32" -D"UINT_PTR=UINT"
+CLIBFLAGS   =$(CLIBFLAGS) -D"HB_NO_DUPLICATE_HVMPROCESSSYMBOL" -D"HAVE_CONFIG_H" -D"__EXPORT__" -cpp -mn $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__"
+CLIBFLAGS_C =$(CLIBFLAGS) -D"HB_NO_DUPLICATE_HVMPROCESSSYMBOL" -D"HAVE_CONFIG_H" -D"__EXPORT__" -mn $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" 
 HARBOURFLAGS=$(HARBOURFLAGS) -i"include" -q0 -w2 -es2 -gc0
 CC_CMD      =SCPPN $(CLIBFLAGS) -o$@ $**
 CCC_CMD     =SCPPN $(CLIBFLAGS_C) -o$@ $**
@@ -375,14 +375,6 @@ $(HARBOUR_DLL_OBJS),$@,,,$(OBJ_DIR)\dmcdll.def
 !elif ("$(__BLD__)"=="CONTRIB_BLD")
 #*******************************************************************************
 # Uncomment this section if you have want to build the libraries.
-# HB_GTWVW=1
-# HB_PGSQL=1
-# HB_MZIP=1
-# HB_ZIP=1
-# HB_FREEIMAGE=1
-# HB_WHAT32=1
-# HB_XWT=1
-# HB_LIBHARU=1
 
 #===============================================================================
 # Append your own build flags here
@@ -420,10 +412,11 @@ RDDSQL_INCLUDE=-I$(HB_DIR_MYSQL)\include $(RDDSQL_INCLUDE)
 RDDSQL_INCLUDE=-I$(HB_DIR_FIREBIRD)\include $(RDDSQL_INCLUDE)
 !endif
 INCLUDE_DIR=$(INCLUDE_DIR) $(RDDSQL_INCLUDE)
-CLIBFLAGS=$(CLIBFLAGS) -cpp -mn $(ACEH_DIR) $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -D"_HAVE_SQLITE_CONFIG_H"
-CLIBFLAGS_C=-mn $(ACEH_DIR) $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"WIN32" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -D"_HAVE_SQLITE_CONFIG_H"
-HB_CMD=$(HARBOUR_EXE) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -n1 -q0 -w2 -es2 -gc0 $** -o$@
+CLIBFLAGS=$(CLIBFLAGS) -cpp -mn $(ACEH_DIR) $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -D"_HAVE_SQLITE_CONFIG_H"
+CLIBFLAGS_C=-mn $(ACEH_DIR) $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -D"_HAVE_SQLITE_CONFIG_H"
+HB_CMD=$(HARBOUR_EXE) -iinclude -i$(GDLIB_DIR)\include -i$(WHAT32_DIR)\include -i$(XWT_DIR)\include -n1 -q0 -w2 -es2 -gc0 $** -o$@
 CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
+CC_CMD_ZIP=SCPPN -cpp -mn -Iinclude -I$(CC_DIR)\include\win32 -I$(CC_DIR)\include -I$(HBZIP_DIR)\include -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -o$@ $**
 CCC_CMD=SCPPN $(CLIBFLAGS_C) -o$@ $**
 LIB_CMD=LIB -c -n $@ $**
 
@@ -452,42 +445,22 @@ CONTRIB_PROJECT=\
 	\
 	$(RDDSQL_LIB)\
 	$(SDDSQLT3_LIB)\
-	$(SDDODBC_LIB)
+	$(SDDODBC_LIB)\
+	$(FREEIMAGE_LIB)\
+	$(XWT_LIB)\
+	$(WHAT32_LIB)\
+	$(LIBHARU_LIB)\
+	$(HBMZIP_LIB)
 
-!ifdef HB_DIR_OPENSSL
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(TIPSSL_LIB)
-!endif
-
-!ifdef HB_FREEIMAGE
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(FREEIMAGE_LIB)
-!endif
-
-!ifdef HB_MZIP
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBMZIP_LIB)
-!endif
+# Digital Mars cannot build hbzlip.lib
+# HB_ZIP=1
 
 !ifdef HB_ZIP
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBZIP_LIB)
 !endif
 
-!ifdef HB_XWT
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(XWT_LIB)
-!endif
-
-!ifdef HB_WHAT32
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(WHAT32_LIB)
-!endif
-
-!ifdef HB_GTWVW
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(GTWVW_LIB)
-!endif
-
-!ifdef HB_PGSQL
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(PGSQL_LIB)
-!endif
-
-!ifdef HB_LIBHARU
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(LIBHARU_LIB)
+!ifdef HB_DIR_OPENSSL
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(TIPSSL_LIB)
 !endif
 
 !ifdef HB_DIR_CURL
@@ -502,6 +475,10 @@ CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBCAIRO_LIB)
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(FIREBIRD_LIB) $(SDDFB_LIB)
 !endif
 
+!ifdef HB_DIR_POSTGRESQL
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(PGSQL_LIB) $(SDDPG_LIB)
+!endif
+
 !ifdef HB_DIR_MYSQL
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(SDDMY_LIB) $(MYSQL_LIB)
 !endif
@@ -511,18 +488,6 @@ ALL: $(CONTRIB_PROJECT)
 #===============================================================================
 # Library dependencies and build rules
 #===============================================================================
-#ifdef ___X___
-$(RTL_LIB) : $(RTL_LIB_OBJS)
-	LIB -c -n $@ @&&!
-$**
-!
-
-$(CT_LIB) : $(CT_LIB_OBJS)
-	LIB -c -n $@ @&&!
-$**
-!
-#endif
-
 $(CGILIB_LIB) : $(CGILIB_LIB_OBJS)
 	$(LIB_CMD)
 

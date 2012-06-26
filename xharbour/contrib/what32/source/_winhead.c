@@ -46,6 +46,7 @@ extern BOOL Array2Point(PHB_ITEM aPoint, POINT *pt );
         (int)SNDMSG((hwnd), HDM_SETHOTDIVIDER, (WPARAM)(fPos), (LPARAM)(dw))
 #endif
 #if defined(__DMC__)
+#if 0
 typedef struct _HD_ITEM
 {
     UINT    mask;
@@ -64,6 +65,7 @@ typedef struct _HD_ITEM
     LPVOID  pvFilter;
 #endif
 } HDITEM, FAR * LPHDITEM;
+#endif
 #define HDM_CREATEDRAGIMAGE     (HDM_FIRST + 16)
 #define Header_CreateDragImage(hwnd, i) \
         (HIMAGELIST)SNDMSG((hwnd), HDM_CREATEDRAGIMAGE, (WPARAM)(i), 0)

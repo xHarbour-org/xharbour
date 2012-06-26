@@ -11,7 +11,7 @@ rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
 
-SET CC_DIR=D:\DM
+SET CC_DIR=E:\DM
 SET BISON_DIR=D:\BISON\BIN
 SET SUB_DIR=dc
 SET HB_GT_LIB=$(GTWIN_LIB)
@@ -24,7 +24,7 @@ rem process the make script. For a solution, the free Borland make.exe is used.
 rem If you have found a way to make DMC's (s)make.exe works, please modify this
 rem file accordingly.(AJ:2008-04-26)
 rem ============================================================================
-SET MAKE_EXE=D:\BORLAND\BCC55\BIN\MAKE.EXE
+SET MAKE_EXE=E:\BORLAND\BCC55\BIN\MAKE.EXE
 
 rem ============================================================================
 rem The followings should never change
@@ -63,6 +63,10 @@ rem=============================================================================
    @CALL winmake\mdir.bat
    %MAKE_EXE% -l -f winmake\makefile.dc
    if errorlevel 1 goto BUILD_ERR
+   if "%1"=="NOMT" goto BUILD_OK
+   if "%1"=="nomt" goto BUILD_OK
+   if "%2"=="NOMT" goto BUILD_OK
+   if "%2"=="nomt" goto BUILD_OK
 
    SET HB_MT=mt
    SET HB_MT_DIR=\mt
@@ -129,7 +133,7 @@ rem=============================================================================
    SET HB_MT_DIR=
    SET HB_MT=
    @CALL winmake\mdir.bat
-   %MAKE_EXE% -s -l -f winmake\makefile.dc
+   %MAKE_EXE% -l -f winmake\makefile.dc
    if errorlevel 1 goto CONTRIBS_ERR
 
 rem=============================================================================

@@ -8,6 +8,28 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-27 06:46 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * make_dc.bat
+  * winmake/makefile.dc
+    ! some tweaks
+
+  * contrib/what32/source/_wincomm.c
+  * contrib/what32/source/_winhead.c
+  * contrib/what32/source/_winsys.c
+  * contrib/what32/source/_wintab.c
+  * contrib/what32/source/_wintab.c
+    ! fixed for compilation under Digital Mars
+
+  * contrib/what32/source/wincore.prg
+    - Cdump moved to separate file
+
+  + contrib/what32/source/wincorec.c
+    ! Cdump from wincore.prg
+
+  * winmake/common.mak
+  * winmake/compile.mak
+    ! modified to include wincorec.obj
+
 2012-06-27 04:36 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/compile.mak
     ! some filenames lower casing
