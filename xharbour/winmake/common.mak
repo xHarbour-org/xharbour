@@ -37,8 +37,10 @@ CODEPAGE_DIR  =source$(DIR_SEP)codepage
 HBRUN_DIR     =utils$(DIR_SEP)hbrun
 HBTEST_DIR    =utils$(DIR_SEP)hbtest
 HBDOC_DIR     =utils$(DIR_SEP)hbdoc
+HBDICT_DIR    =utils$(DIR_SEP)hbdict
 HBPP_DIR      =utils$(DIR_SEP)hbpp
 HBMAKE_DIR    =utils$(DIR_SEP)hbmake
+HBEXTERN_DIR  =utils$(DIR_SEP)hbextern
 HBFORMAT_DIR  =utils$(DIR_SEP)hbformat
 XBSCRIPT_DIR  =utils$(DIR_SEP)xbscript
 HBFILERE_DIR  =utils$(DIR_SEP)hbfilere
@@ -199,7 +201,9 @@ HBFILERE_EXE=$(BIN_DIR)$(DIR_SEP)hbfilere.exe
 HBRUN_EXE   =$(BIN_DIR)$(DIR_SEP)hbrun$(HB_MT).exe
 HBTEST_EXE  =$(BIN_DIR)$(DIR_SEP)hbtest$(HB_MT).exe
 HBDOC_EXE   =$(BIN_DIR)$(DIR_SEP)hbdoc.exe
+HBDICT_EXE  =$(BIN_DIR)$(DIR_SEP)hbdict.exe
 HBMAKE_EXE  =$(BIN_DIR)$(DIR_SEP)hbmake.exe
+HBEXTERN_EXE=$(BIN_DIR)$(DIR_SEP)hbextern.exe
 HBFORMAT_EXE=$(BIN_DIR)$(DIR_SEP)hbformat.exe
 XBSCRIPT_EXE=$(BIN_DIR)$(DIR_SEP)xbscript.exe
 
@@ -1315,6 +1319,18 @@ CT_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)util$(OBJEXT)
 
 #===============================================================================
+# HBDICT.EXE rules
+#===============================================================================
+HBDICT_EXE_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)hbdict$(OBJEXT)
+
+#===============================================================================
+# HBEXTERN.EXE rules
+#===============================================================================
+HBEXTERN_EXE_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)hbextern$(OBJEXT)
+
+#===============================================================================
 # HBFORMAT.EXE rules
 #===============================================================================
 HBFORMAT_EXE_OBJS=\
@@ -2064,6 +2080,8 @@ ST_PROJECT=\
 	$(XBSCRIPT_EXE)\
 	$(HBTEST_EXE)\
 	$(HBRUN_EXE)\
+	$(HBDICT_EXE)\
+	$(HBEXTERN_EXE)\
 	$(HBFORMAT_EXE)
 
 MT_PROJECT=\

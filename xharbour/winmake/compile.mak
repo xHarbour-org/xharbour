@@ -43,6 +43,14 @@ $(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
 	$(EXE_LINK_CMD)
 	$(MT_CMD)
 
+$(HBDICT_EXE) : $(HBDICT_EXE_OBJS)
+	$(EXE_LINK_CMD)
+	$(MT_CMD)
+
+$(HBEXTERN_EXE) : $(HBEXTERN_EXE_OBJS)
+	$(EXE_LINK_CMD)
+	$(MT_CMD)
+
 $(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS)
 	$(EXE_LINK_CMD)
 	$(MT_CMD)
@@ -378,6 +386,24 @@ $(OBJ_DIR)$(DIR_SEP)pptable$(OBJEXT) : $(PP_DIR)$(DIR_SEP)pptable.c
 
 $(PP_DIR)$(DIR_SEP)pptable.c : $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch $(INCLUDE_DIR2)$(DIR_SEP)std.ch ChangeLog $(PP_DIR)$(DIR_SEP)ppcore.c $(PP_DIR)$(DIR_SEP)ppgen.c
 	$(PPGEN_EXE) $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch -o$(PP_DIR)$(DIR_SEP)pptable.c -cChangeLog -v$(INCLUDE_DIR2)$(DIR_SEP)hbverbld.h
+
+#===============================================================================
+# HBEXTERN.EXE rules
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)hbextern$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hbextern.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbextern.c : $(HBEXTERN_DIR)$(DIR_SEP)hbextern.prg
+	$(HB_CMD_MAIN)
+
+#===============================================================================
+# HBDICT.EXE rules
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)hbdict$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hbdict.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbdict.c : $(HBDICT_DIR)$(DIR_SEP)hbdict.prg
+	$(HB_CMD_MAIN)
 
 #===============================================================================
 # HARBOUR.EXE rules

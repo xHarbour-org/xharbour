@@ -8,6 +8,27 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-26 15:31 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  - contrib/freeimage/tests/dll_b32.bat
+  - contrib/gd/samples/counter/dll_b32.bat
+  - contrib/gd/tests/dll_b32.bat
+  - contrib/hbhpdf/tests/make_bc.bat
+  - contrib/hbhpdf/tests/make_dc.bat
+  - contrib/hbhpdf/tests/make_gc.bat
+  - contrib/hbhpdf/tests/make_pc.bat
+  - contrib/hbhpdf/tests/make_vc.bat
+  - contrib/hbhpdf/tests/make_wc.bat
+  - contrib/hbmzip/tests/bld_b32.bat
+  - contrib/hbmzip/tests/bld_vc.bat
+  - contrib/hbzlib/dll_b32.bat
+  - utils/hbdict/make_b32.bat
+    ! more clean-ups
+
+  * winmake/common.mak
+  * winmake/compile.mak
+    + hbdict.exe created by default
+    + hbextern.exe created by default
+
 2012-06-26 14:57 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   - contrib/gd/MAKE_B32.BAT
   - source/cgi/make_pc.bat
