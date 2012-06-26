@@ -8,6 +8,21 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-27 03:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/mdir.bat
+    + libhbpg.lib not copied to lib dir, fixed.
+
+  * winmake/common.mak
+  * winmake/compile.mak
+    ! some filenames lower casing
+
+  * winmake/makefile.gc
+  * winmake/makefile.bc
+    ! some minor tweaks
+
+  * contrib/hbzlib/ZipString.cpp
+    ! lower-cased filename: ZipString.cpp -> zipstring.cpp
+
 2012-06-27 02:53 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/pdflib/pdflib.c
     + #define HB_OS_WIN_USED

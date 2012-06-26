@@ -3613,10 +3613,10 @@ $(OBJ_DIR)$(DIR_SEP)hbfilere$(OBJEXT) : $(HBFILERE_DIR)$(DIR_SEP)hbfilere.c
 #===============================================================================
 # FIREBIRD.LIB dependencies
 #===============================================================================
-$(OBJ_DIR)$(DIR_SEP)TFirebird$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)TFirebird.c
+$(OBJ_DIR)$(DIR_SEP)tfirebird$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)tfirebird.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)TFirebird.c : $(FIREBIRD_DIR)$(DIR_SEP)TFirebird.prg
+$(OBJ_DIR)$(DIR_SEP)tfirebird.c : $(FIREBIRD_DIR)$(DIR_SEP)tfirebird.prg
 	$(HB_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)firebird$(OBJEXT) : $(FIREBIRD_DIR)$(DIR_SEP)firebird.c
@@ -4591,7 +4591,7 @@ $(OBJ_DIR)$(DIR_SEP)_winicon$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_
 $(OBJ_DIR)$(DIR_SEP)_winilst$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winilst.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)_winINet$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winINet.c
+$(OBJ_DIR)$(DIR_SEP)_wininet$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_wininet.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)_winini$(OBJEXT) : $(WHAT32_DIR)$(DIR_SEP)source$(DIR_SEP)_winini.c

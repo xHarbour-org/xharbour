@@ -1600,7 +1600,7 @@ GTWVW_LIB_OBJS=\
 # FIREBIRD.LIB dependencies
 #===============================================================================
 FIREBIRD_LIB_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)TFirebird$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tfirebird$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)firebird$(OBJEXT)
 
 #===============================================================================

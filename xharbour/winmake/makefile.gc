@@ -381,16 +381,6 @@ $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 else ifeq ($(__BLD__),CONTRIB_BLD)
 #*******************************************************************************
 # Uncomment this section if you have want to build the libraries.
-HB_GTWVW=1
-# HB_PGSQL=1
-
-HB_MZIP=1
-HB_ZIP=1
-
-HB_LIBHARU=1
-HB_FREEIMAGE=1
-HB_WHAT32=1
-HB_XWT=1
 
 #===============================================================================
 # Append your own build flags here
@@ -459,38 +449,17 @@ LIB_CMD=\
 #===============================================================================
 include winmake/common.mak
 
-ifeq ($(HB_FREEIMAGE), 1)
-CONTRIB_PROJECT+=$(FREEIMAGE_LIB)
-endif
-
-ifeq ($(HB_MZIP), 1)
-CONTRIB_PROJECT+=$(HBMZIP_LIB)
-endif
+CONTRIB_PROJECT+=\
+	$(FREEIMAGE_LIB)\
+	$(HBMZIP_LIB)\
+	$(XWT_LIB)\
+	$(WHAT32_LIB)\
+	$(LIBHARU_LIB)
 
 # HBZIP_LIB is broken under GCC
 # ifeq ($(HB_ZIP), 1)
 # CONTRIB_PROJECT+=$(HBZIP_LIB)
 # endif
-
-ifeq ($(HB_XWT), 1)
-CONTRIB_PROJECT+=$(XWT_LIB)
-endif
-
-ifeq ($(HB_WHAT32), 1)
-CONTRIB_PROJECT+=$(WHAT32_LIB)
-endif
-
-ifeq ($(HB_GTWVW), 1)
-CONTRIB_PROJECT+=$(GTWVW_LIB)
-endif
-
-ifeq ($(HB_PGSQL), 1)
-CONTRIB_PROJECT+=$(PGSQL_LIB)
-endif
-
-ifeq ($(HB_LIBHARU), 1)
-CONTRIB_PROJECT+=$(LIBHARU_LIB)
-endif
 
 ifneq ($(HB_DIR_OPENSSL),)
 CONTRIB_PROJECT+=$(TIPSSL_LIB)
@@ -505,7 +474,7 @@ CONTRIB_PROJECT+=$(HBCAIRO_LIB)
 endif
 
 ifdef HB_DIR_POSTGRESQL
-CONTRIB_PROJECT+=$(SDDPG_LIB)
+CONTRIB_PROJECT+=$(PGSQL_LIB) $(SDDPG_LIB)
 endif
 
 ifdef HB_DIR_OCILIB
