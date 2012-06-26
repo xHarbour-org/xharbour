@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-26 14:57 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  - contrib/gd/MAKE_B32.BAT
+  - source/cgi/make_pc.bat
+  - contrib/gd/makefile.nt
+  - contrib/hbzlib/Makefile.mingw
+  - contrib/libnf/makefile.wc
+    ! more clean-ups
+
 2012-06-26 09:37 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   - source/cgi/makefile.bc
   - source/rtl/gtalleg/makefile.bc
