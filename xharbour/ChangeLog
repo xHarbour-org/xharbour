@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-27 14:06 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/compile.mak
+    ! do not compile contrib/gtwvg/gtwvg.c in C++
+
 2012-06-27 10:54 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.dc
   * winmake/makefile.bc

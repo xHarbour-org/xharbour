@@ -2384,7 +2384,7 @@ $(OBJ_DIR)$(DIR_SEP)filemem$(OBJEXT) : $(FILEMEM_DIR)$(DIR_SEP)filemem.c
 # GTWVG.LIB rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)gtwvg$(OBJEXT) : $(GTWVG_DIR)$(DIR_SEP)gtwvg.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)wvtcore$(OBJEXT) : $(GTWVG_DIR)$(DIR_SEP)wvtcore.c
 	$(CCC_CMD)
