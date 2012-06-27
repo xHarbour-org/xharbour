@@ -33,7 +33,7 @@ CLASS Button INHERIT Control
    PROPERTY OwnerDraw     INDEX BS_OWNERDRAW     READ xOwnerDraw     WRITE SetStyle         DEFAULT .F. PROTECTED
    PROPERTY ImageIndex                           READ xImageIndex    WRITE SetImageIndex    DEFAULT  0  PROTECTED
    PROPERTY Border        INDEX WS_BORDER        READ xBorder        WRITE SetStyle         DEFAULT .F. PROTECTED
-   PROPERTY DefaultButton INDEX BS_DEFPUSHBUTTON READ xDefaultButton WRITE SetStyle         DEFAULT .F. PROTECTED
+   PROPERTY DefaultButton                        READ xDefaultButton WRITE SetDefault       DEFAULT .F. PROTECTED
    PROPERTY Enabled       INDEX WS_DISABLED      READ xEnabled       WRITE SetStyle         DEFAULT .T. PROTECTED
 
    DATA ImgInst           EXPORTED
@@ -69,6 +69,7 @@ CLASS Button INHERIT Control
    METHOD OnMouseHover()
    METHOD OnMouseLeave()
    METHOD OnParentCommand()
+   METHOD SetDefault( l )     INLINE IIF( ::Style & BS_DEFPUSHBUTTON == 0, ::SetStyle( BS_DEFPUSHBUTTON, l ), )
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -269,7 +270,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
 
             CASE ::ImageAlign == DT_CENTER
                  nLeft := ( aRect[3] / 2 ) - ( ::Parent:ImageList:IconWidth / 2 )
-                 n := _GetTextExtentPoint32( dis:hDC, ::Caption )[2]
+                 n := _GetTextExtentPoint32( dis:hDC, ::xText )[2]
                  nTop  := ( aRect[4] / 2 ) - ( ::Parent:ImageList:IconHeight / 2 ) - ( n / 2 )
 
 
@@ -277,16 +278,20 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
                  nTextFlags := DT_CENTER + DT_VCENTER + DT_SINGLELINE
 
          ENDCASE
-         IF EMPTY( ::Caption )
+         IF EMPTY( ::xText )
             nTop := ( aRect[4] / 2 ) - ( ::Parent:ImageList:IconHeight / 2 )
          ENDIF
       ENDIF
 
       IF ::Theming .AND. ::OsVer:dwMajorVersion > 4 .AND. ::DrawTheme .AND. IsThemeActive()
          nStyle := PBS_NORMAL
-         IF ::DefaultButton
-//            nStyle := nStyle | PBS_DEFAULTED
+         IF lDefault .OR. lFocus
+            nStyle := nStyle | PBS_DEFAULTED
+            IF ! lFocus .AND. GetClassName( GetFocus() ) == "Button"
+               nStyle := nStyle & NOT( PBS_DEFAULTED )
+            ENDIF
          ENDIF
+
          IF lDisabled
             nStyle := PBS_DISABLED
          ENDIF
@@ -356,7 +361,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
       IF ::Application != NIL .AND. lDisabled
          OffSet( @aTextRect, 1, 1 )
          SetTextColor( dis:hDC, ::System:Colors:BtnHighlight )
-         _DrawText( dis:hDC, ::Caption, aTextRect, nTextFlags )
+         _DrawText( dis:hDC, ::xText, aTextRect, nTextFlags )
          OffSet( @aTextRect, -1, -1 )
          SetTextColor( dis:hDC, ::System:Colors:GrayText )
        ELSE
@@ -367,7 +372,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
          aTextRect[1] := 6
          nTextFlags := DT_LEFT + DT_VCENTER + DT_SINGLELINE
       ENDIF
-      _DrawText( dis:hDC, ::Caption, aTextRect, nTextFlags )
+      _DrawText( dis:hDC, ::xText, aTextRect, nTextFlags )
    ENDIF
 
 RETURN NIL

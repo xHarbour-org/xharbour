@@ -8,6 +8,12 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-06-26 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed Renaming forms
+   ! Fixed OwnerDraw buttons to paint correctly
+   ! Fixed Button selected border.
+   ! Fixed Modal and Modeless form autoclosing.
+
 2013-06-25 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed ToolStripButtons to fire the OnClick event based on the HotKey assigned
      in the Text via &.

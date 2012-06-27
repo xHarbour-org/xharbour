@@ -3891,26 +3891,35 @@ HB_FUNC( __INSERTMENUSTRIPITEM )
    hb_retl( InsertMenuItem( (HMENU) hb_parnl(1), (UINT) hb_parnl(2), hb_parl(3), (LPCMENUITEMINFO) &mii ) );
 }
 
-/*
-HB_FUNC( DRAWITEMSTRUCTURE )
+
+HB_FUNC( __DRAWITEMSTRUCT )
 {
    DRAWITEMSTRUCT *dis = (DRAWITEMSTRUCT*) hb_parnl(1);
-   hb_stornl( (long) dis->CtlType, 2 );
-   hb_stornl( (long) dis->CtlID, 3 );
-   hb_stornl( (long) dis->itemID, 4 );
-   hb_stornl( (long) dis->itemAction, 5 );
-   hb_stornl( (long) dis->itemState, 6 );
-   hb_stornl( (long) dis->hwndItem, 7 );
-   hb_stornl( (long) dis->hDC, 8 );
+   HB_ITEM_NEW( aParams );
+   HB_ITEM_NEW( aRect );
+   hb_arrayNew( &aParams, 8 );
 
-   hb_stornl( dis->rcItem.left  , 9, 1 ) ;
-   hb_stornl( dis->rcItem.top   , 9, 2 ) ;
-   hb_stornl( dis->rcItem.right , 9, 3 ) ;
-   hb_stornl( dis->rcItem.bottom, 9, 4 ) ;
 
-   hb_stornl( (long) dis->itemData, 10 );
+   hb_itemPutNL( hb_arrayGetItemPtr( &aParams, 1 ), (long) dis->CtlType );
+   hb_itemPutNL( hb_arrayGetItemPtr( &aParams, 2 ), (long) dis->CtlID );
+   hb_itemPutNL( hb_arrayGetItemPtr( &aParams, 3 ), (long) dis->itemID );
+   hb_itemPutNL( hb_arrayGetItemPtr( &aParams, 4 ), (long) dis->itemAction );
+   hb_itemPutNL( hb_arrayGetItemPtr( &aParams, 5 ), (long) dis->itemState );
+   hb_itemPutNL( hb_arrayGetItemPtr( &aParams, 6 ), (long) dis->hwndItem );
+   hb_itemPutNL( hb_arrayGetItemPtr( &aParams, 7 ), (long) dis->hDC );
+
+   hb_itemPutNL( hb_arrayGetItemPtr( &aParams, 8 ), (long) dis->itemData );
+
+   hb_arrayNew( &aRect, 4 );
+   hb_itemPutNI( hb_arrayGetItemPtr( &aRect, 1 ), dis->rcItem.left );
+   hb_itemPutNI( hb_arrayGetItemPtr( &aRect, 2 ), dis->rcItem.top );
+   hb_itemPutNI( hb_arrayGetItemPtr( &aRect, 3 ), dis->rcItem.right );
+   hb_itemPutNI( hb_arrayGetItemPtr( &aRect, 4 ), dis->rcItem.bottom );
+   hb_arrayAddForward( &aParams, &aRect );
+
+   hb_itemReturnForward( &aParams );
 }
-*/
+
 
 HB_FUNC( __DOEVENTS )
 {

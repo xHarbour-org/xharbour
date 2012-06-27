@@ -2260,7 +2260,8 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
            ENDIF
 
            nRet  := ::OnCommand( nId, nCode, nlParam )
-           IF nRet == NIL .AND. ::Style & WS_CHILD == 0 .AND. ::Parent != NIL .AND. ( ::Modal .OR. ::AutoClose )
+           //IF nRet == NIL .AND. ::Style & WS_CHILD == 0 .AND. ( ( ::Modal .OR. ::Parent != NIL ) .OR. ::AutoClose )
+           IF nRet == NIL .AND. ::AutoClose .AND. ::Style & WS_CHILD == 0 .AND. ( ::Modal .OR. ::Parent != NIL )
               IF nwParam == IDCANCEL
 
                  nRet := ExecuteEvent( "OnCancel", Self )
@@ -2622,22 +2623,26 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
       CASE WM_DRAWITEM
            ::DrawItemStruct := (struct DRAWITEMSTRUCT*) nlParam
            /*
-           rcItem := Array(4)
-           DrawItemStructure( nlParam, @CtlType, @CtlID, @itemID, @itemAction, @itemState, @hWndItem, @hDC, @rcItem, @itemData )
+           aDraw := __DRAWITEMSTRUCT( nlParam )
+           ::DrawItemStruct := {=>}
+           HSetCaseMatch( ::DrawItemStruct, .F. )
+           ::DrawItemStruct:rcItem := {=>}
+           HSetCaseMatch( ::DrawItemStruct:rcItem, .F. )
 
-           ::DrawItemStruct:CtlType       := CtlType
-           ::DrawItemStruct:CtlID         := CtlID
-           ::DrawItemStruct:itemID        := itemID
-           ::DrawItemStruct:itemAction    := itemAction
-           ::DrawItemStruct:itemState     := itemState
-           ::DrawItemStruct:hWndItem      := hWndItem
-           ::DrawItemStruct:hDC           := hDC
-           ::DrawItemStruct:rcItem:Left   := rcItem[1]
-           ::DrawItemStruct:rcItem:Top    := rcItem[2]
-           ::DrawItemStruct:rcItem:Right  := rcItem[3]
-           ::DrawItemStruct:rcItem:Bottom := rcItem[4]
-           ::DrawItemStruct:rcItem:Array  := rcItem
-           ::DrawItemStruct:itemData      := itemData
+           ::DrawItemStruct:CtlType       := aDraw[1]
+           ::DrawItemStruct:CtlID         := aDraw[2]
+           ::DrawItemStruct:itemID        := aDraw[3]
+           ::DrawItemStruct:itemAction    := aDraw[4]
+           ::DrawItemStruct:itemState     := aDraw[5]
+           ::DrawItemStruct:hWndItem      := aDraw[6]
+           ::DrawItemStruct:hDC           := aDraw[7]
+           ::DrawItemStruct:itemData      := aDraw[8]
+
+           ::DrawItemStruct:rcItem:Left   := aDraw[9][1]
+           ::DrawItemStruct:rcItem:Top    := aDraw[9][2]
+           ::DrawItemStruct:rcItem:Right  := aDraw[9][3]
+           ::DrawItemStruct:rcItem:Bottom := aDraw[9][4]
+           ::DrawItemStruct:rcItem:Array  := ACOPY(aDraw)
            */
            IF ::DrawItemStruct:CtlType == ODT_MENU .AND. ::DrawItemStruct:itemData != NIL .AND. ::DrawItemStruct:itemData <> 0
               IF ( oCtrl := ArrayFromPointer( ::DrawItemStruct:itemData ) ) != NIL .AND. VALTYPE( oCtrl ) == "O"
