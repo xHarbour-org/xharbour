@@ -8,6 +8,57 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-28 04:12 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + contrib/hbexpat
+  + contrib/hbexpat/amigacon.h
+  + contrib/hbexpat/ascii.h
+  + contrib/hbexpat/asciitab.h
+  + contrib/hbexpat/core.c
+  + contrib/hbexpat/expat.h
+  + contrib/hbexpat/expat_ex.h
+  + contrib/hbexpat/hbexpat.ch
+  + contrib/hbexpat/iasciita.h
+  + contrib/hbexpat/internal.c
+  + contrib/hbexpat/internal.h
+  + contrib/hbexpat/latin1ta.h
+  + contrib/hbexpat/macconfi.h
+  + contrib/hbexpat/nametab.h
+  + contrib/hbexpat/unitable.prg
+  + contrib/hbexpat/utf8tab.h
+  + contrib/hbexpat/watcomconfig.h
+  + contrib/hbexpat/winconfi.h
+  + contrib/hbexpat/xmlparse.c
+  + contrib/hbexpat/xmlrole.c
+  + contrib/hbexpat/xmlrole.h
+  + contrib/hbexpat/xmltok.c
+  + contrib/hbexpat/xmltok.h
+  + contrib/hbexpat/xmltok_i.c
+  + contrib/hbexpat/xmltok_i.h
+  + contrib/hbexpat/xmltok_n.c
+  + contrib/hbexpat/_hbconf.h
+  + contrib/hbexpat/tests
+  + contrib/hbexpat/tests/test.prg
+  + contrib/hbexpat/tests/test.xml
+    ! XML Parser tools borrowed from Harbour
+
+      NOTE:
+      You'll need libexpat-1.dll to use this tool, create import lib and link the import lib to application.
+      Download the RT from:
+      http://sourceforge.net/projects/mingw/files/MinGW/Extension/expat/expat-2.0.1-1/libexpat-2.0.1-1-mingw32-dll-1.tar.gz/download
+      http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/expat_2.0.1-1_win32.zip
+
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/contrib.pc
+  * winmake/makefile.bc
+  * winmake/makefile.dc
+  * winmake/makefile.gc
+  * winmake/makefile.pc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+  * winmake/mdir.bat
+    + add compiler flag and hbexpat.lib dependencies
+
 2012-06-27 14:06 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/compile.mak
     ! do not compile contrib/gtwvg/gtwvg.c in C++
