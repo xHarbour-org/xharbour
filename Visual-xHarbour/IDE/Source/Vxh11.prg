@@ -1123,10 +1123,21 @@ METHOD ReplaceAll( cFind, cReplace, nFlags, lInSelection ) CLASS Source
    local nRepLen, nStarLine, nEndLine
    local nLastMatch, nReplacements, nLenTarget, linsideASel, i, nMovePastEOL, nChrNext
    local nLenReplaced, nCurPos, nPosFind
+   local pSource, nPos, nVisLine
 
    IF ( nLen := LEN( cFind ) ) == 0
       return -1
    ENDIF
+
+   //-------------------------------------------------------------
+   pSource  := ::Owner:GetCurDoc()
+   nPos     := ::Owner:SendMessage( SCI_GETCURRENTPOS, 0, 0 )
+   nVisLine := ::Owner:SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
+   IF pSource != ::pSource
+      ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
+   ENDIF
+   //-------------------------------------------------------------
+
    DEFAULT lInSelection TO .F.
    nCountSel := ::Source:GetSelections()
 
@@ -1162,9 +1173,9 @@ METHOD ReplaceAll( cFind, cReplace, nFlags, lInSelection ) CLASS Source
    ::SetSearchFlags( nFlags )
    nPosFind := ::FindInTarget( cFind, nStartPos, nEndPos )
 
+   nReplacements := 0
    IF nPosFind != -1 .AND. nPosFind <= nEndPos
       nLastMatch := nPosFind
-      nReplacements := 0
 
       nCurPos := ::GetCurrentPos()
       ::BeginUndoAction()
@@ -1233,9 +1244,14 @@ METHOD ReplaceAll( cFind, cReplace, nFlags, lInSelection ) CLASS Source
       ::SetCurrentPos( nCurPos )
       ::EndUndoAction()
       ::Owner:PosFind := nPosFind
-      RETURN nReplacements
    ENDIF
-RETURN 0
+   ::Modified := .T.
+   IF pSource != ::pSource
+      ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, pSource )
+   ENDIF
+   ::Owner:SendMessage( SCI_GOTOPOS, nPos, 0 )
+   ::Owner:SendMessage( SCI_SETFIRSTVISIBLELINE, nVisLine, 0 )
+RETURN nReplacements
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD FindInTarget( cText, nStartPos, nEndPos ) CLASS Source

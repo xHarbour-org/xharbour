@@ -643,8 +643,14 @@ METHOD RenameForm( cOldName, cNewName, lProject ) CLASS ObjManager
             ::ActiveObject:__NewName := cNewName
             ::ActiveObject:__OldName := cOldName
          ENDIF
-         ::ActiveObject:Form:Editor:ReplaceAll( cOldName, cNewName, 0 )
          oEditor := ::ActiveObject:Form:Editor
+         oEditor:ReplaceAll( cOldName, cNewName, 0 )
+
+         IF ! Empty( oEditor:FileName )
+            oEditor:Path     := ::Application:Project:Properties:Path
+            oEditor:FileName := ::Application:Project:Properties:Source + "\" + cNewName +".prg"
+            oEditor:File     := oEditor:Path + "\" + oEditor:FileName
+         ENDIF
       ENDIF
       
       IF lProject .OR. ::ActiveObject:ClsName == "VXH_FORM_IDE" .OR. ::ActiveObject:ClsName == "CCTL" 
