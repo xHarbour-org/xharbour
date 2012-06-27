@@ -88,6 +88,36 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
 	$(MT_CMD)
 
 #===============================================================================
+# HBEXPAT.LIB Dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)coreHBEXPAT$(OBJEXT) : $(HBEXPAT_DIR)$(DIR_SEP)core.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xmlparse$(OBJEXT) : $(HBEXPAT_DIR)$(DIR_SEP)xmlparse.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xmltok_n$(OBJEXT) : $(HBEXPAT_DIR)$(DIR_SEP)xmltok_n.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xmlrole$(OBJEXT) : $(HBEXPAT_DIR)$(DIR_SEP)xmlrole.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xmltok$(OBJEXT) : $(HBEXPAT_DIR)$(DIR_SEP)xmltok.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xmltok_i$(OBJEXT) : $(HBEXPAT_DIR)$(DIR_SEP)xmltok_i.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)internal$(OBJEXT) : $(HBEXPAT_DIR)$(DIR_SEP)internal.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)unitable$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)unitable.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)unitable.c : $(HBEXPAT_DIR)$(DIR_SEP)unitable.prg
+	$(HB_CMD)
+
+#===============================================================================
 # CGILIB.LIB Dependencies
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)cgiconfig$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)cgiconfig.c

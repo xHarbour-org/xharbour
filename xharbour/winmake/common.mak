@@ -57,6 +57,7 @@ SDDSQLT3_DIR  =contrib$(DIR_SEP)sddsqlt3
 SDDPG_DIR     =contrib$(DIR_SEP)sddpg
 RDDSQL_DIR    =contrib$(DIR_SEP)rddsql
 HBMLZO_DIR    =contrib$(DIR_SEP)hbmlzo
+HBEXPAT_DIR   =contrib$(DIR_SEP)hbexpat
 HBLZF_DIR     =contrib$(DIR_SEP)hblzf
 HBBZ2_DIR     =contrib$(DIR_SEP)hbbz2
 HBCAIRO_DIR   =contrib$(DIR_SEP)hbcairo
@@ -140,6 +141,7 @@ HB_GT_LIBS  =$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTWVT_LIB) $(
 #===============================================================================
 # Contrib Library Names
 #===============================================================================
+HBEXPAT_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbexpat$(LIBEXT)
 SDDFB_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sddfb$(LIBEXT)
 SDDOCI_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sddoci$(LIBEXT)
 SDDMY_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sddmy$(LIBEXT)
@@ -241,6 +243,19 @@ HARBOUR_LIBS=\
 #===============================================================================
 # List Of Library and Executable Dependencies
 #===============================================================================
+
+#===============================================================================
+# HBEXPAT.LIB Dependencies
+#===============================================================================
+HBEXPAT_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)coreHBEXPAT$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xmlparse$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xmltok_n$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xmlrole$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xmltok$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xmltok_i$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)internal$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)unitable$(OBJEXT)
 
 #===============================================================================
 # MYSQL.LIB Dependencies
@@ -2140,5 +2155,6 @@ CONTRIB_PROJECT=\
 	$(FREEIMAGE_LIB)\
 	$(HBMZIP_LIB)\
 	$(XWT_LIB)\
-	$(LIBHARU_LIB)
+	$(LIBHARU_LIB)\
+	$(HBEXPAT_LIB)
 

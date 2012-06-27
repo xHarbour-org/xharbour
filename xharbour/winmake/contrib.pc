@@ -42,7 +42,7 @@ RDDSQL_INCLUDE=/I"$(HB_DIR_FIREBIRD)\include" $(RDDSQL_INCLUDE)
 INCLUDE_DIR =$(INCLUDE_DIR) /I"$(ZLIB_DIR)" /I"$(WHAT32_DIR)\include" $(RDDSQL_INCLUDE)
 HARBOURFLAGS=$(HARBOURFLAGS) $(INCLUDE_DIR) -q0 -w2 -es2 -gc0
 HB_CMD      =$(HARBOUR_EXE) /n1 $(HARBOURFLAGS) $** -o$@
-CLIBFLAGS   =$(CLIBFLAGS) /Ze /Zx /Tx86-coff /Go $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"NULL=0" /D"_HAVE_SQLITE_CONFIG_H"
+CLIBFLAGS   =$(CLIBFLAGS) /Ze /Zx /Tx86-coff /Go $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"NULL=0" /D"_HAVE_SQLITE_CONFIG_H" /D"HARBOUR_CONF"
 CC_CMD      =POCC $(__MT__) $(CLIBFLAGS) /Fo$@ $**
 CCC_CMD     =$(CC_CMD)
 LIB_CMD     =POLIB /OUT:$@ $**
@@ -91,6 +91,9 @@ ALL: $(CONTRIB_PROJECT)
 #===============================================================================
 # Library dependencies and build rules
 #===============================================================================
+$(HBEXPAT_LIB) : $(HBEXPAT_LIB_OBJS)
+	$(LIB_CMD)
+
 $(CGILIB_LIB) : $(CGILIB_LIB_OBJS)
 	$(LIB_CMD)
 

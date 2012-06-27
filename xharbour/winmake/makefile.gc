@@ -426,7 +426,7 @@ RDDSQL_INCLUDE+=-I"$(HB_DIR_FIREBIRD)/include"
 endif
 
 HARBOURFLAGS+=-iinclude -i$(GDLIB_DIR)/include -i$(WHAT32_DIR)/include -i$(XWT_DIR)/include -q0 -w2 -es2 -gc0
-CLIBFLAGS   +=-D__WIN32__ -D_HAVE_SQLITE_CONFIG_H -Wall $(NOCYGWIN) -O3 -fomit-frame-pointer -march=i586 -mtune=pentium -c -fno-strict-aliasing
+CLIBFLAGS   +=-D__WIN32__ -DHARBOUR_CONF -D_HAVE_SQLITE_CONFIG_H -Wall $(NOCYGWIN) -O3 -fomit-frame-pointer -march=i586 -mtune=pentium -c -fno-strict-aliasing
 CLIBFLAGS   +=$(RDDSQL_INCLUDE) $(ACEH_DIR) -Iinclude -I"$(FREEIMAGE_DIR)/include" -I"$(GDLIB_DIR)/include" -I"$(XWT_DIR)/include" -I"$(XWT_DIR)/src/xwt_win" -I"$(ZLIB_DIR)" -I"$(PNG_DIR)" $(OPENSSL_DIR) $(CURL_DIR)
 CLIBFLAGS   +=$(CAIRO_DIR)
 
@@ -492,6 +492,9 @@ ALL: $(CONTRIB_PROJECT)
 #===============================================================================
 # Libraries dependencies and build rules (ST)
 #===============================================================================
+$(HBEXPAT_LIB) : $(HBEXPAT_LIB_OBJS)
+	$(LIB_CMD)
+
 $(CGILIB_LIB) : $(CGILIB_LIB_OBJS)
 	$(LIB_CMD)
 

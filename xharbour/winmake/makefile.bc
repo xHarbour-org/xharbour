@@ -47,7 +47,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
 INCLUDE_DIR  =$(INCLUDE_DIR) -Iinclude -I$(OBJ_DIR) -I$(ZLIB_DIR)
-CLIBFLAGS    =$(CLIBFLAGS) -q -c $(INCLUDE_DIR) -d -5 -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H
+CLIBFLAGS    =$(CLIBFLAGS) -q -c $(INCLUDE_DIR) -d -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H
 HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 LINK_CMD     =ILINK32 -ap -Tpe -x -Gn -C -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" -Llib\b32 $(LFLAGS) "$(CC_DIR)\lib\c0x32.obj" $**,$@,,
 !if $d(HB_THREAD_SUPPORT)
@@ -575,35 +575,35 @@ ACEH_DIR     =-I"$(HB_DIR_ADS)"
 !endif
 
 !ifdef HB_DIR_OPENSSL
-OPENSSL_DIR    =-I$(HB_DIR_OPENSSL)\include
+OPENSSL_DIR    =-I"$(HB_DIR_OPENSSL)\include"
 !endif
 
 !ifdef HB_DIR_CURL
-CURL_DIR    =-I$(HB_DIR_CURL)\include
+CURL_DIR    =-I"$(HB_DIR_CURL)\include"
 !endif
 
 !ifdef HB_DIR_CAIRO
-CAIRO_DIR   =-I$(HB_DIR_CAIRO)\include\cairo
+CAIRO_DIR   =-I"$(HB_DIR_CAIRO)\include\cairo"
 !endif
 
 !ifdef HB_DIR_POSTGRESQL
-RDDSQL_INCLUDE=-I$(HB_DIR_POSTGRESQL)\include $(RDDSQL_INCLUDE)
+RDDSQL_INCLUDE=-I"$(HB_DIR_POSTGRESQL)\include" $(RDDSQL_INCLUDE)
 !endif
 
 !ifdef HB_DIR_OCILIB
-RDDSQL_INCLUDE=-I$(HB_DIR_OCILIB)\include $(RDDSQL_INCLUDE)
+RDDSQL_INCLUDE=-I"$(HB_DIR_OCILIB)\include" $(RDDSQL_INCLUDE)
 !endif
 
 !ifdef HB_DIR_MYSQL
-RDDSQL_INCLUDE=-I$(HB_DIR_MYSQL)\include $(RDDSQL_INCLUDE)
+RDDSQL_INCLUDE=-I"$(HB_DIR_MYSQL)\include" $(RDDSQL_INCLUDE)
 !endif
 
 !ifdef HB_DIR_FIREBIRD
-RDDSQL_INCLUDE=-I$(HB_DIR_FIREBIRD)\include $(RDDSQL_INCLUDE)
+RDDSQL_INCLUDE=-I"$(HB_DIR_FIREBIRD)\include" $(RDDSQL_INCLUDE)
 !endif
 
 INCLUDE_DIR  =-Iinclude $(RDDSQL_INCLUDE)
-CLIBFLAGS    =$(CLIBFLAGS) -c -q $(ACEH_DIR) $(CAIRO_DIR) $(CURL_DIR) $(OPENSSL_DIR) $(INCLUDE_DIR) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(HBHPDF_DIR) -I$(ZLIB_DIR) -d -5 -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H
+CLIBFLAGS    =$(CLIBFLAGS) -c -q $(ACEH_DIR) $(CAIRO_DIR) $(CURL_DIR) $(OPENSSL_DIR) $(INCLUDE_DIR) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(HBHPDF_DIR) -I$(ZLIB_DIR) -d -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
 HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -i$(GDLIB_DIR)\include -i$(WHAT32_DIR)\include -i$(XWT_DIR)\include -q0 -w2 -es2 -gc0
 !if $d(HB_THREAD_SUPPORT)
 CLIBFLAGS    =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT
@@ -666,6 +666,13 @@ ALL: $(CONTRIB_PROJECT)
 #===============================================================================
 # Library dependencies and build rules
 #===============================================================================
+$(HBEXPAT_LIB) : $(HBEXPAT_LIB_OBJS)
+	IF EXIST "$(HBEXPAT_LIB)" $(DEL) "$(HBEXPAT_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
 $(CGILIB_LIB) : $(CGILIB_LIB_OBJS)
 	IF EXIST "$(CGILIB_LIB)" $(DEL) "$(CGILIB_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!

@@ -412,8 +412,8 @@ RDDSQL_INCLUDE=-I$(HB_DIR_MYSQL)\include $(RDDSQL_INCLUDE)
 RDDSQL_INCLUDE=-I$(HB_DIR_FIREBIRD)\include $(RDDSQL_INCLUDE)
 !endif
 INCLUDE_DIR=$(INCLUDE_DIR) $(RDDSQL_INCLUDE)
-CLIBFLAGS=$(CLIBFLAGS) -cpp -mn $(ACEH_DIR) $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -D"_HAVE_SQLITE_CONFIG_H"
-CLIBFLAGS_C=-mn $(ACEH_DIR) $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -D"_HAVE_SQLITE_CONFIG_H"
+CLIBFLAGS=$(CLIBFLAGS) -cpp -mn $(ACEH_DIR) $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -D"_HAVE_SQLITE_CONFIG_H" -D"HARBOUR_CONF"
+CLIBFLAGS_C=-mn $(ACEH_DIR) $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -D"_HAVE_SQLITE_CONFIG_H" -D"HARBOUR_CONF"
 HB_CMD=$(HARBOUR_EXE) -iinclude -i$(GDLIB_DIR)\include -i$(WHAT32_DIR)\include -i$(XWT_DIR)\include -n1 -q0 -w2 -es2 -gc0 $** -o$@
 CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
 CC_CMD_ZIP=SCPPN -cpp -mn -Iinclude -I$(CC_DIR)\include\win32 -I$(CC_DIR)\include -I$(HBZIP_DIR)\include -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -o$@ $**
@@ -461,6 +461,9 @@ ALL: $(CONTRIB_PROJECT)
 #===============================================================================
 # Library dependencies and build rules
 #===============================================================================
+$(HBEXPAT_LIB) : $(HBEXPAT_LIB_OBJS)
+	$(LIB_CMD)
+
 $(CGILIB_LIB) : $(CGILIB_LIB_OBJS)
 	$(LIB_CMD)
 

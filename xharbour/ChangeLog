@@ -8,6 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-28 04:14 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/contrib.pc
+  * winmake/makefile.bc
+  * winmake/makefile.dc
+  * winmake/makefile.gc
+  * winmake/makefile.pc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+  * winmake/mdir.bat
+    ! missing from previous commit
+
 2012-06-28 04:12 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   + contrib/hbexpat
   + contrib/hbexpat/amigacon.h
