@@ -8,6 +8,29 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-27 10:54 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/makefile.dc
+  * winmake/makefile.bc
+  * winmake/makefile.wc
+  * winmake/makefile.vc
+  * winmake/makefile.pc
+  * winmake/makefile.gc
+  * winmake/hrbdll.pc
+  * winmake/contrib.pc
+  * winmake/compile.mak
+  * winmake/common.mak
+    - remove not-required WIN32 flag
+    ! more tweaks
+
+  * contrib/gtwvg/gtwvg.h
+    ! fix to compile under Digital Mars
+
+  * contrib/what32/source/_winsock.c
+    ! fix to compile under PellesC
+
+  * contrib/firebird/firebird.c
+    ! castings to compile under Digital Mars
+
 2012-06-27 06:46 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * make_dc.bat
   * winmake/makefile.dc

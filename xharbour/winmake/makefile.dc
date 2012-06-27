@@ -425,33 +425,6 @@ LIB_CMD=LIB -c -n $@ $**
 #===============================================================================
 !include winmake\common.mak
 
-# over write CONTRIB_PROJECT as some modules are not compile
-CONTRIB_PROJECT=\
-	$(FILEMEM_LIB)\
-	$(GTWVW_LIB)\
-	$(GDLIB_LIB)\
-	$(LIBNF_LIB)\
-	$(TELEPATH_LIB)\
-	$(HBCC_LIB)\
-	$(PNG_LIB)\
-	$(HBHPDF_LIB)\
-	$(LIBHARU_LIB)\
-	$(HBZEBRA_LIB)\
-	$(HBBZ2_LIB)\
-	$(HBLZF_LIB)\
-	$(HBMLZO_LIB)\
-	$(SEVENZIP_LIB)\
-	$(CGILIB_LIB)\
-	\
-	$(RDDSQL_LIB)\
-	$(SDDSQLT3_LIB)\
-	$(SDDODBC_LIB)\
-	$(FREEIMAGE_LIB)\
-	$(XWT_LIB)\
-	$(WHAT32_LIB)\
-	$(LIBHARU_LIB)\
-	$(HBMZIP_LIB)
-
 # Digital Mars cannot build hbzlip.lib
 # HB_ZIP=1
 

@@ -154,6 +154,7 @@
 #define SetWindowLongPtr SetWindowLong
 #endif
 
+#if 0
 #if defined(__DMC__)
    #if (_WIN32_IE >= 0x0300)
       #if !defined(ICC_BAR_CLASSES)
@@ -182,6 +183,7 @@
          WINCOMMCTRLAPI BOOL WINAPI InitCommonControlsEx(LPINITCOMMONCONTROLSEX);
       #endif
    #endif
+#endif
 #endif
 
 #if defined( __cplusplus ) && !defined( HB_OS_WIN_64 ) && \

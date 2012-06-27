@@ -1796,7 +1796,7 @@ PDFLIB_LIB_OBJS=\
 # PQSQL.LIB dependencies
 #===============================================================================
 PGSQL_LIB_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)TPostgres$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tpostgres$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)postgres$(OBJEXT)
 
 #===============================================================================
@@ -2122,7 +2122,6 @@ DLL_PROJECT=\
 CONTRIB_PROJECT=\
 	$(FILEMEM_LIB)\
 	$(GDLIB_LIB)\
-	$(GTWVG_LIB)\
 	$(GTWVW_LIB)\
 	$(LIBNF_LIB)\
 	$(TELEPATH_LIB)\
@@ -2130,7 +2129,6 @@ CONTRIB_PROJECT=\
 	$(PNG_LIB)\
 	$(HBHPDF_LIB)\
 	$(SEVENZIP_LIB)\
-	$(HBSQLIT3_LIB)\
 	$(HBZEBRA_LIB)\
 	$(HBMLZO_LIB)\
 	$(HBLZF_LIB)\
@@ -2138,4 +2136,9 @@ CONTRIB_PROJECT=\
 	$(RDDSQL_LIB)\
 	$(SDDSQLT3_LIB)\
 	$(SDDODBC_LIB)\
-	$(CGILIB_LIB)
+	$(CGILIB_LIB)\
+	$(FREEIMAGE_LIB)\
+	$(HBMZIP_LIB)\
+	$(XWT_LIB)\
+	$(LIBHARU_LIB)
+

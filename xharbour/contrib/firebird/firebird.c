@@ -850,9 +850,9 @@ HB_FUNC(FBBACKUPDB)
 
    local_service_handle = NULL;
 
-   service_name         = ISNULL(1) ? "localhost" : (char*) hb_parcx(1);
-   user                 = ISNULL(4) ? "SYSDBA" : (char*) hb_parcx(4);
-   password             = ISNULL(5) ? "masterkey" : (char*) hb_parcx(5);
+   service_name         = ISNULL(1) ? (char*) "localhost" : (char*) hb_parcx(1);
+   user                 = ISNULL(4) ? (char*) "SYSDBA" : (char*) hb_parcx(4);
+   password             = ISNULL(5) ? (char*) "masterkey" : (char*) hb_parcx(5);
 
    cdbname              = (char*) hb_parcx(2);
    cbkpname             = (char*) hb_parcx(3);
@@ -913,9 +913,9 @@ HB_FUNC(FBRESTOREDB)
 
    local_service_handle = NULL;
 
-   service_name   = ISNULL(1) ? "localhost" : (char*) hb_parcx(1);
-   user           = ISNULL(4) ? "SYSDBA" : (char*) hb_parcx(4);
-   password       = ISNULL(5) ? "masterkey" : (char*) hb_parcx(5);
+   service_name   = ISNULL(1) ? (char*) "localhost" : (char*) hb_parcx(1);
+   user           = ISNULL(4) ? (char*) "SYSDBA" : (char*) hb_parcx(4);
+   password       = ISNULL(5) ? (char*) "masterkey" : (char*) hb_parcx(5);
 
    cbkpname       = (char*) hb_parcx(2);
    cdbname        = (char*) hb_parcx(3);

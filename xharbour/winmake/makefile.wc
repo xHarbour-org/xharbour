@@ -44,7 +44,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 INCLUDE_DIR =include
 INCLUDE_DIR =-i=$(INCLUDE_DIR) -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt
 INCLUDE_DIR =$(INCLUDE_DIR) -i=$(ZLIB_DIR)
-CLIBFLAGS   =$(CLIBFLAGS) $(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dWIN32 -dHAVE_CONFIG_H -d_HAVE_SQLITE_CONFIG_H
+CLIBFLAGS   =$(CLIBFLAGS) $(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dHAVE_CONFIG_H -d_HAVE_SQLITE_CONFIG_H
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 
 !ifdef HB_THREAD_SUPPORT
@@ -330,8 +330,8 @@ EXEFLAGS=\
 ACEH_DIR    =-i="$(HB_DIR_ADS)"
 !endif
 INCLUDE_DIR =-i=include -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt -i=$(ZLIB_DIR)
-CLIBFLAGS   =$(CLIBFLAGS) $(ACEH_DIR) $(INCLUDE_DIR) -bd -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dWIN32 -dHB_NO_DUPLICATE_HVMPROCESSSYMBOL -d__EXPORT__ -dHAVE_CONFIG_H
-HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc2
+CLIBFLAGS   =$(CLIBFLAGS) $(ACEH_DIR) $(INCLUDE_DIR) -bd -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dHB_NO_DUPLICATE_HVMPROCESSSYMBOL -d__EXPORT__ -dHAVE_CONFIG_H
+HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 CC_CMD      =WCC386 $(CLIBFLAGS) -fo$@ $**
 CCC_CMD     =$(CC_CMD)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
@@ -355,16 +355,6 @@ $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 #*******************************************************************************
 !elseif ("$(__BLD__)"=="CONTRIB_BLD")
 #*******************************************************************************
-# Uncomment this section if you have want to build the libraries.
-HB_GTWVW=1
-# HB_PGSQL=1
-# HB_WHAT32=1
-# HB_ZIP=1
-
-HB_LIBHARU=1
-HB_FREEIMAGE=1
-HB_MZIP=1
-HB_XWT=1
 
 #===============================================================================
 # Append your own build flags here
@@ -412,15 +402,15 @@ RDDSQL_INCLUDE=-i=$(HB_DIR_FIREBIRD)\include $(RDDSQL_INCLUDE)
 INCLUDE_DIR =include
 INCLUDE_DIR =$(RDDSQL_INCLUDE) $(ACEH_DIR) -i=$(INCLUDE_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt -i=$(FREEIMAGE_DIR)\include -i=$(GDLIB_DIR)\include -i=$(XWT_DIR)\include -i=$(XWT_DIR)\src\xwt_win -i=$(ZLIB_DIR) -i=$(PNG_DIR) $(OPENSSL_DIR) $(CURL_DIR)
 INCLUDE_DIR =$(INCLUDE_DIR) $(CAIRO_DIR)
-CLIBFLAGS   =$(CLIBFLAGS) $(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dWIN32 -d_HAVE_SQLITE_CONFIG_H
-HARBOURFLAGS=$(HARBOURFLAGS) -iinclude;$(GDLIB_DIR)\include;$(WHAT32_DIR)\include;$(XWT_DIR)\include -q0 -w2 -es2 -gc2
+CLIBFLAGS   =$(CLIBFLAGS) $(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -d_HAVE_SQLITE_CONFIG_H
+HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i$(GDLIB_DIR)\include -i$(WHAT32_DIR)\include -i$(XWT_DIR)\include -q0 -w2 -es2 -gc0
 !ifdef HB_THREAD_SUPPORT
 CLIBFLAGS   =$(CLIBFLAGS) -bm -DHB_THREAD_SUPPORT
 !endif
 HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 CC_CMD      =WCC386 $(CLIBFLAGS) -fo$@ $**
 CCC_CMD     =$(CC_CMD)
-CC_CMD_ZIP  =WCC386 $(CLIBFLAGS) -i=$(HBZIP_DIR)\include -fo$@ $**
+CC_CMD_ZIP  =WPP386 $(CLIBFLAGS) -i=$(HBZIP_DIR)\include -fo$@ $**
 LIB_CMD     =LIB386 /nologo /out:$@ $**
 
 #===============================================================================
@@ -431,21 +421,8 @@ LIB_CMD     =LIB386 /nologo /out:$@ $**
 # Reset CONTRIB_PROJECT because some modules cannot build
 
 CONTRIB_PROJECT=\
-	$(LIBNF_LIB)\
-	$(TELEPATH_LIB)\
-	$(HBCC_LIB)\
-	$(PNG_LIB)\
-	$(HBHPDF_LIB)\
-	$(HBZEBRA_LIB)\
-	$(HBBZ2_LIB)\
-	$(HBLZF_LIB)\
-	$(HBMLZO_LIB)\
-	$(SEVENZIP_LIB)\
-	$(HBSQLIT3_LIB)\
-	\
-	$(RDDSQL_LIB)\
-	$(SDDSQLT3_LIB)\
-	$(SDDODBC_LIB)
+	$(CONTRIB_PROJECT)\
+	$(HBSQLIT3_LIB)
 
 !ifdef HB_GTWVG
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(GTWVG_LIB)

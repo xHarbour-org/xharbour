@@ -410,24 +410,24 @@ CAIRO_DIR   =-I"$(HB_DIR_CAIRO)/include/cairo"
 endif
 
 ifdef HB_DIR_POSTGRESQL
-RDDSQL_INCLUDE+=-I$(HB_DIR_POSTGRESQL)/include
+RDDSQL_INCLUDE+=-I"$(HB_DIR_POSTGRESQL)/include"
 endif
 
 ifdef HB_DIR_OCILIB
-RDDSQL_INCLUDE+=-I$(HB_DIR_OCILIB)/include
+RDDSQL_INCLUDE+=-I"$(HB_DIR_OCILIB)/include"
 endif
 
 ifdef HB_DIR_MYSQL
-RDDSQL_INCLUDE+=-I$(HB_DIR_MYSQL)/include
+RDDSQL_INCLUDE+=-I"$(HB_DIR_MYSQL)/include"
 endif
 
 ifdef HB_DIR_FIREBIRD
-RDDSQL_INCLUDE+=-I$(HB_DIR_FIREBIRD)/include
+RDDSQL_INCLUDE+=-I"$(HB_DIR_FIREBIRD)/include"
 endif
 
 HARBOURFLAGS+=-iinclude -i$(GDLIB_DIR)/include -i$(WHAT32_DIR)/include -i$(XWT_DIR)/include -q0 -w2 -es2 -gc0
 CLIBFLAGS   +=-D__WIN32__ -D_HAVE_SQLITE_CONFIG_H -Wall $(NOCYGWIN) -O3 -fomit-frame-pointer -march=i586 -mtune=pentium -c -fno-strict-aliasing
-CLIBFLAGS   +=$(RDDSQL_INCLUDE) $(ACEH_DIR) -Iinclude -I$(FREEIMAGE_DIR)/include -I$(GDLIB_DIR)/include -I$(XWT_DIR)/include -I$(XWT_DIR)/src/xwt_win -I$(ZLIB_DIR) -I$(PNG_DIR) $(OPENSSL_DIR) $(CURL_DIR)
+CLIBFLAGS   +=$(RDDSQL_INCLUDE) $(ACEH_DIR) -Iinclude -I"$(FREEIMAGE_DIR)/include" -I"$(GDLIB_DIR)/include" -I"$(XWT_DIR)/include" -I"$(XWT_DIR)/src/xwt_win" -I"$(ZLIB_DIR)" -I"$(PNG_DIR)" $(OPENSSL_DIR) $(CURL_DIR)
 CLIBFLAGS   +=$(CAIRO_DIR)
 
 ifeq ($(HB_THREAD_SUPPORT),1)
@@ -437,7 +437,7 @@ endif
 HB_CMD =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) -o$@ $^
 CC_CMD =GCC $(CLIBFLAGS) -o $@ $^
 CCC_CMD =$(CC_CMD)
-CC_CMD_ZIP=G++ -Iinclude -I$(HBZIP_DIR)/include -DWIN32 -D_WIN32 -DNDEBUG -fpermissive -c -o $@ $^
+CC_CMD_ZIP=G++ -Iinclude -I"$(HBZIP_DIR)/include" -D_WIN32 -DNDEBUG -fpermissive -c -o $@ $^
 LIB_CMD=\
 	RM -f $@ &&\
 	AR cru $@ $^ &&\
@@ -450,11 +450,9 @@ LIB_CMD=\
 include winmake/common.mak
 
 CONTRIB_PROJECT+=\
-	$(FREEIMAGE_LIB)\
-	$(HBMZIP_LIB)\
-	$(XWT_LIB)\
+	$(HBSQLIT3_LIB)\
 	$(WHAT32_LIB)\
-	$(LIBHARU_LIB)\
+	$(GTWVG_LIB)\
 	$(HBZIP_LIB)
 
 ifneq ($(HB_DIR_OPENSSL),)
