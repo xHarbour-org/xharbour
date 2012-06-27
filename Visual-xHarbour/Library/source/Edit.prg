@@ -210,9 +210,9 @@ METHOD Init( oParent ) CLASS EditBox
    ::ExStyle      := WS_EX_CLIENTEDGE
    ::BackSysColor := GetSysColor( COLOR_WINDOW )
    ::ForeSysColor := GetSysColor( COLOR_WINDOWTEXT )
-#ifdef __WINFAKT__
-   ::AutoHScroll  := .T.
-#endif
+
+   ::AutoHScroll  := .F.
+
    IF ::__ClassInst != NIL
       ::__PropFilter := { "HIGHLIGHTCAPTION", "SMALLCAPTION", "ALLOWMAXIMIZE" }
       ::Events := ;
