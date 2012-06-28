@@ -4871,15 +4871,20 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
 
    aEditors := ::Application:SourceEditor:aDocs
 
+   cSourcePath := cPath + "\" + ::Properties:Source
+
    FOR n := 1 TO LEN( aEditors )
        WITH OBJECT aEditors[n]
           IF (:Modified .OR. lForce) .AND. !EMPTY( :Path ) .AND. !EMPTY( :File )
              :Save()
+             IF :PrevFile != NIL
+                FERASE( cSourcePath + "\" + :PrevFile + ".prg" )
+                FERASE( cSourcePath + "\" + :PrevFile + ".xfm" )
+                :PrevFile := NIL
+             ENDIF
           ENDIF
        END
    NEXT
-
-   cSourcePath := cPath + "\" + ::Properties:Source
 
    IF ::Application:ProjectPrgEditor:Modified .OR. lForce .OR. !FILE( cSourcePath + "\" + ::Properties:Name +"_Main.prg" )
       ::Application:ProjectPrgEditor:Save( cSourcePath + "\" + ::Properties:Name +"_Main.prg" )

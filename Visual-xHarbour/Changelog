@@ -8,6 +8,11 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-06-27 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed bhg Renaming forms where the text in the project prg is incorrect
+   ! Fixed bug renaming files when renaming forms risking the user doesn't 
+     save the changes and losing the previous file.
+
 2013-06-26 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed Renaming forms
    ! Fixed OwnerDraw buttons to paint correctly

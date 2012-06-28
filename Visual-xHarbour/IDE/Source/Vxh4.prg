@@ -633,6 +633,7 @@ METHOD RenameForm( cOldName, cNewName, lProject ) CLASS ObjManager
       DEFAULT lProject TO .F.
       
       oEditor := ::Application:ProjectPrgEditor
+      ::Application:ProjectPrgEditor:Select()
       ::Application:ProjectPrgEditor:ReplaceAll( cOldName, cNewName, 0 )
 
       IF lProject
@@ -644,14 +645,16 @@ METHOD RenameForm( cOldName, cNewName, lProject ) CLASS ObjManager
             ::ActiveObject:__OldName := cOldName
          ENDIF
          oEditor := ::ActiveObject:Form:Editor
+         oEditor:Select()
          oEditor:ReplaceAll( cOldName, cNewName, 0 )
 
          IF ! Empty( oEditor:FileName )
-            oEditor:Path     := ::Application:Project:Properties:Path
-            oEditor:FileName := ::Application:Project:Properties:Source + "\" + cNewName +".prg"
+            oEditor:Path     := ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source
+            oEditor:FileName := cNewName +".prg"
             oEditor:File     := oEditor:Path + "\" + oEditor:FileName
          ENDIF
       ENDIF
+      oEditor:PrevFile := cOldName
       
       IF lProject .OR. ::ActiveObject:ClsName == "VXH_FORM_IDE" .OR. ::ActiveObject:ClsName == "CCTL" 
          TRY
@@ -1022,14 +1025,14 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
             ::RenameForm( cVal, xValue,, oActiveObject )
             IF oActiveObject:ClsName == "VXH_FORM_IDE"
                ::Application:FileTree:UpdateView()
-               IF FILE( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + cVal +".prg" )
-                  FRENAME( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + cVal +".prg",;
-                           ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + xValue +".prg" )
-               ENDIF
-               IF FILE( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + cVal +".xfm" )
-                  FRENAME( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + cVal +".xfm",;
-                           ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + xValue +".xfm" )
-               ENDIF
+               //IF FILE( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + cVal +".prg" )
+               //   FRENAME( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + cVal +".prg",;
+               //            ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + xValue +".prg" )
+               //ENDIF
+               //IF FILE( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + cVal +".xfm" )
+               //   FRENAME( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + cVal +".xfm",;
+               //            ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + xValue +".xfm" )
+               //ENDIF
             ENDIF
             
             FOR EACH Topic IN oActiveObject:Events
@@ -1054,10 +1057,10 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
       END
     ELSEIF cProp == "Name"
       ::RenameForm( "__"+cVal, "__"+xValue, .T., oActiveObject )
-      IF FILE( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + cVal +".xfm" )
-         FRENAME( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + cVal +".xfm",;
-                  ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + xValue +".xfm" )
-      ENDIF
+      //IF FILE( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + cVal +".xfm" )
+      //   FRENAME( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + cVal +".xfm",;
+      //            ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + xValue +".xfm" )
+      //ENDIF
    ENDIF
    s_bSetting := .F.
 

@@ -370,6 +370,7 @@ CLASS Window INHERIT Object
    DATA __WidthPerc            PROTECTED
    DATA __HeightPerc           PROTECTED
    DATA __hRegion              PROTECTED
+   DATA __aMinRect             PROTECTED
    DATA __hBmpRgn              PROTECTED
    DATA __lNCMouseHover        PROTECTED INIT .F.
    DATA __IsForm               PROTECTED INIT .F.
@@ -2070,7 +2071,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               DestroyWindow( ::__TaskBarParent )
            ENDIF
            ::hWnd := NIL
-           ::__GC()
            EXIT
 
 /*
@@ -2809,6 +2809,9 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
            ODEFAULT nRet TO __Evaluate( ::OnWMSysCommand,  Self, nwParam, nlParam, nRet )
 
            IF nwParam != SC_CLOSE
+              IF nwParam == SC_MINIMIZE
+                 ::__aMinRect := {::xLeft,::xTop,::xWidth,::xHeight}
+              ENDIF
               ::PostMessage( WM_USER + 3025 )
            ENDIF
            EXIT
@@ -5079,7 +5082,6 @@ CLASS WinForm INHERIT Window
    METHOD __SetBitmapMaskColor()
    METHOD __PaintBakgndImage()
    METHOD __PrcMdiMenu()
-   METHOD __GC()           INLINE IIF( ::__ClassInst == NIL, hb_gcAll(),)
 
    METHOD SetImageList()
 
@@ -5214,22 +5216,46 @@ METHOD OnSysCommand( nwParam ) CLASS WinForm
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
-METHOD SaveLayout( cIniFile, cSection ) CLASS WinForm
-   LOCAL oIni, rc := (struct RECT)
-   GetWindowRect( ::hWnd, @rc )
+METHOD SaveLayout( cIniFile, cSection, lAllowOut, lAllowMinimized ) CLASS WinForm
+   LOCAL nShow, oIni, rc := (struct RECT)
+   DEFAULT lAllowOut TO .T.
+   DEFAULT lAllowMinimized TO .T.
+   nShow := ::__GetShowMode()
+   IF ! IsIconic( ::hWnd )
+      GetWindowRect( ::hWnd, @rc )
+    ELSE
+      rc:left   := ::__aMinRect[1]
+      rc:top    := ::__aMinRect[2]
+      rc:right  := ::__aMinRect[3]+::__aMinRect[1]
+      rc:bottom := ::__aMinRect[4]+::__aMinRect[2]
+      
+      // Main Form cannot start minimized can it?
+      IF nShow == 2 .AND. ! lAllowMinimized
+         nShow := 1
+      ENDIF
+   ENDIF
    IF EMPTY( cIniFile )
       oIni := ::Application:IniFile
     ELSE
       oIni := IniFile( cIniFile )
    ENDIF
    DEFAULT cSection TO "Main"
-   oIni:WriteString( cSection, ::Application:Name + "_" + ::Name, xSTR( rc:Left ) + ", " + xSTR( rc:Top ) + ", " + xSTR( ::Width ) + ", " + xSTR( ::Height ) + ", " + xSTR( ::__GetShowMode() ) )
+   IF ! lAllowOut
+      rc:left := MAX( 0, rc:left )
+      rc:top  := MAX( 0, rc:top )
+   ENDIF
+   oIni:WriteString( cSection, ::Application:Name + "_" + ::Name, xSTR( rc:Left )  + ", " +;
+                                                                  xSTR( rc:Top )   + ", " +;
+                                                                  xSTR( rc:right-rc:Left )  + ", " +;
+                                                                  xSTR( rc:bottom-rc:Top )  + ", " +;
+                                                                  xSTR( nShow ) )
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD RestoreLayout( cIniFile, cSection, lAllowOut ) CLASS WinForm
+METHOD RestoreLayout( cIniFile, cSection, lAllowOut, lAllowMinimized ) CLASS WinForm
    LOCAL c, oIni, aRect, aPos
    DEFAULT lAllowOut TO .T.
+   DEFAULT lAllowMinimized TO .T.
    IF EMPTY( cIniFile )
       oIni := ::Application:IniFile
     ELSE
@@ -5248,6 +5274,9 @@ METHOD RestoreLayout( cIniFile, cSection, lAllowOut ) CLASS WinForm
       CATCH
       END
       IF LEN( aPos ) > 4
+         IF aPos[5] == 2 .AND. ! lAllowMinimized
+            aPos[5] := 1
+         ENDIF
          ::ShowMode := aPos[5]
          IF aPos[5] == 3
             RETURN Self
@@ -5258,6 +5287,11 @@ METHOD RestoreLayout( cIniFile, cSection, lAllowOut ) CLASS WinForm
       ::xWidth  := aPos[3]
       ::xHeight := aPos[4]
 
+      IF ::xWidth <= 0 .OR. ::xHeight <= 0
+         ::ShowMode := 3
+         RETURN Self
+      ENDIF
+         
       IF !lAllowOut
          aRect := GetDesktopRect()
 

@@ -851,6 +851,7 @@ CLASS Source
    DATA cObj      EXPORTED INIT ""
    DATA Form      EXPORTED
    DATA nPrevLine EXPORTED
+   DATA PrevFile  EXPORTED
    // Compatibility with xedit for debugger ------------------------------------------------
    ACCESS cFile             INLINE ::FileName
    ACCESS cPath             INLINE IIF( ! EMPTY(::Path), ::Path + "\", "" )
@@ -1123,23 +1124,21 @@ METHOD ReplaceAll( cFind, cReplace, nFlags, lInSelection ) CLASS Source
    local nRepLen, nStarLine, nEndLine
    local nLastMatch, nReplacements, nLenTarget, linsideASel, i, nMovePastEOL, nChrNext
    local nLenReplaced, nCurPos, nPosFind
-   local pSource, nPos, nVisLine
+//   local pSource, nPos, nVisLine
 
-   IF ( nLen := LEN( cFind ) ) == 0
+   IF ( nLen := LEN( cFind ) ) == 0 .OR. LEN( cReplace ) == 0
       return -1
    ENDIF
-
    //-------------------------------------------------------------
-   pSource  := ::Owner:GetCurDoc()
-   nPos     := ::Owner:SendMessage( SCI_GETCURRENTPOS, 0, 0 )
-   nVisLine := ::Owner:SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
-   IF pSource != ::pSource
-      ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
-   ENDIF
+//    pSource  := ::Owner:GetCurDoc()
+//    nPos     := ::Owner:SendMessage( SCI_GETCURRENTPOS, 0, 0 )
+//    nVisLine := ::Owner:SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
+//    
+//    ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
    //-------------------------------------------------------------
 
    DEFAULT lInSelection TO .F.
-   nCountSel := ::Source:GetSelections()
+   nCountSel := ::GetSelections()
 
    IF lInSelection
       nStartPos := ::GetSelectionStart()
@@ -1161,11 +1160,8 @@ METHOD ReplaceAll( cFind, cReplace, nFlags, lInSelection ) CLASS Source
          return -2
       ENDIF
     ELSE
+      nStartPos := 0
       nEndPos := ::GetTextLen()
-      IF ::Application:EditorProps:WrapSearch == 1
-         nStartPos := 0
-      ENDIF
-      // If not wrapFind, replace all only from caret to end of document
    ENDIF
 
    nRepLen := LEN( cReplace )
@@ -1174,14 +1170,14 @@ METHOD ReplaceAll( cFind, cReplace, nFlags, lInSelection ) CLASS Source
    nPosFind := ::FindInTarget( cFind, nStartPos, nEndPos )
 
    nReplacements := 0
-   IF nPosFind != -1 .AND. nPosFind <= nEndPos
+   IF nPosFind >= 0 .AND. nPosFind <= nEndPos
       nLastMatch := nPosFind
 
       nCurPos := ::GetCurrentPos()
       ::BeginUndoAction()
 
       // Replacement loop
-      DO WHILE nPosFind != -1
+      DO WHILE nPosFind >= 0
          nLenTarget := ::GetTargetEnd() - ::GetTargetStart()
          IF lInSelection .AND. nCountSel > 1
             // We must check that the found target is entirely inside a selection
@@ -1219,7 +1215,9 @@ METHOD ReplaceAll( cFind, cReplace, nFlags, lInSelection ) CLASS Source
          ENDIF
 
          nLenReplaced := nRepLen
+
          ::ReplaceTarget( nRepLen, cReplace ) 
+
          nEndPos += nLenReplaced - nLenTarget
          nLastMatch := nPosFind + nLenReplaced + nMovePastEOL
          IF nLenTarget == 0
@@ -1245,12 +1243,11 @@ METHOD ReplaceAll( cFind, cReplace, nFlags, lInSelection ) CLASS Source
       ::EndUndoAction()
       ::Owner:PosFind := nPosFind
    ENDIF
-   ::Modified := .T.
-   IF pSource != ::pSource
-      ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, pSource )
-   ENDIF
-   ::Owner:SendMessage( SCI_GOTOPOS, nPos, 0 )
-   ::Owner:SendMessage( SCI_SETFIRSTVISIBLELINE, nVisLine, 0 )
+
+//    ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, pSource )
+//    ::Owner:SendMessage( SCI_GOTOPOS, nPos, 0 )
+//    ::Owner:SendMessage( SCI_SETFIRSTVISIBLELINE, nVisLine, 0 )
+
 RETURN nReplacements
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -1259,7 +1256,8 @@ METHOD FindInTarget( cText, nStartPos, nEndPos ) CLASS Source
    ::SetTargetStart( nStartPos )
    ::SetTargetEnd( nEndPos )
    nPos := ::SearchInTarget( nLen, cText )
-   WHILE ::Owner:FindInStyle .AND. nPos != -1 && ::Owner:FindStyle != ::GetStyleAt( nPos )
+
+   WHILE ::Owner:FindInStyle .AND. nPos != -1 // ::Owner:FindStyle != ::GetStyleAt( nPos )
       IF nStartPos < nEndPos
          ::SetTargetStart( nPos + 1 )
          ::SetTargetEnd( nEndPos )
