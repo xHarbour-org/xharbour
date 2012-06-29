@@ -8,6 +8,9 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-29 11:20 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * contrib/pgsql/Makefile
+    ! added -I/usr/include/postgresql/ to CFLAGS and change TPostgres.prg to tpostgres.prg due dependencie rename
 2012-06-29 11:10 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * contrib/tipssl/inetssl.c
     ! fixed unused variavle and wrong include  definition
