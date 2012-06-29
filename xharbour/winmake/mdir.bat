@@ -211,6 +211,16 @@ if exist bin\ppgen.tds      del bin\ppgen.tds
 if exist bin\ppgen.map      del bin\ppgen.map
 if exist bin\ppgen.cgl      del bin\ppgen.cgl
 
+if exist bin\hbextern.exe   del bin\hbextern.exe
+if exist bin\hbextern.tds   del bin\hbextern.tds
+if exist bin\hbextern.map   del bin\hbextern.map
+if exist bin\hbextern.cgl   del bin\hbextern.cgl
+
+if exist bin\hbdict.exe     del bin\hbdict.exe
+if exist bin\hbdict.tds     del bin\hbdict.tds
+if exist bin\hbdict.map     del bin\hbdict.map
+if exist bin\hbdict.cgl     del bin\hbdict.cgl
+
 if exist lib\%LIBPREFIX%xharbour%LIBEXT%             del lib\%LIBPREFIX%xharbour%LIBEXT%
 if exist lib\%LIBPREFIX%codepage%LIBEXT%             del lib\%LIBPREFIX%codepage%LIBEXT%
 if exist lib\%LIBPREFIX%common%LIBEXT%               del lib\%LIBPREFIX%common%LIBEXT%
@@ -320,6 +330,8 @@ if exist bin\%SUB_DIR%\hbtest.exe                    del bin\%SUB_DIR%\hbtest.ex
 if exist bin\%SUB_DIR%\hbformat.exe                  del bin\%SUB_DIR%\hbformat.exe
 if exist bin\%SUB_DIR%\hbtestmt.exe                  del bin\%SUB_DIR%\hbtestmt.exe
 if exist bin\%SUB_DIR%\ppgen.exe                     del bin\%SUB_DIR%\ppgen.exe
+if exist bin\%SUB_DIR%\hbextern.exe                  del bin\%SUB_DIR%\hbextern.exe
+if exist bin\%SUB_DIR%\hbdict.exe                    del bin\%SUB_DIR%\hbdict.exe
 if exist bin\%SUB_DIR%\xbscript.exe                  del bin\%SUB_DIR%\xbscript.exe
 if exist bin\%SUB_DIR%\*.tds                         del bin\%SUB_DIR%\*.tds
 if exist bin\%SUB_DIR%\*.map                         del bin\%SUB_DIR%\*.map
