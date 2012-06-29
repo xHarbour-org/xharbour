@@ -70,16 +70,12 @@
       defined(HB_OS_UNIX_COMPATIBLE) || \
       defined(HB_OS_BSD) || \
       defined(HB_OS_OS2)
-#include <sys/ \
-      time.h>
+#include <sys/time.h>
 #endif
 #if defined(HB_OS_OS2)
-#include <sys/ \
-      socket.h>
-#include <sys/ \
-      select.h>
-#include <sys/ \
-      ioctl.h>
+#include <sys/socket.h>
+#include <sys/select.h>
+#include <sys/ioctl.h>
 #endif
 #if defined(HB_OS_OS2) || \
       defined(HB_OS_WIN) || \
@@ -2116,7 +2112,7 @@ HB_FUNC( INETSSLCONNECT )
    int                  iRetries = 0;
    int                  iRet = 0;
    int                  iRet2 = 0;
-   int                  iErr = 0;
+//    int                  iErr = 0;
 
    if (szHost == NULL || !ISNUM(2) || (Socket == NULL && !ISNIL(3)) ||
        (Socket != NULL && Socket->sign != HB_SOCKET_SIGN))

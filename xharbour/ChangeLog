@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-29 11:10 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * contrib/tipssl/inetssl.c
+    ! fixed unused variavle and wrong include  definition
+    
 2012-06-29 13:46 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbexpat/core.c
   * contrib/hbexpat/_hbconf.h
