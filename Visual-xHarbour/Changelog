@@ -8,6 +8,11 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-06-28 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed MaskEdit:Valid event not being fired on SINGLE MaskEdit.
+   - Removed property CueBanner from MaskEdit since the control sets a buffer
+     as text and CueBanner needs the control text to be completely empty.
+
 2013-06-27 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed bhg Renaming forms where the text in the project prg is incorrect
    ! Fixed bug renaming files when renaming forms risking the user doesn't 

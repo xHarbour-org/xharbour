@@ -27,8 +27,10 @@ CLASS MaskEdit INHERIT EditBox
    DATA lInValid     EXPORTED  INIT .F.
    DATA NoEdit       EXPORTED  INIT .F.
    DATA NoOverStrike EXPORTED  INIT .F.
-   DATA oGet EXPORTED
+   DATA oGet         EXPORTED
    DATA  __Validate  EXPORTED INIT .F.
+
+   DATA CueBanner    PROTECTED
 
    ACCESS PreBlock       INLINE ::oGet:preblock
    ASSIGN PreBlock(b)    INLINE ::oGet:preblock  := b
@@ -54,7 +56,7 @@ CLASS MaskEdit INHERIT EditBox
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
-   //METHOD OnGetDlgCode()
+   METHOD OnGetDlgCode()
    METHOD OnUserMsg()
    METHOD OnUndo()
    METHOD OnKeyDown()
@@ -116,7 +118,6 @@ METHOD Create() CLASS MaskEdit
 
    IF ::__ClassInst == NIL
       SetWindowText( ::hWnd, ::oGet:buffer )
-      //::Text := ::oGet:buffer
    ENDIF
    IF ValType( ::oGet:preblock ) == 'B' .AND. ! eval( ::oGet:preblock, Self, .F. )
       EnableWindow( ::hWnd, .F. )
@@ -124,14 +125,14 @@ METHOD Create() CLASS MaskEdit
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-/*
+
 METHOD OnGetDlgCode() CLASS MaskEdit
    LOCAL nRet
-//   IF ::wParam > 0
+   IF ::wParam > 0 .AND. ( ValType( ::oGet:postblock ) == "B" .OR. HGetPos( ::EventHandler, "Valid" ) > 0 )
       nRet := DLGC_WANTMESSAGE | DLGC_WANTALLKEYS
-//   ENDIF
+   ENDIF
 RETURN nRet
-*/
+
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnUserMsg( hWnd, nMsg, nwParam ) CLASS MaskEdit
@@ -156,7 +157,7 @@ METHOD OnUserMsg( hWnd, nMsg, nwParam ) CLASS MaskEdit
                     IF ValType( ::oGet:postblock ) == "B"
                        ::IsValid := eval( ::oGet:postblock, Self )
                     ENDIF
-                    IF HGetPos( ::EventHandler, "Valid" ) != 0
+                    IF HGetPos( ::EventHandler, "Valid" ) > 0
                        ::IsValid := ExecuteEvent( "Valid", Self )
                     ENDIF
                     ::Validating := FALSE
@@ -305,7 +306,7 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS MaskEdit
            ENDIF
 
       CASE ( nwParam == 13 .OR. nwParam == 9 )
-           IF ValType( ::oGet:postblock ) == 'B' .OR. HGetPos( ::EventHandler, "Valid" ) != 0
+           IF ValType( ::oGet:postblock ) == 'B' .OR. HGetPos( ::EventHandler, "Valid" ) > 0
               IF !::lInValid
                  ::oGet:assign()
                  ::oGet:updatebuffer()
