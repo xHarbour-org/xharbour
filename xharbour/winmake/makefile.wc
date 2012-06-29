@@ -399,6 +399,10 @@ RDDSQL_INCLUDE=-i=$(HB_DIR_MYSQL)\include $(RDDSQL_INCLUDE)
 RDDSQL_INCLUDE=-i=$(HB_DIR_FIREBIRD)\include $(RDDSQL_INCLUDE)
 !endif
 
+!ifdef HB_DIR_MAGIC
+RDDSQL_INCLUDE=-i=$(HB_DIR_MAGIC)\include $(RDDSQL_INCLUDE)
+!endif
+
 INCLUDE_DIR =include
 INCLUDE_DIR =$(RDDSQL_INCLUDE) $(ACEH_DIR) -i=$(INCLUDE_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt -i=$(FREEIMAGE_DIR)\include -i=$(GDLIB_DIR)\include -i=$(XWT_DIR)\include -i=$(XWT_DIR)\src\xwt_win -i=$(ZLIB_DIR) -i=$(PNG_DIR) $(OPENSSL_DIR) $(CURL_DIR)
 INCLUDE_DIR =$(INCLUDE_DIR) $(CAIRO_DIR)
@@ -496,11 +500,21 @@ CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(MYSQL_LIB) $(SDDMY_LIB)
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(FIREBIRD_LIB) $(SDDFB_LIB)
 !endif
 
+!ifdef HB_DIR_MAGIC
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBMAGIC_LIB)
+!endif
+
 ALL: $(CONTRIB_PROJECT)
 
 #===============================================================================
 # Library dependencies and build rules
 #===============================================================================
+$(HBTINYMT_LIB) : $(HBTINYMT_LIB_OBJS)
+	$(LIB_CMD)
+
+$(HBMAGIC_LIB) : $(HBMAGIC_LIB_OBJS)
+	$(LIB_CMD)
+
 $(HBEXPAT_LIB) : $(HBEXPAT_LIB_OBJS)
 	$(LIB_CMD)
 

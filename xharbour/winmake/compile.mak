@@ -88,6 +88,27 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
 	$(MT_CMD)
 
 #===============================================================================
+# HBTINYMT.LIB Dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)hbtinymt$(OBJEXT) : $(HBTINYMT_DIR)$(DIR_SEP)hbtinymt.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tinymt32$(OBJEXT) : $(HBTINYMT_DIR)$(DIR_SEP)tinymt32.c
+	$(CC_CMD)
+
+#===============================================================================
+# HBMAGIC.LIB Dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)coreHBMAGIC$(OBJEXT) : $(HBMAGIC_DIR)$(DIR_SEP)core.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbmagis$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hbmagis.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbmagis.c : $(HBMAGIC_DIR)$(DIR_SEP)hbmagis.prg
+	$(HB_CMD)
+
+#===============================================================================
 # HBEXPAT.LIB Dependencies
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)coreHBEXPAT$(OBJEXT) : $(HBEXPAT_DIR)$(DIR_SEP)core.c

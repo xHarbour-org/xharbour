@@ -687,6 +687,13 @@ static HB_GARBAGE_FUNC( PHB_EXPAT_release )
    if( hb_expat_ptr && * hb_expat_ptr )
    {
       PHB_EXPAT hb_expat = * hb_expat_ptr;
+      HB_UINT tmp;
+
+      for( tmp = 0; tmp < HB_SIZEOFARRAY( hb_expat->pVar ); ++tmp )
+      {
+         if( hb_expat->pVar[ tmp ] )
+            hb_gcItemRef( hb_expat->pVar[ tmp ] );
+      }
 
       /* set pointer to NULL to avoid multiple freeing */
       * hb_expat_ptr = NULL;
@@ -696,6 +703,7 @@ static HB_GARBAGE_FUNC( PHB_EXPAT_release )
    }
 }
 
+#if 0
 static HB_GARBAGE_FUNC( PHB_EXPAT_mark )
 {
    PHB_EXPAT * hb_expat_ptr = ( PHB_EXPAT * ) Cargo;
@@ -712,6 +720,7 @@ static HB_GARBAGE_FUNC( PHB_EXPAT_mark )
       }
    }
 }
+#endif
 
 static void * PHB_EXPAT_is( int iParam )
 {

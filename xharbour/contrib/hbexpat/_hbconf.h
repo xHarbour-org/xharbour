@@ -28,4 +28,8 @@
 /* Define to make XML Namespaces functionality available. */
 #define XML_NS 1
 
+#if defined( __BORLANDC__ )
+   #pragma warn -csu
+#endif
+
 #endif /* _HBCONF_H */

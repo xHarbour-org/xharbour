@@ -4799,8 +4799,8 @@ internalEntityProcessor(XML_Parser parser,
     processor = contentProcessor;
     /* see externalEntityContentProcessor vs contentProcessor */
     return doContent(parser, parentParser ? 1 : 0, encoding, s, end,
-                     nextPtr, (XML_Bool)!ps_finalBuffer); 
-  }  
+                     nextPtr, (XML_Bool)!ps_finalBuffer);
+  }
 }
 
 static enum XML_Error PTRCALL
@@ -4809,6 +4809,9 @@ errorProcessor(XML_Parser parser,
                const char *end,
                const char **nextPtr)
 {
+  HB_SYMBOL_UNUSED(s);
+  HB_SYMBOL_UNUSED(end);
+  HB_SYMBOL_UNUSED(nextPtr);
   return errorCode;
 }
 

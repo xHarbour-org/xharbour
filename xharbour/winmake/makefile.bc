@@ -602,6 +602,10 @@ RDDSQL_INCLUDE=-I"$(HB_DIR_MYSQL)\include" $(RDDSQL_INCLUDE)
 RDDSQL_INCLUDE=-I"$(HB_DIR_FIREBIRD)\include" $(RDDSQL_INCLUDE)
 !endif
 
+!ifdef HB_DIR_MAGIC
+RDDSQL_INCLUDE=-I"$(HB_DIR_MAGIC)\include" $(RDDSQL_INCLUDE)
+!endif
+
 INCLUDE_DIR  =-Iinclude $(RDDSQL_INCLUDE)
 CLIBFLAGS    =$(CLIBFLAGS) -c -q $(ACEH_DIR) $(CAIRO_DIR) $(CURL_DIR) $(OPENSSL_DIR) $(INCLUDE_DIR) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(HBHPDF_DIR) -I$(ZLIB_DIR) -d -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
 HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -i$(GDLIB_DIR)\include -i$(WHAT32_DIR)\include -i$(XWT_DIR)\include -q0 -w2 -es2 -gc0
@@ -661,11 +665,29 @@ CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(MYSQL_LIB) $(SDDMY_LIB)
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(FIREBIRD_LIB) $(SDDFB_LIB)
 !endif
 
+!ifdef HB_DIR_MAGIC
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBMAGIC_LIB)
+!endif
+
 ALL: $(CONTRIB_PROJECT)
 
 #===============================================================================
 # Library dependencies and build rules
 #===============================================================================
+$(HBMAGIC_LIB) : $(HBMAGIC_LIB_OBJS)
+	IF EXIST "$(HBMAGIC_LIB)" $(DEL) "$(HBMAGIC_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
+$(HBTINYMT_LIB) : $(HBTINYMT_LIB_OBJS)
+	IF EXIST "$(HBTINYMT_LIB)" $(DEL) "$(HBTINYMT_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
 $(HBEXPAT_LIB) : $(HBEXPAT_LIB_OBJS)
 	IF EXIST "$(HBEXPAT_LIB)" $(DEL) "$(HBEXPAT_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!

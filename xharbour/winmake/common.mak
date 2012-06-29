@@ -87,6 +87,8 @@ XWT_DIR       =contrib$(DIR_SEP)xwt
 XWT2_DIR      =contrib$(DIR_SEP)xwt2
 TIPSSL_DIR    =contrib$(DIR_SEP)tipssl
 CGILIB_DIR    =contrib$(DIR_SEP)cgilib
+HBMAGIC_DIR   =contrib$(DIR_SEP)hbmagic
+HBTINYMT_DIR  =contrib$(DIR_SEP)hbtinymt
 
 INCLUDE_DIR2  =include
 
@@ -141,6 +143,8 @@ HB_GT_LIBS  =$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTWVT_LIB) $(
 #===============================================================================
 # Contrib Library Names
 #===============================================================================
+HBTINYMT_LIB =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbtinymt$(LIBEXT)
+HBMAGIC_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbmagic$(LIBEXT)
 HBEXPAT_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbexpat$(LIBEXT)
 SDDFB_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sddfb$(LIBEXT)
 SDDOCI_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sddoci$(LIBEXT)
@@ -243,6 +247,20 @@ HARBOUR_LIBS=\
 #===============================================================================
 # List Of Library and Executable Dependencies
 #===============================================================================
+
+#===============================================================================
+# HBTINYMT.LIB Dependencies
+#===============================================================================
+HBTINYMT_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)hbtinymt$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tinymt32$(OBJEXT)
+
+#===============================================================================
+# HBMAGIC.LIB Dependencies
+#===============================================================================
+HBMAGIC_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)coreHBMAGIC$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbmagis$(OBJEXT)
 
 #===============================================================================
 # HBEXPAT.LIB Dependencies
@@ -2156,5 +2174,6 @@ CONTRIB_PROJECT=\
 	$(HBMZIP_LIB)\
 	$(XWT_LIB)\
 	$(LIBHARU_LIB)\
-	$(HBEXPAT_LIB)
+	$(HBEXPAT_LIB)\
+	$(HBTINYMT_LIB)
 

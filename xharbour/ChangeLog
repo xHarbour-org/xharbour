@@ -8,6 +8,43 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-29 13:46 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbexpat/core.c
+  * contrib/hbexpat/_hbconf.h
+  * contrib/hbexpat/xmlparse.c
+    ! pacify BCC warnings
+
+  + contrib/hbmagic
+  + contrib/hbmagic/core.c
+  + contrib/hbmagic/hbmagic.ch
+  + contrib/hbmagic/hbmagis.prg
+  + contrib/hbmagic/tests
+  + contrib/hbmagic/tests/hbmagit.prg
+    + hbmagic file function borrowed from Harbour.
+    Will be built when (example): SET HB_DIR_MAGIC=C:\LIBMAGIC is setup
+
+  + contrib/hbtinymt
+  + contrib/hbtinymt/hbtinymt.c
+  + contrib/hbtinymt/LICENSE.txt
+  + contrib/hbtinymt/tinymt32.c
+  + contrib/hbtinymt/tinymt32.h
+  + contrib/hbtinymt/tests
+  + contrib/hbtinymt/tests/test.prg
+    + TinyMT pseudo random number generator
+      Site: http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/TINYMT/index.html
+
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/contrib.pc
+  * winmake/makefile.bc
+  * winmake/makefile.dc
+  * winmake/makefile.gc
+  * winmake/makefile.pc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+  * winmake/mdir.bat
+    + hbmagic.lib and hbtinymt.lib dependencies
+
 2012-06-28 04:14 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/common.mak
   * winmake/compile.mak
