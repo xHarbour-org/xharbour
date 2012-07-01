@@ -36,6 +36,7 @@ typedef struct _ORA_BIND_COLS
    ULONG  ulValue;
    char sDate[ 7 ];
    int iValue;
+   char sValue[31];   
 //    OCIRowId * RowId;
 } ORA_BIND_COLS ;
 
@@ -892,16 +893,14 @@ HB_FUNC( ORACLEINBINDPARAM )
    int ret = SQL_ERROR;
    BOOL lStmt = ISLOG( 7 ) ? hb_parl( 7 ) : 0;
    BOOL isNull = ISLOG( 8 ) ? hb_parl( 8 ) : 0;
-   
+
   
 
 
    if ( Stmt)
    {
 
-      Stmt->pLink[iPos].col_name = (char *) hb_xgrab( sizeof(char) * (iFieldSize + 1));
-      memset(Stmt->pLink[iPos].col_name,'\0',(iFieldSize) * sizeof(char));
-
+   
       Stmt->pLink[iPos].sVal = isNull ? -1 : 0;
       Stmt->pLink[iPos].iType = iParamType;
       switch (Stmt->pLink[iPos].iType)
@@ -1010,18 +1009,48 @@ HB_FUNC( ORACLEINBINDPARAM )
                           0);
      }
       break;
+     case 1:
+     {
+	     
+        if ( ISCHAR( 6 ) )
+        {
+           sprintf(Stmt->pLink[ iPos ].sValue,hb_parcx(6),hb_parclen( 6 ));          
+        }
+         ret = sqlo_bind_by_pos( lStmt ? Stmt->stmt : Stmt->stmtParam,
+                           iParamNum,
+                           SQLOT_AFC ,
+                           &Stmt->pLink[ iPos ].sValue,
+                           iFieldSize ,
+                           &Stmt->pLink[iPos].sVal,
+                          0);
+	     
+     } 
+     break;
            
 
       default :
+      if (iFieldSize  == 0 )
+      {
+         iFieldSize = 1;
+      }
+         Stmt->pLink[iPos].col_name = (char *) hb_xgrab( sizeof(char) * (iFieldSize + 1));
+         memset(Stmt->pLink[iPos].col_name,'\0',(iFieldSize+1) * sizeof(char));
+
+      
       if ( ISCHAR( 6 ) )
-         strcpy(Stmt->pLink[ iPos ].col_name, hb_parc( 6 ) ) ;
+      {
+         hb_xmemcpy(Stmt->pLink[ iPos ].col_name, hb_parc( 6 ),hb_parclen( 6 ) ) ;
+      }
+      
+      
       ret = sqlo_bind_by_pos( lStmt ? Stmt->stmt :Stmt->stmtParam,
                           iParamNum,
                           SQLOT_STR,
                           Stmt->pLink[ iPos ].col_name,
-                          iFieldSize,
+                          iFieldSize+1,
                           &Stmt->pLink[iPos].sVal,
                           0);
+                          
      break;
      }
 
@@ -1270,6 +1299,7 @@ HB_FUNC( ORACLEBINDALLOC )
    {
       iBind = hb_parni( 2 ) ;
       session->pLink = ( ORA_BIND_COLS * ) hb_xgrab( sizeof( ORA_BIND_COLS ) * iBind );
+      memset(session->pLink,0,sizeof( ORA_BIND_COLS ) * iBind );      
       session->ubBindNum = iBind;
    }
    hb_retni( 1 );

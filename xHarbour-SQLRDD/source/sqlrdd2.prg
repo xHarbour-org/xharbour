@@ -6761,13 +6761,24 @@ METHOD sqlOrderCreate( cIndexName, cColumns, cTag, cConstraintName, cTargetTable
             aadd( aCols, "DT__HIST" )
          EndIf
       EndIf
-
-      For i = 1 to len( aCols )
-         cList += SR_DBQUALIFY( aCols[i], ::oSql:nSystemID )
-         cList += if( i == len( aCols ), "", "," )
-         cList2 += ["] + aCols[i] + ["]
-         cList2 += if( i == len( aCols ), "", "," )
-      Next
+      xxxxxxxxxxxxxxxxxxxxx
+      If ::oSql:nSystemID == SYSTEMID_POSTGR .and.  ::osql:lPostgresql8
+               // PGS 8.3 will use it once released
+         For i = 1 to len( aCols )
+            cList += SR_DBQUALIFY( aCols[i], ::oSql:nSystemID ) + " NULLS FIRST"
+            cList += if( i == len( aCols ), "", "," )
+            cList2 += ["] + aCols[i] + ["]
+            cList2 += if( i == len( aCols ), "", "," )
+         Next
+      Else
+         For i = 1 to len( aCols )
+            cList += SR_DBQUALIFY( aCols[i], ::oSql:nSystemID )
+            cList += if( i == len( aCols ), "", "," )
+            cList2 += ["] + aCols[i] + ["]
+            cList2 += if( i == len( aCols ), "", "," )
+         Next
+      EndIf
+      
 
       /* Drop the index */
 

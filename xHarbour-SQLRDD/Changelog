@@ -8,6 +8,16 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-06-01 08:35 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+  * source/sqlorax.c
+    ! some enhacements to bind function by create tipe 1 in ORACLEINBINDPARAM to bind CHAR type bind variables ( varchar2 is -1 type )
+  * source/sqlconnection.prg
+   ! moved method ExecSPRC and ExecSP to sqloracle
+  * source/sqloracle.prg   
+   ! added  method ExecSPRC and ExecSP moved from sqlconnection.prg
+  * source/sqlrdd2.prg 
+    ! changed sqlOrderCreate method to add nulls first in database is postgresql 8 or newer to indkey_xxx coluns
+      
 2012-05-27 12:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
   * source/sqlrdd2.prg
     * aaded support to create index for datetime fields
