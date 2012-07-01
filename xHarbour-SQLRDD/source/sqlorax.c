@@ -1029,6 +1029,7 @@ HB_FUNC( ORACLEINBINDPARAM )
            
 
       default :
+      {
       if (iFieldSize  == 0 )
       {
          iFieldSize = 1;
@@ -1050,7 +1051,7 @@ HB_FUNC( ORACLEINBINDPARAM )
                           iFieldSize+1,
                           &Stmt->pLink[iPos].sVal,
                           0);
-                          
+     }                     
      break;
      }
 

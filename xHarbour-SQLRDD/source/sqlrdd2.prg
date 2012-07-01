@@ -6761,7 +6761,7 @@ METHOD sqlOrderCreate( cIndexName, cColumns, cTag, cConstraintName, cTargetTable
             aadd( aCols, "DT__HIST" )
          EndIf
       EndIf
-      xxxxxxxxxxxxxxxxxxxxx
+
       If ::oSql:nSystemID == SYSTEMID_POSTGR .and.  ::osql:lPostgresql8
                // PGS 8.3 will use it once released
          For i = 1 to len( aCols )
