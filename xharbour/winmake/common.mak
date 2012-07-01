@@ -98,32 +98,32 @@ INCLUDE_DIR2  =include
 COMPILER_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)compiler$(LIBEXT)
 COMMON_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)common$(LIBEXT)
 CODEPAGE_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)codepage$(LIBEXT)
-CT_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)ct$(HB_MT)$(LIBEXT)
-DBFCDX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfcdx$(HB_MT)$(LIBEXT)
-DBFMDX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfmdx$(HB_MT)$(LIBEXT)
-BMDBFCDX_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)bmdbfcdx$(HB_MT)$(LIBEXT)
-REDBFCDX_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)redbfcdx$(HB_MT)$(LIBEXT)
-DBFMDX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfmdx$(HB_MT)$(LIBEXT)
-SIXCDX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sixcdx$(HB_MT)$(LIBEXT)
-BMSIXCDX_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)bmsixcdx$(HB_MT)$(LIBEXT)
-DBFFPT_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbffpt$(HB_MT)$(LIBEXT)
-REDBFFPT_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)redbffpt$(HB_MT)$(LIBEXT)
-DBFNTX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfntx$(HB_MT)$(LIBEXT)
-DBFNSX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfnsx$(HB_MT)$(LIBEXT)
-HBSIX_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbsix$(HB_MT)$(LIBEXT)
-HSX_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hsx$(HB_MT)$(LIBEXT)
-USRRDD_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)usrrdd$(HB_MT)$(LIBEXT)
-RDDS_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)rdds$(HB_MT)$(LIBEXT)
+CT_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)ct$(LIBEXT)
+DBFCDX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfcdx$(LIBEXT)
+DBFMDX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfmdx$(LIBEXT)
+BMDBFCDX_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)bmdbfcdx$(LIBEXT)
+REDBFCDX_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)redbfcdx$(LIBEXT)
+DBFMDX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfmdx$(LIBEXT)
+SIXCDX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sixcdx$(LIBEXT)
+BMSIXCDX_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)bmsixcdx$(LIBEXT)
+DBFFPT_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbffpt$(LIBEXT)
+REDBFFPT_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)redbffpt$(LIBEXT)
+DBFNTX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfntx$(LIBEXT)
+DBFNSX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfnsx$(LIBEXT)
+HBSIX_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbsix$(LIBEXT)
+HSX_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hsx$(LIBEXT)
+USRRDD_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)usrrdd$(LIBEXT)
+RDDS_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)rdds$(LIBEXT)
 DEBUG_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)debug$(LIBEXT)
 LANG_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)lang$(LIBEXT)
-MACRO_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)macro$(HB_MT)$(LIBEXT)
+MACRO_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)macro$(LIBEXT)
 NULSYS_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)nulsys$(LIBEXT)
-PP_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)pp$(HB_MT)$(LIBEXT)
-RDD_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)rdd$(HB_MT)$(LIBEXT)
-RTL_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)rtl$(HB_MT)$(LIBEXT)
+PP_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)pp$(LIBEXT)
+RDD_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)rdd$(LIBEXT)
+RTL_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)rtl$(LIBEXT)
 PCREPOS_LIB =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)pcrepos$(LIBEXT)
 ZLIB_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)zlib$(LIBEXT)
-TIP_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)tip$(HB_MT)$(LIBEXT)
+TIP_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)tip$(LIBEXT)
 VM_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)vm$(HB_MT)$(LIBEXT)
 FMSTAT_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)fmstat$(HB_MT)$(LIBEXT)
 ODBC_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbodbc$(LIBEXT)
@@ -183,7 +183,7 @@ XWT2_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)xwt2$(LIBEXT)
 PNG_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)png$(LIBEXT)
 HBHPDF_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbhpdf$(LIBEXT)
 LIBHARU_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)libharu$(LIBEXT)
-TIPSSL_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)tipssl$(HB_MT)$(LIBEXT)
+TIPSSL_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)tipssl$(LIBEXT)
 CGILIB_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)cgilib$(LIBEXT)
 
 #===============================================================================
@@ -525,7 +525,6 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)philesx$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)rat$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)readline$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)regex$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)replic$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)right$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)round$(OBJEXT)\
@@ -535,7 +534,6 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)scroll$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)seconds$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)session$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)set$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)readexit$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)readins$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)setcolor$(OBJEXT)\
@@ -983,46 +981,48 @@ COMMON_LIB_OBJS=\
 # VM.LIB rules
 #===============================================================================
 VM_LIB_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)arrays$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)arrayshb$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)asort$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)break$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)classes$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)classesc$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cmdarg$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)codebloc$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)dbgentry$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)debug$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)do$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)dynlibhb$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)dynsym$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)errorapi$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)estack$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)eval$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)evalhb$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)extend$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)fm$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)garbage$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)hash$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)hbi18n$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)hvm$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)inet$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)initexit$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)initsymb$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)itemapi$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)fastitem$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)macro$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)memvars$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)memvclip$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)pcount$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)proc$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)pvalue$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)runner$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)strapi$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)thread$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)throw$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)arrays$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)arrayshb$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)asort$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)break$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)classes$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)classesc$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)cmdarg$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)codebloc$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)dbgentry$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)debug$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)do$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)dynlibhb$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)dynsym$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)errorapi$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)estack$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)eval$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)evalhb$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)extend$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)fm$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)garbage$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hash$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbi18n$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hvm$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)inet$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)initexit$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)initsymb$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)itemapi$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)fastitem$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)macro$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)memvars$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)memvclip$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pcount$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)proc$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pvalue$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)regex$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)runner$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)set$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)strapi$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)thread$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)throw$(HB_MT)$(OBJEXT)\
 	\
-	$(OBJ_DIR)$(DIR_SEP)harbinit$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)harbinit$(HB_MT)$(OBJEXT)
 
 #===============================================================================
 # VMMAIN Object Files, Only Linked On Static Libraries
@@ -1036,7 +1036,7 @@ VM_MAIN_OBJS=\
 # FMSTAT.LIB rules
 #===============================================================================
 FMSTAT_LIB_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)fmSTAT$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)fmSTAT$(HB_MT)$(OBJEXT)
 
 #===============================================================================
 # GTCGI.LIB rules
@@ -2119,28 +2119,8 @@ ST_PROJECT=\
 	$(HBFORMAT_EXE)
 
 MT_PROJECT=\
-	$(PP_LIB)\
 	$(VM_LIB)\
 	$(FMSTAT_LIB)\
-	$(RTL_LIB)\
-	$(MACRO_LIB)\
-	$(RDD_LIB)\
-	$(TIP_LIB)\
-	$(DBFFPT_LIB)\
-	$(REDBFFPT_LIB)\
-	$(DBFNTX_LIB)\
-	$(DBFNSX_LIB)\
-	$(DBFCDX_LIB)\
-	$(DBFMDX_LIB)\
-	$(BMDBFCDX_LIB)\
-	$(REDBFCDX_LIB)\
-	$(SIXCDX_LIB)\
-	$(BMSIXCDX_LIB)\
-	$(HBSIX_LIB)\
-	$(HSX_LIB)\
-	$(USRRDD_LIB)\
-	$(RDDS_LIB)\
-	$(CT_LIB)\
 	$(HBTEST_EXE)\
 	$(HBRUN_EXE)
 

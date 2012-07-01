@@ -721,148 +721,154 @@ $(OBJ_DIR)$(DIR_SEP)rddsys$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)rddsys.c
 #===============================================================================
 # VM.LIB rules
 #===============================================================================
-$(OBJ_DIR)$(DIR_SEP)arrays$(OBJEXT) : $(VM_DIR)$(DIR_SEP)arrays.c
+$(OBJ_DIR)$(DIR_SEP)arrays$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)arrays.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)arrayshb$(OBJEXT) : $(VM_DIR)$(DIR_SEP)arrayshb.c
+$(OBJ_DIR)$(DIR_SEP)arrayshb$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)arrayshb.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)asort$(OBJEXT) : $(VM_DIR)$(DIR_SEP)asort.c
+$(OBJ_DIR)$(DIR_SEP)asort$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)asort.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)break$(OBJEXT) : $(VM_DIR)$(DIR_SEP)break.c
+$(OBJ_DIR)$(DIR_SEP)break$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)break.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)classes$(OBJEXT) : $(VM_DIR)$(DIR_SEP)classes.c
+$(OBJ_DIR)$(DIR_SEP)classes$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)classes.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)classesc$(OBJEXT) : $(VM_DIR)$(DIR_SEP)classesc.c
+$(OBJ_DIR)$(DIR_SEP)classesc$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)classesc.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)cmdarg$(OBJEXT) : $(VM_DIR)$(DIR_SEP)cmdarg.c
+$(OBJ_DIR)$(DIR_SEP)cmdarg$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)cmdarg.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)codebloc$(OBJEXT) : $(VM_DIR)$(DIR_SEP)codebloc.c
+$(OBJ_DIR)$(DIR_SEP)codebloc$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)codebloc.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)dbgentry$(OBJEXT) : $(VM_DIR)$(DIR_SEP)dbgentry.c
+$(OBJ_DIR)$(DIR_SEP)dbgentry$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)dbgentry.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)debug$(OBJEXT) : $(VM_DIR)$(DIR_SEP)debug.c
+$(OBJ_DIR)$(DIR_SEP)debug$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)debug.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)do$(OBJEXT) : $(VM_DIR)$(DIR_SEP)do.c
+$(OBJ_DIR)$(DIR_SEP)do$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)do.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)dynlibhb$(OBJEXT) : $(VM_DIR)$(DIR_SEP)dynlibhb.c
+$(OBJ_DIR)$(DIR_SEP)dynlibhb$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)dynlibhb.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)dynsym$(OBJEXT) : $(VM_DIR)$(DIR_SEP)dynsym.c
+$(OBJ_DIR)$(DIR_SEP)dynsym$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)dynsym.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)errorapi$(OBJEXT) : $(VM_DIR)$(DIR_SEP)errorapi.c
+$(OBJ_DIR)$(DIR_SEP)errorapi$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)errorapi.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)eval$(OBJEXT) : $(VM_DIR)$(DIR_SEP)eval.c
+$(OBJ_DIR)$(DIR_SEP)eval$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)eval.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)evalhb$(OBJEXT) : $(VM_DIR)$(DIR_SEP)evalhb.c
+$(OBJ_DIR)$(DIR_SEP)evalhb$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)evalhb.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)estack$(OBJEXT) : $(VM_DIR)$(DIR_SEP)estack.c
+$(OBJ_DIR)$(DIR_SEP)estack$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)estack.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)extend$(OBJEXT) : $(VM_DIR)$(DIR_SEP)extend.c
+$(OBJ_DIR)$(DIR_SEP)extend$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)extend.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)fm$(OBJEXT) : $(VM_DIR)$(DIR_SEP)fm.c
+$(OBJ_DIR)$(DIR_SEP)fm$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)fm.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)garbage$(OBJEXT) : $(VM_DIR)$(DIR_SEP)garbage.c
+$(OBJ_DIR)$(DIR_SEP)garbage$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)garbage.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)harbinit.c : $(VM_DIR)$(DIR_SEP)harbinit.prg
 	$(HB_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)harbinit$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)harbinit.c
+$(OBJ_DIR)$(DIR_SEP)harbinit$(HB_MT)$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)harbinit.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)hash$(OBJEXT) : $(VM_DIR)$(DIR_SEP)hash.c
+$(OBJ_DIR)$(DIR_SEP)hash$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)hash.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)hbi18n$(OBJEXT) : $(VM_DIR)$(DIR_SEP)hbi18n.c
+$(OBJ_DIR)$(DIR_SEP)hbi18n$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)hbi18n.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)hvm$(OBJEXT) : $(VM_DIR)$(DIR_SEP)hvm.c
+$(OBJ_DIR)$(DIR_SEP)hvm$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)hvm.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)inet$(OBJEXT) : $(VM_DIR)$(DIR_SEP)inet.c
+$(OBJ_DIR)$(DIR_SEP)inet$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)inet.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)initexit$(OBJEXT) : $(VM_DIR)$(DIR_SEP)initexit.c
+$(OBJ_DIR)$(DIR_SEP)initexit$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)initexit.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)initsymb$(OBJEXT) : $(VM_DIR)$(DIR_SEP)initsymb.c
+$(OBJ_DIR)$(DIR_SEP)initsymb$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)initsymb.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)itemapi$(OBJEXT) : $(VM_DIR)$(DIR_SEP)itemapi.c
+$(OBJ_DIR)$(DIR_SEP)itemapi$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)itemapi.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)fastitem$(OBJEXT) : $(VM_DIR)$(DIR_SEP)fastitem.c
+$(OBJ_DIR)$(DIR_SEP)fastitem$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)fastitem.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)macro$(OBJEXT) : $(VM_DIR)$(DIR_SEP)macro.c
+$(OBJ_DIR)$(DIR_SEP)macro$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)macro.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)maindll$(OBJEXT) : $(VM_DIR)$(DIR_SEP)maindll.c
+$(OBJ_DIR)$(DIR_SEP)maindll$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)maindll.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)mainstd$(OBJEXT) : $(VM_DIR)$(DIR_SEP)mainstd.c
+$(OBJ_DIR)$(DIR_SEP)mainstd$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)mainstd.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)mainwin$(OBJEXT) : $(VM_DIR)$(DIR_SEP)mainwin.c
+$(OBJ_DIR)$(DIR_SEP)mainwin$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)mainwin.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)maindlle$(OBJEXT) : $(VM_DIR)$(DIR_SEP)maindlle.c
+$(OBJ_DIR)$(DIR_SEP)maindlle$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)maindlle.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)maindllh$(OBJEXT) : $(VM_DIR)$(DIR_SEP)maindllh.c
+$(OBJ_DIR)$(DIR_SEP)maindllh$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)maindllh.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)memvars$(OBJEXT) : $(VM_DIR)$(DIR_SEP)memvars.c
+$(OBJ_DIR)$(DIR_SEP)memvars$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)memvars.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)memvclip$(OBJEXT) : $(VM_DIR)$(DIR_SEP)memvclip.c
+$(OBJ_DIR)$(DIR_SEP)memvclip$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)memvclip.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)pcount$(OBJEXT) : $(VM_DIR)$(DIR_SEP)pcount.c
+$(OBJ_DIR)$(DIR_SEP)pcount$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)pcount.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)proc$(OBJEXT) : $(VM_DIR)$(DIR_SEP)proc.c
+$(OBJ_DIR)$(DIR_SEP)proc$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)proc.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)pvalue$(OBJEXT) : $(VM_DIR)$(DIR_SEP)pvalue.c
+$(OBJ_DIR)$(DIR_SEP)pvalue$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)pvalue.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)runner$(OBJEXT) : $(VM_DIR)$(DIR_SEP)runner.c
+$(OBJ_DIR)$(DIR_SEP)regex$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)regex.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)strapi$(OBJEXT) : $(VM_DIR)$(DIR_SEP)strapi.c
+$(OBJ_DIR)$(DIR_SEP)runner$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)runner.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)usedll$(OBJEXT) : $(VM_DIR)$(DIR_SEP)usedll.c
+$(OBJ_DIR)$(DIR_SEP)set$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)set.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)thread$(OBJEXT) : $(VM_DIR)$(DIR_SEP)thread.c
+$(OBJ_DIR)$(DIR_SEP)strapi$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)strapi.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)throw$(OBJEXT) : $(VM_DIR)$(DIR_SEP)throw.c
+$(OBJ_DIR)$(DIR_SEP)usedll$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)usedll.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)thread$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)thread.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)throw$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)throw.c
 	$(CC_CMD)
 
 #===============================================================================
 # FMSTAT.LIB rules
 #===============================================================================
-$(OBJ_DIR)$(DIR_SEP)fmSTAT$(OBJEXT) : $(VM_DIR)$(DIR_SEP)fm.c
+$(OBJ_DIR)$(DIR_SEP)fmSTAT$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)fm.c
 	$(CC_CMD_FMSTAT)
 
 #===============================================================================
@@ -1444,9 +1450,6 @@ $(OBJ_DIR)$(DIR_SEP)readvar.c : $(RTL_DIR)$(DIR_SEP)readvar.prg
 $(OBJ_DIR)$(DIR_SEP)readvar$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)readvar.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)regex$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)regex.c
-	$(CC_CMD)
-
 $(OBJ_DIR)$(DIR_SEP)regexrpl.c : $(RTL_DIR)$(DIR_SEP)regexrpl.prg
 	$(HB_CMD)
 
@@ -1484,9 +1487,6 @@ $(OBJ_DIR)$(DIR_SEP)seconds$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)seconds.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)session$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)session.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)set$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)set.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)readexit$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)readexit.c

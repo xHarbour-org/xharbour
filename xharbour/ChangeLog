@@ -8,6 +8,27 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-02 04:47 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  - source/rtl/regex.c
+  - source/rtl/set.c
+  + source/vm/regex.c
+  + source/vm/set.c
+  * source/rtl/Makefile
+  * source/vm/Makefile
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/make_b32.bat
+  * winmake/make_dc.bat
+  * winmake/make_gc.bat
+  * winmake/make_pc.bat
+  * winmake/make_vc.bat
+  * winmake/make_w32.bat
+  * winmake/mdir.bat
+    ! move module using internals to vm library so now MT application will
+    only have to use vmmt.lib in place of vm.lib
+    ! remove creation of no longer required MT libraries as they are now common
+    to both ST and MT applications.
+
 2012-06-30 01:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/mdir.bat
     ! clean make did not delete hbdict.exe and hbextern.exe, fixed.

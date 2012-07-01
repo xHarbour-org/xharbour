@@ -110,7 +110,6 @@ C_SOURCES=\
 	readexit.c   \
 	readins.c    \
 	readline.c   \
-	regex.c      \
 	replic.c     \
 	right.c      \
 	round.c      \
@@ -119,7 +118,6 @@ C_SOURCES=\
 	saverest.c   \
 	scroll.c     \
 	seconds.c    \
-	set.c        \
 	setcolor.c   \
 	setcurs.c    \
 	setkey.c     \
