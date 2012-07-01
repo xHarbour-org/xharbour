@@ -66,7 +66,7 @@ rem=============================================================================
 
    SET HB_THREAD_SUPPORT=1
    SET HB_MT=mt
-   SET HB_MT_DIR=/mt
+   SET HB_MT_DIR=
    @CALL winmake\mdir.bat
    mingw32-make.exe -f winmake\makefile.gc 1>>make0_%SUB_DIR%.log 2>>make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
@@ -136,7 +136,7 @@ rem=============================================================================
 
    REM SET HB_THREAD_SUPPORT=1
    REM SET HB_MT=mt
-   REM SET HB_MT_DIR=/mt
+   REM SET HB_MT_DIR=
    REM mingw32-make.exe -f winmake\makefile.gc  1>>cont0_%SUB_DIR%.log 2>>cont_%SUB_DIR%.log
    REM if errorlevel 1 goto BUILD_ERR
 

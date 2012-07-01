@@ -69,7 +69,7 @@ rem=============================================================================
    if "%2"=="nomt" goto BUILD_OK
 
    SET HB_MT=mt
-   SET HB_MT_DIR=\mt
+   SET HB_MT_DIR=
    @CALL winmake\mdir.bat
    %MAKE_EXE% -l -f winmake\makefile.dc
    if errorlevel 1 goto BUILD_ERR

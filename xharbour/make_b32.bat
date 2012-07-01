@@ -107,7 +107,7 @@ rem=============================================================================
    if "%2"=="nomt" goto BUILD_OK
 
    SET HB_MT=mt
-   SET HB_MT_DIR=\mt
+   SET HB_MT_DIR=
    @CALL winmake\mdir.bat
    make -s -l -DHB_THREAD_SUPPORT -fwinmake\makefile.bc >>make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
@@ -174,7 +174,7 @@ rem=============================================================================
    if errorlevel 1 goto CONTRIBS_ERR
 
    REM SET HB_MT=mt
-   REM SET HB_MT_DIR=\mt
+   REM SET HB_MT_DIR=
    REM make -s -l -DHB_THREAD_SUPPORT -fwinmake\makefile.bc >>cont_%SUB_DIR%.log
    REM if errorlevel 1 goto CONTRIBS_ERR
 

@@ -96,7 +96,7 @@ rem=============================================================================
    if "%2"=="nomt" goto BUILD_OK
 
    SET HB_MT=mt
-   SET HB_MT_DIR=\mt
+   SET HB_MT_DIR=
    SET __MT__=-MT -DHB_THREAD_SUPPORT
    SET HB_MT_FLAGS=-dHB_THREAD_SUPPORT
    SET PROJECT=$(MT_PROJECT)
