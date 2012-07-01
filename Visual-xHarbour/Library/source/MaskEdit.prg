@@ -31,6 +31,7 @@ CLASS MaskEdit INHERIT EditBox
    DATA  __Validate  EXPORTED INIT .F.
 
    DATA CueBanner    PROTECTED
+   DATA EnterNext    PROTECTED INIT .F.
 
    ACCESS PreBlock       INLINE ::oGet:preblock
    ASSIGN PreBlock(b)    INLINE ::oGet:preblock  := b
