@@ -1090,12 +1090,17 @@ HB_FUNC( ORACLEGETBINDDATA)
           if(century >= 100)
           {
              int year    = (unsigned char)(p->pLink[ iPos - 1 ].sDate[1]);
+             int month;
+             int day  ;
+             int hour ;
+             int min  ;
+             int sec  ;
              year = ((century-100)*100) + (year-100);
-             int month = p->pLink[ iPos - 1 ].sDate[2];
-             int day   = p->pLink[ iPos - 1 ].sDate[3];
-             int hour  = p->pLink[ iPos - 1 ].sDate[4] - 1;
-             int min   = p->pLink[ iPos - 1 ].sDate[5] - 1;
-             int sec   = p->pLink[ iPos - 1 ].sDate[6] - 1;
+             month = p->pLink[ iPos - 1 ].sDate[2];
+             day   = p->pLink[ iPos - 1 ].sDate[3];
+             hour  = p->pLink[ iPos - 1 ].sDate[4] - 1;
+             min   = p->pLink[ iPos - 1 ].sDate[5] - 1;
+             sec   = p->pLink[ iPos - 1 ].sDate[6] - 1;
              if ( p->pLink[ iPos - 1 ].iType == 8) 
                hb_retd( year, month,day ); /* returns a date */
             else
