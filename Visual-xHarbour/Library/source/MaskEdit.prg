@@ -61,6 +61,7 @@ CLASS MaskEdit INHERIT EditBox
    METHOD OnUndo()
    METHOD OnKeyDown()
    METHOD OnChar()
+   METHOD TabNextControl()
    METHOD OnSetFocus()
    METHOD OnKillFocus()
    METHOD OnPaste()
@@ -68,6 +69,7 @@ CLASS MaskEdit INHERIT EditBox
    METHOD OnClear( nwParam, nlParam )  INLINE ::OnCut( nwParam, nlParam )
    METHOD OnCut()
    METHOD VarPut( xVal ) INLINE Eval( ::oGet:Block, xVal ), ::oGet:updateBuffer()
+   METHOD OnLButtonDown()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -86,7 +88,20 @@ METHOD Init( oParent ) CLASS MaskEdit
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
+METHOD OnLButtonDown( nwParam, nlParam ) CLASS MaskEdit
+   LOCAL oCtrl := ObjFromHandle( GetFocus() )
+   Super:OnLButtonDown()
+   IF oCtrl != NIL .AND. oCtrl:__xCtrlName == "MaskEdit" .AND. oCtrl:hWnd != ::hWnd
+      oCtrl:SendMessage( WM_INVALID, ::hWnd, 0 )
+      IF ! oCtrl:IsValid
+         RETURN 0
+       ELSE
+         ::PostMessage( WM_LBUTTONUP, nwParam, nlParam )
+      ENDIF
+   ENDIF
+RETURN NIL
 
+//-----------------------------------------------------------------------------------------------
 METHOD SetGetProp( cProp, xVal ) CLASS MaskEdit
    IF cProp == "Picture" .AND. ::oGet != NIL
       ::oGet:Picture := xVal
@@ -94,7 +109,6 @@ METHOD SetGetProp( cProp, xVal ) CLASS MaskEdit
 RETURN xVal
 
 //-----------------------------------------------------------------------------------------------
-
 METHOD Create() CLASS MaskEdit
    LOCAL aTextExt := ::Drawing:GetTextExtentPoint32( 'X' )
 
@@ -125,14 +139,25 @@ METHOD Create() CLASS MaskEdit
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
+METHOD OnGetDlgCode( msg ) CLASS MaskEdit
+   IF msg != NIL .AND. msg:message == WM_KEYDOWN .AND. msg:wParam IN {13,9,40,38}
+      ::oGet:assign()
+      ::oGet:updatebuffer()
+      IF ::oGet:baddate()
+         MessageBeep( MB_OK )
+         ::oGet:buffer := dtoc(CTOD( "" ))
+      ENDIF
+      SetWindowText( ::hWnd, ::oGet:buffer )
+      ::SendMessage( WM_INVALID, 0, 0 )
 
-METHOD OnGetDlgCode() CLASS MaskEdit
-   LOCAL nRet
-   IF ::wParam > 0 .AND. ( ValType( ::oGet:postblock ) == "B" .OR. HGetPos( ::EventHandler, "Valid" ) > 0 )
-      nRet := DLGC_WANTMESSAGE | DLGC_WANTALLKEYS
-   ENDIF
-RETURN nRet
-
+      IF ::IsValid
+         ::TabNextControl()
+       ELSE
+         SetFocus( ::hWnd )
+      ENDIF
+      RETURN NIL
+    ENDIF
+RETURN DLGC_WANTALLKEYS
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnUserMsg( hWnd, nMsg, nwParam ) CLASS MaskEdit
@@ -143,11 +168,8 @@ METHOD OnUserMsg( hWnd, nMsg, nwParam ) CLASS MaskEdit
 
       CASE nMsg == WM_INVALID
            IF isChildOfActiveWindow( hWnd ) .AND. GetDlgCtrlID( nwParam ) <> IDCANCEL
-              IF !::lInValid .AND. ::__Validate
+              IF ! ::lInValid
                  ::lInValid := .T.
-                 IF ::__Validate
-                    ::__Validate := .F.
-                 ENDIF
                  IF ValType( ::oGet:postblock ) == "B" .OR. HGetPos( ::EventHandler, "Valid" ) != 0
                     coldbuff := ::oGet:buffer
                     h:=GetFocus()
@@ -191,7 +213,6 @@ METHOD OnUserMsg( hWnd, nMsg, nwParam ) CLASS MaskEdit
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
-
 METHOD OnUndo() CLASS MaskEdit
    ::oGet:Undo()
    ::oGet:changed := FALSE
@@ -200,9 +221,8 @@ METHOD OnUndo() CLASS MaskEdit
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
-
 METHOD OnKeyDown( nwParam, nlParam ) CLASS MaskEdit
-   LOCAL nStart, nEnd, i, lShift, lCtrl, cOldBuff, h, nCur, nPos
+   LOCAL nStart, nEnd, i, lShift, lCtrl, nCur, nPos
    IF ::ReadOnly
       RETURN(0)
    ENDIF
@@ -228,49 +248,6 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS MaskEdit
 
    DO CASE
       CASE ( nwParam == 40 .OR. nwParam == 38 )
-           IF ValType( ::oGet:postblock ) == "B" .OR. HGetPos( ::EventHandler, "Valid" ) != 0
-              IF !::lInValid
-                 ::oGet:assign()
-                 ::oGet:updatebuffer()
-                 IF ::oGet:baddate()
-                    MessageBeep( MB_OK )
-                    ::oGet:buffer:=dtoc(ctod( "" ))
-                 ENDIF
-                 SetWindowText( ::hWnd, ::oGet:buffer )
-                 //::Text := ::oGet:buffer
-                 cOldBuff := ::oGet:buffer
-                 h:=GetFocus()
-                 HideCaret(h)
-                 ::Validating := .T.
-                 ::IsValid := .T.
-                 IF ValType( ::oGet:postblock ) == "B"
-                    ::IsValid := eval( ::oGet:postblock, Self )
-                 ENDIF
-                 IF HGetPos( ::EventHandler, "Valid" ) != 0
-                    ::IsValid := ExecuteEvent( "Valid", Self )
-                 ENDIF
-                 ::Validating := .F.
-                 IF !::IsValid
-                    ::SetFocus()
-                  ELSE
-                    ShowCaret(h)
-                 ENDIF
-                 IF !( cOldBuff == ::oGet:buffer )
-                    SetWindowText( ::hWnd, ::oGet:buffer )
-                    //::Text := ::oGet:buffer
-                 ENDIF
-                 ::InvalidateRect()
-                 IF !::IsValid
-                    ShowCaret(h)
-                    RETURN 0
-                 ENDIF
-                 IF ::Parent:ClsName == "DataGrid"
-                    ::lInvalid := .T.
-                    ::SendMessage( WM_KILLFOCUS )
-                    ::Parent:SetFocus()
-                 ENDIF
-              ENDIF
-           ENDIF
 
            nCur := ASCAN( ::Parent:Children, {|o|o:hWnd == ::hWnd} ) + IIF( nwParam == 38, -1, 1 )
            FOR nPos := nCur TO IIF( nwParam == 38, 1, LEN( ::Parent:Children ) ) STEP IIF( nwParam == 38, -1, 1 )
@@ -304,26 +281,6 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS MaskEdit
                   ENDIF
               NEXT
            ENDIF
-
-      CASE ( nwParam == 13 .OR. nwParam == 9 )
-           IF ValType( ::oGet:postblock ) == 'B' .OR. HGetPos( ::EventHandler, "Valid" ) > 0
-              IF !::lInValid
-                 ::oGet:assign()
-                 ::oGet:updatebuffer()
-                 IF ::oGet:baddate()
-                    MessageBeep( MB_OK )
-                    ::oGet:buffer := dtoc(CTOD( "" ))
-                 ENDIF
-                 SetWindowText( ::hWnd, ::oGet:buffer )
-                 //::Text := ::oGet:buffer
-                 ::__Validate := .T.
-                 ::SendMessage( WM_INVALID, nwParam, 0 )
-                 ::InvalidateRect()
-              ENDIF
-            ELSEIF ::Parent:ClsName == "DataGrid"
-              ::Parent:SetFocus()
-           ENDIF
-           RETURN 0
 
       CASE nwParam == 27
            IF ::Parent:ClsName == "DataGrid"
@@ -420,15 +377,25 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS MaskEdit
               RETURN 0
            ENDIF
    ENDCASE
-
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
+METHOD TabNextControl() CLASS MaskEdit
+   LOCAL h, lShift := IsKeyDown( VK_SHIFT )
+   IF ( h := GetNextDlgTabItem( ::Form:hWnd, ::hWnd, lShift ) ) > 0
+      IF ::Form:Modal
+         PostMessage( ::Form:hWnd, WM_NEXTDLGCTL, h, MAKELPARAM( 1, 0 ) )
+       ELSE
+         SetFocus(h)
+      ENDIF
+   ENDIF
+RETURN NIL
 
+//-----------------------------------------------------------------------------------------------
 METHOD OnChar( nwParam, nlParam ) CLASS MaskEdit
-   LOCAL lShift, h, nStart, nEnd, i
+   LOCAL nStart, nEnd, i
 
-   IF nwParam==27
+   IF nwParam==27 .OR. ::Validating
       RETURN 0
    ENDIF
    IF ::ReadOnly
@@ -439,19 +406,6 @@ METHOD OnChar( nwParam, nlParam ) CLASS MaskEdit
       IF ! eval( ::OnCharacter, ::oGet, ::hWnd, nwParam, nlParam )
          RETURN 0
       ENDIF
-   ENDIF
-
-   IF ( nwParam==13 .or. nwParam==9 ) .AND. ::IsValid
-      lShift := CheckBit( GetKeyState( VK_SHIFT ) , 32768 )
-      IF ( h := GetNextDlgTabItem( ::Form:hWnd, ::hWnd, lShift ) ) # 0
-         IF ::Form:Modal
-            PostMessage( ::Form:hWnd, WM_NEXTDLGCTL, h, MAKELPARAM( 1, 0 ) )
-          ELSE
-            SetFocus(h)
-         ENDIF
-         RETURN 0
-      ENDIF
-
    ENDIF
 
    IF ::IsWindowEnabled()
@@ -600,7 +554,11 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD OnKillFocus( nwParam ) CLASS MaskEdit
+METHOD OnKillFocus() CLASS MaskEdit
+   IF ! ::IsValid
+      ::SetFocus()
+      RETURN 0
+   ENDIF
    IF ::oGet:Type == "N" .AND. ::oGet:VarGet() == 0
       ::oget:VarPut( 0 )
    ENDIF
@@ -613,17 +571,8 @@ METHOD OnKillFocus( nwParam ) CLASS MaskEdit
       ::oget:buffer:=dtoc(ctod( "" ))
    ENDIF
    SetWindowText( ::hWnd, ::oGet:buffer )
-   //::Text := ::oget:buffer
-   IF ::__Validate
-      IF ( ValType( ::oget:postblock ) == 'B' .OR. HGetPos( ::EventHandler, "Valid" ) != 0 ) .AND. !::lInValid .AND. ::TabValidate
-         ::PostMessage( WM_INVALID, nwParam, 0 )
-      ENDIF
-    ELSE
-      ::__Validate := .F.
-   ENDIF
    ::InvalidateRect()
    ::SendMessage( WM_MOUSEMOVE, 1, 1 )
-
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
