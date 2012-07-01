@@ -41,7 +41,6 @@ ECHO Creating System Files (MT) ...
 :_CORE
 if not exist obj               md obj
 if not exist obj\%SUB_DIR%     md obj\%SUB_DIR%
-if not exist obj\%SUB_DIR%\mt  md obj\%SUB_DIR%\mt
 
 if not exist lib               md lib
 if not exist lib\%SUB_DIR%     md lib\%SUB_DIR%
@@ -225,27 +224,16 @@ if exist lib\%LIBPREFIX%xharbour%LIBEXT%             del lib\%LIBPREFIX%xharbour
 if exist lib\%LIBPREFIX%codepage%LIBEXT%             del lib\%LIBPREFIX%codepage%LIBEXT%
 if exist lib\%LIBPREFIX%common%LIBEXT%               del lib\%LIBPREFIX%common%LIBEXT%
 if exist lib\%LIBPREFIX%ct%LIBEXT%                   del lib\%LIBPREFIX%ct%LIBEXT%
-if exist lib\%LIBPREFIX%ctmt%LIBEXT%                 del lib\%LIBPREFIX%ctmt%LIBEXT%
 if exist lib\%LIBPREFIX%dbfcdx%LIBEXT%               del lib\%LIBPREFIX%dbfcdx%LIBEXT%
-if exist lib\%LIBPREFIX%dbfcdxmt%LIBEXT%             del lib\%LIBPREFIX%dbfcdxmt%LIBEXT%
 if exist lib\%LIBPREFIX%dbfmdx%LIBEXT%               del lib\%LIBPREFIX%dbfmdx%LIBEXT%
-if exist lib\%LIBPREFIX%dbfmdxmt%LIBEXT%             del lib\%LIBPREFIX%dbfmdxmt%LIBEXT%
 if exist lib\%LIBPREFIX%bmdbfcdx%LIBEXT%             del lib\%LIBPREFIX%bmdbfcdx%LIBEXT%
-if exist lib\%LIBPREFIX%bmdbfcdxmt%LIBEXT%           del lib\%LIBPREFIX%bmdbfcdxmt%LIBEXT%
 if exist lib\%LIBPREFIX%redbfcdx%LIBEXT%             del lib\%LIBPREFIX%redbfcdx%LIBEXT%
-if exist lib\%LIBPREFIX%redbfcdxmt%LIBEXT%           del lib\%LIBPREFIX%redbfcdxmt%LIBEXT%
 if exist lib\%LIBPREFIX%redbffpt%LIBEXT%             del lib\%LIBPREFIX%redbffpt%LIBEXT%
-if exist lib\%LIBPREFIX%redbffptmt%LIBEXT%           del lib\%LIBPREFIX%redbffptmt%LIBEXT%
 if exist lib\%LIBPREFIX%bmsixcdx%LIBEXT%             del lib\%LIBPREFIX%bmsixcdx%LIBEXT%
-if exist lib\%LIBPREFIX%bmsixcdxmt%LIBEXT%           del lib\%LIBPREFIX%bmsixcdxmt%LIBEXT%
 if exist lib\%LIBPREFIX%dbfdbt%LIBEXT%               del lib\%LIBPREFIX%dbfdbt%LIBEXT%
-if exist lib\%LIBPREFIX%dbfdbtmt%LIBEXT%             del lib\%LIBPREFIX%dbfdbtmt%LIBEXT%
 if exist lib\%LIBPREFIX%dbffpt%LIBEXT%               del lib\%LIBPREFIX%dbffpt%LIBEXT%
-if exist lib\%LIBPREFIX%dbffptmt%LIBEXT%             del lib\%LIBPREFIX%dbffptmt%LIBEXT%
 if exist lib\%LIBPREFIX%dbfntx%LIBEXT%               del lib\%LIBPREFIX%dbfntx%LIBEXT%
-if exist lib\%LIBPREFIX%dbfntxmt%LIBEXT%             del lib\%LIBPREFIX%dbfntxmt%LIBEXT%
 if exist lib\%LIBPREFIX%dbfnsx%LIBEXT%               del lib\%LIBPREFIX%dbfnsx%LIBEXT%
-if exist lib\%LIBPREFIX%dbfnsxmt%LIBEXT%             del lib\%LIBPREFIX%dbfnsxmt%LIBEXT%
 if exist lib\%LIBPREFIX%debug%LIBEXT%                del lib\%LIBPREFIX%debug%LIBEXT%
 if exist lib\%LIBPREFIX%dllmain%LIBEXT%              del lib\%LIBPREFIX%dllmain%LIBEXT%
 if exist lib\%LIBPREFIX%filemem%LIBEXT%              del lib\%LIBPREFIX%filemem%LIBEXT%
@@ -262,32 +250,21 @@ if exist lib\%LIBPREFIX%gtwvg%LIBEXT%                del lib\%LIBPREFIX%gtwvg%LI
 if exist lib\%LIBPREFIX%gtwvt%LIBEXT%                del lib\%LIBPREFIX%gtwvt%LIBEXT%
 if exist lib\%LIBPREFIX%gtwvw%LIBEXT%                del lib\%LIBPREFIX%gtwvw%LIBEXT%
 if exist lib\%LIBPREFIX%hbodbc%LIBEXT%               del lib\%LIBPREFIX%hbodbc%LIBEXT%
-if exist lib\%LIBPREFIX%hbodbcmt%LIBEXT%             del lib\%LIBPREFIX%hbodbcmt%LIBEXT%
 if exist lib\%LIBPREFIX%hbsix%LIBEXT%                del lib\%LIBPREFIX%hbsix%LIBEXT%
-if exist lib\%LIBPREFIX%hbsixmt%LIBEXT%              del lib\%LIBPREFIX%hbsixmt%LIBEXT%
 if exist lib\%LIBPREFIX%hsx%LIBEXT%                  del lib\%LIBPREFIX%hsx%LIBEXT%
-if exist lib\%LIBPREFIX%hsxmt%LIBEXT%                del lib\%LIBPREFIX%hsxmt%LIBEXT%
 if exist lib\%LIBPREFIX%lang%LIBEXT%                 del lib\%LIBPREFIX%lang%LIBEXT%
 if exist lib\%LIBPREFIX%libmisc%LIBEXT%              del lib\%LIBPREFIX%libmisc%LIBEXT%
 if exist lib\%LIBPREFIX%macro%LIBEXT%                del lib\%LIBPREFIX%macro%LIBEXT%
-if exist lib\%LIBPREFIX%macromt%LIBEXT%              del lib\%LIBPREFIX%macromt%LIBEXT%
 if exist lib\%LIBPREFIX%nulsys%LIBEXT%               del lib\%LIBPREFIX%nulsys%LIBEXT%
 if exist lib\%LIBPREFIX%pcrepos%LIBEXT%              del lib\%LIBPREFIX%pcrepos%LIBEXT%
 if exist lib\%LIBPREFIX%pp%LIBEXT%                   del lib\%LIBPREFIX%pp%LIBEXT%
-if exist lib\%LIBPREFIX%ppmt%LIBEXT%                 del lib\%LIBPREFIX%ppmt%LIBEXT%
 if exist lib\%LIBPREFIX%rdd%LIBEXT%                  del lib\%LIBPREFIX%rdd%LIBEXT%
-if exist lib\%LIBPREFIX%rddmt%LIBEXT%                del lib\%LIBPREFIX%rddmt%LIBEXT%
 if exist lib\%LIBPREFIX%rdds%LIBEXT%                 del lib\%LIBPREFIX%rdds%LIBEXT%
-if exist lib\%LIBPREFIX%rddsmt%LIBEXT%               del lib\%LIBPREFIX%rddsmt%LIBEXT%
 if exist lib\%LIBPREFIX%rtl%LIBEXT%                  del lib\%LIBPREFIX%rtl%LIBEXT%
-if exist lib\%LIBPREFIX%rtlmt%LIBEXT%                del lib\%LIBPREFIX%rtlmt%LIBEXT%
 if exist lib\%LIBPREFIX%samples%LIBEXT%              del lib\%LIBPREFIX%samples%LIBEXT%
-if exist lib\%LIBPREFIX%samplesmt%LIBEXT%            del lib\%LIBPREFIX%samplesmt%LIBEXT%
 if exist lib\%LIBPREFIX%sixcdx%LIBEXT%               del lib\%LIBPREFIX%sixcdx%LIBEXT%
-if exist lib\%LIBPREFIX%sixcdxmt%LIBEXT%             del lib\%LIBPREFIX%sixcdxmt%LIBEXT%
 if exist lib\%LIBPREFIX%sevenzip%LIBEXT%             del lib\%LIBPREFIX%sevenzip%LIBEXT%
 if exist lib\%LIBPREFIX%tip%LIBEXT%                  del lib\%LIBPREFIX%tip%LIBEXT%
-if exist lib\%LIBPREFIX%tipmt%LIBEXT%                del lib\%LIBPREFIX%tipmt%LIBEXT%
 if exist lib\%LIBPREFIX%tipssl%LIBEXT%               del lib\%LIBPREFIX%tipssl%LIBEXT%
 if exist lib\%LIBPREFIX%hbcurl%LIBEXT%               del lib\%LIBPREFIX%hbcurl%LIBEXT%
 if exist lib\%LIBPREFIX%hbmlzo%LIBEXT%               del lib\%LIBPREFIX%hbmlzo%LIBEXT%
@@ -299,7 +276,6 @@ if exist lib\%LIBPREFIX%hbmagic%LIBEXT%              del lib\%LIBPREFIX%hbmagic%
 if exist lib\%LIBPREFIX%hbzebra%LIBEXT%              del lib\%LIBPREFIX%hbzebra%LIBEXT%
 if exist lib\%LIBPREFIX%use_dll%LIBEXT%              del lib\%LIBPREFIX%use_dll%LIBEXT%
 if exist lib\%LIBPREFIX%usrrdd%LIBEXT%               del lib\%LIBPREFIX%usrrdd%LIBEXT%
-if exist lib\%LIBPREFIX%usrrddmt%LIBEXT%             del lib\%LIBPREFIX%usrrddmt%LIBEXT%
 if exist lib\%LIBPREFIX%vm%LIBEXT%                   del lib\%LIBPREFIX%vm%LIBEXT%
 if exist lib\%LIBPREFIX%vmmt%LIBEXT%                 del lib\%LIBPREFIX%vmmt%LIBEXT%
 if exist lib\%LIBPREFIX%zlib%LIBEXT%                 del lib\%LIBPREFIX%zlib%LIBEXT%
@@ -342,27 +318,17 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%*.bak              del lib\%SUB_DIR%\%LIBPREFI
 if exist lib\%SUB_DIR%\%LIBPREFIX%*%OBJEXT%          del lib\%SUB_DIR%\%LIBPREFIX%*%OBJEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%*.map              del lib\%SUB_DIR%\%LIBPREFIX%*.map
 if exist lib\%SUB_DIR%\%LIBPREFIX%bmdbfcdx%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%bmdbfcdx%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%bmdbfcdxmt%LIBEXT% del lib\%SUB_DIR%\%LIBPREFIX%bmdbfcdxmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%bmsixcdx%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%bmsixcdx%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%bmsixcdxmt%LIBEXT% del lib\%SUB_DIR%\%LIBPREFIX%bmsixcdxmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%redbfcdx%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%redbfcdx%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%redbfcdxmt%LIBEXT% del lib\%SUB_DIR%\%LIBPREFIX%redbfcdxmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%redbffpt%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%redbffpt%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%redbffptmt%LIBEXT% del lib\%SUB_DIR%\%LIBPREFIX%redbffptmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%codepage%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%codepage%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%common%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%common%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%ct%LIBEXT%         del lib\%SUB_DIR%\%LIBPREFIX%ct%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%ctmt%LIBEXT%       del lib\%SUB_DIR%\%LIBPREFIX%ctmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%dbfcdx%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%dbfcdx%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%dbfcdxmt%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%dbfcdxmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%dbfmdx%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%dbfmdx%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%dbfmdxmt%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%dbfmdxmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%dbffpt%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%dbffpt%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%dbffptmt%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%dbffptmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%dbfntx%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%dbfntx%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%dbfntxmt%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%dbfntxmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%dbfnsx%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%dbfnsx%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%dbfnsxmt%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%dbfnsxmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%debug%LIBEXT%      del lib\%SUB_DIR%\%LIBPREFIX%debug%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%dllmain%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%dllmain%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%filemem%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%filemem%LIBEXT%
@@ -378,29 +344,19 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%gtwvg%LIBEXT%      del lib\%SUB_DIR%\%LIBPREFI
 if exist lib\%SUB_DIR%\%LIBPREFIX%gtwvt%LIBEXT%      del lib\%SUB_DIR%\%LIBPREFIX%gtwvt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbodbc%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%hbodbc%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbsix%LIBEXT%      del lib\%SUB_DIR%\%LIBPREFIX%hbsix%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%hbsixmt%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%hbsixmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hsx%LIBEXT%        del lib\%SUB_DIR%\%LIBPREFIX%hsx%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%hsxmt%LIBEXT%      del lib\%SUB_DIR%\%LIBPREFIX%hsxmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%lang%LIBEXT%       del lib\%SUB_DIR%\%LIBPREFIX%lang%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%libmisc%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%libmisc%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%macro%LIBEXT%      del lib\%SUB_DIR%\%LIBPREFIX%macro%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%macromt%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%macromt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%nulsys%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%nulsys%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%pcrepos%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%pcrepos%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%pp%LIBEXT%         del lib\%SUB_DIR%\%LIBPREFIX%pp%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%ppmt%LIBEXT%       del lib\%SUB_DIR%\%LIBPREFIX%ppmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%rdd%LIBEXT%        del lib\%SUB_DIR%\%LIBPREFIX%rdd%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%rddmt%LIBEXT%      del lib\%SUB_DIR%\%LIBPREFIX%rddmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%rdds%LIBEXT%       del lib\%SUB_DIR%\%LIBPREFIX%rdds%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%rddsmt%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%rddsmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%rtl%LIBEXT%        del lib\%SUB_DIR%\%LIBPREFIX%rtl%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%rtlmt%LIBEXT%      del lib\%SUB_DIR%\%LIBPREFIX%rtlmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%sixcdx%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%sixcdx%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%sixcdxmt%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%sixcdxmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%tip%LIBEXT%        del lib\%SUB_DIR%\%LIBPREFIX%tip%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%tipmt%LIBEXT%      del lib\%SUB_DIR%\%LIBPREFIX%tipmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%usrrdd%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%usrrdd%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%usrrddmt%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%usrrddmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%use_dll%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%use_dll%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%vm%LIBEXT%         del lib\%SUB_DIR%\%LIBPREFIX%vm%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%vmmt%LIBEXT%       del lib\%SUB_DIR%\%LIBPREFIX%vmmt%LIBEXT%
@@ -419,13 +375,6 @@ if exist obj\%SUB_DIR%\bin\*%OBJEXT%                 del obj\%SUB_DIR%\bin\*%OBJ
 if exist obj\%SUB_DIR%\bin\*.output                  del obj\%SUB_DIR%\bin\*.output
 if exist obj\%SUB_DIR%\bin\*.c                       del obj\%SUB_DIR%\bin\*.c
 if exist obj\%SUB_DIR%\bin\*.h                       del obj\%SUB_DIR%\bin\*.h
-
-if exist obj\%SUB_DIR%\mt\*%OBJEXT%                  del obj\%SUB_DIR%\mt\*%OBJEXT%
-if exist obj\%SUB_DIR%\mt\*.output                   del obj\%SUB_DIR%\mt\*.output
-if exist obj\%SUB_DIR%\mt\*.c                        del obj\%SUB_DIR%\mt\*.c
-if exist obj\%SUB_DIR%\mt\*.ppo                      del obj\%SUB_DIR%\mt\*.ppo
-if exist obj\%SUB_DIR%\mt\*.h                        del obj\%SUB_DIR%\mt\*.h
-if exist obj\%SUB_DIR%\mt\*.tmp                      del obj\%SUB_DIR%\mt\*.tmp
 
 if exist bin\%SUB_DIR%\harbour.exp                   del bin\%SUB_DIR%\harbour.exp
 if exist bin\%SUB_DIR%\hbdoc.exp                     del bin\%SUB_DIR%\hbdoc.exp
@@ -520,13 +469,10 @@ if exist bin\xbscriptdll.exe                         del bin\xbscriptdll.exe
 
 ECHO Removing Contrib Libraries and Object Files ...
 if exist obj\%SUB_DIR%\*%OBJEXT%                    del obj\%SUB_DIR%\*%OBJEXT%
-if exist obj\%SUB_DIR%\mt\*%OBJEXT%                 del obj\%SUB_DIR%\mt\*%OBJEXT%
 if exist obj\%SUB_DIR%\*.ppo                        del obj\%SUB_DIR%\*.ppo
 if exist obj\%SUB_DIR%\*.idb                        del obj\%SUB_DIR%\*.idb
 if exist obj\%SUB_DIR%\*.pch                        del obj\%SUB_DIR%\*.pch
-if exist obj\%SUB_DIR%\mt\*.ppo                     del obj\%SUB_DIR%\mt\*.ppo
 if exist obj\%SUB_DIR%\*.c                          del obj\%SUB_DIR%\*.c
-if exist obj\%SUB_DIR%\mt\*.c                       del obj\%SUB_DIR%\mt\*.c
 
 if exist lib\%SUB_DIR%\%LIBPREFIX%mysql%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%mysql%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%filemem%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%filemem%LIBEXT%

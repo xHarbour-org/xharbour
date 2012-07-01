@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-02 04:51 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/mdir.bat
+    ! missing from previous commit
+
 2012-07-02 04:47 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   - source/rtl/regex.c
   - source/rtl/set.c
