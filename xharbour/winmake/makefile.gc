@@ -94,23 +94,23 @@ HARBOUR_LIBS=\
 	-lvm$(HB_MT)\
 	-lrtl$(HB_MT)\
 	-lrdd$(HB_MT)\
-	-lct$(HB_MT)\
+	-lct\
 	-lzlib\
 	-lgtwin\
 	-llibmisc\
 	-lcodepage\
 	-lmacro$(HB_MT)\
-	-ldbfcdx$(HB_MT)\
-	-lbmdbfcdx$(HB_MT)\
-	-lsixcdx$(HB_MT)\
-	-ldbfntx$(HB_MT)\
-	-ldbfnsx$(HB_MT)\
-	-ldbffpt$(HB_MT)\
-	-lhbsix$(HB_MT)\
+	-ldbfcdx\
+	-lbmdbfcdx\
+	-lsixcdx\
+	-ldbfntx\
+	-ldbfnsx\
+	-ldbffpt\
+	-lhbsix\
 	-lhsx$(HB_MT)\
 	-lpcrepos\
 	-lcommon\
-	-lpp$(HB_MT)\
+	-lpp\
 	-llang\
 	-Wl,--end-group
 COMPILERLIBS=\
