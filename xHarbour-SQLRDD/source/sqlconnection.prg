@@ -901,7 +901,7 @@ Return NIL
 
 /*------------------------------------------------------------------------*/
 
-Static Function SR_AdjustNum(a)
+Function SR_AdjustNum(a)
 
    local b := aClone(a)
    local i

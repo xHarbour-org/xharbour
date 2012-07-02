@@ -8,6 +8,10 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-01 10:37 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  * source/sqlconnection.prg
+    SR_AdjustNum made NON static as it is also used in other PRG's
+
 2012-06-01 15:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
   * source/sqlrdd2.prg
     ! fixed an typo on source
