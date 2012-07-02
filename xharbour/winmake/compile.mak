@@ -598,10 +598,10 @@ $(OBJ_DIR)$(DIR_SEP)rddinfo$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)rddinfo.c
 $(OBJ_DIR)$(DIR_SEP)workarea$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)workarea.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)wacore$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)wacore.c
+$(OBJ_DIR)$(DIR_SEP)wacore$(HB_MT)$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)wacore.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)wafunc$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)wafunc.c
+$(OBJ_DIR)$(DIR_SEP)wafunc$(HB_MT)$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)wafunc.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)dbf1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbf1.c
@@ -844,9 +844,6 @@ $(OBJ_DIR)$(DIR_SEP)proc$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)proc.c
 $(OBJ_DIR)$(DIR_SEP)pvalue$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)pvalue.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)regex$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)regex.c
-	$(CC_CMD)
-
 $(OBJ_DIR)$(DIR_SEP)runner$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)runner.c
 	$(CC_CMD)
 
@@ -910,7 +907,7 @@ $(OBJ_DIR)$(DIR_SEP)arrayblk$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)arrayblk.c
 $(OBJ_DIR)$(DIR_SEP)at$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)at.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)bkgtsks$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)bkgtsks.c
+$(OBJ_DIR)$(DIR_SEP)bkgtsks$(HB_MT)$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)bkgtsks.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)binnum$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)binnum.c
@@ -967,7 +964,7 @@ $(OBJ_DIR)$(DIR_SEP)clpclass$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)clpclass.c
 $(OBJ_DIR)$(DIR_SEP)colorind$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)colorind.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)console$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)console.c
+$(OBJ_DIR)$(DIR_SEP)console$(HB_MT)$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)console.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)copyfile$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)copyfile.c
@@ -1066,10 +1063,10 @@ $(OBJ_DIR)$(DIR_SEP)empty$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)empty.c
 $(OBJ_DIR)$(DIR_SEP)error$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)error.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)errorsys.c : $(RTL_DIR)$(DIR_SEP)errorsys.prg
+$(OBJ_DIR)$(DIR_SEP)errorsys$(HB_MT).c : $(RTL_DIR)$(DIR_SEP)errorsys.prg
 	$(HB_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)errorsys$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)errorsys.c
+$(OBJ_DIR)$(DIR_SEP)errorsys$(HB_MT)$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)errorsys$(HB_MT).c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)fieldbl.c : $(RTL_DIR)$(DIR_SEP)fieldbl.prg
@@ -1093,13 +1090,13 @@ $(OBJ_DIR)$(DIR_SEP)getsys$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)getsys.c
 $(OBJ_DIR)$(DIR_SEP)file$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)file.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)filebuf$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)filebuf.c
+$(OBJ_DIR)$(DIR_SEP)filebuf$(HB_MT)$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)filebuf.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)filehb$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)filehb.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)filenet$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)filenet.c
+$(OBJ_DIR)$(DIR_SEP)filenet$(HB_MT)$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)filenet.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)filestat$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)filestat.c
@@ -1210,19 +1207,19 @@ $(OBJ_DIR)$(DIR_SEP)hboutdbg$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hboutdbg.c
 $(OBJ_DIR)$(DIR_SEP)hbntos$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbntos.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)hblog.c : $(RTL_DIR)$(DIR_SEP)hblog.prg
+$(OBJ_DIR)$(DIR_SEP)hblog$(HB_MT).c : $(RTL_DIR)$(DIR_SEP)hblog.prg
 	$(HB_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)hblog$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hblog.c
+$(OBJ_DIR)$(DIR_SEP)hblog$(HB_MT)$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hblog$(HB_MT).c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hbmd5$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbmd5.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)hblognet.c : $(RTL_DIR)$(DIR_SEP)hblognet.prg
+$(OBJ_DIR)$(DIR_SEP)hblognet$(HB_MT).c : $(RTL_DIR)$(DIR_SEP)hblognet.prg
 	$(HB_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)hblognet$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hblognet.c
+$(OBJ_DIR)$(DIR_SEP)hblognet$(HB_MT)$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hblognet$(HB_MT).c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hbhex2n$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbhex2n.c
@@ -1243,7 +1240,7 @@ $(OBJ_DIR)$(DIR_SEP)hbserial.c : $(RTL_DIR)$(DIR_SEP)hbserial.prg
 $(OBJ_DIR)$(DIR_SEP)hbserial$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hbserial.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)hbserv$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbserv.c
+$(OBJ_DIR)$(DIR_SEP)hbserv$(HB_MT)$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbserv.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hbsrlraw$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbsrlraw.c
@@ -1258,7 +1255,7 @@ $(OBJ_DIR)$(DIR_SEP)hbtoken$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbtoken.c
 $(OBJ_DIR)$(DIR_SEP)hbxml$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbxml.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)idle$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)idle.c
+$(OBJ_DIR)$(DIR_SEP)idle$(HB_MT)$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)idle.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)inkey$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)inkey.c
@@ -1297,7 +1294,7 @@ $(OBJ_DIR)$(DIR_SEP)listbox.c : $(RTL_DIR)$(DIR_SEP)listbox.prg
 $(OBJ_DIR)$(DIR_SEP)listbox$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)listbox.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)math$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)math.c
+$(OBJ_DIR)$(DIR_SEP)math$(HB_MT)$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)math.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)maxrow$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)maxrow.c
@@ -1448,6 +1445,9 @@ $(OBJ_DIR)$(DIR_SEP)readvar.c : $(RTL_DIR)$(DIR_SEP)readvar.prg
 	$(HB_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)readvar$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)readvar.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)regex$(HB_MT)$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)regex.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)regexrpl.c : $(RTL_DIR)$(DIR_SEP)regexrpl.prg
@@ -1657,7 +1657,7 @@ $(OBJ_DIR)$(DIR_SEP)tpopup$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)tpopup.c
 $(OBJ_DIR)$(DIR_SEP)tprinter$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)tprinter.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)trace$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)trace.c
+$(OBJ_DIR)$(DIR_SEP)trace$(HB_MT)$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)trace.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)transfrm$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)transfrm.c
@@ -1771,16 +1771,16 @@ $(OBJ_DIR)$(DIR_SEP)xhelp$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)xhelp.c
 $(OBJ_DIR)$(DIR_SEP)xsavescr$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)xsavescr.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)trpc.c : $(RTL_DIR)$(DIR_SEP)trpc.prg
+$(OBJ_DIR)$(DIR_SEP)trpc$(HB_MT).c : $(RTL_DIR)$(DIR_SEP)trpc.prg
 	$(HB_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)trpc$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)trpc.c
+$(OBJ_DIR)$(DIR_SEP)trpc$(HB_MT)$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)trpc$(HB_MT).c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)trpccli.c : $(RTL_DIR)$(DIR_SEP)trpccli.prg
+$(OBJ_DIR)$(DIR_SEP)trpccli$(HB_MT).c : $(RTL_DIR)$(DIR_SEP)trpccli.prg
 	$(HB_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)trpccli$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)trpccli.c
+$(OBJ_DIR)$(DIR_SEP)trpccli$(HB_MT)$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)trpccli$(HB_MT).c
 	$(CC_CMD)
 
 #===============================================================================
@@ -2203,7 +2203,7 @@ $(OBJ_DIR)$(DIR_SEP)sxtrig$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)sxtrig.c
 #===============================================================================
 # HSX.LIB rules
 #===============================================================================
-$(OBJ_DIR)$(DIR_SEP)hsx$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)hsx$(DIR_SEP)hsx.c
+$(OBJ_DIR)$(DIR_SEP)hsx$(HB_MT)$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)hsx$(DIR_SEP)hsx.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)cftsfunc$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)hsx$(DIR_SEP)cftsfunc.c

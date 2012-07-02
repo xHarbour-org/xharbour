@@ -110,6 +110,7 @@ C_SOURCES=\
 	readexit.c   \
 	readins.c    \
 	readline.c   \
+	regex.c      \
 	replic.c     \
 	right.c      \
 	round.c      \

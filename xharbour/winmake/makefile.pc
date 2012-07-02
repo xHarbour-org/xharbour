@@ -49,8 +49,8 @@ HARBOURFLAGS=$(HARBOURFLAGS) $(INCLUDE_DIR) -q0 -w2 -es2 -gc0
 #  -n is ONLY applied to main module to make sure that only that module will
 #  execute upon running the executable.
 #-------------------------------------------------------------------------------
-HB_CMD       =$(HARBOUR_EXE) /n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
-HB_CMD_MAIN  =$(HARBOUR_EXE) /n0 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
+HB_CMD       =$(HARBOUR_EXE) /n1 $(LINEFLAGS) $(HB_MT_FLAGS) $(HARBOURFLAGS) $** -o$@
+HB_CMD_MAIN  =$(HARBOUR_EXE) /n0 $(LINEFLAGS) $(HB_MT_FLAGS) $(HARBOURFLAGS) $** -o$@
 
 CLIBFLAGS    =$(CLIBFLAGS) /Ze /Zx /Tx86-coff /Go $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"NULL=0" /D"HAVE_CONFIG_H"
 CC_CMD       =POCC $(__MT__) $(CLIBFLAGS) /Fo$@ $**
@@ -253,13 +253,13 @@ $(OBJ_DIR)\harboury$(OBJEXT) : $(OBJ_DIR)\harboury.c
 $(OBJ_DIR)\macroy.c : $(MACRO_DIR)\macro.y
 	$(BISON_CMD2)
 
-$(OBJ_DIR)\macroy$(OBJEXT) : $(OBJ_DIR)\macroy.c
+$(OBJ_DIR)\macroy$(HB_MT)$(OBJEXT) : $(OBJ_DIR)\macroy.c
 	$(CC_CMD)
 !else
 $(OBJ_DIR)\harboury$(OBJEXT) : $(COMPILER_DIR)\harbouryy.c
 	$(CC_CMD)
 
-$(OBJ_DIR)\macroy$(OBJEXT) : $(MACRO_DIR)\macroyy.c
+$(OBJ_DIR)\macroy$(HB_MT)$(OBJEXT) : $(MACRO_DIR)\macroyy.c
 	$(CC_CMD)
 !endif
 !include winmake\compile.mak

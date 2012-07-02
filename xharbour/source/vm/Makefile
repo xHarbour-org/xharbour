@@ -61,7 +61,6 @@ C_SOURCES=\
 	pcount.c     \
 	proc.c       \
 	pvalue.c     \
-	regex.c      \
 	runner.c     \
 	set.c        \
 	thread.c     \

@@ -39,6 +39,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 INCLUDE_DIR=-I"include" -I"$(OBJ_DIR)" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(ZLIB_DIR)"
 !if ("$(HB_MT)"=="mt")
+HARBOURFLAGS=-dHB_THREAD_SUPPORT
 CLIBFLAGS   =-D_MT -DHB_THREAD_SUPPORT
 CLIBFLAGS_C =-D_MT -DHB_THREAD_SUPPORT
 !endif
@@ -608,13 +609,13 @@ $(OBJ_DIR)\harboury$(OBJEXT) : $(OBJ_DIR)\harboury.c
 $(OBJ_DIR)\macroy.c : $(MACRO_DIR)\macro.y
 	$(BISON_CMD2)
 
-$(OBJ_DIR)\macroy$(OBJEXT) : $(OBJ_DIR)\macroy.c
+$(OBJ_DIR)\macroy$(HB_MT)$(OBJEXT) : $(OBJ_DIR)\macroy.c
 	$(CC_CMD)
 !else
 $(OBJ_DIR)\harboury$(OBJEXT) : $(COMPILER_DIR)\harbouryy.c
 	$(CC_CMD)
 
-$(OBJ_DIR)\macroy$(OBJEXT) : $(MACRO_DIR)\macroyy.c
+$(OBJ_DIR)\macroy$(HB_MT)$(OBJEXT) : $(MACRO_DIR)\macroyy.c
 	$(CC_CMD)
 !endif
 !include winmake\compile.mak

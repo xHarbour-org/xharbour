@@ -489,6 +489,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 !if $d(DLL_MT)
 CLIBFLAGS   =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT
 !else
+HARBOURFLAGS=$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
 CLIBFLAGS   =$(CLIBFLAGS) -tWD
 !endif
 !ifdef HB_DIR_ADS
@@ -611,7 +612,7 @@ CLIBFLAGS    =$(CLIBFLAGS) -c -q $(ACEH_DIR) $(CAIRO_DIR) $(CURL_DIR) $(OPENSSL_
 HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -i$(GDLIB_DIR)\include -i$(WHAT32_DIR)\include -i$(XWT_DIR)\include -q0 -w2 -es2 -gc0
 !if $d(HB_THREAD_SUPPORT)
 CLIBFLAGS    =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT
-HB_MT_FLAGS  =-DHB_THREAD_SUPPORT
+HARBOURFLAGS =-dHB_THREAD_SUPPORT $(HARBOURFLAGS)
 !endif
 
 # User flags should be able to override everything!
@@ -978,13 +979,13 @@ $(OBJ_DIR)\harboury$(OBJEXT) : $(OBJ_DIR)\harboury.c
 $(OBJ_DIR)\macroy.c : $(MACRO_DIR)\macro.y
 	$(BISON_CMD2)
 
-$(OBJ_DIR)\macroy$(OBJEXT) : $(OBJ_DIR)\macroy.c
+$(OBJ_DIR)\macroy$(HB_MT)$(OBJEXT) : $(OBJ_DIR)\macroy.c
 	$(CC_CMD)
 !else
 $(OBJ_DIR)\harboury$(OBJEXT) : $(COMPILER_DIR)\harbouryy.c
 	$(CC_CMD)
 
-$(OBJ_DIR)\macroy$(OBJEXT) : $(MACRO_DIR)\macroyy.c
+$(OBJ_DIR)\macroy$(HB_MT)$(OBJEXT) : $(MACRO_DIR)\macroyy.c
 	$(CC_CMD)
 !endif
 !include winmake\compile.mak

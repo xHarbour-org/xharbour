@@ -8,6 +8,28 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-02 10:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  - source/vm/regex.c
+  + source/rtl/regex.c
+  * source/vm/Makefile
+  * source/rtl/Makefile
+    ! move regex.c to where it should belonged
+
+  * winmake/common.mak
+  * winmake/compile.mak
+    ! re-enabled: rtlmt.lib, rddmt.lib, hsxmt.lib and macromt.lib
+    ! MT application should now use: vmmt.lib, rddmt.lib, rtlmt.lib,
+    macromt.lib and hsxmt.lib
+
+  * winmake/makefile.bc
+  * winmake/makefile.dc
+  * winmake/makefile.gc
+  * winmake/makefile.pc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+  * winmake/mdir.bat
+    ! add -dHB_THREAD_SUPPORT to HARBOURFLAGS when building MT libraries
+
 2012-07-02 05:01 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/make_b32.bat
   * winmake/make_dc.bat

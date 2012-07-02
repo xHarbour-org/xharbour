@@ -49,6 +49,7 @@ HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 
 !ifdef HB_THREAD_SUPPORT
 CLIBFLAGS   =$(CLIBFLAGS) -bm -DHB_THREAD_SUPPORT
+HARBOURFLAGS=-dHB_THREAD_SUPPORT $(HARBOURFLAGS)
 !endif
 
 #-------------------------------------------------------------------------------
@@ -312,6 +313,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 !if ("$(DLL_MT)"=="mt")
 CLIBFLAGS   =$(CLIBFLAGS) -bm -DHB_THREAD_SUPPORT
+HARBOURFLAGS=$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
 !endif
 
 DLLFLAGS=\
@@ -649,13 +651,13 @@ $(OBJ_DIR)\harboury$(OBJEXT) : $(OBJ_DIR)\harboury.c
 $(OBJ_DIR)\macroy.c : $(MACRO_DIR)\macro.y
 	$(BISON_CMD2)
 
-$(OBJ_DIR)\macroy$(OBJEXT) : $(OBJ_DIR)\macroy.c
+$(OBJ_DIR)\macroy$(HB_MT)$(OBJEXT) : $(OBJ_DIR)\macroy.c
 	$(CC_CMD)
 !else
 $(OBJ_DIR)\harboury$(OBJEXT) : $(COMPILER_DIR)\harbouryy.c
 	$(CC_CMD)
 
-$(OBJ_DIR)\macroy$(OBJEXT) : $(MACRO_DIR)\macroyy.c
+$(OBJ_DIR)\macroy$(HB_MT)$(OBJEXT) : $(MACRO_DIR)\macroyy.c
 	$(CC_CMD)
 !endif
 !include winmake\compile.mak
