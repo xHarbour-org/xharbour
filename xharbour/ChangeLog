@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-02 18:02 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/common.mak
+  * winmake/compile.mak
+    ! break.obj, harbinit.obj, initsymb.obj, memvclip.obj and throw.obj are
+    shared among ST and MT libs
+
+  * tests/mtcomplexshare.prg
+    ! function does not return value, fixed.
+
 2012-07-02 17:09 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.gc
     ! MT exe not built, fixed.

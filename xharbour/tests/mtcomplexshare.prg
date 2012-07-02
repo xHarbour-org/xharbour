@@ -1,3 +1,22 @@
+*
+* Complex example of Multi thread usage
+*
+* Giancarlo Niccolai
+* $Id$
+*
+* Here we have a main thread counting, and some secondary
+* threads counting too (in different fashons).
+* A control thread is notified when each secondary
+* thread finishes, and some of the secondary threads
+* are killed before they are able to reach the end.
+*
+* Added atomic or volatile increment and decrement of counters of complex
+* types and structures. Now is safe to share complex data type in diferent
+* threads if C compiler or OS support function or create ASM thread-safe to
+* inc/dec.
+* NOTE: Atomic increment and decrement need counter memory aligned and 32 bits
+* of lenght.
+
 Static lEnd := .f.
 Static nGlobalCounter := 0
 Static aResult[2]
@@ -21,6 +40,7 @@ cls
 @6,0 say "          GlobalCounter="+str(nGlobalCounter)
 @8,0 say "Difference              "+str(aResult[1]+aResult[2]-nGlobalCounter)
 
+Return NIL
 
 Procedure paralell( nId, mtxCounter )
 Local nLocalCounter := 0

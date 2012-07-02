@@ -985,7 +985,7 @@ VM_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)arrays$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)arrayshb$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)asort$(HB_MT)$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)break$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)break$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)classes$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)classesc$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cmdarg$(HB_MT)$(OBJEXT)\
@@ -1007,12 +1007,12 @@ VM_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hvm$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)inet$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)initexit$(HB_MT)$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)initsymb$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)initsymb$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)itemapi$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)fastitem$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)macro$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)memvars$(HB_MT)$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)memvclip$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)memvclip$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcount$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)proc$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pvalue$(HB_MT)$(OBJEXT)\
@@ -1020,9 +1020,9 @@ VM_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)set$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)strapi$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)thread$(HB_MT)$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)throw$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)throw$(OBJEXT)\
 	\
-	$(OBJ_DIR)$(DIR_SEP)harbinit$(HB_MT)$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)harbinit$(OBJEXT)
 
 #===============================================================================
 # VMMAIN Object Files, Only Linked On Static Libraries

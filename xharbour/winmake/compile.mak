@@ -730,7 +730,7 @@ $(OBJ_DIR)$(DIR_SEP)arrayshb$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)arrayshb.c
 $(OBJ_DIR)$(DIR_SEP)asort$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)asort.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)break$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)break.c
+$(OBJ_DIR)$(DIR_SEP)break$(OBJEXT) : $(VM_DIR)$(DIR_SEP)break.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)classes$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)classes.c
@@ -784,7 +784,7 @@ $(OBJ_DIR)$(DIR_SEP)garbage$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)garbage.c
 $(OBJ_DIR)$(DIR_SEP)harbinit.c : $(VM_DIR)$(DIR_SEP)harbinit.prg
 	$(HB_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)harbinit$(HB_MT)$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)harbinit.c
+$(OBJ_DIR)$(DIR_SEP)harbinit$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)harbinit.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hash$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)hash.c
@@ -802,7 +802,7 @@ $(OBJ_DIR)$(DIR_SEP)inet$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)inet.c
 $(OBJ_DIR)$(DIR_SEP)initexit$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)initexit.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)initsymb$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)initsymb.c
+$(OBJ_DIR)$(DIR_SEP)initsymb$(OBJEXT) : $(VM_DIR)$(DIR_SEP)initsymb.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)itemapi$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)itemapi.c
@@ -832,7 +832,7 @@ $(OBJ_DIR)$(DIR_SEP)maindllh$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)maindllh.c
 $(OBJ_DIR)$(DIR_SEP)memvars$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)memvars.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)memvclip$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)memvclip.c
+$(OBJ_DIR)$(DIR_SEP)memvclip$(OBJEXT) : $(VM_DIR)$(DIR_SEP)memvclip.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcount$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)pcount.c
@@ -859,7 +859,7 @@ $(OBJ_DIR)$(DIR_SEP)usedll$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)usedll.c
 $(OBJ_DIR)$(DIR_SEP)thread$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)thread.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)throw$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)throw.c
+$(OBJ_DIR)$(DIR_SEP)throw$(OBJEXT) : $(VM_DIR)$(DIR_SEP)throw.c
 	$(CC_CMD)
 
 #===============================================================================
