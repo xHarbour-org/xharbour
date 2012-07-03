@@ -78,6 +78,14 @@ HB_CMD_MAIN=$(HARBOUR_EXE) -n0 $(LINEFLAGS) -d_USE_APPMAIN_ $(HARBOURFLAGS) $(HB
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
+ifndef HB_NO_FM_DL_ALLOC
+CLIBFLAGS    +=-DHB_FM_DL_ALLOC
+endif
+
+ifndef HB_NO_VM_ALL
+CLIBFLAGS    +=-DHB_VM_ALL
+endif
+
 CC_CMD       =GCC $(CLIBFLAGS) -o $@ $^
 CCC_CMD      =$(CC_CMD)
 CC_CMD_FMSTAT=GCC $(CLIBFLAGS) -DHB_FM_STATISTICS -o $@ $^
@@ -131,6 +139,10 @@ else
 PROJECT=$(MT_PROJECT)
 endif
 
+ifdef HB_NO_VM_ALL
+PROJECT+=$(FMSTAT_LIB)
+endif
+
 ALL: $(PROJECT)
 
 #===============================================================================
@@ -150,6 +162,14 @@ $(CT_LIB) : $(CT_LIB_OBJS)
 	$(LIB_CMD)
 
 VM_LIB_OBJS+=\
+	$(VM_MAIN_OBJS)
+
+ifndef HB_NO_VM_ALL
+VM_LIB_OBJS=\
+	$(VM_ALL_OBJS)
+endif
+VM_LIB_OBJS+=\
+	$(VM_COMMON_OBJS)\
 	$(VM_MAIN_OBJS)
 $(VM_LIB) : $(VM_LIB_OBJS)
 	$(LIB_CMD)
@@ -359,6 +379,15 @@ INCLUDE_DIR =include
 CLIBFLAGS   +=-DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -Wall -mdll -fomit-frame-pointer -march=i586 $(NOCYGWIN) -O3 -c -fno-strict-aliasing $(ACEH_DIR) -I$(INCLUDE_DIR) -I$(OBJ_DIR)
 CLIBFLAGS   +=-I$(ZLIB_DIR)
 HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
+
+ifndef HB_NO_FM_DL_ALLOC
+CLIBFLAGS    +=-DHB_FM_DL_ALLOC
+endif
+
+ifndef HB_NO_VM_ALL
+CLIBFLAGS    +=-DHB_VM_ALL
+endif
+
 CC_CMD      =GCC $(CLIBFLAGS) -o $@ $^
 CCC_CMD     =$(CC_CMD)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) -o$@ $^
@@ -376,6 +405,12 @@ ALL: $(DLL_PROJECT)
 #===============================================================================
 # HARBOUR.DLL rules
 #===============================================================================
+ifndef HB_NO_VM_ALL
+VM_LIB_OBJS=\
+	$(VM_ALL_OBJS)
+endif
+VM_LIB_OBJS+=\
+	$(VM_COMMON_OBJS)
 $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 	$(DLL_LINK_CMD)
 

@@ -52,7 +52,9 @@
 
 #define HB_OS_WIN_USED
 
+#if 0
 #include "hbvmopt.h"
+#endif
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbinit.h"
@@ -72,6 +74,13 @@ HANDLE hb_hInstance     = 0;
 HANDLE hb_hPrevInstance = 0;
 int    hb_iCmdShow      = 0;
 BOOL   s_WinMainParam   = FALSE;
+
+#if defined( HB_VM_ALL )
+   #if defined( _MSC_VER ) || defined( __DMC__ )
+      extern HB_EXPORT void hb_winmainArgInit( HANDLE hInstance, HANDLE hPrevInstance, int iCmdShow );
+      extern HB_EXPORT BOOL hb_winmainArgGet( HANDLE * phInstance, HANDLE * phPrevInstance, int * piCmdShow );
+   #endif
+#endif
 
 HB_EXTERN_END
 
@@ -446,6 +455,7 @@ HB_FUNC( HB_CMDARGARGV )
    hb_retc( hb_cmdargARGV()[0] );
 }
 
+#if 0
 #define __PRG_SOURCE__ __FILE__
 
 HB_FUNC_EXTERN( HB_VMMODE );
@@ -464,4 +474,5 @@ HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_CMDARG )
 #elif defined( HB_DATASEG_STARTUP )
    #define HB_DATASEG_BODY    HB_DATASEG_FUNC( hb_vm_SymbolInit_CMDARG )
    #include "hbiniseg.h"
+#endif
 #endif

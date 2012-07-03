@@ -63,6 +63,11 @@
 #include "classes.h"
 #include "hbapirdd.h"
 
+HB_EXTERN_BEGIN
+extern HB_STACK * _TlsGetValue( void );
+extern void _TlsSetValue( void * );
+HB_EXTERN_END
+
 #if defined( HB_OS_DARWIN ) || defined(__DJGPP__)
    #include <stdlib.h>
    #include <unistd.h>    /* We need usleep() in Darwin */
@@ -125,7 +130,9 @@ static HB_CRITICAL_T s_thread_unique_id_mutex;
 static UINT s_thread_unique_id;
 
 #if defined(HB_OS_WIN)
-   DWORD hb_dwCurrentStack;
+   #if !defined( HB_VM_ALL )
+      DWORD hb_dwCurrentStack;
+   #endif
 #elif defined(HB_OS_OS2)
    PPVOID hb_dwCurrentStack;
    HEV  hb_hevWakeUpAll; /* posted to wake up all threads waiting somewhere on an INDEFINITE wait */
@@ -219,6 +226,16 @@ void hb_threadInit( void )
 #endif
       s_hb_threadIsInit = TRUE;
    }
+}
+
+HB_STACK * _TlsGetValue( void )
+{
+   return (HB_STACK *) TlsGetValue( hb_dwCurrentStack );
+}
+
+void _TlsSetValue( void *p )
+{
+   TlsSetValue( hb_dwCurrentStack, p );
 }
 
 void hb_threadExit( void )
@@ -772,7 +789,7 @@ void hb_threadIsLocalRef( void )
    Stack count can NEVER be accurate; but it is useful to know about
    prorgram status or progress.
 */
-int hb_threadCountStacks()
+int hb_threadCountStacks( void )
 {
    HB_STACK *p;
    int count = 0;
@@ -899,7 +916,7 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
 */
 
 #if defined(HB_OS_WIN) || defined(HB_OS_OS2)
-void hb_threadCancelInternal( )
+void hb_threadCancelInternal( void )
 {
    HB_THREAD_STUB
    int iCount;
@@ -1057,7 +1074,7 @@ void hb_threadTerminator( void *pData )
 
    IT is meant to be called from the main thread.
 */
-void hb_threadWaitAll()
+void hb_threadWaitAll( void )
 {
    HB_THREAD_STUB
 
@@ -1089,7 +1106,7 @@ void hb_threadWaitAll()
    Kill all the threads except the main one. Must be called
    from the main thread.
 */
-void hb_threadKillAll()
+void hb_threadKillAll( void )
 {
    HB_STACK *pStack;
 

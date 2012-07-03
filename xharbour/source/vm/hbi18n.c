@@ -56,7 +56,10 @@
    #include <windows.h>
 #endif
 
+#if 0
 #include "hbvmopt.h"
+#endif
+
 #include "hbsetup.h"
 #include "hbapi.h"
 #include "hbapiitm.h"

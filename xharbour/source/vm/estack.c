@@ -82,15 +82,19 @@ HB_EXTERN_BEGIN
 
 /* ------------------------------- */
 
+#if !defined( _HB_STACK_LOCAL_MACROS_ )
 #ifdef HB_THREAD_SUPPORT
 HB_STACK hb_stackMT;
 #else
 HB_STACK hb_stackST;
 HB_STACK * hb_stack_ptr = &hb_stackST;
 #endif
+#if !defined( HB_VM_ALL )
+BOOL hb_stack_ready = FALSE;
+#endif
+#endif /* _HB_STACK_LOCAL_MACROS_ */
 
 static HB_IOERRORS s_IOErrors;
-BOOL hb_stack_ready = FALSE;
 
 /* ------------------------------- */
 
@@ -190,6 +194,30 @@ void hb_stackFree( void )
 
 #endif
 }
+
+#if ( defined( HB_THREAD_SUPPORT ) && defined( HB_VM_ALL ) )
+   /*
+   Wrapper to avoid direct access to stack. Needed if VM is amalgamated.
+   */
+   HB_EXTERN_BEGIN
+
+   BOOL hb_stackcheckrddpstack( const char * szName, HB_STACK *pstack )
+   {
+      return ( pstack == &hb_stackMT || strncmp( szName, ":TH:", 4 ) == 0 );
+   }
+
+   BOOL _hb_stack_ready( void )
+   {
+      return hb_stack_ready;
+   }
+
+   HB_MATH_EXCEPTION hb_s_hb_exc ( void )
+   {
+      return (HB_VM_STACK.math_exc);
+   }
+
+   HB_EXTERN_END
+#endif
 
 #undef hb_stackSetStruct
 PHB_SET_STRUCT hb_stackSetStruct( void )

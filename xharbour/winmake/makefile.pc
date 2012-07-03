@@ -53,6 +53,12 @@ HB_CMD       =$(HARBOUR_EXE) /n1 $(LINEFLAGS) $(HB_MT_FLAGS) $(HARBOURFLAGS) $**
 HB_CMD_MAIN  =$(HARBOUR_EXE) /n0 $(LINEFLAGS) $(HB_MT_FLAGS) $(HARBOURFLAGS) $** -o$@
 
 CLIBFLAGS    =$(CLIBFLAGS) /Ze /Zx /Tx86-coff /Go $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"NULL=0" /D"HAVE_CONFIG_H"
+!ifndef HB_NO_FM_DL_ALLOC
+CLIBFLAGS    =/D"HB_FM_DL_ALLOC" $(CLIBFLAGS)
+!endif
+!ifndef HB_NO_VM_ALL
+CLIBFLAGS    =/D"HB_VM_ALL" $(CLIBFLAGS)
+!endif
 CC_CMD       =POCC $(__MT__) $(CLIBFLAGS) /Fo$@ $**
 CCC_CMD      =$(CC_CMD)
 CC_CMD_FMSTAT=POCC $(__MT__) /DHB_FM_STATISTICS $(CLIBFLAGS) /Fo$@ $**
@@ -101,6 +107,10 @@ HBDOC_EXE_OBJS=\
 #===============================================================================
 # NOTE: We cannot include target.mak (read: make_pc.bat)
 
+!ifdef HB_NO_VM_ALL
+PROJECT=$(PROJECT) $(FMSTAT_LIB)
+!endif
+
 ALL: $(PROJECT)
 
 #===============================================================================
@@ -115,8 +125,13 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
 $(CT_LIB) : $(CT_LIB_OBJS)
 	$(LIB_CMD)
 
+!ifndef HB_NO_VM_ALL
+VM_LIB_OBJS=\
+	$(VM_ALL_OBJS)
+!endif
 VM_LIB_OBJS=\
 	$(VM_LIB_OBJS)\
+	$(VM_COMMON_OBJS)\
 	$(VM_MAIN_OBJS)
 $(VM_LIB) : $(VM_LIB_OBJS)
 	$(LIB_CMD)

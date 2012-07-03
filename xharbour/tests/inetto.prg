@@ -137,14 +137,14 @@ FUNCTION Connect( cAddress, nPort, nTimeout )
       HB_MutexUnlock( MutexCnt )
       /* Kill that thread, but without waiting for it to be done*/
       KillThread( thSearcher )
-      RETURN
+      RETURN NIL
    ENDIF
 
    /* But the resolver could also return a failure */
    IF Len( aServer ) == 0
       aServiceData[3] := 3 /* Name not found */
       HB_MutexUnlock( MutexCnt )
-      RETURN
+      RETURN NIL
    ENDIF
 
    HB_MutexUnlock( MutexCnt )
@@ -213,4 +213,4 @@ FUNCTION SearchForServer( cName, MutexDone )
 
    aServer := InetGetHosts( cName )
    Notify( MutexDone, aServer )
-RETURN
+RETURN NIL

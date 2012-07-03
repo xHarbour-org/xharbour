@@ -106,6 +106,14 @@ static int sb_isService = 0;
 /* There is a service mutex in multithreading */
 #ifdef HB_THREAD_SUPPORT
    static HB_CRITICAL_T s_ServiceMutex;
+   #if defined( HB_VM_ALL )
+      HB_EXTERN_BEGIN
+      extern  HB_STACK *          _TlsGetValue( void );
+      extern  void                _TlsSetValue( void * );
+      HB_EXTERN_END
+      #define TlsGetValue( x )    _TlsGetValue()
+      #define TlsSetValue( x, y ) _TlsSetValue( y )
+   #endif
 #endif
 
 /* This structure holds a translation to transform a certain OS level signal

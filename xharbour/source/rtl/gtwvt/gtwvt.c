@@ -84,9 +84,18 @@
 
 #define HB_OS_WIN_USED
 
-#define _HB_API_INTERNAL_ /* for hb_stack_ready */
-#include "hbstack.h"
+#if !defined( HB_VM_ALL )
+   #define _HB_API_INTERNAL_ /* for hb_stack_ready */
+   #include "hbstack.h"
+#endif
+
 #include "gtwvt.h"
+
+#if defined( HB_VM_ALL )
+   HB_EXTERN_BEGIN
+   extern BOOL _hb_stack_ready( void );
+   HB_EXTERN_END
+#endif
 
 #if defined( __DMC__ ) || ( _MSC_VER <= 1200 )
 #define LONG_PTR LONG
@@ -250,7 +259,11 @@ static int hb_gt_wvt_FireEvent( PHB_GTWVT pWVT, int nEvent )
 {
    int nResult = 0; /* Unhandled */
 
+#if defined( HB_VM_ALL )
+   if( _hb_stack_ready() && pWVT->pGT->pNotifierBlock )
+#else
    if( hb_stack_ready && pWVT->pGT->pNotifierBlock )
+#endif
    {
       if( hb_vmRequestReenter() )
       {

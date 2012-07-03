@@ -50,9 +50,18 @@ INCLUDE_DIR  =$(INCLUDE_DIR) -Iinclude -I$(OBJ_DIR) -I$(ZLIB_DIR)
 CLIBFLAGS    =$(CLIBFLAGS) -q -c $(INCLUDE_DIR) -d -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H
 HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 LINK_CMD     =ILINK32 -ap -Tpe -x -Gn -C -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" -Llib\b32 $(LFLAGS) "$(CC_DIR)\lib\c0x32.obj" $**,$@,,
+
 !if $d(HB_THREAD_SUPPORT)
 CLIBFLAGS    =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT
 HB_MT_FLAGS  =-DHB_THREAD_SUPPORT
+!endif
+
+!ifndef HB_NO_FM_DL_ALLOC
+CLIBFLAGS    =-DHB_FM_DL_ALLOC $(CLIBFLAGS)
+!endif
+
+!ifndef HB_NO_VM_ALL
+CLIBFLAGS    =-DHB_VM_ALL $(CLIBFLAGS)
 !endif
 
 # User flags should be able to override everything!
@@ -120,6 +129,10 @@ PROJECT=$(ST_PROJECT)
 PROJECT=$(MT_PROJECT)
 !endif
 
+!ifdef HB_NO_VM_ALL
+PROJECT=$(PROJECT) $(FMSTAT_LIB)
+!endif
+
 ALL: $(PROJECT)
 
 #===============================================================================
@@ -146,8 +159,13 @@ $(CT_LIB) : $(CT_LIB_OBJS)
 +)
 !
 
+!ifndef HB_NO_VM_ALL
+VM_LIB_OBJS=\
+	$(VM_ALL_OBJS)
+!endif
 VM_LIB_OBJS=\
 	$(VM_LIB_OBJS)\
+	$(VM_COMMON_OBJS)\
 	$(VM_MAIN_OBJS)
 $(VM_LIB) : $(VM_LIB_OBJS)
 	IF EXIST "$(VM_LIB)" $(DEL) "$(VM_LIB)" > NUL
@@ -459,6 +477,14 @@ HARBOUR_DLL_OBJS=\
 	$(RDDADS_LIB_OBJS)
 !endif
 
+!ifndef HB_NO_VM_ALL
+VM_LIB_OBJS=\
+	$(VM_ALL_OBJS)
+!endif
+VM_LIB_OBJS=\
+	$(VM_LIB_OBJS)\
+	$(VM_COMMON_OBJS)
+
 #===============================================================================
 # DANIEL VIK MEMCPY
 #===============================================================================
@@ -517,6 +543,14 @@ DLLFLAGS    =$(DLLFLAGS) $(LFLAGS)
 EXEFLAGS    =$(EXEFLAGS) $(LFLAGS)
 CLIBFLAGS   =$(CLIBFLAGS)  $(CFLAGS)
 LINKERFLAGS =$(LINKERFLAGS) $(LFLAGS)
+
+!ifndef HB_NO_VM_ALL
+CLIBFLAGS   =-DHB_VM_ALL $(CLIBFLAGS)
+!endif
+
+!ifndef HB_NO_FM_DL_ALLOC
+CLIBFLAGS    =-DHB_FM_DL_ALLOC $(CLIBFLAGS)
+!endif
 
 CC_CMD      =BCC32 $(CLIBFLAGS) -o$@ $**
 CCC_CMD     =$(CC_CMD)

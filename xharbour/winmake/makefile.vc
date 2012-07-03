@@ -65,6 +65,10 @@ PROJECT=$(ST_PROJECT)
 PROJECT=$(MT_PROJECT)
 !endif
 
+!ifdef HB_NO_VM_ALL
+PROJECT=$(PROJECT) $(FMSTAT_LIB)
+!endif
+
 ALL: $(PROJECT)
 
 #===============================================================================
@@ -136,6 +140,17 @@ MT_CMD       =MT -nologo -manifest "$(OBJ_DIR)\intermediate.manifest" -outputres
 MANIFESTFLAGS=/MANIFEST:NO
 !endif
 !endif
+
+!ifndef HB_NO_FM_DL_ALLOC
+CLIBFLAGS    =-DHB_FM_DL_ALLOC $(CLIBFLAGS)
+CLIBFLAGS_C  =-DHB_FM_DL_ALLOC $(CLIBFLAGS_C)
+!endif
+
+!ifndef HB_NO_VM_ALL
+CLIBFLAGS    =-DHB_VM_ALL $(CLIBFLAGS)
+CLIBFLAGS_C  =-DHB_VM_ALL $(CLIBFLAGS_C)
+!endif
+
 CC_CMD       =CL $(CLIBFLAGS) -Fo$@ $**
 CCC_CMD      =CL $(CLIBFLAGS_C) -Fo$@ $**
 CC_CMD_FMSTAT=CL $(CLIBFLAGS) -DHB_FM_STATISTICS -Fo$@ $**
@@ -169,8 +184,13 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
 $(CT_LIB) : $(CT_LIB_OBJS)
 	$(LIB_CMD)
 
+!ifndef HB_NO_VM_ALL
+VM_LIB_OBJS=\
+	$(VM_ALL_OBJS)
+!endif
 VM_LIB_OBJS=\
 	$(VM_LIB_OBJS)\
+	$(VM_COMMON_OBJS)\
 	$(VM_MAIN_OBJS)
 $(VM_LIB) : $(VM_LIB_OBJS)
 	$(LIB_CMD)
@@ -414,6 +434,16 @@ CLIBFLAGS   =$(CLIBFLAGS) -c -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H $(ACEH_DIR)
 CLIBFLAGS_C =$(CLIBFLAGS_C) -c -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H $(ACEH_DIR) $(OPENSSL_DIR) -I"$(ZLIB_DIR)" -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ $(OPTFLAGS) -Gs -W3 -DOPENSSL_NO_DEPRECATED -nologo $(CFLAGS)
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 
+!ifndef HB_NO_FM_DL_ALLOC
+CLIBFLAGS    =-DHB_FM_DL_ALLOC $(CLIBFLAGS)
+CLIBFLAGS_C  =-DHB_FM_DL_ALLOC $(CLIBFLAGS_C)
+!endif
+
+!ifndef HB_NO_VM_ALL
+CLIBFLAGS    =-DHB_VM_ALL $(CLIBFLAGS)
+CLIBFLAGS_C  =-DHB_VM_ALL $(CLIBFLAGS_C)
+!endif
+
 CC_CMD     =CL $(CLIBFLAGS) -Fo$@ $**
 CCC_CMD    =CL $(CLIBFLAGS_C) -Fo$@ $**
 HB_CMD     =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
@@ -431,6 +461,13 @@ ALL: $(DLL_PROJECT)
 #===============================================================================
 # HARBOUR.DLL rules
 #===============================================================================
+!ifndef HB_NO_VM_ALL
+VM_LIB_OBJS=\
+	$(VM_ALL_OBJS)
+!endif
+VM_LIB_OBJS=\
+	$(VM_LIB_OBJS)\
+	$(VM_COMMON_OBJS)
 $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 	$(DLL_LINK_CMD)
 	$(MT_CMD_DLL)

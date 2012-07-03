@@ -85,6 +85,13 @@
 
 #if defined( HB_THREAD_SUPPORT )
 
+   #if defined( HB_VM_ALL )
+      HB_EXTERN_BEGIN
+      extern  HB_STACK *        _TlsGetValue( void );
+      HB_EXTERN_END
+      #define TlsGetValue( x )  _TlsGetValue()
+   #endif
+
    static void s_doNothing( void *nothing ) { HB_SYMBOL_UNUSED( nothing ) ;}
    /* WARNING: Output is a cancellation point. NEVER cross non optimized stack access,
    or calls to hb_param* / hb_ret* family functions with this macros. This macros

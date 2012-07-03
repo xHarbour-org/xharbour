@@ -87,7 +87,13 @@
  */
 
 #if defined(HB_THREAD_SUPPORT)
-   #define s_hb_exc   (HB_VM_STACK.math_exc)
+   #if defined( HB_VM_ALL )
+      HB_EXTERN_BEGIN
+      extern HB_MATH_EXCEPTION hb_s_hb_exc ( void );
+      HB_EXTERN_END
+   #else
+      #define s_hb_exc   (HB_VM_STACK.math_exc)
+   #endif
 #else
    #define s_hb_exc   s_hb_exc
    static HB_MATH_EXCEPTION s_hb_exc = {HB_MATH_ERR_NONE, "", "", 0.0, 0.0, 0.0, 1, 0, 0};
@@ -96,7 +102,12 @@
 /* reset math error information */
 void hb_mathResetError (void)
 {
+   #if defined(HB_THREAD_SUPPORT) && defined( HB_VM_ALL )
+      HB_MATH_EXCEPTION s_hb_exc = hb_s_hb_exc();
+   #endif
+
    HB_TRACE (HB_TR_DEBUG, ("hb_mathResetError()"));
+
    s_hb_exc.type = HB_MATH_ERR_NONE;
    s_hb_exc.funcname = "";
    s_hb_exc.error = "";
@@ -112,7 +123,12 @@ void hb_mathResetError (void)
 /* get last math error */
 int hb_mathGetLastError (HB_MATH_EXCEPTION * phb_exc)
 {
+   #if defined(HB_THREAD_SUPPORT) && defined( HB_VM_ALL )
+      HB_MATH_EXCEPTION s_hb_exc = hb_s_hb_exc();
+   #endif
+
    HB_TRACE (HB_TR_DEBUG, ("hb_mathGetLastError(%p)", phb_exc));
+
    if (phb_exc != NULL)
    {
      phb_exc->type = s_hb_exc.type;
@@ -151,6 +167,10 @@ matherr (struct exception * err)
 {
    int retval;
    HB_MATH_HANDLERPROC mathHandler;
+
+   #if defined(HB_THREAD_SUPPORT) && defined( HB_VM_ALL )
+      HB_MATH_EXCEPTION s_hb_exc = hb_s_hb_exc();
+   #endif
 
    HB_TRACE (HB_TR_DEBUG, ("matherr(%p)", err));
 
@@ -219,6 +239,10 @@ matherr (struct exception * err)
 int hb_mathErrSet( double dResult, double arg1, double arg2, char * szFunc, int errCode )
 {
    HB_MATH_HANDLERPROC mathHandler;
+
+   #if defined(HB_THREAD_SUPPORT) && defined( HB_VM_ALL )
+      HB_MATH_EXCEPTION s_hb_exc = hb_s_hb_exc();
+   #endif
 
    HB_TRACE (HB_TR_DEBUG, ("hb_mathErrSet(%f, %d)", dResult, errCode));
 

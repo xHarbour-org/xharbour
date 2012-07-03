@@ -606,7 +606,7 @@ $(OBJ_DIR)$(DIR_SEP)wafunc$(HB_MT)$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)wafunc.c
 
 $(OBJ_DIR)$(DIR_SEP)dbf1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbf1.c
 	$(CC_CMD)
-   
+
 $(OBJ_DIR)$(DIR_SEP)dbf1net$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbf1net.c
 	$(CC_CMD)
 
@@ -721,6 +721,9 @@ $(OBJ_DIR)$(DIR_SEP)rddsys$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)rddsys.c
 #===============================================================================
 # VM.LIB rules
 #===============================================================================
+$(OBJ_DIR)$(DIR_SEP)hvmall$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)hvmall.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)arrays$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)arrays.c
 	$(CC_CMD)
 
@@ -1447,7 +1450,7 @@ $(OBJ_DIR)$(DIR_SEP)readvar.c : $(RTL_DIR)$(DIR_SEP)readvar.prg
 $(OBJ_DIR)$(DIR_SEP)readvar$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)readvar.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)regex$(HB_MT)$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)regex.c
+$(OBJ_DIR)$(DIR_SEP)regex$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)regex.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)regexrpl.c : $(RTL_DIR)$(DIR_SEP)regexrpl.prg

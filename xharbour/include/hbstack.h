@@ -137,23 +137,28 @@ typedef struct
    unsigned int uiVMFlags;
 } HB_STACK, * PHB_STACK;
 
+#if !defined( _HB_STACK_LOCAL_MACROS_ )
 #ifndef __IMPORT__
 extern HB_EXPORT HB_STACK hb_stackST;
 #else
 extern HB_IMPORT HB_STACK hb_stackST;
 #endif
+#endif
 
 extern HB_STACK * hb_stack_ptr;
 #else
+#if !defined( _HB_STACK_LOCAL_MACROS_ )
 #ifndef __IMPORT__
 extern HB_EXPORT HB_STACK hb_stackMT;
 #else
 extern HB_IMPORT HB_STACK hb_stackMT;
 #endif
 #endif
+#endif
 
-
+#if !defined( _HB_STACK_LOCAL_MACROS_ )
 extern BOOL hb_stack_ready;
+#endif
 
 typedef struct
 {

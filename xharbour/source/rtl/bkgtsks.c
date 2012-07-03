@@ -100,6 +100,13 @@ static USHORT s_uiBackgroundTask = 0;
 static USHORT s_uiBackgroundMaxTask = 0;
 #else
 
+#if defined( HB_VM_ALL )
+   HB_EXTERN_BEGIN
+   extern HB_STACK *        _TlsGetValue( void );
+   HB_EXTERN_END
+   #define TlsGetValue( x ) _TlsGetValue()
+#endif
+
 #define s_ulBackgroundID      HB_VM_STACK.ulBackgroundID
 #define s_pBackgroundTasks    (HB_VM_STACK.pBackgroundTasks)
 #define s_bIamBackground      HB_VM_STACK.bIamBackground

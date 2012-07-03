@@ -79,6 +79,14 @@
 
 #include "hbstack.h"
 
+#if defined( HB_VM_ALL )
+   HB_EXTERN_BEGIN
+   extern HB_STACK* _TlsGetValue( void );
+   extern BOOL      hb_stackcheckrddpstack( const char*, HB_STACK * );
+   HB_EXTERN_END
+   #define TlsGetValue( x ) _TlsGetValue()
+#endif
+
 #define HB_GET_AREA_HANDLE_FROM_SYM( iArea, pSymAlias ) \
    { \
       PHB_DYNS pDyn = hb_setGetWorkareasShared() ? ( pSymAlias )->pDynSym : s_rddAliasThFind( ( pSymAlias )->szName, &HB_VM_STACK ); \
@@ -93,7 +101,11 @@
 PHB_DYNS s_rddAliasThGet( const char * szName, HB_STACK *pstack )
 {
    // Can NOT use HB_VM_STACK here!!!
+#if defined( HB_VM_ALL )
+   if ( hb_stackcheckrddpstack( szName, pstack ) )
+#else
    if( pstack == &hb_stackMT || strncmp( szName, ":TH:", 4 ) == 0 )
+#endif
    {
       return hb_dynsymGet( szName );
    }
@@ -108,7 +120,11 @@ PHB_DYNS s_rddAliasThGet( const char * szName, HB_STACK *pstack )
 PHB_DYNS s_rddAliasThFind( const char * szName, HB_STACK *pstack )
 {
    // Can NOT use HB_VM_STACK here!!!
+#if defined( HB_VM_ALL )
+   if ( hb_stackcheckrddpstack( szName, pstack ) )
+#else
    if( pstack == &hb_stackMT || strncmp( szName, ":TH:", 4 ) == 0 )
+#endif
    {
       return hb_dynsymFindName( szName );
    }

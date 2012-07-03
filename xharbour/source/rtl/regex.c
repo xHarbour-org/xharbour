@@ -52,7 +52,7 @@
 
 #define HB_THREAD_OPTIMIZE_STACK
 
-#include "hbvmopt.h"
+// #include "hbvmopt.h"
 #include "hbdefs.h"
 #include "hbstack.h"
 #include "hbapi.h"
@@ -72,7 +72,8 @@
 #  define HB_ALLOC_ALIGNMENT     8
 #endif
 
-#define hb_isregexstring( x )  ( ( x->item.asString.length > 3 && memcmp( x->item.asString.value, "***", 3 ) == 0 ) )
+/* #define hb_isregexstring( x )  ( ( x->item.asString.length > 3 && memcmp( x->item.asString.value, "***", 3 ) == 0 ) ) */
+#define hb_isregexstring( x )  ( ( hb_itemGetCLen(x) > 3 && memcmp( hb_itemGetCPtr(x), "***", 3 ) == 0 ) )
 
 extern void HB_PCREPOS_LIBRARY( void );
 
@@ -228,11 +229,17 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
       return FALSE;
    }
 
+/*
    pReg = hb_getregex( pRegEx,
                        pCaseSensitive && ! pCaseSensitive->item.asLogical.value,
                        pNewLine != NULL && pNewLine->item.asLogical.value,
                        &fFree );
+*/
 
+   pReg = hb_getregex( pRegEx,
+                       pCaseSensitive && ! hb_itemGetL( pCaseSensitive ),
+                       pNewLine != NULL && hb_itemGetL( pNewLine ),
+                       &fFree );
    if( pReg == NULL )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, "Invalid regular expression", "Regex subsystem", 4, pRegEx, pString, hb_paramError( 3 ), hb_paramError( 4 ) );
@@ -247,7 +254,8 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
    aMatches[0].rm_so = 0;
    aMatches[0].rm_eo = pString->item.asString.length;
 
-   if( regexec( pReg, pString->item.asString.value, iMaxMatch, aMatches, EFlags ) == 0 )
+   /* if( regexec( pReg, pString->item.asString.value, iMaxMatch, aMatches, EFlags ) == 0 ) */
+   if( regexec( pReg, hb_itemGetCPtr( pString ), iMaxMatch, aMatches, EFlags ) == 0 )
    {
       switch ( cRequest )
       {
@@ -269,8 +277,12 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             {
                if (aMatches[i].rm_eo > -1 )
                {
-                  hb_arraySetCL( &pRetArray, i + 1,
+/*                 hb_arraySetCL( &pRetArray, i + 1,
                                 pString->item.asString.value + aMatches[i].rm_so,
+                                aMatches[i].rm_eo - aMatches[i].rm_so ); */
+
+                   hb_arraySetCL( &pRetArray, i + 1,
+                                hb_itemGetCPtr( pString ) + aMatches[i].rm_so,
                                 aMatches[i].rm_eo - aMatches[i].rm_so );
                }
                else
@@ -310,7 +322,8 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
          case 3: // Split
          {
             HB_ITEM_NEW( Match );
-            char *str = pString->item.asString.value;
+            /* char *str = pString->item.asString.value; */
+            char *str = hb_itemGetCPtr( pString );
             int iMax = hb_parni( 5 );
             int iCount = 1;
 
@@ -363,8 +376,9 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
                if ( aMatches[i].rm_eo != -1 )
                {
-                  //matched string
-                  hb_arraySetCL( &aSingleMatch, 1, pString->item.asString.value + aMatches[i].rm_so, aMatches[i].rm_eo - aMatches[i].rm_so );
+                  // matched string
+                  // hb_arraySetCL( &aSingleMatch, 1, pString->item.asString.value + aMatches[i].rm_so, aMatches[i].rm_eo - aMatches[i].rm_so );
+                  hb_arraySetCL( &aSingleMatch, 1, hb_itemGetCPtr( pString ) + aMatches[i].rm_so, aMatches[i].rm_eo - aMatches[i].rm_so );
 
                   // begin of match
                   hb_arraySetNI( &aSingleMatch, 2, aMatches[i].rm_so + 1 );
@@ -395,7 +409,8 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             HB_ITEM_NEW( pAtxArray );
             HB_ITEM aSingleMatch;
 
-            char  *str = pString->item.asString.value;
+            // char  *str = pString->item.asString.value;
+            char  *str       = hb_itemGetCPtr( pString );
             int   iMax       = hb_parni( 5 );  // max nuber of matches I want, 0 = unlimited
             int   iGetMatch  = hb_parni( 6 );  // Gets if want only one single match or a sub-match
             BOOL  fOnlyMatch = TRUE;           // if TRUE returns only matches and sub-matches, not positions
@@ -681,10 +696,16 @@ HB_FUNC( HB_ATX )
    PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
    LONG lStart = hb_parnl(4), lEnd = hb_parnl(5);
 
-   if( pRegEx && pString && lStart <= pString->item.asString.length )
+   // if( pRegEx && pString && lStart <= pString->item.asString.length )
+   if( pRegEx && pString && lStart <= hb_itemGetCLen( pString ) )
    {
+      /*
       pReg = hb_getregex( pRegEx,
                           pCaseSensitive && ! pCaseSensitive->item.asLogical.value,
+                          FALSE, &fFree );
+      */
+      pReg = hb_getregex( pRegEx,
+                          pCaseSensitive && ! hb_itemGetL( pCaseSensitive ),
                           FALSE, &fFree );
       if( pReg )
       {
@@ -695,7 +716,8 @@ HB_FUNC( HB_ATX )
          }
          else if( lStart < 0 )
          {
-            lStart += pString->item.asString.length - 1;
+            // lStart += pString->item.asString.length - 1;
+            lStart += hb_itemGetCLen( pString ) - 1;
 
             if( lStart < 0 )
             {
@@ -708,19 +730,23 @@ HB_FUNC( HB_ATX )
          {
             lEnd--;
 
-            if( lEnd > pString->item.asString.length )
+            // if( lEnd > pString->item.asString.length )
+            if( lEnd > hb_itemGetCLen( pString ) )
             {
-               lEnd = lStart ? pString->item.asString.length : 0;
+               // lEnd = lStart ? pString->item.asString.length : 0;
+               lEnd = lStart ? hb_itemGetCLen( pString ) : 0;
             }
          }
          else if( lEnd < 0 )
          {
-            lEnd += pString->item.asString.length;
+            // lEnd += pString->item.asString.length;
+            lEnd += hb_itemGetCLen( pString );
 
             /* Let it fail for: lStart > lEnd
             if( lEnd < 0 )
             {
-               lEnd = lStart ? pString->item.asString.length : 0;
+               // lEnd = lStart ? pString->item.asString.length : 0;
+               lEnd = lStart ? hb_itemGetCLen( pString ) : 0;
             }
             */
          }
@@ -728,7 +754,8 @@ HB_FUNC( HB_ATX )
          {
             if( lStart )
             {
-               lEnd = pString->item.asString.length;
+               // lEnd = pString->item.asString.length;
+               lEnd = hb_itemGetCLen( pString );
             }
          }
 
@@ -761,7 +788,8 @@ HB_FUNC( HB_ATX )
             aMatches[0].rm_eo = lEnd;
          }
 
-         if( regexec( pReg, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
+         // if( regexec( pReg, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
+         if( regexec( pReg, hb_itemGetCPtr( pString ), REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
          {
             ulLen = aMatches[0].rm_eo - aMatches[0].rm_so;
 
@@ -775,7 +803,8 @@ HB_FUNC( HB_ATX )
                hb_stornl( aMatches[0].rm_eo - aMatches[0].rm_so, 5 );
             }
 
-            hb_retclen( pString->item.asString.value + aMatches[0].rm_so + lStart, ulLen );
+            // hb_retclen( pString->item.asString.value + aMatches[0].rm_so + lStart, ulLen );
+            hb_retclen( hb_itemGetCPtr( pString ) + aMatches[0].rm_so + lStart, ulLen );
 
             if( fFree )
             {
@@ -879,17 +908,20 @@ HB_FUNC( HB_REGEXCOMP )
       return;
    }
 
-   if( pCaseSensitive != NULL && pCaseSensitive->item.asLogical.value == ( int )FALSE )
+   // if( pCaseSensitive != NULL && pCaseSensitive->item.asLogical.value == ( int )FALSE )
+   if( pCaseSensitive != NULL && hb_itemGetL( pCaseSensitive ) == ( int )FALSE )
    {
       CFlags |= REG_ICASE;
    }
 
-   if( pNewLine != NULL && pNewLine->item.asLogical.value == ( int )TRUE )
+   // if( pNewLine != NULL && pNewLine->item.asLogical.value == ( int )TRUE )
+   if( pNewLine != NULL && hb_itemGetL( pNewLine ) == ( int )TRUE )
    {
       CFlags |= REG_NEWLINE;
    }
 
-   if( regcomp( &re, pRegEx->item.asString.value, CFlags ) == 0 )
+   // if( regcomp( &re, pRegEx->item.asString.value, CFlags ) == 0 )
+   if( regcomp( &re, hb_itemGetCPtr( pRegEx ), CFlags ) == 0 )
    {
       ULONG nSize = ((real_pcre *) re.re_pcre)->size;
       cRegex = (char *) hb_xgrab( HB_ALLOC_ALIGNMENT + sizeof( re ) + nSize );

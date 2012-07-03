@@ -249,6 +249,12 @@ HARBOUR_LIBS=\
 #===============================================================================
 
 #===============================================================================
+# HVMALL.OBJ
+#===============================================================================
+VM_ALL_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)hvmall$(HB_MT)$(OBJEXT)
+
+#===============================================================================
 # HBTINYMT.LIB Dependencies
 #===============================================================================
 HBTINYMT_LIB_OBJS=\
@@ -536,7 +542,7 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)session$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)readexit$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)readins$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)regex$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)regex$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)setcolor$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)setcurs$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)setkey$(OBJEXT)\
@@ -985,12 +991,9 @@ VM_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)arrays$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)arrayshb$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)asort$(HB_MT)$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)break$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)classes$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)classesc$(HB_MT)$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)cmdarg$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)codebloc$(HB_MT)$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)dbgentry$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)debug$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)do$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)dynlibhb$(HB_MT)$(OBJEXT)\
@@ -1003,30 +1006,34 @@ VM_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)fm$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)garbage$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hash$(HB_MT)$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)hbi18n$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hvm$(HB_MT)$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)inet$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)initexit$(HB_MT)$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)initsymb$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)itemapi$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)fastitem$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)macro$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)memvars$(HB_MT)$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)memvclip$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pcount$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)proc$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pvalue$(HB_MT)$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)runner$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)set$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)strapi$(HB_MT)$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)thread$(HB_MT)$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)throw$(OBJEXT)\
-	\
-	$(OBJ_DIR)$(DIR_SEP)harbinit$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)thread$(HB_MT)$(OBJEXT)
 
 #===============================================================================
 # VMMAIN Object Files, Only Linked On Static Libraries
 #===============================================================================
+VM_COMMON_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)cmdarg$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)dbgentry$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbi18n$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)inet$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)break$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)initsymb$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)memvclip$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)runner$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)throw$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)harbinit$(OBJEXT)
+
 VM_MAIN_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)maindll$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)mainstd$(OBJEXT)\
@@ -2076,7 +2083,6 @@ ST_PROJECT=\
 	$(COMPILER_LIB)\
 	$(HARBOUR_EXE)\
 	$(VM_LIB)\
-	$(FMSTAT_LIB)\
 	$(RTL_LIB)\
 	$(MACRO_LIB)\
 	$(RDD_LIB)\
@@ -2124,7 +2130,6 @@ MT_PROJECT=\
 	$(MACRO_LIB)\
 	$(RDD_LIB)\
 	$(HSX_LIB)\
-	$(FMSTAT_LIB)\
 	$(HBTEST_EXE)\
 	$(HBRUN_EXE)
 

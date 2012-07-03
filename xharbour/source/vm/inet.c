@@ -55,7 +55,11 @@
 *
 */
 
+#if (defined( __EXPORT__ ) && defined( HB_VM_ALL )) || defined( HB_THREAD_SUPPORT )
 #include "hbvmopt.h"
+#else
+#define _HB_API_INTERNAL_
+#endif
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbstack.h"
@@ -71,6 +75,13 @@
    #include <sys/socket.h>
    #include <sys/select.h>
    #include <sys/ioctl.h>
+#endif
+
+#if (defined( __EXPORT__ ) && defined( HB_VM_ALL )) || defined( HB_THREAD_SUPPORT )
+   HB_EXTERN_BEGIN
+   extern HB_STACK *        _TlsGetValue( void );
+   HB_EXTERN_END
+   #define TlsGetValue( x ) _TlsGetValue()
 #endif
 
 #if defined( HB_OS_OS2 ) || defined( HB_OS_WIN )
@@ -936,8 +947,10 @@ static void s_inetRecvInternal( char *szFuncName, int iMode )
          {
             hb_execFromArray( Socket->caPeriodic );
 
-            /* do we continue? */
-            if( ! hb_itemGetL( &HB_VM_STACK.Return ) || (Socket->timelimit != -1 && iTimeElapsed >= Socket->timelimit ) )
+            /* do we continue?
+               if( ! hb_itemGetL( &HB_VM_STACK.Return ) || (Socket->timelimit != -1 && iTimeElapsed >= Socket->timelimit ) )
+            */
+            if( ! hb_itemGetL( hb_stackReturnItem() ) || (Socket->timelimit != -1 && iTimeElapsed >= Socket->timelimit ) )
             {
                HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" )
                hb_retni( iReceived );
@@ -1060,8 +1073,10 @@ static void s_inetRecvPattern( char *szFuncName, char *szPattern )
          if( Socket->caPeriodic != NULL )
          {
             hb_execFromArray( Socket->caPeriodic );
-            /* do we continue? */
-            if ( hb_itemGetL( &HB_VM_STACK.Return ) &&
+            /* do we continue?
+              if ( hb_itemGetL( &HB_VM_STACK.Return ) &&
+            */
+            if ( hb_itemGetL( hb_stackReturnItem() ) &&
                (Socket->timelimit == -1 || iTimeElapsed < Socket->timelimit ))
             {
                continue;
@@ -1263,7 +1278,8 @@ HB_FUNC( INETRECVENDBLOCK )
          {
             hb_execFromArray( Socket->caPeriodic );
 
-            if( hb_itemGetL( &HB_VM_STACK.Return ) &&
+            /* if( hb_itemGetL( &HB_VM_STACK.Return ) && */
+            if( hb_itemGetL( hb_stackReturnItem() ) &&
                 ( Socket->timelimit == -1 || iTimeElapsed < Socket->timelimit ) )
             {
                continue;

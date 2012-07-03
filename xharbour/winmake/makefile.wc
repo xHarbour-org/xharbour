@@ -48,8 +48,16 @@ CLIBFLAGS   =$(CLIBFLAGS) $(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -e
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 
 !ifdef HB_THREAD_SUPPORT
-CLIBFLAGS   =$(CLIBFLAGS) -bm -DHB_THREAD_SUPPORT
+CLIBFLAGS   =$(CLIBFLAGS) -bm -dHB_THREAD_SUPPORT
 HARBOURFLAGS=-dHB_THREAD_SUPPORT $(HARBOURFLAGS)
+!endif
+
+!ifndef HB_NO_FM_DL_ALLOC
+CLIBFLAGS    =-dHB_FM_DL_ALLOC $(CLIBFLAGS)
+!endif
+
+!ifndef HB_NO_VM_ALL
+CLIBFLAGS    =-dHB_VM_ALL $(CLIBFLAGS)
 !endif
 
 #-------------------------------------------------------------------------------
@@ -117,6 +125,10 @@ PROJECT=$(ST_PROJECT)
 PROJECT=$(MT_PROJECT)
 !endif
 
+!ifdef HB_NO_VM_ALL
+PROJECT=$(PROJECT) $(FMSTAT_LIB)
+!endif
+
 ALL: $(PROJECT)
 
 #===============================================================================
@@ -131,8 +143,13 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
 $(CT_LIB) : $(CT_LIB_OBJS)
 	$(LIB_CMD)
 
+!ifndef HB_NO_VM_ALL
+VM_LIB_OBJS=\
+	$(VM_ALL_OBJS)
+!endif
 VM_LIB_OBJS=\
 	$(VM_LIB_OBJS)\
+	$(VM_COMMON_OBJS)\
 	$(VM_MAIN_OBJS)
 $(VM_LIB) : $(VM_LIB_OBJS)
 	$(LIB_CMD)
@@ -333,6 +350,12 @@ ACEH_DIR    =-i="$(HB_DIR_ADS)"
 !endif
 INCLUDE_DIR =-i=include -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt -i=$(ZLIB_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) $(ACEH_DIR) $(INCLUDE_DIR) -bd -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dHB_NO_DUPLICATE_HVMPROCESSSYMBOL -d__EXPORT__ -dHAVE_CONFIG_H
+!ifndef HB_NO_FM_DL_ALLOC
+CLIBFLAGS    =-dHB_FM_DL_ALLOC $(CLIBFLAGS)
+!endif
+!ifndef HB_NO_VM_ALL
+CLIBFLAGS    =-dHB_VM_ALL $(CLIBFLAGS)
+!endif
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 CC_CMD      =WCC386 $(CLIBFLAGS) -fo$@ $**
 CCC_CMD     =$(CC_CMD)
@@ -351,6 +374,13 @@ ALL: $(DLL_PROJECT)
 #===============================================================================
 # HARBOUR.DLL rules
 #===============================================================================
+!ifndef HB_NO_VM_ALL
+VM_LIB_OBJS=\
+	$(VM_ALL_OBJS)
+!endif
+VM_LIB_OBJS=\
+	$(VM_LIB_OBJS)\
+	$(VM_COMMON_OBJS)
 $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 	$(DLL_LINK_CMD)
 

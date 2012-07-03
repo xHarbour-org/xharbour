@@ -71,7 +71,13 @@ EXEFLAGS=\
 	/SUBSYSTEM:CONSOLE
 
 CLIBFLAGS   =$(CLIBFLAGS) /Ze /Zx /Tx86-coff /Go $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"NULL=0" /D"HB_NO_DUPLICATE_HVMPROCESSSYMBOL" /D"__EXPORT__" /D"HAVE_CONFIG_H"
-HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -iINCLUDE -q0 -w2 -es2 -gc0
+HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -iinclude -q0 -w2 -es2 -gc0
+!ifndef HB_NO_FM_DL_ALLOC
+CLIBFLAGS    =/D"HB_FM_DL_ALLOC" $(CLIBFLAGS)
+!endif
+!ifndef HB_NO_VM_ALL
+CLIBFLAGS    =/D"HB_VM_ALL" $(CLIBFLAGS)
+!endif
 CC_CMD      =POCC $(CLIBFLAGS) /Fo$@ $**
 CCC_CMD     =$(CC_CMD)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
@@ -89,6 +95,13 @@ ALL: $(DLL_PROJECT)
 #===============================================================================
 # HARBOUR.DLL rules
 #===============================================================================
+!ifndef HB_NO_VM_ALL
+VM_LIB_OBJS=\
+	$(VM_ALL_OBJS)
+!endif
+VM_LIB_OBJS=\
+	$(VM_LIB_OBJS)\
+	$(VM_COMMON_OBJS)
 $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 	$(DLL_LINK_CMD)
 

@@ -75,7 +75,8 @@ typedef struct _HB_STACKRDD_TLS
 #if defined( HB_OS_WIN )
    /* This section should be above any #includes that may #include <windows.h> */
    #ifndef _WIN32_WINNT
-      #define _WIN32_WINNT 0x0400
+      #define _WIN32_WINNT 0x0403
+      /* #define _WIN32_WINNT 0x0400 */
    #endif
    #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
 
@@ -153,7 +154,9 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    #define HB_SAME_THREAD(x, y)        ((x) == (y))
 
    /* Guard for cancellation requets */
+   HB_EXTERN_BEGIN
    extern HB_CRITICAL_T hb_cancelMutex;
+   HB_EXTERN_END
 
    #define HB_ENABLE_ASYN_CANC       HB_THREAD_GUARD( hb_cancelMutex, HB_VM_STACK.bCanCancel = TRUE )
    #define HB_DISABLE_ASYN_CANC      HB_THREAD_GUARD( hb_cancelMutex, HB_VM_STACK.bCanCancel = FALSE )
@@ -193,6 +196,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
       HB_VM_STACK.pCleanUp[ HB_VM_STACK.iCleanCount ]( HB_VM_STACK.pCleanUpParam[ HB_VM_STACK.iCleanCount ]);\
    }
 
+#if !defined( _HB_STACK_LOCAL_MACROS_ )
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -204,6 +208,7 @@ extern HB_IMPORT DWORD hb_dwCurrentStack;
 #ifdef __cplusplus
 }
 #endif
+#endif /* _HB_STACK_LOCAL_MACROS_ */
 
    #define hb_threadGetCurrentStack() ( (HB_STACK *) TlsGetValue( hb_dwCurrentStack ) )
 

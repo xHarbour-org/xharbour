@@ -8,6 +8,89 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-04 04:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + source/vm/hvmall.c
+    ! This file serves as an amalgamation of VM modules which is enabled by
+    default. Idea is borrowed from Harbour.
+
+  * source/vm/cmdarg.c
+  * source/vm/hbi18n.c
+  * source/vm/inet.c
+  * source/vm/dbgentry.c
+  * source/vm/runner.c
+    ! do not access internals directly
+
+  * source/vm/cmdarg.c
+    + fixed compilation when HB_VM_ALL is defined
+    - commented not-required startup procedure
+
+  * source/rtl/regex.c
+    ! use API instead of directly accessing internals
+
+  * include/hbstack.h
+  * source/vm/estack.c
+    + BOOL hb_stackcheckrddpstack()
+    + HB_MATH_EXCEPTION hb_s_hb_exc()
+    + BOOL _hb_stack_ready()
+    The above functions help various xHarbour modules avoiding access to internals
+    when HB_VM_ALL is activated
+
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/hbserv.c
+  * source/rtl/bkgtsks.c
+  * source/rtl/console.c
+  * source/rtl/math.c
+  * source/rdd/wafunc.c
+    ! using API in place of internals when HB_VM_ALL is defined
+
+  * source/vm/dbgentry.c
+    ! renamed: HB_DEBUGINFO -> HB_DEBUGINFO_ since it clashes with that in
+      include/hbcomp.h
+
+  * source/vm/thread.c
+  * source/vm/estack.c
+  * include/thread.h
+  * include/hbstack.h
+    + optional flags to enable amalgamation of VM modules.
+
+  * include/thread.h
+    ! upgrade _WIN32_WINNT: 0x400 -> 0x0403, to enable some locking functions
+    required when HB_FM_DL_ALLOC is defined.
+
+  * tests/inetto.prg
+    ! function does not return value, fixed.
+
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/makefile.wc
+  * winmake/makefile.bc
+  * winmake/makefile.vc
+  * winmake/makefile.gc
+  * winmake/makefile.pc
+  * winmake/makefile.dc
+  * winmake/hrbdll.pc
+    ! add option to amalgamate vm functions.
+    /*
+    NOTE:
+    The following report shows various performance of tests/speedtst.prg:
+
+    Total real time (WinXP SP3, Pentium 4, 1GB memory, BCC 5.82)
+    1. Without HB_FM_DL_ALLOC and without HB_VM_ALL: 92.34
+    2. Witout HB_FM_DL_ALLOC and with HB_VM_ALL:     88.98
+    3. With HB_FM_DL_ALLOC and with HB_VM_ALL:       67.45
+    4. With HB_FM_DL_ALLOC and without HB_VM_ALL:    64.30
+
+    HB_FM_DL_ALLOC and HB_VM_ALL are set by default. There were reports that
+    HB_FM_DL_ALLOC fails in some Win7 machines, therefore if this anomaly is
+    found, HB_FM_DL_ALLOC should be disabled. The following settings will be
+    required to return to normal build (either one of them or both):
+      SET HB_NO_FM_DL_ALLOC=yes  (to disable external memory manager dlmalloc)
+      SET HB_NO_VM_ALL=yes       (to disable VM amalgamation)
+
+    fmstat.lib is by default no longer built. If required, we have to compile
+    xHarbour in classic way by: SET HB_NO_VM_ALL=yes
+    */
+
 2012-07-02 18:02 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/common.mak
   * winmake/compile.mak

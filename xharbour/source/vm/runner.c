@@ -59,8 +59,9 @@
  *  __HRBGETFU()
  *  __HRBDOFU()
  */
-
+#if 0
 #include "hbvmopt.h"
+#endif
 #include "hbapi.h"
 #include "hbstack.h"
 #include "hbapiitm.h"
