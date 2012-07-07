@@ -90,7 +90,7 @@ OPTFLAGS=-Ogt2yb1p
 !else
 OPTFLAGS=-Otyb1
 !endif
-INCLUDE_DIR =-I"include" -I"$(OBJ_DIR)" -I"$(CC_DIR)\include" -I"$(ZLIB_DIR)"
+INCLUDE_DIR =-I"include" -I"$(OBJ_DIR)" -I"$(CC_DIR)\include" -I"$(ZLIB_DIR)" -I"$(PDFLIB_DIR)"
 !if ("$(USE_MSVCRT)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -MD
 CLIBFLAGS_C=$(CLIBFLAGS_C) -MD

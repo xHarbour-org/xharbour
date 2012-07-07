@@ -3589,7 +3589,7 @@ $(OBJ_DIR)$(DIR_SEP)genpdf1.c : $(HBDOC_DIR)$(DIR_SEP)genpdf1.prg
 $(OBJ_DIR)$(DIR_SEP)genpdf1$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)genpdf1.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)pdfhbdoc$(OBJEXT) : $(PDFLIB_DIR)$(DIR_SEP)pdfhbdoc.c
+$(OBJ_DIR)$(DIR_SEP)pdfhbdoc$(OBJEXT) : $(HBDOC_DIR)$(DIR_SEP)pdfhbdoc.c
 	$(CC_CMD)
 
 #===============================================================================
@@ -4486,17 +4486,14 @@ $(OBJ_DIR)$(DIR_SEP)tsqlbrw.c : $(MYSQL_DIR)$(DIR_SEP)tsqlbrw.prg
 $(OBJ_DIR)$(DIR_SEP)pdf1$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)pdf1.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)pdfhbdocs$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)pdfhbdocs.c
-	$(CC_CMD)
-
 $(OBJ_DIR)$(DIR_SEP)pdf1.c : $(PDFLIB_DIR)$(DIR_SEP)pdf1.prg
 	$(HB_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pdflib$(OBJEXT) : $(PDFLIB_DIR)$(DIR_SEP)pdflib.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)pdfhbdocs.c : $(PDFLIB_DIR)$(DIR_SEP)pdfhbdocs.prg
-	$(HB_CMD)
+$(OBJ_DIR)$(DIR_SEP)hbpdflib$(OBJEXT) : $(PDFLIB_DIR)$(DIR_SEP)hbpdflib.c
+	$(CC_CMD)
 
 #===============================================================================
 # PQSQL.LIB dependencies

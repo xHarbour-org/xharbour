@@ -1830,7 +1830,7 @@ MYQSL_LIB_OBJS=\
 PDFLIB_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)pdf1$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pdflib$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)pdfhbdocs$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)hbpdflib$(OBJEXT)
 
 #===============================================================================
 # PQSQL.LIB dependencies

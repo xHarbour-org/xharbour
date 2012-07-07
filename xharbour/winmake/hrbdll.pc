@@ -54,7 +54,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 HARBOURFLAGS=$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
 CLIBFLAGS   =$(CLIBFLAGS) /MT /DHB_THREAD_SUPPORT
-INCLUDE_DIR =/I"include" /I"$(CC_DIR)\include" /I"$(CC_DIR)\include\win" /I"$(OBJ_DIR)"
+INCLUDE_DIR =/I"include" /I"$(CC_DIR)\include" /I"$(CC_DIR)\include\win" /I"$(OBJ_DIR)" /I"$(PDFLIB_DIR)"
 INCLUDE_DIR =$(INCLUDE_DIR) /I"$(ZLIB_DIR)"
 
 DLLFLAGS=\

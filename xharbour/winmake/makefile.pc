@@ -37,7 +37,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
-INCLUDE_DIR =/I"include" /I"$(CC_DIR)\include" /I"$(CC_DIR)\include\win" /I"$(OBJ_DIR)"
+INCLUDE_DIR =/I"include" /I"$(CC_DIR)\include" /I"$(CC_DIR)\include\win" /I"$(OBJ_DIR)" /I"$(PDFLIB_DIR)"
 INCLUDE_DIR =$(INCLUDE_DIR) /I"$(ZLIB_DIR)"
 HARBOURFLAGS=$(HARBOURFLAGS) $(INCLUDE_DIR) -q0 -w2 -es2 -gc0
 #-------------------------------------------------------------------------------

@@ -46,7 +46,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
-INCLUDE_DIR  =$(INCLUDE_DIR) -Iinclude -I$(OBJ_DIR) -I$(ZLIB_DIR)
+INCLUDE_DIR  =$(INCLUDE_DIR) -Iinclude -I$(OBJ_DIR) -I$(ZLIB_DIR) -I$(PDFLIB_DIR)
 CLIBFLAGS    =$(CLIBFLAGS) -q -c $(INCLUDE_DIR) -d -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H
 HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 LINK_CMD     =ILINK32 -ap -Tpe -x -Gn -C -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" -Llib\b32 $(LFLAGS) "$(CC_DIR)\lib\c0x32.obj" $**,$@,,

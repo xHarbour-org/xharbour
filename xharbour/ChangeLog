@@ -8,6 +8,41 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-07 14:23 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + contrib/pdflib/tests/pdflib.txt
+  + contrib/pdflib/tests/text2pdf.prg
+    ! test program for PDFLib
+
+  + contrib/pdflib/hbpdflib.c
+    ! PRG Level functions (very partial - quick & dirty made) just for testing
+    the accompanying test program.
+
+  * contrib/pdflib/pdflib.c
+    ! added missing wrappers
+
+  * contrib/pdflib/pdf.ch
+  * contrib/pdflib/pdfhbdoc.ch
+    + SVN file header added
+
+  - contrib/pdflib/pdfhbdoc.c
+  - contrib/pdflib/pdfhbdocs.prg
+  - contrib/pdflib/fonts.dat
+  + utils/hbdoc/pdfhbdoc.c
+  + utils/hbdoc/pdfhbdocs.prg
+  + utils/hbdoc/fonts.dat
+    ! moved HBDOC related files to proper folder
+
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/hrbdll.pc
+  * winmake/makefile.bc
+  * winmake/makefile.dc
+  * winmake/makefile.gc
+  * winmake/makefile.pc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+    ! inclusion of hbpdflib.obj into PDFlib.lib and movement of files per above
+
 2012-07-04 04:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   + source/vm/hvmall.c
     ! This file serves as an amalgamation of VM modules which is enabled by

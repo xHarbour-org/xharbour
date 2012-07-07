@@ -57,7 +57,7 @@ CLIBFLAGS   +=
 INCLUDE_DIR  =include
 HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
 CLIBFLAGS   +=-DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -D__WIN32__ -Wall $(NOCYGWIN) -O3 -mtune=pentium -c -fomit-frame-pointer -march=i586 -fno-strict-aliasing -I$(INCLUDE_DIR) -I$(OBJ_DIR)
-CLIBFLAGS   +=-I$(ZLIB_DIR)
+CLIBFLAGS   +=-I$(ZLIB_DIR) -I$(PDFLIB_DIR)
 
 ifeq ($(HB_THREAD_SUPPORT),1)
 	CLIBFLAGS+=-DHB_THREAD_SUPPORT -mthreads

@@ -37,7 +37,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
-INCLUDE_DIR=-I"include" -I"$(OBJ_DIR)" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(ZLIB_DIR)"
+INCLUDE_DIR=-I"include" -I"$(OBJ_DIR)" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(ZLIB_DIR)" -I"$(PDFLIB_DIR)"
 !if ("$(HB_MT)"=="mt")
 HARBOURFLAGS=-dHB_THREAD_SUPPORT
 CLIBFLAGS   =-D_MT -DHB_THREAD_SUPPORT
@@ -355,7 +355,9 @@ CLIBFLAGS_C  =-D"HB_FM_DL_ALLOC" $(CLIBFLAGS_C)
 CLIBFLAGS    =-D"HB_VM_ALL" $(CLIBFLAGS)
 CLIBFLAGS_C  =-D"HB_VM_ALL" $(CLIBFLAGS_C)
 !endif
-HARBOURFLAGS=$(HARBOURFLAGS) -i"include" -q0 -w2 -es2 -gc0
+CLIBFLAGS   =-D_MT -D"HB_THREAD_SUPPORT" $(CLIBFLAGS)
+CLIBFLAGS_C =-D_MT -D"HB_THREAD_SUPPORT" $(CLIBFLAGS_C)
+HARBOURFLAGS=$(HARBOURFLAGS) -d"HB_THREAD_SUPPORT" -i"include" -q0 -w2 -es2 -gc0
 CC_CMD      =SCPPN $(CLIBFLAGS) -o$@ $**
 CCC_CMD     =SCPPN $(CLIBFLAGS_C) -o$@ $**
 HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@

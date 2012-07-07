@@ -266,6 +266,19 @@ int PDF_findfont (PDF *p, const char *fontname, const char *encoding, int embed 
     return pFunc( p, fontname, encoding, embed );
 }
 
+int PDF_load_font(PDF *p, const char *fontname, int len, const char *encoding, const char *optlist )
+{
+#if defined(__cplusplus)
+    static PDF_LOAD_FONT
+#else
+    static PDF_LOAD_FONT pFunc = NULL;
+    if ( !pFunc )
+#endif
+       pFunc = (PDF_LOAD_FONT) PDFLib_GetProcAddress( "PDF_load_font" );
+
+    return pFunc( p, fontname, len, encoding, optlist );
+}
+
 void PDF_set_info (PDF *p, const char *key, const char *value)
 {
 #if defined(__cplusplus)
@@ -2056,13 +2069,13 @@ static void hb_pdflibInit( void * cargo )
    if ( !hModule )
    {
       hModule = LoadLibrary( PDFLIBDLL_NAME );
-   }
 
-   if ( !hModule )
-   {
-      char __szError[256];
-      hb_snprintf( __szError, sizeof( __szError ), "Cannot load %s", PDFLIBDLL_NAME );
-      hb_errInternal( 5178, __szError, NULL, NULL );
+      if ( !hModule )
+      {
+         char __szError[256];
+         hb_snprintf( __szError, sizeof( __szError ), "Cannot load %s", PDFLIBDLL_NAME );
+         hb_errInternal( 5178, __szError, NULL, NULL );
+      }
    }
 }
 
@@ -2073,6 +2086,7 @@ static void hb_pdflibExit( void * cargo )
    if( hModule )
       FreeLibrary( hModule );
 }
+
 
 #define __PRG_SOURCE__ __FILE__
 

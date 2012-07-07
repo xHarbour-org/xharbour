@@ -43,7 +43,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 INCLUDE_DIR =include
 INCLUDE_DIR =-i=$(INCLUDE_DIR) -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt
-INCLUDE_DIR =$(INCLUDE_DIR) -i=$(ZLIB_DIR)
+INCLUDE_DIR =$(INCLUDE_DIR) -i=$(ZLIB_DIR) -i=$(PDFLIB_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) $(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dHAVE_CONFIG_H -d_HAVE_SQLITE_CONFIG_H
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 
