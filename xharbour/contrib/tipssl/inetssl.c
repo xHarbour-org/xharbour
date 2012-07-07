@@ -58,7 +58,9 @@
 * if you do not wish that, delete this exception notice.
 *
 */
+#if 0
 #include "hbvmopt.h"
+#endif
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbstack.h"
