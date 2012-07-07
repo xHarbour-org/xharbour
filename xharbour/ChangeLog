@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-07 14:43 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/hvmall.c
+    ! simplified logic
+
 2012-07-07 14:23 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   + contrib/pdflib/tests/pdflib.txt
   + contrib/pdflib/tests/text2pdf.prg
