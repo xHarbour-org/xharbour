@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-07 21:44 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/pdflib/hbpdflib.c
+    ! pacify BCC warning
+
 2012-07-07 20:31 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/tipssl/inetssl.c
     ! using API instead of internals

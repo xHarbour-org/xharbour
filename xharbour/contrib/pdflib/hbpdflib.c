@@ -53,16 +53,15 @@
 #define HB_OS_WIN_USED
 
 #include "hbapi.h"
-#include "hbapifs.h"
 #include "hbapiitm.h"
-#include "hbvm.h"
 #include "pdflib.h"
 
 static PDF* pPDFLib = NULL;
 
 HB_FUNC( PDF_NEW )
 {
-   hb_retni( ( pPDFLib = PDF_new() ) ? 1 : 0 );
+   pPDFLib = PDF_new();
+   hb_retni( pPDFLib ? 1 : 0 );
 }
 
 HB_FUNC( PDF_DELETE )
