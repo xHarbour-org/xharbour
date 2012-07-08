@@ -17,14 +17,6 @@
 #===============================================================================
 !include winmake\common.mak
 
-!if !("$(HB_DOC_PDF)"=="")
-HBDOC_PDFLIB_LIB=$(PDFLIB_LIB)
-HBDOC_EXE_OBJS=\
-	$(HBDOC_EXE_OBJS)\
-	$(OBJ_DIR)\genpdf1.obj\
-	$(OBJ_DIR)\pdfhbdoc.obj
-!endif
-
 #===============================================================================
 # Compiler and 3rd Party libraries need to be linked
 #===============================================================================
@@ -54,8 +46,8 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 HARBOURFLAGS=$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
 CLIBFLAGS   =$(CLIBFLAGS) /MT /DHB_THREAD_SUPPORT
-INCLUDE_DIR =/I"include" /I"$(CC_DIR)\include" /I"$(CC_DIR)\include\win" /I"$(OBJ_DIR)" /I"$(PDFLIB_DIR)"
-INCLUDE_DIR =$(INCLUDE_DIR) /I"$(ZLIB_DIR)"
+INCLUDE_DIR =/I"include" /I"$(CC_DIR)\include" /I"$(CC_DIR)\include\win" /I"$(OBJ_DIR)"
+INCLUDE_DIR =$(INCLUDE_DIR) /I"$(ZLIB_DIR)" /I"$(PNG_DIR)" /I"$(PDFLIB_DIR)" /I"$(PDFLITE_DIR)\include"
 
 DLLFLAGS=\
 	/OUT:$(HARBOUR_DLL)\
@@ -85,7 +77,7 @@ HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
 DLL_LINK_CMD=POLINK $(DLLFLAGS)
-DLLEXE_LINK_CMD=POLINK $(EXEFLAGS) /OUT:$@ $** $(USE_DLL_LIB) $(HARBOUR_DLL_LIB) $(HBDOC_PDFLIB_LIB) $(COMPILERLIBS)
+DLLEXE_LINK_CMD=POLINK $(EXEFLAGS) /OUT:$@ $** $(USE_DLL_LIB) $(HARBOUR_DLL_LIB) $(ZLIB_LIB) $(PNG_LIB) $(PDFLITE_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # The Project

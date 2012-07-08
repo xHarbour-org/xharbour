@@ -33,13 +33,6 @@ include winmake/common.mak
 
 HBFILERE_EXE=
 
-ifneq ($(HB_DOC_PDF),)
-HBDOC_PDFLIB_LIB=$(PDFLIB_LIB)
-HBDOC_EXE_OBJS+=\
-	$(OBJ_DIR)/genpdf1.o\
-	$(OBJ_DIR)/pdfhbdoc.o
-endif
-
 ifeq ($(HB_GTALLEG),yes)
 HB_GT_LIBS+=\
 	$(GTALLEG_LIB)
@@ -57,7 +50,7 @@ CLIBFLAGS   +=
 INCLUDE_DIR  =include
 HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
 CLIBFLAGS   +=-DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -D__WIN32__ -Wall $(NOCYGWIN) -O3 -mtune=pentium -c -fomit-frame-pointer -march=i586 -fno-strict-aliasing -I$(INCLUDE_DIR) -I$(OBJ_DIR)
-CLIBFLAGS   +=-I$(ZLIB_DIR) -I$(PDFLIB_DIR)
+CLIBFLAGS   +=-I$(ZLIB_DIR) -I$(PNG_DIR) -I$(PDFLIB_DIR) -I$(PDFLITE_DIR)/include
 
 ifeq ($(HB_THREAD_SUPPORT),1)
 	CLIBFLAGS+=-DHB_THREAD_SUPPORT -mthreads
@@ -103,7 +96,10 @@ HARBOUR_LIBS=\
 	-lrtl$(HB_MT)\
 	-lrdd$(HB_MT)\
 	-lct\
+	-lpng\
 	-lzlib\
+	-lpdflib\
+	-lpdflite\
 	-lgtwin\
 	-llibmisc\
 	-lcodepage\
@@ -286,7 +282,10 @@ $(HSX_LIB) : $(HSX_LIB_OBJS)
 $(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
 	$(LIB_CMD)
 
-$(PDFLIB_LIB) : $(PDFLIB_LIB_OBJS)
+$(PDFLITE_LIB) : $(PDFLITE_LIB_OBJS)
+	$(LIB_CMD)
+
+$(PNG_LIB) : $(PNG_LIB_OBJS)
 	$(LIB_CMD)
 
 #*******************************************************************************
@@ -305,13 +304,6 @@ DLL_MT=mt
 # Macro Definitions
 #===============================================================================
 include winmake/common.mak
-
-ifneq ($(HB_DOC_PDF),)
-HBDOC_PDFLIB_LIB=$(PDFLIB_LIB)
-HBDOC_EXE_OBJS+=\
-	$(OBJ_DIR)/genpdf1.o\
-	$(OBJ_DIR)/pdfhbdoc.o
-endif
 
 #===============================================================================
 # Compiler and 3rd Party libraries need to be linked
@@ -377,7 +369,7 @@ ACEH_DIR    =-I"$(HB_DIR_ADS)"
 endif
 INCLUDE_DIR =include
 CLIBFLAGS   +=-DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -Wall -mdll -fomit-frame-pointer -march=i586 $(NOCYGWIN) -O3 -c -fno-strict-aliasing $(ACEH_DIR) -I$(INCLUDE_DIR) -I$(OBJ_DIR)
-CLIBFLAGS   +=-I$(ZLIB_DIR)
+CLIBFLAGS   +=-I$(ZLIB_DIR) -I$(PNG_DIR) -I$(PDFLIB_DIR) -I$(PDFLITE_DIR)/include
 HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
 
 ifndef HB_NO_FM_DL_ALLOC
@@ -395,7 +387,7 @@ HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(LINEFLAGS) -d_USE_APPMAIN_ $(HARBOURFLAGS) -o$
 BISON_CMD1  =bison -v -p yy -d -o $@ $^
 BISON_CMD2  =bison -v -p hb_comp -d -o $@ $^
 DLL_LINK_CMD=GCC -shared -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1)
-DLLEXE_LINK_CMD=GCC -Wall $(NOCYGWIN) -o $@ $^ $(HARBOUR_DLL) $(USE_DLL_LIB) $(HBDOC_PDFLIB_LIB) $(COMPILERLIBS)
+DLLEXE_LINK_CMD=GCC -Wall $(NOCYGWIN) -o $@ $^ $(HARBOUR_DLL) $(USE_DLL_LIB) -Wl,--start-group -lpng -lzlib -lpdflib -lpdflite -Wl,--end-group  $(COMPILERLIBS)
 
 #===============================================================================
 # The Project
@@ -644,9 +636,6 @@ $(WHAT32_LIB) : $(WHAT32_LIB_OBJS)
 	$(LIB_CMD)
 
 $(WVTGUI_LIB) : $(WVTGUI_LIB_OBJS)
-	$(LIB_CMD)
-
-$(PNG_LIB) : $(PNG_LIB_OBJS)
 	$(LIB_CMD)
 
 $(HBHPDF_LIB) : $(HBHPDF_LIB_OBJS)

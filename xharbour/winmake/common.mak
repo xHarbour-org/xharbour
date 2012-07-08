@@ -89,6 +89,7 @@ TIPSSL_DIR    =contrib$(DIR_SEP)tipssl
 CGILIB_DIR    =contrib$(DIR_SEP)cgilib
 HBMAGIC_DIR   =contrib$(DIR_SEP)hbmagic
 HBTINYMT_DIR  =contrib$(DIR_SEP)hbtinymt
+PDFLITE_DIR   =contrib$(DIR_SEP)pdflite
 
 INCLUDE_DIR2  =include
 
@@ -143,6 +144,7 @@ HB_GT_LIBS  =$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTWVT_LIB) $(
 #===============================================================================
 # Contrib Library Names
 #===============================================================================
+PDFLITE_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)pdflite$(LIBEXT)
 HBTINYMT_LIB =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbtinymt$(LIBEXT)
 HBMAGIC_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbmagic$(LIBEXT)
 HBEXPAT_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbexpat$(LIBEXT)
@@ -171,7 +173,6 @@ HBMZIP_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbmzip$(LIBEXT)
 HBZIP_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbzip$(LIBEXT)
 LIBNF_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)libnf$(LIBEXT)
 MYSQL_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)mysql$(LIBEXT)
-PDFLIB_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)pdflib$(LIBEXT)
 PGSQL_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)libhbpg$(LIBEXT)
 RDDADS_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)rddads$(LIBEXT)
 ACE32_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)ace32$(LIBEXT)
@@ -253,6 +254,171 @@ HARBOUR_LIBS=\
 #===============================================================================
 VM_ALL_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hvmall$(HB_MT)$(OBJEXT)
+
+#===============================================================================
+# PDFLITE.LIB Dependencies
+#===============================================================================
+PDFLITE_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)pdf1$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbpdflib$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)ft_cid$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ft_corefont$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ft_font$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ft_hostfont$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ft_pdffont$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ft_truetype$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ft_type1$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)pc_aes$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_aescbc$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_arc4$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_chartabs$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_contain$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_core$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_crypt$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_ctype$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_digsig$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_ebcdic$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_encoding$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_file$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_geom$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_md5$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_optparse$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_output$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_resource$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_scan$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_scope$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_string$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_unicode$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_util$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pc_xmp$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)pdflib_core$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_actions$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_afm$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_annots$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_bmp$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_ccitt$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_cid$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_color$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_document$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_draw$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_encoding$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_filter$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_font$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_gif$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_gstate$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_hyper$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_icclib$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_image$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_jpeg$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_jpx$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_kerning$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_mbox$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_object$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_opi$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_page$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_params$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_pattern$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_pfm$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_photoshp$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_png$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_shading$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_subsett$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_tagged$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_template$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_text$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_tiff$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_truetype$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_type1$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_type3$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_util$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)p_xgstate$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)tif_auxx$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_close$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_codec$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_color$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_compress$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_dir$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_dirinfo$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_dirread$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_dirwrite$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_dumpmode$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_error$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_extension$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_fax3$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_fax3sm$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_flush$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_getimage$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_jpeg$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_luv$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_lzw$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_next$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_ojpeg$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_open$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_packbits$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_pixarlog$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_predict$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_print$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_read$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_strip$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_swab$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_thunder$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_tile$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_unix$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_version$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_warning$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_write$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_zip$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)jcapimin$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jcapistd$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jccoefct$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jccolor$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jcdctmgr$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jchuff$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jcinit$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jcmainct$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jcmarker$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jcmaster$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jcomapi$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jcparam$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jcphuff$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jcprepct$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jcsample$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jctrans$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jdapimin$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jdapistd$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jdatadst$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jdatasrc$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jdcoefct$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jdcolor$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jddctmgr$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jdhuff$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jdinput$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jdmainct$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jdmarker$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jdmaster$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jdmerge$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jdphuff$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jdpostct$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jdsample$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jdtrans$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jerror$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jfdctflt$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jfdctfst$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jfdctint$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jidctflt$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jidctfst$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jidctint$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jidctred$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jmemmgr$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jmemnobs$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jquant1$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jquant2$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)jutils$(OBJEXT)
 
 #===============================================================================
 # HBTINYMT.LIB Dependencies
@@ -1479,7 +1645,10 @@ HBDOC_EXE_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)troff$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)fclass1$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)ffile1$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)ft_funcs$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)ft_funcs$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)genpdf1$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pdfhbdoc$(OBJEXT)
 
 #===============================================================================
 # HBMAKE.EXE rules
@@ -1824,13 +1993,6 @@ MYQSL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)tsqlbrw$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)mysql$(OBJEXT)
 
-#===============================================================================
-# PDFLIB.LIB dependencies
-#===============================================================================
-PDFLIB_LIB_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)pdf1$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)pdflib$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)hbpdflib$(OBJEXT)
 
 #===============================================================================
 # PQSQL.LIB dependencies
@@ -2113,7 +2275,8 @@ ST_PROJECT=\
 	$(USE_DLL_LIB)\
 	$(ODBC_LIB)\
 	$(MISC_LIB)\
-	$(PDFLIB_LIB)\
+	$(PDFLITE_LIB)\
+	$(PNG_LIB)\
 	$(HBPP_EXE)\
 	$(HBDOC_EXE)\
 	$(HBMAKE_EXE)\
@@ -2148,7 +2311,6 @@ CONTRIB_PROJECT=\
 	$(LIBNF_LIB)\
 	$(TELEPATH_LIB)\
 	$(HBCC_LIB)\
-	$(PNG_LIB)\
 	$(HBHPDF_LIB)\
 	$(SEVENZIP_LIB)\
 	$(HBZEBRA_LIB)\

@@ -37,8 +37,8 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
-INCLUDE_DIR =/I"include" /I"$(CC_DIR)\include" /I"$(CC_DIR)\include\win" /I"$(OBJ_DIR)" /I"$(PDFLIB_DIR)"
-INCLUDE_DIR =$(INCLUDE_DIR) /I"$(ZLIB_DIR)"
+INCLUDE_DIR =/I"include" /I"$(CC_DIR)\include" /I"$(CC_DIR)\include\win" /I"$(OBJ_DIR)"
+INCLUDE_DIR =$(INCLUDE_DIR) /I"$(ZLIB_DIR)" /I"$(PNG_DIR)" /I"$(PDFLIB_DIR)" /I"$(PDFLITE_DIR)\include"
 HARBOURFLAGS=$(HARBOURFLAGS) $(INCLUDE_DIR) -q0 -w2 -es2 -gc0
 #-------------------------------------------------------------------------------
 # AJ: 2008-04-26
@@ -65,7 +65,6 @@ CC_CMD_FMSTAT=POCC $(__MT__) /DHB_FM_STATISTICS $(CLIBFLAGS) /Fo$@ $**
 #--------------------------------------------------------
 # Pelles C v.5x need /alternatename flag. It seems a bug.
 #--------------------------------------------------------
-#LINKERFLAGS  =/LIBPATH:$(LIB_DIR) /LIBPATH:"$(CC_DIR)\LIB" /LIBPATH:"$(CC_DIR)\LIB\WIN" /MACHINE:IX86 /SUBSYSTEM:CONSOLE /ALTERNATENAME:_WizMain=WizMain /ALTERNATENAME:_errno=___errno
 LINKERFLAGS  =/LIBPATH:$(LIB_DIR) /LIBPATH:"$(CC_DIR)\LIB" /LIBPATH:"$(CC_DIR)\LIB\WIN" /MACHINE:IX86 /SUBSYSTEM:CONSOLE
 LINK_CMD     =POLINK /OUT:$@ $** $(LINKERFLAGS)
 LIB_CMD      =POLIB /OUT:$@ $**
@@ -93,14 +92,6 @@ CMN_LIBS=$(COMMON_LIB) $(COMPILERLIBS)
 # Macro Definitions
 #===============================================================================
 !include winmake\common.mak
-
-!if !("$(HB_DOC_PDF)"=="")
-HBDOC_PDFLIB_LIB=$(PDFLIB_LIB)
-HBDOC_EXE_OBJS=\
-	$(HBDOC_EXE_OBJS)\
-	$(OBJ_DIR)\genpdf1.obj\
-	$(OBJ_DIR)\pdfhbdoc.obj
-!endif
 
 #===============================================================================
 # The Project
@@ -252,8 +243,11 @@ $(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
 $(FMSTAT_LIB) : $(FMSTAT_LIB_OBJS)
 	$(LIB_CMD)
 
-$(PDFLIB_LIB) : $(PDFLIB_LIB_OBJS)
+$(PDFLITE_LIB) : $(PDFLITE_LIB_OBJS)
         $(LIB_CMD)
+
+$(PNG_LIB) : $(PNG_LIB_OBJS)
+	$(LIB_CMD)
 
 #===============================================================================
 # Building rules of Object files

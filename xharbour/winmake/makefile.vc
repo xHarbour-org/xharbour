@@ -42,14 +42,6 @@ CPLUSPLUS=1
 #===============================================================================
 !include winmake\common.mak
 
-!if !("$(HB_DOC_PDF)"=="")
-HBDOC_PDFLIB_LIB=$(PDFLIB_LIB)
-HBDOC_EXE_OBJS=\
-	$(HBDOC_EXE_OBJS)\
-	$(OBJ_DIR)\genpdf1.obj\
-	$(OBJ_DIR)\pdfhbdoc.obj
-!endif
-
 !ifdef HB_GTALLEG
 HB_GT_LIBS=\
 	$(HB_GT_LIBS)\
@@ -91,6 +83,7 @@ OPTFLAGS=-Ogt2yb1p
 OPTFLAGS=-Otyb1
 !endif
 INCLUDE_DIR =-I"include" -I"$(OBJ_DIR)" -I"$(CC_DIR)\include" -I"$(ZLIB_DIR)" -I"$(PDFLIB_DIR)"
+INCLUDE_DIR =$(INCLUDE_DIR) -I"$(PDFLIB_DIR)" -I"$(PDFLITE_DIR)\include" -I"$(PNG_DIR)"
 !if ("$(USE_MSVCRT)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -MD
 CLIBFLAGS_C=$(CLIBFLAGS_C) -MD
@@ -305,14 +298,17 @@ $(ODBC_LIB) : $(ODBC_LIB_OBJS)
 $(MISC_LIB) : $(MISC_LIB_OBJS)
 	$(LIB_CMD)
 
-$(PDFLIB_LIB) : $(PDFLIB_LIB_OBJS)
-	$(LIB_CMD)
-
 $(DLL_MAIN_LIB) : $(DLL_MAIN_LIB_OBJS)
 	$(LIB_CMD)
 
 $(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
         $(LIB_CMD)
+
+$(PDFLITE_LIB) : $(PDFLITE_LIB_OBJS)
+	$(LIB_CMD)
+
+$(PNG_LIB) : $(PNG_LIB_OBJS)
+	$(LIB_CMD)
 
 #*******************************************************************************
 !elseif ("$(__BLD__)"=="DLL_BLD")
@@ -405,13 +401,6 @@ ACEH_DIR    =-I"$(HB_DIR_ADS)"
 !ifdef HB_DIR_OPENSSL
 OPENSSL_DIR    =-I"$(HB_DIR_OPENSSL)\include"
 !endif
-!if !("$(HB_DOC_PDF)"=="")
-HBDOC_PDFLIB_LIB=$(PDFLIB_LIB)
-HBDOC_EXE_OBJS=\
-	$(HBDOC_EXE_OBJS)\
-	$(OBJ_DIR)\genpdf1.obj\
-	$(OBJ_DIR)\pdfhbdoc.obj
-!endif
 
 DLLFLAGS=\
  	/MAP\
@@ -432,6 +421,8 @@ EXEFLAGS=\
 
 CLIBFLAGS   =$(CLIBFLAGS) -c -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H $(ACEH_DIR) $(OPENSSL_DIR) -I"$(ZLIB_DIR)" -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ $(OPTFLAGS) -Gs -W3 -DOPENSSL_NO_DEPRECATED -nologo $(CFLAGS)
 CLIBFLAGS_C =$(CLIBFLAGS_C) -c -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H $(ACEH_DIR) $(OPENSSL_DIR) -I"$(ZLIB_DIR)" -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ $(OPTFLAGS) -Gs -W3 -DOPENSSL_NO_DEPRECATED -nologo $(CFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS) -I"$(PDFLIB_DIR)" -I"$(PDFLITE_DIR)\include" -I"$(PNG_DIR)"
+CLIBFLAGS_C =$(CLIBFLAGS_C) -I"$(PDFLIB_DIR)" -I"$(PDFLITE_DIR)\include" -I"$(PNG_DIR)"
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 
 !ifndef HB_NO_FM_DL_ALLOC
@@ -451,7 +442,7 @@ HB_CMD_MAIN=$(HARBOUR_EXE) -n0 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 BISON_CMD1 =bison -v -d $** -o$@
 BISON_CMD2 =bison -v -p hb_comp -d $** -o$@
 DLL_LINK_CMD=LINK $(DLLFLAGS)
-DLLEXE_LINK_CMD=LINK $(EXEFLAGS) $(LFLAGS) /OUT:$@ $** $(USE_DLL_LIB) $(HBDOC_PDFLIB_LIB) $(HARBOUR_DLL_LIB)
+DLLEXE_LINK_CMD=LINK $(EXEFLAGS) $(LFLAGS) /OUT:$@ $** $(USE_DLL_LIB) $(PNG_LIB) $(ZLIB_LIB) $(PDFLITE_LIB) $(HARBOUR_DLL_LIB)
 
 #===============================================================================
 # The Project
@@ -720,9 +711,6 @@ WHAT32_LIB_OBJS=\
 	$(WHAT32_LIB_OBJS)\
 	$(OBJ_DIR)\_wincall.obj
 $(WHAT32_LIB) : $(WHAT32_LIB_OBJS)
-	$(LIB_CMD)
-
-$(PNG_LIB) : $(PNG_LIB_OBJS)
 	$(LIB_CMD)
 
 $(HBHPDF_LIB) : $(HBHPDF_LIB_OBJS)

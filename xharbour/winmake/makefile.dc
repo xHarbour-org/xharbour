@@ -38,6 +38,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
 INCLUDE_DIR=-I"include" -I"$(OBJ_DIR)" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(ZLIB_DIR)" -I"$(PDFLIB_DIR)"
+INCLUDE_DIR=$(INCLUDE_DIR) -I"$(PNG_DIR)" -I"$(PDFLITE_DIR)\include"
 !if ("$(HB_MT)"=="mt")
 HARBOURFLAGS=-dHB_THREAD_SUPPORT
 CLIBFLAGS   =-D_MT -DHB_THREAD_SUPPORT
@@ -59,7 +60,7 @@ CLIBFLAGS_C  =-D"HB_VM_ALL" $(CLIBFLAGS_C)
 CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
 CCC_CMD=SCPPN $(CLIBFLAGS_C) -o$@ $**
 CC_CMD_FMSTAT=SCPPN $(CLIBFLAGS) -DHB_FM_STATISTICS -o$@ $**
-LIB_CMD=LIB -c -n $@ $**
+LIB_CMD=LIB -c -n -p64 $@ $**
 BISON_CMD1=bison -v -d $** -o$@
 BISON_CMD2=bison -v -p hb_comp -d $** -o$@
 COMPILERLIBS=\
@@ -87,14 +88,6 @@ CMN_LIBS=$(COMMON_LIB)
 
 # overwrite HB_GT_LIBS because some modules did not compile
 HB_GT_LIBS  =$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTGUI_LIB)
-
-!if !("$(HB_DOC_PDF)"=="")
-HBDOC_PDFLIB_LIB=$(PDFLIB_LIB)
-HBDOC_EXE_OBJS=\
-	$(HBDOC_EXE_OBJS)\
-	$(OBJ_DIR)\genpdf1.obj\
-	$(OBJ_DIR)\pdfhbdoc.obj
-!endif
 
 !ifdef HB_GTALLEG
 HB_GT_LIBS=\
@@ -257,7 +250,10 @@ $(DLL_MAIN_LIB) : $(DLL_MAIN_LIB_OBJS)
 $(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
 	$(LIB_CMD)
 
-$(PDFLIB_LIB) : $(PDFLIB_LIB_OBJS)
+$(PDFLITE_LIB) : $(PDFLITE_LIB_OBJS)
+	$(LIB_CMD)
+
+$(PNG_LIB) : $(PNG_LIB_OBJS)
 	$(LIB_CMD)
 
 #*******************************************************************************
@@ -270,14 +266,6 @@ $(PDFLIB_LIB) : $(PDFLIB_LIB_OBJS)
 # Macro Definitions
 #===============================================================================
 !include winmake\common.mak
-
-!if !("$(HB_DOC_PDF)"=="")
-HBDOC_PDFLIB_LIB=$(PDFLIB_LIB)
-HBDOC_EXE_OBJS=\
-	$(HBDOC_EXE_OBJS)\
-	$(OBJ_DIR)\genpdf1.obj\
-	$(OBJ_DIR)\pdfhbdoc.obj
-!endif
 
 # overwrite HARBOUR_DLL_OBJS as some modules are not compilable
 HARBOUR_DLL_OBJS=\
@@ -343,6 +331,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 ACEH_DIR    =-I"$(HB_DIR_ADS)"
 !endif
 INCLUDE_DIR =-I"include" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(OBJ_DIR)" -I"$(ZLIB_DIR)" $(ACEH_DIR)
+INCLUDE_DIR =$(INCLUDE_DIR) -I"$(PNG_DIR)" -I"$(PDFLIB_DIR)" -I"$(PDFLITE_DIR)\include"
 DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) -D"HB_NO_DUPLICATE_HVMPROCESSSYMBOL" -D"HAVE_CONFIG_H" -D"__EXPORT__" -cpp -mn $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__"
@@ -364,7 +353,7 @@ HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
-DLLEXE_LINK_CMD=LINK /EXETYPE:NT /SUBSYSTEM:CONSOLE $(OBJ_DIR)\mainwin.obj $(OBJ_DIR)\dummyDLL.obj $**,$@,,$(USE_DLL_LIB) $(HBDOC_PDFLIB_LIB) $(HARBOUR_DLL_LIB)
+DLLEXE_LINK_CMD=LINK /EXETYPE:NT /SUBSYSTEM:CONSOLE $(OBJ_DIR)\mainwin.obj $(OBJ_DIR)\dummyDLL.obj $**,$@,,$(USE_DLL_LIB) $(ZLIB_LIB) $(PNG_LIB) $(PDFLITE_LIB) $(HARBOUR_DLL_LIB)
 #===============================================================================
 # The Project
 #===============================================================================
@@ -596,9 +585,6 @@ WHAT32_LIB_OBJS=\
 	$(WHAT32_LIB_OBJS)\
 	$(OBJ_DIR)\_wincall.obj
 $(WHAT32_LIB) : $(WHAT32_LIB_OBJS)
-	$(LIB_CMD)
-
-$(PNG_LIB) : $(PNG_LIB_OBJS)
 	$(LIB_CMD)
 
 $(HBHPDF_LIB) : $(HBHPDF_LIB_OBJS)

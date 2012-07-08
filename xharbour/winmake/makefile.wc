@@ -43,7 +43,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 INCLUDE_DIR =include
 INCLUDE_DIR =-i=$(INCLUDE_DIR) -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt
-INCLUDE_DIR =$(INCLUDE_DIR) -i=$(ZLIB_DIR) -i=$(PDFLIB_DIR)
+INCLUDE_DIR =$(INCLUDE_DIR) -i=$(ZLIB_DIR) -i=$(PDFLIB_DIR) -i=$(PNG_DIR) -i=$(PDFLITE_DIR)\include
 CLIBFLAGS   =$(CLIBFLAGS) $(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dHAVE_CONFIG_H -d_HAVE_SQLITE_CONFIG_H
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 
@@ -101,14 +101,6 @@ CMN_LIBS=$(COMMON_LIB)
 # Macro Definitions
 #===============================================================================
 !include winmake\common.mak
-
-!if !("$(HB_DOC_PDF)"=="")
-HBDOC_PDFLIB_LIB=$(PDFLIB_LIB)
-HBDOC_EXE_OBJS=\
-	$(HBDOC_EXE_OBJS)\
-	$(OBJ_DIR)\genpdf1.obj\
-	$(OBJ_DIR)\pdfhbdoc.obj
-!endif
 
 !ifdef HB_GTALLEG
 HB_GT_LIBS=\
@@ -270,7 +262,10 @@ $(DLL_MAIN_LIB) : $(DLL_MAIN_LIB_OBJS)
 $(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
 	$(LIB_CMD)
 
-$(PDFLIB_LIB) : $(PDFLIB_LIB_OBJS)
+$(PDFLITE_LIB) : $(PDFLITE_LIB_OBJS)
+	$(LIB_CMD)
+
+$(PNG_LIB) : $(PNG_LIB_OBJS)
 	$(LIB_CMD)
 
 #*******************************************************************************
@@ -286,14 +281,6 @@ $(PDFLIB_LIB) : $(PDFLIB_LIB_OBJS)
 # Macro Definitions
 #===============================================================================
 !include winmake\common.mak
-
-!if !("$(HB_DOC_PDF)"=="")
-HBDOC_PDFLIB_LIB=$(PDFLIB_LIB)
-HBDOC_EXE_OBJS=\
-	$(HBDOC_EXE_OBJS)\
-	$(OBJ_DIR)\genpdf1.obj\
-	$(OBJ_DIR)\pdfhbdoc.obj
-!endif
 
 #===============================================================================
 # RDDADS
@@ -340,7 +327,7 @@ DLLFLAGS=\
 	/nologo\
 	/subsystem:console\
 	$(HARBOUR_DLL_OBJS)
-	
+
 EXEFLAGS=\
 	/nologo\
 	/subsystem:console
@@ -349,6 +336,7 @@ EXEFLAGS=\
 ACEH_DIR    =-i="$(HB_DIR_ADS)"
 !endif
 INCLUDE_DIR =-i=include -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt -i=$(ZLIB_DIR)
+INCLUDE_DIR =$(INCLUDE_DIR) -i=$(PDFLIB_DIR) -i=$(PNG_DIR) -i=$(PDFLITE_DIR)\include
 CLIBFLAGS   =$(CLIBFLAGS) $(ACEH_DIR) $(INCLUDE_DIR) -bd -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dHB_NO_DUPLICATE_HVMPROCESSSYMBOL -d__EXPORT__ -dHAVE_CONFIG_H
 !ifndef HB_NO_FM_DL_ALLOC
 CLIBFLAGS    =-dHB_FM_DL_ALLOC $(CLIBFLAGS)
@@ -357,6 +345,7 @@ CLIBFLAGS    =-dHB_FM_DL_ALLOC $(CLIBFLAGS)
 CLIBFLAGS    =-dHB_VM_ALL $(CLIBFLAGS)
 !endif
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
+MAINWIN_OBJ =$(OBJ_DIR)\mainwinW32.obj
 CC_CMD      =WCC386 $(CLIBFLAGS) -fo$@ $**
 CCC_CMD     =$(CC_CMD)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
@@ -364,7 +353,7 @@ HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
 DLL_LINK_CMD=LINK386 $(DLLFLAGS)
-DLLEXE_LINK_CMD=LINK386 $(EXEFLAGS) /OUT:$@ $** $(USE_DLL_LIB) $(HBDOC_PDFLIB_LIB) $(HARBOUR_DLL_LIB)
+DLLEXE_LINK_CMD=LINK386 $(EXEFLAGS) /OUT:$@ $** $(ZLIB_LIB) $(PNG_LIB) $(PDFLITE_LIB) $(HARBOUR_DLL_LIB)
 
 #===============================================================================
 # The Project
@@ -383,6 +372,26 @@ VM_LIB_OBJS=\
 	$(VM_COMMON_OBJS)
 $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 	$(DLL_LINK_CMD)
+
+HBDOCDLL_EXE_OBJS=\
+	$(MAINWIN_OBJ)\
+	$(HBDOCDLL_EXE_OBJS)
+
+HBTESTDLL_EXE_OBJS=\
+	$(MAINWIN_OBJ)\
+	$(HBTESTDLL_EXE_OBJS)
+
+HBMAKEDLL_EXE_OBJS=\
+	$(MAINWIN_OBJ)\
+	$(HBMAKEDLL_EXE_OBJS)
+
+HBRUNDLL_EXE_OBJS=\
+	$(MAINWIN_OBJ)\
+	$(HBRUNDLL_EXE_OBJS)
+
+XBSCRIPTDLL_EXE_OBJS=\
+	$(MAINWIN_OBJ)\
+	$(XBSCRIPTDLL_EXE_OBJS)
 
 #*******************************************************************************
 !elseif ("$(__BLD__)"=="CONTRIB_BLD")
@@ -630,9 +639,6 @@ WHAT32_LIB_OBJS=\
 $(WHAT32_LIB) : $(WHAT32_LIB_OBJS)
 	$(LIB_CMD)
 
-$(PNG_LIB) : $(PNG_LIB_OBJS)
-	$(LIB_CMD)
-
 $(HBHPDF_LIB) : $(HBHPDF_LIB_OBJS)
 	$(LIB_CMD)
 
@@ -671,6 +677,9 @@ $(HBMLZO_LIB) : $(HBMLZO_LIB_OBJS)
 #===============================================================================
 # Building rules of Object files
 #===============================================================================
+$(MAINWIN_OBJ) : $(VM_DIR)\mainwin.c
+	$(CC_CMD)
+
 !if ("$(HB_USE_BISON)"=="1")
 $(OBJ_DIR)\harboury.c : $(COMPILER_DIR)\harbour.sly
 	$(BISON_CMD1)
@@ -690,4 +699,5 @@ $(OBJ_DIR)\harboury$(OBJEXT) : $(COMPILER_DIR)\harbouryy.c
 $(OBJ_DIR)\macroy$(HB_MT)$(OBJEXT) : $(MACRO_DIR)\macroyy.c
 	$(CC_CMD)
 !endif
+
 !include winmake\compile.mak

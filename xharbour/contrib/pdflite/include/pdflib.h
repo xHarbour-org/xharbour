@@ -1,10 +1,7 @@
-/*
- * $Id$
- */
 /*---------------------------------------------------------------------------*
  |              PDFlib - A library for generating PDF on the fly             |
  +---------------------------------------------------------------------------+
- | Copyright (c) 1997-2005 Thomas Merz and PDFlib GmbH. All rights reserved. |
+ | Copyright (c) 1997-2009 Thomas Merz and PDFlib GmbH. All rights reserved. |
  +---------------------------------------------------------------------------+
  |                                                                           |
  |    This software is subject to the PDFlib license. It is NOT in the       |
@@ -15,7 +12,8 @@
 
 /* $Id$
  *
- * PDFlib public function declarations
+ * Public function declarations for PDFlib Lite, PDFlib, PDFlib+PDI, and PPS;
+ * see PDFlib API reference for details.
  *
  */
 
@@ -30,15 +28,17 @@ extern "C" {
 #include <stdio.h>
 #include <setjmp.h>
 
+#define PDFLIB_PRODUCTNAME      "PDFlib"
+
 /*
  * The version defines below can be used to check the version of the
  * include file against the library.
  */
 
-#define PDFLIB_MAJORVERSION	6	/* PDFlib major version number */
-#define PDFLIB_MINORVERSION	0       /* PDFlib minor version number */
-#define PDFLIB_REVISION		2       /* PDFlib revision number */
-#define PDFLIB_VERSIONSTRING	"6.0.2"       /* The whole bunch */
+#define PDFLIB_MAJORVERSION	7		/* major version number */
+#define PDFLIB_MINORVERSION	0       	/* minor version number */
+#define PDFLIB_REVISION		5       	/* revision number */
+#define PDFLIB_VERSIONSTRING	"7.0.5p3"       /* The whole bunch */
 
 
 /*
@@ -74,7 +74,7 @@ extern "C" {
 #endif
 
 #ifndef PDFLIB_API
-    #define PDFLIB_API /* */	/* default: generate or use static library */
+    #define PDFLIB_API /* */	 /* default: generate or use static library */
 #endif
 
 /* Define the basic PDF type. This is used opaquely at the API level. */
@@ -97,21 +97,15 @@ typedef struct PDFlib_api_s PDFlib_api;
  * ----------------------------------------------------------------------
  */
 
-/* pacify MSVS warning, because xHarbour link it as static library */
-#undef  PDFLIB_API
-#undef  PDFLIB_CALL
-#define PDFLIB_API extern
-#define PDFLIB_CALL
-
 /* Activate a previously created structure element or other content item. */
 PDFLIB_API void PDFLIB_CALL
 PDF_activate_item(PDF *p, int id);
 
-/* Deprecated, use  PDF_create_bookmark(). */
+/* Deprecated, use PDF_create_bookmark(). */
 PDFLIB_API int PDFLIB_CALL
 PDF_add_bookmark(PDF *p, const char *text, int parent, int open);
 
-/* Deprecated, use  PDF_create_bookmark(). */
+/* Deprecated, use PDF_create_bookmark(). */
 PDFLIB_API int PDFLIB_CALL
 PDF_add_bookmark2(PDF *p, const char *text, int len, int parent, int open);
 
@@ -129,12 +123,12 @@ PDF_add_locallink(PDF *p, double llx, double lly, double urx, double ury,
 PDFLIB_API void PDFLIB_CALL
 PDF_add_nameddest(PDF *p, const char *name, int len, const char *optlist);
 
-/* Deprecated, use PDF_create_annotation() instead. */
+/* Deprecated, use PDF_create_annotation(). */
 PDFLIB_API void PDFLIB_CALL
 PDF_add_note(PDF *p, double llx, double lly, double urx, double ury,
     const char *contents, const char *title, const char *icon, int open);
 
-/* Deprecated, use PDF_create_annotation() instead. */
+/* Deprecated, use PDF_create_annotation(). */
 PDFLIB_API void PDFLIB_CALL
 PDF_add_note2(PDF *p, double llx, double lly, double urx, double ury,
     const char *contents, int len_cont, const char *title, int len_title,
@@ -144,6 +138,21 @@ PDF_add_note2(PDF *p, double llx, double lly, double urx, double ury,
 PDFLIB_API void PDFLIB_CALL
 PDF_add_pdflink(PDF *p, double llx, double lly, double urx, double ury,
     const char *filename, int page, const char *optlist);
+
+/* Add a cell to a new or existing table.
+   Returns: A table handle which can be used in subsequent table-related calls.
+*/
+PDFLIB_API int PDFLIB_CALL
+PDF_add_table_cell(PDF *p, int table, int column, int row, const char *text,
+    int len, const char *optlist);
+
+/* Create a Textflow object, or add text and explicit options to an existing
+   Textflow.
+   Returns: A Textflow handle, or -1 (in PHP: 0) on error.
+*/
+PDFLIB_API int PDFLIB_CALL
+PDF_add_textflow(PDF *p, int textflow, const char *text, int len,
+    const char *optlist);
 
 /* Add an existing image as thumbnail for the current page. */
 PDFLIB_API void PDFLIB_CALL
@@ -162,24 +171,26 @@ PDF_arc(PDF *p, double x, double y, double r, double alpha, double beta);
 PDFLIB_API void PDFLIB_CALL
 PDF_arcn(PDF *p, double x, double y, double r, double alpha, double beta);
 
-/* Deprecated, use  PDF_create_annotation() instead. */
+/* Deprecated, use PDF_create_annotation(). */
 PDFLIB_API void PDFLIB_CALL
 PDF_attach_file(PDF *p, double llx, double lly, double urx, double ury,
     const char *filename, const char *description, const char *author,
     const char *mimetype, const char *icon);
 
-/* Deprecated, use  PDF_create_annotation() instead. */
+/* Deprecated, use PDF_create_annotation(). */
 PDFLIB_API void PDFLIB_CALL
 PDF_attach_file2(PDF *p, double llx, double lly, double urx, double ury,
     const char *filename, int len_filename, const char *description,
     int len_descr, const char *author, int len_auth, const char *mimetype,
     const char *icon);
 
-/* Create a new PDF file subject to various options. */
+/* Create a new PDF file subject to various options.
+   Returns: -1 (in PHP: 0) on error, and 1 otherwise.
+*/
 PDFLIB_API int PDFLIB_CALL
 PDF_begin_document(PDF *p, const char *filename, int len, const char *optlist);
 
-/* Create a new PDF file subject to various options. */
+/* Create a new PDF document subject to various options. */
 typedef size_t (*writeproc_t)(PDF *p1, void *data, size_t size);
 PDFLIB_API void PDFLIB_CALL
 PDF_begin_document_callback(PDF *p, writeproc_t writeproc, const char *optlist);
@@ -196,7 +207,9 @@ PDF_begin_glyph(PDF *p, const char *glyphname, double wx,
     double llx, double lly, double urx, double ury);
 
 /* Open a structure element or other content item with attributes supplied
- as options. */
+   as options.
+   Returns: An item handle.
+*/
 PDFLIB_API int PDFLIB_CALL
 PDF_begin_item(PDF *p, const char *tag, const char *optlist);
 
@@ -216,22 +229,31 @@ PDF_begin_page(PDF *p, double width, double height);
 PDFLIB_API void PDFLIB_CALL
 PDF_begin_page_ext(PDF *p, double width, double height, const char *optlist);
 
-/* Start a pattern definition. */
+/* Start a pattern definition.
+   Returns: A pattern handle.
+*/
 PDFLIB_API int PDFLIB_CALL
 PDF_begin_pattern(PDF *p,
     double width, double height, double xstep, double ystep, int painttype);
 
-/* Start a template definition. */
+/* Deprecated, use PDF_begin_template_ext(). */
 PDFLIB_API int PDFLIB_CALL
 PDF_begin_template(PDF *p, double width, double height);
 
-/* Start a template definition with option list (unsupported). */
+/* Start a template definition.
+   Returns: A template handle.
+*/
 PDFLIB_API int PDFLIB_CALL
-PDF_begin_template2(PDF *p, double width, double height, const char *optlist);
+PDF_begin_template_ext(PDF *p, double width, double height,
+    const char *optlist);
 
-/* Boot PDFlib (recommended although currently not required). */
+/* Deprecated, and not required. */
 PDFLIB_API void PDFLIB_CALL
 PDF_boot(void);
+
+/* Check the validity of a PDFlib context (unsupported). */
+PDFLIB_API int PDFLIB_CALL
+PDF_check_context(PDF *p);
 
 /* Draw a circle. */
 PDFLIB_API void PDFLIB_CALL
@@ -249,11 +271,15 @@ PDF_close(PDF *p);
 PDFLIB_API void PDFLIB_CALL
 PDF_close_image(PDF *p, int image);
 
-/* Close all open page handles, and close the input PDF document. */
+/* Deprecated, use PDF_close_pdi_document(). */
 PDFLIB_API void PDFLIB_CALL
 PDF_close_pdi(PDF *p, int doc);
 
-/* Close the page handle, and free all page-related resources. */
+/* Close all open PDI page handles, and close the input PDF document. */
+PDFLIB_API void PDFLIB_CALL
+PDF_close_pdi_document(PDF *p, int doc);
+
+/* Close the page handle and free all page-related resources. */
 PDFLIB_API void PDFLIB_CALL
 PDF_close_pdi_page(PDF *p, int page);
 
@@ -269,7 +295,7 @@ PDF_closepath_fill_stroke(PDF *p);
 PDFLIB_API void PDFLIB_CALL
 PDF_closepath_stroke(PDF *p);
 
-/* Concatenate a matrix to the current transformation matrix. */
+/* Apply a transformation matrix to the current coordinate system. */
 PDFLIB_API void PDFLIB_CALL
 PDF_concat(PDF *p, double a, double b, double c, double d, double e, double f);
 
@@ -277,11 +303,19 @@ PDF_concat(PDF *p, double a, double b, double c, double d, double e, double f);
 PDFLIB_API void PDFLIB_CALL
 PDF_continue_text(PDF *p, const char *text);
 
-/* Same as PDF_continue_text but with explicit string length. */
+/* Same as PDF_continue_text(), but with explicit string length. */
 PDFLIB_API void PDFLIB_CALL
 PDF_continue_text2(PDF *p, const char *text, int len);
 
-/* Create an action which can be applied to various objects and events. */
+/* Create a 3D view (requires PDF 1.6).
+   Returns: A 3D view handle, or -1 (in PHP: 0) on error.
+*/
+PDFLIB_API int PDFLIB_CALL
+PDF_create_3dview(PDF *p, const char *username, int len, const char *optlist);
+
+/* Create an action which can be applied to various objects and events.
+   Returns: An action handle.
+*/
 PDFLIB_API int PDFLIB_CALL
 PDF_create_action(PDF *p, const char *type, const char *optlist);
 
@@ -290,7 +324,9 @@ PDFLIB_API void PDFLIB_CALL
 PDF_create_annotation(PDF *p, double llx, double lly, double urx, double ury,
     const char *type, const char *optlist);
 
-/* Create a bookmark subject to various options. */
+/* Create a bookmark subject to various options.
+   Returns: A handle for the generated bookmark.
+*/
 PDFLIB_API int PDFLIB_CALL
 PDF_create_bookmark(PDF *p, const char *text, int len, const char *optlist);
 
@@ -303,16 +339,21 @@ PDF_create_field(PDF *p, double llx, double lly, double urx, double ury,
 PDFLIB_API void PDFLIB_CALL
 PDF_create_fieldgroup(PDF *p, const char *name, int len, const char *optlist);
 
-/* Create a graphics state object subject to various options. */
+/* Create a graphics state object subject to various options.
+   Returns: A graphics state handle.
+*/
 PDFLIB_API int PDFLIB_CALL
 PDF_create_gstate(PDF *p, const char *optlist);
 
 /* Create a named virtual read-only file from data provided in memory. */
 PDFLIB_API void PDFLIB_CALL
 PDF_create_pvf(PDF *p, const char *filename, int len,
-               const void *data, size_t size, const char *optlist);
+    const void *data, size_t size, const char *optlist);
 
-/* Preprocess text for later formatting and create a textflow object. */
+/* Create a Textflow object from text contents, inline options, and explicit
+   options.
+   Returns: A Textflow handle, or -1 (in PHP: 0) on error.
+*/
 PDFLIB_API int PDFLIB_CALL
 PDF_create_textflow(PDF *p, const char *text, int len, const char *optlist);
 
@@ -321,7 +362,9 @@ PDFLIB_API void PDFLIB_CALL
 PDF_curveto(PDF *p,
     double x_1, double y_1, double x_2, double y_2, double x_3, double y_3);
 
-/* Create a new layer definition (requires PDF 1.5). */
+/* Create a new layer definition (requires PDF 1.5).
+   Returns: A layer handle.
+*/
 PDFLIB_API int PDFLIB_CALL
 PDF_define_layer(PDF *p, const char *name, int len, const char *optlist);
 
@@ -330,28 +373,27 @@ PDFLIB_API void PDFLIB_CALL
 PDF_delete(PDF *p);
 
 /* Delete a named virtual file and free its data structures (but not the
- contents). */
+   contents).
+   Returns: -1 (in PHP: 0) if the virtual file exists but is locked, and
+   1 otherwise.
+ */
 PDFLIB_API int PDFLIB_CALL
 PDF_delete_pvf(PDF *p, const char *filename, int len);
 
-/* Delete a textflow and the associated data structures. */
+/* Delete a table and all associated data structures. */
+PDFLIB_API void PDFLIB_CALL
+PDF_delete_table(PDF *p, int table, const char *optlist);
+
+/* Delete a Textflow and all associated data structures. */
 PDFLIB_API void PDFLIB_CALL
 PDF_delete_textflow(PDF *p, int textflow);
-
-/* Retrieve a glyph name from an encoding (unsupported). */
-PDFLIB_API const char * PDFLIB_CALL
-PDF_encoding_get_glyphname(PDF *p, const char *encoding, int slot);
-
-/* Retrieve a slot's unicode value from an encoding (unsupported). */
-PDFLIB_API int PDFLIB_CALL
-PDF_encoding_get_unicode(PDF *p, const char *encoding, int slot);
 
 /* Add a glyph name and/or Unicode value to a custom encoding. */
 PDFLIB_API void PDFLIB_CALL
 PDF_encoding_set_char(PDF *p, const char *encoding, int slot,
     const char *glyphname, int uv);
 
-/* Close the generated PDF file and apply various options. */
+/* Close the generated PDF document and apply various options. */
 PDFLIB_API void PDFLIB_CALL
 PDF_end_document(PDF *p, const char *optlist);
 
@@ -399,12 +441,16 @@ PDF_endpath(PDF *p);
 PDFLIB_API void PDFLIB_CALL
 PDF_fill(PDF *p);
 
-/* Fill an image block with variable data according to its properties. */
+/* Fill an image block with variable data according to its properties.
+   Returns: -1 (in PHP: 0) on error, and 1 otherwise.
+*/
 PDFLIB_API int PDFLIB_CALL
 PDF_fill_imageblock(PDF *p, int page, const char *blockname,
     int image, const char *optlist);
 
-/* Fill a PDF block with variable data according to its properties. */
+/* Fill a PDF block with variable data according to its properties.
+   Returns: -1 (in PHP: 0) on error, and 1 otherwise.
+*/
 PDFLIB_API int PDFLIB_CALL
 PDF_fill_pdfblock(PDF *p, int page, const char *blockname,
     int contents, const char *optlist);
@@ -413,16 +459,18 @@ PDF_fill_pdfblock(PDF *p, int page, const char *blockname,
 PDFLIB_API void PDFLIB_CALL
 PDF_fill_stroke(PDF *p);
 
-/* Fill a text block with variable data according to its properties. */
+/* Fill a text block with variable data according to its properties.
+   Returns: -1 (in PHP: 0) on error, and 1 otherwise.
+*/
 PDFLIB_API int PDFLIB_CALL
 PDF_fill_textblock(PDF *p, int page, const char *blockname,
     const char *text, int len, const char *optlist);
 
-/* Deprecated, use  PDF_load_font(). */
+/* Deprecated, use PDF_load_font(). */
 PDFLIB_API int PDFLIB_CALL
 PDF_findfont(PDF *p, const char *fontname, const char *encoding, int embed);
 
-/* Place an image or template at on the page, subject to various options. */
+/* Place an image or template on the page, subject to various options. */
 PDFLIB_API void PDFLIB_CALL
 PDF_fit_image(PDF *p, int image, double x, double y, const char *optlist);
 
@@ -430,7 +478,16 @@ PDF_fit_image(PDF *p, int image, double x, double y, const char *optlist);
 PDFLIB_API void PDFLIB_CALL
 PDF_fit_pdi_page(PDF *p, int page, double x, double y, const char *optlist);
 
-/* Format the next portion of a textflow into a rectangular area. */
+/* Fully or partially place a table on the page.
+   Returns: A string which specifies the reason for returning.
+*/
+PDFLIB_API const char * PDFLIB_CALL
+PDF_fit_table(PDF *p, int table, double llx, double lly,
+    double urx, double ury, const char *optlist);
+
+/* Format the next portion of a Textflow into a rectangular area.
+   Returns: A string which specifies the reason for returning.
+*/
 PDFLIB_API const char * PDFLIB_CALL
 PDF_fit_textflow(PDF *p, int textflow, double llx, double lly,
     double urx, double ury, const char *optlist);
@@ -443,69 +500,108 @@ PDF_fit_textline(PDF *p, const char *text, int len, double x, double y,
 /*
  * Retrieve a structure with PDFlib API function pointers (mainly for DLLs).
  * Although this function is published here, it is not supposed to be used
- * directly by clients. Use PDF_new_dl() (in pdflibdl.c) instead.
+ * directly by clients. Use PDF_new_dl() (in pdflibdl.c).
  */
 PDFLIB_API const PDFlib_api * PDFLIB_CALL
 PDF_get_api(void);
 
-/* Get the name of the API function which threw the last exception or failed. */
+/* Get the name of the API function which threw the last exception or failed.
+   Returns: Name of an API function.
+*/
 PDFLIB_API const char * PDFLIB_CALL
 PDF_get_apiname(PDF *p);
 
-/* Get the contents of the PDF output buffer. */
+/* Get the contents of the PDF output buffer.
+   Returns: A buffer full of binary PDF data for consumption by the client.
+*/
 PDFLIB_API const char * PDFLIB_CALL
 PDF_get_buffer(PDF *p, long *size);
 
-/* Get the descriptive text of the last thrown exception or the reason of
- a failed function call. */
+/* Get the text of the last thrown exception or the reason of a failed
+   function call.
+   Returns: Text containing the description of the most recent error condition.
+*/
 PDFLIB_API const char * PDFLIB_CALL
 PDF_get_errmsg(PDF *p);
 
 /* Get the number of the last thrown exception or the reason of a failed
- function call. */
+   function call.
+   Returns: The error code of the most recent error condition.
+*/
 PDFLIB_API int PDFLIB_CALL
 PDF_get_errnum(PDF *p);
-
-/* Request a glyph ID value from a font (unsupported). */
-PDFLIB_API int PDFLIB_CALL
-PDF_get_glyphid(PDF *p, int font, int code);
 
 /* Request the amount of kerning between two characters (unsupported). */
 PDFLIB_API double PDFLIB_CALL
 PDF_get_kern_amount(PDF *p, int font, int firstchar, int secondchar);
 
-/* Depreceated, use PDF_get_value(). */
+/* Deprecated, use PDF_get_value(). */
 PDFLIB_API int PDFLIB_CALL
 PDF_get_majorversion(void);
 
-/* Depreceated, use PDF_get_value(). */
+/* Deprecated, use PDF_get_value(). */
 PDFLIB_API int PDFLIB_CALL
 PDF_get_minorversion(void);
 
-/* Fetch the opaque application pointer stored in PDFlib. */
+/* Fetch the opaque application pointer stored in PDFlib.
+   Returns: The opaque application pointer stored in PDFlib.
+*/
 PDFLIB_API void * PDFLIB_CALL
 PDF_get_opaque(PDF *p);
 
-/* Get the contents of some PDFlib parameter with string type. */
+/* Get the contents of some PDFlib parameter with string type.
+   Returns: The string value of the parameter as a hypertext string.
+*/
 PDFLIB_API const char * PDFLIB_CALL
 PDF_get_parameter(PDF *p, const char *key, double modifier);
 
-/* Get some PDI document parameter with string type. */
+/* Deprecated, use PDF_pcos_get_string(). */
 PDFLIB_API const char *PDFLIB_CALL
 PDF_get_pdi_parameter(PDF *p, const char *key, int doc, int page,
     int reserved, int *len);
 
-/* Get some PDI document parameter with numerical type. */
+/* Deprecated, use PDF_pcos_get_number. */
 PDFLIB_API double PDFLIB_CALL
 PDF_get_pdi_value(PDF *p, const char *key, int doc, int page, int reserved);
 
-/* Get the value of some PDFlib parameter with numerical type. */
+/* Get the value of some PDFlib parameter with numerical type.
+   Returns: The numerical value of the parameter.
+*/
 PDFLIB_API double PDFLIB_CALL
 PDF_get_value(PDF *p, const char *key, double modifier);
 
-/* Query the current state of a textflow. */
+/* Query detailed information about a loaded font.
+   Returns: The value of some font property as requested by keyword.
+*/
+PDFLIB_API double PDFLIB_CALL
+PDF_info_font(PDF *p, int font, const char *keyword, const char *optlist);
+
+/* Query information about a matchbox on the current page.
+   Returns: The value of some matchbox parameter as requested by keyword.
+*/
+PDFLIB_API double PDFLIB_CALL
+PDF_info_matchbox(PDF *p, const char *boxname, int len, int num,
+    const char *keyword);
+
+/* Retrieve table information related to the most recently placed table
+   instance.
+   Returns: The value of some table parameter as requested by keyword.
+*/
+PDFLIB_API double PDFLIB_CALL
+PDF_info_table(PDF *p, int table, const char *keyword);
+
+/* Query the current state of a Textflow.
+   Returns: The value of some Textflow parameter as requested by keyword.
+*/
 PDFLIB_API double PDFLIB_CALL
 PDF_info_textflow(PDF *p, int textflow, const char *keyword);
+
+/* Perform textline formatting and query the resulting metrics.
+   Returns: The value of some text metric value as requested by keyword.
+*/
+PDFLIB_API double PDFLIB_CALL
+PDF_info_textline(PDF *p, const char *text, int len, const char *keyword,
+    const char *optlist);
 
 /* Reset all color and graphics state parameters to their defaults. */
 PDFLIB_API void PDFLIB_CALL
@@ -515,23 +611,37 @@ PDF_initgraphics(PDF *p);
 PDFLIB_API void PDFLIB_CALL
 PDF_lineto(PDF *p, double x, double y);
 
-/* Search for a font and prepare it for later use. */
+/* Load a 3D model from a disk-based or virtual file (requires PDF 1.6).
+   Returns: A 3D handle, or -1 (in PHP: 0) on error.
+*/
+PDFLIB_API int PDFLIB_CALL
+PDF_load_3ddata(PDF *p, const char *filename, int len, const char *optlist);
+
+/* Search for a font and prepare it for later use.
+   Returns: A font handle.
+*/
 PDFLIB_API int PDFLIB_CALL
 PDF_load_font(PDF *p, const char *fontname, int len,
     const char *encoding, const char *optlist);
 
-/* Search for an ICC profile, and prepare it for later use. */
+/* Search for an ICC profile and prepare it for later use.
+   Returns: A profile handle.
+*/
 PDFLIB_API int PDFLIB_CALL
 PDF_load_iccprofile(PDF *p, const char *profilename, int len,
     const char *optlist);
 
-/* Open a disk-based or virtual image file subject to various options. */
+/* Open a disk-based or virtual image file subject to various options.
+   Returns: An image handle, or -1 (in PHP: 0) on error.
+*/
 PDFLIB_API int PDFLIB_CALL
 PDF_load_image(PDF *p, const char *imagetype, const char *filename,
     int len, const char *optlist);
 
 /* Find a built-in spot color name, or make a named spot color from the
- current fill color. */
+   current fill color.
+   Returns: A color handle.
+*/
 PDFLIB_API int PDFLIB_CALL
 PDF_makespotcolor(PDF *p, const char *spotname, int reserved);
 
@@ -543,12 +653,16 @@ PDF_mc_point(PDF *p, const char *tag, const char *optlist);
 PDFLIB_API void PDFLIB_CALL
 PDF_moveto(PDF *p, double x, double y);
 
-/* Create a new PDFlib object with default settings. */
+/* Create a new PDFlib object.
+   Returns: A handle to a PDFlib object.
+*/
 PDFLIB_API PDF * PDFLIB_CALL
 PDF_new(void);
 
 /* Create a new PDFlib object with client-supplied error handling and memory
- allocation routines. */
+   allocation routines.
+   Returns: A handle to a PDFlib object.
+*/
 typedef void  (*errorproc_t)(PDF *p1, int errortype, const char *msg);
 typedef void* (*allocproc_t)(PDF *p2, size_t size, const char *caller);
 typedef void* (*reallocproc_t)(PDF *p3,
@@ -583,21 +697,51 @@ PDF_open_image_file(PDF *p, const char *imagetype, const char *filename,
 PDFLIB_API void PDFLIB_CALL
 PDF_open_mem(PDF *p, writeproc_t writeproc);
 
-/* Open a disk-based or virtual PDF document and prepare it for later use. */
+/* Deprecated, use PDF_open_pdi_document(). */
 PDFLIB_API int PDFLIB_CALL
 PDF_open_pdi(PDF *p, const char *filename, const char *optlist, int len);
 
-/* Open an existing PDF document from a custom data source and prepare it for
- later use. */
+/* Open a disk-based or virtual PDF document and prepare it for later use.
+   Returns: A PDI document handle.
+*/
+PDFLIB_API int PDFLIB_CALL
+PDF_open_pdi_document(PDF *p, const char *filename, int len,
+    const char *optlist);
+
+/* Open a PDF document from a custom data source and prepare it for
+   later use.
+   Returns: A PDI document handle.
+*/
 PDFLIB_API int PDFLIB_CALL
 PDF_open_pdi_callback(PDF *p, void *opaque, size_t filesize,
     size_t (*readproc)(void *opaque, void *buffer, size_t size),
     int (*seekproc)(void *opaque, long offset),
     const char *optlist);
 
-/* Prepare a page for later use with PDF_fit_pdi_page(). */
+/* Prepare a page for later use with PDF_fit_pdi_page().
+   Returns: A page handle.
+*/
 PDFLIB_API int PDFLIB_CALL
 PDF_open_pdi_page(PDF *p, int doc, int pagenumber, const char *optlist);
+
+/* Get the value of a pCOS path with type number or boolean.
+   Returns: The numerical value of the object identified by the pCOS path.
+*/
+PDFLIB_API double PDFLIB_CALL
+PDF_pcos_get_number(PDF *p, int doc, const char *path, ...);
+
+/* Get the value of a pCOS path with type name, string or boolean.
+   Returns: A string with the value of the object identified by the pCOS path.
+*/
+PDFLIB_API const char * PDFLIB_CALL
+PDF_pcos_get_string(PDF *p, int doc, const char *path, ...);
+
+/* Get the contents of a pCOS path with type stream, fstream, or string.
+   Returns: The unencrypted data contained in the stream or string.
+*/
+PDFLIB_API const unsigned char * PDFLIB_CALL
+PDF_pcos_get_stream(PDF *p, int doc, int *length, const char *optlist,
+    const char *path, ...);
 
 /* Deprecated, use PDF_fit_image(). */
 PDFLIB_API void PDFLIB_CALL
@@ -607,7 +751,9 @@ PDF_place_image(PDF *p, int image, double x, double y, double scale);
 PDFLIB_API void PDFLIB_CALL
 PDF_place_pdi_page(PDF *p, int page, double x, double y, double sx, double sy);
 
-/* Process certain elements of an imported PDF document. */
+/* Process certain elements of an imported PDF document.
+   Returns: -1 (in PHP: 0) on error, and 1 otherwise.
+*/
 PDFLIB_API int PDFLIB_CALL
 PDF_process_pdi(PDF *p, int doc, int page, const char *optlist);
 
@@ -660,7 +806,7 @@ PDF_set_border_dash(PDF *p, double b, double w);
 PDFLIB_API void PDFLIB_CALL
 PDF_set_border_style(PDF *p, const char *style, double width);
 
-/* Activate a gstate object. */
+/* Activate a graphics state object. */
 PDFLIB_API void PDFLIB_CALL
 PDF_set_gstate(PDF *p, int gstate);
 
@@ -672,8 +818,9 @@ PDF_set_info(PDF *p, const char *key, const char *value);
 PDFLIB_API void PDFLIB_CALL
 PDF_set_info2(PDF *p, const char *key, const char *value, int len);
 
-/* Define hierarchical and group relationships among layers (requires
- PDF 1.5). */
+/* Define hierarchical, group, and lock conditions among layers (requires
+   PDF 1.5).
+*/
 PDFLIB_API void PDFLIB_CALL
 PDF_set_layer_dependency(PDF *p, const char *type, const char *optlist);
 
@@ -760,19 +907,21 @@ PDFLIB_API void PDFLIB_CALL
 PDF_setrgbcolor_stroke(PDF *p, double red, double green, double blue);
 
 /* Define a blend from the current fill color to another color (requires
- PDF 1.4 or above). */
+   PDF 1.4).
+   Returns: A shading handle.
+*/
 PDFLIB_API int PDFLIB_CALL
 PDF_shading(PDF *p, const char *shtype, double x_0, double y_0, double x_1,
     double y_1, double c_1, double c_2, double c_3, double c_4,
     const char *optlist);
 
-/* Define a shading pattern using a shading object (requires PDF 1.4 or
- above). */
+/* Define a shading pattern using a shading object (requires PDF 1.4).
+   Returns: A pattern handle.
+*/
 PDFLIB_API int PDFLIB_CALL
 PDF_shading_pattern(PDF *p, int shading, const char *optlist);
 
-/* Fill an area with a shading, based on a shading object (requires PDF 1.4
- or above). */
+/* Fill an area with a shading, based on a shading object (requires PDF 1.4) */
 PDFLIB_API void PDFLIB_CALL
 PDF_shfill(PDF *p, int shading);
 
@@ -798,11 +947,11 @@ PDF_show_boxed2(PDF *p, const char *text, int len, double left, double top,
 PDFLIB_API void PDFLIB_CALL
 PDF_show_xy(PDF *p, const char *text, double x, double y);
 
-/* Same as PDF_show_xy() but with explicit string length. */
+/* Same as PDF_show_xy(), but with explicit string length. */
 PDFLIB_API void PDFLIB_CALL
 PDF_show_xy2(PDF *p, const char *text, int len, double x, double y);
 
-/* Shut down PDFlib (recommended although currently not required). */
+/* Deprecated, and not required. */
 PDFLIB_API void PDFLIB_CALL
 PDF_shutdown(void);
 
@@ -810,11 +959,13 @@ PDF_shutdown(void);
 PDFLIB_API void PDFLIB_CALL
 PDF_skew(PDF *p, double alpha, double beta);
 
-/* Return the width of text in an arbitrary font. */
+/* Calculate the width of text in an arbitrary font.
+   Returns: The width of text.
+*/
 PDFLIB_API double PDFLIB_CALL
 PDF_stringwidth(PDF *p, const char *text, int font, double fontsize);
 
-/* Same as PDF_stringwidth() but with explicit string length. */
+/* Same as PDF_stringwidth(), but with explicit string length. */
 PDFLIB_API double PDFLIB_CALL
 PDF_stringwidth2(PDF *p, const char *text, int len, int font, double fontsize);
 
@@ -830,17 +981,29 @@ PDF_suspend_page(PDF *p, const char *optlist);
 PDFLIB_API void PDFLIB_CALL
 PDF_translate(PDF *p, double tx, double ty);
 
-/* Convert a string from UTF-16 format to UTF-8. */
+/* Convert a string from UTF-16 format to UTF-8.
+   Returns: The converted UTF-8 string, starting with the UTF-8 BOM.
+*/
 PDFLIB_API const char * PDFLIB_CALL
 PDF_utf16_to_utf8(PDF *p, const char *utf16string, int len, int *size);
 
-/* Convert a string from UTF-8 format to UTF-16. */
+/* Convert a string from UTF-32 format to UTF-16.
+   Returns: The converted UTF-16 string.
+*/
+PDFLIB_API const char * PDFLIB_CALL
+PDF_utf32_to_utf16(PDF *p, const char *utf32string, int len,
+    const char *ordering, int *size);
+
+/* Convert a string from UTF-8 format to UTF-16.
+   Returns: The converted UTF-16 string.
+*/
 PDFLIB_API const char * PDFLIB_CALL
 PDF_utf8_to_utf16(PDF *p, const char *utf8string, const char *ordering,
     int *size);
 
 /* Print text in the current font and size, using individual horizontal
- positions (unsupported). */
+   positions (unsupported).
+*/
 PDFLIB_API void PDFLIB_CALL
 PDF_xshow(PDF *p, const char *text, int len, const double *xadvancelist);
 
@@ -871,107 +1034,114 @@ struct PDFlib_api_s {
 
     void (PDFLIB_CALL * PDF_activate_item)(PDF *p, int id);
     int (PDFLIB_CALL * PDF_add_bookmark)(PDF *p, const char *text,
-	    int parent, int open);
-    int (PDFLIB_CALL * PDF_add_bookmark2) (PDF *p, const char *text, int len,
-	    int parent, int open);
+                int parent, int open);
+    int (PDFLIB_CALL * PDF_add_bookmark2)(PDF *p, const char *text, int len,
+	        int parent, int open);
     void (PDFLIB_CALL * PDF_add_launchlink)(PDF *p,
                 double llx, double lly, double urx,
                 double ury, const char *filename);
     void (PDFLIB_CALL * PDF_add_locallink)(PDF *p,
                 double llx, double lly, double urx,
                 double ury, int page, const char *optlist);
-    void (PDFLIB_CALL * PDF_add_nameddest) (PDF *p, const char *name,
-	    int len, const char *optlist);
+    void (PDFLIB_CALL * PDF_add_nameddest)(PDF *p, const char *name,
+	        int len, const char *optlist);
     void (PDFLIB_CALL * PDF_add_note)(PDF *p, double llx, double lly,
                 double urx, double ury, const char *contents, const char *title,
 		const char *icon, int open);
-    void (PDFLIB_CALL * PDF_add_note2) (PDF *p, double llx, double lly,
+    void (PDFLIB_CALL * PDF_add_note2)(PDF *p, double llx, double lly,
                 double urx, double ury, const char *contents, int len_cont,
 		const char *title, int len_title, const char *icon, int open);
     void (PDFLIB_CALL * PDF_add_pdflink)(PDF *p,
                 double llx, double lly, double urx, double ury,
 		const char *filename, int page, const char *optlist);
+    int (PDFLIB_CALL * PDF_add_table_cell)(PDF *p, int table, int column,
+                int row, const char *text, int len, const char *optlist);
+    int (PDFLIB_CALL * PDF_add_textflow)(PDF *p, int textflow, const char *text,
+                int len, const char *optlist);
     void (PDFLIB_CALL * PDF_add_thumbnail)(PDF *p, int image);
     void (PDFLIB_CALL * PDF_add_weblink)(PDF *p, double llx,
 		double lly, double urx, double ury, const char *url);
     void (PDFLIB_CALL * PDF_arc)(PDF *p, double x, double y,
-                        double r, double alpha, double beta);
+                double r, double alpha, double beta);
     void (PDFLIB_CALL * PDF_arcn)(PDF *p, double x, double y,
-                        double r, double alpha, double beta);
+                double r, double alpha, double beta);
     void (PDFLIB_CALL * PDF_attach_file)(PDF *p, double llx, double lly,
                 double urx, double ury, const char *filename,
 		const char *description,
 		const char *author, const char *mimetype, const char *icon);
-    void (PDFLIB_CALL * PDF_attach_file2) (PDF *p, double llx, double lly,
+    void (PDFLIB_CALL * PDF_attach_file2)(PDF *p, double llx, double lly,
                 double urx, double ury, const char *filename, int len_filename,
 		const char *description, int len_descr, const char *author,
 		int len_auth, const char *mimetype, const char *icon);
-    int  (PDFLIB_CALL * PDF_begin_document)(PDF *p, const char *filename,
-                        int len, const char *optlist);
+    int (PDFLIB_CALL * PDF_begin_document)(PDF *p, const char *filename,
+                int len, const char *optlist);
     void (PDFLIB_CALL * PDF_begin_document_callback)(PDF *p,
-                        writeproc_t writeproc, const char *optlist);
+                writeproc_t writeproc, const char *optlist);
     void (PDFLIB_CALL * PDF_begin_font)(PDF *p, const char *fontname,
-        int len, double a, double b, double c, double d, double e, double f,
-        const char *optlist);
+                int len, double a, double b, double c, double d, double e,
+                double f, const char *optlist);
     void (PDFLIB_CALL * PDF_begin_glyph)(PDF *p, const char *glyphname,
-        double wx, double llx, double lly, double urx, double ury);
-    int  (PDFLIB_CALL * PDF_begin_item)(PDF *p, const char *tag,
-						    const char *optlist);
+                double wx, double llx, double lly, double urx, double ury);
+    int (PDFLIB_CALL * PDF_begin_item)(PDF *p, const char *tag,
+                const char *optlist);
     void (PDFLIB_CALL * PDF_begin_layer)(PDF *p, int layer);
     void (PDFLIB_CALL * PDF_begin_mc)(PDF *p,
-				const char *tag, const char *optlist);
-    void (PDFLIB_CALL * PDF_begin_page)(PDF *p, double width,
-                                double height);
+		const char *tag, const char *optlist);
+    void (PDFLIB_CALL * PDF_begin_page)(PDF *p, double width, double height);
     void (PDFLIB_CALL * PDF_begin_page_ext)(PDF *p, double width,
-                                double height, const char *optlist);
-    int  (PDFLIB_CALL * PDF_begin_pattern)(PDF *p,
-                        double width, double height,
-                        double xstep, double ystep, int painttype);
-    int  (PDFLIB_CALL * PDF_begin_template)(PDF *p,
-                        double width, double height);
+                double height, const char *optlist);
+    int (PDFLIB_CALL * PDF_begin_pattern)(PDF *p, double width, double height,
+                double xstep, double ystep, int painttype);
+    int (PDFLIB_CALL * PDF_begin_template)(PDF *p,
+                double width, double height);
+    int (PDFLIB_CALL * PDF_begin_template_ext)(PDF *p,
+                double width, double height, const char *optlist);
     void (PDFLIB_CALL * PDF_boot)(void);
+    int (PDFLIB_CALL * PDF_check_context)(PDF *p);
     void (PDFLIB_CALL * PDF_circle)(PDF *p, double x, double y, double r);
     void (PDFLIB_CALL * PDF_clip)(PDF *p);
     void (PDFLIB_CALL * PDF_close)(PDF *p);
     void (PDFLIB_CALL * PDF_close_image)(PDF *p, int image);
     void (PDFLIB_CALL * PDF_close_pdi)(PDF *p, int doc);
+    void (PDFLIB_CALL * PDF_close_pdi_document)(PDF *p, int doc);
     void (PDFLIB_CALL * PDF_close_pdi_page)(PDF *p, int page);
     void (PDFLIB_CALL * PDF_closepath)(PDF *p);
     void (PDFLIB_CALL * PDF_closepath_fill_stroke)(PDF *p);
     void (PDFLIB_CALL * PDF_closepath_stroke)(PDF *p);
     void (PDFLIB_CALL * PDF_concat)(PDF *p, double a, double b,
-                                    double c, double d, double e, double f);
+                double c, double d, double e, double f);
     void (PDFLIB_CALL * PDF_continue_text)(PDF *p, const char *text);
-    void (PDFLIB_CALL * PDF_continue_text2)(PDF *p, const char *text,
-					    int len);
+    void (PDFLIB_CALL * PDF_continue_text2)(PDF *p, const char *text, int len);
+    int (PDFLIB_CALL * PDF_create_3dview)(PDF *p, const char *username,
+                int len, const char *optlist);
     int (PDFLIB_CALL * PDF_create_action)(PDF *p, const char *type,
-               const char *optlist);
+                const char *optlist);
     void (PDFLIB_CALL * PDF_create_annotation)(PDF *p,
                 double llx, double lly, double urx, double ury,
                 const char *type, const char *optlist);
     int (PDFLIB_CALL * PDF_create_bookmark)(PDF *p, const char *text, int len,
-            const char *optlist);
-    void (PDFLIB_CALL * PDF_create_field) (PDF *p, double llx, double lly,
+                const char *optlist);
+    void (PDFLIB_CALL * PDF_create_field)(PDF *p, double llx, double lly,
                 double urx, double ury, const char *name, int len,
                 const char *type, const char *optlist);
-    void (PDFLIB_CALL * PDF_create_fieldgroup) (PDF *p, const char *name,
+    void (PDFLIB_CALL * PDF_create_fieldgroup)(PDF *p, const char *name,
                 int len, const char *optlist);
-    int (PDFLIB_CALL * PDF_create_gstate) (PDF *p, const char *optlist);
+    int (PDFLIB_CALL * PDF_create_gstate)(PDF *p, const char *optlist);
     void (PDFLIB_CALL * PDF_create_pvf)(PDF *p, const char *filename,
-                            int len, const void *data, size_t size,
-                            const char *optlist);
+                int len, const void *data, size_t size, const char *optlist);
     int (PDFLIB_CALL * PDF_create_textflow)(PDF *p, const char *text, int len,
-                                            const char *optlist);
+                const char *optlist);
     void (PDFLIB_CALL * PDF_curveto)(PDF *p, double x_1, double y_1,
-                        double x_2, double y_2, double x_3, double y_3);
+                double x_2, double y_2, double x_3, double y_3);
     int (PDFLIB_CALL * PDF_define_layer)(PDF *p, const char *name, int len,
-						    const char *optlist);
-
+                const char *optlist);
     void (PDFLIB_CALL * PDF_delete)(PDF *);
     int (PDFLIB_CALL * PDF_delete_pvf)(PDF *p, const char *filename, int len);
+    void (PDFLIB_CALL * PDF_delete_table)(PDF *p, int table,
+                const char *optlist);
     void (PDFLIB_CALL * PDF_delete_textflow)(PDF *p, int textflow);
-    void (PDFLIB_CALL * PDF_encoding_set_char) (PDF *p, const char *encoding,
-                            int slot, const char *glyphname, int uv);
+    void (PDFLIB_CALL * PDF_encoding_set_char)(PDF *p, const char *encoding,
+                int slot, const char *glyphname, int uv);
     void (PDFLIB_CALL * PDF_end_document)(PDF *p, const char *optlist);
     void (PDFLIB_CALL * PDF_end_font)(PDF *p);
     void (PDFLIB_CALL * PDF_end_glyph)(PDF *p);
@@ -984,172 +1154,239 @@ struct PDFlib_api_s {
     void (PDFLIB_CALL * PDF_end_template)(PDF *p);
     void (PDFLIB_CALL * PDF_endpath)(PDF *p);
     void (PDFLIB_CALL * PDF_fill)(PDF *p);
-    int (PDFLIB_CALL * PDF_fill_imageblock) (PDF *p, int page,
+    int (PDFLIB_CALL * PDF_fill_imageblock)(PDF *p, int page,
 		const char *blockname, int image, const char *optlist);
-    int (PDFLIB_CALL * PDF_fill_pdfblock) (PDF *p, int page,
-	    const char *blockname, int contents, const char *optlist);
+    int (PDFLIB_CALL * PDF_fill_pdfblock)(PDF *p, int page,
+	        const char *blockname, int contents, const char *optlist);
     void (PDFLIB_CALL * PDF_fill_stroke)(PDF *p);
-    int (PDFLIB_CALL * PDF_fill_textblock) (PDF *p, int page,
-	    const char *blockname, const char *text, int len,
-	    const char *optlist);
-    int  (PDFLIB_CALL * PDF_findfont)(PDF *p, const char *fontname,
-			    const char *encoding, int embed);
-    void (PDFLIB_CALL * PDF_fit_image) (PDF *p, int image, double x, double y,
-	    const char *optlist);
-    void (PDFLIB_CALL * PDF_fit_pdi_page) (PDF *p, int page, double x,
-            double y, const char *optlist);
+    int (PDFLIB_CALL * PDF_fill_textblock)(PDF *p, int page,
+	        const char *blockname, const char *text, int len,
+	        const char *optlist);
+    int (PDFLIB_CALL * PDF_findfont)(PDF *p, const char *fontname,
+	        const char *encoding, int embed);
+    void (PDFLIB_CALL * PDF_fit_image)(PDF *p, int image, double x, double y,
+	        const char *optlist);
+    void (PDFLIB_CALL * PDF_fit_pdi_page)(PDF *p, int page, double x,
+                double y, const char *optlist);
+    const char * (PDFLIB_CALL * PDF_fit_table)(PDF *p, int table,
+                double llx, double lly, double urx, double ury,
+                const char *optlist);
     const char * (PDFLIB_CALL * PDF_fit_textflow)(PDF *p, int textflow,
-                        double llx, double lly, double urx, double ury,
-                        const char *optlist);
+                double llx, double lly, double urx, double ury,
+                const char *optlist);
     void (PDFLIB_CALL * PDF_fit_textline)(PDF *p, const char *text,
-                         int len, double x, double y, const char *optlist);
+                int len, double x, double y, const char *optlist);
     const PDFlib_api * (PDFLIB_CALL * PDF_get_api)(void);
-    const char * (PDFLIB_CALL * PDF_get_apiname) (PDF *p);
+    const char * (PDFLIB_CALL * PDF_get_apiname)(PDF *p);
     const char * (PDFLIB_CALL * PDF_get_buffer)(PDF *p, long *size);
-    const char * (PDFLIB_CALL * PDF_get_errmsg) (PDF *p);
-    int (PDFLIB_CALL * PDF_get_errnum) (PDF *p);
-    int  (PDFLIB_CALL * PDF_get_minorversion)(void);
-    int  (PDFLIB_CALL * PDF_get_majorversion)(void);
+    const char * (PDFLIB_CALL * PDF_get_errmsg)(PDF *p);
+    int (PDFLIB_CALL * PDF_get_errnum)(PDF *p);
+    int (PDFLIB_CALL * PDF_get_minorversion)(void);
+    int (PDFLIB_CALL * PDF_get_majorversion)(void);
     void * (PDFLIB_CALL * PDF_get_opaque)(PDF *p);
     const char * (PDFLIB_CALL * PDF_get_parameter)(PDF *p,
-                                const char *key, double modifier);
+                const char *key, double modifier);
     const char * (PDFLIB_CALL * PDF_get_pdi_parameter)(PDF *p,
-		    const char *key, int doc, int page, int reserved, int *len);
+		const char *key, int doc, int page, int reserved, int *len);
     double (PDFLIB_CALL * PDF_get_pdi_value)(PDF *p, const char *key,
-					    int doc, int page, int reserved);
+                int doc, int page, int reserved);
     double (PDFLIB_CALL * PDF_get_value)(PDF *p, const char *key,
-                                double modifier);
+                double modifier);
+    double (PDFLIB_CALL * PDF_info_font)(PDF *p, int font, const char *keyword,
+                const char *optlist);
+    double (PDFLIB_CALL * PDF_info_matchbox)(PDF *p, const char *boxname,
+                int len, int num, const char *keyword);
+    double (PDFLIB_CALL * PDF_info_table)(PDF *p, int table,
+                const char *keyword);
     double (PDFLIB_CALL * PDF_info_textflow)(PDF *p, int textflow,
-                        const char *keyword);
+                const char *keyword);
+    double (PDFLIB_CALL * PDF_info_textline)(PDF *p, const char *text, int len,
+                const char *keyword, const char *optlist);
     void (PDFLIB_CALL * PDF_initgraphics)(PDF *p);
     void (PDFLIB_CALL * PDF_lineto)(PDF *p, double x, double y);
+    int (PDFLIB_CALL * PDF_load_3ddata)(PDF *p, const char *filename, int len,
+                const char *optlist);
     int (PDFLIB_CALL * PDF_load_font)(PDF *p, const char *fontname,
 		int len, const char *encoding, const char *optlist);
-    int  (PDFLIB_CALL * PDF_load_iccprofile)(PDF *p, const char *profilename,
-                        int len, const char *optlist);
-    int (PDFLIB_CALL * PDF_load_image) (PDF *p, const char *imagetype,
-	    const char *filename, int len, const char *optlist);
-    int  (PDFLIB_CALL * PDF_makespotcolor)(PDF *p, const char *spotname,
-                        int len);
+    int (PDFLIB_CALL * PDF_load_iccprofile)(PDF *p, const char *profilename,
+                int len, const char *optlist);
+    int (PDFLIB_CALL * PDF_load_image)(PDF *p, const char *imagetype,
+	        const char *filename, int len, const char *optlist);
+    int (PDFLIB_CALL * PDF_makespotcolor)(PDF *p, const char *spotname,
+                int len);
     void (PDFLIB_CALL * PDF_mc_point)(PDF *p,
-    				const char *tag, const char *optlist);
+    	        const char *tag, const char *optlist);
     void (PDFLIB_CALL * PDF_moveto)(PDF *p, double x, double y);
     PDF* (PDFLIB_CALL * PDF_new)(void);
     PDF* (PDFLIB_CALL * PDF_new2)(errorproc_t errorhandler,
-                                allocproc_t allocproc,
-                                reallocproc_t reallocproc,
-                                freeproc_t freeproc, void *opaque);
+                allocproc_t allocproc, reallocproc_t reallocproc,
+                freeproc_t freeproc, void *opaque);
     int (PDFLIB_CALL * PDF_open_CCITT)(PDF *p, const char *filename,
-    			int width, int height,
-			int BitReverse, int K, int BlackIs1);
-    int  (PDFLIB_CALL * PDF_open_file)(PDF *p, const char *filename);
+    	        int width, int height, int BitReverse, int K, int BlackIs1);
+    int (PDFLIB_CALL * PDF_open_file)(PDF *p, const char *filename);
     int (PDFLIB_CALL * PDF_open_image)(PDF *p, const char *imagetype,
 		const char *source, const char *data, long length, int width,
 		int height, int components, int bpc, const char *params);
     int (PDFLIB_CALL * PDF_open_image_file)(PDF *p, const char *imagetype,
 		const char *filename, const char *stringparam, int intparam);
     void (PDFLIB_CALL * PDF_open_mem)(PDF *p, writeproc_t writeproc);
-    int  (PDFLIB_CALL * PDF_open_pdi)(PDF *p, const char *filename,
-                                const char *optlist, int len);
-    int (PDFLIB_CALL * PDF_open_pdi_callback) (PDF *p, void *opaque,
+    int (PDFLIB_CALL * PDF_open_pdi)(PDF *p, const char *filename,
+                const char *optlist, int len);
+    int (PDFLIB_CALL * PDF_open_pdi_callback)(PDF *p, void *opaque,
 	    size_t filesize, size_t (*readproc)(void *opaque, void *buffer,
 	    size_t size), int (*seekproc)(void *opaque, long offset),
 	    const char *optlist);
-    int  (PDFLIB_CALL * PDF_open_pdi_page)(PDF *p,
-				int doc, int pagenumber, const char *optlist);
+    int (PDFLIB_CALL * PDF_open_pdi_document)(PDF *p, const char *filename,
+                int len, const char *optlist);
+    int (PDFLIB_CALL * PDF_open_pdi_page)(PDF *p,
+	        int doc, int pagenumber, const char *optlist);
+    double (PDFLIB_CALL * PDF_pcos_get_number)(PDF *p,
+		int doc, const char *path, ...);
+    const char * (PDFLIB_CALL * PDF_pcos_get_string)(PDF *p,
+		int doc, const char *path, ...);
+    const unsigned char * (PDFLIB_CALL * PDF_pcos_get_stream)(PDF *p,
+		int doc, int *length, const char *optlist,
+		const char *path, ...);
     void (PDFLIB_CALL * PDF_place_image)(PDF *p, int image,
-                                        double x, double y, double scale);
+                double x, double y, double scale);
     void (PDFLIB_CALL * PDF_place_pdi_page)(PDF *p, int page,
-                                double x, double y, double sx, double sy);
-    int (PDFLIB_CALL * PDF_process_pdi)(PDF *p,
-				int doc, int page, const char *optlist);
+                double x, double y, double sx, double sy);
+    int (PDFLIB_CALL * PDF_process_pdi)(PDF *p, int doc, int page,
+                const char *optlist);
     void (PDFLIB_CALL * PDF_rect)(PDF *p, double x, double y,
-                        double width, double height);
+                double width, double height);
     void (PDFLIB_CALL * PDF_restore)(PDF *p);
     void (PDFLIB_CALL * PDF_resume_page)(PDF *p, const char *optlist);
     void (PDFLIB_CALL * PDF_rotate)(PDF *p, double phi);
     void (PDFLIB_CALL * PDF_save)(PDF *p);
     void (PDFLIB_CALL * PDF_scale)(PDF *p, double sx, double sy);
     void (PDFLIB_CALL * PDF_set_border_color)(PDF *p,
-                                    double red, double green, double blue);
+                double red, double green, double blue);
     void (PDFLIB_CALL * PDF_set_border_dash)(PDF *p, double b, double w);
     void (PDFLIB_CALL * PDF_set_border_style)(PDF *p,
-                                    const char *style, double width);
-    void (PDFLIB_CALL * PDF_set_gstate) (PDF *p, int gstate);
+                const char *style, double width);
+    void (PDFLIB_CALL * PDF_set_gstate)(PDF *p, int gstate);
     void (PDFLIB_CALL * PDF_set_info)(PDF *p, const char *key,
-	    const char *value);
-    void (PDFLIB_CALL * PDF_set_info2) (PDF *p, const char *key,
-	    const char *value, int len);
+	        const char *value);
+    void (PDFLIB_CALL * PDF_set_info2)(PDF *p, const char *key,
+	        const char *value, int len);
     void (PDFLIB_CALL * PDF_set_layer_dependency)(PDF *p, const char *type,
-						    const char *optlist);
-    void (PDFLIB_CALL * PDF_set_parameter)(PDF *p,
-				const char *key, const char *value);
+                const char *optlist);
+    void (PDFLIB_CALL * PDF_set_parameter)(PDF *p, const char *key,
+                const char *value);
     void (PDFLIB_CALL * PDF_set_text_pos)(PDF *p, double x, double y);
-    void (PDFLIB_CALL * PDF_set_value)(PDF *p, const char *key,
-                                double value);
-    void (PDFLIB_CALL * PDF_setcolor)(PDF *p,
-			const char *fstype, const char *colorspace,
-                        double c1, double c2, double c3, double c4);
+    void (PDFLIB_CALL * PDF_set_value)(PDF *p, const char *key, double value);
+    void (PDFLIB_CALL * PDF_setcolor)(PDF *p, const char *fstype,
+                const char *colorspace, double c1, double c2,
+                double c3, double c4);
     void (PDFLIB_CALL * PDF_setdash)(PDF *p, double b, double w);
-    void (PDFLIB_CALL * PDF_setdashpattern) (PDF *p, const char *optlist);
+    void (PDFLIB_CALL * PDF_setdashpattern)(PDF *p, const char *optlist);
     void (PDFLIB_CALL * PDF_setflat)(PDF *p, double flatness);
     void (PDFLIB_CALL * PDF_setfont)(PDF *p, int font, double fontsize);
     void (PDFLIB_CALL * PDF_setgray)(PDF *p, double gray);
-    void (PDFLIB_CALL * PDF_setgray_stroke)(PDF *p, double gray);
     void (PDFLIB_CALL * PDF_setgray_fill)(PDF *p, double gray);
+    void (PDFLIB_CALL * PDF_setgray_stroke)(PDF *p, double gray);
     void (PDFLIB_CALL * PDF_setlinecap)(PDF *p, int linecap);
     void (PDFLIB_CALL * PDF_setlinejoin)(PDF *p, int linejoin);
     void (PDFLIB_CALL * PDF_setlinewidth)(PDF *p, double width);
     void (PDFLIB_CALL * PDF_setmatrix)(PDF *p, double a, double b,
-                                    double c, double d, double e, double f);
+                double c, double d, double e, double f);
     void (PDFLIB_CALL * PDF_setmiterlimit)(PDF *p, double miter);
-    void (PDFLIB_CALL * PDF_setpolydash)(PDF *p, float *dasharray,
-				    int length);
+    void (PDFLIB_CALL * PDF_setpolydash)(PDF *p, float *dasharray, int length);
     void (PDFLIB_CALL * PDF_setrgbcolor)(PDF *p, double red, double green,
-                        double blue);
+                double blue);
     void (PDFLIB_CALL * PDF_setrgbcolor_fill)(PDF *p,
-                        double red, double green, double blue);
+                double red, double green, double blue);
     void (PDFLIB_CALL * PDF_setrgbcolor_stroke)(PDF *p,
-                        double red, double green, double blue);
-    int (PDFLIB_CALL * PDF_shading) (PDF *p, const char *shtype, double x_0,
-            double y_0, double x_1, double y_1, double c_1, double c_2,
-            double c_3, double c_4, const char *optlist);
-    int (PDFLIB_CALL * PDF_shading_pattern) (PDF *p, int shading,
-	    const char *optlist);
-    void (PDFLIB_CALL * PDF_shfill) (PDF *p, int shading);
+                double red, double green, double blue);
+    int (PDFLIB_CALL * PDF_shading)(PDF *p, const char *shtype, double x_0,
+                double y_0, double x_1, double y_1, double c_1, double c_2,
+                double c_3, double c_4, const char *optlist);
+    int (PDFLIB_CALL * PDF_shading_pattern)(PDF *p, int shading,
+                const char *optlist);
+    void (PDFLIB_CALL * PDF_shfill)(PDF *p, int shading);
     void (PDFLIB_CALL * PDF_show)(PDF *p, const char *text);
     void (PDFLIB_CALL * PDF_show2)(PDF *p, const char *text, int len);
-    int  (PDFLIB_CALL * PDF_show_boxed)(PDF *p, const char *text,
-                        double left, double top, double width, double height,
-                        const char *hmode, const char *feature);
-    int  (PDFLIB_CALL * PDF_show_boxed2)(PDF *p, const char *text, int len,
-                        double left, double top, double width, double height,
-                        const char *hmode, const char *feature);
+    int (PDFLIB_CALL * PDF_show_boxed)(PDF *p, const char *text,
+                double left, double top, double width, double height,
+                const char *hmode, const char *feature);
+    int (PDFLIB_CALL * PDF_show_boxed2)(PDF *p, const char *text, int len,
+                double left, double top, double width, double height,
+                const char *hmode, const char *feature);
     void (PDFLIB_CALL * PDF_show_xy)(PDF *p, const char *text, double x,
-                        double y);
+                double y);
     void (PDFLIB_CALL * PDF_show_xy2)(PDF *p, const char *text,
-                                            int len, double x, double y);
+                int len, double x, double y);
     void (PDFLIB_CALL * PDF_shutdown)(void);
     void (PDFLIB_CALL * PDF_skew)(PDF *p, double alpha, double beta);
-    double (PDFLIB_CALL * PDF_stringwidth)(PDF *p,
-                                const char *text, int font, double fontsize);
+    double (PDFLIB_CALL * PDF_stringwidth)(PDF *p, const char *text,
+                int font, double fontsize);
     double (PDFLIB_CALL * PDF_stringwidth2)(PDF *p, const char *text,
-                        int len, int font, double fontsize);
+                int len, int font, double fontsize);
     void (PDFLIB_CALL * PDF_stroke)(PDF *p);
     void (PDFLIB_CALL * PDF_suspend_page)(PDF *p, const char *optlist);
     void (PDFLIB_CALL * PDF_translate)(PDF *p, double tx, double ty);
-    const char * (PDFLIB_CALL * PDF_utf16_to_utf8) (PDF *p,
-        const char *utf16string, int len, int *size);
-    const char * (PDFLIB_CALL * PDF_utf8_to_utf16) (PDF *p,
-        const char *utf8string, const char *format, int *size);
+    const char * (PDFLIB_CALL * PDF_utf16_to_utf8)(PDF *p,
+                const char *utf16string, int len, int *size);
+    const char * (PDFLIB_CALL * PDF_utf32_to_utf16)(PDF *p,
+                const char *utf32string, int len, const char *ordering,
+                int *size);
+    const char * (PDFLIB_CALL * PDF_utf8_to_utf16)(PDF *p,
+                const char *utf8string, const char *format, int *size);
     void (PDFLIB_CALL * PDF_xshow)(PDF *p, const char *text, int len,
-    	const double *xadvancelist);
+                const double *xadvancelist);
 
-    int  (PDFLIB_CALL * pdf_catch)(PDF *p);
+    int (PDFLIB_CALL * pdf_catch)(PDF *p);
     void (PDFLIB_CALL * pdf_exit_try)(PDF *p);
     pdf_jmpbuf * (PDFLIB_CALL * pdf_jbuf)(PDF *p);
     void (PDFLIB_CALL * pdf_rethrow)(PDF *p);
 };
+
+
+/*
+ * ----------------------------------------------------------------------
+ * pCOS-specific enums and defines
+ * ----------------------------------------------------------------------
+ */
+
+/*
+ * PDFlib GmbH products implement the following pCOS interface numbers:
+ *
+ * pCOS interface   Products
+ * 1                TET 2.0, 2.1
+ * 2                pCOS 1.x
+ * 3                PDFlib 7.0.x
+ */
+
+#ifndef PCOS_INTERFACE
+#define PCOS_INTERFACE	3
+
+/* document access levels.
+*/
+typedef enum
+{
+    pcos_mode_minimum	 = 0, /* encrypted doc (opened w/o password)	      */
+    pcos_mode_restricted = 1, /* encrypted doc (opened w/ user password)      */
+    pcos_mode_full	 = 2  /* unencrypted doc or opened w/ master password */
+} pcos_mode;
+
+
+/* object types.
+*/
+typedef enum
+{
+    pcos_ot_null	= 0,
+    pcos_ot_boolean	= 1,
+    pcos_ot_number	= 2,
+    pcos_ot_name	= 3,
+    pcos_ot_string	= 4,
+    pcos_ot_array	= 5,
+    pcos_ot_dict	= 6,
+    pcos_ot_stream	= 7,
+    pcos_ot_fstream	= 8
+} pcos_object_type;
+
+#endif /* PCOS_INTERFACE */
 
 
 /*
@@ -1226,8 +1463,7 @@ struct PDFlib_api_s {
 /*
  * Error classes are deprecated; use PDF_TRY/PDF_CATCH instead.
  * Note that old-style error handlers are still supported, but
- * they will always receive type PDF_NonfatalError (for warnings)
- * or PDF_UnknownError (for other exceptions).
+ * they will always receive PDF_UnknownError.
  */
 
 #define PDF_MemoryError    1
@@ -1240,10 +1476,59 @@ struct PDFlib_api_s {
 #define PDF_SyntaxError    8
 #define PDF_ValueError     9
 #define PDF_SystemError   10
-
 #define PDF_NonfatalError 11
 #define PDF_UnknownError  12
 
+
+/*
+ * ----------------------------------------------------------------------
+ * Deprecated functions (should no longer be used)
+ * ----------------------------------------------------------------------
+ */
+
+#if _MSC_VER >= 1310    /* VS .NET 2003 and later */
+#pragma deprecated(PDF_add_bookmark)
+#pragma deprecated(PDF_add_bookmark2)
+#pragma deprecated(PDF_add_launchlink)
+#pragma deprecated(PDF_add_locallink)
+#pragma deprecated(PDF_add_note)
+#pragma deprecated(PDF_add_note2)
+#pragma deprecated(PDF_add_pdflink)
+#pragma deprecated(PDF_add_weblink)
+#pragma deprecated(PDF_attach_file)
+#pragma deprecated(PDF_attach_file2)
+#pragma deprecated(PDF_begin_page)
+#pragma deprecated(PDF_begin_template)
+#pragma deprecated(PDF_boot)
+#pragma deprecated(PDF_close)
+#pragma deprecated(PDF_end_page)
+#pragma deprecated(PDF_findfont)
+#pragma deprecated(PDF_get_majorversion)
+#pragma deprecated(PDF_get_minorversion)
+#pragma deprecated(PDF_get_pdi_value)
+#pragma deprecated(PDF_get_pdi_parameter)
+#pragma deprecated(PDF_open_CCITT)
+#pragma deprecated(PDF_open_file)
+#pragma deprecated(PDF_open_image)
+#pragma deprecated(PDF_open_image_file)
+#pragma deprecated(PDF_open_mem)
+#pragma deprecated(PDF_open_pdi)
+#pragma deprecated(PDF_place_image)
+#pragma deprecated(PDF_place_pdi_page)
+#pragma deprecated(PDF_set_border_color)
+#pragma deprecated(PDF_set_border_dash)
+#pragma deprecated(PDF_set_border_style)
+#pragma deprecated(PDF_setgray)
+#pragma deprecated(PDF_setgray_fill)
+#pragma deprecated(PDF_setgray_stroke)
+#pragma deprecated(PDF_setpolydash)
+#pragma deprecated(PDF_setrgbcolor)
+#pragma deprecated(PDF_setrgbcolor_fill)
+#pragma deprecated(PDF_setrgbcolor_stroke)
+#pragma deprecated(PDF_show_boxed)
+#pragma deprecated(PDF_show_boxed2)
+#pragma deprecated(PDF_shutdown)
+#endif
 
 /*
  * ----------------------------------------------------------------------

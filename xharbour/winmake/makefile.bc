@@ -47,12 +47,14 @@ CLIBFLAGS   =$(CLIBFLAGS)
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
 INCLUDE_DIR  =$(INCLUDE_DIR) -Iinclude -I$(OBJ_DIR) -I$(ZLIB_DIR) -I$(PDFLIB_DIR)
+INCLUDE_DIR  =$(INCLUDE_DIR) -I$(PDFLITE_DIR)\include -I$(PNG_DIR)
 CLIBFLAGS    =$(CLIBFLAGS) -q -c $(INCLUDE_DIR) -d -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H
 HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 LINK_CMD     =ILINK32 -ap -Tpe -x -Gn -C -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" -Llib\b32 $(LFLAGS) "$(CC_DIR)\lib\c0x32.obj" $**,$@,,
+CLIBFLAGS    =$(CLIBFLAGS) -tWM
 
 !if $d(HB_THREAD_SUPPORT)
-CLIBFLAGS    =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT
+CLIBFLAGS    =$(CLIBFLAGS) -DHB_THREAD_SUPPORT
 HB_MT_FLAGS  =-DHB_THREAD_SUPPORT
 !endif
 
@@ -87,7 +89,7 @@ BISON_CMD1   =bison -v -d $** -o$@
 BISON_CMD2   =bison -v -p hb_comp -d $** -o$@
 
 COMPILERLIBS=\
-	cw32$(HB_MT).lib\
+	cw32mt.lib\
 	import32.lib
 
 !if $d(HB_CG32)
@@ -104,14 +106,6 @@ CMN_LIBS=$(COMMON_LIB) $(COMPILERLIBS)
 # Macro Definitions
 #===============================================================================
 !include winmake\common.mak
-
-!if !("$(HB_DOC_PDF)"=="")
-HBDOC_PDFLIB_LIB=$(PDFLIB_LIB)
-HBDOC_EXE_OBJS=\
-	$(HBDOC_EXE_OBJS)\
-	$(OBJ_DIR)\genpdf1.obj\
-	$(OBJ_DIR)\pdfhbdoc.obj
-!endif
 
 !ifdef HB_GTALLEG
 HB_GT_LIBS=\
@@ -438,8 +432,15 @@ $(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
 +)
 !
 
-$(PDFLIB_LIB) : $(PDFLIB_LIB_OBJS)
-	IF EXIST "$(PDFLIB_LIB)" $(DEL) "$(PDFLIB_LIB)" > NUL
+$(PDFLITE_LIB) : $(PDFLITE_LIB_OBJS)
+	IF EXIST "$(PDFLITE_LIB)" $(DEL) "$(PDFLITE_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
+$(PNG_LIB) : $(PNG_LIB_OBJS)
+	IF EXIST "$(PNG_LIB)" $(DEL) "$(PNG_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
@@ -524,15 +525,8 @@ ACEH_DIR    =-I"$(HB_DIR_ADS)"
 !ifdef HB_DIR_OPENSSL
 OPENSSL_DIR    =-I"$(HB_DIR_OPENSSL)\include"
 !endif
-!if !("$(HB_DOC_PDF)"=="")
-HBDOC_PDFLIB_LIB=$(PDFLIB_LIB)
-HBDOC_EXE_OBJS=\
-	$(HBDOC_EXE_OBJS)\
-	$(OBJ_DIR)\genpdf1.obj\
-	$(OBJ_DIR)\pdfhbdoc.obj
-!endif
 
-INCLUDE_DIR =-I"include" -I"$(OBJ_DIR)" -I"$(ZLIB_DIR)"
+INCLUDE_DIR =-I"include" -I"$(OBJ_DIR)" -I"$(ZLIB_DIR)" -I"$(PDFLITE_DIR)\include"
 DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) -DHAVE_CONFIG_H -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -q -a8 -OS -O2 -6 -c $(ACEH_DIR) $(OPENSSL_DIR) $(INCLUDE_DIR) -d -w3 -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H
@@ -559,7 +553,7 @@ HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
 DLL_LINK_CMD=ILINK32 $(LINKERFLAGS) -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" "$(CC_DIR)\lib\c0d32.obj" $**,$@,,$(COMPILERLIBS)
-DLLEXE_LINK_CMD=ILINK32 $(LINKERFLAGS) -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" "$(CC_DIR)\lib\c0x32.obj" $**,$@,,$(USE_DLL_LIB) $(HBDOC_PDFLIB_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+DLLEXE_LINK_CMD=ILINK32 $(LINKERFLAGS) -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" "$(CC_DIR)\lib\c0x32.obj" $**,$@,,$(USE_DLL_LIB) $(PNG_LIB) $(ZLIB_LIB) $(PDFLITE_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # Compiler and 3rd Party libraries need to be linked
@@ -644,8 +638,9 @@ RDDSQL_INCLUDE=-I"$(HB_DIR_MAGIC)\include" $(RDDSQL_INCLUDE)
 INCLUDE_DIR  =-Iinclude $(RDDSQL_INCLUDE)
 CLIBFLAGS    =$(CLIBFLAGS) -c -q $(ACEH_DIR) $(CAIRO_DIR) $(CURL_DIR) $(OPENSSL_DIR) $(INCLUDE_DIR) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(HBHPDF_DIR) -I$(ZLIB_DIR) -d -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
 HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -i$(GDLIB_DIR)\include -i$(WHAT32_DIR)\include -i$(XWT_DIR)\include -q0 -w2 -es2 -gc0
+CLIBFLAGS    =$(CLIBFLAGS) -tWM
 !if $d(HB_THREAD_SUPPORT)
-CLIBFLAGS    =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT
+CLIBFLAGS    =$(CLIBFLAGS) -DHB_THREAD_SUPPORT
 HARBOURFLAGS =-dHB_THREAD_SUPPORT $(HARBOURFLAGS)
 !endif
 
@@ -654,7 +649,7 @@ CLIBFLAGS    =$(CLIBFLAGS)  $(CFLAGS)
 HB_CMD       =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 CC_CMD       =BCC32 $(CLIBFLAGS) -o$@ $**
 CCC_CMD      =$(CC_CMD)
-CC_CMD_ZIP   =BCC32 -q -c -I$(HBZIP_DIR)\include;include -Ve -6 -R- -H- -5 -OS -w- -O2 -X- -a8 -b -k- -o$@ $**
+CC_CMD_ZIP   =BCC32 -tWM -q -c -I$(HBZIP_DIR)\include;include -Ve -6 -R- -H- -5 -OS -w- -O2 -X- -a8 -b -k- -o$@ $**
 
 #===============================================================================
 # Macro Definitions
@@ -965,13 +960,6 @@ $(FILEMEM_LIB) : $(FILEMEM_LIB_OBJS)
 
 $(GTWVG_LIB) : $(GTWVG_LIB_OBJS)
 	IF EXIST "$(GTWVG_LIB)" $(DEL) "$(GTWVG_LIB)" > NUL
-	TLIB $@ $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-!
-
-$(PNG_LIB) : $(PNG_LIB_OBJS)
-	IF EXIST "$(PNG_LIB)" $(DEL) "$(PNG_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
