@@ -12,6 +12,7 @@ rem
 rem ============================================================================
 REM SET __MAKE__=D:\VC9\BIN\NMAKE.EXE
 REM NOTE: POMAKE 6.50 is buggy. In this case, please use NMAKE.EXE of MSVC.
+REM NOTE: POMAKE 7.00 is working fine
 
 IF "%__MAKE__%"=="" SET __MAKE__=POMAKE
 IF "%SUB_DIR%"=="" SET SUB_DIR=pc
@@ -135,7 +136,7 @@ rem=============================================================================
    SET HB_MT_FLAGS=
    SET HB_MT_DIR=\dll
    @CALL winmake\mdir.bat dllcreate
-   %__MAKE__% /F winmake\hrbdll.pc  >dll_%SUB_DIR%.log
+   %__MAKE__% /F winmake\makefile.pc >dll_%SUB_DIR%.log
    if errorlevel 1 goto DLL_ERR
    goto DLL_OK
 
@@ -166,7 +167,7 @@ rem=============================================================================
    SET HB_MT_FLAGS=
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
-   %__MAKE__% /F winmake\contrib.pc  >cont_%SUB_DIR%.log
+   %__MAKE__% /F winmake\makefile.pc >cont_%SUB_DIR%.log
    if errorlevel 1 goto CONTRIBS_ERR
    goto CONTRIBS_OK
 

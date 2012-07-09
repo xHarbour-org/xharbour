@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2012-07-10 06:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  - winmake/hrbdll.pc
+  - winmake/contrib.pc
+  * winmake/makefile.pc
+  * make_pc.bat
+    ! Finally, pomake.exe, the native PellesC make utility, works as expected
+    in the newest version 7.00 released 07-20-2012. Hence, scattered makefiles
+    are combined into one, makefile.pc
+
 2012-07-09 20:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   ! bin/pack_src.sh
     ! added new contribs
