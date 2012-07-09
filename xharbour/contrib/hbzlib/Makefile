@@ -25,7 +25,7 @@ CPP_SOURCES := \
 	zipnew.cpp \
 	zipplatformcomm.cpp \
 	zipstorage.cpp \
-	ZipString.cpp
+	zipstring.cpp
 
 ifeq ($(HB_ARCHITECTURE),linux)
 CPP_SOURCES +=\
@@ -54,7 +54,7 @@ INSTALL_RULE_HEADERS := $(INSTALL_RULE)
 include $(TOP)$(ROOT)config/lib.cf
 
 
-CFLAGS := $(CFLAGS) -I../../Linux -I../..
+CFLAGS := $(CFLAGS) -I../../linux -I../..
 
 
 
