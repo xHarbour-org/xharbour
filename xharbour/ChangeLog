@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-10 03:44 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/pcre/*.*
+    ! SVN file properties re-assigned as file versions show incorrect number
+
 2012-07-10 03:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/pcre/*.*
     ! folder refreshed, due to uncommited commits.
