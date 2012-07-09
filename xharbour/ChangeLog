@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2012-07-09 20:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  ! bin/pack_src.sh
+    ! added new contribs
+  + contrib/hbbz2/Makefile
+  + contrib/hbcairo/Makefile
+  + contrib/hbcurl/Makefile
+  + contrib/hbexpat/Makefile
+  + contrib/hblzf/Makefile
+  + contrib/hbmagic/Makefile
+  + contrib/hbzebra/Makefile
+    ! added linux makefile to new contribs commited
 
 2012-07-10 03:44 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/pcre/*.*

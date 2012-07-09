@@ -370,19 +370,150 @@ $hb_collect contrib/libnf/*.ch
 $hb_collect contrib/libnf/include/*.h
 $hb_collect contrib/libnf/include/*.ch
 
-# CONTRIB\LIBMISC
-#$hb_collect contrib/libmisc/Makefile
-#$hb_collect contrib/libmisc/*.[ch]
-#$hb_collect contrib/libmisc/*.prg
-#$hb_collect contrib/libmisc/*.ch
+#contrib\sqlite3 
+$hb_collect contrib/hbsqlit3/Makefile
+$hb_collect contrib/hbsqlit3/config.h
+$hb_collect contrib/hbsqlit3/hbapistr.h
+$hb_collect contrib/hbsqlit3/sqlite3.c
+$hb_collect contrib/hbsqlit3/sqlite3.h
+$hb_collect contrib/hbsqlit3/sqlite3ext.h
+$hb_collect contrib/hbsqlit3/strapi.c
+$hb_collect contrib/hbsqlit3/xhbsqlite3.c
+$hb_collect contrib/hbsqlit3/tests
+$hb_collect contrib/hbsqlit3/tests/authorizer.prg
+$hb_collect contrib/hbsqlit3/tests/blob.prg
+$hb_collect contrib/hbsqlit3/tests/pngtest.png
+$hb_collect contrib/hbsqlit3/tests/sqlite3.ch
+$hb_collect contrib/hbsqlit3/tests/sqlite3_test.prg
+  
+#contrib\hbcairo
+$hb_collect contrib/hbcairo/Makefile
+$hb_collect contrib/hbcairo/tests
+$hb_collect contrib/hbcairo/context.c
+$hb_collect contrib/hbcairo/core.c
+$hb_collect contrib/hbcairo/hbapistr.h
+$hb_collect contrib/hbcairo/hbcairo.ch
+$hb_collect contrib/hbcairo/hbcairo.h
+$hb_collect contrib/hbcairo/image.c
+$hb_collect contrib/hbcairo/paths.c
+$hb_collect contrib/hbcairo/pdf.c
+$hb_collect contrib/hbcairo/png.c
+$hb_collect contrib/hbcairo/ps.c
+$hb_collect contrib/hbcairo/surface.c
+$hb_collect contrib/hbcairo/text.c
+$hb_collect contrib/hbcairo/transfor.c
+$hb_collect contrib/hbcairo/util.c
+$hb_collect contrib/hbcairo/tests/fancytxt.prg
+$hb_collect contrib/hbcairo/tests/glyphdbg.prg
+$hb_collect contrib/hbcairo/tests/hellow.prg
+$hb_collect contrib/hbcairo/tests/lightning.prg
+$hb_collect contrib/hbcairo/tests/table.prg
+#contrib\hbzebra
+$hb_collect contrib/hbzebra/Makefile
+$hb_collect contrib/hbzebra/tests
+$hb_collect contrib/hbzebra/codabar.c
+$hb_collect contrib/hbzebra/code11.c
+$hb_collect contrib/hbzebra/code128.c
+$hb_collect contrib/hbzebra/code39.c
+$hb_collect contrib/hbzebra/code93.c
+$hb_collect contrib/hbzebra/core.c
+$hb_collect contrib/hbzebra/coredraw.c
+$hb_collect contrib/hbzebra/datamtrx.c
+$hb_collect contrib/hbzebra/eanupc.c
+$hb_collect contrib/hbzebra/hbzebra.ch
+$hb_collect contrib/hbzebra/hbzebra.h
+$hb_collect contrib/hbzebra/itf.c
+$hb_collect contrib/hbzebra/msi.c
+$hb_collect contrib/hbzebra/pdf417.c
+$hb_collect contrib/hbzebra/qrcode.c
+$hb_collect contrib/hbzebra/tests/testcair.prg
+$hb_collect contrib/hbzebra/tests/testhpdf.prg
 
-# CONTRIB\HTMLLIB
-#$hb_collect contrib/htmllib/Makefile
-#$hb_collect contrib/htmllib/*.prg
-#$hb_collect contrib/htmllib/example/*.*
-#$hb_collect contrib/htmllib/help/*.*
-#$hb_collect contrib/htmllib/include/Makefile
-#$hb_collect contrib/htmllib/include/*.ch
+#contrib/hbbz2
+$hb_collect contrib/hbbz2/Makefile
+$hb_collect contrib/hbbz2/tests
+$hb_collect contrib/hbbz2/blocksor.c
+$hb_collect contrib/hbbz2/bzlib.c
+$hb_collect contrib/hbbz2/bzlib.h
+$hb_collect contrib/hbbz2/bzlib_pr.h
+$hb_collect contrib/hbbz2/compress.c
+$hb_collect contrib/hbbz2/core.c
+$hb_collect contrib/hbbz2/crctable.c
+$hb_collect contrib/hbbz2/decompre.c
+$hb_collect contrib/hbbz2/hbbz2.ch
+$hb_collect contrib/hbbz2/huffman.c
+$hb_collect contrib/hbbz2/randtabl.c
+$hb_collect contrib/hbbz2/tests/test.prg
+
+
+#contrib/hblzf
+$hb_collect contrib/hblzf/Makefile
+$hb_collect contrib/hblzf/tests
+$hb_collect contrib/hblzf/core.c
+$hb_collect contrib/hblzf/crc32.h
+$hb_collect contrib/hblzf/hblzf.ch
+$hb_collect contrib/hblzf/lzf.h
+$hb_collect contrib/hblzf/lzfp.h
+$hb_collect contrib/hblzf/lzf_c.c
+$hb_collect contrib/hblzf/lzf_d.c
+$hb_collect contrib/hblzf/tests/test.prg
+$hb_collect contrib/hblzf/tests/test2.prg
+ 
+
+#contrib/hbmlzo
+$hb_collect contrib/hbmlzo/Makefile
+$hb_collect contrib/hbmlzo/tests
+$hb_collect contrib/hbmlzo/core.c
+$hb_collect contrib/hbmlzo/hbmlzo.ch
+$hb_collect contrib/hbmlzo/lzoconf.h
+$hb_collect contrib/hbmlzo/lzodefs.h
+$hb_collect contrib/hbmlzo/minilzo.c
+$hb_collect contrib/hbmlzo/minilzo.h
+$hb_collect contrib/hbmlzo/tests/test.prg
+
+#contrib/hbexpat
+$hb_collect contrib/hbexpat/Makefile
+$hb_collect contrib/hbexpat/amigacon.h
+$hb_collect contrib/hbexpat/ascii.h
+$hb_collect contrib/hbexpat/asciitab.h
+$hb_collect contrib/hbexpat/core.c
+$hb_collect contrib/hbexpat/expat.h
+$hb_collect contrib/hbexpat/expat_ex.h
+$hb_collect contrib/hbexpat/hbexpat.ch
+$hb_collect contrib/hbexpat/iasciita.h
+$hb_collect contrib/hbexpat/internal.c
+$hb_collect contrib/hbexpat/internal.h
+$hb_collect contrib/hbexpat/latin1ta.h
+$hb_collect contrib/hbexpat/macconfi.h
+$hb_collect contrib/hbexpat/nametab.h
+$hb_collect contrib/hbexpat/unitable.prg
+$hb_collect contrib/hbexpat/utf8tab.h
+$hb_collect contrib/hbexpat/watcomconfig.h
+$hb_collect contrib/hbexpat/winconfi.h
+$hb_collect contrib/hbexpat/xmlparse.c
+$hb_collect contrib/hbexpat/xmlrole.c
+$hb_collect contrib/hbexpat/xmlrole.h
+$hb_collect contrib/hbexpat/xmltok.c
+$hb_collect contrib/hbexpat/xmltok.h
+$hb_collect contrib/hbexpat/xmltok_i.c
+$hb_collect contrib/hbexpat/xmltok_i.h
+$hb_collect contrib/hbexpat/xmltok_n.c
+$hb_collect contrib/hbexpat/_hbconf.h
+$hb_collect contrib/hbexpat/tests
+$hb_collect contrib/hbexpat/tests/test.prg
+$hb_collect contrib/hbexpat/tests/test.xml
+
+#contrib/hbmagic
+$hb_collect contrib/hbmagic/Makefile
+$hb_collect contrib/hbmagic/core.c
+$hb_collect contrib/hbmagic/hbmagic.ch
+$hb_collect contrib/hbmagic/hbmagis.prg
+$hb_collect contrib/hbmagic/tests
+$hb_collect contrib/hbmagic/tests/hbmagit.prg
+#contrib/curl
+$hb_collect contrib/hbcurl/*.[ch]
+$hb_collect contrib/hbcurl/Makefile
+
 
 }
 
