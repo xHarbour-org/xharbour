@@ -11,7 +11,7 @@ C_SOURCES = \
 	xmlrole.c \
 	xmltok.c \
 	xmltok_i.c \
-	internal.c \ 
+	internal.c \
 
 PRG_SOURCES= \
 	unitable.prg \
@@ -25,3 +25,5 @@ LIBNAME=hbexpat
 
 include $(TOP)$(ROOT)config/lib.cf
 include $(TOP)$(ROOT)config/header.cf
+
+CFLAGS := $(CFLAGS) -I../..  -DHARBOUR_CONF
