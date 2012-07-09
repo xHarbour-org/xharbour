@@ -34,6 +34,15 @@ DIRS=\
 	hbzlib \
 	libnf \
 	xwt \
+	hbexpat \
+	hbzebra \
+	hbcurl \
+	hblzo \
+	hbbz2 \
+	hbcurl \
+	tipssl \
+	hblzf \
+	
 
 endif
 endif

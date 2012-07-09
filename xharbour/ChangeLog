@@ -1,4 +1,4 @@
-/*
+BBBBBBBB/*
  * $Id$
  */
 
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-09 20:36  UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  - contrib/hblzf/lzfp.h
+    ! Removed to make linux happy
+  + contrib/hblfz/lzfP.h
+    ! renamed lzfp.h to lzfP.h to make linux build happy
+    
 2012-07-10 06:28 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * ChangeLog
     ! typo : 07-20-2012 -> 07-10-2012
