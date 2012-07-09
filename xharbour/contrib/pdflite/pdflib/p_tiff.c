@@ -210,7 +210,8 @@ pdf_data_source_TIFF_fill(PDF *p, PDF_data_source *src)
             src->bytes_available = bc[image->info.tiff.cur_line];
 
             /* special handling for uncompressed 16-bit images */
-            if (MYTIFF->tif_header.tiff_magic == TIFF_LITTLEENDIAN &&
+//          if (MYTIFF->tif_header.tiff_magic == TIFF_LITTLEENDIAN &&
+            if (MYTIFF->tif_header.common.tiff_magic == TIFF_LITTLEENDIAN &&
                 image->compression == pdf_comp_none && image->bpc == 16)
             {
                 TIFFSwabArrayOfShort((uint16 *) src->buffer_start,
@@ -344,6 +345,15 @@ pdf_is_TIFF_file(PDF *p, pdc_file *fp, pdf_tiff_info *tiff_info, pdc_bool check)
     pdc_logg_cond(p->pdc, 1, trc_image, "\tChecking image type TIFF...\n");
 
     filename = pdc_file_name(fp);
+
+#if 1
+    tiff_info->tif = TIFFClientOpen(filename, "rc",
+            (void *)fp,
+            pdf_libtiff_read, NULL,
+            pdf_libtiff_seek, pdf_libtiff_close,
+            pdf_libtiff_size,
+            NULL, NULL );
+#else
     tiff_info->tif = TIFFClientOpen(filename, "rc",
             (void *)fp,
             pdf_libtiff_read, NULL,
@@ -351,6 +361,7 @@ pdf_is_TIFF_file(PDF *p, pdc_file *fp, pdf_tiff_info *tiff_info, pdc_bool check)
             NULL, NULL, (void *)p,
             pdf_libtiff_malloc, pdf_libtiff_realloc, pdf_libtiff_free,
             pdf_libtiff_error, pdf_libtiff_error);
+#endif
     if (tiff_info->tif == NULL)
     {
         pdc_fseek(fp, 0L, SEEK_SET);
@@ -609,7 +620,8 @@ pdf_process_TIFF_data(
 	 * It's not nice to pull the endianness directly from the TIFF
 	 * structure, but there doesn't seem to be a public interface for it.
 	 */
-	if (MYTIFF->tif_header.tiff_magic == TIFF_LITTLEENDIAN &&
+	// if (MYTIFF->tif_header.tiff_magic == TIFF_LITTLEENDIAN &&
+	if (MYTIFF->tif_header.common.tiff_magic == TIFF_LITTLEENDIAN &&
 	    (compression == COMPRESSION_DEFLATE ||
 	    compression == COMPRESSION_ADOBE_DEFLATE))
 	{

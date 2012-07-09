@@ -38,7 +38,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
 INCLUDE_DIR=-I"include" -I"$(OBJ_DIR)" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(ZLIB_DIR)" -I"$(PDFLIB_DIR)"
-INCLUDE_DIR=$(INCLUDE_DIR) -I"$(PNG_DIR)" -I"$(PDFLITE_DIR)\include"
+INCLUDE_DIR=$(INCLUDE_DIR) -I"$(PNG_DIR)" -I"$(PDFLITE_DIR)\include" -I"$(TIFF_DIR)" -I"$(JPEG_DIR)"
 !if ("$(HB_MT)"=="mt")
 HARBOURFLAGS=-dHB_THREAD_SUPPORT
 CLIBFLAGS   =-D_MT -DHB_THREAD_SUPPORT
@@ -256,6 +256,12 @@ $(PDFLITE_LIB) : $(PDFLITE_LIB_OBJS)
 $(PNG_LIB) : $(PNG_LIB_OBJS)
 	$(LIB_CMD)
 
+$(TIFF_LIB) : $(TIFF_LIB_OBJS)
+	$(LIB_CMD)
+
+$(JPEG_LIB) : $(JPEG_LIB_OBJS)
+	$(LIB_CMD)
+
 #*******************************************************************************
 !elif ("$(__BLD__)"=="DLL_BLD")
 #*******************************************************************************
@@ -273,6 +279,9 @@ HARBOUR_DLL_OBJS=\
 	\
 	$(RTL_LIB_OBJS)\
 	$(PCREPOS_LIB_OBJS)\
+	$(JPEG_LIB_OBJS)\
+	$(TIFF_LIB_OBJS)\
+	$(PNG_LIB_OBJS)\
 	$(ZLIB_LIB_OBJS)\
 	$(LANG_LIB_OBJS)\
 	$(MACRO_LIB_OBJS)\
@@ -332,6 +341,7 @@ ACEH_DIR    =-I"$(HB_DIR_ADS)"
 !endif
 INCLUDE_DIR =-I"include" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(OBJ_DIR)" -I"$(ZLIB_DIR)" $(ACEH_DIR)
 INCLUDE_DIR =$(INCLUDE_DIR) -I"$(PNG_DIR)" -I"$(PDFLIB_DIR)" -I"$(PDFLITE_DIR)\include"
+INCLUDE_DIR =$(INCLUDE_DIR) -I"$(TIFF_DIR)" -I"$(JPEG_DIR)"
 DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) -D"HB_NO_DUPLICATE_HVMPROCESSSYMBOL" -D"HAVE_CONFIG_H" -D"__EXPORT__" -cpp -mn $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__"
@@ -353,7 +363,7 @@ HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
-DLLEXE_LINK_CMD=LINK /EXETYPE:NT /SUBSYSTEM:CONSOLE $(OBJ_DIR)\mainwin.obj $(OBJ_DIR)\dummyDLL.obj $**,$@,,$(USE_DLL_LIB) $(ZLIB_LIB) $(PNG_LIB) $(PDFLITE_LIB) $(HARBOUR_DLL_LIB)
+DLLEXE_LINK_CMD=LINK /EXETYPE:NT /SUBSYSTEM:CONSOLE $(OBJ_DIR)\mainwin.obj $(OBJ_DIR)\dummyDLL.obj $**,$@,,$(USE_DLL_LIB) $(PDFLITE_LIB) $(HARBOUR_DLL_LIB)
 #===============================================================================
 # The Project
 #===============================================================================
@@ -392,7 +402,7 @@ $(HARBOUR_DLL) :\
 	$(OBJ_DIR)\dummyDLL.obj\
 	$(OBJ_DIR)\dmcdll.def
 	LINK @&&!
-$(HARBOUR_DLL_OBJS),$@,,,$(OBJ_DIR)\dmcdll.def
+$(HARBOUR_DLL_OBJS),$@,,,$(OBJ_DIR)\dmcdll.def $(EXPORT_DEF)
 !
 	IMPLIB $(HARBOUR_DLL_LIB) $(HARBOUR_DLL) /system /noi
 #*******************************************************************************

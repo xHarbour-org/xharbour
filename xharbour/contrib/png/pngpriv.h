@@ -38,6 +38,12 @@
 
 #define PNG_USE_COMPILE_TIME_MASKS 0
 
+#if defined( __EXPORT__ )
+   #if !defined( PNG_BUILD_DLL )
+      #define PNG_BUILD_DLL   1
+   #endif
+#endif
+
 #if defined( __BORLANDC__ )
    /*
      * To pacify warnings

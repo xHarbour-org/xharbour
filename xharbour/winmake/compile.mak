@@ -36,7 +36,7 @@ $(HBPP_EXE) : $(HBPP_EXE_OBJS)
 	$(MT_CMD)
 
 $(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
-	$(EXE_LINK_CMD) $(PNG_LIB) $(PDFLITE_LIB)
+	$(EXE_LINK_CMD) $(PNG_LIB) $(TIFF_LIB) $(JPEG_LIB) $(PDFLITE_LIB)
 	$(MT_CMD)
 
 $(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
@@ -86,6 +86,300 @@ $(HBMAKEDLL_EXE) : $(HBMAKEDLL_EXE_OBJS)
 $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
 	$(DLLEXE_LINK_CMD)
 	$(MT_CMD)
+
+#===============================================================================
+# TIFF.LIB Dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)tif_aux$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_aux.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_close$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_close.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_codec$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_codec.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_color$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_color.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_compress$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_compress.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_dir$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_dir.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_dirinfo$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_dirinfo.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_dirread$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_dirread.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_dirwrite$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_dirwrite.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_dumpmode$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_dumpmode.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_error$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_error.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_extension$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_extension.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_fax3$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_fax3.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_fax3sm$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_fax3sm.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_flush$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_flush.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_getimage$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_getimage.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_jbig$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_jbig.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_jpeg$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_jpeg.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_jpeg_12$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_jpeg_12.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_luv$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_luv.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_lzma$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_lzma.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_lzw$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_lzw.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_next$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_next.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_ojpeg$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_ojpeg.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_open$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_open.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_packbits$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_packbits.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_pixarlog$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_pixarlog.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_predict$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_predict.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_print$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_print.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_read$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_read.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_strip$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_strip.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_swab$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_swab.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_thunder$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_thunder.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_tile$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_tile.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_version$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_version.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_warning$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_warning.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_win32$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_win32.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_write$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_write.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_zip$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_zip.c
+	$(CCC_CMD)
+
+#===============================================================================
+# JPEG.LIB
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)djpeg$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)djpeg.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)wrtarga$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)wrtarga.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)wrppm$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)wrppm.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)wrgif$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)wrgif.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)wrbmp$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)wrbmp.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cdjpeg$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)cdjpeg.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)rdcolmap$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)rdcolmap.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jdarith$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jdarith.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jaricom$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jaricom.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jmemansi$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jmemansi.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jcomapi$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jcomapi.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jutils$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jutils.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jerror$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jerror.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jmemmgr$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jmemmgr.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jmemnobs$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jmemnobs.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jcapimin$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jcapimin.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jcapistd$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jcapistd.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jctrans$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jctrans.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jcarith$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jcarith.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jcparam$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jcparam.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jdatadst$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jdatadst.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jcinit$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jcinit.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jcmaster$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jcmaster.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jcmarker$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jcmarker.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jcmainct$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jcmainct.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jcprepct$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jcprepct.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jccoefct$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jccoefct.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jccolor$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jccolor.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jcsample$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jcsample.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jchuff$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jchuff.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jcphuff$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jcphuff.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jcdctmgr$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jcdctmgr.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jfdctfst$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jfdctfst.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jfdctflt$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jfdctflt.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jfdctint$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jfdctint.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jdapimin$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jdapimin.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jdapistd$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jdapistd.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jdtrans$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jdtrans.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jdatasrc$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jdatasrc.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jdmaster$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jdmaster.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jdinput$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jdinput.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jdmarker$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jdmarker.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jdhuff$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jdhuff.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jdphuff$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jdphuff.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jdmainct$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jdmainct.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jdcoefct$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jdcoefct.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jdpostct$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jdpostct.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jddctmgr$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jddctmgr.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jidctfst$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jidctfst.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jidctflt$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jidctflt.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jidctint$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jidctint.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jidctred$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jidctred.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jdsample$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jdsample.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jdcolor$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jdcolor.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jquant1$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jquant1.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jquant2$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jquant2.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)jdmerge$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jdmerge.c
+	$(CCC_CMD)
 
 #===============================================================================
 # PDFLITE.LIB Dependencies
@@ -219,6 +513,9 @@ $(OBJ_DIR)$(DIR_SEP)p_draw$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_
 $(OBJ_DIR)$(DIR_SEP)p_encoding$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_encoding.c
 	$(CCC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)p_fields$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_fields.c
+	$(CCC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)p_filter$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_filter.c
 	$(CCC_CMD)
 
@@ -273,6 +570,9 @@ $(OBJ_DIR)$(DIR_SEP)p_params$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)
 $(OBJ_DIR)$(DIR_SEP)p_pattern$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_pattern.c
 	$(CCC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)p_pdi$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_pdi.c
+	$(CCC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)p_pfm$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_pfm.c
 	$(CCC_CMD)
 
@@ -300,6 +600,9 @@ $(OBJ_DIR)$(DIR_SEP)p_template$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SE
 $(OBJ_DIR)$(DIR_SEP)p_text$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_text.c
 	$(CCC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)p_textflow$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_textflow.c
+	$(CCC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)p_tiff$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_tiff.c
 	$(CCC_CMD)
 
@@ -318,250 +621,7 @@ $(OBJ_DIR)$(DIR_SEP)p_util$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_
 $(OBJ_DIR)$(DIR_SEP)p_xgstate$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_xgstate.c
 	$(CCC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)tif_auxx$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_auxx.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_close$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_close.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_codec$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_codec.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_color$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_color.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_compress$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_compress.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_dir$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_dir.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_dirinfo$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_dirinfo.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_dirread$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_dirread.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_dirwrite$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_dirwrite.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_dumpmode$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_dumpmode.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_error$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_error.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_extension$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_extension.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_fax3$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_fax3.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_fax3sm$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_fax3sm.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_flush$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_flush.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_getimage$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_getimage.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_jpeg$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_jpeg.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_luv$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_luv.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_lzw$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_lzw.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_next$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_next.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_ojpeg$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_ojpeg.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_open$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_open.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_packbits$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_packbits.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_pixarlog$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_pixarlog.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_predict$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_predict.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_print$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_print.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_read$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_read.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_strip$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_strip.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_swab$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_swab.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_thunder$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_thunder.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_tile$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_tile.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_unix$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_unix.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_version$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_version.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_warning$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_warning.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_write$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_write.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)tif_zip$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_zip.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jcapimin$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jcapimin.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jcapistd$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jcapistd.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jccoefct$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jccoefct.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jccolor$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jccolor.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jcdctmgr$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jcdctmgr.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jchuff$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jchuff.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jcinit$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jcinit.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jcmainct$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jcmainct.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jcmarker$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jcmarker.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jcmaster$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jcmaster.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jcomapi$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jcomapi.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jcparam$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jcparam.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jcphuff$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jcphuff.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jcprepct$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jcprepct.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jcsample$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jcsample.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jctrans$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jctrans.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jdapimin$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jdapimin.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jdapistd$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jdapistd.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jdatadst$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jdatadst.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jdatasrc$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jdatasrc.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jdcoefct$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jdcoefct.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jdcolor$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jdcolor.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jddctmgr$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jddctmgr.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jdhuff$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jdhuff.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jdinput$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jdinput.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jdmainct$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jdmainct.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jdmarker$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jdmarker.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jdmaster$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jdmaster.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jdmerge$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jdmerge.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jdphuff$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jdphuff.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jdpostct$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jdpostct.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jdsample$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jdsample.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jdtrans$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jdtrans.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jerror$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jerror.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jfdctflt$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jfdctflt.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jfdctfst$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jfdctfst.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jfdctint$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jfdctint.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jidctflt$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jidctflt.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jidctfst$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jidctfst.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jidctint$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jidctint.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jidctred$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jidctred.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jmemmgr$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jmemmgr.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jmemnobs$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jmemnobs.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jquant1$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jquant1.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jquant2$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jquant2.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)jutils$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)jpeg$(DIR_SEP)jutils.c
+$(OBJ_DIR)$(DIR_SEP)p_xmp$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_xmp.c
 	$(CCC_CMD)
 
 #===============================================================================

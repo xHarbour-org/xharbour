@@ -121,10 +121,16 @@
 
 /* provide prototypes for these when building zlib without LFS */
 #if !defined(_LARGEFILE64_SOURCE) || _LFS64_LARGEFILE-0 == 0
+    #if defined(__cplusplus)
+       extern "C" {
+    #endif
     ZEXTERN gzFile ZEXPORT gzopen64 OF((const char *, const char *));
     ZEXTERN z_off64_t ZEXPORT gzseek64 OF((gzFile, z_off64_t, int));
     ZEXTERN z_off64_t ZEXPORT gztell64 OF((gzFile));
     ZEXTERN z_off64_t ZEXPORT gzoffset64 OF((gzFile));
+    #if defined(__cplusplus)
+       }
+    #endif
 #endif
 
 /* default memLevel */

@@ -16,6 +16,7 @@
  *
  */
 
+#define   HAVE_BOOLEAN
 #include "p_intern.h"
 #include "p_color.h"
 #include "p_image.h"

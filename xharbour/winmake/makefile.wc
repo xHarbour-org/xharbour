@@ -44,6 +44,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 INCLUDE_DIR =include
 INCLUDE_DIR =-i=$(INCLUDE_DIR) -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt
 INCLUDE_DIR =$(INCLUDE_DIR) -i=$(ZLIB_DIR) -i=$(PDFLIB_DIR) -i=$(PNG_DIR) -i=$(PDFLITE_DIR)\include
+INCLUDE_DIR =$(INCLUDE_DIR) -i=$(TIFF_DIR) -i=$(JPEG_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) $(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dHAVE_CONFIG_H -d_HAVE_SQLITE_CONFIG_H
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 
@@ -268,6 +269,12 @@ $(PDFLITE_LIB) : $(PDFLITE_LIB_OBJS)
 $(PNG_LIB) : $(PNG_LIB_OBJS)
 	$(LIB_CMD)
 
+$(TIFF_LIB) : $(TIFF_LIB_OBJS)
+	$(LIB_CMD)
+
+$(JPEG_LIB) : $(JPEG_LIB_OBJS)
+	$(LIB_CMD)
+
 #*******************************************************************************
 !elseif ("$(__BLD__)"=="DLL_BLD")
 #*******************************************************************************
@@ -322,6 +329,7 @@ HARBOURFLAGS=$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
 
 DLLFLAGS=\
 	/out:$(HARBOUR_DLL)\
+	/def:$(EXPORT_DEF)\
 	/dll\
 	/implib:$(HARBOUR_DLL_LIB)\
 	/nologo\
@@ -337,6 +345,7 @@ ACEH_DIR    =-i="$(HB_DIR_ADS)"
 !endif
 INCLUDE_DIR =-i=include -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt -i=$(ZLIB_DIR)
 INCLUDE_DIR =$(INCLUDE_DIR) -i=$(PDFLIB_DIR) -i=$(PNG_DIR) -i=$(PDFLITE_DIR)\include
+INCLUDE_DIR =$(INCLUDE_DIR) -i=$(TIFF_DIR) -i=$(JPEG_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) $(ACEH_DIR) $(INCLUDE_DIR) -bd -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dHB_NO_DUPLICATE_HVMPROCESSSYMBOL -d__EXPORT__ -dHAVE_CONFIG_H
 !ifndef HB_NO_FM_DL_ALLOC
 CLIBFLAGS    =-dHB_FM_DL_ALLOC $(CLIBFLAGS)
@@ -353,7 +362,7 @@ HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
 DLL_LINK_CMD=LINK386 $(DLLFLAGS)
-DLLEXE_LINK_CMD=LINK386 $(EXEFLAGS) /OUT:$@ $** $(ZLIB_LIB) $(PNG_LIB) $(PDFLITE_LIB) $(HARBOUR_DLL_LIB)
+DLLEXE_LINK_CMD=LINK386 $(EXEFLAGS) /OUT:$@ $** $(PDFLITE_LIB) $(HARBOUR_DLL_LIB)
 
 #===============================================================================
 # The Project

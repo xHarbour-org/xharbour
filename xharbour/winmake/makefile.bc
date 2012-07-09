@@ -47,7 +47,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
 INCLUDE_DIR  =$(INCLUDE_DIR) -Iinclude -I$(OBJ_DIR) -I$(ZLIB_DIR) -I$(PDFLIB_DIR)
-INCLUDE_DIR  =$(INCLUDE_DIR) -I$(PDFLITE_DIR)\include -I$(PNG_DIR)
+INCLUDE_DIR  =$(INCLUDE_DIR) -I$(PDFLITE_DIR)\include -I$(PNG_DIR) -I$(JPEG_DIR) -I$(TIFF_DIR)
 CLIBFLAGS    =$(CLIBFLAGS) -q -c $(INCLUDE_DIR) -d -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H
 HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 LINK_CMD     =ILINK32 -ap -Tpe -x -Gn -C -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" -Llib\b32 $(LFLAGS) "$(CC_DIR)\lib\c0x32.obj" $**,$@,,
@@ -446,6 +446,20 @@ $(PNG_LIB) : $(PNG_LIB_OBJS)
 +)
 !
 
+$(JPEG_LIB) : $(JPEG_LIB_OBJS)
+	IF EXIST "$(JPEG_LIB)" $(DEL) "$(JPEG_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
+$(TIFF_LIB) : $(TIFF_LIB_OBJS)
+	IF EXIST "$(TIFF_LIB)" $(DEL) "$(TIFF_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
 #*******************************************************************************
 !elif ("$(__BLD__)"=="DLL_BLD")
 #*******************************************************************************
@@ -527,6 +541,7 @@ OPENSSL_DIR    =-I"$(HB_DIR_OPENSSL)\include"
 !endif
 
 INCLUDE_DIR =-I"include" -I"$(OBJ_DIR)" -I"$(ZLIB_DIR)" -I"$(PDFLITE_DIR)\include"
+INCLUDE_DIR =$(INCLUDE_DIR) -I"$(JPEG_DIR)" -I"$(TIFF_DIR)"
 DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) -DHAVE_CONFIG_H -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -q -a8 -OS -O2 -6 -c $(ACEH_DIR) $(OPENSSL_DIR) $(INCLUDE_DIR) -d -w3 -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H
@@ -535,7 +550,7 @@ HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
 # User flags should be able to override everything!
 DLLFLAGS    =$(DLLFLAGS) $(LFLAGS)
 EXEFLAGS    =$(EXEFLAGS) $(LFLAGS)
-CLIBFLAGS   =$(CLIBFLAGS)  $(CFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS) $(CFLAGS)
 LINKERFLAGS =$(LINKERFLAGS) $(LFLAGS)
 
 !ifndef HB_NO_VM_ALL
@@ -552,8 +567,8 @@ HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
-DLL_LINK_CMD=ILINK32 $(LINKERFLAGS) -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" "$(CC_DIR)\lib\c0d32.obj" $**,$@,,$(COMPILERLIBS)
-DLLEXE_LINK_CMD=ILINK32 $(LINKERFLAGS) -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" "$(CC_DIR)\lib\c0x32.obj" $**,$@,,$(USE_DLL_LIB) $(PNG_LIB) $(ZLIB_LIB) $(PDFLITE_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+
+DLLEXE_LINK_CMD=ILINK32 $(LINKERFLAGS) -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" "$(CC_DIR)\lib\c0x32.obj" $**,$@,,$(USE_DLL_LIB) $(PDFLITE_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # Compiler and 3rd Party libraries need to be linked
@@ -581,7 +596,7 @@ ALL: $(DLL_PROJECT)
 #===============================================================================
 $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 	ILINK32 $(DLLFLAGS) -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" @&&!
-"$(CC_DIR)\lib\c0d32.obj" $**, $@,, $(COMPILERLIBS)
+"$(CC_DIR)\lib\c0d32.obj" $**, $@,, $(COMPILERLIBS), $(RTL_DIR)\bcc.def
 !
 
 #*******************************************************************************
