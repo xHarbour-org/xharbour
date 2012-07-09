@@ -394,7 +394,7 @@ switch(rc)
   compile time, as the sizeof() operator does not work in the C preprocessor.
   As all the PCRE_ERROR_xxx values are negative, we can use 0 and 1. */
 
-  case 0:
+  case 1:
   case (sizeof(eint)/sizeof(int) == ERRCOUNT):
   return REG_ASSERT;
 /* ========================================================================== */
