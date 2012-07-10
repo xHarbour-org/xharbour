@@ -38,7 +38,11 @@
  */
 
 #include "lzf.h"
+#if defined(HB_OS_WIN) || defined(__WIN32__)
+#include "lzfp_win.h"
+#else
 #include "lzfP.h"
+#endif
 
 #define HSIZE (1 << (HLOG))
 

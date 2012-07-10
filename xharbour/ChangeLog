@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-10 07:54 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hblzf/core.c
+  + contrib/hblzf/lzfp_win.h
+  * contrib/hblzf/lzf_c.c
+  * contrib/hblzf/lzf_d.c
+    ! windows build use lzfp_win.h
+
 2012-07-10 07:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   - contrib/pdflib
   - contrib/pdflib/tests
