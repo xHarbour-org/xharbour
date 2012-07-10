@@ -43,10 +43,10 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 INCLUDE_DIR =include
 INCLUDE_DIR =-i=$(INCLUDE_DIR) -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt
-INCLUDE_DIR =$(INCLUDE_DIR) -i=$(ZLIB_DIR) -i=$(PDFLIB_DIR) -i=$(PNG_DIR) -i=$(PDFLITE_DIR)\include
+INCLUDE_DIR =$(INCLUDE_DIR) -i=$(ZLIB_DIR) -i=$(PNG_DIR) -i=$(PDFLITE_DIR)\include
 INCLUDE_DIR =$(INCLUDE_DIR) -i=$(TIFF_DIR) -i=$(JPEG_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) $(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dHAVE_CONFIG_H -d_HAVE_SQLITE_CONFIG_H
-HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
+HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 -gc0
 
 !ifdef HB_THREAD_SUPPORT
 CLIBFLAGS   =$(CLIBFLAGS) -bm -dHB_THREAD_SUPPORT
@@ -344,7 +344,7 @@ EXEFLAGS=\
 ACEH_DIR    =-i="$(HB_DIR_ADS)"
 !endif
 INCLUDE_DIR =-i=include -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt -i=$(ZLIB_DIR)
-INCLUDE_DIR =$(INCLUDE_DIR) -i=$(PDFLIB_DIR) -i=$(PNG_DIR) -i=$(PDFLITE_DIR)\include
+INCLUDE_DIR =$(INCLUDE_DIR) -i=$(PNG_DIR) -i=$(PDFLITE_DIR)\include
 INCLUDE_DIR =$(INCLUDE_DIR) -i=$(TIFF_DIR) -i=$(JPEG_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) $(ACEH_DIR) $(INCLUDE_DIR) -bd -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dHB_NO_DUPLICATE_HVMPROCESSSYMBOL -d__EXPORT__ -dHAVE_CONFIG_H
 !ifndef HB_NO_FM_DL_ALLOC
@@ -353,7 +353,7 @@ CLIBFLAGS    =-dHB_FM_DL_ALLOC $(CLIBFLAGS)
 !ifndef HB_NO_VM_ALL
 CLIBFLAGS    =-dHB_VM_ALL $(CLIBFLAGS)
 !endif
-HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
+HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 -gc0
 MAINWIN_OBJ =$(OBJ_DIR)\mainwinW32.obj
 CC_CMD      =WCC386 $(CLIBFLAGS) -fo$@ $**
 CCC_CMD     =$(CC_CMD)

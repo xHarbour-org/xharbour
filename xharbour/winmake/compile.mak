@@ -384,6 +384,15 @@ $(OBJ_DIR)$(DIR_SEP)jdmerge$(OBJEXT) : $(JPEG_DIR)$(DIR_SEP)jdmerge.c
 #===============================================================================
 # PDFLITE.LIB Dependencies
 #===============================================================================
+$(OBJ_DIR)$(DIR_SEP)pdf1$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)pdf1.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pdf1.c : $(PDFLITE_DIR)$(DIR_SEP)pdf1.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbpdflib$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)hbpdflib.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)ft_cid$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)font$(DIR_SEP)ft_cid.c
 	$(CCC_CMD)
 
@@ -5016,18 +5025,6 @@ $(OBJ_DIR)$(DIR_SEP)tmysql.c : $(MYSQL_DIR)$(DIR_SEP)tmysql.prg
 
 $(OBJ_DIR)$(DIR_SEP)tsqlbrw.c : $(MYSQL_DIR)$(DIR_SEP)tsqlbrw.prg
 	$(HB_CMD)
-
-#===============================================================================
-# PDFLIB.LIB dependencies
-#===============================================================================
-$(OBJ_DIR)$(DIR_SEP)pdf1$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)pdf1.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)pdf1.c : $(PDFLIB_DIR)$(DIR_SEP)pdf1.prg
-	$(HB_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)hbpdflib$(OBJEXT) : $(PDFLIB_DIR)$(DIR_SEP)hbpdflib.c
-	$(CC_CMD)
 
 #===============================================================================
 # PQSQL.LIB dependencies

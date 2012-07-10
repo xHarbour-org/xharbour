@@ -1,4 +1,4 @@
-BBBBBBBB/*
+/*
  * $Id$
  */
 
@@ -7,6 +7,33 @@ BBBBBBBB/*
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2012-07-10 07:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  - contrib/pdflib
+  - contrib/pdflib/tests
+  - contrib/pdflib/hbpdflib.c
+  - contrib/pdflib/Makefile
+  - contrib/pdflib/pdf.ch
+  - contrib/pdflib/pdf1.prg
+  - contrib/pdflib/pdfhbdoc.ch
+  - contrib/pdflib/tests/pdflib.txt
+  - contrib/pdflib/tests/text2pdf.prg
+  + contrib/pdflite/hbpdflite.c
+  + contrib/pdflite/include/pdf.ch
+  + contrib/pdflite/include/pdfhbdoc.ch
+  + contrib/pdflite/pdf1.prg
+  + contrib/pdflite/tests
+  + contrib/pdflite/tests/pdflite.txt
+  + contrib/pdflite/tests/text2pdf.prg
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/makefile.bc
+  * winmake/makefile.dc
+  * winmake/makefile.gc
+  * winmake/makefile.pc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+    ! moved PDFLite related files into appropriate folder
 
 2012-07-09 20:36  UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   - contrib/hblzf/lzfp.h

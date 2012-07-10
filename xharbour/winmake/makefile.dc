@@ -37,14 +37,14 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
-INCLUDE_DIR=-I"include" -I"$(OBJ_DIR)" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(ZLIB_DIR)" -I"$(PDFLIB_DIR)"
+INCLUDE_DIR=-I"include" -I"$(OBJ_DIR)" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(ZLIB_DIR)" 
 INCLUDE_DIR=$(INCLUDE_DIR) -I"$(PNG_DIR)" -I"$(PDFLITE_DIR)\include" -I"$(TIFF_DIR)" -I"$(JPEG_DIR)"
 !if ("$(HB_MT)"=="mt")
 HARBOURFLAGS=-dHB_THREAD_SUPPORT
 CLIBFLAGS   =-D_MT -DHB_THREAD_SUPPORT
 CLIBFLAGS_C =-D_MT -DHB_THREAD_SUPPORT
 !endif
-HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
+HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 -gc0
 CLIBFLAGS=$(CLIBFLAGS) -cpp -mn $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"HAVE_CONFIG_H"
 CLIBFLAGS_C=$(CLIBFLAGS_C) -mn $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"HAVE_CONFIG_H"
 HB_CMD=$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
@@ -340,7 +340,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 ACEH_DIR    =-I"$(HB_DIR_ADS)"
 !endif
 INCLUDE_DIR =-I"include" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(OBJ_DIR)" -I"$(ZLIB_DIR)" $(ACEH_DIR)
-INCLUDE_DIR =$(INCLUDE_DIR) -I"$(PNG_DIR)" -I"$(PDFLIB_DIR)" -I"$(PDFLITE_DIR)\include"
+INCLUDE_DIR =$(INCLUDE_DIR) -I"$(PNG_DIR)" -I"$(PDFLITE_DIR)\include"
 INCLUDE_DIR =$(INCLUDE_DIR) -I"$(TIFF_DIR)" -I"$(JPEG_DIR)"
 DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
@@ -356,7 +356,7 @@ CLIBFLAGS_C  =-D"HB_VM_ALL" $(CLIBFLAGS_C)
 !endif
 CLIBFLAGS   =-D_MT -D"HB_THREAD_SUPPORT" $(CLIBFLAGS)
 CLIBFLAGS_C =-D_MT -D"HB_THREAD_SUPPORT" $(CLIBFLAGS_C)
-HARBOURFLAGS=$(HARBOURFLAGS) -d"HB_THREAD_SUPPORT" -i"include" -q0 -w2 -es2 -gc0
+HARBOURFLAGS=$(HARBOURFLAGS) -d"HB_THREAD_SUPPORT" -i"include" -i"$(PDFLITE_DIR)\include" -q0 -w2 -es2 -gc0
 CC_CMD      =SCPPN $(CLIBFLAGS) -o$@ $**
 CCC_CMD     =SCPPN $(CLIBFLAGS_C) -o$@ $**
 HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@

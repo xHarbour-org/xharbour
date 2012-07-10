@@ -78,7 +78,6 @@ HBMZIP_DIR    =contrib$(DIR_SEP)hbmzip
 HBZIP_DIR     =contrib$(DIR_SEP)hbzlib
 LIBNF_DIR     =contrib$(DIR_SEP)libnf
 MYSQL_DIR     =contrib$(DIR_SEP)mysql
-PDFLIB_DIR    =contrib$(DIR_SEP)pdflib
 PGSQL_DIR     =contrib$(DIR_SEP)pgsql
 RDDADS_DIR    =contrib$(DIR_SEP)rdd_ads
 TELEPATH_DIR  =contrib$(DIR_SEP)tp_

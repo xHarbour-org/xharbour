@@ -48,9 +48,9 @@ CLIBFLAGS   +=
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
 INCLUDE_DIR  =include
-HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
+HARBOURFLAGS+=-i$(INCLUDE_DIR) -i$(PDFLITE_DIR)/include -q0 -w2 -es2 -gc0
 CLIBFLAGS   +=-DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -D__WIN32__ -Wall $(NOCYGWIN) -O3 -mtune=pentium -c -fomit-frame-pointer -march=i586 -fno-strict-aliasing -I$(INCLUDE_DIR) -I$(OBJ_DIR)
-CLIBFLAGS   +=-I$(ZLIB_DIR) -I$(PNG_DIR) -I$(PDFLIB_DIR) -I$(PDFLITE_DIR)/include
+CLIBFLAGS   +=-I$(ZLIB_DIR) -I$(PNG_DIR) -I$(PDFLITE_DIR)/include
 CLIBFLAGS   +=-I$(JPEG_DIR) -I$(TIFF_DIR)
 
 ifeq ($(HB_THREAD_SUPPORT),1)
@@ -377,9 +377,9 @@ ACEH_DIR    =-I"$(HB_DIR_ADS)"
 endif
 INCLUDE_DIR =include
 CLIBFLAGS   +=-DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -Wall -mdll -fomit-frame-pointer -march=i586 $(NOCYGWIN) -O3 -c -fno-strict-aliasing $(ACEH_DIR) -I$(INCLUDE_DIR) -I$(OBJ_DIR)
-CLIBFLAGS   +=-I$(ZLIB_DIR) -I$(PNG_DIR) -I$(PDFLIB_DIR) -I$(PDFLITE_DIR)/include
+CLIBFLAGS   +=-I$(ZLIB_DIR) -I$(PNG_DIR) -I$(PDFLITE_DIR)/include
 CLIBFLAGS   +=-I$(TIFF_DIR) -I$(JPEG_DIR) -D__WIN32__
-HARBOURFLAGS+=-i$(INCLUDE_DIR) -q0 -w2 -es2 -gc0
+HARBOURFLAGS+=-i$(INCLUDE_DIR) -i$(PDFLITE_DIR)/include -q0 -w2 -es2 -gc0
 
 ifndef HB_NO_FM_DL_ALLOC
 CLIBFLAGS    +=-DHB_FM_DL_ALLOC

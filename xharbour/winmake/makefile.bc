@@ -46,10 +46,10 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
-INCLUDE_DIR  =$(INCLUDE_DIR) -Iinclude -I$(OBJ_DIR) -I$(ZLIB_DIR) -I$(PDFLIB_DIR)
+INCLUDE_DIR  =$(INCLUDE_DIR) -Iinclude -I$(OBJ_DIR) -I$(ZLIB_DIR)
 INCLUDE_DIR  =$(INCLUDE_DIR) -I$(PDFLITE_DIR)\include -I$(PNG_DIR) -I$(JPEG_DIR) -I$(TIFF_DIR)
 CLIBFLAGS    =$(CLIBFLAGS) -q -c $(INCLUDE_DIR) -d -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H
-HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
+HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 -gc0
 LINK_CMD     =ILINK32 -ap -Tpe -x -Gn -C -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" -Llib\b32 $(LFLAGS) "$(CC_DIR)\lib\c0x32.obj" $**,$@,,
 CLIBFLAGS    =$(CLIBFLAGS) -tWM
 
@@ -545,7 +545,7 @@ INCLUDE_DIR =$(INCLUDE_DIR) -I"$(JPEG_DIR)" -I"$(TIFF_DIR)"
 DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) -DHAVE_CONFIG_H -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -q -a8 -OS -O2 -6 -c $(ACEH_DIR) $(OPENSSL_DIR) $(INCLUDE_DIR) -d -w3 -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H
-HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -q0 -w2 -es2 -gc0
+HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 -gc0
 
 # User flags should be able to override everything!
 DLLFLAGS    =$(DLLFLAGS) $(LFLAGS)
