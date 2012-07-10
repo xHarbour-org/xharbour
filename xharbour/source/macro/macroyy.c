@@ -165,6 +165,11 @@
    #endif
 #endif
 
+#if defined( __POCC__ )
+   #pragma warn(push)
+   #pragma warn(disable:2154)
+#endif
+
 #if defined( __BORLANDC__ )
    #pragma warn -aus
    #pragma warn -ccc
