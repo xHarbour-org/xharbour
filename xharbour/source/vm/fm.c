@@ -145,7 +145,15 @@
 #  if defined( _MSC_VER ) && ( _MSC_VER < 1600 ) && ! defined( __POCC__ )
 #     include "intsafe.h"
 #  endif
+#  if defined( __POCC__ )
+#     pragma warn(push)
+#     pragma warn(disable:2154)
+#     pragma warn(disable:2243)
+#  endif
 #  include "dlmalloc.c"
+#  if defined( __POCC__ )
+#     pragma warn(pop)
+#  endif
 #  if defined( __BORLANDC__ )
 #     pragma warn +aus
 #     pragma warn +ccc
