@@ -69,6 +69,10 @@
 
 #if defined( HB_OS_WIN )
 
+   #if defined( __WATCOMC__ )
+      #pragma disable_message ( 200 )
+   #endif
+
 #include <windows.h>
 
 #include "hbdll.ch"

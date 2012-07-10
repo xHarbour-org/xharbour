@@ -139,6 +139,9 @@
 #     pragma warn -rch
 #     pragma warn -inl
 #  elif defined( _MSC_VER ) || defined( __DMC__ ) || defined( __WATCOMC__ )
+#     if defined( __WATCOMC__ )
+#        pragma disable_message ( 201 )
+#     endif
 #     define USE_DL_PREFIX
 #  endif
 #  include "errno.h"
@@ -151,6 +154,9 @@
 #     pragma warn(disable:2243)
 #  endif
 #  include "dlmalloc.c"
+#  if defined( __WATCOMC__ )
+#     pragma enable_message ( 201 )
+#  endif
 #  if defined( __POCC__ )
 #     pragma warn(pop)
 #  endif

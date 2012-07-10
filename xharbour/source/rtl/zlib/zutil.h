@@ -164,6 +164,10 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #  endif
 #endif
 
+#if defined(__WATCOMC__) && !defined(MSDOS)
+   #pragma disable_message ( 201 )
+#endif
+
 #if defined(__BORLANDC__) && !defined(MSDOS)
   #pragma warn -8004
   #pragma warn -8008

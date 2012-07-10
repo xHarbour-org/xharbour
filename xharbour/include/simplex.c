@@ -47,6 +47,10 @@
  *
  */
 
+#if defined( __WATCOMC__ )
+   #pragma disable_message ( 136 )
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

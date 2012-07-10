@@ -17,6 +17,10 @@
    #define SUPPORT_UTF8
    #define PCRE_STATIC
 
+   #if defined( __WATCOMC__ )
+      #pragma disable_message ( 201 )
+   #endif
+
    #if defined( __BORLANDC__ )
       #pragma warn -use
       #pragma warn -csu

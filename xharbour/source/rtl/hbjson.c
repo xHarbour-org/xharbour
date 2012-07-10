@@ -50,6 +50,10 @@
  *
  */
 
+#if defined( __WATCOMC__ )
+   #pragma disable_message ( 136 )
+#endif
+
 #include "hbjson.h"
 
 /*

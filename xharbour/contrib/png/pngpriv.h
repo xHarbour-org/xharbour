@@ -60,6 +60,10 @@
    #define _CRT_SECURE_NO_WARNINGS
 #endif
 
+#if defined( __WATCOMC__ )
+   #pragma disable_message ( 124 )
+#endif
+
 #if defined( __POCC__ )
    #pragma warn(push)
    #pragma warn(disable:2154)

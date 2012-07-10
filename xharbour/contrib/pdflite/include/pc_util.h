@@ -19,6 +19,12 @@
 #ifndef PC_UTIL_H
 #define PC_UTIL_H
 
+#if defined(__WATCOMC__)
+   #pragma disable_message ( 202 )
+   #pragma disable_message ( 106 )
+   #pragma disable_message ( 124 )
+#endif
+
 #if defined(_MSC_VER) && (_MSC_VER>=1400)
    #define _CRT_SECURE_NO_WARNINGS
    #define _CRT_SECURE_NO_DEPRECATE

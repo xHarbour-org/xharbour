@@ -1,6 +1,11 @@
 /* jconfig.bcc --- jconfig.h for Borland C (Turbo C) on MS-DOS or OS/2. */
 /* see jconfig.doc for explanations */
 
+#if defined(__WATCOMC__)
+   #pragma disable_message ( 201 )
+   #pragma disable_message ( 136 )
+#endif
+
 #if defined(__BORLANDC__)
    #pragma warn -prc
    #pragma warn -pia

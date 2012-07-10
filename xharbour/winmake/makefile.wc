@@ -78,7 +78,7 @@ CC_CMD       =WCC386 $(CLIBFLAGS) -fo$@ $**
 CCC_CMD      =$(CC_CMD)
 CC_CMD_FMSTAT=WCC386 $(CLIBFLAGS) -DHB_FM_STATISTICS -fo$@ $**
 LIB_CMD      =LIB386 /nologo /out:$@ $**
-LINK_CMD     =LINK386 /nologo /out:$@ $** $(LINKERFLAGS)
+LINK_CMD     =LINK386 /out:$@ $** $(LINKERFLAGS)
 
 BISON_CMD1   =bison -v -d $** -o$@
 BISON_CMD2   =bison -v -p hb_comp -d $** -o$@
@@ -323,7 +323,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
 !if ("$(DLL_MT)"=="mt")
-CLIBFLAGS   =$(CLIBFLAGS) -bm -DHB_THREAD_SUPPORT
+CLIBFLAGS   =$(CLIBFLAGS) -bm -dHB_THREAD_SUPPORT
 HARBOURFLAGS=$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
 !endif
 
@@ -355,6 +355,7 @@ CLIBFLAGS    =-dHB_VM_ALL $(CLIBFLAGS)
 !endif
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 -gc0
 MAINWIN_OBJ =$(OBJ_DIR)\mainwinW32.obj
+DUMMY_OBJ   =$(OBJ_DIR)\dummyDLL.obj
 CC_CMD      =WCC386 $(CLIBFLAGS) -fo$@ $**
 CCC_CMD     =$(CC_CMD)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
@@ -362,7 +363,7 @@ HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
 DLL_LINK_CMD=LINK386 $(DLLFLAGS)
-DLLEXE_LINK_CMD=LINK386 $(EXEFLAGS) /OUT:$@ $** $(PDFLITE_LIB) $(HARBOUR_DLL_LIB)
+DLLEXE_LINK_CMD=LINK386 /out:$@ $** $(USE_DLL_LIB) $(HARBOUR_DLL_LIB) $(PDFLITE_LIB) $(EXEFLAGS)
 
 #===============================================================================
 # The Project
@@ -384,24 +385,41 @@ $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 
 HBDOCDLL_EXE_OBJS=\
 	$(MAINWIN_OBJ)\
+	$(DUMMY_OBJ)\
 	$(HBDOCDLL_EXE_OBJS)
 
 HBTESTDLL_EXE_OBJS=\
 	$(MAINWIN_OBJ)\
+	$(DUMMY_OBJ)\
 	$(HBTESTDLL_EXE_OBJS)
 
 HBMAKEDLL_EXE_OBJS=\
 	$(MAINWIN_OBJ)\
+	$(DUMMY_OBJ)\
 	$(HBMAKEDLL_EXE_OBJS)
 
 HBRUNDLL_EXE_OBJS=\
 	$(MAINWIN_OBJ)\
+	$(DUMMY_OBJ)\
 	$(HBRUNDLL_EXE_OBJS)
 
 XBSCRIPTDLL_EXE_OBJS=\
 	$(MAINWIN_OBJ)\
+	$(DUMMY_OBJ)\
 	$(XBSCRIPTDLL_EXE_OBJS)
 
+$(MAINWIN_OBJ) : $(VM_DIR)\mainwin.c
+	WCC386 $(INCLUDE_DIR) -bd -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -fo$@ $**
+
+$(DUMMY_OBJ) : $(OBJ_DIR)\dummyDLL.c
+	$(CC_CMD)
+
+$(OBJ_DIR)\dummyDLL.c : $(OBJ_DIR)\dummyDLL.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\dummyDLL.prg :
+	@ECHO REQUEST HB_GT_WIN_DEFAULT >$(OBJ_DIR)\dummyDLL.prg
+	@ECHO PROCEDURE HB_GT_SYS >>$(OBJ_DIR)\dummyDLL.prg
 #*******************************************************************************
 !elseif ("$(__BLD__)"=="CONTRIB_BLD")
 #*******************************************************************************
@@ -686,9 +704,6 @@ $(HBMLZO_LIB) : $(HBMLZO_LIB_OBJS)
 #===============================================================================
 # Building rules of Object files
 #===============================================================================
-$(MAINWIN_OBJ) : $(VM_DIR)\mainwin.c
-	$(CC_CMD)
-
 !if ("$(HB_USE_BISON)"=="1")
 $(OBJ_DIR)\harboury.c : $(COMPILER_DIR)\harbour.sly
 	$(BISON_CMD1)

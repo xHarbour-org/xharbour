@@ -27,6 +27,13 @@
    #define ___EXPORT___
 #endif
 
+/* Pacify WatcomC warnings */
+#if defined(__WATCOMC__)
+   #pragma disable_message ( 201 )
+   #pragma disable_message ( 124 )
+   #pragma disable_message ( 136 )
+#endif
+
 /* Pacify BCC warnings */
 #if defined(__BORLANDC__)
    #pragma warn -aus

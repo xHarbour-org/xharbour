@@ -52,6 +52,10 @@
 
 /* please run $(HARBOUR)\tests\testhbf.prg for testing */
 
+#if defined( __WATCOMC__ )
+   #pragma disable_message ( 124 )
+#endif
+
 #include "hbapi.h"
 #include "hbapifs.h"
 
