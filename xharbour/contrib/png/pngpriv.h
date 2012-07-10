@@ -60,6 +60,12 @@
    #define _CRT_SECURE_NO_WARNINGS
 #endif
 
+#if defined( __POCC__ )
+   #pragma warn(push)
+   #pragma warn(disable:2154)
+   #pragma warn(disable:2130)
+#endif
+
 /* Feature Test Macros.  The following are defined here to ensure that correctly
  * implemented libraries reveal the APIs libpng needs to build and hide those
  * that are not needed and potentially damaging to the compilation.
