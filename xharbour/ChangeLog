@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-10 09:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/harbouryy.c
+  * source/compiler/harbour.sly
+    ! pacify PellesC warnings
+
 2012-07-10 08:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/fm.c
     ! pacify PellesC warnings on dlmalloc.c
