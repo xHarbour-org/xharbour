@@ -37,18 +37,18 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
-INCLUDE_DIR=-I"include" -I"$(OBJ_DIR)" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(ZLIB_DIR)" 
+INCLUDE_DIR=-I"include" -I"$(OBJ_DIR)" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(ZLIB_DIR)"
 INCLUDE_DIR=$(INCLUDE_DIR) -I"$(PNG_DIR)" -I"$(PDFLITE_DIR)\include" -I"$(TIFF_DIR)" -I"$(JPEG_DIR)"
 !if ("$(HB_MT)"=="mt")
 HARBOURFLAGS=-dHB_THREAD_SUPPORT
 CLIBFLAGS   =-D_MT -DHB_THREAD_SUPPORT
 CLIBFLAGS_C =-D_MT -DHB_THREAD_SUPPORT
 !endif
-HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 -gc0
+HARBOURFLAGS=$(HARBOURFLAGS) -i"include" -i"$(PDFLITE_DIR)\include" -q0 -w2 -es2 -gc0
 CLIBFLAGS=$(CLIBFLAGS) -cpp -mn $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"HAVE_CONFIG_H"
 CLIBFLAGS_C=$(CLIBFLAGS_C) -mn $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"HAVE_CONFIG_H"
 HB_CMD=$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
-HB_CMD_MAIN=$(HARBOUR_EXE) -n $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
+HB_CMD_MAIN=$(HARBOUR_EXE) -n0 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 !ifndef HB_NO_FM_DL_ALLOC
 CLIBFLAGS    =-D"HB_FM_DL_ALLOC" $(CLIBFLAGS)
 CLIBFLAGS_C  =-D"HB_FM_DL_ALLOC" $(CLIBFLAGS_C)
@@ -59,8 +59,8 @@ CLIBFLAGS_C  =-D"HB_VM_ALL" $(CLIBFLAGS_C)
 !endif
 CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
 CCC_CMD=SCPPN $(CLIBFLAGS_C) -o$@ $**
-CC_CMD_FMSTAT=SCPPN $(CLIBFLAGS) -DHB_FM_STATISTICS -o$@ $**
-LIB_CMD=LIB -c -n -p64 $@ $**
+CC_CMD_FMSTAT=SCPPN $(CLIBFLAGS) -D"HB_FM_STATISTICS" -o$@ $**
+LIB_CMD=LIB -c -n -p256 $@ $**
 BISON_CMD1=bison -v -d $** -o$@
 BISON_CMD2=bison -v -p hb_comp -d $** -o$@
 COMPILERLIBS=\
@@ -84,8 +84,6 @@ CMN_LIBS=$(COMMON_LIB)
 #===============================================================================
 !include winmake\common.mak
 
-#ODBC_LIB=
-
 # overwrite HB_GT_LIBS because some modules did not compile
 HB_GT_LIBS  =$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTGUI_LIB)
 
@@ -98,6 +96,81 @@ HB_GT_LIBS=\
 #===============================================================================
 # The Project
 #===============================================================================
+
+# Redefined becaue there are some file thet DMC cannot built
+# TIFF Library 4.02 is not working with DMC
+
+ST_PROJECT=\
+	$(COMMON_LIB)\
+	$(PPGEN_EXE)\
+	$(PP_LIB)\
+	$(COMPILER_LIB)\
+	$(HARBOUR_EXE)\
+	$(VM_LIB)\
+	$(RTL_LIB)\
+	$(MACRO_LIB)\
+	$(RDD_LIB)\
+	$(TIP_LIB)\
+	$(DBFFPT_LIB)\
+	$(REDBFFPT_LIB)\
+	$(DBFNTX_LIB)\
+	$(DBFNSX_LIB)\
+	$(DBFCDX_LIB)\
+	$(DBFMDX_LIB)\
+	$(BMDBFCDX_LIB)\
+	$(REDBFCDX_LIB)\
+	$(SIXCDX_LIB)\
+	$(BMSIXCDX_LIB)\
+	$(HBSIX_LIB)\
+	$(HSX_LIB)\
+	$(USRRDD_LIB)\
+	$(RDDS_LIB)\
+	$(CT_LIB)\
+	$(PCREPOS_LIB)\
+	$(HB_GT_LIBS)\
+	$(DEBUG_LIB)\
+	$(LANG_LIB)\
+	$(NULSYS_LIB)\
+	$(CODEPAGE_LIB)\
+	$(ZLIB_LIB)\
+	$(DLL_MAIN_LIB)\
+	$(USE_DLL_LIB)\
+	$(ODBC_LIB)\
+	$(MISC_LIB)\
+	$(JPEG_LIB)\
+	$(TIFF_LIB)\
+	$(PDFLITE_LIB)\
+	$(PNG_LIB)\
+	$(HBPP_EXE)\
+	$(HBMAKE_EXE)\
+	$(XBSCRIPT_EXE)\
+	$(HBTEST_EXE)\
+	$(HBDOC_EXE)\
+	$(HBRUN_EXE)\
+	$(HBDICT_EXE)\
+	$(HBEXTERN_EXE)\
+	$(HBFORMAT_EXE)
+
+HBDOC_EXE_OBJS=\
+	$(OBJ_DIR)\hbdoc.obj\
+	$(OBJ_DIR)\genasc.obj\
+	$(OBJ_DIR)\teeasc.obj\
+	$(OBJ_DIR)\genhpc.obj\
+	$(OBJ_DIR)\genhtm.obj\
+	$(OBJ_DIR)\genchm.obj\
+	$(OBJ_DIR)\genng.obj\
+	$(OBJ_DIR)\genos2.obj\
+	$(OBJ_DIR)\genrtf.obj\
+	$(OBJ_DIR)\gentrf.obj\
+	$(OBJ_DIR)\html.obj\
+	$(OBJ_DIR)\ng.obj\
+	$(OBJ_DIR)\os2.obj\
+	$(OBJ_DIR)\rtf.obj\
+	$(OBJ_DIR)\troff.obj\
+	$(OBJ_DIR)\fclass1.obj\
+	$(OBJ_DIR)\ffile1.obj\
+	$(OBJ_DIR)\ft_funcs.obj
+
 !if ("$(HB_MT)"=="mt")
 PROJECT=$(MT_PROJECT)
 !else
@@ -117,12 +190,12 @@ $(COMPILER_LIB) : $(COMPILER_LIB_OBJS)
 	$(LIB_CMD)
 
 $(RTL_LIB) : $(RTL_LIB_OBJS)
-	LIB -c -n $@ @&&!
+	LIB -c -n -p256 $@ @&&!
 $**
 !
 
 $(CT_LIB) : $(CT_LIB_OBJS)
-	LIB -c -n $@ @&&!
+	LIB -c -n -p256 $@ @&&!
 $**
 !
 
@@ -250,17 +323,23 @@ $(DLL_MAIN_LIB) : $(DLL_MAIN_LIB_OBJS)
 $(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
 	$(LIB_CMD)
 
-$(PDFLITE_LIB) : $(PDFLITE_LIB_OBJS)
-	$(LIB_CMD)
-
 $(PNG_LIB) : $(PNG_LIB_OBJS)
 	$(LIB_CMD)
 
+$(PDFLITE_LIB) : $(PDFLITE_LIB_OBJS)
+	LIB -c -n -p256 $@ @&&!
+$**
+!
+
 $(TIFF_LIB) : $(TIFF_LIB_OBJS)
-	$(LIB_CMD)
+	LIB -c -n -p256 $@ @&&!
+$**
+!
 
 $(JPEG_LIB) : $(JPEG_LIB_OBJS)
-	$(LIB_CMD)
+	LIB -c -n -p256 $@ @&&!
+$**
+!
 
 #*******************************************************************************
 !elif ("$(__BLD__)"=="DLL_BLD")
@@ -280,7 +359,6 @@ HARBOUR_DLL_OBJS=\
 	$(RTL_LIB_OBJS)\
 	$(PCREPOS_LIB_OBJS)\
 	$(JPEG_LIB_OBJS)\
-	$(TIFF_LIB_OBJS)\
 	$(PNG_LIB_OBJS)\
 	$(ZLIB_LIB_OBJS)\
 	$(LANG_LIB_OBJS)\
@@ -345,7 +423,7 @@ INCLUDE_DIR =$(INCLUDE_DIR) -I"$(TIFF_DIR)" -I"$(JPEG_DIR)"
 DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) -D"HB_NO_DUPLICATE_HVMPROCESSSYMBOL" -D"HAVE_CONFIG_H" -D"__EXPORT__" -cpp -mn $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__"
-CLIBFLAGS_C =$(CLIBFLAGS) -D"HB_NO_DUPLICATE_HVMPROCESSSYMBOL" -D"HAVE_CONFIG_H" -D"__EXPORT__" -mn $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__"
+CLIBFLAGS_C =$(CLIBFLAGS_C) -D"HB_NO_DUPLICATE_HVMPROCESSSYMBOL" -D"HAVE_CONFIG_H" -D"__EXPORT__" -mn $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__"
 !ifndef HB_NO_FM_DL_ALLOC
 CLIBFLAGS    =-D"HB_FM_DL_ALLOC" $(CLIBFLAGS)
 CLIBFLAGS_C  =-D"HB_FM_DL_ALLOC" $(CLIBFLAGS_C)
@@ -363,31 +441,63 @@ HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
-DLLEXE_LINK_CMD=LINK /EXETYPE:NT /SUBSYSTEM:CONSOLE $(OBJ_DIR)\mainwin.obj $(OBJ_DIR)\dummyDLL.obj $**,$@,,$(USE_DLL_LIB) $(PDFLITE_LIB) $(HARBOUR_DLL_LIB)
+DLLEXE_LINK_CMD=LINK /EXETYPE:NT /SUBSYSTEM:CONSOLE $**,$@,,$(USE_DLL_LIB) $(PDFLITE_LIB) $(HARBOUR_DLL_LIB)
 #===============================================================================
 # The Project
 #===============================================================================
+# Overwrite DLL_PROJECT as some modules are not compilable under DMC
+DLL_PROJECT=\
+	$(HARBOUR_DLL)\
+	$(HBRUNDLL_EXE)\
+	$(HBDOCDLL_EXE)\
+	$(HBTESTDLL_EXE)\
+	$(HBMAKEDLL_EXE)\
+	$(XBSCRIPTDLL_EXE)
+
+HBDOC_EXE_OBJS=\
+	$(OBJ_DIR)\hbdoc.obj\
+	$(OBJ_DIR)\genasc.obj\
+	$(OBJ_DIR)\teeasc.obj\
+	$(OBJ_DIR)\genhpc.obj\
+	$(OBJ_DIR)\genhtm.obj\
+	$(OBJ_DIR)\genchm.obj\
+	$(OBJ_DIR)\genng.obj\
+	$(OBJ_DIR)\genos2.obj\
+	$(OBJ_DIR)\genrtf.obj\
+	$(OBJ_DIR)\gentrf.obj\
+	$(OBJ_DIR)\html.obj\
+	$(OBJ_DIR)\ng.obj\
+	$(OBJ_DIR)\os2.obj\
+	$(OBJ_DIR)\rtf.obj\
+	$(OBJ_DIR)\troff.obj\
+	$(OBJ_DIR)\fclass1.obj\
+	$(OBJ_DIR)\ffile1.obj\
+	$(OBJ_DIR)\ft_funcs.obj
+
+STARTUP_OBJS        =$(OBJ_DIR)\mainwin_dll.obj $(OBJ_DIR)\dummydll.obj
+HBDOCDLL_EXE_OBJS   =$(STARTUP_OBJS) $(HBDOCDLL_EXE_OBJS)
+HBRUNDLL_EXE_OBJS   =$(STARTUP_OBJS) $(HBRUNDLL_EXE_OBJS)
+HBTESTDLL_EXE_OBJS  =$(STARTUP_OBJS) $(HBTESTDLL_EXE_OBJS)
+HBMAKEDLL_EXE_OBJS  =$(STARTUP_OBJS) $(HBMAKEDLL_EXE_OBJS)
+XBSCRIPTDLL_EXE_OBJS=$(STARTUP_OBJS) $(XBSCRIPTDLL_EXE_OBJS)
+
 ALL: $(DLL_PROJECT)
 
 #===============================================================================
 # HARBOUR.DLL rules
 #===============================================================================
-$(OBJ_DIR)\dummyDLL.obj : $(OBJ_DIR)\dummyDLL.c
+$(OBJ_DIR)\mainwin_dll.obj : $(VM_DIR)\mainwin.c
 	$(CC_CMD)
 
-$(OBJ_DIR)\dummyDLL.c : $(OBJ_DIR)\dummyDLL.prg
+$(OBJ_DIR)\dummydll.obj : $(OBJ_DIR)\dummydll.c
+	$(CC_CMD)
+
+$(OBJ_DIR)\dummydll.c : $(OBJ_DIR)\dummydll.prg
 	$(HB_CMD)
 
-$(OBJ_DIR)\dummyDLL.prg :
-	@ECHO REQUEST HB_GT_WIN_DEFAULT >$(OBJ_DIR)\dummyDLL.prg
-	@ECHO PROCEDURE DMCGT >>$(OBJ_DIR)\dummyDLL.prg
-
-$(OBJ_DIR)\dmcdll.def :
-	@ECHO LIBRARY "harbour.dll" > $(OBJ_DIR)\dmcdll.def
-	@ECHO EXETYPE NT >> $(OBJ_DIR)\dmcdll.def
-	@ECHO SUBSYSTEM CONSOLE >> $(OBJ_DIR)\dmcdll.def
-	@ECHO CODE SHARED EXECUTE >> $(OBJ_DIR)\dmcdll.def
-	@ECHO DATA WRITE >> $(OBJ_DIR)\dmcdll.def
+$(OBJ_DIR)\dummydll.prg :
+	@ECHO REQUEST HB_GT_WIN_DEFAULT >$(OBJ_DIR)\dummydll.prg
+	@ECHO PROCEDURE DMCGT >>$(OBJ_DIR)\dummydll.prg
 
 !ifndef HB_NO_VM_ALL
 VM_LIB_OBJS=\
@@ -396,13 +506,9 @@ VM_LIB_OBJS=\
 VM_LIB_OBJS=\
 	$(VM_LIB_OBJS)\
 	$(VM_COMMON_OBJS)
-$(HARBOUR_DLL) :\
-	$(HARBOUR_DLL_OBJS)\
-	$(OBJ_DIR)\mainwin.obj\
-	$(OBJ_DIR)\dummyDLL.obj\
-	$(OBJ_DIR)\dmcdll.def
-	LINK @&&!
-$(HARBOUR_DLL_OBJS),$@,,,$(OBJ_DIR)\dmcdll.def $(EXPORT_DEF)
+$(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
+	LINK /EXETYPE:NT /SU:CONSOLE @&&!
+$(HARBOUR_DLL_OBJS),$@,,,$(EXPORT_DEF)
 !
 	IMPLIB $(HARBOUR_DLL_LIB) $(HARBOUR_DLL) /system /noi
 #*******************************************************************************
@@ -419,43 +525,44 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
-RDDSQL_INCLUDE=-I$(RDDSQL_DIR) -I$(HBSQLIT3_DIR)
+RDDSQL_INCLUDE=-I"$(RDDSQL_DIR)" -I"$(HBSQLIT3_DIR)"
 !ifdef HB_DIR_ADS
 ACEH_DIR     =-I"$(HB_DIR_ADS)"
 !endif
-INCLUDE_DIR=-Iinclude -I$(CC_DIR)\include\win32 -I$(CC_DIR)\include -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(ZLIB_DIR) -I$(PNG_DIR)
+INCLUDE_DIR=-I"include" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(FREEIMAGE_DIR)\include" -I"$(GDLIB_DIR)\include"
+INCLUDE_DIR=-I"$(XWT_DIR)\include" -I"$(XWT_DIR)\src\xwt_win" $(INCLUDE_DIR) -I"$(ZLIB_DIR)" -I"$(PNG_DIR)"
 !ifdef HB_DIR_OPENSSL
-INCLUDE_DIR  =$(INCLUDE_DIR) -I$(HB_DIR_OPENSSL)\include
+INCLUDE_DIR  =$(INCLUDE_DIR) -I"$(HB_DIR_OPENSSL)\include"
 !endif
 !ifdef HB_DIR_CURL
-INCLUDE_DIR  =$(INCLUDE_DIR) -I$(HB_DIR_CURL)\include
+INCLUDE_DIR  =$(INCLUDE_DIR) -I"$(HB_DIR_CURL)\include"
 !endif
 !ifdef HB_DIR_CAIRO
-INCLUDE_DIR   =$(INCLUDE_DIR) -I$(HB_DIR_CAIRO)\include\cairo
+INCLUDE_DIR   =$(INCLUDE_DIR) -I"$(HB_DIR_CAIRO)\include\cairo"
 !endif
 !ifdef HB_DIR_POSTGRESQL
-RDDSQL_INCLUDE=-I$(HB_DIR_POSTGRESQL)\include $(RDDSQL_INCLUDE)
+RDDSQL_INCLUDE=-I"$(HB_DIR_POSTGRESQL)\include" $(RDDSQL_INCLUDE)
 !endif
 !ifdef HB_DIR_OCILIB
-RDDSQL_INCLUDE=-I$(HB_DIR_OCILIB)\include $(RDDSQL_INCLUDE)
+RDDSQL_INCLUDE=-I"$(HB_DIR_OCILIB)\include" $(RDDSQL_INCLUDE)
 !endif
 !ifdef HB_DIR_MYSQL
-RDDSQL_INCLUDE=-I$(HB_DIR_MYSQL)\include $(RDDSQL_INCLUDE)
+RDDSQL_INCLUDE=-I"$(HB_DIR_MYSQL)\include" $(RDDSQL_INCLUDE)
 !endif
 !ifdef HB_DIR_FIREBIRD
-RDDSQL_INCLUDE=-I$(HB_DIR_FIREBIRD)\include $(RDDSQL_INCLUDE)
+RDDSQL_INCLUDE=-I"$(HB_DIR_FIREBIRD)\include" $(RDDSQL_INCLUDE)
 !endif
 !ifdef HB_DIR_MAGIC
-RDDSQL_INCLUDE=-I$(HB_DIR_MAGIC)\include $(RDDSQL_INCLUDE)
+RDDSQL_INCLUDE=-I"$(HB_DIR_MAGIC)\include" $(RDDSQL_INCLUDE)
 !endif
 INCLUDE_DIR=$(INCLUDE_DIR) $(RDDSQL_INCLUDE)
 CLIBFLAGS=$(CLIBFLAGS) -cpp -mn $(ACEH_DIR) $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -D"_HAVE_SQLITE_CONFIG_H" -D"HARBOUR_CONF"
 CLIBFLAGS_C=-mn $(ACEH_DIR) $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -D"_HAVE_SQLITE_CONFIG_H" -D"HARBOUR_CONF"
-HB_CMD=$(HARBOUR_EXE) -iinclude -i$(GDLIB_DIR)\include -i$(WHAT32_DIR)\include -i$(XWT_DIR)\include -n1 -q0 -w2 -es2 -gc0 $** -o$@
+HB_CMD=$(HARBOUR_EXE) -i"include" -i"$(GDLIB_DIR)\include" -i"$(WHAT32_DIR)\include" -i"$(XWT_DIR)\include" -n1 -q0 -w2 -es2 -gc0 $** -o$@
 CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
-CC_CMD_ZIP=SCPPN -cpp -mn -Iinclude -I$(CC_DIR)\include\win32 -I$(CC_DIR)\include -I$(HBZIP_DIR)\include -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -o$@ $**
+CC_CMD_ZIP=SCPPN -cpp -mn -I"include" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(HBZIP_DIR)\include" -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -o$@ $**
 CCC_CMD=SCPPN $(CLIBFLAGS_C) -o$@ $**
-LIB_CMD=LIB -c -n $@ $**
+LIB_CMD=LIB -c -n -p256 $@ $**
 
 #===============================================================================
 # Macro Definitions
@@ -648,5 +755,5 @@ $(OBJ_DIR)\harboury$(OBJEXT) : $(COMPILER_DIR)\harbouryy.c
 $(OBJ_DIR)\macroy$(HB_MT)$(OBJEXT) : $(MACRO_DIR)\macroyy.c
 	$(CC_CMD)
 !endif
-!include winmake\compile.mak
 
+!include winmake\compile.mak

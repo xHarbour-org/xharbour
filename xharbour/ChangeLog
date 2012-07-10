@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-10 16:38 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/makefile.dc
+    ! some local adjustments because DMC fails to utilize tiff.lib
+
 2012-07-10 09:21 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/png/pngpriv.h
     ! pacify PellesC warnings
