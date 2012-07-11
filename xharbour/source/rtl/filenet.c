@@ -792,7 +792,7 @@ PHB_FILE hb_fileNetExtOpen( const char * pFileName, const char * pDefExt,
 void hb_fileNetClose( PHB_FILE pFile )
 {
    HB_FHANDLE hFile = FS_ERROR;
-   HB_SOCKET_T hCurSocket;
+   HB_SOCKET_T hCurSocket = NULL;
 
    HB_CRITICAL_LOCK( s_fileMtx );
 
@@ -842,7 +842,7 @@ void hb_fileNetClose( PHB_FILE pFile )
 
 BOOL hb_fileNetLock( PHB_FILE pFile, HB_FOFFSET ulStart, HB_FOFFSET ulLen, int iType )
 {
-   BOOL fResult, fLockFS = FALSE;
+   BOOL fResult = FALSE, fLockFS = FALSE;
 
    if( ( iType & FL_MASK ) == FL_UNLOCK )
    {

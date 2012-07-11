@@ -2491,7 +2491,7 @@ static HB_ERRCODE hb_fptGetMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem,
    ULONG ulSize = 0, ulType = 0;
    char * pBuffer;
    BYTE * bMemoBuf;
-   BYTE uiFlags;
+   BYTE uiFlags = 0;
    FPTBLOCK fptBlock;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fptGetMemo(%p, %hu, %p, %p, %lu, %lu)", pArea, uiIndex, pItem, ( void * ) ( HB_PTRDIFF ) hFile, ulStart, ulCount));

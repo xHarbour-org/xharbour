@@ -5919,6 +5919,8 @@ static HB_ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL fSoftSeek, PHB_ITEM pKeyItm, 
    }
 }
 
+#if 0
+
 static BYTE * hb_cdxPageGetKeyValActual( LPCDXPAGE pPage )
 {
     while( pPage->Child )
@@ -6004,7 +6006,6 @@ static ULONG hb_cdxTagKeyFindWild( LPCDXTAG pTag, LPCDXKEY pKey, BOOL fNext )
    return 0;
 }
 
-
 /* hb_cdxSeekWild */
 static HB_ERRCODE hb_cdxSeekWild( CDXAREAP pArea, BOOL fSoftSeek, PHB_ITEM pKeyItm, BOOL fFindLast, BOOL fNext, BOOL bAll )
 {
@@ -6086,6 +6087,7 @@ static HB_ERRCODE hb_cdxSeekWild( CDXAREAP pArea, BOOL fSoftSeek, PHB_ITEM pKeyI
       return retval;
    }
 }
+#endif
 
 /* ( DBENTRYP_L )     hb_cdxSkip        : NULL */
 static HB_ERRCODE hb_cdxSkip( CDXAREAP pArea, LONG lToSkip )

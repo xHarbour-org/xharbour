@@ -8,6 +8,22 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-12 02:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/filenet.c
+    * initialize hCurSocket and fResult
+
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rdd/dbffpt/redbffpt1.c
+    ! initialize uiFlags
+
+  * source/rdd/dbfmdx/dbfmdx1.c
+    ! deff out unused method: hb_cdxSeekWild, hb_cdxTagKeyFindWild,
+      hb_cdxPageSeekKeyWild, hb_cdxPageGetKeyValActual, hb_cdxValCompareWild
+
+  * winmake/makefile.pc
+    - deff out not-necesssary COMPILERLIBS macro as the libraries are already
+    requested via include/pragma.h
+
 2012-07-11 09:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
    * source/misc/hb_f.c
      ! pscify POCC warning

@@ -74,23 +74,9 @@ LINK_CMD     =POLINK /OUT:$@ $** $(LINKERFLAGS)
 LIB_CMD      =POLIB /OUT:$@ $**
 BISON_CMD1   =bison -v -d $** -o$@
 BISON_CMD2   =bison -v -p hb_comp -d $** -o$@
-
-COMPILERLIBS=\
-	crt$(HB_MT).lib\
-	kernel32.lib\
-	winspool.lib\
-	user32.lib\
-	advapi32.lib\
-	ole32.lib\
-	uuid.lib\
-	wsock32.lib\
-	oleaut32.lib\
-	winmm.lib\
-        mpr.lib \
-        comctl32.lib
-HRB_LIBS=$(COMMON_LIB) $(PP_LIB) $(COMPILER_LIB) $(COMPILERLIBS)
-EXE_LIBS=$(HARBOUR_LIBS) $(COMPILERLIBS)
-CMN_LIBS=$(COMMON_LIB) $(COMPILERLIBS)
+HRB_LIBS     =$(COMMON_LIB) $(PP_LIB) $(COMPILER_LIB) $(COMPILERLIBS)
+EXE_LIBS     =$(HARBOUR_LIBS) $(COMPILERLIBS)
+CMN_LIBS     =$(COMMON_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # Macro Definitions
@@ -268,24 +254,6 @@ $(TIFF_LIB) : $(TIFF_LIB_OBJS)
 !include winmake\common.mak
 
 #===============================================================================
-# Compiler and 3rd Party libraries need to be linked
-#===============================================================================
-COMPILERLIBS=\
-	$(COMPILERLIBS)\
-	crtmt.lib\
-	kernel32.lib\
-	winspool.lib\
-	gdi32.lib\
-	ws2_32.lib\
-	user32.lib\
-	advapi32.lib\
-	ole32.lib\
-	uuid.lib\
-	oleaut32.lib\
-	winmm.lib\
-	mpr.lib
-
-#===============================================================================
 # Append your own build flags here
 #===============================================================================
 HARBOURFLAGS=$(HARBOURFLAGS)
@@ -307,7 +275,7 @@ DLLFLAGS=\
 	/IMPLIB:$(HARBOUR_DLL_LIB)\
 	/LIBPATH:"$(CC_DIR)\LIB" /LIBPATH:$(LIB_DIR) /LIBPATH:"$(CC_DIR)\LIB\WIN"\
 	/SUBSYSTEM:WINDOWS\
-	$(HARBOUR_DLL_OBJS) $(COMPILERLIBS)
+	$(HARBOUR_DLL_OBJS)
 
 EXEFLAGS=\
 	/LIBPATH:"$(CC_DIR)\LIB"\
@@ -329,7 +297,7 @@ HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
 DLL_LINK_CMD=POLINK $(DLLFLAGS)
-DLLEXE_LINK_CMD=POLINK $(EXEFLAGS) /OUT:$@ $** $(USE_DLL_LIB) $(HARBOUR_DLL_LIB) $(ZLIB_LIB) $(PNG_LIB) $(PDFLITE_LIB) $(COMPILERLIBS)
+DLLEXE_LINK_CMD=POLINK $(EXEFLAGS) /OUT:$@ $** $(USE_DLL_LIB) $(HARBOUR_DLL_LIB) $(ZLIB_LIB) $(PNG_LIB) $(PDFLITE_LIB)
 
 #===============================================================================
 # The Project
