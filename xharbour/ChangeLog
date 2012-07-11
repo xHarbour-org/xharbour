@@ -8,6 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-12 06:27 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbzebra/qrcode.c
+    ! iDataLen initialized as 0
+
+  + contrib/hbmlzo/config.h
+    ! local config file for xHarbour
+
+  * contrib/hbmlzo/minilzo.c
+    ! <config.h> -> "config.h"
+
+  * winmake/makefile.pc
+    + /DMINILZO_HAVE_CONFIG_H to invoke POCC setups
+
 2012-07-12 06:13 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbhpdf/hpdf_fontdef_tt.c
     ! LoadTTFTable() is static

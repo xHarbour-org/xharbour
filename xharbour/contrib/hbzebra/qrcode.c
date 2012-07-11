@@ -631,7 +631,7 @@ static int _qr_cci_len( int iVersion, int iMode ) /* Character Count Indicator *
 
 static int _qr_dataencode( const char * szCode, ULONG nSize, PHB_BITBUFFER pData, int iLevel )
 {
-   int i, iVersion, iMode, iLen, iDataLen;
+   int i, iVersion, iMode, iLen, iDataLen = 0;
    ULONG n;
    char ch;
 
