@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-12 06:37 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbbz2/bzlib_pr.h
+    ! pscify POCC warning
+
+  * contrib/hbbz2/compress.c
+    ! initialize nSelectors as 0
+
 2012-07-12 06:27 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbzebra/qrcode.c
     ! iDataLen initialized as 0
