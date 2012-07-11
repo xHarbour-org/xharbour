@@ -164,15 +164,20 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #  endif
 #endif
 
+#if defined( __POCC__ )
+   #pragma warn(push)
+   #pragma warn(disable:2154)
+#endif
+
 #if defined(__WATCOMC__) && !defined(MSDOS)
    #pragma disable_message ( 201 )
 #endif
 
 #if defined(__BORLANDC__) && !defined(MSDOS)
-  #pragma warn -8004
-  #pragma warn -8008
-  #pragma warn -8066
-  #pragma warn -8012
+   #pragma warn -8004
+   #pragma warn -8008
+   #pragma warn -8066
+   #pragma warn -8012
 #endif
 
 /* provide prototypes for these when building zlib without LFS */

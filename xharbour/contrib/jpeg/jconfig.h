@@ -4,9 +4,10 @@
 #if defined(__WATCOMC__)
    #pragma disable_message ( 201 )
    #pragma disable_message ( 136 )
-#endif
-
-#if defined(__BORLANDC__)
+#elif defined( __POCC__ )
+   #pragma warn(push)
+   #pragma warn(disable:2154)
+#elif defined(__BORLANDC__)
    #pragma warn -prc
    #pragma warn -pia
    #pragma warn -rch

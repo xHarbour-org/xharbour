@@ -49,6 +49,9 @@
 
 #if defined( __WATCOMC__ )
    #pragma disable_message ( 136 )
+#elif defined( __POCC__ )
+   #pragma warn(push)
+   #pragma warn(disable:2154)
 #endif
 
 #include <stdio.h>

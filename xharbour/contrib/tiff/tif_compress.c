@@ -250,7 +250,7 @@ TIFFUnRegisterCODEC(TIFFCodec* c)
  */
 
 TIFFCodec*
-TIFFGetConfiguredCODECs()
+TIFFGetConfiguredCODECs( void )
 {
 	int i = 1;
 	codec_t *cd;

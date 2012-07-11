@@ -23,9 +23,14 @@
    #pragma disable_message ( 202 )
    #pragma disable_message ( 106 )
    #pragma disable_message ( 124 )
-#endif
-
-#if defined(_MSC_VER) && (_MSC_VER>=1400)
+#elif defined( __POCC__ )
+   #pragma warn(push)
+   #pragma warn(disable:2130)
+   #pragma warn(disable:2135)
+   #pragma warn(disable:2117)
+   #pragma warn(disable:2073)
+   #pragma warn(disable:2115)
+#elif defined(_MSC_VER) && (_MSC_VER>=1400)
    #define _CRT_SECURE_NO_WARNINGS
    #define _CRT_SECURE_NO_DEPRECATE
 #endif

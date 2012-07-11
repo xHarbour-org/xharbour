@@ -55,6 +55,11 @@
  *
  */
 
+#if defined( __POCC__ )
+   #pragma warn(push)
+   #pragma warn(disable:2130)
+#endif
+
 #if defined(__DJGPP__)
 #  include <libm/math.h>
    _LIB_VERSION_TYPE _LIB_VERSION = _XOPEN_;

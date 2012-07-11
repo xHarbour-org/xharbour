@@ -77,6 +77,11 @@
    #endif
 #endif
 
+#if defined( __POCC__ )
+   #pragma warn(push)
+   #pragma warn(disable:2130)
+#endif
+
 // For hb_ppPlatform()
 #define INCL_DOSMISC
 

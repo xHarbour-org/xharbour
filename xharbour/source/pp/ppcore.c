@@ -55,6 +55,11 @@
 /* #define HB_PP_NO_LINEINFO_TOKEN */
 /* #define HB_PP_STRICT_LINEINFO_TOKEN */
 
+#if defined( __POCC__ )
+   #pragma warn(push)
+   #pragma warn(disable:2154)
+#endif
+
 #define _HB_PP_INTERNAL
 
 #if defined( HB_PP_STRICT_LINEINFO_TOKEN ) && \

@@ -58,6 +58,11 @@
 /* W32 */
 #define HB_OS_WIN_USED
 
+#if defined( __POCC__ )
+   #pragma warn(push)
+   #pragma warn(disable:2154)
+#endif
+
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbapiitm.h"

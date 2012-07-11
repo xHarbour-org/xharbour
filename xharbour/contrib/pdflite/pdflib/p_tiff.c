@@ -48,6 +48,7 @@ pdf_process_TIFF_data(
 #else
 
 #include "tiffiop.h"
+
 static tsize_t
 pdf_libtiff_read(void* fd, tdata_t buf, tsize_t size)
 {
@@ -82,6 +83,7 @@ pdf_libtiff_size(void* fd)
     return (toff_t) pdc_file_size(fp);
 }
 
+#if 0
 static void *
 pdf_libtiff_malloc(TIFF *t, tsize_t size)
 {
@@ -104,6 +106,7 @@ pdf_libtiff_free(TIFF *t, tdata_t mem)
 }
 
 #define PDF_TIFF_LENGTH_MAX 512
+
 static void
 pdf_libtiff_error(TIFF *t, const char* module, const char* fmt, va_list ap)
 {
@@ -118,6 +121,7 @@ pdf_libtiff_error(TIFF *t, const char* module, const char* fmt, va_list ap)
         pdc_logg(p->pdc, "\tlibtiff(%s): %s\n", module, buffer);
     }
 }
+#endif
 
 static void
 pdf_data_source_TIFF_init(PDF *p, PDF_data_source *src)

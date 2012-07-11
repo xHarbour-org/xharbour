@@ -1209,7 +1209,7 @@ HB_FUNC_STATIC( LOADBITMAPFILE )
 {
   PTSTR pstrFileName = (PTSTR) hb_parc(1) ;
   BOOL               bSuccess= FALSE ;
-  DWORD              dwFileSize, dwHighSize, dwBytesRead ;
+  DWORD              dwFileSize = 0, dwHighSize, dwBytesRead ;
   HANDLE             hFile ;
   BITMAPFILEHEADER * pbmfh = NULL ;
   hFile = CreateFile (pstrFileName, GENERIC_READ, FILE_SHARE_READ, NULL,OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL) ;

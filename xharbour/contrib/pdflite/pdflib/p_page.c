@@ -1402,7 +1402,7 @@ pdf_add_reslist(PDF *p, pdf_reslist *rl, int num)
 #define PDF_SPOT_FLAG  PDC_OPT_UNSUPP
 
 #define PDF_METADATA_FLAG  PDC_OPT_UNSUPP
-
+#if 0
 static const pdc_defopt pdf_sepinfo_options[] =
 {
     {"pages", pdc_integerlist, PDC_OPT_NONE, 1, 1,
@@ -1416,6 +1416,7 @@ static const pdc_defopt pdf_sepinfo_options[] =
 
     PDC_OPT_TERMINATE
 };
+#endif
 
 #define PDF_PAGE_OPTIONS1 \
 \

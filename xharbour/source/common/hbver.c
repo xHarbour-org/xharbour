@@ -71,6 +71,11 @@
 
 #define HB_OS_WIN_USED
 
+#if defined( __POCC__ )
+   #pragma warn(push)
+   #pragma warn(disable:2130)
+#endif
+
 #include "hbapi.h"
 #include "hbver.h"
 #include "hbcomp.h"

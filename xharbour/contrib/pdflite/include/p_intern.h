@@ -31,9 +31,11 @@
    #pragma warn -sus
    #pragma warn -use
    #pragma warn -eff
-#endif
-
-#if defined(_MSC_VER) && (_MSC_VER>=1400)
+#elif defined( __POCC__ )
+   #pragma warn(push)
+   #pragma warn(disable:2135)
+   #pragma warn(disable:2229)
+#elif defined(_MSC_VER) && (_MSC_VER>=1400)
    #define _CRT_SECURE_NO_WARNINGS
    #define _CRT_SECURE_NO_DEPRECATE
 #endif

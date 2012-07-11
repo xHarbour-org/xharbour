@@ -17,11 +17,13 @@
    #define SUPPORT_UTF8
    #define PCRE_STATIC
 
-   #if defined( __WATCOMC__ )
+   #if defined( __POCC__ )
+      #pragma warn(push)
+      #pragma warn(disable:2154)
+      #pragma warn(disable:2229)
+   #elif defined( __WATCOMC__ )
       #pragma disable_message ( 201 )
-   #endif
-
-   #if defined( __BORLANDC__ )
+   #elif defined( __BORLANDC__ )
       #pragma warn -use
       #pragma warn -csu
       #pragma warn -aus

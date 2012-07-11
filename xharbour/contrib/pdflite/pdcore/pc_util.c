@@ -44,8 +44,10 @@
 #else /* isfinite */
 
 #if defined(WIN32)
+#if 0
 #if !defined(_UNICODE)
 #define UNICODE
+#endif
 #endif
 #include <windows.h>
 #include <float.h>
@@ -359,21 +361,39 @@ pdc_getenv_filename(pdc_core *pdc, const char *envname)
        typedef unsigned long DWORD;
     #endif
     size_t len = strlen(envname), wlen;
-    const wchar_t *wenvvalue;
-    wchar_t *wenvname;
+    #if defined(UNICODE)
+       const wchar_t *wenvvalue;
+       wchar_t       *wenvname;
+    #else
+       const char *wenvvalue;
+       char       *wenvname;
+    #endif
 
     DWORD nSize = PDC_FILENAMELEN;
 
     wlen = 2 * (len + 1);
-    wenvname = (wchar_t *) pdc_calloc(pdc, wlen, fn);
+    #if defined(UNICODE)
+       wenvname = (wchar_t *) pdc_calloc(pdc, wlen, fn);
+    #else
+       wenvname = (char *) pdc_calloc(pdc, wlen, fn);
+    #endif
     pdc_inflate_ascii(envname, (int) len, (char *) wenvname, pdc_utf16);
 
-    wenvvalue = _wgetenv(wenvname);
+    #if defined(UNICODE)
+       wenvvalue = _wgetenv(wenvname);
+    #else
+       wenvvalue = getenv(wenvname);
+    #endif
+
     pdc_free(pdc, wenvname);
 
     if (wenvvalue != NULL && pdc_wstrlen((char *) wenvvalue))
     {
-        wlen = 2 * wcslen(wenvvalue);
+        #if defined(UNICODE)
+           wlen = 2 * wcslen(wenvvalue);
+        #else
+           wlen = 2 * strlen(wenvvalue);
+        #endif
         pdc_logg_cond(pdc, 1, trc_filesearch,
             "\tEnvironment variable \"%s=%T\"\n", envname, wenvvalue, wlen);
 

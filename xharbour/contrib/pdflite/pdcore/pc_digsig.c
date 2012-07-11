@@ -16,5 +16,5 @@
 
 /* ANSI C forbids an empty source file */
 void pdc_dummy_digsig_c(void);
-void pdc_dummy_digsig_c() {}
+void pdc_dummy_digsig_c(void) {}
 

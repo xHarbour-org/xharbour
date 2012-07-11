@@ -8,6 +8,30 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-11 09:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/win32prn.prg
+  * source/rtl/math.c
+  * source/rtl/zlib/zutil.h
+  * source/rtl/pcre/config.h
+  * contrib/tiff/tif_config.h
+  * contrib/tiff/tif_compress.c
+  * contrib/jpeg/jconfig.h
+  * contrib/pdflite/include/pc_util.h
+  * contrib/pdflite/include/p_intern.h
+  * source/ct/files.c
+  * include/simplex.c
+  * source/common/hbver.c
+  * source/pp/ppcore.c
+  * utils/hbpp/hbppcore.c
+  * contrib/pdflite/include/p_keyconn.h
+  * contrib/pdflite/pdcore/pc_digsig.c
+  * contrib/pdflite/pdflib/p_tiff.c
+  * contrib/pdflite/pdflib/p_page.c
+     pacify POCC warnings
+
+  * contrib/pdflite/pdcore/pc_util.c
+    ! guard wcslen and related vars under UNICODE constant
+
 2012-07-11 05:17 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/pdflite/include/pc_util.h
   * contrib/png/pngpriv.h

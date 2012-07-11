@@ -32,10 +32,11 @@
    #pragma disable_message ( 201 )
    #pragma disable_message ( 124 )
    #pragma disable_message ( 136 )
-#endif
-
-/* Pacify BCC warnings */
-#if defined(__BORLANDC__)
+#elif defined( __POCC__ )
+   #pragma warn(push)
+   #pragma warn(disable:2154)
+   #pragma warn(disable:2030)
+#elif defined(__BORLANDC__)
    #pragma warn -aus
    #pragma warn -pia
    #pragma warn -csu
