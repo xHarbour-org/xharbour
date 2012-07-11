@@ -54,6 +54,9 @@
 
 #if defined( __WATCOMC__ )
    #pragma disable_message ( 124 )
+#elif defined( __POCC__ )
+   #pragma warn(push)
+   #pragma warn(disable:2130)
 #endif
 
 #include "hbapi.h"

@@ -422,7 +422,7 @@ static const pdc_keyconn pdf_mbox_keylist[] =
 #endif /* P_MBOX_C */
 
 
-#if defined(P_PAGE_C) || defined(P_TEMPLATE_C)
+#if defined(P_PAGE_C)
 
 static const pdc_keyconn pdf_tgroup_cs_pdfkeylist[] =
 {
@@ -634,7 +634,7 @@ static const pdc_keyconn pdf_underlineposition_keylist[] =
 #endif /* P_BLOCK_C || P_TEXT_C || P_TEXTFLOW_C */
 
 
-#if defined(P_BLOCK_C)|| defined(P_PARAMS_C) || \
+#if defined(P_BLOCK_C)|| \
     defined(P_TEXT_C) || defined(P_TEXTFLOW_C)
 
 static const pdc_keyconn pdf_glyphcheck_keylist[] =
@@ -648,7 +648,7 @@ static const pdc_keyconn pdf_glyphcheck_keylist[] =
 #endif /* P_BLOCK_C || P_PARAMS_C || P_TEXT_C || P_TEXTFLOW_C */
 
 
-#if defined(P_ANNOTS_C) || defined(P_BLOCK_C) || defined(P_FIELDS_C) || \
+#if defined(P_ANNOTS_C) || defined(P_BLOCK_C) || \
     defined(P_IMAGE_C) || defined(P_TEXT_C)
 
 static const pdc_keyconn pdf_position_keylist[] =
@@ -661,10 +661,10 @@ static const pdc_keyconn pdf_position_keylist[] =
     {NULL, 0}
 };
 
-#endif /* P_ANNOTS_C || P_BLOCK_C || P_FIELDS_C || P_IMAGE_C || P_TEXT_C */
+#endif /* P_ANNOTS_C || P_BLOCK_C || P_IMAGE_C || P_TEXT_C */
 
 
-#if defined(P_BLOCK_C) || defined(P_FIELDS_C) || \
+#if defined(P_BLOCK_C) || \
     defined(P_IMAGE_C) || defined(P_TABLE_C) || \
     defined(P_TEXT_C) || defined(P_TEXTFLOW_C)
 
@@ -681,11 +681,11 @@ static const pdc_keyconn pdf_fitmethod_keylist[] =
     {NULL, 0}
 };
 
-#endif /* P_BLOCK_C || P_FIELDS_C || P_IMAGE_C || P_TABLE_C ||
+#endif /* P_BLOCK_C || P_IMAGE_C || P_TABLE_C ||
           P_TEXT_C || P_TEXTFLOW_C */
 
 
-#if defined(P_ANNOTS_C) || defined(P_BLOCK_C) || defined(P_FIELDS_C) || \
+#if defined(P_ANNOTS_C) || defined(P_BLOCK_C) || \
     defined(P_IMAGE_C) || defined(P_TEXT_C) || defined(P_TEXTFLOW_C)
 
 static const pdc_keyconn pdf_orientate_keylist[] =
@@ -697,11 +697,11 @@ static const pdc_keyconn pdf_orientate_keylist[] =
     {NULL, 0}
 };
 
-#endif /* P_ANNOTS_C || P_BLOCK_C || P_FIELDS_C ||
+#endif /* P_ANNOTS_C || P_BLOCK_C || 
           P_IMAGE_C || P_TEXT_C || P_TEXTFLOW_C */
 
 
-#if defined(P_ANNOTS_C) || defined(P_BLOCK_C) || defined(P_FIELDS_C) ||  \
+#if defined(P_ANNOTS_C) || defined(P_BLOCK_C) || \
     defined(P_MBOX_C) || defined(P_TEXT_C) || defined(P_TEXTFLOW_C)
 
 static const pdc_keyconn pdf_fontsize_keylist[] =
@@ -714,7 +714,7 @@ static const pdc_keyconn pdf_fontsize_keylist[] =
     {NULL, 0}
 };
 
-#endif /* P_ANNOTS_C P_BLOCK_C || P_FIELDS_C ||
+#endif /* P_ANNOTS_C P_BLOCK_C ||
           P_MBOX_C || P_TEXT_C || P_TEXTFLOW_C */
 
 
@@ -734,7 +734,7 @@ static const pdc_keyconn pdf_fontstyle_pdfkeylist[] =
           P_MBOX_C || P_TEXT_C || P_TEXTFLOW_C */
 
 
-#if defined(P_ANNOTS_C) || defined(P_FIELDS_C)
+#if defined(P_ANNOTS_C)
 
 static const pdc_keyconn pdf_quadding_keylist[] =
 {
@@ -791,10 +791,10 @@ static const pdc_keyconn pdf_borderstyle_pdfkeylist[] =
     {NULL, 0}
 };
 
-#endif /* P_ANNOTS_C || P_FIELDS_C */
+#endif /* P_ANNOTS_C */
 
 
-#if defined(P_3D_C) || defined(P_BLOCK_C) || defined(P_FIELDS_C) || \
+#if defined(P_3D_C) || defined(P_BLOCK_C) || \
     defined(P_HYPER_C) || defined(P_LAYER_C) || defined(P_PARAMS_C) || \
     defined(P_TEXT_C) || defined(P_TEXTFLOW_C) || defined(P_UTIL_C) || \
     defined(P_XMP_C)
@@ -813,7 +813,7 @@ static const pdc_keyconn pdf_textformat_keylist[] =
     {NULL, 0}
 };
 
-#endif /* P_3D_C || P_BLOCK_C || P_FIELDS_C || P_HYPER_C ||
+#endif /* P_3D_C || P_BLOCK_C || P_HYPER_C ||
           P_LAYER_C || P_PARAMS_C || P_TEXT_C || P_TEXTFLOW_C ||
           P_UTIL_C || P_XMP_C */
 
@@ -822,7 +822,6 @@ static const pdc_keyconn pdf_textformat_keylist[] =
     defined(P_3D_C) || \
     defined(P_ACTIONS_C) || \
     defined(P_BLOCK_C) || \
-    defined(P_FIELDS_C) || \
     defined(P_FONT_C) || \
     defined(P_ICC_C) || \
     defined(P_IMAGE_C) || \
