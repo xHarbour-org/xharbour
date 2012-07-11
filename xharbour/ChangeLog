@@ -8,9 +8,27 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-12 06:52 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * ChangeLog
+    ! some typos
+
+  * contrib/xwt/src/xwt_win/xwt_win.c
+    ! xwt_drv_process_events() -> xwt_drv_process_events( void )
+    ! xwt_drv_quit()           -> xwt_drv_quit( void )
+
+  * contrib/hbexpat/xmltok_i.c
+    ! pacify POCC warning
+
+  * contrib/firebird/firebird.c
+    !initialized some variables:
+      line# 535): fetch_stat = 0
+      line# 685): value = 0
+      line# 686): field_width = 0
+      line# 777): aNew = NULL
+
 2012-07-12 06:37 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbbz2/bzlib_pr.h
-    ! pscify POCC warning
+    ! pacify POCC warning
 
   * contrib/hbbz2/compress.c
     ! initialize nSelectors as 0
@@ -63,7 +81,7 @@
 
 2012-07-11 09:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
    * source/misc/hb_f.c
-     ! pscify POCC warning
+     ! pacify POCC warning
 
    * contrib/pdflite/include/p_keyconn.h
      ! missing from previous commit

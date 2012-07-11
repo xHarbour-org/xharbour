@@ -9,8 +9,11 @@
 /* This file is included! */
 #ifdef XML_TOK_IMPL_C
 
-#ifdef __WATCOMC__
-#pragma off ( unreachable )
+#if defined( __POCC__ )
+   #pragma warn(push)
+   #pragma warn(disable:2154)
+#elif def __WATCOMC__
+   #pragma off ( unreachable )
 #endif
 
 #ifndef IS_INVALID_CHAR

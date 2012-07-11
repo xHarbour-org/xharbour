@@ -280,25 +280,25 @@ BOOL xwt_drv_init( int argc, char **argv )
    return TRUE;
 }
 
-BOOL xwt_drv_process_events()
+BOOL xwt_drv_process_events( void )
 {
    MSG msg;
    BYTE bRet;
-   
+
    while( (bRet = GetMessage( &msg, NULL, 0, 0 )) != 0 )
    {
       if ( bRet > 0 )
       {
-         TranslateMessage(&msg); 
-         DispatchMessage(&msg); 
+         TranslateMessage(&msg);
+         DispatchMessage(&msg);
       }
       //hb_gcAll( FALSE );
-   } 
+   }
 
    return TRUE;
 }
 
-BOOL xwt_drv_quit()
+BOOL xwt_drv_quit( void )
 {  
    PostQuitMessage( 0 );
    //UnregisterClass( "XWTWIN_Framewnd", hb_hInstance);

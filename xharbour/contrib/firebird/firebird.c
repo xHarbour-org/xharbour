@@ -532,7 +532,7 @@ HB_FUNC(FBFETCH)
     isc_stmt_handle     stmt = NULL;
     ISC_STATUS          status[MAX_FIELDS];
     XSQLDA              ISC_FAR * sqlda;
-    long                fetch_stat;
+    long                fetch_stat = 0;
     int                 dialect;
 
     PHB_ITEM aParam ;
@@ -682,8 +682,8 @@ HB_FUNC(FBGETDATA)
                 case SQL_LONG:
         	    case SQL_INT64:
         		{
-            		ISC_INT64	value;
-            		short		field_width;
+            		ISC_INT64	value = 0;
+            		short		field_width = 0;
             		short		dscale;
             		switch (dtype)
 		            {
@@ -774,7 +774,7 @@ HB_FUNC(FBGETBLOB)
     long                blob_stat;
 
     ITEM temp;
-    ITEM aNew;
+    ITEM aNew = NULL;
 
     db = ( isc_db_handle ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
     blob_id = ( ISC_QUAD * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
