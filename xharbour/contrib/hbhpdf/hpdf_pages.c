@@ -189,7 +189,7 @@ HPDF_Page_InsertBefore  (HPDF_Page   page,
 }
 
 
-HPDF_STATUS
+static HPDF_STATUS
 Pages_BeforeWrite  (HPDF_Dict    obj)
 {
     HPDF_Array kids = (HPDF_Array )HPDF_Dict_GetItem (obj, "Kids",
@@ -438,7 +438,7 @@ HPDF_Page_GetInheritableItem  (HPDF_Page          page,
 }
 
 
-HPDF_STATUS
+static HPDF_STATUS
 AddResource  (HPDF_Page  page)
 {
     HPDF_STATUS ret = HPDF_OK;

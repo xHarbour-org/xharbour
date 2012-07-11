@@ -35,6 +35,12 @@
    #pragma warn -rch
    #pragma warn -csu
    #pragma warn -par
+#elif defined( __POCC__ )
+   #pragma warn(push)
+   #pragma warn(disable:2130)
+   #pragma warn(disable:2154)
+   #pragma warn(disable:2135)
+   #pragma warn(disable:2231)   
 #endif
 
 /*----------------------------------------------------------------------------*/

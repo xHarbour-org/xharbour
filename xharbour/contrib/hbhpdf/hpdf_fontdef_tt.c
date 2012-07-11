@@ -695,7 +695,7 @@ WriteINT16 (HPDF_Stream   stream,
 }
 
 
-HPDF_STATUS
+static HPDF_STATUS
 LoadTTFTable (HPDF_FontDef  fontdef)
 {
     HPDF_TTFontDefAttr attr = (HPDF_TTFontDefAttr)fontdef->attr;

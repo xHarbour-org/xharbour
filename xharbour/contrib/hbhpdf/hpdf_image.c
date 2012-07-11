@@ -332,7 +332,7 @@ HPDF_Image_LoadRawImageFromMem  (HPDF_MMgr          mmgr,
 {
     HPDF_Dict image;
     HPDF_STATUS ret = HPDF_OK;
-    HPDF_UINT size;
+    HPDF_UINT size = 0;
 
     HPDF_PTRACE ((" HPDF_Image_LoadRawImageFromMem\n"));
 

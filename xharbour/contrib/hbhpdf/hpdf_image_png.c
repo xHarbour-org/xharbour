@@ -243,7 +243,7 @@ ReadTransparentPngData  (HPDF_Dict    image,
 	HPDF_STATUS ret = HPDF_OK;
 	HPDF_INT row_len;
 	HPDF_UINT i, j;
-	png_bytep *row_ptr, row;
+	png_bytep *row_ptr, row = 0;
 	png_byte color_type;
 	png_uint_32 height = png_get_image_height(png_ptr, info_ptr);
 	png_uint_32 width = png_get_image_width(png_ptr, info_ptr);

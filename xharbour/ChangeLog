@@ -8,6 +8,23 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-12 06:13 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbhpdf/hpdf_fontdef_tt.c
+    ! LoadTTFTable() is static
+
+  * contrib/hbhpdf/hpdf_pages.c
+   ! Pages_BeforeWrite() and AddResource() are statics.
+
+  * contrib/hbhpdf/hpdf_image.c
+    * initialize size as 0
+
+  * contrib/hbhpdf/hpdf_image_png.c
+     initialize row as 0
+
+  * contrib/hbhpdf/hpdf_conf.h
+  * contrib/hbhpdf/hpdf_config.h
+     ! pacify POCC warnings
+
 2012-07-12 02:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/filenet.c
     * initialize hCurSocket and fResult
