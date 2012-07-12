@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-12 07:48 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/tipssl/inetssl.c
+    - deffed-out line# 1102 : iRet, unused
+    - deffed-out line# 1419 : iRet, unused
+
 2012-07-12 07:18 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/readme.txt
     ! typo on Advantage Database URL

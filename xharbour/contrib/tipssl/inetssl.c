@@ -1099,7 +1099,7 @@ static void s_inetRecvInternal(char *szFuncName, int iMode)
                         iReceived,
                         iBufferLen;
    int                  iTimeElapsed;
-   int                  iRet = 0;
+   /* int               iRet = 0; */
 
    if (Socket == NULL || Socket->sign != HB_SOCKET_SIGN || pBuffer == NULL ||
        !ISBYREF(2))
@@ -1416,7 +1416,7 @@ HB_FUNC( INETSSLRECVENDBLOCK )
    int                  i;
    int                  *iprotosize;
    int                  ifindproto = 0;
-   int                  iRet = 0;
+   /* int               iRet = 0; */
    BOOL                 bProtoFound;
 
    if (Socket == NULL || Socket->sign != HB_SOCKET_SIGN)
