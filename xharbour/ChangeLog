@@ -8,6 +8,33 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-13 01:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbbtree/hb_btree.c
+    ! pacify BCC warnings
+
+  * contrib/png/png.c
+  * contrib/png/png.h
+  * contrib/png/pngconf.h
+  * contrib/png/pngdebug.h
+  * contrib/png/pngerror.c
+  * contrib/png/pngget.c
+  * contrib/png/pnginfo.h
+  * contrib/png/pngmem.c
+  * contrib/png/pngpread.c
+  * contrib/png/pngread.c
+  * contrib/png/pngrio.c
+  * contrib/png/pngrtran.c
+  * contrib/png/pngrutil.c
+  * contrib/png/pngset.c
+  * contrib/png/pngstruct.h
+  * contrib/png/pngtest.c
+  * contrib/png/pngtrans.c
+  * contrib/png/pngwio.c
+  * contrib/png/pngwrite.c
+  * contrib/png/pngwtran.c
+  * contrib/png/pngwutil.c
+    ! updated to version 1.5.12
+
 2012-07-12 21:11 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * ChangeLog
     ! corrected typos on addition : * -> +

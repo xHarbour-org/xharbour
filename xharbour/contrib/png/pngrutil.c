@@ -402,10 +402,6 @@ png_inflate(png_structp png_ptr, png_bytep data, png_size_t size,
        */
       return 0;
    }
-#if defined( __XCC__ )
-   /* To pacify XCC warning - 'Missing Return Value' */
-   return 0;
-#endif
 }
 
 /*

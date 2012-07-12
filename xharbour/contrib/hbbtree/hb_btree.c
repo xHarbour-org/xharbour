@@ -62,6 +62,8 @@
  */
 
 #if defined(__POCC__)
+#elif defined(__BORLANDC__)
+   #pragma warn -8071
 #elif defined(_MSC_VER)
    #pragma warning( disable:4244 )
 #endif
