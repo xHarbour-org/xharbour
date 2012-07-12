@@ -2,9 +2,17 @@
  * $Id$
  */
 
+#message "This program requires freetype6.dll"
+#message "This program requires libcairo-2.dll"
+#message "This program requires libexpat-1.dll"
+#message "This program requires libfontconfig-1.dll"
+#message "This program requires libpng14-14.dll"
+#message "This program requires zlib1.dll"
+#message "Download the binaries at: http://www.gtk.org/download/win32.php"
+#message "Create an import lib of libcairo-2.dll and link it to application"
+#message ""
 
 #include "hbcairo.ch"
-
 
 PROC main()
    LOCAL hSurface, hCairo

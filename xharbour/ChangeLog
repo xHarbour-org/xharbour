@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-12 09:06 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbcairo/tests/fancytxt.prg
+  * contrib/hbcairo/tests/glyphdbg.prg
+  * contrib/hbcairo/tests/hellow.prg
+  * contrib/hbcairo/tests/lightning.prg
+  * contrib/hbcairo/tests/table.prg
+    + implemented message directive as these samples are quite complicated
+    to build
+
 2012-07-12 08:46 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/pp/ppcore.c
     + message directive to show info on compile time. For example:

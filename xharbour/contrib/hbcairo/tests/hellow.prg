@@ -2,6 +2,15 @@
  * $Id$
  */
 
+#message "This program requires freetype6.dll"
+#message "This program requires libcairo-2.dll"
+#message "This program requires libexpat-1.dll"
+#message "This program requires libfontconfig-1.dll"
+#message "This program requires libpng14-14.dll"
+#message "This program requires zlib1.dll"
+#message "Download the binaries at: http://www.gtk.org/download/win32.php"
+#message "Create an import lib of libcairo-2.dll and link it to application"
+#message ""
 
 #include "hbcairo.ch"
 
@@ -17,7 +26,7 @@ PROC main()
    cairo_select_font_face( hCairo, "sans-serif", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD )
    cairo_set_font_size( hCairo, 16 )
    cairo_set_source_rgb( hCairo, 0, 0, 0 )  // black
-   
+
    cairo_move_to( hCairo, 50, 50 )
    cairo_show_text( hCairo, "Hello, World!" )
    
