@@ -8,19 +8,23 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-12 21:11 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * ChangeLog
+    ! corrected typos on addition : * -> +
+
 2012-07-12 21:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
-  * contrib/hbbtree
-  * contrib/hbbtree/tbtree.prg
-  * contrib/hbbtree/hb_btree.c
-  * contrib/hbbtree/hb_btree.ch
-  * contrib/hbbtree/hb_btree.h
-  * contrib/hbbtree/doc
-  * contrib/hbbtree/doc/en
-  * contrib/hbbtree/doc/en/hb_btree.txt
-  * contrib/hbbtree/tests
-  * contrib/hbbtree/tests/ctest.c
-  * contrib/hbbtree/tests/test.prg
-  * contrib/hbbtree/tests/ttest.prg
+  + contrib/hbbtree
+  + contrib/hbbtree/tbtree.prg
+  + contrib/hbbtree/hb_btree.c
+  + contrib/hbbtree/hb_btree.ch
+  + contrib/hbbtree/hb_btree.h
+  + contrib/hbbtree/doc
+  + contrib/hbbtree/doc/en
+  + contrib/hbbtree/doc/en/hb_btree.txt
+  + contrib/hbbtree/tests
+  + contrib/hbbtree/tests/ctest.c
+  + contrib/hbbtree/tests/test.prg
+  + contrib/hbbtree/tests/ttest.prg
     ! hbbtree.lib, a work of April White; added upon request of xHarbour user.
 
   * winmake/common.mak
