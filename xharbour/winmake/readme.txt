@@ -50,4 +50,4 @@ Download URL: ftp://ftp.astron.com/pub/file/file-5.04.tar.gz
 
 SET HB_DIR_ADS=<install dir>
 Required to build rdads.lib
-Download URL: http://devzone.advantagedatabase.com/dz/content.aspx?Key=<install dir>20
+Download URL: http://devzone.advantagedatabase.com/dz/content.aspx?Key=20
