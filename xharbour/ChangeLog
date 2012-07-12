@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-12 09:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbexpat/xmltok_i.c
+    ! corrected typo (thanks Mel)
+
 2012-07-12 09:06 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbcairo/tests/fancytxt.prg
   * contrib/hbcairo/tests/glyphdbg.prg

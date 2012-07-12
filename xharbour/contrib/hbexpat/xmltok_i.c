@@ -12,7 +12,7 @@
 #if defined( __POCC__ )
    #pragma warn(push)
    #pragma warn(disable:2154)
-#elif def __WATCOMC__
+#elif defined( __WATCOMC__ )
    #pragma off ( unreachable )
 #endif
 
