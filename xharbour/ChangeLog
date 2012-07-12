@@ -8,6 +8,29 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-12 08:46 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/pp/ppcore.c
+    + message directive to show info on compile time. For example:
+
+      /* begin file */
+      #message ""
+      #message "This program require FOOBAR.LIB"
+      #message ""
+
+      PROCEDURE MAIN()
+
+      #if defined( __FOOBAR__)
+         #message "__FOOBAR__ is defined"
+      #else
+         #message "__FOOBAR__ is not defined"
+      #endif
+
+      RETURN
+      /* end */
+
+  + tests/testmsg.prg
+    ! sample program to test message directive
+
 2012-07-12 07:48 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/tipssl/inetssl.c
     - deffed-out line# 1102 : iRet, unused

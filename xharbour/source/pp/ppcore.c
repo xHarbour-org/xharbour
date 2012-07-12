@@ -55,11 +55,6 @@
 /* #define HB_PP_NO_LINEINFO_TOKEN */
 /* #define HB_PP_STRICT_LINEINFO_TOKEN */
 
-#if defined( __POCC__ )
-   #pragma warn(push)
-   #pragma warn(disable:2154)
-#endif
-
 #define _HB_PP_INTERNAL
 
 #if defined( HB_PP_STRICT_LINEINFO_TOKEN ) && \
@@ -5273,6 +5268,12 @@ static void hb_pp_preprocessToken( PHB_PP_STATE pState )
          else if( hb_pp_tokenValueCmp( pToken, "LINE", HB_PP_CMP_DBASE ) )
          {
             /* ignore #line directives */
+         }
+         else if( hb_pp_tokenValueCmp( pToken, "MESSAGE", HB_PP_CMP_DBASE ) )
+         {
+            pToken = pToken->pNext;
+            if( pToken && HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_STRING )
+               printf( "%s\n", pToken->value );
          }
 #endif
          else
