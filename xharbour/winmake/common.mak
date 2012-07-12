@@ -92,6 +92,7 @@ HBTINYMT_DIR  =contrib$(DIR_SEP)hbtinymt
 PDFLITE_DIR   =contrib$(DIR_SEP)pdflite
 JPEG_DIR      =contrib$(DIR_SEP)jpeg
 TIFF_DIR      =contrib$(DIR_SEP)tiff
+HBBTREE_DIR   =contrib$(DIR_SEP)hbbtree
 
 INCLUDE_DIR2  =include
 
@@ -146,6 +147,7 @@ HB_GT_LIBS  =$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTWVT_LIB) $(
 #===============================================================================
 # Contrib Library Names
 #===============================================================================
+HBBTREE_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbbtree$(LIBEXT)
 TIFF_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)tiff$(LIBEXT)
 JPEG_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)jpeg$(LIBEXT)
 PDFLITE_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)pdflite$(LIBEXT)
@@ -258,6 +260,14 @@ HARBOUR_LIBS=\
 #===============================================================================
 VM_ALL_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hvmall$(HB_MT)$(OBJEXT)
+
+#===============================================================================
+# HBBTREE.LIB Dependencies
+#===============================================================================
+HBBTREE_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)hb_btree$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tbtree$(OBJEXT)
+
 
 #===============================================================================
 # TIFF.LIB Dependencies
@@ -2356,5 +2366,6 @@ CONTRIB_PROJECT=\
 	$(XWT_LIB)\
 	$(LIBHARU_LIB)\
 	$(HBEXPAT_LIB)\
-	$(HBTINYMT_LIB)
+	$(HBTINYMT_LIB)\
+	$(HBBTREE_LIB)
 

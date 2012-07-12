@@ -8,6 +8,32 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-12 21:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbbtree
+  * contrib/hbbtree/tbtree.prg
+  * contrib/hbbtree/hb_btree.c
+  * contrib/hbbtree/hb_btree.ch
+  * contrib/hbbtree/hb_btree.h
+  * contrib/hbbtree/doc
+  * contrib/hbbtree/doc/en
+  * contrib/hbbtree/doc/en/hb_btree.txt
+  * contrib/hbbtree/tests
+  * contrib/hbbtree/tests/ctest.c
+  * contrib/hbbtree/tests/test.prg
+  * contrib/hbbtree/tests/ttest.prg
+    ! hbbtree.lib, a work of April White; added upon request of xHarbour user.
+
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/makefile.bc
+  * winmake/makefile.dc
+  * winmake/makefile.gc
+  * winmake/makefile.pc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+  * winmake/mdir.bat
+    + inclusion of hbbtree.lib
+
 2012-07-12 07:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   ! contrib/hblfz/lzfP.h
     ! fixed for work in linux 

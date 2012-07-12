@@ -1001,6 +1001,13 @@ $(TIPSSL_LIB) : $(TIPSSL_LIB_OBJS)
 +)
 !
 
+$(HBBTREE_LIB) : $(HBBTREE_LIB_OBJS)
+	IF EXIST "$(HBBTREE_LIB)" $(DEL) "$(HBBTREE_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
 !endif
 
 #===============================================================================

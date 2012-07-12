@@ -88,6 +88,18 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
 	$(MT_CMD)
 
 #===============================================================================
+# HBBTREE.LIB Dependencies
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)hb_btree$(OBJEXT) : $(HBBTREE_DIR)$(DIR_SEP)hb_btree.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tbtree$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)tbtree.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tbtree.c : $(HBBTREE_DIR)$(DIR_SEP)tbtree.prg
+	$(HB_CMD)
+
+#===============================================================================
 # TIFF.LIB Dependencies
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)tif_aux$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_aux.c

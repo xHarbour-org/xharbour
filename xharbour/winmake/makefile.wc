@@ -699,6 +699,9 @@ $(HBLZF_LIB) : $(HBLZF_LIB_OBJS)
 $(HBMLZO_LIB) : $(HBMLZO_LIB_OBJS)
 	$(LIB_CMD)
 
+$(HBBTREE_LIB) : $(HBBTREE_LIB_OBJS)
+	$(LIB_CMD)
+
 !endif
 
 #===============================================================================
