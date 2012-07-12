@@ -44,30 +44,24 @@
    #endif
 #endif
 
+/*
+  * To pacify warnings
+*/
 #if defined( __BORLANDC__ )
-   /*
-     * To pacify warnings
-   */
    #pragma warn -use
    #pragma warn -csu
    #pragma warn -aus
    #pragma warn -sig
    #pragma warn -ccc
    #pragma warn -rch
-#endif
-
-#if defined( _MSC_VER ) && ( _MSC_VER >= 1400 ) && !defined( _CRT_SECURE_NO_WARNINGS )
-   #define _CRT_SECURE_NO_WARNINGS
-#endif
-
-#if defined( __WATCOMC__ )
-   #pragma disable_message ( 124 )
-#endif
-
-#if defined( __POCC__ )
+#elif defined( __POCC__ )
    #pragma warn(push)
    #pragma warn(disable:2154)
    #pragma warn(disable:2130)
+#elif defined( _MSC_VER ) && ( _MSC_VER >= 1400 ) && !defined( _CRT_SECURE_NO_WARNINGS )
+   #define _CRT_SECURE_NO_WARNINGS
+#elif defined( __WATCOMC__ )
+   #pragma disable_message ( 124 )
 #endif
 
 /* Feature Test Macros.  The following are defined here to ensure that correctly

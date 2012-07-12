@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-13 03:23 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbsqlit3/config.h
+  * source/pp/ppcore.c
+    ! pacify POCC warning
+
+  * contrib/png/pngpriv.h
+    ! formatting
+
 2012-07-13 01:43 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/png/*.*
     ! folder refreshed

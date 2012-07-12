@@ -12,6 +12,13 @@
       #pragma warn -prc
       #pragma warn -pia
       #pragma warn -use
+   #elif defined( __POCC__ )
+      #pragma warn(push)
+      #pragma warn(disable:2154)
+      #pragma warn(disable:2071)
+      #pragma warn(disable:2214)
+      #pragma warn(disable:2114)
+      #pragma warn(disable:2135)
    #endif
 
 #endif /* SQLLITE3_CONFIG_H */
