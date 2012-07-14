@@ -537,7 +537,7 @@ pdf_process_metrics_data(
     pdc_ushort uv;
     pdc_encoding enc = font->ft.enc;
     pdc_encodingvector *ev = NULL;
-    int nalloc, foundglyphs = 0, i, j = 0, k;
+    int /* nalloc, */ foundglyphs = 0, i, j = 0, k;
 
     (void) j;
 
@@ -579,7 +579,7 @@ pdf_process_metrics_data(
         font->towinansi = pdc_winansi;
 
     /* glyph name list for incore fonts */
-    nalloc = font->ft.numglyphs + AFM_GLYPH_SUPPL;
+    /* nalloc = font->ft.numglyphs + AFM_GLYPH_SUPPL; */
 
     /*
      * Generate character width according to the chosen encoding
