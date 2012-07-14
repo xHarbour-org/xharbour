@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-14 09:10 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * contrib/Makefile
+    ! added new folders to compile under linux
+  + contrib/hbsqlit3/Makefile
+    + added linux makefile to sqllit3
+  + contrib/hbbtree/Makefile
+    + added makefile for hbbtree        
+
 2012-07-13 03:23 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbsqlit3/config.h
   * source/pp/ppcore.c
