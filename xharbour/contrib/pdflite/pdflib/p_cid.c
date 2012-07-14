@@ -41,7 +41,7 @@ pdf_handle_cidfont(PDF *p, const char *fontname, const char *encoding,
     fnt_cmap_info cmapinfo;
     const fnt_font_metric *fontmetric;
     pdc_bool isidentity = pdc_false;
-    pdc_bool isstdfont = pdc_false;
+    /* pdc_bool isstdfont = pdc_false; */
     pdc_bool iscjkcp = pdc_false;
     int charcoll, slot;
 
@@ -116,7 +116,7 @@ pdf_handle_cidfont(PDF *p, const char *fontname, const char *encoding,
                            0, 0, 0, 0);
             return pdc_false;
         }
-        isstdfont = pdc_true;
+        /* isstdfont = pdc_true; */
 
 
         /* Embedding not possible */

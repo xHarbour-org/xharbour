@@ -98,7 +98,7 @@ pdf__begin_template(PDF *p, pdc_scalar width, pdc_scalar height,
     pdc_clientdata cdata;
     pdc_bool topdown;
     char *iconname = NULL;
-    pdc_bool verbose = pdc_true;
+    /* pdc_bool verbose = pdc_true; */
     int im = -1;
 
     pdc_check_number_limits(p->pdc, "width", width,
@@ -152,7 +152,7 @@ pdf__begin_template(PDF *p, pdc_scalar width, pdc_scalar height,
         pdc_cleanup_optionlist(p->pdc, resopts);
     }
 
-    verbose = image->verbose;
+    /* verbose = image->verbose; */
 
 
 

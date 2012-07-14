@@ -8,6 +8,23 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-15 05:09 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/filenet.c
+  * source/rdd/dbfmdx/dbfmdx1.c
+  * contrib/pdflite/pdcore/pc_crypt.c
+  * contrib/pdflite/pdcore/pc_scope.c
+  * contrib/pdflite/pdcore/pc_util.c
+  * contrib/pdflite/pdflib/p_afm.c:
+  * contrib/pdflite/pdflib/p_bmp.c
+  * contrib/pdflite/pdflib/p_cid.c
+  * contrib/pdflite/pdflib/p_color.c
+  * contrib/pdflite/pdflib/p_document.c
+  * contrib/pdflite/pdflib/p_params.c
+  * contrib/pdflite/pdflib/p_template.c
+  * contrib/pdflite/pdflib/p_text.c
+  * contrib/pdflite/pdflib/p_truetype.c
+    ! pacify MinGW warnings, mostly, deff-out unused vars and initialization
+
 2012-07-14 09:10 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * contrib/Makefile
     ! added new folders to compile under linux

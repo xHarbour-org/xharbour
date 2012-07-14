@@ -792,7 +792,7 @@ PHB_FILE hb_fileNetExtOpen( const char * pFileName, const char * pDefExt,
 void hb_fileNetClose( PHB_FILE pFile )
 {
    HB_FHANDLE hFile = FS_ERROR;
-   HB_SOCKET_T hCurSocket = NULL;
+   HB_SOCKET_T hCurSocket = (HB_SOCKET_T) NULL;
 
    HB_CRITICAL_LOCK( s_fileMtx );
 

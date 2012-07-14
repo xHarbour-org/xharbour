@@ -568,11 +568,11 @@ pdf__set_value(PDF *p, const char *key, double value)
 {
     int i;
     int ivalue = (int) value;
-    pdf_ppt *ppt;
+    /* pdf_ppt *ppt; */
 
     i = pdf_get_index(p, key, pdc_true);
 
-    ppt = p->curr_ppt;
+    /* ppt = p->curr_ppt; */
 
     pdc_check_number(p->pdc, "value", value);
 

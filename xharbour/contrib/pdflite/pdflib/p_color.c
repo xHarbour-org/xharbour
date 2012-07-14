@@ -474,7 +474,7 @@ pdf_set_color_values(PDF *p, pdf_color *cfill, pdf_color *cstroke,
 void
 pdf_init_colorspaces(PDF *p)
 {
-    int i, slot;
+    int i /*, slot*/ ;
     pdf_colorspace cs;
 
 
@@ -496,11 +496,11 @@ pdf_init_colorspaces(PDF *p)
      */
 
     cs.type = DeviceGray;
-    slot = pdf_add_colorspace(p, &cs, pdc_false);
+    /* slot = */ pdf_add_colorspace(p, &cs, pdc_false);
     cs.type = DeviceRGB;
-    slot = pdf_add_colorspace(p, &cs, pdc_false);
+    /* slot = */ pdf_add_colorspace(p, &cs, pdc_false);
     cs.type = DeviceCMYK;
-    slot = pdf_add_colorspace(p, &cs, pdc_false);
+    /* slot = */ pdf_add_colorspace(p, &cs, pdc_false);
 
 } /* pdf_init_colorspaces */
 
@@ -621,7 +621,7 @@ void
 pdf_write_colormap(PDF *p, int slot)
 {
     PDF_data_source src;
-    pdf_colorspace *cs, *base;
+    pdf_colorspace *cs /*, *base */;
     pdc_id length_id;
 
     cs   = &p->colorspaces[slot];
@@ -629,7 +629,7 @@ pdf_write_colormap(PDF *p, int slot)
     if (cs->type != Indexed || cs->val.indexed.colormap_done == pdc_true)
 	return;
 
-    base = &p->colorspaces[cs->val.indexed.base];
+    /* base = &p->colorspaces[cs->val.indexed.base]; */
 
     pdc_begin_obj(p->out, cs->val.indexed.colormap_id);	/* colormap object */
     pdc_begin_dict(p->out);

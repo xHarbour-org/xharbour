@@ -431,12 +431,12 @@ pdf_process_BMP_data(
     int imageslot)
 {
     static const char *fn = "pdf_process_BMP_data";
-    pdc_byte buf[256], *pos, *cmap, bdummy;
+    pdc_byte buf[256], *pos , *cmap /* , bdummy */;
     pdf_image *image = &p->images[imageslot];
     pdc_file *fp = image->fp;
-    pdc_uint32 uldummy, infosize = 0, offras = 0, planes = 0, bitmapsize = 0;
+    pdc_uint32 /* uldummy, */ infosize = 0, offras = 0, planes = 0, bitmapsize = 0;
     pdc_uint32 ncolors = 0, importcolors = 0, compression = PDF_BMP_RGB;
-    pdc_ushort usdummy, bpp = 0, bpp_pdf = 0;
+    pdc_ushort /* usdummy, */ bpp = 0, bpp_pdf = 0;
     pdc_sint32 width = 0, height = 0, dpi_x = 0, dpi_y = 0;
     pdc_uint32 redmask = 0, greenmask = 0, bluemask = 0, ccmax;
     size_t nbytes;
@@ -460,9 +460,9 @@ pdf_process_BMP_data(
         errcode = PDF_E_IMAGE_CORRUPT;
         goto PDF_BMP_ERROR;
     }
-    uldummy = PDF_GET_ULONG(pos);
-    usdummy = PDF_GET_USHORT(pos);
-    usdummy = PDF_GET_USHORT(pos);
+    /* uldummy = */ PDF_GET_ULONG(pos);
+    /* usdummy = */ PDF_GET_USHORT(pos);
+    /* usdummy = */ PDF_GET_USHORT(pos);
     offras = PDF_GET_ULONG(pos);
     infosize = PDF_GET_ULONG(pos);
 
@@ -580,7 +580,7 @@ pdf_process_BMP_data(
             colormap[i][0] = PDF_GET_BYTE(pos);
             if (infosize == PDF_BMP_INFO_HEAD3SIZE)
             {
-                bdummy = PDF_GET_BYTE(pos);
+                pos += sizeof(pdc_byte);
             }
         }
         pdc_free(p->pdc, cmap);

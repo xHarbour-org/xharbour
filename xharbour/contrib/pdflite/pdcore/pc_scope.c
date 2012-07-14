@@ -21,6 +21,6 @@
 #include "pc_file.h"
 #include "pc_ctype.h"
 
-
+#if 0
 static void pdc_check_scope_core(void) {}
-
+#endif

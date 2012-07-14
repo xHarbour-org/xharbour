@@ -4120,7 +4120,7 @@ static void hb_cdxIndexFree( LPCDXINDEX pIndex )
    {
       hb_fileClose( pIndex->pFile );
       if( pIndex->fDelete )
-         hb_fileDelete( pIndex->szRealName ? pIndex->szRealName : pIndex->szFileName, NULL );
+         hb_fileDelete( pIndex->szRealName ? pIndex->szRealName : pIndex->szFileName, 0 );
    }
 
    if( pIndex->fShared && ( pIndex->lockWrite || pIndex->lockRead ) &&

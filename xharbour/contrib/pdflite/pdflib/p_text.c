@@ -2584,8 +2584,8 @@ pdf_fit_textline_internal(PDF *p, pdf_fitres *fitres,
     pdc_scalar ss, width, height, boxwidth, boxheight, fontsizeref;
     pdc_scalar ascender, capheight, xheight, descender;
     pdc_scalar x, y, tx = 0, ty = 0, basey = 0;
-    pdc_bool hasfitbox = pdc_false;
-    pdc_bool hasboxwidth = pdc_false;
+    /* pdc_bool hasfitbox = pdc_false; */
+    /* pdc_bool hasboxwidth = pdc_false; */
     pdc_bool verbose = pdc_true;
     pdc_scalar font2user;
     int indangle = fit->orientate / 90;
@@ -2649,8 +2649,8 @@ pdf_fit_textline_internal(PDF *p, pdf_fitres *fitres,
     boxheight -= 2 * elemmargin.y;
     if (boxheight < 0)
         boxheight = 0;
-    hasboxwidth = boxwidth > PDC_FLOAT_PREC;
-    hasfitbox = hasboxwidth && boxheight > PDC_FLOAT_PREC;
+    /* hasboxwidth = boxwidth > PDC_FLOAT_PREC; */
+    /* hasfitbox = hasboxwidth && boxheight > PDC_FLOAT_PREC; */
 
     /* kind of text box */
     pdf_get_mbox_boxheight(p, fit->matchbox, textyextent);

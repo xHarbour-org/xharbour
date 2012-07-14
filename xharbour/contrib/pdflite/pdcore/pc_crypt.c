@@ -22,6 +22,6 @@
 #include "pc_md5.h"
 #include "pc_crypt.h"
 
-
+#if 0
 static void pdc_pd_crypt_c(void) {}
-
+#endif

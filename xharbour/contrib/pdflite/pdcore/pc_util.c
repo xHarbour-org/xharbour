@@ -369,7 +369,7 @@ pdc_getenv_filename(pdc_core *pdc, const char *envname)
        char       *wenvname;
     #endif
 
-    DWORD nSize = PDC_FILENAMELEN;
+    /* DWORD nSize = PDC_FILENAMELEN; */
 
     wlen = 2 * (len + 1);
     #if defined(UNICODE)

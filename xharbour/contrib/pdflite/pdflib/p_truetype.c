@@ -30,13 +30,13 @@ pdf_get_metrics_tt(PDF *p, pdf_font *font, const char *fontname,
 {
     pdc_bool logg1 = pdc_logg_is_enabled(p->pdc, 1, trc_font);
     pdc_bool logg2 = pdc_logg_is_enabled(p->pdc, 2, trc_font);
-    int filesize = 0;
-    double kbfilesize = 0;
+    /* int filesize = 0; */
+    /* double kbfilesize = 0; */
     int foundglyphs, flags = 0;
     tt_file *ttf;
     pdc_bool retval;
     pdc_encoding enc_req;
-    pdc_encodingvector *ev = NULL;
+    /* pdc_encodingvector *ev = NULL; */
     pdc_bool isotf;
     int errcode = 0;
 
@@ -51,8 +51,8 @@ pdf_get_metrics_tt(PDF *p, pdf_font *font, const char *fontname,
     ttf->verbose = font->verbose;
     ttf->incore = pdc_true;
     ttf->monospace = font->opt.monospace;
-    filesize = font->ft.filelen;
-    kbfilesize = filesize / 1024.0;
+    /* filesize = font->ft.filelen; */
+    /* kbfilesize = filesize / 1024.0; */
 
     /*
      * Read font file
@@ -195,7 +195,7 @@ pdf_get_metrics_tt(PDF *p, pdf_font *font, const char *fontname,
         enc = enc_req;
     }
     if (enc >= 0)
-        ev = pdc_get_encoding_vector(p->pdc, enc);
+        /* ev = */ pdc_get_encoding_vector(p->pdc, enc);
     font->ft.enc = enc;
     font->ft.issymbfont = ttf->issymbol;
     font->hasnomac = !ttf->tab_cmap || !ttf->tab_cmap->mac;
@@ -212,7 +212,7 @@ pdf_get_metrics_tt(PDF *p, pdf_font *font, const char *fontname,
         else
         {
             /* encoding vector for builtin */
-            ev = pdf_create_font_encoding(p, enc, font, fontname, pdc_true);
+            /* ev = */ pdf_create_font_encoding(p, enc, font, fontname, pdc_true);
             font->symenc = font->ft.enc;
         }
     }

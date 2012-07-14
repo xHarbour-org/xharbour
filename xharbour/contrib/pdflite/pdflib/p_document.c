@@ -1921,14 +1921,14 @@ static const pdc_defopt pdf_end_document_options[] =
 void
 pdf__end_document(PDF *p, const char *optlist)
 {
-    pdf_document *doc;
+    /* pdf_document *doc; */
 
     /* check if there are any suspended pages left.
     */
     pdf_check_suspended_pages(p);
 
     /* get document pointer */
-    doc = pdf_init_get_document(p);
+    /* doc = */ pdf_init_get_document(p);
 
     if (optlist && *optlist)
     {
