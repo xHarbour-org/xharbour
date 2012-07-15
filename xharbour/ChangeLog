@@ -8,6 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-15 07:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/pdflite/hbpdflib.c
+    + add some graphic functions
+
+  * contrib/pdflite/tests/text2pdf.prg
+    ! minor modification
+
+  + contrib/pdflite/tests/img2pdf.prg
+  + contrib/pdflite/tests/mybmp.bmp
+  + contrib/pdflite/tests/mygif.gif
+  + contrib/pdflite/tests/mypng.png
+    ! test program for converting image to pdf
+
 2012-07-15 05:11 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/pdflite/pdflib/p_afm.c
     ! missing from previous commit

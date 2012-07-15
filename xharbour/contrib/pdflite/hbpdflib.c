@@ -54,6 +54,7 @@
 
 #include "hbapi.h"
 #include "hbapiitm.h"
+#include "hbapifs.h"
 #include "pdflib.h"
 
 static PDF* pPDFLib = NULL;
@@ -61,7 +62,7 @@ static PDF* pPDFLib = NULL;
 HB_FUNC( PDF_NEW )
 {
    pPDFLib = PDF_new();
-   hb_retni( pPDFLib ? 1 : 0 );
+   hb_retl( pPDFLib ? TRUE : FALSE );
 }
 
 HB_FUNC( PDF_DELETE )
@@ -72,7 +73,15 @@ HB_FUNC( PDF_DELETE )
 
 HB_FUNC( PDF_BEGIN_DOCUMENT )
 {
-   hb_retni( PDF_begin_document(pPDFLib, hb_parc(1), hb_parni(2), hb_parc(3) ) );
+   if( ISCHAR(1) )
+   {
+      hb_retl( PDF_begin_document(pPDFLib,
+         hb_parc( 1 ),
+         ISNUM(2)  ? hb_parni(2) : 0,
+         ISCHAR(3) ? hb_parc(3) : "" ) != -1 );
+      return;
+   }
+   hb_retl( FALSE );
 }
 
 HB_FUNC( PDF_SET_INFO )
@@ -102,7 +111,7 @@ HB_FUNC( PDF_SETFONT )
 
 HB_FUNC( PDF_FINDFONT )
 {
-   hb_retni( PDF_findfont( pPDFLib, hb_parc(1), hb_parc(2), hb_parni(3) ) );
+   hb_retni( PDF_findfont( pPDFLib, hb_parc(1), ISCHAR(2) ? hb_parc(2) : "host", hb_parni(3) ) );
 }
 
 HB_FUNC( PDF_SET_TEXT_POS )
@@ -118,4 +127,70 @@ HB_FUNC( PDF_CONTINUE_TEXT )
 HB_FUNC( PDF_END_DOCUMENT )
 {
    PDF_end_document( pPDFLib, hb_parc(1) );
+}
+
+HB_FUNC( PDF_SET_PARAMETER )
+{
+   PDF_set_parameter(pPDFLib, hb_parc(1), hb_parc(2) );
+}
+
+HB_FUNC( PDF_CLOSE_IMAGE )
+{
+   PDF_close_image(pPDFLib, hb_parni(1) );
+}
+
+HB_FUNC( PDF_LOAD_IMAGE )
+{
+   if ( ISCHAR(1) )
+   {
+      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
+
+      if( pFileName->szExtension )
+      {
+         char *szExt = hb_strlow( (char*) pFileName->szExtension );
+         char *szImageType = NULL;
+
+         if ( strcmp( szExt, ".gif" ) == 0 )
+            szImageType = "gif";
+         else if ( strcmp( szExt, ".bmp" ) == 0 )
+            szImageType = "bmp";
+         else if ( strcmp( szExt, ".png" ) == 0 )
+            szImageType = "png";
+
+         hb_xfree( pFileName );
+
+         if ( szImageType )
+         {
+            hb_retni( PDF_load_image( pPDFLib, szImageType, hb_parcx(1), 0, hb_parcx(2) ) );
+            return;
+         }
+      }
+   }
+
+   hb_retni( -1 );
+}
+
+HB_FUNC( PDF_SETCOLOR )
+{
+   PDF_setcolor(pPDFLib, hb_parc(1), hb_parc(2), hb_parnd(3), hb_parnd(4), hb_parnd(5), hb_parnd(6) );
+}
+
+HB_FUNC( PDF_RECT )
+{
+   PDF_rect(pPDFLib, hb_parnd(1), hb_parnd(2), hb_parnd(3), hb_parnd(4) );
+}
+
+HB_FUNC( PDF_FILL )
+{
+   PDF_fill(pPDFLib);
+}
+
+HB_FUNC( PDF_CREATE_BOOKMARK )
+{
+   hb_retni( PDF_add_bookmark(pPDFLib, hb_parc(1), hb_parni(2), hb_parni(3) ) );
+}
+
+HB_FUNC( PDF_FIT_IMAGE )
+{
+   PDF_fit_image( pPDFLib, hb_parni(1), hb_parnd(2), hb_parnd(3), hb_parc(4) );
 }

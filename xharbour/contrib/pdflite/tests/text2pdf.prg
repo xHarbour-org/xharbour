@@ -20,14 +20,14 @@ PROCEDURE MAIN()
    LOCAL width := 595
    LOCAL cTextFile := "pdflib.txt"
 
-   if !Empty ( PDF_new() )
+   if PDF_new()
 
       if ( handle := fopen( cTextFile ) ) != -1
 
          x := margin
          y := height - margin
 
-         PDF_begin_document( pdffilename, 0, "")
+         PDF_begin_document( pdffilename )
          PDF_set_info( "Title",   "Converted text" )
          PDF_set_info( "Creator", "Text2pdf" )
 
@@ -35,12 +35,12 @@ PROCEDURE MAIN()
 
             if (y < margin)
                 y := height - margin
-                PDF_end_page_ext("")
+                PDF_end_page_ext()
             endif
 
             if ( y == height - margin )
-                font := PDF_findfont( fontname, "host" )
-                PDF_begin_page_ext(width, height, "")
+                font := PDF_findfont( fontname )
+                PDF_begin_page_ext(width, height )
                 PDF_setfont( font, fontsize )
                 PDF_set_text_pos( x, y )
                 y -= fontsize
@@ -54,12 +54,12 @@ PROCEDURE MAIN()
          fclose( handle )
 
          if (y != height - margin)
-            PDF_end_page_ext("")
+            PDF_end_page_ext()
          endif
 
       endif
 
-      PDF_end_document("")
+      PDF_end_document()
       PDF_delete()
 
    endif
