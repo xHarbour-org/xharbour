@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-15 09:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/pdflite/hbpdflib.c
+    ! potential memory leak on PDF_load_image() fixed.
+
 2012-07-15 07:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/pdflite/hbpdflib.c
     + add some graphic functions

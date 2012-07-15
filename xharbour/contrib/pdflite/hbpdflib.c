@@ -165,6 +165,7 @@ HB_FUNC( PDF_LOAD_IMAGE )
             return;
          }
       }
+      hb_xfree( pFileName );
    }
 
    hb_retni( -1 );
