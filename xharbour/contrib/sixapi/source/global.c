@@ -444,7 +444,20 @@ HB_FUNC( SX_SETCHRCOLLATE )
 {
    PHB_ITEM vParam = hb_param( 1, HB_IT_ARRAY );
 
-   hb_retl( sx_SysProp( SDE_SP_SETCHRCOLLATE, ( PVOID ) vParam->item.asArray.value ) );
+   if( vParam )
+   {
+      char * szChrCollate[255];
+      ULONG ulLen = HB_ARRAY_LEN( vParam );
+      ULONG u;
+
+      for ( u = 0; u < ulLen ; u ++ )
+         szChrCollate[ u ] = hb_arrayGetCPtr( vParam, u + 1 );
+
+      hb_retl( sx_SysProp( SDE_SP_SETCHRCOLLATE, ( PVOID ) szChrCollate ) );
+      return;
+   }
+
+   hb_retl( FALSE );
 }
 
 /*
@@ -547,7 +560,20 @@ HB_FUNC( SX_SETOEMCOLLATE )
 {
    PHB_ITEM vParam = hb_param( 1, HB_IT_ARRAY );
 
-   hb_retl( sx_SysProp( SDE_SP_SETOEMCOLLATE, ( PVOID ) vParam->item.asArray.value ) );
+   if( vParam )
+   {
+      char * sxOEMCollate[255];
+      ULONG ulLen = HB_ARRAY_LEN( vParam );
+      ULONG u;
+
+      for ( u = 0; u < ulLen ; u ++ )
+         sxOEMCollate[ u ] = hb_arrayGetCPtr( vParam, u + 1 );
+
+      hb_retl( sx_SysProp( SDE_SP_SETOEMCOLLATE, ( PVOID ) sxOEMCollate ) );
+      return;
+   }
+
+   hb_retl( FALSE );
 }
 
 /*

@@ -24,6 +24,8 @@
  */
 #include "sxapi.h"
 
+HB_FUNC_EXTERN( SX_REPLACEARRAY );
+
 HB_FUNC( SX_REPLACE )  /* ( cpFieldName, xData, cArea ) */
 {
    PHB_ITEM pItem = hb_param( 2, HB_IT_ANY );
@@ -145,6 +147,11 @@ HB_FUNC( SX_REPLACEBITMAP )  // ( cpFieldName, xData, cArea )
    }
 }
 
+HB_FUNC( __SX_FORCELINK_SX_REPLACEARRAY )
+{
+   HB_FUNC_EXEC( SX_REPLACEARRAY );
+}
+
 HB_FUNC( SX_REPLACEBLOB )    // ( cpFieldName, xData, cArea )
 {
    if( ! _sx_Used() )
@@ -167,8 +174,17 @@ HB_FUNC( SX_REPLACEBLOB )    // ( cpFieldName, xData, cArea )
       }
       else if( ISARRAY( 2 ) )
       {
-         pValue  = ( hb_param( 2, HB_IT_ARRAY ) )->item.asArray.value;
-         lResult = sx_PutBlob( cFieldName, pValue, ( LONG ) sizeof( pValue ) );
+         PHB_ITEM pAlias = hb_itemNew( NULL );
+         PHB_ITEM pFieldName = hb_itemNew( NULL );
+         PHB_ITEM pResult;
+
+         hb_itemPutC( pAlias, (const char*) sx_Alias( 0 ) );
+         hb_itemPutC( pFieldName, (const char*) cFieldName );
+         pResult = hb_itemDoC( "SX_REPLACEARRAY", 3, pFieldName, hb_param( 2, HB_IT_ARRAY ), pAlias );
+         lResult = HB_GETL( pResult );
+         hb_itemRelease( pAlias );
+         hb_itemRelease( pFieldName );
+         hb_itemRelease( pResult );
       }
 
       /* Back to Previous Area */
@@ -205,7 +221,6 @@ HB_FUNC( SX_REPLACEEX )      /* ( aReplace, cArea ) */
          /* Give Protection of NOT an array */
          if( HB_IS_ARRAY( pInfo ) && HB_ARRAY_LEN( pInfo ) >= 2 )
          {
-            /* if ( pInfo->item.asArray.value->ulLen >= 2 ) */
             cFieldName = ( PBYTE ) hb_arrayGetC( pInfo, 1 );
             uVarType   = ( WORD ) hb_arrayGetType( pInfo, 2 );
             switch( uVarType )

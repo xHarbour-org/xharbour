@@ -149,7 +149,7 @@ HB_FUNC( __SX_DBSORT ) // (file,afields,bfor,bwhile,nnext,nrec,lrest,rdd,ldescen
       sx_Select( sx_WorkArea( cSourceAlias ) );
 
       // Checking Array of Fields FOR MAKING INDEX !
-      uilenpArray         = pArray->item.asArray.value->ulLen;
+      uilenpArray         = HB_ARRAY_LEN( pArray );
       *cIndexExpression   = '\0';
       if( uilenpArray > 0 )
       {
