@@ -555,10 +555,10 @@ RDDSQL_INCLUDE=-I"$(HB_DIR_FIREBIRD)\include" $(RDDSQL_INCLUDE)
 !ifdef HB_DIR_MAGIC
 RDDSQL_INCLUDE=-I"$(HB_DIR_MAGIC)\include" $(RDDSQL_INCLUDE)
 !endif
-INCLUDE_DIR=$(INCLUDE_DIR) $(RDDSQL_INCLUDE)
+INCLUDE_DIR=$(INCLUDE_DIR) $(RDDSQL_INCLUDE) -I"$(SIXAPI_DIR)\include"
 CLIBFLAGS=$(CLIBFLAGS) -cpp -mn $(ACEH_DIR) $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -D"_HAVE_SQLITE_CONFIG_H" -D"HARBOUR_CONF"
 CLIBFLAGS_C=-mn $(ACEH_DIR) $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -D"_HAVE_SQLITE_CONFIG_H" -D"HARBOUR_CONF"
-HB_CMD=$(HARBOUR_EXE) -i"include" -i"$(GDLIB_DIR)\include" -i"$(WHAT32_DIR)\include" -i"$(XWT_DIR)\include" -n1 -q0 -w2 -es2 -gc0 $** -o$@
+HB_CMD=$(HARBOUR_EXE) -i"include" -i"$(SIXAPI_DIR)\include" -i"$(GDLIB_DIR)\include" -i"$(WHAT32_DIR)\include" -i"$(XWT_DIR)\include" -n1 -q0 -w2 -es2 -gc0 $** -o$@
 CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
 CC_CMD_ZIP=SCPPN -cpp -mn -I"include" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(HBZIP_DIR)\include" -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -o$@ $**
 CCC_CMD=SCPPN $(CLIBFLAGS_C) -o$@ $**
@@ -732,6 +732,9 @@ $(HBMLZO_LIB) : $(HBMLZO_LIB_OBJS)
 	$(LIB_CMD)
 
 $(HBBTREE_LIB) : $(HBBTREE_LIB_OBJS)
+	$(LIB_CMD)
+
+$(SIXAPI_LIB) : $(SIXAPI_LIB_OBJS)
 	$(LIB_CMD)
 
 !endif

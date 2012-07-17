@@ -93,6 +93,7 @@ PDFLITE_DIR   =contrib$(DIR_SEP)pdflite
 JPEG_DIR      =contrib$(DIR_SEP)jpeg
 TIFF_DIR      =contrib$(DIR_SEP)tiff
 HBBTREE_DIR   =contrib$(DIR_SEP)hbbtree
+SIXAPI_DIR    =contrib$(DIR_SEP)sixapi
 
 INCLUDE_DIR2  =include
 
@@ -147,6 +148,7 @@ HB_GT_LIBS  =$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTWVT_LIB) $(
 #===============================================================================
 # Contrib Library Names
 #===============================================================================
+SIXAPI_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sixapi$(LIBEXT)
 HBBTREE_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbbtree$(LIBEXT)
 TIFF_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)tiff$(LIBEXT)
 JPEG_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)jpeg$(LIBEXT)
@@ -256,6 +258,62 @@ HARBOUR_LIBS=\
 #===============================================================================
 
 #===============================================================================
+# SIXAPI.LIB
+#===============================================================================
+SIXAPI_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)aliasSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)appendSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)baseSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)bofeofSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)closeSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)commitSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)copySIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)countSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)createSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)dbcopySIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)dbdelimSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)dbevalSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)dbsortSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)dbstruSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)decryptSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)deleteSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)descendSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)emptySIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)encryptSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)evalSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)fieldSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)filterSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)finalizeSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)getSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)goSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)indexSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)isnullSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)lockSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)putSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)querySIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)recSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)replaceSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ryoSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)seekSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)selectSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)setSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)skipSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)strSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)syspropSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)useSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)arraySIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)browdbSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)browseSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)dbeditSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)fblockSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)sdeSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ttableSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ttagSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tindexSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)globalSIXAPI$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)toolsSIXAPI$(OBJEXT)
+
+#===============================================================================
 # HVMALL.OBJ
 #===============================================================================
 VM_ALL_OBJS=\
@@ -267,7 +325,6 @@ VM_ALL_OBJS=\
 HBBTREE_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hb_btree$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)tbtree$(OBJEXT)
-
 
 #===============================================================================
 # TIFF.LIB Dependencies
@@ -2367,5 +2424,6 @@ CONTRIB_PROJECT=\
 	$(LIBHARU_LIB)\
 	$(HBEXPAT_LIB)\
 	$(HBTINYMT_LIB)\
-	$(HBBTREE_LIB)
+	$(HBBTREE_LIB)\
+	$(SIXAPI_LIB)
 

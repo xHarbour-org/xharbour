@@ -467,10 +467,10 @@ ifdef HB_DIR_MAGIC
 RDDSQL_INCLUDE+=-I"$(HB_DIR_MAGIC)/include"
 endif
 
-HARBOURFLAGS+=-iinclude -i$(GDLIB_DIR)/include -i$(WHAT32_DIR)/include -i$(XWT_DIR)/include -q0 -w2 -es2 -gc0
+HARBOURFLAGS+=-iinclude -i$(SIXAPI_DIR)/include -i$(GDLIB_DIR)/include -i$(WHAT32_DIR)/include -i$(XWT_DIR)/include -q0 -w2 -es2 -gc0
 CLIBFLAGS   +=-D__WIN32__ -DHARBOUR_CONF -D_HAVE_SQLITE_CONFIG_H -Wall $(NOCYGWIN) -O3 -fomit-frame-pointer -march=i586 -mtune=pentium -c -fno-strict-aliasing
 CLIBFLAGS   +=$(RDDSQL_INCLUDE) $(ACEH_DIR) -Iinclude -I"$(FREEIMAGE_DIR)/include" -I"$(GDLIB_DIR)/include" -I"$(XWT_DIR)/include" -I"$(XWT_DIR)/src/xwt_win" -I"$(ZLIB_DIR)" -I"$(PNG_DIR)" $(OPENSSL_DIR) $(CURL_DIR)
-CLIBFLAGS   +=$(CAIRO_DIR)
+CLIBFLAGS   +=$(CAIRO_DIR) -I"$(SIXAPI_DIR)/include"
 
 ifeq ($(HB_THREAD_SUPPORT),1)
 	CLIBFLAGS+=-DHB_THREAD_SUPPORT -mthreads
@@ -669,6 +669,9 @@ $(HBMLZO_LIB) : $(HBMLZO_LIB_OBJS)
 	$(LIB_CMD)
 
 $(HBBTREE_LIB) : $(HBBTREE_LIB_OBJS)
+	$(LIB_CMD)
+
+$(SIXAPI_LIB) : $(SIXAPI_LIB_OBJS)
 	$(LIB_CMD)
 
 endif

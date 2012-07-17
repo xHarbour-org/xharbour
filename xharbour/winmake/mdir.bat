@@ -130,6 +130,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%hbbz2%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%hblzf%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%hblzf%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbmlzo%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%hbmlzo%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbbtree%LIBEXT%  copy lib\%SUB_DIR%\%LIBPREFIX%hbbtree%LIBEXT% lib >NUL
+if exist lib\%SUB_DIR%\%LIBPREFIX%sixapi%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%sixapi%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbcairo%LIBEXT%  copy lib\%SUB_DIR%\%LIBPREFIX%hbcairo%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbmagic%LIBEXT%  copy lib\%SUB_DIR%\%LIBPREFIX%hbmagic%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbtinymt%LIBEXT% copy lib\%SUB_DIR%\%LIBPREFIX%hbtinymt%LIBEXT% lib >NUL
@@ -276,6 +277,7 @@ if exist lib\%LIBPREFIX%tipssl%LIBEXT%               del lib\%LIBPREFIX%tipssl%L
 if exist lib\%LIBPREFIX%hbcurl%LIBEXT%               del lib\%LIBPREFIX%hbcurl%LIBEXT%
 if exist lib\%LIBPREFIX%hbmlzo%LIBEXT%               del lib\%LIBPREFIX%hbmlzo%LIBEXT%
 if exist lib\%LIBPREFIX%hbbtree%LIBEXT%              del lib\%LIBPREFIX%hbbtree%LIBEXT%
+if exist lib\%LIBPREFIX%sixapi%LIBEXT%               del lib\%LIBPREFIX%sixapi%LIBEXT%
 if exist lib\%LIBPREFIX%hblzf%LIBEXT%                del lib\%LIBPREFIX%hblzf%LIBEXT%
 if exist lib\%LIBPREFIX%hbbz2%LIBEXT%                del lib\%LIBPREFIX%hbbz2%LIBEXT%
 if exist lib\%LIBPREFIX%hbcairo%LIBEXT%              del lib\%LIBPREFIX%hbcairo%LIBEXT%
@@ -512,6 +514,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%hbbz2%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%hblzf%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%hblzf%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbmlzo%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%hbmlzo%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbbtree%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%hbbtree%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%sixapi%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%sixapi%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbcairo%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%hbcairo%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbmagic%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%hbmagic%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbtinymt%LIBEXT%  del lib\%SUB_DIR%\%LIBPREFIX%hbtinymt%LIBEXT%

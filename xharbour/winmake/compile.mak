@@ -88,6 +88,192 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
 	$(MT_CMD)
 
 #===============================================================================
+# SIXAPI.LIB
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)tindexSIXAPI$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)tindexSIXAPI.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tindexSIXAPI.c : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)tindex.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ttagSIXAPI$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)ttagSIXAPI.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ttagSIXAPI.c : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)ttag.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ttableSIXAPI$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)ttableSIXAPI.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ttableSIXAPI.c : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)ttable.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)aliasSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)alias.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)appendSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)append.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)baseSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)base.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)bofeofSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)bofeof.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)closeSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)close.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)commitSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)commit.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)copySIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)copy.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)countSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)count.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)createSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)create.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbcopySIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)dbcopy.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbdelimSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)dbdelim.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbevalSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)dbeval.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbsortSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)dbsort.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbstruSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)dbstru.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)decryptSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)decrypt.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)deleteSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)delete.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)descendSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)descend.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dllentrySIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)dllentry.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)emptySIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)empty.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)encryptSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)encrypt.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)evalSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)eval.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)fieldSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)field.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)filterSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)filter.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)finalizeSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)finalize.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)getSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)get.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)goSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)go.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)indexSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)index.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)isnullSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)isnull.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)lockSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)lock.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)putSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)put.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)querySIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)query.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)recSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)rec.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)replaceSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)replace.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ryoSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)ryo.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)seekSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)seek.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)selectSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)select.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)setSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)set.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)skipSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)skip.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)strSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)str.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)syspropSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)sysprop.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)useSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)use.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)arraySIXAPI$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)array.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)browdbSIXAPI$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)browdbSIXAPI.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)browseSIXAPI$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)browseSIXAPI.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbeditSIXAPI$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)dbeditSIXAPI.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)fblockSIXAPI$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)fblock.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)array.c : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)array.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)browdbSIXAPI.c : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)browdb.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)browseSIXAPI.c : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)browse.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dbeditSIXAPI.c : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)dbedit.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)fblock.c : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)fblock.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)initproc.c : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)initproc.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)sdeSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)sde.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)globalSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)global.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)toolsSIXAPI$(OBJEXT) : $(SIXAPI_DIR)$(DIR_SEP)source$(DIR_SEP)tools.c
+	$(CC_CMD)
+
+#===============================================================================
 # HBBTREE.LIB Dependencies
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)hb_btree$(OBJEXT) : $(HBBTREE_DIR)$(DIR_SEP)hb_btree.c
