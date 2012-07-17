@@ -387,8 +387,8 @@ extern VOID sx_AddDetecCollation( VOID );
 typedef VOID ( WINAPI * SX_ADDDUDENCOLLATION )( VOID );
 extern VOID sx_AddDudenCollation( VOID );
 
-typedef LONG ( WINAPI * SX_ALIAS )( WORD uiWorkArea );
-extern LONG sx_Alias( WORD uiWorkArea );
+typedef PBYTE ( WINAPI * SX_ALIAS )( WORD uiWorkArea );
+extern PBYTE sx_Alias( WORD uiWorkArea );
 
 typedef VOID ( WINAPI * SX_APPEND )( VOID );
 extern VOID    sx_Append( VOID );

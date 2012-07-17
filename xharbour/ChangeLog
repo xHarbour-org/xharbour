@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-18 06:04 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/sixapi/include/sxapi.h
+  * contrib/sixapi/source/sde.c
+    ! sx_Alias to return PBYTE
+
 2012-07-18 05:51 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/sixapi/source/dbcopy.c
   * contrib/sixapi/source/dbsort.c

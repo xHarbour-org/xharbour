@@ -105,7 +105,7 @@ VOID sx_AddDudenCollation( VOID )
    pFunc();
 }
 
-LONG sx_Alias( WORD uiWorkArea )
+PBYTE sx_Alias( WORD uiWorkArea )
 {
 #ifdef __cplusplus
    static SX_ALIAS
