@@ -347,6 +347,4 @@
 #define TAB_DELIM                 23
 #define SPACE_DELIM               24
 
-REQUEST SXAPI
-
 #endif //  end __SIXAPI__
