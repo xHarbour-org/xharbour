@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-18 00:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/sixapi/tests/test01.prg
+    ! corrected syntax error
+
 2012-07-18 00:37 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/sixapi/include/sixapi.ch
     - delete "REQUEST SXAPI"
