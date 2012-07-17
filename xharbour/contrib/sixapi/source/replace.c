@@ -45,8 +45,16 @@ HB_FUNC( SX_REPLACE )  /* ( cpFieldName, xData, cArea ) */
       {
          case HB_IT_ARRAY:
          {
-            PVOID pValue = ( PVOID ) HB_ARRAY_LEN( hb_param( 2, HB_IT_ARRAY ) );
-            sx_PutBlob( cFieldName, pValue, ( LONG ) sizeof( pValue ) );
+            PHB_ITEM pAlias = hb_itemNew( NULL );
+            PHB_ITEM pFieldName = hb_itemNew( NULL );
+            PHB_ITEM pResult;
+
+            hb_itemPutC( pAlias, (const char*) sx_Alias( 0 ) );
+            hb_itemPutC( pFieldName, (const char*) cFieldName );
+            pResult = hb_itemDoC( "SX_REPLACEARRAY", 3, pFieldName, hb_param( 2, HB_IT_ARRAY ), pAlias );
+            hb_itemRelease( pAlias );
+            hb_itemRelease( pFieldName );
+            hb_itemRelease( pResult );
             break;
          }
 
