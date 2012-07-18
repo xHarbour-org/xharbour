@@ -411,7 +411,7 @@ HB_FUNC( SX_GETRECORDEX )
 
    sx_GetRecord( cpRecord );
    pString = hb_itemPutCL( NULL, ( char * ) ( cpRecord ), 1 );
-   HB_STORC( ( char * ) pString->item.asString.value, -1, 1 );
+   HB_STORC( ( char * ) HB_GETC( pString ), -1, 1 );
    if( pString )
       hb_itemRelease( pString );
 
@@ -422,7 +422,7 @@ HB_FUNC( SX_GETRECORDEX )
       iFieldWidth   = sx_FieldWidth( cpFieldName );
       pString       = hb_itemPutCL( NULL, ( char * ) ( cpRecord + iOffSet - 1 ),
                                     iFieldWidth );
-      HB_STORC( pString->item.asString.value, -1, i + 2 );
+      HB_STORC( HB_GETC( pString ), -1, i + 2 );
       if( pString )
          hb_itemRelease( pString );
    }
