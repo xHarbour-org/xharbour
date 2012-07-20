@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-20 20:46 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbcab/cabinet.h
+  * contrib/hbcab/compress.c
+    ! minor formatting
+
 2012-07-20 20:26 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   + contrib/hbcab
   + contrib/hbcab/cabinet.c
@@ -36,7 +41,6 @@
   * winmake/makefile.wc
   * winmake/mdir.bat
     + inclusion of hbcab.lib
-
 
 2012-07-18 08:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/sixapi/source/get.c

@@ -137,9 +137,9 @@ extern BOOL hb_FDIDestroy( HFDI hfdi );
 #define COMPRESSION_TYPE   tcompTYPE_MSZIP
 
 #if defined ( __POCC__ )
-   #define TEMPNAME( a, b )   tmpnam( NULL )
+   #define TEMPNAME()   tmpnam( NULL )
 #else
-   #define TEMPNAME( a, b )   _tempnam( "", "xx" )
+   #define TEMPNAME()   _tempnam( "", "xx" )
 #endif
 
 #if defined( __BORLANDC__ )

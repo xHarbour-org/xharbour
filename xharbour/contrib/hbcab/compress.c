@@ -115,7 +115,7 @@ HB_FUNC( HB_CREATECAB )
       fci_delete,
       get_temp_file,
       &cab_parms,
-      vCallBack /* &cs */
+      vCallBack
       );
 
    if( ! hfci )
@@ -345,7 +345,7 @@ static int file_placed( PCCAB pccab, char * pszFile, long cbFile, BOOL fContinua
 
 static BOOL get_temp_file( char * pszTempName, int cbTempName, void * pv )
 {
-   char * psz = TEMPNAME( "", "xx" );   // Get a name
+   char * psz = TEMPNAME();            // Get a name
 
    if( ( psz != NULL ) && ( strlen( psz ) < ( unsigned ) cbTempName ) )
    {
@@ -361,6 +361,7 @@ static BOOL get_temp_file( char * pszTempName, int cbTempName, void * pv )
 
    return FALSE;
 }
+
 static long progress( UINT typeStatus, ULONG cb1, ULONG cb2, void * pv )
 {
    PHB_ITEM bBlock = ( PHB_ITEM ) pv;
