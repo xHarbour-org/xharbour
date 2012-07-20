@@ -88,6 +88,18 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
 	$(MT_CMD)
 
 #===============================================================================
+# HBCAB.LIB
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)cabinetHBCAB$(OBJEXT) : $(HBCAB_DIR)$(DIR_SEP)cabinet.c
+        $(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)compressHBCAB$(OBJEXT) : $(HBCAB_DIR)$(DIR_SEP)compress.c
+        $(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)decompressHBCAB$(OBJEXT) : $(HBCAB_DIR)$(DIR_SEP)decompress.c
+        $(CCC_CMD)
+
+#===============================================================================
 # SIXAPI.LIB
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)tindexSIXAPI$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)tindexSIXAPI.c

@@ -737,6 +737,9 @@ $(HBBTREE_LIB) : $(HBBTREE_LIB_OBJS)
 $(SIXAPI_LIB) : $(SIXAPI_LIB_OBJS)
 	$(LIB_CMD)
 
+$(HBCAB_LIB) : $(HBCAB_LIB_OBJS)
+	$(LIB_CMD)
+
 !endif
 
 #===============================================================================

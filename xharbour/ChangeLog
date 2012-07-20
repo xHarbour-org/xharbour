@@ -8,6 +8,36 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-20 20:26 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + contrib/hbcab
+  + contrib/hbcab/cabinet.c
+  + contrib/hbcab/cabinet.h
+  + contrib/hbcab/compress.c
+  + contrib/hbcab/decompress.c
+  + contrib/hbcab/fci.h
+  + contrib/hbcab/fdi.h
+  + contrib/hbcab/tests
+  + contrib/hbcab/tests/cabtest1.txt
+  + contrib/hbcab/tests/cabtest2.txt
+  + contrib/hbcab/tests/cabtest3.txt
+  + contrib/hbcab/tests/cabtest4.txt
+  + contrib/hbcab/tests/compress.prg
+  + contrib/hbcab/tests/decompress.prg
+    + Ms's proprietary CABinet compression/decompression generically
+    transported to xHarbour.
+
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/makefile.bc
+  * winmake/makefile.dc
+  * winmake/makefile.gc
+  * winmake/makefile.pc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+  * winmake/mdir.bat
+    + inclusion of hbcab.lib
+
+
 2012-07-18 08:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/sixapi/source/get.c
     ! do not access internals

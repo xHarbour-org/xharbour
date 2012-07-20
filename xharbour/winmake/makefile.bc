@@ -1015,6 +1015,13 @@ $(SIXAPI_LIB) : $(SIXAPI_LIB_OBJS)
 +)
 !
 
+$(HBCAB_LIB) : $(HBCAB_LIB_OBJS)
+	IF EXIST "$(HBCAB_LIB)" $(DEL) "$(HBCAB_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
 !endif
 
 #===============================================================================

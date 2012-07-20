@@ -94,6 +94,7 @@ JPEG_DIR      =contrib$(DIR_SEP)jpeg
 TIFF_DIR      =contrib$(DIR_SEP)tiff
 HBBTREE_DIR   =contrib$(DIR_SEP)hbbtree
 SIXAPI_DIR    =contrib$(DIR_SEP)sixapi
+HBCAB_DIR     =contrib$(DIR_SEP)hbcab
 
 INCLUDE_DIR2  =include
 
@@ -148,6 +149,7 @@ HB_GT_LIBS  =$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTWVT_LIB) $(
 #===============================================================================
 # Contrib Library Names
 #===============================================================================
+HBCAB_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbcab$(LIBEXT)
 SIXAPI_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sixapi$(LIBEXT)
 HBBTREE_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbbtree$(LIBEXT)
 TIFF_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)tiff$(LIBEXT)
@@ -256,6 +258,14 @@ HARBOUR_LIBS=\
 #===============================================================================
 # List Of Library and Executable Dependencies
 #===============================================================================
+
+#===============================================================================
+# HBCAB.LIB
+#===============================================================================
+HBCAB_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)cabinetHBCAB$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)compressHBCAB$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)decompressHBCAB$(OBJEXT)
 
 #===============================================================================
 # SIXAPI.LIB
@@ -2425,5 +2435,6 @@ CONTRIB_PROJECT=\
 	$(HBEXPAT_LIB)\
 	$(HBTINYMT_LIB)\
 	$(HBBTREE_LIB)\
-	$(SIXAPI_LIB)
+	$(SIXAPI_LIB)\
+	$(HBCAB_LIB)
 
