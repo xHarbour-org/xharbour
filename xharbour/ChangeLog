@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-21 07:41 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/tip/httpcln.prg
+    + throw error when invalid protocol is passed as argument
+
 2012-07-20 20:46 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbcab/cabinet.h
   * contrib/hbcab/compress.c

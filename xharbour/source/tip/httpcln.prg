@@ -53,6 +53,7 @@
 
 #include "hbclass.ch"
 #include "tip.ch"
+#include "error.ch"
 
 /**
 * Inet service manager: http
@@ -107,7 +108,22 @@ Return
 
 METHOD New( oUrl,lTrace, oCredentials) CLASS tIPClientHTTP
    local cFile :="http"
-   local n := 0
+   local n := 0 , oErr
+
+   IF .NOT. oURL:cProto IN "ftp,http,pop,smtp"
+      oErr := ErrorNew()
+      oErr:Args          := { Self, oURL:cProto }
+      oErr:CanDefault    := .F.
+      oErr:CanRetry      := .F.
+      oErr:CanSubstitute := .T.
+      oErr:Description   := "unsupported protocol"
+      oErr:GenCode       := EG_UNSUPPORTED
+      oErr:Operation     := ::className()+":new()"
+      oErr:Severity      := ES_ERROR
+      oErr:SubCode       := 1081
+      oErr:SubSystem     := "BASE"
+      Throw( oErr )
+   ENDIF
 
    ::super:new( oUrl, lTrace, oCredentials )
    ::nDefaultPort := 80
