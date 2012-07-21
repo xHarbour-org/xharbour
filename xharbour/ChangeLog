@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-21 12:56 UTC-0300 Marcos Antonio Gambeta <marcosgambeta at uol.com.br>
+  * winmake/compile.mak
+    Spaces replaced by TABs in the lines 94, 97 and 100 (to fix compilation
+    with MinGW)
+
 2012-07-21 10:01 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/tip/client.prg
     ! assign ::ltrace before other stuff in Method New()
