@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-21 09:46 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/tip/url.prg
+    * reverted changes :-((
+
 2012-07-21 09:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/tip/httpcln.prg
     ! reverted previous changes
