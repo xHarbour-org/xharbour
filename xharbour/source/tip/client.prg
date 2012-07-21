@@ -175,6 +175,8 @@ METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClient
 
    Default lTrace to .F.
 
+   ::lTrace       := lTrace
+
    IF .not. ::bInitSocks
       InetInit()
       ::bInitSocks := .T.
@@ -209,7 +211,6 @@ METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClient
    ::nRead        := 0
    ::nLastRead    := 0
    ::bEof         := .F.
-   ::lTrace       := lTrace
 
 RETURN self
 
