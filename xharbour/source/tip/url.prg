@@ -52,6 +52,7 @@
  */
 
 #include "hbclass.ch"
+#include "error.ch"
 
 /*
 * An URL:
@@ -74,6 +75,7 @@ CLASS tURL
    DATA nPort
    DATA cUserid
    DATA cPassword
+   DATA lValid INIT .T.
 
    METHOD New( cUrl )
    METHOD SetAddress( cUrl )
@@ -90,7 +92,25 @@ ENDCLASS
 
 
 METHOD New( cUrl ) CLASS tURL
+
+   LOCAL oErr
+
    ::SetAddress( cUrl )
+
+   IF ::lValid
+      oErr := ErrorNew()
+      oErr:Args          := { Self, cUrl }
+      oErr:CanDefault    := .F.
+      oErr:CanRetry      := .F.
+      oErr:CanSubstitute := .T.
+      oErr:Description   := "unsupported protocol"
+      oErr:GenCode       := EG_UNSUPPORTED
+      oErr:Operation     := ::className()+":new()"
+      oErr:Severity      := ES_ERROR
+      oErr:SubCode       := 1081
+      oErr:SubSystem     := "BASE"
+      Throw( oErr )
+   ENDIF
 RETURN Self
 
 
@@ -116,6 +136,7 @@ METHOD SetAddress( cUrl ) CLASS tURL
 
    //May fail
    IF Empty( aMatch )
+      ::lValid := .F.
       RETURN .F.
    ENDIF
 
