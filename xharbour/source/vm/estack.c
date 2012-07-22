@@ -195,20 +195,23 @@ void hb_stackFree( void )
 #endif
 }
 
+HB_EXTERN_BEGIN
+
+#if defined( HB_VM_ALL )
+   BOOL _hb_stack_ready( void )
+   {
+      return hb_stack_ready;
+   }
+#endif
+
 #if ( defined( HB_THREAD_SUPPORT ) && defined( HB_VM_ALL ) )
    /*
    Wrapper to avoid direct access to stack. Needed if VM is amalgamated.
    */
-   HB_EXTERN_BEGIN
 
    BOOL hb_stackcheckrddpstack( const char * szName, HB_STACK *pstack )
    {
       return ( pstack == &hb_stackMT || strncmp( szName, ":TH:", 4 ) == 0 );
-   }
-
-   BOOL _hb_stack_ready( void )
-   {
-      return hb_stack_ready;
    }
 
    HB_MATH_EXCEPTION hb_s_hb_exc ( void )
@@ -216,8 +219,8 @@ void hb_stackFree( void )
       return (HB_VM_STACK.math_exc);
    }
 
-   HB_EXTERN_END
 #endif
+HB_EXTERN_END
 
 #undef hb_stackSetStruct
 PHB_SET_STRUCT hb_stackSetStruct( void )
