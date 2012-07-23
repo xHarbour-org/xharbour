@@ -66,7 +66,7 @@ static int    s_argc = 0;
 static char * s_argv[ MAX_ARGS ];
 static char   s_szAppName[ 256 ];
 
-int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
+int APIENTRY WinMain( HINSTANCE hInstance,      /* handle to current instance */
                     HINSTANCE hPrevInstance,  /* handle to previous instance */
                     LPSTR lpCmdLine,          /* pointer to command line */
                     int iCmdShow )            /* show state of window */
@@ -151,7 +151,7 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
          }
       }
    }
-
+   printf( "mainwin ..\n" );
    hb_winmainArgInit( hInstance, hPrevInstance, iCmdShow );
    hb_cmdargInit( s_argc, s_argv );
 
@@ -166,7 +166,7 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
    return iResult;
 }
 
-#if ( defined( __DMC__ ) || defined( __WATCOMC__ ) || defined( __MINGW32__ ) ) && !defined(__EXPORT__)
+#if ( defined( __DMC__ ) || defined( __WATCOMC__ ) /* || defined( __MINGW32__ ) */ ) && !defined(__EXPORT__)
 HB_EXTERN_BEGIN
 void hb_forceLinkMainWin( void ) {}
 HB_EXTERN_END

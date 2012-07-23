@@ -8,6 +8,24 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-23 22:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/mainwin.c
+  * source/vm/hvm.c
+    ! MINGW32 does not require hb_forceLinkMainWin() to be force-linked,
+    condition is hence removed.
+
+  * winmake/compile.mak
+  * winmake/makefile.gc
+    ! remove mainstd and mainwin as library members of MINGW's vm.lib due
+    to the fact that in GUI mode, MINGW (eg. ver 4.7.1 of nuwen.net) sometimes
+    fails to use mainwin as startup, IOW MINGW always searches for main() which
+    is in mainstd.c. This results in a non-initialization of GUI handles which
+    throw an error of non-GUI program although appropriate flags have been
+    assigned to MINGW's linker. This configuration is IMHO a correct and very
+    clear way instead of letting MINGW guessing which startup is to be used in
+    an application. As a consequence thereof, programmers now have to explicitely
+    link mainstd for console applications, or mainwin for GUI applications.
+
 2012-07-23 01:26 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/estack.c
     ! hb_stack_ready also need in ST mode, sorry.

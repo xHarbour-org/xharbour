@@ -13,7 +13,7 @@
 # LINK COMMANDS
 #===============================================================================
 HRB_LINK_CMD=$(LINK_CMD) $(HRB_LIBS)
-EXE_LINK_CMD=$(LINK_CMD) $(EXE_LIBS)
+EXE_LINK_CMD=$(LINK_CMD) $(START_UP_OBJ) $(EXE_LIBS)
 CMN_LINK_CMD=$(LINK_CMD) $(CMN_LIBS)
 
 #===============================================================================

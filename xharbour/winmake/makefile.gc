@@ -31,6 +31,9 @@ ifeq ($(__BLD__),CORE_BLD)
 #===============================================================================
 include winmake/common.mak
 
+CONSOLE_LIB =$(LIB_DIR)/libconsole.a
+WINDOW_LIB  =$(LIB_DIR)/libwindow.a
+
 HBFILERE_EXE=
 
 ifeq ($(HB_GTALLEG),yes)
@@ -123,10 +126,11 @@ COMPILERLIBS=\
 	-L$(CC_DIR)/lib\
 	-luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr\
 	-lole32 -luuid -loleaut32 -lws2_32
+START_UP_OBJ=$(OBJ_DIR)/mainstd.o
 EXE_LIBS=$(HARBOUR_LIBS) $(COMPILERLIBS)
 HRB_LIBS=-L$(LIB_DIR) -Wl,--start-group -lpp -lcommon -lcompiler -Wl,--end-group $(COMPILERLIBS)
 CMN_LIBS=-L$(LIB_DIR) -lcommon $(COMPILERLIBS)
-LINK_CMD=GCC -Wall -o $@ $^ $(NOCYGWIN)
+LINK_CMD=GCC -mconsole -Wall -o $@ $^ $(NOCYGWIN)
 
 #===============================================================================
 # The Project
@@ -159,16 +163,12 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
 $(CT_LIB) : $(CT_LIB_OBJS)
 	$(LIB_CMD)
 
-VM_LIB_OBJS+=\
-	$(VM_MAIN_OBJS)
-
 ifndef HB_NO_VM_ALL
 VM_LIB_OBJS=\
 	$(VM_ALL_OBJS)
 endif
 VM_LIB_OBJS+=\
-	$(VM_COMMON_OBJS)\
-	$(VM_MAIN_OBJS)
+	$(VM_COMMON_OBJS)
 $(VM_LIB) : $(VM_LIB_OBJS)
 	$(LIB_CMD)
 
