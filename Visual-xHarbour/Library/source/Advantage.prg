@@ -26,9 +26,13 @@ CLASS AdsDataTable INHERIT DataTable
    DATA __ExplorerFilter EXPORTED  INIT { { "DataTable / Advantage (*.dbf,*.adt)", "*.dbf;*.adt" } }
    DATA __xCtrlName      EXPORTED  INIT "AdsDataTable"
 
-   METHOD File2Blob( cFile, cField ) INLINE (::Area)->( AdsFile2Blob( cFile, cField ) )
-   METHOD Blob2File( cFile, cField ) INLINE (::Area)->( AdsBlob2File( cFile, cField ) )
-   METHOD AdsSetServerType(n)        INLINE AdsSetServerType(n)
+   METHOD File2Blob( cFile, cField )          INLINE (::Area)->( AdsFile2Blob( cFile, cField ) )
+   METHOD Blob2File( cFile, cField )          INLINE (::Area)->( AdsBlob2File( cFile, cField ) )
+   METHOD AdsSetServerType(n)                 INLINE AdsSetServerType(n)
+   METHOD BlobImport( nFieldPos, cFile )      INLINE (::Area)->( BlobImport( nFieldPos, cFile ) )
+
+   METHOD BlobGet( nFieldNo, nStart, nCount ) INLINE (::Area)->( dbFieldInfo( DBS_BLOB_GET, nFieldNo, { nStart, nCount } ) )
+   METHOD MemoExt()                           INLINE ".adm"
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------

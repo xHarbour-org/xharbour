@@ -157,8 +157,13 @@ METHOD OnGetDlgCode( msg ) CLASS MaskEdit
          SetFocus( ::hWnd )
       ENDIF
       RETURN NIL
-    ENDIF
-RETURN DLGC_WANTALLKEYS
+   ENDIF
+   IF ::wParam == VK_RETURN
+      ::LastKey := ::wParam
+      ::PostMessage( WM_KEYDOWN, VK_TAB, ::lParam )
+      RETURN DLGC_WANTALLKEYS
+   ENDIF
+RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnUserMsg( hWnd, nMsg, nwParam ) CLASS MaskEdit

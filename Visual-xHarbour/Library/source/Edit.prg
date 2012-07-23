@@ -978,6 +978,11 @@ RETURN IIF( nRet == NIL, 0, nRet )
 METHOD OnKeyDown( nKey ) CLASS EditBox
    LOCAL h, lShift
    ::LastKey := nKey
+   IF nKey == VK_F1 .AND. IsKeyDown( VK_CONTROL ) .AND. HGetPos( ::EventHandler, "OnImageClick" ) > 0
+      ExecuteEvent( "OnImageClick", Self )
+      RETURN 0
+   ENDIF
+
    IF ::Transparent
       ::InvalidateRect(, .F.)
    ENDIF

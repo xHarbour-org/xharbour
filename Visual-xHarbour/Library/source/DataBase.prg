@@ -120,6 +120,7 @@ CLASS DataTable INHERIT Component
    METHOD Open()
    METHOD CreateFields()
    METHOD Create()
+   METHOD MemoExt()                           INLINE ::Connector:MemoExt() 
    METHOD Gather()                            INLINE ::Connector:Gather()
    METHOD Scatter( aData )                    INLINE ::Connector:Scatter( aData )
    METHOD SetTopScope( xScope )               INLINE ::Connector:SetTopScope( xScope )
@@ -278,7 +279,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Create( lIgnoreAO ) CLASS DataTable
-   LOCAL lChanged, n, cFileName, cPath, nServer
+   LOCAL lChanged, n, cFileName, cPath, nServer, cMemo
    IF ValType( ::Socket ) == "C" .AND. Ascan( ::Form:Property:Keys, {|c| Upper(c) == Upper(::Socket) } ) > 0
       ::Socket := ::Form:Property[ ::Socket ]
       IF ::__ClassInst == NIL
@@ -286,7 +287,7 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
       ENDIF
    ENDIF
    ::Connector:Create( lIgnoreAO )
-   IF ! Empty( ::__aTmpStruct )
+   IF ! Empty( ::__aTmpStruct ) .AND. ! Empty ( ::Structure )
       lChanged := LEN(::__aTmpStruct) <> LEN(::Structure) 
       IF ! lChanged
          FOR n := 1 TO LEN( ::__aTmpStruct )
@@ -313,6 +314,7 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
             ENDIF
             ::Close()
             dbUseArea( ! ::__lMemory, ::Driver, cPath + "\__" + cFileName, "modstru", .F., .F. )
+            cMemo := ::MemoExt()
 
             SELECT "modstru"
             APPEND FROM (cPath + "\" + cFileName) VIA (::Driver)
@@ -320,6 +322,11 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
             modstru->( dbCloseArea() )
             FERASE( cPath + "\" + cFileName )
             FRENAME( cPath + "\__" + cFileName, cPath + "\" + cFileName )
+            
+            n := RAT( ".", cFileName )
+            cFileName := Left( cFileName, n-1 ) + cMemo
+            FRENAME( cPath + "\__" + cFileName, cPath + "\" + cFileName )
+
             IF nServer != NIL
                ::AdsSetServerType( nServer )
             ENDIF
@@ -544,6 +551,7 @@ CLASS DataRdd
    METHOD FieldGet( nField )                  INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( FieldGet( nField ) ),)
    METHOD FieldType( nField )                 INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( FieldType( nField ) ),)
    METHOD OrdBagExt()                         INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdBagExt() ),)
+   METHOD MemoExt()                           INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( RddInfo( RDDI_MEMOEXT ) ), )
 
    METHOD CreateTable( cFile, aStru, cDriver) INLINE dbCreate( cFile, aStru, cDriver )
    METHOD Gather()
@@ -683,7 +691,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
          ENDIF
       ENDIF
 
-      IF !::Owner:__lMemory .AND. ::Owner:Driver != NIL .AND. ::Owner:Driver != NIL .AND. UPPER( ::Owner:Driver ) $ "ADSCDXADSNTXADSADT"
+      IF !::Owner:__lMemory .AND. ::Owner:Driver != NIL .AND. ::Owner:Driver != NIL .AND. UPPER( ::Owner:Driver ) $ "ADSCDXADSNTXADSADT" .AND. __objHasMsg( ::Owner, "ServerType" )
          nServer := ::Owner:AdsSetServerType( ::Owner:ServerType )
       ENDIF
       

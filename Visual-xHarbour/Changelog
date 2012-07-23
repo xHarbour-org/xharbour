@@ -7,26 +7,39 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-2013-06-29 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+
+2012-07-23 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Button:MultiLine property
+   + Added datatable MemoExt() and Advantage BlobImport() and BlobGet() functions
+   ! Fixed bug in DataTable testing for changed structure and fixed memo file
+     not being renamed after structure changed.
+   + Added EditBox/MaskEdit the ability to execute "OnImageClick" by hitting CTRL+F1 
+     so fast users don't have to grab the mouse to get the associated event.
+   + Added "Border" property to class FreeImage hence the BackgroundImage object.
+   ! Fixed FreeImage:LoadFromString( cData ) to default to ImageName if cData is NIL
+   ! Fixed MaskEdit Return key to not to depend on EditBox settings.
+
+   
+2012-06-29 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    * MaskEdit: Reworked and fixed the entire Validation process.
 
-2013-06-28 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+2012-06-28 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed MaskEdit:Valid event not being fired on SINGLE MaskEdit.
    - Removed property CueBanner from MaskEdit since the control sets a buffer
      as text and CueBanner needs the control text to be completely empty.
 
-2013-06-27 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+2012-06-27 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed bhg Renaming forms where the text in the project prg is incorrect
    ! Fixed bug renaming files when renaming forms risking the user doesn't 
      save the changes and losing the previous file.
 
-2013-06-26 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+2012-06-26 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed Renaming forms
    ! Fixed OwnerDraw buttons to paint correctly
    ! Fixed Button selected border.
    ! Fixed Modal and Modeless form autoclosing.
 
-2013-06-25 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+2012-06-25 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed ToolStripButtons to fire the OnClick event based on the HotKey assigned
      in the Text via &.
    ! Fixed Forms to intercept ToolStripButtons HotKeys and fire the corresponding 
@@ -35,7 +48,7 @@
      AutoClose is set to true.
 
    
-2013-06-22 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+2012-06-22 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed StatusBar unnecesary processing in a effort to remove flckering.
    ! Fixed Edit->Paste not being enabled when changing source code.
    ! Fixed bug when selecting text whouldn't enable the Copy command so users
@@ -48,15 +61,15 @@
      the empty white space it assumes the last record.
    + Added System:Cursor:Hand cursor.
 
-2013-06-19 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+2012-06-19 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed deleting TabPage to show the contents of the new current page.
    ! Fixed DataGrid HeaderOnClick error.
    ! Fixed DataGrid to keep the assigned cursor even if it has to be changed by the system.
 
-2013-06-14 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+2012-06-14 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed IntelliSense not showing the controls in the current form.
 
-2013-06-13 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+2012-06-13 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed designer rectangle selection handlers position when scrolling current form.
    ! Fixed Flicker in TabStrip when moving its parent.
 

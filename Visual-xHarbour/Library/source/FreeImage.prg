@@ -14,8 +14,9 @@
 
 CLASS FreeImage INHERIT FreeImageRenderer, Panel
 
-   PROPERTY Transparent READ xTransparent WRITE Update DEFAULT .F.
-   PROPERTY Alignment   READ xAlignment   WRITE Update DEFAULT 1
+   PROPERTY Transparent                 READ xTransparent WRITE Update   DEFAULT .F.
+   PROPERTY Alignment                   READ xAlignment   WRITE Update   DEFAULT 1
+   PROPERTY Border      INDEX WS_BORDER READ xBorder      WRITE SetStyle DEFAULT .F.       PROTECTED
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -129,6 +130,7 @@ CLASS FreeImageRenderer
    DATA ClsName         EXPORTED INIT "FreeImageRenderer"
    DATA __IsInstance    EXPORTED INIT .F.
    DATA __ClassInst     EXPORTED
+   DATA __cData         PROTECTED
    DATA hDIB            EXPORTED
    DATA __Alignments    EXPORTED INIT { "None",;
                                         "Center",;
@@ -217,7 +219,9 @@ RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
 METHOD LoadFromString( cData ) CLASS FreeImageRenderer
-   IF !EMPTY( cData )
+   DEFAULT cData TO ::__cData
+   IF ! EMPTY( cData )
+      ::__cData := cData
       IF ::hDIB != NIL
          FreeImageUnload( ::hDIB )
       ENDIF
@@ -407,7 +411,9 @@ RETURN lOK
 
 //--------------------------------------------------------------------------------------------------------
 METHOD Update() CLASS FreeImageRenderer
-   ::__SetImageName( ::xImageName )
+   IF ::__cData == NIL
+      ::__SetImageName( ::xImageName )
+   ENDIF
    IF ::Owner != NIL
       ::Owner:InvalidateRect()
    ENDIF

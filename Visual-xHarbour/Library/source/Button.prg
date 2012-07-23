@@ -35,6 +35,7 @@ CLASS Button INHERIT Control
    PROPERTY Border        INDEX WS_BORDER        READ xBorder        WRITE SetStyle         DEFAULT .F. PROTECTED
    PROPERTY DefaultButton                        READ xDefaultButton WRITE SetDefault       DEFAULT .F. PROTECTED
    PROPERTY Enabled       INDEX WS_DISABLED      READ xEnabled       WRITE SetStyle         DEFAULT .T. PROTECTED
+   PROPERTY MultiLine     INDEX BS_MULTILINE     READ xMultiLine     WRITE SetStyle         DEFAULT .F. PROTECTED
 
    DATA ImgInst           EXPORTED
    DATA ImageIndent       EXPORTED INIT 3
@@ -371,6 +372,12 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
          ::DrawArrow( dis:hDC, {aTextRect[3]-22,aTextRect[2],aTextRect[3],aTextRect[4]} )
          aTextRect[1] := 6
          nTextFlags := DT_LEFT + DT_VCENTER + DT_SINGLELINE
+      ENDIF
+      IF ::xMultiLine
+         _DrawText( dis:hDC, ::xText, @aRect, DT_CALCRECT )
+         aTextRect  := {0,(::xHeight-aRect[4])/2,::xWidth,::xHeight}
+         
+         nTextFlags := DT_CENTER | DT_VCENTER
       ENDIF
       _DrawText( dis:hDC, ::xText, aTextRect, nTextFlags )
    ENDIF
