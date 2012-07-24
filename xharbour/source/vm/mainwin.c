@@ -151,7 +151,7 @@ int APIENTRY WinMain( HINSTANCE hInstance,      /* handle to current instance */
          }
       }
    }
-   printf( "mainwin ..\n" );
+
    hb_winmainArgInit( hInstance, hPrevInstance, iCmdShow );
    hb_cmdargInit( s_argc, s_argv );
 

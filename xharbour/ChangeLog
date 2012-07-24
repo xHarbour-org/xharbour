@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-24 07:18 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/mainwin.c
+    - remove debugging trace
+
 2012-07-23 22:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/mainwin.c
   * source/vm/hvm.c
