@@ -145,7 +145,7 @@ STATIC s_lGenCsource     := .F.  // Generate PCode by default // Ath added 31-05
 STATIC s_cInvalidExt     := {".prg",".c",".cpp",".ch",".h",".ppo",".bat",".doc",".txt",".dbf",".ntx",".cdx",".dbt",".fpt",".mem"}
 
 *---------------------------------------------
-FUNCTION MAIN( cScriptfile, p1, p2, p3, p4, p5, p6 )
+FUNCTION _APPMAIN( cScriptfile, p1, p2, p3, p4, p5, p6 )
 *---------------------------------------------
 
    LOCAL aFile       := {}
@@ -3279,9 +3279,11 @@ Endif // Create and compile
          SetPos(9,0)
 //       Main( cFile, " -f "+iif(s_nLang=1,"-lPT",iif(s_nLang=3,"-lES","-lEN")) )
          if cBuildParam != NIL
-            Main( cFile, cBuildParam )
+            // Main( cFile, cBuildParam )
+            _AppMain( cFile, cBuildParam )
          else
-            Main( cFile )
+            // Main( cFile )
+            _AppMain( cFile )
          endif
       ELSE
          set cursor on
@@ -4651,7 +4653,8 @@ FUNCTION CreateScriptLib( cFile )
          SetColor("W/N,N/W")
          Clear
          SetPos(9,0)
-         Main( cFile, " -f "+iif(s_nLang=1,"-lPT",iif(s_nLang=3,"-lES","-lEN")) )
+         // Main( cFile, " -f "+iif(s_nLang=1,"-lPT",iif(s_nLang=3,"-lES","-lEN")) )
+         _AppMain( cFile, " -f "+iif(s_nLang=1,"-lPT",iif(s_nLang=3,"-lES","-lEN")) )
       ELSE
          set cursor on
          SetColor("W/N,N/W")

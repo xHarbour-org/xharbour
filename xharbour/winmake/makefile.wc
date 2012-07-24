@@ -72,7 +72,7 @@ CLIBFLAGS    =-dHB_VM_ALL $(CLIBFLAGS)
 #-------------------------------------------------------------------------------
 HB_CMD       =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN  =$(HARBOUR_EXE) -n0 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
-
+START_UP_OBJ =$(OBJ_DIR)\mainstd.obj
 LINKERFLAGS  =/nologo /subsystem:console
 CC_CMD       =WCC386 $(CLIBFLAGS) -fo$@ $**
 CCC_CMD      =$(CC_CMD)
@@ -142,8 +142,7 @@ VM_LIB_OBJS=\
 !endif
 VM_LIB_OBJS=\
 	$(VM_LIB_OBJS)\
-	$(VM_COMMON_OBJS)\
-	$(VM_MAIN_OBJS)
+	$(VM_COMMON_OBJS)
 $(VM_LIB) : $(VM_LIB_OBJS)
 	$(LIB_CMD)
 
@@ -347,23 +346,24 @@ INCLUDE_DIR =-i=include -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt -i=$(ZLIB
 INCLUDE_DIR =$(INCLUDE_DIR) -i=$(PNG_DIR) -i=$(PDFLITE_DIR)\include
 INCLUDE_DIR =$(INCLUDE_DIR) -i=$(TIFF_DIR) -i=$(JPEG_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) $(ACEH_DIR) $(INCLUDE_DIR) -bd -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dHB_NO_DUPLICATE_HVMPROCESSSYMBOL -d__EXPORT__ -dHAVE_CONFIG_H
+CLIBFLAGS_OW32=$(ACEH_DIR) $(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -dHB_NO_DUPLICATE_HVMPROCESSSYMBOL -d__EXPORT__ -dHAVE_CONFIG_H
 !ifndef HB_NO_FM_DL_ALLOC
 CLIBFLAGS    =-dHB_FM_DL_ALLOC $(CLIBFLAGS)
 !endif
 !ifndef HB_NO_VM_ALL
 CLIBFLAGS    =-dHB_VM_ALL $(CLIBFLAGS)
 !endif
-HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 -gc0
-MAINWIN_OBJ =$(OBJ_DIR)\mainwinW32.obj
-DUMMY_OBJ   =$(OBJ_DIR)\dummyDLL.obj
+HARBOURFLAGS=$(HARBOURFLAGS) -d_USE_APPMAIN_ -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 -gc0
+MAINWIN_OBJ =$(OBJ_DIR)\mainstdW32.obj
 CC_CMD      =WCC386 $(CLIBFLAGS) -fo$@ $**
+CC_CMD_OW32 =WCC386 $(CLIBFLAGS_OW32) -fo$@ $**
 CCC_CMD     =$(CC_CMD)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
 DLL_LINK_CMD=LINK386 $(DLLFLAGS)
-DLLEXE_LINK_CMD=LINK386 /out:$@ $** $(USE_DLL_LIB) $(HARBOUR_DLL_LIB) $(PDFLITE_LIB) $(EXEFLAGS)
+DLLEXE_LINK_CMD=LINK386 /out:$@ $** $(HARBOUR_DLL_LIB) $(PDFLITE_LIB) $(EXEFLAGS)
 
 #===============================================================================
 # The Project
@@ -383,43 +383,338 @@ VM_LIB_OBJS=\
 $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 	$(DLL_LINK_CMD)
 
+#
+# Unlike other compilers, Open Watcom does not like dll flag used for creating
+# application which using DLL. Hence the global DLL flag is invalid, and we have
+# to compile application without dll flag. This is why the following rules look
+# like redundancy of those in common.mak and compile.mak
+#
+
 HBDOCDLL_EXE_OBJS=\
 	$(MAINWIN_OBJ)\
-	$(DUMMY_OBJ)\
-	$(HBDOCDLL_EXE_OBJS)
+	$(OBJ_DIR)\hbdocOW32.obj\
+	$(OBJ_DIR)\genascOW32.obj\
+	$(OBJ_DIR)\teeascOW32.obj\
+	$(OBJ_DIR)\genhpcOW32.obj\
+	$(OBJ_DIR)\genhtmOW32.obj\
+	$(OBJ_DIR)\genchmOW32.obj\
+	$(OBJ_DIR)\genngOW32.obj\
+	$(OBJ_DIR)\genos2OW32.obj\
+	$(OBJ_DIR)\genrtfOW32.obj\
+	$(OBJ_DIR)\gentrfOW32.obj\
+	$(OBJ_DIR)\htmlOW32.obj\
+	$(OBJ_DIR)\ngOW32.obj\
+	$(OBJ_DIR)\os2OW32.obj\
+	$(OBJ_DIR)\rtfOW32.obj\
+	$(OBJ_DIR)\troffOW32.obj\
+	$(OBJ_DIR)\fclass1OW32.obj\
+	$(OBJ_DIR)\ffile1OW32.obj\
+	$(OBJ_DIR)\ft_funcsOW32.obj\
+	\
+	$(OBJ_DIR)\genpdf1OW32.obj\
+	$(OBJ_DIR)\pdfhbdocOW32.obj
 
 HBTESTDLL_EXE_OBJS=\
 	$(MAINWIN_OBJ)\
-	$(DUMMY_OBJ)\
-	$(HBTESTDLL_EXE_OBJS)
+	$(OBJ_DIR)\hbtestOW32.obj\
+	$(OBJ_DIR)\rt_hvmOW32.obj\
+	$(OBJ_DIR)\rt_hvmaOW32.obj\
+	$(OBJ_DIR)\rt_mathOW32.obj\
+	$(OBJ_DIR)\rt_dateOW32.obj\
+	$(OBJ_DIR)\rt_strOW32.obj\
+	$(OBJ_DIR)\rt_straOW32.obj\
+	$(OBJ_DIR)\rt_transOW32.obj\
+	$(OBJ_DIR)\rt_arrayOW32.obj\
+	$(OBJ_DIR)\rt_fileOW32.obj\
+	$(OBJ_DIR)\rt_miscOW32.obj\
+	$(OBJ_DIR)\rt_ccallOW32.obj
 
 HBMAKEDLL_EXE_OBJS=\
 	$(MAINWIN_OBJ)\
-	$(DUMMY_OBJ)\
-	$(HBMAKEDLL_EXE_OBJS)
+	$(OBJ_DIR)\hbmakeOW32.obj\
+	$(OBJ_DIR)\tmakeOW32.obj\
+	$(OBJ_DIR)\hbmutilsOW32.obj\
+	$(OBJ_DIR)\checksOW32.obj\
+	$(OBJ_DIR)\pickarryOW32.obj\
+	$(OBJ_DIR)\pickfileOW32.obj\
+	$(OBJ_DIR)\prb_stakOW32.obj\
+	$(OBJ_DIR)\radiosOW32.obj\
+	$(OBJ_DIR)\hbmlangOW32.obj\
+	\
+	$(OBJ_DIR)\ft_funcsOW32.obj\
+	$(OBJ_DIR)\fclass1OW32.obj\
+	$(OBJ_DIR)\ffile1OW32.obj
 
 HBRUNDLL_EXE_OBJS=\
 	$(MAINWIN_OBJ)\
-	$(DUMMY_OBJ)\
-	$(HBRUNDLL_EXE_OBJS)
+	$(OBJ_DIR)\hbrunOW32.obj\
+	$(OBJ_DIR)\externalOW32.obj
 
 XBSCRIPTDLL_EXE_OBJS=\
 	$(MAINWIN_OBJ)\
-	$(DUMMY_OBJ)\
-	$(XBSCRIPTDLL_EXE_OBJS)
+	$(OBJ_DIR)\xbscriptOW32.obj
 
-$(MAINWIN_OBJ) : $(VM_DIR)\mainwin.c
-	WCC386 $(INCLUDE_DIR) -bd -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -fo$@ $**
+$(MAINWIN_OBJ) : $(VM_DIR)\mainstd.c
+	WCC386 $(INCLUDE_DIR) -j -w3 -d0 -6s -fp6 -s -onaehtzr -oi -ei -zp8 -zq -zt0 -mf -bt=NT -d__WIN32__ -fo$@ $**
 
-$(DUMMY_OBJ) : $(OBJ_DIR)\dummyDLL.c
-	$(CC_CMD)
+$(OBJ_DIR)\hbrunOW32.c : $(HBRUN_DIR)\hbrun.prg
+	$(HB_CMD_MAIN)
 
-$(OBJ_DIR)\dummyDLL.c : $(OBJ_DIR)\dummyDLL.prg
+$(OBJ_DIR)\hbrunOW32.obj : $(OBJ_DIR)\hbrunOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\externalOW32.c : $(HBRUN_DIR)\external.prg
 	$(HB_CMD)
 
-$(OBJ_DIR)\dummyDLL.prg :
-	@ECHO REQUEST HB_GT_WIN_DEFAULT >$(OBJ_DIR)\dummyDLL.prg
-	@ECHO PROCEDURE HB_GT_SYS >>$(OBJ_DIR)\dummyDLL.prg
+$(OBJ_DIR)\externalOW32.obj : $(OBJ_DIR)\externalOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\hbtestOW32.c : $(HBTEST_DIR)\hbtest.prg
+	$(HB_CMD_MAIN)
+
+$(OBJ_DIR)\hbtestOW32.obj : $(OBJ_DIR)\hbtestOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\rt_hvmOW32.c : $(HBTEST_DIR)\rt_hvm.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\rt_hvmOW32.obj : $(OBJ_DIR)\rt_hvmOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\rt_hvmaOW32.c : $(HBTEST_DIR)\rt_hvma.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\rt_hvmaOW32.obj : $(OBJ_DIR)\rt_hvmaOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\rt_mathOW32.c : $(HBTEST_DIR)\rt_math.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\rt_mathOW32.obj : $(OBJ_DIR)\rt_mathOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\rt_dateOW32.c : $(HBTEST_DIR)\rt_date.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\rt_dateOW32.obj : $(OBJ_DIR)\rt_dateOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\rt_strOW32.c : $(HBTEST_DIR)\rt_str.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\rt_strOW32.obj : $(OBJ_DIR)\rt_strOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\rt_straOW32.c : $(HBTEST_DIR)\rt_stra.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\rt_straOW32.obj : $(OBJ_DIR)\rt_straOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\rt_transOW32.c : $(HBTEST_DIR)\rt_trans.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\rt_transOW32.obj : $(OBJ_DIR)\rt_transOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\rt_arrayOW32.c : $(HBTEST_DIR)\rt_array.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\rt_arrayOW32.obj : $(OBJ_DIR)\rt_arrayOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\rt_fileOW32.c : $(HBTEST_DIR)\rt_file.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\rt_fileOW32.obj : $(OBJ_DIR)\rt_fileOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\rt_miscOW32.c : $(HBTEST_DIR)\rt_misc.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\rt_miscOW32.obj : $(OBJ_DIR)\rt_miscOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\rt_ccallOW32.c : $(HBTEST_DIR)\rt_ccall.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\rt_ccallOW32.obj : $(OBJ_DIR)\rt_ccallOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\hbdocOW32.c : $(HBDOC_DIR)\hbdoc.prg
+	$(HB_CMD_MAIN)
+
+$(OBJ_DIR)\hbdocOW32.obj : $(OBJ_DIR)\hbdocOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\genascOW32.c : $(HBDOC_DIR)\genasc.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\genascOW32.obj : $(OBJ_DIR)\genascOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\teeascOW32.c : $(HBDOC_DIR)\teeasc.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\teeascOW32.obj : $(OBJ_DIR)\teeascOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\genhpcOW32.c : $(HBDOC_DIR)\genhpc.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\genhpcOW32.obj : $(OBJ_DIR)\genhpcOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\genhtmOW32.c : $(HBDOC_DIR)\genhtm.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\genhtmOW32.obj : $(OBJ_DIR)\genhtmOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\genchmOW32.c : $(HBDOC_DIR)\genchm.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\genchmOW32.obj : $(OBJ_DIR)\genchmOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\genngOW32.c : $(HBDOC_DIR)\genng.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\genngOW32.obj : $(OBJ_DIR)\genngOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\genos2OW32.c : $(HBDOC_DIR)\genos2.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\genos2OW32.obj : $(OBJ_DIR)\genos2OW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\genrtfOW32.c : $(HBDOC_DIR)\genrtf.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\genrtfOW32.obj : $(OBJ_DIR)\genrtfOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\gentrfOW32.c : $(HBDOC_DIR)\gentrf.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\gentrfOW32.obj : $(OBJ_DIR)\gentrfOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\htmlOW32.c : $(HBDOC_DIR)\html.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\htmlOW32.obj : $(OBJ_DIR)\htmlOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\ngOW32.c : $(HBDOC_DIR)\ng.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\ngOW32.obj : $(OBJ_DIR)\ngOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\os2OW32.c : $(HBDOC_DIR)\os2.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\os2OW32.obj : $(OBJ_DIR)\os2OW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\rtfOW32.c : $(HBDOC_DIR)\rtf.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\rtfOW32.obj : $(OBJ_DIR)\rtfOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\troffOW32.c : $(HBDOC_DIR)\troff.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\troffOW32.obj : $(OBJ_DIR)\troffOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\fclass1OW32.c : $(HBDOC_DIR)\fclass1.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\fclass1OW32.obj : $(OBJ_DIR)\fclass1OW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\ffile1OW32.c : $(HBDOC_DIR)\ffile1.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\ffile1OW32.obj : $(OBJ_DIR)\ffile1OW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\ft_funcsOW32.c : $(HBDOC_DIR)\ft_funcs.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\ft_funcsOW32.obj : $(OBJ_DIR)\ft_funcsOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\genpdf1OW32.c : $(HBDOC_DIR)\genpdf1.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\genpdf1OW32.obj : $(OBJ_DIR)\genpdf1OW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\pdfhbdocOW32.obj : $(HBDOC_DIR)\pdfhbdoc.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\hbmakeOW32.c : $(HBMAKE_DIR)\hbmake.prg
+	$(HB_CMD_MAIN)
+
+$(OBJ_DIR)\hbmakeOW32.obj : $(OBJ_DIR)\hbmakeOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\tmakeOW32.c : $(HBMAKE_DIR)\tmake.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\tmakeOW32.obj : $(OBJ_DIR)\tmakeOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\hbmutilsOW32.c : $(HBMAKE_DIR)\hbmutils.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\hbmutilsOW32.obj : $(OBJ_DIR)\hbmutilsOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\radiosOW32.c : $(HBMAKE_DIR)\radios.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\radiosOW32.obj : $(OBJ_DIR)\radiosOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\checksOW32.c : $(HBMAKE_DIR)\checks.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\checksOW32.obj : $(OBJ_DIR)\checksOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\pickarryOW32.c : $(HBMAKE_DIR)\pickarry.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\pickarryOW32.obj : $(OBJ_DIR)\pickarryOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\pickfileOW32.c : $(HBMAKE_DIR)\pickfile.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\pickfileOW32.obj : $(OBJ_DIR)\pickfileOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\prb_stakOW32.c : $(HBMAKE_DIR)\prb_stak.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)\prb_stakOW32.obj : $(OBJ_DIR)\prb_stakOW32.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\hbmlangOW32.obj : $(HBMAKE_DIR)\hbmlang.c
+	$(CC_CMD_OW32)
+
+$(OBJ_DIR)\xbscriptOW32.c : $(XBSCRIPT_DIR)\xbscript.prg
+	$(HB_CMD_MAIN)
+
+$(OBJ_DIR)\xbscriptOW32.obj : $(OBJ_DIR)\xbscriptOW32.c
+	$(CC_CMD_OW32)
+
 #*******************************************************************************
 !elseif ("$(__BLD__)"=="CONTRIB_BLD")
 #*******************************************************************************
@@ -717,19 +1012,19 @@ $(HBCAB_LIB) : $(HBCAB_LIB_OBJS)
 $(OBJ_DIR)\harboury.c : $(COMPILER_DIR)\harbour.sly
 	$(BISON_CMD1)
 
-$(OBJ_DIR)\harboury$(OBJEXT) : $(OBJ_DIR)\harboury.c
+$(OBJ_DIR)\harboury.obj : $(OBJ_DIR)\harboury.c
 	$(CC_CMD)
 
 $(OBJ_DIR)\macroy.c : $(MACRO_DIR)\macro.y
 	$(BISON_CMD2)
 
-$(OBJ_DIR)\macroy$(HB_MT)$(OBJEXT) : $(OBJ_DIR)\macroy.c
+$(OBJ_DIR)\macroy$(HB_MT).obj : $(OBJ_DIR)\macroy.c
 	$(CC_CMD)
 !else
-$(OBJ_DIR)\harboury$(OBJEXT) : $(COMPILER_DIR)\harbouryy.c
+$(OBJ_DIR)\harboury.obj : $(COMPILER_DIR)\harbouryy.c
 	$(CC_CMD)
 
-$(OBJ_DIR)\macroy$(HB_MT)$(OBJEXT) : $(MACRO_DIR)\macroyy.c
+$(OBJ_DIR)\macroy$(HB_MT).obj : $(MACRO_DIR)\macroyy.c
 	$(CC_CMD)
 !endif
 

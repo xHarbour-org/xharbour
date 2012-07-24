@@ -166,10 +166,12 @@ int APIENTRY WinMain( HINSTANCE hInstance,      /* handle to current instance */
    return iResult;
 }
 
-#if ( /* defined( __DMC__ ) || */ defined( __WATCOMC__ ) /* || defined( __MINGW32__ ) */ ) && !defined(__EXPORT__)
-HB_EXTERN_BEGIN
-void hb_forceLinkMainWin( void ) {}
-HB_EXTERN_END
+#if 0
+   #if ( /* defined( __DMC__ ) || */ defined( __WATCOMC__ ) /* || defined( __MINGW32__ ) */ ) && !defined(__EXPORT__)
+      HB_EXTERN_BEGIN
+      void hb_forceLinkMainWin( void ) {}
+      HB_EXTERN_END
+   #endif
 #endif
 
 #endif

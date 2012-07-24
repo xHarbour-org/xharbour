@@ -160,7 +160,7 @@ STATIC cTitle:=''
 *+
 *+北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北
 *+
-FUNCTION MAIN( cFlags, cLinkName, cAtFile )
+FUNCTION _APPMAIN( cFlags, cLinkName, cAtFile )
 
    //  LOCAL variables:
    // NG/EH input

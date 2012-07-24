@@ -99,7 +99,7 @@ STATIC s_nEndTime
    REQUEST HB_LANG_EN
 #endif
 
-PROCEDURE Main( cPar1, cPar2 )
+PROCEDURE _AppMain( cPar1, cPar2 )
 
    OutStd( "xHarbour Regression Test Suite" + HB_OSNewLine() +;
            "Copyright 1999-2012, http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() )

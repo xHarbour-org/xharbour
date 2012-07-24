@@ -11899,8 +11899,9 @@ HB_FUNC( HB_VMMODE )
 
 #if defined(HB_OS_WIN) && !defined(__EXPORT__) && \
     ( /* defined(__DMC__) || */ defined(__WATCOMC__) /* || defined(__MINGW32__) */ )
-
+# if 0
 #  define HB_FORCE_LINK_MAIN  hb_forceLinkMainWin
+# endif
 
 #elif defined(HB_OS_LINUX) && defined(__WATCOMC__)
 

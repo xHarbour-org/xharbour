@@ -8,6 +8,26 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-25 05:55 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/mainwin.c
+  * source/vm/hvm.c
+    ! Open Watcom does not require hb_forceLinkMainWin() to be force-linked,
+    condition is hence removed.
+
+  * winmake/makefile.wc
+    ! explicitely use mainstd.obj as startup
+    ! remove mainstd.obj and mainwin.obj as vm.lib members
+
+  * utils/hbdoc/hbdoc.prg
+  * utils/hbmake/hbmake.prg
+  * utils/hbtest/hbtest.prg
+    ! MAIN -> _APPMAIN
+
+  /*
+    This in effect removes long-time-hack to known Windows compilers with
+    regards to force linking of hb_forceLinkMainWin()
+  */
+
 2012-07-25 02:22 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/mainwin.c
   * source/vm/hvm.c
