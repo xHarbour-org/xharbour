@@ -99,6 +99,7 @@ HB_GT_LIBS=\
 
 # Redefined becaue there are some file thet DMC cannot built
 # TIFF Library 4.02 is not working with DMC
+_STARTUP_OBJ=$(OBJ_DIR)\mainstd.obj
 
 ST_PROJECT=\
 	$(COMMON_LIB)\
@@ -171,6 +172,26 @@ HBDOC_EXE_OBJS=\
 	$(OBJ_DIR)\ffile1.obj\
 	$(OBJ_DIR)\ft_funcs.obj
 
+HBDOC_EXE_OBJS=\
+	$(_STARTUP_OBJ)\
+	$(HBDOC_EXE_OBJS)
+
+HBTEST_EXE_OBJS=\
+	$(_STARTUP_OBJ)\
+	$(HBTEST_EXE_OBJS)
+
+HBMAKE_EXE_OBJS=\
+	$(_STARTUP_OBJ)\
+	$(HBMAKE_EXE_OBJS)
+
+HBRUN_EXE_OBJS=\
+	$(_STARTUP_OBJ)\
+	$(HBRUN_EXE_OBJS)
+
+XBSCRIPT_EXE_OBJS=\
+	$(_STARTUP_OBJ)\
+	$(XBSCRIPT_EXE_OBJS)
+
 !if ("$(HB_MT)"=="mt")
 PROJECT=$(MT_PROJECT)
 !else
@@ -205,8 +226,7 @@ VM_LIB_OBJS=\
 !endif
 VM_LIB_OBJS=\
 	$(VM_LIB_OBJS)\
-	$(VM_COMMON_OBJS)\
-	$(VM_MAIN_OBJS)
+	$(VM_COMMON_OBJS)
 $(VM_LIB) : $(VM_LIB_OBJS)
 	$(LIB_CMD)
 
@@ -474,7 +494,7 @@ HBDOC_EXE_OBJS=\
 	$(OBJ_DIR)\ffile1.obj\
 	$(OBJ_DIR)\ft_funcs.obj
 
-STARTUP_OBJS        =$(OBJ_DIR)\mainwin_dll.obj $(OBJ_DIR)\dummydll.obj
+STARTUP_OBJS        =$(OBJ_DIR)\mainstd_dll.obj
 HBDOCDLL_EXE_OBJS   =$(STARTUP_OBJS) $(HBDOCDLL_EXE_OBJS)
 HBRUNDLL_EXE_OBJS   =$(STARTUP_OBJS) $(HBRUNDLL_EXE_OBJS)
 HBTESTDLL_EXE_OBJS  =$(STARTUP_OBJS) $(HBTESTDLL_EXE_OBJS)
@@ -486,18 +506,8 @@ ALL: $(DLL_PROJECT)
 #===============================================================================
 # HARBOUR.DLL rules
 #===============================================================================
-$(OBJ_DIR)\mainwin_dll.obj : $(VM_DIR)\mainwin.c
+$(OBJ_DIR)\mainstd_dll.obj : $(VM_DIR)\mainstd.c
 	$(CC_CMD)
-
-$(OBJ_DIR)\dummydll.obj : $(OBJ_DIR)\dummydll.c
-	$(CC_CMD)
-
-$(OBJ_DIR)\dummydll.c : $(OBJ_DIR)\dummydll.prg
-	$(HB_CMD)
-
-$(OBJ_DIR)\dummydll.prg :
-	@ECHO REQUEST HB_GT_WIN_DEFAULT >$(OBJ_DIR)\dummydll.prg
-	@ECHO PROCEDURE DMCGT >>$(OBJ_DIR)\dummydll.prg
 
 !ifndef HB_NO_VM_ALL
 VM_LIB_OBJS=\

@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-25 02:22 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/mainwin.c
+  * source/vm/hvm.c
+    ! Digital Mars does not require hb_forceLinkMainWin() to be force-linked,
+    condition is hence removed.
+
+  * winmake/makefile.dc
+    ! explicitely use mainstd.obj as startup
+    ! remove mainstd.obj and mainwin.obj as vm.lib members
+
 2012-07-24 07:18 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/mainwin.c
     - remove debugging trace
