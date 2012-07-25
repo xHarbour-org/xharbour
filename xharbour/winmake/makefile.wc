@@ -725,6 +725,10 @@ $(OBJ_DIR)\xbscriptOW32.obj : $(OBJ_DIR)\xbscriptOW32.c
 HARBOURFLAGS=$(HARBOURFLAGS)
 CLIBFLAGS   =$(CLIBFLAGS)
 
+!ifndef HB_NO_VM_ALL
+CLIBFLAGS    =-DHB_VM_ALL $(CLIBFLAGS)
+!endif
+
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================

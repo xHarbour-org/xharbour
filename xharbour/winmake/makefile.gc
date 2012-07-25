@@ -426,6 +426,10 @@ else ifeq ($(__BLD__),CONTRIB_BLD)
 HARBOURFLAGS+=
 CLIBFLAGS   +=
 
+ifndef HB_NO_VM_ALL
+CLIBFLAGS   +=-DHB_VM_ALL
+endif
+
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================

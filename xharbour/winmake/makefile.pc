@@ -325,6 +325,9 @@ $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 #===============================================================================
 HARBOURFLAGS=$(HARBOURFLAGS)
 CLIBFLAGS   =$(CLIBFLAGS)
+!ifndef HB_NO_VM_ALL
+CLIBFLAGS   =/D"HB_VM_ALL" $(CLIBFLAGS)
+!endif
 RDDSQL_INCLUDE=/I"$(RDDSQL_DIR)" /I"$(HBSQLIT3_DIR)"
 INCLUDE_DIR =/I"include" /I"$(CC_DIR)\include" /I"$(CC_DIR)\include\win" /I"$(FREEIMAGE_DIR)\include" /I"$(GDLIB_DIR)\include" /I"$(XWT_DIR)\include" /I"$(XWT_DIR)\src\xwt_win" /I"$(ZLIB_DIR)" /I"$(PNG_DIR)"
 !ifdef HB_DIR_OPENSSL

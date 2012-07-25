@@ -473,6 +473,7 @@ $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 #*******************************************************************************
 !elseif ("$(__BLD__)"=="CONTRIB_BLD")
 #*******************************************************************************
+
 # Uncomment this line if linking with MSVCRT is preferred
 # USE_MSVCRT=1
 
@@ -543,6 +544,11 @@ ALL: $(CONTRIB_PROJECT)
 HARBOURFLAGS=$(HARBOURFLAGS)
 CLIBFLAGS   =$(CLIBFLAGS)
 CLIBFLAGS_C =$(CLIBFLAGS_C)
+
+!ifndef HB_NO_VM_ALL
+CLIBFLAGS    =-DHB_VM_ALL $(CLIBFLAGS)
+CLIBFLAGS_C  =-DHB_VM_ALL $(CLIBFLAGS_C)
+!endif
 
 #===============================================================================
 # Option to use MSVCRT rather than LIBC*.LIB

@@ -8,6 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-25 16:25 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/gtwvg/gtwvg.c
+    ! do not access internals
+
+  * winmake/makefile.bc
+  * winmake/makefile.dc
+  * winmake/makefile.gc
+  * winmake/makefile.pc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+    + missing -DHB_VM_ALL for contrib stuffs
+
 2012-07-25 05:55 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/mainwin.c
   * source/vm/hvm.c
