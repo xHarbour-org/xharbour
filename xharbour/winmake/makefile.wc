@@ -726,7 +726,7 @@ HARBOURFLAGS=$(HARBOURFLAGS)
 CLIBFLAGS   =$(CLIBFLAGS)
 
 !ifndef HB_NO_VM_ALL
-CLIBFLAGS    =-DHB_VM_ALL $(CLIBFLAGS)
+CLIBFLAGS    =-dHB_VM_ALL $(CLIBFLAGS)
 !endif
 
 #===============================================================================
