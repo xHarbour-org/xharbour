@@ -8,6 +8,49 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-27 05:42 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + contrib/misc/hb_f.c
+  + contrib/misc/date.c
+  + contrib/misc/environ.c
+  + contrib/misc/fileread.prg
+  + contrib/misc/gauge.c
+  + contrib/misc/mathx.c
+  + contrib/misc/nconvert.prg
+  + contrib/misc/num.c
+  + contrib/misc/numtxten.prg
+  + contrib/misc/numtxthu.prg
+  + contrib/misc/stack.c
+  + contrib/misc/status.c
+  + contrib/misc/strfmt.c
+  + contrib/misc/stringp.prg
+  + contrib/misc/stringsx.c
+  + contrib/misc/time.c
+  + contrib/misc/twirler.prg
+  - source/misc/hb_f.c
+  - source/misc
+  - tests/misc/date.c
+  - tests/misc/environ.c
+  - tests/misc/fileread.prg
+  - tests/misc/gauge.c
+  - tests/misc/mathx.c
+  - tests/misc/nconvert.prg
+  - tests/misc/num.c
+  - tests/misc/numtxten.prg
+  - tests/misc/numtxthu.prg
+  - tests/misc/stack.c
+  - tests/misc/status.c
+  - tests/misc/strfmt.c
+  - tests/misc/stringp.prg
+  - tests/misc/stringsx.c
+  - tests/misc/time.c
+  - tests/misc/twirler.prg
+  * source/Makefile
+    ! move miscellaneous functions to contrib/misc
+
+  * winmake/common.mak
+  * winmake/compile.mak
+    + added miscellaneous functions to libmisc.lib
+
 2012-07-25 17:13 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.wc
     * typo: -DHB_VM_ALL -> -dHB_VM_ALL

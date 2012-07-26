@@ -47,9 +47,9 @@ XBSCRIPT_DIR  =utils$(DIR_SEP)xbscript
 HBFILERE_DIR  =utils$(DIR_SEP)hbfilere
 
 CT_DIR        =source$(DIR_SEP)ct
-MISC_DIR      =source$(DIR_SEP)misc
 TIP_DIR       =source$(DIR_SEP)tip
 ODBC_DIR      =source$(DIR_SEP)odbc
+MISC_DIR      =contrib$(DIR_SEP)misc
 SDDFB_DIR     =contrib$(DIR_SEP)sddfb
 SDDMY_DIR     =contrib$(DIR_SEP)sddmy
 SDDOCI_DIR    =contrib$(DIR_SEP)sddoci
@@ -1787,7 +1787,24 @@ ODBC_LIB_OBJS=\
 # LIBMISC.LIB rules
 #===============================================================================
 MISC_LIB_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)hb_f$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)hb_fHBMISC$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)twirlerHBMISC$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)numtxthuHBMISC$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)numtxtenHBMISC$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)nconvertHBMISC$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)stringpHBMISC$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)filereadHBMISC$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)environHBMISC$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)gaugeHBMISC$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)numHBMISC$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)dateHBMISC$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)timeHBMISC$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)stackHBMISC$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)statusHBMISC$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)strfmtHBMISC$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)mathxHBMISC$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)stringsxHBMISC$(OBJEXT)
 
 #===============================================================================
 # DLLMAIN.LIB rules

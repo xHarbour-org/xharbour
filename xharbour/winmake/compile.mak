@@ -3646,7 +3646,73 @@ $(OBJ_DIR)$(DIR_SEP)todbc$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)todbc.c
 #===============================================================================
 # LIBMISC.LIB rules
 #===============================================================================
-$(OBJ_DIR)$(DIR_SEP)hb_f$(OBJEXT) : $(MISC_DIR)$(DIR_SEP)hb_f.c
+$(OBJ_DIR)$(DIR_SEP)hb_fHBMISC$(OBJEXT) : $(MISC_DIR)$(DIR_SEP)hb_f.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)twirlerHBMISC$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)twirlerHBMISC.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)numtxthuHBMISC$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)numtxthuHBMISC.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)numtxtenHBMISC$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)numtxtenHBMISC.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)nconvertHBMISC$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)nconvertHBMISC.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)stringpHBMISC$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)stringpHBMISC.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)filereadHBMISC$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)filereadHBMISC.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)twirlerHBMISC.c : $(MISC_DIR)$(DIR_SEP)twirler.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)numtxthuHBMISC.c : $(MISC_DIR)$(DIR_SEP)numtxthu.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)numtxtenHBMISC.c : $(MISC_DIR)$(DIR_SEP)numtxten.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)nconvertHBMISC.c : $(MISC_DIR)$(DIR_SEP)nconvert.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)stringpHBMISC.c : $(MISC_DIR)$(DIR_SEP)stringp.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)filereadHBMISC.c : $(MISC_DIR)$(DIR_SEP)fileread.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)environHBMISC$(OBJEXT) : $(MISC_DIR)$(DIR_SEP)environ.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)gaugeHBMISC$(OBJEXT) : $(MISC_DIR)$(DIR_SEP)gauge.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)numHBMISC$(OBJEXT) : $(MISC_DIR)$(DIR_SEP)num.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)dateHBMISC$(OBJEXT) : $(MISC_DIR)$(DIR_SEP)date.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)timeHBMISC$(OBJEXT) : $(MISC_DIR)$(DIR_SEP)time.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)stackHBMISC$(OBJEXT) : $(MISC_DIR)$(DIR_SEP)stack.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)statusHBMISC$(OBJEXT) : $(MISC_DIR)$(DIR_SEP)status.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)strfmtHBMISC$(OBJEXT) : $(MISC_DIR)$(DIR_SEP)strfmt.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)mathxHBMISC$(OBJEXT) : $(MISC_DIR)$(DIR_SEP)mathx.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)stringsxHBMISC$(OBJEXT) : $(MISC_DIR)$(DIR_SEP)stringsx.c
 	$(CC_CMD)
 
 #===============================================================================

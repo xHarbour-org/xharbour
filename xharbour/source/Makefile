@@ -38,7 +38,6 @@ DIRS=\
 	debug$(HB_COMP_REF) \
 	odbc$(HB_COMP_REF) \
 	ct$(HB_COMP_REF) \
-	misc \
 	cgi$(HB_COMP_REF)
 
 ifneq ($(HB_ARCHITECTURE),dos)
