@@ -6,7 +6,7 @@
 
 /* TODO: search this file for TODO and find 'em! */
 
-char *hb_strtoken(char *szText,
+static char *hb_strtoken(char *szText,
                   long lText,
                   long lIndex,
                   char cDelimiter,
