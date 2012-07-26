@@ -10,6 +10,24 @@
    #define M_PI_2      1.57079632679489661923
 #endif
 
+HB_FUNC_EXTERN( CEILING ); /* from CT library */
+
+HB_FUNC( FRACTION )
+{
+   if( ISNUM( 1 ) )
+      hb_retnd( hb_parnd( 1 ) - hb_parnl( 1 ) );
+   else
+      /* TODO: Error or return NAN */
+      hb_retnd( 0 );
+}
+
+HB_FUNC( CEIL )
+{
+   HB_FUNC_EXEC( CEILING );
+}
+
+#if 0
+
 HB_FUNC( ACOS )
 {
    if( hb_pcount() > 0 )
@@ -161,12 +179,4 @@ HB_FUNC( FLOOR )
       hb_retnd( 0 );
 }
 
-HB_FUNC( FRACTION )
-{
-   if( ISNUM( 1 ) )
-      hb_retnd( hb_parnd( 1 ) - hb_parnl( 1 ) );
-   else
-      /* TODO: Error or return NAN */
-      hb_retnd( 0 );
-}
-
+#endif

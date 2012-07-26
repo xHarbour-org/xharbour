@@ -8,6 +8,22 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-27 06:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/misc/num.c
+  * contrib/misc/mathx.c
+    - deff-out functions already exist in ct.lib
+
+2012-07-27 06:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/misc/date.c
+    - deff-out function ADDMONTH(), already exist in ct.lib
+    + functions: AMONTHS(), ADAYS(), ISLEAPYEAR(), DAYSINMONTH(), DATETIME()
+
+  - tests/misc
+    - removed, stuffs transferred to contrib/misc
+
+  - source/rdd/dbfntx/dbfntx0.prg
+    - removed (not used)
+
 2012-07-27 05:42 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   + contrib/misc/hb_f.c
   + contrib/misc/date.c

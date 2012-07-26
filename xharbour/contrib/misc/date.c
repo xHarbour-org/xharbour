@@ -50,10 +50,23 @@
  *
  */
 
+/*
+ * The following parts are Copyright of the individual authors.
+ * www - http://www.harbour-project.org
+ *
+ * Copyright 1999 Jon Berg <jmberg@pnh10.med.navy.mil>
+ *    DateTime()
+ *
+ * See doc/license.txt for licensing terms.
+ *
+ */
+
+#include <time.h>
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbset.h"
 #include "hbdate.h"
+#include "hbapilng.h"
 
 /* MDY( <dDate> ) --> "month dd, yyyy"
 */
@@ -139,6 +152,7 @@ HB_FUNC( DATEASAGE )
    hb_retni( iAge );
 }
 
+#if 0
 /* ADDMONTH( <dDate>, <nMonths> ) --> <dNewDate>
    NOTE: Caller must validate dNewDate.
 */
@@ -178,6 +192,7 @@ HB_FUNC( ADDMONTH )
 
    hb_retd( iYear, iMonth, iDay );
 }
+#endif
 
 /* DATEASARRAY( <dDate> ) --> { Year, Month, Day }
    NOTE: Returns an empty array if <dDate> is not a valid date.
@@ -247,4 +262,77 @@ HB_FUNC( DATEISLEAP )
 HB_FUNC( NTOD )
 {
    hb_retd( hb_parni( 3 ), hb_parni( 1 ), hb_parni( 2 ) );
+}
+
+HB_FUNC( AMONTHS )
+{
+   HB_ITEM Return, Tmp;
+   int i;
+
+   Tmp.type = HB_IT_NIL;
+   Return.type = HB_IT_NIL;
+   hb_arrayNew( &Return, 0 );
+
+   for( i = 0; i < 12; i++ )
+   {
+      hb_arrayAddForward( &Return, hb_itemPutC( &Tmp, ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_MONTH + i ) ) );
+   }
+
+   hb_itemReturn( &Return );
+}
+
+HB_FUNC( ADAYS )
+{
+   HB_ITEM Return, Tmp;
+   int i;
+
+   Tmp.type = HB_IT_NIL;
+   Return.type = HB_IT_NIL;
+
+   hb_arrayNew( &Return, 0 );
+
+   for( i = 0; i < 7; i++ )
+   {
+      hb_arrayAddForward( &Return, hb_itemPutC( &Tmp, ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_DAY + i ) ));
+   }
+
+   hb_itemReturn( &Return );
+}
+
+HB_FUNC( ISLEAPYEAR )
+{
+   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+
+   if( pDate )
+   {
+      int iYear, iMonth, iDay;
+
+      hb_dateDecode( hb_itemGetDL( pDate ), &iYear, &iMonth, &iDay );
+      hb_retl( hb_isleapyear( iYear ) );
+   }
+   else
+      hb_retl( FALSE );
+}
+
+HB_FUNC( DAYSINMONTH )
+{
+   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+
+   if( pDate )
+   {
+      int iYear, iMonth, iDay;
+
+      hb_dateDecode( hb_itemGetDL( pDate ), &iYear, &iMonth, &iDay );
+      hb_retni( hb_daysinmonth( iYear, iMonth ) );
+   }
+   else
+      hb_retni( 0 );
+}
+HB_FUNC( DATETIME )
+{
+   time_t current_time;
+
+   time( &current_time );
+
+   hb_retc( ctime( &current_time ) );
 }

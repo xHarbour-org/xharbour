@@ -61,6 +61,7 @@
 #endif
 #define PI  ( 3.1415926535897932384626433 )
 
+#if 0
 /* Ceiling( <nNumber> ) --> nInteger
    Return the smallest integer that is greater than or equal to <nNumber>
 */
@@ -68,6 +69,7 @@ HB_FUNC( CEILING )
 {
    hb_retnl( ( LONG ) ceil( hb_parnd( 1 ) ) );
 }
+#endif
 
 /* DtoR( <nDegrees> ) --> nRadians
    Convert an angle size specified in radians to degrees
