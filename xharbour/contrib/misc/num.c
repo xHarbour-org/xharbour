@@ -69,7 +69,6 @@ HB_FUNC( CEILING )
 {
    hb_retnl( ( LONG ) ceil( hb_parnd( 1 ) ) );
 }
-#endif
 
 /* DtoR( <nDegrees> ) --> nRadians
    Convert an angle size specified in radians to degrees
@@ -79,7 +78,6 @@ HB_FUNC( DTOR )
    hb_retndlen( ( hb_parnd( 1 ) / 180 ) * PI, 10, 9 );
 }
 
-#if 0
 /*
   This is deffed-out because FLOOR already defined tin mathx.c
 */
@@ -90,6 +88,31 @@ HB_FUNC( FLOOR )
 {
    hb_retnl( ( LONG ) floor( hb_parnd( 1 ) ) );
 }
+
+/* RtoD( <nRadians> ) --> nDegrees
+   Convert an angle size specified in radians to degrees
+*/
+HB_FUNC( RTOD )
+{
+   hb_retnd( 180 * ( hb_parnd( 1 ) / PI ) );
+}
+
+/* Sign( <nNumber> ) --> nSign
+   Return the sign of a number as follows:
+      0 - <nNumber> is zero
+      1 - <nNumber> is positive
+     -1 - <nNumber> is negative
+*/
+HB_FUNC( SIGN )
+{
+   if( ISNUM( 1 ) )
+   {
+      LONG lNumber = hb_parnl( 1 );
+
+      hb_retni( lNumber == 0 ? 0 : ( lNumber > 0 ? 1 : -1 ) );
+   }
+}
+
 #endif
 
 /* NumAsLog10( <nNumber> ) --> nLog10
@@ -157,29 +180,6 @@ HB_FUNC( NUMGETLEN )
    hb_retnl( ulLen );
 }
 
-/* RtoD( <nRadians> ) --> nDegrees
-   Convert an angle size specified in radians to degrees
-*/
-HB_FUNC( RTOD )
-{
-   hb_retnd( 180 * ( hb_parnd( 1 ) / PI ) );
-}
-
-/* Sign( <nNumber> ) --> nSign
-   Return the sign of a number as follows:
-      0 - <nNumber> is zero
-      1 - <nNumber> is positive
-     -1 - <nNumber> is negative
-*/
-HB_FUNC( SIGN )
-{
-   if( ISNUM( 1 ) )
-   {
-      LONG lNumber = hb_parnl( 1 );
-
-      hb_retni( lNumber == 0 ? 0 : ( lNumber > 0 ? 1 : -1 ) );
-   }
-}
 
 /* NumAsCurrency( <nNumber>, <cSymbol>, <nSide> ) --> cCurrency
    Convert number to currency format, floating dollar symbol

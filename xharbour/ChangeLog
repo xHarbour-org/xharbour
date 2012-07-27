@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-27 07:49 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/misc/date.c
+  * contrib/misc/num.c
+  * contrib/misc/stringp.prg
+    - deff-out duplicate functions defined elsewhere
+
 2012-07-27 07:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/misc/date.c
     + missing supporting functions

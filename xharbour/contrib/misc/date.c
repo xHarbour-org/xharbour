@@ -78,73 +78,6 @@ static BOOL hb_isleapyear( int iYear )
    return ( iYear % 4 == 0 && iYear % 100 != 0 ) || ( iYear % 400 == 0 );
 }
 
-static int hb_daysinmonth( int iYear, int iMonth )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_daysinmonth(%d, %d)", iYear, iMonth));
-
-   if( iMonth > 0 && iMonth < 13 )
-      return s_daysinmonth[ iMonth - 1 ] +
-             ( ( iMonth == 2 && hb_isleapyear( iYear ) ) ? 1 : 0 );
-   else
-      return 0;
-}
-
-/* MDY( <dDate> ) --> "month dd, yyyy"
-*/
-HB_FUNC( MDY )
-{
-   int iYear, iMonth, iDay;
-   char szDate[ 9 ];
-   char szFormatted[ 11 ];
-   char * szReturn;
-   int iBufferLen;
-   int iLen;
-
-   hb_dateDecode( hb_parnl( 1 ), &iYear, &iMonth, &iDay );
-   hb_dateFormat( hb_pardsbuff( szDate, 1 ), szFormatted, "MM/DD/YYYY" );
-
-   iLen = strlen( hb_dateCMonth( iMonth ) );
-
-   iBufferLen = iLen + ( hb_setGetCentury() ? 9 : 7 );
-   szReturn = ( char * ) hb_xgrab( iBufferLen );
-
-   memset( szReturn, ' ', iBufferLen + 1 );
-   memcpy( szReturn, hb_dateCMonth( iMonth ), iLen );
-   memcpy( szReturn + iLen + 1, szFormatted + 3, 2 );
-   szReturn[ iLen + 3 ] = ',';
-   memcpy( szReturn + iLen + 5, szFormatted + 6 + ( hb_setGetCentury() ? 0 : 2 ), 2 + ( hb_setGetCentury() ? 2 : 0 ) );
-
-   hb_retclen( szReturn, iBufferLen );
-   hb_xfree( szReturn );
-}
-
-/* DMY( <dDate> ) --> "dd month yyyy" (european date format)
-*/
-HB_FUNC( DMY )
-{
-   int  iYear, iMonth, iDay;
-   char szDate[ 9 ];
-   char szFormatted[ 11 ];
-   char * szReturn;
-   int iBufferLen;
-   int iLen;
-
-   hb_dateDecode( hb_parnl( 1 ), &iYear, &iMonth, &iDay );
-   hb_dateFormat( hb_pardsbuff( szDate, 1 ), szFormatted, "MM/DD/YYYY" );
-
-   iLen = strlen( hb_dateCMonth( iMonth ) );
-
-   iBufferLen = iLen + ( hb_setGetCentury() ? 9 : 7 );
-   szReturn = ( char * ) hb_xgrab( iBufferLen );
-
-   memset( szReturn, ' ', iBufferLen );
-   memcpy( szReturn, szFormatted + 3, 2 );
-   memcpy( szReturn + 3, hb_dateCMonth( iMonth ), iLen );
-   memcpy( szReturn + iLen + 4, szFormatted + 6 + ( hb_setGetCentury() ? 0 : 2 ), 2 + ( hb_setGetCentury() ? 2 : 0 ) );
-
-   hb_retclen( szReturn, iBufferLen );
-   hb_xfree( szReturn );
-}
 
 /* DATEASAGE( <dDate> ) --> <nYears>
 */
@@ -335,6 +268,20 @@ HB_FUNC( ISLEAPYEAR )
       hb_retl( FALSE );
 }
 
+
+#if 0
+
+static int hb_daysinmonth( int iYear, int iMonth )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_daysinmonth(%d, %d)", iYear, iMonth));
+
+   if( iMonth > 0 && iMonth < 13 )
+      return s_daysinmonth[ iMonth - 1 ] +
+             ( ( iMonth == 2 && hb_isleapyear( iYear ) ) ? 1 : 0 );
+   else
+      return 0;
+}
+
 HB_FUNC( DAYSINMONTH )
 {
    PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
@@ -349,6 +296,7 @@ HB_FUNC( DAYSINMONTH )
    else
       hb_retni( 0 );
 }
+
 HB_FUNC( DATETIME )
 {
    time_t current_time;
@@ -357,3 +305,62 @@ HB_FUNC( DATETIME )
 
    hb_retc( ctime( &current_time ) );
 }
+
+/* MDY( <dDate> ) --> "month dd, yyyy"
+*/
+HB_FUNC( MDY )
+{
+   int iYear, iMonth, iDay;
+   char szDate[ 9 ];
+   char szFormatted[ 11 ];
+   char * szReturn;
+   int iBufferLen;
+   int iLen;
+
+   hb_dateDecode( hb_parnl( 1 ), &iYear, &iMonth, &iDay );
+   hb_dateFormat( hb_pardsbuff( szDate, 1 ), szFormatted, "MM/DD/YYYY" );
+
+   iLen = strlen( hb_dateCMonth( iMonth ) );
+
+   iBufferLen = iLen + ( hb_setGetCentury() ? 9 : 7 );
+   szReturn = ( char * ) hb_xgrab( iBufferLen );
+
+   memset( szReturn, ' ', iBufferLen + 1 );
+   memcpy( szReturn, hb_dateCMonth( iMonth ), iLen );
+   memcpy( szReturn + iLen + 1, szFormatted + 3, 2 );
+   szReturn[ iLen + 3 ] = ',';
+   memcpy( szReturn + iLen + 5, szFormatted + 6 + ( hb_setGetCentury() ? 0 : 2 ), 2 + ( hb_setGetCentury() ? 2 : 0 ) );
+
+   hb_retclen( szReturn, iBufferLen );
+   hb_xfree( szReturn );
+}
+
+/* DMY( <dDate> ) --> "dd month yyyy" (european date format)
+*/
+HB_FUNC( DMY )
+{
+   int  iYear, iMonth, iDay;
+   char szDate[ 9 ];
+   char szFormatted[ 11 ];
+   char * szReturn;
+   int iBufferLen;
+   int iLen;
+
+   hb_dateDecode( hb_parnl( 1 ), &iYear, &iMonth, &iDay );
+   hb_dateFormat( hb_pardsbuff( szDate, 1 ), szFormatted, "MM/DD/YYYY" );
+
+   iLen = strlen( hb_dateCMonth( iMonth ) );
+
+   iBufferLen = iLen + ( hb_setGetCentury() ? 9 : 7 );
+   szReturn = ( char * ) hb_xgrab( iBufferLen );
+
+   memset( szReturn, ' ', iBufferLen );
+   memcpy( szReturn, szFormatted + 3, 2 );
+   memcpy( szReturn + 3, hb_dateCMonth( iMonth ), iLen );
+   memcpy( szReturn + iLen + 4, szFormatted + 6 + ( hb_setGetCentury() ? 0 : 2 ), 2 + ( hb_setGetCentury() ? 2 : 0 ) );
+
+   hb_retclen( szReturn, iBufferLen );
+   hb_xfree( szReturn );
+}
+
+#endif

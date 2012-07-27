@@ -55,10 +55,10 @@
 /* $Doc$
  * $FuncName$     <xRet> Default( <xArg>, <xDefault> )
  * $Description$  If argument is not set, return default
- * $End$ */
+ * $End$
 function Default( xArg, xDef )
 return if( ValType(xArg) != ValType(xDef), xDef, xArg )
-
+*/
 
 /* $Doc$
  * $FuncName$     <cOut> ToChar( <xTxt>, [cSeparator], [lDebug] )
