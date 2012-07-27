@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-27 15:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/misc/date.c
+    - deff-out unused variable
+
 2012-07-27 07:49 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/misc/date.c
   * contrib/misc/num.c
@@ -20,7 +24,7 @@
 
 2012-07-27 06:39 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/misc/stringx.c
-    ! hb_strtoken() made static to
+    ! hb_strtoken() made static
 
 2012-07-27 06:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/misc/num.c
