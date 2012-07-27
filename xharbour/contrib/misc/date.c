@@ -68,6 +68,27 @@
 #include "hbdate.h"
 #include "hbapilng.h"
 
+static int s_daysinmonth[ 12 ] =
+{ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+static BOOL hb_isleapyear( int iYear )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_isleapyear(%d)", iYear));
+
+   return ( iYear % 4 == 0 && iYear % 100 != 0 ) || ( iYear % 400 == 0 );
+}
+
+static int hb_daysinmonth( int iYear, int iMonth )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_daysinmonth(%d, %d)", iYear, iMonth));
+
+   if( iMonth > 0 && iMonth < 13 )
+      return s_daysinmonth[ iMonth - 1 ] +
+             ( ( iMonth == 2 && hb_isleapyear( iYear ) ) ? 1 : 0 );
+   else
+      return 0;
+}
+
 /* MDY( <dDate> ) --> "month dd, yyyy"
 */
 HB_FUNC( MDY )

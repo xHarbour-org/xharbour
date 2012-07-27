@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-27 07:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/misc/date.c
+    + missing supporting functions
+
 2012-07-27 06:39 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/misc/stringx.c
     ! hb_strtoken() made static to
