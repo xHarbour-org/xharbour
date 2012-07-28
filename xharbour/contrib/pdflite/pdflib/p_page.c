@@ -22,11 +22,7 @@
 #include "p_color.h"
 #include "p_font.h"
 #include "p_image.h"
-#include "p_layer.h"
 #include "p_page.h"
-#include "p_tagged.h"
-
-
 
 #define PDF_N_PAGE_BOXES        5
 

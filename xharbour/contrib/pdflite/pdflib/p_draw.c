@@ -17,8 +17,6 @@
  */
 
 #include "p_intern.h"
-#include "p_layer.h"
-#include "p_tagged.h"
 
 /* Path segment operators */
 

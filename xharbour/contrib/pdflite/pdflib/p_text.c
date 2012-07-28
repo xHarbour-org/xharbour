@@ -22,8 +22,6 @@
 #include "p_color.h"
 #include "p_defopt.h"
 #include "p_font.h"
-#include "p_layer.h"
-#include "p_tagged.h"
 
 /* --------------------- Text state and options functions ------------------- */
 

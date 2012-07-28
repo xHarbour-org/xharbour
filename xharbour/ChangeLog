@@ -8,6 +8,39 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-28 22:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  - contrib/pdflite/include/ft_pdffont.h
+  - contrib/pdflite/include/pc_crypt.h
+  - contrib/pdflite/include/pc_digsig.h
+  - contrib/pdflite/include/pc_prefix.h
+  - contrib/pdflite/include/pc_pstok.h
+  - contrib/pdflite/include/pc_scan.h
+  - contrib/pdflite/include/pc_scantok.h
+  - contrib/pdflite/include/pc_scope.h
+  - contrib/pdflite/include/pc_strconst.h
+  - contrib/pdflite/include/pc_xmp.h
+  - contrib/pdflite/include/p_hkscmyk.h
+  - contrib/pdflite/include/p_hkslab.h
+  - contrib/pdflite/include/p_icc.h
+  - contrib/pdflite/include/p_icc9809.h
+  - contrib/pdflite/include/p_icclib.h
+  - contrib/pdflite/include/p_layer.h
+  - contrib/pdflite/include/p_pantlab.h
+  - contrib/pdflite/include/p_tagged.h
+    - remove unused files
+
+  * contrib/pdflite/pdflib/p_actions.c
+  * contrib/pdflite/pdflib/p_document.c
+  * contrib/pdflite/pdflib/p_draw.c
+  * contrib/pdflite/pdflib/p_font.c
+  * contrib/pdflite/pdflib/p_image.c
+  * contrib/pdflite/pdflib/p_page.c
+  * contrib/pdflite/pdflib/p_params.c
+  * contrib/pdflite/pdflib/p_text.c
+  * contrib/pdflite/pdflib/p_type1.c
+  * contrib/pdflite/pdflib/p_util.c
+    - remove inclusion of unused header files
+
 2012-07-28 21:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.dc
     + missing flags for memcpy option

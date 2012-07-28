@@ -23,9 +23,6 @@
 #include "p_font.h"
 #include "p_image.h"
 #include "p_page.h"
-#include "p_tagged.h"
-
-#include "pc_scope.h"
 #include "pc_file.h"
 
 /*

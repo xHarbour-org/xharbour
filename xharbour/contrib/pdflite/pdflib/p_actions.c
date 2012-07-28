@@ -19,7 +19,6 @@
 #define P_ACTIONS_C
 
 #include "p_intern.h"
-#include "p_layer.h"
 
 typedef enum
 {

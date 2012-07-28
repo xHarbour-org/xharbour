@@ -23,8 +23,6 @@
 #include "p_defopt.h"
 #include "p_font.h"
 #include "p_image.h"
-#include "p_layer.h"
-#include "p_tagged.h"
 
 static void
 pdf_init_image_struct(PDF *p, pdf_image *image)

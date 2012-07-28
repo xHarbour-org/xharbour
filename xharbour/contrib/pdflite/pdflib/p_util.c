@@ -21,8 +21,6 @@
 #include "p_intern.h"
 #include "p_font.h"
 #include "p_image.h"
-#include "p_layer.h"
-
 
 /* ------------------------- [hyper]textformat -----------------------------*/
 

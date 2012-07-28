@@ -24,14 +24,7 @@
 
 #include "p_intern.h"
 #include "p_image.h"
-#include "p_layer.h"
 #include "p_page.h"
-#include "p_tagged.h"
-
-
-
-
-#include "pc_strconst.h"
 
 
 #if (defined(WIN32) || defined(OS2)) && !defined(WINCE)

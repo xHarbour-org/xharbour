@@ -19,11 +19,8 @@
 
 #include "p_intern.h"
 #include "p_font.h"
-
 #include "pc_ctype.h"
-#include "pc_strconst.h"
 #include "pc_string.h"
-
 
 /* Type 1 font portions: ASCII, encrypted, zeros */
 typedef enum
