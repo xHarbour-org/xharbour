@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-29 01:19 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/hvm.c
+    ! in function hb_vmEqual(): remove redundant comparison of variables:
+      >> if( HB_IS_DATETIME( pItem1 ) && HB_IS_DATETIME( pItem2 ) ) <<
+
 2012-07-28 22:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   - contrib/pdflite/include/ft_pdffont.h
   - contrib/pdflite/include/pc_crypt.h
