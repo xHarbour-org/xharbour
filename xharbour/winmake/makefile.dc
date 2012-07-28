@@ -34,6 +34,10 @@ LINEFLAGS=-l
 HARBOURFLAGS=$(HARBOURFLAGS)
 CLIBFLAGS   =$(CLIBFLAGS)
 
+!ifdef HB_NO_DV_MEMCPY
+CLIBFLAGS   =-DHB_NO_DV_MEMCPY $(CLIBFLAGS)
+!endif
+
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
@@ -57,9 +61,13 @@ CLIBFLAGS_C  =-D"HB_FM_DL_ALLOC" $(CLIBFLAGS_C)
 CLIBFLAGS    =-D"HB_VM_ALL" $(CLIBFLAGS)
 CLIBFLAGS_C  =-D"HB_VM_ALL" $(CLIBFLAGS_C)
 !endif
-CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
-CCC_CMD=SCPPN $(CLIBFLAGS_C) -o$@ $**
-CC_CMD_FMSTAT=SCPPN $(CLIBFLAGS) -D"HB_FM_STATISTICS" -o$@ $**
+!ifdef HB_NO_DV_MEMCPY
+CLIBFLAGS   =-D"HB_NO_DV_MEMCPY" $(CLIBFLAGS)
+CLIBFLAGS_C =-D"HB_NO_DV_MEMCPY" $(CLIBFLAGS_C)
+!endif
+CC_CMD=SCPPN -o+s $(CLIBFLAGS) -o$@ $**
+CCC_CMD=SCPPN -o+s $(CLIBFLAGS_C) -o$@ $**
+CC_CMD_FMSTAT=SCPPN -o+s $(CLIBFLAGS) -D"HB_FM_STATISTICS" -o$@ $**
 LIB_CMD=LIB -c -n -p256 $@ $**
 BISON_CMD1=bison -v -d $** -o$@
 BISON_CMD2=bison -v -p hb_comp -d $** -o$@
@@ -452,11 +460,15 @@ CLIBFLAGS_C  =-D"HB_FM_DL_ALLOC" $(CLIBFLAGS_C)
 CLIBFLAGS    =-D"HB_VM_ALL" $(CLIBFLAGS)
 CLIBFLAGS_C  =-D"HB_VM_ALL" $(CLIBFLAGS_C)
 !endif
+!ifdef HB_NO_DV_MEMCPY
+CLIBFLAGS    =-D"HB_NO_DV_MEMCPY" $(CLIBFLAGS)
+CLIBFLAGS_C  =-D"HB_NO_DV_MEMCPY" $(CLIBFLAGS_C)
+!endif
 CLIBFLAGS   =-D_MT -D"HB_THREAD_SUPPORT" $(CLIBFLAGS)
 CLIBFLAGS_C =-D_MT -D"HB_THREAD_SUPPORT" $(CLIBFLAGS_C)
 HARBOURFLAGS=$(HARBOURFLAGS) -d"HB_THREAD_SUPPORT" -i"include" -i"$(PDFLITE_DIR)\include" -q0 -w2 -es2 -gc0
-CC_CMD      =SCPPN $(CLIBFLAGS) -o$@ $**
-CCC_CMD     =SCPPN $(CLIBFLAGS_C) -o$@ $**
+CC_CMD      =SCPPN -o+s $(CLIBFLAGS) -o$@ $**
+CCC_CMD     =SCPPN -o+s $(CLIBFLAGS_C) -o$@ $**
 HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
@@ -532,10 +544,6 @@ $(HARBOUR_DLL_OBJS),$@,,,$(EXPORT_DEF)
 HARBOURFLAGS=$(HARBOURFLAGS)
 CLIBFLAGS   =$(CLIBFLAGS)
 
-!ifndef HB_NO_VM_ALL
-CLIBFLAGS    =-D"HB_VM_ALL" $(CLIBFLAGS)
-!endif
-
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
@@ -572,10 +580,18 @@ RDDSQL_INCLUDE=-I"$(HB_DIR_MAGIC)\include" $(RDDSQL_INCLUDE)
 INCLUDE_DIR=$(INCLUDE_DIR) $(RDDSQL_INCLUDE) -I"$(SIXAPI_DIR)\include"
 CLIBFLAGS=$(CLIBFLAGS) -cpp -mn $(ACEH_DIR) $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -D"_HAVE_SQLITE_CONFIG_H" -D"HARBOUR_CONF"
 CLIBFLAGS_C=-mn $(ACEH_DIR) $(INCLUDE_DIR) -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -D"_HAVE_SQLITE_CONFIG_H" -D"HARBOUR_CONF"
+!ifndef HB_NO_VM_ALL
+CLIBFLAGS    =-D"HB_VM_ALL" $(CLIBFLAGS)
+CLIBFLAGS_C  =-D"HB_VM_ALL" $(CLIBFLAGS_C)
+!endif
+!ifdef HB_NO_DV_MEMCPY
+CLIBFLAGS    =-D"HB_NO_DV_MEMCPY" $(CLIBFLAGS)
+CLIBFLAGS_C  =-D"HB_NO_DV_MEMCPY" $(CLIBFLAGS_C)
+!endif
 HB_CMD=$(HARBOUR_EXE) -i"include" -i"$(SIXAPI_DIR)\include" -i"$(GDLIB_DIR)\include" -i"$(WHAT32_DIR)\include" -i"$(XWT_DIR)\include" -n1 -q0 -w2 -es2 -gc0 $** -o$@
-CC_CMD=SCPPN $(CLIBFLAGS) -o$@ $**
-CC_CMD_ZIP=SCPPN -cpp -mn -I"include" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(HBZIP_DIR)\include" -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -o$@ $**
-CCC_CMD=SCPPN $(CLIBFLAGS_C) -o$@ $**
+CC_CMD=SCPPN -o+s $(CLIBFLAGS) -o$@ $**
+CC_CMD_ZIP=SCPPN -o+s -cpp -mn -I"include" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(HBZIP_DIR)\include" -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -o$@ $**
+CCC_CMD=SCPPN -o+s $(CLIBFLAGS_C) -o$@ $**
 LIB_CMD=LIB -c -n -p256 $@ $**
 
 #===============================================================================

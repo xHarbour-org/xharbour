@@ -612,25 +612,10 @@ $(OBJ_DIR)$(DIR_SEP)ft_corefont$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)font$(DIR_SEP
 $(OBJ_DIR)$(DIR_SEP)ft_font$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)font$(DIR_SEP)ft_font.c
 	$(CCC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)ft_hostfont$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)font$(DIR_SEP)ft_hostfont.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)ft_pdffont$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)font$(DIR_SEP)ft_pdffont.c
-	$(CCC_CMD)
-
 $(OBJ_DIR)$(DIR_SEP)ft_truetype$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)font$(DIR_SEP)ft_truetype.c
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)ft_type1$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)font$(DIR_SEP)ft_type1.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)pc_aes$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdcore$(DIR_SEP)pc_aes.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)pc_aescbc$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdcore$(DIR_SEP)pc_aescbc.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)pc_arc4$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdcore$(DIR_SEP)pc_arc4.c
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pc_chartabs$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdcore$(DIR_SEP)pc_chartabs.c
@@ -642,16 +627,10 @@ $(OBJ_DIR)$(DIR_SEP)pc_contain$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdcore$(DIR_SE
 $(OBJ_DIR)$(DIR_SEP)pc_core$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdcore$(DIR_SEP)pc_core.c
 	$(CCC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)pc_crypt$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdcore$(DIR_SEP)pc_crypt.c
-	$(CCC_CMD)
-
 $(OBJ_DIR)$(DIR_SEP)pc_ctype$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdcore$(DIR_SEP)pc_ctype.c
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pc_digsig$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdcore$(DIR_SEP)pc_digsig.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)pc_ebcdic$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdcore$(DIR_SEP)pc_ebcdic.c
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pc_encoding$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdcore$(DIR_SEP)pc_encoding.c
@@ -675,12 +654,6 @@ $(OBJ_DIR)$(DIR_SEP)pc_output$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdcore$(DIR_SEP
 $(OBJ_DIR)$(DIR_SEP)pc_resource$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdcore$(DIR_SEP)pc_resource.c
 	$(CCC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)pc_scan$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdcore$(DIR_SEP)pc_scan.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)pc_scope$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdcore$(DIR_SEP)pc_scope.c
-	$(CCC_CMD)
-
 $(OBJ_DIR)$(DIR_SEP)pc_string$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdcore$(DIR_SEP)pc_string.c
 	$(CCC_CMD)
 
@@ -688,9 +661,6 @@ $(OBJ_DIR)$(DIR_SEP)pc_unicode$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdcore$(DIR_SE
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pc_util$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdcore$(DIR_SEP)pc_util.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)pc_xmp$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdcore$(DIR_SEP)pc_xmp.c
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pdflib_core$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)pdflib.c
@@ -732,9 +702,6 @@ $(OBJ_DIR)$(DIR_SEP)p_draw$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_
 $(OBJ_DIR)$(DIR_SEP)p_encoding$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_encoding.c
 	$(CCC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)p_fields$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_fields.c
-	$(CCC_CMD)
-
 $(OBJ_DIR)$(DIR_SEP)p_filter$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_filter.c
 	$(CCC_CMD)
 
@@ -753,9 +720,6 @@ $(OBJ_DIR)$(DIR_SEP)p_hyper$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p
 $(OBJ_DIR)$(DIR_SEP)p_icc$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_icc.c
 	$(CCC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)p_icclib$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_icclib.c
-	$(CCC_CMD)
-
 $(OBJ_DIR)$(DIR_SEP)p_image$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_image.c
 	$(CCC_CMD)
 
@@ -763,9 +727,6 @@ $(OBJ_DIR)$(DIR_SEP)p_jpeg$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)p_jpx$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_jpx.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)p_kerning$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_kerning.c
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)p_layer$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_layer.c
@@ -777,9 +738,6 @@ $(OBJ_DIR)$(DIR_SEP)p_mbox$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_
 $(OBJ_DIR)$(DIR_SEP)p_object$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_object.c
 	$(CCC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)p_opi$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_opi.c
-	$(CCC_CMD)
-
 $(OBJ_DIR)$(DIR_SEP)p_page$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_page.c
 	$(CCC_CMD)
 
@@ -789,13 +747,7 @@ $(OBJ_DIR)$(DIR_SEP)p_params$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)
 $(OBJ_DIR)$(DIR_SEP)p_pattern$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_pattern.c
 	$(CCC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)p_pdi$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_pdi.c
-	$(CCC_CMD)
-
 $(OBJ_DIR)$(DIR_SEP)p_pfm$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_pfm.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)p_photoshp$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_photoshp.c
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)p_png$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_png.c
@@ -804,22 +756,13 @@ $(OBJ_DIR)$(DIR_SEP)p_png$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_p
 $(OBJ_DIR)$(DIR_SEP)p_shading$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_shading.c
 	$(CCC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)p_subsett$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_subsett.c
-	$(CCC_CMD)
-
 $(OBJ_DIR)$(DIR_SEP)p_table$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_table.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)p_tagged$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_tagged.c
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)p_template$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_template.c
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)p_text$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_text.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)p_textflow$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_textflow.c
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)p_tiff$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_tiff.c
@@ -838,9 +781,6 @@ $(OBJ_DIR)$(DIR_SEP)p_util$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)p_xgstate$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_xgstate.c
-	$(CCC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)p_xmp$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_xmp.c
 	$(CCC_CMD)
 
 #===============================================================================

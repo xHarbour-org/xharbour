@@ -447,21 +447,14 @@ PDFLITE_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)ft_cid$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)ft_corefont$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)ft_font$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)ft_hostfont$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)ft_pdffont$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)ft_truetype$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)ft_type1$(OBJEXT)\
 	\
-	$(OBJ_DIR)$(DIR_SEP)pc_aes$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)pc_aescbc$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)pc_arc4$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pc_chartabs$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pc_contain$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pc_core$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)pc_crypt$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pc_ctype$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pc_digsig$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)pc_ebcdic$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pc_encoding$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pc_file$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pc_geom$(OBJEXT)\
@@ -469,12 +462,9 @@ PDFLITE_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)pc_optparse$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pc_output$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pc_resource$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)pc_scan$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)pc_scope$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pc_string$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pc_unicode$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pc_util$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)pc_xmp$(OBJEXT)\
 	\
 	$(OBJ_DIR)$(DIR_SEP)pdflib_core$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_actions$(OBJEXT)\
@@ -487,40 +477,30 @@ PDFLITE_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)p_document$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_draw$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_encoding$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)p_fields$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_filter$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_font$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_gif$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_gstate$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_hyper$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)p_icclib$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_image$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_jpeg$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_jpx$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)p_kerning$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_mbox$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_object$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)p_opi$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_page$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_params$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_pattern$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)p_pdi$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_pfm$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)p_photoshp$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_png$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_shading$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)p_subsett$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)p_tagged$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_template$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_text$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)p_textflow$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_tiff$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_truetype$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_type1$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_type3$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_util$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)p_xgstate$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)p_xmp$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)p_xgstate$(OBJEXT)
 
 #===============================================================================
 # HBTINYMT.LIB Dependencies

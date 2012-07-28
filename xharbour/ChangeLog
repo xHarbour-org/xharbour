@@ -8,6 +8,34 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-28 21:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/makefile.dc
+    + missing flags for memcpy option
+
+  * winmake/common.mak
+  * winmake/compile.mak
+  - contrib/pdflite/font/ft_hostfont.c
+  - contrib/pdflite/font/ft_pdffont.c
+  - contrib/pdflite/pdcore/pc_aes.c
+  - contrib/pdflite/pdcore/pc_aescbc.c
+  - contrib/pdflite/pdcore/pc_arc4.c
+  - contrib/pdflite/pdcore/pc_crypt.c
+  - contrib/pdflite/pdcore/pc_ebcdic.c
+  - contrib/pdflite/pdcore/pc_scan.c
+  - contrib/pdflite/pdcore/pc_scope.c
+  - contrib/pdflite/pdcore/pc_xmp.c
+  - contrib/pdflite/pdflib/p_fields.c
+  - contrib/pdflite/pdflib/p_icclib.c
+  - contrib/pdflite/pdflib/p_kerning.c
+  - contrib/pdflite/pdflib/p_opi.c
+  - contrib/pdflite/pdflib/p_pdi.c
+  - contrib/pdflite/pdflib/p_photoshp.c
+  - contrib/pdflite/pdflib/p_subsett.c
+  - contrib/pdflite/pdflib/p_tagged.c
+  - contrib/pdflite/pdflib/p_textflow.c
+  - contrib/pdflite/pdflib/p_xmp.c
+    - removed unused files
+
 2012-07-28 18:29 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * ChangeLog
     ! edited last log in order to be clearer on envar setup
