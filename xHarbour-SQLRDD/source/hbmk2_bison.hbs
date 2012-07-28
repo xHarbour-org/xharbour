@@ -3,7 +3,7 @@
  */
 
 /*
- * hbmk2 plugin script, implementing support for bison
+ * hbmk plugin script, implementing support for bison
  *
  * Copyright 2011 Viktor Szakats (harbour.01 syenar.hu)
  * www - http://harbour-project.org
@@ -31,7 +31,7 @@
 
 #define I_( x )                 hb_i18n_gettext( x )
 
-FUNCTION hbmk2_plugin_bison( hbmk2 )
+FUNCTION hbmk_plugin_bison( hbmk )
    LOCAL cRetVal := ""
 
    LOCAL cSrc
@@ -43,10 +43,10 @@ FUNCTION hbmk2_plugin_bison( hbmk2 )
    LOCAL nError
    LOCAL lBuildIt
 
-   SWITCH hbmk2[ "cSTATE" ]
+   SWITCH hbmk[ "cSTATE" ]
    CASE "init"
 
-      hbmk2_Register_Input_File_Extension( hbmk2, ".y" )
+      hbmk_Register_Input_File_Extension( hbmk, ".y" )
 
       EXIT
 
@@ -54,14 +54,14 @@ FUNCTION hbmk2_plugin_bison( hbmk2 )
 
       /* Gather input parameters */
 
-      hbmk2[ "vars" ][ "aBIS_Src" ] := {}
-      FOR EACH cSrc IN hbmk2[ "params" ]
+      hbmk[ "vars" ][ "aBIS_Src" ] := {}
+      FOR EACH cSrc IN hbmk[ "params" ]
          IF Left( cSrc, Len( "-bisonflag=" ) ) == "-bisonflag="
             /* TODO: process bison flags */
          ELSE
             SWITCH Lower( hb_FNameExt( cSrc ) )
             CASE ".y"
-               AAdd( hbmk2[ "vars" ][ "aBIS_Src" ], cSrc )
+               AAdd( hbmk[ "vars" ][ "aBIS_Src" ], cSrc )
                EXIT
             ENDSWITCH
          ENDIF
@@ -69,19 +69,19 @@ FUNCTION hbmk2_plugin_bison( hbmk2 )
 
       /* Create output file lists */
 
-      hbmk2[ "vars" ][ "aBIS_Dst" ] := {}
-      FOR EACH cSrc IN hbmk2[ "vars" ][ "aBIS_Src" ]
-         cDst := hbmk2_FNameDirExtSet( hb_FNameName( cSrc ) + "y", hbmk2[ "cWorkDir" ], ".c" )
-         AAdd( hbmk2[ "vars" ][ "aBIS_Dst" ], cDst )
-         hbmk2_AddInput_C( hbmk2, cDst )
+      hbmk[ "vars" ][ "aBIS_Dst" ] := {}
+      FOR EACH cSrc IN hbmk[ "vars" ][ "aBIS_Src" ]
+         cDst := hbmk_FNameDirExtSet( hb_FNameName( cSrc ) + "y", hbmk[ "cWorkDir" ], ".c" )
+         AAdd( hbmk[ "vars" ][ "aBIS_Dst" ], cDst )
+         hbmk_AddInput_C( hbmk, cDst )
       NEXT
 
       /* Detect tool locations */
 
-      IF ! hbmk2[ "lCLEAN" ]
-         IF ! Empty( hbmk2[ "vars" ][ "aBIS_Src" ] )
-            hbmk2[ "vars" ][ "cBIS_BIN" ] := tool_detect( hbmk2, "bison", "BISON_BIN" )
-            IF Empty( hbmk2[ "vars" ][ "cBIS_BIN" ] )
+      IF ! hbmk[ "lCLEAN" ]
+         IF ! Empty( hbmk[ "vars" ][ "aBIS_Src" ] )
+            hbmk[ "vars" ][ "cBIS_BIN" ] := "c:\program files\gnuWin32\bin\" // tool_detect( hbmk, "bison", "BISON_BIN" )
+            IF Empty( hbmk[ "vars" ][ "cBIS_BIN" ] )
                cRetVal := I_( "Required 'bison' tool not found" )
             ENDIF
          ENDIF
@@ -95,16 +95,16 @@ FUNCTION hbmk2_plugin_bison( hbmk2 )
 
    CASE "pre_c"
 
-      IF ! hbmk2[ "lCLEAN" ] .AND. ;
-         ! Empty( hbmk2[ "vars" ][ "aBIS_Src" ] )
+      IF ! hbmk[ "lCLEAN" ] .AND. ;
+         ! Empty( hbmk[ "vars" ][ "aBIS_Src" ] )
 
-         IF ! Empty( hbmk2[ "vars" ][ "cBIS_BIN" ] )
+         IF ! Empty( hbmk[ "vars" ][ "cBIS_BIN" ] )
 
             /* Execute 'bison' commands on input files */
 
-            FOR EACH cSrc, cDst IN hbmk2[ "vars" ][ "aBIS_Src" ], hbmk2[ "vars" ][ "aBIS_Dst" ]
+            FOR EACH cSrc, cDst IN hbmk[ "vars" ][ "aBIS_Src" ], hbmk[ "vars" ][ "aBIS_Dst" ]
 
-               IF hbmk2[ "lINC" ] .AND. ! hbmk2[ "lREBUILD" ]
+               IF hbmk[ "lINC" ] .AND. ! hbmk[ "lREBUILD" ]
                   lBuildIt := ! hb_FGetDateTime( cDst, @tDst ) .OR. ;
                               ! hb_FGetDateTime( cSrc, @tSrc ) .OR. ;
                               tSrc > tDst
@@ -114,24 +114,24 @@ FUNCTION hbmk2_plugin_bison( hbmk2 )
 
                IF lBuildIt
 
-                  cCommand := hbmk2[ "vars" ][ "cBIS_BIN" ] +;
+                  cCommand := hbmk[ "vars" ][ "cBIS_BIN" ] +;
                               " -d -p hb_comp" +;
-                              " -o " + hbmk2_FNameEscape( hbmk2_PathSepToTarget( hbmk2, cDst ), hbmk2[ "nCmd_Esc" ], hbmk2[ "nCmd_FNF" ] ) +;
-                              " " + hbmk2_FNameEscape( hbmk2_PathSepToTarget( hbmk2, cSrc ), hbmk2[ "nCmd_Esc" ], hbmk2[ "nCmd_FNF" ] )
+                              " -o " + hbmk_FNameEscape( hbmk_PathSepToTarget( hbmk, cDst ), hbmk[ "nCmd_Esc" ], hbmk[ "nCmd_FNF" ] ) +;
+                              " " + hbmk_FNameEscape( hbmk_PathSepToTarget( hbmk, cSrc ), hbmk[ "nCmd_Esc" ], hbmk[ "nCmd_FNF" ] )
 
-                  IF hbmk2[ "lTRACE" ]
-                     IF ! hbmk2[ "lQUIET" ]
-                        hbmk2_OutStd( hbmk2, I_( "'bison' command:" ) )
+                  IF hbmk[ "lTRACE" ]
+                     IF ! hbmk[ "lQUIET" ]
+                        hbmk_OutStd( hbmk, I_( "'bison' command:" ) )
                      ENDIF
-                     hbmk2_OutStdRaw( cCommand )
+                     hbmk_OutStdRaw( cCommand )
                   ENDIF
 
-                  IF ! hbmk2[ "lDONTEXEC" ] .AND. ( nError := hb_processRun( cCommand ) ) != 0
-                     hbmk2_OutErr( hbmk2, hb_StrFormat( I_( "Error: Running 'bison' executable. %1$s" ), hb_ntos( nError ) ) )
-                     IF ! hbmk2[ "lQUIET" ]
-                        hbmk2_OutErrRaw( cCommand )
+                  IF ! hbmk[ "lDONTEXEC" ] .AND. ( nError := hb_processRun( cCommand ) ) != 0
+                     hbmk_OutErr( hbmk, hb_StrFormat( I_( "Error: Running 'bison' executable. %1$s" ), hb_ntos( nError ) ) )
+                     IF ! hbmk[ "lQUIET" ]
+                        hbmk_OutErrRaw( cCommand )
                      ENDIF
-                     IF ! hbmk2[ "lIGNOREERROR" ]
+                     IF ! hbmk[ "lIGNOREERROR" ]
                         cRetVal := "error"
                         EXIT
                      ENDIF
@@ -145,8 +145,8 @@ FUNCTION hbmk2_plugin_bison( hbmk2 )
 
    CASE "post_all"
 
-      IF ! hbmk2[ "lINC" ] .OR. hbmk2[ "lCLEAN" ]
-         AEval( hbmk2[ "vars" ][ "aBIS_Dst" ], {| tmp | FErase( tmp ),;
+      IF ! hbmk[ "lINC" ] .OR. hbmk[ "lCLEAN" ]
+         AEval( hbmk[ "vars" ][ "aBIS_Dst" ], {| tmp | FErase( tmp ),;
                                                         FErase( HB_FNameExtSet( tmp, ".h" ) ) } )
       ENDIF
 
@@ -156,18 +156,18 @@ FUNCTION hbmk2_plugin_bison( hbmk2 )
 
    RETURN cRetVal
 
-STATIC FUNCTION tool_detect( hbmk2, cName, cEnvQT )
+STATIC FUNCTION tool_detect( hbmk, cName, cEnvQT )
    LOCAL cBIN
    LOCAL aEnvList := { "HB_BISONPATH" }
 
    IF Empty( cBIN := GetEnv( cEnvQT ) )
 
-      cName += hbmk2[ "cCCEXT" ]
+      cName += hbmk[ "cCCEXT" ]
 
       IF Empty( cBIN )
-         cBIN := hbmk2_FindInPath( cName, GetEnv( "PATH" ) )
+         cBIN := hbmk_FindInPath( cName, GetEnv( "PATH" ) )
          IF Empty( cBIN )
-            hbmk2_OutErr( hbmk2, hb_StrFormat( "%1$s not set, could not autodetect '%2$s' executable", hbmk2_ArrayToList( aEnvList, ", " ), cName ) )
+            hbmk_OutErr( hbmk, hb_StrFormat( "%1$s not set, could not autodetect '%2$s' executable", hbmk_ArrayToList( aEnvList, ", " ), cName ) )
             RETURN NIL
          ENDIF
       ENDIF
