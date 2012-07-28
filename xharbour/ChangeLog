@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-28 18:29 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * ChangeLog
+    ! edited last log in order to be clearer on envar setup
+
 2012-07-28 18:09 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbapi.h
   * include/hbdefs.h
@@ -24,8 +28,8 @@
   * winmake/makefile.vc
   * winmake/makefile.wc
     + inclusion of hbmem.obj to common.lib
-    + flag for option of memcpy version. By default xHarbour uses dv_memcpy.
     + optimization flags on BCC and MSVC builds
+    + flag for option of memcpy version. By default xHarbour uses dv_memcpy.
     To use the compiler's version, an envar should be set:
 
        SET HB_NO_DV_MEMCPY=1
