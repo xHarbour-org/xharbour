@@ -738,7 +738,7 @@ void hb_compGenPCodeN( BYTE * pBuffer, ULONG ulSize, BOOL bStackAffected )
       pFunc->pCode = ( BYTE * ) hb_xrealloc( pFunc->pCode, pFunc->lPCodeSize );
    }
 
-   memcpy( pFunc->pCode + pFunc->lPCodePos, pBuffer, ulSize );
+   HB_MEMCPY( pFunc->pCode + pFunc->lPCodePos, pBuffer, ulSize );
    pFunc->lPCodePos += ulSize;
 
 #if defined(HB_COMP_STRONG_TYPES)

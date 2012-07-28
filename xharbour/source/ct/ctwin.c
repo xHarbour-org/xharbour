@@ -1206,7 +1206,7 @@ static void hb_ctw_gt_GetColorData( PHB_GT pGT, int ** pColorsPtr, int * piColor
       PHB_CT_WND pWnd = s_windows[ s_iCurrWindow ];
 
       *pColorsPtr = ( int * ) hb_xgrab( pWnd->iColorCount * sizeof( int ) );
-      memcpy( *pColorsPtr, pWnd->piColors, pWnd->iColorCount * sizeof( int ) );
+      HB_MEMCPY( *pColorsPtr, pWnd->piColors, pWnd->iColorCount * sizeof( int ) );
       *piColorCount = pWnd->iColorCount;
       *piColorIndex = pWnd->iColorIndex;
    }

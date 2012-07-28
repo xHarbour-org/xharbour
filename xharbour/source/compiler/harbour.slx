@@ -1177,7 +1177,7 @@ static int hb_comp_SLX_CustomAction( int x )
 
       case HB_LIT_ACT :
          yylval.valChar.string = (char *) hb_xgrab( iPairLen + 1 );
-         memcpy( yylval.valChar.string, sPair, iPairLen + 1);
+         HB_MEMCPY( yylval.valChar.string, sPair, iPairLen + 1);
          yylval.valChar.length = iPairLen;
          yylval.valChar.dealloc = TRUE;
          return LITERAL + DONT_REDUCE;

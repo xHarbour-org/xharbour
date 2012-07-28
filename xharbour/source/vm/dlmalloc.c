@@ -5201,7 +5201,7 @@ void* dlrealloc(void* oldmem, size_t bytes) {
         mem = internal_malloc(m, bytes);
         if (mem != 0) {
           size_t oc = chunksize(oldp) - overhead_for(oldp);
-          memcpy(mem, oldmem, (oc < bytes)? oc : bytes);
+          HB_MEMCPY(mem, oldmem, (oc < bytes)? oc : bytes);
           internal_free(m, oldmem);
         }
       }
@@ -5748,7 +5748,7 @@ void* mspace_realloc(mspace msp, void* oldmem, size_t bytes) {
         mem = mspace_malloc(m, bytes);
         if (mem != 0) {
           size_t oc = chunksize(oldp) - overhead_for(oldp);
-          memcpy(mem, oldmem, (oc < bytes)? oc : bytes);
+          HB_MEMCPY(mem, oldmem, (oc < bytes)? oc : bytes);
           mspace_free(m, oldmem);
         }
       }
@@ -6112,7 +6112,7 @@ History:
         Aaron Bachmann,  Emery Berger, and others.
       * Speed up non-fastbin processing enough to remove fastbins.
       * Remove useless cfree() to avoid conflicts with other apps.
-      * Remove internal memcpy, memset. Compilers handle builtins better.
+      * Remove internal HB_MEMCPY, memset. Compilers handle builtins better.
       * Remove some options that no one ever used and rename others.
 
     V2.7.2 Sat Aug 17 09:07:30 2002  Doug Lea  (dl at gee)

@@ -2282,7 +2282,7 @@ static MXML_STATUS mxml_sgs_append_string_len( MXML_SGS *sgs, const char *s, int
          sgs->buffer = buf;
       }
 
-      memcpy( sgs->buffer + sgs->length , s, slen + 1 ); /* include also the trailing space */
+      HB_MEMCPY( sgs->buffer + sgs->length , s, slen + 1 ); /* include also the trailing space */
       sgs->length += slen;
    }
 

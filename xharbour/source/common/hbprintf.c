@@ -299,7 +299,7 @@ static v_param * va_arg_get( int iArg, v_paramlst * plst, int iType )
 
          plst->size = iArg + _ARGBUF_ALLOC;
          if( prev_size == _ARGBUF_SIZE )
-            plst->arglst = ( v_param * ) memcpy( hb_xgrab( plst->size * sizeof( v_param ) ),
+            plst->arglst = ( v_param * ) HB_MEMCPY( hb_xgrab( plst->size * sizeof( v_param ) ),
                                                  plst->arglst, _ARGBUF_SIZE * sizeof( v_param ) );
          else
             plst->arglst = ( v_param * ) hb_xrealloc( plst->arglst, plst->size * sizeof( v_param ) );

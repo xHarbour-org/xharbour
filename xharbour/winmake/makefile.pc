@@ -63,6 +63,9 @@ CLIBFLAGS    =/D"HB_FM_DL_ALLOC" $(CLIBFLAGS)
 !ifndef HB_NO_VM_ALL
 CLIBFLAGS    =/D"HB_VM_ALL" $(CLIBFLAGS)
 !endif
+!ifdef HB_NO_DV_MEMCPY
+CLIBFLAGS    =/D"HB_NO_DV_MEMCPY" $(CLIBFLAGS)
+!endif
 CC_CMD       =POCC $(__MT__) $(CLIBFLAGS) /Fo$@ $**
 CCC_CMD      =$(CC_CMD)
 CC_CMD_FMSTAT=POCC $(__MT__) /DHB_FM_STATISTICS $(CLIBFLAGS) /Fo$@ $**
@@ -123,11 +126,6 @@ $(ZLIB_LIB) : $(ZLIB_LIB_OBJS)
 $(PCREPOS_LIB) : $(PCREPOS_LIB_OBJS)
 	$(LIB_CMD)
 
-!if ("$(DV_MEMCPY)" == "1")
-COMMON_LIB_OBJS=\
-	$(COMMON_LIB_OBJS)\
-	$(OBJ_DIR)\dvmemcpy.obj
-!endif
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
 	$(LIB_CMD)
 
@@ -290,6 +288,9 @@ CLIBFLAGS    =/D"HB_FM_DL_ALLOC" $(CLIBFLAGS)
 !ifndef HB_NO_VM_ALL
 CLIBFLAGS    =/D"HB_VM_ALL" $(CLIBFLAGS)
 !endif
+!ifdef HB_NO_DV_MEMCPY
+CLIBFLAGS    =/D"HB_NO_DV_MEMCPY" $(CLIBFLAGS)
+!endif
 CC_CMD      =POCC $(CLIBFLAGS) /Fo$@ $**
 CCC_CMD     =$(CC_CMD)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
@@ -327,6 +328,9 @@ HARBOURFLAGS=$(HARBOURFLAGS)
 CLIBFLAGS   =$(CLIBFLAGS)
 !ifndef HB_NO_VM_ALL
 CLIBFLAGS   =/D"HB_VM_ALL" $(CLIBFLAGS)
+!endif
+!ifdef HB_NO_DV_MEMCPY
+CLIBFLAGS   =/D"HB_NO_DV_MEMCPY" $(CLIBFLAGS)
 !endif
 RDDSQL_INCLUDE=/I"$(RDDSQL_DIR)" /I"$(HBSQLIT3_DIR)"
 INCLUDE_DIR =/I"include" /I"$(CC_DIR)\include" /I"$(CC_DIR)\include\win" /I"$(FREEIMAGE_DIR)\include" /I"$(GDLIB_DIR)\include" /I"$(XWT_DIR)\include" /I"$(XWT_DIR)\src\xwt_win" /I"$(ZLIB_DIR)" /I"$(PNG_DIR)"

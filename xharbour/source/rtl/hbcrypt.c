@@ -92,7 +92,7 @@ void nxs_crypt(
    }
 
 #ifdef DEBUG_0
-   memcpy( cipher, source, srclen );
+   HB_MEMCPY( cipher, source, srclen );
 #endif
 
    /* pass one: scramble the source using the key */
@@ -118,7 +118,7 @@ void nxs_decrypt(
       keylen = NXS_MAX_KEYLEN;
    }
 
-   memcpy( result, cipher, cipherlen );
+   HB_MEMCPY( result, cipher, cipherlen );
 
    /* pass one: xor the source with the cyclic key */
    nxs_xorcyclic( result, cipherlen, key, keylen );
@@ -234,7 +234,7 @@ void nxs_partial_unscramble(
       kpos++;
       if ( kpos >= (USHORT) keylen )
       {
-         memcpy( cipher + pos, buf, keylen );
+         HB_MEMCPY( cipher + pos, buf, keylen );
          kpos = 0;
          pos += keylen;
       }

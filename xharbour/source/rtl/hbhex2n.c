@@ -188,7 +188,7 @@ HB_FUNC( STRTOHEX )
    {
       if ( ulLenSep && ul )
       {
-         memcpy( c, cSep, ulLenSep );
+         HB_MEMCPY( c, cSep, ulLenSep );
          c += ulLenSep;
       }
 

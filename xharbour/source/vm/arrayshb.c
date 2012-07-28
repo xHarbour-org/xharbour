@@ -1510,7 +1510,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
                   }
                   else
                   {
-                     memcpy( (void *) ( Buffer + uiOffset ), (void *) ( HB_PTRDIFF ) pStructure->item.asLong.value, uiMemberSize );
+                     HB_MEMCPY( (void *) ( Buffer + uiOffset ), (void *) ( HB_PTRDIFF ) pStructure->item.asLong.value, uiMemberSize );
                   }
                }
 #if UINT_MAX == ULONG_MAX
@@ -1522,7 +1522,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
                   }
                   else
                   {
-                     memcpy( (void *) ( Buffer + uiOffset ), (void *) ( HB_PTRDIFF ) pStructure->item.asInteger.value, uiMemberSize );
+                     HB_MEMCPY( (void *) ( Buffer + uiOffset ), (void *) ( HB_PTRDIFF ) pStructure->item.asInteger.value, uiMemberSize );
                   }
                }
 #endif
@@ -1551,7 +1551,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
                   }
                   else
                   {
-                     memcpy( (void *) ( Buffer + uiOffset ), (void *) pInternalBuffer->item.asString.value, uiMemberSize );
+                     HB_MEMCPY( (void *) ( Buffer + uiOffset ), (void *) pInternalBuffer->item.asString.value, uiMemberSize );
                   }
                }
                else

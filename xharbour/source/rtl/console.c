@@ -538,13 +538,13 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
          {
             if( ++s_uiPRow > uiPRow )
             {
-               memcpy( &buf[ iPtr ], "\x0C\x0D\x00\x00", 2 );  /* Source buffer is 4 bytes to make CodeGuard happy */
+               HB_MEMCPY( &buf[ iPtr ], "\x0C\x0D\x00\x00", 2 );  /* Source buffer is 4 bytes to make CodeGuard happy */
                iPtr += 2;
                s_uiPRow = 0;
             }
             else
             {
-               memcpy( &buf[ iPtr ], s_szCrLf, s_iCrLfLen );
+               HB_MEMCPY( &buf[ iPtr ], s_szCrLf, s_iCrLfLen );
                iPtr += s_iCrLfLen;
             }
 
@@ -555,7 +555,7 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
                   hb_fsWrite( hb_setGetPrintHan(), buf, ( USHORT ) iPtr );
                   iPtr = 0;
                }
-               memcpy( &buf[ iPtr ], s_szCrLf, s_iCrLfLen );
+               HB_MEMCPY( &buf[ iPtr ], s_szCrLf, s_iCrLfLen );
                iPtr += s_iCrLfLen;
                ++s_uiPRow;
             }

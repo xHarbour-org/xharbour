@@ -1549,7 +1549,7 @@ HB_FUNC( CREATEOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] [, cLicense] )
       }
       else
       {
-         memcpy( ( LPVOID ) &iid, hb_parcx( 2 ), sizeof( iid ) );
+         HB_MEMCPY( ( LPVOID ) &iid, hb_parcx( 2 ), sizeof( iid ) );
       }
 
       riid = &iid;
@@ -1622,7 +1622,7 @@ HB_FUNC( GETOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] )
       }
       else
       {
-         memcpy( ( LPVOID ) &iid, hb_parcx( 2 ), sizeof( iid ) );
+         HB_MEMCPY( ( LPVOID ) &iid, hb_parcx( 2 ), sizeof( iid ) );
       }
 
       riid = &iid;

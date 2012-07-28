@@ -182,7 +182,7 @@ HB_FUNC( TIP_TIMESTAMP )
    /* init time structure anyway */
    time( &current );
 #if _POSIX_C_SOURCE < 199506L || defined( HB_OS_DARWIN_5 )
-   memcpy( (void *) &tmTime, (void *) localtime( &current ), sizeof(tmTime) );
+   HB_MEMCPY( (void *) &tmTime, (void *) localtime( &current ), sizeof(tmTime) );
 #else
    localtime_r( &current , &tmTime );
 #endif

@@ -81,7 +81,7 @@ HB_FUNC( LEFT )
       }
 
       sLeft = (char*) hb_xgrab( lLeft + 1 );
-      memcpy( sLeft, sString, lLeft );
+      HB_MEMCPY( sLeft, sString, lLeft );
       sLeft[ lLeft ] = '\0';
 
       hb_retclenAdopt( sLeft, lLeft );

@@ -1208,7 +1208,7 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
                      /* extract a single expression from the array
                       */
                      HB_EXPR_PTR pNew = hb_compExprNew( HB_ET_NONE );
-                     memcpy( pNew, pExpr, sizeof(  HB_EXPR ) );
+                     HB_MEMCPY( pNew, pExpr, sizeof(  HB_EXPR ) );
                      /* This will suppres releasing of memory occupied by components of
                      * the expression - we have just copied them into the new expression.
                      * This method is simpler then traversing the list and releasing all
@@ -2000,7 +2000,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
 
                               sSubStr = (char *) hb_xgrab( (ULONG) pLen->value.asNum.lVal + 1 );
 
-                              memcpy( (void *) sSubStr,
+                              HB_MEMCPY( (void *) sSubStr,
                                       (const char *)( pString->value.asString.string + (int)( pStart->value.asNum.lVal - 1 ) ),
                                       (size_t)( (ULONG)( pLen->value.asNum.lVal ) ) );
 

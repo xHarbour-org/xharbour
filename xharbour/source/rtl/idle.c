@@ -351,7 +351,7 @@ PHB_ITEM hb_idleDelFunc( void * pID )
          {
             if( iTask != s_uiIdleMaxTask )
             {
-               memcpy( &s_pIdleTasks[ iTask ], &s_pIdleTasks[ iTask + 1 ],
+               HB_MEMCPY( &s_pIdleTasks[ iTask ], &s_pIdleTasks[ iTask + 1 ],
                         sizeof( HB_ITEM_PTR ) * ( s_uiIdleMaxTask - iTask ) );
             }
             s_pIdleTasks = ( HB_ITEM_PTR * ) hb_xrealloc( s_pIdleTasks, sizeof( HB_ITEM_PTR ) * s_uiIdleMaxTask );

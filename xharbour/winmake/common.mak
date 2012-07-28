@@ -1242,6 +1242,7 @@ COMMON_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hbfsapi$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbgete$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbhash$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbmem$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbstr$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbprintf$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbtrace$(OBJEXT)\

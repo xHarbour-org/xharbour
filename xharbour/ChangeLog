@@ -8,6 +8,114 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-28 18:09 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbapi.h
+  * include/hbdefs.h
+  + source/common/hbmem.c
+  - source/common/dvmemcpy.c
+    + function dv_memcpy() now in common.lib, accessible via macro HB_MEMCPY,
+    activated by default. This configuration gives a speed improvement.
+
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/makefile.bc
+  * winmake/makefile.gc
+  * winmake/makefile.pc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+    + inclusion of hbmem.obj to common.lib
+    + flag for option of memcpy version. By default xHarbour uses dv_memcpy.
+    + optimization flags on BCC and MSVC builds
+    To use the compiler's version, an envar should be set:
+
+       SET HB_NO_DV_MEMCPY=1
+
+  * include/hbexprb.c
+  * include/hbexprc.c
+  * source/common/expropt2.c
+  * source/common/hbdate.c
+  * source/common/hbprintf.c
+  * source/common/hbstr.c
+  * source/compiler/cmdcheck.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+  * source/compiler/harbouryy.c
+  * source/compiler/hbpcode.c
+  * source/compiler/ppcomp.c
+  * source/ct/ctwfunc.c
+  * source/ct/ctwin.c
+  * source/ct/ftoc.c
+  * source/pp/ppcore.c
+  * source/rdd/dbf1.c
+  * source/rdd/dbf1net.c
+  * source/rdd/delim1.c
+  * source/rdd/hbdbsort.c
+  * source/rdd/sdf1.c
+  * source/rdd/workarea.c
+  * source/rdd/bmdbfcdx/bmdbfcdx1.c
+  * source/rdd/bmdbfcdx/redbfcdx1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbfdbt/dbfdbt1.c
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rdd/dbffpt/redbffpt1.c
+  * source/rdd/dbfmdx/dbfmdx1.c
+  * source/rdd/dbfnsx/dbfnsx1.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rdd/hbsix/sxcompr.c
+  * source/rdd/hbsix/sxcrypt.c
+  * source/rdd/hsx/hsx.c
+  * source/rtl/ampm.c
+  * source/rtl/cdpapi.c
+  * source/rtl/console.c
+  * source/rtl/cstruct.prg
+  * source/rtl/dateshb.c
+  * source/rtl/diskspac.c
+  * source/rtl/dllcall.c
+  * source/rtl/filenet.c
+  * source/rtl/filesys.c
+  * source/rtl/gtclip.c
+  * source/rtl/hbcrypt.c
+  * source/rtl/hbgtcore.c
+  * source/rtl/hbhex2n.c
+  * source/rtl/hbip.c
+  * source/rtl/hbmd5.c
+  * source/rtl/hbsrlraw.c
+  * source/rtl/hbwinole.c
+  * source/rtl/hbxml.c
+  * source/rtl/idle.c
+  * source/rtl/left.c
+  * source/rtl/net.c
+  * source/rtl/regex.c
+  * source/rtl/strmatch.c
+  * source/rtl/strtran.c
+  * source/rtl/valtostr.c
+  * source/rtl/win32prn.prg
+  * source/rtl/gtcgi/gtcgi.c
+  * source/rtl/gtstd/gtstd.c
+  * source/rtl/gtwin/gtwin.c
+  * source/tip/utils.c
+  * source/vm/arrayshb.c
+  * source/vm/classes.c
+  * source/vm/codebloc.c
+  * source/vm/dbgentry.c
+  * source/vm/dlmalloc.c
+  * source/vm/dynsym.c
+  * source/vm/eval.c
+  * source/vm/fastitem.c
+  * source/vm/fm.c
+  * source/vm/hash.c
+  * source/vm/hbi18n.c
+  * source/vm/hvm.c
+  * source/vm/inet.c
+  * source/vm/itemapi.c
+  * source/vm/macro.c
+  * source/vm/runner.c
+  * source/vm/set.c
+  * source/vm/strapi.c
+  * source/vm/thread.c
+    ! memcpy -> HB_MEMCPY
+
 2012-07-27 15:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/misc/date.c
     - deff-out unused variable

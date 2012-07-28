@@ -154,7 +154,7 @@ static BOOL _hb_sxGetKey( PHB_ITEM pKeyItem, char * pKeyVal )
    {
       ulKey = hb_itemGetCLen( pKeyItem );
       if( ulKey )
-         memcpy( pKeyVal, hb_itemGetCPtr( pKeyItem ), HB_MIN( ulKey, 8 ) );
+         HB_MEMCPY( pKeyVal, hb_itemGetCPtr( pKeyItem ), HB_MIN( ulKey, 8 ) );
       if( ulKey < 8 )
          memset( pKeyVal + ulKey, 0, 8 - ulKey );
       fResult = TRUE;

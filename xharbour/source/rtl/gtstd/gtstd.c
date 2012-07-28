@@ -237,7 +237,7 @@ static void hb_gt_std_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
 
       /* if( pGTSTD->saved_TIO.c_lflag & TOSTOP ) != 0 */
       sigaction( SIGTTOU, NULL, &old );
-      memcpy( &act, &old, sizeof( struct sigaction ) );
+      HB_MEMCPY( &act, &old, sizeof( struct sigaction ) );
       act.sa_handler = sig_handler;
       /* do not use SA_RESTART - new Linux kernels will repeat the operation */
 #if defined( SA_ONESHOT )
@@ -253,7 +253,7 @@ static void hb_gt_std_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
       s_fRestTTY = TRUE;
 
       tcgetattr( pGTSTD->hStdin, &pGTSTD->saved_TIO );
-      memcpy( &pGTSTD->curr_TIO, &pGTSTD->saved_TIO, sizeof( struct termios ) );
+      HB_MEMCPY( &pGTSTD->curr_TIO, &pGTSTD->saved_TIO, sizeof( struct termios ) );
       /* atexit( restore_input_mode ); */
       pGTSTD->curr_TIO.c_lflag &= ~( ICANON | ECHO );
       pGTSTD->curr_TIO.c_iflag &= ~ICRNL;

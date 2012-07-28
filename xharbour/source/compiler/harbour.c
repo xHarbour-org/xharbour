@@ -1026,7 +1026,7 @@ void hb_compGenGlobalName( char *szVarName )
       }
       pBuffer[i++] = HB_LOBYTE( iVar );
       pBuffer[i++] = HB_HIBYTE( iVar );
-      memcpy( ( BYTE * ) ( & ( pBuffer[ i ] ) ), szVarName, iVarLen + 1 );
+      HB_MEMCPY( ( BYTE * ) ( & ( pBuffer[ i ] ) ), szVarName, iVarLen + 1 );
       hb_compGenPCodeN( pBuffer, i + iVarLen + 1, 0 );
       hb_xfree( pBuffer );
 
@@ -1044,7 +1044,7 @@ static void hb_compGenLocalName( USHORT wLocal, char *szVarName )
    pBuffer[1] = HB_LOBYTE( wLocal );
    pBuffer[2] = HB_HIBYTE( wLocal );
 
-   memcpy( ( BYTE * ) ( & ( pBuffer[3] ) ), szVarName, strlen( szVarName ) + 1 );
+   HB_MEMCPY( ( BYTE * ) ( & ( pBuffer[3] ) ), szVarName, strlen( szVarName ) + 1 );
 
    hb_compGenPCodeN( pBuffer, strlen( szVarName ) + 4 , 0 );
 
@@ -1078,7 +1078,7 @@ void hb_compGenStaticName( char *szVarName )
       pBuffer[2] = HB_LOBYTE( iVar );
       pBuffer[3] = HB_HIBYTE( iVar );
 
-      memcpy( ( BYTE * ) ( & ( pBuffer[4] ) ), szVarName, strlen( szVarName ) + 1 );
+      HB_MEMCPY( ( BYTE * ) ( & ( pBuffer[4] ) ), szVarName, strlen( szVarName ) + 1 );
 
       hb_compGenPCodeN( pBuffer, strlen( szVarName ) + 5 , 0 );
 
@@ -3017,12 +3017,12 @@ void hb_compGenModuleName( const char *szFile, const char *szFunc )
    iBufLen = 1 + iFileLen + ( szFunc ? iFuncLen : 0 ) + 1;
    pBuffer = (BYTE *)hb_xgrab( iBufLen );
    pBuffer[ 0 ] = HB_P_MODULENAME;
-   memcpy( (BYTE *)( &( pBuffer[ 1 ] ) ), (BYTE *)szFile, iFileLen );
+   HB_MEMCPY( (BYTE *)( &( pBuffer[ 1 ] ) ), (BYTE *)szFile, iFileLen );
 
    if ( szFunc )
    {
       pBuffer[ 1 + iFileLen ] = ':';
-      memcpy( (BYTE *)( &( pBuffer[ 1 + iFileLen + 1 ] ) ), (BYTE *)szFunc, iFuncLen );
+      HB_MEMCPY( (BYTE *)( &( pBuffer[ 1 + iFileLen + 1 ] ) ), (BYTE *)szFunc, iFuncLen );
    }
    else
    {
@@ -4077,7 +4077,7 @@ BYTE * hb_compHideString( int iType, char * szText, ULONG ulStrLen, ULONG * ulBu
 
       default:             // No encode
          pBuffer = ( BYTE * ) hb_xgrab( ulStrLen + 1 );
-         memcpy( pBuffer, ( BYTE * ) szText, ulStrLen );
+         HB_MEMCPY( pBuffer, ( BYTE * ) szText, ulStrLen );
          *ulBufferLen = ulStrLen;
          break;
 
@@ -4140,7 +4140,7 @@ void hb_compGenPushString( char * szText, ULONG ulStrLen )
       pBuffer[1] = HB_LOBYTE( ulStrLen );
       pBuffer[2] = HB_HIBYTE( ulStrLen );
 
-      memcpy( ( BYTE *)( &( pBuffer[3] ) ), ( BYTE * ) szText, ulStrLen );
+      HB_MEMCPY( ( BYTE *)( &( pBuffer[3] ) ), ( BYTE * ) szText, ulStrLen );
 
       hb_compGenPCodeN( pBuffer, ulStrLen + 3, 1 );
    }
@@ -4151,7 +4151,7 @@ void hb_compGenPushString( char * szText, ULONG ulStrLen )
       pBuffer[0] = HB_P_PUSHSTRSHORT;
       pBuffer[1] = ( BYTE ) ulStrLen;
 
-      memcpy( ( BYTE *)( &( pBuffer[2] ) ), ( BYTE * ) szText, ulStrLen );
+      HB_MEMCPY( ( BYTE *)( &( pBuffer[2] ) ), ( BYTE * ) szText, ulStrLen );
 
       hb_compGenPCodeN( pBuffer, ulStrLen + 2, 1 );
    }

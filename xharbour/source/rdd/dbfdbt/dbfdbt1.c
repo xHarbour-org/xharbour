@@ -358,7 +358,7 @@ static void hb_dbtWriteMemo( DBTAREAP pArea, ULONG ulBlock, PHB_ITEM pItem, ULON
 
       if( pBuff )
       {
-         memcpy( pBuff, hb_itemGetCPtr( pItem ), ulLen );
+         HB_MEMCPY( pBuff, hb_itemGetCPtr( pItem ), ulLen );
          pBuff[ ulLen ] = 0x1A;
          hb_cdpnTranslate( ( char * ) pBuff, hb_cdppage(), pArea->cdPage, ulLen );
          hb_fsWriteLarge( pArea->hMemoFile, pBuff, ulLen + 1 );
@@ -372,7 +372,7 @@ static void hb_dbtWriteMemo( DBTAREAP pArea, ULONG ulBlock, PHB_ITEM pItem, ULON
          do
          {
             ulRest = HB_MIN( ulLen - ulWritten, DBT_BLOCKSIZE );
-            memcpy( pBlock, pSrc + ulWritten, ulRest );
+            HB_MEMCPY( pBlock, pSrc + ulWritten, ulRest );
             memset( pBlock + ulRest, 0x1A, DBT_BLOCKSIZE - ulRest );
             hb_cdpnTranslate( ( char * ) pBlock, hb_cdppage(), pArea->cdPage, ulRest );
             hb_fsWrite( pArea->hMemoFile, pBlock, DBT_BLOCKSIZE );

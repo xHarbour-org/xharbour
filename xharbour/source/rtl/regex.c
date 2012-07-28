@@ -925,11 +925,11 @@ HB_FUNC( HB_REGEXCOMP )
    {
       ULONG nSize = ((real_pcre *) re.re_pcre)->size;
       cRegex = (char *) hb_xgrab( HB_ALLOC_ALIGNMENT + sizeof( re ) + nSize );
-      memcpy( cRegex + HB_ALLOC_ALIGNMENT + sizeof( re ), re.re_pcre, nSize );
+      HB_MEMCPY( cRegex + HB_ALLOC_ALIGNMENT + sizeof( re ), re.re_pcre, nSize );
       (pcre_free)(re.re_pcre);
       re.re_pcre = (pcre *) ( cRegex + HB_ALLOC_ALIGNMENT + sizeof( re ) );
-      memcpy( cRegex, "***", 3 );
-      memcpy( cRegex + HB_ALLOC_ALIGNMENT, &re, sizeof( re ) );
+      HB_MEMCPY( cRegex, "***", 3 );
+      HB_MEMCPY( cRegex + HB_ALLOC_ALIGNMENT, &re, sizeof( re ) );
       hb_retclenAdoptRaw( cRegex, HB_ALLOC_ALIGNMENT + sizeof( re ) + nSize );
    }
    else {

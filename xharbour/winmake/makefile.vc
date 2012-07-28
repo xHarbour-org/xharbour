@@ -82,6 +82,7 @@ OPTFLAGS=-Ogt2yb1p
 !else
 OPTFLAGS=-Otyb1
 !endif
+OPTFLAGS=-EHsc $(OPTFLAGS)
 INCLUDE_DIR =-I"include" -I"$(OBJ_DIR)" -I"$(CC_DIR)\include" -I"$(ZLIB_DIR)"
 INCLUDE_DIR =$(INCLUDE_DIR) -I"$(PDFLITE_DIR)\include" -I"$(PNG_DIR)" -I"$(TIFF_DIR)" -I"$(JPEG_DIR)"
 !if ("$(USE_MSVCRT)"=="1")
@@ -144,6 +145,11 @@ CLIBFLAGS    =-DHB_VM_ALL $(CLIBFLAGS)
 CLIBFLAGS_C  =-DHB_VM_ALL $(CLIBFLAGS_C)
 !endif
 
+!ifdef HB_NO_DV_MEMCPY
+CLIBFLAGS   =-DHB_NO_DV_MEMCPY $(CLIBFLAGS)
+CLIBFLAGS_C =-DHB_NO_DV_MEMCPY $(CLIBFLAGS_C)
+!endif
+
 CC_CMD       =CL $(CLIBFLAGS) -Fo$@ $**
 CCC_CMD      =CL $(CLIBFLAGS_C) -Fo$@ $**
 CC_CMD_FMSTAT=CL $(CLIBFLAGS) -DHB_FM_STATISTICS -Fo$@ $**
@@ -191,11 +197,6 @@ $(VM_LIB) : $(VM_LIB_OBJS)
 $(ZLIB_LIB) : $(ZLIB_LIB_OBJS)
 	$(LIB_CMD)
 
-!if ("$(DV_MEMCPY)" == "1")
-COMMON_LIB_OBJS=\
-	$(COMMON_LIB_OBJS)\
-	$(OBJ_DIR)\dvmemcpy.obj
-!endif
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
 	$(LIB_CMD)
 
@@ -357,15 +358,6 @@ HARBOUR_DLL_OBJS=\
 !endif
 
 #===============================================================================
-# DANIEL VIK MEMCPY
-#===============================================================================
-!if ("$(DV_MEMCPY)" == "1")
-HARBOUR_DLL_OBJS=\
-	$(HARBOUR_DLL_OBJS)\
-	$(OBJ_DIR)\dvmemcpy.obj
-!endif
-
-#===============================================================================
 # Append your own build flags here
 #===============================================================================
 HARBOURFLAGS=$(HARBOURFLAGS)
@@ -380,6 +372,7 @@ OPTFLAGS=-Ogt2yb1p
 !else
 OPTFLAGS=-Otyb1
 !endif
+OPTFLAGS=-EHsc $(OPTFLAGS)
 !if ("$(CPLUSPLUS)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
@@ -440,6 +433,11 @@ CLIBFLAGS_C  =-DHB_FM_DL_ALLOC $(CLIBFLAGS_C)
 !ifndef HB_NO_VM_ALL
 CLIBFLAGS    =-DHB_VM_ALL $(CLIBFLAGS)
 CLIBFLAGS_C  =-DHB_VM_ALL $(CLIBFLAGS_C)
+!endif
+
+!ifdef HB_NO_DV_MEMCPY
+CLIBFLAGS   =-DHB_NO_DV_MEMCPY $(CLIBFLAGS)
+CLIBFLAGS_C =-DHB_NO_DV_MEMCPY $(CLIBFLAGS_C)
 !endif
 
 CC_CMD     =CL $(CLIBFLAGS) -Fo$@ $**
@@ -550,6 +548,11 @@ CLIBFLAGS    =-DHB_VM_ALL $(CLIBFLAGS)
 CLIBFLAGS_C  =-DHB_VM_ALL $(CLIBFLAGS_C)
 !endif
 
+!ifdef HB_NO_DV_MEMCPY
+CLIBFLAGS   =-DHB_NO_DV_MEMCPY $(CLIBFLAGS)
+CLIBFLAGS_C =-DHB_NO_DV_MEMCPY $(CLIBFLAGS_C)
+!endif
+
 #===============================================================================
 # Option to use MSVCRT rather than LIBC*.LIB
 #===============================================================================
@@ -558,6 +561,8 @@ OPTFLAGS=-Ogt2yb1p
 !else
 OPTFLAGS=-Otyb1
 !endif
+
+OPTFLAGS=-EHsc $(OPTFLAGS)
 
 !ifdef HB_DIR_ADS
 ACEH_DIR=-I"$(HB_DIR_ADS)"

@@ -154,7 +154,7 @@ HB_FUNC( HB_STRTOEXP )
             *pDst++ = '[';
             ch = ']';
          }
-         memcpy( pDst, pszString, ulLen );
+         HB_MEMCPY( pDst, pszString, ulLen );
          pDst += ulLen;
          *pDst++ = ch;
       }

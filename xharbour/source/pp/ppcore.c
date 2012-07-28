@@ -392,7 +392,7 @@ static void hb_membufAddData( PHB_MEM_BUFFER pBuffer, char * data, ULONG ulLen )
       pBuffer->pBufPtr = ( char * ) hb_xrealloc( pBuffer->pBufPtr, pBuffer->ulAllocated );
    }
 
-   memcpy( &pBuffer->pBufPtr[ pBuffer->ulLen ], data, ulLen );
+   HB_MEMCPY( &pBuffer->pBufPtr[ pBuffer->ulLen ], data, ulLen );
    pBuffer->ulLen += ulLen;
 }
 
@@ -512,7 +512,7 @@ static PHB_PP_TOKEN hb_pp_tokenNew( const char * value, ULONG ulLen,
       else
       {
          pToken->value = ( char * ) hb_xgrab( ulLen + 1 );
-         memcpy( pToken->value, value, ulLen );
+         HB_MEMCPY( pToken->value, value, ulLen );
          pToken->value[ ulLen ] = '\0';
       }
    }
@@ -543,7 +543,7 @@ static void hb_pp_tokenSetValue( PHB_PP_TOKEN pToken,
    {
       pToken->type &= ~HB_PP_TOKEN_STATIC;
       pToken->value = ( char * ) hb_xgrab( ulLen + 1 );
-      memcpy( pToken->value, value, ulLen );
+      HB_MEMCPY( pToken->value, value, ulLen );
       pToken->value[ ulLen ] = '\0';
    }
    pToken->len = ( USHORT ) ulLen;
@@ -553,11 +553,11 @@ static PHB_PP_TOKEN hb_pp_tokenClone( PHB_PP_TOKEN pSource )
 {
    PHB_PP_TOKEN pDest = ( PHB_PP_TOKEN ) hb_xgrab( sizeof( HB_PP_TOKEN ) );
 
-   memcpy( pDest, pSource, sizeof( HB_PP_TOKEN ) );
+   HB_MEMCPY( pDest, pSource, sizeof( HB_PP_TOKEN ) );
    if( HB_PP_TOKEN_ALLOC( pDest->type ) )
    {
       pDest->value = ( char * ) hb_xgrab( pDest->len + 1 );
-      memcpy( pDest->value, pSource->value, pDest->len );
+      HB_MEMCPY( pDest->value, pSource->value, pDest->len );
       pDest->value[ pDest->len ] = '\0';
    }
    pDest->pNext  = NULL;
@@ -6096,7 +6096,7 @@ void hb_pp_tokenUpper( PHB_PP_TOKEN pToken )
          if( !HB_PP_TOKEN_ALLOC( pToken->type ) )
          {
             char * value = ( char * ) hb_xgrab( pToken->len + 1 );
-            memcpy( value, pToken->value + 1, pToken->len );
+            HB_MEMCPY( value, pToken->value + 1, pToken->len );
             hb_xfree( pToken->value );
             pToken->type &= ~HB_PP_TOKEN_STATIC;
          }
@@ -6110,7 +6110,7 @@ void hb_pp_tokenUpper( PHB_PP_TOKEN pToken )
       if( !HB_PP_TOKEN_ALLOC( pToken->type ) )
       {
          char * value = ( char * ) hb_xgrab( pToken->len + 1 );
-         memcpy( value, pToken->value, pToken->len + 1 );
+         HB_MEMCPY( value, pToken->value, pToken->len + 1 );
          pToken->value = value;
          pToken->type &= ~HB_PP_TOKEN_STATIC;
       }

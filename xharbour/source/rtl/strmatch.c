@@ -163,8 +163,8 @@ BOOL hb_strMatchWild( const char *szString, const char *szPattern )
                {
                   ulAnyPosP = ( ULONG * ) hb_xgrab( ulBufSize * sizeof( ULONG ) );
                   ulAnyPosV = ( ULONG * ) hb_xgrab( ulBufSize * sizeof( ULONG ) );
-                  memcpy( ulAnyPosP, pulBufPosP, HB_MAX_WILDPATTERN * sizeof( ULONG ) );
-                  memcpy( ulAnyPosV, pulBufPosV, HB_MAX_WILDPATTERN * sizeof( ULONG ) );
+                  HB_MEMCPY( ulAnyPosP, pulBufPosP, HB_MAX_WILDPATTERN * sizeof( ULONG ) );
+                  HB_MEMCPY( ulAnyPosV, pulBufPosV, HB_MAX_WILDPATTERN * sizeof( ULONG ) );
                }
                else
                {
@@ -234,8 +234,8 @@ BOOL hb_strMatchWildExact( const char *szString, const char *szPattern )
                {
                   ulAnyPosP = ( ULONG * ) hb_xgrab( ulBufSize * sizeof( ULONG ) );
                   ulAnyPosV = ( ULONG * ) hb_xgrab( ulBufSize * sizeof( ULONG ) );
-                  memcpy( ulAnyPosP, pulBufPosP, HB_MAX_WILDPATTERN * sizeof( ULONG ) );
-                  memcpy( ulAnyPosV, pulBufPosV, HB_MAX_WILDPATTERN * sizeof( ULONG ) );
+                  HB_MEMCPY( ulAnyPosP, pulBufPosP, HB_MAX_WILDPATTERN * sizeof( ULONG ) );
+                  HB_MEMCPY( ulAnyPosV, pulBufPosV, HB_MAX_WILDPATTERN * sizeof( ULONG ) );
                }
                else
                {
@@ -306,8 +306,8 @@ BOOL hb_strMatchCaseWildExact( const char *szString, const char *szPattern )
                {
                   ulAnyPosP = ( ULONG * ) hb_xgrab( ulBufSize * sizeof( ULONG ) );
                   ulAnyPosV = ( ULONG * ) hb_xgrab( ulBufSize * sizeof( ULONG ) );
-                  memcpy( ulAnyPosP, pulBufPosP, HB_MAX_WILDPATTERN * sizeof( ULONG ) );
-                  memcpy( ulAnyPosV, pulBufPosV, HB_MAX_WILDPATTERN * sizeof( ULONG ) );
+                  HB_MEMCPY( ulAnyPosP, pulBufPosP, HB_MAX_WILDPATTERN * sizeof( ULONG ) );
+                  HB_MEMCPY( ulAnyPosV, pulBufPosV, HB_MAX_WILDPATTERN * sizeof( ULONG ) );
                }
                else
                {

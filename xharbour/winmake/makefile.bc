@@ -48,7 +48,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 INCLUDE_DIR  =$(INCLUDE_DIR) -Iinclude -I$(OBJ_DIR) -I$(ZLIB_DIR)
 INCLUDE_DIR  =$(INCLUDE_DIR) -I$(PDFLITE_DIR)\include -I$(PNG_DIR) -I$(JPEG_DIR) -I$(TIFF_DIR)
-CLIBFLAGS    =$(CLIBFLAGS) -q -c $(INCLUDE_DIR) -d -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H
+CLIBFLAGS    =$(CLIBFLAGS) -OS -O2 -q -c $(INCLUDE_DIR) -d -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H
 HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 -gc0
 LINK_CMD     =ILINK32 -ap -Tpe -x -Gn -C -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" -Llib\b32 $(LFLAGS) "$(CC_DIR)\lib\c0x32.obj" $**,$@,,
 CLIBFLAGS    =$(CLIBFLAGS) -tWM
@@ -64,6 +64,10 @@ CLIBFLAGS    =-DHB_FM_DL_ALLOC $(CLIBFLAGS)
 
 !ifndef HB_NO_VM_ALL
 CLIBFLAGS    =-DHB_VM_ALL $(CLIBFLAGS)
+!endif
+
+!ifdef HB_NO_DV_MEMCPY
+CLIBFLAGS    =-DHB_NO_DV_MEMCPY $(CLIBFLAGS)
 !endif
 
 # User flags should be able to override everything!
@@ -175,11 +179,6 @@ $(ZLIB_LIB) : $(ZLIB_LIB_OBJS)
 +)
 !
 
-!if ("$(DV_MEMCPY)" == "1")
-COMMON_LIB_OBJS=\
-	$(COMMON_LIB_OBJS)\
-	$(OBJ_DIR)\dvmemcpy.obj
-!endif
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
 	IF EXIST "$(COMMON_LIB)" $(DEL) "$(COMMON_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!
@@ -501,15 +500,6 @@ VM_LIB_OBJS=\
 	$(VM_COMMON_OBJS)
 
 #===============================================================================
-# DANIEL VIK MEMCPY
-#===============================================================================
-!if ("$(DV_MEMCPY)" == "1")
-HARBOUR_DLL_OBJS=\
-	$(HARBOUR_DLL_OBJS)\
-	$(OBJ_DIR)\dvmemcpy.obj
-!endif
-
-#===============================================================================
 # WVG
 #===============================================================================
 !if $d(HB_WVG)
@@ -561,6 +551,10 @@ CLIBFLAGS   =-DHB_VM_ALL $(CLIBFLAGS)
 CLIBFLAGS    =-DHB_FM_DL_ALLOC $(CLIBFLAGS)
 !endif
 
+!ifdef HB_NO_DV_MEMCPY
+CLIBFLAGS    =-DHB_NO_DV_MEMCPY $(CLIBFLAGS)
+!endif
+
 CC_CMD      =BCC32 $(CLIBFLAGS) -o$@ $**
 CCC_CMD     =$(CC_CMD)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
@@ -605,6 +599,10 @@ $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 
 !ifndef HB_NO_VM_ALL
 CLIBFLAGS    =-DHB_VM_ALL $(CLIBFLAGS)
+!endif
+
+!ifdef HB_NO_DV_MEMCPY
+CLIBFLAGS    =-DHB_NO_DV_MEMCPY $(CLIBFLAGS)
 !endif
 
 #===============================================================================
@@ -655,7 +653,7 @@ RDDSQL_INCLUDE=-I"$(HB_DIR_MAGIC)\include" $(RDDSQL_INCLUDE)
 !endif
 
 INCLUDE_DIR  =-Iinclude $(RDDSQL_INCLUDE) -I$(SIXAPI_DIR)\include
-CLIBFLAGS    =$(CLIBFLAGS) -c -q $(ACEH_DIR) $(CAIRO_DIR) $(CURL_DIR) $(OPENSSL_DIR) $(INCLUDE_DIR) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(HBHPDF_DIR) -I$(ZLIB_DIR) -d -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
+CLIBFLAGS    =$(CLIBFLAGS) -OS -O2 -c -q $(ACEH_DIR) $(CAIRO_DIR) $(CURL_DIR) $(OPENSSL_DIR) $(INCLUDE_DIR) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(HBHPDF_DIR) -I$(ZLIB_DIR) -d -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
 HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -i$(GDLIB_DIR)\include -i$(SIXAPI_DIR)\include -i$(WHAT32_DIR)\include -i$(XWT_DIR)\include -q0 -w2 -es2 -gc0
 CLIBFLAGS    =$(CLIBFLAGS) -tWM
 !if $d(HB_THREAD_SUPPORT)

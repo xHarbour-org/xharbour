@@ -72,7 +72,7 @@ BOOL hb_gt_setClipboard( const char * szClipData, ULONG ulLen )
    if( s_ulClipboardLen )
    {
       s_szClipboardData = ( char * ) hb_xgrab( s_ulClipboardLen + 1 );
-      memcpy( s_szClipboardData, szClipData, s_ulClipboardLen );
+      HB_MEMCPY( s_szClipboardData, szClipData, s_ulClipboardLen );
       s_szClipboardData[ s_ulClipboardLen ] = '\0';
    }
    return TRUE;
@@ -85,7 +85,7 @@ BOOL hb_gt_getClipboard( char ** pszClipData, ULONG *pulLen )
    if( s_ulClipboardLen )
    {
       *pszClipData = ( char * ) hb_xgrab( s_ulClipboardLen + 1 );
-      memcpy( *pszClipData, s_szClipboardData, s_ulClipboardLen );
+      HB_MEMCPY( *pszClipData, s_szClipboardData, s_ulClipboardLen );
       ( *pszClipData )[ s_ulClipboardLen ] = '\0';
    }
    return s_ulClipboardLen != 0;
@@ -118,7 +118,7 @@ BOOL hb_gt_w32_setClipboard( UINT uFormat, const char * szClipData, ULONG ulLen 
             }
             else
             {
-               memcpy( lptstrCopy, szClipData, ulLen );
+               HB_MEMCPY( lptstrCopy, szClipData, ulLen );
                lptstrCopy[ ulLen ] = '\0';
             }
             fResult = TRUE;
@@ -178,7 +178,7 @@ BOOL hb_gt_w32_getClipboard( UINT uFormat, char ** pszClipData, ULONG *pulLen )
                   if( *pulLen )
                   {
                      *pszClipData = ( char * ) hb_xgrab( *pulLen + 1 );
-                     memcpy( *pszClipData, lptstr, *pulLen );
+                     HB_MEMCPY( *pszClipData, lptstr, *pulLen );
                      ( *pszClipData )[ *pulLen ] = '\0';
                   }
                   break;

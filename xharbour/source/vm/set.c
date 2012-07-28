@@ -516,7 +516,7 @@ BOOL hb_setSetCentury( BOOL new_century_setting )
 
       {
          int format_len;
-         if( y_start > 0 ) memcpy( szNewFormat, szDateFormat, y_start );
+         if( y_start > 0 ) HB_MEMCPY( szNewFormat, szDateFormat, y_start );
          szNewFormat[ y_start ] = '\0';
          hb_strncat( szNewFormat, "YY", size );
          if( new_century_setting )
@@ -1573,7 +1573,7 @@ PHB_SET_STRUCT hb_setClone( PHB_SET_STRUCT pSrc )
 
    pSet = ( PHB_SET_STRUCT ) hb_xgrab( sizeof( HB_SET_STRUCT ) );
 
-   memcpy( pSet, pSrc, sizeof( HB_SET_STRUCT ) );
+   HB_MEMCPY( pSet, pSrc, sizeof( HB_SET_STRUCT ) );
 
    pSet->hb_set_althan = pSet->hb_set_extrahan = pSet->hb_set_printhan = FS_ERROR;
 

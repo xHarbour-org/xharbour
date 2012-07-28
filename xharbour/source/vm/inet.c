@@ -1798,7 +1798,7 @@ HB_FUNC( INETACCEPT )
       PHB_ITEM pSocket = NULL;
       /* we'll be using only nonblocking sockets */
       HB_SOCKET_INIT( NewSocket, pSocket );
-      memcpy( &NewSocket->remote, &si_remote, Len );
+      HB_MEMCPY( &NewSocket->remote, &si_remote, Len );
       NewSocket->com = incoming;
       /* hb_socketSetNonBlocking( NewSocket ); */
       hb_itemReturnRelease( pSocket );

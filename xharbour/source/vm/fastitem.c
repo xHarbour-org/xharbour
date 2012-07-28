@@ -492,7 +492,7 @@ void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
          PHB_SYMBCARGO pSymCargo = (PHB_SYMBCARGO) hb_xgrab( sizeof( HB_SYMBCARGO ) );
 
          assert( pSource->item.asSymbol.pCargo );
-         memcpy( pSymCargo, (void *) pSource->item.asSymbol.pCargo, sizeof( HB_SYMBCARGO ) );
+         HB_MEMCPY( pSymCargo, (void *) pSource->item.asSymbol.pCargo, sizeof( HB_SYMBCARGO ) );
 
          pDest->item.asSymbol.pCargo = pSymCargo;
       }
@@ -638,7 +638,7 @@ PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, const char * szText, ULONG ulLen )
              __HB_STRING_REALLOC( pItem, ulLen );
 
              // Safe, no need to use memmove()
-             memcpy( pItem->item.asString.value, szText, ulLen );
+             HB_MEMCPY( pItem->item.asString.value, szText, ulLen );
 
              return pItem;
           }

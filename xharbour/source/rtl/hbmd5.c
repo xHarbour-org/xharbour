@@ -162,7 +162,7 @@ static void hb_md5go( MD5_BUF * md5 )
    int i;
 
    /* copy accumulators first */
-   memcpy( A, md5->accum, sizeof( A ) );
+   HB_MEMCPY( A, md5->accum, sizeof( A ) );
 
    /* fill buffer */
    for( i = 0, ptr = md5->buf; i < 16; i++, ptr += 4 )
@@ -288,20 +288,20 @@ void hb_md5( const void * data, ULONG ulLen, char * digest )
    /* process full blocks */
    for( i = 0; i < n; i++, ucdata += 64 )
    {
-      memcpy( md5.buf, ucdata, 64 );
+      HB_MEMCPY( md5.buf, ucdata, 64 );
       hb_md5go( &md5 );
    }
    /* prepare additional block(s) */
    n = ulLen & 63;
    if( n )
-      memcpy( buf, ucdata, n );
-   memcpy( buf + n, pad, 64 );
+      HB_MEMCPY( buf, ucdata, n );
+   HB_MEMCPY( buf + n, pad, 64 );
    /* count bits length */
    i = 56;
    if( n >= 56 )
    {
       i += 64;
-      memcpy( md5.buf, buf, 64 );
+      HB_MEMCPY( md5.buf, buf, 64 );
       hb_md5go( &md5 );
    }
    buf[ i++ ] = ( UCHAR ) ( ( ulLen << 3 ) & 0xF8 );
@@ -311,7 +311,7 @@ void hb_md5( const void * data, ULONG ulLen, char * digest )
       buf[ i++ ] = ( UCHAR ) ( ulLen & 0xFF );
       ulLen >>= 8;
    }
-   memcpy( md5.buf, buf + i - 64, 64 );
+   HB_MEMCPY( md5.buf, buf + i - 64, 64 );
    hb_md5go( &md5 );
    /* write digest */
    hb_md5val( md5.accum, digest );
@@ -333,7 +333,7 @@ void hb_md5file( HB_FHANDLE hFile, char * digest )
    {
       for( i = 0; i < ( MAX_FBUF >> 6 ); i++ )
       {
-         memcpy( md5.buf, readbuf + ( i << 6 ), 64 );
+         HB_MEMCPY( md5.buf, readbuf + ( i << 6 ), 64 );
          hb_md5go( &md5 );
       }
       n = hb_fsReadLarge( hFile, readbuf, MAX_FBUF );
@@ -343,19 +343,19 @@ void hb_md5file( HB_FHANDLE hFile, char * digest )
    i = 0;
    while( n > 64 )
    {
-      memcpy( md5.buf, readbuf + i, 64 );
+      HB_MEMCPY( md5.buf, readbuf + i, 64 );
       hb_md5go( &md5 );
       i += 64;
       n -= 64;
    }
    if( n )
-      memcpy( buf, readbuf + i, n );
-   memcpy( buf + n, pad, 64 );
+      HB_MEMCPY( buf, readbuf + i, n );
+   HB_MEMCPY( buf + n, pad, 64 );
    i = 56;
    if( n >= 56 )
    {
       i += 64;
-      memcpy( md5.buf, buf, 64 );
+      HB_MEMCPY( md5.buf, buf, 64 );
       hb_md5go( &md5 );
    }
    buf[ i++ ] = ( UCHAR ) ( ( flen << 3 ) & 0xF8 );
@@ -365,7 +365,7 @@ void hb_md5file( HB_FHANDLE hFile, char * digest )
       buf[ i++ ] = ( UCHAR ) ( flen & 0xFF );
       flen >>= 8;
    }
-   memcpy( md5.buf, buf + i - 64, 64 );
+   HB_MEMCPY( md5.buf, buf + i - 64, 64 );
    hb_md5go( &md5 );
    hb_md5val( md5.accum, digest );
    hb_xfree( readbuf );

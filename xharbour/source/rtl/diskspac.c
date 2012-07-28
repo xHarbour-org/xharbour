@@ -145,7 +145,7 @@ HB_FUNC( DISKSPACE )
                                   ( PULARGE_INTEGER ) &i64TotalBytes,
                                   ( PULARGE_INTEGER ) &i64FreeBytes ) )
          {
-            memcpy( &i64RetVal, &i64FreeBytesToCaller, sizeof( ULARGE_INTEGER ) );
+            HB_MEMCPY( &i64RetVal, &i64FreeBytesToCaller, sizeof( ULARGE_INTEGER ) );
 
             #if (defined(__GNUC__) || defined(_MSC_VER)  || defined(__LCC__) ) && !defined(__RSXNT__)
 

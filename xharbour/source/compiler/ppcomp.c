@@ -54,7 +54,7 @@ static void hb_pp_PragmaDump( void * cargo, char * pBuffer, ULONG ulSize,
    //hb_comp_iLine = iLine + 1;
    pInline = hb_compInlineAdd( NULL );
    pInline->pCode = ( BYTE * ) hb_xgrab( ulSize + 1 );
-   memcpy( pInline->pCode, pBuffer, ulSize );
+   HB_MEMCPY( pInline->pCode, pBuffer, ulSize );
    pInline->pCode[ ulSize ] = '\0';
    pInline->lPCodeSize = ulSize;
    pInline->iLine = iLine;
@@ -73,7 +73,7 @@ static void hb_pp_hb_inLine( void * cargo, char * szFunc,
    {
       PINLINE pInline = hb_compInlineAdd( hb_compIdentifierNew( szFunc, TRUE ) );
       pInline->pCode = ( BYTE * ) hb_xgrab( ulSize + 1 );
-      memcpy( pInline->pCode, pBuffer, ulSize );
+      HB_MEMCPY( pInline->pCode, pBuffer, ulSize );
       pInline->pCode[ ulSize ] = '\0';
       pInline->lPCodeSize = ulSize;
       pInline->iLine = iLine;

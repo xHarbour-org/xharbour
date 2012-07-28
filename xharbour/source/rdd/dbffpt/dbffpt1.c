@@ -1259,7 +1259,7 @@ static ULONG hb_fptStoreSMTItem( FPTAREAP pArea, PHB_ITEM pItem, BYTE ** bBufPtr
          *bBufPtr += 2;
          if( ulLen > 0 )
          {
-            memcpy( *bBufPtr, hb_itemGetCPtr( pItem ), ulLen );
+            HB_MEMCPY( *bBufPtr, hb_itemGetCPtr( pItem ), ulLen );
 #ifndef HB_CDP_SUPPORT_OFF
             if( ( uiFlags & HB_FF_BINARY ) == 0 )
                hb_cdpnTranslate( ( char * ) *bBufPtr, hb_cdppage(), pArea->area.cdPage, ulLen );
@@ -1660,7 +1660,7 @@ static ULONG hb_fptStoreSixItem( FPTAREAP pArea, PHB_ITEM pItem, BYTE ** bBufPtr
          *bBufPtr += SIX_ITEM_BUFSIZE;
          if( ulLen > 0 )
          {
-            memcpy( *bBufPtr, hb_itemGetCPtr( pItem ), ulLen );
+            HB_MEMCPY( *bBufPtr, hb_itemGetCPtr( pItem ), ulLen );
 #ifndef HB_CDP_SUPPORT_OFF
             if( ( uiFlags & HB_FF_BINARY ) == 0 )
                hb_cdpnTranslate( ( char *) *bBufPtr, hb_cdppage(), pArea->area.cdPage, ulLen );
@@ -1855,7 +1855,7 @@ static void hb_fptStoreFlexItem( FPTAREAP pArea, PHB_ITEM pItem, BYTE ** bBufPtr
             *(*bBufPtr)++ = FPTIT_FLEXAR_STR;
             HB_PUT_LE_UINT16( *bBufPtr, ( USHORT ) ulLen );
             *bBufPtr += 2;
-            memcpy( *bBufPtr, hb_itemGetCPtr( pItem ), ulLen );
+            HB_MEMCPY( *bBufPtr, hb_itemGetCPtr( pItem ), ulLen );
 #ifndef HB_CDP_SUPPORT_OFF
             if( ( uiFlags & HB_FF_BINARY ) == 0 )
                hb_cdpnTranslate( ( char *) *bBufPtr, hb_cdppage(), pArea->area.cdPage, ulLen );
@@ -2886,7 +2886,7 @@ static HB_ERRCODE hb_fptPutMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem,
       if( ulSize > 0 && pArea->area.cdPage != hb_cdppage() && ( uiFlags & HB_FF_BINARY ) == 0 )
       {
          bBufAlloc = ( BYTE * ) hb_xgrab( ulSize );
-         memcpy( bBufAlloc, bBufPtr, ulSize );
+         HB_MEMCPY( bBufAlloc, bBufPtr, ulSize );
          hb_cdpnTranslate( ( char *) bBufAlloc, hb_cdppage(), pArea->area.cdPage, ulSize );
          bBufPtr = bBufAlloc;
       }
@@ -3204,7 +3204,7 @@ static HB_ERRCODE hb_fptGetVarField( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pI
 
             pBuf = pString;
             if( uiType <= pField->uiLen - 2 )
-               memcpy( pString, pFieldBuf, uiType );
+               HB_MEMCPY( pString, pFieldBuf, uiType );
             else
             {
                ULONG ulSize = ulLen;
@@ -3212,7 +3212,7 @@ static HB_ERRCODE hb_fptGetVarField( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pI
                if( pField->uiLen > 6 )
                {
                   USHORT uiVLen = pField->uiLen - 6;
-                  memcpy( pBuf, pFieldBuf, uiVLen );
+                  HB_MEMCPY( pBuf, pFieldBuf, uiVLen );
                   ulSize -= uiVLen;
                   pBuf += uiVLen;
                }
@@ -3553,7 +3553,7 @@ static HB_ERRCODE hb_fptPutVarField( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pI
                HB_PUT_LE_DOUBLE( &buffer[ 3 ], dVal );
                uiType = HB_VF_DNUM;
                if( pField->uiLen > 12 )
-                  memcpy( pFieldBuf, buffer + 1, 10 );
+                  HB_MEMCPY( pFieldBuf, buffer + 1, 10 );
                else
                {
                   pBlock = buffer;
@@ -3569,14 +3569,14 @@ static HB_ERRCODE hb_fptPutVarField( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pI
                ulLen = HB_VF_CHAR;
             uiType = ( USHORT ) ulLen;
             pAlloc = ( BYTE * ) hb_xgrab( uiType + 1 );
-            memcpy( pAlloc, hb_itemGetCPtr( pItem ), uiType );
+            HB_MEMCPY( pAlloc, hb_itemGetCPtr( pItem ), uiType );
 #ifndef HB_CDP_SUPPORT_OFF
             if( ( pField->uiFlags & HB_FF_BINARY ) == 0 )
                hb_cdpnTranslate( ( char * ) pAlloc, hb_cdppage(), pArea->area.cdPage, uiType );
 #endif
             if( uiType <= pField->uiLen - 2 )
             {
-               memcpy( pFieldBuf, pAlloc, uiType );
+               HB_MEMCPY( pFieldBuf, pAlloc, uiType );
             }
             else
             {
@@ -3584,7 +3584,7 @@ static HB_ERRCODE hb_fptPutVarField( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pI
                ulNewSize = uiType;
                if( pField->uiLen > 6 )
                {
-                  memcpy( pFieldBuf, pBlock, pField->uiLen - 6 );
+                  HB_MEMCPY( pFieldBuf, pBlock, pField->uiLen - 6 );
                   ulNewSize -= pField->uiLen - 6;
                   pBlock += pField->uiLen - 6;
                }
@@ -3880,15 +3880,15 @@ static HB_ERRCODE hb_fptCreateMemFile( FPTAREAP pArea, LPDBOPENINFO pCreateInfo 
    ulSize = 512;
    if( pArea->uiMemoVersion == DB_MEMOVER_SIX )
    {
-      memcpy( fptHeader.signature1, "SIxMemo", 8 );
+      HB_MEMCPY( fptHeader.signature1, "SIxMemo", 8 );
    }
    else
    {
-      memcpy( fptHeader.signature1, "Harbour", 8 );
+      HB_MEMCPY( fptHeader.signature1, "Harbour", 8 );
       if( pArea->uiMemoVersion == DB_MEMOVER_FLEX ||
           pArea->uiMemoVersion == DB_MEMOVER_CLIP )
       {
-         memcpy( fptHeader.signature2, "FlexFile3\003", 11 );
+         HB_MEMCPY( fptHeader.signature2, "FlexFile3\003", 11 );
          ulSize = sizeof( FPTHEADER );
          if( pArea->area.rddID == s_uiRddIdBLOB )
          {

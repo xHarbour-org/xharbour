@@ -93,7 +93,7 @@ static void hb_sdfInitArea( SDFAREAP pArea, char * szFileName )
 static void hb_sdfClearRecordBuffer( SDFAREAP pArea )
 {
    memset( pArea->pRecord, ' ', pArea->uiRecordLen );
-   memcpy( pArea->pRecord + pArea->uiRecordLen,
+   HB_MEMCPY( pArea->pRecord + pArea->uiRecordLen,
            pArea->szEol, pArea->uiEolLen );
 }
 
@@ -144,7 +144,7 @@ static HB_ERRCODE hb_sdfReadRecord( SDFAREAP pArea )
       }
 
       if( uiEolPos != pArea->uiRecordLen )
-         memcpy( pArea->pRecord + pArea->uiRecordLen,
+         HB_MEMCPY( pArea->pRecord + pArea->uiRecordLen,
                  pArea->szEol, pArea->uiEolLen );
    }
 
@@ -193,7 +193,7 @@ static HB_ERRCODE hb_sdfNextRecord( SDFAREAP pArea )
                if( pArea->uiEolLen > 1 )
                {
                   uiRest = pArea->uiEolLen - 1;
-                  memcpy( pArea->pRecord, pArea->pRecord + uiRead - uiRest, uiRest );
+                  HB_MEMCPY( pArea->pRecord, pArea->pRecord + uiRead - uiRest, uiRest );
                }
                ulOffset += uiRead - uiRest;
             }
@@ -381,7 +381,7 @@ static HB_ERRCODE hb_sdfGetValue( SDFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
          if( pArea->area.cdPage != hb_cdppage() )
          {
             char * pVal = ( char * ) hb_xgrab( pField->uiLen + 1 );
-            memcpy( pVal, pArea->pRecord + pArea->pFieldOffset[ uiIndex ], pField->uiLen );
+            HB_MEMCPY( pVal, pArea->pRecord + pArea->pFieldOffset[ uiIndex ], pField->uiLen );
             pVal[ pField->uiLen ] = '\0';
             hb_cdpnTranslate( pVal, pArea->area.cdPage, hb_cdppage(), pField->uiLen );
             hb_itemPutCPtr( pItem, pVal, pField->uiLen );
@@ -494,7 +494,7 @@ static HB_ERRCODE hb_sdfPutValue( SDFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
             uiSize = ( USHORT ) hb_itemGetCLen( pItem );
             if( uiSize > pField->uiLen )
                uiSize = pField->uiLen;
-            memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
+            HB_MEMCPY( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
                     hb_itemGetCPtr( pItem ), uiSize );
 #ifndef HB_CDP_SUPPORT_OFF
             hb_cdpnTranslate( (char *) pArea->pRecord + pArea->pFieldOffset[ uiIndex ], hb_cdppage(), pArea->area.cdPage, uiSize );
@@ -510,7 +510,7 @@ static HB_ERRCODE hb_sdfPutValue( SDFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
          if( pField->uiType == HB_FT_DATE )
          {
             hb_itemGetDS( pItem, szBuffer );
-            memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ], szBuffer, 8 );
+            HB_MEMCPY( pArea->pRecord + pArea->pFieldOffset[ uiIndex ], szBuffer, 8 );
          }
          else
             uiError = EDBF_DATATYPE;
@@ -521,7 +521,7 @@ static HB_ERRCODE hb_sdfPutValue( SDFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
          {
             if( hb_itemStrBuf( szBuffer, pItem, pField->uiLen, pField->uiDec ) )
             {
-               memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
+               HB_MEMCPY( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
                        szBuffer, pField->uiLen );
             }
             else
@@ -577,7 +577,7 @@ static HB_ERRCODE hb_sdfPutRec( SDFAREAP pArea, BYTE * pBuffer )
       return HB_FAILURE;
 
    /* Copy data to buffer */
-   memcpy( pArea->pRecord, pBuffer + 1, pArea->uiRecordLen );
+   HB_MEMCPY( pArea->pRecord, pBuffer + 1, pArea->uiRecordLen );
 
    return HB_SUCCESS;
 }

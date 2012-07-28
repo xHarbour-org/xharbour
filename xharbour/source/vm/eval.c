@@ -795,7 +795,7 @@ HB_FUNC( HB_EXEC )
 
       // Changing the Pointer item to a Symbol Item, so that we don't have to re-push paramters.
       hb_itemPutSymbol( pPointer, pSymbol );
-      memcpy( pPointer->item.asSymbol.pCargo, hb_stackBaseItem()->item.asSymbol.pCargo, sizeof( HB_SYMBCARGO ) );
+      HB_MEMCPY( pPointer->item.asSymbol.pCargo, hb_stackBaseItem()->item.asSymbol.pCargo, sizeof( HB_SYMBCARGO ) );
       pPointer->item.asSymbol.pCargo->stackbase = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
       pPointer->item.asSymbol.pCargo->uiSuperClass = 0;
 

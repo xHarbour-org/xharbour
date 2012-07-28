@@ -12015,7 +12015,7 @@ yyreduce:
                                       PNAMESPACE pClone;
 
                                       pClone = (PNAMESPACE) hb_xgrab( sizeof( _NAMESPACE ) );
-                                      memcpy( (void *) pClone, (void *) pNamespace, sizeof( _NAMESPACE ) );
+                                      HB_MEMCPY( (void *) pClone, (void *) pNamespace, sizeof( _NAMESPACE ) );
 
                                       pClone->pOuter = hb_comp_UsedNamespaces.pCurrent;
                                       hb_comp_UsedNamespaces.pCurrent = pClone;

@@ -204,7 +204,7 @@ HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
     * the passed buffer
     */
    pCBlock->pCode = ( BYTE * ) hb_xgrab( usLen );
-   memcpy( pCBlock->pCode, pBuffer, usLen );
+   HB_MEMCPY( pCBlock->pCode, pBuffer, usLen );
 
    //pCBlock->dynBuffer = TRUE;
    //pCBlock->bPrivVars = FALSE;

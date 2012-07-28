@@ -83,6 +83,10 @@ ifndef HB_NO_VM_ALL
 CLIBFLAGS    +=-DHB_VM_ALL
 endif
 
+ifdef HB_NO_DV_MEMCPY
+CLIBFLAGS    +=-DHB_NO_DV_MEMCPY
+endif
+
 CC_CMD       =GCC $(CLIBFLAGS) -o $@ $^
 CCC_CMD      =$(CC_CMD)
 CC_CMD_FMSTAT=GCC $(CLIBFLAGS) -DHB_FM_STATISTICS -o $@ $^
@@ -175,10 +179,6 @@ $(VM_LIB) : $(VM_LIB_OBJS)
 $(ZLIB_LIB) : $(ZLIB_LIB_OBJS)
 	$(LIB_CMD)
 
-ifeq ($(DV_MEMCPY),1)
-COMMON_LIB_OBJS+=\
-	$(OBJ_DIR)/dvmemcpy.o
-endif
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
 	$(LIB_CMD)
 
@@ -343,14 +343,6 @@ HARBOUR_DLL_OBJS+=\
 endif
 
 #===============================================================================
-# DANIEL VIK MEMCPY
-#===============================================================================
-ifeq ($(DV_MEMCPY),1)
-HARBOUR_DLL_OBJS+=\
-	$(OBJ_DIR)/dvmemcpy.o
-endif
-
-#===============================================================================
 # WVTGUI
 #===============================================================================
 ifeq ($(HB_WVTGUI),1)
@@ -387,6 +379,10 @@ endif
 
 ifndef HB_NO_VM_ALL
 CLIBFLAGS    +=-DHB_VM_ALL
+endif
+
+ifdef HB_NO_DV_MEMCPY
+CLIBFLAGS    +=-DHB_NO_DV_MEMCPY
 endif
 
 CC_CMD      =GCC $(CLIBFLAGS) -o $@ $^
@@ -428,6 +424,10 @@ CLIBFLAGS   +=
 
 ifndef HB_NO_VM_ALL
 CLIBFLAGS   +=-DHB_VM_ALL
+endif
+
+ifdef HB_NO_DV_MEMCPY
+CLIBFLAGS   +=-DHB_NO_DV_MEMCPY
 endif
 
 #===============================================================================

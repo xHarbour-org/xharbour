@@ -1087,7 +1087,7 @@ HB_FUNC_STATIC( SETDOCUMENTPROPERTIES )
                 size_t iLen = ( size_t ) hb_parclen( 3 ) ;
                 if ( cForm && iLen && iLen < CCHFORMNAME  )
                 {
-                  memcpy( pDevMode->dmFormName, cForm, iLen + 1 ) ;  // Copy the trailing '\0'
+                  HB_MEMCPY( pDevMode->dmFormName, cForm, iLen + 1 ) ;  // Copy the trailing '\0'
                   dInit |= DM_FORMNAME ;
                 }
               }

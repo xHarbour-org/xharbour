@@ -62,7 +62,7 @@ HB_FUNC( AMPM )
    BOOL   bAM;
 
    memset( pszResult, '\0', 3 );
-   memcpy( pszResult, pszTime, ulTimeLen );
+   HB_MEMCPY( pszResult, pszTime, ulTimeLen );
 
    if( uiHour == 0 || uiHour == 24 )
    {

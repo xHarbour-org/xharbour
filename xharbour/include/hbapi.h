@@ -569,7 +569,7 @@ extern HB_EXPORT ULONG   hb_xquery( USHORT uiMode );               /* Query diff
    more reasonable. */
 #if UINT_MAX > USHRT_MAX
    /* NOTE: memcpy/memset can work with ULONG data blocks */
-   #define  hb_xmemcpy  memcpy
+   #define  hb_xmemcpy  HB_MEMCPY
    #define  hb_xmemset  memset
 #else
    /* NOTE: otherwise, the hb_xmemcpy and hb_xmemset functions
@@ -998,6 +998,7 @@ extern HB_EXPORT int     Wild2RegEx( const char *sWild, char* sRegEx, BOOL bMatc
 extern HB_EXPORT int     Mask2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase );
 extern HB_EXPORT BOOL    hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString );
 extern HB_EXPORT HB_ULONG hb_hextonum(const char *cHex);
+extern HB_EXPORT void *  dv_memcpy(void *dest, const void *src, size_t count);
 
 #include "local.h"
 

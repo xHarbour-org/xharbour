@@ -182,7 +182,7 @@ static PHB_FILE hb_fileNetNew( HB_FHANDLE hFile, BOOL fShared, BOOL fBufferLock,
       pFile->pFileName = ( char * ) hb_xalloc( HB_PATH_MAX );
       memset( pFile->pFileName, 0, sizeof( HB_PATH_MAX ) );
       if( pFileName )
-         memcpy( pFile->pFileName, pFileName, strlen( ( const char * ) pFileName ) );
+         HB_MEMCPY( pFile->pFileName, pFileName, strlen( ( const char * ) pFileName ) );
       pFile->pFuncs     = hb_fileNetMethods();
       pFile->hFile      = hFile;
       pFile->shared     = fShared;
@@ -559,7 +559,7 @@ static int hb_NetGetCmdItem( char ** pptr, char * szDest )
    if( *ptr )
    {
       if( ptr > *pptr )
-         memcpy( szDest, *pptr, ptr-*pptr );
+         HB_MEMCPY( szDest, *pptr, ptr-*pptr );
       szDest[ptr-*pptr] = '\0';
       *pptr = ptr;
       return 1;
@@ -940,7 +940,7 @@ ULONG hb_fileNetReadAt( PHB_FILE pFile, void * pBuffer, ULONG ulSize, HB_FOFFSET
          uiError = HB_GET_BE_UINT32( ptrBuf );
          hb_fsSetError( uiError );
          if( ulRead )
-            memcpy( pBuffer, ptrBuf + 4, ulRead );
+            HB_MEMCPY( pBuffer, ptrBuf + 4, ulRead );
       }
       else
       {
@@ -979,7 +979,7 @@ ULONG hb_fileNetReadLarge( PHB_FILE pFile, void * pBuffer, ULONG ulSize )
          uiError = HB_GET_BE_UINT32( ptrBuf );
          hb_fsSetError( uiError );
          if( ulRead )
-            memcpy( pBuffer, ptrBuf + 4, ulRead );
+            HB_MEMCPY( pBuffer, ptrBuf + 4, ulRead );
       }
       else
       {
@@ -1008,9 +1008,9 @@ ULONG hb_fileNetWriteAt( PHB_FILE pFile, const void * buffer, ULONG ulSize, HB_F
       szData = ( char * ) hb_xgrab( 40 + ulSize );
       ulLen = sprintf( szData + HB_LENGTH_ACK, "E|%p|%lu|%" PFHL "i|", ( void * ) pFile->hFile, ulSize, llOffset );
       ptr = szData + HB_LENGTH_ACK + ulLen;
-      memcpy( ptr, ( char * ) buffer, ulSize );
+      HB_MEMCPY( ptr, ( char * ) buffer, ulSize );
       ptr = ptr + ulSize;
-      memcpy( ptr, "\r\n", 2 );
+      HB_MEMCPY( ptr, "\r\n", 2 );
       HB_PUT_BE_UINT32( szData, ulSize + ulLen + 2 );
       if( hb_NetSingleSendRecv( pFile->hSocket, szData, ulLen + ulSize + 2 + HB_LENGTH_ACK, 1005 ) )
       {
@@ -1052,9 +1052,9 @@ ULONG hb_fileNetWriteLarge( PHB_FILE pFile, const void * pBuffer, ULONG ulSize )
       szData = ( char * ) hb_xgrab( 36 + ulSize + HB_LENGTH_ACK );
       ulLen = sprintf( szData + HB_LENGTH_ACK, "J|%p|%lu|", ( void * ) pFile->hFile, ulSize );
       ptr = szData + HB_LENGTH_ACK + ulLen;
-      memcpy( ptr, ( char * ) pBuffer, ulSize );
+      HB_MEMCPY( ptr, ( char * ) pBuffer, ulSize );
       ptr = ptr + ulSize;
-      memcpy( ptr, "\r\n", 2 );
+      HB_MEMCPY( ptr, "\r\n", 2 );
       HB_PUT_BE_UINT32( szData, ulSize + ulLen + 2 );
       if( hb_NetSingleSendRecv( pFile->hSocket, szData, ulLen + ulSize + 2 + HB_LENGTH_ACK, 1009 ) )
       {
@@ -1097,9 +1097,9 @@ USHORT hb_fileNetWrite( PHB_FILE pFile, const char * pBuffer, USHORT uiCount )
       szData = ( char * ) hb_xgrab( 36 + uiCount + HB_LENGTH_ACK );
       ulLen = sprintf( szData + HB_LENGTH_ACK, "O|%p|%hu|", ( void * ) pFile->hFile, uiCount );
       ptr = szData + HB_LENGTH_ACK + ulLen;
-      memcpy( ptr, ( char * ) pBuffer, uiCount );
+      HB_MEMCPY( ptr, ( char * ) pBuffer, uiCount );
       ptr = ptr + uiCount;
-      memcpy( ptr, "\r\n", 2 );
+      HB_MEMCPY( ptr, "\r\n", 2 );
       HB_PUT_BE_UINT32( szData, uiCount + ulLen + 2 );
       if( hb_NetSingleSendRecv( pFile->hSocket, szData, ulLen + uiCount + 2 + HB_LENGTH_ACK, 1012 ) )
       {
@@ -1452,13 +1452,13 @@ PHB_NETFFIND hb_FileNetFindFirst( const char * pszFileName, ULONG ulAttr )
          ptr = hb_strToken( ptrBuf, ulLen, 4, &ulSize );
          sscanf( ptr, "%lu" , &pffind->lDate );
          ptr = hb_strToken( ptrBuf, ulLen, 5, &ulSize );
-         memcpy( pffind->szTime, ptr, 8 );
+         HB_MEMCPY( pffind->szTime, ptr, 8 );
          pffind->szTime[8] = '\0';
          ptr = hb_strToken( ptrBuf, ulLen, 6, &ulSize );
          sscanf( ptr, "%hu" , &uiError );
          hb_fsSetError( uiError );
          ptr = hb_strToken( ptrBuf, ulLen, 7, &ulSize );
-         memcpy( pffind->szName, ptr, ulSize );
+         HB_MEMCPY( pffind->szName, ptr, ulSize );
          pffind->szName[ulSize] = '\0';
       }
       else
@@ -1499,7 +1499,7 @@ BOOL hb_FileNetFindNext( PHB_NETFFIND pffind )
       ptr = hb_strToken( ptrBuf, ulLen, 3, &ulSize );
       sscanf( ptr, "%lu" , &pffind->lDate );
       ptr = hb_strToken( ptrBuf, ulLen, 4, &ulSize );
-      memcpy( pffind->szTime, ptr, 8 );
+      HB_MEMCPY( pffind->szTime, ptr, 8 );
       pffind->szTime[8] = '\0';
       ptr = hb_strToken( ptrBuf, ulLen, 5, &ulSize );
       bFound = (ptr[0] == '1' ? TRUE : FALSE);
@@ -1507,7 +1507,7 @@ BOOL hb_FileNetFindNext( PHB_NETFFIND pffind )
       sscanf( ptr, "%hu" , &uiError );
       hb_fsSetError( uiError );
       ptr = hb_strToken( ptrBuf, ulLen, 7, &ulSize );
-      memcpy( pffind->szName, ptr, ulSize );
+      HB_MEMCPY( pffind->szName, ptr, ulSize );
       pffind->szName[ulSize] = '\0';
    }
    else

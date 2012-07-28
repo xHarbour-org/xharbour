@@ -504,7 +504,7 @@ BOOL hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
             pNewBase->pKeys = (PHB_ITEM) hb_xgrab( sizeof( HB_ITEM) * pNewBase->ulAllocated );
             pNewBase->pValues = (PHB_ITEM) hb_xgrab( sizeof( HB_ITEM) * pNewBase->ulAllocated );
 
-            /* NOT needed because we are copying all items using memcpy(), see below!
+            /* NOT needed because we are copying all items using HB_MEMCPY(), see below!
             for( ulPosLoop = 0; ulPosLoop < pNewBase->ulAllocated; ulPosLoop++ )
             {
                ( pNewBase->pKeys + ulPosLoop )->type = HB_IT_NIL;
@@ -512,7 +512,7 @@ BOOL hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
             }
             */
 
-            memcpy( pNewBase->pKeys, pPivotKey, sizeof( HB_ITEM) * pNewBase->ulAllocated );
+            HB_MEMCPY( pNewBase->pKeys, pPivotKey, sizeof( HB_ITEM) * pNewBase->ulAllocated );
 
             #ifndef HB_ARRAY_USE_COUNTER
             {
@@ -528,7 +528,7 @@ BOOL hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
 
             pPivotValue = pPageBase->pValues + (pBaseHash->ulPageSize / 2 );
 
-            memcpy( pNewBase->pValues, pPivotValue, sizeof( HB_ITEM) * pNewBase->ulAllocated );
+            HB_MEMCPY( pNewBase->pValues, pPivotValue, sizeof( HB_ITEM) * pNewBase->ulAllocated );
 
             #ifndef HB_ARRAY_USE_COUNTER
             {
@@ -547,10 +547,10 @@ BOOL hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
             // Resize old page
             pPageBase->ulLen = pPageBase->ulLen - pNewBase->ulLen;
 
-            // HB_ARRAY_USE_COUNTER logic is above just below the memcpy.
+            // HB_ARRAY_USE_COUNTER logic is above just below the HB_MEMCPY.
             pPageBase->pKeys = ( PHB_ITEM ) hb_xrealloc( pPageBase->pKeys, pPageBase->ulLen * sizeof( HB_ITEM ) );
 
-            // HB_ARRAY_USE_COUNTER logic is above just below the memcpy.
+            // HB_ARRAY_USE_COUNTER logic is above just below the HB_MEMCPY.
             pPageBase->pValues = ( PHB_ITEM ) hb_xrealloc( pPageBase->pValues, pPageBase->ulLen * sizeof( HB_ITEM ) );
 
             for( ulPosLoop = pPageBase->ulAllocated; ulPosLoop < pPageBase->ulLen; ulPosLoop++ )
@@ -697,7 +697,7 @@ BOOL hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
 
          for( ; ulPos <= ulLen; ulLen--, pPos--, pPos1-- )
          {
-            memcpy( pPos, pPos-1, sizeof( HB_ITEM ) );
+            HB_MEMCPY( pPos, pPos-1, sizeof( HB_ITEM ) );
 
             #ifndef HB_ARRAY_USE_COUNTER
                if( HB_IS_ARRAY( pPos ) && pPos->item.asArray.value )
@@ -706,7 +706,7 @@ BOOL hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
                }
             #endif
 
-            memcpy( pPos1, pPos1-1, sizeof( HB_ITEM ) );
+            HB_MEMCPY( pPos1, pPos1-1, sizeof( HB_ITEM ) );
 
             #ifndef HB_ARRAY_USE_COUNTER
                if( HB_IS_ARRAY( pPos1 ) && pPos1->item.asArray.value )
@@ -883,7 +883,7 @@ BOOL hb_hashAddForward( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pVa
 
          for( ; ulPos <= ulLen; ulLen--, pPos--, pPos1-- )
          {
-            memcpy( pPos, pPos - 1, sizeof( HB_ITEM ) );
+            HB_MEMCPY( pPos, pPos - 1, sizeof( HB_ITEM ) );
 
             #ifndef HB_ARRAY_USE_COUNTER
                if( HB_IS_ARRAY( pPos ) && pPos->item.asArray.value )
@@ -892,7 +892,7 @@ BOOL hb_hashAddForward( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pVa
                }
             #endif
 
-            memcpy( pPos1, pPos1 - 1, sizeof( HB_ITEM ) );
+            HB_MEMCPY( pPos1, pPos1 - 1, sizeof( HB_ITEM ) );
 
             #ifndef HB_ARRAY_USE_COUNTER
                if( HB_IS_ARRAY( pPos1 ) && pPos1->item.asArray.value )
@@ -1085,7 +1085,7 @@ BOOL hb_hashRemove( PHB_ITEM pHash, ULONG ulPos )
 
          if ( ulLen > 1 ) // if ulLen == 1 just set ulLen to 0.
          {
-            memcpy( pBaseHash->pKeys + ( ulPos - 1 ), pBaseHash->pKeys + ulPos, sizeof( HB_ITEM ) * ( ulLen - ulPos ) );
+            HB_MEMCPY( pBaseHash->pKeys + ( ulPos - 1 ), pBaseHash->pKeys + ulPos, sizeof( HB_ITEM ) * ( ulLen - ulPos ) );
 
             #ifndef HB_ARRAY_USE_COUNTER
             {
@@ -1099,7 +1099,7 @@ BOOL hb_hashRemove( PHB_ITEM pHash, ULONG ulPos )
             }
             #endif
 
-            memcpy( pBaseHash->pValues + ( ulPos - 1 ), pBaseHash->pValues + ulPos, sizeof( HB_ITEM ) * ( ulLen - ulPos ) );
+            HB_MEMCPY( pBaseHash->pValues + ( ulPos - 1 ), pBaseHash->pValues + ulPos, sizeof( HB_ITEM ) * ( ulLen - ulPos ) );
 
             #ifndef HB_ARRAY_USE_COUNTER
             {
@@ -1521,7 +1521,7 @@ PHB_ITEM hb_hashClone( PHB_ITEM pSrcHash, PHB_ITEM pDest )
    // Associative Array compatibility
    if( pDestBase->pAccessAA )
    {
-      memcpy( pDestBase->pAccessAA, pSrcBase->pAccessAA, sizeof( ULONG ) * pSrcBase->ulAllocated );
+      HB_MEMCPY( pDestBase->pAccessAA, pSrcBase->pAccessAA, sizeof( ULONG ) * pSrcBase->ulAllocated );
    }
 
    pDestBase->ulLen      = ulLen;

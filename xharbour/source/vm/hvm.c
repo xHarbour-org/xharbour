@@ -455,7 +455,7 @@ static BYTE * hb_vmUnhideString( BYTE uiType, ULONG ulSize, const BYTE * pSource
     }
 
       default:     /* No decode */
-         memcpy( pBuffer, pSource, ulSize );
+         HB_MEMCPY( pBuffer, pSource, ulSize );
          break;
    }
 
@@ -6953,7 +6953,7 @@ static void hb_vmArrayPop( HB_PCODE pcode )
          {
             char *sNew = (char *) hb_xgrab( pArray->item.asString.length + 1 );
 
-            memcpy( sNew, pArray->item.asString.value, pArray->item.asString.length );
+            HB_MEMCPY( sNew, pArray->item.asString.value, pArray->item.asString.length );
             sNew[ pArray->item.asString.length ] = '\0';
             hb_itemPutCPtr( pArray, sNew, pArray->item.asString.length );
          }
@@ -8338,13 +8338,13 @@ static void hb_vmFrame( unsigned short iLocals, BYTE bParams )
                #endif
 
                // Store copy of the arguments pointers.
-               memcpy( (void *) pStackArguments, (void *) ( HB_VM_STACK.pBase + 2 ), iArguments * sizeof(PHB_ITEM) );
+               HB_MEMCPY( (void *) pStackArguments, (void *) ( HB_VM_STACK.pBase + 2 ), iArguments * sizeof(PHB_ITEM) );
 
                // Move the Locals Pointers into bottom of the frame.
                memmove( (void *) ( HB_VM_STACK.pBase + 2 ), (void *) ( HB_VM_STACK.pBase + 2 + iArguments ), iLocals * sizeof( PHB_ITEM ) );
 
                // Restore the Arguments Pointers on top of the Locals.
-               memcpy( (void *) ( HB_VM_STACK.pBase + 2 + iLocals ), (void *) pStackArguments, iArguments * sizeof( PHB_ITEM ) );
+               HB_MEMCPY( (void *) ( HB_VM_STACK.pBase + 2 + iLocals ), (void *) pStackArguments, iArguments * sizeof( PHB_ITEM ) );
 
                // Free the copy
                hb_xfree( (void *) pStackArguments );
@@ -8465,13 +8465,13 @@ static void hb_vmDivertFrame( unsigned short iLocals, BYTE bParams )
             #endif
 
             // Store copy of the arguments pointers.
-            memcpy( (void *) pStackArguments, (void *) ( HB_VM_STACK.pBase + 2 ), iArguments * sizeof(PHB_ITEM) );
+            HB_MEMCPY( (void *) pStackArguments, (void *) ( HB_VM_STACK.pBase + 2 ), iArguments * sizeof(PHB_ITEM) );
 
             // Move the Locals Pointers into bottom of the frame.
             memmove( (void *) ( HB_VM_STACK.pBase + 2 ), (void *) ( HB_VM_STACK.pBase + 2 + iArguments ), iLocals * sizeof( PHB_ITEM ) );
 
             // Restore the Arguments Pointers on top of the Locals.
-            memcpy( (void *) ( HB_VM_STACK.pBase + 2 + iLocals ), (void *) pStackArguments, iArguments * sizeof( PHB_ITEM ) );
+            HB_MEMCPY( (void *) ( HB_VM_STACK.pBase + 2 + iLocals ), (void *) pStackArguments, iArguments * sizeof( PHB_ITEM ) );
 
             // Free the copy
             hb_xfree( (void *) pStackArguments );
@@ -8541,13 +8541,13 @@ static void hb_vmSetDivert( BOOL bDivertOf )
          #endif
 
          // Store copy of the Arguments pointers.
-         memcpy( (void *) pStackArguments, (void *) ( HB_VM_STACK.pBase + 2 + iLocals ), iArguments * sizeof(PHB_ITEM) );
+         HB_MEMCPY( (void *) pStackArguments, (void *) ( HB_VM_STACK.pBase + 2 + iLocals ), iArguments * sizeof(PHB_ITEM) );
 
          // Move the Locals Pointers up beyond the Arguments space.
          memmove( (void *) ( HB_VM_STACK.pBase + 2 + iArguments ), (void *) ( HB_VM_STACK.pBase + 2 ), iLocals * sizeof( PHB_ITEM ) );
 
          // Restore the Arguments Pointers to BASE of the Frame.
-         memcpy( (void *) ( HB_VM_STACK.pBase + 2 ), (void *) pStackArguments, iArguments * sizeof( PHB_ITEM ) );
+         HB_MEMCPY( (void *) ( HB_VM_STACK.pBase + 2 ), (void *) pStackArguments, iArguments * sizeof( PHB_ITEM ) );
 
          // Free the copy
          hb_xfree( (void *) pStackArguments );
@@ -8714,13 +8714,13 @@ static void hb_vmSetDivert( BOOL bDivertOf )
                #endif
 
                // Store copy of the arguments pointers.
-               memcpy( (void *) pStackArguments, (void *) ( HB_VM_STACK.pBase + 2 ), iArguments * sizeof(PHB_ITEM) );
+               HB_MEMCPY( (void *) pStackArguments, (void *) ( HB_VM_STACK.pBase + 2 ), iArguments * sizeof(PHB_ITEM) );
 
                // Move the Locals Pointers into bottom of the frame.
                memmove( (void *) ( HB_VM_STACK.pBase + 2 ), (void *) ( HB_VM_STACK.pBase + 2 + iArguments ), iLocals * sizeof( PHB_ITEM ) );
 
                // Restore the Arguments Pointers on top of the Locals.
-               memcpy( (void *) ( HB_VM_STACK.pBase + 2 + iLocals ), (void *) pStackArguments, iArguments * sizeof( PHB_ITEM ) );
+               HB_MEMCPY( (void *) ( HB_VM_STACK.pBase + 2 + iLocals ), (void *) pStackArguments, iArguments * sizeof( PHB_ITEM ) );
 
                // Free the copy
                hb_xfree( (void *) pStackArguments );
@@ -8749,13 +8749,13 @@ static void hb_vmSetDivert( BOOL bDivertOf )
                #endif
 
                // Store copy of the arguments pointers.
-               memcpy( (void *) pStackArguments, (void *) ( HB_VM_STACK.pBase + 2 + iLocals ), iArguments * sizeof(PHB_ITEM) );
+               HB_MEMCPY( (void *) pStackArguments, (void *) ( HB_VM_STACK.pBase + 2 + iLocals ), iArguments * sizeof(PHB_ITEM) );
 
                // Move the Locals Pointers up beyond the Arguments space.
                memmove( (void *) ( HB_VM_STACK.pBase + 2 + iArguments ), (void *) ( HB_VM_STACK.pBase + 2 ), iLocals * sizeof( PHB_ITEM ) );
 
                // Restore the Arguments Pointers to the BASE of the Frame.
-               memcpy( (void *) ( HB_VM_STACK.pBase + 2 ), (void *) pStackArguments, iArguments * sizeof( PHB_ITEM ) );
+               HB_MEMCPY( (void *) ( HB_VM_STACK.pBase + 2 ), (void *) pStackArguments, iArguments * sizeof( PHB_ITEM ) );
 
                // Free the copy
                hb_xfree( (void *) pStackArguments );
@@ -9346,7 +9346,7 @@ static void hb_vmPushBlock( const BYTE * pCode, USHORT usSize, BOOL bDynCode )
    {
       pBlockTemp = pBlockCode;
       pBlockCode = ( BYTE * ) hb_xgrab( usSize );
-      memcpy( pBlockCode, pBlockTemp, usSize );
+      HB_MEMCPY( pBlockCode, pBlockTemp, usSize );
    }
 
    pItem->item.asBlock.value =
@@ -9400,7 +9400,7 @@ static void hb_vmPushBlockShort( const BYTE * pCode, USHORT usSize, BOOL bDynCod
    if( bDynCode )
    {
       BYTE * pBuffer = ( BYTE * ) hb_xgrab( usSize );
-      memcpy( pBuffer, pCode, usSize );
+      HB_MEMCPY( pBuffer, pCode, usSize );
       pCode = pBuffer;
    }
 
@@ -10403,7 +10403,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, const char
       {
          PHB_SYMB pSymbols = ( PHB_SYMB ) hb_xgrab( uiSymbols * sizeof( HB_SYMB ) );
 
-         memcpy( pSymbols, pSymbolTable, uiSymbols * sizeof( HB_SYMB ) );
+         HB_MEMCPY( pSymbols, pSymbolTable, uiSymbols * sizeof( HB_SYMB ) );
 
          for( ui = 0; ui < uiSymbols; ui++ )
          {

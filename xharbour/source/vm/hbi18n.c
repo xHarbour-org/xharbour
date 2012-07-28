@@ -437,7 +437,7 @@ PHB_ITEM hb_i18n_read_memory_table( BYTE* pData, int count )
 
       for ( j = 1; j <= 2 ; j ++ )
       {
-         memcpy( szStrLen, pData, 8 );
+         HB_MEMCPY( szStrLen, pData, 8 );
          pData += 8;
          nStrLen = atoi( szStrLen );
 
@@ -445,7 +445,7 @@ PHB_ITEM hb_i18n_read_memory_table( BYTE* pData, int count )
          if ( nStrLen > 0 ) // sanitizing unwritten strings
          {
             char *str = ( char * ) hb_xgrab( nStrLen );
-            memcpy( str, pData, nStrLen );
+            HB_MEMCPY( str, pData, nStrLen );
             pData += nStrLen;
             // using trailing zero as memory integrity check
             // (zero is the last character read, so we check nStrLen-1)
@@ -563,7 +563,7 @@ BOOL hb_i18n_load_language( char *language )
       }
 
       pRes = (BYTE*) LockResource( hMem );
-      memcpy( &header, pRes, sizeof( header ) );
+      HB_MEMCPY( &header, pRes, sizeof( header ) );
 
       // checking signature
       if ( strcmp( header.signature, "\3HIL" ) != 0 &&

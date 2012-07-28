@@ -356,7 +356,7 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
 
    /* copy the input string with trailing zero byte
     */
-   memcpy( szResult, szString, ulResStrLen + 1 );
+   HB_MEMCPY( szResult, szString, ulResStrLen + 1 );
    /* switch the pointer so it will point into the result buffer
     */
    pHead = szResult + ( pHead - szString );
@@ -460,7 +460,7 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
                memmove( pTail + ulValLen, pHead, ulCharsLeft + 1 );
 
                /* copy substituted value */
-               memcpy( pTail, szValPtr, ulValLen );
+               HB_MEMCPY( pTail, szValPtr, ulValLen );
 
                /* restart scanning from the beginning of replaced string */
                /* NOTE: This causes that the following code:
@@ -587,7 +587,7 @@ void hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
          pOut = ( char * ) hb_xgrab( HB_PP_STR_SIZE );
          ptr = pText;
          ulLength = HB_MIN( ulLength, HB_PP_STR_SIZE - 1 );
-         memcpy( pText, szString, ulLength );
+         HB_MEMCPY( pText, szString, ulLength );
          pText[ ulLength ] = 0;
          memset( pOut, 0, HB_PP_STR_SIZE );
 
@@ -756,10 +756,10 @@ static void hb_macroUseAliased( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, int iFlag,
       HB_MACRO struMacro;
       int iStatus;
 
-      memcpy( szCopy, pAlias->item.asString.value, pAlias->item.asString.length );
+      HB_MEMCPY( szCopy, pAlias->item.asString.value, pAlias->item.asString.length );
       szCopy[ pAlias->item.asString.length ]     = '-';
       szCopy[ pAlias->item.asString.length + 1 ] = '>';
-      memcpy( szCopy + pAlias->item.asString.length + 2, pVar->item.asString.value, pVar->item.asString.length );
+      HB_MEMCPY( szCopy + pAlias->item.asString.length + 2, pVar->item.asString.value, pVar->item.asString.length );
       szCopy[ iLen ] = '\0';
 
       struMacro.Flags      = iFlag;
@@ -890,7 +890,7 @@ HB_FUNC( HB_MACROCOMPILE )
       HB_MACRO_PTR pMacro;
       int iStatus;
 
-      memcpy( sMacro, sString, ulLen + 1 );
+      HB_MEMCPY( sMacro, sString, ulLen + 1 );
 
       if( iFlags == 0 )
       {
@@ -956,7 +956,7 @@ void hb_macroPushSymbol( HB_ITEM_PTR pItem )
       {
          bNewBuffer = TRUE;
          szString = (char *) hb_xgrab( ulLength + 1 );
-         memcpy( (void *) szString, (void *) pItem->item.asString.value, ulLength );
+         HB_MEMCPY( (void *) szString, (void *) pItem->item.asString.value, ulLength );
          szString[ulLength] = '\0';
       }
 
@@ -1759,7 +1759,7 @@ void hb_compGenPCodeN( BYTE * pBuffer, ULONG ulSize, HB_MACRO_DECL )
       pFunc->pCode = ( BYTE * ) hb_xrealloc( pFunc->pCode, pFunc->lPCodeSize );
    }
 
-   memcpy( pFunc->pCode + pFunc->lPCodePos, pBuffer, ulSize );
+   HB_MEMCPY( pFunc->pCode + pFunc->lPCodePos, pBuffer, ulSize );
    pFunc->lPCodePos += ulSize;
 }
 

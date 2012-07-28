@@ -2266,8 +2266,8 @@ HB_ERRCODE hb_rddInheritEx( RDDFUNCS * pTable, const RDDFUNCS * pSubTable,
    if( !szDrvName || ! *szDrvName )
    {
       /* no name for inherited driver - use the default one */
-      memcpy( pTable, &waTable, sizeof( RDDFUNCS ) );
-      memcpy( pSuperTable, &waTable, sizeof( RDDFUNCS ) );
+      HB_MEMCPY( pTable, &waTable, sizeof( RDDFUNCS ) );
+      HB_MEMCPY( pSuperTable, &waTable, sizeof( RDDFUNCS ) );
       if( puiSupperRddId )
          * puiSupperRddId = ( USHORT ) -1;
    }
@@ -2280,8 +2280,8 @@ HB_ERRCODE hb_rddInheritEx( RDDFUNCS * pTable, const RDDFUNCS * pSubTable,
       if( ! pRddNode )
          return HB_FAILURE;
 
-      memcpy( pTable, &pRddNode->pTable, sizeof( RDDFUNCS ) );
-      memcpy( pSuperTable, &pRddNode->pTable, sizeof( RDDFUNCS ) );
+      HB_MEMCPY( pTable, &pRddNode->pTable, sizeof( RDDFUNCS ) );
+      HB_MEMCPY( pSuperTable, &pRddNode->pTable, sizeof( RDDFUNCS ) );
       if( puiSupperRddId )
          * puiSupperRddId = pRddNode->rddID;
    }
@@ -2322,8 +2322,8 @@ HB_ERRCODE hb_rddInherit( RDDFUNCS * pTable, const RDDFUNCS * pSubTable, RDDFUNC
    if( !szDrvName || ! *szDrvName )
    {
       /* no name for inherited driver - use the default one */
-      memcpy( pTable, &waTable, sizeof( RDDFUNCS ) );
-      memcpy( pSuperTable, &waTable, sizeof( RDDFUNCS ) );
+      HB_MEMCPY( pTable, &waTable, sizeof( RDDFUNCS ) );
+      HB_MEMCPY( pSuperTable, &waTable, sizeof( RDDFUNCS ) );
    }
    else
    {
@@ -2334,8 +2334,8 @@ HB_ERRCODE hb_rddInherit( RDDFUNCS * pTable, const RDDFUNCS * pSubTable, RDDFUNC
       if( ! pRddNode )
          return HB_FAILURE;
 
-      memcpy( pTable, &pRddNode->pTable, sizeof( RDDFUNCS ) );
-      memcpy( pSuperTable, &pRddNode->pTable, sizeof( RDDFUNCS ) );
+      HB_MEMCPY( pTable, &pRddNode->pTable, sizeof( RDDFUNCS ) );
+      HB_MEMCPY( pSuperTable, &pRddNode->pTable, sizeof( RDDFUNCS ) );
    }
 
    /* Copy the non NULL entries from pSubTable into pTable */

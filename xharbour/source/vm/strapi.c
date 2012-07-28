@@ -78,7 +78,7 @@ ULONG hb_strcopy( PHB_ITEM pItem, char * pStr, ULONG nLen )
          if( size > nLen )
             size = nLen;
          if( size )
-            memcpy( pStr, hb_itemGetCPtr( pItem ), size );
+            HB_MEMCPY( pStr, hb_itemGetCPtr( pItem ), size );
          if( size < nLen )
             pStr[ size ] = '\0';
       }

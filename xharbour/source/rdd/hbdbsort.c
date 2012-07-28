@@ -155,9 +155,9 @@ static BOOL hb_dbQSortIsLess( LPDBQUICKSORT pQuickSort, ULONG ulRecNo1, ULONG ul
       }
       else
       {
-         memcpy( pQuickSort->pCmpBufferA, pQuickSort->pSwapBufferA +
+         HB_MEMCPY( pQuickSort->pCmpBufferA, pQuickSort->pSwapBufferA +
                  pArea->pFieldOffset[ uiField ], pField->uiLen );
-         memcpy( pQuickSort->pCmpBufferB, pQuickSort->pSwapBufferB +
+         HB_MEMCPY( pQuickSort->pCmpBufferB, pQuickSort->pSwapBufferB +
                  pArea->pFieldOffset[ uiField ], pField->uiLen );
       }
       pQuickSort->pCmpBufferA[ pField->uiLen ] = 0;

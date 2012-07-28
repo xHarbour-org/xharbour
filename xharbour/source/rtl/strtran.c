@@ -159,7 +159,7 @@ HB_FUNC( STRTRAN )
                            if( ulFound >= ulStart )
                            {
                               lReplaced--;
-                              memcpy( szPtr, szReplace, ulReplace );
+                              HB_MEMCPY( szPtr, szReplace, ulReplace );
                               szPtr += ulReplace;
                               i += ulSeek;
                               continue;

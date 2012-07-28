@@ -797,7 +797,7 @@ static void hb_gt_win_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
    GetConsoleScreenBufferInfo( s_HOutput, &s_csbi );
 
    /* save screen info to restore on exit */
-   memcpy( &s_origCsbi, &s_csbi, sizeof( s_csbi ) );
+   HB_MEMCPY( &s_origCsbi, &s_csbi, sizeof( s_csbi ) );
 
    s_csbi.srWindow.Top = s_csbi.srWindow.Left = 0;
    s_csbi.srWindow.Right = HB_MIN( s_csbi.srWindow.Right, _GetScreenWidth() - 1 );

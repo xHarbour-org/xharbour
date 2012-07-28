@@ -545,11 +545,11 @@ void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
       {
          if( ulSize > ulMemSize )
          {
-            memcpy( pMem, pMemBlock, HB_ALLOC_SIZE( ulMemSize ) );
+            HB_MEMCPY( pMem, pMemBlock, HB_ALLOC_SIZE( ulMemSize ) );
             memset( ( BYTE * ) pMem + HB_ALLOC_SIZE( ulMemSize ), HB_MEMFILER, ulSize - ulMemSize );
          }
          else
-            memcpy( pMem, pMemBlock, HB_ALLOC_SIZE( ulSize ) );
+            HB_MEMCPY( pMem, pMemBlock, HB_ALLOC_SIZE( ulSize ) );
       }
       memset( pMemBlock, HB_MEMFILER, HB_ALLOC_SIZE( ulMemSize ) );
       free( pMemBlock );
@@ -725,7 +725,7 @@ void * hb_xRefResize( void * pMem, ULONG ulSave, ULONG ulSize )
 #ifdef HB_FM_STATISTICS
    if( HB_ATOMIC_GET( HB_COUNTER_PTR( pMem ) ) > 1 )
    {
-      void * pMemNew = memcpy( hb_xgrab( ulSize ), pMem, HB_MIN( ulSave, ulSize ) );
+      void * pMemNew = HB_MEMCPY( hb_xgrab( ulSize ), pMem, HB_MIN( ulSave, ulSize ) );
 
       if( HB_ATOMIC_DECP( HB_COUNTER_PTR( pMem ) ) == 0 )
          hb_xfree( pMem );
@@ -744,7 +744,7 @@ void * hb_xRefResize( void * pMem, ULONG ulSave, ULONG ulSize )
       if( pMemNew )
       {
          HB_ATOMIC_SET( HB_COUNTER_PTR( HB_MEM_PTR( pMemNew ) ), 1 );
-         memcpy( HB_MEM_PTR( pMemNew ), pMem, HB_MIN( ulSave, ulSize ) );
+         HB_MEMCPY( HB_MEM_PTR( pMemNew ), pMem, HB_MIN( ulSave, ulSize ) );
          if( HB_ATOMIC_DECP( HB_COUNTER_PTR( pMem ) ) == 0 )
             free( ( void * ) HB_FM_PTR( pMem ) );
          return HB_MEM_PTR( pMemNew );
@@ -1040,7 +1040,7 @@ void * hb_xmemcpy( void * pDestArg, void * pSourceArg, ULONG ulLen )
 
    while( ulRemaining )
    {
-      /* Overcome the memcpy() size_t limitation */
+      /* Overcome the HB_MEMCPY() size_t limitation */
       if( ulRemaining > UINT_MAX )
       {
          iCopySize = UINT_MAX;
@@ -1051,7 +1051,7 @@ void * hb_xmemcpy( void * pDestArg, void * pSourceArg, ULONG ulLen )
          iCopySize = ( int ) ulRemaining;
          ulRemaining = 0;
       }
-      memcpy( pDest, pSource, iCopySize );
+      HB_MEMCPY( pDest, pSource, iCopySize );
       pDest += iCopySize;
       pSource += iCopySize;
    }

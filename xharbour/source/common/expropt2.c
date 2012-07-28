@@ -1277,7 +1277,7 @@ BOOL hb_compExprReduceUPPER( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
                else
                {
                   szValue = ( char * ) hb_xgrab( pArg->ulLength + 1 );
-                  memcpy( szValue, pArg->value.asString.string, pArg->ulLength + 1 );
+                  HB_MEMCPY( szValue, pArg->value.asString.string, pArg->ulLength + 1 );
                   fDealloc = TRUE;
                }
                do
@@ -1296,7 +1296,7 @@ BOOL hb_compExprReduceUPPER( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
 
          hb_compExprFree( pParms, HB_MACRO_PARAM );
          hb_compExprFree( pSelf->value.asFunCall.pFunName, HB_MACRO_PARAM );
-         memcpy( pSelf, pExpr, sizeof( HB_EXPR ) );
+         HB_MEMCPY( pSelf, pExpr, sizeof( HB_EXPR ) );
          hb_compExprClear( pExpr );
 
          return TRUE;

@@ -1272,7 +1272,7 @@ HB_FHANDLE hb_fsOpenProcess( const char *pFilename, HB_FHANDLE *fhStdin,
    }
    else
    {
-      memcpy( cmdName, pFilename, ulSize );
+      HB_MEMCPY( cmdName, pFilename, ulSize );
       cmdName[ulSize+1] = 0;
       // find the command in the path
       if ( ! SearchPath( NULL, cmdName, NULL, 1024, fullCommand, &filePart ) )

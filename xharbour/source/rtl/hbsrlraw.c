@@ -165,7 +165,7 @@ HB_FUNC( HB_SERIALIZESIMPLE )
          cRet = (BYTE *) hb_xgrab( ulRet + 1 );
          cRet[0] = (BYTE) 'C';
          hb_createlen8( cRet + 1, pItem->item.asString.length );
-         memcpy( cRet + 9, pItem->item.asString.value, pItem->item.asString.length );
+         HB_MEMCPY( cRet + 9, pItem->item.asString.value, pItem->item.asString.length );
       break;
 
       case HB_IT_LOGICAL:
@@ -205,7 +205,7 @@ HB_FUNC( HB_SERIALIZESIMPLE )
          cRet = (BYTE *)hb_xgrab( ulRet + 1 );
          cRet[0] = (BYTE)'N';
          cRet[1] = (BYTE)'D';
-         memcpy( cRet + 2, &(pItem->item.asDouble.value), sizeof( double ) );
+         HB_MEMCPY( cRet + 2, &(pItem->item.asDouble.value), sizeof( double ) );
       break;
 
       case HB_IT_DATE:
@@ -222,7 +222,7 @@ HB_FUNC( HB_SERIALIZESIMPLE )
             ulRet = 1 + sizeof( double );
             cRet = (BYTE *)hb_xgrab( ulRet + 1 );
             cRet[0] = (BYTE)'T';
-            memcpy( cRet + 1, &(dDateTime), sizeof( double ) );
+            HB_MEMCPY( cRet + 1, &(dDateTime), sizeof( double ) );
          }
       break;
 
@@ -450,7 +450,7 @@ HB_FUNC( HB_DESERIALBEGIN )
 
    cBuf = (BYTE *) hb_xgrab( pItem->item.asString.length + 9 );
    hb_createlen8( cBuf, 9 );
-   memcpy( cBuf+8, pItem->item.asString.value, pItem->item.asString.length );
+   HB_MEMCPY( cBuf+8, pItem->item.asString.value, pItem->item.asString.length );
    hb_retclenAdopt( ( char *) cBuf, 8 + pItem->item.asString.length );
 }
 

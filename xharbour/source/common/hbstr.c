@@ -150,7 +150,7 @@ char * hb_strdup( const char * pszText )
    HB_TRACE(HB_TR_DEBUG, ("hb_strdup(%s, %ld)", pszText, ulLen));
 
    pszDup = ( char * ) hb_xgrab( ulLen );
-   memcpy( pszDup, pszText, ulLen );
+   HB_MEMCPY( pszDup, pszText, ulLen );
 
    return pszDup;
 }
@@ -168,7 +168,7 @@ char * hb_strndup( const char * pszText, ULONG ulLen )
       ++ul;
 
    pszDup = ( char * ) hb_xgrab( ul + 1 );
-   memcpy( pszDup, pszText, ul );
+   HB_MEMCPY( pszDup, pszText, ul );
    pszDup[ ul ] = '\0';
 
    return pszDup;
@@ -201,7 +201,7 @@ char * hb_strduptrim( const char * pszText )
       --ulLen;
 
    pszDup = ( char * ) hb_xgrab( ulLen + 1 );
-   memcpy( pszDup, pszText, ulLen );
+   HB_MEMCPY( pszDup, pszText, ulLen );
    pszDup[ ulLen ] = '\0';
 
    return pszDup;

@@ -1726,7 +1726,7 @@ HB_FUNC( STARTTHREAD )
    {
       PHB_SET_STRUCT pSet = hb_setClone( hb_stackSetStruct() );
 
-      memcpy( &pStack->set, pSet, sizeof( HB_SET_STRUCT ) );
+      HB_MEMCPY( &pStack->set, pSet, sizeof( HB_SET_STRUCT ) );
       hb_xfree( pSet );
    }
 

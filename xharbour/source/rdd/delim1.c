@@ -131,13 +131,13 @@ static ULONG hb_delimEncodeBuffer( DELIMAREAP pArea )
             if( pArea->cDelim )
             {
                pBuffer[ ulSize++ ] = pArea->cDelim;
-               memcpy( pBuffer + ulSize, pFieldBuf, uiLen );
+               HB_MEMCPY( pBuffer + ulSize, pFieldBuf, uiLen );
                ulSize += uiLen;
                pBuffer[ ulSize++ ] = pArea->cDelim;
             }
             else
             {
-               memcpy( pBuffer + ulSize, pFieldBuf, uiLen );
+               HB_MEMCPY( pBuffer + ulSize, pFieldBuf, uiLen );
                ulSize += uiLen;
             }
             break;
@@ -154,7 +154,7 @@ static ULONG hb_delimEncodeBuffer( DELIMAREAP pArea )
                ++uiLen;
             if( uiLen < 8 )
             {
-               memcpy( pBuffer + ulSize, pFieldBuf, 8 );
+               HB_MEMCPY( pBuffer + ulSize, pFieldBuf, 8 );
                ulSize += 8;
             }
             break;
@@ -165,7 +165,7 @@ static ULONG hb_delimEncodeBuffer( DELIMAREAP pArea )
                ++uiLen;
             if( uiLen < pField->uiLen )
             {
-               memcpy( pBuffer + ulSize, pFieldBuf + uiLen, pField->uiLen - uiLen );
+               HB_MEMCPY( pBuffer + ulSize, pFieldBuf + uiLen, pField->uiLen - uiLen );
                ulSize += pField->uiLen - uiLen;
             }
             else
@@ -187,7 +187,7 @@ static ULONG hb_delimEncodeBuffer( DELIMAREAP pArea )
             break;
       }
    }
-   memcpy( pBuffer + ulSize, pArea->szEol, pArea->uiEolLen );
+   HB_MEMCPY( pBuffer + ulSize, pArea->szEol, pArea->uiEolLen );
    ulSize += pArea->uiEolLen;
 
    return ulSize;
@@ -202,7 +202,7 @@ static int hb_delimNextChar( DELIMAREAP pArea )
       ULONG ulLeft = pArea->ulBufferRead - pArea->ulBufferIndex;
 
       if( ulLeft )
-         memcpy( pArea->pBuffer,
+         HB_MEMCPY( pArea->pBuffer,
                  pArea->pBuffer + pArea->ulBufferIndex, ulLeft );
       pArea->ulBufferStart += pArea->ulBufferIndex;
       pArea->ulBufferIndex = 0;
@@ -317,7 +317,7 @@ static HB_ERRCODE hb_delimReadRecord( DELIMAREAP pArea )
             else if( pField->uiType == HB_FT_DATE )
             {
                if( uiSize == 8 && hb_dateEncStr( ( char * ) buffer ) != 0 )
-                  memcpy( pFieldBuf, buffer, 8 );
+                  HB_MEMCPY( pFieldBuf, buffer, 8 );
             }
             else
             {
@@ -334,7 +334,7 @@ static HB_ERRCODE hb_delimReadRecord( DELIMAREAP pArea )
 
                hb_itemStrBuf( ( char * ) buffer, pArea->area.valResult, uiLen, pField->uiDec );
                /* TODO: RT error on width range */
-               memcpy( pFieldBuf, buffer, uiLen );
+               HB_MEMCPY( pFieldBuf, buffer, uiLen );
             }
          }
 
@@ -558,7 +558,7 @@ static HB_ERRCODE hb_delimGetValue( DELIMAREAP pArea, USHORT uiIndex, PHB_ITEM p
          if( pArea->area.cdPage != hb_cdppage() )
          {
             char * pVal = ( char * ) hb_xgrab( pField->uiLen + 1 );
-            memcpy( pVal, pArea->pRecord + pArea->pFieldOffset[ uiIndex ], pField->uiLen );
+            HB_MEMCPY( pVal, pArea->pRecord + pArea->pFieldOffset[ uiIndex ], pField->uiLen );
             pVal[ pField->uiLen ] = '\0';
             hb_cdpnTranslate( pVal, pArea->area.cdPage, hb_cdppage(), pField->uiLen );
             hb_itemPutCPtr( pItem, pVal, pField->uiLen );
@@ -665,7 +665,7 @@ static HB_ERRCODE hb_delimPutValue( DELIMAREAP pArea, USHORT uiIndex, PHB_ITEM p
             ulSize = hb_itemGetCLen( pItem );
             if( ulSize > ( ULONG ) pField->uiLen )
                ulSize = pField->uiLen;
-            memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
+            HB_MEMCPY( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
                     hb_itemGetCPtr( pItem ), ulSize );
 #ifndef HB_CDP_SUPPORT_OFF
             hb_cdpnTranslate( (char *) pArea->pRecord + pArea->pFieldOffset[ uiIndex ], hb_cdppage(), pArea->area.cdPage, ulSize );
@@ -681,7 +681,7 @@ static HB_ERRCODE hb_delimPutValue( DELIMAREAP pArea, USHORT uiIndex, PHB_ITEM p
          if( pField->uiType == HB_FT_DATE )
          {
             hb_itemGetDS( pItem, szBuffer );
-            memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ], szBuffer, 8 );
+            HB_MEMCPY( pArea->pRecord + pArea->pFieldOffset[ uiIndex ], szBuffer, 8 );
          }
          else
             uiError = EDBF_DATATYPE;
@@ -692,7 +692,7 @@ static HB_ERRCODE hb_delimPutValue( DELIMAREAP pArea, USHORT uiIndex, PHB_ITEM p
          {
             if( hb_itemStrBuf( szBuffer, pItem, pField->uiLen, pField->uiDec ) )
             {
-               memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
+               HB_MEMCPY( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
                        szBuffer, pField->uiLen );
             }
             else
@@ -748,7 +748,7 @@ static HB_ERRCODE hb_delimPutRec( DELIMAREAP pArea, BYTE * pBuffer )
       return HB_FAILURE;
 
    /* Copy data to buffer */
-   memcpy( pArea->pRecord, pBuffer + 1, pArea->uiRecordLen );
+   HB_MEMCPY( pArea->pRecord, pBuffer + 1, pArea->uiRecordLen );
 
    return HB_SUCCESS;
 }

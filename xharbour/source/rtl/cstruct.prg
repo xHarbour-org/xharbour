@@ -712,7 +712,7 @@ RETURN cString
      hb_vmPush( pStructure );
      hb_vmSend(0);
 
-     memcpy( pPointer, (void *) hb_parc(-1), hb_itemGetNI( pSizeOf ) );
+     HB_MEMCPY( pPointer, (void *) hb_parc(-1), hb_itemGetNI( pSizeOf ) );
   }
 #pragma ENDDUMP
 //---------------------------------------------------------------------------//

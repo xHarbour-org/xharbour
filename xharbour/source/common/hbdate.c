@@ -643,7 +643,7 @@ char * hb_datetimeFormat( const char * szDateTime, char * szFormattedDateTime, c
 
    if( szDateFormat )
    {
-      memcpy( szDate, szDateTime, 8 );
+      HB_MEMCPY( szDate, szDateTime, 8 );
       szDate[8] = '\0';
       hb_dateFormat( szDate, szFormattedDateTime, szDateFormat );
       n = strlen( szFormattedDateTime );
@@ -1180,7 +1180,7 @@ void hb_datetimeEncStr( const char * szDateTime, LONG *plDate, LONG *plTime )
    {
       char szDate[9];
       szDate[8] = '\0';
-      memcpy( szDate, szDateTime, 8 );
+      HB_MEMCPY( szDate, szDateTime, 8 );
       *plDate = hb_dateEncStr( szDate );
    }
    if( plTime )

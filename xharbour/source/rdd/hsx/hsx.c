@@ -1166,7 +1166,7 @@ static int hb_hsxSeekSet( int iHandle, const char * pStr, ULONG ulLen )
          if( pHSX->pSearchVal )
             hb_xfree( pHSX->pSearchVal );
          pHSX->pSearchVal = ( char * ) hb_xgrab( ulLen + 1 );
-         memcpy( pHSX->pSearchVal, pStr, ulLen );
+         HB_MEMCPY( pHSX->pSearchVal, pStr, ulLen );
          pHSX->pSearchVal[ ulLen ] = '\0';
          pHSX->ulSearch = ulLen;
          if( ! pHSX->pSearchKey )
@@ -1874,7 +1874,7 @@ HB_FUNC( HS_FILTER )
             if( ulLen && pHSX->pSearchVal )
             {
                pBuff = ( char * ) hb_xgrab( ulLen + 1 );
-               memcpy( pBuff, pHSX->pSearchVal, ulLen );
+               HB_MEMCPY( pBuff, pHSX->pSearchVal, ulLen );
                pBuff[ ulLen ] = '\0';
                szText = pBuff;
                fToken = FALSE;

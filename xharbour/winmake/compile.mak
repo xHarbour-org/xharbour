@@ -1128,7 +1128,7 @@ $(OBJ_DIR)$(DIR_SEP)t7zip.c : $(SEVENZIP_DIR)$(DIR_SEP)t7zip.prg
 #===============================================================================
 # COMMON.LIB rules
 #===============================================================================
-$(OBJ_DIR)$(DIR_SEP)dvmemcpy$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)dvmemcpy.c
+$(OBJ_DIR)$(DIR_SEP)hbmem$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbmem.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hbfopen$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbfopen.c

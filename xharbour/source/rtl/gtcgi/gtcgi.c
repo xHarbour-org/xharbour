@@ -263,7 +263,7 @@ static void hb_gt_cgi_WriteCon( PHB_GT pGT, BYTE * pText, ULONG ulLength )
    if( pGTCGI->fDispTrans )
    {
       buffer = ( BYTE * ) hb_xgrab( ulLength );
-      memcpy( buffer, pText, ulLength );
+      HB_MEMCPY( buffer, pText, ulLength );
       hb_cdpnTranslate( ( char * ) buffer, pGTCGI->cdpHost, pGTCGI->cdpTerm, ulLength );
       pText = buffer;
    }

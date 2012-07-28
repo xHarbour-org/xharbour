@@ -1270,9 +1270,9 @@ void hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )
    hb_itemClear( &temp );
 
 /* Faster, but less safe way
-   memcpy( &temp, pItem2, sizeof( HB_ITEM ) );
-   memcpy( pItem2, pItem1, sizeof( HB_ITEM ) );
-   memcpy( pItem1, &temp, sizeof( HB_ITEM ) );
+   HB_MEMCPY( &temp, pItem2, sizeof( HB_ITEM ) );
+   HB_MEMCPY( pItem2, pItem1, sizeof( HB_ITEM ) );
+   HB_MEMCPY( pItem1, &temp, sizeof( HB_ITEM ) );
 */
 }
 #endif

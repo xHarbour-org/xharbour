@@ -458,7 +458,7 @@ BOOL hb_cdpRegister( PHB_CODEPAGE cdpage )
                   if( nMulti )
                   {
                      cdpage->multi = ( PHB_MULTICHAR ) hb_xgrab( sizeof( HB_MULTICHAR ) * nMulti );
-                     memcpy( cdpage->multi, multi, sizeof( HB_MULTICHAR ) * nMulti );
+                     HB_MEMCPY( cdpage->multi, multi, sizeof( HB_MULTICHAR ) * nMulti );
                      cdpage->nMulti = nMulti;
                   }
                   else
@@ -678,7 +678,7 @@ char *hb_cdpUTF8StringSubstr( const char * pSrc, ULONG ulLen,
 
          ulDst = ul - ulFrom;
          pDst = ( char * ) hb_xgrab( ulDst + 1 );
-         memcpy( pDst, &pSrc[ ulFrom ], ulDst );
+         HB_MEMCPY( pDst, &pSrc[ ulFrom ], ulDst );
          pDst[ ulDst ] = '\0';
       }
    }
@@ -1061,7 +1061,7 @@ char * hb_cdpnDup( const char * pszSrc, ULONG * pulLen,
           */
          ulDst = *pulLen;
          pszDst = ( char * ) hb_xgrab( ulDst + 1 );
-         memcpy( pszDst, pszSrc, ulDst );
+         HB_MEMCPY( pszDst, pszSrc, ulDst );
          pszDst[ ulDst ] = '\0';
          hb_cdpnTranslate( pszDst, cdpIn, cdpOut, ulDst );
       }
@@ -1070,7 +1070,7 @@ char * hb_cdpnDup( const char * pszSrc, ULONG * pulLen,
    {
       ulDst = *pulLen;
       pszDst = ( char * ) hb_xgrab( ulDst + 1 );
-      memcpy( pszDst, pszSrc, ulDst );
+      HB_MEMCPY( pszDst, pszSrc, ulDst );
       pszDst[ ulDst ] = '\0';
    }
 
@@ -1101,7 +1101,7 @@ const char * hb_cdpnDup2( const char * pszSrc, ULONG ulSrc,
          }
          else
             ulSrc = *pulDst;
-         memcpy( pszDst, pszSrc, ulSrc );
+         HB_MEMCPY( pszDst, pszSrc, ulSrc );
          hb_cdpnTranslate( pszDst, cdpIn, cdpOut, ulSrc );
       }
    }
@@ -1114,7 +1114,7 @@ const char * hb_cdpnDup2( const char * pszSrc, ULONG ulSrc,
       }
       else
          ulSrc = *pulDst;
-      memcpy( pszDst, pszSrc, ulSrc );
+      HB_MEMCPY( pszDst, pszSrc, ulSrc );
    }
 
    return pszDst;
@@ -1156,7 +1156,7 @@ const char * hb_cdpnDup3( const char * pszSrc, ULONG ulSrc,
           * multibyte characters
           */
          if( pszDst != pszSrc )
-            memcpy( pszDst, pszSrc, ulDst );
+            HB_MEMCPY( pszDst, pszSrc, ulDst );
          pszDst[ ulDst ] = '\0';
          hb_cdpnTranslate( pszDst, cdpIn, cdpOut, ulSrc );
       }
@@ -1748,9 +1748,9 @@ HB_FUNC( HB_UTF8POKE )
          {
             char *szResult = ( char * ) hb_xgrab( ulLen - n2 + n + 1 );
 
-            memcpy( szResult, szString, ulPos );
+            HB_MEMCPY( szResult, szString, ulPos );
             u16toutf8( &szResult[ulPos], uc );
-            memcpy( szResult + ulPos + n, szString + ulPos + n2, ulLen - ulPos - n2 );
+            HB_MEMCPY( szResult + ulPos + n, szString + ulPos + n2, ulLen - ulPos - n2 );
             if( ISBYREF( 1 ) )
                hb_storclen( szResult, ulLen - n2 + n, 1 );
             hb_retclen_buffer( szResult, ulLen - n2 + n );

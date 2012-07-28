@@ -1146,7 +1146,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                 }
                 if( i > 1 )
                 {
-                   memcpy( hb_comp_szPrefix, s + 1, i - 1 );
+                   HB_MEMCPY( hb_comp_szPrefix, s + 1, i - 1 );
                    hb_comp_szPrefix[ i - 1 ] = '_';
                    hb_comp_szPrefix[ i ] = '\0';
                 }

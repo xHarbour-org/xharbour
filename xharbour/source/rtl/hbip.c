@@ -666,7 +666,7 @@ HB_SOCKET_T hb_ipAccept( HB_SOCKET_T hSocket, int timeout, char * szAddr, long i
    {
       char * ptr = inet_ntoa( si_remote.sin_addr );
       int iOpt = 1;
-      memcpy( szAddr, ptr, strlen(ptr) );
+      HB_MEMCPY( szAddr, ptr, strlen(ptr) );
       szAddr[strlen(ptr)] = '\0';
       *lPort = ntohs( si_remote.sin_port );
       setsockopt( incoming, SOL_SOCKET, SO_KEEPALIVE, (const char *) &iOpt , sizeof( iOpt ));

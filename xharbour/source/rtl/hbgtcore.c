@@ -259,7 +259,7 @@ static void hb_gt_def_GetColorData( PHB_GT pGT, int ** pColorsPtr, int * piColor
    if( pGT->iColorCount )
    {
       *pColorsPtr = ( int * ) hb_xgrab( pGT->iColorCount * sizeof( int ) );
-      memcpy( *pColorsPtr, pGT->pColor, pGT->iColorCount * sizeof( int ) );
+      HB_MEMCPY( *pColorsPtr, pGT->pColor, pGT->iColorCount * sizeof( int ) );
       *piColorCount = pGT->iColorCount;
       *piColorIndex = pGT->iColorIndex;
    }
@@ -637,7 +637,7 @@ static void hb_gt_def_OutStd( PHB_GT pGT, BYTE * pbyStr, ULONG ulLen )
          if( pGT->fDispTrans )
          {
             BYTE * pbyStrBuff = ( BYTE * ) hb_xgrab( ulLen );
-            memcpy( pbyStrBuff, pbyStr, ulLen );
+            HB_MEMCPY( pbyStrBuff, pbyStr, ulLen );
             hb_cdpnTranslate( ( char * ) pbyStrBuff,
                               pGT->cdpHost, pGT->cdpTerm, ulLen );
             hb_fsWriteLarge( pGT->hStdOut, pbyStrBuff, ulLen );
@@ -662,7 +662,7 @@ static void hb_gt_def_OutErr( PHB_GT pGT, BYTE * pbyStr, ULONG ulLen )
          if( pGT->fDispTrans )
          {
             BYTE * pbyStrBuff = ( BYTE * ) hb_xgrab( ulLen );
-            memcpy( pbyStrBuff, pbyStr, ulLen );
+            HB_MEMCPY( pbyStrBuff, pbyStr, ulLen );
             hb_cdpnTranslate( ( char * ) pbyStrBuff,
                               pGT->cdpHost, pGT->cdpTerm, ulLen );
             hb_fsWriteLarge( pGT->hStdErr, pbyStrBuff, ulLen );
@@ -3160,7 +3160,7 @@ BOOL hb_gtLoad( const char * szGtName, PHB_GT_FUNCS pFuncTable )
       {
          if( pFuncTable == NULL )
             pFuncTable = &s_gtCoreFunc;
-         memcpy( s_gtInit[ iPos ]->pSuperTable, pFuncTable, sizeof( HB_GT_FUNCS ) );
+         HB_MEMCPY( s_gtInit[ iPos ]->pSuperTable, pFuncTable, sizeof( HB_GT_FUNCS ) );
          if( !s_gtInit[ iPos ]->init( pFuncTable ) )
          {
             hb_errInternal( 6001, "Internal error: screen driver initialization failure", NULL, NULL );
@@ -3187,7 +3187,7 @@ BOOL hb_gtUnLoad( void )
    while( s_iGtLinkCount > 0 )
    {
       if( --s_iGtLinkCount == 0 )
-         memcpy( &s_gtCoreFunc,
+         HB_MEMCPY( &s_gtCoreFunc,
                  s_gtInit[ s_gtLinkOrder[ s_iGtLinkCount ] ]->pSuperTable,
                  sizeof( HB_GT_FUNCS ) );
    }

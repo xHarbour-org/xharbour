@@ -468,7 +468,7 @@ PHRB_BODY hb_hrbLoad( const char* szHrbBody, ULONG ulBodySize, char* szHrb )
 
             /* Copy function body */
             pDynFunc[ ul ].pCode = ( BYTE * ) hb_xgrab( ulSize );
-            memcpy( ( char * ) pDynFunc[ ul ].pCode, szHrbBody + ulBodyOffset, ulSize );
+            HB_MEMCPY( ( char * ) pDynFunc[ ul ].pCode, szHrbBody + ulBodyOffset, ulSize );
             ulBodyOffset += ulSize;
 
             pDynFunc[ ul ].pCodeFunc = (PHB_PCODEFUNC) hb_xgrab( sizeof( HB_PCODEFUNC ) );

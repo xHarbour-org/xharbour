@@ -84,7 +84,7 @@ HB_FUNC( CTOF )
    {
       pcString = hb_parcx( 1 );
 
-      memcpy( xConvert.string, pcString, sizeof( double ) );
+      HB_MEMCPY( xConvert.string, pcString, sizeof( double ) );
       hb_retnd( xConvert.value );
    }
    else

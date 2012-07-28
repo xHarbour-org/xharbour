@@ -118,7 +118,7 @@ PHB_SYMB hb_symbolNew( const char * szName )      /* Create a new symbol */
 
    iLen = strlen( szName );
    pHolder = ( PHB_SYM_HOLDER ) hb_xgrab( sizeof( HB_SYM_HOLDER ) + iLen );
-   memcpy( pHolder->szName, szName, iLen + 1 );
+   HB_MEMCPY( pHolder->szName, szName, iLen + 1 );
    pHolder->pNext = s_pAllocSyms;
    s_pAllocSyms = pHolder;
 
@@ -202,7 +202,7 @@ PHB_DYNS hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    /* creates
          for( uiPos = 0; uiPos < (UINT) ( s_uiDynSymbols - s_uiClosestDynSym ); uiPos++ )
          {
              /* Insert element in array */
-            memcpy( &s_pDynItems[ s_uiDynSymbols - uiPos ], &s_pDynItems[ s_uiDynSymbols - uiPos - 1 ], sizeof( DYNHB_ITEM ) );
+            HB_MEMCPY( &s_pDynItems[ s_uiDynSymbols - uiPos ], &s_pDynItems[ s_uiDynSymbols - uiPos - 1 ], sizeof( DYNHB_ITEM ) );
          }
       }
 
@@ -1025,7 +1025,7 @@ PHB_DYNS hb_dynsymNew_r( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols, PHB_DYNS pDe
 
    if ( pRet )
    {
-      memcpy( pDest, pRet, sizeof( HB_DYNS ) );
+      HB_MEMCPY( pDest, pRet, sizeof( HB_DYNS ) );
       hb_dynsymUnlock();
       return pDest;
    }
@@ -1046,7 +1046,7 @@ PHB_DYNS hb_dynsymGet_r( const char * szName, PHB_DYNS pDest )
 
    if ( pRet )
    {
-      memcpy( pDest, pRet, sizeof( HB_DYNS ) );
+      HB_MEMCPY( pDest, pRet, sizeof( HB_DYNS ) );
       hb_dynsymUnlock();
       return pDest;
    }
@@ -1066,7 +1066,7 @@ PHB_DYNS hb_dynsymGetCase_r( const char * szName, PHB_DYNS pDest )
 
    if ( pRet )
    {
-      memcpy( pDest, pRet, sizeof( HB_DYNS ) );
+      HB_MEMCPY( pDest, pRet, sizeof( HB_DYNS ) );
       hb_dynsymUnlock();
       return pDest;
    }
@@ -1086,7 +1086,7 @@ PHB_DYNS pRet;
 
    if ( pRet )
    {
-      memcpy( pDest, pRet, sizeof( HB_DYNS ) );
+      HB_MEMCPY( pDest, pRet, sizeof( HB_DYNS ) );
       hb_dynsymUnlock();
       return pDest;
    }
@@ -1106,7 +1106,7 @@ PHB_DYNS hb_dynsymFindName_r( const char * szName, PHB_DYNS pDest )
 
    if ( pRet )
    {
-      memcpy( pDest, pRet, sizeof( HB_DYNS ) );
+      HB_MEMCPY( pDest, pRet, sizeof( HB_DYNS ) );
       hb_dynsymUnlock();
       return pDest;
    }

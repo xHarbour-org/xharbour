@@ -138,7 +138,7 @@ void hb_netname( char * pszNetName, BOOL bGetUser )
          if( regs.h.ch == 0 )
             pszNetName[ 0 ] = '\0';
          else
-            memcpy( pszNetName, szValue, 16 );
+            HB_MEMCPY( pszNetName, szValue, 16 );
       }
    #endif
 

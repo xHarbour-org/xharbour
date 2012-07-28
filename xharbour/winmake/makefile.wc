@@ -61,6 +61,10 @@ CLIBFLAGS    =-dHB_FM_DL_ALLOC $(CLIBFLAGS)
 CLIBFLAGS    =-dHB_VM_ALL $(CLIBFLAGS)
 !endif
 
+!ifdef HB_NO_DV_MEMCPY
+CLIBFLAGS   =-dHB_NO_DV_MEMCPY $(CLIBFLAGS)
+!endif
+
 #-------------------------------------------------------------------------------
 # AJ: 2008-04-26
 # NOTE ON HB_CMD/HB_CMD_MAIN:
@@ -149,11 +153,6 @@ $(VM_LIB) : $(VM_LIB_OBJS)
 $(ZLIB_LIB) : $(ZLIB_LIB_OBJS)
 	$(LIB_CMD)
 
-!if ("$(DV_MEMCPY)" == "1")
-COMMON_LIB_OBJS=\
-	$(COMMON_LIB_OBJS)\
-	$(OBJ_DIR)\dvmemcpy.obj
-!endif
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
 	$(LIB_CMD)
 
@@ -304,15 +303,6 @@ HARBOUR_DLL_OBJS=\
 !endif
 
 #===============================================================================
-# DANIEL VIK MEMCPY
-#===============================================================================
-!if ("$(DV_MEMCPY)" == "1")
-HARBOUR_DLL_OBJS=\
-	$(HARBOUR_DLL_OBJS)\
-	$(OBJ_DIR)\dvmemcpy.obj
-!endif
-
-#===============================================================================
 # Append your own build flags here
 #===============================================================================
 HARBOURFLAGS=$(HARBOURFLAGS)
@@ -352,6 +342,9 @@ CLIBFLAGS    =-dHB_FM_DL_ALLOC $(CLIBFLAGS)
 !endif
 !ifndef HB_NO_VM_ALL
 CLIBFLAGS    =-dHB_VM_ALL $(CLIBFLAGS)
+!endif
+!ifdef HB_NO_DV_MEMCPY
+CLIBFLAGS    =-dHB_NO_DV_MEMCPY $(CLIBFLAGS)
 !endif
 HARBOURFLAGS=$(HARBOURFLAGS) -d_USE_APPMAIN_ -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 -gc0
 MAINWIN_OBJ =$(OBJ_DIR)\mainstdW32.obj
@@ -727,6 +720,10 @@ CLIBFLAGS   =$(CLIBFLAGS)
 
 !ifndef HB_NO_VM_ALL
 CLIBFLAGS    =-dHB_VM_ALL $(CLIBFLAGS)
+!endif
+
+!ifdef HB_NO_DV_MEMCPY
+CLIBFLAGS    =-dHB_NO_DV_MEMCPY $(CLIBFLAGS)
 !endif
 
 #===============================================================================

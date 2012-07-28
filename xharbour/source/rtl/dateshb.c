@@ -430,7 +430,7 @@ HB_FUNC( STOD )
    {
      char szDate[ 9 ] ;
      const char *pDate = hb_parcx( 1 ) ;
-     memcpy( szDate, pDate, 8 ) ;
+     HB_MEMCPY( szDate, pDate, 8 ) ;
      szDate[ 8 ] = '\0' ;
      hb_retds( szDate );
    }
@@ -665,7 +665,7 @@ HB_FUNC( CTOT )
 
          len -= fin;
          memset( szTime, ' ', 12 );
-         memcpy( szTime, szDate+fin+1, (len>12?12:len) );
+         HB_MEMCPY( szTime, szDate+fin+1, (len>12?12:len) );
          szTime[12] = '\0';
          hb_timectot( szTime, &h_value, &n_value, &s_value );
       }
@@ -687,7 +687,7 @@ HB_FUNC( STOT )
 
       memset( szTime, ' ', 18 );
       szTime[18] = '\0';
-      memcpy( szTime, szDate, (len>18?18:len) );
+      HB_MEMCPY( szTime, szDate, (len>18?18:len) );
       hb_datetimeEncStr( szTime, &lDate, &lTime );
 
       hb_retdtl( lDate, lTime );

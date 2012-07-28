@@ -617,7 +617,7 @@ static void hb_dbgAddStack( HB_DEBUGINFO_ *info, char *szName, int nProcLevel )
    top = ARRAY_ADD( HB_CALLSTACKINFO, info->aCallStack, info->nCallStackLen );
    if ( info->bCodeBlock )
    {
-      memcpy( szBuff, "(b)", 3 );
+      HB_MEMCPY( szBuff, "(b)", 3 );
       hb_strncpy( szBuff + 3, szFunction, sizeof( szBuff ) - 4 );
       top->szFunction = STRDUP( szBuff );
    }

@@ -1338,7 +1338,7 @@ PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc,
          {
             PHB_SYMB pSymCloned = (PHB_SYMB) hb_xgrab( sizeof( HB_SYMB ) );
 
-            memcpy( pSymCloned, ( void * ) pClass->pFunError, sizeof( HB_SYMB ) );
+            HB_MEMCPY( pSymCloned, ( void * ) pClass->pFunError, sizeof( HB_SYMB ) );
 
             pSymCloned->szName = pMessage->szName;
             pSymCloned->scope.value |= HB_FS_CLSERROR;
@@ -2030,7 +2030,7 @@ static BOOL hb_clsAddMsg( USHORT uiClass, const char * szMessage,
             PHB_SYMB pMsg = hb_symbolNew( pMessage->pSymbol->szName );
             const char *szMsg = pMsg->szName;
 
-            memcpy( pMsg, pFunc, sizeof(HB_SYMB) );
+            HB_MEMCPY( pMsg, pFunc, sizeof(HB_SYMB) );
             pMsg->szName = szMsg;
 
             pNewMeth->pFunction = (PHB_FUNC) pMsg;
@@ -2314,7 +2314,7 @@ static USHORT hb_clsNew( const char * szClassName, USHORT uiDatas,
                pNewCls->pClassDatas  = hb_arrayClone( pSprCls->pClassDatas, NULL );
                pNewCls->pInlines = hb_arrayClone( pSprCls->pInlines, NULL );
                pNewCls->uiDatasShared = pSprCls->uiDatasShared;
-               memcpy( pNewCls->pMethDyn, pSprCls->pMethDyn, pSprCls->uiMethods * sizeof( METHDYN ) );
+               HB_MEMCPY( pNewCls->pMethDyn, pSprCls->pMethDyn, pSprCls->uiMethods * sizeof( METHDYN ) );
             }
             else if( !hb_clsHasParent( pNewCls, pSprCls->pClassSym ) )
             {
