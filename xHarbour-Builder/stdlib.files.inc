@@ -284,7 +284,7 @@
 [source\rtl\hbcrc32.c]
 [source\rtl\fnsplit.c]
 [source\rtl\fssize.c]
-[source\rtl\set.c]
+[source\vm\set.c]
 [source\rtl\cdpapi.c]
 [source\rtl\gt.c]
 [source\rtl\gtapiu.c]

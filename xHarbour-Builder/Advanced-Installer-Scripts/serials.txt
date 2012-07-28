@@ -1,12 +1,17 @@
+July 2012
+Personal     = 39H9-3848-C511
+Professional = UH9N-WFV5-P64D
+Enterprise   = RV6F-LYGQ-8CH5
+
 October 2011 & November 2011 
 Personal     = 39H9-3848-C511
 Professional = 664H-2518-K496
-Professional = 8531-E7F2-942K
+Enterprise   = 8531-E7F2-942K
 
 September 2010
 Personal     = 79YQ-G081-98W6
 Professional = 7084-8086-522I
-Professional = 9851-0068-8757
+Enterprise   = 9851-0068-8757
 
 March 2010
 Personal     = JXZHB-SWHPL-USGDW-MFIQE-7TLBU
