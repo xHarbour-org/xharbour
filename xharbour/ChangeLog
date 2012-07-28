@@ -8,6 +8,39 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-29 05:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/common/hbstr.c
+  * include/hbapi.h
+    ! hb_strtohex() borrowed from Harbour
+
+  * winmake/common.mak
+  * winmake/compile.mak
+  * source/vm/hbsha1.c
+  * source/vm/hbsha1hm.c
+  * source/vm/hbsha2.c
+  * source/vm/hbsha2hm.c
+  * source/rtl/sha1.c
+  * source/rtl/sha1hmac.c
+  * source/rtl/sha2.c
+  * source/rtl/sha2hmac.c
+  * tests/testsha1.prg
+  * tests/testsha2.prg
+  * include/sha1.h
+  * include/sha1hmac.h
+  * include/sha2.h
+  * include/sha2hmac.h
+    ! SHA crypto routines borrowed from Harbour. Function list:
+      - HB_SHA1( <cMessage> ) -> <cDigest>
+      - HB_HMAC_SHA1( <cMessage> ) -> <cDigest>
+      - HB_SHA224( <cMessage> ) -> <cDigest>
+      - HB_SHA256( <cMessage> ) -> <cDigest>
+      - HB_SHA384( <cMessage> ) -> <cDigest>
+      - HBSHA512( <cMessage> ) -> <cDigest>
+      - HB_HMAC_SHA224( <cMessage>, <cKey> ) -> <cMAC>
+      - HB_HMAC_SHA256( <cMessage>, <cKey> ) -> <cMAC>
+      - HB_HMAC_SHA384( <cMessage>, <cKey> ) -> <cMAC>
+      - HB_HMAC_SHA512( <cMessage>, <cKey> ) -> <cMAC>
+
 2012-07-29 01:19 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/hvm.c
     ! in function hb_vmEqual(): remove redundant comparison of variables:

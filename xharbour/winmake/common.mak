@@ -902,7 +902,12 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hbwinole$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)win32prn$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)winos$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)winreg$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)winreg$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)sha1$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)sha1hmac$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)sha2$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)sha2hmac$(OBJEXT)
 
 #===============================================================================
 # PCREPOS.LIB rules
@@ -1281,7 +1286,12 @@ VM_COMMON_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)memvclip$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)runner$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)throw$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)harbinit$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)harbinit$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)hbsha1$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbsha1hm$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbsha2$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbsha2hm$(OBJEXT)
 
 VM_MAIN_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)maindll$(OBJEXT)\

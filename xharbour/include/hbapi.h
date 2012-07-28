@@ -475,6 +475,7 @@ extern HB_EXPORT       void   hb_retnintlen( HB_LONG llNumber, int iWidth );
     extern HB_EXPORT   void   hb_retnll( LONGLONG llNumber ); /* returns a long long int */
     extern HB_EXPORT   void   hb_retnlllen( LONGLONG llNumber, int iWidth ); /* returns a long long int, with specific width */
 #endif
+extern HB_EXPORT       void   hb_rettdt( long lJulian, long lMilliSec );
 
 #ifdef HB_API_MACROS
    #include "hbapiitm.h"
@@ -536,6 +537,7 @@ extern HB_EXPORT void    hb_stornl( LONG lValue, int iParam, ... ); /* stores a 
 extern HB_EXPORT void    hb_stornint( HB_LONG lValue, int iParam, ... ); /* stores a HB_LONG on a variable by reference */
 extern HB_EXPORT void    hb_stornd( double dValue, int iParam, ... ); /* stores a double on a variable by reference */
 extern HB_EXPORT void    hb_storptr( void * pointer, int iParam, ... ); /* stores a pointer on a variable by reference */
+extern HB_EXPORT int     hb_stortdt( long lJulian, long lMilliSec, int iParam );
 
 #ifndef HB_LONG_LONG_OFF
    extern HB_EXPORT void   hb_stornll( LONGLONG llValue, int iParam, ... ); /* stores a long long int on a variable by reference */
@@ -999,7 +1001,7 @@ extern HB_EXPORT int     Mask2RegEx( const char *sWild, char* sRegEx, BOOL bMatc
 extern HB_EXPORT BOOL    hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString );
 extern HB_EXPORT HB_ULONG hb_hextonum(const char *cHex);
 extern HB_EXPORT void *  dv_memcpy(void *dest, const void *src, size_t count);
-
+extern HB_EXPORT void    hb_strtohex( const char * pSource, ULONG size, char * pDest );
 #include "local.h"
 
 HB_EXTERN_END

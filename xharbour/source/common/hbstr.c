@@ -1226,3 +1226,18 @@ char *hb_strerror( int errNum )
    return strerror( errNum );
 #endif
 }
+
+/* 'pDest' must be double the size of 'size'. [vszakats] */
+void hb_strtohex( const char * pSource, ULONG size, char * pDest )
+{
+   ULONG i;
+
+   for( i = 0; i < size; i++ )
+   {
+      int b;
+      b = ( ( UCHAR ) pSource[ i ] >> 4 ) & 0x0F;
+      *pDest++ = ( char ) ( b + ( b > 9 ? 'a' - 10 : '0' ) );
+      b = ( UCHAR ) pSource[ i ] & 0x0F;
+      *pDest++ = ( char ) ( b + ( b > 9 ? 'a' - 10 : '0' ) );
+   }
+}
