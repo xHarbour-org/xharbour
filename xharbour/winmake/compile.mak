@@ -1561,18 +1561,6 @@ $(OBJ_DIR)$(DIR_SEP)thread$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)thread.c
 $(OBJ_DIR)$(DIR_SEP)throw$(OBJEXT) : $(VM_DIR)$(DIR_SEP)throw.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)hbsha1$(OBJEXT) : $(VM_DIR)$(DIR_SEP)hbsha1.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)hbsha1hm$(OBJEXT) : $(VM_DIR)$(DIR_SEP)hbsha1hm.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)hbsha2$(OBJEXT) : $(VM_DIR)$(DIR_SEP)hbsha2.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)hbsha2hm$(OBJEXT) : $(VM_DIR)$(DIR_SEP)hbsha2hm.c
-	$(CC_CMD)
-
 #===============================================================================
 # FMSTAT.LIB rules
 #===============================================================================
@@ -1582,6 +1570,18 @@ $(OBJ_DIR)$(DIR_SEP)fmSTAT$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)fm.c
 #===============================================================================
 # RTL.LIB rules
 #===============================================================================
+$(OBJ_DIR)$(DIR_SEP)hbsha1$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbsha1.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbsha1hm$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbsha1hm.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbsha2$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbsha2.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbsha2hm$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbsha2hm.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)sha1$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)sha1.c
 	$(CC_CMD)
 
