@@ -4543,7 +4543,9 @@ void hb_clsFinalize( PHB_ITEM pObject )
 
             if( s_AllowDestructors /* && hb_stack_ready */ )
             {
-               if( HB_IS_SYMBOL( hb_stackBaseItem() ) && hb_stackBaseItem()->item.asSymbol.pCargo->uiSuperClass == 0 && strcmp( hb_stackBaseItem()->item.asSymbol.value->szName, "__CLSINSTSUPER" ) )
+               if( HB_IS_SYMBOL( hb_stackBaseItem() ) &&
+                  (hb_stackBaseItem()->item.asSymbol.pCargo->uiSuperClass == 0 || hb_stackBaseItem()->item.asSymbol.pCargo->uiSuperClass != uiClass ||
+                  (HB_IS_ARRAY( hb_stackSelfItem() ) && hb_stackSelfItem()->item.asArray.value != pObject->item.asArray.value )) && strcmp( hb_stackBaseItem()->item.asSymbol.value->szName, "__CLSINSTSUPER" ) )
                {
                   // To DISABLE GC here where no refernce to this object will cause GPF for double release!
                   BOOL bCollecting = hb_gcSetCollecting( TRUE ), bPop = TRUE;

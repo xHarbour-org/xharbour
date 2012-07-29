@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-29 10:18 UTC-0300 Walter Negro <wnegro/AT/vstour.com>
+  * source/vm/classes.c
+    ! Correction in hb_clsFinalize() for not to skip the execution of the destructor
+      of an object when this object is destroyed in a method of a parent class.
+
 2012-07-29 07:06 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * ChangeLog
     ! correction on last log: * -> +
