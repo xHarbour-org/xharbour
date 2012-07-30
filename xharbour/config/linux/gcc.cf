@@ -23,7 +23,7 @@ CC_OUT = -o
 CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
 
 # We are under linux
-CFLAGS = -DHB_OS_LINUX -Wall -W
+CFLAGS = -DHB_OS_LINUX -Wall -W -DHB_NO_DV_MEMCPY
 
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS += -DSIMPLEX
