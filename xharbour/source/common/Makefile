@@ -19,6 +19,7 @@ C_SOURCES=\
 	hbver.c \
 	hbarch.c \
 	reserved.c \
+	hbmem.c \
 
 PRG_SOURCES=\
 
