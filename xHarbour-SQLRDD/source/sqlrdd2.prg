@@ -532,6 +532,12 @@ METHOD SolveRestrictors()  CLASS SR_WORKAREA
          cRet += ::RecnoExpr()
      endif
    EndIf
+   if  SR_UseDeleteds() .and. set( _SET_DELETED )
+      if !empty( cRet ) 
+         cRet += " AND "
+      ENDIF
+      cRet += " (" + SR_DBQUALIFY( ::cDeletedName, ::oSql:nSystemID ) + " IS NULL  OR "  + SR_DBQUALIFY( ::cDeletedName, ::oSql:nSystemID )  + " != " + if(::nTCCompat > 0, "'*'", "'T'") +" ) "
+   endif
 
 Return cRet
 
@@ -2003,7 +2009,7 @@ METHOD QuotedNull( uData, trim, nLen, nDec, nTargetDB, lNull, lMemo )   CLASS SR
    DEFAULT lNull     := .T.
    DEFAULT lMemo     := .F.
 
-   If empty( uData ) .and. (!cType $ "AOH") .and. ((nTargetDB = SYSTEMID_POSTGR .and. cType $ "DCMNT" .and. cType != "L" ) .or. ( nTargetDB != SYSTEMID_POSTGR .and. cType != "L" ))
+   If empty( uData ) .and. (!cType $ "AOH") .and. ((nTargetDB = SYSTEMID_POSTGR .and. cType $ "DCMNT" .and. cType != "L"  .and. SETPGSOLDBEHAVIOR()) .or. ( nTargetDB != SYSTEMID_POSTGR .and. cType != "L" ))
 
 
       If lNull
@@ -4942,9 +4948,11 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
    AADD( aCreate, { ::cRecnoName, "N", 15, 0, .F., , MULTILANG_FIELD_OFF, , , 0, .F. } )
 
    If SR_UseDeleteds()
-      AADD( aCreate, { ::cDeletedName, "C", 1, 0, .F., , MULTILANG_FIELD_OFF, , , 0, .F. } )
+      AADD( aCreate, { ::cDeletedName, "C", 1, 0, if( ::oSql:nSystemID == SYSTEMID_ORACLE, .T., .F. ), , MULTILANG_FIELD_OFF, , , 0, .F. } )
    EndIf
 
+   
+   
    If ::lHistoric
       AADD( aCreate, { "DT__HIST", "D", 8, 0, .T., , MULTILANG_FIELD_OFF, , , 0, .F. } )
    EndIf
@@ -4972,7 +4980,7 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
          If (aCreate[i,FIELD_LEN] > 30)
                cSql := cSql + "VARCHAR2(" + ltrim(str(min(aCreate[i,FIELD_LEN],4000),9,0)) + ")" + IF(lNotNull, " NOT NULL", "")
          Else
-            cSql := cSql + "CHAR(" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ")" + IF(lNotNull, " NOT NULL", "")
+               cSql := cSql + "CHAR(" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ")" + IF(lNotNull, " NOT NULL", "")
          EndIf
 
       Case (aCreate[i,FIELD_TYPE] == "C" .or. aCreate[i,FIELD_TYPE] == "M") .and. ::oSql:nSystemID == SYSTEMID_SQLBAS

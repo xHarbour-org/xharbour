@@ -903,5 +903,5 @@ HB_FUNC(SETPGSOLDBEHAVIOR)
 	int iOld = iOldBehavior;
 	if (ISLOG( 1 ) ) 
        iOldBehavior= hb_parl( 1 ) ;
-    hb_retni( iOld ) ;   
+    hb_retl( iOld ) ;   
 }

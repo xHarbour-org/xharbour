@@ -8,6 +8,20 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-07-30 00:01 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/sqlrdd2.prg 
+    ! updated SolveRestrictors() method to check for SET_DELETED flag when using deleted record,so it can respect the seek/skip on deleted records
+    ! changed QuotedNull() method for then checking for postgresql() use the oldbehavior when set
+    ! when createing tables , and target is oracle and using deleted record, now deleted record is created nullable, since newer oracle version trying to store '' , oracle chenge to null    
+  + source/oraclip.prg
+  + source/oraedit.prg
+    ! added oraclip compatible bindings    
+  * source/pgs.c
+    ! changed SETPGSOLDBEHAVIOR() to return the old status
+  * source/sqlorax.c
+    ! changed SQLO_DESCRIBECOL() to return the correct size when returning rowid type 
+    ! fixed ORACLEINBINDPARAM() to correct find date values
+      
 2012-07-01 10:37 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
   * source/sqlconnection.prg
     SR_AdjustNum made NON static as it is also used in other PRG's

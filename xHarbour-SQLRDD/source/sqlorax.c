@@ -215,12 +215,20 @@ HB_FUNC( SQLO_EXECDIRECT )
 HB_FUNC( SQLO_EXECUTE )
 {
    POCI_SESSION session  = ( POCI_SESSION ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
-
+   BOOL lStmt = ISLOG( 3 ) ? hb_parl( 3 ) : 0;
    if( session )
    {
 
       // TraceLog( "oci.log", "Statement: %s\n", hb_parcx(2) );
+      if (lStmt )
+      {
 
+         while (SQLO_STILL_EXECUTING == (session->status = sqlo_executeselect( session->stmt , 1 )))
+     	  {
+            SQLO_USLEEP;
+         }
+      }
+      else
       while (SQLO_STILL_EXECUTING == (session->status = sqlo_open2( &(session->stmt), session->dbh, hb_parcx(2), 0, NULL )))
      	{
          SQLO_USLEEP;
@@ -344,6 +352,10 @@ HB_FUNC( SQLO_DESCRIBECOL ) // ( hStmt, nCol, @cName, @nDataType, @nColSize, @nD
       type = sqlo_sqldtype( dType );
       hb_storni( type, 4 );
 
+      if (dType == SQLOT_RDD)
+      {
+	      dbsize = 18 ;
+      }
       if( type == SQL_CHAR )
       {
          hb_storni( 0, 6 );
@@ -965,9 +977,9 @@ HB_FUNC( ORACLEINBINDPARAM )
          Stmt->pLink[ iPos ].sDate[1]= (iYear % 100) + 100; // year
          Stmt->pLink[ iPos ].sDate[2]= iMonth;
          Stmt->pLink[ iPos ].sDate[3]= iDay;
-         Stmt->pLink[ iPos ].sDate[4]= 0;
-         Stmt->pLink[ iPos ].sDate[5]= 0;
-         Stmt->pLink[ iPos ].sDate[6]= 0;         
+         Stmt->pLink[ iPos ].sDate[4]= 1;
+         Stmt->pLink[ iPos ].sDate[5]= 1;
+         Stmt->pLink[ iPos ].sDate[6]= 1;         
       }    
 
          ret = sqlo_bind_by_pos( lStmt ? Stmt->stmt :Stmt->stmtParam,
@@ -1146,10 +1158,18 @@ HB_FUNC(ORACLEPREPARE)
 {
    POCI_SESSION session= (POCI_SESSION) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
    const char * szSql = hb_parc( 2 ) ;
+   BOOL lStmt = ISLOG( 3 ) ? hb_parl( 3 ) : 0;
 
    if ( session )
    {
+	  if ( lStmt ) 
+	  {
+	     session->stmt  = sqlo_prepare( session->dbh, szSql );
+      }
+	  else
+	  {
       session->stmtParam = sqlo_prepare( session->dbh, szSql );
+      }   
       hb_retni( 1 );
       return;
    }
