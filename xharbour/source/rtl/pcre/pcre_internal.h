@@ -920,9 +920,9 @@ req_byte match. */
 /* Miscellaneous definitions. The #ifndef is to pacify compiler warnings in
 environments where these macros are defined elsewhere. Unfortunately, there
 is no way to do the same for the typedef. */
-
+#if !defined(HB_DEFS_H_)
 typedef int BOOL;
-
+#endif
 #ifndef FALSE
 #define FALSE   0
 #define TRUE    1

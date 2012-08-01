@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2012-08-01 14:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * config/linux/gcc.cf
+    ! added -DHB_VM_ALL
+  * source/rtl/pcre/pcre_internal.h
+   ! dont redefine BOOL if hbdefs.h is included for correct compilation under *nix
+
 2012-07-30 06:50 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   ! config/linix/gcc.cf
     ! added -DHB_NO_DV_MEMCPY to linux builds
