@@ -2915,9 +2915,8 @@ HB_EXTERN_BEGIN
    static HB_CRITICAL_T  s_fileNetMtx;
    static HB_CRITICAL_T  s_CriticalMutex;
    static HB_CRITICAL_T  s_ServiceMutex;
+   static void s_doNothing( void *nothing ) { HB_SYMBOL_UNUSED( nothing ) ;}
 #endif
-
-static void s_doNothing( void *nothing ) { HB_SYMBOL_UNUSED( nothing ) ;}
 
 /* source/rtl/hbserv.c */
 
