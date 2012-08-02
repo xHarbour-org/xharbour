@@ -67,13 +67,13 @@
 /* JC1: test for macro accessing the stack */
 #include "thread.h"
 
-#if defined( HB_OS_WIN )
-#include "windows.h" /* for CRITICAL_SECTION */
-#endif
-
 HB_EXTERN_BEGIN
 
 #if defined( _HB_API_INTERNAL_ )
+
+#if !defined( HB_THREAD_SUPPORT )
+   #define HB_CRITICAL_T  ULONG
+#endif
 
 typedef struct _HB_STACKRDD
 {
@@ -98,12 +98,8 @@ typedef struct _HB_STACKRDD
       HB_COUNTER     ulCounter;
    #endif
 #else
-   #if defined( HB_OS_WIN )
-      CRITICAL_SECTION  mtxWorkArea;   /* Mutex */
-   #else
-      HB_CRITICAL_T     mtxWorkArea;   /* Mutex */
-   #endif
-   BOOL           fMtLockInit;         /* Lock initialized */
+   HB_CRITICAL_T  mtxWorkArea;   /* Mutex */
+   BOOL           fMtLockInit;   /* Lock initialized */
    HB_COUNTER     ulCounter;
 #endif
 }
