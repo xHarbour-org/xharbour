@@ -4146,10 +4146,10 @@ METHOD MoveWindow( x, y, w, h, lRep ) CLASS Window
 RETURN Self
 //---------------------------------------------------------------------------------------------
 
-METHOD MessageWait( cText, cTitle, lProgress ) CLASS Window
+METHOD MessageWait( cText, cTitle, lProgress, cCancel ) CLASS Window
    LOCAL oWnd
    DEFAULT lProgress TO .F.
-   oWnd := MessageWait( cText, cTitle, lProgress )
+   oWnd := MessageWait( cText, cTitle, lProgress, cCancel )
 RETURN oWnd
 
 //----------------------------------------------------------------------------------------------------

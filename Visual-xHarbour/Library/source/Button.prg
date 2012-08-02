@@ -376,7 +376,6 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
       IF ::xMultiLine
          _DrawText( dis:hDC, ::xText, @aRect, DT_CALCRECT )
          aTextRect  := {0,(::xHeight-aRect[4])/2,::xWidth,::xHeight}
-         
          nTextFlags := DT_CENTER | DT_VCENTER
       ENDIF
       _DrawText( dis:hDC, ::xText, aTextRect, nTextFlags )

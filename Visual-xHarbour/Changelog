@@ -7,6 +7,17 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2012-08-01 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added MessageWait( cText, cTitle, lProgress, cCancel ) cCancel parameter. This will
+     contain the text of a button that will cancel a process "Cancel". Processes MUST
+     call ::Application:DoEvents() inside the LOOP to allow the wait window breathing.
+     
+     oWait := ::MessageWait( "Processing invoices", "Winvoice", .T., "Cancel" )
+     
+     DO WHILE (your test) .AND. oWait:IsWindow() // very important, that's how you will know it has been cancelled.
+        ::Application:DoEvents() // Mandatory or the cancel button won't even paint.
+        ...
+     ENDDO
 
 2012-07-23 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Added Button:MultiLine property

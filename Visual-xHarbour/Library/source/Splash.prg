@@ -14,7 +14,7 @@
 static __pCallBackPtr
 static __pPicture
 static aSize
-static nSecs, __aCenter, s_lProgress, s_hFont, s_cText
+static nSecs, __aCenter, s_lProgress, s_cCancel, s_hFont, s_cText
 
 #define SHOWDEBUG
 
@@ -124,8 +124,8 @@ CLASS MessageWait
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------------------------------------
-METHOD Init( cText, cTitle, lProgress ) CLASS MessageWait
-   ::hWnd := __MsgWait( cText, cTitle, lProgress )
+METHOD Init( cText, cTitle, lProgress, cCancel ) CLASS MessageWait
+   ::hWnd := __MsgWait( cText, cTitle, lProgress, cCancel )
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------
@@ -140,6 +140,10 @@ METHOD SetPosition() CLASS MessageWait
    aBar[3]-=1
    aBar[4]-=1
 
+   IF s_cCancel != NIL
+      aBar[2] -= 30
+   ENDIF
+
    aBar[3] := aBar[1] + (((aBar[3] - aBar[1]) * ::xPosition )/100)
    DrawThemeBackground( hTheme, hDC, PP_CHUNK, 0, aBar )
 
@@ -148,7 +152,7 @@ METHOD SetPosition() CLASS MessageWait
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------
-FUNCTION __MsgWait( cText, cTitle, lProgress )
+FUNCTION __MsgWait( cText, cTitle, lProgress, cCancel )
    LOCAL nWidth, nHeight, nStyle, dt, hDC, hWnd
 
    DEFAULT cText  TO ""
@@ -162,7 +166,8 @@ FUNCTION __MsgWait( cText, cTitle, lProgress )
    IF lProgress
       nHeight += 24
    ENDIF
-   
+
+   s_cCancel   := cCancel
    s_lProgress := lProgress
    s_cText     := cText
    
@@ -197,7 +202,7 @@ RETURN hWnd
 
 //-------------------------------------------------------------------------------------------------------------------------------------
 FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
-   LOCAL nLeft, nTop, aRect, aPar, hDC
+   LOCAL nLeft, nTop, aRect, aPar, hDC, aSize, hBtn
    LOCAL hTheme, aBar
    SWITCH nMsg
       CASE WM_INITDIALOG
@@ -213,8 +218,21 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
            
            nLeft := __aCenter[1] + ( ( __aCenter[3] ) / 2 ) - ( (aRect[3]-aRect[1]) / 2 )
            nTop  := __aCenter[2] + ( ( __aCenter[4] ) / 2 ) - ( (aRect[4]-aRect[2]) / 2 )
-            
-           MoveWindow( hWnd, nLeft, nTop, aRect[3]-aRect[1], aRect[4]-aRect[2] )
+
+           MoveWindow( hWnd, nLeft, nTop, aRect[3]-aRect[1], ( aRect[4]-aRect[2] ) + IIF( s_cCancel != NIL, 30, 0 ) )
+
+           IF s_cCancel != NIL
+              aRect := _GetClientRect( hWnd )
+              hDC   := GetDC( hWnd )
+              aSize := _GetTextExtentPoint32( hDC, s_cCancel+" " )
+              ReleaseDC( hWnd, hDC )
+
+              nLeft := ( aRect[3] - aSize[1] ) / 2
+              hBtn  := CreateWindowEx( 0, "Button", s_cCancel,;
+                              WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,;
+                              nLeft, aRect[4]-27, aSize[1], 25,;
+                              hWnd, 4000, __GetApplication():Instance, NIL )
+           ENDIF
            RETURN 1
 
       CASE WM_ERASEBKGND  
@@ -226,6 +244,11 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
            aRect[2]+=5
            aRect[3]-=5
            aRect[4]-=5
+           IF s_cCancel != NIL
+              aBar[2] -= 30
+              aBar[4] -= 30
+              aRect[4] -= 30
+           ENDIF
            IF s_lProgress
               aRect[4]-= 26
               hTheme := OpenThemeData(,"PROGRESS")
@@ -238,7 +261,12 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
            SelectObject( hDC, s_hFont )
            _DrawText( hDC, s_cText, @aRect, DT_LEFT+DT_CENTER+DT_VCENTER+DT_SINGLELINE )
            RETURN 1
-           
+
+      CASE WM_COMMAND
+           IF nwParam == 4000
+              DestroyWindow( hWnd )
+           ENDIF
+
       CASE WM_NCDESTROY
            DeleteObject( s_hFont )
            FreeCallBackPointer( __pCallBackPtr )
