@@ -53,7 +53,7 @@
 
 #ifdef __XHARBOUR__
 /* JC1: optimizing stack access under MT */
-#define HB_THREAD_OPTIMIZE_STACK
+// #define HB_THREAD_OPTIMIZE_STACK
 #endif
 #ifndef _HB_API_INTERNAL_
    #define _HB_API_INTERNAL_
@@ -66,20 +66,16 @@
 #include "hbstack.h"
 #include "hbset.h"
 
-
-#ifndef HB_THREAD_SUPPORT
-   #define LOCK_AREA
-   #define UNLOCK_AREA
-   #define LOCK_AREA_INIT
-   #define LOCK_AREA_DESTROY
-#else
-   #define LOCK_AREA          if (  pRddInfo->fMtLockInit ) HB_CRITICAL_LOCK( pRddInfo->mtxWorkArea );
-   #define UNLOCK_AREA        if (  pRddInfo->fMtLockInit ) HB_CRITICAL_UNLOCK( pRddInfo->mtxWorkArea );
-   #define LOCK_AREA_INIT     if ( !pRddInfo->fMtLockInit ) { HB_CRITICAL_INIT( pRddInfo->mtxWorkArea ); pRddInfo->fMtLockInit = TRUE; }
-   #define LOCK_AREA_DESTROY  if (  pRddInfo->fMtLockInit ) { HB_CRITICAL_DESTROY( pRddInfo->mtxWorkArea ); pRddInfo->fMtLockInit = FALSE; }
-#endif
-
-
+HB_EXTERN_BEGIN
+extern void hb_rdd_wacore_Lock( PHB_STACKRDD pRddInfo );
+extern void hb_rdd_wacore_Unlock( PHB_STACKRDD pRddInfo );
+extern void hb_rdd_wacore_LockInit( PHB_STACKRDD pRddInfo );
+extern void hb_rdd_wacore_LockDestroy( PHB_STACKRDD pRddInfo );
+extern void hb_rdd_wacore_rddWaShutDown( PHB_STACKRDD pRddInfo );
+extern BOOL hb_rdd_wacore_rddChangeSetWorkareasShared( BOOL bPrev, BOOL bSet, PHB_STACKRDD pRddInfo );
+extern void hb_rdd_wacore_hb_atomic_inc( PHB_STACKRDD pRddInfo );
+extern void hb_rdd_wacore_rddWaInit( PHB_STACKRDD pRddInfo );
+HB_EXTERN_END
 
 #define HB_SET_WA( n )  do \
             { \
@@ -191,7 +187,6 @@ static void hb_waNodeDelete( PHB_STACKRDD pRddInfo, PHB_STACKRDD_TLS pRddTls )
  */
 HB_ERRCODE hb_rddSelectFirstAvailable( void )
 {
-   HB_THREAD_STUB
    PHB_STACKRDD pRddInfo;
    PHB_STACKRDD_TLS pRddTls;
    USHORT uiArea;
@@ -200,7 +195,7 @@ HB_ERRCODE hb_rddSelectFirstAvailable( void )
 
    pRddInfo = hb_stackRDD();
 
-   LOCK_AREA
+   hb_rdd_wacore_Lock( pRddInfo );
 
    uiArea = 1;
    while( uiArea < pRddInfo->uiWaNumMax )
@@ -211,14 +206,14 @@ HB_ERRCODE hb_rddSelectFirstAvailable( void )
    }
    if( uiArea >= HB_RDD_MAX_AREA_NUM )
    {
-      UNLOCK_AREA
+      hb_rdd_wacore_Unlock( pRddInfo );
 
       return HB_FAILURE;
    }
    pRddTls = hb_stackRDDTLS();
    HB_SET_WA( uiArea );
 
-   UNLOCK_AREA
+   hb_rdd_wacore_Unlock( pRddInfo );
 
    return HB_SUCCESS;
 }
@@ -228,7 +223,6 @@ HB_ERRCODE hb_rddSelectFirstAvailable( void )
  */
 USHORT hb_rddInsertAreaNode( const char *szDriver )
 {
-   HB_THREAD_STUB
    PHB_STACKRDD pRddInfo;
    PHB_STACKRDD_TLS pRddTls;
    LPRDDNODE pRddNode;
@@ -252,10 +246,10 @@ USHORT hb_rddInsertAreaNode( const char *szDriver )
    pRddInfo = hb_stackRDD();
    if ( pRddInfo->uiWaNumMax == 0  && hb_setGetWorkareasShared() )
    {
-      LOCK_AREA_INIT
+      hb_rdd_wacore_LockInit( pRddInfo );
    }
 
-   LOCK_AREA
+   hb_rdd_wacore_Lock( pRddInfo );
 
    if( pRddTls->uiCurrArea == 0 )
    {
@@ -265,7 +259,7 @@ USHORT hb_rddInsertAreaNode( const char *szDriver )
 
    hb_waNodeInsert( pRddInfo, pRddTls, pArea );
 
-   UNLOCK_AREA
+   hb_rdd_wacore_Unlock( pRddInfo );
 
    return pRddTls->uiCurrArea;
 }
@@ -276,7 +270,6 @@ USHORT hb_rddInsertAreaNode( const char *szDriver )
  */
 void hb_rddReleaseCurrentArea( void )
 {
-   HB_THREAD_STUB
    PHB_STACKRDD pRddInfo;
    PHB_STACKRDD_TLS pRddTls;
    AREAP pArea;
@@ -290,11 +283,11 @@ void hb_rddReleaseCurrentArea( void )
 
    pRddInfo = hb_stackRDD();
 
-   LOCK_AREA
+   hb_rdd_wacore_Lock( pRddInfo );
 
    if( SELF_CLOSE( pArea ) == HB_FAILURE )
    {
-      UNLOCK_AREA
+      hb_rdd_wacore_Unlock( pRddInfo );
 
       return;
    }
@@ -303,7 +296,7 @@ void hb_rddReleaseCurrentArea( void )
 
    hb_waNodeDelete( pRddInfo, pRddTls );
 
-   UNLOCK_AREA
+   hb_rdd_wacore_Unlock( pRddInfo );
 }
 
 PHB_STACKRDD hb_rddWaInit( void )
@@ -320,11 +313,9 @@ PHB_STACKRDD hb_rddWaInit( void )
       pRddInfo->uiWaMax       = 0;
       pRddInfo->uiWaSpace     = 0;
       pRddInfo->uiWaNumMax    = 0;
-#ifdef HB_THREAD_SUPPORT
-      pRddInfo->fMtLockInit   = FALSE;
-      pRddInfo->ulCounter     = 1;
-#endif
-      
+
+      hb_rdd_wacore_rddWaInit( pRddInfo );
+
       if( s_pRddInfo == NULL )
       {
          s_pRddInfo = pRddInfo;
@@ -333,9 +324,7 @@ PHB_STACKRDD hb_rddWaInit( void )
    else
    {
       pRddInfo = s_pRddInfo;
-#ifdef HB_THREAD_SUPPORT
-      HB_ATOMIC_INC( pRddInfo->ulCounter );
-#endif
+      hb_rdd_wacore_hb_atomic_inc( pRddInfo );
    }
 
    return pRddInfo;
@@ -343,116 +332,14 @@ PHB_STACKRDD hb_rddWaInit( void )
 
 BOOL hb_rddChangeSetWorkareasShared( BOOL bPrev, BOOL bSet )
 {
-   BOOL bOk = TRUE;
-#ifdef HB_THREAD_SUPPORT
-   if( bPrev == bSet )
-   {
-      return TRUE;
-   }
-
-   hb_threadWaitForIdle();
-   if( !bSet )
-   {
-      /* We must create HB_STACKRDD structures for each thread and save them in their respective stacks
-       * And we must destroy the LOCK_AREA and set fMtLockInit to FALSE */
-
-      PHB_STACK p = hb_ht_stack->next; /* Start from the second thread */
-      PHB_STACKRDD pRddInfo;
-
-      while( p )
-      {
-         pRddInfo = (PHB_STACKRDD) hb_xgrab( sizeof( HB_STACKRDD ) );
-
-         pRddInfo->szDefaultRDD  = NULL;
-         pRddInfo->waList        = NULL;
-         pRddInfo->waNums        = NULL;
-         pRddInfo->uiWaMax       = 0;
-         pRddInfo->uiWaSpace     = 0;
-         pRddInfo->uiWaNumMax    = 0;
-         pRddInfo->fMtLockInit   = FALSE;
-         pRddInfo->ulCounter     = 1;
-
-         p->rdd = pRddInfo;
-         p->set.HB_SET_WORKAREAS_SHARED = bSet;
-
-         p = p->next;
-      }
-
-      pRddInfo = s_pRddInfo;
-      pRddInfo->ulCounter = 1;
-      if( pRddInfo->fMtLockInit )
-      {
-         LOCK_AREA_DESTROY
-      }
-   }
-   else
-   {
-      /* We must verify that there are no open areas in any thread except the main one.
-       * We must destroy HB_STACKRDD structures of each thread except the main one and
-       * set each stack's HB_STACKRDD pointer to the main thread's HB_STACKRDD.
-       * In the main thread, if there are open areas, create the LOCK_AREA and set fMtLockInit to TRUE. */
-
-      HB_STACK *p = hb_ht_stack->next; /* Start from the second thread */
-      PHB_STACKRDD pRddInfo;
-
-      while( p )
-      {
-         if( p->rdd->uiWaMax > 0 )
-         {
-            bOk = FALSE;
-            break;
-         }
-         p = p->next;
-      }
-
-      if( bOk )
-      {
-         p = hb_ht_stack; /* Start from the first thread */
-         pRddInfo = p->rdd;
-
-         if( pRddInfo->uiWaMax > 0 )
-         {
-            LOCK_AREA_INIT
-         }
-         p = p->next;
-
-         while( p )
-         {
-            hb_xfree( p->rdd );
-            p->rdd = pRddInfo;
-            p->set.HB_SET_WORKAREAS_SHARED = bSet;
-            p = p->next;
-         }
-      }
-   }
-   hb_threadIdleEnd();
-#else
-   HB_SYMBOL_UNUSED(bPrev);
-   HB_SYMBOL_UNUSED(bSet);
-#endif
+   BOOL bOk = hb_rdd_wacore_rddChangeSetWorkareasShared( bPrev, bSet, s_pRddInfo );
    return bOk;
 }
 
 /* Destroy the workarea mutex */
 void hb_rddWaShutDown( PHB_STACKRDD pRddInfo )
 {
-#ifdef HB_THREAD_SUPPORT
-   if( !hb_setGetWorkareasShared() )
-   {
-      hb_rddCloseAll();
-   }
-
-   if( HB_ATOMIC_DEC( pRddInfo->ulCounter ) == 0 )
-   {
-      if( pRddInfo->fMtLockInit )
-      {
-         LOCK_AREA_DESTROY
-      }
-      hb_xfree( pRddInfo );
-   }
-#else
-   hb_xfree( pRddInfo );
-#endif
+   hb_rdd_wacore_rddWaShutDown( pRddInfo );
 }
 
 /*
@@ -460,7 +347,6 @@ void hb_rddWaShutDown( PHB_STACKRDD pRddInfo )
  */
 void hb_rddCloseAll( void )
 {
-   HB_THREAD_STUB
    PHB_STACKRDD pRddInfo;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddCloseAll()"));
@@ -473,7 +359,7 @@ void hb_rddCloseAll( void )
       USHORT uiIndex;
       PHB_STACKRDD_TLS pRddTls = hb_stackRDDTLS();
 
-      LOCK_AREA
+      hb_rdd_wacore_Lock( pRddInfo );
 
       do
       {
@@ -511,18 +397,17 @@ void hb_rddCloseAll( void )
       pRddInfo->waNums = NULL;
       HB_SET_WA( 1 );
 
-      UNLOCK_AREA
+      hb_rdd_wacore_Unlock( pRddInfo );
    }
 }
 
 void hb_rddFlushAll( void )
 {
-   HB_THREAD_STUB
    PHB_STACKRDD pRddInfo = hb_stackRDD();
    PHB_STACKRDD_TLS pRddTls = hb_stackRDDTLS();
    USHORT uiArea = hb_rddGetCurrentWorkAreaNumber(), uiIndex;
 
-   LOCK_AREA
+   hb_rdd_wacore_Lock( pRddInfo );
 
    for( uiIndex = 1; uiIndex < pRddInfo->uiWaMax; ++uiIndex )
    {
@@ -530,19 +415,18 @@ void hb_rddFlushAll( void )
       SELF_FLUSH( ( AREAP ) pRddTls->pCurrArea );
    }
 
-   UNLOCK_AREA
+   hb_rdd_wacore_Unlock( pRddInfo );
 
    hb_rddSelectWorkAreaNumber( uiArea );
 }
 
 void hb_rddUnLockAll( void )
 {
-   HB_THREAD_STUB
    PHB_STACKRDD pRddInfo = hb_stackRDD();
    PHB_STACKRDD_TLS pRddTls = hb_stackRDDTLS();
    USHORT uiArea = hb_rddGetCurrentWorkAreaNumber(), uiIndex;
 
-   LOCK_AREA
+   hb_rdd_wacore_Lock( pRddInfo );
 
    for( uiIndex = 1; uiIndex < pRddInfo->uiWaMax; ++uiIndex )
    {
@@ -550,7 +434,7 @@ void hb_rddUnLockAll( void )
       SELF_UNLOCK( ( AREAP ) pRddTls->pCurrArea, NULL );
    }
 
-   UNLOCK_AREA
+   hb_rdd_wacore_Unlock( pRddInfo );
 
    hb_rddSelectWorkAreaNumber( uiArea );
 }
@@ -560,7 +444,6 @@ void hb_rddUnLockAll( void )
  */
 HB_ERRCODE hb_rddIterateWorkAreas( WACALLBACK pCallBack, void * cargo )
 {
-   HB_THREAD_STUB
    PHB_STACKRDD pRddInfo;
    HB_ERRCODE errCode = HB_SUCCESS;
    USHORT uiIndex;
@@ -569,7 +452,7 @@ HB_ERRCODE hb_rddIterateWorkAreas( WACALLBACK pCallBack, void * cargo )
 
    pRddInfo = hb_stackRDD();
 
-   LOCK_AREA
+   hb_rdd_wacore_Lock( pRddInfo );
 
    for( uiIndex = 1; uiIndex < pRddInfo->uiWaMax; uiIndex++ )
    {
@@ -578,20 +461,18 @@ HB_ERRCODE hb_rddIterateWorkAreas( WACALLBACK pCallBack, void * cargo )
          break;
    }
 
-   UNLOCK_AREA
+   hb_rdd_wacore_Unlock( pRddInfo );
 
    return errCode;
 }
 
 BOOL hb_rddGetNetErr( void )
 {
-   HB_THREAD_STUB
    return hb_stackRDDTLS()->fNetError;
 }
 
 void hb_rddSetNetErr( BOOL fNetErr )
 {
-   HB_THREAD_STUB
    hb_stackRDDTLS()->fNetError = fNetErr;
 }
 
@@ -600,7 +481,6 @@ void hb_rddSetNetErr( BOOL fNetErr )
  */
 const char * hb_rddDefaultDrv( const char * szDriver )
 {
-   HB_THREAD_STUB
    PHB_STACKRDD pRddInfo = hb_stackRDD();
 
    if( szDriver && *szDriver )
@@ -638,7 +518,6 @@ const char * hb_rddDefaultDrv( const char * szDriver )
  */
 void * hb_rddGetWorkAreaPointer( int iArea )
 {
-   HB_THREAD_STUB
    PHB_STACKRDD pRddInfo;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddGetWorkAreaPointer(%d)", iArea));
@@ -658,7 +537,6 @@ void * hb_rddGetWorkAreaPointer( int iArea )
  */
 void * hb_rddGetCurrentWorkAreaPointer( void )
 {
-   HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_rddGetCurrentWorkAreaPointer()"));
 
    return hb_stackRDDTLS()->pCurrArea;
@@ -669,7 +547,6 @@ void * hb_rddGetCurrentWorkAreaPointer( void )
  */
 int hb_rddGetCurrentWorkAreaNumber( void )
 {
-   HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_rddGetCurrentWorkAreaNumber()"));
 
    return hb_stackRDDTLS()->uiCurrArea;
@@ -680,7 +557,6 @@ int hb_rddGetCurrentWorkAreaNumber( void )
  */
 HB_ERRCODE hb_rddSelectWorkAreaNumber( int iArea )
 {
-   HB_THREAD_STUB
    PHB_STACKRDD pRddInfo;
    PHB_STACKRDD_TLS pRddTls;
 
@@ -689,14 +565,14 @@ HB_ERRCODE hb_rddSelectWorkAreaNumber( int iArea )
    pRddInfo = hb_stackRDD();
    pRddTls = hb_stackRDDTLS();
 
-   LOCK_AREA
+   hb_rdd_wacore_Lock( pRddInfo );
 
    if( iArea < 1 || iArea > HB_RDD_MAX_AREA_NUM )
       HB_SET_WA( 0 );
    else
       HB_SET_WA( iArea );
 
-   UNLOCK_AREA
+   hb_rdd_wacore_Unlock( pRddInfo );
 
    return ( pRddTls->pCurrArea == NULL ) ? HB_FAILURE : HB_SUCCESS;
 }

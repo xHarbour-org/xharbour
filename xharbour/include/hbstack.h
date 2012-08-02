@@ -67,6 +67,10 @@
 /* JC1: test for macro accessing the stack */
 #include "thread.h"
 
+#if defined( HB_OS_WIN )
+#include "windows.h" /* for CRITICAL_SECTION */
+#endif
+
 HB_EXTERN_BEGIN
 
 #if defined( _HB_API_INTERNAL_ )
@@ -80,10 +84,26 @@ typedef struct _HB_STACKRDD
    USHORT         uiWaMax;          /* Number of allocated WA */
    USHORT         uiWaSpace;        /* Number of allocated WA */
    USHORT         uiWaNumMax;       /* Number of allocated WA */
-
-#ifdef HB_THREAD_SUPPORT
-   HB_CRITICAL_T  mtxWorkArea;      /* Mutex */
-   BOOL           fMtLockInit;      /* Lock initialized */
+/*
+  AJ: hard-wired HB_THREAD_SUPPORT is eliminated here in order to make this
+  struct common. At this stage, it seems that HB_CRITICAL_T was not defined
+  on ST compilation, therefore a direct approach using CRITICAL_SECTION is
+  adapted here. This may fails on other system. Non-windows developers are
+  expected to make necessary modification if this proves fail on his system.
+*/
+#if 0
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_T  mtxWorkArea;      /* Mutex */
+      BOOL           fMtLockInit;      /* Lock initialized */
+      HB_COUNTER     ulCounter;
+   #endif
+#else
+   #if defined( HB_OS_WIN )
+      CRITICAL_SECTION  mtxWorkArea;   /* Mutex */
+   #else
+      HB_CRITICAL_T     mtxWorkArea;   /* Mutex */
+   #endif
+   BOOL           fMtLockInit;         /* Lock initialized */
    HB_COUNTER     ulCounter;
 #endif
 }

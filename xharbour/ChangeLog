@@ -7,6 +7,58 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2012-08-02 08:25 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/macro/macro.y
+  * source/macro/macroyy.c
+  * source/rdd/hsx/hsx.c
+  * source/rtl/filebuf.c
+  * source/rtl/trace.c
+  * source/rtl/console.c
+  * source/rtl/idle.c
+  * source/rtl/filenet.c
+  * source/rtl/errorsys.prg
+  * source/rtl/hblog.prg
+  * source/rtl/hblognet.prg
+  * source/rtl/trpccli.prg
+  * source/rtl/trpc.prg
+  * source/rtl/hbserv.c
+  * source/rtl/math.c
+  * source/rdd/wafunc.c
+  * source/rdd/wacore.c
+    ! replace hard-coded HB_THREAD_SUPPORT with (pseudo) API
+
+  * include/hbstack.h
+    ! remove hard-coded HB_THREAD_SUPPORT in HB_STACKRDD struct.
+    NOTE: Non-Windows developers please read a note in the file.
+
+  * source/vm/thread.c
+    + added (pseudo) functions to replace hard-wired HB_THREAD_SUPPORT
+
+  * source/vm/estack.c
+    ! hb_s_hb_exc() now for ST and MT
+
+  + source/vm/trpcvmmt.prg
+  + source/vm/lognetmt.prg
+  + source/vm/errlogmt.prg
+    + added (pseudo) functions to replace hard-wired HB_THREAD_SUPPORT in RTL
+
+  * winmake/common.mak
+  * winmake/compile.mak
+    ! temporarily classify bkgtsks.c in VM lib (pending clean-ups of hard-wired
+    codes safely)
+    - rtlmt.lib, rddmt.lib, hsxmt.lib and macromt.lib no longer created as they
+    are now common to ST and MT applications, IOW MT applications need to only
+    use vmmt.lib instead of vm.lib besides the regular libs
+
+  * winmake/makefile.bc
+  * winmake/makefile.dc
+  * winmake/makefile.gc
+  * winmake/makefile.pc
+  * winmake/makefile.wc
+    - remove no longer required MT attributes
+
+
 2012-08-01 14:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * config/linux/gcc.cf
     ! added -DHB_VM_ALL

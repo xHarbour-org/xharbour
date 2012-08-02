@@ -95,9 +95,11 @@ HB_FILE;
 
 static const HB_FILE_FUNCS * s_fileMethods( void );
 
-#ifdef HB_THREAD_SUPPORT
-static HB_CRITICAL_T  s_fileMtx;
-#endif
+HB_EXTERN_BEGIN
+extern void hb_filebuf_critical_Lock( void );
+extern void hb_filebuf_critical_UnLock( void );
+extern void hb_filebuf_critical_Init( void );
+HB_EXTERN_END
 
 static PHB_FILE s_openFiles = NULL;
 
@@ -344,7 +346,7 @@ static PHB_FILE s_fileExtOpen( const char * pFilename, const char * pDefExt,
 
    if( fResult )
    {
-      HB_CRITICAL_LOCK( s_fileMtx );
+      hb_filebuf_critical_Lock();
       pFile = hb_fileFind( statbuf.st_dev, statbuf.st_ino );
       if( pFile )
       {
@@ -355,7 +357,7 @@ static PHB_FILE s_fileExtOpen( const char * pFilename, const char * pDefExt,
          else
             pFile->used++;
       }
-      HB_CRITICAL_UNLOCK( s_fileMtx );
+      hb_filebuf_critical_UnLock();
    }
 
    if( pFile )
@@ -396,7 +398,7 @@ static PHB_FILE s_fileExtOpen( const char * pFilename, const char * pDefExt,
          hb_vmLock();
 #endif
 
-         HB_CRITICAL_LOCK( s_fileMtx );
+         hb_filebuf_critical_Lock();
          pFile = hb_fileNew( hFile, fShared, fReadonly, device, inode, TRUE );
          if( pFile->hFile != hFile )
          {
@@ -430,7 +432,7 @@ static PHB_FILE s_fileExtOpen( const char * pFilename, const char * pDefExt,
          }
          else
             hFile = FS_ERROR;
-         HB_CRITICAL_UNLOCK( s_fileMtx );
+         hb_filebuf_critical_UnLock();
 
          if( hFile != FS_ERROR )
          {
@@ -451,7 +453,7 @@ static void s_fileClose( PHB_FILE pFile )
 {
    HB_FHANDLE hFile = FS_ERROR, hFileRO = FS_ERROR;
 
-   HB_CRITICAL_LOCK( s_fileMtx );
+   hb_filebuf_critical_Lock();
 
    if( --pFile->used == 0 )
    {
@@ -476,7 +478,7 @@ static void s_fileClose( PHB_FILE pFile )
       hb_xfree( pFile );
    }
 
-   HB_CRITICAL_UNLOCK( s_fileMtx );
+   hb_filebuf_critical_UnLock();
 
    hb_fsSetError( 0 );
 
@@ -493,9 +495,9 @@ static BOOL s_fileLock( PHB_FILE pFile, HB_FOFFSET ulStart, HB_FOFFSET ulLen,
 
    if( ( iType & FL_MASK ) == FL_UNLOCK )
    {
-      HB_CRITICAL_LOCK( s_fileMtx );
+      hb_filebuf_critical_Lock();
       fResult = hb_fileUnlock( pFile, &fLockFS, ulStart, ulLen );
-      HB_CRITICAL_UNLOCK( s_fileMtx );
+      hb_filebuf_critical_UnLock();
       if( fLockFS )
          hb_fsLockLarge( pFile->hFile, ulStart, ulLen, ( USHORT ) iType );
       else
@@ -503,17 +505,17 @@ static BOOL s_fileLock( PHB_FILE pFile, HB_FOFFSET ulStart, HB_FOFFSET ulLen,
    }
    else
    {
-      HB_CRITICAL_LOCK( s_fileMtx );
+      hb_filebuf_critical_Lock();
       fResult = hb_fileSetLock( pFile, &fLockFS, ulStart, ulLen );
-      HB_CRITICAL_UNLOCK( s_fileMtx );
+      hb_filebuf_critical_UnLock();
       if( fLockFS )
       {
          fResult = hb_fsLockLarge( pFile->hFile, ulStart, ulLen, ( USHORT ) iType );
          if( !fResult )
          {
-            HB_CRITICAL_LOCK( s_fileMtx );
+            hb_filebuf_critical_Lock();
             hb_fileUnlock( pFile, &fLockFS, ulStart, ulLen );
-            HB_CRITICAL_UNLOCK( s_fileMtx );
+            hb_filebuf_critical_UnLock();
          }
       }
       else
@@ -625,7 +627,7 @@ BOOL hb_fileRegister( const HB_FILE_FUNCS * pFuncs )
 {
    BOOL fResult = FALSE;
 
-   HB_CRITICAL_LOCK( s_fileMtx );
+   hb_filebuf_critical_Lock();
 
    if( s_iFileTypes < HB_FILE_TYPE_MAX )
    {
@@ -634,7 +636,7 @@ BOOL hb_fileRegister( const HB_FILE_FUNCS * pFuncs )
       fResult = TRUE;
    }
 
-   HB_CRITICAL_UNLOCK( s_fileMtx );
+   hb_filebuf_critical_UnLock();
 
    return fResult;
 }
@@ -785,7 +787,5 @@ PHB_FILE hb_fileCreateTempEx( char * pszName,
 
 void hb_filebufInit( void )
 {
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_INIT( s_fileMtx );
-   #endif
+   hb_filebuf_critical_Init();
 }

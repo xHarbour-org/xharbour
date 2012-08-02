@@ -91,6 +91,17 @@
 
 extern PHB_FUNC pHVMFuncService;
 
+HB_EXTERN_BEGIN
+extern void hb_service_signalHandlerQuit( HB_FUNC_PTR );
+extern void hb_service_Lock( void );
+extern void hb_service_UnLock( void );
+extern void hb_service_LockInit( void );
+extern void hb_service_threadCancel( void );
+extern void hb_service_ConsoleHandlerRoutineDestroyStack( PHB_STACK pStack );
+extern PHB_STACK hb_service_ConsoleHandlerRoutineInit( void );
+extern void hb_service_hbstartservice( PHB_ITEM p_hooks );
+HB_EXTERN_END
+
 /**************************************************
 * Global definition, valid for all systems
 ***************************************************/
@@ -102,19 +113,6 @@ static void s_signalHandlersInit( void );
 static PHB_ITEM sp_hooks = NULL;
 static BOOL bSignalEnabled = TRUE;
 static int sb_isService = 0;
-
-/* There is a service mutex in multithreading */
-#ifdef HB_THREAD_SUPPORT
-   static HB_CRITICAL_T s_ServiceMutex;
-   #if defined( HB_VM_ALL )
-      HB_EXTERN_BEGIN
-      extern  HB_STACK *          _TlsGetValue( void );
-      extern  void                _TlsSetValue( void * );
-      HB_EXTERN_END
-      #define TlsGetValue( x )    _TlsGetValue()
-      #define TlsSetValue( x, y ) _TlsSetValue( y )
-   #endif
-#endif
 
 /* This structure holds a translation to transform a certain OS level signal
 into abstract HB_SIGNAL; os specific implementation must provide the
@@ -172,12 +170,12 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
    #endif
 
    // let's find the right signal handler.
-   HB_CRITICAL_LOCK( s_ServiceMutex );
+   hb_service_Lock();
 
    // avoid working if PRG signal handling has been disabled
    if ( ! bSignalEnabled )
    {
-      HB_CRITICAL_UNLOCK( s_ServiceMutex );
+      hb_service_UnLock();
       return;
    }
 
@@ -232,28 +230,15 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
          {
             case HB_SERVICE_HANDLED:
                bSignalEnabled = TRUE;
-               HB_CRITICAL_UNLOCK( s_ServiceMutex );
+               hb_service_UnLock();
                return;
 
             case HB_SERVICE_QUIT:
                bSignalEnabled = FALSE;
-               HB_CRITICAL_UNLOCK( s_ServiceMutex );
+               hb_service_UnLock();
                //TODO: A service cleanup routine
                hb_vmRequestQuit();
-               #ifndef HB_THREAD_SUPPORT
-                  hb_vmQuit();
-                  exit(0);
-               #else
-                  /* Allow signals to go through pthreads */
-                  s_serviceSetDflSig();
-                  /* NOTICE: should be pthread_exit(0), but a bug in linuxthread prevents it:
-                     calling pthread exit from a signal handler will cause infinite wait for
-                     restart signal.
-                     This solution is rude, while the other would allow clean VM termination...
-                     but it works.
-                  */
-                  exit(0);
-               #endif
+               hb_service_signalHandlerQuit( s_serviceSetDflSig );
          }
       }
       ulPos--;
@@ -431,12 +416,12 @@ static LONG s_signalHandler( int type, int sig, PEXCEPTION_RECORD exc )
    int iRet;
 
    // let's find the right signal handler.
-   HB_CRITICAL_LOCK( s_ServiceMutex );
+   hb_service_Lock();
 
    // avoid working if PRG signal handling has been disabled
    if ( ! bSignalEnabled )
    {
-      HB_CRITICAL_UNLOCK( s_ServiceMutex );
+      hb_service_UnLock();
       return EXCEPTION_EXECUTE_HANDLER;
    }
 
@@ -497,20 +482,14 @@ static LONG s_signalHandler( int type, int sig, PEXCEPTION_RECORD exc )
          {
             case HB_SERVICE_HANDLED:
                bSignalEnabled = TRUE;
-               HB_CRITICAL_UNLOCK( s_ServiceMutex );
+               hb_service_UnLock();
                return EXCEPTION_CONTINUE_EXECUTION;
 
             case HB_SERVICE_QUIT:
                bSignalEnabled = FALSE;
-               HB_CRITICAL_UNLOCK( s_ServiceMutex );
+               hb_service_UnLock();
                hb_vmRequestQuit();
-               #ifndef HB_THREAD_SUPPORT
-                  hb_vmQuit();
-                  exit(0);
-               #else
-                  hb_threadCancelInternal();
-               #endif
-
+               hb_service_threadCancel();
          }
       }
       ulPos--;
@@ -554,33 +533,14 @@ static LRESULT CALLBACK s_MsgFilterFunc( int nCode, WPARAM wParam, LPARAM lParam
    return CallNextHookEx( s_hMsgHook, nCode, wParam, lParam );
 }
 
-#ifdef HB_THREAD_SUPPORT
-extern DWORD hb_dwCurrentStack;
-#endif
-
 BOOL WINAPI s_ConsoleHandlerRoutine( DWORD dwCtrlType )
 {
-#ifdef HB_THREAD_SUPPORT
-   PHB_STACK pStack = NULL;
-
-   /* we need a new stack: this is NOT an hb thread. */
-
-   if ( TlsGetValue( hb_dwCurrentStack ) == 0 )
-   {
-      pStack = hb_threadCreateStack( GetCurrentThreadId() );
-      pStack->th_h = GetCurrentThread();
-      TlsSetValue( hb_dwCurrentStack, ( void * ) pStack );
-   }
-#endif
+   PHB_STACK pStack = hb_service_ConsoleHandlerRoutineInit();
 
    s_signalHandler( 2, dwCtrlType, NULL );
 
-#ifdef HB_THREAD_SUPPORT
-   if ( pStack )
-   {
-      hb_threadDestroyStack( pStack );
-   }
-#endif
+   hb_service_ConsoleHandlerRoutineDestroyStack( pStack );
+
    /* We have handled it */
    return TRUE;
 }
@@ -728,7 +688,7 @@ static int s_translateSignal( UINT sig, UINT subsig )
 
 static void s_signalHandlersInit( void )
 {
-   #if defined( HB_THREAD_SUPPORT ) && ( defined( HB_OS_UNIX ) || defined( HB_OS_UNIX ) )
+   #if defined( HB_THREAD_SUPPORT ) && defined( HB_OS_UNIX )
       pthread_t res;
       PHB_STACK pStack;
 
@@ -740,9 +700,7 @@ static void s_signalHandlersInit( void )
       s_serviceSetHBSig();
    #endif
 
-   #if defined( HB_THREAD_SUPPORT )
-      HB_CRITICAL_INIT( s_ServiceMutex );
-   #endif
+   hb_service_LockInit();
 
    sp_hooks = hb_itemNew( NULL );
    hb_arrayNew( sp_hooks, 0 );
@@ -762,15 +720,7 @@ static void s_signalHandlersInit( void )
 
 HB_FUNC( HB_STARTSERVICE )
 {
-   #ifdef HB_THREAD_SUPPORT
-   int iCount = hb_threadCountStacks();
-   if ( iCount > 2 || ( sp_hooks == NULL && iCount > 1 ) )
-   {
-      //TODO: Right error code here
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Service must be started before starting threads", NULL, 0);
-      return;
-   }
-   #endif
+   hb_service_hbstartservice( sp_hooks );
 
    #ifdef HB_OS_UNIX
    {
@@ -900,11 +850,11 @@ HB_FUNC( HB_PUSHSIGNALHANDLER )
       s_signalHandlersInit();
    }
 
-   HB_CRITICAL_LOCK( s_ServiceMutex );
+   hb_service_Lock();
 
    hb_arrayAddForward( sp_hooks, pHandEntry );
 
-   HB_CRITICAL_UNLOCK( s_ServiceMutex );
+   hb_service_UnLock();
 
    hb_itemRelease( pHandEntry );
 }
@@ -916,7 +866,7 @@ HB_FUNC( HB_POPSIGNALHANDLER )
 
    if ( sp_hooks != NULL )
    {
-      HB_CRITICAL_LOCK( s_ServiceMutex );
+      hb_service_Lock();
 
       nLen = hb_arrayLen( sp_hooks );
       if ( nLen > 0 )
@@ -935,7 +885,7 @@ HB_FUNC( HB_POPSIGNALHANDLER )
       {
          hb_retl( FALSE );
       }
-      HB_CRITICAL_UNLOCK( s_ServiceMutex );
+      hb_service_UnLock();
    }
    else
    {

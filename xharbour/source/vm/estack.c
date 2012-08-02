@@ -204,6 +204,23 @@ HB_EXTERN_BEGIN
    }
 #endif
 
+void hb_s_hb_exc( HB_MATH_EXCEPTION hb_exc )
+{
+#ifdef HB_THREAD_SUPPORT
+   (HB_VM_STACK.math_exc).type        = hb_exc.type;
+   (HB_VM_STACK.math_exc).funcname    = hb_exc.funcname;
+   (HB_VM_STACK.math_exc).error       = hb_exc.error;
+   (HB_VM_STACK.math_exc).arg1        = hb_exc.arg1;
+   (HB_VM_STACK.math_exc).arg2        = hb_exc.arg2;
+   (HB_VM_STACK.math_exc).retval      = hb_exc.retval;
+   (HB_VM_STACK.math_exc).retvalwidth = hb_exc.retvalwidth;
+   (HB_VM_STACK.math_exc).retvaldec   = hb_exc.retvaldec;
+   (HB_VM_STACK.math_exc).handled     = hb_exc.handled;
+#else
+   HB_SYMBOL_UNUSED( hb_exc );
+#endif
+}
+
 #if ( defined( HB_THREAD_SUPPORT ) && defined( HB_VM_ALL ) )
    /*
    Wrapper to avoid direct access to stack. Needed if VM is amalgamated.
@@ -214,10 +231,6 @@ HB_EXTERN_BEGIN
       return ( pstack == &hb_stackMT || strncmp( szName, ":TH:", 4 ) == 0 );
    }
 
-   HB_MATH_EXCEPTION hb_s_hb_exc ( void )
-   {
-      return (HB_VM_STACK.math_exc);
-   }
 
 #endif
 HB_EXTERN_END

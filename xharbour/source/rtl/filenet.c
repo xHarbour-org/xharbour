@@ -112,9 +112,11 @@ typedef struct _HB_FILE
 }
 HB_FILE;
 
-#ifdef HB_THREAD_SUPPORT
-static HB_CRITICAL_T  s_fileMtx;
-#endif
+HB_EXTERN_BEGIN
+extern void hb_filenet_Init( void );
+extern void hb_filenet_Lock( void );
+extern void hb_filenet_UnLock( void );
+HB_EXTERN_END
 
 #if defined( HB_OS_WIN )
    #define HB_SOCKET_T SOCKET
@@ -766,9 +768,9 @@ PHB_FILE hb_fileNetExtOpen( const char * pFileName, const char * pDefExt,
 
       if( hFile != FS_ERROR )
       {
-         HB_CRITICAL_LOCK( s_fileMtx );
+         hb_filenet_Lock();
          pFile = hb_fileNetNew( hFile, fShared, fBufferLock, TRUE, pszFile );
-         HB_CRITICAL_UNLOCK( s_fileMtx );
+         hb_filenet_UnLock();
       }
 
       if( pError )
@@ -794,7 +796,7 @@ void hb_fileNetClose( PHB_FILE pFile )
    HB_FHANDLE hFile = FS_ERROR;
    HB_SOCKET_T hCurSocket = (HB_SOCKET_T) NULL;
 
-   HB_CRITICAL_LOCK( s_fileMtx );
+   hb_filenet_Lock();
 
    if( --pFile->used == 0 )
    {
@@ -820,7 +822,7 @@ void hb_fileNetClose( PHB_FILE pFile )
       hb_xfree( pFile );
    }
 
-   HB_CRITICAL_UNLOCK( s_fileMtx );
+   hb_filenet_UnLock();
 
    if( hFile != FS_ERROR )
    {
@@ -848,9 +850,9 @@ BOOL hb_fileNetLock( PHB_FILE pFile, HB_FOFFSET ulStart, HB_FOFFSET ulLen, int i
    {
       if( pFile->BufferLock )
       {
-         HB_CRITICAL_LOCK( s_fileMtx );
+         hb_filenet_Lock();
          fResult = hb_fileNetUnlock( pFile, &fLockFS, ulStart, ulLen );
-         HB_CRITICAL_UNLOCK( s_fileMtx );
+         hb_filenet_UnLock();
       }
       else
       {
@@ -879,9 +881,9 @@ BOOL hb_fileNetLock( PHB_FILE pFile, HB_FOFFSET ulStart, HB_FOFFSET ulLen, int i
    {
       if( pFile->BufferLock )
       {
-         HB_CRITICAL_LOCK( s_fileMtx );
+         hb_filenet_Lock();
          fResult = hb_fileNetSetLock( pFile, &fLockFS, ulStart, ulLen );
-         HB_CRITICAL_UNLOCK( s_fileMtx );
+         hb_filenet_UnLock();
       }
       else
          fLockFS = TRUE;
@@ -907,9 +909,9 @@ BOOL hb_fileNetLock( PHB_FILE pFile, HB_FOFFSET ulStart, HB_FOFFSET ulLen, int i
 
          if( pFile->BufferLock && !fResult )
          {
-            HB_CRITICAL_LOCK( s_fileMtx );
+            hb_filenet_Lock();
             hb_fileNetUnlock( pFile, &fLockFS, ulStart, ulLen );
-            HB_CRITICAL_UNLOCK( s_fileMtx );
+            hb_filenet_UnLock();
          }
       }
    }
@@ -2249,9 +2251,9 @@ static const HB_FILE_FUNCS * hb_fileNetMethods( void )
 static void hb_fileNet_init( void * cargo )
 {
    HB_SYMBOL_UNUSED( cargo );
-#ifdef HB_THREAD_SUPPORT
-   HB_CRITICAL_INIT( s_fileMtx );
-#endif
+
+   hb_filenet_Init();
+
    if( lBufferLen == 0 )
    {
       lBufferLen = HB_SENDRECV_BUFFER_SIZE;

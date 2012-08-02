@@ -380,17 +380,15 @@ static LPHSXTABLE hb_hsxTable( void )
 static HSXTABLE s_hsxTable;
 #define hb_hsxTable()   ( &s_hsxTable )
 
-#ifdef HB_THREAD_SUPPORT
-static HB_CRITICAL_T  s_hsxMtx;
-#define HB_HSX_LOCK      EnterCriticalSection( &s_hsxMtx );
-#define HB_HSX_UNLOCK    LeaveCriticalSection( &s_hsxMtx );
-#else
-#define HB_HSX_LOCK
-#define HB_HSX_UNLOCK
-#endif
+#endif /* HB_HSX_TSDSTORE */
 
+HB_EXTERN_BEGIN
+extern void hb_hsx_critical_Lock( void );
+extern void hb_hsx_critical_UnLock( void );
+HB_EXTERN_END
 
-#endif
+#define HB_HSX_LOCK     hb_hsx_critical_Lock();
+#define HB_HSX_UNLOCK   hb_hsx_critical_UnLock();
 
 /* the conversion table for ASCII alpha pairs */
 static const UCHAR hb_hsxHashArray[] = {

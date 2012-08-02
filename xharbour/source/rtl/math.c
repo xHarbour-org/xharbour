@@ -91,26 +91,19 @@
  * ************************************************************
  */
 
-#if defined(HB_THREAD_SUPPORT)
-   #if defined( HB_VM_ALL )
-      HB_EXTERN_BEGIN
-      extern HB_MATH_EXCEPTION hb_s_hb_exc ( void );
-      HB_EXTERN_END
-   #else
-      #define s_hb_exc   (HB_VM_STACK.math_exc)
-   #endif
-#else
-   #define s_hb_exc   s_hb_exc
-   static HB_MATH_EXCEPTION s_hb_exc = {HB_MATH_ERR_NONE, "", "", 0.0, 0.0, 0.0, 1, 0, 0};
-#endif
+/*
+AJ: Forcing to use static in order to make this routines common to both
+    ST and MT modes. This may very much not MT save.
+*/
+static HB_MATH_EXCEPTION s_hb_exc = {HB_MATH_ERR_NONE, "", "", 0.0, 0.0, 0.0, 1, 0, 0};
+
+HB_EXTERN_BEGIN
+extern void hb_s_hb_exc( HB_MATH_EXCEPTION );
+HB_EXTERN_END
 
 /* reset math error information */
 void hb_mathResetError (void)
 {
-   #if defined(HB_THREAD_SUPPORT) && defined( HB_VM_ALL )
-      HB_MATH_EXCEPTION s_hb_exc = hb_s_hb_exc();
-   #endif
-
    HB_TRACE (HB_TR_DEBUG, ("hb_mathResetError()"));
 
    s_hb_exc.type = HB_MATH_ERR_NONE;
@@ -122,16 +115,15 @@ void hb_mathResetError (void)
    s_hb_exc.retvalwidth = -1; /* we don't know */
    s_hb_exc.retvaldec = -1; /* use standard SET DECIMALS */
    s_hb_exc.handled = 1;
+
+   hb_s_hb_exc( s_hb_exc );
+
    return;
 }
 
 /* get last math error */
 int hb_mathGetLastError (HB_MATH_EXCEPTION * phb_exc)
 {
-   #if defined(HB_THREAD_SUPPORT) && defined( HB_VM_ALL )
-      HB_MATH_EXCEPTION s_hb_exc = hb_s_hb_exc();
-   #endif
-
    HB_TRACE (HB_TR_DEBUG, ("hb_mathGetLastError(%p)", phb_exc));
 
    if (phb_exc != NULL)
@@ -172,10 +164,6 @@ matherr (struct exception * err)
 {
    int retval;
    HB_MATH_HANDLERPROC mathHandler;
-
-   #if defined(HB_THREAD_SUPPORT) && defined( HB_VM_ALL )
-      HB_MATH_EXCEPTION s_hb_exc = hb_s_hb_exc();
-   #endif
 
    HB_TRACE (HB_TR_DEBUG, ("matherr(%p)", err));
 
@@ -225,6 +213,8 @@ matherr (struct exception * err)
    s_hb_exc.retval = err->retval;
    s_hb_exc.handled = 0;
 
+   hb_s_hb_exc( s_hb_exc );
+
    mathHandler = hb_mathGetHandler();
    if (mathHandler != NULL)
    {
@@ -244,10 +234,6 @@ matherr (struct exception * err)
 int hb_mathErrSet( double dResult, double arg1, double arg2, char * szFunc, int errCode )
 {
    HB_MATH_HANDLERPROC mathHandler;
-
-   #if defined(HB_THREAD_SUPPORT) && defined( HB_VM_ALL )
-      HB_MATH_EXCEPTION s_hb_exc = hb_s_hb_exc();
-   #endif
 
    HB_TRACE (HB_TR_DEBUG, ("hb_mathErrSet(%f, %d)", dResult, errCode));
 
@@ -282,8 +268,6 @@ int hb_mathErrSet( double dResult, double arg1, double arg2, char * szFunc, int 
       return 0;
    }
 
-   hb_mathResetError();
-
    /* map math error types */
    switch (errCode)
    {
@@ -313,6 +297,8 @@ int hb_mathErrSet( double dResult, double arg1, double arg2, char * szFunc, int 
    s_hb_exc.arg2 = arg2;
    s_hb_exc.retval = dResult;
    s_hb_exc.handled = 0;
+
+   hb_s_hb_exc( s_hb_exc );
 
    mathHandler = hb_mathGetHandler();
    if (mathHandler != NULL)

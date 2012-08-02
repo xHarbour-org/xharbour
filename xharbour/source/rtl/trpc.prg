@@ -195,7 +195,7 @@
 
 */
 
-#ifdef HB_THREAD_SUPPORT
+/* #ifdef HB_THREAD_SUPPORT */
 
 #include "hbclass.ch"
 #include "hbrpc.ch"
@@ -397,6 +397,7 @@ CLASS tRPCServeCon
    METHOD IsCanceled()        INLINE ::lCanceled
 
    METHOD GetStatus()         INLINE ::nStatus
+   METHOD FunctionRunner( cFuncName, oFunc, nMode, aParams, aItems )
 HIDDEN:
    /* Current status */
    DATA  nStatus              INIT RPCS_STATUS_NONE
@@ -420,7 +421,7 @@ HIDDEN:
    METHOD FuncForeachCall( cData, cMode )
    METHOD LaunchChallenge( cUserid, cPassword )
    METHOD LaunchFunction( cFuncName, aParms, nMode, aItems )
-   METHOD FunctionRunner( cFuncName, oFunc, nMode, aParams, aItems )
+   /* METHOD FunctionRunner( cFuncName, oFunc, nMode, aParams, aItems ) */
    METHOD SendResult( oRet )
 
    METHOD Encrypt(cDataIn)
@@ -1626,4 +1627,4 @@ METHOD OnClientTerminate( oClient ) CLASS tRPCService
    ENDIF
 RETURN .T.
 
-#endif
+/* #endif */

@@ -54,6 +54,7 @@ LINK_CMD     =ILINK32 -ap -Tpe -x -Gn -C -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk
 CLIBFLAGS    =$(CLIBFLAGS) -tWM
 
 !if $d(HB_THREAD_SUPPORT)
+HARBOURFLAGS =$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
 CLIBFLAGS    =$(CLIBFLAGS) -DHB_THREAD_SUPPORT
 HB_MT_FLAGS  =-DHB_THREAD_SUPPORT
 !endif
@@ -519,8 +520,8 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 !if $d(DLL_MT)
 CLIBFLAGS   =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT
-!else
 HARBOURFLAGS=$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
+!else
 CLIBFLAGS   =$(CLIBFLAGS) -tWD
 !endif
 !ifdef HB_DIR_ADS
@@ -1039,13 +1040,13 @@ $(OBJ_DIR)\harboury$(OBJEXT) : $(OBJ_DIR)\harboury.c
 $(OBJ_DIR)\macroy.c : $(MACRO_DIR)\macro.y
 	$(BISON_CMD2)
 
-$(OBJ_DIR)\macroy$(HB_MT)$(OBJEXT) : $(OBJ_DIR)\macroy.c
+$(OBJ_DIR)\macroy$(OBJEXT) : $(OBJ_DIR)\macroy.c
 	$(CC_CMD)
 !else
 $(OBJ_DIR)\harboury$(OBJEXT) : $(COMPILER_DIR)\harbouryy.c
 	$(CC_CMD)
 
-$(OBJ_DIR)\macroy$(HB_MT)$(OBJEXT) : $(MACRO_DIR)\macroyy.c
+$(OBJ_DIR)\macroy$(OBJEXT) : $(MACRO_DIR)\macroyy.c
 	$(CC_CMD)
 !endif
 !include winmake\compile.mak

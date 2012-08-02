@@ -465,11 +465,7 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, "Involved File .....: " + oErr:filename() )
         FWriteLine( nHandle, "Dos Error Code ....: " + strvalue( oErr:oscode() ) )
 
-        #ifdef HB_THREAD_SUPPORT
-        FWriteLine( nHandle, "Running threads ...: " + strvalue( oErr:RunningThreads() ) )
-        FWriteLine( nHandle, "VM thread ID ......: " + strvalue( oErr:VmThreadId() ) )
-        FWriteLine( nHandle, "OS thread ID ......: " + strvalue( oErr:OsThreadId() ) )
-        #endif
+        hb_Error_MT( nHandle, oErr, { |o| strvalue( o ) } )
 
         FWriteLine( nHandle, "" )
         FWriteLine( nHandle, " Trace Through:" )

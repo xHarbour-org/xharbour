@@ -1,7 +1,6 @@
 /*
  * $Id$
  */
-
 /* A Bison parser, made by GNU Bison 2.4.1.  */
 
 /* Skeleton implementation for Bison's Yacc-like parsers in C
@@ -79,7 +78,7 @@
 /* Copy the first part of user declarations.  */
 
 /* Line 189 of yacc.c  */
-#line 2 "source\\macro\\macro.y"
+// #line 2 "source\\macro\\macro.y"
 
 /*
  * $Id$
@@ -149,20 +148,17 @@
 //JC1: yylex is not threadsafe, we need mutexes
 #include "hbstack.h"    // that also includes thread.h
 
-#ifdef HB_THREAD_SUPPORT
+/* AJ: Remove quallification of thread.h inclusion in order to make this file
+   useable in both ST and MT modes */
+/* #ifdef HB_THREAD_SUPPORT */
   #include "thread.h"
-#endif
+/* #endif */
 
 /* Compile using: bison -d -p hb_comp macro.y */
 
 /* to pacify some warnings in BCC */
 #if defined( __BORLANDC__ ) && !defined( __STDC__ )
 #  define __STDC__
-   #if defined( __BORLANDC__ )
-      #pragma warn -aus
-      #pragma warn -ccc
-      #pragma warn -rch
-   #endif
 #endif
 
 #if defined( __POCC__ )
@@ -175,6 +171,14 @@
    #pragma warn -ccc
    #pragma warn -rch
 #endif
+
+/* AJ: added functions to enter and leave critical section made common to ST
+   and MT mode
+*/
+HB_EXTERN_BEGIN
+extern void hb_macro_critical_Lock( void );
+extern void hb_macro_critical_UnLock( void );
+HB_EXTERN_END
 
 /* NOTE: these symbols are used internally in bison.simple
  */
@@ -244,7 +248,7 @@ extern void yyerror( char * ); /* parsing error management function */
 
 
 /* Line 189 of yacc.c  */
-#line 229 "obj\\63\\macroy.c"
+// #line 250 "obj\\b32\\macroy.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -327,7 +331,7 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 150 "source\\macro\\macro.y"
+// #line 171 "source\\macro\\macro.y"
 
    char *    string;       /* to hold a string returned by lex */
    int       iNumber;      /* to hold a temporary integer number */
@@ -361,7 +365,7 @@ typedef union YYSTYPE
 
 
 /* Line 214 of yacc.c  */
-#line 346 "obj\\63\\macroy.c"
+// #line 367 "obj\\b32\\macroy.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -372,7 +376,7 @@ typedef union YYSTYPE
 /* Copy the second part of user declarations.  */
 
 /* Line 264 of yacc.c  */
-#line 181 "source\\macro\\macro.y"
+// #line 202 "source\\macro\\macro.y"
 
 /* This must be placed after the above union - the union is
  * typedef-ined to YYSTYPE
@@ -380,7 +384,7 @@ typedef union YYSTYPE
 int yylex( YYSTYPE *, HB_MACRO_PTR );
 
 /* Line 264 of yacc.c  */
-#line 188 "source\\macro\\macro.y"
+// #line 209 "source\\macro\\macro.y"
 
 #ifdef __WATCOMC__
 /* disable warnings for unreachable code */
@@ -389,7 +393,7 @@ int yylex( YYSTYPE *, HB_MACRO_PTR );
 
 
 /* Line 264 of yacc.c  */
-#line 374 "obj\\63\\macroy.c"
+// #line 395 "obj\\b32\\macroy.c"
 
 #ifdef short
 # undef short
@@ -783,32 +787,32 @@ static const yytype_int16 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   281,   281,   291,   301,   318,   325,   350,   370,   392,
-     397,   398,   401,   406,   411,   416,   417,   422,   427,   436,
-     450,   463,   477,   490,   504,   523,   533,   536,   537,   538,
-     543,   548,   551,   556,   559,   584,   595,   598,   605,   606,
-     611,   612,   613,   614,   615,   618,   619,   622,   623,   624,
-     625,   626,   627,   628,   637,   638,   639,   640,   641,   646,
-     647,   648,   649,   650,   651,   652,   653,   654,   655,   656,
-     657,   658,   659,   660,   661,   662,   663,   664,   667,   668,
-     676,   685,   694,   703,   721,   729,   732,   735,   736,   803,
-     804,   805,   808,   811,   818,   828,   834,   835,   836,   837,
-     838,   839,   840,   841,   842,   843,   844,   845,   846,   847,
-     848,   849,   850,   851,   852,   853,   854,   855,   856,   857,
-     858,   859,   860,   861,   862,   863,   864,   867,   868,   871,
-     871,   886,   887,   890,   891,   894,   895,   896,   897,   898,
-     899,   900,   901,   902,   903,   904,   905,   906,   907,   908,
-     909,   910,   911,   912,   913,   914,   915,   916,   917,   923,
-     924,   930,   933,   934,   937,   938,   939,   942,   943,   944,
-     945,   946,   947,   948,   949,   950,   951,   952,   953,   954,
-     955,   956,   957,   958,   959,   960,   961,   962,   963,   964,
-     965,   968,   971,   974,   977,   980,   983,   986,   987,   988,
-     989,   990,   991,   994,   995,   996,   997,   998,   999,  1000,
-    1001,  1002,  1003,  1004,  1007,  1008,  1011,  1012,  1013,  1014,
-    1015,  1016,  1017,  1018,  1019,  1020,  1021,  1024,  1030,  1031,
-    1032,  1036,  1035,  1054,  1053,  1075,  1076,  1082,  1085,  1086,
-    1089,  1090,  1093,  1094,  1114,  1118,  1117,  1123,  1122,  1128,
-    1127,  1133,  1132
+       0,   302,   302,   312,   322,   339,   346,   371,   391,   413,
+     418,   419,   422,   427,   432,   437,   438,   443,   448,   457,
+     471,   484,   498,   511,   525,   544,   554,   557,   558,   559,
+     564,   569,   572,   577,   580,   605,   616,   619,   626,   627,
+     632,   633,   634,   635,   636,   639,   640,   643,   644,   645,
+     646,   647,   648,   649,   658,   659,   660,   661,   662,   667,
+     668,   669,   670,   671,   672,   673,   674,   675,   676,   677,
+     678,   679,   680,   681,   682,   683,   684,   685,   688,   689,
+     697,   706,   715,   724,   742,   750,   753,   756,   757,   824,
+     825,   826,   829,   832,   839,   849,   855,   856,   857,   858,
+     859,   860,   861,   862,   863,   864,   865,   866,   867,   868,
+     869,   870,   871,   872,   873,   874,   875,   876,   877,   878,
+     879,   880,   881,   882,   883,   884,   885,   888,   889,   892,
+     892,   907,   908,   911,   912,   915,   916,   917,   918,   919,
+     920,   921,   922,   923,   924,   925,   926,   927,   928,   929,
+     930,   931,   932,   933,   934,   935,   936,   937,   938,   944,
+     945,   951,   954,   955,   958,   959,   960,   963,   964,   965,
+     966,   967,   968,   969,   970,   971,   972,   973,   974,   975,
+     976,   977,   978,   979,   980,   981,   982,   983,   984,   985,
+     986,   989,   992,   995,   998,  1001,  1004,  1007,  1008,  1009,
+    1010,  1011,  1012,  1015,  1016,  1017,  1018,  1019,  1020,  1021,
+    1022,  1023,  1024,  1025,  1028,  1029,  1032,  1033,  1034,  1035,
+    1036,  1037,  1038,  1039,  1040,  1041,  1042,  1045,  1051,  1052,
+    1053,  1057,  1056,  1075,  1074,  1096,  1097,  1103,  1106,  1107,
+    1110,  1111,  1114,  1115,  1135,  1139,  1138,  1144,  1143,  1149,
+    1148,  1154,  1153
 };
 #endif
 
@@ -2201,7 +2205,7 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 281 "source\\macro\\macro.y"
+// #line 302 "source\\macro\\macro.y"
     {
                            HB_MACRO_DATA->exprType = hb_compExprType( (yyvsp[(1) - (2)].asExpr) );
                            if( HB_MACRO_DATA->Flags & HB_MACRO_GEN_PUSH )
@@ -2217,7 +2221,7 @@ yyreduce:
   case 3:
 
 /* Line 1455 of yacc.c  */
-#line 291 "source\\macro\\macro.y"
+// #line 312 "source\\macro\\macro.y"
     {
                            HB_MACRO_DATA->exprType = hb_compExprType( (yyvsp[(1) - (1)].asExpr) );
                            if( HB_MACRO_DATA->Flags &  HB_MACRO_GEN_PUSH )
@@ -2233,7 +2237,7 @@ yyreduce:
   case 4:
 
 /* Line 1455 of yacc.c  */
-#line 301 "source\\macro\\macro.y"
+// #line 322 "source\\macro\\macro.y"
     {
                            if( ! ( HB_MACRO_DATA->Flags & HB_MACRO_GEN_LIST ) )
                            {
@@ -2256,7 +2260,7 @@ yyreduce:
   case 5:
 
 /* Line 1455 of yacc.c  */
-#line 318 "source\\macro\\macro.y"
+// #line 339 "source\\macro\\macro.y"
     {
                            HB_MACRO_DATA->exprType = hb_compExprType( (yyvsp[(1) - (1)].asExpr) );
 
@@ -2269,7 +2273,7 @@ yyreduce:
   case 6:
 
 /* Line 1455 of yacc.c  */
-#line 325 "source\\macro\\macro.y"
+// #line 346 "source\\macro\\macro.y"
     {
                            HB_TRACE(HB_TR_DEBUG, ("macro -> invalid expression: %s", HB_MACRO_DATA->string));
 
@@ -2300,7 +2304,7 @@ yyreduce:
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 350 "source\\macro\\macro.y"
+// #line 371 "source\\macro\\macro.y"
     {
                            HB_TRACE(HB_TR_DEBUG, ("macro -> invalid expression: %s", HB_MACRO_DATA->string));
 
@@ -2326,7 +2330,7 @@ yyreduce:
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 370 "source\\macro\\macro.y"
+// #line 391 "source\\macro\\macro.y"
     {
                            // This case is when error maybe nested in say a CodeBlock.
                            HB_TRACE(HB_TR_DEBUG, ("macro -> invalid syntax: %s", HB_MACRO_DATA->string));
@@ -2352,70 +2356,70 @@ yyreduce:
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 392 "source\\macro\\macro.y"
+// #line 413 "source\\macro\\macro.y"
     { (yyval.string) = (yyvsp[(1) - (1)].string); (yyvsp[(1) - (1)].string) = NULL; ;}
     break;
 
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 397 "source\\macro\\macro.y"
+// #line 418 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewDouble( (yyvsp[(1) - (1)].valDouble).dNumber, (yyvsp[(1) - (1)].valDouble).bWidth, (yyvsp[(1) - (1)].valDouble).bDec ); ;}
     break;
 
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 398 "source\\macro\\macro.y"
+// #line 419 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewLong( (yyvsp[(1) - (1)].valLong).lNumber ); ;}
     break;
 
   case 12:
 
 /* Line 1455 of yacc.c  */
-#line 401 "source\\macro\\macro.y"
+// #line 422 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewLong( (yyvsp[(1) - (2)].valLong).lNumber ); ;}
     break;
 
   case 13:
 
 /* Line 1455 of yacc.c  */
-#line 406 "source\\macro\\macro.y"
+// #line 427 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewNil(); ;}
     break;
 
   case 14:
 
 /* Line 1455 of yacc.c  */
-#line 411 "source\\macro\\macro.y"
+// #line 432 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewString( (yyvsp[(1) - (1)].valChar).string, (yyvsp[(1) - (1)].valChar).length, TRUE ); ;}
     break;
 
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 416 "source\\macro\\macro.y"
+// #line 437 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewLogical( TRUE ); ;}
     break;
 
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 417 "source\\macro\\macro.y"
+// #line 438 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewLogical( FALSE ); ;}
     break;
 
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 422 "source\\macro\\macro.y"
+// #line 443 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewSelf(); ;}
     break;
 
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 428 "source\\macro\\macro.y"
+// #line 449 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewDate( (yyvsp[(3) - (8)].asExpr), (yyvsp[(5) - (8)].asExpr), (yyvsp[(7) - (8)].asExpr) );
                                      hb_compExprDelete( (yyvsp[(3) - (8)].asExpr), HB_MACRO_PARAM );
                                      hb_compExprDelete( (yyvsp[(5) - (8)].asExpr), HB_MACRO_PARAM );
@@ -2426,7 +2430,7 @@ yyreduce:
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 437 "source\\macro\\macro.y"
+// #line 458 "source\\macro\\macro.y"
     { int iOk = 0;
                                 (yyval.asExpr) = hb_compExprNewDateTime( (yyvsp[(3) - (13)].asExpr), (yyvsp[(5) - (13)].asExpr), (yyvsp[(7) - (13)].asExpr), (yyvsp[(8) - (13)].asExpr), (yyvsp[(10) - (13)].asExpr), (yyvsp[(12) - (13)].asExpr), 0, &iOk );
                                      hb_compExprDelete( (yyvsp[(3) - (13)].asExpr), HB_MACRO_PARAM );
@@ -2445,7 +2449,7 @@ yyreduce:
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 451 "source\\macro\\macro.y"
+// #line 472 "source\\macro\\macro.y"
     { int iOk = 0;
                                 (yyval.asExpr) = hb_compExprNewDateTime( (yyvsp[(3) - (11)].asExpr), (yyvsp[(5) - (11)].asExpr), (yyvsp[(7) - (11)].asExpr), (yyvsp[(8) - (11)].asExpr), (yyvsp[(10) - (11)].asExpr), NULL, 0, &iOk );
                                      hb_compExprDelete( (yyvsp[(3) - (11)].asExpr), HB_MACRO_PARAM );
@@ -2463,7 +2467,7 @@ yyreduce:
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 464 "source\\macro\\macro.y"
+// #line 485 "source\\macro\\macro.y"
     { int iOk = 0;
                                 (yyval.asExpr) = hb_compExprNewDateTime( (yyvsp[(3) - (14)].asExpr), (yyvsp[(5) - (14)].asExpr), (yyvsp[(7) - (14)].asExpr), (yyvsp[(8) - (14)].asExpr), (yyvsp[(10) - (14)].asExpr), (yyvsp[(12) - (14)].asExpr), 1, &iOk );
                                      hb_compExprDelete( (yyvsp[(3) - (14)].asExpr), HB_MACRO_PARAM );
@@ -2482,7 +2486,7 @@ yyreduce:
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 478 "source\\macro\\macro.y"
+// #line 499 "source\\macro\\macro.y"
     { int iOk = 0;
                                 (yyval.asExpr) = hb_compExprNewDateTime( (yyvsp[(3) - (12)].asExpr), (yyvsp[(5) - (12)].asExpr), (yyvsp[(7) - (12)].asExpr), (yyvsp[(8) - (12)].asExpr), (yyvsp[(10) - (12)].asExpr), NULL, 1, &iOk );
                                      hb_compExprDelete( (yyvsp[(3) - (12)].asExpr), HB_MACRO_PARAM );
@@ -2500,7 +2504,7 @@ yyreduce:
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 491 "source\\macro\\macro.y"
+// #line 512 "source\\macro\\macro.y"
     { int iOk = 0;
                                 (yyval.asExpr) = hb_compExprNewDateTime( (yyvsp[(3) - (14)].asExpr), (yyvsp[(5) - (14)].asExpr), (yyvsp[(7) - (14)].asExpr), (yyvsp[(8) - (14)].asExpr), (yyvsp[(10) - (14)].asExpr), (yyvsp[(12) - (14)].asExpr), 2, &iOk );
                                      hb_compExprDelete( (yyvsp[(3) - (14)].asExpr), HB_MACRO_PARAM );
@@ -2519,7 +2523,7 @@ yyreduce:
   case 24:
 
 /* Line 1455 of yacc.c  */
-#line 505 "source\\macro\\macro.y"
+// #line 526 "source\\macro\\macro.y"
     { int iOk = 0;
                                 (yyval.asExpr) = hb_compExprNewDateTime( (yyvsp[(3) - (12)].asExpr), (yyvsp[(5) - (12)].asExpr), (yyvsp[(7) - (12)].asExpr), (yyvsp[(8) - (12)].asExpr), (yyvsp[(10) - (12)].asExpr), NULL, 2, &iOk );
                                      hb_compExprDelete( (yyvsp[(3) - (12)].asExpr), HB_MACRO_PARAM );
@@ -2537,7 +2541,7 @@ yyreduce:
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 523 "source\\macro\\macro.y"
+// #line 544 "source\\macro\\macro.y"
     {
                                    (yyval.asExpr) = hb_compExprNewArray( (yyvsp[(2) - (3)].asExpr) );
 
@@ -2551,56 +2555,56 @@ yyreduce:
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 533 "source\\macro\\macro.y"
+// #line 554 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewFunCall( hb_compExprNewFunName( hb_strdup( "HASH" ) ), (yyvsp[(2) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 536 "source\\macro\\macro.y"
+// #line 557 "source\\macro\\macro.y"
     { (yyval.asExpr) = NULL; ;}
     break;
 
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 537 "source\\macro\\macro.y"
+// #line 558 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAddListExpr( hb_compExprNewArgList( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 538 "source\\macro\\macro.y"
+// #line 559 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAddListExpr( hb_compExprAddListExpr( (yyvsp[(1) - (5)].asExpr), (yyvsp[(3) - (5)].asExpr) ), (yyvsp[(5) - (5)].asExpr) ); ;}
     break;
 
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 543 "source\\macro\\macro.y"
+// #line 564 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 31:
 
 /* Line 1455 of yacc.c  */
-#line 548 "source\\macro\\macro.y"
+// #line 569 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewVar( (yyvsp[(1) - (1)].string) ); ;}
     break;
 
   case 32:
 
 /* Line 1455 of yacc.c  */
-#line 551 "source\\macro\\macro.y"
+// #line 572 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewAlias( (yyvsp[(1) - (2)].string) ); ;}
     break;
 
   case 33:
 
 /* Line 1455 of yacc.c  */
-#line 556 "source\\macro\\macro.y"
+// #line 577 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewMacro( NULL, '&', (yyvsp[(1) - (1)].string) );
                                 HB_MACRO_CHECK( (yyval.asExpr) );
                               ;}
@@ -2609,7 +2613,7 @@ yyreduce:
   case 34:
 
 /* Line 1455 of yacc.c  */
-#line 559 "source\\macro\\macro.y"
+// #line 580 "source\\macro\\macro.y"
     {  ULONG ulLen = strlen( (yyvsp[(1) - (1)].string) );
                                  char * szVarName = hb_macroTextSubst( (yyvsp[(1) - (1)].string), &ulLen );
                                  if( hb_macroIsIdent( szVarName ) )
@@ -2638,7 +2642,7 @@ yyreduce:
   case 35:
 
 /* Line 1455 of yacc.c  */
-#line 584 "source\\macro\\macro.y"
+// #line 605 "source\\macro\\macro.y"
     {
                                       if( (yyvsp[(1) - (2)].asExpr)->ExprType == HB_ET_VARIABLE )
                                       {
@@ -2651,308 +2655,308 @@ yyreduce:
   case 36:
 
 /* Line 1455 of yacc.c  */
-#line 595 "source\\macro\\macro.y"
+// #line 616 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewMacro( (yyvsp[(2) - (2)].asExpr), 0, NULL ); ;}
     break;
 
   case 37:
 
 /* Line 1455 of yacc.c  */
-#line 598 "source\\macro\\macro.y"
+// #line 619 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 38:
 
 /* Line 1455 of yacc.c  */
-#line 605 "source\\macro\\macro.y"
+// #line 626 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewAlias( hb_strdup( "FIELD") ); ;}
     break;
 
   case 39:
 
 /* Line 1455 of yacc.c  */
-#line 606 "source\\macro\\macro.y"
+// #line 627 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(3) - (3)].asExpr); ;}
     break;
 
   case 40:
 
 /* Line 1455 of yacc.c  */
-#line 611 "source\\macro\\macro.y"
+// #line 632 "source\\macro\\macro.y"
     { hb_compExprDelete( (yyvsp[(1) - (2)].asExpr), HB_MACRO_PARAM ); (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 41:
 
 /* Line 1455 of yacc.c  */
-#line 612 "source\\macro\\macro.y"
+// #line 633 "source\\macro\\macro.y"
     { hb_compExprDelete( (yyvsp[(1) - (2)].asExpr), HB_MACRO_PARAM ); (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 613 "source\\macro\\macro.y"
+// #line 634 "source\\macro\\macro.y"
     { hb_compExprDelete( (yyvsp[(1) - (2)].asExpr), HB_MACRO_PARAM ); (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 43:
 
 /* Line 1455 of yacc.c  */
-#line 614 "source\\macro\\macro.y"
+// #line 635 "source\\macro\\macro.y"
     { hb_compExprDelete( (yyvsp[(1) - (2)].asExpr), HB_MACRO_PARAM ); (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 44:
 
 /* Line 1455 of yacc.c  */
-#line 615 "source\\macro\\macro.y"
+// #line 636 "source\\macro\\macro.y"
     { hb_compExprDelete( (yyvsp[(1) - (2)].asExpr), HB_MACRO_PARAM ); (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 45:
 
 /* Line 1455 of yacc.c  */
-#line 618 "source\\macro\\macro.y"
+// #line 639 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewVar( (yyvsp[(1) - (1)].string) ); ;}
     break;
 
   case 46:
 
 /* Line 1455 of yacc.c  */
-#line 619 "source\\macro\\macro.y"
+// #line 640 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 47:
 
 /* Line 1455 of yacc.c  */
-#line 622 "source\\macro\\macro.y"
+// #line 643 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewAliasVar( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 48:
 
 /* Line 1455 of yacc.c  */
-#line 623 "source\\macro\\macro.y"
+// #line 644 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewAliasVar( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 49:
 
 /* Line 1455 of yacc.c  */
-#line 624 "source\\macro\\macro.y"
+// #line 645 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewAliasVar( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 50:
 
 /* Line 1455 of yacc.c  */
-#line 625 "source\\macro\\macro.y"
+// #line 646 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewAliasVar( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 51:
 
 /* Line 1455 of yacc.c  */
-#line 626 "source\\macro\\macro.y"
+// #line 647 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewAliasVar( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 52:
 
 /* Line 1455 of yacc.c  */
-#line 627 "source\\macro\\macro.y"
+// #line 648 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewAliasVar( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 53:
 
 /* Line 1455 of yacc.c  */
-#line 628 "source\\macro\\macro.y"
+// #line 649 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewAliasVar( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 54:
 
 /* Line 1455 of yacc.c  */
-#line 637 "source\\macro\\macro.y"
+// #line 658 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewAliasExpr( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 55:
 
 /* Line 1455 of yacc.c  */
-#line 638 "source\\macro\\macro.y"
+// #line 659 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewAliasExpr( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 56:
 
 /* Line 1455 of yacc.c  */
-#line 639 "source\\macro\\macro.y"
+// #line 660 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewAliasExpr( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 57:
 
 /* Line 1455 of yacc.c  */
-#line 640 "source\\macro\\macro.y"
+// #line 661 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewAliasExpr( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 58:
 
 /* Line 1455 of yacc.c  */
-#line 641 "source\\macro\\macro.y"
+// #line 662 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewAliasExpr( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 59:
 
 /* Line 1455 of yacc.c  */
-#line 646 "source\\macro\\macro.y"
+// #line 667 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 60:
 
 /* Line 1455 of yacc.c  */
-#line 647 "source\\macro\\macro.y"
+// #line 668 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 61:
 
 /* Line 1455 of yacc.c  */
-#line 648 "source\\macro\\macro.y"
+// #line 669 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 62:
 
 /* Line 1455 of yacc.c  */
-#line 649 "source\\macro\\macro.y"
+// #line 670 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 63:
 
 /* Line 1455 of yacc.c  */
-#line 650 "source\\macro\\macro.y"
+// #line 671 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 64:
 
 /* Line 1455 of yacc.c  */
-#line 651 "source\\macro\\macro.y"
+// #line 672 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 65:
 
 /* Line 1455 of yacc.c  */
-#line 652 "source\\macro\\macro.y"
+// #line 673 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 66:
 
 /* Line 1455 of yacc.c  */
-#line 653 "source\\macro\\macro.y"
+// #line 674 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 67:
 
 /* Line 1455 of yacc.c  */
-#line 654 "source\\macro\\macro.y"
+// #line 675 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 68:
 
 /* Line 1455 of yacc.c  */
-#line 655 "source\\macro\\macro.y"
+// #line 676 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 69:
 
 /* Line 1455 of yacc.c  */
-#line 656 "source\\macro\\macro.y"
+// #line 677 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 70:
 
 /* Line 1455 of yacc.c  */
-#line 657 "source\\macro\\macro.y"
+// #line 678 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 71:
 
 /* Line 1455 of yacc.c  */
-#line 658 "source\\macro\\macro.y"
+// #line 679 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 72:
 
 /* Line 1455 of yacc.c  */
-#line 659 "source\\macro\\macro.y"
+// #line 680 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 73:
 
 /* Line 1455 of yacc.c  */
-#line 660 "source\\macro\\macro.y"
+// #line 681 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 74:
 
 /* Line 1455 of yacc.c  */
-#line 661 "source\\macro\\macro.y"
+// #line 682 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 75:
 
 /* Line 1455 of yacc.c  */
-#line 662 "source\\macro\\macro.y"
+// #line 683 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 76:
 
 /* Line 1455 of yacc.c  */
-#line 663 "source\\macro\\macro.y"
+// #line 684 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 77:
 
 /* Line 1455 of yacc.c  */
-#line 664 "source\\macro\\macro.y"
+// #line 685 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 78:
 
 /* Line 1455 of yacc.c  */
-#line 667 "source\\macro\\macro.y"
+// #line 688 "source\\macro\\macro.y"
     { (yyval.string) = (yyvsp[(1) - (2)].string); ;}
     break;
 
   case 79:
 
 /* Line 1455 of yacc.c  */
-#line 668 "source\\macro\\macro.y"
+// #line 689 "source\\macro\\macro.y"
     {
                                                (yyval.string) = hb_xstrcpy( NULL, (yyvsp[(1) - (3)].string), ".", (yyvsp[(2) - (3)].string), NULL );
                                                hb_xfree( (yyvsp[(1) - (3)].string) );
@@ -2963,7 +2967,7 @@ yyreduce:
   case 80:
 
 /* Line 1455 of yacc.c  */
-#line 676 "source\\macro\\macro.y"
+// #line 697 "source\\macro\\macro.y"
     {
                                             (yyval.asExpr) = hb_compExprNewFunCall( hb_compExprNewFunName( (yyvsp[(1) - (4)].string) ), (yyvsp[(3) - (4)].asExpr), HB_MACRO_PARAM );
                                             HB_MACRO_CHECK( (yyval.asExpr) );
@@ -2978,7 +2982,7 @@ yyreduce:
   case 81:
 
 /* Line 1455 of yacc.c  */
-#line 685 "source\\macro\\macro.y"
+// #line 706 "source\\macro\\macro.y"
     {
                                                         (yyval.asExpr) = hb_compExprNewFunCall( hb_compExprNewNamespaceFunName( (yyvsp[(1) - (5)].string), (yyvsp[(2) - (5)].string) ), (yyvsp[(4) - (5)].asExpr), HB_MACRO_PARAM );
                                                         HB_MACRO_CHECK( (yyval.asExpr) );
@@ -2993,7 +2997,7 @@ yyreduce:
   case 82:
 
 /* Line 1455 of yacc.c  */
-#line 694 "source\\macro\\macro.y"
+// #line 715 "source\\macro\\macro.y"
     {
                                             (yyval.asExpr) = hb_compExprNewFunCall( (yyvsp[(1) - (4)].asExpr), (yyvsp[(3) - (4)].asExpr), HB_MACRO_PARAM );
                                             HB_MACRO_CHECK( (yyval.asExpr) );
@@ -3008,7 +3012,7 @@ yyreduce:
   case 83:
 
 /* Line 1455 of yacc.c  */
-#line 703 "source\\macro\\macro.y"
+// #line 724 "source\\macro\\macro.y"
     {
                                             hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
 
@@ -3030,7 +3034,7 @@ yyreduce:
   case 84:
 
 /* Line 1455 of yacc.c  */
-#line 721 "source\\macro\\macro.y"
+// #line 742 "source\\macro\\macro.y"
     {
                                             (yyval.asExpr) = hb_compExprNewArgList( (yyvsp[(1) - (1)].asExpr) );
 
@@ -3044,28 +3048,28 @@ yyreduce:
   case 85:
 
 /* Line 1455 of yacc.c  */
-#line 729 "source\\macro\\macro.y"
+// #line 750 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAddListExpr( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 86:
 
 /* Line 1455 of yacc.c  */
-#line 732 "source\\macro\\macro.y"
+// #line 753 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewVarRef( (yyvsp[(2) - (2)].string) ); ;}
     break;
 
   case 87:
 
 /* Line 1455 of yacc.c  */
-#line 735 "source\\macro\\macro.y"
+// #line 756 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 88:
 
 /* Line 1455 of yacc.c  */
-#line 736 "source\\macro\\macro.y"
+// #line 757 "source\\macro\\macro.y"
     {
                                           switch( (yyvsp[(2) - (2)].asExpr)->ExprType )
                                           {
@@ -3134,35 +3138,35 @@ yyreduce:
   case 89:
 
 /* Line 1455 of yacc.c  */
-#line 803 "source\\macro\\macro.y"
+// #line 824 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewFunName( (yyvsp[(1) - (1)].string) ); ;}
     break;
 
   case 90:
 
 /* Line 1455 of yacc.c  */
-#line 804 "source\\macro\\macro.y"
+// #line 825 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); (yyvsp[(1) - (1)].asExpr)->value.asMacro.SubType = HB_ET_MACRO_SYMBOL; ;}
     break;
 
   case 91:
 
 /* Line 1455 of yacc.c  */
-#line 805 "source\\macro\\macro.y"
+// #line 826 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); (yyvsp[(1) - (1)].asExpr)->value.asMacro.SubType = HB_ET_MACRO_SYMBOL; ;}
     break;
 
   case 92:
 
 /* Line 1455 of yacc.c  */
-#line 808 "source\\macro\\macro.y"
+// #line 829 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 93:
 
 /* Line 1455 of yacc.c  */
-#line 811 "source\\macro\\macro.y"
+// #line 832 "source\\macro\\macro.y"
     {
                                             (yyval.asExpr) = hb_compExprNewWithSendExp( (yyvsp[(2) - (2)].asExpr) );
                                          ;}
@@ -3171,7 +3175,7 @@ yyreduce:
   case 94:
 
 /* Line 1455 of yacc.c  */
-#line 818 "source\\macro\\macro.y"
+// #line 839 "source\\macro\\macro.y"
     {
                                                (yyval.asExpr) = hb_compExprNewMethodCall( (yyvsp[(1) - (4)].asExpr), (yyvsp[(3) - (4)].asExpr) );
 
@@ -3185,7 +3189,7 @@ yyreduce:
   case 95:
 
 /* Line 1455 of yacc.c  */
-#line 828 "source\\macro\\macro.y"
+// #line 849 "source\\macro\\macro.y"
     {
                                             (yyval.asExpr) = hb_compExprNewWithMethodCall( (yyvsp[(1) - (4)].asExpr), (yyvsp[(3) - (4)].asExpr) );
                                          ;}
@@ -3194,231 +3198,231 @@ yyreduce:
   case 97:
 
 /* Line 1455 of yacc.c  */
-#line 835 "source\\macro\\macro.y"
+// #line 856 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 98:
 
 /* Line 1455 of yacc.c  */
-#line 836 "source\\macro\\macro.y"
+// #line 857 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 99:
 
 /* Line 1455 of yacc.c  */
-#line 837 "source\\macro\\macro.y"
+// #line 858 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 100:
 
 /* Line 1455 of yacc.c  */
-#line 838 "source\\macro\\macro.y"
+// #line 859 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 101:
 
 /* Line 1455 of yacc.c  */
-#line 839 "source\\macro\\macro.y"
+// #line 860 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 102:
 
 /* Line 1455 of yacc.c  */
-#line 840 "source\\macro\\macro.y"
+// #line 861 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 103:
 
 /* Line 1455 of yacc.c  */
-#line 841 "source\\macro\\macro.y"
+// #line 862 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 104:
 
 /* Line 1455 of yacc.c  */
-#line 842 "source\\macro\\macro.y"
+// #line 863 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 105:
 
 /* Line 1455 of yacc.c  */
-#line 843 "source\\macro\\macro.y"
+// #line 864 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 106:
 
 /* Line 1455 of yacc.c  */
-#line 844 "source\\macro\\macro.y"
+// #line 865 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 107:
 
 /* Line 1455 of yacc.c  */
-#line 845 "source\\macro\\macro.y"
+// #line 866 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 108:
 
 /* Line 1455 of yacc.c  */
-#line 846 "source\\macro\\macro.y"
+// #line 867 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 109:
 
 /* Line 1455 of yacc.c  */
-#line 847 "source\\macro\\macro.y"
+// #line 868 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 110:
 
 /* Line 1455 of yacc.c  */
-#line 848 "source\\macro\\macro.y"
+// #line 869 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 111:
 
 /* Line 1455 of yacc.c  */
-#line 849 "source\\macro\\macro.y"
+// #line 870 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 112:
 
 /* Line 1455 of yacc.c  */
-#line 850 "source\\macro\\macro.y"
+// #line 871 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 113:
 
 /* Line 1455 of yacc.c  */
-#line 851 "source\\macro\\macro.y"
+// #line 872 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 114:
 
 /* Line 1455 of yacc.c  */
-#line 852 "source\\macro\\macro.y"
+// #line 873 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 115:
 
 /* Line 1455 of yacc.c  */
-#line 853 "source\\macro\\macro.y"
+// #line 874 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 116:
 
 /* Line 1455 of yacc.c  */
-#line 854 "source\\macro\\macro.y"
+// #line 875 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 117:
 
 /* Line 1455 of yacc.c  */
-#line 855 "source\\macro\\macro.y"
+// #line 876 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 118:
 
 /* Line 1455 of yacc.c  */
-#line 856 "source\\macro\\macro.y"
+// #line 877 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 119:
 
 /* Line 1455 of yacc.c  */
-#line 857 "source\\macro\\macro.y"
+// #line 878 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 120:
 
 /* Line 1455 of yacc.c  */
-#line 858 "source\\macro\\macro.y"
+// #line 879 "source\\macro\\macro.y"
     { HB_MACRO_IFENABLED( (yyval.asExpr), (yyvsp[(1) - (1)].asExpr), HB_SM_HARBOUR ); ;}
     break;
 
   case 121:
 
 /* Line 1455 of yacc.c  */
-#line 859 "source\\macro\\macro.y"
+// #line 880 "source\\macro\\macro.y"
     { HB_MACRO_IFENABLED( (yyval.asExpr), (yyvsp[(1) - (1)].asExpr), HB_SM_HARBOUR ); ;}
     break;
 
   case 122:
 
 /* Line 1455 of yacc.c  */
-#line 860 "source\\macro\\macro.y"
+// #line 881 "source\\macro\\macro.y"
     { HB_MACRO_IFENABLED( (yyval.asExpr), (yyvsp[(1) - (1)].asExpr), HB_SM_HARBOUR ); ;}
     break;
 
   case 123:
 
 /* Line 1455 of yacc.c  */
-#line 861 "source\\macro\\macro.y"
+// #line 882 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 124:
 
 /* Line 1455 of yacc.c  */
-#line 862 "source\\macro\\macro.y"
+// #line 883 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 125:
 
 /* Line 1455 of yacc.c  */
-#line 863 "source\\macro\\macro.y"
+// #line 884 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 126:
 
 /* Line 1455 of yacc.c  */
-#line 864 "source\\macro\\macro.y"
+// #line 885 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 127:
 
 /* Line 1455 of yacc.c  */
-#line 867 "source\\macro\\macro.y"
+// #line 888 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); HB_MACRO_CHECK( (yyval.asExpr) ) ;}
     break;
 
   case 128:
 
 /* Line 1455 of yacc.c  */
-#line 868 "source\\macro\\macro.y"
+// #line 889 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); HB_MACRO_CHECK( (yyval.asExpr) ) ;}
     break;
 
   case 129:
 
 /* Line 1455 of yacc.c  */
-#line 871 "source\\macro\\macro.y"
+// #line 892 "source\\macro\\macro.y"
     {
                                 if( !(HB_MACRO_DATA->Flags & HB_MACRO_GEN_LIST) )
                                 {
@@ -3433,7 +3437,7 @@ yyreduce:
   case 130:
 
 /* Line 1455 of yacc.c  */
-#line 880 "source\\macro\\macro.y"
+// #line 901 "source\\macro\\macro.y"
     {
                                 HB_MACRO_DATA->iListElements = 1;
                                 (yyval.asExpr) = hb_compExprAddListExpr( ( HB_MACRO_DATA->Flags & HB_MACRO_GEN_PARE ) ? hb_compExprNewList( (yyvsp[(1) - (4)].asExpr) ) : hb_compExprNewArgList( (yyvsp[(1) - (4)].asExpr) ), (yyvsp[(4) - (4)].asExpr) );
@@ -3443,532 +3447,532 @@ yyreduce:
   case 131:
 
 /* Line 1455 of yacc.c  */
-#line 886 "source\\macro\\macro.y"
+// #line 907 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 132:
 
 /* Line 1455 of yacc.c  */
-#line 887 "source\\macro\\macro.y"
+// #line 908 "source\\macro\\macro.y"
     { HB_MACRO_DATA->iListElements++; (yyval.asExpr) = hb_compExprAddListExpr( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 133:
 
 /* Line 1455 of yacc.c  */
-#line 890 "source\\macro\\macro.y"
+// #line 911 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewEmpty(); ;}
     break;
 
   case 159:
 
 /* Line 1455 of yacc.c  */
-#line 923 "source\\macro\\macro.y"
+// #line 944 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewPostInc( (yyvsp[(0) - (1)].asExpr) ); ;}
     break;
 
   case 160:
 
 /* Line 1455 of yacc.c  */
-#line 924 "source\\macro\\macro.y"
+// #line 945 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewPostDec( (yyvsp[(0) - (1)].asExpr) ); ;}
     break;
 
   case 161:
 
 /* Line 1455 of yacc.c  */
-#line 930 "source\\macro\\macro.y"
+// #line 951 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 162:
 
 /* Line 1455 of yacc.c  */
-#line 933 "source\\macro\\macro.y"
+// #line 954 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewPreInc( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 163:
 
 /* Line 1455 of yacc.c  */
-#line 934 "source\\macro\\macro.y"
+// #line 955 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewPreDec( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 164:
 
 /* Line 1455 of yacc.c  */
-#line 937 "source\\macro\\macro.y"
+// #line 958 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewNot( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 165:
 
 /* Line 1455 of yacc.c  */
-#line 938 "source\\macro\\macro.y"
+// #line 959 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewNegate( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 166:
 
 /* Line 1455 of yacc.c  */
-#line 939 "source\\macro\\macro.y"
+// #line 960 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 167:
 
 /* Line 1455 of yacc.c  */
-#line 942 "source\\macro\\macro.y"
+// #line 963 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 168:
 
 /* Line 1455 of yacc.c  */
-#line 943 "source\\macro\\macro.y"
+// #line 964 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 169:
 
 /* Line 1455 of yacc.c  */
-#line 944 "source\\macro\\macro.y"
+// #line 965 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 170:
 
 /* Line 1455 of yacc.c  */
-#line 945 "source\\macro\\macro.y"
+// #line 966 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 171:
 
 /* Line 1455 of yacc.c  */
-#line 946 "source\\macro\\macro.y"
+// #line 967 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 172:
 
 /* Line 1455 of yacc.c  */
-#line 947 "source\\macro\\macro.y"
+// #line 968 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 173:
 
 /* Line 1455 of yacc.c  */
-#line 948 "source\\macro\\macro.y"
+// #line 969 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 174:
 
 /* Line 1455 of yacc.c  */
-#line 949 "source\\macro\\macro.y"
+// #line 970 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 175:
 
 /* Line 1455 of yacc.c  */
-#line 950 "source\\macro\\macro.y"
+// #line 971 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 176:
 
 /* Line 1455 of yacc.c  */
-#line 951 "source\\macro\\macro.y"
+// #line 972 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 177:
 
 /* Line 1455 of yacc.c  */
-#line 952 "source\\macro\\macro.y"
+// #line 973 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 178:
 
 /* Line 1455 of yacc.c  */
-#line 953 "source\\macro\\macro.y"
+// #line 974 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 179:
 
 /* Line 1455 of yacc.c  */
-#line 954 "source\\macro\\macro.y"
+// #line 975 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 180:
 
 /* Line 1455 of yacc.c  */
-#line 955 "source\\macro\\macro.y"
+// #line 976 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 181:
 
 /* Line 1455 of yacc.c  */
-#line 956 "source\\macro\\macro.y"
+// #line 977 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 182:
 
 /* Line 1455 of yacc.c  */
-#line 957 "source\\macro\\macro.y"
+// #line 978 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 183:
 
 /* Line 1455 of yacc.c  */
-#line 958 "source\\macro\\macro.y"
+// #line 979 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 184:
 
 /* Line 1455 of yacc.c  */
-#line 959 "source\\macro\\macro.y"
+// #line 980 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 185:
 
 /* Line 1455 of yacc.c  */
-#line 960 "source\\macro\\macro.y"
+// #line 981 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 186:
 
 /* Line 1455 of yacc.c  */
-#line 961 "source\\macro\\macro.y"
+// #line 982 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 187:
 
 /* Line 1455 of yacc.c  */
-#line 962 "source\\macro\\macro.y"
+// #line 983 "source\\macro\\macro.y"
     { HB_MACRO_IFENABLED( (yyval.asExpr), hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ), HB_SM_HARBOUR ); ;}
     break;
 
   case 188:
 
 /* Line 1455 of yacc.c  */
-#line 963 "source\\macro\\macro.y"
+// #line 984 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 189:
 
 /* Line 1455 of yacc.c  */
-#line 964 "source\\macro\\macro.y"
+// #line 985 "source\\macro\\macro.y"
     { HB_MACRO_IFENABLED( (yyval.asExpr), hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ), HB_SM_HARBOUR ); ;}
     break;
 
   case 190:
 
 /* Line 1455 of yacc.c  */
-#line 965 "source\\macro\\macro.y"
+// #line 986 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 191:
 
 /* Line 1455 of yacc.c  */
-#line 968 "source\\macro\\macro.y"
+// #line 989 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 192:
 
 /* Line 1455 of yacc.c  */
-#line 971 "source\\macro\\macro.y"
+// #line 992 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 193:
 
 /* Line 1455 of yacc.c  */
-#line 974 "source\\macro\\macro.y"
+// #line 995 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 194:
 
 /* Line 1455 of yacc.c  */
-#line 977 "source\\macro\\macro.y"
+// #line 998 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 195:
 
 /* Line 1455 of yacc.c  */
-#line 980 "source\\macro\\macro.y"
+// #line 1001 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 196:
 
 /* Line 1455 of yacc.c  */
-#line 983 "source\\macro\\macro.y"
+// #line 1004 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 197:
 
 /* Line 1455 of yacc.c  */
-#line 986 "source\\macro\\macro.y"
+// #line 1007 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 198:
 
 /* Line 1455 of yacc.c  */
-#line 987 "source\\macro\\macro.y"
+// #line 1008 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 199:
 
 /* Line 1455 of yacc.c  */
-#line 988 "source\\macro\\macro.y"
+// #line 1009 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 200:
 
 /* Line 1455 of yacc.c  */
-#line 989 "source\\macro\\macro.y"
+// #line 1010 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 201:
 
 /* Line 1455 of yacc.c  */
-#line 990 "source\\macro\\macro.y"
+// #line 1011 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 202:
 
 /* Line 1455 of yacc.c  */
-#line 991 "source\\macro\\macro.y"
+// #line 1012 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 203:
 
 /* Line 1455 of yacc.c  */
-#line 994 "source\\macro\\macro.y"
+// #line 1015 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlus( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 204:
 
 /* Line 1455 of yacc.c  */
-#line 995 "source\\macro\\macro.y"
+// #line 1016 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinus( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 205:
 
 /* Line 1455 of yacc.c  */
-#line 996 "source\\macro\\macro.y"
+// #line 1017 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMult( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 206:
 
 /* Line 1455 of yacc.c  */
-#line 997 "source\\macro\\macro.y"
+// #line 1018 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDiv( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 207:
 
 /* Line 1455 of yacc.c  */
-#line 998 "source\\macro\\macro.y"
+// #line 1019 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMod( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 208:
 
 /* Line 1455 of yacc.c  */
-#line 999 "source\\macro\\macro.y"
+// #line 1020 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPower( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 209:
 
 /* Line 1455 of yacc.c  */
-#line 1000 "source\\macro\\macro.y"
+// #line 1021 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewBitAnd( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 210:
 
 /* Line 1455 of yacc.c  */
-#line 1001 "source\\macro\\macro.y"
+// #line 1022 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewBitOr( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 211:
 
 /* Line 1455 of yacc.c  */
-#line 1002 "source\\macro\\macro.y"
+// #line 1023 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewBitXOr( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 212:
 
 /* Line 1455 of yacc.c  */
-#line 1003 "source\\macro\\macro.y"
+// #line 1024 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewBitShiftR( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 213:
 
 /* Line 1455 of yacc.c  */
-#line 1004 "source\\macro\\macro.y"
+// #line 1025 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewBitShiftL( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 214:
 
 /* Line 1455 of yacc.c  */
-#line 1007 "source\\macro\\macro.y"
+// #line 1028 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewAnd( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 215:
 
 /* Line 1455 of yacc.c  */
-#line 1008 "source\\macro\\macro.y"
+// #line 1029 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewOr( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 216:
 
 /* Line 1455 of yacc.c  */
-#line 1011 "source\\macro\\macro.y"
+// #line 1032 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewEQ( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 217:
 
 /* Line 1455 of yacc.c  */
-#line 1012 "source\\macro\\macro.y"
+// #line 1033 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewLT( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 218:
 
 /* Line 1455 of yacc.c  */
-#line 1013 "source\\macro\\macro.y"
+// #line 1034 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewGT( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 219:
 
 /* Line 1455 of yacc.c  */
-#line 1014 "source\\macro\\macro.y"
+// #line 1035 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewLE( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 220:
 
 /* Line 1455 of yacc.c  */
-#line 1015 "source\\macro\\macro.y"
+// #line 1036 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewGE( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 221:
 
 /* Line 1455 of yacc.c  */
-#line 1016 "source\\macro\\macro.y"
+// #line 1037 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewNE( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 222:
 
 /* Line 1455 of yacc.c  */
-#line 1017 "source\\macro\\macro.y"
+// #line 1038 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewNE( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 223:
 
 /* Line 1455 of yacc.c  */
-#line 1018 "source\\macro\\macro.y"
+// #line 1039 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewIN( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 224:
 
 /* Line 1455 of yacc.c  */
-#line 1019 "source\\macro\\macro.y"
+// #line 1040 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewEqual( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 225:
 
 /* Line 1455 of yacc.c  */
-#line 1020 "source\\macro\\macro.y"
+// #line 1041 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewLike( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 226:
 
 /* Line 1455 of yacc.c  */
-#line 1021 "source\\macro\\macro.y"
+// #line 1042 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMatch( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 227:
 
 /* Line 1455 of yacc.c  */
-#line 1024 "source\\macro\\macro.y"
+// #line 1045 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 228:
 
 /* Line 1455 of yacc.c  */
-#line 1030 "source\\macro\\macro.y"
+// #line 1051 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewArrayAt( (yyvsp[(0) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 229:
 
 /* Line 1455 of yacc.c  */
-#line 1031 "source\\macro\\macro.y"
+// #line 1052 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewArrayAt( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 230:
 
 /* Line 1455 of yacc.c  */
-#line 1032 "source\\macro\\macro.y"
+// #line 1053 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewArrayAt( (yyvsp[(1) - (4)].asExpr), (yyvsp[(4) - (4)].asExpr), HB_MACRO_PARAM ); ;}
     break;
 
   case 231:
 
 /* Line 1455 of yacc.c  */
-#line 1036 "source\\macro\\macro.y"
+// #line 1057 "source\\macro\\macro.y"
     {
                     (yyval.asExpr) = hb_compExprNewCodeBlock();
 
@@ -3982,7 +3986,7 @@ yyreduce:
   case 232:
 
 /* Line 1455 of yacc.c  */
-#line 1045 "source\\macro\\macro.y"
+// #line 1066 "source\\macro\\macro.y"
     {
                     (yyval.asExpr) = (yyvsp[(3) - (7)].asExpr);
 
@@ -3996,7 +4000,7 @@ yyreduce:
   case 233:
 
 /* Line 1455 of yacc.c  */
-#line 1054 "source\\macro\\macro.y"
+// #line 1075 "source\\macro\\macro.y"
     {
                     (yyval.asExpr) = hb_compExprNewCodeBlock();
 
@@ -4010,7 +4014,7 @@ yyreduce:
   case 234:
 
 /* Line 1455 of yacc.c  */
-#line 1063 "source\\macro\\macro.y"
+// #line 1084 "source\\macro\\macro.y"
     {
                     (yyval.asExpr) = (yyvsp[(3) - (7)].asExpr);
 
@@ -4024,63 +4028,63 @@ yyreduce:
   case 235:
 
 /* Line 1455 of yacc.c  */
-#line 1075 "source\\macro\\macro.y"
+// #line 1096 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAddListExpr( (yyvsp[(-2) - (1)].asExpr), (yyvsp[(1) - (1)].asExpr) ); ;}
     break;
 
   case 236:
 
 /* Line 1455 of yacc.c  */
-#line 1076 "source\\macro\\macro.y"
+// #line 1097 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAddListExpr( (yyvsp[(-2) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 237:
 
 /* Line 1455 of yacc.c  */
-#line 1082 "source\\macro\\macro.y"
+// #line 1103 "source\\macro\\macro.y"
     { (yyval.asExpr) = NULL; ;}
     break;
 
   case 238:
 
 /* Line 1455 of yacc.c  */
-#line 1085 "source\\macro\\macro.y"
+// #line 1106 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprCBVarAdd( (yyvsp[(0) - (1)].asExpr), (yyvsp[(1) - (1)].string), HB_MACRO_PARAM ); ;}
     break;
 
   case 239:
 
 /* Line 1455 of yacc.c  */
-#line 1086 "source\\macro\\macro.y"
+// #line 1107 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprCBVarAdd( (yyvsp[(0) - (3)].asExpr), (yyvsp[(3) - (3)].string), HB_MACRO_PARAM ); HB_MACRO_CHECK( (yyval.asExpr) ); ;}
     break;
 
   case 240:
 
 /* Line 1455 of yacc.c  */
-#line 1089 "source\\macro\\macro.y"
+// #line 1110 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewList( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 241:
 
 /* Line 1455 of yacc.c  */
-#line 1090 "source\\macro\\macro.y"
+// #line 1111 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAddListExpr( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 242:
 
 /* Line 1455 of yacc.c  */
-#line 1093 "source\\macro\\macro.y"
+// #line 1114 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 243:
 
 /* Line 1455 of yacc.c  */
-#line 1094 "source\\macro\\macro.y"
+// #line 1115 "source\\macro\\macro.y"
     {
                                             hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
 
@@ -4104,70 +4108,70 @@ yyreduce:
   case 244:
 
 /* Line 1455 of yacc.c  */
-#line 1114 "source\\macro\\macro.y"
+// #line 1135 "source\\macro\\macro.y"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 245:
 
 /* Line 1455 of yacc.c  */
-#line 1118 "source\\macro\\macro.y"
+// #line 1139 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAddListExpr( hb_compExprNewList( (yyvsp[(3) - (6)].asExpr) ), (yyvsp[(5) - (6)].asExpr) ); ;}
     break;
 
   case 246:
 
 /* Line 1455 of yacc.c  */
-#line 1120 "source\\macro\\macro.y"
+// #line 1141 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewIIF( hb_compExprAddListExpr( (yyvsp[(7) - (9)].asExpr), (yyvsp[(8) - (9)].asExpr) ) ); ;}
     break;
 
   case 247:
 
 /* Line 1455 of yacc.c  */
-#line 1123 "source\\macro\\macro.y"
+// #line 1144 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAddListExpr( hb_compExprNewList( (yyvsp[(3) - (6)].asExpr) ), (yyvsp[(5) - (6)].asExpr) ); ;}
     break;
 
   case 248:
 
 /* Line 1455 of yacc.c  */
-#line 1125 "source\\macro\\macro.y"
+// #line 1146 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewIIF( hb_compExprAddListExpr( (yyvsp[(7) - (9)].asExpr), (yyvsp[(8) - (9)].asExpr) ) ); ;}
     break;
 
   case 249:
 
 /* Line 1455 of yacc.c  */
-#line 1128 "source\\macro\\macro.y"
+// #line 1149 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAddListExpr( hb_compExprNewList( (yyvsp[(3) - (5)].asExpr) ), (yyvsp[(5) - (5)].asExpr) ); ;}
     break;
 
   case 250:
 
 /* Line 1455 of yacc.c  */
-#line 1130 "source\\macro\\macro.y"
+// #line 1151 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewIIF( hb_compExprAddListExpr( (yyvsp[(6) - (7)].asExpr), hb_compExprNew( HB_ET_NONE ) ) ); ;}
     break;
 
   case 251:
 
 /* Line 1455 of yacc.c  */
-#line 1133 "source\\macro\\macro.y"
+// #line 1154 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprAddListExpr( hb_compExprNewList( (yyvsp[(3) - (5)].asExpr) ), (yyvsp[(5) - (5)].asExpr) ); ;}
     break;
 
   case 252:
 
 /* Line 1455 of yacc.c  */
-#line 1135 "source\\macro\\macro.y"
+// #line 1156 "source\\macro\\macro.y"
     { (yyval.asExpr) = hb_compExprNewIIF( hb_compExprAddListExpr( (yyvsp[(6) - (7)].asExpr), hb_compExprNew( HB_ET_NONE ) ) ); ;}
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 4152 "obj\\63\\macroy.c"
+// #line 4173 "obj\\b32\\macroy.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -4379,7 +4383,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 1138 "source\\macro\\macro.y"
+// #line 1159 "source\\macro\\macro.y"
 
 
 #ifdef __WATCOMC__
@@ -4396,8 +4400,15 @@ int hb_macroYYParse( HB_MACRO_PTR pMacro )
    int iResult;
    void * lexBuffer;
 
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_LOCK( hb_macroMutex );
+   /* AJ: Replace hard coded MT related codes with API to make this file
+      common to ST and MT modes
+   */
+   #if 0
+      #ifdef HB_THREAD_SUPPORT
+         HB_CRITICAL_LOCK( hb_macroMutex );
+      #endif
+   #else
+      hb_macro_critical_Lock();
    #endif
 
    // Reset
@@ -4412,8 +4423,15 @@ int hb_macroYYParse( HB_MACRO_PTR pMacro )
 
    hb_compFlexDelete( lexBuffer );
 
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_UNLOCK( hb_macroMutex );
+   /* AJ: Replace hard coded MT related codes with API to make this file
+      common to ST and MT modes
+   */
+   #if 0
+      #ifdef HB_THREAD_SUPPORT
+         HB_CRITICAL_UNLOCK( hb_macroMutex );
+      #endif
+   #else
+      hb_macro_critical_UnLock();
    #endif
 
    return iResult;

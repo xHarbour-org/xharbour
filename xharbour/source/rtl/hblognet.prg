@@ -208,24 +208,23 @@ CLASS HB_LogInetPort FROM HB_LogChannel
    DATA skIn
    DATA bOnConnect
 
-#ifdef HB_THREAD_SUPPORT
    DATA bTerminate      INIT .F.
    DATA nThread
    DATA mtxBusy
-#endif
 
    METHOD New( nLevel, nPort )
    METHOD Open( cName )
    METHOD Close( cName )
    METHOD Connections()
    METHOD BroadcastMessage( cMessage )
+   METHOD AcceptCon()
 
 PROTECTED:
    METHOD Send( nStyle, cMessage, cName, nPrio )
 
-HIDDEN:
+/* HIDDEN:
    METHOD AcceptCon()
-
+*/
 ENDCLASS
 
 
@@ -249,14 +248,7 @@ METHOD Open() CLASS HB_LogInetPort
       RETURN .F.
    ENDIF
 
-#ifdef HB_THREAD_SUPPORT
-   ::mtxBusy := HB_MutexCreate()
-   ::nThread := StartThread( Self, "AcceptCon" )
-#else
-   // If we have not threads, we have to sync accept incoming connection
-   // when we log a message
-   InetSetTimeout( ::skIn, 50 )
-#endif
+   HB_LOGOPEN( self )
 
 RETURN .T.
 
@@ -268,11 +260,9 @@ METHOD Close( ) CLASS HB_LogInetPort
       RETURN .F.
    ENDIF
 
-#ifdef HB_THREAD_SUPPORT
    // kind termination request
    ::bTerminate := .T.
    JoinThread( ::nThread )
-#endif
 
    InetClose( ::skIn )
 
@@ -304,12 +294,7 @@ METHOD BroadcastMessage( cMessage ) CLASS HB_LogInetPort
       cMessage := ""
    ENDIF
 
-#ifdef HB_THREAD_SUPPORT
-   // be sure thread is not busy now
-   HB_MutexLock( ::mtxBusy )
-#else
-   ::AcceptCon()
-#endif
+   HB_LOGBROADCASTMESSAGE( self )
 
    nCount := 1
    DO WHILE nCount <= Len( ::aListeners )
@@ -324,9 +309,7 @@ METHOD BroadcastMessage( cMessage ) CLASS HB_LogInetPort
       ENDIF
    ENDDO
 
-#ifdef HB_THREAD_SUPPORT
    HB_MutexUnlock( ::mtxBusy )
-#endif
 
 RETURN .T.
 
@@ -335,42 +318,17 @@ METHOD Connections() CLASS HB_LogInetPort
 
    ::BroadcastMessage( Chr(0) )
 
-#ifdef HB_THREAD_SUPPORT
    // be sure thread is not busy now
    HB_MutexLock( ::mtxBusy )
-#endif
 
    nCount := Len( ::aListeners )
 
-#ifdef HB_THREAD_SUPPORT
    HB_MutexUnlock( ::mtxBusy )
-#endif
 
 RETURN nCount
 
-
 METHOD AcceptCon() CLASS HB_LogInetPort
-   LOCAL sk
 
-#ifdef HB_THREAD_SUPPORT
-   InetSetTimeout( ::skIn, 250 )
-   DO WHILE .not. ::bTerminate
-      sk := InetAccept( ::skIn )
-      // A gentle termination request, or an error
-      IF sk != NIL
-         HB_MutexLock( ::mtxBusy )
-         AAdd( ::aListeners, sk )
-         HB_MutexUnlock( ::mtxBusy )
-      ENDIF
-   ENDDO
-#else
-   sk := InetAccept( ::skIn )
-   // A gentle termination request, or an error
-   IF sk != NIL
-      AAdd( ::aListeners, sk )
-      IF ::bOnConnect <> NIL
-         Eval( ::bOnConnect, sk )
-      ENDIF
-   ENDIF
-#endif
+   HB_LOGACCEPTCON( self )
+
 RETURN .T.

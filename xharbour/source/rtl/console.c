@@ -71,7 +71,6 @@
 
 #define HB_OS_WIN_USED
 
-#define HB_THREAD_OPTIMIZE_STACK
 #ifndef _HB_API_INTERNAL_
    #define _HB_API_INTERNAL_
 #endif
@@ -83,37 +82,14 @@
 #include "hb_io.h"
 #include "thread.h"
 
-#if defined( HB_THREAD_SUPPORT )
-
-   #if defined( HB_VM_ALL )
-      HB_EXTERN_BEGIN
-      extern  HB_STACK *        _TlsGetValue( void );
-      HB_EXTERN_END
-      #define TlsGetValue( x )  _TlsGetValue()
-   #endif
-
-   static void s_doNothing( void *nothing ) { HB_SYMBOL_UNUSED( nothing ) ;}
-   /* WARNING: Output is a cancellation point. NEVER cross non optimized stack access,
-   or calls to hb_param* / hb_ret* family functions with this macros. This macros
-   are inner shell locks. */
-   #define HB_CONSOLE_SAFE_LOCK\
-      HB_CLEANUP_PUSH( hb_setGetOutputSafety() ? s_doNothing : hb_rawMutexForceUnlock, hb_outputMutex );\
-      if ( hb_setGetOutputSafety() ) {\
-         HB_CRITICAL_LOCK( hb_outputMutex );\
-      }
-
-   #define HB_CONSOLE_SAFE_UNLOCK \
-      if ( hb_setGetOutputSafety() ) {\
-         HB_CRITICAL_UNLOCK( hb_outputMutex );\
-      }\
-      HB_CLEANUP_POP;
-
-#else
-   #define HB_CONSOLE_SAFE_LOCK
-   #define HB_CONSOLE_SAFE_UNLOCK
-#endif
-
-
+HB_EXTERN_BEGIN
+extern void hb_console_Lock( void );
+extern void hb_console_UnLock( void );
+extern void hb_console_safe_lock( void );
+extern void hb_console_safe_unlock( void );
+extern void hb_stack_lock( void );
+extern void hb_stack_unlock( void );
+HB_EXTERN_END
 
 /* NOTE: Some C compilers like BCC32 optimize the call of small static buffers
  *       into an integer to read it faster. Later, programs like CodeGuard
@@ -220,7 +196,6 @@ char * hb_conNewLine( void )
 
 HB_FUNC( HB_OSNEWLINE )
 {
-   HB_THREAD_STUB_API;
    hb_retc( s_szCrLf );
 }
 
@@ -377,21 +352,17 @@ static void hb_conOut( USHORT uiParam, hb_out_func_typedef * pOutFunc )
    if( bFreeReq )
    {
       /* never call xfree with stack unlocked */
-      HB_THREAD_STUB
-      HB_STACK_LOCK
+      hb_stack_lock();
       hb_xfree( pszString );
-      HB_STACK_UNLOCK
+      hb_stack_unlock();
    }
 }
 
 HB_FUNC( OUTSTD ) /* writes a list of values to the standard output device */
 {
-   HB_THREAD_STUB_API
-
    USHORT uiPCount = hb_pcount();
    USHORT uiParam;
-
-   HB_CONSOLE_SAFE_LOCK
+   hb_console_safe_lock();
 
    for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
    {
@@ -400,17 +371,15 @@ HB_FUNC( OUTSTD ) /* writes a list of values to the standard output device */
          hb_conOutStd( " ", 1 );
    }
 
-   HB_CONSOLE_SAFE_UNLOCK
+   hb_console_safe_unlock();
 }
 
 HB_FUNC( OUTERR ) /* writes a list of values to the standard error device */
 {
-   HB_THREAD_STUB_API
-
    USHORT uiPCount = hb_pcount();
    USHORT uiParam;
 
-   HB_CONSOLE_SAFE_LOCK
+   hb_console_safe_lock();
 
    for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
    {
@@ -419,17 +388,15 @@ HB_FUNC( OUTERR ) /* writes a list of values to the standard error device */
          hb_conOutErr( " ", 1 );
    }
 
-   HB_CONSOLE_SAFE_UNLOCK
+   hb_console_safe_unlock();
 }
 
 HB_FUNC( QQOUT ) /* writes a list of values to the current device (screen or printer) and is affected by SET ALTERNATE */
 {
-   HB_THREAD_STUB_API
-
    USHORT uiPCount = hb_pcount();
    USHORT uiParam;
 
-   HB_CONSOLE_SAFE_LOCK
+   hb_console_safe_lock();
 
    for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
    {
@@ -438,18 +405,14 @@ HB_FUNC( QQOUT ) /* writes a list of values to the current device (screen or pri
          hb_conOutAlt( " ", 1 );
    }
 
-   HB_CONSOLE_SAFE_UNLOCK
+   hb_console_safe_unlock();
 }
 
 HB_FUNC( QOUT )
 {
-#if defined(HB_OS_WIN) || defined(HB_OS_OS2)
-   HB_THREAD_STUB
-#endif
-
    hb_conOutAlt( s_szCrLf, s_iCrLfLen );
 
-   HB_CONSOLE_SAFE_LOCK
+   hb_console_safe_lock();
 
    if( hb_setGetPrinter() && hb_setGetPrintHan() != FS_ERROR )
    {
@@ -476,18 +439,14 @@ HB_FUNC( QOUT )
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
    }
 
-   HB_CONSOLE_SAFE_UNLOCK
+   hb_console_safe_unlock();
 
    HB_FUNC_EXEC( QQOUT );
 }
 
 HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
 {
-#if defined(HB_OS_WIN) || defined(HB_OS_OS2)
-   HB_THREAD_STUB
-#endif
-
-   HB_CONSOLE_SAFE_LOCK
+   hb_console_safe_lock();
 
    if( hb_set_SetPrinterStart() )
    {
@@ -500,18 +459,16 @@ HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
 
    s_uiPRow = s_uiPCol = 0;
 
-   HB_CONSOLE_SAFE_UNLOCK
+   hb_console_safe_unlock();
 }
 
 HB_FUNC( PROW ) /* Returns the current printer row position */
 {
-   HB_THREAD_STUB_API
    hb_retni( ( int ) s_uiPRow );
 }
 
 HB_FUNC( PCOL ) /* Returns the current printer row position */
 {
-   HB_THREAD_STUB_API
    hb_retni( ( int ) s_uiPCol );
 }
 
@@ -592,37 +549,28 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
 
 HB_FUNC( DEVPOS ) /* Sets the screen and/or printer position */
 {
-#if defined(HB_OS_WIN) || defined(HB_OS_OS2)
-   HB_THREAD_STUB
-#endif
-   HB_CONSOLE_SAFE_LOCK
+   hb_console_safe_lock();
    if( ISNUM( 1 ) && ISNUM( 2 ) )
    {
       hb_conDevPos( hb_parni( 1 ), hb_parni( 2 ) );
    }
-   HB_CONSOLE_SAFE_UNLOCK
+   hb_console_safe_unlock();
 }
 
 HB_FUNC( SETPRC ) /* Sets the current printer row and column positions */
 {
-#if defined(HB_OS_WIN) || defined(HB_OS_OS2)
-   HB_THREAD_STUB
-#endif
-
-   HB_CONSOLE_SAFE_LOCK
+   hb_console_safe_lock();
    if( hb_pcount() == 2 && ISNUM( 1 ) && ISNUM( 2 ) )
    {
       s_uiPRow = ( USHORT ) hb_parni( 1 );
       s_uiPCol = ( USHORT ) hb_parni( 2 );
    }
-   HB_CONSOLE_SAFE_UNLOCK
+   hb_console_safe_unlock();
 }
 
 HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or printer), but is not affected by SET ALTERNATE */
 {
-   HB_THREAD_STUB_API
-
-   HB_CONSOLE_SAFE_LOCK
+   hb_console_safe_lock();
 
    if( ISNUM( 3 ) && ISNUM( 4 ) )
    {
@@ -644,18 +592,16 @@ HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or prin
    {
       hb_conOut( 1, hb_conOutDev );
    }
-   HB_CONSOLE_SAFE_UNLOCK
+   hb_console_safe_unlock();
 }
 
 HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected by SET ALTERNATE */
 {
-   HB_THREAD_STUB_API
-
    char * pszString;
    ULONG ulLen;
    BOOL bFreeReq;
 
-   HB_CONSOLE_SAFE_LOCK
+   hb_console_safe_lock();
 
    if( ISCHAR( 2 ) )
    {
@@ -682,7 +628,7 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
       if( bFreeReq )
          hb_xfree( pszString );
    }
-   HB_CONSOLE_SAFE_UNLOCK
+   hb_console_safe_unlock();
 }
 
 /* Undocumented Clipper function */
@@ -691,12 +637,11 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
 
 HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position, but is not affected by SET ALTERNATE */
 {
-   HB_THREAD_STUB_API
    char * pszString = NULL;
    ULONG ulLen;
    BOOL bFreeReq = FALSE;
 
-   HB_CONSOLE_SAFE_LOCK
+   hb_console_safe_lock();
 
    if( ISCHAR( 4 ) )
    {
@@ -717,7 +662,7 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
 
       hb_gtWriteAt( hb_parni( 1 ), hb_parni( 2 ), ( BYTE * ) pszString, ulLen );
    }
-   HB_CONSOLE_SAFE_UNLOCK
+   hb_console_safe_unlock();
 
    if( bFreeReq )
    {
@@ -745,31 +690,27 @@ HB_FUNC( HB_DISPOUTAT )
       else
          iColor = -1;
 
-      HB_CONSOLE_SAFE_LOCK
+      hb_console_safe_lock();
       hb_gtPutText( ( USHORT ) hb_parni( 1 ), ( USHORT ) hb_parni( 2 ), ( BYTE * ) pszString, ulLen, iColor );
-      HB_CONSOLE_SAFE_UNLOCK
+      hb_console_safe_unlock();
 
       if( bFreeReq )
          hb_xfree( pszString );
    }
 }
 
-
 HB_FUNC( HB_GETSTDIN ) /* Return Handel for STDIN */
 {
-   HB_THREAD_STUB_API
    hb_retni( s_hFilenoStdin );
 }
 
 HB_FUNC( HB_GETSTDOUT ) /* Return Handel for STDOUT */
 {
-   HB_THREAD_STUB_API
    hb_retni( s_hFilenoStdout );
 }
 
 HB_FUNC( HB_GETSTDERR ) /* Return Handel for STDERR */
 {
-   HB_THREAD_STUB_API
    hb_retni( s_hFilenoStderr );
 }
 
@@ -779,11 +720,11 @@ HB_FUNC( HB_GETSTDERR ) /* Return Handel for STDERR */
 
 HB_FUNC( HBCONSOLELOCK )
 {
-   HB_CRITICAL_LOCK( hb_outputMutex );
+   hb_console_Lock();
 }
 
 /****************************************************************************/
 HB_FUNC( HBCONSOLEUNLOCK )
 {
-   HB_CRITICAL_UNLOCK( hb_outputMutex );
+   hb_console_UnLock();
 }

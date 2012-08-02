@@ -68,9 +68,11 @@
 //JC1: yylex is not threadsafe, we need mutexes
 #include "hbstack.h"    // that also includes thread.h
 
-#ifdef HB_THREAD_SUPPORT
+/* AJ: Remove quallification of thread.h inclusion in order to make this file
+   useable in both ST and MT modes */
+/* #ifdef HB_THREAD_SUPPORT */
   #include "thread.h"
-#endif
+/* #endif */
 
 /* Compile using: bison -d -p hb_comp macro.y */
 
@@ -89,6 +91,14 @@
    #pragma warn -ccc
    #pragma warn -rch
 #endif
+
+/* AJ: added functions to enter and leave critical section made common to ST
+   and MT mode
+*/
+HB_EXTERN_BEGIN
+extern void hb_macro_critical_Lock( void );
+extern void hb_macro_critical_UnLock( void );
+HB_EXTERN_END
 
 /* NOTE: these symbols are used internally in bison.simple
  */
@@ -1162,8 +1172,15 @@ int hb_macroYYParse( HB_MACRO_PTR pMacro )
    int iResult;
    void * lexBuffer;
 
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_LOCK( hb_macroMutex );
+   /* AJ: Replace hard coded MT related codes with API to make this file
+      common to ST and MT modes
+   */
+   #if 0
+      #ifdef HB_THREAD_SUPPORT
+         HB_CRITICAL_LOCK( hb_macroMutex );
+      #endif
+   #else
+      hb_macro_critical_Lock();
    #endif
 
    // Reset
@@ -1178,8 +1195,15 @@ int hb_macroYYParse( HB_MACRO_PTR pMacro )
 
    hb_compFlexDelete( lexBuffer );
 
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_UNLOCK( hb_macroMutex );
+   /* AJ: Replace hard coded MT related codes with API to make this file
+      common to ST and MT modes
+   */
+   #if 0
+      #ifdef HB_THREAD_SUPPORT
+         HB_CRITICAL_UNLOCK( hb_macroMutex );
+      #endif
+   #else
+      hb_macro_critical_UnLock();
    #endif
 
    return iResult;

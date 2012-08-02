@@ -117,16 +117,16 @@ REDBFFPT_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)redbffpt$(LIBEXT)
 DBFNTX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfntx$(LIBEXT)
 DBFNSX_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dbfnsx$(LIBEXT)
 HBSIX_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbsix$(LIBEXT)
-HSX_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hsx$(HB_MT)$(LIBEXT)
+HSX_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hsx$(LIBEXT)
 USRRDD_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)usrrdd$(LIBEXT)
 RDDS_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)rdds$(LIBEXT)
 DEBUG_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)debug$(LIBEXT)
 LANG_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)lang$(LIBEXT)
-MACRO_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)macro$(HB_MT)$(LIBEXT)
+MACRO_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)macro$(LIBEXT)
 NULSYS_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)nulsys$(LIBEXT)
 PP_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)pp$(LIBEXT)
-RDD_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)rdd$(HB_MT)$(LIBEXT)
-RTL_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)rtl$(HB_MT)$(LIBEXT)
+RDD_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)rdd$(LIBEXT)
+RTL_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)rtl$(LIBEXT)
 PCREPOS_LIB =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)pcrepos$(LIBEXT)
 ZLIB_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)zlib$(LIBEXT)
 TIP_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)tip$(LIBEXT)
@@ -680,14 +680,13 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)accept$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)ampm$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)at$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)bkgtsks$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)binnum$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)binnumx$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)box$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cdpapi$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)chrasc$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)colorind$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)console$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)console$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)copyfile$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)datec$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)dateshb$(OBJEXT)\
@@ -701,9 +700,9 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)dllcall$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)empty$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)file$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)filebuf$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)filebuf$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)filehb$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)filenet$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)filenet$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)filestat$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)filesys$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)fserror$(OBJEXT)\
@@ -728,6 +727,7 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hbbitf$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbchksum$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbcomprs$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbserv$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbzlibgz$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbcrc32$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbcrypt$(OBJEXT)\
@@ -741,12 +741,11 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hbntos$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hboutdbg$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbrandom$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)hbserv$(HB_MT)$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbsrlraw$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbsyslog$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbtoken$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbxml$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)idle$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)idle$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)inkey$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)inkeyapi$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)is$(OBJEXT)\
@@ -755,7 +754,7 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)left$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)len$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)lennum$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)math$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)math$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)maxrow$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)memofile$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)minmax$(OBJEXT)\
@@ -813,7 +812,7 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)substr$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)tone$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)tprinter$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)trace$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)trace$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)transfrm$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)trim$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)txtline$(OBJEXT)\
@@ -846,13 +845,13 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)dumpvar$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)einstvar$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)error$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)errorsys$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)errorsys$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)fieldbl$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)getlist$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)getsys$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbini$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)hblog$(HB_MT)$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)hblognet$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hblog$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hblognet$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbserial$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)input$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)listbox$(OBJEXT)\
@@ -889,8 +888,8 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)tpopup$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)traceprg$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)treport$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)trpc$(HB_MT)$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)trpccli$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)trpc$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)trpccli$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)tscalar$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)ttable$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)ttextlin$(OBJEXT)\
@@ -1024,7 +1023,7 @@ LANG_LIB_OBJS=\
 # MACRO.LIB rules
 #===============================================================================
 MACRO_LIB_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)macroy$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)macroy$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)macroa$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)macrob$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)macroc$(OBJEXT)\
@@ -1044,8 +1043,8 @@ RDD_LIB_OBJS=\
               $(OBJ_DIR)$(DIR_SEP)fieldhb$(OBJEXT)\
               $(OBJ_DIR)$(DIR_SEP)rddinfo$(OBJEXT)\
               $(OBJ_DIR)$(DIR_SEP)workarea$(OBJEXT)\
-              $(OBJ_DIR)$(DIR_SEP)wacore$(HB_MT)$(OBJEXT)\
-              $(OBJ_DIR)$(DIR_SEP)wafunc$(HB_MT)$(OBJEXT)\
+              $(OBJ_DIR)$(DIR_SEP)wacore$(OBJEXT)\
+              $(OBJ_DIR)$(DIR_SEP)wafunc$(OBJEXT)\
               $(OBJ_DIR)$(DIR_SEP)dbf1$(OBJEXT)\
               $(OBJ_DIR)$(DIR_SEP)dbf1net$(OBJEXT)\
               $(OBJ_DIR)$(DIR_SEP)dbnubs$(OBJEXT)\
@@ -1290,7 +1289,11 @@ VM_COMMON_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)memvclip$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)runner$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)throw$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)harbinit$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)harbinit$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)errlogmt$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)lognetmt$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)trpcvmmt$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)bkgtsks$(HB_MT)$(OBJEXT)
 
 VM_MAIN_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)maindll$(OBJEXT)\
@@ -2403,10 +2406,6 @@ ST_PROJECT=\
 
 MT_PROJECT=\
 	$(VM_LIB)\
-	$(RTL_LIB)\
-	$(MACRO_LIB)\
-	$(RDD_LIB)\
-	$(HSX_LIB)\
 	$(HBTEST_EXE)\
 	$(HBRUN_EXE)
 

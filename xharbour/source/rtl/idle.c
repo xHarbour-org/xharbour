@@ -98,102 +98,30 @@ static USHORT s_uiIdleTask = 0;
 /* number of tasks in the list */
 static USHORT s_uiIdleMaxTask = 0;
 
-#if defined(HB_THREAD_SUPPORT) || defined(HB_OS_UNIX)
-   #define HB_IDLE_MSEC_DEFAULT 10
-#else
-   #if defined(HB_OS_WIN) || defined(__CYGWIN__)
-      #define HB_IDLE_MSEC_DEFAULT 20
-   #else
-      #define HB_IDLE_MSEC_DEFAULT 1
-   #endif
-#endif
 /* sleep idle time in milli-seconds */
-static USHORT s_uiIdleSleepMsec = HB_IDLE_MSEC_DEFAULT;
+static USHORT s_uiIdleSleepMsec = 0;
 /* indicates if OS wait state is to be used instead of sleep() type function */
 static int s_iIdleWaitNoCpu = 0;
 
 /* flag to indicate GarbageCollection should be done in idle state. */
 BOOL hb_vm_bCollectGarbage = TRUE;
 
+HB_EXTERN_BEGIN
+extern void hb_idle_releaseCPU( USHORT uiIdleSleepMsec, BOOL bIdleWaitNoCpu );
+extern int hb_idle_msec_default( void );
+HB_EXTERN_END
+
 void hb_releaseCPU( BOOL bIndefinite )
 {
-#if defined(HB_THREAD_SUPPORT) || defined(HB_OS_WIN) || defined(__CYGWIN__)
    BOOL bIdleWaitNoCpu = ( s_iIdleWaitNoCpu && bIndefinite && !s_uiIdleMaxTask ) ;   /* Only if No idle tasks */
-#else
-   HB_SYMBOL_UNUSED( bIndefinite );
-#endif
+
+   if( s_uiIdleSleepMsec == 0 )
+       s_uiIdleSleepMsec = hb_idle_msec_default();
+
    HB_TRACE(HB_TR_DEBUG, ("releaseCPU()"));
 
    /* TODO: Add code to release time slices on all platforms */
-#ifdef HB_THREAD_SUPPORT
-
-   hb_threadSleep( s_uiIdleSleepMsec, bIdleWaitNoCpu );
-
-#else
-
-   #if defined(HB_OS_WIN) || defined(__CYGWIN__)
-      /* Forfeit the remainder of the current time slice. */
-      if ( bIdleWaitNoCpu )
-      {
-         WaitMessage() ;
-      }
-      else
-      {
-         Sleep( s_uiIdleSleepMsec );
-      }
-   #elif defined(HB_OS_OS2)
-      /* 23/nov/2000 - maurilio.longo@libero.it
-         Minimum time slice under OS/2 is 32 milliseconds, passed 1 will be rounded to 32 and
-         will give a chance to threads of lower priority to get executed.
-         Passing 0 causes current thread to give up its time slice only if there are threads of
-         equal priority waiting to be dispatched. Note: certain versions of OS/2 kernel have a
-         bug which causes DosSleep(0) not to work as expected.  */
-      DosSleep( s_uiIdleSleepMsec ); /* Duration is in milliseconds */
-
-   #elif defined(HB_OS_DOS)
-
-      /* NOTE: there is a bug under NT 4 and 2000 -  if the app is running
-         in protected mode, time slices will _not_ be released - you must switch
-         to real mode first, execute the following, and switch back.
-
-         It just occurred to me that this is actually by design.  Since MS doesn't
-         want you to do this from a console app, their solution was to not allow
-         the call to work in protected mode - screw the rest of the planet <g>.
-
-         returns zero on failure. (means not supported)
-      */
-
-      {
-         union REGS regs;
-
-         regs.h.ah = 2;
-         regs.HB_XREGS.ax = 0x1680;
-
-         HB_DOS_INT86( 0x2F, &regs, &regs );
-      }
-
-   #elif defined(HB_OS_DARWIN)
-      usleep( s_uiIdleSleepMsec );
-   #elif defined(HB_OS_UNIX)
-   {
-
-      //struct timeval tv;
-      //tv.tv_sec = 0;
-      //tv.tv_usec = 1000;
-//      select( 0, NULL, NULL, NULL, &tv );
-      struct timeval tv;
-      tv.tv_sec = 0;
-      tv.tv_usec = 20000;
-      select( 0, NULL, NULL, NULL, &tv );
-
-
-   }
-   #else
-
-   /* Do nothing */
-
-   #endif
-#endif
+   hb_idle_releaseCPU( s_uiIdleSleepMsec, bIdleWaitNoCpu );
 }
 
 /* performs all tasks defined for idle state */
@@ -399,6 +327,9 @@ HB_FUNC( HB_IDLEDEL )
 
 HB_FUNC( HB_IDLESLEEPMSEC )
 {
+   if( s_uiIdleSleepMsec == 0 )
+       s_uiIdleSleepMsec = hb_idle_msec_default();
+
    hb_retnl( s_uiIdleSleepMsec );
    if ( hb_pcount() > 0 )
    {

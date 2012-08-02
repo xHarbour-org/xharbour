@@ -57,12 +57,15 @@
 
 #ifdef HB_EXTENSION
 
-#ifdef HB_THREAD_SUPPORT
-   static HB_CRITICAL_T s_CriticalMutex;
-#endif
-
 // It is Thread Safe - It's manipulated only once at primary thread startup.
 static BOOL s_bDoInit = TRUE;
+
+HB_EXTERN_BEGIN
+extern void hb_trace_critical_Lock( void );
+extern void hb_trace_critical_UnLock( void );
+extern void hb_trace_critical_Init( void );
+extern void hb_trace_critical_Destroy( void );
+HB_EXTERN_END
 
 void hb_traceInit( void )
 {
@@ -73,10 +76,8 @@ void hb_traceInit( void )
    {
       s_bDoInit = FALSE;
 
-      #ifdef HB_THREAD_SUPPORT
-         // Might have been initialized if TraceLog() was called before traceInit!
-         HB_CRITICAL_INIT( s_CriticalMutex );
-      #endif
+      // Might have been initialized if TraceLog() was called before traceInit!
+      hb_trace_critical_Init();
 
       /* Empty the file if it exists. */
       fpTrace = hb_fopen( "trace.log", "w" );
@@ -94,9 +95,7 @@ void hb_traceInit( void )
 
 void hb_traceExit( void )
 {
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_DESTROY( s_CriticalMutex );
-   #endif
+   hb_trace_critical_Destroy();
 }
 
 void TraceLog( const char * sFile, const char * sTraceMsg, ... )
@@ -114,14 +113,10 @@ void TraceLog( const char * sFile, const char * sTraceMsg, ... )
       s_bDoInit = FALSE;
       bEmpty = TRUE;
 
-      #ifdef HB_THREAD_SUPPORT
-         HB_CRITICAL_INIT( s_CriticalMutex );
-      #endif
+      hb_trace_critical_Init();
    }
 
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_LOCK( s_CriticalMutex );
-   #endif
+   hb_trace_critical_Lock();
 
    if( sFile == NULL )
    {
@@ -151,9 +146,7 @@ void TraceLog( const char * sFile, const char * sTraceMsg, ... )
       fclose( hFile );
    }
 
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_UNLOCK( s_CriticalMutex );
-   #endif
+   hb_trace_critical_UnLock();
 }
 
 HB_FUNC( HB_TRACESTATE )
