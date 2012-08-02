@@ -3258,6 +3258,7 @@ int hb_get_Area_Handle_From_Sym( PHB_SYMB pSymAlias )
 #ifndef HB_THREAD_SUPPORT
    int iArea = HB_GET_AREA_HANDLE( pSymAlias->pDynSym );
 #else
+   HB_THREAD_STUB
    PHB_DYNS pDyn = hb_setGetWorkareasShared() ? pSymAlias->pDynSym : s_rddAliasThFind( ( pSymAlias )->szName, &HB_VM_STACK );
    int iArea = HB_GET_AREA_HANDLE( pDyn );
 #endif
@@ -3269,6 +3270,7 @@ void hb_get_Area_Handle_From_Name( int * iArea, const char * szAlias )
 #ifndef HB_THREAD_SUPPORT
    PHB_DYNS pDyn = hb_dynsymFindName( szAlias );
 #else
+   HB_THREAD_STUB
    PHB_DYNS pDyn = hb_setGetWorkareasShared() ? hb_dynsymFindName( szAlias ) : s_rddAliasThFind( szAlias, &HB_VM_STACK );
 #endif
    * iArea = HB_GET_AREA_HANDLE( pDyn );
@@ -3279,6 +3281,7 @@ PHB_DYNS hb_get_Area_Sym( const char * szAlias )
    PHB_DYNS pSymAlias;
 
 #ifdef HB_THREAD_SUPPORT
+   HB_THREAD_STUB
    if ( ! hb_setGetWorkareasShared() )
       pSymAlias = s_rddAliasThGet( szAlias, &HB_VM_STACK );
    else
@@ -3405,6 +3408,7 @@ void hb_idle_releaseCPU( USHORT uiIdleSleepMsec, BOOL bIdleWaitNoCpu )
 void hb_stack_lock( void )
 {
 #if defined( HB_THREAD_SUPPORT )
+   HB_THREAD_STUB
    if( ! HB_VM_STACK.bInUse && HB_VM_STACK.uiIdleInspect == 0)
    {
       HB_SHARED_LOCK( hb_runningStacks );
@@ -3422,6 +3426,7 @@ void hb_stack_lock( void )
 void hb_stack_unlock( void )
 {
 #if defined( HB_THREAD_SUPPORT )
+   HB_THREAD_STUB
    if( HB_VM_STACK.bInUse && HB_VM_STACK.uiIdleInspect == 0 )
    {
       HB_SHARED_LOCK( hb_runningStacks );
@@ -3450,6 +3455,7 @@ void hb_console_UnLock( void )
 void hb_console_safe_lock( void )
 {
 #if defined( HB_THREAD_SUPPORT )
+   HB_THREAD_STUB
    HB_CLEANUP_PUSH( hb_setGetOutputSafety() ? s_doNothing : hb_rawMutexForceUnlock, hb_outputMutex );
    if ( hb_setGetOutputSafety() )
       HB_CRITICAL_LOCK( hb_outputMutex );
@@ -3459,6 +3465,7 @@ void hb_console_safe_lock( void )
 void hb_console_safe_unlock( void )
 {
 #if defined( HB_THREAD_SUPPORT )
+   HB_THREAD_STUB
    if ( hb_setGetOutputSafety() )
       HB_CRITICAL_UNLOCK( hb_outputMutex );
    HB_CLEANUP_POP;
