@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-02 21:49 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbstack.h
+    ! use fake typedef for HB_CRITICAL_T in ST compilation
+
 2012-08-02 19:49 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.gc
     ! remove not required MT attributes
