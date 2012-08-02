@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-02 18:19 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/estack.c
+    ! fix compilation on MT mode when HB_VM_ALL is not defined
+
 2012-08-02 18:04 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/thread.c
     ! fix compilation on MT mode when HB_VM_ALL is not defined

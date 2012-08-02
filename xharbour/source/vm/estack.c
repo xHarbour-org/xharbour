@@ -208,6 +208,7 @@ HB_EXTERN_BEGIN
 void hb_s_hb_exc( HB_MATH_EXCEPTION hb_exc )
 {
 #ifdef HB_THREAD_SUPPORT
+   HB_THREAD_STUB
    (HB_VM_STACK.math_exc).type        = hb_exc.type;
    (HB_VM_STACK.math_exc).funcname    = hb_exc.funcname;
    (HB_VM_STACK.math_exc).error       = hb_exc.error;
