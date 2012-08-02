@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-02 17:51 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/estack.c
+    + #include "hbmath.h" -> just in case
+
+  * source/vm/inet.c
+  * source/rtl/filenet.c
+  * source/rtl/hbsrlraw.c
+  * contrib/what32/source/_winsock.c
+    ! reordered include files and/or remove not required one to fix
+    compilation on some compilers
+
 2012-08-02 08:25 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/macro/macro.y
   * source/macro/macroyy.c

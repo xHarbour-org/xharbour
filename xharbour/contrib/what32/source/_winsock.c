@@ -10,7 +10,7 @@
 
 #include "hbapi.h"
 #include "hbvm.h"
-#include "hbstack.h"
+// #include "hbstack.h"
 #include "hbapiitm.h"
 #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
 #include <time.h>

@@ -63,7 +63,7 @@
 #include "hbapiitm.h"
 #include "hbset.h"
 #include "hbapierr.h"
-#include "hbstack.h"
+// #include "hbstack.h"
 #include "hbvm.h"
 #include "hbipapi.h"
 #include "directry.ch"

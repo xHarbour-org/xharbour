@@ -55,9 +55,9 @@
 
 #include "hbapi.h"
 #include "hbapiitm.h"
+#include "inet.h"
 #include "hbstack.h"
 #include "hbapierr.h"
-#include "inet.h"
 #include "hbdate.h"
 #include "hbfast.h"
 

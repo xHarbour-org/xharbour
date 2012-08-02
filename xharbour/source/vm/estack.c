@@ -67,6 +67,7 @@
 #include "hbapierr.h"
 #include "hbvm.h"
 #include "hbapirdd.h"
+#include "hbmath.h"
 
 HB_EXTERN_BEGIN
 

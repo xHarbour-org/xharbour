@@ -62,8 +62,8 @@
 #endif
 #include "hbapi.h"
 #include "hbapiitm.h"
-#include "hbstack.h"
 #include "inet.h"
+#include "hbstack.h"
 #include <fcntl.h>
 #include <errno.h>
 
