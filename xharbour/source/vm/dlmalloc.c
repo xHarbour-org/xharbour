@@ -1986,7 +1986,11 @@ static void init_malloc_global_mutex( void ) {
       return;
     /* transition to < 0 while initializing, then to > 0) */
     if (stat == 0 &&
+#if defined(__DMC__)
         interlockedcompareexchange((void**)&malloc_global_mutex_status, (void**)-1, 0) == 0) {
+#else
+        interlockedcompareexchange(&malloc_global_mutex_status, -1, 0) == 0) {
+#endif
       InitializeCriticalSection(&malloc_global_mutex);
       interlockedexchange(&malloc_global_mutex_status,1);
       return;
