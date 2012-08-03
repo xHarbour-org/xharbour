@@ -153,7 +153,7 @@ CLASS DataTable INHERIT Component
    METHOD SetOrder( nOrder )                  INLINE ::Connector:SetOrder( nOrder )
    METHOD Select()                            INLINE ::Connector:Select()
    METHOD SelectArea()                        INLINE ::Connector:SelectArea()
-   METHOD Delete()                            INLINE ::Connector:Delete()
+   METHOD Delete()                            INLINE ::__lNew := .F., ::__aData := {}, ::Connector:Delete()
    METHOD Recall()                            INLINE ::Connector:Recall()
    METHOD Seek( xKey, lSoft )                 INLINE ::Connector:Seek( xKey, lSoft )
    METHOD Found()                             INLINE ::Connector:Found()
@@ -173,8 +173,8 @@ CLASS DataTable INHERIT Component
    METHOD OrdKeyCount()                       INLINE ::Connector:OrdKeyCount()
    METHOD Used()                              INLINE ::Connector:Used()
 
-   METHOD FieldPut( nField, xVal )            INLINE IIF( ::__lNew, ::__aData[nField] := xVal, ::Connector:FieldPut( nField, xVal ) )
-   METHOD FieldGet( nField )                  INLINE IIF( ! Empty(::__aData), ::__aData[nField], ::Connector:FieldGet( nField ) )
+   METHOD FieldPut( nField, xVal )            INLINE IIF( ! Empty(::__aData), ::__aData[nField] := xVal, ::Connector:FieldPut( nField, xVal ) )
+   METHOD FieldGet( nField,n )                INLINE IIF( ! Empty(::__aData) .AND. n==NIL, ::__aData[nField], ::Connector:FieldGet( nField ) )
   
    METHOD FieldType( nField )                 INLINE ::Connector:FieldType( nField )
 
@@ -225,7 +225,7 @@ METHOD Blank() CLASS DataTable
                xValue := .F.
           CASE ::Structure[n][2] == "D"
                xValue := CTOD("")
-          CASE ::Structure[n][2] == "N"
+          OTHERWISE
                xValue := ""
        ENDCASE
        AADD( ::__aData, xValue )
@@ -237,7 +237,7 @@ METHOD Save() CLASS DataTable
    IF ::__lNew
       ::Append()
    ENDIF
-   AEVAL( ::__aData, {|,n| (::Alias)->( FieldPut( n, ::__aData[n] ) ) } )
+   AEVAL( ::__aData, {|,n| IIF( ::__aData[n] != NIL, (::Alias)->( FieldPut( n, ::__aData[n] ) ),) } )
    IF ::__lNew .AND. ::Shared
       ::Unlock()
    ENDIF
@@ -248,10 +248,12 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD Load() CLASS DataTable
    LOCAL n
-   ::__aData := {}
-   FOR n := 1 TO LEN( ::Structure )
-       AADD( ::__aData, ::FieldGet(n) )
-   NEXT
+   IF ! ::__lNew
+      ::__aData := {}
+      FOR n := 1 TO LEN( ::Structure )
+          AADD( ::__aData, ::FieldGet(n,1) )
+      NEXT
+   ENDIF
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------

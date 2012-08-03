@@ -134,15 +134,16 @@ METHOD SetPosition() CLASS MessageWait
    LOCAL hDC := GetDC( ::hWnd )
    aBar := {4,aRect[4]-24,aRect[3]-4,aRect[4]-4}
    hTheme := OpenThemeData(,"PROGRESS")
+   IF s_cCancel != NIL
+      aBar[2] -= 30
+      aBar[4] -= 30
+   ENDIF
+
    DrawThemeBackground( hTheme, hDC, PP_BAR, 0, aBar )
    aBar[1]+=1
    aBar[2]+=1
    aBar[3]-=1
    aBar[4]-=1
-
-   IF s_cCancel != NIL
-      aBar[2] -= 30
-   ENDIF
 
    aBar[3] := aBar[1] + (((aBar[3] - aBar[1]) * ::xPosition )/100)
    DrawThemeBackground( hTheme, hDC, PP_CHUNK, 0, aBar )

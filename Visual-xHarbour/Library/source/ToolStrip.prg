@@ -1779,7 +1779,10 @@ METHOD Create() CLASS ToolStripButton
       ::xText := EVAL( &(::xText) )
 
       IF ( n := AT( "&", ::xText ) ) > 0
-         ::Form:RegisterHotKey( ::Id, MOD_ALT, ASC( Upper(::xText[n+1]) ) )
+         ::Parent:Form:AddAccelerator( FVIRTKEY | FCONTROL, ASC( Upper(::xText[n+1]) ), ::Id )
+         //::Form:RegisterHotKey( ::Id, MOD_ALT, ASC( Upper(::xText[n+1]) ) )
+       ELSE
+         ::ShortCutKey:SetAccel()
       ENDIF
    ENDIF
    aSize := ::Drawing:GetTextExtentPoint32( STRTRAN( ::Caption, "&" ) )

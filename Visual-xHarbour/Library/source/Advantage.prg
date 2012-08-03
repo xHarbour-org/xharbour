@@ -15,6 +15,7 @@
 
 #include "vxh.ch"
 #include "ord.ch"
+#include "debug.ch"
 
 //-------------------------------------------------------------------------------------------------------
 
@@ -33,7 +34,45 @@ CLASS AdsDataTable INHERIT DataTable
 
    METHOD BlobGet( nFieldNo, nStart, nCount ) INLINE (::Area)->( dbFieldInfo( DBS_BLOB_GET, nFieldNo, { nStart, nCount } ) )
    METHOD MemoExt()                           INLINE ".adm"
+   METHOD Save()
+   METHOD SetData()
+   METHOD FieldPut()
 ENDCLASS
+
+//-------------------------------------------------------------------------------------------------------
+METHOD Save() CLASS AdsDataTable
+   IF ::__lNew
+      ::Append()
+   ENDIF
+   AEVAL( ::__aData, {|,n| ::SetData(n) } )
+   IF ::__lNew .AND. ::Shared
+      ::Unlock()
+   ENDIF
+   ::__lNew := .F.
+   ::__aData := {}
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+METHOD SetData(n) CLASS AdsDataTable
+   IF ::Structure[n][2] == "BINARY" .AND. ! Empty( ::__aData[n] )
+      ::File2Blob( ::__aData[n], ::Structure[n][1] )
+    ELSE
+      (::Alias)->( FieldPut( n, ::__aData[n] ) )
+   ENDIF
+RETURN NIL
+
+//-------------------------------------------------------------------------------------------------------
+METHOD FieldPut( nField, xVal ) CLASS AdsDataTable
+   IF ! Empty( ::__aData )
+      ::__aData[nField] := xVal
+    ELSE
+      IF ::Structure[nField][2] == "BINARY" .AND. ! Empty( xVal )
+         ::File2Blob( xVal, ::Structure[nField][1] )
+       ELSE
+         ::Connector:FieldPut( nField, xVal )
+      ENDIF
+   ENDIF
+RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 

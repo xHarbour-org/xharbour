@@ -7,6 +7,16 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2012-08-02 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added AdsDataTable methods Save(), SetData() and FieldPut() to save off buffered
+     blob fields.
+   + Added DataTable:Delete()
+   ! Fixed DataTable:Load() to allow buffering Memo and Binary fields
+   ! Fixed ToolStripButton to create hotkey based on CTRL + underlined letter if
+     accelerator is not specified.
+   ! Fixed bug displaying progress bar on the MessageWait window.
+
 2012-08-01 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    + Added MessageWait( cText, cTitle, lProgress, cCancel ) cCancel parameter. This will
      contain the text of a button that will cancel a process "Cancel". Processes MUST
