@@ -1519,7 +1519,7 @@ LONG __cdecl _InterlockedExchange(LONG volatile *Target, LONG Value);
 #endif /* Win32 */
 #endif /* USE_LOCKS */
 
-#if defined(__BORLANDC__)
+#if defined(__BORLANDC__) || defined(__WATCOMC__) || defined(__DMC__)
 #define interlockedcompareexchange InterlockedCompareExchange
 #define interlockedexchange InterlockedExchange
 #endif
@@ -1986,7 +1986,7 @@ static void init_malloc_global_mutex( void ) {
       return;
     /* transition to < 0 while initializing, then to > 0) */
     if (stat == 0 &&
-        interlockedcompareexchange(&malloc_global_mutex_status, -1, 0) == 0) {
+        interlockedcompareexchange((void**)&malloc_global_mutex_status, (void**)-1, 0) == 0) {
       InitializeCriticalSection(&malloc_global_mutex);
       interlockedexchange(&malloc_global_mutex_status,1);
       return;

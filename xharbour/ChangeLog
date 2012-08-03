@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-03 07:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/fm.c
+  * source/vm/dlmalloc.c
+    ! fixed to compile under Digital Mars and Open Watcom (MT using dlmalloc)
+
 2012-08-03 02:53 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbstack.h
     ! reverted previous changes, it did not work.

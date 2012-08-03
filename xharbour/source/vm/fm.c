@@ -139,8 +139,20 @@
 #     pragma warn -rch
 #     pragma warn -inl
 #  elif defined( _MSC_VER ) || defined( __DMC__ ) || defined( __WATCOMC__ )
+#     if defined( __DMC__ )
+         HB_EXTERN_BEGIN
+         WINBASEAPI
+         BOOL
+         WINAPI
+         InitializeCriticalSectionAndSpinCount(
+             LPCRITICAL_SECTION lpCriticalSection,
+             DWORD dwSpinCount
+             );
+         HB_EXTERN_END
+#     endif
 #     if defined( __WATCOMC__ )
 #        pragma disable_message ( 201 )
+#        pragma disable_message ( 302 )
 #     endif
 #     define USE_DL_PREFIX
 #  endif
