@@ -727,6 +727,8 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hbbitf$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbchksum$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbcomprs$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbsocket$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbsockhb$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbserv$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbzlibgz$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbcrc32$(OBJEXT)\

@@ -8,6 +8,27 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-05 22:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + include/hbsocket.ch
+  + include/hbsocket.h
+  + source/rtl/hbsocket.c
+  + source/rtl/hbsockhb.c
+    ! socket routines borrowed from Harbour
+
+  * source/rtl/hbip.c
+    ! rename hb_socketConnect -> hb_socketConnect_
+
+  + tests/ipsvr.prg
+    ! test program for Harbour socket borrowed from Harbour
+
+  * include/thread.h
+  * source/vm/thread.c
+    + supporting functions for Harbour socket
+
+  * winmake/common.mak
+  * winmake/compile.mak
+    + Harbour socket dependencies
+
 2012-08-03 07:27 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/dlmalloc.c
     ! remove castings for non-DMC compilers

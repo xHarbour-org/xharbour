@@ -2910,6 +2910,7 @@ HB_FUNC( ISVALIDTHREAD )
 HB_EXTERN_BEGIN
 
 #ifdef HB_THREAD_SUPPORT
+   static HB_CRITICAL_T  s_sockMtx;
    static HB_CRITICAL_T  s_hsxMtx;
    static HB_CRITICAL_T  s_fileMtx;
    static HB_CRITICAL_T  s_fileNetMtx;
@@ -2917,6 +2918,29 @@ HB_EXTERN_BEGIN
    static HB_CRITICAL_T  s_ServiceMutex;
    static void s_doNothing( void *nothing ) { HB_SYMBOL_UNUSED( nothing ) ;}
 #endif
+
+/* source/rtl/hbsocket.c */
+
+void hb_socket_LockInit( void )
+{
+#if defined( HB_THREAD_SUPPORT )
+   HB_CRITICAL_INIT( s_sockMtx );
+#endif
+}
+
+void hb_socket_Lock( void )
+{
+#if defined( HB_THREAD_SUPPORT )
+   HB_CRITICAL_LOCK( s_sockMtx );
+#endif
+}
+
+void hb_socket_UnLock( void )
+{
+#if defined( HB_THREAD_SUPPORT )
+   HB_CRITICAL_UNLOCK( s_sockMtx );
+#endif
+}
 
 /* source/rtl/hbserv.c */
 

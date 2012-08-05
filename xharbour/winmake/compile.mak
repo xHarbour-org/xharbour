@@ -1984,6 +1984,12 @@ $(OBJ_DIR)$(DIR_SEP)hbserial$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hbserial.c
 $(OBJ_DIR)$(DIR_SEP)hbserv$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbserv.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)hbsocket$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbsocket.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbsockhb$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbsockhb.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)hbsrlraw$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbsrlraw.c
 	$(CC_CMD)
 

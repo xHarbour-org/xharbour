@@ -375,7 +375,7 @@ static void hb_socketSetBlocking( HB_SOCKET_T hSocket )
 #endif
 }
 
-int hb_socketConnect( HB_SOCKET_T hSocket, struct sockaddr_in *remote, int timeout )
+int hb_socketConnect_( HB_SOCKET_T hSocket, struct sockaddr_in *remote, int timeout )
 {
    int iErr1;
    #if ! defined(HB_OS_WIN)
@@ -548,7 +548,7 @@ HB_SOCKET_T hb_ipConnect( const char * szHost, int iPort, int timeout )
          */
          hb_ipSetBufSize( hSocket, BUFFER_SIZE, BUFFER_SIZE );
 
-         if( ! hb_socketConnect( hSocket, &remote, timeout ) )
+         if( ! hb_socketConnect_( hSocket, &remote, timeout ) )
             hSocket = ( HB_SOCKET_T ) -1;
       }
    }
