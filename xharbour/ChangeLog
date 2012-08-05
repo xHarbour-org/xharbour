@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-06 01:03 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/hbsockhb.c
+    ! minor tweak to kill BCC warning
+
 2012-08-06 00:57 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.bc
     + link ws2_32.lib when creating harbour.dll
