@@ -160,6 +160,8 @@ C_SOURCES=\
 	sha1hmac.c \
 	sha2.c \
 	sha2hmac.c \
+	hbsocket.c \
+	hbsockhb.c \
 
 
 PRG_SOURCES=\

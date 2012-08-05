@@ -903,7 +903,7 @@ HB_EXTERN_END
 #else
 
    #define HB_THREAD_T HB_PTRDIFF
-
+   #define HB_CRITICAL_T               ULONG
    #define HB_ATOMIC_INC( x )    ( ++(x) )
    #define HB_ATOMIC_DEC( x )    ( --(x) )
 

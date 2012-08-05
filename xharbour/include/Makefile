@@ -72,8 +72,9 @@ C_HEADERS=\
 	ctset.h      \
 	ctstr.h      \
 	hbapises.h   \
-        pragma.h     \
-        hbzlib.h     \
+	pragma.h     \
+	hbzlib.h     \
+	hbsocket.h \
 
 PRG_HEADERS=\
 	achoice.ch   \
@@ -135,6 +136,7 @@ PRG_HEADERS=\
 	ctvideo.ch   \
 	ctwin.ch     \
 	cterror.ch   \
+	hbsocket.ch  \	
 
 API_HEADERS=\
 	error.api    \
