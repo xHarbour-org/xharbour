@@ -345,7 +345,7 @@ HB_FUNC( HB_SOCKETCONNECT )
 
    if( socket != HB_NO_SOCKET && socketaddrParam( 2, &addr, &len ) )
    {
-      hb_retl( hb_socketConnect_( socket, addr, len, hb_parnintdef( 3, -1 ) ) == 0 );
+      hb_retl( hb_socketConnect( socket, addr, len, hb_parnintdef( 3, -1 ) ) == 0 );
       hb_xfree( addr );
    }
 }
