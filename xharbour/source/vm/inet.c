@@ -55,11 +55,7 @@
 *
 */
 
-#if (defined( __EXPORT__ ) && defined( HB_VM_ALL )) || defined( HB_THREAD_SUPPORT )
-#include "hbvmopt.h"
-#else
 #define _HB_API_INTERNAL_
-#endif
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "inet.h"

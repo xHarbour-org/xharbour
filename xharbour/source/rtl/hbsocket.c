@@ -1677,7 +1677,7 @@ BOOL hb_socketLocalAddr( void ** pSockAddr, unsigned * puiLen,
    sa.sun_family = AF_LOCAL;
 #endif
    hb_strncpy( sa.sun_path, szAddr, sizeof( sa.sun_path ) - 1 );
-   *pSockAddr = memcpy( hb_xgrab( sizeof( sa ) + 1 ), &sa, sizeof( sa ) );
+   *pSockAddr = HB_MEMCPY( hb_xgrab( sizeof( sa ) + 1 ), &sa, sizeof( sa ) );
    *puiLen = ( unsigned ) sizeof( sa );
    return TRUE;
 #else
@@ -1701,7 +1701,7 @@ BOOL hb_socketInetAddr( void ** pSockAddr, unsigned * puiLen,
    if( !szAddr || !*szAddr )
    {
       sa.sin_addr.s_addr = htonl( INADDR_ANY );
-      *pSockAddr = memcpy( hb_xgrab( sizeof( sa ) + 1 ), &sa, sizeof( sa ) );
+      *pSockAddr = HB_MEMCPY( hb_xgrab( sizeof( sa ) + 1 ), &sa, sizeof( sa ) );
       *puiLen = ( unsigned ) sizeof( sa );
       return TRUE;
    }
@@ -1717,7 +1717,7 @@ BOOL hb_socketInetAddr( void ** pSockAddr, unsigned * puiLen,
           strcmp( "255.255.255.255", szAddr ) == 0 )  /* dirty hack */
 #endif
       {
-         *pSockAddr = memcpy( hb_xgrab( sizeof( sa ) + 1 ), &sa, sizeof( sa ) );
+         *pSockAddr = HB_MEMCPY( hb_xgrab( sizeof( sa ) + 1 ), &sa, sizeof( sa ) );
          *puiLen = ( unsigned ) sizeof( sa );
          return TRUE;
       }
@@ -1746,13 +1746,13 @@ BOOL hb_socketInet6Addr( void ** pSockAddr, unsigned * puiLen,
    if( !szAddr || !*szAddr )
    {
 #if defined( HB_HAS_INET6_ADDR_CONST )
-      memcpy( &sa.sin6_addr, &in6addr_any, sizeof( struct in6_addr ) );
+      HB_MEMCPY( &sa.sin6_addr, &in6addr_any, sizeof( struct in6_addr ) );
 #elif defined( IN6ADDR_ANY_INIT )
-      memcpy( &sa.sin6_addr, &s_in6addr_any, sizeof( struct in6_addr ) );
+      HB_MEMCPY( &sa.sin6_addr, &s_in6addr_any, sizeof( struct in6_addr ) );
 #else
       int iTODO;
 #endif
-      *pSockAddr = memcpy( hb_xgrab( sizeof( sa ) + 1 ), &sa, sizeof( sa ) );
+      *pSockAddr = HB_MEMCPY( hb_xgrab( sizeof( sa ) + 1 ), &sa, sizeof( sa ) );
       *puiLen = ( unsigned ) sizeof( sa );
       return TRUE;
    }
@@ -1762,7 +1762,7 @@ BOOL hb_socketInet6Addr( void ** pSockAddr, unsigned * puiLen,
       int err = inet_pton( AF_INET6, szAddr, &sa.sin6_addr );
       if( err > 0 )
       {
-         *pSockAddr = memcpy( hb_xgrab( sizeof( sa ) + 1 ), &sa, sizeof( sa ) );
+         *pSockAddr = HB_MEMCPY( hb_xgrab( sizeof( sa ) + 1 ), &sa, sizeof( sa ) );
          *puiLen = ( unsigned ) sizeof( sa );
          return TRUE;
       }
@@ -2028,7 +2028,7 @@ int hb_socketGetSockName( HB_SOCKET sd, void ** pSockAddr, unsigned * puiLen )
    hb_socketSetOsError( ret == 0 ? 0 : HB_SOCK_GETERROR() );
    if( ret == 0 )
    {
-      *pSockAddr = memcpy( hb_xgrab( len + 1 ), &st.sa, len );
+      *pSockAddr = HB_MEMCPY( hb_xgrab( len + 1 ), &st.sa, len );
       *puiLen = ( unsigned ) len;
    }
    else
@@ -2055,7 +2055,7 @@ int hb_socketGetPeerName( HB_SOCKET sd, void ** pSockAddr, unsigned * puiLen )
    hb_socketSetOsError( ret == 0 ? 0 : HB_SOCK_GETERROR() );
    if( ret == 0 )
    {
-      *pSockAddr = memcpy( hb_xgrab( len + 1 ), &st.sa, len );
+      *pSockAddr = HB_MEMCPY( hb_xgrab( len + 1 ), &st.sa, len );
       *puiLen = ( unsigned ) len;
    }
    else
@@ -2225,7 +2225,7 @@ HB_SOCKET hb_socketAccept( HB_SOCKET sd, void ** pSockAddr, unsigned * puiLen, H
          }
          else
          {
-            *pSockAddr = memcpy( hb_xgrab( len + 1 ), &st.sa, len );
+            *pSockAddr = HB_MEMCPY( hb_xgrab( len + 1 ), &st.sa, len );
             *puiLen = ( unsigned ) len;
          }
       }
@@ -2442,7 +2442,7 @@ long hb_socketRecvFrom( HB_SOCKET sd, void * data, long len, int flags, void ** 
          }
          else
          {
-            *pSockAddr = memcpy( hb_xgrab( salen + 1 ), &st.sa, salen );
+            *pSockAddr = HB_MEMCPY( hb_xgrab( salen + 1 ), &st.sa, salen );
             *puiSockLen = ( unsigned ) salen;
          }
       }
@@ -2833,7 +2833,7 @@ BOOL hb_socketResolveInetAddr( void ** pSockAddr, unsigned * puiLen, const char 
    if( !szAddr || !*szAddr )
    {
       sa.sin_addr.s_addr = htonl( INADDR_ANY );
-      *pSockAddr = memcpy( hb_xgrab( sizeof( sa ) + 1 ), &sa, sizeof( sa ) );
+      *pSockAddr = HB_MEMCPY( hb_xgrab( sizeof( sa ) + 1 ), &sa, sizeof( sa ) );
       *puiLen = ( unsigned ) sizeof( sa );
       return TRUE;
    }
@@ -2883,7 +2883,7 @@ BOOL hb_socketResolveInetAddr( void ** pSockAddr, unsigned * puiLen, const char 
 
    if( fTrans )
    {
-      *pSockAddr = memcpy( hb_xgrab( sizeof( sa ) + 1 ), &sa, sizeof( sa ) );
+      *pSockAddr = HB_MEMCPY( hb_xgrab( sizeof( sa ) + 1 ), &sa, sizeof( sa ) );
       *puiLen = ( unsigned ) sizeof( sa );
       return TRUE;
    }
