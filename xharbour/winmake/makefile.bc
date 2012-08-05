@@ -573,11 +573,13 @@ COMPILERLIBS=\
 	cg32.lib\
 	$(COMPILERLIBS)\
 	cw32mt.lib\
+	ws2_32.lib\
 	import32.lib
 !else
 COMPILERLIBS=\
 	$(COMPILERLIBS)\
 	cw32mt.lib\
+	ws2_32.lib\
 	import32.lib
 !endif
 
