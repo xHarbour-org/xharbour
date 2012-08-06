@@ -162,6 +162,12 @@ C_SOURCES=\
 	sha2hmac.c \
 	hbsocket.c \
 	hbsockhb.c \
+	hbcom.c \
+	hbcomhb.c \
+	hbbffnc.c \
+	hbbfish.c \
+	hbrand.c \
+	arc4.c \
 
 
 PRG_SOURCES=\
