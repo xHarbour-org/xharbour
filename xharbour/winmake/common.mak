@@ -918,7 +918,10 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hbbfish$(OBJEXT)\
 	\
 	$(OBJ_DIR)$(DIR_SEP)hbrand$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)arc4$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)arc4$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)hbcom$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbcomhb$(OBJEXT)
 
 #===============================================================================
 # PCREPOS.LIB rules

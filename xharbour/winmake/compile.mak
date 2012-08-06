@@ -1588,6 +1588,12 @@ $(OBJ_DIR)$(DIR_SEP)fmSTAT$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)fm.c
 #===============================================================================
 # RTL.LIB rules
 #===============================================================================
+$(OBJ_DIR)$(DIR_SEP)hbcom$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbcom.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbcomhb$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbcomhb.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)hbrand$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbrand.c
 	$(CC_CMD)
 

@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-06 18:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + source/rtl/hbcom.c
+  + source/rtl/hbcomhb.c
+  + include/hbcom.ch
+  + include/hbapicom.h
+    ! serial communication functions borrowed from Harbour
+
+  * winmake/common.mak
+  * winmake/compile.mak
+    + new members of RTL
+
 2012-08-06 10:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   + source/rtl/hbbffnc.c
   + source/rtl/hbbfish.c
@@ -23,7 +34,7 @@
   + source/rtl/arc4.c
   + include/arc4.h
   + tests/testarc4.prg
-    ! yet another arc4-based random number generator bowwored from Harbour
+    ! yet another arc4-based random number generator borrowed from Harbour
     ! PRG level function :
       HB_RAND32() -> returns an integer between 0 and 0xFFFFFFFF (inclusive)
 
