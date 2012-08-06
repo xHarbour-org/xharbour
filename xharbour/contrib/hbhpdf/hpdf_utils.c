@@ -18,6 +18,9 @@
  *
  */
 
+#if defined( __WATCOMC__ )
+   #pragma disable_message ( 124 )
+#endif
 #include <stdlib.h>
 #include "hpdf_utils.h"
 #include "hpdf_consts.h"

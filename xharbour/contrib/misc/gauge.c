@@ -104,7 +104,7 @@ HB_FUNC( GAUGENEW )
       ISNUM( B_LEFT ) &&
       ( hb_parni( B_RIGHT ) < hb_parni( B_LEFT ) + 9 ) ) );
 
-   hb_itemPutC( hb_arrayGetItemPtr( &Return, B_BARCHAR),( ISCHAR( B_BARCHAR ) ? hb_parcx( B_BARCHAR ) : ( char * ) '\xdb'));
+   hb_itemPutC( hb_arrayGetItemPtr( &Return, B_BARCHAR),( ISCHAR( B_BARCHAR ) ? (char*) hb_parcx( B_BARCHAR ) : ( char * ) '\xdb'));
    hb_itemPutC( hb_arrayGetItemPtr( &Return, B_PERCENT), 0 );
 
    hb_itemReturnForward( &Return );

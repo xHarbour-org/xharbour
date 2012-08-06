@@ -30,6 +30,8 @@
 
 #if defined( __BORLANDC__ )
    #pragma warn -csu
+#elif defined( __WATCOMC__ )
+   #pragma disable_message ( 201 )
 #endif
 
 #endif /* _HBCONF_H */

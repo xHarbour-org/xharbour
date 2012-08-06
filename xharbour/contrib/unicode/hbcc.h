@@ -52,6 +52,8 @@
 
 #if defined(_MSC_VER) && (_MSC_VER>=1400) && !defined(_CRT_SECURE_NO_WARNINGS)
    #define _CRT_SECURE_NO_WARNINGS
+#elif defined( __WATCOMC__ )
+   #pragma disable_message ( 136 )
 #endif
 
 #if !defined( __HBCC_H_INCLUDED )

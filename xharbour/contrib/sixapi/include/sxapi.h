@@ -25,6 +25,10 @@
 #ifndef __SIXAPIC__
 #define __SIXAPIC__
 
+#if defined( __WATCOMC__ )
+   #pragma disable_message ( 136 )
+#endif
+
 #if defined( __DMC__ )
    #include <windows.h>
    #include <tchar.h>

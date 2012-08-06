@@ -12,6 +12,10 @@
       #pragma warn -prc
       #pragma warn -pia
       #pragma warn -use
+   #elif defined( __WATCOMC__ )
+      #pragma disable_message ( 201 )
+      #pragma disable_message ( 136 )
+      #pragma disable_message ( 202 )
    #elif defined( __POCC__ )
       #pragma warn(push)
       #pragma warn(disable:2154)

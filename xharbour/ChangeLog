@@ -8,6 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-07 04:55 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbhpdf/hpdf_utils.c
+  * contrib/hbhpdf/hpdf_conf.h
+  * contrib/unicode/hbcc.h
+  * contrib/hbsqlit3/config.h
+  * contrib/hbbz2/bzlib_pr.h
+  * contrib/sixapi/include/sxapi.h
+  * contrib/misc/gauge.c
+  * contrib/hbexpat/_hbconf.h
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rdd/dbffpt/redbffpt1.c
+    ! pacify Open Watcom warnings
+
 2012-08-06 13:50 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/rtl/Makefile
     source/include/Makefile

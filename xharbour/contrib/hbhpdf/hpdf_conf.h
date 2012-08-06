@@ -35,6 +35,10 @@
    #pragma warn -rch
    #pragma warn -csu
    #pragma warn -par
+#elif defined( __WATCOMC__ )
+   #pragma disable_message ( 136 )
+   #pragma disable_message ( 124 )
+   #pragma disable_message ( 202 )
 #elif defined( __POCC__ )
    #pragma warn(push)
    #pragma warn(disable:2130)

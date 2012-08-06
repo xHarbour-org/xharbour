@@ -55,6 +55,10 @@
  *
  */
 
+#if defined( __WATCOMC__ )
+   #pragma disable_message ( 136 )
+#endif
+
 #if defined( HB_FPT_NO_READLOCK )
 #  undef HB_MEMO_SAFELOCK
 #else
