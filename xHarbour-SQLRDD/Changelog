@@ -8,6 +8,10 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-06 05:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/sqlorax.c
+    ! some changes to make harbour happy
+    
 2012-07-30 00:01 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
   * source/sqlrdd2.prg 
     ! updated SolveRestrictors() method to check for SET_DELETED flag when using deleted record,so it can respect the seek/skip on deleted records
