@@ -2910,6 +2910,7 @@ HB_FUNC( ISVALIDTHREAD )
 HB_EXTERN_BEGIN
 
 #ifdef HB_THREAD_SUPPORT
+   static HB_CRITICAL_T  arc4_lock;
    static HB_CRITICAL_T  s_sockMtx;
    static HB_CRITICAL_T  s_hsxMtx;
    static HB_CRITICAL_T  s_fileMtx;
@@ -2918,6 +2919,28 @@ HB_EXTERN_BEGIN
    static HB_CRITICAL_T  s_ServiceMutex;
    static void s_doNothing( void *nothing ) { HB_SYMBOL_UNUSED( nothing ) ;}
 #endif
+
+/* source/rtl/arc4.c */
+void hb_arc4_LockInit( void )
+{
+#if defined( HB_THREAD_SUPPORT )
+   HB_CRITICAL_INIT( arc4_lock );
+#endif
+}
+
+void hb_arc4_Lock( void )
+{
+#if defined( HB_THREAD_SUPPORT )
+   HB_CRITICAL_LOCK( arc4_lock );
+#endif
+}
+
+void hb_arc4_UnLock( void )
+{
+#if defined( HB_THREAD_SUPPORT )
+   HB_CRITICAL_UNLOCK( arc4_lock );
+#endif
+}
 
 /* source/rtl/hbsocket.c */
 

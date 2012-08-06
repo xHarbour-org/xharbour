@@ -912,7 +912,13 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hbsha1$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbsha1hm$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbsha2$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)hbsha2hm$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)hbsha2hm$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)hbbffnc$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbbfish$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)hbrand$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)arc4$(OBJEXT)
 
 #===============================================================================
 # PCREPOS.LIB rules

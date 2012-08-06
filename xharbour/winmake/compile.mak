@@ -1588,6 +1588,18 @@ $(OBJ_DIR)$(DIR_SEP)fmSTAT$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)fm.c
 #===============================================================================
 # RTL.LIB rules
 #===============================================================================
+$(OBJ_DIR)$(DIR_SEP)hbrand$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbrand.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)arc4$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)arc4.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbbffnc$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbbffnc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbbfish$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbbfish.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)hbsha1$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbsha1.c
 	$(CC_CMD)
 
