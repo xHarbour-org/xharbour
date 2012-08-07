@@ -12,7 +12,7 @@ rem
 rem ============================================================================
 
 SET CC_DIR=E:\DM
-SET BISON_DIR=D:\BISON\BIN
+REM SET BISON_DIR=D:\BISON\BIN
 SET SUB_DIR=dc
 SET HB_GT_LIB=$(GTWIN_LIB)
 
@@ -61,7 +61,7 @@ rem=============================================================================
    SET HB_MT=
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
-   %MAKE_EXE% -l -f winmake\makefile.dc
+   %MAKE_EXE% -l -f winmake\makefile.dc >make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    if "%1"=="NOMT" goto BUILD_OK
    if "%1"=="nomt" goto BUILD_OK
@@ -71,7 +71,7 @@ rem=============================================================================
    SET HB_MT=mt
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
-   %MAKE_EXE% -l -f winmake\makefile.dc
+   %MAKE_EXE% -l -f winmake\makefile.dc >>make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
 
    goto BUILD_OK
@@ -104,7 +104,7 @@ rem=============================================================================
    SET HB_MT=
    SET HB_MT_DIR=\dll
    @CALL winmake\mdir.bat dllcreate
-   %MAKE_EXE% -f winmake\makefile.dc
+   %MAKE_EXE% -f winmake\makefile.dc >dll_%SUB_DIR%.log
    if errorlevel 1 goto DLL_ERR
    goto DLL_OK
 
@@ -133,7 +133,7 @@ rem=============================================================================
    SET HB_MT_DIR=
    SET HB_MT=
    @CALL winmake\mdir.bat
-   %MAKE_EXE% -l -f winmake\makefile.dc
+   %MAKE_EXE% -l -f winmake\makefile.dc >cont_%SUB_DIR%.log
    if errorlevel 1 goto CONTRIBS_ERR
 
 rem=============================================================================

@@ -377,7 +377,7 @@ HB_FUNC( SX_SETDATEFORMAT )
    __hb_setDateFormat( szDateFormat );
 }
 
-BOOL _sx_SetCentury()
+BOOL _sx_SetCentury( void )
 {
    return bCenturyIsOn;
 }

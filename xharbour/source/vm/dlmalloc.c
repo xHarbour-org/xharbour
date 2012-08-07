@@ -518,6 +518,13 @@ MAX_RELEASE_CHECK_RATE   default: 4095 unless not HAVE_MMAP
   disable, set to MAX_SIZE_T. This may lead to a very slight speed
   improvement at the expense of carrying around more memory.
 */
+#if defined (__PICK_DLMALLOC_VERSION)
+/* Version identifier to allow people to support multiple versions */
+#ifndef DLMALLOC_VERSION
+#define DLMALLOC_VERSION 20805
+#endif /* DLMALLOC_VERSION */
+
+#else
 
 /* Version identifier to allow people to support multiple versions */
 #ifndef DLMALLOC_VERSION
@@ -5956,6 +5963,7 @@ int mspace_mallopt(int param_number, int value) {
 
 #endif /* MSPACES */
 
+#endif /* __PICK_DLMALLOC_VERSION */
 
 /* -------------------- Alternative MORECORE functions ------------------- */
 

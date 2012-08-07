@@ -209,7 +209,7 @@ HB_FUNC( SX_DBSTRUCT )
       sx_Select( iWorkArea );
 }
 
-PHB_ITEM _sx_DbStruct()
+PHB_ITEM _sx_DbStruct( void )
 {
    PHB_ITEM pStruct    = hb_itemNew( NULL );
    PHB_ITEM pData      = hb_itemNew( NULL );

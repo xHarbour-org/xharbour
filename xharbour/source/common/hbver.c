@@ -69,6 +69,7 @@
  *
  */
 
+#define __PICK_DLMALLOC_VERSION
 #define HB_OS_WIN_USED
 
 #if defined( __POCC__ )
@@ -81,6 +82,13 @@
 #include "hbcomp.h"
 #include "hbmemory.ch"
 #include "hbexemem.h"
+
+#include "../source/vm/dlmalloc.c"
+#include "../contrib/tiff/tiffvers.h"
+#include "../contrib/jpeg/jversion.h"
+#include "../contrib/png/png.h"
+#include "../source/rtl/pcre/pcre.h"
+#include "../source/rtl/zlib/zlib.h"
 
 #if defined(HB_OS_WIN)
 
@@ -836,6 +844,63 @@ char *hb_verBuildInfo( BOOL bOut )
    hb_conOutErr_( hb_verCvsChangeLogID(), 0, bOut );
    hb_xstrcat( szBuildInfo, hb_verCvsChangeLogID(), "\t", NULL );
    hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+
+   #if defined( HB_FM_DL_ALLOC )
+   {
+      char szDLMallocVer[64];
+      hb_snprintf( szDLMallocVer, sizeof( szDLMallocVer ), "DLMALLOC version: %i\t", DLMALLOC_VERSION );
+      hb_conOutErr_( szDLMallocVer, 0, bOut );
+      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   }
+   #endif
+
+   {
+      char szPCREVer[64];
+      hb_snprintf( szPCREVer, sizeof( szPCREVer ), "PCRE version: %i.%i\t", PCRE_MAJOR, PCRE_MINOR );
+      hb_conOutErr_( szPCREVer, 0, bOut );
+      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   }
+
+   {
+      char szZLIBVer[64];
+      hb_snprintf( szZLIBVer, sizeof( szZLIBVer ), "ZLIB version: %i.%i.%i\t", ZLIB_VER_MAJOR, ZLIB_VER_MINOR, ZLIB_VER_REVISION );
+      hb_conOutErr_( szZLIBVer, 0, bOut );
+      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   }
+
+   #if !defined( HB_NO_DV_MEMCPY )
+   {
+      char szMEMCPYVer[64];
+      hb_snprintf( szMEMCPYVer, sizeof( szMEMCPYVer ), "MEMCPY is: Daniel Vik's memcpy\t" );
+      hb_conOutErr_( szMEMCPYVer, 0, bOut );
+      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   }
+   #endif
+
+   {
+      char szPNGVer[64];
+      hb_snprintf( szPNGVer, sizeof( szPNGVer ), "PNG version: %i.%i.%i\t", PNG_LIBPNG_VER_MAJOR, PNG_LIBPNG_VER_MINOR, PNG_LIBPNG_VER_RELEASE );
+      hb_conOutErr_( szPNGVer, 0, bOut );
+      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   }
+
+   {
+      char szJPEGVer[64];
+      hb_snprintf( szJPEGVer, sizeof( szJPEGVer ), "JPEG version: %s\t", JVERSION );
+      hb_conOutErr_( szJPEGVer, 0, bOut );
+      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   }
+
+   {
+      char szTIFFVer[256];
+      char *pTmp;
+      hb_snprintf( szTIFFVer, sizeof( szTIFFVer ), "TIFF version: %s\t", TIFFLIB_VERSION_STR );
+      if( ( pTmp = strchr( szTIFFVer, '\n' ) ) != NULL )
+         *pTmp = '\0';
+      hb_conOutErr_( szTIFFVer, 0, bOut );
+      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   }
 
    if( strlen( hb_verFlagsC() ) )
    {
@@ -1104,3 +1169,4 @@ char *hb_credits( void )
 
   return szCredits;
 }
+
