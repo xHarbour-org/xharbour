@@ -68,6 +68,10 @@ C_SOURCES=\
 
 PRG_SOURCES=\
 	harbinit.prg \
+	trpcvmmt.prg \
+	lognetmt.prg \
+	errlogmt.prg \
+
 
 ifeq ($(HB_MT),MT)
    MT_LIBNAME=vmmt
