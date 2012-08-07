@@ -7,7 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
+2012-08-07 00:20  UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * include/hbapicom.h
+    ! added missing HB_BOOL define  to make *unix happy
+    
 2012-08-07 04:55 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbhpdf/hpdf_utils.c
   * contrib/hbhpdf/hpdf_conf.h
@@ -21,7 +24,7 @@
   * source/rdd/dbffpt/redbffpt1.c
     ! pacify Open Watcom warnings
 
-2012-08-06 13:50 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+2012-08-06 13:50  UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/rtl/Makefile
     source/include/Makefile
     ! added new depenciencies from Andi last commits
