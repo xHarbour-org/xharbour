@@ -72,7 +72,7 @@ char * hb_dateCDOW( int iDay )
 
 HB_FUNC( CMONTH )
 {
-   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+   PHB_ITEM pDate = hb_param( 1, HB_IT_DATETIME );
 
    if( pDate )
    {
@@ -89,7 +89,7 @@ HB_FUNC( CMONTH )
 
 HB_FUNC( CDOW )
 {
-   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+   PHB_ITEM pDate = hb_param( 1, HB_IT_DATETIME );
 
    if( pDate )
    {

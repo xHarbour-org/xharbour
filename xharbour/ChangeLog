@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-08 05:02 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/datec.c
+    ! CDOW() and CMONTH() now accepts DATETIME values as parameter
+      This fixes the followings which were previously RTE:
+        CDOW( DateTime() )
+        CMONTH( DateTime() )
+
 2012-08-07 18:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/sixapi/source/dbstru.c
   * contrib/sixapi/source/global.c
