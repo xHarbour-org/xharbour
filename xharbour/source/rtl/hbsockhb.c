@@ -435,9 +435,10 @@ HB_FUNC( HB_SOCKETRECVFROM )
             if( lRead >= 0 && lRead < ( long ) nLen )
                nLen = lRead;
          }
-         hb_retnl( lRet = hb_socketRecvFrom( socket, pBuffer, ( long ) nLen,
+         lRet = hb_socketRecvFrom( socket, pBuffer, ( long ) nLen,
                                              hb_parni( 4 ), &addr, &len,
-                                             hb_parnintdef( 6, -1 ) ) );
+                                             hb_parnintdef( 6, -1 ) );
+         hb_retnl( lRet );
 #if 0
          if( ISBYREF( 5 ) )
          {
