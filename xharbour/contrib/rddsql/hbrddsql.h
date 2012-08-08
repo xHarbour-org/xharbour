@@ -60,48 +60,29 @@
 #include "hbapi.h"
 #include "hbrddsql.ch"
 
-#if defined ( __XHARBOUR__ )
+#define S_HB_ARRAYGETSTR( arr, n, phstr, plen ) hb_strget( hb_arrayGetItemPtr( arr, n ), phstr, plen )
+#define S_HB_ITEMCOPYSTR( itm, str, len )       hb_strcopy( itm, str, len )
+#define S_HB_ITEMGETSTR( itm, phstr, plen )     hb_strget( itm, phstr, plen )
+#define S_HB_ITEMPUTSTR( itm, str )             hb_itemPutC( itm, str )
+#define S_HB_ITEMPUTSTRLEN( itm, str, len )     hb_itemPutCL( itm, str, len )
 
-   #define HB_USHORT               USHORT
-   #define HB_ULONG                LONG
-   #define HB_IS_TIMESTAMP         HB_IS_TIMEFLAG
-   #define HB_BYTE                 BYTE
-   #define HB_BOOL                 BOOL
-   #define HB_FALSE                FALSE
-   #define HB_TRUE                 TRUE
-   #define HB_SIZE                 ULONG
-   #define HB_CDP_ISBINSORT(cdp)   0
+#define M_HB_ARRAYGETSTR( arr, n, phstr, len )  hb_strget( hb_arrayGetItemPtr( arr, n ), phstr, len )
+#define M_HB_ITEMGETSTR( itm, phstr, len )      hb_strget( itm, phstr, len )
+#define M_HB_ITEMPUTSTR( itm, str )             hb_itemPutC( itm, str )
+#define M_HB_ITEMPUTSTRLEN( itm, str, len )     hb_itemPutCL( itm, str, len )
+#define M_HB_CHAR  char
 
-   #define S_HB_ARRAYGETSTR( arr, n, phstr, plen ) hb_strget( hb_arrayGetItemPtr( arr, n ), phstr, plen )
-   #define S_HB_ITEMCOPYSTR( itm, str, len )       hb_strcopy( itm, str, len )
-   #define S_HB_ITEMGETSTR( itm, phstr, plen )     hb_strget( itm, phstr, plen )
-   #define S_HB_ITEMPUTSTR( itm, str )             hb_itemPutC( itm, str )
-   #define S_HB_ITEMPUTSTRLEN( itm, str, len )     hb_itemPutCL( itm, str, len )
+#define D_HB_ARRAYGETSTR( arr, n, phstr, len )  hb_strget( hb_arrayGetItemPtr( arr, n ), phstr, len )
+#define D_HB_ITEMGETSTR( itm, phstr, len )      hb_strget( itm, phstr, len )
+#define D_HB_ITEMPUTSTR( itm, str )             hb_itemPutC( itm, str )
+#define D_HB_ITEMPUTSTRLEN( itm, str, len )     hb_itemPutCL( itm, str, len )
+#define D_HB_CHAR   char
 
-   #define M_HB_ARRAYGETSTR( arr, n, phstr, len )  hb_strget( hb_arrayGetItemPtr( arr, n ), phstr, len )
-   #define M_HB_ITEMGETSTR( itm, phstr, len )      hb_strget( itm, phstr, len )
-   #define M_HB_ITEMPUTSTR( itm, str )             hb_itemPutC( itm, str )
-   #define M_HB_ITEMPUTSTRLEN( itm, str, len )     hb_itemPutCL( itm, str, len )
-   #define M_HB_CHAR  char
-
-   #define D_HB_ARRAYGETSTR( arr, n, phstr, len )  hb_strget( hb_arrayGetItemPtr( arr, n ), phstr, len )
-   #define D_HB_ITEMGETSTR( itm, phstr, len )      hb_strget( itm, phstr, len )
-   #define D_HB_ITEMPUTSTR( itm, str )             hb_itemPutC( itm, str )
-   #define D_HB_ITEMPUTSTRLEN( itm, str, len )     hb_itemPutCL( itm, str, len )
-   #define D_HB_CHAR   char
-
-   #define HB_FT_IMAGE HB_FT_PICTURE
-
-   #define O_HB_ARRAYGETSTR( arr, n, phstr, len )  hb_strget( hb_arrayGetItemPtr( arr, n ), phstr, len )
-   #define O_HB_ITEMGETSTR( itm, phstr, len )      hb_strget( itm, phstr, len )
-   #define O_HB_ITEMPUTSTR( itm, str )             hb_itemPutC( itm, str )
-   #define O_HB_ITEMPUTSTRLEN( itm, str, len )     hb_itemPutCL( itm, str, len )
-   #define O_HB_CHAR    char
-   #define HB_I64       INT64
-
-   #define hb_itemPutTS hb_itemPutDTS
-
-#endif
+#define O_HB_ARRAYGETSTR( arr, n, phstr, len )  hb_strget( hb_arrayGetItemPtr( arr, n ), phstr, len )
+#define O_HB_ITEMGETSTR( itm, phstr, len )      hb_strget( itm, phstr, len )
+#define O_HB_ITEMPUTSTR( itm, str )             hb_itemPutC( itm, str )
+#define O_HB_ITEMPUTSTRLEN( itm, str, len )     hb_itemPutCL( itm, str, len )
+#define O_HB_CHAR    char
 
 /*
 ====================================================================

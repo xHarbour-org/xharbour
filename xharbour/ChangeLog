@@ -8,6 +8,28 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-08 08:27 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + include/hbcompat.h
+    + xHarbour types equivalent to Harbour's one
+
+  * include/hbdefs.h
+    + inclusion of hbcompat.h
+
+  * include/hbapicom.h
+  * include/arc4.h
+  * include/hbbfish.h
+  * contrib/hbbtree/hb_btree.h
+  * contrib/hbexpat/core.c
+  * contrib/hbbz2/core.c
+  * contrib/hbmagic/core.c
+  * contrib/hbexpat/internal.c
+  * contrib/rddsql/hbrddsql.h
+  * source/rtl/hbsockhb.c
+  * source/rtl/hbcomprs.c
+  * source/rtl/hbzlibgz.c
+    - remove xHarbour equivalent of Harbour's types since they are now
+    included in hbcompat.h
+
 2012-08-08 05:02 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/datec.c
     ! CDOW() and CMONTH() now accepts DATETIME values as parameter
@@ -67,7 +89,7 @@
   + source/rtl/hbbffnc.c
   + source/rtl/hbbfish.c
   + include/hbbfish.h
-  + tests/tstblow.prg
+  + tests/testblow.prg
     ! blowfish encryption borrowed from Harbour
       PRG function list:
         hb_blowfishKey( <cPass> ) -> <bfKey>

@@ -58,12 +58,6 @@
 
 #include "hbdefs.h"
 
-#define HB_SIZE ULONG
-#define HB_U32  UINT32
-#define HB_U8   BYTE
-#define HB_I32  INT32
-#define HB_ISIZ HB_LONG
-
 #ifdef __cplusplus
 extern "C" {
 #endif

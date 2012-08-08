@@ -66,8 +66,6 @@ HB_EXTERN_BEGIN
 
 #define SUBKEYS_COUNT   18
 #define SBOX_ENTRIES    256
-#define HB_U32          UINT32
-#define HB_SIZE         ULONG
 
 typedef struct
 {

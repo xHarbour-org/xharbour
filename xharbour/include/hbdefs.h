@@ -1366,4 +1366,6 @@ typedef BYTE HB_ATTR;
 // UGLY hack
 #include "hbtrace.h"
 
+#include "hbcompat.h"
+
 #endif /* HB_DEFS_H_ */

@@ -98,9 +98,6 @@
 
 static BOOL s_fInit = FALSE;
 
-#define hb_parnidef( n1, n2 )      ( ISNUM( n1 ) ? hb_parni( n1 ) : n2 )
-#define hb_parnintdef( n1, n2 )    ( ISNUM( n1 ) ? hb_parnint( n1 ) : n2 )
-
 /* Collectable pointer support */
 
 static HB_GARBAGE_FUNC( hb_socket_destructor )
@@ -438,12 +435,9 @@ HB_FUNC( HB_SOCKETRECVFROM )
             if( lRead >= 0 && lRead < ( long ) nLen )
                nLen = lRead;
          }
-
-         lRet = hb_socketRecvFrom( socket, pBuffer, ( long ) nLen,
+         hb_retnl( lRet = hb_socketRecvFrom( socket, pBuffer, ( long ) nLen,
                                              hb_parni( 4 ), &addr, &len,
-                                             hb_parnintdef( 6, -1 ) );
-
-         hb_retnl( lRet );
+                                             hb_parnintdef( 6, -1 ) ) );
 #if 0
          if( ISBYREF( 5 ) )
          {

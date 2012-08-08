@@ -67,22 +67,6 @@ HB_EXTERN_BEGIN
 #define HB_COM_ENABLED        1
 #define HB_COM_OPEN           2
 
-#define HB_MAXINT             HB_LONG
-#define HB_TRUE               TRUE
-#define HB_FALSE              FALSE
-#define HB_SIZE               ULONG
-#define HB_U32                UINT32
-#define HB_U8                 BYTE
-#define HB_I32                INT32
-#define HB_ISIZ               HB_LONG
-#define hb_vmAtQuit           hb_vmAtExit
-#define HB_FSNAMECONV         hb_fsNameConv
-#define HB_ISCHAR             ISCHAR
-#define HB_ISBYREF            ISBYREF
-#define HB_ISNUM              ISNUM
-#define hb_parnidef( n1, n2 ) ( ISNUM( n1 ) ? hb_parni( n1 ) : n2 )
-#define HB_BOOL               BOOL
-
 extern HB_EXPORT int  hb_comLastNum( void );
 extern HB_EXPORT int  hb_comOpen( int iPort );
 extern HB_EXPORT int  hb_comClose( int iPort );

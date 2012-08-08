@@ -59,8 +59,6 @@
 
 #include "hbbz2.ch"
 
-#define hb_parnidef( n1, n2 )      ( ISNUM( n1 ) ? hb_parni( n1 ) : n2 )
-
 /* Required if bz2 lib was built with BZ_NO_STDIO [vszakats] */
 void bz_internal_error( int errcode )
 {

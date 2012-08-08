@@ -55,8 +55,6 @@
 #include "hbapi.h"
 #include "hbapierr.h"
 
-#define hb_parnidef( n1, n2 )      ( ISNUM( n1 ) ? hb_parni( n1 ) : n2 )
-
 static HB_GARBAGE_FUNC( magic_gc_close )
 {
    void ** ph = ( void ** ) Cargo;

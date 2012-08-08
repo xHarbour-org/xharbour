@@ -128,13 +128,6 @@ typedef struct _HB_EXPAT
          hb_errRT_BASE( EG_ARG, 2020, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS ); \
    }
 
-#define hb_retns  hb_retnl
-#define hb_gcMark hb_gcItemRef
-#define HB_BOOL   BOOL
-#define HB_FALSE  FALSE
-#define HB_TRUE   TRUE
-#define HB_UINT   UINT
-#define HB_ISIZ   LONG
 /* ---------------------------------------------------------------------------- */
 /* Global initialization/deinitialization */
 

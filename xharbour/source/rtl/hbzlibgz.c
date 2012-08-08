@@ -57,8 +57,6 @@
 
 #include <zlib.h>
 
-#define hb_parnidef( n1, n2 )      ( ISNUM( n1 ) ? hb_parni( n1 ) : n2 )
-
 /* GZIP stream destructor */
 static HB_GARBAGE_FUNC( hb_gz_Destructor )
 {

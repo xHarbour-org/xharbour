@@ -70,9 +70,6 @@
 #include "hbzlib.h"
 int s_hb_compress_error;
 
-
-#define hb_parnidef( n1, n2 )      ( ISNUM( n1 ) ? hb_parni( n1 ) : n2 )
-
 static int hb_gz_compress( char ** pDstPtr, ULONG * pnDst,
                            const char * pSrc, ULONG nSrc, int level )
 {

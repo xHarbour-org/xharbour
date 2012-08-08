@@ -4,9 +4,9 @@
 
 /*
  * Harbour Project source code:
- * expat API - Harbour complementary functions
+ * Header file for compiler and runtime basic type declarations
  *
- * Copyright 2010 Viktor Szakats (harbour syenar.net)
+ * Copyright 1999 {list of individual authors and e-mail addresses}
  * www - http://harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,23 +50,39 @@
  *
  */
 
-#include "hbapicdp.h"
-#include "hbapiitm.h"
+#ifndef HB_COMPAT_H_
+#define HB_COMPAT_H_
 
-HB_FUNC( __HB_XML_CDPU16MAP )
-{
-   PHB_CODEPAGE cdp = hb_cdpFindExt( hb_parc( 1 ) );
+#define HB_MAXINT                 HB_LONG
+#define HB_BOOL                   BOOL
+#define HB_TRUE                   TRUE
+#define HB_FALSE                  FALSE
+#define HB_SIZE                   ULONG
+#define HB_U32                    UINT32
+#define HB_U8                     BYTE
+#define HB_UINT                   UINT
+#define HB_U16                    UINT16
+#define HB_I32                    INT32
+#define HB_ISIZ                   HB_LONG
+#define HB_ISCHAR                 ISCHAR
+#define HB_ISBYREF                ISBYREF
+#define HB_ISNUM                  ISNUM
+#define hb_parldef( l1, l2 )      ( ISLOG( l1 ) ? hb_parl( l1 )    : l2 )
+#define hb_parnidef( n1, n2 )     ( ISNUM( n1 ) ? hb_parni( n1 )   : n2 )
+#define hb_parnintdef( n1, n2 )   ( ISNUM( n1 ) ? hb_parnint( n1 ) : n2 )
+#define HB_ULONG                  ULONG
+#define HB_BYTE                   BYTE
+#define HB_USHORT                 USHORT
+#define HB_UCHAR                  UCHAR
+#define HB_FT_IMAGE               HB_FT_PICTURE
+#define HB_I64                    INT64
+#define hb_retns                  hb_retnl
+#define hb_gcMark                 hb_gcItemRef
+#define hb_vmAtQuit               hb_vmAtExit
+#define HB_FSNAMECONV             hb_fsNameConv
+#define hb_cdpFindExt             hb_cdpFind
+#define hb_itemPutTS              hb_itemPutDTS
+#define HB_IS_TIMESTAMP           HB_IS_TIMEFLAG
+#define HB_CDP_ISBINSORT(cdp)     0
 
-   if( cdp )
-   {
-      PHB_ITEM pMap = hb_itemArrayNew( UCHAR_MAX + 1 );
-      unsigned int tmp;
-
-      for( tmp = 0; tmp <= UCHAR_MAX; ++tmp )
-         hb_arraySetNI( pMap, tmp + 1, hb_cdpGetU16( cdp, TRUE, ( HB_UCHAR ) tmp ) );
-
-      hb_itemReturnRelease( pMap );
-   }
-   else
-      hb_ret();
-}
+#endif /* HB_COMPAT_H_ */

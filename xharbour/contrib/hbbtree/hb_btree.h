@@ -40,17 +40,6 @@ HB_EXTERN_BEGIN
 
 #include "hb_btree.ch"
 
-#define HB_ULONG  ULONG
-#define HB_BOOL   BOOL
-#define HB_BYTE   BYTE
-#define HB_USHORT USHORT
-#define HB_FALSE  FALSE
-#define HB_TRUE   TRUE
-#define HB_ISCHAR ISCHAR
-#define HB_ISNUM  ISNUM
-#define HB_U32    UINT32
-#define HB_U16    UINT16
-
 struct hb_BTree;
 
 struct hb_BTree * hb_BTreeNew( const char * FileName, HB_USHORT usPageSize, HB_USHORT usKeySize,
