@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-11 06:27 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * ChangeLog
+    ! correction on my note vis:
+      2012-08-10 08:27 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+      RE: TODO -> MinGW : GPF when loading PNG and JPG.
+      This was wrong. No GPF occurs.
+
 2012-08-10 10:43 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/common/hbver.c
     ! jpeg lib version using integer
