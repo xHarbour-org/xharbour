@@ -21,7 +21,7 @@ PROCEDURE MAIN()
    LOCAL current_page := 1
    LOCAL image
    LOCAL imageno := 1
-   LOCAL aPicture := {"mygif.gif","mybmp.bmp","mypng.png"}
+   LOCAL aPicture := {"mygif.gif","mybmp.bmp","mypng.png", "myjpg.jpg"}
 
    if PDF_new()
 

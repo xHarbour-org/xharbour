@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-10 08:27 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/pdflite/pdflib/p_jpeg.c
+  * contrib/pdflite/include/p_intern.h
+  * contrib/pdflite/hbpdflib.c
+  * contrib/pdflite/tests/img2pdf.prg
+  + contrib/pdflite/tests/myjpg.jpg
+    + added support for JPEG format
+    TODO: PellesC: GPF when loading JPG
+          MinGW  : GPF when loading PNG and JPG
+
 2012-08-08 16:43 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbexpat/core.c
     ! HB_ISIZ -> LONG

@@ -16,7 +16,10 @@
  *
  */
 
-#define   HAVE_BOOLEAN
+//#if defined( __WIN32__ )
+//   #define WIN32_LEAN_AND_MEAN
+//#endif
+
 #include "p_intern.h"
 #include "p_color.h"
 #include "p_image.h"
@@ -53,6 +56,7 @@ pdf_cleanup_jpeg(PDF *p, pdf_image *image)
 
 #else
 
+#define JPEG_INTERNALS
 #include "jinclude.h"
 #include "jpeglib.h"
 

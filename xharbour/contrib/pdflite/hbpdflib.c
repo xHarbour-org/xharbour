@@ -156,7 +156,16 @@ HB_FUNC( PDF_LOAD_IMAGE )
             szImageType = "bmp";
          else if ( strcmp( szExt, ".png" ) == 0 )
             szImageType = "png";
-
+         else if ( strcmp( szExt, ".jpg" ) == 0 || strcmp( szExt, ".jpeg" ) == 0 )
+            szImageType = "jpeg";
+#if 0
+         /* PDFLib Lite does not support JPEG2000. This format requires
+            commercial version */
+         else if ( strcmp( szExt, ".jpx" ) == 0 || strcmp( szExt, ".jp2" ) == 0 ||
+                   strcmp( szExt, ".jpf" ) == 0 || strcmp( szExt, ".jpm" ) == 0 ||
+                   strcmp( szExt, ".j2k" ) == 0 )
+            szImageType = "jpeg2000";
+#endif
          hb_xfree( pFileName );
 
          if ( szImageType )
@@ -169,6 +178,11 @@ HB_FUNC( PDF_LOAD_IMAGE )
    }
 
    hb_retni( -1 );
+}
+
+HB_FUNC( PDF_GET_ERRMSG )
+{
+   hb_retc( PDF_get_errmsg(pPDFLib ) );
 }
 
 HB_FUNC( PDF_SETCOLOR )

@@ -19,6 +19,10 @@
 #ifndef P_INTERN_H
 #define P_INTERN_H
 
+#if defined( __WIN32__ )
+   #define WIN32_LEAN_AND_MEAN
+#endif
+
 #if defined(__BORLANDC__)
    #pragma warn -prc
    #pragma warn -pia
@@ -54,6 +58,9 @@
 /* ------------------------ PDFlib feature configuration  ------------------- */
 
 /* changing the following is not recommended, and not supported */
+
+/* Code page */
+#define PDF_BUILTINENCODING_SUPPORTED
 
 /* BMP image support */
 #define PDF_BMP_SUPPORTED
