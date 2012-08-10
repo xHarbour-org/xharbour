@@ -85,7 +85,7 @@
 
 #include "../source/vm/dlmalloc.c"
 #include "../contrib/tiff/tiffvers.h"
-#include "../contrib/jpeg/jversion.h"
+#include "../contrib/jpeg/jpeglib.h"
 #include "../contrib/png/png.h"
 #include "../source/rtl/pcre/pcre.h"
 #include "../source/rtl/zlib/zlib.h"
@@ -887,7 +887,7 @@ char *hb_verBuildInfo( BOOL bOut )
 
    {
       char szJPEGVer[64];
-      hb_snprintf( szJPEGVer, sizeof( szJPEGVer ), "JPEG version: %s\t", JVERSION );
+      hb_snprintf( szJPEGVer, sizeof( szJPEGVer ), "JPEG version: %i.%i\t", JPEG_LIB_VERSION_MAJOR, JPEG_LIB_VERSION_MINOR );
       hb_conOutErr_( szJPEGVer, 0, bOut );
       hb_conOutErr_( hb_conNewLine(), 0, bOut );
    }

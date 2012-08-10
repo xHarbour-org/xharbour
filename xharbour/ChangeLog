@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-10 10:43 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/common/hbver.c
+    ! jpeg lib version using integer
+
 2012-08-10 08:27 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/pdflite/pdflib/p_jpeg.c
   * contrib/pdflite/include/p_intern.h
