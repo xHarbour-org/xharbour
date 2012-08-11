@@ -8,7 +8,7 @@
 
 #message "/ ---------------------------------------------------------\"
 #message "| Demo to convert images to pdf                            |"
-#message "| Currrently support: PNG, BMP, GIF formats                |"
+#message "| Currrently support: PNG, BMP, GIF, JPEG, TIFF formats    |"
 #message "| This program requires: jpeg.lib, tiff.lib, png.lib       |"
 #message "| and pdflite.lib aside the regular libraries              |"
 #message "\ ---------------------------------------------------------/"
@@ -21,7 +21,7 @@ PROCEDURE MAIN()
    LOCAL current_page := 1
    LOCAL image
    LOCAL imageno := 1
-   LOCAL aPicture := {"mygif.gif","mybmp.bmp","mypng.png", "myjpg.jpg"}
+   LOCAL aPicture := {"mygif.gif","mybmp.bmp","mypng.png", "myjpg.jpg", "mytiff.tiff"}
 
    if PDF_new()
 

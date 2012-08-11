@@ -8,6 +8,30 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-11 12:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/tiff/tiff.h
+    + include "hbdefs.h" for INT64 and UNIT64
+
+  * contrib/jpeg/jdhuff.c
+    + function jpeg_reset_huff_decode() for PDFLite compatibility
+
+  * contrib/pdflite/hbpdflib.c
+    + enabled support for TIFF format
+
+  * contrib/pdflite/tests/img2pdf.prg
+  * contrib/pdflite/include/p_image.h
+  * contrib/pdflite/pdflib/p_tiff.c
+  + contrib/pdflite/tests/mytiff.tiff
+  + contrib/pdflite/tiff/*.c
+  + contrib/pdflite/include/port.h
+  + contrib/pdflite/include/pdflite_*.h
+  * winmake/common.mak
+  * winmake/compile.mak
+    ! add back proprietary version of tiff for pdflite
+
+  * winmake/makefile.bc
+    ! increase library page size to 256
+
 2012-08-11 06:27 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * ChangeLog
     ! correction on my note vis:

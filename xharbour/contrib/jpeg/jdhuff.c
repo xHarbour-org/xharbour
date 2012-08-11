@@ -366,7 +366,7 @@ jpeg_make_d_derived_tbl (j_decompress_ptr cinfo, boolean isDC, int tblno,
   
   /* Figure C.2: generate the codes themselves */
   /* We also validate that the counts represent a legal Huffman code tree. */
-  
+
   code = 0;
   si = huffsize[0];
   p = 0;
@@ -1538,4 +1538,18 @@ jinit_huff_decoder (j_decompress_ptr cinfo)
       entropy->dc_derived_tbls[i] = entropy->ac_derived_tbls[i] = NULL;
     }
   }
+}
+
+GLOBAL(void)
+jpeg_reset_huff_decode (register j_decompress_ptr cinfo);
+
+GLOBAL(void)
+jpeg_reset_huff_decode (register j_decompress_ptr cinfo)
+{ register huff_entropy_ptr entropy = (huff_entropy_ptr)cinfo->entropy;
+  register int ci = 0;
+
+  /* Discard encoded input bits, up to the next Byte boundary */
+  entropy->bitstate.bits_left &= ~7;
+  /* Re-initialize DC predictions to 0 */
+  do entropy->saved.last_dc_val[ci] = 0; while (++ci < cinfo->comps_in_scan);
 }

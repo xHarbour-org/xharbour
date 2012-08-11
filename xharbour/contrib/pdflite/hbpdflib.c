@@ -158,6 +158,8 @@ HB_FUNC( PDF_LOAD_IMAGE )
             szImageType = "png";
          else if ( strcmp( szExt, ".jpg" ) == 0 || strcmp( szExt, ".jpeg" ) == 0 )
             szImageType = "jpeg";
+         else if ( strcmp( szExt, ".tif" ) == 0 || strcmp( szExt, ".tiff" ) == 0 )
+            szImageType = "tiff";
 #if 0
          /* PDFLib Lite does not support JPEG2000. This format requires
             commercial version */

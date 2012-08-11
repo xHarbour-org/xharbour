@@ -20,7 +20,7 @@
 #define P_IMAGE_H
 
 #ifdef HAVE_LIBTIFF
-#include "tiffio.h"
+#include "pdflite_tiffio.h"
 #endif
 
 #ifdef HAVE_LIBPNG
