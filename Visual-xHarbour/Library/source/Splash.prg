@@ -126,6 +126,8 @@ ENDCLASS
 //-------------------------------------------------------------------------------------------------------------------------------------
 METHOD Init( cText, cTitle, lProgress, cCancel ) CLASS MessageWait
    ::hWnd := __MsgWait( cText, cTitle, lProgress, cCancel )
+   //SetActiveWindow( ::hWnd )
+   //__GetApplication():DoEvents()
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------
@@ -150,6 +152,7 @@ METHOD SetPosition() CLASS MessageWait
 
    CloseThemeData( hTheme )
    ReleaseDC( ::hWnd, hDC )
+   //ValidateRect( ::hWnd )
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------
