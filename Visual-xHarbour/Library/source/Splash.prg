@@ -14,7 +14,7 @@
 static __pCallBackPtr
 static __pPicture
 static aSize
-static nSecs, __aCenter, s_lProgress, s_cCancel, s_hFont, s_cText
+static nSecs, __aCenter, s_lProgress, s_cCancel, s_hFont, s_cText, s_hProgress
 
 #define SHOWDEBUG
 
@@ -126,50 +126,29 @@ ENDCLASS
 //-------------------------------------------------------------------------------------------------------------------------------------
 METHOD Init( cText, cTitle, lProgress, cCancel ) CLASS MessageWait
    ::hWnd := __MsgWait( cText, cTitle, lProgress, cCancel )
-   //SetActiveWindow( ::hWnd )
-   //__GetApplication():DoEvents()
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------
 METHOD SetPosition() CLASS MessageWait
-   LOCAL hTheme, aBar, aRect := _GetClientRect( ::hWnd )
-   LOCAL hDC := GetDC( ::hWnd )
-   aBar := {4,aRect[4]-24,aRect[3]-4,aRect[4]-4}
-   hTheme := OpenThemeData(,"PROGRESS")
-   IF s_cCancel != NIL
-      aBar[2] -= 30
-      aBar[4] -= 30
-   ENDIF
-
-   DrawThemeBackground( hTheme, hDC, PP_BAR, 0, aBar )
-   aBar[1]+=1
-   aBar[2]+=1
-   aBar[3]-=1
-   aBar[4]-=1
-
-   aBar[3] := aBar[1] + (((aBar[3] - aBar[1]) * ::xPosition )/100)
-   DrawThemeBackground( hTheme, hDC, PP_CHUNK, 0, aBar )
-
-   CloseThemeData( hTheme )
-   ReleaseDC( ::hWnd, hDC )
-   //ValidateRect( ::hWnd )
+   SendMessage( s_hProgress, PBM_SETPOS, ::xPosition, 0 )
+   __GetApplication():DoEvents()
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------
 FUNCTION __MsgWait( cText, cTitle, lProgress, cCancel )
-   LOCAL nWidth, nHeight, nStyle, dt, hDC, hWnd
+   LOCAL nWidth, nHeight, nStyle, dt, hDC, hWnd, hFont
 
    DEFAULT cText  TO ""
    DEFAULT lProgress TO .F.
 
+   s_hFont   := __GetMessageFont()
+
    hDC       := GetDC(0)
+   hFont     := SelectObject( hDC, s_hFont )
    nHeight   := 55
    nWidth    := Max( _GetTextExtentPoint32( hDC, cText )[1] + 40, 270)
+   SelectObject( hDC, hFont )
    ReleaseDC(0,hDC)
-
-   IF lProgress
-      nHeight += 24
-   ENDIF
 
    s_cCancel   := cCancel
    s_lProgress := lProgress
@@ -190,8 +169,6 @@ FUNCTION __MsgWait( cText, cTitle, lProgress, cCancel )
       
    __pCallBackPtr := WinCallBackPointer( @__MsgWaitDlgProc() )
 
-   s_hFont := __GetMessageFont()
-
    dt:style           := nStyle
    dt:dwExtendedStyle := WS_EX_TOOLWINDOW 
    dt:x               := 0
@@ -206,8 +183,8 @@ RETURN hWnd
 
 //-------------------------------------------------------------------------------------------------------------------------------------
 FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
-   LOCAL nLeft, nTop, aRect, aPar, hDC, aSize, hBtn
-   LOCAL hTheme, aBar
+   LOCAL nLeft, nTop, aRect, aPar, hDC, aSize, hBtn, hText, hFont
+
    SWITCH nMsg
       CASE WM_INITDIALOG
            SetWindowPos( hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE )
@@ -223,47 +200,50 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
            nLeft := __aCenter[1] + ( ( __aCenter[3] ) / 2 ) - ( (aRect[3]-aRect[1]) / 2 )
            nTop  := __aCenter[2] + ( ( __aCenter[4] ) / 2 ) - ( (aRect[4]-aRect[2]) / 2 )
 
-           MoveWindow( hWnd, nLeft, nTop, aRect[3]-aRect[1], ( aRect[4]-aRect[2] ) + IIF( s_cCancel != NIL, 30, 0 ) )
+           MoveWindow( hWnd, nLeft, nTop, aRect[3]-aRect[1], ( aRect[4]-aRect[2] ) + IIF( s_cCancel != NIL .OR. s_lProgress, 30, 0 ) )
+
+           aRect := _GetClientRect( hWnd )
+           aRect[1]+=5
+           aRect[2]+=5
+           aRect[3]-=5
+           aRect[4]-= ( 5 + IIF( s_cCancel != NIL .OR. s_lProgress, 30, 0 ) )
+
+           hText := CreateWindowEx( 0, "static", s_cText,;
+                              WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | SS_CENTER | SS_CENTERIMAGE,;
+                              aRect[1], aRect[2], aRect[3], aRect[4],;
+                              hWnd, 4002, __GetApplication():Instance, NIL )
+
+           SendMessage( hText, WM_SETFONT, s_hFont )
+
+           aSize := {0,0}
 
            IF s_cCancel != NIL
               aRect := _GetClientRect( hWnd )
               hDC   := GetDC( hWnd )
-              aSize := _GetTextExtentPoint32( hDC, s_cCancel+" " )
+              hFont := SelectObject( hDC, s_hFont )
+              aSize := _GetTextExtentPoint32( hDC, s_cCancel )
+              aSize[1] += 20
+              SelectObject( hDC, hFont )
               ReleaseDC( hWnd, hDC )
 
               nLeft := ( aRect[3] - aSize[1] ) / 2
+              
+              IF s_lProgress
+                 nLeft := ( aRect[3] - aSize[1] ) - 2
+              ENDIF
               hBtn  := CreateWindowEx( 0, "Button", s_cCancel,;
                               WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,;
                               nLeft, aRect[4]-27, aSize[1], 25,;
                               hWnd, 4000, __GetApplication():Instance, NIL )
-           ENDIF
-           RETURN 1
-
-      CASE WM_ERASEBKGND  
-           hDC := nwParam
-           aRect := _GetClientRect( hWnd )
-           _FillRect( hDC, aRect, GetSysColorBrush( COLOR_BTNFACE ) )
-           aBar := {4,aRect[4]-24,aRect[3]-4,aRect[4]-4}
-           aRect[1]+=5
-           aRect[2]+=5
-           aRect[3]-=5
-           aRect[4]-=5
-           IF s_cCancel != NIL
-              aBar[2] -= 30
-              aBar[4] -= 30
-              aRect[4] -= 30
+              SendMessage( hBtn, WM_SETFONT, s_hFont )
            ENDIF
            IF s_lProgress
-              aRect[4]-= 26
-              hTheme := OpenThemeData(,"PROGRESS")
-              IF hTheme != NIL
-                 DrawThemeBackground( hTheme, hDC, 1, 0, aBar )
-                 CloseThemeData( hTheme )
-              ENDIF
+              aRect := _GetClientRect( hWnd )
+              s_hProgress := CreateWindowEx( 0, PROGRESS_CLASS, ,;
+                              WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,;
+                              2, aRect[4]-24, aRect[3]-aSize[1]-6, 20,;
+                              hWnd, 4001, __GetApplication():Instance, NIL )
            ENDIF
-           SetBkMode( hDC, TRANSPARENT )
-           SelectObject( hDC, s_hFont )
-           _DrawText( hDC, s_cText, @aRect, DT_LEFT+DT_CENTER+DT_VCENTER+DT_SINGLELINE )
            RETURN 1
 
       CASE WM_COMMAND
