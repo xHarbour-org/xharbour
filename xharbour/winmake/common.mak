@@ -500,7 +500,44 @@ PDFLITE_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)p_type1$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_type3$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)p_util$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)p_xgstate$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)p_xgstate$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)tif_auxx_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_close_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_codec_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_color_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_compress_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_dir_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_dirinfo_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_dirread_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_dirwrite_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_dumpmode_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_error_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_extension_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_fax3_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_fax3sm_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_flush_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_getimage_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_jpeg_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_luv_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_lzw_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_next_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_ojpeg_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_open_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_packbits_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_pixarlog_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_predict_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_print_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_read_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_strip_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_swab_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_thunder_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_tile_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_version_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_warning_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_unix_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_write_PDFLITE$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)tif_zip_PDFLITE$(OBJEXT)
 
 #===============================================================================
 # HBTINYMT.LIB Dependencies

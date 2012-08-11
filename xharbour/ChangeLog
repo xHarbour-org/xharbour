@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-11 13:28 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/common.mak
+  * winmake/compile.mak
+    ! missing from previous commit
+
 2012-08-11 12:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/tiff/tiff.h
     + include "hbdefs.h" for INT64 and UNIT64

@@ -783,6 +783,114 @@ $(OBJ_DIR)$(DIR_SEP)p_util$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_
 $(OBJ_DIR)$(DIR_SEP)p_xgstate$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)pdflib$(DIR_SEP)p_xgstate.c
 	$(CCC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)tif_auxx_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_auxx.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_close_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_close.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_codec_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_codec.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_color_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_color.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_compress_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_compress.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_dir_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_dir.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_dirinfo_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_dirinfo.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_dirread_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_dirread.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_dirwrite_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_dirwrite.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_dumpmode_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_dumpmode.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_error_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_error.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_extension_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_extension.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_fax3_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_fax3.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_fax3sm_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_fax3sm.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_flush_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_flush.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_getimage_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_getimage.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_jpeg_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_jpeg.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_luv_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_luv.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_lzw_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_lzw.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_next_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_next.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_ojpeg_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_ojpeg.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_open_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_open.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_packbits_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_packbits.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_pixarlog_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_pixarlog.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_predict_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_predict.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_print_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_print.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_read_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_read.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_strip_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_strip.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_swab_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_swab.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_thunder_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_thunder.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_tile_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_tile.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_version_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_version.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_warning_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_warning.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_unix_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_unix.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_write_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_write.c
+	$(CCC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)tif_zip_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_zip.c
+	$(CCC_CMD)
+
 #===============================================================================
 # HBTINYMT.LIB Dependencies
 #===============================================================================
