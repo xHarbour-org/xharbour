@@ -183,13 +183,21 @@ RETURN hWnd
 
 //-------------------------------------------------------------------------------------------------------------------------------------
 FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
-   LOCAL nLeft, nTop, aRect, aPar, hDC, aSize, hBtn, hText, hFont
-
+   LOCAL aClient, nLeft, nTop, aRect, aPar, hDC, aSize, hBtn, hText, hFont, rc := (struct RECT)
+   LOCAL nBorder
    SWITCH nMsg
       CASE WM_INITDIALOG
            SetWindowPos( hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE )
-           aPar  := _GetWindowRect( GetDeskTopWindow() )
-           aRect := _GetWindowRect( hWnd )
+           aPar    := _GetWindowRect( GetDeskTopWindow() )
+           aRect   := _GetWindowRect( hWnd )
+           aClient := _GetClientRect( hWnd )
+           nBorder := aRect[4]-aRect[2]-aClient[4]
+
+           hDC   := GetDC( hWnd )
+           hFont := SelectObject( hDC, s_hFont )
+           DrawText( hDC, s_cText, @rc, DT_CALCRECT )
+
+           aRect[4] := aRect[2] + rc:bottom + nBorder + 20
            
            DEFAULT __aCenter TO aPar
            DEFAULT __aCenter[1] TO 0
@@ -200,16 +208,18 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
            nLeft := __aCenter[1] + ( ( __aCenter[3] ) / 2 ) - ( (aRect[3]-aRect[1]) / 2 )
            nTop  := __aCenter[2] + ( ( __aCenter[4] ) / 2 ) - ( (aRect[4]-aRect[2]) / 2 )
 
-           MoveWindow( hWnd, nLeft, nTop, aRect[3]-aRect[1], ( aRect[4]-aRect[2] ) + IIF( s_cCancel != NIL .OR. s_lProgress, 30, 0 ) )
+           MoveWindow( hWnd, nLeft, nTop, aRect[3]-aRect[1], ( aRect[4]-aRect[2] ) + IIF( s_cCancel != NIL .OR. s_lProgress, 25, 0 ) )
 
            aRect := _GetClientRect( hWnd )
            aRect[1]+=5
-           aRect[2]+=5
            aRect[3]-=5
-           aRect[4]-= ( 5 + IIF( s_cCancel != NIL .OR. s_lProgress, 30, 0 ) )
+           aRect[4]-= ( IIF( s_cCancel != NIL .OR. s_lProgress, 25, 0 ) )
 
+
+           aRect[2] := (aRect[4]-rc:bottom)/2
+           aRect[4] := rc:bottom
            hText := CreateWindowEx( 0, "static", s_cText,;
-                              WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | SS_CENTER | SS_CENTERIMAGE,;
+                              WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | SS_CENTER,;
                               aRect[1], aRect[2], aRect[3], aRect[4],;
                               hWnd, 4002, __GetApplication():Instance, NIL )
 
@@ -219,12 +229,8 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
 
            IF s_cCancel != NIL
               aRect := _GetClientRect( hWnd )
-              hDC   := GetDC( hWnd )
-              hFont := SelectObject( hDC, s_hFont )
               aSize := _GetTextExtentPoint32( hDC, s_cCancel )
               aSize[1] += 20
-              SelectObject( hDC, hFont )
-              ReleaseDC( hWnd, hDC )
 
               nLeft := ( aRect[3] - aSize[1] ) / 2
               
@@ -244,6 +250,8 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
                               2, aRect[4]-24, aRect[3]-aSize[1]-6, 20,;
                               hWnd, 4001, __GetApplication():Instance, NIL )
            ENDIF
+           SelectObject( hDC, hFont )
+           ReleaseDC( hWnd, hDC )
            RETURN 1
 
       CASE WM_COMMAND
