@@ -8,13 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-12 02:48 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/common/hbver.c
+    ! work around to prevent INT32 to be redefined in jmorecfg.h
+
 2012-08-11 15:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/pdflite/tiff/tif_ojpeg.c
   * contrib/pdflite/tiff/tif_unix.c
-    ! fixed to compiler under DMC
+    ! fixed to compile under DMC
 
   * contrib/pdflite/tiff/tif_luv.c
-    ! fixed to compiler under POCC
+    ! fixed to compile under POCC
 
   * contrib/jpeg/jdhuff.c
     + extern "C" for jpeg_reset_huff_decode()
@@ -26,7 +30,7 @@
 
 2012-08-11 12:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/tiff/tiff.h
-    + include "hbdefs.h" for INT64 and UNIT64
+    + include "hbdefs.h" for INT64 and UINT64
 
   * contrib/jpeg/jdhuff.c
     + function jpeg_reset_huff_decode() for PDFLite compatibility
