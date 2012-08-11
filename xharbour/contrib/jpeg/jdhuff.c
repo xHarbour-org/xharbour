@@ -1540,8 +1540,14 @@ jinit_huff_decoder (j_decompress_ptr cinfo)
   }
 }
 
+#if defined(__cplusplus)
+   extern "C" {
+#endif
 GLOBAL(void)
 jpeg_reset_huff_decode (register j_decompress_ptr cinfo);
+#if defined(__cplusplus)
+   }
+#endif
 
 GLOBAL(void)
 jpeg_reset_huff_decode (register j_decompress_ptr cinfo)

@@ -141,7 +141,13 @@
 #undef JPEG_INTERNALS
 
 /* Hack for files produced by Wang Imaging application on Microsoft Windows */
+#if defined( __cplusplus )
+   extern "C" {
+#endif
 extern void jpeg_reset_huff_decode(j_decompress_ptr);
+#if defined( __cplusplus )
+   }
+#endif
 
 /* PDFlib GmbH */
 #if defined(__ia64__) && defined (__linux__)
@@ -2393,7 +2399,7 @@ OJPEGVSetField(register TIFF *tif,ttag_t tag,va_list ap)
               do /* copy each Huffman table */
                 { int size = 0;
                   register UINT8 *from = tif->tif_base + *v++, *to;
-                  register int j = sizeof (*h)->bits;
+                  register int j = sizeof( (*h)->bits );
 
                /* WARNING:  This code relies on the fact that an image file not
                             "memory mapped" was read entirely into a single
@@ -2413,13 +2419,13 @@ OJPEGVSetField(register TIFF *tif,ttag_t tag,va_list ap)
                   to = (*h++)->bits;
                   *to++ = 0;
                   while (--j > 0) size += *to++ = *from++; /* Copy 16 Bytes */
-                  if (size > sizeof (*h)->huffval/sizeof *(*h)->huffval)
+                  if (size > sizeof( (*h)->huffval)/sizeof( *(*h)->huffval) )
                     {
                       _TIFFError(tif, tif->tif_name,"Huffman table too big");
                       return 0;
                     };
                   if ((j = size) > 0) do *to++ = *from++; while (--j > 0);
-                  while (++size <= sizeof (*h)->huffval/sizeof *(*h)->huffval)
+                  while (++size <= sizeof ((*h)->huffval)/sizeof( *(*h)->huffval) )
                     *to++ = 0; /* Zero the rest of the table for cleanliness */
                 }
               while ((uint16)++i < v32);

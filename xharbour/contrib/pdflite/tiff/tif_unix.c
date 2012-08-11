@@ -227,9 +227,9 @@ TIFFOpenW(const wchar_t* name, const char* mode, void* pdflib_opaque,
 		return ((TIFF*)0);
 
 	if (m == O_RDONLY) {
-	    fd = _wfopen(name, READBMODE);
+	    fd = _wfopen(name, (unsigned short const *)READBMODE);
 	} else {
-	    fd = _wfopen(name, WRITEMODE);
+	    fd = _wfopen(name, (unsigned short const *)WRITEMODE);
 	}
         if (fd == NULL) {
 		_TIFFError(tif, module, "%s: Cannot open", name);

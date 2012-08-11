@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-11 15:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/pdflite/tiff/tif_ojpeg.c
+  * contrib/pdflite/tiff/tif_unix.c
+    ! fixed to compiler under DMC
+
+  * contrib/pdflite/tiff/tif_luv.c
+    ! fixed to compiler under POCC
+
+  * contrib/jpeg/jdhuff.c
+    + extern "C" for jpeg_reset_huff_decode()
+
 2012-08-11 13:28 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/common.mak
   * winmake/compile.mak
