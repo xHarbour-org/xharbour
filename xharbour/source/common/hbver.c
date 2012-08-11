@@ -71,8 +71,11 @@
 
 #define __PICK_DLMALLOC_VERSION
 #define HB_OS_WIN_USED
-#define _BASETSD_H_
-#define _BASETSD_H
+
+#if defined( __DMC__ )
+   #define _BASETSD_H_
+   #define _BASETSD_H
+#endif
 
 #if defined( __POCC__ )
    #pragma warn(push)
