@@ -1008,6 +1008,7 @@ HB_FUNC( ORACLEINBINDPARAM )
 	     int iYear, iMonth, iDay; 
          int  iHour,  iMin;
          double  dSec;
+         int mSec;
 	     PHB_ITEM pFieldData = hb_param(6,HB_IT_DATETIME);
 	     #ifdef __XHARBOUR__
          hb_dateDecode( hb_itemGetDL( pFieldData ), &iYear, &iMonth, &iDay );
@@ -1015,9 +1016,9 @@ HB_FUNC( ORACLEINBINDPARAM )
          #else
          long  plJulian;
          long  plMilliSec ;
-         hb_itemGetTDT    (pFieldData,&plJulian, &plMilliSec );
+         hb_itemGetTDT(pFieldData,&plJulian, &plMilliSec );
          hb_dateDecode( plJulian, &iYear, &iMonth, &iDay );
-         hb_timeDecode( plMilliSec , &iHour, &iMin, &dSec );         
+         hb_timeDecode( plMilliSec , &iHour, &iMin, &mSec );         
          
          #endif
 //         hb_dateStrPut( Stmt->pLink[ iPos ].sDate, iYear, iMonth, iDay );
@@ -1027,7 +1028,11 @@ HB_FUNC( ORACLEINBINDPARAM )
          Stmt->pLink[ iPos ].sDate[3]= iDay;
          Stmt->pLink[ iPos ].sDate[4]= iHour+1;
          Stmt->pLink[ iPos ].sDate[5]= iMin+1;
+	     #ifdef __XHARBOUR__         
          Stmt->pLink[ iPos ].sDate[6]= dSec+1;         
+         #else
+         Stmt->pLink[ iPos ].sDate[6]= mSec+1;         
+         #endif
       }    
 
          ret = sqlo_bind_by_pos( lStmt ? Stmt->stmt :Stmt->stmtParam,

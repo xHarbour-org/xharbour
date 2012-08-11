@@ -8,6 +8,10 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-11 03:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/sqlorax.c
+    ! some changes to make harbour happy
+    
 2012-08-06 05:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
   * source/sqlorax.c
     ! some changes to make harbour happy
