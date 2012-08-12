@@ -28,7 +28,7 @@ typedef struct _PSQL_SESSION
 } PSQL_SESSION;
 
 // culik 11/9/2010 variavel para setar o comportamento do postgresql
-static BOOL iOldBehavior      = 0;
+
 
 typedef PSQL_SESSION * PPSQL_SESSION;
 
@@ -463,7 +463,7 @@ HB_FUNC( PGSTABLEATTR )     /* PGSTableAttr( ConnHandle, cTableName ) => aStruct
 
       type   = atoi( PQgetvalue( stmtTemp, row, 1 ) );
       typmod = atol( PQgetvalue( stmtTemp, row, 2 ) );
-      if ( iOldBehavior ) 
+      if ( sr_iOldPgsBehavior() ) 
       {
          nullable = 0;
       }    
@@ -898,10 +898,3 @@ HB_FUNC( PGSLINEPROCESSED )
 }
 
 //-----------------------------------------------------------------------------//
-HB_FUNC(SETPGSOLDBEHAVIOR)
-{
-	int iOld = iOldBehavior;
-	if (ISLOG( 1 ) ) 
-       iOldBehavior= hb_parl( 1 ) ;
-    hb_retl( iOld ) ;   
-}

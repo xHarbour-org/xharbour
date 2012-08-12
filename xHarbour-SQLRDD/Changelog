@@ -8,6 +8,22 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-12 18:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/sqlex1.c
+    ! minor fix for sqlex for datetime fields under oracle, since date fields need to be binded as timestamp ( oracle odbc driver requiment)
+  * source/sqlex2.c
+  * source/sqlex3.c
+    ! minor fix for sqlex for datetime fields under oracle, since date fields need to be binded as timestamp ( oracle odbc driver requiment)
+  + source/sqlrdddemo.hbp
+    + makefile for sqlrdd demo for harbour  
+  * source/pgs.c
+    - removed function SETPGSOLDBEHAVIOR and variable iOldBehavior
+  * source/sqlrdd0.prg
+    + added SETPGSOLDBEHAVIOR() function and added iOldBehavior Variable named as s_iOldPgsBehavior
+    + added sr_iOldPgsBehavior() function 
+  * source/sqlprototypes.h
+    + added declaration for sr_iOldPgsBehavior()  function
+
 2012-08-11 03:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
   * source/sqlorax.c
     ! some changes to make harbour happy

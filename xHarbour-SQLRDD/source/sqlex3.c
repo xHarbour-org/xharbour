@@ -543,6 +543,11 @@ void BindSeekStmt( SQLEXAREAP thiswa, int queryLevel )
       BindStructure   = GetBindStruct( thiswa, SeekBindParam );
       if( !BindStructure->isArgumentNull )
       {
+
+       if ( thiswa->nSystemID = SYSTEMID_ORACLE )
+          if ( BindStructure->iCType == SQL_C_TYPE_DATE ) 
+	           BindStructure->iCType = SQL_C_TYPE_TIMESTAMP;        // May be DATE or TIMESTAMP
+	           
          switch (BindStructure->iCType)
          {
             case SQL_C_CHAR:

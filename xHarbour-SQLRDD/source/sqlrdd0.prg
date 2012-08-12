@@ -2017,6 +2017,8 @@ static HB_BOOL s_fSerializeArrayAsJson    = HB_FALSE;
 /* Culik added new global to tell if we are using sqlverser 2008 or newer */
 static HB_BOOL s_fSql2008newTypes         = HB_FALSE;
 
+static HB_BOOL s_iOldPgsBehavior             = HB_FALSE;
+
 HB_BOOL HB_EXPORT sr_isMultilang( void )
 {
    return s_fMultiLang;
@@ -2118,6 +2120,11 @@ BOOL HB_EXPORT sr_lsql2008newTypes( void )
    return s_fSql2008newTypes;
 }
 
+BOOL HB_EXPORT sr_iOldPgsBehavior( void ) 
+{
+   return s_iOldPgsBehavior ;
+}   
+
 HB_FUNC( SR_GETSQL2008NEWTYPES )
 {
    hb_retl( s_fSql2008newTypes );
@@ -2129,6 +2136,15 @@ HB_FUNC( SR_SETSQL2008NEWTYPES )
    if( HB_ISLOG( 1 ) )
       s_fSql2008newTypes = hb_parl( 1 );
 }
+
+HB_FUNC(SETPGSOLDBEHAVIOR)
+{
+	int iOld = s_iOldPgsBehavior;
+	if (ISLOG( 1 ) ) 
+       s_iOldPgsBehavior= hb_parl( 1 ) ;
+    hb_retl( iOld ) ;   
+}
+
 
 #pragma ENDDUMP
 

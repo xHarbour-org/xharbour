@@ -1334,9 +1334,20 @@ void SetCurrRecordStructure( SQLEXAREAP thiswa )
             BindStructure->iCType          = SQL_C_DOUBLE;
             break;
          }
+         case 'T':
+         {
+            BindStructure->iCType          = SQL_C_TYPE_TIMESTAMP;    
+            break;
+         }   
+           
          case 'D':
          {
-            BindStructure->iCType          = lType;    // DATE or TIMESTAMP
+//             BindStructure->iCType          = lType;    // DATE or TIMESTAMP
+	        if ( thiswa->nSystemID = SYSTEMID_ORACLE )
+	           BindStructure->iCType          = SQL_C_TYPE_TIMESTAMP;        // May be DATE or TIMESTAMP
+	        else
+               BindStructure->iCType          = lType;        // May be DATE or TIMESTAMP
+
             break;
          }
          case 'L':

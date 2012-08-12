@@ -273,8 +273,12 @@ void CreateInsertStmt( SQLEXAREAP thiswa )
             InsertRecord->iCType          = SQL_C_DOUBLE;
             break;
          }
+        
          case 'D':
          {
+	        if ( thiswa->nSystemID = SYSTEMID_ORACLE )
+	           InsertRecord->iCType          = SQL_C_TYPE_TIMESTAMP;        // May be DATE or TIMESTAMP
+	        else
             InsertRecord->iCType          = lType;        // May be DATE or TIMESTAMP
             break;
          }
