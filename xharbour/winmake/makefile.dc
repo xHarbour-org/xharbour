@@ -200,6 +200,18 @@ XBSCRIPT_EXE_OBJS=\
 	$(_STARTUP_OBJ)\
 	$(XBSCRIPT_EXE_OBJS)
 
+HBDICT_EXE_OBJS=\
+	$(_STARTUP_OBJ)\
+	$(HBDICT_EXE_OBJS)
+
+HBEXTERN_EXE_OBJS=\
+	$(_STARTUP_OBJ)\
+	$(HBEXTERN_EXE_OBJS)
+
+HBFORMAT_EXE_OBJS=\
+	$(_STARTUP_OBJ)\
+	$(HBFORMAT_EXE_OBJS)
+
 !if ("$(HB_MT)"=="mt")
 PROJECT=$(MT_PROJECT)
 !else
@@ -602,6 +614,10 @@ LIB_CMD=LIB -c -n -p256 $@ $**
 # Digital Mars cannot build hbzlip.lib
 # HB_ZIP=1
 
+!ifdef HB_DIR_ADS
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(RDDADS_LIB)
+!endif
+
 !ifdef HB_ZIP
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBZIP_LIB)
 !endif
@@ -717,6 +733,8 @@ RDDADS_LIB_OBJS=\
 	$(OBJ_DIR)\ace32.obj
 !endif
 $(RDDADS_LIB) : $(RDDADS_LIB_OBJS)
+	IF NOT "$(HB_ADS_IMPLIB)" == "no" ECHO Creating $(ACE32_LIB) import library
+	IF NOT "$(HB_ADS_IMPLIB)" == "no" implib "$(ACE32_LIB)" "$(HB_DIR_ADS)\ace32.dll"  /system /noi /p:64
 	$(LIB_CMD)
 
 $(GTWVW_LIB) : $(GTWVW_LIB_OBJS)
