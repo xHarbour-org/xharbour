@@ -95,6 +95,7 @@ TIFF_DIR      =contrib$(DIR_SEP)tiff
 HBBTREE_DIR   =contrib$(DIR_SEP)hbbtree
 SIXAPI_DIR    =contrib$(DIR_SEP)sixapi
 HBCAB_DIR     =contrib$(DIR_SEP)hbcab
+HBCOMM_DIR    =contrib$(DIR_SEP)hbcomm
 
 INCLUDE_DIR2  =include
 
@@ -149,6 +150,7 @@ HB_GT_LIBS  =$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTWVT_LIB) $(
 #===============================================================================
 # Contrib Library Names
 #===============================================================================
+HBCOMM_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbcomm$(LIBEXT)
 HBCAB_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbcab$(LIBEXT)
 SIXAPI_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sixapi$(LIBEXT)
 HBBTREE_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbbtree$(LIBEXT)
@@ -258,6 +260,12 @@ HARBOUR_LIBS=\
 #===============================================================================
 # List Of Library and Executable Dependencies
 #===============================================================================
+
+#===============================================================================
+# HBCOMM.LIB
+#===============================================================================
+HBCOMM_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)commHBCOMM$(OBJEXT)
 
 #===============================================================================
 # HBCAB.LIB
@@ -722,6 +730,7 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)box$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cdpapi$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)chrasc$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)chruni$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)colorind$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)console$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)copyfile$(OBJEXT)\
@@ -2490,5 +2499,6 @@ CONTRIB_PROJECT=\
 	$(HBTINYMT_LIB)\
 	$(HBBTREE_LIB)\
 	$(SIXAPI_LIB)\
-	$(HBCAB_LIB)
+	$(HBCAB_LIB)\
+	$(HBCOMM_LIB)
 

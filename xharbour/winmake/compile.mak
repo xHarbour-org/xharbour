@@ -88,6 +88,15 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
 	$(MT_CMD)
 
 #===============================================================================
+# HBCOMM.LIB
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)commHBCOMM$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)commHBCOMM.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)commHBCOMM.c : $(HBCOMM_DIR)$(DIR_SEP)comm.prg
+	$(HB_CMD)
+
+#===============================================================================
 # HBCAB.LIB
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)cabinetHBCAB$(OBJEXT) : $(HBCAB_DIR)$(DIR_SEP)cabinet.c
@@ -1820,6 +1829,9 @@ $(OBJ_DIR)$(DIR_SEP)color53$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)color53.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)chrasc$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)chrasc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)chruni$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)chruni.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)clpclass.c : $(RTL_DIR)$(DIR_SEP)clpclass.prg

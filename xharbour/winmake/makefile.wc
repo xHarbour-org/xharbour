@@ -1004,6 +1004,9 @@ $(SIXAPI_LIB) : $(SIXAPI_LIB_OBJS)
 $(HBCAB_LIB) : $(HBCAB_LIB_OBJS)
 	$(LIB_CMD)
 
+$(HBCOMM_LIB) : $(HBCOMM_LIB_OBJS)
+	$(LIB_CMD)
+
 !endif
 
 #===============================================================================

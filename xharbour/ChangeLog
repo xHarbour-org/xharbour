@@ -8,6 +8,27 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-12 09:52 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + source/rtl/chruni.c
+    + HB_BLEN(), HB_BSUBSTR() borrowed from Harbour
+
+  + contrib/hbcomm
+  + contrib/hbcomm/comm.prg
+  + contrib/hbcomm/tests
+  + contrib/hbcomm/tests/test.prg
+    + PRG level functions for serial communication borrowed from Harbour
+
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/makefile.bc
+  * winmake/makefile.dc
+  * winmake/makefile.gc
+  * winmake/makefile.pc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+  * winmake/mdir.bat
+    + chruni.obj dependencies and hbcomm.lib
+
 2012-08-12 06:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/jpeg/jdhuff.c
     * exporting jpeg_reset_huff_decode()

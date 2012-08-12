@@ -1027,6 +1027,13 @@ $(HBCAB_LIB) : $(HBCAB_LIB_OBJS)
 +)
 !
 
+$(HBCOMM_LIB) : $(HBCOMM_LIB_OBJS)
+	IF EXIST "$(HBCOMM_LIB)" $(DEL) "$(HBCOMM_LIB)" > NUL
+	TLIB $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
 !endif
 
 #===============================================================================
