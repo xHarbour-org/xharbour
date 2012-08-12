@@ -1007,8 +1007,11 @@ HB_FUNC( ORACLEINBINDPARAM )
       {
 	     int iYear, iMonth, iDay; 
          int  iHour,  iMin;
+         #ifdef __XHARBOUR__
          double  dSec;
+         #else
          int mSec;
+         #endif
 	     PHB_ITEM pFieldData = hb_param(6,HB_IT_DATETIME);
 	     #ifdef __XHARBOUR__
          hb_dateDecode( hb_itemGetDL( pFieldData ), &iYear, &iMonth, &iDay );
