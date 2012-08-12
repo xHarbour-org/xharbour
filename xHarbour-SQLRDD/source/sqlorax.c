@@ -1011,6 +1011,7 @@ HB_FUNC( ORACLEINBINDPARAM )
          double  dSec;
          #else
          int mSec;
+         int iSeconds;
          #endif
 	     PHB_ITEM pFieldData = hb_param(6,HB_IT_DATETIME);
 	     #ifdef __XHARBOUR__
@@ -1021,7 +1022,7 @@ HB_FUNC( ORACLEINBINDPARAM )
          long  plMilliSec ;
          hb_itemGetTDT(pFieldData,&plJulian, &plMilliSec );
          hb_dateDecode( plJulian, &iYear, &iMonth, &iDay );
-         hb_timeDecode( plMilliSec , &iHour, &iMin, &mSec );         
+         hb_timeDecode( plMilliSec , &iHour, &iMin, &iSeconds, &mSec );         
          
          #endif
 //         hb_dateStrPut( Stmt->pLink[ iPos ].sDate, iYear, iMonth, iDay );
@@ -1034,7 +1035,7 @@ HB_FUNC( ORACLEINBINDPARAM )
 	     #ifdef __XHARBOUR__         
          Stmt->pLink[ iPos ].sDate[6]= dSec+1;         
          #else
-         Stmt->pLink[ iPos ].sDate[6]= mSec+1;         
+         Stmt->pLink[ iPos ].sDate[6]= iSeconds+1;         
          #endif
       }    
 
