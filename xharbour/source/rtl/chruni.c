@@ -81,7 +81,7 @@ HB_FUNC( HB_BSUBSTR )
    {
       const char * pszText = hb_itemGetCPtr( pText );
       HB_ISIZ nSize = hb_itemGetCLen( pText );
-      HB_ISIZ nFrom = hb_parnl( 2 );
+      LONG nFrom = hb_parnl( 2 );
       HB_ISIZ nCount = iPCount < 3 ? nSize : hb_parnl( 3 );
 
       if( nFrom > 0 )
