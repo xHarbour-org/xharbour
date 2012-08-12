@@ -330,7 +330,7 @@ EXEFLAGS=\
 	/subsystem:console
 
 !ifdef HB_DIR_ADS
-ACEH_DIR    =-i="$(HB_DIR_ADS)"
+ACEH_DIR    =-i=$(HB_DIR_ADS)
 !endif
 INCLUDE_DIR =-i=include -i=$(OBJ_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt -i=$(ZLIB_DIR)
 INCLUDE_DIR =$(INCLUDE_DIR) -i=$(PNG_DIR) -i=$(PDFLITE_DIR)\include
@@ -731,10 +731,6 @@ CLIBFLAGS    =-dHB_NO_DV_MEMCPY $(CLIBFLAGS)
 #===============================================================================
 RDDSQL_INCLUDE=-i=$(RDDSQL_DIR) -i=$(HBSQLIT3_DIR)
 
-!ifdef HB_DIR_ADS
-ACEH_DIR    =-i=$(HB_DIR_ADS)"
-!endif
-
 !ifdef HB_DIR_OPENSSL
 OPENSSL_DIR =-i=$(HB_DIR_OPENSSL)\include
 !endif
@@ -767,6 +763,10 @@ RDDSQL_INCLUDE=-i=$(HB_DIR_FIREBIRD)\include $(RDDSQL_INCLUDE)
 RDDSQL_INCLUDE=-i=$(HB_DIR_MAGIC)\include $(RDDSQL_INCLUDE)
 !endif
 
+!ifdef HB_DIR_ADS
+ACEH_DIR    =-i=$(HB_DIR_ADS)
+!endif
+
 INCLUDE_DIR =include
 INCLUDE_DIR =$(RDDSQL_INCLUDE) $(ACEH_DIR) -i=$(INCLUDE_DIR) -i=$(CC_DIR)\h -i=$(CC_DIR)\h\nt -i=$(FREEIMAGE_DIR)\include -i=$(GDLIB_DIR)\include -i=$(XWT_DIR)\include -i=$(XWT_DIR)\src\xwt_win -i=$(ZLIB_DIR) -i=$(PNG_DIR) $(OPENSSL_DIR) $(CURL_DIR)
 INCLUDE_DIR =$(INCLUDE_DIR) $(CAIRO_DIR) -i=$(SIXAPI_DIR)\include
@@ -791,6 +791,10 @@ LIB_CMD     =LIB386 /nologo /out:$@ $**
 CONTRIB_PROJECT=\
 	$(CONTRIB_PROJECT)\
 	$(HBSQLIT3_LIB)
+
+!ifdef HB_DIR_ADS
+CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(RDDADS_LIB)
+!endif
 
 !ifdef HB_GTWVG
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(GTWVG_LIB)
@@ -942,6 +946,8 @@ RDDADS_LIB_OBJS=\
 	$(OBJ_DIR)\ace32.obj
 !endif
 $(RDDADS_LIB) : $(RDDADS_LIB_OBJS)
+	IF NOT "$(HB_ADS_IMPLIB)" == "no" ECHO Creating $(ACE32_LIB) import library
+	IF NOT "$(HB_ADS_IMPLIB)" == "no" wlib -io -c -n -o -fo "$(ACE32_LIB)" +"$(HB_DIR_ADS)\ace32.dll"
 	$(LIB_CMD)
 
 $(GTWVW_LIB) : $(GTWVW_LIB_OBJS)
