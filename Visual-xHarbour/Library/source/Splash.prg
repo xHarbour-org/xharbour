@@ -160,8 +160,6 @@ FUNCTION __MsgWait( cText, cTitle, lProgress, cCancel )
       nStyle := nStyle | WS_CAPTION | WS_THICKFRAME
    ENDIF
 
-   __aCenter   := NIL
-   
    HB_CStructureCSyntax("_DIALOGTEMPLATE",{"-4","style -4","dwExtendedStyle -2","cdit","2","x","2","y","2","cx","2","cy -2","menu -2","windowclass -2","title",},,,4 )
    __ClsSetModule(__ActiveStructure() )
 
@@ -170,7 +168,7 @@ FUNCTION __MsgWait( cText, cTitle, lProgress, cCancel )
    __pCallBackPtr := WinCallBackPointer( @__MsgWaitDlgProc() )
 
    dt:style           := nStyle
-   dt:dwExtendedStyle := WS_EX_TOOLWINDOW 
+   dt:dwExtendedStyle := WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE
    dt:x               := 0
    dt:y               := 0
    dt:cx              := Int( ( nWidth  * 4 )/LOWORD(GetDialogBaseUnits()) )
@@ -179,12 +177,14 @@ FUNCTION __MsgWait( cText, cTitle, lProgress, cCancel )
    hWnd := CreateDialogIndirect( GetModuleHandle(), dt, GetActiveWindow(), __pCallBackPtr )
    SetWindowText( hWnd, cTitle )
    ShowWindow( hWnd, SW_SHOW )
+   UpdateWindow( hWnd )
 RETURN hWnd
 
 //-------------------------------------------------------------------------------------------------------------------------------------
 FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
    LOCAL aClient, nLeft, nTop, aRect, aPar, hDC, aSize, hBtn, hText, hFont, rc := (struct RECT)
-   LOCAL nBorder
+   LOCAL nBorder, aCenter
+
    SWITCH nMsg
       CASE WM_INITDIALOG
            SetWindowPos( hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE )
@@ -199,14 +199,14 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
 
            aRect[4] := aRect[2] + rc:bottom + nBorder + 20
            
-           DEFAULT __aCenter TO aPar
-           DEFAULT __aCenter[1] TO 0
-           DEFAULT __aCenter[2] TO 0
-           DEFAULT __aCenter[3] TO aPar[3]
-           DEFAULT __aCenter[4] TO aPar[4]
+           aCenter := aPar
+           DEFAULT aCenter[1] TO 0
+           DEFAULT aCenter[2] TO 0
+           DEFAULT aCenter[3] TO aPar[3]
+           DEFAULT aCenter[4] TO aPar[4]
            
-           nLeft := __aCenter[1] + ( ( __aCenter[3] ) / 2 ) - ( (aRect[3]-aRect[1]) / 2 )
-           nTop  := __aCenter[2] + ( ( __aCenter[4] ) / 2 ) - ( (aRect[4]-aRect[2]) / 2 )
+           nLeft := aCenter[1] + ( ( aCenter[3] ) / 2 ) - ( (aRect[3]-aRect[1]) / 2 )
+           nTop  := aCenter[2] + ( ( aCenter[4] ) / 2 ) - ( (aRect[4]-aRect[2]) / 2 )
 
            MoveWindow( hWnd, nLeft, nTop, aRect[3]-aRect[1], ( aRect[4]-aRect[2] ) + IIF( s_cCancel != NIL .OR. s_lProgress, 25, 0 ) )
 
@@ -247,7 +247,7 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
               aRect := _GetClientRect( hWnd )
               s_hProgress := CreateWindowEx( 0, PROGRESS_CLASS, ,;
                               WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,;
-                              2, aRect[4]-24, aRect[3]-aSize[1]-6, 20,;
+                              6, aRect[4]-22, aRect[3]-aSize[1]-12, 15,;
                               hWnd, 4001, __GetApplication():Instance, NIL )
            ENDIF
            SelectObject( hDC, hFont )
