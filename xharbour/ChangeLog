@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-13 07:56 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/makefile.vc
+    ! missing -D__WIN32__ required for some module
+
 2012-08-13 07:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.pc
   * winmake/makefile.wc
