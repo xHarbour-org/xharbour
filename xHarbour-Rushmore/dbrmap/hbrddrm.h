@@ -32,8 +32,10 @@ HB_EXTERN_BEGIN
 #undef  HB_PRG_PCODE_VER
 #define HB_PRG_PCODE_VER HB_PCODE_VER
 
-#define HB_FALSE        0
-#define HB_TRUE         (!0)
+#ifndef HB_FALSE
+   #define HB_FALSE        0
+   #define HB_TRUE         (!0)
+#endif
 
 #define HB_LONG         LONG
 #define HB_ULONG        ULONG
