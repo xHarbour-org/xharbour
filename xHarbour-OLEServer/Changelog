@@ -8,6 +8,12 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-14 13:37 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * bc5\ole.lib.xbp
+  * vc8\ole.lib.xbp
+  * vc9\ole.lib.xbp
+  * xcc\ole.lib.xbp
+    - Removed wrongly defined __IMPORT__ __EXPORT__ from MYDEFINES
 
 2009-10-07 10:21 UTC-0450 Ron Pinkas <ron@xHarbour.com>
   * source\olewrap.prg
