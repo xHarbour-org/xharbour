@@ -2,6 +2,10 @@
  * $Id:
  */
 
+2012-08-14 12:37 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * xlink\export.c
+    ! Fixed .dll generation of .exp and .lib with regard to underscore decoration (COFF_I_NAME_NOPREF)
+
 2012-08-14 12:23 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * xcc\cc\init.c
     + Added support for imported function pointers as static initializers
