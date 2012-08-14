@@ -8,6 +8,14 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-14 13:35 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * vxhdebug\vc8\xDebugW.exe.xbp
+  * vxhdebug\vc8\xDebugW.exe\xDebugW.exe.xbp
+  * vxhdebug\xcc\vxhd.lib.xbp
+  * vxhdebug\xcc\xDebugW.exe.xbp
+  * vxhdebug\xcc\xdebugw.exe\xDebugW.exe.xbp
+    - Removed wrongly defined __IMPORT__ __EXPORT__ from MYDEFINES
+
 2010-07-13 11:42 UTC-0300 Luiz Rafael Culik Guimaraes < luiz at xharbour.com.br
   * vxhdebug/source/vxhdapp.prg
     ! fixed opensource() method to not open file dialog if the file exist on sourcepath
@@ -39,7 +47,7 @@
 2009-06-06 00:00 UTC-0800 Augusto Infante <augusto.infante@xharbour.com>
   * vxhdebug/source/vxhdapp.prg
     + Added missing property "oButtonOpen"
-    
+
 2009-01-21 15:09 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
 - xHarbour-DebugClient/vxhdebug/vc8/xbuild.msvc8.ini
 - xHarbour-DebugClient/vxhdebug/xcc/vxhd.lib/vxhd.lib.xbp
@@ -94,13 +102,13 @@
             different folders. So, "sourcepath" is also a candidate to be in the
             INI file
   * vxhdebug/xDebugW.exe.xbp and xDebugW-demo.exe.xbp
-    + Added vxhd.lib.xbp (instead of vxhd.lib) 
+    + Added vxhd.lib.xbp (instead of vxhd.lib)
 
 2007-08-22 00:33 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * vxhdebug/source/gtkdapp.prg
     * Version bump to Linux Preview Release 1.1.
   * vxhdebug/source/gtkdgui.prg
-    ! Work around GTK+ bug #56070, "button under cursor does not work after 
+    ! Work around GTK+ bug #56070, "button under cursor does not work after
       becoming sensitive".
 
 2007-08-12 22:28 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
@@ -146,7 +154,7 @@
        ::oTab:TabPage1:Select()
        ::btnGo:Caption := "Start"
        ::btnGo:Tooltip := "Start <F5>"
-   
+
        AEval( { ::btnBreak, ::btnStop, ::btnInto, ::btnOver, ::btnOut, ::btnCursor, ::btnToggle }, {|o| o:Disable() } )
 
 
