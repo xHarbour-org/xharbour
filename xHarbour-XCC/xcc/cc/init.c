@@ -919,6 +919,11 @@ static int emit_constant_tree(TREE *e)
                 (*IR->defaddress)(e->u.sym);
                 return e->type->size;
 
+            /* Ron Pinkas Aug 09 2012 - added support for imported function pointers. */
+            case INDIR:
+                (*IR->defaddress)(e->kids[0]->u.sym);
+                return e->type->size;
+
             case CNST:
                 if (e->op == CNST+P && isarray(e->type))
                 {
@@ -983,6 +988,10 @@ static bool_t is_constant_tree(TREE *e)
         {
             case CNST:
             case ADDRG:
+                return TRUE;
+
+            /* Ron Pinkas Aug 09 2012 - added support for imported function pointers. */
+            case INDIR:
                 return TRUE;
 
             case RIGHT:

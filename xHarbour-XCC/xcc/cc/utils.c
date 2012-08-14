@@ -304,8 +304,18 @@ size_t my_fullpath(char *buf, const char *relpath, const char *curpath)
         const char *p;
         char *s;
 
+        //printf( "Relative: '%s' Current: '%s'", relpath, curpath );
+
         strcpy(buf, curpath);
+
         s = buf + strlen(curpath);
+
+        /* Ron Pinkas added, Aug 7 2012 */
+        if ( s[-1] == '\\' || s[-1] == '/' )
+             s--;
+        else if ( s[-1] == '.' )
+             *s++ = '\\';
+        /* END - Ron Pinkas added, Aug 7 2012 */
 
         p = relpath;
         while (*p)
@@ -320,7 +330,8 @@ size_t my_fullpath(char *buf, const char *relpath, const char *curpath)
                     p++;
                 }
 
-                if (*p && *p++ != '\\' && p[-1] != '/')
+                /* Ron Pinkas fixed redundant ++ applied to p, Aug 7 2012 */
+                if (*p != '\\' && *p != '/')
                     return 0;
             }
             else
@@ -336,6 +347,7 @@ size_t my_fullpath(char *buf, const char *relpath, const char *curpath)
         }
 
         *s = '\0';
+        //printf( " Result: '%s'\n", buf );
         return strlen(buf);
     }
 }
@@ -358,8 +370,8 @@ const char *basename(const char *filename)
     {
         const char *s;
 
-        for (s = filename + strlen(filename); 
-             s > filename && s[-1] != '\\' && s[-1] != '/'; 
+        for (s = filename + strlen(filename);
+             s > filename && s[-1] != '\\' && s[-1] != '/';
              s--)
             ;
         return s;

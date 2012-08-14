@@ -2,9 +2,10 @@
  * $Id:
  */
 
-/* Use this format for the entry headers:
-   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
-   For example:
-   2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
-*/
+2012-08-14 12:23 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * xcc\cc\init.c
+    + Added support for imported function pointers as static initializers
+
+  * xcc\cc\utils.c
+    Fixed support for relative paths in my_fullpath()
 
