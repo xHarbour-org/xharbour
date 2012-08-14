@@ -133,7 +133,7 @@
 #define HB_TERROR_IVARCOUNT         22
 
 
-HB_FUNC_EXTERN( ERRORNEW );
+HB_FUNC( ERRORNEW );
 /* pseudo function name in operation description
    (deprecated, kept for compatibility, use HB_ERR_FUNCNAME instead) */
 const char hb_errFuncName = 1;

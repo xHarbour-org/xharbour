@@ -60,11 +60,18 @@
 #include "hb_io.h"
 #include "hbtrace.h"
 
-#if defined(_MSC_VER) && ! defined( __XCC__ )
-#define close  _close
-#define dup    _dup
-#define fileno _fileno
+#if defined(_MSC_VER)
+#if ! defined(close)
+   #define close(i)  _close(i)
 #endif
+#if ! defined(dup)
+   #define dup(i)    _dup(i)
+#endif
+#if ! defined(fileno)
+   #define fileno(p) _fileno(p)
+#endif
+#endif // _MSC_VER
+
 char * hb_tr_file_ = "";
 int    hb_tr_line_ = 0;
 int    hb_tr_level_ = 0;

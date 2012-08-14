@@ -55,7 +55,7 @@
 #include "hbapierr.h"
 #include "hbvm.h"
 
-#include <zlib.h>
+#include "zlib/zlib.h"
 
 /* GZIP stream destructor */
 static HB_GARBAGE_FUNC( hb_gz_Destructor )

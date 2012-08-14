@@ -18,7 +18,7 @@
 
 #define YY_BUF_SIZE 0 /* Use PP allocated buffer. */
 
-#if ( defined(__XCC__) || defined(__LCC__) )
+#if ( defined(__LCC__) )
    #define SLX_RULES "source/compiler/harbour.slx"
 #else
    #define SLX_RULES "../source/compiler/harbour.slx"

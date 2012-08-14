@@ -242,14 +242,14 @@
 
    #if ! defined( HB_DONT_DEFINE_BASIC_TYPES ) && ! defined( _WINNT_H )
       #if !defined( LONGLONG )
-         #if defined( __GNUC__ )
+         #if defined( __GNUC__ ) || defined( __XCC__ )
             typedef signed long long LONGLONG;
          #else
             typedef __int64 LONGLONG;
          #endif
       #endif
       #if !defined( ULONGLONG )
-         #if defined( __GNUC__ )
+         #if defined( __GNUC__ ) || defined( __XCC__ )
             typedef unsigned long long ULONGLONG;
          #else
             typedef unsigned __int64 ULONGLONG;
@@ -1309,8 +1309,8 @@ typedef PHB_FUNC HB_FUNC_PTR;
 #define HB_NS_FUNC_STATIC( funcname )                           static HARBOUR HB_NSF##funcname ( void )
 
 #define HB_FUNC_EXEC( funcname )                          HB_FUN_##funcname();
-#define HB_FUNC( funcname )                               HB_EXTERN_C_ HB_EXPORT HARBOUR HB_FUN_##funcname ( void )
-#define HB_FUNC_EXTERN( funcname )                        HB_EXTERN_C_ HB_EXTERN_ HARBOUR HB_EXPORT HB_FUN_##funcname ( void )
+#define HB_FUNC( funcname )                               HB_EXTERN_C_            HB_EXPORT HARBOUR HB_FUN_##funcname ( void )
+#define HB_FUNC_EXTERN( funcname )                        HB_EXTERN_C_ HB_EXTERN_ HB_IMPORT HARBOUR HB_FUN_##funcname ( void )
 #define HB_FUNC_STATIC( funcname )                        static HARBOUR HB_FUN_##funcname ( void )
 #define HB_FUNC_INIT( funcname )                          static HARBOUR HB_FUN_init_##funcname ( void )
 #define HB_FUNC_EXIT( funcname )                          static HARBOUR HB_FUN_exit_##funcname ( void )

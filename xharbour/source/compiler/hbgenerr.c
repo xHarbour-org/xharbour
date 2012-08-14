@@ -143,7 +143,8 @@ const char * hb_comp_szWarnings[] =
    "3Message \'%s\' not known in class \'%s\'",
    "0Meaningless use of expression: \'%s\'",
    "2Unreachable code",
-   "1Redundant \'ANNOUNCE %s\' statement ignored"
+   "1Redundant \'ANNOUNCE %s\' statement ignored",
+   "1STATIC Function \'%s\' defined but never used"
 };
 
 void hb_compGenError( const char * szErrors[], char cPrefix, int iError, const char * szError1, const char * szError2 )

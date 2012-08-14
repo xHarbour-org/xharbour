@@ -549,9 +549,6 @@
    /* Fix DJGPP in call to: toupper(), tolower(), is...() */
    #include "hbfixdj.h"
 #elif defined(__XCC__)
-   #if !defined(isascii)
-      #define isascii(c)   ((unsigned)(c)<=0x7f)
-   #endif
    #if !defined(NEED_DUMMY_RETURN)
       #define NEED_DUMMY_RETURN
    #endif

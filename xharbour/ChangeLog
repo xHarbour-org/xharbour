@@ -8,6 +8,41 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-14 11:36 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * include/hbdefs.h
+    * Define LONGLONG for xCC
+    ! Fixed HB_FUNC_EXTERN to use HB_IMPORT instead of HB_EXPORT
+
+  * include/hbsetup.h
+    - Removed unneeded #define of isacii() for xCC
+
+  * source/common/hbtrace.c
+    - Removed unneeded #define of close() dup() and fileno() for xCC and protected them with #ifndef
+
+  * source/compiler/genc.c
+    * Fixed and frefined forward declaration of PRG Function, EXTERNAL Function, and C Dump Functions
+    + Added logic to detect and warn of STATIC FUNCTION or HB_FUNC_STATIC defined but never used
+    * Added missing support for HB_FUNC_INIT and HB_FUNC_EXIT and refined hb_compWriteExternEntries()
+    * Enabled HB_FUNC_STATIC in hb_compGenCAddProtos()
+    * Corrected description for hb_compCStatSymList()
+    ! Rewrote hb_compGenCCheckInLineStatic() to fixa some bugs and to add missing support for HB_FUNC_INIT() HB_FUNC_EXIT and HB_FUNC_STATIC()
+
+  * source/compiler/hbslex.c
+    - Removed #define exception of SLX_RULES for xCC since xCC bug in processing relative paths using forward slash (/) has been fixed.
+
+  * source/rtl/hbzlibgz.c
+    * Corrected #include <zlib/zlib.h> to "zlib/zlib.h"
+
+  * source/vm/errorapi.c
+    ! Fixed forward declarion HB_FUNC_EXTERN( ERRORNEW ) to HB_FUNC( ERRORNEW )
+
+  * include/hberrors.h
+    + Added HB_COMP_WARN_STATIC_UNUSED
+  * source/compiler/hbgenerr.c
+    + Added : "1STATIC Function \'%s\' defined but never used"
+  * source/compiler/genc.c
+    + Added logic to detect and warn of STATIC FUNCTION or HB_FUNC_STATIC defined but never used
+
 2012-08-13 07:56 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.vc
     ! missing -D__WIN32__ required for some module
@@ -182,7 +217,7 @@
 2012-08-07 00:20  UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * include/hbapicom.h
     ! added missing HB_BOOL define  to make *unix happy
-    
+
 2012-08-07 04:55 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbhpdf/hpdf_utils.c
   * contrib/hbhpdf/hpdf_conf.h
@@ -244,7 +279,7 @@
   * source/rtl/Makefile
     source/include/Makefile
     ! added new depenciencies from andi commits
-    
+
 2012-08-06 01:03 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/hbsockhb.c
     ! minor tweak to kill BCC warning
@@ -397,7 +432,7 @@
   * source/rtl/Makefile
   * source/common/Makefile
     ! updated to use new dependencies
-    
+
 2012-07-29 10:18 UTC-0300 Walter Negro <wnegro/AT/vstour.com>
   * source/vm/classes.c
     ! Correction in hb_clsFinalize() for not to skip the execution of the destructor
@@ -1076,7 +1111,7 @@
   + contrib/hbsqlit3/Makefile
     + added linux makefile to sqllit3
   + contrib/hbbtree/Makefile
-    + added makefile for hbbtree        
+    + added makefile for hbbtree
 
 2012-07-13 03:23 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbsqlit3/config.h
@@ -1149,8 +1184,8 @@
 
 2012-07-12 07:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   ! contrib/hblfz/lzfP.h
-    ! fixed for work in linux 
-    
+    ! fixed for work in linux
+
 2012-07-12 09:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbexpat/xmltok_i.c
     ! corrected typo (thanks Mel)
@@ -1385,7 +1420,7 @@
     ! Removed to make linux happy
   + contrib/hblfz/lzfP.h
     ! renamed lzfp.h to lzfP.h to make linux build happy
-    
+
 2012-07-10 06:28 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * ChangeLog
     ! typo : 07-20-2012 -> 07-10-2012
@@ -2214,7 +2249,7 @@
 2012-06-29 11:10 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * contrib/tipssl/inetssl.c
     ! fixed unused variavle and wrong include  definition
-    
+
 2012-06-29 13:46 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbexpat/core.c
   * contrib/hbexpat/_hbconf.h
@@ -3346,7 +3381,7 @@
 
 2012-05-24 08:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/tip/mail.prg
-    ! fixed getFileName() method to include "Content-Disposition" as 
+    ! fixed getFileName() method to include "Content-Disposition" as
       suggested by Fabio Nery from xharbour news.
 
 2012-04-21 16:43 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
@@ -3456,7 +3491,7 @@
 2012-02-07 13:30 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/rtl/pcre/Makefile
     ! updated due depencendie changes
-    
+
 2012-02-05 03:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/pcre/config.h
   * source/rtl/pcre/config.h.generic
@@ -3495,8 +3530,8 @@
 
 2012-02-03 09:50 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/rtl/fssize.c
-    ! fixed hb_fsFSize to properly return correct file size under windows 
-    
+    ! fixed hb_fsFSize to properly return correct file size under windows
+
 2012-02-02 08:03 UTC-0800 Luis Krause <kaddath at shaw dot ca>
   * contrib/rdd_ads/ace32.c
     ! updated AdsCreateFTSIndex params to v10.x that are now type VOID
@@ -3507,7 +3542,7 @@
 
 2012-02-01 10:50 UTC-0800 Luis Krause <kaddath at shaw dot ca>
   * winmake/mdir.bat
-    ! added gtwvw and sevenzip when called with CLEAN param 
+    ! added gtwvw and sevenzip when called with CLEAN param
       (REMOVE section in batch file).
 
 2012-01-31 15:50 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
