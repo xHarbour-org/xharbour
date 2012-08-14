@@ -8,6 +8,11 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-14 13:18 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * vc8\activex.lib.xbp
+  * xcc\activex.lib.xbp
+    - Removed wrong definition of WIN32,__IMPORT__ and __EXPORT__ from MYDEFINES
+
 2012-08-14 13:13 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * ActiveX.c
   * TActiveX.prg
