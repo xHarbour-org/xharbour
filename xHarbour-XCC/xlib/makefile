@@ -42,9 +42,9 @@ mscvars = $(mscvars) -DUNICODE -D_UNICODE
 !ENDIF
 
 !IFDEF POWERDEBUG
-mslflags = /incremental:no /pdb:none /debug /nologo
+mslflags = /incremental:no /pdb:none /debug /nologo $(LFLAGS)
 !ELSE
-mslflags = /incremental:no /pdb:none /release /nologo
+mslflags = /incremental:no /pdb:none /release /nologo $(LFLAGS)
 !ENDIF
 
 mscc = cl $(mscflags) $(mscvars) $(mscdebug) -DXHARBOUR
