@@ -238,6 +238,8 @@ double __cdecl log2(double);
 double __cdecl sin(double);
 double __cdecl sinh(double);
 
+/* double macro overrides */
+#ifndef _M_ARM
 #define cos(x)  __sin(x,1)
 #define cosh(x)  __cosh(x,1)
 #define log(x)  __log(x,0)
@@ -245,6 +247,7 @@ double __cdecl sinh(double);
 #define log2(x)  __log(x,2)
 #define sin(x)  __sin(x,0)
 #define sinh(x)  __sinh(x,1)
+#endif /* _M_ARM */
 
 /* float macro overrides */
 float __cdecl cosf(float);
@@ -255,6 +258,8 @@ float __cdecl log2f(float);
 float __cdecl sinf(float);
 float __cdecl sinhf(float);
 
+/* float macro overrides */
+#ifndef _M_ARM
 #define cosf(x)  __sinf(x,1)
 #define coshf(x)  __coshf(x,1)
 #define logf(x)  __logf(x,0)
@@ -262,6 +267,7 @@ float __cdecl sinhf(float);
 #define log2f(x)  __logf(x,2)
 #define sinf(x)  __sinf(x,0)
 #define sinhf(x)  __sinhf(x,1)
+#endif /* _M_ARM */
 
 /* long double macro overrides */
 long double __cdecl cosl(long double);
@@ -272,6 +278,8 @@ long double __cdecl log2l(long double);
 long double __cdecl sinl(long double);
 long double __cdecl sinhl(long double);
 
+/* long double macro overrides */
+#ifndef _M_ARM
 #define cosl(x)  __sinl(x,1)
 #define coshl(x)  __coshl(x,1)
 #define logl(x)  __logl(x,0)
@@ -279,6 +287,7 @@ long double __cdecl sinhl(long double);
 #define log2l(x)  __logl(x,2)
 #define sinl(x)  __sinl(x,0)
 #define sinhl(x)  __sinhl(x,1)
+#endif /* _M_ARM */
 
 /* double declarations */
 double __cdecl __cosh(double, double);
@@ -304,6 +313,8 @@ long double __cdecl __sinhl(long double, long double);
 short __cdecl __fptestl(long double *);
 short __expl(long double *, long double, short);
 
+#ifdef _MSC_EXTENSIONS
+/* values for _exception type */
 #define _DOMAIN     1   /* argument domain error */
 #define _SING       2   /* argument singularity */
 #define _OVERFLOW   3   /* overflow range error */
@@ -314,12 +325,15 @@ short __expl(long double *, long double, short);
 #define EDOM        33
 #define ERANGE      34
 
+/* compatibility names */
+#ifdef __POCC__OLDNAMES
 #define DOMAIN      _DOMAIN
 #define SING        _SING
 #define OVERFLOW    _OVERFLOW
 #define UNDERFLOW   _UNDERFLOW
 #define TLOSS       _TLOSS
 #define PLOSS       _PLOSS
+#endif /* __POCC__OLDNAMES */
 
 #ifndef _EXCEPTION_DEFINED
 struct _exception {
@@ -329,9 +343,9 @@ struct _exception {
         double arg2;    /* second argument (if any) to function */
         double retval;  /* value to be returned by function */
 };
-
+int __cdecl _matherr(struct _exception *);
 #define _EXCEPTION_DEFINED
-#endif
+#endif /* _MSC_EXTENSIONS */
 
 #endif /* _MATH_H */
 

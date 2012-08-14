@@ -11,7 +11,8 @@ typedef enum _EXCEPTION_DISPOSITION {
     ExceptionContinueExecution,
     ExceptionContinueSearch,
     ExceptionNestedException,
-    ExceptionCollidedUnwind
+    ExceptionCollidedUnwind,
+    ExceptionExecuteHandler
 } EXCEPTION_DISPOSITION;
 
 struct _EXCEPTION_RECORD;

@@ -3,6 +3,8 @@
 
 /* signal.h - C99 standard header */
 
+#ifndef _WINCE
+
 /* type definitions */
 typedef int sig_atomic_t;
 typedef void __cdecl __sigfunc(int);
@@ -23,6 +25,8 @@ typedef void __cdecl __sigfunc(int);
 /* declarations */
 int __cdecl raise(int);
 __sigfunc * __cdecl signal(int, __sigfunc *);
+
+#endif /* _WINCE */
 
 #endif /* _SIGNAL_H */
 

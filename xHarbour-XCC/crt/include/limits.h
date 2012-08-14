@@ -40,11 +40,11 @@
 #define ULLONG_MAX  0xffffffffffffffff      /* maximum unsigned long long value */
 #endif /* _M_ARM */
 
-/* MSVC compatibility. */
-
-#define _I64_MIN    LLONG_MIN
-#define _I64_MAX    LLONG_MAX
-#define _UI64_MAX   ULLONG_MAX
+#ifdef _MSC_EXTENSIONS
+#define _I64_MIN    LLONG_MIN               /* minimum signed 64 bit value */
+#define _I64_MAX    LLONG_MAX               /* maximum signed 64 bit value */
+#define _UI64_MAX   ULLONG_MAX              /* maximum unsigned 64 bit value */
+#endif /* _MSC_EXTENSIONS */
 
 #endif /* _LIMITS_H */
 

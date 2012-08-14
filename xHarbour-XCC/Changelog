@@ -2,6 +2,27 @@
  * $Id:
  */
 
+2012-08-14 12:49 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * crt\include\assert.h
+  * crt\include\complex.h
+  * crt\include\conio.h
+  * crt\include\ctype.h
+  * crt\include\direct.h
+  * crt\include\errno.h
+  * crt\include\excpt.h
+  * crt\include\fcntl.h
+  * crt\include\fenv.h
+  * crt\include\inttypes.h
+  * crt\include\io.h
+  * crt\include\limits.h
+  * crt\include\locale.h
+  * crt\include\math.h
+  * crt\include\process.h
+  * crt\include\setjmp.h
+  * crt\include\signal.h
+  * crt\include\stdio.h
+    * Tried to merge WINCE support from xcc\crt\include to \crt\include
+
 2012-08-14 12:43 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * xcc\crt\include\conio.h
   * xcc\crt\include\ctype.h

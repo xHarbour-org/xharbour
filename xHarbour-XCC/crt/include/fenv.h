@@ -3,6 +3,16 @@
 
 /* fenv.h - C99 standard header; TC1 changes added */
 
+#ifndef _WINCE
+
+#ifndef _CRTIMP
+#ifdef _DLL
+#define _CRTIMP  __declspec(dllimport)
+#else
+#define _CRTIMP
+#endif
+#endif /* _CRTIMP */
+
 typedef unsigned long fexcept_t;
 
 typedef struct fenv_t {
@@ -42,8 +52,10 @@ int __cdecl feupdateenv(const fenv_t *);  /* return type changed to int in TC1 *
 int __cdecl feholdexcept(fenv_t *);
 
 /* data declarations */
-extern const fenv_t __dfl_fenv;
-extern fenv_t __fenv;
+extern _CRTIMP const fenv_t __dfl_fenv;
+extern _CRTIMP fenv_t __fenv;
+
+#endif /* _WINCE */
 
 #endif /* _FENV_H */
 

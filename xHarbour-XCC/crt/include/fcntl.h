@@ -22,6 +22,7 @@
 #define _O_SEQUENTIAL   0x0020
 #define _O_RANDOM       0x0010
 
+/* compatibility names */
 #ifndef _NO_OLDNAMES
 
 #define O_RDONLY        _O_RDONLY

@@ -2,6 +2,8 @@
 
 #undef assert
 
+#ifndef _WINCE
+
 #ifdef NDEBUG
 #define assert(exp)  ((void)0)
 #else
@@ -9,3 +11,8 @@
 void __cdecl __assert(char *, char *, int, const char *);
 #endif /* NDEBUG */
 
+#else /* _WINCE */
+
+#define assert(exp)  ((void)0)
+
+#endif /* _WINCE */

@@ -69,12 +69,16 @@
 
 #endif
 
-#ifdef __MT__
+#ifndef _WINCE
+
+#if defined(__MT__) || defined(_DLL)
 extern int * __cdecl __errno(void);
 #define errno  (*__errno())
 #else
 extern int errno;
 #endif /* __MT__ */
+
+#endif /* _WINCE */
 
 #endif /* _ERRNO_H */
 

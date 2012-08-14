@@ -3,6 +3,8 @@
 
 /* io.h - private header for low-level I/O definitions */
 
+#ifndef _WINCE
+
 /* type definitions */
 #ifndef _TIME_T_DEFINED
 #define _TIME_T_DEFINED
@@ -39,10 +41,8 @@ struct _finddata_t {
 #define _SH_DENYNO  0x40
 
 /* flags for _open() and _chmod() */
-#ifndef _S_IREAD
    #define _S_IREAD    0x100
    #define _S_IWRITE   0x80
-#endif
 
 /* locking modes for _locking() */
 #define _LK_UNLCK   0
@@ -65,6 +65,7 @@ long __cdecl _filelength(int);
 long __cdecl _findfirst(const char *, struct _finddata_t *);
 int __cdecl _findnext(long, struct _finddata_t *);
 int __cdecl _findclose(long);
+long __cdecl _get_osfhandle(int);
 int __cdecl _isatty(int);
 int __cdecl _locking(int, int, long);
 long __cdecl _lseek(int, long, int);
@@ -80,43 +81,42 @@ int __cdecl _write(int, const void *, unsigned int);
 /* macros */
 #define _tell(fh)  _lseek((fh),0L,/*SEEK_CUR*/1)
 
-#ifndef _NO_OLDNAMES
+/* compatibility names */
+#ifdef __POCC__OLDNAMES
+#define SH_DENYRW  _SH_DENYRW
+#define SH_DENYWR  _SH_DENYWR
+#define SH_DENYRD  _SH_DENYRD
+#define SH_DENYNO  _SH_DENYNO
+#define S_IREAD  _S_IREAD
+#define S_IWRITE  _S_IWRITE
+#define LK_UNLCK  _LK_UNLCK
+#define LK_LOCK  _LK_LOCK
+#define LK_NBLCK  _LK_NBLCK
+#define LK_RLCK  _LK_RLCK
+#define LK_NBRLCK  _LK_NBRLCK
 
-#define access(_pc, _i)          _access(_pc, _i)
-#define chmod(_pc, _i)           _chmod(_pc, _i)
-#define chsize(_i, _l)           _chsize(_i, _l)
-#define close(_i)                _close(_i)
-#define creat(_cp, _i)           _creat(_cp, _i)
-#define dup(_i)                  _dup(_i)
-#define dup2(_i, _i2)            _dup2(_i, _i2)
-#define eof(_i)                  _eof(_i)
-#define filelength(_i)           _filelength(_i)
-#define isatty(_i)               _isatty(_i)
-#define locking(_1, _i2, _l)     _locking(_1, _i2, _l)
-#define lseek(_i, _l, _i2)       _lseek(_i, _l, _i2)
-#define mktemp(_cp)              _mktemp(_cp)
+int __cdecl access(const char *, int);
+int __cdecl chmod(const char *, int);
+int __cdecl chsize(int, long);
+int __cdecl close(int);
+int __cdecl creat(const char *, int);
+int __cdecl dup(int);
+int __cdecl dup2(int, int);
+int __cdecl eof(int);
+long __cdecl filelength(int);
+int __cdecl isatty(int);
+int __cdecl locking(int, int, long);
+long __cdecl lseek(int, long, int);
+int __cdecl open(const char *, int, ...);
+int __cdecl read(int, void *, unsigned int);
+int __cdecl setmode(int, int);
+int __cdecl sopen(const char *, int, int, ...);
+long __cdecl tell(int);
+int __cdecl unlink(const char *);
+int __cdecl write(int, const void *, unsigned int);
+#endif /* __POCC__OLDNAMES */
 
-/*
-#define open(_cp, _i)            _open(_cp, _i)
-#define open(_cp, _i, _i2)       _open(_cp, _i, _i2)
-*/
-#define open                     _open
-
-#define read(_i, _p, _ui)        _read(_i, _p, _ui)
-#define setmode(_i, _i2)         _setmode(_i, _i2)
-
-/*
-#define sopen(_cp, _i, _i2)      _sopen(_cp, _i, _i2)
-#define sopen(_cp, _i, _i2, _i3) _sopen(_cp, _i, _i2, _i3)
-*/
-#define sopen                    _sopen
-
-#define tell(_i)                 _tell(_i)
-#define umask(_i)                _umask(_i)
-#define unlink(_cp)              _unlink(_cp)
-#define write(_i, _p, _ui)       _write(_i, _p, _ui)
-
-#endif
+#endif /* _WINCE */
 
 #endif /* _IO_H */
 
