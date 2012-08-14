@@ -1,4 +1,4 @@
-@ECHO OFF
+REM @ECHO OFF
 
 SET _PRESET_PATH=%PATH%
 SET _PRESET_INCLUDE=%INCLUDE%
@@ -22,28 +22,29 @@ SET _PRESET_LFLAGS=%LFLAGS%
 :SET_VC2005
    CALL "%ProgramFiles%\Microsoft Visual Studio 8\vc\vcvarsall.bat"
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 8\vc
+   SET PSDKDIR=%ProgramFiles%\Microsoft Visual Studio 8\Common7\Tools
    GOTO READY
 
 :SET_VC2003
    CALL "%ProgramFiles%\Microsoft Visual Studio .NET 2003\VC7\vcvarsall.bat"
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual .NET 2003\vc
+   SET PSDKDIR="*** PLEASE SET PSDKDIR ***""
    GOTO READY
 
 :SET_VC6
    CALL "%ProgramFiles%\Microsoft Visual Studio\VC98\vcvarsall.bat"
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\vc98
+   SET PSDKDIR="*** PLEASE SET PSDKDIR ***"
    GOTO READY
 
-:NONE   
+:NONE
 
 :READY
 SET PELLESCDIR=%ProgramFiles%\PellesC
 SET PATH=%PATH%;"%PELLESCDIR%\bin"
 
-SET _PRESET_CFLAGS=%CFLAGS%
 SET CFLAGS=/Od /EHsc /RTC1 /MTd /Gs /GS /Gy /GR /Zi /D_CRT_SECURE_NO_DEPRECATE /D_CRT_NONSTDC_NO_DEPRECATE
 
-SET _PRESET_LFLAGS=%LFLAGS%
 SET LFLAGS=-DEBUG -DEBUGTYPE:CV
 
 IF NOT EXIST lburg MD lburg
@@ -63,10 +64,10 @@ IF ERRORLEVEL 0 xcopy crt\include \xhb\c_include /s /d /r /y
 IF ERRORLEVEL 0 xcopy "%PELLESCDIR%\include\win" \xhb\c_include\win /s /d /r /y
 
 SET PATH=%_PRESET_PATH%
-SET INCLUDE=%_PRESET_INCLUDE% 
-SET LIB=%_PRESET_LIB% 
-SET CFLAGS=%_PRESET_CFLAGS% 
-SET LFLAGS=%_PRESET_LFLAGS% 
+SET INCLUDE=%_PRESET_INCLUDE%
+SET LIB=%_PRESET_LIB%
+SET CFLAGS=%_PRESET_CFLAGS%
+SET LFLAGS=%_PRESET_LFLAGS%
 
 SET _PRESET_PATH=
 SET _PRESET_INCLUDE=
