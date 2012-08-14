@@ -27,6 +27,7 @@
 #pragma comment( lib, "wincore.lib" )
 #pragma comment( lib, "version.lib")
 #pragma comment( lib, "Rpcrt4.lib")
+#pragma comment( lib, "WinSpool.lib")
 
 
 #define _WIN32_WINNT 0x0500
@@ -34,6 +35,8 @@
 #ifndef CINTERFACE
    #define CINTERFACE 1
 #endif
+
+#define WIN32_LEAN_AND_MEAN
 
 #include "item.api"
 #include "hbdefs.h"
@@ -46,12 +49,8 @@
 #include "hbpcode.h"
 #include "hbstack.h"
 
-// Not a mistake MUST precede windows.h because it then #includes winsock.h
-#ifndef __XCC__
-   #include <winsock2.h>
-#endif
-
 #include <windows.h>
+#include <unknwn.h>
 #include <commdlg.h>
 #include <shlobj.h>
 #include <shellapi.h>
@@ -65,6 +64,8 @@
 #include <Rpc.h>
 #include <ole2.h>
 #include <wincrypt.h>
+#include <winsock2.h>
+#include <winspool.h>
 
 #include "TaskDialog.h"
 

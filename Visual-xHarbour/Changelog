@@ -8,6 +8,10 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-14 13:01 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * Library/sourceC/winapi.c
+    + Added #define WIN32_LEAN_AND_MEAN and respective missining #includes
+
 2012-08-02 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    + Added AdsDataTable methods Save(), SetData() and FieldPut() to save off buffered
      blob fields.
@@ -21,9 +25,9 @@
    + Added MessageWait( cText, cTitle, lProgress, cCancel ) cCancel parameter. This will
      contain the text of a button that will cancel a process "Cancel". Processes MUST
      call ::Application:DoEvents() inside the LOOP to allow the wait window breathing.
-     
+
      oWait := ::MessageWait( "Processing invoices", "Winvoice", .T., "Cancel" )
-     
+
      DO WHILE (your test) .AND. oWait:IsWindow() // very important, that's how you will know it has been cancelled.
         ::Application:DoEvents() // Mandatory or the cancel button won't even paint.
         ...
@@ -34,13 +38,13 @@
    + Added datatable MemoExt() and Advantage BlobImport() and BlobGet() functions
    ! Fixed bug in DataTable testing for changed structure and fixed memo file
      not being renamed after structure changed.
-   + Added EditBox/MaskEdit the ability to execute "OnImageClick" by hitting CTRL+F1 
+   + Added EditBox/MaskEdit the ability to execute "OnImageClick" by hitting CTRL+F1
      so fast users don't have to grab the mouse to get the associated event.
    + Added "Border" property to class FreeImage hence the BackgroundImage object.
    ! Fixed FreeImage:LoadFromString( cData ) to default to ImageName if cData is NIL
    ! Fixed MaskEdit Return key to not to depend on EditBox settings.
 
-   
+
 2012-06-29 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    * MaskEdit: Reworked and fixed the entire Validation process.
 
@@ -51,7 +55,7 @@
 
 2012-06-27 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed bhg Renaming forms where the text in the project prg is incorrect
-   ! Fixed bug renaming files when renaming forms risking the user doesn't 
+   ! Fixed bug renaming files when renaming forms risking the user doesn't
      save the changes and losing the previous file.
 
 2012-06-26 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
@@ -63,12 +67,12 @@
 2012-06-25 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed ToolStripButtons to fire the OnClick event based on the HotKey assigned
      in the Text via &.
-   ! Fixed Forms to intercept ToolStripButtons HotKeys and fire the corresponding 
+   ! Fixed Forms to intercept ToolStripButtons HotKeys and fire the corresponding
      command.
    ! Fixed Modeless Forms to CLOSE upon receiving OnClose from other controls if
      AutoClose is set to true.
 
-   
+
 2012-06-22 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed StatusBar unnecesary processing in a effort to remove flckering.
    ! Fixed Edit->Paste not being enabled when changing source code.
@@ -116,12 +120,12 @@
    ! Hidden more private properties and methods.
    ! Fixed method Save/RestoreLayout to default ini file section to [Main]
    + Upgraded to Beta 3.
-   
+
 2012-06-05 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed property "Enabled" to repaint controls
    * Renamed some internal methods to not to be shown in IntelliSense.
    ! Fixed bug in DataTable:SetRelation() using Alias instead of Area.
-   ! Fixed DataGrid to allow closing a dialog with the Escape key and allow translating Enter 
+   ! Fixed DataGrid to allow closing a dialog with the Escape key and allow translating Enter
      key to the default button.
    * Changed DataGrid to draw items grayed when disabled.
    ! Fixed bug in "Theming" property.
@@ -137,9 +141,9 @@
    ! Fixed Components panel to hide when last component is deleted.
    + Added API FlatSB_SetScrollProp though it's obsolete in OS higher than XP.
    ! Fixed some internal methods to have __ and allow IntelliSense to filter them.
-   
+
 2012-05-30 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
-   ! Fixed editor line shifting bug when hitting : 
+   ! Fixed editor line shifting bug when hitting :
    + Added DataTable Blank(), Load() and Save()
      Blank: Creates an array of empty values based of the table structure and marks as new record
      Load:  Loads current records into an array in memory
@@ -157,7 +161,7 @@
      doesn't match the current structure.
 
 2012-05-24 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
-   + Added Application:Quit() to shutdown the exe inmediately. Unlike method Exit(), Quit() 
+   + Added Application:Quit() to shutdown the exe inmediately. Unlike method Exit(), Quit()
      destroys all resources and closes the exe without returning to the previous Form.
 
 2012-05-23 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
@@ -165,7 +169,7 @@
 
 2012-05-22 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Fixed UpDown control inversed behavior.
-   + Added UpDown control properties 
+   + Added UpDown control properties
      MinRange: Minimum Value allowed
      MaxRange: Maximum Value allowed
      Alignment: (Left, Right) Position where the updown is placed within the "Buddy"
@@ -217,16 +221,16 @@
 2012-02-01 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Added System:IsProcRunning( cProcName, lTerminate ) it will let users know
      whether a process is running or not and will allow termination of it at the same time.
-     usage: 
-     
+     usage:
+
      lVXH := ::System:IsProcRunning( "vxh.exe" ) (NO PATH)
      or
-     ::System:IsProcRunning( "vxh.exe", .T. ) 
-     
+     ::System:IsProcRunning( "vxh.exe", .T. )
+
      The second parameter indicates whether **ALL INSTANCES** of the process should be terminated.
 
      OR simply use both methods in conjuction:
-     
+
      ::System:IsProcRunning( "iexplorer.exe", .T. )  // kills all vxh.exe (if any)
      lVXH := ::System:IsProcRunning( "iexplorer.exe" ) // must return false
 
@@ -235,7 +239,7 @@
 
      ::System:IsProcRunning( "iexplorer.exe", ::System:IsProcRunning( "vxh.exe" ) )
 
-     
+
 2012-01-30 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed memory overload creating array of events.
    + Added new METHOD System:GetRunningProcs()
@@ -249,7 +253,7 @@
 
 2012-01-27 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed controls bad border leaving artifacts when Border is set to true.
-   
+
 2012-01-24 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Optimized Events manager to avoid flicker.
    * Changed internal array of events to clone from a static array and avoid memory leaks.
@@ -264,7 +268,7 @@
    + Added Application:Icon property. This icon shows in the explorer instead of the window icon.
    + Added API SetFileTime( cFile, cTime, dDate )
    + Added API wString := MultiByteToWideChar( nCodePage, nFlags, cString )
-   
+
 2012-01-13 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed load error when components/forms name was larger than 25 chars (removed limitation)
    + Added logical return value to eMail:Send()
@@ -318,15 +322,15 @@
    ! Fixed DataGrid FreezeColumn display problem.
 
 2011-12-19 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
-   + Added GridColumn event "OnCellFont" to receive the font object that will be used to 
+   + Added GridColumn event "OnCellFont" to receive the font object that will be used to
      display the cell. Make sure the font objects to be used are created **BEFORE**
      data is displayed for the first time which happens while the form is still hidden so
-     if these objects are created in the OnLoad() event, make sure you UPDATE the datagrid 
+     if these objects are created in the OnLoad() event, make sure you UPDATE the datagrid
      (DataGrid1:Update()) or simply create them in the OnInit event of the form.
-      
+
       static oMyFont
       ...
-      
+
       METHOD Form1_OnInit( Sender ) CLASS Form1
          oMyFont := Font()
          oMyFont:Italic := .T.
@@ -338,11 +342,11 @@
       ...
 
       METHOD GridColumn3_OnCellFont( Sender ) CLASS Form1
-         
+
          *****************************************
          **** DO NOT CREATE FONT OBJECTS HERE ****
          *****************************************
-         
+
          IF ::AdsDataTable1:Recno() < 50
             RETURN oMyFont // Return the previously created font
          ENDIF
@@ -364,13 +368,13 @@
      the Attachment property can be a string of files separated by semi-colons.
      i.e. c:\Visual-xHarbour\Changelog;C:\Events.htm
      or it can also be an array of files.
-     
+
 2011-12-14 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    + Added new eMail component
 
 2011-12-05 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed HeaderMenu error displaying on empty DataGrids.
-   + Added column property "ButtonText" if the representation is a button it will draw 
+   + Added column property "ButtonText" if the representation is a button it will draw
      this text and default to the DataSource data
 
 2011-12-01 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
@@ -407,27 +411,27 @@
      Button. This pseudo button fires a Column event called ButtonClicked specific for
      all columns ie:
      METHOD GridColumn4_ButtonClicked( Sender ) CLASS Form1
-        Alert( "Button con Column 4" ) 
+        Alert( "Button con Column 4" )
      RETURN Self
      METHOD GridColumn5_ButtonClicked( Sender ) CLASS Form1
-        Alert( "Button con Column 5" ) 
+        Alert( "Button con Column 5" )
      RETURN Self
      This event doesn't provide or pass any information to the user all the information
      needed is in DataGrid:DataSource or by using normal database commands:
 
      METHOD GridColumn4_ButtonClicked( Sender ) CLASS Form1
-        Alert( ::DataGrid1:DataSource:Fields:CITY ) 
+        Alert( ::DataGrid1:DataSource:Fields:CITY )
      RETURN Self
-     
+
      METHOD GridColumn5_ButtonClicked( Sender ) CLASS Form1
-        Alert( ::DataGrid1:DataSource:Fields:STATE ) 
+        Alert( ::DataGrid1:DataSource:Fields:STATE )
      RETURN Self
    ! Fixed DataGrid's Extended scrollbar to match real position
    ! Added DataBase method OrdKeyVal()
 
 2011-11-10 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed RTE dropping ServiceControler component with standard users logged on
-   
+
 2011-11-09 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed object allocation error generated by previous Application:Form
      property generation.
@@ -449,7 +453,7 @@
 2011-11-02 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed DataGrid RTE produced by mouse wheel when usable records are less
      than visible records.
-   
+
 2011-11-01 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Forced creating missing directories during build process to avoid I/O errors
    * Changed main array of property names to be separated alphabet hashes to allow
@@ -463,20 +467,20 @@
 2011-10-31 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Reduced project loading time by 80%
    ! Reduced Save time by 70%
-   + Added garbage collector at the end of every form to allow recycling large 
+   + Added garbage collector at the end of every form to allow recycling large
      amounts of unused memory after closing forms with lots of resources.
    * Forced sub-directory creation if they were deleted
 
 2011-10-05 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
-   + Added DataGrid:AnchorColum (numeric) property to identify if a column should shrink or 
+   + Added DataGrid:AnchorColum (numeric) property to identify if a column should shrink or
      stretch to force all columns fit in the client area. A value of zero disables it.
    + Added missing DataTable:dbEval( codeblock ) method
-   
+
 2011-09-24 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed CURSORS not being loaded in resource manager.
    ! Fixed component display in property manager to avoid empty arrays when users can't collect
      system information due to lack of rights.
-   ! Fixed DataTable SqlConnector property not being set when loading the project. This also 
+   ! Fixed DataTable SqlConnector property not being set when loading the project. This also
      fixes a valtype problem at runtime.
    ! Fixed error displaying closing windows.
 
@@ -700,7 +704,7 @@
 2010-07-02 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    + Added ColorScheme property to TabControl's TabStripStyle to override
      de default gradient with any windows scheme
-     
+
 2010-06-06 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed RTE opening projects containing Imagelists
 
@@ -709,7 +713,7 @@
    ! Fixed ActiveX controls' Visible property (WebBrowser included)
    ! Fixed ObjectTree's initial project name
 
-   
+
 2010-05-04 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed TreeView AfterSelect event
    ! Fixed default LinkLabel underline
@@ -718,24 +722,24 @@
    + Added DataTable:FromAlias() to adopt an open database into a DataTable object
      i.e.
            USE "C:\xhb\samples\test.dbf" NEW ALIAS "TESTING" SHARED
-           
+
            oData := DataTable( Self )
            oData:FromAlias( "TESTING" )
 
            ::DataGrid1:DataSource := oData
            ::DataGrid1:AutoAddColumns()
-           
+
    ! Fixed DataTable:Scatter() and Gather() methods
    + Added DataTable aScatter to contain an array with scattered values allowing
      users to use such values besides Gathering them. It also allowes users to
      modify the values before gathering i.e.
-     
+
      oData:Scatter()
      cName := oData:aScatter[1] // cName is "Downey"
-     
+
      oData:Skip()
      oData:RecLock()
-     
+
      oData:aScatter[1] := "Smith"
 
      oData:Gather() // save the new record with first value changed
@@ -758,7 +762,7 @@
    ! Fixed StatusBar to smooth fonts after changing text
    ! Fixed ToolStrip to refresh child controls after enabling/disabling
    ! Fixed bug in ToolStripButtons not moving siblings when size changed.
-   
+
 2010-04-22 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    * Renamed BindingSource to SqlConnector to follow ms standard.
    + Added property ContextMenu to DataGrid Columns. Any right click will
@@ -783,17 +787,17 @@
      When assigning a Socket component, DataTable sends requests to the
      specified host in the Socket component in the following format:
         'SOCKETRDD|Request|MyTABLEALIAS|dbSeek|"cData"|.F.'
-        When the server receives the string it must macro convert the 
+        When the server receives the string it must macro convert the
         parameter list starting at the 5th element i.e:
             aReceived := hb_aTokens( Sender:RecData, "|" )
             cParams := ""
             FOR i := 5 TO LEN( aReceived )
                 cParams += aReceived[i] + IIF( i < 5, ",", "" )
-            NEXT            
+            NEXT
             This creates a string like this: ""cData",.F." so the function
             in the server can be called like this: dbSkip( &cParams )
 
-            
+
 2010-04-19 14:04 UTC-0800 Patrick Mast <Patrick.Mast@xHarbour.com>
 * IDE\Source\Vxh1.prg
   * Bumped up version to 2.5 and build to 231
