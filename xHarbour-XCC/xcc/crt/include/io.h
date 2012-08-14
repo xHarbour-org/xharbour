@@ -82,7 +82,7 @@ int __cdecl _write(int, const void *, unsigned int);
 #define _tell(fh)  _lseek((fh),0L,/*SEEK_CUR*/1)
 
 /* compatibility names */
-#ifdef __POCC__OLDNAMES
+#ifndef _NO_OLDNAMES
 #define SH_DENYRW  _SH_DENYRW
 #define SH_DENYWR  _SH_DENYWR
 #define SH_DENYRD  _SH_DENYRD
@@ -95,26 +95,26 @@ int __cdecl _write(int, const void *, unsigned int);
 #define LK_RLCK  _LK_RLCK
 #define LK_NBRLCK  _LK_NBRLCK
 
-int __cdecl access(const char *, int);
-int __cdecl chmod(const char *, int);
-int __cdecl chsize(int, long);
-int __cdecl close(int);
-int __cdecl creat(const char *, int);
-int __cdecl dup(int);
-int __cdecl dup2(int, int);
-int __cdecl eof(int);
-long __cdecl filelength(int);
-int __cdecl isatty(int);
-int __cdecl locking(int, int, long);
-long __cdecl lseek(int, long, int);
-int __cdecl open(const char *, int, ...);
-int __cdecl read(int, void *, unsigned int);
-int __cdecl setmode(int, int);
-int __cdecl sopen(const char *, int, int, ...);
-long __cdecl tell(int);
-int __cdecl unlink(const char *);
-int __cdecl write(int, const void *, unsigned int);
-#endif /* __POCC__OLDNAMES */
+#define access(p, i)         _access(p, i)
+#define chmod(p, i)          _chmod(p, i)
+#define chsize(i, l)         _chsize(i, l)
+#define close(i)             _close(i)
+#define creat(p, i)          _creat(p, i)
+#define dup(i)               _dup(i)
+#define dup2(i, i2)          _dup2(i,i2)
+#define eof(i)               _eof(i)
+#define filelength(i)        _filelength(i)
+#define isatty(i)            _isatty(i)
+#define locking(i, i2, l)    _locking(i, i2, l)
+#define lseek(i, l, i2)      _lseek(i, l, i2)
+#define open(p, i, ...)      _open(p, i, __VA_ARGS__)
+#define read(i, p, ui)       _read(i, p, ui)
+#define setmode(i, i2)       _setmode(i, i2)
+#define sopen(p, i, i2, ...) _sopen(p, i, i2, __VA_ARGS__)
+#define tell(i)              _tell(i)
+#define unlink(p)            _unlink(p)
+#define write(i, p, ui)      _write(i, p, ui)
+#endif /* _NO_OLDNAMES */
 
 #endif /* _WINCE */
 

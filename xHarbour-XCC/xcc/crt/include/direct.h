@@ -20,11 +20,11 @@ int __cdecl _mkdir(const char *);  /* WINCE: in crtce.lib */
 int __cdecl _rmdir(const char *);  /* WINCE: in crtce.lib */
 
 /* compatibility names */
-#ifdef __POCC__OLDNAMES
+#ifndef _NO_OLDNAMES
 int __cdecl chdir(const char *);
 char * __cdecl getcwd(char *, size_t);
 int __cdecl mkdir(const char *);
 int __cdecl rmdir(const char *);
-#endif /* __POCC__OLDNAMES */
+#endif /* _NO_OLDNAMES */
 
 #endif /* _DIRECT_H */

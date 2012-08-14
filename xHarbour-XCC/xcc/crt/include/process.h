@@ -34,7 +34,7 @@ int __cdecl _spawnvp(int, const char *, /*const*/ char * const *);
 int __cdecl _spawnvpe(int, const char *, /*const*/ char * const *, /*const*/ char * const *);
 
 /* compatibility names */
-#ifdef __POCC__OLDNAMES
+#ifndef _NO_OLDNAMES
 #define P_WAIT  _P_WAIT
 #define P_NOWAIT  _P_NOWAIT
 #define P_OVERLAY  _P_OVERLAY
@@ -51,7 +51,7 @@ int __cdecl spawnv(int, const char *, /*const*/ char * const *);
 int __cdecl spawnve(int, const char *, /*const*/ char * const *, /*const*/ char * const *);
 int __cdecl spawnvp(int, const char *, /*const*/ char * const *);
 int __cdecl spawnvpe(int, const char *, /*const*/ char * const *, /*const*/ char * const *);
-#endif /* __POCC__OLDNAMES */
+#endif /*  _NO_OLDNAMES */
 
 #endif /* _WINCE */
 

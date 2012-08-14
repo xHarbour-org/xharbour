@@ -20,7 +20,7 @@ unsigned short __cdecl _outpw(unsigned short, unsigned short);
 unsigned long __cdecl _outpd(unsigned short, unsigned long);
 
 /* compatibility names */
-#ifdef __POCC__OLDNAMES
+#ifndef _NO_OLDNAMES
 int __cdecl getch(void);
 int __cdecl getche(void);
 int __cdecl kbhit(void);
@@ -30,7 +30,7 @@ int __cdecl inp(unsigned short);
 unsigned short __cdecl inpw(unsigned short);
 int __cdecl outp(unsigned short, int);
 unsigned short __cdecl outpw(unsigned short, unsigned short);
-#endif /* __POCC__OLDNAMES */
+#endif /* _NO_OLDNAMES */
 
 #endif  /* _WINCE */
 

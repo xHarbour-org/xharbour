@@ -121,14 +121,14 @@ size_t __cdecl _set_crt_heap_size(size_t);
 #endif /* _WINCE */
 
 /* compatibility names */
-#ifdef __POCC__OLDNAMES
+#ifndef _NO_OLDNAMES
 char * __cdecl itoa(int, char *, int);
 char * __cdecl ltoa(long, char *, int);
 int __cdecl putenv(const char *);
 char * __cdecl ultoa(unsigned long, char *, int);
 #undef alloca
 #define alloca  _alloca
-#endif /* __POCC__OLDNAMES */
+#endif /* _NO_OLDNAMES */
 
 /* internal stuff */
 #ifndef _WINCE
@@ -165,5 +165,22 @@ extern _CRTIMP size_t __bheap_threshold;
 #define strtoul(s,endptr,base)  __stoul(s,endptr,base)
 #define strtoull(s,endptr,base)  __stoull(s,endptr,base)
 #endif /* _WINCE */
+/*
+ * Sizes for buffers used by the _makepath() and _splitpath() functions.
+ * note that the sizes include space for 0-terminator
+ */
+#define _MAX_PATH   260 /* max. length of full pathname */
+#define _MAX_DRIVE  3   /* max. length of drive component */
+#define _MAX_DIR    256 /* max. length of path component */
+#define _MAX_FNAME  256 /* max. length of file name component */
+#define _MAX_EXT    256 /* max. length of extension component */
+
+/*
+ * Argument values for _set_error_mode().
+ */
+#define _OUT_TO_DEFAULT 0
+#define _OUT_TO_STDERR  1
+#define _OUT_TO_MSGBOX  2
+#define _REPORT_ERRMODE 3
 
 #endif /* _STDLIB_H */

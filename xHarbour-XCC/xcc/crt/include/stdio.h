@@ -204,9 +204,9 @@ extern FILE *__filetab[FOPEN_MAX];
 #endif /* _WINCE */
 
 /* compatibility names */
-#ifdef __POCC__OLDNAMES
+#ifndef _NO_OLDNAMES
 FILE * __cdecl fdopen(int, const char *);
 int __cdecl fileno(FILE *);
-#endif /* __POCC__OLDNAMES */
+#endif /* _NO_OLDNAMES */
 
 #endif /* _STDIO_H */

@@ -167,7 +167,7 @@ unsigned long __cdecl __wcstoul(const wchar_t *, wchar_t **, int);
 #endif /* _WINCE */
 
 /* compatibility names */
-#ifdef __POCC__OLDNAMES
+#ifndef _NO_OLDNAMES
 int __cdecl wcsicmp(const wchar_t *, const wchar_t *);
 int __cdecl wcsnicmp(const wchar_t *, const wchar_t *, size_t);
 wchar_t * __cdecl wcsdup(const wchar_t *);
@@ -175,7 +175,7 @@ wchar_t * __cdecl wcsupr(wchar_t *);
 wchar_t * __cdecl wcslwr(wchar_t *);
 wchar_t * __cdecl wcsnset(wchar_t *, wchar_t, size_t);
 wchar_t * __cdecl wcsrev(wchar_t *);
-#endif /* __POCC__OLDNAMES */
+#endif /* _NO_OLDNAMES */
 
 #endif /* _WCHAR_H */
 

@@ -61,10 +61,10 @@ wint_t __cdecl __towctrans(wint_t, wctrans_t);
 #define towupper(wc)  __towctrans(wc,2)
 #define towctrans(wc,desc)  __towctrans(wc,desc)
 
-#ifdef __POCC__OLDNAMES
+#ifndef _NO_OLDNAMES
 int __cdecl iswascii(wint_t);
 #define iswascii(c)  __iswctype(wc,13)
-#endif /* __POCC__OLDNAMES */
+#endif /* _NO_OLDNAMES */
 
 #else /* _WINCE */
 
@@ -108,9 +108,9 @@ wint_t __cdecl towupper(wint_t);
 #define _iswascii(c)  ((unsigned)(c) < 0x80)
 /* towctrans() */
 
-#ifdef __POCC__OLDNAMES
+#ifndef _NO_OLDNAMES
 #define iswascii  _iswascii
-#endif /* __POCC__OLDNAMES */
+#endif /* _NO_OLDNAMES */
 
 #endif /* _WINCE */
 

@@ -72,10 +72,10 @@ int __cdecl toupper(int);
 #define tolower(c)  __tolowertab[(int)(c)]
 #define toupper(c)  __touppertab[(int)(c)]
 
-#ifdef __POCC__OLDNAMES
+#ifndef _NO_OLDNAMES
 int __cdecl isascii(int);
 #define isascii(c)  (__ctypetab[(int)(c)] & (_ASCII|_CNTRL|_SPACE|_PUNCT|_DIGIT|_UPPER|_LOWER))
-#endif /* __POCC__OLDNAMES */
+#endif /* _NO_OLDNAMES */
 
 #else /* _WINCE */
 
@@ -109,9 +109,9 @@ int __cdecl toupper(int);
 #define isxdigit(c)  (_isctype((c), _HEX))
 #define _isascii(c)  ((unsigned)(c) < 0x80)
 
-#ifdef __POCC__OLDNAMES
+#ifndef _NO_OLDNAMES
 #define isascii  _isascii
-#endif /* __POCC__OLDNAMES */
+#endif /* _NO_OLDNAMES */
 
 #endif /* _WINCE */
 

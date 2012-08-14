@@ -55,6 +55,8 @@ int __cdecl __fpsignl(long double);
 #define isnan(x)     (fpclassify(x) == FP_NAN)
 #define isnormal(x)  (fpclassify(x) == FP_NORMAL)
 
+/* MSVC compatibility. */
+#define _isfinite(x)  isfinite(x)
 #define isgreater(x,y)  (_FPCOMP(x,y) & _FP_GT)
 #define isgreaterequal(x,y)  (_FPCOMP(x,y) & (_FP_EQ|_FP_GT))
 #define isless(x,y)  (_FPCOMP(x,y) & _FP_LT)
@@ -226,6 +228,7 @@ long double __cdecl tanhl(long double);
 long double __cdecl tgammal(long double);
 long double __cdecl truncl(long double);
 
+/* double macro overrides */
 double __cdecl cos(double);
 double __cdecl cosh(double);
 double __cdecl log(double);
@@ -245,6 +248,7 @@ double __cdecl sinh(double);
 #define sinh(x)  __sinh(x,1)
 #endif /* _M_ARM */
 
+/* float macro overrides */
 float __cdecl cosf(float);
 float __cdecl coshf(float);
 float __cdecl logf(float);
@@ -264,6 +268,7 @@ float __cdecl sinhf(float);
 #define sinhf(x)  __sinhf(x,1)
 #endif /* _M_ARM */
 
+/* long double macro overrides */
 long double __cdecl cosl(long double);
 long double __cdecl coshl(long double);
 long double __cdecl logl(long double);
@@ -309,33 +314,37 @@ short __expl(long double *, long double, short);
 
 #ifdef _MSC_EXTENSIONS
 /* values for _exception type */
-#define _DOMAIN  1
-#define _SING  2
-#define _OVERFLOW  3
-#define _UNDERFLOW  4
-#define _TLOSS  5
-#define _PLOSS  6
+#define _DOMAIN     1   /* argument domain error */
+#define _SING       2   /* argument singularity */
+#define _OVERFLOW   3   /* overflow range error */
+#define _UNDERFLOW  4   /* underflow range error */
+#define _TLOSS      5   /* total loss of precision */
+#define _PLOSS      6   /* partial loss of precision */
+
+#define EDOM        33
+#define ERANGE      34
 
 /* compatibility names */
-#ifdef __POCC__OLDNAMES
+#ifndef _NO_OLDNAMES
 #define DOMAIN  _DOMAIN
 #define SING  _SING
 #define OVERFLOW  _OVERFLOW
 #define UNDERFLOW  _UNDERFLOW
 #define TLOSS  _TLOSS
 #define PLOSS  _PLOSS
-#endif /* __POCC__OLDNAMES */
+#endif /* _NO_OLDNAMES */
 
-/* passed to _matherr() when a fp exception is detected */
+#ifndef _EXCEPTION_DEFINED
 struct _exception {
-    int type;
-    char *name;
-    double arg1;
-    double arg2;
-    double retval;
+        int type;       /* exception type - see below */
+        char *name;     /* name of function where error occured */
+        double arg1;    /* first argument to function */
+        double arg2;    /* second argument (if any) to function */
+        double retval;  /* value to be returned by function */
 };
 
 int __cdecl _matherr(struct _exception *);
+#define _EXCEPTION_DEFINED
 #endif /* _MSC_EXTENSIONS */
 
 #endif /* _MATH_H */

@@ -2,6 +2,23 @@
  * $Id:
  */
 
+2012-08-14 12:43 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * xcc\crt\include\conio.h
+  * xcc\crt\include\ctype.h
+  * xcc\crt\include\direct.h
+  * xcc\crt\include\errno.h
+  * xcc\crt\include\fcntl.h
+  * xcc\crt\include\io.h
+  * xcc\crt\include\math.h
+  * xcc\crt\include\process.h
+  * xcc\crt\include\stdio.h
+  * xcc\crt\include\stdlib.h
+  * xcc\crt\include\string.h
+  * xcc\crt\include\wchar.h
+  * xcc\crt\include\wctype.h
+    * Tried to merge most features between crt\include and xcc\crt\include
+    * Tried to standardized use of #ifndef _NO_OLDNAMES instead of #ifdef __POCC__OLDNAMES
+
 2012-08-14 12:37 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * xlink\export.c
     ! Fixed .dll generation of .exp and .lib with regard to underscore decoration (COFF_I_NAME_NOPREF)

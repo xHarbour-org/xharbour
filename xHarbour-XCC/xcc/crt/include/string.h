@@ -51,7 +51,7 @@ char * __cdecl _strrev(char *);
 char * __cdecl _strupr(char *);
 
 /* compatibility names */
-#ifdef __POCC__OLDNAMES
+#ifndef _NO_OLDNAMES
 int __cdecl memicmp(const void *, const void *, size_t);
 char * __cdecl strdup(const char *);
 int __cdecl stricmp(const char *, const char *);
@@ -60,6 +60,6 @@ int __cdecl strnicmp(const char *, const char *, size_t);
 char * __cdecl strnset(char *, int, size_t);
 char * __cdecl strrev(char *);
 char * __cdecl strupr(char *);
-#endif /* __POCC__OLDNAMES */
+#endif /* _NO_OLDNAMES */
 
 #endif /* _STRING_H */
