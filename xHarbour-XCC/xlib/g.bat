@@ -15,12 +15,14 @@ SET _PRESET_LFLAGS=%LFLAGS%
 
 :SET_VC2008
    CALL "%ProgramFiles%\Microsoft Visual Studio 9.0\vc\vcvarsall.bat"
-   REM SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 9.0\vc
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 9.0\vc
+   SET PSDKDIR=%ProgramFiles%\Microsoft SDKs\Windows\v6.0A
    GOTO READY
 
 :SET_VC2005
    CALL "%ProgramFiles%\Microsoft Visual Studio 8\vc\vcvarsall.bat"
-   REM SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 8\vc
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 8\vc
+   SET PSDKDIR=%ProgramFiles%\Microsoft Visual Studio 8\Common7\Tools
    GOTO READY
 
 :SET_VC2003
@@ -30,7 +32,8 @@ SET _PRESET_LFLAGS=%LFLAGS%
 
 :SET_VC6
    CALL "%ProgramFiles%\Microsoft Visual Studio\VC98\vcvarsall.bat"
-   REM SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\vc98
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\vc98
+   SET PSDKDIR="*** PLEASE SET PSDKDIR ***"
    GOTO READY
 
 :NONE   
