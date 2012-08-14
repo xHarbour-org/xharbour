@@ -40,7 +40,10 @@ CLASS Control INHERIT Window
 
    DATA xText                  EXPORTED  INIT ""
    ACCESS Text                 INLINE    IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xText, _GetWindowText( ::hWnd ) ) PERSISTENT
-   ASSIGN Text(c)              INLINE    ::SetWindowText( c ), IIF( ::SmallCaption, ::RedrawWindow( , , RDW_FRAME | RDW_NOERASE | RDW_NOINTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN ), )
+   ASSIGN Text(c)              INLINE    ::SetWindowText( c ),;
+                                         ::xText := c,;
+                                         IIF( ::SmallCaption,;
+                                             ::RedrawWindow( , , RDW_FRAME | RDW_NOERASE | RDW_NOINTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN ), )
 
    DATA AllowMaximize     PUBLISHED INIT .F.
    
@@ -210,7 +213,7 @@ RETURN Self
 
 METHOD OnSize( nwParam, x, y ) CLASS Control
    IF ::Super:OnSize( nwParam, x, y ) == NIL
-      IF !EMPTY( ::Caption ) .AND. ::Style & WS_CHILD == 0 .AND. ::xSmallCaption
+      IF !EMPTY( ::xText ) .AND. ::Style & WS_CHILD == 0 .AND. ::xSmallCaption
          ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW )
       ENDIF
       IF ::LeftSplitter != NIL
@@ -248,7 +251,7 @@ RETURN NIL
 //---------------------------------------------------------------------------------------------------
 
 METHOD OnKillFocus() CLASS Control
-   IF ::Super:OnKillFocus() == NIL .AND. !EMPTY( ::Caption ) .AND. ::xSmallCaption
+   IF ::Super:OnKillFocus() == NIL .AND. !EMPTY( ::xText ) .AND. ::xSmallCaption
       ::RedrawWindow( , , RDW_FRAME | RDW_NOERASE | RDW_NOINTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN )
    ENDIF
 RETURN NIL
@@ -263,7 +266,7 @@ METHOD __SetSmallCaption() CLASS Control
 RETURN Self
 
 METHOD OnSetFocus() CLASS Control
-   IF ::Super:OnSetFocus() == NIL .AND. !EMPTY( ::Caption ) .AND. ::xSmallCaption
+   IF ::Super:OnSetFocus() == NIL .AND. !EMPTY( ::xText ) .AND. ::xSmallCaption
       ::RedrawWindow( , , RDW_FRAME | RDW_NOERASE | RDW_NOINTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN )
    ENDIF
 RETURN NIL
@@ -288,7 +291,7 @@ METHOD OnNCCalcSize( nwParam, nlParam ) CLASS Control
    LOCAL nccs
    (nwParam)
    ::CaptionHeight := 0
-   IF ( !EMPTY( ::Caption ) .AND. ::xSmallCaption ) .OR. ::FlatBorder
+   IF ( !EMPTY( ::xText ) .AND. ::xSmallCaption ) .OR. ::FlatBorder
       IF ::Style & WS_DLGFRAME != 0 .AND. ::Style & WS_BORDER != 0
          ::xSmallCaption := FALSE
          RETURN NIL
@@ -297,7 +300,7 @@ METHOD OnNCCalcSize( nwParam, nlParam ) CLASS Control
       nccs := (struct NCCALCSIZE_PARAMS)
       nccs:Pointer( nlParam )
       
-      IF ( !EMPTY( ::Caption ) .AND. ::xSmallCaption )
+      IF ( !EMPTY( ::xText ) .AND. ::xSmallCaption )
          ::CaptionHeight := IIF( ::Font != NIL, ABS( ::Font:Height ), ABS( ::Form:Font:Height ) ) + 8
 
          nccs:rgrc[1]:Left += ::EmptyLeft
@@ -305,7 +308,7 @@ METHOD OnNCCalcSize( nwParam, nlParam ) CLASS Control
       ENDIF      
       IF ::FlatBorder .AND. ::__xCtrlName != "ToolBox"
          nccs:rgrc[1]:Left   += 1
-         IF ! ( !EMPTY( ::Caption ) .AND. ::xSmallCaption )
+         IF ! ( !EMPTY( ::xText ) .AND. ::xSmallCaption )
             nccs:rgrc[1]:Top    += 1
          ENDIF
          nccs:rgrc[1]:Right  -= 1
@@ -321,7 +324,7 @@ RETURN NIL
 //---------------------------------------------------------------------------------------------------
 
 METHOD OnNCMouseleave() CLASS Control
-   IF !EMPTY( ::Caption ) .AND. ::xSmallCaption .AND. ::AllowClose
+   IF !EMPTY( ::xText ) .AND. ::xSmallCaption .AND. ::AllowClose
       ::CloseHover  := .F.
       ::PinHover    := .F.
       ::Redraw()
@@ -334,7 +337,7 @@ RETURN NIL
 METHOD OnNCPaint( nwParam, nlParam ) CLASS Control
    LOCAL hOldBrush, hOldPen, hdc, hOldFont, nWidth, hRegion, hBrush, n:=0
    ::CallWindowProc()
-   IF ::Super:OnNCPaint( nwParam, nlParam ) == NIL .AND. !EMPTY( ::Caption ) .AND. ::xSmallCaption
+   IF ::Super:OnNCPaint( nwParam, nlParam ) == NIL .AND. !EMPTY( ::xText ) .AND. ::xSmallCaption
       ::CaptionWidth := ::xWidth
 
       hRegion := CreateRectRgn( 0, 0, ::Width, ::Height )
@@ -370,7 +373,7 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS Control
          ::DrawArrow( hDC, ::ArrowRect )
       ENDIF
 
-      _DrawText( hDC, ::Caption, { IIF( ::MenuArrow .AND. ::ArrowRect != NIL, ::ArrowRect[3]+2, ::CaptionRect[1]+5 ), ::CaptionRect[2], ::CaptionRect[3], ::CaptionRect[4] }, DT_LEFT | DT_SINGLELINE | DT_VCENTER | DT_WORD_ELLIPSIS )
+      _DrawText( hDC, ::xText, { IIF( ::MenuArrow .AND. ::ArrowRect != NIL, ::ArrowRect[3]+2, ::CaptionRect[1]+5 ), ::CaptionRect[2], ::CaptionRect[3], ::CaptionRect[4] }, DT_LEFT | DT_SINGLELINE | DT_VCENTER | DT_WORD_ELLIPSIS )
 
       nWidth := 0
       IF ::AllowClose
@@ -614,7 +617,7 @@ METHOD Undock() CLASS Control
 
       ::__DockParent := WinForm( ::Form )
       ::__DockParent:Cargo      := Self
-      ::__DockParent:Caption    := ::Caption
+      ::__DockParent:Caption    := ::xText
       ::__DockParent:Left       := pt:x
       ::__DockParent:Top        := pt:y
       ::__DockParent:Width      := ::Width  + ( GetSystemMetrics( SM_CXFRAME ) + 2 )
@@ -647,7 +650,7 @@ RETURN Self
 
 METHOD OnNCHitTest( x, y ) CLASS Control
    LOCAL nRes, aPt, hRegion, hdc, n
-   IF !EMPTY(::CaptionRect) .AND. !EMPTY( ::Caption ) .AND. ::xSmallCaption .AND. ::Super:OnNCHitTest( x, y ) == NIL
+   IF !EMPTY(::CaptionRect) .AND. !EMPTY( ::xText ) .AND. ::xSmallCaption .AND. ::Super:OnNCHitTest( x, y ) == NIL
       aPt := { x, y }
       _ScreenToClient( ::hWnd, @aPt )
       aPt[2]+=::CaptionRect[4]
