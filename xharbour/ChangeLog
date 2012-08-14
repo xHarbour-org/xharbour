@@ -20,7 +20,7 @@
     - Removed unneeded #define of close() dup() and fileno() for xCC and protected them with #ifndef
 
   * source/compiler/genc.c
-    * Fixed and frefined forward declaration of PRG Function, EXTERNAL Function, and C Dump Functions
+    * Fixed and refined forward declaration of PRG Function, EXTERNAL Function, and C Dump Functions
     + Added logic to detect and warn of STATIC FUNCTION or HB_FUNC_STATIC defined but never used
     * Added missing support for HB_FUNC_INIT and HB_FUNC_EXIT and refined hb_compWriteExternEntries()
     * Enabled HB_FUNC_STATIC in hb_compGenCAddProtos()
@@ -34,7 +34,7 @@
     * Corrected #include <zlib/zlib.h> to "zlib/zlib.h"
 
   * source/vm/errorapi.c
-    ! Fixed forward declarion HB_FUNC_EXTERN( ERRORNEW ) to HB_FUNC( ERRORNEW )
+    ! Fixed forward declaration HB_FUNC_EXTERN( ERRORNEW ) to HB_FUNC( ERRORNEW )
 
   * include/hberrors.h
     + Added HB_COMP_WARN_STATIC_UNUSED
