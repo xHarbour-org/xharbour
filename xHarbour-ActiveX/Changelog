@@ -8,6 +8,11 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-14 13:13 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * ActiveX.c
+  * TActiveX.prg
+    * Renamed ATLX based implementaion of ActiveX_GetDispatch() to ActiveX_GetDispatchATLX()
+
 2009-01-21 14:48 UTC+0100 Patrick Mast <patrick@xHarbour.com>
 - xHarbour-AxtiveX/activex.lib.xbp
 + xHarbour-AxtiveX/xcc/activex.lib.xbp
@@ -16,7 +21,7 @@
 
 
 2005-01-05 12:00 UTC+0100 Patrick Mast <patrick@xHarbour.com>
-  - Moved TestActiveX.prg to 
+  - Moved TestActiveX.prg to
     \xHarbour.com\xHarbour-Builder\Samples\Samples for PROF and ENT versions\Test_ActiveX.prg
 
 

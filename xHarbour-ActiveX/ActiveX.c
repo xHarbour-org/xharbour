@@ -1484,7 +1484,7 @@ HB_FUNC( __CREATEACTIVEX )
    }
 }
 
-HB_FUNC( ACTIVEX_GETDISPATCH )
+HB_FUNC( ACTIVEX_GETDISPATCHATLX )
 {
    HWND hWnd = (HWND) hb_parnl( 1 );
    IUnknown *pUnknown = NULL;

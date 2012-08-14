@@ -97,9 +97,9 @@ METHOD New( hWnd, cClass, cLicense, nVerb ) CLASS TActiveX
              ::hObj := ActiveX_GetDispatch( ::pOleInterface )
           #else
             #ifdef INPLACE_WINDOW
-               ::hObj := ActiveX_GetDispatch( ::hWnd )
+               ::hObj := ActiveX_GetDispatchATLX( ::hWnd )
             #else
-               ::hObj := ActiveX_GetDispatch( ::hControlWnd )
+               ::hObj := ActiveX_GetDispatchATLX( ::hControlWnd )
             #endif
           #endif
 
@@ -233,10 +233,10 @@ FUNCTION CreateActiveX( hWnd, cClass, cLicense, nVerb, hFrame, _6, xArg )
          #else
             #ifdef INPLACE_WINDOW
               pOleInterface := __CreateActiveX( hWnd, cClass, cLicense, nVerb )
-              hObj          := ActiveX_GetDispatch( hWnd )
+              hObj          := ActiveX_GetDispatchATLX( hWnd )
             #else
               pOleInterface := __CreateActiveX( hWnd, cClass, cLicense, nVerb, @hControlWnd )
-              hObj          := ActiveX_GetDispatch( hControlWnd )
+              hObj          := ActiveX_GetDispatchATLX( hControlWnd )
             #endif
 
             //TraceLog( hControlWnd, hObj )
