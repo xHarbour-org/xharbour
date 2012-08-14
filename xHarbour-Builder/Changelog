@@ -7,6 +7,14 @@
    For example:
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2012-08-14 13:25 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * xhb.c
+     + Added -Ze and -Zx to compliation of backend generated C code.
+     * _MAX_PATH to MAX_PATH
+
+   - guiddef.h
+   - wtypes.h
+     - Removed older header files which now interfered with compilation after fixing xCC support for relative path in #include
 
 2010-04-19 16:51 UTC-0800 Patrick Mast <patrick.mast@xHarbour.com>
    * xbldfull.bat

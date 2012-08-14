@@ -25,14 +25,19 @@
 
 extern int libmain(int argc, char **argv);
 
-#define MIN_ARGUMENTS 13
+#define ENABLE_EXTENSIONS
+#ifndef ENABLE_EXTENSIONS
+   #define MIN_ARGUMENTS 13
+#else
+   #define MIN_ARGUMENTS 15
+#endif
 
 int xHarbourBackEnd( char *szFileName )
 {
    int argc = MIN_ARGUMENTS;
    char **argv, *szObjName, *szOutSwitch, *pTmp;
    int ret, iLen;
-   char szModulePath[ _MAX_PATH + 2 ], szPath_C_Include[ _MAX_PATH ], szPath_C_IncludeWin[ _MAX_PATH ], szPath_C_IncludeMSVC[ _MAX_PATH ];
+   char szModulePath[MAX_PATH + 2 ], szPath_C_Include[MAX_PATH ], szPath_C_IncludeWin[MAX_PATH ], szPath_C_IncludeMSVC[MAX_PATH ];
    DWORD Len;
    HB_PATHNAMES *pInclude;
    void *pCopy;
@@ -45,7 +50,7 @@ int xHarbourBackEnd( char *szFileName )
    szModulePath[0] = '-';
    szModulePath[1] = 'I';
 
-   Len = GetModuleFileName( NULL, szModulePath + 2, _MAX_PATH ) + 2;
+   Len = GetModuleFileName( NULL, szModulePath + 2,MAX_PATH ) + 2;
 
    while( Len && szModulePath[Len] != '\\' )
    {
@@ -128,6 +133,13 @@ int xHarbourBackEnd( char *szFileName )
    argv[11] = "-Ot";
 
    argv[12] = "-Zi";
+
+   // Ron Pinkas added Aug 7 2012
+   #ifdef ENABLE_EXTENSIONS
+      argv[13] = "-Ze";
+      argv[14] = "-Zx";
+   #endif
+   // End
 
    pInclude = hb_comp_PP->pIncludePath;
 
