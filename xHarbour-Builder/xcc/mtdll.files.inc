@@ -130,7 +130,6 @@
 [\xbp\xcc\xhbmt.lib\scrollbr.obj]
 [\xbp\xcc\xhbmt.lib\seconds.obj]
 [\xbp\xcc\xhbmt.lib\session.obj]
-[\xbp\xcc\xhbmt.lib\set.obj]
 [\xbp\xcc\xhbmt.lib\setcolor.obj]
 [\xbp\xcc\xhbmt.lib\setcurs.obj]
 [\xbp\xcc\xhbmt.lib\setkey.obj]
@@ -280,6 +279,33 @@
 [\xbp\xcc\xhbmt.lib\throw.obj]
 
 [\xbp\xcc\xhbmt.lib\hbwinole.obj]
+
+[\xbp\xcc\xhbmt.lib\set.obj]
+[\xbp\xcc\xhbmt.lib\hbmem.obj]
+[\xbp\xcc\xhbmt.lib\strapi.obj]
+[\xbp\xcc\xhbmt.lib\trpcvmmt.obj]
+[\xbp\xcc\xhbmt.lib\errlogmt.obj]
+[\xbp\xcc\xhbmt.lib\lognetmt.obj]
+
+#[\xbp\xcc\xhbmt.lib\hvmall.obj]
+
+[\xbp\xcc\xhbmt.lib\arc4.obj]
+[\xbp\xcc\xhbmt.lib\hbbffnc.obj]
+[\xbp\xcc\xhbmt.lib\hbbfish.obj]
+[\xbp\xcc\xhbmt.lib\hbcom.obj]
+[\xbp\xcc\xhbmt.lib\hbcomhb.obj]
+[\xbp\xcc\xhbmt.lib\hbrand.obj]
+[\xbp\xcc\xhbmt.lib\hbsha1.obj]
+[\xbp\xcc\xhbmt.lib\hbsha1hm.obj]
+[\xbp\xcc\xhbmt.lib\hbsha2.obj]
+[\xbp\xcc\xhbmt.lib\hbsha2hm.obj]
+[\xbp\xcc\xhbmt.lib\hbsocket.obj]
+[\xbp\xcc\xhbmt.lib\hbsockhb.obj]
+[\xbp\xcc\xhbmt.lib\hbzlibgz.obj]
+[\xbp\xcc\xhbmt.lib\sha1.obj]
+[\xbp\xcc\xhbmt.lib\sha1hmac.obj]
+[\xbp\xcc\xhbmt.lib\sha2.obj]
+[\xbp\xcc\xhbmt.lib\sha2hmac.obj]
 
 # DBF
 [\xbp\xcc\dbfmt.lib\dbcmd.obj]

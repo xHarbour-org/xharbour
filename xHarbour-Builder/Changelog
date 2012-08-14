@@ -7,6 +7,15 @@
    For example:
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2012-08-14 13:27 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * stdlib.files.inc
+  * stxhb.files.inc
+  * xcc\libmisc.lib.xbp
+  * xcc\mtdll.files.inc
+  * xcc\stddll.files.inc
+    * Synched with .ORG changes
+
 2012-08-14 13:25 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * xhb.c
      + Added -Ze and -Zx to compliation of backend generated C code.

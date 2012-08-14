@@ -46,6 +46,13 @@
 [source\vm\inet.c]
 [source\vm\throw.c]
 
+[source\vm\set.c]
+[source\vm\strapi.c]
+[source\vm\trpcvmmt.prg]
+[source\vm\errlogmt.prg]
+[source\vm\lognetmt.prg]
+
+#[source\vm\hvmall.c]
 
 # *** gtstd.lib ***
 [source\rtl\gtstd\gtstd.c]
@@ -284,7 +291,6 @@
 [source\rtl\hbcrc32.c]
 [source\rtl\fnsplit.c]
 [source\rtl\fssize.c]
-[source\vm\set.c]
 [source\rtl\cdpapi.c]
 [source\rtl\gt.c]
 [source\rtl\gtapiu.c]
@@ -367,8 +373,6 @@
 [source\rtl\filebuf.c]
 [source\rtl\hbjson.c]
 
-[source\common\hbprintf.c]
-
 [source\rtl\hbwinole.c]
 
 [source\rtl\browdb.prg]
@@ -447,6 +451,24 @@
 [source\rtl\regexrpl.prg]
 [source\rtl\decode.prg]
 
+[source\rtl\arc4.c]
+[source\rtl\hbbffnc.c]
+[source\rtl\hbbfish.c]
+[source\rtl\hbcom.c]
+[source\rtl\hbcomhb.c]
+[source\rtl\hbrand.c]
+[source\rtl\hbsha1.c]
+[source\rtl\hbsha1hm.c]
+[source\rtl\hbsha2.c]
+[source\rtl\hbsha2hm.c]
+[source\rtl\hbsocket.c]
+[source\rtl\hbsockhb.c]
+[source\rtl\hbzlibgz.c]
+[source\rtl\sha1.c]
+[source\rtl\sha1hmac.c]
+[source\rtl\sha2.c]
+[source\rtl\sha2hmac.c]
+
 # *** common.lib ***
 [source\common\hbhash.c]
 [source\common\reserved.c]
@@ -461,7 +483,8 @@
 [source\common\hbtrace.c]
 [source\common\hbdate.c]
 [source\common\hbfopen.c]
-
+[source\common\hbprintf.c]
+[source\common\hbmem.c]
 
 # *** pp.lib ***
 [source\pp\ppcore.c]
@@ -716,5 +739,7 @@ MYDEFINES = HAVE_CONFIG_H
 [source\rtl\zlib\zutil.c]
 [source\rtl\zlib\gzlib.c]
 [source\rtl\zlib\gzwrite.c]
+
+MYDEFINES = HAVE_VSNPRINTF
 [source\rtl\zlib\gzread.c]
 [source\rtl\zlib\gzclose.c]

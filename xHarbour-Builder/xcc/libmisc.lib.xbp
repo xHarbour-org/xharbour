@@ -18,14 +18,24 @@ RC_OUTPUTFOLDER =
 SLY_OUTPUTFOLDER =
 TARGETFOLDER = \xhb\lib
 
-[\xHarbour\source\misc\hb_f.c]
 
 # *** samples.lib ***
-[\xHarbour\tests\misc\date.c]
-[\xHarbour\tests\misc\dbf.c]
-[\xHarbour\tests\misc\environ.c]
-[\xHarbour\tests\misc\gauge.c]
-[\xHarbour\tests\misc\num.c]
-[\xHarbour\tests\misc\stack.c]
-[\xHarbour\tests\misc\status.c]
-[\xHarbour\tests\misc\time.c]
+[\xHarbour\contrib\misc\date.c]
+#[\xHarbour\contrib\misc\dbf.c]
+[\xHarbour\contrib\misc\environ.c]
+[\xHarbour\contrib\misc\gauge.c]
+[\xHarbour\contrib\misc\hb_f.c]
+[\xHarbour\contrib\misc\mathx.c]
+[\xHarbour\contrib\misc\num.c]
+[\xHarbour\contrib\misc\stack.c]
+[\xHarbour\contrib\misc\status.c]
+[\xHarbour\contrib\misc\strfmt.c]
+[\xHarbour\contrib\misc\stringsx.c]
+[\xHarbour\contrib\misc\time.c]
+
+[\xHarbour\contrib\misc\fileread.prg]
+[\xHarbour\contrib\misc\nconvert.prg]
+[\xHarbour\contrib\misc\numtxten.prg]
+[\xHarbour\contrib\misc\numtxthu.prg]
+[\xHarbour\contrib\misc\stringp.prg]
+[\xHarbour\contrib\misc\twirler.prg]

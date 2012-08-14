@@ -40,10 +40,7 @@ MYDEFINES = HB_BACK_END=xHarbourBackEnd(szFileName)
 [source\common\hbhash.c]
 [source\common\reserved.c]
 [source\common\hbgete.c]
-
-
 #[source\common\hbfhnd.c]
-
 [source\common\hbver.c]
 [source\common\expropt2.c]
 [source\common\hbfsapi.c]
@@ -53,15 +50,13 @@ MYDEFINES = HB_BACK_END=xHarbourBackEnd(szFileName)
 [source\common\hbtrace.c]
 [source\common\hbdate.c]
 [source\common\hbfopen.c]
+[source\common\hbprintf.c]
+[source\common\hbmem.c]
 
 
 [source\compiler\ppcomp.c]
 [source\pp\ppcore.c]
 [source\pp\pptable.c]
-
-
-[source\common\hbprintf.c]
-
 
 [\xHarbour.com\xHarbour-Builder\xhb.c]
 
