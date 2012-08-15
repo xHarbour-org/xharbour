@@ -230,16 +230,16 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
            IF s_cCancel != NIL
               aRect := _GetClientRect( hWnd )
               aSize := _GetTextExtentPoint32( hDC, s_cCancel )
-              aSize[1] += 20
+              aSize[1] += 18
 
               nLeft := ( aRect[3] - aSize[1] ) / 2
               
               IF s_lProgress
-                 nLeft := ( aRect[3] - aSize[1] ) - 2
+                 nLeft := ( aRect[3] - aSize[1] ) - 4
               ENDIF
               hBtn  := CreateWindowEx( 0, "Button", s_cCancel,;
                               WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,;
-                              nLeft, aRect[4]-27, aSize[1], 25,;
+                              nLeft, aRect[4]-26, aSize[1], 22,;
                               hWnd, 4000, __GetApplication():Instance, NIL )
               SendMessage( hBtn, WM_SETFONT, s_hFont )
            ENDIF
@@ -247,7 +247,7 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
               aRect := _GetClientRect( hWnd )
               s_hProgress := CreateWindowEx( 0, PROGRESS_CLASS, ,;
                               WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,;
-                              6, aRect[4]-22, aRect[3]-aSize[1]-12, 15,;
+                              6, aRect[4]-23, aRect[3]-aSize[1]-14, 16,;
                               hWnd, 4001, __GetApplication():Instance, NIL )
            ENDIF
            SelectObject( hDC, hFont )
