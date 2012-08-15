@@ -9,6 +9,10 @@
 */
 
 2012-08-14 13:01 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   ! Fixed MessageWait() progressbar and cancel button position and size
+   ! Fixed DataGrid:Save/RestoreLayout() to save/restore size and position not only the columns
+
+2012-08-14 13:01 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * Library/sourceC/winapi.c
     + Added #define WIN32_LEAN_AND_MEAN and respective missining #includes
 

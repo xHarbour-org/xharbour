@@ -605,6 +605,7 @@ METHOD SaveLayout( cIniFile, cSection ) CLASS DataGrid
       oIni := IniFile( cIniFile )
    ENDIF
    oIni:WriteString( cSection, ::Application:Name + "_" + ::Form:Name + "_" + ::Name, cEntry )
+   Super:SaveLayout( cIniFile, cSection )
 RETURN Self
 
 METHOD RestoreLayout( cIniFile, cSection )  CLASS DataGrid
@@ -628,6 +629,7 @@ METHOD RestoreLayout( cIniFile, cSection )  CLASS DataGrid
       NEXT
    ENDIF
    ::Update()
+   Super:RestoreLayout( cIniFile, cSection )
 RETURN Self
 
 METHOD __CheckData( cData ) CLASS DataGrid
