@@ -160,11 +160,13 @@ typedef short INT16;
 
 /* INT32 must hold at least signed 32-bit values. */
 
+#ifndef HB_DEFS_H_
 #ifndef XMD_H			/* X11/xmd.h correctly defines INT32 */
 #ifndef _BASETSD_H_		/* Microsoft defines it in basetsd.h */
 #ifndef _BASETSD_H		/* MinGW is slightly different */
 #ifndef QGLOBAL_H		/* Qt defines it in qglobal.h */
 typedef long INT32;
+#endif
 #endif
 #endif
 #endif

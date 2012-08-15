@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-15 12:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/common/hbver.c
+  * contrib/jpeg/jmorecfg.h
+    ! avoid redefinition of INT32 with HB_DEFS_H_
+
 2012-08-14 11:36 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * include/hbdefs.h
     * Define LONGLONG for xCC
