@@ -34,6 +34,8 @@ MYPRG_FLAGS =
 MYDEFINES = 
 MYRC_FLAGS = 
 
+[filemem.lib]
+
 [\xhb\lib\vc8\vxhd.lib]
 
 [\xhb\lib\vc8\vxh.lib]

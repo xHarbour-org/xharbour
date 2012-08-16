@@ -35,14 +35,17 @@ MYPRG_FLAGS =
 MYDEFINES =
 MYRC_FLAGS =
 
+[filemem.lib]
+
 [\xhb\lib\vc8\vxhd.lib]
 
-[\xhb\lib\vc8\vxhdll.lib]
+[\xhb\lib\vc8\vxh.lib]
 
 [\xhb\lib\vc8\tproject.lib]
 
 [\xhb\lib\vc8\xEditVXH.lib]
 
+[\xhb\lib\vc8\ActiveX.lib]
+
 [\xhb\lib\vc8\Ole.lib]
 
-[\xhb\lib\vc8\ActiveX.lib]
