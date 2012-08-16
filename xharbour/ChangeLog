@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-16 11:10 UTC-0300 Eduardo Fernandes <modalsist/at/yahoo.com.br>
+  * source/rtl/tbrowse.prg
+    ! fixed Stabilize, SetHilite and Moved methods for manual hilite/dehilite.
+    Bug reported on xharbour's news group.
+
 2012-08-15 12:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/common/hbver.c
   * contrib/jpeg/jmorecfg.h

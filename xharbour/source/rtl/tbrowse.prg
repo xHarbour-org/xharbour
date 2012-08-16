@@ -876,8 +876,8 @@ CLASS TBrowse STATIC
    METHOD ColWidth( nColumn )                     // Returns the display width of a particular column
 
    METHOD ColorRect( aRect, aColors )             // Alters the color of a rectangular group of cells
-   METHOD Hilite()             INLINE ::SetHilite(.T.)   // Highlights the current cell
-   METHOD DeHilite()           INLINE ::SetHilite(.F.)   // Dehighlights the current cell
+   METHOD Hilite()             INLINE ::SetHilite(.t.)   // Highlights the current cell
+   METHOD DeHilite()           INLINE ::SetHilite(.f.)   // Dehighlights the current cell
 
    METHOD Configure( nMode )                      // Configures the internal settings of the TBrowse object
    METHOD PerformConfiguration()                  // Call ::Configure() in any circunstancies.
@@ -953,7 +953,7 @@ HIDDEN:
    METHOD SetRowPos( nRow )                       // Set new row pos.
 
    METHOD Refresh()                               // Causes refresh all/or one data row to be refreshed during the next stabilization.
-   METHOD SetHilite(lHilite)                      // Hilights/Dehighlights the current cell
+   METHOD SetHilite(lHilite,lAuto)                // Hilights/Dehighlights the current cell
    METHOD ResetHitState()
 
    DATA lAutolite
@@ -1029,10 +1029,11 @@ HIDDEN:
    DATA nMoveTo      INIT 0                       // To control vertical movements
    DATA aPendingMovements                         // There is any movement pending
    DATA lColorRect                                // colorrect active
-   DATA lRectPainted                              // colorrect area painted 
+   DATA lRectPainted                              // colorrect area painted
 
    DATA nDispbegin   INIT 0
-   
+   DATA lHiLite INIT .F.                          // Manual Cell Hilite.
+
 END CLASS
 
 *------------------------------------------------------*
@@ -1051,9 +1052,9 @@ DEFAULT  nRight  TO MaxCol()
    nRight  := Min(MaxCol(),nRight)
 
    ::nwTop     := nTop
-   ::nwLeft    := nLeft     
-   ::nwBottom  := nBottom   
-   ::nwRight   := nRight    
+   ::nwLeft    := nLeft
+   ::nwBottom  := nBottom
+   ::nwRight   := nRight
 
    ::nRowCount       := (nBottom - nTop + 1)
    ::nVisWidth       := nRight - nLeft + 1
@@ -1944,7 +1945,10 @@ METHOD Moved() CLASS TBrowse
 
    // No need to Dehilite() current cell more than once
    if ::Stable
-      ::setHilite(.f.)
+      //if ::lAutoLite
+      if ! ::lHilite
+         ::SetHilite(.f.)
+      endif
       ::Stable := .f.
    endif
 
@@ -2574,9 +2578,8 @@ Local nMoveTo := ::nMoveTo
 
    endif
 
-
    if ::lAutoLite .and. ! ::lRectPainted
-      ::SetHilite(.t.)
+      ::SetHilite(.t.,.t.)
    else
       // only sincronize data and repos cursor.
       ::SetHilite(nil)
@@ -3026,10 +3029,9 @@ LOCAL nCursor := SetCursor(SC_NONE)
 Return Self
 
 *------------------------------------------------------*
-METHOD SetHilite( lHilite ) CLASS TBrowse
+METHOD SetHilite( lHilite, lAuto ) CLASS TBrowse
 *------------------------------------------------------*
 LOCAL xValue, nColor, nScrRow, nScrCol
-
 
    if ::nColPos > 0 .AND. ::nColPos <= ::nColCount .and. ::nRowPos > 0
 
@@ -3037,6 +3039,10 @@ LOCAL xValue, nColor, nScrRow, nScrCol
       xValue := ::oCache:GetCellValue( ::nRowPos, ::nColPos )
 
       if ! hb_Isnil(lHilite)
+
+         if hb_isNil( lAuto ) .or. ( hb_isLogical( lAuto ) .and. ! lAuto )
+            ::lHiLite := lHiLite
+         endif
 
          if lHilite
             nColor := _TB_COLOR_ENHANCED
