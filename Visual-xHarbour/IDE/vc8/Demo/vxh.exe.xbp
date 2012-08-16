@@ -40,7 +40,9 @@ MYPRG_FLAGS =
 MYDEFINES =
 MYRC_FLAGS =
 
-[\xhb\lib\vc8\demo\vxh.lib]
+[filemem.lib]
+
+[vxh.lib]
 
 [xEditVXH.lib]
 
