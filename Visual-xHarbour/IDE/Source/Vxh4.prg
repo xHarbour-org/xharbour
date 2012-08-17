@@ -1958,6 +1958,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
             DO CASE
 
                CASE cType == "SHORTCUTKEY_KEY"
+                    ::Application:AccelEnabled := .F.
                     ::ActiveControl := EditBox( Self )
                     WITH OBJECT ::ActiveControl
                        :Left        := nLeft + IIF( cType == "ICONS", 20, 0 )
@@ -1977,6 +1978,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :OnWMKillFocus := {|o,cText,oPar| cText := IIF( o:Cargo == NIL, 0, o:Cargo ),;
                                                          oPar  := o:Parent,;
                                                          IIF( ::__xCtrlName == "ObjManager", oPar:SetValue( cText ), ),;
+                                                         o:Application:AccelEnabled := .T.,;
                                                          o:Destroy(), 0 }
 
                        :Create()
