@@ -8,6 +8,11 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2012-08-16 22:42 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/compat.h
+    ! removed duplicates defines due recent xharbour core header changes
+    
 2012-08-12 18:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
   * source/sqlex1.c
     ! minor fix for sqlex for datetime fields under oracle, since date fields need to be binded as timestamp ( oracle odbc driver requiment)

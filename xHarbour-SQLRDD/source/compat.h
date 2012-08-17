@@ -29,11 +29,11 @@
    #endif
    #define hb_vmCDP()                           hb_cdppage()
 
-   #define HB_FALSE           0
-   #define HB_TRUE            (!0)
+//    #define HB_FALSE           0
+//    #define HB_TRUE            (!0)
 
    #define HB_ISLOG(x)        ISLOG(x)
-   #define HB_ISNUM(x)        ISNUM(x)
+//    #define HB_ISNUM(x)        ISNUM(x)
 
    typedef ULONG              HB_SIZE;
    typedef BOOL               HB_BOOL;
