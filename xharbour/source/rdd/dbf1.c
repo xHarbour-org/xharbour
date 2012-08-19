@@ -5237,7 +5237,13 @@ static HB_ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
                break;
 
             case 0xF5: /* FoxPro w. memo file */
-               pArea->bTableType = DB_DBF_VFP;
+               #if 0
+                 /*
+                   bug fix in Foxpro DBFCDX after appending record with memo
+                   field (reported by Grzegorz in comp.lang.xharbour)
+                 */
+                 pArea->bTableType = DB_DBF_VFP; /* This is the bug */
+               #endif
                pArea->fHasMemo = TRUE;
                pArea->bMemoType = DB_MEMO_FPT;
                break;
