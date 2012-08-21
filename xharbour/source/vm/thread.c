@@ -63,11 +63,12 @@
 #include "classes.h"
 #include "hbapirdd.h"
 
+#if defined(HB_OS_WIN)
 HB_EXTERN_BEGIN
 extern HB_STACK * _TlsGetValue( void );
 extern void _TlsSetValue( void * );
 HB_EXTERN_END
-
+#endif
 #if defined( HB_OS_DARWIN ) || defined(__DJGPP__)
    #include <stdlib.h>
    #include <unistd.h>    /* We need usleep() in Darwin */
@@ -227,7 +228,7 @@ void hb_threadInit( void )
       s_hb_threadIsInit = TRUE;
    }
 }
-
+#if defined(HB_OS_WIN)
 HB_STACK * _TlsGetValue( void )
 {
    return (HB_STACK *) TlsGetValue( hb_dwCurrentStack );
@@ -237,7 +238,7 @@ void _TlsSetValue( void *p )
 {
    TlsSetValue( hb_dwCurrentStack, p );
 }
-
+#endif
 void hb_threadExit( void )
 {
    if( s_hb_threadIsInit )
