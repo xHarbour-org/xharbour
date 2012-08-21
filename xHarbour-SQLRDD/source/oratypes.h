@@ -349,7 +349,11 @@ typedef   signed long  sbig_ora;
 # endif 
 #else
 # ifndef lint
+   #if  defined( __XCC__ )
+   typedef unsigned __int64 ub8;
+   #else
    typedef unsigned _int64 ub8;
+   #endif
 # else
 #  define ub8 unsigned _int64 
 # endif 
@@ -376,7 +380,11 @@ typedef   signed long  sbig_ora;
 # endif 
 #else
 # ifndef lint
+#if  defined( __XCC__ )
+   typedef signed __int64 sb8;
+#else
    typedef signed _int64 sb8;
+#endif   
 # else
 #  define sb8 signed _int64
 # endif 
