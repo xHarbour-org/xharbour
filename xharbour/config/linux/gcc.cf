@@ -23,7 +23,7 @@ CC_OUT = -o
 CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
 
 # We are under linux
-CFLAGS = -DHB_OS_LINUX -Wall -W -DHB_NO_DV_MEMCPY  -DHB_VM_ALL
+CFLAGS = -DHB_OS_LINUX -Wall -W -DHB_NO_DV_MEMCPY 
 
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS += -DSIMPLEX
@@ -79,15 +79,15 @@ LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(subst lib,,$(lib)))
 LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 
 # If LIBS specifies the rdd library, add all DB drivers.
-ifeq ($(findstring rddmt,$(LIBS)),rddmt)
+ifeq ($(findstring rdd,$(LIBS)),rdd)
 #DBFNTX and DBFCDX are MTzed
 ifeq ($(findstring dbfcdx,$(HB_DB_DRIVERS)),dbfcdx)
-LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfcdx/$(ARCH_DIR)_mt
-LINKLIBS += -ldbfcdxmt
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfcdx/$(ARCH_DIR)
+LINKLIBS += -ldbfcdx
 endif
 ifeq ($(findstring dbfntx,$(HB_DB_DRIVERS)),dbfntx)
-LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfntx/$(ARCH_DIR)_mt
-LINKLIBS += -ldbfntxmt
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfntx/$(ARCH_DIR)
+LINKLIBS += -ldbfntx
 endif
 
 #DBFDBT and DBFFTP are not MTzed
@@ -98,6 +98,11 @@ endif
 ifeq ($(findstring dbffpt,$(HB_DB_DRIVERS)),dbffpt)
 LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbffpt/$(ARCH_DIR)
 LINKLIBS += -ldbffpt
+endif
+
+ifeq ($(findstring hbsix,$(HB_DB_DRIVERS)),hbsix)
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/hbsix/$(ARCH_DIR)
+LINKLIBS += -lhbsix
 endif
 
 else
