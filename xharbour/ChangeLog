@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-24 20:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbmzip/hbmzip.c
+    ! wrong casting caused GPF (per Salius report in comp.lang.xharbour)
+
 2012-08-22 02:35  UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * config/linux/gcc.cf
     ! removed -DHB_VM_ALL from cflags

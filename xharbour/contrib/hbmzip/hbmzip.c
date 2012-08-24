@@ -94,13 +94,12 @@ static HB_GARBAGE_FUNC( hb_zipfile_destructor )
    }
 }
 
-
-static gzFile hb_zipfileParam( int iParam )
+static zipFile hb_zipfileParam( int iParam )
 {
    zipFile*  phZip = ( zipFile* ) hb_parptrGC( hb_zipfile_destructor, iParam );
 
    if( phZip && * phZip )
-      return (gzFile) phZip;
+      return *phZip;
 
    hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
    return NULL;
@@ -118,19 +117,16 @@ static HB_GARBAGE_FUNC( hb_unzipfile_destructor )
    }
 }
 
-
-static gzFile hb_unzipfileParam( int iParam )
+static unzFile hb_unzipfileParam( int iParam )
 {
    unzFile*  phUnzip = ( unzFile* ) hb_parptrGC( hb_unzipfile_destructor, iParam );
 
    if( phUnzip && * phUnzip )
-      return (gzFile) phUnzip;
+      return *phUnzip;
 
    hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
    return NULL;
 }
-
-
 
 /* HB_ZipOpen( cFileName, [ iMode = HB_ZIP_CREATE ], [ @cGlobalComment ] ) --> hZip */
 HB_FUNC( HB_ZIPOPEN )
