@@ -57,7 +57,7 @@ PROC MyUnzip( ... )
          dDate, cTime, nSize, nCompSize, nErr, ;
          lCrypted, cPassword, cComment, tmp
 
-   aWild := { ... }
+   aWild := hb_aparams()
    IF LEN( aWild ) < 1
       ? "Usage: myunzip <ZipName> [ --pass <password> ] [ <FilePattern1> ... ]"
       RETURN
@@ -102,7 +102,7 @@ PROC MyUnzip( ... )
             ? "comment:", cComment
          ENDIF
 
-        IF ASCAN( aWild, {|cPattern| HB_WILDMATCH( cPattern, cFile, .T. ) } ) > 0
+        IF ASCAN( aWild, {|cPattern| WILDMATCH( cPattern, cFile, .T. ) } ) > 0
            ?? " Extracting"
            HB_UnzipExtractCurrentFile( hUnzip, NIL, cPassword )
         ELSE

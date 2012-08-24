@@ -51,13 +51,12 @@
  */
 
 
-
 PROC MyZip( ... )
    LOCAL hZip, aDir, aFile, aWild, ;
          cZipName, cPath, cFileName, cExt, cWild, cPassword, cComment,;
          tmp
 
-   aWild := { ... }
+   aWild := hb_aparams()
    IF LEN(aWild) < 2
       ? "Usage: myzip <ZipName> [ --pass <password> ] [ --comment <comment> ] <FilePattern1> [ <FilePattern2> ... ]"
       RETURN
@@ -69,7 +68,7 @@ PROC MyZip( ... )
    ENDIF
    cZipName := HB_FNameMerge( cPath, cFileName, cExt )
 
-   HB_ADEL( aWild, 1, .T. )
+   ADEL( aWild, 1, .T. )
 
    FOR tmp := LEN( aWild ) - 1 TO 1 STEP -1
       IF LOWER( aWild[ tmp ] ) == "--pass"
@@ -93,7 +92,7 @@ PROC MyZip( ... )
       FOR EACH cWild IN aWild
          IF !EMPTY( cWild )
             HB_FNameSplit( cWild, @cPath, @cFileName, @cExt )
-            aDir := HB_DirScan( cPath, cFileName + cExt )
+            aDir := Directory( cPath + cFileName + cExt )
             FOR EACH aFile IN aDir
                IF ! cPath + aFile[ 1 ] == cZipName
                   ? "Adding", cPath + aFile[ 1 ]
