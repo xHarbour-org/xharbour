@@ -395,7 +395,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD OnKillFocus() CLASS EditBox
    ::Redraw()
-   IF ::__oDataGrid != NIL .AND. ::__oDataGrid:Height > 0
+   IF ::__oDataGrid != NIL .AND. ::__oDataGrid:Height > 0 .AND. ! ::LastKey IN {VK_UP,VK_DOWN,VK_ESCAPE,VK_RETURN}
       ::__ChkGridKeys( NIL, VK_RETURN, .F. )
    ENDIF
 RETURN NIL
