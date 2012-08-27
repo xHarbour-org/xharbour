@@ -8,6 +8,11 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-26 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed RTE in designer when deleting an EditBox control.
+   + Added EditBox event OnDataSelected() that will be executed when data in the dropdown
+     grid is selected.
+
 2012-08-16 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed ShortcutKey:Key assignment to temporarilly disable VXH keys while editing.
 

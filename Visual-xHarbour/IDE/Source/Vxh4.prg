@@ -3127,7 +3127,7 @@ METHOD ResetEvents( aSel ) CLASS EventManager
       RETURN NIL
    ENDIF
 
-   IF EMPTY( aSel[1] ) .OR. aSel[1][1] == NIL
+   IF EMPTY( aSel ) .OR. EMPTY( aSel[1] ) .OR. aSel[1][1] == NIL
       ::ResetContent()
       RETURN NIL
    ENDIF

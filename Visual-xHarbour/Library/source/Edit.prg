@@ -222,6 +222,8 @@ METHOD Init( oParent ) CLASS EditBox
                {"Color",       {;
                                { "OnCtlColorEdit"     , "", "" },;
                                { "OnSysColorChange"   , "", "" } } },;
+               {"Data",        {;
+                               { "OnDataSelected"     , "", "" } } },;
                {"Drawing",     {;
                                { "OnEraseBkGnd"       , "", "" },;
                                { "OnPaint"            , "", "" } } },;
@@ -398,6 +400,7 @@ METHOD __ChkGridKeys( o, nKey ) CLASS EditBox
       ENDIF
     ELSEIF nKey == VK_RETURN
       ::Caption := ALLTRIM( ::__oDataGrid:DataSource:Fields:FieldGet( 1 ) )
+      ExecuteEvent( "OnDataSelected", Self )      
       ::SetFocus()
       ::__oDataGrid:Height := 0
       ::PostMessage( WM_KEYDOWN, VK_END )
