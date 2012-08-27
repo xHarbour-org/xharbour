@@ -12,6 +12,8 @@
    ! Fixed RTE in designer when deleting an EditBox control.
    + Added EditBox event OnDataSelected() that will be executed when data in the dropdown
      grid is selected.
+   ! Fixed EditBox to execute OnDataSelected() event when losing focus and the Datagrid is
+     open in case users assume the current record is valid without having to select it
 
 2012-08-16 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed ShortcutKey:Key assignment to temporarilly disable VXH keys while editing.

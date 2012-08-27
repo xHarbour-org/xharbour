@@ -183,7 +183,7 @@ CLASS EditBox INHERIT Control
    METHOD __SetContextMenu()
    METHOD OnKeyDown()
    METHOD OnGetDlgCode()
-   METHOD OnKillFocus()                INLINE ::Redraw(), NIL
+   METHOD OnKillFocus()
    METHOD OnSetFocus()                 INLINE ::Redraw(), NIL
    METHOD OnLButtonDown()
    METHOD OnChar()
@@ -393,17 +393,28 @@ METHOD __UpdateDataGrid() CLASS EditBox
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD __ChkGridKeys( o, nKey ) CLASS EditBox
+METHOD OnKillFocus() CLASS EditBox
+   ::Redraw()
+   IF ::__oDataGrid != NIL .AND. ::__oDataGrid:Height > 0
+      ::__ChkGridKeys( NIL, VK_RETURN, .F. )
+   ENDIF
+RETURN NIL
+
+//-----------------------------------------------------------------------------------------------
+METHOD __ChkGridKeys( o, nKey, lFocus ) CLASS EditBox
    IF nKey == VK_UP
       IF o:GetPosition() == 1
          ::SetFocus()
       ENDIF
     ELSEIF nKey == VK_RETURN
+      DEFAULT lFocus TO .T.
       ::Caption := ALLTRIM( ::__oDataGrid:DataSource:Fields:FieldGet( 1 ) )
       ExecuteEvent( "OnDataSelected", Self )      
-      ::SetFocus()
       ::__oDataGrid:Height := 0
-      ::PostMessage( WM_KEYDOWN, VK_END )
+      IF lFocus
+         ::SetFocus()
+         ::PostMessage( WM_KEYDOWN, VK_END )
+      ENDIF
     ELSEIF nKey == VK_ESCAPE
       ::SetFocus()
       ::__oDataGrid:Height := 0
