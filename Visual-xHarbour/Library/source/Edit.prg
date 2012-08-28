@@ -330,7 +330,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD __UpdateDataGrid() CLASS EditBox
-   LOCAL nRecs, cData
+   LOCAL nRecs, cData, nOrder
    
    IF ::__oDataGrid == NIL
       
@@ -374,14 +374,25 @@ METHOD __UpdateDataGrid() CLASS EditBox
    
    ::DataSource:GoTop()
    nRecs := 0
+   
+   TRY
+      nOrder := ::DataSource:SetOrder( ::DataSearchField )
+      ::DataSource:Seek( ::Caption )
+   CATCH
+   END
    WHILE ( nRecs < ::DataSearchRecords .OR. ::DataSearchRecords == 0 ) .AND. !::DataSource:Eof()
       cData := ALLTRIM( ::DataSource:Fields:FieldGet( ::DataSearchField ) )
       IF UPPER( ALLTRIM( ::Caption ) ) IN UPPER( cData )
          AADD( ::__oDataGrid:DataSource:Table, { cData } )
-         nRecs ++
       ENDIF
+      nRecs ++
       ::DataSource:Skip()
    ENDDO
+   IF nOrder != NIL
+      ::DataSource:SetOrder( nOrder )
+   ENDIF
+
+   nRecs := MIN( nRecs, LEN( ::__oDataGrid:DataSource:Table ) )
 
    ::__oDataGrid:Height := MIN( (nRecs * ::__oDataGrid:ItemHeight), ::Parent:ClientHeight - ::__oDataGrid:Top )
    IF ::__oDataGrid:Height < ::__oDataGrid:ItemHeight
