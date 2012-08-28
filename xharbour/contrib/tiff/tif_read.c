@@ -50,18 +50,20 @@ TIFFFillStripPartial( TIFF *tif, int strip, tmsize_t read_ahead, int restart )
         uint64 unused_data;
         uint64 read_offset;
         tmsize_t cc, to_read;
-        tmsize_t bytecountm;
-        
+        /* UNUSED, def-out */
+        /* tmsize_t bytecountm; */
+
         if (!_TIFFFillStriles( tif ) || !tif->tif_dir.td_stripbytecount)
             return 0;
-        
+
         /*
          * Expand raw data buffer, if needed, to hold data
          * strip coming from file (perhaps should set upper
          * bound on the size of a buffer we'll use?).
          */
 
-        bytecountm=(tmsize_t) td->td_stripbytecount[strip];
+        /* UNUSED, def-out */
+        /* bytecountm=(tmsize_t) td->td_stripbytecount[strip]; */
         if (read_ahead*2 > tif->tif_rawdatasize) {
                 assert( restart );
                 

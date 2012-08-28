@@ -219,7 +219,7 @@ TIFFOpenW(const wchar_t* name, const char* mode, void* pdflib_opaque,
 	FILE *fd;
 	int mbsize;
 	char *mbname;
-	TIFF* tif;
+	TIFF* tif = (TIFF*) 0;
 	int m;
 
 	m = _TIFFgetMode(mode, module);

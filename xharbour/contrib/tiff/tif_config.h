@@ -5,6 +5,8 @@
 #ifndef __TIF_CONGIG_H
 #define __TIF_CONGIG_H
 
+#include "hbdefs.h"  /* UINT64 and INT64 */
+
 #if defined(__EXPORT__)
    #if defined( __RSXNT__ )
       #define ___EXPORT___

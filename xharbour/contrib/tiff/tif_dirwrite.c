@@ -2570,7 +2570,8 @@ _TIFFRewriteField(TIFF* tif, uint16 tag, TIFFDataType in_datatype,
                   tmsize_t count, void* data)
 {
     static const char module[] = "TIFFResetField";
-    const TIFFField* fip = NULL;
+    /* UNUSED, def-out */
+    /* const TIFFField* fip = NULL; */
     uint16 dircount;
     tmsize_t dirsize;
     uint8 direntry_raw[20];
@@ -2586,14 +2587,15 @@ _TIFFRewriteField(TIFF* tif, uint16 tag, TIFFDataType in_datatype,
 /* -------------------------------------------------------------------- */
 /*      Find field definition.                                          */
 /* -------------------------------------------------------------------- */
-    fip = TIFFFindField(tif, tag, TIFF_ANY);
+    /* UNUSED, def-out */
+    /* fip = TIFFFindField(tif, tag, TIFF_ANY); */
 
 /* -------------------------------------------------------------------- */
 /*      Do some checking this is a straight forward case.               */
 /* -------------------------------------------------------------------- */
     if( isMapped(tif) )
     {
-        TIFFErrorExt( tif->tif_clientdata, module, 
+        TIFFErrorExt( tif->tif_clientdata, module,
                       "Memory mapped files not currently supported for this operation." );
         return 0;
     }

@@ -8,6 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-28 07:09 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/jpeg/jcmainct.c
+  * contrib/jpeg/jdmainct.c
+    ! variable renamed: main -> jmain
+
+  * contrib/tiff/tif_config.h
+  * contrib/tiff/tif_dirread.c
+  * contrib/tiff/tif_dirwrite.c
+  * contrib/tiff/tif_predict.c
+  * contrib/tiff/tif_read.c
+  * contrib/pdflite/tiff/tif_unix.c
+    ! pacify GCC warnings
+
 2012-08-25 03:58 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbmzip/crypt.h
   * contrib/hbmzip/ioapi.c
