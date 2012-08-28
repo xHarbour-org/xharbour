@@ -231,6 +231,13 @@ HB_FUNC( OS_ISWIN7 )
   hb_retl( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1 );
 }
 
+HB_FUNC( OS_ISWIN8 )
+{
+  OSVERSIONINFO osvi;
+  getwinver( &osvi );
+  hb_retl( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 2 );
+}
+
 HB_FUNC( OS_ISWTSCLIENT )
 {
   int iResult = FALSE;

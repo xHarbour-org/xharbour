@@ -263,6 +263,18 @@ char * hb_verPlatform( void )
                   }
 
                }
+               else if( osVer.dwMajorVersion == 6 && osVer.dwMinorVersion >= 2 )
+               {
+                  if (osVer.wProductType == VER_NT_WORKSTATION )
+                  {
+                     szName = " 8";
+                  }
+                  else
+                  {
+                     szName = " 2012";
+                  }
+
+               }
                else if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 2 )
                {
                   #ifndef SM_SERVERR2
@@ -358,8 +370,7 @@ char * hb_verPlatform( void )
                               szProduct = " Server";
                            }
                         }
-
-                        else
+                        else if( osVerEx.dwMajorVersion == 4 )
                         {
                            if( osVerEx.wSuiteMask & VER_SUITE_ENTERPRISE )
                            {
@@ -369,6 +380,10 @@ char * hb_verPlatform( void )
                            {
                               szProduct = " Server 4.0";
                            }
+                        }
+                        else
+                        {
+                           szProduct = " Server";
                         }
                      }
                   }

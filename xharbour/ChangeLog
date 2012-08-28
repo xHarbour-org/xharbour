@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-08-29 09:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source\rtl\winros.prg
+    * added os_iswin8()
+  * source\common\hbver.c
+    * added support for Windows 8 and 2012 server
+
 2012-08-28 07:09 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/jpeg/jcmainct.c
   * contrib/jpeg/jdmainct.c
@@ -43,7 +49,7 @@
 2012-08-22 02:35  UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * config/linux/gcc.cf
     ! removed -DHB_VM_ALL from cflags
-    
+
 2012-08-21 01:00  UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * thread.c
     ! protected _TlsSetValue and 	_TlsGetValue under HB_OS_WIN
@@ -61,7 +67,7 @@
 2012-08-17 10:20  UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * contrib/jpeg/jmorecfg.h
     ! avoid redefinition of INT16 and UINT'6 with HB_DEFS_H_
-    
+
 2012-08-16 11:10 UTC-0300 Eduardo Fernandes <modalsist/at/yahoo.com.br>
   * source/rtl/tbrowse.prg
     ! fixed Stabilize, SetHilite and Moved methods for manual hilite/dehilite.
