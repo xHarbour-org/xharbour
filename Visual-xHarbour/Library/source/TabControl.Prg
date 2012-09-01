@@ -957,7 +957,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD OnLButtonDown() CLASS TabControl
    ::CallWindowProc()
-   IF !::__lMouseDown
+   IF !::__lMouseDown .AND. ::Children != NIL
       IF VALTYPE( ::Children[ ::CurSel ] ) == "O" .AND. ::Children[ ::CurSel ]:AllowDrag
          ::__lMouseDown := .T.
          ::Cursor := ::System:Cursor:SizeWE
@@ -1474,6 +1474,7 @@ METHOD __SetPosition(n) CLASS TabPage
              ::__ClassInst:xPosition := nIndex
           ENDIF
       NEXT
+      ::Parent:Cursel := TabCtrl_GetCurSel( ::Parent:hWnd ) + 1
    ENDIF
 RETURN Self
 
