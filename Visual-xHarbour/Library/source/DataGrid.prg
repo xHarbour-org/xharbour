@@ -16,7 +16,7 @@
 #include "dbinfo.ch"
 
 #define WHEEL_PAGESCROLL 00041
-
+#define CS_DROPSHADOW 0x00020000
 #define BP_PUSHBUTTON            1
 #define BP_RADIOBUTTON           2
 #define BP_CHECKBOX              3
@@ -166,6 +166,8 @@ CLASS DataGrid INHERIT Control
    DATA __nDragPos              PROTECTED INIT -1
    DATA __hDragBrush            PROTECTED
    DATA __hPrevCursor           PROTECTED
+   DATA __aPixels               PROTECTED
+   DATA __aRect                 PROTECTED
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -223,6 +225,9 @@ CLASS DataGrid INHERIT Control
    METHOD __GetDataValue(n)  INLINE &( ::Children[n]:Data )
    METHOD __CheckData()
 
+   METHOD DrawShadow()
+   METHOD RestoreShadow()
+
    METHOD Refresh() INLINE ::InvalidateRect()
    METHOD ColFromPos()
    
@@ -275,6 +280,7 @@ RETURN DLGC_WANTMESSAGE
 
 METHOD Init( oParent ) CLASS DataGrid
    DEFAULT ::__xCtrlName TO "DataGrid"
+   ::ClassStyle              := CS_OWNDC | CS_DBLCLKS | CS_SAVEBITS | CS_DROPSHADOW
    ::ClsName                 := "DataGrid"
    ::BackSysColor            := GetSysColor( COLOR_WINDOW )
    ::BackColor               := GetSysColor( COLOR_WINDOW )
@@ -3167,6 +3173,67 @@ METHOD Down() CLASS DataGrid
 RETURN Self
 
 //----------------------------------------------------------------------------------
+METHOD DrawShadow() CLASS DataGrid
+   LOCAL hDC, pixel, x, y, ix, iy, n, pt
+   LOCAL hMemDC, hMemBitmap, hOldBitmap
+   // temporarily disabled until moved to C for better performance
+   
+   DEFAULT ::__aPixels TO {}
+   pt := (struct POINT)
+   pt:x := ::Left+::Width
+   pt:y := ::Top
+   ::Parent:ClientToScreen( @pt )
+   ::__aRect := { pt:x, pt:y, 4, ::Height-1 }
+
+   hDC        := CreateDC( "DISPLAY" )
+   hMemDC     := CreateCompatibleDC( hDC )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::__aRect[3]+1, ::__aRect[4] )
+   hOldBitmap := SelectObject( hMemDC, hMemBitmap )
+   BitBlt( hMemDC, 0, 0, ::__aRect[3]+1, ::__aRect[4]+1, hDC, ::__aRect[1], ::__aRect[2], SRCCOPY )
+
+   ix := 4
+   iy := 0 
+   ::UpdateWindow()
+   FOR x := 1 TO 4
+       FOR y := 4 TO 7
+           IF ( n := ASCAN( ::__aPixels, {|a| a[1]==ix-x .AND. a[2]==y+iy} ) ) > 0
+              pixel := ::__aPixels[n][3]
+            ELSE
+              pixel := GetPixel( hMemDC, ix-x, y+iy )
+              AADD( ::__aPixels, { ix-x, y+iy, pixel } )
+           ENDIF
+           SetPixel( hMemDC, ix-x, y+iy, DarkenColorXP( 2* 3 * x * (y - 3), pixel ) )
+       NEXT
+       FOR y := 8 TO ::__aRect[4]-1
+           IF ( n := ASCAN( ::__aPixels, {|a| a[1]==ix-x .AND. a[2]==y+iy} ) ) > 0
+              pixel := ::__aPixels[n][3]
+            ELSE
+              pixel := GetPixel( hMemDC, ix-x, y+iy )
+              AADD( ::__aPixels, { ix-x, y+iy, pixel } )
+           ENDIF
+           SetPixel( hMemDC, ix-x, y+iy, DarkenColorXP( 2*15 * x, pixel ) )
+       NEXT
+   NEXT
+   BitBlt( hDC, ::__aRect[1], ::__aRect[2], ::__aRect[1]+::__aRect[3]+1, ::__aRect[2]+::__aRect[4]+1, hMemDC, 0, 0, SRCCOPY )
+
+   SelectObject( hMemDC, hOldBitmap )
+   DeleteObject( hMemBitmap )
+   DeleteDC( hMemDC )
+   DeleteDC( hDC )
+
+RETURN NIL           
+
+METHOD RestoreShadow() CLASS DataGrid
+   LOCAL hDC, n
+   IF ::__aPixels != NIL
+      hDC := CreateDC( "DISPLAY" )
+      FOR n := 1 TO LEN( ::__aPixels )
+          SetPixel( hDC, ::__aRect[1]+::__aPixels[n][1], ::__aRect[2]+::__aPixels[n][2], ::__aPixels[n][3] )
+      NEXT
+      DeleteDC( hDC )
+   ENDIF
+   ::__aPixels := NIL
+RETURN NIL
 
 METHOD Up() CLASS DataGrid
    LOCAL lRes, aScroll, aClip, lSel, n

@@ -728,7 +728,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
          ENDDO
          ::Owner:xAlias := cAlias + XSTR( nAlias )
       ENDIF
-      
+
       TRY
          dbUseArea( ! ::Owner:__lMemory, ::Owner:Driver, cFile, ::Owner:Alias, ::Owner:Shared, ::Owner:ReadOnly, ::Owner:CodePage, IIF( ::Owner:SqlConnector != NIL, ::Owner:SqlConnector:ConnectionID, ) )
        CATCH oErr
