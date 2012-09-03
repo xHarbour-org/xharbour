@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-02 21:20 UTC-0300 Luiz Rafael Culik <luiz/at/xharbour.com>
+  * source/winos.prg
+    ! added stub for OS_ISWIN8 when compiling under *nix
+    
 2012-09-02 21:10 UTC-0300 Luiz Rafael Culik <luiz/at/xharbour.com>
   * source/vm/thread.c
     ! added #undef to HB_OS_WIN when compilation under unix
