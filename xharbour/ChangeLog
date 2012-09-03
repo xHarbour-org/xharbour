@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-02 21:10 UTC-0300 Luiz Rafael Culik <luiz/at/xharbour.com>
+  * source/vm/thread.c
+    ! added #undef to HB_OS_WIN when compilation under unix
+  * bin/pack_src.ch 
+    ! added contrib/png contrib/tiff and contrib/jpeg folders to compress to build .rpm
+        
 2012-08-29 09:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source\rtl\winros.prg
     * added os_iswin8()

@@ -62,6 +62,9 @@
 #include "hbstack.h"
 #include "classes.h"
 #include "hbapirdd.h"
+#if defined(HB_OS_UNIX)
+#undef HB_OS_WIN
+#endif
 
 #if defined(HB_OS_WIN)
 HB_EXTERN_BEGIN

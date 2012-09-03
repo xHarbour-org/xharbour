@@ -373,11 +373,9 @@ $hb_collect contrib/libnf/include/*.ch
 #contrib\sqlite3 
 $hb_collect contrib/hbsqlit3/Makefile
 $hb_collect contrib/hbsqlit3/config.h
-$hb_collect contrib/hbsqlit3/hbapistr.h
 $hb_collect contrib/hbsqlit3/sqlite3.c
 $hb_collect contrib/hbsqlit3/sqlite3.h
 $hb_collect contrib/hbsqlit3/sqlite3ext.h
-$hb_collect contrib/hbsqlit3/strapi.c
 $hb_collect contrib/hbsqlit3/xhbsqlite3.c
 $hb_collect contrib/hbsqlit3/tests
 $hb_collect contrib/hbsqlit3/tests/authorizer.prg
@@ -391,7 +389,6 @@ $hb_collect contrib/hbcairo/Makefile
 $hb_collect contrib/hbcairo/tests
 $hb_collect contrib/hbcairo/context.c
 $hb_collect contrib/hbcairo/core.c
-$hb_collect contrib/hbcairo/hbapistr.h
 $hb_collect contrib/hbcairo/hbcairo.ch
 $hb_collect contrib/hbcairo/hbcairo.h
 $hb_collect contrib/hbcairo/image.c
@@ -453,7 +450,7 @@ $hb_collect contrib/hblzf/core.c
 $hb_collect contrib/hblzf/crc32.h
 $hb_collect contrib/hblzf/hblzf.ch
 $hb_collect contrib/hblzf/lzf.h
-$hb_collect contrib/hblzf/lzfp.h
+$hb_collect contrib/hblzf/lzfP.h
 $hb_collect contrib/hblzf/lzf_c.c
 $hb_collect contrib/hblzf/lzf_d.c
 $hb_collect contrib/hblzf/tests/test.prg
@@ -514,7 +511,15 @@ $hb_collect contrib/hbmagic/tests/hbmagit.prg
 $hb_collect contrib/hbcurl/*.[ch]
 $hb_collect contrib/hbcurl/Makefile
 
-
+#config/tiff
+$hb_collect contrib/tiff/*.[ch]
+$hb_collect contrib/tiff/Makefile
+#jpeg
+$hb_collect contrib/jpeg/*.[ch]
+$hb_collect contrib/jpeg/Makefile
+#png
+$hb_collect contrib/png/*.[ch]
+$hb_collect contrib/png/Makefile
 }
 
 hb_flst=`cd "$hb_rootdir";hb_collect_all|grep -v "[*?[]"`
