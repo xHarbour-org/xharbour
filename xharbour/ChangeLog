@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2012-09-02 21:41 UTC-0300 Luiz Rafael Culik <luiz/at/xharbour.com>
+  * source/vm/thread.c
+    ! Protected one function for compilation under windows
 
 2012-09-02 21:20 UTC-0300 Luiz Rafael Culik <luiz/at/xharbour.com>
   * source/winos.prg

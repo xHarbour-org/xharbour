@@ -62,9 +62,6 @@
 #include "hbstack.h"
 #include "classes.h"
 #include "hbapirdd.h"
-#if defined(HB_OS_UNIX)
-#undef HB_OS_WIN
-#endif
 
 #if defined(HB_OS_WIN)
 HB_EXTERN_BEGIN
@@ -3026,7 +3023,7 @@ PHB_STACK hb_service_ConsoleHandlerRoutineInit( void )
    PHB_STACK pStack = NULL;
 
    /* we need a new stack: this is NOT an hb thread. */
-
+#ifdef HB_OS_WIN
    if ( TlsGetValue( hb_dwCurrentStack ) == 0 )
    {
       pStack = hb_threadCreateStack( GetCurrentThreadId() );
@@ -3034,6 +3031,9 @@ PHB_STACK hb_service_ConsoleHandlerRoutineInit( void )
       TlsSetValue( hb_dwCurrentStack, ( void * ) pStack );
    }
    return pStack;
+#else
+   return NULL;
+#endif      
 #else
    return NULL;
 #endif
