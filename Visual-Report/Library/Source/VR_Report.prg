@@ -801,9 +801,9 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    hDC := GetDC(0)
 #ifndef VRDLL
    TRY
-      IF ::Application:Props:ExtraPage:PagePosition > -2
+      IF VAL( ::hExtra:PagePosition ) > -2
          ::CreateExtraPage( hDC )
-         IF ::Application:Props:ExtraPage:PagePosition == -1
+         IF VAL( ::hExtra:PagePosition ) == -1
             ::EndPage()
             ::StartPage()
          ENDIF
@@ -888,7 +888,7 @@ METHOD ChangePage( hDC, nHeight )
       ::EndPage()
       ::StartPage()
 #ifndef VRDLL
-      IF ::Application:Props:ExtraPage:PagePosition == 0
+      IF VAL( ::hExtra:PagePosition ) == 0
          ::CreateExtraPage( hDC )
       ENDIF
 #endif
