@@ -156,9 +156,9 @@ RETURN 0
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD CreateControl( hControl, x, y, oParent ) CLASS RepEdit
-   EXTERN VrLabel, VrLine, VrImage, VrDataTable, VrTotal, VrGroupHeader, VrGroupFooter, VrTotal, VrFormula
+   EXTERN VrLabel, VrLine, VrImage, VrDataTable, VrAdsDataTable, VrTotal, VrGroupHeader, VrGroupFooter, VrTotal, VrFormula
    LOCAL xValue, xVar, hWnd, n, oControl, hPointer := HB_FuncPtr( IIF( VALTYPE( hControl ) == "C", hControl, hControl:ClsName ) )
-   
+
    IF hPointer != NIL
       DEFAULT oParent TO Self
       DEFAULT x TO 0
@@ -167,7 +167,22 @@ METHOD CreateControl( hControl, x, y, oParent ) CLASS RepEdit
       oControl:__ClsInst := __ClsInst( oControl:ClassH )
       oControl:Left := x 
       oControl:Top  := y 
+      IF oControl:ClsName == "GroupHeader"
+         oControl:bCreate := <|Self|
+                        WITH OBJECT ::EditCtrl := __VrGroup( ::Parent )
+                           :BackColor := ::BackColor
+                           :Cargo     := Self
+                           :Left      := -1
+                           :Top       := ::Top
+                           :Height    := ::Height
+                           :Create()
+                           :Width     := ::Parent:Width
+                        END
+                      >
+      ENDIF
+
       oControl:Create()
+
       IF VALTYPE( hControl ) == "C" .AND. UPPER( hControl ) == "VRLABEL"
          oControl:Font:FaceName  := "Arial"
          oControl:Font:PointSize := 10
@@ -380,70 +395,6 @@ RETURN cBits
 FUNCTION Snap( x, nGrain )
 RETURN ROUND( ( x / nGrain ), 0) * nGrain
 
-FUNCTION KeyDown( oCtrl, nKey )
-   LOCAL lShift, aRect, nMove := 1, lMod := .T.
-   IF oCtrl != NIL .AND. oCtrl:Cargo != NIL
-      IF oCtrl:Cargo:lUI
-         aRect := oCtrl:GetRectangle()
-         lShift := CheckBit( GetKeyState( VK_SHIFT ) , 32768 )
-         IF CheckBit( GetKeyState( VK_CONTROL ) , 32768 )
-            nMove := 8
-         ENDIF
-         aRect[1]-=(nMove+4)
-         aRect[2]-=(nMove+4)
-         aRect[3]+=(nMove+4)
-         aRect[4]+=(nMove+4)
-      ENDIF
-      IF nKey == VK_DELETE
-         oCtrl:Cargo:Delete()
-       ELSEIF nKey == VK_LEFT
-         IF lShift .AND. oCtrl:aSize[2]
-            oCtrl:Cargo:Width -= nMove
-            oCtrl:Width -= nMove
-          ELSE
-            oCtrl:Cargo:Left -= nMove
-            oCtrl:Left -= nMove
-         ENDIF
-       ELSEIF nKey == VK_UP
-         IF lShift .AND. oCtrl:aSize[8]
-            oCtrl:Cargo:Height -= nMove
-            oCtrl:Height -= nMove
-          ELSE
-            oCtrl:Cargo:Top -= nMove
-            oCtrl:Top -= nMove
-         ENDIF
-       ELSEIF nKey == VK_RIGHT
-         IF lShift .AND. oCtrl:aSize[6]
-            oCtrl:Cargo:Width += nMove
-            oCtrl:Width += nMove
-          ELSE
-            oCtrl:Cargo:Left += nMove
-            oCtrl:Left += nMove
-         ENDIF
-       ELSEIF nKey == VK_DOWN
-         IF lShift .AND. oCtrl:aSize[4]
-            oCtrl:Cargo:Height += nMove
-            oCtrl:Height += nMove
-          ELSE
-            oCtrl:Cargo:Top += nMove
-            oCtrl:Top += nMove
-         ENDIF
-       ELSE
-         lMod := .F.
-      ENDIF
-      IF lMod
-         IF !oCtrl:Application:Report:Modified
-            oCtrl:Application:Report:Modified := .T.
-         ENDIF
-         IF oCtrl:Cargo:lUI
-            oCtrl:Parent:InvalidateRect( aRect, .T.)
-          ELSEIF oCtrl:Cargo:Button != NIL
-            oCtrl:Cargo:Button:Delete()
-         ENDIF
-      ENDIF
-   ENDIF
-RETURN NIL
-
 //-----------------------------------------------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------------------------------
@@ -485,7 +436,6 @@ METHOD OnLButtonDown(n,x,y) CLASS __VrGroup
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------------------------------------------
-
 METHOD OnMouseMove(n,x,y) CLASS __VrGroup 
    LOCAL oCtrl
    IF n == MK_LBUTTON

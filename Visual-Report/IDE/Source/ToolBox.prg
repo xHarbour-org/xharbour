@@ -101,6 +101,7 @@ METHOD Create() CLASS ToolBox
    AADD( ::aButtons[2][2], { "Formula",     .T. } )
    AADD( ::aButtons[2][2], { "Image",       .T. } )
    AADD( ::aButtons[2][2], { "DataTable",   .T. } )
+   AADD( ::aButtons[2][2], { "AdsDataTable",.T. } )
    AADD( ::aButtons[2][2], { "GroupHeader", .T. } )
    AADD( ::aButtons[2][2], { "GroupFooter", .T. } )
 

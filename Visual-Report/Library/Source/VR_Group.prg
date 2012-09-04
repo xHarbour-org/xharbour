@@ -46,24 +46,20 @@ METHOD Create() CLASS VrGroupHeader
       RETURN ::Draw()
    ENDIF
    #ifndef VRDLL
-      WITH OBJECT ::EditCtrl := __VrGroup( ::Parent )
-         :BackColor := ::BackColor
-         :Cargo     := Self
-         :Left      := -1
-         :Top       := ::Top
-         :Height    := ::Height
-         :Create()
-         :Width     := ::Parent:Width
-      END
-      Super:Create()
+      IF ::bCreate != NIL
+         EVAL( ::bCreate, Self )
+         Super:Create()
+      ENDIF
    #endif
 RETURN Self
 
 METHOD Configure() CLASS VrGroupHeader
-   WITH OBJECT ::EditCtrl
-      :Width  := ::Parent:Width
-      :Height := ::Height
-   END
+   IF ::EditCtrl != NIL
+      WITH OBJECT ::EditCtrl
+         :Width  := ::Parent:Width
+         :Height := ::Height
+      END
+   ENDIF
 RETURN Self
 
 METHOD WriteProps( oXmlControl ) CLASS VrGroupHeader

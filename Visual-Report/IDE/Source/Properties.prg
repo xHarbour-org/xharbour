@@ -993,7 +993,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
                                                  oPar:SetPropValue( ::ActiveObject:Enum&c[2][n+1] ) }
           xValue := NIL
 
-        ELSEIF UPPER(cProp) IN {"ORDER"} .AND. ::ActiveObject:ClsName == "DataTable" .AND. ::ActiveObject:Driver != "SQLRDD" .AND. ! ( ::ActiveObject:Driver == "DBF" )
+        ELSEIF UPPER(cProp) IN {"ORDER"} .AND. ::ActiveObject:ClsName IN {"DataTable","AdsDataTable"} .AND. ::ActiveObject:Driver != "SQLRDD" .AND. ! ( ::ActiveObject:Driver == "DBF" )
           aCol[1]:ColType := "ORDER"
           aCol[1]:Value   := { "", { NIL } }
           IF ::ActiveObject:EditCtrl:IsOpen
@@ -1030,7 +1030,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
           aCol[1]:ColType := "RELATIONTABLE"
           aCol[1]:Value   := { "", { NIL } }
           FOR EACH Child IN ::Application:Props:Components:Children
-              IF Child:Component:ClsName == "DataTable" .AND. !( Child:Component == ::ActiveObject )
+              IF Child:Component:ClsName IN {"DataTable","AdsDataTable"} .AND. !( Child:Component == ::ActiveObject )
                  AADD( aCol[1]:Value[2], Child:Component )
               ENDIF
           NEXT
@@ -1040,7 +1040,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
           aCol[1]:ColType := "DATASOURCE"
           aCol[1]:Value   := { "", { NIL } }
           FOR EACH Child IN ::Application:Props:Components:Children
-              IF Child:Component:ClsName == "DataTable"
+              IF Child:Component:ClsName IN { "AdsDataTable", "DataTable" }
                  AADD( aCol[1]:Value[2], Child:Component )
               ENDIF
           NEXT

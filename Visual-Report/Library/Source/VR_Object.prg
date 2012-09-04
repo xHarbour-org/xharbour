@@ -53,7 +53,8 @@ CLASS VrObject
    
    DATA Report      EXPORTED
    DATA nPixPerInch EXPORTED INIT PIX_PER_INCH
-   
+   DATA bCreate
+
    METHOD Init() CONSTRUCTOR
    METHOD GetValue( cVal ) INLINE ::&cVal
    METHOD SetControlName()
@@ -137,7 +138,7 @@ RETURN aProps
 
 METHOD SetControlName( cProp ) CLASS VrObject
    LOCAL n := 1
-   IF UPPER( ::Parent:ClassName ) != "VRREPORT"
+   IF UPPER( ::Parent:ClassName ) != "VRREPORT" .AND. __objHasMsg( ::Application, "aNames" )
       IF !EMPTY(cProp) .AND. !EMPTY(::xName)
          IF UPPER(cProp) == UPPER(::xName)
             RETURN Self
@@ -197,4 +198,68 @@ METHOD FillRect( aRect, cColor ) CLASS VrObject
       :ObjectAttribute( cName, "Bottom", aRect[4] )
    END
 RETURN Self
+
+FUNCTION KeyDown( oCtrl, nKey )
+   LOCAL lShift, aRect, nMove := 1, lMod := .T.
+   IF oCtrl != NIL .AND. oCtrl:Cargo != NIL
+      IF oCtrl:Cargo:lUI
+         aRect := oCtrl:GetRectangle()
+         lShift := CheckBit( GetKeyState( VK_SHIFT ) , 32768 )
+         IF CheckBit( GetKeyState( VK_CONTROL ) , 32768 )
+            nMove := 8
+         ENDIF
+         aRect[1]-=(nMove+4)
+         aRect[2]-=(nMove+4)
+         aRect[3]+=(nMove+4)
+         aRect[4]+=(nMove+4)
+      ENDIF
+      IF nKey == VK_DELETE
+         oCtrl:Cargo:Delete()
+       ELSEIF nKey == VK_LEFT
+         IF lShift .AND. oCtrl:aSize[2]
+            oCtrl:Cargo:Width -= nMove
+            oCtrl:Width -= nMove
+          ELSE
+            oCtrl:Cargo:Left -= nMove
+            oCtrl:Left -= nMove
+         ENDIF
+       ELSEIF nKey == VK_UP
+         IF lShift .AND. oCtrl:aSize[8]
+            oCtrl:Cargo:Height -= nMove
+            oCtrl:Height -= nMove
+          ELSE
+            oCtrl:Cargo:Top -= nMove
+            oCtrl:Top -= nMove
+         ENDIF
+       ELSEIF nKey == VK_RIGHT
+         IF lShift .AND. oCtrl:aSize[6]
+            oCtrl:Cargo:Width += nMove
+            oCtrl:Width += nMove
+          ELSE
+            oCtrl:Cargo:Left += nMove
+            oCtrl:Left += nMove
+         ENDIF
+       ELSEIF nKey == VK_DOWN
+         IF lShift .AND. oCtrl:aSize[4]
+            oCtrl:Cargo:Height += nMove
+            oCtrl:Height += nMove
+          ELSE
+            oCtrl:Cargo:Top += nMove
+            oCtrl:Top += nMove
+         ENDIF
+       ELSE
+         lMod := .F.
+      ENDIF
+      IF lMod
+         IF !oCtrl:Application:Report:Modified
+            oCtrl:Application:Report:Modified := .T.
+         ENDIF
+         IF oCtrl:Cargo:lUI
+            oCtrl:Parent:InvalidateRect( aRect, .T.)
+          ELSEIF oCtrl:Cargo:Button != NIL
+            oCtrl:Cargo:Button:Delete()
+         ENDIF
+      ENDIF
+   ENDIF
+RETURN NIL
 

@@ -173,7 +173,7 @@ RETURN Self
 
 METHOD GetFormulas( cText ) CLASS VrLabel
    LOCAL i, n, cFormula, nFormula, cValue, nVal, nFilter
-   WHILE ( n := AT( "@", cText ) ) > 0
+   WHILE ValType( cText ) == "C" .AND. ( n := AT( "@", cText ) ) > 0
       cFormula := ""
       FOR i := n+1 TO LEN( cText )
           IF i == LEN( cText )

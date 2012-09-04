@@ -690,7 +690,8 @@ ENDCLASS
 METHOD OnInitDialog() CLASS TestFilter
    LOCAL cFilter, oGrid, oEdit, oData, oTable := ::Parent:oDataTable
    
-   WITH OBJECT oData := DataTable( Self )
+   WITH OBJECT oData := &(SubStr(oTable:ClsName,3))( Self )
+   
       :xFileName := oTable:FileName
       :Driver   := oTable:Driver
       

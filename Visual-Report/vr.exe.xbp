@@ -63,11 +63,3 @@ MYRC_FLAGS =
 [oci.lib]
 
 [fbclient_ms.lib]
-
-[W:\wf.8.5\Build\Lib\wf.8.5-SQL\wf.8.5-SQL-Level0_VXH.Lib]
-
-[W:\wf.8.5\Build\Lib\wf.8.5-SQL\wf.8.5-SQL-Level1_VXH.Lib]
-
-[W:\wf.8.5\Build\Lib\wf.8.5-SQL\wf.8.5-SQL-Level2_VXH.Lib]
-
-[W:\wf.8.5\Build\Lib\VXH\wf_Dialogs.lib]

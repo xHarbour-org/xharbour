@@ -66,20 +66,22 @@ RETURN Self
 
 METHOD Create( lSuper ) CLASS VrDataTable
    DEFAULT lSuper TO .T.
-   WITH OBJECT ::EditCtrl := DataTable( ::Parent )
-      :Cargo    := Self
-      :FileName := ::FileName
-      :Driver   := ::Driver
-      IF !EMPTY( ::Alias )
-         :Alias := ::Alias
-      ENDIF
-      IF :Driver != "SQLRDD"
-         :Create()
-         IF ! EMPTY( ::Order )
-            :OrdSetFocus( ::Order )
+   IF ::EditCtrl == NIL
+      WITH OBJECT ::EditCtrl := DataTable( ::Parent )
+         :Cargo    := Self
+         :FileName := ::FileName
+         :Driver   := ::Driver
+         IF !EMPTY( ::Alias )
+            :Alias := ::Alias
          ENDIF
-      ENDIF
-   END
+         IF :Driver != "SQLRDD"
+            :Create()
+            IF ! EMPTY( ::Order )
+               :OrdSetFocus( ::Order )
+            ENDIF
+         ENDIF
+      END
+   ENDIF
    IF lSuper
       Super:Create()
    ENDIF
@@ -87,8 +89,9 @@ RETURN Self
 
 METHOD Configure() CLASS VrDataTable
    LOCAL cAlias, nCnn, oIni, cEntry, e
+
    WITH OBJECT ::EditCtrl
-      :xFileName := ::FileName
+      :FileName := ::FileName
       :Driver   := ::Driver
       
       IF ::Driver != "SQLRDD"
@@ -174,6 +177,67 @@ METHOD WriteProps( oControl ) CLASS VrDataTable
          NEXT
       oControl:addBelow( oFilter )
    ENDIF
+RETURN Self
+
+CLASS VrAdsDataTable INHERIT VrDataTable
+   DATA ClsName          EXPORTED INIT "AdsDataTable"
+   DATA __ExplorerFilter EXPORTED INIT { { "AdsDataTable *.adt", "*.adt;*.dbf" } }
+   METHOD Create()
+   METHOD Configure()
+ENDCLASS
+
+METHOD Create( lSuper ) CLASS VrAdsDataTable
+   DEFAULT lSuper TO .T.
+   WITH OBJECT ::EditCtrl := AdsDataTable( ::Parent )
+      :Cargo    := Self
+      :FileName := ::FileName
+      :Driver   := ::Driver
+      IF !EMPTY( ::Alias )
+         :Alias := ::Alias
+      ENDIF
+      :Create()
+      IF ! EMPTY( ::Order )
+         :OrdSetFocus( ::Order )
+      ENDIF
+   END
+   Super:Create( lSuper )
+RETURN Self
+
+METHOD Configure() CLASS VrAdsDataTable
+   LOCAL cAlias, nCnn, oIni, cEntry, e
+
+   WITH OBJECT ::EditCtrl
+      :FileName := ::FileName
+      :Driver   := ::Driver
+      
+      IF !EMPTY( ::Alias )
+         :Alias := ::Alias
+         IF ::EditMode
+            :Alias += "_des"
+         ENDIF
+       ELSE
+         cAlias := SUBSTR( ::FileName, RAT("\",::FileName)+1 )
+         cAlias := SUBSTR( cAlias, 1, RAT(".",cAlias)-1 )
+         IF ::EditMode
+            :Alias := cAlias + "_des"
+         ENDIF
+      ENDIF
+      IF ! FILE( ::FileName )
+         MessageBox( 0, "File not found", ::FileName )
+       ELSE
+          TRY
+             :Create()
+          CATCH e
+             MessageBox( GetActiveWindow(), "An error has ocurred opening the main file please check the correct driver has been set for this file" + CRLF + CRLF +;
+                                                                                                                   "Description: " + e:Description + CRLF +;
+                                                                                                                   "Operation: " + e:Operation + CRLF +;
+                                                                                                                   "Code: " + xStr(e:GenCode) + CRLF +;
+                                                                                                                   "SubCode: " + xStr(e:SubCode), "Error Opening " + ::FileName )
+             RETURN .F.
+          END
+
+      ENDIF
+   END
 RETURN Self
 
 #pragma BEGINDUMP

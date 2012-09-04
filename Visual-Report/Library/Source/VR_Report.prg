@@ -126,6 +126,8 @@ CLASS VrReport INHERIT VrObject
    METHOD Save() INLINE ::oPDF:Save( ::FileName + ".pdf", acFileSaveView )
    METHOD __SetDataSource()
    METHOD ChangePage()
+   METHOD Print()
+
    error HANDLER OnError()
 ENDCLASS
 
@@ -141,6 +143,7 @@ RETURN hRet
 
 //-----------------------------------------------------------------------------------------------
 METHOD Init() CLASS VrReport
+   EXTERN VrLabel, VrLine, VrImage, VrDataTable, VrAdsDataTable, VrTotal, VrGroupHeader, VrGroupFooter, VrTotal, VrFormula
    ::aProperties := {}
    ::Orientation := __GetSystem():PageSetup:Portrait
    AADD( ::aProperties, { "Name",           "Object"  } )
@@ -198,6 +201,15 @@ METHOD End() CLASS VrReport
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
+METHOD Print( lPrompt ) CLASS VrReport
+   DEFAULT lPrompt TO .T.
+   TRY
+      ::oPDF:Print( "", lPrompt )
+   CATCH
+   END
+RETURN NIL
+
+//-----------------------------------------------------------------------------------------------
 METHOD StartPage() CLASS VrReport
    ::nRow := 0
    IF ::nPage > 0
@@ -215,8 +227,8 @@ METHOD EndPage() CLASS VrReport
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
-METHOD Preview() CLASS VrReport
-   LOCAL oPv := VrPreview( Self )
+METHOD Preview( aIcons ) CLASS VrReport
+   LOCAL oPv := VrPreview( Self, aIcons )
    oPv:Create()
    ::oPDF:Destroy()
 RETURN Self
@@ -237,8 +249,8 @@ METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal, nVirTop, nTop, hTotal )
    ENDIF
 
    IF oPanel == NIL
-      oControl := hb_ExecFromArray( hCtrl:ClsName, {,.F.} )
-      oControl:Parent := Self
+      oControl := &(hCtrl:ClsName)( Self )
+      //oControl:Parent := Self
       oControl:Left := x
       oControl:Top  := y
 
@@ -269,9 +281,9 @@ METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal, nVirTop, nTop, hTotal )
             oParent := oPanel:Objects[n]
          ENDIF
       ENDIF
+      //view hCtrl:ClsName
       oControl := oPanel:CreateControl( hCtrl, x, y, oParent )
    ENDIF
-
    IF ASCAN( oControl:aProperties, {|a| a[1]=="DataSource"} ) > 0
       IF VALTYPE( oControl:DataSource ) == "C"
          IF ( n := ASCAN( ::Application:Props:CompObjects, {|o| o:Name==oControl:DataSource} ) ) > 0
@@ -554,20 +566,22 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
 #ifndef VRDLL
    TRY
       n := ::Application:Props[ "RepHeader" ]:Height - ::Application:Props[ "RepHeader" ]:ClientHeight
-           ::Application:Props[ "RepHeader" ]:Height := VAL( ::hProps:RepHeaderHeight )+n
+      ::Application:Props[ "RepHeader" ]:Height := VAL( ::hProps:RepHeaderHeight )+n
 
       n := ::Application:Props[ "RepFooter" ]:Height - ::Application:Props[ "RepFooter" ]:ClientHeight
-           ::Application:Props[ "RepFooter" ]:Height := VAL( ::hProps:RepFooterHeight )+n
+      ::Application:Props[ "RepFooter" ]:Height := VAL( ::hProps:RepFooterHeight )+n
+
+      n := ::Application:Props[ "Header" ]:Height - ::Application:Props[ "Header" ]:ClientHeight
+      ::Application:Props[ "Header" ]:Height := VAL( ::hProps:HeaderHeight )+n
+
+      n := ::Application:Props[ "Footer" ]:Height - ::Application:Props[ "Footer" ]:ClientHeight
+      ::Application:Props[ "Footer" ]:Height := VAL( ::hProps:FooterHeight )+n
+
+      ::Application:Props[ "Footer" ]:Dockit()
+      ::Application:Props[ "Body" ]:Dockit()
    CATCH
    END
-   n := ::Application:Props[ "Header" ]:Height - ::Application:Props[ "Header" ]:ClientHeight
-        ::Application:Props[ "Header" ]:Height := VAL( ::hProps:HeaderHeight )+n
 
-   n := ::Application:Props[ "Footer" ]:Height - ::Application:Props[ "Footer" ]:ClientHeight
-        ::Application:Props[ "Footer" ]:Height := VAL( ::hProps:FooterHeight )+n
-
-        ::Application:Props[ "Footer" ]:Dockit()
-        ::Application:Props[ "Body" ]:Dockit()
 #endif
    TRY
       ::Orientation  := VAL( ::hProps:Orientation )
@@ -584,9 +598,10 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
    END
 
    hDC := GetDC(0)
-   ::HeaderHeight := VAL( ::hProps:HeaderHeight ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY )
-   ::FooterHeight := VAL( ::hProps:FooterHeight ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY )
    TRY
+      ::HeaderHeight := VAL( ::hProps:HeaderHeight ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY )
+      ::FooterHeight := VAL( ::hProps:FooterHeight ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY )
+
       ::RepHeaderHeight := VAL( ::hProps:RepHeaderHeight ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY )
       ::RepFooterHeight := VAL( ::hProps:RepFooterHeight ) * PIX_PER_INCH / GetDeviceCaps( hDC, LOGPIXELSY )
    CATCH
@@ -607,13 +622,19 @@ METHOD Load( cReport ) CLASS VrReport
        ENDIF
    NEXT
 
-   ::PrintHeader    := ::hProps:PrintHeader    == "1"
-   ::PrintRepHeader := ::hProps:PrintRepHeader == "1"
-   ::PrintFooter    := ::hProps:PrintFooter    == "1"
-   ::PrintRepFooter := ::hProps:PrintRepFooter == "1"
    TRY
+      ::PrintHeader    := ::hProps:PrintHeader    == "1"
+      ::PrintRepHeader := ::hProps:PrintRepHeader == "1"
+      ::PrintFooter    := ::hProps:PrintFooter    == "1"
+      ::PrintRepFooter := ::hProps:PrintRepFooter == "1"
+
       ::GroupBy1 := ::hProps:GroupBy1
    CATCH
+      ::PrintHeader    := .T.
+      ::PrintRepHeader := .T.
+      ::PrintFooter    := .T.
+      ::PrintRepFooter := .T.
+
       ::hProps:GroupBy1 := NIL
       ::GroupBy1 := ::hProps:GroupBy1
    END
@@ -658,7 +679,7 @@ RETURN oDoc
 METHOD Run( oDoc, oWait ) CLASS VrReport
    LOCAL nHeight, hDC, nSubHeight, nTotHeight, nCount, nPer, nPos, nRow, oData, hCtrl, hData := {=>}
    LOCAL xValue1, xValue2, xValue3, cFilter, cData, oIni, cEntry, aRelation, aRelations, cRelation, e
-   
+
    ::Create()
 
    IF oDoc != NIL .AND. ::hProps == NIL
@@ -674,11 +695,12 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    ::GroupBy3       := ::hProps:GroupBy3
 
    FOR EACH hCtrl IN ::aComponents
-       IF hCtrl:ClsName == "VRDATATABLE"
-          oData := DataTable( NIL )
+       IF hCtrl:ClsName IN {"VRDATATABLE","VRADSDATATABLE"}
+          oData := &(SubStr(hCtrl:ClsName,3))( NIL )
           oData:Driver   := hCtrl:Driver
           oData:FileName := hCtrl:FileName
           oData:xName    := hCtrl:Name
+
           IF hCtrl:Driver != "SQLRDD"
              IF !EMPTY( hCtrl:Alias )
                 oData:Alias := hCtrl:Alias
@@ -748,7 +770,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    NEXT
 
    FOR EACH hCtrl IN ::aComponents
-       IF hCtrl:ClsName == "VRDATATABLE"
+       IF hCtrl:ClsName $ { "VRDATATABLE", "VRADSDATATABLE" }
           cData := hCtrl:Name
           IF ! EMPTY( hCtrl:Relation )
              aRelations := hb_aTokens( hCtrl:Relation, "," )
@@ -770,7 +792,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
          MessageBox(0, "Database error" )
          ::End()
          hb_gcall(.t.)
-         HEVAL( hData, {|cKey,o| IIF( o:IsOpen, o:Close(),)} )
+         HEVAL( hData, {|cKey,o| IIF( o:EditCtrl:IsOpen, o:EditCtrl:Close(),)} )
          RETURN .F.
       END
    ENDIF
@@ -778,13 +800,16 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    ::StartPage()
    hDC := GetDC(0)
 #ifndef VRDLL
-   IF ::Application:Props:ExtraPage:PagePosition > -2
-      ::CreateExtraPage( hDC )
-      IF ::Application:Props:ExtraPage:PagePosition == -1
-         ::EndPage()
-         ::StartPage()
+   TRY
+      IF ::Application:Props:ExtraPage:PagePosition > -2
+         ::CreateExtraPage( hDC )
+         IF ::Application:Props:ExtraPage:PagePosition == -1
+            ::EndPage()
+            ::StartPage()
+         ENDIF
       ENDIF
-   ENDIF
+   CATCH
+   END
 #endif
    nPageNumber := 1
 
@@ -798,6 +823,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       nPos := 0
 
       nHeight := ::CreateGroupHeaders( hDC )
+
       IF !EMPTY(::GroupBy1)
          xValue1 := ::DataSource:Fields:&(::GroupBy1)
       ENDIF
@@ -809,12 +835,19 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       ENDIF
       WHILE ! ::DataSource:Eof()
          nHeight := ::CreateRecord( hDC )
-         IF ( xValue1 != NIL .AND. ::DataSource:Fields:&(::GroupBy1) != xValue1 ) .OR.;
-            ( xValue2 != NIL .AND. ::DataSource:Fields:&(::GroupBy2) != xValue2 ) .OR.;
-            ( xValue3 != NIL .AND. ::DataSource:Fields:&(::GroupBy3) != xValue3 )
-            xValue1 := ::DataSource:Fields:&(::GroupBy1)
-            xValue2 := ::DataSource:Fields:&(::GroupBy2)
-            xValue3 := ::DataSource:Fields:&(::GroupBy3)
+         IF ( xValue1 != NIL .AND. ! Empty(::GroupBy1) .AND. ::DataSource:Fields:&(::GroupBy1) != xValue1 ) .OR.;
+            ( xValue2 != NIL .AND. ! Empty(::GroupBy2) .AND. ::DataSource:Fields:&(::GroupBy2) != xValue2 ) .OR.;
+            ( xValue3 != NIL .AND. ! Empty(::GroupBy3) .AND. ::DataSource:Fields:&(::GroupBy3) != xValue3 )
+
+            IF ! Empty(::GroupBy1)
+               xValue1 := ::DataSource:Fields:&(::GroupBy1)
+            ENDIF
+            IF ! Empty(::GroupBy2)
+               xValue2 := ::DataSource:Fields:&(::GroupBy2)
+            ENDIF
+            IF ! Empty(::GroupBy3)
+               xValue3 := ::DataSource:Fields:&(::GroupBy3)
+            ENDIF
             ::nRow += 100
             nHeight := ::CreateGroupFooters( hDC )
             ::nRow += 500
@@ -864,19 +897,23 @@ FUNCTION S2R( hDC, cSize ); RETURN VAL(cSize)*PIX_PER_INCH/GetDeviceCaps( hDC, L
 CLASS VrPreview INHERIT Dialog
    DATA Report EXPORTED
    DATA oPDF   EXPORTED
+   DATA aIcons EXPORTED INIT {"ICO_ZOOMIN","ICO_ZOOMOUT","ICO_PRINT"}
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------
 
-METHOD Init( oReport ) CLASS VrPreview
+METHOD Init( oReport, aIcons ) CLASS VrPreview
    ::Report := oReport
    ::Super:Init( oReport:oForm )
    ::Modal      := .T.
    ::Top        := 300
    ::Width      := 800
    ::Height     := 900
+   IF ! Empty( aIcons )
+      ::aIcons := ACLONE(aIcons)
+   ENDIF
 //   ::Style      := WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::DlgModalFrame := .T.
 RETURN Self
@@ -892,9 +929,9 @@ METHOD OnInitDialog() CLASS VrPreview
       :ShowGrip    := .F.
       :ImageList   := ImageList( :this, 32, 32 ):Create()
       :Height      := 38
-      :ImageList:AddImage( "ICO_ZOOMIN" )
-      :ImageList:AddImage( "ICO_ZOOMOUT" )
-      :ImageList:AddImage( "ICO_PRINT" )
+      :ImageList:AddImage( ::aIcons[1] )
+      :ImageList:AddImage( ::aIcons[2] )
+      :ImageList:AddImage( ::aIcons[3] )
       :Create()
       WITH OBJECT ToolStripButton( :this )
          :Caption           := "Zoom-In"
@@ -1151,7 +1188,7 @@ RETURN Self
 
 METHOD BrowseF3_OnClick() CLASS VrAskLater
    LOCAL aTemp := HB_ATOKENS( ::hExp:AskMeLater:Search, CRLF )
-   ::oGet1:Caption  := wf_BrowseF3(aTemp, .T., ALIAS(), .F. )
+   ::oGet1:Caption  := VR_BrowseF3( Self) //wf_BrowseF3(aTemp, .T., ALIAS(), .F. )
 RETURN Self
 
 METHOD OK_OnClick() CLASS VrAskLater
