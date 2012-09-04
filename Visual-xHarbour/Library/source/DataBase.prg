@@ -246,14 +246,16 @@ METHOD Save() CLASS DataTable
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD Load() CLASS DataTable
+METHOD Load( lAvoidNew ) CLASS DataTable
    LOCAL n
-   IF ! ::__lNew
-      ::__aData := {}
-      FOR n := 1 TO LEN( ::Structure )
-          AADD( ::__aData, ::FieldGet(n,1) )
-      NEXT
+   DEFAULT lAvoidNew TO .F.
+   IF !lAvoidNew
+      ::__lNew := .F.
    ENDIF
+   ::__aData := {}
+   FOR n := 1 TO LEN( ::Structure )
+       AADD( ::__aData, ::FieldGet(n,1) )
+   NEXT
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -798,6 +800,7 @@ RETURN Self
 METHOD Scatter() CLASS DataRdd
    ::Owner:aScatter := ARRAY( LEN( ::Owner:Structure ) )
    aEval( ::Owner:aScatter, {|,n| ::Owner:aScatter[n] := (::Owner:Alias)->( FieldGet(n) ) } )
+   ::Owner:Load( .T. )
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------

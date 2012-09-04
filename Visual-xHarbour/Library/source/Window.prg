@@ -654,15 +654,20 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD SetWindowText( cText ) CLASS Window
+   LOCAL xText := cText
    IF ::__ClassInst == NIL .AND. ! ::Application:__Vxh
-      IF VALTYPE(cText)=="C" .AND. LEFT(cText,2)=="{|"
-         cText := &cText
-      ENDIF
-      IF VALTYPE(cText)=="B"
-         cText := EVAL(cText)
-      ENDIF
+      TRY
+         IF VALTYPE(cText)=="C" .AND. LEFT(cText,2)=="{|"
+            cText := &cText
+         ENDIF
+         IF VALTYPE(cText)=="B"
+            cText := EVAL(cText)
+         ENDIF
+      CATCH
+         cText := xText
+      END
    ENDIF
-   ::xCaption := cText
+   ::xText := cText
    IF ::hWnd != NIL
       SetWindowText( ::hWnd, cText )
    ENDIF
@@ -879,7 +884,7 @@ RETURN NIL
 METHOD Create( oParent ) CLASS Window
    LOCAL hParent, nLeft, nTop, wc
    LOCAL oObj, nError, cError, aSize
-   LOCAL cBmpMask
+   LOCAL cBmpMask, cText
 
    IF ! ::MDIContainer
       ::MDIClient := NIL
@@ -992,11 +997,15 @@ METHOD Create( oParent ) CLASS Window
       ENDIF
 
       IF ::__ClassInst == NIL .AND. ! ::Application:__Vxh
-         IF VALTYPE(::xCaption)=="C" .AND. LEFT(::xCaption,2)=="{|"
-            ::xCaption := &(::xCaption)
+         cText := ::xText
+         IF VALTYPE(cText)=="C" .AND. LEFT(cText,2)=="{|"
+            TRY
+               cText := &cText
+            CATCH
+            END
          ENDIF
-         IF VALTYPE(::xCaption)=="B"
-            ::xCaption := EVAL(::xCaption)
+         IF VALTYPE(cText)=="B"
+            ::xText := EVAL(cText)
          ENDIF
       ENDIF
       ::hWnd := CreateWindowEx( ::ExStyle, ::ClsName, ::Caption, ::Style, ::Left, ::Top, ::Width, ::Height, hParent, ::Id, ::AppInstance, ::__ClientStruct )
