@@ -3042,7 +3042,7 @@ PHB_ITEM hb_socketGetHosts( const char * szAddr, int af )
                if( szResult )
                {
                   ++iCount;
-                  if( !hb_arraySetCLPtr( pItem, iCount, szResult, strlen( szResult ) ) )
+                  if( !hb_arraySetCPtr( pItem, iCount, szResult, strlen( szResult ) ) )
                      hb_xfree( szResult );
                }
             }
