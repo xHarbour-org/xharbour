@@ -26,6 +26,7 @@ CLASS AdsDataTable INHERIT DataTable
    DATA __ServerTypes    EXPORTED  INIT { "Local", "Remote", "Either" }
    DATA __ExplorerFilter EXPORTED  INIT { { "DataTable / Advantage (*.dbf,*.adt)", "*.dbf;*.adt" } }
    DATA __xCtrlName      EXPORTED  INIT "AdsDataTable"
+   DATA ClsName          EXPORTED  INIT "AdsDataTable"
 
    METHOD File2Blob( cFile, cField )          INLINE (::Area)->( AdsFile2Blob( cFile, cField ) )
    METHOD Blob2File( cFile, cField )          INLINE (::Area)->( AdsBlob2File( cFile, cField ) )

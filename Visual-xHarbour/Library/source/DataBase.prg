@@ -766,7 +766,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
          RETURN .F.
       ENDIF
 
-      IF !::Owner:__lMemory .AND. nServer != NIL
+     IF !::Owner:__lMemory .AND. nServer != NIL
          ::Owner:AdsSetServerType( nServer )
       ENDIF
 
