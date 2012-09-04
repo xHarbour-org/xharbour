@@ -182,8 +182,12 @@ METHOD ToggleBreakPoint( nRow, lSet) CLASS HBBrwText
       ENDIF
    ELSE
       IF nAt != 0
+#ifdef HB_C52_STRICT
          ADel( ::aBreakPoints, nAt )
          ASize( ::aBreakPoints, Len( ::aBreakPoints ) - 1 )
+#else
+         ADel( ::aBreakPoints, nAt, .T. )
+#endif
       ENDIF
    ENDIF
 
@@ -304,13 +308,15 @@ METHOD Skip( n ) CLASS HBBrwText
    LOCAL nSkipped := 0
 
    IF n > 0
-      DO WHILE nSkipped != n .AND. ::GoNext()
-         nSkipped++
-      ENDDO
-   ELSE
-      DO WHILE nSkipped != n .AND. ::GoPrev()
-         nSkipped--
-      ENDDO
+      IF ::nRow < ::nRows
+         nSkipped := MIN( ::nRows - ::nRow, n )
+         ::nRow = nSkipped
+      ENDIF
+   ELSEIF n < 0
+      IF ::nRow > 1
+         nSkipped := MAX( 1 - ::nRow, n )
+         ::nRow = nSkipped
+      ENDIF
    ENDIF
 
    RETURN nSkipped

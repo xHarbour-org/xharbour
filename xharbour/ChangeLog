@@ -8,9 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-04 20:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/debug/tbrwtext.prg
+    ! method Skip was updated (borrowed from Harbour)
+
 2012-09-04 10:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/hbsocket.c
-    ! use xHarbour funcfion: hb_arraySetCLPtr -> hb_arraySetCPtr
+    ! use xHarbour function: hb_arraySetCLPtr -> hb_arraySetCPtr
 
 2012-09-04 09:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbsqlit3/sqlite3ext.h
