@@ -864,10 +864,10 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
             ::nRow += 500
             nHeight := ::CreateGroupHeaders( hDC )
          ENDIF
+         nPos ++
          IF oWait != NIL
             oWait:Position := Int( (nPos/nCount)*100 )
          ENDIF
-         nPos ++
       ENDDO
    ENDIF
 
@@ -988,6 +988,10 @@ METHOD OnInitDialog() CLASS VrPreview
       :Height      := 300
       :RulerSize   := 0
       :MinimumGap  := 5
+
+      :HorzScrollBar := .F.
+      :StatusBar     := .F.
+
       :DoCommandTool( acCommandToolPageHome )
       nZoom        := ::Application:IniFile:Read( "Preview", "ZoomFactor", 0 )
       IF nZoom > 0
