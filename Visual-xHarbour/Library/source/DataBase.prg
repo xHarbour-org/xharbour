@@ -112,7 +112,7 @@ CLASS DataTable INHERIT Component
    ACCESS Exists           INLINE ::IsOpen
 
    DATA __aTmpStruct       PROTECTED
-   DATA __lNew             EXPORTED INIT .F.
+   DATA __lNew             PROTECTED INIT .F.
    DATA __aData            PROTECTED INIT {}
 
    METHOD Init() CONSTRUCTOR
