@@ -219,7 +219,7 @@ METHOD Configure() CLASS VrAdsDataTable
          cAlias := SUBSTR( ::FileName, RAT("\",::FileName)+1 )
          cAlias := SUBSTR( cAlias, 1, RAT(".",cAlias)-1 )
          IF ::EditMode
-            :Alias := cAlias + "_des"
+            :Alias := cAlias + "1"
          ENDIF
       ENDIF
       IF ! FILE( ::FileName )

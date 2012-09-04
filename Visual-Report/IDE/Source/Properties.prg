@@ -738,8 +738,8 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             ENDIF
 
                             :Create()
-                            :Caption := ::GetEditBuffer( ::ActiveItem, nCol )
-                            :Cargo   := :Caption
+                            :Text := ::GetEditBuffer( ::ActiveItem, nCol )
+                            :Cargo := :Text
 
                             :OnWMKillFocus := {|o,cText,oPar| cText := o:Caption,;
                                                               oPar  := o:Parent,;

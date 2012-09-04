@@ -91,7 +91,7 @@ RETURN Self
 METHOD Configure() CLASS VrLabel
    IF ::lUI
       WITH OBJECT ::EditCtrl
-         :Caption        := ::Text
+         :Text           := ::Text
          :ForeColor      := ::ForeColor     
          :BackColor      := ::BackColor     
          :Font:FaceName  := ::Font:FaceName 
@@ -215,7 +215,7 @@ RETURN cText
 
 METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
    LOCAL nX, nY, hFont, hPrevFont, nWidth, x, y, cUnderline, cText, cItalic, cName := "Text" + AllTrim( Str( ::Parent:nText++ ) )
-   LOCAL lAuto, lf := (struct LOGFONT), aTxSize, n
+   LOCAL xText, lAuto, lf := (struct LOGFONT), aTxSize, n
 
    lAuto := ::AutoResize
 
@@ -256,13 +256,20 @@ METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
             cText := ALLTRIM( xStr( cText ) )
             hCtrl:Text := cText
           ELSE
+            xText := cText
             TRY
                cText := &cText
-             CATCH
+            CATCH
             END
-            IF VALTYPE( cText ) == "B"
-               cText := EVAL( cText, ::Parent )
-            ENDIF
+            TRY
+               IF VALTYPE( cText ) == "B"
+                  cText := EVAL( cText, ::Parent )
+               ENDIF
+            CATCH
+               IF ValType(cText) != ValType(xText)
+                  cText := xText
+               ENDIF
+            END
 
             IF hTotal != NIL
                IF EMPTY( hTotal:Value )
