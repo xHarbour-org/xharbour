@@ -112,7 +112,7 @@ CLASS DataTable INHERIT Component
    ACCESS Exists           INLINE ::IsOpen
 
    DATA __aTmpStruct       PROTECTED
-   DATA __lNew             PROTECTED INIT .F.
+   DATA __lNew             EXPORTED INIT .F.
    DATA __aData            PROTECTED INIT {}
 
    METHOD Init() CONSTRUCTOR
@@ -142,7 +142,7 @@ CLASS DataTable INHERIT Component
    METHOD GoTop()                             INLINE ::Connector:GoTop()     
    METHOD GoTo( nRec )                        INLINE ::Connector:GoTo( nRec )
    METHOD GoBottom()                          INLINE ::Connector:GoBottom()  
-   METHOD Skip( n )                           INLINE ::Connector:Skip( n )   
+   METHOD Skip( n )                           INLINE ::__lNew := .F., ::__aData := {}, ::Connector:Skip( n )   
    METHOD Close(lNotify)                      INLINE ::Connector:Close(), ::Structure := NIL, ::Fields := NIL,;
                                                                       IIF( VALTYPE( lNotify ) == "L" .AND. lNotify, __Evaluate( ::bOnFileClosed, Self ), ),;
                                                                       ExecuteEvent( "OnClose", Self )
