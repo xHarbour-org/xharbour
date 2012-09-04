@@ -824,6 +824,10 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
 
       nHeight := ::CreateGroupHeaders( hDC )
 
+      xValue1 := NIL
+      xValue2 := NIL
+      xValue3 := NIL
+
       IF !EMPTY(::GroupBy1)
          xValue1 := ::DataSource:Fields:&(::GroupBy1)
       ENDIF
@@ -835,19 +839,26 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       ENDIF
       WHILE ! ::DataSource:Eof()
          nHeight := ::CreateRecord( hDC )
-         IF ( xValue1 != NIL .AND. ! Empty(::GroupBy1) .AND. ::DataSource:Fields:&(::GroupBy1) != xValue1 ) .OR.;
-            ( xValue2 != NIL .AND. ! Empty(::GroupBy2) .AND. ::DataSource:Fields:&(::GroupBy2) != xValue2 ) .OR.;
-            ( xValue3 != NIL .AND. ! Empty(::GroupBy3) .AND. ::DataSource:Fields:&(::GroupBy3) != xValue3 )
+         ::DataSource:Skip()
 
-            IF ! Empty(::GroupBy1)
+         IF ( ( xValue1 != NIL .AND. ! Empty(::GroupBy1) .AND. ::DataSource:Fields:&(::GroupBy1) != xValue1 ) .OR.;
+              ( xValue2 != NIL .AND. ! Empty(::GroupBy2) .AND. ::DataSource:Fields:&(::GroupBy2) != xValue2 ) .OR.;
+              ( xValue3 != NIL .AND. ! Empty(::GroupBy3) .AND. ::DataSource:Fields:&(::GroupBy3) != xValue3 ) ) .AND. ! ::DataSource:Eof()
+
+            xValue1 := NIL
+            xValue2 := NIL
+            xValue3 := NIL
+
+            IF !EMPTY(::GroupBy1)
                xValue1 := ::DataSource:Fields:&(::GroupBy1)
             ENDIF
-            IF ! Empty(::GroupBy2)
+            IF !EMPTY(::GroupBy2)
                xValue2 := ::DataSource:Fields:&(::GroupBy2)
             ENDIF
-            IF ! Empty(::GroupBy3)
+            IF !EMPTY(::GroupBy3)
                xValue3 := ::DataSource:Fields:&(::GroupBy3)
             ENDIF
+
             ::nRow += 100
             nHeight := ::CreateGroupFooters( hDC )
             ::nRow += 500
@@ -857,7 +868,6 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
             oWait:Position := Int( (nPos/nCount)*100 )
          ENDIF
          nPos ++
-         ::DataSource:Skip()
       ENDDO
    ENDIF
 
