@@ -934,74 +934,77 @@ METHOD OnInitDialog() CLASS VrPreview
    LOCAL oItem, oSub, nZoom
    ::Caption := ::Report:PreviewCaption
 
-   WITH OBJECT ToolStrip( Self )
-      :ShowChevron := .F.
-      :ShowGrip    := .F.
-      :ImageList   := ImageList( :this, 32, 32 ):Create()
-      :Height      := 38
-      :ImageList:AddImage( ::aIcons[1] )
-      :ImageList:AddImage( ::aIcons[2] )
-      :ImageList:AddImage( ::aIcons[3] )
+   WITH OBJECT ToolStripContainer( Self )
       :Create()
-      WITH OBJECT ToolStripButton( :this )
-         :Caption           := "Zoom-In"
-         :ImageIndex        := 1
-         :Action            := {|o| ::Report:oPDF:DoCommandTool( acCommandToolZoomIn )}
+
+      WITH OBJECT ToolStrip( :this )
+         :ShowChevron := .F.
+         //:ShowGrip    := .F.
+         :ImageList   := ImageList( :this, 32, 32 ):Create()
+         :Height      := 38
+         :ImageList:AddImage( ::aIcons[1] )
+         :ImageList:AddImage( ::aIcons[2] )
+         :ImageList:AddImage( ::aIcons[3] )
          :Create()
+         WITH OBJECT ToolStripButton( :this )
+            :Caption           := "Zoom-In"
+            :ImageIndex        := 1
+            :Action            := {|o| ::Report:oPDF:DoCommandTool( acCommandToolZoomIn )}
+            :Create()
+         END
+         WITH OBJECT ToolStripButton( :this )
+            :Caption           := "Zoom-Out"
+            :ImageIndex        := 2
+            :Action            := {|o| ::Report:oPDF:DoCommandTool( acCommandToolZoomOut )}
+            :Create()
+         END
+         WITH OBJECT ToolStripButton( :this )
+            :Caption           := "Print"
+            :Begingroup        := .T.
+            :ImageIndex        := 3
+            :Action            := <|o| 
+                                   TRY
+                                     ::Report:oPDF:Print( "", .T. )
+                                   CATCH
+                                   END
+                                   >
+            :Create()
+         END
       END
-      WITH OBJECT ToolStripButton( :this )
-         :Caption           := "Zoom-Out"
-         :ImageIndex        := 2
-         :Action            := {|o| ::Report:oPDF:DoCommandTool( acCommandToolZoomOut )}
+
+      WITH OBJECT StatusBar( Self )
+         StatusBarPanel( ::StatusBar1, , 120 )
+         StatusBarPanel( ::StatusBar1, ,  -1 )
+         StatusBarPanel( ::StatusBar1, , 250 )
          :Create()
+         :DockIt()
       END
-      WITH OBJECT ToolStripButton( :this )
-         :Caption           := "Print"
-         :Begingroup        := .T.
-         :ImageIndex        := 3
-         :Action            := <|o| 
-                                TRY
-                                  ::Report:oPDF:Print( "", .T. )
-                                CATCH
-                                END
-                                >
-         :Create()
+
+      WITH OBJECT ::Report:oPDF
+         :SetParent( Self )
+         :Dock:Left   := Self
+         :Dock:Top    := ::ToolStripContainer1
+         :Dock:Right  := Self
+         :Dock:Bottom := ::StatusBar1
+         :DockIt()
+         :Width       := 300
+         :Height      := 300
+         :RulerSize   := 0
+         :MinimumGap  := 5
+
+         :HorzScrollBar := .F.
+         :StatusBar     := .F.
+
+         :DoCommandTool( acCommandToolPageHome )
+         nZoom        := ::Application:IniFile:Read( "Preview", "ZoomFactor", 0 )
+         IF nZoom > 0
+            :ZoomFactor := nZoom
+          ELSE
+            :ScaleToWindow( acScaleVertical )
+         ENDIF
+         :Show()
       END
    END
-   
-   WITH OBJECT StatusBar( Self )
-      StatusBarPanel( ::StatusBar1, , 120 )
-      StatusBarPanel( ::StatusBar1, ,  -1 )
-      StatusBarPanel( ::StatusBar1, , 250 )
-      :Create()
-      :DockIt()
-   END
-
-   WITH OBJECT ::Report:oPDF
-      :SetParent( Self )
-      :Dock:Left   := Self
-      :Dock:Top    := ::ToolStrip1
-      :Dock:Right  := Self
-      :Dock:Bottom := ::StatusBar1
-      :DockIt()
-      :Width       := 300
-      :Height      := 300
-      :RulerSize   := 0
-      :MinimumGap  := 5
-
-      :HorzScrollBar := .F.
-      :StatusBar     := .F.
-
-      :DoCommandTool( acCommandToolPageHome )
-      nZoom        := ::Application:IniFile:Read( "Preview", "ZoomFactor", 0 )
-      IF nZoom > 0
-         :ZoomFactor := nZoom
-       ELSE
-         :ScaleToWindow( acScaleVertical )
-      ENDIF
-      :Show()
-   END
-
    ::CenterWindow( .T. )
 RETURN Self
 
