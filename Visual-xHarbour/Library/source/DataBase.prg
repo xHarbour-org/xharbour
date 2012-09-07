@@ -139,11 +139,11 @@ CLASS DataTable INHERIT Component
    METHOD Deleted()                           INLINE ::Connector:Deleted()   
    METHOD RecCount()                          INLINE ::Connector:RecCount()  
    METHOD RecNo()                             INLINE ::Connector:RecNo()     
-   METHOD GoTop()                             INLINE ::Connector:GoTop()     
-   METHOD GoTo( nRec )                        INLINE ::Connector:GoTo( nRec )
-   METHOD GoBottom()                          INLINE ::Connector:GoBottom()  
-   METHOD Skip( n )                           INLINE ::__lNew := .F., ::__aData := {}, ::Connector:Skip( n )   
-   METHOD Close(lNotify)                      INLINE ::Connector:Close(), ::Structure := NIL, ::Fields := NIL,;
+   METHOD GoTop()                             INLINE ::Cancel(), ::Connector:GoTop()     
+   METHOD GoTo( nRec )                        INLINE ::Cancel(), ::Connector:GoTo( nRec )
+   METHOD GoBottom()                          INLINE ::Cancel(), ::Connector:GoBottom()  
+   METHOD Skip( n )                           INLINE ::Cancel(), ::Connector:Skip( n )   
+   METHOD Close(lNotify)                      INLINE ::Cancel(), ::Connector:Close(), ::Structure := NIL, ::Fields := NIL,;
                                                                       IIF( VALTYPE( lNotify ) == "L" .AND. lNotify, __Evaluate( ::bOnFileClosed, Self ), ),;
                                                                       ExecuteEvent( "OnClose", Self )
    METHOD Append()                            INLINE ::Connector:Append()
@@ -153,7 +153,7 @@ CLASS DataTable INHERIT Component
    METHOD SetOrder( nOrder )                  INLINE ::Connector:SetOrder( nOrder )
    METHOD Select()                            INLINE ::Connector:Select()
    METHOD SelectArea()                        INLINE ::Connector:SelectArea()
-   METHOD Delete()                            INLINE ::__lNew := .F., ::__aData := {}, ::Connector:Delete()
+   METHOD Delete()                            INLINE ::Cancel(), ::Connector:Delete()
    METHOD Recall()                            INLINE ::Connector:Recall()
    METHOD Seek( xKey, lSoft )                 INLINE ::Connector:Seek( xKey, lSoft )
    METHOD Found()                             INLINE ::Connector:Found()
@@ -161,7 +161,7 @@ CLASS DataTable INHERIT Component
    METHOD CreateIndex( cName, xKey, lUnique ) INLINE ::Connector:CreateIndex( cName, xKey, lUnique )
    
    METHOD IndexOrd()                          INLINE ::Connector:IndexOrd()
-   METHOD Zap()                               INLINE ::Connector:Zap()
+   METHOD Zap()                               INLINE ::Cancel(), ::Connector:Zap()
    METHOD OrdCount()                          INLINE ::Connector:OrdCount()
    METHOD OrdName(n)                          INLINE ::Connector:OrdName(n)
    METHOD OrdNumber(cOrd,cBag)                INLINE ::Connector:OrdNumber(cOrd,cBag)
