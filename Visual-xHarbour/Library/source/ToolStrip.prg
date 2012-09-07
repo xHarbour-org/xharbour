@@ -1569,6 +1569,9 @@ RETURN Self
 METHOD OnParentCommand( nId, nCode, nlParam ) CLASS ToolStripItem
    LOCAL n, i, nRet
    IF ::Id == nId
+      IF ::Role == 2
+         ::Checked := ! ::Checked
+      ENDIF
       IF VALTYPE( ::Action ) == "B"
          nRet := EVAL( ::Action, Self )
        ELSE
