@@ -3208,6 +3208,10 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               CATCH
               END
               IF HGetPos( oItem:EventHandler, "OnClick" ) != 0
+                 IF oItem:ClsName == "MenuStripItem" .AND. oItem:Role == 2
+                    oItem:Checked := ! oItem:Checked
+                 ENDIF
+
                  oForm := oItem:Form
                  IF ::ClsName == "CCTL"
                     oForm := Self

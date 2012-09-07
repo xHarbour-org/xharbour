@@ -231,8 +231,8 @@ METHOD OnSize( nwParam, x, y ) CLASS Control
    ENDIF
 RETURN NIL
 
-METHOD OnMove( nwParam, x, y ) CLASS Control
-   IF ::Super:OnMove( nwParam, x, y ) == NIL
+METHOD OnMove( x, y ) CLASS Control
+   IF ::Super:OnMove( x, y ) == NIL
       IF ::LeftSplitter != NIL
          ::LeftSplitter:OnParentMove( x, y )
       ENDIF

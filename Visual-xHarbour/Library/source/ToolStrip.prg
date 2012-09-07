@@ -1163,6 +1163,8 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 METHOD OnMove( x, y ) CLASS ToolStrip
    IF ::Row == 0 .AND. ::__lOnCaption .AND. ::__PrevRow > 0 .AND. ::Parent:ClsName == "ToolStripContainer"
+      DEFAULT x TO 0
+      DEFAULT y TO 0
       ::__LastLeft := x
       ::__LastTop  := y
       DEFAULT ::__PrevPos TO { x, y }
@@ -2946,9 +2948,8 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS MenuStripItem
           LineTo( dis:hDC, 10, dis:rcItem:Top + 12 + n )
           LineTo( dis:hDC, 15, dis:rcItem:Top +  7 + n )
       NEXT
-   ENDIF
 
-   IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
+    ELSEIF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
       IF lDisabled
          SelectObject( dis:hDC, GetSysColorBrush( COLOR_GRAYTEXT ) )
          ::Parent:ImageList:DrawDisabled( dis:hDC, ::ImageIndex, 5, dis:rcItem:top + 3, ILD_TRANSPARENT )
