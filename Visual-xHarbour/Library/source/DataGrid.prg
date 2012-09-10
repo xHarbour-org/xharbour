@@ -4012,8 +4012,8 @@ METHOD __SetSortArrow(n) CLASS GridColumn
 RETURN NIL
 
 METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
-   LOCAL aAlign, z, y, i, nColor, hOldPen, hOldBrush, hOldFont, n, aRect, nH := 5, nx := 0
-   LOCAL nTop, nIcoLeft, hPenShadow, hPenLight, nTxColor, nImage := ::xHeaderImageIndex
+   LOCAL aAlign, y, nColor, hOldPen, hOldBrush, hOldFont, n, aRect, nH := 5, nx := 0
+   LOCAL nTop, nIcoLeft, nTxColor, nImage := ::xHeaderImageIndex
    LOCAL hBorderPen, nColor1, nColor2
    
    DEFAULT lHot   TO .F.
@@ -4125,30 +4125,21 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    _ExtTextOut( hDC, x, y, ETO_CLIPPED, aRect, ::xText )
    SetTextColor( hDC, nColor )
 
-   IF ::SortArrow > 0 .AND. aRect[3]-15 > nLeft .AND. aRect[3]-15 > x + aAlign[1]
-      hPenShadow := CreatePen( PS_SOLID, 0, LightenColor( nColor1, 100 ) )
-      hPenLight  := CreatePen( PS_SOLID, 0, DarkenColor( nColor1, 100 ) )
-      hOldPen    := SelectObject( hDC, hPenLight )
-
-      z := 1
-      FOR i := 1 TO 2
-          FOR n := 1 TO nH
-              x := IIF( ::SortArrow == 1,n,nH-n+1)
-              y := (aRect[4]-nH)/2
-              
-              MoveTo( hDC, aRect[3] - (15-x), y+n+z )
-              LineTo( hDC, aRect[3] - ( 4+x), y+n+z )
-          NEXT
-          SelectObject( hDC, hPenShadow )
-          z := 0
-          aRect[3]--
-      NEXT
-      SelectObject( hDC, hOldPen )
-      DeleteObject( hPenShadow )
-      DeleteObject( hPenLight )
-   ENDIF
    SelectObject( hDC, hOldFont )
    SelectObject( hDC, hOldPen )
+
+   IF ::SortArrow > 0 .AND. aRect[3]-15 > nLeft .AND. aRect[3]-15 > x + aAlign[1]
+      hOldPen    := SelectObject( hDC, GetStockObject( BLACK_PEN ) )
+
+      FOR n := 1 TO nH
+          x := IIF( ::SortArrow == 1,n,nH-n+1)
+          y := (aRect[4]-nH)/2
+          
+          MoveTo( hDC, aRect[3] - (15-x), y+n-1 )
+          LineTo( hDC, aRect[3] - ( 4+x), y+n-1 )
+      NEXT
+      SelectObject( hDC, hOldPen )
+   ENDIF
 
 RETURN NIL
 
