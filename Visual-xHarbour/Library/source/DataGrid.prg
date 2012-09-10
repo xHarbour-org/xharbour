@@ -453,7 +453,7 @@ METHOD CreateDragImage(y) CLASS DataGrid
    LOCAL hImageList, hMemBitmap, nTop
    nTop       := ::__GetHeaderHeight() + ( ::ItemHeight*(::RowPos-1) )
    hMemBitmap := GetScreenBitmap( { 0, nTop, ::ClientWidth, nTop + ::ItemHeight }, ::hWnd )
-   hImageList := ImageListCreate( ::ClientWidth, ::ItemHeight, ILC_COLOR32 | ILC_MASK, 1, 0 )
+   hImageList := ImageListCreate( ::ClientWidth, ::ItemHeight, ILC_COLORDDB | ILC_MASK, 1, 0 )
    ImageListAdd( hImageList, hMemBitmap )
    DeleteObject( hMemBitmap )
    ::__nDragTop := y-nTop
@@ -1256,11 +1256,12 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
          IF nClickCol > 0
             
             ::__SelCol := nClickCol
-            
+
             IF ABS( ::__SelWidth-xPos ) <= HEADERSIZEGAP
                IF !::Children[ nClickCol ]:AllowSize
                   RETURN NIL
                ENDIF
+
                ::__lSizeMouseDown := .T.
              ELSEIF nClickCol <= LEN( ::Children )
                IF !::Children[ nClickCol ]:AllowDrag
@@ -3949,6 +3950,8 @@ CLASS GridColumn INHERIT Object
    DATA __HeaderLeft                 PROTECTED INIT 0
    DATA __HeaderRight                PROTECTED INIT 0
    DATA __HeaderX                    PROTECTED INIT 0
+   DATA __aVertex                    PROTECTED
+   DATA __aMesh                      PROTECTED
    
    METHOD Init() CONSTRUCTOR
    METHOD SetColor()
@@ -3983,11 +3986,14 @@ CLASS GridColumn INHERIT Object
 ENDCLASS
 
 METHOD CreateDragImage( nLeft ) CLASS GridColumn
-   LOCAL hImageList, hMemBitmap, nWidth := MIN( ::Parent:ClientWidth, nLeft + ::Width ) - nLeft
+   LOCAL hImageList, hMemBitmap, nWidth
+   nLeft -= 1
+   nWidth := MIN( ::Parent:ClientWidth, nLeft + ::Width ) - nLeft
+   nWidth ++
 
    hMemBitmap := GetScreenBitmap( {nLeft,0,nLeft+nWidth, ::Parent:ClientHeight}, ::Parent:hWnd )
 
-   hImageList := ImageListCreate( nWidth, ::Parent:ClientHeight, ILC_COLOR32 | ILC_MASK, 1, 0 )
+   hImageList := ImageListCreate( nWidth, ::Parent:ClientHeight, ILC_COLORDDB | ILC_MASK, 1, 0 )
    ImageListAdd( hImageList, hMemBitmap )
    
    DeleteObject( hMemBitmap )
@@ -4006,8 +4012,9 @@ METHOD __SetSortArrow(n) CLASS GridColumn
 RETURN NIL
 
 METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
-   LOCAL aAlign, z, y, i, nColor, nShadow, hOldPen, hOldBrush, nBorder, nBackColor, hOldFont, n, aRect, nH := 5, nx := 0
+   LOCAL aAlign, z, y, i, nColor, hOldPen, hOldBrush, hOldFont, n, aRect, nH := 5, nx := 0
    LOCAL nTop, nIcoLeft, hPenShadow, hPenLight, nTxColor, nImage := ::xHeaderImageIndex
+   LOCAL hBorderPen, nColor1, nColor2
    
    DEFAULT lHot   TO .F.
    DEFAULT nLeft  TO ::__HeaderLeft
@@ -4027,13 +4034,6 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
       nTxColor := ::System:Colors:BtnText
    ENDIF
    
-   nBorder    := ::HeaderForeColor
-   nBackColor := ::HeaderBackColor
-   IF lHot
-      nBorder    := ::System:CurrentScheme:MenuItemBorder
-      nBackColor := ::System:CurrentScheme:MenuItemSelected
-   ENDIF
-   
    ::__HeaderLeft  := nLeft
    ::__HeaderRight := nRight
    ::__HeaderX     := x
@@ -4043,19 +4043,37 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    aAlign := _GetTextExtentPoint32( hDC, ::xText )
    y := (::Parent:__GetHeaderHeight() - aAlign[2] ) / 2
 
+   ::__aVertex[1]:x := aRect[1]-1
+   ::__aVertex[1]:y := aRect[2]
+   ::__aVertex[2]:x := aRect[3]
+   ::__aVertex[2]:y := aRect[4]
 
-   hOldBrush := SelectObject( hDC, CreateSolidBrush( nBackColor ) )
+   IF ! lHot
+      nColor1 := ::System:CurrentScheme:ButtonSelectedGradientBegin
+      nColor2 := ::System:CurrentScheme:ButtonSelectedGradientEnd
+      hBorderPen := ::System:CurrentScheme:Pen:ButtonSelectedBorder
+    ELSE
+      nColor1 := ::System:CurrentScheme:ButtonPressedGradientBegin
+      nColor2 := ::System:CurrentScheme:ButtonPressedGradientEnd
+      hBorderPen := ::System:CurrentScheme:Pen:ButtonPressedBorder
+   ENDIF
 
-   Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
+   ::__aVertex[1]:Red   := GetRValue( nColor1 ) * 256
+   ::__aVertex[1]:Green := GetGValue( nColor1 ) * 256
+   ::__aVertex[1]:Blue  := GetBValue( nColor1 ) * 256
 
-   nColor  := LightenColor( nBackColor, 100 )
-   nShadow := DarkenColor( nBackColor, 100 )
+   ::__aVertex[2]:Red   := GetRValue( nColor2 ) * 256
+   ::__aVertex[2]:Green := GetGValue( nColor2 ) * 256
+   ::__aVertex[2]:Blue  := GetBValue( nColor2 ) * 256
 
-   hPenShadow := CreatePen( PS_SOLID, 0, nShadow )
-   hPenLight  := CreatePen( PS_SOLID, 0, nColor )
+   hOldPen   := SelectObject( hDC, hBorderPen )
+   hOldBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
 
-   __Draw3dRect( hDC, aRect, nColor, nShadow )
-   
+   __GradientFill( hDC, ::__aVertex, 2, ::__aMesh, 1, 1 )
+   Rectangle( hDC, aRect[1]-1, aRect[2]-1, aRect[3], aRect[4] )
+
+   SelectObject( hDC, hOldBrush )
+
    nColor := SetTextColor( hDC, nTxColor )
    n := ::Alignment
    
@@ -4104,7 +4122,10 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    SetTextColor( hDC, nColor )
 
    IF ::SortArrow > 0 .AND. aRect[3]-15 > nLeft .AND. aRect[3]-15 > x + aAlign[1]
-      hOldPen := SelectObject( hDC, hPenLight )
+      hPenShadow := CreatePen( PS_SOLID, 0, LightenColor( nColor1, 100 ) )
+      hPenLight  := CreatePen( PS_SOLID, 0, DarkenColor( nColor1, 100 ) )
+      hOldPen    := SelectObject( hDC, hPenLight )
+
       z := 1
       FOR i := 1 TO 2
           FOR n := 1 TO nH
@@ -4119,12 +4140,12 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
           aRect[3]--
       NEXT
       SelectObject( hDC, hOldPen )
+      DeleteObject( hPenShadow )
+      DeleteObject( hPenLight )
    ENDIF
    SelectObject( hDC, hOldFont )
+   SelectObject( hDC, hOldPen )
 
-   DeleteObject( SelectObject( hDC, hOldBrush ) )
-   DeleteObject( hPenShadow )
-   DeleteObject( hPenLight )
 RETURN NIL
 
 METHOD GetSize( nPos ) CLASS GridColumn
@@ -4174,8 +4195,7 @@ RETURN rc
 //----------------------------------------------------------------------------------
 
 METHOD Init( oParent ) CLASS GridColumn
-//   DEFAULT bData    TO {||""}
-
+   LOCAL nColor1, nColor2
    ::Children    := {}
    ::Parent      := oParent
    ::xImageIndex := 0
@@ -4197,6 +4217,18 @@ METHOD Init( oParent ) CLASS GridColumn
       ::HeaderFont:__ClassInst := __ClsInst( ::HeaderFont:ClassH )
       ::HeaderFont:__ClassInst:__IsInstance := .T.
    ENDIF
+
+   nColor1 := ::System:CurrentScheme:ButtonSelectedGradientBegin
+   nColor2 := ::System:CurrentScheme:ButtonSelectedGradientEnd
+
+   ::__aMesh    := { {=>} }
+   ::__aMesh[1]:UpperLeft  := 0
+   ::__aMesh[1]:LowerRight := 1
+
+   ::__aVertex  := { {=>}, {=>} }
+
+   ::__aVertex[1]:Alpha := 0
+   ::__aVertex[2]:Alpha := 0
 
    ::Font:Create()
    ::HeaderFont:Create()
