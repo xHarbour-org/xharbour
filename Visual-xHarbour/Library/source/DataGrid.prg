@@ -4051,6 +4051,10 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    IF ! lHot
       nColor1 := ::System:CurrentScheme:ButtonSelectedGradientBegin
       nColor2 := ::System:CurrentScheme:ButtonSelectedGradientEnd
+      IF ! ::Parent:Enabled
+         nColor1 := ::System:Color:White
+         nColor2 := ::System:Color:LtGray
+      ENDIF
       hBorderPen := ::System:CurrentScheme:Pen:ButtonSelectedBorder
     ELSE
       nColor1 := ::System:CurrentScheme:ButtonPressedGradientBegin
