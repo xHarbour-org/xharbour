@@ -546,6 +546,24 @@ FUNCTION HB_SetMimeType( cFile, cFname, cFext )
    ELSEIF cFile LIKE ".+\.svr"                         ; RETURN "x-world/x-svr=" + cFname + cFext
    ELSEIF cFile LIKE ".+\.(wrl|wrz)"                   ; RETURN "x-world/x-vrml=" +cFname + cFext
    ELSEIF cFile LIKE ".+\.vrt"                         ; RETURN "x-world/x-vrt=" + cFname + cFext
+   ELSEIF cFile LIKE ".+\.docm"                         ; RETURN "application/vnd.ms-word.document.macroEnabled.12=" + cFname + cFext
+   ELSEIF cFile LIKE ".+\.docx"                         ; RETURN "application/vnd.openxmlformats-officedocument.wordprocessingml.document=" + cFname + cFext
+   ELSEIF cFile LIKE ".+\.dotm"                         ; RETURN "application/vnd.ms-word.template.macroEnabled.12=" + cFname + cFext
+   ELSEIF cFile LIKE ".+\.dotx"                         ; RETURN "application/vnd.openxmlformats-officedocument.wordprocessingml.template=" + cFname + cFext
+   ELSEIF cFile LIKE ".+\.potm"                         ; RETURN "application/vnd.ms-powerpoint.template.macroEnabled.12=" + cFname + cFext
+   ELSEIF cFile LIKE ".+\.potx"                         ; RETURN "application/vnd.openxmlformats-officedocument.presentationml.template=" + cFname + cFext
+   ELSEIF cFile LIKE ".+\.ppam"                         ; RETURN "application/vnd.ms-powerpoint.addin.macroEnabled.12=" + cFname + cFext
+   ELSEIF cFile LIKE ".+\.ppsm"                         ; RETURN "application/vnd.ms-powerpoint.slideshow.macroEnabled.12=" + cFname + cFext
+   ELSEIF cFile LIKE ".+\.ppsx"                         ; RETURN "application/vnd.openxmlformats-officedocument.presentationml.slideshow=" + cFname + cFext
+   ELSEIF cFile LIKE ".+\.pptm"                         ; RETURN "application/vnd.ms-powerpoint.presentation.macroEnabled.12=" + cFname + cFext
+   ELSEIF cFile LIKE ".+\.pptx"                         ; RETURN "application/vnd.openxmlformats-officedocument.presentationml.presentation=" + cFname + cFext
+   ELSEIF cFile LIKE ".+\.xlam"                         ; RETURN "application/vnd.ms-excel.addin.macroEnabled.12=" + cFname + cFext
+   ELSEIF cFile LIKE ".+\.xlsb"                         ; RETURN "application/vnd.ms-excel.sheet.binary.macroEnabled.12=" + cFname + cFext
+   ELSEIF cFile LIKE ".+\.xlsm"                         ; RETURN "application/vnd.ms-excel.sheet.macroEnabled.12=" + cFname + cFext
+   ELSEIF cFile LIKE ".+\.xlsx"                         ; RETURN "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet=" + cFname + cFext
+   ELSEIF cFile LIKE ".+\.xltm"                         ; RETURN "application/vnd.ms-excel.template.macroEnabled.12=" + cFname + cFext
+   ELSEIF cFile LIKE ".+\.xltx"                         ; RETURN "application/vnd.openxmlformats-officedocument.spreadsheetml.template=" + cFname + cFext
+   
    ENDIF
 
 RETURN "text/plain;filename=" + cFname + cFext

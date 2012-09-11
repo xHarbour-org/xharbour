@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-11 10:30 UTC-0300 Luiz Rafael Culik <luiz/at/xharbour.com>
+  * source/tip/mail.prg
+  * source/tip/sendmail.prg
+    ! added new mime types for msoffice 2007 extension
+
 2012-09-04 20:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/debug/tbrwtext.prg
     ! method Skip was updated (borrowed from Harbour)
