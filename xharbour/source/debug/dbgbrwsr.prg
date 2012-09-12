@@ -61,158 +61,24 @@
  * A minimalistic TBrowse implementation just enough for use in
  * the debugger instead of the HBBrowse monster
  */
-CREATE CLASS HBDbBrowser
+CREATE CLASS HBDbBrowser INHERIT TBrowse  // Debugger browser
 
    VAR Window
-   VAR cargo
-
-   VAR nTop
-   VAR nLeft
-   VAR nBottom
-   VAR nRight
-   VAR cColorSpec
-   VAR autoLite INIT .T.
-
-   VAR goTopBlock
-   VAR goBottomBlock
-   VAR skipBlock
-
-   VAR stable INIT .F.
-   VAR rowCount INIT 0
-   VAR rowPos INIT 1
-   VAR colCount INIT 0
-   VAR colPos INIT 1
-   VAR hitBottom INIT .F.
-   VAR freeze INIT 0
-
-   VAR aColumns INIT {}
-   VAR aRowState INIT {}
-   VAR aColorSpec INIT {}
-   VAR nFirstVisible INIT 1
-   VAR lConfigured INIT .F.
 
    METHOD New( nTop, nLeft, nBottom, nRight, oParentWindow )
-   METHOD AddColumn( oCol )    INLINE AAdd( ::aColumns, oCol ), ::colCount++, Self
    METHOD Resize( nTop, nLeft, nBottom, nRight )
-   ACCESS ColorSpec            INLINE ::cColorSpec
-   ASSIGN ColorSpec( cColors ) METHOD SetColorSpec( cColors )
-   METHOD Configure()
-   METHOD DeHiLite()           INLINE Self
-   METHOD HiLite()             INLINE Self
-   METHOD MoveCursor( nSkip )
-   METHOD GoTo( nRow )
-   METHOD GoTop()              INLINE ::GoTo( 1 ), ::rowPos := 1, ::nFirstVisible := 1, ::RefreshAll()
-   METHOD GoBottom()
-   METHOD Down()               INLINE ::MoveCursor( 1 )
-   METHOD Up()                 INLINE ::MoveCursor( -1 )
-   METHOD PageDown()           INLINE ::MoveCursor( ::rowCount )
-   METHOD PageUp()             INLINE ::MoveCursor( -::rowCount )
-   METHOD GetColumn( nColumn ) INLINE ::aColumns[ nColumn ]
-   METHOD RefreshAll()         INLINE AFill( ::aRowState, .F. ), Self
-   METHOD RefreshCurrent()     INLINE iif( ::rowCount > 0 .AND. ::rowPos <= Len( ::aRowState ), ::aRowState[ ::rowPos ] := .F., ), Self
-   METHOD Invalidate()         INLINE ::RefreshAll()
-   METHOD Stabilize()          INLINE ::ForceStable()
-   METHOD ForceStable()
+   METHOD ForceStable() INLINE iif( ::RowCount > 0, ::Super:ForceStable(), )
+   METHOD RefreshAll() INLINE iif( ::RowCount > 0, ::Super:RefreshAll(), )
+   method Up() inline ::dehilite(),::refreshcurrent(),::super:up(),::hilite()
+   method Down() inline ::dehilite(),::refreshcurrent(),::super:Down(),::hilite()
 
 ENDCLASS
 
 METHOD New( nTop, nLeft, nBottom, nRight, oParentWindow ) CLASS HBDbBrowser
 
    ::Window := oParentWindow
-   ::nTop := nTop
-   ::nLeft := nLeft
-   ::nBottom := nBottom
-   ::nRight := nRight
+   ::super:New( nTop, nLeft, nBottom, nRight )
 
-   RETURN Self
-
-METHOD Configure()
-   ::rowCount := ::nBottom - ::nTop + 1
-   ASize( ::aRowState, ::rowCount )
-   ::lConfigured := .T.
-   RETURN Self
-
-METHOD SetColorSpec( cColors )
-   IF ISCHARACTER( cColors )
-      ::cColorSpec := cColors
-      ::aColorSpec := hb_aTokens( ::cColorSpec, "," )
-   ENDIF
-   RETURN ::cColorSpec
-
-METHOD MoveCursor( nSkip )
-   LOCAL nSkipped
-
-   nSkipped := ::GoTo( ::rowPos + ::nFirstVisible - 1 + nSkip )
-   IF !::hitBottom .OR. Abs( nSkipped ) > 0
-      IF iif( nSkipped > 0, ::rowPos + nSkipped <= ::rowCount, ::rowPos + nSkipped >= 1 )
-         ::RefreshCurrent()
-         ::rowPos += nSkipped
-         ::RefreshCurrent()
-      ELSE
-         ::nFirstVisible := Max( 1, nSkipped + ::nFirstVisible )
-         ::RefreshAll()
-      ENDIF
-   ENDIF
-   RETURN Self
-
-METHOD ForceStable()
-   LOCAL nRow, nCol, xData, oCol, nColX, nWid, aClr, nClr
-
-   IF !::lConfigured
-      ::Configure()
-   ENDIF
-   FOR nRow := 1 TO ::rowCount
-      IF Empty( ::aRowState[ nRow ] )
-         ::GoTo( ::nFirstVisible + nRow - 1 )
-         IF ::hitBottom
-            hb_dispOutAt( ::nTop + nRow - 1, ::nLeft, Space( ::nRight - ::nLeft + 1 ), ::aColorSpec[ 1 ] )
-         ELSE
-            nColX := ::nLeft
-            FOR nCol := 1 TO Len( ::aColumns )
-               IF nColX <= ::nRight
-                  oCol := ::aColumns[ nCol ]
-                  xData := Eval( oCol:block )
-                  nClr := iif( nRow == ::rowPos, 2, 1 )
-                  aClr := Eval( oCol:colorBlock, xData )
-                  IF ISARRAY( aClr )
-                     nClr := aClr[ nClr ]
-                  ELSE
-                     nClr := oCol:defColor[ nClr ]
-                  ENDIF
-                  IF oCol:width == NIL
-                     nWid := Len( xData )
-                  ELSE
-                     nWid := oCol:width
-                  ENDIF
-                  hb_dispOutAt( ::nTop + nRow - 1, nColX, PadR( xData, nWid ) + iif( nCol < Len( ::aColumns ), " ", "" ), ::aColorSpec[ nClr ] )
-                  nColX += nWid + 1
-               ENDIF
-            NEXT
-         ENDIF
-         ::aRowState[ nRow ] := .T.
-      ENDIF
-   NEXT
-   ::GoTo( ::nFirstVisible + ::rowPos - 1 )
-   SetPos( ::nTop + ::rowPos - 1, ::nLeft )
-   RETURN Self
-
-METHOD GoTo( nRow )
-   LOCAL nOldRow := ::nFirstVisible + ::rowPos - 1
-   LOCAL nSkipped := 0
-
-   Eval( ::goTopBlock )
-   IF nRow == 1
-      ::hitBottom := .F.
-   ELSE
-      nSkipped := Eval( ::skipBlock, nRow - 1 )
-      ::hitBottom := ( nSkipped != nRow - 1 )
-   ENDIF
-   RETURN nSkipped - nOldRow + 1
-
-METHOD GoBottom()
-   DO WHILE !::hitBottom
-      ::PageDown()
-   ENDDO
    RETURN Self
 
 METHOD Resize( nTop, nLeft, nBottom, nRight )
@@ -236,30 +102,11 @@ METHOD Resize( nTop, nLeft, nBottom, nRight )
    ENDIF
 
    IF lResize
-      ::Configure():ForceStable()
+      /* The following check prevents a "High limit exceeded" error. Maybe it
+       * would be wiser to make TBrowse handle height of 0 rows -- Ph.K. */
+      IF ::nBottom >= ::nTop
+         ::configure()
+      ENDIF
    ENDIF
 
    RETURN self
-
-CREATE CLASS HBDbColumn
-
-   EXPORTED:
-
-   VAR block      AS CODEBLOCK                  /* Code block to retrieve data for the column */
-   VAR colorBlock AS CODEBLOCK INIT {|| NIL }   /* column color block */
-   VAR defColor   AS ARRAY     INIT { 1, 2 }    /* Array of numeric indexes into the color table */
-   VAR width      AS USUAL                      /* Column display width */
-
-   METHOD New( cHeading, bBlock )               /* NOTE: This method is a Harbour extension [vszakats] */
-
-ENDCLASS
-
-METHOD New( cHeading, bBlock ) CLASS HBDbColumn
-
-   HB_SYMBOL_UNUSED( cHeading )
-   ::block := bBlock
-
-   RETURN Self
-
-FUNCTION HBDbColumnNew( cHeading, bBlock )
-   RETURN HBDbColumn():New( cHeading, bBlock )

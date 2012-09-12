@@ -577,7 +577,7 @@ METHOD BuildBrowseStack() CLASS HBDebugger
 
    IF ::oBrwStack == NIL
       aColors := __DbgColors()
-      ::oBrwStack := HBDbBrowser():New( 2, ::nMaxCol - 14, ::nMaxRow - 7, ::nMaxCol - 1 )
+            ::oBrwStack := HBDbBrowser():new( 2, ::nMaxCol - 14, ::nMaxRow - 7, ::nMaxCol - 1 )
       ::oBrwStack:ColorSpec := aColors[ 3 ] + "," + aColors[ 4 ] + "," + aColors[ 5 ] + "," + aColors[ 6 ]
       ::oBrwStack:goTopBlock := { || ::oBrwStack:Cargo := 1 }
       ::oBrwStack:goBottomBlock := { || ::oBrwStack:Cargo := Len( ::aProcStack ) }
@@ -588,7 +588,7 @@ METHOD BuildBrowseStack() CLASS HBDebugger
 
       ::oBrwStack:Cargo := 1 // Actual highligthed row
 
-      ::oBrwStack:AddColumn( HBDbColumnNew( "", { || iif( Len( ::aProcStack ) > 0,;
+      ::oBrwStack:AddColumn( TBColumnNew( "", { || iif( Len( ::aProcStack ) > 0,;
             PadC( ::aProcStack[ ::oBrwStack:Cargo ][ CSTACK_FUNCTION ], 14 ), Space( 14 ) ) } ) )
    ENDIF
 
@@ -782,7 +782,7 @@ METHOD Colors() CLASS HBDebugger
                       "Text High Sel.", "Text PPO Sel.", "Menu", "Menu High",;
                       "Menu Selected", "Menu High Sel." }
 
-   LOCAL oBrwColors := HBDbBrowser():New( oWndColors:nTop + 1, oWndColors:nLeft + 1,;
+   LOCAL oBrwColors := HBDbBrowser():new( oWndColors:nTop + 1, oWndColors:nLeft + 1,;
                                           oWndColors:nBottom - 1, oWndColors:nRight - 1 )
    LOCAL nWidth := oWndColors:nRight - oWndColors:nLeft - 1
    LOCAL oCol
@@ -799,10 +799,10 @@ METHOD Colors() CLASS HBDebugger
    oBrwColors:skipBlock := { | nPos | ( nPos := ArrayBrowseSkip( nPos, oBrwColors ), oBrwColors:cargo[ 1 ] := ;
    oBrwColors:cargo[ 1 ] + nPos, nPos ) }
 
-   oBrwColors:AddColumn( oCol := HBDbColumnNew( "", { || PadR( aColors[ oBrwColors:Cargo[ 1 ] ], 14 ) } ) )
+   oBrwColors:AddColumn( oCol := TBColumnNew( "", { || PadR( aColors[ oBrwColors:Cargo[ 1 ] ], 14 ) } ) )
    oCol:defColor := { 1, 2 }
    AAdd( oBrwColors:Cargo[ 2 ], aColors )
-   oBrwColors:AddColumn( oCol := HBDbColumnNew( "",;
+   oBrwColors:AddColumn( oCol := TBColumnNew( "",;
                        { || PadR( '"' + ::aColors[ oBrwColors:Cargo[ 1 ] ] + '"', nWidth - 15 ) } ) )
    AAdd( oBrwColors:Cargo[ 2 ], aColors )
    oCol:defColor := { 1, 3 }
@@ -2761,11 +2761,13 @@ METHOD ShowVars() CLASS HBDebugger
    ENDIF
 
    IF Len( ::aVars ) > 0 .AND. ::oBrwVars == NIL
+   
       ::oBrwVars := HBDbBrowser():New( nTop + 1, 1, nBottom - 1, ;
                                        ::nMaxCol - iif( ::oWndStack != NIL, ::oWndStack:nWidth(), 0 ) - 1 )
+      
       aColors := __DbgColors()
       ::oBrwVars:Cargo := { 1, {} } // Actual highlighted row
-      ::oBrwVars:ColorSpec := aColors[ 2 ] + "," + aColors[ 5 ] + "," + aColors[ 3 ] + "," + aColors[ 6 ]
+      ::oBrwVars:ColorSpec := ::aColors[ 2 ] + "," + ::aColors[ 5 ] + "," + ::aColors[ 3 ]
       ::oBrwVars:goTopBlock := { || ::oBrwVars:cargo[ 1 ] := Min( 1, Len( ::aVars ) ) }
       ::oBrwVars:goBottomBlock := { || ::oBrwVars:cargo[ 1 ] := Max( 1, Len( ::aVars ) ) }
       ::oBrwVars:skipBlock := { | nSkip, nOld | ;
@@ -2773,15 +2775,20 @@ METHOD ShowVars() CLASS HBDebugger
                                ::oBrwVars:Cargo[ 1 ] += nSkip,;
                                ::oBrwVars:Cargo[ 1 ] := Min( Max( ::oBrwVars:Cargo[ 1 ], 1 ), Len( ::aVars ) ),;
                                ::oBrwVars:Cargo[ 1 ] - nOld }
+                               
+
+      ::oBrwVars:Cargo[1] := 1 // Actual highligthed row
+                               
 
       nWidth := ::oWndVars:nWidth() - 1
-      oCol := HBDbColumnNew( "", ;
-           { || PadR( hb_NToS( ::oBrwVars:Cargo[ 1 ] - 1 ) + ") " + ;
+      oCol := TBColumnNew( "", ;
+           { || PadR( LTrim( Str( ::oBrwVars:Cargo[ 1 ] - 1 ) ) + ") " + ;
                       ::VarGetInfo( ::aVars[ Max( ::oBrwVars:Cargo[ 1 ], 1 ) ] ), ;
                       ::oWndVars:nWidth() - 2 ) } )
       ::oBrwVars:AddColumn( oCol )
       AAdd( ::oBrwVars:Cargo[ 2 ], ::aVars )
       oCol:DefColor := { 1, 2 }
+
       ::oBrwVars:ForceStable()
    ELSEIF Len( ::aVars ) == 0
       ::oBrwVars := NIL
@@ -3038,10 +3045,10 @@ METHOD ViewSets() CLASS HBDebugger
    oBrwSets:goBottomBlock := { || oBrwSets:cargo[ 1 ] := Len( oBrwSets:cargo[ 2 ][ 1 ] ) }
    oBrwSets:skipBlock := { | nPos | ( nPos := ArrayBrowseSkip( nPos, oBrwSets ), oBrwSets:cargo[ 1 ] := ;
    oBrwSets:cargo[ 1 ] + nPos, nPos ) }
-   oBrwSets:AddColumn( oCol := HBDbColumnNew( "", { || PadR( aSets[ oBrwSets:cargo[ 1 ] ], 12 ) } ) )
+   oBrwSets:AddColumn( oCol := TBColumnNew( "", { || PadR( aSets[ oBrwSets:cargo[ 1 ] ], 12 ) } ) )
    AAdd( oBrwSets:Cargo[ 2 ], aSets )
    ocol:defcolor := { 1, 2 }
-   oBrwSets:AddColumn( oCol := HBDbColumnNew( "",;
+   oBrwSets:AddColumn( oCol := TBColumnNew( "",;
                        { || PadR( __dbgValToStr( Set( oBrwSets:cargo[ 1 ]  ) ), nWidth - 13 ) } ) )
    ocol:defcolor := { 1, 3 }
    ocol:width := 40
@@ -3240,7 +3247,7 @@ METHOD WatchpointsShow() CLASS HBDebugger
                                iif( Len(::aWatch) > 0, ::oBrwPnt:Cargo[ 1 ] - nOld, 0 ) }
 
       nWidth := ::oWndPnt:nWidth() - 1
-      oCol := HBDbColumnNew( "", ;
+      oCol := TBColumnNew( "", ;
          { || PadR( iif( Len( ::aWatch ) > 0, ;
                        hb_NToS( ::oBrwPnt:Cargo[ 1 ] - 1 ) + ") " + ;
                        ::WatchGetInfo( Max( ::oBrwPnt:Cargo[ 1 ], 1 ) ), ;
@@ -3399,7 +3406,7 @@ STATIC PROCEDURE RefreshVarsS( oBrowse )
    ENDIF
    oBrowse:deHilite():forceStable()
 
-   IF nLen == 2
+   IF nLen == 1
       oBrowse:hilite():colPos := 1
    ENDIF
    oBrowse:hilite()
@@ -3496,7 +3503,7 @@ FUNCTION __dbgAChoice( nTop, nLeft, nBottom, nRight, aItems, cColors )
    oBrw:colorSpec := IIF( ISCHARACTER( cColors ), cColors, SetColor() )
    nLen := nRight - nLeft + 1
    nRow := 1
-   oCol := HBDbColumnNew( "", {|| PadR( aItems[ nRow ], nLen ) } )
+   oCol := tbColumnNew( "", {|| PadR( aItems[ nRow ], nLen ) } )
    oBrw:AddColumn( oCol )
    oBrw:goTopBlock := {|| nRow := 1 }
    oBrw:goBottomBlock := {|| nRow := Len( aItems ) }

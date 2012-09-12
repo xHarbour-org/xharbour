@@ -74,9 +74,9 @@ PROCEDURE __dbgHelp( nTopic )
 
    oDlg := HBDbWindow():New( 2, 2, MaxRow() - 2, MaxCol() - 2, "Help", cColor )
 
-   oBrw := HBDbBrowser():New( oDlg:nTop + 1, oDlg:nLeft + 1, oDlg:nBottom - 1, oDlg:nLeft + 12 )
+   oBrw := TBrowseNew( oDlg:nTop + 1, oDlg:nLeft + 1, oDlg:nBottom - 1, oDlg:nLeft + 12 )
    oBrw:Cargo := 1
-   oBrw:AddColumn( HBDbColumnNew( "", { || aTopics[ oBrw:Cargo ][ 1 ] }, 12 ) )
+   oBrw:AddColumn( TBColumnNew( "", { || aTopics[ oBrw:Cargo ][ 1 ] }, 12 ) )
    oBrw:ColorSpec := StrTran( __Dbg():ClrModal(), ", R/W", "" )
    oBrw:SkipBlock := { | nSkip, nOld | nOld := oBrw:Cargo, oBrw:Cargo += nSkip,;
                   oBrw:Cargo := Min( Max( oBrw:Cargo, 1 ), Len( aTopics ) ),;

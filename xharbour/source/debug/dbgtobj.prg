@@ -71,7 +71,7 @@ CREATE CLASS HBDbObject
    METHOD New( oObject, cVarName, lEditable )
    METHOD addWindows( aArray, nRow )
    METHOD doGet( oBrowse, pItem, nSet )
-   METHOD SetsKeyPressed( nKey, oBrwSets, nSets, aArray )
+   METHOD SetsKeyPressed( nKey, oBrwSets, nSets, oWnd, cName, aArray )
 
 ENDCLASS
 
@@ -126,7 +126,7 @@ METHOD addWindows( aArray, nRow ) CLASS HBDbObject
 
    nWidth := oWndSets:nRight - oWndSets:nLeft - 1
 
-   oBrwSets := HBDbBrowser():New( oWndSets:nTop + 1, oWndSets:nLeft + 1, oWndSets:nBottom - 1, oWndSets:nRight - 1 )
+   oBrwSets := TBrowseNew( oWndSets:nTop + 1, oWndSets:nLeft + 1, oWndSets:nBottom - 1, oWndSets:nRight - 1 )
    ::ArrayReference := aArray
 
    oBrwSets:autolite := .T.
@@ -138,13 +138,13 @@ METHOD addWindows( aArray, nRow ) CLASS HBDbObject
                           Max( 1, ::arrayindex + nSkip ) ), ::arrayindex - nPos }
 
    nMaxLen := ArrayMaxLen( ::AllNames )
-   oBrwSets:AddColumn( oCol := HBDbColumnNew( "",;
+   oBrwSets:AddColumn( oCol := TBColumnNew( "",;
                     { || PadR( ::ArrayReference[ ::arrayindex, 1 ], nMaxLen ) } ) )
    oCol:width := nMaxLen
    oCol:ColorBlock := { || { iif( ::Arrayindex == oBrwSets:Cargo, 2, 1 ), 2 } }
    oBrwSets:Freeze := 1
 
-   oBrwSets:AddColumn( oCol := HBDbColumnNew( "", { || iif( ISCHARACTER( ::ArrayReference[ ::ArrayIndex, 2 ] ) .AND. ::ArrayReference[ ::ArrayIndex, 2 ] == "Method",;
+   oBrwSets:AddColumn( oCol := TBColumnNew( "", { || iif( ISCHARACTER( ::ArrayReference[ ::ArrayIndex, 2 ] ) .AND. ::ArrayReference[ ::ArrayIndex, 2 ] == "Method",;
       "Method",;
       PadR( __dbgValToStr( __objSendMsg( ::TheObj, ::ArrayReference[ ::arrayindex, 1 ] ) ), nWidth  - 12 ) ) } ) )
 
@@ -153,7 +153,8 @@ METHOD addWindows( aArray, nRow ) CLASS HBDbObject
    oCol:width := MaxCol() - 14 - nMaxLen
    oBrwSets:colPos := 2
    ::aWindows[ ::nCurWindow ]:bPainted    := { || oBrwSets:ForceStable() }
-   ::aWindows[ ::nCurWindow ]:bKeyPressed := { | nKey | ::SetsKeyPressed( nKey, oBrwSets, Len( aArray ), ::ArrayReference ) }
+   ::aWindows[ ::nCurWindow ]:bKeyPressed := { | nKey | ::SetsKeyPressed( nKey, oBrwSets, Len( aArray ),;
+                                               ::aWindows[ ::nCurWindow ], ::objname, ::Arrayreference ) }
    ::aWindows[ ::nCurwindow ]:cCaption := ::objname + " is of class: " +::TheObj:ClassName()
 
    SetCursor( SC_NONE )
@@ -223,7 +224,7 @@ METHOD doGet( oBrowse, pItem, nSet ) CLASS HBDbObject
 
    RETURN NIL
 
-METHOD SetsKeyPressed( nKey, oBrwSets, nSets, aArray ) CLASS HBDbObject
+METHOD SetsKeyPressed( nKey, oBrwSets, nSets, oWnd, cName, aArray ) CLASS HBDbObject
 
    LOCAL nSet := oBrwSets:Cargo
    LOCAL cOldname := ::objname

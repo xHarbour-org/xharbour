@@ -102,18 +102,18 @@ PROCEDURE __dbgShowWorkAreas()
 
    /* Alias browse */
 
-   aBrw[ 1 ] := HBDbBrowser():new( oDlg:nTop + 1, oDlg:nLeft + 1, oDlg:nBottom - 1, oDlg:nLeft + 11 )
+   aBrw[ 1 ] := TBrowseNew( oDlg:nTop + 1, oDlg:nLeft + 1, oDlg:nBottom - 1, oDlg:nLeft + 11 )
 
    aBrw[ 1 ]:Cargo         := ( n1 := cur_id )
    aBrw[ 1 ]:ColorSpec     := oDlg:cColor
-   aBrw[ 1 ]:GoTopBlock    := { || aBrw[ 1 ]:Cargo := n1 := 1 }
-   aBrw[ 1 ]:GoBottomBlock := { || aBrw[ 1 ]:Cargo := n1 := Len( aAlias ) }
+   aBrw[ 1 ]:GoTopBlock    := { || n1 := 1 }
+   aBrw[ 1 ]:GoBottomBlock := { || n1 := Len( aAlias ) }
    aBrw[ 1 ]:SkipBlock     := { | nSkip, nPos | nPos := n1,;
-                                  aBrw[ 1 ]:Cargo := n1 := iif( nSkip > 0, Min( Len( aAlias ), n1 + nSkip ),;
+                                  n1 := iif( nSkip > 0, Min( Len( aAlias ), n1 + nSkip ),;
                                           Max( 1, n1 + nSkip ) ),;
                                   n1 - nPos }
 
-   aBrw[ 1 ]:AddColumn( oCol := HBDbColumnNew( "", { || PadR( aAlias[ n1 ][ 2 ], 11 ) } ) )
+   aBrw[ 1 ]:AddColumn( oCol := TBColumnNew( "", { || PadR( aAlias[ n1 ][ 2 ], 11 ) } ) )
 
    oCol:ColorBlock := { || iif( aAlias[ n1 ][ 1 ] == Select(), { 3, 4 }, { 1, 2 } ) }
 
@@ -121,18 +121,17 @@ PROCEDURE __dbgShowWorkAreas()
 
    aInfo := ( aAlias[ n1 ][ 1 ] )->( DbfInfo() )
 
-   aBrw[ 2 ] := HBDbBrowser():new( oDlg:nTop + 7, oDlg:nLeft + 13, oDlg:nBottom - 1, oDlg:nLeft + 50 )
+   aBrw[ 2 ] := TBrowseNew( oDlg:nTop + 7, oDlg:nLeft + 13, oDlg:nBottom - 1, oDlg:nLeft + 50 )
 
    aBrw[ 2 ]:Cargo         := ( n2 := 1 )
    aBrw[ 2 ]:ColorSpec     := oDlg:cColor
    aBrw[ 2 ]:GoTopBlock    := { || aBrw[ 2 ]:Cargo := n2 := 1 }
-   aBrw[ 2 ]:GoBottomBlock := { || aBrw[ 2 ]:Cargo := n2 := Len( aInfo ) }
+   aBrw[ 2 ]:GoBottomBlock := { || n2 := Len( aInfo ) }
    aBrw[ 2 ]:SkipBlock     := { | nSkip, nPos | nPos := n2, ;
-                                aBrw[ 2 ]:Cargo := n2 := iif( nSkip > 0, Min( Len( aInfo ), n2 + nSkip ), ;
-                                                                         Max( 1, n2 + nSkip ) ), ;
-                                n2 - nPos }
+                                  n2 := iif( nSkip > 0, Min( Len( aInfo ), n2 + nSkip ),;
+                                          Max( 1, n2 + nSkip ) ), n2 - nPos }
 
-   aBrw[ 2 ]:AddColumn( oCol := HBDbColumnNew( "", { || PadR( aInfo[ n2 ], 38 ) } ) )
+   aBrw[ 2 ]:AddColumn( oCol := TBColumnNew( "", { || PadR( aInfo[ n2 ], 38 ) } ) )
 
    oCol:ColorBlock := { || iif( aAlias[ n1 ][ 1 ] == Select() .AND. n2 == 1, { 3, 4 }, { 1, 2 } ) }
 
@@ -140,17 +139,17 @@ PROCEDURE __dbgShowWorkAreas()
 
    aStruc := ( aAlias[ n1 ][ 1 ] )->( DbStruct() )
 
-   aBrw[ 3 ] := HBDbBrowser():new( oDlg:nTop + 1, oDlg:nLeft + 52, oDlg:nBottom - 1, oDlg:nLeft + 70 )
+   aBrw[ 3 ] := TBrowseNew( oDlg:nTop + 1, oDlg:nLeft + 52, oDlg:nBottom - 1, oDlg:nLeft + 70 )
 
-   aBrw[ 3 ]:Cargo         := n3 := 1
+   aBrw[ 3 ]:Cargo         := 1
    aBrw[ 3 ]:ColorSpec     := oDlg:cColor
    aBrw[ 3 ]:GoTopBlock    := { || aBrw[ 3 ]:Cargo := n3 := 1 }
-   aBrw[ 3 ]:GoBottomBlock := { || aBrw[ 3 ]:Cargo := n3 := Len( aStruc ) }
+   aBrw[ 3 ]:GoBottomBlock := { || n3 := Len( aStruc ) }
    aBrw[ 3 ]:SkipBlock     := { | nSkip, nPos | nPos := n3,;
-                                  aBrw[ 3 ]:Cargo := n3 := iif( nSkip > 0, Min( Len( aStruc ), n3 + nSkip ),;
+                                  n3 := iif( nSkip > 0, Min( Len( aStruc ), n3 + nSkip ),;
                                           Max( 1, n3 + nSkip ) ), n3 - nPos }
 
-   aBrw[ 3 ]:AddColumn( HBDbColumnNew( "", { || PadR( aStruc[ n3, 1 ], 11 ) + ;
+   aBrw[ 3 ]:AddColumn( TBColumnNew( "", { || PadR( aStruc[ n3, 1 ], 11 ) + ;
                                                 aStruc[ n3, 2 ] + ;
                                                 Str( aStruc[ n3, 3 ], 4 ) + ;
                                                 Str( aStruc[ n3, 4 ], 3 ) } ) )
@@ -204,7 +203,6 @@ STATIC PROCEDURE DlgWorkAreaPaint( oDlg, aBrw )
    UpdateInfo( oDlg, Alias() )
 
    RETURN
-
 STATIC PROCEDURE DlgWorkAreaKey( nKey, oDlg, aBrw, aAlias, aStruc, aInfo )
 
    LOCAL oDebug := __Dbg()

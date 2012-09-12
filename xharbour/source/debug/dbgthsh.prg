@@ -114,13 +114,13 @@ METHOD addWindows( hHash, nRow ) CLASS HBDbHash
    AAdd( ::aWindows, oWndSets )
 
    nWidth := oWndSets:nRight - oWndSets:nLeft - 1
-   oBrwSets := HBDbBrowser():New( oWndSets:nTop + 1, oWndSets:nLeft + 1, oWndSets:nBottom - 1, oWndSets:nRight - 1 )
+   oBrwSets := TBrowseNew( oWndSets:nTop + 1, oWndSets:nLeft + 1, oWndSets:nBottom - 1, oWndSets:nRight - 1 )
    oBrwSets:autolite := .F.
    oBrwSets:ColorSpec := __Dbg():ClrModal()
    oBrwSets:Cargo := { 1, {} } // Actual highligthed row
    AAdd( oBrwSets:Cargo[ 2 ], hHash )
 
-   oBrwSets:AddColumn( oCol := HBDbColumnNew( "", { || ::hashName + "[" + HashKeyString( hHash, oBrwSets:cargo[ 1 ] ) + "]" } ) )
+   oBrwSets:AddColumn( oCol := TBColumnNew( "", { || ::hashName + "[" + HashKeyString( hHash, oBrwSets:cargo[ 1 ] ) + "]" } ) )
 
    // calculate max key length
    nKeyLen := 0
@@ -129,7 +129,7 @@ METHOD addWindows( hHash, nRow ) CLASS HBDbHash
    oCol:DefColor := { 1, 2 }
    nColWidth := oCol:Width
 
-   oBrwSets:AddColumn( oCol := HBDbColumnNew( "" ,{ || PadR( __dbgValToStr( HGetValueAt( hHash, oBrwSets:cargo[ 1 ] ) ), nWidth - nColWidth - 1 ) } ) )
+   oBrwSets:AddColumn( oCol := TBColumnNew( "" ,{ || PadR( __dbgValToStr( HGetValueAt( hHash, oBrwSets:cargo[ 1 ] ) ), nWidth - nColWidth - 1 ) } ) )
 
    /* 09/08/2004 - <maurilio.longo@libero.it>
                    Setting a fixed width like it is done in the next line of code wich I've

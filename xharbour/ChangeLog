@@ -8,6 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-12 11:10 UTC-0300 Luiz Rafael Culik <luiz/at/xharbour.com>
+  * source/debug/dbgbrwsr.prg
+  * source/debug/dbghelp.prg
+  * source/debug/dbgmenu.prg
+  * source/debug/dbgtarr.prg
+  * source/debug/dbgthsh.prg
+  * source/debug/dbgtobj.prg
+  * source/debug/dbgwa.prg
+  * source/debug/debugger.prg
+  * source/debug/tbrwtext.prg
+    ! updated to allow debug big sources with very large number of lines
+
 2012-09-11 10:30 UTC-0300 Luiz Rafael Culik <luiz/at/xharbour.com>
   * source/tip/mail.prg
   * source/tip/sendmail.prg
