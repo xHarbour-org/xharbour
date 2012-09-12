@@ -229,6 +229,9 @@ METHOD SetsKeyPressed( nKey, oBrwSets, nSets, oWnd, cName, aArray ) CLASS HBDbOb
    LOCAL nSet := oBrwSets:Cargo
    LOCAL cOldname := ::objname
 
+   HB_SYMBOL_UNUSED( oWnd )
+   HB_SYMBOL_UNUSED( cName )
+
    DO CASE
    CASE nKey == K_UP
 
