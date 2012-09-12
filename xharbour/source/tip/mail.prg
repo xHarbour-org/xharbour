@@ -660,7 +660,9 @@ METHOD attachFile( cFileName ) CLASS TipMail
          Lower( cFileName ) LIKE ".+\.(xdr|vgp|vts|vtts|3dmf|3dm|qd3d|qd3)"      .OR. ;
          Lower( cFileName ) LIKE ".+\.(xml)"      .OR. ;
          Lower( cFileName ) LIKE ".+\.(docm|docx|dotm|dotx|potm|potx|ppam|ppsm|ppsx|pptm|pptx|xlam|xlsb|xlsm|xlsx|xltm|xltx)" .or. ;
-         Lower( cFileName ) LIKE ".+\.(svr|wrl|wrz|vrt)" .OR. Empty(cFExt)
+         Lower( cFileName ) LIKE ".+\.(odt,ott,oth,odm,odg,otg,odp,otp,ods,ots,odc,odf,odb,odi,oxt)" .or. ;
+         Lower( cFileName ) LIKE ".+\.(svr|wrl|wrz|vrt|7z)" .OR. Empty(cFExt)
+         
          oAttach   := TIPMail():new( cContent, "base64" )
       ELSE
          oAttach   := TIPMail():new( cContent, "7-bit" )

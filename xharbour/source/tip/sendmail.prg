@@ -383,7 +383,7 @@ FUNCTION HB_SetMimeType( cFile, cFname, cFext )
    ELSEIF cFile LIKE ".+\.(pot|pps|ppt|ppz)"           ; RETURN "application/mspowerpoint =" + cFname + cFext
    ELSEIF cFile LIKE ".+\.doc"                         ; RETURN "application/msword=" +cFname + cFext
    ELSEIF cFile LIKE ".+\.n2p"                         ; RETURN "application/n2p="+cFname + cFext
-   ELSEIF cFile LIKE ".+\.(bin|class|lha|lzh|lzx|dbf)" ; RETURN "application/octet-stream =" + cFname + cFext
+   ELSEIF cFile LIKE ".+\.(bin|class|lha|lzh|lzx|dbf|prg)" ; RETURN "application/octet-stream =" + cFname + cFext
    ELSEIF cFile LIKE ".+\.oda"                         ; RETURN "application/oda="+cFname + cFext
    ELSEIF cFile LIKE ".+\.axs"                         ; RETURN "application/olescript=" + cFname + cFext
    ELSEIF cFile LIKE ".+\.zpa"                         ; RETURN "application/pcphoto="+cFname + cFext
@@ -563,6 +563,24 @@ FUNCTION HB_SetMimeType( cFile, cFname, cFext )
    ELSEIF cFile LIKE ".+\.xlsx"                         ; RETURN "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet=" + cFname + cFext
    ELSEIF cFile LIKE ".+\.xltm"                         ; RETURN "application/vnd.ms-excel.template.macroEnabled.12=" + cFname + cFext
    ELSEIF cFile LIKE ".+\.xltx"                         ; RETURN "application/vnd.openxmlformats-officedocument.spreadsheetml.template=" + cFname + cFext
+   ELSEIF cFile LIKE ".+\.c"                            ; RETURN "text/x-csrc="+ cFname + cFext
+   ELSEIF cFile LIKE ".+\.cpp"                          ; RETURN "text/x-c++src="+ cFname + cFext
+   ELSEIF cFile LIKE ".+\.7z"                           ; RETURN "application/x-7z-compressed="+ cFname + cFext
+   ELSEIF cFile LIKE ".+\.odt"                          ; RETURN "application/vnd.oasis.opendocument.text="+ cFname + cFext                 
+   ELSEIF cFile LIKE ".+\.ott"                          ; RETURN "application/vnd.oasis.opendocument.text-template="+ cFname + cFext        
+   ELSEIF cFile LIKE ".+\.oth"                          ; RETURN "application/vnd.oasis.opendocument.text-web="+ cFname + cFext             
+   ELSEIF cFile LIKE ".+\.odm"                          ; RETURN "application/vnd.oasis.opendocument.text-master="+ cFname + cFext          
+   ELSEIF cFile LIKE ".+\.odg"                          ; RETURN "application/vnd.oasis.opendocument.graphics="+ cFname + cFext             
+   ELSEIF cFile LIKE ".+\.otg"                          ; RETURN "application/vnd.oasis.opendocument.graphics-template="+ cFname + cFext    
+   ELSEIF cFile LIKE ".+\.odp"                          ; RETURN "application/vnd.oasis.opendocument.presentation="+ cFname + cFext         
+   ELSEIF cFile LIKE ".+\.otp"                          ; RETURN "application/vnd.oasis.opendocument.presentation-template="+ cFname + cFext
+   ELSEIF cFile LIKE ".+\.ods"                          ; RETURN "application/vnd.oasis.opendocument.spreadsheet="+ cFname + cFext          
+   ELSEIF cFile LIKE ".+\.ots"                          ; RETURN "application/vnd.oasis.opendocument.spreadsheet-template="+ cFname + cFext 
+   ELSEIF cFile LIKE ".+\.odc"                          ; RETURN "application/vnd.oasis.opendocument.chart="+ cFname + cFext                
+   ELSEIF cFile LIKE ".+\.odf"                          ; RETURN "application/vnd.oasis.opendocument.formula="+ cFname + cFext              
+   ELSEIF cFile LIKE ".+\.odb"                          ; RETURN "application/vnd.oasis.opendocument.database="+ cFname + cFext             
+   ELSEIF cFile LIKE ".+\.odi"                          ; RETURN "application/vnd.oasis.opendocument.image="+ cFname + cFext                
+   ELSEIF cFile LIKE ".+\.oxt"                          ; RETURN "application/vnd.openofficeorg.extension="+ cFname + cFext                 
    
    ENDIF
 

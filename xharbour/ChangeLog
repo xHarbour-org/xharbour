@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2012-09-12 14:15 UTC-0300 Luiz Rafael Culik <luiz/at/xharbour.com>
+  * source/tip/mail.prg
+  * source/tip/sendmail.prg
+    ! added new mime types for openoffice files and 7zip
+    
 2012-09-12 11:10 UTC-0300 Luiz Rafael Culik <luiz/at/xharbour.com>
   * source/debug/dbgbrwsr.prg
   * source/debug/dbghelp.prg
