@@ -111,6 +111,8 @@ static void UnzipCreateArray( char *szZipFileName, char *szSkleton, int uiOption
    int ulLen = hb_arrayLen(ZipArray);
    char sRegEx[ HB_PATH_MAX + HB_PATH_MAX ];
 
+   HB_SYMBOL_UNUSED( szZipFileName );
+
    Wild2RegEx( szSkleton, sRegEx, FALSE );
 
 
@@ -695,75 +697,76 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
 HB_FUNC( HB_UNZIPFILE )
 {
    BOOL bRet = FALSE;
+   char *szZipFileName;
+   BYTE *pCurDir;
+   PHB_ITEM pUnzip;
 
-   if( ISCHAR( 1 ) && ( ISARRAY( 6 ) || ISCHAR( 6 ) ) )
+   if ( ISCHAR( 1 ) )
    {
       char szFile[ HB_PATH_MAX ];
-      PHB_ITEM pUnzip = hb_param( 6, HB_IT_ANY );
-      char *szZipFileName;
-      BYTE *pCurDir;
-
-      pCurDir = ( BYTE * )hb_xstrcpy( NULL, HB_OS_PATH_DELIM_CHR_STRING, ( const char * )hb_fsCurDir( 0 ) , NULL );
 
       strcpy( szFile, hb_parc( 1 ) );
       szZipFileName = hb___CheckFile( szFile );
 
+      if ( ISARRAY( 6 ) || ISCHAR( 6 ) )
+         pUnzip  = hb_param( 6, HB_IT_ANY );
+
+      pCurDir = ( BYTE * )hb_xstrcpy( NULL, HB_OS_PATH_DELIM_CHR_STRING, ( const char * )hb_fsCurDir( 0 ) , NULL );
       UnzipFiles = hb_itemArrayNew(0);
 
-      if(  hb_TestForPKS( szZipFileName ) <=0 )
+      if( hb_TestForPKS( szZipFileName ) <=0 )
       {
-      hb___GetFileNamesFromZip( szZipFileName, TRUE );
+         hb___GetFileNamesFromZip( szZipFileName, TRUE );
 
-
-      if( pUnzip )
-      {
-         if( HB_IS_STRING( pUnzip ) )
+         if( pUnzip )
          {
-            UnzipCreateArray( szZipFileName, hb_itemGetCPtr( pUnzip ), 1 );
-         }
-         else if( HB_IS_ARRAY( pUnzip ) )
-         {
-            int uiZ, uiZLen = hb_arrayLen(pUnzip);
-            char *szUnzip;
-
-            for ( uiZ = 0; uiZ < uiZLen; uiZ ++ )
+            if( HB_IS_STRING( pUnzip ) )
+	    {
+               UnzipCreateArray( szZipFileName, hb_itemGetCPtr( pUnzip ), 1 );
+	    }
+            else if( HB_IS_ARRAY( pUnzip ) )
             {
-               szUnzip = hb_arrayGetC( pUnzip, uiZ + 1 );
+               int uiZ, uiZLen = hb_arrayLen(pUnzip);
+               char *szUnzip;
 
-               if ( szUnzip )
+               for ( uiZ = 0; uiZ < uiZLen; uiZ ++ )
                {
-                  UnzipCreateArray( szZipFileName, szUnzip, 1 );
-                  hb_xfree( szUnzip );
+                  szUnzip = hb_arrayGetC( pUnzip, uiZ + 1 );
+
+                  if ( szUnzip )
+                  {
+                     UnzipCreateArray( szZipFileName, szUnzip, 1 );
+                     hb_xfree( szUnzip );
+                  }
                }
             }
          }
+	 else
+	 {
+            UnzipCreateArray( szZipFileName, (char*) "*", 1 );
+	 }
       }
-      else
-      {
-//s.r. change "*.*" to "*" because file without extension were ignored
-         UnzipCreateArray( szZipFileName, (char*) "*", 1 );
-      }
-      if ( hb_arrayLen(UnzipFiles) > 0 )
-      {
-         PHB_ITEM pProgress = ISBLOCK( 7 ) ? hb_itemNew( hb_param( 7 , HB_IT_BLOCK ) ) : hb_itemNew( NULL );
-         bRet = hb_UnzipSel( szZipFileName,
-                             hb_param( 2, HB_IT_BLOCK ),
-                             ISLOG( 3 ) ? hb_parl( 3 ) : 0,
-                             ISCHAR( 4 ) ? hb_parc( 4 ) : NULL,
-                             ISCHAR( 5 ) ? hb_parc( 5 ) : ".\\",
-                             UnzipFiles,
-                             pProgress );
-         hb_itemRelease( pProgress );
-      }
-
-      hb_xfree( szZipFileName );
-      hb_itemRelease( UnzipFiles );
-      hb_fsChDir( (const char*) pCurDir ) ;
-      hb_xfree( pCurDir ) ;
-      hb_itemClear( ZipArray );
-      hb_itemRelease( ZipArray );
-    }
    }
+
+   if ( hb_arrayLen(UnzipFiles) > 0 )
+   {
+      PHB_ITEM pProgress = ISBLOCK( 7 ) ? hb_itemNew( hb_param( 7 , HB_IT_BLOCK ) ) : hb_itemNew( NULL );
+      bRet = hb_UnzipSel( szZipFileName,
+                          hb_param( 2, HB_IT_BLOCK ),
+                          ISLOG( 3 ) ? hb_parl( 3 ) : 0,
+                          ISCHAR( 4 ) ? hb_parc( 4 ) : NULL,
+                          ISCHAR( 5 ) ? hb_parc( 5 ) : ".\\",
+                          UnzipFiles,
+                          pProgress );
+      hb_itemRelease( pProgress );
+   }
+
+   hb_xfree( szZipFileName );
+   hb_itemRelease( UnzipFiles );
+   hb_fsChDir( (const char*) pCurDir ) ;
+   hb_xfree( pCurDir ) ;
+   hb_itemClear( ZipArray );
+   hb_itemRelease( ZipArray );
 
    hb_retl( bRet );
 }
