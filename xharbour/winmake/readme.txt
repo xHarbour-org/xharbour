@@ -13,7 +13,7 @@ SET HB_NO_FM_DL_ALLOC=
 When set, xHarbour will use compiler's native memory manager
 
 SET HB_DIR_POSTGRESQL=<install dir>
-Required to build pgsql.lib and sddpg.lib
+Required to build libhbpg.lib and sddpg.lib
 Download URL: http://postgresql.org/download/
 
 SET HB_DIR_OCILIB=<install dir>

@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-14 07:57 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/readme.txt
+    ! typo: pgsql.lib -> libhbpg.lib
+
 2012-09-14 07:48 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbzlib/zip.c
     ! fixed GPF traps when calling HB_UNZIPFILE without parameter
