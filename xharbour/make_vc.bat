@@ -14,12 +14,24 @@ rem ============================================================================
 IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
  
 :FIND_VC
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc" GOTO SET_VC2012X86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 11.0\vc"      GOTO SET_VC2012
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 10.0\vc" GOTO SET_VC2010X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 10.0\vc"      GOTO SET_VC2010
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 9.0\vc"       GOTO SET_VC2008
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 8\vc"         GOTO SET_VC2005
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 2003\vc"      GOTO SET_VC2003
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\vc8"          GOTO SET_VC6
+   GOTO FIND_BISON
+
+:SET_VC2012X86
+   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc
+   IF "%VS110COMNTOOLS%"=="" SET VS110COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\Common7\Tools\
+   GOTO FIND_BISON
+
+:SET_VC2012
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 11.0\vc
+   IF "%VS110COMNTOOLS%"=="" SET VS110COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio 11.0\Common7\Tools\
    GOTO FIND_BISON
 
 :SET_VC2010X86
@@ -74,7 +86,7 @@ SET HB_GT_LIB=$(GTWIN_LIB)
 
 SET _PATH=%PATH%
 IF EXIST "%CC_DIR%"\vcvarsall.bat CALL "%CC_DIR%"\vcvarsall.bat
-SET PATH="%CC_DIR%\bin";"%BISON_DIR%";%~dp0bin;%VS100COMNTOOLS%;%VS90COMNTOOLS%;%PATH%
+SET PATH="%CC_DIR%\bin";"%BISON_DIR%";%~dp0bin;%VS110COMNTOOLS%;%VS100COMNTOOLS%;%VS90COMNTOOLS%;%PATH%
 
 rem ============================================================================
 rem The followings should never change
