@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: stdafx.h $
 // $Archive: /ZipArchive_STL/stdafx.h $
@@ -10,114 +14,123 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // For the licensing details see the file License.txt
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_STDAFX_H__926F70F4_1B34_49AA_9532_498E8D2F3495__INCLUDED_)
+#if ! defined( AFX_STDAFX_H__926F70F4_1B34_49AA_9532_498E8D2F3495__INCLUDED_ )
 #define AFX_STDAFX_H__926F70F4_1B34_49AA_9532_498E8D2F3495__INCLUDED_
 
-#if (_MSC_VER < 1300) && !defined (__BORLANDC__)  && !defined (__GNUC__)
-	#define ZIPINLINE inline
+#if ( _MSC_VER < 1300 ) && ! defined ( __BORLANDC__ ) && ! defined ( __GNUC__ )
+        #define ZIPINLINE inline
 #else
-	#define ZIPINLINE
+        #define ZIPINLINE
 #endif
 
 
 #define ZIP_ARCHIVE_STL
 
 #if _MSC_VER > 1000
-	#pragma once
-//because of STL
-	#pragma warning (disable : 4710) // 'function' : function not inlined
-	#pragma warning (disable : 4514) // unreferenced inline/local function has been removed
-	#pragma warning (disable:4786) // 'identifier' : identifier was truncated to 'number' characters in the debug information
+   #pragma once
+   //because of STL
+   #pragma warning (disable : 4710)  // 'function' : function not inlined
+   #pragma warning (disable : 4514)  // unreferenced inline/local function has been removed
+   #pragma warning (disable : 4786)  // 'identifier' : identifier was truncated to 'number' characters in the debug information
+   #pragma warning( push, 3 ) // STL requrements
+   #if ( _MSC_VER >= 1400 )
+      #if ! defined( _CRT_SECURE_NO_WARNINGS )
+         #define _CRT_SECURE_NO_WARNINGS
+      #endif
+   #endif
+#elif defined( __BORLANDC__ )
+   #pragma warn -8027
+   #pragma warn -8004
 #endif // _MSC_VER > 1000
 
 
 // some Windows typical definitions
 
-#if defined (_UNICODE) && !defined (UNICODE)
-	#define UNICODE
+#if defined ( _UNICODE ) && ! defined ( UNICODE )
+        #define UNICODE
 #endif
-#if defined (UNICODE) && !defined (_UNICODE)
-	#define _UNICODE
+#if defined ( UNICODE ) && ! defined ( _UNICODE )
+        #define _UNICODE
 #endif
 
 #ifndef _WIN32
-	#ifndef NULL
-		#define NULL    0
-	#endif
+        #ifndef NULL
+                #define NULL 0
+        #endif
 
-	#include <ctype.h>
-	typedef int HFILE;
-	typedef void*				HANDLE;
-	typedef unsigned long       DWORD;
-	typedef long				LONG;
-	typedef int                 BOOL;
-	typedef unsigned char       BYTE;
-	typedef unsigned short      WORD;
-	typedef unsigned int        UINT;
+        #include <ctype.h>
+typedef int HFILE;
+typedef void *                           HANDLE;
+typedef unsigned long DWORD;
+typedef long LONG;
+typedef int BOOL;
+typedef unsigned char BYTE;
+typedef unsigned short WORD;
+typedef unsigned int UINT;
 
-	#ifndef FALSE
-		#define FALSE               (int)0
-	#endif
+        #ifndef FALSE
+                #define FALSE ( int ) 0
+        #endif
 
-	#ifndef TRUE
-		#define TRUE                (int)1
-	#endif
+        #ifndef TRUE
+                #define TRUE  ( int ) 1
+        #endif
 
 
-	typedef unsigned short WCHAR;    // wc,   16-bit UNICODE character
-	typedef const WCHAR *LPCWSTR;
-	typedef const char *LPCSTR;
-	typedef WCHAR *LPWSTR;
-	typedef char *LPSTR;
+typedef unsigned short WCHAR;            // wc,   16-bit UNICODE character
+typedef const WCHAR * LPCWSTR;
+typedef const char * LPCSTR;
+typedef WCHAR * LPWSTR;
+typedef char * LPSTR;
 
-	#ifdef  _UNICODE
-		typedef wchar_t TCHAR;
-		typedef LPCWSTR LPCTSTR;
-		typedef LPWSTR LPTSTR;
-		#define _T(x)      L ## x
-	#else   /* _UNICODE */               // r_winnt
-		typedef char TCHAR;
-		typedef LPCSTR LPCTSTR;
-		typedef LPSTR LPTSTR;
-		#define _T(x)      x
-	#endif /* _UNICODE */                // r_winnt
+        #ifdef  _UNICODE
+typedef wchar_t TCHAR;
+typedef LPCWSTR LPCTSTR;
+typedef LPWSTR LPTSTR;
+                #define _T( x )  L##x
+        #else /* _UNICODE */                 // r_winnt
+typedef char TCHAR;
+typedef LPCSTR LPCTSTR;
+typedef LPSTR LPTSTR;
+                #define _T( x )  x
+        #endif /* _UNICODE */                // r_winnt
 
 
 #else
-  	#include <tchar.h>
-       	#include <windows.h>
-      	#ifndef STRICT
-		#define STRICT
-	#endif
-#endif	// #ifndef _WIN32
+        #include <tchar.h>
+        #include <windows.h>
+        #ifndef STRICT
+                #define STRICT
+        #endif
+#endif  // #ifndef _WIN32
 
 #ifndef ASSERT
-	#include <assert.h>
-	#define ASSERT(f) assert((f))
+        #include <assert.h>
+        #define ASSERT( f )         assert( ( f ) )
 #endif
 #ifndef VERIFY
-	#ifdef _DEBUG
-		#define VERIFY(x) ASSERT((x))
-	#else
-		#define VERIFY(x) x
-	#endif
+        #ifdef _DEBUG
+                #define VERIFY( x ) ASSERT( ( x ) )
+        #else
+                #define VERIFY( x ) x
+        #endif
 #endif
 
 
 #ifndef TRACE
-	#define TRACE(m)  ((void)0)
+        #define TRACE( m )          ( ( void ) 0 )
 #endif
 
 #if _MSC_VER >= 1300
-	#define ZIP_ULONGLONG ULONGLONG
-	#define ZIP_LONGLONG LONGLONG
+        #define ZIP_ULONGLONG ULONGLONG
+        #define ZIP_LONGLONG  LONGLONG
 #else
-	#define ZIP_ULONGLONG DWORD
-	#define ZIP_LONGLONG LONG
+        #define ZIP_ULONGLONG DWORD
+        #define ZIP_LONGLONG  LONG
 #endif
 
 //{{AFX_INSERT_LOCATION}}

@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipFile.h $
 // $Archive: /ZipArchive_STL/ZipFile.h $
@@ -15,7 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-#if !defined(AFX_ZIPFILE_H__80609DE0_2C6D_4C94_A90C_0BE34A50C769__INCLUDED_)
+#if ! defined( AFX_ZIPFILE_H__80609DE0_2C6D_4C94_A90C_0BE34A50C769__INCLUDED_ )
 #define AFX_ZIPFILE_H__80609DE0_2C6D_4C94_A90C_0BE34A50C769__INCLUDED_
 
 #if _MSC_VER > 1000
@@ -27,13 +31,13 @@
 #include "ZipExport.h"
 
 #ifndef __GNUC__
-	#include <io.h>
+        #include <io.h>
 #else
-	#include <unistd.h>
-	#include <errno.h>
+        #include <unistd.h>
+        #include <errno.h>
 #endif
 
-#if ( defined(__ICL) || (defined(_MSC_VER) && _MSC_VER>=1400) )
+#if ( defined( __ICL ) || ( defined( _MSC_VER ) && _MSC_VER >= 1400 ) )
    #define close  _close
    #define write  _write
    #define tell   _tell
@@ -42,84 +46,94 @@
    #define chsize _chsize
 #endif
 
-class ZIP_API CZipFile :public CZipAbstractFile
+class ZIP_API CZipFile : public CZipAbstractFile
 {
-	void ThrowError() const;
+void ThrowError() const;
 public:
-	int m_hFile;
-	operator HANDLE();
-	enum OpenModes
-	{
-		modeRead =          0x0001,
-		modeWrite =         0x0002,
-		modeReadWrite =     modeRead | modeWrite,
-		shareDenyWrite =    0x0004,
-		shareDenyRead =     0x0008,
-		shareDenyNone =     0x0010,
-		modeCreate =        0x0020,
-		modeNoTruncate =    0x0040,
-	};
-	
-	CZipFile(LPCTSTR lpszFileName, UINT openFlags)
-	{
-		m_hFile = -1;
-		Open(lpszFileName, openFlags, true);
-	}
-	void Flush();
-	ZIP_ULONGLONG GetLength() const;
-	CZipString GetFilePath() const {return m_szFileName;}
-	bool IsClosed()const { return m_hFile == -1;}
-	bool Open(LPCTSTR lpszFileName, UINT openFlags, bool bThrow);
-	void Close() 
-	{
-		if (IsClosed())
-			return;
+int m_hFile;
+operator HANDLE();
+enum OpenModes
+{
+   modeRead       = 0x0001,
+   modeWrite      = 0x0002,
+   modeReadWrite  = modeRead | modeWrite,
+   shareDenyWrite = 0x0004,
+   shareDenyRead  = 0x0008,
+   shareDenyNone  = 0x0010,
+   modeCreate     = 0x0020,
+   modeNoTruncate = 0x0040,
+};
 
-		if (close(m_hFile) != 0)
-			ThrowError();
-		else
-		{
-			m_szFileName.empty();
-			m_hFile = -1;
-		}
-	}
-	void Write(const void* lpBuf, UINT nCount)
-	{
-		if (write(m_hFile, lpBuf, nCount) != (int) nCount)
-			ThrowError();
-	}
-	ZIP_ULONGLONG GetPosition() const
-	{
+CZipFile( LPCTSTR lpszFileName, UINT openFlags )
+{
+   m_hFile = -1;
+   Open( lpszFileName, openFlags, true );
+}
+void Flush();
+ZIP_ULONGLONG GetLength() const;
+CZipString GetFilePath() const
+{
+   return m_szFileName;
+}
+bool IsClosed() const
+{
+   return m_hFile == -1;
+}
+bool Open( LPCTSTR lpszFileName, UINT openFlags, bool bThrow );
+void Close()
+{
+   if( IsClosed() )
+      return;
+
+   if( close( m_hFile ) != 0 )
+      ThrowError();
+   else
+   {
+      m_szFileName.empty();
+      m_hFile = -1;
+   }
+}
+void Write( const void * lpBuf, UINT nCount )
+{
+   if( write( m_hFile, lpBuf, nCount ) != ( int ) nCount )
+      ThrowError();
+}
+ZIP_ULONGLONG GetPosition() const
+{
 #ifndef __GNUC__
-		long ret = tell(m_hFile);
+   long  ret   = tell( m_hFile );
 #else
-		long ret = lseek(m_hFile, 0, SEEK_CUR);
+   long  ret   = lseek( m_hFile, 0, SEEK_CUR );
 #endif
-		if (ret == -1L)
-			ThrowError();
-		return ret;
-	}
-	void SetLength(ZIP_ULONGLONG nNewLen);
-	UINT Read(void *lpBuf, UINT nCount)
-	{
-		errno = 0;
-		int ret = read(m_hFile, lpBuf, nCount);
-		if (ret < (int) nCount && errno != 0)
-			ThrowError();
-		return ret;
+   if( ret == -1L )
+      ThrowError();
+   return ret;
+}
+void SetLength( ZIP_ULONGLONG nNewLen );
+UINT Read( void * lpBuf, UINT nCount )
+{
+   errno = 0;
+   int ret = read( m_hFile, lpBuf, nCount );
+   if( ret < ( int ) nCount && errno != 0 )
+      ThrowError();
+   return ret;
 
-	}
-	ZIP_ULONGLONG Seek(ZIP_LONGLONG dOff, int nFrom)
-	{
-		long ret = lseek(m_hFile, (long)dOff, nFrom);
-		if (ret == -1)
-			ThrowError();
-		return ret;
-	}
-	CZipFile ();
-	virtual ~CZipFile (){Close();};
+}
+ZIP_ULONGLONG Seek( ZIP_LONGLONG dOff, int nFrom )
+{
+   long ret = lseek( m_hFile, ( long ) dOff, nFrom );
+
+   if( ret == -1 )
+      ThrowError();
+   return ret;
+}
+CZipFile ();
+virtual ~CZipFile ()
+{
+   Close();
+};
 protected:
-	CZipString m_szFileName;
+CZipString m_szFileName;
 
 };
 

@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipString.cpp $
 // $Archive: /ZipArchive/ZipString.cpp $
@@ -10,16 +14,16 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // For the licensing details see the file License.txt
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "zipstring.h"
-	
-ZIPSTRINGCOMPARE GetCZipStrCompFunc(bool bCaseSensitive, bool bCollate)
+
+ZIPSTRINGCOMPARE GetCZipStrCompFunc( bool bCaseSensitive, bool bCollate )
 {
-	if (bCollate)
-		return bCaseSensitive ? & CZipString::Collate : & CZipString::CollateNoCase;
-	else
-		return bCaseSensitive ? & CZipString::Compare : & CZipString::CompareNoCase;
+   if( bCollate )
+      return bCaseSensitive ? &CZipString::Collate : &CZipString::CollateNoCase;
+   else
+      return bCaseSensitive ? &CZipString::Compare : &CZipString::CompareNoCase;
 }

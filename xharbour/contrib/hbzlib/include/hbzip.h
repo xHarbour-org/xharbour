@@ -53,6 +53,13 @@
 
 #ifndef HB_APIZLIB_H_
 #define HB_APIZLIB_H_
+
+#if defined ( _MSC_VER ) && ( _MSC_VER >= 1400 )
+   #if ! defined( _CRT_SECURE_NO_WARNINGS )
+      #define _CRT_SECURE_NO_WARNINGS
+   #endif
+#endif
+
 #include <hbsetup.h>
 #include <hbapiitm.h>
 #include <hbapifs.h>
@@ -64,25 +71,25 @@
 
 HB_EXTERN_BEGIN
 
-#define filePos 1
-#define Lenght 2
-#define Method 3
-#define Size 4
-#define Ratio 5
-#define Date 6
-#define Time 7
-#define Crc32 8
+#define filePos   1
+#define Lenght    2
+#define Method    3
+#define Size      4
+#define Ratio     5
+#define Date      6
+#define Time      7
+#define Crc32     8
 
-extern uLong hb___filetime(char *f, tm_zip *tmzip, uLong *dt);
-extern char *hb___CheckFile( char * szFile);
-extern int hb___CompressOneFile(char *szFile,char *szFiletoCompress,int iCompLevel,PHB_ITEM pBlock,BOOL bOverWrite);
-extern int hb___CompressMultipleFile(char *szFile,PHB_ITEM pArray,int iCompLevel,PHB_ITEM pBlock,BOOL bOverWrite);
-extern BOOL hb___unZipFiles(char *szFile,PHB_ITEM pBlock,BOOL bExtractPath);
-extern int hb___ExtractCurrentFile(unzFile uf,BOOL popt_extract_without_path,BOOL popt_overwrite,PHB_ITEM pBlock);
-extern void hb____ChangeFileDate(char *filename,uLong dosdate,tm_unz tmu_date);
-extern int hb___MakeDir(char *szNewDirectory);
-extern int hb___GetNumberofFilestoUnzip(char *szFile);
-extern PHB_ITEM hb___GetFileNamesFromZip(char *szFile,BOOL iMode);
+extern uLong hb___filetime( char * f, tm_zip * tmzip, uLong * dt );
+extern char * hb___CheckFile( char * szFile );
+extern int hb___CompressOneFile( char * szFile, char * szFiletoCompress, int iCompLevel, PHB_ITEM pBlock, BOOL bOverWrite );
+extern int hb___CompressMultipleFile( char * szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock, BOOL bOverWrite );
+extern BOOL hb___unZipFiles( char * szFile, PHB_ITEM pBlock, BOOL bExtractPath );
+extern int hb___ExtractCurrentFile( unzFile uf, BOOL popt_extract_without_path, BOOL popt_overwrite, PHB_ITEM pBlock );
+extern void hb____ChangeFileDate( char * filename, uLong dosdate, tm_unz tmu_date );
+extern int hb___MakeDir( char * szNewDirectory );
+extern int hb___GetNumberofFilestoUnzip( char * szFile );
+extern PHB_ITEM hb___GetFileNamesFromZip( char * szFile, BOOL iMode );
 
 HB_EXTERN_END
 

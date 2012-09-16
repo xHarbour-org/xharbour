@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-16 12:38 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbzlib/*.*
+  * contrib/hbzlib/include/*.*
+    ! files were reformatted and assigned SVN file attributes
+
 2012-09-14 22:39 UTC-0300 Marcos Antonio Gambeta <marcosgambeta at uol.com.br>
   * make_vc.bat
     Added MSVC 2012

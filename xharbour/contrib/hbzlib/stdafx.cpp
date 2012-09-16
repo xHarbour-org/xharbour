@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 ///////////////////////////////////////////////////////////////////////////////
 // $Workfile: stdafx.cpp $
 // $Archive: /ZipArchive/stdafx.cpp $
@@ -10,11 +14,9 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // For the licensing details see the file License.txt
 ////////////////////////////////////////////////////////////////////////////////
 
-
 #include "stdafx.h"
-
 
