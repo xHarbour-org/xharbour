@@ -8,6 +8,23 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-16 17:33 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/gd/source/gdbar.prg
+  * contrib/gd/source/gdbarcode.prg
+  * contrib/gd/include/gd.h
+  * contrib/gd/include/gdcache.h
+  * contrib/gd/include/gdfontg.h
+  * contrib/gd/include/gdfontl.h
+  * contrib/gd/include/gdfontmb.h
+  * contrib/gd/include/gdfonts.h
+  * contrib/gd/include/gdfontt.h
+  * contrib/gd/include/gdfx.h
+  * contrib/gd/include/gdhelpers.h
+  * contrib/gd/include/gd_io.h
+  * contrib/gd/include/jisx0208.h
+  * contrib/gd/include/wbmp.h
+    + added SVN file headers
+
 2012-09-16 15:24 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * ChangeLog
     ! missing log
