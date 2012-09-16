@@ -61,25 +61,25 @@
 
 #define pbyte *( ( char * ) 0x00400100 )
 
-HB_FUNC(FT_PRTSCR)
+HB_FUNC( FT_PRTSCR )
 {
-#if defined(HB_OS_DOS)
+#if defined( HB_OS_DOS )
    {
 
-   if ( hb_pcount() && ISLOG( 1 ) )
-   {      
-      if ( hb_parl( 1 ) )
-          pbyte = 0;
+      if( hb_pcount() && ISLOG( 1 ) )
+      {
+         if( hb_parl( 1 ) )
+            pbyte = 0;
+         else
+            pbyte = 1;
+      }
+
+      if( pbyte == 1 )
+         hb_retl( FALSE );
       else
-          pbyte = 1;
-   }
+         hb_retl( TRUE );
 
-   if ( pbyte == 1)
-      hb_retl( FALSE );
-   else
-      hb_retl( TRUE );
-
-   return;
+      return;
    }
 #endif
 }

@@ -77,30 +77,30 @@
 
 #define status_byte ( *( char * ) ( 0x00400017 ) )
 
-#if defined(HB_OS_WIN)
-   extern BOOL ft_SetKeyBoardState( USHORT uKey, BOOL bOn, BOOL *bCurrentStatus, BOOL );
+#if defined( HB_OS_WIN )
+extern BOOL ft_SetKeyBoardState( USHORT uKey, BOOL bOn, BOOL * bCurrentStatus, BOOL );
 #endif
 
-HB_FUNC(FT_NUMLOCK)
+HB_FUNC( FT_NUMLOCK )
 {
-#if defined(HB_OS_DOS)
+#if defined( HB_OS_DOS )
 
    hb_retl( ( int ) ( status_byte & 0x20 ) );
 
-   if ( hb_pcount() )
+   if( hb_pcount() )
    {
-      if ( ISLOG(1) )
+      if( ISLOG( 1 ) )
          status_byte = ( status_byte | 0x20 );
       else
          status_byte = ( status_byte & 0xDF );
    }
    return;
 
-#elif defined(HB_OS_WIN)
-   #define HB_VK_NUMLOCK        0x90
-   BOOL bCurrentStatus;
-   BOOL bParam = ISLOG(1);
-   ft_SetKeyBoardState( HB_VK_NUMLOCK, hb_parl(1), &bCurrentStatus, bParam );
+#elif defined( HB_OS_WIN )
+   #define HB_VK_NUMLOCK 0x90
+   BOOL  bCurrentStatus;
+   BOOL  bParam = ISLOG( 1 );
+   ft_SetKeyBoardState( HB_VK_NUMLOCK, hb_parl( 1 ), &bCurrentStatus, bParam );
    hb_retl( bCurrentStatus );
 #endif
 }

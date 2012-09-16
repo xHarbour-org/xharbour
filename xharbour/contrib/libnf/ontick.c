@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: ONTICK.C
  * Author....: Ted Means
  * CIS ID....: 73067,3332
@@ -77,33 +80,35 @@ typedef union
 void cdecl _evLow( unsigned int, void *, unsigned int );
 void cdecl _bcopy( void *, void *, unsigned int );
 
-static long far Ticks = 0;
-static long far Interval = 1;
-static ITEM far codeBlock;
-static char inProgress = 0;
+static long far   Ticks       = 0;
+static long far   Interval    = 1;
+static ITEM far   codeBlock;
+static char       inProgress  = 0;
 
 static void cdecl TickTock( void )
 {
    auto unsigned int ProtMode = cpmiIsProtected();
-   auto LONGPTR Timer;
-   auto EVALINFO eval;
+   auto LONGPTR      Timer;
+   auto EVALINFO     eval;
 
-   if ( inProgress ) return;
+   if( inProgress )
+      return;
 
    inProgress = 1;
 
-   if ( ProtMode )
+   if( ProtMode )
    {
-      Timer.Pointer.Segment = cpmiProtectedPtr( ( long * ) ( 0x0000046C ), sizeof( long ) );
-      Timer.Pointer.Offset  = 0;
+      Timer.Pointer.Segment   = cpmiProtectedPtr( ( long * ) ( 0x0000046C ), sizeof( long ) );
+      Timer.Pointer.Offset    = 0;
 
-      if ( Timer.Pointer.Segment == 0 ) goto Exit;
+      if( Timer.Pointer.Segment == 0 )
+         goto Exit;
    }
    else
       Timer.Address = ( long * ) ( 0x0000046C );
 
-   if ( *Timer.Address >= ( Ticks + Interval ) ||
-      ( *Timer.Address < Ticks ) )
+   if( *Timer.Address >= ( Ticks + Interval ) ||
+       ( *Timer.Address < Ticks ) )
    {
       Ticks = *Timer.Address;
 
@@ -112,21 +117,22 @@ static void cdecl TickTock( void )
       _itemRelease( _evalLaunch( &eval ) );
    }
 
-   if ( ProtMode ) cpmiFreeSelector( Timer.Pointer.Segment );
+   if( ProtMode )
+      cpmiFreeSelector( Timer.Pointer.Segment );
 
-   Exit: inProgress = 0;
+ Exit: inProgress = 0;
 
-   return;
 }
 
 
 CLIPPER FT_OnTick( void )
 {
-   if ( _itemType( codeBlock ) == BLOCK ) _itemRelease( codeBlock );
+   if( _itemType( codeBlock ) == BLOCK )
+      _itemRelease( codeBlock );
 
    codeBlock = _itemParam( 1 );
 
-   if ( _itemType( codeBlock ) == BLOCK )
+   if( _itemType( codeBlock ) == BLOCK )
    {
       Interval = _parnl( 2 );
 
@@ -135,5 +141,4 @@ CLIPPER FT_OnTick( void )
    else
       _evLow( 5, TickTock, FALSE );
 
-   return;
 }

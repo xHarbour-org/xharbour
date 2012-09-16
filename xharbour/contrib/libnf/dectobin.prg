@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: DECTOBIN.PRG
  * Author....: Greg Lief
  * CIS ID....: 72460,1760
@@ -45,23 +48,29 @@
 #ifdef FT_TEST
 
 FUNCTION MAIN
-LOCAL X
-FOR X = 1 TO 255
-   QOUT( FT_DEC2BIN( x ))
-next
-return nil
+
+   LOCAL X
+
+   FOR X = 1 TO 255
+      QOut( FT_DEC2BIN( x ) )
+   NEXT
+
+   RETURN nil
 
 #endif
 
-function FT_DEC2BIN(x)
-local i, buffer := { '0', '0', '0', '0', '0', '0', '0', '0' }
-for i = 8 to 1 step -1
-  if x >= 2 ^ (i - 1)
-     x -= 2 ^ (i - 1)
-     buffer[9 - i] = '1'
-  endif
-next
-return ( buffer[1] + buffer[2] + buffer[3] + buffer[4] + ;
-         buffer[5] + buffer[6] + buffer[7] + buffer[8] )
+FUNCTION FT_DEC2BIN( x )
 
-* end of file: dectobin.prg
+   LOCAL i, buffer := { '0', '0', '0', '0', '0', '0', '0', '0' }
+
+   FOR i = 8 TO 1 step - 1
+      IF x >= 2 ^ ( i - 1 )
+         x -= 2 ^ ( i - 1 )
+         buffer[9 - i] = '1'
+      ENDIF
+   NEXT
+
+   RETURN ( buffer[1] + buffer[2] + buffer[3] + buffer[4] + ;
+      buffer[5] + buffer[6] + buffer[7] + buffer[8] )
+
+// end of file: dectobin.prg

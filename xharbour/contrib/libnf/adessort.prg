@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: ADesSort.Prg
  * Author....: David Husnian
  * CIS ID....: ?
@@ -55,27 +58,27 @@
 
 
 #command    DEFAULT <Param1> TO <Def1> [, <ParamN> TO <DefN> ] ;
-            => ;
-            <Param1> := IF(<Param1> == NIL,<Def1>,<Param1>) ;
-         [; <ParamN> := IF(<ParamN> == NIL,<DefN>,<ParamN>)]
+      => ;
+      < Param1 > := IF( < Param1 > == NIL, < Def1 > , < Param1 > ) ;
+      [; <ParamN> := IF(<ParamN> == NIL,<DefN>,<ParamN>)]
 
 #command    DEFAULT <Param1> TO <Def1> IF NOT <Type1> ;
-                 [, <ParamN> TO <DefN> IF NOT <TypeN> ] ;
-            => ;
-            <Param1> := IF(VALTYPE(<Param1>) == <Type1>,<Param1>,<Def1>) ;
-         [; <ParamN> := IF(VALTYPE(<ParamN>) == <TypeN>,<ParamN>,<DefN>)]
+      [, <ParamN> TO <DefN> IF NOT <TypeN> ] ;
+      => ;
+      < Param1 > := IF( ValType( < Param1 > ) == < Type1 > , < Param1 > , < Def1 > ) ;
+      [; <ParamN> := IF(VALTYPE(<ParamN>) == <TypeN>,<ParamN>,<DefN>)]
 
 
 #define FORCE_BETWEEN(x,y,z)         (y := MAX(MIN(y,z),x))
 
-FUNCTION FT_ADESSORT(aArray, nStartIndex, nEndIndex)
+FUNCTION FT_ADESSORT( aArray, nStartIndex, nEndIndex )
 
    DEFAULT nStartIndex TO 1, ;
-           nEndIndex   TO LEN(aArray)
+      nEndIndex   TO Len( aArray )
 
-                                        // Make Sure Bounds are in Range
-   FORCE_BETWEEN(1, nEndIndex,   LEN(aArray))
-   FORCE_BETWEEN(1, nStartIndex, nEndIndex)
+// Make Sure Bounds are in Range
+   FORCE_BETWEEN( 1, nEndIndex,   Len( aArray ) )
+   FORCE_BETWEEN( 1, nStartIndex, nEndIndex )
 
-   RETURN (ASORT(aArray, nStartIndex, nEndIndex, ;
-                 { | xElement1, xElement2 | xElement1 > xElement2 } ))
+   RETURN ( ASort( aArray, nStartIndex, nEndIndex, ;
+      { | xElement1, xElement2 | xElement1 > xElement2 } ) )

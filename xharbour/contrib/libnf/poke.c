@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: POKE.C
  * Author....: Ted Means
  * CIS ID....: 73067,3332
@@ -66,30 +69,32 @@
 
 HB_FUNC( FT_POKE )
 {
-   auto unsigned int ProtMode = hb_cpmiIsProtected();
+   auto unsigned int    ProtMode = hb_cpmiIsProtected();
    auto unsigned char * bytePtr;
 
-   if ( ( PCOUNT >= 3 ) && ( ISNUM( 1 ) ) && ( ISNUM( 2 ) ) && ( ISNUM( 3 ) ) )
+   if( ( PCOUNT >= 3 ) && ( ISNUM( 1 ) ) && ( ISNUM( 2 ) ) && ( ISNUM( 3 ) ) )
    {
       FP_SEG( bytePtr ) = _parni( 1 );
       FP_OFF( bytePtr ) = _parni( 2 );
 
-      if ( ProtMode )
+      if( ProtMode )
       {
          FP_SEG( bytePtr ) = hb_cpmiProtectedPtr( bytePtr, 1 );
          FP_OFF( bytePtr ) = 0;
 
-         if ( FP_SEG( bytePtr ) == 0 ) goto Bogus;
+         if( FP_SEG( bytePtr ) == 0 )
+            goto Bogus;
       }
 
       *bytePtr = ( unsigned char ) _parni( 3 );
 
-      if ( ProtMode ) hb_cpmiFreeSelector( FP_SEG( bytePtr ) );
+      if( ProtMode )
+         hb_cpmiFreeSelector( FP_SEG( bytePtr ) );
 
       _retl( TRUE );
    }
    else
-      Bogus: _retl( FALSE );
+ Bogus: _retl( FALSE );
 
    return;
 }

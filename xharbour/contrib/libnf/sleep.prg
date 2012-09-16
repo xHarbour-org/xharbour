@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: SLEEP.PRG
  * Author....: Leo Letendre
  * CIS ID....: 73607,233
@@ -19,17 +22,17 @@
 
 #ifdef FT_TEST
 
-  * Test routine
-  * Invoke by running SLEEP 1.0 to sleep 1.0 seconds
-  *
+// Test routine
+// Invoke by running SLEEP 1.0 to sleep 1.0 seconds
+//
 
-  FUNCTION MAIN(nSleep)
+FUNCTION MAIN( nSleep )
 
-       ? "Time is now: " + time()
-       FT_SLEEP(VAL(nSleep))
-       ? "Time is now: " + time()
+   ? "Time is now: " + Time()
+   FT_SLEEP( Val( nSleep ) )
+   ? "Time is now: " + Time()
 
-  RETURN ( nil )
+   RETURN ( nil )
 
 #endif
 
@@ -83,26 +86,26 @@
 
 FUNCTION FT_SLEEP( nSeconds, nInitial )
 
-  IF nInitial == NIL .OR. VALTYPE( nInitial ) != "N"
-	   nInitial := SECONDS()
-  ENDIF
+   IF nInitial == NIL .OR. ValType( nInitial ) != "N"
+      nInitial := Seconds()
+   ENDIF
 
-  // correct for running at midnight
+// correct for running at midnight
 
-  IF nInitial + nSeconds > 86399
-	   nInitial -= 86399
-     *  Wait until midnight
-     DO WHILE SECONDS() > 100  // no problem with a _very_ slow machine
-     ENDDO
-  ENDIF
+   IF nInitial + nSeconds > 86399
+      nInitial -= 86399
+      //  Wait until midnight
+      DO WHILE Seconds() > 100  // no problem with a _very_ slow machine
+      ENDDO
+   ENDIF
 
-  // calculate final time
+// calculate final time
 
-  nSeconds += ninitial
+   nSeconds += ninitial
 
-  // Loop until we are done
+// Loop until we are done
 
-  DO WHILE ( SECONDS() < nSeconds )
-  ENDDO
+   DO WHILE ( Seconds() < nSeconds )
+   ENDDO
 
-  RETURN NIL
+   RETURN NIL

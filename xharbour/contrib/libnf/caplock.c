@@ -64,63 +64,63 @@
 
 #include <hbapi.h>
 
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN )
    #include <windows.h>
 
-   BOOL ft_SetKeyBoardState( USHORT uKey, BOOL bOn, BOOL *bCurrentStatus, BOOL bParam )
+BOOL ft_SetKeyBoardState( USHORT uKey, BOOL bOn, BOOL * bCurrentStatus, BOOL bParam )
+{
+   BYTE  kbBuffer[ 256 ];
+   BOOL  bRetval = FALSE;
+
+   GetKeyboardState( kbBuffer );
+
+   if( kbBuffer[ uKey ] & 0x01 )
    {
-      BYTE kbBuffer[ 256 ];
-      BOOL bRetval = FALSE;
-
-      GetKeyboardState( kbBuffer );
-
-      if( kbBuffer[ uKey ] & 0x01 )
+      *bCurrentStatus = TRUE;
+      if( ! bOn )
       {
-         *bCurrentStatus = TRUE;
-         if( !bOn)
-         {
-            kbBuffer[ uKey ] = 0;
-         }
+         kbBuffer[ uKey ] = 0;
       }
-      else
-      {
-         *bCurrentStatus = FALSE;
-         if( bOn)
-         {
-            kbBuffer[ uKey ] = 1;
-         }
-      }
-
-      if( bParam )
-         bRetval = SetKeyboardState( kbBuffer );
-
-      return bRetval;
-
    }
+   else
+   {
+      *bCurrentStatus = FALSE;
+      if( bOn )
+      {
+         kbBuffer[ uKey ] = 1;
+      }
+   }
+
+   if( bParam )
+      bRetval = SetKeyboardState( kbBuffer );
+
+   return bRetval;
+
+}
 #endif
 
 #define status_byte ( *( unsigned char * ) ( 0x00400017 ) )
 
-HB_FUNC(FT_CAPLOCK)
+HB_FUNC( FT_CAPLOCK )
 {
-#if defined(HB_OS_DOS)
+#if defined( HB_OS_DOS )
    {
-   hb_retl( ( int ) ( status_byte & 0x40 ) );
+      hb_retl( ( int ) ( status_byte & 0x40 ) );
 
-   if ( hb_pcount() )
-   {
-      if ( ISLOG(1) )
-         status_byte = ( status_byte | ( unsigned char ) 0x40 );
-      else
-         status_byte = ( status_byte & ( unsigned char ) 0xBF );
+      if( hb_pcount() )
+      {
+         if( ISLOG( 1 ) )
+            status_byte = ( status_byte | ( unsigned char ) 0x40 );
+         else
+            status_byte = ( status_byte & ( unsigned char ) 0xBF );
+      }
+      return;
    }
-   return;
-   }
-#elif defined(HB_OS_WIN)
-   #define HB_VK_CAPITAL        0x14
-   BOOL bCurrentStatus;
-   BOOL bParam = ISLOG(1);
-   ft_SetKeyBoardState( HB_VK_CAPITAL, hb_parl(1), &bCurrentStatus, bParam );
+#elif defined( HB_OS_WIN )
+   #define HB_VK_CAPITAL 0x14
+   BOOL  bCurrentStatus;
+   BOOL  bParam = ISLOG( 1 );
+   ft_SetKeyBoardState( HB_VK_CAPITAL, hb_parl( 1 ), &bCurrentStatus, bParam );
    hb_retl( bCurrentStatus );
 #endif
 }

@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: ANoMatch.Prg
  * Author....: David Husnian
  * CIS ID....: ?
@@ -67,25 +70,25 @@
 #define FORCE_BETWEEN(x,y,z)         (y := MAX(MIN(y,z),x))
 
 #command    DEFAULT <Param1> TO <Def1> [, <ParamN> TO <DefN> ] ;
-            => ;
-            <Param1> := IF(<Param1> == NIL,<Def1>,<Param1>) ;
-         [; <ParamN> := IF(<ParamN> == NIL,<DefN>,<ParamN>)]
+      => ;
+      < Param1 > := IF( < Param1 > == NIL, < Def1 > , < Param1 > ) ;
+      [; <ParamN> := IF(<ParamN> == NIL,<DefN>,<ParamN>)]
 
-FUNCTION FT_ANOMATCHES(aArray, bCompareBlock, nStartIndex, nEndIndex)
+FUNCTION FT_ANOMATCHES( aArray, bCompareBlock, nStartIndex, nEndIndex )
 
    LOCAL nNoOfMatches := 0              // Number of Matches Found
 
    DEFAULT nStartIndex TO 1, ;
-           nEndIndex   TO LEN(aArray)
+      nEndIndex   TO Len( aArray )
 
-                                        // Make Sure Bounds are in Range
-   FORCE_BETWEEN(1, nEndIndex,   LEN(aArray))
-   FORCE_BETWEEN(1, nStartIndex, nEndIndex)
+// Make Sure Bounds are in Range
+   FORCE_BETWEEN( 1, nEndIndex,   Len( aArray ) )
+   FORCE_BETWEEN( 1, nStartIndex, nEndIndex )
 
-   AEVAL(aArray, ;
-         { | xElement | ;
-           IIF(EVAL(bCompareBlock, xElement), nNoOfMatches++, NIL) }, ;
-         nStartIndex, nEndIndex - nStartIndex + 1)
+   AEval( aArray, ;
+      { | xElement | ;
+      iif( Eval( bCompareBlock, xElement ), nNoOfMatches++, NIL ) }, ;
+      nStartIndex, nEndIndex - nStartIndex + 1 )
 
-   RETURN (nNoOfMatches)                // FT_ANoMatches
+   RETURN ( nNoOfMatches )                // FT_ANoMatches
 

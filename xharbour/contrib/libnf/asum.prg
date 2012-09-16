@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: ASum.Prg
  * Author....: David Husnian
  * CIS ID....: ?
@@ -60,28 +63,28 @@
 #define IS_CHAR(x)                   (VALTYPE(x) == "C")
 
 #command    DEFAULT <Param1> TO <Def1> [, <ParamN> TO <DefN> ] ;
-            => ;
-            <Param1> := IF(<Param1> == NIL,<Def1>,<Param1>) ;
-         [; <ParamN> := IF(<ParamN> == NIL,<DefN>,<ParamN>)]
+      => ;
+      < Param1 > := IF( < Param1 > == NIL, < Def1 > , < Param1 > ) ;
+      [; <ParamN> := IF(<ParamN> == NIL,<DefN>,<ParamN>)]
 
-
-FUNCTION FT_ASUM(aArray, nStartIndex, nEndIndex)
+FUNCTION FT_ASUM( aArray, nStartIndex, nEndIndex )
 
    LOCAL nSumTotal := 0                 // Array Sum
 
    DEFAULT nStartIndex TO 1, ;
-           nEndIndex   TO LEN(aArray)
-                                        // Make Sure Bounds are in Range
-   FORCE_BETWEEN(1, nEndIndex,   LEN(aArray))
-   FORCE_BETWEEN(1, nStartIndex, nEndIndex)
+      nEndIndex   TO Len( aArray )
+// Make Sure Bounds are in Range
+   FORCE_BETWEEN( 1, nEndIndex,   Len( aArray ) )
+   FORCE_BETWEEN( 1, nStartIndex, nEndIndex )
 
-   AEVAL(aArray, ;
-         { | xElement | ;
-           nSumTotal += ;
-              CASE_AT(VALTYPE(xElement), "NC", ;
-                      { 0, xElement, ;
-                           IF(IS_CHAR(xElement),LEN(xElement),0) }) }, ;
-         nStartIndex, nEndIndex - nStartIndex + 1)
+   AEval( aArray, ;
+      { | xElement | ;
+      nSumTotal += ;
+      CASE_AT( ValType( xElement ), "NC", ;
+      { 0, xElement, ;
+      IF( IS_CHAR( xElement ), Len( xElement ), 0 ) } ) }, ;
+      nStartIndex, nEndIndex - nStartIndex + 1 )
 
-   RETURN (nSumTotal)                   // FT_ASum
+   RETURN ( nSumTotal )                   // FT_ASum
+
 

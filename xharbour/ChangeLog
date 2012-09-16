@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-16 15:03 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/libnf/*.*
+    ! files were reformatted and assigned SVN file header
+
 2012-09-16 12:38 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbzlib/*.*
   * contrib/hbzlib/include/*.*

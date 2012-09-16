@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: WORKDAYS.PRG
  * Author....: John F. Kaster
  * CIS_ID....: 71510,3321
@@ -43,7 +46,7 @@
  *  $DESCRIPTION$
  *     FT_WORKDAYS() returns a number indicating the number of work days
  *     between two dates.  Work days are considered Monday through Friday.
- *		 (The five day work week none of us Clipper programmers have.)
+ *   (The five day work week none of us Clipper programmers have.)
  *
  *  $EXAMPLES$
  *    ? FT_WorkDays( CTOD("5/16/91"), CTOD("5/20/91") ) // 3  (Th - Mo)
@@ -54,43 +57,46 @@
 */
 
 #ifdef FT_TEST
-  function main( cStart, cStop )
-     return qout( ft_workdays( ctod( cStart ), ctod( cStop ) ) )
+
+FUNCTION main( cStart, cStop )
+
+   RETURN QOut( ft_workdays( CToD( cStart ), CToD( cStop ) ) )
+
 #endif
 
-
 FUNCTION FT_WorkDays( dStart, dStop )
-  LOCAL nWorkDays := 0, nDays, nAdjust
 
-  IF dStart # NIL .AND. dStop # NIL
-	   IF dStart # dStop
-        IF dStart > dStop   // Swap the values
+   LOCAL nWorkDays := 0, nDays, nAdjust
+
+   IF dStart # NIL .AND. dStop # NIL
+      IF dStart # dStop
+         IF dStart > dStop   // Swap the values
             nAdjust    := dStop
             dStop    := dStart
             dStart    := nAdjust
-        ENDIF
+         ENDIF
 
-        IF ( nDays := Dow( dStart ) ) == 1 // Sunday (change to next Monday)
-           dStart++
-        ELSEIF nDays == 7 // Saturday (change to next Monday)
-           dStart += 2
-        ENDIF
+         IF ( nDays := DOW( dStart ) ) == 1 // Sunday (change to next Monday)
+            dStart++
+         ELSEIF nDays == 7 // Saturday (change to next Monday)
+            dStart += 2
+         ENDIF
 
-        IF ( nDays := Dow( dStop ) ) == 1 // Sunday (change to prev Friday)
-           dStop -= 2
-        ELSEIF nDays == 7 // Saturday (change to prev Friday)
-           dStop--
-        ENDIF
+         IF ( nDays := DOW( dStop ) ) == 1 // Sunday (change to prev Friday)
+            dStop -= 2
+         ELSEIF nDays == 7 // Saturday (change to prev Friday)
+            dStop--
+         ENDIF
 
-        nAdjust := ( nDays := dStop - dStart + 1 ) % 7
+         nAdjust := ( nDays := dStop - dStart + 1 ) % 7
 
-        IF Dow( dStop ) + 1 < Dow( dStart ) // Weekend adjustment
-           nAdjust -= 2
-        ENDIF
+         IF DOW( dStop ) + 1 < DOW( dStart ) // Weekend adjustment
+            nAdjust -= 2
+         ENDIF
 
-        nWorkDays := Int( nDays / 7 ) * 5 + nAdjust
+         nWorkDays := Int( nDays / 7 ) * 5 + nAdjust
 
-      ELSEIF ( Dow( dStart ) # 1 .AND. Dow( dStart ) # 7 )
+      ELSEIF ( DOW( dStart ) # 1 .AND. DOW( dStart ) # 7 )
 
          nWorkDays := 1
 
@@ -98,4 +104,4 @@ FUNCTION FT_WorkDays( dStart, dStop )
 
    ENDIF
 
-RETURN ( IIF(nWorkDays>0,nWorkDays,0) )
+   RETURN ( iif( nWorkDays > 0,nWorkDays,0 ) )

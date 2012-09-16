@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: BYTEXOR.PRG
  * Author....: Forest Belt, Computer Diagnostic Services, Inc.
  * CIS ID....: ?
@@ -62,21 +65,21 @@
  *  $END$
  */
 
-FUNCTION FT_BYTEXOR(cByte1, cByte2)
+FUNCTION FT_BYTEXOR( cByte1, cByte2 )
 
-  LOCAL nCounter, cNewByte
+   LOCAL nCounter, cNewByte
 
-  IF valtype(cByte1) != "C" .or. valtype(cByte2) != "C" // parameter check
-     cNewByte := NIL
-  ELSE
-     cNewByte := chr(0)
-     FOR nCounter := 0 to 7           // test each bit position
-        IF FT_ISBIT(cByte1, nCounter) .or. FT_ISBIT(cByte2, nCounter)
-           IF .not. (FT_ISBIT(cByte1, nCounter) .and. FT_ISBIT(cByte2, nCounter))
-              cNewByte := FT_BITSET(cNewByte, nCounter)
-           ENDIF
-        ENDIF
-     NEXT
-  ENDIF
+   IF ValType( cByte1 ) != "C" .OR. ValType( cByte2 ) != "C" // parameter check
+      cNewByte := NIL
+   ELSE
+      cNewByte := Chr( 0 )
+      FOR nCounter := 0 TO 7           // test each bit position
+         IF FT_ISBIT( cByte1, nCounter ) .OR. FT_ISBIT( cByte2, nCounter )
+            IF .NOT. ( FT_ISBIT( cByte1, nCounter ) .AND. FT_ISBIT( cByte2, nCounter ) )
+               cNewByte := FT_BITSET( cNewByte, nCounter )
+            ENDIF
+         ENDIF
+      NEXT
+   ENDIF
 
-RETURN cNewByte
+   RETURN cNewByte

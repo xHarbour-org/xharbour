@@ -62,15 +62,15 @@
 
 #include <hbapi.h>
 
-HB_FUNC(FT_ORIGIN)
+HB_FUNC( FT_ORIGIN )
 {
 /* NOTE this directly accessed **__argv which leads to problems at link
    time under certain conditions - the following is the preferred call - pt
  */
 
-#if defined(HB_OS_DOS) || defined(HB_OS_WIN)
+#if defined( HB_OS_DOS ) || defined( HB_OS_WIN )
 
-   hb_retc( hb_cmdargARGV()[0] );
+   hb_retc( hb_cmdargARGV()[ 0 ] );
 
 #endif
 }

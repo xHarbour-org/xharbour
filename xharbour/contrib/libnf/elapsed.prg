@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: ELAPSED.PRG
  * Author....: Jo W. French dba Practical Computing
  * CIS ID....: ?
@@ -26,20 +29,23 @@
 
 #ifdef FT_TEST
 
-  FUNCTION DEMO()
-  LOCAL dStart, dEnd, cTimeStart, cTimeEnd, n, aDataTest := {}
-  dStart := CTOD('11/28/90')
-  dEnd   := CTOD('11/30/90')
-  cTimeStart := "08:00:00"
-  cTimeEnd   := "12:10:30"
+FUNCTION DEMO()
 
-  aDataTest := FT_ELAPSED(dStart,dEnd,cTimeStart,cTimeEnd)
-  FOR n = 1 to 4
-    ? aDataTest[n,1], STR(aDataTest[n,2], 12, 4)
-    ?? " "
-    ?? IF(n == 1, 'Days', IF( n== 2, 'Hours', IF( n == 3, 'Mins.', 'Secs.')))
-  NEXT
-  RETURN NIL
+   LOCAL dStart, dEnd, cTimeStart, cTimeEnd, n, aDataTest := {}
+
+   dStart := CToD( '11/28/90' )
+   dEnd   := CToD( '11/30/90' )
+   cTimeStart := "08:00:00"
+   cTimeEnd   := "12:10:30"
+
+   aDataTest := FT_ELAPSED( dStart, dEnd, cTimeStart, cTimeEnd )
+   FOR n = 1 TO 4
+      ? aDataTest[n,1], Str( aDataTest[n,2], 12, 4 )
+      ?? " "
+      ?? IF( n == 1, 'Days', IF( n == 2, 'Hours', IF( n == 3, 'Mins.', 'Secs.' ) ) )
+   NEXT
+
+   RETURN NIL
 
 #endif
 
@@ -85,43 +91,44 @@
  *  $END$
  */
 
-FUNCTION FT_ELAPSED(dStart, dEnd, cTimeStart, cTimeEnd)
-  LOCAL nTotalSec, nCtr, nConstant, nTemp, aRetVal[4,2]
+FUNCTION FT_ELAPSED( dStart, dEnd, cTimeStart, cTimeEnd )
 
-  IF ! ( VALTYPE(dStart) $ 'DC' )
-     dStart := DATE()
-  ELSEIF VALTYPE(dStart) == 'C'
-     cTimeStart := dStart
-     dStart     := DATE()
-  ENDIF
+   LOCAL nTotalSec, nCtr, nConstant, nTemp, aRetVal[4,2]
 
-  IF ! ( VALTYPE(dEnd) $ 'DC' )
-     dEnd := DATE()
-  ELSEIF VALTYPE(dEnd) == 'C'
-     cTimeEnd := dEnd
-     dEnd     := DATE()
-  ENDIF
+   IF ! ( ValType( dStart ) $ 'DC' )
+      dStart := Date()
+   ELSEIF ValType( dStart ) == 'C'
+      cTimeStart := dStart
+      dStart     := Date()
+   ENDIF
 
-  IF( VALTYPE(cTimeStart) != 'C', cTimeStart := '00:00:00', )
-  IF( VALTYPE(cTimeEnd)   != 'C', cTimeEnd   := '00:00:00', )
+   IF ! ( ValType( dEnd ) $ 'DC' )
+      dEnd := Date()
+   ELSEIF ValType( dEnd ) == 'C'
+      cTimeEnd := dEnd
+      dEnd     := Date()
+   ENDIF
 
-  nTotalSec  := (dEnd - dStart) * 86400                              + ;
-                VAL(cTimeEnd)   *  3600                              + ;
-                VAL(SUBSTR(cTimeEnd,AT(':', cTimeEnd)+1,2)) * 60     + ;
-                IF(RAT(':', cTimeEnd) == AT(':', cTimeEnd), 0,         ;
-                VAL(SUBSTR(cTimeEnd,RAT(':', cTimeEnd)+1)))          - ;
-                VAL(cTimeStart) * 3600                               - ;
-                VAL(SUBSTR(cTimeStart,AT(':', cTimeStart)+1,2)) * 60 - ;
-                IF(RAT(':', cTimeStart) == AT(':', cTimeStart), 0,     ;
-                VAL(SUBSTR(cTimeStart,RAT(':', cTimeStart)+1)))
+   IF( ValType( cTimeStart ) != 'C', cTimeStart := '00:00:00', )
+      IF( ValType( cTimeEnd )   != 'C', cTimeEnd   := '00:00:00', )
 
-  nTemp := nTotalSec
+         nTotalSec  := ( dEnd - dStart ) * 86400                              + ;
+            Val( cTimeEnd )   *  3600                              + ;
+            Val( SubStr( cTimeEnd,At(':', cTimeEnd ) + 1,2 ) ) * 60     + ;
+            IF( RAt( ':', cTimeEnd ) == At( ':', cTimeEnd ), 0,         ;
+            Val( SubStr( cTimeEnd,RAt(':', cTimeEnd ) + 1 ) ) )          - ;
+            Val( cTimeStart ) * 3600                               - ;
+            Val( SubStr( cTimeStart,At(':', cTimeStart ) + 1,2 ) ) * 60 - ;
+            IF( RAt( ':', cTimeStart ) == At( ':', cTimeStart ), 0,     ;
+            Val( SubStr( cTimeStart,RAt(':', cTimeStart ) + 1 ) ) )
 
-  FOR nCtr = 1 to 4
-     nConstant := IF(nCtr == 1, 86400, IF(nCtr == 2, 3600, IF( nCtr == 3, 60, 1)))
-     aRetVal[nCtr,1] := INT(nTemp/nConstant)
-     aRetval[nCtr,2] := nTotalSec / nConstant
-     nTemp -= aRetVal[nCtr,1] * nConstant
-  NEXT
+         nTemp := nTotalSec
 
-RETURN aRetVal
+         FOR nCtr = 1 TO 4
+            nConstant := IF( nCtr == 1, 86400, IF( nCtr == 2, 3600, IF( nCtr == 3, 60, 1 ) ) )
+            aRetVal[nCtr,1] := Int( nTemp/nConstant )
+            aRetval[nCtr,2] := nTotalSec / nConstant
+            nTemp -= aRetVal[nCtr,1] * nConstant
+         NEXT
+
+         RETURN aRetVal

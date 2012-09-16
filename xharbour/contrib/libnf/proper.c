@@ -80,64 +80,68 @@ static int _ftIsLower( char );
 
 HB_FUNC( FT_PROPER )
 {
-  int  iLen   =  hb_parclen(1);
-  char *cStr;
+   int      iLen = hb_parclen( 1 );
+   char *   cStr;
 
-  int i, fCap = TRUE; /*, iPos = 0; */
+   int      i, fCap = TRUE; /*, iPos = 0; */
 
-  hb_storc( NULL, 1 );
-  cStr = (char*) hb_parcx(1);
+   hb_storc( NULL, 1 );
+   cStr = ( char * ) hb_parcx( 1 );
 
-  for( i = 0; i < iLen + 1; i++ ) {
-     if( _ftIsAlpha( cStr[i] ) != 0 )  {
-        if( fCap != 0 )
-           cStr[i] = _ftToUpper( cStr[i] );
-        else cStr[i] = _ftToLower( cStr[i] );
-        }
-     fCap = ( cStr[i] == ' ' || cStr[i] == '-' || cStr[i] == 0x27 );
-  }
+   for( i = 0; i < iLen + 1; i++ )
+   {
+      if( _ftIsAlpha( cStr[ i ] ) != 0 )
+      {
+         if( fCap != 0 )
+            cStr[ i ] = _ftToUpper( cStr[ i ] );
+         else
+            cStr[ i ] = _ftToLower( cStr[ i ] );
+      }
+      fCap = ( cStr[ i ] == ' ' || cStr[ i ] == '-' || cStr[ i ] == 0x27 );
+   }
 
-  // Find "Mc"
-  for( i = 0; i <= iLen; i++ )
-     if( cStr[i] == 'M' && cStr[i+1] == 'c' ) {
-        cStr[i+2] = _ftToUpper( cStr[i+2] );
-     }
+   // Find "Mc"
+   for( i = 0; i <= iLen; i++ )
+      if( cStr[ i ] == 'M' && cStr[ i + 1 ] == 'c' )
+      {
+         cStr[ i + 2 ] = _ftToUpper( cStr[ i + 2 ] );
+      }
 
-  /* // If "Mc" was found, Cap next letter if Alpha
-  if( iPos > 1 )
-     if( iPos < iLen )
-        if( _ftIsUpper( cStr[iPos] ) == FALSE )
-           cStr[iPos] = _ftToUpper( cStr[iPos] );
-  */
-  hb_retc( cStr );
-  return;
+   /* // If "Mc" was found, Cap next letter if Alpha
+      if( iPos > 1 )
+      if( iPos < iLen )
+         if( _ftIsUpper( cStr[iPos] ) == FALSE )
+            cStr[iPos] = _ftToUpper( cStr[iPos] );
+    */
+   hb_retc( cStr );
+   return;
 }
 
 
 
 static int _ftIsAlpha( char c )
 {
-  return( _ftIsUpper(c) || _ftIsLower(c));
+   return _ftIsUpper( c ) || _ftIsLower( c );
 }
 
 static char _ftToLower( char c )
 {
-  return(c >= 'A' && c <= 'Z' ? c - 'A' + 'a' : c);
+   return c >= 'A' && c <= 'Z' ? c - 'A' + 'a' : c;
 }
 
 
 static char _ftToUpper( char c )
 {
-  return(c >= 'a' && c <= 'z' ? c - 'a' + 'A' : c);
+   return c >= 'a' && c <= 'z' ? c - 'a' + 'A' : c;
 }
 
 static int _ftIsUpper( char c )
 {
-  return(c >= 'A' && c <= 'Z');
+   return c >= 'A' && c <= 'Z';
 }
 
 
 static int _ftIsLower( char c )
 {
-  return(c >= 'a' && c <= 'z');
+   return c >= 'a' && c <= 'z';
 }

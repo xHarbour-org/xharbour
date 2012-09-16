@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: BLINK.PRG
  * Author....: Terry Hackett
  * CIS ID....: 76662,2035
@@ -54,95 +57,105 @@ STATIC tAnterior, lDoit, nxWait
 STATIC aFT_Blinks := {}
 
 #ifdef FT_TEST
-  FUNCTION MAIN()
-     FT_BLINK( "WAIT", 5, 10 )
-     return ( nil )
+
+FUNCTION MAIN()
+
+   FT_BLINK( "WAIT", 5, 10 )
+
+   RETURN ( nil )
+
 #endif
 
 FUNCTION FT_BLINK( cMsg, nRow, nCol )
 
-  * Declare color restore var.
-  LOCAL cSavColor, lBlinkStatus
+// Declare color restore var.
+   LOCAL cSavColor, lBlinkStatus
 
-  * Return if no msg.
-  IF (cMsg == NIL) ; RETURN NIL; ENDIF
+// Return if no msg.
+   IF ( cMsg == NIL ) ; RETURN NIL; ENDIF
 
-  * Set default row and col to current.
-  nRow := IF( nRow == NIL, ROW(), nRow )
-  nCol := IF( nCol == NIL, COL(), nCol )
+// Set default row and col to current.
+   nRow := IF( nRow == NIL, Row(), nRow )
+   nCol := IF( nCol == NIL, Col(), nCol )
 
-  cSavColor := SETCOLOR()                // Save colors to restore on exit.
-  lBlinkStatus := SETBLINK( .T. )        // Save setblink
+   cSavColor := SetColor()                // Save colors to restore on exit.
+   lBlinkStatus := SetBlink( .T. )        // Save setblink
 
-  * IF blink colors not already set, add blink to current foreground color.
+// IF blink colors not already set, add blink to current foreground color.
 
-  SETCOLOR( IF( ("*" $ LEFT(cSavColor,4)), cSavColor, "*" + cSavColor ) )
+   SetColor( IF( ("*" $ Left(cSavColor,4 ) ), cSavColor, "*" + cSavColor ) )
 
-  @ nRow, nCol SAY cMsg                  // Say the dreaded blinking msg.
-  SETCOLOR( cSavColor )                  // It's a wrap, restore colors & exit.
-  SETBLINK( lBlinkStatus )               // Restore setblink status
+   @ nRow, nCol SAY cMsg                  // Say the dreaded blinking msg.
+   SetColor( cSavColor )                  // It's a wrap, restore colors & exit.
+   SetBlink( lBlinkStatus )               // Restore setblink status
 
-RETURN NIL
+   RETURN NIL
 
 FUNCTION FT_BLINKW32( cMsg, nRow, nCol, nWait )
 
-  * Return if no msg.
-  IF (cMsg == NIL) ; RETURN NIL; ENDIF
+// Return if no msg.
+   IF ( cMsg == NIL ) ; RETURN NIL; ENDIF
 
-  * Set default row and col to current.
-  nRow      := IIF( nRow == NIL, ROW(), nRow )
-  nCol      := IIF( nCol == NIL, COL(), nCol )
+// Set default row and col to current.
+   nRow      := iif( nRow == NIL, Row(), nRow )
+   nCol      := iif( nCol == NIL, Col(), nCol )
 
-  nxWait    := IIF( nWait == NIL, 1, nWait )
-  cxMsg     := cMsg
-  nxRow     := nRow
-  nxCol     := nCol
-  tAnterior := NIL
-  lDoit     := NIL
-  IF ( nxTask == NIL )
-    nxTask := HB_IDLEADD( {|| FT_BLINKW32IT() } )
-    aFT_Blinks := { { nxRow, nxCol, cxMsg } }
-  ELSE
-    AADD( aFT_Blinks, { nxRow, nxCol, cxMsg } )
-  ENDIF
-RETURN NIL
+   nxWait    := iif( nWait == NIL, 1, nWait )
+   cxMsg     := cMsg
+   nxRow     := nRow
+   nxCol     := nCol
+   tAnterior := NIL
+   lDoit     := NIL
+   IF ( nxTask == NIL )
+      nxTask := hb_idleAdd( {|| FT_BLINKW32IT() } )
+      aFT_Blinks := { { nxRow, nxCol, cxMsg } }
+   ELSE
+      AAdd( aFT_Blinks, { nxRow, nxCol, cxMsg } )
+   ENDIF
+
+   RETURN NIL
 
 FUNCTION FT_BLINKW32CANCEL()
-  aFT_Blinks := {}
-  HB_IDLEDEL( nxTask )
-  nxTask := NIL
-RETURN NIL
+
+   aFT_Blinks := {}
+   hb_idleDel( nxTask )
+   nxTask := NIL
+
+   RETURN NIL
 
 FUNCTION FT_BLINKW32IT()
-  LOCAL cSavColor, lBlinkStatus
-  LOCAL i, aBlinks
-  tAnterior := IIF( tAnterior == NIL, SECONDS(), tAnterior )
-  lDoit     := IIF( lDoit == NIL, .F., lDoit )
-  IF SECONDS() < tAnterior    // Hemos pasado la medianoche
-    tAnterior := SECONDS()
-  ENDIF
-  IF SECONDS() - tAnterior > nxWait
-    tAnterior := SECONDS()
-    cSavColor    := SETCOLOR()
-    lBlinkStatus := SETBLINK( .T. )
-    SETCOLOR( IF( ("*" $ LEFT(cSavColor,4)), cSavColor, "*" + cSavColor ) )
-    IF Len( aFT_BLINKS ) < 1
-      RETURN NIL
-    ENDIF
-    FOR i := 1 TO Len( aFT_Blinks )
-      aBlinks := aFT_Blinks[ i ]
-      IF lDoit
-        @ aBlinks[ 1 ], aBlinks[ 2 ] SAY SPACE( LEN( aBlinks[ 3 ] ) )
-      ELSE
-        @ aBlinks[ 1 ], aBlinks[ 2 ] SAY aBlinks[ 3 ]
+
+   LOCAL cSavColor, lBlinkStatus
+   LOCAL i, aBlinks
+
+   tAnterior := iif( tAnterior == NIL, Seconds(), tAnterior )
+   lDoit     := iif( lDoit == NIL, .F. , lDoit )
+   IF Seconds() < tAnterior    // Hemos pasado la medianoche
+      tAnterior := Seconds()
+   ENDIF
+   IF Seconds() - tAnterior > nxWait
+      tAnterior := Seconds()
+      cSavColor    := SetColor()
+      lBlinkStatus := SetBlink( .T. )
+      SetColor( IF( ("*" $ Left(cSavColor,4 ) ), cSavColor, "*" + cSavColor ) )
+      IF Len( aFT_BLINKS ) < 1
+         RETURN NIL
       ENDIF
-    NEXT
-    IF lDoit
-      lDoit := .F.
-    ELSE
-      lDoit := .T.
-    ENDIF
-    SETCOLOR( cSavColor )
-    SETBLINK( lBlinkStatus )
-  ENDIF
-RETURN NIL
+      FOR i := 1 TO Len( aFT_Blinks )
+         aBlinks := aFT_Blinks[ i ]
+         IF lDoit
+            @ aBlinks[ 1 ], aBlinks[ 2 ] SAY Space( Len( aBlinks[ 3 ] ) )
+         ELSE
+            @ aBlinks[ 1 ], aBlinks[ 2 ] SAY aBlinks[ 3 ]
+         ENDIF
+      NEXT
+      IF lDoit
+         lDoit := .F.
+      ELSE
+         lDoit := .T.
+      ENDIF
+      SetColor( cSavColor )
+      SetBlink( lBlinkStatus )
+   ENDIF
+
+   RETURN NIL

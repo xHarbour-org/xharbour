@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: PAGE.PRG
  * Author....: Glenn Scott
  * CIS ID....: 71620,1521
@@ -55,7 +58,6 @@
  *  $END$
  */
 
-
 FUNCTION FT_SETVPG( nPage )
 /*
   LOCAL aRegs[ INT86_MAX_REGS ]
@@ -63,9 +65,10 @@ FUNCTION FT_SETVPG( nPage )
   aRegs[ AX ] = MAKEHI( 5 ) + nPage
   FT_INT86( VIDEO, aRegs )
   */
-  _ft_setvpg(nPage)
 
-  RETURN( NIL )
+   _ft_setvpg( nPage )
+
+   RETURN( NIL )
 
 
 
@@ -96,8 +99,6 @@ FUNCTION FT_SETVPG( nPage )
  *  $END$
  */
 
-
-
 FUNCTION FT_GETVPG()
 /*
   LOCAL aRegs[ INT86_MAX_REGS ]
@@ -106,6 +107,8 @@ FUNCTION FT_GETVPG()
   FT_INT86( VIDEO, aRegs )
 
   RETURN ( HIGHBYTE( aRegs[ BX ] ) ) */
- Return _ft_getvpg()
+
+   RETURN _ft_getvpg()
+
 
 

@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: MILTIME.PRG
  * Author....: Alexander B. Spencer
  * CIS ID....: 76276,1012
@@ -26,39 +29,40 @@
 
 #ifdef FT_TEST
 
-  function main()
+FUNCTION main()
 
-     cls
-     ? "am-pm"
-     ? ft_civ2mil(" 5:40 pm")
-     ? ft_civ2mil("05:40 pm")
-     ? ft_civ2mil(" 5:40 PM")
-     ? ft_civ2mil(" 5:40 am")
-     ? ft_civ2mil("05:40 am")
-     ? ft_civ2mil(" 5:40 AM")
-     ?
-     inkey(0)
-     cls
-     ? "noon-midnight"
-     ? ft_civ2mil("12:00 m")
-     ? ft_civ2mil("12:00 M")
-     ? ft_civ2mil("12:00 m")
-     ? ft_civ2mil("12:00 n")
-     ? ft_civ2mil("12:00 N")
-     ? ft_civ2mil("12:00 n")
-     ?
-     inkey(0)
-     cls
-     ? "errors in noon-midnight"
-     ? ft_civ2mil("12:01 n")
-     ? ft_civ2mil("22:00 n")
-     ? ft_civ2mil("12:01 m")
-     ? ft_civ2mil("22:00 n")
-     ?
-     ? "sys to mil"
-     ? time()
-     ? ft_sys2mil()
-  return nil
+   cls
+   ? "am-pm"
+   ? ft_civ2mil( " 5:40 pm" )
+   ? ft_civ2mil( "05:40 pm" )
+   ? ft_civ2mil( " 5:40 PM" )
+   ? ft_civ2mil( " 5:40 am" )
+   ? ft_civ2mil( "05:40 am" )
+   ? ft_civ2mil( " 5:40 AM" )
+   ?
+   Inkey( 0 )
+   cls
+   ? "noon-midnight"
+   ? ft_civ2mil( "12:00 m" )
+   ? ft_civ2mil( "12:00 M" )
+   ? ft_civ2mil( "12:00 m" )
+   ? ft_civ2mil( "12:00 n" )
+   ? ft_civ2mil( "12:00 N" )
+   ? ft_civ2mil( "12:00 n" )
+   ?
+   Inkey( 0 )
+   cls
+   ? "errors in noon-midnight"
+   ? ft_civ2mil( "12:01 n" )
+   ? ft_civ2mil( "22:00 n" )
+   ? ft_civ2mil( "12:01 m" )
+   ? ft_civ2mil( "22:00 n" )
+   ?
+   ? "sys to mil"
+   ? Time()
+   ? ft_sys2mil()
+
+   RETURN nil
 
 #endif
 
@@ -86,8 +90,9 @@
  *  $END$
  */
 
-function FT_MIL2MIN(cMILTIME)
-  return int(val(left(cMILTIME,2))*60 + val(right(cMILTIME,2)))
+FUNCTION FT_MIL2MIN( cMILTIME )
+
+   RETURN Int( Val( Left(cMILTIME,2 ) ) * 60 + Val( Right(cMILTIME,2 ) ) )
 
 
 /*  $DOC$
@@ -112,10 +117,12 @@ function FT_MIL2MIN(cMILTIME)
  *  $END$
  */
 
-function FT_MIN2MIL(nMIN)
-  nMIN := nMIN%1440
-  return  right("00" + ltrim(str(INT(nMIN/60))),2) + ;
-          right("00" + ltrim(str(INT(nMIN%60))),2)
+FUNCTION FT_MIN2MIL( nMIN )
+
+   nMIN := nMIN % 1440
+
+   RETURN  Right( "00" + LTrim( Str(Int(nMIN/60 ) ) ), 2 ) + ;
+      Right( "00" + LTrim( Str(Int(nMIN % 60 ) ) ), 2 )
 
 
 
@@ -150,35 +157,36 @@ function FT_MIN2MIL(nMIN)
   *  $END$
  */
 
-function FT_MIL2CIV(cMILTIME)
-  local cHRS,cMINS,nHRS,cCIVTIME
+FUNCTION FT_MIL2CIV( cMILTIME )
 
-  nHRS  := val(LEFT(cMILTIME,2))
-  cMINS := right(cMILTIME,2)
+   LOCAL cHRS, cMINS, nHRS, cCIVTIME
 
-  do case
-     case (nHRS == 24 .OR. nHRS == 0) .AND. (cMINS == "00")  // Midnight
-        cCIVTIME = "12:00 m"
-     case (nHRS == 12)                                       // Noon to 12:59pm
-        if cMINS == "00"
-           cCIVTIME = "12:00 n"
-        else
-           cCIVTIME = "12:" + cMINS + " pm"
-        endif
-     case (nHRS < 12)                                    && AM
-        if nHRS == 0
-           cHRS = "12"
-        else
-           cHRS = right("  " + ltrim(str(int(nHRS))),2)
-        endif
-        cCIVTIME = cHRS + ":" + cMINS + " am"
+   nHRS  := Val( Left( cMILTIME,2 ) )
+   cMINS := Right( cMILTIME, 2 )
 
-  otherwise                                           && PM
-     cCIVTIME = right("  " + ltrim(str(int(nHRS - 12))), 2) + ;
-                ":" + cMINS + " pm"
-  endcase
+   DO CASE
+   CASE ( nHRS == 24 .OR. nHRS == 0 ) .AND. ( cMINS == "00" )  // Midnight
+      cCIVTIME = "12:00 m"
+   CASE ( nHRS == 12 )                                       // Noon to 12:59pm
+      IF cMINS == "00"
+         cCIVTIME = "12:00 n"
+      ELSE
+         cCIVTIME = "12:" + cMINS + " pm"
+      ENDIF
+   CASE ( nHRS < 12 )                                    // AM
+      IF nHRS == 0
+         cHRS = "12"
+      ELSE
+         cHRS = Right( "  " + LTrim( Str(Int(nHRS ) ) ), 2 )
+      ENDIF
+      cCIVTIME = cHRS + ":" + cMINS + " am"
 
-  return cCIVTIME
+   OTHERWISE                                           // PM
+      cCIVTIME = Right( "  " + LTrim( Str(Int(nHRS - 12 ) ) ), 2 ) + ;
+         ":" + cMINS + " pm"
+   ENDCASE
+
+   RETURN cCIVTIME
 
 
 
@@ -214,44 +222,45 @@ function FT_MIL2CIV(cMILTIME)
  *  $END$
  */
 
-function FT_CIV2MIL(cTIME)
-  local cKEY, cMILTIME
+FUNCTION FT_CIV2MIL( cTIME )
 
-*** Insure leading 0's
-cTIME = REPLICATE("0", 3 - at(":", ltrim(cTIME))) + ltrim(cTIME)
+   LOCAL cKEY, cMILTIME
 
-*** Adjust for popular use of '12' for first hour after noon and midnight
-if left(ltrim(cTIME),2) == "12"
-   cTIME = stuff(cTIME, 1, 2, "00")
-endif
+//** Insure leading 0's
+   cTIME = Replicate( "0", 3 - At( ":", LTrim(cTIME ) ) ) + LTrim( cTIME )
 
-*** am, pm, noon or midnight
-cKEY = substr(ltrim(cTIME), 7, 1)
+//** Adjust for popular use of '12' for first hour after noon and midnight
+   IF Left( LTrim( cTIME ), 2 ) == "12"
+      cTIME = Stuff( cTIME, 1, 2, "00" )
+   ENDIF
 
-do case
-case upper(cKEY) == "N"                           && noon
-      if left(cTIME,2) + substr(cTIME,4,2) == "0000"
+//** am, pm, noon or midnight
+   cKEY = SubStr( LTrim( cTIME ), 7, 1 )
+
+   DO CASE
+   CASE Upper( cKEY ) == "N"                           // noon
+      IF Left( cTIME, 2 ) + SubStr( cTIME, 4, 2 ) == "0000"
          cMILTIME = "1200"
-      else
+      ELSE
          cMILTIME = "    "
-      endif
-   case upper(cKEY) == "M"                           && midnight
-      if left(cTIME,2) + substr(cTIME,4,2) == "0000"
+      ENDIF
+   CASE Upper( cKEY ) == "M"                           // midnight
+      IF Left( cTIME, 2 ) + SubStr( cTIME, 4, 2 ) == "0000"
          cMILTIME = "0000"
-      else
+      ELSE
          cMILTIME = "    "
-      endif
-   case upper(cKEY) == "A"                           && am
-      cMILTIME = right("00" + ltrim(str(val(left(cTIME,2)))),2) + ;
-                 substr(cTIME,4,2)
-   case upper(cKEY) == "P"                           && pm
-      cMILTIME = right("00" + ltrim(str(val(left(cTIME,2))+12)),2) + ;
-                 substr(cTIME,4,2)
-   otherwise
-      cMILTIME = "    "                              && error
-endcase
+      ENDIF
+   CASE Upper( cKEY ) == "A"                           // am
+      cMILTIME = Right( "00" + LTrim( Str(Val(Left(cTIME,2 ) ) ) ), 2 ) + ;
+         SubStr( cTIME, 4, 2 )
+   CASE Upper( cKEY ) == "P"                           // pm
+      cMILTIME = Right( "00" + LTrim( Str(Val(Left(cTIME,2 ) ) + 12 ) ), 2 ) + ;
+         SubStr( cTIME, 4, 2 )
+   OTHERWISE
+      cMILTIME = "    "                              // error
+   ENDCASE
 
-  return cMILTIME
+   RETURN cMILTIME
 
 
 /*  $DOC$
@@ -276,5 +285,6 @@ endcase
  *  $END$
  */
 
-function FT_SYS2MIL()
-return left(stuff(time(),3,1,""),4)
+FUNCTION FT_SYS2MIL()
+
+   RETURN Left( Stuff( Time(),3,1,"" ), 4 )

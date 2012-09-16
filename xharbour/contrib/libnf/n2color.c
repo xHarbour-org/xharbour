@@ -46,28 +46,28 @@
  */
 
 #include "hbapi.h"
-#if defined(HB_OS_DOS)
+#if defined( HB_OS_DOS )
 static void _ftI2Color( int iColor, char * cColor );
 static int _ftGetColorStr( int iColor, char * cColor );
 #endif
 
-HB_FUNC(FT_N2COLOR )
+HB_FUNC( FT_N2COLOR )
 {
-#if defined(HB_OS_DOS)
+#if defined( HB_OS_DOS )
    {
 
-   char * cColor = "       ";
+      char * cColor = "       ";
 
-   // make sure parameter is a numeric type
+      // make sure parameter is a numeric type
 
-   if ( ISNUM(1))
-      _ftI2Color( hb_parni( 1 ), cColor );
-	else
-		cColor = NULL;
+      if( ISNUM( 1 ) )
+         _ftI2Color( hb_parni( 1 ), cColor );
+      else
+         cColor = NULL;
 
-    hb_retc( cColor );
+      hb_retc( cColor );
 
-   return;
+      return;
    }
 #endif
 }
@@ -81,36 +81,36 @@ HB_FUNC(FT_N2COLOR )
 //              *cColor -  pointer to the color string
 // Returns   :  void (string is modified directly)
 // 컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-#if defined(HB_OS_DOS)
+#if defined( HB_OS_DOS )
 static void _ftI2Color( int iColor, char * cColor )
 {
    unsigned int iBack, iFore, i = 0;
 
    // check for blink attribute
 
-   if ( iColor > 127 )
+   if( iColor > 127 )
    {
-      cColor[ i++ ] = '*';
+      cColor[ i++ ]  = '*';
 
-      iColor %= 128;
+      iColor         %= 128;
    }
 
    // check for background and foreground colors
 
 // if ( iColor > 15 )
 // {
-      iFore = iColor % 16;
+   iFore = iColor % 16;
 
-      iBack = ( iColor - iFore ) / 16;
+   iBack = ( iColor - iFore ) / 16;
 // }
 
-    // check for intensity attrib
+   // check for intensity attrib
 
-   if ( iFore > 7 )
+   if( iFore > 7 )
    {
-      cColor[ i++ ] = '+';
+      cColor[ i++ ]  = '+';
 
-      iFore %= 8;
+      iFore          %= 8;
    }
 
    // get forground color
@@ -129,7 +129,6 @@ static void _ftI2Color( int iColor, char * cColor )
 
    cColor[ i ] = 0;
 
-   return ;
 }
 
 
@@ -143,24 +142,24 @@ static void _ftI2Color( int iColor, char * cColor )
 
 static int _ftGetColorStr( int iColor, char * cColor )
 {
-    int iLen = 0;
+   int iLen = 0;
 
-    switch ( iColor )
-    {
-       case  0 : cColor[iLen++] = 'n';  break;
-       case  1 : cColor[iLen++] = 'b';  break;
-       case  2 : cColor[iLen++] = 'g';  break;
-       case  3 : cColor[iLen++] = 'b';
-                 cColor[iLen++] = 'g';  break;
-       case  4 : cColor[iLen++] = 'r';  break;
-       case  5 : cColor[iLen++] = 'r';
-                 cColor[iLen++] = 'b';  break;
-       case  6 : cColor[iLen++] = 'g';
-                 cColor[iLen++] = 'r';  break;
-       case  7 : cColor[iLen++] = 'w';
-     }
+   switch( iColor )
+   {
+      case  0: cColor[ iLen++ ]  = 'n';  break;
+      case  1: cColor[ iLen++ ]  = 'b';  break;
+      case  2: cColor[ iLen++ ]  = 'g';  break;
+      case  3: cColor[ iLen++ ]  = 'b';
+         cColor[ iLen++ ]        = 'g';  break;
+      case  4: cColor[ iLen++ ]  = 'r';  break;
+      case  5: cColor[ iLen++ ]  = 'r';
+         cColor[ iLen++ ]        = 'b';  break;
+      case  6: cColor[ iLen++ ]  = 'g';
+         cColor[ iLen++ ]        = 'r';  break;
+      case  7: cColor[ iLen++ ]  = 'w';
+   }
 
-    return iLen;
+   return iLen;
 
 }
 #endif

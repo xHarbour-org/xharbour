@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: BYTENEG.PRG
  * Author....: Forest Belt, Computer Diagnostic Services, Inc.
  * CIS ID....: ?
@@ -58,7 +61,7 @@
  *  $END$
  */
 
+FUNCTION FT_BYTENEG( cByte )
 
-FUNCTION FT_BYTENEG(cByte)
-RETURN   iif(valtype(cByte) != "C", NIL, chr((256 - asc(cByte)) % 256))
+   RETURN   iif( ValType( cByte ) != "C", NIL, Chr( (256 - Asc(cByte ) ) % 256 ) )
 

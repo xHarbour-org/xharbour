@@ -3,112 +3,112 @@
  */
 
 /* File......: RMDIR.ASM
-* Author....: Ted Means
-* CIS ID....: 73067,3332
-*
-* This function is an original work by Ted Means and is placed in the
-* public domain.
-*
-* Modification history:
-* ---------------------
-*
-*     Rev 1.2   15 Aug 1991 23:07:12   GLENN
-*  Forest Belt proofread/edited/cleaned up doc
-*
-*     Rev 1.1   14 Jun 1991 19:54:58   GLENN
-*  Minor edit to file header
-*
-*     Rev 1.0   01 Apr 1991 01:03:52   GLENN
-*  Nanforum Toolkit
-*
-*/
+ * Author....: Ted Means
+ * CIS ID....: 73067,3332
+ *
+ * This function is an original work by Ted Means and is placed in the
+ * public domain.
+ *
+ * Modification history:
+ * ---------------------
+ *
+ *     Rev 1.2   15 Aug 1991 23:07:12   GLENN
+ *  Forest Belt proofread/edited/cleaned up doc
+ *
+ *     Rev 1.1   14 Jun 1991 19:54:58   GLENN
+ *  Minor edit to file header
+ *
+ *     Rev 1.0   01 Apr 1991 01:03:52   GLENN
+ *  Nanforum Toolkit
+ *
+ */
 
 
 /*  $DOC$
-*  $FUNCNAME$
-*      FT_RMDIR()
-*  $CATEGORY$
-*      DOS/BIOS
-*  $ONELINER$
-*      Delete a subdirectory
-*  $SYNTAX$
-*      FT_RMDIR( <cDirName> ) -> nResult
-*  $ARGUMENTS$
-*      <cDirName> is the name of the directory to delete.
-*  $RETURNS$
-*       0  if successful
-*       3  if Path Not Found
-*       5  if Access Denied (directory not empty)
-*      16  if attempt to delete current directory.
-*      99  if invalid parameters passed
-*  $DESCRIPTION$
-*     This function is useful if you need to remove a subdirectory for
-*     some reason.
-*
-*     The source code is written to adhere to Turbo Assembler's IDEAL mode.
-*     To use another assembler, you will need to rearrange the PROC and
-*     SEGMENT directives, and also the ENDP and ENDS directives (a very
-*     minor task).
-*  $EXAMPLES$
-*     FT_RMDIR( "C:\CLIPPER" )
-*     FT_RMDIR( "\EXAMPLE" )
-*     FT_RMDIR( "..\SOURCE" )
-*  $END$
-*/
+ *  $FUNCNAME$
+ *      FT_RMDIR()
+ *  $CATEGORY$
+ *      DOS/BIOS
+ *  $ONELINER$
+ *      Delete a subdirectory
+ *  $SYNTAX$
+ *      FT_RMDIR( <cDirName> ) -> nResult
+ *  $ARGUMENTS$
+ *      <cDirName> is the name of the directory to delete.
+ *  $RETURNS$
+ *       0  if successful
+ *       3  if Path Not Found
+ *       5  if Access Denied (directory not empty)
+ *      16  if attempt to delete current directory.
+ *      99  if invalid parameters passed
+ *  $DESCRIPTION$
+ *     This function is useful if you need to remove a subdirectory for
+ *     some reason.
+ *
+ *     The source code is written to adhere to Turbo Assembler's IDEAL mode.
+ *     To use another assembler, you will need to rearrange the PROC and
+ *     SEGMENT directives, and also the ENDP and ENDS directives (a very
+ *     minor task).
+ *  $EXAMPLES$
+ *     FT_RMDIR( "C:\CLIPPER" )
+ *     FT_RMDIR( "\EXAMPLE" )
+ *     FT_RMDIR( "..\SOURCE" )
+ *  $END$
+ */
 /*This  is the Original FT_RMDIR() code
-IDEAL
+   IDEAL
 
-Public   FT_RMDIR
+   Public   FT_RMDIR
 
-Extrn    __ftdir:Far
+   Extrn    __ftdir:Far
 
-Segment  _NanFor   Word      Public    "CODE"
+   Segment  _NanFor   Word      Public    "CODE"
          Assume    CS:_NanFor
 
-Proc     FT_RMDIR  Far
+   Proc     FT_RMDIR  Far
 
          Mov       AH,3Ah                    * DOS service--remove directory
          Push      AX                        * Save on stack
          Call      __ftdir                   * Call generic directory routine
          Add       SP,2                      * Realign stack
          Ret
-Endp     FT_RMDIR
-Ends     _NanFor
-End
-*/
+   Endp     FT_RMDIR
+   Ends     _NanFor
+   End
+ */
 
 /* This is the New one Rewriten in C*/
 
 #include "hbapi.h"
 #include "hbapifs.h"
 
-#if defined(HB_OS_DOS)
+#if defined( HB_OS_DOS )
 #include "extend.h"
 #include "dos.h"
-#elif defined(__WIN32__)
+#elif defined( __WIN32__ )
 #include <windows.h>
 #endif
 
-HB_FUNC(FT_RMDIR)
+HB_FUNC( FT_RMDIR )
 {
-#if defined(HB_OS_DOS)
-   int Status;
-   char *path=hb_parcx(1);
-   union REGS regs;
-   struct SREGS sregs;
-   segread(&sregs);
-   regs.h.ah=0x3A   ;
-   sregs.ds=FP_SEG(path);
-   regs.HB_XREGS.dx=FP_OFF(path);
-   HB_DOS_INT86X(0x21,&regs,&regs,&sregs);
-   Status=regs.HB_XREGS.ax;
-   hb_retni(Status);
-#elif defined(__WIN32__)
+#if defined( HB_OS_DOS )
+   int            Status;
+   char *         path = hb_parcx( 1 );
+   union REGS     regs;
+   struct SREGS   sregs;
+   segread( &sregs );
+   regs.h.ah         = 0x3A;
+   sregs.ds          = FP_SEG( path );
+   regs.HB_XREGS.dx  = FP_OFF( path );
+   HB_DOS_INT86X( 0x21, &regs, &regs, &sregs );
+   Status            = regs.HB_XREGS.ax;
+   hb_retni( Status );
+#elif defined( __WIN32__ )
    UINT iResult;
 
    hb_fsRmDir( ( const char * ) hb_parcx( 1 ) );
 
-   iResult = (UINT) GetLastError();
+   iResult = ( UINT ) GetLastError();
 
    if( iResult != 0 && iResult != 3 && iResult != 5 && iResult != 16 )
    {
@@ -117,19 +117,19 @@ HB_FUNC(FT_RMDIR)
 
    hb_retni( iResult );
 #else
-   BOOL bResult;
-   int iRet = 0;
-   if ( ISCHAR( 1 ) )
+   BOOL  bResult;
+   int   iRet = 0;
+   if( ISCHAR( 1 ) )
    {
-       bResult = hb_fsRmDir( ( const char * ) hb_parcx( 1 ) );
-       if ( !bResult )
-       {
+      bResult = hb_fsRmDir( ( const char * ) hb_parcx( 1 ) );
+      if( ! bResult )
+      {
          iRet = 5;
-       }
+      }
    }
    else
    {
-     iRet = 99;
+      iRet = 99;
    }
    hb_retni( iRet );
 #endif

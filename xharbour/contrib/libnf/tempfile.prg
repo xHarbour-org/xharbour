@@ -89,29 +89,30 @@
  */
 
 #ifdef HB_OS_DOS
-  #define FT_TEMPFILE_ORIGINAL
+#define FT_TEMPFILE_ORIGINAL
 #endif
 
 #ifdef HB_OS_DOS_32
-  #undef FT_TEMPFILE_ORIGINAL
+#undef FT_TEMPFILE_ORIGINAL
 #endif
 
 #ifdef FT_TEMPFILE_ORIGINAL
 
-  #include "ftint86.ch"
+#include "ftint86.ch"
 
-  #define DOS         33
-  #define TEMPNAME    90
+#define DOS         33
+#define TEMPNAME    90
 
-  FUNCTION FT_TEMPFIL( cPath, lHide, nHandle )
-    LOCAL  cRet,aRegs[3]
+FUNCTION FT_TEMPFIL( cPath, lHide, nHandle )
 
-    cPath := iif( valType(cPath) != "C",           ;
-                     replicate( chr(0),13) ,            ;
-                     cPath += replicate( chr(0), 13 )   ;
-                )
+   LOCAL  cRet, aRegs[3]
 
-    lHide := iif( valType(lHide) != "L", .f., lHide )
+   cPath := iif( ValType( cPath ) != "C",           ;
+      Replicate( Chr( 0 ), 13 ) ,            ;
+      cPath += Replicate( Chr( 0 ), 13 )   ;
+      )
+
+   lHide := iif( ValType( lHide ) != "L", .F. , lHide )
     /*
     aRegs[AX]        := MAKEHI( TEMPNAME )
     aRegs[CX]        := iif( lHide, 2, 0 )
@@ -120,127 +121,133 @@
 
     FT_INT86( DOS, aRegs )
     */
-    aRegs:=_ft_tempfil(cPath,lHide)
+   aRegs := _ft_tempfil( cPath, lHide )
     /*  If carry flag is clear, then call succeeded and a file handle is
      *  sitting in AX that needs to be closed.
      */
 
-    if !ft_isBitOn( aRegs[3], FLAG_CARRY )
-       if hb_isbyref( @nHandle )
-          nHandle = aRegs[1]
-       else
-          fclose( aRegs[1] )
-       endif
-       cRet := alltrim( strtran( aRegs[2], chr(0) ) )
-    else
-       cRet := ""
-    endif
+   IF !ft_isBitOn( aRegs[3], FLAG_CARRY )
+      IF hb_isbyref( @nHandle )
+         nHandle = aRegs[1]
+      ELSE
+         FClose( aRegs[1] )
+      ENDIF
+      cRet := AllTrim( StrTran( aRegs[2], Chr(0 ) ) )
+   ELSE
+      cRet := ""
+   ENDIF
 
-  RETURN cRet
+   RETURN cRet
 
 #else
 
-  #include "common.ch"
-  #include "fileio.ch"
+#include "common.ch"
 
-  FUNCTION FT_TEMPFIL( cPath, lHide, nHandle )
+#include "fileio.ch"
+
+FUNCTION FT_TEMPFIL( cPath, lHide, nHandle )
 
 #ifndef __CT_DEPENDENCE__
 
-  LOCAL cFile
+   LOCAL cFile
 
-  Default cPath to ".\"
-  Default lHide to .f.
+   DEFAULT cPath TO ".\"
+   DEFAULT lHide TO .F.
 
-  cPath = alltrim( cPath )
+   cPath = AllTrim( cPath )
 
-  nHandle := HB_FTempCreate( cPath, nil, if( lHide, FC_HIDDEN, FC_NORMAL ), @cFile )
+   nHandle := hb_FTempCreate( cPath, nil, if( lHide, FC_HIDDEN, FC_NORMAL ), @cFile )
 
-  if !hb_isbyref( @nHandle )
-     fclose( nHandle )
-  endif
+   IF !hb_isbyref( @nHandle )
+      FClose( nHandle )
+   ENDIF
 
-  return cFile
+   RETURN cFile
 
 #else
 
-  LOCAL nError := 0, cFile
+   LOCAL nError := 0, cFile
 
-  Default cPath to ".\"
-  Default lHide to .f.
+   DEFAULT cPath TO ".\"
+   DEFAULT lHide TO .F.
 
-  cPath = alltrim( cPath )
-  if right( cPath ) # "\"
-    cPath += "\"
-  endif
+   cPath = AllTrim( cPath )
+   IF Right( cPath ) # "\"
+      cPath += "\"
+   ENDIF
 
 
-  do while .t.
-     cFile = ntoc( int( ft_rand1( 65535 ) ), 16 ) + ntoc( int( ft_rand1( 65535 ) ), 16 )
+   DO WHILE .T.
+      cFile = ntoc( Int( ft_rand1( 65535 ) ), 16 ) + ntoc( Int( ft_rand1( 65535 ) ), 16 )
 
-     nHandle := fopen( cPath + cFile )  // Use this method because
-                                        // the FILE() function can't see
-                                        // the hidden and system files
+      nHandle := FOpen( cPath + cFile )  // Use this method because
+      // the FILE() function can't see
+      // the hidden and system files
 
-     if ferror() = 2   // File not found
+      IF FError() = 2   // File not found
 
-        nHandle = fcreate( cPath + cFile, if( lHide, FC_HIDDEN, FC_NORMAL ) )
+         nHandle = FCreate( cPath + cFile, if( lHide, FC_HIDDEN, FC_NORMAL ) )
 
-        if ferror() = 5
-           fclose( nHandle )
-           loop
-        endif
+         IF FError() = 5
+            FClose( nHandle )
+            LOOP
+         ENDIF
 
-        if ferror() # 0
-           nError ++
-           if nError > 10
-              cFile = ""
-              exit
-           endif
-        endif
-        fclose( nHandle )
+         IF FError() # 0
+            nError ++
+            IF nError > 10
+               cFile = ""
+               EXIT
+            ENDIF
+         ENDIF
+         FClose( nHandle )
 
-        nHandle = fopen( cPath + cFile, FO_EXCLUSIVE + FO_READWRITE )
-        if ferror() = 0
-           exit
-        else
-           nError ++
-           if nError > 10
-              cFile = ""
-              exit
-           endif
-        endif
+         nHandle = FOpen( cPath + cFile, FO_EXCLUSIVE + FO_READWRITE )
+         IF FError() = 0
+            EXIT
+         ELSE
+            nError ++
+            IF nError > 10
+               cFile = ""
+               EXIT
+            ENDIF
+         ENDIF
 
-     else
-        fclose( nHandle )
+      ELSE
+         FClose( nHandle )
 
-     endif
+      ENDIF
 
-  enddo
+   ENDDO
 
-  if !hb_isbyref( @nHandle )
-     fclose( nHandle )
-  endif
+   IF !hb_isbyref( @nHandle )
+      FClose( nHandle )
+   ENDIF
 
-  return cFile
+   RETURN cFile
 
 #endif /* __CT_DEPENDENCE__ */
 
 #endif /* FT_TEMPFILE_ORIGINAL */
 
 #ifdef FT_TEST
-  FUNCTION MAIN( cPath, cHide )
-     LOCAL cFile, nHandle
-     cFile := FT_TEMPFIL( cPath, (cHide == "Y") )
 
-     if !empty( cFile )
-        QOut( cFile )
-        nHandle := fopen( cFile, 1 )
-        fwrite( nHandle, "This is a test!" )
-        fclose( nHandle )
-     else
-        Qout( "An error occurred" )
-     endif
-  RETURN nil
+FUNCTION MAIN( cPath, cHide )
+
+   LOCAL cFile, nHandle
+
+   cFile := FT_TEMPFIL( cPath, ( cHide == "Y" ) )
+
+   IF !Empty( cFile )
+      QOut( cFile )
+      nHandle := FOpen( cFile, 1 )
+      FWrite( nHandle, "This is a test!" )
+      FClose( nHandle )
+   ELSE
+      QOut( "An error occurred" )
+   ENDIF
+
+   RETURN nil
+
 #endif
 

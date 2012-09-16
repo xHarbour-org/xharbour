@@ -53,14 +53,14 @@ static int _ftColor2I( char * cColor );
 static int _ftGetColorNum( char * cColor );
 static char * _ftStripIt( char * cColor );
 
-HB_FUNC(FT_COLOR2N)
+HB_FUNC( FT_COLOR2N )
 {
    int iRet = 0;
 
    // make sure parameter is a char type and that it is 8 chars or less
 
-   if ( ISCHAR( 1 )  && hb_parclen( 1 ) < 8 )
-      iRet = _ftColor2I( (char*) hb_parcx( 1 ) );
+   if( ISCHAR( 1 ) && hb_parclen( 1 ) < 8 )
+      iRet = _ftColor2I( ( char * ) hb_parcx( 1 ) );
 
    hb_retni( iRet );
 
@@ -77,45 +77,48 @@ HB_FUNC(FT_COLOR2N)
 
 static int _ftColor2I( char * cColor )
 {
-    char * cFore = "         ", * cBack = "      ";
-    unsigned int iBlink = 0, iIntense = 0, iBack = 0, i = 0;
+   char *         cFore    = "         ", * cBack = "      ";
+   unsigned int   iBlink   = 0, iIntense = 0, iBack = 0, i = 0;
 
-    // copy the Clipper string to buffer, check for attributes, and
-    // make lower case
+   // copy the Clipper string to buffer, check for attributes, and
+   // make lower case
 
-    while ( ( cFore[ i ] = cColor[ i ] ) != 0 )
-    {
-       // check for a blink attrib
+   while( ( cFore[ i ] = cColor[ i ] ) != 0 )
+   {
+      // check for a blink attrib
 
-       if ( cFore[ i ] == '*' && iBlink == 0 ) iBlink = 128;
+      if( cFore[ i ] == '*' && iBlink == 0 )
+         iBlink = 128;
 
-       // check for an intensity attrib
+      // check for an intensity attrib
 
-       if ( cFore[ i ] == '+' && iIntense == 0 ) iIntense = 8;
+      if( cFore[ i ] == '+' && iIntense == 0 )
+         iIntense = 8;
 
-        // make sure all chars are lower case
+      // make sure all chars are lower case
 
-       if ( 91 > cFore[ i ] && cFore[ i ] > 64 ) cFore[ i ] += 32;
+      if( 91 > cFore[ i ] && cFore[ i ] > 64 )
+         cFore[ i ] += 32;
 
-       i++;
-    }
+      i++;
+   }
 
-    // check for the background color
+   // check for the background color
 
-    while ( cColor[ iBack++ ] != '/' && cColor[ iBack ] != 0 )
-    {
-    }
+   while( cColor[ iBack++ ] != '/' && cColor[ iBack ] != 0 )
+   {
+   }
 
-    if ( cColor[--iBack ] == '/' )
-    {
-       cBack = cFore + iBack + 1;
-       cFore[ iBack ] = 0;
-    }
+   if( cColor[ --iBack ] == '/' )
+   {
+      cBack          = cFore + iBack + 1;
+      cFore[ iBack ] = 0;
+   }
 
-    // calculate and return the value
+   // calculate and return the value
 
-    return ( iIntense + iBlink + _ftGetColorNum( _ftStripIt( cFore ) ) +
-                          ( 16 * _ftGetColorNum( _ftStripIt( cBack ) ) ) );
+   return iIntense + iBlink + _ftGetColorNum( _ftStripIt( cFore ) ) +
+          ( 16 * _ftGetColorNum( _ftStripIt( cBack ) ) );
 
 }
 
@@ -131,19 +134,23 @@ static int _ftGetColorNum( char * cColor )
 {
    unsigned * iColor = ( unsigned * ) cColor;
 
-   if ( cColor[ 1 ] == 0 ) switch ( cColor[ 0 ] )
-   {
-         case 'n' : *iColor = 0; break;
-         case 'b' : *iColor = 1; break;
-         case 'g' : *iColor = 2; break;
-         case 'r' : *iColor = 4; break;
-         case 'w' : *iColor = 7; break;
-   }
+   if( cColor[ 1 ] == 0 )
+      switch( cColor[ 0 ] )
+      {
+         case 'n': *iColor = 0; break;
+         case 'b': *iColor = 1; break;
+         case 'g': *iColor = 2; break;
+         case 'r': *iColor = 4; break;
+         case 'w': *iColor = 7; break;
+      }
    else
    {
-      if ( ( cColor[ 0 ] == 'b' ) && cColor[ 1 ] == 'g' ) *iColor = 3;
-      if ( ( cColor[ 0 ] == 'r' ) && cColor[ 1 ] == 'b' ) *iColor = 5;
-      if ( ( cColor[ 0 ] == 'g' ) && cColor[ 1 ] == 'r' ) *iColor = 6;
+      if( ( cColor[ 0 ] == 'b' ) && cColor[ 1 ] == 'g' )
+         *iColor = 3;
+      if( ( cColor[ 0 ] == 'r' ) && cColor[ 1 ] == 'b' )
+         *iColor = 5;
+      if( ( cColor[ 0 ] == 'g' ) && cColor[ 1 ] == 'r' )
+         *iColor = 6;
    }
 
    return *iColor;
@@ -164,11 +171,13 @@ static char * _ftStripIt( char * cColor )
 
    // move past any leading markers
 
-   while ( *cColor == '+' || *cColor == '*' ) cColor++;
+   while( *cColor == '+' || *cColor == '*' )
+      cColor++;
 
    // truncate any trailing markers
 
-   while ( cColor[ i ] && cColor[ i ] != '+' && cColor[ i ] != '*' ) i++;
+   while( cColor[ i ] && cColor[ i ] != '+' && cColor[ i ] != '*' )
+      i++;
 
    // null terminate the string
 

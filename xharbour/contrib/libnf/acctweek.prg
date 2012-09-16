@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: ACCTWEEK.PRG
  * Author....: Jo W. French dba Practical Computing
  * CIS ID....: 74731,1751
@@ -77,31 +80,31 @@
  *  $END$
 */
  
-FUNCTION FT_ACCTWEEK(dGivenDate,nWeekNum)
+FUNCTION FT_ACCTWEEK( dGivenDate, nWeekNum )
  
-  LOCAL nTemp, lIsWeek, aRetVal
+   LOCAL nTemp, lIsWeek, aRetVal
  
-  IF ! VALTYPE(dGivenDate) $ 'ND'
-     dGivenDate := DATE()
-  ELSEIF VALTYPE(dGivenDate) == 'N'
-     nWeekNum := dGivenDate
-     dGivenDate := DATE()
-  ENDIF
+   IF ! ValType( dGivenDate ) $ 'ND'
+      dGivenDate := Date()
+   ELSEIF ValType( dGivenDate ) == 'N'
+      nWeekNum := dGivenDate
+      dGivenDate := Date()
+   ENDIF
  
-  aRetVal := FT_ACCTYEAR(dGivenDate)
+   aRetVal := FT_ACCTYEAR( dGivenDate )
  
-  lIsWeek := ( VALTYPE(nWeekNum) == 'N' )
-  IF lIsWeek
-     nTemp      := INT( (aRetVal[3] - aRetVal[2]) / 7 ) + 1
-     IF( nWeekNum < 1 .OR. nWeekNum > nTemp, nWeekNum := nTemp, )
-     dGivenDate := aRetVal[2] + (nWeekNum - 1) * 7
-  ENDIF
+   lIsWeek := ( ValType( nWeekNum ) == 'N' )
+   IF lIsWeek
+      nTemp      := Int( ( aRetVal[3] - aRetVal[2] ) / 7 ) + 1
+      IF( nWeekNum < 1 .OR. nWeekNum > nTemp, nWeekNum := nTemp, )
+         dGivenDate := aRetVal[2] + ( nWeekNum - 1 ) * 7
+      ENDIF
  
-  aRetVal[1] += PADL(LTRIM(STR(INT( (dGivenDate - ;
-                aRetVal[2]) / 7 ) + 1, 2)), 2, '0')
-  dGivenDate += ( 6 - FT_DAYTOBOW(dGivenDate) )  // end of week
-  aRetVal[2] := dGivenDate - 6
-  aRetVal[3] := dGivenDate
+      aRetVal[1] += PadL( LTrim( Str(Int( (dGivenDate - ;
+         aRetVal[2] ) / 7 ) + 1, 2 ) ), 2, '0' )
+      dGivenDate += ( 6 - FT_DAYTOBOW( dGivenDate ) )  // end of week
+      aRetVal[2] := dGivenDate - 6
+      aRetVal[3] := dGivenDate
  
-RETURN aRetVal
+      RETURN aRetVal
 

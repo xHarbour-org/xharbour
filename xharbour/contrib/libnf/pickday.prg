@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: PICKDAY.PRG
  * Author....: Greg Lief
  * CIS ID....: 72460,1760
@@ -46,22 +49,26 @@
 #ifdef FT_TEST
 
 FUNCTION MAIN
-QOUT("You selected " + FT_PICKDAY())
-return nil
+
+   QOut( "You selected " + FT_PICKDAY() )
+
+   RETURN nil
 
 #endif
 
+FUNCTION FT_PICKDAY
 
-function FT_PICKDAY
-LOCAL DAYS := { "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", ;
-                "FRIDAY", "SATURDAY" }, SEL := 0
-LOCAL OLDSCRN := SAVESCREEN(8, 35, 16, 45), oldcolor := setcolor('+w/r')
-@ 8, 35, 16, 45 box B_SINGLE + " "
-/* do not allow user to Esc out, which would cause array access error */
-do while sel = 0
-   sel = achoice(9, 36, 15, 44, days)
-enddo
-/* restore previous screen contents and color */
-restscreen(8, 35, 16, 45, oldscrn)
-setcolor(oldcolor)
-return days[sel]
+   LOCAL DAYS := { "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", ;
+      "FRIDAY", "SATURDAY" }, SEL := 0
+   LOCAL OLDSCRN := SaveScreen( 8, 35, 16, 45 ), oldcolor := SetColor( '+w/r' )
+
+   @ 8, 35, 16, 45 BOX B_SINGLE + " "
+   /* do not allow user to Esc out, which would cause array access error */
+   DO WHILE sel = 0
+      sel = AChoice( 9, 36, 15, 44, days )
+   ENDDO
+   /* restore previous screen contents and color */
+   RestScreen( 8, 35, 16, 45, oldscrn )
+   SetColor( oldcolor )
+
+   RETURN days[sel]

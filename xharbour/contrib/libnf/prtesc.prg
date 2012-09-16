@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: PRTESC.PRG
  * Author....: Steven Tyrakowski
  * CIS ID....: ?
@@ -21,19 +24,23 @@
  */
 
 #ifdef FT_TEST
-  FUNCTION MAIN( cParm1 )
-     *-------------------------------------------------------
-     * Sample routine to test function from command line
-     *-------------------------------------------------------
 
-    IF PCount() > 0
+FUNCTION MAIN( cParm1 )
+
+//-------------------------------------------------------
+// Sample routine to test function from command line
+//-------------------------------------------------------
+
+   IF PCount() > 0
       ? FT_ESCCODE( cParm1 )
-    ELSE
+   ELSE
       ? "Usage: PRT_ESC  'escape code sequence' "
       ? "            outputs converted code to  standard output"
       ?
-    ENDIF
-  RETURN (nil)
+   ENDIF
+
+   RETURN ( nil )
+
 #endif
 
 /*  $DOC$
@@ -47,10 +54,10 @@
  *     FT_ESCCODE( <cASCII> )  -> <cPrinterFormat>
  *  $ARGUMENTS$
  *     <cASCII> is the ASCII representation of the printer control
- *		codes in Lotus 123 format (e.g. "\027E" for Chr(27)+"E")
+ *  codes in Lotus 123 format (e.g. "\027E" for Chr(27)+"E")
  *
- *		"\nnn" will be converted to Chr(nnn)
- *		"\\" will be converted to "\"
+ *  "\nnn" will be converted to Chr(nnn)
+ *  "\\" will be converted to "\"
  *  $RETURNS$
  *     The binary version of an ASCII coded printer setup string.
  *  $DESCRIPTION$
@@ -66,37 +73,37 @@
  *  $END$
  */
 
-
 FUNCTION FT_ESCCODE( cInput )
 
-LOCAL cOutput  := ""             ,;
-	  cCurrent					 ,;
-	  nPointer := 1 			 ,;
-	  nLen	   := Len( cInput )
+   LOCAL cOutput  := ""             , ;
+      cCurrent      , ;
+      nPointer := 1     , ;
+      nLen    := Len( cInput )
 
-  DO WHILE nPointer <= nLen
+   DO WHILE nPointer <= nLen
 
-	cCurrent := Substr( cInput, nPointer, 1 )
+      cCurrent := SubStr( cInput, nPointer, 1 )
 
-    DO CASE
+      DO CASE
 
-       CASE cCurrent == "\" .AND. ;
-		IsDigit(Substr(cInput, nPointer+1, 1) ) .AND. ;
-		IsDigit(Substr(cInput, nPointer+2, 1) ) .AND. ;
-		IsDigit(Substr(cInput, nPointer+3, 1) )
-	   cOutput  += Chr(Val(Substr(cInput, nPointer+1,3)))
-	   nPointer += 4
+      CASE cCurrent == "\" .AND. ;
+            IsDigit( SubStr( cInput, nPointer + 1, 1 ) ) .AND. ;
+            IsDigit( SubStr( cInput, nPointer + 2, 1 ) ) .AND. ;
+            IsDigit( SubStr( cInput, nPointer + 3, 1 ) )
+         cOutput  += Chr( Val( SubStr(cInput, nPointer + 1,3 ) ) )
+         nPointer += 4
 
-       CASE cCurrent == "\" .AND. ;
-		 Substr(cInput, nPointer+1, 1) == "\"
-	   cOutput += "\"
-	   nPointer += 2
+      CASE cCurrent == "\" .AND. ;
+            SubStr( cInput, nPointer + 1, 1 ) == "\"
+         cOutput += "\"
+         nPointer += 2
 
-       OTHERWISE
-	   cOutput += cCurrent
-	   nPointer++
+      OTHERWISE
+         cOutput += cCurrent
+         nPointer++
 
-    ENDCASE
-  ENDDO
+      ENDCASE
+   ENDDO
 
-RETURN cOutput
+   RETURN cOutput
+

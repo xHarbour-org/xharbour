@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: NETPV.PRG
  * Author....: David Husnian
  * CIS ID....: ?
@@ -65,22 +68,26 @@
  */
 
 #ifdef FT_TEST
-  FUNCTION MAIN()
-     ? FT_NETPV( 10000, 10, { 10000,15000,16000,17000 } )
-  RETURN ( nil )
+
+FUNCTION MAIN()
+
+   ? FT_NETPV( 10000, 10, { 10000, 15000, 16000, 17000 } )
+
+   RETURN ( nil )
+
 #endif
 
-
-FUNCTION FT_NETPV(nInitialInvestment, nInterestRate, aCashFlow, nNoOfCashFlows)
+FUNCTION FT_NETPV( nInitialInvestment, nInterestRate, aCashFlow, nNoOfCashFlows )
 
    LOCAL nNetPresentValue := 0
 
-   nNoOfCashFlows := iif( nNoOfCashFlows == nil, len( aCashFlow ), nNoOfCashFlows )
+   nNoOfCashFlows := iif( nNoOfCashFlows == nil, Len( aCashFlow ), nNoOfCashFlows )
 
-   AEVAL(aCashFlow, ;
-         { | nElement, nElementNo | ;
-           nNetPresentValue += nElement / ;
-                               ((1 + (nInterestRate / 100)) ** nElementNo) }, ;
-         1, nNoOfCashFlows)
+   AEval( aCashFlow, ;
+      { | nElement, nElementNo | ;
+      nNetPresentValue += nElement / ;
+      ( ( 1 + (nInterestRate / 100 ) ) ** nElementNo ) }, ;
+      1, nNoOfCashFlows )
 
-   RETURN (nNetPresentValue -= nInitialInvestment)
+   RETURN ( nNetPresentValue -= nInitialInvestment )
+

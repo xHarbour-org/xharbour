@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: SYSMEM.PRG
  * Author....: Glenn Scott
  * CIS ID....: 71620,1521
@@ -58,16 +61,21 @@
 #define MEMSIZE    18
 
 #ifdef FT_TEST
-  FUNCTION MAIN()
-  QOut( "Conventional memory: " + str( FT_SYSMEM() ) + "K installed" )
-  return ( nil )
+
+FUNCTION MAIN()
+
+   QOut( "Conventional memory: " + Str( FT_SYSMEM() ) + "K installed" )
+
+   RETURN ( nil )
+
 #endif
 
 FUNCTION FT_SYSMEM()
-  LOCAL aRegs[ INT86_MAX_REGS ]
 
-  aRegs[ AX ] := 0
-  FT_INT86( MEMSIZE, aRegs )
+   LOCAL aRegs[ INT86_MAX_REGS ]
 
-RETURN ( aRegs[ AX ] )
+   aRegs[ AX ] := 0
+   FT_INT86( MEMSIZE, aRegs )
+
+   RETURN ( aRegs[ AX ] )
 

@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: ISSHARE.PRG
  * Author....: Glenn Scott (from Tom Leylan C source)
  * CIS ID....: ?
@@ -57,21 +60,24 @@
 #include "ftint86.ch"
 
 #ifdef FT_TEST
-  function main()
-     local nLoaded := ft_isshare()
 
-     do case
-        case nLoaded == 0
-           Qout("Share not loaded, but ok to load")
-        case nLoaded == 1
-           Qout("Share not loaded, but NOT ok to load!")
-        case nLoaded == 255
-           Qout("Share is loaded!")
-     endcase
+FUNCTION main()
 
-     Qout("Retcode: " + str( nLoaded ) )
+   LOCAL nLoaded := ft_isshare()
 
-  return nil
+   DO CASE
+   CASE nLoaded == 0
+      QOut( "Share not loaded, but ok to load" )
+   CASE nLoaded == 1
+      QOut( "Share not loaded, but NOT ok to load!" )
+   CASE nLoaded == 255
+      QOut( "Share is loaded!" )
+   ENDCASE
+
+   QOut( "Retcode: " + Str( nLoaded ) )
+
+   RETURN nil
+
 #endif
 
 FUNCTION ft_isshare()
@@ -86,5 +92,6 @@ FUNCTION ft_isshare()
 
 RETURN lowbyte( aRegs[AX] )
   */
-RETURN   _ft_isshare()
+
+   RETURN   _ft_isshare()
 

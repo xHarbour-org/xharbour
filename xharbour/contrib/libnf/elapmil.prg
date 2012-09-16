@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: ELAPMIL.PRG
  * Author....: Alexander B. Spencer
  * CIS ID....: 76276,1012
@@ -47,6 +50,7 @@
  *  $END$
  */
 
-function FT_ELAPMIN(cTIME1,cTIME2)
-  return ((VAL(LEFT(cTIME2,2))*60) + (VAL(RIGHT(cTIME2,2)))) - ;
-         ((VAL(LEFT(cTIME1,2))*60) + (VAL(RIGHT(cTIME1,2))))
+FUNCTION FT_ELAPMIN( cTIME1, cTIME2 )
+
+   RETURN ( ( Val(Left(cTIME2,2 ) ) * 60 ) + ( Val(Right(cTIME2,2 ) ) ) ) - ;
+      ( ( Val(Left(cTIME1,2 ) ) * 60 ) + ( Val(Right(cTIME1,2 ) ) ) )

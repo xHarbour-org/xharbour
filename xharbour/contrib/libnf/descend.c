@@ -49,39 +49,39 @@
 #include <hbapiitm.h>
 //#include <fm.api>
 
-HB_FUNC( FT_DESCEND)
+HB_FUNC( FT_DESCEND )
 {
-#if defined(HB_OS_DOS) || defined(HB_OS_WIN)
+#if defined( HB_OS_DOS ) || defined( HB_OS_WIN )
    {
 
-      PHB_ITEM iP   = hb_itemParam( 1 );
-      USHORT uiType = hb_itemType( iP );
+      PHB_ITEM iP       = hb_itemParam( 1 );
+      USHORT   uiType   = hb_itemType( iP );
 
-      PHB_ITEM iR   = NULL;
-      USHORT uiLen, n;
-      char * pDescend;
+      PHB_ITEM iR       = NULL;
+      USHORT   uiLen, n;
+      char *   pDescend;
 
-      if ( ( uiType & HB_IT_NUMERIC ) && ( uiType & HB_IT_DOUBLE ) )
+      if( ( uiType & HB_IT_NUMERIC ) && ( uiType & HB_IT_DOUBLE ) )
          iR = hb_itemPutND( 0, 0 - hb_itemGetND( iP ) );
 
-      else if ( uiType & HB_IT_NUMERIC )
+      else if( uiType & HB_IT_NUMERIC )
          iR = hb_itemPutNL( 0, 0 - hb_itemGetNL( iP ) );
 
-      else if ( uiType & HB_IT_DATE )
+      else if( uiType & HB_IT_DATE )
          iR = hb_itemPutNL( 0, 0x4FD4C0L - hb_itemGetNL( iP ) );
 
-      else if ( uiType & HB_IT_LOGICAL )
+      else if( uiType & HB_IT_LOGICAL )
          iR = hb_itemPutL( 0, ( hb_itemGetL( iP ) > 0 ) ? 0 : 1 );
 
-      else if ( uiType & HB_IT_STRING )
+      else if( uiType & HB_IT_STRING )
       {
-         uiLen = (USHORT) hb_itemSize( iP );
+         uiLen    = ( USHORT ) hb_itemSize( iP );
 
-         pDescend = ( char *) hb_xgrab( uiLen );
+         pDescend = ( char * ) hb_xgrab( uiLen );
 
          hb_itemCopyC( iP, pDescend, uiLen );
 
-         for ( n = 0; n < uiLen; n++ )
+         for( n = 0; n < uiLen; n++ )
             pDescend[ n ] = ( char ) 0 - pDescend[ n ];
 
          iR = hb_itemPutCL( 0, pDescend, uiLen );
@@ -94,7 +94,7 @@ HB_FUNC( FT_DESCEND)
       hb_itemRelease( iP );
       hb_itemRelease( iR );
 
-   return;
+      return;
    }
 #endif
 }

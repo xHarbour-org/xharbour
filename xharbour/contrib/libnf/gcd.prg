@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: GCD.PRG
  * Author....: David Husnian
  * CIS ID....: ?
@@ -50,41 +53,45 @@
 
 
 #command    REPEAT ;
-            => ;
-            DO WHILE .T.
+      => ;
+      DO WHILE .T.
 
 #command    UNTIL <Condition> ;
-            => ;
-            IF <Condition> ; EXIT ; END ; END
+      => ;
+      IF < Condition > ; EXIT ; END ; END
 
 #ifdef FT_TEST
-  FUNCTION MAIN( cNum1, cNum2 )
-     RETURN OUTSTD( STR(FT_GCD( val(cNum1), val(cNum2) )) + CHR(13) + CHR(10) )
+
+FUNCTION MAIN( cNum1, cNum2 )
+
+   RETURN OutStd( Str( FT_GCD( Val(cNum1 ), Val(cNum2 ) ) ) + Chr( 13 ) + Chr( 10 ) )
+
 #endif
 
-FUNCTION FT_GCD(nNumber1, nNumber2)
+FUNCTION FT_GCD( nNumber1, nNumber2 )
 
    LOCAL nHold1, ;                      // Temporarily Hold the Maximum Number
-         nHold2, ;                      // Temporarily Hold the Minimum Number
-         nResult                        // GCD
+      nHold2, ;                      // Temporarily Hold the Minimum Number
+      nResult                        // GCD
 
-                                        // Either Number Zero??
-   IF (nNumber1 == 0 .OR. nNumber2 == 0)
+// Either Number Zero??
+   IF ( nNumber1 == 0 .OR. nNumber2 == 0 )
       nResult := 0                      // Yes, Can't Have a GCD
    ELSE                                 // No, Calculate the GCD
 
-      nHold1 := MAX(ABS(nNumber1), ABS(nNumber2))
-      nHold2 := MIN(ABS(nNumber1), ABS(nNumber2))
+      nHold1 := Max( Abs( nNumber1 ), Abs( nNumber2 ) )
+      nHold2 := Min( Abs( nNumber1 ), Abs( nNumber2 ) )
 
       REPEAT
 
-         nResult := nHold1 % nHold2     // Get the Remainder
-         nHold1  := nHold2              // Which Makes a New Maximum Number
-         nHold2  := nResult             // and it's the Minimum Number
+      nResult := nHold1 % nHold2     // Get the Remainder
+      nHold1  := nHold2              // Which Makes a New Maximum Number
+      nHold2  := nResult             // and it's the Minimum Number
 
       UNTIL nResult <= 0
 
       nResult := nHold1                 // Maximum Number Should Be the Answer
 
    ENDIF                                // nNumber1 == 0 or nNumber2 == 0
-   RETURN (nResult)                     // FT_GCD
+
+   RETURN ( nResult )                     // FT_GCD

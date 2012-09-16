@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: AAvg.Prg
  * Author....: David Husnian
  * CIS ID....: ?
@@ -60,23 +63,22 @@
 #define IS_NOT_ARRAY(x)              (VALTYPE(x) != "A")
 
 #command    DEFAULT <Param1> TO <Def1> [, <ParamN> TO <DefN> ] ;
-            => ;
-            <Param1> := IF(<Param1> == NIL,<Def1>,<Param1>) ;
-         [; <ParamN> := IF(<ParamN> == NIL,<DefN>,<ParamN>)]
-
-
+      => ;
+      < Param1 > := IF( < Param1 > == NIL, < Def1 > , < Param1 > ) ;
+      [; <ParamN> := IF(<ParamN> == NIL,<DefN>,<ParamN>)]
          
-FUNCTION FT_AAVG(aArray, nStartIndex, nEndIndex)
+FUNCTION FT_AAVG( aArray, nStartIndex, nEndIndex )
 
    DEFAULT nStartIndex TO 1, ;
-           nEndIndex   TO LEN(aArray)
+      nEndIndex   TO Len( aArray )
 
-   // Make Sure Bounds are in Range
+// Make Sure Bounds are in Range
 
-   FORCE_BETWEEN(1, nEndIndex,   LEN(aArray))
-   FORCE_BETWEEN(1, nStartIndex, nEndIndex)
+   FORCE_BETWEEN( 1, nEndIndex,   Len( aArray ) )
+   FORCE_BETWEEN( 1, nStartIndex, nEndIndex )
 
-   RETURN (IF(IS_NOT_ARRAY(aArray) .OR. LEN(aArray) == 0, ;
-              0, ;
-              FT_ASUM(aArray, nStartIndex, nEndIndex) / ;
-                 (nEndIndex - nStartIndex + 1)))
+   RETURN ( IF( IS_NOT_ARRAY(aArray ) .OR. Len(aArray ) == 0, ;
+      0, ;
+      FT_ASUM( aArray, nStartIndex, nEndIndex ) / ;
+      ( nEndIndex - nStartIndex + 1 ) ) )
+

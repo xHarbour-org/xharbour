@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: BYTEOR.PRG
  * Author....: Forest Belt, Computer Diagnostic Services, Inc.
  * CIS ID....: ?
@@ -59,20 +62,20 @@
  *  $END$
  */
 
-FUNCTION FT_BYTEOR(cByte1, cByte2)
+FUNCTION FT_BYTEOR( cByte1, cByte2 )
 
-  LOCAL nCounter, cNewByte
+   LOCAL nCounter, cNewByte
 
-  IF valtype(cByte1) != "C" .or. valtype(cByte2) != "C" // parameter check
-     cNewByte := NIL
-  ELSE
-     cNewByte := chr(0)
-     for nCounter := 0 to 7           // test each bit position
-        if FT_ISBIT(cByte1, nCounter) .or. FT_ISBIT(cByte2, nCounter)
-           cNewByte := FT_BITSET(cNewByte, nCounter)
-        endif
-     next
-  ENDIF
+   IF ValType( cByte1 ) != "C" .OR. ValType( cByte2 ) != "C" // parameter check
+      cNewByte := NIL
+   ELSE
+      cNewByte := Chr( 0 )
+      FOR nCounter := 0 TO 7           // test each bit position
+         IF FT_ISBIT( cByte1, nCounter ) .OR. FT_ISBIT( cByte2, nCounter )
+            cNewByte := FT_BITSET( cNewByte, nCounter )
+         ENDIF
+      NEXT
+   ENDIF
 
-RETURN cNewByte
+   RETURN cNewByte
 

@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: MENUTO.PRG
  * Author....: Ted Means
  * CIS ID....: 73067,3332

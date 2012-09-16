@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: DFILE.PRG
  * Author....: Mike Taylor
  * CIS ID....: ?
@@ -25,35 +28,35 @@
 
 
 
-static nHandle := 0
+STATIC nHandle := 0
 
 #ifdef FT_TEST
 
-    FUNCTION MAIN()
+FUNCTION MAIN()
 
-    @ 0,0 CLEAR
+   @ 0, 0 CLEAR
 
-    cInFile   := "FT_DFILE.PRG"
-    CKEY      := ""
-    NNCOLOR   := 7
-    NHCOLOR   := 15
-    NCOLSKIP  := 5
-    NRMARGIN  := 132
-    CEXITKEYS := "AABBC       "
-    LBROWSE   := .F.
-    NSTART    := 1
-    NBUFFSIZE := 4096
+   cInFile   := "FT_DFILE.PRG"
+   CKEY      := ""
+   NNCOLOR   := 7
+   NHCOLOR   := 15
+   NCOLSKIP  := 5
+   NRMARGIN  := 132
+   CEXITKEYS := "AABBC       "
+   LBROWSE   := .F.
+   NSTART    := 1
+   NBUFFSIZE := 4096
 
-    @ 0,0  SAY "ENTER FILENAME: "   GET CINFILE
-    @ 1,0  SAY "    FOREGROUND: "   GET NNCOLOR   PICTURE "999"
-    @ 2,0  SAY "     HIGHLIGHT: "   GET NHCOLOR   PICTURE "999"
-    @ 3,0  SAY "     EXIT KEYS: "   GET CEXITKEYS
-    @ 4,0  SAY "   BUFFER SIZE: "   GET NBUFFSIZE PICTURE "9999"
-    @ 1,40 SAY "COLUMN INCREMENT: " GET NCOLSKIP  PICTURE "999"
-    @ 2,40 SAY "   MAX LINE SIZE: " GET NRMARGIN  PICTURE "999"
-    @ 3,40 SAY "     BROWSE MODE? " GET LBROWSE   PICTURE "Y"
+   @ 0, 0  SAY "ENTER FILENAME: "   GET CINFILE
+   @ 1, 0  SAY "    FOREGROUND: "   GET NNCOLOR   PICTURE "999"
+   @ 2, 0  SAY "     HIGHLIGHT: "   GET NHCOLOR   PICTURE "999"
+   @ 3, 0  SAY "     EXIT KEYS: "   GET CEXITKEYS
+   @ 4, 0  SAY "   BUFFER SIZE: "   GET NBUFFSIZE PICTURE "9999"
+   @ 1, 40 SAY "COLUMN INCREMENT: " GET NCOLSKIP  PICTURE "999"
+   @ 2, 40 SAY "   MAX LINE SIZE: " GET NRMARGIN  PICTURE "999"
+   @ 3, 40 SAY "     BROWSE MODE? " GET LBROWSE   PICTURE "Y"
 
-    READ
+   READ
 
     /*
      * REMEMBER A WINDOW WILL BE ONE SIZE LESS AND GREATER THAN THE PASSED COORD.'S
@@ -63,19 +66,19 @@ static nHandle := 0
      *
      */
 
-    @ 4,9 TO 11,71
+   @ 4, 9 TO 11, 71
 
-    FT_DFSETUP(cInFile, 5, 10, 10, 70, nStart,;
-               nNColor, nHColor, cExitKeys + CHR(143),;
-               lBrowse, nColSkip, nRMargin, nBuffSize)
+   FT_DFSETUP( cInFile, 5, 10, 10, 70, nStart, ;
+      nNColor, nHColor, cExitKeys + Chr( 143 ), ;
+      lBrowse, nColSkip, nRMargin, nBuffSize )
 
-    cKey := FT_DISPFILE()
+   cKey := FT_DISPFILE()
 
-    FT_DFCLOSE()
+   FT_DFCLOSE()
 
-    @ 20,0 SAY "Key pressed was: " + '[' + cKey + ']'
+   @ 20, 0 SAY "Key pressed was: " + '[' + cKey + ']'
 
-    return (NIL)
+   RETURN ( NIL )
 
 #endif
 
@@ -135,48 +138,46 @@ static nHandle := 0
  *  $END$
  */
 
+FUNCTION FT_DFSETUP( cInFile, nTop, nLeft, nBottom, nRight, ;
+      nStart, nCNormal, nCHighlight, cExitKeys, ;
+      lBrowse, nColSkip, nRMargin, nBuffSize )
 
+   LOCAL rval := 0
 
-function FT_DFSETUP(cInFile, nTop, nLeft, nBottom, nRight,;
-                    nStart, nCNormal, nCHighlight, cExitKeys,;
-                    lBrowse, nColSkip, nRMargin, nBuffSize )
+   IF File( cInFile )
+      nTop    := if( ValType( nTop )    == "N", nTop,           0 )
+      nLeft   := if( ValType( nLeft )   == "N", nLeft,          0 )
+      nBottom := if( ValType( nBottom ) == "N", nBottom, MaxRow() )
+      nRight  := if( ValType( nRight )  == "N", nRight,  MaxCol() )
 
-  local rval := 0
+      nCNormal     := if( ValType( nCNormal )    == "N", nCNormal,     7 )
+      nCHighlight := if( ValType( nCHighlight ) == "N", nCHighlight, 15 )
 
-  if File(cInFile)
-     nTop    := if(ValType(nTop)    == "N", nTop,           0)
-     nLeft   := if(ValType(nLeft)   == "N", nLeft,          0)
-     nBottom := if(ValType(nBottom) == "N", nBottom, MaxRow())
-     nRight  := if(ValType(nRight)  == "N", nRight,  MaxCol())
+      nStart    := if( ValType( nStart )    == "N", nStart,      1 )
+      nColSkip  := if( ValType( nColSkip )  == "N", nColSkip,    1 )
+      lBrowse   := if( ValType( lBrowse )   == "L", lBrowse,   .F. )
 
-     nCNormal     := if(ValType(nCNormal)    == "N", nCNormal,     7)
-     nCHighlight := if(ValType(nCHighlight) == "N", nCHighlight, 15)
+      nRMargin  := if( ValType( nRMargin )  == "N", nRMargin,   255 )
+      nBuffSize := if( ValType( nBuffSize ) == "N", nBuffSize, 4096 )
 
-     nStart    := if(ValType(nStart)    == "N", nStart,      1)
-     nColSkip  := if(ValType(nColSkip)  == "N", nColSkip,    1)
-     lBrowse   := if(ValType(lBrowse)   == "L", lBrowse,   .F.)
+      cExitKeys := if( ValType( cExitKeys ) == "C", cExitKeys,  "" )
 
-     nRMargin  := if(ValType(nRMargin)  == "N", nRMargin,   255)
-     nBuffSize := if(ValType(nBuffSize) == "N", nBuffSize, 4096)
+      cExitKeys := if( Len( cExitKeys ) > 25, SubStr( cExitKeys, 1, 25 ), cExitKeys )
 
-     cExitKeys := if(ValType(cExitKeys) == "C", cExitKeys,  "")
+      nHandle := FOpen( cInFile )
 
-     cExitKeys := if(Len(cExitKeys) > 25, SubStr(cExitKeys, 1, 25), cExitKeys)
+      rval := FError()
 
-     nHandle := FOpen(cInFile)
+      IF ( rval == 0 )
+         rval := _FT_DFINIT( nHandle, nTop, nLeft, nBottom, nRight, ;
+            nStart, nCNormal, nCHighlight, cExitKeys, ;
+            lBrowse, nColSkip, nRMargin, nBuffSize )
+      ENDIF
+   ELSE
+      rval := 2       // simulate a file-not-found DOS file error
+   ENDIF
 
-     rval := FError()
-
-     if ( rval == 0 )
-           rval := _FT_DFINIT(nHandle, nTop, nLeft, nBottom, nRight,;
-                              nStart, nCNormal, nCHighlight, cExitKeys,;
-                              lBrowse, nColSkip, nRMargin, nBuffSize)
-     endif
-  else
-     rval := 2       // simulate a file-not-found DOS file error
-  endif
-
-return (rval)
+   RETURN ( rval )
 
 
 
@@ -211,17 +212,15 @@ return (rval)
  *  $END$
  */
 
+FUNCTION FT_DFCLOSE()
 
+   IF ( nHandle > 0 )
+      _FT_DFCLOS()
 
+      FClose( nHandle )
 
-function FT_DFCLOSE()
+      nHandle := 0
+   ENDIF
 
-  if ( nHandle > 0 )
-     _FT_DFCLOS()
+   RETURN ( NIL )
 
-     FClose(nHandle)
-
-     nHandle := 0
-  endif
-
-  return (NIL)

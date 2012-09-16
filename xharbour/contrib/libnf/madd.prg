@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: MADD.PRG
  * Author....: Jo W. French dba Practical Computing
  * CIS ID....: 74731,1751
@@ -70,33 +73,34 @@
  *  $END$
 */
 
-FUNCTION FT_MADD( dGivenDate, nAddMonths, lMakeEOM)
-  LOCAL nAdjDay, dTemp, i
+FUNCTION FT_MADD( dGivenDate, nAddMonths, lMakeEOM )
 
-  IF(VALTYPE(dGivenDate) != 'D', dGivenDate := DATE(), )
-  IF(VALTYPE(nAddMonths) != 'N', nAddMonths := 0, )
-  IF(VALTYPE(lMakeEOM)   != 'L', lMakeEom := .F., )
+   LOCAL nAdjDay, dTemp, i
 
-  nAdjDay := DAY( dGivenDate ) - 1
+   IF( ValType( dGivenDate ) != 'D', dGivenDate := Date(), )
+      IF( ValType( nAddMonths ) != 'N', nAddMonths := 0, )
+         IF( ValType( lMakeEOM )   != 'L', lMakeEom := .F. , )
 
-  /* If givendate is end of month and lMakeEom, then force EOM.*/
+            nAdjDay := Day( dGivenDate ) - 1
 
-  lMakeEom := ( lMakeEom .AND. dGivenDate ==  dGivenDate - nAdjDay + 31 - ;
-                DAY( dGivenDate - nAdjDay + 31 ) )
+            /* If givendate is end of month and lMakeEom, then force EOM.*/
 
-  dTemp := dGivenDate - nAdjDay     // first of month
+            lMakeEom := ( lMakeEom .AND. dGivenDate ==  dGivenDate - nAdjDay + 31 - ;
+               Day( dGivenDate - nAdjDay + 31 ) )
 
-  /* Work with 1st of months.*/
-  FOR i := 1 TO ABS(nAddMonths)
-      dTemp += IF( nAddMonths > 0, 31, -1 )
-      dTemp += 1 - DAY( dTemp )
-  NEXT
+            dTemp := dGivenDate - nAdjDay     // first of month
 
-  IF lMakeEom
-     dTemp += 31 - DAY( dTemp + 31 )
-  ELSE
-     dTemp := MIN( (dTemp + nAdjday), (dTemp += 31 - DAY( dTemp + 31 )))
-  ENDIF
+            /* Work with 1st of months.*/
+            FOR i := 1 TO Abs( nAddMonths )
+               dTemp += IF( nAddMonths > 0, 31, - 1 )
+               dTemp += 1 - Day( dTemp )
+            NEXT
 
-RETURN dTemp
+            IF lMakeEom
+               dTemp += 31 - Day( dTemp + 31 )
+            ELSE
+               dTemp := Min( ( dTemp + nAdjday ), ( dTemp += 31 - Day( dTemp + 31 ) ) )
+            ENDIF
+
+            RETURN dTemp
 

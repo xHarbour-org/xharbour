@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: CntrySet.Prg
  * Author....: David Husnian
  * CIS ID....: ?
@@ -54,13 +57,15 @@
 
 #define IS_LOGICAL(x)                (VALTYPE(x) == "L")
 
-FUNCTION FT_SETCENTURY(lNewSetState)
-                                        // Note that if CENTURY is ON then
-                                        // DTOC() Will Return a String of Length
-                                        // 10, Otherwise it Will be of Length 8
-   LOCAL lOldSetState := (LEN(DTOC(DATE())) == 10)
+FUNCTION FT_SETCENTURY( lNewSetState )
 
-   IF (IS_LOGICAL(lNewSetState))        // Did They Want it Set??
-      SET CENTURY (lNewSetState)        // Yes, Set it
+// Note that if CENTURY is ON then
+// DTOC() Will Return a String of Length
+// 10, Otherwise it Will be of Length 8
+   LOCAL lOldSetState := ( Len( DToC(Date() ) ) == 10 )
+
+   IF ( IS_LOGICAL( lNewSetState ) )        // Did They Want it Set??
+      SET CENTURY ( lNewSetState )        // Yes, Set it
    ENDIF                                // IS_LOGICAL(lNewSetState)
-   RETURN (lOldSetState)                // FT_SetCentury
+
+   RETURN ( lOldSetState )                // FT_SetCentury

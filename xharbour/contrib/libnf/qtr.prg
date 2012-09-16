@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: QTR.PRG
  * Author....: Jo W. French dba Practical Computing
  * CIS ID....: 74731,1751
@@ -81,30 +84,31 @@
  *  $END$
 */
 
-FUNCTION FT_QTR(dGivenDate,nQtrNum)
-LOCAL lIsQtr, nTemp, aRetVal
+FUNCTION FT_QTR( dGivenDate, nQtrNum )
 
-  IF !(VALTYPE(dGivenDate) $ 'ND')
-     dGivenDate := DATE()
-  ELSEIF VALTYPE(dGivenDate) == 'N'
-     nQtrNum    := dGivenDate
-     dGivenDate := DATE()
-  ENDIF
+   LOCAL lIsQtr, nTemp, aRetVal
 
-  aRetval := FT_YEAR(dGivenDate)
+   IF !( ValType( dGivenDate ) $ 'ND' )
+      dGivenDate := Date()
+   ELSEIF ValType( dGivenDate ) == 'N'
+      nQtrNum    := dGivenDate
+      dGivenDate := Date()
+   ENDIF
 
-  lIsQtr  := ( VALTYPE(nQtrNum) == 'N' )
-  IF lIsQtr
-     IF( nQtrNum < 1 .OR. nQtrNum > 4, nQtrNum := 4, )
-     dGivenDate := FT_MADD(aRetVal[2], 3*(nQtrNum - 1) )
-  ENDIF
+   aRetval := FT_YEAR( dGivenDate )
 
-  nTemp := MONTH( dGivenDate ) - MONTH( aRetVal[2] )
-  nTemp += IF( nTemp >= 0, 1, 13 )
-  nTemp := INT( (nTemp - 1) / 3 )
+   lIsQtr  := ( ValType( nQtrNum ) == 'N' )
+   IF lIsQtr
+      IF( nQtrNum < 1 .OR. nQtrNum > 4, nQtrNum := 4, )
+         dGivenDate := FT_MADD( aRetVal[2], 3 * ( nQtrNum - 1 ) )
+      ENDIF
 
-  aRetVal[1] += PADL(LTRIM(STR( nTemp + 1, 2)), 2, '0')
-  aRetVal[2] := FT_MADD( aRetVal[2], nTemp * 3 )
-  aRetVal[3] := FT_MADD( aRetVal[2], 3 ) - 1
+      nTemp := Month( dGivenDate ) - Month( aRetVal[2] )
+      nTemp += IF( nTemp >= 0, 1, 13 )
+      nTemp := Int( ( nTemp - 1 ) / 3 )
 
-RETURN aRetVal
+      aRetVal[1] += PadL( LTrim( Str( nTemp + 1, 2 ) ), 2, '0' )
+      aRetVal[2] := FT_MADD( aRetVal[2], nTemp * 3 )
+      aRetVal[3] := FT_MADD( aRetVal[2], 3 ) - 1
+
+      RETURN aRetVal

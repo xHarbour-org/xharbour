@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: SaveSets.Prg
  * Author....: David Husnian
  * CIS ID....: ?
@@ -54,26 +57,31 @@
 
 #include "set.ch"
 
-#Define FT_EXTRA_SETS    2
-#DEFINE FT_SET_CENTURY   _SET_COUNT + 1
-#DEFINE FT_SET_BLINK     _SET_COUNT + 2
+#define FT_EXTRA_SETS    2
+#define FT_SET_CENTURY   _SET_COUNT + 1
+#define FT_SET_BLINK     _SET_COUNT + 2
 
-#IFDEF FT_TEST
-  FUNCTION MAIN
-     LOCAL ASETS := FT_SAVESETS()
-     INKEY(0)
-     RETURN Nil
+#ifdef FT_TEST
+
+FUNCTION MAIN
+
+   LOCAL ASETS := FT_SAVESETS()
+
+   Inkey( 0 )
+
+   RETURN Nil
+
 #endif
 
 FUNCTION  FT_SAVESETS()
 
-   LOCAL aOldSets := ARRAY(_SET_COUNT + FT_EXTRA_SETS)
+   LOCAL aOldSets := Array( _SET_COUNT + FT_EXTRA_SETS )
 
-   AEVAL(aOldSets, ;
-         { | , nElementNo | ;
-           aOldSets[nElementNo] := SET(nElementNo) } )
+   AEval( aOldSets, ;
+      { | , nElementNo | ;
+      aOldSets[nElementNo] := Set( nElementNo ) } )
 
    aOldSets[FT_SET_CENTURY] := FT_SETCENTURY()
-   aOldSets[FT_SET_BLINK]   := SETBLINK()
+   aOldSets[FT_SET_BLINK]   := SetBlink()
 
-   RETURN (aOldSets)                    // FT_SaveSets
+   RETURN ( aOldSets )                    // FT_SaveSets

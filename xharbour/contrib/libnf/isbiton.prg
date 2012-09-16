@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: ISBITON.PRG
  * Author....: Ted Means
  * CIS ID....: 73067,3332
@@ -55,12 +58,12 @@
  *  $END$
  */
 
+FUNCTION FT_ISBITON( nWord, nBit )
 
-function FT_ISBITON( nWord, nBit )
+   nWord := iif( nWord < 0, nWord + 65536, nWord )
+   nWord := Int( nWord * ( 2 ^ (15 - nBit ) ) )
+   nWord := Int( nWord % 65536 )
+   nWord := Int( nWord / 32768 )
 
-  nWord := iif(nWord < 0, nWord + 65536, nWord)
-  nWord := int(nWord * (2 ^ (15 - nBit)))
-  nWord := int(nWord % 65536)
-  nWord := int(nWord / 32768)
+   RETURN ( nWord == 1 )
 
-  return (nWord == 1)

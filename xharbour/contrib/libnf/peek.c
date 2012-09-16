@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: PEEK.C
  * Author....: Ted Means
  * CIS ID....: 73067,3332
@@ -61,30 +64,32 @@
 #define FP_SEG( fp ) ( *( ( unsigned int * ) &( fp ) + 1 ) )
 #define FP_OFF( fp ) ( *( ( unsigned int * ) &( fp ) ) )
 
-HB_FUNC(FT_PEEK)
+HB_FUNC( FT_PEEK )
 {
-   auto unsigned int ProtMode = cpmiIsProtected();
+   auto unsigned int    ProtMode = cpmiIsProtected();
    auto unsigned char * bytePtr;
 
-   if ( ( PCOUNT >= 2 ) && ( ISNUM( 1 ) ) && ( ISNUM( 2 ) ) )
+   if( ( PCOUNT >= 2 ) && ( ISNUM( 1 ) ) && ( ISNUM( 2 ) ) )
    {
       FP_SEG( bytePtr ) = _parni( 1 );
       FP_OFF( bytePtr ) = _parni( 2 );
 
-      if ( ProtMode )
+      if( ProtMode )
       {
          FP_SEG( bytePtr ) = hb_cpmiProtectedPtr( bytePtr, 1 );
          FP_OFF( bytePtr ) = 0;
 
-         if ( FP_SEG( bytePtr ) == 0 ) goto Bogus;
+         if( FP_SEG( bytePtr ) == 0 )
+            goto Bogus;
       }
 
       _retni( ( int ) *bytePtr );
 
-      if ( ProtMode ) hb_cpmiFreeSelector( FP_SEG( bytePtr ) );
+      if( ProtMode )
+         hb_cpmiFreeSelector( FP_SEG( bytePtr ) );
    }
    else
-      Bogus: _retni( -1 );
+ Bogus: _retni( -1 );
 
    return;
 }

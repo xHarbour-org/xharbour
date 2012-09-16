@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: VIDCUR.PRG
  * Author....: Glenn Scott
  * CIS ID....: 71620,1521
@@ -63,21 +66,21 @@
  *  $END$
  */
 
-
 FUNCTION FT_SETVCUR( nPage, nRow, nCol )
-  LOCAL aRegs[ INT86_MAX_REGS ]
 
-  nPage := iif( nPage == nil, FT_GETVPG()  , nPage )
-  nRow  := iif( nRow  == nil, 0            , nRow  )
-  nCol  := iif( nCol  == nil, 0            , nCol  )
+   LOCAL aRegs[ INT86_MAX_REGS ]
 
-  aRegs[ AX ] := MAKEHI(  2    )
-  aRegs[ BX ] := MAKEHI( nPage )
-  aRegs[ DX ] := MAKEHI( nRow  ) + nCol
+   nPage := iif( nPage == nil, FT_GETVPG()  , nPage )
+   nRow  := iif( nRow  == nil, 0            , nRow  )
+   nCol  := iif( nCol  == nil, 0            , nCol  )
 
-  FT_INT86( VIDEO, aRegs )
+   aRegs[ AX ] := MAKEHI(  2    )
+   aRegs[ BX ] := MAKEHI( nPage )
+   aRegs[ DX ] := MAKEHI( nRow  ) + nCol
 
-RETURN ( NIL )
+   FT_INT86( VIDEO, aRegs )
+
+   RETURN ( NIL )
 
 
 
@@ -124,14 +127,14 @@ RETURN ( NIL )
  *  $END$
  */
 
-
 FUNCTION FT_GETVCUR( nPage )
-  LOCAL aRegs[ INT86_MAX_REGS ]
 
-  nPage := iif( nPage == nil, FT_GETVPG(), nPage )
-  aRegs[ AX ] := MAKEHI( 3     )
-  aRegs[ BX ] := MAKEHI( nPage )
-  FT_INT86( VIDEO, aRegs )
+   LOCAL aRegs[ INT86_MAX_REGS ]
 
-RETURN ( { HIGHBYTE( aRegs[CX] ), LOWBYTE( aRegs[CX] ), HIGHBYTE( aRegs[DX] ), LOWBYTE( aRegs[DX] ) } )
+   nPage := iif( nPage == nil, FT_GETVPG(), nPage )
+   aRegs[ AX ] := MAKEHI( 3     )
+   aRegs[ BX ] := MAKEHI( nPage )
+   FT_INT86( VIDEO, aRegs )
+
+   RETURN ( { HIGHBYTE( aRegs[CX] ), LOWBYTE( aRegs[CX] ), HIGHBYTE( aRegs[DX] ), LOWBYTE( aRegs[DX] ) } )
 

@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: DAYTOBOW.PRG
  * Author....: Jo W. French dba Practical Computing
  * CIS_ID....: 74731,1751
@@ -62,14 +65,14 @@
 
 FUNCTION FT_DAYTOBOW( dGivenDate )
 
-  LOCAL nRetVal, nDOW_Start
+   LOCAL nRetVal, nDOW_Start
 
-  nDOW_Start := FT_DATECNFG()[2]
+   nDOW_Start := FT_DATECNFG()[2]
 
-  IF(VALTYPE(dGivenDate) != 'D', dGivenDate := DATE(), )
+   IF( ValType( dGivenDate ) != 'D', dGivenDate := Date(), )
 
-  nRetVal := DOW( dGivenDate ) - nDOW_Start
-  IF( nRetVal < 0, nRetVal += 7, )
+      nRetVal := DOW( dGivenDate ) - nDOW_Start
+      IF( nRetVal < 0, nRetVal += 7, )
 
-RETURN nRetVal
+         RETURN nRetVal
 

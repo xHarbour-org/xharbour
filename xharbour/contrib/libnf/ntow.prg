@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: NTOW.PRG
  * Author....: Gary Baren
  * CIS ID....: 75470,1027
@@ -47,88 +50,93 @@
  *      Also, numeric 0 is returned as a null string.  You will need to
  *      make a decision how to output it (zero dollars, no dollars, etc).
  *  $EXAMPLES$
- *		? FT_NTOW( 999 )		-> Nine Hundred Ninety Nine
+ *  ? FT_NTOW( 999 )  -> Nine Hundred Ninety Nine
  *
- *		? FT_NTOW( 1000 )		-> One Thousand
+ *  ? FT_NTOW( 1000 )  -> One Thousand
  *
- *		? FT_NTOW( 23 ) + " Dollars and " + FT_NTOW( 99 ) + " Cents"
- *			-> Twenty Three Dollars and Ninety Nine Cents
+ *  ? FT_NTOW( 23 ) + " Dollars and " + FT_NTOW( 99 ) + " Cents"
+ *   -> Twenty Three Dollars and Ninety Nine Cents
  *
- *		? FT_NTOW( 23 ) + " Dollars and " + "99/100"
- *			-> Twenty Three Dollars and 99/100
+ *  ? FT_NTOW( 23 ) + " Dollars and " + "99/100"
+ *   -> Twenty Three Dollars and 99/100
  *
  *    x      := -23.99
  *    cents  := str( (x - int( x )) * 100, 2, 0 ) + "/100"
- *		x      := int( x )
+ *  x      := int( x )
  *    string := iif( x < 0, "Credit of ", "Debit of " )
- *		? string + FT_NTOW( abs(x) ) + " Dollars and " + "99/100"
- *		     -> Credit of Twenty Three Dollars and 99/100
+ *  ? string + FT_NTOW( abs(x) ) + " Dollars and " + "99/100"
+ *       -> Credit of Twenty Three Dollars and 99/100
  *  $END$
  */
 
 
 
-static ones  := { "",     " One",   " Two",   " Three", " Four", " Five",  ;
-                  " Six", " Seven", " Eight", " Nine"                      ;
-                }
+STATIC ones  := { "",     " One",   " Two",   " Three", " Four", " Five",  ;
+      " Six", " Seven", " Eight", " Nine"                      ;
+      }
 
-static teens := { " Ten",      " Eleven",    " Twelve",   ;
-                  " Thirteen", " Fourteen",  " Fifteen",  ;
-                  " Sixteen",  " Seventeen", " Eighteen", ;
-                  " Nineteen"                             ;
-                }
+STATIC teens := { " Ten",      " Eleven",    " Twelve",   ;
+      " Thirteen", " Fourteen",  " Fifteen",  ;
+      " Sixteen",  " Seventeen", " Eighteen", ;
+      " Nineteen"                             ;
+      }
 
-static tens  :=  { "", "", " Twenty", " Thirty", " Forty", " Fifty", ;
-                   " Sixty", " Seventy", " Eighty", " Ninety"  }
+STATIC tens  :=  { "", "", " Twenty", " Thirty", " Forty", " Fifty", ;
+      " Sixty", " Seventy", " Eighty", " Ninety"  }
 
-static qualifiers := { "", " Thousand", " Million", " Billion", " Trillion" }
+STATIC qualifiers := { "", " Thousand", " Million", " Billion", " Trillion" }
 
 
 #ifdef FT_TEST
-  function main( cNum )
-     return qout( ft_ntow( val( cNum ) ) )
+
+FUNCTION main( cNum )
+
+   RETURN QOut( ft_ntow( Val( cNum ) ) )
+
 #endif
 
+FUNCTION ft_ntow( nAmount )
 
+   LOCAL nTemp, sResult := " ", nQualNo
+   LOCAL nDiv := 10 ^ ( Int( sol10(nAmount ) / 3 ) * 3 )
 
-function ft_ntow(nAmount)
-  local nTemp, sResult := " ", nQualNo
-  local nDiv := 10 ^ ( int( sol10(nAmount) / 3 ) * 3 )
+   nTemp   := Int( nAmount % nDiv )
+   nAmount := Int( nAmount / nDiv )
+   nQualNo := Int( sol10( nDiv ) / 3 ) + 1
+   sResult += grp_to_words( nAmount, qualifiers[ nQualNo ] )
 
-  nTemp   := int(nAmount % nDiv)
-  nAmount := int(nAmount / nDiv)
-  nQualNo := int( sol10( nDiv ) / 3 ) + 1
-  sResult += grp_to_words(nAmount, qualifiers[ nQualNo ] )
+   IF nTemp > ( nDiv /= 1000 ) .AND. ( nDiv > 1 )
+      sResult += ft_ntow( nTemp, nDiv )
+   ELSE
+      sResult += grp_to_words( nTemp, "" )
+   ENDIF
 
-  if nTemp > (nDiv /= 1000) .and. (nDiv > 1)
-     sResult += ft_ntow( nTemp, nDiv )
-  else
-	   sResult += grp_to_words(nTemp, "")
-  endif
-  return( ltrim(sResult) )
+   RETURN( LTrim( sResult ) )
 
+STATIC FUNCTION grp_to_words( nGrp, sQual )
 
-static function grp_to_words(nGrp, sQual)
-  local sResult := "", nTemp
+   LOCAL sResult := "", nTemp
 
-  nTemp   := int(nGrp % 100)
-  nGrp    := int(nGrp / 100)
-  sResult += ones[ nGrp + 1 ] + iif( nGrp > 0, " Hundred", "")
+   nTemp   := Int( nGrp % 100 )
+   nGrp    := Int( nGrp / 100 )
+   sResult += ones[ nGrp + 1 ] + iif( nGrp > 0, " Hundred", "" )
 
-  do case
-	   case nTemp > 19
-		   sResult += tens[ int( nTemp / 10 ) + 1 ]
-  		sResult += ones[ int( nTemp % 10 ) + 1 ]
-     case nTemp < 20 .and. nTemp > 9
-		   sResult += teens[ int( nTemp % 10 ) + 1 ]
-     case nTemp < 10 .and. nTemp > 0
-		   sResult += ones[ int( nTemp) + 1 ]
-  endcase
-  return(sResult + sQual)
+   DO CASE
+   CASE nTemp > 19
+      sResult += tens[ int( nTemp / 10 ) + 1 ]
+      sResult += ones[ int( nTemp % 10 ) + 1 ]
+   CASE nTemp < 20 .AND. nTemp > 9
+      sResult += teens[ int( nTemp % 10 ) + 1 ]
+   CASE nTemp < 10 .AND. nTemp > 0
+      sResult += ones[ int( nTemp) + 1 ]
+   ENDCASE
 
+   RETURN( sResult + sQual )
 
-static function sol10( nNumber )
-  local sTemp
+STATIC FUNCTION sol10( nNumber )
 
-  sTemp := ltrim( str( int(nNumber), 0) )
-  return( len(sTemp) - 1 )
+   LOCAL sTemp
+
+   sTemp := LTrim( Str( Int(nNumber ), 0 ) )
+
+   RETURN( Len( sTemp ) - 1 )

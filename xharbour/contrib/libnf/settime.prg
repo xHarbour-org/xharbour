@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: SETTIME.PRG
  * Author....: Glenn Scott
  * CIS ID....: 71620,1521
@@ -75,24 +78,29 @@
 #define MINS( ts )  ( val( substr( ts, 4, 2 ) ) )
 
 #ifdef FT_TEST
-  FUNCTION MAIN( cTime )
-    cTime := iif( cTime == nil, time(), cTime )
-    QOut( "Setting time to: " + cTime  + "... " )
-    FT_SETTIME( cTime )
-    Qout( "Time is now: " + time() )
-  return ( nil )
+
+FUNCTION MAIN( cTime )
+
+   cTime := iif( cTime == nil, Time(), cTime )
+   QOut( "Setting time to: " + cTime  + "... " )
+   FT_SETTIME( cTime )
+   QOut( "Time is now: " + Time() )
+
+   RETURN ( nil )
+
 #endif
 
-function FT_SETTIME( cTime )
-  local aRegs[ INT86_MAX_REGS ]
+FUNCTION FT_SETTIME( cTime )
 
-  cTime := iif( cTime == nil, time(), cTime )
+   LOCAL aRegs[ INT86_MAX_REGS ]
 
-  //            -------- High Byte ------      ----- Low Byte -------
+   cTime := iif( cTime == nil, Time(), cTime )
 
-  aRegs[ AX ] = SETTIME       * ( 2 ^ 8 )
-  aRegs[ CX ] = HRS( cTime  ) * ( 2 ^ 8 )   +    MINS( cTime )
-  aRegs[ DX ] = SECS( cTime ) * ( 2 ^ 8 )
+//            -------- High Byte ------      ----- Low Byte -------
 
-return( FT_INT86( DOS, aRegs ) )
+   aRegs[ AX ] = SETTIME       * ( 2 ^ 8 )
+   aRegs[ CX ] = HRS( cTime  ) * ( 2 ^ 8 )   +    MINS( cTime )
+   aRegs[ DX ] = Secs( cTime ) * ( 2 ^ 8 )
+
+   RETURN( FT_INT86( DOS, aRegs ) )
 

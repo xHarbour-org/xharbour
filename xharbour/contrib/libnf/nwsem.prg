@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: NWSEM.PRG
  * Author....: Glenn Scott
  * CIS ID....: 71620,1521
@@ -29,7 +32,6 @@
  *
  */
 
-
 // --------------------------------------------------------------
 //    Semaphore Package for Novell NetWare
 // --------------------------------------------------------------
@@ -40,7 +42,7 @@
 #define INT21    33
 
 #xcommand DEFAULT <v1> TO <x1> [, <vN> TO <xN> ];
-      => IIF((<v1>)=NIL,<v1>:=<x1>,NIL) [; IF((<vN>)=NIL,<vN>:=<xN>,NIL)]
+      => iif( ( < v1 > ) = NIL, < v1 > := < x1 > , NIL ) [; IF((<vN>)=NIL,<vN>:=<xN>,NIL)]
 
 #define WAIT_SEMAPHORE    2
 #define SIGNAL_SEMAPHORE  3
@@ -51,50 +53,51 @@
 
 #ifdef FT_TEST
 
-  #define INITIAL_SEMAPHORE_VALUE     2
-  #define WAIT_SECONDS                1
+#define INITIAL_SEMAPHORE_VALUE     2
+#define WAIT_SECONDS                1
 
-  function main()
-     local nInitVal, nRc, nHandle, nValue, nOpenCnt
+FUNCTION main()
 
-     cls
+   LOCAL nInitVal, nRc, nHandle, nValue, nOpenCnt
 
-     nInitVal := INITIAL_SEMAPHORE_VALUE
-     FT_NWSEMOPEN( "TEST", nInitVal, @nHandle, @nOpenCnt )
+   cls
 
-     qout( "Waiting ten seconds..." )
-     nRc := ft_nwSemWait( nHandle, 180 )
-     qout( "Final nRc value = " + STR( nRc ) )
-     inkey(0)
-     if nRc == 254
-        qout("Couldn't get the semaphore.  Try again.")
-        quit
-     end
+   nInitVal := INITIAL_SEMAPHORE_VALUE
+   FT_NWSEMOPEN( "TEST", nInitVal, @nHandle, @nOpenCnt )
 
-     cls
+   QOut( "Waiting ten seconds..." )
+   nRc := ft_nwSemWait( nHandle, 180 )
+   QOut( "Final nRc value = " + Str( nRc ) )
+   Inkey( 0 )
+   IF nRc == 254
+      QOut( "Couldn't get the semaphore.  Try again." )
+      QUIT
+   end
 
-     @ 24, 0 say "Any key to exit"
-     @ 0,  0 say "Handle: " + str( nHandle )
+   cls
 
-     ft_nwSemEx( nHandle, @nValue, @nOpenCnt )
-     while .t.
-        @ 23, 0 say "Semaphore test -> Open at [" + ;
-                    alltrim(str(nOpenCnt))        + ;
-                    "] stations, value is ["      + ;
-                    alltrim(str(nValue)) + "]"
+   @ 24, 0 SAY "Any key to exit"
+   @ 0,  0 SAY "Handle: " + Str( nHandle )
 
-        if inkey( WAIT_SECONDS ) != 0
-           exit
-        endif
+   ft_nwSemEx( nHandle, @nValue, @nOpenCnt )
+   WHILE .T.
+      @ 23, 0 SAY "Semaphore test -> Open at [" + ;
+         AllTrim( Str( nOpenCnt ) )        + ;
+         "] stations, value is ["      + ;
+         AllTrim( Str( nValue ) ) + "]"
 
-        tone( nHandle,.5 )
-        ft_nwSemEx( nHandle, @nValue, @nOpenCnt )
-     end
+      IF Inkey( WAIT_SECONDS ) != 0
+         EXIT
+      ENDIF
 
-     qout( "Signal returns: " + str( ft_nwsemSig( nHandle ) ) )
-     qout( "Close returns:  " + str( ft_nwsemClose( nHandle ) ) )
+      Tone( nHandle, .5 )
+      ft_nwSemEx( nHandle, @nValue, @nOpenCnt )
+   end
 
-  return nil
+   QOut( "Signal returns: " + Str( ft_nwsemSig( nHandle ) ) )
+   QOut( "Close returns:  " + Str( ft_nwsemClose( nHandle ) ) )
+
+   RETURN nil
 
 #endif
 
@@ -191,31 +194,32 @@
  *  $END$
  */
 
-function ft_nwSemOpen( cName, nInitVal, nHandle, nOpenCnt )
-  local aRegs[ INT86_MAX_REGS ], cRequest, nRet
+FUNCTION ft_nwSemOpen( cName, nInitVal, nHandle, nOpenCnt )
 
-  default cName    to "",   ;
-          nInitVal to 0,    ;
-          nHandle  to 0,    ;
-          nOpenCnt to 0
+   LOCAL aRegs[ INT86_MAX_REGS ], cRequest, nRet
+
+   DEFAULT cName    TO "",   ;
+      nInitVal TO 0,    ;
+      nHandle  TO 0,    ;
+      nOpenCnt TO 0
 
 
-  cName    := iif( len( cName ) > 127, substr( cName, 1, 127 ), cName )
-  cRequest := chr( len( cName ) ) + cName
+   cName    := iif( Len( cName ) > 127, SubStr( cName, 1, 127 ), cName )
+   cRequest := Chr( Len( cName ) ) + cName
 
-  aRegs[ AX ]      := makehi( 197 )                       // C5h
-  aRegs[ DS ]      := cRequest
-  aRegs[ DX ]      := REG_DS
-  aRegs[ CX ]      := nInitVal
+   aRegs[ AX ]      := makehi( 197 )                       // C5h
+   aRegs[ DS ]      := cRequest
+   aRegs[ DX ]      := REG_DS
+   aRegs[ CX ]      := nInitVal
 
-  ft_int86( INT21, aRegs )
+   ft_int86( INT21, aRegs )
 
-  nHandle  := bin2l( i2bin( aRegs[CX] ) + i2bin( aRegs[DX] ) )
-  nOpenCnt := lowbyte( aRegs[ BX ] )
+   nHandle  := Bin2L( I2Bin( aRegs[CX] ) + I2Bin( aRegs[DX] ) )
+   nOpenCnt := lowbyte( aRegs[ BX ] )
 
-  nRet := lowbyte( aRegs[AX] )
+   nRet := lowbyte( aRegs[AX] )
 
-  return iif( nRet < 0, nRet + 256, nRet )
+   RETURN iif( nRet < 0, nRet + 256, nRet )
 
 
 
@@ -258,7 +262,7 @@ function ft_nwSemOpen( cName, nInitVal, nHandle, nOpenCnt )
  *    FT_NWSEMOPEN( "Semaphore Test", nInitVal, @nHandle, @nOpenCnt )
  *
  *    nRc := FT_NWSEMWAIT( nHandle )
- *    	IF nRc == 254
+ *     IF nRc == 254
  *       QOUT( "All slots for this resource are currently in use" )
  *       QUIT
  *    ENDIF
@@ -273,32 +277,32 @@ function ft_nwSemOpen( cName, nInitVal, nHandle, nOpenCnt )
  *  $END$
  */
 
+FUNCTION ft_nwSemEx( nHandle, nValue, nOpenCnt )
 
-function ft_nwSemEx( nHandle, nValue, nOpenCnt )
-  local aRegs[ INT86_MAX_REGS ], nRet
+   LOCAL aRegs[ INT86_MAX_REGS ], nRet
 
-  default nHandle  to 0,  ;
-          nValue   to 0,  ;
-          nOpenCnt to 0
+   DEFAULT nHandle  TO 0,  ;
+      nValue   TO 0,  ;
+      nOpenCnt TO 0
 
-  aRegs[ AX ] :=  makehi( 197 ) + 1                         // C5h, 01h
-  aRegs[ CX ] :=  bin2i( substr( l2bin( nHandle ), 1, 2 ) )
-  aRegs[ DX ] :=  bin2i( substr( l2bin( nHandle ), 3, 2 ) )
+   aRegs[ AX ] :=  makehi( 197 ) + 1                         // C5h, 01h
+   aRegs[ CX ] :=  Bin2I( SubStr( L2Bin( nHandle ), 1, 2 ) )
+   aRegs[ DX ] :=  Bin2I( SubStr( L2Bin( nHandle ), 3, 2 ) )
 
-  ft_int86( INT21, aRegs )
+   ft_int86( INT21, aRegs )
 
-  #ifdef FT_TEST
+#ifdef FT_TEST
 
-     @ 5, 1 say highbyte( aregs[CX] )
-     @ 6, 1 say lowbyte( aregs[CX ] )
+   @ 5, 1 SAY highbyte( aregs[CX] )
+   @ 6, 1 SAY lowbyte( aregs[CX ] )
 
-  #endif
+#endif
 
-  nValue   := aRegs[ CX ]
-  nOpenCnt := lowbyte( aRegs[ DX ] )
-  nRet     := lowbyte( aRegs[ AX ] )
+   nValue   := aRegs[ CX ]
+   nOpenCnt := lowbyte( aRegs[ DX ] )
+   nRet     := lowbyte( aRegs[ AX ] )
 
-  return iif( nRet < 0, nRet + 256, nRet )
+   RETURN iif( nRet < 0, nRet + 256, nRet )
 
 
 /*  $DOC$
@@ -339,10 +343,9 @@ function ft_nwSemEx( nHandle, nValue, nOpenCnt )
  *  $END$
  */
 
+FUNCTION ft_nwSemWait( nHandle, nTimeout )
 
-
-function ft_nwSemWait( nHandle, nTimeout )
-  return  _ftnwsem( WAIT_SEMAPHORE, nHandle, nTimeout )
+   RETURN  _ftnwsem( WAIT_SEMAPHORE, nHandle, nTimeout )
 
 
 
@@ -377,9 +380,9 @@ function ft_nwSemWait( nHandle, nTimeout )
  *  $END$
  */
 
+FUNCTION ft_nwSemSig( nHandle )
 
-function ft_nwSemSig( nHandle )
-  return  _ftnwsem( SIGNAL_SEMAPHORE, nHandle )
+   RETURN  _ftnwsem( SIGNAL_SEMAPHORE, nHandle )
 
 
 /*  $DOC$
@@ -410,33 +413,34 @@ function ft_nwSemSig( nHandle )
  *  $END$
  */
 
-function ft_nwSemClose( nHandle )
-  return  _ftnwsem( CLOSE_SEMAPHORE, nHandle )
+FUNCTION ft_nwSemClose( nHandle )
 
+   RETURN  _ftnwsem( CLOSE_SEMAPHORE, nHandle )
 
 // ---------------------------------------------------------
 // _ftnwsem() - internal for the semaphore package
 // ---------------------------------------------------------
 
-static function _ftnwsem( nOp, nHandle, nTimeout )
-  local aRegs[ INT86_MAX_REGS ],;
-        nRet
+STATIC FUNCTION _ftnwsem( nOp, nHandle, nTimeout )
 
-  default nOp      to SIGNAL_SEMAPHORE, ;
-          nHandle  to 0,                ;
-          nTimeout to 0
+   LOCAL aRegs[ INT86_MAX_REGS ], ;
+      nRet
 
-  aRegs[ AX ] :=  makehi( 197 ) + nOp
-  aRegs[ CX ] :=  bin2i( substr( l2bin( nHandle ), 1, 2 ) )
-  aRegs[ DX ] :=  bin2i( substr( l2bin( nHandle ), 3, 2 ) )
-  aRegs[ BP ] :=  nTimeout
+   DEFAULT nOp      TO SIGNAL_SEMAPHORE, ;
+      nHandle  TO 0,                ;
+      nTimeout TO 0
+
+   aRegs[ AX ] :=  makehi( 197 ) + nOp
+   aRegs[ CX ] :=  Bin2I( SubStr( L2Bin( nHandle ), 1, 2 ) )
+   aRegs[ DX ] :=  Bin2I( SubStr( L2Bin( nHandle ), 3, 2 ) )
+   aRegs[ BP ] :=  nTimeout
 
 
-  ft_int86( INT21, aRegs )
-  nRet := lowbyte( aRegs[AX] )
-  nRet := iif( nRet < 0, nRet + 256, nRet )
+   ft_int86( INT21, aRegs )
+   nRet := lowbyte( aRegs[AX] )
+   nRet := iif( nRet < 0, nRet + 256, nRet )
 
-  return nRet
+   RETURN nRet
 
 
 
@@ -504,21 +508,20 @@ static function _ftnwsem( nOp, nHandle, nTimeout )
  *  $END$
  */
 
+FUNCTION ft_nwSemLock( cSemaphore, nHandle )
 
+   LOCAL nRc
+   LOCAL nOpenCnt := 0
 
-function ft_nwSemLock( cSemaphore, nHandle )
-  local nRc
-  local nOpenCnt := 0
+   nRc  := FT_NWSEMOPEN( cSemaphore, 0, @nHandle, @nOpenCnt )
 
-  nRc  := FT_NWSEMOPEN( cSemaphore, 0, @nHandle, @nOpenCnt )
+   IF nRc == 0
+      IF nOpenCnt != 1
+         ft_nwSemClose( nHandle )
+      ENDIF
+   ENDIF
 
-  if nRc == 0
-     if nOpenCnt != 1
-        ft_nwSemClose( nHandle )
-     endif
-  endif
-
-  return ( nOpenCnt == 1 )
+   RETURN ( nOpenCnt == 1 )
 
 
 /*  $DOC$
@@ -562,6 +565,7 @@ function ft_nwSemLock( cSemaphore, nHandle )
  *  $END$
  */
 
+FUNCTION ft_nwSemUnLock( nHandle )
 
-function ft_nwSemUnLock( nHandle )
-  return ( ft_nwSemClose( nHandle ) == 0 )
+   RETURN ( ft_nwSemClose( nHandle ) == 0 )
+

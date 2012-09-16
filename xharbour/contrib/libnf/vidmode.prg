@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: VIDMODE.PRG
  * Author....: Glenn Scott
  * CIS ID....: 71620,1521
@@ -31,11 +34,13 @@
 
 
 #ifdef FT_TEST
-  FUNCTION MAIN( cMode )
 
-     FT_SETMODE( val( cMode ) )
-     QOut( "Video mode is: " + str( FT_GETMODE() ) )
-     return ( nil )
+FUNCTION MAIN( cMode )
+
+   FT_SETMODE( Val( cMode ) )
+   QOut( "Video mode is: " + Str( FT_GETMODE() ) )
+
+   RETURN ( nil )
 
 #endif
 
@@ -70,7 +75,6 @@
  *  $END$
  */
 
-
 FUNCTION FT_SETMODE( nMode )
 /*
   LOCAL aRegs[ INT86_MAX_REGS ]
@@ -78,8 +82,10 @@ FUNCTION FT_SETMODE( nMode )
   aRegs[ AX ] = nMode
   FT_INT86( VIDEO, aRegs )
 */
-_ft_setmode(nMode)
-  RETURN( NIL )
+
+   _ft_setmode( nMode )
+
+   RETURN( NIL )
 
 
 
@@ -112,8 +118,6 @@ _ft_setmode(nMode)
  *  $END$
  */
 
-
-
 FUNCTION FT_GETMODE()
 /*
   LOCAL aRegs[INT86_MAX_REGS]
@@ -123,5 +127,7 @@ FUNCTION FT_GETMODE()
 
   RETURN ( LOWBYTE( aRegs[ AX ] ) )
 */
- RETURN _ft_getmode()  
+
+   RETURN _ft_getmode()
+
 

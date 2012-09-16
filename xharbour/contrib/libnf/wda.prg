@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: WDA.PRG
  * Author....: Eric Splaver
  * CIS ID....: ?
@@ -62,20 +65,26 @@
  */
 
 #ifdef FT_TEST
-  function main( cDate, cDays )
-     local nDays := ft_addWkDy( ctod(cDate), val(cDays) )
-     qout( "Num days to add: " + str( nDays ) )
-     qout( "New date:        " + dtoc( ctod( cDate ) + nDays ) )
-     return nil
+
+FUNCTION main( cDate, cDays )
+
+   LOCAL nDays := ft_addWkDy( CToD( cDate ), Val( cDays ) )
+
+   QOut( "Num days to add: " + Str( nDays ) )
+   QOut( "New date:        " + DToC( CToD( cDate ) + nDays ) )
+
+   RETURN nil
+
 #endif
 
-
 FUNCTION ft_addWkDy( dStart, nDys )
-    LOCAL nDc  := dow( dStart )
-    RETURN ( iif( nDc == 7,                                                        ;
-            (nDys-1)      % 5 + 7 * int( (nDys-1)      / 5 ) + 2,         ;
-            (nDys+nDc-2)  % 5 + 7 * int( (nDys+nDc-2)  / 5 ) + 2  - nDc   ;
-                )                                                                   ;
-            )
+
+   LOCAL nDc  := DOW( dStart )
+
+   RETURN ( iif( nDc == 7,                                                        ;
+      ( nDys - 1 )      % 5 + 7 * Int( ( nDys - 1 )      / 5 ) + 2,         ;
+      ( nDys + nDc - 2 )  % 5 + 7 * Int( ( nDys + nDc - 2 )  / 5 ) + 2  - nDc   ;
+      )                                                                   ;
+      )
 
 

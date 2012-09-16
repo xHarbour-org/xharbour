@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: DOSVER.PRG
  * Author....: Glenn Scott
  * CIS ID....: ?
@@ -63,14 +66,19 @@
 
 
 #ifdef FT_TEST
-  FUNCTION MAIN()
-  QOut( "Dos version: " + FT_DOSVER() )
-  return ( nil )
+
+FUNCTION MAIN()
+
+   QOut( "Dos version: " + FT_DOSVER() )
+
+   RETURN ( nil )
+
 #endif
 
 FUNCTION FT_DOSVER()
-/*  local aRegs[ INT86_MAX_REGS ] */
-  local cResult := ""
+
+   /*  local aRegs[ INT86_MAX_REGS ] */
+   LOCAL cResult := ""
 
 /*  aRegs[ AX ] = MAKEHI( DOSVER )
   if FT_INT86( DOS, aRegs )
@@ -78,6 +86,7 @@ FUNCTION FT_DOSVER()
                 alltrim( str( HIGHBYTE( aRegs[ AX ] ) ) )
   endif
 */
-cResult:= _get_dosver()
-RETURN ( cResult )
+   cResult := _get_dosver()
+
+   RETURN ( cResult )
 

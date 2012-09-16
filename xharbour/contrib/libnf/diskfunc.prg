@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: DISKFUNC.PRG
  * Author....: Robert A. DiFalco
  * CIS ID....: ?
@@ -27,12 +30,14 @@
 #define DRVTABLE "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 #ifdef FT_TEST
-  FUNCTION MAIN( cDrv )
 
-     QOut("Disk size:   " + str( FT_DSKSIZE() ) )
-     QOut("Free bytes:  " + str( FT_DSKFREE() ) )
+FUNCTION MAIN( cDrv )
 
-  return ( nil )
+   QOut( "Disk size:   " + Str( FT_DSKSIZE() ) )
+   QOut( "Free bytes:  " + Str( FT_DSKFREE() ) )
+
+   RETURN ( nil )
+
 #endif
 
 /*  $DOC$
@@ -60,10 +65,12 @@
  */
 
 FUNCTION FT_DSKSIZE( cDrive )
-   local nDrive
-   nDrive := if( cDrive == NIL, 0, at( upper(cDrive), DRVTABLE ) )
 
-Return DISKSPACE(nDrive,3)
+   LOCAL nDrive
+
+   nDrive := if( cDrive == NIL, 0, At( Upper(cDrive ), DRVTABLE ) )
+
+   RETURN DiskSpace( nDrive, 3 )
 
 
 /*  $DOC$
@@ -91,11 +98,12 @@ Return DISKSPACE(nDrive,3)
  *  $END$
  */
 
-
 FUNCTION FT_DSKFREE( cDrive )
-   local nDrive
-   nDrive := if( cDrive == NIL, 0, at( upper(cDrive), DRVTABLE ) )
 
+   LOCAL nDrive
 
-RETURN    DISKSPACE(nDrive,1)
+   nDrive := if( cDrive == NIL, 0, At( Upper(cDrive ), DRVTABLE ) )
+
+   RETURN    DiskSpace( nDrive, 1 )
+
 

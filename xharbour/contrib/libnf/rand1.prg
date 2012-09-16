@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: RAND1.PRG
  * Author....: Gary Baren
  * CIS ID....: 75470,1027
@@ -52,26 +55,28 @@
 
 #ifdef FT_TEST
 
-  // Write 100 random numbers from 1 to 100 to stdout.
-  // Run it multiple times and redirect output to a file
-  // to check it
+// Write 100 random numbers from 1 to 100 to stdout.
+// Run it multiple times and redirect output to a file
+// to check it
 
-  function main()
-     local x
+FUNCTION main()
 
-     for x := 1 to 100
-        outstd( int( ft_rand1(100) ) )
-        outstd( chr(13) + chr(10) )
-     next
-     return nil
+   LOCAL x
+
+   FOR x := 1 TO 100
+      OutStd( Int( ft_rand1(100 ) ) )
+      OutStd( Chr( 13 ) + Chr( 10 ) )
+   NEXT
+
+   RETURN nil
 
 #endif
 
+FUNCTION ft_rand1( nMax )
 
-function ft_rand1(nMax)
-  static nSeed
-  local m := 100000000, b := 31415621
+   STATIC nSeed
+   LOCAL m := 100000000, b := 31415621
 
-  nSeed := iif( nSeed == NIL, seconds(), nSeed )   // init_seed()
+   nSeed := iif( nSeed == NIL, Seconds(), nSeed )   // init_seed()
 
-  return( nMax * ( ( nSeed := mod( nSeed*b+1, m ) ) / m ) )
+   RETURN( nMax * ( ( nSeed := Mod( nSeed * b + 1, m ) ) / m ) )

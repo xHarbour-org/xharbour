@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: RestSets.Prg
  * Author....: David Husnian
  * CIS ID....: ?
@@ -51,18 +54,18 @@
 
 #include "set.ch"
 
-#Define FT_EXTRA_SETS    2
-#DEFINE FT_SET_CENTURY   _SET_COUNT + 1
-#DEFINE FT_SET_BLINK     _SET_COUNT + 2
+#define FT_EXTRA_SETS    2
+#define FT_SET_CENTURY   _SET_COUNT + 1
+#define FT_SET_BLINK     _SET_COUNT + 2
 
-FUNCTION  FT_RESTSETS(aOldSets)
+FUNCTION  FT_RESTSETS( aOldSets )
 
-   AEVAL(aOldSets, ;
-         { | xElement, nElementNo | ;
-           SET(nElementNo, xElement) }, ;
-         1, _SET_COUNT )
+   AEval( aOldSets, ;
+      { | xElement, nElementNo | ;
+      Set( nElementNo, xElement ) }, ;
+      1, _SET_COUNT )
 
-   FT_SETCENTURY(aOldSets[FT_SET_CENTURY])
-   SETBLINK(aOldSets[FT_SET_BLINK])
+   FT_SETCENTURY( aOldSets[FT_SET_CENTURY] )
+   SetBlink( aOldSets[FT_SET_BLINK] )
 
-   RETURN (NIL)                         // FT_RestSets
+   RETURN ( NIL )                         // FT_RestSets

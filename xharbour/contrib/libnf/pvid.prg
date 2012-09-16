@@ -1,4 +1,7 @@
 /*
+ * $Id$
+ */
+/*
  * File......: PVID.PRG
  * Author....: Ted Means
  * CIS ID....: 73067,3332
@@ -29,7 +32,7 @@
 #define PV_MAXCOL  9
 #define PV_SCORE  10
 
-static aVideo := {}
+STATIC aVideo := {}
 
 /*  $DOC$
  *  $FUNCNAME$
@@ -61,20 +64,20 @@ static aVideo := {}
  *  $END$
  */
 
-function FT_PushVid()
+FUNCTION FT_PushVid()
 
-AAdd( aVideo, { row(), ;
-                col(), ;
-                setcolor(), ;
-                savescreen( 0, 0, maxrow(), maxcol() ), ;
-                set( _SET_CURSOR ), ;
-                setblink(), ;
-                nosnow(), ;
-                maxrow() + 1, ;
-                maxcol() + 1, ;
-                set( _SET_SCOREBOARD ) } )
+   AAdd( aVideo, { Row(), ;
+      Col(), ;
+      SetColor(), ;
+      SaveScreen( 0, 0, MaxRow(), MaxCol() ), ;
+      Set( _SET_CURSOR ), ;
+      SetBlink(), ;
+      NoSnow(), ;
+      MaxRow() + 1, ;
+      MaxCol() + 1, ;
+      Set( _SET_SCOREBOARD ) } )
 
-return len( aVideo )
+   RETURN Len( aVideo )
 
 
 
@@ -105,24 +108,24 @@ return len( aVideo )
  *  $END$
  */
 
-function FT_PopVid()
+FUNCTION FT_PopVid()
 
-local nNewSize := len( aVideo ) - 1
-local aBottom  := ATail( aVideo )
+   LOCAL nNewSize := Len( aVideo ) - 1
+   LOCAL aBottom  := ATail( aVideo )
 
-if nNewSize >= 0
-   setmode( aBottom[ PV_MAXROW ], aBottom[ PV_MAXCOL ] )
-   set( _SET_CURSOR, aBottom[ PV_CURSOR ] )
-   nosnow( aBottom[ PV_NOSNOW ] )
-   setblink( aBottom[ PV_BLINK ] )
-   restscreen( 0, 0, maxrow(), maxcol(), aBottom[ PV_IMAGE ] )
-   setcolor( aBottom[ PV_COLOR ] )
-   setpos( aBottom[ PV_ROW ], aBottom[ PV_COL ] )
-   set( _SET_SCOREBOARD, aBottom[ PV_SCORE ] )
+   IF nNewSize >= 0
+      SetMode( aBottom[ PV_MAXROW ], aBottom[ PV_MAXCOL ] )
+      SET( _SET_CURSOR, aBottom[ PV_CURSOR ] )
+      NoSnow( aBottom[ PV_NOSNOW ] )
+      SetBlink( aBottom[ PV_BLINK ] )
+      RestScreen( 0, 0, MaxRow(), MaxCol(), aBottom[ PV_IMAGE ] )
+      SetColor( aBottom[ PV_COLOR ] )
+      SetPos( aBottom[ PV_ROW ], aBottom[ PV_COL ] )
+      SET( _SET_SCOREBOARD, aBottom[ PV_SCORE ] )
 
-   aSize( aVideo, nNewSize )
-endif
+      ASize( aVideo, nNewSize )
+   ENDIF
 
-return len( aVideo )
+   RETURN Len( aVideo )
 
 
