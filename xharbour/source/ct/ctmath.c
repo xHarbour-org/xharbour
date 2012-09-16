@@ -52,7 +52,6 @@
  *
  */
 
-
 #include "ct.h"
 
 /* ---------------- */
@@ -60,14 +59,14 @@
 /* ---------------- */
 int ct_math_init( void )
 {
-  HB_TRACE(HB_TR_DEBUG, ("ct_math_init()"));
-  return (1);
+   HB_TRACE( HB_TR_DEBUG, ( "ct_math_init()" ) );
+   return 1;
 }
 
 int ct_math_exit( void )
 {
-  HB_TRACE(HB_TR_DEBUG, ("ct_math_exit()"));
-  return (1);
+   HB_TRACE( HB_TR_DEBUG, ( "ct_math_exit()" ) );
+   return 1;
 }
 
 /* ---------------- */
@@ -75,57 +74,50 @@ int ct_math_exit( void )
 /* ---------------- */
 static int s_ct_precision = 16;  /* TODO: make this thread safe */
 
-void ct_setprecision (int iPrecision)
+void ct_setprecision( int iPrecision )
 {
-  HB_TRACE(HB_TR_DEBUG, ("ct_setprecision (%i)", iPrecision));
-  s_ct_precision = iPrecision;
-  return;
-}
-int ct_getprecision (void)
-{
-  HB_TRACE(HB_TR_DEBUG, ("ct_getprecision()"));
-  return (s_ct_precision);
+   HB_TRACE( HB_TR_DEBUG, ( "ct_setprecision (%i)", iPrecision ) );
+   s_ct_precision = iPrecision;
 }
 
-
-
-HB_FUNC (SETPREC)
+int ct_getprecision( void )
 {
+   HB_TRACE( HB_TR_DEBUG, ( "ct_getprecision()" ) );
+   return s_ct_precision;
+}
 
-  if ((ISNUM (1)) &&
-      (hb_parni (1) >= 1) &&
-      (hb_parni (1) <= 16))
-  {
-    ct_setprecision (hb_parni (1));
-  }
-  else
-  {
-    int iArgErrorMode = ct_getargerrormode();
-    if (iArgErrorMode != CT_ARGERR_IGNORE)
-    {
-      ct_error ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_SETPREC,
-                NULL, "SETPREC", 0, EF_CANDEFAULT, 1, hb_paramError (1));
-    }
-  }
+HB_FUNC( SETPREC )
+{
+   if( ( ISNUM( 1 ) ) &&
+       ( hb_parni( 1 ) >= 1 ) &&
+       ( hb_parni( 1 ) <= 16 ) )
+   {
+      ct_setprecision( hb_parni( 1 ) );
+   }
+   else
+   {
+      int iArgErrorMode = ct_getargerrormode();
+      if( iArgErrorMode != CT_ARGERR_IGNORE )
+      {
+         ct_error( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_SETPREC,
+                   NULL, "SETPREC", 0, EF_CANDEFAULT, 1, hb_paramError( 1 ) );
+      }
+   }
 
-  hb_retc ("");
+   hb_retc( "" );
 
 }
 
-
-
-HB_FUNC (GETPREC)
+HB_FUNC( GETPREC )
 {
-
-  hb_retni (ct_getprecision ());
-  if (hb_pcount() > 0)
-  {
-    int iArgErrorMode = ct_getargerrormode();
-    if (iArgErrorMode != CT_ARGERR_IGNORE)
-    {
-      ct_error ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_GETPREC,
-                NULL, "GETPREC", 0, EF_CANDEFAULT, 1, hb_paramError (1));
-    }
-  }
-
+   hb_retni( ct_getprecision() );
+   if( hb_pcount() > 0 )
+   {
+      int iArgErrorMode = ct_getargerrormode();
+      if( iArgErrorMode != CT_ARGERR_IGNORE )
+      {
+         ct_error( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_GETPREC,
+                   NULL, "GETPREC", 0, EF_CANDEFAULT, 1, hb_paramError( 1 ) );
+      }
+   }
 }

@@ -64,144 +64,155 @@
  *
  */
 
-
-
 #include "fileio.ch"
 #include "common.ch"
 #define  F_BLOCK   512
 
-Static nSrchand
-Static lStillOpen := .F.
-Static s_lSetDati := .t.
+STATIC nSrchand
+STATIC lStillOpen := .F.
+STATIC s_lSetDati := .T.
 
 /*
 * FileCopy()
 * This is a replacement for the CA-tools III function of the
 * same name that causes GPF's.
 */
-Function FileCopy(cSource, cDest, lMode)
 
-  Local nDestHand
-  Local cBuffer   := Space(F_BLOCK)
-  Local lDone     := .F.
-  Local nSrcBytes, nDestBytes, nTotBytes := 0
+FUNCTION FileCopy( cSource, cDest, lMode )
 
-  lStillOpen := .F.
-  nSrcHand := fOpen(cSource, FO_READ)
-  
-  HB_SYMBOL_UNUSED( lMode )
+   LOCAL nDestHand
+   LOCAL cBuffer   := Space( F_BLOCK )
+   LOCAL lDone     := .F.
+   LOCAL nSrcBytes, nDestBytes, nTotBytes := 0
 
-  IF nSrcHand > 0
+   lStillOpen := .F.
+   nSrcHand := FOpen( cSource, FO_READ )
 
-   nDestHand := fCreate(cDest)
+   HB_SYMBOL_UNUSED( lMode )
 
-     IF nDestHand > 0
-         Do while ! lDone
-            nSrcBytes  := fRead(nSrcHand, @cBuffer, F_BLOCK)
-            nDestBytes := fWrite(nDestHand, cBuffer, nSrcBytes)
-            if nDestBytes < nSrcBytes
+   IF nSrcHand > 0
+
+      nDestHand := FCreate( cDest )
+
+      IF nDestHand > 0
+         DO WHILE ! lDone
+            nSrcBytes  := FRead( nSrcHand, @cBuffer, F_BLOCK )
+            nDestBytes := FWrite( nDestHand, cBuffer, nSrcBytes )
+            IF nDestBytes < nSrcBytes
                lStillOpen := .T.
                lDone      := .T.
-            else
-               lDone := (nSrcBytes == 0)
-            endif
+            ELSE
+               lDone := ( nSrcBytes == 0 )
+            ENDIF
             nTotBytes += nDestBytes
-         Enddo
+         ENDDO
 
-   //    if lStillOpen
-   //       fSeek(nSrcHand, nTotBytes, FS_SET)
-   //    else
+         //    if lStillOpen
+         //       fSeek(nSrcHand, nTotBytes, FS_SET)
+         //    else
             /* 28/04/2004 - <maurilio.longo@libero.it>
                Since lMode is not supported (fully, at least) if file has been fully copyed into destination
                close source file handle or else it stays open */
-            fClose(nSrcHand)
-   //    endif
-         fClose(nDestHand)
+         FClose( nSrcHand )
+         //    endif
+         FClose( nDestHand )
 
-         if s_lSetDati
+         IF s_lSetDati
            /* Set target date/time same as source date/time (default).
               If you want change to system date/time, call filecdati(.f.)
               before filecopy
             */
-           Setfdati( cDest, filedate(cSource) , filetime(cSource) )
-         endif
+            Setfdati( cDest, filedate( cSource ) , filetime( cSource ) )
+         ENDIF
 
-    ELSE
-      fClose(nSrcHand)
-     ENDIF
-   endif
-Return(nTotBytes)
+      ELSE
+         FClose( nSrcHand )
+      ENDIF
+   ENDIF
 
-/***/
-Function FileCOpen()
-Return(lStillOpen)
+   RETURN( nTotBytes )
 
-/***/
-Function FileCCont(cDest)
+   /***/
 
-Local nDestHand  := fCreate(cDest)
-Local cBuffer   := Space(F_BLOCK)
-Local lDone     := .F.
-Local nSrcBytes, nDestBytes, nTotBytes := 0
+FUNCTION FileCOpen()
 
-lStillOpen := .F.
+   RETURN( lStillOpen )
 
-Do while ! lDone
-   nSrcBytes := fRead(nSrcHand, @cBuffer, F_BLOCK)
-   nDestBytes := fWrite(nDestHand, cBuffer, nSrcBytes)
-   if nDestBytes < nSrcBytes
-      lStillOpen := .T.
-      lDone      := .T.
-   else
-      lDone := (nSrcBytes == 0)
-   endif
-   nTotBytes += nDestBytes
-Enddo
-if lStillOpen
-   fSeek(nSrcHand, nTotBytes, FS_SET)
-endif
-fClose(nDestHand)
-Return(nTotBytes)
+   /***/
 
-Function FileCClose()
-Return(fClose(nSrcHand))
+FUNCTION FileCCont( cDest )
 
-/***/
-Function FileAppend(cSrc, cDest)
+   LOCAL nDestHand  := FCreate( cDest )
+   LOCAL cBuffer   := Space( F_BLOCK )
+   LOCAL lDone     := .F.
+   LOCAL nSrcBytes, nDestBytes, nTotBytes := 0
 
-Local cBuffer   := Space(F_BLOCK)
-Local lDone     := .F.
-Local nSrcBytes, nDestBytes, nTotBytes := 0
-Local nSrcHand  := fOpen(cSrc, FO_READ)
-Local nDestHand
+   lStillOpen := .F.
 
-if ! file(cDest)
-   nDestHand := fCreate(cDest)
-else
-   nDestHand := fOpen(cDest, FO_WRITE)
-   FSeek( nDestHand, 0, FS_END )
-endif
+   DO WHILE ! lDone
+      nSrcBytes := FRead( nSrcHand, @cBuffer, F_BLOCK )
+      nDestBytes := FWrite( nDestHand, cBuffer, nSrcBytes )
+      IF nDestBytes < nSrcBytes
+         lStillOpen := .T.
+         lDone      := .T.
+      ELSE
+         lDone := ( nSrcBytes == 0 )
+      ENDIF
+      nTotBytes += nDestBytes
+   ENDDO
+   IF lStillOpen
+      FSeek( nSrcHand, nTotBytes, FS_SET )
+   ENDIF
+   FClose( nDestHand )
 
-Do while ! lDone
-   nSrcBytes := fRead(nSrcHand, @cBuffer, F_BLOCK)
-   nDestBytes := fWrite(nDestHand, cBuffer, nSrcBytes)
-   if nDestBytes < nSrcBytes
-      lDone := .T. // error in this case
-   else
-      lDone := (nSrcBytes == 0)
-   endif
-   nTotBytes += nDestBytes
-Enddo
-fClose(nSrcHand)
-fClose(nDesthand)
-Return(nTotBytes)
+   RETURN( nTotBytes )
 
-/****/
-Function FileCDati( lNewMode )
-Local lOldMode := s_lSetDati
-if hb_IsLogical( lNewMode )
-   s_lSetDati := lNewMode
-endif
-Return lOldMode
+FUNCTION FileCClose()
+
+   RETURN( FClose( nSrcHand ) )
+
+   /***/
+
+FUNCTION FileAppend( cSrc, cDest )
+
+   LOCAL cBuffer   := Space( F_BLOCK )
+   LOCAL lDone     := .F.
+   LOCAL nSrcBytes, nDestBytes, nTotBytes := 0
+   LOCAL nSrcHand  := FOpen( cSrc, FO_READ )
+   LOCAL nDestHand
+
+   IF ! File( cDest )
+      nDestHand := FCreate( cDest )
+   ELSE
+      nDestHand := FOpen( cDest, FO_WRITE )
+      FSeek( nDestHand, 0, FS_END )
+   ENDIF
+
+   DO WHILE ! lDone
+      nSrcBytes := FRead( nSrcHand, @cBuffer, F_BLOCK )
+      nDestBytes := FWrite( nDestHand, cBuffer, nSrcBytes )
+      IF nDestBytes < nSrcBytes
+         lDone := .T. // error in this case
+      ELSE
+         lDone := ( nSrcBytes == 0 )
+      ENDIF
+      nTotBytes += nDestBytes
+   ENDDO
+   FClose( nSrcHand )
+   FClose( nDesthand )
+
+   RETURN( nTotBytes )
+
+   /****/
+
+FUNCTION FileCDati( lNewMode )
+
+   LOCAL lOldMode := s_lSetDati
+
+   IF HB_ISLOGICAL( lNewMode )
+      s_lSetDati := lNewMode
+   ENDIF
+
+   RETURN lOldMode
 
 // eof: fcopy.prg

@@ -3,7 +3,7 @@
  */
 
 /*
- * Harbour Project source code: 
+ * Harbour Project source code:
  *   ASCIISUM CT3 string function
  *
  * Copyright 2001 IntTec GmbH, Neunlindenstr 32, 79106 Freiburg, Germany
@@ -52,45 +52,41 @@
  *
  */
 
-
 #include "ct.h"
 
-HB_FUNC (ASCIISUM)
+HB_FUNC( ASCIISUM )
 {
+   if( ISCHAR( 1 ) )
+   {
+      size_t         sStrSize = hb_parclen( 1 );
+      const char *   pcString = hb_parc( 1 );
+      size_t         sPos;
+      ULONG          ulResult = 0;
 
-  if (ISCHAR (1))
-  {
-    size_t sStrSize = hb_parclen (1);
-    const char *pcString  = hb_parc (1);
-    size_t sPos;
-    ULONG ulResult = 0;
+      for( sPos = 0; sPos < sStrSize; sPos++ )
+         ulResult += ( BYTE ) pcString[ sPos ];
 
-    for (sPos = 0; sPos < sStrSize; sPos++)
-      ulResult += (BYTE) pcString[sPos];
+      hb_retnl( ulResult );
+   }
+   else
+   {
+      PHB_ITEM pSubst         = NULL;
+      int      iArgErrorMode  = ct_getargerrormode();
+      if( iArgErrorMode != CT_ARGERR_IGNORE )
+      {
+         pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_ASCIISUM,
+                                  NULL, "ASCIISUM", 0, EF_CANSUBSTITUTE, 1, hb_paramError( 1 ) );
+      }
 
-    hb_retnl (ulResult);
-  }
-  else
-  {
-    PHB_ITEM pSubst = NULL;
-    int iArgErrorMode = ct_getargerrormode();
-    if (iArgErrorMode != CT_ARGERR_IGNORE)
-    {
-      pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_ASCIISUM,
-                               NULL, "ASCIISUM", 0, EF_CANSUBSTITUTE, 1, hb_paramError (1));
-    }
-    
-    if (pSubst != NULL)
-    {
-      hb_itemRelease( hb_itemReturnForward( pSubst ) );
-    }
-    else
-    {
-      hb_retnl (0);
-    }
-  }
-  return;
+      if( pSubst != NULL )
+      {
+         hb_itemRelease( hb_itemReturnForward( pSubst ) );
+      }
+      else
+      {
+         hb_retnl( 0 );
+      }
+   }
+   return;
 }
-
-
 

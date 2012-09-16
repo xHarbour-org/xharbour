@@ -52,459 +52,452 @@
  *
  */
 
-
 #include "ct.h"
 
-
-
-HB_FUNC (TABEXPAND)
+HB_FUNC( TABEXPAND )
 {
+   if( ISCHAR( 1 ) )
+   {
+      char *   pcString    = ( char * ) hb_parc( 1 );
+      size_t   sStrLen     = ( size_t ) hb_parclen( 1 );
+      char *   pcRet;
+      size_t   sRetLen;
+      size_t   sTabWidth   = 0;
+      char     cFill, cTab, cCR;
+      char *   pcNewLine;
+      size_t   sNewLineLen;
+      int      iIgnore141;
 
-  if (ISCHAR (1))
-  {
-    char *pcString = (char *)hb_parc (1);
-    size_t sStrLen = (size_t)hb_parclen (1);
-    char *pcRet;
-    size_t sRetLen;
-    size_t sTabWidth = 0;
-    char cFill, cTab, cCR;
-    char *pcNewLine;
-    size_t sNewLineLen;
-    int iIgnore141;
+      size_t   sIndex, sLineIndex;
+      size_t   sTabCnt = 0;
 
-    size_t sIndex, sLineIndex;
-    size_t sTabCnt = 0;
-
-    if (ISNUM (2))
-    {
-      sTabWidth = hb_parnl (2);
-    }
-    if ((signed)sTabWidth <= 0)
-    {
-      sTabWidth = 8;
-    }
-
-    if (ISNUM (3) ||
-        ((ISCHAR (3)) && (hb_parclen(3)>0)))
-    {
-      if (ISNUM (3))
+      if( ISNUM( 2 ) )
       {
-        cFill = (char)((hb_parnl (3))%256);
+         sTabWidth = hb_parnl( 2 );
+      }
+      if( ( signed ) sTabWidth <= 0 )
+      {
+         sTabWidth = 8;
+      }
+
+      if( ISNUM( 3 ) ||
+          ( ( ISCHAR( 3 ) ) && ( hb_parclen( 3 ) > 0 ) ) )
+      {
+         if( ISNUM( 3 ) )
+         {
+            cFill = ( char ) ( ( hb_parnl( 3 ) ) % 256 );
+         }
+         else
+         {
+            cFill = ( char ) ( *( hb_parc( 3 ) ) );
+         }
       }
       else
       {
-        cFill = (char)(*(hb_parc (3)));
+         cFill = 0x20;
       }
-    }
-    else
-    {
-      cFill = 0x20;
-    }
 
-    if ((ISCHAR (4)) && (hb_parclen(4)>0))
-    {
-      pcNewLine = (char *)hb_parc (4);
-      sNewLineLen = hb_parclen (4);
-    }
-    else
-    {
-      pcNewLine = hb_conNewLine();
-      sNewLineLen = 0;
-      while (*(pcNewLine+sNewLineLen) != 0x00)
-        sNewLineLen++;
-    }
-    if (sNewLineLen > 0)
-    {
-      cCR = *(pcNewLine);
-    }
-    else
-    {
-      cCR = 13;
-    }
-      
-    if (ISNUM (5) ||
-        ((ISCHAR (5)) && (hb_parclen(5)>0)))
-    {
-      if (ISNUM (5))
+      if( ( ISCHAR( 4 ) ) && ( hb_parclen( 4 ) > 0 ) )
       {
-        cTab = (char)((hb_parnl (5))%256);
+         pcNewLine   = ( char * ) hb_parc( 4 );
+         sNewLineLen = hb_parclen( 4 );
       }
       else
       {
-        cTab = (char)(*(hb_parc (5)));
+         pcNewLine   = hb_conNewLine();
+         sNewLineLen = 0;
+         while( *( pcNewLine + sNewLineLen ) != 0x00 )
+            sNewLineLen++;
       }
-    }
-    else
-    {
-      cTab = 0x09;
-    }
-
-    if (ISLOG (6))
-    {
-      iIgnore141 = hb_parl (6);
-    }
-    else
-    {
-      iIgnore141 = 0;
-    }
-
-    /* estimate maximum return length by assuming that EVERY tab char
-       can be replaced by at most <nTabWidth> characters */
-    for (sIndex = 0; sIndex < sStrLen; sIndex++)
-    {
-      if (*(pcString+sIndex) == cTab)
+      if( sNewLineLen > 0 )
       {
-        sTabCnt++;
-      }
-    }
-    if(sTabCnt == 0)
-    {
-       hb_retclen(pcString, sStrLen);
-       return;
-    }
-    pcRet = (char *)hb_xgrab (sStrLen+(sTabCnt*(sTabWidth-1)));
-
-    /* now copy the string */
-    sIndex = 0;
-    sRetLen = 0;
-    sLineIndex = 0;
-    while (sTabCnt > 0)
-    {
-      char cChar = (char)*(pcString+sIndex);
-      if (cChar == cTab)
-      {
-        /* tab character */
-        size_t sFillIndex;
-        for (sFillIndex = sTabWidth-(sLineIndex%sTabWidth);
-             sFillIndex > 0; sFillIndex--)
-        {
-          *(pcRet+sRetLen) = cFill;
-          sRetLen++;
-          sLineIndex++;
-        }
-        sTabCnt--;
-        sIndex++;
-      }
-      else if ((unsigned char)cChar == 141)
-      {
-        /* soft carriage return */
-        *(pcRet+sRetLen) = ( char )141;
-        sRetLen++;
-        sIndex++;
-        if (iIgnore141)
-        {
-          sLineIndex++;
-        }
-        else
-        {
-          sLineIndex = 0;
-        }
-      }
-      else if (cChar == cCR)
-      {
-        /* newline string ? */
-        if ((sNewLineLen > 0) &&
-            ((sIndex+sNewLineLen) <= sStrLen) &&
-            (ct_at_exact_forward (pcString+sIndex, sNewLineLen,
-                                  pcNewLine, sNewLineLen, NULL) == pcString+sIndex))
-        {
-          hb_xmemcpy (pcRet+sRetLen, pcString+sIndex, sNewLineLen);
-          sRetLen += sNewLineLen;
-          sIndex += sNewLineLen;
-          sLineIndex = 0;
-        }
-        else
-        {
-          *(pcRet+sRetLen) = cCR;
-          sRetLen++;
-          sIndex++;
-          sLineIndex++;
-        }  
+         cCR = *( pcNewLine );
       }
       else
       {
-        *(pcRet+sRetLen) = *(pcString+sIndex);
-        sRetLen++;
-        sIndex++;
-        sLineIndex++;
+         cCR = 13;
       }
 
-    }
+      if( ISNUM( 5 ) ||
+          ( ( ISCHAR( 5 ) ) && ( hb_parclen( 5 ) > 0 ) ) )
+      {
+         if( ISNUM( 5 ) )
+         {
+            cTab = ( char ) ( ( hb_parnl( 5 ) ) % 256 );
+         }
+         else
+         {
+            cTab = ( char ) ( *( hb_parc( 5 ) ) );
+         }
+      }
+      else
+      {
+         cTab = 0x09;
+      }
 
-    /* copy rest */
-    hb_xmemcpy (pcRet+sRetLen, pcString+sIndex, sStrLen-sIndex);
-    sRetLen += sStrLen-sIndex;
-    hb_retclen (pcRet, sRetLen);
-    hb_xfree (pcRet);
+      if( ISLOG( 6 ) )
+      {
+         iIgnore141 = hb_parl( 6 );
+      }
+      else
+      {
+         iIgnore141 = 0;
+      }
 
-  }
-  else /* ISCHAR (1) */
-  {
-    PHB_ITEM pSubst = NULL;
-    int iArgErrorMode = ct_getargerrormode();
-    if (iArgErrorMode != CT_ARGERR_IGNORE)
-    {
-      pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_TABEXPAND,
-                               NULL, "TABEXPAND", 0, EF_CANSUBSTITUTE, 6,
-                               hb_paramError (1), hb_paramError (2), hb_paramError (3),
-                               hb_paramError (4), hb_paramError (5), hb_paramError (6));
-    }
-    
-    if (pSubst != NULL)
-    {
-      hb_itemRelease( hb_itemReturnForward( pSubst ) );
-    }
-    else
-    {
-      hb_retc ("");
-    }
-  }
-  
-  return;
+      /* estimate maximum return length by assuming that EVERY tab char
+         can be replaced by at most <nTabWidth> characters */
+      for( sIndex = 0; sIndex < sStrLen; sIndex++ )
+      {
+         if( *( pcString + sIndex ) == cTab )
+         {
+            sTabCnt++;
+         }
+      }
+      if( sTabCnt == 0 )
+      {
+         hb_retclen( pcString, sStrLen );
+         return;
+      }
+      pcRet       = ( char * ) hb_xgrab( sStrLen + ( sTabCnt * ( sTabWidth - 1 ) ) );
+
+      /* now copy the string */
+      sIndex      = 0;
+      sRetLen     = 0;
+      sLineIndex  = 0;
+      while( sTabCnt > 0 )
+      {
+         char cChar = ( char ) *( pcString + sIndex );
+         if( cChar == cTab )
+         {
+            /* tab character */
+            size_t sFillIndex;
+            for( sFillIndex = sTabWidth - ( sLineIndex % sTabWidth );
+                 sFillIndex > 0; sFillIndex-- )
+            {
+               *( pcRet + sRetLen ) = cFill;
+               sRetLen++;
+               sLineIndex++;
+            }
+            sTabCnt--;
+            sIndex++;
+         }
+         else if( ( unsigned char ) cChar == 141 )
+         {
+            /* soft carriage return */
+            *( pcRet + sRetLen ) = ( char ) 141;
+            sRetLen++;
+            sIndex++;
+            if( iIgnore141 )
+            {
+               sLineIndex++;
+            }
+            else
+            {
+               sLineIndex = 0;
+            }
+         }
+         else if( cChar == cCR )
+         {
+            /* newline string ? */
+            if( ( sNewLineLen > 0 ) &&
+                ( ( sIndex + sNewLineLen ) <= sStrLen ) &&
+                ( ct_at_exact_forward( pcString + sIndex, sNewLineLen,
+                                       pcNewLine, sNewLineLen, NULL ) == pcString + sIndex ) )
+            {
+               hb_xmemcpy( pcRet + sRetLen, pcString + sIndex, sNewLineLen );
+               sRetLen     += sNewLineLen;
+               sIndex      += sNewLineLen;
+               sLineIndex  = 0;
+            }
+            else
+            {
+               *( pcRet + sRetLen ) = cCR;
+               sRetLen++;
+               sIndex++;
+               sLineIndex++;
+            }
+         }
+         else
+         {
+            *( pcRet + sRetLen ) = *( pcString + sIndex );
+            sRetLen++;
+            sIndex++;
+            sLineIndex++;
+         }
+
+      }
+
+      /* copy rest */
+      hb_xmemcpy( pcRet + sRetLen, pcString + sIndex, sStrLen - sIndex );
+      sRetLen += sStrLen - sIndex;
+      hb_retclen( pcRet, sRetLen );
+      hb_xfree( pcRet );
+
+   }
+   else /* ISCHAR (1) */
+   {
+      PHB_ITEM pSubst         = NULL;
+      int      iArgErrorMode  = ct_getargerrormode();
+      if( iArgErrorMode != CT_ARGERR_IGNORE )
+      {
+         pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_TABEXPAND,
+                                  NULL, "TABEXPAND", 0, EF_CANSUBSTITUTE, 6,
+                                  hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ),
+                                  hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ) );
+      }
+
+      if( pSubst != NULL )
+      {
+         hb_itemRelease( hb_itemReturnForward( pSubst ) );
+      }
+      else
+      {
+         hb_retc( "" );
+      }
+   }
+
+   return;
 
 }
 
-
-
-HB_FUNC (TABPACK)
+HB_FUNC( TABPACK )
 {
+   if( ISCHAR( 1 ) )
+   {
+      char *   pcString    = ( char * ) hb_parc( 1 );
+      size_t   sStrLen     = ( size_t ) hb_parclen( 1 );
+      char *   pcRet;
+      size_t   sRetLen;
+      size_t   sTabWidth   = 0;
+      char     cFill, cTab, cCR;
+      char *   pcNewLine;
+      size_t   sNewLineLen;
+      int      iIgnore141;
 
-  if (ISCHAR (1))
-  {
-    char *pcString = (char *)hb_parc (1);
-    size_t sStrLen = (size_t)hb_parclen (1);
-    char *pcRet;
-    size_t sRetLen;
-    size_t sTabWidth = 0;
-    char cFill, cTab, cCR;
-    char *pcNewLine;
-    size_t sNewLineLen;
-    int iIgnore141;
+      size_t   sIndex, sTabIndex, sFillCount;
 
-    size_t sIndex, sTabIndex, sFillCount;
-
-    if (ISNUM (2))
-    {
-      sTabWidth = hb_parnl (2);
-    }
-    if ((signed)sTabWidth <= 0)
-    {
-      sTabWidth = 8;
-    }
-
-    if (ISNUM (3) ||
-        ((ISCHAR (3)) && (hb_parclen(3)>0)))
-    {
-      if (ISNUM (3))
+      if( ISNUM( 2 ) )
       {
-        cFill = (char)((hb_parnl (3))%256);
+         sTabWidth = hb_parnl( 2 );
+      }
+      if( ( signed ) sTabWidth <= 0 )
+      {
+         sTabWidth = 8;
+      }
+
+      if( ISNUM( 3 ) ||
+          ( ( ISCHAR( 3 ) ) && ( hb_parclen( 3 ) > 0 ) ) )
+      {
+         if( ISNUM( 3 ) )
+         {
+            cFill = ( char ) ( ( hb_parnl( 3 ) ) % 256 );
+         }
+         else
+         {
+            cFill = ( char ) ( *( hb_parc( 3 ) ) );
+         }
       }
       else
       {
-        cFill = (char)(*(hb_parc (3)));
+         cFill = 0x20;
       }
-    }
-    else
-    {
-      cFill = 0x20;
-    }
 
-    if ((ISCHAR (4)) && (hb_parclen(4)>0))
-    {
-      pcNewLine = (char *)hb_parc (4);
-      sNewLineLen = hb_parclen (4);
-    }
-    else
-    {
-      pcNewLine = hb_conNewLine();
-      sNewLineLen = 0;
-      while (*(pcNewLine+sNewLineLen) != 0x00)
-        sNewLineLen++;
-    }
-    if (sNewLineLen > 0)
-    {
-      cCR = *(pcNewLine);
-    }
-    else
-    {
-      cCR = 13;
-    }
-      
-    if (ISNUM (5) ||
-        ((ISCHAR (5)) && (hb_parclen(5)>0)))
-    {
-      if (ISNUM (5))
+      if( ( ISCHAR( 4 ) ) && ( hb_parclen( 4 ) > 0 ) )
       {
-        cTab = (char)((hb_parnl (5))%256);
+         pcNewLine   = ( char * ) hb_parc( 4 );
+         sNewLineLen = hb_parclen( 4 );
       }
       else
       {
-        cTab = (char)(*(hb_parc (5)));
+         pcNewLine   = hb_conNewLine();
+         sNewLineLen = 0;
+         while( *( pcNewLine + sNewLineLen ) != 0x00 )
+            sNewLineLen++;
       }
-    }
-    else
-    {
-      cTab = 0x09;
-    }
-
-    if (ISLOG (6))
-    {
-      iIgnore141 = hb_parl (6);
-    }
-    else
-    {
-      iIgnore141 = 0;
-    }
-
-    if ( sStrLen == 0)
-    {
-       hb_retc( "" );
-       return;
-    }
-    /* estimate maximum return length by assuming that there's
-       nothing to pack */
-    pcRet = (char *)hb_xgrab (sStrLen);
-
-    /* now copy the string */
-    sIndex = 0;
-    sRetLen = 0;
-    sTabIndex = 0;
-    sFillCount = 0;
-
-    while (sIndex < sStrLen)
-    {
-      char cChar = (char)*(pcString+sIndex);
-     
-      if (cChar == cFill)
+      if( sNewLineLen > 0 )
       {
-        if (sTabIndex==sTabWidth-1)
-        {
-          /* we have just found the last character of a tabstopp */
-          *(pcRet+sRetLen) = cTab;
-          sRetLen++;
-          sFillCount = 0;
-          sTabIndex = 0;
-          sIndex++;
-        }
-        else
-        {
-          sFillCount++;
-          sTabIndex++;
-          sIndex++;
-        }  
+         cCR = *( pcNewLine );
       }
-      else if (cChar == cTab)
+      else
       {
-        *(pcRet+sRetLen) = cTab;
-        sRetLen++;
-        /* discard any fill characters before the tabstopp */
-        sFillCount = 0;
-        sTabIndex = 0;
-        sIndex++;
+         cCR = 13;
       }
-      else if (((unsigned char)cChar == 141) && (!iIgnore141))
-      {
-        /* soft carriage return */
 
-        /* eventually not enough fill chars to fill a tab,
-           so copy them verbatim */
-        for (;sFillCount>0;sFillCount--)
-        {
-          *(pcRet+sRetLen) = cFill;
-          sRetLen++;
-        }  
-        *(pcRet+sRetLen) = ( char )141;
-        sRetLen++;
-        sTabIndex = 0;
-        sIndex++;
-      }
-      else if (cChar == cCR)
+      if( ISNUM( 5 ) ||
+          ( ( ISCHAR( 5 ) ) && ( hb_parclen( 5 ) > 0 ) ) )
       {
-        /* newline string ? */
-        if ((sNewLineLen > 0) &&
-            ((sIndex+sNewLineLen) <= sStrLen) &&
-            (ct_at_exact_forward (pcString+sIndex, sNewLineLen,
-                                  pcNewLine, sNewLineLen, NULL) == pcString+sIndex))
-        {
-          /* eventually not enough fill chars to fill a tab,
-             so copy them verbatim */
-          for (;sFillCount>0;sFillCount--)
-          {
-            *(pcRet+sRetLen) = cFill;
+         if( ISNUM( 5 ) )
+         {
+            cTab = ( char ) ( ( hb_parnl( 5 ) ) % 256 );
+         }
+         else
+         {
+            cTab = ( char ) ( *( hb_parc( 5 ) ) );
+         }
+      }
+      else
+      {
+         cTab = 0x09;
+      }
+
+      if( ISLOG( 6 ) )
+      {
+         iIgnore141 = hb_parl( 6 );
+      }
+      else
+      {
+         iIgnore141 = 0;
+      }
+
+      if( sStrLen == 0 )
+      {
+         hb_retc( "" );
+         return;
+      }
+      /* estimate maximum return length by assuming that there's
+         nothing to pack */
+      pcRet       = ( char * ) hb_xgrab( sStrLen );
+
+      /* now copy the string */
+      sIndex      = 0;
+      sRetLen     = 0;
+      sTabIndex   = 0;
+      sFillCount  = 0;
+
+      while( sIndex < sStrLen )
+      {
+         char cChar = ( char ) *( pcString + sIndex );
+
+         if( cChar == cFill )
+         {
+            if( sTabIndex == sTabWidth - 1 )
+            {
+               /* we have just found the last character of a tabstopp */
+               *( pcRet + sRetLen ) = cTab;
+               sRetLen++;
+               sFillCount           = 0;
+               sTabIndex            = 0;
+               sIndex++;
+            }
+            else
+            {
+               sFillCount++;
+               sTabIndex++;
+               sIndex++;
+            }
+         }
+         else if( cChar == cTab )
+         {
+            *( pcRet + sRetLen ) = cTab;
             sRetLen++;
-          }
-          hb_xmemcpy (pcRet+sRetLen, pcString+sIndex, sNewLineLen);
-          sRetLen += sNewLineLen;
-          sIndex += sNewLineLen;
-          sTabIndex = 0;
-        }
-        else
-        {
-          *(pcRet+sRetLen) = cCR;
-          sRetLen++;
-          sIndex++;
-          sTabIndex = 0;
-        }  
+            /* discard any fill characters before the tabstopp */
+            sFillCount           = 0;
+            sTabIndex            = 0;
+            sIndex++;
+         }
+         else if( ( ( unsigned char ) cChar == 141 ) && ( ! iIgnore141 ) )
+         {
+            /* soft carriage return */
+
+            /* eventually not enough fill chars to fill a tab,
+               so copy them verbatim */
+            for(; sFillCount > 0; sFillCount-- )
+            {
+               *( pcRet + sRetLen ) = cFill;
+               sRetLen++;
+            }
+            *( pcRet + sRetLen ) = ( char ) 141;
+            sRetLen++;
+            sTabIndex            = 0;
+            sIndex++;
+         }
+         else if( cChar == cCR )
+         {
+            /* newline string ? */
+            if( ( sNewLineLen > 0 ) &&
+                ( ( sIndex + sNewLineLen ) <= sStrLen ) &&
+                ( ct_at_exact_forward( pcString + sIndex, sNewLineLen,
+                                       pcNewLine, sNewLineLen, NULL ) == pcString + sIndex ) )
+            {
+               /* eventually not enough fill chars to fill a tab,
+                  so copy them verbatim */
+               for(; sFillCount > 0; sFillCount-- )
+               {
+                  *( pcRet + sRetLen ) = cFill;
+                  sRetLen++;
+               }
+               hb_xmemcpy( pcRet + sRetLen, pcString + sIndex, sNewLineLen );
+               sRetLen     += sNewLineLen;
+               sIndex      += sNewLineLen;
+               sTabIndex   = 0;
+            }
+            else
+            {
+               *( pcRet + sRetLen ) = cCR;
+               sRetLen++;
+               sIndex++;
+               sTabIndex            = 0;
+            }
+         }
+         else
+         {
+            /* eventually not enough fill chars to fill a tab,
+               so copy them verbatim */
+            for(; sFillCount > 0; sFillCount-- )
+            {
+               *( pcRet + sRetLen ) = cFill;
+               sRetLen++;
+               sTabIndex++;
+               if( sTabIndex == sTabWidth - 1 )
+               {
+                  sTabIndex = 0;
+               }
+            }
+            *( pcRet + sRetLen ) = *( pcString + sIndex );
+            sRetLen++;
+            sIndex++;
+            sTabIndex++;
+            if( sTabIndex == sTabWidth - 1 )
+            {
+               sTabIndex = 0;
+            }
+         }
+
+      }
+
+      /* copy rest */
+      for(; sFillCount > 0; sFillCount-- )
+      {
+         *( pcRet + sRetLen ) = cFill;
+         sRetLen++;
+      }
+
+      hb_retclen( pcRet, sRetLen );
+      hb_xfree( pcRet );
+
+   }
+   else /* ISCHAR (1) */
+   {
+      PHB_ITEM pSubst         = NULL;
+      int      iArgErrorMode  = ct_getargerrormode();
+      if( iArgErrorMode != CT_ARGERR_IGNORE )
+      {
+         pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_TABPACK,
+                                  NULL, "TABPACK", 0, EF_CANSUBSTITUTE, 6,
+                                  hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ),
+                                  hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ) );
+      }
+
+      if( pSubst != NULL )
+      {
+         hb_itemRelease( hb_itemReturnForward( pSubst ) );
       }
       else
       {
-        /* eventually not enough fill chars to fill a tab,
-           so copy them verbatim */
-        for (;sFillCount>0;sFillCount--)
-        {
-          *(pcRet+sRetLen) = cFill;
-          sRetLen++;
-	  sTabIndex++;
-          if (sTabIndex==sTabWidth-1)
-          {
-            sTabIndex = 0;
-          }
-        }
-        *(pcRet+sRetLen) = *(pcString+sIndex);
-        sRetLen++;
-        sIndex++;
-        sTabIndex++;
-        if (sTabIndex==sTabWidth-1)
-        {
-          sTabIndex = 0;
-        }
+         hb_retc( "" );
       }
+   }
 
-    }
-
-    /* copy rest */
-    for (;sFillCount>0;sFillCount--)
-    {
-      *(pcRet+sRetLen) = cFill;
-      sRetLen++;
-    }
-
-    hb_retclen (pcRet, sRetLen);
-    hb_xfree (pcRet);
-
-  }
-  else /* ISCHAR (1) */
-  {
-    PHB_ITEM pSubst = NULL;
-    int iArgErrorMode = ct_getargerrormode();
-    if (iArgErrorMode != CT_ARGERR_IGNORE)
-    {
-      pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_TABPACK,
-                               NULL, "TABPACK", 0, EF_CANSUBSTITUTE, 6,
-                               hb_paramError (1), hb_paramError (2), hb_paramError (3),
-                               hb_paramError (4), hb_paramError (5), hb_paramError (6));
-    }
-    
-    if (pSubst != NULL)
-    {
-      hb_itemRelease( hb_itemReturnForward( pSubst ) );
-    }
-    else
-    {
-      hb_retc ("");
-    }
-  }
-  
-  return;
+   return;
 
 }

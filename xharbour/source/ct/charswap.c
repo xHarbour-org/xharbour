@@ -3,7 +3,7 @@
  */
 
 /*
- * Harbour Project source code: 
+ * Harbour Project source code:
  *   CT3 string functions
  *     - CHARSWAP()
  *     - WORDSWAP()
@@ -54,188 +54,175 @@
  *
  */
 
-
 #include "ct.h"
 
-
 /* defines */
-#define DO_CHARSWAP_CHARSWAP          0
-#define DO_CHARSWAP_WORDSWAP          1
-#define DO_CHARSWAP_WORDSWAP_CHARSWAP 2
+#define DO_CHARSWAP_CHARSWAP           0
+#define DO_CHARSWAP_WORDSWAP           1
+#define DO_CHARSWAP_WORDSWAP_CHARSWAP  2
 
 /* helper function for the charswap and wordswap functions */
-static void do_charswap (int iSwitch)
+static void do_charswap( int iSwitch )
 {
+   int iNoRet;
 
-  int iNoRet;
+   /* suppress return value ? */
+   iNoRet = ct_getref() && ISBYREF( 1 );
 
-  /* suppress return value ? */
-  iNoRet = ct_getref() && ISBYREF( 1 );
+   /* param check */
+   if( ISCHAR( 1 ) )
+   {
+      const char *   pcString    = hb_parc( 1 );
+      size_t         sStrLen     = ( size_t ) hb_parclen( 1 );
+      char *         pcRet;
+      size_t         sRetIndex   = 0;
+      int            iShift, iMod;
+      const char *   pcSub;
 
-  /* param check */
-  if (ISCHAR (1))
-  {
-
-    const char *pcString = hb_parc (1);
-    size_t sStrLen = (size_t)hb_parclen (1);
-    char *pcRet;
-    size_t sRetIndex = 0;
-    int iShift, iMod;
-    const char *pcSub;
-
-    if ( sStrLen == 0 )
-    {
-       if (iNoRet)
-       {
-          hb_ret();
-       }
-       else
-       {
-          hb_retc( "" );
-       }
-       return;
-    }
-
-    if (iSwitch == DO_CHARSWAP_WORDSWAP)
-    {
-      iShift = 4;
-      if (ISLOG (2) && hb_parl (2))
+      if( sStrLen == 0 )
       {
-        iSwitch = DO_CHARSWAP_WORDSWAP_CHARSWAP;
+         if( iNoRet )
+         {
+            hb_ret();
+         }
+         else
+         {
+            hb_retc( "" );
+         }
+         return;
       }
-    }
-    else
-    {
-      iShift = 2;
-    }
 
-    pcRet = ( char * ) hb_xgrab (sStrLen);
-
-    for (pcSub = pcString; pcSub < pcString+sStrLen+1-iShift; pcSub += iShift)
-    {
-      switch (iSwitch)
+      if( iSwitch == DO_CHARSWAP_WORDSWAP )
       {
-        case DO_CHARSWAP_WORDSWAP:
-        {
-          *(pcRet+sRetIndex) = *(pcSub+2);
-          sRetIndex++;
-          *(pcRet+sRetIndex) = *(pcSub+3);
-          sRetIndex++;
-          *(pcRet+sRetIndex) = *(pcSub);
-          sRetIndex++;
-          *(pcRet+sRetIndex) = *(pcSub+1);
-          sRetIndex++;
-        }; break;
-
-        case DO_CHARSWAP_WORDSWAP_CHARSWAP:
-        {
-          *(pcRet+sRetIndex) = *(pcSub+3);
-          sRetIndex++;
-          *(pcRet+sRetIndex) = *(pcSub+2);
-          sRetIndex++;
-        }; /* no 'break' here !! */
-
-        case DO_CHARSWAP_CHARSWAP:
-        {
-          *(pcRet+sRetIndex) = *(pcSub+1);
-          sRetIndex++;
-          *(pcRet+sRetIndex) = *(pcSub);
-          sRetIndex++;
-        };
-      }
-    }
-
-    /* copy rest of string */
-    if ((iSwitch == DO_CHARSWAP_WORDSWAP) ||
-        (iSwitch == DO_CHARSWAP_WORDSWAP_CHARSWAP))
-    {
-      iMod = sStrLen%4;
-    }
-    else
-    {
-      iMod = sStrLen%2;
-    }
-
-    for (pcSub = pcString+sStrLen-iMod; pcSub < pcString+sStrLen; pcSub++)
-    {
-      *(pcRet+sRetIndex) = *pcSub;
-      sRetIndex++;
-    }
-
-    /* return string */
-    if (ISBYREF (1))
-    {
-      hb_storclen (pcRet, sRetIndex, 1);
-    }
-
-    if (iNoRet)
-    {
-      hb_retl (0);
-    }
-    else
-    {
-      hb_retclen (pcRet, sRetIndex);
-    }
-
-    hb_xfree (pcRet);
-
-  }
-  else /* if (ISCHAR (1)) */
-  {
-    PHB_ITEM pSubst = NULL;
-    int iArgErrorMode = ct_getargerrormode();
-    if (iArgErrorMode != CT_ARGERR_IGNORE)
-    {
-      
-      if (iSwitch == DO_CHARSWAP_CHARSWAP)
-      {
-        pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_CHARSWAP,
-                                 NULL, "CHARSWAP", 0, EF_CANSUBSTITUTE, 1,
-                                 hb_paramError (1));
+         iShift = 4;
+         if( ISLOG( 2 ) && hb_parl( 2 ) )
+         {
+            iSwitch = DO_CHARSWAP_WORDSWAP_CHARSWAP;
+         }
       }
       else
       {
-        pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_WORDSWAP,
-                                 NULL, "WORDSWAP", 0, EF_CANSUBSTITUTE, 2,
-                                 hb_paramError (1), hb_paramError (2));
+         iShift = 2;
       }
-    }
 
-    if (pSubst != NULL)
-    {
-      hb_itemRelease( hb_itemReturnForward( pSubst ) );
-    }
-    else
-    {
-      if (iNoRet)
+      pcRet = ( char * ) hb_xgrab( sStrLen );
+
+      for( pcSub = pcString; pcSub < pcString + sStrLen + 1 - iShift; pcSub += iShift )
       {
-        hb_retl (0);
+         switch( iSwitch )
+         {
+            case DO_CHARSWAP_WORDSWAP:
+            {
+               *( pcRet + sRetIndex )  = *( pcSub + 2 );
+               sRetIndex++;
+               *( pcRet + sRetIndex )  = *( pcSub + 3 );
+               sRetIndex++;
+               *( pcRet + sRetIndex )  = *( pcSub );
+               sRetIndex++;
+               *( pcRet + sRetIndex )  = *( pcSub + 1 );
+               sRetIndex++;
+            }; break;
+
+            case DO_CHARSWAP_WORDSWAP_CHARSWAP:
+            {
+               *( pcRet + sRetIndex )  = *( pcSub + 3 );
+               sRetIndex++;
+               *( pcRet + sRetIndex )  = *( pcSub + 2 );
+               sRetIndex++;
+            }; /* no 'break' here !! */
+
+            case DO_CHARSWAP_CHARSWAP:
+            {
+               *( pcRet + sRetIndex )  = *( pcSub + 1 );
+               sRetIndex++;
+               *( pcRet + sRetIndex )  = *( pcSub );
+               sRetIndex++;
+            };
+         }
+      }
+
+      /* copy rest of string */
+      if( ( iSwitch == DO_CHARSWAP_WORDSWAP ) ||
+          ( iSwitch == DO_CHARSWAP_WORDSWAP_CHARSWAP ) )
+      {
+         iMod = sStrLen % 4;
       }
       else
       {
-        hb_retc ("");
+         iMod = sStrLen % 2;
       }
-    }
-  }
 
+      for( pcSub = pcString + sStrLen - iMod; pcSub < pcString + sStrLen; pcSub++ )
+      {
+         *( pcRet + sRetIndex ) = *pcSub;
+         sRetIndex++;
+      }
+
+      /* return string */
+      if( ISBYREF( 1 ) )
+      {
+         hb_storclen( pcRet, sRetIndex, 1 );
+      }
+
+      if( iNoRet )
+      {
+         hb_retl( 0 );
+      }
+      else
+      {
+         hb_retclen( pcRet, sRetIndex );
+      }
+
+      hb_xfree( pcRet );
+
+   }
+   else /* if (ISCHAR (1)) */
+   {
+      PHB_ITEM pSubst         = NULL;
+      int      iArgErrorMode  = ct_getargerrormode();
+      if( iArgErrorMode != CT_ARGERR_IGNORE )
+      {
+
+         if( iSwitch == DO_CHARSWAP_CHARSWAP )
+         {
+            pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_CHARSWAP,
+                                     NULL, "CHARSWAP", 0, EF_CANSUBSTITUTE, 1,
+                                     hb_paramError( 1 ) );
+         }
+         else
+         {
+            pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_WORDSWAP,
+                                     NULL, "WORDSWAP", 0, EF_CANSUBSTITUTE, 2,
+                                     hb_paramError( 1 ), hb_paramError( 2 ) );
+         }
+      }
+
+      if( pSubst != NULL )
+      {
+         hb_itemRelease( hb_itemReturnForward( pSubst ) );
+      }
+      else
+      {
+         if( iNoRet )
+         {
+            hb_retl( 0 );
+         }
+         else
+         {
+            hb_retc( "" );
+         }
+      }
+   }
 }
 
-
-
-HB_FUNC (CHARSWAP)
+HB_FUNC( CHARSWAP )
 {
-
-  do_charswap (DO_CHARSWAP_CHARSWAP);
-  return;
-
+   do_charswap( DO_CHARSWAP_CHARSWAP );
+   return;
 }
 
-
-
-HB_FUNC (WORDSWAP)
+HB_FUNC( WORDSWAP )
 {
-
-  do_charswap (DO_CHARSWAP_WORDSWAP);
-  return;
-
+   do_charswap( DO_CHARSWAP_WORDSWAP );
+   return;
 }

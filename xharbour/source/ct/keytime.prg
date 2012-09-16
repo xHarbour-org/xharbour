@@ -50,70 +50,73 @@
  *
  */
 
-Static pHandle, cTime, nsKey
-Static nHour, nMin, nSec, nLast
+STATIC pHandle, cTime, nsKey
+STATIC nHour, nMin, nSec, nLast
 
+FUNCTION KeyTime( nKey, cClockTime )
 
-Function KeyTime(nKey, cClockTime)
-Local lActivated := .f.
+   LOCAL lActivated := .F.
 
-if pHandle != nil
-   HB_IdleDel(pHandle)
-   pHandle := nil
-endif
+   IF pHandle != nil
+      hb_idleDel( pHandle )
+      pHandle := nil
+   ENDIF
 
-if nKey != nil .and. ValType(cClockTime) = 'C'
+   IF nKey != nil .AND. ValType( cClockTime ) = 'C'
 
-   nsKey := nKey
-   cTime := cClockTime
-   nHour := Val(Substr(cClockTime, 1, 2))
-   nMin  := Val(Substr(cClockTime, 4, 2))
-   nSec  := Val(Substr(cClockTime, 7, 2))
-   nLast := -1
-   pHandle := HB_IdleAdd({|| doKeyTime()})
-   lActivated := .t.
+      nsKey := nKey
+      cTime := cClockTime
+      nHour := Val( SubStr( cClockTime, 1, 2 ) )
+      nMin  := Val( SubStr( cClockTime, 4, 2 ) )
+      nSec  := Val( SubStr( cClockTime, 7, 2 ) )
+      nLast := - 1
+      pHandle := hb_idleAdd( {|| doKeyTime() } )
+      lActivated := .T.
 
-endif
-Return lActivated
+   ENDIF
 
-Static function doKeyTime()
-Local ccTime := Time()
-Local nHr := Val(Substr(ccTime, 1, 2))
-Local nMn := Val(Substr(ccTime, 4, 2))
-Local nSc := Val(Substr(ccTime, 7, 2))
+   RETURN lActivated
 
-if nHour = 99
-   if nHr > nLast
-      __Keyboard(nsKey)
-      nLast := nHr
-      if nHr == 23
-         HB_IdleDel(pHandle)
-         pHandle := nil
-      endif
-   endif
-elseif nMin = 99 .and. nHr == nHour
-   if nMn > nLast
-      __Keyboard(nsKey)
-      nLast := nMn
-      if nMn == 59
-         HB_IdleDel(pHandle)
-         pHandle := nil
-      endif
-   endif
-elseif nSec = 99 .and. nHr == nHour .and. nMn == nMin
-   if nSc > nLast
-      __Keyboard(nsKey)
-      nLast := nSc
-      if nSc == 59
-         HB_IdleDel(pHandle)
-         pHandle := nil
-      endif
-   endif
-elseif ccTime > cTime
+STATIC FUNCTION doKeyTime()
 
-   __Keyboard(nsKey)
-   HB_IdleDel(pHandle)
-   pHandle := nil
+   LOCAL ccTime := Time()
+   LOCAL nHr := Val( SubStr( ccTime, 1, 2 ) )
+   LOCAL nMn := Val( SubStr( ccTime, 4, 2 ) )
+   LOCAL nSc := Val( SubStr( ccTime, 7, 2 ) )
 
-endif
-Return nil
+   IF nHour = 99
+      IF nHr > nLast
+         __Keyboard( nsKey )
+         nLast := nHr
+         IF nHr == 23
+            hb_idleDel( pHandle )
+            pHandle := nil
+         ENDIF
+      ENDIF
+   ELSEIF nMin = 99 .AND. nHr == nHour
+      IF nMn > nLast
+         __Keyboard( nsKey )
+         nLast := nMn
+         IF nMn == 59
+            hb_idleDel( pHandle )
+            pHandle := nil
+         ENDIF
+      ENDIF
+   ELSEIF nSec = 99 .AND. nHr == nHour .AND. nMn == nMin
+      IF nSc > nLast
+         __Keyboard( nsKey )
+         nLast := nSc
+         IF nSc == 59
+            hb_idleDel( pHandle )
+            pHandle := nil
+         ENDIF
+      ENDIF
+   ELSEIF ccTime > cTime
+
+      __Keyboard( nsKey )
+      hb_idleDel( pHandle )
+      pHandle := nil
+
+   ENDIF
+
+   RETURN nil

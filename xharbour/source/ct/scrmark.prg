@@ -53,38 +53,38 @@
 
 #include "common.ch"
 
+FUNCTION ScreenMark( cSearch, xAttr, lUpperLower, lAll, cForward, cTrailing )
 
-Function ScreenMark(cSearch, xAttr, lUpperLower, lAll, cForward, cTrailing)
+   LOCAL lFound := .F. , nAt, nCount := 1
+   LOCAL cScreen := CharOdd( SaveScreen( 0, 0, MaxRow(), MaxCol() ) )
+   LOCAL nRow, nCol
 
-Local lFound := .f., nAt, nCount := 1
-Local cScreen := CharOdd( SaveScreen(0, 0, MaxRow(), MaxCol()) )
-Local nRow, nCol
+   DEFAULT lAll TO .F.
+   DEFAULT cForward TO ""
+   DEFAULT cTrailing TO ""
 
-DEFAULT lAll TO .f.
-DEFAULT cForward TO ""
-DEFAULT cTrailing TO ""
+   IF ! lUpperLower
+      cSearch := Upper( cSearch )
+      cScreen := Upper( cScreen )
+   ENDIF
 
-if ! lUpperLower
-   cSearch := Upper(cSearch)
-   cScreen := Upper(cScreen)
-endif
+   WHILE ( nAt := ATNUM( cSearch, cScreen, nCount ) ) <> 0
 
-while (nAt := ATNUM(cSearch, cScreen, nCount)) <> 0
+      IF ( nAt == 1 .OR. Len( cForward ) == 0 .OR. At( cScreen[nAt-1], cForward ) <> 0 ) .AND. ;
+            ( nAt + Len( cSearch ) > Len( cScreen ) .OR. Len( cTrailing ) == 0 .OR. At( cScreen[nAt + len(cSearch)], cTrailing ) <> 0 )
 
-   if ( nAt == 1 .or. len(cForward) == 0 .or. At(cScreen[nAt-1], cForward) <> 0 ) .and.;
-      ( nAt + len(cSearch) > len(cScreen) .or. len(cTrailing) == 0 .or. At(cScreen[nAt + len(cSearch)], cTrailing) <> 0 )
+         lFound := .T.
+         nRow := Int( nAt / ( MaxCol() + 1 ) )
+         nCol := ( nAt % ( MaxCol() + 1 ) ) - 1
+         ColorWin( nRow, nCol, nRow, nCol + Len( cSearch ) - 1, xAttr )
+         IF ! lAll
+            EXIT
+         ENDIF
 
-      lFound := .t.
-      nRow := Int( nAt / (MaxCol() + 1) )
-      nCol := (nAt % (MaxCol() + 1) ) - 1
-      ColorWin(nRow, nCol, nRow, nCol + len(cSearch) - 1, xAttr)
-      if ! lAll
-         exit
-      endif
+      ENDIF
+      nCount ++
 
-   endif
-   nCount ++
+   ENDDO
 
-enddo
+   RETURN lFound
 
-Return lFound

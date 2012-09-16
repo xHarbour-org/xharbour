@@ -57,31 +57,32 @@ HB_FUNC( MAXLINE )
 {
    LONG lLength = 0;
 
-   if( ISCHAR(1) )
+   if( ISCHAR( 1 ) )
    {
-      const char *pcString = hb_parc(1);
-      const char *pBuffer;
-      LONG lStrLen = hb_parclen(1);
+      const char *   pcString = hb_parc( 1 );
+      const char *   pBuffer;
+      LONG           lStrLen  = hb_parclen( 1 );
 
       while( lStrLen > 0 )
       {
-         pBuffer = (char *) memchr(pcString, 13, lStrLen);
-         if(! pBuffer)
+         pBuffer = ( char * ) memchr( pcString, 13, lStrLen );
+         if( ! pBuffer )
          {
             pBuffer = pcString + lStrLen;
          }
 
-         if( (pBuffer - pcString) > lLength)
+         if( ( pBuffer - pcString ) > lLength )
          {
             lLength = pBuffer - pcString;
          }
-         pBuffer ++;
-         if( *pBuffer == 10) pBuffer ++;
-         lStrLen -= pBuffer - pcString;
+         pBuffer++;
+         if( *pBuffer == 10 )
+            pBuffer++;
+         lStrLen  -= pBuffer - pcString;
          pcString = pBuffer;
       }
 
    }
 
-   hb_retnl(lLength);
+   hb_retnl( lLength );
 }

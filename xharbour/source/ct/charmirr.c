@@ -3,7 +3,7 @@
  */
 
 /*
- * Harbour Project source code: 
+ * Harbour Project source code:
  *   CT3 string function CHARMIRR()
  *
  * Copyright 2001 IntTec GmbH, Neunlindenstr 32, 79106 Freiburg, Germany
@@ -52,110 +52,103 @@
  *
  */
 
-
 #include "ct.h"
 
-
-
-HB_FUNC (CHARMIRR)
+HB_FUNC( CHARMIRR )
 {
+   int iNoRet;
 
-  int iNoRet;
+   /* suppressing return value ? */
+   iNoRet = ct_getref() && ISBYREF( 1 );
 
-  /* suppressing return value ? */
-  iNoRet = ct_getref() && ISBYREF( 1 );
+   /* param check */
+   if( ISCHAR( 1 ) )
+   {
 
-  /* param check */
-  if (ISCHAR (1))
-  {
+      const char *   pcString = hb_parc( 1 );
+      size_t         sStrLen  = ( size_t ) hb_parclen( 1 );
+      const char *   pc1;
+      char *         pcRet, * pc2;
+      int            iDontMirrorSpaces;
 
-    const char *pcString = hb_parc (1);
-    size_t sStrLen = (size_t)hb_parclen (1);
-    const char *pc1;
-    char *pcRet, *pc2;
-    int iDontMirrorSpaces;
-
-    if (ISLOG (2))
-      iDontMirrorSpaces = hb_parl (2);
-    else
-      iDontMirrorSpaces = 0;
-
-    if (sStrLen == 0)
-    {
-      int iArgErrorMode = ct_getargerrormode();
-      if (iArgErrorMode != CT_ARGERR_IGNORE)
-      {
-        ct_error ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_CHARMIRR,
-                  NULL, "CHARMIRR", 0, EF_CANDEFAULT, 2,
-                  hb_paramError (1), hb_paramError (2));
-      }
-      if (iNoRet)
-        hb_retl (0);
+      if( ISLOG( 2 ) )
+         iDontMirrorSpaces = hb_parl( 2 );
       else
-        hb_retc ("");
-      return;
-    }
+         iDontMirrorSpaces = 0;
 
-    pcRet = ( char * ) hb_xgrab (sStrLen);
-
-    pc1 = pcString+sStrLen-1;
-    if (iDontMirrorSpaces)
-    {
-      pc2 = pcRet+sStrLen-1;
-      while ((pc1 >= pcString) && (*pc1 == 0x20))
+      if( sStrLen == 0 )
       {
-        *pc2 = 0x20;
-        pc1--;
-        pc2--;
+         int iArgErrorMode = ct_getargerrormode();
+         if( iArgErrorMode != CT_ARGERR_IGNORE )
+         {
+            ct_error( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_CHARMIRR,
+                      NULL, "CHARMIRR", 0, EF_CANDEFAULT, 2,
+                      hb_paramError( 1 ), hb_paramError( 2 ) );
+         }
+         if( iNoRet )
+            hb_retl( 0 );
+         else
+            hb_retc( "" );
+         return;
       }
-    }
 
-    pc2 = pcRet;
-    for (; pc1 >= pcString; pc1--)
-    {
-      *pc2 = *pc1;
-      pc2++;
-    }
+      pcRet = ( char * ) hb_xgrab( sStrLen );
 
-    /* return string */
-    if (ISBYREF (1))
-      hb_storclen (pcRet, sStrLen, 1);
+      pc1   = pcString + sStrLen - 1;
+      if( iDontMirrorSpaces )
+      {
+         pc2 = pcRet + sStrLen - 1;
+         while( ( pc1 >= pcString ) && ( *pc1 == 0x20 ) )
+         {
+            *pc2 = 0x20;
+            pc1--;
+            pc2--;
+         }
+      }
 
-    if (iNoRet)
-      hb_retl (0);
-    else
-      hb_retclen (pcRet, sStrLen);
+      pc2 = pcRet;
+      for(; pc1 >= pcString; pc1-- )
+      {
+         *pc2 = *pc1;
+         pc2++;
+      }
 
-    hb_xfree (pcRet);
+      /* return string */
+      if( ISBYREF( 1 ) )
+         hb_storclen( pcRet, sStrLen, 1 );
 
-  }
-  else /* if (ISCHAR (1)) */
-  {
-    PHB_ITEM pSubst = NULL;
-    int iArgErrorMode = ct_getargerrormode();
-    if (iArgErrorMode != CT_ARGERR_IGNORE)
-    {
-      pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_CHARMIRR,
-                               NULL, "CHARMIRR", 0, EF_CANSUBSTITUTE, 2,
-                               hb_paramError (1), hb_paramError (2));
-    }  
-    
-    if (pSubst != NULL)
-    {
-      hb_itemRelease( hb_itemReturnForward( pSubst ) );
-    }
-    else
-    {
-      if (iNoRet)
-        hb_retl (0);
+      if( iNoRet )
+         hb_retl( 0 );
       else
-        hb_retc ("");
-    }
-  }
+         hb_retclen( pcRet, sStrLen );
 
-  return;
+      hb_xfree( pcRet );
 
+   }
+   else /* if (ISCHAR (1)) */
+   {
+      PHB_ITEM pSubst         = NULL;
+      int      iArgErrorMode  = ct_getargerrormode();
+      if( iArgErrorMode != CT_ARGERR_IGNORE )
+      {
+         pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_CHARMIRR,
+                                  NULL, "CHARMIRR", 0, EF_CANSUBSTITUTE, 2,
+                                  hb_paramError( 1 ), hb_paramError( 2 ) );
+      }
+
+      if( pSubst != NULL )
+      {
+         hb_itemRelease( hb_itemReturnForward( pSubst ) );
+      }
+      else
+      {
+         if( iNoRet )
+            hb_retl( 0 );
+         else
+            hb_retc( "" );
+      }
+   }
+
+   return;
 }
-
-
 

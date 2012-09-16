@@ -3,7 +3,7 @@
  */
 
 /*
- * Harbour Project source code: 
+ * Harbour Project source code:
  *
  *   CT3 Numeric functions - PART 1
  *     - CELSIUS
@@ -13,8 +13,8 @@
  * NOTE: All these functions were builded using Borland C++ 5.5 (free version)
  *
  * Copyright 2001  Alejandro de Garate  <alex_degarate@hotmail.com>
- * 
- * Documentation and changes concerning error handling Copyright 2001 
+ *
+ * Documentation and changes concerning error handling Copyright 2001
  *   IntTec GmbH, Freiburg, Germany, Author: Martin Vogel <vogel@inttec.de>
  *
  * www - http://www.harbour-project.org
@@ -58,97 +58,88 @@
  * If you write modifications of your own for Harbour, it is your choice
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
- * 
+ *
  */
 
- 
 #include "ct.h"
-
-
 
 HB_FUNC( CELSIUS )
 {
-  if( ISNUM(1) )
-  {
-    double dInput = hb_parnd(1);
-    double dResult;
-    
-    dResult = (5.0 / 9.0) * ( dInput - 32.0 );  
-    hb_retnd( dResult );
-  }
-  else
-  {
-    PHB_ITEM pSubst = NULL;
-    int iArgErrorMode = ct_getargerrormode();
-    if (iArgErrorMode != CT_ARGERR_IGNORE)
-    {
-      pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_CELSIUS,
-                               NULL, "CELSIUS", 0, EF_CANSUBSTITUTE, 1, hb_paramError (1));
-    }
-    
-    if (pSubst != NULL)
-    {
-      hb_itemRelease( hb_itemReturnForward( pSubst ) );
-    }
-    else
-    {
-      hb_retnd (0.0);
-    }
-  }
+   if( ISNUM( 1 ) )
+   {
+      double   dInput = hb_parnd( 1 );
+      double   dResult;
 
-  return;
+      dResult = ( 5.0 / 9.0 ) * ( dInput - 32.0 );
+      hb_retnd( dResult );
+   }
+   else
+   {
+      PHB_ITEM pSubst         = NULL;
+      int      iArgErrorMode  = ct_getargerrormode();
+      if( iArgErrorMode != CT_ARGERR_IGNORE )
+      {
+         pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_CELSIUS,
+                                  NULL, "CELSIUS", 0, EF_CANSUBSTITUTE, 1, hb_paramError( 1 ) );
+      }
+
+      if( pSubst != NULL )
+      {
+         hb_itemRelease( hb_itemReturnForward( pSubst ) );
+      }
+      else
+      {
+         hb_retnd( 0.0 );
+      }
+   }
+
+   return;
 }
-
-
 
 HB_FUNC( FAHRENHEIT )
 {
-  if( ISNUM(1) )
-  {
-    double dInput = hb_parnd(1);
-    double dResult;
+   if( ISNUM( 1 ) )
+   {
+      double   dInput = hb_parnd( 1 );
+      double   dResult;
 
-    dResult = (( 9.0 / 5.0) * dInput ) + 32.0 ;  
-    hb_retnd( dResult );
-  }
-  else
-  {
-    PHB_ITEM pSubst = NULL;
-    int iArgErrorMode = ct_getargerrormode();
-    if (iArgErrorMode != CT_ARGERR_IGNORE)
-    {
-      pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_FAHRENHEIT,
-                               NULL, "FAHRENHEIT", 0, EF_CANSUBSTITUTE, 1, hb_paramError (1));
-    }
-    
-    if (pSubst != NULL)
-    {
-      hb_itemRelease( hb_itemReturnForward( pSubst ) );
-    }
-    else
-    {
-      hb_retnd (0.0);
-    }
-  }
+      dResult = ( ( 9.0 / 5.0 ) * dInput ) + 32.0;
+      hb_retnd( dResult );
+   }
+   else
+   {
+      PHB_ITEM pSubst         = NULL;
+      int      iArgErrorMode  = ct_getargerrormode();
+      if( iArgErrorMode != CT_ARGERR_IGNORE )
+      {
+         pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_FAHRENHEIT,
+                                  NULL, "FAHRENHEIT", 0, EF_CANSUBSTITUTE, 1, hb_paramError( 1 ) );
+      }
 
-  return;
+      if( pSubst != NULL )
+      {
+         hb_itemRelease( hb_itemReturnForward( pSubst ) );
+      }
+      else
+      {
+         hb_retnd( 0.0 );
+      }
+   }
+
+   return;
 }
 
- 
-
-HB_FUNC( INFINITY ) 
+HB_FUNC( INFINITY )
 {
-  
-  if (ISLOG (1) && hb_parl(1))
-  {
-    hb_retnd (DBL_MAX);
-  }
-  else
-  {
-    hb_retnd (93786976294838206460.00);
-  }
-  return;
+   if( ISLOG( 1 ) && hb_parl( 1 ) )
+   {
+      hb_retnd( DBL_MAX );
+   }
+   else
+   {
+      hb_retnd( 93786976294838206460.00 );
+   }
+   return;
 
 }
- 
 

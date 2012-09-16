@@ -50,7 +50,6 @@
  *
  */
 
-
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "ct.h"
@@ -58,8 +57,8 @@
 HB_FUNC( BLANK )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_ANY );
-   BOOL bRef = ISBYREF( 1 );
-   BOOL bRet = ! ct_getref();
+   BOOL     bRef  = ISBYREF( 1 );
+   BOOL     bRet  = ! ct_getref();
 
    if( ! pItem )
    {
@@ -86,8 +85,8 @@ HB_FUNC( BLANK )
 
       if( pMode && hb_itemGetL( pMode ) )
       {
-         ULONG lLen = hb_itemGetCLen( pItem );
-         char *szResult = ( char * ) hb_xgrab( lLen + 1 );
+         ULONG    lLen     = hb_itemGetCLen( pItem );
+         char *   szResult = ( char * ) hb_xgrab( lLen + 1 );
 
          hb_xmemset( szResult, ' ', lLen );
          if( bRef )

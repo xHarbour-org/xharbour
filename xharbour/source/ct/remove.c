@@ -52,123 +52,104 @@
  *
  */
 
-
 #include "ct.h"
 
-
 /* defines */
-#define DO_REMOVE_REMALL      0
-#define DO_REMOVE_REMLEFT     1
-#define DO_REMOVE_REMRIGHT    2
+#define DO_REMOVE_REMALL   0
+#define DO_REMOVE_REMLEFT  1
+#define DO_REMOVE_REMRIGHT 2
 
-static const ULONG sulErrorSubcodes[3] = {CT_ERROR_REMALL,
-                                          CT_ERROR_REMLEFT,
-                                          CT_ERROR_REMRIGHT};
-static const char * spcErrorOperation[3] = {"REMALL",
-                                            "REMLEFT",
-                                            "REMRIGHT"};
+static const ULONG   sulErrorSubcodes[ 3 ] = { CT_ERROR_REMALL,
+                                               CT_ERROR_REMLEFT,
+                                               CT_ERROR_REMRIGHT };
+static const char *  spcErrorOperation[ 3 ] = { "REMALL",
+                                                "REMLEFT",
+                                                "REMRIGHT" };
 
 /* helper function for the remxxx functions */
-static void do_remove (int iSwitch)
+static void do_remove( int iSwitch )
 {
+   /* param check */
+   if( ISCHAR( 1 ) )
+   {
+      char *   pcString = ( char * ) hb_parc( 1 );
+      size_t   sStrLen  = ( size_t ) hb_parclen( 1 );
+      char *   pcRet, * pc;
+      size_t   sRetLen;
+      char     cSearch;
 
-  /* param check */
-  if (ISCHAR (1))
-  {
+      if( hb_parclen( 2 ) > 0 )
+         cSearch = *( hb_parc( 2 ) );
+      else if( ISNUM( 2 ) )
+         cSearch = ( char ) ( hb_parnl( 2 ) % 256 );
+      else
+         cSearch = 0x20;
 
-    char *pcString = (char *)hb_parc (1);
-    size_t sStrLen = (size_t)hb_parclen (1);
-    char *pcRet, *pc;
-    size_t sRetLen;
-    char cSearch;
+      sRetLen  = sStrLen;
+      pcRet    = pcString;
 
-    if (hb_parclen (2) > 0)
-      cSearch = *(hb_parc (2));
-    else if (ISNUM (2))
-      cSearch = (char)( hb_parnl(2) % 256 );
-    else
-      cSearch = 0x20;
-
-    sRetLen = sStrLen;
-    pcRet = pcString;
-
-    if (iSwitch != DO_REMOVE_REMRIGHT)
-    {
-      while ((*pcRet == cSearch) && (pcRet < pcString+sStrLen))
+      if( iSwitch != DO_REMOVE_REMRIGHT )
       {
-        pcRet++;
-        sRetLen--;
+         while( ( *pcRet == cSearch ) && ( pcRet < pcString + sStrLen ) )
+         {
+            pcRet++;
+            sRetLen--;
+         }
       }
-    }
 
-    if (iSwitch != DO_REMOVE_REMLEFT)
-    {
-      pc = pcString+sStrLen-1;
-      while ((*pc == cSearch) && (pc >= pcRet))
+      if( iSwitch != DO_REMOVE_REMLEFT )
       {
-        pc--;
-        sRetLen--;
+         pc = pcString + sStrLen - 1;
+         while( ( *pc == cSearch ) && ( pc >= pcRet ) )
+         {
+            pc--;
+            sRetLen--;
+         }
       }
-    }
 
-    if (sRetLen == 0)
-      hb_retc ("");
-    else
-      hb_retclen (pcRet, sRetLen);
+      if( sRetLen == 0 )
+         hb_retc( "" );
+      else
+         hb_retclen( pcRet, sRetLen );
 
-  }
-  else /* if (ISCHAR (1)) */
-  {
-    PHB_ITEM pSubst = NULL;
-    int iArgErrorMode = ct_getargerrormode();
-    if (iArgErrorMode != CT_ARGERR_IGNORE)
-    {
-      pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG, sulErrorSubcodes[iSwitch],
-                               NULL, (char *)spcErrorOperation[iSwitch], 0, EF_CANSUBSTITUTE, 2,
-                               hb_paramError (1), hb_paramError (2));
-    }
+   }
+   else /* if (ISCHAR (1)) */
+   {
+      PHB_ITEM pSubst         = NULL;
+      int      iArgErrorMode  = ct_getargerrormode();
+      if( iArgErrorMode != CT_ARGERR_IGNORE )
+      {
+         pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG, sulErrorSubcodes[ iSwitch ],
+                                  NULL, ( char * ) spcErrorOperation[ iSwitch ], 0, EF_CANSUBSTITUTE, 2,
+                                  hb_paramError( 1 ), hb_paramError( 2 ) );
+      }
 
-    if (pSubst != NULL)
-    {
-      hb_itemRelease( hb_itemReturnForward( pSubst ) );
-    }
-    else
-    {
-      hb_retc ("");
-    }
-    return;
-  }
-
-  return;
-
+      if( pSubst != NULL )
+      {
+         hb_itemRelease( hb_itemReturnForward( pSubst ) );
+      }
+      else
+      {
+         hb_retc( "" );
+      }
+      return;
+   }
 }
 
-
-
-HB_FUNC (REMALL)
+HB_FUNC( REMALL )
 {
-
-  do_remove (DO_REMOVE_REMALL);
-  return;
-
+   do_remove( DO_REMOVE_REMALL );
+   return;
 }
 
-
-
-HB_FUNC (REMLEFT)
+HB_FUNC( REMLEFT )
 {
-
-  do_remove (DO_REMOVE_REMLEFT);
-  return;
-
+   do_remove( DO_REMOVE_REMLEFT );
+   return;
 }
 
-
-
-HB_FUNC (REMRIGHT)
+HB_FUNC( REMRIGHT )
 {
-
-  do_remove (DO_REMOVE_REMRIGHT);
-  return;
-
+   do_remove( DO_REMOVE_REMRIGHT );
+   return;
 }

@@ -52,207 +52,198 @@
  *
  */
 
-
 #include "ct.h"
 #include "hbvm.h"
 #include "hbstack.h"
 
 /* throwing a CT-subsystem error without value substitution
    - function adapted from errorapi.c */
-USHORT ct_error (USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
+USHORT ct_error( USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
                  const char * szDescription, const char * szOperation,
-                 USHORT uiOsCode, USHORT uiFlags, ULONG uiArgCount, ...)
+                 USHORT uiOsCode, USHORT uiFlags, ULONG uiArgCount, ... )
 {
-  USHORT uiAction;
-  PHB_ITEM pError;
+   USHORT   uiAction;
+   PHB_ITEM pError;
 
-  PHB_ITEM pArray;
-  va_list va;
-  ULONG uiArgPos;
-  BOOL bRelease = TRUE;
+   PHB_ITEM pArray;
+   va_list  va;
+   ULONG    uiArgPos;
+   BOOL     bRelease = TRUE;
 
-  HB_TRACE(HB_TR_DEBUG, ("ct_error (%hu, %lu, %lu, %s, %s, %hu, %hu, %lu",
-                          uiSeverity, ulGenCode, ulSubCode, szDescription,
-                          szOperation, uiOsCode, uiFlags, uiArgCount));
+   HB_TRACE( HB_TR_DEBUG, ( "ct_error (%hu, %lu, %lu, %s, %s, %hu, %hu, %lu",
+                            uiSeverity, ulGenCode, ulSubCode, szDescription,
+                            szOperation, uiOsCode, uiFlags, uiArgCount ) );
 
-  pArray = hb_itemArrayNew (uiArgCount);
+   pArray = hb_itemArrayNew( uiArgCount );
 
-  /* Build the array from the passed arguments. */
-  va_start (va, uiArgCount);
+   /* Build the array from the passed arguments. */
+   va_start( va, uiArgCount );
 
-  for (uiArgPos = 1; uiArgPos <= uiArgCount; uiArgPos++)
-  {
-    PHB_ITEM pTemp = va_arg (va, PHB_ITEM);
-    hb_itemArrayPut (pArray, uiArgPos, pTemp );
+   for( uiArgPos = 1; uiArgPos <= uiArgCount; uiArgPos++ )
+   {
+      PHB_ITEM pTemp = va_arg( va, PHB_ITEM );
+      hb_itemArrayPut( pArray, uiArgPos, pTemp );
 //  hb_itemArrayPut (pArray, uiArgPos, pTemp = va_arg (va, PHB_ITEM));
-    HB_TRACE(HB_TR_DEBUG, ("\t%p,",pTemp));
-  }
-  va_end (va);
-  HB_TRACE(HB_TR_DEBUG, (")"));
+      HB_TRACE( HB_TR_DEBUG, ( "\t%p,", pTemp ) );
+   }
+   va_end( va );
+   HB_TRACE( HB_TR_DEBUG, ( ")" ) );
 
-  pError = hb_errRT_New (uiSeverity, CT_SUBSYSTEM, ulGenCode, ulSubCode,
-                         ( char * ) szDescription, ( char * ) szOperation,
-                         uiOsCode, uiFlags);
+   pError = hb_errRT_New( uiSeverity, CT_SUBSYSTEM, ulGenCode, ulSubCode,
+                          ( char * ) szDescription, ( char * ) szOperation,
+                          uiOsCode, uiFlags );
 
-  /* Assign the new array to the object data item. */
-  hb_vmPushSymbol (hb_dynsymGetSymbol ("_ARGS"));
-  hb_vmPush (pError);
-  hb_vmPush (pArray);
-  hb_vmSend (1);
+   /* Assign the new array to the object data item. */
+   hb_vmPushSymbol( hb_dynsymGetSymbol( "_ARGS" ) );
+   hb_vmPush( pError );
+   hb_vmPush( pArray );
+   hb_vmSend( 1 );
 
-  /* Release the Array. */
-  if (bRelease)
-  {
-    hb_itemRelease (pArray);
-  }
+   /* Release the Array. */
+   if( bRelease )
+   {
+      hb_itemRelease( pArray );
+   }
 
-  /* launch error codeblock */
-  uiAction = hb_errLaunch (pError);
+   /* launch error codeblock */
+   uiAction = hb_errLaunch( pError );
 
-  /* release error codeblock */
-  hb_itemRelease( pError );
+   /* release error codeblock */
+   hb_itemRelease( pError );
 
-  return (uiAction);
+   return uiAction;
 }
 
 
 /* throwing a CT-subsystem error with value substitution
    - function adapted from errorapi.c */
-PHB_ITEM ct_error_subst (USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
+PHB_ITEM ct_error_subst( USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
                          const char * szDescription, const char * szOperation,
-                         USHORT uiOsCode, USHORT uiFlags, ULONG uiArgCount, ...)
+                         USHORT uiOsCode, USHORT uiFlags, ULONG uiArgCount, ... )
 {
-  PHB_ITEM pRetVal;
-  PHB_ITEM pError;
+   PHB_ITEM pRetVal;
+   PHB_ITEM pError;
 
-  PHB_ITEM pArray;
-  va_list va;
-  ULONG uiArgPos;
+   PHB_ITEM pArray;
+   va_list  va;
+   ULONG    uiArgPos;
 
-  HB_TRACE(HB_TR_DEBUG, ("ct_error_subst (%hu, %lu, %lu, %s, %s, %hu, %hu, %lu",
-                          uiSeverity, ulGenCode, ulSubCode, szDescription,
-                          szOperation, uiOsCode, uiFlags, uiArgCount));
+   HB_TRACE( HB_TR_DEBUG, ( "ct_error_subst (%hu, %lu, %lu, %s, %s, %hu, %hu, %lu",
+                            uiSeverity, ulGenCode, ulSubCode, szDescription,
+                            szOperation, uiOsCode, uiFlags, uiArgCount ) );
 
-  pArray = hb_itemArrayNew (uiArgCount);
+   pArray = hb_itemArrayNew( uiArgCount );
 
-  /* Build the array from the passed arguments. */
-  va_start (va, uiArgCount);
-  for (uiArgPos = 1; uiArgPos <= uiArgCount; uiArgPos++)
-  {
-    PHB_ITEM pTemp = va_arg (va, PHB_ITEM);
-    hb_itemArrayPut (pArray, uiArgPos, pTemp );
-    HB_TRACE(HB_TR_DEBUG, ("\t%p,",pTemp));
-  }
-  va_end (va);
-  HB_TRACE(HB_TR_DEBUG, (")"));
+   /* Build the array from the passed arguments. */
+   va_start( va, uiArgCount );
+   for( uiArgPos = 1; uiArgPos <= uiArgCount; uiArgPos++ )
+   {
+      PHB_ITEM pTemp = va_arg( va, PHB_ITEM );
+      hb_itemArrayPut( pArray, uiArgPos, pTemp );
+      HB_TRACE( HB_TR_DEBUG, ( "\t%p,", pTemp ) );
+   }
+   va_end( va );
+   HB_TRACE( HB_TR_DEBUG, ( ")" ) );
 
-  pError = hb_errRT_New_Subst (uiSeverity, CT_SUBSYSTEM, ulGenCode, ulSubCode,
-                               ( char * ) szDescription, ( char * ) szOperation,
-                               uiOsCode, uiFlags);
+   pError = hb_errRT_New_Subst( uiSeverity, CT_SUBSYSTEM, ulGenCode, ulSubCode,
+                                ( char * ) szDescription, ( char * ) szOperation,
+                                uiOsCode, uiFlags );
 
-  /* Assign the new array to the object data item. */
-  hb_vmPushSymbol (hb_dynsymGetSymbol ("_ARGS"));
-  hb_vmPush (pError);
-  hb_vmPush (pArray);
-  hb_vmSend (1);
+   /* Assign the new array to the object data item. */
+   hb_vmPushSymbol( hb_dynsymGetSymbol( "_ARGS" ) );
+   hb_vmPush( pError );
+   hb_vmPush( pArray );
+   hb_vmSend( 1 );
 
-  /* Release the Array. */
-  hb_itemRelease (pArray);
+   /* Release the Array. */
+   hb_itemRelease( pArray );
 
-  /* launch error codeblock */
-  pRetVal = hb_errLaunchSubst (pError);
-  hb_itemRelease( pError );
+   /* launch error codeblock */
+   pRetVal = hb_errLaunchSubst( pError );
+   hb_itemRelease( pError );
 
-  return (pRetVal);
+   return pRetVal;
 }
 
 
 /* argument error behaviour */
 static int s_iArgErrMode = CT_ARGERR_IGNORE;
 
-void ct_setargerrormode (int iMode)
+void ct_setargerrormode( int iMode )
 {
-  HB_TRACE(HB_TR_DEBUG, ("ct_setargerrormode(%i)",iMode));
-  s_iArgErrMode = iMode;
+   HB_TRACE( HB_TR_DEBUG, ( "ct_setargerrormode(%i)", iMode ) );
+   s_iArgErrMode = iMode;
 }
 
-int ct_getargerrormode (void)
+int ct_getargerrormode( void )
 {
-  HB_TRACE(HB_TR_DEBUG, ("ct_getargerrormode()"));
-  return (s_iArgErrMode);
+   HB_TRACE( HB_TR_DEBUG, ( "ct_getargerrormode()" ) );
+   return s_iArgErrMode;
 }
 
 
-HB_FUNC (CSETARGERR)
+HB_FUNC( CSETARGERR )
 {
 
-  hb_retni (ct_getargerrormode());
+   hb_retni( ct_getargerrormode() );
 
-  if (ISNUM (1))
-  {
-    int iNewMode = hb_parni (1);
-    if ((iNewMode == CT_ARGERR_WHOCARES) ||
-        (iNewMode == CT_ARGERR_WARNING) ||
-        (iNewMode == CT_ARGERR_ERROR) || 
-        (iNewMode == CT_ARGERR_CATASTROPHIC)||
-        (iNewMode == CT_ARGERR_IGNORE))      
-    {
-      ct_setargerrormode (hb_parni (1));
-    }
-    else
-    {
-      int iArgErrorMode = ct_getargerrormode();
-      if (iArgErrorMode != CT_ARGERR_IGNORE)
+   if( ISNUM( 1 ) )
+   {
+      int iNewMode = hb_parni( 1 );
+      if( ( iNewMode == CT_ARGERR_WHOCARES ) ||
+          ( iNewMode == CT_ARGERR_WARNING ) ||
+          ( iNewMode == CT_ARGERR_ERROR ) ||
+          ( iNewMode == CT_ARGERR_CATASTROPHIC ) ||
+          ( iNewMode == CT_ARGERR_IGNORE ) )
       {
-        ct_error ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_CSETARGERR,
-                  NULL, "CSETARGERR", 0, EF_CANDEFAULT, 1, hb_paramError (1));
+         ct_setargerrormode( hb_parni( 1 ) );
       }
-    }
-  }
-  else if (hb_pcount() > 0)  /* more than one param but not integer */
-  {
-    int iArgErrorMode = ct_getargerrormode();
-    if (iArgErrorMode != CT_ARGERR_IGNORE)
-    {
-      ct_error ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_CSETARGERR,
-                NULL, "CSETARGERR", 0, EF_CANDEFAULT, 1, hb_paramError (1));
-    }
-  }
+      else
+      {
+         int iArgErrorMode = ct_getargerrormode();
+         if( iArgErrorMode != CT_ARGERR_IGNORE )
+         {
+            ct_error( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_CSETARGERR,
+                      NULL, "CSETARGERR", 0, EF_CANDEFAULT, 1, hb_paramError( 1 ) );
+         }
+      }
+   }
+   else if( hb_pcount() > 0 )  /* more than one param but not integer */
+   {
+      int iArgErrorMode = ct_getargerrormode();
+      if( iArgErrorMode != CT_ARGERR_IGNORE )
+      {
+         ct_error( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_CSETARGERR,
+                   NULL, "CSETARGERR", 0, EF_CANDEFAULT, 1, hb_paramError( 1 ) );
+      }
+   }
 
-  return;
-
+   return;
 }
-
 
 /* initialization */
 static int s_initialized = 0;  /* TODO: make this thread safe */
 
-
-HB_FUNC (CTCINIT)
+HB_FUNC( CTCINIT )
 {
-  
-  if (s_initialized == 0)
-  {
-    int iSuccess;
-    iSuccess = ct_str_init();
-    iSuccess |= ct_math_init();
-    s_initialized = iSuccess;
-  }
 
-  hb_retl (s_initialized);
+   if( s_initialized == 0 )
+   {
+      int iSuccess;
+      iSuccess       = ct_str_init();
+      iSuccess       |= ct_math_init();
+      s_initialized  = iSuccess;
+   }
 
+   hb_retl( s_initialized );
 }
 
-
-
-HB_FUNC (CTCEXIT)
+HB_FUNC( CTCEXIT )
 {
+   ct_str_exit();
+   ct_math_exit();
 
-  ct_str_exit();
-  ct_math_exit();
+   s_initialized = 0;
 
-  s_initialized = 0;
-
-  hb_ret();
-
+   hb_ret();
 }

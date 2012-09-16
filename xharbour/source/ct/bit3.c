@@ -65,284 +65,262 @@ typedef USHORT * USHORTP;
 
 static LONG __getparam( int iParam );
 static LONG __numand( LONG wNum1, LONG wNum2 );
-static LONG __numor ( LONG wNum1, LONG wNum2 );
+static LONG __numor( LONG wNum1, LONG wNum2 );
 static LONG __numxor( LONG wNum1, LONG wNum2 );
 static LONG __numnot( LONG wNum1, LONG wNum2 );
-static LONG __numfun( int iPCount, LONG (*operation)(LONG wNum1, LONG wNum2), BOOLP pbOk );
+static LONG __numfun( int iPCount, LONG ( * operation )( LONG wNum1, LONG wNum2 ), BOOLP pbOk );
 static void sizeofbits( USHORTP pusBytes, LONGP plPattern, LONGP plTestMSB );
-
 
 HB_FUNC( NUMANDX )
 {
-  int   iPCount;
-  LONG  lNumOp;
-  BOOL  bOk;
+   int   iPCount;
+   LONG  lNumOp;
+   BOOL  bOk;
 
-  iPCount = hb_pcount();
+   iPCount  = hb_pcount();
 
-  lNumOp = __numfun( iPCount, (LONG (*)(LONG wNum1, LONG wNum2))(__numand), &bOk );
+   lNumOp   = __numfun( iPCount, ( LONG ( * )( LONG wNum1, LONG wNum2 ) )( __numand ), &bOk );
 
-  if ( bOk )
-     hb_retnl( lNumOp );
-  else
-     hb_ret( );
+   if( bOk )
+      hb_retnl( lNumOp );
+   else
+      hb_ret();
 }
-
-
 
 HB_FUNC( NUMORX )
 {
-  int   iPCount;
-  LONG  lNumOp;
-  BOOL  bOk;
+   int   iPCount;
+   LONG  lNumOp;
+   BOOL  bOk;
 
-  iPCount = hb_pcount();
+   iPCount  = hb_pcount();
 
-  lNumOp = __numfun( iPCount, (LONG (*)(LONG wNum1, LONG wNum2))(__numor), &bOk );
+   lNumOp   = __numfun( iPCount, ( LONG ( * )( LONG wNum1, LONG wNum2 ) )( __numor ), &bOk );
 
-  if ( bOk )
-     hb_retnl( lNumOp );
-  else
-     hb_ret( );
+   if( bOk )
+      hb_retnl( lNumOp );
+   else
+      hb_ret();
 }
-
-
 
 HB_FUNC( NUMXORX )
 {
-  int   iPCount;
-  LONG  lNumOp;
-  BOOL  bOk;
+   int   iPCount;
+   LONG  lNumOp;
+   BOOL  bOk;
 
 /*  iPCount = hb_pcount(); */
 
-  iPCount = 3;
+   iPCount  = 3;
 
-  lNumOp = __numfun( iPCount, (LONG (*)(LONG wNum1, LONG wNum2))(__numxor), &bOk );
+   lNumOp   = __numfun( iPCount, ( LONG ( * )( LONG wNum1, LONG wNum2 ) )( __numxor ), &bOk );
 
-  if ( bOk )
-     hb_retnl( lNumOp );
-  else
-     hb_ret( );
+   if( bOk )
+      hb_retnl( lNumOp );
+   else
+      hb_ret();
 }
-
-
 
 HB_FUNC( NUMNOTX )
 {
-  int   iPCount;
-  LONG  lNumOp;
-  BOOL  bOk;
+   int   iPCount;
+   LONG  lNumOp;
+   BOOL  bOk;
 
 /*  iPCount = hb_pcount(); */
 
-  iPCount = 2;
+   iPCount  = 2;
 
-  lNumOp = __numfun( iPCount, (LONG (*)(LONG wNum1, LONG wNum2))(__numnot), &bOk );
+   lNumOp   = __numfun( iPCount, ( LONG ( * )( LONG wNum1, LONG wNum2 ) )( __numnot ), &bOk );
 
-  if ( bOk )
-     hb_retnl( lNumOp );
-  else
-     hb_ret( );
+   if( bOk )
+      hb_retnl( lNumOp );
+   else
+      hb_ret();
 }
-
-
 
 HB_FUNC( NUMROLX )
 {
-  LONG    lNum1, lNumBak, lPattern, lTestRol;
-  USHORT  usBytes, usFor, usNum2;
+   LONG     lNum1, lNumBak, lPattern, lTestRol;
+   USHORT   usBytes, usFor, usNum2;
 
-  if ( ISNUM(2) || ISCHAR(2) )
-  {
-     lNum1  = __getparam( 2 );           /* Number to do ROL */
-     usNum2 = (USHORT) __getparam( 3 );  /* Iterations       */
+   if( ISNUM( 2 ) || ISCHAR( 2 ) )
+   {
+      lNum1    = __getparam( 2 );            /* Number to do ROL */
+      usNum2   = ( USHORT ) __getparam( 3 ); /* Iterations       */
 
-     sizeofbits( &usBytes, &lPattern, &lTestRol );
+      sizeofbits( &usBytes, &lPattern, &lTestRol );
 
-     usNum2 = usNum2 % usBytes;          /* Set usNum2 < usBytes  */
+      usNum2   = usNum2 % usBytes;        /* Set usNum2 < usBytes  */
 
-     lNumBak = lNum1 & lPattern;         /* lNumBak contain the section
-                                            to doesn't ROL               */
+      lNumBak  = lNum1 & lPattern;        /* lNumBak contain the section
+                                             to doesn't ROL               */
 
-     for (usFor = 1; usFor <= usNum2; usFor++)
-     {
-        if ( lNum1 & lTestRol )  /* Test if MSB is ON */
-        {
-           lNum1 = lNum1 << 1;
-           lNum1 = lNum1 | 1;    /* Simulate that the MSB move to LSB */
-        }
-        else
-           lNum1 = lNum1 << 1;
-     }
-                                 /* Set the section not ROLed */
-     lNum1 = ( lNum1 & (~lPattern) ) | lNumBak;
+      for( usFor = 1; usFor <= usNum2; usFor++ )
+      {
+         if( lNum1 & lTestRol )  /* Test if MSB is ON */
+         {
+            lNum1 = lNum1 << 1;
+            lNum1 = lNum1 | 1;   /* Simulate that the MSB move to LSB */
+         }
+         else
+            lNum1 = lNum1 << 1;
+      }
+      /* Set the section not ROLed */
+      lNum1 = ( lNum1 & ( ~lPattern ) ) | lNumBak;
 
-     hb_retnl( lNum1 );
-  }
-  else
-     hb_ret( );
-
+      hb_retnl( lNum1 );
+   }
+   else
+      hb_ret();
 }
 
-
-
-HB_FUNC ( NUMMIRRX )
+HB_FUNC( NUMMIRRX )
 {
-  LONG    lNum1, lPattern, lTestMSB, lNumBak, lMirror = 0;
-  USHORT  usBytes, usFor;
+   LONG     lNum1, lPattern, lTestMSB, lNumBak, lMirror = 0;
+   USHORT   usBytes, usFor;
 
-  if ( ISNUM(2) || ISCHAR(2) )
-  {
-     lNum1 = __getparam( 2 );
+   if( ISNUM( 2 ) || ISCHAR( 2 ) )
+   {
+      lNum1 = __getparam( 2 );
 
-     sizeofbits( &usBytes, &lPattern, &lTestMSB );
+      sizeofbits( &usBytes, &lPattern, &lTestMSB );
 
-     lNumBak = lNum1 & lPattern;
+      lNumBak = lNum1 & lPattern;
 
-     for ( usFor = 1; usFor <= usBytes; usFor++ )
-     {
-       if ( lNum1 & 1 )
-       {
+      for( usFor = 1; usFor <= usBytes; usFor++ )
+      {
+         if( lNum1 & 1 )
+         {
 
-          lMirror = lMirror << 1;  /* if the LSB of lNum1 == 1 then */
-          lMirror = lMirror | 1;   /* set the LSB of lMirror = 1    */
-       }
-       else
-          lMirror = lMirror << 1;
+            lMirror  = lMirror << 1;   /* if the LSB of lNum1 == 1 then */
+            lMirror  = lMirror | 1;    /* set the LSB of lMirror = 1    */
+         }
+         else
+            lMirror = lMirror << 1;
 
-       lNum1 = lNum1 >> 1;
+         lNum1 = lNum1 >> 1;
 
-     }
-     lMirror = ( lMirror & (~lPattern) ) | lNumBak;
+      }
+      lMirror = ( lMirror & ( ~lPattern ) ) | lNumBak;
 
-     hb_retnl( lMirror );
-  }
-  else
-     hb_ret( );
+      hb_retnl( lMirror );
+   }
+   else
+      hb_ret();
 
 }
-
 
 static LONG __getparam( int iParam )
 {
-
-  if ( ISCHAR( iParam ) )
-     return (LONG) hb_hextonum( hb_parcx( iParam ) );
-  else
-     return hb_parnl( iParam );
-
+   if( ISCHAR( iParam ) )
+      return ( LONG ) hb_hextonum( hb_parcx( iParam ) );
+   else
+      return hb_parnl( iParam );
 }
-
 
 static LONG __numand( LONG lNum1, LONG lNum2 )
 {
-    return lNum1 & lNum2;
+   return lNum1 & lNum2;
 }
-
 
 static LONG __numor( LONG lNum1, LONG lNum2 )
 {
-    return lNum1 | lNum2;
+   return lNum1 | lNum2;
 }
 
 
 static LONG __numxor( LONG lNum1, LONG lNum2 )
 {
-    return lNum1 ^ lNum2;
+   return lNum1 ^ lNum2;
 }
-
 
 static LONG __numnot( LONG lNum1, LONG lNum2 )
 {
-    HB_SYMBOL_UNUSED (lNum2);
-    return ~lNum1;
+   HB_SYMBOL_UNUSED( lNum2 );
+   return ~lNum1;
 }
 
-
-static LONG __numfun( int iPCount, LONG (*operation)(LONG wNum1, LONG wNum2), BOOLP pbOk )
+static LONG __numfun( int iPCount, LONG ( * operation )( LONG wNum1, LONG wNum2 ), BOOLP pbOk )
 {
-  LONG   lNumOp = 0;
-  LONG   lNum1, lNum2;
-  LONG   lPattern, lTestMSB;
-  USHORT usBytes;
-  int    iFor;
+   LONG     lNumOp = 0;
+   LONG     lNum1, lNum2;
+   LONG     lPattern, lTestMSB;
+   USHORT   usBytes;
+   int      iFor;
 
-  if ( ISNUM(1) || ISNIL(1) )
-  {
-     sizeofbits( &usBytes, &lPattern, &lTestMSB );
+   if( ISNUM( 1 ) || ISNIL( 1 ) )
+   {
+      sizeofbits( &usBytes, &lPattern, &lTestMSB );
 
-     if ( ISNUM(2) || ISCHAR(2) )
-     {
-        lNum1 = __getparam( 2 );
+      if( ISNUM( 2 ) || ISCHAR( 2 ) )
+      {
+         lNum1 = __getparam( 2 );
 
-        if ( iPCount == 2 )
+         if( iPCount == 2 )
+            /*  If unary operation: NOT                           */
+            lNumOp = ( *operation )( lNum1, 0 );
 
-  /*  If unary operation: NOT                           */
-           lNumOp = (*operation)( lNum1, 0 );
+         else
+         {
 
-        else
-        {
-
-           for ( iFor=3; iFor <= iPCount; iFor++)
-           {
-              if ( ISNUM( iFor ) || ISCHAR( iFor ) )
-              {
-                 lNum2 = __getparam( iFor );
+            for( iFor = 3; iFor <= iPCount; iFor++ )
+            {
+               if( ISNUM( iFor ) || ISCHAR( iFor ) )
+               {
+                  lNum2 = __getparam( iFor );
 
 
-  /*  Call to operation: AND, OR, XOR                   */
-                 lNumOp = (*operation)( lNum1, lNum2 );
+                  /*  Call to operation: AND, OR, XOR                   */
+                  lNumOp = ( *operation )( lNum1, lNum2 );
 
-              }
-              else
-              {
-  /*  If error in parameter then return -1              */
-                 *pbOk = FALSE;
-                 return (-1);
-              }
+               }
+               else
+               {
+                  /*  If error in parameter then return -1              */
+                  *pbOk = FALSE;
+                  return -1;
+               }
 
-  /*  Copy result to first parameter if multi operation */
-              lNum1 = lNumOp;
-           }
+               /*  Copy result to first parameter if multi operation */
+               lNum1 = lNumOp;
+            }
 
-        }
+         }
 
-     }
-     else
-     {
+      }
+      else
+      {
 
-  /*  If error in parameter then return -1              */
-        *pbOk = FALSE;
-        return (-1);
-     }
+         /*  If error in parameter then return -1              */
+         *pbOk = FALSE;
+         return -1;
+      }
 
-  /*  Return result of operation */
-     lNumOp = (lNumOp & lTestMSB) ? lNumOp | lPattern : lNumOp & (~lPattern);
+      /*  Return result of operation */
+      lNumOp   = ( lNumOp & lTestMSB ) ? lNumOp | lPattern : lNumOp & ( ~lPattern );
 
-     *pbOk = TRUE;
+      *pbOk    = TRUE;
 
-     return lNumOp;
-  }
-  else
-  {
-     *pbOk = FALSE;
-     return (-1);
-  }
-
+      return lNumOp;
+   }
+   else
+   {
+      *pbOk = FALSE;
+      return -1;
+   }
 }
 
-static void sizeofbits( USHORTP pusBytes, LONG *plPattern, LONG *plTestMSB )
+static void sizeofbits( USHORTP pusBytes, LONG * plPattern, LONG * plTestMSB )
 {
 
-  *pusBytes = ((ISNIL(1) || hb_parni(1) == 0) ? sizeof( int ) * 8
-                                             : (USHORT) hb_parni( 1 ) );
+   *pusBytes = ( ( ISNIL( 1 ) || hb_parni( 1 ) == 0 ) ? sizeof( int ) * 8
+                 : ( USHORT ) hb_parni( 1 ) );
 
-  if ( *pusBytes > sizeof( LONG ) * 8 )
-     *pusBytes = *pusBytes % (sizeof( LONG ) * 8);
+   if( *pusBytes > sizeof( LONG ) * 8 )
+      *pusBytes = *pusBytes % ( sizeof( LONG ) * 8 );
 
-  *plPattern = *pusBytes == ( sizeof( LONG ) * 8) ? 0 : (-1) << *pusBytes;
-  *plTestMSB = *pusBytes == 0 ? 0 : 1 << (*pusBytes - 1);
+   *plPattern  = *pusBytes == ( sizeof( LONG ) * 8 ) ? 0 : ( -1 ) << *pusBytes;
+   *plTestMSB  = *pusBytes == 0 ? 0 : 1 << ( *pusBytes - 1 );
 }
-
 

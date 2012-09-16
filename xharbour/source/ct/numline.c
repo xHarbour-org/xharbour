@@ -57,36 +57,37 @@ HB_FUNC( NUMLINE )
 {
    LONG lLines = 0;
 
-   if( ISCHAR(1) )
+   if( ISCHAR( 1 ) )
    {
-      const char *pcString = hb_parc(1);
-      const char *pBuffer;
-      LONG lStrLen = hb_parclen(1);
-      LONG lLength = (ISNUM(2) ? hb_parnl(2) : 80);
+      const char *   pcString = hb_parc( 1 );
+      const char *   pBuffer;
+      LONG           lStrLen  = hb_parclen( 1 );
+      LONG           lLength  = ( ISNUM( 2 ) ? hb_parnl( 2 ) : 80 );
 
       while( lStrLen > 0 )
       {
-         pBuffer = (char *) memchr(pcString, 13, lStrLen);
-         if(! pBuffer)
+         pBuffer = ( char * ) memchr( pcString, 13, lStrLen );
+         if( ! pBuffer )
          {
             pBuffer = pcString + lStrLen;
          }
 
-         if( (pBuffer - pcString) > lLength)
+         if( ( pBuffer - pcString ) > lLength )
          {
             pBuffer = pcString + lLength;
          }
          else
          {
-            pBuffer ++;
-            if( *pBuffer == 10) pBuffer ++;
+            pBuffer++;
+            if( *pBuffer == 10 )
+               pBuffer++;
          }
-         lStrLen -= pBuffer - pcString;
+         lStrLen  -= pBuffer - pcString;
          pcString = pBuffer;
-         lLines ++;
+         lLines++;
       }
 
    }
 
-   hb_retnl(lLines);
+   hb_retnl( lLines );
 }

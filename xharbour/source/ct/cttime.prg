@@ -51,73 +51,78 @@
  *
  */
 
-function TIMETOSEC( cTime )
-local nSec, nLen, nVal
+FUNCTION TIMETOSEC( cTime )
 
-nSec := seconds()
+   LOCAL nSec, nLen, nVal
+
+   nSec := Seconds()
 
 /* NOTE: In CA-Clipper Tools, timetosec() is limited to HH:MM:SS:hh (hundredth).
          In xHarbour, timetosec() is extended to HH:MM:SS:ttt (thousandth).
  */
-if valtype( cTime ) == "C"
+   IF ValType( cTime ) == "C"
 
-    nSec := 0
-    nLen := Len( cTime )
+      nSec := 0
+      nLen := Len( cTime )
 
-    if Timevalid( cTime )
+      IF Timevalid( cTime )
 
-       if nLen >= 2  // HH
-          nVal := Val(SubStr(cTime,1,2))  // hours
-          nSec += nVal * 3600
-       endif
+         IF nLen >= 2  // HH
+            nVal := Val( SubStr( cTime,1,2 ) )  // hours
+            nSec += nVal * 3600
+         ENDIF
 
-       if nLen >= 5 // HH:MM
-          nVal := Val(SubStr(cTime,4,2))  // minutes
-          nSec += nVal * 60
-       endif
+         IF nLen >= 5 // HH:MM
+            nVal := Val( SubStr( cTime,4,2 ) )  // minutes
+            nSec += nVal * 60
+         ENDIF
 
-       if nLen >= 8 // HH:MM:SS
-          nVal := Val(SubStr(cTime,7,2))  // seconds
-          nSec += nVal
-       endif
+         IF nLen >= 8 // HH:MM:SS
+            nVal := Val( SubStr( cTime,7,2 ) )  // seconds
+            nSec += nVal
+         ENDIF
 
-       if nLen = 11 // HH:MM:SS:hh
-          nVal := Val(SubStr(cTime,10,2)) // hundredth
-          nSec += nVal / 100
-       elseif nLen = 12  // HH:MM:SS:ttt
-          nVal := Val(SubStr(cTime,10,3)) // thousandth
-          nSec += nVal / 1000
-       endif
+         IF nLen = 11 // HH:MM:SS:hh
+            nVal := Val( SubStr( cTime,10,2 ) ) // hundredth
+            nSec += nVal / 100
+         ELSEIF nLen = 12  // HH:MM:SS:ttt
+            nVal := Val( SubStr( cTime,10,3 ) ) // thousandth
+            nSec += nVal / 1000
+         ENDIF
 
-    else
-       nSec := -1  // Clipper compliant.
-    endif
+      ELSE
+         nSec := - 1  // Clipper compliant.
+      ENDIF
 
-endif
-return round( nSec, iif( nSec - int(nSec) > 0, iif(nLen=12,3,2), 0) )
+   ENDIF
 
+   RETURN Round( nSec, iif( nSec - Int(nSec ) > 0, iif(nLen = 12,3,2 ), 0 ) )
 
-function SECTOTIME( nSec, lHundr, lThous )
-local i, h, n
-n := iif( !valtype( nSec ) == "N", seconds(), nSec )
-h := ""
-if valtype( lHundr ) == "L" .and. lHundr
-   h := strzero( ( nSec * 100 ) % 100, 2 )
-endif
+FUNCTION SECTOTIME( nSec, lHundr, lThous )
+
+   LOCAL i, h, n
+
+   n := iif( !ValType( nSec ) == "N", Seconds(), nSec )
+   h := ""
+   IF ValType( lHundr ) == "L" .AND. lHundr
+      h := StrZero( ( nSec * 100 ) % 100, 2 )
+   ENDIF
 /* NOTE: In CA-Clipper Tools, sectotime() is limited to HH:MM:SS:hh (hundredth).
          In xHarbour, sectotime() is extended to HH:MM:SS:ttt (thousandth).
  */
-if valtype( lThous ) == "L" .and. lThous
-   h := strzero( ( nSec * 1000 ) % 1000, 3 )
-endif
-n := int( n % 86400 )
-for i := 1 to 3
-  h := strzero( n % 60, 2 ) + iif( len( h ) == 0, "", ":") + h
-  n := int( n / 60 )
-next
-return h
+   IF ValType( lThous ) == "L" .AND. lThous
+      h := StrZero( ( nSec * 1000 ) % 1000, 3 )
+   ENDIF
+   n := Int( n % 86400 )
+   FOR i := 1 TO 3
+      h := StrZero( n % 60, 2 ) + iif( Len( h ) == 0, "", ":" ) + h
+      n := Int( n / 60 )
+   NEXT
 
+   RETURN h
 
-function MILLISEC( nDelay )
-SECONDSSLEEP(nDelay / 1000)
-return ""
+FUNCTION MILLISEC( nDelay )
+
+   SECONDSSLEEP( nDelay / 1000 )
+
+   RETURN ""

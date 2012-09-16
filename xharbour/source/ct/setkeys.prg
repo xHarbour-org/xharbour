@@ -54,10 +54,13 @@ FUNCTION SaveSetKey()
 RETURN HB_SETKEYSAVE()
 
 FUNCTION RestSetKey( aSavedTraps )
+
   LOCAL lRetVal := .T., oErr
+
   TRY
-    HB_SETKEYSAVE( aSavedTraps )
+     HB_SETKEYSAVE( aSavedTraps )
   CATCH oErr
-    lRetVal := .F.
+     lRetVal := .F.
   END
+
 RETURN lRetVal

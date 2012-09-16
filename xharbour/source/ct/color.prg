@@ -12,12 +12,12 @@
  *     Copyright 2002 Walter Negro <anegro@overnet.com.ar>:
  *                        - NTOCOLOR()
  *                        - COLORTON()
- *                       
+ *
  *     Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>:
  *                        - ENHANCED()
  *                        - STANDARD()
  *                        - UNSELECTED()
- *	 
+ * 
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -64,152 +64,147 @@
 #include "color.ch"
 #include "common.ch"
 
-
 FUNCTION INVERTATTR( xAttr )
-  LOCAL n := ColorToN( xAttr )
-RETURN ( n & 0x0F ) << 4 + ( n >> 4 )
 
+   LOCAL n := ColorToN( xAttr )
 
+   RETURN ( n & 0x0F ) << 4 + ( n >> 4 )
 
 FUNCTION NTOCOLOR( nColor, lChar )
 
-  local nColorFore
-  local nColorBack
-  local lHiColor
-  local lBlinking
-  local cColor := ""
+   LOCAL nColorFore
+   LOCAL nColorBack
+   LOCAL lHiColor
+   LOCAL lBlinking
+   LOCAL cColor := ""
 
-  DEFAULT lChar TO .f.
+   DEFAULT lChar TO .F.
 
-  if valtype( nColor ) == "N" .and. nColor >= 0 .and. nColor < 256
+   IF ValType( nColor ) == "N" .AND. nColor >= 0 .AND. nColor < 256
 
-     nColorFore = nColor % 16
-     nColorBack = INT( nColor / 16 )
+      nColorFore = nColor % 16
+      nColorBack = Int( nColor / 16 )
 
-     if !lChar
+      IF !lChar
 
-        cColor = strzero( nColorFore, 2 ) + "/" + strzero( nColorBack, 2 )
+         cColor = StrZero( nColorFore, 2 ) + "/" + StrZero( nColorBack, 2 )
 
-     else
+      ELSE
        
-        lHiColor  = nColorFore > 7
-        lBlinking = nColorBack > 7
+         lHiColor  = nColorFore > 7
+         lBlinking = nColorBack > 7
 
-        nColorFore = nColorFore % 8
-        nColorBack = nColorBack % 8
+         nColorFore = nColorFore % 8
+         nColorBack = nColorBack % 8
 
-        cColor = n2c( nColorFore ) + if( lHiColor, "+", "" ) + "/" +;
-                 n2c( nColorBack ) + if( lBlinking, "*", "" )
+         cColor = n2c( nColorFore ) + if( lHiColor, "+", "" ) + "/" + ;
+            n2c( nColorBack ) + if( lBlinking, "*", "" )
 
-     endif
-  endif
+      ENDIF
+   ENDIF
 
-  return cColor
+   RETURN cColor
 
-static function n2c( nColor )
+STATIC FUNCTION n2c( nColor )
 
-  do case
-  case nColor = 0
-     return "N"
-  case nColor = 1
-     return "B"
-  case nColor = 2
-     return "G"
-  case nColor = 3
-     return "BG"
-  case nColor = 4
-     return "R"
-  case nColor = 5
-     return "BR"
-  case nColor = 6
-     return "GR"
-  case nColor = 7
-     return "W"
-  endcase
+   DO CASE
+   CASE nColor = 0
+      RETURN "N"
+   CASE nColor = 1
+      RETURN "B"
+   CASE nColor = 2
+      RETURN "G"
+   CASE nColor = 3
+      RETURN "BG"
+   CASE nColor = 4
+      RETURN "R"
+   CASE nColor = 5
+      RETURN "BR"
+   CASE nColor = 6
+      RETURN "GR"
+   CASE nColor = 7
+      RETURN "W"
+   ENDCASE
 
-  return ""
+   RETURN ""
 
-static function c2n( cColor )
+STATIC FUNCTION c2n( cColor )
   
-  local nColor := 0
+   LOCAL nColor := 0
 
-  cColor = upper( cColor )
+   cColor = Upper( cColor )
 
-  nColor += if( "B" $ cColor, 1, 0 )
-  nColor += if( "G" $ cColor, 2, 0 )
-  nColor += if( "R" $ cColor, 4, 0 )
-  nColor += if( "W" $ cColor, 7, 0 )
+   nColor += if( "B" $ cColor, 1, 0 )
+   nColor += if( "G" $ cColor, 2, 0 )
+   nColor += if( "R" $ cColor, 4, 0 )
+   nColor += if( "W" $ cColor, 7, 0 )
 
-  return nColor
-
-
+   RETURN nColor
 
 FUNCTION COLORTON( cColor )
 
-  local cColorFore, cColorBack
-  local nColorFore, nColorBack
-  local lHiColor := .f., lBlinking := .f.
-  local nSep
+   LOCAL cColorFore, cColorBack
+   LOCAL nColorFore, nColorBack
+   LOCAL lHiColor := .F. , lBlinking := .F.
+   LOCAL nSep
 
-  if valtype( cColor ) == "N"
-     return cColor
-  endif
+   IF ValType( cColor ) == "N"
+      RETURN cColor
+   ENDIF
 
-  if valtype( cColor ) == "C"
+   IF ValType( cColor ) == "C"
 
-     if ( nSep := at( ",", cColor ) ) <> 0
-        cColor := left(cColor, nSep - 1)
-     endif
+      IF ( nSep := At( ",", cColor ) ) <> 0
+         cColor := Left( cColor, nSep - 1 )
+      ENDIF
 
-     if ( nSep := at( "/", cColor ) ) == 0
+      IF ( nSep := At( "/", cColor ) ) == 0
 
-        cColorFore = cColor
-	cColorBack = ""
-     else
+         cColorFore = cColor
+         cColorBack = ""
+      ELSE
 
-        cColorFore = alltrim( substr( cColor, 1, nSep - 1 ) )
-        cColorBack = alltrim( substr( cColor, nSep + 1 ) )
-     endif
+         cColorFore = AllTrim( SubStr( cColor, 1, nSep - 1 ) )
+         cColorBack = AllTrim( SubStr( cColor, nSep + 1 ) )
+      ENDIF
 
-     if "+" $ cColorFore .or. "+" $ cColorBack
-        lHiColor  = .t.
-        cColorFore = strtran( cColorFore, "+", "" )
-        cColorBack = strtran( cColorBack, "+", "" )
-     endif
+      IF "+" $ cColorFore .OR. "+" $ cColorBack
+         lHiColor  = .T.
+         cColorFore = StrTran( cColorFore, "+", "" )
+         cColorBack = StrTran( cColorBack, "+", "" )
+      ENDIF
 
-     if "*" $ cColorFore .or. "*" $ cColorBack
-        lBlinking = .t.
-        cColorFore = strtran( cColorFore, "*", "" )
-        cColorBack = strtran( cColorBack, "*", "" )
-     endif
+      IF "*" $ cColorFore .OR. "*" $ cColorBack
+         lBlinking = .T.
+         cColorFore = StrTran( cColorFore, "*", "" )
+         cColorBack = StrTran( cColorBack, "*", "" )
+      ENDIF
 
-     nColorFore = val( cColorFore )
-     nColorBack = val( cColorBack )
+      nColorFore = Val( cColorFore )
+      nColorBack = Val( cColorBack )
 
-     if nColorFore > 0 .or. nColorBack > 0
-        return nColorFore + nColorBack * 16
-     endif
+      IF nColorFore > 0 .OR. nColorBack > 0
+         RETURN nColorFore + nColorBack * 16
+      ENDIF
 
-     if len( cColorFore ) > 2 .or. len( cColorBack ) > 2
-        return 0
-     endif
+      IF Len( cColorFore ) > 2 .OR. Len( cColorBack ) > 2
+         RETURN 0
+      ENDIF
 
-     nColorFore = c2n( cColorFore )
-     nColorBack = c2n( cColorBack )
+      nColorFore = c2n( cColorFore )
+      nColorBack = c2n( cColorBack )
 
-     if nColorFore > 7 .or. nColorBack > 7
-        return 0
-     endif
+      IF nColorFore > 7 .OR. nColorBack > 7
+         RETURN 0
+      ENDIF
 
-     nColorFore += if( lHiColor, 8, 0 )
-     nColorBack += if( lBlinking, 8, 0 )
+      nColorFore += if( lHiColor, 8, 0 )
+      nColorBack += if( lBlinking, 8, 0 )
 
-     return nColorFore + nColorBack * 16
-  endif
+      RETURN nColorFore + nColorBack * 16
+   ENDIF
 
-  return 0
-
-
+   RETURN 0
 
 FUNCTION ENHANCED()
 
@@ -217,16 +212,15 @@ FUNCTION ENHANCED()
 
    RETURN ""
 
-
 FUNCTION STANDARD()
 
    ColorSelect( CLR_STANDARD )
 
    RETURN ""
 
-
 FUNCTION UNSELECTED()
 
    ColorSelect( CLR_UNSELECTED )
 
    RETURN ""
+

@@ -57,12 +57,15 @@
 MEMVAR GetList
 
 FUNCTION CENTER( c, n, p, lMode )
+
    LOCAL cRet
-   DEFAULT n TO MaxCol() + 1 - Col()*2
+
+   DEFAULT n TO MaxCol() + 1 - Col() * 2
    DEFAULT c TO ""
    DEFAULT lMode TO .F.
    cRet := PadC( AllTrim( c ), n, p )
-   RETURN if(lMode, cRet, RTrim( cRet ) )
+
+   RETURN IF( lMode, cRet, RTrim( cRet ) )
 
 FUNCTION CSETCURS( l )
 
@@ -73,17 +76,21 @@ FUNCTION CSETCURS( l )
    RETURN SetCursor( iif( l, SC_NORMAL, SC_NONE ) ) != SC_NONE
 
 FUNCTION CSETKEY( n )
+
    RETURN SetKey( n )
 
 FUNCTION CSETCENT( nCentury )
-   if nCentury == NIL
-      RETURN __SETCENTURY()
-   else
-      RETURN __SETCENTURY( nCentury )
-   endif
+
+   IF nCentury == NIL
+      RETURN __SetCentury()
+   ELSE
+      RETURN __SetCentury( nCentury )
+   ENDIF
+
    RETURN NIL
 
 FUNCTION LTOC( l )
+
    RETURN iif( l, "T", "F" )
 
 FUNCTION RESTGETS( aGetList )
@@ -93,6 +100,7 @@ FUNCTION RESTGETS( aGetList )
    RETURN .T.
 
 FUNCTION SAVEGETS()
+
    LOCAL aGetList := GetList
 
    GetList := {}
@@ -100,28 +108,36 @@ FUNCTION SAVEGETS()
    RETURN aGetList
 
 FUNCTION DOSPARAM
+
    LOCAL cRet := ""
-   LOCAL nCount := HB_ARGC(), i
+   LOCAL nCount := hb_argc(), i
 
    FOR i := 1 TO nCount
-      cRet += if(i==1, "", " ") + HB_ARGV( i )
+      cRet += if( i == 1, "", " " ) + hb_argv( i )
    NEXT
+
    RETURN cRet
 
-FUNCTION SetRC(nRow, nCol)
-   SetPos(nRow, nCol)
+FUNCTION SetRC( nRow, nCol )
+
+   SetPos( nRow, nCol )
+
    RETURN ""
 
 #ifndef __PLATFORM__Windows
+
 FUNCTION EXENAME()
-   RETURN HB_ARGV( 0 )
+
+   RETURN hb_argv( 0 )
+
 #endif
+
 #ifdef __PLATFORM__Windows
 #pragma BEGINDUMP
 
 #include "hbapi.h"
 #include "windows.h"
-HB_FUNC(EXENAME)
+HB_FUNC( EXENAME )
 {
    char szBuffer[ MAX_PATH + 1 ] = {0} ;
 
@@ -130,6 +146,6 @@ HB_FUNC(EXENAME)
    hb_retc( szBuffer );
 }
 
-
 #pragma enddump
+
 #endif

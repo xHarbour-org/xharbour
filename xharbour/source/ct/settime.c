@@ -57,108 +57,106 @@
 #include "hbapi.h"
 #include "hbdate.h"
 
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN )
 #include <windows.h>
 #include <winbase.h>
 #define HB_OS_WIN_USED
 #endif
 
 #if defined( HB_OS_UNIX )
-   /* stime exists only in SVr4, SVID, X/OPEN and Linux */
+/* stime exists only in SVr4, SVID, X/OPEN and Linux */
    #ifndef _SVID_SOURCE
       #define _SVID_SOURCE
    #endif
 #endif
 #include <time.h>
 
-HB_FUNC ( SETNEWDATE )
+HB_FUNC( SETNEWDATE )
 {
+#if defined( HB_OS_WIN )
+   {
+      WORD        wNewYear, wNewMonth, wNewDay, wNewDayOfWeek;
+      // BOOL lMode;
+      SYSTEMTIME  st;
 
-#if defined(HB_OS_WIN)
-{
-   WORD wNewYear,wNewMonth,wNewDay,wNewDayOfWeek;
-   // BOOL lMode;
-   SYSTEMTIME st;
+      wNewYear       = hb_parni( 1 );
+      wNewMonth      = hb_parni( 2 );
+      wNewDay        = hb_parni( 3 );
+      wNewDayOfWeek  = hb_parni( 4 );
+      // lMode = hb_parl(5);
 
-   wNewYear = hb_parni(1);
-   wNewMonth = hb_parni(2);
-   wNewDay = hb_parni(3);
-   wNewDayOfWeek = hb_parni(4);
-   // lMode = hb_parl(5);
+      GetLocalTime( &st );
 
-   GetLocalTime(&st) ;
+      st.wYear       = wNewYear;
+      st.wMonth      = wNewMonth;
+      st.wDayOfWeek  = wNewDayOfWeek;
+      st.wDay        = wNewDay;
 
-   st.wYear = wNewYear ;
-   st.wMonth = wNewMonth ;
-   st.wDayOfWeek = wNewDayOfWeek ;
-   st.wDay = wNewDay ;
-
-   hb_retl ( SetLocalTime(&st) );
-}
-#elif defined( HB_OS_UNIX ) && !defined( __WATCOMC__ )
+      hb_retl( SetLocalTime( &st ) );
+   }
+#elif defined( HB_OS_UNIX ) && ! defined( __WATCOMC__ )
 /* stime exists only in SVr4, SVID, X/OPEN and Linux */
-{
-   /* LONG lNewYear,lNewMonth,lNewDay,lNewDayOfWeek; */
+   {
+      /* LONG lNewYear,lNewMonth,lNewDay,lNewDayOfWeek; */
 
-   ULONG lNewDate;
-   int iY, iM, iD;
-   time_t tm;
+      ULONG    lNewDate;
+      int      iY, iM, iD;
+      time_t   tm;
 
-   iY = hb_parni( 1 );
-   iM = hb_parni( 2 );
-   iD = hb_parni( 3 );
+      iY       = hb_parni( 1 );
+      iM       = hb_parni( 2 );
+      iD       = hb_parni( 3 );
 
-   lNewDate = hb_dateEncode( iY, iM, iD ) - hb_dateEncode( 1970, 1, 1 );
+      lNewDate = hb_dateEncode( iY, iM, iD ) - hb_dateEncode( 1970, 1, 1 );
 
-   tm = time(NULL);
-   tm = lNewDate * 86400 + ( tm % 86400 );
+      tm       = time( NULL );
+      tm       = lNewDate * 86400 + ( tm % 86400 );
 
-   hb_retl( stime(&tm) == 0);
-}
+      hb_retl( stime( &tm ) == 0 );
+   }
 #else
    hb_retl( FALSE );
 #endif
 }
 
-
-HB_FUNC ( SETNEWTIME )
+HB_FUNC( SETNEWTIME )
 {
-#if defined(HB_OS_WIN)
-{
-   WORD wNewHour,wNewMin,wNewSec;
-   // BOOL lMode;
-   SYSTEMTIME st ;
+#if defined( HB_OS_WIN )
+   {
+      WORD        wNewHour, wNewMin, wNewSec;
+      // BOOL lMode;
+      SYSTEMTIME  st;
 
-   wNewHour = (WORD) hb_parni(1);
-   wNewMin = (WORD) hb_parni(2);
-   wNewSec = (WORD) hb_parni(3);
-   // lMode = (BOOL) hb_parl(4);
+      wNewHour = ( WORD ) hb_parni( 1 );
+      wNewMin  = ( WORD ) hb_parni( 2 );
+      wNewSec  = ( WORD ) hb_parni( 3 );
+      // lMode = (BOOL) hb_parl(4);
 
-   GetLocalTime(&st) ;
+      GetLocalTime( &st );
 
-   st.wHour = wNewHour ;
-   st.wMinute = wNewMin ;
-   st.wSecond = wNewSec ;
+      st.wHour    = wNewHour;
+      st.wMinute  = wNewMin;
+      st.wSecond  = wNewSec;
 
-   hb_retl ( SetLocalTime(&st) );
-}
-#elif defined( HB_OS_UNIX ) && !defined( __WATCOMC__ )
+      hb_retl( SetLocalTime( &st ) );
+   }
+#elif defined( HB_OS_UNIX ) && ! defined( __WATCOMC__ )
 /* stime exists only in SVr4, SVID, X/OPEN and Linux */
-{
-   ULONG lNewTime;
-   int iH, iM, iS;
-   time_t tm;
+   {
+      ULONG    lNewTime;
+      int      iH, iM, iS;
+      time_t   tm;
 
-   iH = hb_parni( 1 );
-   iM = hb_parni( 2 );
-   iS = hb_parni( 3 );
-   lNewTime = iH * 3600 + iM * 60 + iS;
+      iH       = hb_parni( 1 );
+      iM       = hb_parni( 2 );
+      iS       = hb_parni( 3 );
+      lNewTime = iH * 3600 + iM * 60 + iS;
 
-   tm = time(NULL);
-   tm += lNewTime - ( tm % 86400 );
+      tm       = time( NULL );
+      tm       += lNewTime - ( tm % 86400 );
 
-   hb_retl( stime(&tm) == 0);
-}
+      hb_retl( stime( &tm ) == 0 );
+   }
 #else
    hb_retl( FALSE );
 #endif

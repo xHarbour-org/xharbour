@@ -55,92 +55,93 @@
 
 #include "setcurs.ch"
 
-#command @ <row>, <col> GET <var>                                ;
-                        [<clauses,...>]                          ;
-                        PASSWORD                                 ;
-                        [<moreClauses,...>]                      ;
-                                                                 ;
-      => @ <row>, <col> GET <var>                                ;
-                        [<clauses>]                              ;
-                        SEND reader := {|oGet|                   ;
-                                        GetPassword( oGet, Len(<var>)  ) }      ;
-                        [<moreClauses>]
-
+#command @ <row>, <col> GET <var>              ;
+      [<clauses,...>]                          ;
+      PASSWORD                                 ;
+      [<moreClauses,...>]                      ;
+                                               ;
+      => @ < row > , < col > GET < var >       ;
+      [<clauses>]                              ;
+      SEND reader := {|oGet|                   ;
+      GetPassword( oGet, Len( < var > )  ) }   ;
+      [<moreClauses>]
 
 #include "getexit.ch"
 #include "inkey.ch"
 #include "common.ch"
-proc GetPassword( oGet, nLen )
 
-  LOCAL nKey
-  Local nSaveCursor := 0
+PROCEDURE GetPassword( oGet, nLen )
 
-  // read the GET if the WHEN condition is satisfied
-  IF ( GetPreValidate(oGet) )
-    // activate the GET for reading
-    oGet:SetFocus()
+   LOCAL nKey
+   LOCAL nSaveCursor := 0
 
-    oGet:cargo := ""
-    DO WHILE ( oGet:exitState == GE_NOEXIT )
-      // check for initial typeout (no editable positions)
-      IF ( oGet:typeOut )
-        oGet:exitState := GE_ENTER
-      ENDIF
+// read the GET if the WHEN condition is satisfied
+   IF ( GetPreValidate( oGet ) )
+      // activate the GET for reading
+      oGet:SetFocus()
 
-      // apply keystrokes until exit
+      oGet:cargo := ""
       DO WHILE ( oGet:exitState == GE_NOEXIT )
-        SetCursor( iif( nSaveCursor == SC_NONE, SC_NORMAL, nSaveCursor ) )
-        nKey := InKey(0)
-        setCursor( SC_NONE )
-        IF nKey >= 32 .AND. nKey <= 255
-          oGet:cargo += Chr(nKey)
-          GetApplyKey( oGet, Asc( "*" ) )
-       	ELSEIF nKey == K_BS
-          oGet:cargo := Substr( oGet:cargo, 1, Len( oGet:cargo ) - 1 )
-          GetapplyKey( oGet, nKey)
-        ELSEIF nKey == K_ESC
-          oGet:Undo()
-          oGet:ExitState := GE_ESCAPE
-          EXIT
-        ELSEIF nKey == K_ENTER
-          GetApplyKey( oGet, nKey )
-        ENDIF
+         // check for initial typeout (no editable positions)
+         IF ( oGet:typeOut )
+            oGet:exitState := GE_ENTER
+         ENDIF
+
+         // apply keystrokes until exit
+         DO WHILE ( oGet:exitState == GE_NOEXIT )
+            SetCursor( iif( nSaveCursor == SC_NONE, SC_NORMAL, nSaveCursor ) )
+            nKey := Inkey( 0 )
+            SetCursor( SC_NONE )
+            IF nKey >= 32 .AND. nKey <= 255
+               oGet:cargo += Chr( nKey )
+               GetApplyKey( oGet, Asc( "*" ) )
+            ELSEIF nKey == K_BS
+               oGet:cargo := SubStr( oGet:cargo, 1, Len( oGet:cargo ) - 1 )
+               GetApplyKey( oGet, nKey )
+            ELSEIF nKey == K_ESC
+               oGet:Undo()
+               oGet:ExitState := GE_ESCAPE
+               EXIT
+            ELSEIF nKey == K_ENTER
+               GetApplyKey( oGet, nKey )
+            ENDIF
+         ENDDO
+
+         // disallow exit if the VALID condition is not satisfied
+         IF ( !GetPostValidate( oGet ) )
+            oGet:exitState := GE_NOEXIT
+         ENDIF
       ENDDO
+      // de-activate the GET
+      oGet:KillFocus()
+   ENDIF
 
-      // disallow exit if the VALID condition is not satisfied
-      IF ( !GetPostValidate( oGet ) )
-        oGet:exitState := GE_NOEXIT
-      ENDIF
-    ENDDO
-    // de-activate the GET
-    oGet:KillFocus()
-  ENDIF
-
-  IF oGet:exitState != GE_ESCAPE
+   IF oGet:exitState != GE_ESCAPE
       IF nLen = NIL
-         nLen := len(oGet:varget())
+         nLen := Len( oGet:varget() )
       ENDIF
-     oGet:varPut( oGet:cargo + Space( nLen - Len( oGet:cargo ) ) )
-  ENDIF
+      oGet:varPut( oGet:cargo + Space( nLen - Len( oGet:cargo ) ) )
+   ENDIF
 
-RETURN
+   RETURN
 
 FUNCTION GetSecret( cDef, nRow, nCol, lSay, lPrompt )
 
-   Local OldRow := Row()
-   Local OldCol := Col()
-   Local GetList := {}
-   Local cColor := Setcolor()
-   Local cVar   := Space( Len( cDef ) )
-   DEFAULT nRow to Row(), nCol to Col(), lSay To .F.
+   LOCAL OldRow := Row()
+   LOCAL OldCol := Col()
+   LOCAL GetList := {}
+   LOCAL cColor := SetColor()
+   LOCAL cVar   := Space( Len( cDef ) )
+
+   DEFAULT nRow TO Row(), nCol TO Col(), lSay TO .F.
 
    IF lPrompt <> Nil
-      @ nRow, nCol Say lPrompt Get cVar PASSWORD
+      @ nRow, nCol SAY lPrompt GET cVar PASSWORD
    ELSE
-      @ nRow, nCol Get cVar PASSWORD
+      @ nRow, nCol GET cVar PASSWORD
    ENDIF
 
    READ
    SetPos( OldRow, OldCol )
 
-RETURN cVar
+   RETURN cVar

@@ -57,17 +57,17 @@ static LONG s_lCounter = 0;
 
 HB_FUNC( NUMCOUNT )
 {
-   BOOL bMode = (ISLOG(2) ? hb_parl(2) : 0);
+   BOOL bMode = ( ISLOG( 2 ) ? hb_parl( 2 ) : 0 );
 
-   if( ISNUM (1) )
+   if( ISNUM( 1 ) )
    {
-      if (bMode)
+      if( bMode )
       {
-         s_lCounter = hb_parnl(1);
+         s_lCounter = hb_parnl( 1 );
       }
       else
       {
-         s_lCounter += hb_parnl(1);
+         s_lCounter += hb_parnl( 1 );
       }
    }
 

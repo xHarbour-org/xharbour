@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-16 18:19 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/ct/*.c
+  * source/ct/*.prg
+    ! reformatted
+
 2012-09-16 17:33 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/gd/source/gdbar.prg
   * contrib/gd/source/gdbarcode.prg

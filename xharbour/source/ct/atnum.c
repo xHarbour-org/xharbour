@@ -8,7 +8,7 @@
  *
  *   - AFTERATNUM()
  *   - BEFORATNUM()
- *   - ATNUM() 
+ *   - ATNUM()
  *
  * Copyright 2001 IntTec GmbH, Neunlindenstr 32, 79106 Freiburg, Germany
  *        Author: Martin Vogel <vogel@inttec.de>
@@ -56,333 +56,313 @@
  *
  */
 
-
 #include "ct.h"
 
-
-#define DO_ATNUM_AFTERATNUM      0
-#define DO_ATNUM_BEFORATNUM      1
-#define DO_ATNUM_ATNUM           2
-
+#define DO_ATNUM_AFTERATNUM   0
+#define DO_ATNUM_BEFORATNUM   1
+#define DO_ATNUM_ATNUM        2
 
 /* helper function */
-static void do_atnum (int iSwitch)
+static void do_atnum( int iSwitch )
 {
+   if( ( ISCHAR( 1 ) ) && ( ISCHAR( 2 ) ) )
+   {
 
-  if ((ISCHAR (1)) && (ISCHAR (2)))
-  {
-    
-    const char *pcStringToMatch = hb_parc (1);
-    size_t sStrToMatchLen = (size_t)hb_parclen (1);
-    const char *pcString = hb_parc (2);
-    size_t sStrLen = (size_t)hb_parclen (2);
-    int iMultiPass = ct_getatmupa();
-    int iAtLike    = ct_getatlike();
-    char cAtLike   = ct_getatlikechar();
-    size_t sIgnore, sMatchStrLen;
-    ULONG ulCounter;
-    const char *pc = NULL;
+      const char *   pcStringToMatch   = hb_parc( 1 );
+      size_t         sStrToMatchLen    = ( size_t ) hb_parclen( 1 );
+      const char *   pcString          = hb_parc( 2 );
+      size_t         sStrLen           = ( size_t ) hb_parclen( 2 );
+      int            iMultiPass        = ct_getatmupa();
+      int            iAtLike           = ct_getatlike();
+      char           cAtLike           = ct_getatlikechar();
+      size_t         sIgnore, sMatchStrLen;
+      ULONG          ulCounter;
+      const char *   pc                = NULL;
 
-    /* eventually ignore some characters */
-    if (ISNUM (4))
-      sIgnore = (size_t)hb_parnl (4);
-    else
-      sIgnore = 0;
+      /* eventually ignore some characters */
+      if( ISNUM( 4 ) )
+         sIgnore = ( size_t ) hb_parnl( 4 );
+      else
+         sIgnore = 0;
 
-    if (sIgnore >= sStrLen)
-    {
-      switch (iSwitch)
+      if( sIgnore >= sStrLen )
       {
-        case DO_ATNUM_AFTERATNUM:
-        {
-          /* AFTERATNUM */
-          int iArgErrorMode = ct_getargerrormode();
-          if (iArgErrorMode != CT_ARGERR_IGNORE)
-          {
-            ct_error ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_AFTERATNUM,
-                      NULL, "AFTERATNUM", 0, EF_CANDEFAULT, 4,
-                      hb_paramError (1), hb_paramError (2),
-                      hb_paramError (3), hb_paramError (4));
-          };
-          hb_retc ("");
-        }; break;
-
-        case DO_ATNUM_BEFORATNUM:
-        {
-          /* BEFORATNUM */
-          int iArgErrorMode = ct_getargerrormode();
-          if (iArgErrorMode != CT_ARGERR_IGNORE)
-          {
-            ct_error ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_BEFORATNUM,
-                      NULL, "BEFORATNUM", 0, EF_CANDEFAULT, 4,
-                      hb_paramError (1), hb_paramError (2),
-                      hb_paramError (3), hb_paramError (4));
-          };
-          hb_retc ("");
-        }; break;
-
-        case DO_ATNUM_ATNUM:
-        {
-          /* ATNUM */
-          int iArgErrorMode = ct_getargerrormode();
-          if (iArgErrorMode != CT_ARGERR_IGNORE)
-          {
-            ct_error ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_ATNUM,
-                      NULL, "ATNUM", 0, EF_CANDEFAULT, 4,
-                      hb_paramError (1), hb_paramError (2),
-                      hb_paramError (3), hb_paramError (4));
-          };
-          hb_retnl (0);
-        }; break;
-      }
-
-      return;
-    }
-    else
-    {
-      pcString += sIgnore;
-      sStrLen -= sIgnore;
-    }
-
-    /* nth match or last match ? */
-    if (ISNUM (3) && ((ulCounter = hb_parnl (3)) != 0))
-    {
-
-      /* find the <ulCounter>th match */
-      const char *pcSubStr;
-      size_t sSubStrLen;
-      ULONG ulMatchCounter = 0;
-
-      pcSubStr = pcString;
-      sSubStrLen = sStrLen;
-
-      while (ulMatchCounter < ulCounter) 
-      {
-        switch (iAtLike)
-        {
-          case CT_SETATLIKE_EXACT:
-          {
-            pc = ct_at_exact_forward (pcSubStr, sSubStrLen,
-                                      pcStringToMatch, sStrToMatchLen,
-                                      &sMatchStrLen);
-          }; break;
-
-          case CT_SETATLIKE_WILDCARD:
-          {
-            pc = ct_at_wildcard_forward (pcSubStr, sSubStrLen,
-                                         pcStringToMatch, sStrToMatchLen,
-                                         cAtLike, &sMatchStrLen);
-          }; break;
-
-          default:
-          {
-            pc = NULL;
-          };
-        }
-
-        if (pc == NULL)
-        {
-          /* no match found; if this happens at this point,
-             there are no <ulCounter> matches, so return an empty string */
-          switch (iSwitch)
-          {
+         switch( iSwitch )
+         {
             case DO_ATNUM_AFTERATNUM:
+            {
+               /* AFTERATNUM */
+               int iArgErrorMode = ct_getargerrormode();
+               if( iArgErrorMode != CT_ARGERR_IGNORE )
+               {
+                  ct_error( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_AFTERATNUM,
+                            NULL, "AFTERATNUM", 0, EF_CANDEFAULT, 4,
+                            hb_paramError( 1 ), hb_paramError( 2 ),
+                            hb_paramError( 3 ), hb_paramError( 4 ) );
+               }
+               ;
+               hb_retc( "" );
+            }; break;
+
             case DO_ATNUM_BEFORATNUM:
             {
-              /* AFTERATNUM */
-              /* BEFORATNUM */
-              hb_retc ("");
+               /* BEFORATNUM */
+               int iArgErrorMode = ct_getargerrormode();
+               if( iArgErrorMode != CT_ARGERR_IGNORE )
+               {
+                  ct_error( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_BEFORATNUM,
+                            NULL, "BEFORATNUM", 0, EF_CANDEFAULT, 4,
+                            hb_paramError( 1 ), hb_paramError( 2 ),
+                            hb_paramError( 3 ), hb_paramError( 4 ) );
+               }
+               ;
+               hb_retc( "" );
             }; break;
-            
+
             case DO_ATNUM_ATNUM:
             {
-              /* ATNUM */
-              hb_retnl (0);
+               /* ATNUM */
+               int iArgErrorMode = ct_getargerrormode();
+               if( iArgErrorMode != CT_ARGERR_IGNORE )
+               {
+                  ct_error( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_ATNUM,
+                            NULL, "ATNUM", 0, EF_CANDEFAULT, 4,
+                            hb_paramError( 1 ), hb_paramError( 2 ),
+                            hb_paramError( 3 ), hb_paramError( 4 ) );
+               }
+               ;
+               hb_retnl( 0 );
             }; break;
-          }
-          
-          return;
-        }
+         }
 
-        ulMatchCounter++;
-
-        if (iMultiPass)
-          pcSubStr = pc+1;
-        else
-          pcSubStr = pc+sMatchStrLen;
-        sSubStrLen = sStrLen-(pcSubStr-pcString);
+         return;
+      }
+      else
+      {
+         pcString += sIgnore;
+         sStrLen  -= sIgnore;
       }
 
-    }
-    else /* (ISNUM (3) && ((ulCounter = hb_parnl (3)) != 0) */
-    {
-        
-      /* we have to find the last match and return the
-         string after that last match */
-
-      switch (iAtLike)
+      /* nth match or last match ? */
+      if( ISNUM( 3 ) && ( ( ulCounter = hb_parnl( 3 ) ) != 0 ) )
       {
-        case CT_SETATLIKE_EXACT:
-        {
-          pc = ct_at_exact_backward (pcString, sStrLen,
-                                     pcStringToMatch, sStrToMatchLen,
-                                     &sMatchStrLen);
-        }; break;
 
-        case CT_SETATLIKE_WILDCARD:
-        {
-          pc = ct_at_wildcard_backward (pcString, sStrLen,
-                                        pcStringToMatch, sStrToMatchLen,
-                                        cAtLike, &sMatchStrLen);
-        }; break;
+         /* find the <ulCounter>th match */
+         const char *   pcSubStr;
+         size_t         sSubStrLen;
+         ULONG          ulMatchCounter = 0;
 
-        default:
-        {
-          pc = NULL;
-        };
+         pcSubStr    = pcString;
+         sSubStrLen  = sStrLen;
+
+         while( ulMatchCounter < ulCounter )
+         {
+            switch( iAtLike )
+            {
+               case CT_SETATLIKE_EXACT:
+               {
+                  pc = ct_at_exact_forward( pcSubStr, sSubStrLen,
+                                            pcStringToMatch, sStrToMatchLen,
+                                            &sMatchStrLen );
+               }; break;
+
+               case CT_SETATLIKE_WILDCARD:
+               {
+                  pc = ct_at_wildcard_forward( pcSubStr, sSubStrLen,
+                                               pcStringToMatch, sStrToMatchLen,
+                                               cAtLike, &sMatchStrLen );
+               }; break;
+
+               default:
+               {
+                  pc = NULL;
+               };
+            }
+
+            if( pc == NULL )
+            {
+               /* no match found; if this happens at this point,
+                  there are no <ulCounter> matches, so return an empty string */
+               switch( iSwitch )
+               {
+                  case DO_ATNUM_AFTERATNUM:
+                  case DO_ATNUM_BEFORATNUM:
+                  {
+                     /* AFTERATNUM */
+                     /* BEFORATNUM */
+                     hb_retc( "" );
+                  }; break;
+
+                  case DO_ATNUM_ATNUM:
+                  {
+                     /* ATNUM */
+                     hb_retnl( 0 );
+                  }; break;
+               }
+
+               return;
+            }
+
+            ulMatchCounter++;
+
+            if( iMultiPass )
+               pcSubStr = pc + 1;
+            else
+               pcSubStr = pc + sMatchStrLen;
+            sSubStrLen = sStrLen - ( pcSubStr - pcString );
+         }
+
+      }
+      else /* (ISNUM (3) && ((ulCounter = hb_parnl (3)) != 0) */
+      {
+
+         /* we have to find the last match and return the
+            string after that last match */
+
+         switch( iAtLike )
+         {
+            case CT_SETATLIKE_EXACT:
+            {
+               pc = ct_at_exact_backward( pcString, sStrLen,
+                                          pcStringToMatch, sStrToMatchLen,
+                                          &sMatchStrLen );
+            }; break;
+
+            case CT_SETATLIKE_WILDCARD:
+            {
+               pc = ct_at_wildcard_backward( pcString, sStrLen,
+                                             pcStringToMatch, sStrToMatchLen,
+                                             cAtLike, &sMatchStrLen );
+            }; break;
+
+            default:
+            {
+               pc = NULL;
+            };
+         }
+
+         if( pc == NULL )
+         {
+            /* no matches found */
+            switch( iSwitch )
+            {
+               case DO_ATNUM_AFTERATNUM:
+               case DO_ATNUM_BEFORATNUM:
+               {
+                  /* AFTERATNUM */
+                  /* BEFORATNUM */
+                  hb_retc( "" );
+               }; break;
+
+               case DO_ATNUM_ATNUM:
+               {
+                  /* ATNUM */
+                  hb_retnl( 0 );
+               }; break;
+            }
+
+            return;
+         }
+
       }
 
-      if (pc == NULL)
+      switch( iSwitch )
       {
-        /* no matches found */
-        switch (iSwitch)
-        {
-          case DO_ATNUM_AFTERATNUM:
-          case DO_ATNUM_BEFORATNUM:
-          {
+         case DO_ATNUM_AFTERATNUM:
+         {
             /* AFTERATNUM */
-            /* BEFORATNUM */
-            hb_retc ("");
-          }; break;
+            if( pc + sMatchStrLen >= pcString + sStrLen )
+               hb_retc( "" );
+            else
+               hb_retclen( pc + sMatchStrLen, sStrLen - ( pc + sMatchStrLen - pcString ) );
+         }; break;
 
-          case DO_ATNUM_ATNUM:
-          {
+         case DO_ATNUM_BEFORATNUM:
+         {
+            /* BEFORATNUM */
+            hb_retclen( pcString - sIgnore, pc - ( pcString - sIgnore ) );
+         }; break;
+
+         case DO_ATNUM_ATNUM:
+         {
             /* ATNUM */
-            hb_retnl (0);
-          }; break;
-        }
-        
-        return;
+            hb_retnl( pc - ( pcString - sIgnore ) + 1 );
+         }; break;
       }
 
-    }
-
-    switch (iSwitch)
-    {
-      case DO_ATNUM_AFTERATNUM:
+   }
+   else /* ((ISCHAR (1)) && (ISCHAR (2))) */
+   {
+      switch( iSwitch )
       {
-        /* AFTERATNUM */
-        if (pc+sMatchStrLen >= pcString+sStrLen)
-          hb_retc ("");
-        else
-          hb_retclen (pc+sMatchStrLen, sStrLen-(pc+sMatchStrLen-pcString));
-      }; break;
+         case DO_ATNUM_AFTERATNUM:
+         case DO_ATNUM_BEFORATNUM:
+         {
+            /* AFTERATNUM */
+            PHB_ITEM pSubst         = NULL;
+            int      iArgErrorMode  = ct_getargerrormode();
+            if( iArgErrorMode != CT_ARGERR_IGNORE )
+            {
+               pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG,
+                                        ( iSwitch == DO_ATNUM_AFTERATNUM ? CT_ERROR_AFTERATNUM : CT_ERROR_BEFORATNUM ),
+                                        NULL,
+                                        ( iSwitch == DO_ATNUM_AFTERATNUM ? "AFTERATNUM" : "BEFORATNUM" ),
+                                        0, EF_CANSUBSTITUTE, 4,
+                                        hb_paramError( 1 ), hb_paramError( 2 ),
+                                        hb_paramError( 3 ), hb_paramError( 4 ) );
+            }
 
-      case DO_ATNUM_BEFORATNUM:
-      {
-        /* BEFORATNUM */
-        hb_retclen (pcString-sIgnore, pc-(pcString-sIgnore));
-      }; break;
+            if( pSubst != NULL )
+            {
+               hb_itemRelease( hb_itemReturnForward( pSubst ) );
+            }
+            else
+            {
+               hb_retc( "" );
+            }
+         }; break;
 
-      case DO_ATNUM_ATNUM:
-      {
-        /* ATNUM */
-        hb_retnl (pc-(pcString-sIgnore)+1);
-      }; break;
-    }
-    
-  }
-  else /* ((ISCHAR (1)) && (ISCHAR (2))) */
-  {
-    switch (iSwitch)
-    {
-      case DO_ATNUM_AFTERATNUM:
-      case DO_ATNUM_BEFORATNUM:
-      {
-        /* AFTERATNUM */
-        PHB_ITEM pSubst = NULL;
-        int iArgErrorMode = ct_getargerrormode();
-        if (iArgErrorMode != CT_ARGERR_IGNORE)
-        {
-          pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG,
-                                   (iSwitch == DO_ATNUM_AFTERATNUM ? CT_ERROR_AFTERATNUM : CT_ERROR_BEFORATNUM),
-                                   NULL,
-                                   (iSwitch == DO_ATNUM_AFTERATNUM ? "AFTERATNUM" : "BEFORATNUM"),
-                                   0, EF_CANSUBSTITUTE, 4,
-                                   hb_paramError (1), hb_paramError (2),
-                                   hb_paramError (3), hb_paramError (4));
-        }
-        
-        if (pSubst != NULL)
-        {
-          hb_itemRelease( hb_itemReturnForward( pSubst ) );
-        }
-        else
-        {
-          hb_retc ("");
-        }
-      }; break;
-        
-      case DO_ATNUM_ATNUM:
-      {
-        /* ATNUM */
-        PHB_ITEM pSubst = NULL;
-        int iArgErrorMode = ct_getargerrormode();
-        if (iArgErrorMode != CT_ARGERR_IGNORE)
-        {
-          pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_ATNUM,
-                                   NULL, "ATNUM", 0, EF_CANSUBSTITUTE, 4,
-                                   hb_paramError (1), hb_paramError (2),
-                                   hb_paramError (3), hb_paramError (4));
-        }
-        
-        if (pSubst != NULL)
-        {
-          hb_itemRelease( hb_itemReturnForward( pSubst ) );
-        }
-        else
-        {
-          hb_retnl (0);
-        }
-      }; break;
-    }
-    
-  }
+         case DO_ATNUM_ATNUM:
+         {
+            /* ATNUM */
+            PHB_ITEM pSubst         = NULL;
+            int      iArgErrorMode  = ct_getargerrormode();
+            if( iArgErrorMode != CT_ARGERR_IGNORE )
+            {
+               pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_ATNUM,
+                                        NULL, "ATNUM", 0, EF_CANSUBSTITUTE, 4,
+                                        hb_paramError( 1 ), hb_paramError( 2 ),
+                                        hb_paramError( 3 ), hb_paramError( 4 ) );
+            }
 
-  return;
-
+            if( pSubst != NULL )
+            {
+               hb_itemRelease( hb_itemReturnForward( pSubst ) );
+            }
+            else
+            {
+               hb_retnl( 0 );
+            }
+         }; break;
+      }
+   }
 }
 
-
-
-HB_FUNC (AFTERATNUM)
+HB_FUNC( AFTERATNUM )
 {
-
-  do_atnum (DO_ATNUM_AFTERATNUM);
-  return;
-
+   do_atnum( DO_ATNUM_AFTERATNUM );
+   return;
 }
 
-
-
-HB_FUNC (BEFORATNUM)
+HB_FUNC( BEFORATNUM )
 {
-
-  do_atnum (DO_ATNUM_BEFORATNUM);
-  return;
-
+   do_atnum( DO_ATNUM_BEFORATNUM );
+   return;
 }
 
-
-
-HB_FUNC (ATNUM)
+HB_FUNC( ATNUM )
 {
-
-  do_atnum (DO_ATNUM_ATNUM);
-  return;
-
+   do_atnum( DO_ATNUM_ATNUM );
+   return;
 }
-
-
-
 

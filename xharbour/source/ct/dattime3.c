@@ -59,7 +59,7 @@
 #   include <windows.h>
 #   include <winbase.h>
 #elif defined( HB_OS_UNIX )
-   /* stime exists only in SVr4, SVID, X/OPEN and Linux */
+/* stime exists only in SVr4, SVID, X/OPEN and Linux */
 #   ifndef _SVID_SOURCE
 #      define _SVID_SOURCE
 #   endif
@@ -118,8 +118,8 @@
  */
 
 /* TODO: make it MT safe */
-static double s_dTimeSet = 0;
-static double s_dTimeCounter = 0;
+static double  s_dTimeSet     = 0;
+static double  s_dTimeCounter = 0;
 
 HB_FUNC( WAITPERIOD )
 {
@@ -127,8 +127,8 @@ HB_FUNC( WAITPERIOD )
 
    if( hb_pcount() > 0 )
    {
-      s_dTimeSet = d;
-      s_dTimeCounter = d + hb_parnd( 1 )  / 100.0;
+      s_dTimeSet     = d;
+      s_dTimeCounter = d + hb_parnd( 1 ) / 100.0;
    }
 
    if( d < s_dTimeSet )
@@ -143,29 +143,29 @@ static BOOL _hb_timeValid( const char * szTime, ULONG ulLen, int * piDecode )
 
    /* NOTE: In CA-Clipper Tools, timevalid() is limited to HH:MM:SS:hh (hundredth).
             In xHarbour, timevalid() is extended to HH:MM:SS:ttt (thousandth).
-   */
+    */
    if( ulLen == 2 || ulLen == 5 || ulLen == 8 || ulLen == 11 || ulLen == 12 )
    {
-      static int s_iMax[] = { 23, 59, 59, 99 };
+      static int  s_iMax[] = { 23, 59, 59, 99 };
 
-      int i, iVal;
-      ULONG ul;
+      int         i, iVal;
+      ULONG       ul;
 
       if( ulLen == 12 )
-        s_iMax[3] = 999;
+         s_iMax[ 3 ] = 999;
 
       fValid = TRUE;
       for( ul = 0; fValid && ul < ulLen; ++ul )
       {
-         fValid = ul < 11 && ul % 3 == 2 ? szTime[ul] == ':' :
-                  ( szTime[ul] >= '0' && szTime[ul] <= '9' );
+         fValid = ul < 11 && ul % 3 == 2 ? szTime[ ul ] == ':' :
+                  ( szTime[ ul ] >= '0' && szTime[ ul ] <= '9' );
       }
       for( ul = 0, i = 0; fValid && ul < ulLen; ul += 3, ++i )
       {
-         iVal = 10 * ( szTime[ul] - '0' ) + ( szTime[ul + 1] - '0' );
-         fValid = iVal <= s_iMax[i];
+         iVal     = 10 * ( szTime[ ul ] - '0' ) + ( szTime[ ul + 1 ] - '0' );
+         fValid   = iVal <= s_iMax[ i ];
          if( piDecode )
-            piDecode[i] = iVal;
+            piDecode[ i ] = iVal;
       }
    }
 
@@ -235,7 +235,7 @@ static BOOL _hb_timeValid( const char * szTime, ULONG ulLen, int * piDecode )
 
 HB_FUNC( TIMEVALID )
 {
-   hb_retl( _hb_timeValid( hb_parc( 1 ), hb_parclen( 1 ), NULL ));
+   hb_retl( _hb_timeValid( hb_parc( 1 ), hb_parclen( 1 ), NULL ) );
 }
 
 
@@ -292,29 +292,29 @@ HB_FUNC( TIMEVALID )
 
 HB_FUNC( SETTIME )
 {
-   BOOL fResult = FALSE;
-   int iTime[4];
+   BOOL  fResult = FALSE;
+   int   iTime[ 4 ];
 
-   iTime[0] = iTime[1] = iTime[2] = iTime[3] = 0;
+   iTime[ 0 ] = iTime[ 1 ] = iTime[ 2 ] = iTime[ 3 ] = 0;
    if( _hb_timeValid( hb_parc( 1 ), hb_parclen( 1 ), iTime ) )
    {
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN )
       SYSTEMTIME st;
       GetLocalTime( &st );
-      st.wHour         = iTime[0];
-      st.wMinute       = iTime[1];
-      st.wSecond       = iTime[2];
-      st.wMilliseconds = iTime[3] * 10;
-      fResult = SetLocalTime( &st );
-#elif defined( HB_OS_UNIX ) && !defined( __WATCOMC__ )
+      st.wHour          = iTime[ 0 ];
+      st.wMinute        = iTime[ 1 ];
+      st.wSecond        = iTime[ 2 ];
+      st.wMilliseconds  = iTime[ 3 ] * 10;
+      fResult           = SetLocalTime( &st );
+#elif defined( HB_OS_UNIX ) && ! defined( __WATCOMC__ )
 /* stime exists only in SVr4, SVID, X/OPEN and Linux */
-      ULONG lNewTime;
-      time_t tm;
+      ULONG    lNewTime;
+      time_t   tm;
 
-      lNewTime = iTime[0] * 3600 + iTime[1] * 60 + iTime[2];
-      tm = time( NULL );
-      tm += lNewTime - ( tm % 86400 );
-      fResult = stime( &tm ) == 0;
+      lNewTime = iTime[ 0 ] * 3600 + iTime[ 1 ] * 60 + iTime[ 2 ];
+      tm       = time( NULL );
+      tm       += lNewTime - ( tm % 86400 );
+      fResult  = stime( &tm ) == 0;
 #endif
    }
 
@@ -374,8 +374,8 @@ HB_FUNC( SETTIME )
 
 HB_FUNC( SETDATE )
 {
-   BOOL fResult = FALSE;
-   long lDate = hb_pardl( 1 );
+   BOOL  fResult  = FALSE;
+   long  lDate    = hb_pardl( 1 );
 
    if( lDate )
    {
@@ -384,23 +384,23 @@ HB_FUNC( SETDATE )
       hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
       if( iYear >= 1970 )
       {
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN )
          SYSTEMTIME st;
          GetLocalTime( &st );
-         st.wYear      = iYear;
-         st.wMonth     = iMonth;
-         st.wDay       = iDay;
-         st.wDayOfWeek = hb_dateJulianDOW( lDate );
-         fResult = SetLocalTime( &st );
-#elif defined( HB_OS_UNIX ) && !defined( __WATCOMC__ )
+         st.wYear       = iYear;
+         st.wMonth      = iMonth;
+         st.wDay        = iDay;
+         st.wDayOfWeek  = hb_dateJulianDOW( lDate );
+         fResult        = SetLocalTime( &st );
+#elif defined( HB_OS_UNIX ) && ! defined( __WATCOMC__ )
 /* stime exists only in SVr4, SVID, X/OPEN and Linux */
-         long lNewDate;
-         time_t tm;
+         long     lNewDate;
+         time_t   tm;
 
          lNewDate = lDate - hb_dateEncode( 1970, 1, 1 );
-         tm = time( NULL );
-         tm = lNewDate * 86400 + ( tm % 86400 );
-         fResult = stime( &tm ) == 0;
+         tm       = time( NULL );
+         tm       = lNewDate * 86400 + ( tm % 86400 );
+         fResult  = stime( &tm ) == 0;
 #endif
       }
    }

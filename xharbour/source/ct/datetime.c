@@ -7,7 +7,7 @@
  *   CT3 Date & Time functions: - BOM() / EOM()
  *                              - BOQ() / EOQ()
  *                              - BOY() / EOY()
- *                              - WOM() 
+ *                              - WOM()
  *
  * Copyright 2005 Pavel Tsarenko <tpe2@mail.ru>
  * www - http://www.harbour-project.org
@@ -53,7 +53,6 @@
  *
  */
 
-
 /*
  * The following parts are Copyright of the individual authors.
  * www - http://www.harbour-project.org
@@ -65,20 +64,19 @@
  *
  */
 
-
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbdate.h"
 
 HB_FUNC( BOM )
 {
-   LONG lDate;
-   int iYear, iMonth, iDay;
+   LONG  lDate;
+   int   iYear, iMonth, iDay;
 
-   if( ISNIL(1) )
+   if( ISNIL( 1 ) )
    {
       hb_dateToday( &iYear, &iMonth, &iDay );
-      lDate = hb_dateEncode(iYear, iMonth, iDay);
+      lDate = hb_dateEncode( iYear, iMonth, iDay );
    }
    else
    {
@@ -87,8 +85,8 @@ HB_FUNC( BOM )
 
    if( lDate != 0 )
    {
-     hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
-     hb_retd( iYear, iMonth, 1);
+      hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
+      hb_retd( iYear, iMonth, 1 );
    }
    else
    {
@@ -97,16 +95,15 @@ HB_FUNC( BOM )
 
 }
 
-
 HB_FUNC( EOM )
 {
-   LONG lDate;
-   int iYear, iMonth, iDay;
+   LONG  lDate;
+   int   iYear, iMonth, iDay;
 
-   if( ISNIL(1) )
+   if( ISNIL( 1 ) )
    {
       hb_dateToday( &iYear, &iMonth, &iDay );
-      lDate = hb_dateEncode(iYear, iMonth, iDay);
+      lDate = hb_dateEncode( iYear, iMonth, iDay );
    }
    else
    {
@@ -115,14 +112,14 @@ HB_FUNC( EOM )
 
    if( lDate != 0 )
    {
-     hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
-     iMonth ++;
-     if( iMonth > 12)
-     {
-       iMonth = 1;
-       iYear ++;
-     }
-     hb_retdl( hb_dateEncode( iYear, iMonth, 1 ) - 1);
+      hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
+      iMonth++;
+      if( iMonth > 12 )
+      {
+         iMonth = 1;
+         iYear++;
+      }
+      hb_retdl( hb_dateEncode( iYear, iMonth, 1 ) - 1 );
    }
    else
    {
@@ -132,13 +129,13 @@ HB_FUNC( EOM )
 
 HB_FUNC( BOQ )
 {
-   LONG lDate;
-   int iYear, iMonth, iDay;
+   LONG  lDate;
+   int   iYear, iMonth, iDay;
 
-   if( ISNIL(1) )
+   if( ISNIL( 1 ) )
    {
       hb_dateToday( &iYear, &iMonth, &iDay );
-      lDate = hb_dateEncode(iYear, iMonth, iDay);
+      lDate = hb_dateEncode( iYear, iMonth, iDay );
    }
    else
    {
@@ -160,13 +157,13 @@ HB_FUNC( BOQ )
 
 HB_FUNC( EOQ )
 {
-   LONG lDate;
-   int iYear, iMonth, iDay;
+   LONG  lDate;
+   int   iYear, iMonth, iDay;
 
-   if( ISNIL(1) )
+   if( ISNIL( 1 ) )
    {
       hb_dateToday( &iYear, &iMonth, &iDay );
-      lDate = hb_dateEncode(iYear, iMonth, iDay);
+      lDate = hb_dateEncode( iYear, iMonth, iDay );
    }
    else
    {
@@ -181,7 +178,7 @@ HB_FUNC( EOQ )
       if( iMonth > 12 )
       {
          iMonth = 1;
-         iYear ++;
+         iYear++;
       }
       hb_retdl( hb_dateEncode( iYear, iMonth, 1 ) - 1 );
    }
@@ -193,13 +190,13 @@ HB_FUNC( EOQ )
 
 HB_FUNC( BOY )
 {
-   LONG lDate;
-   int iYear, iMonth, iDay;
+   LONG  lDate;
+   int   iYear, iMonth, iDay;
 
-   if( ISNIL(1) )
+   if( ISNIL( 1 ) )
    {
       hb_dateToday( &iYear, &iMonth, &iDay );
-      lDate = hb_dateEncode(iYear, iMonth, iDay);
+      lDate = hb_dateEncode( iYear, iMonth, iDay );
    }
    else
    {
@@ -219,13 +216,13 @@ HB_FUNC( BOY )
 
 HB_FUNC( EOY )
 {
-   LONG lDate;
-   int iYear, iMonth, iDay;
+   LONG  lDate;
+   int   iYear, iMonth, iDay;
 
-   if( ISNIL(1) )
+   if( ISNIL( 1 ) )
    {
       hb_dateToday( &iYear, &iMonth, &iDay );
-      lDate = hb_dateEncode(iYear, iMonth, iDay);
+      lDate = hb_dateEncode( iYear, iMonth, iDay );
    }
    else
    {
@@ -243,12 +240,11 @@ HB_FUNC( EOY )
    }
 }
 
-
 static int hb_wom( int iYear, int iMonth, int iDay )
 {
    int iWom;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_wom(%d, %d, %d)", iYear, iMonth, iDay));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_wom(%d, %d, %d)", iYear, iMonth, iDay ) );
 
    iWom = iDay + hb_dateDOW( iYear, iMonth, 1 ) - 1;
    if( iWom > 0 )
@@ -259,13 +255,13 @@ static int hb_wom( int iYear, int iMonth, int iDay )
 
 HB_FUNC( WOM )
 {
-   LONG lDate;
-   int iYear, iMonth, iDay;
+   LONG  lDate;
+   int   iYear, iMonth, iDay;
 
-   if( ISNIL(1) )
+   if( ISNIL( 1 ) )
    {
       hb_dateToday( &iYear, &iMonth, &iDay );
-      lDate = hb_dateEncode(iYear, iMonth, iDay);
+      lDate = hb_dateEncode( iYear, iMonth, iDay );
    }
    else
    {

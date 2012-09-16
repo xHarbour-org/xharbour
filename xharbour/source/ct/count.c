@@ -52,108 +52,94 @@
  *
  */
 
-
 #include "ct.h"
 
-
 /* defines */
-#define DO_COUNT_COUNTLEFT     0
-#define DO_COUNT_COUNTRIGHT    1
+#define DO_COUNT_COUNTLEFT    0
+#define DO_COUNT_COUNTRIGHT   1
 
 /* helper function for the countxxx functions */
-static void do_count (int iSwitch)
+static void do_count( int iSwitch )
 {
+   /* param check */
+   if( ISCHAR( 1 ) )
+   {
+      const char *   pcString = hb_parc( 1 );
+      size_t         sStrLen  = ( size_t ) hb_parclen( 1 );
+      size_t         sRetVal;
+      const char *   pc;
+      char           cSearch;
 
-  /* param check */
-  if (ISCHAR (1))
-  {
+      if( hb_parclen( 2 ) > 0 )
+         cSearch = *( hb_parc( 2 ) );
+      else if( ISNUM( 2 ) )
+         cSearch = ( char ) ( hb_parnl( 2 ) % 256 );
+      else
+         cSearch = 0x20;
 
-    const char *pcString = hb_parc( 1 );
-    size_t sStrLen = (size_t)hb_parclen( 1 );
-    size_t sRetVal;
-    const char *pc;
-    char cSearch;
+      sRetVal = 0;
 
-    if (hb_parclen (2) > 0)
-      cSearch = *(hb_parc (2));
-    else if (ISNUM (2))
-      cSearch = (char)( hb_parnl (2) % 256 );
-    else
-      cSearch = 0x20;
-
-    sRetVal = 0;
-
-    switch (iSwitch)
-    {
-      case DO_COUNT_COUNTLEFT:
+      switch( iSwitch )
       {
-        pc = pcString;
-        while ((*pc == cSearch) && (pc < pcString+sStrLen))
-        {
-          sRetVal++;
-          pc++;
-        }
-      }; break;
+         case DO_COUNT_COUNTLEFT:
+         {
+            pc = pcString;
+            while( ( *pc == cSearch ) && ( pc < pcString + sStrLen ) )
+            {
+               sRetVal++;
+               pc++;
+            }
+         }; break;
 
-      case DO_COUNT_COUNTRIGHT:
+         case DO_COUNT_COUNTRIGHT:
+         {
+            pc = pcString + sStrLen - 1;
+            while( ( *pc == cSearch ) && ( pc >= pcString ) )
+            {
+               sRetVal++;
+               pc--;
+            }
+         }; break;
+
+      }
+
+      hb_retnl( sRetVal );
+
+   }
+   else /* if (ISCHAR (1)) */
+   {
+      PHB_ITEM pSubst         = NULL;
+      int      iArgErrorMode  = ct_getargerrormode();
+      if( iArgErrorMode != CT_ARGERR_IGNORE )
       {
-        pc = pcString+sStrLen-1;
-        while ((*pc == cSearch) && (pc >= pcString))
-        {
-          sRetVal++;
-          pc--;
-        }
-      }; break;
+         pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG,
+                                  ( iSwitch == DO_COUNT_COUNTLEFT ? CT_ERROR_COUNTLEFT : CT_ERROR_COUNTRIGHT ),
+                                  NULL,
+                                  ( iSwitch == DO_COUNT_COUNTLEFT ? "COUNTLEFT" : "COUNTRIGHT" ),
+                                  0, EF_CANSUBSTITUTE, 2,
+                                  hb_paramError( 1 ), hb_paramError( 2 ) );
+      }
 
-    }
-
-    hb_retnl (sRetVal);
-
-  }
-  else /* if (ISCHAR (1)) */
-  {
-    PHB_ITEM pSubst = NULL;
-    int iArgErrorMode = ct_getargerrormode();
-    if (iArgErrorMode != CT_ARGERR_IGNORE)
-    {
-      pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG,
-                               (iSwitch == DO_COUNT_COUNTLEFT ? CT_ERROR_COUNTLEFT : CT_ERROR_COUNTRIGHT),
-                               NULL,
-                               (iSwitch == DO_COUNT_COUNTLEFT ? "COUNTLEFT" : "COUNTRIGHT"),
-                               0, EF_CANSUBSTITUTE, 2,
-                               hb_paramError (1), hb_paramError (2));
-    }
-
-    if (pSubst != NULL)
-    {
-      hb_itemRelease( hb_itemReturnForward( pSubst ) );
-    }
-    else
-    {
-      hb_retnl (0);
-    }
-  }
-
-  return;
+      if( pSubst != NULL )
+      {
+         hb_itemRelease( hb_itemReturnForward( pSubst ) );
+      }
+      else
+      {
+         hb_retnl( 0 );
+      }
+   }
 
 }
 
-
-
-HB_FUNC (COUNTLEFT)
+HB_FUNC( COUNTLEFT )
 {
-
-  do_count (DO_COUNT_COUNTLEFT);
-  return;
-
+   do_count( DO_COUNT_COUNTLEFT );
+   return;
 }
 
-
-
-HB_FUNC (COUNTRIGHT)
+HB_FUNC( COUNTRIGHT )
 {
-
-  do_count (DO_COUNT_COUNTRIGHT);
-  return;
-
+   do_count( DO_COUNT_COUNTRIGHT );
+   return;
 }

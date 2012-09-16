@@ -89,7 +89,7 @@
 #include "hbset.h"
 #include "hbapierr.h"
 
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN )
 
 #   include <windows.h>
 #   include <winnetwk.h>
@@ -113,9 +113,9 @@ BOOL WINAPI WNetErrorHandler( DWORD dwErrorCode, LPSTR lpszFunction )
    }
    else
    {
-      DWORD dwLastError, dwWNetResult;
-      TCHAR lpDescription[256], lpProvider[256];
-      char * szDescription, * szProvider;
+      DWORD    dwLastError, dwWNetResult;
+      TCHAR    lpDescription[ 256 ], lpProvider[ 256 ];
+      char *   szDescription, * szProvider;
 
       dwWNetResult = WNetGetLastError( &dwLastError, lpDescription, 256,
                                        lpProvider, 256 );
@@ -130,11 +130,11 @@ BOOL WINAPI WNetErrorHandler( DWORD dwErrorCode, LPSTR lpszFunction )
          return FALSE;
       }
 
-      szDescription = HB_TCHAR_CONVFROM( lpDescription );
-      szProvider = HB_TCHAR_CONVFROM( lpProvider );
-      pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_TOOLS, 9999, 9999,
-                             szDescription, szProvider,
-                             ( USHORT ) dwLastError, EF_NONE );
+      szDescription  = HB_TCHAR_CONVFROM( lpDescription );
+      szProvider     = HB_TCHAR_CONVFROM( lpProvider );
+      pError         = hb_errRT_New( ES_ERROR, HB_ERR_SS_TOOLS, 9999, 9999,
+                                     szDescription, szProvider,
+                                     ( USHORT ) dwLastError, EF_NONE );
       HB_TCHAR_FREE( szDescription );
       HB_TCHAR_FREE( szProvider );
 
@@ -145,16 +145,16 @@ BOOL WINAPI WNetErrorHandler( DWORD dwErrorCode, LPSTR lpszFunction )
    return TRUE;
 }
 
-static BOOL hb_IsNetShared( const char *szLocalDevice )
+static BOOL hb_IsNetShared( const char * szLocalDevice )
 {
-   TCHAR lpRemoteDevice[80];
-   LPTSTR lpLocalDevice;
-   DWORD cchBuff = sizeof( lpRemoteDevice ) / sizeof( TCHAR );
-   DWORD dwResult;
+   TCHAR    lpRemoteDevice[ 80 ];
+   LPTSTR   lpLocalDevice;
+   DWORD    cchBuff = sizeof( lpRemoteDevice ) / sizeof( TCHAR );
+   DWORD    dwResult;
 
-   lpLocalDevice = HB_TCHAR_CONVTO( szLocalDevice );
-   dwResult = WNetGetConnection( ( LPTSTR ) lpLocalDevice,
-                                 ( LPTSTR ) lpRemoteDevice, &cchBuff );
+   lpLocalDevice  = HB_TCHAR_CONVTO( szLocalDevice );
+   dwResult       = WNetGetConnection( ( LPTSTR ) lpLocalDevice,
+                                       ( LPTSTR ) lpRemoteDevice, &cchBuff );
    HB_TCHAR_FREE( lpLocalDevice );
 
    return dwResult == NO_ERROR;
@@ -162,8 +162,8 @@ static BOOL hb_IsNetShared( const char *szLocalDevice )
 
 HB_FUNC( NETCANCEL )
 {
-   DWORD dwResult;
-   LPTSTR lpDevice = HB_TCHAR_CONVTO( hb_parcx( 1 ) );
+   DWORD    dwResult;
+   LPTSTR   lpDevice = HB_TCHAR_CONVTO( hb_parcx( 1 ) );
 
    dwResult = WNetCancelConnection( lpDevice, TRUE ); /* FALSE = fail if exist open files or print jobs. */
 
@@ -184,7 +184,7 @@ HB_FUNC( NETPRINTER )
     * redirected to a network printer, NetPrinter() always will return false,
     * so I need treat PRN as LPT1.
     */
-   if( !cPrn || !*cPrn || hb_stricmp( cPrn, "PRN" ) == 0 )
+   if( ! cPrn || ! *cPrn || hb_stricmp( cPrn, "PRN" ) == 0 )
    {
       cPrn = "LPT1";
    }
@@ -195,11 +195,11 @@ HB_FUNC( NETPRINTER )
 
 HB_FUNC( NETDISK )
 {
-   char cDrive[3];
+   char cDrive[ 3 ];
 
-   cDrive[0] = hb_parcx( 1 )[0];
-   cDrive[1] = ':';
-   cDrive[2] = '\0';
+   cDrive[ 0 ] = hb_parcx( 1 )[ 0 ];
+   cDrive[ 1 ] = ':';
+   cDrive[ 2 ] = '\0';
 
    hb_retl( hb_IsNetShared( cDrive ) );
 }
@@ -207,11 +207,11 @@ HB_FUNC( NETDISK )
 
 HB_FUNC( NETREDIR )
 {
-   DWORD dwResult;
-   LPTSTR lpLocalDev  = HB_TCHAR_CONVTO( hb_parcx( 1 ) );
-   LPTSTR lpSharedRes = HB_TCHAR_CONVTO( hb_parcx( 2 ) );
-   LPTSTR lpPassword  = HB_TCHAR_CONVTO( hb_parcx( 3 ) );
-   BOOL bShowError = ( ISLOG( 4 ) ? hb_parl( 4 ) : FALSE );
+   DWORD    dwResult;
+   LPTSTR   lpLocalDev  = HB_TCHAR_CONVTO( hb_parcx( 1 ) );
+   LPTSTR   lpSharedRes = HB_TCHAR_CONVTO( hb_parcx( 2 ) );
+   LPTSTR   lpPassword  = HB_TCHAR_CONVTO( hb_parcx( 3 ) );
+   BOOL     bShowError  = ( ISLOG( 4 ) ? hb_parl( 4 ) : FALSE );
 
    if( hb_pcount() >= 3 && ISCHAR( 3 ) )
    {
@@ -230,9 +230,9 @@ HB_FUNC( NETREDIR )
    {
       if( bShowError )
       {
-         char szCommand[80];
+         char szCommand[ 80 ];
          hb_snprintf( szCommand, 80, "NETREDIR( \"%s\", \"%s\", \"%s\" )",
-                   hb_parcx( 1 ), hb_parcx( 2 ), hb_parcx( 3 ) );
+                      hb_parcx( 1 ), hb_parcx( 2 ), hb_parcx( 3 ) );
          WNetErrorHandler( dwResult, szCommand );
       }
       hb_retl( FALSE );
@@ -241,15 +241,15 @@ HB_FUNC( NETREDIR )
 
 HB_FUNC( NETRMTNAME )
 {
-   TCHAR lpRemoteDevice[80];
-   LPTSTR lpLocalDevice;
-   DWORD cchBuff = sizeof( lpRemoteDevice ) / sizeof( TCHAR );
-   DWORD dwResult;
-   char *szRemoteDevice;
+   TCHAR    lpRemoteDevice[ 80 ];
+   LPTSTR   lpLocalDevice;
+   DWORD    cchBuff = sizeof( lpRemoteDevice ) / sizeof( TCHAR );
+   DWORD    dwResult;
+   char *   szRemoteDevice;
 
-   lpLocalDevice = HB_TCHAR_CONVTO( hb_parcx( 1 ) );
-   dwResult = WNetGetConnection( ( LPTSTR ) lpLocalDevice,
-                                 ( LPTSTR ) lpRemoteDevice, &cchBuff );
+   lpLocalDevice  = HB_TCHAR_CONVTO( hb_parcx( 1 ) );
+   dwResult       = WNetGetConnection( ( LPTSTR ) lpLocalDevice,
+                                       ( LPTSTR ) lpRemoteDevice, &cchBuff );
    HB_TCHAR_FREE( lpLocalDevice );
    szRemoteDevice = HB_TCHAR_CONVFROM( lpRemoteDevice );
    hb_retc( dwResult == NO_ERROR ? szRemoteDevice : "" );
@@ -260,7 +260,7 @@ HB_FUNC( NETRMTNAME )
 HB_FUNC( NETWORK )
 {
    DWORD dwResult;
-   TCHAR lpProviderName[80];
+   TCHAR lpProviderName[ 80 ];
    DWORD cchBuff = sizeof( lpProviderName ) / sizeof( TCHAR );
 
    dwResult = WNetGetProviderName( WNNC_NET_MSNET, lpProviderName, &cchBuff );
@@ -282,7 +282,7 @@ HB_FUNC( NETWORK )
 HB_FUNC( NNETWORK )
 {
    DWORD dwResult;
-   TCHAR lpProviderName[80];
+   TCHAR lpProviderName[ 80 ];
    DWORD cchBuff = sizeof( lpProviderName ) / sizeof( TCHAR );
 
    dwResult = WNetGetProviderName( WNNC_NET_NETWARE, lpProviderName, &cchBuff );

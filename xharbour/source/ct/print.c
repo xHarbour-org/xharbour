@@ -63,21 +63,19 @@
 #include <dpmi.h>
 #endif
 
-
-
 HB_FUNC( PRINTSTAT )
 {
-   USHORT uiPort =  ISNUM( 1 ) ? hb_parni( 1 ) : 1;
-   int    Status = 0;
+   USHORT   uiPort   = ISNUM( 1 ) ? hb_parni( 1 ) : 1;
+   int      Status   = 0;
 
-#if defined(HB_OS_DOS)
+#if defined( HB_OS_DOS )
 
    /* NOTE: DOS specific solution, using BIOS interrupt */
 
    union REGS regs;
 
-   regs.h.ah = 2;
-   regs.HB_XREGS.dx = uiPort - 1;
+   regs.h.ah         = 2;
+   regs.HB_XREGS.dx  = uiPort - 1;
 
    HB_DOS_INT86( 0x17, &regs, &regs );
 
@@ -90,21 +88,19 @@ HB_FUNC( PRINTSTAT )
    hb_retni( Status );
 }
 
-
-
 HB_FUNC( PRINTREADY )
 {
-   USHORT uiPort =  ISNUM( 1 ) ? hb_parni( 1 ) : 1;
-   int    Status = 0;
+   USHORT   uiPort   = ISNUM( 1 ) ? hb_parni( 1 ) : 1;
+   int      Status   = 0;
 
-#if defined(HB_OS_DOS)
+#if defined( HB_OS_DOS )
 
    /* NOTE: DOS specific solution, using BIOS interrupt */
 
    union REGS regs;
 
-   regs.h.ah = 2;
-   regs.HB_XREGS.dx = uiPort - 1;
+   regs.h.ah         = 2;
+   regs.HB_XREGS.dx  = uiPort - 1;
 
    HB_DOS_INT86( 0x17, &regs, &regs );
 
@@ -114,23 +110,23 @@ HB_FUNC( PRINTREADY )
    HB_SYMBOL_UNUSED( uiPort );
 #endif
 
-   hb_retl( (Status == 0x90) );
+   hb_retl( ( Status == 0x90 ) );
 }
 
 
 
 HB_FUNC( PRINTSEND )
 {
-#if defined(__DJGPP__)
+#if defined( __DJGPP__ )
    __dpmi_regs r;
 
    r.x.dx = hb_parni( 2 ) - 1;
 
-   if ( ISNUM( 1 ) )
+   if( ISNUM( 1 ) )
    {
       r.h.al = hb_parni( 1 );
       __dpmi_int( 0x17, &r );
-      if ( r.h.ah & 1 )
+      if( r.h.ah & 1 )
       {
          hb_retni( 1 );
       }
@@ -139,37 +135,37 @@ HB_FUNC( PRINTSEND )
          hb_retni( 0 );
       }
    }
-   else if ( ISCHAR( 1 ) )
+   else if( ISCHAR( 1 ) )
    {
-      char *string = hb_parcx( 1 );
-      int i, len = hb_parclen( 1 );
+      char *   string = hb_parcx( 1 );
+      int      i, len = hb_parclen( 1 );
 
       r.h.ah = 0;
-      for (i = 0; i < len && !( r.h.ah & 1 ); i++)
+      for( i = 0; i < len && ! ( r.h.ah & 1 ); i++ )
       {
-         r.h.al = string[i];
+         r.h.al = string[ i ];
          __dpmi_int( 0x17, &r );
       }
-      if ( r.h.ah & 1 )
+      if( r.h.ah & 1 )
       {
-        hb_retni( len - ( i - 1 ) );
+         hb_retni( len - ( i - 1 ) );
       }
       else
       {
-        hb_retni( 0 );
+         hb_retni( 0 );
       }
    }
 #elif defined( HB_OS_WIN )
-   char szChr[ 2 ] = { ' ', '\0' };
-   char szPort[ 5 ] = { 'l', 'p', 't', '1', '\0' };
-   const char *szStr = NULL;
-   USHORT usLen = 0, usRet = 0;
+   char           szChr[ 2 ]  = { ' ', '\0' };
+   char           szPort[ 5 ] = { 'l', 'p', 't', '1', '\0' };
+   const char *   szStr       = NULL;
+   USHORT         usLen       = 0, usRet = 0;
 
    if( ISNUM( 1 ) )
    {
-      szChr[ 0 ] = ( char ) hb_parni( 1 );
-      szStr = szChr;
-      usLen = 1;
+      szChr[ 0 ]  = ( char ) hb_parni( 1 );
+      szStr       = szChr;
+      usLen       = 1;
    }
    else if( ISCHAR( 1 ) )
    {

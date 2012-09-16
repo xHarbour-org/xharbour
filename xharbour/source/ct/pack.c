@@ -53,85 +53,83 @@
 
 #include "hbapi.h"
 
-
 HB_FUNC( CHARPACK )
 {
-   unsigned len = hb_parclen(1);
-   unsigned char *in = (unsigned char*) hb_parcx(1);
+   unsigned          len   = hb_parclen( 1 );
+   unsigned char *   in    = ( unsigned char * ) hb_parcx( 1 );
 
-   if (hb_parni(2) == 0)
+   if( hb_parni( 2 ) == 0 )
    {
-      unsigned char *out = (unsigned char *) hb_xgrab(len * 3 + 2);
-      unsigned n_in = 0, n_out = 0;
+      unsigned char *   out   = ( unsigned char * ) hb_xgrab( len * 3 + 2 );
+      unsigned          n_in  = 0, n_out = 0;
 
-      out[n_out++] = 158;
-      out[n_out++] = 158;
+      out[ n_out++ ] = 158;
+      out[ n_out++ ] = 158;
 
-      while (n_in < len)
+      while( n_in < len )
       {
-         int n_count = 1, n_max = HB_MIN(255, len - n_in);
-         unsigned char c = in[n_in];
+         int            n_count  = 1, n_max = HB_MIN( 255, len - n_in );
+         unsigned char  c        = in[ n_in ];
 
-         while (n_count < n_max && in[n_in + n_count] == c)
-           n_count++;
-         out[n_out++] = 0;
-         out[n_out++] = n_count;
-         out[n_out++] = c;
-         n_in += n_count;
+         while( n_count < n_max && in[ n_in + n_count ] == c )
+            n_count++;
+         out[ n_out++ ] = 0;
+         out[ n_out++ ] = n_count;
+         out[ n_out++ ] = c;
+         n_in           += n_count;
       }
-      if (n_out < len)
-        hb_retclen((char *) out, n_out);
-      hb_xfree(out);
-      if (n_out < len)
-        return;
+      if( n_out < len )
+         hb_retclen( ( char * ) out, n_out );
+      hb_xfree( out );
+      if( n_out < len )
+         return;
    }
-   hb_retclen((char *) in, len);
+   hb_retclen( ( char * ) in, len );
 }
 
-
-static unsigned char *buf_append(unsigned char *buf, unsigned *buf_size, unsigned count,
-                                 unsigned char c, unsigned *buf_len)
+static unsigned char * buf_append( unsigned char * buf, unsigned * buf_size, unsigned count,
+                                   unsigned char c, unsigned * buf_len )
 {
-   if (*buf_len + count > *buf_size) {
-      *buf_size = HB_MAX(*buf_len + count, *buf_size + 32768);
-      buf = (unsigned char *) hb_xrealloc(buf, *buf_size);
+   if( *buf_len + count > *buf_size )
+   {
+      *buf_size   = HB_MAX( *buf_len + count, *buf_size + 32768 );
+      buf         = ( unsigned char * ) hb_xrealloc( buf, *buf_size );
    }
-   memset(buf + *buf_len, c, count);
+   memset( buf + *buf_len, c, count );
    *buf_len += count;
    return buf;
 }
 
-
 HB_FUNC( CHARUNPACK )
 {
-   unsigned buf_size = 32768;
-   unsigned len = hb_parclen(1);
-   unsigned out_len = 0;
-   unsigned char *in = (unsigned char*) hb_parcx(1);
-   unsigned char *out;
-   unsigned i;
+   unsigned          buf_size = 32768;
+   unsigned          len      = hb_parclen( 1 );
+   unsigned          out_len  = 0;
+   unsigned char *   in       = ( unsigned char * ) hb_parcx( 1 );
+   unsigned char *   out;
+   unsigned          i;
 
-   if (hb_parni(2) == 0)
+   if( hb_parni( 2 ) == 0 )
    {
-      if (!(in[0] == 158 && in[1] == 158))
+      if( ! ( in[ 0 ] == 158 && in[ 1 ] == 158 ) )
       {
-         hb_retclen((char *) in, len);
+         hb_retclen( ( char * ) in, len );
          return;
       }
-      out = (unsigned char *) hb_xgrab(buf_size);
-      for (i = 2; i <= len - 3; i += 3)
+      out = ( unsigned char * ) hb_xgrab( buf_size );
+      for( i = 2; i <= len - 3; i += 3 )
       {
-         if (in[i] != 0)
+         if( in[ i ] != 0 )
          {
-            hb_xfree(out);
-            hb_retclen((char *) in, len);
+            hb_xfree( out );
+            hb_retclen( ( char * ) in, len );
             return;
          }
-         out = buf_append(out, &buf_size, in[i + 1], in[i + 2], &out_len);
+         out = buf_append( out, &buf_size, in[ i + 1 ], in[ i + 2 ], &out_len );
       }
-      hb_retclen((char *) out, out_len);
-      hb_xfree(out);
+      hb_retclen( ( char * ) out, out_len );
+      hb_xfree( out );
       return;
    }
-   hb_retclen((char *) in, len);
+   hb_retclen( ( char * ) in, len );
 }

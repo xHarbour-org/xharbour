@@ -96,7 +96,7 @@ HB_FUNC( SETCLEARB )
    if( ISNUM( 1 ) )
       iNew = hb_parni( 1 );
    else if( ISCHAR( 1 ) )
-      iNew = hb_parc( 1 )[0];
+      iNew = hb_parc( 1 )[ 0 ];
    else
       iNew = 255;
 
@@ -166,7 +166,7 @@ HB_FUNC( WACLOSE )
 HB_FUNC( WSELECT )
 {
    hb_retni( ISNUM( 1 ) ? hb_ctwSelectWindow( hb_parni( 1 ) ) :
-                          hb_ctwCurrentWindow() );
+             hb_ctwCurrentWindow() );
 }
 
 HB_FUNC( WNUM )
@@ -176,29 +176,30 @@ HB_FUNC( WNUM )
 
 HB_FUNC( WBOX )
 {
-   static const char * pWBoxFrames[] = {
-            _B_DOUBLE,        /* 0  WB_DOUBLE_CLEAR */
-            _B_SINGLE,        /* 1  WB_SINGLE_CLEAR */
-            _B_DOUBLE_SINGLE, /* 2  WB_DOUBLE_SINGLE_CLEAR */
-            _B_SINGLE_DOUBLE, /* 3  WB_SINGLE_DOUBLE_CLEAR */
+   static const char *  pWBoxFrames[] = {
+      _B_DOUBLE,              /* 0  WB_DOUBLE_CLEAR */
+      _B_SINGLE,              /* 1  WB_SINGLE_CLEAR */
+      _B_DOUBLE_SINGLE,       /* 2  WB_DOUBLE_SINGLE_CLEAR */
+      _B_SINGLE_DOUBLE,       /* 3  WB_SINGLE_DOUBLE_CLEAR */
 
-            _B_DOUBLE,        /* 4  WB_DOUBLE */
-            _B_SINGLE,        /* 5  WB_SINGLE */
-            _B_DOUBLE_SINGLE, /* 6  WB_DOUBLE_SINGLE */
-            _B_SINGLE_DOUBLE, /* 7  WB_SINGLE_DOUBLE */
+      _B_DOUBLE,              /* 4  WB_DOUBLE */
+      _B_SINGLE,              /* 5  WB_SINGLE */
+      _B_DOUBLE_SINGLE,       /* 6  WB_DOUBLE_SINGLE */
+      _B_SINGLE_DOUBLE,       /* 7  WB_SINGLE_DOUBLE */
 
-            "лплллмлл",       /* 8  WB_HALF_FULL_CLEAR */
-            "опнннмоо",       /* 9  WB_HALF_CLEAR */
-            "олнннлоо",       /* 10 WB_FULL_HALF_CLEAR */
-            "лллллллл",       /* 11 WB_FULL_CLEAR */
+      "лплллмлл",             /* 8  WB_HALF_FULL_CLEAR */
+      "опнннмоо",             /* 9  WB_HALF_CLEAR */
+      "олнннлоо",             /* 10 WB_FULL_HALF_CLEAR */
+      "лллллллл",             /* 11 WB_FULL_CLEAR */
 
-            "лплллмлл",       /* 12 WB_HALF_FULL */
-            "опнннмоо",       /* 13 WB_HALF */
-            "олнннлоо",       /* 14 WB_FULL_HALF */
-            "лллллллл"  };    /* 15 WB_FULL */
+      "лплллмлл",             /* 12 WB_HALF_FULL */
+      "опнннмоо",             /* 13 WB_HALF */
+      "олнннлоо",             /* 14 WB_FULL_HALF */
+      "лллллллл"
+   };                         /* 15 WB_FULL */
 
-   BYTE * szBox, szBoxBuf[ 10 ];
-   int iColor;
+   BYTE *               szBox, szBoxBuf[ 10 ];
+   int                  iColor;
 
    if( ISCHAR( 1 ) )
    {
@@ -215,8 +216,8 @@ HB_FUNC( WBOX )
       {
          szBoxBuf[ 8 ] = hb_gtGetClearChar();
       }
-      szBoxBuf[ 9 ] = '0';
-      szBox = szBoxBuf;
+      szBoxBuf[ 9 ]  = '0';
+      szBox          = szBoxBuf;
    }
 
    iColor = hb_ctColorParam( 2, 0 );   /* Harbour extension */
@@ -225,23 +226,23 @@ HB_FUNC( WBOX )
 
 HB_FUNC( WFORMAT )
 {
-   int iWindow = hb_ctwCurrentWindow();
-   int iTop, iLeft, iBottom, iRight;
+   int   iWindow = hb_ctwCurrentWindow();
+   int   iTop, iLeft, iBottom, iRight;
 
    if( hb_pcount() == 0 )
    {
       hb_ctwGetFormatCords( iWindow, TRUE, &iTop, &iLeft, &iBottom, &iRight );
-      iTop    = -iTop;
-      iLeft   = -iLeft;
-      iBottom = -iBottom;
-      iRight  = -iRight;
+      iTop     = -iTop;
+      iLeft    = -iLeft;
+      iBottom  = -iBottom;
+      iRight   = -iRight;
    }
    else
    {
-      iTop    = hb_parni( 1 );
-      iLeft   = hb_parni( 2 );
-      iBottom = hb_parni( 3 );
-      iRight  = hb_parni( 4 );
+      iTop     = hb_parni( 1 );
+      iLeft    = hb_parni( 2 );
+      iBottom  = hb_parni( 3 );
+      iRight   = hb_parni( 4 );
    }
    hb_retni( hb_ctwChangeMargins( iWindow, iTop, iLeft, iBottom, iRight ) );
 }

@@ -50,56 +50,60 @@
  *
  */
 
-Static pHandle
-Static nSeconds, nsKey, nsTime, nsCounter, lsMode
+STATIC pHandle
+STATIC nSeconds, nsKey, nsTime, nsCounter, lsMode
 
-Function KeySec(nKey, nTime, nCounter, lMode)
-Local lActivated := .f.
+FUNCTION KeySec( nKey, nTime, nCounter, lMode )
 
-if pHandle != nil
-   HB_IdleDel(pHandle)
-   pHandle := nil
-endif
+   LOCAL lActivated := .F.
 
-if nKey != nil
-
-   if nTime < 0
-      nTime := -nTime/18.2
-   endif
-   if nCounter == nil
-      nCounter := 1
-   endif
-   if lMode == nil
-      lMode := .f.
-   endif
-
-   nsKey := nKey
-   nsTime := nTime
-   nsCounter := nCounter
-   lsMode := lMode
-   nSeconds := Seconds()
-
-   pHandle := HB_IdleAdd({|| doKeySec()})
-   lActivated := .t.
-
-endif
-Return lActivated
-
-Static function doKeySec()
-Local nSec := Seconds()
-
-if lsMode .and. ! Empty(NextKey())
-   nSeconds := nSec
-elseif nsCounter != 0 .and. nSec - nSeconds >= nsTime
-   __Keyboard(nsKey)
-   if nsCounter > 0
-      nsCounter --
-   endif
-   if nsCounter == 0
-      HB_IdleDel(pHandle)
+   IF pHandle != nil
+      hb_idleDel( pHandle )
       pHandle := nil
-   else
+   ENDIF
+
+   IF nKey != nil
+
+      IF nTime < 0
+         nTime := - nTime/18.2
+      ENDIF
+      IF nCounter == nil
+         nCounter := 1
+      ENDIF
+      IF lMode == nil
+         lMode := .F.
+      ENDIF
+
+      nsKey := nKey
+      nsTime := nTime
+      nsCounter := nCounter
+      lsMode := lMode
+      nSeconds := Seconds()
+
+      pHandle := hb_idleAdd( {|| doKeySec() } )
+      lActivated := .T.
+
+   ENDIF
+
+   RETURN lActivated
+
+STATIC FUNCTION doKeySec()
+
+   LOCAL nSec := Seconds()
+
+   IF lsMode .AND. ! Empty( NextKey() )
       nSeconds := nSec
-   endif
-endif
-Return nil
+   ELSEIF nsCounter != 0 .AND. nSec - nSeconds >= nsTime
+      __Keyboard( nsKey )
+      IF nsCounter > 0
+         nsCounter --
+      ENDIF
+      IF nsCounter == 0
+         hb_idleDel( pHandle )
+         pHandle := nil
+      ELSE
+         nSeconds := nSec
+      ENDIF
+   ENDIF
+
+   RETURN nil

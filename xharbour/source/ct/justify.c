@@ -52,9 +52,7 @@
  *
  */
 
-
 #include "ct.h"
-
 
 /* defines */
 #define DO_JUSTIFY_JUSTLEFT   0
@@ -63,7 +61,6 @@
 /* helper function for the justxxx() functions */
 static void do_justify( int iSwitch )
 {
-
    int iNoRet;
 
    iNoRet = ct_getref() && ISBYREF( 1 );
@@ -71,12 +68,12 @@ static void do_justify( int iSwitch )
    if( ISCHAR( 1 ) )
    {
 
-      const char *pcString = hb_parc( 1 );
-      size_t sStrLen = hb_parclen( 1 );
-      char cJustChar;
-      const char *pc;
-      char *pcRet, *pcw;
-      size_t sJustOffset;
+      const char *   pcString = hb_parc( 1 );
+      size_t         sStrLen  = hb_parclen( 1 );
+      char           cJustChar;
+      const char *   pc;
+      char *         pcRet, * pcw;
+      size_t         sJustOffset;
 
       if( sStrLen == 0 )
       {
@@ -96,10 +93,10 @@ static void do_justify( int iSwitch )
 
       pcRet = ( char * ) hb_xgrab( sStrLen + 1 );
 
-      switch ( iSwitch )
+      switch( iSwitch )
       {
          case DO_JUSTIFY_JUSTLEFT:
-            pc = pcString;
+            pc          = pcString;
             sJustOffset = 0;
             while( ( *pc == cJustChar ) && ( pc < pcString + sStrLen ) )
             {
@@ -114,7 +111,7 @@ static void do_justify( int iSwitch )
             break;
 
          case DO_JUSTIFY_JUSTRIGHT:
-            pc = pcString + sStrLen - 1;
+            pc          = pcString + sStrLen - 1;
             sJustOffset = 0;
             while( ( *pc == cJustChar ) && ( pc >= pcString ) )
             {
@@ -142,8 +139,8 @@ static void do_justify( int iSwitch )
    }
    else  /* ISCHAR( 1 ) */
    {
-      PHB_ITEM pSubst = NULL;
-      int iArgErrorMode = ct_getargerrormode();
+      PHB_ITEM pSubst         = NULL;
+      int      iArgErrorMode  = ct_getargerrormode();
 
       if( iArgErrorMode != CT_ARGERR_IGNORE )
       {
@@ -196,7 +193,6 @@ HB_FUNC( JUSTLEFT )
 {
    do_justify( DO_JUSTIFY_JUSTLEFT );
 }
-
 
 /*  $DOC$
  *  $FUNCNAME$

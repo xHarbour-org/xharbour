@@ -75,13 +75,13 @@ HB_FUNC( FIELDNUM )
 
 HB_FUNC( DBFSIZE )
 {
-   HB_LONG llSize = 0;
-   AREAP pArea;
+   HB_LONG  llSize = 0;
+   AREAP    pArea;
 
-   if( (pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer()) != NULL )
+   if( ( pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer() ) != NULL )
    {
       PHB_ITEM pSize = hb_itemNew( NULL );
-      ULONG ulRecSize, ulRecCount;
+      ULONG    ulRecSize, ulRecCount;
 
       if( SELF_INFO( pArea, DBI_GETHEADERSIZE, pSize ) == SUCCESS )
       {
@@ -102,11 +102,11 @@ HB_FUNC( DBFSIZE )
 }
 
 /*
- These are now part of xHarbour rdd, or aren't needed
- pt
+   These are now part of xHarbour rdd, or aren't needed
+   pt
 
-static LPFIELD _hb_get_field( void )
-{
+   static LPFIELD _hb_get_field( void )
+   {
    LPFIELD pField = NULL;
 
    if( hb_pcount() > 0 && ISNUM(1) )
@@ -129,10 +129,10 @@ static LPFIELD _hb_get_field( void )
    }
 
    return pField;
-}
+   }
 
-HB_FUNC( FIELDTYPE )
-{
+   HB_FUNC( FIELDTYPE )
+   {
    char *pszType = "";
    LPFIELD pField = _hb_get_field();
 
@@ -158,10 +158,10 @@ HB_FUNC( FIELDTYPE )
       }
    }
    hb_retc( pszType );
-}
+   }
 
-HB_FUNC( FIELDSIZE )
-{
+   HB_FUNC( FIELDSIZE )
+   {
    UINT uiLen = 0;
    LPFIELD pField = _hb_get_field();
 
@@ -169,10 +169,10 @@ HB_FUNC( FIELDSIZE )
       uiLen = pField->uiLen;
 
    hb_retni( uiLen );
-}
+   }
 
-HB_FUNC( FIELDDECI )
-{
+   HB_FUNC( FIELDDECI )
+   {
    UINT uiDec = 0;
    LPFIELD pField = _hb_get_field();
 
@@ -180,7 +180,7 @@ HB_FUNC( FIELDDECI )
       uiDec = pField->uiDec;
 
    hb_retni( uiDec );
-}
+   }
 
-*/
+ */
 

@@ -53,7 +53,7 @@
 /* NOTE: User programs should never call this layer directly! */
 
 /* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_NAME      CTW
+#define HB_GT_NAME CTW
 
 #include "hbgtcore.h"
 #include "hbinit.h"
@@ -63,14 +63,14 @@
 
 static int           s_GtId;
 static HB_GT_FUNCS   SuperTable;
-#define HB_GTSUPER   (&SuperTable)
-#define HB_GTID_PTR  (&s_GtId)
+#define HB_GTSUPER         ( &SuperTable )
+#define HB_GTID_PTR        ( &s_GtId )
 
-#define HB_CTWIN_ALLOC        16
-#define HB_CTWIN_MINROWS      1
-#define HB_CTWIN_MINCOLS      1
-#define HB_CTWIN_MAXROWS      255
-#define HB_CTWIN_MAXCOLS      255
+#define HB_CTWIN_ALLOC     16
+#define HB_CTWIN_MINROWS   1
+#define HB_CTWIN_MINCOLS   1
+#define HB_CTWIN_MAXROWS   255
+#define HB_CTWIN_MAXCOLS   255
 
 typedef struct
 {
@@ -103,38 +103,38 @@ typedef struct
 
 } HB_CT_WND, * PHB_CT_WND;
 
-static BOOL s_fInit           = FALSE;
+static BOOL          s_fInit           = FALSE;
 
-static int s_iShadowWidth     = 2;
-static int s_iShadowAttr      = -1;
+static int           s_iShadowWidth    = 2;
+static int           s_iShadowAttr     = -1;
 
-static int s_iOpenWindows     = 0;
-static int s_iCurrWindow      = 0;
-static int s_iMaxWindow       = 0;
+static int           s_iOpenWindows    = 0;
+static int           s_iCurrWindow     = 0;
+static int           s_iMaxWindow      = 0;
 
-static int s_fBoardSet        = FALSE;
-static int s_iBoardTop        = 0;
-static int s_iBoardLeft       = 0;
-static int s_iBoardBottom     = 0;
-static int s_iBoardRight      = 0;
+static int           s_fBoardSet       = FALSE;
+static int           s_iBoardTop       = 0;
+static int           s_iBoardLeft      = 0;
+static int           s_iBoardBottom    = 0;
+static int           s_iBoardRight     = 0;
 
-static int s_fBoardTop        = FALSE;
-static int s_fBoardLeft       = FALSE;
-static int s_fBoardBottom     = FALSE;
-static int s_fBoardRight      = FALSE;
+static int           s_fBoardTop       = FALSE;
+static int           s_fBoardLeft      = FALSE;
+static int           s_fBoardBottom    = FALSE;
+static int           s_fBoardRight     = FALSE;
 
-static int s_iMoveMode        = 1;
-static int s_iVerticalStep    = 2;
-static int s_iHorizontalStep  = 5;
+static int           s_iMoveMode       = 1;
+static int           s_iVerticalStep   = 2;
+static int           s_iHorizontalStep = 5;
 
-static PHB_CT_WND * s_windows = NULL;
-static int * s_windowStack    = NULL;
-static int * s_pWindowMap     = NULL;
-static int * s_pShadowMap     = NULL;
-static int s_iMapWidth        = 0;
-static int s_iMapHeight       = 0;
+static PHB_CT_WND *  s_windows         = NULL;
+static int *         s_windowStack     = NULL;
+static int *         s_pWindowMap      = NULL;
+static int *         s_pShadowMap      = NULL;
+static int           s_iMapWidth       = 0;
+static int           s_iMapHeight      = 0;
 
-static int s_iLastKey         = 0;
+static int           s_iLastKey        = 0;
 
 
 static int hb_ctw_CalcShadowWidth( int iRows, int iCols )
@@ -148,9 +148,9 @@ static int hb_ctw_CalcShadowWidth( int iRows, int iCols )
 static void hb_ctw_SetMap( PHB_GT pGT, int * piMap, int iWindow, int iTop, int iLeft, int iBottom, int iRight )
 {
    ULONG lIndex;
-   int i;
+   int   i;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_SetMap(%p,%p,%d,%d,%d,%d,%d)", pGT, piMap, iWindow, iTop, iLeft, iBottom, iRight));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_SetMap(%p,%p,%d,%d,%d,%d,%d)", pGT, piMap, iWindow, iTop, iLeft, iBottom, iRight ) );
 
    HB_SYMBOL_UNUSED( pGT );
 
@@ -176,7 +176,7 @@ static void hb_ctw_ClearMap( PHB_GT pGT )
 {
    ULONG ulSize;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_ClearMap(%p)", pGT));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_ClearMap(%p)", pGT ) );
 
    HB_SYMBOL_UNUSED( pGT );
 
@@ -189,14 +189,14 @@ static void hb_ctw_WindowMap( PHB_GT pGT, int iWindow, BOOL fExpose )
 {
    PHB_CT_WND pWnd;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_WindowMap(%p,%d,%d)", pGT, iWindow, (int) fExpose));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_WindowMap(%p,%d,%d)", pGT, iWindow, ( int ) fExpose ) );
 
    pWnd = s_windows[ iWindow ];
 
    if( ! pWnd->fHidden )
    {
-      int iLastRow = pWnd->iFirstRow + pWnd->iHeight - 1,
-          iLastCol = pWnd->iFirstCol + pWnd->iWidth - 1;
+      int iLastRow   = pWnd->iFirstRow + pWnd->iHeight - 1,
+          iLastCol   = pWnd->iFirstCol + pWnd->iWidth - 1;
 
       hb_ctw_SetMap( pGT, s_pWindowMap, iWindow,
                      pWnd->iFirstRow, pWnd->iFirstCol,
@@ -227,7 +227,7 @@ static void hb_ctw_WindowMap( PHB_GT pGT, int iWindow, BOOL fExpose )
 
 static void hb_ctw_RemapAllWindows( PHB_GT pGT )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_RemapAllWindows(%p)", pGT));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_RemapAllWindows(%p)", pGT ) );
 
    if( s_iMaxWindow )
    {
@@ -242,7 +242,7 @@ static void hb_ctw_RemapAllWindows( PHB_GT pGT )
 
 static BOOL hb_ctw_Init( PHB_GT pGT )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_Init(%p)",pGT));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_Init(%p)", pGT ) );
 
    if( ! s_fInit )
    {
@@ -266,7 +266,7 @@ static int hb_ctw_SetShadowAttr( PHB_GT pGT, int iAttr )
 {
    int iOldAttr = s_iShadowAttr;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_SetShadowAttr(%p,%d)", pGT, iAttr));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_SetShadowAttr(%p,%d)", pGT, iAttr ) );
 
    HB_SYMBOL_UNUSED( pGT );
 
@@ -280,7 +280,7 @@ static int hb_ctw_SetMoveMode( PHB_GT pGT, int iMode )
 {
    int iOldMode = s_iMoveMode;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_SetMoveMode(%p,%d)", pGT, iMode));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_SetMoveMode(%p,%d)", pGT, iMode ) );
 
    HB_SYMBOL_UNUSED( pGT );
 
@@ -292,7 +292,7 @@ static int hb_ctw_SetMoveMode( PHB_GT pGT, int iMode )
 
 static int hb_ctw_SetMoveStep( PHB_GT pGT, int iVertical, int iHorizontal )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_SetMoveStep(%p,%d,%d)", pGT, iVertical, iHorizontal));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_SetMoveStep(%p,%d,%d)", pGT, iVertical, iHorizontal ) );
 
    if( s_fInit || hb_ctw_Init( pGT ) )
    {
@@ -310,7 +310,7 @@ static int hb_ctw_SetMoveStep( PHB_GT pGT, int iVertical, int iHorizontal )
 
 static int hb_ctw_SetWindowBoard( PHB_GT pGT, int iTop, int iLeft, int iBottom, int iRight )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_SetWindowBoard(%d,%d,%d,%d)", iTop, iLeft, iBottom, iRight));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_SetWindowBoard(%d,%d,%d,%d)", iTop, iLeft, iBottom, iRight ) );
 
    if( s_fInit || hb_ctw_Init( pGT ) )
    {
@@ -325,11 +325,11 @@ static int hb_ctw_SetWindowBoard( PHB_GT pGT, int iTop, int iLeft, int iBottom, 
          iRight = s_iMapWidth - 1;
       if( iTop >= 0 && iLeft >= 0 && iTop < iBottom && iLeft < iRight )
       {
-         s_iBoardTop     = iTop;
-         s_iBoardLeft    = iLeft;
-         s_iBoardBottom  = iBottom;
-         s_iBoardRight   = iRight;
-         s_fBoardSet     = TRUE;
+         s_iBoardTop    = iTop;
+         s_iBoardLeft   = iLeft;
+         s_iBoardBottom = iBottom;
+         s_iBoardRight  = iRight;
+         s_fBoardSet    = TRUE;
          hb_ctw_RemapAllWindows( pGT );
 
          return 0;
@@ -341,18 +341,18 @@ static int hb_ctw_SetWindowBoard( PHB_GT pGT, int iTop, int iLeft, int iBottom, 
 
 static int  hb_ctw_SetBorderMode( PHB_GT pGT, int iTop, int iLeft, int iBottom, int iRight )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_SetBorderMode(%p,%d,%d,%d,%d)", pGT, iTop, iLeft, iBottom, iRight));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_SetBorderMode(%p,%d,%d,%d,%d)", pGT, iTop, iLeft, iBottom, iRight ) );
 
    if( s_fInit || hb_ctw_Init( pGT ) )
    {
       if( iTop >= 0 )
-         s_fBoardTop     = iTop != 0;
+         s_fBoardTop = iTop != 0;
       if( iLeft >= 0 )
-         s_fBoardLeft    = iLeft != 0;
+         s_fBoardLeft = iLeft != 0;
       if( iBottom >= 0 )
-         s_fBoardBottom  = iBottom != 0;
+         s_fBoardBottom = iBottom != 0;
       if( iRight >= 0 )
-         s_fBoardRight   = iRight != 0;
+         s_fBoardRight = iRight != 0;
 
       return 0;
    }
@@ -362,7 +362,7 @@ static int  hb_ctw_SetBorderMode( PHB_GT pGT, int iTop, int iLeft, int iBottom, 
 
 static int hb_ctw_CurrentWindow( PHB_GT pGT )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_CurrentWindow(%p)", pGT));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_CurrentWindow(%p)", pGT ) );
 
    HB_SYMBOL_UNUSED( pGT );
 
@@ -371,7 +371,7 @@ static int hb_ctw_CurrentWindow( PHB_GT pGT )
 
 static int hb_ctw_SelectWindow( PHB_GT pGT, int iWindow )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_SelectWindow(%p,%d)", pGT, iWindow));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_SelectWindow(%p,%d)", pGT, iWindow ) );
 
    if( iWindow == 0 )
       s_iCurrWindow = iWindow;
@@ -407,7 +407,7 @@ static int hb_ctw_MaxWindow( PHB_GT pGT )
 {
    int i, iMaxHandle = 0;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_MaxWindow(%p)", pGT));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_MaxWindow(%p)", pGT ) );
 
    HB_SYMBOL_UNUSED( pGT );
 
@@ -422,13 +422,13 @@ static int hb_ctw_MaxWindow( PHB_GT pGT )
 
 static int hb_ctw_CreateWindow( PHB_GT pGT, int iTop, int iLeft, int iBottom, int iRight, BOOL fClear, int iColor )
 {
-   PHB_CT_WND pWnd;
-   BYTE bAttr, bColor;
-   USHORT usChar;
-   int iRow, iCol, iHeight, iWidth, iTmp;
-   long lIndex;
+   PHB_CT_WND  pWnd;
+   BYTE        bAttr, bColor;
+   USHORT      usChar;
+   int         iRow, iCol, iHeight, iWidth, iTmp;
+   long        lIndex;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_CreateWindow(%p,%d,%d,%d,%d,%d,%d)", pGT, iTop, iLeft, iBottom, iRight, (int) fClear, iColor));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_CreateWindow(%p,%d,%d,%d,%d,%d,%d)", pGT, iTop, iLeft, iBottom, iRight, ( int ) fClear, iColor ) );
 
    if( s_iOpenWindows == s_iMaxWindow )
    {
@@ -438,7 +438,7 @@ static int hb_ctw_CreateWindow( PHB_GT pGT, int iTop, int iLeft, int iBottom, in
       {
          ULONG ulSize;
 
-         if( !s_fInit )
+         if( ! s_fInit )
          {
             if( ! hb_ctw_Init( pGT ) )
                return -1;
@@ -446,36 +446,36 @@ static int hb_ctw_CreateWindow( PHB_GT pGT, int iTop, int iLeft, int iBottom, in
 
          HB_GTSUPER_GETSIZE( pGT, &s_iMapHeight, &s_iMapWidth );
          s_iShadowWidth = hb_ctw_CalcShadowWidth( s_iMapHeight, s_iMapWidth );
-         if( !s_fBoardSet )
+         if( ! s_fBoardSet )
             hb_ctw_SetWindowBoard( pGT, 0, 0, s_iMapHeight - 1, s_iMapWidth - 1 );
-         ulSize = ( ULONG ) s_iMapHeight * s_iMapWidth * sizeof( int );
-         s_pWindowMap = ( int * ) hb_xgrab( ulSize );
-         s_pShadowMap = ( int * ) hb_xgrab( ulSize );
+         ulSize         = ( ULONG ) s_iMapHeight * s_iMapWidth * sizeof( int );
+         s_pWindowMap   = ( int * ) hb_xgrab( ulSize );
+         s_pShadowMap   = ( int * ) hb_xgrab( ulSize );
          hb_ctw_ClearMap( pGT );
 
-         s_iMaxWindow = HB_CTWIN_ALLOC;
-         s_windows = ( PHB_CT_WND * ) hb_xgrab( ( HB_CTWIN_ALLOC + 1 ) * sizeof( PHB_CT_WND ) );
-         s_windowStack = ( int * ) hb_xgrab( HB_CTWIN_ALLOC * sizeof( int ) );
+         s_iMaxWindow   = HB_CTWIN_ALLOC;
+         s_windows      = ( PHB_CT_WND * ) hb_xgrab( ( HB_CTWIN_ALLOC + 1 ) * sizeof( PHB_CT_WND ) );
+         s_windowStack  = ( int * ) hb_xgrab( HB_CTWIN_ALLOC * sizeof( int ) );
          s_windows[ 0 ] = NULL;
       }
       else
       {
-         s_iMaxWindow += HB_CTWIN_ALLOC;
-         s_windows = ( PHB_CT_WND * ) hb_xrealloc( s_windows, ( s_iMaxWindow + 1 ) * sizeof( PHB_CT_WND ) );
-         s_windowStack = ( int * ) hb_xrealloc( s_windowStack, s_iMaxWindow * sizeof( int ) );
+         s_iMaxWindow   += HB_CTWIN_ALLOC;
+         s_windows      = ( PHB_CT_WND * ) hb_xrealloc( s_windows, ( s_iMaxWindow + 1 ) * sizeof( PHB_CT_WND ) );
+         s_windowStack  = ( int * ) hb_xrealloc( s_windowStack, s_iMaxWindow * sizeof( int ) );
       }
       do
       {
-         s_windows[ i + 1 ] = NULL;
-         s_windowStack[ i ] = 0;
+         s_windows[ i + 1 ]   = NULL;
+         s_windowStack[ i ]   = 0;
       }
       while( ++i < s_iMaxWindow );
    }
 
-   iHeight = iBottom - iTop + 1;
-   iWidth  = iRight - iLeft + 1;
-   iRow = iTop;
-   iCol = iLeft;
+   iHeight  = iBottom - iTop + 1;
+   iWidth   = iRight - iLeft + 1;
+   iRow     = iTop;
+   iCol     = iLeft;
 
    if( iHeight > s_iBoardBottom - s_iBoardTop + 1 )
       iHeight = s_iBoardBottom - s_iBoardTop + 1;
@@ -486,10 +486,10 @@ static int hb_ctw_CreateWindow( PHB_GT pGT, int iTop, int iLeft, int iBottom, in
        iHeight > HB_CTWIN_MAXROWS || iWidth > HB_CTWIN_MAXCOLS )
       return -1;
 
-   iTop    = s_iBoardTop - ( s_fBoardTop ? iHeight : 0 );
-   iBottom = s_iBoardBottom + 1 - ( s_fBoardBottom ? 0 : iHeight );
-   iLeft   = s_iBoardLeft - ( s_fBoardLeft ? iWidth : 0 );
-   iRight  = s_iBoardRight + 1 - ( s_fBoardRight ? 0 : iWidth );
+   iTop     = s_iBoardTop - ( s_fBoardTop ? iHeight : 0 );
+   iBottom  = s_iBoardBottom + 1 - ( s_fBoardBottom ? 0 : iHeight );
+   iLeft    = s_iBoardLeft - ( s_fBoardLeft ? iWidth : 0 );
+   iRight   = s_iBoardRight + 1 - ( s_fBoardRight ? 0 : iWidth );
 
    if( iRow < iTop )
       iRow = iTop;
@@ -500,43 +500,43 @@ static int hb_ctw_CreateWindow( PHB_GT pGT, int iTop, int iLeft, int iBottom, in
    else if( iCol > iRight )
       iCol = iRight;
 
-   pWnd = ( PHB_CT_WND ) hb_xgrab( sizeof( HB_CT_WND ) );
-   memset( pWnd, 0,  sizeof( HB_CT_WND ) );
+   pWnd                 = ( PHB_CT_WND ) hb_xgrab( sizeof( HB_CT_WND ) );
+   memset( pWnd, 0, sizeof( HB_CT_WND ) );
 
-   pWnd->fHidden = FALSE;
-   pWnd->iShadowAttr = s_iShadowAttr;
-   pWnd->iCursorStyle = HB_GTSELF_GETCURSORSTYLE( pGT );
+   pWnd->fHidden        = FALSE;
+   pWnd->iShadowAttr    = s_iShadowAttr;
+   pWnd->iCursorStyle   = HB_GTSELF_GETCURSORSTYLE( pGT );
 
-   pWnd->iHeight = iHeight;
-   pWnd->iWidth  = iWidth;
-   pWnd->iFirstRow = iRow;
-   pWnd->iFirstCol = iCol;
+   pWnd->iHeight        = iHeight;
+   pWnd->iWidth         = iWidth;
+   pWnd->iFirstRow      = iRow;
+   pWnd->iFirstCol      = iCol;
 
    HB_GTSELF_GETCOLORDATA( pGT, &pWnd->piColors, &pWnd->iColorCount, &pWnd->iColorIndex );
 
    pWnd->screenBuffer = ( PHB_SCREENCELL ) hb_xgrab( ( ULONG ) pWnd->iHeight *
-                                    pWnd->iWidth * sizeof( HB_SCREENCELL ) );
+                                                     pWnd->iWidth * sizeof( HB_SCREENCELL ) );
 
    if( pWnd->iShadowAttr >= 0 )
       fClear = TRUE;
-   bAttr  = 0;
-   bColor = iColor ? iColor : HB_GTSELF_GETCOLOR( pGT );
-   usChar = ( USHORT ) HB_GTSELF_GETCLEARCHAR( pGT );
+   bAttr    = 0;
+   bColor   = iColor ? iColor : HB_GTSELF_GETCOLOR( pGT );
+   usChar   = ( USHORT ) HB_GTSELF_GETCLEARCHAR( pGT );
 
-   lIndex = 0;
+   lIndex   = 0;
    for( iRow = pWnd->iFirstRow; iRow < pWnd->iFirstRow + pWnd->iHeight; ++iRow )
    {
       for( iCol = pWnd->iFirstCol; iCol < pWnd->iFirstCol + pWnd->iWidth; ++iCol )
       {
-         if( !fClear && !HB_GTSELF_GETSCRCHAR( pGT, iRow, iCol, &bColor, &bAttr, &usChar ) )
+         if( ! fClear && ! HB_GTSELF_GETSCRCHAR( pGT, iRow, iCol, &bColor, &bAttr, &usChar ) )
          {
-            usChar = ( USHORT ) HB_GTSELF_GETCLEARCHAR( pGT );
-            bColor = ( BYTE ) HB_GTSELF_GETCOLOR( pGT );
-            bAttr  = 0;
+            usChar   = ( USHORT ) HB_GTSELF_GETCLEARCHAR( pGT );
+            bColor   = ( BYTE ) HB_GTSELF_GETCOLOR( pGT );
+            bAttr    = 0;
          }
-         pWnd->screenBuffer[ lIndex ].c.usChar = usChar;
-         pWnd->screenBuffer[ lIndex ].c.bColor = bColor;
-         pWnd->screenBuffer[ lIndex ].c.bAttr  = 0;
+         pWnd->screenBuffer[ lIndex ].c.usChar  = usChar;
+         pWnd->screenBuffer[ lIndex ].c.bColor  = bColor;
+         pWnd->screenBuffer[ lIndex ].c.bAttr   = 0;
          ++lIndex;
       }
    }
@@ -546,11 +546,11 @@ static int hb_ctw_CreateWindow( PHB_GT pGT, int iTop, int iLeft, int iBottom, in
       if( s_windows[ iTmp ] == NULL )
          break;
    }
-   pWnd->iHandle = iTmp;
+   pWnd->iHandle                       = iTmp;
 
-   s_windows[ pWnd->iHandle ] = pWnd;
-   s_windowStack[ s_iOpenWindows++ ] = pWnd->iHandle;
-   s_iCurrWindow = pWnd->iHandle;
+   s_windows[ pWnd->iHandle ]          = pWnd;
+   s_windowStack[ s_iOpenWindows++ ]   = pWnd->iHandle;
+   s_iCurrWindow                       = pWnd->iHandle;
 
    hb_ctw_WindowMap( pGT, pWnd->iHandle, TRUE );
 
@@ -559,13 +559,13 @@ static int hb_ctw_CreateWindow( PHB_GT pGT, int iTop, int iLeft, int iBottom, in
 
 static int hb_ctw_CloseWindow( PHB_GT pGT, int iWindow )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_CloseWindow(%p,%d)", pGT, iWindow));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_CloseWindow(%p,%d)", pGT, iWindow ) );
 
    if( iWindow > 0 && iWindow <= s_iMaxWindow && s_windows[ iWindow ] )
    {
-      PHB_CT_WND pWnd = s_windows[ iWindow ];
-      int i, iWnd, iLast;
-      BOOL fHidden = pWnd->fHidden;
+      PHB_CT_WND  pWnd     = s_windows[ iWindow ];
+      int         i, iWnd, iLast;
+      BOOL        fHidden  = pWnd->fHidden;
 
       hb_xfree( pWnd->screenBuffer );
       if( pWnd->iColorCount )
@@ -573,22 +573,22 @@ static int hb_ctw_CloseWindow( PHB_GT pGT, int iWindow )
       hb_xfree( pWnd );
       s_windows[ iWindow ] = NULL;
 
-      iWnd = 0;
-      i = --s_iOpenWindows;
+      iWnd                 = 0;
+      i                    = --s_iOpenWindows;
       do
       {
-         iLast = s_windowStack[ i ];
-         s_windowStack[ i ] = iWnd;
+         iLast                = s_windowStack[ i ];
+         s_windowStack[ i ]   = iWnd;
          if( iLast == iWindow )
             break;
-         iWnd = iLast;
+         iWnd                 = iLast;
       }
       while( --i >= 0 );
 
       if( iWindow == s_iCurrWindow )
          s_iCurrWindow = s_iOpenWindows > 0 ? s_windowStack[ s_iOpenWindows - 1 ] : 0;
 
-      if( !fHidden )
+      if( ! fHidden )
          hb_ctw_RemapAllWindows( pGT );
       return s_iCurrWindow;
    }
@@ -598,18 +598,18 @@ static int hb_ctw_CloseWindow( PHB_GT pGT, int iWindow )
 
 static int hb_ctw_CloseAllWindows( PHB_GT pGT )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_CloseAllWindows(%p)", pGT));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_CloseAllWindows(%p)", pGT ) );
 
    if( s_iOpenWindows > 0 )
    {
-      PHB_CT_WND pWnd;
-      int i, iWindow;
+      PHB_CT_WND  pWnd;
+      int         i, iWindow;
 
       for( i = 0; i < s_iOpenWindows; ++i )
       {
-         iWindow = s_windowStack[ i ];
-         pWnd = s_windows[ iWindow ];
-         s_windowStack[ i ] = 0;
+         iWindow              = s_windowStack[ i ];
+         pWnd                 = s_windows[ iWindow ];
+         s_windowStack[ i ]   = 0;
          s_windows[ iWindow ] = NULL;
          hb_xfree( pWnd->screenBuffer );
          if( pWnd->iColorCount )
@@ -626,7 +626,7 @@ static int hb_ctw_CloseAllWindows( PHB_GT pGT )
 
 static int hb_ctw_CenterWindow( PHB_GT pGT, int iWindow, BOOL fCenter )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_CenterWindow(%p,%d,%d)", pGT, iWindow, (int) fCenter));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_CenterWindow(%p,%d,%d)", pGT, iWindow, ( int ) fCenter ) );
 
    HB_SYMBOL_UNUSED( pGT );
 
@@ -639,10 +639,10 @@ static int hb_ctw_CenterWindow( PHB_GT pGT, int iWindow, BOOL fCenter )
          if( fCenter )
          {
             int iHeight = s_iBoardBottom - s_iBoardTop + 1,
-                iWidth = s_iBoardRight - s_iBoardLeft + 1;
+                iWidth  = s_iBoardRight - s_iBoardLeft + 1;
 
-            pWnd->iFirstRow = s_iBoardTop;
-            pWnd->iFirstCol = s_iBoardLeft;
+            pWnd->iFirstRow   = s_iBoardTop;
+            pWnd->iFirstCol   = s_iBoardLeft;
 
             if( iHeight > pWnd->iHeight )
                pWnd->iFirstRow += ( iHeight - pWnd->iHeight ) >> 1;
@@ -669,7 +669,7 @@ static int hb_ctw_CenterWindow( PHB_GT pGT, int iWindow, BOOL fCenter )
 
 static int hb_ctw_MoveWindow( PHB_GT pGT, int iWindow, int iRow, int iCol )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_MoveWindow(%p,%d,%d,%d)", pGT, iWindow, iRow, iCol));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_MoveWindow(%p,%d,%d,%d)", pGT, iWindow, iRow, iCol ) );
 
    if( iWindow > 0 && iWindow <= s_iOpenWindows )
    {
@@ -682,8 +682,8 @@ static int hb_ctw_MoveWindow( PHB_GT pGT, int iWindow, int iRow, int iCol )
              ( iCol + ( s_fBoardLeft ? pWnd->iWidth : 0 ) >= s_iBoardLeft ) &&
              ( iCol + ( s_fBoardRight ? 0 : pWnd->iWidth ) <= s_iBoardRight + 1 ) )
          {
-            pWnd->iFirstRow = iRow;
-            pWnd->iFirstCol = iCol;
+            pWnd->iFirstRow   = iRow;
+            pWnd->iFirstCol   = iCol;
             if( ! pWnd->fHidden )
                hb_ctw_RemapAllWindows( pGT );
             return iWindow;
@@ -696,7 +696,7 @@ static int hb_ctw_MoveWindow( PHB_GT pGT, int iWindow, int iRow, int iCol )
 
 static int hb_ctw_ChangeMargins( PHB_GT pGT, int iWindow, int iTop, int iLeft, int iBottom, int iRight )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_ChangeMargins(%p,%d,%d,%d,%d,%d)", pGT, iWindow, iTop, iLeft, iBottom, iRight));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_ChangeMargins(%p,%d,%d,%d,%d,%d)", pGT, iWindow, iTop, iLeft, iBottom, iRight ) );
 
    HB_SYMBOL_UNUSED( pGT );
 
@@ -717,10 +717,10 @@ static int hb_ctw_ChangeMargins( PHB_GT pGT, int iWindow, int iTop, int iLeft, i
 
          if( iTop + iBottom < pWnd->iHeight && iLeft + iRight < pWnd->iWidth )
          {
-            pWnd->iTopMargin    = iTop;
-            pWnd->iLeftMargin   = iLeft;
-            pWnd->iBottomMargin = iBottom;
-            pWnd->iRightMargin  = iRight;
+            pWnd->iTopMargin     = iTop;
+            pWnd->iLeftMargin    = iLeft;
+            pWnd->iBottomMargin  = iBottom;
+            pWnd->iRightMargin   = iRight;
 
             return iWindow;
          }
@@ -732,7 +732,7 @@ static int hb_ctw_ChangeMargins( PHB_GT pGT, int iWindow, int iTop, int iLeft, i
 
 static int hb_ctw_GetWindowCords( PHB_GT pGT, int iWindow, BOOL fCenter, int * piTop, int * piLeft, int * piBottom, int * piRight )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_GetWindowCords(%p,%d,%d,%p,%p,%p,%p)", pGT, iWindow, (int) fCenter, piTop, piLeft, piBottom, piRight));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_GetWindowCords(%p,%d,%d,%p,%p,%p,%p)", pGT, iWindow, ( int ) fCenter, piTop, piLeft, piBottom, piRight ) );
 
    if( iWindow > 0 && iWindow <= s_iOpenWindows )
    {
@@ -743,10 +743,10 @@ static int hb_ctw_GetWindowCords( PHB_GT pGT, int iWindow, BOOL fCenter, int * p
          if( fCenter )
          {
             int iHeight = s_iBoardBottom - s_iBoardTop + 1,
-                iWidth = s_iBoardRight - s_iBoardLeft + 1;
+                iWidth  = s_iBoardRight - s_iBoardLeft + 1;
 
-            *piTop  = s_iBoardTop;
-            *piLeft = s_iBoardLeft;
+            *piTop   = s_iBoardTop;
+            *piLeft  = s_iBoardLeft;
 
             if( iHeight > pWnd->iHeight )
                *piTop += ( iHeight - pWnd->iHeight ) >> 1;
@@ -755,26 +755,26 @@ static int hb_ctw_GetWindowCords( PHB_GT pGT, int iWindow, BOOL fCenter, int * p
          }
          else
          {
-            *piTop  = pWnd->iFirstRow;
-            *piLeft = pWnd->iFirstCol;
+            *piTop   = pWnd->iFirstRow;
+            *piLeft  = pWnd->iFirstCol;
          }
-         *piBottom = *piTop + pWnd->iHeight - 1;
-         *piRight  = *piLeft + pWnd->iWidth - 1;
+         *piBottom   = *piTop + pWnd->iHeight - 1;
+         *piRight    = *piLeft + pWnd->iWidth - 1;
 
          return iWindow;
       }
    }
 
-   *piTop = *piLeft = 0;
-   *piBottom = HB_GTSELF_MAXROW( pGT );
-   *piRight  = HB_GTSELF_MAXCOL( pGT );
+   *piTop      = *piLeft = 0;
+   *piBottom   = HB_GTSELF_MAXROW( pGT );
+   *piRight    = HB_GTSELF_MAXCOL( pGT );
 
    return -1;
 }
 
 static int hb_ctw_GetFormatCords( PHB_GT pGT, int iWindow, BOOL fRelative, int * piTop, int * piLeft, int * piBottom, int * piRight )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_GetFormatCords(%p,%d,%d,%p,%p,%p,%p)", pGT, iWindow, (int) fRelative, piTop, piLeft, piBottom, piRight));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_GetFormatCords(%p,%d,%d,%p,%p,%p,%p)", pGT, iWindow, ( int ) fRelative, piTop, piLeft, piBottom, piRight ) );
 
    if( iWindow > 0 && iWindow <= s_iOpenWindows )
    {
@@ -784,17 +784,17 @@ static int hb_ctw_GetFormatCords( PHB_GT pGT, int iWindow, BOOL fRelative, int *
       {
          if( fRelative )
          {
-            *piTop    = pWnd->iTopMargin;
-            *piLeft   = pWnd->iLeftMargin;
-            *piBottom = pWnd->iBottomMargin;
-            *piRight  = pWnd->iRightMargin;
+            *piTop      = pWnd->iTopMargin;
+            *piLeft     = pWnd->iLeftMargin;
+            *piBottom   = pWnd->iBottomMargin;
+            *piRight    = pWnd->iRightMargin;
          }
          else
          {
-            *piTop    = pWnd->iFirstRow + pWnd->iTopMargin;
-            *piLeft   = pWnd->iFirstCol + pWnd->iLeftMargin;
-            *piBottom = pWnd->iFirstRow + pWnd->iHeight - pWnd->iBottomMargin - 1;
-            *piRight  = pWnd->iFirstCol + pWnd->iWidth - pWnd->iRightMargin - 1;
+            *piTop      = pWnd->iFirstRow + pWnd->iTopMargin;
+            *piLeft     = pWnd->iFirstCol + pWnd->iLeftMargin;
+            *piBottom   = pWnd->iFirstRow + pWnd->iHeight - pWnd->iBottomMargin - 1;
+            *piRight    = pWnd->iFirstCol + pWnd->iWidth - pWnd->iRightMargin - 1;
          }
          return iWindow;
       }
@@ -806,9 +806,9 @@ static int hb_ctw_GetFormatCords( PHB_GT pGT, int iWindow, BOOL fRelative, int *
    }
    else
    {
-      *piTop = *piLeft = 0;
-      *piBottom = HB_GTSELF_MAXROW( pGT );
-      *piRight  = HB_GTSELF_MAXCOL( pGT );
+      *piTop      = *piLeft = 0;
+      *piBottom   = HB_GTSELF_MAXROW( pGT );
+      *piRight    = HB_GTSELF_MAXCOL( pGT );
    }
 
    return -1;
@@ -820,10 +820,10 @@ static int hb_ctw_AddWindowBox( PHB_GT pGT, int iWindow, BYTE * szBox, int iColo
 {
    int iMaxRow, iMaxCol;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_AddWindowBox(%p,%d,%p,%d)", pGT, iWindow, szBox, iColor));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_AddWindowBox(%p,%d,%p,%d)", pGT, iWindow, szBox, iColor ) );
 
-   iMaxRow = HB_GTSELF_MAXROW( pGT );
-   iMaxCol = HB_GTSELF_MAXCOL( pGT );
+   iMaxRow  = HB_GTSELF_MAXROW( pGT );
+   iMaxCol  = HB_GTSELF_MAXCOL( pGT );
 
    if( iMaxRow > 1 && iMaxCol > 1 )
    {
@@ -849,7 +849,7 @@ static int hb_ctw_AddWindowBox( PHB_GT pGT, int iWindow, BYTE * szBox, int iColo
 
 static void hb_ctw_gt_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStdout, FHANDLE hFilenoStderr )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_gt_Init(%p,%p,%p,%p)", pGT, hFilenoStdin, hFilenoStdout, hFilenoStderr));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_Init(%p,%p,%p,%p)", pGT, hFilenoStdin, hFilenoStdout, hFilenoStderr ) );
 
    HB_GTSUPER_INIT( pGT, hFilenoStdin, hFilenoStdout, hFilenoStderr );
 
@@ -858,7 +858,7 @@ static void hb_ctw_gt_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
 
 static void hb_ctw_gt_Exit( PHB_GT pGT )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_gt_Exit(%p)", pGT));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_Exit(%p)", pGT ) );
 
    if( s_iMaxWindow > 0 )
    {
@@ -868,12 +868,12 @@ static void hb_ctw_gt_Exit( PHB_GT pGT )
       hb_xfree( s_windowStack );
       hb_xfree( s_pWindowMap );
       hb_xfree( s_pShadowMap );
-      s_windows = NULL;
-      s_windowStack = NULL;
-      s_pWindowMap = s_pShadowMap = NULL;
-      s_iMaxWindow = s_iOpenWindows = s_iCurrWindow =
-      s_iMapWidth = s_iMapHeight = 0;
-      s_fBoardSet = s_fInit = FALSE;
+      s_windows                                                                           = NULL;
+      s_windowStack                                                                       = NULL;
+      s_pWindowMap                                                                        = s_pShadowMap = NULL;
+      s_iMaxWindow                                                                        = s_iOpenWindows = s_iCurrWindow =
+                                                                            s_iMapWidth   = s_iMapHeight = 0;
+      s_fBoardSet                                                                         = s_fInit = FALSE;
    }
 
    HB_GTSUPER_EXIT( pGT );
@@ -883,7 +883,7 @@ static int hb_ctw_MouseRow( PHB_GT pGT )
 {
    int iRow;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_MouseRow(%p)", pGT));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_MouseRow(%p)", pGT ) );
 
    iRow = HB_GTSUPER_MOUSEROW( pGT );
 
@@ -898,7 +898,7 @@ static int hb_ctw_MouseCol( PHB_GT pGT )
 {
    int iCol;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_MouseCol(%p)", pGT));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_MouseCol(%p)", pGT ) );
 
    iCol = HB_GTSUPER_MOUSECOL( pGT );
 
@@ -911,12 +911,12 @@ static int hb_ctw_MouseCol( PHB_GT pGT )
 
 static void hb_ctw_gt_GetPos( PHB_GT pGT, int * piRow, int * piCol )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_gt_GetPos(%p,%p,%p)", pGT, piRow, piCol));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_GetPos(%p,%p,%p)", pGT, piRow, piCol ) );
 
    if( s_iCurrWindow > 0 )
    {
-      *piRow = s_windows[ s_iCurrWindow ]->iRow;
-      *piCol = s_windows[ s_iCurrWindow ]->iCol;
+      *piRow   = s_windows[ s_iCurrWindow ]->iRow;
+      *piCol   = s_windows[ s_iCurrWindow ]->iCol;
    }
    else
       HB_GTSUPER_GETPOS( pGT, piRow, piCol );
@@ -931,25 +931,25 @@ static void hb_ctw_gt_SetPos( PHB_GT pGT, int iRow, int iCol )
 {
    int iHeight, iWidth;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_gt_GetPos(%p,%d,%d)", pGT, iRow, iCol));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_GetPos(%p,%d,%d)", pGT, iRow, iCol ) );
 
-   iHeight = HB_GTSELF_MAXROW( pGT ) + 1;
-   iWidth = HB_GTSELF_MAXCOL( pGT ) + 1;
+   iHeight  = HB_GTSELF_MAXROW( pGT ) + 1;
+   iWidth   = HB_GTSELF_MAXCOL( pGT ) + 1;
 
    if( iCol > iWidth )
       iCol = iWidth;
    else if( iCol < 0 )
    {
-      iRow += iCol / iWidth - 1;
-      iCol = iWidth + iCol % iWidth;
+      iRow  += iCol / iWidth - 1;
+      iCol  = iWidth + iCol % iWidth;
    }
    if( iRow > iHeight )
       iRow = iHeight;
 
    if( s_iCurrWindow > 0 )
    {
-      if( iRow < - s_windows[ s_iCurrWindow ]->iTopMargin )
-         iRow = - s_windows[ s_iCurrWindow ]->iTopMargin;
+      if( iRow < -s_windows[ s_iCurrWindow ]->iTopMargin )
+         iRow = -s_windows[ s_iCurrWindow ]->iTopMargin;
       s_windows[ s_iCurrWindow ]->iRow = iRow;
       s_windows[ s_iCurrWindow ]->iCol = iCol;
    }
@@ -963,7 +963,7 @@ static void hb_ctw_gt_SetPos( PHB_GT pGT, int iRow, int iCol )
 
 static int hb_ctw_gt_MaxCol( PHB_GT pGT )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_gt_MaxCol(%p)", pGT));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_MaxCol(%p)", pGT ) );
 
    if( s_iCurrWindow > 0 )
       return s_windows[ s_iCurrWindow ]->iWidth -
@@ -975,7 +975,7 @@ static int hb_ctw_gt_MaxCol( PHB_GT pGT )
 
 static int hb_ctw_gt_MaxRow( PHB_GT pGT )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_gt_MaxRow(%p)", pGT));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_MaxRow(%p)", pGT ) );
 
    if( s_iCurrWindow > 0 )
       return s_windows[ s_iCurrWindow ]->iHeight -
@@ -993,16 +993,16 @@ static int hb_ctw_gt_MaxRow( PHB_GT pGT )
 
 static void hb_ctw_gt_WriteCon( PHB_GT pGT, BYTE * pText, ULONG ulLength )
 {
-   int iLen = 0;
-   BOOL bDisp = FALSE;
-   BOOL bBell = FALSE;
-   int iRow, iCol, iMaxRow, iMaxCol;
-   BYTE szString[ WRITECON_BUFFER_SIZE ];
+   int   iLen  = 0;
+   BOOL  bDisp = FALSE;
+   BOOL  bBell = FALSE;
+   int   iRow, iCol, iMaxRow, iMaxCol;
+   BYTE  szString[ WRITECON_BUFFER_SIZE ];
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_gt_WriteCon(%p,%p,%lu)", pGT, pText, ulLength));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_WriteCon(%p,%p,%lu)", pGT, pText, ulLength ) );
 
-   iMaxRow = HB_GTSELF_MAXROW( pGT );
-   iMaxCol = HB_GTSELF_MAXCOL( pGT );
+   iMaxRow  = HB_GTSELF_MAXROW( pGT );
+   iMaxCol  = HB_GTSELF_MAXCOL( pGT );
 
    HB_GTSELF_GETPOS( pGT, &iRow, &iCol );
 
@@ -1033,7 +1033,7 @@ static void hb_ctw_gt_WriteCon( PHB_GT pGT, BYTE * pText, ULONG ulLength )
             }
             else if( iRow > 0 )
             {
-               iCol = iMaxCol;
+               iCol  = iMaxCol;
                --iRow;
                bDisp = TRUE;
             }
@@ -1050,7 +1050,7 @@ static void hb_ctw_gt_WriteCon( PHB_GT pGT, BYTE * pText, ULONG ulLength )
             break;
 
          case HB_CHAR_LF:
-            iCol = 0;
+            iCol  = 0;
             ++iRow;
             bDisp = TRUE;
             break;
@@ -1070,7 +1070,7 @@ static void hb_ctw_gt_WriteCon( PHB_GT pGT, BYTE * pText, ULONG ulLength )
             szString[ iLen++ ] = ch;
             if( ++iCol > iMaxCol )
             {
-               iCol = 0;
+               iCol  = 0;
                ++iRow;
                bDisp = TRUE;
             }
@@ -1089,9 +1089,9 @@ static void hb_ctw_gt_WriteCon( PHB_GT pGT, BYTE * pText, ULONG ulLength )
             HB_GTSELF_SCROLL( pGT, 0, 0, iMaxRow, iMaxCol,
                               HB_GTSELF_GETCOLOR( pGT ),
                               HB_GTSELF_GETCLEARCHAR( pGT ),
-                          iRow - iMaxRow, 0 );
-            iRow = iMaxRow;
-            iCol = 0;
+                              iRow - iMaxRow, 0 );
+            iRow  = iMaxRow;
+            iCol  = 0;
          }
          HB_GTSELF_SETPOS( pGT, iRow, iCol );
          bDisp = FALSE;
@@ -1108,10 +1108,9 @@ static void hb_ctw_gt_WriteCon( PHB_GT pGT, BYTE * pText, ULONG ulLength )
    }
 }
 
-
 static int hb_ctw_gt_GetCursorStyle( PHB_GT pGT )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_gt_GetCursorStyle(%p)", pGT));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_GetCursorStyle(%p)", pGT ) );
 
    if( s_iCurrWindow > 0 )
       return s_windows[ s_iCurrWindow ]->iCursorStyle;
@@ -1121,7 +1120,7 @@ static int hb_ctw_gt_GetCursorStyle( PHB_GT pGT )
 
 static void hb_ctw_gt_SetCursorStyle( PHB_GT pGT, int iStyle )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_gt_SetCursorStyle(%p,%d)", pGT, iStyle));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_SetCursorStyle(%p,%d)", pGT, iStyle ) );
 
    if( s_iCurrWindow > 0 )
    {
@@ -1132,10 +1131,10 @@ static void hb_ctw_gt_SetCursorStyle( PHB_GT pGT, int iStyle )
          case SC_INSERT:
          case SC_SPECIAL1:
          case SC_SPECIAL2:
-            s_windows[ s_iCurrWindow ]->iCursorStyle = iStyle;
+            s_windows[ s_iCurrWindow ]->iCursorStyle  = iStyle;
             break;
          default:
-            s_windows[ s_iCurrWindow ]->iCursorStyle = SC_NORMAL;
+            s_windows[ s_iCurrWindow ]->iCursorStyle  = SC_NORMAL;
             break;
       }
    }
@@ -1145,7 +1144,7 @@ static void hb_ctw_gt_SetCursorStyle( PHB_GT pGT, int iStyle )
 
 static void hb_ctw_gt_GetColorStr( PHB_GT pGT, char * pszColorString )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_gt_GetColorStr(%p,%p)", pGT, pszColorString));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_GetColorStr(%p,%p)", pGT, pszColorString ) );
 
    if( s_iCurrWindow > 0 )
    {
@@ -1158,7 +1157,7 @@ static void hb_ctw_gt_GetColorStr( PHB_GT pGT, char * pszColorString )
 
 static void hb_ctw_gt_SetColorStr( PHB_GT pGT, const char * szColorString )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_gt_SetColorStr(%p,%s)", pGT, szColorString));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_SetColorStr(%p,%s)", pGT, szColorString ) );
 
    if( s_iCurrWindow > 0 )
    {
@@ -1172,7 +1171,7 @@ static void hb_ctw_gt_SetColorStr( PHB_GT pGT, const char * szColorString )
 
 static void hb_ctw_gt_ColorSelect( PHB_GT pGT, int iColorIndex )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_gt_ColorSelect(%p,%d)", pGT, iColorIndex));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_ColorSelect(%p,%d)", pGT, iColorIndex ) );
 
    if( s_iCurrWindow > 0 )
    {
@@ -1186,7 +1185,7 @@ static void hb_ctw_gt_ColorSelect( PHB_GT pGT, int iColorIndex )
 
 static int hb_ctw_gt_GetColor( PHB_GT pGT )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_gt_GetColor(%p)", pGT));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_GetColor(%p)", pGT ) );
 
    if( s_iCurrWindow > 0 )
    {
@@ -1199,16 +1198,16 @@ static int hb_ctw_gt_GetColor( PHB_GT pGT )
 
 static void hb_ctw_gt_GetColorData( PHB_GT pGT, int ** pColorsPtr, int * piColorCount, int * piColorIndex )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_gt_GetColor(%p,%p,%p,%p)", pGT, pColorsPtr, piColorCount, piColorIndex));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_GetColor(%p,%p,%p,%p)", pGT, pColorsPtr, piColorCount, piColorIndex ) );
 
    if( s_iCurrWindow > 0 )
    {
       PHB_CT_WND pWnd = s_windows[ s_iCurrWindow ];
 
-      *pColorsPtr = ( int * ) hb_xgrab( pWnd->iColorCount * sizeof( int ) );
+      *pColorsPtr    = ( int * ) hb_xgrab( pWnd->iColorCount * sizeof( int ) );
       HB_MEMCPY( *pColorsPtr, pWnd->piColors, pWnd->iColorCount * sizeof( int ) );
-      *piColorCount = pWnd->iColorCount;
-      *piColorIndex = pWnd->iColorIndex;
+      *piColorCount  = pWnd->iColorCount;
+      *piColorIndex  = pWnd->iColorIndex;
    }
    else
       HB_GTSUPER_GETCOLORDATA( pGT, pColorsPtr, piColorCount, piColorIndex );
@@ -1216,17 +1215,17 @@ static void hb_ctw_gt_GetColorData( PHB_GT pGT, int ** pColorsPtr, int * piColor
 
 static void hb_ctw_gt_GetScrCursor( PHB_GT pGT, int * piRow, int * piCol, int * piStyle )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_gt_GetScrCursor(%p,%p,%p,%p)", pGT, piRow, piCol, piStyle));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_GetScrCursor(%p,%p,%p,%p)", pGT, piRow, piCol, piStyle ) );
 
    HB_GTSUPER_GETSCRCURSOR( pGT, piRow, piCol, piStyle );
    if( s_iCurrWindow > 0 )
    {
-      *piRow += s_windows[ s_iCurrWindow ]->iFirstRow +
-                s_windows[ s_iCurrWindow ]->iTopMargin;
-      *piCol += s_windows[ s_iCurrWindow ]->iFirstCol +
-                s_windows[ s_iCurrWindow ]->iLeftMargin;
+      *piRow   += s_windows[ s_iCurrWindow ]->iFirstRow +
+                  s_windows[ s_iCurrWindow ]->iTopMargin;
+      *piCol   += s_windows[ s_iCurrWindow ]->iFirstCol +
+                  s_windows[ s_iCurrWindow ]->iLeftMargin;
       if( *piStyle != SC_NONE &&
-          ( *piRow < s_iBoardTop  || *piRow > s_iBoardBottom ||
+          ( *piRow < s_iBoardTop || *piRow > s_iBoardBottom ||
             *piCol < s_iBoardLeft || *piCol > s_iBoardRight ) )
          *piStyle = SC_NONE;
    }
@@ -1237,25 +1236,25 @@ static BOOL hb_ctw_gt_GetScrChar( PHB_GT pGT, int iRow, int iCol,
 {
    int iWindow = s_iCurrWindow, iShadow = 0;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_gt_GetScrChar(%p,%d,%d,%p,%p,%p)", pGT, iRow, iCol, pbColor, pbAttr, pusChar));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_GetScrChar(%p,%d,%d,%p,%p,%p)", pGT, iRow, iCol, pbColor, pbAttr, pusChar ) );
 
    if( s_iOpenWindows > 0 )
    {
-      if( iRow < s_iBoardTop  || iRow > s_iBoardBottom ||
+      if( iRow < s_iBoardTop || iRow > s_iBoardBottom ||
           iCol < s_iBoardLeft || iCol > s_iBoardRight )
          iWindow = 0;
       else
       {
          long lIndex = ( long ) iRow * s_iMapWidth + iCol;
-         iWindow = s_pWindowMap[ lIndex ];
-         iShadow = s_pShadowMap[ lIndex ];
+         iWindow  = s_pWindowMap[ lIndex ];
+         iShadow  = s_pShadowMap[ lIndex ];
       }
    }
 
    if( iWindow > 0 )
    {
-      iRow -= s_windows[ iWindow ]->iFirstRow;
-      iCol -= s_windows[ iWindow ]->iFirstCol;
+      iRow  -= s_windows[ iWindow ]->iFirstRow;
+      iCol  -= s_windows[ iWindow ]->iFirstCol;
       if( iCol >= 0 && iRow >= 0 && iRow < s_windows[ iWindow ]->iHeight &&
           iCol < s_windows[ iWindow ]->iWidth )
       {
@@ -1283,14 +1282,14 @@ static BOOL hb_ctw_gt_GetScrChar( PHB_GT pGT, int iRow, int iCol,
 static BOOL hb_ctw_gt_GetChar( PHB_GT pGT, int iRow, int iCol,
                                BYTE * pbColor, BYTE * pbAttr, USHORT * pusChar )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_gt_GetChar(%p,%d,%d,%p,%p,%p)", pGT, iRow, iCol, pbColor, pbAttr, pusChar));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_GetChar(%p,%d,%d,%p,%p,%p)", pGT, iRow, iCol, pbColor, pbAttr, pusChar ) );
 
    if( s_iCurrWindow == 0 )
       /* TODO: it may badly interacts with character translations */
       return HB_GTSELF_GETSCRCHAR( pGT, iRow, iCol, pbColor, pbAttr, pusChar );
 
-   iRow += s_windows[ s_iCurrWindow ]->iTopMargin;
-   iCol += s_windows[ s_iCurrWindow ]->iLeftMargin;
+   iRow  += s_windows[ s_iCurrWindow ]->iTopMargin;
+   iCol  += s_windows[ s_iCurrWindow ]->iLeftMargin;
 
    if( iCol >= 0 && iRow >= 0 &&
        iRow < s_windows[ s_iCurrWindow ]->iHeight &&
@@ -1311,16 +1310,16 @@ static BOOL hb_ctw_gt_PutChar( PHB_GT pGT, int iRow, int iCol,
 {
    int iWindow = s_iCurrWindow;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_gt_PutChar(%p,%d,%d,%d,%d,%hu)", pGT, iRow, iCol, (int)bColor, (int)bAttr, (int)usChar));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_PutChar(%p,%d,%d,%d,%d,%hu)", pGT, iRow, iCol, ( int ) bColor, ( int ) bAttr, ( int ) usChar ) );
 
    if( s_iOpenWindows > 0 && iWindow == 0 )
    {
-      if( iRow >= s_iBoardTop  && iRow <= s_iBoardBottom &&
+      if( iRow >= s_iBoardTop && iRow <= s_iBoardBottom &&
           iCol >= s_iBoardLeft && iCol <= s_iBoardRight )
       {
          long lIndex = ( long ) iRow * s_iMapWidth + iCol;
-         iWindow = s_pWindowMap[ lIndex ];
-         s_pShadowMap[ lIndex ] = 0;
+         iWindow                 = s_pWindowMap[ lIndex ];
+         s_pShadowMap[ lIndex ]  = 0;
       }
    }
 
@@ -1330,21 +1329,21 @@ static BOOL hb_ctw_gt_PutChar( PHB_GT pGT, int iRow, int iCol,
 
       if( s_iCurrWindow == 0 )
       {
-         iWndRow = iRow - s_windows[ iWindow ]->iFirstRow;
-         iWndCol = iCol - s_windows[ iWindow ]->iFirstCol;
-         iWndHeight = s_windows[ iWindow ]->iWidth;
-         iWndWidth  = s_windows[ iWindow ]->iWidth;
+         iWndRow     = iRow - s_windows[ iWindow ]->iFirstRow;
+         iWndCol     = iCol - s_windows[ iWindow ]->iFirstCol;
+         iWndHeight  = s_windows[ iWindow ]->iWidth;
+         iWndWidth   = s_windows[ iWindow ]->iWidth;
       }
       else
       {
-         iWndRow = iRow + s_windows[ iWindow ]->iTopMargin;
-         iWndCol = iCol + s_windows[ iWindow ]->iLeftMargin;
-         iRow = iWndRow + s_windows[ iWindow ]->iFirstRow;
-         iCol = iWndCol + s_windows[ iWindow ]->iFirstCol;
-         iWndHeight = s_windows[ iWindow ]->iHeight -
-                      s_windows[ iWindow ]->iBottomMargin;
-         iWndWidth  = s_windows[ iWindow ]->iWidth -
-                      s_windows[ iWindow ]->iRightMargin;
+         iWndRow     = iRow + s_windows[ iWindow ]->iTopMargin;
+         iWndCol     = iCol + s_windows[ iWindow ]->iLeftMargin;
+         iRow        = iWndRow + s_windows[ iWindow ]->iFirstRow;
+         iCol        = iWndCol + s_windows[ iWindow ]->iFirstCol;
+         iWndHeight  = s_windows[ iWindow ]->iHeight -
+                       s_windows[ iWindow ]->iBottomMargin;
+         iWndWidth   = s_windows[ iWindow ]->iWidth -
+                       s_windows[ iWindow ]->iRightMargin;
       }
       if( iWndCol >= 0 && iWndRow >= 0 &&
           iWndRow < iWndHeight &&
@@ -1359,7 +1358,7 @@ static BOOL hb_ctw_gt_PutChar( PHB_GT pGT, int iRow, int iCol,
          {
             if( s_iCurrWindow == 0 )
                HB_GTSUPER_TOUCHCELL( pGT, iRow, iCol );
-            else if( iRow >= s_iBoardTop  && iRow <= s_iBoardBottom &&
+            else if( iRow >= s_iBoardTop && iRow <= s_iBoardBottom &&
                      iCol >= s_iBoardLeft && iCol <= s_iBoardRight )
                HB_GTSUPER_TOUCHCELL( pGT, iRow, iCol );
          }
@@ -1373,7 +1372,7 @@ static BOOL hb_ctw_gt_PutChar( PHB_GT pGT, int iRow, int iCol,
 
 static BOOL hb_ctw_gt_Resize( PHB_GT pGT, int iRows, int iCols )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_gt_Resize(%p,%d,%d)", pGT, iRows, iCols));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_Resize(%p,%d,%d)", pGT, iRows, iCols ) );
 
    if( HB_GTSUPER_RESIZE( pGT, iRows, iCols ) )
    {
@@ -1381,12 +1380,12 @@ static BOOL hb_ctw_gt_Resize( PHB_GT pGT, int iRows, int iCols )
       {
          ULONG ulSize;
 
-         s_iMapHeight = iRows;
-         s_iMapWidth  = iCols;
+         s_iMapHeight   = iRows;
+         s_iMapWidth    = iCols;
          s_iShadowWidth = hb_ctw_CalcShadowWidth( s_iMapHeight, s_iMapWidth );
-         ulSize = ( ULONG ) s_iMapHeight * s_iMapWidth * sizeof( int );
-         s_pWindowMap = ( int * ) hb_xrealloc( s_pWindowMap, ulSize );
-         s_pShadowMap = ( int * ) hb_xrealloc( s_pShadowMap, ulSize );
+         ulSize         = ( ULONG ) s_iMapHeight * s_iMapWidth * sizeof( int );
+         s_pWindowMap   = ( int * ) hb_xrealloc( s_pWindowMap, ulSize );
+         s_pShadowMap   = ( int * ) hb_xrealloc( s_pShadowMap, ulSize );
       }
       if( s_fBoardSet )
          hb_ctw_SetWindowBoard( pGT, 0, 0, iRows - 1, iCols - 1 );
@@ -1397,9 +1396,9 @@ static BOOL hb_ctw_gt_Resize( PHB_GT pGT, int iRows, int iCols )
 
 static BOOL hb_ctw_gt_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_gt_Info(%p,%d,%p)", pGT, iType, pInfo));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_Info(%p,%d,%p)", pGT, iType, pInfo ) );
 
-   switch ( iType )
+   switch( iType )
    {
       case GTI_ISCTWIN:
          pInfo->pResult = hb_itemPutL( pInfo->pResult, TRUE );
@@ -1419,8 +1418,8 @@ static BOOL hb_ctw_gt_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
       }
       case GTI_GETWIN:
       {
-         BOOL fResult;
-         int iWindow = s_iCurrWindow;
+         BOOL  fResult;
+         int   iWindow = s_iCurrWindow;
 
          hb_ctw_SelectWindow( pGT, 0 );
          fResult = HB_GTSUPER_INFO( pGT, iType, pInfo );
@@ -1450,14 +1449,14 @@ static int hb_ctw_gt_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
 {
    int iOptions, iRet = 0;
 
-   HB_TRACE( HB_TR_DEBUG, ("hb_ctw_gt_Alert(%p,%p,%p,%d,%d,%f)", pGT, pMessage, pOptions, iClrNorm, iClrHigh, dDelay ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_Alert(%p,%p,%p,%d,%d,%f)", pGT, pMessage, pOptions, iClrNorm, iClrHigh, dDelay ) );
 
    iOptions = ( int ) hb_arrayLen( pOptions );
 
    if( HB_IS_STRING( pMessage ) && iOptions > 0 )
    {
-      int iRows, iCols;
-      BOOL fScreen;
+      int   iRows, iCols;
+      BOOL  fScreen;
 
       HB_GTSELF_GETSIZE( pGT, &iRows, &iCols );
       if( iCols <= 4 || iRows <= 4 )
@@ -1467,22 +1466,22 @@ static int hb_ctw_gt_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
          HB_GT_INFO gtInfo;
          gtInfo.pNewVal = gtInfo.pResult = NULL;
          HB_GTSELF_INFO( pGT, GTI_FULLSCREEN, &gtInfo );
-         fScreen = gtInfo.pResult && hb_itemGetL( gtInfo.pResult );
+         fScreen        = gtInfo.pResult && hb_itemGetL( gtInfo.pResult );
          HB_GTSELF_INFO( pGT, GTI_KBDSUPPORT, &gtInfo );
          if( gtInfo.pResult )
          {
-            if( !hb_itemGetL( gtInfo.pResult ) )
+            if( ! hb_itemGetL( gtInfo.pResult ) )
                fScreen = FALSE;
             hb_itemRelease( gtInfo.pResult );
          }
       }
       if( fScreen )
       {
-         ULONG ulWidth = 0, ulCurrWidth = 0, ul = 0, ul2, ulMaxWidth, ulLast;
-         int iKey, iDspCount, iLines = 0, iTop, iLeft, iBottom, iRight,
-             iMnuCol, iPos, iClr, iWnd, i;
-         char * szMessage = hb_itemGetCPtr( pMessage );
-         ULONG ulLen = hb_itemGetCLen( pMessage );
+         ULONG    ulWidth     = 0, ulCurrWidth = 0, ul = 0, ul2, ulMaxWidth, ulLast;
+         int      iKey, iDspCount, iLines = 0, iTop, iLeft, iBottom, iRight,
+                  iMnuCol, iPos, iClr, iWnd, i;
+         char *   szMessage   = hb_itemGetCPtr( pMessage );
+         ULONG    ulLen       = hb_itemGetCLen( pMessage );
 
          ulMaxWidth = iCols - 4;
          while( ul < ulLen )
@@ -1513,10 +1512,10 @@ static int hb_ctw_gt_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
             ulWidth = ulMaxWidth;
          if( iRows < iLines + 4 )
             iLines = iRows - 4;
-         iTop = ( iRows - iLines - 4 ) >> 1;
-         iLeft = ( iCols - ulWidth - 4 ) >> 1;
-         iBottom = iTop + iLines + 3;
-         iRight = iLeft + ulWidth + 3;
+         iTop     = ( iRows - iLines - 4 ) >> 1;
+         iLeft    = ( iCols - ulWidth - 4 ) >> 1;
+         iBottom  = iTop + iLines + 3;
+         iRight   = iLeft + ulWidth + 3;
          if( iClrNorm == 0 )
             iClrNorm = 79;
          if( iClrHigh == 0 )
@@ -1526,11 +1525,11 @@ static int hb_ctw_gt_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
          if( iDspCount == 0 )
             HB_GTSELF_DISPBEGIN( pGT );
 
-         iWnd = hb_ctw_CreateWindow( pGT, iTop, iLeft, iBottom, iRight, TRUE, iClrNorm );
+         iWnd     = hb_ctw_CreateWindow( pGT, iTop, iLeft, iBottom, iRight, TRUE, iClrNorm );
          hb_ctw_AddWindowBox( pGT, iWnd, ( BYTE * ) _B_SINGLE, iClrNorm );
          HB_GTSELF_SETCURSORSTYLE( pGT, SC_NONE );
-         ulLast = 0;
-         i = 0;
+         ulLast   = 0;
+         i        = 0;
          for( ul = 0; ul < ulLen; ++ul )
          {
             if( szMessage[ ul ] == '\n' )
@@ -1564,11 +1563,11 @@ static int hb_ctw_gt_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
             iMnuCol = ( ( ulWidth - ulCurrWidth ) >> 1 ) + 1;
             for( i = 1; i <= iOptions; ++i )
             {
-               iClr = i == iPos ? iClrHigh : iClrNorm;
-               ulLen = hb_arrayGetCLen( pOptions, i );
+               iClr     = i == iPos ? iClrHigh : iClrNorm;
+               ulLen    = hb_arrayGetCLen( pOptions, i );
                HB_GTSELF_PUTTEXT( pGT, iLines + 1, iMnuCol, iClr,
                                   ( BYTE * ) hb_arrayGetCPtr( pOptions, i ), ulLen );
-               iMnuCol += ulLen + 3;
+               iMnuCol  += ulLen + 3;
             }
             while( HB_GTSELF_DISPCOUNT( pGT ) )
                HB_GTSELF_DISPEND( pGT );
@@ -1598,8 +1597,8 @@ static int hb_ctw_gt_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
 #ifdef HB_COMPAT_C53
             else if( iKey == K_LBUTTONDOWN )
             {
-               int iMRow = HB_GTSELF_MOUSEROW( pGT ),
-                   iMCol = HB_GTSELF_MOUSECOL( pGT );
+               int iMRow   = HB_GTSELF_MOUSEROW( pGT ),
+                   iMCol   = HB_GTSELF_MOUSECOL( pGT );
                if( iMRow == iLines + 1 )
                {
                   iMnuCol = ( ( ulWidth - ulCurrWidth ) >> 1 ) + 1;
@@ -1621,7 +1620,7 @@ static int hb_ctw_gt_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
                int iUp = hb_charUpper( iKey );
                for( i = 1; i <= iOptions; ++i )
                {
-                  char *szValue = hb_arrayGetCPtr( pOptions, i );
+                  char * szValue = hb_arrayGetCPtr( pOptions, i );
                   if( szValue && iUp == hb_charUpper( *szValue ) )
                   {
                      iRet = i;
@@ -1648,7 +1647,7 @@ static int hb_ctw_gt_ReadKey( PHB_GT pGT, int iEventMask )
 {
    int iKey;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_gt_ReadKey(%p,%d)", pGT, iEventMask));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ctw_gt_ReadKey(%p,%d)", pGT, iEventMask ) );
 
    iKey = HB_GTSUPER_READKEY( pGT, iEventMask );
 
@@ -1663,8 +1662,9 @@ HB_EXTERN_BEGIN
 
 BOOL hb_ctwInit( void )
 {
-   PHB_GT pGT = hb_gt_Base();
-   BOOL fResult = FALSE;
+   PHB_GT   pGT      = hb_gt_Base();
+   BOOL     fResult  = FALSE;
+
    if( pGT )
       fResult = hb_ctw_Init( pGT );
    return fResult;
@@ -1672,8 +1672,9 @@ BOOL hb_ctwInit( void )
 
 int  hb_ctwSetShadowAttr( int iAttr )
 {
-   PHB_GT pGT = hb_gt_Base();
-   int iResult = -1;
+   PHB_GT   pGT      = hb_gt_Base();
+   int      iResult  = -1;
+
    if( pGT )
       iResult = hb_ctw_SetShadowAttr( pGT, iAttr );
    return iResult;
@@ -1681,8 +1682,9 @@ int  hb_ctwSetShadowAttr( int iAttr )
 
 int  hb_ctwSetMoveMode( int iMode )
 {
-   PHB_GT pGT = hb_gt_Base();
-   int iResult = -1;
+   PHB_GT   pGT      = hb_gt_Base();
+   int      iResult  = -1;
+
    if( pGT )
       iResult = hb_ctw_SetMoveMode( pGT, iMode );
    return iResult;
@@ -1690,8 +1692,9 @@ int  hb_ctwSetMoveMode( int iMode )
 
 int  hb_ctwSetMoveStep( int iVertical, int iHorizontal )
 {
-   PHB_GT pGT = hb_gt_Base();
-   int iResult = -1;
+   PHB_GT   pGT      = hb_gt_Base();
+   int      iResult  = -1;
+
    if( pGT )
       iResult = hb_ctw_SetMoveStep( pGT, iVertical, iHorizontal );
    return iResult;
@@ -1699,8 +1702,9 @@ int  hb_ctwSetMoveStep( int iVertical, int iHorizontal )
 
 int  hb_ctwSetWindowBoard( int iTop, int iLeft, int iBottom, int iRight )
 {
-   PHB_GT pGT = hb_gt_Base();
-   int iResult = -1;
+   PHB_GT   pGT      = hb_gt_Base();
+   int      iResult  = -1;
+
    if( pGT )
    {
       iResult = hb_ctw_SetWindowBoard( pGT, iTop, iLeft, iBottom, iRight );
@@ -1711,8 +1715,9 @@ int  hb_ctwSetWindowBoard( int iTop, int iLeft, int iBottom, int iRight )
 
 int  hb_ctwSetBorderMode( int iTop, int iLeft, int iBottom, int iRight )
 {
-   PHB_GT pGT = hb_gt_Base();
-   int iResult = -1;
+   PHB_GT   pGT      = hb_gt_Base();
+   int      iResult  = -1;
+
    if( pGT )
       iResult = hb_ctw_SetBorderMode( pGT, iTop, iLeft, iBottom, iRight );
    return iResult;
@@ -1720,8 +1725,9 @@ int  hb_ctwSetBorderMode( int iTop, int iLeft, int iBottom, int iRight )
 
 int  hb_ctwCreateWindow( int iTop, int iLeft, int iBottom, int iRight, BOOL fClear, int iColor )
 {
-   PHB_GT pGT = hb_gt_Base();
-   int iResult = -1;
+   PHB_GT   pGT      = hb_gt_Base();
+   int      iResult  = -1;
+
    if( pGT )
    {
       iResult = hb_ctw_CreateWindow( pGT, iTop, iLeft, iBottom, iRight, fClear, iColor );
@@ -1732,8 +1738,9 @@ int  hb_ctwCreateWindow( int iTop, int iLeft, int iBottom, int iRight, BOOL fCle
 
 int  hb_ctwCloseAllWindows( void )
 {
-   PHB_GT pGT = hb_gt_Base();
-   int iResult = -1;
+   PHB_GT   pGT      = hb_gt_Base();
+   int      iResult  = -1;
+
    if( pGT )
    {
       iResult = hb_ctw_CloseAllWindows( pGT );
@@ -1744,8 +1751,9 @@ int  hb_ctwCloseAllWindows( void )
 
 int  hb_ctwCloseWindow( int iWindow )
 {
-   PHB_GT pGT = hb_gt_Base();
-   int iResult = -1;
+   PHB_GT   pGT      = hb_gt_Base();
+   int      iResult  = -1;
+
    if( pGT )
    {
       iResult = hb_ctw_CloseWindow( pGT, iWindow );
@@ -1756,8 +1764,9 @@ int  hb_ctwCloseWindow( int iWindow )
 
 int  hb_ctwCurrentWindow( void )
 {
-   PHB_GT pGT = hb_gt_Base();
-   int iResult = 0;
+   PHB_GT   pGT      = hb_gt_Base();
+   int      iResult  = 0;
+
    if( pGT )
       iResult = hb_ctw_CurrentWindow( pGT );
    return iResult;
@@ -1765,8 +1774,9 @@ int  hb_ctwCurrentWindow( void )
 
 int  hb_ctwSelectWindow( int iWindow )
 {
-   PHB_GT pGT = hb_gt_Base();
-   int iResult = 0;
+   PHB_GT   pGT      = hb_gt_Base();
+   int      iResult  = 0;
+
    if( pGT )
    {
       iResult = hb_ctw_SelectWindow( pGT, iWindow );
@@ -1777,8 +1787,9 @@ int  hb_ctwSelectWindow( int iWindow )
 
 int  hb_ctwMaxWindow( void )
 {
-   PHB_GT pGT = hb_gt_Base();
-   int iResult = 0;
+   PHB_GT   pGT      = hb_gt_Base();
+   int      iResult  = 0;
+
    if( pGT )
       iResult = hb_ctw_MaxWindow( pGT );
    return iResult;
@@ -1786,8 +1797,9 @@ int  hb_ctwMaxWindow( void )
 
 int  hb_ctwChangeMargins( int iWindow, int iTop, int iLeft, int iBottom, int iRight )
 {
-   PHB_GT pGT = hb_gt_Base();
-   int iResult = -1;
+   PHB_GT   pGT      = hb_gt_Base();
+   int      iResult  = -1;
+
    if( pGT )
       iResult = hb_ctw_ChangeMargins( pGT, iWindow, iTop, iLeft, iBottom, iRight );
    return iResult;
@@ -1795,8 +1807,9 @@ int  hb_ctwChangeMargins( int iWindow, int iTop, int iLeft, int iBottom, int iRi
 
 int  hb_ctwGetWindowCords( int iWindow, BOOL fCenter, int * piTop, int * piLeft, int * piBottom, int * piRight )
 {
-   PHB_GT pGT = hb_gt_Base();
-   int iResult = -1;
+   PHB_GT   pGT      = hb_gt_Base();
+   int      iResult  = -1;
+
    if( pGT )
       iResult = hb_ctw_GetWindowCords( pGT, iWindow, fCenter, piTop, piLeft, piBottom, piRight );
    return iResult;
@@ -1804,8 +1817,9 @@ int  hb_ctwGetWindowCords( int iWindow, BOOL fCenter, int * piTop, int * piLeft,
 
 int  hb_ctwGetFormatCords( int iWindow, BOOL fRelative, int * piTop, int * piLeft, int * piBottom, int * piRight )
 {
-   PHB_GT pGT = hb_gt_Base();
-   int iResult = -1;
+   PHB_GT   pGT      = hb_gt_Base();
+   int      iResult  = -1;
+
    if( pGT )
       iResult = hb_ctw_GetFormatCords( pGT, iWindow, fRelative, piTop, piLeft, piBottom, piRight );
    return iResult;
@@ -1813,8 +1827,9 @@ int  hb_ctwGetFormatCords( int iWindow, BOOL fRelative, int * piTop, int * piLef
 
 int  hb_ctwMoveWindow( int iWindow, int iRow, int iCol )
 {
-   PHB_GT pGT = hb_gt_Base();
-   int iResult = -1;
+   PHB_GT   pGT      = hb_gt_Base();
+   int      iResult  = -1;
+
    if( pGT )
       iResult = hb_ctw_MoveWindow( pGT, iWindow, iRow, iCol );
    return iResult;
@@ -1822,8 +1837,9 @@ int  hb_ctwMoveWindow( int iWindow, int iRow, int iCol )
 
 int  hb_ctwCenterWindow( int iWindow, BOOL fCenter )
 {
-   PHB_GT pGT = hb_gt_Base();
-   int iResult = -1;
+   PHB_GT   pGT      = hb_gt_Base();
+   int      iResult  = -1;
+
    if( pGT )
       iResult = hb_ctw_CenterWindow( pGT, iWindow, fCenter );
    return iResult;
@@ -1831,8 +1847,9 @@ int  hb_ctwCenterWindow( int iWindow, BOOL fCenter )
 
 int  hb_ctwAddWindowBox( int iWindow, BYTE * szBox, int iColor )
 {
-   PHB_GT pGT = hb_gt_Base();
-   int iResult = -1;
+   PHB_GT   pGT      = hb_gt_Base();
+   int      iResult  = -1;
+
    if( pGT )
    {
       iResult = hb_ctw_AddWindowBox( pGT, iWindow, szBox, iColor );
@@ -1848,7 +1865,7 @@ int  hb_ctwLastKey( void )
     * buffer size is decreased by 1024 to 63488 bytes
     * before adding key. TODO: check id buffer is shifted
     */
-   if( !s_fInit )
+   if( ! s_fInit )
    {
       PHB_GT pGT = hb_gt_Base();
       if( pGT )
@@ -1861,32 +1878,32 @@ HB_EXTERN_END
 
 static BOOL hb_gt_FuncInit( PHB_GT_FUNCS pFuncTable )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_FuncInit(%p)", pFuncTable));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_FuncInit(%p)", pFuncTable ) );
 
-   pFuncTable->Init                       = hb_ctw_gt_Init;
-   pFuncTable->Exit                       = hb_ctw_gt_Exit;
-   pFuncTable->MouseRow                   = hb_ctw_MouseRow;
-   pFuncTable->MouseCol                   = hb_ctw_MouseCol;
-   pFuncTable->MaxCol                     = hb_ctw_gt_MaxCol;
-   pFuncTable->MaxRow                     = hb_ctw_gt_MaxRow;
-   pFuncTable->GetPos                     = hb_ctw_gt_GetPos;
-   pFuncTable->SetPos                     = hb_ctw_gt_SetPos;
-   pFuncTable->WriteCon                   = hb_ctw_gt_WriteCon;
-   pFuncTable->GetCursorStyle             = hb_ctw_gt_GetCursorStyle;
-   pFuncTable->SetCursorStyle             = hb_ctw_gt_SetCursorStyle;
-   pFuncTable->GetColorStr                = hb_ctw_gt_GetColorStr;
-   pFuncTable->SetColorStr                = hb_ctw_gt_SetColorStr;
-   pFuncTable->ColorSelect                = hb_ctw_gt_ColorSelect;
-   pFuncTable->GetColor                   = hb_ctw_gt_GetColor;
-   pFuncTable->GetColorData               = hb_ctw_gt_GetColorData;
-   pFuncTable->GetScrCursor               = hb_ctw_gt_GetScrCursor;
-   pFuncTable->GetScrChar                 = hb_ctw_gt_GetScrChar;
-   pFuncTable->GetChar                    = hb_ctw_gt_GetChar;
-   pFuncTable->PutChar                    = hb_ctw_gt_PutChar;
-   pFuncTable->Resize                     = hb_ctw_gt_Resize;
-   pFuncTable->Info                       = hb_ctw_gt_Info;
-   pFuncTable->Alert                      = hb_ctw_gt_Alert;
-   pFuncTable->ReadKey                    = hb_ctw_gt_ReadKey;
+   pFuncTable->Init           = hb_ctw_gt_Init;
+   pFuncTable->Exit           = hb_ctw_gt_Exit;
+   pFuncTable->MouseRow       = hb_ctw_MouseRow;
+   pFuncTable->MouseCol       = hb_ctw_MouseCol;
+   pFuncTable->MaxCol         = hb_ctw_gt_MaxCol;
+   pFuncTable->MaxRow         = hb_ctw_gt_MaxRow;
+   pFuncTable->GetPos         = hb_ctw_gt_GetPos;
+   pFuncTable->SetPos         = hb_ctw_gt_SetPos;
+   pFuncTable->WriteCon       = hb_ctw_gt_WriteCon;
+   pFuncTable->GetCursorStyle = hb_ctw_gt_GetCursorStyle;
+   pFuncTable->SetCursorStyle = hb_ctw_gt_SetCursorStyle;
+   pFuncTable->GetColorStr    = hb_ctw_gt_GetColorStr;
+   pFuncTable->SetColorStr    = hb_ctw_gt_SetColorStr;
+   pFuncTable->ColorSelect    = hb_ctw_gt_ColorSelect;
+   pFuncTable->GetColor       = hb_ctw_gt_GetColor;
+   pFuncTable->GetColorData   = hb_ctw_gt_GetColorData;
+   pFuncTable->GetScrCursor   = hb_ctw_gt_GetScrCursor;
+   pFuncTable->GetScrChar     = hb_ctw_gt_GetScrChar;
+   pFuncTable->GetChar        = hb_ctw_gt_GetChar;
+   pFuncTable->PutChar        = hb_ctw_gt_PutChar;
+   pFuncTable->Resize         = hb_ctw_gt_Resize;
+   pFuncTable->Info           = hb_ctw_gt_Info;
+   pFuncTable->Alert          = hb_ctw_gt_Alert;
+   pFuncTable->ReadKey        = hb_ctw_gt_ReadKey;
 
    return TRUE;
 }
@@ -1901,14 +1918,14 @@ static const HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
 HB_GT_ANNOUNCE( HB_GT_NAME )
 
 HB_CALL_ON_STARTUP_BEGIN( _hb_startup_gt_Init_ )
-   hb_gtRegister( &gtInit );
+hb_gtRegister( &gtInit );
 HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
 #elif defined( HB_DATASEG_STARTUP )
    #define HB_DATASEG_BODY \
-                              HB_DATASEG_FUNC( _hb_startup_gt_Init_ )
+   HB_DATASEG_FUNC( _hb_startup_gt_Init_ )
    #include "hbiniseg.h"
 #endif
 /* *********************************************************************** */

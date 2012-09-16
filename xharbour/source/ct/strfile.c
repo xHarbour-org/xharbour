@@ -8,7 +8,7 @@
  * Functions:
  * SETFCREATE(), CSETSAFETY(), STRFILE(), FILESTR(), SCREENFILE()
  * SCREENFILE(), FILESCREEN()
- *                                             
+ *
  * Copyright 2004 Pavel Tsarenko <tpe2@mail.ru>
  * www - http://www.xharbour.org
  *
@@ -57,9 +57,8 @@
 #include "hbapifs.h"
 #include "hbapigt.h"
 
-
-static int s_iFileAttr = HB_FA_NORMAL;
-static BOOL s_bSafety = 0;
+static int  s_iFileAttr = HB_FA_NORMAL;
+static BOOL s_bSafety   = 0;
 
 void ct_setfcreate( int iFileAttr )
 {
@@ -108,17 +107,17 @@ HB_FUNC( CSETSAFETY )
 static LONG ct_StrFile( const char * pFileName, const char * pcStr, ULONG ulLen, BOOL bOverwrite, LONG lOffset,
                         BOOL bTrunc )
 {
-   HB_FHANDLE hFile;
-   BOOL bOpen = FALSE;
-   BOOL bFile = hb_fsFile( pFileName );
-   ULONG ulWrite = 0;
+   HB_FHANDLE  hFile;
+   BOOL        bOpen    = FALSE;
+   BOOL        bFile    = hb_fsFile( pFileName );
+   ULONG       ulWrite  = 0;
 
    if( bFile && bOverwrite )
    {
       hFile = hb_fsOpen( pFileName, FO_READWRITE );
       bOpen = TRUE;
    }
-   else if( !bFile || !ct_getsafety() )
+   else if( ! bFile || ! ct_getsafety() )
       hFile = hb_fsCreate( pFileName, ct_getfcreate() );
    else
       hFile = FS_ERROR;
@@ -159,10 +158,10 @@ HB_FUNC( FILESTR )
 
       if( hFile != FS_ERROR )
       {
-         LONG lFileSize = hb_fsSeek( hFile, 0, FS_END );
-         LONG lPos = hb_fsSeek( hFile, hb_parnl( 3 ), FS_SET ), lLength;
-         char *pcResult, *pCtrlZ;
-         BOOL bCtrlZ = ISLOG( 4 ) && hb_parl( 4 );
+         LONG     lFileSize   = hb_fsSeek( hFile, 0, FS_END );
+         LONG     lPos        = hb_fsSeek( hFile, hb_parnl( 3 ), FS_SET ), lLength;
+         char *   pcResult, * pCtrlZ;
+         BOOL     bCtrlZ      = ISLOG( 4 ) && hb_parl( 4 );
 
          if( ISNUM( 2 ) )
          {
@@ -200,8 +199,8 @@ HB_FUNC( SCREENFILE )
 {
    if( ISCHAR( 1 ) )
    {
-      char *pBuffer;
-      ULONG ulSize;
+      char *   pBuffer;
+      ULONG    ulSize;
 
       hb_gtRectSize( 0, 0, hb_gtMaxRow(), hb_gtMaxCol(), &ulSize );
       pBuffer = ( char * ) hb_xgrab( ulSize );
@@ -227,9 +226,9 @@ HB_FUNC( FILESCREEN )
 
       if( hFile != FS_ERROR )
       {
-         char * pBuffer;
-         ULONG ulSize;
-         LONG lLength;
+         char *   pBuffer;
+         ULONG    ulSize;
+         LONG     lLength;
 
          if( ISNUM( 2 ) )
          {
@@ -237,9 +236,9 @@ HB_FUNC( FILESCREEN )
          }
 
          hb_gtRectSize( 0, 0, hb_gtMaxRow(), hb_gtMaxCol(), &ulSize );
-         pBuffer = ( char * ) hb_xgrab( ulSize );
+         pBuffer  = ( char * ) hb_xgrab( ulSize );
 
-         lLength = hb_fsReadLarge( hFile, pBuffer, ulSize );
+         lLength  = hb_fsReadLarge( hFile, pBuffer, ulSize );
          hb_gtRest( 0, 0, hb_gtMaxRow(), hb_gtMaxCol(), pBuffer );
 
          hb_xfree( pBuffer );

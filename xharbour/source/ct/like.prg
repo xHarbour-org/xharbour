@@ -51,5 +51,6 @@
  *
  */
 
-Function Like( cPattern, cString )
-Return WildMatch( cPattern, cString, .T. )
+FUNCTION Like( cPattern, cString )
+
+   RETURN WildMatch( cPattern, cString, .T. )

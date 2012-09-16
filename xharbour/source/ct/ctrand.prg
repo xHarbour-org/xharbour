@@ -51,12 +51,16 @@
 
 #include "common.ch"
 
-Function Random(lMode)
-DEFAULT lMode TO .T.
-Return if( lMode, HB_RandomInt( 0, 65535 ), HB_RandomInt( -32768, 32767 ) )
+FUNCTION Random( lMode )
 
-Function Rand(nStart)
-if nStart <> nil
-   HB_RandomSeed(nStart)
-endif
-Return HB_Random()
+   DEFAULT lMode TO .T.
+
+   RETURN IF( lMode, hb_RandomInt( 0, 65535 ), hb_RandomInt( - 32768, 32767 ) )
+
+FUNCTION Rand( nStart )
+
+   IF nStart <> nil
+      hb_RandomSeed( nStart )
+   ENDIF
+
+   RETURN hb_Random()

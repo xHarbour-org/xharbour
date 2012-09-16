@@ -55,7 +55,6 @@
  *
  */
 
-
 #include "hbapi.h"
 #include "ct.h"
 
@@ -63,300 +62,279 @@ typedef BOOL * BOOLP;
 
 static LONG __getparam( int iParam );
 static LONG __numand( LONG wNum1, LONG wNum2 );
-static LONG __numor ( LONG wNum1, LONG wNum2 );
+static LONG __numor( LONG wNum1, LONG wNum2 );
 static LONG __numxor( LONG wNum1, LONG wNum2 );
 static LONG __numnot( LONG wNum1, LONG wNum2 );
-static LONG __numfun( int iPCount, LONG (*operation)(LONG wNum1, LONG wNum2), BOOLP pbOk);
-
-
+static LONG __numfun( int iPCount, LONG ( * operation )( LONG wNum1, LONG wNum2 ), BOOLP pbOk );
 
 HB_FUNC( NUMAND )
 {
-  int iPCount = hb_pcount();
-  LONG lResult;
-  BOOL bOk;
+   int   iPCount = hb_pcount();
+   LONG  lResult;
+   BOOL  bOk;
 
-  if( iPCount >= 2 )
-  {
-     lResult = __numfun( iPCount, (LONG (*)(LONG wNum1, LONG wNum2))(__numand), &bOk );
-     if( ! bOk)
-     {
-        hb_retnl( -1 );
-     }
-     else if( lResult > 0 )
-     {
-        hb_retnl( lResult );
-     }
-     else
-     {
-        hb_retnd( (ULONG) lResult );
-     }
-  }
-  else
-  {
-     hb_retnl( -1 );
-  }
+   if( iPCount >= 2 )
+   {
+      lResult = __numfun( iPCount, ( LONG ( * )( LONG wNum1, LONG wNum2 ) )( __numand ), &bOk );
+      if( ! bOk )
+      {
+         hb_retnl( -1 );
+      }
+      else if( lResult > 0 )
+      {
+         hb_retnl( lResult );
+      }
+      else
+      {
+         hb_retnd( ( ULONG ) lResult );
+      }
+   }
+   else
+   {
+      hb_retnl( -1 );
+   }
 }
-
-
 
 HB_FUNC( NUMOR )
 {
-  int iPCount = hb_pcount();
-  LONG lResult;
-  BOOL bOk;
+   int   iPCount = hb_pcount();
+   LONG  lResult;
+   BOOL  bOk;
 
-  if( iPCount >= 2 )
-  {
-     lResult = __numfun( iPCount, (LONG (*)(LONG wNum1, LONG wNum2))(__numor), &bOk );
-     if( ! bOk)
-     {
-        hb_retnl( -1 );
-     }
-     else if( lResult > 0 )
-     {
-        hb_retnl( lResult );
-     }
-     else
-     {
-        hb_retnd( (ULONG) lResult );
-     }
-  }
-  else
-  {
-     hb_retnl( -1 );
-  }
+   if( iPCount >= 2 )
+   {
+      lResult = __numfun( iPCount, ( LONG ( * )( LONG wNum1, LONG wNum2 ) )( __numor ), &bOk );
+      if( ! bOk )
+      {
+         hb_retnl( -1 );
+      }
+      else if( lResult > 0 )
+      {
+         hb_retnl( lResult );
+      }
+      else
+      {
+         hb_retnd( ( ULONG ) lResult );
+      }
+   }
+   else
+   {
+      hb_retnl( -1 );
+   }
 }
-
-
 
 HB_FUNC( NUMXOR )
 {
-  int  iPCount = hb_pcount();
-  LONG lResult;
-  BOOL bOk;
+   int   iPCount = hb_pcount();
+   LONG  lResult;
+   BOOL  bOk;
 
-  if( iPCount >= 2 )
-  {
-     lResult = __numfun( iPCount, (LONG (*)(LONG wNum1, LONG wNum2))(__numxor), &bOk );
-     if( ! bOk)
-     {
-        hb_retnl( -1 );
-     }
-     else if( lResult > 0 )
-     {
-        hb_retnl( lResult );
-     }
-     else
-     {
-        hb_retnd( (ULONG) lResult );
-     }
-  }
-  else
-  {
-     hb_retnl( -1 );
-  }
+   if( iPCount >= 2 )
+   {
+      lResult = __numfun( iPCount, ( LONG ( * )( LONG wNum1, LONG wNum2 ) )( __numxor ), &bOk );
+      if( ! bOk )
+      {
+         hb_retnl( -1 );
+      }
+      else if( lResult > 0 )
+      {
+         hb_retnl( lResult );
+      }
+      else
+      {
+         hb_retnd( ( ULONG ) lResult );
+      }
+   }
+   else
+   {
+      hb_retnl( -1 );
+   }
 }
-
-
 
 HB_FUNC( NUMNOT )
 {
-  int  iPCount = 1;
-  BOOL bOk;
-  LONG lResult = __numfun( iPCount, (LONG (*)(LONG wNum1, LONG wNum2))(__numnot), &bOk );
+   int   iPCount  = 1;
+   BOOL  bOk;
+   LONG  lResult  = __numfun( iPCount, ( LONG ( * )( LONG wNum1, LONG wNum2 ) )( __numnot ), &bOk );
 
-  if( ! bOk )
-  {
-     hb_retnl( -1 );
-  }
-  else
-  {
-     hb_retnl( (USHORT) lResult );
-  }
+   if( ! bOk )
+   {
+      hb_retnl( -1 );
+   }
+   else
+   {
+      hb_retnl( ( USHORT ) lResult );
+   }
 }
-
-
 
 HB_FUNC( NUMROL )
 {
-  USHORT   usNum1, usNum2, usNumBak, usPattern, usTestRol;
-  USHORT   usBytes, usFor;
+   USHORT   usNum1, usNum2, usNumBak, usPattern, usTestRol;
+   USHORT   usBytes, usFor;
 
-  usNum1 = (USHORT) __getparam( 1 );  /* Number to do ROL */
-  usNum2 = (USHORT) __getparam( 2 );  /* Iterations       */
+   usNum1   = ( USHORT ) __getparam( 1 ); /* Number to do ROL */
+   usNum2   = ( USHORT ) __getparam( 2 ); /* Iterations       */
 
-  if ( ISLOG( 3 ) )                   /* if 3th parameter is LOGICAL */
-  {
-    if ( hb_parl( 3 ) )
-       usBytes = 8;
-    else
-       usBytes = 16;
-  }
-  else
-    usBytes = 16;
-
-  usNum2 = usNum2 % usBytes;          /* Set usNum2 < usBytes  */
-
-  usPattern = (-1) << usBytes;
-
-  usTestRol = 1 << ( usBytes - 1 );   /* Pattern to test the MSB */
-
-  usNumBak = usNum1 & usPattern;      /* usNumBak contain the section
-                                         to doesn't ROL               */
-
-  for (usFor = 1; usFor <= usNum2; usFor++)
-  {
-     if ( usNum1 & usTestRol )  /* Test if MSB is ON */
-     {
-        usNum1 = usNum1 << 1;
-        usNum1 = usNum1 | 1;    /* Simulate that the MSB move to LSB */
-     }
-     else
-        usNum1 = usNum1 << 1;
+   if( ISLOG( 3 ) )                       /* if 3th parameter is LOGICAL */
+   {
+      if( hb_parl( 3 ) )
+         usBytes = 8;
+      else
+         usBytes = 16;
    }
-                              /* Set the section not ROLed */
-  usNum1 = ( usNum1 & (~usPattern) ) | usNumBak;
+   else
+      usBytes = 16;
 
-  hb_retnl( usNum1 );
+   usNum2      = usNum2 % usBytes;    /* Set usNum2 < usBytes  */
+
+   usPattern   = ( -1 ) << usBytes;
+
+   usTestRol   = 1 << ( usBytes - 1 ); /* Pattern to test the MSB */
+
+   usNumBak    = usNum1 & usPattern;   /* usNumBak contain the section
+                                          to doesn't ROL               */
+
+   for( usFor = 1; usFor <= usNum2; usFor++ )
+   {
+      if( usNum1 & usTestRol )  /* Test if MSB is ON */
+      {
+         usNum1   = usNum1 << 1;
+         usNum1   = usNum1 | 1; /* Simulate that the MSB move to LSB */
+      }
+      else
+         usNum1 = usNum1 << 1;
+   }
+   /* Set the section not ROLed */
+   usNum1 = ( usNum1 & ( ~usPattern ) ) | usNumBak;
+
+   hb_retnl( usNum1 );
 }
 
-
-
-HB_FUNC ( NUMMIRR )
+HB_FUNC( NUMMIRR )
 {
-  USHORT  usNum1, usBytes, usFor, usPattern = 0, usNumBak, usMirror = 0;
+   USHORT usNum1, usBytes, usFor, usPattern = 0, usNumBak, usMirror = 0;
 
-  usNum1 = (USHORT) __getparam( 1 );
+   usNum1 = ( USHORT ) __getparam( 1 );
 
-  if ( ISLOG( 2 ) )                   /* if 3th parameter is LOGICAL */
-  {
-    if ( hb_parl( 2 ) )
-    {
-       usBytes = 8;
-       usPattern = 0xFF00;
-    }
-    else
-    {
-       usBytes = 16;
-       usPattern = 0;
-    }
-  }
-  else
-    usBytes = 16;
+   if( ISLOG( 2 ) )                   /* if 3th parameter is LOGICAL */
+   {
+      if( hb_parl( 2 ) )
+      {
+         usBytes     = 8;
+         usPattern   = 0xFF00;
+      }
+      else
+      {
+         usBytes     = 16;
+         usPattern   = 0;
+      }
+   }
+   else
+      usBytes = 16;
 
-  usNumBak = usNum1 & usPattern;
+   usNumBak = usNum1 & usPattern;
 
-  for ( usFor = 1; usFor <= usBytes; usFor++ )
-  {
-    if ( usNum1 & 1 )
-    {
+   for( usFor = 1; usFor <= usBytes; usFor++ )
+   {
+      if( usNum1 & 1 )
+      {
 
-       usMirror = usMirror << 1;  /* if the LSB of usNum1 == 1 then */
-       usMirror = usMirror | 1;   /* set the LSB of usMirror = 1    */
-    }
-    else
-       usMirror = usMirror << 1;
+         usMirror = usMirror << 1;  /* if the LSB of usNum1 == 1 then */
+         usMirror = usMirror | 1;   /* set the LSB of usMirror = 1    */
+      }
+      else
+         usMirror = usMirror << 1;
 
-    usNum1 = usNum1 >> 1;
+      usNum1 = usNum1 >> 1;
 
-  }
-  usMirror = ( usMirror & (~usPattern) ) | usNumBak;
+   }
+   usMirror = ( usMirror & ( ~usPattern ) ) | usNumBak;
 
-  hb_retnl( usMirror );
+   hb_retnl( usMirror );
 
 }
-
 
 static LONG __getparam( int iParam )
 {
-
-  if ( ISCHAR( iParam ) )
-     return (LONG) hb_hextonum( hb_parcx( iParam ) );
-  else
-     return hb_parnl( iParam );
-
+   if( ISCHAR( iParam ) )
+      return ( LONG ) hb_hextonum( hb_parcx( iParam ) );
+   else
+      return hb_parnl( iParam );
 }
-
 
 static LONG __numand( LONG lNum1, LONG lNum2 )
 {
-    return lNum1 & lNum2;
+   return lNum1 & lNum2;
 }
-
 
 static LONG __numor( LONG lNum1, LONG lNum2 )
 {
-    return lNum1 | lNum2;
+   return lNum1 | lNum2;
 }
-
 
 static LONG __numxor( LONG lNum1, LONG lNum2 )
 {
-    return lNum1 ^ lNum2;
+   return lNum1 ^ lNum2;
 }
-
 
 static LONG __numnot( LONG lNum1, LONG lNum2 )
 {
-    HB_SYMBOL_UNUSED (lNum2);
-    return ~lNum1;
+   HB_SYMBOL_UNUSED( lNum2 );
+   return ~lNum1;
 }
 
-
-static LONG __numfun( int iPCount, LONG (*operation)(LONG wNum1, LONG wNum2), BOOLP pbOk)
+static LONG __numfun( int iPCount, LONG ( * operation )( LONG wNum1, LONG wNum2 ), BOOLP pbOk )
 {
-  LONG lNumOp = 0;
-  LONG lNum1, lNum2;
-  int  iFor;
+   LONG  lNumOp = 0;
+   LONG  lNum1, lNum2;
+   int   iFor;
 
-  *pbOk = TRUE;
-  if ( ISNUM(1) || ISCHAR(1) )
-  {
-     lNum1 = __getparam( 1 );
+   *pbOk = TRUE;
+   if( ISNUM( 1 ) || ISCHAR( 1 ) )
+   {
+      lNum1 = __getparam( 1 );
 
-     if ( iPCount == 1 )
+      if( iPCount == 1 )
+         /*  If unary operation: NOT                           */
+         lNumOp = ( *operation )( lNum1, 0 );
 
-  /*  If unary operation: NOT                           */
-        lNumOp = (*operation)( lNum1, 0 );
+      else
+      {
 
-     else
-     {
-
-        for ( iFor=2; iFor <= iPCount; iFor++)
-        {
-           if ( ISNUM( iFor ) || ISCHAR( iFor ) )
-           {
-              lNum2 = __getparam( iFor );
+         for( iFor = 2; iFor <= iPCount; iFor++ )
+         {
+            if( ISNUM( iFor ) || ISCHAR( iFor ) )
+            {
+               lNum2 = __getparam( iFor );
 
 
-  /*  Call to operation: AND, OR, XOR                   */
-              lNumOp = (*operation)( lNum1, lNum2 );
+               /*  Call to operation: AND, OR, XOR                   */
+               lNumOp = ( *operation )( lNum1, lNum2 );
 
-           }
-           else
-           {
-  /*  If error in parameter then return -1              */
-              *pbOk = FALSE;
-              return (-1);
+            }
+            else
+            {
+               /*  If error in parameter then return -1              */
+               *pbOk = FALSE;
+               return -1;
 
-           }
-  /*  Copy result to first parameter if multi operation */
-           lNum1 = lNumOp;
-        }
+            }
+            /*  Copy result to first parameter if multi operation */
+            lNum1 = lNumOp;
+         }
 
-     }
+      }
 
-  }
-  else
-  {
+   }
+   else
+   {
 
-  /*  If error in parameter then return -1              */
-     *pbOk = FALSE;
-     return (-1);
-  }
+      /*  If error in parameter then return -1              */
+      *pbOk = FALSE;
+      return -1;
+   }
 
-  /*  Return result of operation */
-  return lNumOp;
+   /*  Return result of operation */
+   return lNumOp;
 
 }

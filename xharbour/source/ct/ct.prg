@@ -52,47 +52,43 @@
  *
  */
 
+STATIC sbInitialized := .F.
 
-static sbInitialized := .F.
+FUNCTION CTINIT()
 
+   IF !sbInitialized
+      sbInitialized := ctcinit()
+   ENDIF
 
+   RETURN ( sbInitialized )
 
-function CTINIT()
+   init FUNCTION _CTINIT()
 
-  if !sbInitialized
-    sbInitialized := ctcinit()
-  endif
+   IF !sbInitialized
+      sbInitialized := ctcinit()
+   ENDIF
 
-return (sbInitialized)
+   RETURN ( sbInitialized )
 
-init function _CTINIT()
+FUNCTION CTEXIT()
 
-  if !sbInitialized
-    sbInitialized := ctcinit()
-  endif
+   IF ( sbInitialized )
+      /* call tokenexit to release static token environment */
+      tokenexit()
+      ctcexit()
+      sbInitialized := .F.
+   ENDIF
 
-return (sbInitialized)
+   RETURN ( nil )
 
+   EXIT FUNCTION _CTEXIT()
 
+   IF ( sbInitialized )
+      /* call tokenexit to release static token environment */
+      tokenexit()
+      ctcexit()
+      sbInitialized := .F.
+   ENDIF
 
-function CTEXIT()
+   RETURN ( nil )
 
-  if (sbInitialized)
-    /* call tokenexit to release static token environment */
-    tokenexit()
-    ctcexit()
-    sbInitialized := .F.
-  endif
-
-return (nil)
-
-exit function _CTEXIT()
-
-  if (sbInitialized)
-    /* call tokenexit to release static token environment */
-    tokenexit()
-    ctcexit()
-    sbInitialized := .F.
-  endif
-
-return (nil)

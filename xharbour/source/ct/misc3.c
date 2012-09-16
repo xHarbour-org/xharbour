@@ -56,8 +56,8 @@
 
 HB_FUNC( KBDSTAT )
 {
-   int iRet = 0;
-   HB_GT_INFO gtInfo;
+   int         iRet = 0;
+   HB_GT_INFO  gtInfo;
 
    gtInfo.pNewVal = NULL;
    gtInfo.pResult = NULL;

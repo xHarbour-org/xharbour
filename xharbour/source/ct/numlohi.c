@@ -55,7 +55,7 @@
 
 #include "hbapi.h"
 
-#if (defined(_MSC_VER) && (_MSC_VER>=1400))
+#if ( defined( _MSC_VER ) && ( _MSC_VER >= 1400 ) )
 #define sscanf sscanf_s
 #endif
 
@@ -63,22 +63,21 @@ HB_FUNC( NUMLOW )
 {
    unsigned n;
 
-   if (ISNUM(1))
-     n = hb_parni(1);
+   if( ISNUM( 1 ) )
+      n = hb_parni( 1 );
    else
-     sscanf("%x", hb_parcx(1), &n);
-   hb_retni(n & 0xFF);
+      sscanf( "%x", hb_parcx( 1 ), &n );
+   hb_retni( n & 0xFF );
 }
-
 
 
 HB_FUNC( NUMHIGH )
 {
    unsigned n;
 
-   if (ISNUM(1))
-     n = hb_parni(1);
+   if( ISNUM( 1 ) )
+      n = hb_parni( 1 );
    else
-     sscanf("%x", hb_parcx(1), &n);
-   hb_retni((n >> 8) & 0xFF);
+      sscanf( "%x", hb_parcx( 1 ), &n );
+   hb_retni( ( n >> 8 ) & 0xFF );
 }

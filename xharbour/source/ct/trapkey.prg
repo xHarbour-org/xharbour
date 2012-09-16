@@ -51,64 +51,70 @@
 
 #include "common.ch"
 
-Static s_Proc1, s_Param
-Static s_Proc2, s_Bitmap
-Static bTrap := {|| Trap()}
+STATIC s_Proc1, s_Param
+STATIC s_Proc2, s_Bitmap
+STATIC bTrap := {|| Trap() }
 
-Function TrapInput(cProc, lParam)
-Local cOldProc := s_Proc1
-DEFAULT lParam TO .F.
+FUNCTION TrapInput( cProc, lParam )
 
-s_Proc1 := cProc
-s_Param := lParam
+   LOCAL cOldProc := s_Proc1
 
-SetInkeyAfterBlock(if(! Empty(s_Proc1) .or. ! Empty(s_Proc2), bTrap, nil))
-Return s_Proc1
+   DEFAULT lParam TO .F.
 
+   s_Proc1 := cProc
+   s_Param := lParam
 
-Function TrapShift(cProc, nBitmap)
-Local cOldProc := s_Proc2
-s_Proc2 := cProc
-s_Bitmap := nBitmap
+   SetInkeyAfterBlock( if( ! Empty(s_Proc1 ) .OR. ! Empty(s_Proc2 ), bTrap, nil ) )
 
-SetInkeyAfterBlock(if(! Empty(s_Proc1) .or. ! Empty(s_Proc2), bTrap, nil))
-Return s_Proc2
+   RETURN s_Proc1
 
+FUNCTION TrapShift( cProc, nBitmap )
 
-Static function Trap
-Local nKbdStat, iRet := 0
+   LOCAL cOldProc := s_Proc2
 
-if ! Empty(s_Proc1)
-   if s_Param
-      Do( s_Proc1, ProcName(1), ProcLine(1), "" )
-   else
-      Do( s_Proc1)
-   endif
-endif
+   s_Proc2 := cProc
+   s_Bitmap := nBitmap
 
-if ! Empty(s_Proc2)
-   nKbdStat := KbdStat()
+   SetInkeyAfterBlock( if( ! Empty(s_Proc1 ) .OR. ! Empty(s_Proc2 ), bTrap, nil ) )
 
-   if ((nKbdStat & 1) .and. (s_Bitmap & 3)) .or.;   // Shift
-      ((nKbdStat & 4) .and. (s_Bitmap & 8)) .or.;   // Control
-      ((nKbdStat & 8) .and. (s_Bitmap & 8))         // Alt
+   RETURN s_Proc2
 
-      Do( s_Proc2 )
+STATIC FUNCTION Trap
 
-   endif
+   LOCAL nKbdStat, iRet := 0
 
-endif
-Return iRet
+   IF ! Empty( s_Proc1 )
+      IF s_Param
+         DO( s_Proc1, ProcName( 1 ), ProcLine( 1 ), "" )
+      ELSE
+         DO( s_Proc1 )
+      ENDIF
+   ENDIF
 
+   IF ! Empty( s_Proc2 )
+      nKbdStat := KbdStat()
 
-Function InkeyTrap( nDelay )
-Local nKey := INKEY( 0 )
-Local bKeyBlock
+      IF ( ( nKbdStat & 1 ) .AND. ( s_Bitmap & 3 ) ) .OR. ;   // Shift
+         ( ( nKbdStat & 4 ) .AND. ( s_Bitmap & 8 ) ) .OR. ;   // Control
+         ( ( nKbdStat & 8 ) .AND. ( s_Bitmap & 8 ) )         // Alt
 
-HB_SYMBOL_UNUSED( nDelay )
+         DO( s_Proc2 )
 
-IF nKey # 0 .and. ( bKeyBlock := SETKEY( nKey ) ) <> NIL
-   EVAL( bKeyBlock, PROCNAME(1), PROCLINE(1), "" )
-ENDIF
+      ENDIF
 
-Return nKey
+   ENDIF
+
+   RETURN iRet
+
+FUNCTION InkeyTrap( nDelay )
+
+   LOCAL nKey := Inkey( 0 )
+   LOCAL bKeyBlock
+
+   HB_SYMBOL_UNUSED( nDelay )
+
+   IF nKey # 0 .AND. ( bKeyBlock := SetKey( nKey ) ) <> NIL
+      Eval( bKeyBlock, ProcName( 1 ), ProcLine( 1 ), "" )
+   ENDIF
+
+   RETURN nKey

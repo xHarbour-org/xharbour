@@ -3,7 +3,7 @@
  */
 
 /*
- * Harbour Project source code: 
+ * Harbour Project source code:
  *   CT3 string functions
  *     - CHAREVEN()
  *     - CHARODD()
@@ -57,103 +57,89 @@
  *
  */
 
-
 #include "ct.h"
 
-
-#define DO_CHAREVOD_CHAREVEN   0
-#define DO_CHAREVOD_CHARODD    1
+#define DO_CHAREVOD_CHAREVEN  0
+#define DO_CHAREVOD_CHARODD   1
 
 /* helper function */
-static void do_charevod (int iSwitch)
+static void do_charevod( int iSwitch )
 {
-  
-  if (ISCHAR (1))
-  {
+   if( ISCHAR( 1 ) )
+   {
+      const char *   pcString = hb_parc( 1 );
+      size_t         sLen     = hb_parclen( 1 );
+      char *         pcResult;
+      size_t         sPos, sResultPos;
 
-    const char *pcString = hb_parc (1);
-    size_t sLen = hb_parclen (1);
-    char *pcResult;
-    size_t sPos, sResultPos;
-
-    if (sLen == 0)
-    {
-      int iArgErrorMode = ct_getargerrormode();
-      if (iArgErrorMode != CT_ARGERR_IGNORE)
+      if( sLen == 0 )
       {
-        ct_error ((USHORT)iArgErrorMode, EG_ARG,
-                  (iSwitch == DO_CHAREVOD_CHAREVEN ? CT_ERROR_CHAREVEN : CT_ERROR_CHARODD),
-                  NULL,
-                  (iSwitch == DO_CHAREVOD_CHAREVEN ? "CHAREVEN" : "CHARODD"),
-                  0, EF_CANDEFAULT, 1, hb_paramError (1));
+         int iArgErrorMode = ct_getargerrormode();
+         if( iArgErrorMode != CT_ARGERR_IGNORE )
+         {
+            ct_error( ( USHORT ) iArgErrorMode, EG_ARG,
+                      ( iSwitch == DO_CHAREVOD_CHAREVEN ? CT_ERROR_CHAREVEN : CT_ERROR_CHARODD ),
+                      NULL,
+                      ( iSwitch == DO_CHAREVOD_CHAREVEN ? "CHAREVEN" : "CHARODD" ),
+                      0, EF_CANDEFAULT, 1, hb_paramError( 1 ) );
+         }
+         hb_retc( "" );
+         return;
       }
-      hb_retc ("");
-      return;
-    }
-    
-    pcResult = ( char * ) hb_xgrab ((sLen+1)/2);
 
-    if (iSwitch == DO_CHAREVOD_CHAREVEN)
-      sPos = 1;
-    else
-      sPos = 0;
+      pcResult = ( char * ) hb_xgrab( ( sLen + 1 ) / 2 );
 
-    sResultPos = 0;
-    for (; sPos < sLen; sPos+=2)
-      pcResult[sResultPos++] = pcString[sPos];
+      if( iSwitch == DO_CHAREVOD_CHAREVEN )
+         sPos = 1;
+      else
+         sPos = 0;
 
-    if (sResultPos == 0)
-      hb_retc ("");
-    else
-      hb_retclen (pcResult, sResultPos);
-  
-    hb_xfree (pcResult);
+      sResultPos = 0;
+      for(; sPos < sLen; sPos += 2 )
+         pcResult[ sResultPos++ ] = pcString[ sPos ];
 
-  }
-  else
-  {
-    PHB_ITEM pSubst = NULL;
-    int iArgErrorMode = ct_getargerrormode();
-    if (iArgErrorMode != CT_ARGERR_IGNORE)
-    {
-      pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG, 
-                               (iSwitch == DO_CHAREVOD_CHAREVEN ? CT_ERROR_CHAREVEN : CT_ERROR_CHARODD),
-                               NULL,
-                               (iSwitch == DO_CHAREVOD_CHAREVEN ? "CHAREVEN" : "CHARODD"),
-                               0, EF_CANSUBSTITUTE, 1, hb_paramError (1));
-    }
-     
-    if (pSubst != NULL)
-    {
-      hb_itemRelease( hb_itemReturnForward( pSubst ) );
-    }
-    else
-    {
-      hb_retc ("");
-    }
-  }
+      if( sResultPos == 0 )
+         hb_retc( "" );
+      else
+         hb_retclen( pcResult, sResultPos );
+
+      hb_xfree( pcResult );
+
+   }
+   else
+   {
+      PHB_ITEM pSubst         = NULL;
+      int      iArgErrorMode  = ct_getargerrormode();
+      if( iArgErrorMode != CT_ARGERR_IGNORE )
+      {
+         pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG,
+                                  ( iSwitch == DO_CHAREVOD_CHAREVEN ? CT_ERROR_CHAREVEN : CT_ERROR_CHARODD ),
+                                  NULL,
+                                  ( iSwitch == DO_CHAREVOD_CHAREVEN ? "CHAREVEN" : "CHARODD" ),
+                                  0, EF_CANSUBSTITUTE, 1, hb_paramError( 1 ) );
+      }
+
+      if( pSubst != NULL )
+      {
+         hb_itemRelease( hb_itemReturnForward( pSubst ) );
+      }
+      else
+      {
+         hb_retc( "" );
+      }
+   }
 
 }
 
-
-
-HB_FUNC (CHAREVEN)
+HB_FUNC( CHAREVEN )
 {
-
-  do_charevod (DO_CHAREVOD_CHAREVEN);
-  return;
-
+   do_charevod( DO_CHAREVOD_CHAREVEN );
+   return;
 }
 
-
-
-HB_FUNC (CHARODD)
+HB_FUNC( CHARODD )
 {
-
-  do_charevod (DO_CHAREVOD_CHARODD);
-  return;
-
+   do_charevod( DO_CHAREVOD_CHARODD );
+   return;
 }
-
-
 

@@ -54,57 +54,65 @@
  *
  */
 
-*----------------------------------------
-FUNCTION Default( cVarByRef , uDefValue )
-*----------------------------------------
+//----------------------------------------
+
+FUNCTION DEFAULT( cVarByRef , uDefValue )
+
+//----------------------------------------
 /* This function is similar to SET DEFAULT <var> TO <value> command.
 * <cVarByRef> Variable passed by reference
 * <uDefValue> Default value to assign to the cVarByRef. Can be any data type.
 * ex: Default( @AnyVar, "hello")
 *     Default( @AnyVar, 10)
 */
-IF cVarByRef == NIL
-   cVarByRef := uDefValue
-ENDIF
-RETURN (Nil)
+   IF cVarByRef == NIL
+      cVarByRef := uDefValue
+   ENDIF
 
-*---------------------
+   RETURN ( Nil )
+
+//---------------------
+
 FUNCTION IsDir( cDir )
-*---------------------
+
+//---------------------
 /*
 * Short function name.
-* IsDirectory() is xHarbour rtl function. 
-* Source is in \source\rtl\file.c and 
+* IsDirectory() is xHarbour rtl function.
+* Source is in \source\rtl\file.c and
 *              \source\rtl\filehb.c
 */
-RETURN IsDirectory( cDir )
 
-*------------------------
+   RETURN IsDirectory( cDir )
+
+//------------------------
+
 FUNCTION Occurs( c1, c2 )
-*------------------------
+
+//------------------------
 /*
 Return the ammout of times that c1 occurs into c2
 */
-   LOCAL nRet,nPos
+   LOCAL nRet, nPos
 
-   IF valtype( c1 ) != "C" .or. valtype( c2 ) != "C"
+   IF ValType( c1 ) != "C" .OR. ValType( c2 ) != "C"
       RETURN ( 0 )
    ENDIF
 
-   IF Len( c1 ) = 0 .or. Len( c2 ) = 0
+   IF Len( c1 ) = 0 .OR. Len( c2 ) = 0
       RETURN ( 0 )
    ENDIF
 
    nPos := nRet := 0
 
-   While !empty(c2)
-       nPos := At( c1, c2 )
-       if nPos>0
-          nRet++
-          c2 := SubStr( c2, nPos+1 ) 
-       else
-          c2 := ""
-       endif   
-   Enddo
+   WHILE !Empty( c2 )
+      nPos := At( c1, c2 )
+      IF nPos > 0
+         nRet++
+         c2 := SubStr( c2, nPos + 1 )
+      ELSE
+         c2 := ""
+      ENDIF
+   ENDDO
    
-RETURN ( nRet )
+   RETURN ( nRet )

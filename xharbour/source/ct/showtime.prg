@@ -52,16 +52,18 @@
  */
 
 FUNCTION SHOWTIME( nRow, nCol, lNoSec, cColor, l12, lAmPm )
+
    STATIC s_hTimer := NIL
 
-   IF VALTYPE( nRow ) == "N" .AND. nRow >= 0 .AND. nRow <= MAXROW( .T. )
+   IF ValType( nRow ) == "N" .AND. nRow >= 0 .AND. nRow <= MaxRow( .T. )
       IF s_hTimer != NIL
-         HB_IDLEDEL( s_hTimer )
+         hb_idleDel( s_hTimer )
       ENDIF
-      s_hTimer := HB_IDLEADD( {|| _HB_CTDSPTIME( nRow, nCol, lNoSec, cColor, ;
-                                                 l12, lAmPm ) } )
+      s_hTimer := hb_idleAdd( {|| _HB_CTDSPTIME( nRow, nCol, lNoSec, cColor, ;
+         l12, lAmPm ) } )
    ELSEIF s_hTimer != NIL
-      HB_IDLEDEL( s_hTimer )
+      hb_idleDel( s_hTimer )
       s_hTimer := NIL
    ENDIF
-RETURN ""
+
+   RETURN ""

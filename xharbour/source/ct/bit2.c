@@ -52,142 +52,132 @@
  *
  */
 
-
 #include "ct.h"
 
 static LONG __getparam( int iParam );
 
-
 HB_FUNC( CLEARBIT )
 {
-  LONG lNumClearBit;
-  LONG lNum1;
-  int  iNum2;
-  int  iPCount, iFor;
+   LONG  lNumClearBit;
+   LONG  lNum1;
+   int   iNum2;
+   int   iPCount, iFor;
 
-  iPCount = hb_pcount();
+   iPCount  = hb_pcount();
 
-  lNum1 = __getparam( 1 );  /* Obtain the parameter and converting from HEXA
-                               if necessary */
+   lNum1    = __getparam( 1 ); /* Obtain the parameter and converting from HEXA
+                                  if necessary */
 
-  if ( ISNUM(1) || ISCHAR(1) )
-  {
-    lNumClearBit = lNum1;
+   if( ISNUM( 1 ) || ISCHAR( 1 ) )
+   {
+      lNumClearBit = lNum1;
 
-    for ( iFor=2; iFor <= iPCount; iFor++)
-    {
-      if ( ISNUM( iFor ) )
+      for( iFor = 2; iFor <= iPCount; iFor++ )
       {
-         iNum2 = hb_parni( iFor );
-
-         if ( (iNum2 >= 1) && (iNum2 <= 32) )
+         if( ISNUM( iFor ) )
          {
-           /* if bit to clear this between 1 and 32 */
+            iNum2 = hb_parni( iFor );
 
-           lNumClearBit = lNumClearBit & ~( 1L << (iNum2 - 1) );
+            if( ( iNum2 >= 1 ) && ( iNum2 <= 32 ) )
+            {
+               /* if bit to clear this between 1 and 32 */
+
+               lNumClearBit = lNumClearBit & ~( 1L << ( iNum2 - 1 ) );
+            }
+            else
+            {
+               lNumClearBit = -1L;
+               break;
+            }
          }
          else
          {
-           lNumClearBit = -1L;
-           break;
+            lNumClearBit = -1L;
+            break;
          }
       }
-      else
-      {
-        lNumClearBit = -1L;
-        break;
-      }
-    }
-  }
-  else
-    lNumClearBit = -1L;
+   }
+   else
+      lNumClearBit = -1L;
 
-  if ( lNumClearBit == -1L )
-     hb_retnl( lNumClearBit );
-  else
-     hb_retnd( (ULONG) lNumClearBit );
-
+   if( lNumClearBit == -1L )
+      hb_retnl( lNumClearBit );
+   else
+      hb_retnd( ( ULONG ) lNumClearBit );
 }
-
-
 
 HB_FUNC( SETBIT )
 {
-  LONG lNumSetBit;
-  LONG lNum1;
-  int  iNum2;
-  int  iPCount, iFor;
+   LONG  lNumSetBit;
+   LONG  lNum1;
+   int   iNum2;
+   int   iPCount, iFor;
 
-  iPCount = hb_pcount();
+   iPCount  = hb_pcount();
 
-  lNum1 = __getparam( 1 );  /* Obtain the parameter and converting from HEXA
-                               if necessary */
+   lNum1    = __getparam( 1 ); /* Obtain the parameter and converting from HEXA
+                                  if necessary */
 
-  if ( ISNUM(1) || ISCHAR(1) )
-  {
-    lNumSetBit = lNum1;
+   if( ISNUM( 1 ) || ISCHAR( 1 ) )
+   {
+      lNumSetBit = lNum1;
 
-    for ( iFor=2; iFor <= iPCount; iFor++)
-    {
-      if ( ISNUM( iFor ) )
+      for( iFor = 2; iFor <= iPCount; iFor++ )
       {
-         iNum2 = hb_parni( iFor );
+         if( ISNUM( iFor ) )
+         {
+            iNum2 = hb_parni( iFor );
 
-         if ( (iNum2 >= 1) && (iNum2 <= 32) )
-           {
-           /* if bit to clear this between 1 and 32 */
+            if( ( iNum2 >= 1 ) && ( iNum2 <= 32 ) )
+            {
+               /* if bit to clear this between 1 and 32 */
 
-           lNumSetBit = lNumSetBit | ( 1L << (iNum2 - 1) );
+               lNumSetBit = lNumSetBit | ( 1L << ( iNum2 - 1 ) );
 
-           }
+            }
+            else
+            {
+               lNumSetBit = -1L;
+               break;
+            }
+         }
          else
          {
-           lNumSetBit = -1L;
-           break;
+            lNumSetBit = -1L;
+            break;
          }
       }
-      else
-      {
-        lNumSetBit = -1L;
-        break;
-      }
-    }
-  }
-  else
-    lNumSetBit = -1L;
+   }
+   else
+      lNumSetBit = -1L;
 
-  if ( lNumSetBit == -1L )
+   if( lNumSetBit == -1L )
       hb_retnl( lNumSetBit );
-  else
-      hb_retnd( (ULONG) lNumSetBit );
-
+   else
+      hb_retnd( ( ULONG ) lNumSetBit );
 }
 
-
-HB_FUNC ( ISBIT )
+HB_FUNC( ISBIT )
 {
-  LONG lNum1;
-  int  iTestBit;
+   LONG  lNum1;
+   int   iTestBit;
 
-  if (( ISNUM( 1 ) || ISCHAR( 1 ) ) && ( ISNUM( 2 ) || ISNIL( 2 ) ) )
-  {
-     lNum1    = __getparam( 1 );
-     iTestBit = ISNUM( 2 ) ? hb_parni( 2 ) : 1;
+   if( ( ISNUM( 1 ) || ISCHAR( 1 ) ) && ( ISNUM( 2 ) || ISNIL( 2 ) ) )
+   {
+      lNum1    = __getparam( 1 );
+      iTestBit = ISNUM( 2 ) ? hb_parni( 2 ) : 1;
 
-     hb_retl( lNum1 & ( 1L << (iTestBit - 1) ) );
-  }
-  else
-     hb_retl( FALSE );
+      hb_retl( lNum1 & ( 1L << ( iTestBit - 1 ) ) );
+   }
+   else
+      hb_retl( FALSE );
 
 }
-
 
 static LONG __getparam( int iParam )
 {
-
-  if ( ISCHAR( iParam ) )
-     return (LONG) hb_hextonum( hb_parcx( iParam ) );
-  else
-     return hb_parnl( iParam );
-
+   if( ISCHAR( iParam ) )
+      return ( LONG ) hb_hextonum( hb_parcx( iParam ) );
+   else
+      return hb_parnl( iParam );
 }

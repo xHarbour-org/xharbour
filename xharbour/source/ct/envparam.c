@@ -59,70 +59,69 @@
 
 HB_FUNC( ENVPARAM )
 {
-#if defined(HB_OS_DOS)
+#if defined( HB_OS_DOS )
    {
+      extern char ** _environ;
+      char *         buffer   = NULL;
+      int            x;
+      int            buffsize = 0;
 
-   extern char **_environ;
-   char *buffer = NULL;
-   int x;
-   int buffsize = 0;
+      // scan strings first and add up total size
+      for( x = 0;; x++ )
+      {
+         if( ! _environ[ x ] )
+            break;
+         buffsize += ( strlen( _environ[ x ] ) + 2 );
+      }
 
-   // scan strings first and add up total size
-   for (x = 0; ;x++)
-   {
-      if (! _environ[x])
-         break;
-      buffsize += (strlen(_environ[x]) + 2);
+      buffer      = ( char * ) hb_xalloc( buffsize + 1 );
+      buffer[ 0 ] = 0;
+
+      for( x = 0;; x++ )
+      {
+         if( ! _environ[ x ] )
+            break;
+
+         hb_xstrcat( buffer, _environ[ x ], CRLF, 0 );
+      }
+
+      buffer[ buffsize ] = 0;
+      hb_retclenAdopt( buffer, buffsize );
+
    }
-
-   buffer = ( char * ) hb_xalloc(buffsize + 1);
-   buffer[ 0 ] = 0;
-
-   for (x = 0; ;x++)
-   {
-      if (! _environ[x])
-         break;
-
-      hb_xstrcat( buffer, _environ[x], CRLF, 0 );
-   }
-
-   buffer[ buffsize ] = 0;
-   hb_retclenAdopt(buffer, buffsize);
-
-}
-#elif defined(HB_OS_WIN)
-{
-
-   char *buffer;
-   LPVOID lpEnviron = GetEnvironmentStrings();
-   char *sCurEnv;
-   int buffsize = 0;
-
-   // scan strings first and add up total size
-   for (sCurEnv = (LPTSTR) lpEnviron; *sCurEnv; sCurEnv++)
-   {
-      buffsize += (strlen( (char*) sCurEnv) + 2 );
-      while (*sCurEnv)
-         sCurEnv++;
-   }
-
-   buffer = ( char * ) hb_xalloc( buffsize + 1 );
-   buffer[ 0 ] = 0;
-
-   for (sCurEnv = (LPTSTR) lpEnviron; *sCurEnv; sCurEnv++)
+#elif defined( HB_OS_WIN )
    {
 
-      hb_xstrcat( buffer, (char*) sCurEnv, CRLF, 0 );
+      char *   buffer;
+      LPVOID   lpEnviron   = GetEnvironmentStrings();
+      char *   sCurEnv;
+      int      buffsize    = 0;
 
-      while (*sCurEnv)
-         sCurEnv++;
+      // scan strings first and add up total size
+      for( sCurEnv = ( LPTSTR ) lpEnviron; *sCurEnv; sCurEnv++ )
+      {
+         buffsize += ( strlen( ( char * ) sCurEnv ) + 2 );
+         while( *sCurEnv )
+            sCurEnv++;
+      }
+
+      buffer      = ( char * ) hb_xalloc( buffsize + 1 );
+      buffer[ 0 ] = 0;
+
+      for( sCurEnv = ( LPTSTR ) lpEnviron; *sCurEnv; sCurEnv++ )
+      {
+
+         hb_xstrcat( buffer, ( char * ) sCurEnv, CRLF, 0 );
+
+         while( *sCurEnv )
+            sCurEnv++;
+      }
+
+      FreeEnvironmentStrings( ( LPCH ) lpEnviron );
+
+      buffer[ buffsize ] = 0;
+      hb_retclenAdopt( buffer, buffsize );
    }
-
-   FreeEnvironmentStrings( (LPCH) lpEnviron);
-
-   buffer[ buffsize ] = 0;
-   hb_retclenAdopt(buffer, buffsize);
-}
 
 #endif
 }

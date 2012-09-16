@@ -55,7 +55,7 @@
 
 HB_FUNC( LTON )
 {
-   BOOL bValue = (ISLOG(1) ? hb_parl(1) : 0);
+   BOOL bValue = ( ISLOG( 1 ) ? hb_parl( 1 ) : 0 );
 
-   hb_retnl( bValue ? 1 : 0);
+   hb_retnl( bValue ? 1 : 0 );
 }

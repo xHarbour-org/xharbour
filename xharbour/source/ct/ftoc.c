@@ -51,36 +51,31 @@
  *
  */
 
-
 #include "ct.h"
-
-
 
 HB_FUNC( FTOC )
 {
    union
    {
       double value;
-      char   string[ sizeof( double )];
+      char string[ sizeof( double ) ];
    }  xConvert;
 
-  xConvert.value = hb_parnd( 1 );
+   xConvert.value = hb_parnd( 1 );
 
-  hb_retclen( xConvert.string, sizeof( double ) );
+   hb_retclen( xConvert.string, sizeof( double ) );
 }
-
-
 
 HB_FUNC( CTOF )
 {
    union
    {
       double value;
-      char   string[ sizeof( double ) ];
+      char string[ sizeof( double ) ];
    } xConvert;
-   const char *pcString;
+   const char * pcString;
 
-   if ( hb_parclen( 1 ) >= sizeof( double ) )
+   if( hb_parclen( 1 ) >= sizeof( double ) )
    {
       pcString = hb_parcx( 1 );
 

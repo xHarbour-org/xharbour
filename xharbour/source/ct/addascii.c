@@ -3,7 +3,7 @@
  */
 
 /*
- * Harbour Project source code: 
+ * Harbour Project source code:
  *   ADDASCII() CT3 string function
  *
  * Copyright 2001 IntTec GmbH, Neunlindenstr 32, 79106 Freiburg, Germany
@@ -52,128 +52,119 @@
  *
  */
 
-
 #include "ct.h"
 
-
-
-
-HB_FUNC (ADDASCII)
+HB_FUNC( ADDASCII )
 {
+   int iNoRet;
 
-  int iNoRet;
+   /* suppressing return value ? */
+   iNoRet = ct_getref() && ISBYREF( 1 );
 
-  /* suppressing return value ? */
-  iNoRet = ct_getref() && ISBYREF( 1 );
-  
-  if (ISCHAR (1))
-  {
-    
-    const char *pcSource = hb_parc (1);
-    size_t sLen = hb_parclen (1);
-    char *pcResult;
-    size_t sPos;
-    LONG lValue;
-    int iCarryOver;
+   if( ISCHAR( 1 ) )
+   {
 
-    if (ISNUM (3))
-      sPos = hb_parnl (3);
-    else
-      sPos = sLen;
+      const char *   pcSource = hb_parc( 1 );
+      size_t         sLen     = hb_parclen( 1 );
+      char *         pcResult;
+      size_t         sPos;
+      LONG           lValue;
+      int            iCarryOver;
 
-    if ((sPos > sLen) || !(ISNUM (2)) || (sLen == 0))
-    {
-      int iArgErrorMode = ct_getargerrormode();
-      if (iArgErrorMode != CT_ARGERR_IGNORE)
+      if( ISNUM( 3 ) )
+         sPos = hb_parnl( 3 );
+      else
+         sPos = sLen;
+
+      if( ( sPos > sLen ) || ! ( ISNUM( 2 ) ) || ( sLen == 0 ) )
       {
-        ct_error ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_ADDASCII,
-                  NULL, "ADDASCII", 0, EF_CANDEFAULT, 4,
-                  hb_paramError (1), hb_paramError (2),
-                  hb_paramError (3), hb_paramError (4));
+         int iArgErrorMode = ct_getargerrormode();
+         if( iArgErrorMode != CT_ARGERR_IGNORE )
+         {
+            ct_error( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_ADDASCII,
+                      NULL, "ADDASCII", 0, EF_CANDEFAULT, 4,
+                      hb_paramError( 1 ), hb_paramError( 2 ),
+                      hb_paramError( 3 ), hb_paramError( 4 ) );
+         }
+
+         /* return string unchanged */
+         if( iNoRet )
+            hb_retl( 0 );
+         else
+            hb_retclen( pcSource, sLen );
+
+         return;
       }
 
-      /* return string unchanged */
-      if (iNoRet) 
-        hb_retl (0);
+      pcResult = ( char * ) hb_xgrab( sLen );
+      hb_xmemcpy( pcResult, pcSource, sLen );
+
+      lValue   = hb_parnl( 2 );
+      if( ISLOG( 4 ) )
+         iCarryOver = hb_parl( 4 );
       else
-        hb_retclen (pcSource, sLen);
-    
+         iCarryOver = 0;
+
+      if( iCarryOver )
+      {
+         size_t   sCurrent;
+         LONG     lResult;
+
+         for( sCurrent = sPos; ( sCurrent > 0 ) && ( lValue != 0 ); sCurrent-- )
+         {
+            lResult  = ( LONG ) pcSource[ sCurrent - 1 ] + ( lValue % 256 );
+
+            lValue   /= 256;
+            if( lResult > 255 )
+               lValue++;
+            else if( lResult < 0 )
+               lValue--;
+
+            pcResult[ sCurrent - 1 ] = ( char ) ( lResult % 256 );
+         }
+      }
+      else
+      {
+         pcResult[ sPos - 1 ] = ( char ) ( ( ( LONG ) pcResult[ sPos - 1 ] + lValue ) % 256 );
+      }
+
+      if( iNoRet )
+         hb_retl( 0 );
+      else
+         hb_retclen( pcResult, sLen );
+
+      if( ISBYREF( 1 ) )
+         hb_storclen( pcResult, sLen, 1 );
+
+      hb_xfree( pcResult );
       return;
-    }
 
-    pcResult = (char *)hb_xgrab (sLen);
-    hb_xmemcpy (pcResult, pcSource, sLen);
-    
-    lValue   = hb_parnl (2);
-    if (ISLOG (4))
-      iCarryOver = hb_parl (4);
-    else
-      iCarryOver = 0;
-    
-    if (iCarryOver)
-    {
-      size_t sCurrent;
-      LONG lResult;
-
-      for (sCurrent = sPos; (sCurrent>0) && (lValue != 0); sCurrent--)
+   }
+   else
+   {
+      PHB_ITEM pSubst         = NULL;
+      int      iArgErrorMode  = ct_getargerrormode();
+      if( iArgErrorMode != CT_ARGERR_IGNORE )
       {
-        lResult = (LONG)pcSource[sCurrent-1]+(lValue%256);
-        
-        lValue /= 256;
-        if (lResult > 255)
-          lValue++;
-        else if (lResult < 0)
-          lValue--;
-
-        pcResult[sCurrent-1] = (char)(lResult%256);
+         pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_ADDASCII,
+                                  NULL, "ADDASCII", 0, EF_CANSUBSTITUTE, 4,
+                                  hb_paramError( 1 ), hb_paramError( 2 ),
+                                  hb_paramError( 3 ), hb_paramError( 4 ) );
       }
-    }
-    else
-    {
-      pcResult[sPos-1] = (char)(((LONG)pcResult[sPos-1]+lValue)%256);
-    }
 
-    if (iNoRet)
-      hb_retl (0);
-    else
-      hb_retclen (pcResult, sLen);
-
-    if (ISBYREF (1))
-      hb_storclen (pcResult, sLen, 1);
-
-    hb_xfree (pcResult);
-    return;
-
-  }
-  else
-  {
-    PHB_ITEM pSubst = NULL;
-    int iArgErrorMode = ct_getargerrormode();
-    if (iArgErrorMode != CT_ARGERR_IGNORE)
-    {
-      pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_ADDASCII,
-                               NULL, "ADDASCII", 0, EF_CANSUBSTITUTE, 4,
-                               hb_paramError (1), hb_paramError (2),
-                               hb_paramError (3), hb_paramError (4));
-    }
-    
-    if (pSubst != NULL)
-    {
-      hb_itemRelease( hb_itemReturnForward( pSubst ) );
-    }
-    else
-    {
-      if (iNoRet)
-        hb_retl (0);
+      if( pSubst != NULL )
+      {
+         hb_itemRelease( hb_itemReturnForward( pSubst ) );
+      }
       else
-        hb_retc ("");
-    }
-    return;
-  }
+      {
+         if( iNoRet )
+            hb_retl( 0 );
+         else
+            hb_retc( "" );
+      }
+      return;
+   }
 
 }
-
-
-
-
 

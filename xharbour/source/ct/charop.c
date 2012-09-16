@@ -3,14 +3,14 @@
  */
 
 /*
- * Harbour Project source code: 
+ * Harbour Project source code:
  *   CT3 string functions
  *     - CHARADD()
  *     - CHARSUB()  (NEW)
  *     - CHARAND()
  *     - CHARNOT()
  *     - CHAROR()
- *     - CHARXOR()  
+ *     - CHARXOR()
  *     - CHARSHL()  (NEW)
  *     - CHARSHR()  (NEW)
  *     - CHARRLL()  (NEW)
@@ -64,16 +64,16 @@
 
 #include "ct.h"
 
-#define DO_CHAROP_CHARADD      0
-#define DO_CHAROP_CHARSUB      1  /* new: character subtraction */
-#define DO_CHAROP_CHARAND      2
-#define DO_CHAROP_CHARNOT      3
-#define DO_CHAROP_CHAROR       4
-#define DO_CHAROP_CHARXOR      5
-#define DO_CHAROP_CHARSHL      6  /* new: shift left */
-#define DO_CHAROP_CHARSHR      7  /* new: shift right */
-#define DO_CHAROP_CHARRLL      8  /* new: left rotation */
-#define DO_CHAROP_CHARRLR      9  /* new: right rotation */
+#define DO_CHAROP_CHARADD  0
+#define DO_CHAROP_CHARSUB  1      /* new: character subtraction */
+#define DO_CHAROP_CHARAND  2
+#define DO_CHAROP_CHARNOT  3
+#define DO_CHAROP_CHAROR   4
+#define DO_CHAROP_CHARXOR  5
+#define DO_CHAROP_CHARSHL  6        /* new: shift left */
+#define DO_CHAROP_CHARSHR  7        /* new: shift right */
+#define DO_CHAROP_CHARRLL  8        /* new: left rotation */
+#define DO_CHAROP_CHARRLR  9        /* new: right rotation */
 
 static void do_charop( int iMode )
 {
@@ -82,10 +82,10 @@ static void do_charop( int iMode )
 
    if( ISCHAR( 1 ) )
    {
-      size_t sStrLen = hb_parclen( 1 );
-      size_t sPos;
-      const unsigned char * pucString = ( const unsigned char * ) hb_parc( 1 );
-      unsigned char * pucResult;
+      size_t                  sStrLen     = hb_parclen( 1 );
+      size_t                  sPos;
+      const unsigned char *   pucString   = ( const unsigned char * ) hb_parc( 1 );
+      unsigned char *         pucResult;
 
       if( sStrLen == 0 )
       {
@@ -98,7 +98,7 @@ static void do_charop( int iMode )
 
       pucResult = ( unsigned char * ) hb_xgrab( sStrLen + 1 );
 
-      switch ( iMode )
+      switch( iMode )
       {
          /* NOT */
          case DO_CHAROP_CHARNOT:
@@ -188,11 +188,10 @@ static void do_charop( int iMode )
 
          /* ADD */
          case DO_CHAROP_CHARADD:
-         {
             if( ISCHAR( 2 ) )
             {
-               const char * pucString2 = hb_parc( 2 );
-               size_t sStrLen2 = hb_parclen( 2 );
+               const char *   pucString2  = hb_parc( 2 );
+               size_t         sStrLen2    = hb_parclen( 2 );
 
                for( sPos = 0; sPos < sStrLen; ++sPos )
                   pucResult[ sPos ] = ( char ) ( pucString[ sPos ] + pucString2[ sStrLen2 ? ( sPos % sStrLen2 ) : 0 ] );
@@ -210,15 +209,13 @@ static void do_charop( int iMode )
                hb_xmemcpy( pucResult, pucString, sStrLen );
             }
             break;
-         }
 
          /* SUB */
          case DO_CHAROP_CHARSUB:
-         {
             if( ISCHAR( 2 ) )
             {
-               const char * pucString2 = hb_parc( 2 );
-               size_t sStrLen2 = hb_parclen( 2 );
+               const char *   pucString2  = hb_parc( 2 );
+               size_t         sStrLen2    = hb_parclen( 2 );
 
                for( sPos = 0; sPos < sStrLen; ++sPos )
                   pucResult[ sPos ] = ( char ) ( pucString[ sPos ] - pucString2[ sStrLen2 ? ( sPos % sStrLen2 ) : 0 ] );
@@ -236,15 +233,13 @@ static void do_charop( int iMode )
                hb_xmemcpy( pucResult, pucString, sStrLen );
             }
             break;
-         }
 
          /* AND */
          case DO_CHAROP_CHARAND:
-         {
             if( ISCHAR( 2 ) )
             {
-               const char * pucString2 = hb_parc( 2 );
-               size_t sStrLen2 = hb_parclen( 2 );
+               const char *   pucString2  = hb_parc( 2 );
+               size_t         sStrLen2    = hb_parclen( 2 );
 
                for( sPos = 0; sPos < sStrLen; ++sPos )
                   pucResult[ sPos ] = ( char ) ( pucString[ sPos ] & pucString2[ sStrLen2 ? ( sPos % sStrLen2 ) : 0 ] );
@@ -261,15 +256,13 @@ static void do_charop( int iMode )
                hb_xmemcpy( pucResult, pucString, sStrLen );
             }
             break;
-         }
 
          /* OR */
          case DO_CHAROP_CHAROR:
-         {
             if( ISCHAR( 2 ) )
             {
-               const char * pucString2 = hb_parc( 2 );
-               size_t sStrLen2 = hb_parclen( 2 );
+               const char *   pucString2  = hb_parc( 2 );
+               size_t         sStrLen2    = hb_parclen( 2 );
 
                for( sPos = 0; sPos < sStrLen; ++sPos )
                   pucResult[ sPos ] = ( char ) ( pucString[ sPos ] | pucString2[ sStrLen2 ? ( sPos % sStrLen2 ) : 0 ] );
@@ -286,15 +279,13 @@ static void do_charop( int iMode )
                hb_xmemcpy( pucResult, pucString, sStrLen );
             }
             break;
-         }
 
          /* XOR */
          case DO_CHAROP_CHARXOR:
-         {
             if( ISCHAR( 2 ) )
             {
-               const char * pucString2 = hb_parc( 2 );
-               size_t sStrLen2 = hb_parclen( 2 );
+               const char *   pucString2  = hb_parc( 2 );
+               size_t         sStrLen2    = hb_parclen( 2 );
 
                for( sPos = 0; sPos < sStrLen; ++sPos )
                   pucResult[ sPos ] = ( char ) ( pucString[ sPos ] ^ pucString2[ sStrLen2 ? ( sPos % sStrLen2 ) : 0 ] );
@@ -311,7 +302,6 @@ static void do_charop( int iMode )
                hb_xmemcpy( pucResult, pucString, sStrLen );
             }
             break;
-         }
       }  /* endswitch( iMode ) */
 
       if( ISBYREF( 1 ) )
@@ -324,13 +314,13 @@ static void do_charop( int iMode )
    }
    else  /* if( ISCHAR( 1 ) ) */
    {
-      PHB_ITEM pSubst = NULL;
-      int iArgErrorMode = ct_getargerrormode();
-      int iError = 0;
+      PHB_ITEM pSubst         = NULL;
+      int      iArgErrorMode  = ct_getargerrormode();
+      int      iError         = 0;
 
       if( iArgErrorMode != CT_ARGERR_IGNORE )
       {
-         switch ( iMode )
+         switch( iMode )
          {
             case DO_CHAROP_CHARADD:
                iError = CT_ERROR_CHARADD;
@@ -384,63 +374,62 @@ static void do_charop( int iMode )
    }
 }
 
-HB_FUNC (CHARADD)
+HB_FUNC( CHARADD )
 {
-  do_charop (DO_CHAROP_CHARADD);
-  return;
+   do_charop( DO_CHAROP_CHARADD );
+   return;
 }
 
-HB_FUNC (CHARSUB)
+HB_FUNC( CHARSUB )
 {
-  do_charop (DO_CHAROP_CHARSUB);
-  return;
+   do_charop( DO_CHAROP_CHARSUB );
+   return;
 }
 
-
-HB_FUNC (CHARAND)
+HB_FUNC( CHARAND )
 {
-  do_charop (DO_CHAROP_CHARAND);
-  return;
+   do_charop( DO_CHAROP_CHARAND );
+   return;
 }
 
-HB_FUNC (CHARNOT)
+HB_FUNC( CHARNOT )
 {
-  do_charop (DO_CHAROP_CHARNOT);
-  return;
+   do_charop( DO_CHAROP_CHARNOT );
+   return;
 }
 
-HB_FUNC (CHAROR)
+HB_FUNC( CHAROR )
 {
-  do_charop (DO_CHAROP_CHAROR);
-  return;
+   do_charop( DO_CHAROP_CHAROR );
+   return;
 }
 
-HB_FUNC (CHARXOR)
+HB_FUNC( CHARXOR )
 {
-  do_charop (DO_CHAROP_CHARXOR);
-  return;
+   do_charop( DO_CHAROP_CHARXOR );
+   return;
 }
 
-HB_FUNC (CHARSHL)
+HB_FUNC( CHARSHL )
 {
-  do_charop (DO_CHAROP_CHARSHL);
-  return;
+   do_charop( DO_CHAROP_CHARSHL );
+   return;
 }
 
-HB_FUNC (CHARSHR)
+HB_FUNC( CHARSHR )
 {
-  do_charop (DO_CHAROP_CHARSHR);
-  return;
+   do_charop( DO_CHAROP_CHARSHR );
+   return;
 }
 
-HB_FUNC (CHARRLL)
+HB_FUNC( CHARRLL )
 {
-  do_charop (DO_CHAROP_CHARRLL);
-  return;
+   do_charop( DO_CHAROP_CHARRLL );
+   return;
 }
 
-HB_FUNC (CHARRLR)
+HB_FUNC( CHARRLR )
 {
-  do_charop (DO_CHAROP_CHARRLR);
-  return;
+   do_charop( DO_CHAROP_CHARRLR );
+   return;
 }

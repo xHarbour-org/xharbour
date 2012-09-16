@@ -55,64 +55,67 @@
 
 #include "common.ch"
 
-Function Expand(cStr, nLength, xChar)
-Local cResult, cChar, ser
-Local nCount
+FUNCTION Expand( cStr, nLength, xChar )
 
-DEFAULT nLength TO 1
+   LOCAL cResult, cChar, ser
+   LOCAL nCount
 
-if ISCHARACTER(nlength)
-   nCount := 1
-   XChar := LEFT(nLength,1)
-else
-   nCount := nLength
-endif
+   DEFAULT nLength TO 1
 
-if xChar == nil
-   cChar := ' '
-elseif ISNUMBER(xChar)
-   cChar := Chr(xChar)
-elseif ISCHARACTER(xChar)
-   cChar := LEFT(xChar,1)
-else
-   cChar := ' '
-endif
+   IF ISCHARACTER( nlength )
+      nCount := 1
+      XChar := Left( nLength, 1 )
+   ELSE
+      nCount := nLength
+   ENDIF
 
-if ISCHARACTER(cStr)
-   if len(cStr) > 1
-      cResult := cStr[1]
-      for ser := 2 to len(cStr)
-         cResult += REPLICATE(cChar,nCount) + cStr[ser]
-      next
-   else
-      cResult := cStr
-   endif
-else
-   cResult := ''
-endif
+   IF xChar == nil
+      cChar := ' '
+   ELSEIF ISNUMBER( xChar )
+      cChar := Chr( xChar )
+   ELSEIF ISCHARACTER( xChar )
+      cChar := Left( xChar, 1 )
+   ELSE
+      cChar := ' '
+   ENDIF
 
-Return cResult
+   IF ISCHARACTER( cStr )
+      IF Len( cStr ) > 1
+         cResult := cStr[1]
+         FOR ser := 2 TO Len( cStr )
+            cResult += Replicate( cChar, nCount ) + cStr[ser]
+         NEXT
+      ELSE
+         cResult := cStr
+      ENDIF
+   ELSE
+      cResult := ''
+   ENDIF
 
-Function CharSpread(cStr, nLength, xChar)
-Local cResult := cStr, cChar
-Local nTokens, ser, nAt, nAt2, nCount
+   RETURN cResult
 
-if ISCHARACTER(cStr) .and. ISNUMBER(nLength)
+FUNCTION CharSpread( cStr, nLength, xChar )
 
-   cChar := if(ISNUMBER(xChar), Chr(xChar), xChar)
+   LOCAL cResult := cStr, cChar
+   LOCAL nTokens, ser, nAt, nAt2, nCount
 
-   if nLength > len(cStr) .and. (nTokens := NumToken(cStr, cChar)) > 0
-      nLength -= len(cStr)
-      nCount := Int(nLength / (nTokens - 1))
-      nAt := AtToken(cStr, cChar, 2)
-      cResult := Left(cStr, nAt - 1)
-      for ser := 2 to nTokens
-         nAt2 := if(ser==nTokens, len(cStr)+1, AtToken(cStr, cChar, ser+1))
-         cResult += Replicate(cChar, if(ser==nTokens, nLength, nCount)) + ;
-                    Substr(cStr, nAt, nAt2 - nAt)
-         nLength -= nCount
-         nAt := nAt2
-      next
-   endif
-endif
-Return cResult
+   IF ISCHARACTER( cStr ) .AND. ISNUMBER( nLength )
+
+      cChar := if( ISNUMBER( xChar ), Chr( xChar ), xChar )
+
+      IF nLength > Len( cStr ) .AND. ( nTokens := NumToken( cStr, cChar ) ) > 0
+         nLength -= Len( cStr )
+         nCount := Int( nLength / ( nTokens - 1 ) )
+         nAt := AtToken( cStr, cChar, 2 )
+         cResult := Left( cStr, nAt - 1 )
+         FOR ser := 2 TO nTokens
+            nAt2 := if( ser == nTokens, Len( cStr ) + 1, AtToken( cStr, cChar, ser + 1 ) )
+            cResult += Replicate( cChar, if( ser == nTokens, nLength, nCount ) ) + ;
+               SubStr( cStr, nAt, nAt2 - nAt )
+            nLength -= nCount
+            nAt := nAt2
+         NEXT
+      ENDIF
+   ENDIF
+
+   RETURN cResult

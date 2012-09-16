@@ -52,9 +52,7 @@
  *
  */
 
-
 #include "ct.h"
-
 
 /*  $DOC$
  *  $FUNCNAME$
@@ -122,8 +120,8 @@
 
 HB_FUNC( CHARREPL )
 {
-   int iNoRet;
-   size_t sSearchLen, sReplaceLen;
+   int      iNoRet;
+   size_t   sSearchLen, sReplaceLen;
 
    /* suppressing return value ? */
    iNoRet = ct_getref() && ISBYREF( 2 );
@@ -133,13 +131,13 @@ HB_FUNC( CHARREPL )
        ( sReplaceLen = ( size_t ) hb_parclen( 3 ) ) > 0 )
    {
       /* get parameters */
-      const char *pcSearch = hb_parc( 1 );
-      const char *pcString = hb_parc( 2 );
-      size_t sStrLen = ( size_t ) hb_parclen( 2 );
-      const char *pcReplace = hb_parc( 3 );
-      int iMode;
-      char *pcRet;
-      size_t sIndex;
+      const char *   pcSearch    = hb_parc( 1 );
+      const char *   pcString    = hb_parc( 2 );
+      size_t         sStrLen     = ( size_t ) hb_parclen( 2 );
+      const char *   pcReplace   = hb_parc( 3 );
+      int            iMode;
+      char *         pcRet;
+      size_t         sIndex;
 
       /* if sStrLen == 0, we can return immediately */
       if( sStrLen == 0 )
@@ -169,9 +167,9 @@ HB_FUNC( CHARREPL )
 
       for( sIndex = 0; sIndex < sSearchLen; sIndex++ )
       {
-         size_t sMatchStrLen;
-         const char *pc;
-         size_t sReplIndex = sIndex;
+         size_t         sMatchStrLen;
+         const char *   pc;
+         size_t         sReplIndex = sIndex;
 
          if( sReplIndex > sReplaceLen - 1 )
          {
@@ -224,8 +222,8 @@ HB_FUNC( CHARREPL )
    else  /* ( ( sSearchLen = ( size_t ) hb_parclen( 1 ) ) > 0 && ISCHAR( 2 ) &&
               ( sReplaceLen = ( size_t ) hb_parclen( 3 ) ) > 0 ) */
    {
-      PHB_ITEM pSubst = NULL;
-      int iArgErrorMode = ct_getargerrormode();
+      PHB_ITEM pSubst         = NULL;
+      int      iArgErrorMode  = ct_getargerrormode();
 
       if( iArgErrorMode != CT_ARGERR_IGNORE )
       {

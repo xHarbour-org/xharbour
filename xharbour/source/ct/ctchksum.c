@@ -54,10 +54,10 @@
 
 HB_FUNC( CHECKSUM )
 {
-   BYTE * pbyString = ( BYTE * ) hb_parcx( 1 );
-   ULONG ulLen = hb_parclen( 1 );
-   ULONG ulPos;
-   ULONG ulResult = 0;
+   BYTE *   pbyString   = ( BYTE * ) hb_parcx( 1 );
+   ULONG    ulLen       = hb_parclen( 1 );
+   ULONG    ulPos;
+   ULONG    ulResult    = 0;
 
    for( ulPos = 0; ulPos < ulLen; ulPos++ )
       ulResult += ( ( ULONG ) ( pbyString[ ulPos ] + ( ULONG ) ( pbyString[ ulPos + 1 ] * 256 ) ) ) & 0xFFFF;

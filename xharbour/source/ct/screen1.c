@@ -101,14 +101,14 @@
 
 HB_FUNC( SCREENATTR )
 {
-   SHORT sRow, sCol;
-   int iRow, iCol;
-   BYTE bColor, bAttr;
-   USHORT usChar;
+   SHORT    sRow, sCol;
+   int      iRow, iCol;
+   BYTE     bColor, bAttr;
+   USHORT   usChar;
 
    hb_gtGetPos( &sRow, &sCol );
-   iRow = ISNUM( 1 ) ? hb_parni( 1 ) : sRow;
-   iCol = ISNUM( 2 ) ? hb_parni( 2 ) : sCol;
+   iRow  = ISNUM( 1 ) ? hb_parni( 1 ) : sRow;
+   iCol  = ISNUM( 2 ) ? hb_parni( 2 ) : sCol;
 
    if( hb_gtGetChar( iRow, iCol, &bColor, &bAttr, &usChar ) != SUCCESS )
       bColor = 0;
@@ -148,22 +148,22 @@ HB_FUNC( SCREENMIX )
 
    if( ulLen )
    {
-      const char * szText = hb_parc( 1 ), * szAttr;
-      ULONG ulAttr = hb_parclen( 2 ), ul = 0;
-      SHORT sRow, sCol;
-      int iRow, iCol, i;
+      const char *   szText   = hb_parc( 1 ), * szAttr;
+      ULONG          ulAttr   = hb_parclen( 2 ), ul = 0;
+      SHORT          sRow, sCol;
+      int            iRow, iCol, i;
 
       if( ulAttr == 0 )
       {
-         szAttr = " ";
-         ulAttr = 1;
+         szAttr   = " ";
+         ulAttr   = 1;
       }
       else
          szAttr = hb_parc( 2 );
 
       hb_gtGetPos( &sRow, &sCol );
-      iRow = ISNUM( 3 ) ? hb_parni( 3 ) : sRow;
-      iCol = ISNUM( 4 ) ? hb_parni( 4 ) : sCol;
+      iRow  = ISNUM( 3 ) ? hb_parni( 3 ) : sRow;
+      iCol  = ISNUM( 4 ) ? hb_parni( 4 ) : sCol;
 
       if( iRow >= 0 && iCol >= 0 &&
           iRow <= hb_gtMaxRow() && iCol <= hb_gtMaxCol() )
@@ -229,13 +229,13 @@ HB_FUNC( SAYSCREEN )
 
    if( ulLen )
    {
-      const char * szText = hb_parc( 1 );
-      SHORT sRow, sCol;
-      int iRow, iCol, i;
+      const char *   szText = hb_parc( 1 );
+      SHORT          sRow, sCol;
+      int            iRow, iCol, i;
 
       hb_gtGetPos( &sRow, &sCol );
-      iRow = ISNUM( 2 ) ? hb_parni( 2 ) : sRow;
-      iCol = ISNUM( 3 ) ? hb_parni( 3 ) : sCol;
+      iRow  = ISNUM( 2 ) ? hb_parni( 2 ) : sRow;
+      iCol  = ISNUM( 3 ) ? hb_parni( 3 ) : sCol;
 
       if( iRow >= 0 && iCol >= 0 &&
           iRow <= hb_gtMaxRow() && iCol <= hb_gtMaxCol() )
@@ -244,8 +244,8 @@ HB_FUNC( SAYSCREEN )
          i = iCol;
          do
          {
-            BYTE bColor, bAttr;
-            USHORT usChar;
+            BYTE     bColor, bAttr;
+            USHORT   usChar;
             if( hb_gtGetChar( iRow, i, &bColor, &bAttr, &usChar ) != SUCCESS )
             {
                if( ++iRow > hb_gtMaxRow() )
@@ -267,15 +267,15 @@ HB_FUNC( SAYSCREEN )
 static BOOL hb_ctGetWinCord( int * piTop, int * piLeft,
                              int * piBottom, int * piRight )
 {
-   int iMaxRow = hb_gtMaxRow();
-   int iMaxCol = hb_gtMaxCol();
+   int   iMaxRow  = hb_gtMaxRow();
+   int   iMaxCol  = hb_gtMaxCol();
 
    hb_gtGetPosEx( piTop, piLeft );
 
    if( ISNUM( 1 ) )
       *piTop = hb_parni( 1 );
    if( ISNUM( 2 ) )
-      *piLeft   = hb_parni( 2 );
+      *piLeft = hb_parni( 2 );
    if( ISNUM( 3 ) )
    {
       *piBottom = hb_parni( 3 );
@@ -304,7 +304,7 @@ static int hb_ctGetClearChar( int iParam )
    if( ISNUM( iParam ) )
       iChar = hb_parni( iParam );
    else if( ISCHAR( iParam ) )
-      iChar = ( UCHAR ) hb_parc( iParam )[0];
+      iChar = ( UCHAR ) hb_parc( iParam )[ 0 ];
    else
       iChar = hb_gtGetClearChar();
 
@@ -333,8 +333,8 @@ HB_FUNC( CLEARWIN )
    {
       BYTE bColor, bChar;
 
-      bColor = ( BYTE ) hb_ctGetClearColor( 5 );
-      bChar  = ( BYTE ) hb_ctGetClearChar( 6 );
+      bColor   = ( BYTE ) hb_ctGetClearColor( 5 );
+      bChar    = ( BYTE ) hb_ctGetClearChar( 6 );
 
       hb_gtScrollEx( iTop, iLeft, iBottom, iRight, bColor, bChar, 0, 0 );
    }
@@ -349,9 +349,9 @@ HB_FUNC( CLEARWIN )
  *  $CATEGORY$
  *      CT3 video functions
  *  $ONELINER$
- *     
+ *
  *  $SYNTAX$
- *     
+ *
  *  $ARGUMENTS$
  *  $RETURNS$
  *  $DESCRIPTION$
@@ -382,9 +382,9 @@ HB_FUNC( INVERTWIN )
          int iCol = iLeft;
          while( iCol <= iRight )
          {
-            BYTE bColor, bAttr;
-            USHORT usChar;
-   
+            BYTE     bColor, bAttr;
+            USHORT   usChar;
+
             hb_gtGetChar( iTop, iCol, &bColor, &bAttr, &usChar );
             bColor = ( bColor & 0x88 ) |
                      ( ( bColor & 0x07 ) << 4 ) |
@@ -451,7 +451,7 @@ HB_FUNC( INVERTWIN )
 
 HB_FUNC( UNTEXTWIN )
 {
-   int iTop, iLeft, iBottom, iRight;
+   int   iTop, iLeft, iBottom, iRight;
    UCHAR ucRepl, ucInit, ucEnd;
 
    if( hb_ctGetWinCord( &iTop, &iLeft, &iBottom, &iRight ) )
@@ -461,14 +461,14 @@ HB_FUNC( UNTEXTWIN )
       if( ISNUM( 6 ) )
          ucInit = ( UCHAR ) hb_parni( 6 );
       else if( hb_parclen( 6 ) > 0 )
-         ucInit = ( UCHAR ) hb_parc( 6 )[0];
+         ucInit = ( UCHAR ) hb_parc( 6 )[ 0 ];
       else
          ucInit = 176;
 
       if( ISNUM( 7 ) )
          ucEnd = ( UCHAR ) hb_parni( 7 );
       else if( hb_parclen( 7 ) > 0 )
-         ucEnd = ( UCHAR ) hb_parc( 7 )[0];
+         ucEnd = ( UCHAR ) hb_parc( 7 )[ 0 ];
       else
          ucEnd = 223;
 
@@ -478,12 +478,12 @@ HB_FUNC( UNTEXTWIN )
          int iCol = iLeft;
          while( iCol <= iRight )
          {
-            BYTE bColor, bAttr;
-            USHORT usChar;
+            BYTE     bColor, bAttr;
+            USHORT   usChar;
 
             hb_gtGetChar( iTop, iCol, &bColor, &bAttr, &usChar );
             if( ucInit <= ucEnd ? ( usChar < ucInit || usChar > ucEnd ) :
-                                  ( usChar > ucEnd && usChar < ucInit ) )
+                ( usChar > ucEnd && usChar < ucInit ) )
                hb_gtPutChar( iTop, iCol, bColor, bAttr, ucRepl );
             ++iCol;
          }
@@ -540,14 +540,14 @@ HB_FUNC( CHARWIN )
    if( hb_ctGetWinCord( &iTop, &iLeft, &iBottom, &iRight ) )
    {
       UCHAR ucNewChar, ucOldChar = 0;
-      BOOL fAll = FALSE;
+      BOOL  fAll = FALSE;
 
       ucNewChar = ( UCHAR ) hb_ctGetClearChar( 5 );
 
       if( ISNUM( 6 ) )
          ucOldChar = ( UCHAR ) hb_parni( 6 );
       else if( hb_parclen( 6 ) > 0 )
-         ucOldChar = ( UCHAR ) hb_parc( 6 )[0];
+         ucOldChar = ( UCHAR ) hb_parc( 6 )[ 0 ];
       else
          fAll = TRUE;
 
@@ -557,8 +557,8 @@ HB_FUNC( CHARWIN )
          int iCol = iLeft;
          while( iCol <= iRight )
          {
-            BYTE bColor, bAttr;
-            USHORT usChar;
+            BYTE     bColor, bAttr;
+            USHORT   usChar;
 
             hb_gtGetChar( iTop, iCol, &bColor, &bAttr, &usChar );
             if( fAll || usChar == ucOldChar )
@@ -621,7 +621,7 @@ HB_FUNC( COLORWIN )
    if( hb_ctGetWinCord( &iTop, &iLeft, &iBottom, &iRight ) )
    {
       UCHAR ucNewColor, ucOldColor = 0;
-      BOOL fAll = FALSE;
+      BOOL  fAll = FALSE;
 
       ucNewColor = ( UCHAR ) hb_ctGetClearColor( 5 );
 
@@ -636,8 +636,8 @@ HB_FUNC( COLORWIN )
          int iCol = iLeft;
          while( iCol <= iRight )
          {
-            BYTE bColor, bAttr;
-            USHORT usChar;
+            BYTE     bColor, bAttr;
+            USHORT   usChar;
 
             hb_gtGetChar( iTop, iCol, &bColor, &bAttr, &usChar );
             if( fAll || bColor == ucOldColor )
@@ -686,21 +686,21 @@ HB_FUNC( COLORWIN )
 
 HB_FUNC( SCREENTEXT )
 {
-   int iTop, iLeft, iBottom, iRight;
-   char * pBuffer, * szText;
-   ULONG ulSize;
+   int      iTop, iLeft, iBottom, iRight;
+   char *   pBuffer, * szText;
+   ULONG    ulSize;
 
    if( hb_ctGetWinCord( &iTop, &iLeft, &iBottom, &iRight ) )
    {
-      ulSize = ( ULONG ) ( iBottom - iTop + 1 ) * ( iRight - iLeft + 1 );
-      szText = pBuffer = ( char * ) hb_xgrab( ulSize + 1 );
+      ulSize   = ( ULONG ) ( iBottom - iTop + 1 ) * ( iRight - iLeft + 1 );
+      szText   = pBuffer = ( char * ) hb_xgrab( ulSize + 1 );
       while( iTop <= iBottom )
       {
          int iCol = iLeft;
          while( iCol <= iRight )
          {
-            BYTE bColor, bAttr;
-            USHORT usChar;
+            BYTE     bColor, bAttr;
+            USHORT   usChar;
             hb_gtGetChar( iTop, iCol, &bColor, &bAttr, &usChar );
             *szText++ = ( char ) usChar;
             ++iCol;
@@ -746,11 +746,11 @@ HB_FUNC( SCREENTEXT )
 
 HB_FUNC( COLORREPL )
 {
-   int iMaxRow = hb_gtMaxRow();
-   int iMaxCol = hb_gtMaxCol();
-   int iRow = 0, iCol;
+   int   iMaxRow  = hb_gtMaxRow();
+   int   iMaxCol  = hb_gtMaxCol();
+   int   iRow     = 0, iCol;
    UCHAR ucNewColor, ucOldColor = 0;
-   BOOL fAll = FALSE;
+   BOOL  fAll     = FALSE;
 
    ucNewColor = ( UCHAR ) hb_ctGetClearColor( 1 );
 
@@ -765,8 +765,8 @@ HB_FUNC( COLORREPL )
       iCol = 0;
       while( iCol <= iMaxCol )
       {
-         BYTE bColor, bAttr;
-         USHORT usChar;
+         BYTE     bColor, bAttr;
+         USHORT   usChar;
 
          hb_gtGetChar( iRow, iCol, &bColor, &bAttr, &usChar );
          if( fAll || bColor == ucOldColor )

@@ -3,7 +3,7 @@
  */
 
 /*
- * Harbour Project source code: 
+ * Harbour Project source code:
  *   CT3 string functions
  *     - CHARONE()
  *     - WORDONE()
@@ -54,70 +54,67 @@
  *
  */
 
-
 #include "ct.h"
 
-
 /* defines */
-#define DO_CHARONE_CHARONE     0
-#define DO_CHARONE_WORDONE     1
+#define DO_CHARONE_CHARONE 0
+#define DO_CHARONE_WORDONE 1
 
 /* helper function for the *one functions */
 static void do_charone( int iSwitch )
 {
-   const char *pcString;
-   size_t sStrLen;
-   const char *pcDeleteSet;
-   size_t sDeleteSetLen;
+   const char *   pcString;
+   size_t         sStrLen;
+   const char *   pcDeleteSet;
+   size_t         sDeleteSetLen;
 
    /* param check */
-   if ( ISCHAR( 1 ) )
+   if( ISCHAR( 1 ) )
    {
-      if ( ISCHAR( 2 ) )
+      if( ISCHAR( 2 ) )
       {
-         pcString = hb_parc( 2 );
-         sStrLen = (size_t)hb_parclen( 2 );
-         pcDeleteSet = hb_parc( 1 );
-         sDeleteSetLen = (size_t)hb_parclen( 1 );
+         pcString       = hb_parc( 2 );
+         sStrLen        = ( size_t ) hb_parclen( 2 );
+         pcDeleteSet    = hb_parc( 1 );
+         sDeleteSetLen  = ( size_t ) hb_parclen( 1 );
       }
       else
       {
-         pcString = hb_parc( 1 );
-         sStrLen = (size_t)hb_parclen( 1 );
-         pcDeleteSet = NULL;
-         sDeleteSetLen = 0;
+         pcString       = hb_parc( 1 );
+         sStrLen        = ( size_t ) hb_parclen( 1 );
+         pcDeleteSet    = NULL;
+         sDeleteSetLen  = 0;
       }
 
-      switch ( iSwitch )
+      switch( iSwitch )
       {
          case DO_CHARONE_CHARONE:
-         {
-            if (sStrLen > 1)
+            if( sStrLen > 1 )
             {
-               const char *pcSub;
-               char *pcRet;
-               size_t sRetStrLen = 0;
-               char cCurrent = *pcString;
+               const char *   pcSub;
+               char *         pcRet;
+               size_t         sRetStrLen  = 0;
+               char           cCurrent    = *pcString;
 
-               pcRet = (char *)hb_xgrab( sStrLen );
+               pcRet                   = ( char * ) hb_xgrab( sStrLen );
 
                /* copy first char */
-               pcRet[ sRetStrLen++ ] = cCurrent;
+               pcRet[ sRetStrLen++ ]   = cCurrent;
 
-               for ( pcSub = pcString + 1; pcSub < pcString + sStrLen; pcSub++ )
+               for( pcSub = pcString + 1; pcSub < pcString + sStrLen; pcSub++ )
                {
-                  if ( *pcSub != cCurrent )
+                  if( *pcSub != cCurrent )
                   {
-                     cCurrent = *pcSub;
+                     cCurrent                = *pcSub;
+                     pcRet[ sRetStrLen++ ]   = cCurrent;
+                  }
+                  else if( pcDeleteSet != NULL
+                           && ! ct_at_exact_forward( pcDeleteSet, sDeleteSetLen,
+                                                     pcSub, 1, NULL ) )
+                  {
                      pcRet[ sRetStrLen++ ] = cCurrent;
-		  }
-		  else if ( pcDeleteSet != NULL
-		            && !ct_at_exact_forward( pcDeleteSet, sDeleteSetLen,
-		                                     pcSub, 1, NULL ) )
-		  {
-		     pcRet[ sRetStrLen++ ] = cCurrent;
-		  }
-	       }
+                  }
+               }
 
                hb_retclen( pcRet, sRetStrLen );
                hb_xfree( pcRet );
@@ -127,59 +124,57 @@ static void do_charone( int iSwitch )
                /* algorithm does nothing to 1-char-strings */
                hb_retclen( pcString, sStrLen );
             }
-         }
-	 break;
+            break;
 
          case DO_CHARONE_WORDONE:
-         {
-            if ( sStrLen > 3 && sDeleteSetLen >= 2 )
+            if( sStrLen > 3 && sDeleteSetLen >= 2 )
             {
-               const char *pcSub;
-               char *pcRet;
-               size_t sRetStrLen = 0;
-               char cCurrent1 = pcString[0];
-               char cCurrent2 = pcString[1];
+               const char *   pcSub;
+               char *         pcRet;
+               size_t         sRetStrLen  = 0;
+               char           cCurrent1   = pcString[ 0 ];
+               char           cCurrent2   = pcString[ 1 ];
 
-               pcRet = (char *)hb_xgrab( sStrLen );
+               pcRet                   = ( char * ) hb_xgrab( sStrLen );
 
                /* copy first double char */
-               pcRet[ sRetStrLen++ ] = cCurrent1;
-               pcRet[ sRetStrLen++ ] = cCurrent2;
+               pcRet[ sRetStrLen++ ]   = cCurrent1;
+               pcRet[ sRetStrLen++ ]   = cCurrent2;
 
-               for ( pcSub = pcString + 2; pcSub < pcString + sStrLen - 1; pcSub += 2 )
+               for( pcSub = pcString + 2; pcSub < pcString + sStrLen - 1; pcSub += 2 )
                {
-                  if ( !( pcSub[0] == cCurrent1 && pcSub[1] == cCurrent2 ) )
+                  if( ! ( pcSub[ 0 ] == cCurrent1 && pcSub[ 1 ] == cCurrent2 ) )
                   {
-                     cCurrent1 = pcSub[0];
-                     cCurrent2 = pcSub[1];
-                     pcRet[ sRetStrLen++ ] = cCurrent1;
-                     pcRet[ sRetStrLen++ ] = cCurrent2;
-		  }
-		  else if ( pcDeleteSet != NULL )
-		  {
-		     const char *pc = NULL;
-		     const char *pStart = pcDeleteSet;
-		     size_t sLen = sDeleteSetLen;
+                     cCurrent1               = pcSub[ 0 ];
+                     cCurrent2               = pcSub[ 1 ];
+                     pcRet[ sRetStrLen++ ]   = cCurrent1;
+                     pcRet[ sRetStrLen++ ]   = cCurrent2;
+                  }
+                  else if( pcDeleteSet != NULL )
+                  {
+                     const char *   pc       = NULL;
+                     const char *   pStart   = pcDeleteSet;
+                     size_t         sLen     = sDeleteSetLen;
 
-		     while ( sLen >= 2
-		             && ( pc = ct_at_exact_forward( pStart, sLen,
-		                                            pcSub, 2, NULL ) ) != 0
-			     && ( pc - pcDeleteSet ) % 2 == 1 )
-		     {
-		        pStart = pc + 1;
-			sLen = sDeleteSetLen - ( pStart - pcDeleteSet );
-		     }
-		     
-		     if ( pc == NULL )
-		     {
-		        pcRet[ sRetStrLen++ ] = cCurrent1;
-			pcRet[ sRetStrLen++ ] = cCurrent2;
-		     }
-		  }
+                     while( sLen >= 2
+                            && ( pc = ct_at_exact_forward( pStart, sLen,
+                                                           pcSub, 2, NULL ) ) != 0
+                            && ( pc - pcDeleteSet ) % 2 == 1 )
+                     {
+                        pStart   = pc + 1;
+                        sLen     = sDeleteSetLen - ( pStart - pcDeleteSet );
+                     }
+
+                     if( pc == NULL )
+                     {
+                        pcRet[ sRetStrLen++ ]   = cCurrent1;
+                        pcRet[ sRetStrLen++ ]   = cCurrent2;
+                     }
+                  }
                }
 
                /* copy last character if string len is odd */
-               if ( sStrLen % 2 == 1 )
+               if( sStrLen % 2 == 1 )
                {
                   pcRet[ sRetStrLen++ ] = pcString[ sStrLen - 1 ];
                }
@@ -191,26 +186,25 @@ static void do_charone( int iSwitch )
                /* algorithm does nothing to 3-char-strings */
                hb_retclen( pcString, sStrLen );
             }
-         }
-	 break;
-      } /* switch (iSwitch) */
+            break;
+      }  /* switch (iSwitch) */
    }
-   else /* if (ISCHAR (1)) */
+   else  /* if (ISCHAR (1)) */
    {
-      PHB_ITEM pSubst = NULL;
-      int iArgErrorMode = ct_getargerrormode();
-    
-      if ( iArgErrorMode != CT_ARGERR_IGNORE )
+      PHB_ITEM pSubst         = NULL;
+      int      iArgErrorMode  = ct_getargerrormode();
+
+      if( iArgErrorMode != CT_ARGERR_IGNORE )
       {
-         pSubst = ct_error_subst( (USHORT)iArgErrorMode, EG_ARG,
+         pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG,
                                   ( iSwitch == DO_CHARONE_CHARONE ? CT_ERROR_CHARONE : CT_ERROR_WORDONE ),
                                   NULL,
                                   ( iSwitch == DO_CHARONE_CHARONE ? "CHARONE" : "WORDONE" ),
                                   0, EF_CANSUBSTITUTE, 2,
                                   hb_paramError( 1 ), hb_paramError( 2 ) );
       }
-     
-      if ( pSubst != NULL )
+
+      if( pSubst != NULL )
       {
          hb_itemRelease( hb_itemReturnForward( pSubst ) );
       }
@@ -221,14 +215,10 @@ static void do_charone( int iSwitch )
    }
 }
 
-
-
 HB_FUNC( CHARONE )
 {
    do_charone( DO_CHARONE_CHARONE );
 }
-
-
 
 HB_FUNC( WORDONE )
 {

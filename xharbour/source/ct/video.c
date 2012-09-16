@@ -74,37 +74,36 @@ HB_FUNC( CHARPIX )
 #endif
 }
 
-
 HB_FUNC( SETFONT )
 {
-   char *font = hb_parcx( 1 );
-   int len = hb_parclen( 1 );
-   int area = hb_parni( 2 );
-   int offset = 0;
-   int count = 256;
-   int height = 16;
+   char *   font     = hb_parcx( 1 );
+   int      len      = hb_parclen( 1 );
+   int      area     = hb_parni( 2 );
+   int      offset   = 0;
+   int      count    = 256;
+   int      height   = 16;
 
-   if ( !area )
-     area = 1;
-   if ( ISNUM( 3 ) )
-     offset = hb_parni( 3 );
-   if ( ISNUM( 4 ) )
-     count = hb_parni( 4 );
-   if ( ISLOG( 3 ) )
-     if ( hb_parl( 3 ) && count != 0 )
-       height = len / count;
+   if( ! area )
+      area = 1;
+   if( ISNUM( 3 ) )
+      offset = hb_parni( 3 );
+   if( ISNUM( 4 ) )
+      count = hb_parni( 4 );
+   if( ISLOG( 3 ) )
+      if( hb_parl( 3 ) && count != 0 )
+         height = len / count;
 
 #ifdef __DJGPP__
    {
       __dpmi_regs r;
 
-      r.x.ax = 0x1110; /* Load user-defined text-mode display font */
-      r.h.bl = area - 1;
-      r.h.bh = height;
-      r.x.cx = count;
-      r.x.dx = offset;
-      r.x.es = __tb >> 4;
-      r.x.bp = __tb & 0xF;
+      r.x.ax   = 0x1110; /* Load user-defined text-mode display font */
+      r.h.bl   = area - 1;
+      r.h.bh   = height;
+      r.x.cx   = count;
+      r.x.dx   = offset;
+      r.x.es   = __tb >> 4;
+      r.x.bp   = __tb & 0xF;
       dosmemput( font, len, __tb );
       __dpmi_int( 0x10, &r );
    }
@@ -113,50 +112,48 @@ HB_FUNC( SETFONT )
    hb_retni( 0 );
 }
 
-
-
 HB_FUNC( VGAPALETTE )
 {
-   char *color_string;
-   char red, green, blue;
-   char attr = 0;
+   char *   color_string;
+   char     red, green, blue;
+   char     attr = 0;
 
-   if ( hb_pcount() < 4 )
+   if( hb_pcount() < 4 )
    {
       /* Resetting palette registers to default values is not supported yet */
       hb_retl( FALSE );
       return;
    }
-   if ( ISNUM( 1 ) && hb_parni( 1 ) < 16 )
+   if( ISNUM( 1 ) && hb_parni( 1 ) < 16 )
    {
       attr = hb_parni( 1 );
    }
-   else if ( ISCHAR( 1 ) )
+   else if( ISCHAR( 1 ) )
    {
-      char *s;
+      char * s;
 
       color_string = hb_parcx( 1 );
-      for ( s = color_string; *s; s++ )
+      for( s = color_string; *s; s++ )
       {
-         switch ( *s )
+         switch( *s )
          {
             case 'N':
-	    case 'n': attr |= 0; break;
+            case 'n': attr |= 0; break;
             case 'B':
-	    case 'b': attr |= 1; break;
-	    case 'G':
-	    case 'g': attr |= 2; break;
+            case 'b': attr |= 1; break;
+            case 'G':
+            case 'g': attr |= 2; break;
             case 'R':
-	    case 'r': attr |= 4; break;
+            case 'r': attr |= 4; break;
             case 'W':
-	    case 'w': attr |= 7; break;
+            case 'w': attr |= 7; break;
             case '+': attr |= 8; break;
             case 'U':
-	    case 'u':
+            case 'u':
             case 'I':
-	    case 'i':
+            case 'i':
             case 'X':
-	    case 'x':
+            case 'x':
                /* these seem to be used only in mono */
                break;
             default:
@@ -164,40 +161,44 @@ HB_FUNC( VGAPALETTE )
                return;
          }
       }
-   } else {
+   }
+   else
+   {
       /* An invalid argument */
       hb_retl( FALSE );
       return;
    }
 
-   red = hb_parni( 2 );
+   red   = hb_parni( 2 );
    green = hb_parni( 3 );
-   blue = hb_parni( 4 );
+   blue  = hb_parni( 4 );
 
 #ifdef __DJGPP__
    {
       __dpmi_regs r;
-      int iflag;
+      int         iflag;
 
       /* Get palette register for this attribute to BH using BIOS -
        * I couldn't manage to get it through ports */
-      r.x.ax = 0x1007;
-      r.h.bl = attr;
+      r.x.ax   = 0x1007;
+      r.h.bl   = attr;
       __dpmi_int( 0x10, &r );
 
-      iflag = __dpmi_get_and_disable_virtual_interrupt_state();
+      iflag    = __dpmi_get_and_disable_virtual_interrupt_state();
 
       /* Wait for vertical retrace (for old VGA cards) */
-      while ( inportb( 0x3DA ) & 8 );
-      while ( !( inportb( 0x3DA ) & 8 ) );
+      while( inportb( 0x3DA ) & 8 )
+         ;
+      while( ! ( inportb( 0x3DA ) & 8 ) )
+         ;
 
       outportb( 0x3C8, r.h.bh );
       outportb( 0x3C9, red );
       outportb( 0x3C9, green );
       outportb( 0x3C9, blue );
 
-      if ( iflag )
-        __dpmi_get_and_enable_virtual_interrupt_state();
+      if( iflag )
+         __dpmi_get_and_enable_virtual_interrupt_state();
    }
    hb_retl( TRUE );
 #else
@@ -205,27 +206,28 @@ HB_FUNC( VGAPALETTE )
 #endif
 }
 
-
-
 HB_FUNC( VIDEOTYPE )
 {
 #if defined( __DJGPP__ )
    __dpmi_regs r;
 
-   r.h.ah = 0x12; /* Alternate Select */
-   r.h.bl = 0x10; /* Get EGA info */
+   r.h.ah   = 0x12;  /* Alternate Select */
+   r.h.bl   = 0x10;  /* Get EGA info */
    __dpmi_int( 0x10, &r );
-   if ( r.h.bl == 0x10 ) {
+   if( r.h.bl == 0x10 )
+   {
       /* CGA/HGC/MDA */
       hb_retni( VCARD_MONOCHROME );
-   } else {
+   }
+   else
+   {
       /* EGA/VGA */
       r.x.ax = 0x1A00;
       __dpmi_int( 0x10, &r );
-      if ( r.h.al == 0x1A )
-        hb_retni( VCARD_VGA );
+      if( r.h.al == 0x1A )
+         hb_retni( VCARD_VGA );
       else
-        hb_retni( VCARD_EGA );
+         hb_retni( VCARD_EGA );
    }
 #endif
 }

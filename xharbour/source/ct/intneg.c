@@ -56,27 +56,27 @@
 
 HB_FUNC( INTNEG )
 {
-   LONG lNumber = 0;
-   BOOL b32 = (ISLOG(2) && hb_parl( 2 ) ? 1 : 0);
+   LONG  lNumber  = 0;
+   BOOL  b32      = ( ISLOG( 2 ) && hb_parl( 2 ) ? 1 : 0 );
 
-   if( ISNUM(1) )
+   if( ISNUM( 1 ) )
    {
-      lNumber = hb_parnl(1);
+      lNumber = hb_parnl( 1 );
    }
-   else if( ISCHAR(1) )
+   else if( ISCHAR( 1 ) )
    {
-      lNumber = hb_hextonum( hb_parc(1) );
+      lNumber = hb_hextonum( hb_parc( 1 ) );
    }
 
    if( b32 )
    {
 #ifndef HB_LONG_LONG_OFF
-      if( lNumber < 0)
+      if( lNumber < 0 )
 #endif
-         hb_retnl( lNumber );
+      hb_retnl( lNumber );
 #ifndef HB_LONG_LONG_OFF
       else
-         hb_retnll( (LONG) lNumber );
+         hb_retnll( ( LONG ) lNumber );
 #endif
    }
    else
@@ -92,7 +92,7 @@ HB_FUNC( INTNEG )
       }
       else
       {
-         hb_retni( (SHORT) ( lNumber & 0xFFFF ) );
+         hb_retni( ( SHORT ) ( lNumber & 0xFFFF ) );
       }
    }
 
@@ -100,28 +100,28 @@ HB_FUNC( INTNEG )
 
 HB_FUNC( INTPOS )
 {
-   LONG lNumber = 0;
-   BOOL b32 = (ISLOG(2) && hb_parl( 2 ) ? 1 : 0);
+   LONG  lNumber  = 0;
+   BOOL  b32      = ( ISLOG( 2 ) && hb_parl( 2 ) ? 1 : 0 );
 
 
-   if( ISNUM(1) )
+   if( ISNUM( 1 ) )
    {
-      lNumber = hb_parnl(1);
+      lNumber = hb_parnl( 1 );
    }
-   else if( ISCHAR(1) )
+   else if( ISCHAR( 1 ) )
    {
-      lNumber = hb_hextonum( hb_parc(1) );
+      lNumber = hb_hextonum( hb_parc( 1 ) );
    }
 
    if( b32 )
    {
 #ifndef HB_LONG_LONG_OFF
-      if( lNumber >= 0)
+      if( lNumber >= 0 )
 #endif
-         hb_retnl( lNumber );
+      hb_retnl( lNumber );
 #ifndef HB_LONG_LONG_OFF
       else
-         hb_retnll( (ULONG) lNumber );
+         hb_retnll( ( ULONG ) lNumber );
 #endif
    }
    else
@@ -137,7 +137,7 @@ HB_FUNC( INTPOS )
       }
       else
       {
-         hb_retni( (USHORT) ( lNumber & 0xFFFF ) );
+         hb_retni( ( USHORT ) ( lNumber & 0xFFFF ) );
       }
    }
 

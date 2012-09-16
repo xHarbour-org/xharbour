@@ -55,15 +55,15 @@
 
 #include "ct.h"
 
-#if defined (HB_OS_DOS)
+#if defined ( HB_OS_DOS )
 
-#if defined(__DJGPP__)
+#if defined( __DJGPP__ )
     #include "pc.h"
     #include "sys\exceptn.h"
     #include "sys\farptr.h"
-#elif defined(__MSC_VER)
+#elif defined( __MSC_VER )
     #include "signal.h"
-#elif defined(__BORLANDC__)
+#elif defined( __BORLANDC__ )
    #ifndef FAR
       #define FAR far /* Because FAR is not defined for Borland C 3.x */
    #endif
@@ -71,25 +71,25 @@
 
 static void SetGet( char cKey );
 
-HB_FUNC (KSETINS)
+HB_FUNC( KSETINS )
 {
    char cKey = 0x80;
    SetGet( cKey );
 }
 
-HB_FUNC (KSETCAPS)
+HB_FUNC( KSETCAPS )
 {
    char cKey = 0x40;
    SetGet( cKey );
 }
 
-HB_FUNC (KSETNUM)
+HB_FUNC( KSETNUM )
 {
    char cKey = 0x20;
    SetGet( cKey );
 }
 
-HB_FUNC (KSETSCROLL)
+HB_FUNC( KSETSCROLL )
 {
    char cKey = 0x10;
    SetGet( cKey );
@@ -97,74 +97,60 @@ HB_FUNC (KSETSCROLL)
 
 static void SetGet( char cKey )
 {
-
-#if defined(__WATCOMC__) && defined(__386__)
-
+#if defined( __WATCOMC__ ) && defined( __386__ )
    hb_retl( *( ( char * ) 0x0417 ) & cKey );
-
-#elif defined(__DJGPP__)
-
+#elif defined( __DJGPP__ )
    hb_retl( _farpeekb( 0x0040, 0x0017 ) & cKey );
-
 #else
-
    hb_retl( *( ( char FAR * ) MK_FP( 0x0040, 0x0017 ) ) & cKey );
-
 #endif
 
-   if ( hb_pcount() >= 1 )
+   if( hb_pcount() >= 1 )
    {
       cKey = hb_parl( 1 ) * cKey;
 
-   #if defined(__WATCOMC__) && defined(__386__)
-
-      *( ( char * ) 0x0417 ) = ( *( ( char * ) 0x0417 ) & ( !cKey ) ) | cKey;
-
-   #elif defined(__DJGPP__)
-
-      _farpokeb( 0x0040, 0x0017, ( _farpeekb( 0x0040, 0x0017 ) & ( !cKey ) ) | cKey );
-
+   #if defined( __WATCOMC__ ) && defined( __386__ )
+      *( ( char * ) 0x0417 ) = ( *( ( char * ) 0x0417 ) & ( ! cKey ) ) | cKey;
+   #elif defined( __DJGPP__ )
+      _farpokeb( 0x0040, 0x0017, ( _farpeekb( 0x0040, 0x0017 ) & ( ! cKey ) ) | cKey );
    #else
-
-      *( ( char FAR * ) MK_FP( 0x0040, 0x0017 ) ) = ( *( ( char FAR * ) MK_FP( 0x0040, 0x0017 ) ) & ( !cKey ) ) | cKey;
-
+      *( ( char FAR * ) MK_FP( 0x0040, 0x0017 ) ) = ( *( ( char FAR * ) MK_FP( 0x0040, 0x0017 ) ) & ( ! cKey ) ) | cKey;
    #endif
    }
-
 }
 
 #endif /* #if defined (HB_OS_DOS) */
 
-#if defined (HB_OS_WIN)
+#if defined ( HB_OS_WIN )
 /*
- The following function ONLY works with GTWVT/GTWVW/GTALLEG.
- They will NOT WORK on pure CONSOLE mode
-*/
+   The following function ONLY works with GTWVT/GTWVW/GTALLEG.
+   They will NOT WORK on pure CONSOLE mode
+ */
 #include "hbapi.h"
 #include <windows.h>
 
-#define HB_VK_INSERT         0x2D
-#define HB_VK_CAPITAL        0x14
-#define HB_VK_NUMLOCK        0x90
-#define HB_VK_SCROLL         0x91
+#define HB_VK_INSERT    0x2D
+#define HB_VK_CAPITAL   0x14
+#define HB_VK_NUMLOCK   0x90
+#define HB_VK_SCROLL    0x91
 
 static BOOL hb_SetKeyBoardState( USHORT uKey, BOOL bOn )
 {
-   BYTE kbBuffer[ 256 ];
-   BOOL bRetval;
+   BYTE  kbBuffer[ 256 ];
+   BOOL  bRetval;
 
    GetKeyboardState( kbBuffer );
 
    if( kbBuffer[ uKey ] & 0x01 )
    {
-      if( !bOn)
+      if( ! bOn )
       {
          kbBuffer[ uKey ] = 0;
       }
    }
    else
    {
-      if( bOn)
+      if( bOn )
       {
          kbBuffer[ uKey ] = 1;
       }
@@ -176,24 +162,24 @@ static BOOL hb_SetKeyBoardState( USHORT uKey, BOOL bOn )
 
 }
 
-HB_FUNC (KSETINS)
+HB_FUNC( KSETINS )
 {
-   hb_retl(hb_SetKeyBoardState( HB_VK_INSERT , hb_parl(1) ));
+   hb_retl( hb_SetKeyBoardState( HB_VK_INSERT, hb_parl( 1 ) ) );
 }
 
-HB_FUNC (KSETCAPS)
+HB_FUNC( KSETCAPS )
 {
-   hb_retl(hb_SetKeyBoardState( HB_VK_CAPITAL, hb_parl(1) ));
+   hb_retl( hb_SetKeyBoardState( HB_VK_CAPITAL, hb_parl( 1 ) ) );
 }
 
-HB_FUNC (KSETNUM)
+HB_FUNC( KSETNUM )
 {
-   hb_retl(hb_SetKeyBoardState( HB_VK_NUMLOCK, hb_parl(1) ));
+   hb_retl( hb_SetKeyBoardState( HB_VK_NUMLOCK, hb_parl( 1 ) ) );
 }
 
-HB_FUNC (KSETSCROLL)
+HB_FUNC( KSETSCROLL )
 {
-   hb_retl(hb_SetKeyBoardState( HB_VK_SCROLL , hb_parl(1) ));
+   hb_retl( hb_SetKeyBoardState( HB_VK_SCROLL, hb_parl( 1 ) ) );
 }
 
 #endif /* #if defined (HB_OS_WIN) */

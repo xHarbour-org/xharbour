@@ -75,57 +75,72 @@ RETURN ( GetList := aGetList ) <> NIL
 */
 
 FUNCTION CountGets()
-RETURN LEN( GetList )
+
+   RETURN Len( GetList )
 
 FUNCTION CurrentGet()
-  LOCAL nPos, ;
-        oActive := GetActive()
-  nPos:= ASCAN( GetList, {|oGet| oGet == oActive } )
-RETURN nPos
+
+   LOCAL nPos, ;
+      oActive := GetActive()
+
+   nPos := AScan( GetList, {|oGet| oGet == oActive } )
+
+   RETURN nPos
 
 FUNCTION GetFldRow( nField )
-  LOCAL nRow := -1
-  DEFAULT nField  TO  CurrentGet()
-  IF ( nField >= 1 .AND. nField <= LEN( GetList ) )
-    nRow := GetList[ nField ]:Row
-  ENDIF
-RETURN nRow
+
+   LOCAL nRow := - 1
+
+   DEFAULT nField  TO  CurrentGet()
+   IF ( nField >= 1 .AND. nField <= Len( GetList ) )
+      nRow := GetList[ nField ]:Row
+   ENDIF
+
+   RETURN nRow
 
 FUNCTION GetFldCol( nField )
-  LOCAL nCol := -1
-  DEFAULT nField  TO  CurrentGet()
-  IF ( nField >= 1 .AND. nField <= LEN( GetList ) )
-    nCol := GetList[ nField ]:Col
-  ENDIF
-RETURN nCol
+
+   LOCAL nCol := - 1
+
+   DEFAULT nField  TO  CurrentGet()
+   IF ( nField >= 1 .AND. nField <= Len( GetList ) )
+      nCol := GetList[ nField ]:Col
+   ENDIF
+
+   RETURN nCol
 
 FUNCTION GetFldVar( nField )
-  LOCAL nVar := -1
-  DEFAULT nField  TO  CurrentGet()
-  IF ( nField >= 1 .AND. nField <= LEN( GetList ) )
-    nVar := GetList[ nField ]:Name
-  ENDIF
-RETURN nVar
 
-FUNCTION GetInput(xDefault, nRow, nCol, lSay, cPrompt)
-Local GetList := {}
+   LOCAL nVar := - 1
 
-if nRow # nil
-  SetPos(nRow, nCol)
-endif
-if cPrompt # nil
-  DispOut(cPrompt)
-  nRow := Row()
-  nCol := Col() + 1
-else
-  nRow := Row()
-  nCol := Col()
-endif
-@ nRow, nCol GET xDefault
-READ
+   DEFAULT nField  TO  CurrentGet()
+   IF ( nField >= 1 .AND. nField <= Len( GetList ) )
+      nVar := GetList[ nField ]:Name
+   ENDIF
 
-if lSay # nil .and. lSay
-  SetPos(nRow, nCol)
-  DispOut(xDefault)
-endif
-RETURN xDefault
+   RETURN nVar
+
+FUNCTION GetInput( xDefault, nRow, nCol, lSay, cPrompt )
+
+   LOCAL GetList := {}
+
+   IF nRow # nil
+      SetPos( nRow, nCol )
+   ENDIF
+   IF cPrompt # nil
+      DispOut( cPrompt )
+      nRow := Row()
+      nCol := Col() + 1
+   ELSE
+      nRow := Row()
+      nCol := Col()
+   ENDIF
+   @ nRow, nCol GET xDefault
+   READ
+
+   IF lSay # nil .AND. lSay
+      SetPos( nRow, nCol )
+      DispOut( xDefault )
+   ENDIF
+
+   RETURN xDefault

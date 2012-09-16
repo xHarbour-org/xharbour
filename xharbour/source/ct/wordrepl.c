@@ -3,7 +3,7 @@
  */
 
 /*
- * Harbour Project source code: 
+ * Harbour Project source code:
  *   CT3 string function WORDREPL()
  *
  * Copyright 2001 IntTec GmbH, Neunlindenstr 32, 79106 Freiburg, Germany
@@ -52,162 +52,156 @@
  *
  */
 
-
 #include "ct.h"
 
-
-
-HB_FUNC (WORDREPL)
+HB_FUNC( WORDREPL )
 {
 
-  int iNoRet;
-  int iMultiPass;
+   int      iNoRet;
+   int      iMultiPass;
 
-  size_t sSearchLen, sReplaceLen;
+   size_t   sSearchLen, sReplaceLen;
 
-  /* suppressing return value ? */
-  iNoRet = ct_getref() && ISBYREF( 2 );
-  iMultiPass = ct_getatmupa();
+   /* suppressing return value ? */
+   iNoRet      = ct_getref() && ISBYREF( 2 );
+   iMultiPass  = ct_getatmupa();
 
-  /* param check */
-  if (((sSearchLen = (size_t)hb_parclen (1))/2 > 0) &&
-      (ISCHAR (2)) &&
-      ((sReplaceLen = (size_t)hb_parclen (3))/2 > 0))
-  {
+   /* param check */
+   if( ( ( sSearchLen = ( size_t ) hb_parclen( 1 ) ) / 2 > 0 ) &&
+       ( ISCHAR( 2 ) ) &&
+       ( ( sReplaceLen = ( size_t ) hb_parclen( 3 ) ) / 2 > 0 ) )
+   {
 
-    /* get parameters */
-    const char *pcSearch = hb_parc (1);
-    const char *pcString = hb_parc (2);
-    size_t sStrLen = (size_t)hb_parclen (2);
-    const char *pcReplace = hb_parc (3);
-    int iMode;
-    char *pcRet;
-    size_t sIndex;
+      /* get parameters */
+      const char *   pcSearch    = hb_parc( 1 );
+      const char *   pcString    = hb_parc( 2 );
+      size_t         sStrLen     = ( size_t ) hb_parclen( 2 );
+      const char *   pcReplace   = hb_parc( 3 );
+      int            iMode;
+      char *         pcRet;
+      size_t         sIndex;
 
-    if (ISLOG (4))
-    {
-      iMode = hb_parl (4);
-    }
-    else
-    {
-      iMode =0;
-    }
-
-    pcRet = ( char * ) hb_xgrab (sStrLen + 1);
-    hb_xmemcpy (pcRet, pcString, sStrLen);
-
-    for (sIndex = 0; sIndex < (sSearchLen&0xFFFFFFFE); sIndex+=2)
-    {
-    
-      size_t sMatchStrLen;
-      const char *pc;
-      size_t sReplIndex = sIndex;
-
-      if (sReplIndex > (sReplaceLen&0xFFFFFFFE))
+      if( ISLOG( 4 ) )
       {
-        sReplIndex = (sReplaceLen&0xFFFFFFFE);
-      }
-
-      pc = pcString;
-      while ((pc = ct_at_exact_forward (pc, sStrLen-(pc-pcString),
-                                        pcSearch+sIndex, 2,
-                                        &sMatchStrLen)) != NULL)
-      {
-        if (iMode)
-        {
-          /* always replace */
-          *(pcRet+(pc-pcString)) = *(pcReplace+sReplIndex);
-          *(pcRet+(pc-pcString)+1) = *(pcReplace+sReplIndex+1);
-          
-          if (iMultiPass)
-          {
-            pc++;
-          }
-          else
-          {
-            pc+=2;
-          }
-
-        }
-        else
-        {
-          /* replace only if pc is an even position */
-          if (((pc-pcString)%2) == 0)
-          {
-            *(pcRet+(pc-pcString)) = *(pcReplace+sReplIndex);
-            *(pcRet+(pc-pcString)+1) = *(pcReplace+sReplIndex+1);
-            /* parse pcString in steps of two characters */
-            pc+=2;
-          }
-          else
-          {
-            /* we are on an odd position, so add only 1 to pc */
-            pc++;
-          }
-        }
-      }
-    }
-
-    /* return string */
-    if (ISBYREF (2))
-    {
-      hb_storclen (pcRet, sStrLen, 2);
-    }
-
-    if (iNoRet)
-    {
-      hb_retl (0);
-    }
-    else
-    {
-      hb_retclen (pcRet, sStrLen);
-    }
-
-    hb_xfree (pcRet);
-
-  }
-  else /* ((sSearchLen = (size_t)hb_parclen (1))/2 > 0) &&
-          (ISCHAR (2)) &&
-          ((sReplaceLen = (size_t)hb_parclen (3))/2 > 0))  */
-  {
-    PHB_ITEM pSubst = NULL;
-    int iArgErrorMode = ct_getargerrormode();
-    if (iArgErrorMode != CT_ARGERR_IGNORE)
-    {
-      pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_WORDREPL,
-                               NULL, "WORDREPL", 0, EF_CANSUBSTITUTE, 4,
-                               hb_paramError (1), hb_paramError (2),
-                               hb_paramError (3), hb_paramError (4));
-    }
-
-    if (pSubst != NULL)
-    {
-      hb_itemRelease( hb_itemReturnForward( pSubst ) );
-    }
-    else
-    {
-      if (iNoRet)
-      {
-        hb_retl (0);
+         iMode = hb_parl( 4 );
       }
       else
       {
-        if (ISCHAR (2))
-        {
-          hb_retclen (hb_parc (2), hb_parclen (2));
-        }
-        else
-        {
-          hb_retc ("");
-        }
+         iMode = 0;
       }
-    }
-  }
 
-  return;
+      pcRet = ( char * ) hb_xgrab( sStrLen + 1 );
+      hb_xmemcpy( pcRet, pcString, sStrLen );
+
+      for( sIndex = 0; sIndex < ( sSearchLen & 0xFFFFFFFE ); sIndex += 2 )
+      {
+
+         size_t         sMatchStrLen;
+         const char *   pc;
+         size_t         sReplIndex = sIndex;
+
+         if( sReplIndex > ( sReplaceLen & 0xFFFFFFFE ) )
+         {
+            sReplIndex = ( sReplaceLen & 0xFFFFFFFE );
+         }
+
+         pc = pcString;
+         while( ( pc = ct_at_exact_forward( pc, sStrLen - ( pc - pcString ),
+                                            pcSearch + sIndex, 2,
+                                            &sMatchStrLen ) ) != NULL )
+         {
+            if( iMode )
+            {
+               /* always replace */
+               *( pcRet + ( pc - pcString ) )      = *( pcReplace + sReplIndex );
+               *( pcRet + ( pc - pcString ) + 1 )  = *( pcReplace + sReplIndex + 1 );
+
+               if( iMultiPass )
+               {
+                  pc++;
+               }
+               else
+               {
+                  pc += 2;
+               }
+
+            }
+            else
+            {
+               /* replace only if pc is an even position */
+               if( ( ( pc - pcString ) % 2 ) == 0 )
+               {
+                  *( pcRet + ( pc - pcString ) )      = *( pcReplace + sReplIndex );
+                  *( pcRet + ( pc - pcString ) + 1 )  = *( pcReplace + sReplIndex + 1 );
+                  /* parse pcString in steps of two characters */
+                  pc                                  += 2;
+               }
+               else
+               {
+                  /* we are on an odd position, so add only 1 to pc */
+                  pc++;
+               }
+            }
+         }
+      }
+
+      /* return string */
+      if( ISBYREF( 2 ) )
+      {
+         hb_storclen( pcRet, sStrLen, 2 );
+      }
+
+      if( iNoRet )
+      {
+         hb_retl( 0 );
+      }
+      else
+      {
+         hb_retclen( pcRet, sStrLen );
+      }
+
+      hb_xfree( pcRet );
+
+   }
+   else /* ((sSearchLen = (size_t)hb_parclen (1))/2 > 0) &&
+           (ISCHAR (2)) &&
+           ((sReplaceLen = (size_t)hb_parclen (3))/2 > 0))  */
+   {
+      PHB_ITEM pSubst         = NULL;
+      int      iArgErrorMode  = ct_getargerrormode();
+      if( iArgErrorMode != CT_ARGERR_IGNORE )
+      {
+         pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_WORDREPL,
+                                  NULL, "WORDREPL", 0, EF_CANSUBSTITUTE, 4,
+                                  hb_paramError( 1 ), hb_paramError( 2 ),
+                                  hb_paramError( 3 ), hb_paramError( 4 ) );
+      }
+
+      if( pSubst != NULL )
+      {
+         hb_itemRelease( hb_itemReturnForward( pSubst ) );
+      }
+      else
+      {
+         if( iNoRet )
+         {
+            hb_retl( 0 );
+         }
+         else
+         {
+            if( ISCHAR( 2 ) )
+            {
+               hb_retclen( hb_parc( 2 ), hb_parclen( 2 ) );
+            }
+            else
+            {
+               hb_retc( "" );
+            }
+         }
+      }
+   }
+
+   return;
 
 }
-
-
-
 

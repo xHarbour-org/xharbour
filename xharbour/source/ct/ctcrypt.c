@@ -58,24 +58,24 @@ HB_FUNC( CRYPT )
 
    if( ulCryptLen >= 2 )
    {
-      BYTE * pbyCrypt = ( BYTE * ) hb_parcx( 2 );
-      ULONG ulCryptPos = 0;
+      BYTE *   pbyCrypt    = ( BYTE * ) hb_parcx( 2 );
+      ULONG    ulCryptPos  = 0;
 
-      BYTE * pbyString = ( BYTE * ) hb_parcx( 1 );
-      ULONG ulStringLen = hb_parclen( 1 );
-      ULONG ulStringPos;
+      BYTE *   pbyString   = ( BYTE * ) hb_parcx( 1 );
+      ULONG    ulStringLen = hb_parclen( 1 );
+      ULONG    ulStringPos;
 
-      BYTE * pbyResult = ( BYTE * ) hb_xgrab( ulStringLen + 1 );
+      BYTE *   pbyResult   = ( BYTE * ) hb_xgrab( ulStringLen + 1 );
 
-      USHORT uiCount2 = ( ( ( USHORT ) ( pbyCrypt[ ulCryptPos ] + ( USHORT ) ( pbyCrypt[ ulCryptPos + 1 ] * 256 ) ) ) & 0xFFFF ) ^ ( ( USHORT ) ulCryptLen & 0xFFFF );
-      USHORT uiCount1 = 0xAAAA;
+      USHORT   uiCount2    = ( ( ( USHORT ) ( pbyCrypt[ ulCryptPos ] + ( USHORT ) ( pbyCrypt[ ulCryptPos + 1 ] * 256 ) ) ) & 0xFFFF ) ^ ( ( USHORT ) ulCryptLen & 0xFFFF );
+      USHORT   uiCount1    = 0xAAAA;
 
       for( ulStringPos = 0; ulStringPos < ulStringLen; )
       {
-         USHORT uiTmpCount1 = uiCount1;
-         USHORT uiTmpCount2 = uiCount2;
-         BYTE byte = pbyString[ ulStringPos ] ^ pbyCrypt[ ulCryptPos++ ];
-         USHORT tmp;
+         USHORT   uiTmpCount1 = uiCount1;
+         USHORT   uiTmpCount2 = uiCount2;
+         BYTE     byte        = pbyString[ ulStringPos ] ^ pbyCrypt[ ulCryptPos++ ];
+         USHORT   tmp;
 
          uiTmpCount2 = HB_MKUSHORT( ( HB_LOBYTE( uiTmpCount2 ) ^ HB_HIBYTE( uiTmpCount2 ) ), HB_HIBYTE( uiTmpCount2 ) );
 
@@ -85,7 +85,7 @@ HB_FUNC( CRYPT )
          uiTmpCount2 ^= uiTmpCount1;
          uiTmpCount2 += 16;
 
-         uiCount2 = uiTmpCount2;
+         uiCount2    = uiTmpCount2;
 
          uiTmpCount2 &= 0x1E;
          uiTmpCount2 += 2;
@@ -104,14 +104,15 @@ HB_FUNC( CRYPT )
             uiTmpCount1 = ( uiTmpCount1 << 1 ) | ( ( uiTmpCount1 & 0x8000 ) >> 15 );
             uiTmpCount1 ^= 0xAAAA;
 
-            byTmp = HB_LOBYTE( uiTmpCount1 );
-            byTmp = ( byTmp << 1 ) | ( ( byTmp & 0x80 ) >> 7 );
+            byTmp       = HB_LOBYTE( uiTmpCount1 );
+            byTmp       = ( byTmp << 1 ) | ( ( byTmp & 0x80 ) >> 7 );
 
             uiTmpCount1 = HB_MKUSHORT( byTmp, HB_HIBYTE( uiTmpCount1 ) );
 
-         } while ( --uiTmpCount2 );
+         }
+         while( --uiTmpCount2 );
 
-         uiCount1 = uiTmpCount1;
+         uiCount1                   = uiTmpCount1;
 
          pbyResult[ ulStringPos++ ] = byte ^ HB_LOBYTE( uiTmpCount1 );
 
