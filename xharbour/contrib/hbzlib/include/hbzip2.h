@@ -109,7 +109,7 @@ typedef const char * LPCSTR;
 typedef LPCSTR LPCTSTR;
 #endif
 
-extern char     * hb___CheckFile( char * szFile );
+extern char     * hb___CheckFile( char * szFile, BOOL bExist );
 extern unsigned long   GetCurrentFileSize(   LPCTSTR szFile );
 
 extern PHB_ITEM hb___GetFileNamesFromZip( char * szFile, BOOL iMode );

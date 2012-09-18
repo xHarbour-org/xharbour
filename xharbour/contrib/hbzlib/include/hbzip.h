@@ -81,7 +81,7 @@ HB_EXTERN_BEGIN
 #define Crc32     8
 
 extern uLong hb___filetime( char * f, tm_zip * tmzip, uLong * dt );
-extern char * hb___CheckFile( char * szFile );
+extern char * hb___CheckFile( char * szFile, BOOL bExist );
 extern int hb___CompressOneFile( char * szFile, char * szFiletoCompress, int iCompLevel, PHB_ITEM pBlock, BOOL bOverWrite );
 extern int hb___CompressMultipleFile( char * szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock, BOOL bOverWrite );
 extern BOOL hb___unZipFiles( char * szFile, PHB_ITEM pBlock, BOOL bExtractPath );

@@ -475,7 +475,7 @@ HB_FUNC( HB_ZIPFILE )
          }
 
          hb_xfree( pCurDir );
-         szZipFileName = hb___CheckFile( szFile );
+         szZipFileName = hb___CheckFile( szFile, FALSE );
 
          if( szZipFileName && hb_arrayLen( FileToZip ) > 0 )
          {
@@ -509,7 +509,7 @@ HB_FUNC( HB_GETFILESINZIP )
       char *   szZipFileName;
 
       hb_xstrcpy( szFile, hb_parc( 1 ), 0 );
-      szZipFileName = hb___CheckFile( szFile );;
+      szZipFileName = hb___CheckFile( szFile, TRUE );;
 
       if( szZipFileName )
       {
@@ -540,7 +540,7 @@ HB_FUNC( HB_GETFILECOUNT )
       char *   szZipFileName;
 
       hb_xstrcpy( szFile, hb_parc( 1 ), 0 );
-      szZipFileName = hb___CheckFile( szFile );
+      szZipFileName = hb___CheckFile( szFile, TRUE );
 
       if( szZipFileName )
       {
@@ -597,7 +597,7 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
             hb_xstrcpy( szFile, hb_parc( 1 ), 0 );
          }
          hb_xfree( pCurDir );   /* by JGS */
-         szZipFileName = hb___CheckFile( szFile );
+         szZipFileName = hb___CheckFile( szFile, TRUE );
 
          if( szZipFileName && hb_arrayLen( FileToZip ) > 0 )
          {
@@ -671,7 +671,7 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
          }
          hb_xfree( pCurDir );
          /* by JGS */
-         szZipFileName = hb___CheckFile( szFile );
+         szZipFileName = hb___CheckFile( szFile, TRUE );
 
          if( szZipFileName && hb_arrayLen( FileToZip ) > 0 )
          {
@@ -709,7 +709,7 @@ HB_FUNC( HB_UNZIPFILE )
       char     szFile[ HB_PATH_MAX ];
 
       hb_xstrcpy( szFile, hb_parc( 1 ), 0 );
-      szZipFileName = hb___CheckFile( szFile );
+      szZipFileName = hb___CheckFile( szFile, TRUE );
 
       if( szZipFileName )
       {
@@ -798,7 +798,7 @@ HB_FUNC( HB_ZIPDELETEFILES )
 
          DelZip         = hb_itemArrayNew( 0 );
          hb_xstrcpy( szFile, hb_parc( 1 ), 0 );
-         szZipFileName  = hb___CheckFile( szFile );
+         szZipFileName  = hb___CheckFile( szFile, TRUE );
 
          if( szZipFileName )
          {
@@ -885,7 +885,7 @@ HB_FUNC( HB_ZIPTESTPK )
    char *   szZipFileName;
 
    hb_xstrcpy( szFile, hb_parc( 1 ), 0 );
-   szZipFileName = hb___CheckFile( szFile );
+   szZipFileName = hb___CheckFile( szFile, TRUE );
 
    if( szZipFileName )
    {
@@ -927,7 +927,7 @@ HB_FUNC( HB_UNZIPFILEINDEX )
          int      ulLen;
 
          hb_xstrcpy( szFile, hb_parc( 1 ), 0 );
-         szZipFileName = hb___CheckFile( szFile );
+         szZipFileName = hb___CheckFile( szFile, TRUE );
 
          if( szZipFileName )
          {
@@ -1011,6 +1011,7 @@ HB_FUNC( SETZIPREADONLY )
 {
    hb_SetZipReadOnly( hb_parl( 1 ) );
 }
+
 HB_FUNC( HB_UNZIPALLFILE )
 {
    if( ! ISCHAR( 6 ) && ! ISARRAY( 6 ) )
@@ -1019,7 +1020,7 @@ HB_FUNC( HB_UNZIPALLFILE )
       char *   szZipFile;
 
       hb_xstrcpy( szFile, hb_parc( 1 ), 0 );
-      szZipFile = hb___CheckFile( szFile );
+      szZipFile = hb___CheckFile( szFile, TRUE );
 
       if( szZipFile )
       {

@@ -411,9 +411,9 @@ PHB_ITEM hb___GetFileNamesFromZip( char * szFile, BOOL iMode )
    return ZipArray;
 }
 
-char * hb___CheckFile( char * szFile )
+char * hb___CheckFile( char * szFile, BOOL bExist )
 {
-   if( szFile && hb_spFile( ( const char * ) szFile, NULL ) )
+   if( szFile && ( bExist ? hb_spFile( ( const char * ) szFile, NULL ) : TRUE ) )
    {
       PHB_FNAME   pFileName   = hb_fsFNameSplit( szFile );
       char *      szZipName   = ( char * ) hb_xgrab( HB_PATH_MAX );
@@ -425,6 +425,7 @@ char * hb___CheckFile( char * szFile )
 
       hb_fsFNameMerge( szZipName, pFileName );
       hb_xfree( pFileName );
+
       return szZipName;
    }
 
