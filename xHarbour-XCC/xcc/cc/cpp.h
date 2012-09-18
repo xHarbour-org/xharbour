@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-#define INS   32768     /* input buffer size */
+#define INS   65536     /* input buffer size */
 #define OBS   4096      /* outbut buffer size */
 #define NARG  127       /* max number of arguments to a macro (old limit 32) */
 #define NIF   63        /* depth of nesting of #if (old limit 32) */

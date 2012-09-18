@@ -112,8 +112,10 @@ void process_exports(void)
 
             if (!options.no_export_object)
                 write_and_process_export_object();
+            /* Ron Pinkas
             if (!options.no_import_archive)
                 write_import_archive();
+            */
         }
     }
 }
@@ -462,7 +464,7 @@ static void *write_export_object_file(void *ip)
         address_table[idx] = 0;
         nameptr_table[i] = ((char *)ip - (char *)export);
         ordinal_table[i] = idx;
-        
+
         /* Ron Pinkas Aug 13 2012
         strcpy(ip, exp->name);
         */
