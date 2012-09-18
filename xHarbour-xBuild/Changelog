@@ -8,6 +8,10 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-17 19:11 UTC-0700 Ron Pinkas <Ron in xHarbour.com>
+  * tproject.prg
+    + Added HACK support for IMP LIB generation to follow DLL generation.
+
 2009-12-21 15:50 UTC-0450 Ron Pinkas <Ron in xHarbour.com>
   * tproject.prg
     + Added OleDialog.lib and version.lib to ::C_Libs

@@ -1327,7 +1327,9 @@ RETURN Self
 
 METHOD Refresh() CLASS TMakeObject
 
-   #ifndef __PLATFORM__Windows
+   #ifdef __PLATFORM__Windows
+      LOCAL lBuildImpLib := .F.
+   #else
       //On Linux Install the Libraries to xBuilder Lib Folder
       LOCAL lExecuteLibInstall := .F.
    #endif
@@ -1364,13 +1366,16 @@ METHOD Refresh() CLASS TMakeObject
          TraceLog( ::Lib_Executable + " " + ::LIB_Command() )
 
          #ifndef __PLATFORM__Windows
-            lExecuteLibInstall := .T.
+            lExecuteLibInstall := ValType( ::bLib_Install ) == 'B'
          #endif
 
          EXIT
 
       CASE TYPE_DLL
          TraceLog( ::Link_Executable + " " + ::DLL_Command() )
+         IF ::Link_Executable == "xlink.exe" .AND. ( ! ( "-NOIMPLIB" IN ::DLL_Command() ) )
+            lBuildImpLib := .T.
+         ENDIF
          EXIT
 
       CASE TYPE_HRB
@@ -1392,15 +1397,6 @@ METHOD Refresh() CLASS TMakeObject
       Eval( ::bAction, Self )
    ENDIF
 
-   #ifndef __PLATFORM__Windows
-      IF lExecuteLibInstall
-         ::bAction := ::bLib_Install
-         IF ValType( ::bAction ) == 'B'
-            Eval( ::bAction, Self )
-         ENDIF
-      ENDIF
-   #endif
-
    ::lCurrent := .T.
 
    ::Reset()
@@ -1408,6 +1404,17 @@ METHOD Refresh() CLASS TMakeObject
    IF ! ::lCurrent
       Throw( ErrorNew( "xBuild", 0, 1001, Self:ClassName, "Couldn't build: " + ::cFile, HB_aParams() ) )
    ENDIF
+
+   #ifdef __PLATFORM__Windows
+      IF lBuildImpLib
+         TraceLog( ::Lib_Executable + " " + ::IMPLIB_Command() )
+         Eval( ::bImpLib_Build, Self )
+      ENDIF
+   #else
+      IF lExecuteLibInstall
+         Eval( ::bLib_Install, Self )
+      ENDIF
+   #endif
 
 RETURN Self
 
@@ -1627,6 +1634,8 @@ CLASS TMakeProject FROM TMakeObject
 
    METHOD LIB_Command()
 
+   METHOD IMPLIB_Command()
+
    #ifdef __PLATFORM__Windows
 
       #ifdef OLD_PROCESS
@@ -1653,6 +1662,12 @@ CLASS TMakeProject FROM TMakeObject
 
          VAR bLIB_Build INIT {|Self| CreateProcessWait( ::Librarian, ;
                                                         ::Lib_Executable + " " + ::LIB_Command(), ;
+                                                        ::Project:cFile + ".log", ;
+                                                        "PATH=" + ::Project:C_RootX + "..\Common7\Ide" + Chr(0) + ;
+                                                        "SystemRoot=" + GetEnv( "SystemRoot" ) + Chr(0) ) } PROTECTED
+
+         VAR bIMPLIB_Build INIT {|Self| CreateProcessWait( ::Librarian, ;
+                                                        ::Lib_Executable + " " + ::IMPLIB_Command(), ;
                                                         ::Project:cFile + ".log", ;
                                                         "PATH=" + ::Project:C_RootX + "..\Common7\Ide" + Chr(0) + ;
                                                         "SystemRoot=" + GetEnv( "SystemRoot" ) + Chr(0) ) } PROTECTED
@@ -2162,6 +2177,14 @@ METHOD Lib_Command() CLASS TMakeProject
       cCommand += ::Lib_OutputFlag + ::OutputFile( .F. ) + " "
       cCommand += ::Lib_AddFlag + StrTran( Self:ObjList(), ",", " " + ::Lib_AddFlag )
    ENDIF
+
+RETURN cCommand
+
+METHOD ImpLib_Command() CLASS TMakeProject
+
+   LOCAL cCommand, cOutputDll := ::OutputFile( .T. ), cOutputBase := Left( cOutputDll, Len( cOutputDll ) - 4 )
+
+   cCommand := "-OUT:" + '"' + cOutputBase + ".lib" + '"' + " " + ::OutputFile( .F. )
 
 RETURN cCommand
 
