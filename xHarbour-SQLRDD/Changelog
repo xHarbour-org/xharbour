@@ -8,6 +8,12 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-18 19:16 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/sqlrdd0.prg
+    ! fixed sr_renametable under postgresql
+  * source/sqlrdd2.prg
+    ! minor fix to method QuotedNull() when database is postgresql and old behavior is set
+  
 2012-09-17 19:16 UTC-0800 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/firebird.c
     * Define _INTPTR_T_DEFINED for xCC and Borland

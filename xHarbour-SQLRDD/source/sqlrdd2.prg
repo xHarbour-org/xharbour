@@ -2009,7 +2009,7 @@ METHOD QuotedNull( uData, trim, nLen, nDec, nTargetDB, lNull, lMemo )   CLASS SR
    DEFAULT lNull     := .T.
    DEFAULT lMemo     := .F.
 
-   If empty( uData ) .and. (!cType $ "AOH") .and. ((nTargetDB = SYSTEMID_POSTGR .and. cType $ "DCMNT" .and. cType != "L"  .and. SETPGSOLDBEHAVIOR()) .or. ( nTargetDB != SYSTEMID_POSTGR .and. cType != "L" ))
+   If empty( uData ) .and. (!cType $ "AOH") .and. ((nTargetDB = SYSTEMID_POSTGR .and. cType $ "DCMNT" .and. cType != "L"  ) .or. ( nTargetDB != SYSTEMID_POSTGR .and. cType != "L" ))
 
 
       If lNull
@@ -2021,6 +2021,13 @@ METHOD QuotedNull( uData, trim, nLen, nDec, nTargetDB, lNull, lMemo )   CLASS SR
          Case cType $ "CM" .and. ::nTCCompat > 0
             Return "'" + uData + "'"
          Case cType $ "CM"
+          if nTargetDB = SYSTEMID_POSTGR 
+             if SETPGSOLDBEHAVIOR()
+                Return "''"
+             else
+                Return "' '"
+             endif   
+          endif   
             Return "' '"
          Case cType == "N"
             Return "0"

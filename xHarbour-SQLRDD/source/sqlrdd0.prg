@@ -1617,7 +1617,7 @@ Function SR_RenameTable( cTable, cNewName, cOwner )
 
    aRet   := eval( SR_GetTableInfoBlock(), cTable )
    cTable := SR_ParseFileName( alltrim( aRet[ TABLE_INFO_TABLE_NAME ] ) )
-
+altd()
    If cOwner == NIL
       cOwner := aRet[ TABLE_INFO_OWNER_NAME ]
       If !Empty( SR_GetGlobalOwner() )
@@ -1661,12 +1661,18 @@ Function SR_RenameTable( cTable, cNewName, cOwner )
    Case SYSTEMID_POSTGR
    Case SYSTEMID_ORACLE
    Case SYSTEMID_MYSQL
-      nRet := oCnn:exec( "ALTER TABLE " + cOwner + cTable + " RENAME TO " + cOwner + cNewName, .F. )
+   
+      IF oCnn:nSystemID == SYSTEMID_POSTGR
+         nRet := oCnn:exec( "ALTER TABLE " + cOwner +SR_DBQUALIFY(cTable+"_sq",oCnn:nSystemID) + "RENAME TO " + cOwner + SR_DBQUALIFY(cNewName+"_sq",oCnn:nSystemID), .F. )            
+      ENDIF
+
+      nRet := oCnn:exec( "ALTER TABLE " + cOwner + SR_DBQUALIFY(cTable,oCnn:nSystemID) + " RENAME TO " + cOwner + SR_DBQUALIFY(cNewName,oCnn:nSystemID), .F. )
       If nRet == SQL_SUCCESS .or. nRet == SQL_SUCCESS_WITH_INFO
          lOk := .T.
       EndIf
+   
       IF oCnn:nSystemID == SYSTEMID_POSTGR
-         nRet := oCnn:exec( "ALTER TABLE " + cOwner +cTable+"_sq" + "RENAME TO " + cOwner + cNewName+"_sq", .F. )            
+         nRet := oCnn:exec( "ALTER TABLE "+cOwner + SR_DBQUALIFY(cNewName,oCnn:nSystemID) +" ALTER COLUMN " + SR_RecnoName()+ " SET DEFAULT nextval('"+ lower(cNewName)+"_sq'::regclass)");
       ENDIF
       IF oCnn:nSystemID == SYSTEMID_ORACLE
          nRet := oCnn:exec( "RENAME " + cOwner +cTable+"_sq" + " TO " + cOwner + cNewName+"_sq", .F. )            
