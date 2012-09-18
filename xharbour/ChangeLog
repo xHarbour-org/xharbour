@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-19 04:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * bin/bld.bat
+    ! remove MT attributes from non-vm libraries
+
 2012-09-19 02:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbzlib/zip.c
   * contrib/hbzlib/zipnew.cpp
