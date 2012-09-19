@@ -428,14 +428,14 @@ Function SR_AddConnection( nType, cDSN, cUser, cPassword, cOwner, lCounter, lAut
    If oConnect:nSystemID != 0 .and. oConnect:nSystemID != NIL
 
       oConnect:nConnectionType := nType
-      
+
 
       /* Create other connections to the database */
 
       If nType < CONNECT_NOEXLOCK
          oConnect:oSqlTransact := oConnect2:Connect( "", cUser, cPassword, 1, cOwner, 4000, .F.,;
                                   cDSN, 50, "ANSI", 0, 0, 0, .T., lAutoCommit, nTimeout )
-         oConnect2:nConnectionType := nType                                       
+         oConnect2:nConnectionType := nType
       ElseIf nType < CONNECT_QUERY_ONLY
          lNoSetEnv := .F.
       Else
@@ -596,7 +596,7 @@ Static Function SR_SetEnvSQLRDD( oConnect )
 
       Case SYSTEMID_MSSQL7
       Case SYSTEMID_MSSQL6
-      Case SYSTEMID_AZURE	
+      Case SYSTEMID_AZURE
          oCnn:Commit()
          oCnn:exec( "SET QUOTED_IDENTIFIER ON" )
          oCnn:exec( "SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED" )
@@ -632,7 +632,7 @@ Static Function SR_SetEnvSQLRDD( oConnect )
          Exit
 
       Case SYSTEMID_FIREBR
-//         oCnn:exec( "SET TERM !@¨§;", .f. )
+//         oCnn:exec( "SET TERM !@Â¨Â§;", .f. )
          oCnn:Commit()
          Exit
 
@@ -701,14 +701,14 @@ Static Function SR_SetEnvSQLRDD( oConnect )
       oConnect:commit()
       oConnect:exec( "CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTVERSION (VERSION_ CHAR(20), SIGNATURE_ CHAR(20))",.F. )
       oConnect:commit()
-      
+
       If oConnect:nSystemID == SYSTEMID_AZURE
-      	
+
          oConnect:exec( "CREATE CLUSTERED INDEX " + if( oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner() ) + "SR_MGMNTVERSION01 ON " + SR_GetToolsOwner() + "SR_MGMNTVERSION ( VERSION_ )",.F. )
-         oConnect:commit()      	
-      	
+         oConnect:commit()
+
       Endif
-      
+
       oConnect:exec( "INSERT INTO " + SR_GetToolsOwner() + "SR_MGMNTVERSION (VERSION_, SIGNATURE_) VALUES ('" + HB_SR__MGMNT_VERSION + "', '" + DTOS(DATE()) + " " + TIME() + "')" ,.T. )
       oConnect:commit()
       oConnect:exec( "DROP TABLE " + SR_GetToolsOwner() + "SR_MGMNTINDEXES",.F. )
@@ -737,7 +737,7 @@ Static Function SR_SetEnvSQLRDD( oConnect )
       oConnect:commit()
       oConnect:exec( "CREATE " + If(oConnect:nSystemID == SYSTEMID_AZURE," CLUSTERED " ," ") + " INDEX " + if( oConnect:nSystemID != SYSTEMID_ORACLE, "", SR_GetToolsOwner() ) + "SR_MGMNTCONSTRTGTCOLS01 ON " + SR_GetToolsOwner() + "SR_MGMNTCONSTRTGTCOLS ( SOURCETABLE_, CONSTRNAME_, ORDER_ )",.F. )
 
-      // Caché - should add dual table ,like Oracle
+      // CachÃ© - should add dual table ,like Oracle
 
       cRet := HB_SR__MGMNT_VERSION
 
@@ -768,7 +768,7 @@ Static Function SR_SetEnvSQLRDD( oConnect )
 
       Switch oConnect:nSystemID
       Case SYSTEMID_MSSQL7
-      Case SYSTEMID_AZURE	
+      Case SYSTEMID_AZURE
          oConnect:exec( "CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOCKS (LOCK_ CHAR(250) NOT NULL UNIQUE, WSID_ CHAR(250) NOT NULL, SPID_ NUMERIC(6), LOGIN_TIME_ DATETIME )",.F. )
          Exit
       Case SYSTEMID_POSTGR
@@ -978,7 +978,7 @@ Static Function SR_SetEnvMinimal( oConnect )
 
    Case SYSTEMID_MSSQL7
    Case SYSTEMID_MSSQL6
-   Case SYSTEMID_AZURE	
+   Case SYSTEMID_AZURE
       oCnn:Commit()
       oCnn:exec( "SET QUOTED_IDENTIFIER ON" )
       oCnn:exec( "SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED" )
@@ -1473,7 +1473,7 @@ Function SR_DropIndex( cIndexName, cOwner )
       If (nRet == SQL_SUCCESS .or. nRet == SQL_SUCCESS_WITH_INFO) .and. len(aRet) == 0
           aRet := {}
           nRet := oCnn:exec( "SELECT TABLE_, PHIS_NAME_, IDXNAME_, IDXCOL_, IDXFOR_, IDXKEY_ FROM " + SR_GetToolsOwner() + "SR_MGMNTINDEXES WHERE TAG_ = '" + Alltrim(ctempIndex) + "'" ,.F.,.T.,@aRet )
-         If (nRet == SQL_SUCCESS .or. nRet == SQL_SUCCESS_WITH_INFO) .and. len(aRet) == 0          
+         If (nRet == SQL_SUCCESS .or. nRet == SQL_SUCCESS_WITH_INFO) .and. len(aRet) == 0
             Return .F.
          ELSE
             lTag := .T.
@@ -1498,7 +1498,7 @@ Function SR_DropIndex( cIndexName, cOwner )
       Case SYSTEMID_MSSQL6
       Case SYSTEMID_MSSQL7
       Case SYSTEMID_SYBASE
-      Case SYSTEMID_AZURE	
+      Case SYSTEMID_AZURE
          oCnn:exec( "DROP INDEX " + cOwner + SR_DBQUALIFY( cFileName, oCnn:nSystemID ) + "." + cPhisicalName, .F. )
          Exit
       Case SYSTEMID_MYSQL
@@ -1527,7 +1527,7 @@ Function SR_DropIndex( cIndexName, cOwner )
          If aIndex[5][1] == "#"
             oWA:DropColumn( "INDFOR_" + substr(aIndex[5],2,3), .F. )
          EndIf
-         
+
          TEMPDROPCO->( dbCLoseArea() )
       EndIf
    Next
@@ -1617,7 +1617,7 @@ Function SR_RenameTable( cTable, cNewName, cOwner )
 
    aRet   := eval( SR_GetTableInfoBlock(), cTable )
    cTable := SR_ParseFileName( alltrim( aRet[ TABLE_INFO_TABLE_NAME ] ) )
-altd()
+
    If cOwner == NIL
       cOwner := aRet[ TABLE_INFO_OWNER_NAME ]
       If !Empty( SR_GetGlobalOwner() )
@@ -1652,7 +1652,7 @@ altd()
 
    Switch oCnn:nSystemID
    Case SYSTEMID_MSSQL7
-   Case SYSTEMID_AZURE	
+   Case SYSTEMID_AZURE
       nRet := oCnn:exec( "exec sp_rename " + cOwner + cTable + ", " + cOwner + cNewName, .F. )
       If nRet == SQL_SUCCESS .or. nRet == SQL_SUCCESS_WITH_INFO
          lOk := .T.
@@ -1661,22 +1661,22 @@ altd()
    Case SYSTEMID_POSTGR
    Case SYSTEMID_ORACLE
    Case SYSTEMID_MYSQL
-   
+
       IF oCnn:nSystemID == SYSTEMID_POSTGR
-         nRet := oCnn:exec( "ALTER TABLE " + cOwner +SR_DBQUALIFY(cTable+"_sq",oCnn:nSystemID) + "RENAME TO " + cOwner + SR_DBQUALIFY(cNewName+"_sq",oCnn:nSystemID), .F. )            
+         nRet := oCnn:exec( "ALTER TABLE " + cOwner +SR_DBQUALIFY(cTable+"_sq",oCnn:nSystemID) + "RENAME TO " + cOwner + SR_DBQUALIFY(cNewName+"_sq",oCnn:nSystemID), .F. )
       ENDIF
 
       nRet := oCnn:exec( "ALTER TABLE " + cOwner + SR_DBQUALIFY(cTable,oCnn:nSystemID) + " RENAME TO " + cOwner + SR_DBQUALIFY(cNewName,oCnn:nSystemID), .F. )
       If nRet == SQL_SUCCESS .or. nRet == SQL_SUCCESS_WITH_INFO
          lOk := .T.
       EndIf
-   
+
       IF oCnn:nSystemID == SYSTEMID_POSTGR
-         nRet := oCnn:exec( "ALTER TABLE "+cOwner + SR_DBQUALIFY(cNewName,oCnn:nSystemID) +" ALTER COLUMN " + SR_RecnoName()+ " SET DEFAULT nextval('"+ lower(cNewName)+"_sq'::regclass)");
+         nRet := oCnn:exec( "ALTER TABLE "+cOwner + SR_DBQUALIFY(cNewName,oCnn:nSystemID) +" ALTER COLUMN " + SR_RecnoName()+ " SET DEFAULT nextval('"+ lower(cNewName)+"_sq'::regclass)")
       ENDIF
       IF oCnn:nSystemID == SYSTEMID_ORACLE
-         nRet := oCnn:exec( "RENAME " + cOwner +cTable+"_sq" + " TO " + cOwner + cNewName+"_sq", .F. )            
-      ENDIF      
+         nRet := oCnn:exec( "RENAME " + cOwner +cTable+"_sq" + " TO " + cOwner + cNewName+"_sq", .F. )
+      ENDIF
       Exit
    End
 
@@ -1824,7 +1824,7 @@ Function SR_SetLocks( uLocks, oCnn, nRetries )
 
       Switch oCnn:nSystemID
       Case SYSTEMID_MSSQL7
-      Case SYSTEMID_AZURE	
+      Case SYSTEMID_AZURE
          cIns := "INSERT INTO " + SR_GetToolsOwner() + "SR_MGMNTLOCKS ( LOCK_, WSID_, SPID_, LOGIN_TIME_ ) VALUES ( '" + cValue + "', '" + SR_GetInternalID() + "', @@SPID, '" + oCnn:oSqlTransact:cLoginTime + "' )"
          cDel := "DELETE FROM SR_MGMNTLOCKS WHERE convert( CHAR(10), SPID_ ) + convert( CHAR(23), LOGIN_TIME_, 21 ) NOT IN (SELECT convert( CHAR(10), SPID) + CONVERT( CHAR(23), LOGIN_TIME, 21 ) FROM MASTER.DBO.SYSPROCESSES)"
          Exit
@@ -1881,7 +1881,7 @@ Function SR_SetLocks( uLocks, oCnn, nRetries )
          Case SYSTEMID_ORACLE
          Case SYSTEMID_POSTGR
          Case SYSTEMID_IBMDB2
-         Case SYSTEMID_AZURE	
+         Case SYSTEMID_AZURE
             cSql := "DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE LOCK_ = '" + cValue + "' AND WSID_ = '" + SR_GetInternalID() + "'"
             Exit
          End
@@ -1920,7 +1920,7 @@ Function SR_ReleaseLocks( uLocks, oCnn )
       Case SYSTEMID_ORACLE
       Case SYSTEMID_POSTGR
       Case SYSTEMID_IBMDB2
-      Case SYSTEMID_AZURE	
+      Case SYSTEMID_AZURE
          cSql := "DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE LOCK_ = '" + cValue + "' AND WSID_ = '" + SR_GetInternalID() + "'"
          Exit
       End
@@ -1957,7 +1957,7 @@ Function SR_ListLocks( oCnn, lAll )
       Exit
    Case SYSTEMID_MSSQL7
    Case SYSTEMID_MSSQL6
-   Case SYSTEMID_AZURE	
+   Case SYSTEMID_AZURE
       oCnn:oSqlTransact:exec( "DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE convert( CHAR(10), SPID_ ) + convert( CHAR(23), LOGIN_TIME_, 21 ) NOT IN (SELECT convert( CHAR(10), SPID) + CONVERT( CHAR(23), LOGIN_TIME, 21 ) FROM MASTER.DBO.SYSPROCESSES)",.F. )
       Exit
    Case SYSTEMID_MYSQL
@@ -2126,10 +2126,10 @@ BOOL HB_EXPORT sr_lsql2008newTypes( void )
    return s_fSql2008newTypes;
 }
 
-BOOL HB_EXPORT sr_iOldPgsBehavior( void ) 
+BOOL HB_EXPORT sr_iOldPgsBehavior( void )
 {
    return s_iOldPgsBehavior ;
-}   
+}
 
 HB_FUNC( SR_GETSQL2008NEWTYPES )
 {
@@ -2146,9 +2146,9 @@ HB_FUNC( SR_SETSQL2008NEWTYPES )
 HB_FUNC(SETPGSOLDBEHAVIOR)
 {
 	int iOld = s_iOldPgsBehavior;
-	if (ISLOG( 1 ) ) 
+	if (ISLOG( 1 ) )
        s_iOldPgsBehavior= hb_parl( 1 ) ;
-    hb_retl( iOld ) ;   
+    hb_retl( iOld ) ;
 }
 
 
