@@ -126,7 +126,7 @@ LINKERFLAGS =$(LINKERFLAGS) $(LFLAGS)
 #-------------------------------------------------------------------------------
 HB_CMD       =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN  =$(HARBOUR_EXE) -n $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
-!if ("$(__MSC__)"=="8") || ("$(__MSC__)"=="9") || ("$(__MSC__)"=="10")
+!if ("$(__MSC__)"=="8") || ("$(__MSC__)"=="9") || ("$(__MSC__)"=="10") || ("$(__MSC__)"=="11")
 !if ("$(USE_MSVCRT)"=="1")
 MANIFESTFLAGS=/MANIFEST /MANIFESTFILE:"$(OBJ_DIR)\intermediate.manifest"
 MT_CMD       =MT -nologo -manifest "$(OBJ_DIR)\intermediate.manifest" -outputresource:$@;1
@@ -383,7 +383,7 @@ HARBOURFLAGS=$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
 !if ("$(USE_MSVCRT)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -MD
 CLIBFLAGS_C=$(CLIBFLAGS_C) -MD
-!if ("$(__MSC__)"=="8") || ("$(__MSC__)"=="9") || ("$(__MSC__)"=="10")
+!if ("$(__MSC__)"=="8") || ("$(__MSC__)"=="9") || ("$(__MSC__)"=="10") || ("$(__MSC__)"=="11")
 MANIFESTFLAGS=/MANIFEST /MANIFESTFILE:"$(OBJ_DIR)\intermediate.manifest"
 MT_CMD_DLL  =MT -nologo -manifest "$(OBJ_DIR)\intermediate.manifest" -outputresource:$@;2
 MT_CMD      =MT -nologo -manifest "$(OBJ_DIR)\intermediate.manifest" -outputresource:$@;1
