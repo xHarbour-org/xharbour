@@ -6949,7 +6949,7 @@ METHOD Init() CLASS AboutVXH
    ::Center        := .T.
    ::DlgModalFrame := .T.
    ::Style         := WS_POPUP | WS_CAPTION | WS_SYSMENU | DS_MODALFRAME
-   ::Caption       := "Visual xharbour"
+   ::Caption       := "Visual xHarbour"
    ::Create()
 RETURN Self
 
