@@ -655,7 +655,8 @@ extern void hb_compGenPortObj( PHB_FNAME );      /* generates the portable objec
 
 /* REMOVED: Non-functional */
 // extern void hb_compGenObj32( PHB_FNAME );              /* generates OBJ 32 bits */
-// extern void hb_compGenCObj( PHB_FNAME, const char *);  /* generates platform dependant object module */
+
+extern void hb_compGenCObj( PHB_FNAME, const char *);  /* generates platform dependant object module */
 
 /* hbident.c   */
 extern char * hb_compIdentifierNew( char * szName, BOOL bCopy ); /* create the reusable identifier */

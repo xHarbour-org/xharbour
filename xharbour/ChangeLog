@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-23 04:33 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/cmdcheck.c
+  * source/compiler/Makefile
+  + source/compiler/gencobj.c
+  * include/hbcomp.h
+  * source/compiler/hbusage.c
+  * source/compiler/harbour.c
+  * winmake/common.mak
+  * winmake/compile.mak
+    ! restore -go functionality
+
 2012-09-22 09:22 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/cmdcheck.c
     ! removed -go -gw switches

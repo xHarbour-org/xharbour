@@ -1744,6 +1744,7 @@ COMPILER_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hbfunchk$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)gencc$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)gencc1$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)gencobj$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbpcstat$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbdbginf$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hblbl$(OBJEXT)\

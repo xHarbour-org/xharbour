@@ -46,6 +46,7 @@ C_SOURCES=\
 	genc.c \
 	gencc.c \
 	gencc1.c \
+	gencobj.c \
 	genhrb.c \
 	hbfunchk.c \
 	hbgenerr.c \

@@ -1348,6 +1348,9 @@ $(OBJ_DIR)$(DIR_SEP)gencc$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)gencc.c
 $(OBJ_DIR)$(DIR_SEP)gencc1$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)gencc1.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)gencobj$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)gencobj.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)hbpcstat$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbpcstat.c
 	$(CC_CMD)
 

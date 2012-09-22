@@ -661,7 +661,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                             hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
                       }
                       break;
-#if 0
+
                    case 'o':
                    case 'O':
                       hb_comp_iLanguage = LANG_OBJ_MODULE;
@@ -698,7 +698,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                             hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
                       }
                       break;
-#endif
+
                    case 'h':
                    case 'H':
                       hb_comp_iLanguage = LANG_PORT_OBJ;
