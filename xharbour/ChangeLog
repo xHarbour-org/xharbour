@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-22 09:22 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/cmdcheck.c
+    ! removed -go -gw switches
+
 2012-09-22 08:34 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/Makefile
     ! remove gencobj.c dependency
