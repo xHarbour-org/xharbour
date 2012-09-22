@@ -69,8 +69,9 @@ void hb_compPrintUsage( char * szSelf )
            "\n          %cgc[<type>]      output type: C source (.c) (default)",
            "\n                           <type>: 0=compact 1=normal 2=verbose (default)",
            "\n                                   3=generate real C code",
-           "\n          %cgo              output type: Platform dependant object module",
+/* REMOVED "\n          %cgo              output type: Platform dependant object module",
            "\n          %cgw              output type: Windows/DOS OBJ32 (.obj)",
+*/
            "\n          %cgh              output type: Harbour Portable Object (.hrb)",
            "\n          %ci<path>         #include file search path",
            "\n          %cj[<file>]       output i18n support [to <file>] to .hil",

@@ -1327,9 +1327,6 @@ $(OBJ_DIR)$(DIR_SEP)hbfix$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbfix.c
 $(OBJ_DIR)$(DIR_SEP)genc$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)genc.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)gencobj$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)gencobj.c
-	$(CC_CMD)
-
 $(OBJ_DIR)$(DIR_SEP)genhrb$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)genhrb.c
 	$(CC_CMD)
 

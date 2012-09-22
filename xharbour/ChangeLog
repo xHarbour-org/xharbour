@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-22 08:27 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  - source/compiler/gencobj.c
+  - source/compiler/genobj32.c
+  * include/hbcomp.h
+  * source/compiler/hbusage.c
+  * source/compiler/harbour.c
+  * winmake/common.mak
+  * winmake/compile.mak
+    ! removed never-and-won't-be-functional object file generation stuffs
+
 2012-09-22 05:50 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.vc
   * winmake/msvc.err

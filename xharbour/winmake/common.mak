@@ -1737,7 +1737,6 @@ COMPILER_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hbstripl$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbfix$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)genc$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)gencobj$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)genhrb$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)expropta$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)exproptb$(OBJEXT)\
