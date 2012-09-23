@@ -1283,6 +1283,7 @@ DEBUG_LIB_OBJS=\
 # COMMON.LIB rules
 #===============================================================================
 COMMON_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)hbarch$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbfopen$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbfsapi$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbgete$(OBJEXT)\
