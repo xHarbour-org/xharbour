@@ -62,6 +62,8 @@
  *
  */
 
+#ifndef NODLL
+
 #define _WIN32_WINNT   0x0400
 #define  WIN32_LEAN_AND_MEAN
 
@@ -1030,3 +1032,5 @@ HB_FUNC( CALLDLL )
 
 
 #endif /* HB_OS_WIN32 */
+
+#endif /* NODLL */

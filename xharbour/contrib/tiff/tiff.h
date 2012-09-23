@@ -28,6 +28,7 @@
 #define	_TIFF_
 
 #include "tiffconf.h"
+#include "hbdefs.h"
 
 /*
  * Tag Image File Format (TIFF)
@@ -79,8 +80,8 @@ typedef TIFF_UINT32_T uint32;
 typedef long  int64;
 typedef unsigned long uint64;
 #else
-typedef TIFF_INT64_T  int64;
-typedef TIFF_UINT64_T uint64;
+typedef INT64  int64;
+typedef UINT64 uint64;
 #endif
 
 /*

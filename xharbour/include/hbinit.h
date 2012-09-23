@@ -69,7 +69,7 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
    #endif
 #endif
 
-#if defined( _MSC_VER ) && !defined(HB_OS_WIN_64) && \
+#if defined( _MSC_VER ) && \
     !defined( __LCC__ ) && !defined( __POCC__ ) && !defined( __XCC__ ) && \
     !defined(HARBOUR_STRICT_ANSI_C) && !defined(HB_STATIC_STARTUP) && \
     !defined( HB_PRAGMA_STARTUP ) && !defined( HB_MSC_STARTUP )
