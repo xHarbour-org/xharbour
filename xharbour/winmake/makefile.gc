@@ -23,6 +23,13 @@ ifneq ($(HB_HAS_LINENO),1)
 LINEFLAGS=-l
 endif
 
+ifeq ($(HB_ARCH),64)
+C64FLAGS=-DHB_OS_WIN_64 -DNODLL
+HB64FLAGS=-DNODLL
+else
+HB_TARGET=-mtune=pentium -march=i586
+endif
+
 #*******************************************************************************
 ifeq ($(__BLD__),CORE_BLD)
 #*******************************************************************************
@@ -52,7 +59,7 @@ CLIBFLAGS   +=
 #===============================================================================
 INCLUDE_DIR  =include
 HARBOURFLAGS+=-i$(INCLUDE_DIR) -i$(PDFLITE_DIR)/include -q0 -w2 -es2 -gc0
-CLIBFLAGS   +=-DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -D__WIN32__ -Wall $(NOCYGWIN) -O3 -mtune=pentium -c -fomit-frame-pointer -march=i586 -fno-strict-aliasing -I$(INCLUDE_DIR) -I$(OBJ_DIR)
+CLIBFLAGS   +=-DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -D__WIN32__ -Wall $(NOCYGWIN) -O3 $(HB_TARGET) -c -fomit-frame-pointer -fno-strict-aliasing -I$(INCLUDE_DIR) -I$(OBJ_DIR)
 CLIBFLAGS   +=-I$(ZLIB_DIR) -I$(PNG_DIR) -I$(PDFLITE_DIR)/include
 CLIBFLAGS   +=-I$(JPEG_DIR) -I$(TIFF_DIR)
 
@@ -69,6 +76,7 @@ endif
 #  -n is ONLY applied to main module to make sure that only that module will
 #  execute upon running the executable.(AJ: 2008-04-26)
 #===============================================================================
+HARBOURFLAGS+=$(HB64FLAGS)
 HB_CMD     =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) -o$@ $^
 HB_CMD_MAIN=$(HARBOUR_EXE) -n0 $(LINEFLAGS) -d_USE_APPMAIN_ $(HARBOURFLAGS) $(HB_MT_FLAGS) -o$@ $^
 
@@ -86,6 +94,8 @@ endif
 ifdef HB_NO_DV_MEMCPY
 CLIBFLAGS    +=-DHB_NO_DV_MEMCPY
 endif
+
+CLIBFLAGS    +=$(C64FLAGS)
 
 CC_CMD       =GCC $(CLIBFLAGS) -o $@ $^
 CCC_CMD      =$(CC_CMD)
@@ -368,7 +378,7 @@ ifdef HB_DIR_ADS
 ACEH_DIR    =-I"$(HB_DIR_ADS)"
 endif
 INCLUDE_DIR =include
-CLIBFLAGS   +=-DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -Wall -mdll -fomit-frame-pointer -march=i586 $(NOCYGWIN) -O3 -c -fno-strict-aliasing $(ACEH_DIR) -I$(INCLUDE_DIR) -I$(OBJ_DIR)
+CLIBFLAGS   +=-DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -Wall -mdll -fomit-frame-pointer $(HB_TARGET) $(NOCYGWIN) -O3 -c -fno-strict-aliasing $(ACEH_DIR) -I$(INCLUDE_DIR) -I$(OBJ_DIR)
 CLIBFLAGS   +=-I$(ZLIB_DIR) -I$(PNG_DIR) -I$(PDFLITE_DIR)/include
 CLIBFLAGS   +=-I$(TIFF_DIR) -I$(JPEG_DIR) -D__WIN32__
 HARBOURFLAGS+=-i$(INCLUDE_DIR) -i$(PDFLITE_DIR)/include -q0 -w2 -es2 -gc0
@@ -384,7 +394,8 @@ endif
 ifdef HB_NO_DV_MEMCPY
 CLIBFLAGS    +=-DHB_NO_DV_MEMCPY
 endif
-
+CLIBFLAGS+=$(C64FLAGS)
+HARBOURFLAGS+=$(HB64FLAGS)
 CC_CMD      =GCC $(CLIBFLAGS) -o $@ $^
 CCC_CMD     =$(CC_CMD)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) -o$@ $^
@@ -472,7 +483,7 @@ RDDSQL_INCLUDE+=-I"$(HB_DIR_MAGIC)/include"
 endif
 
 HARBOURFLAGS+=-iinclude -i$(SIXAPI_DIR)/include -i$(GDLIB_DIR)/include -i$(WHAT32_DIR)/include -i$(XWT_DIR)/include -q0 -w2 -es2 -gc0
-CLIBFLAGS   +=-D__WIN32__ -DHARBOUR_CONF -D_HAVE_SQLITE_CONFIG_H -Wall $(NOCYGWIN) -O3 -fomit-frame-pointer -march=i586 -mtune=pentium -c -fno-strict-aliasing
+CLIBFLAGS   +=-D__WIN32__ -DHARBOUR_CONF -D_HAVE_SQLITE_CONFIG_H -Wall $(NOCYGWIN) -O3 -fomit-frame-pointer $(HB_TARGET) -c -fno-strict-aliasing
 CLIBFLAGS   +=$(RDDSQL_INCLUDE) $(ACEH_DIR) -Iinclude -I"$(FREEIMAGE_DIR)/include" -I"$(GDLIB_DIR)/include" -I"$(XWT_DIR)/include" -I"$(XWT_DIR)/src/xwt_win" -I"$(ZLIB_DIR)" -I"$(PNG_DIR)" $(OPENSSL_DIR) $(CURL_DIR)
 CLIBFLAGS   +=$(CAIRO_DIR) -I"$(SIXAPI_DIR)/include"
 
@@ -480,6 +491,9 @@ ifeq ($(HB_THREAD_SUPPORT),1)
 	CLIBFLAGS+=-DHB_THREAD_SUPPORT -mthreads
 	HARBOURFLAGS+=-dHB_THREAD_SUPPORT
 endif
+
+CLIBFLAGS+=$(C64FLAGS)
+HARBOURFLAGS+=$(HB64FLAGS)
 
 HB_CMD =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) -o$@ $^
 CC_CMD =GCC $(CLIBFLAGS) -o $@ $^
@@ -497,10 +511,14 @@ LIB_CMD=\
 include winmake/common.mak
 
 CONTRIB_PROJECT+=\
-	$(HBSQLIT3_LIB)\
+	$(HBSQLIT3_LIB)
+
+ifneq ($(HB_ARCH),64)
+CONTRIB_PROJECT+=\
 	$(WHAT32_LIB)\
 	$(GTWVG_LIB)\
 	$(HBZIP_LIB)
+endif
 
 ifneq ($(HB_DIR_ADS),)
 CONTRIB_PROJECT+=$(RDDADS_LIB)

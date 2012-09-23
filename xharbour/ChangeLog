@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-23 17:02 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/makefile.gc
+  * make_gc.bat
+    ! enable MinGW 64-bit compilation. Envar should be set:
+         SET HB_ARCH=64 (remmed by default in make_gc.bat)
+
 2012-09-23 15:49 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/common.mak
     - remove gtwvw.lib and xwt.lib as default contrib as they are currently

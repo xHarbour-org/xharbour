@@ -11,6 +11,9 @@ rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
 
+rem uncomment HB_ARCH to compile under Win64
+rem SET HB_ARCH=64
+
 IF "%CC_DIR%"=="" SET CC_DIR=C:/MinGW
 IF "%SUB_DIR%"=="" SET SUB_DIR=gc
 IF "%HB_GT_LIB%"=="" SET HB_GT_LIB=$(GTWIN_LIB)
