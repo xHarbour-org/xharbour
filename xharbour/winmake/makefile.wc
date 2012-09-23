@@ -790,6 +790,8 @@ LIB_CMD     =LIB386 /nologo /out:$@ $**
 
 CONTRIB_PROJECT=\
 	$(CONTRIB_PROJECT)\
+	$(GTWVW_LIB)\
+	$(XWT_LIB)\
 	$(HBSQLIT3_LIB)
 
 !ifdef HB_DIR_ADS

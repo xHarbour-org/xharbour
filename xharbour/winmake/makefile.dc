@@ -614,6 +614,11 @@ LIB_CMD=LIB -c -n -p256 $@ $**
 # Digital Mars cannot build hbzlip.lib
 # HB_ZIP=1
 
+CONTRIB_PROJECT=\
+	$(CONTRIB_PROJECT)\
+        $(GTWVW_LIB)\
+	$(XWT_LIB)
+
 !ifdef HB_DIR_ADS
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(RDDADS_LIB)
 !endif

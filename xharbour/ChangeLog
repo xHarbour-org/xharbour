@@ -8,6 +8,27 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-23 15:49 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/common.mak
+    - remove gtwvw.lib and xwt.lib as default contrib as they are currently
+    not compilable under 64-bit mode
+
+  * winmake/makefile.bc
+  * winmake/makefile.dc
+  * winmake/makefile.wc
+    ! add gtwvw.lib and xwt.lib creation (moved from common.mak)
+    /*
+     TODO:
+      * rearrange PellesC and MinGW makefiles as the 64-bit version compiler
+        are available
+      * pacify a bunch of warnings in 64-bit mode compilation
+    */
+
+  * winmake/makefile.vc
+    ! compile all source in C mode when HB_OS_WIN_64 is defined
+    ! do not create gtwvw.lib, xwt.lib, what32.lib, gtwvg.lib, hbzlib.lib
+      under 64-bit
+
 2012-09-23 14:27 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * make_vc.bat
   * winmake/makefile.vc

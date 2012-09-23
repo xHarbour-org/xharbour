@@ -28,6 +28,8 @@ LINEFLAGS=-l
 !if ("$(HB_ARCH)"=="64")
 C64FLAGS=-DHB_OS_WIN_64 -DNODLL
 HB64FLAGS=-DNODLL
+!else
+CPLUSPLUS=1
 !endif
 
 #*******************************************************************************
@@ -38,11 +40,6 @@ HB64FLAGS=-DNODLL
 # USE_MSVCRT=1
 
 !include winmake\msvcerr.vc
-
-# Comment this line if use of C-Mode is preferred
-!if !("$(HB_ARCH)"=="64")
-CPLUSPLUS=1
-!endif
 
 #===============================================================================
 # Macro Definitions
@@ -334,9 +331,6 @@ $(TIFF_LIB) : $(TIFF_LIB_OBJS)
 
 !include winmake\msvcerr.vc
 
-# Comment this line if use of C-Mode is preferred
-CPLUSPLUS=1
-
 # Comment this line if ST mode is preferred
 DLL_MT=mt
 
@@ -485,9 +479,6 @@ $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 
 !include winmake\msvcerr.vc
 
-# Comment this line if use of C-Mode is preferred
-CPLUSPLUS=1
-
 #===============================================================================
 # Macro Definitions
 #===============================================================================
@@ -497,10 +488,17 @@ RDDSQL_INCLUDE=-I"$(RDDSQL_DIR)" -I"$(HBSQLIT3_DIR)"
 
 CONTRIB_PROJECT=\
 	$(CONTRIB_PROJECT)\
-	$(HBSQLIT3_LIB)\
+	$(HBSQLIT3_LIB)
+
+!if !("$(HB_ARCH)"=="64")
+CONTRIB_PROJECT=\
+	$(CONTRIB_PROJECT)\
+	$(GTWVW_LIB)\
+	$(XWT_LIB)\
 	$(WHAT32_LIB)\
 	$(GTWVG_LIB)\
 	$(HBZIP_LIB)
+!endif
 
 !ifdef HB_DIR_ADS
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(RDDADS_LIB)
