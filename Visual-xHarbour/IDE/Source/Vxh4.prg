@@ -3533,6 +3533,7 @@ __aProps["D"] := { { "DisableNoScroll",         "Style" },;
 
 __aProps["E"] := { { "EditLabels",              "Style" },;
                    { "Escapement",              "" },;
+                   { "EditBoxFocusBorder",      "Appearance" },;
                    { "EnterNext",               "Behavior" },;
                    { "Expanded",                "Behavior" },;
                    { "ExtVertScrollBar",        "Behavior" },;

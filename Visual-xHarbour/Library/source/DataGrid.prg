@@ -168,6 +168,7 @@ CLASS DataGrid INHERIT Control
    DATA __hPrevCursor           PROTECTED
    DATA __aPixels               PROTECTED
    DATA __aRect                 PROTECTED
+   DATA __cSearch               PROTECTED INIT ""
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -744,12 +745,17 @@ RETURN Self
 
 //----------------------------------------------------------------------------------
 
-METHOD __OnTimer( Sender ) CLASS DataGrid
-   ::KillTimer( 15 )
-   IF Sender:wParam == 15
-      ::Update()
-   ENDIF
-   ::SetTimer( 15, ::__nUpdtTimer*1000 )
+METHOD __OnTimer( nID ) CLASS DataGrid
+   ::KillTimer( nID )
+   DO CASE
+      CASE nID == 15
+           ::Update()
+           ::SetTimer( 15, ::__nUpdtTimer*1000 )
+
+      CASE nID == 10
+           ::__cSearch := ""
+
+   ENDCASE
 RETURN 0
 
 //----------------------------------------------------------------------------------
@@ -1263,7 +1269,15 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
                ENDIF
 
                ::__lSizeMouseDown := .T.
+
              ELSEIF nClickCol <= LEN( ::Children )
+
+               IF ! Empty( ::Children[ nClickCol ]:Tag )
+                  ::DataSource:OrdSetFocus( ::Children[ nClickCol ]:Tag )
+                  ::Children[ nClickCol ]:DrawHeader( ::Drawing:hDC,,,, .T. )
+                  ::Update()
+               ENDIF
+
                IF !::Children[ nClickCol ]:AllowDrag
                   RETURN NIL
                ENDIF
@@ -1273,8 +1287,12 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
                ::__SelLeft := xPos - ::__SelWidth
 
                ::__prevDrag := nClickCol
+               ::__DragColumn := nClickCol
 
                ::__lMoveMouseDown := .T.
+
+               ::Children[ nClickCol ]:DrawHeader( ::Drawing:hDC,,,, .T. )
+
                ::__hDragImageList := ::Children[ nClickCol ]:CreateDragImage( ::__SelWidth - ::Children[nClickCol]:Width )
                ImageListBeginDrag( ::__hDragImageList, 0, 0, 0 )
                ImageListDragEnter( ::hWnd, ::__SelWidth-::Children[nClickCol]:Width+1, IIF( !EMPTY( ::Caption ) .AND. ::SmallCaption, ::CaptionHeight, 0 )+1 )
@@ -1589,7 +1607,7 @@ RETURN Self
 //----------------------------------------------------------------------------------
 
 METHOD OnKeyDown( nwParam, nlParam ) CLASS DataGrid
-   LOCAL nKey, h, nCount, lShift, x, nPos, lVUpdate := FALSE
+   LOCAL nRec, nKey, h, nCount, lShift, x, nPos, lVUpdate := FALSE
 
    IF ( x := ::Super:OnKeyDown( nwParam, nlParam ) ) != NIL .OR. ::DataSource == NIL
       IF ::DataSource == NIL .AND. nwParam == VK_TAB
@@ -1672,6 +1690,33 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS DataGrid
                ELSE
                  ADEL( ::aTagged, nPos, .T. )
               ENDIF
+           ENDIF
+
+      OTHERWISE
+           IF EMPTY( ::__cSearch )
+              // Start auto clearing timer
+              ::SetTimer( 10, 2000 )
+           ENDIF
+           IF nwParam == VK_BACK 
+              IF ! EMPTY( ::__cSearch )
+                 ::__cSearch := LEFT( ::__cSearch, LEN( ::__cSearch )-1 )
+              ENDIF
+            ELSE
+              ::KillTimer( 10 )
+              ::__cSearch += CHR( nwParam )
+           ENDIF
+           IF EMPTY( ::__cSearch )
+              ::KillTimer( 10 )
+            ELSE
+              nRec := ::DataSource:recno()
+              IF ::DataSource:Seek( ::__cSearch )
+                 ::Update()
+                 ::OnRowChanged()
+                 ExecuteEvent( "OnRowChanged", Self )
+               ELSE
+                 ::DataSource:Goto( nRec )
+              ENDIF
+              ::SetTimer( 10, 2000 )
            ENDIF
    ENDCASE
    IF lVUpdate
@@ -3881,7 +3926,8 @@ CLASS GridColumn INHERIT Object
    PROPERTY HeaderImageIndex  READ xHeaderImageIndex WRITE SetHeaderImageIndex DEFAULT 0
    PROPERTY Representation    READ xRepresentation   WRITE SetRepresentation   DEFAULT 1
    PROPERTY AutoEdit          READ xAutoEdit         WRITE __SetAutoEdit       DEFAULT .F. INVERT
-   
+
+   DATA Tag                          PUBLISHED
    DATA SelOnlyRep                   PUBLISHED INIT .T.
    DATA HeaderTooltip                PUBLISHED
    DATA HeaderFont                   PUBLISHED
@@ -3898,8 +3944,6 @@ CLASS GridColumn INHERIT Object
    DATA xHeaderForeColor             EXPORTED
    ACCESS HeaderForeColor            INLINE IIF( ::xHeaderForeColor == NIL, ::HeaderForeSysColor, ::xHeaderForeColor ) PERSISTENT
    ASSIGN HeaderForeColor( n )       INLINE ::xHeaderForeColor := n
-
-
 
    DATA __lResizeable                EXPORTED INIT {.F.,.F.,.F.,.F.,.F.,.T.,.F.,.F.}
    DATA __lMoveable                  EXPORTED INIT .F.
@@ -3987,7 +4031,7 @@ ENDCLASS
 
 METHOD CreateDragImage( nLeft ) CLASS GridColumn
    LOCAL hImageList, hMemBitmap, nWidth
-   nLeft -= 1
+
    nWidth := MIN( ::Parent:ClientWidth, nLeft + ::Width ) - nLeft
    nWidth ++
 
@@ -4014,7 +4058,7 @@ RETURN NIL
 METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    LOCAL aAlign, y, nColor, hOldPen, hOldBrush, hOldFont, n, aRect, nH := 5, nx := 0
    LOCAL nTop, nIcoLeft, nTxColor, nImage := ::xHeaderImageIndex
-   LOCAL hBorderPen, nColor1, nColor2
+   LOCAL hBorderPen, nColor1, nColor2, cOrd
    
    DEFAULT lHot   TO .F.
    DEFAULT nLeft  TO ::__HeaderLeft
@@ -4022,7 +4066,12 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    DEFAULT x      TO ::__HeaderX
    DEFAULT nImage TO 0
    DEFAULT hDC    TO ::Parent:Drawing:hDC
-   
+
+//   IF ::Parent:__ClassInst == NIL .AND. ! lHot .AND. ! Empty( ::Tag ) .AND. ::Parent:DataSource != NIL
+//      cOrd := ::Parent:DataSource:OrdSetFocus()
+//      lHot := ! Empty(cOrd) .AND. Upper( cOrd ) == Upper( ::Tag )
+//   ENDIF
+
    aRect := {nLeft, 0, nRight+1, ::Parent:__GetHeaderHeight()}
 
    IF ::SortArrow > 0
@@ -4049,13 +4098,22 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    ::__aVertex[2]:y := aRect[4]
 
    IF ! lHot
-      nColor1 := ::System:CurrentScheme:ButtonSelectedGradientBegin
-      nColor2 := ::System:CurrentScheme:ButtonSelectedGradientEnd
+      IF ::Parent:__ClassInst == NIL .AND. ! lHot .AND. ! Empty( ::Tag ) .AND. ::Parent:DataSource != NIL
+         cOrd := ::Parent:DataSource:OrdSetFocus()
+      ENDIF
+      IF ! Empty(cOrd) .AND. Upper( cOrd ) == Upper( ::Tag )
+         nColor1 := ::System:CurrentScheme:ButtonCheckedGradientBegin
+         nColor2 := ::System:CurrentScheme:ButtonCheckedGradientEnd
+         hBorderPen := ::System:CurrentScheme:Pen:ButtonPressedBorder
+       ELSE
+         nColor1 := ::System:CurrentScheme:ButtonSelectedGradientBegin
+         nColor2 := ::System:CurrentScheme:ButtonSelectedGradientEnd
+         hBorderPen := ::System:CurrentScheme:Pen:ButtonSelectedBorder
+      ENDIF
       IF ! ::Parent:Enabled
          nColor1 := ::System:Color:White
          nColor2 := ::System:Color:LtGray
       ENDIF
-      hBorderPen := ::System:CurrentScheme:Pen:ButtonSelectedBorder
     ELSE
       nColor1 := ::System:CurrentScheme:ButtonPressedGradientBegin
       nColor2 := ::System:CurrentScheme:ButtonPressedGradientEnd

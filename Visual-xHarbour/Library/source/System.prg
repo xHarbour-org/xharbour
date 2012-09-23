@@ -36,6 +36,7 @@ RETURN
 
 EXIT PROCEDURE __SystemCleanup
    oSystem:ImageList[ "StdSmall" ]:Destroy()
+   DeleteObject( oSystem:FocusPen )
 RETURN
 
 FUNCTION __GetSystem(); RETURN oSystem
@@ -71,7 +72,8 @@ CLASS System
    DATA xLocalTime             PROTECTED
    DATA PageSetup              EXPORTED
    DATA PaperSize              EXPORTED
-   
+   DATA FocusPen               EXPORTED
+
    ACCESS LocalTime     INLINE ::GetLocalTime()
    ACCESS RootFolders   INLINE ::Folders
    ACCESS LastError     INLINE STRTRAN( FormatMessage( , , GetLastError() ), CRLF )
@@ -125,7 +127,6 @@ RETURN NIL
 METHOD Init() CLASS System
    LOCAL cRdd, aList, hSmall, hLarge, cBuffer := ""
    LOCAL cSupp := ""
-
    ::FreeImageFormats := {;
                    { "Windows or OS/2 Bitmap (*.bmp)",                   "*.bmp;" },;
                    { "Dr. Halo (*.cut)",                                 "*.cut;" },;
@@ -706,6 +707,8 @@ METHOD Init() CLASS System
    cBuffer := ::ExplorerBar:Value()
    ExplorerBarInfo( @cBuffer )
    ::ExplorerBar:Buffer( cBuffer )
+
+   ::FocusPen := CreatePen( PS_SOLID, 3, RGB( 65, 160, 228 ) )
 RETURN Self
 
 METHOD GetRunningProcs() CLASS System

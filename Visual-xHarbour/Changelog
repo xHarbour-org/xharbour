@@ -7,6 +7,10 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2012-09-23 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Application:EditBoxFocusBorder to draw a bluie border around EditBoxes
+   - Removed TreeView auto-drag/drop until fixed.
+
 2012-09-17 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed TabControls to allow having controls other than TabPages.
    

@@ -10440,3 +10440,10 @@ HB_FUNC( FINDTEXT )
    fr.lpTemplateName   = NULL;
    hb_retnl( (long) FindText(&fr) );
 }
+
+//-------------------------------------------------------------------------------------------------
+HB_FUNC( ROUNDRECT )
+{
+   hb_retl( RoundRect( (HDC) hb_parnl(1), hb_parni(2), hb_parni(3), hb_parni(4), hb_parni(5), hb_parni(6), hb_parni(7) ) );
+}
+

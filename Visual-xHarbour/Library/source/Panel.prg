@@ -21,7 +21,7 @@ CLASS Panel FROM Control
 
    DATA ImageIndex PROTECTED
    DATA oLastFocus EXPORTED
-   DATA Border     EXPORTED INIT .F.
+   //DATA Border     EXPORTED INIT .F.
    DATA Transparent PUBLISHED INIT .F.
 
    PROPERTY SmallCaption                         READ xSmallCaption WRITE __SetSmallCaption DEFAULT .T. PROTECTED

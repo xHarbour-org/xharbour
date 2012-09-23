@@ -331,6 +331,8 @@ CLASS Application
    DATA UserVariables                  PUBLISHED INIT ""
    DATA Cursor                         PUBLISHED
    DATA GenerateMembers                PUBLISHED INIT .T.
+   DATA EditBoxFocusBorder             PUBLISHED INIT .F.
+   
    DATA __Cursors                      EXPORTED  INIT { "None",;
                                                          "Arrow"       ,;
                                                          "Help"        ,;

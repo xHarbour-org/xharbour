@@ -109,9 +109,9 @@ CLASS TreeView FROM Control
    METHOD __SetScrollBars() INLINE NIL
    METHOD GetExpandedCount()
 
-   METHOD OnMouseMove()
-   METHOD OnLButtonDown()
-   METHOD OnLButtonUp()
+   //METHOD OnMouseMove()
+   //METHOD OnLButtonDown()
+   //METHOD OnLButtonUp()
 ENDCLASS
 
 //----------------------------------------------------------------------------//
@@ -477,6 +477,7 @@ METHOD HitTest( x, y ) CLASS TreeView
 RETURN oItem
 
 //----------------------------------------------------------------------------------------------------------
+/*
 METHOD OnMouseMove(n,x,y) CLASS TreeView
    LOCAL oItem, pt
    (n)
@@ -501,6 +502,7 @@ METHOD OnMouseMove(n,x,y) CLASS TreeView
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------------
+
 METHOD OnLButtonUp() CLASS TreeView
    LOCAL oItem, oColumn, oSubItem
 
@@ -549,3 +551,4 @@ METHOD OnLButtonDown( n,x,y ) CLASS TreeView
    ENDIF
    ::Application:Yield()
 RETURN Self
+*/

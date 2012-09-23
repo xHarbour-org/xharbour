@@ -489,7 +489,7 @@ CLASS Window INHERIT Object
    METHOD SetTabOrder()
 
    //METHOD DefControlProc()
-
+   METHOD PaintFocusRect()
    METHOD DockToParent()          INLINE ::Dock:Left   := ::Parent,;
                                          ::Dock:Top    := ::Parent,;
                                          ::Dock:Right  := ::Parent,;
@@ -1478,6 +1478,15 @@ FUNCTION ExecuteEvent( cEvent, oObj, xParam1, xParam2, xParam3, xParam4, xParam5
 RETURN nRet
 
 //-----------------------------------------------------------------------------------------------
+METHOD PaintFocusRect( hDC ) CLASS Window
+   LOCAL hOldPen := SelectObject( hDC, ::System:FocusPen )
+   LOCAL hOldBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
+   RoundRect( hDC, ::Left-2, ::Top-2, ::Left+::Width+2, ::Top+::Height+2, 4, 4 )
+   SelectObject( hDC, hOldPen )
+   SelectObject( hDC, hOldBrush )
+RETURN NIL
+
+//-----------------------------------------------------------------------------------------------
 #define WM_THEMECHANGED   0x031A
 #define WM_SOCKET_NOTIFY  0x0373
 #define WM_SOCKET_DEAD    0x0374
@@ -1492,6 +1501,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    LOCAL Band, msg, lHandled, aComp, oMenu, mmi, nFiles, oForm, aChildren
    LOCAL rc, pt, cFile, hwndFrom, idFrom, code, aParams
    LOCAL nAnimation
+   local aParent
    
    ::Msg    := nMsg
    ::wParam := nwParam
@@ -2517,9 +2527,15 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               IF ::__PaintBakgndImage( nwParam ) == NIL
                  _FillRect( nwParam, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, ::BkBrush )
               ENDIF
+              IF ! Empty( ::Children ) .AND. ( n := aScan( ::Children, {|o|o:hWnd==GetFocus() .AND. o:ClsName == "Edit" } ) ) > 0
+                 ::Children[n]:PaintFocusRect( nwParam )
+              ENDIF
               RETURN 1
            ENDIF
            DEFAULT nRet TO ::__PaintBakgndImage( nwParam )
+           IF ::Application:EditBoxFocusBorder .AND. ! Empty( ::Children ) .AND. ( n := aScan( ::Children, {|o|o:hWnd==GetFocus() .AND. o:ClsName == "Edit" } ) ) > 0
+              ::Children[n]:PaintFocusRect( nwParam )
+           ENDIF
            EXIT
 
       CASE WM_GETDLGCODE
@@ -2588,15 +2604,74 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               ::Parent:oLastFocus := Self
               ::Parent:SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
            ENDIF
-
+           IF ::Application:EditBoxFocusBorder .AND. ::Parent != NIL
+              oObj := ObjFromHandle( nwParam )
+              IF oObj != NIL .AND. oObj:ClsName == "Edit"
+                 aRect := oObj:GetRectangle()
+                 aRect[1] -= 3
+                 aRect[2] -= 3
+                 aRect[3] += 3
+                 aRect[4] += 3
+                 _InvalidateRect( ::Parent:hWnd, aRect )
+              ENDIF
+              IF ::ClsName == "Edit"
+                 aRect := ::GetRectangle()
+                 aRect[1] -= 3
+                 aRect[2] -= 3
+                 aRect[3] += 3
+                 aRect[4] += 3
+                 _InvalidateRect( ::Parent:hWnd, aRect )
+              ENDIF
+           ENDIF
            EXIT
 
       CASE WM_SETFOCUS
+           IF ::Parent != NIL .AND. ::Parent:VertScroll
+              aRect    := _GetWindowRect( ::hWnd )
+
+              aPt := { aRect[1], aRect[2] }
+              _ScreenToClient( ::Parent:hWnd, @aPt )
+              aRect[1] := aPt[1]
+              aRect[2] := aPt[2]
+
+              aPt := { aRect[3], aRect[4] }
+              _ScreenToClient( ::Parent:hWnd, @aPt )
+              aRect[3] := aPt[1]
+              aRect[4] := aPt[2]
+
+              aParent  := _GetClientRect( ::Parent:hWnd )
+
+              // Set Vertical Position
+              IF aRect[4] > aParent[4]
+                 n := aParent[2]+( aRect[4]-aParent[4] ) - aRect[2]
+                 ::Parent:OnVScroll( SB_THUMBTRACK, ::Parent:VertScrollPos + ( aRect[4]-aParent[4] )- MAX(n,0), 0 )
+               ELSEIF aRect[2] < 0
+                 ::Parent:OnVScroll( SB_THUMBTRACK, ::Parent:VertScrollPos + ( aRect[2] ), 0 )
+              ENDIF
+
+              // Set Horizontal Position
+              IF aRect[3] > aParent[3]
+                 n := aParent[1]+( aRect[3]-aParent[3] ) - aRect[1]
+                 ::Parent:OnHScroll( SB_THUMBTRACK, ::Parent:HorzScrollPos + ( aRect[3]-aParent[3] ) - MAX(n,0), 0 )
+               ELSEIF aRect[1] < 0
+                 ::Parent:OnHScroll( SB_THUMBTRACK, ::Parent:HorzScrollPos + ( aRect[1] ), 0 )
+              ENDIF
+           ENDIF
+
            nRet := ExecuteEvent( "OnSetFocus", Self )
            ODEFAULT nRet TO ::OnSetFocus( nwParam )
            ODEFAULT nRet TO __Evaluate( ::OnWMSetFocus, Self, nwParam, nlParam, nRet )
            IF ::Parent != NIL .AND. ::Parent:ClsName == "PanelBox"
               ::Parent:SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
+           ENDIF
+
+           IF ::Application:EditBoxFocusBorder .AND. ::ClsName == "Edit"
+              aRect := ::GetRectangle()
+              aRect[1] -= 3
+              aRect[2] -= 3
+              aRect[3] += 3
+              aRect[4] += 3
+              _InvalidateRect( ::Parent:hWnd, aRect )
            ENDIF
            EXIT
 
