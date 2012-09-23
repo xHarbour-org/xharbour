@@ -11,6 +11,8 @@ rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
 
+rem SET HB_ARCH=64
+
 IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
  
 :FIND_VC

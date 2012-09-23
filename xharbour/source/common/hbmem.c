@@ -97,6 +97,10 @@ typedef unsigned __int64    UInt64;
 typedef unsigned long long  UInt64;
 #endif
 
+#if defined(HB_OS_WIN_64)
+#define MEMCPY_64BIT
+#endif
+
 #ifdef MEMCPY_64BIT
 typedef UInt64              UIntN;
 #define TYPE_WIDTH          8L
