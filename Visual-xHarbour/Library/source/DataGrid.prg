@@ -306,7 +306,7 @@ METHOD Init( oParent ) CLASS DataGrid
    ::HighlightTextColor      := ::System:Colors:HighlightText
    ::HighlightSysColor       := ::System:Colors:Highlight
    ::HighlightTextSysColor   := ::System:Colors:HighlightText
-   ::__InactiveHighlight     := RGB(224,224,224)
+   ::__InactiveHighlight     := RGB(240,240,240)
    ::__InactiveHighlightText := ::System:Colors:WindowText
    ::__lCreateAfterChildren  := .T.
    ::DeferRedraw             := FALSE
@@ -4102,21 +4102,19 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
          cOrd := ::Parent:DataSource:OrdSetFocus()
       ENDIF
       IF ! Empty(cOrd) .AND. Upper( cOrd ) == Upper( ::Tag )
-         nColor1 := ::System:CurrentScheme:ButtonCheckedGradientBegin
-         nColor2 := ::System:CurrentScheme:ButtonCheckedGradientEnd
+         nColor1 := ::System:Color:Gray //::System:CurrentScheme:ButtonCheckedGradientBegin
+         nColor2 := ::System:Color:LtGray  //::System:CurrentScheme:ButtonCheckedGradientEnd
          hBorderPen := ::System:CurrentScheme:Pen:ButtonPressedBorder
        ELSE
-         nColor1 := ::System:CurrentScheme:ButtonSelectedGradientBegin
-         nColor2 := ::System:CurrentScheme:ButtonSelectedGradientEnd
+         nColor1 := ::System:Color:LtGray //::System:CurrentScheme:ButtonSelectedGradientBegin
+         nColor2 := ::System:Color:White  //::System:CurrentScheme:ButtonSelectedGradientEnd
          hBorderPen := ::System:CurrentScheme:Pen:ButtonSelectedBorder
       ENDIF
-      IF ! ::Parent:Enabled
-         nColor1 := ::System:Color:White
-         nColor2 := ::System:Color:LtGray
-      ENDIF
+      //nColor1 := ::System:Color:White
+      //nColor2 := ::System:Color:LtGray
     ELSE
-      nColor1 := ::System:CurrentScheme:ButtonPressedGradientBegin
-      nColor2 := ::System:CurrentScheme:ButtonPressedGradientEnd
+      nColor1 := ::System:Color:LtGray //::System:CurrentScheme:ButtonPressedGradientBegin
+      nColor2 := ::System:Color:Gray   //::System:CurrentScheme:ButtonPressedGradientEnd
       hBorderPen := ::System:CurrentScheme:Pen:ButtonPressedBorder
    ENDIF
 
