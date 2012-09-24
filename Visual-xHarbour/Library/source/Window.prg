@@ -1481,7 +1481,11 @@ RETURN nRet
 METHOD PaintFocusRect( hDC ) CLASS Window
    LOCAL hOldPen := SelectObject( hDC, ::System:FocusPen )
    LOCAL hOldBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
-   RoundRect( hDC, ::Left-2, ::Top-2, ::Left+::Width+2, ::Top+::Height+2, 4, 4 )
+   RoundRect( hDC, ::Left-2-::Parent:HorzScrollPos,;
+                   ::Top-2-::Parent:VertScrollPos,;
+                   ::Left+::Width+2-::Parent:HorzScrollPos,;
+                   ::Top+::Height+2-::Parent:VertScrollPos, 4, 4 )
+
    SelectObject( hDC, hOldPen )
    SelectObject( hDC, hOldBrush )
 RETURN NIL
@@ -2604,25 +2608,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               ::Parent:oLastFocus := Self
               ::Parent:SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
            ENDIF
-           IF ::Application:EditBoxFocusBorder .AND. ::Parent != NIL
-              oObj := ObjFromHandle( nwParam )
-              IF oObj != NIL .AND. oObj:ClsName == "Edit"
-                 aRect := oObj:GetRectangle()
-                 aRect[1] -= 3
-                 aRect[2] -= 3
-                 aRect[3] += 3
-                 aRect[4] += 3
-                 _InvalidateRect( ::Parent:hWnd, aRect )
-              ENDIF
-              IF ::ClsName == "Edit"
-                 aRect := ::GetRectangle()
-                 aRect[1] -= 3
-                 aRect[2] -= 3
-                 aRect[3] += 3
-                 aRect[4] += 3
-                 _InvalidateRect( ::Parent:hWnd, aRect )
-              ENDIF
-           ENDIF
            EXIT
 
       CASE WM_SETFOCUS
@@ -2667,10 +2652,10 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
 
            IF ::Application:EditBoxFocusBorder .AND. ::ClsName == "Edit"
               aRect := ::GetRectangle()
-              aRect[1] -= 3
-              aRect[2] -= 3
-              aRect[3] += 3
-              aRect[4] += 3
+              aRect[1] -= 3 + ::Parent:HorzScrollPos
+              aRect[2] -= 3 + ::Parent:VertScrollPos
+              aRect[3] += 3 + ::Parent:HorzScrollPos
+              aRect[4] += 3 + ::Parent:VertScrollPos
               _InvalidateRect( ::Parent:hWnd, aRect )
            ENDIF
            EXIT

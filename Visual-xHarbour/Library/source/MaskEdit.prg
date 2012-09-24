@@ -579,7 +579,7 @@ METHOD OnKillFocus() CLASS MaskEdit
    SetWindowText( ::hWnd, ::oGet:buffer )
    ::InvalidateRect()
    ::SendMessage( WM_MOUSEMOVE, 1, 1 )
-RETURN NIL
+RETURN Super:OnKillFocus()
 
 //-----------------------------------------------------------------------------------------------
 

@@ -405,6 +405,24 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnKillFocus() CLASS EditBox
+   LOCAL oObj, aRect
+   IF ::Application:EditBoxFocusBorder
+      oObj := ObjFromHandle( ::wParam )
+      IF oObj != NIL .AND. oObj:ClsName == "Edit"
+         aRect := oObj:GetRectangle()
+         aRect[1] -= 3 + ::Parent:HorzScrollPos
+         aRect[2] -= 3 + ::Parent:VertScrollPos
+         aRect[3] += 3 + ::Parent:HorzScrollPos
+         aRect[4] += 3 + ::Parent:VertScrollPos
+         _InvalidateRect( ::Parent:hWnd, aRect )
+      ENDIF
+      aRect := ::GetRectangle()
+      aRect[1] -= 3 + ::Parent:HorzScrollPos
+      aRect[2] -= 3 + ::Parent:VertScrollPos
+      aRect[3] += 3 + ::Parent:HorzScrollPos
+      aRect[4] += 3 + ::Parent:VertScrollPos
+      _InvalidateRect( ::Parent:hWnd, aRect )
+   ENDIF
    ::Redraw()
    IF ::__oDataGrid != NIL .AND. ::__oDataGrid:Height > 0 .AND. ! ::LastKey IN {VK_UP,VK_DOWN,VK_ESCAPE,VK_RETURN}
       ::__ChkGridKeys( NIL, VK_RETURN, .F. )
