@@ -123,8 +123,10 @@ ALL: $(PROJECT)
 #===============================================================================
 # Library dependencies and build rules
 #===============================================================================
+!if ("$(HB_ARCH)"=="64")
 $(WS2_32PC_LIB) : $(WS32DEF)
 	POLIB /DEF:$(WS32DEF) /OUT:$(WS2_32PC_LIB) /MACHINE:AMD64
+!endif
 
 $(COMPILER_LIB) : $(COMPILER_LIB_OBJS)
 	$(LIB_CMD)
