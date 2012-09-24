@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-24 09:44 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * make_pc.bat
+    ! reuploaded because previously committed file is private one
+
 2012-09-24 09:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/ws2_32pc.def
     ! import file to build POCC64's ws2_32pc.lib as the supplied
