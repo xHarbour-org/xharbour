@@ -8,6 +8,36 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-24 09:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/ws2_32pc.def
+    ! import file to build POCC64's ws2_32pc.lib as the supplied
+      ws2_32.lib does not work (missing: __WSAFDIsSet)
+
+  * winmake/makefile.pc
+  * winmake/mdir.bat
+  * make_pc.bat
+    ! enable PellesC 64-bit compilation. Envar should be set:
+         SET HB_ARCH=64 (remmed by default in make_pc.bat)
+
+  * source/odbc/odbc.c
+    + casting to compile with POCC64
+
+  * source/common/hbver.c
+    + differentiating POCC version, 32 and 64 bit.
+
+  * source/ct/files.c
+    ! function SETFDATI() now use xHarbour API
+
+  * source/rtl/hbsocket.c
+    ! replace POCC64 hack on non-existence of function __WSAFDIsSet
+
+  /*
+    NOTE:
+    POCC64 stuffs are succesfully built eventhough the binaries are buggy.
+    -> hbtest.exe yields 83 errors compared to 48 of MSVC and MinGW
+    -> exe created with harbour.dll GPFs
+  */
+
 2012-09-23 17:02 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.gc
   * make_gc.bat

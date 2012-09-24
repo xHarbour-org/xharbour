@@ -735,7 +735,7 @@ char * hb_verCompiler( void )
    hb_snprintf( szSub, sizeof( szSub ), " (DJGPP %i.%02i)", ( int ) __DJGPP__, ( int ) __DJGPP_MINOR__ );
    hb_strncat( pszCompiler, szSub, COMPILER_BUF_SIZE - 1 );
 
-#elif defined(__BORLANDC__) || defined(__WATCOMC__) || defined(__GNUC__)
+#elif defined(__BORLANDC__) || defined(__POCC__) || defined(__WATCOMC__) || defined(__GNUC__)
 
    #if defined( HB_ARCH_16BIT )
       hb_strncat( pszCompiler, " (16 bit)", COMPILER_BUF_SIZE - 1 );

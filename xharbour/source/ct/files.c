@@ -954,6 +954,17 @@ HB_FUNC( SETFDATI )
          hb_timeStrGet( hb_itemGetCPtr( pTime ), &hour, &minute, &second, NULL );
 
 #if defined( HB_OS_WIN ) && ! defined( __CYGWIN__ )
+      #if 1
+      {
+         LONG lJulian, lMillisec;
+
+         lJulian     = pDate ? hb_dateEncode( year, month, day ) : -1;
+         lMillisec   = pTime ? hb_timeStampEncode( hour, minute, second, 0 ) : -1;
+
+         hb_retl( hb_fsSetFileTime( szFile, lJulian, lMillisec ) );
+         return;
+      }
+      #else
       {
          FILETIME    ft, local_ft;
          SYSTEMTIME  st;
@@ -984,6 +995,7 @@ HB_FUNC( SETFDATI )
             return;
          }
       }
+      #endif
 #elif defined( HB_OS_OS2 )
       {
          FILESTATUS3 fs3;

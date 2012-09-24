@@ -211,7 +211,11 @@ HB_FUNC( SQLGETDATA ) /* HB_SQLGETDATA( hStmt, nField, nType, nLen, @cBuffer ) -
    wResult = ! SQL_NO_DATA;
    while( wResult != SQL_NO_DATA )
    {
+#if defined(__POCC__) && defined(HB_OS_WIN_64)
+      wResult    = SQLGetData( ( HSTMT ) hb_parnl( 1 ), hb_parni( 2 ), wType, ( PTR ) bBuffer, lLen, (long long int *)&lLen );
+#else
       wResult    = SQLGetData( ( HSTMT ) hb_parnl( 1 ), hb_parni( 2 ), wType, ( PTR ) bBuffer, lLen, &lLen );
+#endif
       if( wResult == SQL_SUCCESS && iReallocs == 0 )
       {
          hb_storclen( ( LPSTR ) bBuffer, ( ULONG ) ( lLen < 0 ? 0 : ( lLen < hb_parnl( 4 ) ? lLen : hb_parnl( 4 ) ) ), 5 );
@@ -277,10 +281,17 @@ HB_FUNC( SQLDESCRIB )
     SQLUINTEGER wColSize  = hb_parni( 7 );
     SQLSMALLINT wDecimals = hb_parni( 8 );
     SQLSMALLINT wNullable = hb_parni( 9 );
+#if defined(__POCC__) && defined(HB_OS_WIN_64)
+    WORD        wResult   = SQLDescribeCol( ( HSTMT ) hb_parnl( 1 ), hb_parni( 2 ),
+                                            (SQLCHAR *)  bBuffer, hb_parni( 4 ), &wBufLen,
+                                            &wDataType, (unsigned long long int *)&wColSize, &wDecimals,
+                                            &wNullable );
+#else
     WORD        wResult   = SQLDescribeCol( ( HSTMT ) hb_parnl( 1 ), hb_parni( 2 ),
                                             (SQLCHAR *)  bBuffer, hb_parni( 4 ), &wBufLen,
                                             &wDataType, &wColSize, &wDecimals,
                                             &wNullable );
+#endif
 
     if( wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO )
     {
@@ -464,7 +475,11 @@ HB_FUNC( SQLEXECUTESCALAR )
          wResult = SQLFetch( ( HSTMT ) hStmt );
          if( wResult != SQL_NO_DATA )
          {
+#if defined(__POCC__) && defined(HB_OS_WIN_64)
+            wResult = SQLGetData( ( HSTMT ) hStmt, 1, SQL_C_CHAR, bBuffer, sizeof( bBuffer ), (long long int *) &lLen );
+#else
             wResult = SQLGetData( ( HSTMT ) hStmt, 1, SQL_C_CHAR, bBuffer, sizeof( bBuffer ), &lLen );
+#endif
             hb_storc( (char *)bBuffer, 3 );
          }
       }

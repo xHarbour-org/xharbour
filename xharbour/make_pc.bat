@@ -1,4 +1,7 @@
 @echo off
+SET HB_DIR_ADS=
+SET HB_ADS_IMPLIB=yes
+SET CC_DIR=..\PELLESC700
 rem ============================================================================
 rem
 rem $Id$
@@ -89,7 +92,7 @@ rem=============================================================================
    SET HB_MT_FLAGS=
    SET PROJECT=$(ST_PROJECT)
    @CALL winmake\mdir.bat
-   %__MAKE__% /F winmake\makefile.pc >make_%SUB_DIR%.log
+   %__MAKE__% /F winmake\makefile.pc
    if errorlevel 1 goto BUILD_ERR
    if "%1"=="NOMT" goto BUILD_OK
    if "%1"=="nomt" goto BUILD_OK
@@ -102,7 +105,7 @@ rem=============================================================================
    SET HB_MT_FLAGS=-dHB_THREAD_SUPPORT
    SET PROJECT=$(MT_PROJECT)
    @CALL winmake\mdir.bat
-   %__MAKE__% /F winmake\makefile.pc >>make_%SUB_DIR%.log
+   %__MAKE__% /F winmake\makefile.pc
    if errorlevel 1 goto BUILD_ERR
    goto BUILD_OK
 
@@ -121,7 +124,6 @@ rem=============================================================================
 rem=============================================================================
 :BUILD_ERR
 rem=============================================================================
-   IF EXIST make_%SUB_DIR%.log notepad make_%SUB_DIR%.log
    goto EXIT
 
 rem=============================================================================
@@ -136,7 +138,7 @@ rem=============================================================================
    SET HB_MT_FLAGS=
    SET HB_MT_DIR=\dll
    @CALL winmake\mdir.bat dllcreate
-   %__MAKE__% /F winmake\makefile.pc >dll_%SUB_DIR%.log
+   %__MAKE__% /F winmake\makefile.pc
    if errorlevel 1 goto DLL_ERR
    goto DLL_OK
 
@@ -155,7 +157,6 @@ rem=============================================================================
 rem=============================================================================
 :DLL_ERR
 rem=============================================================================
-   if exist dll_%SUB_DIR%.log notepad dll_%SUB_DIR%.log
    goto EXIT
 
 rem=============================================================================
@@ -167,7 +168,7 @@ rem=============================================================================
    SET HB_MT_FLAGS=
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
-   %__MAKE__% /F winmake\makefile.pc >cont_%SUB_DIR%.log
+   %__MAKE__% /F winmake\makefile.pc
    if errorlevel 1 goto CONTRIBS_ERR
    goto CONTRIBS_OK
 
@@ -181,7 +182,6 @@ rem=============================================================================
 rem=============================================================================
 :CONTRIBS_ERR
 rem=============================================================================
-   IF EXIST cont_%SUB_DIR%.log notepad cont_%SUB_DIR%.log
    goto EXIT
 
 rem=============================================================================

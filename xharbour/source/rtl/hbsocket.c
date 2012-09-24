@@ -276,6 +276,7 @@
    };
 #endif
 
+#if 0
 #if defined( __POCC__ ) && ( __POCC__ >= 500 ) && defined( HB_OS_WIN_64 )
    /* TOFIX: Bad workaround for the '__WSAFDIsSet unresolved' problem
              in Pelles C 5.00.13 AMD64 mode, to make final executables
@@ -283,6 +284,7 @@
              won't properly work though. [vszakats] */
    #undef FD_ISSET
    #define FD_ISSET( s, f ) ( 0 )
+#endif
 #endif
 
 #if defined( HB_OS_WIN )

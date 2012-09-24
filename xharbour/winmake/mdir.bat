@@ -270,6 +270,7 @@ if exist lib\%LIBPREFIX%rdd%LIBEXT%                  del lib\%LIBPREFIX%rdd%LIBE
 if exist lib\%LIBPREFIX%rddmt%LIBEXT%                del lib\%LIBPREFIX%rddmt%LIBEXT%
 if exist lib\%LIBPREFIX%rdds%LIBEXT%                 del lib\%LIBPREFIX%rdds%LIBEXT%
 if exist lib\%LIBPREFIX%rtl%LIBEXT%                  del lib\%LIBPREFIX%rtl%LIBEXT%
+if exist lib\%LIBPREFIX%ws2_32pc%LIBEXT%             del lib\%LIBPREFIX%ws2_32pc%LIBEXT%
 if exist lib\%LIBPREFIX%rtlmt%LIBEXT%                del lib\%LIBPREFIX%rtlmt%LIBEXT%
 if exist lib\%LIBPREFIX%samples%LIBEXT%              del lib\%LIBPREFIX%samples%LIBEXT%
 if exist lib\%LIBPREFIX%sixcdx%LIBEXT%               del lib\%LIBPREFIX%sixcdx%LIBEXT%
@@ -371,6 +372,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%rdd%LIBEXT%        del lib\%SUB_DIR%\%LIBPREFI
 if exist lib\%SUB_DIR%\%LIBPREFIX%rddmt%LIBEXT%      del lib\%SUB_DIR%\%LIBPREFIX%rddmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%rdds%LIBEXT%       del lib\%SUB_DIR%\%LIBPREFIX%rdds%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%rtl%LIBEXT%        del lib\%SUB_DIR%\%LIBPREFIX%rtl%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%ws2_32pc%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%ws2_32pc%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%rtlmt%LIBEXT%      del lib\%SUB_DIR%\%LIBPREFIX%rtlmt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%sixcdx%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%sixcdx%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%tip%LIBEXT%        del lib\%SUB_DIR%\%LIBPREFIX%tip%LIBEXT%
