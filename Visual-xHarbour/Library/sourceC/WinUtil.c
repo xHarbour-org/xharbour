@@ -3094,13 +3094,9 @@ HB_FUNC( GETOSDISPLAYSTRING )
 
       // Test for the specific product.
 
-      if ( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion > 0 )
+      if ( osvi.dwMajorVersion == 6 )
       {
-         if( osvi.dwMinorVersion == 1 )
-         {
-            strcat(pszOS, "Windows 7 ");
-         }
-         else
+         if( osvi.dwMinorVersion == 0 )
          {
             if( osvi.wProductType == VER_NT_WORKSTATION )
             {
@@ -3111,6 +3107,30 @@ HB_FUNC( GETOSDISPLAYSTRING )
                strcat(pszOS, "Windows Server 2008 " );
             }
          }
+         if( osvi.dwMinorVersion == 1 )
+         {
+            if( osvi.wProductType == VER_NT_WORKSTATION )
+            {
+               strcat(pszOS, "Windows 7 ");
+            }
+            else
+            {
+               strcat(pszOS, "Windows Server 2008 R2" );
+            }
+         }
+
+         if( osvi.dwMinorVersion == 2 )
+         {
+            if( osvi.wProductType == VER_NT_WORKSTATION )
+            {
+               strcat(pszOS, "Windows 8 ");
+            }
+            else
+            {
+               strcat(pszOS, "Windows Server 2012" );
+            }
+         }
+
          pGPI = (PGPI) GetProcAddress( GetModuleHandle("kernel32.dll"), "GetProductInfo");
          pGPI( 6, 0, 0, 0, &dwType);
 
