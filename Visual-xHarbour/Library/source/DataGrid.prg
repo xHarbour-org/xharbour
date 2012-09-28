@@ -85,7 +85,7 @@ CLASS DataGrid INHERIT Control
    DATA MultipleSelection       PUBLISHED INIT .F.
    DATA TagRecords              PUBLISHED INIT .F.
    DATA ClearColumns            PUBLISHED INIT .T.
-
+   DATA GradientHeader          PUBLISHED INIT .F.
 
    PROPERTY ImageList  GET __ChkComponent( Self, ::xImageList )
    PROPERTY DataSource GET __ChkComponent( Self, ::xDataSource ) SET __SetDataSource 
@@ -4058,7 +4058,7 @@ RETURN NIL
 METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    LOCAL aAlign, y, nColor, hOldPen, hOldBrush, hOldFont, n, aRect, nH := 5, nx := 0
    LOCAL nTop, nIcoLeft, nTxColor, nImage := ::xHeaderImageIndex
-   LOCAL hBorderPen, nColor1, nColor2, cOrd
+   LOCAL hBorderPen, nColor1, nColor2, cOrd, nBackColor, nBorder, nShadow, hPenShadow, hPenLight, z, i
    
    DEFAULT lHot   TO .F.
    DEFAULT nLeft  TO ::__HeaderLeft
@@ -4087,51 +4087,78 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    ::__HeaderRight := nRight
    ::__HeaderX     := x
 
-   hOldFont := SelectObject( hDC, ::HeaderFont:Handle )
+   IF ::Parent:GradientHeader
+      hOldFont := SelectObject( hDC, ::HeaderFont:Handle )
 
-   aAlign := _GetTextExtentPoint32( hDC, ::xText )
-   y := (::Parent:__GetHeaderHeight() - aAlign[2] ) / 2
+      aAlign := _GetTextExtentPoint32( hDC, ::xText )
+      y := (::Parent:__GetHeaderHeight() - aAlign[2] ) / 2
 
-   ::__aVertex[1]:x := aRect[1]-1
-   ::__aVertex[1]:y := aRect[2]
-   ::__aVertex[2]:x := aRect[3]
-   ::__aVertex[2]:y := aRect[4]
+      ::__aVertex[1]:x := aRect[1]-1
+      ::__aVertex[1]:y := aRect[2]
+      ::__aVertex[2]:x := aRect[3]
+      ::__aVertex[2]:y := aRect[4]
 
-   IF ! lHot
-      IF ::Parent:__ClassInst == NIL .AND. ! lHot .AND. ! Empty( ::Tag ) .AND. ::Parent:DataSource != NIL
-         cOrd := ::Parent:DataSource:OrdSetFocus()
-      ENDIF
-      IF ! Empty(cOrd) .AND. Upper( cOrd ) == Upper( ::Tag )
-         nColor1 := ::System:Color:Gray //::System:CurrentScheme:ButtonCheckedGradientBegin
-         nColor2 := ::System:Color:LtGray  //::System:CurrentScheme:ButtonCheckedGradientEnd
-         hBorderPen := ::System:CurrentScheme:Pen:ButtonPressedBorder
+      IF ! lHot
+         IF ::Parent:__ClassInst == NIL .AND. ! lHot .AND. ! Empty( ::Tag ) .AND. ::Parent:DataSource != NIL
+            cOrd := ::Parent:DataSource:OrdSetFocus()
+         ENDIF
+         IF ! Empty(cOrd) .AND. Upper( cOrd ) == Upper( ::Tag )
+            nColor1 := ::System:Color:Gray //::System:CurrentScheme:ButtonCheckedGradientBegin
+            nColor2 := ::System:Color:LtGray  //::System:CurrentScheme:ButtonCheckedGradientEnd
+            hBorderPen := ::System:CurrentScheme:Pen:ButtonPressedBorder
+          ELSE
+            nColor1 := ::System:Color:LtGray //::System:CurrentScheme:ButtonSelectedGradientBegin
+            nColor2 := ::System:Color:White  //::System:CurrentScheme:ButtonSelectedGradientEnd
+            hBorderPen := ::System:CurrentScheme:Pen:ButtonSelectedBorder
+         ENDIF
+         //nColor1 := ::System:Color:White
+         //nColor2 := ::System:Color:LtGray
        ELSE
-         nColor1 := ::System:Color:LtGray //::System:CurrentScheme:ButtonSelectedGradientBegin
-         nColor2 := ::System:Color:White  //::System:CurrentScheme:ButtonSelectedGradientEnd
-         hBorderPen := ::System:CurrentScheme:Pen:ButtonSelectedBorder
+         nColor1 := ::System:Color:LtGray //::System:CurrentScheme:ButtonPressedGradientBegin
+         nColor2 := ::System:Color:Gray   //::System:CurrentScheme:ButtonPressedGradientEnd
+         hBorderPen := ::System:CurrentScheme:Pen:ButtonPressedBorder
       ENDIF
-      //nColor1 := ::System:Color:White
-      //nColor2 := ::System:Color:LtGray
+
+      ::__aVertex[1]:Red   := GetRValue( nColor1 ) * 256
+      ::__aVertex[1]:Green := GetGValue( nColor1 ) * 256
+      ::__aVertex[1]:Blue  := GetBValue( nColor1 ) * 256
+
+      ::__aVertex[2]:Red   := GetRValue( nColor2 ) * 256
+      ::__aVertex[2]:Green := GetGValue( nColor2 ) * 256
+      ::__aVertex[2]:Blue  := GetBValue( nColor2 ) * 256
+
+      hOldPen   := SelectObject( hDC, hBorderPen )
+      hOldBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
+
+      __GradientFill( hDC, ::__aVertex, 2, ::__aMesh, 1, 1 )
+      Rectangle( hDC, aRect[1]-1, aRect[2]-1, aRect[3], aRect[4] )
     ELSE
-      nColor1 := ::System:Color:LtGray //::System:CurrentScheme:ButtonPressedGradientBegin
-      nColor2 := ::System:Color:Gray   //::System:CurrentScheme:ButtonPressedGradientEnd
-      hBorderPen := ::System:CurrentScheme:Pen:ButtonPressedBorder
+      nBorder    := ::HeaderForeColor
+      nBackColor := ::HeaderBackColor
+      IF lHot
+         nBorder    := ::System:CurrentScheme:MenuItemBorder
+         nBackColor := ::System:CurrentScheme:MenuItemSelected
+      ENDIF
+
+      ::__HeaderLeft  := nLeft
+      ::__HeaderRight := nRight
+      ::__HeaderX     := x
+
+      hOldFont := SelectObject( hDC, ::HeaderFont:Handle )
+
+      aAlign := _GetTextExtentPoint32( hDC, ::Caption )
+      y := (::Parent:__GetHeaderHeight() - aAlign[2] ) / 2
+
+      hOldBrush := SelectObject( hDC, CreateSolidBrush( nBackColor ) )
+
+      Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
+
+      nColor  := LightenColor( nBackColor, 100 )
+      nShadow := DarkenColor( nBackColor, 100 )
+
+      __Draw3dRect( hDC, aRect, nColor, nShadow )
+      
    ENDIF
-
-   ::__aVertex[1]:Red   := GetRValue( nColor1 ) * 256
-   ::__aVertex[1]:Green := GetGValue( nColor1 ) * 256
-   ::__aVertex[1]:Blue  := GetBValue( nColor1 ) * 256
-
-   ::__aVertex[2]:Red   := GetRValue( nColor2 ) * 256
-   ::__aVertex[2]:Green := GetGValue( nColor2 ) * 256
-   ::__aVertex[2]:Blue  := GetBValue( nColor2 ) * 256
-
-   hOldPen   := SelectObject( hDC, hBorderPen )
-   hOldBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
-
-   __GradientFill( hDC, ::__aVertex, 2, ::__aMesh, 1, 1 )
-   Rectangle( hDC, aRect[1]-1, aRect[2]-1, aRect[3], aRect[4] )
-
    SelectObject( hDC, hOldBrush )
 
    nColor := SetTextColor( hDC, nTxColor )
@@ -4185,18 +4212,40 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    SelectObject( hDC, hOldPen )
 
    IF ::SortArrow > 0 .AND. aRect[3]-15 > nLeft .AND. aRect[3]-15 > x + aAlign[1]
-      hOldPen    := SelectObject( hDC, GetStockObject( BLACK_PEN ) )
+      IF ::Parent:GradientHeader
+         hOldPen    := SelectObject( hDC, GetStockObject( BLACK_PEN ) )
+         FOR n := 1 TO nH
+             x := IIF( ::SortArrow == 1,n,nH-n+1)
+             y := (aRect[4]-nH)/2
 
-      FOR n := 1 TO nH
-          x := IIF( ::SortArrow == 1,n,nH-n+1)
-          y := (aRect[4]-nH)/2
-          
-          MoveTo( hDC, aRect[3] - (15-x), y+n-1 )
-          LineTo( hDC, aRect[3] - ( 4+x), y+n-1 )
-      NEXT
-      SelectObject( hDC, hOldPen )
+             MoveTo( hDC, aRect[3] - (15-x), y+n-1 )
+             LineTo( hDC, aRect[3] - ( 4+x), y+n-1 )
+         NEXT
+         SelectObject( hDC, hOldPen )
+       ELSE
+         hPenShadow := CreatePen( PS_SOLID, 0, nShadow )
+         hPenLight  := CreatePen( PS_SOLID, 0, nColor )
+
+         hOldPen := SelectObject( hDC, hPenLight )
+         z := 1
+         FOR i := 1 TO 2
+             FOR n := 1 TO nH
+                 x := IIF( ::SortArrow == 1,n,nH-n+1)
+                 y := (aRect[4]-nH)/2
+
+                 MoveTo( hDC, aRect[3] - (15-x), y+n+z )
+                 LineTo( hDC, aRect[3] - ( 4+x), y+n+z )
+             NEXT
+             SelectObject( hDC, hPenShadow )
+             z := 0
+             aRect[3]--
+         NEXT
+         SelectObject( hDC, hOldPen )
+
+         DeleteObject( hPenShadow )
+         DeleteObject( hPenLight )
+      ENDIF
    ENDIF
-
 RETURN NIL
 
 METHOD GetSize( nPos ) CLASS GridColumn

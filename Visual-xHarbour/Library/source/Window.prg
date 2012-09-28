@@ -10,7 +10,6 @@
 //  This source file is an intellectual property of xHarbour.com Inc.                                   *
 //  You may NOT forward or share this file under any conditions!                                        *
 //------------------------------------------------------------------------------------------------------*
-static aDef := {"BMP","ICO"}
 
 #include "vxh.ch"
 #include "colors.ch"
