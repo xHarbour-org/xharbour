@@ -18,7 +18,7 @@ C_SOURCES = \
 	context.c
 
 
-LIBNAME=hbcurl
+LIBNAME=hbcairo
 
 PRG_HEADERS=\
 	hbcairo.ch \
