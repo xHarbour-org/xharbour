@@ -31,7 +31,7 @@ LINEFLAGS=-l
 # if debug info is requested, set ARFLAGS to /P64 in your environment
 #===============================================================================
 !if !$d(ARFLAGS)
-ARFLAGS=/0 /C
+ARFLAGS=/0 /C /P256
 !endif
 
 #*******************************************************************************

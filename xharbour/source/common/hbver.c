@@ -275,6 +275,38 @@ char * hb_verPlatform( void )
                   }
 
                }
+#if 1
+               else if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion >= 2 )
+               {
+#if !defined( HB_OS_WIN_CE ) && !defined( __DMC__ ) && \
+    ( !defined( _MSC_VER ) || _MSC_VER >= 1400 )
+                  OSVERSIONINFOEX osVerEx;
+
+                  osVerEx.dwOSVersionInfoSize = sizeof( osVerEx );
+
+                  if( GetVersionEx( ( OSVERSIONINFO * ) &osVerEx ) )
+                  {
+                     if( osVerEx.wProductType == VER_NT_WORKSTATION )
+                        szName = " XP x64";
+                     else
+                     {
+                        #ifndef SM_SERVERR2
+                        #define SM_SERVERR2 89
+                        #endif
+
+                        if( GetSystemMetrics( SM_SERVERR2 ) != 0 )
+                           szName = " Server 2003 R2";
+                        else
+                           szName = " Server 2003";
+                     }
+                  }
+                  else
+                     szName = "";
+#else
+                  szName = " Server 2003 / XP x64";
+#endif
+               }
+#else
                else if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 2 )
                {
                   #ifndef SM_SERVERR2
@@ -290,6 +322,7 @@ char * hb_verPlatform( void )
                      szName = " 2003";
                   }
                }
+#endif
                else if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 1 )
                {
                   szName = " XP";

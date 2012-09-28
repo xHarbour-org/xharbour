@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2012-09-29 03:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/makefile.bc
+    ! page size set to 256 (was set, but were perharps unintentionally unset)
+
+  * source/common/hbver.c
+    ! fixed to recognize Windows XP x64 correctly (copy-paste from Harbour)
+
+  * cotrib/png/*.*
+    ! updated to version 1.5.3
+
 2012-09-27 23:19  UTC-0300 Luiz Rafael Culik <luiz/at/xharbour.com>
   * contrib/hbcairo/Makefile 
     ! corrected libname
