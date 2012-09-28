@@ -124,6 +124,11 @@ HB_GT_LIBS=\
 
 !if !$d(HB_THREAD_SUPPORT)
 PROJECT=$(ST_PROJECT)
+!if ( defined(HB_DIR_ADS) && !("$(HB_ADS_IMPLIB)"=="no") )
+PROJECT=\
+	$(PROJECT)\
+	$(ACE32_LIB)
+!endif
 !else
 PROJECT=$(MT_PROJECT)
 !endif
@@ -137,6 +142,10 @@ ALL: $(PROJECT)
 #===============================================================================
 # Library dependencies and build rules
 #===============================================================================
+$(ACE32_LIB) : "$(HB_DIR_ADS)\ace32.dll"
+	ECHO Creating $(ACE32_LIB) import library
+	implib "$(ACE32_LIB)" "$(HB_DIR_ADS)\ace32.dll"
+
 $(COMPILER_LIB) : $(COMPILER_LIB_OBJS)
 	IF EXIST "$(COMPILER_LIB)" $(DEL) "$(COMPILER_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!
@@ -928,8 +937,6 @@ RDDADS_LIB_OBJS=\
 	$(OBJ_DIR)\ace32.obj
 !endif
 $(RDDADS_LIB) : $(RDDADS_LIB_OBJS)
-	IF NOT "$(HB_ADS_IMPLIB)" == "no" ECHO Creating $(ACE32_LIB) import library
-	IF NOT "$(HB_ADS_IMPLIB)" == "no" implib "$(ACE32_LIB)" "$(HB_DIR_ADS)\ace32.dll"
 	IF EXIST "$(RDDADS_LIB)" $(DEL) "$(RDDADS_LIB)" > NUL
 	TLIB $@ $(ARFLAGS) @&&!
 +$(**: = &^

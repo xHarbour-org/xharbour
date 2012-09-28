@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-29 05:03 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/makefile.bc
+    ! move creation of ACE32.LIB to core build stage since it is used by
+      HARBOUR.DLL (previously ACE32.LIB is created during contrib build stage)
+
+  * winmake/mdir.bat
+    ! remove created ACE32.LIB upon clean build
+
+  * make_b32.bat
+    - remove not-needed creation of ACE32.LIB upon clean build
+
 2012-09-29 03:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.bc
     ! page size set to 256 (was set, but were perharps unintentionally unset)

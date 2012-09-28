@@ -211,8 +211,8 @@ rem=============================================================================
 :CLEAN
 rem=============================================================================
    @CALL winmake\mdir.bat clean
-   IF EXIST "%HB_DIR_ADS%\ace32.dll" implib -c lib\b32\ace32.lib "%HB_DIR_ADS%\ace32.dll"
-   IF EXIST lib\b32\ace32.lib copy lib\b32\ace32.lib lib
+   REM IF EXIST "%HB_DIR_ADS%\ace32.dll" implib -c lib\b32\ace32.lib "%HB_DIR_ADS%\ace32.dll"
+   REM IF EXIST lib\b32\ace32.lib copy lib\b32\ace32.lib lib
    IF "%2"=="BUILD" goto BUILD_ALL
    IF "%2"=="build" goto BUILD_ALL
    @ECHO ****** End of Job *****

@@ -564,6 +564,7 @@ if exist lib\%LIBPREFIX%pdflite%LIBEXT%             del lib\%LIBPREFIX%pdflite%L
 if exist lib\%LIBPREFIX%tiff%LIBEXT%                del lib\%LIBPREFIX%tiff%LIBEXT%
 if exist lib\%LIBPREFIX%jpeg%LIBEXT%                del lib\%LIBPREFIX%jpeg%LIBEXT%
 if exist lib\%LIBPREFIX%hbexpat%LIBEXT%             del lib\%LIBPREFIX%hbexpat%LIBEXT%
+if exist lib\%LIBPREFIX%ace32%LIBEXT%               del lib\%LIBPREFIX%ace32%LIBEXT%
 if exist lib\%LIBPREFIX%rddads%LIBEXT%              del lib\%LIBPREFIX%rddads%LIBEXT%
 if exist lib\%LIBPREFIX%telepath%LIBEXT%            del lib\%LIBPREFIX%telepath%LIBEXT%
 if exist lib\%LIBPREFIX%hbcc%LIBEXT%                del lib\%LIBPREFIX%hbcc%LIBEXT%
