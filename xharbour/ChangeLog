@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-29 19:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+   * contrib/rddsql/hbrddsql.h
+     ! temporarily sync with xHarbour RDDAPI
+
+   * include/hbver.h
+     ! version: 1.2.2 -> 1.2.3
+
 2012-09-29 08:27 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbcompat.h
     + xHarbour equivalent for HB_PFS

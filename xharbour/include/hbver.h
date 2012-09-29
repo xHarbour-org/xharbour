@@ -56,7 +56,7 @@
 #define HB_VER_LEX "SimpLex"
 #define HB_VER_MAJOR    1       /* Major version number */
 #define HB_VER_MINOR    2       /* Minor version number */
-#define HB_VER_REVISION 1       /* Revision number */
+#define HB_VER_REVISION 3       /* Revision number */
 
 /* TOFIX: Ideally these should be generated dynamically, until
           then, they should be updated by the builder. [vszakats] */
