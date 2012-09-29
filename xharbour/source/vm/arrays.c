@@ -2266,3 +2266,26 @@ int hb_arrayMode( void )
       return 1;
    #endif
 }
+
+HB_ISIZ hb_arrayGetNS( PHB_ITEM pArray, HB_SIZE nIndex )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetNS(%p, %" HB_PFS "u)", pArray, nIndex));
+
+   if( HB_IS_ARRAY( pArray ) && nIndex > 0 && nIndex <= pArray->item.asArray.value->ulLen )
+      return hb_itemGetNS( pArray->item.asArray.value->pItems + nIndex - 1 );
+   else
+      return 0;
+}
+
+BOOL hb_arraySetNS( PHB_ITEM pArray, HB_SIZE nIndex, HB_ISIZ nNumber )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_arraySetNS(%p, %" HB_PFS "u, %" HB_PFS "d)", pArray, nIndex, nNumber));
+
+   if( HB_IS_ARRAY( pArray ) && nIndex > 0 && nIndex <= pArray->item.asArray.value->ulLen )
+   {
+      hb_itemPutNS( pArray->item.asArray.value->pItems + nIndex - 1, nNumber );
+      return TRUE;
+   }
+   else
+      return FALSE;
+}

@@ -8,6 +8,42 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-29 08:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbcompat.h
+    - remove definition of hb_retns
+    - remove redefinition of HB_ULONG
+
+  * source/vm/itemapi.c
+    + PHB_ITEM hb_itemPutNS( PHB_ITEM pItem, HB_ISIZ nNumber )
+    + HB_ISIZ hb_itemGetNS( PHB_ITEM pItem )
+      ! functions borrowed from Harbour
+
+  * source/vm/arrays.c
+    + HB_ISIZ hb_arrayGetNS( PHB_ITEM pArray, HB_SIZE nIndex )
+    + BOOL hb_arraySetNS( PHB_ITEM pArray, HB_SIZE nIndex, HB_ISIZ nNumber );
+      ! functions borrowed from Harbour
+
+  * source/vm/hvm.c
+    + void hb_vmPushSize( HB_ISIZ nNumber )
+      ! functions borrowed from Harbour
+
+  * source/vm/extend.c
+    + int hb_storns( HB_ISIZ nValue, int iParam )
+    + void hb_retns( HB_ISIZ nNumber )
+    + HB_ISIZ hb_parns( int iParam, ... )
+      ! functions borrowed from Harbour
+
+  * include/hbapiitm.h
+  * include/hbapi.h
+  * include/hbvm.h
+    + function prototypes for the newly added functions
+
+    /*
+    NOTE:
+    This is the beginning of a quite long process to use uniform data types
+    in both 32 and 64-bit environment.
+    */
+
 2012-09-29 05:03 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.bc
     ! move creation of ACE32.LIB to core build stage since it is used by
@@ -27,7 +63,7 @@
     ! fixed to recognize Windows XP x64 correctly (copy-paste from Harbour)
 
   * cotrib/png/*.*
-    ! updated to version 1.5.3
+    ! updated to version 1.5.13
 
 2012-09-27 23:19  UTC-0300 Luiz Rafael Culik <luiz/at/xharbour.com>
   * contrib/hbcairo/Makefile 

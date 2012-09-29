@@ -178,7 +178,7 @@ extern HB_EXPORT PHB_ITEM   hb_itemUnRef    ( PHB_ITEM pItem ); /* de-references
 extern HB_EXPORT PHB_ITEM   hb_itemUnShare  ( PHB_ITEM pItem ); /* un-share given string item */
 extern HB_EXPORT PHB_ITEM   hb_itemUnShareString( PHB_ITEM pItem ); /* un-share given string item - the pItem have to be valid unrefed string item */
 extern HB_EXPORT void       hb_itemResizeString( PHB_ITEM pItem, ULONG ulLen );
-extern HB_EXPORT BOOL         hb_itemGetWriteCL( PHB_ITEM pItem, char ** pszValue, ULONG * pulLen );
+extern HB_EXPORT BOOL       hb_itemGetWriteCL( PHB_ITEM pItem, char ** pszValue, ULONG * pulLen );
 
 extern HB_EXPORT PHB_ITEM   hb_itemUnRefOnce( PHB_ITEM pItem ); /* de-references passed variable, one step*/
 extern HB_EXPORT char *     hb_itemStr      ( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec ); /* convert a number to a string */
@@ -188,6 +188,9 @@ extern HB_EXPORT PHB_ITEM   hb_itemValToStr ( PHB_ITEM pItem ); /* Convert any s
 extern HB_EXPORT char *     hb_itemPadConv  ( PHB_ITEM pItem, ULONG * pulSize, BOOL * bFreeReq ); /* Convert item to a string for PAD* functions */
 extern HB_EXPORT void       hb_itemSwap     ( PHB_ITEM pItem1, PHB_ITEM pItem2 );
 extern HB_EXPORT PHB_ITEM   hb_itemClone    ( PHB_ITEM pItem );
+
+extern HB_EXPORT PHB_ITEM   hb_itemPutNS( PHB_ITEM pItem, HB_ISIZ nNumber );
+extern HB_EXPORT HB_ISIZ    hb_itemGetNS( PHB_ITEM pItem );
 
 #ifndef HB_LONG_LONG_OFF
    extern HB_EXPORT LONGLONG  hb_itemGetNLL   ( PHB_ITEM pItem );

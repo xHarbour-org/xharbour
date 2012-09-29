@@ -1905,4 +1905,82 @@ void hb_retnlllen( LONGLONG llNumber, int iWidth)
 }
 #endif
 
+#undef hb_retns
+void hb_retns( HB_ISIZ nNumber )
+{
+   HB_THREAD_STUB_ANY
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_retns(%" HB_PFS "d )", nNumber));
+
+   hb_itemPutNS( hb_stackReturnItem(), nNumber );
+}
+
+HB_ISIZ hb_parns( int iParam, ... )
+{
+   HB_THREAD_STUB_ANY
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_parns(%d, ...)", iParam));
+
+   if( iParam >= -1 && iParam <= hb_pcount() )
+   {
+      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+
+      if( HB_IS_BYREF( pItem ) )
+         pItem = hb_itemUnRef( pItem );
+
+      if( HB_IS_LONG( pItem ) )
+         return ( HB_ISIZ ) pItem->item.asLong.value;
+      else if( HB_IS_INTEGER( pItem ) )
+         return ( HB_ISIZ ) pItem->item.asInteger.value;
+      else if( HB_IS_DOUBLE( pItem ) )
+         return ( HB_ISIZ ) pItem->item.asDouble.value;
+      else if( HB_IS_ARRAY( pItem ) )
+      {
+         va_list va;
+         HB_SIZE nArrayIndex;
+
+         va_start( va, iParam );
+         nArrayIndex = va_arg( va, HB_SIZE );
+         va_end( va );
+
+         return hb_arrayGetNS( pItem, nArrayIndex );
+      }
+   }
+
+   return 0;
+}
+
+int hb_storns( HB_ISIZ nValue, int iParam, ... )
+{
+   HB_THREAD_STUB_ANY
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_storvns(%" HB_PFS "d, %d, ...)", nValue, iParam));
+
+   if( iParam >= -1 && iParam <= hb_pcount() )
+   {
+      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      HB_BOOL bByRef = HB_IS_BYREF( pItem );
+
+      if( bByRef  )
+         pItem = hb_itemUnRef( pItem );
+
+      if( HB_IS_ARRAY( pItem ) )
+      {
+         int iRetVal;
+         va_list va;
+         va_start( va, iParam );
+         iRetVal = hb_arraySetNS( pItem, va_arg( va, HB_SIZE ), nValue ) ? 1 : 0;
+         va_end( va );
+         return iRetVal;
+      }
+      else if( bByRef || iParam == -1 )
+      {
+         hb_itemPutNS( pItem, nValue );
+         return 1;
+      }
+   }
+
+   return 0;
+}
+
 HB_EXTERN_END

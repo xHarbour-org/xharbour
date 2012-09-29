@@ -2402,3 +2402,59 @@ PHB_ITEM hb_itemPutNull( PHB_ITEM pItem )
    }
 #endif
 
+PHB_ITEM hb_itemPutNS( PHB_ITEM pItem, HB_ISIZ nNumber )
+{
+   HB_THREAD_STUB_ANY
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_itemPutNS(%p, %" HB_PFS "d)", pItem, nNumber));
+
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+         hb_itemClear( pItem );
+   }
+   else
+      pItem = hb_itemNew( NULL );
+
+#if HB_SIZE_MAX <= HB_UINT_MAX
+   pItem->type = HB_IT_INTEGER;
+   pItem->item.asInteger.value = ( int ) nNumber;
+   /* EXP limit used intentionally */
+   pItem->item.asInteger.length = HB_INT_EXPLENGTH( nNumber );
+#else
+   if( HB_LIM_INT( nNumber ) )
+   {
+      pItem->type = HB_IT_INTEGER;
+      pItem->item.asInteger.value = ( int ) nNumber;
+      /* EXP limit used intentionally */
+      pItem->item.asInteger.length = HB_INT_EXPLENGTH( nNumber );
+   }
+   else
+   {
+      pItem->type = HB_IT_LONG;
+      pItem->item.asLong.value = nNumber;
+      pItem->item.asLong.length = HB_LONG_LENGTH( nNumber );
+   }
+#endif
+
+   return pItem;
+}
+
+HB_ISIZ hb_itemGetNS( PHB_ITEM pItem )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_itemGetNS(%p)", pItem));
+
+   if( pItem )
+   {
+      if( HB_IS_LONG( pItem ) )
+         return ( HB_ISIZ ) pItem->item.asLong.value;
+
+      else if( HB_IS_INTEGER( pItem ) )
+         return ( HB_ISIZ ) pItem->item.asInteger.value;
+
+      else if( HB_IS_DOUBLE( pItem ) )
+         return ( HB_ISIZ ) pItem->item.asDouble.value;
+   }
+
+   return 0;
+}

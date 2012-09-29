@@ -477,6 +477,10 @@ extern HB_EXPORT       void   hb_retnintlen( HB_LONG llNumber, int iWidth );
 #endif
 extern HB_EXPORT       void   hb_rettdt( long lJulian, long lMilliSec );
 
+extern HB_EXPORT void    hb_retns( HB_ISIZ nNumber );
+extern HB_EXPORT HB_ISIZ hb_parns( int iParam, ... );
+extern HB_EXPORT int     hb_storns( HB_ISIZ nValue, int iParam, ... );
+
 #ifdef HB_API_MACROS
    #include "hbapiitm.h"
    #ifndef HB_COMP_H_
@@ -519,6 +523,8 @@ extern HB_EXPORT       void   hb_rettdt( long lJulian, long lMilliSec );
     #define hb_retnintlen( llNumber, iWidth )    hb_itemPutNIntLen( hb_stackReturnItem(), (llNumber), (iWidth) )
     #define hb_retnll( llNumber )                hb_itemPutNLL( hb_stackReturnItem(), (llNumber) )
     #define hb_retnlllen( llNumber, iWidth )     hb_itemPutNLLLen( hb_stackReturnItem(), (llNumber), (iWidth) )
+
+    #define hb_retns( nNumber )                  hb_itemPutNS( hb_stackReturnItem(), nNumber )
 #endif
 
 extern HB_EXPORT void    hb_storc( const char * szText, int iParam, ... ); /* stores a szString on a variable by reference */
@@ -645,6 +651,8 @@ extern HB_EXPORT PHB_ITEM  hb_arrayFromStack( USHORT uiLen ); /* Creates and ret
 extern HB_EXPORT PHB_ITEM  hb_arrayFromParams( PHB_ITEM *pBase ); /* Creates and returns an Array of Generic Parameters for specified base symbol. */
 extern HB_EXPORT PHB_ITEM  hb_arrayBaseParams( void );
 extern HB_EXPORT PHB_ITEM  hb_arraySelfParams( void );
+extern HB_EXPORT HB_ISIZ   hb_arrayGetNS( PHB_ITEM pArray, HB_SIZE nIndex );
+extern HB_EXPORT BOOL      hb_arraySetNS( PHB_ITEM pArray, HB_SIZE nIndex, HB_ISIZ nNumber );
 #ifndef HB_LONG_LONG_OFF
 extern HB_EXPORT LONGLONG  hb_arrayGetNLL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the long long int value contained on an array element */
 #endif

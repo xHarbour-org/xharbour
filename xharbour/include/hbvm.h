@@ -162,6 +162,8 @@ extern HB_EXPORT void     hb_vmPushState( void ); /* push current VM state on st
 extern HB_EXPORT void     hb_vmPopState( void ); /* pop current VM state from stack */
 extern HB_EXPORT void     hb_vmPushItemRef( PHB_ITEM pItem ); /* push item reference */
 
+extern HB_EXPORT void     hb_vmPushSize( HB_ISIZ nNumber );
+
 extern HB_EXPORT BOOL     hb_vmIsMt( void ); /* return TRUE if HVM is compiled with thread support */
 extern HB_EXPORT void     hb_vmLock( void ); /* lock VM blocking GC execution by other threads */
 extern HB_EXPORT void     hb_vmUnlock( void ); /* unlock VM, allow GC execution */

@@ -14194,3 +14194,14 @@ HB_FUNC( __VMVARSSET )
    HB_FUNC_EXEC( HB_DBG_VMVARSSET );
 }
 
+void hb_vmPushSize( HB_ISIZ nNumber )
+{
+#if HB_SIZE_MAX <= HB_UINT_MAX
+   hb_vmPushInteger( ( int ) nNumber );
+#else
+   if( HB_LIM_INT( nNumber ) )
+      hb_vmPushInteger( ( int ) nNumber );
+   else
+      hb_vmPushHBLong( nNumber );
+#endif
+}

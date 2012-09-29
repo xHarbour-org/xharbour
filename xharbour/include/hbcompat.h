@@ -70,13 +70,13 @@
 #define hb_parldef( l1, l2 )      ( ISLOG( l1 ) ? hb_parl( l1 )    : l2 )
 #define hb_parnidef( n1, n2 )     ( ISNUM( n1 ) ? hb_parni( n1 )   : n2 )
 #define hb_parnintdef( n1, n2 )   ( ISNUM( n1 ) ? hb_parnint( n1 ) : n2 )
-#define HB_ULONG                  ULONG
+/* #define HB_ULONG               ULONG */
 #define HB_BYTE                   BYTE
 #define HB_USHORT                 USHORT
 #define HB_UCHAR                  UCHAR
 #define HB_FT_IMAGE               HB_FT_PICTURE
 #define HB_I64                    INT64
-#define hb_retns                  hb_retnl
+/* #define hb_retns               hb_retnl */
 #define hb_gcMark                 hb_gcItemRef
 #define hb_vmAtQuit               hb_vmAtExit
 #define HB_FSNAMECONV             hb_fsNameConv
