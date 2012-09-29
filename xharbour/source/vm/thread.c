@@ -3504,7 +3504,7 @@ void hb_console_UnLock( void )
 
 void hb_console_safe_lock( void )
 {
-#if defined( HB_THREAD_SUPPORT )
+#if defined( HB_THREAD_SUPPORT ) && defined( HB_OS_WIN)
    HB_THREAD_STUB
    HB_CLEANUP_PUSH( hb_setGetOutputSafety() ? s_doNothing : hb_rawMutexForceUnlock, hb_outputMutex );
    if ( hb_setGetOutputSafety() )
@@ -3514,7 +3514,7 @@ void hb_console_safe_lock( void )
 
 void hb_console_safe_unlock( void )
 {
-#if defined( HB_THREAD_SUPPORT )
+#if defined( HB_THREAD_SUPPORT )&& defined( HB_OS_WIN)
    HB_THREAD_STUB
    if ( hb_setGetOutputSafety() )
       HB_CRITICAL_UNLOCK( hb_outputMutex );
@@ -3582,14 +3582,14 @@ void hb_filebuf_critical_UnLock( void )
 
 void hb_hsx_critical_Lock( void )
 {
-#if defined( HB_THREAD_SUPPORT )
+#if defined( HB_THREAD_SUPPORT ) && defined( HB_OS_WIN)
    EnterCriticalSection( &s_hsxMtx );
 #endif
 }
 
 void hb_hsx_critical_UnLock( void )
 {
-#if defined( HB_THREAD_SUPPORT )
+#if defined( HB_THREAD_SUPPORT )  && defined( HB_OS_WIN)
    LeaveCriticalSection( &s_hsxMtx );
 #endif
 }

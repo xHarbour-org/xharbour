@@ -7,7 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
+2012-09-29 10:19  UTC-0300 Luiz Rafael Culik <luiz/at/xharbour.com>
+   * source/vm/thread.c
+     ! fixes to compile in mt mode under linux
+     
 2012-09-29 19:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
    * contrib/rddsql/hbrddsql.h
      ! temporarily sync with xHarbour RDDAPI
