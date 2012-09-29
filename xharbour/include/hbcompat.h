@@ -85,4 +85,6 @@
 #define HB_IS_TIMESTAMP           HB_IS_TIMEFLAG
 #define HB_CDP_ISBINSORT(cdp)     0
 
+#define HB_PFS                    PFLL
+
 #endif /* HB_COMPAT_H_ */

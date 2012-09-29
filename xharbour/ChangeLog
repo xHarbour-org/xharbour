@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-09-29 08:27 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbcompat.h
+    + xHarbour equivalent for HB_PFS
+
 2012-09-29 08:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbcompat.h
     - remove definition of hb_retns
