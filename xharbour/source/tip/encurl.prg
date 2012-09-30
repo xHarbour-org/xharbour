@@ -89,7 +89,7 @@ HB_FUNC( TIPENCODERURL_ENCODE )
    if ( ! cData )
    {
       hb_errRT_BASE( EG_ARG, 3012, NULL,
-         "TIPENCODERBASE64_ENCODE", 1, hb_paramError(1) );
+         "TIPENCODERURL_ENCODE", 1, hb_paramError(1) );
       return;
    }
 
@@ -155,7 +155,7 @@ HB_FUNC( TIPENCODERURL_DECODE )
    if ( ! cData )
    {
       hb_errRT_BASE( EG_ARG, 3012, NULL,
-         "TIPENCODERBASE64_DECODE", 1, hb_paramError(1) );
+         "TIPENCODERURL_DECODE", 1, hb_paramError(1) );
       return;
    }
 

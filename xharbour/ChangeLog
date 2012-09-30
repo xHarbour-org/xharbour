@@ -7,7 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-2012-09-29 10:19  UTC-0300 Luiz Rafael Culik <luiz/at/xharbour.com>
+2012-09-30 11:02 UTC-0300 Walter Negro <wnegro/AT/vstour.com>
+   * source/tip/encurl.prg
+     ! fixed name of function in error
+   * contrib/hbmzip/hbmzip.c
+     ! fixed typo, now files in zip have date and time under Windows
+
+2012-09-29 10:19 UTC-0300 Luiz Rafael Culik <luiz/at/xharbour.com>
    * source/vm/thread.c
      ! fixes to compile in mt mode under linux
      
