@@ -93,9 +93,11 @@ REM --> Copy files
 
     REM ** SQLRDD **
     IF NOT EXIST \xhb\dll\SQLRDD MD \xhb\dll\SQLRDD
-    XCOPY \xharbour.com\xHarbour-SQLRDD\dll\*.dll \xhb\dll\SQLRDD /d /y
-    XCOPY \xharbour.com\xHarbour-SQLRDD\lib\*.lib \xhb\lib /d /y
-    XCOPY \xHarbour.com\xHarbour-SQLRDD\include   \xHb\include /d /y /i
+    XCOPY \xharbour.com\xHarbour-SQLRDD\dll\*.dll      \xhb\dll\SQLRDD /d /y
+    XCOPY \xharbour.com\xHarbour-SQLRDD\lib\*.lib      \xhb\lib /d /y
+    XCOPY \xHarbour.com\xHarbour-SQLRDD\include        \xHb\include /d /y /i
+    XCOPY \xHarbour.com\xHarbour-SQLRDD\source\*.ch    \xHb\include /d /y /i
+    XCOPY \xHarbour.com\xHarbour-SQLRDD\source\mysql.h \xHb\include /d /y
     IF EXIST \xHB\include\sqlrdd.xns DEL \xHB\include\sqlrdd.xns /Q
 
 

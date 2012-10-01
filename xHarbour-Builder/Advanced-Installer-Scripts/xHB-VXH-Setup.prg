@@ -18,6 +18,8 @@ FUNCTION Build_xHB_VXH_Setup(cEdition, cOFw)
    ? ">"+cRevision+"<"
 
    DO CASE
+      CASE IsDirectory("C:\Program Files\Caphyon\Advanced Installer 9.4")
+                  cAI:="C:\Program Files\Caphyon\Advanced Installer 9.4\bin\x86\"
       CASE IsDirectory("C:\Program Files\Caphyon\Advanced Installer 9.0.1")
                   cAI:="C:\Program Files\Caphyon\Advanced Installer 9.0.1\bin\x86\"
       CASE IsDirectory("W:\Program Files\Caphyon\Advanced Installer 8.7")
