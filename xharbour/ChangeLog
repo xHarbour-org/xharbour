@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2012-10-01 07:56 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+   * contrib/hbbtree/hb_btree.h
+     ! Temporary hack: HB_ULONG -> ULONG to pacify BCC warning
+
 2012-09-30 11:02 UTC-0300 Walter Negro <wnegro/AT/vstour.com>
    * source/tip/encurl.prg
      ! fixed name of function in error
