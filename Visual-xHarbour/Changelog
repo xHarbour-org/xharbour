@@ -7,6 +7,12 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2012-10-01 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed wrong references in class Service()
+   + Added DateTimePicker ShortCentury to the list of available formats.
+   + Added property DateTimePicker:InitialEmpty to show blank values until a key
+     is pressed or a date is selected in the dropdown calendar.
+
 2012-09-26 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    - Reverted change in DataGrid Header colors
    + Added new property DataGrid:GradientHeader

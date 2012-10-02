@@ -167,13 +167,13 @@ METHOD __ServiceMain() CLASS Service
 
    IF ::ServiceStatusHandle != 0
       ::ServiceStatusStruct:dwCurrentState := SERVICE_START_PENDING
-      SetServiceStatus( ::ServiceStatusHandle, ::ServiceStatus )
+      SetServiceStatus( ::ServiceStatusHandle, ::ServiceStatusStruct )
 
       ::StopServiceEvent                 := CreateEvent( 0, .F., .F., 0 )
 
       ::ServiceStatusStruct:dwControlsAccepted := ::ServiceStatusStruct:dwControlsAccepted | SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN
       ::ServiceStatusStruct:dwCurrentState     := SERVICE_RUNNING
-      SetServiceStatus( ::ServiceStatusHandle, ::ServiceStatus )
+      SetServiceStatus( ::ServiceStatusHandle, ::ServiceStatusStruct )
 
       WHILE ( WaitForSingleObject( ::StopServiceEvent, ::TimeOut ) == WAIT_TIMEOUT ) .AND. ::ServiceStatusStruct:dwCurrentState == SERVICE_RUNNING
          IF VALTYPE( ::EventBlock ) == "B"
@@ -182,12 +182,12 @@ METHOD __ServiceMain() CLASS Service
       ENDDO
 
       ::ServiceStatusStruct:dwCurrentState := SERVICE_STOP_PENDING
-      SetServiceStatus( ::ServiceStatusHandle, ::ServiceStatus )
+      SetServiceStatus( ::ServiceStatusHandle, ::ServiceStatusStruct )
       CloseHandle( ::StopServiceEvent )
       ::StopServiceEvent := 0
       ::ServiceStatusStruct:dwControlsAccepted := ::ServiceStatusStruct:dwControlsAccepted & NOT(SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN)
       ::ServiceStatusStruct:dwCurrentState     := SERVICE_STOPPED
-      SetServiceStatus( ::ServiceStatusHandle, ::ServiceStatus )
+      SetServiceStatus( ::ServiceStatusHandle, ::ServiceStatusStruct )
    ENDIF
 RETURN 0
 
@@ -199,7 +199,7 @@ METHOD __ServiceProc( nCode ) CLASS Service
 
       CASE SERVICE_CONTROL_STOP
            ::ServiceStatusStruct:dwCurrentState := SERVICE_STOP_PENDING
-           SetServiceStatus( ::ServiceStatusHandle, ::ServiceStatus )
+           SetServiceStatus( ::ServiceStatusHandle, ::ServiceStatusStruct )
            SetEvent( ::StopServiceEvent )
            RETURN 0
 
@@ -209,7 +209,7 @@ METHOD __ServiceProc( nCode ) CLASS Service
       CASE SERVICE_CONTROL_CONTINUE
            EXIT
    END
-   SetServiceStatus( ::ServiceStatusHandle, ::ServiceStatus )
+   SetServiceStatus( ::ServiceStatusHandle, ::ServiceStatusStruct )
 RETURN 0
 
 CLASS ServiceController INHERIT Component, Service

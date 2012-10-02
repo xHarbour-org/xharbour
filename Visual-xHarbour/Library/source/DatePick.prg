@@ -49,12 +49,16 @@ CLASS DateTimePicker INHERIT Control
    ACCESS Time                INLINE    ::xTime PERSISTENT
    ASSIGN Time(c)             INLINE    ::xTime := c, ::SetSystemTime()
 
-   PROPERTY UpDown     INDEX DTS_UPDOWN      READ xUpDown       WRITE SetStyle  DEFAULT .F. PROTECTED
-   PROPERTY Parse      INDEX DTS_APPCANPARSE READ xParse        WRITE SetStyle  DEFAULT .F. PROTECTED
-   PROPERTY Format                           READ xFormat       WRITE SetFormat DEFAULT __GetSystem():DateTimeFormat:Short  PROTECTED
-   PROPERTY CustomFormat                     READ xCustomFormat WRITE SetCustomFormat       PROTECTED
-   PROPERTY Border       INDEX WS_BORDER      READ xBorder     WRITE SetStyle  DEFAULT .F.  PROTECTED
+   PROPERTY UpDown       INDEX DTS_UPDOWN      READ xUpDown       WRITE SetStyle  DEFAULT .F. PROTECTED
+   PROPERTY Parse        INDEX DTS_APPCANPARSE READ xParse        WRITE SetStyle  DEFAULT .F. PROTECTED
+   PROPERTY Format                             READ xFormat       WRITE SetFormat DEFAULT __GetSystem():DateTimeFormat:Short  PROTECTED
+   PROPERTY CustomFormat                       READ xCustomFormat WRITE SetCustomFormat       PROTECTED
+   PROPERTY Border       INDEX WS_BORDER       READ xBorder       WRITE SetStyle  DEFAULT .F. PROTECTED
 
+   PROPERTY ShowNone     INDEX DTS_SHOWNONE    READ xShowNone     WRITE SetStyle  DEFAULT .F. PROTECTED
+   PROPERTY RightAlign   INDEX DTS_RIGHTALIGN  READ xRightAlign   WRITE SetStyle  DEFAULT .F. PROTECTED
+
+   DATA InitialEmpty     PUBLISHED INIT .F.
    DATA __nLast   PROTECTED INIT 0
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -93,6 +97,7 @@ CLASS DateTimePicker INHERIT Control
    METHOD OnKillFocus         VIRTUAL
    METHOD OnSetFocus          VIRTUAL
 
+   METHOD OnKeyDown()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -160,6 +165,9 @@ METHOD Create() CLASS DateTimePicker
    ::MaxTime := STRZERO(::MinRange:Hour,2) +":"+ STRZERO(::MinRange:Minute,2) +":"+ STRZERO(::MinRange:Second,2)
 
    ::SetSystemTime()
+   IF ::InitialEmpty
+      ::Sendmessage( DTM_SETFORMAT, 0, " " )
+   ENDIF
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -173,6 +181,16 @@ METHOD GetSystemTime( nIndex ) CLASS DateTimePicker
       RETURN STRZERO(st:wHour,2) +":"+ STRZERO(st:wMinute,2) +":"+ STRZERO(st:wSecond,2)
    ENDIF
 RETURN st
+
+//-----------------------------------------------------------------------------------------------
+
+METHOD OnKeyDown() CLASS DateTimePicker
+   IF ::InitialEmpty
+      ::InitialEmpty := .F.
+      ::Sendmessage( DTM_SETFORMAT, 0, NIL )
+      ::Sendmessage( WM_KEYDOWN, VK_RIGHT, 0 )
+   ENDIF
+RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 
@@ -259,6 +277,11 @@ METHOD OnParentNotify( nwParam, nlParam ) CLASS DateTimePicker
    (nwParam)
    DO CASE
       CASE ::Parent:hdr:code == DTN_CLOSEUP
+           IF ::InitialEmpty
+              ::InitialEmpty := .F.
+              ::Sendmessage( DTM_SETFORMAT, 0, NIL )
+              ::Sendmessage( WM_KEYDOWN, VK_RIGHT, 0 )
+           ENDIF
            nRet := ::OnCloseUp( ::Parent:hdr, nlParam )
            nRet := __Evaluate( ::Action, Self, ::Parent:hdr, nlParam, nRet )
            nRet := ExecuteEvent( "OnCloseUp", Self )

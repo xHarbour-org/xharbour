@@ -492,6 +492,7 @@ METHOD Init() CLASS System
    ::DateTimeFormat[ "Short" ]       := DTS_SHORTDATEFORMAT
    ::DateTimeFormat[ "Long" ]        := DTS_LONGDATEFORMAT
    ::DateTimeFormat[ "Time" ]        := DTS_TIMEFORMAT
+   ::DateTimeFormat[ "ShortCentury" ]:= DTS_SHORTDATECENTURYFORMAT
    ::DateTimeFormat[ "Custom" ]      := 20
 
    ::StdIcons := Hash()
