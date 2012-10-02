@@ -58,88 +58,91 @@
 
 #define HB_SIX_SECTION "SXKEYWORDS"
 
-memvar SxIniInfo
+MEMVAR SxIniInfo
 
 STATIC FUNCTION _sx_INIlogical( cVal )
-   IF Upper( cVal ) $ {".T.", "TRUE", "YES", "ON" }
+
+   IF Upper( cVal ) $ { ".T.", "TRUE", "YES", "ON" }
       RETURN .T.
    ELSEIF Upper( cVal ) $ { ".F.", "FALSE", "NO", "OFF" }
       RETURN .T.
    ENDIF
-RETURN NIL
 
-function _sx_INIinit( nArea )
-   local cFile, cPath, cName, cExt, cDrive, cSection
-   local xShared, xReadOnly, xAlias, xTrigger
-   local hIni, item, sect, h
+   RETURN NIL
+
+FUNCTION _sx_IniInit( nArea )
+
+   LOCAL cFile, cPath, cName, cExt, cDrive, cSection
+   LOCAL xShared, xReadOnly, xAlias, xTrigger
+   LOCAL hIni, item, sect, h
 
    /* SIX3 keeps information about ini sections in array[250] stored
     * in public variable called "SxIniInfo". This array is indexed
     * by workarea number. In Harbour we are using hash arrays.
     */
 
-   if Type( "SxIniInfo" ) = "U"
-      public SxIniInfo := {=>}
-      HSetCaseMatch( SxIniInfo, .f. )
-      HSetAutoAdd( SxIniInfo, .t. )
-   endif
+   IF Type( "SxIniInfo" ) = "U"
+      PUBLIC SxIniInfo := { => }
+      HSetCaseMatch( SxIniInfo, .F. )
+      HSetAutoAdd( SxIniInfo, .T. )
+   ENDIF
 
-   if nArea == NIL
-      return .f.
-   endif
+   IF nArea == NIL
+      RETURN .F.
+   ENDIF
 
    cFile := ( nArea )->( dbInfo( DBI_FULLPATH ) )
    hb_FNameSplit( cFile, @cPath, @cName, @cExt, @cDrive )
    cFile := hb_FNameMerge( cPath, cName, ".ini", cDrive )
-   hIni := hb_ReadIni( cFile, .F.,, .F. )
+   hIni := hb_ReadIni( cFile, .F. , , .F. )
 
-   if !Empty( hIni )
-      if HHasKey( hIni, HB_SIX_SECTION )
-         for each item in hIni[ HB_SIX_SECTION ]
+   IF !Empty( hIni )
+      IF HHasKey( hIni, HB_SIX_SECTION )
+         FOR EACH item in hIni[ HB_SIX_SECTION ]
             cSection := HGetKeyAt( hIni[ HB_SIX_SECTION ], HB_EnumIndex() )
             IF cSection == "SHARED"
-                  xShared := _sx_INIlogical( item )
+               xShared := _sx_INIlogical( item )
             ELSEIF cSection == "READONLY"
-                  xReadOnly := _sx_INIlogical( item )
+               xReadOnly := _sx_INIlogical( item )
             ELSEIF cSection == "ALIAS"
-                  xAlias := item
+               xAlias := item
             ELSEIF cSection == "TRIGGER"
-                  xTrigger := item
+               xTrigger := item
             ENDIF
-         next
-         if xTrigger != NIL
-            ( nArea )->( Sx_SetTrigger( TRIGGER_INSTALL, xTrigger ) )
-         endif
+         NEXT
+         IF xTrigger != NIL
+            ( nArea )->( sx_SetTrigger( TRIGGER_INSTALL, xTrigger ) )
+         ENDIF
          _sxOpenInit( nArea, xShared, xReadOnly, xAlias )
-      endif
+      ENDIF
 
       /* convert hash array into normal array */
-      for each item in hIni
-         if HB_IsHash( item )
+      FOR EACH item in hIni
+         IF HB_ISHASH( item )
             sect := Array( Len( item ) )
-            FOR each h IN item
+            FOR EACH h IN item
                sect[HB_EnumIndex()] := { HGetKeyAt( item, HB_EnumIndex() ), h }
             NEXT
             item := sect
-         endif
-      next
+         ENDIF
+      NEXT
 
       SxIniInfo[ nArea ] := hIni
 
-   endif
+   ENDIF
 
-return .f.
+   RETURN .F.
 
-function Sx_INIheader( cHeaderName, nArea )
+FUNCTION sx_IniHeader( cHeaderName, nArea )
 
-   if nArea == NIL
+   IF nArea == NIL
       nArea := Select()
-   endif
+   ENDIF
 
-   if HHasKey( SxIniInfo, nArea )
-      if HHasKey( SxIniInfo[ nArea ], cHeaderName )
-         return SxIniInfo[ nArea, cHeaderName ]
-      endif
-   endif
+   IF HHasKey( SxIniInfo, nArea )
+      IF HHasKey( SxIniInfo[ nArea ], cHeaderName )
+         RETURN SxIniInfo[ nArea, cHeaderName ]
+      ENDIF
+   ENDIF
 
-return {}
+   RETURN {}

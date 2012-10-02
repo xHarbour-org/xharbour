@@ -54,10 +54,11 @@
 
 #include "dbstruct.ch"
 
-/* NOTE: Compared to CA-Cl*pper, Harbour has three extra parameters 
+/* NOTE: Compared to CA-Cl*pper, Harbour has three extra parameters
          (cRDD, nConnection, cCodePage). */
 
 FUNCTION __dbJoin( cAlias, cFile, aFields, bFor, cRDD, nConnection, cCodePage )
+
    LOCAL nMaster := Select()
    LOCAL nDetail := Select( cAlias )
    LOCAL nResult
@@ -74,17 +75,17 @@ FUNCTION __dbJoin( cAlias, cFile, aFields, bFor, cRDD, nConnection, cCodePage )
    
    BEGIN SEQUENCE
 
-      dbCreate( cFile, aStruct, cRDD, .T., "", NIL, cCodePage, nConnection )
+      dbCreate( cFile, aStruct, cRDD, .T. , "", NIL, cCodePage, nConnection )
       nResult := Select()
       aJoinList := __JoinList( nMaster, nDetail, nResult, aStruct )
    
       dbSelectArea( nMaster )
       dbGoTop()
-      DO WHILE !Eof()
+      DO WHILE !EOF()
 
          dbSelectArea( nDetail )
          dbGoTop()
-         DO WHILE !Eof()
+         DO WHILE !EOF()
 
             dbSelectArea( nMaster )
             IF Eval( bFor )
@@ -117,6 +118,7 @@ FUNCTION __dbJoin( cAlias, cFile, aFields, bFor, cRDD, nConnection, cCodePage )
    RETURN .T.
 
 STATIC FUNCTION __FieldTwo( cAlias, aFields )
+
    LOCAL aFldTemp
    LOCAL bFind
    LOCAL aStruct
@@ -133,17 +135,18 @@ STATIC FUNCTION __FieldTwo( cAlias, aFields )
 
    aStruct := {}
    bFind := {| cFld | cFld == cField }
-   AEval( dbStruct(), {| aFld | cField := aFld[ DBS_NAME ],;
-                                iif( AScan( aFields, bFind ) == 0, NIL, AAdd( aStruct, aFld ) ) } )
+   AEval( dbStruct(), {| aFld | cField := aFld[ DBS_NAME ], ;
+      iif( AScan( aFields, bFind ) == 0, NIL, AAdd( aStruct, aFld ) ) } )
 
-   Select( cAlias )
+   SELECT( cAlias )
    bFind := {| cFld | "->" $ cFld .AND. SubStr( cFld, At( "->", cFld ) + 2 ) == cField }
-   AEval( dbStruct(), {| aFld | cField := aFld[ DBS_NAME ],;
-                                iif( AScan( aFields, bFind ) == 0, NIL, AAdd( aStruct, aFld ) ) } )
+   AEval( dbStruct(), {| aFld | cField := aFld[ DBS_NAME ], ;
+      iif( AScan( aFields, bFind ) == 0, NIL, AAdd( aStruct, aFld ) ) } )
 
    RETURN aStruct
 
 STATIC FUNCTION __JoinList( nMaster, nDetail, nResult, aStruct )
+
    LOCAL aList := {}
    LOCAL nPos
    LOCAL i
@@ -159,6 +162,7 @@ STATIC FUNCTION __JoinList( nMaster, nDetail, nResult, aStruct )
    RETURN aList
 
 STATIC PROCEDURE __doJoinList( aList )
+
    LOCAL aJoin
    
    IF Len( aList ) > 0

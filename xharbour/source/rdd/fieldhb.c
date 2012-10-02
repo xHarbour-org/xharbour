@@ -53,8 +53,8 @@
 
 #include "hbapi.h"
 
-/* NOTE: These functions are a new Harbour functions implemented in the 
-         original CA-Cl*pper namespace. These should have been marked as 
+/* NOTE: These functions are a new Harbour functions implemented in the
+         original CA-Cl*pper namespace. These should have been marked as
          HB_EXTENSION, but they're not. */
 
 HB_FUNC_EXTERN( HB_FIELDLEN );

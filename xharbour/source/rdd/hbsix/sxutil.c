@@ -62,8 +62,8 @@ HB_FUNC( SX_SLIMFAST )
 
    if( szExp && *szExp )
    {
-      char * szDst, cQuote = 0, c;
-      ULONG ulDst;
+      char *   szDst, cQuote = 0, c;
+      ULONG    ulDst;
 
       szDst = ( char * ) hb_xgrab( hb_parclen( 1 ) + 1 );
       ulDst = 0;
@@ -74,13 +74,13 @@ HB_FUNC( SX_SLIMFAST )
             cQuote = 0;
          else if( c == '"' || c == '\'' )
             cQuote = c;
-         else if( !cQuote )
+         else if( ! cQuote )
          {
-            if( c == ' ' && ulDst && szDst[ulDst - 1] == ' ' )
+            if( c == ' ' && ulDst && szDst[ ulDst - 1 ] == ' ' )
                continue;
             c = ( char ) hb_charUpper( ( UCHAR ) c );
          }
-         szDst[ulDst++] = c;
+         szDst[ ulDst++ ] = c;
       }
 
       hb_retclen_buffer( szDst, ulDst );
@@ -91,10 +91,10 @@ HB_FUNC( SX_SLIMFAST )
 
 HB_FUNC( SX_WILDMATCH )
 {
-   const char * szPattern = hb_parc( 1 ), * szValue = hb_parc( 2 );
-   BOOL fMatch = FALSE;
+   const char *   szPattern   = hb_parc( 1 ), * szValue = hb_parc( 2 );
+   BOOL           fMatch      = FALSE;
 
-   if( szPattern && szPattern[0] && szValue )
+   if( szPattern && szPattern[ 0 ] && szValue )
       fMatch = hb_strMatchWild( szValue, szPattern );
 
    hb_retl( fMatch );

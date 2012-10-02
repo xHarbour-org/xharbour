@@ -4,7 +4,7 @@
 
 /*
  * Harbour Project source code:
- * DataBase Function Mapped to 10 Characters length 
+ * DataBase Function Mapped to 10 Characters length
  *
  * Copyright 2001 Luiz Rafael Culik <culik@sl.conex.net>
  * www - http://www.harbour-project.org
@@ -52,72 +52,94 @@
 
 #include "hbsetup.ch"
 
-/* short (10 chars long) version of some functions for compatibility */
+   /* short (10 chars long) version of some functions for compatibility */
 
 FUNCTION dbClearFil()
+
    RETURN dbClearFilter()
 
 FUNCTION dbSetDrive( cRDD )
+
    RETURN dbSetDriver( cRDD )
 
 FUNCTION dbSetRelat( xArea, bRelation, cRelation, lScoped )
+
    RETURN dbSetRelation( xArea, bRelation, cRelation, lScoped )
 
 FUNCTION dbRLockLis()
-    RETURN dbRLockList()
+
+   RETURN dbRLockList()
 
 FUNCTION dbCloseAre()
+
    RETURN dbCloseArea()
 
 FUNCTION dbSelectAr( xArea )
+
    RETURN dbSelectArea( xArea )
 
-FUNCTION dbUnLockAl()
-   RETURN dbUnLockAll()
+FUNCTION dbUnlockAl()
+
+   RETURN dbUnlockAll()
 
 FUNCTION dbClearRel()
+
    RETURN dbClearRelation()
 
 FUNCTION dbSetFilte( bFilter, cFilter )
+
    RETURN dbSetFilter( bFilter, cFilter )
 
 FUNCTION dbFieldInf( nType, nArea, xInfo )
+
    RETURN dbFieldInfo( nType, nArea, xInfo )
 
 FUNCTION dbOrderInf( nInfo, cIndex, xOrder, xSet )
+
    RETURN dbOrderInfo( nInfo, cIndex, xOrder, xSet )
 
 FUNCTION dbRecordIn( nInfo, nRecord, xSet )
+
    RETURN dbRecordInfo( nInfo, nRecord, xSet )
 
 FUNCTION rddSetDefa( cRDD )
+
    RETURN rddSetDefault( cRDD )
 
 FUNCTION __dbCopySt( cFileName, aFieldList )
+
    RETURN __dbCopyStruct( cFileName, aFieldList )
 
 FUNCTION __dbCopyXS( cFileName )
+
    RETURN __dbCopyXStruct( cFileName )
 
-/* ; NOTE: The created table will be kept open if lOpenMode parameter 
-           is of logical type. If .T. it will be opened in a new workarea, 
+/* ; NOTE: The created table will be kept open if lOpenMode parameter
+           is of logical type. If .T. it will be opened in a new workarea,
            if .F. it will be opened in the current one. */
-/* ; NOTE: Has an identical parameter list with dbCreate() */
+
+   /* ; NOTE: Has an identical parameter list with dbCreate() */
 
 FUNCTION __dbOpenSD( cFile, aStruct, cRDD, lOpenMode, cAlias, cDelimArg, cCodePage, nConnection )
+
    RETURN __dbOpenSDF( cFile, aStruct, cRDD, lOpenMode, cAlias, cDelimArg, cCodePage, nConnection )
 
 FUNCTION __dbArrang( nToArea, aStruct, bFor, bWhile, nNext, nRecord, lRest, aFields )
+
    RETURN __dbArrange( nToArea, aStruct, bFor, bWhile, nNext, nRecord, lRest, aFields )
 
 FUNCTION ordListCle()
+
    RETURN ordListClear()
 
 FUNCTION ordListReb()
+
    RETURN ordListRebuild()
 
 FUNCTION ordSetFocu( xOrder, cFile )
+
    RETURN ordSetFocus( xOrder, cFile )
 
 FUNCTION ordSetRela( xArea, bRelation, cRelation )
+
    RETURN ordSetRelation( xArea, bRelation, cRelation )

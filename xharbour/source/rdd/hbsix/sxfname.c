@@ -61,36 +61,36 @@ HB_FUNC( SX_FNAMEPARSER )
 
    if( szFileName )
    {
-      char szPathBuf[ HB_PATH_MAX ];
-      PHB_FNAME pFileName;
-      ULONG ulLen;
-      char * pszFree;
+      char        szPathBuf[ HB_PATH_MAX ];
+      PHB_FNAME   pFileName;
+      ULONG       ulLen;
+      char *      pszFree;
 
-      szFileName = hb_fsNameConv( szFileName, &pszFree );
-      pFileName = hb_fsFNameSplit( szFileName );
+      szFileName  = hb_fsNameConv( szFileName, &pszFree );
+      pFileName   = hb_fsFNameSplit( szFileName );
       if( pszFree )
          hb_xfree( pszFree );
 
-      if( !ISLOG( 2 ) || !hb_parl( 2 ) )
+      if( ! ISLOG( 2 ) || ! hb_parl( 2 ) )
          pFileName->szPath = NULL;
-      if( !ISLOG( 3 ) || !hb_parl( 3 ) )
+      if( ! ISLOG( 3 ) || ! hb_parl( 3 ) )
          pFileName->szExtension = NULL;
 
-      if( !hb_setGetTrimFileName() )
+      if( ! hb_setGetTrimFileName() )
       {
          if( pFileName->szName )
          {
-            ulLen = ( ULONG ) strlen( pFileName->szName );
-            ulLen = ( ULONG ) hb_strRTrimLen( pFileName->szName, ulLen, FALSE );
-            pFileName->szName = hb_strLTrim( pFileName->szName, ( HB_SIZE * ) &ulLen );
-            ( ( char * ) pFileName->szName )[ulLen] = '\0';
+            ulLen                                     = ( ULONG ) strlen( pFileName->szName );
+            ulLen                                     = ( ULONG ) hb_strRTrimLen( pFileName->szName, ulLen, FALSE );
+            pFileName->szName                         = hb_strLTrim( pFileName->szName, ( HB_SIZE * ) &ulLen );
+            ( ( char * ) pFileName->szName )[ ulLen ] = '\0';
          }
          if( pFileName->szExtension )
          {
-            ulLen = ( ULONG ) strlen( pFileName->szExtension );
-            ulLen = ( ULONG ) hb_strRTrimLen( pFileName->szExtension, ulLen, FALSE );
-            pFileName->szExtension = hb_strLTrim( pFileName->szExtension, ( HB_SIZE * ) &ulLen );
-            ( ( char * ) pFileName->szExtension )[ulLen] = '\0';
+            ulLen                                           = ( ULONG ) strlen( pFileName->szExtension );
+            ulLen                                           = ( ULONG ) hb_strRTrimLen( pFileName->szExtension, ulLen, FALSE );
+            pFileName->szExtension                          = hb_strLTrim( pFileName->szExtension, ( HB_SIZE * ) &ulLen );
+            ( ( char * ) pFileName->szExtension )[ ulLen ]  = '\0';
          }
       }
 

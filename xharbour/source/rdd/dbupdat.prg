@@ -55,6 +55,7 @@
 #include "common.ch"
 
 FUNCTION __dbUpdate( cAlias, bKey, lRandom, bAssign )
+
    LOCAL nOldArea := Select()
    LOCAL xKey
 
@@ -69,7 +70,7 @@ FUNCTION __dbUpdate( cAlias, bKey, lRandom, bAssign )
 
       dbSelectArea( cAlias )
       dbGoTop()
-      DO WHILE !Eof()
+      DO WHILE !EOF()
 
          xKey := Eval( bKey )
 
@@ -79,11 +80,11 @@ FUNCTION __dbUpdate( cAlias, bKey, lRandom, bAssign )
                Eval( bAssign )
             ENDIF
          ELSE
-            DO WHILE Eval( bKey ) < xKey .AND. !Eof()
+            DO WHILE Eval( bKey ) < xKey .AND. !EOF()
                dbSkip()
             ENDDO
 
-            IF Eval( bKey ) == xKey .AND. !Eof()
+            IF Eval( bKey ) == xKey .AND. !EOF()
                Eval( bAssign )
             ENDIF
          ENDIF

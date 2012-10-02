@@ -54,11 +54,12 @@
 
 #include "common.ch"
 
-/* NOTE: Undocumented, internal Clipper function */
+   /* NOTE: Undocumented, internal Clipper function */
 
 #ifdef HB_C52_UNDOC
 
-FUNCTION __FLEDIT( aStruct, aFieldList )
+FUNCTION __FLedit( aStruct, aFieldList )
+
    RETURN __dbStructFilter( aStruct, aFieldList )
 
 #endif

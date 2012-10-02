@@ -50,10 +50,10 @@
  *
  */
 
-/* Standard Harbour RDDSys system */
+   /* Standard Harbour RDDSys system */
 
-ANNOUNCE RDDSYS
+   ANNOUNCE RDDSYS
 
-REQUEST _DBF
-REQUEST DBFNTX
-REQUEST DBFFPT
+   REQUEST _DBF
+   REQUEST DBFNTX
+   REQUEST DBFFPT

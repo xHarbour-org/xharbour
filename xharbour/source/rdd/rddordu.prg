@@ -54,7 +54,7 @@
 
 #include "common.ch"
 
-/* NOTE: Undocumented Clipper function */
+   /* NOTE: Undocumented Clipper function */
 
 #ifdef HB_C52_UNDOC
 

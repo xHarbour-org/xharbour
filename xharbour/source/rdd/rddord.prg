@@ -55,18 +55,22 @@
 #include "common.ch"
 #include "dbinfo.ch"
 
-/* NOTE: The fifth parameters (cOrderName) is undocumented. */
+   /* NOTE: The fifth parameters (cOrderName) is undocumented. */
 
 FUNCTION dbCreateIndex( cOrderBagName, cKeyExpr, bKeyExpr, lUnique, cOrderName )
+
    RETURN ordCreate( cOrderBagName, cOrderName, cKeyExpr, bKeyExpr, lUnique )
 
 FUNCTION dbSetIndex( cIndexName )
+
    RETURN ordListAdd( cIndexName )
 
 FUNCTION dbClearIndex()
+
    RETURN ordListClear()
 
 FUNCTION dbReindex()
+
    RETURN ordListRebuild()
 
 PROCEDURE dbSetOrder( nOrderNum )
@@ -80,6 +84,7 @@ PROCEDURE dbSetOrder( nOrderNum )
    RETURN
 
 FUNCTION IndexExt()
+
    RETURN ordBagExt()
 
 FUNCTION IndexKey( nOrder )
@@ -95,4 +100,5 @@ FUNCTION IndexKey( nOrder )
    RETURN ""
 
 FUNCTION ordSetRelation( xArea, bRelation, cRelation )
+
    RETURN dbSetRelation( xArea, bRelation, cRelation, .T. )

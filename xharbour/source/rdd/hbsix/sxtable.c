@@ -88,8 +88,8 @@ HB_FUNC( SX_GETLOCKS )
 
 HB_FUNC( SX_ISFLOCKED )
 {
-   AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
-   BOOL fLocked = FALSE;
+   AREAP pArea    = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
+   BOOL  fLocked  = FALSE;
 
    if( pArea )
    {
@@ -104,8 +104,8 @@ HB_FUNC( SX_ISFLOCKED )
 
 HB_FUNC( SX_ISREADONLY )
 {
-   AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
-   BOOL fReadOnly = FALSE;
+   AREAP pArea       = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
+   BOOL  fReadOnly   = FALSE;
 
    if( pArea )
    {
@@ -120,8 +120,8 @@ HB_FUNC( SX_ISREADONLY )
 
 HB_FUNC( SX_ISSHARED )
 {
-   AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
-   BOOL fShared = FALSE;
+   AREAP pArea    = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
+   BOOL  fShared  = FALSE;
 
    if( pArea )
    {
@@ -137,7 +137,7 @@ HB_FUNC( SX_ISSHARED )
 HB_FUNC( SX_IDTYPE )
 {
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
-   int iType = 0;
+   int   iType = 0;
 
    if( pArea )
    {
@@ -153,7 +153,7 @@ HB_FUNC( SX_IDTYPE )
 HB_FUNC( SX_TABLETYPE )
 {
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
-   int iType = 0;
+   int   iType = 0;
 
    if( pArea )
    {
@@ -195,14 +195,14 @@ static void hb_sxRollBackChild( AREAP pArea, PHB_ITEM pItem )
 
 HB_FUNC( SX_ROLLBACK )
 {
-   BOOL fResult = FALSE, fRollChild = FALSE;
-   int iArea = 0;
+   BOOL  fResult  = FALSE, fRollChild = FALSE;
+   int   iArea    = 0;
    AREAP pArea;
 
    if( ISNUM( 1 ) )
    {
-      iArea = hb_parni( 1 );
-      fRollChild = iArea == 0;
+      iArea       = hb_parni( 1 );
+      fRollChild  = iArea == 0;
    }
 
    if( iArea )
@@ -224,16 +224,16 @@ HB_FUNC( SX_ROLLBACK )
 
 HB_FUNC( SX_RLOCK )
 {
-   AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
-   BOOL fResult = FALSE;
-   PHB_ITEM pResult = NULL, pRecords;
+   AREAP    pArea    = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
+   BOOL     fResult  = FALSE;
+   PHB_ITEM pResult  = NULL, pRecords;
 
    if( pArea )
    {
       DBLOCKINFO dbLockInfo;
-      dbLockInfo.fResult = FALSE;
-      dbLockInfo.uiMethod = DBLM_MULTIPLE;
-      pRecords = hb_param( 1, HB_IT_ARRAY );
+      dbLockInfo.fResult   = FALSE;
+      dbLockInfo.uiMethod  = DBLM_MULTIPLE;
+      pRecords             = hb_param( 1, HB_IT_ARRAY );
       if( pRecords )
       {
          ULONG ul, ulLen = ( ULONG ) hb_arrayLen( pRecords );
@@ -247,9 +247,9 @@ HB_FUNC( SX_RLOCK )
       }
       else
       {
-         dbLockInfo.itmRecID = hb_param( 1, HB_IT_ANY );
+         dbLockInfo.itmRecID  = hb_param( 1, HB_IT_ANY );
          SELF_LOCK( pArea, &dbLockInfo );
-         fResult = dbLockInfo.fResult;
+         fResult              = dbLockInfo.fResult;
       }
    }
 
@@ -283,11 +283,11 @@ HB_FUNC( SX_UNLOCK )
 
 HB_FUNC( SX_SETPASS )
 {
-   int iPCount = hb_pcount();
-   BOOL fResult = FALSE;
+   int      iPCount  = hb_pcount();
+   BOOL     fResult  = FALSE;
    PHB_ITEM pItem;
 
-   if( iPCount >=1 )
+   if( iPCount >= 1 )
    {
       if( ISCHAR( 1 ) )
       {
@@ -310,9 +310,9 @@ HB_FUNC( SX_SETPASS )
           * 3-rd and 4-th parameters are optional Harbour extensions
           * with RDD name and connection number.
           */
-         LPRDDNODE  pRDDNode;
-         USHORT     uiRddID;
-         const char * szDriver;
+         LPRDDNODE      pRDDNode;
+         USHORT         uiRddID;
+         const char *   szDriver;
 
          if( iPCount == 2 ) /* no RDD parameter, use default */
             szDriver = hb_rddDefaultDrv( NULL );
@@ -361,8 +361,8 @@ HB_FUNC( SX_SETPASS )
 
 HB_FUNC( SX_DBFENCRYPT )
 {
-   AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
-   BOOL fResult = FALSE;
+   AREAP pArea    = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
+   BOOL  fResult  = FALSE;
 
    if( pArea )
    {
@@ -381,8 +381,8 @@ HB_FUNC( SX_DBFENCRYPT )
 
 HB_FUNC( SX_DBFDECRYPT )
 {
-   AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
-   BOOL fResult = FALSE;
+   AREAP pArea    = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
+   BOOL  fResult  = FALSE;
 
    if( pArea )
    {
@@ -396,13 +396,13 @@ HB_FUNC( SX_DBFDECRYPT )
 
 HB_FUNC( SX_MEMOPACK )
 {
-   AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
-   BOOL fResult = FALSE;
+   AREAP pArea    = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
+   BOOL  fResult  = FALSE;
 
    if( pArea )
    {
       PHB_ITEM pItem = hb_itemArrayNew( 3 );
-      int i, iPCount = hb_pcount();
+      int      i, iPCount = hb_pcount();
       for( i = 1; i <= iPCount; ++i )
          hb_arraySet( pItem, i, hb_param( i, HB_IT_ANY ) );
       fResult = SELF_INFO( pArea, DBI_MEMOPACK, pItem ) == HB_SUCCESS;
@@ -430,16 +430,16 @@ HB_FUNC( SX_TURBOAREA )
 
 HB_FUNC( SX_SETTURBO )
 {
-   LPRDDNODE  pRDDNode;
-   USHORT     uiRddID;
-   const char * szDriver;
+   LPRDDNODE      pRDDNode;
+   USHORT         uiRddID;
+   const char *   szDriver;
 
    szDriver = hb_parc( 2 );
-   if( !szDriver ) /* no VIA RDD parameter, use default */
+   if( ! szDriver ) /* no VIA RDD parameter, use default */
       szDriver = hb_rddDefaultDrv( NULL );
 
    pRDDNode = hb_rddFindNode( szDriver, &uiRddID );  /* find the RDDNODE */
-   if( !pRDDNode )
+   if( ! pRDDNode )
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME,
                             HB_ERR_ARGS_BASEPARAMS );
    else
@@ -459,15 +459,15 @@ HB_FUNC( SX_SETTURBO )
 HB_FUNC( _SXOPENINIT )
 {
    AREAP pArea = NULL;
-   int iArea = hb_parni( 1 );
+   int   iArea = hb_parni( 1 );
 
    if( iArea )
       pArea = ( AREAP ) hb_rddGetWorkAreaPointer( iArea );
 
    if( pArea )
    {
-      LPDBOPENINFO pInfo = NULL;
-      PHB_ITEM pItem = hb_itemNew( NULL );
+      LPDBOPENINFO   pInfo = NULL;
+      PHB_ITEM       pItem = hb_itemNew( NULL );
 
       if( SELF_INFO( pArea, DBI_OPENINFO, pItem ) )
          pInfo = ( LPDBOPENINFO ) hb_itemGetPtr( pItem );

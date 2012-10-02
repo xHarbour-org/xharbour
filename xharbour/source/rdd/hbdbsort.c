@@ -73,16 +73,16 @@ BOOL hb_dbQSortInit( LPDBQUICKSORT pQuickSort, LPDBSORTINFO pSortInfo, USHORT ui
       return FALSE;
 
    /* Alloc buffers */
-   pQuickSort->uiMaxRecords = USHRT_MAX / uiRecordLen;
-   pQuickSort->pBuffer = ( BYTE * ) hb_xgrab( pQuickSort->uiMaxRecords * uiRecordLen );
-   pQuickSort->pSwapBufferA = ( BYTE * ) hb_xgrab( uiRecordLen );
-   pQuickSort->pSwapBufferB = ( BYTE * ) hb_xgrab( uiRecordLen );
-   pQuickSort->pCmpBufferA = ( BYTE * ) hb_xgrab( uiRecordLen );
-   pQuickSort->pCmpBufferB = ( BYTE * ) hb_xgrab( uiRecordLen );
+   pQuickSort->uiMaxRecords   = USHRT_MAX / uiRecordLen;
+   pQuickSort->pBuffer        = ( BYTE * ) hb_xgrab( pQuickSort->uiMaxRecords * uiRecordLen );
+   pQuickSort->pSwapBufferA   = ( BYTE * ) hb_xgrab( uiRecordLen );
+   pQuickSort->pSwapBufferB   = ( BYTE * ) hb_xgrab( uiRecordLen );
+   pQuickSort->pCmpBufferA    = ( BYTE * ) hb_xgrab( uiRecordLen );
+   pQuickSort->pCmpBufferB    = ( BYTE * ) hb_xgrab( uiRecordLen );
 
    /* Fill structure */
-   pQuickSort->uiRecordLen = uiRecordLen;
-   pQuickSort->pSortInfo = pSortInfo;
+   pQuickSort->uiRecordLen    = uiRecordLen;
+   pQuickSort->pSortInfo      = pSortInfo;
    return TRUE;
 }
 
@@ -106,16 +106,16 @@ BOOL hb_dbQSortAdvance( LPDBQUICKSORT pQuickSort, USHORT uiCount )
 
    /* Write chunk */
    uiSize = uiCount * pQuickSort->uiRecordLen;
-   return ( hb_fsWrite( pQuickSort->hFile, pQuickSort->pBuffer, uiSize ) == uiSize );
+   return hb_fsWrite( pQuickSort->hFile, pQuickSort->pBuffer, uiSize ) == uiSize;
 }
 
 static BOOL hb_dbQSortIsLess( LPDBQUICKSORT pQuickSort, ULONG ulRecNo1, ULONG ulRecNo2 )
 {
-   USHORT uiCount, uiField;
+   USHORT   uiCount, uiField;
    DBFAREAP pArea;
-   LPFIELD pField;
-   BOOL bAscending, bIgnoreCase;
-   int iResult;
+   LPFIELD  pField;
+   BOOL     bAscending, bIgnoreCase;
+   int      iResult;
 
    pArea = ( DBFAREAP ) pQuickSort->pSortInfo->dbtri.lpaSource;
 
@@ -130,10 +130,10 @@ static BOOL hb_dbQSortIsLess( LPDBQUICKSORT pQuickSort, ULONG ulRecNo1, ULONG ul
    {
       /* Sort flags */
       bIgnoreCase = ( ( pQuickSort->pSortInfo->lpdbsItem[ uiCount ].uiFlags & SF_CASE ) == SF_CASE );
-      bAscending = ( ( pQuickSort->pSortInfo->lpdbsItem[ uiCount ].uiFlags & SF_ASCEND ) == SF_ASCEND );
+      bAscending  = ( ( pQuickSort->pSortInfo->lpdbsItem[ uiCount ].uiFlags & SF_ASCEND ) == SF_ASCEND );
 
-      uiField = pQuickSort->pSortInfo->lpdbsItem[ uiCount ].uiField - 1;
-      pField = pArea->area.lpFields + uiField;
+      uiField     = pQuickSort->pSortInfo->lpdbsItem[ uiCount ].uiField - 1;
+      pField      = pArea->area.lpFields + uiField;
       if( pField->uiType == HB_IT_MEMO )
          continue;
       if( pField->uiType == HB_IT_LOGICAL )
@@ -142,26 +142,26 @@ static BOOL hb_dbQSortIsLess( LPDBQUICKSORT pQuickSort, ULONG ulRecNo1, ULONG ul
              pQuickSort->pSwapBufferA[ pArea->pFieldOffset[ uiField ] ] == 't' ||
              pQuickSort->pSwapBufferA[ pArea->pFieldOffset[ uiField ] ] == 'Y' ||
              pQuickSort->pSwapBufferA[ pArea->pFieldOffset[ uiField ] ] == 'y' )
-            * pQuickSort->pCmpBufferA = '1';
+            *pQuickSort->pCmpBufferA = '1';
          else
-            * pQuickSort->pCmpBufferA = '0';
+            *pQuickSort->pCmpBufferA = '0';
          if( pQuickSort->pSwapBufferB[ pArea->pFieldOffset[ uiField ] ] == 'T' ||
              pQuickSort->pSwapBufferB[ pArea->pFieldOffset[ uiField ] ] == 't' ||
              pQuickSort->pSwapBufferB[ pArea->pFieldOffset[ uiField ] ] == 'Y' ||
              pQuickSort->pSwapBufferB[ pArea->pFieldOffset[ uiField ] ] == 'y' )
-            * pQuickSort->pCmpBufferB = '1';
+            *pQuickSort->pCmpBufferB = '1';
          else
-            * pQuickSort->pCmpBufferB = '0';
+            *pQuickSort->pCmpBufferB = '0';
       }
       else
       {
          HB_MEMCPY( pQuickSort->pCmpBufferA, pQuickSort->pSwapBufferA +
-                 pArea->pFieldOffset[ uiField ], pField->uiLen );
+                    pArea->pFieldOffset[ uiField ], pField->uiLen );
          HB_MEMCPY( pQuickSort->pCmpBufferB, pQuickSort->pSwapBufferB +
-                 pArea->pFieldOffset[ uiField ], pField->uiLen );
+                    pArea->pFieldOffset[ uiField ], pField->uiLen );
       }
-      pQuickSort->pCmpBufferA[ pField->uiLen ] = 0;
-      pQuickSort->pCmpBufferB[ pField->uiLen ] = 0;
+      pQuickSort->pCmpBufferA[ pField->uiLen ]  = 0;
+      pQuickSort->pCmpBufferB[ pField->uiLen ]  = 0;
 
       /* Compare buffers */
       if( bIgnoreCase )
@@ -174,9 +174,9 @@ static BOOL hb_dbQSortIsLess( LPDBQUICKSORT pQuickSort, ULONG ulRecNo1, ULONG ul
       if( iResult == 0 )
          continue;
       else if( bAscending )
-         return ( iResult < 0 );
+         return iResult < 0;
       else
-         return ( iResult > 0 );
+         return iResult > 0;
    }
    return FALSE;
 }
@@ -204,8 +204,8 @@ static void hb_dbQSortDo( LPDBQUICKSORT pQuickSort, ULONG ulFirst, ULONG ulLast 
    else
       ulPivot = ulFirst;
 
-   ulLeft = ulFirst;
-   ulRight = ulLast;
+   ulLeft   = ulFirst;
+   ulRight  = ulLast;
    do
    {
       /* partition into two segments */
@@ -223,7 +223,8 @@ static void hb_dbQSortDo( LPDBQUICKSORT pQuickSort, ULONG ulFirst, ULONG ulLast 
          ulLeft++;
          ulRight--;
       }
-   } while( ulLeft <= ulRight );
+   }
+   while( ulLeft <= ulRight );
 
    /* Sort segment */
    if( ulFirst < ulRight )

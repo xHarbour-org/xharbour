@@ -58,7 +58,7 @@
 
 #include "hbsetup.ch"
 
-/* NOTE: lAll is a dummy parameter, nothing seems to depend on it. [vszakats] */
+   /* NOTE: lAll is a dummy parameter, nothing seems to depend on it. [vszakats] */
 
 PROCEDURE __dbList( lOff, abEval, lAll, bFor, bWhile, nNext, nRecord, lRest, lToPrint, cToFileName )
 
@@ -75,35 +75,36 @@ PROCEDURE __dbList( lOff, abEval, lAll, bFor, bWhile, nNext, nRecord, lRest, lTo
    LOCAL bOutBlock
 
    LOCAL nLen := Len( abEval ), nIndex, asMacros, nMacros, nMacroIndex
-   // Scan for strings instead of blocks - These are macros that need to be compiled into blocks.
+
+// Scan for strings instead of blocks - These are macros that need to be compiled into blocks.
    FOR nIndex := 1 TO nLen
-     IF ValType( abEval[ nIndex ] ) == 'C'
-        //? abEval[ nIndex ]
-        // Macro may be a comma seperated list.
-        asMacros := HB_aExpressions( abEval[ nIndex ] )
-        nMacros  := Len( asMacros )
-        // Array has to be sized to allow dor the extra blocks
-        nLen += ( nMacros - 1 )
-        aSize( abEval, nLen )
-        // We will use the place holder of the string for the first new block.
-        abEval[ nIndex ] := &( "{||" + asMacros[ 1 ] + "}" )
-        // We will now push all subsequent blocks 1 at a time and insert the new block inplace.
-        FOR nMacroIndex := 2 TO nMacros
-           aIns( abEval, nIndex + nMacroIndex - 1 )
-           abEval[ nIndex + nMacroIndex - 1 ] := &( "{||" + asMacros[ nMacroIndex ] + "}" )
-        NEXT
-        // The loop counter should skip the new elements.
-        nIndex += ( nMacros - 1 )
-     ENDIF
+      IF ValType( abEval[ nIndex ] ) == 'C'
+         //? abEval[ nIndex ]
+         // Macro may be a comma seperated list.
+         asMacros := HB_aExpressions( abEval[ nIndex ] )
+         nMacros  := Len( asMacros )
+         // Array has to be sized to allow dor the extra blocks
+         nLen += ( nMacros - 1 )
+         ASize( abEval, nLen )
+         // We will use the place holder of the string for the first new block.
+         abEval[ nIndex ] := &( "{||" + asMacros[ 1 ] + "}" )
+         // We will now push all subsequent blocks 1 at a time and insert the new block inplace.
+         FOR nMacroIndex := 2 TO nMacros
+            AIns( abEval, nIndex + nMacroIndex - 1 )
+            abEval[ nIndex + nMacroIndex - 1 ] := &( "{||" + asMacros[ nMacroIndex ] + "}" )
+         NEXT
+         // The loop counter should skip the new elements.
+         nIndex += ( nMacros - 1 )
+      ENDIF
    NEXT
 
    /* Choose the output style */
    IF lOff
-      bOutBlock := {|| QOut( iif( Deleted(), "*", " " ) ),;
-                       AEval( abEval, {| bEval | QQOut( Eval( bEval ), "" ) } ) }
+      bOutBlock := {|| QOut( iif( Deleted(), "*", " " ) ), ;
+         AEval( abEval, {| bEval | QQOut( Eval( bEval ), "" ) } ) }
    ELSE
-      bOutBlock := {|| QOut( Str( RecNo(), 7 ), iif( Deleted(), "*", " " ) ),;
-                       AEval( abEval, {| bEval | QQOut( Eval( bEval ), "" ) } ) }
+      bOutBlock := {|| QOut( Str( RecNo(), 7 ), iif( Deleted(), "*", " " ) ), ;
+         AEval( abEval, {| bEval | QQOut( Eval( bEval ), "" ) } ) }
    ENDIF
 
    /* Save SETs */
@@ -113,7 +114,7 @@ PROCEDURE __dbList( lOff, abEval, lAll, bFor, bWhile, nNext, nRecord, lRest, lTo
    ENDIF
    IF !Empty( cToFileName )
       hb_FNameSplit( cToFileName, @cPath, @cName, @cExt )
-      IF Set( _SET_DEFEXTENSIONS ) .AND. Empty( cExt )
+      IF SET( _SET_DEFEXTENSIONS ) .AND. Empty( cExt )
          cExt := ".txt"
       ENDIF
       lOldExtra := Set( _SET_EXTRA, .T. )
@@ -125,11 +126,11 @@ PROCEDURE __dbList( lOff, abEval, lAll, bFor, bWhile, nNext, nRecord, lRest, lTo
    BEGIN SEQUENCE
 
       IF Empty( lAll ) .AND. ;
-         Empty( bFor ) .AND. ;
-         Empty( bWhile ) .AND. ;
-         Empty( nNext ) .AND. ;
-         Empty( nRecord ) .AND. ;
-         Empty( lRest )
+            Empty( bFor ) .AND. ;
+            Empty( bWhile ) .AND. ;
+            Empty( nNext ) .AND. ;
+            Empty( nRecord ) .AND. ;
+            Empty( lRest )
 
          Eval( bOutBlock )
       ELSE
@@ -143,11 +144,11 @@ PROCEDURE __dbList( lOff, abEval, lAll, bFor, bWhile, nNext, nRecord, lRest, lTo
    /* Restore SETs */
 
    IF !Empty( lToPrint )
-      Set( _SET_PRINTER, lOldPrinter )
+      SET( _SET_PRINTER, lOldPrinter )
    ENDIF
    IF !Empty( cToFileName )
-      Set( _SET_EXTRAFILE, cOldExtraFile )
-      Set( _SET_EXTRA, lOldExtra )
+      SET( _SET_EXTRAFILE, cOldExtraFile )
+      SET( _SET_EXTRA, lOldExtra )
    ENDIF
 
    /* On error signal the error for the higher level error handler or quit */

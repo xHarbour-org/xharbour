@@ -2,7 +2,7 @@
 
 REQUEST ADORDD
 
-function Main()
+FUNCTION Main()
 
    USE Test.mdb VIA "ADORDD" TABLE "Tabla1"
 
@@ -10,4 +10,4 @@ function Main()
 
    USE
 
-return nil
+   RETURN nil

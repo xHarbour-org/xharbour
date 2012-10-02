@@ -69,7 +69,7 @@ FUNCTION __dbDelim( lExport, cFile, cDelimArg, aFields, bFor, bWhile, nNext, nRe
    LOCAL aStruct
    LOCAL cRDD := "DELIM"
    LOCAL cDefault := Set( _SET_DEFAULT )
-   LOCAL cSep := hb_ospathseparator()
+   LOCAL cSep := hb_osPathSeparator()
    LOCAL cPath
 
    hb_FNameSplit( cFile, @cPath )
@@ -90,14 +90,14 @@ FUNCTION __dbDelim( lExport, cFile, cDelimArg, aFields, bFor, bWhile, nNext, nRe
    ENDIF
 
    IF lExport
-      dbCreate( cFile, aStruct, cRDD, .T., "", cDelimArg, cCdp )
+      dbCreate( cFile, aStruct, cRDD, .T. , "", cDelimArg, cCdp )
       nDstArea := Select()
       IF nDstArea == nSrcArea
          nDstArea := NIL
       ENDIF
       dbSelectArea( nSrcArea )
    ELSE
-      IF !__dbOpenSDF( cFile, aStruct, cRDD, .T., "", cDelimArg, cCdp )
+      IF !__dbOpenSDF( cFile, aStruct, cRDD, .T. , "", cDelimArg, cCdp )
          RETURN .F.
       ENDIF
       nSrcArea := Select()
@@ -124,7 +124,9 @@ FUNCTION __dbDelim( lExport, cFile, cDelimArg, aFields, bFor, bWhile, nNext, nRe
 #else
 
    LOCAL cDefault := Set( _SET_DEFAULT )
-   LOCAL cSep := hb_ospathseparator()
+
+   LOCAL cSep := hb_osPathSeparator()
+
    LOCAL cPath
 
    hb_FNameSplit( cFile, @cPath )
@@ -134,8 +136,8 @@ FUNCTION __dbDelim( lExport, cFile, cDelimArg, aFields, bFor, bWhile, nNext, nRe
       cFile    := cDefault + cFile
    ENDIF
 
-   RETURN iif( lExport,;
-      __dbCopy( cFile, aFields, bFor, bWhile, nNext, nRecord, lRest, "DELIM", cCdp, , cDelimArg ) ,;
+   RETURN iif( lExport, ;
+      __dbCopy( cFile, aFields, bFor, bWhile, nNext, nRecord, lRest, "DELIM", cCdp, , cDelimArg ) , ;
       __dbApp( cFile, aFields, bFor, bWhile, nNext, nRecord, lRest, "DELIM", cCdp, , cDelimArg ) )
 
 #endif

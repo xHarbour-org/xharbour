@@ -61,10 +61,10 @@
 
 static BOOL hb_sxSemName( char * szFileName )
 {
-   const char * szName = hb_parc( 1 );
-   BOOL fResult = FALSE;
+   const char *   szName   = hb_parc( 1 );
+   BOOL           fResult  = FALSE;
 
-   if( szName && szName[0] )
+   if( szName && szName[ 0 ] )
    {
       hb_strncpy( szFileName, szName, HB_PATH_MAX - 1 );
       hb_strLower( szFileName, strlen( szFileName ) );
@@ -78,13 +78,13 @@ static BOOL hb_sxSemName( char * szFileName )
          DBORDERINFO pOrderInfo;
 
          memset( &pOrderInfo, 0, sizeof( DBORDERINFO ) );
-         pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );
+         pOrderInfo.itmOrder  = hb_param( 1, HB_IT_NUMERIC );
          if( pOrderInfo.itmOrder && hb_itemGetNI( pOrderInfo.itmOrder ) == 0 )
             pOrderInfo.itmOrder = NULL;
          pOrderInfo.itmResult = hb_itemPutC( NULL, NULL );
          SELF_ORDINFO( pArea, DBOI_NAME, &pOrderInfo );
-         szName = hb_itemGetCPtr( pOrderInfo.itmResult );
-         if( szName && szName[0] )
+         szName               = hb_itemGetCPtr( pOrderInfo.itmResult );
+         if( szName && szName[ 0 ] )
          {
             hb_strncpy( szFileName, szName, HB_PATH_MAX - 1 );
             hb_strLower( szFileName, strlen( szFileName ) );
@@ -99,8 +99,8 @@ static BOOL hb_sxSemName( char * szFileName )
 
 static HB_FHANDLE hb_sxSemOpen( char * szFileName, BOOL * pfNewFile )
 {
-   HB_FHANDLE hFile;
-   int i = 0;
+   HB_FHANDLE  hFile;
+   int         i = 0;
 
    do
    {
@@ -138,10 +138,10 @@ static HB_FHANDLE hb_sxSemOpen( char * szFileName, BOOL * pfNewFile )
 
 HB_FUNC( SX_MAKESEM )
 {
-   char szFileName[HB_PATH_MAX];
-   BYTE buffer[2];
-   int iUsers = -1;
-   BOOL fError = FALSE, fNewFile = FALSE;
+   char  szFileName[ HB_PATH_MAX ];
+   BYTE  buffer[ 2 ];
+   int   iUsers   = -1;
+   BOOL  fError   = FALSE, fNewFile = FALSE;
 
    if( hb_sxSemName( szFileName ) )
    {
@@ -176,9 +176,9 @@ HB_FUNC( SX_MAKESEM )
 
 HB_FUNC( SX_KILLSEM )
 {
-   char szFileName[HB_PATH_MAX];
-   BYTE buffer[2];
-   int iUsers = -1;
+   char  szFileName[ HB_PATH_MAX ];
+   BYTE  buffer[ 2 ];
+   int   iUsers = -1;
 
    if( hb_sxSemName( szFileName ) )
    {
@@ -203,8 +203,8 @@ HB_FUNC( SX_KILLSEM )
 
 HB_FUNC( SX_ISSEM )
 {
-   char szFileName[HB_PATH_MAX];
-   HB_FHANDLE hFile = FS_ERROR;
+   char        szFileName[ HB_PATH_MAX ];
+   HB_FHANDLE  hFile = FS_ERROR;
 
    if( hb_sxSemName( szFileName ) )
    {

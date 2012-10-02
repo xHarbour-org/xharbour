@@ -60,18 +60,20 @@
 #include "usrrdd.ch"
 #include "dbinfo.ch"
 
-/* Force linking DBFCDX and DBFFPT from which our RDD inherits */
-REQUEST DBFCDX
-REQUEST DBFFPT
+   /* Force linking DBFCDX and DBFFPT from which our RDD inherits */
+   REQUEST DBFCDX
+   REQUEST DBFFPT
 
-/* Announce our RDD for forign REQUESTs */
-ANNOUNCE SMTCDX
+   /* Announce our RDD for forign REQUESTs */
+   ANNOUNCE SMTCDX
 
 FUNCTION SMTCDX_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
-RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, ;
-                            "DBFCDX", {} ) /* We are inheriting from DBFCDX */
 
-INIT PROC SMTCDX_INIT()
+   RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, ;
+      "DBFCDX", {} ) /* We are inheriting from DBFCDX */
+
+   INIT PROC SMTCDX_INIT()
    rddRegister( "SMTCDX", RDT_FULL )
    rddInfo( RDDI_MEMOTYPE, DB_MEMO_SMT, "SMTCDX" )
-RETURN
+
+   RETURN

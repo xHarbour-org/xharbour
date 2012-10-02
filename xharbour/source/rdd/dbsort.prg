@@ -52,11 +52,12 @@
 
 #include "hbsetup.ch"
 
-/* NOTE: Compared to CA-Cl*pper, Harbour has three extra parameters 
+/* NOTE: Compared to CA-Cl*pper, Harbour has three extra parameters
          (cRDD, nConnection, cCodePage). */
 
-FUNCTION __dbSort( cToFileName, aFields, bFor, bWhile, nNext, nRecord, lRest,;
-                   cRDD, nConnection, cCodePage )
+FUNCTION __dbSort( cToFileName, aFields, bFor, bWhile, nNext, nRecord, lRest, ;
+      cRDD, nConnection, cCodePage )
+
    LOCAL nOldArea
    LOCAL nToArea
    LOCAL aStruct
@@ -72,7 +73,7 @@ FUNCTION __dbSort( cToFileName, aFields, bFor, bWhile, nNext, nRecord, lRest,;
 
    BEGIN SEQUENCE
 
-      dbCreate( cToFileName, aStruct, cRDD, .T., "", NIL, cCodePage, nConnection )
+      dbCreate( cToFileName, aStruct, cRDD, .T. , "", NIL, cCodePage, nConnection )
       nToArea := Select()
       dbSelectArea( nOldArea )
       __dbArrange( nToArea, aStruct, bFor, bWhile, nNext, nRecord, lRest, aFields )

@@ -55,6 +55,7 @@
 #ifdef HB_COMPAT_XPP
 
 FUNCTION dbTotal( cFile, xKey, aFields, xFor, xWhile, nNext, nRec, lRest )
+
    RETURN __dbTotal( cFile, xKey, aFields, xFor, xWhile, nNext, nRec, lRest )
 
 #endif

@@ -65,7 +65,7 @@
 #include "dbstruct.ch"
 #include "common.ch"
 
-ANNOUNCE ARRAYRDD
+   ANNOUNCE ARRAYRDD
 
 #define DATABASE_FILENAME    1
 #define DATABASE_RECORDS     2
@@ -104,9 +104,10 @@ ANNOUNCE ARRAYRDD
  * Methods INIT and EXIT does not have to execute SUPER methods - these is
  * always done by low level USRRDD code
  */
+
 STATIC FUNCTION AR_INIT( nRDD )
 
-   //Tracelog( "nRDD = ", nRDD )
+//Tracelog( "nRDD = ", nRDD )
 
    /* Init DBF Hash */
    USRRDD_RDDDATA( nRDD, Hash() )
@@ -114,40 +115,44 @@ STATIC FUNCTION AR_INIT( nRDD )
    RETURN SUCCESS
 
 STATIC FUNCTION AR_RDDDATAINIT()
+
    RETURN { ;
-            NIL     ; // RDDDATA_DATABASE
-          }
+      NIL     ; // RDDDATA_DATABASE
+   }
 
 STATIC FUNCTION AR_DATABASEINIT()
+
    RETURN { ;
-             NIL   ,; // DATABASE_FILENAME
-             {}    ,; // DATABASE_RECORDS
-             {}    ,; // DATABASE_RECINFO
-             0     ,; // DATABASE_OPENNUMBER
-             FALSE ,; // DATABASE_LOCKED
-             NIL    ; // DATABASE_STRUCT - aStruct
-          }
+      NIL   , ; // DATABASE_FILENAME
+      {}    , ; // DATABASE_RECORDS
+      {}    , ; // DATABASE_RECINFO
+      0     , ; // DATABASE_OPENNUMBER
+      FALSE , ; // DATABASE_LOCKED
+      NIL    ; // DATABASE_STRUCT - aStruct
+   }
 
 STATIC FUNCTION AR_WADATAINIT()
+
    RETURN { ;
-            NIL    ,; // WADATA_DATABASE
-            0      ,; // WADATA_WORKAREA
-            NIL    ,; // WADATA_OPENINFO
-            0      ,; // WADATA_RECNO
-            FALSE  ,; // WADATA_BOF
-            FALSE  ,; // WADATA_FORCEBOF  // to solve an hack in dbf1.c
-            FALSE  ,; // WADATA_EOF
-            FALSE  ,; // WADATA_TOP
-            FALSE  ,; // WADATA_BOTTOM
-            FALSE  ,; // WADATA_FOUND
-            NIL     ; // WADATA_FILTERINFO
-          }
+      NIL    , ; // WADATA_DATABASE
+      0      , ; // WADATA_WORKAREA
+      NIL    , ; // WADATA_OPENINFO
+      0      , ; // WADATA_RECNO
+      FALSE  , ; // WADATA_BOF
+      FALSE  , ; // WADATA_FORCEBOF  // to solve an hack in dbf1.c
+      FALSE  , ; // WADATA_EOF
+      FALSE  , ; // WADATA_TOP
+      FALSE  , ; // WADATA_BOTTOM
+      FALSE  , ; // WADATA_FOUND
+      NIL     ; // WADATA_FILTERINFO
+   }
 
 STATIC FUNCTION AR_RECDATAINIT()
+
    RETURN { ;
-            FALSE  ,; // RECDATA_DELETED
-            0       ; // RECDATA_LOCKED
-          }
+      FALSE  , ; // RECDATA_DELETED
+      0        ; // RECDATA_LOCKED
+   }
 
 /*
  * methods: NEW and RELEASE receive pointer to work area structure
@@ -156,6 +161,7 @@ STATIC FUNCTION AR_RECDATAINIT()
  * these methods does not have to execute SUPER methods - these is
  * always done by low level USRRDD code
  */
+
 STATIC FUNCTION AR_NEW( pWA )
 
    /*
@@ -164,45 +170,50 @@ STATIC FUNCTION AR_NEW( pWA )
     * we have to emulate it and there is no phantom record so we
     * cannot return EOF flag directly.
     */
+
    USRRDD_AREADATA( pWA, AR_WADATAINIT() )
 
    RETURN SUCCESS
 
 // Creating fields for new DBF - dbCreate() in current workarea
+
 STATIC FUNCTION AR_CREATEFIELDS( nWA, aStruct )
+
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
    LOCAL nResult   := SUCCESS
    LOCAL aFieldStruct, aField
 
-   // Setting WA number to current WorkArea
+// Setting WA number to current WorkArea
    aWAData[ WADATA_WORKAREA ] := nWA
 
-   // Create new file data structure - workarea uses a reference to database
+// Create new file data structure - workarea uses a reference to database
    aWAData[ WADATA_DATABASE ] := AR_DATABASEINIT()
 
-   // Store DBF Structure
+// Store DBF Structure
    aWAData[ WADATA_DATABASE ][ DATABASE_STRUCT ] := aStruct
 
-   // Set fields
+// Set fields
    UR_SUPER_SETFIELDEXTENT( nWA, Len( aStruct ) )
 
    FOR EACH aFieldStruct IN aStruct
 
-       aField := ARRAY( UR_FI_SIZE )
-       aField[ UR_FI_NAME ]    := aFieldStruct[ DBS_NAME ]
-       aFieldStruct[ DBS_TYPE ] := upper( aFieldStruct[ DBS_TYPE ] )
-       aField[ UR_FI_TYPE ]    := HB_Decode( aFieldStruct[ DBS_TYPE ], "C", HB_FT_STRING, "L", HB_FT_LOGICAL, "M", HB_FT_MEMO, "D", HB_FT_DATE, "N", IIF( aFieldStruct[ DBS_DEC ] > 0, HB_FT_DOUBLE, HB_FT_INTEGER ) )
-       aField[ UR_FI_TYPEEXT ] := 0
-       aField[ UR_FI_LEN ]     := aFieldStruct[ DBS_LEN ]
-       aField[ UR_FI_DEC ]     := aFieldStruct[ DBS_DEC ]
-       UR_SUPER_ADDFIELD( nWA, aField )
+      aField := Array( UR_FI_SIZE )
+      aField[ UR_FI_NAME ]    := aFieldStruct[ DBS_NAME ]
+      aFieldStruct[ DBS_TYPE ] := Upper( aFieldStruct[ DBS_TYPE ] )
+      aField[ UR_FI_TYPE ]    := HB_Decode( aFieldStruct[ DBS_TYPE ], "C", HB_FT_STRING, "L", HB_FT_LOGICAL, "M", HB_FT_MEMO, "D", HB_FT_DATE, "N", iif( aFieldStruct[ DBS_DEC ] > 0, HB_FT_DOUBLE, HB_FT_INTEGER ) )
+      aField[ UR_FI_TYPEEXT ] := 0
+      aField[ UR_FI_LEN ]     := aFieldStruct[ DBS_LEN ]
+      aField[ UR_FI_DEC ]     := aFieldStruct[ DBS_DEC ]
+      UR_SUPER_ADDFIELD( nWA, aField )
 
    NEXT
 
    RETURN nResult
 
 // Create database from current WA fields definition
+
 STATIC FUNCTION AR_CREATE( nWA, aOpenInfo )
+
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
    LOCAL hRDDData  := USRRDD_RDDDATA( USRRDD_ID( nWA ) )
    LOCAL cName
@@ -216,7 +227,7 @@ STATIC FUNCTION AR_CREATE( nWA, aOpenInfo )
 
    /* When there is no ALIAS we will create new one using file name */
    IF aOpenInfo[ UR_OI_ALIAS ] == NIL
-      HB_FNAMESPLIT( cFullName, , @cName )
+      hb_FNameSplit( cFullName, , @cName )
       aOpenInfo[ UR_OI_ALIAS ] := cName
    ENDIF
 
@@ -229,14 +240,14 @@ STATIC FUNCTION AR_CREATE( nWA, aOpenInfo )
          dbCreate( cFullName, aStructure, "ARRAYRDD" )
          ....
    */
-   //IF !( cFullName IN hRDDData:Keys )
+//IF !( cFullName IN hRDDData:Keys )
 
-      /* Setting file attribs */
-      aDBFData[ DATABASE_FILENAME ] := cFullName
-      aDBFData[ DATABASE_LOCKED   ] := TRUE      /* I need Exclusive mode in creation */
+   /* Setting file attribs */
+   aDBFData[ DATABASE_FILENAME ] := cFullName
+   aDBFData[ DATABASE_LOCKED   ] := TRUE      /* I need Exclusive mode in creation */
 
-      /* Adding new database in RDD memory slots using filename as key */
-      hSet( hRDDData, cFullName, aDBFData )
+   /* Adding new database in RDD memory slots using filename as key */
+   hSet( hRDDData, cFullName, aDBFData )
 
    /* TODO: to clean this part
    ELSE
@@ -258,16 +269,17 @@ STATIC FUNCTION AR_CREATE( nWA, aOpenInfo )
    ENDIF
    */
 
-   // Set WorkArea Info
+// Set WorkArea Info
    aWAData[ WADATA_WORKAREA ] := nWA
    aWAData[ WADATA_OPENINFO ] := aOpenInfo // Put open informations
 
-   // increase open number
+// increase open number
    aDBFData[ DATABASE_OPENNUMBER ]++
 
    RETURN SUCCESS
 
 STATIC FUNCTION AR_OPEN( nWA, aOpenInfo )
+
    LOCAL cFullName, cName, hRDDData, aWAData, aDBFData
    LOCAL aStruct, oError, aFieldStruct, aField, nResult
 
@@ -275,12 +287,12 @@ STATIC FUNCTION AR_OPEN( nWA, aOpenInfo )
 
    /* When there is no ALIAS we will create new one using file name */
    IF aOpenInfo[ UR_OI_ALIAS ] == NIL
-      HB_FNAMESPLIT( cFullName, , @cName )
+      hb_FNameSplit( cFullName, , @cName )
       aOpenInfo[ UR_OI_ALIAS ] := cName
    ENDIF
 
-   //nMode := IIF( aOpenInfo[ UR_OI_SHARED ], FO_SHARED , FO_EXCLUSIVE ) + ;
-   //         IIF( aOpenInfo[ UR_OI_READONLY ], FO_READ, FO_READWRITE )
+//nMode := IIF( aOpenInfo[ UR_OI_SHARED ], FO_SHARED , FO_EXCLUSIVE ) + ;
+//         IIF( aOpenInfo[ UR_OI_READONLY ], FO_READ, FO_READWRITE )
 
    hRDDData := USRRDD_RDDDATA( USRRDD_ID( nWA ) )
 
@@ -294,7 +306,7 @@ STATIC FUNCTION AR_OPEN( nWA, aOpenInfo )
       oError := ErrorNew()
       oError:GenCode     := EG_OPEN
       oError:SubCode     := 1000
-      oError:Description := HB_LANGERRMSG( EG_OPEN ) + ", memory file not found"
+      oError:Description := hb_langErrMsg( EG_OPEN ) + ", memory file not found"
       oError:FileName    := aOpenInfo[ UR_OI_NAME ]
       oError:CanDefault  := .T.
       UR_SUPER_ERROR( nWA, oError )
@@ -302,24 +314,24 @@ STATIC FUNCTION AR_OPEN( nWA, aOpenInfo )
 
    ENDIF
 
-   // Set WorkArea Infos
+// Set WorkArea Infos
    aWAData  := USRRDD_AREADATA( nWA )
    aWAData[ WADATA_DATABASE ] := aDBFData  // Put a reference to database
    aWAData[ WADATA_WORKAREA ] := nWA
    aWAData[ WADATA_OPENINFO ] := aOpenInfo // Put open informations
 
-   // Set fields
+// Set fields
    UR_SUPER_SETFIELDEXTENT( nWA, Len( aStruct ) )
 
    FOR EACH aFieldStruct IN aStruct
 
-       aField := ARRAY( UR_FI_SIZE )
-       aField[ UR_FI_NAME ]    := aFieldStruct[ DBS_NAME ]
-       aField[ UR_FI_TYPE ]    := HB_Decode( aFieldStruct[ DBS_TYPE ], "C", HB_FT_STRING, "L", HB_FT_LOGICAL, "M", HB_FT_MEMO, "D", HB_FT_DATE, "N", IIF( aFieldStruct[ DBS_DEC ] > 0, HB_FT_DOUBLE, HB_FT_INTEGER ) )
-       aField[ UR_FI_TYPEEXT ] := 0
-       aField[ UR_FI_LEN ]     := aFieldStruct[ DBS_LEN ]
-       aField[ UR_FI_DEC ]     := aFieldStruct[ DBS_DEC ]
-       UR_SUPER_ADDFIELD( nWA, aField )
+      aField := Array( UR_FI_SIZE )
+      aField[ UR_FI_NAME ]    := aFieldStruct[ DBS_NAME ]
+      aField[ UR_FI_TYPE ]    := HB_Decode( aFieldStruct[ DBS_TYPE ], "C", HB_FT_STRING, "L", HB_FT_LOGICAL, "M", HB_FT_MEMO, "D", HB_FT_DATE, "N", iif( aFieldStruct[ DBS_DEC ] > 0, HB_FT_DOUBLE, HB_FT_INTEGER ) )
+      aField[ UR_FI_TYPEEXT ] := 0
+      aField[ UR_FI_LEN ]     := aFieldStruct[ DBS_LEN ]
+      aField[ UR_FI_DEC ]     := aFieldStruct[ DBS_DEC ]
+      UR_SUPER_ADDFIELD( nWA, aField )
 
    NEXT
 
@@ -327,18 +339,18 @@ STATIC FUNCTION AR_OPEN( nWA, aOpenInfo )
    nResult := UR_SUPER_OPEN( nWA, aOpenInfo )
 
    /* Add a new open number */
-   //aDBFData[ DATABASE_OPENNUMBER ]++
+//aDBFData[ DATABASE_OPENNUMBER ]++
 
-   // File already opened in exclusive mode
-   // I have to do this check here because, in case of error, AR_CLOSE() is called however
+// File already opened in exclusive mode
+// I have to do this check here because, in case of error, AR_CLOSE() is called however
    IF aDBFData[ DATABASE_LOCKED ]
 
       UR_SUPER_CLOSE( nWA )
       oError := ErrorNew()
       oError:GenCode     := EG_OPEN
       oError:SubCode     := 1000
-      oError:Description := HB_LANGERRMSG( EG_OPEN ) + "(" + ;
-                            HB_LANGERRMSG( EG_LOCK ) + " - already opened in exclusive mode)"
+      oError:Description := hb_langErrMsg( EG_OPEN ) + "(" + ;
+         hb_langErrMsg( EG_LOCK ) + " - already opened in exclusive mode)"
       oError:FileName    := aOpenInfo[ UR_OI_NAME ]
       oError:CanDefault  := .T.
       UR_SUPER_ERROR( nWA, oError )
@@ -346,7 +358,7 @@ STATIC FUNCTION AR_OPEN( nWA, aOpenInfo )
 
    ENDIF
 
-   // Open file in exclusive mode
+// Open file in exclusive mode
    IF !aOpenInfo[ UR_OI_SHARED ]
       IF aDBFData[ DATABASE_OPENNUMBER ] == 0
          aDBFData[ DATABASE_LOCKED     ] := TRUE
@@ -355,8 +367,8 @@ STATIC FUNCTION AR_OPEN( nWA, aOpenInfo )
          oError := ErrorNew()
          oError:GenCode     := EG_OPEN
          oError:SubCode     := 1000
-         oError:Description := HB_LANGERRMSG( EG_OPEN ) + "(" + ;
-                               HB_LANGERRMSG( EG_LOCK ) + " - already opened in shared mode)"
+         oError:Description := hb_langErrMsg( EG_OPEN ) + "(" + ;
+            hb_langErrMsg( EG_LOCK ) + " - already opened in shared mode)"
          oError:FileName    := aOpenInfo[ UR_OI_NAME ]
          oError:CanDefault  := .T.
          UR_SUPER_ERROR( nWA, oError )
@@ -365,13 +377,14 @@ STATIC FUNCTION AR_OPEN( nWA, aOpenInfo )
    ENDIF
 
    IF nResult == SUCCESS
-      aDBFData[ DATABASE_OPENNUMBER ]++ 
+      aDBFData[ DATABASE_OPENNUMBER ]++
       AR_GOTOP( nWA )
    ENDIF
 
    RETURN nResult
 
 STATIC FUNCTION AR_CLOSE( nWA )
+
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
    LOCAL aDBFData  := aWAData[ WADATA_DATABASE ]
 
@@ -386,6 +399,7 @@ STATIC FUNCTION AR_CLOSE( nWA )
    RETURN UR_SUPER_CLOSE( nWA )
 
 STATIC FUNCTION AR_GETVALUE( nWA, nField, xValue )
+
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
    LOCAL aDBFData  := aWAData[ WADATA_DATABASE ]
    LOCAL aRecords  := aDBFData[ DATABASE_RECORDS ]
@@ -408,7 +422,8 @@ STATIC FUNCTION AR_GETVALUE( nWA, nField, xValue )
    RETURN FAILURE
 
 STATIC FUNCTION AR_PACK( nWA )
-   local oError, nReg
+
+   LOCAL oError, nReg
    LOCAL aWAData  := USRRDD_AREADATA( nWA )
    LOCAL aDBFData := aWAData[ WADATA_DATABASE ]
    LOCAL aRecords := aDBFData[ DATABASE_RECORDS ]
@@ -419,17 +434,17 @@ STATIC FUNCTION AR_PACK( nWA )
       oError := ErrorNew()
       oError:GenCode     := EG_UNLOCKED
       oError:SubCode     := 1022 // EDBF_UNLOCKED
-      oError:Description := HB_LANGERRMSG( EG_UNLOCKED )
+      oError:Description := hb_langErrMsg( EG_UNLOCKED )
       //oError:FileName    := aOpenInfo[ UR_OI_NAME ]
       UR_SUPER_ERROR( nWA, oError )
       RETURN FAILURE
 
    ENDIF
 
-   FOR nReg := len( aRecInfo ) TO 1 step -1
+   FOR nReg := Len( aRecInfo ) TO 1 step - 1
       IF aRecInfo[ nReg, RECDATA_DELETED ]
-         aDel( aRecInfo, nReg, .t. )
-         aDel( aRecords, nReg, .t. )
+         ADel( aRecInfo, nReg, .T. )
+         ADel( aRecords, nReg, .T. )
       ENDIF
    NEXT
    AR_GOTOP( nWA )
@@ -437,6 +452,7 @@ STATIC FUNCTION AR_PACK( nWA )
    RETURN SUCCESS
 
 STATIC FUNCTION AR_PUTVALUE( nWA, nField, xValue )
+
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
    LOCAL aDBFData  := aWAData[ WADATA_DATABASE ]
    LOCAL aRecords  := aDBFData[ DATABASE_RECORDS ]
@@ -445,7 +461,7 @@ STATIC FUNCTION AR_PUTVALUE( nWA, nField, xValue )
    LOCAL xVal
 
    IF nField > 0 .AND. nField <= Len( aStruct ) .AND. ;
-      IIF( ValType( xValue ) == "C" .AND. aStruct[ nField ][ DBS_TYPE ] == "M", TRUE, ValType( xValue ) == aStruct[ nField ][ DBS_TYPE ] )
+         iif( ValType( xValue ) == "C" .AND. aStruct[ nField ][ DBS_TYPE ] == "M", TRUE, ValType( xValue ) == aStruct[ nField ][ DBS_TYPE ] )
 
       xVal := PutValue( xValue, aStruct[ nField ][ DBS_TYPE ], aStruct[ nField ][ DBS_LEN ], aStruct[ nField ][ DBS_DEC ] )
 
@@ -462,24 +478,25 @@ STATIC FUNCTION AR_PUTVALUE( nWA, nField, xValue )
    RETURN FAILURE
 
 STATIC FUNCTION AR_GOTO( nWA, nRecord )
+
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
    LOCAL aDBFData  := aWAData[ WADATA_DATABASE ]
    LOCAL aRecords  := aDBFData[ DATABASE_RECORDS ]
    LOCAL nRecCount := Len( aRecords )
 
-   //if( SELF_GOCOLD( ( AREAP ) pArea ) == FAILURE )
-   //   return FAILURE;
-   //
-   //if( pArea->lpdbPendingRel )
-   //{
-   //   if( pArea->lpdbPendingRel->isScoped )
-   //      SELF_FORCEREL( ( AREAP ) pArea );
-   //   else /* Reset parent rel struct */
-   //      pArea->lpdbPendingRel = NULL;
-   //}
-   ///* Update record count */
-   //if( ulRecNo > pArea->ulRecCount && pArea->fShared )
-   //   pArea->ulRecCount = hb_dbfCalcRecCount( pArea );
+//if( SELF_GOCOLD( ( AREAP ) pArea ) == FAILURE )
+//   return FAILURE;
+//
+//if( pArea->lpdbPendingRel )
+//{
+//   if( pArea->lpdbPendingRel->isScoped )
+//      SELF_FORCEREL( ( AREAP ) pArea );
+//   else /* Reset parent rel struct */
+//      pArea->lpdbPendingRel = NULL;
+//}
+///* Update record count */
+//if( ulRecNo > pArea->ulRecCount && pArea->fShared )
+//   pArea->ulRecCount = hb_dbfCalcRecCount( pArea );
 
 
    IF nRecord >= 1 .AND. nRecord <= nRecCount
@@ -513,9 +530,11 @@ STATIC FUNCTION AR_GOTO( nWA, nRecord )
    RETURN SUCCESS
 
 STATIC FUNCTION AR_GOTOID( nWA, nRecord )
+
    RETURN AR_GOTO( nWA, nRecord )
 
 STATIC FUNCTION AR_GOTOP( nWA )
+
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
    LOCAL aDBFData  := aWAData[ WADATA_DATABASE ]
    LOCAL aRecords  := aDBFData[ DATABASE_RECORDS ]
@@ -533,7 +552,7 @@ STATIC FUNCTION AR_GOTOP( nWA )
       aWAData[ WADATA_EOF ]   := .F.
       aWAData[ WADATA_RECNO ] := 1
 
-      IF Set( _SET_DELETED ) .AND. aRecInfo[ aWAData[ WADATA_RECNO ] ][ RECDATA_DELETED ]
+      IF SET( _SET_DELETED ) .AND. aRecInfo[ aWAData[ WADATA_RECNO ] ][ RECDATA_DELETED ]
          RETURN AR_SKIPFILTER( nWA, 1 )
       ENDIF
    ENDIF
@@ -541,6 +560,7 @@ STATIC FUNCTION AR_GOTOP( nWA )
    RETURN SUCCESS
 
 STATIC FUNCTION AR_GOBOTTOM( nWA )
+
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
    LOCAL aDBFData  := aWAData[ WADATA_DATABASE ]
    LOCAL aRecords  := aDBFData[ DATABASE_RECORDS ]
@@ -556,8 +576,8 @@ STATIC FUNCTION AR_GOBOTTOM( nWA )
       aWAData[ WADATA_EOF ]   := .F.
       aWAData[ WADATA_RECNO ] := Len( aRecords )
 
-      IF Set( _SET_DELETED ) .AND. aRecInfo[ aWAData[ WADATA_RECNO ] ][ RECDATA_DELETED ]
-         RETURN AR_SKIPFILTER( nWA, -1 )
+      IF SET( _SET_DELETED ) .AND. aRecInfo[ aWAData[ WADATA_RECNO ] ][ RECDATA_DELETED ]
+         RETURN AR_SKIPFILTER( nWA, - 1 )
       ENDIF
 
    ENDIF
@@ -565,17 +585,18 @@ STATIC FUNCTION AR_GOBOTTOM( nWA )
    RETURN SUCCESS
 
 STATIC FUNCTION AR_SKIPFILTER( nWA, nRecords )
+
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
    LOCAL aDBFData  := aWAData[ WADATA_DATABASE ]
    LOCAL aRecInfo  := aDBFData[ DATABASE_RECINFO ]
    LOCAL lBof, nToSkip
 
-   nToSkip := IIF( nRecords > 0, 1, IIF( nRecords < 0, -1, 0 ) )
+   nToSkip := iif( nRecords > 0, 1, iif( nRecords < 0, - 1, 0 ) )
 
    IF nToSkip != 0
       DO WHILE !aWAData[ WADATA_BOF ] .AND. !aWAData[ WADATA_EOF ]
-   IF ( SET( _SET_DELETED ) .AND. aRecInfo[ aWAData[ WADATA_RECNO ] ][ RECDATA_DELETED ] ) .OR. ;
-               ( aWAData[ WADATA_FILTERINFO ] <> nil .AND. !eval( aWAData[ WADATA_FILTERINFO, 1 ] ) )
+         IF ( Set( _SET_DELETED ) .AND. aRecInfo[ aWAData[ WADATA_RECNO ] ][ RECDATA_DELETED ] ) .OR. ;
+               ( aWAData[ WADATA_FILTERINFO ] <> nil .AND. !Eval( aWAData[ WADATA_FILTERINFO, 1 ] ) )
             IF !( AR_SKIPRAW( nWA, nToSkip ) == SUCCESS )
                RETURN FAILURE
             ENDIF
@@ -603,46 +624,48 @@ STATIC FUNCTION AR_SKIPFILTER( nWA, nRecords )
    RETURN SUCCESS
 
 STATIC FUNCTION AR_SKIPRAW( nWA, nRecords )
+
    LOCAL aWAData    := USRRDD_AREADATA( nWA )
    LOCAL lBof, lEof
    LOCAL nResult
 
-   //if( pArea->lpdbPendingRel )
-   //   SELF_FORCEREL( ( AREAP ) pArea );
+//if( pArea->lpdbPendingRel )
+//   SELF_FORCEREL( ( AREAP ) pArea );
 
-   //IF nRecCount > 0
+//IF nRecCount > 0
 
-      IF nRecords == 0
+   IF nRecords == 0
 
-         lBof := aWAData[ WADATA_BOF ]
-         lEof := aWAData[ WADATA_EOF ]
+      lBof := aWAData[ WADATA_BOF ]
+      lEof := aWAData[ WADATA_EOF ]
 
-         nResult := AR_GOTO( nWA, aWAData[ WADATA_RECNO ] )
+      nResult := AR_GOTO( nWA, aWAData[ WADATA_RECNO ] )
 
-         aWAData[ WADATA_BOF ] := lBof
-         aWAData[ WADATA_EOF ] := lEof
+      aWAData[ WADATA_BOF ] := lBof
+      aWAData[ WADATA_EOF ] := lEof
 
-      ELSEIF nRecords < 0 .AND. -nRecords >= aWAData[ WADATA_RECNO ]
+   ELSEIF nRecords < 0 .AND. - nRecords >= aWAData[ WADATA_RECNO ]
 
-            nResult := AR_GOTO( nWA, 1 )
-            aWAData[ WADATA_BOF ]   := .T.
-            // Hack for dbf1.c hack GOTOP
+      nResult := AR_GOTO( nWA, 1 )
+      aWAData[ WADATA_BOF ]   := .T.
+      // Hack for dbf1.c hack GOTOP
             /*
             aWAData[ WADATA_FORCEBOF ] := .T.
             */
 
-      ELSE
+   ELSE
 
-         nResult := AR_GOTO( nWA, aWAData[ WADATA_RECNO ] + nRecords )
+      nResult := AR_GOTO( nWA, aWAData[ WADATA_RECNO ] + nRecords )
 
-      ENDIF
+   ENDIF
 
    RETURN nResult // SUCCESS
 
 STATIC FUNCTION AR_BOF( nWA, lBof )
+
    LOCAL aWAData    := USRRDD_AREADATA( nWA )
 
-   // This is a hack to protect from dbf1.c skipraw hack
+// This is a hack to protect from dbf1.c skipraw hack
    IF aWAData[ WADATA_FORCEBOF ] .AND. lBof
       aWAData[ WADATA_BOF ] := lBof
       aWAData[ WADATA_FORCEBOF ] := FALSE
@@ -653,6 +676,7 @@ STATIC FUNCTION AR_BOF( nWA, lBof )
    RETURN SUCCESS
 
 STATIC FUNCTION AR_EOF( nWA, lEof )
+
    LOCAL aWAData    := USRRDD_AREADATA( nWA )
 
    lEof := aWAData[ WADATA_EOF ]
@@ -660,10 +684,13 @@ STATIC FUNCTION AR_EOF( nWA, lEof )
    RETURN SUCCESS
 
 STATIC FUNCTION AR_CLEARFILTER( nWA )
+
    USRRDD_AREADATA( nWA )[ WADATA_FILTERINFO ] := nil
-RETURN SUCCESS
+
+   RETURN SUCCESS
 
 STATIC FUNCTION AR_DELETE( nWA )
+
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
    LOCAL aDBFData  := aWAData[ WADATA_DATABASE ]
    LOCAL aRecInfo  := aDBFData[ DATABASE_RECINFO ]
@@ -675,39 +702,40 @@ STATIC FUNCTION AR_DELETE( nWA )
       oError := ErrorNew()
       oError:GenCode     := EG_READONLY
       oError:SubCode     := 1025 // EDBF_READONLY
-      oError:Description := HB_LANGERRMSG( EG_READONLY )
+      oError:Description := hb_langErrMsg( EG_READONLY )
       oError:FileName    := aOpenInfo[ UR_OI_NAME ]
       UR_SUPER_ERROR( nWA, oError )
       RETURN FAILURE
 
    ENDIF
 
-IF !aWAData[ WADATA_EOF ]
-     IF aOpenInfo[ UR_OI_SHARED ] .AND. aRecInfo[ aWAData[ WADATA_RECNO ] ][ RECDATA_LOCKED ] <> nWA
+   IF !aWAData[ WADATA_EOF ]
+      IF aOpenInfo[ UR_OI_SHARED ] .AND. aRecInfo[ aWAData[ WADATA_RECNO ] ][ RECDATA_LOCKED ] <> nWA
 
-        oError := ErrorNew()
-        oError:GenCode     := EG_UNLOCKED
-        oError:SubCode     := 1022 // EDBF_UNLOCKED
-        oError:Description := HB_LANGERRMSG( EG_UNLOCKED )
-        oError:FileName    := aOpenInfo[ UR_OI_NAME ]
-        UR_SUPER_ERROR( nWA, oError )
-        RETURN FAILURE
+         oError := ErrorNew()
+         oError:GenCode     := EG_UNLOCKED
+         oError:SubCode     := 1022 // EDBF_UNLOCKED
+         oError:Description := hb_langErrMsg( EG_UNLOCKED )
+         oError:FileName    := aOpenInfo[ UR_OI_NAME ]
+         UR_SUPER_ERROR( nWA, oError )
+         RETURN FAILURE
 
-     ENDIF
+      ENDIF
 
-     IF Len( aRecInfo ) > 0 .AND. aWAData[ WADATA_RECNO ] <= Len( aRecInfo )
-        aRecInfo[ aWAData[ WADATA_RECNO ] ][ RECDATA_DELETED ] := .T.
-     ENDIF 
-ENDIF
+      IF Len( aRecInfo ) > 0 .AND. aWAData[ WADATA_RECNO ] <= Len( aRecInfo )
+         aRecInfo[ aWAData[ WADATA_RECNO ] ][ RECDATA_DELETED ] := .T.
+      ENDIF
+   ENDIF
 
-RETURN SUCCESS
+   RETURN SUCCESS
 
 STATIC FUNCTION AR_DELETED( nWA, lDeleted )
+
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
    LOCAL aDBFData  := aWAData[ WADATA_DATABASE ]
    LOCAL aRecInfo  := aDBFData[ DATABASE_RECINFO ]
 
-   //lDeleted := .F.
+//lDeleted := .F.
    IF Len( aRecInfo ) > 0 .AND. aWAData[ WADATA_RECNO ] <= Len( aRecInfo )
       lDeleted := aRecInfo[ aWAData[ WADATA_RECNO ] ][ RECDATA_DELETED ]
    ELSE
@@ -717,6 +745,7 @@ STATIC FUNCTION AR_DELETED( nWA, lDeleted )
    RETURN SUCCESS
 
 STATIC FUNCTION AR_APPEND( nWA /*, nRecords*/ )
+
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
    LOCAL aDBFData  := aWAData[ WADATA_DATABASE ]
    LOCAL aRecords  := aDBFData[ DATABASE_RECORDS ]
@@ -730,7 +759,7 @@ STATIC FUNCTION AR_APPEND( nWA /*, nRecords*/ )
       oError := ErrorNew()
       oError:GenCode     := EG_READONLY
       oError:SubCode     := 1025 // EDBF_READONLY
-      oError:Description := HB_LANGERRMSG( EG_READONLY )
+      oError:Description := hb_langErrMsg( EG_READONLY )
       oError:FileName    := aOpenInfo[ UR_OI_NAME ]
       //oError:OsCode      := fError()
       oError:CanDefault  := .T.
@@ -741,8 +770,8 @@ STATIC FUNCTION AR_APPEND( nWA /*, nRecords*/ )
    ENDIF
 
    aRecord := BlankRecord( aStruct )
-   aAdd( aRecords, aRecord )
-   aAdd( aRecInfo, AR_RECDATAINIT() )
+   AAdd( aRecords, aRecord )
+   AAdd( aRecInfo, AR_RECDATAINIT() )
    AR_GOBOTTOM( nWA )
 
    /* TODO: SHARED ACCESS */
@@ -750,30 +779,33 @@ STATIC FUNCTION AR_APPEND( nWA /*, nRecords*/ )
    RETURN SUCCESS
 
 STATIC FUNCTION AR_LOCK( nWA, aLock )
-   local aWAData  := USRRDD_AREADATA( nWA )
-   local nReg     := if( aLock[ UR_LI_RECORD ] == nil, aWAData[ WADATA_RECNO ], aLock[ UR_LI_RECORD ] )
+
+   LOCAL aWAData  := USRRDD_AREADATA( nWA )
+   LOCAL nReg     := if( aLock[ UR_LI_RECORD ] == nil, aWAData[ WADATA_RECNO ], aLock[ UR_LI_RECORD ] )
    LOCAL aRecInfo
 
    IF aWAData[ WADATA_EOF ]
-      aLock[ UR_LI_RESULT ] := .t.
-   else
+      aLock[ UR_LI_RESULT ] := .T.
+   ELSE
       aRecInfo := aWAData[ WADATA_DATABASE, DATABASE_RECINFO,nReg ]
-      if aWAData[ WADATA_OPENINFO, UR_OI_SHARED ]
+      IF aWAData[ WADATA_OPENINFO, UR_OI_SHARED ]
          IF aRecInfo[ RECDATA_LOCKED ] == nWA
-            aLock[ UR_LI_RESULT ] := .t.
-         elseIf aRecInfo[ RECDATA_LOCKED ] <> 0
-            aLock[ UR_LI_RESULT ] := .f.
-         else
+            aLock[ UR_LI_RESULT ] := .T.
+         ELSEIF aRecInfo[ RECDATA_LOCKED ] <> 0
+            aLock[ UR_LI_RESULT ] := .F.
+         ELSE
             aRecInfo[ RECDATA_LOCKED ] := nWA
-            aLock[ UR_LI_RESULT ] := .t.
+            aLock[ UR_LI_RESULT ] := .T.
          ENDIF
-      else
-         aLock[ UR_LI_RESULT ] := .t.
-      endIf
-  ENDIF
-RETURN SUCCESS
+      ELSE
+         aLock[ UR_LI_RESULT ] := .T.
+      ENDIF
+   ENDIF
+
+   RETURN SUCCESS
 
 STATIC FUNCTION AR_RECID( nWA, nRecNo )
+
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
    LOCAL aDBFData  := aWAData[ WADATA_DATABASE ]
    LOCAL aRecords  := aDBFData[ DATABASE_RECORDS ]
@@ -788,6 +820,7 @@ STATIC FUNCTION AR_RECID( nWA, nRecNo )
    RETURN SUCCESS
 
 STATIC FUNCTION AR_RECCOUNT( nWA, nRecords )
+
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
    LOCAL aDBFData  := aWAData[ WADATA_DATABASE ]
    LOCAL aRecords  := aDBFData[ DATABASE_RECORDS ]
@@ -797,27 +830,35 @@ STATIC FUNCTION AR_RECCOUNT( nWA, nRecords )
    RETURN SUCCESS
 
 STATIC FUNCTION AR_RECNO( nWA, nRecNo )
+
    nRecNo := USRRDD_AREADATA( nWA )[ WADATA_RECNO ]
+
    RETURN SUCCESS
 
 STATIC FUNCTION AR_SETFILTER( nWa, aDbFilterInfo )
+
    USRRDD_AREADATA( nWA )[ WADATA_FILTERINFO ] := { aDbFilterInfo[ UR_FRI_BEXPR ], aDbFilterInfo[ UR_FRI_CEXPR ] }
+
    RETURN SUCCESS
 
 STATIC FUNCTION AR_UNLOCK( nWA, nReg )
-   local aRecInfo
+
+   LOCAL aRecInfo
+
    IF nReg == nil
       FOR EACH aRecInfo IN USRRDD_AREADATA( nWA )[ WADATA_DATABASE,DATABASE_RECINFO ]
          IF aRecInfo[ RECDATA_LOCKED ] == nWA
             aRecInfo[ RECDATA_LOCKED ] := 0
          ENDIF
       NEXT
-   elseIf USRRDD_AREADATA( nWA )[ WADATA_DATABASE, DATABASE_RECINFO,nReg, RECDATA_LOCKED ] == nWA
+   ELSEIF USRRDD_AREADATA( nWA )[ WADATA_DATABASE, DATABASE_RECINFO,nReg, RECDATA_LOCKED ] == nWA
       aRecInfo[ nReg, RECDATA_LOCKED ] := 0
    ENDIF
+
    RETURN SUCCESS
 
 STATIC FUNCTION AR_ZAP( nWA )
+
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
    LOCAL aDBFData  := aWAData[ WADATA_DATABASE ]
    LOCAL aOpenInfo := aWAData[ WADATA_OPENINFO ]
@@ -828,7 +869,7 @@ STATIC FUNCTION AR_ZAP( nWA )
       oError := ErrorNew()
       oError:GenCode     := EG_READONLY
       oError:SubCode     := 1025 // EDBF_READONLY
-      oError:Description := HB_LANGERRMSG( EG_READONLY )
+      oError:Description := hb_langErrMsg( EG_READONLY )
       oError:FileName    := aOpenInfo[ UR_OI_NAME ]
       UR_SUPER_ERROR( nWA, oError )
       RETURN FAILURE
@@ -840,18 +881,18 @@ STATIC FUNCTION AR_ZAP( nWA )
       oError := ErrorNew()
       oError:GenCode     := EG_SHARED
       oError:SubCode     := 1023 // EDBF_SHARED
-      oError:Description := HB_LANGERRMSG( EG_SHARED )
+      oError:Description := hb_langErrMsg( EG_SHARED )
       oError:FileName    := aOpenInfo[ UR_OI_NAME ]
       UR_SUPER_ERROR( nWA, oError )
       RETURN FAILURE
 
    ENDIF
 
-   // empty records
+// empty records
    aDBFData[ DATABASE_RECORDS ] := {}
    aDBFData[ DATABASE_RECINFO ] := {}
 
-   // move to 0 recno
+// move to 0 recno
    AR_GOTO( nWA, 0 )
 
    RETURN SUCCESS
@@ -894,26 +935,30 @@ STATIC FUNCTION AR_ORDINFO( nWA, xMsg, xValue )
    AR_GOTO( nWA, 0 )
    */
 
-   (nWA)
-   (xMsg)
-   (xValue)
+   ( nWA )
+   ( xMsg )
+   ( xValue )
 
    RETURN SUCCESS
 
 STATIC FUNCTION AR_DUMMY()
-  // function for when be necesary for the rdd doesn't cause error
-RETURN SUCCESS 
+
+// function for when be necesary for the rdd doesn't cause error
+
+   RETURN SUCCESS
 /*
  * This function have to exist in all RDD and then name have to be in
  * format: <RDDNAME>_GETFUNCTABLE
  */
+
 FUNCTION ARRAYRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
+
    LOCAL cSuperRDD := NIL     /* NO SUPER RDD */
    LOCAL aMyFunc[ UR_METHODCOUNT ]
 
    aMyFunc[ UR_INIT         ] := ( @AR_INIT()         )
    aMyFunc[ UR_NEW          ] := ( @AR_NEW()          )
-   aMyFunc[ UR_FLUSH        ] := ( @AR_DUMMY()        ) 
+   aMyFunc[ UR_FLUSH        ] := ( @AR_DUMMY()        )
    aMyFunc[ UR_CREATE       ] := ( @AR_CREATE()       )
    aMyFunc[ UR_CREATEFIELDS ] := ( @AR_CREATEFIELDS() )
    aMyFunc[ UR_OPEN         ] := ( @AR_OPEN()         )
@@ -943,27 +988,29 @@ FUNCTION ARRAYRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
    aMyFunc[ UR_UNLOCK       ] := ( @AR_UNLOCK()       )
 
    RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, ;
-                               cSuperRDD, aMyFunc )
+      cSuperRDD, aMyFunc )
 
-INIT PROCEDURE ARRAYRDD_INIT()
+   INIT PROCEDURE ARRAYRDD_INIT()
    rddRegister( "ARRAYRDD", RDT_FULL )
+
    RETURN
 
-/* -------------------------------------------------- */
-/*           UTILITY FUNCTIONS                        */
-/* -------------------------------------------------- */
+   /* -------------------------------------------------- */
+   /*           UTILITY FUNCTIONS                        */
+   /* -------------------------------------------------- */
 
 /*
   EraseArrayRdd() function is equivalent of FErase() function, but works here in memory
 */
 
 FUNCTION EraseArrayRdd( cFullName )
+
    LOCAL nReturn := FAILURE
    LOCAL aDBFData, oError
    LOCAL nRDD, aRDDList
    LOCAL hRDDData
 
-   aRDDList := RDDLIST( RDT_FULL )
+   aRDDList := rddList( RDT_FULL )
    nRDD     := AScan( aRDDList, "ARRAYRDD" )
 
    IF nRDD > 0
@@ -989,8 +1036,8 @@ FUNCTION EraseArrayRdd( cFullName )
 
                   oError:GenCode     := EG_UNSUPPORTED
                   oError:SubCode     := 1000  // EDBF_UNSUPPORTED
-                  oError:Description := HB_LANGERRMSG( EG_UNSUPPORTED ) + " (" + ;
-                                        "database in use)"
+                  oError:Description := hb_langErrMsg( EG_UNSUPPORTED ) + " (" + ;
+                     "database in use)"
                   oError:FileName    := cFullName
                   oError:CanDefault  := .T.
                   //UR_SUPER_ERROR( 0, oError )
@@ -1015,8 +1062,8 @@ FUNCTION EraseArrayRdd( cFullName )
 
          oError:GenCode     := EG_UNSUPPORTED
          oError:SubCode     := 1000  // EDBF_UNSUPPORTED
-         oError:Description := HB_LANGERRMSG( EG_UNSUPPORTED ) + " (" + ;
-                               "ARRAYRDD not inizialized)"
+         oError:Description := hb_langErrMsg( EG_UNSUPPORTED ) + " (" + ;
+            "ARRAYRDD not inizialized)"
          oError:FileName    := cFullName
          oError:CanDefault  := .T.
          //UR_SUPER_ERROR( 0, oError )
@@ -1031,8 +1078,8 @@ FUNCTION EraseArrayRdd( cFullName )
 
       oError:GenCode     := EG_UNSUPPORTED
       oError:SubCode     := 1000  // EDBF_UNSUPPORTED
-      oError:Description := HB_LANGERRMSG( EG_UNSUPPORTED ) + " (" + ;
-                            "ARRAYRDD not in use)"
+      oError:Description := hb_langErrMsg( EG_UNSUPPORTED ) + " (" + ;
+         "ARRAYRDD not in use)"
       oError:FileName    := cFullName
       oError:CanDefault  := .T.
       //UR_SUPER_ERROR( 0, oError )
@@ -1050,12 +1097,13 @@ FUNCTION EraseArrayRdd( cFullName )
 */
 
 FUNCTION FileArrayRdd( cFullName )
+
    LOCAL nReturn := FAILURE
    LOCAL oError
    LOCAL nRDD, aRDDList
    LOCAL hRDDData
 
-   aRDDList := RDDLIST( RDT_FULL )
+   aRDDList := rddList( RDT_FULL )
    nRDD     := AScan( aRDDList, "ARRAYRDD" )
 
    IF nRDD > 0
@@ -1082,8 +1130,8 @@ FUNCTION FileArrayRdd( cFullName )
 
          oError:GenCode     := EG_UNSUPPORTED
          oError:SubCode     := 1000  // EDBF_UNSUPPORTED
-         oError:Description := HB_LANGERRMSG( EG_UNSUPPORTED ) + " (" + ;
-                               "ARRAYRDD not inizialized)"
+         oError:Description := hb_langErrMsg( EG_UNSUPPORTED ) + " (" + ;
+            "ARRAYRDD not inizialized)"
          oError:FileName    := cFullName
          oError:CanDefault  := .T.
          //UR_SUPER_ERROR( 0, oError )
@@ -1099,8 +1147,8 @@ FUNCTION FileArrayRdd( cFullName )
 
       oError:GenCode     := EG_UNSUPPORTED
       oError:SubCode     := 1000  // EDBF_UNSUPPORTED
-      oError:Description := HB_LANGERRMSG( EG_UNSUPPORTED ) + " (" + ;
-                            "ARRAYRDD not in use)"
+      oError:Description := hb_langErrMsg( EG_UNSUPPORTED ) + " (" + ;
+         "ARRAYRDD not in use)"
       oError:FileName    := cFullName
       oError:CanDefault  := .T.
       //UR_SUPER_ERROR( 0, oError )
@@ -1109,49 +1157,55 @@ FUNCTION FileArrayRdd( cFullName )
       nReturn := FAILURE
 
    ENDIF
-RETURN ( nReturn == SUCCESS )
+
+   RETURN ( nReturn == SUCCESS )
 
 FUNCTION setArryRdd( aArray )
-LOCAL aRecInfo
-LOCAL nWA      := select()
-LOCAL aDBFData := USRRDD_AREADATA( nWA )[ WADATA_DATABASE ]
-aDBFData[ DATABASE_RECORDS ] := aArray
-aDBFData[ DATABASE_RECINFO ] := array( len( aArray ) )
-FOR each aRecInfo in aDBFData[ DATABASE_RECINFO ]
-   aRecInfo := AR_RECDATAINIT()
-NEXT
-AR_GOTOP( nWA )
-RETURN nil 
+
+   LOCAL aRecInfo
+   LOCAL nWA      := Select()
+   LOCAL aDBFData := USRRDD_AREADATA( nWA )[ WADATA_DATABASE ]
+
+   aDBFData[ DATABASE_RECORDS ] := aArray
+   aDBFData[ DATABASE_RECINFO ] := Array( Len( aArray ) )
+   FOR EACH aRecInfo in aDBFData[ DATABASE_RECINFO ]
+      aRecInfo := AR_RECDATAINIT()
+   NEXT
+   AR_GOTOP( nWA )
+
+   RETURN nil
 
 STATIC FUNCTION BlankRecord( aStruct )
+
    LOCAL nLenStruct := Len( aStruct )
    LOCAL aRecord    := Array( nLenStruct )
    LOCAL nField
 
    FOR nField := 1 TO nLenStruct
-       aRecord[ nField ] := EmptyValue( aStruct[ nField ][ DBS_TYPE ], aStruct[ nField ][ DBS_LEN ], aStruct[ nField ][ DBS_DEC ] )
+      aRecord[ nField ] := EmptyValue( aStruct[ nField ][ DBS_TYPE ], aStruct[ nField ][ DBS_LEN ], aStruct[ nField ][ DBS_DEC ] )
    NEXT
 
    RETURN aRecord
 
 STATIC FUNCTION PutValue( xValue, cType, nLen, nDec )
+
    LOCAL xVal
 
    DO CASE
    CASE cType == "C"
-        xVal := PadR( xValue, nLen )
+      xVal := PadR( xValue, nLen )
    CASE cType == "M"
-        xVal := xValue  // No limit for a memo field
+      xVal := xValue  // No limit for a memo field
    CASE cType == "N"
-        xVal := Val( Str( xValue, nLen, nDec ) )
+      xVal := Val( Str( xValue, nLen, nDec ) )
    OTHERWISE
-        xVal := xValue
+      xVal := xValue
    ENDCASE
 
    RETURN xVal
 
-
 STATIC FUNCTION EmptyValue( cType, nLen, nDec )
+
    LOCAL xVal
 
    DEFAULT nLen TO 0
@@ -1159,12 +1213,13 @@ STATIC FUNCTION EmptyValue( cType, nLen, nDec )
 
    DO CASE
    CASE cType == "C" .OR. cType == "M"
-        xVal := Space( nLen )
+      xVal := Space( nLen )
    CASE cType == "D"
-        xVal := CToD( "" )
+      xVal := CToD( "" )
    CASE cType == "L"
-        xVal := FALSE
+      xVal := FALSE
    CASE cType == "N"
-        xVal := Val( Str( 0, nLen, nDec ) )
+      xVal := Val( Str( 0, nLen, nDec ) )
    ENDCASE
-RETURN xVal
+
+   RETURN xVal

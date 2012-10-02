@@ -77,9 +77,9 @@
  */
 static HB_ERRCODE hb_waBof( AREAP pArea, BOOL * pBof )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waBof(%p, %p)", pArea, pBof));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waBof(%p, %p)", pArea, pBof ) );
 
-   * pBof = pArea->fBof;
+   *pBof = pArea->fBof;
    return HB_SUCCESS;
 }
 
@@ -88,9 +88,9 @@ static HB_ERRCODE hb_waBof( AREAP pArea, BOOL * pBof )
  */
 static HB_ERRCODE hb_waEof( AREAP pArea, BOOL * pEof )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waEof(%p, %p)", pArea, pEof));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waEof(%p, %p)", pArea, pEof ) );
 
-   * pEof = pArea->fEof;
+   *pEof = pArea->fEof;
    return HB_SUCCESS;
 }
 
@@ -99,9 +99,9 @@ static HB_ERRCODE hb_waEof( AREAP pArea, BOOL * pEof )
  */
 static HB_ERRCODE hb_waFound( AREAP pArea, BOOL * pFound )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waFound(%p, %p)", pArea, pFound));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waFound(%p, %p)", pArea, pFound ) );
 
-   * pFound = pArea->fFound;
+   *pFound = pArea->fFound;
    return HB_SUCCESS;
 }
 
@@ -112,7 +112,7 @@ static HB_ERRCODE hb_waSkip( AREAP pArea, LONG lToSkip )
 {
    LONG lSkip;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_waSkip(%p, %ld)", pArea, lToSkip));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waSkip(%p, %ld)", pArea, lToSkip ) );
 
    /* Flush record and exit */
    if( lToSkip == 0 )
@@ -124,8 +124,8 @@ static HB_ERRCODE hb_waSkip( AREAP pArea, LONG lToSkip )
       lSkip = 1;
    else
    {
-      lSkip = -1;
-      lToSkip *= -1;
+      lSkip    = -1;
+      lToSkip  *= -1;
    }
    while( --lToSkip >= 0 )
    {
@@ -151,25 +151,25 @@ static HB_ERRCODE hb_waSkip( AREAP pArea, LONG lToSkip )
  */
 static HB_ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
 {
-   BOOL fBottom, fDeleted;
-   HB_ERRCODE errCode;
+   BOOL        fBottom, fDeleted;
+   HB_ERRCODE  errCode;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_waSkipFilter(%p, %ld)", pArea, lUpDown));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waSkipFilter(%p, %ld)", pArea, lUpDown ) );
 
-   if( pArea->dbfi.itmCobExpr == NULL && !hb_setGetDeleted() )
+   if( pArea->dbfi.itmCobExpr == NULL && ! hb_setGetDeleted() )
       return HB_SUCCESS;
 
    /* Since lToSkip is passed to SkipRaw, it should never request more than
       a single skip.
       The implied purpose of hb_waSkipFilter is to get off of a "bad" record
       after a skip was performed, NOT to skip lToSkip filtered records.
-   */
-   lUpDown = ( lUpDown < 0  ? -1 : 1 );
+    */
+   lUpDown  = ( lUpDown < 0  ? -1 : 1 );
 
    /* remember if we are here after SLEF_GOTOP() */
-   fBottom = pArea->fBottom;
+   fBottom  = pArea->fBottom;
 
-   while( !pArea->fBof && !pArea->fEof )
+   while( ! pArea->fBof && ! pArea->fEof )
    {
       /* SET DELETED */
       if( hb_setGetDeleted() )
@@ -191,7 +191,7 @@ static HB_ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
             return HB_FAILURE;
 
          if( HB_IS_LOGICAL( pArea->valResult ) &&
-             !hb_itemGetL( pArea->valResult ) )
+             ! hb_itemGetL( pArea->valResult ) )
          {
             if( SELF_SKIPRAW( pArea, lUpDown ) != HB_SUCCESS )
                return HB_FAILURE;
@@ -224,7 +224,7 @@ static HB_ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
       }
       else
       {
-         errCode = SELF_GOTOP( pArea );
+         errCode     = SELF_GOTOP( pArea );
          pArea->fBof = TRUE;
       }
    }
@@ -241,11 +241,11 @@ static HB_ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
  */
 static HB_ERRCODE hb_waAddField( AREAP pArea, LPDBFIELDINFO pFieldInfo )
 {
-   LPFIELD pField;
-   char szFieldName[ HB_SYMBOL_NAME_LEN + 1 ];
-   const char *szPtr;
+   LPFIELD        pField;
+   char           szFieldName[ HB_SYMBOL_NAME_LEN + 1 ];
+   const char *   szPtr;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_waAddField(%p, %p)", pArea, pFieldInfo));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waAddField(%p, %p)", pArea, pFieldInfo ) );
 
    /* Validate the name of field */
    szPtr = pFieldInfo->atomName;
@@ -257,29 +257,29 @@ static HB_ERRCODE hb_waAddField( AREAP pArea, LPDBFIELDINFO pFieldInfo )
    if( szFieldName[ 0 ] == 0 )
       return HB_FAILURE;
 
-   pField = pArea->lpFields + pArea->uiFieldCount;
+   pField                  = pArea->lpFields + pArea->uiFieldCount;
    if( pArea->uiFieldCount > 0 )
       ( ( LPFIELD ) ( pField - 1 ) )->lpfNext = pField;
-   pField->sym = ( void * ) hb_dynsymGetCase( szFieldName );
-   pField->uiType = pFieldInfo->uiType;
-   pField->uiTypeExtended = pFieldInfo->uiTypeExtended;
-   pField->uiLen = pFieldInfo->uiLen;
-   pField->uiDec = pFieldInfo->uiDec;
-   pField->uiFlags = pFieldInfo->uiFlags;
-   pField->uiArea = pArea->uiArea;
+   pField->sym             = ( void * ) hb_dynsymGetCase( szFieldName );
+   pField->uiType          = pFieldInfo->uiType;
+   pField->uiTypeExtended  = pFieldInfo->uiTypeExtended;
+   pField->uiLen           = pFieldInfo->uiLen;
+   pField->uiDec           = pFieldInfo->uiDec;
+   pField->uiFlags         = pFieldInfo->uiFlags;
+   pField->uiArea          = pArea->uiArea;
 
 #ifdef HB_COMPAT_FOXPRO
-   pField->uiStep = pFieldInfo->uiStep;
+   pField->uiStep          = pFieldInfo->uiStep;
 
    if( pField->uiFlags & HB_FF_NULLABLE )
-      pField->bNullPos = (pArea->bFlagCount ++);
+      pField->bNullPos = ( pArea->bFlagCount++ );
    if( pField->uiType == HB_FT_VARLENGTH )
-      pField->bVarPos = (pArea->bFlagCount ++);
+      pField->bVarPos = ( pArea->bFlagCount++ );
    if( pField->uiFlags & HB_FF_HIDDEN )
-      pArea->uiFieldHidden ++;
+      pArea->uiFieldHidden++;
 #endif
 
-   pArea->uiFieldCount ++;
+   pArea->uiFieldCount++;
    return HB_SUCCESS;
 }
 
@@ -288,13 +288,13 @@ static HB_ERRCODE hb_waAddField( AREAP pArea, LPDBFIELDINFO pFieldInfo )
  */
 static HB_ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
 {
-   USHORT uiItems, uiCount, uiLen, uiDec;
-   HB_ERRCODE errCode = HB_SUCCESS;
+   USHORT      uiItems, uiCount, uiLen, uiDec;
+   HB_ERRCODE  errCode = HB_SUCCESS;
    DBFIELDINFO pFieldInfo;
-   PHB_ITEM pFieldDesc;
-   int iData;
+   PHB_ITEM    pFieldDesc;
+   int         iData;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_waCreateFields(%p, %p)", pArea, pStruct));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waCreateFields(%p, %p)", pArea, pStruct ) );
 
    uiItems = ( USHORT ) hb_arrayLen( pStruct );
    if( SELF_SETFIELDEXTENT( pArea, uiItems ) != HB_SUCCESS )
@@ -302,71 +302,71 @@ static HB_ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
 
    for( uiCount = 0; uiCount < uiItems; uiCount++ )
    {
-      pFieldInfo.uiTypeExtended = 0;
-      pFieldDesc = hb_arrayGetItemPtr( pStruct, uiCount + 1 );
-      pFieldInfo.atomName = hb_arrayGetCPtr( pFieldDesc, DBS_NAME );
-      iData = hb_arrayGetNI( pFieldDesc, DBS_LEN );
+      pFieldInfo.uiTypeExtended  = 0;
+      pFieldDesc                 = hb_arrayGetItemPtr( pStruct, uiCount + 1 );
+      pFieldInfo.atomName        = hb_arrayGetCPtr( pFieldDesc, DBS_NAME );
+      iData                      = hb_arrayGetNI( pFieldDesc, DBS_LEN );
       if( iData < 0 )
          iData = 0;
-      uiLen = pFieldInfo.uiLen = ( USHORT ) iData;
-      iData = hb_arrayGetNI( pFieldDesc, DBS_DEC );
+      uiLen                      = pFieldInfo.uiLen = ( USHORT ) iData;
+      iData                      = hb_arrayGetNI( pFieldDesc, DBS_DEC );
       if( iData < 0 )
          iData = 0;
-      uiDec = ( USHORT ) iData;
-      pFieldInfo.uiDec = 0;
+      uiDec                      = ( USHORT ) iData;
+      pFieldInfo.uiDec           = 0;
 #ifdef HB_COMPAT_FOXPRO
-      pFieldInfo.uiFlags = ( ( USHORT ) hb_arrayLen( pFieldDesc ) ) >= DBS_FLAG ? hb_arrayGetNI( pFieldDesc, DBS_FLAG ): 0;
+      pFieldInfo.uiFlags         = ( ( USHORT ) hb_arrayLen( pFieldDesc ) ) >= DBS_FLAG ? hb_arrayGetNI( pFieldDesc, DBS_FLAG ) : 0;
 #else
-      pFieldInfo.uiFlags = 0;
+      pFieldInfo.uiFlags         = 0;
 #endif
-      iData = HB_TOUPPER( hb_arrayGetCPtr( pFieldDesc, DBS_TYPE )[ 0 ] );
+      iData                      = HB_TOUPPER( hb_arrayGetCPtr( pFieldDesc, DBS_TYPE )[ 0 ] );
       switch( iData )
       {
          case 'C':
             pFieldInfo.uiType = HB_FT_STRING;
-            pFieldInfo.uiLen = uiLen;
+            pFieldInfo.uiLen  = uiLen;
 /* Too many people reported the behavior with code below as a
    Clipper compatibility bug so I commented this code. Druzus.
-#ifdef HB_C52_STRICT
+   #ifdef HB_C52_STRICT
             pFieldInfo.uiLen = uiLen;
-#else
+   #else
             pFieldInfo.uiLen = uiLen + uiDec * 256;
-#endif
-*/
+   #endif
+ */
             break;
 
          case 'L':
             pFieldInfo.uiType = HB_FT_LOGICAL;
-            pFieldInfo.uiLen = 1;
+            pFieldInfo.uiLen  = 1;
             break;
 
          case 'D':
             pFieldInfo.uiType = HB_FT_DATE;
-            pFieldInfo.uiLen = ( uiLen == 3 || uiLen == 4 ) ? uiLen : 8;
+            pFieldInfo.uiLen  = ( uiLen == 3 || uiLen == 4 ) ? uiLen : 8;
             break;
 
          case 'I':
             pFieldInfo.uiType = HB_FT_INTEGER;
-            pFieldInfo.uiLen = ( ( uiLen > 0 && uiLen <= 4 ) || uiLen == 8 ) ? uiLen : 4;
-            pFieldInfo.uiDec = uiDec;
+            pFieldInfo.uiLen  = ( ( uiLen > 0 && uiLen <= 4 ) || uiLen == 8 ) ? uiLen : 4;
+            pFieldInfo.uiDec  = uiDec;
             break;
 
          case 'Y':
             pFieldInfo.uiType = HB_FT_CURRENCY;
-            pFieldInfo.uiLen = 8;
-            pFieldInfo.uiDec = 4;
+            pFieldInfo.uiLen  = 8;
+            pFieldInfo.uiDec  = 4;
             break;
 
          case 'Z':
             pFieldInfo.uiType = HB_FT_CURDOUBLE;
-            pFieldInfo.uiLen = 8;
-            pFieldInfo.uiDec = uiDec;
+            pFieldInfo.uiLen  = 8;
+            pFieldInfo.uiDec  = uiDec;
             break;
 
          case '2':
          case '4':
             pFieldInfo.uiType = HB_FT_INTEGER;
-            pFieldInfo.uiLen = iData - '0';
+            pFieldInfo.uiLen  = iData - '0';
             break;
 
          case 'B':
@@ -374,33 +374,33 @@ static HB_ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
             if( uiLen == 10 )
             {
                pFieldInfo.uiType = HB_FT_BINARY;
-               pFieldInfo.uiLen = 10;
+               pFieldInfo.uiLen  = 10;
                break;
             }
-            /* else as HB_FT_DOUBLE */
+         /* else as HB_FT_DOUBLE */
          case '8':
             pFieldInfo.uiType = HB_FT_DOUBLE;
-            pFieldInfo.uiLen = 8;
-            pFieldInfo.uiDec = uiDec;
+            pFieldInfo.uiLen  = 8;
+            pFieldInfo.uiDec  = uiDec;
             break;
 
          case 'N':
             pFieldInfo.uiType = HB_FT_LONG;
-            pFieldInfo.uiDec = uiDec;
+            pFieldInfo.uiDec  = uiDec;
             /* DBASE documentation defines maximum numeric field size as 20
              * but Clipper alows to create longer fileds so I remove this
              * limit, Druzus
              */
             /*
-            if( uiLen > 20 )
-            */
+               if( uiLen > 20 )
+             */
             if( uiLen > 255 )
                errCode = HB_FAILURE;
             break;
 
          case 'F':
             pFieldInfo.uiType = HB_FT_FLOAT;
-            pFieldInfo.uiDec = uiDec;
+            pFieldInfo.uiDec  = uiDec;
             /* see note above */
             if( uiLen > 255 )
                errCode = HB_FAILURE;
@@ -410,68 +410,68 @@ static HB_ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
             if( uiLen == 4 )
             {
                pFieldInfo.uiType = HB_FT_TIME;
-               pFieldInfo.uiLen = 4;
+               pFieldInfo.uiLen  = 4;
             }
             else
             {
                pFieldInfo.uiType = HB_FT_DATETIME;
-               pFieldInfo.uiLen = 8;
+               pFieldInfo.uiLen  = 8;
             }
             break;
 
          case '@':
             pFieldInfo.uiType = HB_FT_TIMESTAMP;
-            pFieldInfo.uiLen = 8;
+            pFieldInfo.uiLen  = 8;
             break;
 
          case '=':
             pFieldInfo.uiType = HB_FT_MODTIME;
-            pFieldInfo.uiLen = 8;
+            pFieldInfo.uiLen  = 8;
             break;
 
          case '^':
             pFieldInfo.uiType = HB_FT_ROWVER;
-            pFieldInfo.uiLen = 8;
+            pFieldInfo.uiLen  = 8;
             break;
 
          case '+':
             pFieldInfo.uiType = HB_FT_AUTOINC;
-            pFieldInfo.uiLen = 4;
+            pFieldInfo.uiLen  = 4;
             break;
 
          case 'Q':
             pFieldInfo.uiType = HB_FT_VARLENGTH;
-            pFieldInfo.uiLen = uiLen > 255 ? 255 : ( uiLen == 0 ? 1 : uiLen );
+            pFieldInfo.uiLen  = uiLen > 255 ? 255 : ( uiLen == 0 ? 1 : uiLen );
             break;
 
          case 'M':
             pFieldInfo.uiType = HB_FT_MEMO;
-            pFieldInfo.uiLen = ( uiLen == 4 ) ? 4 : 10;
+            pFieldInfo.uiLen  = ( uiLen == 4 ) ? 4 : 10;
             break;
 
          case 'V':
             pFieldInfo.uiType = HB_FT_ANY;
-            pFieldInfo.uiLen = ( uiLen < 3 || uiLen == 5 ) ? 6 : uiLen;
+            pFieldInfo.uiLen  = ( uiLen < 3 || uiLen == 5 ) ? 6 : uiLen;
             break;
 
          case 'P':
             pFieldInfo.uiType = HB_FT_PICTURE;
-            pFieldInfo.uiLen = ( uiLen == 4 ) ? 4 : 10;
+            pFieldInfo.uiLen  = ( uiLen == 4 ) ? 4 : 10;
             break;
 
          case 'W':
             pFieldInfo.uiType = HB_FT_BLOB;
-            pFieldInfo.uiLen = ( uiLen == 4 ) ? 4 : 10;
+            pFieldInfo.uiLen  = ( uiLen == 4 ) ? 4 : 10;
             break;
 
          case 'G':
             pFieldInfo.uiType = HB_FT_OLE;
-            pFieldInfo.uiLen = ( uiLen == 4 ) ? 4 : 10;
+            pFieldInfo.uiLen  = ( uiLen == 4 ) ? 4 : 10;
             break;
 
          case '0':
             pFieldInfo.uiType = HB_FT_NONE;
-            pFieldInfo.uiLen = uiLen;
+            pFieldInfo.uiLen  = uiLen;
             break;
 
          default:
@@ -496,12 +496,12 @@ static HB_ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
  */
 static HB_ERRCODE hb_waFieldCount( AREAP pArea, USHORT * uiFields )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waFieldCount(%p, %p)", pArea, uiFields));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waFieldCount(%p, %p)", pArea, uiFields ) );
 
 #ifdef HB_COMPAT_FOXPRO
-   * uiFields = pArea->uiFieldCount - pArea->uiFieldHidden;
+   *uiFields   = pArea->uiFieldCount - pArea->uiFieldHidden;
 #else
-   * uiFields = pArea->uiFieldCount;
+   *uiFields   = pArea->uiFieldCount;
 #endif
    return HB_SUCCESS;
 }
@@ -513,7 +513,7 @@ static HB_ERRCODE hb_waFieldInfo( AREAP pArea, USHORT uiIndex, USHORT uiType, PH
 {
    LPFIELD pField;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_waFieldInfo(%p, %hu, %hu, %p)", pArea, uiIndex, uiType, pItem));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waFieldInfo(%p, %hu, %hu, %p)", pArea, uiIndex, uiType, pItem ) );
 
    if( uiIndex > pArea->uiFieldCount )
       return HB_FAILURE;
@@ -654,7 +654,7 @@ static HB_ERRCODE hb_waFieldName( AREAP pArea, USHORT uiIndex, char * szName )
 {
    LPFIELD pField;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_waFieldName(%p, %hu, %p)", pArea, uiIndex, szName));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waFieldName(%p, %hu, %p)", pArea, uiIndex, szName ) );
 
    if( uiIndex > pArea->uiFieldExtent )
       return HB_FAILURE;
@@ -670,7 +670,7 @@ static HB_ERRCODE hb_waFieldName( AREAP pArea, USHORT uiIndex, char * szName )
  */
 static HB_ERRCODE hb_waSetFieldExtent( AREAP pArea, USHORT uiFieldExtent )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waSetFieldExtent(%p, %hu)", pArea, uiFieldExtent));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waSetFieldExtent(%p, %hu)", pArea, uiFieldExtent ) );
 
    pArea->uiFieldExtent = uiFieldExtent;
 
@@ -689,12 +689,12 @@ static HB_ERRCODE hb_waSetFieldExtent( AREAP pArea, USHORT uiFieldExtent )
  */
 static HB_ERRCODE hb_waAlias( AREAP pArea, char * szAlias )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waAlias(%p, %p)", pArea, szAlias));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waAlias(%p, %p)", pArea, szAlias ) );
 
    hb_strncpy( szAlias,
-      pArea->atomAlias && hb_dynsymAreaHandle( ( PHB_DYNS ) pArea->atomAlias )
-      ? hb_rddGetAliasName( ( PHB_DYNS ) pArea->atomAlias ) : "",
-      HB_RDD_MAX_ALIAS_LEN );
+               pArea->atomAlias && hb_dynsymAreaHandle( ( PHB_DYNS ) pArea->atomAlias )
+               ? hb_rddGetAliasName( ( PHB_DYNS ) pArea->atomAlias ) : "",
+               HB_RDD_MAX_ALIAS_LEN );
 
    return HB_SUCCESS;
 }
@@ -704,7 +704,7 @@ static HB_ERRCODE hb_waAlias( AREAP pArea, char * szAlias )
  */
 static HB_ERRCODE hb_waClose( AREAP pArea )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waClose(%p)", pArea));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waClose(%p)", pArea ) );
 
    /* Clear items */
    SELF_CLEARFILTER( pArea );
@@ -725,7 +725,7 @@ static HB_ERRCODE hb_waClose( AREAP pArea )
  */
 static HB_ERRCODE hb_waInfo( AREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waInfo(%p, %hu, %p)", pArea, uiIndex, pItem));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waInfo(%p, %hu, %p)", pArea, uiIndex, pItem ) );
 
    switch( uiIndex )
    {
@@ -761,8 +761,8 @@ static HB_ERRCODE hb_waInfo( AREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
       case DBI_CHILDCOUNT:
       {
-         LPDBRELINFO lpdbRelations = pArea->lpdbRelations;
-         USHORT uiCount = 0;
+         LPDBRELINFO lpdbRelations  = pArea->lpdbRelations;
+         USHORT      uiCount        = 0;
          while( lpdbRelations )
          {
             uiCount++;
@@ -812,8 +812,8 @@ static HB_ERRCODE hb_waInfo( AREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
       case DBI_SCOPEDRELATION:
       {
-         int iRelNo = hb_itemGetNI( pItem );
-         BOOL fScoped = FALSE;
+         int   iRelNo   = hb_itemGetNI( pItem );
+         BOOL  fScoped  = FALSE;
 
          if( iRelNo > 0 )
          {
@@ -860,10 +860,10 @@ static HB_ERRCODE hb_waInfo( AREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          if( HB_IS_STRING( pItem ) )
          {
             PHB_CODEPAGE cdpage = hb_cdpFind( hb_itemGetCPtr( pItem ) );
-            if ( cdpage )
+            if( cdpage )
                pArea->cdPage = cdpage;
          }
-         if ( pArea->cdPage )
+         if( pArea->cdPage )
             hb_itemPutC( pItem, ( char * ) pArea->cdPage->id );
          else
             hb_itemPutC( pItem, "" );
@@ -881,7 +881,7 @@ static HB_ERRCODE hb_waInfo( AREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
  */
 static HB_ERRCODE hb_waOrderInfo( AREAP pArea, USHORT index, LPDBORDERINFO pInfo )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waOrderInfo(%p, %hu, %p)", pArea, index, pInfo));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waOrderInfo(%p, %hu, %p)", pArea, index, pInfo ) );
 
    HB_SYMBOL_UNUSED( pArea );
    HB_SYMBOL_UNUSED( index );
@@ -902,12 +902,12 @@ static HB_ERRCODE hb_waOrderInfo( AREAP pArea, USHORT index, LPDBORDERINFO pInfo
  */
 static HB_ERRCODE hb_waNewArea( AREAP pArea )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waNewArea(%p)", pArea));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waNewArea(%p)", pArea ) );
 
-   pArea->valResult = hb_itemNew( NULL );
-   pArea->lpdbRelations = NULL;
-   pArea->uiParents = 0;
-   pArea->uiMaxFieldNameLength = 10;
+   pArea->valResult              = hb_itemNew( NULL );
+   pArea->lpdbRelations          = NULL;
+   pArea->uiParents              = 0;
+   pArea->uiMaxFieldNameLength   = 10;
 
    return HB_SUCCESS;
 }
@@ -918,7 +918,7 @@ static HB_ERRCODE hb_waNewArea( AREAP pArea )
  */
 static HB_ERRCODE hb_waOpen( AREAP pArea, LPDBOPENINFO pInfo )
 {
-   if( !pArea->atomAlias && pInfo->atomAlias && pInfo->atomAlias[ 0 ] )
+   if( ! pArea->atomAlias && pInfo->atomAlias && pInfo->atomAlias[ 0 ] )
    {
       pArea->atomAlias = hb_rddAllocWorkAreaAlias( pInfo->atomAlias,
                                                    ( int ) pInfo->uiArea );
@@ -971,7 +971,7 @@ static HB_ERRCODE hb_waOrderCondition( AREAP pArea, LPDBORDERCONDINFO param )
  */
 static HB_ERRCODE hb_waRelease( AREAP pArea )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waRelease(%p)", pArea));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waRelease(%p)", pArea ) );
 
    /* Free all allocated pointers */
    if( pArea->lpFields )
@@ -980,7 +980,7 @@ static HB_ERRCODE hb_waRelease( AREAP pArea )
       hb_itemRelease( pArea->valResult );
    if( pArea->lpdbOrdCondInfo )
       /* intentionally direct call not a method */
-      hb_waOrderCondition( pArea,NULL );
+      hb_waOrderCondition( pArea, NULL );
    hb_xfree( pArea );
    return HB_SUCCESS;
 }
@@ -990,10 +990,10 @@ static HB_ERRCODE hb_waRelease( AREAP pArea )
  */
 static HB_ERRCODE hb_waStructSize( AREAP pArea, USHORT * uiSize )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waStrucSize(%p, %p)", pArea, uiSize));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waStrucSize(%p, %p)", pArea, uiSize ) );
    HB_SYMBOL_UNUSED( pArea );
 
-   * uiSize = sizeof( AREA );
+   *uiSize = sizeof( AREA );
    return HB_SUCCESS;
 }
 
@@ -1002,7 +1002,7 @@ static HB_ERRCODE hb_waStructSize( AREAP pArea, USHORT * uiSize )
  */
 static HB_ERRCODE hb_waSysName( AREAP pArea, char * pBuffer )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waSysName(%p, %p)", pArea, pBuffer));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waSysName(%p, %p)", pArea, pBuffer ) );
 
    hb_strncpy( pBuffer, SELF_RDDNODE( pArea )->szName,
                HB_RDD_MAX_DRIVERNAME_LEN );
@@ -1015,10 +1015,10 @@ static HB_ERRCODE hb_waSysName( AREAP pArea, char * pBuffer )
  */
 static HB_ERRCODE hb_waEval( AREAP pArea, LPDBEVALINFO pEvalInfo )
 {
-   LONG lNext = 1;
-   BOOL fEof, fFor;
+   LONG  lNext = 1;
+   BOOL  fEof, fFor;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_waEval(%p, %p)", pArea, pEvalInfo));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waEval(%p, %p)", pArea, pEvalInfo ) );
 
    if( pEvalInfo->dbsci.itmRecID )
    {
@@ -1029,8 +1029,8 @@ static HB_ERRCODE hb_waEval( AREAP pArea, LPDBEVALINFO pEvalInfo )
    {
       lNext = hb_itemGetNL( pEvalInfo->dbsci.lNext );
    }
-   else if( !pEvalInfo->dbsci.itmCobWhile &&
-            !hb_itemGetL( pEvalInfo->dbsci.fRest ) )
+   else if( ! pEvalInfo->dbsci.itmCobWhile &&
+            ! hb_itemGetL( pEvalInfo->dbsci.fRest ) )
    {
       if( SELF_GOTOP( pArea ) != HB_SUCCESS )
          return HB_FAILURE;
@@ -1038,9 +1038,9 @@ static HB_ERRCODE hb_waEval( AREAP pArea, LPDBEVALINFO pEvalInfo )
 
    /* TODO: use SKIPSCOPE() method and fRest parameter */
 
-   if( !pEvalInfo->dbsci.lNext || lNext > 0 )
+   if( ! pEvalInfo->dbsci.lNext || lNext > 0 )
    {
-      for( ;; )
+      for(;; )
       {
          if( SELF_EOF( pArea, &fEof ) != HB_SUCCESS )
             return HB_FAILURE;
@@ -1087,10 +1087,10 @@ static HB_ERRCODE hb_waEval( AREAP pArea, LPDBEVALINFO pEvalInfo )
  */
 static HB_ERRCODE hb_waLocate( AREAP pArea, BOOL fContinue )
 {
-   LONG lNext = 1;
-   BOOL fEof;
+   LONG  lNext = 1;
+   BOOL  fEof;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_waLocate(%p, %d)", pArea, fContinue));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waLocate(%p, %d)", pArea, fContinue ) );
 
    if( fContinue )
    {
@@ -1109,8 +1109,8 @@ static HB_ERRCODE hb_waLocate( AREAP pArea, BOOL fContinue )
    {
       lNext = hb_itemGetNL( pArea->dbsi.lNext );
    }
-   else if( !pArea->dbsi.itmCobWhile &&
-            !hb_itemGetL( pArea->dbsi.fRest ) )
+   else if( ! pArea->dbsi.itmCobWhile &&
+            ! hb_itemGetL( pArea->dbsi.fRest ) )
    {
       if( SELF_GOTOP( pArea ) != HB_SUCCESS )
          return HB_FAILURE;
@@ -1120,9 +1120,9 @@ static HB_ERRCODE hb_waLocate( AREAP pArea, BOOL fContinue )
 
    /* TODO: use SKIPSCOPE() method and fRest parameter */
 
-   if( !pArea->dbsi.lNext || lNext > 0 )
+   if( ! pArea->dbsi.lNext || lNext > 0 )
    {
-      for( ;; )
+      for(;; )
       {
          if( SELF_EOF( pArea, &fEof ) != HB_SUCCESS )
             return HB_FAILURE;
@@ -1130,7 +1130,7 @@ static HB_ERRCODE hb_waLocate( AREAP pArea, BOOL fContinue )
          if( fEof )
             break;
 
-         if( !fContinue && pArea->dbsi.itmCobWhile )
+         if( ! fContinue && pArea->dbsi.itmCobWhile )
          {
             if( SELF_EVALBLOCK( pArea, pArea->dbsi.itmCobWhile ) != HB_SUCCESS )
                return HB_FAILURE;
@@ -1155,7 +1155,7 @@ static HB_ERRCODE hb_waLocate( AREAP pArea, BOOL fContinue )
             }
          }
 
-         if( !fContinue &&
+         if( ! fContinue &&
              ( pArea->dbsi.itmRecID || ( pArea->dbsi.lNext && --lNext < 1 ) ) )
             break;
 
@@ -1172,10 +1172,10 @@ static HB_ERRCODE hb_waLocate( AREAP pArea, BOOL fContinue )
  */
 static HB_ERRCODE hb_waTrans( AREAP pArea, LPDBTRANSINFO pTransInfo )
 {
-   LONG lNext = 1;
-   BOOL fEof, fFor;
+   LONG  lNext = 1;
+   BOOL  fEof, fFor;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_waTrans(%p, %p)", pArea, pTransInfo));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waTrans(%p, %p)", pArea, pTransInfo ) );
 
    if( pTransInfo->dbsci.itmRecID )
    {
@@ -1186,8 +1186,8 @@ static HB_ERRCODE hb_waTrans( AREAP pArea, LPDBTRANSINFO pTransInfo )
    {
       lNext = hb_itemGetNL( pTransInfo->dbsci.lNext );
    }
-   else if( !pTransInfo->dbsci.itmCobWhile &&
-            !hb_itemGetL( pTransInfo->dbsci.fRest ) )
+   else if( ! pTransInfo->dbsci.itmCobWhile &&
+            ! hb_itemGetL( pTransInfo->dbsci.fRest ) )
    {
       if( SELF_GOTOP( pArea ) != HB_SUCCESS )
          return HB_FAILURE;
@@ -1195,9 +1195,9 @@ static HB_ERRCODE hb_waTrans( AREAP pArea, LPDBTRANSINFO pTransInfo )
 
    /* TODO: use SKIPSCOPE() method and fRest parameter */
 
-   if( !pTransInfo->dbsci.lNext || lNext > 0 )
+   if( ! pTransInfo->dbsci.lNext || lNext > 0 )
    {
-      for( ;; )
+      for(;; )
       {
          if( SELF_EOF( pArea, &fEof ) != HB_SUCCESS )
             return HB_FAILURE;
@@ -1244,11 +1244,11 @@ static HB_ERRCODE hb_waTrans( AREAP pArea, LPDBTRANSINFO pTransInfo )
  */
 static HB_ERRCODE hb_waTransRec( AREAP pArea, LPDBTRANSINFO pTransInfo )
 {
-   BOOL bDeleted;
-   BYTE *pRecord;
-   HB_ERRCODE errCode;
+   BOOL        bDeleted;
+   BYTE *      pRecord;
+   HB_ERRCODE  errCode;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_waTransRec(%p, %p)", pArea, pTransInfo));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waTransRec(%p, %p)", pArea, pTransInfo ) );
 
    /* Record deleted? */
    errCode = SELF_DELETED( ( AREAP ) pArea, &bDeleted );
@@ -1271,17 +1271,17 @@ static HB_ERRCODE hb_waTransRec( AREAP pArea, LPDBTRANSINFO pTransInfo )
    }
    else
    {
-      LPDBTRANSITEM pTransItem;
-      PHB_ITEM pItem;
-      USHORT uiCount;
+      LPDBTRANSITEM  pTransItem;
+      PHB_ITEM       pItem;
+      USHORT         uiCount;
 
       /* Append a new record */
       errCode = SELF_APPEND( ( AREAP ) pTransInfo->lpaDest, TRUE );
       if( errCode != HB_SUCCESS )
          return errCode;
 
-      pItem = hb_itemNew( NULL );
-      pTransItem = pTransInfo->lpTransItems;
+      pItem       = hb_itemNew( NULL );
+      pTransItem  = pTransInfo->lpTransItems;
       for( uiCount = pTransInfo->uiItemCount; uiCount; --uiCount )
       {
          errCode = SELF_GETVALUE( ( AREAP ) pArea,
@@ -1316,15 +1316,15 @@ static HB_ERRCODE hb_waTransRec( AREAP pArea, LPDBTRANSINFO pTransInfo )
  */
 static HB_ERRCODE hb_waChildEnd( AREAP pArea, LPDBRELINFO pRelInfo )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waChildEnd(%p, %p)", pArea, pRelInfo));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waChildEnd(%p, %p)", pArea, pRelInfo ) );
 
    if( pRelInfo->isScoped )
    {
       DBORDERINFO pInfo;
-      pInfo.itmOrder = NULL;
+      pInfo.itmOrder    = NULL;
       pInfo.atomBagName = NULL;
-      pInfo.itmResult = hb_itemNew( NULL );
-      pInfo.itmNewVal = NULL;
+      pInfo.itmResult   = hb_itemNew( NULL );
+      pInfo.itmNewVal   = NULL;
       SELF_ORDINFO( pArea, DBOI_SCOPETOPCLEAR, &pInfo );
       SELF_ORDINFO( pArea, DBOI_SCOPEBOTTOMCLEAR, &pInfo );
       hb_itemRelease( pInfo.itmResult );
@@ -1339,10 +1339,10 @@ static HB_ERRCODE hb_waChildEnd( AREAP pArea, LPDBRELINFO pRelInfo )
  */
 static HB_ERRCODE hb_waChildStart( AREAP pArea, LPDBRELINFO pRelInfo )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waChildStart(%p, %p)", pArea, pRelInfo));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waChildStart(%p, %p)", pArea, pRelInfo ) );
    HB_SYMBOL_UNUSED( pRelInfo );
 
-   pArea->uiParents ++;
+   pArea->uiParents++;
    return HB_SUCCESS;
 }
 
@@ -1353,7 +1353,8 @@ static HB_ERRCODE hb_waSyncChildren( AREAP pArea )
 {
 
    LPDBRELINFO lpdbRelation;
-   HB_TRACE(HB_TR_DEBUG, ("hb_waSyncChildren(%p)", pArea));
+
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waSyncChildren(%p)", pArea ) );
 
    lpdbRelation = pArea->lpdbRelations;
    while( lpdbRelation )
@@ -1371,7 +1372,7 @@ static HB_ERRCODE hb_waSyncChildren( AREAP pArea )
  */
 static HB_ERRCODE hb_waClearRel( AREAP pArea )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waClearRel(%p)", pArea ));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waClearRel(%p)", pArea ) );
 
    /* Free all relations */
    if( pArea->lpdbRelations )
@@ -1410,12 +1411,12 @@ static HB_ERRCODE hb_waClearRel( AREAP pArea )
 static HB_ERRCODE hb_waRelArea( AREAP pArea, USHORT uiRelNo, USHORT * pRelArea )
 {
    LPDBRELINFO lpdbRelations;
-   USHORT uiIndex = 1;
+   USHORT      uiIndex = 1;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_waRelArea(%p, %hu, %p)", pArea, uiRelNo, pRelArea));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waRelArea(%p, %hu, %p)", pArea, uiRelNo, pRelArea ) );
 
-   *pRelArea = 0;
-   lpdbRelations = pArea->lpdbRelations;
+   *pRelArea      = 0;
+   lpdbRelations  = pArea->lpdbRelations;
    while( lpdbRelations )
    {
       if( uiIndex++ == uiRelNo )
@@ -1433,10 +1434,10 @@ static HB_ERRCODE hb_waRelArea( AREAP pArea, USHORT uiRelNo, USHORT * pRelArea )
  */
 static HB_ERRCODE hb_waRelEval( AREAP pArea, LPDBRELINFO pRelInfo )
 {
-   HB_ERRCODE errCode;
-   BOOL fEof;
+   HB_ERRCODE  errCode;
+   BOOL        fEof;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_waRelEval(%p, %p)", pArea, pRelInfo));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waRelEval(%p, %p)", pArea, pRelInfo ) );
 
    errCode = SELF_EOF( pRelInfo->lpaParent, &fEof );
    if( errCode == HB_SUCCESS )
@@ -1448,17 +1449,17 @@ static HB_ERRCODE hb_waRelEval( AREAP pArea, LPDBRELINFO pRelInfo )
          errCode = SELF_EVALBLOCK( pRelInfo->lpaParent, pRelInfo->itmCobExpr );
          if( errCode == HB_SUCCESS )
          {
-            PHB_ITEM pResult;
+            PHB_ITEM    pResult;
             DBORDERINFO pInfo;
 
             /*
              *  Check the current order
              */
-            pResult = pRelInfo->lpaParent->valResult;
-            pRelInfo->lpaParent->valResult = NULL;
+            pResult                          = pRelInfo->lpaParent->valResult;
+            pRelInfo->lpaParent->valResult   = NULL;
             memset( &pInfo, 0, sizeof( pInfo ) );
-            pInfo.itmResult = hb_itemPutNI( NULL, 0 );
-            errCode = SELF_ORDINFO( pArea, DBOI_NUMBER, &pInfo );
+            pInfo.itmResult                  = hb_itemPutNI( NULL, 0 );
+            errCode                          = SELF_ORDINFO( pArea, DBOI_NUMBER, &pInfo );
 
             if( errCode == HB_SUCCESS )
             {
@@ -1467,8 +1468,8 @@ static HB_ERRCODE hb_waRelEval( AREAP pArea, LPDBRELINFO pRelInfo )
                {
                   if( pRelInfo->isScoped )
                   {
-                     pInfo.itmNewVal = pResult;
-                     errCode = SELF_ORDINFO( pArea, DBOI_SCOPETOP, &pInfo );
+                     pInfo.itmNewVal   = pResult;
+                     errCode           = SELF_ORDINFO( pArea, DBOI_SCOPETOP, &pInfo );
                      if( errCode == HB_SUCCESS )
                         errCode = SELF_ORDINFO( pArea, DBOI_SCOPEBOTTOM, &pInfo );
                   }
@@ -1505,9 +1506,9 @@ static HB_ERRCODE hb_waRelEval( AREAP pArea, LPDBRELINFO pRelInfo )
 static HB_ERRCODE hb_waRelText( AREAP pArea, USHORT uiRelNo, PHB_ITEM pExpr )
 {
    LPDBRELINFO lpdbRelations;
-   USHORT uiIndex = 1;
+   USHORT      uiIndex = 1;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_waRelText(%p, %hu, %p)", pArea, uiRelNo, pExpr));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waRelText(%p, %hu, %p)", pArea, uiRelNo, pExpr ) );
 
    lpdbRelations = pArea->lpdbRelations;
 
@@ -1531,28 +1532,28 @@ static HB_ERRCODE hb_waSetRel( AREAP pArea, LPDBRELINFO lpdbRelInf )
 {
    LPDBRELINFO lpdbRelations;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_waSetRel(%p, %p)", pArea, lpdbRelInf));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waSetRel(%p, %p)", pArea, lpdbRelInf ) );
 
    lpdbRelations = pArea->lpdbRelations;
    if( ! lpdbRelations )
    {
       pArea->lpdbRelations = ( LPDBRELINFO ) hb_xgrab( sizeof( DBRELINFO ) );
-      lpdbRelations = pArea->lpdbRelations;
+      lpdbRelations        = pArea->lpdbRelations;
    }
    else
    {
       while( lpdbRelations->lpdbriNext )
          lpdbRelations = lpdbRelations->lpdbriNext;
-      lpdbRelations->lpdbriNext = ( LPDBRELINFO ) hb_xgrab( sizeof( DBRELINFO ) );
-      lpdbRelations = lpdbRelations->lpdbriNext;
+      lpdbRelations->lpdbriNext  = ( LPDBRELINFO ) hb_xgrab( sizeof( DBRELINFO ) );
+      lpdbRelations              = lpdbRelations->lpdbriNext;
    }
-   lpdbRelations->lpaParent = pArea;
-   lpdbRelations->lpaChild = lpdbRelInf->lpaChild;
-   lpdbRelations->itmCobExpr = lpdbRelInf->itmCobExpr;
-   lpdbRelations->isScoped = lpdbRelInf->isScoped;
+   lpdbRelations->lpaParent   = pArea;
+   lpdbRelations->lpaChild    = lpdbRelInf->lpaChild;
+   lpdbRelations->itmCobExpr  = lpdbRelInf->itmCobExpr;
+   lpdbRelations->isScoped    = lpdbRelInf->isScoped;
    lpdbRelations->isOptimized = lpdbRelInf->isOptimized;
-   lpdbRelations->abKey = lpdbRelInf->abKey;
-   lpdbRelations->lpdbriNext = lpdbRelInf->lpdbriNext;
+   lpdbRelations->abKey       = lpdbRelInf->abKey;
+   lpdbRelations->lpdbriNext  = lpdbRelInf->lpdbriNext;
 
    return SELF_CHILDSTART( ( AREAP ) lpdbRelInf->lpaChild, lpdbRelations );
 }
@@ -1562,7 +1563,7 @@ static HB_ERRCODE hb_waSetRel( AREAP pArea, LPDBRELINFO lpdbRelInf )
  */
 static HB_ERRCODE hb_waClearFilter( AREAP pArea )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waClearFilter(%p)", pArea));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waClearFilter(%p)", pArea ) );
 
    /* Free all items */
    if( pArea->dbfi.itmCobExpr )
@@ -1575,8 +1576,8 @@ static HB_ERRCODE hb_waClearFilter( AREAP pArea )
       hb_itemRelease( pArea->dbfi.abFilterText );
       pArea->dbfi.abFilterText = NULL;
    }
-   pArea->dbfi.fOptimized = FALSE;
-   pArea->dbfi.fFilter = FALSE;
+   pArea->dbfi.fOptimized  = FALSE;
+   pArea->dbfi.fFilter     = FALSE;
 
    return HB_SUCCESS;
 }
@@ -1586,7 +1587,7 @@ static HB_ERRCODE hb_waClearFilter( AREAP pArea )
  */
 static HB_ERRCODE hb_waClearLocate( AREAP pArea )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waClearLocate(%p)", pArea));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waClearLocate(%p)", pArea ) );
 
    /* Free all items */
    if( pArea->dbsi.itmCobFor )
@@ -1633,7 +1634,7 @@ static HB_ERRCODE hb_waClearLocate( AREAP pArea )
  */
 static HB_ERRCODE hb_waFilterText( AREAP pArea, PHB_ITEM pFilter )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waFilterText(%p, %p)", pArea, pFilter));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waFilterText(%p, %p)", pArea, pFilter ) );
 
    if( pArea->dbfi.abFilterText )
       hb_itemCopy( pFilter, pArea->dbfi.abFilterText );
@@ -1646,7 +1647,7 @@ static HB_ERRCODE hb_waFilterText( AREAP pArea, PHB_ITEM pFilter )
  */
 static HB_ERRCODE hb_waSetFilter( AREAP pArea, LPDBFILTERINFO pFilterInfo )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waSetFilter(%p, %p)", pArea, pFilterInfo));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waSetFilter(%p, %p)", pArea, pFilterInfo ) );
 
    /* Clear the active filter expression */
    if( SELF_CLEARFILTER( pArea ) != HB_SUCCESS )
@@ -1660,8 +1661,8 @@ static HB_ERRCODE hb_waSetFilter( AREAP pArea, LPDBFILTERINFO pFilterInfo )
    {
       pArea->dbfi.abFilterText = hb_itemNew( pFilterInfo->abFilterText );
    }
-   pArea->dbfi.fOptimized = pFilterInfo->fOptimized;
-   pArea->dbfi.fFilter = TRUE;
+   pArea->dbfi.fOptimized  = pFilterInfo->fOptimized;
+   pArea->dbfi.fFilter     = TRUE;
 
    return HB_SUCCESS;
 }
@@ -1671,7 +1672,7 @@ static HB_ERRCODE hb_waSetFilter( AREAP pArea, LPDBFILTERINFO pFilterInfo )
  */
 static HB_ERRCODE hb_waSetLocate( AREAP pArea, LPDBSCOPEINFO pScopeInfo )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waSetLocate(%p, %p)", pArea, pScopeInfo));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waSetLocate(%p, %p)", pArea, pScopeInfo ) );
 
    /* Clear the active locate expression */
    if( SELF_CLEARLOCATE( pArea ) != HB_SUCCESS )
@@ -1715,7 +1716,7 @@ static HB_ERRCODE hb_waCompile( AREAP pArea, const char * pExpr )
 {
    HB_MACRO_PTR pMacro;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_waCompile(%p, %p)", pArea, pExpr));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waCompile(%p, %p)", pArea, pExpr ) );
 
    pMacro = hb_macroCompile( pExpr );
    if( pMacro )
@@ -1734,7 +1735,7 @@ static HB_ERRCODE hb_waError( AREAP pArea, PHB_ITEM pError )
 {
    char szRddName[ HB_RDD_MAX_DRIVERNAME_LEN + 1 ];
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_waError(%p, %p)", pArea, pError));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waError(%p, %p)", pArea, pError ) );
 
    if( pArea && pArea->lprfsHost->sysName )
       SELF_SYSNAME( pArea, szRddName );
@@ -1751,12 +1752,12 @@ static HB_ERRCODE hb_waError( AREAP pArea, PHB_ITEM pError )
 static HB_ERRCODE hb_waEvalBlock( AREAP pArea, PHB_ITEM pBlock )
 {
    PHB_ITEM pItem;
-   int iCurrArea, iUsedArea;
+   int      iCurrArea, iUsedArea;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_waEvalBlock(%p, %p)", pArea, pBlock));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waEvalBlock(%p, %p)", pArea, pBlock ) );
 
-   iCurrArea = hb_rddGetCurrentWorkAreaNumber();
-   iUsedArea = pArea->uiArea;
+   iCurrArea   = hb_rddGetCurrentWorkAreaNumber();
+   iUsedArea   = pArea->uiArea;
    if( iCurrArea != iUsedArea )
       hb_rddSelectWorkAreaNumber( iUsedArea );
 
@@ -1779,10 +1780,10 @@ static HB_ERRCODE hb_waEvalBlock( AREAP pArea, PHB_ITEM pBlock )
  */
 static HB_ERRCODE hb_waRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnection, PHB_ITEM pItem )
 {
-   BOOL fResult;
-   int iResult;
+   BOOL  fResult;
+   int   iResult;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_rddInfo(%p, %hu, %lu, %p)", pRDD, uiIndex, ulConnection, pItem));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_rddInfo(%p, %hu, %lu, %p)", pRDD, uiIndex, ulConnection, pItem ) );
 
    HB_SYMBOL_UNUSED( pRDD );
    HB_SYMBOL_UNUSED( ulConnection );
@@ -1862,8 +1863,8 @@ static HB_ERRCODE hb_waRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnecti
          break;
       case RDDI_MEMOEXT:
       {
-         const char * szExt = hb_setGetMFileExt();
-         char * szResult = szExt ? hb_strdup( szExt ) : NULL;
+         const char *   szExt    = hb_setGetMFileExt();
+         char *         szResult = szExt ? hb_strdup( szExt ) : NULL;
          if( hb_itemType( pItem ) & HB_IT_STRING )
          {
             hb_setSetItem( HB_SET_MFILEEXT, pItem );
@@ -1889,7 +1890,7 @@ static HB_ERRCODE hb_waRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnecti
       case RDDI_TRIGGER:
       case RDDI_PENDINGTRIGGER:
          hb_itemPutC( pItem, NULL );
-         /* no break - return HB_FAILURE */
+      /* no break - return HB_FAILURE */
 
       default:
          return HB_FAILURE;
@@ -1904,7 +1905,7 @@ static HB_ERRCODE hb_waUnsupported( AREAP pArea )
 {
    PHB_ITEM pError;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_waUnsupported(%p)", pArea));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waUnsupported(%p)", pArea ) );
 
    pError = hb_errNew();
    hb_errPutGenCode( pError, EG_UNSUPPORTED );
@@ -1922,7 +1923,7 @@ static HB_ERRCODE hb_waRddUnsupported( LPRDDNODE pRDD )
 {
    PHB_ITEM pError;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_waRDDUnsupported(%p)", pRDD));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waRDDUnsupported(%p)", pRDD ) );
 
    pError = hb_errNew();
    hb_errPutGenCode( pError, EG_UNSUPPORTED );
@@ -1942,7 +1943,7 @@ static HB_ERRCODE hb_waRddUnsupported( LPRDDNODE pRDD )
  */
 static HB_ERRCODE hb_waNull( AREAP pArea )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waNull(%p)", pArea));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_waNull(%p)", pArea ) );
 
    HB_SYMBOL_UNUSED( pArea );
 
@@ -1959,38 +1960,38 @@ static const RDDFUNCS waTable =
 /* ( DBENTRYP_BP )   */ hb_waBof,               /* Bof        */
 /* ( DBENTRYP_BP )   */ hb_waEof,               /* Eof        */
 /* ( DBENTRYP_BP )   */ hb_waFound,             /* Found      */
-   ( DBENTRYP_V )       hb_waUnsupported,       /* GoBottom   */
-   ( DBENTRYP_UL )      hb_waUnsupported,       /* GoTo       */
-   ( DBENTRYP_I )       hb_waUnsupported,       /* GoToId     */
-   ( DBENTRYP_V )       hb_waUnsupported,       /* GoTop      */
-   ( DBENTRYP_BIB )     hb_waUnsupported,       /* Seek       */
+   ( DBENTRYP_V ) hb_waUnsupported,             /* GoBottom   */
+   ( DBENTRYP_UL ) hb_waUnsupported,            /* GoTo       */
+   ( DBENTRYP_I ) hb_waUnsupported,             /* GoToId     */
+   ( DBENTRYP_V ) hb_waUnsupported,             /* GoTop      */
+   ( DBENTRYP_BIB ) hb_waUnsupported,           /* Seek       */
 /* ( DBENTRYP_L )    */ hb_waSkip,              /* Skip       */
 /* ( DBENTRYP_L )    */ hb_waSkipFilter,        /* SkipFilter */
-   ( DBENTRYP_L )       hb_waUnsupported,       /* SkipRaw    */
+   ( DBENTRYP_L ) hb_waUnsupported,             /* SkipRaw    */
 
    /* Data management */
 /* ( DBENTRYP_VF )   */ hb_waAddField,          /* AddField       */
-   ( DBENTRYP_B )       hb_waUnsupported,       /* Append         */
+   ( DBENTRYP_B ) hb_waUnsupported,             /* Append         */
 /* ( DBENTRYP_I )    */ hb_waCreateFields,      /* CreateFields   */
-   ( DBENTRYP_V )       hb_waUnsupported,       /* DeleteRec      */
-   ( DBENTRYP_BP )      hb_waUnsupported,       /* Deleted        */
+   ( DBENTRYP_V ) hb_waUnsupported,             /* DeleteRec      */
+   ( DBENTRYP_BP ) hb_waUnsupported,            /* Deleted        */
 /* ( DBENTRYP_SP )   */ hb_waFieldCount,        /* FieldCount     */
-   ( DBENTRYP_VF )      hb_waUnsupported,       /* FieldDisplay   */
+   ( DBENTRYP_VF ) hb_waUnsupported,            /* FieldDisplay   */
 /* ( DBENTRYP_SSI )  */ hb_waFieldInfo,         /* FieldInfo      */
 /* ( DBENTRYP_SCP )  */ hb_waFieldName,         /* FieldName      */
-   ( DBENTRYP_V )       hb_waUnsupported,       /* Flush          */
-   ( DBENTRYP_PP )      hb_waUnsupported,       /* GetRec         */
-   ( DBENTRYP_SI )      hb_waUnsupported,       /* GetValue       */
-   ( DBENTRYP_SVL )     hb_waUnsupported,       /* GetVarLen      */
-   ( DBENTRYP_V )       hb_waUnsupported,       /* GoCold         */
-   ( DBENTRYP_V )       hb_waUnsupported,       /* GoHot          */
-   ( DBENTRYP_P )       hb_waUnsupported,       /* PutRec         */
-   ( DBENTRYP_SI )      hb_waUnsupported,       /* PutValue       */
-   ( DBENTRYP_V )       hb_waUnsupported,       /* Recall         */
-   ( DBENTRYP_ULP )     hb_waUnsupported,       /* RecCount       */
-   ( DBENTRYP_ISI )     hb_waUnsupported,       /* RecInfo        */
-   ( DBENTRYP_ULP )     hb_waUnsupported,       /* RecNo          */
-   ( DBENTRYP_I )       hb_waUnsupported,       /* RecId          */
+   ( DBENTRYP_V ) hb_waUnsupported,             /* Flush          */
+   ( DBENTRYP_PP ) hb_waUnsupported,            /* GetRec         */
+   ( DBENTRYP_SI ) hb_waUnsupported,            /* GetValue       */
+   ( DBENTRYP_SVL ) hb_waUnsupported,           /* GetVarLen      */
+   ( DBENTRYP_V ) hb_waUnsupported,             /* GoCold         */
+   ( DBENTRYP_V ) hb_waUnsupported,             /* GoHot          */
+   ( DBENTRYP_P ) hb_waUnsupported,             /* PutRec         */
+   ( DBENTRYP_SI ) hb_waUnsupported,            /* PutValue       */
+   ( DBENTRYP_V ) hb_waUnsupported,             /* Recall         */
+   ( DBENTRYP_ULP ) hb_waUnsupported,           /* RecCount       */
+   ( DBENTRYP_ISI ) hb_waUnsupported,           /* RecInfo        */
+   ( DBENTRYP_ULP ) hb_waUnsupported,           /* RecNo          */
+   ( DBENTRYP_I ) hb_waUnsupported,             /* RecId          */
 /* ( DBENTRYP_S )    */ hb_waSetFieldExtent,    /* SetFieldExtent */
 
    /* WorkArea/Database management */
@@ -2005,47 +2006,47 @@ static const RDDFUNCS waTable =
 /* ( DBENTRYP_SP )   */ hb_waStructSize,        /* StructSize  */
 /* ( DBENTRYP_CP )   */ hb_waSysName,           /* SysName     */
 /* ( DBENTRYP_VEI )  */ hb_waEval,              /* Eval        */
-   ( DBENTRYP_V )       hb_waUnsupported,       /* Pack        */
-   ( DBENTRYP_LSP )     hb_waUnsupported,       /* PackRec     */
-   ( DBENTRYP_VS )      hb_waUnsupported,       /* Sort        */
+   ( DBENTRYP_V ) hb_waUnsupported,             /* Pack        */
+   ( DBENTRYP_LSP ) hb_waUnsupported,           /* PackRec     */
+   ( DBENTRYP_VS ) hb_waUnsupported,            /* Sort        */
 /* ( DBENTRYP_VT )   */ hb_waTrans,             /* Trans       */
 /* ( DBENTRYP_VT )   */ hb_waTransRec,          /* TransRec    */
-   ( DBENTRYP_V )       hb_waUnsupported,       /* Zap         */
+   ( DBENTRYP_V ) hb_waUnsupported,             /* Zap         */
 
    /* Relational Methods */
 /* ( DBENTRYP_VR )   */ hb_waChildEnd,          /* ChildEnd      */
 /* ( DBENTRYP_VR )   */ hb_waChildStart,        /* ChildStart    */
-   ( DBENTRYP_VR )      hb_waUnsupported,       /* ChildSync     */
+   ( DBENTRYP_VR ) hb_waUnsupported,            /* ChildSync     */
 /* ( DBENTRYP_V )    */ hb_waSyncChildren,      /* SyncChildren  */
 /* ( DBENTRYP_V )    */ hb_waClearRel,          /* ClearRel      */
-   ( DBENTRYP_V )       hb_waUnsupported,       /* ForceRel      */
+   ( DBENTRYP_V ) hb_waUnsupported,             /* ForceRel      */
 /* ( DBENTRYP_SSP )  */ hb_waRelArea,           /* RelArea       */
 /* ( DBENTRYP_VR )   */ hb_waRelEval,           /* RelEval       */
 /* ( DBENTRYP_SI )   */ hb_waRelText,           /* RelText       */
 /* ( DBENTRYP_VR )   */ hb_waSetRel,            /* SetRel        */
 
    /* Order Management */
-   ( DBENTRYP_VOI )     hb_waUnsupported,       /* OrderListAdd      */
-   ( DBENTRYP_V )       hb_waUnsupported,       /* OrderListClear    */
-   ( DBENTRYP_VOI )     hb_waUnsupported,       /* OrderListDelete   */
-   ( DBENTRYP_VOI )     hb_waUnsupported,       /* OrderListFocus    */
-   ( DBENTRYP_V )       hb_waUnsupported,       /* OrderListRebuild  */
+   ( DBENTRYP_VOI ) hb_waUnsupported,           /* OrderListAdd      */
+   ( DBENTRYP_V ) hb_waUnsupported,             /* OrderListClear    */
+   ( DBENTRYP_VOI ) hb_waUnsupported,           /* OrderListDelete   */
+   ( DBENTRYP_VOI ) hb_waUnsupported,           /* OrderListFocus    */
+   ( DBENTRYP_V ) hb_waUnsupported,             /* OrderListRebuild  */
 /* ( DBENTRYP_VOO )  */ hb_waOrderCondition,    /* OrderCondition    */
-   ( DBENTRYP_VOC )     hb_waUnsupported,       /* OrderCreate       */
-   ( DBENTRYP_VOI )     hb_waUnsupported,       /* OrderDestroy      */
+   ( DBENTRYP_VOC ) hb_waUnsupported,           /* OrderCreate       */
+   ( DBENTRYP_VOI ) hb_waUnsupported,           /* OrderDestroy      */
 /* ( DBENTRYP_SVOI ) */ hb_waOrderInfo,         /* OrderInfo         */
 
    /* Filters and Scope Settings */
 /* ( DBENTRYP_V )    */ hb_waClearFilter,       /* ClearFilter  */
 /* ( DBENTRYP_V )    */ hb_waClearLocate,       /* ClearLocate  */
-   ( DBENTRYP_V )       hb_waUnsupported,       /* ClearScope   */
-   ( DBENTRYP_VPLP )    hb_waUnsupported,       /* CountScope   */
+   ( DBENTRYP_V ) hb_waUnsupported,             /* ClearScope   */
+   ( DBENTRYP_VPLP ) hb_waUnsupported,          /* CountScope   */
 /* ( DBENTRYP_I )    */ hb_waFilterText,        /* FilterText   */
-   ( DBENTRYP_SI )      hb_waUnsupported,       /* ScopeInfo    */
+   ( DBENTRYP_SI ) hb_waUnsupported,            /* ScopeInfo    */
 /* ( DBENTRYP_VFI )  */ hb_waSetFilter,         /* SetFilter    */
 /* ( DBENTRYP_VLO )  */ hb_waSetLocate,         /* SetLocate    */
-   ( DBENTRYP_VOS )     hb_waUnsupported,       /* SetScope     */
-   ( DBENTRYP_VPL )     hb_waUnsupported,       /* SkipScope    */
+   ( DBENTRYP_VOS ) hb_waUnsupported,           /* SetScope     */
+   ( DBENTRYP_VPL ) hb_waUnsupported,           /* SkipScope    */
 /* ( DBENTRYP_B )    */ hb_waLocate,            /* Locate       */
 
    /* Miscellaneous */
@@ -2054,56 +2055,56 @@ static const RDDFUNCS waTable =
 /* ( DBENTRYP_I )    */ hb_waEvalBlock,         /* EvalBlock  */
 
    /* Network operations */
-   ( DBENTRYP_VSP )     hb_waUnsupported,       /* RawLock  */
-   ( DBENTRYP_VL )      hb_waUnsupported,       /* Lock     */
-   ( DBENTRYP_I )       hb_waUnsupported,       /* UnLock   */
+   ( DBENTRYP_VSP ) hb_waUnsupported,           /* RawLock  */
+   ( DBENTRYP_VL ) hb_waUnsupported,            /* Lock     */
+   ( DBENTRYP_I ) hb_waUnsupported,             /* UnLock   */
 
    /* Memofile functions */
-   ( DBENTRYP_V )       hb_waUnsupported,       /* CloseMemFile   */
-   ( DBENTRYP_VO )      hb_waUnsupported,       /* CreateMemFile  */
-   ( DBENTRYP_SCCS )    hb_waUnsupported,       /* GetValueFile   */
-   ( DBENTRYP_VO )      hb_waUnsupported,       /* OpenMemFile    */
-   ( DBENTRYP_SCCS )    hb_waUnsupported,       /* PutValueFile   */
+   ( DBENTRYP_V ) hb_waUnsupported,             /* CloseMemFile   */
+   ( DBENTRYP_VO ) hb_waUnsupported,            /* CreateMemFile  */
+   ( DBENTRYP_SCCS ) hb_waUnsupported,          /* GetValueFile   */
+   ( DBENTRYP_VO ) hb_waUnsupported,            /* OpenMemFile    */
+   ( DBENTRYP_SCCS ) hb_waUnsupported,          /* PutValueFile   */
 
    /* Database file header handling */
-   ( DBENTRYP_V )       hb_waUnsupported,       /* ReadDBHeader   */
-   ( DBENTRYP_V )       hb_waUnsupported,       /* WriteDBHeader  */
+   ( DBENTRYP_V ) hb_waUnsupported,             /* ReadDBHeader   */
+   ( DBENTRYP_V ) hb_waUnsupported,             /* WriteDBHeader  */
 
    /* non WorkArea functions */
-   ( DBENTRYP_R )       NULL,                   /* Init    */
-   ( DBENTRYP_R )       NULL,                   /* Exit    */
-   ( DBENTRYP_RVVL )    hb_waRddUnsupported,    /* Drop    */
-   ( DBENTRYP_RVVL )    hb_waRddUnsupported,    /* Exists  */
-   ( DBENTRYP_RVVVL )   hb_waRddUnsupported,    /* Rename  */
+   ( DBENTRYP_R ) NULL,                         /* Init    */
+   ( DBENTRYP_R ) NULL,                         /* Exit    */
+   ( DBENTRYP_RVVL ) hb_waRddUnsupported,       /* Drop    */
+   ( DBENTRYP_RVVL ) hb_waRddUnsupported,       /* Exists  */
+   ( DBENTRYP_RVVVL ) hb_waRddUnsupported,      /* Rename  */
 /* ( DBENTRYP_RSLV ) */ hb_waRddInfo,           /* RddInfo */
 
    /* Special and reserved methods */
-   ( DBENTRYP_SVP )   hb_waUnsupported          /* WhoCares */
+   ( DBENTRYP_SVP ) hb_waUnsupported            /* WhoCares */
 };
 
-#define HB_RDD_POOL_ALLOCSIZE       128
+#define HB_RDD_POOL_ALLOCSIZE 128
 /* common for all threads list of registered RDDs */
-static LPRDDNODE * s_RddList    = NULL;   /* Registered RDDs pool */
-static USHORT      s_uiRddMax   = 0;      /* Size of RDD pool */
-static USHORT      s_uiRddCount = 0;      /* Number of registered RDD */
+static LPRDDNODE *   s_RddList      = NULL;  /* Registered RDDs pool */
+static USHORT        s_uiRddMax     = 0;     /* Size of RDD pool */
+static USHORT        s_uiRddCount   = 0;     /* Number of registered RDD */
 
 /*
  * Get RDD node pointer
  */
 LPRDDNODE hb_rddGetNode( USHORT uiNode )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_rddGetNode(%hu)", uiNode));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_rddGetNode(%hu)", uiNode ) );
 
    return uiNode < s_uiRddCount ? s_RddList[ uiNode ] : NULL;
 }
 
 PHB_ITEM hb_rddList( USHORT uiType )
 {
-   USHORT uiCount, uiIndex, uiRdds;
-   PHB_ITEM pRddArray;
-   LPRDDNODE pNode;
+   USHORT      uiCount, uiIndex, uiRdds;
+   PHB_ITEM    pRddArray;
+   LPRDDNODE   pNode;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_rddList(%hu)", uiType));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_rddList(%hu)", uiType ) );
 
    for( uiCount = uiRdds = 0; uiCount < s_uiRddCount; ++uiCount )
    {
@@ -2127,7 +2128,7 @@ LPRDDNODE hb_rddFindNode( const char * szDriver, USHORT * uiIndex )
 {
    USHORT uiCount;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_rddFindNode(%s, %p)", szDriver, uiIndex));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_rddFindNode(%s, %p)", szDriver, uiIndex ) );
 
    for( uiCount = 0; uiCount < s_uiRddCount; uiCount++ )
    {
@@ -2135,12 +2136,12 @@ LPRDDNODE hb_rddFindNode( const char * szDriver, USHORT * uiIndex )
       if( strcmp( pNode->szName, szDriver ) == 0 ) /* Matched RDD */
       {
          if( uiIndex )
-            * uiIndex = uiCount;
+            *uiIndex = uiCount;
          return pNode;
       }
    }
    if( uiIndex )
-      * uiIndex = 0;
+      *uiIndex = 0;
    return NULL;
 }
 
@@ -2151,7 +2152,7 @@ void hb_rddShutDown( void )
 {
    USHORT uiCount;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_rddShutDown()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_rddShutDown()" ) );
 
    if( s_uiRddCount > 0 )
    {
@@ -2165,8 +2166,8 @@ void hb_rddShutDown( void )
          hb_xfree( s_RddList[ uiCount ] );
       }
       hb_xfree( s_RddList );
-      s_RddList = NULL;
-      s_uiRddMax = s_uiRddCount = 0;
+      s_RddList   = NULL;
+      s_uiRddMax  = s_uiRddCount = 0;
    }
 }
 
@@ -2175,13 +2176,13 @@ void hb_rddShutDown( void )
  */
 int hb_rddRegister( const char * szDriver, USHORT uiType )
 {
-   LPRDDNODE pRddNewNode;
-   PHB_DYNS pGetFuncTable;
-   char szGetFuncTable[ HB_RDD_MAX_DRIVERNAME_LEN + 14 ];
-   USHORT uiFunctions;
-   int iResult;
+   LPRDDNODE   pRddNewNode;
+   PHB_DYNS    pGetFuncTable;
+   char        szGetFuncTable[ HB_RDD_MAX_DRIVERNAME_LEN + 14 ];
+   USHORT      uiFunctions;
+   int         iResult;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_rddRegister(%s, %hu)", szDriver, uiType));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_rddRegister(%s, %hu)", szDriver, uiType ) );
 
    if( hb_rddFindNode( szDriver, NULL ) )    /* Duplicated RDD */
       return 1;
@@ -2189,7 +2190,7 @@ int hb_rddRegister( const char * szDriver, USHORT uiType )
    hb_snprintf( szGetFuncTable, sizeof( szGetFuncTable ), "%s_GETFUNCTABLE",
                 szDriver );
    pGetFuncTable = hb_dynsymFindName( szGetFuncTable );
-   if( !pGetFuncTable )
+   if( ! pGetFuncTable )
       return 2;              /* Not valid RDD */
 
    /* Create a new RDD node */
@@ -2198,8 +2199,8 @@ int hb_rddRegister( const char * szDriver, USHORT uiType )
 
    /* Fill the new RDD node */
    hb_strncpy( pRddNewNode->szName, szDriver, sizeof( pRddNewNode->szName ) - 1 );
-   pRddNewNode->uiType = uiType;
-   pRddNewNode->rddID = s_uiRddCount;
+   pRddNewNode->uiType  = uiType;
+   pRddNewNode->rddID   = s_uiRddCount;
 
    /* Call <szDriver>_GETFUNCTABLE() */
    hb_vmPushDynSym( pGetFuncTable );
@@ -2220,13 +2221,13 @@ int hb_rddRegister( const char * szDriver, USHORT uiType )
       {
          if( s_uiRddCount == s_uiRddMax )
          {
-            s_uiRddMax += HB_RDD_POOL_ALLOCSIZE;
-            s_RddList = ( LPRDDNODE * )
-                  hb_xrealloc( s_RddList, sizeof( LPRDDNODE ) * s_uiRddMax );
+            s_uiRddMax  += HB_RDD_POOL_ALLOCSIZE;
+            s_RddList   = ( LPRDDNODE * )
+                          hb_xrealloc( s_RddList, sizeof( LPRDDNODE ) * s_uiRddMax );
          }
-         s_RddList[ s_uiRddCount ] = pRddNewNode;   /* Add the new RDD node */
+         s_RddList[ s_uiRddCount ]  = pRddNewNode;  /* Add the new RDD node */
          s_uiRddCount++;
-         iResult = 0;
+         iResult                    = 0;
       }
       else
          iResult = 1;
@@ -2250,26 +2251,26 @@ HB_ERRCODE hb_rddInheritEx( RDDFUNCS * pTable, const RDDFUNCS * pSubTable,
                             RDDFUNCS * pSuperTable, const char * szDrvName,
                             USHORT * puiSupperRddId )
 {
-   LPRDDNODE pRddNode;
-   USHORT uiCount;
-   DBENTRYP_V * pFunction;
-   const DBENTRYP_V * pSubFunction;
+   LPRDDNODE            pRddNode;
+   USHORT               uiCount;
+   DBENTRYP_V *         pFunction;
+   const DBENTRYP_V *   pSubFunction;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_rddInheritEx(%p, %p, %p, %s, %p)", pTable, pSubTable, pSuperTable, szDrvName, puiSupperRddId));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_rddInheritEx(%p, %p, %p, %s, %p)", pTable, pSubTable, pSuperTable, szDrvName, puiSupperRddId ) );
 
-   if( !pTable )
+   if( ! pTable )
    {
       return HB_FAILURE;
    }
 
    /* Copy the pSuperTable into pTable */
-   if( !szDrvName || ! *szDrvName )
+   if( ! szDrvName || ! *szDrvName )
    {
       /* no name for inherited driver - use the default one */
       HB_MEMCPY( pTable, &waTable, sizeof( RDDFUNCS ) );
       HB_MEMCPY( pSuperTable, &waTable, sizeof( RDDFUNCS ) );
       if( puiSupperRddId )
-         * puiSupperRddId = ( USHORT ) -1;
+         *puiSupperRddId = ( USHORT ) -1;
    }
    else
    {
@@ -2283,18 +2284,18 @@ HB_ERRCODE hb_rddInheritEx( RDDFUNCS * pTable, const RDDFUNCS * pSubTable,
       HB_MEMCPY( pTable, &pRddNode->pTable, sizeof( RDDFUNCS ) );
       HB_MEMCPY( pSuperTable, &pRddNode->pTable, sizeof( RDDFUNCS ) );
       if( puiSupperRddId )
-         * puiSupperRddId = pRddNode->rddID;
+         *puiSupperRddId = pRddNode->rddID;
    }
 
    /* Copy the non NULL entries from pSubTable into pTable */
-   pFunction = ( DBENTRYP_V * ) pTable;
-   pSubFunction = ( const DBENTRYP_V * ) pSubTable;
+   pFunction      = ( DBENTRYP_V * ) pTable;
+   pSubFunction   = ( const DBENTRYP_V * ) pSubTable;
    for( uiCount = 0; uiCount < RDDFUNCSCOUNT; uiCount++ )
    {
-      if( * pSubFunction )
-         * pFunction = * pSubFunction;
-      pFunction ++;
-      pSubFunction ++;
+      if( *pSubFunction )
+         *pFunction = *pSubFunction;
+      pFunction++;
+      pSubFunction++;
    }
    return HB_SUCCESS;
 }
@@ -2307,19 +2308,19 @@ HB_ERRCODE hb_rddInheritEx( RDDFUNCS * pTable, const RDDFUNCS * pSubTable,
  */
 HB_ERRCODE hb_rddInherit( RDDFUNCS * pTable, const RDDFUNCS * pSubTable, RDDFUNCS * pSuperTable, const char * szDrvName )
 {
-   LPRDDNODE pRddNode;
-   USHORT uiCount;
-   DBENTRYP_V * pFunction, * pSubFunction;
+   LPRDDNODE      pRddNode;
+   USHORT         uiCount;
+   DBENTRYP_V *   pFunction, * pSubFunction;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_rddInherit(%p, %p, %p, %s)", pTable, pSubTable, pSuperTable, szDrvName));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_rddInherit(%p, %p, %p, %s)", pTable, pSubTable, pSuperTable, szDrvName ) );
 
-   if( !pTable )
+   if( ! pTable )
    {
       return HB_FAILURE;
    }
 
    /* Copy the pSuperTable into pTable */
-   if( !szDrvName || ! *szDrvName )
+   if( ! szDrvName || ! *szDrvName )
    {
       /* no name for inherited driver - use the default one */
       HB_MEMCPY( pTable, &waTable, sizeof( RDDFUNCS ) );
@@ -2339,14 +2340,14 @@ HB_ERRCODE hb_rddInherit( RDDFUNCS * pTable, const RDDFUNCS * pSubTable, RDDFUNC
    }
 
    /* Copy the non NULL entries from pSubTable into pTable */
-   pFunction = ( DBENTRYP_V * ) pTable;
-   pSubFunction = ( DBENTRYP_V * ) pSubTable;
+   pFunction      = ( DBENTRYP_V * ) pTable;
+   pSubFunction   = ( DBENTRYP_V * ) pSubTable;
    for( uiCount = 0; uiCount < RDDFUNCSCOUNT; uiCount++ )
    {
-      if( * pSubFunction )
-         * pFunction = * pSubFunction;
-      pFunction ++;
-      pSubFunction ++;
+      if( *pSubFunction )
+         *pFunction = *pSubFunction;
+      pFunction++;
+      pSubFunction++;
    }
    return HB_SUCCESS;
 }
@@ -2364,9 +2365,9 @@ HB_FUNC( __RDDPREALLOCATE )
       lNewSize = USHRT_MAX;
    if( lNewSize > ( LONG ) s_uiRddMax )
    {
-      s_uiRddMax += HB_RDD_POOL_ALLOCSIZE;
-      s_RddList = ( LPRDDNODE * )
-                  hb_xrealloc( s_RddList, sizeof( LPRDDNODE ) * s_uiRddMax );
+      s_uiRddMax  += HB_RDD_POOL_ALLOCSIZE;
+      s_RddList   = ( LPRDDNODE * )
+                    hb_xrealloc( s_RddList, sizeof( LPRDDNODE ) * s_uiRddMax );
    }
 
    hb_retnl( s_uiRddMax );

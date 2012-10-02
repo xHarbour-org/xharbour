@@ -60,18 +60,20 @@
  * set default memo type to FPT
  */
 
-/* Force linking DBFCDX and DBFFPT from which our RDD inherits */
-REQUEST DBFCDX
-REQUEST DBFFPT
+   /* Force linking DBFCDX and DBFFPT from which our RDD inherits */
+   REQUEST DBFCDX
+   REQUEST DBFFPT
 
-/* Announce our RDD for forign REQUESTs */
-ANNOUNCE FPTCDX
+   /* Announce our RDD for forign REQUESTs */
+   ANNOUNCE FPTCDX
 
 FUNCTION FPTCDX_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
-RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, ;
-                            "DBFCDX", {} ) /* We are inheriting from DBFCDX */
 
-INIT PROC FPTCDX_INIT()
+   RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, ;
+      "DBFCDX", {} ) /* We are inheriting from DBFCDX */
+
+   INIT PROC FPTCDX_INIT()
    rddRegister( "FPTCDX", RDT_FULL )
    rddInfo( RDDI_MEMOTYPE, DB_MEMO_FPT, "FPTCDX" )
-RETURN
+
+   RETURN

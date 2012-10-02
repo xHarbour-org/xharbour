@@ -53,28 +53,28 @@
 #include "rddsys.ch"
 #include "usrrdd.ch"
 
-ANNOUNCE ANSIRDD
+   ANNOUNCE ANSIRDD
 
 STATIC FUNCTION ANSI_GETVALUE( nWA, nField, xValue )
 
    LOCAL nResult := UR_SUPER_GETVALUE( nWA, nField, @xValue )
 
    IF nResult == SUCCESS .AND. ValType( xValue ) == 'C'
-      xValue := hb_OemToAnsi( xValue )
+      xValue := hb_OEMToANSI( xValue )
    ENDIF
 
-RETURN nResult
+   RETURN nResult
 
 STATIC FUNCTION ANSI_PUTVALUE( nWA, nField, xValue )
 
    IF ValType( xValue ) == 'C'
-      xValue := hb_AnsiToOem( xValue )
+      xValue := hb_ANSIToOEM( xValue )
    ENDIF
 
-RETURN UR_SUPER_PUTVALUE( nWA, nField, xValue )
+   RETURN UR_SUPER_PUTVALUE( nWA, nField, xValue )
 
-/* Force linking BMDBFCDX from which our RDD inherits */
-REQUEST BMDBFCDX
+   /* Force linking BMDBFCDX from which our RDD inherits */
+   REQUEST BMDBFCDX
 
 FUNCTION ANSIRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
 
@@ -83,8 +83,9 @@ FUNCTION ANSIRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
    aANSIFunc[ UR_GETVALUE ]     := ( @ANSI_GETVALUE() )
    aANSIFunc[ UR_PUTVALUE ]     := ( @ANSI_PUTVALUE() )
 
-RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, 'BMDBFCDX', aANSIFunc )
+   RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, 'BMDBFCDX', aANSIFunc )
 
-INIT PROCEDURE ANSI_INIT()
+   INIT PROCEDURE ANSI_INIT()
    rddRegister( "ANSIRDD", RDT_FULL )
-RETURN
+
+   RETURN

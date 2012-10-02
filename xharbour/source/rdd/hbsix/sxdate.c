@@ -59,10 +59,10 @@
 
 char * hb_sxDtoP( char * pDate, LONG lJulian )
 {
-   int iYear, iMonth, iDay;
-   LONG lPDate;
+   int   iYear, iMonth, iDay;
+   LONG  lPDate;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_sxDtoP(%p, %ld)", pDate, lJulian));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_sxDtoP(%p, %ld)", pDate, lJulian ) );
 
    hb_dateDecode( lJulian, &iYear, &iMonth, &iDay );
    lPDate = ( ( ( iYear << 1 ) | ( iMonth >> 3 ) ) << 8 ) |
@@ -74,17 +74,17 @@ char * hb_sxDtoP( char * pDate, LONG lJulian )
 
 LONG hb_sxPtoD( const char * pDate )
 {
-   int iYear, iMonth, iDay;
-   LONG lPDate;
+   int   iYear, iMonth, iDay;
+   LONG  lPDate;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_sxPtoD(%p)", pDate));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_sxPtoD(%p)", pDate ) );
 
    if( pDate )
    {
-      lPDate = HB_GET_BE_UINT24( pDate );
-      iDay = lPDate & 0x1f;
-      iMonth = ( lPDate >> 5 ) & 0x0f;
-      iYear = ( lPDate >> 9 );
+      lPDate   = HB_GET_BE_UINT24( pDate );
+      iDay     = lPDate & 0x1f;
+      iMonth   = ( lPDate >> 5 ) & 0x0f;
+      iYear    = ( lPDate >> 9 );
 
       return hb_dateEncode( iYear, iMonth, iDay );
    }
@@ -94,6 +94,7 @@ LONG hb_sxPtoD( const char * pDate )
 HB_FUNC( SX_DTOP )
 {
    char pDate[ 3 ];
+
    hb_retclen( hb_sxDtoP( pDate, hb_pardl( 1 ) ), 3 );
 }
 

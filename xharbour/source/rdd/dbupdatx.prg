@@ -55,6 +55,7 @@
 #ifdef HB_COMPAT_XPP
 
 FUNCTION dbUpdate( cAlias, bAssign, bKey, lRandom )
+
    RETURN __dbUpdate( cAlias, bKey, lRandom, bAssign )
 
 #endif

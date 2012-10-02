@@ -60,10 +60,10 @@
 
 #include "rddsys.ch"
 #ifdef __XHARBOUR__
-  #include "usrrdd.ch"
-  #xtranslate hb_valtoexp(  => cStr(
+#include "usrrdd.ch"
+#xtranslate hb_valtoexp(  => cStr(
 #else
-  #include "hbusrrdd.ch"
+#include "hbusrrdd.ch"
 #endif
 #include "common.ch"
 #include "fileio.ch"
@@ -77,33 +77,35 @@
 #define ARRAY_MSGLOGBLOCK  6
 #define ARRAY_USERLOGBLOCK 7
 
-ANNOUNCE LOGRDD
+   ANNOUNCE LOGRDD
 //REQUEST  HB_LOGRDDINHERIT  /* To be defined at user level */
 
 STATIC FUNCTION LOGRDD_INIT( nRDD )
+
    LOCAL lActive, cFileName, cTag, cRDDName
 
    /* Defaults */
    cFileName := "changes.log"
    lActive   := .F.
-   #ifdef __XHARBOUR__
-      cTag := NETNAME() + "\" + NETNAME( 1 )
-   #else
-      cTag := NETNAME() + "\" + hb_USERNAME()
-   #endif
+#ifdef __XHARBOUR__
+   cTag := NetName() + "\" + NetName( 1 )
+#else
+   cTag := NetName() + "\" + hb_UserName()
+#endif
 
-   // Avoid missing external in harbour.dll
+// Avoid missing external in harbour.dll
    cRDDName := &( "hb_LogRddInherit()" )
 
    /* Log File will be open later so user can change parameters */
 
    /* Store data in RDD cargo */
-                        /* cFileName, nHandle, cTag, lActive, cRDDName, bMsgLogBlock, bUserLogBlock */
+   /* cFileName, nHandle, cTag, lActive, cRDDName, bMsgLogBlock, bUserLogBlock */
    USRRDD_RDDDATA( nRDD, { cFileName, NIL, cTag, lActive, cRDDName, NIL, NIL } )
 
-RETURN SUCCESS
+   RETURN SUCCESS
 
 STATIC FUNCTION LOGRDD_EXIT( nRDD )
+
    LOCAL aRDDData  := USRRDD_RDDDATA( nRDD )
 
    /* Closing log file */
@@ -112,90 +114,121 @@ STATIC FUNCTION LOGRDD_EXIT( nRDD )
       aRDDData[ ARRAY_FHANDLE ] := NIL
    ENDIF
 
-RETURN SUCCESS
+   RETURN SUCCESS
 
 // Create database from current WA fields definition
+
 STATIC FUNCTION LOGRDD_CREATE( nWA, aOpenInfo )
+
    LOCAL nResult := UR_SUPER_CREATE( nWA, aOpenInfo )
+
    IF nResult == SUCCESS
       ToLog( "CREATE", nWA, aOpenInfo )
    ENDIF
+
    RETURN nResult
 
 // Creating fields for new DBF - dbCreate() in current workarea
+
 STATIC FUNCTION LOGRDD_CREATEFIELDS( nWA, aStruct )
+
    LOCAL nResult := UR_SUPER_CREATEFIELDS( nWA, aStruct )
+
    IF nResult == SUCCESS
       ToLog( "CREATEFIELDS", nWA, aStruct )
    ENDIF
+
    RETURN nResult
 
 // Open workarea
+
 STATIC FUNCTION LOGRDD_OPEN( nWA, aOpenInfo )
+
    LOCAL nResult := UR_SUPER_OPEN( nWA, aOpenInfo )
+
    IF nResult == SUCCESS
       ToLog( "OPEN", nWA, aOpenInfo )
    ENDIF
+
    RETURN nResult
 
 // Close workarea
+
 STATIC FUNCTION LOGRDD_CLOSE( nWA )
+
    LOCAL cFile   := dbInfo( DBI_FULLPATH )
    LOCAL cAlias  := Alias()
    LOCAL nResult := UR_SUPER_CLOSE( nWA )
+
    IF nResult == SUCCESS
       ToLog( "CLOSE", nWA, cFile, cAlias )
    ENDIF
+
    RETURN nResult
 
 STATIC FUNCTION LOGRDD_APPEND( nWA, lUnlockAll )
+
    LOCAL nResult := UR_SUPER_APPEND( nWA, lUnlockAll )
+
    IF nResult == SUCCESS
       ToLog( "APPEND", nWA, lUnlockAll )
    ENDIF
+
    RETURN nResult
 
 STATIC FUNCTION LOGRDD_DELETE( nWA )
+
    LOCAL nResult := UR_SUPER_DELETE( nWA )
+
    IF nResult == SUCCESS
       ToLog( "DELETE", nWA )
    ENDIF
+
    RETURN nResult
 
 STATIC FUNCTION LOGRDD_RECALL( nWA )
+
    LOCAL nResult := UR_SUPER_RECALL( nWA )
+
    IF nResult == SUCCESS
       ToLog( "RECALL", nWA )
    ENDIF
+
    RETURN nResult
 
 STATIC FUNCTION LOGRDD_PUTVALUE( nWA, nField, xValue )
+
    LOCAL xOldValue := FieldGet( nField )
    LOCAL nResult   := UR_SUPER_PUTVALUE( nWA, nField, xValue )
 
-   //Log Only Changes
+//Log Only Changes
    IF !( xOldValue == xValue )
       ToLog( "PUTVALUE", nWA, nField, xValue, xOldValue )
    ENDIF
+
    RETURN nResult
 
 STATIC FUNCTION LOGRDD_ZAP( nWA )
+
    LOCAL nResult := UR_SUPER_ZAP( nWA )
+
    IF nResult == SUCCESS
       ToLog( "ZAP", nWA )
    ENDIF
+
    RETURN nResult
 
-/* Force linking DBFCDX from which our RDD inherits */
-REQUEST DBFCDX
+   /* Force linking DBFCDX from which our RDD inherits */
+   REQUEST DBFCDX
 
 /*
  * This function have to exist in all RDD and then name have to be in
  * format: <RDDNAME>_GETFUNCTABLE
  */
+
 FUNCTION LOGRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
 
-   // Avoid missing external in harbour.dll
+// Avoid missing external in harbour.dll
    LOCAL cSuperRDD := &( "hb_LogRddInherit()" ) /* We are inheriting from a User Defined RDD */
    LOCAL aMyFunc[ UR_METHODCOUNT ]
 
@@ -211,10 +244,10 @@ FUNCTION LOGRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
    aMyFunc[ UR_PUTVALUE     ] := ( @LOGRDD_PUTVALUE()     )
    aMyFunc[ UR_ZAP          ] := ( @LOGRDD_ZAP()          )
 
-RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, ;
-                            cSuperRDD, aMyFunc )
+   RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, ;
+      cSuperRDD, aMyFunc )
 
-INIT PROCEDURE _LOGRDD_INIT()
+   INIT PROCEDURE _LOGRDD_INIT()
 
    IF Type( "hb_LogRddInherit()" ) == "UI"
       rddRegister( "LOGRDD", RDT_FULL )
@@ -222,16 +255,17 @@ INIT PROCEDURE _LOGRDD_INIT()
 
    RETURN
 
-/* -------------------------------------------------- */
-/*           USER UTILITY FUNCTIONS                   */
-/* -------------------------------------------------- */
+   /* -------------------------------------------------- */
+   /*           USER UTILITY FUNCTIONS                   */
+   /* -------------------------------------------------- */
 
 FUNCTION hb_LogRddLogFileName( cFileName )
+
    LOCAL nRDD, aRDDList
    LOCAL aRDDData
    LOCAL cOldFileName
 
-   aRDDList := RDDLIST( RDT_FULL )
+   aRDDList := rddList( RDT_FULL )
    nRDD     := AScan( aRDDList, "LOGRDD" )
 
    IF nRDD > 0
@@ -247,14 +281,16 @@ FUNCTION hb_LogRddLogFileName( cFileName )
       ENDIF
 
    ENDIF
+
    RETURN cOldFileName
 
 FUNCTION hb_LogRddTag( cTag )
+
    LOCAL nRDD, aRDDList
    LOCAL aRDDData
    LOCAL cOldTag
 
-   aRDDList := RDDLIST( RDT_FULL )
+   aRDDList := rddList( RDT_FULL )
    nRDD     := AScan( aRDDList, "LOGRDD" )
 
    IF nRDD > 0
@@ -270,14 +306,16 @@ FUNCTION hb_LogRddTag( cTag )
       ENDIF
 
    ENDIF
+
    RETURN cOldTag
 
 FUNCTION hb_LogRddActive( lActive )
+
    LOCAL nRDD, aRDDList
    LOCAL aRDDData
    LOCAL lOldActive
 
-   aRDDList := RDDLIST( RDT_FULL )
+   aRDDList := rddList( RDT_FULL )
    nRDD     := AScan( aRDDList, "LOGRDD" )
 
    IF nRDD > 0
@@ -293,14 +331,16 @@ FUNCTION hb_LogRddActive( lActive )
       ENDIF
 
    ENDIF
+
    RETURN lOldActive
 
 FUNCTION hb_LogRddMsgLogBlock( bMsgLogBlock )
+
    LOCAL nRDD, aRDDList
    LOCAL aRDDData
    LOCAL bOldMsgLogBlock
 
-   aRDDList := RDDLIST( RDT_FULL )
+   aRDDList := rddList( RDT_FULL )
    nRDD     := AScan( aRDDList, "LOGRDD" )
 
    IF nRDD > 0
@@ -316,14 +356,16 @@ FUNCTION hb_LogRddMsgLogBlock( bMsgLogBlock )
       ENDIF
 
    ENDIF
+
    RETURN bOldMsgLogBlock
 
 FUNCTION hb_LogRddUserLogBlock( bUserLogBlock )
+
    LOCAL nRDD, aRDDList
    LOCAL aRDDData
    LOCAL bOldUserLogBlock
 
-   aRDDList := RDDLIST( RDT_FULL )
+   aRDDList := rddList( RDT_FULL )
    nRDD     := AScan( aRDDList, "LOGRDD" )
 
    IF nRDD > 0
@@ -339,16 +381,20 @@ FUNCTION hb_LogRddUserLogBlock( bUserLogBlock )
       ENDIF
 
    ENDIF
+
    RETURN bOldUserLogBlock
 
 #ifdef __XHARBOUR__
+
 FUNCTION hb_LogRddValueToText( uValue )
 
    LOCAL cType := ValType( uValue )
    LOCAL cText := ValToPrg( uValue )
 
    RETURN "[" + cType + "]>>>" + cText + "<<<"
+
 #else
+
 FUNCTION hb_LogRddValueToText( uValue )
 
    LOCAL cType := ValType( uValue )
@@ -359,7 +405,7 @@ FUNCTION hb_LogRddValueToText( uValue )
       cText := hb_StrToExp( uValue )
 
    CASE cType == "N"
-      cText := hb_NToS( uValue )
+      cText := hb_ntos( uValue )
 
    CASE cType == "D"
       cText := DToS( uValue )
@@ -370,19 +416,21 @@ FUNCTION hb_LogRddValueToText( uValue )
    ENDCASE
 
    RETURN "[" + cType + "]>>>" + cText + "<<<"
+
 #endif
 
-/* -------------------------------------------------- */
-/*           LOCAL UTILITY FUNCTIONS                  */
-/* -------------------------------------------------- */
+   /* -------------------------------------------------- */
+   /*           LOCAL UTILITY FUNCTIONS                  */
+   /* -------------------------------------------------- */
 
 STATIC PROCEDURE OpenLogFile( nWA )
+
    LOCAL aRDDData  := USRRDD_RDDDATA( USRRDD_ID( nWA ) )
    LOCAL cFileName := aRDDData[ ARRAY_FILENAME ]
    LOCAL nHandle   := aRDDData[ ARRAY_FHANDLE  ]
    LOCAL lActive   := aRDDData[ ARRAY_ACTIVE   ]
 
-   //TraceLog( "nHandle " + cStr( nHandle ) )
+//TraceLog( "nHandle " + cStr( nHandle ) )
 
    IF lActive .AND. nHandle == NIL
 
@@ -407,53 +455,57 @@ STATIC PROCEDURE OpenLogFile( nWA )
       aRDDData[ ARRAY_FHANDLE  ] := nHandle
 
    ENDIF
+
    RETURN
 
 STATIC FUNCTION ToString( cCmd, nWA, xPar1, xPar2, xPar3 )
+
    LOCAL cString
 
    DO CASE
-      CASE cCmd == "CREATE"
-           // Parameters received: xPar1 = aOpenInfo
-           cString := xPar1[ UR_OI_NAME ]
-      CASE cCmd == "CREATEFIELDS"
-           // Parameters received: xPar1 = aStruct
-           cString := hb_ValToExp( xPar1 )
-      CASE cCmd == "OPEN"
-           // Parameters received: xPar1 = aOpenInfo
-           cString := 'Table : "' + xPar1[ UR_OI_NAME ] + '", Alias : "' + Alias() + '", WorkArea : ' + LTrim( Str( nWA ) )
-      CASE cCmd == "CLOSE"
-           // Parameters received: xPar1 = cTableName, xPar2 = cAlias
-           cString := 'Table : "' + xPar1 + '", Alias : "' + xPar2 + '", WorkArea : ' + LTrim( Str( nWA ) )
-      CASE cCmd == "APPEND"
-           // Parameters received: xPar1 = lUnlockAll
-           cString := Alias() + "->RecNo() = " + LTrim( Str( RecNo() ) )
-      CASE cCmd == "DELETE"
-           // Parameters received: none
-           cString := Alias() + "->RecNo() = " + LTrim( Str( RecNo() ) )
-      CASE cCmd == "RECALL"
-           // Parameters received: none
-           cString := Alias() + "->RecNo() = " + LTrim( Str( RecNo() ) )
-      CASE cCmd == "PUTVALUE"
-           // Parameters received: xPar1 = nField, xPar2 = xValue, xPar3 = xOldValue
+   CASE cCmd == "CREATE"
+      // Parameters received: xPar1 = aOpenInfo
+      cString := xPar1[ UR_OI_NAME ]
+   CASE cCmd == "CREATEFIELDS"
+      // Parameters received: xPar1 = aStruct
+      cString := hb_ValToExp( xPar1 )
+   CASE cCmd == "OPEN"
+      // Parameters received: xPar1 = aOpenInfo
+      cString := 'Table : "' + xPar1[ UR_OI_NAME ] + '", Alias : "' + Alias() + '", WorkArea : ' + LTrim( Str( nWA ) )
+   CASE cCmd == "CLOSE"
+      // Parameters received: xPar1 = cTableName, xPar2 = cAlias
+      cString := 'Table : "' + xPar1 + '", Alias : "' + xPar2 + '", WorkArea : ' + LTrim( Str( nWA ) )
+   CASE cCmd == "APPEND"
+      // Parameters received: xPar1 = lUnlockAll
+      cString := Alias() + "->RecNo() = " + LTrim( Str( RecNo() ) )
+   CASE cCmd == "DELETE"
+      // Parameters received: none
+      cString := Alias() + "->RecNo() = " + LTrim( Str( RecNo() ) )
+   CASE cCmd == "RECALL"
+      // Parameters received: none
+      cString := Alias() + "->RecNo() = " + LTrim( Str( RecNo() ) )
+   CASE cCmd == "PUTVALUE"
+      // Parameters received: xPar1 = nField, xPar2 = xValue, xPar3 = xOldValue
 #ifndef __XHARBOUR__
-           HB_UNUSED_VAR( xPar3 ) // Here don't log previous value
+      HB_UNUSED_VAR( xPar3 ) // Here don't log previous value
 #else
-           HB_SYMBOL_UNUSED( xPar3 ) // Here don't log previous value                      
+      HB_SYMBOL_UNUSED( xPar3 ) // Here don't log previous value
 #endif
-           cString := Alias() + "(" + LTrim( Str( RecNo() ) ) + ")->" + PadR( FieldName( xPar1 ), 10 ) + " := " + hb_LogRddValueToText( xPar2 )
-      CASE cCmd == "ZAP"
-           // Parameters received: none
-           cString := 'Alias : "' + Alias() + ' Table : "' + dbInfo( DBI_FULLPATH ) + '"'
+      cString := Alias() + "(" + LTrim( Str( RecNo() ) ) + ")->" + PadR( FieldName( xPar1 ), 10 ) + " := " + hb_LogRddValueToText( xPar2 )
+   CASE cCmd == "ZAP"
+      // Parameters received: none
+      cString := 'Alias : "' + Alias() + ' Table : "' + dbInfo( DBI_FULLPATH ) + '"'
    ENDCASE
+
    RETURN cString
 
 STATIC PROCEDURE ToLog( cCmd, nWA, xPar1, xPar2, xPar3 )
+
    LOCAL aRDDData := USRRDD_RDDDATA( USRRDD_ID( nWA ) )
    LOCAL lActive  := aRDDData[ ARRAY_ACTIVE ]
    LOCAL nHandle, cTag, cRDDName, bMsgLogBlock, bUserLogBlock, cLog
 
-   // Check if logging system is active
+// Check if logging system is active
    IF lActive
 
       cTag          := aRDDData[ ARRAY_TAG ]
@@ -483,7 +535,7 @@ STATIC PROCEDURE ToLog( cCmd, nWA, xPar1, xPar2, xPar3 )
             ENDIF
             // Log to file only if cLog is a valid string
             IF HB_ISSTRING( cLog )
-               FWrite( nHandle, cLog + hb_OSNewLine() )
+               FWrite( nHandle, cLog + hb_osNewLine() )
             ENDIF
          ENDIF
 
@@ -495,5 +547,6 @@ STATIC PROCEDURE ToLog( cCmd, nWA, xPar1, xPar2, xPar3 )
       ENDIF
 
    ENDIF
+
    RETURN
 

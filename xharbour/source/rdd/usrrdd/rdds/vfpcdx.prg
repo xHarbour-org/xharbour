@@ -54,17 +54,19 @@
 #include "dbinfo.ch"
 #include "usrrdd.ch"
 
-/* Force linking DBFCDX from which our RDD inherits */
-REQUEST DBFCDX
-REQUEST DBFFPT
+   /* Force linking DBFCDX from which our RDD inherits */
+   REQUEST DBFCDX
+   REQUEST DBFFPT
 
-ANNOUNCE VFPCDX
+   ANNOUNCE VFPCDX
 
 FUNCTION VFPCDX_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
-   /* We are inheriting from DBFCDX */
-RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, "DBFCDX", {} ) 
 
-INIT PROCEDURE VFPCDX_INIT()
+   /* We are inheriting from DBFCDX */
+
+   RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, "DBFCDX", {} )
+
+   INIT PROCEDURE VFPCDX_INIT()
 
    rddRegister( "VFPCDX", RDT_FULL )
 
@@ -73,4 +75,4 @@ INIT PROCEDURE VFPCDX_INIT()
    rddInfo( RDDI_MEMOVERSION, DB_MEMOVER_STD, "VFPCDX" )
    rddInfo( RDDI_LOCKSCHEME, DB_DBFLOCK_VFP, "VFPCDX" )
 
-RETURN
+   RETURN

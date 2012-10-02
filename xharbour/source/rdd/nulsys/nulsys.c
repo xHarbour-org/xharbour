@@ -121,9 +121,13 @@ HB_ERRCODE hb_rddGetAliasNumber( const char * szAlias, int * iArea )
    return HB_FAILURE;
 }
 
-void hb_rddCloseAll( void ) {}
+void hb_rddCloseAll( void )
+{
+}
 
-void hb_rddShutDown( void ) {}
+void hb_rddShutDown( void )
+{
+}
 
 
 HB_EXTERN_BEGIN
@@ -140,108 +144,246 @@ void hb_rddWaShutDown( PHB_STACKRDD pRddInfo )
 
 HB_EXTERN_END
 
-HB_FUNC( RDDSYS ) {}
+HB_FUNC( RDDSYS )
+{
+}
 
 
-HB_FUNC( RDDNAME ) { hb_retc( NULL ); }
+HB_FUNC( RDDNAME )
+{
+   hb_retc( NULL );
+}
 
-HB_FUNC( RDDLIST ) { hb_reta( 0 ); }
-
-
-HB_FUNC( FIELDGET ) { hb_retc( NULL ); }
-
-HB_FUNC( FIELDPUT ) { hb_retc( NULL ); }
-
-HB_FUNC( FIELDPOS ) { hb_retni( 0 ); }
-
-HB_FUNC( FIELDNAME ) { hb_retc( NULL ); }
+HB_FUNC( RDDLIST )
+{
+   hb_reta( 0 );
+}
 
 
-HB_FUNC( DBCREATE ) {}
+HB_FUNC( FIELDGET )
+{
+   hb_retc( NULL );
+}
 
-HB_FUNC( DBUSEAREA ) {}
+HB_FUNC( FIELDPUT )
+{
+   hb_retc( NULL );
+}
 
-HB_FUNC( DBCLOSEAREA ) {}
+HB_FUNC( FIELDPOS )
+{
+   hb_retni( 0 );
+}
 
-HB_FUNC( DBSELECTAREA ) {}
+HB_FUNC( FIELDNAME )
+{
+   hb_retc( NULL );
+}
 
-HB_FUNC( DBSTRUCT ) {}
 
-HB_FUNC( DBGOTO ) { hb_retni( 0 ); }
+HB_FUNC( DBCREATE )
+{
+}
 
-HB_FUNC( DBGOTOP ) {}
+HB_FUNC( DBUSEAREA )
+{
+}
 
-HB_FUNC( DBGOBOTTOM ) {}
+HB_FUNC( DBCLOSEAREA )
+{
+}
 
-HB_FUNC( DBSEEK ) { hb_retl( FALSE ); }
+HB_FUNC( DBSELECTAREA )
+{
+}
 
-HB_FUNC( DBSKIP ) { hb_retni( 0 ); }
+HB_FUNC( DBSTRUCT )
+{
+}
+
+HB_FUNC( DBGOTO )
+{
+   hb_retni( 0 );
+}
+
+HB_FUNC( DBGOTOP )
+{
+}
+
+HB_FUNC( DBGOBOTTOM )
+{
+}
+
+HB_FUNC( DBSEEK )
+{
+   hb_retl( FALSE );
+}
+
+HB_FUNC( DBSKIP )
+{
+   hb_retni( 0 );
+}
 
 #ifdef HB_COMPAT_XPP
-HB_FUNC( DBSKIPPER ) { hb_retni( 0 ); }
+HB_FUNC( DBSKIPPER )
+{
+   hb_retni( 0 );
+}
 #endif
 
-HB_FUNC( DBAPPEND ) {}
+HB_FUNC( DBAPPEND )
+{
+}
 
-HB_FUNC( DBRECALL ) {}
+HB_FUNC( DBRECALL )
+{
+}
 
-HB_FUNC( DBDELETE ) {}
+HB_FUNC( DBDELETE )
+{
+}
 
-HB_FUNC( DBRLOCK ) { hb_retl( FALSE ); }
+HB_FUNC( DBRLOCK )
+{
+   hb_retl( FALSE );
+}
 
-HB_FUNC( DBUNLOCK ) { hb_retl( FALSE ); }
+HB_FUNC( DBUNLOCK )
+{
+   hb_retl( FALSE );
+}
 
-HB_FUNC( DBRELATION ) { hb_retc( NULL ); }
+HB_FUNC( DBRELATION )
+{
+   hb_retc( NULL );
+}
 
-HB_FUNC( DBRSELECT ) { hb_retni( 0 ); }
+HB_FUNC( DBRSELECT )
+{
+   hb_retni( 0 );
+}
 
-HB_FUNC( DBFILTER ) { hb_retc( NULL ); }
+HB_FUNC( DBFILTER )
+{
+   hb_retc( NULL );
+}
 
-HB_FUNC( DBEVAL ) {}
+HB_FUNC( DBEVAL )
+{
+}
 
-HB_FUNC( SELECT ) { hb_retni( 0 ); }
+HB_FUNC( SELECT )
+{
+   hb_retni( 0 );
+}
 
-HB_FUNC( ALIAS ) { hb_retc( NULL ); }
+HB_FUNC( ALIAS )
+{
+   hb_retc( NULL );
+}
 
-HB_FUNC( USED ) { hb_retl( FALSE ); }
+HB_FUNC( USED )
+{
+   hb_retl( FALSE );
+}
 
-HB_FUNC( NETERR ) { hb_retl( FALSE ); }
+HB_FUNC( NETERR )
+{
+   hb_retl( FALSE );
+}
 
-HB_FUNC( LOCK ) { hb_retl( FALSE ); }
+HB_FUNC( LOCK )
+{
+   hb_retl( FALSE );
+}
 
-HB_FUNC( FLOCK ) { hb_retl( FALSE ); }
+HB_FUNC( FLOCK )
+{
+   hb_retl( FALSE );
+}
 
-HB_FUNC( RLOCK ) { hb_retl( FALSE ); }
+HB_FUNC( RLOCK )
+{
+   hb_retl( FALSE );
+}
 
-HB_FUNC( BOF ) { hb_retl( FALSE ); }
+HB_FUNC( BOF )
+{
+   hb_retl( FALSE );
+}
 
-HB_FUNC( EOF ) { hb_retl( FALSE ); }
+HB_FUNC( EOF )
+{
+   hb_retl( FALSE );
+}
 
-HB_FUNC( FOUND ) { hb_retl( FALSE ); }
+HB_FUNC( FOUND )
+{
+   hb_retl( FALSE );
+}
 
-HB_FUNC( DELETED ) { hb_retl( FALSE ); }
+HB_FUNC( DELETED )
+{
+   hb_retl( FALSE );
+}
 
-HB_FUNC( RECNO ) { hb_retni( 0 ); }
+HB_FUNC( RECNO )
+{
+   hb_retni( 0 );
+}
 
-HB_FUNC( RECCOUNT ) { hb_parni( 0 ); }
+HB_FUNC( RECCOUNT )
+{
+   hb_parni( 0 );
+}
 
-HB_FUNC( LASTREC ) { hb_retni( 0 ); }
+HB_FUNC( LASTREC )
+{
+   hb_retni( 0 );
+}
 
-HB_FUNC( FCOUNT ) { hb_parni( 0 ); }
+HB_FUNC( FCOUNT )
+{
+   hb_parni( 0 );
+}
 
-HB_FUNC( RECSIZE ) { hb_retni( 0 ); }
+HB_FUNC( RECSIZE )
+{
+   hb_retni( 0 );
+}
 
-HB_FUNC( HEADER ) { hb_retni( 0 ); }
+HB_FUNC( HEADER )
+{
+   hb_retni( 0 );
+}
 
-HB_FUNC( LUPDATE ) { hb_retds( NULL ); }
+HB_FUNC( LUPDATE )
+{
+   hb_retds( NULL );
+}
 
 
-HB_FUNC( INDEXORD ) { hb_parni( 1 ); }
+HB_FUNC( INDEXORD )
+{
+   hb_parni( 1 );
+}
 
-HB_FUNC( INDEXKEY ) { hb_retc( NULL ); }
+HB_FUNC( INDEXKEY )
+{
+   hb_retc( NULL );
+}
 
-HB_FUNC( ORDNAME ) { hb_retc( NULL ); }
+HB_FUNC( ORDNAME )
+{
+   hb_retc( NULL );
+}
 
-HB_FUNC( ORDKEY ) { hb_retc( NULL ); }
+HB_FUNC( ORDKEY )
+{
+   hb_retc( NULL );
+}
 
-HB_FUNC( ORDFOR ) { hb_retc( NULL ); }
+HB_FUNC( ORDFOR )
+{
+   hb_retc( NULL );
+}

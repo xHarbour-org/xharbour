@@ -84,14 +84,14 @@ HB_FUNC( ORDWILDSEEK )
 
       if( szPattern )
       {
-         BOOL fCont = hb_parl( 2 ), fBack = hb_parl( 3 ), fFound = FALSE;
+         BOOL        fCont    = hb_parl( 2 ), fBack = hb_parl( 3 ), fFound = FALSE;
          DBORDERINFO OrderInfo;
-         HB_ERRCODE errCode = HB_SUCCESS;
+         HB_ERRCODE  errCode  = HB_SUCCESS;
 
          memset( &OrderInfo, 0, sizeof( DBORDERINFO ) );
          OrderInfo.itmResult = hb_itemNew( NULL );
 
-         if( !fCont )
+         if( ! fCont )
          {
             char * szKey;
 
@@ -105,16 +105,16 @@ HB_FUNC( ORDWILDSEEK )
                errCode = SELF_ORDINFO( pArea, DBOI_KEYVAL, &OrderInfo );
                if( errCode == HB_SUCCESS )
                {
-                  szKey = hb_itemGetCPtr( OrderInfo.itmResult );
-                  fFound = hb_strMatchWild( szKey, szPattern );
+                  szKey    = hb_itemGetCPtr( OrderInfo.itmResult );
+                  fFound   = hb_strMatchWild( szKey, szPattern );
                }
             }
          }
-         if( !fFound && errCode == HB_SUCCESS )
+         if( ! fFound && errCode == HB_SUCCESS )
          {
             OrderInfo.itmNewVal = hb_param( 1, HB_IT_STRING );
             if( SELF_ORDINFO( pArea, fBack ? DBOI_SKIPWILDBACK : DBOI_SKIPWILD,
-                          &OrderInfo ) == HB_SUCCESS )
+                              &OrderInfo ) == HB_SUCCESS )
                fFound = hb_itemGetL( OrderInfo.itmResult );
          }
          hb_itemRelease( OrderInfo.itmResult );
@@ -133,10 +133,10 @@ HB_FUNC( DBSKIPPER )
 
    if( pArea )
    {
-      LONG lSkipped = 0;
-      LONG lRecs = 1;
-      BOOL fBEof;
-      ULONG ulRecords = 0;
+      LONG  lSkipped    = 0;
+      LONG  lRecs       = 1;
+      BOOL  fBEof;
+      ULONG ulRecords   = 0;
 
       if( SELF_RECCOUNT( pArea, &ulRecords ) == HB_SUCCESS && ulRecords > 0 )
       {
