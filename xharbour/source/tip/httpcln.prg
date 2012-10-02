@@ -59,15 +59,16 @@
 */
 
 CLASS tIPClientHTTP FROM tIPClient
+
    DATA cMethod
    DATA nReplyCode
    DATA cReplyDescr
    DATA nVersion     INIT  1
    DATA nSubversion  INIT  0
    DATA bChunked
-   DATA hHeaders     INIT  {=>}
-   DATA hCookies     INIT  {=>}
-   DATA hFields      INIT  {=>}
+   DATA hHeaders     INIT  { => }
+   DATA hCookies     INIT  { => }
+   DATA hFields      INIT  { => }
    DATA cUserAgent   INIT  "Mozilla/3.0 compatible"
    DATA cAuthMode    INIT ""
    DATA cConnetion   INIT "close"
@@ -75,62 +76,62 @@ CLASS tIPClientHTTP FROM tIPClient
    DATA aAttachments init {}
    DATA cLogFile
 
-   METHOD New( oUrl,lTrace, oCredentials)
+   METHOD New( oUrl, lTrace, oCredentials )
    METHOD Get( cQuery )
    METHOD Post( cPostData, cQuery )
    METHOD ReadHeaders()
-   METHOD Read( nLen )
+   METHOD READ( nLen )
    METHOD UseBasicAuth()      INLINE   ::cAuthMode := "Basic"
-   Method ReadAll()
-   Method SetCookie
-   Method GetCookies
-   Method Boundary
-   METHOD Attach(cName,cFileName,cType)
-   Method PostMultiPart
-   Method WriteAll( cFile )
+   METHOD ReadAll()
+   METHOD SetCookie
+   METHOD GetCookies
+   METHOD Boundary
+   METHOD Attach( cName, cFileName, cType )
+   METHOD PostMultiPart
+   METHOD WriteAll( cFile )
    DESTRUCTOR httpClnDesTructor
-HIDDEN:
+   HIDDEN:
    METHOD StandardFields()
-
-
-
 
 ENDCLASS
 
 PROCEDURE httpClnDesTructor CLASS  tIPClienthttp
 
-   IF ::lTrace .and. ::nHandle > 0
-      fClose( ::nHandle )
-      ::nHandle := -1
+   IF ::lTrace .AND. ::nHandle > 0
+      FClose( ::nHandle )
+      ::nHandle := - 1
    ENDIF
-Return
 
-METHOD New( oUrl,lTrace, oCredentials) CLASS tIPClientHTTP
-   local cFile :="http"
-   local n := 0
+   RETURN
+
+METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClientHTTP
+
+   LOCAL cFile := "http"
+   LOCAL n := 0
 
    ::super:new( oUrl, lTrace, oCredentials )
    ::nDefaultPort := 80
    ::nConnTimeout := 5000
    ::bChunked     := .F.
    if ::ltrace
-      if !file("http.log")
-         ::nHandle := fcreate("http.log")
-      else
-         while file(cFile+LTrim(str(Int(n)))+".log")
-           n++
-         enddo
-         ::cLogFile:= cFile+LTrim(str(Int(n)))+".log"
-         ::nHandle := fcreate(::cLogFile)
-      endif
-   endif
+      IF !File( "http.log" )
+         ::nHandle := FCreate( "http.log" )
+      ELSE
+         WHILE File( cFile + LTrim( Str(Int(n ) ) ) + ".log" )
+            n++
+         ENDDO
+         ::cLogFile := cFile + LTrim( Str( Int(n ) ) ) + ".log"
+         ::nHandle := FCreate( ::cLogFile )
+      ENDIF
+   ENDIF
 
    HSetCaseMatch( ::hHeaders, .F. )
-RETURN Self
 
+   RETURN Self
 
 METHOD Get( cQuery ) CLASS tIPClientHTTP
-   IF .not. HB_IsString( cQuery )
+
+   IF .NOT. HB_ISSTRING( cQuery )
       cQuery := ::oUrl:BuildQuery()
    ENDIF
 
@@ -140,66 +141,67 @@ METHOD Get( cQuery ) CLASS tIPClientHTTP
    IF ::InetErrorCode( ::SocketCon ) ==  0
       RETURN ::ReadHeaders()
    ENDIF
-RETURN .F.
 
+   RETURN .F.
 
 METHOD Post( cPostData, cQuery ) CLASS tIPClientHTTP
-   LOCAL cData, nI, cTmp,y
 
-   IF HB_IsHash( cPostData )
+   LOCAL cData, nI, cTmp, y
+
+   IF HB_ISHASH( cPostData )
       cData := ""
       FOR nI := 1 TO Len( cPostData )
          cTmp := HGetKeyAt( cPostData, nI )
          cTmp := CStr( cTmp )
          cTmp := AllTrim( cTmp )
          cTmp := TipEncoderUrl_Encode( cTmp )
-         cData += cTmp +"="
+         cData += cTmp + "="
          cTmp := HGetValueAt( cPostData, nI )
          cTmp := CStr( cTmp )
          cTmp := TipEncoderUrl_Encode( cTmp )
          cData += cTmp + "&"
       NEXT
-      cData := left( cData, len( cData ) - 1 )
-   elseIF HB_IsArray( cPostData )
+      cData := Left( cData, Len( cData ) - 1 )
+   ELSEIF HB_ISARRAY( cPostData )
       cData := ""
-      y:=Len(cPostData)
+      y := Len( cPostData )
       FOR nI := 1 TO y
          cTmp := cPostData[ nI ,1]
          cTmp := CStr( cTmp )
          cTmp := AllTrim( cTmp )
          cTmp := TipEncoderUrl_Encode( cTmp )
-         cData += cTmp +"="
+         cData += cTmp + "="
          cTmp := cPostData[ nI,2]
          cTmp := CStr( cTmp )
          cTmp := TipEncoderUrl_Encode( cTmp )
          cData += cTmp
-         IF nI!=y
-            cData+="&"
+         IF nI != y
+            cData += "&"
          ENDIF
       NEXT
 
-   ELSEIF HB_IsString( cPostData )
+   ELSEIF HB_ISSTRING( cPostData )
       cData := cPostData
    ELSE
       Alert( "TipClientHTTP_PostRequest: Invalid parameters" )
       RETURN .F.
    ENDIF
 
-   IF .not. HB_IsString( cQuery )
+   IF .NOT. HB_ISSTRING( cQuery )
       cQuery := ::oUrl:BuildQuery()
    ENDIF
 
    ::InetSendall( ::SocketCon, "POST " + cQuery + " HTTP/1.1" + ::cCRLF )
    ::StandardFields()
 
-   IF .not. "Content-Type" IN ::hFields
+   IF .NOT. "Content-Type" IN ::hFields
       ::InetSendall( ::SocketCon, e"Content-Type: application/x-www-form-urlencoded\r\n" )
    ENDIF
 
    ::InetSendall( ::SocketCon, "Content-Length: " + ;
-         LTrim(Str( Len( cData ) ) ) + ::cCRLF )
+      LTrim( Str( Len( cData ) ) ) + ::cCRLF )
 
-   // End of header
+// End of header
    ::InetSendall( ::SocketCon, ::cCRLF )
 
    IF ::InetErrorCode( ::SocketCon  ) ==  0
@@ -209,54 +211,55 @@ METHOD Post( cPostData, cQuery ) CLASS tIPClientHTTP
 /*   else
       alert("Post InetErrorCode:"+winsockerrorcode(::InetErrorCode( ::SocketCon  )))*/
    ENDIF
-RETURN .F.
+
+   RETURN .F.
 
 METHOD StandardFields() CLASS tIPClientHTTP
+
    LOCAL iCount
-   LOCAL oEncoder,cCookies
+   LOCAL oEncoder, cCookies
 
    ::InetSendall( ::SocketCon, "Host: " + ::oUrl:cServer + ::cCRLF )
    ::InetSendall( ::SocketCon, "User-agent: " + ::cUserAgent + ::cCRLF )
-   ::InetSendall( ::SocketCon, "Connection: " + ::cConnetion+::cCRLF )
+   ::InetSendall( ::SocketCon, "Connection: " + ::cConnetion + ::cCRLF )
 
-   // Perform a basic authentication request
-   IF ::cAuthMode == "Basic" .and. .not. ("Authorization" in ::hFields)
+// Perform a basic authentication request
+   IF ::cAuthMode == "Basic" .AND. .NOT. ( "Authorization" in ::hFields )
       oEncoder := TIPEncoderBase64():New()
       oEncoder:bHttpExcept := .T.
-      ::InetSendall( ::SocketCon, "Authorization: Basic " +;
-          oEncoder:Encode(  ::oUrl:cUserID + ":" + ::oUrl:cPassword ) + ::cCRLF )
+      ::InetSendall( ::SocketCon, "Authorization: Basic " + ;
+         oEncoder:Encode(  ::oUrl:cUserID + ":" + ::oUrl:cPassword ) + ::cCRLF )
    ENDIF
 
 
-   // send cookies
-   cCookies:=::getCookies()
+// send cookies
+   cCookies := ::getCookies()
    IF ! Empty( cCookies )
-      ::InetSendall( ::SocketCon, "Cookie: " + cCookies+::cCRLF)
+      ::InetSendall( ::SocketCon, "Cookie: " + cCookies + ::cCRLF )
    ENDIF
 
-   //Send optional Fields
+//Send optional Fields
    FOR iCount := 1 TO Len( ::hFields )
-      ::InetSendall( ::SocketCon, HGetKeyAt( ::hFields, iCount ) +;
+      ::InetSendall( ::SocketCon, HGetKeyAt( ::hFields, iCount ) + ;
          ": " + HGetValueAt( ::hFields, iCount ) + ::cCRLF )
    NEXT
 
-RETURN .T.
+   RETURN .T.
 
+METHOD ReadHeaders( lClear ) CLASS tIPClientHTTP
 
-
-METHOD ReadHeaders(lClear) CLASS tIPClientHTTP
    LOCAL cLine, nPos, aVersion
    LOCAL aHead
 
-   // Now reads the fields and set the content lenght
+// Now reads the fields and set the content lenght
    cLine := ::InetRecvLine( ::SocketCon, @nPos, 500 )
    IF Empty( cLine )
       // In case of timeout or error on receiving
       RETURN .F.
    ENDIF
 
-   // Get Protocol version
-   aVersion := HB_Regex( "^HTTP/(.)\.(.) ([0-9][0-9][0-9]) +(.*)$", cLine )
+// Get Protocol version
+   aVersion := hb_regex( "^HTTP/(.)\.(.) ([0-9][0-9][0-9]) +(.*)$", cLine )
    ::cReply := cLine
 
    IF aVersion == NIL
@@ -265,41 +268,41 @@ METHOD ReadHeaders(lClear) CLASS tIPClientHTTP
       ::nReplyCode := 0
       ::cReplyDescr := ""
    ELSE
-      ::nVersion := Val(aVersion[2])
+      ::nVersion := Val( aVersion[2] )
       ::nSubversion := Val( aVersion[3] )
-      ::nReplyCode := val( aVersion[4] )
+      ::nReplyCode := Val( aVersion[4] )
       ::cReplyDescr := aVersion[5]
    ENDIF
 
-   ::nLength := -1
+   ::nLength := - 1
    ::bChunked := .F.
    cLine := ::InetRecvLine( ::SocketCon, @nPos, 500 )
-   IF !lClear=.f. .AND. !empty(::hHeaders)
-      ::hHeaders:={=>}
+   IF !lClear = .F. .AND. !Empty( ::hHeaders )
+      ::hHeaders := { => }
    ENDIF
-   DO WHILE ::InetErrorCode( ::SocketCon ) == 0 .and. .not. Empty( cLine )
-      aHead := HB_RegexSplit( ":", cLine,,, 1 )
-      IF aHead == NIL .or. Len( aHead ) != 2
+   DO WHILE ::InetErrorCode( ::SocketCon ) == 0 .AND. .NOT. Empty( cLine )
+      aHead := hb_regexSplit( ":", cLine, , , 1 )
+      IF aHead == NIL .OR. Len( aHead ) != 2
          cLine := ::InetRecvLine( ::SocketCon, @nPos, 500 )
          LOOP
       ENDIF
 
-      ::hHeaders[ aHead[1] ] := LTrim(aHead[2])
+      ::hHeaders[ aHead[1] ] := LTrim( aHead[2] )
       DO CASE
 
          // RFC 2068 forces to discard content length on chunked encoding
-         CASE lower( aHead[1] ) == "content-length" .and. .not. ::bChunked
-            cLine := Substr( cLine, 16 )
-            ::nLength := Val( cLine )
+      CASE Lower( aHead[1] ) == "content-length" .AND. .NOT. ::bChunked
+         cLine := SubStr( cLine, 16 )
+         ::nLength := Val( cLine )
 
          // as above
-         CASE lower( aHead[1] ) == "transfer-encoding"
-            IF At( "chunked", lower( cLine ) ) > 0
-               ::bChunked := .T.
-               ::nLength := -1
-            ENDIF
-         CASE lower( aHead[1] ) == "set-cookie"
-            ::setCookie(aHead[2])
+      CASE Lower( aHead[1] ) == "transfer-encoding"
+         IF At( "chunked", Lower( cLine ) ) > 0
+            ::bChunked := .T.
+            ::nLength := - 1
+         ENDIF
+      CASE Lower( aHead[1] ) == "set-cookie"
+         ::setCookie( aHead[2] )
 
       ENDCASE
       cLine := ::InetRecvLine( ::SocketCon, @nPos, 500 )
@@ -307,15 +310,16 @@ METHOD ReadHeaders(lClear) CLASS tIPClientHTTP
    IF ::InetErrorCode( ::SocketCon ) != 0
       RETURN .F.
    ENDIF
-RETURN .T.
 
+   RETURN .T.
 
-METHOD Read( nLen ) CLASS tIPClientHTTP
+METHOD READ( nLen ) CLASS tIPClientHTTP
+
    LOCAL cData, nPos, cLine, aHead
 
-   IF .not. ::bInitialized
+   IF .NOT. ::bInitialized
       ::bInitialized := .T.
-      IF .not. ::Get()
+      IF .NOT. ::Get()
          RETURN NIL
       ENDIF
    ENDIF
@@ -325,7 +329,7 @@ METHOD Read( nLen ) CLASS tIPClientHTTP
       nLenght is set to nRead plus the expected chunk size. After reading the
       chunk, the footer is discarded, and nLenght is reset to -1.
    */
-   IF ::nLength == -1 .and. ::bChunked
+   IF ::nLength == - 1 .AND. ::bChunked
       cLine := ::InetRecvLine( ::SocketCon, @nPos, 1024 )
 
       IF Empty( cLine )
@@ -337,11 +341,11 @@ METHOD Read( nLen ) CLASS tIPClientHTTP
 
          // read the footers.
          cLine := ::InetRecvLine( ::SocketCon, @nPos, 1024 )
-         DO WHILE .not. Empty( cLine )
+         DO WHILE .NOT. Empty( cLine )
             // add Headers to footers
-            aHead := HB_RegexSplit( ":", cLine,,, 1 )
+            aHead := hb_regexSplit( ":", cLine, , , 1 )
             IF aHead != NIL
-               ::hHeaders[ aHead[1] ] := LTrim(aHead[2])
+               ::hHeaders[ aHead[1] ] := LTrim( aHead[2] )
             ENDIF
 
             cLine := ::InetRecvLine( ::SocketCon, @nPos, 1024 )
@@ -355,9 +359,9 @@ METHOD Read( nLen ) CLASS tIPClientHTTP
       // A normal chunk here
 
       // Remove the extensions
-      nPos := at( ";", cLine )
+      nPos := At( ";", cLine )
       IF nPos > 0
-         cLine := Substr( cLine, 1, nPos - 1 )
+         cLine := SubStr( cLine, 1, nPos - 1 )
       ENDIF
 
       // Convert to length
@@ -366,148 +370,154 @@ METHOD Read( nLen ) CLASS tIPClientHTTP
 
    ENDIF
 
-   // nLen is normalized by super:read()
+// nLen is normalized by super:read()
    cData := ::super:Read( nLen )
 
-   // If bEof is set with chunked encoding, this means that the whole chunk has been read;
-   IF ::bEof .and. ::bChunked
+// If bEof is set with chunked encoding, this means that the whole chunk has been read;
+   IF ::bEof .AND. ::bChunked
       ::bEof := .F.
-      ::nLength := -1
-     //chunked data is followed by a blank line
+      ::nLength := - 1
+      //chunked data is followed by a blank line
       cLine := ::InetRecvLine( ::SocketCon, @nPos, 1024 )
 
    ENDIF
 
-RETURN cData
+   RETURN cData
 
 METHOD ReadAll() CLASS tIPClientHTTP
 
-   local cOut:='', cChunk
-   IF .not. ::bInitialized
+   LOCAL cOut := '', cChunk
+
+   IF .NOT. ::bInitialized
       ::bInitialized := .T.
-      IF .not. ::Get()
+      IF .NOT. ::Get()
          RETURN NIL
       ENDIF
    ENDIF
    IF ::bChunked
-      cChunk:=::read()
-      while cChunk!=nil
-         cOut+=cChunk
-      // ::nLength:=-1
-         cChunk:=::read()
+      cChunk := ::read()
+      WHILE cChunk != nil
+         cOut += cChunk
+         // ::nLength:=-1
+         cChunk := ::read()
       end
-   else
-      return(::read())
-   endif
-   return(cOut)
-
-METHOD setCookie(cLine) CLASS tIPClientHTTP
-   //docs from http://www.ietf.org/rfc/rfc2109.txt
-   local aParam
-   local cHost, cPath, cName, cValue, aElements, cElement
-   local cDefaultHost:=::oUrl:cServer, cDefaultPath:=::oUrl:cPath
-   local x,y
-   IF empty(cDefaultPath)
-      cDefaultPath:='/'
+   ELSE
+      RETURN( ::read() )
    ENDIF
-   //this function currently ignores expires, secure and other tags that may be in the cookie for now...
+
+   RETURN( cOut )
+
+METHOD setCookie( cLine ) CLASS tIPClientHTTP
+
+//docs from http://www.ietf.org/rfc/rfc2109.txt
+   LOCAL aParam
+   LOCAL cHost, cPath, cName, cValue, aElements, cElement
+   LOCAL cDefaultHost := ::oUrl:cServer, cDefaultPath := ::oUrl:cPath
+   LOCAL x, y
+   IF Empty( cDefaultPath )
+      cDefaultPath := '/'
+   ENDIF
+//this function currently ignores expires, secure and other tags that may be in the cookie for now...
 //   ?'Setting COOKIE:',cLine
-   aParam := HB_RegexSplit( ";", cLine )
-   cName:=cValue:=''
-   cHost:=cDefaultHost
-   cPath:=cDefaultPath
-   y:=len(aParam)
-   FOR x:=1 to y
-      aElements := HB_RegexSplit( "=", aParam[x], 1)
-      IF len(aElements)==2
-         IF x=1
-            cName:=alltrim(aElements[1])
-            cValue:=alltrim(aElements[2])
-         else
-            cElement:=upper(alltrim(aElements[1]))
-            do case
-            //case cElement=='EXPIRES'
-            case cElement=='PATH'
-               cPath:=alltrim(aElements[2])
-            case cElement=='DOMAIN'
-               cHost:=alltrim(aElements[2])
-            endcase
-         ENDIF
-      ENDIF
-   next
-   IF !empty(cName)
-      //cookies are stored in hashes as host.path.name
-      //check if we have a host hash yet
-      if !HHASKEY(::hCookies,cHost)
-         ::hCookies[cHost]:={=>}
-      endif
-      if !HHASKEY(::hCookies[cHost],cPath)
-         ::hCookies[cHost][cPath]:={=>}
-      endif
-      ::hCookies[cHost][cPath][cName]:=cValue
-   ENDIF
-return NIL
-
-METHOD getcookies(cHost,cPath) CLASS tIPClientHTTP
-   local x,y,aDomKeys:={},aKeys,z,cKey,aPathKeys,nPath
-   local a, b, cOut := '', c, d
-
-   IF cHost=nil
-      cHost:=::oUrl:cServer
-   ENDIF
-   IF cPath=nil
-      cPath:=::oUrl:cPath
-      IF empty(cPath)
-         cPath:='/'
-      ENDIF
-   ENDIF
-   IF empty(cHost)
-      return(cOut)
-   ENDIF
-
-   //tail matching the domain
-   aKeys:=hgetkeys(::hCookies)
-   y:=len(aKeys)
-   z:=len(cHost)
-   cHost:=upper(cHost)
+   aParam := hb_regexSplit( ";", cLine )
+   cName := cValue := ''
+   cHost := cDefaultHost
+   cPath := cDefaultPath
+   y := Len( aParam )
    FOR x := 1 TO y
-      cKey:=upper(aKeys[x])
-      IF upper(right(cKey,z))==cHost.and.(len(cKey)=z .OR. substr(aKeys[x],0-z,1)=='.')
-         aadd(aDomKeys,aKeys[x])
+      aElements := hb_regexSplit( "=", aParam[x], 1 )
+      IF Len( aElements ) == 2
+         IF x = 1
+            cName := AllTrim( aElements[1] )
+            cValue := AllTrim( aElements[2] )
+         ELSE
+            cElement := Upper( AllTrim( aElements[1] ) )
+            DO CASE
+               //case cElement=='EXPIRES'
+            CASE cElement == 'PATH'
+               cPath := AllTrim( aElements[2] )
+            CASE cElement == 'DOMAIN'
+               cHost := AllTrim( aElements[2] )
+            ENDCASE
+         ENDIF
       ENDIF
    NEXT
-   //more specific paths should be sent before lesser generic paths.
-   asort(aDomKeys,,, {|cX,cY| len(cX) > len(cY)} )
-   y:=len(aDomKeys)
-   //now that we have the domain matches we have to do path matchine
-   nPath:=len(cPath)
+   IF !Empty( cName )
+      //cookies are stored in hashes as host.path.name
+      //check if we have a host hash yet
+      IF !HHASKEY( ::hCookies, cHost )
+         ::hCookies[cHost] := { => }
+      ENDIF
+      IF !HHASKEY( ::hCookies[cHost], cPath )
+         ::hCookies[cHost][cPath] := { => }
+      ENDIF
+      ::hCookies[cHost][cPath][cName] := cValue
+   ENDIF
+
+   RETURN NIL
+
+METHOD getcookies( cHost, cPath ) CLASS tIPClientHTTP
+
+   LOCAL x, y, aDomKeys := {}, aKeys, z, cKey, aPathKeys, nPath
+   LOCAL a, b, cOut := '', c, d
+
+   IF cHost = nil
+      cHost := ::oUrl:cServer
+   ENDIF
+   IF cPath = nil
+      cPath := ::oUrl:cPath
+      IF Empty( cPath )
+         cPath := '/'
+      ENDIF
+   ENDIF
+   IF Empty( cHost )
+      RETURN( cOut )
+   ENDIF
+
+//tail matching the domain
+   aKeys := hgetkeys( ::hCookies )
+   y := Len( aKeys )
+   z := Len( cHost )
+   cHost := Upper( cHost )
    FOR x := 1 TO y
-      aKeys:=hgetkeys(::hCookies[aDomKeys[x]])
-      aPathKeys:={}
-      b:=len(aKeys)
-      FOR  a:= 1 TO b
-         cKey:=aKeys[a]
-         z:=len(cKey)
-         IF cKey=='/'.or.(z<=nPath.and.substr(cKey,1,nPath)==cKey)
-            aadd(aPathKeys,aKeys[a])
+      cKey := Upper( aKeys[x] )
+      IF Upper( Right( cKey,z ) ) == cHost .AND. ( Len( cKey ) = z .OR. SubStr( aKeys[x],0 - z,1 ) == '.' )
+         AAdd( aDomKeys, aKeys[x] )
+      ENDIF
+   NEXT
+//more specific paths should be sent before lesser generic paths.
+   ASort( aDomKeys, , , {|cX, cY| Len( cX ) > Len( cY ) } )
+   y := Len( aDomKeys )
+//now that we have the domain matches we have to do path matchine
+   nPath := Len( cPath )
+   FOR x := 1 TO y
+      aKeys := hgetkeys( ::hCookies[aDomKeys[x]] )
+      aPathKeys := {}
+      b := Len( aKeys )
+      FOR  a := 1 TO b
+         cKey := aKeys[a]
+         z := Len( cKey )
+         IF cKey == '/' .OR. ( z <= nPath .AND. SubStr( cKey,1,nPath ) == cKey )
+            AAdd( aPathKeys, aKeys[a] )
          ENDIF
       NEXT
-      asort(aPathKeys,,, {|cX,cY| len(cX) > len(cY)} )
-      b:=len(aPathKeys)
+      ASort( aPathKeys, , , {|cX, cY| Len( cX ) > Len( cY ) } )
+      b := Len( aPathKeys )
       FOR a := 1 TO b
-         aKeys:=hgetkeys(::hCookies[aDomKeys[x]][aPathKeys[a]])
-         d:=len(aKeys)
+         aKeys := hgetkeys( ::hCookies[aDomKeys[x]][aPathKeys[a]] )
+         d := Len( aKeys )
          FOR c := 1 TO d
-            IF !empty(cOut)
-               cOut+='; '
+            IF !Empty( cOut )
+               cOut += '; '
             ENDIF
-            cOut+=aKeys[c]+'='+::hCookies[aDomKeys[x]][aPathKeys[a]][aKeys[c]]
+            cOut += aKeys[c] + '=' + ::hCookies[aDomKeys[x]][aPathKeys[a]][aKeys[c]]
          NEXT
       NEXT
    NEXT
-return(cOut)
 
-METHOD Boundary(nType) CLASS tIPClientHTTP
+   RETURN( cOut )
+
+METHOD Boundary( nType ) CLASS tIPClientHTTP
    /*
    nType: 0=as found as the separator in the stdin stream
          1=as found as the last one in the stdin stream
@@ -518,114 +528,119 @@ METHOD Boundary(nType) CLASS tIPClientHTTP
 ---------------------------41184676334 //in the header or CGI envirnment
    */
 
-   local cBound:=::cBoundary
+   LOCAL cBound := ::cBoundary
    LOCAL i
-   IF nType=nil
-      nType=0
-   ENDIF
-   IF empty(cBound)
-      cBound:=replicate('-',27)+space(11)
-      FOR i := 28 TO 38
-         cBound[i] := str(int(HB_Random(0, 9 )),1,0)
-      NEXT
-      ::cBoundary:=cBound
-   endif
-   cBound:=if(nType<2,'--','')+cBound+if(nType=1,'--','')
-   RETURN(cBound)
 
-METHOD Attach(cName,cFileName,cType) CLASS tIPClientHTTP
-   aadd(::aAttachments,{cName,cFileName,cType})
-return(nil)
+   IF nType = nil
+      nType = 0
+   ENDIF
+   IF Empty( cBound )
+      cBound := Replicate( '-', 27 ) + Space( 11 )
+      FOR i := 28 TO 38
+         cBound[i] := Str( Int( hb_Random(0, 9 ) ), 1, 0 )
+      NEXT
+      ::cBoundary := cBound
+   ENDIF
+   cBound := if( nType < 2, '--', '' ) + cBound + if( nType = 1, '--', '' )
+
+   RETURN( cBound )
+
+METHOD Attach( cName, cFileName, cType ) CLASS tIPClientHTTP
+
+   AAdd( ::aAttachments, { cName, cFileName, cType } )
+
+   RETURN( nil )
 
 METHOD PostMultiPart( cPostData, cQuery ) CLASS tIPClientHTTP
-   LOCAL cData:="", nI, cTmp,y,cBound:=::boundary()
-   local cCrlf:=::cCRlf,oSub
-   local nPos
-   local cFilePath,cName,cFile,cType
-   local nFile,cBuf,nBuf,nRead
 
-   IF empty(cPostData)
-   elseif HB_IsHash( cPostData )
+   LOCAL cData := "", nI, cTmp, y, cBound := ::boundary()
+   LOCAL cCrlf := ::cCRlf, oSub
+   LOCAL nPos
+   LOCAL cFilePath, cName, cFile, cType
+   LOCAL nFile, cBuf, nBuf, nRead
+
+   IF Empty( cPostData )
+   ELSEIF HB_ISHASH( cPostData )
       FOR nI := 1 TO Len( cPostData )
          cTmp := HGetKeyAt( cPostData, nI )
          cTmp := CStr( cTmp )
          cTmp := AllTrim( cTmp )
          cTmp := TipEncoderUrl_Encode( cTmp )
-         cData += cBound+cCrlf+'Content-Disposition: form-data; name="'+cTmp +'"'+cCrlf+cCrLf
+         cData += cBound + cCrlf + 'Content-Disposition: form-data; name="' + cTmp + '"' + cCrlf + cCrLf
          cTmp := HGetValueAt( cPostData, nI )
          cTmp := CStr( cTmp )
          cTmp := AllTrim( cTmp )
          cTmp := TipEncoderUrl_Encode( cTmp )
-         cData += cTmp+cCrLf
+         cData += cTmp + cCrLf
       NEXT
-   elseIF HB_IsArray( cPostData )
-      y:=Len(cPostData)
+   ELSEIF HB_ISARRAY( cPostData )
+      y := Len( cPostData )
       FOR nI := 1 TO y
          cTmp := cPostData[ nI ,1]
          cTmp := CStr( cTmp )
          cTmp := AllTrim( cTmp )
          cTmp := TipEncoderUrl_Encode( cTmp )
-         cData += cBound+cCrlf+'Content-Disposition: form-data; name="'+cTmp +'"'+cCrlf+cCrLf
+         cData += cBound + cCrlf + 'Content-Disposition: form-data; name="' + cTmp + '"' + cCrlf + cCrLf
          cTmp := cPostData[ nI,2]
          cTmp := CStr( cTmp )
          cTmp := AllTrim( cTmp )
          cTmp := TipEncoderUrl_Encode( cTmp )
-         cData += cTmp+cCrLf
+         cData += cTmp + cCrLf
       NEXT
 
-   ELSEIF HB_IsString( cPostData )
+   ELSEIF HB_ISSTRING( cPostData )
       cData := cPostData
    ENDIF
-   FOR each oSub in ::aAttachments
-      cName:=oSub[1]
-      cFile:=oSub[2]
-      cType:=oSub[3]
-      cTmp:=strtran(cFile,'/','\')
-      if ( nPos := rat( "\", cTmp ) ) != 0
-          cFilePath := substr( cTmp, 1, nPos )
-      elseif ( nPos := rat( ":", cTmp ) ) != 0
-          cFilePath := substr( cTmp, 1, nPos )
-      else
-          cFilePath := ""
-      endif
-      cTmp:=substr(cFile,Len(cFilePath)+1)
-      IF empty(cType)
-         cType:='text/html'
+   FOR EACH oSub in ::aAttachments
+      cName := oSub[1]
+      cFile := oSub[2]
+      cType := oSub[3]
+      cTmp := StrTran( cFile, '/', '\' )
+      IF ( nPos := RAt( "\", cTmp ) ) != 0
+         cFilePath := SubStr( cTmp, 1, nPos )
+      ELSEIF ( nPos := RAt( ":", cTmp ) ) != 0
+         cFilePath := SubStr( cTmp, 1, nPos )
+      ELSE
+         cFilePath := ""
       ENDIF
-      cData += cBound+cCrlf+'Content-Disposition: form-data; name="'+cName +'"; filename="'+cTmp+'"'+cCrlf+'Content-Type: '+cType+cCrLf+cCrLf
+      cTmp := SubStr( cFile, Len( cFilePath ) + 1 )
+      IF Empty( cType )
+         cType := 'text/html'
+      ENDIF
+      cData += cBound + cCrlf + 'Content-Disposition: form-data; name="' + cName + '"; filename="' + cTmp + '"' + cCrlf + 'Content-Type: ' + cType + cCrLf + cCrLf
       //hope this is not a big file....
-      nFile:=fopen(cFile)
-      nbuf:=8192
-      nRead:=nBuf
-      cBuf:=space(nBuf)
-      while nRead=nBuf
+      nFile := FOpen( cFile )
+      nbuf := 8192
+      nRead := nBuf
+      cBuf := Space( nBuf )
+      WHILE nRead = nBuf
          //nRead=FRead( nFile,@cBuf,nBuf)
-         cBuf:=FReadstr( nFile,nBuf)
-         nRead:=len(cBuf)
+         cBuf := FReadStr( nFile, nBuf )
+         nRead := Len( cBuf )
 /*         IF nRead<nBuf
             cBuf:=pad(cBuf,nRead)
          ENDIF
 */
-         cData+=cBuf
+         cData += cBuf
       end
-      fClose(nFile)
-      cData+=cCrlf
+      FClose( nFile )
+      cData += cCrlf
    NEXT
-   cData+=cBound+'--'+cCrlf
-   IF .not. HB_IsString( cQuery )
+   cData += cBound + '--' + cCrlf
+   IF .NOT. HB_ISSTRING( cQuery )
       cQuery := ::oUrl:BuildQuery()
    ENDIF
 
    ::InetSendall( ::SocketCon, "POST " + cQuery + " HTTP/1.1" + ::cCRLF )
    ::StandardFields()
 
-   IF .not. "Content-Type" IN ::hFields
-      ::InetSendall( ::SocketCon, e"Content-Type: multipart/form-data; boundary="+::boundary(2)+::cCrlf )
+   IF .NOT. "Content-Type" IN ::hFields
+      ::InetSendall( ::SocketCon, e"Content-Type: multipart/form-data; boundary=" + ::boundary( 2 ) + ::cCrlf )
    ENDIF
 
    ::InetSendall( ::SocketCon, "Content-Length: " + ;
-         LTrim(Str( Len( cData ) ) ) + ::cCRLF )
-   // End of header
+      LTrim( Str( Len( cData ) ) ) + ::cCRLF )
+// End of header
    ::InetSendall( ::SocketCon, ::cCRLF )
 
    IF ::InetErrorCode( ::SocketCon  ) ==  0
@@ -635,27 +650,28 @@ METHOD PostMultiPart( cPostData, cQuery ) CLASS tIPClientHTTP
 /*   else
       alert("Post InetErrorCode:"+winsockerrorcode(::InetErrorCode( ::SocketCon  )))*/
    ENDIF
-RETURN .F.
+
+   RETURN .F.
 
 METHOD WriteAll( cFile ) CLASS tIPClientHTTP
 
-   local nFile
-   local lSuccess
-   local nLen
-   local cStream
+   LOCAL nFile
+   LOCAL lSuccess
+   LOCAL nLen
+   LOCAL cStream
 
    cStream := ::ReadAll()
 
-   nLen := len( cStream )
+   nLen := Len( cStream )
 
-   nFile := fcreate( cFile )
+   nFile := FCreate( cFile )
 
-   if nFile != 0
-      lSuccess := ( fwrite( nFile, cStream, nLen ) == nLen )
-      fclose( nFile )
-   else
-      lSuccess := .f.
-   endif
+   IF nFile != 0
+      lSuccess := ( FWrite( nFile, cStream, nLen ) == nLen )
+      FClose( nFile )
+   ELSE
+      lSuccess := .F.
+   ENDIF
 
    RETURN lSuccess
 

@@ -60,14 +60,18 @@
 #pragma ENDDUMP
 
 CLASS TIPEncoderUrl FROM TIPEncoder
+
    METHOD New()   Constructor
    METHOD Encode()
    METHOD Decode()
+
 ENDCLASS
 
 METHOD New() CLASS TIPEncoderURL
+
    ::cName := "urlencoded"
-RETURN Self
+
+   RETURN Self
 
 
 #pragma BEGINDUMP
@@ -140,6 +144,7 @@ HB_FUNC( TIPENCODERURL_ENCODE )
    /* this function also adds a zero */
    hb_retclenAdoptRaw( cRet, nPosRet );
 }
+
 #pragma ENDDUMP
 
 
@@ -210,5 +215,6 @@ HB_FUNC( TIPENCODERURL_DECODE )
    cRet = (char *) hb_xrealloc( cRet, nPosRet + 1 );
    hb_retclenAdopt( cRet, nPosRet );
 }
+
 #pragma ENDDUMP
 

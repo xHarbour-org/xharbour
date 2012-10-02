@@ -81,12 +81,13 @@
 #include "tip.ch"
 #include "common.ch"
 
-#DEFINE RCV_BUF_SIZE Int( ::InetRcvBufSize( ::SocketCon ) / 2 )
-#DEFINE SND_BUF_SIZE Int( ::InetSndBufSize( ::SocketCon ) / 2 )
+#define RCV_BUF_SIZE Int( ::InetRcvBufSize( ::SocketCon ) / 2 )
+#define SND_BUF_SIZE Int( ::InetSndBufSize( ::SocketCon ) / 2 )
 
 /**
 * Inet Client class
 */
+
 CLASS tIPClient
 
    CLASSDATA   bInitSocks  INIT .F.
@@ -95,8 +96,8 @@ CLASS tIPClient
    DATA oCredentials                         // credential needed to access the service
    DATA nStatus                              // basic status
    DATA SocketCon
-   Data lTrace
-   Data nHandle   INIT -1
+   DATA lTrace
+   DATA nHandle   INIT - 1
 
    DATA nDefaultRcvBuffSize
    DATA nDefaultSndBuffSize
@@ -125,29 +126,30 @@ CLASS tIPClient
 
    DATA Cargo
 
-   // Data For proxy connection
+// Data For proxy connection
    DATA cProxyHost
    DATA nProxyPort
    DATA cProxyUser
    DATA cProxyPassword
-   Method SetProxy()
-   METHOD Openproxy( cServer, nPort, cProxy, nProxyPort, cResp, cUserName, cPassWord, nTimeOut, cUserAgent)
-   Method ReadHTTPProxyResponse()
+   METHOD SetProxy()
+   METHOD Openproxy( cServer, nPort, cProxy, nProxyPort, cResp, cUserName, cPassWord, nTimeOut, cUserAgent )
+   METHOD ReadHTTPProxyResponse()
 
    METHOD New( oUrl, lTrace, oCredentials )
    METHOD Open()
 
-   METHOD Read( iLen )
+   METHOD READ( iLen )
    METHOD ReadToFile( cFile, nMode, nSize )
    METHOD Write( cData, iLen, bCommit )
-   METHOD Commit()
+   METHOD COMMIT()
    METHOD WriteFromFile( cFile )
    METHOD Reset()
-   METHOD Close()
-/*   METHOD Data( cData ) */                   // commented: calls undeclared METHOD :getOk
+   METHOD CLOSE()
+   /*   METHOD Data( cData ) */
+// commented: calls undeclared METHOD :getOk
 
    METHOD lastErrorCode() INLINE ::nLastError
-   METHOD lastErrorMessage(SocketCon) INLINE ::INetErrorDesc(SocketCon)
+   METHOD lastErrorMessage( SocketCon ) INLINE ::INetErrorDesc( SocketCon )
 
    METHOD InetRcvBufSize( SocketCon, nSizeBuff )
    METHOD InetSndBufSize( SocketCon, nSizeBuff )
@@ -156,33 +158,33 @@ CLASS tIPClient
    DATA nLastError INIT 0
 
    /* Methods to log data if needed */
-   METHOD InetRecv( SocketCon, cStr1, len)
+   METHOD InetRecv( SocketCon, cStr1, len )
    METHOD InetRecvLine( SocketCon, nLen, size )
    METHOD InetRecvAll( SocketCon, cStr1, len )
    METHOD InetCount( SocketCon )
    METHOD InetSendAll( SocketCon, cData, nLen )
-   METHOD InetErrorCode(SocketCon)
-   METHOD InetErrorDesc(SocketCon)
+   METHOD InetErrorCode( SocketCon )
+   METHOD InetErrorDesc( SocketCon )
    METHOD InetConnect( cServer, nPort, SocketCon )
 
    METHOD Log()
 
 ENDCLASS
 
-
 METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClient
+
    LOCAL oErr
 
-   Default lTrace to .F.
+   DEFAULT lTrace TO .F.
 
    ::lTrace       := lTrace
 
-   IF .not. ::bInitSocks
+   IF .NOT. ::bInitSocks
       InetInit()
       ::bInitSocks := .T.
    ENDIF
 
-   IF HB_IsString( oUrl )
+   IF HB_ISSTRING( oUrl )
       oUrl := tUrl():New( oUrl )
    ENDIF
 
@@ -194,7 +196,7 @@ METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClient
       oErr:CanSubstitute := .T.
       oErr:Description   := "unsupported protocol"
       oErr:GenCode       := EG_UNSUPPORTED
-      oErr:Operation     := ::className()+":new()"
+      oErr:Operation     := ::className() + ":new()"
       oErr:Severity      := ES_ERROR
       oErr:SubCode       := 1081
       oErr:SubSystem     := "BASE"
@@ -207,94 +209,89 @@ METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClient
    ::bInitialized := .F.
    ::nWrite       := 0
    ::nLastWrite   := 0
-   ::nLength      := -1
+   ::nLength      := - 1
    ::nRead        := 0
    ::nLastRead    := 0
    ::bEof         := .F.
 
-RETURN self
-
-
+   RETURN self
 
 METHOD Open( cUrl ) CLASS tIPClient
 
    LOCAL nPort
-   Local cResp:=""
+   LOCAL cResp := ""
 
-   IF HB_IsString( cUrl )
+   IF HB_ISSTRING( cUrl )
       ::oUrl := tUrl():New( cUrl )
    ENDIF
 
-   IF ::oUrl:nPort == -1
+   IF ::oUrl:nPort == - 1
       nPort := ::nDefaultPort
    ELSE
       nPort := ::oUrl:nPort
    ENDIF
    ::SocketCon := InetCreate()
    InetSetTimeout( ::SocketCon, ::nConnTimeout )
-   if !empty( ::cProxyHost )
-      if !::openProxy( ::oUrl:cServer,nport,::cProxyHost,::nProxyPort,@cResp,::cProxyUser ,::cProxyPassword,::nConnTimeout,'')
-         return .F.
-      endif
-   else
+   IF !Empty( ::cProxyHost )
+      IF !::openProxy( ::oUrl:cServer, nport, ::cProxyHost, ::nProxyPort, @cResp, ::cProxyUser , ::cProxyPassword, ::nConnTimeout, '' )
+         RETURN .F.
+      ENDIF
+   ELSE
       ::InetConnect( ::oUrl:cServer, nPort, ::SocketCon )
 
       IF ::InetErrorCode( ::SocketCon ) != 0
          RETURN .F.
       ENDIF
-   endif
+   ENDIF
    ::isOpen := .T.
-RETURN .T.
 
+   RETURN .T.
 
+METHOD CLOSE() CLASS tIPClient
 
-METHOD Close() CLASS tIPClient
+   LOCAL nRet := - 1
 
-   local nRet:=-1
-
-   IF .not. Empty( ::SocketCon )
+   IF .NOT. Empty( ::SocketCon )
 
       nRet := InetClose( ::SocketCon )
 
-      ::SocketCon:=nil
+      ::SocketCon := nil
       ::isOpen := .F.
    ENDIF
 
-RETURN(nRet)
-
-
+   RETURN( nRet )
 
 METHOD Reset() CLASS tIPClient
+
    ::bInitialized := .F.
    ::bEof := .F.
-RETURN .T.
 
+   RETURN .T.
 
+METHOD COMMIT() CLASS tIPClient
 
-METHOD Commit() CLASS tIPClient
-RETURN .T.
+   RETURN .T.
 
+METHOD READ( nLen ) CLASS tIPClient
 
-
-METHOD Read( nLen ) CLASS tIPClient
    LOCAL cStr0, cStr1
 
-   IF ::nLength > 0 .and. ::nLength == ::nRead
+   IF ::nLength > 0 .AND. ::nLength == ::nRead
       RETURN NIL
    ENDIF
 
-   IF Empty( nLen ) .or. nLen < 0 .or.( ::nLength > 0 .and. nLen > ::nLength - ::nRead )
+   IF Empty( nLen ) .OR. nLen < 0 .OR. ( ::nLength > 0 .AND. nLen > ::nLength - ::nRead )
       nLen := ::nLength - ::nRead
    ENDIF
 
-   IF Empty( nLen ) .or. nLen < 0
+   IF Empty( nLen ) .OR. nLen < 0
       // read till end of stream
       cStr1 := Space( RCV_BUF_SIZE )
       cStr0 := ""
       ::nLastRead := ::InetRecv( ::SocketCon, @cStr1, RCV_BUF_SIZE )
       DO WHILE ::nLastRead > 0
          ::nRead += ::nLastRead
-         cStr0 += Substr( cStr1, 1, ::nLastRead )
+         cStr0 += SubStr( cStr1, 1, ::nLastRead )
          ::nLastRead := ::InetRecv( ::SocketCon, @cStr1, RCV_BUF_SIZE )
       ENDDO
       ::bEof := .T.
@@ -311,7 +308,7 @@ METHOD Read( nLen ) CLASS tIPClient
 
       IF ::nLastRead != nLen
          ::bEof := .T.
-         cStr0 := Substr( cStr0, 1, ::nLastRead )
+         cStr0 := SubStr( cStr0, 1, ::nLastRead )
          // S.R.         RETURN NIL
       ENDIF
 
@@ -320,11 +317,11 @@ METHOD Read( nLen ) CLASS tIPClient
       ENDIF
 
    ENDIF
-RETURN cStr0
 
-
+   RETURN cStr0
 
 METHOD ReadToFile( cFile, nMode, nSize ) CLASS tIPClient
+
    LOCAL nFout
    LOCAL cData
    LOCAL nSent
@@ -336,17 +333,17 @@ METHOD ReadToFile( cFile, nMode, nSize ) CLASS tIPClient
    nSent := 0
 
    IF !Empty( ::exGauge )
-      HB_ExecFromArray( ::exGauge, { nSent, nSize, Self } )
+      hb_ExecFromArray( ::exGauge, { nSent, nSize, Self } )
    ENDIF
 
    ::nRead   := 0
    ::nStatus := 1
 
-   DO WHILE ::InetErrorCode( ::SocketCon ) == 0 .and. .not. ::bEof
+   DO WHILE ::InetErrorCode( ::SocketCon ) == 0 .AND. .NOT. ::bEof
       cData := ::Read( RCV_BUF_SIZE )
       IF cData == NIL
          IF nFout != NIL
-            Fclose( nFout )
+            FClose( nFout )
          ENDIF
          IF ::InetErrorCode( ::SocketCon ) > 0
             RETURN .F.
@@ -355,36 +352,36 @@ METHOD ReadToFile( cFile, nMode, nSize ) CLASS tIPClient
          ENDIF
       ENDIF
       IF nFout == NIL
-         nFout := Fcreate( cFile, nMode )
+         nFout := FCreate( cFile, nMode )
          IF nFout < 0
             ::nStatus := 0
             RETURN .F.
          ENDIF
       ENDIF
 
-      IF Fwrite( nFout, cData ) < 0
-         Fclose( nFout )
+      IF FWrite( nFout, cData ) < 0
+         FClose( nFout )
          RETURN .F.
       ENDIF
 
       nSent += Len( cData )
       IF !Empty( ::exGauge )
-         HB_ExecFromArray( ::exGauge, { nSent, nSize, Self } )
+         hb_ExecFromArray( ::exGauge, { nSent, nSize, Self } )
       ENDIF
 
    ENDDO
 
    IF nSent > 0
       ::Commit()
-   Endif
+   ENDIF
 
    ::nStatus := 2
-   Fclose( nFout )
-RETURN .T.
+   FClose( nFout )
 
-
+   RETURN .T.
 
 METHOD WriteFromFile( cFile ) CLASS tIPClient
+
    LOCAL nFin
    LOCAL cData
    LOCAL nLen
@@ -392,7 +389,7 @@ METHOD WriteFromFile( cFile ) CLASS tIPClient
 
    ::nWrite  := 0
    ::nStatus := 0
-   nFin := Fopen( cFile, FO_READ )
+   nFin := FOpen( cFile, FO_READ )
    IF nFin < 0
       RETURN .F.
    ENDIF
@@ -401,35 +398,36 @@ METHOD WriteFromFile( cFile ) CLASS tIPClient
 
    nBufSize := SND_BUF_SIZE
 
-   // allow initialization of the gauge
+// allow initialization of the gauge
    nSent := 0
    IF ! Empty( ::exGauge )
-      HB_ExecFromArray( ::exGauge, {nSent, nSize, Self} )
+      hb_ExecFromArray( ::exGauge, { nSent, nSize, Self } )
    ENDIF
 
    ::nStatus := 1
    cData := Space( nBufSize )
-   nLen := Fread( nFin, @cData, nBufSize )
+   nLen := FRead( nFin, @cData, nBufSize )
    DO WHILE nLen > 0
       IF ::Write( @cData, nLen ) != nLen
-         Fclose( nFin )
+         FClose( nFin )
          RETURN .F.
       ENDIF
       nSent += nLen
       IF ! Empty( ::exGauge )
-         HB_ExecFromArray( ::exGauge, {nSent, nSize, Self} )
+         hb_ExecFromArray( ::exGauge, { nSent, nSize, Self } )
       ENDIF
-      nLen := Fread( nFin, @cData, nBufSize )
+      nLen := FRead( nFin, @cData, nBufSize )
    ENDDO
 
-   // it may happen that the file has lenght 0
+// it may happen that the file has lenght 0
    IF nSent > 0
       ::Commit()
    ENDIF
 
    ::nStatus := 2
-   Fclose( nFin )
-RETURN .T.
+   FClose( nFin )
+
+   RETURN .T.
 
 
 /*
@@ -444,7 +442,6 @@ METHOD Data( cData ) CLASS tIPClient
 RETURN ::GetOk()
 */
 
-
 METHOD Write( cData, nLen, bCommit ) CLASS tIPClient
 
    IF Empty( nLen )
@@ -453,7 +450,7 @@ METHOD Write( cData, nLen, bCommit ) CLASS tIPClient
 
    ::nLastWrite := ::InetSendall( ::SocketCon,  cData , nLen )
 
-   IF .not. Empty( bCommit )
+   IF .NOT. Empty( bCommit )
 
       ::Commit()
 
@@ -461,13 +458,11 @@ METHOD Write( cData, nLen, bCommit ) CLASS tIPClient
 
    ::nWrite += ::nLastWrite
 
-RETURN ::nLastWrite
-
-
+   RETURN ::nLastWrite
 
 METHOD InetSendAll( SocketCon, cData, nLen ) CLASS tIPClient
 
-   Local nRet
+   LOCAL nRet
 
    IF Empty( nLen )
       nLen := Len( cData )
@@ -477,29 +472,25 @@ METHOD InetSendAll( SocketCon, cData, nLen ) CLASS tIPClient
 
    if ::lTrace
       ::Log( SocketCon, nlen, cData, nRet )
-   endif
+   ENDIF
 
-Return nRet
-
-
+   RETURN nRet
 
 METHOD InetCount( SocketCon ) CLASS tIPClient
 
-   Local nRet
+   LOCAL nRet
 
    nRet := InetCount( SocketCon )
 
    if ::lTrace
       ::Log( SocketCon, nRet )
-   endif
+   ENDIF
 
-Return nRet
-
-
+   RETURN nRet
 
 METHOD InetRecv( SocketCon, cStr1, len ) CLASS tIPClient
 
-   Local nRet
+   LOCAL nRet
 
    nRet := InetRecv( SocketCon, @cStr1, len )
 
@@ -507,15 +498,13 @@ METHOD InetRecv( SocketCon, cStr1, len ) CLASS tIPClient
 
       ::Log( SocketCon, "", len, iif( nRet >= 0, cStr1, nRet ) )
 
-   endif
+   ENDIF
 
-Return nRet
-
-
+   RETURN nRet
 
 METHOD InetRecvLine( SocketCon, nLen, size ) CLASS tIPClient
 
-   Local cRet
+   LOCAL cRet
 
    cRet := InetRecvLine( SocketCon, @nLen, size )
 
@@ -523,15 +512,13 @@ METHOD InetRecvLine( SocketCon, nLen, size ) CLASS tIPClient
 
       ::Log( SocketCon, "", size, cRet )
 
-   endif
+   ENDIF
 
-Return cRet
-
-
+   RETURN cRet
 
 METHOD InetRecvAll( SocketCon, cStr1, len ) CLASS tIPClient
 
-   Local nRet
+   LOCAL nRet
 
    nRet := InetRecvAll( SocketCon, @cStr1, len )
 
@@ -539,15 +526,13 @@ METHOD InetRecvAll( SocketCon, cStr1, len ) CLASS tIPClient
 
       ::Log( SocketCon, "", len, iif( nRet >= 0, cStr1, nRet ) )
 
-   endif
+   ENDIF
 
-Return nRet
-
-
+   RETURN nRet
 
 METHOD InetErrorCode( SocketCon ) CLASS tIPClient
 
-   Local nRet
+   LOCAL nRet
 
    ::nLastError := nRet := InetErrorCode( SocketCon )
 
@@ -555,25 +540,26 @@ METHOD InetErrorCode( SocketCon ) CLASS tIPClient
 
       ::Log( SocketCon, nRet )
 
-   endif
+   ENDIF
 
-Return nRet
-
+   RETURN nRet
 
 METHOD InetErrorDesc( SocketCon ) CLASS tIPClient
+
    LOCAL cMsg := ""
 
    DEFAULT SocketCon TO ::SocketCon
 
-   IF .not. Empty( SocketCon )
+   IF .NOT. Empty( SocketCon )
 
       cMsg := InetErrorDesc( SocketCon )
 
    ENDIF
-RETURN cMsg
 
+   RETURN cMsg
 
-/* BROKEN, should test number of parameters and act accordingly, see doc\inet.txt */
+   /* BROKEN, should test number of parameters and act accordingly, see doc\inet.txt */
+
 METHOD InetConnect( cServer, nPort, SocketCon ) CLASS tIPClient
 
    InetConnect( cServer, nPort, SocketCon )
@@ -590,139 +576,147 @@ METHOD InetConnect( cServer, nPort, SocketCon ) CLASS tIPClient
 
       ::Log( cServer, nPort, SocketCon )
 
-   endif
+   ENDIF
 
-Return Nil
+   RETURN Nil
 
-/* Methods to manage buffers */
+   /* Methods to manage buffers */
+
 METHOD InetRcvBufSize( SocketCon, nSizeBuff ) CLASS tIPClient
+
    IF ! Empty( nSizeBuff )
       InetSetRcvBufSize( SocketCon, nSizeBuff )
    ENDIF
-RETURN InetGetRcvBufSize( SocketCon )
+
+   RETURN InetGetRcvBufSize( SocketCon )
 
 METHOD InetSndBufSize( SocketCon, nSizeBuff ) CLASS tIPClient
+
    IF ! Empty( nSizeBuff )
       InetSetSndBufSize( SocketCon, nSizeBuff )
    ENDIF
-RETURN InetGetSndBufSize( SocketCon )
+
+   RETURN InetGetSndBufSize( SocketCon )
 
 /* Called from another method with list of parameters and, as last parameter, return code
    of function being logged.
    Example, I want to log MyFunc( a, b, c ) which returns m,
             ::Log( a, b, c, m )
 */
+
 METHOD Log( ... ) CLASS tIPClient
 
    LOCAL xVar
    LOCAL cMsg := DToS( Date() ) + "-" + Time() + Space( 2 ) + ;
-                 SubStr( ProcName( 1 ), Rat( ":", ProcName( 1 ) ) ) +;
-                 "( "
+      SubStr( ProcName( 1 ), RAt( ":", ProcName( 1 ) ) ) + ;
+      "( "
 
-   for each xVar in hb_aParams()
+   FOR EACH xVar in hb_AParams()
 
       // Preserves CRLF on result
-      if hb_EnumIndex() < PCount()
+      IF hb_EnumIndex() < PCount()
          cMsg += StrTran( StrTran( AllTrim( CStr( xVar ) ), Chr( 13 ) ), Chr( 10 ) )
-      else
+      ELSE
          cMsg += CStr( xVar )
-      endif
+      ENDIF
 
       cMsg += iif ( hb_EnumIndex() < PCount() - 1, ", ", "" )
 
-      if hb_EnumIndex() == PCount() - 1
-         cMsg += " )" + hb_OsNewLine() + ">> "
+      IF hb_EnumIndex() == PCount() - 1
+         cMsg += " )" + hb_osNewLine() + ">> "
 
-      elseif hb_EnumIndex() == PCount()
-         cMsg += " <<" + hb_OsNewLine() + hb_OsNewLine()
+      ELSEIF hb_EnumIndex() == PCount()
+         cMsg += " <<" + hb_osNewLine() + hb_osNewLine()
 
-      endif
+      ENDIF
 
-   next
+   NEXT
 
-   fWrite( ::nHandle, cMsg )
+   FWrite( ::nHandle, cMsg )
 
-RETURN Self
-
+   RETURN Self
 
 METHOD SetProxy( cProxyHost, nProxyPort, cProxyUser, cProxyPassword )  CLASS tIPClient
+
    ::cProxyHost     := cProxyHost
    ::nProxyPort     := nProxyPort
-   ::cProxyUser     := cProxyUser 
+   ::cProxyUser     := cProxyUser
    ::cProxyPassword := cProxyPassword
-RETURN Self
 
+   RETURN Self
 
+METHOD Openproxy( cServer, nPort, cProxy, nProxyPort, cResp, cUserName, cPassWord, nTimeOut, cUserAgent )
 
-METHOD Openproxy( cServer, nPort, cProxy, nProxyPort, cResp, cUserName, cPassWord, nTimeOut, cUserAgent)
 //Local pSocket
-Local cLine
-Local cRequest := ""
-Local cPass := ""
-Local cEncoded := ''
-Local lRet := .T.
+   LOCAL cLine
+   LOCAL cRequest := ""
+   LOCAL cPass := ""
+   LOCAL cEncoded := ''
+   LOCAL lRet := .T.
 
-Local pEx,nResponseCode
-Local sResponseCode,nFirstSpace
-::InetConnect( cProxy, nProxyPort, ::SocketCon )
-IF ::InetErrorCode( ::SocketCon ) == 0
-   Try
-      cLine := sprintf( 'CONNECT %s:%d HTTP/1', cServer, nPort) + CHR( 13 ) + CHR( 10 )
-      cRequest += cLine
-      IF !empty( cUserName )
-         cPass := sprintf( '%s:%s', cUserName, cPassWord )
-         cEncoded := hb_base64( cPass, Len( cPass ) )
-         cLine := sprintf( "Proxy-authorization: Basic %s", cEncoded ) + Chr( 13 ) + Chr( 10 )
+   LOCAL pEx, nResponseCode
+   LOCAL sResponseCode, nFirstSpace
+   ::InetConnect( cProxy, nProxyPort, ::SocketCon )
+   IF ::InetErrorCode( ::SocketCon ) == 0
+      Try
+         cLine := sprintf( 'CONNECT %s:%d HTTP/1', cServer, nPort ) + Chr( 13 ) + Chr( 10 )
          cRequest += cLine
-      ENDIF
-      IF !empty(cUserAgent )
-         cLine := sprintf( "User-Agent: %s", cUserAgent ) + Chr( 13 ) + Chr( 10 )
-         cRequest += cLine
-      ENDIF
-      cRequest += Chr( 13 ) + Chr( 10 )
-      ::InetSendAll( ::SocketCon, cRequest )
-      cResp := ''
-      ::ReadHTTPProxyResponse(nTimeOut, @cResp,::SocketCon)
-      nFirstSpace := at(" ",cResp )
-      IF ( nFirstSpace != 0)
-         sResponseCode := Right( cResp, Len( cResp ) - nFirstSpace )
-         nResponseCode = val( sResponseCode )
-         IF ( nResponseCode != 200 )
-            Throw( Errornew( "INETCONNECTPROXY", 0, 4000, Procname(), "Connection refused" ) )
+         IF !Empty( cUserName )
+            cPass := sprintf( '%s:%s', cUserName, cPassWord )
+            cEncoded := hb_base64( cPass, Len( cPass ) )
+            cLine := sprintf( "Proxy-authorization: Basic %s", cEncoded ) + Chr( 13 ) + Chr( 10 )
+            cRequest += cLine
          ENDIF
-      ENDIF
-   catch pEx 
-      ::close( )
-      lRet := .F.
-   END
+         IF !Empty( cUserAgent )
+            cLine := sprintf( "User-Agent: %s", cUserAgent ) + Chr( 13 ) + Chr( 10 )
+            cRequest += cLine
+         ENDIF
+         cRequest += Chr( 13 ) + Chr( 10 )
+         ::InetSendAll( ::SocketCon, cRequest )
+         cResp := ''
+         ::ReadHTTPProxyResponse( nTimeOut, @cResp, ::SocketCon )
+         nFirstSpace := At( " ", cResp )
+         IF ( nFirstSpace != 0 )
+            sResponseCode := Right( cResp, Len( cResp ) - nFirstSpace )
+            nResponseCode = Val( sResponseCode )
+            IF ( nResponseCode != 200 )
+               Throw( ErrorNew( "INETCONNECTPROXY", 0, 4000, ProcName(), "Connection refused" ) )
+            ENDIF
+         ENDIF
+      catch pEx
+         ::close( )
+         lRet := .F.
+      END
    
-ENDIF
-RETURN  lRet
-
-
-
-Method ReadHTTPProxyResponse(dwTimeout, sResponse)
-
-Local  bMoreDataToRead := .t.
-Local nLength,nData
-Local szResponse
-HB_SYMBOL_UNUSED( dwTimeout )
-WHILE bMoreDataToRead
-  
-   szResponse := space(1)
-   nData := inetRecv(::SocketCon,@szResponse, 1)
-   IF (nData == 0)
-      throw(Errornew("INETCONNECTPROXY" ,0,4000,Procname(),"Disconnected"))
-   ENDIF 
-   sResponse += szResponse
-
-   nLength = len(sResponse)
-   IF nLength >= 4   
-      bMoreDataToRead := !( ( substr( sResponse, nLength - 3 , 1 )== chr( 13 ) ) .and. ( substr( sResponse, nLength - 2, 1 ) == chr( 10 ) ) .and. ;
-                           ( substr( sResponse, nLength - 1, 1 ) == chr( 13 ) ) .and. ( substr( sResponse, nLength, 1 ) == chr( 10 ) ) ) 
    ENDIF
-ENDDO
-RETURN nil
+
+   RETURN  lRet
+
+METHOD ReadHTTPProxyResponse( dwTimeout, sResponse )
+
+   LOCAL  bMoreDataToRead := .T.
+   LOCAL nLength, nData
+   LOCAL szResponse
+
+   HB_SYMBOL_UNUSED( dwTimeout )
+   WHILE bMoreDataToRead
+  
+      szResponse := Space( 1 )
+      nData := inetRecv( ::SocketCon, @szResponse, 1 )
+      IF ( nData == 0 )
+         throw( ErrorNew( "INETCONNECTPROXY" ,0,4000,ProcName(),"Disconnected" ) )
+      ENDIF
+      sResponse += szResponse
+
+      nLength = Len( sResponse )
+      IF nLength >= 4
+         bMoreDataToRead := !( ( SubStr( sResponse, nLength - 3 , 1 ) == Chr( 13 ) ) .AND. ( SubStr( sResponse, nLength - 2, 1 ) == Chr( 10 ) ) .AND. ;
+            ( SubStr( sResponse, nLength - 1, 1 ) == Chr( 13 ) ) .AND. ( SubStr( sResponse, nLength, 1 ) == Chr( 10 ) ) )
+      ENDIF
+   ENDDO
+
+   RETURN nil
+
 
 
 

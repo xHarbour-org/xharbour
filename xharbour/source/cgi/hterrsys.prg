@@ -52,17 +52,17 @@
 #command ? <list,...>   =>  ?? Chr(13) + Chr(10) ; ?? <list>
 #command ?? <list,...>  =>  OutErr(<list>)
 
-REQUEST HARDCR
-REQUEST MEMOWRIT
+   REQUEST HARDCR
+   REQUEST MEMOWRIT
 
-STATIC sbFixCorrupt
-STATIC scErrFooter  := " "
+   STATIC sbFixCorrupt
+   STATIC scErrFooter  := " "
 
 
 /***
-*	ErrorSys()
+* ErrorSys()
 *
-*	Note:  automatically executes at startup
+* Note:  automatically executes at startup
 */
 /* TOFIX: Luiz please review it
 ANNOUNCE ERRORSYS
@@ -74,27 +74,25 @@ PROC Errorsys()
 RETURN
 */
 /***
-*	DefError()
+* DefError()
 */
 
-
 STATIC FUNC DefError( e )
-
    
    LOCAL i
    LOCAL cMessage   := ""
    LOCAL cErrString := ""
-   LOCAL nDispCount := Dispcount()
+   LOCAL nDispCount := DispCount()
    LOCAL aError     := {}
    LOCAL nH         := IF( HtmlPageHandle() == NIL, 0, HtmlPageHandle() )
 
-   // by default, division by zero yields zero
+// by default, division by zero yields zero
    IF ( e:genCode == EG_ZERODIV )
       RETURN ( 0 )
    END
 
    IF ( e:genCode == EG_CORRUPTION )
-      IF Valtype( sbFixCorrupt ) == "B"
+      IF ValType( sbFixCorrupt ) == "B"
          Eval( sbFixCorrupt, e )
          RETURN .F.
       ELSE
@@ -102,32 +100,32 @@ STATIC FUNC DefError( e )
       ENDIF
    ENDIF
 
-   // for network open error, set NETERR() and subsystem default
-   IF ( e:genCode == EG_OPEN .and. ( e:osCode == 32 .or. e:osCode == 5 ) ;
-        .and. e:canDefault )
+// for network open error, set NETERR() and subsystem default
+   IF ( e:genCode == EG_OPEN .AND. ( e:osCode == 32 .OR. e:osCode == 5 ) ;
+         .AND. e:canDefault )
 
-      Neterr( .T. )
+      NetErr( .T. )
       RETURN ( .F. )                    // NOTE
 
    END
 
-   // for lock error during APPEND BLANK, set NETERR() and subsystem default
-   IF ( e:genCode == EG_APPENDLOCK .and. e:canDefault )
+// for lock error during APPEND BLANK, set NETERR() and subsystem default
+   IF ( e:genCode == EG_APPENDLOCK .AND. e:canDefault )
 
-      Neterr( .T. )
+      NetErr( .T. )
       RETURN ( .F. )                    // NOTE
 
    END
 
-   // build error message
+// build error message
    cMessage += ErrorMessage( e )
 
-   // display message and traceback
+// display message and traceback
    IF ( !Empty( e:osCode ) )
       cMessage += " (DOS Error   : " + NTRIM( e:osCode ) + ")"
    END
 
-   // RESET System //
+// RESET System //
 
    cErrString := CRLF() + "</TD></TR></TABLE>" + CRLF()
    cErrString += '<TABLE bgcolor="white" border CellPadding=1 CellSpacing=1 COLS=2 WIDTH=80%>'
@@ -162,10 +160,10 @@ STATIC FUNC DefError( e )
 
    i := 2
 
-   WHILE ( !Empty( Procname( i ) ) )
+   WHILE ( !Empty( ProcName( i ) ) )
 
-      cErrString += "Called from " + Trim( Procname( i ) ) + ;
-                                           "(" + NTRIM( Procline( i ) ) + ") <BR>" + CRLF()
+      cErrString += "Called from " + Trim( ProcName( i ) ) + ;
+         "(" + NTRIM( ProcLine( i ) ) + ") <BR>" + CRLF()
 
       i ++
    END
@@ -177,70 +175,67 @@ STATIC FUNC DefError( e )
    cErrstring += "Extra Notes..."
 
    cErrString += "</TD>" + CRLF() + "</TR>" + CRLF() + "</TABLE>" + CRLF()
-   Fwrite( nH, "<BR>" + cErrString + CRLF() )
-   Memowrit( "Error.Log", Hardcr( cErrString ) + CRLF() + ;
-             Hardcr( Memoread( "Error.Log" ) ) )
+   FWrite( nH, "<BR>" + cErrString + CRLF() )
+   MemoWrit( "Error.Log", HardCR( cErrString ) + CRLF() + ;
+      HardCR( MemoRead( "Error.Log" ) ) )
 
-   Fwrite( nH, "</TD>" + CRLF() + "</TR>" + CRLF() + "</TABLE>" + CRLF() )
+   FWrite( nH, "</TD>" + CRLF() + "</TR>" + CRLF() + "</TABLE>" + CRLF() )
 
    HtmlJsCmd( nH, 'alert("There was an error processing your request:\n' + ;
-            'Look at the bottom of this page for\n' + ;
-            'error description and parameters...");' )
-   Fwrite( nH, "</FONT>" + CRLF() + "</BODY></HTML>" + CRLF() )
+      'Look at the bottom of this page for\n' + ;
+      'error description and parameters...");' )
+   FWrite( nH, "</FONT>" + CRLF() + "</BODY></HTML>" + CRLF() )
 
    CLOSE ALL
 
-   Errorlevel( 1 )
+   ErrorLevel( 1 )
    QUIT
 
-RETURN ( .F. )
-
+   RETURN ( .F. )
 
 FUNCTION SetCorruptFunc( bFunc )
-
    
-   IF Valtype( bFunc ) == "B"
+   IF ValType( bFunc ) == "B"
       sbFixCorrupt := bFunc
    ENDIF
 
-RETURN sbFixCorrupt
+   RETURN sbFixCorrupt
 
 FUNCTION SetErrorFooter()
 
-RETURN ( scErrFooter )
+   RETURN ( scErrFooter )
 
 /***
-*	ErrorMessage()
+* ErrorMessage()
 */
 
 STATIC FUNC ErrorMessage( e )
-
    
    LOCAL cMessage := ""
 
-   // start error message
+// start error message
    cMessage += IF( e:severity > ES_WARNING, "Error ", "Warning " )
 
-   // add subsystem name if available
-   IF ( Valtype( e:subsystem ) == "C" )
+// add subsystem name if available
+   IF ( ValType( e:subsystem ) == "C" )
       cMessage += e:subsystem()
    ELSE
       cMessage += "???"
    END
 
-   // add subsystem's error code if available
-   IF ( Valtype( e:subCode ) == "N" )
+// add subsystem's error code if available
+   IF ( ValType( e:subCode ) == "N" )
       cMessage += ( "/" + NTRIM( e:subCode ) )
    ELSE
       cMessage += "/???"
    END
 
-   // add error description if available
-   IF ( Valtype( e:description ) == "C" )
+// add error description if available
+   IF ( ValType( e:description ) == "C" )
       cMessage += ( "<BR>  " + e:description )
    END
 
-   // add either filename or operation
+// add either filename or operation
    IF ( !Empty( e:filename ) )
       cMessage += ( ": " + e:filename )
 
@@ -250,5 +245,6 @@ STATIC FUNC ErrorMessage( e )
    END
    cMessage += CRLF()
 
-RETURN ( cMessage )
+   RETURN ( cMessage )
+
 

@@ -65,11 +65,11 @@
 #include "fileio.ch"
 #include "tip.ch"
 
-
 FUNCTION TIp_GetEncoder( cModel )
+
    LOCAL oEncoder
 
-   IF Valtype( cModel ) <> "C"
+   IF ValType( cModel ) <> "C"
       cModel := "as-is"
    ENDIF
 
@@ -82,10 +82,10 @@ FUNCTION TIp_GetEncoder( cModel )
    CASE cModel == "quoted-printable"
       oEncoder := TIPEncoderQP():New()
 
-   CASE cModel == "url" .or. cModel == "urlencoded"
+   CASE cModel == "url" .OR. cModel == "urlencoded"
       oEncoder := TIPEncoderURL():New()
 
-   CASE cModel == "7bit" .or. cModel == "8bit"
+   CASE cModel == "7bit" .OR. cModel == "8bit"
       oEncoder := TIPEncoder():New( cModel )
       oEncoder:cName := cModel
 
@@ -94,30 +94,32 @@ FUNCTION TIp_GetEncoder( cModel )
 
    ENDCASE
 
-RETURN oEncoder
-
-
+   RETURN oEncoder
 
 CLASS TIPEncoder
+
    DATA cName
 
    METHOD New( cModel )
    METHOD Encode( cData )
    METHOD Decode( cData )
+
 ENDCLASS
 
+METHOD New( cModel ) CLASS TIPEncoder
 
-METHOD New( cModel ) class TIPEncoder
-   IF Valtype( cModel ) <> "C"
+   IF ValType( cModel ) <> "C"
       cModel := "as-is"
    ENDIF
    ::cName := cModel
-RETURN self
 
+   RETURN self
 
-METHOD Encode( cData ) class TIPEncoder
-RETURN cData
+METHOD Encode( cData ) CLASS TIPEncoder
 
-METHOD Decode( cData ) class TIPEncoder
-RETURN cData
+   RETURN cData
+
+METHOD Decode( cData ) CLASS TIPEncoder
+
+   RETURN cData
 

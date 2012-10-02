@@ -63,45 +63,45 @@
  * string should be freed when not used anymore.
  */
 
-static char * base64enc( const char *s, size_t s_len )
+static char * base64enc( const char * s, size_t s_len )
 {
-   char b64chars[] =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-   char * t;
-   char * p;
-   int x, y;
-   int len;
+   char     b64chars[] =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+   char *   t;
+   char *   p;
+   int      x, y;
+   int      len;
 
    if( s_len > ( size_t ) INT_MAX )
    {
-      return NULL ; /* die("data too long in base64enc()"); */
+      return NULL;  /* die("data too long in base64enc()"); */
    }
-   len = ( int ) s_len;
-   t = ( char * ) hb_xgrab( ( 4 * ( ( len + 2 ) / 3 ) + 1 ) * sizeof( char ) );
-   p = t;
+   len   = ( int ) s_len;
+   t     = ( char * ) hb_xgrab( ( 4 * ( ( len + 2 ) / 3 ) + 1 ) * sizeof( char ) );
+   p     = t;
 
    while( len-- > 0 )
    {
-      x = *s++;
-      *p++ = b64chars[(x >> 2) & 63];
+      x     = *s++;
+      *p++  = b64chars[ ( x >> 2 ) & 63 ];
       if( len-- <= 0 )
       {
-         *p++ = b64chars[(x << 4) & 63];
-         *p++ = '=';
-         *p++ = '=';
+         *p++  = b64chars[ ( x << 4 ) & 63 ];
+         *p++  = '=';
+         *p++  = '=';
          break;
       }
-      y = *s++;
-      *p++ = b64chars[((x << 4) | ((y >> 4) & 15)) & 63];
+      y     = *s++;
+      *p++  = b64chars[ ( ( x << 4 ) | ( ( y >> 4 ) & 15 ) ) & 63 ];
       if( len-- <= 0 )
       {
-         *p++ = b64chars[(y << 2) & 63];
-         *p++ = '=';
+         *p++  = b64chars[ ( y << 2 ) & 63 ];
+         *p++  = '=';
          break;
       }
-      x = *s++;
-      *p++ = b64chars[((y << 2) | ((x >> 6) & 3)) & 63];
-      *p++ = b64chars[x & 63];
+      x     = *s++;
+      *p++  = b64chars[ ( ( y << 2 ) | ( ( x >> 6 ) & 3 ) ) & 63 ];
+      *p++  = b64chars[ x & 63 ];
    }
    *p = '\0';
 
@@ -110,14 +110,14 @@ static char * base64enc( const char *s, size_t s_len )
 
 HB_FUNC( BUILDUSERPASSSTRING )
 {
-   char * s;
-   const char * szUser = hb_parcx( 1 );
-   const char * szPass = hb_parcx( 2 );
-   size_t p_len = strlen( szPass );
-   size_t u_len = strlen( szUser );
+   char *         s;
+   const char *   szUser   = hb_parcx( 1 );
+   const char *   szPass   = hb_parcx( 2 );
+   size_t         p_len    = strlen( szPass );
+   size_t         u_len    = strlen( szUser );
 
-   s = ( char * ) hb_xgrab( ( u_len + p_len + 3 ) * sizeof( char ) );
-   s[0] = '\0';
+   s        = ( char * ) hb_xgrab( ( u_len + p_len + 3 ) * sizeof( char ) );
+   s[ 0 ]   = '\0';
    hb_xstrcpy( s + 1, szUser, 0 );
    hb_xstrcpy( s + u_len + 2, szPass, 0 );
 
@@ -126,9 +126,9 @@ HB_FUNC( BUILDUSERPASSSTRING )
 
 HB_FUNC( HB_BASE64 )
 {
-   const char * szItem = hb_parcx( 1 );
-   int nLen = hb_parni( 2 );
-   char * szRet = base64enc( szItem, nLen );
+   const char *   szItem   = hb_parcx( 1 );
+   int            nLen     = hb_parni( 2 );
+   char *         szRet    = base64enc( szItem, nLen );
 
    hb_retcAdopt( szRet );
 

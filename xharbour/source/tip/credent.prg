@@ -59,7 +59,9 @@
 */
 
 CLASS tIPCredentials
+
    DATA cMethod
    DATA cUserid
    DATA cPassword
+
 ENDCLASS

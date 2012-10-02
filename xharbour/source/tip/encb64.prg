@@ -62,20 +62,24 @@
 #pragma ENDDUMP
 
 CLASS TIPEncoderBase64 FROM TIPEncoder
-   // Set this to .T. to enable RFC 2068 (HTTP/1.1) exception to
-   // RFC 2045 (MIME) base64 format. This exception consists in
-   // not applying CRLF after each 76 output bytes.
+
+// Set this to .T. to enable RFC 2068 (HTTP/1.1) exception to
+// RFC 2045 (MIME) base64 format. This exception consists in
+// not applying CRLF after each 76 output bytes.
    DATA bHttpExcept
 
    METHOD New()      Constructor
    METHOD Encode( cData )
    METHOD Decode( cData )
+
 ENDCLASS
 
 METHOD New() CLASS TIPEncoderBase64
+
    ::cName := "Base64"
    ::bHttpExcept := .F.
-RETURN Self
+
+   RETURN Self
 
 
 
@@ -209,6 +213,7 @@ HB_FUNC( TIPENCODERBASE64_ENCODE )
    /* this function also adds a zero */
    hb_retclenAdopt( cRet, nPosRet );
 }
+
 #pragma ENDDUMP
 
 
@@ -310,5 +315,6 @@ HB_FUNC( TIPENCODERBASE64_DECODE )
    cRet = (unsigned char *) hb_xrealloc( cRet, nPosRet + 1 );
    hb_retclenAdopt( (char *)cRet, nPosRet );
 }
+
 #pragma ENDDUMP
 

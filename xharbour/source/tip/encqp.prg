@@ -60,14 +60,18 @@
 #pragma ENDDUMP
 
 CLASS TIPEncoderQP FROM TIPEncoder
+
    METHOD New()      Constructor
    METHOD Encode( cData )
    METHOD Decode( cData )
+
 ENDCLASS
 
 METHOD New() CLASS TIPEncoderQP
+
    ::cName := "Quoted-Printable"
-RETURN Self
+
+   RETURN Self
 
 
 
@@ -146,6 +150,7 @@ HB_FUNC( TIPENCODERQP_ENCODE )
    cRet = (char *) hb_xrealloc( cRet, nPosRet + 1 );
    hb_retclenAdopt( cRet, nPosRet );
 }
+
 #pragma ENDDUMP
 
 
@@ -225,5 +230,6 @@ HB_FUNC( TIPENCODERQP_DECODE )
    cRet = (char *) hb_xrealloc( cRet, nPosRet + 1 );
    hb_retclenAdopt( cRet, nPosRet );
 }
+
 #pragma ENDDUMP
 

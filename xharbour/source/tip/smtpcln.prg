@@ -66,38 +66,41 @@ CLASS tIPClientSMTP FROM tIPClient
 
    METHOD New( oUrl, lTrace, oCredentials )
    METHOD Open()
-   METHOD Close()
+   METHOD CLOSE()
    METHOD Write( cData, nLen, bCommit )
    METHOD Mail( cFrom )
    METHOD Rcpt( cRcpt )
-   METHOD Data( cData )
-   METHOD Commit()
-   METHOD Quit()
+   METHOD DATA( cData )
+   METHOD COMMIT()
+   METHOD QUIT()
    METHOD GetOK()
    /* Method for smtp server that require login */
    METHOD OpenSecure()
-   METHOD AUTH( cUser, cPass) // Auth by login method
-   METHOD AUTHplain( cUser, cPass) // Auth by plain method
-   METHOD ServerSuportSecure(lAuthp,lAuthl) 
+   METHOD AUTH( cUser, cPass ) // Auth by login method
+   METHOD AUTHplain( cUser, cPass ) // Auth by plain method
+   METHOD ServerSuportSecure( lAuthp, lAuthl )
 
    METHOD sendMail
    DESTRUCTOR SmtpClnDesTructor
    HIDDEN:
    DATA isAuth INIT .F.
-ENDCLASS
 
+ENDCLASS
 
 PROCEDURE SmtpClnDesTructor CLASS  tIPClientsmtp
 
-   IF ::lTrace .and. ::nHandle > 0
-      fClose( ::nHandle )
-      ::nHandle := -1
+   IF ::lTrace .AND. ::nHandle > 0
+      FClose( ::nHandle )
+      ::nHandle := - 1
    ENDIF
-Return 
+
+   RETURN
 
 METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClientSMTP
-local cFile :="sendmail"
-local n:=1
+
+   LOCAL cFile := "sendmail"
+   LOCAL n := 1
+
    ::super:New( oUrl, lTrace, oCredentials )
 
    ::nDefaultPort := 25
@@ -105,88 +108,95 @@ local n:=1
    ::nAccessMode := TIP_WO  // a write only
 
    if ::ltrace
-      if !file("sendmail.log")
-         ::nHandle := fcreate("sendmail.log")
-      else
-         while file(cFile+alltrim(str(n,4))+".log")
-           n++
-         enddo
-         ::nHandle := fcreate(cFile+alltrim(str(n,4))+".log")
-      endif        
-   endif
-RETURN Self
+      IF !File( "sendmail.log" )
+         ::nHandle := FCreate( "sendmail.log" )
+      ELSE
+         WHILE File( cFile + AllTrim( Str(n,4 ) ) + ".log" )
+            n++
+         ENDDO
+         ::nHandle := FCreate( cFile + AllTrim( Str(n,4 ) ) + ".log" )
+      ENDIF
+   ENDIF
+
+   RETURN Self
 
 METHOD Open( cUrl ) CLASS tIPClientSMTP
 
-   IF .not. ::super:Open( cUrl )
+   IF .NOT. ::super:Open( cUrl )
       RETURN .F.
    ENDIF
 
    InetSetTimeout( ::SocketCon, ::nConnTimeout )
-   IF .not. Empty ( ::oUrl:cUserid )
+   IF .NOT. Empty ( ::oUrl:cUserid )
       ::InetSendall( ::SocketCon, "HELO " +  ::oUrl:cUserid + ::cCRLF )
    ELSE
       ::InetSendall( ::SocketCon, "HELO tipClientSMTP" + ::cCRLF )
    ENDIF
 
-RETURN ::GetOk()
-
+   RETURN ::GetOk()
 
 METHOD GetOk() CLASS tIPClientSMTP
+
    LOCAL nLen
 
    ::cReply := ::InetRecvLine( ::SocketCon, @nLen, 512 )
-   IF ::InetErrorCode( ::SocketCon ) != 0 .or. Substr( ::cReply, 1, 1 ) == '5'
+   IF ::InetErrorCode( ::SocketCon ) != 0 .OR. SubStr( ::cReply, 1, 1 ) == '5'
       RETURN .F.
    ENDIF
-RETURN .T.
 
+   RETURN .T.
 
-METHOD Close() CLASS tIPClientSMTP
+METHOD CLOSE() CLASS tIPClientSMTP
+
    InetSetTimeOut( ::SocketCon, ::nConnTimeout )
    if ::ltrace
-      fClose(::nHandle)
-      ::nhandle := -1
-   endif
+      FClose( ::nHandle )
+      ::nhandle := - 1
+   ENDIF
    ::Quit()
-RETURN ::super:Close()
 
-METHOD Commit() CLASS tIPClientSMTP
+   RETURN ::super:Close()
+
+METHOD COMMIT() CLASS tIPClientSMTP
+
    ::InetSendall( ::SocketCon, ::cCRLF + "." + ::cCRLF )
-RETURN ::GetOk()
 
+   RETURN ::GetOk()
 
-METHOD Quit() CLASS tIPClientSMTP
+METHOD QUIT() CLASS tIPClientSMTP
+
    ::InetSendall( ::SocketCon, "QUIT" + ::cCRLF )
    ::isAuth := .F.
-RETURN ::GetOk()
 
+   RETURN ::GetOk()
 
 METHOD Mail( cFrom ) CLASS tIPClientSMTP
-   ::InetSendall( ::SocketCon, "MAIL FROM: <" + cFrom +">" + ::cCRLF )
-RETURN ::GetOk()
 
+   ::InetSendall( ::SocketCon, "MAIL FROM: <" + cFrom + ">" + ::cCRLF )
+
+   RETURN ::GetOk()
 
 METHOD Rcpt( cTo ) CLASS tIPClientSMTP
+
    ::InetSendall( ::SocketCon, "RCPT TO: <" + cTo + ">" + ::cCRLF )
-RETURN ::GetOk()
 
+   RETURN ::GetOk()
 
-METHOD Data( cData ) CLASS tIPClientSMTP
+METHOD DATA( cData ) CLASS tIPClientSMTP
+
    ::InetSendall( ::SocketCon, "DATA" + ::cCRLF )
-   IF .not. ::GetOk()
+   IF .NOT. ::GetOk()
       RETURN .F.
    ENDIF
-   ::InetSendall(::SocketCon, cData + ::cCRLF + "." + ::cCRLF )
-RETURN ::GetOk()
+   ::InetSendall( ::SocketCon, cData + ::cCRLF + "." + ::cCRLF )
 
-
+   RETURN ::GetOk()
 
 METHOD OpenSecure( cUrl ) CLASS tIPClientSMTP
 
-   Local cUser
+   LOCAL cUser
 
-   IF .not. ::super:Open( cUrl )
+   IF .NOT. ::super:Open( cUrl )
       RETURN .F.
    ENDIF
 
@@ -194,77 +204,81 @@ METHOD OpenSecure( cUrl ) CLASS tIPClientSMTP
 
    cUser := ::oUrl:cUserid
 
-   IF .not. Empty ( ::oUrl:cUserid )
+   IF .NOT. Empty ( ::oUrl:cUserid )
       ::InetSendall( ::SocketCon, "EHLO " +  cUser + ::cCRLF )
    ELSE
       ::InetSendall( ::SocketCon, "EHLO tipClientSMTP" + ::cCRLF )
    ENDIF
 
-RETURN ::getOk()
+   RETURN ::getOk()
 
-METHOD AUTH( cUser, cPass) CLASS tIPClientSMTP
+METHOD AUTH( cUser, cPass ) CLASS tIPClientSMTP
 
-   Local cs:=''
-   Local cEncodedUser
-   Local cEncodedPAss
+   LOCAL cs := ''
+   LOCAL cEncodedUser
+   LOCAL cEncodedPAss
 
-   cUser := StrTran( cUser,"&at;", "@")
+   cUser := StrTran( cUser, "&at;", "@" )
 
-   cEncodedUser := alltrim(HB_BASE64(cuser,len(cuser)))
-   cEncodedPAss :=alltrim(HB_BASE64(cPass,len(cpass)))
+   cEncodedUser := AllTrim( HB_BASE64( cuser,Len(cuser ) ) )
+   cEncodedPAss := AllTrim( HB_BASE64( cPass,Len(cpass ) ) )
 
 
-   ::InetSendall( ::SocketCon, "AUTH LOGIN" +::ccrlf )
+   ::InetSendall( ::SocketCon, "AUTH LOGIN" + ::ccrlf )
 
    if ::GetOk()
-      ::InetSendall( ::SocketCon, cEncodedUser+::cCrlf  )
+      ::InetSendall( ::SocketCon, cEncodedUser + ::cCrlf  )
       if ::Getok()
-         ::InetSendall( ::SocketCon, cEncodedPass +::cCrlf )
-      endif
-   endif
+         ::InetSendall( ::SocketCon, cEncodedPass + ::cCrlf )
+      ENDIF
+   ENDIF
 
-   return ( ::isAuth := ::GetOk() )
+   RETURN ( ::isAuth := ::GetOk() )
 
-METHOD AuthPlain( cUser, cPass) CLASS tIPClientSMTP
+METHOD AuthPlain( cUser, cPass ) CLASS tIPClientSMTP
 
-   Local cBase := BUILDUSERPASSSTRING( cUser, cPass )
-   Local cen   := HB_BASE64( cBase, 2 + Len( cUser ) + Len( cPass ) )
+   LOCAL cBase := BUILDUSERPASSSTRING( cUser, cPass )
+   LOCAL cen   := HB_BASE64( cBase, 2 + Len( cUser ) + Len( cPass ) )
 
-   ::InetSendall( ::SocketCon, "AUTH PLAIN" + cen + ::cCrlf)
-   return ( ::isAuth := ::GetOk() )
+   ::InetSendall( ::SocketCon, "AUTH PLAIN" + cen + ::cCrlf )
 
+   RETURN ( ::isAuth := ::GetOk() )
 
 METHOD Write( cData, nLen, bCommit ) CLASS tIPClientSMTP
-Local aTo,cRecpt
-   IF .not. ::bInitialized
+
+   LOCAL aTo, cRecpt
+
+   IF .NOT. ::bInitialized
       //IF Empty( ::oUrl:cUserid ) .or. Empty( ::oUrl:cFile )
       IF Empty( ::oUrl:cFile )  //GD user id not needed if we did not auth
-         RETURN -1
+         RETURN - 1
       ENDIF
 
-      IF .not. ::Mail( ::oUrl:cUserid )
-         RETURN -1
+      IF .NOT. ::Mail( ::oUrl:cUserid )
+         RETURN - 1
       ENDIF
-      aTo:= HB_RegexSplit(",", ::oUrl:cFile )
+      aTo := hb_regexSplit( ",", ::oUrl:cFile )
 
-      FOR each cRecpt in Ato
-         IF .not.   ::Rcpt(cRecpt)
-            RETURN -1
+      FOR EACH cRecpt in Ato
+         IF .NOT.   ::Rcpt( cRecpt )
+            RETURN - 1
          ENDIF
       NEXT
 
       ::InetSendall( ::SocketCon, "DATA" + ::cCRLF )
-      IF .not. ::GetOk()
-         RETURN -1
+      IF .NOT. ::GetOk()
+         RETURN - 1
       ENDIF
       ::bInitialized := .T.
    ENDIF
 
    ::nLastWrite := ::super:Write( cData, nLen, bCommit )
-RETURN ::nLastWrite
 
-METHOD ServerSuportSecure(lAuthp,lAuthl) CLASS  tIPClientSMTP
-   Local lAuthLogin := .F.,lAuthPlain :=.F.
+   RETURN ::nLastWrite
+
+METHOD ServerSuportSecure( lAuthp, lAuthl ) CLASS  tIPClientSMTP
+
+   LOCAL lAuthLogin := .F. , lAuthPlain := .F.
 
    IF ::OPENSECURE()
       WHILE .T.
@@ -277,16 +291,16 @@ METHOD ServerSuportSecure(lAuthp,lAuthl) CLASS  tIPClientSMTP
             lAuthPlain := .T.
          ENDIF
       ENDDO
-    ::CLOSE()
- ENDIF
+      ::CLOSE()
+   ENDIF
 
-   lAuthp:=lAuthPlain
-   lAuthl:=lAuthLogin
+   lAuthp := lAuthPlain
+   lAuthl := lAuthLogin
 
-RETURN  lAuthLogin .OR. lAuthPlain
-
+   RETURN  lAuthLogin .OR. lAuthPlain
 
 METHOD sendMail( oTIpMail ) CLASS TIpClientSmtp
+
    LOCAL cFrom, cTo, aTo
  
    IF .NOT. ::isOpen
@@ -300,19 +314,19 @@ METHOD sendMail( oTIpMail ) CLASS TIpClientSmtp
       ENDIF
    ENDIF
 
-   cFrom := oTIpMail:getFieldPart( "From" )   
-   cTo   := oTIpMail:getFieldPart( "To" )   
+   cFrom := oTIpMail:getFieldPart( "From" )
+   cTo   := oTIpMail:getFieldPart( "To" )
 
    cTo   := StrTran( cTo, InetCRLF(), "" )
-   cTo   := StrTran( cTo, Chr(9)    , "" )
-   cTo   := StrTran( cTo, Chr(32)   , "" )
+   cTo   := StrTran( cTo, Chr( 9 )    , "" )
+   cTo   := StrTran( cTo, Chr( 32 )   , "" )
 
-   aTo   := HB_RegExSplit( "," , cTo )
+   aTo   := hb_regexSplit( "," , cTo )
 
    ::mail( cFrom )
    FOR EACH cTo IN aTo
       ::rcpt( cTo   )
    NEXT
 
-RETURN ::data( oTIpMail:toString() )
+   RETURN ::data( oTIpMail:toString() )
 

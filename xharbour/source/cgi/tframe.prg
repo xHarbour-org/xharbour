@@ -47,12 +47,11 @@
 #include "common.ch"
 #include "cgi.ch"
 
-
 CLASS THtmlFrameSet
 
    DATA nH
    DATA FName
-   Data cStr INIT ""
+   DATA cStr INIT ""
 
    DATA TITLE INIT "FrameSet01"
 
@@ -65,10 +64,9 @@ CLASS THtmlFrameSet
    METHOD END ()
 
    METHOD Frame( cName, cURL, lBorder, lResize, lScrolling, ;
-   marginwidth, marginheight, cTarget, cScrolling )
+      marginwidth, marginheight, cTarget, cScrolling )
 
 ENDCLASS
-
    
 METHOD New( cFName, cTitle ) CLASS THtmlFrameSet
 
@@ -85,17 +83,17 @@ METHOD New( cFName, cTitle ) CLASS THtmlFrameSet
       ::nH := STD_OUT
    ELSE
       cStr := ""
-      ::nH := Fcreate( ::FName )
+      ::nH := FCreate( ::FName )
    ENDIF
 
    cStr += "<HTML>" + CRLF() + ;
-                             " <HEAD>" + CRLF() + ;
-                             "  <TITLE>" + ::Title + "</TITLE>" + CRLF() + ;
-                             " </HEAD>" + CRLF()
+      " <HEAD>" + CRLF() + ;
+      "  <TITLE>" + ::Title + "</TITLE>" + CRLF() + ;
+      " </HEAD>" + CRLF()
 
-   ::cStr +=  cStr 
+   ::cStr +=  cStr
 
-RETURN Self
+   RETURN Self
 
 METHOD StartSet( aRows, aCols, onLoad, onUnload ) CLASS THtmlFrameSet
 
@@ -105,11 +103,11 @@ METHOD StartSet( aRows, aCols, onLoad, onUnload ) CLASS THtmlFrameSet
 
    cStr += CRLF() + " <FRAMESET "
 
-   IF aRows != NIL .and. Valtype( aRows ) == "A" .and. !Empty( aRows )
+   IF aRows != NIL .AND. ValType( aRows ) == "A" .AND. !Empty( aRows )
       cStr += ' rows="'
 
       FOR EACH cItem in aRows
-         i:=HB_ENUMINDEX()
+         i := HB_ENUMINDEX()
 
          IF i < Len( aRows )
             cStr += cItem + ","
@@ -121,12 +119,12 @@ METHOD StartSet( aRows, aCols, onLoad, onUnload ) CLASS THtmlFrameSet
       cStr += '"'
    ENDIF
 
-   IF aCols != NIL .and. Valtype( aCols ) == "A" .and. !Empty( aCols )
+   IF aCols != NIL .AND. ValType( aCols ) == "A" .AND. !Empty( aCols )
 
       cStr += ' cols="'
 
       FOR EACH cItem IN aCols
-        i:=hb_enumindex()
+         i := hb_enumindex()
          IF i < Len( aCols )
             cStr += cItem + ","
          ELSE
@@ -148,32 +146,29 @@ METHOD StartSet( aRows, aCols, onLoad, onUnload ) CLASS THtmlFrameSet
 
    cStr += " >" + CRLF()
 
-   ::cStr +=  cStr 
+   ::cStr +=  cStr
 
-RETURN Self
-
+   RETURN Self
 
 METHOD Endset() CLASS THtmlFrameSet
 
-   ::cStr +=  " </FRAMESET>" + CRLF() 
+   ::cStr +=  " </FRAMESET>" + CRLF()
 
-RETURN Self
-
+   RETURN Self
 
 METHOD END () CLASS THtmlFrameSet
 
-   ::cStr +=  "</HTML>" + CRLF() 
+   ::cStr +=  "</HTML>" + CRLF()
    FWrite( ::nH, ::cStr )
 
    IF ::FName != NIL
-      Fclose( ::nH )
+      FClose( ::nH )
    ENDIF
 
-RETURN Self
-
+   RETURN Self
 
 METHOD Frame( cName, cURL, lBorder, lResize, lScrolling, ;
-                 marginwidth, marginheight, cTarget, cScrolling ) CLASS THtmlFrameSet
+      marginwidth, marginheight, cTarget, cScrolling ) CLASS THtmlFrameSet
 
    LOCAL cStr
 
@@ -181,7 +176,7 @@ METHOD Frame( cName, cURL, lBorder, lResize, lScrolling, ;
    DEFAULT lResize TO .T.
    DEFAULT lScrolling TO .F.
    DEFAULT cScrolling TO "AUTO"
-   DEFAULT cTarget TO "_self"  
+   DEFAULT cTarget TO "_self"
 
    cStr := "  <FRAME "
 
@@ -220,7 +215,7 @@ METHOD Frame( cName, cURL, lBorder, lResize, lScrolling, ;
    ENDIF
 
    IF marginwidth != NIL
-      cStr += " MARGINWIDTH= " + NTRIM( marginwidth ) 
+      cStr += " MARGINWIDTH= " + NTRIM( marginwidth )
    ENDIF
 
    IF marginheight != NIL
@@ -229,6 +224,7 @@ METHOD Frame( cName, cURL, lBorder, lResize, lScrolling, ;
 
    cStr += ">" + CRLF()
 
-   ::cStr +=  cStr 
+   ::cStr +=  cStr
 
    RETURN Self
+
