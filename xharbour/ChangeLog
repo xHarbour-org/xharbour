@@ -8,6 +8,25 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-02 17:50 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/gtalleg/*.*
+  * source/rtl/gtcgi/*.*
+  * source/rtl/gtcrs/*.*
+  * source/rtl/gtdos/*.*
+  * source/rtl/gtgui/*.*
+  * source/rtl/gtos2/*.*
+  * source/rtl/gtpca/*.*
+  * source/rtl/gtQTc/*.*
+  * source/rtl/gtsln/*.*
+  * source/rtl/gtstd/*.*
+  * source/rtl/gttrm/*.*
+  * source/rtl/gtwin/*.*
+  * source/rtl/gtwvt/*.*
+  * source/rtl/gtxvt/*.*
+  * source/rtl/gtxwc/*.*
+  * source/rtl/gt_tpl/*.*
+    ! code reformatting
+
 2012-10-02 17:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/*.*
     ! code reformatting

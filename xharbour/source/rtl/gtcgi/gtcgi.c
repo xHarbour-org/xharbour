@@ -52,7 +52,7 @@
 
 /* NOTE: User programs should never call this layer directly! */
 
-#define HB_GT_NAME      CGI
+#define HB_GT_NAME CGI
 
 /*
  * HB_GT_CGI_RAWOUTPUT controls the behavior of GTCGI output
@@ -78,24 +78,24 @@
 
 static int           s_GtId;
 static HB_GT_FUNCS   SuperTable;
-#define HB_GTSUPER   (&SuperTable)
-#define HB_GTID_PTR  (&s_GtId)
+#define HB_GTSUPER   ( &SuperTable )
+#define HB_GTID_PTR  ( &s_GtId )
 
-#define HB_GTCGI_GET(p) ( ( PHB_GTCGI ) HB_GTLOCAL( p ) )
+#define HB_GTCGI_GET( p ) ( ( PHB_GTCGI ) HB_GTLOCAL( p ) )
 
 typedef struct _HB_GTCGI
 {
-   FHANDLE        hStdout;
-   int            iRow;
-   int            iCol;
-   int            iLastCol;
-   int            iLineBufSize;
-   BYTE *         sLineBuf;
-   char *         szCrLf;
-   HB_SIZE        ulCrLf;
-   BOOL           fDispTrans;
-   PHB_CODEPAGE   cdpTerm;
-   PHB_CODEPAGE   cdpHost;
+   FHANDLE hStdout;
+   int iRow;
+   int iCol;
+   int iLastCol;
+   int iLineBufSize;
+   BYTE * sLineBuf;
+   char * szCrLf;
+   HB_SIZE ulCrLf;
+   BOOL fDispTrans;
+   PHB_CODEPAGE cdpTerm;
+   PHB_CODEPAGE cdpHost;
 } HB_GTCGI, * PHB_GTCGI;
 
 static void hb_gt_cgi_termOut( PHB_GTCGI pGTCGI, const BYTE * pStr, HB_SIZE ulLen )
@@ -114,14 +114,14 @@ static void hb_gt_cgi_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_cgi_Init(%p,%p,%p,%p)", pGT, hFilenoStdin, hFilenoStdout, hFilenoStderr ) );
 
-   pGTCGI = ( PHB_GTCGI ) hb_xgrab( sizeof( HB_GTCGI ) );
+   pGTCGI            = ( PHB_GTCGI ) hb_xgrab( sizeof( HB_GTCGI ) );
    memset( pGTCGI, 0, sizeof( HB_GTCGI ) );
    HB_GTLOCAL( pGT ) = pGTCGI;
 
-   pGTCGI->hStdout = hFilenoStdout;
+   pGTCGI->hStdout   = hFilenoStdout;
 
-   pGTCGI->szCrLf = hb_strdup( hb_conNewLine() );
-   pGTCGI->ulCrLf = strlen( pGTCGI->szCrLf );
+   pGTCGI->szCrLf    = hb_strdup( hb_conNewLine() );
+   pGTCGI->ulCrLf    = strlen( pGTCGI->szCrLf );
 
    hb_fsSetDevMode( pGTCGI->hStdout, FD_BINARY );
 
@@ -133,7 +133,7 @@ static void hb_gt_cgi_Exit( PHB_GT pGT )
 {
    PHB_GTCGI pGTCGI;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_cgi_Exit(%p)", pGT));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_cgi_Exit(%p)", pGT ) );
 
    HB_GTSELF_REFRESH( pGT );
 
@@ -157,7 +157,7 @@ static void hb_gt_cgi_Exit( PHB_GT pGT )
 
 static int hb_gt_cgi_ReadKey( PHB_GT pGT, int iEventMask )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_cgi_ReadKey(%p,%d)", pGT, iEventMask));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_cgi_ReadKey(%p,%d)", pGT, iEventMask ) );
 
    HB_SYMBOL_UNUSED( pGT );
    HB_SYMBOL_UNUSED( iEventMask );
@@ -167,7 +167,7 @@ static int hb_gt_cgi_ReadKey( PHB_GT pGT, int iEventMask )
 
 static BOOL hb_gt_cgi_IsColor( PHB_GT pGT )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_cgi_IsColor(%p)", pGT));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_cgi_IsColor(%p)", pGT ) );
 
    HB_SYMBOL_UNUSED( pGT );
 
@@ -177,9 +177,9 @@ static BOOL hb_gt_cgi_IsColor( PHB_GT pGT )
 static void hb_gt_cgi_Bell( PHB_GT pGT )
 {
    static const BYTE s_szBell[] = { HB_CHAR_BEL, 0 };
-   PHB_GTCGI pGTCGI;
+   PHB_GTCGI         pGTCGI;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_cgi_Bell(%p)", pGT));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_cgi_Bell(%p)", pGT ) );
 
    pGTCGI = HB_GTCGI_GET( pGT );
 
@@ -216,35 +216,35 @@ static void hb_gt_cgi_Scroll( PHB_GT pGT, int iTop, int iLeft, int iBottom, int 
       /* scroll up the internal screen buffer */
       HB_GTSELF_SCROLLUP( pGT, iRows, bColor, bChar );
       /* update our internal row position */
-      pGTCGI->iRow -= iRows;
+      pGTCGI->iRow      -= iRows;
       if( pGTCGI->iRow < 0 )
          pGTCGI->iRow = 0;
-      pGTCGI->iLastCol = pGTCGI->iCol = 0;
+      pGTCGI->iLastCol  = pGTCGI->iCol = 0;
    }
    else
       HB_GTSUPER_SCROLL( pGT, iTop, iLeft, iBottom, iRight, bColor, bChar, iRows, iCols );
 }
 
-static BOOL hb_gt_cgi_SetDispCP( PHB_GT pGT, const char *pszTermCDP, const char *pszHostCDP, BOOL fBox )
+static BOOL hb_gt_cgi_SetDispCP( PHB_GT pGT, const char * pszTermCDP, const char * pszHostCDP, BOOL fBox )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_cgi_SetDispCP(%p,%s,%s,%d)", pGT, pszTermCDP, pszHostCDP, (int) fBox ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_cgi_SetDispCP(%p,%s,%s,%d)", pGT, pszTermCDP, pszHostCDP, ( int ) fBox ) );
 
    HB_GTSUPER_SETDISPCP( pGT, pszTermCDP, pszHostCDP, fBox );
 
 #ifndef HB_CDP_SUPPORT_OFF
-   if( !pszHostCDP )
+   if( ! pszHostCDP )
       pszHostCDP = hb_cdpID();
-   if( !pszTermCDP )
+   if( ! pszTermCDP )
       pszTermCDP = pszHostCDP;
 
    if( pszTermCDP && pszHostCDP )
    {
       PHB_GTCGI pGTCGI = HB_GTCGI_GET( pGT );
 
-      pGTCGI->cdpTerm = hb_cdpFind( pszTermCDP );
-      pGTCGI->cdpHost = hb_cdpFind( pszHostCDP );
-      pGTCGI->fDispTrans = pGTCGI->cdpTerm && pGTCGI->cdpHost &&
-                           pGTCGI->cdpTerm != pGTCGI->cdpHost;
+      pGTCGI->cdpTerm      = hb_cdpFind( pszTermCDP );
+      pGTCGI->cdpHost      = hb_cdpFind( pszHostCDP );
+      pGTCGI->fDispTrans   = pGTCGI->cdpTerm && pGTCGI->cdpHost &&
+                             pGTCGI->cdpTerm != pGTCGI->cdpHost;
       return TRUE;
    }
 #endif
@@ -256,16 +256,16 @@ static BOOL hb_gt_cgi_SetDispCP( PHB_GT pGT, const char *pszTermCDP, const char 
 
 static void hb_gt_cgi_WriteCon( PHB_GT pGT, BYTE * pText, HB_SIZE ulLength )
 {
-   BYTE * buffer = NULL;
-   PHB_GTCGI pGTCGI = HB_GTCGI_GET( pGT );
+   BYTE *      buffer   = NULL;
+   PHB_GTCGI   pGTCGI   = HB_GTCGI_GET( pGT );
 
 #ifndef HB_CDP_SUPPORT_OFF
    if( pGTCGI->fDispTrans )
    {
-      buffer = ( BYTE * ) hb_xgrab( ulLength );
-      HB_MEMCPY( buffer, pText, (size_t) ulLength );
+      buffer   = ( BYTE * ) hb_xgrab( ulLength );
+      HB_MEMCPY( buffer, pText, ( size_t ) ulLength );
       hb_cdpnTranslate( ( char * ) buffer, pGTCGI->cdpHost, pGTCGI->cdpTerm, ulLength );
-      pText = buffer;
+      pText    = buffer;
    }
 #endif
 
@@ -302,8 +302,8 @@ static void hb_gt_cgi_WriteCon( PHB_GT pGT, BYTE * pText, HB_SIZE ulLength )
 
 static void hb_gt_cgi_WriteAt( PHB_GT pGT, int iRow, int iCol, BYTE * pText, HB_SIZE ulLength )
 {
-   int iLineFeed = 0, iSpace = 0;
-   PHB_GTCGI pGTCGI = HB_GTCGI_GET( pGT );
+   int         iLineFeed   = 0, iSpace = 0;
+   PHB_GTCGI   pGTCGI      = HB_GTCGI_GET( pGT );
 
    if( pGTCGI->iRow != iRow )
    {
@@ -311,8 +311,8 @@ static void hb_gt_cgi_WriteAt( PHB_GT pGT, int iRow, int iCol, BYTE * pText, HB_
    }
    else if( pGTCGI->iCol > iCol )
    {
-      iLineFeed = 1;
-      iSpace = iCol;
+      iLineFeed   = 1;
+      iSpace      = iCol;
    }
    else if( pGTCGI->iCol < iCol )
    {
@@ -328,8 +328,8 @@ static void hb_gt_cgi_WriteAt( PHB_GT pGT, int iRow, int iCol, BYTE * pText, HB_
    }
    while( --iLineFeed >= 0 )
       hb_gt_cgi_newLine( pGTCGI );
-   pGTCGI->iRow = iRow;
-   pGTCGI->iCol = iCol;
+   pGTCGI->iRow   = iRow;
+   pGTCGI->iCol   = iCol;
 
    hb_gt_cgi_WriteCon( pGT, pText, ulLength );
 }
@@ -338,33 +338,33 @@ static void hb_gt_cgi_WriteAt( PHB_GT pGT, int iRow, int iCol, BYTE * pText, HB_
 
 static void hb_gt_cgi_Redraw( PHB_GT pGT, int iRow, int iCol, int iSize )
 {
-   BYTE bColor, bAttr;
-   USHORT usChar;
-   int iLineFeed, iHeight, iWidth, iLen;
-   PHB_GTCGI pGTCGI;
+   BYTE        bColor, bAttr;
+   USHORT      usChar;
+   int         iLineFeed, iHeight, iWidth, iLen;
+   PHB_GTCGI   pGTCGI;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_cgi_Redraw(%p,%d,%d,%d)", pGT, iRow, iCol, iSize ) );
 
-   pGTCGI = HB_GTCGI_GET( pGT );
+   pGTCGI      = HB_GTCGI_GET( pGT );
    HB_GTSELF_GETSIZE( pGT, &iHeight, &iWidth );
-   iLineFeed = iLen = 0;
+   iLineFeed   = iLen = 0;
 
    if( pGTCGI->iRow != iRow )
    {
-      iLineFeed = pGTCGI->iRow < iRow ? iRow - pGTCGI->iRow : 1;
-      pGTCGI->iLastCol = pGTCGI->iCol = iCol = 0;
-      iSize = iWidth;
+      iLineFeed         = pGTCGI->iRow < iRow ? iRow - pGTCGI->iRow : 1;
+      pGTCGI->iLastCol  = pGTCGI->iCol = iCol = 0;
+      iSize             = iWidth;
    }
    else if( pGTCGI->iCol < iCol )
    {
       iSize += iCol - pGTCGI->iCol;
-      iCol = pGTCGI->iCol;
+      iCol  = pGTCGI->iCol;
    }
    else if( pGTCGI->iCol > iCol )
    {
-      iLineFeed = 1;
-      iCol = pGTCGI->iCol = pGTCGI->iLastCol = 0;
-      iSize = iWidth;
+      iLineFeed   = 1;
+      iCol        = pGTCGI->iCol = pGTCGI->iLastCol = 0;
+      iSize       = iWidth;
    }
 
    while( iSize > 0 && iCol + iSize > pGTCGI->iLastCol &&
@@ -383,7 +383,7 @@ static void hb_gt_cgi_Redraw( PHB_GT pGT, int iRow, int iCol, int iSize )
 
       while( iLen < iSize )
       {
-         if( !HB_GTSELF_GETSCRCHAR( pGT, iRow, iCol, &bColor, &bAttr, &usChar ) )
+         if( ! HB_GTSELF_GETSCRCHAR( pGT, iRow, iCol, &bColor, &bAttr, &usChar ) )
             break;
          pGTCGI->sLineBuf[ iLen++ ] = ( BYTE ) usChar;
          ++iCol;
@@ -404,8 +404,8 @@ static void hb_gt_cgi_Redraw( PHB_GT pGT, int iRow, int iCol, int iSize )
 
 static void hb_gt_cgi_Refresh( PHB_GT pGT )
 {
-   int iHeight, iWidth;
-   PHB_GTCGI pGTCGI;
+   int         iHeight, iWidth;
+   PHB_GTCGI   pGTCGI;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_cgi_Refresh(%p)", pGT ) );
 
@@ -413,12 +413,12 @@ static void hb_gt_cgi_Refresh( PHB_GT pGT )
    HB_GTSELF_GETSIZE( pGT, &iHeight, &iWidth );
    if( pGTCGI->iLineBufSize == 0 )
    {
-      pGTCGI->sLineBuf = ( BYTE * ) hb_xgrab( iWidth );
+      pGTCGI->sLineBuf     = ( BYTE * ) hb_xgrab( iWidth );
       pGTCGI->iLineBufSize = iWidth;
    }
    else if( pGTCGI->iLineBufSize < iWidth )
    {
-      pGTCGI->sLineBuf = ( BYTE * ) hb_xrealloc( pGTCGI->sLineBuf, iWidth );
+      pGTCGI->sLineBuf     = ( BYTE * ) hb_xrealloc( pGTCGI->sLineBuf, iWidth );
       pGTCGI->iLineBufSize = iWidth;
    }
    HB_GTSUPER_REFRESH( pGT );
@@ -430,25 +430,25 @@ static void hb_gt_cgi_Refresh( PHB_GT pGT )
 
 static BOOL hb_gt_FuncInit( PHB_GT_FUNCS pFuncTable )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_FuncInit(%p)", pFuncTable));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_FuncInit(%p)", pFuncTable ) );
 
-   pFuncTable->Init                       = hb_gt_cgi_Init;
-   pFuncTable->Exit                       = hb_gt_cgi_Exit;
-   pFuncTable->IsColor                    = hb_gt_cgi_IsColor;
+   pFuncTable->Init        = hb_gt_cgi_Init;
+   pFuncTable->Exit        = hb_gt_cgi_Exit;
+   pFuncTable->IsColor     = hb_gt_cgi_IsColor;
 #ifdef HB_GT_CGI_RAWOUTPUT
-   pFuncTable->WriteCon                   = hb_gt_cgi_WriteCon;
-   pFuncTable->Write                      = hb_gt_cgi_WriteCon;
-   pFuncTable->WriteAt                    = hb_gt_cgi_WriteAt;
+   pFuncTable->WriteCon    = hb_gt_cgi_WriteCon;
+   pFuncTable->Write       = hb_gt_cgi_WriteCon;
+   pFuncTable->WriteAt     = hb_gt_cgi_WriteAt;
 #else
-   pFuncTable->Redraw                     = hb_gt_cgi_Redraw;
-   pFuncTable->Refresh                    = hb_gt_cgi_Refresh;
+   pFuncTable->Redraw      = hb_gt_cgi_Redraw;
+   pFuncTable->Refresh     = hb_gt_cgi_Refresh;
 #endif
-   pFuncTable->Scroll                     = hb_gt_cgi_Scroll;
-   pFuncTable->Version                    = hb_gt_cgi_Version;
-   pFuncTable->SetDispCP                  = hb_gt_cgi_SetDispCP;
-   pFuncTable->Bell                       = hb_gt_cgi_Bell;
+   pFuncTable->Scroll      = hb_gt_cgi_Scroll;
+   pFuncTable->Version     = hb_gt_cgi_Version;
+   pFuncTable->SetDispCP   = hb_gt_cgi_SetDispCP;
+   pFuncTable->Bell        = hb_gt_cgi_Bell;
 
-   pFuncTable->ReadKey                    = hb_gt_cgi_ReadKey;
+   pFuncTable->ReadKey     = hb_gt_cgi_ReadKey;
 
    return TRUE;
 }
@@ -463,13 +463,13 @@ static const HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
 HB_GT_ANNOUNCE( HB_GT_NAME )
 
 HB_CALL_ON_STARTUP_BEGIN( _hb_startup_gt_Init_ )
-   hb_gtRegister( &gtInit );
+hb_gtRegister( &gtInit );
 HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
 #elif defined( HB_DATASEG_STARTUP )
-   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( _hb_startup_gt_Init_ )
+   #define HB_DATASEG_BODY HB_DATASEG_FUNC( _hb_startup_gt_Init_ )
    #include "hbiniseg.h"
 #endif
 

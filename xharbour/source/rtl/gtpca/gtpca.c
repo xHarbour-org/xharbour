@@ -57,7 +57,7 @@
 
 /* NOTE: User programs should never call this layer directly! */
 
-#define HB_GT_NAME      PCA
+#define HB_GT_NAME PCA
 
 #include "hbgtcore.h"
 #include "hbinit.h"
@@ -71,7 +71,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#if defined( HB_OS_UNIX  ) || defined( __DJGPP__ )
+#if defined( HB_OS_UNIX ) || defined( __DJGPP__ )
    #include <unistd.h>  /* read() function requires it */
    #include <termios.h>
    #include <sys/ioctl.h>
@@ -84,46 +84,46 @@
 #  if defined( HB_WIN32_IO )
 #     include <windows.h>
 #  endif
-#  if ( defined( _MSC_VER ) || defined( __WATCOMC__ ) ) && !defined( HB_OS_WIN_CE )
+#  if ( defined( _MSC_VER ) || defined( __WATCOMC__ ) ) && ! defined( HB_OS_WIN_CE )
 #     include <conio.h>
 #  endif
 #endif
 
 static int           s_GtId;
 static HB_GT_FUNCS   SuperTable;
-#define HB_GTSUPER   (&SuperTable)
-#define HB_GTID_PTR  (&s_GtId)
+#define HB_GTSUPER   ( &SuperTable )
+#define HB_GTID_PTR  ( &s_GtId )
 
-static const BYTE   s_szBell[] = { HB_CHAR_BEL, 0 };
-static const int    s_AnsiColors[] = { 0, 4, 2, 6, 1, 5, 3, 7 };
+static const BYTE    s_szBell[] = { HB_CHAR_BEL, 0 };
+static const int     s_AnsiColors[] = { 0, 4, 2, 6, 1, 5, 3, 7 };
 
-static HB_FHANDLE   s_hFilenoStdin;
-static HB_FHANDLE   s_hFilenoStdout;
-static HB_FHANDLE   s_hFilenoStderr;
-static int          s_iRow;
-static int          s_iCol;
-static int          s_iLineBufSize = 0;
-static BYTE *       s_sLineBuf;
-static BYTE *       s_szCrLf;
-static HB_SIZE      s_ulCrLf;
-static int          s_iCurrentSGR, s_iFgColor, s_iBgColor, s_iBold, s_iBlink, s_iAM;
-static int          s_iCursorStyle;
-static BOOL         s_bStdinConsole;
-static BOOL         s_bStdoutConsole;
-static BOOL         s_bStderrConsole;
-static BOOL         s_fDispTrans;
-static PHB_CODEPAGE s_cdpTerm;
-static PHB_CODEPAGE s_cdpHost;
-static BYTE         s_keyTransTbl[ 256 ];
+static HB_FHANDLE    s_hFilenoStdin;
+static HB_FHANDLE    s_hFilenoStdout;
+static HB_FHANDLE    s_hFilenoStderr;
+static int           s_iRow;
+static int           s_iCol;
+static int           s_iLineBufSize = 0;
+static BYTE *        s_sLineBuf;
+static BYTE *        s_szCrLf;
+static HB_SIZE       s_ulCrLf;
+static int           s_iCurrentSGR, s_iFgColor, s_iBgColor, s_iBold, s_iBlink, s_iAM;
+static int           s_iCursorStyle;
+static BOOL          s_bStdinConsole;
+static BOOL          s_bStdoutConsole;
+static BOOL          s_bStderrConsole;
+static BOOL          s_fDispTrans;
+static PHB_CODEPAGE  s_cdpTerm;
+static PHB_CODEPAGE  s_cdpHost;
+static BYTE          s_keyTransTbl[ 256 ];
 
-static int          s_iOutBufSize = 0;
-static int          s_iOutBufIndex = 0;
-static BYTE *       s_sOutBuf;
+static int           s_iOutBufSize  = 0;
+static int           s_iOutBufIndex = 0;
+static BYTE *        s_sOutBuf;
 
 #if defined( HB_OS_UNIX ) || defined( __DJGPP__ )
 
-static volatile BOOL s_fRestTTY = FALSE;
-static struct termios s_saved_TIO, s_curr_TIO;
+static volatile BOOL    s_fRestTTY = FALSE;
+static struct termios   s_saved_TIO, s_curr_TIO;
 
 #if defined( SIGTTOU )
 static void sig_handler( int iSigNo )
@@ -133,10 +133,12 @@ static void sig_handler( int iSigNo )
 #ifdef SIGCHLD
       case SIGCHLD:
       {
-         int e = errno, stat;
+         int   e = errno, stat;
          pid_t pid;
          do
+         {
             pid = waitpid( -1, &stat, WNOHANG );
+         }
          while( pid > 0 );
          errno = e;
          break;
@@ -195,16 +197,16 @@ static void hb_gt_pca_termOut( const BYTE * pStr, int iLen )
          if( i > iLen )
             i = iLen;
          memcpy( s_sOutBuf + s_iOutBufIndex, pStr, i );
-         pStr += i;
+         pStr           += i;
          s_iOutBufIndex += i;
-         iLen -= i;
+         iLen           -= i;
       }
    }
 }
 
 static void hb_gt_pca_AnsiSetAutoMargin( int iAM )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_pca_AnsiSetAutoMargin(%d)", iAM));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_pca_AnsiSetAutoMargin(%d)", iAM ) );
 
    if( iAM != s_iAM )
    {
@@ -226,7 +228,7 @@ static void hb_gt_pca_AnsiGetCurPos( int * iRow, int * iCol )
 {
    static BOOL s_fIsAnswer = TRUE;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_pca_AnsiGetCurPos(%p, %p)", iRow, iCol));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_pca_AnsiGetCurPos(%p, %p)", iRow, iCol ) );
 
    if( s_fIsAnswer && s_bStdinConsole && s_bStdoutConsole )
    {
@@ -235,39 +237,39 @@ static void hb_gt_pca_AnsiGetCurPos( int * iRow, int * iCol )
 
 #if defined( HB_OS_UNIX ) || defined( __DJGPP__ )
       {
-         char rdbuf[ 64 ];
-         int i, n, y, x;
+         char           rdbuf[ 64 ];
+         int            i, n, y, x;
          struct timeval tv;
-         fd_set rdfds;
+         fd_set         rdfds;
 
          FD_ZERO( &rdfds );
          FD_SET( s_hFilenoStdin, &rdfds );
-         tv.tv_sec = 2;
-         tv.tv_usec = 0;
+         tv.tv_sec   = 2;
+         tv.tv_usec  = 0;
 
-         *iRow = *iCol = -1;
-         n = 0;
+         *iRow       = *iCol = -1;
+         n           = 0;
          s_fIsAnswer = FALSE;
 
          while( select( s_hFilenoStdin + 1, &rdfds, NULL, NULL, &tv ) > 0 )
          {
-            i = read( s_hFilenoStdin, rdbuf + n, sizeof( rdbuf ) - 1 - n );
+            i  = read( s_hFilenoStdin, rdbuf + n, sizeof( rdbuf ) - 1 - n );
             if( i <= 0 )
                break;
-            n += i;
+            n  += i;
             if( n >= 6 )
             {
                rdbuf[ n ] = '\0';
                if( sscanf( rdbuf, "\033[%d;%dR", &y, &x ) == 2 )
                {
-                  *iRow = y;
-                  *iCol = x;
+                  *iRow       = y;
+                  *iCol       = x;
                   s_fIsAnswer = TRUE;
                   break;
                }
             }
          }
-         if( !s_fIsAnswer )
+         if( ! s_fIsAnswer )
             *iRow = *iCol = -1;
       }
 #else
@@ -287,7 +289,7 @@ static void hb_gt_pca_AnsiGetCurPos( int * iRow, int * iCol )
             }
          }
          while( ch != 'R' && index < 10 );
-         *iCol = value - 1;
+         *iCol       = value - 1;
          s_fIsAnswer = ch == 'R' && *iCol != -1 && *iRow != -1;
       }
 #endif
@@ -296,47 +298,47 @@ static void hb_gt_pca_AnsiGetCurPos( int * iRow, int * iCol )
 
 static void hb_gt_pca_AnsiSetCursorPos( int iRow, int iCol )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_pca_AnsiSetCursorPos(%d, %d)", iRow, iCol));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_pca_AnsiSetCursorPos(%d, %d)", iRow, iCol ) );
 
    if( s_iRow != iRow || s_iCol != iCol )
    {
-      char buff[16];
+      char buff[ 16 ];
       hb_snprintf( buff, sizeof( buff ), "\x1B[%d;%dH", iRow + 1, iCol + 1 );
-      hb_gt_pca_termOut( ( BYTE * ) buff, (int) strlen( buff ) );
-      s_iRow = iRow;
-      s_iCol = iCol;
+      hb_gt_pca_termOut( ( BYTE * ) buff, ( int ) strlen( buff ) );
+      s_iRow   = iRow;
+      s_iCol   = iCol;
    }
 }
 
 static void hb_gt_pca_AnsiSetCursorStyle( int iStyle )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_pca_AnsiSetCursorStyle(%d)", iStyle));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_pca_AnsiSetCursorStyle(%d)", iStyle ) );
 
    if( s_iCursorStyle != iStyle )
    {
       hb_gt_pca_termOut( ( BYTE * ) ( iStyle == SC_NONE ? "\x1B[?25l" :
-                                                          "\x1B[?25h" ), 6 );
+                                      "\x1B[?25h" ), 6 );
       s_iCursorStyle = iStyle;
    }
 }
 
 static void hb_gt_pca_AnsiSetAttributes( int iAttr )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_pca_AnsiSetAttributes(%d)", iAttr));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_pca_AnsiSetAttributes(%d)", iAttr ) );
 
    if( s_iCurrentSGR != iAttr )
    {
-      int i, bg, fg, bold, blink;
-      BYTE buff[16];
+      int   i, bg, fg, bold, blink;
+      BYTE  buff[ 16 ];
 
-      i = 2;
-      buff[ 0 ] = 0x1b;
-      buff[ 1 ] = '[';
+      i           = 2;
+      buff[ 0 ]   = 0x1b;
+      buff[ 1 ]   = '[';
 
-      bg    = s_AnsiColors[ ( iAttr >> 4 ) & 0x07 ];
-      fg    = s_AnsiColors[ iAttr & 0x07 ];
-      bold  = iAttr & 0x08 ? 1 : 0;
-      blink = iAttr & 0x80 ? 1 : 0;
+      bg          = s_AnsiColors[ ( iAttr >> 4 ) & 0x07 ];
+      fg          = s_AnsiColors[ iAttr & 0x07 ];
+      bold        = iAttr & 0x08 ? 1 : 0;
+      blink       = iAttr & 0x80 ? 1 : 0;
 
       if( s_iCurrentSGR == -1 )
       {
@@ -358,42 +360,42 @@ static void hb_gt_pca_AnsiSetAttributes( int iAttr )
          buff[ i++ ] = '4';
          buff[ i++ ] = '0' + ( BYTE ) bg;
          buff[ i++ ] = 'm';
-         s_iBold    = bold;
-         s_iBlink   = blink;
-         s_iFgColor = fg;
-         s_iBgColor = bg;
+         s_iBold     = bold;
+         s_iBlink    = blink;
+         s_iFgColor  = fg;
+         s_iBgColor  = bg;
       }
       else
       {
          if( s_iBold != bold )
          {
-            if( !bold )
+            if( ! bold )
                buff[ i++ ] = '2';
             buff[ i++ ] = '1';
             buff[ i++ ] = ';';
-            s_iBold = bold;
+            s_iBold     = bold;
          }
          if( s_iBlink != blink )
          {
-            if( !blink )
+            if( ! blink )
                buff[ i++ ] = '2';
             buff[ i++ ] = '5';
             buff[ i++ ] = ';';
-            s_iBlink = blink;
+            s_iBlink    = blink;
          }
          if( s_iFgColor != fg )
          {
             buff[ i++ ] = '3';
             buff[ i++ ] = '0' + ( BYTE ) fg;
             buff[ i++ ] = ';';
-            s_iFgColor = fg;
+            s_iFgColor  = fg;
          }
          if( s_iBgColor != bg )
          {
             buff[ i++ ] = '4';
             buff[ i++ ] = '0' + ( BYTE ) bg;
             buff[ i++ ] = ';';
-            s_iBgColor = bg;
+            s_iBgColor  = bg;
          }
          buff[ i - 1 ] = 'm';
       }
@@ -410,9 +412,9 @@ static void hb_gt_pca_AnsiInit( void )
    s_iCurrentSGR = s_iRow = s_iCol = s_iCursorStyle = s_iAM = -1;
 }
 
-static void hb_gt_pca_AnsiPutStr( int iRow, int iCol, BYTE bAttr, BYTE *pStr, int iLen )
+static void hb_gt_pca_AnsiPutStr( int iRow, int iCol, BYTE bAttr, BYTE * pStr, int iLen )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_pca_AnsiPutStr(%d,%d,%hu,%p,%d)", iRow, iCol, bAttr, pStr, iLen));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_pca_AnsiPutStr(%d,%d,%hu,%p,%d)", iRow, iCol, bAttr, pStr, iLen ) );
 
    hb_gt_pca_AnsiSetAttributes( bAttr );
    hb_gt_pca_AnsiSetCursorPos( iRow, iCol );
@@ -440,22 +442,22 @@ static void hb_gt_pca_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
 {
    int iRows = 25, iCols = 80;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_pca_Init(%p,%p,%p,%p)", pGT, ( void * ) ( HB_PTRDIFF ) hFilenoStdin, ( void * ) ( HB_PTRDIFF ) hFilenoStdout, ( void * ) ( HB_PTRDIFF ) hFilenoStderr));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_pca_Init(%p,%p,%p,%p)", pGT, ( void * ) ( HB_PTRDIFF ) hFilenoStdin, ( void * ) ( HB_PTRDIFF ) hFilenoStdout, ( void * ) ( HB_PTRDIFF ) hFilenoStderr ) );
 
-   s_hFilenoStdin  = hFilenoStdin;
-   s_hFilenoStdout = hFilenoStdout;
-   s_hFilenoStderr = hFilenoStderr;
+   s_hFilenoStdin    = hFilenoStdin;
+   s_hFilenoStdout   = hFilenoStdout;
+   s_hFilenoStderr   = hFilenoStderr;
 
-   s_bStdinConsole  = hb_fsIsDevice( s_hFilenoStdin );
-   s_bStdoutConsole = hb_fsIsDevice( s_hFilenoStdout );
-   s_bStderrConsole = hb_fsIsDevice( s_hFilenoStderr );
+   s_bStdinConsole   = hb_fsIsDevice( s_hFilenoStdin );
+   s_bStdoutConsole  = hb_fsIsDevice( s_hFilenoStdout );
+   s_bStderrConsole  = hb_fsIsDevice( s_hFilenoStderr );
 
-   s_cdpTerm = s_cdpHost = NULL;
-   s_fDispTrans = FALSE;
+   s_cdpTerm         = s_cdpHost = NULL;
+   s_fDispTrans      = FALSE;
    hb_gt_pca_setKeyTrans( NULL, NULL );
 
-   s_szCrLf = (BYTE *) hb_conNewLine();
-   s_ulCrLf = strlen( (char *) s_szCrLf );
+   s_szCrLf          = ( BYTE * ) hb_conNewLine();
+   s_ulCrLf          = strlen( ( char * ) s_szCrLf );
 
    hb_fsSetDevMode( s_hFilenoStdout, FD_BINARY );
 
@@ -463,7 +465,7 @@ static void hb_gt_pca_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
 
 /* SA_NOCLDSTOP in #if is a hack to detect POSIX compatible environment */
 #if ( defined( HB_OS_UNIX ) || defined( __DJGPP__ ) ) && \
-    defined( SA_NOCLDSTOP )
+   defined( SA_NOCLDSTOP )
    s_fRestTTY = FALSE;
    if( s_bStdinConsole )
    {
@@ -476,11 +478,11 @@ static void hb_gt_pca_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
       act.sa_handler = sig_handler;
       /* do not use SA_RESTART - new Linux kernels will repeat the operation */
 #if defined( SA_ONESHOT )
-      act.sa_flags = SA_ONESHOT;
+      act.sa_flags   = SA_ONESHOT;
 #elif defined( SA_RESETHAND )
-      act.sa_flags = SA_RESETHAND;
+      act.sa_flags   = SA_RESETHAND;
 #else
-      act.sa_flags = 0;
+      act.sa_flags   = 0;
 #endif
       sigaction( SIGTTOU, &act, 0 );
 #endif
@@ -490,10 +492,10 @@ static void hb_gt_pca_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
       tcgetattr( hFilenoStdin, &s_saved_TIO );
       memcpy( &s_curr_TIO, &s_saved_TIO, sizeof( struct termios ) );
       /* atexit( restore_input_mode ); */
-      s_curr_TIO.c_lflag &= ~( ICANON | ECHO );
-      s_curr_TIO.c_iflag &= ~ICRNL;
-      s_curr_TIO.c_cc[ VMIN ] = 0;
-      s_curr_TIO.c_cc[ VTIME ] = 0;
+      s_curr_TIO.c_lflag         &= ~( ICANON | ECHO );
+      s_curr_TIO.c_iflag         &= ~ICRNL;
+      s_curr_TIO.c_cc[ VMIN ]    = 0;
+      s_curr_TIO.c_cc[ VTIME ]   = 0;
       tcsetattr( hFilenoStdin, TCSAFLUSH, &s_curr_TIO );
 
 #if defined( SIGTTOU )
@@ -507,7 +509,7 @@ static void hb_gt_pca_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
    {
       struct winsize win;
 
-      if ( ioctl( hFilenoStdout, TIOCGWINSZ, ( char * ) &win ) != -1 )
+      if( ioctl( hFilenoStdout, TIOCGWINSZ, ( char * ) &win ) != -1 )
       {
          iRows = win.ws_row;
          iCols = win.ws_col;
@@ -519,8 +521,8 @@ static void hb_gt_pca_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
    if( s_iOutBufSize == 0 )
    {
       s_iOutBufIndex = 0;
-      s_iOutBufSize = 16384;
-      s_sOutBuf = ( BYTE * ) hb_xgrab( s_iOutBufSize );
+      s_iOutBufSize  = 16384;
+      s_sOutBuf      = ( BYTE * ) hb_xgrab( s_iOutBufSize );
    }
 
    HB_GTSELF_RESIZE( pGT, iRows, iCols );
@@ -533,7 +535,7 @@ static void hb_gt_pca_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
 
 static void hb_gt_pca_Exit( PHB_GT pGT )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_pca_Exit(%p)", pGT));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_pca_Exit(%p)", pGT ) );
 
    HB_GTSELF_REFRESH( pGT );
    /* set default color */
@@ -565,7 +567,7 @@ static int hb_gt_pca_ReadKey( PHB_GT pGT, int iEventMask )
 {
    int ch = 0;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_pca_ReadKey(%p,%d)", pGT, iEventMask));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_pca_ReadKey(%p,%d)", pGT, iEventMask ) );
 
    HB_SYMBOL_UNUSED( pGT );
    HB_SYMBOL_UNUSED( iEventMask );
@@ -578,7 +580,8 @@ static int hb_gt_pca_ReadKey( PHB_GT pGT, int iEventMask )
    {
       /* It's a function key lead-in, so read the function key scan code */
       ch = _read_kbd( 0, 0, 0 );
-      if( ch != -1 ) ch += 256;      /* If it's really a scan code, offset it */
+      if( ch != -1 )
+         ch += 256;                  /* If it's really a scan code, offset it */
    }
    /* _read_kbd() returns -1 for no key, the switch statement will handle
       this. */
@@ -589,9 +592,9 @@ static int hb_gt_pca_ReadKey( PHB_GT pGT, int iEventMask )
 #elif defined( HB_OS_UNIX ) || defined( __DJGPP__ )
    {
       struct timeval tv;
-      fd_set rfds;
-      tv.tv_sec = 0;
-      tv.tv_usec = 0;
+      fd_set         rfds;
+      tv.tv_sec   = 0;
+      tv.tv_usec  = 0;
       FD_ZERO( &rfds );
       FD_SET( s_hFilenoStdin, &rfds );
       if( select( s_hFilenoStdin + 1, &rfds, NULL, NULL, &tv ) > 0 )
@@ -601,7 +604,7 @@ static int hb_gt_pca_ReadKey( PHB_GT pGT, int iEventMask )
             ch = s_keyTransTbl[ bChar ];
       }
    }
-#elif defined( _MSC_VER ) && !defined( HB_OS_WIN_CE )
+#elif defined( _MSC_VER ) && ! defined( HB_OS_WIN_CE )
    if( s_bStdinConsole )
    {
       if( _kbhit() )
@@ -618,14 +621,14 @@ static int hb_gt_pca_ReadKey( PHB_GT pGT, int iEventMask )
             ch = s_keyTransTbl[ ch ];
       }
    }
-   else if( !_eof( (int) s_hFilenoStdin ) )
+   else if( ! _eof( ( int ) s_hFilenoStdin ) )
    {
       BYTE bChar;
-      if( _read( (int) s_hFilenoStdin, &bChar, 1 ) == 1 )
+      if( _read( ( int ) s_hFilenoStdin, &bChar, 1 ) == 1 )
          ch = s_keyTransTbl[ bChar ];
    }
 #elif defined( HB_WIN32_IO )
-   if( !s_bStdinConsole ||
+   if( ! s_bStdinConsole ||
        WaitForSingleObject( ( HANDLE ) hb_fsGetOsHandle( s_hFilenoStdin ), 0 ) == 0x0000 )
    {
       BYTE bChar;
@@ -649,7 +652,7 @@ static int hb_gt_pca_ReadKey( PHB_GT pGT, int iEventMask )
             ch = s_keyTransTbl[ ch ];
       }
    }
-   else if( !eof( s_hFilenoStdin ) )
+   else if( ! eof( s_hFilenoStdin ) )
    {
       BYTE bChar;
       if( read( s_hFilenoStdin, &bChar, 1 ) == 1 )
@@ -666,10 +669,10 @@ static int hb_gt_pca_ReadKey( PHB_GT pGT, int iEventMask )
 
 static void hb_gt_pca_Tone( PHB_GT pGT, double dFrequency, double dDuration )
 {
-   static double dLastSeconds = 0;
-   double dCurrentSeconds;
+   static double  dLastSeconds = 0;
+   double         dCurrentSeconds;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_pca_Tone(%p, %lf, %lf)", pGT, dFrequency, dDuration));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_pca_Tone(%p, %lf, %lf)", pGT, dFrequency, dDuration ) );
 
    HB_SYMBOL_UNUSED( pGT );
 
@@ -694,7 +697,7 @@ static void hb_gt_pca_Tone( PHB_GT pGT, double dFrequency, double dDuration )
 
 static void hb_gt_pca_Bell( PHB_GT pGT )
 {
-   HB_TRACE(HB_TR_DEBUG, ( "hb_gt_pca_Bell(%p)", pGT ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_pca_Bell(%p)", pGT ) );
 
    HB_SYMBOL_UNUSED( pGT );
 
@@ -746,23 +749,23 @@ static BOOL hb_gt_pca_Resume( PHB_GT pGT )
    return TRUE;
 }
 
-static BOOL hb_gt_pca_SetDispCP( PHB_GT pGT, const char *pszTermCDP, const char *pszHostCDP, BOOL fBox )
+static BOOL hb_gt_pca_SetDispCP( PHB_GT pGT, const char * pszTermCDP, const char * pszHostCDP, BOOL fBox )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_pca_SetDispCP(%p,%s,%s,%d)", pGT, pszTermCDP, pszHostCDP, (int) fBox ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_pca_SetDispCP(%p,%s,%s,%d)", pGT, pszTermCDP, pszHostCDP, ( int ) fBox ) );
 
    HB_GTSUPER_SETDISPCP( pGT, pszTermCDP, pszHostCDP, fBox );
 
 #ifndef HB_CDP_SUPPORT_OFF
-   if( !pszHostCDP )
+   if( ! pszHostCDP )
       pszHostCDP = hb_cdpID();
-   if( !pszTermCDP )
+   if( ! pszTermCDP )
       pszTermCDP = pszHostCDP;
 
    if( pszTermCDP && pszHostCDP )
    {
-      s_cdpTerm = hb_cdpFind( pszTermCDP );
-      s_cdpHost = hb_cdpFind( pszHostCDP );
-      s_fDispTrans = s_cdpTerm && s_cdpHost && s_cdpTerm != s_cdpHost;
+      s_cdpTerm      = hb_cdpFind( pszTermCDP );
+      s_cdpHost      = hb_cdpFind( pszHostCDP );
+      s_fDispTrans   = s_cdpTerm && s_cdpHost && s_cdpTerm != s_cdpHost;
       return TRUE;
    }
 #endif
@@ -770,16 +773,16 @@ static BOOL hb_gt_pca_SetDispCP( PHB_GT pGT, const char *pszTermCDP, const char 
    return FALSE;
 }
 
-static BOOL hb_gt_pca_SetKeyCP( PHB_GT pGT, const char *pszTermCDP, const char *pszHostCDP )
+static BOOL hb_gt_pca_SetKeyCP( PHB_GT pGT, const char * pszTermCDP, const char * pszHostCDP )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_pca_SetKeyCP(%p,%s,%s)", pGT, pszTermCDP, pszHostCDP ) );
 
    HB_GTSUPER_SETKEYCP( pGT, pszTermCDP, pszHostCDP );
 
 #ifndef HB_CDP_SUPPORT_OFF
-   if( !pszHostCDP )
+   if( ! pszHostCDP )
       pszHostCDP = hb_cdpID();
-   if( !pszTermCDP )
+   if( ! pszTermCDP )
       pszTermCDP = pszHostCDP;
 
    if( pszTermCDP && pszHostCDP )
@@ -789,8 +792,8 @@ static BOOL hb_gt_pca_SetKeyCP( PHB_GT pGT, const char *pszTermCDP, const char *
       if( cdpTerm && cdpHost && cdpTerm != cdpHost &&
           cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
       {
-         char *pszHostLetters = ( char * ) hb_xgrab( cdpHost->nChars * 2 + 1 );
-         char *pszTermLetters = ( char * ) hb_xgrab( cdpTerm->nChars * 2 + 1 );
+         char *   pszHostLetters = ( char * ) hb_xgrab( cdpHost->nChars * 2 + 1 );
+         char *   pszTermLetters = ( char * ) hb_xgrab( cdpTerm->nChars * 2 + 1 );
 
          hb_strncpy( pszHostLetters, cdpHost->CharsUpper, cdpHost->nChars * 2 );
          hb_strncat( pszHostLetters, cdpHost->CharsLower, cdpHost->nChars * 2 );
@@ -814,15 +817,15 @@ static BOOL hb_gt_pca_SetKeyCP( PHB_GT pGT, const char *pszTermCDP, const char *
 
 static void hb_gt_pca_Redraw( PHB_GT pGT, int iRow, int iCol, int iSize )
 {
-   BYTE bColor, bAttr;
-   USHORT usChar;
-   int iLen = 0, iColor = 0;
+   BYTE     bColor, bAttr;
+   USHORT   usChar;
+   int      iLen = 0, iColor = 0;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_pca_Redraw(%p,%d,%d,%d)", pGT, iRow, iCol, iSize ) );
 
    while( iSize-- )
    {
-      if( !HB_GTSELF_GETSCRCHAR( pGT, iRow, iCol + iLen, &bColor, &bAttr, &usChar ) )
+      if( ! HB_GTSELF_GETSCRCHAR( pGT, iRow, iCol + iLen, &bColor, &bAttr, &usChar ) )
          break;
 
       if( iLen == 0 )
@@ -834,9 +837,9 @@ static void hb_gt_pca_Redraw( PHB_GT pGT, int iRow, int iCol, int iSize )
             hb_cdpnTranslate( ( char * ) s_sLineBuf, s_cdpHost, s_cdpTerm, iLen );
 #endif
          hb_gt_pca_AnsiPutStr( iRow, iCol, ( BYTE ) iColor, s_sLineBuf, iLen );
-         iCol += iLen;
-         iLen = 0;
-         iColor = bColor;
+         iCol     += iLen;
+         iLen     = 0;
+         iColor   = bColor;
       }
       if( usChar < 32 || usChar == 127 )
          usChar = '.';
@@ -862,12 +865,12 @@ static void hb_gt_pca_Refresh( PHB_GT pGT )
 
    if( s_iLineBufSize == 0 )
    {
-      s_sLineBuf = ( BYTE * ) hb_xgrab( iWidth );
+      s_sLineBuf     = ( BYTE * ) hb_xgrab( iWidth );
       s_iLineBufSize = iWidth;
    }
    else if( s_iLineBufSize != iWidth )
    {
-      s_sLineBuf = ( BYTE * ) hb_xrealloc( s_sLineBuf, iWidth );
+      s_sLineBuf     = ( BYTE * ) hb_xrealloc( s_sLineBuf, iWidth );
       s_iLineBufSize = iWidth;
    }
 
@@ -889,7 +892,7 @@ static BOOL hb_gt_pca_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_pca_Info(%p,%d,%p)", pGT, iType, pInfo ) );
 
-   switch ( iType )
+   switch( iType )
    {
       case HB_GTI_FULLSCREEN:
       case HB_GTI_KBDSUPPORT:
@@ -906,22 +909,22 @@ static BOOL hb_gt_pca_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
 
 static BOOL hb_gt_FuncInit( PHB_GT_FUNCS pFuncTable )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_FuncInit(%p)", pFuncTable));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_FuncInit(%p)", pFuncTable ) );
 
-   pFuncTable->Init                       = hb_gt_pca_Init;
-   pFuncTable->Exit                       = hb_gt_pca_Exit;
-   pFuncTable->Redraw                     = hb_gt_pca_Redraw;
-   pFuncTable->Refresh                    = hb_gt_pca_Refresh;
-   pFuncTable->Version                    = hb_gt_pca_Version;
-   pFuncTable->Suspend                    = hb_gt_pca_Suspend;
-   pFuncTable->Resume                     = hb_gt_pca_Resume;
-   pFuncTable->SetDispCP                  = hb_gt_pca_SetDispCP;
-   pFuncTable->SetKeyCP                   = hb_gt_pca_SetKeyCP;
-   pFuncTable->Tone                       = hb_gt_pca_Tone;
-   pFuncTable->Bell                       = hb_gt_pca_Bell;
-   pFuncTable->Info                       = hb_gt_pca_Info;
+   pFuncTable->Init        = hb_gt_pca_Init;
+   pFuncTable->Exit        = hb_gt_pca_Exit;
+   pFuncTable->Redraw      = hb_gt_pca_Redraw;
+   pFuncTable->Refresh     = hb_gt_pca_Refresh;
+   pFuncTable->Version     = hb_gt_pca_Version;
+   pFuncTable->Suspend     = hb_gt_pca_Suspend;
+   pFuncTable->Resume      = hb_gt_pca_Resume;
+   pFuncTable->SetDispCP   = hb_gt_pca_SetDispCP;
+   pFuncTable->SetKeyCP    = hb_gt_pca_SetKeyCP;
+   pFuncTable->Tone        = hb_gt_pca_Tone;
+   pFuncTable->Bell        = hb_gt_pca_Bell;
+   pFuncTable->Info        = hb_gt_pca_Info;
 
-   pFuncTable->ReadKey                    = hb_gt_pca_ReadKey;
+   pFuncTable->ReadKey     = hb_gt_pca_ReadKey;
 
    return TRUE;
 }
@@ -936,13 +939,13 @@ static const HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
 HB_GT_ANNOUNCE( HB_GT_NAME )
 
 HB_CALL_ON_STARTUP_BEGIN( _hb_startup_gt_Init_ )
-   hb_gtRegister( &gtInit );
+hb_gtRegister( &gtInit );
 HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
 #elif defined( HB_DATASEG_STARTUP )
-   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( _hb_startup_gt_Init_ )
+   #define HB_DATASEG_BODY HB_DATASEG_FUNC( _hb_startup_gt_Init_ )
    #include "hbiniseg.h"
 #endif
 /* *********************************************************************** */

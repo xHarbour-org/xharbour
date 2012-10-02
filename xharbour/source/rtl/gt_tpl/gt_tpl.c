@@ -58,8 +58,8 @@
 #include "hbinit.h"
 static int           s_GtId;
 static HB_GT_FUNCS   SuperTable;
-#define HB_GTSUPER   (&SuperTable)
-#define HB_GTID_PTR  (&s_GtId)
+#define HB_GTSUPER   ( &SuperTable )
+#define HB_GTID_PTR  ( &s_GtId )
 
 static void hb_gt_tpl_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStdout, FHANDLE hFilenoStderr )
 {
@@ -72,7 +72,7 @@ static void hb_gt_tpl_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
 
 static void hb_gt_tpl_Exit( PHB_GT pGT )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_tpl_Exit(%p)", pGT));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_tpl_Exit(%p)", pGT ) );
 
    HB_GTSUPER_EXIT( pGT );
 
@@ -82,7 +82,7 @@ static void hb_gt_tpl_Exit( PHB_GT pGT )
 
 static int hb_gt_tpl_ReadKey( PHB_GT pGT, int iEventMask )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_tpl_ReadKey(%p,%d)", pGT, iEventMask));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_tpl_ReadKey(%p,%d)", pGT, iEventMask ) );
 
    HB_SYMBOL_UNUSED( pGT );
    HB_SYMBOL_UNUSED( iEventMask );
@@ -107,7 +107,7 @@ static char * hb_gt_tpl_Version( PHB_GT pGT, int iType )
 
 static BOOL hb_gt_tpl_SetMode( PHB_GT pGT, int iRows, int iCols )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_tpl_SetMode(%p,%d,%d)", pGT, iRows, iCols));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_tpl_SetMode(%p,%d,%d)", pGT, iRows, iCols ) );
 
    HB_SYMBOL_UNUSED( pGT );
    HB_SYMBOL_UNUSED( iRows );
@@ -120,14 +120,14 @@ static BOOL hb_gt_tpl_SetMode( PHB_GT pGT, int iRows, int iCols )
 
 static void hb_gt_tpl_Redraw( PHB_GT pGT, int iRow, int iCol, int iSize )
 {
-   BYTE bColor, bAttr;
-   USHORT usChar;
+   BYTE     bColor, bAttr;
+   USHORT   usChar;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_tpl_Redraw(%p,%d,%d,%d)", pGT, iRow, iCol, iSize ) );
 
    while( iSize-- )
    {
-      if( !HB_GTSELF_GETSCRCHAR( pGT, iRow, iCol, &bColor, &bAttr, &usChar ) )
+      if( ! HB_GTSELF_GETSCRCHAR( pGT, iRow, iCol, &bColor, &bAttr, &usChar ) )
          break;
       /* TODO: display usChar at iRow, iCol position with color bColor */
       ++iCol;
@@ -151,15 +151,15 @@ static void hb_gt_tpl_Refresh( PHB_GT pGT )
 
 static BOOL hb_gt_FuncInit( PHB_GT_FUNCS pFuncTable )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_FuncInit(%p)", pFuncTable));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_FuncInit(%p)", pFuncTable ) );
 
-   pFuncTable->Init                       = hb_gt_tpl_Init;
-   pFuncTable->Exit                       = hb_gt_tpl_Exit;
-   pFuncTable->ReadKey                    = hb_gt_tpl_ReadKey;
-   pFuncTable->Version                    = hb_gt_tpl_Version;
-   pFuncTable->SetMode                    = hb_gt_tpl_SetMode;
-   pFuncTable->Redraw                     = hb_gt_tpl_Redraw;
-   pFuncTable->Refresh                    = hb_gt_tpl_Refresh;
+   pFuncTable->Init     = hb_gt_tpl_Init;
+   pFuncTable->Exit     = hb_gt_tpl_Exit;
+   pFuncTable->ReadKey  = hb_gt_tpl_ReadKey;
+   pFuncTable->Version  = hb_gt_tpl_Version;
+   pFuncTable->SetMode  = hb_gt_tpl_SetMode;
+   pFuncTable->Redraw   = hb_gt_tpl_Redraw;
+   pFuncTable->Refresh  = hb_gt_tpl_Refresh;
 
    return TRUE;
 }
@@ -174,13 +174,13 @@ static const HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
 HB_GT_ANNOUNCE( HB_GT_NAME )
 
 HB_CALL_ON_STARTUP_BEGIN( _hb_startup_gt_Init_ )
-   hb_gtRegister( &gtInit );
+hb_gtRegister( &gtInit );
 HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
 #elif defined( HB_DATASEG_STARTUP )
-   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( _hb_startup_gt_Init_ )
+   #define HB_DATASEG_BODY HB_DATASEG_FUNC( _hb_startup_gt_Init_ )
    #include "hbiniseg.h"
 #endif
 

@@ -65,17 +65,17 @@
 
 #if defined( HB_OS_WIN ) && defined( HB_GTGUI_HACK )
 
-#if defined(HB_GT_DEFAULT)
+#if defined( HB_GT_DEFAULT )
 #  define HB_GT_NAME HB_GT_DEFAULT
-#elif defined(HB_GT_LIB)
+#elif defined( HB_GT_LIB )
 #  define HB_GT_NAME HB_GT_LIB
 #else
 #  define HB_GT_NAME WIN
 #endif
 
 /* Small trick to check if the default GT is not already set to GUI */
-#define GUI 1
-#define gui 1
+#define GUI          1
+#define gui          1
 
 #if HB_GT_NAME + 1 == 1
 
@@ -89,13 +89,13 @@ HB_GT_REQUEST( GUI )
 HB_GT_ANNOUNCE( HB_GT_NAME )
 
 HB_CALL_ON_STARTUP_BEGIN( _hb_startup_gt_hack_ )
-   hb_gtSetDefault( "GUI" );
+hb_gtSetDefault( "GUI" );
 HB_CALL_ON_STARTUP_END( _hb_startup_gt_hack_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_hack_
 #elif defined( HB_DATASEG_STARTUP )
-   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( _hb_startup_gt_hack_ )
+   #define HB_DATASEG_BODY HB_DATASEG_FUNC( _hb_startup_gt_hack_ )
    #include "hbiniseg.h"
 #endif
 

@@ -4,7 +4,7 @@
 
 /*
  * Harbour Project source code:
- * Mouse subsystem for gtsln 
+ * Mouse subsystem for gtsln
  *
  * Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>
  * www - http://www.harbour-project.org
@@ -59,50 +59,50 @@
     #include <sys/stat.h>
     #include <fcntl.h>
     #include <gpm.h>
-    Gpm_Connect Conn;
+Gpm_Connect Conn;
 #endif
 
 /* *********************************************************************** */
 
-static int  s_iMouseRow = 0;
-static int  s_iMouseCol = 0;
+static int              s_iMouseRow          = 0;
+static int              s_iMouseCol          = 0;
 
-static BOOL s_bMousePresent = FALSE;
-static int  s_iMouseButtons = -1;
+static BOOL             s_bMousePresent      = FALSE;
+static int              s_iMouseButtons      = -1;
 
-static USHORT  s_usMouseState = 0;
-static USHORT  s_usLastMouseState = 0;
+static USHORT           s_usMouseState       = 0;
+static USHORT           s_usLastMouseState   = 0;
 
-static struct timeval mLeftDblckTime;
-static struct timeval mMiddleDblckTime;
-static struct timeval mRightDblckTime;
+static struct timeval   mLeftDblckTime;
+static struct timeval   mMiddleDblckTime;
+static struct timeval   mRightDblckTime;
 
 
 /* *********************************************************************** */
 
 #ifdef HAVE_GPM_H
-static BOOL GetGpmEvent( Gpm_Event *Evt )
+static BOOL GetGpmEvent( Gpm_Event * Evt )
 {
    if( s_bMousePresent && gpm_fd >= 0 )
    {
       struct timeval tv = { 0, 0 };
-      fd_set ReadFD;
+      fd_set         ReadFD;
 
-      FD_ZERO( &ReadFD ); 
+      FD_ZERO( &ReadFD );
       FD_SET( gpm_fd, &ReadFD );
 
-      if( select( gpm_fd+1, &ReadFD, NULL, NULL, &tv ) > 0 )
-         if( FD_ISSET( gpm_fd, &ReadFD ) ) 
+      if( select( gpm_fd + 1, &ReadFD, NULL, NULL, &tv ) > 0 )
+         if( FD_ISSET( gpm_fd, &ReadFD ) )
             return Gpm_GetEvent( Evt ) > 0;
    }
 
    return FALSE;
 }
-#endif    
+#endif
 
 /* *********************************************************************** */
 
-static BOOL GetXtermEvent( int *Btn, int *Col, int *Row )
+static BOOL GetXtermEvent( int * Btn, int * Col, int * Row )
 {
    /* Xterm mouse event consists of three chars */
    if( SLang_input_pending( 0 ) > 0 )
@@ -119,7 +119,7 @@ static BOOL GetXtermEvent( int *Btn, int *Col, int *Row )
          }
       }
    }
-    
+
    return FALSE;
 }
 
@@ -136,19 +136,19 @@ static void hb_sln_CheckDoubleClick()
       TIMEVAL_GET( evtTime );
       if( usNewButtons & M_BUTTON_LEFT )
       {
-         if ( TIMEVAL_LESS( evtTime, mLeftDblckTime ) )
+         if( TIMEVAL_LESS( evtTime, mLeftDblckTime ) )
             s_usMouseState |= M_BUTTON_LDBLCK;
          TIMEVAL_ADD( mLeftDblckTime, evtTime, hb_mouseGetDoubleClickSpeed() );
       }
       if( usNewButtons & M_BUTTON_MIDDLE )
       {
-         if ( TIMEVAL_LESS( evtTime, mMiddleDblckTime ) )
+         if( TIMEVAL_LESS( evtTime, mMiddleDblckTime ) )
             s_usMouseState |= M_BUTTON_MDBLCK;
          TIMEVAL_ADD( mMiddleDblckTime, evtTime, hb_mouseGetDoubleClickSpeed() );
       }
       if( usNewButtons & M_BUTTON_RIGHT )
       {
-         if ( TIMEVAL_LESS( evtTime, mRightDblckTime ) )
+         if( TIMEVAL_LESS( evtTime, mRightDblckTime ) )
             s_usMouseState |= M_BUTTON_RDBLCK;
          TIMEVAL_ADD( mRightDblckTime, evtTime, hb_mouseGetDoubleClickSpeed() );
       }
@@ -273,13 +273,13 @@ int hb_gt_sln_mouse_Inkey( int iEventMask, BOOL fCheckNew )
 
 #ifdef HAVE_GPM_H
 
-#define CHECK_BUTTON_DOWN(Mask,GpmBtn,InkBtn,InkDbl)              \
+#define CHECK_BUTTON_DOWN( Mask, GpmBtn, InkBtn, InkDbl )              \
    if( ( iEventMask & Mask ) && ( Evt.buttons & GpmBtn ) )        \
    {                                                              \
       if( Evt.type & GPM_SINGLE )                                 \
-         return( InkBtn );                                        \
+         return ( InkBtn );                                        \
       else if( Evt.type & GPM_DOUBLE || Evt.type & GPM_TRIPLE )   \
-         return( InkDbl );                                        \
+         return ( InkDbl );                                        \
    }
 
    else if( hb_sln_UnderLinuxConsole && fCheckNew )
@@ -293,238 +293,238 @@ int hb_gt_sln_mouse_Inkey( int iEventMask, BOOL fCheckNew )
          s_iMouseCol = Evt.x;
 
          if( ( Evt.type & GPM_MOVE ) && ( iEventMask & INKEY_MOVE ) )
-            return( K_MOUSEMOVE );
+            return K_MOUSEMOVE;
 
          else if( Evt.type & GPM_DOWN )
          {
-            CHECK_BUTTON_DOWN(INKEY_LDOWN,GPM_B_LEFT,K_LBUTTONDOWN,K_LDBLCLK)
+            CHECK_BUTTON_DOWN( INKEY_LDOWN, GPM_B_LEFT, K_LBUTTONDOWN, K_LDBLCLK )
             else
-            CHECK_BUTTON_DOWN(INKEY_RDOWN,GPM_B_RIGHT,K_RBUTTONDOWN,K_RDBLCLK)
-            else
-            CHECK_BUTTON_DOWN(INKEY_MMIDDLE,GPM_B_MIDDLE,K_MBUTTONDOWN,K_MDBLCLK)
-         }
-
-         else if( Evt.type & GPM_UP )
-         {
-            if( ( iEventMask & INKEY_LUP ) && ( Evt.buttons & GPM_B_LEFT ) )
-               return( K_LBUTTONUP );
-            else if( ( iEventMask & INKEY_RUP ) && ( Evt.buttons & GPM_B_RIGHT ) )
-               return( K_RBUTTONUP );
-            else if( ( iEventMask & INKEY_MMIDDLE ) && ( Evt.buttons & GPM_B_MIDDLE ) )
-               return( K_MBUTTONUP );
+               CHECK_BUTTON_DOWN( INKEY_RDOWN, GPM_B_RIGHT, K_RBUTTONDOWN, K_RDBLCLK )
+               else
+                  CHECK_BUTTON_DOWN( INKEY_MMIDDLE, GPM_B_MIDDLE, K_MBUTTONDOWN, K_MDBLCLK )
+                  }
+                  else if( Evt.type & GPM_UP )
+                  {
+                     if( ( iEventMask & INKEY_LUP ) && ( Evt.buttons & GPM_B_LEFT ) )
+                        return K_LBUTTONUP;
+                     else if( ( iEventMask & INKEY_RUP ) && ( Evt.buttons & GPM_B_RIGHT ) )
+                        return K_RBUTTONUP;
+                     else if( ( iEventMask & INKEY_MMIDDLE ) && ( Evt.buttons & GPM_B_MIDDLE ) )
+                        return K_MBUTTONUP;
+                  }
          }
       }
-   }
 #else
    HB_SYMBOL_UNUSED( fCheckNew );
    HB_SYMBOL_UNUSED( iEventMask );
 #endif
 
-   return 0;
-}
+      return 0;
+   }
 
 /* *********************************************************************** */
 
-void hb_gt_sln_mouse_Init( void )
-{
-   if( hb_sln_UnderXterm )
-   {
-      char * SaveHilit = "\033[?1001s"; /* save old hilit tracking */
-      char * EnabTrack = "\033[?1000h"; /* enable mouse tracking */
-
-      /* force mouse usage under xterm */
-      (void)SLtt_set_mouse_mode( 1, 1 );
-
-      /* initial xterm settings */
-      SLtt_write_string( SaveHilit );
-      SLtt_write_string( EnabTrack );
-      SLtt_flush_output();
-
-      s_iMouseButtons = SLtt_tgetnum( "BT" );
-
-      /* force two buttons mouse under xterm */
-      if( s_iMouseButtons < 1 )
-         s_iMouseButtons = 3;
-
-      s_bMousePresent = TRUE;
-   }
-#ifdef HAVE_GPM_H
-   else if( hb_sln_UnderLinuxConsole )
-   {
-#ifdef HB_GPM_NOICE_DISABLE
-      int iNull, iErr;
-
-      iErr = dup( 2 );
-      iNull = open( "/dev/null", O_RDWR );
-      dup2( iNull, 2 );
-      close( iNull );
-#endif
-      Conn.eventMask = GPM_MOVE | GPM_UP | GPM_DOWN | GPM_DRAG | GPM_DOUBLE;
-      /* give me move events but handle them anyway */
-      Conn.defaultMask= GPM_MOVE | GPM_HARD; 
-      /* only pure mouse events, no Ctrl,Alt,Shft events */
-      Conn.minMod = 0;    Conn.maxMod = 0;
-      gpm_zerobased = 1;  gpm_visiblepointer = 1;
-
-      if( Gpm_Open( &Conn, 0 ) >= 0 && gpm_fd >= 0 )
-      {
-         Gpm_Event Evt;
-
-         s_bMousePresent = TRUE;
-
-         while( GetGpmEvent( &Evt ) );
-         {
-            s_iMouseRow = Evt.y;
-            s_iMouseCol = Evt.x;
-         }
-
-         /*
-          * In recent GPM versions it produce unpleasure noice on the screen
-          * so I covered it with this macro, [druzus]
-          */         
-#ifdef HB_GPM_USE_XTRA
-         s_iMouseButtons = Gpm_GetSnapshot( NULL );
-#else
-         s_iMouseButtons = 3;
-#endif
-         hb_gt_sln_mouse_FixTrash();
-      }
-#ifdef HB_GPM_NOICE_DISABLE
-      dup2( iErr, 2 );
-      close( iErr );
-#endif
-   }
-#endif
-}
-
-/* *********************************************************************** */
-
-void hb_gt_sln_mouse_Exit( void )
-{
-   if( s_bMousePresent )
+   void hb_gt_sln_mouse_Init( void )
    {
       if( hb_sln_UnderXterm )
       {
-         char * DisabTrack = "\033[?1000l"; /* disable mouse tracking */
-         char * RestoHilit = "\033[?1001r"; /* restore old hilittracking */
-
-         /* restore xterm settings */
-         SLtt_write_string( DisabTrack );
-         SLtt_write_string( RestoHilit );
-         SLtt_flush_output();
+         char *   SaveHilit   = "\033[?1001s";  /* save old hilit tracking */
+         char *   EnabTrack   = "\033[?1000h";  /* enable mouse tracking */
 
          /* force mouse usage under xterm */
-         (void)SLtt_set_mouse_mode( 0, 1 );
+         ( void ) SLtt_set_mouse_mode( 1, 1 );
+
+         /* initial xterm settings */
+         SLtt_write_string( SaveHilit );
+         SLtt_write_string( EnabTrack );
+         SLtt_flush_output();
+
+         s_iMouseButtons = SLtt_tgetnum( "BT" );
+
+         /* force two buttons mouse under xterm */
+         if( s_iMouseButtons < 1 )
+            s_iMouseButtons = 3;
+
+         s_bMousePresent = TRUE;
       }
 #ifdef HAVE_GPM_H
       else if( hb_sln_UnderLinuxConsole )
       {
-         if( gpm_fd >= 0 )
-            Gpm_Close();
+#ifdef HB_GPM_NOICE_DISABLE
+         int iNull, iErr;
+
+         iErr  = dup( 2 );
+         iNull = open( "/dev/null", O_RDWR );
+         dup2( iNull, 2 );
+         close( iNull );
+#endif
+         Conn.eventMask    = GPM_MOVE | GPM_UP | GPM_DOWN | GPM_DRAG | GPM_DOUBLE;
+         /* give me move events but handle them anyway */
+         Conn.defaultMask  = GPM_MOVE | GPM_HARD;
+         /* only pure mouse events, no Ctrl,Alt,Shft events */
+         Conn.minMod       = 0;    Conn.maxMod = 0;
+         gpm_zerobased     = 1;  gpm_visiblepointer = 1;
+
+         if( Gpm_Open( &Conn, 0 ) >= 0 && gpm_fd >= 0 )
+         {
+            Gpm_Event Evt;
+
+            s_bMousePresent = TRUE;
+
+            while( GetGpmEvent( &Evt ) )
+               ;
+            {
+               s_iMouseRow = Evt.y;
+               s_iMouseCol = Evt.x;
+            }
+
+            /*
+             * In recent GPM versions it produce unpleasure noice on the screen
+             * so I covered it with this macro, [druzus]
+             */
+#ifdef HB_GPM_USE_XTRA
+            s_iMouseButtons   = Gpm_GetSnapshot( NULL );
+#else
+            s_iMouseButtons   = 3;
+#endif
+            hb_gt_sln_mouse_FixTrash();
+         }
+#ifdef HB_GPM_NOICE_DISABLE
+         dup2( iErr, 2 );
+         close( iErr );
+#endif
       }
 #endif
-      s_bMousePresent = FALSE;
    }
-}
 
 /* *********************************************************************** */
 
-BOOL hb_gt_sln_mouse_IsPresent( PHB_GT pGT )
-{
-   HB_SYMBOL_UNUSED( pGT );
-
-   return s_bMousePresent;
-}
-
-/* *********************************************************************** */
-
-void hb_gt_sln_mouse_Show( PHB_GT pGT )
-{
-   HB_SYMBOL_UNUSED( pGT );
-
-#ifdef HAVE_GPM_H
-   gpm_visiblepointer = 1;
-   if( hb_sln_UnderLinuxConsole && s_bMousePresent )
-      Gpm_DrawPointer( s_iMouseCol, s_iMouseRow, gpm_consolefd );
-#endif
-   ;
-}
-
-/* *********************************************************************** */
-
-void hb_gt_sln_mouse_Hide( PHB_GT pGT )
-{
-   HB_SYMBOL_UNUSED( pGT );
-
-#ifdef HAVE_GPM_H
-   gpm_visiblepointer = 0;
-#endif
-   ;
-}
-
-/* *********************************************************************** */
-
-void hb_gt_sln_mouse_GetPos( PHB_GT pGT, int * piRow, int * piCol )
-{
-   HB_SYMBOL_UNUSED( pGT );
-
-   *piRow = s_iMouseRow;
-   *piCol = s_iMouseCol;
-}
-
-/* *********************************************************************** */
-
-void hb_gt_sln_mouse_SetPos( PHB_GT pGT, int iRow, int iCol )
-{
-   HB_SYMBOL_UNUSED( pGT );
-
-   /* it does really nothing */
-   s_iMouseRow = iRow;
-   s_iMouseCol = iCol;
-#ifdef HAVE_GPM_H
-   if( hb_sln_UnderLinuxConsole )
-      if( s_bMousePresent && gpm_visiblepointer )
-         Gpm_DrawPointer( iCol, iRow, gpm_consolefd );
-#endif
-}
-
-/* *********************************************************************** */
-
-BOOL hb_gt_sln_mouse_ButtonState( PHB_GT pGT, int iButton )
-{
-   HB_SYMBOL_UNUSED( pGT );
-
-   switch( iButton )
+   void hb_gt_sln_mouse_Exit( void )
    {
-      case 0:
-         return ( s_usMouseState & M_BUTTON_LEFT ) != 0;
-      case 1:
-         return ( s_usMouseState & M_BUTTON_RIGHT ) != 0;
-      case 2:
-         return ( s_usMouseState & M_BUTTON_MIDDLE ) != 0;
+      if( s_bMousePresent )
+      {
+         if( hb_sln_UnderXterm )
+         {
+            char *   DisabTrack  = "\033[?1000l";  /* disable mouse tracking */
+            char *   RestoHilit  = "\033[?1001r";  /* restore old hilittracking */
+
+            /* restore xterm settings */
+            SLtt_write_string( DisabTrack );
+            SLtt_write_string( RestoHilit );
+            SLtt_flush_output();
+
+            /* force mouse usage under xterm */
+            ( void ) SLtt_set_mouse_mode( 0, 1 );
+         }
+#ifdef HAVE_GPM_H
+         else if( hb_sln_UnderLinuxConsole )
+         {
+            if( gpm_fd >= 0 )
+               Gpm_Close();
+         }
+#endif
+         s_bMousePresent = FALSE;
+      }
    }
 
-   return FALSE;
-}
+/* *********************************************************************** */
+
+   BOOL hb_gt_sln_mouse_IsPresent( PHB_GT pGT )
+   {
+      HB_SYMBOL_UNUSED( pGT );
+
+      return s_bMousePresent;
+   }
 
 /* *********************************************************************** */
 
-int hb_gt_sln_mouse_CountButton( PHB_GT pGT )
-{
-   HB_SYMBOL_UNUSED( pGT );
+   void hb_gt_sln_mouse_Show( PHB_GT pGT )
+   {
+      HB_SYMBOL_UNUSED( pGT );
 
-   return s_iMouseButtons;
-}
-
-/* *********************************************************************** */
-
-void hb_gt_sln_mouse_FixTrash( void )
-{
 #ifdef HAVE_GPM_H
-   if( hb_sln_UnderLinuxConsole )
-      if( s_bMousePresent && gpm_visiblepointer )
+      gpm_visiblepointer = 1;
+      if( hb_sln_UnderLinuxConsole && s_bMousePresent )
          Gpm_DrawPointer( s_iMouseCol, s_iMouseRow, gpm_consolefd );
 #endif
-}
+      ;
+   }
+
+/* *********************************************************************** */
+
+   void hb_gt_sln_mouse_Hide( PHB_GT pGT )
+   {
+      HB_SYMBOL_UNUSED( pGT );
+
+#ifdef HAVE_GPM_H
+      gpm_visiblepointer = 0;
+#endif
+      ;
+   }
+
+/* *********************************************************************** */
+
+   void hb_gt_sln_mouse_GetPos( PHB_GT pGT, int * piRow, int * piCol )
+   {
+      HB_SYMBOL_UNUSED( pGT );
+
+      *piRow   = s_iMouseRow;
+      *piCol   = s_iMouseCol;
+   }
+
+/* *********************************************************************** */
+
+   void hb_gt_sln_mouse_SetPos( PHB_GT pGT, int iRow, int iCol )
+   {
+      HB_SYMBOL_UNUSED( pGT );
+
+      /* it does really nothing */
+      s_iMouseRow = iRow;
+      s_iMouseCol = iCol;
+#ifdef HAVE_GPM_H
+      if( hb_sln_UnderLinuxConsole )
+         if( s_bMousePresent && gpm_visiblepointer )
+            Gpm_DrawPointer( iCol, iRow, gpm_consolefd );
+#endif
+   }
+
+/* *********************************************************************** */
+
+   BOOL hb_gt_sln_mouse_ButtonState( PHB_GT pGT, int iButton )
+   {
+      HB_SYMBOL_UNUSED( pGT );
+
+      switch( iButton )
+      {
+         case 0:
+            return ( s_usMouseState & M_BUTTON_LEFT ) != 0;
+         case 1:
+            return ( s_usMouseState & M_BUTTON_RIGHT ) != 0;
+         case 2:
+            return ( s_usMouseState & M_BUTTON_MIDDLE ) != 0;
+      }
+
+      return FALSE;
+   }
+
+/* *********************************************************************** */
+
+   int hb_gt_sln_mouse_CountButton( PHB_GT pGT )
+   {
+      HB_SYMBOL_UNUSED( pGT );
+
+      return s_iMouseButtons;
+   }
+
+/* *********************************************************************** */
+
+   void hb_gt_sln_mouse_FixTrash( void )
+   {
+#ifdef HAVE_GPM_H
+      if( hb_sln_UnderLinuxConsole )
+         if( s_bMousePresent && gpm_visiblepointer )
+            Gpm_DrawPointer( s_iMouseCol, s_iMouseRow, gpm_consolefd );
+#endif
+   }
 
 /* *********************************************************************** */

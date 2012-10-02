@@ -60,60 +60,61 @@
 #include <windows.h>
 #endif
 
-HB_FUNC(CGIREAD)
+HB_FUNC( CGIREAD )
 {
-   ULONG cgilen;
-   int n;
-   char *cgistr, *temp;
-   temp = getenv("REQUEST_METHOD");
-   if (temp)
+   ULONG    cgilen;
+   int      n;
+   char *   cgistr, * temp;
+
+   temp = getenv( "REQUEST_METHOD" );
+   if( temp )
    {
-      if ( strcmp(temp,"GET") == 0 )
+      if( strcmp( temp, "GET" ) == 0 )
       {
-         temp = getenv("QUERY_STRING");
-         if (temp)
+         temp = getenv( "QUERY_STRING" );
+         if( temp )
          {
-            cgilen = strlen(temp);
-            cgistr = (char *) hb_xgrab(cgilen);
-            strncpy(cgistr,temp,cgilen);
+            cgilen   = strlen( temp );
+            cgistr   = ( char * ) hb_xgrab( cgilen );
+            strncpy( cgistr, temp, cgilen );
          }
          else
-            hb_retc("");
+            hb_retc( "" );
          return;
       }
-      else if ( strcmp(temp,"POST") == 0 )
+      else if( strcmp( temp, "POST" ) == 0 )
       {
-        sscanf(getenv("CONTENT_LENGTH"),"%d",&n);
-        cgistr = (char *) hb_xgrab(n);
+         sscanf( getenv( "CONTENT_LENGTH" ), "%d", &n );
+         cgistr = ( char * ) hb_xgrab( n );
 #ifdef HB_OS_WIN //(WINDOWS.H must be included)
-        ReadFile(GetStdHandle(STD_INPUT_HANDLE),cgistr,n,&cgilen,NULL);
+         ReadFile( GetStdHandle( STD_INPUT_HANDLE ), cgistr, n, &cgilen, NULL );
 #else
-        cgilen=fread(cgistr,sizeof(char),n,stdin);
+         cgilen = fread( cgistr, sizeof( char ), n, stdin );
 #endif
       }
       else /*Not get, not post...*/
       {
-         hb_retc("");
+         hb_retc( "" );
          return;
       }
-      hb_xfree(cgistr);
-      hb_retclen(cgistr,cgilen);
+      hb_xfree( cgistr );
+      hb_retclen( cgistr, cgilen );
    }
    else
-      hb_retc("");
+      hb_retc( "" );
 }
 
-HB_FUNC(CGIWRITE)
+HB_FUNC( CGIWRITE )
 {
-   ULONG len;
-   PHB_ITEM phbstr = hb_param(1,HB_IT_STRING);
+   ULONG    len;
+   PHB_ITEM phbstr = hb_param( 1, HB_IT_STRING );
 
 #ifdef HB_OS_WIN
-   if (phbstr)
-      WriteFile(GetStdHandle(STD_OUTPUT_HANDLE),phbstr->item.asString.value,phbstr->item.asString.length,&len,NULL);
+   if( phbstr )
+      WriteFile( GetStdHandle( STD_OUTPUT_HANDLE ), phbstr->item.asString.value, phbstr->item.asString.length, &len, NULL );
 #else
-   if (phbstr)
-      fwrite(phbstr->item.asString.value,sizeof(char),phbstr->item.asString.length,stdout);
+   if( phbstr )
+      fwrite( phbstr->item.asString.value, sizeof( char ), phbstr->item.asString.length, stdout );
 #endif
 }
 

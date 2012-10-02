@@ -54,7 +54,7 @@
 
 /* NOTE: User programs should never call this layer directly! */
 
-#define HB_GT_NAME   GUI
+#define HB_GT_NAME GUI
 
 #define HB_OS_WIN_USED
 #include "hbgtcore.h"
@@ -65,8 +65,8 @@
 
 static int           s_GtId;
 static HB_GT_FUNCS   SuperTable;
-#define HB_GTSUPER   (&SuperTable)
-#define HB_GTID_PTR  (&s_GtId)
+#define HB_GTSUPER   (&SuperTable )
+#define HB_GTID_PTR  (&s_GtId )
 
 /* *********************************************************************** */
 
@@ -76,7 +76,7 @@ static const char * hb_gt_gui_Version( PHB_GT pGT, int iType )
 
    HB_SYMBOL_UNUSED( pGT );
 
-   if ( iType == 0 )
+   if( iType == 0 )
       return HB_GT_DRVNAME( HB_GT_NAME );
 
    return "Harbour Terminal: Strep GT driver for W32 GUI programs";
@@ -86,7 +86,7 @@ static const char * hb_gt_gui_Version( PHB_GT pGT, int iType )
 /* dDuration is in 'Ticks' (18.2 per second) */
 static void hb_gt_gui_Tone( PHB_GT pGT, double dFrequency, double dDuration )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_gui_Tone(%p,%lf,%lf)", pGT, dFrequency, dDuration));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_gui_Tone(%p,%lf,%lf)", pGT, dFrequency, dDuration ) );
 
 #if defined( HB_OS_WIN )
    HB_SYMBOL_UNUSED( pGT );
@@ -113,8 +113,8 @@ static BOOL hb_gt_gui_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
          }
          else
          {
-            char * szClipboardData;
-            HB_SIZE ulLen;
+            char *   szClipboardData;
+            HB_SIZE  ulLen;
 
             if( hb_gt_w32_getClipboard( CF_TEXT, &szClipboardData, &ulLen ) )
             {
@@ -145,11 +145,11 @@ static BOOL hb_gt_gui_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
 
 static BOOL hb_gt_FuncInit( PHB_GT_FUNCS pFuncTable )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_FuncInit(%p)", pFuncTable));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_FuncInit(%p)", pFuncTable ) );
 
-   pFuncTable->Version                    = hb_gt_gui_Version;
-   pFuncTable->Tone                       = hb_gt_gui_Tone;
-   pFuncTable->Info                       = hb_gt_gui_Info;
+   pFuncTable->Version  = hb_gt_gui_Version;
+   pFuncTable->Tone     = hb_gt_gui_Tone;
+   pFuncTable->Info     = hb_gt_gui_Info;
 
    return TRUE;
 }
@@ -164,12 +164,12 @@ static const HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
 HB_GT_ANNOUNCE( HB_GT_NAME )
 
 HB_CALL_ON_STARTUP_BEGIN( _hb_startup_gt_Init_ )
-   hb_gtRegister( &gtInit );
+hb_gtRegister( &gtInit );
 HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
 #elif defined( HB_DATASEG_STARTUP )
-   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( _hb_startup_gt_Init_ )
+   #define HB_DATASEG_BODY HB_DATASEG_FUNC( _hb_startup_gt_Init_ )
    #include "hbiniseg.h"
 #endif
