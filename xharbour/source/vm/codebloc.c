@@ -128,7 +128,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer,
          /* Increment the reference counter so this value will not be
           * released if other codeblock will be deleted
           */
-         hb_memvarValueIncRef( pLocal->item.asMemvar.value );
+         hb_memvarValueIncRef( ( HB_HANDLE ) pLocal->item.asMemvar.value );
          ++ui;
       }
    }
@@ -152,7 +152,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer,
          {  /* the outer codeblock have the table with local references - reuse it */
             while( uiLocals )
             {
-               hb_memvarValueIncRef( pCBlock->pLocals[ uiLocals ].item.asMemvar.value );
+               hb_memvarValueIncRef( ( HB_HANDLE ) pCBlock->pLocals[ uiLocals ].item.asMemvar.value );
                --uiLocals;
             }
             /* increment a reference counter for the table of local references
@@ -236,7 +236,7 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
          while( ui )
          {
             //TraceLog( NULL, "Release Detached %i\n", ui );
-            hb_memvarValueDecRef( pCBlock->pLocals[ ui ].item.asMemvar.value );
+            hb_memvarValueDecRef( ( HB_HANDLE ) pCBlock->pLocals[ ui ].item.asMemvar.value );
             //TraceLog( NULL, "DONE Release Detached %i\n", ui );
 
 			ui--;
@@ -285,7 +285,7 @@ HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage )
       while( ui <= pCBlock->uiLocals )
       {
          //TraceLog( NULL, "GC Release Detached %i %i\n", ui, pCBlock->pLocals[ ui ].item.asMemvar.value );
-         hb_memvarValueDecGarbageRef( pCBlock->pLocals[ ui ].item.asMemvar.value );
+         hb_memvarValueDecGarbageRef( ( HB_HANDLE ) pCBlock->pLocals[ ui ].item.asMemvar.value );
          ++ui;
       }
 
@@ -310,7 +310,7 @@ HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage )
 
 /* Get local variable referenced in a codeblock
  */
-PHB_ITEM  hb_codeblockGetVar( PHB_ITEM pItem, LONG iItemPos )
+PHB_ITEM hb_codeblockGetVar( PHB_ITEM pItem, long iItemPos )
 {
    HB_CODEBLOCK_PTR pCBlock = pItem->item.asBlock.value;
 

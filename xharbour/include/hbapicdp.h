@@ -312,31 +312,31 @@ extern HB_EXPORT PHB_CODEPAGE  hb_cdpSelect( PHB_CODEPAGE );
 extern HB_EXPORT PHB_CODEPAGE  hb_cdpFind( const char * );
 extern HB_EXPORT PHB_CODEPAGE  hb_cdpcharsetFind( const char * );
 extern HB_EXPORT void          hb_cdpTranslate( char *, PHB_CODEPAGE, PHB_CODEPAGE );
-extern HB_EXPORT void          hb_cdpnTranslate( char *, PHB_CODEPAGE, PHB_CODEPAGE, ULONG );
-extern HB_EXPORT int           hb_cdpcmp( const char *, ULONG, const char *, ULONG, PHB_CODEPAGE, BOOL );
-extern HB_EXPORT int           hb_cdpicmp( const char *, ULONG, const char *, ULONG, PHB_CODEPAGE, BOOL );
+extern HB_EXPORT void          hb_cdpnTranslate( char *, PHB_CODEPAGE, PHB_CODEPAGE, HB_SIZE );
+extern HB_EXPORT int           hb_cdpcmp( const char *, HB_SIZE, const char *, HB_SIZE, PHB_CODEPAGE, BOOL );
+extern HB_EXPORT int           hb_cdpicmp( const char *, HB_SIZE, const char *, HB_SIZE, PHB_CODEPAGE, BOOL );
 extern HB_EXPORT int           hb_cdpchrcmp( char, char, PHB_CODEPAGE );
 extern HB_EXPORT char *        hb_cdpDup( const char *, PHB_CODEPAGE, PHB_CODEPAGE );
-extern HB_EXPORT char *        hb_cdpnDup( const char *, ULONG *, PHB_CODEPAGE, PHB_CODEPAGE );
-extern HB_EXPORT const char *  hb_cdpnDup2( const char *, ULONG, char *, ULONG *, PHB_CODEPAGE, PHB_CODEPAGE );
-extern HB_EXPORT const char *  hb_cdpnDup3( const char *, ULONG, char *, ULONG *, char **, ULONG *, PHB_CODEPAGE, PHB_CODEPAGE );
-extern HB_EXPORT ULONG         hb_cdpnDupLen( const char *, ULONG, PHB_CODEPAGE, PHB_CODEPAGE );
-extern HB_EXPORT ULONG         hb_cdpnDup2Len( const char *, ULONG, ULONG, PHB_CODEPAGE, PHB_CODEPAGE );
+extern HB_EXPORT char *        hb_cdpnDup( const char *, HB_SIZE *, PHB_CODEPAGE, PHB_CODEPAGE );
+extern HB_EXPORT const char *  hb_cdpnDup2( const char *, HB_SIZE, char *, HB_SIZE *, PHB_CODEPAGE, PHB_CODEPAGE );
+extern HB_EXPORT const char *  hb_cdpnDup3( const char *, HB_SIZE, char *, HB_SIZE *, char **, HB_SIZE *, PHB_CODEPAGE, PHB_CODEPAGE );
+extern HB_EXPORT HB_SIZE       hb_cdpnDupLen( const char *, HB_SIZE, PHB_CODEPAGE, PHB_CODEPAGE );
+extern HB_EXPORT HB_SIZE       hb_cdpnDup2Len( const char *, HB_SIZE, HB_SIZE, PHB_CODEPAGE, PHB_CODEPAGE );
 
 extern HB_EXPORT void          hb_cdpReleaseAll( void );
 
 extern HB_EXPORT USHORT        hb_cdpGetU16( PHB_CODEPAGE, BOOL, UCHAR );
 extern HB_EXPORT UCHAR         hb_cdpGetChar( PHB_CODEPAGE, BOOL, USHORT );
 extern HB_EXPORT BOOL          hb_cdpGetFromUTF8( PHB_CODEPAGE, BOOL, UCHAR, int *, USHORT * );
-extern HB_EXPORT ULONG         hb_cdpStrnToUTF8( PHB_CODEPAGE, BOOL, const char *, ULONG, char * );
-extern HB_EXPORT ULONG         hb_cdpStrnToUTF8n( PHB_CODEPAGE, BOOL, const char *, ULONG, char *, ULONG );
-extern HB_EXPORT ULONG         hb_cdpStrnToU16( PHB_CODEPAGE, BOOL, const char *, ULONG, char * );
-extern HB_EXPORT ULONG         hb_cdpStringInUTF8Length( PHB_CODEPAGE, BOOL, const char *, ULONG );
-extern HB_EXPORT ULONG         hb_cdpStringInUTF8Length2( PHB_CODEPAGE, BOOL, const char *, ULONG, ULONG );
-extern HB_EXPORT ULONG         hb_cdpUTF8ToStrn( PHB_CODEPAGE, BOOL, const char *, ULONG, char *, ULONG );
-extern HB_EXPORT ULONG         hb_cdpUTF8StringLength( const char *, ULONG );
-extern HB_EXPORT char *        hb_cdpUTF8StringSubstr( const char *, ULONG, ULONG, ULONG, ULONG * );
-extern HB_EXPORT ULONG         hb_cdpUTF8StringPeek( const char *, ULONG, ULONG );
+extern HB_EXPORT HB_SIZE       hb_cdpStrnToUTF8( PHB_CODEPAGE, BOOL, const char *, HB_SIZE, char * );
+extern HB_EXPORT HB_SIZE       hb_cdpStrnToUTF8n( PHB_CODEPAGE, BOOL, const char *, HB_SIZE, char *, HB_SIZE );
+extern HB_EXPORT HB_SIZE       hb_cdpStrnToU16( PHB_CODEPAGE, BOOL, const char *, HB_SIZE, char * );
+extern HB_EXPORT HB_SIZE       hb_cdpStringInUTF8Length( PHB_CODEPAGE, BOOL, const char *, HB_SIZE );
+extern HB_EXPORT HB_SIZE       hb_cdpStringInUTF8Length2( PHB_CODEPAGE, BOOL, const char *, HB_SIZE, HB_SIZE );
+extern HB_EXPORT HB_SIZE       hb_cdpUTF8ToStrn( PHB_CODEPAGE, BOOL, const char *, HB_SIZE, char *, HB_SIZE );
+extern HB_EXPORT HB_SIZE       hb_cdpUTF8StringLength( const char *, HB_SIZE );
+extern HB_EXPORT char *        hb_cdpUTF8StringSubstr( const char *, HB_SIZE, HB_SIZE, HB_SIZE, HB_SIZE * );
+extern HB_EXPORT HB_SIZE       hb_cdpUTF8StringPeek( const char *, HB_SIZE, HB_SIZE );
 extern HB_EXPORT PHB_CODEPAGE  hb_cdppage( void );
 
 HB_EXTERN_END

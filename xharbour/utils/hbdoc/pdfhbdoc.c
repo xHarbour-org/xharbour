@@ -50,6 +50,10 @@
  *
  */
 
+/* Pacify MSVS2005 and above */
+#if defined(_MSC_VER) && (_MSC_VER>=1400)
+   #pragma warning (disable:4995)
+#endif
 
 #include <hbapi.h>
 #include <hbapiitm.h>
@@ -73,8 +77,8 @@ static float fCol;
 static int sziFontBold = 0;
 static int sziFont = 0;
 static int iPage = 1;
-static ULONG uiLen;
-static ULONG uiCount;
+static HB_SIZE uiLen;
+static HB_SIZE uiCount;
 static BOOL bTItems;
 static BOOL bFItems;
 static float /* fCurRow, */ fCurCol = 0 ,fCurLastCol, fLastRow;
@@ -319,7 +323,7 @@ HB_FUNC(HB_PDFINITBOOK)
 HB_FUNC(HB_PDFBOOKMARK)
 {
    const char *szBook1 =( char * )hb_parc( 2 );
-   ULONG uiPos;
+   HB_SIZE uiPos;
    HB_ITEM TempArray;
    int iParent = 0;
    PHB_ITEM pBlock = hb_param( 3, HB_IT_BLOCK );
@@ -363,7 +367,7 @@ static  BOOL hb_checkRow( float iLine )
 static  float hb_checkStringWidth(const char *szString)
 {
    float fReturn;
-   fReturn = PDF_stringwidth( szPDFFile, szString, sziFont, FONTSIZESMALL);
+   fReturn = (float) PDF_stringwidth( szPDFFile, szString, sziFont, FONTSIZESMALL);
    return fReturn;
 }
 
@@ -449,7 +453,7 @@ HB_FUNC(HB_PDFTABLE)
 static void hb_ProcessTableItem( PHB_ITEM p1, PHB_ITEM p2, PHB_ITEM p3, PHB_ITEM p4)
 {
    ULONG ulTempPos;
-   ULONG ulLen;
+   HB_SIZE ulLen;
    /*
    float fHeight;
    float fI; */

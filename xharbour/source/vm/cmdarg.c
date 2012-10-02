@@ -220,7 +220,7 @@ static char * hb_cmdargGet( const char * pszName, BOOL bRetValue )
             {
                char * pszPos = pszEnvVar + strlen( pszName );
 
-               ULONG ulLen; /* NOTE: Use this variable as a workaround for MSC 8 internal error. [vszakats] */
+               HB_SIZE ulLen; /* NOTE: Use this variable as a workaround for MSC 8 internal error. [vszakats] */
 
                /* Skip value separator colon. */
                if( *pszPos == ':' )

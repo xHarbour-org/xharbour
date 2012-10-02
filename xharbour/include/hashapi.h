@@ -59,20 +59,20 @@ HB_EXTERN_BEGIN
 #define  HB_HASH_ALLOC_BLOCK  16
 
 HB_EXPORT PHB_ITEM hb_hashNew( PHB_ITEM pItem );
-HB_EXPORT BOOL hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue );
-HB_EXPORT BOOL hb_hashAddForward( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue );
-HB_EXPORT BOOL hb_hashRemove( PHB_ITEM pHash, ULONG ulPos );
-HB_EXPORT BOOL hb_hashScan( PHB_ITEM pHash, PHB_ITEM pKey, ULONG *ulIndex );
-HB_EXPORT BOOL hb_hashSet( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem );
-HB_EXPORT BOOL hb_hashSetForward( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem );
-HB_EXPORT BOOL hb_hashGet( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem );
-HB_EXPORT BOOL hb_hashGetForward( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem );
+HB_EXPORT BOOL hb_hashAdd( PHB_ITEM pHash, HB_SIZE ulPos, PHB_ITEM pKey, PHB_ITEM pValue );
+HB_EXPORT BOOL hb_hashAddForward( PHB_ITEM pHash, HB_SIZE ulPos, PHB_ITEM pKey, PHB_ITEM pValue );
+HB_EXPORT BOOL hb_hashRemove( PHB_ITEM pHash, HB_SIZE ulPos );
+HB_EXPORT BOOL hb_hashScan( PHB_ITEM pHash, PHB_ITEM pKey, HB_SIZE *ulIndex );
+HB_EXPORT BOOL hb_hashSet( PHB_ITEM pHash, HB_SIZE ulIndex, PHB_ITEM pItem );
+HB_EXPORT BOOL hb_hashSetForward( PHB_ITEM pHash, HB_SIZE ulIndex, PHB_ITEM pItem );
+HB_EXPORT BOOL hb_hashGet( PHB_ITEM pHash, HB_SIZE ulIndex, PHB_ITEM pItem );
+HB_EXPORT BOOL hb_hashGetForward( PHB_ITEM pHash, HB_SIZE ulIndex, PHB_ITEM pItem );
 HB_EXPORT void hb_hashSetCaseMatch( PHB_ITEM pHash, BOOL bCase );
 
-HB_EXPORT void hb_hashPreallocate( PHB_ITEM pHash, ULONG ulLength );
+HB_EXPORT void hb_hashPreallocate( PHB_ITEM pHash, HB_SIZE ulLength );
 HB_EXPORT PHB_ITEM hb_hashClone( PHB_ITEM pSrcHash, PHB_ITEM pDestHash );
 HB_EXPORT void hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource,
-      ULONG ulStart, ULONG ulEnd, PHB_ITEM pBlock );
+      HB_SIZE ulStart, HB_SIZE ulEnd, PHB_ITEM pBlock );
 
 HB_EXPORT  BOOL hb_hashSetAACompatibility( PHB_ITEM pHash, BOOL bCompatAA, BOOL bSilent );
 
@@ -81,19 +81,19 @@ HB_EXPORT  BOOL hb_hashSetAACompatibility( PHB_ITEM pHash, BOOL bCompatAA, BOOL 
    #define hb_hashGetCompatibility( pHash )     (( pHash )->item.asHash.value->pAccessAA == NULL?FALSE:TRUE)
    #define hb_hashAAGetRealPos( pHash, ulPos )  ( ( ( ulPos ) > 0 && ( ulPos) <= hb_hashLen( ( pHash ) ) )? *(( pHash )->item.asHash.value->pAccessAA + ( ulPos ) - 1 ) : 0 )
 #else
-   extern HB_EXPORT ULONG hb_hashLen( PHB_ITEM pHash );
+   extern HB_EXPORT HB_SIZE hb_hashLen( PHB_ITEM pHash );
    extern HB_EXPORT  BOOL hb_hashGetCompatibility( PHB_ITEM pHash );
-   extern HB_EXPORT ULONG hb_hashAAGetRealPos( PHB_ITEM pHash, ULONG ulPos );
+   extern HB_EXPORT HB_SIZE hb_hashAAGetRealPos( PHB_ITEM pHash, HB_SIZE ulPos );
 #endif
 
 HB_EXPORT PHB_ITEM hb_hashGetKeys( PHB_ITEM pKeys, PHB_ITEM pHash );
 HB_EXPORT PHB_ITEM hb_hashGetValues( PHB_ITEM pValues, PHB_ITEM pHash );
-HB_EXPORT PHB_ITEM hb_hashGetKeyAt( PHB_ITEM pHash, ULONG ulPos );
-HB_EXPORT PHB_ITEM hb_hashGetValueAt( PHB_ITEM pHash, ULONG ulPos );
+HB_EXPORT PHB_ITEM hb_hashGetKeyAt( PHB_ITEM pHash, HB_SIZE ulPos );
+HB_EXPORT PHB_ITEM hb_hashGetValueAt( PHB_ITEM pHash, HB_SIZE ulPos );
 
 
-HB_EXPORT PHB_ITEM hb_hashGetKeyAt( PHB_ITEM pHash, ULONG ulPos );
-HB_EXPORT PHB_ITEM hb_hashGetValueAt( PHB_ITEM pHash, ULONG ulPos );
+HB_EXPORT PHB_ITEM hb_hashGetKeyAt( PHB_ITEM pHash, HB_SIZE ulPos );
+HB_EXPORT PHB_ITEM hb_hashGetValueAt( PHB_ITEM pHash, HB_SIZE ulPos );
 
 void hb_hashReleaseBase( PHB_BASEHASH pBaseHash );
 HB_EXPORT BOOL hb_hashRelease( PHB_ITEM pHash );

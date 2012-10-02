@@ -88,11 +88,11 @@
        {
           LONG lStart = pStart ? hb_itemGetNL( pStart ) : 1;
           LONG lEnd = pEnd ? hb_itemGetNL( pEnd ) : ( LONG ) pText->item.asString.length;
-          ULONG ulPos;
+          HB_SIZE ulPos;
 
           if( lStart < 0 )
           {
-             lStart += pText->item.asString.length;
+             lStart += ( LONG ) pText->item.asString.length;
 
              if( lStart < 0 )
              {
@@ -106,12 +106,12 @@
 
           if( lEnd < 0 )
           {
-             lEnd += pText->item.asString.length + 1;
+             lEnd += ( LONG ) pText->item.asString.length + 1;
           }
 
           if( lEnd > ( LONG ) pText->item.asString.length )
           {
-             lEnd = pText->item.asString.length;
+             lEnd = ( LONG ) pText->item.asString.length;
           }
 
           // Stop searching if starting past beyond end.
@@ -126,7 +126,7 @@
 
           ulPos = hb_strAt( pSub->item.asString.value, pSub->item.asString.length, pText->item.asString.value + lStart, lEnd - lStart );
 
-          hb_retnl( ulPos ? ulPos + lStart : 0 );
+          hb_retnl( (LONG) ( ulPos ? ulPos + lStart : 0 ) );
        }
        else
        {
@@ -136,7 +136,7 @@
 
 #endif
 
-ULONG hb_AtSkipStrings( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen )
+HB_SIZE hb_AtSkipStrings( const char * szSub, HB_SIZE ulSubLen, const char * szText, HB_SIZE ulLen )
 {
    char cLastChar = ' ';
 
@@ -244,14 +244,14 @@ HB_FUNC( ATSKIPSTRINGS ) // cFind, cWhere, nStart
 
       if( ulStart < pWhere->item.asString.length )
       {
-         unsigned long ulRet;
+         HB_SIZE ulRet;
 
          ulRet = hb_AtSkipStrings( pFind->item.asString.value, pFind->item.asString.length,
                                       pWhere->item.asString.value + ulStart, pWhere->item.asString.length - ulStart );
 
          if( ulRet )
          {
-            hb_retnl( ulRet + ulStart );
+            hb_retnl( ( LONG ) ( ulRet + ulStart ) );
             return;
          }
       }

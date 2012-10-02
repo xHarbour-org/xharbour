@@ -104,7 +104,7 @@
 
 HB_EXTERN_BEGIN
 
-PHB_ITEM hb_param( int iParam, LONG lMask )
+PHB_ITEM hb_param( int iParam, long lMask )
 {
    HB_THREAD_STUB_ANY
 
@@ -268,7 +268,7 @@ const char * hb_parcx( int iParam, ... )
    return "";
 }
 
-ULONG  hb_parclen( int iParam, ... )
+HB_SIZE  hb_parclen( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
@@ -307,7 +307,7 @@ ULONG  hb_parclen( int iParam, ... )
          terminating zero byte, and it only works for parameters passed by
          reference. [vszakats] */
 
-ULONG  hb_parcsiz( int iParam, ... )
+HB_SIZE  hb_parcsiz( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
@@ -460,7 +460,7 @@ char  * hb_pardsbuff( char * szDate, int iParam, ... )
 
 /* retrieve a date as long integer - number of days from Julian's day */
 
-LONG  hb_pardl( int iParam, ... )
+long hb_pardl( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
@@ -497,7 +497,7 @@ LONG  hb_pardl( int iParam, ... )
 
 /* NOTE: szDateTime must be a 26 chars wide buffer. [walter negro] */
 
-char  * hb_pardtsbuff( char * szDateTime, int iParam, ... )
+char * hb_pardtsbuff( char * szDateTime, int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
@@ -534,7 +534,7 @@ char  * hb_pardtsbuff( char * szDateTime, int iParam, ... )
 
 /* retrieve a time as LONG - number of seconds in the time part */
 
-LONG hb_part( int iParam, ... )
+long hb_part( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
@@ -796,7 +796,7 @@ int  hb_parni( int iParam, ... )
    return 0;
 }
 
-LONG  hb_parnl( int iParam, ... )
+long hb_parnl( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
@@ -813,31 +813,31 @@ LONG  hb_parnl( int iParam, ... )
 
       if( HB_IS_LONG( pItem ) )
       {
-         return ( LONG ) pItem->item.asLong.value;
+         return ( long ) pItem->item.asLong.value;
       }
       else if( HB_IS_INTEGER( pItem ) )
       {
-         return ( LONG ) pItem->item.asInteger.value;
+         return pItem->item.asInteger.value;
       }
       else if( HB_IS_DOUBLE( pItem ) )
       {
 #ifdef __GNUC__
-         return ( LONG ) ( ULONG ) pItem->item.asDouble.value;
+         return ( long ) ( ULONG ) pItem->item.asDouble.value;
 #else
-         return ( LONG ) pItem->item.asDouble.value;
+         return ( long ) pItem->item.asDouble.value;
 #endif
       }
       else if( HB_IS_DATETIME( pItem ) )
       {
-         return pItem->item.asDate.value;
+         return ( long ) pItem->item.asDate.value;
       }
       else if( HB_IS_LOGICAL( pItem ) )
       {
-         return ( LONG ) pItem->item.asLogical.value;
+         return ( long ) pItem->item.asLogical.value;
       }
       else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
       {
-         return ( LONG ) ( BYTE ) pItem->item.asString.value[0];
+         return ( long ) ( BYTE ) pItem->item.asString.value[0];
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
@@ -855,7 +855,7 @@ LONG  hb_parnl( int iParam, ... )
    return 0;
 }
 
-HB_LONG  hb_parnint( int iParam, ... )
+HB_LONG hb_parnint( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
@@ -993,7 +993,7 @@ void * hb_parptrGC( HB_GARBAGE_FUNC_PTR pFunc, int iParam, ... )
    return NULL;
 }
 
-ULONG  hb_parinfa( int iParamNum, ULONG uiArrayIndex )
+HB_SIZE  hb_parinfa( int iParamNum, HB_SIZE uiArrayIndex )
 {
    PHB_ITEM pArray;
 
@@ -1012,7 +1012,7 @@ ULONG  hb_parinfa( int iParamNum, ULONG uiArrayIndex )
       return 0;
 }
 
-ULONG  hb_parinfo( int iParam )
+HB_SIZE  hb_parinfo( int iParam )
 {
    HB_THREAD_STUB_ANY
 
@@ -1081,7 +1081,7 @@ void hb_ret( void )
 #endif
 
 #undef hb_reta
-void hb_reta( ULONG ulLen )  /* undocumented hb_reta() */
+void hb_reta( HB_SIZE ulLen )  /* undocumented hb_reta() */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_reta(%lu)", ulLen));
 
@@ -1105,7 +1105,7 @@ void hb_retc_null( void )
 }
 
 #undef hb_retclen
-void hb_retclen( const char * szText, ULONG ulLen )
+void hb_retclen( const char * szText, HB_SIZE ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retclen(%s, %lu)", szText, ulLen));
 
@@ -1149,7 +1149,7 @@ void hb_retdt( int iYear, int iMonth, int iDay, int iHour, int iMin, double dSec
 }
 
 #undef hb_retdl
-void hb_retdl( LONG lJulian )
+void hb_retdl( long lJulian )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retdl(%ld)", lJulian));
 
@@ -1165,7 +1165,7 @@ void hb_retdtd( double dDateTime )
 }
 
 #undef hb_retdtl
-void hb_retdtl( LONG lDate, LONG lTime )
+void hb_retdtl( long lDate, long lTime )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retdtl(%ld,%ld)", lDate, lTime));
 
@@ -1197,7 +1197,7 @@ void hb_retni( int iNumber )
 }
 
 #undef hb_retnl
-void hb_retnl( LONG lNumber )
+void hb_retnl( long lNumber )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retnl(%ld)", lNumber));
 
@@ -1229,7 +1229,7 @@ void hb_retnilen( int iNumber, int iWidth )
 }
 
 #undef hb_retnllen
-void hb_retnllen( LONG lNumber, int iWidth )
+void hb_retnllen( long lNumber, int iWidth )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retnllen(%ld, %d)", lNumber, iWidth));
 
@@ -1302,7 +1302,7 @@ void hb_storc( const char * szText, int iParam, ... )
    }
 }
 
-void hb_storclen( const char * szText, ULONG ulLen, int iParam, ... )
+void hb_storclen( const char * szText, HB_SIZE ulLen, int iParam, ... )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_storclen(%s, %lu, %d, ...)", szText, ulLen, iParam));
 
@@ -1335,7 +1335,7 @@ void hb_storclen( const char * szText, ULONG ulLen, int iParam, ... )
    }
 }
 
-int hb_storclenAdopt( char * szText, ULONG ulLen, int iParam, ... )
+int hb_storclenAdopt( char * szText, HB_SIZE ulLen, int iParam, ... )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_storclenAdopt(%s, %lu, %d, ...)", szText, ulLen, iParam));
 
@@ -1442,7 +1442,7 @@ void hb_stordts( const char * szDateTime, int iParam, ... )
    }
 }
 
-void hb_stordl( LONG lJulian, int iParam, ... )
+void hb_stordl( long lJulian, int iParam, ... )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_stordl(%ld, %d, ...)", lJulian, iParam));
 
@@ -1508,7 +1508,7 @@ void hb_stordtd( double dDateTime, int iParam, ... )
    }
 }
 
-void hb_stordtl( LONG lDate, LONG lTime, int iParam, ... )
+void hb_stordtl( long lDate, long lTime, int iParam, ... )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_stordtl(%ld, %ld, %d, ...)", lDate, lTime, iParam));
 
@@ -1673,7 +1673,7 @@ void hb_storni( int iValue, int iParam, ... )
    }
 }
 
-void hb_stornl( LONG lValue, int iParam, ... )
+void hb_stornl( long lValue, int iParam, ... )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_stornl(%ld, %d, ...)", lValue, iParam));
 

@@ -468,14 +468,14 @@ typedef struct tag_HB_STACK
    PHB_ITEM * pItems;           /* pointer to the stack items */
    PHB_ITEM * pPos;             /* pointer to the latest used item */
    PHB_ITEM * pEnd;             /* pointer to the end of stack items */
-   LONG       wItems;           /* total items that may be holded on the stack */
+   long       wItems;           /* total items that may be holded on the stack */
    HB_ITEM    Return;           /* latest returned value */
    PHB_ITEM * pBase;            /* stack frame position for the current function call */
    PHB_ITEM * pEvalBase;        /* stack frame position for the evaluated codeblock */
-   LONG       lStatics;         /* statics base for the current function call */
-   LONG       lWithObject;      /* stack offset to base current WITH OBJECT item */
-   ULONG      lRecoverBase;     /* current SEQUENCE envelope offset or 0 if no SEQUENCE is active */
-   //USHORT     uiActionRequest;  /* Request for some action - stop processing of opcodes */
+   long       lStatics;         /* statics base for the current function call */
+   long       lWithObject;      /* stack offset to base current WITH OBJECT item */
+   HB_SIZE    lRecoverBase;     /* current SEQUENCE envelope offset or 0 if no SEQUENCE is active */
+   //USHORT   uiActionRequest;  /* Request for some action - stop processing of opcodes */
    char       szDate[ 26 ];     /* last returned date from _pards() yyyymmdd format */
    struct _HB_STACKRDD * rdd;   /* RDD related data */
    HB_STACKRDD_TLS rddTls;      /* RDD related data which is always thread-local */
@@ -522,7 +522,7 @@ typedef struct tag_HB_STACK
    /* Mt for each enumeration index */
    HB_ITEM  aEnumCollection[ HB_MAX_ENUMERATIONS ];
    PHB_ITEM apEnumVar[ HB_MAX_ENUMERATIONS ];
-   ULONG    awEnumIndex[ HB_MAX_ENUMERATIONS ];
+   HB_SIZE  awEnumIndex[ HB_MAX_ENUMERATIONS ];
    UINT     wEnumCollectionCounter;
 
    /* management of codeblock and macro params */
@@ -552,20 +552,20 @@ typedef struct tag_HB_STACK
 
    /* Management of PRIVATE variables (and macro memvars) */
    PHB_DYNS * privateStack;
-   ULONG privateStackSize;
-   ULONG privateStackCnt;
-   ULONG privateStackBase;
+   HB_SIZE privateStackSize;
+   HB_SIZE privateStackCnt;
+   HB_SIZE privateStackBase;
 
    /* Management of globals memvars */
-   ULONG globalTableSize;
-   ULONG globalFirstFree;
-   ULONG globalLastFree;
+   HB_SIZE globalTableSize;
+   HB_SIZE globalFirstFree;
+   HB_SIZE globalLastFree;
    HB_VALUE_PTR globalTable;
 
    /* Pointers to hMemvar for thread aware dynsyms */
    HB_HANDLE *hMemvars;
-   ULONG hMemvarsAllocated;
-   ULONG hMemvarsLastFree;
+   HB_SIZE hMemvarsAllocated;
+   HB_SIZE hMemvarsLastFree;
 
    /* Background per-thread jobs */
    struct HB_BACKGROUNDTASK_ **pBackgroundTasks;

@@ -67,10 +67,10 @@ static void do_charevod( int iSwitch )
 {
    if( ISCHAR( 1 ) )
    {
-      const char *   pcString = hb_parc( 1 );
-      size_t         sLen     = hb_parclen( 1 );
-      char *         pcResult;
-      size_t         sPos, sResultPos;
+      const char * pcString = hb_parc( 1 );
+      HB_SIZE      sLen     = hb_parclen( 1 );
+      char *       pcResult;
+      HB_SIZE      sPos, sResultPos;
 
       if( sLen == 0 )
       {
@@ -95,6 +95,7 @@ static void do_charevod( int iSwitch )
          sPos = 0;
 
       sResultPos = 0;
+
       for(; sPos < sLen; sPos += 2 )
          pcResult[ sResultPos++ ] = pcString[ sPos ];
 

@@ -346,8 +346,8 @@ static LPCDXKEY hb_cdxKeyPutC( LPCDXKEY pKey, const char * szText, USHORT uiReal
 /*
  * compare two values using Tag conditions (len & type)
  */
-static int hb_cdxValCompare( LPCDXTAG pTag, BYTE * val1, BYTE len1,
-                             BYTE * val2, BYTE len2, int iMode )
+static int hb_cdxValCompare( LPCDXTAG pTag, BYTE * val1, int len1,
+                             BYTE * val2, int len2, int iMode )
 {
    int iLimit, iResult = 0;
 
@@ -468,21 +468,21 @@ static LPCDXKEY hb_cdxKeyPutItem( LPCDXKEY pKey, PHB_ITEM pItem, ULONG ulRec, LP
             if( pTag->IgnoreCase )
             {
                char tmp[CDX_MAXKEY];
-               ULONG ul = hb_itemGetCLen( pItem );
+               ULONG ul = ( ULONG ) hb_itemGetCLen( pItem );
                if( ul > ( ULONG ) sizeof( tmp ) )
                   ul = ( ULONG ) sizeof( tmp );
-               HB_MEMCPY( tmp, hb_itemGetCPtr( pItem ), ul );
+               HB_MEMCPY( tmp, hb_itemGetCPtr( pItem ), (size_t) ul );
                hb_strUpper( tmp, ul );
-               hb_cdpnDup2( tmp, ul, ( char * ) ptr, &ulLen,
+               hb_cdpnDup2( tmp, ul, ( char * ) ptr, ( HB_SIZE *) &ulLen,
                             hb_cdppage(), pTag->pIndex->pArea->dbfarea.area.cdPage );
             }
             else
                hb_cdpnDup2( hb_itemGetCPtr( pItem ), hb_itemGetCLen( pItem ),
-                            ( char * ) ptr, &ulLen,
+                            ( char * ) ptr, ( HB_SIZE *) &ulLen,
                             hb_cdppage(), pTag->pIndex->pArea->dbfarea.area.cdPage );
             if( iMode == CDX_CMP_EXACT && ulLen < ( ULONG ) pTag->uiLen )
             {
-               memset( ptr + ulLen, pTag->bTrail, pTag->uiLen - ulLen );
+               memset( ptr + ulLen, pTag->bTrail, (size_t) ( pTag->uiLen - ulLen ) );
                ulLen = pTag->uiLen;
             }
          }
@@ -491,19 +491,19 @@ static LPCDXKEY hb_cdxKeyPutItem( LPCDXKEY pKey, PHB_ITEM pItem, ULONG ulRec, LP
          HB_SYMBOL_UNUSED( fTrans );
 #endif
          {
-            ulLen = hb_itemGetCLen( pItem );
+            ulLen = ( ULONG ) hb_itemGetCLen( pItem );
             if( ulLen > ( ULONG ) pTag->uiLen )
                ulLen = pTag->uiLen;
 
             if( pTag->IgnoreCase ||
                 ( iMode == CDX_CMP_EXACT && ulLen < ( ULONG ) pTag->uiLen ) )
             {
-               HB_MEMCPY( ptr, hb_itemGetCPtr( pItem ), ulLen );
+               HB_MEMCPY( ptr, hb_itemGetCPtr( pItem ), (size_t) ulLen );
                if( pTag->IgnoreCase )
                   hb_strUpper( ( char * ) ptr, ulLen );
                if( iMode == CDX_CMP_EXACT && ulLen < ( ULONG ) pTag->uiLen )
                {
-                  memset( ptr + ulLen, pTag->bTrail, pTag->uiLen - ulLen );
+                  memset( ptr + ulLen, pTag->bTrail, (size_t) ( pTag->uiLen - ulLen ) );
                   ulLen = pTag->uiLen;
                }
             }
@@ -562,7 +562,7 @@ static PHB_ITEM hb_cdxKeyGetItem( LPCDXKEY pKey, PHB_ITEM pItem, LPCDXTAG pTag, 
             if( fTrans )
             {
                ULONG ulLen = pKey->len;
-               char * pszVal = hb_cdpnDup( ( const char * ) pKey->val, &ulLen,
+               char * pszVal = hb_cdpnDup( ( const char * ) pKey->val, ( HB_SIZE *) &ulLen,
                                            pTag->pIndex->pArea->dbfarea.area.cdPage, hb_cdppage() );
                pItem = hb_itemPutCPtr( pItem, pszVal, ulLen );
             }
@@ -795,7 +795,7 @@ static void hb_cdxTagSetScope( LPCDXTAG pTag, USHORT nScope, PHB_ITEM pItem )
    pScopeVal = ( hb_itemType( pItem ) == HB_IT_BLOCK ) ?
                            hb_vmEvalBlock( pItem ) : pItem;
 
-   if( hb_cdxItemTypeCmp( pTag->uiType ) == hb_cdxItemTypeCmp( hb_cdxItemType( pScopeVal ) ) )
+   if( hb_cdxItemTypeCmp( ( BYTE ) pTag->uiType ) == hb_cdxItemTypeCmp( ( BYTE ) hb_cdxItemType( pScopeVal ) ) )
    {
       PHB_ITEM *pScope;
       LPCDXKEY *pScopeKey;
@@ -2250,7 +2250,7 @@ static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, int iChildRet )
                iSize += iLen - 6 - ( j == 0 ? 0 : pPtr[ ( j + 1 ) * iLen - 2 ] ) - pPtr[ ( j + 1 ) * iLen - 1 ];
             }
             pbKey = hb_cdxPageGetKeyVal( lpTmpPage, 0 );
-            bMax = hb_cdxPageGetKeyTrl( lpTmpPage, 0 );
+            bMax = ( BYTE ) hb_cdxPageGetKeyTrl( lpTmpPage, 0 );
 #ifdef HB_CDX_PACKTRAIL
             bMax = iLen - 6 - bMax;
 #else
@@ -2876,8 +2876,8 @@ static void hb_cdxTagHeaderStore( LPCDXTAG pTag )
    if( pTag->IgnoreCase )
       tagHeader.ignoreCase = 1;
 
-   uiKeyLen = pTag->KeyExpr == NULL ? 0 : strlen( pTag->KeyExpr );
-   uiForLen = pTag->ForExpr == NULL ? 0 : strlen( pTag->ForExpr );
+   uiKeyLen = pTag->KeyExpr == NULL ? 0 : ( USHORT ) strlen( pTag->KeyExpr );
+   uiForLen = pTag->ForExpr == NULL ? 0 : ( USHORT ) strlen( pTag->ForExpr );
 
    if( uiKeyLen + uiForLen > CDX_HEADEREXPLEN - 2 )
    {
@@ -4955,7 +4955,7 @@ static BOOL hb_cdxRegexMatch( CDXAREAP pArea, PHB_REGEX pRegEx, LPCDXKEY pKey )
    if( pArea->dbfarea.area.cdPage != hb_cdppage() )
    {
       ulLen = sizeof( szBuff ) - 1;
-      hb_cdpnDup2( szKey, pKey->len, szBuff, &ulLen,
+      hb_cdpnDup2( szKey, pKey->len, szBuff, ( HB_SIZE *) &ulLen,
                    pArea->dbfarea.area.cdPage, hb_cdppage() );
       szBuff[ ulLen ] = '\0';
       szKey = szBuff;
@@ -8854,7 +8854,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag, BOOL fReindex )
                case HB_IT_STRING | HB_IT_MEMO:
                   hb_cdxSortKeyAdd( pSort, pArea->dbfarea.ulRecNo,
                                     ( BYTE * ) hb_itemGetCPtr( pItem ),
-                                    hb_itemGetCLen( pItem ) );
+                                    (int) hb_itemGetCLen( pItem ) );
                   break;
 
                case HB_IT_INTEGER:

@@ -126,7 +126,7 @@ HB_FUNC( HB_BUILDINFO )
    for ( ui=0; ui<iWords; ui++ )
    {
       char * szInfo = hb_arrayGetC( &hbInfo, ui + 1 );
-      int iLen = strlen( szInfo );
+      HB_SIZE iLen = strlen( szInfo );
 
       if( hb_stricmp( szInfo, "yes" ) == 0 )
       {

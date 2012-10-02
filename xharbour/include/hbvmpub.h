@@ -128,7 +128,7 @@
                                                 } \
                                                 else \
                                                 { \
-                                                   p = hb_codeblockGetVar( hb_stackSelfItem(), (LONG)( n ) ); \
+                                                   p = hb_codeblockGetVar( hb_stackSelfItem(),  ( n ) ); \
                                                 } \
                                              }while(0);
 
@@ -184,15 +184,15 @@
 
    struct hb_struBlock
    {
-      LONG   statics;
-      USHORT paramcnt;
-      struct _HB_CODEBLOCK * value;
+      long    statics;
+      USHORT  paramcnt;
+      struct  _HB_CODEBLOCK * value;
    };
 
    struct hb_struDate
    {
-      LONG value;
-      LONG time;
+      long value;
+      long time;
    };
 
    /* this definition signals that number of decimal places for double value
@@ -229,8 +229,8 @@
    struct hb_struMemvar
    {
       struct _HB_VALUE ** itemsbase;
-      LONG offset;
-      LONG value;
+      long offset;
+      long value;
    };
 
    struct hb_struPointer
@@ -247,8 +247,8 @@
          struct _HB_BASEARRAY * pBaseArray;    /* Array Members */
          struct _HB_ITEM ** *itemsbasePtr;     /* local variables */
       } BasePtr;
-      LONG offset;    /* 0 for static variables */
-      LONG value;
+      long offset;    /* 0 for static variables */
+      long value;
    };
 
    struct hb_struExtRef
@@ -259,16 +259,16 @@
 
    struct hb_struString
    {
-      ULONG           length;
-      ULONG           allocated;
+      HB_SIZE         length;
+      HB_SIZE         allocated;
       char          * value;
       HB_COUNTER    * pulHolders; /* number of holders of this string */
    };
 
    typedef struct _HB_SYMBCARGO
    {
-      LONG        stackbase;
-      ULONG       privatesbase;
+      long        stackbase;
+      HB_SIZE     privatesbase;
       USHORT      lineno;
       USHORT      arguments;
       USHORT      locals;
@@ -316,13 +316,13 @@
    typedef struct _HB_BASEARRAY
    {
       PHB_ITEM   pItems;       /* pointer to the array items */
-      ULONG      ulLen;        /* number of items in the array */
+      HB_SIZE    ulLen;        /* number of items in the array */
       HB_COUNTER ulHolders;    /* number of holders of this array */
       USHORT     uiClass;      /* offset to the classes base if it is an object */
       USHORT     uiPrevCls;    /* for fixing after access super */
       USHORT *   puiClsTree;   /* without use  */
-      ULONG      ulAllocated;
-      ULONG      ulBlock;
+      HB_SIZE    ulAllocated;
+      HB_SIZE    ulBlock;
       UINT       uiFlags;
 #ifndef HB_ARRAY_USE_COUNTER
       PHB_ARRAY_HOLDER pOwners;
@@ -339,15 +339,15 @@
    {
       PHB_ITEM    pKeys;
       PHB_ITEM    pValues;        /* pointer to the array items */
-      ULONG       ulLen;          /* number of items in the array */
-      ULONG       ulAllocated;    /* items allocated in keys and values */
+      HB_SIZE     ulLen;          /* number of items in the array */
+      HB_SIZE     ulAllocated;    /* items allocated in keys and values */
       PHB_HASH_ORDER_FUNC fOrder; /* returns -1, 0 or 1 */
       BOOL        bCase;          /* Case sensitivity */
       BOOL        bAutoAdd;       /* Signal error if key is not found on assign */
       USHORT      uiLevel;        /* Pagination depth level */
-      ULONG       ulTotalLen;     /* Total lenght in paged hashes */
-      ULONG       ulPageSize;     /* Maximum size allowed per page */
-      ULONG*      pAccessAA;      /* Associative Array pointer */
+      HB_SIZE     ulTotalLen;     /* Total lenght in paged hashes */
+      HB_SIZE     ulPageSize;     /* Maximum size allowed per page */
+      HB_SIZE*    pAccessAA;      /* Associative Array pointer */
       HB_COUNTER  ulHolders;      /* number of holders of this hash */
    } HB_BASEHASH, * PHB_BASEHASH, * HB_BASEHASH_PTR;
 
@@ -377,9 +377,9 @@
       HB_HANDLE hMemvar;      /* Index number into memvars ( publics & privates ) array */
       PHB_SYMB  pSymbol;      /* pointer to its relative local symbol */
       PSYMBOLS  pModuleSymbols;
-      ULONG     ulCalls;      /* profiler support */
-      ULONG     ulTime;       /* profiler support */
-      ULONG     ulRecurse;    /* profiler support */
+      HB_SIZE   ulCalls;      /* profiler support */
+      HB_SIZE   ulTime;       /* profiler support */
+      HB_SIZE   ulRecurse;    /* profiler support */
    } HB_DYNS, * PHB_DYNS, * HB_DYNS_PTR;
 #else
    /* dynamic symbol structure */
@@ -390,9 +390,9 @@
       PHB_SYMB  pSymbol;      /* pointer to its relative local symbol */
       PSYMBOLS  pModuleSymbols;
 #if ! defined( HB_NO_PROFILER )
-      ULONG     ulCalls;      /* profiler support */
-      ULONG     ulTime;       /* profiler support */
-      ULONG     ulRecurse;    /* profiler support */
+      HB_SIZE   ulCalls;      /* profiler support */
+      HB_SIZE   ulTime;       /* profiler support */
+      HB_SIZE   ulRecurse;    /* profiler support */
 #endif
    } HB_DYNS, * PHB_DYNS, * HB_DYNS_PTR;
 #endif

@@ -64,7 +64,7 @@ HB_FUNC( BIN2U )
    if( pItem )
    {
       char * pszString = pItem->item.asString.value;
-      ULONG ulLen = pItem->item.asString.length;
+      HB_SIZE ulLen = pItem->item.asString.length;
       ULONG value = HB_MKULONG( ( ulLen >= 1 ) ? ( BYTE ) pszString[ 0 ] : 0,
                                 ( ulLen >= 2 ) ? ( BYTE ) pszString[ 1 ] : 0,
                                 ( ulLen >= 3 ) ? ( BYTE ) pszString[ 2 ] : 0,

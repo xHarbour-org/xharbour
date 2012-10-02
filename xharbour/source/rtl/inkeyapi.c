@@ -114,7 +114,7 @@ int  hb_inkeySetLast( int iKey )
    return pGT ? HB_GTSELF_INKEYSETLAST( pGT, iKey ) : 0;
 }
 
-void hb_inkeySetText( const char * szText, ULONG ulLen )
+void hb_inkeySetText( const char * szText, HB_SIZE ulLen )
 {
    PHB_GT pGT;
 

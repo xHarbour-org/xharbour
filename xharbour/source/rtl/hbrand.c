@@ -61,5 +61,5 @@ HB_FUNC( HB_RAND32 ) /* returns an integer between 0 and 0xFFFFFFFF (inclusive) 
 
 void hb_random_block( void * data, HB_SIZE len )
 {
-   hb_arc4random_buf( data, len );
+   hb_arc4random_buf( data, (ULONG) len );
 }

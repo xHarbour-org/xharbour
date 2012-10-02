@@ -62,10 +62,10 @@
 #include "fm.api"
 #include "inkey.ch"
 
-#define OFF          0
-#define ON           ( ! OFF )
-#define NO           0
-#define YES          ( ! NO )
+#define OFF          FALSE
+#define ON           TRUE
+#define NO           FALSE
+#define YES          TRUE
 #define OK           0
 #define K_STRING     0
 #define K_LIST       ( ! K_STRING )
@@ -98,8 +98,8 @@ int      hlight;              /* highlight attribute                 */
 int      norm;                /* normal attribute                    */
 int      kcount;              /* number of keys in terminate key list*/
 int      colinc;              /* col increment amount                */
-int      brows;               /* browse flag                         */
-char     refresh;             /* YES means refresh screen            */
+BOOL     brows;               /* browse flag                         */
+BOOL     refresh;             /* YES means refresh screen            */
 char     kstr[ 25 ];          /* terminate key string                */
 int      keylist[ 24 ];       /* terminate key list                  */
 int      keytype;             /* K_STRING or K_LIST                  */
@@ -566,11 +566,9 @@ HB_FUNC( _FT_DFINIT )
          strcpyn( kstr, hb_parcx( 9 ), kcount );  /* get exit key string */
       }
 
-      brows    = hb_parl( 10 );                 /* get browse flag   */
+      brows    = hb_parl( 10 ) ? TRUE: FALSE;   /* get browse flag   */
 
       colinc   = hb_parni( 11 );                /* column skip value */
-
-
 
       bufftop     = 0;                    /* init buffer top pointer      */
       buffbot     = buffsize;             /* init buffer bottom pointer   */
@@ -579,8 +577,6 @@ HB_FUNC( _FT_DFINIT )
       wincol      = 0;                    /* init window col              */
       wintop      = 0;                    /* init window top pointer      */
       winbot      = 0;                    /* init window bottom pointer   */
-
-
 
       /* get file size */
 
@@ -715,7 +711,7 @@ HB_FUNC( FT_DISPFILE )
 
       do
       {
-         if( refresh == YES )               /* redraw window contents? */
+         if( refresh )               /* redraw window contents? */
             disp_update( wintop );
 
          hb_gtRest( sline, scol, eline, ecol, vseg );
@@ -742,13 +738,13 @@ HB_FUNC( FT_DISPFILE )
 
          switch( ch )
          {
-            case K_DOWN:  if( brows == YES )                /* if browse flag */
+            case K_DOWN:  if( brows )                       /* if browse flag */
                   winrow = eline;                           /* is set, force  */
                                                             /* active line to */
                linedown();                                  /* be last line   */
                break;
 
-            case K_UP:  if( brows == YES )                  /* if browse flag */
+            case K_UP:  if( brows )                         /* if browse flag */
                   winrow = sline;                           /* is set, force  */
                                                             /* active line to */
                lineup();                                    /* be first line  */

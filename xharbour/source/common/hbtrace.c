@@ -60,27 +60,27 @@
 #include "hb_io.h"
 #include "hbtrace.h"
 
-#if defined(_MSC_VER)
-#if ! defined(close)
-   #define close(i)  _close(i)
+#if defined( _MSC_VER )
+#if ! defined( close )
+   #define close( i )   _close( i )
 #endif
-#if ! defined(dup)
-   #define dup(i)    _dup(i)
+#if ! defined( dup )
+   #define dup( i )     _dup( i )
 #endif
-#if ! defined(fileno)
-   #define fileno(p) _fileno(p)
+#if ! defined( fileno )
+   #define fileno( p )  _fileno( p )
 #endif
 #endif // _MSC_VER
 
-char * hb_tr_file_ = "";
-int    hb_tr_line_ = 0;
-int    hb_tr_level_ = 0;
+char *         hb_tr_file_             = "";
+int            hb_tr_line_             = 0;
+int            hb_tr_level_            = 0;
 
-static int s_enabled = 1;
-static int s_flush   = 0;
+static int     s_enabled               = 1;
+static int     s_flush                 = 0;
 
-static FILE * s_fp = NULL;
-static char * s_slevel[ HB_TR_LAST ] =
+static FILE *  s_fp                    = NULL;
+static char *  s_slevel[ HB_TR_LAST ]  =
 {
    "HB_TR_ALWAYS",
    "HB_TR_FATAL",
@@ -107,7 +107,7 @@ int hb_tracelevel( int new_level )
    int old_level = hb_tr_level_;
 
    if( new_level >= HB_TR_ALWAYS &&
-       new_level <  HB_TR_LAST )
+       new_level < HB_TR_LAST )
       hb_tr_level_ = new_level;
 
    return old_level;
@@ -183,8 +183,8 @@ void hb_tr_trace( const char * fmt, ... )
     */
    if( s_enabled )
    {
-      int i;
-      va_list ap;
+      int      i;
+      va_list  ap;
 
       /*
        * Clean up the file, so that instead of showing
@@ -207,7 +207,7 @@ void hb_tr_trace( const char * fmt, ... )
        * Print file and line.
        */
       fprintf( s_fp, "%s:%d: %s ",
-               hb_tr_file_ + i, hb_tr_line_, (hb_tr_level_ >= 0) ? s_slevel[ hb_tr_level_ ] : "HB_TR_LOST");
+               hb_tr_file_ + i, hb_tr_line_, ( hb_tr_level_ >= 0 ) ? s_slevel[ hb_tr_level_ ] : "HB_TR_LOST" );
 
       /*
        * Print the name and arguments for the function.
@@ -235,10 +235,10 @@ void hb_tr_trace( const char * fmt, ... )
          hb_tr_line_ = -1;
       }
 
-      if ( s_flush )
+      if( s_flush )
       {
-         fflush( s_fp ) ;
-         close( dup( fileno( s_fp ))) ;
+         fflush( s_fp );
+         close( dup( fileno( s_fp ) ) );
       }
    }
 }

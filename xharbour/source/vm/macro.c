@@ -89,7 +89,7 @@ static void hb_macroUseAliased( HB_ITEM_PTR, HB_ITEM_PTR, int, BYTE );
  * 'szString' - a string to compile
  * 'iLen' - length of the string to compile
  */
-static int hb_macroParse( HB_MACRO_PTR pMacro, char * szString, int iLen )
+static int hb_macroParse( HB_MACRO_PTR pMacro, char * szString, HB_SIZE iLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_macroParse(%p, %s, %i)", pMacro, szString, iLen));
 
@@ -321,27 +321,29 @@ BOOL hb_macroIsIdent( char * szString )
  *    PRIVATE &a&b   //this will cause syntax error '&'
  *
  */
-char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
+char * hb_macroTextSubst( char * szString, HB_SIZE *pulStringLen )
 {
    char * szResult;
-   ULONG ulResStrLen;
-   ULONG ulResBufLen;
-   ULONG ulCharsLeft;
-   ULONG ulPad = 0;
+   HB_SIZE ulResStrLen;
+   HB_SIZE ulResBufLen;
+   HB_SIZE ulCharsLeft;
+   HB_SIZE ulPad = 0;
    char * pHead;
    char * pTail;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_macroTextSubst(%s, %li)", szString, *pulStringLen));
 
    (*pulStringLen)--;
+
    while( szString[*pulStringLen] == ' ' )
    {
       (*pulStringLen)--;
       ulPad++;
    }
+
    (*pulStringLen)++;
 
-   pHead = (char *) memchr( (void *)szString, '&', *pulStringLen );
+   pHead = (char *) memchr( (void *) szString, '&', (size_t) *pulStringLen );
 
    if( pHead == NULL )
    {
@@ -356,7 +358,7 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
 
    /* copy the input string with trailing zero byte
     */
-   HB_MEMCPY( szResult, szString, ulResStrLen + 1 );
+   HB_MEMCPY( szResult, szString, (size_t) ulResStrLen + 1 );
    /* switch the pointer so it will point into the result buffer
     */
    pHead = szResult + ( pHead - szString );
@@ -397,7 +399,7 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
          {
             /* this is not the "&_" string */
             char * szValPtr, cSave;
-            ULONG ulValLen;
+            HB_SIZE ulValLen;
 
             // Save overriden char, and terminate.
             cSave = pName[ ulNameLen ];
@@ -442,8 +444,8 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
 
                   if( ulResStrLen > ulResBufLen )
                   {
-                     ULONG ulHead = pHead - szResult;
-                     ULONG ulTail = pTail - szResult;
+                     HB_SIZE ulHead = pHead - szResult;
+                     HB_SIZE ulTail = pTail - szResult;
 
                      ulResBufLen = ulResStrLen;
                      szResult = ( char * ) hb_xrealloc( szResult, ulResBufLen + 1 );
@@ -457,10 +459,10 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
                }
 
                /* move bytes located on the right side of a variable name */
-               memmove( pTail + ulValLen, pHead, ulCharsLeft + 1 );
+               memmove( pTail + ulValLen, pHead, (size_t) ulCharsLeft + 1 );
 
                /* copy substituted value */
-               HB_MEMCPY( pTail, szValPtr, ulValLen );
+               HB_MEMCPY( pTail, szValPtr, (size_t) ulValLen );
 
                /* restart scanning from the beginning of replaced string */
                /* NOTE: This causes that the following code:
@@ -476,7 +478,7 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
 
       ulCharsLeft = ulResStrLen - ( pHead - szResult );
    }
-   while( ulCharsLeft && ( pHead = (char *) memchr( (void *)pHead, '&', ulCharsLeft ) ) != NULL );
+   while( ulCharsLeft && ( pHead = (char *) memchr( (void *)pHead, '&', (size_t) ulCharsLeft ) ) != NULL );
 
    if( ulResStrLen < ulResBufLen )
    {
@@ -528,7 +530,7 @@ void hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
       int iStatus;
       const char * szString;
       char *szCopy;
-      ULONG ulLength = pItem->item.asString.length;
+      HB_SIZE ulLength = pItem->item.asString.length;
 
 #ifdef HB_MACRO_STATEMENTS
       char * pText;
@@ -587,7 +589,7 @@ void hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
          pOut = ( char * ) hb_xgrab( HB_PP_STR_SIZE );
          ptr = pText;
          ulLength = HB_MIN( ulLength, HB_PP_STR_SIZE - 1 );
-         HB_MEMCPY( pText, szString, ulLength );
+         HB_MEMCPY( pText, szString, (size_t) ulLength );
          pText[ ulLength ] = 0;
          memset( pOut, 0, HB_PP_STR_SIZE );
 
@@ -673,7 +675,7 @@ void hb_macroSetValue( HB_ITEM_PTR pItem, BYTE flags )
       char *szCopy;
       HB_MACRO struMacro;
       int iStatus;
-      ULONG ulLen = pItem->item.asString.length;
+      HB_SIZE ulLen = pItem->item.asString.length;
 
       szCopy = hb_strdup( pItem->item.asString.value );
 
@@ -751,15 +753,15 @@ static void hb_macroUseAliased( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, int iFlag,
    {
       /* grab memory for "alias->var"
       */
-      int iLen = pAlias->item.asString.length + 2 + pVar->item.asString.length;
+      HB_SIZE iLen = pAlias->item.asString.length + 2 + pVar->item.asString.length;
       char * szCopy = ( char * ) hb_xgrab( iLen + 1 );
       HB_MACRO struMacro;
       int iStatus;
 
-      HB_MEMCPY( szCopy, pAlias->item.asString.value, pAlias->item.asString.length );
+      HB_MEMCPY( szCopy, pAlias->item.asString.value, (size_t) pAlias->item.asString.length );
       szCopy[ pAlias->item.asString.length ]     = '-';
       szCopy[ pAlias->item.asString.length + 1 ] = '>';
-      HB_MEMCPY( szCopy + pAlias->item.asString.length + 2, pVar->item.asString.value, pVar->item.asString.length );
+      HB_MEMCPY( szCopy + pAlias->item.asString.length + 2, pVar->item.asString.value, (size_t) pVar->item.asString.length );
       szCopy[ iLen ] = '\0';
 
       struMacro.Flags      = iFlag;
@@ -824,7 +826,7 @@ static void hb_macroUseAliased( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, int iFlag,
  * new string if a valid macro text substitution was found (and sets
  * pbNewString to TRUE)
 */
-char * hb_macroExpandString( char *szString, ULONG ulLength, BOOL *pbNewString )
+char * hb_macroExpandString( char *szString, HB_SIZE ulLength, BOOL *pbNewString )
 {
    char *szResultString;
    HB_TRACE(HB_TR_DEBUG, ("hb_macroExpandString(%s)", szString));
@@ -882,15 +884,15 @@ HB_FUNC( HB_MACROCOMPILE )
 
    if( sString )
    {
-      ULONG ulLen  = hb_parclen( 1 );
-      int iFlags   = hb_parni( 2 );
+      HB_SIZE ulLen  = hb_parclen( 1 );
+      int iFlags     = hb_parni( 2 );
 
       char *sMacro = (char *) hb_xgrab( ulLen + 1 );
 
       HB_MACRO_PTR pMacro;
       int iStatus;
 
-      HB_MEMCPY( sMacro, sString, ulLen + 1 );
+      HB_MEMCPY( sMacro, sString, (size_t) ulLen + 1 );
 
       if( iFlags == 0 )
       {
@@ -947,7 +949,7 @@ void hb_macroPushSymbol( HB_ITEM_PTR pItem )
    {
       char * szString;
       BOOL bNewBuffer;
-      ULONG ulLength = pItem->item.asString.length;
+      HB_SIZE ulLength = pItem->item.asString.length;
 
       szString = hb_macroTextSubst( pItem->item.asString.value, &ulLength );
       bNewBuffer = ( szString != pItem->item.asString.value );
@@ -956,7 +958,7 @@ void hb_macroPushSymbol( HB_ITEM_PTR pItem )
       {
          bNewBuffer = TRUE;
          szString = (char *) hb_xgrab( ulLength + 1 );
-         HB_MEMCPY( (void *) szString, (void *) pItem->item.asString.value, ulLength );
+         HB_MEMCPY( (void *) szString, (void *) pItem->item.asString.value, (size_t) ulLength );
          szString[ulLength] = '\0';
       }
 
@@ -1002,7 +1004,7 @@ void hb_macroTextValue( HB_ITEM_PTR pItem )
    if( hb_macroCheckParam( pItem ) )
    {
       char * szString;
-      ULONG ulLength = pItem->item.asString.length;
+      HB_SIZE ulLength = pItem->item.asString.length;
 
       szString = hb_macroTextSubst( pItem->item.asString.value, &ulLength );
 
@@ -1148,7 +1150,7 @@ char * hb_macroGetType( PHB_ITEM pItem, BYTE flags )
  * Set macro capabilities if flag > 0 or get current macro capabilities
  * if flag == 0
  */
-ULONG hb_macroSetMacro( BOOL bSet, ULONG flag )
+HB_SIZE hb_macroSetMacro( BOOL bSet, HB_SIZE flag )
 {
    ULONG ulCurrentFlags = s_macroFlags;
 
@@ -1244,7 +1246,7 @@ int hb_compLocalVarGetPos( char * szVarName, HB_MACRO_DECL )
 }
 
 
-ULONG hb_compGenJump( LONG lOffset, HB_MACRO_DECL )
+HB_SIZE hb_compGenJump( LONG lOffset, HB_MACRO_DECL )
 {
    /* TODO: We need a longer offset (longer then two bytes)
     */
@@ -1258,7 +1260,7 @@ ULONG hb_compGenJump( LONG lOffset, HB_MACRO_DECL )
    return HB_PCODE_DATA->lPCodePos - 2;
 }
 
-ULONG hb_compGenJumpFalse( LONG lOffset, HB_MACRO_DECL )
+HB_SIZE hb_compGenJumpFalse( LONG lOffset, HB_MACRO_DECL )
 {
    /* TODO: We need a longer offset (longer then two bytes)
     */
@@ -1272,10 +1274,10 @@ ULONG hb_compGenJumpFalse( LONG lOffset, HB_MACRO_DECL )
    return HB_PCODE_DATA->lPCodePos - 2;
 }
 
-void hb_compGenJumpThere( ULONG ulFrom, ULONG ulTo, HB_MACRO_DECL )
+void hb_compGenJumpThere( HB_SIZE ulFrom, HB_SIZE ulTo, HB_MACRO_DECL )
 {
-   BYTE * pCode = HB_PCODE_DATA->pCode;
-   LONG lOffset = ulTo - ulFrom + 1;
+   BYTE *  pCode   = HB_PCODE_DATA->pCode;
+   HB_ISIZ lOffset = ulTo - ulFrom + 1;
 
    /* TODO: We need a longer offset (longer then two bytes)
     */
@@ -1288,12 +1290,12 @@ void hb_compGenJumpThere( ULONG ulFrom, ULONG ulTo, HB_MACRO_DECL )
    pCode[ ( ULONG ) ulFrom + 1 ] = HB_HIBYTE( lOffset );
 }
 
-void hb_compGenJumpHere( ULONG ulOffset, HB_MACRO_DECL )
+void hb_compGenJumpHere( HB_SIZE ulOffset, HB_MACRO_DECL )
 {
    hb_compGenJumpThere( ulOffset, HB_PCODE_DATA->lPCodePos, HB_MACRO_PARAM );
 }
 
-ULONG hb_compGenJumpTrue( LONG lOffset, HB_MACRO_DECL )
+HB_SIZE hb_compGenJumpTrue( LONG lOffset, HB_MACRO_DECL )
 {
    /* TODO: We need a longer offset (longer then two bytes)
     */
@@ -1518,7 +1520,7 @@ void hb_compGenPopAliasedVar( char * szVarName,
    {
       if( szAlias )
       {
-         int iLen = strlen( szAlias );
+         int iLen = ( int ) strlen( szAlias );
 
          if( szAlias[ 0 ] == 'M' && ( iLen == 1 ||
              ( iLen >= 4 && iLen <= 6 && strncmp( szAlias, "MEMVAR", iLen ) == 0 ) ) )
@@ -1613,7 +1615,7 @@ void hb_compGenPushAliasedVar( char * szVarName,
          * FIELD->var
          * MEMVAR->var
          */
-         int iLen = strlen( szAlias );
+         int iLen = ( int ) strlen( szAlias );
 
          if( szAlias[ 0 ] == 'M' && ( iLen == 1 ||
              ( iLen >= 4 && iLen <= 6 && strncmp( szAlias, "MEMVAR", iLen ) == 0 ) ) )
@@ -1696,7 +1698,7 @@ void hb_compGenPushFunCall( char * szFunName, char *szNamespace, HB_MACRO_DECL )
 }
 
 /* generates the pcode to push a string on the virtual machine stack */
-void hb_compGenPushString( char * szText, ULONG ulStrLen, HB_MACRO_DECL )
+void hb_compGenPushString( char * szText, HB_SIZE ulStrLen, HB_MACRO_DECL )
 {
    hb_compGenPCode3( HB_P_MPUSHSTR, HB_LOBYTE( ulStrLen ), HB_HIBYTE( ulStrLen ), HB_MACRO_PARAM );
    hb_compGenPCodeN( ( BYTE * ) szText, ulStrLen, HB_MACRO_PARAM );
@@ -1748,7 +1750,7 @@ void hb_compGenPCode4( BYTE byte1, BYTE byte2, BYTE byte3, BYTE byte4, HB_MACRO_
    pFunc->pCode[ pFunc->lPCodePos++ ] = byte4;
 }
 
-void hb_compGenPCodeN( BYTE * pBuffer, ULONG ulSize, HB_MACRO_DECL )
+void hb_compGenPCodeN( BYTE * pBuffer, HB_SIZE ulSize, HB_MACRO_DECL )
 {
    HB_PCODE_INFO_PTR pFunc = HB_PCODE_DATA;
 
@@ -1759,7 +1761,7 @@ void hb_compGenPCodeN( BYTE * pBuffer, ULONG ulSize, HB_MACRO_DECL )
       pFunc->pCode = ( BYTE * ) hb_xrealloc( pFunc->pCode, pFunc->lPCodeSize );
    }
 
-   HB_MEMCPY( pFunc->pCode + pFunc->lPCodePos, pBuffer, ulSize );
+   HB_MEMCPY( pFunc->pCode + pFunc->lPCodePos, pBuffer, (size_t) ulSize );
    pFunc->lPCodePos += ulSize;
 }
 

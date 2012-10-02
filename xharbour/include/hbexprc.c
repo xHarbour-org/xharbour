@@ -942,7 +942,7 @@ HB_EXPR_PTR hb_compExprReducePlusStrings( HB_EXPR_PTR pLeft, HB_EXPR_PTR pRight,
 
    pLeft->value.asString.string = (char *) hb_xrealloc( pLeft->value.asString.string, pLeft->ulLength + pRight->ulLength + 1 );
    pLeft->value.asString.dealloc = TRUE;
-   HB_MEMCPY( pLeft->value.asString.string + pLeft->ulLength, pRight->value.asString.string, pRight->ulLength );
+   HB_MEMCPY( pLeft->value.asString.string + pLeft->ulLength, pRight->value.asString.string, (size_t) pRight->ulLength );
    pLeft->ulLength += pRight->ulLength;
    pLeft->value.asString.string[ pLeft->ulLength ] = '\0';
    hb_compExprFree( pRight, HB_MACRO_PARAM );
@@ -956,8 +956,8 @@ HB_EXPR_PTR hb_compExprReducePlusStrings( HB_EXPR_PTR pLeft, HB_EXPR_PTR pRight,
    char *szString;
 
    szString = (char *) hb_xgrab( pLeft->ulLength + pRight->ulLength + 1 );
-   HB_MEMCPY( szString, pLeft->value.asString.string, pLeft->ulLength );
-   HB_MEMCPY( szString + pLeft->ulLength, pRight->value.asString.string, pRight->ulLength );
+   HB_MEMCPY( szString, pLeft->value.asString.string, (size_t) pLeft->ulLength );
+   HB_MEMCPY( szString + pLeft->ulLength, pRight->value.asString.string, (size_t) pRight->ulLength );
    pLeft->ulLength += pRight->ulLength;
    szString[ pLeft->ulLength ] = '\0';
 

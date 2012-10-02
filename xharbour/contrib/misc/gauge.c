@@ -188,8 +188,8 @@ static void hb_gaugeUpdate( PHB_ITEM pArray, float fPercent )
                     (USHORT) iCenter + 2, (BYTE *) szPct, 4 );
    }
 
-   hb_gtBox( hb_arrayGetNL( pArray, B_TOP ) + 1, hb_arrayGetNL( pArray, B_LEFT ) + 1,
-             hb_arrayGetNL( pArray, B_BOTTOM ) - 1, hb_arrayGetNL( pArray, B_RIGHT ) - 1,
+   hb_gtBox( (SHORT) hb_arrayGetNL( pArray, B_TOP ) + 1, (SHORT) hb_arrayGetNL( pArray, B_LEFT ) + 1,
+             (SHORT) hb_arrayGetNL( pArray, B_BOTTOM ) - 1, (SHORT) hb_arrayGetNL( pArray, B_RIGHT ) - 1,
              ( BYTE * ) szStr );
 
    iMax = hb_arrayGetNL( pArray, B_BOTTOM ) - hb_arrayGetNL( pArray, B_TOP ) - 1;

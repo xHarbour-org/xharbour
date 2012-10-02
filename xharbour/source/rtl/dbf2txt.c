@@ -104,7 +104,7 @@ static BOOL hb_ExportVar( HB_FHANDLE handle, PHB_ITEM pValue, const char * cDeli
          char * szString;
 
          szStrEsc = hb_strescape( hb_itemGetCPtr( pValue ),
-                                  hb_itemGetCLen( pValue ), cDelim );
+                                  (int) hb_itemGetCLen( pValue ), cDelim );
 #ifndef HB_CDP_SUPPORT_OFF
          if( cdp )
          {
@@ -146,7 +146,7 @@ static BOOL hb_ExportVar( HB_FHANDLE handle, PHB_ITEM pValue, const char * cDeli
 
          if ( szResult )
          {
-            ULONG ulLen = strlen( szResult );
+            HB_SIZE ulLen = strlen( szResult );
             const char * szTrimmed = hb_strLTrim( szResult, &ulLen );
 
             hb_fsWriteLarge( handle, (BYTE*) szTrimmed, strlen( szTrimmed ) );
@@ -216,7 +216,7 @@ HB_FUNC( DBF2TEXT )
    }
 
    if( cSep )
-      iSepLen = hb_parclen( 6 );
+      iSepLen = (int) hb_parclen( 6 );
    else
    {
       cSep = ",";

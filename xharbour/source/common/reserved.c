@@ -54,92 +54,92 @@
 
 /* Table with reserved functions names
  * NOTE: THIS TABLE MUST BE SORTED ALPHABETICALLY
-*/
-#if(!defined( HB_RESERVED_OFF ))
+ */
+#if ( ! defined( HB_RESERVED_OFF ) )
 static const char * s_szReservedFun[] = {
-   "AADD"      ,
-   "ABS"       ,
-   "ASC"       ,
-   "AT"        ,
-   "BOF"       ,
-   "BREAK"     ,
-   "CDOW"      ,
-   "CHR"       ,
-   "CMONTH"    ,
-   "COL"       ,
-   "CTOD"      ,
-   "DATE"      ,
-   "DAY"       ,
-   "DELETED"   ,
-   "DEVPOS"    ,
-   "DOW"       ,
-   "DTOC"      ,
-   "DTOS"      ,
-   "EMPTY"     ,
-   "EOF"       ,
-   "EXP"       ,
-   "FCOUNT"    ,
-   "FIELDNAME" ,
-   "FLOCK"     ,
-   "FOUND"     ,
-   "INKEY"     ,
-   "INT"       ,
-   "LASTREC"   ,
-   "LEFT"      ,
-   "LEN"       ,
-   "LOCK"      ,
-   "LOG"       ,
-   "LOWER"     ,
-   "LTRIM"     ,
-   "MAX"       ,
-   "MIN"       ,
-   "MONTH"     ,
-   "PCOL"      ,
-   "PCOUNT"    ,
-   "PROW"      ,
-   "QSELF"     ,
-   "RECCOUNT"  ,
-   "RECNO"     ,
-   "REPLICATE" ,
-   "RLOCK"     ,
-   "ROUND"     ,
-   "ROW"       ,
-   "RTRIM"     ,
-   "SECONDS"   ,
-   "SELECT"    ,
-   "SETPOS"    ,
-   "SETPOSBS"  ,
-   "SPACE"     ,
-   "SQRT"      ,
-   "STR"       ,
-   "SUBSTR"    ,
-   "THROW"     ,
-   "TIME"      ,
-   "TRANSFORM" ,
-   "TRIM"      ,
-   "TYPE"      ,
-   "UPPER"     ,
-   "VAL"       ,
-   "WORD"      ,
+   "AADD",
+   "ABS",
+   "ASC",
+   "AT",
+   "BOF",
+   "BREAK",
+   "CDOW",
+   "CHR",
+   "CMONTH",
+   "COL",
+   "CTOD",
+   "DATE",
+   "DAY",
+   "DELETED",
+   "DEVPOS",
+   "DOW",
+   "DTOC",
+   "DTOS",
+   "EMPTY",
+   "EOF",
+   "EXP",
+   "FCOUNT",
+   "FIELDNAME",
+   "FLOCK",
+   "FOUND",
+   "INKEY",
+   "INT",
+   "LASTREC",
+   "LEFT",
+   "LEN",
+   "LOCK",
+   "LOG",
+   "LOWER",
+   "LTRIM",
+   "MAX",
+   "MIN",
+   "MONTH",
+   "PCOL",
+   "PCOUNT",
+   "PROW",
+   "QSELF",
+   "RECCOUNT",
+   "RECNO",
+   "REPLICATE",
+   "RLOCK",
+   "ROUND",
+   "ROW",
+   "RTRIM",
+   "SECONDS",
+   "SELECT",
+   "SETPOS",
+   "SETPOSBS",
+   "SPACE",
+   "SQRT",
+   "STR",
+   "SUBSTR",
+   "THROW",
+   "TIME",
+   "TRANSFORM",
+   "TRIM",
+   "TYPE",
+   "UPPER",
+   "VAL",
+   "WORD",
    "YEAR"
 };
 
-#define RESERVED_FUNCTIONS  sizeof( s_szReservedFun ) / sizeof( char * )
+#define RESERVED_FUNCTIONS sizeof( s_szReservedFun ) / sizeof( char * )
 #endif
 
 char * hb_compReservedName( char * szName )
 {
-#if(!defined( HB_RESERVED_OFF ))
-   UINT wNum = 0;
-   int iFound = 1;
+#if ( ! defined( HB_RESERVED_OFF ) )
+   UINT  wNum     = 0;
+   int   iFound   = 1;
 
    while( wNum < RESERVED_FUNCTIONS && iFound )
    {
       /* Compare first 4 characters
-      * If they are the same then compare the whole name
-      * SECO() is not allowed because of Clipper function SECONDS()
-      * however SECO32() is a valid name.
-      */
+       * If they are the same then compare the whole name
+       * SECO() is not allowed because of Clipper function SECONDS()
+       * however SECO32() is a valid name.
+       */
       iFound = strncmp( szName, s_szReservedFun[ wNum ], 4 );
 
       if( iFound == 0 )

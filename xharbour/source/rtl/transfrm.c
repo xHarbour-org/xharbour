@@ -102,14 +102,14 @@ HB_FUNC( TRANSFORM )
    if( pPic && hb_itemGetCLen( pPic ) > 0 )
    {
       char * szPic = hb_itemGetCPtr( pPic );
-      ULONG  ulPicLen = hb_itemGetCLen( pPic );
-      USHORT uiPicFlags; /* Function flags */
+      HB_SIZE ulPicLen = hb_itemGetCLen( pPic );
+      USHORT  uiPicFlags; /* Function flags */
 
       ULONG  ulParamS = 0; /* To avoid GCC -O2 warning */
       BYTE   byParamL = '\0'; /* To avoid GCC -O2 warning */
 
       char * szResult;
-      ULONG  ulResultPos;
+      HB_SIZE ulResultPos;
 
       double dValue = 0;
 
@@ -217,9 +217,9 @@ HB_FUNC( TRANSFORM )
       if( HB_IS_STRING( pValue ) )
       {
          char * szExp = hb_itemGetCPtr( pValue );
-         ULONG  ulExpLen = hb_itemGetCLen( pValue );
-         ULONG  ulExpPos = 0;
-         char * szPicNew = NULL;
+         HB_SIZE ulExpLen = hb_itemGetCLen( pValue );
+         ULONG   ulExpPos = 0;
+         char    *szPicNew = NULL;
 
          char szPicDate[ 11 ];
          BOOL bAnyPic = FALSE;
@@ -234,7 +234,7 @@ HB_FUNC( TRANSFORM )
               ( ( uiPicFlags & PF_BRITISH ) && ( uiPicFlags & PF_REMAIN ) ) ) )
             {
                szPicNew = (char*) hb_xgrab( ulExpLen + 1 );
-               hb_xmemset( szPicNew, '9', ulExpLen );
+               hb_xmemset( szPicNew, '9', (size_t) ulExpLen );
                szPicNew[ ulExpLen ] = '\0';
                szPic = szPicNew;
                ulPicLen = ulExpLen;
@@ -631,7 +631,7 @@ HB_FUNC( TRANSFORM )
          int      iOrigDec;
          int      iWidth;                             /* Width of string          */
          int      iDec;                               /* Number of decimals       */
-         ULONG    i;
+         HB_SIZE  i;
          int      iCount = 0;
 
          char *   szStr;
@@ -1150,13 +1150,13 @@ HB_FUNC( TRANSFORM )
 
             if( ulFirstChar < ulResultPos )
             {
-               memmove( szResult + ( ( ( uiPicFlags & PF_PARNEG ) && dValue < 0 && !( uiPicFlags & PF_PARNEGWOS ) ) ? 1: 0 ), szResult + ulFirstChar, ulResultPos - ulFirstChar );
+               memmove( szResult + ( ( ( uiPicFlags & PF_PARNEG ) && dValue < 0 && !( uiPicFlags & PF_PARNEGWOS ) ) ? 1: 0 ), szResult + ulFirstChar, (size_t) ( ulResultPos - ulFirstChar ) );
                memset( szResult + ulResultPos - ulFirstChar + ( ( ( uiPicFlags & PF_PARNEG ) && dValue < 0 && !( uiPicFlags & PF_PARNEGWOS ) ) ? 1: 0 ), ' ', ulFirstChar );
             }
          }
 
          if( uiPicFlags & PF_EMPTY )
-            memset( szResult, ' ', ulResultPos );
+            memset( szResult, ' ', (size_t) ulResultPos );
 
          hb_retclenAdopt( szResult, ( uiPicFlags & PF_WIDTH && ulResultPos > ulParamS && ulParamS > 0 ) ? ulParamS : ulResultPos );
       }

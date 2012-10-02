@@ -106,7 +106,8 @@ static int hb_datectod( char const * szDate, int * pd_value, int * pm_value, int
    {
       int d_pos = 0, m_pos = 0, y_pos = 0;
       const char * szFormat = hb_setGetDateFormat();
-      int count, digit, non_digit, size = strlen( szFormat );
+      int count, digit, non_digit;
+      int size = ( int ) strlen( szFormat );
 
       for( count = 0; count < size; count++ )
       {
@@ -146,7 +147,7 @@ static int hb_datectod( char const * szDate, int * pd_value, int * pm_value, int
       /* If there are non-digits at the start of the date field,
          they are not to be treated as date field separators */
       non_digit = 1;
-      fin = size = strlen( szDate );
+      fin = size = ( int ) strlen( szDate );
 
       for( count = 0; count < size; count++ )
       {
@@ -215,7 +216,7 @@ static int hb_datectod( char const * szDate, int * pd_value, int * pm_value, int
    *pm_value = m_value;
    *py_value = y_value;
 
-   return fin;
+   return (int) fin;
 }
 
 static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, double * ps_value )
@@ -224,8 +225,10 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
    double s_value = 0;
    int h_pos = 0, m_pos = 0, s_pos = 0, c_pos = 0, p_pos = 0;
    const char * szFormat = hb_setGetTimeFormat();
-   int count, digit, non_digit, size = strlen( szFormat );
-   int fin = 0, pm = 0, divisor = 10;
+   int count, digit, non_digit;
+   int size = ( int ) strlen( szFormat );
+   int fin = 0;
+   int pm = 0, divisor = 10;
 
    if( szTime )
    {
@@ -277,7 +280,7 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
       /* If there are non-digits at the start of the date field,
          they are not to be treated as date field separators */
       non_digit = 1;
-      fin = size = strlen( szTime );
+      fin = size = ( int ) strlen( szTime );
       for( count = 0; count < size; count++ )
       {
          digit = szTime[ count ];
@@ -372,7 +375,7 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
    *pm_value = m_value;
    *ps_value = s_value;
 
-   return fin;
+   return (int) fin;
 }
 
 HB_FUNC( CTOD )
@@ -417,7 +420,7 @@ HB_FUNC( DTOS )
 
 HB_FUNC( STOD )
 {
-   ULONG iLen = hb_parclen( 1 ) ;
+   HB_SIZE iLen = hb_parclen( 1 ) ;
    if ( iLen == 8 )
    {
      hb_retds( hb_parc( 1 ) );
@@ -642,7 +645,7 @@ HB_FUNC( CTOT )
    if( ISCHAR( 1 ) )
    {
       const char * szDate = hb_parcx( 1 );
-      int len = hb_parclen( 1 );
+      int len = (int) hb_parclen( 1 );
       int d_value = 0, m_value = 0, y_value = 0;
       int h_value = 0, n_value = 0, fin;
       double s_value = 0;
@@ -678,11 +681,11 @@ HB_FUNC( CTOT )
 
 HB_FUNC( STOT )
 {
-   int len = hb_parclen( 1 );
+   int len = (int) hb_parclen( 1 );
    if( ISCHAR( 1 ) && len >= 8 )
    {
       const char * szDate = hb_parcx( 1 );
-      LONG lDate = 0, lTime = 0;
+      long lDate = 0, lTime = 0;
       char szTime[ 19 ];
 
       memset( szTime, ' ', 18 );

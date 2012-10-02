@@ -33,7 +33,7 @@
 /* Table with parse errors */
 const char * hb_comp_szErrors[] =
 {
-/* 1 */   "Statement not allowed outside of procedure or function",
+/* 1 */ "Statement not allowed outside of procedure or function",
    "Redefinition of procedure or function: \'%s\'",
    "Duplicate variable declaration: \'%s\'",
    "%s declaration follows executable statement",
@@ -42,7 +42,7 @@ const char * hb_comp_szErrors[] =
    "Unterminated string: \'%s\'",
    "Redefinition of predefined function %s: \'%s\'",
    "Illegal variable \'%s\' initializer: \'%s\'",
-/* 10 */   "ENDIF does not match IF",
+/* 10 */ "ENDIF does not match IF",
    "ENDDO does not match WHILE",
    "ENDCASE does not match DO CASE",
    "NEXT does not match FOR",
@@ -52,7 +52,7 @@ const char * hb_comp_szErrors[] =
    "Unclosed control structure %s",
    "%s statement with no loop in sight",
    "Syntax error: \'%s\' in: \'%s\'",
-/* 20 */   "Incomplete statement or unbalanced delimiters",
+/* 20 */ "Incomplete statement or unbalanced delimiters",
    "Incorrect number of arguments: %s %s",
    "Invalid lvalue: \'%s\'",
    "Invalid use of \'@\' (pass by reference): \'%s\'",
@@ -62,7 +62,7 @@ const char * hb_comp_szErrors[] =
    "Could not allocate %s byte(s)",
    "Could not reallocate %s byte(s)",
    "Freeing a NULL memory pointer",
-/* 30 */   "Syntax error: \"%s at \'%s\'\"",
+/* 30 */ "Syntax error: \"%s at \'%s\'\"",
    "Jump offset too long",
    "Can't create output file: \'%s\'",
    "Can't create preprocessed output file: \'%s\'",
@@ -72,7 +72,7 @@ const char * hb_comp_szErrors[] =
    "Mayhem in CASE handler",
    "Operation not supported for this data type: \'%s\'",
    "Invalid alias expression: \'%s\'",
-/* 40 */   "Invalid array index expression: \'%s\'",
+/* 40 */ "Invalid array index expression: \'%s\'",
    "Bound error: \'%s\'",
    "Macro of declared symbol: \'%s\'",
    "Invalid selector in send: \'%s\'",
@@ -82,7 +82,7 @@ const char * hb_comp_szErrors[] =
    "Code block contains both macro and declared symbol references",
    "GET contains complex macro",
    "Unterminated inline block in function: \'%s\'",
-/* 50 */   "Too many inline blocks %s",
+/* 50 */ "Too many inline blocks %s",
    "Inline C requires C output generation, use -gc[n]",
    "Missing ENDTEXT",
    "Optimized Local [%s] out of range, after offsetting %s PARAMETERS.",
@@ -92,7 +92,7 @@ const char * hb_comp_szErrors[] =
    "External Global declaration can not include initializer \'%s\'.",
    "Too many Parameter declarations \'%s\'.",
    "Invalid SWITCH Constant \'%s\'.",
-/* 60 */   "Cannot write HIL table to \'%s\'.",
+/* 60 */ "Cannot write HIL table to \'%s\'.",
    "Illegal character \'%s\'.",
    "Can't create preprocessed tracing file: \'%s\'",
    "Unbalance PRAGMA BEGINDUMP and PRAGMA ENDDUMP",
@@ -149,8 +149,8 @@ const char * hb_comp_szWarnings[] =
 
 void hb_compGenError( const char * szErrors[], char cPrefix, int iError, const char * szError1, const char * szError2 )
 {
-   int iLine = hb_comp_iLine - 1;
-   char * szFile = hb_pp_fileName( hb_comp_PP );
+   int      iLine    = hb_comp_iLine - 1;
+   char *   szFile   = hb_pp_fileName( hb_comp_PP );
 
    if( cPrefix != 'F' && hb_comp_bError )
    {
@@ -186,11 +186,11 @@ void hb_compGenError( const char * szErrors[], char cPrefix, int iError, const c
    }
 }
 
-void hb_compGenWarning( const char * szWarnings[], char cPrefix, int iWarning, const char * szWarning1, const char * szWarning2)
+void hb_compGenWarning( const char * szWarnings[], char cPrefix, int iWarning, const char * szWarning1, const char * szWarning2 )
 {
-   const char * szText = szWarnings[ iWarning - 1 ];
-   int iLine = hb_comp_iLine - 1;
-   char * szFile = hb_pp_fileName( hb_comp_PP );
+   const char *   szText   = szWarnings[ iWarning - 1 ];
+   int            iLine    = hb_comp_iLine - 1;
+   char *         szFile   = hb_pp_fileName( hb_comp_PP );
 
    if( ( ( int ) ( szText[ 0 ] - '0' ) ) <= hb_comp_iWarnings )
    {
@@ -210,6 +210,7 @@ void hb_compGenWarning( const char * szWarnings[], char cPrefix, int iWarning, c
 HB_EXPR_PTR hb_compErrorLValue( HB_EXPR_PTR pExpr )
 {
    char * szDesc = hb_compExprDescription( pExpr );
+
    hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_LVALUE, szDesc, NULL );
    return pExpr;
 }
@@ -217,6 +218,7 @@ HB_EXPR_PTR hb_compErrorLValue( HB_EXPR_PTR pExpr )
 HB_EXPR_PTR hb_compErrorType( HB_EXPR_PTR pExpr )
 {
    char * szDesc = hb_compExprDescription( pExpr );
+
    hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_TYPE, szDesc, NULL );
    return pExpr;
 }
@@ -224,6 +226,7 @@ HB_EXPR_PTR hb_compErrorType( HB_EXPR_PTR pExpr )
 HB_EXPR_PTR hb_compErrorIndex( HB_EXPR_PTR pExpr )
 {
    char * szDesc = hb_compExprDescription( pExpr );
+
    hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_INDEX, szDesc, NULL );
    return pExpr;
 }
@@ -231,6 +234,7 @@ HB_EXPR_PTR hb_compErrorIndex( HB_EXPR_PTR pExpr )
 HB_EXPR_PTR hb_compErrorBound( HB_EXPR_PTR pExpr )
 {
    char * szDesc = hb_compExprDescription( pExpr );
+
    hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_BOUND, szDesc, NULL );
    return pExpr;
 }
@@ -238,6 +242,7 @@ HB_EXPR_PTR hb_compErrorBound( HB_EXPR_PTR pExpr )
 HB_EXPR_PTR hb_compErrorSyntax( HB_EXPR_PTR pExpr )
 {
    char * szDesc = hb_compExprDescription( pExpr );
+
    hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_SYNTAX, szDesc, NULL );
    return pExpr;
 }
@@ -245,6 +250,7 @@ HB_EXPR_PTR hb_compErrorSyntax( HB_EXPR_PTR pExpr )
 HB_EXPR_PTR hb_compErrorAlias(  HB_EXPR_PTR pExpr )
 {
    char * szDesc = hb_compExprDescription( pExpr );
+
    hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_ALIAS, szDesc, NULL );
    return pExpr;
 }
@@ -252,6 +258,7 @@ HB_EXPR_PTR hb_compErrorAlias(  HB_EXPR_PTR pExpr )
 HB_EXPR_PTR hb_compErrorStatic( char * szVarName, HB_EXPR_PTR pExpr )
 {
    char * szDesc = hb_compExprDescription( pExpr );
+
    hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_ILLEGAL_INIT, szVarName, szDesc );
    return pExpr;
 }
@@ -264,6 +271,7 @@ void hb_compErrorDuplVar( char * szVarName )
 HB_EXPR_PTR hb_compWarnMeaningless( HB_EXPR_PTR pExpr )
 {
    char * szDesc = hb_compExprDescription( pExpr );
+
    hb_compGenWarning(  hb_comp_szWarnings, 'W', HB_COMP_WARN_MEANINGLESS, szDesc, NULL );
    return pExpr;
 }

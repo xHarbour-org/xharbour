@@ -144,12 +144,11 @@ struct tag_mxml_refil;
 struct tag_mxml_output;
 
 typedef void (*MXML_REFIL_FUNC)( struct tag_mxml_refil *ref );
-typedef void (*MXML_OUTPUT_FUNC)( struct tag_mxml_output *out, const char *data, int len );
+typedef void (*MXML_OUTPUT_FUNC)( struct tag_mxml_output *out, const char *data, HB_SIZE len );
 
 /*************************************************
    Structures holding the XML data
 **************************************************/
-
 
 /* Refiller */
 
@@ -161,9 +160,9 @@ typedef struct tag_mxml_refil
 
    /* buffer for reading data */
    unsigned char *buffer;
-   int bufsize;  /* size of the whole buffer */
-   int buflen;   /* valid characters in the current buffer */
-   int bufpos;   /* current position */
+   HB_SIZE bufsize;  /* size of the whole buffer */
+   HB_SIZE buflen;   /* valid characters in the current buffer */
+   HB_SIZE bufpos;   /* current position */
 
    /* length of the stream for implementing progress indicators */
    LONG streampos;
@@ -184,7 +183,6 @@ typedef struct tag_mxml_refil
 
 } MXML_REFIL;
 
-
 typedef struct tag_mxml_output
 {
    /* status variables */
@@ -195,8 +193,8 @@ typedef struct tag_mxml_output
    MXML_OUTPUT_FUNC  output_func;
 
    /* data to implement progress indicators */
-   int node_count;
-   int node_done;
+   HB_SIZE node_count;
+   HB_SIZE node_done;
 
    /* data available for callback functions */
    union
@@ -207,19 +205,17 @@ typedef struct tag_mxml_output
 
 } MXML_OUTPUT;
 
-
 typedef struct tag_mxml_self_growing_string
 {
-   char *buffer;
-   int allocated;
-   int length;
+   char    *buffer;
+   HB_SIZE allocated;
+   HB_SIZE length;
 } MXML_SGS;
 
 typedef struct _hbxml_attribute {
    PHB_ITEM pName;
    PHB_ITEM pValue;
 } HBXML_ATTRIBUTE, *PHBXML_ATTRIBUTE;
-
 
 /* Allocator and deletor functions are meant to be redeclared by includers */
 #ifndef MXML_ALLOCATOR

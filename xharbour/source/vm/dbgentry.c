@@ -176,10 +176,8 @@ typedef struct
    PHB_ITEM pStopLines;
 } HB_DEBUGINFO_;
 
-
 static HB_DEBUGINFO_ s_Info = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* bCBTrace */ TRUE, 0, 0, 0, 0, 0 };
 static HB_DEBUGINFO_ *s_pInfo = &s_Info;
-
 
 static PHB_ITEM hb_dbgActivateBreakArray( HB_DEBUGINFO_ *info );
 static PHB_ITEM hb_dbgActivateModuleArray( HB_DEBUGINFO_ *info );
@@ -256,7 +254,6 @@ static void hb_dbgActivate( HB_DEBUGINFO_ *info )
    }
 }
 
-
 static PHB_ITEM hb_dbgActivateBreakArray( HB_DEBUGINFO_ *info )
 {
    int i;
@@ -281,7 +278,6 @@ static PHB_ITEM hb_dbgActivateBreakArray( HB_DEBUGINFO_ *info )
    }
    return pArray;
 }
-
 
 static PHB_ITEM hb_dbgActivateModuleArray( HB_DEBUGINFO_ *info )
 {
@@ -316,7 +312,6 @@ static PHB_ITEM hb_dbgActivateModuleArray( HB_DEBUGINFO_ *info )
    return pArray;
 }
 
-
 static PHB_ITEM hb_dbgActivateVarArray( int nVars, HB_VARINFO *aVars )
 {
    int i;
@@ -337,11 +332,10 @@ static PHB_ITEM hb_dbgActivateVarArray( int nVars, HB_VARINFO *aVars )
    return pArray;
 }
 
-
 void hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
 {
    int i;
-   ULONG nProcLevel;
+   HB_COUNTER nProcLevel;
    char szProcName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ];
    HB_DEBUGINFO_ *info = s_pInfo;
 
@@ -523,7 +517,6 @@ void hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
    }
 }
 
-
 static char * hb_dbgStripModuleName( char * szName )
 {
    char * ptr;
@@ -565,7 +558,7 @@ static void hb_dbgAddLocal( HB_DEBUGINFO_ *info, char *szName, int nIndex, int n
    {
       HB_MODULEINFO *module = &info->aModules[ info->nModules - 1 ];
 
-      hb_dbgAddVar( &module->nGlobals, &module->aGlobals, szName, 'G', nIndex, hb_dbg_vmVarGCount() );
+      hb_dbgAddVar( &module->nGlobals, &module->aGlobals, szName, 'G', nIndex, (int) hb_dbg_vmVarGCount() );
    }
    else
    {
@@ -657,7 +650,7 @@ static void hb_dbgAddStatic( HB_DEBUGINFO_ *info, char *szName, int nIndex, int 
       HB_MODULEINFO *module = &info->aModules[ info->nModules - 1 ];
 
       hb_dbgAddVar( &module->nExternGlobals, &module->aExternGlobals, szName,
-                    'G', nIndex, hb_dbg_vmVarGCount() );
+                    'G', nIndex, (int) hb_dbg_vmVarGCount() );
    }
    else if ( info->bInitStatics )
    {
@@ -673,7 +666,6 @@ static void hb_dbgAddStatic( HB_DEBUGINFO_ *info, char *szName, int nIndex, int 
    }
 }
 
-
 static void hb_dbgAddStopLines( HB_DEBUGINFO_ *info, PHB_ITEM pItem )
 {
    int i, nLinesLen;
@@ -685,9 +677,9 @@ static void hb_dbgAddStopLines( HB_DEBUGINFO_ *info, PHB_ITEM pItem )
    else
    {
       int j;
-      int nItemLen = hb_itemSize( pItem );
+      int nItemLen = (int) hb_itemSize( pItem );
 
-      nLinesLen = hb_itemSize( info->pStopLines );
+      nLinesLen = (int) hb_itemSize( info->pStopLines );
 
       for ( i = 1; i <= nItemLen; i++ )
       {
@@ -705,8 +697,8 @@ static void hb_dbgAddStopLines( HB_DEBUGINFO_ *info, PHB_ITEM pItem )
                /* Merge stopline info */
                int nOrigMin = hb_arrayGetNL( pLines, 2 );
                int nNewMin = hb_arrayGetNL( pEntry, 2 );
-               int nOrigLen = hb_arrayGetCLen( pLines, 3 );
-               int nNewLen = hb_arrayGetCLen( pEntry, 3 );
+               int nOrigLen = (int) hb_arrayGetCLen( pLines, 3 );
+               int nNewLen = (int) hb_arrayGetCLen( pEntry, 3 );
                int nMin = HB_MIN( nNewMin, nOrigMin );
                int nMax = HB_MAX( nNewMin + nNewLen * 8, nOrigMin + nOrigLen * 8 );
                char *pOrigBuffer = hb_arrayGetCPtr( pLines, 3 );
@@ -735,7 +727,7 @@ static void hb_dbgAddStopLines( HB_DEBUGINFO_ *info, PHB_ITEM pItem )
          }
       }
    }
-   nLinesLen = hb_itemSize( info->pStopLines );
+   nLinesLen = (int) hb_itemSize( info->pStopLines );
    for ( i = 1; i <= nLinesLen; i++ )
    {
       PHB_ITEM pEntry = hb_arrayGetItemPtr( info->pStopLines, i );
@@ -753,7 +745,6 @@ static void hb_dbgAddStopLines( HB_DEBUGINFO_ *info, PHB_ITEM pItem )
    }
 }
 
-
 static void hb_dbgAddVar( int *nVars, HB_VARINFO **aVars, char *szName, char cType, int nIndex, int nFrame )
 {
    HB_VARINFO *var;
@@ -764,7 +755,6 @@ static void hb_dbgAddVar( int *nVars, HB_VARINFO **aVars, char *szName, char cTy
    var->nIndex = nIndex;
    var->nFrame = nFrame;
 }
-
 
 void hb_dbgAddWatch( void *handle, const char *szExpr, BOOL bTrace )
 {
@@ -785,7 +775,6 @@ void hb_dbgAddWatch( void *handle, const char *szExpr, BOOL bTrace )
    }
 }
 
-
 static void hb_dbgClearWatch( HB_WATCHPOINT *pWatch )
 {
    FREE( pWatch->szExpr );
@@ -805,7 +794,6 @@ static void hb_dbgClearWatch( HB_WATCHPOINT *pWatch )
    }
 }
 
-
 void hb_dbgDelBreak( void *handle, int nBreak )
 {
    HB_DEBUGINFO_ *info = (HB_DEBUGINFO_ *)handle;
@@ -818,7 +806,6 @@ void hb_dbgDelBreak( void *handle, int nBreak )
    }
    ARRAY_DEL( HB_BREAKPOINT, info->aBreak, info->nBreakPoints, nBreak );
 }
-
 
 void hb_dbgDelWatch( void *handle, int nWatch )
 {
@@ -849,7 +836,6 @@ void hb_dbgDelWatch( void *handle, int nWatch )
    }
 }
 
-
 static void hb_dbgEndProc( HB_DEBUGINFO_ *info )
 {
    HB_CALLSTACKINFO *top;
@@ -875,7 +861,6 @@ static void hb_dbgEndProc( HB_DEBUGINFO_ *info )
    }
 }
 
-
 static BOOL hb_dbgEqual( PHB_ITEM pItem1, PHB_ITEM pItem2 )
 {
    if ( HB_ITEM_TYPE( pItem1 ) != HB_ITEM_TYPE( pItem2 ) )
@@ -898,7 +883,6 @@ static BOOL hb_dbgEqual( PHB_ITEM pItem1, PHB_ITEM pItem2 )
       return ( hb_hashId( pItem1 ) == hb_hashId( pItem2 ) );
    return FALSE;
 }
-
 
 static PHB_ITEM hb_dbgEval( HB_DEBUGINFO_ *info, HB_WATCHPOINT *watch )
 {
@@ -954,7 +938,6 @@ static PHB_ITEM hb_dbgEval( HB_DEBUGINFO_ *info, HB_WATCHPOINT *watch )
    return xResult;
 }
 
-
 static PHB_ITEM hb_dbgEvalMacro( char *szExpr, PHB_ITEM pItem )
 {
    PHB_ITEM pStr;
@@ -973,7 +956,6 @@ static PHB_ITEM hb_dbgEvalMacro( char *szExpr, PHB_ITEM pItem )
    hb_stackPop();
    return pItem;
 }
-
 
 #define IS_IDENT_START( c ) ( HB_ISALPHA( (UCHAR) (c) ) || (c) == '_' )
 #define IS_IDENT_CHAR( c ) ( IS_IDENT_START( (c) ) || HB_ISDIGIT( (UCHAR) (c) ) )
@@ -1011,14 +993,13 @@ static int hb_dbgEvalSubstituteVar( HB_WATCHPOINT *watch, char *szWord, int nSta
    return nStart + 9;
 }
 
-
 static PHB_ITEM hb_dbgEvalMakeBlock( HB_WATCHPOINT *watch )
 {
    int i = 0;
    PHB_ITEM pBlock;
    BOOL bAfterId = FALSE;
    char *s;
-   int buffsize;
+   HB_SIZE buffsize;
 
    watch->nVars = 0;
    while ( watch->szExpr[ i ] )
@@ -1174,7 +1155,6 @@ static PHB_ITEM hb_dbgEvalMakeBlock( HB_WATCHPOINT *watch )
    return pBlock;
 }
 
-
 static PHB_ITEM hb_dbgEvalResolve( HB_DEBUGINFO_ *info, HB_WATCHPOINT *watch )
 {
    int i;
@@ -1182,7 +1162,7 @@ static PHB_ITEM hb_dbgEvalResolve( HB_DEBUGINFO_ *info, HB_WATCHPOINT *watch )
    PHB_ITEM aVars = hb_itemArrayNew( watch->nVars );
    HB_VARINFO *scopes;
    HB_MODULEINFO *module = NULL;
-   int nProcLevel;
+   HB_COUNTER nProcLevel;
 
    if ( !watch->nVars )
    {
@@ -1302,7 +1282,6 @@ static PHB_ITEM hb_dbgEvalResolve( HB_DEBUGINFO_ *info, HB_WATCHPOINT *watch )
    return aVars;
 }
 
-
 PHB_ITEM hb_dbgGetExpressionValue( void *handle, const char *expression )
 {
    HB_DEBUGINFO_ *info = (HB_DEBUGINFO_ *)handle;
@@ -1320,11 +1299,10 @@ PHB_ITEM hb_dbgGetExpressionValue( void *handle, const char *expression )
    return result;
 }
 
-
 PHB_ITEM hb_dbgGetSourceFiles( void *handle )
 {
    HB_DEBUGINFO_ *info = (HB_DEBUGINFO_ *)handle;
-   int nModules = hb_itemSize( info->pStopLines );
+   int nModules = (int) hb_itemSize( info->pStopLines );
    PHB_ITEM ret = hb_itemArrayNew( nModules );
    int i;
 
@@ -1335,14 +1313,12 @@ PHB_ITEM hb_dbgGetSourceFiles( void *handle )
    return ret;
 }
 
-
 PHB_ITEM hb_dbgGetWatchValue( void *handle, int nWatch )
 {
    HB_DEBUGINFO_ *info = (HB_DEBUGINFO_ *)handle;
 
    return hb_dbgEval( info, &( info->aWatch[ nWatch ] ) );
 }
-
 
 static BOOL hb_dbgIsAltD( void )
 {
@@ -1351,7 +1327,6 @@ static BOOL hb_dbgIsAltD( void )
    hb_procinfo( 1, szName, NULL, NULL );
    return !strcmp( szName, "ALTD" );
 }
-
 
 static BOOL hb_dbgIsBreakPoint( HB_DEBUGINFO_ *info, char *szModule, int nLine )
 {
@@ -1368,11 +1343,10 @@ static BOOL hb_dbgIsBreakPoint( HB_DEBUGINFO_ *info, char *szModule, int nLine )
    return FALSE;
 }
 
-
 BOOL hb_dbgIsValidStopLine( void *handle, const char *szModule, int nLine )
 {
    HB_DEBUGINFO_ *info = (HB_DEBUGINFO_ *)handle;
-   int nModules = hb_itemSize( info->pStopLines );
+   int nModules = (int) hb_itemSize( info->pStopLines );
    int i;
 
    for ( i = 1; i <= nModules; i++ )
@@ -1393,7 +1367,6 @@ BOOL hb_dbgIsValidStopLine( void *handle, const char *szModule, int nLine )
    }
    return FALSE;
 }
-
 
 static void hb_dbgQuit( HB_DEBUGINFO_ *info )
 {
@@ -1438,14 +1411,12 @@ static void hb_dbgQuit( HB_DEBUGINFO_ *info )
    }
 }
 
-
 void hb_dbgSetCBTrace( void *handle, BOOL bCBTrace )
 {
    HB_DEBUGINFO_ *info = (HB_DEBUGINFO_ *)handle;
 
    info->bCBTrace = bCBTrace;
 }
-
 
 void hb_dbgSetGo( void *handle )
 {
@@ -1454,14 +1425,12 @@ void hb_dbgSetGo( void *handle )
    info->bGo = TRUE;
 }
 
-
 void hb_dbgSetInvoke( void *handle, BOOL ( *pFunInvoke )( void ) )
 {
    HB_DEBUGINFO_ *info = (HB_DEBUGINFO_ *)handle;
 
    info->pFunInvoke = pFunInvoke;
 }
-
 
 void hb_dbgSetNextRoutine( void *handle )
 {
@@ -1470,14 +1439,12 @@ void hb_dbgSetNextRoutine( void *handle )
    info->bNextRoutine = TRUE;
 }
 
-
 void hb_dbgSetQuit( void *handle )
 {
    HB_DEBUGINFO_ *info = (HB_DEBUGINFO_ *)handle;
 
    info->bQuit = TRUE;
 }
-
 
 void hb_dbgSetToCursor( void *handle, const char *szModule, int nLine )
 {
@@ -1488,7 +1455,6 @@ void hb_dbgSetToCursor( void *handle, const char *szModule, int nLine )
    info->nToCursorLine = nLine;
 }
 
-
 void hb_dbgSetTrace( void *handle )
 {
    HB_DEBUGINFO_ *info = (HB_DEBUGINFO_ *)handle;
@@ -1496,7 +1462,6 @@ void hb_dbgSetTrace( void *handle )
    info->bTraceOver = TRUE;
    info->nTraceLevel = info->nCallStackLen;
 }
-
 
 void hb_dbgSetWatch( void *handle, int nWatch, const char *szExpr, BOOL bTrace )
 {
@@ -1529,7 +1494,6 @@ void hb_dbgSetWatch( void *handle, int nWatch, const char *szExpr, BOOL bTrace )
       pTrace->xValue = hb_dbgEval( info, pWatch );
    }
 }
-
 
 static PHB_ITEM hb_dbgVarGet( HB_VARINFO *scope )
 {
@@ -1568,7 +1532,6 @@ static PHB_ITEM hb_dbgVarGet( HB_VARINFO *scope )
    }
    return NULL;
 }
-
 
 static void hb_dbgVarSet( HB_VARINFO *scope, PHB_ITEM xNewValue )
 {

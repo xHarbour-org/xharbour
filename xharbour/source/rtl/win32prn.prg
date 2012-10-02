@@ -1354,7 +1354,7 @@ HB_FUNC_STATIC( FILLRECT )
    int y1 = hb_parni( 3 );
    int x2 = hb_parni( 4 );
    int y2 = hb_parni( 5 );
-   DOUBLE dColor = (COLORREF) hb_parni( 6 );  // brush color
+   COLORREF dColor = (COLORREF) hb_parni( 6 );  // brush color
    int iStyle = hb_parni( 7 );  // brush style
    LONG lHatch = hb_parnl( 8 );  // brush hatch
    HBRUSH hBrush;
@@ -1457,13 +1457,13 @@ HB_FUNC_STATIC ( DRAWTEXT )
 
    SIZE sSize ;
    char *pszData = (char*) hb_parc(6) ;
-   int iLen = strlen(pszData) ;
+   HB_SIZE iLen = strlen(pszData) ;
    int iStyle = hb_parni(7) ;
    LONG w,h  ;
 
    SetRect( &rect, x1, y1, x2, y2 );
 
-   GetTextExtentPoint32(hDC, pszData, iLen , &sSize) ;
+   GetTextExtentPoint32(hDC, pszData, (int) iLen , &sSize) ;
    w = (LONG) sSize.cx ;   // text width
    h = (LONG) sSize.cy ;   // text height
 

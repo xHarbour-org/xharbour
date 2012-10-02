@@ -70,12 +70,11 @@
 * Utility functions
 *******************************************************/
 
-static int s_memicmp( char* pStr1, ULONG ulLen1, char* pStr2, ULONG ulLen2, BOOL fCase )
+static int s_memicmp( char* pStr1, HB_SIZE ulLen1, char* pStr2, HB_SIZE ulLen2, BOOL fCase )
 {
-   ULONG          ul, ulLen;
+   HB_SIZE        ul, ulLen;
    unsigned char  c1, c2;
    int            ret;
-
 
    ulLen = ulLen1 < ulLen2 ? ulLen1 : ulLen2;
 
@@ -123,9 +122,7 @@ static int s_memicmp( char* pStr1, ULONG ulLen1, char* pStr2, ULONG ulLen2, BOOL
    }
 }
 
-
-static int s_hashOrderComplex( PHB_ITEM pFirst,
-            PHB_ITEM pSecond, BOOL bCase )
+static int s_hashOrderComplex( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bCase )
 {
    if ( pFirst->type & HB_IT_NUMERIC )
    {
@@ -231,10 +228,9 @@ static int s_hashOrderComplex( PHB_ITEM pFirst,
    return -2;
 }
 
-
-static BOOL hb_hashSurfaceScan( PHB_ITEM pHash, PHB_ITEM pKey, ULONG *ulReturn )
+static BOOL hb_hashSurfaceScan( PHB_ITEM pHash, PHB_ITEM pKey, HB_SIZE *ulReturn )
 {
-   ULONG ulLower = 0, ulHigher, ulPoint;
+   HB_SIZE ulLower = 0, ulHigher, ulPoint;
    int iRes;
    PHB_ITEM pKeys, pCurrent;
    PHB_BASEHASH pBase;
@@ -321,7 +317,6 @@ static BOOL hb_hashSurfaceScan( PHB_ITEM pHash, PHB_ITEM pKey, ULONG *ulReturn )
 
 static void hb_calcTotalLenght( PHB_BASEHASH pBase )
 {
-
    if ( pBase->uiLevel == 0 )
    {
       pBase->ulTotalLen = pBase->ulLen;
@@ -330,8 +325,8 @@ static void hb_calcTotalLenght( PHB_BASEHASH pBase )
    else
    {
       PHB_ITEM pValues = pBase->pValues;
-      ULONG ulTot = 0;
-      ULONG ulPosLoop  = pBase->ulLen + 1;
+      HB_SIZE ulTot = 0;
+      HB_SIZE ulPosLoop  = pBase->ulLen + 1;
 
       for( ; --ulPosLoop; pValues++ )
       {
@@ -349,7 +344,7 @@ static void hb_calcTotalLenght( PHB_BASEHASH pBase )
 PHB_ITEM hb_hashNew( PHB_ITEM pItem ) /* creates a new hash */
 {
    PHB_BASEHASH pBaseHash;
-   ULONG ulPosLoop;
+   HB_SIZE ulPosLoop;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_hashNew(%p)", pItem ));
 
@@ -394,9 +389,9 @@ PHB_ITEM hb_hashNew( PHB_ITEM pItem ) /* creates a new hash */
    return pItem;
 }
 
-BOOL hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
+BOOL hb_hashAdd( PHB_ITEM pHash, HB_SIZE ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
 {
-   ULONG ulLen, ulPosLoop;
+   HB_SIZE ulLen, ulPosLoop;
    PHB_ITEM pPos, pPos1;
    PHB_BASEHASH pBaseHash;
    HB_ITEM hbSubHash, HashPage;
@@ -512,7 +507,7 @@ BOOL hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
             }
             */
 
-            HB_MEMCPY( pNewBase->pKeys, pPivotKey, sizeof( HB_ITEM) * pNewBase->ulAllocated );
+            HB_MEMCPY( pNewBase->pKeys, pPivotKey, (size_t) ( sizeof( HB_ITEM ) * pNewBase->ulAllocated ) );
 
             #ifndef HB_ARRAY_USE_COUNTER
             {
@@ -528,7 +523,7 @@ BOOL hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
 
             pPivotValue = pPageBase->pValues + (pBaseHash->ulPageSize / 2 );
 
-            HB_MEMCPY( pNewBase->pValues, pPivotValue, sizeof( HB_ITEM) * pNewBase->ulAllocated );
+            HB_MEMCPY( pNewBase->pValues, pPivotValue, (size_t) ( sizeof( HB_ITEM ) * pNewBase->ulAllocated ) );
 
             #ifndef HB_ARRAY_USE_COUNTER
             {
@@ -670,7 +665,7 @@ BOOL hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
          // Associative Array compatibility
          if( pBaseHash->pAccessAA )
          {
-            pBaseHash->pAccessAA = ( ULONG * ) hb_xrealloc( pBaseHash->pAccessAA, sizeof( ULONG ) * pBaseHash->ulAllocated );
+            pBaseHash->pAccessAA = ( HB_SIZE * ) hb_xrealloc( pBaseHash->pAccessAA, sizeof( HB_SIZE ) * pBaseHash->ulAllocated );
             /* Do not need initialization the position is initialized when a new value is added in a Hash
                is not possible to access to not initialized values ( >ulLen ) */
          }
@@ -728,8 +723,8 @@ BOOL hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
          // Associative Array compatibility
          if( pBaseHash->pAccessAA )
          {
-            ULONG *pulPos;
-            ULONG ulAccessLen;
+            HB_SIZE *pulPos;
+            HB_SIZE ulAccessLen;
 
             ulAccessLen = pBaseHash->ulLen - 1;
 
@@ -754,9 +749,9 @@ BOOL hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
 
 //WARNING: DOES NOT WORK WITH PAGED HASHES
 
-BOOL hb_hashAddForward( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
+BOOL hb_hashAddForward( PHB_ITEM pHash, HB_SIZE ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
 {
-   ULONG ulLen, ulPosLoop;
+   HB_SIZE ulLen, ulPosLoop;
    PHB_ITEM pPos, pPos1;
    PHB_BASEHASH pBaseHash;
 
@@ -856,7 +851,7 @@ BOOL hb_hashAddForward( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pVa
          // Associative Array compatibility
          if( pBaseHash->pAccessAA )
          {
-            pBaseHash->pAccessAA = ( ULONG * ) hb_xrealloc( pBaseHash->pAccessAA, sizeof( ULONG ) * pBaseHash->ulAllocated );
+            pBaseHash->pAccessAA = ( HB_SIZE * ) hb_xrealloc( pBaseHash->pAccessAA, sizeof( HB_SIZE ) * pBaseHash->ulAllocated );
             /* Do not need initialization the position is initialized when a new value is added in a Hash
                is not possible to access to not initialized values ( >ulLen ) */
          }
@@ -914,8 +909,8 @@ BOOL hb_hashAddForward( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pVa
          // Associative Array compatibility
          if( pBaseHash->pAccessAA )
          {
-            ULONG *pulPos;
-            ULONG ulAccessLen;
+            HB_SIZE *pulPos;
+            HB_SIZE ulAccessLen;
 
             ulAccessLen = pBaseHash->ulLen - 1;
 
@@ -938,9 +933,9 @@ BOOL hb_hashAddForward( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pVa
    return FALSE;
 }
 
-BOOL hb_hashScan( PHB_ITEM pHash, PHB_ITEM pKey, ULONG *ulReturn )
+BOOL hb_hashScan( PHB_ITEM pHash, PHB_ITEM pKey, HB_SIZE *ulReturn )
 {
-   ULONG ulPos, ulTotal, ulElem;
+   HB_SIZE ulPos, ulTotal, ulElem;
    PHB_BASEHASH pBase;
    PHB_ITEM pPage;
    BOOL bRet;
@@ -986,9 +981,9 @@ BOOL hb_hashScan( PHB_ITEM pHash, PHB_ITEM pKey, ULONG *ulReturn )
    return bRet;
 }
 
-BOOL hb_hashRemove( PHB_ITEM pHash, ULONG ulPos )
+BOOL hb_hashRemove( PHB_ITEM pHash, HB_SIZE ulPos )
 {
-   ULONG ulLen, ulPosLoop;
+   HB_SIZE ulLen, ulPosLoop;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_hashRemove(%p, %lo)", pHash, ulPos ));
 
@@ -998,8 +993,8 @@ BOOL hb_hashRemove( PHB_ITEM pHash, ULONG ulPos )
 
       if ( pBaseHash->uiLevel > 0 )
       {
-         ULONG ulElem = 1;
-         ULONG ulTotal = 0;
+         HB_SIZE ulElem = 1;
+         HB_SIZE ulTotal = 0;
          PHB_ITEM pPage;
 
          if ( ulPos < 1 || ulPos > pBaseHash->ulTotalLen )
@@ -1052,10 +1047,10 @@ BOOL hb_hashRemove( PHB_ITEM pHash, ULONG ulPos )
          // Associative Array compatibility
          if( pBaseHash->pAccessAA )
          {
-            ULONG *pulPos;
+            HB_SIZE *pulPos;
             BOOL bSearch;
-            ULONG ulAccessLen;
-            ULONG ulFor;
+            HB_SIZE ulAccessLen;
+            HB_SIZE ulFor;
 
             ulAccessLen = pBaseHash->ulLen - 1;
 
@@ -1085,7 +1080,7 @@ BOOL hb_hashRemove( PHB_ITEM pHash, ULONG ulPos )
 
          if ( ulLen > 1 ) // if ulLen == 1 just set ulLen to 0.
          {
-            HB_MEMCPY( pBaseHash->pKeys + ( ulPos - 1 ), pBaseHash->pKeys + ulPos, sizeof( HB_ITEM ) * ( ulLen - ulPos ) );
+            HB_MEMCPY( pBaseHash->pKeys + ( ulPos - 1 ), pBaseHash->pKeys + ulPos, (size_t) ( sizeof( HB_ITEM ) * ( ulLen - ulPos ) ) );
 
             #ifndef HB_ARRAY_USE_COUNTER
             {
@@ -1099,7 +1094,7 @@ BOOL hb_hashRemove( PHB_ITEM pHash, ULONG ulPos )
             }
             #endif
 
-            HB_MEMCPY( pBaseHash->pValues + ( ulPos - 1 ), pBaseHash->pValues + ulPos, sizeof( HB_ITEM ) * ( ulLen - ulPos ) );
+            HB_MEMCPY( pBaseHash->pValues + ( ulPos - 1 ), pBaseHash->pValues + ulPos, (size_t) ( sizeof( HB_ITEM ) * ( ulLen - ulPos ) ) );
 
             #ifndef HB_ARRAY_USE_COUNTER
             {
@@ -1172,7 +1167,7 @@ BOOL hb_hashRemove( PHB_ITEM pHash, ULONG ulPos )
                // Associative Array compatibility
                if( pBaseHash->pAccessAA )
                {
-                  pBaseHash->pAccessAA = ( ULONG * ) hb_xrealloc( pBaseHash->pAccessAA, sizeof( ULONG ) * pBaseHash->ulAllocated );
+                  pBaseHash->pAccessAA = ( HB_SIZE * ) hb_xrealloc( pBaseHash->pAccessAA, sizeof( HB_SIZE ) * pBaseHash->ulAllocated );
                   /* Do not need initialization the position is initialized when a new value is added in a Hash
                      is not possible to access to not initialized values ( >ulLen ) */
                }
@@ -1189,8 +1184,7 @@ BOOL hb_hashRemove( PHB_ITEM pHash, ULONG ulPos )
    return FALSE;
 }
 
-
-BOOL hb_hashSet( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem )
+BOOL hb_hashSet( PHB_ITEM pHash, HB_SIZE ulIndex, PHB_ITEM pItem )
 {
    PHB_ITEM pElement;
 
@@ -1200,7 +1194,7 @@ BOOL hb_hashSet( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem )
    {
       if ( pHash->item.asHash.value->uiLevel > 0 )
       {
-         ULONG ulTotal = 0;
+         HB_SIZE ulTotal = 0;
 
          if ( pHash->item.asHash.value->ulTotalLen < ulIndex )
          {
@@ -1237,7 +1231,7 @@ BOOL hb_hashSet( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem )
    return FALSE;
 }
 
-BOOL hb_hashSetForward( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem )
+BOOL hb_hashSetForward( PHB_ITEM pHash, HB_SIZE ulIndex, PHB_ITEM pItem )
 {
    PHB_ITEM pElement;
 
@@ -1249,7 +1243,7 @@ BOOL hb_hashSetForward( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem )
 
       if ( pHash->item.asHash.value->uiLevel > 0 )
       {
-         ULONG ulTotal = 0;
+         HB_SIZE ulTotal = 0;
 
          if ( pHash->item.asHash.value->ulTotalLen < ulIndex )
          {
@@ -1285,7 +1279,7 @@ BOOL hb_hashSetForward( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem )
    return FALSE;
 }
 
-BOOL hb_hashGet( PHB_ITEM pHash, ULONG ulReturn, PHB_ITEM pItem )
+BOOL hb_hashGet( PHB_ITEM pHash, HB_SIZE ulReturn, PHB_ITEM pItem )
 {
    PHB_ITEM pElement;
 
@@ -1295,7 +1289,7 @@ BOOL hb_hashGet( PHB_ITEM pHash, ULONG ulReturn, PHB_ITEM pItem )
    {
       if ( pHash->item.asHash.value->uiLevel > 0 )
       {
-         ULONG ulTotal = 0;
+         HB_SIZE ulTotal = 0;
 
          if ( pHash->item.asHash.value->ulTotalLen < ulReturn )
          {
@@ -1334,7 +1328,7 @@ BOOL hb_hashGet( PHB_ITEM pHash, ULONG ulReturn, PHB_ITEM pItem )
    return FALSE;
 }
 
-BOOL hb_hashGetForward( PHB_ITEM pHash, ULONG ulReturn, PHB_ITEM pItem )
+BOOL hb_hashGetForward( PHB_ITEM pHash, HB_SIZE ulReturn, PHB_ITEM pItem )
 {
    PHB_ITEM pElement;
 
@@ -1344,7 +1338,7 @@ BOOL hb_hashGetForward( PHB_ITEM pHash, ULONG ulReturn, PHB_ITEM pItem )
    {
       if ( pHash->item.asHash.value->uiLevel > 0 )
       {
-         ULONG ulTotal = 0;
+         HB_SIZE ulTotal = 0;
 
          if ( pHash->item.asHash.value->ulTotalLen < ulReturn )
          {
@@ -1384,9 +1378,9 @@ BOOL hb_hashGetForward( PHB_ITEM pHash, ULONG ulReturn, PHB_ITEM pItem )
    return FALSE;
 }
 
-void hb_hashPreallocate( PHB_ITEM pHash, ULONG ulNewLen )
+void hb_hashPreallocate( PHB_ITEM pHash, HB_SIZE ulNewLen )
 {
-   ULONG ulLen, ulAlloc, ulPosLoop;
+   HB_SIZE ulLen, ulAlloc, ulPosLoop;
    PHB_BASEHASH pBaseHash;
 
    if( ! HB_IS_HASH( pHash ) )
@@ -1464,7 +1458,7 @@ void hb_hashPreallocate( PHB_ITEM pHash, ULONG ulNewLen )
       // Associative Array compatibility
       if( pBaseHash->pAccessAA )
       {
-         pBaseHash->pAccessAA = ( ULONG * ) hb_xrealloc( pBaseHash->pAccessAA, sizeof( ULONG ) * ulNewLen );
+         pBaseHash->pAccessAA = ( HB_SIZE * ) hb_xrealloc( pBaseHash->pAccessAA, sizeof( HB_SIZE ) * ulNewLen );
          /* Do not need initialization the position is initialized when a new value is added in a Hash
             is not possible to access to not initialized values ( >ulLen ) */
       }
@@ -1478,7 +1472,7 @@ PHB_ITEM hb_hashClone( PHB_ITEM pSrcHash, PHB_ITEM pDest )
    PHB_BASEHASH pSrcBase, pDestBase;
    PHB_ITEM pKey, pVal;
 
-   ULONG ulLen, ulCount;
+   HB_SIZE ulLen, ulCount;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_hashClone( %p, %p)", pSrcHash ));
 
@@ -1509,7 +1503,7 @@ PHB_ITEM hb_hashClone( PHB_ITEM pSrcHash, PHB_ITEM pDest )
    // Associative Array compatibility
    if( pSrcBase->pAccessAA )
    {
-      pDestBase->pAccessAA = (ULONG *) hb_xgrab( sizeof( ULONG ) * pDestBase->ulAllocated );
+      pDestBase->pAccessAA = (HB_SIZE *) hb_xgrab( sizeof( HB_SIZE ) * pDestBase->ulAllocated );
    }
 
    for( ulCount = 0; ulCount < ulLen; ulCount++, pKey++, pVal++ )
@@ -1521,7 +1515,7 @@ PHB_ITEM hb_hashClone( PHB_ITEM pSrcHash, PHB_ITEM pDest )
    // Associative Array compatibility
    if( pDestBase->pAccessAA )
    {
-      HB_MEMCPY( pDestBase->pAccessAA, pSrcBase->pAccessAA, sizeof( ULONG ) * pSrcBase->ulAllocated );
+      HB_MEMCPY( pDestBase->pAccessAA, pSrcBase->pAccessAA, (size_t) ( sizeof( HB_SIZE ) * pSrcBase->ulAllocated ) );
    }
 
    pDestBase->ulLen      = ulLen;
@@ -1535,13 +1529,12 @@ PHB_ITEM hb_hashClone( PHB_ITEM pSrcHash, PHB_ITEM pDest )
    return pDest;
 }
 
-
-void hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource, ULONG ulStart, ULONG ulCount, PHB_ITEM pBlock )
+void hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource, HB_SIZE ulStart, HB_SIZE ulCount, PHB_ITEM pBlock )
 {
    int mode = 0;
-   ULONG ulElem;
+   HB_SIZE ulElem;
    PHB_ITEM pKey, pValue;
-   ULONG ulPos;
+   HB_SIZE ulPos;
 
    if( pBlock != NULL )
    {
@@ -1605,7 +1598,7 @@ void hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource, ULONG ulStart, ULONG ulCoun
                   hb_vmPush( pBlock );
                   hb_vmPush( pKey );
                   hb_vmPush( pValue );
-                  hb_vmPushLong( ulElem + 1 );
+                  hb_vmPushSize( ulElem + 1 );
                   hb_vmSend( 3 );
                   if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) &&
                         HB_VM_STACK.Return.item.asLogical.value )
@@ -1651,7 +1644,7 @@ void hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource, ULONG ulStart, ULONG ulCoun
                   hb_vmPush( pBlock );
                   hb_vmPush( pKey );
                   hb_vmPush( pValue );
-                  hb_vmPushLong( ulElem );
+                  hb_vmPushSize( ulElem );
                   hb_vmSend( 3 );
                   if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) &&
                         HB_VM_STACK.Return.item.asLogical.value )
@@ -1666,7 +1659,7 @@ void hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource, ULONG ulStart, ULONG ulCoun
    }
    else // AND mode; we must remove elements in PDEST that are not in pSource
    {
-      ULONG ulDestLen = hb_hashLen( pDest );
+      HB_SIZE ulDestLen = hb_hashLen( pDest );
       ulElem = 0;
 
       if ( pDest->item.asHash.value->uiLevel == 0 )
@@ -1739,7 +1732,7 @@ BOOL hb_hashSetAACompatibility( PHB_ITEM pHash, BOOL bCompatAA, BOOL bSilent )
       {
          if( ! pBaseHash->pAccessAA )
          {
-            pBaseHash->pAccessAA = (ULONG *) hb_xgrab( sizeof( ULONG ) * pBaseHash->ulAllocated );
+            pBaseHash->pAccessAA = (HB_SIZE *) hb_xgrab( sizeof( HB_SIZE ) * pBaseHash->ulAllocated );
          }
          return TRUE;
       }
@@ -1760,7 +1753,6 @@ BOOL hb_hashSetAACompatibility( PHB_ITEM pHash, BOOL bCompatAA, BOOL bSilent )
    }
    return FALSE;
 }
-
 
 void hb_hashReleaseBase( PHB_BASEHASH pBaseHash )
 {
@@ -1783,7 +1775,7 @@ void hb_hashReleaseBase( PHB_BASEHASH pBaseHash )
    {
       PHB_ITEM pKey = pBaseHash->pKeys;
       PHB_ITEM pValue = pBaseHash->pValues;
-      ULONG ulLen = pBaseHash->ulLen;
+      HB_SIZE ulLen = pBaseHash->ulLen;
 
       while( ulLen-- )
       {
@@ -1831,7 +1823,6 @@ void hb_hashReleaseBase( PHB_BASEHASH pBaseHash )
    hb_gcFree( ( void * ) pBaseHash );
 }
 
-
 BOOL hb_hashRelease( PHB_ITEM pHash )
 {
    HB_TRACE( HB_TR_DEBUG, ("hb_hashRelease(%p) %p", pHash, pHash->item.asHash.value ) );
@@ -1866,7 +1857,7 @@ HB_GARBAGE_FUNC( hb_hashReleaseGarbage )
    {
       PHB_ITEM pKey = pBaseHash->pKeys;
       PHB_ITEM pValue = pBaseHash->pValues;
-      ULONG ulLen = pBaseHash->ulLen;
+      HB_SIZE ulLen = pBaseHash->ulLen;
 
       while( ulLen-- )
       {
@@ -1916,7 +1907,7 @@ HB_GARBAGE_FUNC( hb_hashReleaseGarbage )
 PHB_ITEM hb_hashGetKeys( PHB_ITEM pKeys, PHB_ITEM pHash )
 {
    PHB_ITEM pK, pArr;
-   ULONG ulPosLoop, ulLen;
+   HB_SIZE ulPosLoop, ulLen;
 
    if ( ! HB_IS_HASH( pHash ) )
    {
@@ -1962,7 +1953,7 @@ PHB_ITEM hb_hashGetKeys( PHB_ITEM pKeys, PHB_ITEM pHash )
 PHB_ITEM hb_hashGetValues( PHB_ITEM pVals, PHB_ITEM pHash )
 {
    PHB_ITEM pV, pArr;
-   ULONG ulPosLoop, ulLen;
+   HB_SIZE ulPosLoop, ulLen;
 
    if ( ! HB_IS_HASH( pHash ) )
    {
@@ -2005,7 +1996,7 @@ PHB_ITEM hb_hashGetValues( PHB_ITEM pVals, PHB_ITEM pHash )
    return pVals;
 }
 
-PHB_ITEM hb_hashGetKeyAt( PHB_ITEM pHash, ULONG ulPos )
+PHB_ITEM hb_hashGetKeyAt( PHB_ITEM pHash, HB_SIZE ulPos )
 {
    PHB_BASEHASH pBaseHash = pHash->item.asHash.value;
    PHB_ITEM pElement;
@@ -2017,7 +2008,7 @@ PHB_ITEM hb_hashGetKeyAt( PHB_ITEM pHash, ULONG ulPos )
 
    if ( pBaseHash->uiLevel > 0 )
    {
-      ULONG ulTotal = 0;
+      HB_SIZE ulTotal = 0;
 
       if ( pBaseHash->ulTotalLen < ulPos )
       {
@@ -2043,8 +2034,7 @@ PHB_ITEM hb_hashGetKeyAt( PHB_ITEM pHash, ULONG ulPos )
    return pBaseHash->pKeys + (ulPos -1 );
 }
 
-
-PHB_ITEM hb_hashGetValueAt( PHB_ITEM pHash, ULONG ulPos )
+PHB_ITEM hb_hashGetValueAt( PHB_ITEM pHash, HB_SIZE ulPos )
 {
 
    PHB_BASEHASH pBaseHash = pHash->item.asHash.value;
@@ -2057,7 +2047,7 @@ PHB_ITEM hb_hashGetValueAt( PHB_ITEM pHash, ULONG ulPos )
 
    if ( pBaseHash->uiLevel > 0 )
    {
-      ULONG ulTotal = 0;
+      HB_SIZE ulTotal = 0;
 
       if ( pBaseHash->ulTotalLen < ulPos )
       {
@@ -2131,12 +2121,11 @@ HB_FUNC( HASH )
    hb_itemReturnForward( pHash );
 }
 
-
 HB_FUNC( HGETPOS )
 {
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
    PHB_ITEM pKey = hb_param( 2, HB_IT_STRING | HB_IT_DATE | HB_IT_NUMERIC );
-   ULONG ulPos;
+   HB_SIZE ulPos;
 
    if ( pHash == NULL || pKey == NULL )
    {
@@ -2151,7 +2140,7 @@ HB_FUNC( HGETPOS )
    }
    else
    {
-      hb_retnl( ulPos );
+      hb_retns( ulPos );
    }
 }
 
@@ -2159,8 +2148,8 @@ HB_FUNC( HAAGETPOS )
 {
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
    PHB_ITEM pKey = hb_param( 2, HB_IT_STRING | HB_IT_DATE | HB_IT_NUMERIC );
-   ULONG ulPos, ui;
-   ULONG * pAccess;
+   HB_SIZE ulPos, ui;
+   HB_SIZE * pAccess;
 
    if( pHash == NULL || pKey == NULL || pHash->item.asHash.value->pAccessAA == NULL )
    {
@@ -2188,7 +2177,7 @@ HB_FUNC( HAAGETPOS )
       }
       while( ui-- > 0 );
 
-      hb_retnl( ui + 1 );
+      hb_retns( ui + 1 );
    }
 }
 
@@ -2196,7 +2185,7 @@ HB_FUNC( HHASKEY )
 {
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
    PHB_ITEM pKey = hb_param( 2, HB_IT_STRING | HB_IT_DATE | HB_IT_NUMERIC );
-   ULONG ulPos;
+   HB_SIZE ulPos;
 
    if ( pHash == NULL || pKey == NULL )
    {
@@ -2215,14 +2204,12 @@ HB_FUNC( HHASKEY )
    }
 }
 
-
-
 HB_FUNC( HGET )
 {
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
    PHB_ITEM pKey = hb_param( 2, HB_IT_STRING | HB_IT_DATE | HB_IT_NUMERIC );
    HB_ITEM hbRet;
-   ULONG ulPos;
+   HB_SIZE ulPos;
 
    if ( pHash == NULL || pKey == NULL )
    {
@@ -2243,7 +2230,6 @@ HB_FUNC( HGET )
    hb_itemReturnForward( &hbRet );
 }
 
-
 HB_FUNC( HSET )
 {
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
@@ -2260,13 +2246,11 @@ HB_FUNC( HSET )
    hb_hashAdd( pHash, ULONG_MAX, pKey, pValue );
 }
 
-
-
 HB_FUNC( HDEL )
 {
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
    PHB_ITEM pKey = hb_param( 2, HB_IT_STRING | HB_IT_DATE | HB_IT_NUMERIC );
-   ULONG ulPos;
+   HB_SIZE ulPos;
 
    if ( pHash == NULL || pKey == NULL )
    {
@@ -2285,7 +2269,6 @@ HB_FUNC( HDEL )
    hb_hashRemove( pHash, ulPos );
 }
 
-
 /**************************************************************
 * Index oriented operations
 ***************************************************************/
@@ -2294,7 +2277,7 @@ HB_FUNC( HGETKEYAT )
 {
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
    PHB_ITEM pPos = hb_param( 2, HB_IT_NUMERIC );
-   ULONG ulPos;
+   HB_SIZE ulPos;
 
    if ( pHash == NULL || pPos == NULL )
    {
@@ -2317,7 +2300,7 @@ HB_FUNC( HAAGETKEYAT )
 {
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
    PHB_ITEM pPos = hb_param( 2, HB_IT_NUMERIC );
-   ULONG ulPos;
+   HB_SIZE ulPos;
 
    if( pHash == NULL || pPos == NULL )
    {
@@ -2346,7 +2329,7 @@ HB_FUNC( HGETVALUEAT )
 {
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
    PHB_ITEM pPos = hb_param( 2, HB_IT_NUMERIC );
-   ULONG ulPos;
+   HB_SIZE ulPos;
 
    if( pHash == NULL || pPos == NULL )
    {
@@ -2369,7 +2352,7 @@ HB_FUNC( HAAGETVALUEAT )
 {
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
    PHB_ITEM pPos = hb_param( 2, HB_IT_NUMERIC );
-   ULONG ulPos;
+   HB_SIZE ulPos;
 
    if( pHash == NULL || pPos == NULL )
    {
@@ -2400,7 +2383,7 @@ HB_FUNC( HSETVALUEAT )
    PHB_ITEM pPos = hb_param( 2, HB_IT_NUMERIC );
    PHB_ITEM pValue = hb_param( 3, HB_IT_ANY );
    PHB_ITEM pItem;
-   ULONG ulPos;
+   HB_SIZE ulPos;
 
    if( pHash == NULL || pPos == NULL || pValue == NULL )
    {
@@ -2426,7 +2409,7 @@ HB_FUNC( HAASETVALUEAT )
    PHB_ITEM pPos = hb_param( 2, HB_IT_NUMERIC );
    PHB_ITEM pValue = hb_param( 3, HB_IT_ANY );
    PHB_ITEM pItem;
-   ULONG ulPos;
+   HB_SIZE ulPos;
 
    if( pHash == NULL || pPos == NULL || pValue == NULL )
    {
@@ -2461,7 +2444,7 @@ HB_FUNC( HGETPAIRAT )
    PHB_ITEM pKey, pValue;
    HB_ITEM ArrRet;
 
-   ULONG ulPos;
+   HB_SIZE ulPos;
 
    if( pHash == NULL || pPos == NULL )
    {
@@ -2502,7 +2485,7 @@ HB_FUNC( HDELAT )
 {
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
    PHB_ITEM pKey = hb_param( 2, HB_IT_NUMERIC );
-   ULONG ulPos;
+   HB_SIZE ulPos;
 
    if( pHash == NULL || pKey == NULL )
    {
@@ -2524,7 +2507,7 @@ HB_FUNC( HAADELAT )
 {
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
    PHB_ITEM pKey = hb_param( 2, HB_IT_NUMERIC );
-   ULONG ulPos;
+   HB_SIZE ulPos;
 
    if( pHash == NULL || pKey == NULL )
    {
@@ -2590,7 +2573,7 @@ HB_FUNC( HGETVAAPOS )
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
    HB_ITEM Arr, Pos;
    PHB_BASEHASH pBaseHash;
-   ULONG ulLen, ulPosLoop;
+   HB_SIZE ulLen, ulPosLoop;
 
    if( pHash == NULL  )
    {
@@ -2608,7 +2591,7 @@ HB_FUNC( HGETVAAPOS )
 
    for( ulPosLoop = 1 ; ulPosLoop <= ulLen; ulPosLoop++ )
    {
-      hb_itemPutNL( &Pos, *(pBaseHash->pAccessAA + ulPosLoop - 1) );
+      hb_itemPutNS( &Pos, *(pBaseHash->pAccessAA + ulPosLoop - 1) );
       hb_arraySetForward( &Arr, ulPosLoop, &Pos );
    }
    hb_itemForwardValue( &HB_VM_STACK.Return, &Arr );
@@ -2623,7 +2606,7 @@ HB_FUNC( HFILL )
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
    PHB_ITEM pVal = hb_param( 2, HB_IT_ANY );
    PHB_ITEM pV;
-   ULONG ulPosLoop, ulLen;
+   HB_SIZE ulPosLoop, ulLen;
 
    if( pHash == NULL || pVal == NULL  )
    {
@@ -2658,12 +2641,12 @@ HB_FUNC( HSCAN )
 
    if( pHash && pValue )
    {
-      ULONG ulStart   = hb_parnl( 3 );
-      ULONG ulCount   = hb_parnl( 4 );
+      HB_SIZE ulStart = hb_parnl( 3 );
+      HB_SIZE ulCount = hb_parnl( 4 );
       BOOL bExact     = hb_parl( 5 );
       BOOL bAllowChar = hb_parl( 6 );
 
-      hb_retnl( hb_arrayScan( pHash, pValue, ISNUM( 3 ) ? &ulStart : NULL, ISNUM( 4 ) ? &ulCount : NULL, bExact, bAllowChar ) );
+      hb_retns( hb_arrayScan( pHash, pValue, ISNUM( 3 ) ? &ulStart : NULL, ISNUM( 4 ) ? &ulCount : NULL, bExact, bAllowChar ) );
    }
    else
    {
@@ -2681,8 +2664,8 @@ HB_FUNC( HEVAL )
 
    if( pHash && pBlock )
    {
-      ULONG ulStart = hb_parnl( 3 );
-      ULONG ulCount = hb_parnl( 4 );
+      HB_SIZE ulStart = hb_parnl( 3 );
+      HB_SIZE ulCount = hb_parnl( 4 );
 
       hb_arrayEval( pHash, pBlock, ISNUM( 3 ) ? &ulStart : NULL, ISNUM( 4 ) ? &ulCount : NULL );
 
@@ -2733,7 +2716,7 @@ HB_FUNC( HCOPY )
    PHB_ITEM pStart = hb_param( 3, HB_IT_NUMERIC );
    PHB_ITEM pEnd = hb_param( 4, HB_IT_NUMERIC );
    PHB_ITEM pBlock = hb_param( 5, HB_IT_BLOCK | HB_IT_NUMERIC );
-   ULONG ulStart, ulCount, ulLen;
+   HB_SIZE ulStart, ulCount, ulLen;
 
    if ( pSource == NULL || pDest == NULL )
    {
@@ -2745,7 +2728,7 @@ HB_FUNC( HCOPY )
 
    ulLen   = hb_hashLen(pSource);
    ulStart = pStart == NULL ? 1 : hb_itemGetNL( pStart );
-   ulCount = pEnd   == NULL ? ulLen - ulStart + 1 : (ULONG) hb_itemGetNL( pEnd );
+   ulCount = pEnd   == NULL ? ulLen - ulStart + 1 : (HB_SIZE) hb_itemGetNL( pEnd );
 
 //   if ( ulStart < 1 ||  ulCount <= 0 || ulStart + ulCount > ulLen)
 //   {
@@ -2788,7 +2771,7 @@ void hb_hashSetCaseMatch( PHB_ITEM pHash, BOOL bCase )
 
    if ( pBase->uiLevel > 0 )
    {
-      ULONG ulCount;
+      HB_SIZE ulCount;
 
       for ( ulCount = 0; ulCount < pBase->ulLen; ulCount ++ )
       {
@@ -2874,7 +2857,7 @@ HB_FUNC( HSETPARTITION )
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
    PHB_ITEM pSize = hb_param( 2, HB_IT_NUMERIC );
    PHB_ITEM pLevel = hb_param( 3, HB_IT_NUMERIC );
-   ULONG ulSize;
+   HB_SIZE ulSize;
    UINT uiLevel;
 
 
@@ -2960,7 +2943,7 @@ HB_FUNC( HGETPARTITION )
    {
       if ( pSize != NULL )
       {
-         hb_itemPutNL( pSize, pHash->item.asHash.value->ulPageSize );
+         hb_itemPutNS( pSize, pHash->item.asHash.value->ulPageSize );
       }
 
       if ( pLevel != NULL )
@@ -3032,7 +3015,7 @@ HB_FUNC( HAAGETREALPOS )
 
    if( pHash )
    {
-      hb_retnl( hb_hashAAGetRealPos( pHash, (ULONG) hb_parnl( 2 ) ) );
+      hb_retns( hb_hashAAGetRealPos( pHash, (HB_SIZE) hb_parnl( 2 ) ) );
    }
    else
    {
@@ -3044,7 +3027,7 @@ HB_FUNC( HAAGETREALPOS )
 HB_EXTERN_BEGIN
 
 #undef hb_hashAAGetRealPos
-ULONG hb_hashAAGetRealPos( PHB_ITEM pHash, ULONG ulPos )
+HB_SIZE hb_hashAAGetRealPos( PHB_ITEM pHash, HB_SIZE ulPos )
 {
    if( pHash && HB_IS_HASH( pHash ) && pHash->item.asHash.value->pAccessAA &&
        ulPos && ulPos <= hb_hashLen( pHash ) )
@@ -3055,9 +3038,9 @@ ULONG hb_hashAAGetRealPos( PHB_ITEM pHash, ULONG ulPos )
 }
 
 #undef hb_hashLen
-ULONG hb_hashLen( PHB_ITEM pHash )
+HB_SIZE hb_hashLen( PHB_ITEM pHash )
 {
-   ULONG ulLen = 0;
+   HB_SIZE ulLen = 0;
    HB_TRACE(HB_TR_DEBUG, ("hb_hashLen(%p)", pHash));
 
    if( HB_IS_HASH( pHash ) )

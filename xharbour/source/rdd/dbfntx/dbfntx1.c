@@ -444,7 +444,7 @@ static LPKEYINFO hb_ntxKeyPutItem( LPKEYINFO pKey, PHB_ITEM pItem, ULONG ulRecNo
          {
             len = pTag->KeyLength;
             hb_cdpnDup2( hb_itemGetCPtr( pItem ), hb_itemGetCLen( pItem ),
-                         pKey->key, &len,
+                         pKey->key, ( HB_SIZE* ) &len,
                          hb_cdppage(), pTag->Owner->Owner->dbfarea.area.cdPage );
          }
          else
@@ -452,14 +452,14 @@ static LPKEYINFO hb_ntxKeyPutItem( LPKEYINFO pKey, PHB_ITEM pItem, ULONG ulRecNo
          HB_SYMBOL_UNUSED( fTrans );
 #endif
          {
-            len = hb_itemGetCLen( pItem );
+            len = ( ULONG ) hb_itemGetCLen( pItem );
             if( len > ( ULONG ) pTag->KeyLength )
                len = pTag->KeyLength;
-            HB_MEMCPY( pKey->key, hb_itemGetCPtr( pItem ), len );
+            HB_MEMCPY( pKey->key, hb_itemGetCPtr( pItem ), (size_t) len );
          }
          if( len < ( ULONG ) pTag->KeyLength )
          {
-            memset( pKey->key + len, ' ', pTag->KeyLength - len );
+            memset( pKey->key + len, ' ', (size_t) ( pTag->KeyLength - len ) );
             if( puiLen )
                *puiLen = ( USHORT ) len;
          }
@@ -501,7 +501,7 @@ static PHB_ITEM hb_ntxKeyGetItem( PHB_ITEM pItem, LPKEYINFO pKey,
             if( fTrans )
             {
                ULONG ulLen = pTag->KeyLength;
-               char * pszVal = hb_cdpnDup( pKey->key, &ulLen,
+               char * pszVal = hb_cdpnDup( pKey->key, ( HB_SIZE* ) &ulLen,
                                            pTag->Owner->Owner->dbfarea.area.cdPage, hb_cdppage() );
                pItem = hb_itemPutCLPtr( pItem, pszVal, ulLen );
             }
@@ -4324,7 +4324,7 @@ static BOOL hb_ntxRegexMatch( LPTAGINFO pTag, PHB_REGEX pRegEx, char * szKey )
    if( pTag->Owner->Owner->dbfarea.area.cdPage != hb_cdppage() )
    {
       ulLen = sizeof( szBuff ) - 1;
-      hb_cdpnDup2( szKey, pTag->KeyLength, szBuff, &ulLen,
+      hb_cdpnDup2( szKey, pTag->KeyLength, szBuff, ( HB_SIZE* ) &ulLen,
                    pTag->Owner->Owner->dbfarea.area.cdPage, hb_cdppage() );
       szBuff[ ulLen ] = '\0';
       szKey = szBuff;
@@ -5428,7 +5428,7 @@ static HB_ERRCODE hb_ntxTagCreate( LPTAGINFO pTag, BOOL fReindex )
                case HB_IT_STRING | HB_IT_MEMO:
                   hb_ntxSortKeyAdd( pSort, pArea->dbfarea.ulRecNo,
                                     hb_itemGetCPtr( pItem ),
-                                    hb_itemGetCLen( pItem ) );
+                                    (int) hb_itemGetCLen( pItem ) );
                   break;
 
                case HB_IT_INTEGER:
@@ -6248,7 +6248,7 @@ static HB_ERRCODE hb_ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderI
          iLen = 1;
          break;
       case 'C':
-         iLen = hb_itemGetCLen( pResult );
+         iLen = (int) hb_itemGetCLen( pResult );
          if( iLen > NTX_MAX_KEY )
             iLen = NTX_MAX_KEY;
          break;

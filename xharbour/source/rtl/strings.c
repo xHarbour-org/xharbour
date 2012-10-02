@@ -54,7 +54,7 @@
 
 #include "hbapi.h"
 
-BOOL hb_strEmpty( const char * szText, ULONG ulLen )
+BOOL hb_strEmpty( const char * szText, HB_SIZE ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_strEmpty(%s, %lu)", szText, ulLen));
 

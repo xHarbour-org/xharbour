@@ -241,7 +241,7 @@ static void hb_dbfUpdatedbaselockValue( DBFAREAP pArea, ULONG ulRecNo )
 
 static void hb_dbfUpdateStampFields( DBFAREAP pArea )
 {
-   LONG lJulian = 0, lMilliSec = 0;
+   long lJulian = 0, lMilliSec = 0;
    HB_LONG nRowVer = 0;
    LPFIELD pField;
    USHORT uiCount;
@@ -410,7 +410,7 @@ static void hb_dbfSetBlankRecord( DBFAREAP pArea, int iType )
    }
    memset( pPtr, bFill, ulSize );
 
-   ulSize = pArea->pRecord - pPtr - ulSize;
+   ulSize = ( ULONG ) ( pArea->pRecord - pPtr - ulSize );
    if( ulSize < ( ULONG ) pArea->uiRecordLen )
       memset( pPtr, '\0', ( ULONG ) pArea->uiRecordLen - ulSize );
 }
@@ -582,21 +582,21 @@ static BOOL hb_dbfPasswordSet( DBFAREAP pArea, PHB_ITEM pPasswd, BOOL fRaw )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfPasswordSet(%p,%p,%d)", pArea, pPasswd, fRaw));
 
-   ulLen = hb_itemGetCLen( pPasswd );
+   ulLen = ( ULONG ) hb_itemGetCLen( pPasswd );
 
    fSet = !pArea->fHasMemo && HB_IS_STRING( pPasswd ) && (!fRaw || ulLen == 8);
    if( fSet )
    {
-      ulLen = hb_itemGetCLen( pPasswd );
+      ulLen = ( ULONG ) hb_itemGetCLen( pPasswd );
       if( ulLen > 0 )
       {
          if( ulLen < 8 )
          {
-            HB_MEMCPY( byBuffer, hb_itemGetCPtr( pPasswd ), ulLen );
-            memset( byBuffer + ulLen, '\0', 8 - ulLen );
+            HB_MEMCPY( byBuffer, hb_itemGetCPtr( pPasswd ), (size_t) ulLen );
+            memset( byBuffer + ulLen, '\0', (size_t) ( 8 - ulLen ) );
          }
          else
-            HB_MEMCPY( byBuffer, hb_itemGetCPtr( pPasswd ), 8 );
+            HB_MEMCPY( byBuffer, hb_itemGetCPtr( pPasswd ), (size_t) 8 );
       }
    }
 
@@ -617,7 +617,7 @@ static BOOL hb_dbfPasswordSet( DBFAREAP pArea, PHB_ITEM pPasswd, BOOL fRaw )
          /* clean the memory with password key - though it's not
           * a serious actions in such case ;-)
           */
-         memset( pArea->pCryptKey, '\0', 8 );
+         memset( pArea->pCryptKey, '\0', (size_t) 8 );
          hb_xfree( pArea->pCryptKey );
          pArea->pCryptKey = NULL;
       }
@@ -632,7 +632,7 @@ static BOOL hb_dbfPasswordSet( DBFAREAP pArea, PHB_ITEM pPasswd, BOOL fRaw )
          if( !fRaw )
             hb_sxEnCrypt( byBuffer, pArea->pCryptKey, byBuffer, 8 );
          else
-            HB_MEMCPY( pArea->pCryptKey, byBuffer, 8 );
+            HB_MEMCPY( pArea->pCryptKey, byBuffer, (size_t) 8 );
          fKeySet = TRUE;
       }
    }
@@ -1576,7 +1576,7 @@ static HB_ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
          if( pArea->area.cdPage != hb_cdppage() && ( pField->uiFlags & HB_FF_BINARY ) == 0 )
          {
             pszVal = hb_cdpnDup( ( const char * ) pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
-                                 &ulLen, pArea->area.cdPage, hb_cdppage() );
+                                 ( HB_SIZE* ) &ulLen, pArea->area.cdPage, hb_cdppage() );
             hb_itemPutCPtr( pItem, pszVal, ulLen );
 
          }
@@ -1884,7 +1884,7 @@ static HB_ERRCODE hb_dbfPutRec( DBFAREAP pArea, const BYTE * pBuffer )
          return HB_FAILURE;
 
       /* Copy data to buffer */
-      HB_MEMCPY( pArea->pRecord, pBuffer, pArea->uiRecordLen );
+      HB_MEMCPY( pArea->pRecord, pBuffer, (size_t) pArea->uiRecordLen );
 
       /*
        * TODO: such operation should be forbidden
@@ -2005,7 +2005,7 @@ static HB_ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
                 hb_cdpnTranslate( ( char * ) pArea->pRecord + pArea->pFieldOffset[ uiIndex ], hb_cdppage(), pArea->area.cdPage, uiSize );
 #endif
             memset( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] + uiSize,
-                    ' ', pField->uiLen - uiSize );
+                    ' ', (size_t) ( pField->uiLen - uiSize ) );
          }
          else
             errCode = EDBF_DATATYPE;
@@ -3290,7 +3290,7 @@ static HB_ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoT
          pResult = ( BYTE * ) hb_xgrab( ulLength + 1 );
          if( ulLength )
          {
-            HB_MEMCPY( pResult, pArea->pRecord, ulLength );
+            HB_MEMCPY( pResult, pArea->pRecord, (size_t) ulLength );
          }
 
          if( pArea->fHasMemo )
@@ -3306,11 +3306,11 @@ static HB_ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoT
                   errResult = SELF_GETVALUE( ( AREAP ) pArea, uiFields + 1, pInfo );
                   if( errResult != HB_SUCCESS )
                      break;
-                  ulLen = hb_itemGetCLen( pInfo );
+                  ulLen = ( ULONG ) hb_itemGetCLen( pInfo );
                   if( ulLen > 0 )
                   {
                      pResult = ( BYTE * ) hb_xrealloc( pResult, ulLength + ulLen + 1 );
-                     HB_MEMCPY( pResult + ulLength, hb_itemGetCPtr( pInfo ), ulLen );
+                     HB_MEMCPY( pResult + ulLength, hb_itemGetCPtr( pInfo ), (size_t) ulLen );
                      ulLength += ulLen;
                   }
                }

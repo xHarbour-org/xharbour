@@ -206,7 +206,7 @@ BOOL hb_evalRelease( PEVALINFO pEvalInfo )
          [vszakats]
 */
 
-PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
+PHB_ITEM hb_itemDo( PHB_ITEM pItem, HB_SIZE ulPCount, ... )
 {
    HB_THREAD_STUB
 
@@ -308,7 +308,7 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
 /* NOTE: Same as hb_itemDo(), but even simpler, since the function name can be
          directly passed as a zero terminated string. [vszakats]
 */
-PHB_ITEM hb_itemDoC( const char * szFunc, ULONG ulPCount, ... )
+PHB_ITEM hb_itemDoC( const char * szFunc, HB_SIZE ulPCount, ... )
 {
    HB_THREAD_STUB
 
@@ -357,7 +357,7 @@ PHB_ITEM hb_itemDoC( const char * szFunc, ULONG ulPCount, ... )
 /* NOTE: Same as hb_itemDoC(), but has additional second parameter
          which set the reference mask for 1-st 32/64 parametes [druzus]
 */
-PHB_ITEM hb_itemDoCRef( char * szFunc, ULONG ulRefMask, ULONG ulPCount, ... )
+PHB_ITEM hb_itemDoCRef( char * szFunc, HB_SIZE ulRefMask, HB_SIZE ulPCount, ... )
 {
    HB_THREAD_STUB
 
@@ -379,12 +379,12 @@ PHB_ITEM hb_itemDoCRef( char * szFunc, ULONG ulRefMask, ULONG ulPCount, ... )
 
          if( ulPCount )
          {
-  		    PHB_ITEM pItemRefBuf[ sizeof(ULONG) * 8 ];
+	    PHB_ITEM pItemRefBuf[ sizeof(HB_SIZE) * 8 ];
             HB_ITEM itmRef;
-            register ULONG ulParam;
-  		    ULONG ulRef = 0;
+            register HB_SIZE ulParam;
+  	    HB_SIZE ulRef = 0;
             va_list va;
-		    PHB_ITEM *pRefBase;
+	    PHB_ITEM *pRefBase;
             PHB_ITEM pParam;
 
             pRefBase = pItemRefBuf;
@@ -403,7 +403,7 @@ PHB_ITEM hb_itemDoCRef( char * szFunc, ULONG ulRefMask, ULONG ulPCount, ... )
                      the reference on the stack instead of the item itself */
                   pItemRefBuf[ ulRef++ ] = pParam;
                   itmRef.item.asRefer.value = (LONG) ulRef;
-//                  hb_vmPush( &itmRef );
+//                hb_vmPush( &itmRef );
                   pParam = &itmRef;
                }
                hb_vmPush( pParam );
@@ -498,7 +498,7 @@ HB_FUNC( HB_EXECFROMARRAY )
    HB_THREAD_STUB_API
 
    register ULONG i;
-   ULONG ulLen = 0;
+   HB_SIZE ulLen = 0;
    ULONG ulStart = 1;
    UINT uiPcount = (UINT) hb_pcount();
    PHB_ITEM pFirst = hb_param( 1, HB_IT_ANY );
@@ -663,7 +663,7 @@ HB_FUNC( HB_EXECFROMARRAY )
 BOOL hb_execFromArray( PHB_ITEM pFirst )
 {
    register ULONG i;
-   ULONG ulLen;
+   HB_SIZE ulLen;
    ULONG ulStart = 1;
    PHB_ITEM pArgs;
    PHB_ITEM pString;
@@ -796,7 +796,7 @@ HB_FUNC( HB_EXEC )
       // Changing the Pointer item to a Symbol Item, so that we don't have to re-push paramters.
       hb_itemPutSymbol( pPointer, pSymbol );
       HB_MEMCPY( pPointer->item.asSymbol.pCargo, hb_stackBaseItem()->item.asSymbol.pCargo, sizeof( HB_SYMBCARGO ) );
-      pPointer->item.asSymbol.pCargo->stackbase = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
+      pPointer->item.asSymbol.pCargo->stackbase = ( long ) ( HB_VM_STACK.pBase - HB_VM_STACK.pItems );
       pPointer->item.asSymbol.pCargo->uiSuperClass = 0;
 
       if( bSend )

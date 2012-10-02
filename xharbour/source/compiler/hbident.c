@@ -32,17 +32,17 @@
 #include "hbcomp.h"
 #include "hbexemem.h"
 
-#define HB_IDENT_TABLE_SIZE    509UL
+#define HB_IDENT_TABLE_SIZE 509UL
 
 static HB_HASH_TABLE_PTR s_comp_Identifiers;    /* table of identifiers for reuse */
 
 /* create a new identifier or return the existing one
-*/
+ */
 char * hb_compIdentifierNew( char * szName, BOOL bCopy )
 {
    char * szIdent;
 
-   szIdent = ( char * )hb_hashTableFind( s_comp_Identifiers, (void *) szName );
+   szIdent = ( char * ) hb_hashTableFind( s_comp_Identifiers, ( void * ) szName );
 
    if( szIdent )
    {
@@ -59,7 +59,7 @@ char * hb_compIdentifierNew( char * szName, BOOL bCopy )
       else
          szIdent = szName;
 
-      hb_hashTableAdd( s_comp_Identifiers, (void *)szIdent );
+      hb_hashTableAdd( s_comp_Identifiers, ( void * ) szIdent );
    }
 
    return szIdent;
@@ -68,11 +68,11 @@ char * hb_compIdentifierNew( char * szName, BOOL bCopy )
 /* returns a hash key */
 HB_HASH_FUNC( hb_comp_IdentKey )    /* ULONG func (void *Value, void *Cargo) */
 {
-   ULONG ulSum = 0;
-   char *szName = ( char * )Value;
+   ULONG    ulSum    = 0;
+   char *   szName   = ( char * ) Value;
 
    while( *szName )
-     ulSum += *szName++;
+      ulSum += *szName++;
 
    HB_SYMBOL_UNUSED( Cargo );
 
@@ -90,14 +90,14 @@ HB_HASH_FUNC( hb_comp_IdentDel )
 /* compares two identifiers */
 HB_HASH_FUNC( hb_comp_IdentComp )
 {
-   return strcmp( (char *)Value, (char *)Cargo );
+   return strcmp( ( char * ) Value, ( char * ) Cargo );
 }
 
 /* initialize the hash table for identifiers */
 void hb_compIdentifierOpen( void )
 {
    s_comp_Identifiers = hb_hashTableCreate( HB_IDENT_TABLE_SIZE, hb_comp_IdentKey,
-                           hb_comp_IdentDel, hb_comp_IdentComp );
+                                            hb_comp_IdentDel, hb_comp_IdentComp );
 }
 
 /* release identifiers table */

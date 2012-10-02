@@ -90,8 +90,8 @@ HB_FUNC( HB_BLOWFISHENCRYPT )
             nSize = ( fRaw ? ( ( nLen + 7 ) >> 3 ) :
                              ( ( nLen >> 3 ) + 1 ) ) << 3;
             pszData = ( char * ) hb_xgrab( nSize + 1 );
-            HB_MEMCPY( pszData, hb_itemGetCPtr( pData ), nLen );
-            memset( pszData + nLen, '\0', nSize - nLen );
+            HB_MEMCPY( pszData, hb_itemGetCPtr( pData ), (size_t) nLen );
+            memset( pszData + nLen, '\0', (size_t) ( nSize - nLen ) );
             if( !fRaw )
                pszData[ nSize - 1 ] = ( char ) ( nSize - nLen );
             for( nLen = 0; nLen < nSize; nLen += 8 )

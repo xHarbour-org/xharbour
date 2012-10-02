@@ -665,7 +665,7 @@ static LPKEYINFO hb_nsxKeyPutItem( LPKEYINFO pKey, PHB_ITEM pItem, ULONG ulRecNo
          {
             len = pTag->KeyLength;
             hb_cdpnDup2( hb_itemGetCPtr( pItem ), hb_itemGetCLen( pItem ),
-                         ( char * ) pKey->val, &len,
+                         ( char * ) pKey->val, ( HB_SIZE* ) &len,
                          hb_cdppage(), pTag->pIndex->pArea->dbfarea.area.cdPage );
          }
          else
@@ -673,14 +673,14 @@ static LPKEYINFO hb_nsxKeyPutItem( LPKEYINFO pKey, PHB_ITEM pItem, ULONG ulRecNo
          HB_SYMBOL_UNUSED( fTrans );
 #endif
          {
-            len = hb_itemGetCLen( pItem );
+            len = ( ULONG ) hb_itemGetCLen( pItem );
             if( len > ( ULONG ) pTag->KeyLength )
                len = pTag->KeyLength;
-            HB_MEMCPY( pKey->val, hb_itemGetCPtr( pItem ), len );
+            HB_MEMCPY( pKey->val, hb_itemGetCPtr( pItem ), (size_t) len );
          }
          if( len < ( ULONG ) pTag->KeyLength )
          {
-            memset( pKey->val + len, pTag->TrailChar, pTag->KeyLength - len );
+            memset( pKey->val + len, pTag->TrailChar, (size_t) ( pTag->KeyLength - len ) );
             if( puiLen )
                *puiLen = ( USHORT ) len;
          }
@@ -731,7 +731,7 @@ static PHB_ITEM hb_nsxKeyGetItem( PHB_ITEM pItem, LPKEYINFO pKey,
             if( fTrans )
             {
                ULONG ulLen = pTag->KeyLength;
-               char * pszVal = hb_cdpnDup( ( const char * ) pKey->val, &ulLen,
+               char * pszVal = hb_cdpnDup( ( const char * ) pKey->val, ( HB_SIZE* ) &ulLen,
                                            pTag->pIndex->pArea->dbfarea.area.cdPage, hb_cdppage() );
                pItem = hb_itemPutCLPtr( pItem, pszVal, ulLen );
             }
@@ -4178,7 +4178,7 @@ static BOOL hb_nsxOrdKeyGoto( LPTAGINFO pTag, ULONG ulKeyNo )
                }
                else
                {
-                  pTag->stack[ iLevel ].ikey -= ulKeyNo;
+                  pTag->stack[ iLevel ].ikey -= ( USHORT ) ulKeyNo;
                   ulKeyNo = 0;
                }
             }
@@ -4234,7 +4234,7 @@ static BOOL hb_nsxOrdKeyGoto( LPTAGINFO pTag, ULONG ulKeyNo )
                }
                else
                {
-                  pTag->stack[ iLevel ].ikey += ulKeyNo;
+                  pTag->stack[ iLevel ].ikey += ( USHORT ) ulKeyNo;
                   ulKeyNo = 0;
                }
             }
@@ -4717,7 +4717,7 @@ static BOOL hb_nsxRegexMatch( LPTAGINFO pTag, PHB_REGEX pRegEx, const char * szK
    if( pTag->pIndex->pArea->dbfarea.area.cdPage != hb_cdppage() )
    {
       ulLen = sizeof( szBuff ) - 1;
-      hb_cdpnDup2( szKey, pTag->KeyLength, szBuff, &ulLen,
+      hb_cdpnDup2( szKey, pTag->KeyLength, szBuff, ( HB_SIZE* ) &ulLen,
                    pTag->pIndex->pArea->dbfarea.area.cdPage, hb_cdppage() );
       szBuff[ ulLen ] = '\0';
       szKey = szBuff;
@@ -5935,7 +5935,7 @@ static HB_ERRCODE hb_nsxTagCreate( LPTAGINFO pTag, BOOL fReindex )
                case HB_IT_STRING | HB_IT_MEMO:
                   hb_nsxSortKeyAdd( pSort, pArea->dbfarea.ulRecNo,
                                     hb_itemGetCPtr( pItem ),
-                                    hb_itemGetCLen( pItem ) );
+                                    (int) hb_itemGetCLen( pItem ) );
                   break;
 
                case HB_IT_INTEGER:
@@ -6698,7 +6698,7 @@ static HB_ERRCODE hb_nsxOrderCreate( NSXAREAP pArea, LPDBORDERCREATEINFO pOrderI
          iLen = 1;
          break;
       case 'C':
-         iLen = hb_itemGetCLen( pResult );
+         iLen = (int) hb_itemGetCLen( pResult );
          if( iLen > NSX_MAXKEYLEN )
             iLen = NSX_MAXKEYLEN;
          bTrail = ' ';

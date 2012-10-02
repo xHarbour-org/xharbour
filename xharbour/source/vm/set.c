@@ -111,7 +111,8 @@ static char set_char( PHB_ITEM pItem, char oldChar )
    if( HB_IS_STRING( pItem ) )
    {
       /* Only replace if string has at least one character. */
-      ULONG ulLen = hb_itemGetCLen( pItem );
+      HB_SIZE ulLen = hb_itemGetCLen( pItem );
+
       if( ulLen > 0 )
       {
          newChar = *hb_itemGetCPtr( pItem );
@@ -135,7 +136,7 @@ static BOOL set_logical( PHB_ITEM pItem, BOOL bDefault )
    else if( HB_IS_STRING( pItem ) )
    {
       char * szString = hb_itemGetCPtr( pItem );
-      ULONG ulLen = hb_itemGetCLen( pItem );
+      HB_SIZE ulLen = hb_itemGetCLen( pItem );
 
       if( ulLen >= 2
        && HB_TOUPPER( ( UCHAR ) szString[ 0 ] ) == 'O'
@@ -483,7 +484,7 @@ BOOL hb_setSetCentury( BOOL new_century_setting )
       /* Convert to upper case and determine where year is */
       y_start = y_stop = -1;
       szDateFormat = pSet->HB_SET_DATEFORMAT;
-      size = strlen( szDateFormat );
+      size = ( int ) strlen( szDateFormat );
       for( count = 0; count < size; count++ )
       {
          digit = HB_TOUPPER( ( UCHAR ) szDateFormat[ count ] );
@@ -521,7 +522,7 @@ BOOL hb_setSetCentury( BOOL new_century_setting )
          hb_strncat( szNewFormat, "YY", size );
          if( new_century_setting )
             hb_strncat( szNewFormat, "YY", size );
-         format_len = strlen( szDateFormat );
+         format_len = ( int ) strlen( szDateFormat );
          if( y_stop < format_len )
             hb_strncat( szNewFormat, szDateFormat + y_stop, size );
          /* DATE FORMAT is under direct control of SET, so notify when it
@@ -1082,7 +1083,7 @@ HB_FUNC( SET )
          hb_retc( pSet->hb_set_printerjob );
          if ( args > 1 && ISCHAR( 2 ) )
          {
-           ULONG ulLength = hb_parclen( 2 ) ;
+           HB_SIZE ulLength = hb_parclen( 2 ) ;
            if ( pSet->hb_set_printerjob )
            {
               hb_xfree( pSet->hb_set_printerjob ) ;
@@ -3135,7 +3136,7 @@ const char * hb_setGetOSCODEPAGE( void )
    return hb_stackSetStruct()->HB_SET_OSCODEPAGE;
 }
 
-const char * hb_osEncodeCP( const char * szName, char ** pszFree, ULONG * pulSize )
+const char * hb_osEncodeCP( const char * szName, char ** pszFree, HB_SIZE * pulSize )
 {
    HB_THREAD_STUB
 
@@ -3149,7 +3150,7 @@ const char * hb_osEncodeCP( const char * szName, char ** pszFree, ULONG * pulSiz
          PHB_CODEPAGE cdpHost = hb_cdppage();
          if( cdpHost && cdpHost != cdpOS )
          {
-            ULONG ulSize = 0;
+            HB_SIZE ulSize = 0;
             char * pszBuf;
 
             if( pszFree == NULL )
@@ -3163,7 +3164,7 @@ const char * hb_osEncodeCP( const char * szName, char ** pszFree, ULONG * pulSiz
             else if( *pulSize > 0 )
                ulSize = *pulSize - 1;
 
-            szName = hb_cdpnDup3( szName, ( ULONG ) strlen( szName ),
+            szName = hb_cdpnDup3( szName, strlen( szName ),
                                   pszBuf, &ulSize, pszFree, pulSize,
                                   cdpHost, cdpOS );
          }
@@ -3173,7 +3174,7 @@ const char * hb_osEncodeCP( const char * szName, char ** pszFree, ULONG * pulSiz
    return szName;
 }
 
-const char * hb_osDecodeCP( const char * szName, char ** pszFree, ULONG * pulSize )
+const char * hb_osDecodeCP( const char * szName, char ** pszFree, HB_SIZE * pulSize )
 {
    HB_THREAD_STUB
 
@@ -3187,7 +3188,7 @@ const char * hb_osDecodeCP( const char * szName, char ** pszFree, ULONG * pulSiz
          PHB_CODEPAGE cdpHost = hb_cdppage();
          if( cdpHost && cdpHost != cdpOS )
          {
-            ULONG ulSize = 0;
+            HB_SIZE ulSize = 0;
             char * pszBuf;
 
             if( pszFree == NULL )
@@ -3201,7 +3202,7 @@ const char * hb_osDecodeCP( const char * szName, char ** pszFree, ULONG * pulSiz
             else if( *pulSize > 0 )
                ulSize = *pulSize - 1;
 
-            szName = hb_cdpnDup3( szName, ( ULONG ) strlen( szName ),
+            szName = hb_cdpnDup3( szName, strlen( szName ),
                                   pszBuf, &ulSize, pszFree, pulSize,
                                   cdpOS, cdpHost );
          }

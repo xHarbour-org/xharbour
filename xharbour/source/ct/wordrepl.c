@@ -56,30 +56,28 @@
 
 HB_FUNC( WORDREPL )
 {
-
    int      iNoRet;
    int      iMultiPass;
 
-   size_t   sSearchLen, sReplaceLen;
+   HB_SIZE  sSearchLen, sReplaceLen;
 
    /* suppressing return value ? */
    iNoRet      = ct_getref() && ISBYREF( 2 );
    iMultiPass  = ct_getatmupa();
 
    /* param check */
-   if( ( ( sSearchLen = ( size_t ) hb_parclen( 1 ) ) / 2 > 0 ) &&
+   if( ( ( sSearchLen = hb_parclen( 1 ) ) / 2 > 0 ) &&
        ( ISCHAR( 2 ) ) &&
-       ( ( sReplaceLen = ( size_t ) hb_parclen( 3 ) ) / 2 > 0 ) )
+       ( ( sReplaceLen = hb_parclen( 3 ) ) / 2 > 0 ) )
    {
-
       /* get parameters */
       const char *   pcSearch    = hb_parc( 1 );
       const char *   pcString    = hb_parc( 2 );
-      size_t         sStrLen     = ( size_t ) hb_parclen( 2 );
+      HB_SIZE        sStrLen     = hb_parclen( 2 );
       const char *   pcReplace   = hb_parc( 3 );
       int            iMode;
       char *         pcRet;
-      size_t         sIndex;
+      HB_SIZE        sIndex;
 
       if( ISLOG( 4 ) )
       {
@@ -91,14 +89,13 @@ HB_FUNC( WORDREPL )
       }
 
       pcRet = ( char * ) hb_xgrab( sStrLen + 1 );
-      hb_xmemcpy( pcRet, pcString, sStrLen );
+      hb_xmemcpy( pcRet, pcString, (size_t) sStrLen );
 
       for( sIndex = 0; sIndex < ( sSearchLen & 0xFFFFFFFE ); sIndex += 2 )
       {
-
-         size_t         sMatchStrLen;
-         const char *   pc;
-         size_t         sReplIndex = sIndex;
+         HB_SIZE      sMatchStrLen;
+         const char * pc;
+         HB_SIZE      sReplIndex = sIndex;
 
          if( sReplIndex > ( sReplaceLen & 0xFFFFFFFE ) )
          {
@@ -106,6 +103,7 @@ HB_FUNC( WORDREPL )
          }
 
          pc = pcString;
+
          while( ( pc = ct_at_exact_forward( pc, sStrLen - ( pc - pcString ),
                                             pcSearch + sIndex, 2,
                                             &sMatchStrLen ) ) != NULL )
@@ -124,7 +122,6 @@ HB_FUNC( WORDREPL )
                {
                   pc += 2;
                }
-
             }
             else
             {
@@ -169,6 +166,7 @@ HB_FUNC( WORDREPL )
    {
       PHB_ITEM pSubst         = NULL;
       int      iArgErrorMode  = ct_getargerrormode();
+
       if( iArgErrorMode != CT_ARGERR_IGNORE )
       {
          pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_WORDREPL,
@@ -202,6 +200,5 @@ HB_FUNC( WORDREPL )
    }
 
    return;
-
 }
 

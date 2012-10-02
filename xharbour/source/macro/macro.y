@@ -77,16 +77,15 @@
 /* Compile using: bison -d -p hb_comp macro.y */
 
 /* to pacify some warnings in BCC */
-#if defined( __BORLANDC__ ) && !defined( __STDC__ )
-#  define __STDC__
-#endif
-
 #if defined( __POCC__ )
    #pragma warn(push)
    #pragma warn(disable:2154)
-#endif
-
-#if defined( __BORLANDC__ )
+#elif defined( _MSC_VER )
+   #pragma warning (disable:4065)
+#elif defined( __BORLANDC__ )
+   #if !defined( __STDC__ )
+     #define __STDC__
+   #endif
    #pragma warn -aus
    #pragma warn -ccc
    #pragma warn -rch
@@ -577,7 +576,7 @@ VarAlias    : IdentName ALIASOP    { $$ = hb_compExprNewAlias( $1 ); }
 MacroVar    : MACROVAR        { $$ = hb_compExprNewMacro( NULL, '&', $1 );
                                 HB_MACRO_CHECK( $$ );
                               }
-            | MACROTEXT       {  ULONG ulLen = strlen( $1 );
+            | MACROTEXT       {  HB_SIZE ulLen = strlen( $1 );
                                  char * szVarName = hb_macroTextSubst( $1, &ulLen );
                                  if( hb_macroIsIdent( szVarName ) )
                                  {

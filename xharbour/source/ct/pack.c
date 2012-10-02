@@ -55,7 +55,7 @@
 
 HB_FUNC( CHARPACK )
 {
-   unsigned          len   = hb_parclen( 1 );
+   unsigned          len   = ( unsigned ) hb_parclen( 1 );
    unsigned char *   in    = ( unsigned char * ) hb_parcx( 1 );
 
    if( hb_parni( 2 ) == 0 )
@@ -103,7 +103,7 @@ static unsigned char * buf_append( unsigned char * buf, unsigned * buf_size, uns
 HB_FUNC( CHARUNPACK )
 {
    unsigned          buf_size = 32768;
-   unsigned          len      = hb_parclen( 1 );
+   unsigned          len      = ( unsigned ) hb_parclen( 1 );
    unsigned          out_len  = 0;
    unsigned char *   in       = ( unsigned char * ) hb_parcx( 1 );
    unsigned char *   out;

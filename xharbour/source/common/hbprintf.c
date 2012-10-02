@@ -51,13 +51,13 @@
  */
 
 /*
-patterm format:
+   patterm format:
    '%' [<flags>*] [<field width>] [.<precision>] [<length modifier>]
        <conversion specifier>
  */
 
 /*
-The folowwing conversions are not explicitly supported:
+   The folowwing conversions are not explicitly supported:
       A, a
       E, e
       G, g
@@ -68,23 +68,23 @@ The folowwing conversions are not explicitly supported:
       S (or Ls)
    These are wide character conversions and needs locale settings.
 
-double conversion if not necessary can be disabled to not create unnencessary
-overhead and/or references to math library by
+   double conversion if not necessary can be disabled to not create unnencessary
+   overhead and/or references to math library by
    #define __NO_DOUBLE__
-It can be also greatly optimized anyhow it will increase dependences list and
-reduce portability.
-Internally 'long double' is used for all calculations. If some platforms do
-not support it then it can be eliminated by
+   It can be also greatly optimized anyhow it will increase dependences list and
+   reduce portability.
+   Internally 'long double' is used for all calculations. If some platforms do
+   not support it then it can be eliminated by
    #define __NO_LONGDOUBLE__
 
-If positional parameters are not necessary then support for them can be
-disabled by
+   If positional parameters are not necessary then support for them can be
+   disabled by
    #define __NO_ARGPOS__
-In such case this code neither allocates memory nor extensively use stack
-as memory buffer. All conversions are done "on the fly". If memory
-allocations or stack size is not a problem then some parts can be easy
-optimized.
-*/
+   In such case this code neither allocates memory nor extensively use stack
+   as memory buffer. All conversions are done "on the fly". If memory
+   allocations or stack size is not a problem then some parts can be easy
+   optimized.
+ */
 
 
 /* #define __NO_DOUBLE__ */
@@ -97,11 +97,11 @@ optimized.
 #include "hbfloat.h"
 #include <stddef.h>
 
-#if defined( HB_LONG_DOUBLE_OFF ) && !defined( __NO_LONGDOUBLE__ )
+#if defined( HB_LONG_DOUBLE_OFF ) && ! defined( __NO_LONGDOUBLE__ )
 #  define __NO_LONGDOUBLE__
 #endif
 
-#if defined( HB_LONG_LONG_OFF ) && !defined( __NO_LONGLONG__ )
+#if defined( HB_LONG_LONG_OFF ) && ! defined( __NO_LONGLONG__ )
 #  define __NO_LONGLONG__
 #endif
 
@@ -111,133 +111,136 @@ optimized.
 /* few macros for some platform dependent floating point functions/macros */
 
 #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 ) || \
-    ( defined( __WATCOMC__ ) && __WATCOMC__ < 1270 ) || \
-    ( defined( __DJGPP__ ) && \
-      ( __DJGPP__ < 2 || ( __DJGPP__ == 2 && __DJGPP_MINOR__ <= 3 ) ) ) || \
-    ( defined( _MSC_VER ) && \
-      !( defined( __LCC__ ) || defined( __POCC__ ) || defined( __XCC__ ) ) )
-   /* TODO: add other C compilers which does not support [u]intmax_t
-    *       definitions (check C compiler version number).
-    *       If compiler supports stdint.h then it should be added
-    *       to hbdefs.h.
-    */
-#  define intmax_t      _x_longlong
-#  define uintmax_t     _x_ulonglong
+   ( defined( __WATCOMC__ ) && __WATCOMC__ < 1270 ) || \
+   ( defined( __DJGPP__ ) && \
+   ( __DJGPP__ < 2 || ( __DJGPP__ == 2 && __DJGPP_MINOR__ <= 3 ) ) ) || \
+   ( defined( _MSC_VER ) && \
+   ! ( defined( __LCC__ ) || defined( __POCC__ ) || defined( __XCC__ ) ) )
+/* TODO: add other C compilers which does not support [u]intmax_t
+ *       definitions (check C compiler version number).
+ *       If compiler supports stdint.h then it should be added
+ *       to hbdefs.h.
+ */
+#  define intmax_t   _x_longlong
+#  define uintmax_t  _x_ulonglong
 #endif
 
 
 #ifndef va_copy
 #  ifdef __va_copy
-#     define va_copy( dst, src )    __va_copy( dst, src )
+#     define va_copy( dst, src ) __va_copy( dst, src )
 #  else
-#     define va_copy( dst, src )    ( (dst) = (src) )
+#     define va_copy( dst, src ) ( ( dst ) = ( src ) )
 #  endif
 #endif
 
 
-#define _ARGBUF_SIZE    16
-#define _ARGBUF_ALLOC   16
+#define _ARGBUF_SIZE       16
+#define _ARGBUF_ALLOC      16
 
-#define _F_ALTERNATE    0x01  /* only for: o xX aA eE fF gG  */
-#define _F_ZEROPADED    0x02  /* only for: d i o u xX aA eE fF gG */
-#define _F_LEFTADJUSTED 0x04  /* clears _F_ZEROPADED */
-#define _F_SPACE        0x08  /* only for signed num conversions: d i fF aA eE gG */
-#define _F_SIGN         0x10  /* only for signed num conversions: d i fF aA eE gG, clears _F_SPACE */
+#define _F_ALTERNATE       0x01  /* only for: o xX aA eE fF gG  */
+#define _F_ZEROPADED       0x02  /* only for: d i o u xX aA eE fF gG */
+#define _F_LEFTADJUSTED    0x04  /* clears _F_ZEROPADED */
+#define _F_SPACE           0x08  /* only for signed num conversions: d i fF aA eE gG */
+#define _F_SIGN            0x10  /* only for signed num conversions: d i fF aA eE gG, clears _F_SPACE */
 
-#define _L_UNDEF_       0
-#define _L_CHAR_        1
-#define _L_SHORT_       2
-#define _L_LONG_        3
-#define _L_LONGLONG_    4
-#define _L_INTMAX_      5
-#define _L_SIZE_        6
-#define _L_PTRDIFF_     7
-#define _L_DOUBLE_      8
-#define _L_LONGDOUBLE_  9
+#define _L_UNDEF_          0
+#define _L_CHAR_           1
+#define _L_SHORT_          2
+#define _L_LONG_           3
+#define _L_LONGLONG_       4
+#define _L_INTMAX_         5
+#define _L_SIZE_           6
+#define _L_PTRDIFF_        7
+#define _L_DOUBLE_         8
+#define _L_LONGDOUBLE_     9
 
 #ifndef __NO_DOUBLE__
 #  ifdef __NO_LONGDOUBLE__
-#     define _x_long_dbl      double
-#     define _MODFD( x, p )   modf( x, p )
+#     define _x_long_dbl   double
+#     define _MODFD( x, p )      modf( x, p )
 #  else
-#     define _x_long_dbl      long double
+#     define _x_long_dbl   long double
 #     if defined( __WATCOMC__ ) || defined( __MINGW32CE__ ) || defined( __CYGWIN__ ) || \
-         defined( HB_OS_BEOS ) || defined( __OpenBSD__ ) || defined( __NetBSD__ ) || \
-         ( defined( HB_OS_WIN_CE ) && defined( __POCC__ ) )
+   defined( HB_OS_BEOS ) || defined( __OpenBSD__ ) || defined( __NetBSD__ ) || \
+   ( defined( HB_OS_WIN_CE ) && defined( __POCC__ ) )
 #        define _HB_WRAP_MODFL_
 #        define _MODFD( x, p )   _hb_modfl( x, p )
 #     else
 #        define _MODFD( x, p )   modfl( x, p )
 #     endif
 #  endif
-#  define _x_double           double
+#  define _x_double        double
 #else
-#  define _x_long_dbl         int
-#  define _x_double           int
+#  define _x_long_dbl      int
+#  define _x_double        int
 #endif
 #ifndef __NO_LONGLONG__
-#  define _x_longlong         LONGLONG
-#  define _x_ulonglong        ULONGLONG
+#  define _x_longlong      LONGLONG
+#  define _x_ulonglong     ULONGLONG
 #else
-#  define _x_longlong         long
-#  define _x_ulonglong        unsigned long
+#  define _x_longlong      long
+#  define _x_ulonglong     unsigned long
 #endif
-#define _x_int                int
-#define _x_uint               unsigned int
-#define _x_ulong              unsigned long
-#define _x_long               long
-#define _x_intmax_t           intmax_t
-#define _x_uintmax_t          uintmax_t
-#define _x_size_t             size_t
-#define _x_ptrdiff_t          ptrdiff_t
-#define _x_ptr                void *
-#define _x_str                char *
-#define _x_intptr             int *
+#define _x_int             int
+#define _x_uint            unsigned int
+#define _x_ulong           unsigned long
+#define _x_long            long
+#define _x_intmax_t        intmax_t
+#define _x_uintmax_t       uintmax_t
+#define _x_size_t          size_t
+#define _x_ptrdiff_t       ptrdiff_t
+#define _x_ptr             void *
+#define _x_str             char *
+#define _x_intptr          int *
 
-#define v_x_int         1
-#define v_x_uint        2
-#define v_x_long        3
-#define v_x_ulong       4
-#define v_x_longlong    5
-#define v_x_ulonglong   6
-#define v_x_intmax_t    7
-#define v_x_uintmax_t   8
-#define v_x_size_t      9
-#define v_x_ptrdiff_t   10
-#define v_x_ptr         11
-#define v_x_str         12
-#define v_x_intptr      13
-#define v_x_double      14
-#define v_x_long_dbl    15
+#define v_x_int            1
+#define v_x_uint           2
+#define v_x_long           3
+#define v_x_ulong          4
+#define v_x_longlong       5
+#define v_x_ulonglong      6
+#define v_x_intmax_t       7
+#define v_x_uintmax_t      8
+#define v_x_size_t         9
+#define v_x_ptrdiff_t      10
+#define v_x_ptr            11
+#define v_x_str            12
+#define v_x_intptr         13
+#define v_x_double         14
+#define v_x_long_dbl       15
 
-typedef union {
-   _x_int         as_x_int;
-   _x_uint        as_x_uint;
-   _x_long        as_x_long;
-   _x_ulong       as_x_ulong;
-   _x_longlong    as_x_longlong;
-   _x_ulonglong   as_x_ulonglong;
-   _x_intmax_t    as_x_intmax_t;
-   _x_uintmax_t   as_x_uintmax_t;
-   _x_size_t      as_x_size_t;
-   _x_ptrdiff_t   as_x_ptrdiff_t;
-   _x_ptr         as_x_ptr;
-   _x_str         as_x_str;
-   _x_intptr      as_x_intptr;
-   _x_double      as_x_double;
-   _x_long_dbl    as_x_long_dbl;
+typedef union
+{
+   _x_int as_x_int;
+   _x_uint as_x_uint;
+   _x_long as_x_long;
+   _x_ulong as_x_ulong;
+   _x_longlong as_x_longlong;
+   _x_ulonglong as_x_ulonglong;
+   _x_intmax_t as_x_intmax_t;
+   _x_uintmax_t as_x_uintmax_t;
+   _x_size_t as_x_size_t;
+   _x_ptrdiff_t as_x_ptrdiff_t;
+   _x_ptr as_x_ptr;
+   _x_str as_x_str;
+   _x_intptr as_x_intptr;
+   _x_double as_x_double;
+   _x_long_dbl as_x_long_dbl;
 } x_type;
 
-typedef struct {
-   int      id;
-   x_type   value;
+typedef struct
+{
+   int id;
+   x_type value;
 } v_param;
 
-typedef struct {
-   int         maxarg;
-   int         size;
-   BOOL        repeat;
-   v_param *   arglst;
+typedef struct
+{
+   int maxarg;
+   int size;
+   BOOL repeat;
+   v_param * arglst;
 } v_paramlst;
 
 #ifdef __NO_ARGPOS__
@@ -249,7 +252,7 @@ typedef struct {
  * so we will use only this simple macro which ignores parameter
  * positions.
  */
-#define va_arg_n( va, type, n )     va_arg( va, type )
+#define va_arg_n( va, type, n ) va_arg( va, type )
 
 /* on some systems where each parameter allocates memory with
  * the same size in function stack frame this simple macro can
@@ -257,7 +260,7 @@ typedef struct {
  */
 
 /*
-#define va_arg_n( va, type, n )     \
+   #define va_arg_n( va, type, n )     \
    ( { \
       type result; \
       if( n == 0 ) \
@@ -274,13 +277,13 @@ typedef struct {
       } \
       result; \
    } )
-*/
+ */
 
 #else
 
 #define va_arg_n( va, type, n )     \
-               ( n == 0 ? va_arg( va, type ) : \
-                          va_arg_get( n, &params, v##type )->value.as##type )
+   ( n == 0 ? va_arg( va, type ) : \
+     va_arg_get( n, &params, v##type )->value.as##type )
 
 static v_param * va_arg_get( int iArg, v_paramlst * plst, int iType )
 {
@@ -300,11 +303,11 @@ static v_param * va_arg_get( int iArg, v_paramlst * plst, int iType )
          plst->size = iArg + _ARGBUF_ALLOC;
          if( prev_size == _ARGBUF_SIZE )
             plst->arglst = ( v_param * ) HB_MEMCPY( hb_xgrab( plst->size * sizeof( v_param ) ),
-                                                 plst->arglst, _ARGBUF_SIZE * sizeof( v_param ) );
+                                                    plst->arglst, _ARGBUF_SIZE * sizeof( v_param ) );
          else
             plst->arglst = ( v_param * ) hb_xrealloc( plst->arglst, plst->size * sizeof( v_param ) );
          memset( &plst->arglst[ prev_size ], 0, ( plst->size - prev_size ) *
-                                                  sizeof( v_param ) );
+                 sizeof( v_param ) );
       }
       plst->arglst[ iArg - 1 ].id = iType;
    }
@@ -314,55 +317,56 @@ static v_param * va_arg_get( int iArg, v_paramlst * plst, int iType )
 static void va_arg_fill( v_paramlst * plst, va_list va )
 {
    int iArg;
+
    for( iArg = 0; iArg < plst->maxarg; ++iArg )
    {
       switch( plst->arglst[ iArg ].id )
       {
          case v_x_uint:
-             plst->arglst[ iArg ].value.as_x_uint = va_arg( va, _x_uint );
-             break;
+            plst->arglst[ iArg ].value.as_x_uint      = va_arg( va, _x_uint );
+            break;
          case v_x_long:
-             plst->arglst[ iArg ].value.as_x_long = va_arg( va, _x_long );
-             break;
+            plst->arglst[ iArg ].value.as_x_long      = va_arg( va, _x_long );
+            break;
          case v_x_ulong:
-             plst->arglst[ iArg ].value.as_x_ulong = va_arg( va, _x_ulong );
-             break;
+            plst->arglst[ iArg ].value.as_x_ulong     = va_arg( va, _x_ulong );
+            break;
          case v_x_longlong:
-             plst->arglst[ iArg ].value.as_x_longlong = va_arg( va, _x_longlong );
-             break;
+            plst->arglst[ iArg ].value.as_x_longlong  = va_arg( va, _x_longlong );
+            break;
          case v_x_ulonglong:
-             plst->arglst[ iArg ].value.as_x_ulonglong = va_arg( va, _x_ulonglong );
-             break;
+            plst->arglst[ iArg ].value.as_x_ulonglong = va_arg( va, _x_ulonglong );
+            break;
          case v_x_intmax_t:
-             plst->arglst[ iArg ].value.as_x_intmax_t = va_arg( va, _x_intmax_t );
-             break;
+            plst->arglst[ iArg ].value.as_x_intmax_t  = va_arg( va, _x_intmax_t );
+            break;
          case v_x_uintmax_t:
-             plst->arglst[ iArg ].value.as_x_uintmax_t = va_arg( va, _x_uintmax_t );
-             break;
+            plst->arglst[ iArg ].value.as_x_uintmax_t = va_arg( va, _x_uintmax_t );
+            break;
          case v_x_size_t:
-             plst->arglst[ iArg ].value.as_x_size_t = va_arg( va, _x_size_t );
-             break;
+            plst->arglst[ iArg ].value.as_x_size_t    = va_arg( va, _x_size_t );
+            break;
          case v_x_ptrdiff_t:
-             plst->arglst[ iArg ].value.as_x_ptrdiff_t = va_arg( va, _x_ptrdiff_t );
-             break;
+            plst->arglst[ iArg ].value.as_x_ptrdiff_t = va_arg( va, _x_ptrdiff_t );
+            break;
          case v_x_ptr:
-             plst->arglst[ iArg ].value.as_x_ptr = va_arg( va, _x_ptr );
-             break;
+            plst->arglst[ iArg ].value.as_x_ptr       = va_arg( va, _x_ptr );
+            break;
          case v_x_str:
-             plst->arglst[ iArg ].value.as_x_str = va_arg( va, _x_str );
-             break;
+            plst->arglst[ iArg ].value.as_x_str       = va_arg( va, _x_str );
+            break;
          case v_x_intptr:
-             plst->arglst[ iArg ].value.as_x_intptr = va_arg( va, _x_intptr );
-             break;
+            plst->arglst[ iArg ].value.as_x_intptr    = va_arg( va, _x_intptr );
+            break;
          case v_x_double:
-             plst->arglst[ iArg ].value.as_x_double = va_arg( va, _x_double );
-             break;
+            plst->arglst[ iArg ].value.as_x_double    = va_arg( va, _x_double );
+            break;
          case v_x_long_dbl:
-             plst->arglst[ iArg ].value.as_x_long_dbl = va_arg( va, _x_long_dbl );
-             break;
+            plst->arglst[ iArg ].value.as_x_long_dbl  = va_arg( va, _x_long_dbl );
+            break;
          default:
-             plst->arglst[ iArg ].value.as_x_int = va_arg( va, _x_int );
-             break;
+            plst->arglst[ iArg ].value.as_x_int       = va_arg( va, _x_int );
+            break;
       }
    }
 }
@@ -371,28 +375,29 @@ static void va_arg_fill( v_paramlst * plst, va_list va )
 #ifdef _HB_WRAP_MODFL_
 _x_long_dbl _hb_modfl( _x_long_dbl x, _x_long_dbl * p )
 {
-   _x_double pd;
+   _x_double   pd;
    _x_long_dbl r = modf( x, &pd );
+
    *p = pd;
    return r;
 }
 #endif
 
-static char get_decimal( char c, const char **format, int *result )
+static char get_decimal( char c, const char ** format, int * result )
 {
    *result = c - '0';
-   while( ( c = *(*format)++ ) >= '0' && c <= '9' )
+   while( ( c = *( *format )++ ) >= '0' && c <= '9' )
       *result = *result * 10 + ( c - '0' );
 
    return c;
 }
 
-static size_t put_octal( char *buffer, size_t bufsize, size_t size,
+static size_t put_octal( char * buffer, size_t bufsize, size_t size,
                          uintmax_t value, int flags, int width, int precision )
 {
-   uintmax_t v = value;
-   int nums = 0, n;
-   char c;
+   uintmax_t   v     = value;
+   int         nums  = 0, n;
+   char        c;
 
    while( v )
    {
@@ -422,7 +427,7 @@ static size_t put_octal( char *buffer, size_t bufsize, size_t size,
       n = nums;
       do
       {
-         c = ( char ) ( value & 0x7 ) + '0';
+         c     = ( char ) ( value & 0x7 ) + '0';
          value >>= 3;
          --n;
          if( size + n < bufsize )
@@ -442,13 +447,13 @@ static size_t put_octal( char *buffer, size_t bufsize, size_t size,
    return size;
 }
 
-static size_t put_dec( char *buffer, size_t bufsize, size_t size,
+static size_t put_dec( char * buffer, size_t bufsize, size_t size,
                        uintmax_t value, int flags, int width, int precision,
                        int sign )
 {
-   uintmax_t v = value;
-   int nums = 0, n;
-   char c;
+   uintmax_t   v     = value;
+   int         nums  = 0, n;
+   char        c;
 
    while( v )
    {
@@ -487,7 +492,7 @@ static size_t put_dec( char *buffer, size_t bufsize, size_t size,
       n = nums;
       do
       {
-         c = ( char ) ( value % 10 ) + '0';
+         c     = ( char ) ( value % 10 ) + '0';
          value /= 10;
          --n;
          if( size + n < bufsize )
@@ -508,18 +513,18 @@ static size_t put_dec( char *buffer, size_t bufsize, size_t size,
 }
 
 #ifndef __NO_DOUBLE__
-static size_t put_dbl( char *buffer, size_t bufsize, size_t size,
+static size_t put_dbl( char * buffer, size_t bufsize, size_t size,
                        _x_long_dbl value, int flags, int width, int precision )
 {
    _x_long_dbl dInt, dFract;
-   int sign, nums = 0, n;
-   char c;
+   int         sign, nums = 0, n;
+   char        c;
 
    if( precision < 0 )
       precision = 6;
    sign = hb_signbit( value );
    if( sign )
-      value = - value;
+      value = -value;
 
    /* Round the number to given precision.
     * powl() is of course faster when precision is big but it is libm
@@ -527,17 +532,17 @@ static size_t put_dbl( char *buffer, size_t bufsize, size_t size,
     * calculate it in a loop
     */
 #if 0
-   value += _POWD( 10, -precision ) / 2;
+   value    += _POWD( 10, -precision ) / 2;
 #else
-   n = precision;
-   dFract = 1;
+   n        = precision;
+   dFract   = 1;
    while( --n >= 0 )
       dFract /= 10;
-   value += dFract / 2;
+   value    += dFract / 2;
 #endif
 
-   dFract = _MODFD( value, &dInt );
-   width -= precision;
+   dFract   = _MODFD( value, &dInt );
+   width    -= precision;
    if( ( flags & ( _F_SPACE | _F_SIGN ) ) || sign )
       width--;
    if( precision > 0 || ( flags & _F_ALTERNATE ) )
@@ -550,8 +555,8 @@ static size_t put_dbl( char *buffer, size_t bufsize, size_t size,
    }
    while( value >= 1 );
    width -= nums;
-   c = ( ( flags & ( _F_SPACE | _F_SIGN ) ) || sign ) ?
-       ( buffer[ size ] = sign ? '-' : ( flags & _F_SIGN ? '+' : ' ' ) ) : 0;
+   c     = ( ( flags & ( _F_SPACE | _F_SIGN ) ) || sign ) ?
+           ( buffer[ size ] = sign ? '-' : ( flags & _F_SIGN ? '+' : ' ' ) ) : 0;
    if( ( flags & _F_LEFTADJUSTED ) == 0 && width > 0 )
    {
       if( c && ( flags & _F_ZEROPADED ) )
@@ -580,7 +585,7 @@ static size_t put_dbl( char *buffer, size_t bufsize, size_t size,
    do
    {
       value = _MODFD( dInt / 10 + 0.01, &dInt ) * 10;
-      c = '0' + ( char ) ( value + 0.01 );
+      c     = '0' + ( char ) ( value + 0.01 );
       --n;
       if( size + n < bufsize )
          buffer[ size + n ] = c;
@@ -595,8 +600,8 @@ static size_t put_dbl( char *buffer, size_t bufsize, size_t size,
       ++size;
       while( precision > 0 )
       {
-         dFract = _MODFD( dFract * 10, &dInt );
-         c = '0' + ( char ) ( dInt + 0.01 );
+         dFract   = _MODFD( dFract * 10, &dInt );
+         c        = '0' + ( char ) ( dInt + 0.01 );
          if( size < bufsize )
             buffer[ size ] = c;
          ++size;
@@ -615,13 +620,13 @@ static size_t put_dbl( char *buffer, size_t bufsize, size_t size,
 }
 #endif
 
-static size_t put_hex( char *buffer, size_t bufsize, size_t size,
+static size_t put_hex( char * buffer, size_t bufsize, size_t size,
                        uintmax_t value, int flags, int width, int precision,
                        int upper )
 {
-   uintmax_t v = value;
-   int nums = 0, n;
-   char c;
+   uintmax_t   v     = value;
+   int         nums  = 0, n;
+   char        c;
 
    while( v )
    {
@@ -670,7 +675,7 @@ static size_t put_hex( char *buffer, size_t bufsize, size_t size,
       n = nums;
       do
       {
-         c = ( char ) ( value & 0x0f ) + '0';
+         c     = ( char ) ( value & 0x0f ) + '0';
          if( c > '9' )
             c += upper ? 'A' - '9' - 1 : 'a' - '9' - 1;
          value >>= 4;
@@ -692,10 +697,10 @@ static size_t put_hex( char *buffer, size_t bufsize, size_t size,
    return size;
 }
 
-static size_t put_str( char *buffer, size_t bufsize, size_t size,
+static size_t put_str( char * buffer, size_t bufsize, size_t size,
                        const char * str, int flags, int width, int precision )
 {
-   if( !str )
+   if( ! str )
       str = "(null)";
    if( precision < 0 )
       precision = ( int ) strlen( str );
@@ -703,13 +708,14 @@ static size_t put_str( char *buffer, size_t bufsize, size_t size,
       precision = ( int ) hb_strnlen( str, precision );
 
    width -= precision;
-   if( ( flags & _F_LEFTADJUSTED ) == 0 ) while( width > 0 )
-   {
-      if( size < bufsize )
-         buffer[ size ] = ' ';
-      ++size;
-      --width;
-   }
+   if( ( flags & _F_LEFTADJUSTED ) == 0 )
+      while( width > 0 )
+      {
+         if( size < bufsize )
+            buffer[ size ] = ' ';
+         ++size;
+         --width;
+      }
    while( precision > 0 )
    {
       if( size < bufsize )
@@ -730,16 +736,16 @@ static size_t put_str( char *buffer, size_t bufsize, size_t size,
 
 int hb_printf_params( const char * format )
 {
-   int iParam = 0, iMax = 0;
-   char c;
+   int   iParam = 0, iMax = 0;
+   char  c;
 
    do
    {
       c = *format++;
       if( c == '%' )
       {
-         const char * pattern = format;
-         int value, param = 0;
+         const char *   pattern = format;
+         int            value, param = 0;
 
          c = *format++;
          if( c != 0 && c != '%' )
@@ -747,30 +753,31 @@ int hb_printf_params( const char * format )
             /* parameter position */
             if( c >= '0' && c <= '9' )
             {
-               c = get_decimal( c, &format, &param );
+               c  = get_decimal( c, &format, &param );
                if( c != '$' )
                   format = pattern;
-               c = *format++;
+               c  = *format++;
             }
 
             /* flags */
             value = 0;
-            while( !value ) switch( c )
-            {
-               case '#':
-               case '0':
-               case '-':
-               case ' ':
-               case '+':
+            while( ! value )
+               switch( c )
+               {
+                  case '#':
+                  case '0':
+                  case '-':
+                  case ' ':
+                  case '+':
 #ifdef _SUSV2_COMPAT_
-               case '\'':  /* group with locale thousands' grouping characters */
+                  case '\'': /* group with locale thousands' grouping characters */
 #endif
-                  c = *format++;
-                  break;
-               default:
-                  value = 1;
-                  break;
-            }
+                     c     = *format++;
+                     break;
+                  default:
+                     value = 1;
+                     break;
+               }
 
             /* field width */
             if( c == '*' )
@@ -832,36 +839,36 @@ int hb_printf_params( const char * format )
                      c = *format++;
                   break;
                case 'L':
-                  c = *format++;
+                  c  = *format++;
                   break;
                case 'j':
-                  c = *format++;
+                  c  = *format++;
                   break;
                case 'z':
-                  c = *format++;
+                  c  = *format++;
                   break;
                case 't':
-                  c = *format++;
+                  c  = *format++;
                   break;
                case 'I':   /* MS-Windows extension */
                   if( format[ 0 ] == '6' && format[ 1 ] == '4' )
                   {
-                     format += 2;
-                     c = *format++;
+                     format   += 2;
+                     c        = *format++;
                      break;
                   }
                   else if( format[ 0 ] == '1' && format[ 1 ] == '6' )
                   {
-                     format += 2;
-                     c = *format++;
+                     format   += 2;
+                     c        = *format++;
                      break;
                   }
                   else if( format[ 0 ] == '3' && format[ 1 ] == '2' )
                   {
-                     format += 2;
-                     c = *format++;
+                     format   += 2;
+                     c        = *format++;
                   }
-                  /* no break; */
+               /* no break; */
                default:
                   break;
             }
@@ -897,8 +904,8 @@ int hb_printf_params( const char * format )
                case '%':   /* store % consuming arguments % */
                   break;
                default:    /* error, wrong format, store pattern */
-                  format = pattern;
-                  c = '%';
+                  format   = pattern;
+                  c        = '%';
                   break;
             }
          }
@@ -911,17 +918,18 @@ int hb_printf_params( const char * format )
 
 int hb_vsnprintf( char * buffer, size_t bufsize, const char * format, va_list ap )
 {
-   va_list args;
-   size_t size;
-   char c;
-#ifndef __NO_ARGPOS__
-   const char * fmt_start = format;
-   v_param argbuf[ _ARGBUF_SIZE ];
-   v_paramlst params;
+   va_list        args;
+   size_t         size;
+   char           c;
 
-   params.size = _ARGBUF_SIZE;
-   params.maxarg = 0;
-   params.arglst = argbuf;
+#ifndef __NO_ARGPOS__
+   const char *   fmt_start = format;
+   v_param        argbuf[ _ARGBUF_SIZE ];
+   v_paramlst     params;
+
+   params.size    = _ARGBUF_SIZE;
+   params.maxarg  = 0;
+   params.arglst  = argbuf;
 #endif
 
 
@@ -937,57 +945,58 @@ int hb_vsnprintf( char * buffer, size_t bufsize, const char * format, va_list ap
       }
       format = fmt_start;
 #endif
-      va_copy( args, ap );
-      size = 0;
+   va_copy( args, ap );
+   size = 0;
 
-      do
+   do
+   {
+      c = *format++;
+      if( c == '%' )
       {
+         const char * pattern = format;
+
          c = *format++;
-         if( c == '%' )
+         if( c != 0 && c != '%' )
          {
-            const char * pattern = format;
+            /* decode pattern */
+            v_param  argval;
+            int      param = 0, flags = 0, width = -1, precision = -1, length,
+                     value, stop = 0;
 
-            c = *format++;
-            if( c != 0 && c != '%' )
+            /* parameter position */
+            if( c >= '0' && c <= '9' )
             {
-               /* decode pattern */
-               v_param argval;
-               int param = 0, flags = 0, width = -1, precision = -1, length,
-                   value, stop = 0;
+               c = get_decimal( c, &format, &value );
+               if( c == '$' )
+                  param = value;
+               else
+                  format = pattern;
+               c = *format++;
+            }
 
-               /* parameter position */
-               if( c >= '0' && c <= '9' )
-               {
-                  c = get_decimal( c, &format, &value );
-                  if( c == '$' )
-                     param = value;
-                  else
-                     format = pattern;
-                  c = *format++;
-               }
-
-               /* flags */
-               while( !stop ) switch( c )
+            /* flags */
+            while( ! stop )
+               switch( c )
                {
                   case '#':
                      flags |= _F_ALTERNATE;
-                     c = *format++;
+                     c     = *format++;
                      break;
                   case '0':
                      flags |= _F_ZEROPADED;
-                     c = *format++;
+                     c     = *format++;
                      break;
                   case '-':
                      flags |= _F_LEFTADJUSTED;
-                     c = *format++;
+                     c     = *format++;
                      break;
                   case ' ':
                      flags |= _F_SPACE;
-                     c = *format++;
+                     c     = *format++;
                      break;
                   case '+':
                      flags |= _F_SIGN;
-                     c = *format++;
+                     c     = *format++;
                      break;
 #ifdef _SUSV2_COMPAT_
                   case '\'':  /* group with locale thousands' grouping characters */
@@ -999,7 +1008,31 @@ int hb_vsnprintf( char * buffer, size_t bufsize, const char * format, va_list ap
                      break;
                }
 
-               /* field width */
+            /* field width */
+            if( c == '*' )
+            {
+               c = *format++;
+               if( c >= '0' && c <= '9' )
+               {
+                  c = get_decimal( c, &format, &value );
+                  if( c == '$' )
+                  {
+                     width = va_arg_n( args, _x_int, value );
+                     c     = *format++;
+                  }
+                  /* else error, wrong format */
+               }
+               else
+                  width = va_arg_n( args, _x_int, 0 );
+            }
+            else if( c >= '0' && c <= '9' )
+               c = get_decimal( c, &format, &width );
+
+            /* precision */
+            if( c == '.' )
+            {
+               precision   = 0;
+               c           = *format++;
                if( c == '*' )
                {
                   c = *format++;
@@ -1008,286 +1041,264 @@ int hb_vsnprintf( char * buffer, size_t bufsize, const char * format, va_list ap
                      c = get_decimal( c, &format, &value );
                      if( c == '$' )
                      {
-                        width = va_arg_n( args, _x_int, value );
-                        c = *format++;
+                        precision   = va_arg_n( args, _x_int, value );
+                        c           = *format++;
                      }
                      /* else error, wrong format */
                   }
                   else
-                     width = va_arg_n( args, _x_int, 0 );
+                     precision = va_arg_n( args, _x_int, 0 );
                }
                else if( c >= '0' && c <= '9' )
-                  c = get_decimal( c, &format, &width );
+                  c = get_decimal( c, &format, &precision );
+            }
 
-               /* precision */
-               if( c == '.' )
-               {
-                  precision = 0;
+            /* length modifier */
+            switch( c )
+            {
+               case 'h':
                   c = *format++;
-                  if( c == '*' )
+                  if( c == 'h' )
                   {
-                     c = *format++;
-                     if( c >= '0' && c <= '9' )
-                     {
-                        c = get_decimal( c, &format, &value );
-                        if( c == '$' )
-                        {
-                           precision = va_arg_n( args, _x_int, value );
-                           c = *format++;
-                        }
-                        /* else error, wrong format */
-                     }
-                     else
-                        precision = va_arg_n( args, _x_int, 0 );
+                     length   = _L_CHAR_;
+                     c        = *format++;
                   }
-                  else if( c >= '0' && c <= '9' )
-                     c = get_decimal( c, &format, &precision );
-               }
+                  else
+                     length = _L_SHORT_;
+                  break;
+               case 'l':
+                  c = *format++;
+                  if( c == 'l' )
+                  {
+                     length   = _L_LONGLONG_;
+                     c        = *format++;
+                  }
+                  else
+                     length = _L_LONG_;
+                  break;
+               case 'L':
+                  length   = _L_LONGDOUBLE_;
+                  c        = *format++;
+                  break;
+               case 'j':
+                  length   = _L_INTMAX_;
+                  c        = *format++;
+                  break;
+               case 'z':
+                  length   = _L_SIZE_;
+                  c        = *format++;
+                  break;
+               case 't':
+                  length   = _L_PTRDIFF_;
+                  c        = *format++;
+                  break;
+               case 'I':      /* MS-Windows extension */
+                  if( format[ 0 ] == '6' && format[ 1 ] == '4' )
+                  {
+                     length   = _L_LONGLONG_;
+                     format   += 2;
+                     c        = *format++;
+                     break;
+                  }
+                  else if( format[ 0 ] == '1' && format[ 1 ] == '6' )
+                  {
+                     length   = _L_SHORT_;
+                     format   += 2;
+                     c        = *format++;
+                     break;
+                  }
+                  else if( format[ 0 ] == '3' && format[ 1 ] == '2' )
+                  {
+                     format   += 2;
+                     c        = *format++;
+                  }
+               /* no break; */
+               default:
+                  length = _L_UNDEF_;
+                  break;
+            }
 
-               /* length modifier */
-               switch( c )
-               {
-                  case 'h':
-                     c = *format++;
-                     if( c == 'h' )
-                     {
-                        length = _L_CHAR_;
-                        c = *format++;
-                     }
-                     else
-                        length = _L_SHORT_;
-                     break;
-                  case 'l':
-                     c = *format++;
-                     if( c == 'l' )
-                     {
-                        length = _L_LONGLONG_;
-                        c = *format++;
-                     }
-                     else
-                        length = _L_LONG_;
-                     break;
-                  case 'L':
-                     length = _L_LONGDOUBLE_;
-                     c = *format++;
-                     break;
-                  case 'j':
-                     length = _L_INTMAX_;
-                     c = *format++;
-                     break;
-                  case 'z':
-                     length = _L_SIZE_;
-                     c = *format++;
-                     break;
-                  case 't':
-                     length = _L_PTRDIFF_;
-                     c = *format++;
-                     break;
-                  case 'I':   /* MS-Windows extension */
-                     if( format[ 0 ] == '6' && format[ 1 ] == '4' )
-                     {
-                        length = _L_LONGLONG_;
-                        format += 2;
-                        c = *format++;
-                        break;
-                     }
-                     else if( format[ 0 ] == '1' && format[ 1 ] == '6' )
-                     {
-                        length = _L_SHORT_;
-                        format += 2;
-                        c = *format++;
-                        break;
-                     }
-                     else if( format[ 0 ] == '3' && format[ 1 ] == '2' )
-                     {
-                        format += 2;
-                        c = *format++;
-                     }
-                     /* no break; */
-                  default:
-                     length = _L_UNDEF_;
-                     break;
-               }
-
-               /* conversion specifier */
-               switch( c )
-               {
+            /* conversion specifier */
+            switch( c )
+            {
 #ifndef __NO_DOUBLE__
-                  case 'a':
-                  case 'A':
-                  case 'e':
-                  case 'E':
-                  case 'g':
-                  case 'G':
-                     /* redirect above conversion to 'f' or 'F' type to keep
-                      * valid parameters order
-                      */
-                     c = ( c == 'a' || c == 'e' || c == 'g' ) ? 'f' : 'F';
-                     /* no break; */
-                  case 'f':   /* double decimal notation */
-                  case 'F':   /* double decimal notation */
-                     if( length == _L_LONGDOUBLE_ )
-                     {
-                        argval.value.as_x_long_dbl = va_arg_n( args, _x_long_dbl, param );
-                        HB_NUMTYPEL( value, argval.value.as_x_long_dbl );
-                     }
-                     else
-                     {
-                        double d = va_arg_n( args, _x_double, param );
-                        HB_NUMTYPE( value, d );
-                        argval.value.as_x_long_dbl =
-                           ( value & ( _HB_NUM_NAN | _HB_NUM_PINF | _HB_NUM_NINF ) ) == 0 ? d : 0;
-                     }
-                     if( value & _HB_NUM_NAN )
-                        size = put_str( buffer, bufsize, size,
-                                        c == 'f' ?
-                                        ( flags & _F_SIGN ? "+nan": "nan" ) :
-                                        ( flags & _F_SIGN ? "+NAN": "NAN" ) ,
-                                        flags, width, -1 );
-                     else if( value & _HB_NUM_PINF )
-                        size = put_str( buffer, bufsize, size,
-                                        c == 'f' ?
-                                        ( flags & _F_SIGN ? "+inf": "inf" ) :
-                                        ( flags & _F_SIGN ? "+INF": "INF" ),
-                                        flags, width, -1 );
-                     else if( value & _HB_NUM_NINF )
-                        size = put_str( buffer, bufsize, size,
-                                        c == 'f' ? "-inf" : "-INF",
-                                        flags, width, -1 );
-                     else
-                        size = put_dbl( buffer, bufsize, size, argval.value.as_x_long_dbl,
-                                        flags, width, precision );
-                     continue;
+               case 'a':
+               case 'A':
+               case 'e':
+               case 'E':
+               case 'g':
+               case 'G':
+                  /* redirect above conversion to 'f' or 'F' type to keep
+                   * valid parameters order
+                   */
+                  c = ( c == 'a' || c == 'e' || c == 'g' ) ? 'f' : 'F';
+               /* no break; */
+               case 'f':      /* double decimal notation */
+               case 'F':      /* double decimal notation */
+                  if( length == _L_LONGDOUBLE_ )
+                  {
+                     argval.value.as_x_long_dbl = va_arg_n( args, _x_long_dbl, param );
+                     HB_NUMTYPEL( value, argval.value.as_x_long_dbl );
+                  }
+                  else
+                  {
+                     double d = va_arg_n( args, _x_double, param );
+                     HB_NUMTYPE( value, d );
+                     argval.value.as_x_long_dbl =
+                        ( value & ( _HB_NUM_NAN | _HB_NUM_PINF | _HB_NUM_NINF ) ) == 0 ? d : 0;
+                  }
+                  if( value & _HB_NUM_NAN )
+                     size = put_str( buffer, bufsize, size,
+                                     c == 'f' ?
+                                     ( flags & _F_SIGN ? "+nan" : "nan" ) :
+                                     ( flags & _F_SIGN ? "+NAN" : "NAN" ),
+                                     flags, width, -1 );
+                  else if( value & _HB_NUM_PINF )
+                     size = put_str( buffer, bufsize, size,
+                                     c == 'f' ?
+                                     ( flags & _F_SIGN ? "+inf" : "inf" ) :
+                                     ( flags & _F_SIGN ? "+INF" : "INF" ),
+                                     flags, width, -1 );
+                  else if( value & _HB_NUM_NINF )
+                     size = put_str( buffer, bufsize, size,
+                                     c == 'f' ? "-inf" : "-INF",
+                                     flags, width, -1 );
+                  else
+                     size = put_dbl( buffer, bufsize, size, argval.value.as_x_long_dbl,
+                                     flags, width, precision );
+                  continue;
 #endif
-                  case 'd':
-                  case 'i':   /* signed int decimal conversion */
-                     if( length == _L_CHAR_ )
-                        argval.value.as_x_intmax_t = ( unsigned char ) va_arg_n( args, _x_int, param );
-                     else if( length == _L_SHORT_ )
-                        argval.value.as_x_intmax_t = ( unsigned short ) va_arg_n( args, _x_int, param );
-                     else if( length == _L_LONG_ )
-                        argval.value.as_x_intmax_t = va_arg_n( args, _x_long, param );
-                     else if( length == _L_LONGLONG_ )
-                        argval.value.as_x_intmax_t = va_arg_n( args, _x_longlong, param );
-                     else if( length == _L_INTMAX_ )
-                        argval.value.as_x_intmax_t = va_arg_n( args, _x_intmax_t, param );
-                     else if( length == _L_SIZE_ )
-                        argval.value.as_x_intmax_t = va_arg_n( args, _x_size_t, param );
-                     else if( length == _L_PTRDIFF_ )
-                        argval.value.as_x_intmax_t = va_arg_n( args, _x_ptrdiff_t, param );
-                     else
-                        argval.value.as_x_intmax_t = va_arg_n( args, _x_int, param );
-                     value = argval.value.as_x_intmax_t < 0;
-                     argval.value.as_x_uintmax_t = value ? -argval.value.as_x_intmax_t :
-                                                            argval.value.as_x_intmax_t;
-                     size = put_dec( buffer, bufsize, size, argval.value.as_x_uintmax_t,
-                                     flags, width, precision, value );
-                     continue;
-                  case 'o':   /* unsigned int octal conversion */
-                  case 'u':   /* unsigned int decimal conversion */
-                  case 'x':   /* unsigned int hexadecimal conversion */
-                  case 'X':   /* unsigned int hexadecimal conversion */
-                     if( length == _L_CHAR_ )
-                        argval.value.as_x_uintmax_t = ( unsigned char ) va_arg_n( args, _x_int, param );
-                     else if( length == _L_SHORT_ )
-                        argval.value.as_x_uintmax_t = ( unsigned short ) va_arg_n( args, _x_int, param );
-                     else if( length == _L_LONG_ )
-                        argval.value.as_x_uintmax_t = va_arg_n( args, _x_ulong, param );
-                     else if( length == _L_LONGLONG_ )
-                        argval.value.as_x_uintmax_t = va_arg_n( args, _x_ulonglong, param );
-                     else if( length == _L_INTMAX_ )
-                        argval.value.as_x_uintmax_t = va_arg_n( args, _x_uintmax_t, param );
-                     else if( length == _L_SIZE_ )
-                        argval.value.as_x_uintmax_t = va_arg_n( args, _x_size_t, param );
-                     else if( length == _L_PTRDIFF_ )
-                        argval.value.as_x_uintmax_t = va_arg_n( args, _x_ptrdiff_t, param );
-                     else
-                        argval.value.as_x_uintmax_t = va_arg_n( args, _x_uint, param );
+               case 'd':
+               case 'i':      /* signed int decimal conversion */
+                  if( length == _L_CHAR_ )
+                     argval.value.as_x_intmax_t = ( unsigned char ) va_arg_n( args, _x_int, param );
+                  else if( length == _L_SHORT_ )
+                     argval.value.as_x_intmax_t = ( unsigned short ) va_arg_n( args, _x_int, param );
+                  else if( length == _L_LONG_ )
+                     argval.value.as_x_intmax_t = va_arg_n( args, _x_long, param );
+                  else if( length == _L_LONGLONG_ )
+                     argval.value.as_x_intmax_t = va_arg_n( args, _x_longlong, param );
+                  else if( length == _L_INTMAX_ )
+                     argval.value.as_x_intmax_t = va_arg_n( args, _x_intmax_t, param );
+                  else if( length == _L_SIZE_ )
+                     argval.value.as_x_intmax_t = va_arg_n( args, _x_size_t, param );
+                  else if( length == _L_PTRDIFF_ )
+                     argval.value.as_x_intmax_t = va_arg_n( args, _x_ptrdiff_t, param );
+                  else
+                     argval.value.as_x_intmax_t = va_arg_n( args, _x_int, param );
+                  value                         = argval.value.as_x_intmax_t < 0;
+                  argval.value.as_x_uintmax_t   = value ? -argval.value.as_x_intmax_t :
+                                                  argval.value.as_x_intmax_t;
+                  size                          = put_dec( buffer, bufsize, size, argval.value.as_x_uintmax_t,
+                                                           flags, width, precision, value );
+                  continue;
+               case 'o':      /* unsigned int octal conversion */
+               case 'u':      /* unsigned int decimal conversion */
+               case 'x':      /* unsigned int hexadecimal conversion */
+               case 'X':      /* unsigned int hexadecimal conversion */
+                  if( length == _L_CHAR_ )
+                     argval.value.as_x_uintmax_t = ( unsigned char ) va_arg_n( args, _x_int, param );
+                  else if( length == _L_SHORT_ )
+                     argval.value.as_x_uintmax_t = ( unsigned short ) va_arg_n( args, _x_int, param );
+                  else if( length == _L_LONG_ )
+                     argval.value.as_x_uintmax_t = va_arg_n( args, _x_ulong, param );
+                  else if( length == _L_LONGLONG_ )
+                     argval.value.as_x_uintmax_t = va_arg_n( args, _x_ulonglong, param );
+                  else if( length == _L_INTMAX_ )
+                     argval.value.as_x_uintmax_t = va_arg_n( args, _x_uintmax_t, param );
+                  else if( length == _L_SIZE_ )
+                     argval.value.as_x_uintmax_t = va_arg_n( args, _x_size_t, param );
+                  else if( length == _L_PTRDIFF_ )
+                     argval.value.as_x_uintmax_t = va_arg_n( args, _x_ptrdiff_t, param );
+                  else
+                     argval.value.as_x_uintmax_t = va_arg_n( args, _x_uint, param );
 
-                     if( c == 'o' )
-                        size = put_octal( buffer, bufsize, size, argval.value.as_x_uintmax_t,
-                                          flags, width, precision );
-                     else if( c == 'u' )
-                        size = put_dec( buffer, bufsize, size, argval.value.as_x_uintmax_t,
-                                        flags & ~( _F_SPACE | _F_SIGN ),
-                                        width, precision, 0 );
-                     else
-                        size = put_hex( buffer, bufsize, size, argval.value.as_x_uintmax_t,
-                                        flags, width, precision, c == 'X' );
-                     continue;
-                  case 'p':   /* void * pointer */
-                     argval.value.as_x_ptr = va_arg_n( args, _x_ptr, param );
-                     if( argval.value.as_x_ptr )
-                        size = put_hex( buffer, bufsize, size, ( HB_PTRUINT ) argval.value.as_x_ptr,
-                                        flags | _F_ALTERNATE, width, precision, 0 );
-                     else
-                        size = put_str( buffer, bufsize, size, "(nil)",
-                                        flags, width, -1 );
-                     continue;
-                  case 'c':   /* signed int casted to unsigned char */
-                     if( ( flags & _F_LEFTADJUSTED ) == 0 ) while( --width > 0 )
-                     {
-                        if( size < bufsize )
-                           buffer[ size ] = ' ';
-                        ++size;
-                     }
-                     c = ( unsigned char ) va_arg_n( args, _x_int, param );
-                     if( size < bufsize )
-                        buffer[ size ] = c;
-                     ++size;
+                  if( c == 'o' )
+                     size = put_octal( buffer, bufsize, size, argval.value.as_x_uintmax_t,
+                                       flags, width, precision );
+                  else if( c == 'u' )
+                     size = put_dec( buffer, bufsize, size, argval.value.as_x_uintmax_t,
+                                     flags & ~( _F_SPACE | _F_SIGN ),
+                                     width, precision, 0 );
+                  else
+                     size = put_hex( buffer, bufsize, size, argval.value.as_x_uintmax_t,
+                                     flags, width, precision, c == 'X' );
+                  continue;
+               case 'p':      /* void * pointer */
+                  argval.value.as_x_ptr = va_arg_n( args, _x_ptr, param );
+                  if( argval.value.as_x_ptr )
+                     size = put_hex( buffer, bufsize, size, ( HB_PTRUINT ) argval.value.as_x_ptr,
+                                     flags | _F_ALTERNATE, width, precision, 0 );
+                  else
+                     size = put_str( buffer, bufsize, size, "(nil)",
+                                     flags, width, -1 );
+                  continue;
+               case 'c':      /* signed int casted to unsigned char */
+                  if( ( flags & _F_LEFTADJUSTED ) == 0 )
                      while( --width > 0 )
                      {
                         if( size < bufsize )
                            buffer[ size ] = ' ';
                         ++size;
                      }
-                     continue;
-                  case 's':   /* const char * */
-                     argval.value.as_x_str = va_arg_n( args, _x_str, param );
-                     size = put_str( buffer, bufsize, size, argval.value.as_x_str,
-                                     flags, width, precision );
-                     continue;
-                  case 'n':   /* store current result size in int * arg */
-                     /* This is very danger feature in *printf() functions
-                      * family very often used by hackers to create buffer
-                      * overflows. It can also cause unintentional memory
-                      * corruption by programmers typo in pattern so if it's
-                      * not strictly necessary it's good to disable it.
-                      */
-                     *( va_arg_n( args, _x_intptr, param ) ) = ( int ) size;
-                     continue;
-                  case '%':   /* store % consuming arguments % */
-                     break;
-                  default:    /* error, wrong format, store pattern */
-                     format = pattern;
-                     c = '%';
-                     break;
-               }
+                  c = ( unsigned char ) va_arg_n( args, _x_int, param );
+                  if( size < bufsize )
+                     buffer[ size ] = c;
+                  ++size;
+                  while( --width > 0 )
+                  {
+                     if( size < bufsize )
+                        buffer[ size ] = ' ';
+                     ++size;
+                  }
+                  continue;
+               case 's':      /* const char * */
+                  argval.value.as_x_str   = va_arg_n( args, _x_str, param );
+                  size                    = put_str( buffer, bufsize, size, argval.value.as_x_str,
+                                                     flags, width, precision );
+                  continue;
+               case 'n':      /* store current result size in int * arg */
+                  /* This is very danger feature in *printf() functions
+                   * family very often used by hackers to create buffer
+                   * overflows. It can also cause unintentional memory
+                   * corruption by programmers typo in pattern so if it's
+                   * not strictly necessary it's good to disable it.
+                   */
+                  *( va_arg_n( args, _x_intptr, param ) ) = ( int ) size;
+                  continue;
+               case '%':      /* store % consuming arguments % */
+                  break;
+               default:       /* error, wrong format, store pattern */
+                  format   = pattern;
+                  c        = '%';
+                  break;
             }
          }
-
-         /* ISO C99 defines that when size is 0 and buffer is NULL we should
-          * return number of characters that would have been written in case
-          * the output string has been large enough without trailing 0.
-          * Many implementations always returns number of characters necessary
-          * to hold the string even if the above condition is not true so the
-          * returned value can be used to check if buffer was large enough
-          * and if not to allocate bigger buffer. Let's do the same.
-          */
-         if( size < bufsize )
-            buffer[ size ] = c;
-         ++size;
       }
-      while( c != 0 );
 
-      va_end( args );
+      /* ISO C99 defines that when size is 0 and buffer is NULL we should
+       * return number of characters that would have been written in case
+       * the output string has been large enough without trailing 0.
+       * Many implementations always returns number of characters necessary
+       * to hold the string even if the above condition is not true so the
+       * returned value can be used to check if buffer was large enough
+       * and if not to allocate bigger buffer. Let's do the same.
+       */
+      if( size < bufsize )
+         buffer[ size ] = c;
+      ++size;
+   }
+   while( c != 0 );
+
+   va_end( args );
 
 #ifndef __NO_ARGPOS__
-   }
-   while( params.repeat );
+}
+while( params.repeat )
+   ;
 
-   if( params.arglst != argbuf )
-      hb_xfree( params.arglst );
+if( params.arglst != argbuf )
+   hb_xfree( params.arglst );
 #endif
 
    /* always set trailing \0 !!! */
@@ -1309,17 +1320,17 @@ int hb_vsnprintf( char * buffer, size_t nSize, const char * format, va_list argl
 #if defined( __DJGPP__ ) && ( __DJGPP__ < 2 || ( __DJGPP__ == 2 && __DJGPP_MINOR__ <= 3 ) )
    /* Use vsprintf() for DJGPP <= 2.03.
       This is a temporary hack, should implement a C99 snprintf() ourselves. */
-   result = vsprintf( buffer, format, arglist );
+   result   = vsprintf( buffer, format, arglist );
    #define _HB_SNPRINTF_ADD_EOS
 #elif defined( _MSC_VER ) && _MSC_VER >= 1400
-   result = _vsnprintf_s( buffer, nSize, _TRUNCATE, format, arglist );
-#elif ( defined( _MSC_VER ) || defined( __DMC__ ) ) && !defined( __XCC__ )
-   result = _vsnprintf( buffer, nSize, format, arglist );
+   result   = _vsnprintf_s( buffer, nSize, _TRUNCATE, format, arglist );
+#elif ( defined( _MSC_VER ) || defined( __DMC__ ) ) && ! defined( __XCC__ )
+   result   = _vsnprintf( buffer, nSize, format, arglist );
    #define _HB_SNPRINTF_ADD_EOS
 #elif defined( __WATCOMC__ ) && __WATCOMC__ < 1200
-   result = _vbprintf( buffer, nSize, format, arglist );
+   result   = _vbprintf( buffer, nSize, format, arglist );
 #else
-   result = vsnprintf( buffer, nSize, format, arglist );
+   result   = vsnprintf( buffer, nSize, format, arglist );
 #endif
 
 #ifdef _HB_SNPRINTF_ADD_EOS
@@ -1334,8 +1345,8 @@ int hb_vsnprintf( char * buffer, size_t nSize, const char * format, va_list argl
 
 int hb_snprintf( char * buffer, size_t bufsize, const char * format, ... )
 {
-   va_list ap;
-   int iResult;
+   va_list  ap;
+   int      iResult;
 
    va_start( ap, format );
    iResult = hb_vsnprintf( buffer, bufsize, format, ap );

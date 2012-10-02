@@ -3428,7 +3428,7 @@ HB_FUNC_UR_SUPER( GETVARLEN )
       ULONG ulLength;
 
       hb_retni( SUPER_GETVARLEN( pArea, hb_parni( 2 ), &ulLength ) );
-      hb_stornl( ulLength, 3 );
+      hb_storns( ulLength, 3 );
    }
 }
 

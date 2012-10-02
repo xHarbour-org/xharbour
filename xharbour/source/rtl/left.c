@@ -63,7 +63,7 @@ HB_FUNC( LEFT )
    {
       char *sLeft, *sString = pText->item.asString.value;
       LONG lLeft = hb_parnl( 2 );
-      ULONG ulLen = pText->item.asString.length;
+      HB_SIZE ulLen = pText->item.asString.length;
 
       HB_TRACE( HB_TR_DEBUG, ("Left( '%s', %i ) %i", sString, lLeft, ulLen ) );
 

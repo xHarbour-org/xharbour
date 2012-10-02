@@ -198,7 +198,7 @@ extern HB_EXPORT USHORT hb_clsMaxClasses( void );
 extern HB_EXPORT BOOL hb_clsSetScope( BOOL bClsScope );
 
 extern HB_EXPORT PMETHOD hb_objGetpMethod( PHB_ITEM, PHB_SYMB );
-extern HB_EXPORT ULONG   hb_objGetOpOver( const PHB_ITEM pObject );
+extern HB_EXPORT HB_SIZE hb_objGetOpOver( const PHB_ITEM pObject );
 extern HB_EXPORT PHB_SYMB hb_objGetClsSymbol( const PHB_ITEM pObject );
 extern HB_EXPORT PMETHOD hb_objGetpMthd( PHB_DYNS pMsg, USHORT uiClass );
 

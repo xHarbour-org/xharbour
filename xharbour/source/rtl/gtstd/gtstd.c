@@ -106,7 +106,7 @@ typedef struct _HB_GTSTD
    BYTE *         sLineBuf;
    BOOL           fFullRedraw;
    char *         szCrLf;
-   ULONG          ulCrLf;
+   HB_SIZE        ulCrLf;
 
    BOOL           fDispTrans;
    PHB_CODEPAGE   cdpTerm;
@@ -189,7 +189,7 @@ static void hb_gt_std_setKeyTrans( PHB_GTSTD pGTSTD, char * pSrcChars, char * pD
    }
 }
 
-static void hb_gt_std_termOut( PHB_GTSTD pGTSTD, const BYTE * pStr, ULONG ulLen )
+static void hb_gt_std_termOut( PHB_GTSTD pGTSTD, const BYTE * pStr, HB_SIZE ulLen )
 {
    hb_fsWriteLarge( pGTSTD->hStdout, pStr, ulLen );
 }
@@ -370,10 +370,10 @@ static int hb_gt_std_ReadKey( PHB_GT pGT, int iEventMask )
             ch = pGTSTD->keyTransTbl[ ch ];
       }
    }
-   else if( !_eof( pGTSTD->hStdin ) )
+   else if( !_eof( (int) pGTSTD->hStdin ) )
    {
       BYTE bChar;
-      if( _read( pGTSTD->hStdin, &bChar, 1 ) == 1 )
+      if( _read( (int) pGTSTD->hStdin, &bChar, 1 ) == 1 )
          ch = pGTSTD->keyTransTbl[ bChar ];
    }
 #elif defined( HB_WIN32_IO )

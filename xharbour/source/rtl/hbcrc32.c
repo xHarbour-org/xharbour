@@ -63,7 +63,7 @@
 
 #include "hbzlib.h"
 
-HB_FUNC( HB_CRC32)
+HB_FUNC( HB_CRC32 )
 {
    PHB_ITEM pString = hb_param( 1, HB_IT_STRING );
    ULONG ulSum = 0;
@@ -80,7 +80,6 @@ HB_FUNC( HB_CRC32)
    }
 
    hb_retnint( crc32( ulSum, ( const BYTE *) pString->item.asString.value,
-                      pString->item.asString.length ) );
+                      (uInt) pString->item.asString.length ) );
 }
-
 

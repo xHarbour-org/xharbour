@@ -421,7 +421,7 @@ static int arc4_seed_urandom( void )
 
 static int arc4_seed_rand( void )
 {
-   HB_SIZE i;
+   ULONG i;
    HB_U8 buf[ ADD_ENTROPY ];
 
    srand( ( unsigned ) hb_dateMilliSeconds() );
@@ -619,7 +619,7 @@ HB_U32 hb_arc4random( void )
    return val;
 }
 
-void hb_arc4random_buf( void * _buf, HB_SIZE n )
+void hb_arc4random_buf( void * _buf, ULONG n )
 {
    HB_U8 * buf = ( HB_U8 * ) _buf;
 

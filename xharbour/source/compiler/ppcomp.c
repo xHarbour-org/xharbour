@@ -52,12 +52,12 @@ static void hb_pp_PragmaDump( void * cargo, char * pBuffer, ULONG ulSize,
 
    HB_SYMBOL_UNUSED( cargo );
    //hb_comp_iLine = iLine + 1;
-   pInline = hb_compInlineAdd( NULL );
-   pInline->pCode = ( BYTE * ) hb_xgrab( ulSize + 1 );
+   pInline                    = hb_compInlineAdd( NULL );
+   pInline->pCode             = ( BYTE * ) hb_xgrab( ulSize + 1 );
    HB_MEMCPY( pInline->pCode, pBuffer, ulSize );
-   pInline->pCode[ ulSize ] = '\0';
-   pInline->lPCodeSize = ulSize;
-   pInline->iLine = iLine;
+   pInline->pCode[ ulSize ]   = '\0';
+   pInline->lPCodeSize        = ulSize;
+   pInline->iLine             = iLine;
 }
 
 static void hb_pp_hb_inLine( void * cargo, char * szFunc,
@@ -72,20 +72,20 @@ static void hb_pp_hb_inLine( void * cargo, char * szFunc,
    else
    {
       PINLINE pInline = hb_compInlineAdd( hb_compIdentifierNew( szFunc, TRUE ) );
-      pInline->pCode = ( BYTE * ) hb_xgrab( ulSize + 1 );
+      pInline->pCode             = ( BYTE * ) hb_xgrab( ulSize + 1 );
       HB_MEMCPY( pInline->pCode, pBuffer, ulSize );
-      pInline->pCode[ ulSize ] = '\0';
-      pInline->lPCodeSize = ulSize;
-      pInline->iLine = iLine;
+      pInline->pCode[ ulSize ]   = '\0';
+      pInline->lPCodeSize        = ulSize;
+      pInline->iLine             = iLine;
       hb_comp_cInlineID++;
    }
 }
 
 static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
-                                  int iValue, int *piPrevious, char cIndex[1] )
+                                  int iValue, int * piPrevious, char cIndex[ 1 ] )
 {
-   BOOL fError = FALSE;
-   int i = strlen( szSwitch );
+   BOOL     fError   = FALSE;
+   HB_SIZE  i        = strlen( szSwitch );
 
    HB_SYMBOL_UNUSED( cargo );
 
@@ -100,8 +100,8 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
          case 'A':
             if( piPrevious )
             {
-               *piPrevious = (int) hb_comp_bAutoMemvarAssume;
-               cIndex[0] = HB_TOLOWER( szSwitch[ 0 ] );
+               *piPrevious = ( int ) hb_comp_bAutoMemvarAssume;
+               cIndex[ 0 ] = HB_TOLOWER( szSwitch[ 0 ] );
             }
 
             hb_comp_bAutoMemvarAssume = iValue != 0;
@@ -111,24 +111,24 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
          case 'B':
             if( piPrevious )
             {
-               *piPrevious = (int) hb_comp_bDebugInfo;
-               cIndex[0] = HB_TOLOWER( szSwitch[ 0 ] );
+               *piPrevious = ( int ) hb_comp_bDebugInfo;
+               cIndex[ 0 ] = HB_TOLOWER( szSwitch[ 0 ] );
             }
 
             hb_comp_bDebugInfo = iValue != 0;
             break;
 
-         case 'e' :
+         case 'e':
             // If adding such switch then MUST change hard coded cIndex[0] of "es" switch!!!
             fError = TRUE;
             break;
 
-         case 'g' :
+         case 'g':
             // If adding such switch then MUST change hard coded cIndex[0] of "TRACEPRAGMAS" switch!!!
             fError = TRUE;
             break;
 
-         case 'h' :
+         case 'h':
             // If adding such switch then MUST change hard coded cIndex[0] of "TEXHHIDDEN" switch!!!
             fError = TRUE;
             break;
@@ -137,8 +137,8 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
          case 'L':
             if( piPrevious )
             {
-               *piPrevious = (int) hb_comp_bLineNumbers;
-               cIndex[0] = HB_TOLOWER( szSwitch[ 0 ] );
+               *piPrevious = ( int ) hb_comp_bLineNumbers;
+               cIndex[ 0 ] = HB_TOLOWER( szSwitch[ 0 ] );
             }
 
             hb_comp_bLineNumbers = iValue != 0;
@@ -148,8 +148,8 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
          case 'N':
             if( piPrevious )
             {
-               *piPrevious = (int) hb_comp_bStartProc;
-               cIndex[0] = HB_TOLOWER( szSwitch[ 0 ] );
+               *piPrevious = ( int ) hb_comp_bStartProc;
+               cIndex[ 0 ] = HB_TOLOWER( szSwitch[ 0 ] );
             }
 
             hb_comp_bStartProc = iValue != 0;
@@ -159,8 +159,8 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
          case 'P':
             if( piPrevious )
             {
-               *piPrevious = (int) hb_comp_bPPO;
-               cIndex[0] = HB_TOLOWER( szSwitch[ 0 ] );
+               *piPrevious = ( int ) hb_comp_bPPO;
+               cIndex[ 0 ] = HB_TOLOWER( szSwitch[ 0 ] );
             }
 
             hb_comp_bPPO = iValue != 0;
@@ -170,19 +170,19 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
          case 'Q':
             if( piPrevious )
             {
-               *piPrevious = (int) hb_comp_bQuiet;
-               cIndex[0] = HB_TOLOWER( szSwitch[ 0 ] );
+               *piPrevious = ( int ) hb_comp_bQuiet;
+               cIndex[ 0 ] = HB_TOLOWER( szSwitch[ 0 ] );
             }
 
             hb_comp_bQuiet = iValue != 0;
             break;
 
-         case 'r' :
+         case 'r':
             // If adding such switch then MUST change hard coded cIndex[0] of "RECURSELEVEL" switch!!!
             fError = TRUE;
             break;
 
-         case 't' :
+         case 't':
             // If adding such switch then MUST change hard coded cIndex[0] of "pt" switch!!!
             fError = TRUE;
             break;
@@ -191,8 +191,8 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
          case 'V':
             if( piPrevious )
             {
-               *piPrevious = (int) hb_comp_bForceMemvars;
-               cIndex[0] = HB_TOLOWER( szSwitch[ 0 ] );
+               *piPrevious = ( int ) hb_comp_bForceMemvars;
+               cIndex[ 0 ] = HB_TOLOWER( szSwitch[ 0 ] );
             }
 
             hb_comp_bForceMemvars = iValue != 0;
@@ -202,8 +202,8 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
          case 'Z':
             if( piPrevious )
             {
-               *piPrevious = (int) hb_comp_bShortCuts;
-               cIndex[0] = HB_TOLOWER( szSwitch[ 0 ] );
+               *piPrevious = ( int ) hb_comp_bShortCuts;
+               cIndex[ 0 ] = HB_TOLOWER( szSwitch[ 0 ] );
             }
 
             hb_comp_bShortCuts = iValue == 0;
@@ -213,8 +213,8 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
          case 'W':
             if( piPrevious )
             {
-               *piPrevious = (int) hb_comp_iWarnings;
-               cIndex[0] = HB_TOLOWER( szSwitch[ 0 ] );
+               *piPrevious = ( int ) hb_comp_iWarnings;
+               cIndex[ 0 ] = HB_TOLOWER( szSwitch[ 0 ] );
             }
 
             if( iValue >= 0 && iValue <= 4 )
@@ -237,8 +237,8 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
       {
          if( piPrevious )
          {
-            *piPrevious = (int) hb_comp_iExitLevel;
-            cIndex[0] = 'e';
+            *piPrevious = ( int ) hb_comp_iExitLevel;
+            cIndex[ 0 ] = 'e';
          }
 
          hb_comp_iExitLevel = iValue;
@@ -247,8 +247,8 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
       {
          if( piPrevious )
          {
-            *piPrevious = (int) hb_comp_bTracePP;
-            cIndex[0] = 't';
+            *piPrevious = ( int ) hb_comp_bTracePP;
+            cIndex[ 0 ] = 't';
          }
 
          hb_comp_bTracePP = iValue != 0;
@@ -260,8 +260,8 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
    {
       if( piPrevious )
       {
-         *piPrevious = (int) hb_comp_iHidden;
-         cIndex[0] = 'h';
+         *piPrevious = ( int ) hb_comp_iHidden;
+         cIndex[ 0 ] = 'h';
       }
 
       hb_comp_iHidden = iValue;

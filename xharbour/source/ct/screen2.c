@@ -58,7 +58,7 @@
 
 HB_FUNC( SAYDOWN )
 {
-   ULONG ulLen = hb_parclen( 1 );
+   HB_SIZE ulLen = hb_parclen( 1 );
 
    if( ulLen )
    {
@@ -102,12 +102,12 @@ HB_FUNC( SAYDOWN )
 
 HB_FUNC( SAYSPREAD )
 {
-   ULONG ulLen = hb_parclen( 1 );
+   HB_SIZE ulLen = hb_parclen( 1 );
 
    if( ulLen )
    {
       UCHAR *  szText = ( UCHAR * ) hb_parc( 1 );
-      ULONG    ulPos, ul;
+      HB_SIZE  ulPos, ul;
       SHORT    sRow, sCol;
       int      iRow, iCol, iMaxRow, iMaxCol;
       long     lDelay;
@@ -133,6 +133,7 @@ HB_FUNC( SAYSPREAD )
          }
 
          hb_gtBeginWrite();
+
          do
          {
             for( ul = 0; ul < ulLen && iCol + ( int ) ul <= iMaxCol; ++ul )
@@ -156,7 +157,7 @@ HB_FUNC( SAYSPREAD )
 
 HB_FUNC( SAYMOVEIN )
 {
-   ULONG ulLen = hb_parclen( 1 );
+   HB_SIZE ulLen = hb_parclen( 1 );
 
    if( ulLen )
    {
@@ -182,13 +183,16 @@ HB_FUNC( SAYMOVEIN )
 
          sRow  = iRow;
          sCol  = iCol + ( int ) ulLen;
+
          if( fBack )
-            iCol += ulLen - 1;
+            iCol += (int) ulLen - 1;
          else
             szText += ulLen - 1;
+
          ulChars = 1;
 
          hb_gtBeginWrite();
+
          do
          {
             if( fBack )
@@ -270,6 +274,7 @@ HB_FUNC( CLEARSLOW )
       dXX = dYY = 0;
 
       hb_gtBeginWrite();
+
       while( TRUE )
       {
          hb_gtBoxEx( iTop, iLeft, iBottom, iRight, pbFrame, bColor );
@@ -311,17 +316,21 @@ HB_FUNC( CLEARSLOW )
 
 HB_FUNC( SCREENSTR )
 {
-   SHORT    sRow, sCol, sMaxRow, sMaxCol, sC;
-   char *   pBuffer, * szText;
-   ULONG    ulSize, ulCount = ULONG_MAX;
+   SHORT  sRow, sCol, sMaxRow, sMaxCol, sC;
+   char * pBuffer, * szText;
+   ULONG  ulSize, ulCount = ULONG_MAX;
 
    hb_gtGetPos( &sRow, &sCol );
+
    if( ISNUM( 1 ) )
       sRow = ( SHORT ) hb_parni( 1 );
+
    if( ISNUM( 2 ) )
       sCol = ( SHORT ) hb_parni( 2 );
+
    if( ISNUM( 3 ) )
       ulCount = hb_parnl( 3 );
+
    sMaxRow  = ( SHORT ) hb_gtMaxRow();
    sMaxCol  = ( SHORT ) hb_gtMaxCol();
 
@@ -356,7 +365,7 @@ HB_FUNC( SCREENSTR )
 
 HB_FUNC( STRSCREEN )
 {
-   ULONG ulLen = hb_parclen( 1 );
+   HB_SIZE ulLen = hb_parclen( 1 );
 
    if( ulLen & 1 )
       ulLen--;

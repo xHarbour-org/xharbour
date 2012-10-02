@@ -60,21 +60,21 @@ HB_FUNC( ATADJUST )
        ( ISNUM( 3 ) ) )
    {
       const char *   pcStringToMatch   = hb_parc( 1 );
-      size_t         sStrToMatchLen    = ( size_t ) hb_parclen( 1 );
+      HB_SIZE        sStrToMatchLen    = hb_parclen( 1 );
       const char *   pcString          = hb_parc( 2 );
-      size_t         sStrLen           = ( size_t ) hb_parclen( 2 );
-      size_t         sAdjustPosition   = hb_parnl( 3 );
+      HB_SIZE        sStrLen           = hb_parclen( 2 );
+      HB_SIZE        sAdjustPosition   = hb_parnl( 3 );
 
       int            iMultiPass        = ct_getatmupa();
       int            iAtLike           = ct_getatlike();
       char           cAtLike           = ct_getatlikechar();
-      size_t         sIgnore, sMatchStrLen;
+      HB_SIZE        sIgnore, sMatchStrLen;
       ULONG          ulCounter;
       const char *   pc                = NULL;
 
       char           cFillChar;
       const char *   pcRetStr, * pcCheckFill;
-      size_t         sRetStrLen;
+      HB_SIZE        sRetStrLen;
 
       /* eventually ignore some characters */
       if( ISNUM( 5 ) )
@@ -123,10 +123,9 @@ HB_FUNC( ATADJUST )
       /* nth match or last match ? */
       if( ISNUM( 4 ) && ( ( ulCounter = hb_parnl( 4 ) ) != 0 ) )
       {
-
          /* find the <ulCounter>th match */
          const char *   pcSubStr;
-         size_t         sSubStrLen;
+         HB_SIZE        sSubStrLen;
          ULONG          ulMatchCounter = 0;
 
          pcSubStr    = pcString;
@@ -176,7 +175,6 @@ HB_FUNC( ATADJUST )
       }
       else /* (ISNUM (4) && ((ulCounter = hb_parnl (4)) != 0) */
       {
-
          /* we have to find the last match */
          switch( iAtLike )
          {
@@ -247,11 +245,11 @@ HB_FUNC( ATADJUST )
 
             /* copy first portion of string */
             if( sAdjustPosition > 0 )
-               hb_xmemcpy( ( void * ) pcRetStr, pcString, sAdjustPosition );
+               hb_xmemcpy( ( void * ) pcRetStr, pcString, (size_t) sAdjustPosition );
 
             /* copy second portion of string */
             if( sRetStrLen > sAdjustPosition )
-               hb_xmemcpy( ( void * ) ( pcRetStr + sAdjustPosition ), pc, sRetStrLen - sAdjustPosition );
+               hb_xmemcpy( ( void * ) ( pcRetStr + sAdjustPosition ), pc, (size_t) ( sRetStrLen - sAdjustPosition ) );
 
             hb_retclen( pcRetStr, sRetStrLen );
             hb_xfree( ( void * ) pcRetStr );
@@ -264,14 +262,14 @@ HB_FUNC( ATADJUST )
 
             /* copy first portion of string */
             if( pc > pcString )
-               hb_xmemcpy( ( void * ) pcRetStr, pcString, pc - pcString );
+               hb_xmemcpy( ( void * ) pcRetStr, pcString, (size_t) ( pc - pcString ) );
 
             /* fill characters */
-            hb_xmemset( ( void * ) ( pcRetStr + ( pc - pcString ) ), cFillChar, sAdjustPosition - ( pc - pcString ) );
+            hb_xmemset( ( void * ) ( pcRetStr + ( pc - pcString ) ), cFillChar, (size_t) ( sAdjustPosition - ( pc - pcString ) ) );
 
             /* copy second portion of string */
             if( sRetStrLen > sAdjustPosition )
-               hb_xmemcpy( ( void * ) ( pcRetStr + sAdjustPosition ), pc, sRetStrLen - sAdjustPosition );
+               hb_xmemcpy( ( void * ) ( pcRetStr + sAdjustPosition ), pc, (size_t) ( sRetStrLen - sAdjustPosition ) );
 
             hb_retclen( pcRetStr, sRetStrLen );
             hb_xfree( ( void * ) pcRetStr );

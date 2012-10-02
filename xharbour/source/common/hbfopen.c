@@ -53,13 +53,13 @@
 #include "hbapi.h"
 #include "hbapifs.h"
 
-FILE * hb_fopen( const char *path, const char *mode )
+FILE * hb_fopen( const char * path, const char * mode )
 {
-   char * pszFree = NULL;
-   FILE * file;
+   char *   pszFree = NULL;
+   FILE *   file;
 
    path = hb_fsNameConv( path, &pszFree );
-#if ( defined(_MSC_VER) && (_MSC_VER>=1400) )
+#if ( defined( _MSC_VER ) && ( _MSC_VER >= 1400 ) )
    fopen_s( &file, path, mode );
 #else
    file = fopen( path, mode );

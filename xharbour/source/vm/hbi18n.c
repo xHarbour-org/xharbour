@@ -157,7 +157,7 @@ void hb_i18nExit( void )
 PHB_ITEM hb_i18n_scan_table( PHB_ITEM pStr, PHB_ITEM pTable, ULONG * ulIndex )
 {
    ULONG ulLower = 1;
-   ULONG ulHigher = hb_arrayLen( pTable );
+   ULONG ulHigher = (ULONG) hb_arrayLen( pTable );
    ULONG ulPoint = ( ulLower + ulHigher ) / 2;
    int iRes;
    char *cInt = pStr->item.asString.value;
@@ -229,13 +229,13 @@ char * hb_i18n_build_table_filename( char *i18n_dir, char *language )
 
    if ( strlen( i18n_dir ) > 0 )
    {
-      UINT uiLen = (
+      HB_SIZE uiLen = (
          strlen( i18n_dir ) +
          strlen( language ) +
          strlen( HB_I18N_TAB_EXT) + 3 ); // '/', dot and '\0'
 
       path = ( char * ) hb_xgrab( uiLen );
-      hb_snprintf( path, uiLen, "%s%c%s.%s",
+      hb_snprintf( path, (size_t) uiLen, "%s%c%s.%s",
             i18n_dir,
             HB_OS_PATH_DELIM_CHR,
             language,
@@ -243,13 +243,13 @@ char * hb_i18n_build_table_filename( char *i18n_dir, char *language )
    }
    else
    {
-      UINT uiLen = (
+      HB_SIZE uiLen = (
          strlen( language ) +
          strlen( HB_I18N_TAB_EXT) + 2 ); // dot and '\0'
 
       path = ( char * ) hb_xgrab( uiLen );
 
-      hb_snprintf( path, uiLen, "%s.%s",
+      hb_snprintf( path, (size_t) uiLen, "%s.%s",
             language,
             HB_I18N_TAB_EXT );
    }
@@ -495,7 +495,7 @@ BOOL hb_i18n_write_table( FHANDLE handle, PHB_ITEM pTable )
       for ( j = 1; j <= 2 ; j ++ )
       {
          // including also trailing 0
-         nStrLen = hb_arrayGetCLen( pRow, j )+1;
+         nStrLen = (int) hb_arrayGetCLen( pRow, j )+1;
          if (nStrLen == 1 )
          {
             hb_snprintf( szStrLen, sizeof( szStrLen ), "%8d", 0 );

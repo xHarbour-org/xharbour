@@ -58,22 +58,22 @@ HB_FUNC( ATREPL )
 {
    if( ( ISCHAR( 1 ) ) && ( ISCHAR( 2 ) ) )
    {
-      const char *   pcStringToMatch   = hb_parc( 1 );
-      size_t         sStrToMatchLen    = ( size_t ) hb_parclen( 1 );
-      const char *   pcString          = hb_parc( 2 );
-      size_t         sStrLen           = ( size_t ) hb_parclen( 2 );
-      int            iMultiPass        = ct_getatmupa();
-      int            iAtLike           = ct_getatlike();
-      char           cAtLike           = ct_getatlikechar();
-      size_t         sIgnore, sMatchStrLen;
-      ULONG          ulCounter;
-      const char *   pc;
+      const char * pcStringToMatch   = hb_parc( 1 );
+      HB_SIZE      sStrToMatchLen    = hb_parclen( 1 );
+      const char * pcString          = hb_parc( 2 );
+      HB_SIZE      sStrLen           = hb_parclen( 2 );
+      int          iMultiPass        = ct_getatmupa();
+      int          iAtLike           = ct_getatlike();
+      char         cAtLike           = ct_getatlikechar();
+      HB_SIZE      sIgnore, sMatchStrLen;
+      ULONG        ulCounter;
+      const char * pc;
 
-      const char *   pcReplacement;
-      size_t         sReplaceLen;
-      int            iReplaceMode;
-      char *         pcRetStr;
-      size_t         sRetStrLen;
+      const char * pcReplacement;
+      HB_SIZE      sReplaceLen;
+      int          iReplaceMode;
+      char *       pcRetStr;
+      HB_SIZE      sRetStrLen;
 
       /* eventually ignore some characters */
       if( ISNUM( 6 ) )
@@ -133,12 +133,12 @@ HB_FUNC( ATREPL )
                   all occurences are replaced */
 
          const char *   pcRetSubStr;
-         size_t         sRetSubStrLen;
+         HB_SIZE        sRetSubStrLen;
          ULONG          ulMatchCounter = 0;
 
          sRetStrLen     = sStrLen;
          pcRetStr       = ( char * ) hb_xgrab( sRetStrLen );
-         hb_xmemcpy( ( void * ) pcRetStr, pcString, sRetStrLen );
+         hb_xmemcpy( ( void * ) pcRetStr, pcString, (size_t) sRetStrLen );
 
          pcRetSubStr    = pcRetStr + sIgnore;
          sRetSubStrLen  = sRetStrLen - sIgnore;
@@ -193,9 +193,9 @@ HB_FUNC( ATREPL )
 
                if( sReplaceLen != sMatchStrLen )
                   memmove( ( void * ) ( pc + sReplaceLen ), pc + sMatchStrLen,
-                           sRetStrLen - ( ( pc + sMatchStrLen ) - pcRetStr ) );
+                           (size_t) ( sRetStrLen - ( ( pc + sMatchStrLen ) - pcRetStr ) ) );
                if( sReplaceLen > 0 )
-                  hb_xmemcpy( ( void * ) pc, pcReplacement, sReplaceLen );
+                  hb_xmemcpy( ( void * ) pc, pcReplacement, (size_t) sReplaceLen );
 
                if( iMultiPass )
                   pcRetSubStr = pc + 1;
@@ -225,7 +225,7 @@ HB_FUNC( ATREPL )
 
          sRetStrLen  = sStrLen;
          pcRetStr    = ( char * ) hb_xgrab( sRetStrLen );
-         hb_xmemcpy( pcRetStr, pcString, sRetStrLen );
+         hb_xmemcpy( pcRetStr, pcString, (size_t) sRetStrLen );
 
          /* we have to find the last match and replace it */
 
@@ -272,9 +272,9 @@ HB_FUNC( ATREPL )
 
          if( sReplaceLen != sMatchStrLen )
             memmove( ( void * ) ( pc + sReplaceLen ), pc + sMatchStrLen,
-                     sRetStrLen - ( ( pc + sMatchStrLen ) - pcRetStr ) );
+                     (size_t) ( sRetStrLen - ( ( pc + sMatchStrLen ) - pcRetStr ) ) );
          if( sReplaceLen > 0 )
-            hb_xmemcpy( ( void * ) pc, pcReplacement, sReplaceLen );
+            hb_xmemcpy( ( void * ) pc, pcReplacement, (size_t) sReplaceLen );
 
          sRetStrLen += ( sReplaceLen - sMatchStrLen );
 

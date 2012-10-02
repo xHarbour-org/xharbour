@@ -101,16 +101,16 @@
 #include "hbcomp.h"
 
 #ifdef HB_C52_STRICT
-   #define HB_DATE_YEAR_LIMIT    2999
+   #define HB_DATE_YEAR_LIMIT 2999
 #else
-   #define HB_DATE_YEAR_LIMIT    9999
+   #define HB_DATE_YEAR_LIMIT 9999
 #endif
 
 #define HB_STR_DATE_BASE      1721060     /* 0000/01/01 */
 
-LONG hb_dateEncode( int iYear, int iMonth, int iDay )
+long hb_dateEncode( int iYear, int iMonth, int iDay )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateEncode(%d, %d, %d)", iYear, iMonth, iDay));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateEncode(%d, %d, %d)", iYear, iMonth, iDay ) );
 
    /* Perform date validation */
    if( iYear >= 0 && iYear <= HB_DATE_YEAR_LIMIT &&
@@ -127,31 +127,31 @@ LONG hb_dateEncode( int iYear, int iMonth, int iDay )
       {
          int iFactor = ( iMonth < 3 ) ? -1 : 0;
 
-         return ( ( LONG )( iFactor + 4800 + iYear ) * 1461 / 4 ) +
-                ( ( LONG )( iMonth - 2 - ( iFactor * 12 ) ) * 367 ) / 12 -
-                ( ( LONG )( ( iFactor + 4900 + iYear ) / 100 ) * 3 / 4 ) +
-                ( LONG ) iDay - 32075;
+         return ( ( long ) ( iFactor + 4800 + iYear ) * 1461 / 4 ) +
+                ( ( long ) ( iMonth - 2 - ( iFactor * 12 ) ) * 367 ) / 12 -
+                ( ( long ) ( ( iFactor + 4900 + iYear ) / 100 ) * 3 / 4 ) +
+                ( long ) iDay - 32075;
       }
    }
 
    return 0;
 }
 
-void hb_dateDecode( LONG lJulian, int *piYear, int *piMonth, int *piDay )
+void hb_dateDecode( long lJulian, int * piYear, int * piMonth, int * piDay )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateDecode(%ld, %p, %p, %p)", lJulian, piYear, piMonth, piDay));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateDecode(%ld, %p, %p, %p)", lJulian, piYear, piMonth, piDay ) );
 
    if( lJulian >= HB_STR_DATE_BASE )
    {
-      LONG U, V, W, X;
+      long U, V, W, X;
 
-      lJulian += 68569;
-      W = ( lJulian * 4 ) / 146097;
-      lJulian -= ( ( 146097 * W ) + 3 ) / 4;
-      X = 4000 * ( lJulian + 1 ) / 1461001;
-      lJulian -= ( ( 1461 * X ) / 4 ) - 31;
-      V = 80 * lJulian / 2447;
-      U = V / 11;
+      lJulian  += 68569;
+      W        = ( lJulian * 4 ) / 146097;
+      lJulian  -= ( ( 146097 * W ) + 3 ) / 4;
+      X        = 4000 * ( lJulian + 1 ) / 1461001;
+      lJulian  -= ( ( 1461 * X ) / 4 ) - 31;
+      V        = 80 * lJulian / 2447;
+      U        = V / 11;
 
       *piYear  = ( int ) ( X + U + ( W - 49 ) * 100 );
       *piMonth = ( int ) ( V + 2 - ( U * 12 ) );
@@ -159,15 +159,15 @@ void hb_dateDecode( LONG lJulian, int *piYear, int *piMonth, int *piDay )
    }
    else
    {
-      *piYear  =
-      *piMonth =
-      *piDay   = 0;
+      *piYear        =
+         *piMonth    =
+            *piDay   = 0;
    }
 }
 
 void hb_dateStrPut( char * szDate, int iYear, int iMonth, int iDay )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateStrPut(%p, %d, %d, %d)", szDate, iYear, iMonth, iDay));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateStrPut(%p, %d, %d, %d)", szDate, iYear, iMonth, iDay ) );
 
    if( iYear >= 0 && iMonth > 0 && iDay > 0 )
    {
@@ -190,35 +190,35 @@ void hb_dateStrPut( char * szDate, int iYear, int iMonth, int iDay )
 
 void hb_dateStrGet( const char * szDate, int * piYear, int * piMonth, int * piDay )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateStrGet(%s, %p, %p, %p)", szDate, piYear, piMonth, piDay));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateStrGet(%s, %p, %p, %p)", szDate, piYear, piMonth, piDay ) );
 
    if( szDate && hb_strnlen( szDate, 8 ) == 8 )
    {
       /* Date string has correct length, so attempt to convert */
-      *piYear  = ( ( USHORT ) ( szDate[ 0 ] - '0' ) * 1000 ) +
-                 ( ( USHORT ) ( szDate[ 1 ] - '0' ) * 100 ) +
-                 ( ( USHORT ) ( szDate[ 2 ] - '0' ) * 10 ) +
-                   ( USHORT ) ( szDate[ 3 ] - '0' );
+      *piYear = ( ( USHORT ) ( szDate[ 0 ] - '0' ) * 1000 ) +
+                ( ( USHORT ) ( szDate[ 1 ] - '0' ) * 100 ) +
+                ( ( USHORT ) ( szDate[ 2 ] - '0' ) * 10 ) +
+                ( USHORT ) ( szDate[ 3 ] - '0' );
       *piMonth = ( ( szDate[ 4 ] - '0' ) * 10 ) + ( szDate[ 5 ] - '0' );
       *piDay   = ( ( szDate[ 6 ] - '0' ) * 10 ) + ( szDate[ 7 ] - '0' );
    }
    else
    {
       /* Date string missing or bad length, so force an empty date */
-      *piYear  =
-      *piMonth =
-      *piDay   = 0;
+      *piYear        =
+         *piMonth    =
+            *piDay   = 0;
    }
 }
 
 /* This function always closes the date with a zero byte, so it needs a
    9 character long buffer. */
 
-char * hb_dateDecStr( char * szDate, LONG lJulian )
+char * hb_dateDecStr( char * szDate, long lJulian )
 {
    int iYear, iMonth, iDay;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateDecStr(%p, %ld)", szDate, lJulian));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateDecStr(%p, %ld)", szDate, lJulian ) );
 
    if( lJulian <= 0 )
    {
@@ -234,11 +234,11 @@ char * hb_dateDecStr( char * szDate, LONG lJulian )
    return szDate;
 }
 
-LONG hb_dateEncStr( const char * szDate )
+long hb_dateEncStr( const char * szDate )
 {
-   int  iYear, iMonth, iDay;
+   int iYear, iMonth, iDay;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateEncStr(%s)", szDate));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateEncStr(%s)", szDate ) );
 
    hb_dateStrGet( szDate, &iYear, &iMonth, &iDay );
 
@@ -255,33 +255,35 @@ char * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * 
     */
    int format_count, digit_count, size;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateFormat(%s, %p, %s)", szDate, szFormattedDate, szDateFormat));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateFormat(%s, %p, %s)", szDate, szFormattedDate, szDateFormat ) );
 
    /*
     * Determine the maximum size of the formatted date string
     */
-   size = strlen( szDateFormat );
-   if( size > 10 ) size = 10;
+   size = ( int ) strlen( szDateFormat );
+   if( size > 10 )
+      size = 10;
 
    if( szDate && szFormattedDate && strlen( szDate ) == 8 ) /* A valid date is always 8 characters */
    {
-      const char * szPtr;
-      int digit;
-      BOOL used_d, used_m, used_y;
+      const char *   szPtr;
+      int            digit;
+      BOOL           used_d, used_m, used_y;
 
-      format_count = 0;
-      used_d = used_m = used_y = FALSE;
-      szPtr = szDateFormat;
+      format_count   = 0;
+      used_d         = used_m = used_y = FALSE;
+      szPtr          = szDateFormat;
 
       while( format_count < size )
       {
-         digit = HB_TOUPPER( ( UCHAR ) *szPtr );
+         digit       = HB_TOUPPER( ( UCHAR ) *szPtr );
          szPtr++;
          digit_count = 1;
          while( ( ( int ) HB_TOUPPER( ( UCHAR ) *szPtr ) ) == digit && format_count < size )
          {
             szPtr++;
-            if( format_count + digit_count < size ) digit_count++;
+            if( format_count + digit_count < size )
+               digit_count++;
          }
          switch( digit )
          {
@@ -314,13 +316,14 @@ char * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * 
                         szFormattedDate[ format_count++ ] = szDate[ 7 ];
                         digit_count--;
                      }
-                     while( digit_count-- > 0 && format_count < size ) szFormattedDate[ format_count++ ] = ( char ) digit;
+                     while( digit_count-- > 0 && format_count < size )
+                        szFormattedDate[ format_count++ ] = ( char ) digit;
                }
                used_d = TRUE;
                break;
 
             case 'M':
-               switch ( digit_count )
+               switch( digit_count )
                {
                   case 4:
                      if( ! used_m && format_count < size )
@@ -348,7 +351,8 @@ char * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * 
                         szFormattedDate[ format_count++ ] = szDate[ 5 ];
                         digit_count--;
                      }
-                     while( digit_count-- > 0 && format_count < size ) szFormattedDate[ format_count++ ] = ( char ) digit;
+                     while( digit_count-- > 0 && format_count < size )
+                        szFormattedDate[ format_count++ ] = ( char ) digit;
                }
                used_m = TRUE;
                break;
@@ -383,13 +387,15 @@ char * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * 
                         szFormattedDate[ format_count++ ] = szDate[ 3 ];
                         digit_count--;
                      }
-                     while( digit_count-- > 0 && format_count < size ) szFormattedDate[ format_count++ ] = ( char ) digit;
+                     while( digit_count-- > 0 && format_count < size )
+                        szFormattedDate[ format_count++ ] = ( char ) digit;
                }
                used_y = TRUE;
                break;
 
             default:
-               while( digit_count-- > 0 && format_count < size ) szFormattedDate[ format_count++ ] = ( char ) digit;
+               while( digit_count-- > 0 && format_count < size )
+                  szFormattedDate[ format_count++ ] = ( char ) digit;
          }
       }
    }
@@ -419,9 +425,9 @@ char * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * 
    return szFormattedDate;
 }
 
-int hb_dateJulianDOW( LONG lJulian )
+int hb_dateJulianDOW( long lJulian )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateJulianDOW(%ld)", lJulian));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateJulianDOW(%ld)", lJulian ) );
 
    if( lJulian >= HB_STR_DATE_BASE )
       return ( int ) ( ( lJulian + 1 ) % 7 ) + 1;
@@ -437,35 +443,39 @@ char * hb_timeFormat( const char * szTime, char * szFormattedTime, const char * 
     * NOTE: szFormattedTime must point to a buffer of at least 16 bytes.
     *       szTimeFormat must point to a buffer holding the time format to use.
     */
-   int format_count, digit_count, size;
+   int   format_count;
+   int   digit_count;
+   int   size;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_timeFormat(%s, %p, %s)", szTime, szFormattedTime, szTimeFormat));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_timeFormat(%s, %p, %s)", szTime, szFormattedTime, szTimeFormat ) );
 
    /*
     * Determine the maximum size of the formatted time string
     */
-   size = strlen( szTimeFormat );
-   if( size > 15 ) size = 15;
+   size = ( int ) strlen( szTimeFormat );
+   if( size > 15 )
+      size = 15;
 
-   if( szTime && szFormattedTime && strlen( szTime ) == (7 + HB_DATETIMEDECIMALS) )
+   if( szTime && szFormattedTime && strlen( szTime ) == ( 7 + HB_DATETIMEDECIMALS ) )
    {
-      const char * szPtr;
-      int digit, pos_pm = 0, pos_h = -1;
-      BOOL used_h, used_m, used_s, used_c, used_pm;
+      const char *   szPtr;
+      int            digit, pos_pm = 0, pos_h = -1;
+      BOOL           used_h, used_m, used_s, used_c, used_pm;
 
-      format_count = 0;
-      used_h = used_m = used_s = used_c = used_pm = FALSE;
-      szPtr = szTimeFormat;
+      format_count   = 0;
+      used_h         = used_m = used_s = used_c = used_pm = FALSE;
+      szPtr          = szTimeFormat;
 
       while( format_count < size )
       {
-         digit = HB_TOUPPER( *szPtr );
+         digit       = HB_TOUPPER( *szPtr );
          szPtr++;
          digit_count = 1;
          while( ( ( int ) HB_TOUPPER( ( UCHAR ) *szPtr ) ) == digit && format_count < size )
          {
             szPtr++;
-            if( format_count + digit_count < size ) digit_count++;
+            if( format_count + digit_count < size )
+               digit_count++;
          }
          switch( digit )
          {
@@ -475,30 +485,33 @@ char * hb_timeFormat( const char * szTime, char * szFormattedTime, const char * 
                   case 2:
                      if( ! used_h && format_count < size )
                      {
-                        if(pos_h==-1) pos_h = format_count;
+                        if( pos_h == -1 )
+                           pos_h = ( int ) format_count;
                         szFormattedTime[ format_count++ ] = szTime[ 0 ];
                         digit_count--;
                      }
                   default:
                      if( ! used_h && format_count < size )
                      {
-                        if(pos_h==-1) pos_h = format_count;
+                        if( pos_h == -1 )
+                           pos_h = ( int ) format_count;
                         szFormattedTime[ format_count++ ] = szTime[ 1 ];
                         digit_count--;
                      }
-                     while( digit_count-- > 0 && format_count < size ) szFormattedTime[ format_count++ ] = ( char ) digit;
+                     while( digit_count-- > 0 && format_count < size )
+                        szFormattedTime[ format_count++ ] = ( char ) digit;
                }
                used_h = TRUE;
                break;
 
             case 'M':
-               if( pos_pm && format_count-1 == pos_pm )
+               if( pos_pm && format_count - 1 == pos_pm )
                {
-                  used_pm = TRUE;
-                  szFormattedTime[ format_count++ ] = 'M';
+                  used_pm                             = TRUE;
+                  szFormattedTime[ format_count++ ]   = 'M';
                   break;
                }
-               switch ( digit_count )
+               switch( digit_count )
                {
                   case 2:
                      if( ! used_m && format_count < size )
@@ -512,7 +525,8 @@ char * hb_timeFormat( const char * szTime, char * szFormattedTime, const char * 
                         szFormattedTime[ format_count++ ] = szTime[ 3 ];
                         digit_count--;
                      }
-                     while( digit_count-- > 0 && format_count < size ) szFormattedTime[ format_count++ ] = ( char ) digit;
+                     while( digit_count-- > 0 && format_count < size )
+                        szFormattedTime[ format_count++ ] = ( char ) digit;
                }
                used_m = TRUE;
                break;
@@ -533,7 +547,8 @@ char * hb_timeFormat( const char * szTime, char * szFormattedTime, const char * 
                         szFormattedTime[ format_count++ ] = szTime[ 5 ];
                         digit_count--;
                      }
-                     while( digit_count-- > 0 && format_count < size ) szFormattedTime[ format_count++ ] = ( char ) digit;
+                     while( digit_count-- > 0 && format_count < size )
+                        szFormattedTime[ format_count++ ] = ( char ) digit;
                }
                used_s = TRUE;
                break;
@@ -570,19 +585,21 @@ char * hb_timeFormat( const char * szTime, char * szFormattedTime, const char * 
                         szFormattedTime[ format_count++ ] = szTime[ digit_c ];
                         digit_count--;
                      }
-                     while( digit_count-- > 0 && format_count < size ) szFormattedTime[ format_count++ ] = ( char ) digit;
+                     while( digit_count-- > 0 && format_count < size )
+                        szFormattedTime[ format_count++ ] = ( char ) digit;
                }
                used_c = TRUE;
                break;
             }
 
             case 'P':
-               szFormattedTime[ format_count ] = ( char ) digit;
-               pos_pm = format_count++;
+               szFormattedTime[ format_count ]  = ( char ) digit;
+               pos_pm                           = ( int ) format_count++;
                break;
 
             default:
-               while( digit_count-- > 0 && format_count < size ) szFormattedTime[ format_count++ ] = ( char ) digit;
+               while( digit_count-- > 0 && format_count < size )
+                  szFormattedTime[ format_count++ ] = ( char ) digit;
          }
       }
       if( used_pm && pos_h >= 0 )
@@ -590,8 +607,8 @@ char * hb_timeFormat( const char * szTime, char * szFormattedTime, const char * 
          if( szFormattedTime[ pos_h ] == '2' || ( szFormattedTime[ pos_h ] == '1' && szFormattedTime[ pos_h + 1 ] > '1' ) )
          {
             szFormattedTime[ pos_h ]--;
-            szFormattedTime[ pos_h + 1 ] -= (char) 2;
-            szFormattedTime[ pos_pm ] = 'P';
+            szFormattedTime[ pos_h + 1 ]  -= ( char ) 2;
+            szFormattedTime[ pos_pm ]     = 'P';
          }
          else
          {
@@ -601,8 +618,8 @@ char * hb_timeFormat( const char * szTime, char * szFormattedTime, const char * 
 
          if( szFormattedTime[ pos_h ] == '0' && szFormattedTime[ pos_h + 1 ] == '0' )
          {
-            szFormattedTime[ pos_h ] = '1';
-            szFormattedTime[ pos_h + 1 ] = '2';
+            szFormattedTime[ pos_h ]      = '1';
+            szFormattedTime[ pos_h + 1 ]  = '2';
          }
       }
    }
@@ -638,28 +655,28 @@ char * hb_timeFormat( const char * szTime, char * szFormattedTime, const char * 
 
 char * hb_datetimeFormat( const char * szDateTime, char * szFormattedDateTime, const char * szDateFormat, const char * szTimeFormat )
 {
-   int n;
-   char szDate[9];
+   int   n;
+   char  szDate[ 9 ];
 
    if( szDateFormat )
    {
       HB_MEMCPY( szDate, szDateTime, 8 );
-      szDate[8] = '\0';
+      szDate[ 8 ]                = '\0';
       hb_dateFormat( szDate, szFormattedDateTime, szDateFormat );
-      n = strlen( szFormattedDateTime );
-      szFormattedDateTime[ n ] = ' ';
+      n                          = ( int ) strlen( szFormattedDateTime );
+      szFormattedDateTime[ n ]   = ' ';
    }
    else
    {
       n = -1;
    }
-   hb_timeFormat( szDateTime+8 , szFormattedDateTime+n+1, szTimeFormat );
+   hb_timeFormat( szDateTime + 8, szFormattedDateTime + n + 1, szTimeFormat );
    return szFormattedDateTime;
 }
 
 int hb_dateDOW( int iYear, int iMonth, int iDay )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateDOW(%d, %d, %d)", iYear, iMonth, iDay));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateDOW(%d, %d, %d)", iYear, iMonth, iDay ) );
 
    if( iMonth < 3 )
    {
@@ -675,7 +692,7 @@ int hb_dateDOW( int iYear, int iMonth, int iDay )
 
 void hb_dateToday( int * piYear, int * piMonth, int * piDay )
 {
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN )
 
    SYSTEMTIME st;
    GetLocalTime( &st );
@@ -684,10 +701,10 @@ void hb_dateToday( int * piYear, int * piMonth, int * piDay )
    *piMonth = st.wMonth;
    *piDay   = st.wDay;
 
-#elif defined( HB_OS_UNIX ) && !defined( __WATCOMC__ )
+#elif defined( HB_OS_UNIX ) && ! defined( __WATCOMC__ )
 
-   time_t t;
-   struct tm st;
+   time_t      t;
+   struct tm   st;
 
    time( &t );
    localtime_r( &t, &st );
@@ -698,11 +715,11 @@ void hb_dateToday( int * piYear, int * piMonth, int * piDay )
 
 #else
 
-   time_t t;
+   time_t      t;
    struct tm * oTime;
 
    time( &t );
-   oTime = localtime( &t );
+   oTime    = localtime( &t );
 
    *piYear  = oTime->tm_year + 1900;
    *piMonth = oTime->tm_mon + 1;
@@ -715,16 +732,16 @@ void hb_dateToday( int * piYear, int * piMonth, int * piDay )
 
 void hb_dateTimeStr( char * pszTime )
 {
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN )
    {
       SYSTEMTIME st;
       GetLocalTime( &st );
       hb_snprintf( pszTime, 9, "%02d:%02d:%02d", st.wHour, st.wMinute, st.wSecond );
    }
-#elif defined( HB_OS_UNIX ) && !defined( __WATCOMC__ )
+#elif defined( HB_OS_UNIX ) && ! defined( __WATCOMC__ )
    {
-      time_t t;
-      struct tm st;
+      time_t      t;
+      struct tm   st;
 
       time( &t );
       localtime_r( &t, &st );
@@ -733,7 +750,7 @@ void hb_dateTimeStr( char * pszTime )
    }
 #else
    {
-      time_t t;
+      time_t      t;
       struct tm * oTime;
 
       time( &t );
@@ -744,22 +761,22 @@ void hb_dateTimeStr( char * pszTime )
 }
 
 /*
-2-4  The next three characters tell the time a user placed the lock. (10h 09h 07h i.e. 16:09:07)
-5-7  The next three characters tell the date a user placed the lock. ( 60h 09h 0Bh i.e. (19)96-09-11 )
-*/
+   2-4  The next three characters tell the time a user placed the lock. (10h 09h 07h i.e. 16:09:07)
+   5-7  The next three characters tell the date a user placed the lock. ( 60h 09h 0Bh i.e. (19)96-09-11 )
+ */
 void hb_dbaselockEncode( char * pszTimeDate )
 {
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN )
    {
       SYSTEMTIME st;
       GetLocalTime( &st );
       hb_snprintf( pszTimeDate, 6, "%c%c%c%c%c%c",
                    st.wHour, st.wMinute, st.wSecond, st.wYear - 1900, st.wMonth, st.wDay );
    }
-#elif defined( HB_OS_UNIX ) && !defined( __WATCOMC__ )
+#elif defined( HB_OS_UNIX ) && ! defined( __WATCOMC__ )
    {
-      time_t t;
-      struct tm st;
+      time_t      t;
+      struct tm   st;
 
       time( &t );
       localtime_r( &t, &st );
@@ -769,7 +786,7 @@ void hb_dbaselockEncode( char * pszTimeDate )
    }
 #else
    {
-      time_t t;
+      time_t      t;
       struct tm * oTime;
 
       time( &t );
@@ -780,18 +797,18 @@ void hb_dbaselockEncode( char * pszTimeDate )
 #endif
 }
 
-LONG hb_timeStampEncode( int iHour, int iMinutes, int iSeconds, int iMSec )
+long hb_timeStampEncode( int iHour, int iMinutes, int iSeconds, int iMSec )
 {
-   LONG lMillisec;
+   long lMillisec;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_timeStampEncode(%d, %d, %d, %d)", iHour, iMinutes, iSeconds, iMSec));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_timeStampEncode(%d, %d, %d, %d)", iHour, iMinutes, iSeconds, iMSec ) );
 
    if( iHour >= 0 && iHour < 24 &&
        iMinutes >= 0 && iMinutes < 60 &&
        iSeconds >= 0 && iSeconds < 60 &&
        iMSec >= 0 && iMSec < 1000 )
    {
-      lMillisec = ( ( LONG ) ( iHour * 60 + iMinutes ) * 60 + iSeconds ) *
+      lMillisec = ( ( long ) ( iHour * 60 + iMinutes ) * 60 + iSeconds ) *
                   1000 + iMSec;
    }
    else
@@ -802,10 +819,10 @@ LONG hb_timeStampEncode( int iHour, int iMinutes, int iSeconds, int iMSec )
    return lMillisec;
 }
 
-void hb_timeStampDecode( LONG lMillisec, int * piHour, int * piMinutes,
-                                   int * piSeconds, int * piMSec )
+void hb_timeStampDecode( long lMillisec, int * piHour, int * piMinutes,
+                         int * piSeconds, int * piMSec )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_timeStampDecode(%ld, %p, %p, %p, %p)", lMillisec, piHour, piMinutes, piSeconds, piMSec));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_timeStampDecode(%ld, %p, %p, %p, %p)", lMillisec, piHour, piMinutes, piSeconds, piMSec ) );
 
    if( lMillisec <= 0 )
    {
@@ -813,12 +830,12 @@ void hb_timeStampDecode( LONG lMillisec, int * piHour, int * piMinutes,
    }
    else
    {
-      *piMSec = lMillisec % 1000;
-      lMillisec /= 1000;
-      *piSeconds = lMillisec % 60;
-      lMillisec /= 60;
-      *piMinutes = lMillisec % 60;
-      lMillisec /= 60;
+      *piMSec     = lMillisec % 1000;
+      lMillisec   /= 1000;
+      *piSeconds  = lMillisec % 60;
+      lMillisec   /= 60;
+      *piMinutes  = lMillisec % 60;
+      lMillisec   /= 60;
       if( lMillisec >= 24 )
          *piHour = *piMinutes = *piSeconds = *piMSec = 0;
       else
@@ -829,15 +846,15 @@ void hb_timeStampDecode( LONG lMillisec, int * piHour, int * piMinutes,
 /* This function always closes the time with a zero byte, so it needs a
    13 character long buffer. */
 
-char * hb_timeStampStr( char * szTime, LONG lMillisec )
+char * hb_timeStampStr( char * szTime, long lMillisec )
 {
    int iHour, iMinutes, iSeconds, iMSec;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_timeStampStr(%p, %ld)", szTime, lMillisec));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_timeStampStr(%p, %ld)", szTime, lMillisec ) );
 
    hb_timeStampDecode( lMillisec, &iHour, &iMinutes, &iSeconds, &iMSec );
    hb_snprintf( szTime, 13, "%02d:%02d:%02d.%03d",
-             iHour, iMinutes, iSeconds, iMSec );
+                iHour, iMinutes, iSeconds, iMSec );
    szTime[ 12 ] = '\0';
 
    return szTime;
@@ -846,41 +863,41 @@ char * hb_timeStampStr( char * szTime, LONG lMillisec )
 /* This function always closes the time with a zero byte, so it needs a
    24 character long buffer. */
 
-char * hb_dateTimeStampStr( char * szDateTime, LONG lJulian, LONG lMillisec )
+char * hb_dateTimeStampStr( char * szDateTime, long lJulian, long lMillisec )
 {
    int iYear, iMonth, iDay, iHour, iMinutes, iSeconds, iMSec;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateTimeStampStr(%p, %ld, %ld)", szDateTime, lJulian, lMillisec));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateTimeStampStr(%p, %ld, %ld)", szDateTime, lJulian, lMillisec ) );
 
    hb_dateDecode( lJulian, &iYear, &iMonth, &iDay );
    hb_timeStampDecode( lMillisec, &iHour, &iMinutes, &iSeconds, &iMSec );
    hb_snprintf( szDateTime, 24, "%04d-%02d-%02d %02d:%02d:%02d.%03d",
-             iYear, iMonth, iDay, iHour, iMinutes, iSeconds, iMSec );
+                iYear, iMonth, iDay, iHour, iMinutes, iSeconds, iMSec );
    szDateTime[ 23 ] = '\0';
 
    return szDateTime;
 }
 
-void hb_dateTimeStampStrGet( const char * szDateTime, LONG * plJulian, LONG * plMillisec )
+void hb_dateTimeStampStrGet( const char * szDateTime, long * plJulian, long * plMillisec )
 {
    int iLen;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateTimeStampStr(%s, %p, %p)", szDateTime, plJulian, plMillisec));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateTimeStampStr(%s, %p, %p)", szDateTime, plJulian, plMillisec ) );
 
-   *plJulian = *plMillisec = 0;
-   iLen = szDateTime ? hb_strnlen( szDateTime, 23 ) : 0;
+   *plJulian   = *plMillisec = 0;
+   iLen        = szDateTime ? ( int ) hb_strnlen( szDateTime, 23 ) : 0;
    if( iLen >= 10 )
    {
       int iYear, iMonth, iDay;
 
-      iYear  = ( ( ( int ) ( szDateTime[ 0 ] - '0' )   * 10 +
-                   ( int ) ( szDateTime[ 1 ] - '0' ) ) * 10 +
-                   ( int ) ( szDateTime[ 2 ] - '0' ) ) * 10 +
-                   ( int ) ( szDateTime[ 3 ] - '0' );
-      iMonth = ( szDateTime[ 5 ] - '0' ) * 10 + ( szDateTime[ 6 ] - '0' );
-      iDay   = ( szDateTime[ 8 ] - '0' ) * 10 + ( szDateTime[ 9 ] - '0' );
+      iYear = ( ( ( int ) ( szDateTime[ 0 ] - '0' ) * 10 +
+                  ( int ) ( szDateTime[ 1 ] - '0' ) ) * 10 +
+                ( int ) ( szDateTime[ 2 ] - '0' ) ) * 10 +
+              ( int ) ( szDateTime[ 3 ] - '0' );
+      iMonth      = ( szDateTime[ 5 ] - '0' ) * 10 + ( szDateTime[ 6 ] - '0' );
+      iDay        = ( szDateTime[ 8 ] - '0' ) * 10 + ( szDateTime[ 9 ] - '0' );
 
-      *plJulian = hb_dateEncode( iYear, iMonth, iDay );
+      *plJulian   = hb_dateEncode( iYear, iMonth, iDay );
       if( iLen >= 16 )
       {
          int iHour, iMinutes, iSeconds = 0, iMSec = 0;
@@ -899,9 +916,9 @@ void hb_dateTimeStampStrGet( const char * szDateTime, LONG * plJulian, LONG * pl
                   iSeconds = 0;
                else if( iLen >= 23 )
                {
-                  iMSec = ( ( szDateTime[ 20 ] - '0' )   * 10 +
+                  iMSec = ( ( szDateTime[ 20 ] - '0' ) * 10 +
                             ( szDateTime[ 21 ] - '0' ) ) * 10 +
-                            ( szDateTime[ 22 ] - '0' );
+                          ( szDateTime[ 22 ] - '0' );
                   if( iMSec < 0 || iMSec >= 1000 )
                      iMSec = 0;
                }
@@ -915,72 +932,72 @@ void hb_dateTimeStampStrGet( const char * szDateTime, LONG * plJulian, LONG * pl
 
 void hb_dateTime( int * piHour, int * piMinute, double * pdSeconds )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateTime(%p,%p,%p)", piHour, piMinute, pdSeconds ));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateTime(%p,%p,%p)", piHour, piMinute, pdSeconds ) );
 
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN )
    {
       SYSTEMTIME st;
       GetLocalTime( &st );
-      *piHour    = (int) st.wHour;
-      *piMinute  = (int) st.wMinute;
-      *pdSeconds = (double) st.wSecond;
+      *piHour     = ( int ) st.wHour;
+      *piMinute   = ( int ) st.wMinute;
+      *pdSeconds  = ( double ) st.wSecond;
    }
 #else
    {
-      time_t t;
+      time_t      t;
       struct tm * oTime;
 
       time( &t );
-      oTime = localtime( &t );
-      *piHour    = (int) oTime->tm_hour;
-      *piMinute  = (int) oTime->tm_min;
-      *pdSeconds = (double) oTime->tm_sec;
+      oTime       = localtime( &t );
+      *piHour     = ( int ) oTime->tm_hour;
+      *piMinute   = ( int ) oTime->tm_min;
+      *pdSeconds  = ( double ) oTime->tm_sec;
    }
 #endif
 }
 
 double hb_timeEncodeSec( int iHour, int iMinute, double dSeconds )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_timeEncode(%d, %d, %f)", iHour, iMinute, dSeconds));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_timeEncode(%d, %d, %f)", iHour, iMinute, dSeconds ) );
    //printf( "hb_timeEncode(%d, %d, %f)", lHour, lMinute, dSeconds);
 
    if( iHour >= 0 && iHour <= 23 && iMinute >= 0 && iMinute <= 59 && dSeconds >= 0 && dSeconds < 60 )
    {
-      return (double) (iHour * 3600 + iMinute * 60) + dSeconds;
+      return ( double ) ( iHour * 3600 + iMinute * 60 ) + dSeconds;
    }
 
    return 0;
 }
 
-LONG hb_timeEncode( int iHour, int iMinute, double dSeconds )
+long hb_timeEncode( int iHour, int iMinute, double dSeconds )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_timeEncode(%d, %d, %f)", iHour, iMinute, dSeconds));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_timeEncode(%d, %d, %f)", iHour, iMinute, dSeconds ) );
    //printf( "hb_timeEncode(%d, %d, %f)", lHour, lMinute, dSeconds);
 
    if( iHour >= 0 && iHour <= 23 && iMinute >= 0 && iMinute <= 59 && dSeconds >= 0 && dSeconds < 60 )
    {
-      return (LONG) (iHour * 3600 * HB_DATETIMEINSEC) + (LONG) (iMinute * 60 * HB_DATETIMEINSEC) + (LONG) (dSeconds * HB_DATETIMEINSEC);
+      return ( long ) ( iHour * 3600 * HB_DATETIMEINSEC ) + ( long ) ( iMinute * 60 * HB_DATETIMEINSEC ) + ( long ) ( dSeconds * HB_DATETIMEINSEC );
    }
 
    return 0;
 }
 
-void hb_timeDecode( LONG lTime, int * piHour, int * piMinute, double * pdSeconds )
+void hb_timeDecode( long lTime, int * piHour, int * piMinute, double * pdSeconds )
 {
-   int iHour = 0, iMin = 0;
-   double dSec = 0.0;
+   int      iHour = 0, iMin = 0;
+   double   dSec  = 0.0;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_timeDecode(%ld, %p, %p %p)", lTime, piHour, piMinute, pdSeconds));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_timeDecode(%ld, %p, %p %p)", lTime, piHour, piMinute, pdSeconds ) );
 
    if( lTime > 0 )
    {
-      div_t result = div( (int) lTime, (int) ( 3600 * HB_DATETIMEINSEC ) );
-      iHour  = result.quot;
-      lTime  = result.rem;
-      result = div( (int) lTime, (int) ( 60 * HB_DATETIMEINSEC ) );
-      iMin   = result.quot;
-      lTime  = result.rem;
-      dSec   = ( double ) lTime  / HB_DATETIMEINSEC;
+      div_t result = div( ( int ) lTime, ( int ) ( 3600 * HB_DATETIMEINSEC ) );
+      iHour    = result.quot;
+      lTime    = result.rem;
+      result   = div( ( int ) lTime, ( int ) ( 60 * HB_DATETIMEINSEC ) );
+      iMin     = result.quot;
+      lTime    = result.rem;
+      dSec     = ( double ) lTime / HB_DATETIMEINSEC;
       //TraceLog(NULL,"iHour=%d iMin=%d dSec=%f\n",iHour,iMin,dSec);
    }
 
@@ -1002,27 +1019,27 @@ void hb_timeDecode( LONG lTime, int * piHour, int * piMinute, double * pdSeconds
 
 void hb_timeDecodeSec( double dTime, int * piHour, int * piMinute, double * pdSeconds )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_timeDecode(%d, %p, %p %p)", dTime, piHour, piMinute, pdSeconds));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_timeDecode(%d, %p, %p %p)", dTime, piHour, piMinute, pdSeconds ) );
 
    if( dTime > 0 )
    {
-      LONG lTime = (LONG) (dTime * HB_DATETIMEINSEC);
+      double lTime = ( double ) ( dTime * HB_DATETIMEINSEC );
       hb_timeDecodeSec( lTime, piHour, piMinute, pdSeconds );
    }
 }
 
 void hb_timeStrGet( const char * szTime, int * piHour, int * piMinutes,
-                              int * piSeconds, int * piMSec )
+                    int * piSeconds, int * piMSec )
 {
    int iHour, iMinutes, iSeconds, iMSec;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_timeStrGet(%s, %p, %p, %p, %p)", szTime, piHour, piMinutes, piSeconds, piMSec));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_timeStrGet(%s, %p, %p, %p, %p)", szTime, piHour, piMinutes, piSeconds, piMSec ) );
 
    iHour = iMinutes = iSeconds = iMSec = 0;
 
    if( szTime )
    {
-      int iLen = hb_strnlen( szTime, 12 );
+      int iLen = ( int ) hb_strnlen( szTime, 12 );
 
       if( iLen >= 5 )
       {
@@ -1041,9 +1058,9 @@ void hb_timeStrGet( const char * szTime, int * piHour, int * piMinutes,
                   iSeconds = 0;
                else if( iLen >= 12 )
                {
-                  iMSec = ( ( szTime[  9 ] - '0' )   * 10 +
+                  iMSec = ( ( szTime[ 9 ] - '0' ) * 10 +
                             ( szTime[ 10 ] - '0' ) ) * 10 +
-                            ( szTime[ 11 ] - '0' );
+                          ( szTime[ 11 ] - '0' );
                   if( iMSec < 0 || iMSec >= 1000 )
                      iMSec = 0;
                }
@@ -1062,16 +1079,16 @@ void hb_timeStrGet( const char * szTime, int * piHour, int * piMinutes,
       *piMSec = iMSec;
 }
 
-void hb_datetimeEncode( LONG *plDate, LONG *plTime, int iYear, int iMonth, int iDay,
-                                    int iHour, int iMinute, double dSeconds, int iAmPm, int * piOk )
+void hb_datetimeEncode( long * plDate, long * plTime, int iYear, int iMonth, int iDay,
+                        int iHour, int iMinute, double dSeconds, int iAmPm, int * piOk )
 {
-   LONG lDate;
-   BOOL iOk;
+   long  lDate;
+   BOOL  iOk;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_datetimeEncode(%d, %d, %d, %d, %d, %f, %d, %p)", iYear, iMonth, iDay, iHour, iMinute, dSeconds, iAmPm, piOk));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_datetimeEncode(%d, %d, %d, %d, %d, %f, %d, %p)", iYear, iMonth, iDay, iHour, iMinute, dSeconds, iAmPm, piOk ) );
    //printf( "hb_datetimeEncode(%d, %d, %d, %d, %d, %f, %d, %p) Que pasa???\n", iYear, iMonth, iDay, iHour, iMinute, dSeconds, iAmPm, iOk);
 
-   lDate = ( LONG ) hb_dateEncode( iYear, iMonth, iDay );
+   lDate = ( long ) hb_dateEncode( iYear, iMonth, iDay );
    iOk   = FALSE;
 
    if( iAmPm == 0 )
@@ -1082,13 +1099,13 @@ void hb_datetimeEncode( LONG *plDate, LONG *plTime, int iYear, int iMonth, int i
    {
       if( iHour <= 12 )
       {
-         iOk = TRUE;
+         iOk   = TRUE;
          iHour %= 12;
       }
       else
       {
-         iHour = 0;
-         iMinute = 0;
+         iHour    = 0;
+         iMinute  = 0;
          dSeconds = 0;
       }
    }
@@ -1096,14 +1113,14 @@ void hb_datetimeEncode( LONG *plDate, LONG *plTime, int iYear, int iMonth, int i
    {
       if( iHour <= 12 )
       {
-         iOk = TRUE;
+         iOk   = TRUE;
          iHour %= 12;
          iHour += 12;
       }
       else
       {
-         iHour = 0;
-         iMinute = 0;
+         iHour    = 0;
+         iMinute  = 0;
          dSeconds = 0;
       }
    }
@@ -1125,43 +1142,42 @@ void hb_datetimeEncode( LONG *plDate, LONG *plTime, int iYear, int iMonth, int i
       *piOk = iOk;
    }
 
-   return;
 }
 
-void hb_datetimeDecode( LONG lDate, LONG lTime, int * piYear, int * piMonth, int * piDay,
-                                                    int * piHour, int * piMinute, double * pdSeconds )
+void hb_datetimeDecode( long lDate, long lTime, int * piYear, int * piMonth, int * piDay,
+                        int * piHour, int * piMinute, double * pdSeconds )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_datetimeDecode( %d, %d %p, %p, %p, %p, %p, %p)", lDate, lTime, piYear, piMonth, piDay, piHour, piMinute, pdSeconds));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_datetimeDecode( %d, %d %p, %p, %p, %p, %p, %p)", lDate, lTime, piYear, piMonth, piDay, piHour, piMinute, pdSeconds ) );
 
    hb_dateDecode( lDate, piYear, piMonth, piDay );
    hb_timeDecode( lTime, piHour, piMinute, pdSeconds );
 }
 
-LONG hb_timeEncStr( const char * szTime )
+long hb_timeEncStr( const char * szTime )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_timeEncStr(%s)", szTime));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_timeEncStr(%s)", szTime ) );
 
    if( szTime )
    {
-      ULONG ulLen = strlen( szTime );
+      int ulLen = ( int ) strlen( szTime );
 
       if( ulLen >= 4 )
       {
-         return (LONG) hb_strVal( szTime, 2 ) * 3600 * HB_DATETIMEINSEC +
-                (LONG) hb_strVal( szTime + 2, 2 ) * 60 * HB_DATETIMEINSEC +
-                (LONG)(hb_strVal( szTime + 4, ulLen - 4 ) * HB_DATETIMEINSEC);
+         return ( long ) hb_strVal( szTime, 2 ) * 3600 * HB_DATETIMEINSEC +
+                ( long ) hb_strVal( szTime + 2, 2 ) * 60 * HB_DATETIMEINSEC +
+                ( long ) ( hb_strVal( szTime + 4, ulLen - 4 ) * HB_DATETIMEINSEC );
       }
    }
 
    return 0;
 }
 
-char * hb_timeDecStr( char * szTime, LONG lSeconds )
+char * hb_timeDecStr( char * szTime, long lSeconds )
 {
-   int iHour, iMinute;
-   double dSeconds;
+   int      iHour, iMinute;
+   double   dSeconds;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_timeDecStr(%s,%f)", szTime, lSeconds ));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_timeDecStr(%s,%f)", szTime, lSeconds ) );
 
    hb_timeDecode( lSeconds, &iHour, &iMinute, &dSeconds );
 
@@ -1172,68 +1188,69 @@ char * hb_timeDecStr( char * szTime, LONG lSeconds )
    return szTime;
 }
 
-void hb_datetimeEncStr( const char * szDateTime, LONG *plDate, LONG *plTime )
+void hb_datetimeEncStr( const char * szDateTime, long * plDate, long * plTime )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_datetimeEncStr(%s,%p,%p)", szDateTime,plDate,plTime));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_datetimeEncStr(%s,%p,%p)", szDateTime, plDate, plTime ) );
 
    if( plDate )
    {
-      char szDate[9];
-      szDate[8] = '\0';
+      char szDate[ 9 ];
+      szDate[ 8 ] = '\0';
       HB_MEMCPY( szDate, szDateTime, 8 );
-      *plDate = hb_dateEncStr( szDate );
+      *plDate     = hb_dateEncStr( szDate );
    }
    if( plTime )
    {
-      *plTime = hb_timeEncStr( szDateTime+8 );
+      *plTime = hb_timeEncStr( szDateTime + 8 );
    }
 }
 
-char * hb_datetimeDecStr( char * szDateTime, LONG lDate, LONG lTime )
+char * hb_datetimeDecStr( char * szDateTime, long lDate, long lTime )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_datetimeDecStr(%s,%d,%d)", szDateTime, lDate, lTime));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_datetimeDecStr(%s,%d,%d)", szDateTime, lDate, lTime ) );
 
    hb_dateDecStr( szDateTime, lDate );
-   hb_timeDecStr( szDateTime+8, lTime );
+   hb_timeDecStr( szDateTime + 8, lTime );
 
    return szDateTime;
 }
 
 #undef hb_datetimePack
-double hb_datetimePack( LONG lJulian, LONG lTime )
+double hb_datetimePack( long lJulian, long lTime )
 {
-   return (double) lJulian + ((double)lTime / (double) (86400 * HB_DATETIMEINSEC));
+   return ( double ) lJulian + ( ( double ) lTime / ( double ) ( 86400 * HB_DATETIMEINSEC ) );
 }
 
 #undef hb_datetimePackInSec
-double hb_datetimePackInSec( LONG lJulian, LONG lTime )
+double hb_datetimePackInSec( long lJulian, long lTime )
 {
-   return (double) (lJulian * 86400 ) + ((double)lTime / (double) (HB_DATETIMEINSEC));
+   return ( double ) ( lJulian * 86400 ) + ( ( double ) lTime / ( double ) ( HB_DATETIMEINSEC ) );
 }
 
-void hb_datetimeUnpack( double dDateTime, LONG * plDate, LONG * plTime )
+void hb_datetimeUnpack( double dDateTime, long * plDate, long * plTime )
 {
    double dDate, dTime;
+
    dTime = modf( dDateTime, &dDate );
 
    if( plDate )
    {
-      *plDate = (LONG)dDate;
+      *plDate = ( long ) dDate;
    }
    if( plTime )
    {
-      dTime  *= (double)(86400 * HB_DATETIMEINSEC);
-      *plTime = (LONG)dTime;
+      dTime    *= ( double ) ( 86400 * HB_DATETIMEINSEC );
+      *plTime  = ( long ) dTime;
    }
 }
 
-#define hb_datetimePack( lJulian, lTime )   (double)((double) lJulian + ((double)lTime / (double) (86400 * HB_DATETIMEINSEC)))
-#define hb_datetimePackInSec( lJulian, lTime )   (double)((double) (lJulian * 86400 ) + ((double)lTime / (double) (HB_DATETIMEINSEC)))
+#define hb_datetimePack( lJulian, lTime )       ( double ) ( ( double ) lJulian + ( ( double ) lTime / ( double ) ( 86400 * HB_DATETIMEINSEC ) ) )
+#define hb_datetimePackInSec( lJulian, lTime )  ( double ) ( ( double ) ( lJulian * 86400 ) + ( ( double ) lTime / ( double ) ( HB_DATETIMEINSEC ) ) )
 
 void hb_timeStampUnpackDT( double dTimeStamp,
                            long * plJulian, long * plMilliSec )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_timeStampUnpackDT(%f, %p, %p)", dTimeStamp, plJulian, plMilliSec));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_timeStampUnpackDT(%f, %p, %p)", dTimeStamp, plJulian, plMilliSec ) );
 
    {
 #if defined( HB_LONG_LONG_OFF )
@@ -1258,7 +1275,7 @@ void hb_timeStampUnpackDT( double dTimeStamp,
 
 double hb_comp_datetimeEncStr( const char * szDateTime )
 {
-   LONG lDate, lTime;
+   long lDate, lTime;
 
    hb_datetimeEncStr( szDateTime, &lDate, &lTime );
 
@@ -1267,15 +1284,15 @@ double hb_comp_datetimeEncStr( const char * szDateTime )
 
 char * hb_comp_datetimeDecStr( char * szDateTime, double dDateTime )
 {
-   LONG lDate, lTime;
+   long lDate, lTime;
 
    hb_datetimeUnpack( dDateTime, &lDate, &lTime );
 
    return hb_datetimeDecStr( szDateTime, lDate, lTime );
 }
 
-void hb_comp_datetimeEncode( LONG *plDate, LONG *plTime, int iYear, int iMonth, int iDay,
-                              int iHour, int iMinute, double dSeconds, int iAmPm, int * piOk )
+void hb_comp_datetimeEncode( long * plDate, long * plTime, int iYear, int iMonth, int iDay,
+                             int iHour, int iMinute, double dSeconds, int iAmPm, int * piOk )
 {
    hb_datetimeEncode( plDate, plTime, iYear, iMonth, iDay, iHour, iMinute, dSeconds, iAmPm, piOk );
 }

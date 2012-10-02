@@ -56,13 +56,13 @@
 HB_FUNC( AMPM )
 {
    const char * pszTime = hb_parcx( 1 );
-   ULONG  ulTimeLen = hb_parclen( 1 );
+   HB_SIZE ulTimeLen = hb_parclen( 1 );
    char * pszResult = ( char * ) hb_xgrab( HB_MAX( ulTimeLen, 2 ) + 3 + 1 );
    USHORT uiHour = ( USHORT ) hb_strVal( pszTime, ulTimeLen );
    BOOL   bAM;
 
    memset( pszResult, '\0', 3 );
-   HB_MEMCPY( pszResult, pszTime, ulTimeLen );
+   HB_MEMCPY( pszResult, pszTime, (size_t) ulTimeLen );
 
    if( uiHour == 0 || uiHour == 24 )
    {

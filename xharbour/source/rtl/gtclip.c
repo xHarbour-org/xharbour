@@ -62,9 +62,9 @@
 
 /* TODO: add protection for MT mode */
 static char *     s_szClipboardData;
-static ULONG      s_ulClipboardLen;
+static HB_SIZE    s_ulClipboardLen;
 
-BOOL hb_gt_setClipboard( const char * szClipData, ULONG ulLen )
+BOOL hb_gt_setClipboard( const char * szClipData, HB_SIZE ulLen )
 {
    if( s_ulClipboardLen )
       hb_xfree( s_szClipboardData );
@@ -72,20 +72,20 @@ BOOL hb_gt_setClipboard( const char * szClipData, ULONG ulLen )
    if( s_ulClipboardLen )
    {
       s_szClipboardData = ( char * ) hb_xgrab( s_ulClipboardLen + 1 );
-      HB_MEMCPY( s_szClipboardData, szClipData, s_ulClipboardLen );
+      HB_MEMCPY( s_szClipboardData, szClipData, (size_t) s_ulClipboardLen );
       s_szClipboardData[ s_ulClipboardLen ] = '\0';
    }
    return TRUE;
 }
 
-BOOL hb_gt_getClipboard( char ** pszClipData, ULONG *pulLen )
+BOOL hb_gt_getClipboard( char ** pszClipData, HB_SIZE *pulLen )
 {
    *pszClipData = NULL;
    *pulLen = s_ulClipboardLen;
    if( s_ulClipboardLen )
    {
       *pszClipData = ( char * ) hb_xgrab( s_ulClipboardLen + 1 );
-      HB_MEMCPY( *pszClipData, s_szClipboardData, s_ulClipboardLen );
+      HB_MEMCPY( *pszClipData, s_szClipboardData, (size_t) s_ulClipboardLen );
       ( *pszClipData )[ s_ulClipboardLen ] = '\0';
    }
    return s_ulClipboardLen != 0;
@@ -93,7 +93,7 @@ BOOL hb_gt_getClipboard( char ** pszClipData, ULONG *pulLen )
 
 #if defined( HB_OS_WIN )
 
-BOOL hb_gt_w32_setClipboard( UINT uFormat, const char * szClipData, ULONG ulLen )
+BOOL hb_gt_w32_setClipboard( UINT uFormat, const char * szClipData, HB_SIZE ulLen )
 {
    BOOL fResult = FALSE;
 
@@ -104,7 +104,7 @@ BOOL hb_gt_w32_setClipboard( UINT uFormat, const char * szClipData, ULONG ulLen 
       EmptyClipboard();
 
       /* Allocate a global memory object for the text. */
-      hglbCopy = GlobalAlloc( GMEM_MOVEABLE, uFormat == CF_UNICODETEXT ? ( ulLen + 1 ) * sizeof( wchar_t ) : ulLen + 1 );
+      hglbCopy = GlobalAlloc( GMEM_MOVEABLE, uFormat == CF_UNICODETEXT ? ( (size_t) ulLen + 1 ) * sizeof( wchar_t ) : (size_t) ulLen + 1 );
       if( hglbCopy )
       {
          /* Lock the handle and copy the text to the buffer. */
@@ -113,12 +113,12 @@ BOOL hb_gt_w32_setClipboard( UINT uFormat, const char * szClipData, ULONG ulLen 
          {
             if( uFormat == CF_UNICODETEXT )
             {
-               hb_mbtowcset( ( LPWSTR ) lptstrCopy, szClipData, ulLen );
+               hb_mbtowcset( ( LPWSTR ) lptstrCopy, szClipData, (ULONG) ulLen );
                * ( ( ( LPWSTR ) lptstrCopy ) + ulLen ) = L'\0';
             }
             else
             {
-               HB_MEMCPY( lptstrCopy, szClipData, ulLen );
+               HB_MEMCPY( lptstrCopy, szClipData, (size_t) ulLen );
                lptstrCopy[ ulLen ] = '\0';
             }
             fResult = TRUE;
@@ -144,7 +144,7 @@ BOOL hb_gt_w32_setClipboard( UINT uFormat, const char * szClipData, ULONG ulLen 
    return fResult;
 }
 
-BOOL hb_gt_w32_getClipboard( UINT uFormat, char ** pszClipData, ULONG *pulLen )
+BOOL hb_gt_w32_getClipboard( UINT uFormat, char ** pszClipData, HB_SIZE *pulLen )
 {
    *pulLen = 0;
    *pszClipData = NULL;
@@ -169,7 +169,7 @@ BOOL hb_gt_w32_getClipboard( UINT uFormat, char ** pszClipData, ULONG *pulLen )
                   if( *pulLen )
                   {
                      *pszClipData = ( char * ) hb_xgrab( *pulLen + 1 );
-                     HB_TCHAR_GETFROM( *pszClipData, lptstr, *pulLen );
+                     HB_TCHAR_GETFROM( *pszClipData, lptstr, (size_t) *pulLen );
                      ( *pszClipData )[ *pulLen ] = '\0';
                   }
                   break;
@@ -178,7 +178,7 @@ BOOL hb_gt_w32_getClipboard( UINT uFormat, char ** pszClipData, ULONG *pulLen )
                   if( *pulLen )
                   {
                      *pszClipData = ( char * ) hb_xgrab( *pulLen + 1 );
-                     HB_MEMCPY( *pszClipData, lptstr, *pulLen );
+                     HB_MEMCPY( *pszClipData, lptstr, (size_t) *pulLen );
                      ( *pszClipData )[ *pulLen ] = '\0';
                   }
                   break;

@@ -305,7 +305,7 @@ HB_EXPORT void hb_oleItemToVariant( VARIANT *pVariant, PHB_ITEM pItem )
       case HB_IT_STRING:
       case HB_IT_MEMO:
       {
-        ULONG ulLen = hb_itemGetCLen( pItem );
+        HB_SIZE ulLen = hb_itemGetCLen( pItem );
 
         sString = hb_itemGetCPtr( pItem );
 
@@ -518,7 +518,7 @@ HB_EXPORT void hb_oleItemToVariant( VARIANT *pVariant, PHB_ITEM pItem )
 
                  ItemToVariant_StringArray:
 
-                  rgsabound.cElements = hb_itemGetCLen( pItem );
+                  rgsabound.cElements = (ULONG) hb_itemGetCLen( pItem );
                   rgsabound.lLbound = 0;
 
                   parray = SafeArrayCreate( vt, 1, &rgsabound );
@@ -601,7 +601,7 @@ HB_EXPORT void hb_oleItemToVariant( VARIANT *pVariant, PHB_ITEM pItem )
 
           ItemToVariant_ProcessArray:
 
-            rgsabound.cElements = hb_arrayLen( pItem );
+            rgsabound.cElements = (ULONG) hb_arrayLen( pItem );
             rgsabound.lLbound = 0;
 
             //TraceLog( NULL, "ItemToVariant() Array len: %i type: %i ByRef: %i in: %s(%i) \n", rgsabound.cElements, vt, bByRef, __FILE__, __LINE__ );
@@ -977,7 +977,7 @@ static PHB_ITEM SafeArrayToArray( SAFEARRAY *parray, UINT iDim, long* rgIndices,
          {
             // Ugly hack, but needed to allocate our signature as hidden bytes!
             hb_itemPutCL( pArray, NULL, 0 );
-            HB_STRING_ALLOC( pArray, (ULONG)(iLen + 5) );
+            HB_STRING_ALLOC( pArray, (HB_SIZE) (iLen + 5) );
             pArray->item.asString.length = iLen;
 
             sArray = hb_itemGetCPtr( pArray );
@@ -2123,7 +2123,7 @@ HB_FUNC( TOLEAUTO_ONERROR )
          PHB_ITEM pReturn = hb_itemNew( NULL );
          PHB_ITEM pOleClassName = hb_itemNew( NULL );
          char *sOleClassName;
-         int iClassNameLen, iMsgNameLen;
+         HB_SIZE iClassNameLen, iMsgNameLen;
 
          hb_itemForwardValue( pReturn, hb_stackReturnItem() );
 

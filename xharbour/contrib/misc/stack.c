@@ -82,7 +82,7 @@ HB_FUNC( STACKPUSH )
 HB_FUNC( STACKPOP )
 {
    PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
-   LONG ulLen = hb_arrayLen( pArray );
+   HB_SIZE ulLen = hb_arrayLen( pArray );
    HB_ITEM Last;
 
    Last.type = HB_IT_NIL;

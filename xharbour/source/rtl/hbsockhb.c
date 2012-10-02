@@ -396,7 +396,7 @@ HB_FUNC( HB_SOCKETRECV )
    {
       PHB_ITEM pItem = hb_param( 2, HB_IT_STRING );
       char * pBuffer;
-      ULONG nLen;
+      HB_SIZE nLen;
 
       if( pItem && ISBYREF( 2 ) && hb_itemGetWriteCL( pItem, &pBuffer, &nLen ) )
       {
@@ -421,7 +421,7 @@ HB_FUNC( HB_SOCKETRECVFROM )
    {
       PHB_ITEM pItem = hb_param( 2, HB_IT_STRING );
       char * pBuffer;
-      ULONG nLen;
+      HB_SIZE nLen;
 
       if( pItem && ISBYREF( 2 ) && hb_itemGetWriteCL( pItem, &pBuffer, &nLen ) )
       {
@@ -705,5 +705,5 @@ HB_FUNC( HB_SOCKETGETIFACES )
 
 HB_FUNC( HB_SOCKETGETFD )
 {
-   hb_retni( hb_socketParam( 1 ) );
+   hb_retni( ( int ) hb_socketParam( 1 ) );
 }

@@ -61,7 +61,7 @@ typedef struct HB_stru_fix_info
 } HB_FIX_INFO, * HB_FIX_INFO_PTR;
 
 #define HB_FIX_FUNC( func ) HB_PCODE_FUNC( func, HB_FIX_INFO_PTR )
-typedef HB_FIX_FUNC( HB_FIX_FUNC_ );
+typedef HB_FIX_FUNC ( HB_FIX_FUNC_ );
 typedef HB_FIX_FUNC_ * HB_FIX_FUNC_PTR;
 
 
@@ -76,29 +76,29 @@ static HB_FIX_FUNC( hb_p_endblock )
 
 static HB_FIX_FUNC( hb_p_pushblock )
 {
-   USHORT wVar;
-   ULONG ulStart = lPCodePos;
+   USHORT   wVar;
+   HB_SIZE  ulStart = lPCodePos;
 
    ++cargo->iNestedCodeblock;
 
-   wVar = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 5 ] ) );
+   wVar        = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 5 ] ) );
 
    /* opcode + codeblock size + number of parameters + number of local variables */
-   lPCodePos += 7;
+   lPCodePos   += 7;
 
    /* fix local variable's reference */
    while( wVar-- )
    {
-      BYTE * pLocal = &( pFunc->pCode[ lPCodePos ] );
-      USHORT wLocal = HB_PCODE_MKUSHORT( pLocal );
+      BYTE *   pLocal   = &( pFunc->pCode[ lPCodePos ] );
+      USHORT   wLocal   = HB_PCODE_MKUSHORT( pLocal );
 
-      wLocal += pFunc->wParamCount;
+      wLocal      += pFunc->wParamCount;
       pLocal[ 0 ] = HB_LOBYTE( wLocal );
       pLocal[ 1 ] = HB_HIBYTE( wLocal );
-      lPCodePos +=2;
+      lPCodePos   += 2;
    }
 
-   return (lPCodePos - ulStart);
+   return lPCodePos - ulStart;
 }
 
 static HB_FIX_FUNC( hb_p_pushblockshort )
@@ -117,14 +117,14 @@ static HB_FIX_FUNC( hb_p_poplocal )
     */
    if( cargo->iNestedCodeblock == 0 )
    {
-      BYTE * pVar = &pFunc->pCode[ lPCodePos + 1 ];
-      SHORT iVar = HB_PCODE_MKSHORT( pVar );
+      BYTE *   pVar  = &pFunc->pCode[ lPCodePos + 1 ];
+      SHORT    iVar  = HB_PCODE_MKSHORT( pVar );
 
-      iVar += pFunc->wParamCount;
-      pVar[ 0 ] = HB_LOBYTE( iVar );
-      pVar[ 1 ] = HB_HIBYTE( iVar );
+      iVar        += pFunc->wParamCount;
+      pVar[ 0 ]   = HB_LOBYTE( iVar );
+      pVar[ 1 ]   = HB_HIBYTE( iVar );
 
-      if( HB_LIM_INT8( iVar ) && HB_COMP_ISSUPPORTED(HB_COMPFLAG_OPTJUMP) )
+      if( HB_LIM_INT8( iVar ) && HB_COMP_ISSUPPORTED( HB_COMPFLAG_OPTJUMP ) )
       {
          pFunc->pCode[ lPCodePos ] = HB_P_POPLOCALNEAR;
          hb_compNOOPfill( pFunc, lPCodePos + 2, 1, FALSE, FALSE );
@@ -140,14 +140,14 @@ static HB_FIX_FUNC( hb_p_pushlocal )
     */
    if( cargo->iNestedCodeblock == 0 )
    {
-      BYTE * pVar = &pFunc->pCode[ lPCodePos + 1 ];
-      SHORT iVar = HB_PCODE_MKSHORT( pVar );
+      BYTE *   pVar  = &pFunc->pCode[ lPCodePos + 1 ];
+      SHORT    iVar  = HB_PCODE_MKSHORT( pVar );
 
-      iVar += pFunc->wParamCount;
-      pVar[ 0 ] = HB_LOBYTE( iVar );
-      pVar[ 1 ] = HB_HIBYTE( iVar );
+      iVar        += pFunc->wParamCount;
+      pVar[ 0 ]   = HB_LOBYTE( iVar );
+      pVar[ 1 ]   = HB_HIBYTE( iVar );
 
-      if( HB_LIM_INT8( iVar ) && HB_COMP_ISSUPPORTED(HB_COMPFLAG_OPTJUMP) )
+      if( HB_LIM_INT8( iVar ) && HB_COMP_ISSUPPORTED( HB_COMPFLAG_OPTJUMP ) )
       {
          pFunc->pCode[ lPCodePos ] = HB_P_PUSHLOCALNEAR;
          hb_compNOOPfill( pFunc, lPCodePos + 2, 1, FALSE, FALSE );
@@ -163,12 +163,12 @@ static HB_FIX_FUNC( hb_p_pushlocalref )
     */
    if( cargo->iNestedCodeblock == 0 )
    {
-      BYTE * pVar = &pFunc->pCode[ lPCodePos + 1 ];
-      SHORT iVar = HB_PCODE_MKSHORT( pVar );
+      BYTE *   pVar  = &pFunc->pCode[ lPCodePos + 1 ];
+      SHORT    iVar  = HB_PCODE_MKSHORT( pVar );
 
-      iVar += pFunc->wParamCount;
-      pVar[ 0 ] = HB_LOBYTE( iVar );
-      pVar[ 1 ] = HB_HIBYTE( iVar );
+      iVar        += pFunc->wParamCount;
+      pVar[ 0 ]   = HB_LOBYTE( iVar );
+      pVar[ 1 ]   = HB_HIBYTE( iVar );
    }
 
    return 3;
@@ -187,13 +187,13 @@ static HB_FIX_FUNC( hb_p_poplocalnear )
        */
       SHORT iVar = ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
 
-      iVar += pFunc->wParamCount;
+      iVar                          += pFunc->wParamCount;
       pFunc->pCode[ lPCodePos + 1 ] = ( BYTE ) iVar;
 
-      if( !HB_LIM_INT8( iVar ) )
+      if( ! HB_LIM_INT8( iVar ) )
       {
-         char sTemp[16];
-         char sTemp2[16];
+         char  sTemp[ 16 ];
+         char  sTemp2[ 16 ];
 
          hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
          hb_snprintf( sTemp2, sizeof( sTemp2 ), "%i", iVar );
@@ -212,13 +212,13 @@ static HB_FIX_FUNC( hb_p_pushlocalnear )
    {
       SHORT iVar = ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
 
-      iVar += pFunc->wParamCount;
+      iVar                          += pFunc->wParamCount;
       pFunc->pCode[ lPCodePos + 1 ] = ( BYTE ) iVar;
 
       if( ! HB_LIM_INT8( iVar ) )
       {
-         char sTemp[16];
-         char sTemp2[16];
+         char  sTemp[ 16 ];
+         char  sTemp2[ 16 ];
 
          hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
          hb_snprintf( sTemp2, sizeof( sTemp2 ), "%i", iVar );
@@ -237,13 +237,13 @@ static HB_FIX_FUNC( hb_p_pushlocalnearinc )
    {
       SHORT iVar = ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
 
-      iVar += pFunc->wParamCount;
+      iVar                          += pFunc->wParamCount;
       pFunc->pCode[ lPCodePos + 1 ] = ( BYTE ) iVar;
 
       if( ! HB_LIM_INT8( iVar ) )
       {
-         char sTemp[16];
-         char sTemp2[16];
+         char  sTemp[ 16 ];
+         char  sTemp2[ 16 ];
 
          hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
          hb_snprintf( sTemp2, sizeof( sTemp2 ), "%i", iVar );
@@ -262,13 +262,13 @@ static HB_FIX_FUNC( hb_p_pushlocalneardec )
    {
       SHORT iVar = ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
 
-      iVar += pFunc->wParamCount;
+      iVar                          += pFunc->wParamCount;
       pFunc->pCode[ lPCodePos + 1 ] = ( BYTE ) iVar;
 
       if( ! HB_LIM_INT8( iVar ) )
       {
-         char sTemp[16];
-         char sTemp2[16];
+         char  sTemp[ 16 ];
+         char  sTemp2[ 16 ];
 
          hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
          hb_snprintf( sTemp2, sizeof( sTemp2 ), "%i", iVar );
@@ -287,13 +287,13 @@ static HB_FIX_FUNC( hb_p_localnearinc )
    {
       SHORT iVar = ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
 
-      iVar += pFunc->wParamCount;
+      iVar                          += pFunc->wParamCount;
       pFunc->pCode[ lPCodePos + 1 ] = ( BYTE ) iVar;
 
       if( ! HB_LIM_INT8( iVar ) )
       {
-         char sTemp[16];
-         char sTemp2[16];
+         char  sTemp[ 16 ];
+         char  sTemp2[ 16 ];
 
          hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
          hb_snprintf( sTemp2, sizeof( sTemp2 ), "%i", iVar );
@@ -312,13 +312,13 @@ static HB_FIX_FUNC( hb_p_localneardec )
    {
       SHORT iVar = ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
 
-      iVar += pFunc->wParamCount;
+      iVar                          += pFunc->wParamCount;
       pFunc->pCode[ lPCodePos + 1 ] = ( BYTE ) iVar;
 
       if( ! HB_LIM_INT8( iVar ) )
       {
-         char sTemp[16];
-         char sTemp2[16];
+         char  sTemp[ 16 ];
+         char  sTemp2[ 16 ];
 
          hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
          hb_snprintf( sTemp2, sizeof( sTemp2 ), "%i", iVar );
@@ -341,15 +341,15 @@ static HB_FIX_FUNC( hb_p_localnearaddint )
 
       if( HB_LIM_INT8( iVar ) )
       {
-         pFunc->pCode[ lPCodePos + 1 ] = (BYTE) iVar;
+         pFunc->pCode[ lPCodePos + 1 ] = ( BYTE ) iVar;
       }
       else
       {
-        // After fixing this variable cannot be accessed using near code
-        char sTemp[16];
+         // After fixing this variable cannot be accessed using near code
+         char sTemp[ 16 ];
 
-        hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
-        hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, "HB_P_LOCALNEARADDINT", (const char *) sTemp );
+         hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
+         hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, "HB_P_LOCALNEARADDINT", ( const char * ) sTemp );
       }
    }
 
@@ -368,12 +368,12 @@ static HB_FIX_FUNC( hb_p_localnearsetint )
 
       if( HB_LIM_INT8( iVar ) )
       {
-         pFunc->pCode[ lPCodePos + 1 ] = (BYTE) iVar;
+         pFunc->pCode[ lPCodePos + 1 ] = ( BYTE ) iVar;
       }
       else
       {
          // After fixing this variable cannot be accessed using near code
-         char sTemp[16];
+         char sTemp[ 16 ];
 
          hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
          hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, "HB_P_LOCALNEARSETINT", sTemp );
@@ -395,15 +395,15 @@ static HB_FIX_FUNC( hb_p_localnearsetstr )
 
       if( HB_LIM_INT8( iVar ) )
       {
-         pFunc->pCode[ lPCodePos + 1 ] = (BYTE) iVar;
+         pFunc->pCode[ lPCodePos + 1 ] = ( BYTE ) iVar;
       }
       else
       {
-        // After fixing this variable cannot be accessed using near code
-        char sTemp[16];
+         // After fixing this variable cannot be accessed using near code
+         char sTemp[ 16 ];
 
-        hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
-        hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, "HB_P_LOCALNEARSETSTR", (const char *) sTemp );
+         hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
+         hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, "HB_P_LOCALNEARSETSTR", ( const char * ) sTemp );
       }
    }
 
@@ -422,15 +422,15 @@ static HB_FIX_FUNC( hb_p_localnearsetstrhidden )
 
       if( HB_LIM_INT8( iVar ) )
       {
-         pFunc->pCode[ lPCodePos + 1 ] = (BYTE) iVar;
+         pFunc->pCode[ lPCodePos + 1 ] = ( BYTE ) iVar;
       }
       else
       {
-        // After fixing this variable cannot be accessed using near code
-        char sTemp[16];
+         // After fixing this variable cannot be accessed using near code
+         char sTemp[ 16 ];
 
-        hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
-        hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, "HB_P_LOCALNEARSETSTRHIDDEN", (const char *) sTemp );
+         hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
+         hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, "HB_P_LOCALNEARSETSTRHIDDEN", ( const char * ) sTemp );
       }
    }
 
@@ -449,15 +449,15 @@ static HB_FIX_FUNC( hb_p_localnearadd )
 
       if( HB_LIM_INT8( iVar ) )
       {
-         pFunc->pCode[ lPCodePos + 1 ] = (BYTE) iVar;
+         pFunc->pCode[ lPCodePos + 1 ] = ( BYTE ) iVar;
       }
       else
       {
-        // After fixing this variable cannot be accessed using near code
-        char sTemp[16];
+         // After fixing this variable cannot be accessed using near code
+         char sTemp[ 16 ];
 
-        hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
-        hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, "HB_P_LOCALNEARADD", (const char *) sTemp );
+         hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
+         hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, "HB_P_LOCALNEARADD", ( const char * ) sTemp );
       }
    }
 
@@ -493,16 +493,16 @@ static HB_FIX_FUNC( hb_p_false )
                      pFunc->pCode[ lPCodePos + 1 ] = HB_P_JUMPFAR;
                      break;
                   case HB_P_POP:
-                     iCount = 2;
+                     iCount                        = 2;
                      break;
                   case HB_P_JUMPTRUENEAR:
-                     iCount = 3;
+                     iCount                        = 3;
                      break;
                   case HB_P_JUMPTRUE:
-                     iCount = 4;
+                     iCount                        = 4;
                      break;
                   case HB_P_JUMPTRUEFAR:
-                     iCount = 5;
+                     iCount                        = 5;
                      break;
                }
                hb_compNOOPfill( pFunc, lPCodePos, iCount, FALSE, FALSE );
@@ -543,16 +543,16 @@ static HB_FIX_FUNC( hb_p_true )
                      pFunc->pCode[ lPCodePos + 1 ] = HB_P_JUMPFAR;
                      break;
                   case HB_P_POP:
-                     iCount = 2;
+                     iCount                        = 2;
                      break;
                   case HB_P_JUMPFALSENEAR:
-                     iCount = 3;
+                     iCount                        = 3;
                      break;
                   case HB_P_JUMPFALSE:
-                     iCount = 4;
+                     iCount                        = 4;
                      break;
                   case HB_P_JUMPFALSEFAR:
-                     iCount = 5;
+                     iCount                        = 5;
                      break;
                }
                hb_compNOOPfill( pFunc, lPCodePos, iCount, FALSE, FALSE );
@@ -572,28 +572,28 @@ static HB_FIX_FUNC( hb_p_not )
       switch( pFunc->pCode[ lPCodePos + 1 ] )
       {
          case HB_P_NOT:
-            opcode = HB_P_NOOP;
+            opcode   = HB_P_NOOP;
             break;
          case HB_P_JUMPTRUENEAR:
-            opcode = HB_P_JUMPFALSENEAR;
+            opcode   = HB_P_JUMPFALSENEAR;
             break;
          case HB_P_JUMPTRUE:
-            opcode = HB_P_JUMPFALSE;
+            opcode   = HB_P_JUMPFALSE;
             break;
          case HB_P_JUMPTRUEFAR:
-            opcode = HB_P_JUMPFALSEFAR;
+            opcode   = HB_P_JUMPFALSEFAR;
             break;
          case HB_P_JUMPFALSENEAR:
-            opcode = HB_P_JUMPTRUENEAR;
+            opcode   = HB_P_JUMPTRUENEAR;
             break;
          case HB_P_JUMPFALSE:
-            opcode = HB_P_JUMPTRUE;
+            opcode   = HB_P_JUMPTRUE;
             break;
          case HB_P_JUMPFALSEFAR:
-            opcode = HB_P_JUMPTRUEFAR;
+            opcode   = HB_P_JUMPTRUEFAR;
             break;
          default:
-            opcode = HB_P_LAST_PCODE;
+            opcode   = HB_P_LAST_PCODE;
             break;
       }
 
@@ -611,11 +611,11 @@ static HB_FIX_FUNC( hb_p_not )
 
 static HB_FIX_FUNC( hb_p_jumpfar )
 {
-   if( cargo->iNestedCodeblock == 0 && HB_COMP_ISSUPPORTED(HB_COMPFLAG_OPTJUMP) )
+   if( cargo->iNestedCodeblock == 0 && HB_COMP_ISSUPPORTED( HB_COMPFLAG_OPTJUMP ) )
    {
-      BYTE * pAddr = &pFunc->pCode[ lPCodePos + 1 ];
-      LONG lOffset = HB_PCODE_MKINT24( pAddr );
-      ULONG ulNewPos = lPCodePos + lOffset;
+      BYTE *   pAddr    = &pFunc->pCode[ lPCodePos + 1 ];
+      LONG     lOffset  = HB_PCODE_MKINT24( pAddr );
+      HB_SIZE  ulNewPos = lPCodePos + lOffset;
 
       switch( pFunc->pCode[ ulNewPos ] )
       {
@@ -648,11 +648,11 @@ static HB_FIX_FUNC( hb_p_jumpfar )
 
 static HB_FIX_FUNC( hb_p_jumpfalsefar )
 {
-   if( cargo->iNestedCodeblock == 0 && HB_COMP_ISSUPPORTED(HB_COMPFLAG_OPTJUMP) )
+   if( cargo->iNestedCodeblock == 0 && HB_COMP_ISSUPPORTED( HB_COMPFLAG_OPTJUMP ) )
    {
-      BYTE * pAddr = &pFunc->pCode[ lPCodePos + 1 ];
-      LONG lOffset = HB_PCODE_MKINT24( pAddr );
-      ULONG ulNewPos = lPCodePos + lOffset;
+      BYTE *   pAddr    = &pFunc->pCode[ lPCodePos + 1 ];
+      LONG     lOffset  = HB_PCODE_MKINT24( pAddr );
+      HB_SIZE  ulNewPos = lPCodePos + lOffset;
 
       switch( pFunc->pCode[ ulNewPos ] )
       {
@@ -667,11 +667,11 @@ static HB_FIX_FUNC( hb_p_jumpfalsefar )
 
 static HB_FIX_FUNC( hb_p_jumptruefar )
 {
-   if( cargo->iNestedCodeblock == 0 && HB_COMP_ISSUPPORTED(HB_COMPFLAG_OPTJUMP) )
+   if( cargo->iNestedCodeblock == 0 && HB_COMP_ISSUPPORTED( HB_COMPFLAG_OPTJUMP ) )
    {
-      BYTE * pAddr = &pFunc->pCode[ lPCodePos + 1 ];
-      LONG lOffset = HB_PCODE_MKINT24( pAddr );
-      ULONG ulNewPos = lPCodePos + lOffset;
+      BYTE *   pAddr    = &pFunc->pCode[ lPCodePos + 1 ];
+      LONG     lOffset  = HB_PCODE_MKINT24( pAddr );
+      HB_SIZE  ulNewPos = lPCodePos + lOffset;
 
       switch( pFunc->pCode[ ulNewPos ] )
       {
@@ -689,187 +689,187 @@ static HB_FIX_FUNC( hb_p_jumptruefar )
  */
 static HB_FIX_FUNC_PTR s_fixlocals_table[] =
 {
-   NULL,                                            /* HB_P_AND,                  */
-   NULL,                                            /* HB_P_ARRAYPUSH,            */
-   NULL,                                            /* HB_P_ARRAYPOP,             */
-   NULL,                                            /* HB_P_ARRAYDIM,             */
-   NULL,                                            /* HB_P_ARRAYGEN,             */
-   NULL,                                            /* HB_P_EQUAL,                */
-   hb_p_endblock,                                   /* HB_P_ENDBLOCK,             */
-   NULL,                                            /* HB_P_ENDPROC,              */
-   NULL,                                            /* HB_P_EXACTLYEQUAL,         */
-   hb_p_false,                                      /* HB_P_FALSE,                */
-   NULL,                                            /* HB_P_FORTEST,              */
-   NULL,                                            /* HB_P_FUNCTION,             */
-   NULL,                                            /* HB_P_FUNCTIONSHORT,        */
-   NULL,                                            /* HB_P_FRAME,                */
-   NULL,                                            /* HB_P_FUNCPTR,              */
-   NULL,                                            /* HB_P_GREATER,              */
-   NULL,                                            /* HB_P_GREATEREQUAL,         */
-   NULL,                                            /* HB_P_DEC,                  */
-   NULL,                                            /* HB_P_DIVIDE,               */
-   NULL,                                            /* HB_P_DO,                   */
-   NULL,                                            /* HB_P_DOSHORT,              */
-   NULL,                                            /* HB_P_DUPLICATE,            */
-   NULL,                                            /* HB_P_DUPLTWO,              */
-   NULL,                                            /* HB_P_INC,                  */
-   NULL,                                            /* HB_P_INSTRING,             */
-   NULL,                                            /* HB_P_JUMPNEAR,             */
-   NULL,                                            /* HB_P_JUMP,                 */
-   hb_p_jumpfar,                                    /* HB_P_JUMPFAR,              */
-   NULL,                                            /* HB_P_JUMPFALSENEAR,        */
-   NULL,                                            /* HB_P_JUMPFALSE,            */
-   hb_p_jumpfalsefar,                               /* HB_P_JUMPFALSEFAR,         */
-   NULL,                                            /* HB_P_JUMPTRUENEAR,         */
-   NULL,                                            /* HB_P_JUMPTRUE,             */
-   hb_p_jumptruefar,                                /* HB_P_JUMPTRUEFAR,          */
-   NULL,                                            /* HB_P_LESSEQUAL,            */
-   NULL,                                            /* HB_P_LESS,                 */
-   NULL,                                            /* HB_P_LINE,                 */
-   NULL,                                            /* HB_P_LOCALNAME,            */
-   NULL,                                            /* HB_P_MACROPOP,             */
-   NULL,                                            /* HB_P_MACROPOPALIASED,      */
-   NULL,                                            /* HB_P_MACROPUSH,            */
-   NULL,                                            /* HB_P_MACROPUSHARG,         */
-   NULL,                                            /* HB_P_MACROPUSHLIST,        */
-   NULL,                                            /* HB_P_MACROPUSHINDEX,       */
-   NULL,                                            /* HB_P_MACROPUSHPARE,        */
-   NULL,                                            /* HB_P_MACROPUSHALIASED,     */
-   NULL,                                            /* HB_P_MACROSYMBOL,          */
-   NULL,                                            /* HB_P_MACROTEXT,            */
-   NULL,                                            /* HB_P_MESSAGE,              */
-   NULL,                                            /* HB_P_MINUS,                */
-   NULL,                                            /* HB_P_MODULUS,              */
-   NULL,                                            /* HB_P_MODULENAME,           */
+   NULL,                                              /* HB_P_AND,                  */
+   NULL,                                              /* HB_P_ARRAYPUSH,            */
+   NULL,                                              /* HB_P_ARRAYPOP,             */
+   NULL,                                              /* HB_P_ARRAYDIM,             */
+   NULL,                                              /* HB_P_ARRAYGEN,             */
+   NULL,                                              /* HB_P_EQUAL,                */
+   hb_p_endblock,                                     /* HB_P_ENDBLOCK,             */
+   NULL,                                              /* HB_P_ENDPROC,              */
+   NULL,                                              /* HB_P_EXACTLYEQUAL,         */
+   hb_p_false,                                        /* HB_P_FALSE,                */
+   NULL,                                              /* HB_P_FORTEST,              */
+   NULL,                                              /* HB_P_FUNCTION,             */
+   NULL,                                              /* HB_P_FUNCTIONSHORT,        */
+   NULL,                                              /* HB_P_FRAME,                */
+   NULL,                                              /* HB_P_FUNCPTR,              */
+   NULL,                                              /* HB_P_GREATER,              */
+   NULL,                                              /* HB_P_GREATEREQUAL,         */
+   NULL,                                              /* HB_P_DEC,                  */
+   NULL,                                              /* HB_P_DIVIDE,               */
+   NULL,                                              /* HB_P_DO,                   */
+   NULL,                                              /* HB_P_DOSHORT,              */
+   NULL,                                              /* HB_P_DUPLICATE,            */
+   NULL,                                              /* HB_P_DUPLTWO,              */
+   NULL,                                              /* HB_P_INC,                  */
+   NULL,                                              /* HB_P_INSTRING,             */
+   NULL,                                              /* HB_P_JUMPNEAR,             */
+   NULL,                                              /* HB_P_JUMP,                 */
+   hb_p_jumpfar,                                      /* HB_P_JUMPFAR,              */
+   NULL,                                              /* HB_P_JUMPFALSENEAR,        */
+   NULL,                                              /* HB_P_JUMPFALSE,            */
+   hb_p_jumpfalsefar,                                 /* HB_P_JUMPFALSEFAR,         */
+   NULL,                                              /* HB_P_JUMPTRUENEAR,         */
+   NULL,                                              /* HB_P_JUMPTRUE,             */
+   hb_p_jumptruefar,                                  /* HB_P_JUMPTRUEFAR,          */
+   NULL,                                              /* HB_P_LESSEQUAL,            */
+   NULL,                                              /* HB_P_LESS,                 */
+   NULL,                                              /* HB_P_LINE,                 */
+   NULL,                                              /* HB_P_LOCALNAME,            */
+   NULL,                                              /* HB_P_MACROPOP,             */
+   NULL,                                              /* HB_P_MACROPOPALIASED,      */
+   NULL,                                              /* HB_P_MACROPUSH,            */
+   NULL,                                              /* HB_P_MACROPUSHARG,         */
+   NULL,                                              /* HB_P_MACROPUSHLIST,        */
+   NULL,                                              /* HB_P_MACROPUSHINDEX,       */
+   NULL,                                              /* HB_P_MACROPUSHPARE,        */
+   NULL,                                              /* HB_P_MACROPUSHALIASED,     */
+   NULL,                                              /* HB_P_MACROSYMBOL,          */
+   NULL,                                              /* HB_P_MACROTEXT,            */
+   NULL,                                              /* HB_P_MESSAGE,              */
+   NULL,                                              /* HB_P_MINUS,                */
+   NULL,                                              /* HB_P_MODULUS,              */
+   NULL,                                              /* HB_P_MODULENAME,           */
    /* start: pcodes generated by macro compiler */
-   NULL,                                            /* HB_P_MMESSAGE,             */
-   NULL,                                            /* HB_P_MPOPALIASEDFIELD,     */
-   NULL,                                            /* HB_P_MPOPALIASEDVAR,       */
-   NULL,                                            /* HB_P_MPOPFIELD,            */
-   NULL,                                            /* HB_P_MPOPMEMVAR,           */
-   NULL,                                            /* HB_P_MPUSHALIASEDFIELD,    */
-   NULL,                                            /* HB_P_MPUSHALIASEDVAR,      */
-   NULL,                                            /* HB_P_MPUSHBLOCK,           */
-   NULL,                                            /* HB_P_MPUSHFIELD,           */
-   NULL,                                            /* HB_P_MPUSHMEMVAR,          */
-   NULL,                                            /* HB_P_MPUSHMEMVARREF,       */
-   NULL,                                            /* HB_P_MPUSHSYM,             */
-   NULL,                                            /* HB_P_MPUSHVARIABLE,        */
+   NULL,                                              /* HB_P_MMESSAGE,             */
+   NULL,                                              /* HB_P_MPOPALIASEDFIELD,     */
+   NULL,                                              /* HB_P_MPOPALIASEDVAR,       */
+   NULL,                                              /* HB_P_MPOPFIELD,            */
+   NULL,                                              /* HB_P_MPOPMEMVAR,           */
+   NULL,                                              /* HB_P_MPUSHALIASEDFIELD,    */
+   NULL,                                              /* HB_P_MPUSHALIASEDVAR,      */
+   NULL,                                              /* HB_P_MPUSHBLOCK,           */
+   NULL,                                              /* HB_P_MPUSHFIELD,           */
+   NULL,                                              /* HB_P_MPUSHMEMVAR,          */
+   NULL,                                              /* HB_P_MPUSHMEMVARREF,       */
+   NULL,                                              /* HB_P_MPUSHSYM,             */
+   NULL,                                              /* HB_P_MPUSHVARIABLE,        */
    /* end: */
-   NULL,                                            /* HB_P_MULT,                 */
-   NULL,                                            /* HB_P_NEGATE,               */
-   NULL,                                            /* HB_P_NOOP,                 */
-   hb_p_not,                                        /* HB_P_NOT,                  */
-   NULL,                                            /* HB_P_NOTEQUAL,             */
-   NULL,                                            /* HB_P_OR,                   */
-   NULL,                                            /* HB_P_PARAMETER,            */
-   NULL,                                            /* HB_P_PLUS,                 */
-   NULL,                                            /* HB_P_POP,                  */
-   NULL,                                            /* HB_P_POPALIAS,             */
-   NULL,                                            /* HB_P_POPALIASEDFIELD,      */
-   NULL,                                            /* HB_P_POPALIASEDFIELDNEAR,  */
-   NULL,                                            /* HB_P_POPALIASEDVAR,        */
-   NULL,                                            /* HB_P_POPFIELD,             */
-   hb_p_poplocal,                                   /* HB_P_POPLOCAL,             */
-   hb_p_poplocalnear,                               /* HB_P_POPLOCALNEAR,         */
-   NULL,                                            /* HB_P_POPMEMVAR,            */
-   NULL,                                            /* HB_P_POPSTATIC,            */
-   NULL,                                            /* HB_P_POPVARIABLE,          */
-   NULL,                                            /* HB_P_POWER,                */
-   NULL,                                            /* HB_P_PUSHALIAS,            */
-   NULL,                                            /* HB_P_PUSHALIASEDFIELD,     */
-   NULL,                                            /* HB_P_PUSHALIASEDFIELDNEAR, */
-   NULL,                                            /* HB_P_PUSHALIASEDVAR,       */
-   hb_p_pushblock,                                  /* HB_P_PUSHBLOCK,            */
-   hb_p_pushblockshort,                             /* HB_P_PUSHBLOCKSHORT,       */
-   NULL,                                            /* HB_P_PUSHFIELD,            */
-   NULL,                                            /* HB_P_PUSHBYTE,             */
-   NULL,                                            /* HB_P_PUSHINT,              */
-   hb_p_pushlocal,                                  /* HB_P_PUSHLOCAL,            */
-   hb_p_pushlocalnear,                              /* HB_P_PUSHLOCALNEAR,        */
-   hb_p_pushlocalref,                               /* HB_P_PUSHLOCALREF,         */
-   NULL,                                            /* HB_P_PUSHLONG,             */
-   NULL,                                            /* HB_P_PUSHMEMVAR,           */
-   NULL,                                            /* HB_P_PUSHMEMVARREF,        */
-   NULL,                                            /* HB_P_PUSHNIL,              */
-   NULL,                                            /* HB_P_PUSHDOUBLE,           */
-   NULL,                                            /* HB_P_PUSHSELF,             */
-   NULL,                                            /* HB_P_PUSHSTATIC,           */
-   NULL,                                            /* HB_P_PUSHSTATICREF,        */
-   NULL,                                            /* HB_P_PUSHSTR,              */
-   NULL,                                            /* HB_P_PUSHSTRSHORT,         */
-   NULL,                                            /* HB_P_PUSHSYM,              */
-   NULL,                                            /* HB_P_PUSHSYMNEAR,          */
-   NULL,                                            /* HB_P_PUSHVARIABLE,         */
-   NULL,                                            /* HB_P_RETVALUE,             */
-   NULL,                                            /* HB_P_SEND,                 */
-   NULL,                                            /* HB_P_SENDSHORT,            */
-   NULL,                                            /* HB_P_SEQBEGIN,             */
-   NULL,                                            /* HB_P_SEQEND,               */
-   NULL,                                            /* HB_P_SEQRECOVER,           */
-   NULL,                                            /* HB_P_SFRAME,               */
-   NULL,                                            /* HB_P_STATICS,              */
-   NULL,                                            /* HB_P_STATICNAME,           */
-   NULL,                                            /* HB_P_SWAPALIAS,            */
-   hb_p_true,                                       /* HB_P_TRUE,                 */
-   NULL,                                            /* HB_P_ZERO,                 */
-   NULL,                                            /* HB_P_ONE,                  */
-   NULL,                                            /* HB_P_MACROLIST,            */
-   NULL,                                            /* HB_P_MACROLISTEND,         */
-   hb_p_localnearaddint,                            /* HB_P_LOCALNEARADDINT,      */
-   hb_p_localnearsetint,                            /* HB_P_LOCALNEARSETINT,      */
-   hb_p_localnearsetstr,                            /* HB_P_LOCALNEARSETSTR,      */
-   NULL,                                            /* HB_P_ADDINT,               */
-   NULL,                                            /* HB_P_LEFT,                 */
-   NULL,                                            /* HB_P_RIGHT,                */
-   NULL,                                            /* HB_P_SUBSTR,               */
-   NULL,                                            /* HB_P_MPUSHSTR,             */
-   NULL,                                            /* HB_P_BASELINE,             */
-   NULL,                                            /* HB_P_LINEOFFSET,           */
-   NULL,                                            /* HB_P_WITHOBJECT,           */
-   NULL,                                            /* HB_P_SENDWITH,             */
-   NULL,                                            /* HB_P_SENDWITHSHORT,        */
-   NULL,                                            /* HB_P_ENDWITHOBJECT,        */
-   NULL,                                            /* HB_P_FOREACH,              */
-   NULL,                                            /* HB_P_ENUMERATE,            */
-   NULL,                                            /* HB_P_ENDENUMERATE,         */
-   NULL,                                            /* HB_P_PUSHGLOBAL,           */
-   NULL,                                            /* HB_P_POPGLOBAL,            */
-   NULL,                                            /* HB_P_PUSHGLOBALREF,        */
-   NULL,                                            /* HB_P_ENUMINDEX,            */
-   NULL,                                            /* HB_P_SWITCHCASE,           */
-   NULL,                                            /* HB_P_LIKE,                 */
-   NULL,                                            /* HB_P_MATCH,                */
-   NULL,                                            /* HB_P_PUSHMACROREF,         */
-   NULL,                                            /* HB_IVARREF,                */
-   NULL,                                            /* HB_CLASSSETMODULE,         */
-   NULL,                                            /* HB_P_BITAND,               */
-   NULL,                                            /* HB_P_BITOR,                */
-   NULL,                                            /* HB_P_BITXOR,               */
-   NULL,                                            /* HB_P_SHIFTR,               */
-   NULL,                                            /* HB_P_SHIFTL,               */
-   NULL,                                            /* HB_P_LARGEFRAME,           */
-   NULL,                                            /* HB_P_PUSHWITH,             */
-   NULL,                                            /* HB_P_PUSHLONGLONG,         */
-   NULL,                                            /* HB_P_PUSHSTRHIDDEN,        */
-   hb_p_localnearsetstrhidden,                      /* HB_P_LOCALNEARSETSTRHIDDEN,*/
-   NULL,                                            /* HB_P_TRYBEGIN,             */
-   NULL,                                            /* HB_P_TRYEND,               */
-   NULL,                                            /* HB_P_TRYRECOVER,           */
-   NULL,                                            /* HB_P_FINALLY,              */
-   NULL,                                            /* HB_P_ENDFINALLY,           */
-   hb_p_localnearadd,                               /* HB_P_LOCALNEARADD          */
-   NULL,                                            /* HB_P_ARRAYPUSHREF          */
-   NULL,                                            /* HB_P_ARRAYPOPPLUS          */
-   NULL,                                            /* HB_P_PUSHDATETIME          */
-   NULL,                                            /* HB_P_PUSHDATE              */
-   NULL,                                            /* HB_P_HASHGEN               */
-   hb_p_localnearinc,                               /* HB_P_LOCALNEARINC,         */
-   hb_p_localneardec,                               /* HB_P_LOCALNEARDEC,         */
-   hb_p_pushlocalnearinc,                           /* HB_P_PUSHLOCALNEARINC,     */
-   hb_p_pushlocalneardec,                           /* HB_P_PUSHLOCALNEARDEC,     */
-   NULL,                                            /* HB_P_DIVERT                */
-   NULL                                             /* HB_P_DIVERTOF              */
+   NULL,                                              /* HB_P_MULT,                 */
+   NULL,                                              /* HB_P_NEGATE,               */
+   NULL,                                              /* HB_P_NOOP,                 */
+   hb_p_not,                                          /* HB_P_NOT,                  */
+   NULL,                                              /* HB_P_NOTEQUAL,             */
+   NULL,                                              /* HB_P_OR,                   */
+   NULL,                                              /* HB_P_PARAMETER,            */
+   NULL,                                              /* HB_P_PLUS,                 */
+   NULL,                                              /* HB_P_POP,                  */
+   NULL,                                              /* HB_P_POPALIAS,             */
+   NULL,                                              /* HB_P_POPALIASEDFIELD,      */
+   NULL,                                              /* HB_P_POPALIASEDFIELDNEAR,  */
+   NULL,                                              /* HB_P_POPALIASEDVAR,        */
+   NULL,                                              /* HB_P_POPFIELD,             */
+   hb_p_poplocal,                                     /* HB_P_POPLOCAL,             */
+   hb_p_poplocalnear,                                 /* HB_P_POPLOCALNEAR,         */
+   NULL,                                              /* HB_P_POPMEMVAR,            */
+   NULL,                                              /* HB_P_POPSTATIC,            */
+   NULL,                                              /* HB_P_POPVARIABLE,          */
+   NULL,                                              /* HB_P_POWER,                */
+   NULL,                                              /* HB_P_PUSHALIAS,            */
+   NULL,                                              /* HB_P_PUSHALIASEDFIELD,     */
+   NULL,                                              /* HB_P_PUSHALIASEDFIELDNEAR, */
+   NULL,                                              /* HB_P_PUSHALIASEDVAR,       */
+   hb_p_pushblock,                                    /* HB_P_PUSHBLOCK,            */
+   hb_p_pushblockshort,                               /* HB_P_PUSHBLOCKSHORT,       */
+   NULL,                                              /* HB_P_PUSHFIELD,            */
+   NULL,                                              /* HB_P_PUSHBYTE,             */
+   NULL,                                              /* HB_P_PUSHINT,              */
+   hb_p_pushlocal,                                    /* HB_P_PUSHLOCAL,            */
+   hb_p_pushlocalnear,                                /* HB_P_PUSHLOCALNEAR,        */
+   hb_p_pushlocalref,                                 /* HB_P_PUSHLOCALREF,         */
+   NULL,                                              /* HB_P_PUSHLONG,             */
+   NULL,                                              /* HB_P_PUSHMEMVAR,           */
+   NULL,                                              /* HB_P_PUSHMEMVARREF,        */
+   NULL,                                              /* HB_P_PUSHNIL,              */
+   NULL,                                              /* HB_P_PUSHDOUBLE,           */
+   NULL,                                              /* HB_P_PUSHSELF,             */
+   NULL,                                              /* HB_P_PUSHSTATIC,           */
+   NULL,                                              /* HB_P_PUSHSTATICREF,        */
+   NULL,                                              /* HB_P_PUSHSTR,              */
+   NULL,                                              /* HB_P_PUSHSTRSHORT,         */
+   NULL,                                              /* HB_P_PUSHSYM,              */
+   NULL,                                              /* HB_P_PUSHSYMNEAR,          */
+   NULL,                                              /* HB_P_PUSHVARIABLE,         */
+   NULL,                                              /* HB_P_RETVALUE,             */
+   NULL,                                              /* HB_P_SEND,                 */
+   NULL,                                              /* HB_P_SENDSHORT,            */
+   NULL,                                              /* HB_P_SEQBEGIN,             */
+   NULL,                                              /* HB_P_SEQEND,               */
+   NULL,                                              /* HB_P_SEQRECOVER,           */
+   NULL,                                              /* HB_P_SFRAME,               */
+   NULL,                                              /* HB_P_STATICS,              */
+   NULL,                                              /* HB_P_STATICNAME,           */
+   NULL,                                              /* HB_P_SWAPALIAS,            */
+   hb_p_true,                                         /* HB_P_TRUE,                 */
+   NULL,                                              /* HB_P_ZERO,                 */
+   NULL,                                              /* HB_P_ONE,                  */
+   NULL,                                              /* HB_P_MACROLIST,            */
+   NULL,                                              /* HB_P_MACROLISTEND,         */
+   hb_p_localnearaddint,                              /* HB_P_LOCALNEARADDINT,      */
+   hb_p_localnearsetint,                              /* HB_P_LOCALNEARSETINT,      */
+   hb_p_localnearsetstr,                              /* HB_P_LOCALNEARSETSTR,      */
+   NULL,                                              /* HB_P_ADDINT,               */
+   NULL,                                              /* HB_P_LEFT,                 */
+   NULL,                                              /* HB_P_RIGHT,                */
+   NULL,                                              /* HB_P_SUBSTR,               */
+   NULL,                                              /* HB_P_MPUSHSTR,             */
+   NULL,                                              /* HB_P_BASELINE,             */
+   NULL,                                              /* HB_P_LINEOFFSET,           */
+   NULL,                                              /* HB_P_WITHOBJECT,           */
+   NULL,                                              /* HB_P_SENDWITH,             */
+   NULL,                                              /* HB_P_SENDWITHSHORT,        */
+   NULL,                                              /* HB_P_ENDWITHOBJECT,        */
+   NULL,                                              /* HB_P_FOREACH,              */
+   NULL,                                              /* HB_P_ENUMERATE,            */
+   NULL,                                              /* HB_P_ENDENUMERATE,         */
+   NULL,                                              /* HB_P_PUSHGLOBAL,           */
+   NULL,                                              /* HB_P_POPGLOBAL,            */
+   NULL,                                              /* HB_P_PUSHGLOBALREF,        */
+   NULL,                                              /* HB_P_ENUMINDEX,            */
+   NULL,                                              /* HB_P_SWITCHCASE,           */
+   NULL,                                              /* HB_P_LIKE,                 */
+   NULL,                                              /* HB_P_MATCH,                */
+   NULL,                                              /* HB_P_PUSHMACROREF,         */
+   NULL,                                              /* HB_IVARREF,                */
+   NULL,                                              /* HB_CLASSSETMODULE,         */
+   NULL,                                              /* HB_P_BITAND,               */
+   NULL,                                              /* HB_P_BITOR,                */
+   NULL,                                              /* HB_P_BITXOR,               */
+   NULL,                                              /* HB_P_SHIFTR,               */
+   NULL,                                              /* HB_P_SHIFTL,               */
+   NULL,                                              /* HB_P_LARGEFRAME,           */
+   NULL,                                              /* HB_P_PUSHWITH,             */
+   NULL,                                              /* HB_P_PUSHLONGLONG,         */
+   NULL,                                              /* HB_P_PUSHSTRHIDDEN,        */
+   hb_p_localnearsetstrhidden,                        /* HB_P_LOCALNEARSETSTRHIDDEN,*/
+   NULL,                                              /* HB_P_TRYBEGIN,             */
+   NULL,                                              /* HB_P_TRYEND,               */
+   NULL,                                              /* HB_P_TRYRECOVER,           */
+   NULL,                                              /* HB_P_FINALLY,              */
+   NULL,                                              /* HB_P_ENDFINALLY,           */
+   hb_p_localnearadd,                                 /* HB_P_LOCALNEARADD          */
+   NULL,                                              /* HB_P_ARRAYPUSHREF          */
+   NULL,                                              /* HB_P_ARRAYPOPPLUS          */
+   NULL,                                              /* HB_P_PUSHDATETIME          */
+   NULL,                                              /* HB_P_PUSHDATE              */
+   NULL,                                              /* HB_P_HASHGEN               */
+   hb_p_localnearinc,                                 /* HB_P_LOCALNEARINC,         */
+   hb_p_localneardec,                                 /* HB_P_LOCALNEARDEC,         */
+   hb_p_pushlocalnearinc,                             /* HB_P_PUSHLOCALNEARINC,     */
+   hb_p_pushlocalneardec,                             /* HB_P_PUSHLOCALNEARDEC,     */
+   NULL,                                              /* HB_P_DIVERT                */
+   NULL                                               /* HB_P_DIVERTOF              */
 };
 
 void hb_compFixFuncPCode( PFUNCTION pFunc )

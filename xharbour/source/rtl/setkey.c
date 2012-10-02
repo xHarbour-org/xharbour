@@ -238,7 +238,7 @@ HB_FUNC( HB_SETKEYARRAY )
    if( pKeyCodeArray && pAction )
    {
       PHB_ITEM pIsActive = hb_param( 3, HB_IT_BLOCK );
-      ULONG nLen = hb_arrayLen( pKeyCodeArray );
+      HB_SIZE nLen = hb_arrayLen( pKeyCodeArray );
       ULONG nPos;
 
       for( nPos = 1; nPos <= nLen; nPos++ )
@@ -275,7 +275,7 @@ HB_FUNC( HB_SETKEYSAVE )
 {
    PHB_ITEM pKeys, pParam;
    PHB_SETKEY sk_list_tmp;
-   ULONG itemcount, nitem;
+   HB_SIZE itemcount, nitem;
 
    /* build an multi-dimensional array from existing hot-keys, and return it */
 

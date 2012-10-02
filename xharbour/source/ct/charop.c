@@ -82,10 +82,10 @@ static void do_charop( int iMode )
 
    if( ISCHAR( 1 ) )
    {
-      size_t                  sStrLen     = hb_parclen( 1 );
-      size_t                  sPos;
-      const unsigned char *   pucString   = ( const unsigned char * ) hb_parc( 1 );
-      unsigned char *         pucResult;
+      HB_SIZE               sStrLen   = hb_parclen( 1 );
+      HB_SIZE               sPos;
+      const unsigned char * pucString = ( const unsigned char * ) hb_parc( 1 );
+      unsigned char *       pucResult;
 
       if( sStrLen == 0 )
       {
@@ -112,7 +112,7 @@ static void do_charop( int iMode )
             int iSHL = hb_parni( 2 ) % 8;   /* defaults to 0 */
 
             if( iSHL == 0 )
-               hb_xmemcpy( pucResult, pucString, sStrLen );
+               hb_xmemcpy( pucResult, pucString, (size_t) sStrLen );
             else
                for( sPos = 0; sPos < sStrLen; ++sPos )
                   pucResult[ sPos ] = pucString[ sPos ] << iSHL;
@@ -125,7 +125,7 @@ static void do_charop( int iMode )
             int iSHR = hb_parni( 2 ) % 8;   /* defaults to 0 */
 
             if( iSHR == 0 )
-               hb_xmemcpy( pucResult, pucString, sStrLen );
+               hb_xmemcpy( pucResult, pucString, (size_t) sStrLen );
             else
                for( sPos = 0; sPos < sStrLen; ++sPos )
                   pucResult[ sPos ] = pucString[ sPos ] >> iSHR;
@@ -137,7 +137,7 @@ static void do_charop( int iMode )
          {
             int iRLL = hb_parni( 2 ) % 8;   /* defaults to 0 */
 
-            hb_xmemcpy( pucResult, pucString, sStrLen );
+            hb_xmemcpy( pucResult, pucString, (size_t) sStrLen );
 
             if( iRLL != 0 )
                for( sPos = 0; sPos < sStrLen; ++sPos )
@@ -163,7 +163,7 @@ static void do_charop( int iMode )
          {
             int iRLR = hb_parni( 2 ) % 8;   /* defaults to 0 */
 
-            hb_xmemcpy( pucResult, pucString, sStrLen );
+            hb_xmemcpy( pucResult, pucString, (size_t) sStrLen );
 
             if( iRLR != 0 )
             {
@@ -191,7 +191,7 @@ static void do_charop( int iMode )
             if( ISCHAR( 2 ) )
             {
                const char *   pucString2  = hb_parc( 2 );
-               size_t         sStrLen2    = hb_parclen( 2 );
+               HB_SIZE        sStrLen2    = hb_parclen( 2 );
 
                for( sPos = 0; sPos < sStrLen; ++sPos )
                   pucResult[ sPos ] = ( char ) ( pucString[ sPos ] + pucString2[ sStrLen2 ? ( sPos % sStrLen2 ) : 0 ] );
@@ -206,7 +206,7 @@ static void do_charop( int iMode )
                             NULL, HB_ERR_FUNCNAME, 0,
                             EF_CANDEFAULT, HB_ERR_ARGS_BASEPARAMS );
                }
-               hb_xmemcpy( pucResult, pucString, sStrLen );
+               hb_xmemcpy( pucResult, pucString, (size_t) sStrLen );
             }
             break;
 
@@ -215,7 +215,7 @@ static void do_charop( int iMode )
             if( ISCHAR( 2 ) )
             {
                const char *   pucString2  = hb_parc( 2 );
-               size_t         sStrLen2    = hb_parclen( 2 );
+               HB_SIZE        sStrLen2    = hb_parclen( 2 );
 
                for( sPos = 0; sPos < sStrLen; ++sPos )
                   pucResult[ sPos ] = ( char ) ( pucString[ sPos ] - pucString2[ sStrLen2 ? ( sPos % sStrLen2 ) : 0 ] );
@@ -230,7 +230,7 @@ static void do_charop( int iMode )
                             NULL, HB_ERR_FUNCNAME, 0,
                             EF_CANDEFAULT, HB_ERR_ARGS_BASEPARAMS );
                }
-               hb_xmemcpy( pucResult, pucString, sStrLen );
+               hb_xmemcpy( pucResult, pucString, (size_t) sStrLen );
             }
             break;
 
@@ -239,7 +239,7 @@ static void do_charop( int iMode )
             if( ISCHAR( 2 ) )
             {
                const char *   pucString2  = hb_parc( 2 );
-               size_t         sStrLen2    = hb_parclen( 2 );
+               HB_SIZE        sStrLen2    = hb_parclen( 2 );
 
                for( sPos = 0; sPos < sStrLen; ++sPos )
                   pucResult[ sPos ] = ( char ) ( pucString[ sPos ] & pucString2[ sStrLen2 ? ( sPos % sStrLen2 ) : 0 ] );
@@ -253,7 +253,7 @@ static void do_charop( int iMode )
                   ct_error( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_CHARAND, NULL, HB_ERR_FUNCNAME, 0,
                             EF_CANDEFAULT, HB_ERR_ARGS_BASEPARAMS );
                }
-               hb_xmemcpy( pucResult, pucString, sStrLen );
+               hb_xmemcpy( pucResult, pucString, (size_t) sStrLen );
             }
             break;
 
@@ -262,7 +262,7 @@ static void do_charop( int iMode )
             if( ISCHAR( 2 ) )
             {
                const char *   pucString2  = hb_parc( 2 );
-               size_t         sStrLen2    = hb_parclen( 2 );
+               HB_SIZE        sStrLen2    = hb_parclen( 2 );
 
                for( sPos = 0; sPos < sStrLen; ++sPos )
                   pucResult[ sPos ] = ( char ) ( pucString[ sPos ] | pucString2[ sStrLen2 ? ( sPos % sStrLen2 ) : 0 ] );
@@ -276,7 +276,7 @@ static void do_charop( int iMode )
                   ct_error( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_CHAROR, NULL, HB_ERR_FUNCNAME, 0,
                             EF_CANDEFAULT, HB_ERR_ARGS_BASEPARAMS );
                }
-               hb_xmemcpy( pucResult, pucString, sStrLen );
+               hb_xmemcpy( pucResult, pucString, (size_t) sStrLen );
             }
             break;
 
@@ -285,7 +285,7 @@ static void do_charop( int iMode )
             if( ISCHAR( 2 ) )
             {
                const char *   pucString2  = hb_parc( 2 );
-               size_t         sStrLen2    = hb_parclen( 2 );
+               HB_SIZE        sStrLen2    = hb_parclen( 2 );
 
                for( sPos = 0; sPos < sStrLen; ++sPos )
                   pucResult[ sPos ] = ( char ) ( pucString[ sPos ] ^ pucString2[ sStrLen2 ? ( sPos % sStrLen2 ) : 0 ] );
@@ -299,7 +299,7 @@ static void do_charop( int iMode )
                   ct_error( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_CHARXOR, NULL, HB_ERR_FUNCNAME, 0,
                             EF_CANDEFAULT, HB_ERR_ARGS_BASEPARAMS );
                }
-               hb_xmemcpy( pucResult, pucString, sStrLen );
+               hb_xmemcpy( pucResult, pucString, (size_t) sStrLen );
             }
             break;
       }  /* endswitch( iMode ) */
@@ -377,59 +377,49 @@ static void do_charop( int iMode )
 HB_FUNC( CHARADD )
 {
    do_charop( DO_CHAROP_CHARADD );
-   return;
 }
 
 HB_FUNC( CHARSUB )
 {
    do_charop( DO_CHAROP_CHARSUB );
-   return;
 }
 
 HB_FUNC( CHARAND )
 {
    do_charop( DO_CHAROP_CHARAND );
-   return;
 }
 
 HB_FUNC( CHARNOT )
 {
    do_charop( DO_CHAROP_CHARNOT );
-   return;
 }
 
 HB_FUNC( CHAROR )
 {
    do_charop( DO_CHAROP_CHAROR );
-   return;
 }
 
 HB_FUNC( CHARXOR )
 {
    do_charop( DO_CHAROP_CHARXOR );
-   return;
 }
 
 HB_FUNC( CHARSHL )
 {
    do_charop( DO_CHAROP_CHARSHL );
-   return;
 }
 
 HB_FUNC( CHARSHR )
 {
    do_charop( DO_CHAROP_CHARSHR );
-   return;
 }
 
 HB_FUNC( CHARRLL )
 {
    do_charop( DO_CHAROP_CHARRLL );
-   return;
 }
 
 HB_FUNC( CHARRLR )
 {
    do_charop( DO_CHAROP_CHARRLR );
-   return;
 }

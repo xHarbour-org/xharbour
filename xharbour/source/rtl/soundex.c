@@ -71,9 +71,9 @@ HB_FUNC( SOUNDEX )
    if( pString )
    {
       char * pszString = pString->item.asString.value;
-      ULONG ulLen = pString->item.asString.length;
-      ULONG nPos = 0;
-      ULONG nResultPos = 0;
+      HB_SIZE ulLen = pString->item.asString.length;
+      HB_SIZE nPos = 0;
+      HB_SIZE nResultPos = 0;
       char cCharPrev = '0';
 
       while( nPos < ulLen && nResultPos < SOUNDEX_LEN_MAX )

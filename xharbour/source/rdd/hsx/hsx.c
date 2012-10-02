@@ -611,7 +611,7 @@ static int hb_hsxEval( int iHandle, PHB_ITEM pExpr, BYTE *pKey, BOOL *fDeleted )
    if( hb_itemType( pExpr ) & HB_IT_STRING )
    {
       pStr = hb_itemGetCPtr( pExpr );
-      ulLen = hb_itemGetCLen( pExpr );
+      ulLen = ( ULONG ) hb_itemGetCLen( pExpr );
       if( fDeleted )
          *fDeleted = FALSE;
    }
@@ -630,7 +630,7 @@ static int hb_hsxEval( int iHandle, PHB_ITEM pExpr, BYTE *pKey, BOOL *fDeleted )
       }
       pItem = hb_vmEvalBlockOrMacro( pExpr );
       pStr = hb_itemGetCPtr( pItem );
-      ulLen = hb_itemGetCLen( pItem );
+      ulLen = ( ULONG ) hb_itemGetCLen( pItem );
       if( fDeleted )
       {
          AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
@@ -1665,7 +1665,7 @@ static int hb_hsxFilter( int iHandle, const char * pSeek, ULONG ulSeek,
             break;
          fValid = hb_hsxVerify( iHandle,
                                 hb_itemGetCPtr( pArea->valResult ),
-                                hb_itemGetCLen( pArea->valResult ),
+                                ( ULONG ) hb_itemGetCLen( pArea->valResult ),
                                 pSeek, ulSeek, iVerifyType ) == HSX_SUCCESS;
       }
       if( fValid )
@@ -1831,7 +1831,7 @@ HB_FUNC( HS_SET )
    int iRetVal = HSX_BADPARMS;
 
    if( pStr && hb_param( 1, HB_IT_NUMERIC ) )
-      iRetVal = hb_hsxSeekSet( hb_parni( 1 ), pStr, hb_parclen( 2 ) );
+      iRetVal = hb_hsxSeekSet( hb_parni( 1 ), pStr, ( ULONG ) hb_parclen( 2 ) );
    hb_retni( iRetVal );
 }
 
@@ -1841,7 +1841,7 @@ HB_FUNC( HS_FILTER )
 {
    const char * szText = hb_parc( 2 );
    char * pBuff = NULL;
-   ULONG ulLen = hb_parclen( 2 ), ulRecords = 0, ull, ul;
+   ULONG ulLen = ( ULONG ) hb_parclen( 2 ), ulRecords = 0, ull, ul;
    int iHandle = -1, iResult = HSX_BADPARMS;
    BOOL fNew = FALSE, fToken = TRUE;
 
@@ -1987,18 +1987,18 @@ HB_FUNC( HS_VERIFY )
       if( pExpr )
       {
          szText = hb_itemGetCPtr( pExpr );
-         ulLen = hb_itemGetCLen( pExpr );
+         ulLen = ( ULONG ) hb_itemGetCLen( pExpr );
       }
 
       hb_retni( hb_hsxVerify( hb_parni( 1 ), szText, ulLen,
-                              hb_parc( 3 ), hb_parclen( 3 ),
+                              hb_parc( 3 ), ( ULONG ) hb_parclen( 3 ),
                               hb_parni( 4 ) ) );
    }
    else
    {
       PHB_ITEM pExpr = hb_param( 1, HB_IT_BLOCK );
       const char * szSub = hb_parc( 2 ), * szText = NULL;
-      ULONG ulSub = hb_parclen( 2 ), ulLen = 0;
+      ULONG ulSub = ( ULONG ) hb_parclen( 2 ), ulLen = 0;
       BOOL fIgnoreCase = hb_parl( 3 );
 
       if( ulSub )
@@ -2008,7 +2008,7 @@ HB_FUNC( HS_VERIFY )
          if( pExpr )
          {
             szText = hb_itemGetCPtr( pExpr );
-            ulLen = hb_itemGetCLen( pExpr );
+            ulLen = ( ULONG ) hb_itemGetCLen( pExpr );
          }
       }
       hb_retl( ulLen && ulSub && hb_hsxStrCmp( szSub, ulSub, szText, ulLen,

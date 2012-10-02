@@ -141,14 +141,14 @@ static int hb_selectReadSocket( HB_SOCKET_STRUCT *Socket )
 
    if( Socket->timeout == -1 )
    {
-      if( select( Socket->com + 1, &set, NULL, NULL, NULL ) < 0 )
+      if( select( ( int ) Socket->com + 1, &set, NULL, NULL, NULL ) < 0 )
          return 0;
    }
    else
    {
       tv.tv_sec = Socket->timeout/ 1000;
       tv.tv_usec = (Socket->timeout % 1000) * 1000;
-      if( select( Socket->com + 1, &set, NULL, NULL, &tv ) < 0 )
+      if( select( ( int ) Socket->com + 1, &set, NULL, NULL, &tv ) < 0 )
          return 0;
    }
 
@@ -165,14 +165,14 @@ static int hb_selectWriteSocket( HB_SOCKET_STRUCT *Socket )
 
    if( Socket->timeout == -1 )
    {
-      if( select( Socket->com + 1, NULL, &set, NULL, NULL ) < 0 )
+      if( select( ( int ) Socket->com + 1, NULL, &set, NULL, NULL ) < 0 )
          return 0;
    }
    else
    {
       tv.tv_sec = Socket->timeout/ 1000;
       tv.tv_usec = (Socket->timeout % 1000) * 1000;
-      if( select( Socket->com + 1, NULL, &set, NULL, &tv ) < 0 )
+      if( select( ( int ) Socket->com + 1, NULL, &set, NULL, &tv ) < 0 )
          return 0;
    }
 
@@ -192,14 +192,14 @@ int hb_selectWriteExceptSocket( HB_SOCKET_STRUCT *Socket )
 
    if( Socket->timeout == -1 )
    {
-      if( select( Socket->com + 1, NULL, &set, &eset, NULL ) < 0 )
+      if( select( ( int ) Socket->com + 1, NULL, &set, &eset, NULL ) < 0 )
          return 2;
    }
    else
    {
       tv.tv_sec = Socket->timeout/ 1000;
       tv.tv_usec = (Socket->timeout % 1000) * 1000;
-      if( select(Socket->com + 1, NULL, &set, &eset, &tv) < 0 )
+      if( select( ( int ) Socket->com + 1, NULL, &set, &eset, &tv) < 0 )
          return 2;
    }
 
@@ -878,7 +878,7 @@ static void s_inetRecvInternal( char *szFuncName, int iMode )
 
    pBuffer = hb_itemUnShare( pBuffer );
    Buffer = hb_itemGetCPtr( pBuffer );
-   iLen = hb_itemGetCLen( pBuffer );
+   iLen = (int) hb_itemGetCLen( pBuffer );
 
    if( ISNIL( 3 ) )
    {
@@ -1217,7 +1217,7 @@ HB_FUNC( INETRECVENDBLOCK )
          {
             PHB_ITEM pItem  = hb_arrayGetItemPtr( pProto, i + 1 );
             Proto[ i ]      = hb_itemGetCPtr( pItem );
-            iprotosize[ i ] = hb_itemGetCLen( pItem );
+            iprotosize[ i ] = (int) hb_itemGetCLen( pItem );
          }
       }
       else
@@ -1225,7 +1225,7 @@ HB_FUNC( INETRECVENDBLOCK )
          Proto         = (char**) hb_xgrab( sizeof(char*) );
          iprotosize    = (int *) hb_xgrab( sizeof(int) );
          Proto[0]      = hb_itemGetCPtr( pProto );
-         iprotosize[0] = hb_itemGetCLen( pProto );
+         iprotosize[0] = (int) hb_itemGetCLen( pProto );
          iprotos       = 1;
       }
    }
@@ -1408,7 +1408,7 @@ HB_FUNC( INETDATAREADY )
    HB_STACK_UNLOCK;
    HB_TEST_CANCEL_ENABLE_ASYN;
 
-   iLen = select(Socket->com + 1, &rfds, NULL, NULL, &tv);
+   iLen = select( ( int ) Socket->com + 1, &rfds, NULL, NULL, &tv);
 
    HB_DISABLE_ASYN_CANC;
    HB_STACK_LOCK;

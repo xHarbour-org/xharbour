@@ -57,52 +57,52 @@
  */
 void hb_compPrintUsage( char * szSelf )
 {
-   static const char * szOptions [] =
+   static const char *  szOptions[] =
    {
-           "\nOptions:  %ca               automatic memvar declaration",
-           "\n          %cb               debug info",
-           "\n          %cbuild           display detailed version info",
-           "\n          %ccredits         display credits",
-           "\n          %cd<id>[=<val>]   #define <id>",
-           "\n          %ces[<level>]     set exit severity",
-           "\n          %cg<type>         output type generated is <type> (see below)",
-           "\n          %cgc[<type>]      output type: C source (.c) (default)",
-           "\n                           <type>: 0=compact 1=normal 2=verbose (default)",
-           "\n                                   3=generate real C code",
-           "\n          %cgo              output type: Platform dependant object module",
-           "\n          %cgh              output type: Harbour Portable Object (.hrb)",
-           "\n          %ci<path>         #include file search path",
-           "\n          %cj[<file>]       output i18n support [to <file>] to .hil",
-           "\n          %ck               compilation mode (type -k? for more data)",
-           "\n          %cl               suppress line number information",
-           "\n          %cm               compile module only",
-           "\n          %cn[<type>]       no implicit starting procedure (default)",
-           "\n                           <type>: 0=no implicit starting procedure",
-           "\n                                   1=no starting procedure at all",
-           "\n                                   2=force application starting procedure",
-           "\n          %co<path>         object file drive and/or path",
-           "\n          %cp[o<path>]      generate pre-processed output (.ppo) file in <path>",
-           "\n          %cpt[o<path>]     generate pre-processor trace (.ppt) file in <path>",
-           "\n          %cq               quiet",
-           "\n          %cq0              quiet and don't display program header",
+      "\nOptions:  %ca               automatic memvar declaration",
+      "\n          %cb               debug info",
+      "\n          %cbuild           display detailed version info",
+      "\n          %ccredits         display credits",
+      "\n          %cd<id>[=<val>]   #define <id>",
+      "\n          %ces[<level>]     set exit severity",
+      "\n          %cg<type>         output type generated is <type> (see below)",
+      "\n          %cgc[<type>]      output type: C source (.c) (default)",
+      "\n                           <type>: 0=compact 1=normal 2=verbose (default)",
+      "\n                                   3=generate real C code",
+      "\n          %cgo              output type: Platform dependant object module",
+      "\n          %cgh              output type: Harbour Portable Object (.hrb)",
+      "\n          %ci<path>         #include file search path",
+      "\n          %cj[<file>]       output i18n support [to <file>] to .hil",
+      "\n          %ck               compilation mode (type -k? for more data)",
+      "\n          %cl               suppress line number information",
+      "\n          %cm               compile module only",
+      "\n          %cn[<type>]       no implicit starting procedure (default)",
+      "\n                           <type>: 0=no implicit starting procedure",
+      "\n                                   1=no starting procedure at all",
+      "\n                                   2=force application starting procedure",
+      "\n          %co<path>         object file drive and/or path",
+      "\n          %cp[o<path>]      generate pre-processed output (.ppo) file in <path>",
+      "\n          %cpt[o<path>]     generate pre-processor trace (.ppt) file in <path>",
+      "\n          %cq               quiet",
+      "\n          %cq0              quiet and don't display program header",
 /* TODO:   "\n          %cr[<lib>]        request linker to search <lib> (or none)", */
-           "\n          %cs               syntax check only",
+      "\n          %cs               syntax check only",
 /* TODO:   "\n          %ct<path>         path for temp file creation", */
-           "\n          %cu[[+]<file>]    use command def set in <file> (or none)",
-           "\n          %cundef:<id>      #undef <id>",
-           "\n          %cv               variables are assumed M->",
-           "\n          %cvd              external functions are assumed as dynamic functions",
-           "\n          %cw[<level>]      set warning level number (0..3, default 1)",
-           "\n          %cx[<prefix>]     set symbol init function name prefix (for .c only)",
+      "\n          %cu[[+]<file>]    use command def set in <file> (or none)",
+      "\n          %cundef:<id>      #undef <id>",
+      "\n          %cv               variables are assumed M->",
+      "\n          %cvd              external functions are assumed as dynamic functions",
+      "\n          %cw[<level>]      set warning level number (0..3, default 1)",
+      "\n          %cx[<prefix>]     set symbol init function name prefix (for .c only)",
 #ifdef YYDEBUG
-           "\n          %cy               trace lex & yacc activity",
+      "\n          %cy               trace lex & yacc activity",
 #endif
-           "\n          %cz               suppress shortcutting (.and. & .or.)",
-           "\n          @<file>          compile list of modules in <file>",
-           "\n"
+      "\n          %cz               suppress shortcutting (.and. & .or.)",
+      "\n          @<file>          compile list of modules in <file>",
+      "\n"
    };
 
-   int iLine;
+   int                  iLine;
 
    printf( "\nSyntax:  %s <file[s][.prg]> [options]"
            "\n", szSelf );
@@ -116,19 +116,19 @@ void hb_compPrintUsage( char * szSelf )
  */
 void hb_compPrintModes( void )
 {
-   static const char * szOptions [] =
+   static const char *  szOptions[] =
    {
-           "\nOptions:  c               clear all flags (strict Clipper mode)",
-           "\n          h               Harbour mode (default)",
-           "\n          i               enable support for HB_INLINE",
-           "\n          r               runtime settings enabled",
-           "\n          x               extended xbase mode",
-           "\n          J               turn off jump optimization in pcode",
-           "\n          ?               this info",
-           "\n"
+      "\nOptions:  c               clear all flags (strict Clipper mode)",
+      "\n          h               Harbour mode (default)",
+      "\n          i               enable support for HB_INLINE",
+      "\n          r               runtime settings enabled",
+      "\n          x               extended xbase mode",
+      "\n          J               turn off jump optimization in pcode",
+      "\n          ?               this info",
+      "\n"
    };
 
-   int iLine;
+   int                  iLine;
 
    printf( "\nCompatibility flags (lowercase/uppercase significant): -k[options]\n" );
 
@@ -142,7 +142,7 @@ void hb_compPrintModes( void )
 void hb_compPrintCredits( void )
 {
 
-   char *szCredits = hb_credits();
+   char * szCredits = hb_credits();
 
    printf( "\n"
            "Credits: The xHarbour Team at www.xharbour.org\n"

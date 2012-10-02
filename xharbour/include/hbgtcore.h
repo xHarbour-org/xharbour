@@ -163,11 +163,11 @@ typedef struct
    long     (* RectSize) ( HB_GT_PTR, int, int, int, int );
    void     (* Save) ( HB_GT_PTR, int, int, int, int, BYTE * );
    void     (* Rest) ( HB_GT_PTR, int, int, int, int, BYTE * );
-   void     (* PutText) ( HB_GT_PTR, int, int, BYTE, BYTE *, ULONG );
-   void     (* Replicate) ( HB_GT_PTR, int, int, BYTE, BYTE, USHORT, ULONG );
-   void     (* WriteAt) ( HB_GT_PTR, int, int, BYTE *, ULONG );
-   void     (* Write) ( HB_GT_PTR, BYTE *, ULONG );
-   void     (* WriteCon) ( HB_GT_PTR, BYTE *, ULONG );
+   void     (* PutText) ( HB_GT_PTR, int, int, BYTE, BYTE *, HB_SIZE );
+   void     (* Replicate) ( HB_GT_PTR, int, int, BYTE, BYTE, USHORT, HB_SIZE );
+   void     (* WriteAt) ( HB_GT_PTR, int, int, BYTE *, HB_SIZE );
+   void     (* Write) ( HB_GT_PTR, BYTE *, HB_SIZE );
+   void     (* WriteCon) ( HB_GT_PTR, BYTE *, HB_SIZE );
    void     (* SetAttribute) ( HB_GT_PTR, int, int, int, int, BYTE );
    void     (* DrawShadow) ( HB_GT_PTR, int, int, int, int, BYTE );
    void     (* Scroll) ( HB_GT_PTR, int, int, int, int, BYTE, BYTE, int, int );
@@ -185,8 +185,8 @@ typedef struct
    BOOL     (* Resume) ( HB_GT_PTR );
    BOOL     (* PreExt) ( HB_GT_PTR );
    BOOL     (* PostExt) ( HB_GT_PTR );
-   void     (* OutStd) ( HB_GT_PTR, BYTE *, ULONG );
-   void     (* OutErr) ( HB_GT_PTR, BYTE *, ULONG );
+   void     (* OutStd) ( HB_GT_PTR, BYTE *, HB_SIZE );
+   void     (* OutErr) ( HB_GT_PTR, BYTE *, HB_SIZE );
    void     (* Tone) ( HB_GT_PTR, double, double );
    void     (* Bell) ( HB_GT_PTR );
    BOOL     (* Info) ( HB_GT_PTR, int, PHB_GT_INFO );
@@ -206,7 +206,7 @@ typedef struct
    int      (* InkeyLast) ( HB_GT_PTR, int iEventMask );
    int      (* InkeyNext) ( HB_GT_PTR, int iEventMask );
    void     (* InkeyPoll) ( HB_GT_PTR );
-   void     (* InkeySetText) ( HB_GT_PTR, const char * szText, ULONG ulLen );
+   void     (* InkeySetText) ( HB_GT_PTR, const char * szText, HB_SIZE ulLen );
    int      (* InkeySetLast) ( HB_GT_PTR, int iKey );
    void     (* InkeyReset) ( HB_GT_PTR );
    void     (* InkeyExit) ( HB_GT_PTR );
@@ -245,9 +245,9 @@ typedef struct
    int     (* ExtendedKeySupport) ( HB_GT_PTR );
 
    /* GT CLIPBOARD functions */
-   void    (* GetClipboard) ( HB_GT_PTR, char *, ULONG * );
-   void    (* SetClipboard) ( HB_GT_PTR, char *, ULONG );
-   ULONG   (* GetClipboardSize) ( HB_GT_PTR );
+   void    (* GetClipboard) ( HB_GT_PTR, char *, HB_SIZE * );
+   void    (* SetClipboard) ( HB_GT_PTR, char *, HB_SIZE );
+   HB_SIZE   (* GetClipboardSize) ( HB_GT_PTR );
 
    void    (* ProcessMessages) ( HB_GT_PTR );
 
@@ -345,8 +345,8 @@ typedef struct _HB_GT_BASE
    int            iLastPut;
    int            inkeyLast;
    int *          StrBuffer;     /* Change from BYTE of Harbour by Peter Rees 3APR2008 */
-   ULONG          StrBufferSize;
-   ULONG          StrBufferPos;
+   HB_SIZE        StrBufferSize;
+   HB_SIZE        StrBufferPos;
 
    PHB_ITEM       pNotifierBlock;
    int            iLocalGTHandle;
@@ -605,11 +605,11 @@ extern HB_EXPORT void   hb_gtStartupInit( void );
 
 /* low level GT functions common to different GTs supported by RTL */
 extern int  hb_gt_chrmapinit( int *piTransTbl, const char *pszTerm, BOOL fSetACSC );
-extern BOOL hb_gt_setClipboard( const char * szClipData, ULONG ulLen );
-extern BOOL hb_gt_getClipboard( char ** pszClipData, ULONG *pulLen );
+extern BOOL hb_gt_setClipboard( const char * szClipData, HB_SIZE ulLen );
+extern BOOL hb_gt_getClipboard( char ** pszClipData, HB_SIZE *pulLen );
 #if defined( HB_OS_WIN )
-extern BOOL hb_gt_w32_setClipboard( UINT uFormat, const char * szClipData, ULONG ulLen );
-extern BOOL hb_gt_w32_getClipboard( UINT uFormat, char ** pszClipData, ULONG *pulLen );
+extern BOOL hb_gt_w32_setClipboard( UINT uFormat, const char * szClipData, HB_SIZE ulLen );
+extern BOOL hb_gt_w32_getClipboard( UINT uFormat, char ** pszClipData, HB_SIZE *pulLen );
 extern int  hb_gt_w32_getKbdState( void );
 extern void hb_gt_w32_setKbdState( int kbdShifts );
 extern void hb_gt_w32_tone( double dFrequency, double dDuration );

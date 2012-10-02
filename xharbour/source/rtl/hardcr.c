@@ -54,9 +54,9 @@
 #include "hbapiitm.h"
 #include "hbfast.h"
 
-char * hb_strHardCR( char * pszString, ULONG ulStringLen )
+char * hb_strHardCR( char * pszString, HB_SIZE ulStringLen )
 {
-   ULONG ulStringPos;
+   HB_SIZE ulStringPos;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_strHardCR(%s, %lu)", pszString, ulStringLen));
 
@@ -79,7 +79,7 @@ HB_FUNC( HARDCR )
    if( pString )
    {
       char * pszBuffer = hb_itemGetC( pString );
-      ULONG ulStringLen = pString->item.asString.length;
+      HB_SIZE ulStringLen = pString->item.asString.length;
 
       /* hb_strHardCR() actually returns its 1st paramater, in this case pszBuffer. */
       hb_retclenAdopt( hb_strHardCR( pszBuffer, ulStringLen ), ulStringLen );

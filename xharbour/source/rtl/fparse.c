@@ -84,7 +84,7 @@ void hb_ParseLine( PHB_ITEM pReturn, const char * szText, int iDelimiter, int * 
 {
    if ( szText )
    {
-      int iLen = strlen( szText );
+      int iLen = ( int ) strlen( szText );
 
       if ( iLen > 0 )
       {
@@ -113,7 +113,7 @@ void hb_ParseLine( PHB_ITEM pReturn, const char * szText, int iDelimiter, int * 
           {
              int ui = 0;
 
-             hb_xmemset( szResult, ' ', iLen + 1 );
+             hb_xmemset( szResult, ' ', (size_t) ( iLen + 1 ) );
 
              /* an '"' found, loop until the next one is found */
              if ( szText[ i ] == '"' )

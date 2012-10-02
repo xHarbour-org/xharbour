@@ -96,7 +96,7 @@ static void hb_getScreenRange( USHORT * pusMin, USHORT * pusMax,
 HB_FUNC( SAVESCREEN )
 {
    USHORT uiTop, uiLeft, uiBottom, uiRight;
-   ULONG  ulSize;
+   HB_SIZE ulSize;
    void * pBuffer;
 #if defined( HB_EXTENSION )
    BOOL fNoCheck = hb_parl( 5 );

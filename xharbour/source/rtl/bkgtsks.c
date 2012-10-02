@@ -446,10 +446,10 @@ HB_FUNC( HB_BACKGROUNDADD )
 
    if( HB_IS_BLOCK( pBlock ) || HB_IS_ARRAY( pBlock ) )
    {
-      hb_retnl( hb_backgroundAddFunc( pBlock,
-                                      ( pMillisec == NULL ? 0 : hb_itemGetNI( pMillisec ) ),
-                                      ( pActive   == NULL ? TRUE : hb_itemGetL( pActive ) )
-                                    ) );
+      hb_retnl( ( LONG ) hb_backgroundAddFunc( pBlock,
+                                   ( pMillisec == NULL ? 0 : hb_itemGetNI( pMillisec ) ),
+                                   ( pActive   == NULL ? TRUE : hb_itemGetL( pActive ) )
+                                   ) );
    }
    else
       hb_retnl( -1 );    /* error - a codeblock is required */

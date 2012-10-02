@@ -81,7 +81,8 @@ HB_FUNC( STRPOKE )
 
    if( pText && ISNUM( 2 ) && ISNUM( 3 ) )
    {
-      ULONG ulPos = hb_parnl( 2 ), ulLen;
+      ULONG ulPos = hb_parnl( 2 );
+      HB_SIZE ulLen;
       char * pszText;
 
       if( ulPos > 0 && hb_itemGetWriteCL( pText, &pszText, &ulLen ) &&

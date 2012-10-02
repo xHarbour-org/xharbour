@@ -118,8 +118,8 @@ HB_FUNC( BUILDUSERPASSSTRING )
 
    s = ( char * ) hb_xgrab( ( u_len + p_len + 3 ) * sizeof( char ) );
    s[0] = '\0';
-   strcpy( s + 1, szUser );
-   strcpy( s + u_len + 2, szPass );
+   hb_xstrcpy( s + 1, szUser, 0 );
+   hb_xstrcpy( s + u_len + 2, szPass, 0 );
 
    hb_retcAdopt( s );
 }

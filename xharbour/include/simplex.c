@@ -159,7 +159,7 @@ typedef struct _LEX_PAIR
    typedef struct yy_buffer_state *YY_BUFFER_STATE;
 #endif
 
-static unsigned int iLen = 0;
+static int iLen = 0;
 static char chr, cPrev = 0;
 static unsigned int iLastToken = 0;
 static char *s_szBuffer;
@@ -675,7 +675,7 @@ int SimpLex_GetNextToken( void )
                {
                   IF_BELONG_LEFT( chr )
                   {
-                     int iStartLen = strlen( sStart );
+                     int iStartLen = (int) strlen( sStart );
 
                      /* Resetting. */
                      iPairToken = 0;
@@ -1211,7 +1211,8 @@ static int Reduce( int iToken )
 void SimpLex_CheckWords( void )
 {
    int iTentative = -1, iCompare;
-   unsigned int i, iMax, iLenMatched, iBaseSize = 0, iKeyLen, iSavedLen = 0;
+   HB_SIZE iLenMatched, iKeyLen;
+   unsigned int i, iMax, iBaseSize = 0, iSavedLen = 0;
    char *pNextSpacer, *sKeys2Match = NULL, *szBaseBuffer = s_szBuffer, cSpacer = chr;
    LEX_WORD *aCheck;
    BOOL bOptionalSpacer;
@@ -1221,7 +1222,7 @@ void SimpLex_CheckWords( void )
    char sKeyDesc[] = "Key", sWordDesc[] = "Word", *sDesc;
   #endif
   #ifdef LEX_ABBREVIATE
-   unsigned int iLen2Match;
+   HB_SIZE iLen2Match;
   #endif
 
   #ifdef USE_KEYWORDS
@@ -1319,7 +1320,7 @@ void SimpLex_CheckWords( void )
          }
 
          /* Is there a next potential Pattern. */
-         if( i < iMax && strncmp( aCheck[i - 1].sWord, aCheck[i].sWord, iLenMatched ) == 0  )
+         if( i < iMax && strncmp( aCheck[i - 1].sWord, aCheck[i].sWord, (int) iLenMatched ) == 0  )
          {
             /* Same relative position, in the next Pattern. */
             sKeys2Match = aCheck[i].sWord + iLenMatched;
@@ -1349,7 +1350,7 @@ void SimpLex_CheckWords( void )
             }
 
             /* Is there a next potential Pattern. */
-            if( i < iMax && strncmp( aCheck[i - 1].sWord, aCheck[i].sWord, iLenMatched ) == 0  )
+            if( i < iMax && strncmp( aCheck[i - 1].sWord, aCheck[i].sWord, (int) iLenMatched ) == 0  )
             {
                /* Same relative position, in the next Pattern. */
                sKeys2Match = aCheck[i].sWord + iLenMatched;
@@ -1393,7 +1394,7 @@ void SimpLex_CheckWords( void )
          }
 
          /* Is there a next potential Pattern. */
-         if( i < iMax && strncmp( aCheck[i - 1].sWord, aCheck[i].sWord, iLenMatched ) == 0  )
+         if( i < iMax && strncmp( aCheck[i - 1].sWord, aCheck[i].sWord, (int) iLenMatched ) == 0  )
          {
             /* Same relative position, in the next Pattern. */
             sKeys2Match = aCheck[i].sWord + iLenMatched;
@@ -1409,7 +1410,7 @@ void SimpLex_CheckWords( void )
 
       DEBUG_INFO( printf( "iKeyLen: %i iLen2Match: %i comparing: [%s] with: [%s]\n", iKeyLen, iLen2Match, sWord2Check, sKeys2Match ) );
 
-      iCompare = strncmp( (char*) sWord2Check, sKeys2Match, iLen2Match );
+      iCompare = strncmp( (char*) sWord2Check, sKeys2Match, (int) iLen2Match );
      #else
       iCompare = strcmp( (char*) sWord2Check, sKeys2Match );
      #endif
@@ -1438,7 +1439,7 @@ void SimpLex_CheckWords( void )
             i++;
 
             /* Is there a next potential Pattern, that is an extended version of the current Pattern. */
-            if( i < iMax && strncmp( aCheck[i - 1].sWord, aCheck[i].sWord, iLenMatched ) == 0 )
+            if( i < iMax && strncmp( aCheck[i - 1].sWord, aCheck[i].sWord, (int) iLenMatched ) == 0 )
             {
                pNextSpacer = strstr( aCheck[i].sWord + iLenMatched, "{WS}" );
                if( pNextSpacer )
@@ -1488,7 +1489,7 @@ void SimpLex_CheckWords( void )
                }
                else
                {
-                  iLen = strlen( sStart );
+                  iLen = (int) strlen( sStart );
                }
 
                s_szBuffer -= iLen;
@@ -1548,7 +1549,7 @@ void SimpLex_CheckWords( void )
          }
 
          /* Is there a next potential Pattern. */
-         if( i < iMax && strncmp( aCheck[i - 1].sWord, aCheck[i].sWord, iLenMatched ) == 0 )
+         if( i < iMax && strncmp( aCheck[i - 1].sWord, aCheck[i].sWord, (int) iLenMatched ) == 0 )
          {
             /* Same relative position, in the next Pattern. */
             sKeys2Match = aCheck[i].sWord + iLenMatched;

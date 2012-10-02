@@ -103,7 +103,7 @@ static void do_count( int iSwitch )
 
       }
 
-      hb_retnl( sRetVal );
+      hb_retns( sRetVal );
 
    }
    else /* if (ISCHAR (1)) */

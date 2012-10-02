@@ -54,11 +54,11 @@
 
 HB_FUNC( RAT )
 {
-   ULONG ulSubLen = hb_parclen( 1 );
+   HB_SIZE ulSubLen = hb_parclen( 1 );
 
    if( ulSubLen )
    {
-      LONG lPos = hb_parclen( 2 ) - ulSubLen;
+      LONG lPos = ( LONG ) ( hb_parclen( 2 ) - ulSubLen );
 
       if( lPos >= 0 )
       {
@@ -73,7 +73,7 @@ HB_FUNC( RAT )
          while( lPos >= lEnd && !bFound )
          {
             if( *( pszText + lPos ) == *pszSub )
-               bFound = ( memcmp( pszSub, pszText + lPos, ulSubLen ) == 0 );
+               bFound = ( memcmp( pszSub, pszText + lPos, (size_t) ulSubLen ) == 0 );
             lPos--;
          }
          hb_retnl( bFound ? lPos + 2 : 0 );

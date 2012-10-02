@@ -54,8 +54,6 @@
 #include "hbapiitm.h"
 #include "hbapierr.h"
 
-/* returns the right-most n characters in string */
-
 HB_FUNC( RIGHT )
 {
    PHB_ITEM pText = hb_param( 1, HB_IT_STRING );
@@ -63,7 +61,7 @@ HB_FUNC( RIGHT )
    if( pText && ISNUM( 2 ) )
    {
       LONG lLen = hb_parnl( 2 );
-      LONG lTextLen = pText->item.asString.length;
+      LONG lTextLen = ( LONG ) pText->item.asString.length;
 
       if( lLen > lTextLen )
       {
@@ -78,7 +76,7 @@ HB_FUNC( RIGHT )
    }
    else
    {
-#ifdef HB_C52_STRICT 
+#ifdef HB_C52_STRICT
       hb_retc( "" ); /* Clipper doesn't error */
 #else
       hb_errRT_BASE_SubstR( EG_ARG, 1124, NULL, "RIGHT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );

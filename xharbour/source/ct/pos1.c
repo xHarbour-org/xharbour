@@ -198,7 +198,7 @@ static void do_pos1( int iSwitch )
 
          if( ( iMode && ! iDoRet ) || ( ! iMode && iDoRet ) )
          {
-            hb_retnl( puc - pcString + 1 );
+            hb_retns( puc - pcString + 1 );
             return;
          }
       }

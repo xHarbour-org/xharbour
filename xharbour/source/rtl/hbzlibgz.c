@@ -185,7 +185,7 @@ HB_FUNC( HB_GZREAD )
 {
    PHB_ITEM pBuffer = ISBYREF( 2 ) ? hb_param( 2, HB_IT_STRING ) : NULL;
    char * szBuffer;
-   ULONG nLen;
+   HB_SIZE nLen;
 
    if( pBuffer && hb_itemGetWriteCL( pBuffer, &szBuffer, &nLen ) )
    {

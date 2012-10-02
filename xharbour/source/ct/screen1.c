@@ -144,14 +144,14 @@ HB_FUNC( SCREENATTR )
 
 HB_FUNC( SCREENMIX )
 {
-   ULONG ulLen = hb_parclen( 1 );
+   HB_SIZE ulLen = hb_parclen( 1 );
 
    if( ulLen )
    {
-      const char *   szText   = hb_parc( 1 ), * szAttr;
-      ULONG          ulAttr   = hb_parclen( 2 ), ul = 0;
-      SHORT          sRow, sCol;
-      int            iRow, iCol, i;
+      const char * szText   = hb_parc( 1 ), * szAttr;
+      HB_SIZE      ulAttr   = hb_parclen( 2 ), ul = 0;
+      SHORT        sRow, sCol;
+      int          iRow, iCol, i;
 
       if( ulAttr == 0 )
       {
@@ -191,7 +191,6 @@ HB_FUNC( SCREENMIX )
    hb_retc( NULL );
 }
 
-
 /*  $DOC$
  *  $FUNCNAME$
  *      SAYSCREEN()
@@ -225,7 +224,7 @@ HB_FUNC( SCREENMIX )
 
 HB_FUNC( SAYSCREEN )
 {
-   ULONG ulLen = hb_parclen( 1 );
+   HB_SIZE ulLen = hb_parclen( 1 );
 
    if( ulLen )
    {
@@ -274,8 +273,10 @@ static BOOL hb_ctGetWinCord( int * piTop, int * piLeft,
 
    if( ISNUM( 1 ) )
       *piTop = hb_parni( 1 );
+
    if( ISNUM( 2 ) )
       *piLeft = hb_parni( 2 );
+
    if( ISNUM( 3 ) )
    {
       *piBottom = hb_parni( 3 );
@@ -284,6 +285,7 @@ static BOOL hb_ctGetWinCord( int * piTop, int * piLeft,
    }
    else
       *piBottom = iMaxRow;
+
    if( ISNUM( 4 ) )
    {
       *piRight = hb_parni( 4 );
@@ -342,7 +344,6 @@ HB_FUNC( CLEARWIN )
    hb_retc( NULL );
 }
 
-
 /*  $DOC$
  *  $FUNCNAME$
  *      INVERTWIN()
@@ -399,7 +400,6 @@ HB_FUNC( INVERTWIN )
 
    hb_retc( NULL );
 }
-
 
 /*  $DOC$
  *  $FUNCNAME$
@@ -573,7 +573,6 @@ HB_FUNC( CHARWIN )
    hb_retc( NULL );
 }
 
-
 /*  $DOC$
  *  $FUNCNAME$
  *      COLORWIN()
@@ -651,7 +650,6 @@ HB_FUNC( COLORWIN )
 
    hb_retc( NULL );
 }
-
 
 /*  $DOC$
  *  $FUNCNAME$

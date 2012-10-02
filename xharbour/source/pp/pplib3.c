@@ -55,10 +55,10 @@
 #include "hbvm.h"
 #include "hbinit.h"
 
-#define __PRG_SOURCE__ __FILE__
+#define __PRG_SOURCE__        __FILE__
 #ifdef HB_PCODE_VER
    #undef HB_PRG_PCODE_VER
-   #define HB_PRG_PCODE_VER HB_PCODE_VER
+   #define HB_PRG_PCODE_VER   HB_PCODE_VER
 #endif
 
 HB_FUNC_EXTERN( __PP_INIT );
@@ -67,16 +67,18 @@ HB_FUNC_EXTERN( __PP_PROCESS );
 HB_FUNC_EXTERN( __PP_STDRULES );
 
 HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_PPLIB3 )
-{ "__PP_INIT",     {HB_FS_PUBLIC}, {HB_FUNCNAME( __PP_INIT )},     NULL },
-{ "__PP_ADDRULE",  {HB_FS_PUBLIC}, {HB_FUNCNAME( __PP_ADDRULE )},  NULL },
-{ "__PP_PROCESS",  {HB_FS_PUBLIC}, {HB_FUNCNAME( __PP_PROCESS )},  NULL },
-{ "__PP_STDRULES", {HB_FS_PUBLIC}, {HB_FUNCNAME( __PP_STDRULES )}, NULL },
+{
+   "__PP_INIT", { HB_FS_PUBLIC }, { HB_FUNCNAME( __PP_INIT ) }, NULL
+},
+{ "__PP_ADDRULE", { HB_FS_PUBLIC }, { HB_FUNCNAME( __PP_ADDRULE ) }, NULL },
+{ "__PP_PROCESS", { HB_FS_PUBLIC }, { HB_FUNCNAME( __PP_PROCESS ) }, NULL },
+{ "__PP_STDRULES", { HB_FS_PUBLIC }, { HB_FUNCNAME( __PP_STDRULES ) }, NULL },
 HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_PPLIB3 )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup hb_vm_SymbolInit_PPLIB3
 #elif defined( HB_DATASEG_STARTUP )
-   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( hb_vm_SymbolInit_PPLIB3 )
+   #define HB_DATASEG_BODY HB_DATASEG_FUNC( hb_vm_SymbolInit_PPLIB3 )
    #include "hbiniseg.h"
 #endif
 
@@ -105,8 +107,8 @@ static PHB_ITEM hb_pp_Get( void )
 
 HB_FUNC( __PPADDRULE )
 {
-   static PHB_DYNS s_pDynSym = NULL;
-   PHB_ITEM pp = hb_pp_Get(), pLine = hb_param( 1, HB_IT_ANY );
+   static PHB_DYNS   s_pDynSym   = NULL;
+   PHB_ITEM          pp          = hb_pp_Get(), pLine = hb_param( 1, HB_IT_ANY );
 
    if( pp )
    {
@@ -128,8 +130,8 @@ HB_FUNC( __PPADDRULE )
 
 HB_FUNC( __PREPROCESS )
 {
-   static PHB_DYNS s_pDynSym = NULL;
-   PHB_ITEM pp = hb_pp_Get(), pLine = hb_param( 1, HB_IT_ANY );
+   static PHB_DYNS   s_pDynSym   = NULL;
+   PHB_ITEM          pp          = hb_pp_Get(), pLine = hb_param( 1, HB_IT_ANY );
 
    if( pp )
    {

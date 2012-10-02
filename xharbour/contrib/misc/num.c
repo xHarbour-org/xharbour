@@ -112,7 +112,6 @@ HB_FUNC( SIGN )
       hb_retni( lNumber == 0 ? 0 : ( lNumber > 0 ? 1 : -1 ) );
    }
 }
-
 #endif
 
 /* NumAsLog10( <nNumber> ) --> nLog10
@@ -180,20 +179,16 @@ HB_FUNC( NUMGETLEN )
    hb_retnl( ulLen );
 }
 
-
 /* NumAsCurrency( <nNumber>, <cSymbol>, <nSide> ) --> cCurrency
    Convert number to currency format, floating dollar symbol
 */
 HB_FUNC( NUMASCURRENCY )
 {
    char * szBuffer = hb_itemStr( hb_param( 1, HB_IT_NUMERIC ), NULL, NULL );
-   LONG ulSymbolLen = hb_itemGetCLen( hb_param( 2, HB_IT_STRING ) );
+   HB_SIZE ulSymbolLen = hb_itemGetCLen( hb_param( 2, HB_IT_STRING ) );
    char * ptr = szBuffer;
-   char * szCurrency;
-   ULONG ulLen;
-
-   ulLen = strlen( ptr );
-   szCurrency = ( char * ) hb_xgrab( ulLen + ulSymbolLen ) ;
+   HB_SIZE ulLen = strlen( ptr );
+   char * szCurrency = ( char * ) hb_xgrab( ulLen + ulSymbolLen ) ;
 
    if( hb_parni( 3 ) < 0 )
    {
@@ -202,13 +197,13 @@ HB_FUNC( NUMASCURRENCY )
 
       ulLen = strlen( ptr );
 
-      memcpy( szCurrency, hb_parcx( 2 ), ulSymbolLen );
-      memcpy( szCurrency + ulSymbolLen, ptr, ulLen );
+      HB_MEMCPY( szCurrency, hb_parcx( 2 ), (size_t) ulSymbolLen );
+      HB_MEMCPY( szCurrency + ulSymbolLen, ptr, (size_t) ulLen );
    }
    else
    {
-      memcpy( szCurrency, ptr, ulLen );
-      memcpy( szCurrency + ulLen, hb_parcx( 2 ), ulSymbolLen );
+      HB_MEMCPY( szCurrency, ptr, (size_t) ulLen );
+      HB_MEMCPY( szCurrency + ulLen, hb_parcx( 2 ), (size_t) ulSymbolLen );
    }
 
    if( szBuffer )

@@ -66,7 +66,7 @@ extern HB_EXPORT BOOL hb_dbg_InvokeDebug( BOOL bInvoke );
 extern HB_EXPORT ULONG hb_dbg_ProcLevel( void );
 extern HB_EXPORT PHB_ITEM hb_dbg_vmVarSGet( int nStatic, int nOffset );
 extern HB_EXPORT PHB_ITEM hb_dbg_vmVarLGet( int iLevel, int iLocal );
-extern HB_EXPORT ULONG hb_dbg_vmVarGCount( void );
+extern HB_EXPORT HB_SIZE hb_dbg_vmVarGCount( void );
 extern HB_EXPORT PHB_ITEM hb_dbg_vmVarGGet( int nGlobal, int nOffset );
 
 /* internal debugger function */

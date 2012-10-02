@@ -141,8 +141,9 @@ BOOL hb_strMatchWild( const char *szString, const char *szPattern )
    ULONG pulBufPosP[ HB_MAX_WILDPATTERN ], pulBufPosV[ HB_MAX_WILDPATTERN ],
          ulBufSize = HB_MAX_WILDPATTERN;
    ULONG * ulAnyPosP = pulBufPosP, * ulAnyPosV = pulBufPosV,
-         ulSize, ulLen, ulAny, i, j;
-
+         ulAny, i, j;
+   HB_SIZE ulLen, ulSize;
+ 
    i = j = ulAny = 0;
    ulLen = strlen( szString );
    ulSize = strlen( szPattern );
@@ -211,7 +212,8 @@ BOOL hb_strMatchWildExact( const char *szString, const char *szPattern )
    ULONG pulBufPosP[ HB_MAX_WILDPATTERN ], pulBufPosV[ HB_MAX_WILDPATTERN ],
          ulBufSize = HB_MAX_WILDPATTERN;
    ULONG * ulAnyPosP = pulBufPosP, * ulAnyPosV = pulBufPosV,
-         ulSize, ulLen, ulAny, i, j;
+         ulAny, i, j;
+   HB_SIZE ulLen, ulSize;
 
    i = j = ulAny = 0;
    ulLen = strlen( szString );
@@ -282,7 +284,8 @@ BOOL hb_strMatchCaseWildExact( const char *szString, const char *szPattern )
    ULONG pulBufPosP[ HB_MAX_WILDPATTERN ], pulBufPosV[ HB_MAX_WILDPATTERN ],
          ulBufSize = HB_MAX_WILDPATTERN;
    ULONG * ulAnyPosP = pulBufPosP, * ulAnyPosV = pulBufPosV,
-         ulSize, ulLen, ulAny, i, j;
+         ulAny, i, j;
+   HB_SIZE ulLen, ulSize;
 
    i = j = ulAny = 0;
    ulLen = strlen( szString );

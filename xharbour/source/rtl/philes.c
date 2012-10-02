@@ -126,7 +126,8 @@ HB_FUNC( FREAD )
 {
    PHB_ITEM pBuffer = hb_param( 2, HB_IT_STRING );
    USHORT uiError = 0;
-   ULONG ulRead = 0, ulSize;
+   HB_SIZE ulRead = 0;
+   HB_SIZE ulSize;
    char * buffer;
 
    if( ISNUM( 1 ) && pBuffer && ISBYREF( 2 ) && ISNUM( 3 ) )
@@ -166,13 +167,13 @@ HB_FUNC( FWRITE )
    if( ISNUM( 1 ) && ISCHAR( 2 ) )
    {
 #ifdef HB_EXTENSION
-      ULONG ulOffset = hb_parnl( 4 );
+      HB_SIZE ulOffset = hb_parnl( 4 );
 #else
-      ULONG ulOffset = 0;
+      HB_SIZE ulOffset = 0;
 #endif
-      hb_retnl( hb_fsWriteLarge( hb_numToHandle( hb_parnint( 1 ) ),
+      hb_retnl( ( LONG ) hb_fsWriteLarge( hb_numToHandle( hb_parnint( 1 ) ),
                                  ( BYTE * ) hb_parc( 2 ) + ulOffset,
-                                 ISNUM( 3 ) ? ( ULONG ) hb_parnl( 3 ) : hb_parclen( 2 ) - ulOffset ) );
+                                 ISNUM( 3 ) ? hb_parnl( 3 ) : hb_parclen( 2 ) - ulOffset ) );
       uiError = hb_fsError();
    }
    else
@@ -269,7 +270,7 @@ HB_FUNC( FREADSTR )
       {
          HB_FHANDLE fhnd = ( HB_FHANDLE ) hb_parni( 1 );
          char * buffer = ( char * ) hb_xgrab( ulToRead + 1 );
-         ULONG ulRead;
+         HB_SIZE ulRead;
 
          ulRead = hb_fsReadLarge( fhnd, buffer, ulToRead );
          uiError = hb_fsError();
@@ -538,26 +539,26 @@ HB_FUNC( HB_OPENPROCESS )
    {
       if ( pIn != NULL )
       {
-         hb_itemPutNL( pIn, fhIn );
+         hb_itemPutNL( pIn, ( const LONG ) fhIn );
       }
 
       if ( pOut != NULL )
       {
-         hb_itemPutNL( pOut, fhOut );
+         hb_itemPutNL( pOut, ( const LONG ) fhOut );
       }
 
       if ( pErr != NULL && pErr != pOut)
       {
-         hb_itemPutNL( pErr, fhErr );
+         hb_itemPutNL( pErr, ( const LONG ) fhErr );
       }
 
       if ( pProcID != NULL )
       {
-         hb_itemPutNL( pProcID, (LONG) pid );
+         hb_itemPutNL( pProcID, ( const LONG )  pid );
       }
    }
 
-   hb_retnl( fhProcess );
+   hb_retnl( ( long ) fhProcess );
 }
 
 HB_FUNC( HB_CLOSEPROCESS )

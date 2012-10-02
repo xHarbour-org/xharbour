@@ -50,6 +50,12 @@
  *
  */
 
+/* Pacify MSVS2005 and above */
+#if defined(_MSC_VER) && (_MSC_VER>=1400)
+   #define _CRT_SECURE_NO_WARNINGS
+   #define _CRT_SECURE_NO_DEPRECATE
+#endif
+
 /*
  * Avoid tracing in preprocessor/compiler.
  */
@@ -384,19 +390,19 @@ static void OutTable( DEFINES * endDefine, COMMANDS * endCommand, COMMANDS * end
       if( stcmd2->mpatt != NULL )
       {
           len_mpatt = hb_pp_strocpy( s_szLine, stcmd2->mpatt );
-          while( ( ipos = hb_strAt( "\1", 1, s_szLine, len_mpatt ) ) > 0 )
+          while( ( ipos = (int) hb_strAt( "\1", 1, s_szLine, len_mpatt ) ) > 0 )
           {
               hb_pp_Stuff( "\\1", s_szLine + ipos - 1, 2, 1, len_mpatt );
               len_mpatt++;
           }
 
-          while( ( ipos = hb_strAt( "\16", 1, s_szLine, len_mpatt ) ) > 0 )
+          while( ( ipos = (int) hb_strAt( "\16", 1, s_szLine, len_mpatt ) ) > 0 )
           {
               hb_pp_Stuff( "\\16", s_szLine + ipos - 1, 3, 1, len_mpatt );
               len_mpatt += 2;
           }
 
-          while( ( ipos = hb_strAt( "\17", 1, s_szLine, len_mpatt ) ) > 0 )
+          while( ( ipos = (int) hb_strAt( "\17", 1, s_szLine, len_mpatt ) ) > 0 )
           {
               hb_pp_Stuff( "\\17", s_szLine + ipos - 1, 3, 1, len_mpatt );
               len_mpatt += 2;
@@ -412,19 +418,19 @@ static void OutTable( DEFINES * endDefine, COMMANDS * endCommand, COMMANDS * end
       if( stcmd2->value != NULL )
       {
           len_value = hb_pp_strocpy( s_szLine, stcmd2->value );
-          while( ( ipos = hb_strAt( "\1", 1, s_szLine, len_value ) ) > 0 )
+          while( ( ipos = (int) hb_strAt( "\1", 1, s_szLine, len_value ) ) > 0 )
           {
               hb_pp_Stuff( "\\1", s_szLine + ipos - 1, 2, 1, len_value );
               len_value++;
           }
 
-          while( ( ipos = hb_strAt( "\16", 1, s_szLine, len_value ) ) > 0 )
+          while( ( ipos = (int) hb_strAt( "\16", 1, s_szLine, len_value ) ) > 0 )
           {
               hb_pp_Stuff( "\\16", s_szLine + ipos - 1, 3, 1, len_value );
               len_value += 2;
           }
 
-          while( ( ipos = hb_strAt( "\17", 1, s_szLine, len_value ) ) > 0 )
+          while( ( ipos = (int) hb_strAt( "\17", 1, s_szLine, len_value ) ) > 0 )
           {
               hb_pp_Stuff( "\\17", s_szLine + ipos - 1, 3, 1, len_value );
               len_value += 2;
@@ -486,19 +492,19 @@ static void OutTable( DEFINES * endDefine, COMMANDS * endCommand, COMMANDS * end
       {
           len_mpatt = hb_pp_strocpy( s_szLine, stcmd2->mpatt );
 
-          while( ( ipos = hb_strAt( "\1", 1, s_szLine, len_mpatt ) ) > 0 )
+          while( ( ipos = (int) hb_strAt( "\1", 1, s_szLine, len_mpatt ) ) > 0 )
           {
               hb_pp_Stuff( "\\1", s_szLine + ipos - 1, 2, 1, len_mpatt );
               len_mpatt++;
           }
 
-          while( ( ipos = hb_strAt( "\16", 1, s_szLine, len_mpatt ) ) > 0 )
+          while( ( ipos = (int) hb_strAt( "\16", 1, s_szLine, len_mpatt ) ) > 0 )
           {
               hb_pp_Stuff( "\\16", s_szLine + ipos - 1, 3, 1, len_mpatt );
               len_mpatt += 2;
           }
 
-          while( ( ipos = hb_strAt( "\17", 1, s_szLine, len_mpatt ) ) > 0 )
+          while( ( ipos = (int) hb_strAt( "\17", 1, s_szLine, len_mpatt ) ) > 0 )
           {
               hb_pp_Stuff( "\\17", s_szLine + ipos - 1, 3, 1, len_mpatt );
               len_mpatt += 2;
@@ -515,19 +521,19 @@ static void OutTable( DEFINES * endDefine, COMMANDS * endCommand, COMMANDS * end
       {
           len_value = hb_pp_strocpy( s_szLine, stcmd2->value );
 
-          while( ( ipos = hb_strAt( "\1", 1, s_szLine, len_value ) ) > 0 )
+          while( ( ipos = (int) hb_strAt( "\1", 1, s_szLine, len_value ) ) > 0 )
           {
               hb_pp_Stuff( "\\1", s_szLine + ipos - 1, 2, 1, len_value );
               len_value++;
           }
 
-          while( ( ipos = hb_strAt( "\16", 1, s_szLine, len_value ) ) > 0 )
+          while( ( ipos = (int) hb_strAt( "\16", 1, s_szLine, len_value ) ) > 0 )
           {
               hb_pp_Stuff( "\\16", s_szLine + ipos - 1, 3, 1, len_value );
               len_value += 2;
           }
 
-          while( ( ipos = hb_strAt( "\17", 1, s_szLine, len_value ) ) > 0 )
+          while( ( ipos = (int) hb_strAt( "\17", 1, s_szLine, len_value ) ) > 0 )
           {
               hb_pp_Stuff( "\\17", s_szLine + ipos - 1, 3, 1, len_value );
               len_value += 2;
@@ -629,9 +635,9 @@ void hb_compGenWarning( const char* _szWarnings[], char cPrefix, int iWarning, c
 }
 
 #ifndef hb_xgrab
-void * hb_xgrab( ULONG ulSize )         /* allocates fixed memory, exits on failure */
+void * hb_xgrab( HB_SIZE ulSize )         /* allocates fixed memory, exits on failure */
 {
-  void * pMem = malloc( ulSize );
+  void * pMem = malloc( (size_t) ulSize );
 
   HB_TRACE(HB_TR_DEBUG, ("hb_xgrab(%lu)", ulSize));
 
@@ -643,9 +649,9 @@ void * hb_xgrab( ULONG ulSize )         /* allocates fixed memory, exits on fail
 #endif
 
 #ifndef hb_xrealloc
-void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
+void * hb_xrealloc( void * pMem, HB_SIZE ulSize )       /* reallocates memory */
 {
-  void * pResult = realloc( pMem, ulSize );
+  void * pResult = realloc( pMem, (size_t) ulSize );
 
   HB_TRACE(HB_TR_DEBUG, ("hb_xrealloc(%p, %lu)", pMem, ulSize));
 

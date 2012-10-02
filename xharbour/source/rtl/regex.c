@@ -118,7 +118,6 @@ void hb_freeregex( regex_t *pReg )
    hb_xfree( pReg );
 }
 
-
 BOOL hb_regexCompile( PHB_REGEX pRegEx, const char *szRegEx, int iCFlags, int iEFlags )
 {
    pRegEx->pReg    = NULL;
@@ -252,7 +251,7 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
    }
 
    aMatches[0].rm_so = 0;
-   aMatches[0].rm_eo = pString->item.asString.length;
+   aMatches[0].rm_eo = (regoff_t) pString->item.asString.length;
 
    /* if( regexec( pReg, pString->item.asString.value, iMaxMatch, aMatches, EFlags ) == 0 ) */
    if( regexec( pReg, hb_itemGetCPtr( pString ), iMaxMatch, aMatches, EFlags ) == 0 )
@@ -584,7 +583,7 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 int Wild2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase )
 {
    char cChar;
-   int iLen = strlen( sWild );
+   HB_SIZE iLen = strlen( sWild );
    int i, iLenResult = 0;
 
    if( bMatchCase == FALSE )
@@ -645,8 +644,9 @@ int Wild2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase )
 int Mask2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase )
 {
    char cChar;
-   int iLen = strlen( sWild );
-   int i, iLenResult = 0;
+   HB_SIZE iLen = strlen( sWild );
+   HB_SIZE i;
+   int iLenResult = 0;
 
    if( bMatchCase == FALSE )
    {
@@ -694,7 +694,7 @@ HB_FUNC( HB_ATX )
    PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
    PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
-   LONG lStart = hb_parnl(4), lEnd = hb_parnl(5);
+   HB_SIZE lStart = hb_parnl(4), lEnd = hb_parnl(5);
 
    // if( pRegEx && pString && lStart <= pString->item.asString.length )
    if( pRegEx && pString && lStart <= hb_itemGetCLen( pString ) )
@@ -784,8 +784,8 @@ HB_FUNC( HB_ATX )
          {
             EFlags |= REG_STARTEND;
 
-            aMatches[0].rm_so = lStart;
-            aMatches[0].rm_eo = lEnd;
+            aMatches[0].rm_so = ( regoff_t ) lStart;
+            aMatches[0].rm_eo = ( regoff_t ) lEnd;
          }
 
          // if( regexec( pReg, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
@@ -795,7 +795,7 @@ HB_FUNC( HB_ATX )
 
             if( hb_pcount() > 3 )
             {
-               hb_stornl( aMatches[0].rm_so + 1 + lStart, 4 );
+               hb_stornl( ( LONG ) ( aMatches[0].rm_so + 1 + lStart ), 4 );
             }
 
             if( hb_pcount() > 4 )

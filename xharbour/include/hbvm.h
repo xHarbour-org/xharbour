@@ -136,7 +136,7 @@ extern HB_EXPORT void     hb_vmFunction( USHORT uiParams ); /* executes a functi
 extern HB_EXPORT void     hb_vmSend( USHORT uiParams ); /* sends a message to an object */
 extern HB_EXPORT PHB_ITEM hb_vmEvalBlock( PHB_ITEM pBlockItem ); /* executes passed codeblock with no arguments */
 /* executes passed codeblock with variable number of arguments */
-extern HB_EXPORT PHB_ITEM hb_vmEvalBlockV( PHB_ITEM pBlockItem, ULONG ulArgCount, ... );
+extern HB_EXPORT PHB_ITEM hb_vmEvalBlockV( PHB_ITEM pBlockItem, HB_SIZE ulArgCount, ... );
 extern HB_EXPORT PHB_ITEM hb_vmEvalBlockOrMacro( PHB_ITEM pItem ); /* executes codeblock or macro pointed by given item */
 extern HB_EXPORT void     hb_vmDestroyBlockOrMacro( PHB_ITEM pItem ); /* destroy codeblock or macro in given item */
 
@@ -150,7 +150,7 @@ extern HB_EXPORT void     hb_vmPushLongLong( HB_LONG lNumber ); /* pushes a long
 extern HB_EXPORT void     hb_vmPushDouble( double lNumber, int iDec ); /* pushes a double number onto the stack */
 extern HB_EXPORT void     hb_vmPushNumInt( HB_LONG lNumber );  /* pushes a number on to the stack and decides if it is integer or HB_LONG */
 extern HB_EXPORT void     hb_vmPushLogical( BOOL bValue );    /* pushes a logical value onto the stack */
-extern HB_EXPORT void     hb_vmPushString( const char * szText, ULONG length );  /* pushes a string on to the stack */
+extern HB_EXPORT void     hb_vmPushString( const char * szText, HB_SIZE length );  /* pushes a string on to the stack */
 extern HB_EXPORT void     hb_vmPushDate( LONG lDate );  /* pushes a LONG date onto the stack */
 extern HB_EXPORT void     hb_vmPushDateTime( LONG lDate, LONG lTime );   /* pushes a datetime onto the stack */
 extern HB_EXPORT void     hb_vmPushSymbol( PHB_SYMB pSym ); /* pushes a function pointer onto the stack */

@@ -58,13 +58,12 @@ HB_FUNC( POSDIFF )
 {
    if( ISCHAR( 1 ) && ISCHAR( 2 ) )
    {
-      const char *   pcString1   = hb_parc( 1 );
-      size_t         sStrLen1    = hb_parclen( 1 );
-      const char *   pcString2   = hb_parc( 2 );
-      size_t         sStrLen2    = hb_parclen( 2 );
-      const char *   pc1, * pc2;
-
-      size_t         sIgnore;
+      const char *  pcString1   = hb_parc( 1 );
+      HB_SIZE       sStrLen1    = hb_parclen( 1 );
+      const char *  pcString2   = hb_parc( 2 );
+      HB_SIZE       sStrLen2    = hb_parclen( 2 );
+      const char *  pc1, * pc2;
+      HB_SIZE       sIgnore;
 
       if( ISNUM( 3 ) )
          sIgnore = hb_parnl( 3 );
@@ -93,7 +92,7 @@ HB_FUNC( POSDIFF )
       {
          if( *pc1 != *pc2 )
          {
-            hb_retnl( ( pc1 - pcString1 ) + 1 );
+            hb_retnl( ( LONG ) ( pc1 - pcString1 ) + 1 );
             return;
          }
          pc1++;
@@ -102,7 +101,7 @@ HB_FUNC( POSDIFF )
 
       if( sStrLen1 != sStrLen2 )
       {
-         hb_retnl( ( sStrLen1 < sStrLen2 ? sStrLen1 : sStrLen2 ) + 1 );
+         hb_retnl( ( LONG ) ( sStrLen1 < sStrLen2 ? sStrLen1 : sStrLen2 ) + 1 );
       }
       else
       {
@@ -145,13 +144,12 @@ HB_FUNC( POSEQUAL )
 {
    if( ISCHAR( 1 ) && ISCHAR( 2 ) )
    {
-      const char *   pcString1   = hb_parc( 1 );
-      size_t         sStrLen1    = hb_parclen( 1 );
-      const char *   pcString2   = hb_parc( 2 );
-      size_t         sStrLen2    = hb_parclen( 2 );
-      const char *   pc1, * pc2;
-
-      size_t         sIgnore, sCompare, sCompareCnt, sRet = 0;
+      const char * pcString1   = hb_parc( 1 );
+      HB_SIZE      sStrLen1    = hb_parclen( 1 );
+      const char * pcString2   = hb_parc( 2 );
+      HB_SIZE      sStrLen2    = hb_parclen( 2 );
+      const char * pc1, * pc2;
+      HB_SIZE      sIgnore, sCompare, sCompareCnt, sRet = 0;
 
       if( ISNUM( 4 ) )
          sIgnore = hb_parnl( 4 );
@@ -166,6 +164,7 @@ HB_FUNC( POSEQUAL )
       if( ( sCompare == 0 ) || ( sIgnore > sStrLen1 ) || ( sIgnore > sStrLen2 ) )
       {
          int iArgErrorMode = ct_getargerrormode();
+
          if( iArgErrorMode != CT_ARGERR_IGNORE )
          {
             ct_error( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_POSEQUAL,
@@ -181,6 +180,7 @@ HB_FUNC( POSEQUAL )
       if( ( sStrLen1 < ( sCompare + sIgnore ) ) || ( sStrLen2 < ( sCompare + sIgnore ) ) )
       {
          int iArgErrorMode = ct_getargerrormode();
+
          if( iArgErrorMode != CT_ARGERR_IGNORE )
          {
             ct_error( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_POSEQUAL,
@@ -208,7 +208,7 @@ HB_FUNC( POSEQUAL )
             sCompareCnt++;
             if( sCompareCnt == sCompare )
             {
-               hb_retnl( sRet );
+               hb_retnl( ( LONG ) sRet );
                return;
             }
          }
@@ -248,5 +248,4 @@ HB_FUNC( POSEQUAL )
 
    return;
 }
-
 

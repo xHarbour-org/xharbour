@@ -4541,7 +4541,7 @@ HB_FUNC( PSTRCOMPI )
    {
       char * pcBase = (char*) hb_itemGetPtr( pPointer ) ;
       char * pcSub  = pSubstr->item.asString.value ;
-      ULONG uSublen = pSubstr->item.asString.length ;
+      HB_SIZE uSublen = pSubstr->item.asString.length ;
       ULONG uStart  = hb_itemGetNL( pStart ) ;
       int iCompare  = hb_strnicmp( pcBase+uStart-1 , pcSub, uSublen ) ;
 
@@ -4569,7 +4569,7 @@ HB_FUNC( PSTRCOMPI )
 
           if( lStart < 0 )
           {
-             lStart += pText->item.asString.length;
+             lStart += ( LONG ) pText->item.asString.length;
 
              if( lStart < 0 )
              {
@@ -4583,12 +4583,12 @@ HB_FUNC( PSTRCOMPI )
 
           if( lEnd < 0 )
           {
-             lEnd += pText->item.asString.length + 1;
+             lEnd += ( LONG ) pText->item.asString.length + 1;
           }
 
           if( lEnd > ( LONG ) pText->item.asString.length )
           {
-             lEnd = pText->item.asString.length;
+             lEnd = ( LONG ) pText->item.asString.length;
           }
 
           // Stop searching if starting past beyond end.
@@ -4601,7 +4601,7 @@ HB_FUNC( PSTRCOMPI )
 
           //TraceLog( NULL, "Search >%s< for >%s< from %i to %i\n", pText->item.asString.value, pSub->item.asString.value, lStart, lEnd );
 
-          ulPos = hb_strAtI( pSub->item.asString.value, pSub->item.asString.length, pText->item.asString.value + lStart, lEnd - lStart );
+          ulPos = hb_strAtI( pSub->item.asString.value, ( ULONG ) pSub->item.asString.length, pText->item.asString.value + lStart, lEnd - lStart );
 
           hb_retnl( ulPos ? ulPos + lStart : 0 );
        }

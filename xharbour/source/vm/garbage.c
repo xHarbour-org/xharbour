@@ -101,8 +101,8 @@ BOOL hb_gc_bReleaseAll = FALSE;
  */
 static USHORT s_uUsedFlag = HB_GC_USED_FLAG;
 
-static ULONG s_uAllocated = 0;
-static ULONG s_uAllocatedCnt = 0;
+static HB_SIZE s_uAllocated = 0;
+static HB_SIZE s_uAllocatedCnt = 0;
 
 #ifdef GC_RECYCLE
    #define HB_GARBAGE_FREE( pAlloc )  ( pAlloc->pFunc == hb_gcGripRelease ? \
@@ -157,7 +157,7 @@ static void hb_gcUnlink( HB_GARBAGE_PTR *pList, HB_GARBAGE_PTR pAlloc )
 }
 
 /* allocates a memory block */
-void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
+void * hb_gcAlloc( HB_SIZE ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
 {
    HB_GARBAGE_PTR pAlloc;
 
@@ -210,7 +210,7 @@ void hb_gcIncRef( void *pBlock )
    HB_ATOMIC_INC( pAlloc->ulHolders );
 }
 
-ULONG hb_gcDecRef( void *pBlock )
+HB_SIZE hb_gcDecRef( void *pBlock )
 {
    HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pBlock;
 
@@ -466,21 +466,21 @@ void *hb_gcUnlock( void *pBlock )
           struct
           {
              PHB_ITEM pItem;
-             ULONG ulSize;
+             HB_SIZE ulSize;
           } ResumePoint_2; //Resume: if( HB_IS_ARRAY( pItem ) )
 
           struct
           {
              PHB_ITEM pKey;
              PHB_ITEM pValue;
-             ULONG ulSize;
+             HB_SIZE ulSize;
           } ResumePoint_3; //Resume (after pKey): if( HB_IS_HASH( pItem ) )
 
           struct
           {
              PHB_ITEM pKey;
              PHB_ITEM pValue;
-             ULONG ulSize;
+             HB_SIZE ulSize;
           } ResumePoint_4; //Resume (after pValue): if( HB_IS_HASH( pItem ) )
 
           struct
@@ -587,7 +587,7 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
 {
    HB_THREAD_STUB
 
-   ULONG ulSize;
+   HB_SIZE ulSize;
    HB_ITEM FakedItem;
    PHB_ITEM pKey;
    PHB_ITEM pValue;
@@ -1193,6 +1193,6 @@ HB_FUNC( HB_GCALL )
 HB_FUNC( HB_GCALLOCATED )
 {
    HB_THREAD_STUB
-   hb_retnl( s_uAllocatedCnt );
+   hb_retns( s_uAllocatedCnt );
 }
 

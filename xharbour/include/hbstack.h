@@ -119,14 +119,14 @@ typedef struct
    PHB_ITEM * pItems;         /* pointer to the stack items */
    PHB_ITEM * pPos;           /* pointer to the latest used item */
    PHB_ITEM * pEnd;           /* pointer to the end of stack items */
-   LONG       wItems;         /* total items that may be holded on the stack */
+   long       wItems;         /* total items that may be holded on the stack */
    HB_ITEM    Return;         /* latest returned value */
    PHB_ITEM * pBase;          /* stack frame position for the current function call */
    PHB_ITEM * pEvalBase;      /* stack frame position for the evaluated codeblock */
-   LONG       lStatics;       /* statics base for the current function call */
-   LONG       lWithObject;    /* stack offset to base current WITH OBJECT item */
-   LONG       lRecoverBase;   /* current SEQUENCE envelope offset or 0 if no SEQUENCE is active */
-   //USHORT     uiActionRequest;/* Request for some action - stop processing of opcodes */
+   long       lStatics;       /* statics base for the current function call */
+   long       lWithObject;    /* stack offset to base current WITH OBJECT item */
+   long       lRecoverBase;   /* current SEQUENCE envelope offset or 0 if no SEQUENCE is active */
+   //USHORT   uiActionRequest;/* Request for some action - stop processing of opcodes */
    char       szDate[ 26 ];   /* last returned date from _pards() yyyymmdd format */
    PHB_STACKRDD rdd;          /* RDD related data */
    HB_STACKRDD_TLS rddTls;    /* RDD related data which is always thread-local */
@@ -140,7 +140,7 @@ typedef struct
 
    HB_ITEM  aEnumCollection[ HB_MAX_ENUMERATIONS ];
    PHB_ITEM apEnumVar[ HB_MAX_ENUMERATIONS ];
-   ULONG    awEnumIndex[ HB_MAX_ENUMERATIONS ];
+   HB_SIZE  awEnumIndex[ HB_MAX_ENUMERATIONS ];
    UINT     wEnumCollectionCounter;
 
    int aiExtraParams[HB_MAX_MACRO_ARGS];
@@ -182,7 +182,7 @@ extern BOOL hb_stack_ready;
 
 typedef struct
 {
-   LONG lStatics;
+   long lStatics;
 } HB_STACK_STATE;    /* used to save/restore stack state in hb_vmDo)_ */
 
 #else
@@ -196,13 +196,13 @@ typedef void * PHB_STACKRDD;
 
 extern HB_EXPORT HB_ITEM_PTR hb_stackItemFromTop( int nFromTop );
 extern HB_EXPORT HB_ITEM_PTR hb_stackItemFromBase( int nFromBase );
-extern HB_EXPORT LONG        hb_stackTopOffset( void );
-extern HB_EXPORT LONG        hb_stackBaseOffset( void );
-extern HB_EXPORT LONG        hb_stackTotalItems( void );
+extern HB_EXPORT long        hb_stackTopOffset( void );
+extern HB_EXPORT long        hb_stackBaseOffset( void );
+extern HB_EXPORT long        hb_stackTotalItems( void );
 extern HB_EXPORT HB_ITEM_PTR hb_stackTopItem( void );
 extern HB_EXPORT HB_ITEM_PTR hb_stackBaseItem( void );
 extern HB_EXPORT HB_ITEM_PTR hb_stackSelfItem( void );
-extern HB_EXPORT HB_ITEM_PTR hb_stackItem( LONG iItemPos );
+extern HB_EXPORT HB_ITEM_PTR hb_stackItem( long iItemPos );
 extern HB_EXPORT HB_ITEM_PTR hb_stackReturnItem( void );
 extern HB_EXPORT char *      hb_stackDateBuffer( void );
 
@@ -212,21 +212,19 @@ extern HB_EXPORT void        hb_stackPush( void );       /* pushes an item on to
 extern HB_EXPORT HB_ITEM_PTR hb_stackAllocItem( void );  /* allocates new item on the top of stack, returns pointer to it */
 extern HB_EXPORT void        hb_stackPushReturn( void );
 extern HB_EXPORT void        hb_stackPopReturn( void );
-extern void        hb_stackRemove( LONG lUntilPos );
+extern void                  hb_stackRemove( long lUntilPos );
 
 /* stack management functions */
-extern LONG       hb_stackBaseProcOffset( int iLevel );
-extern void       hb_stackDispLocal( void );  /* show the types of the items on the stack for debugging purposes */
-extern void       hb_stackDispCall( void );
-extern void       hb_stackFree( void );       /* releases all memory used by the stack */
-extern void       hb_stackInit( void );       /* initializes the stack */
-extern void       hb_stackIncrease( void );   /* increase the stack size */
-
+extern long    hb_stackBaseProcOffset( int iLevel );
+extern void    hb_stackDispLocal( void );  /* show the types of the items on the stack for debugging purposes */
+extern void    hb_stackDispCall( void );
+extern void    hb_stackFree( void );       /* releases all memory used by the stack */
+extern void    hb_stackInit( void );       /* initializes the stack */
+extern void    hb_stackIncrease( void );   /* increase the stack size */
 
 extern PHB_IOERRORS hb_stackIOErrors( void );
 extern PHB_STACKRDD hb_stackRDD( void );
 extern PHB_STACKRDD_TLS hb_stackRDDTLS( void );
-
 
 extern HB_EXPORT USHORT      hb_stackGetActionRequest( void );
 extern HB_EXPORT void        hb_stackSetActionRequest( USHORT uiAction );
@@ -236,17 +234,15 @@ extern HB_EXPORT PHB_ITEM ** hb_stackItemBasePtr( void );
 
 #if defined( _HB_API_INTERNAL_ )
 
-extern void        hb_stackSetStaticsBase( LONG lBase );
-extern LONG        hb_stackGetStaticsBase( void );
-
-   void hb_stack_init( PHB_STACK pStack );
+   extern void     hb_stackSetStaticsBase( long lBase );
+   extern long     hb_stackGetStaticsBase( void );
+   void            hb_stack_init( PHB_STACK pStack );
 
 #endif /* _HB_API_INTERNAL_ */
 
 #if defined( _HB_API_INTERNAL_ ) || defined( _HB_SET_INTERNAL_ )
    extern PHB_SET_STRUCT hb_stackSetStruct( void );
 #endif
-
 
 #if defined( HB_STACK_MACROS )
 

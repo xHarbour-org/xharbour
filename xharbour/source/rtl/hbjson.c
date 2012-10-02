@@ -100,9 +100,9 @@ typedef struct
 {
    char *   pBuffer;
    char *   pHead;
-   ULONG  nAlloc;
+   HB_SIZE  nAlloc;
    void **  pId;
-   ULONG  nAllocId;
+   HB_SIZE  nAllocId;
    BOOL  fHuman;
 } HB_JSON_ENCODE_CTX, * PHB_JSON_ENCODE_CTX;
 
@@ -117,11 +117,11 @@ typedef struct
 
 #define INDENT_SIZE   2
 
-static void _hb_jsonCtxAdd( PHB_JSON_ENCODE_CTX pCtx, const char * szString, ULONG nLen )
+static void _hb_jsonCtxAdd( PHB_JSON_ENCODE_CTX pCtx, const char * szString, HB_SIZE nLen )
 {
    if( pCtx->pHead + nLen >= pCtx->pBuffer + pCtx->nAlloc )
    {
-      ULONG nSize = pCtx->pHead - pCtx->pBuffer;
+      HB_SIZE nSize = pCtx->pHead - pCtx->pBuffer;
 
       pCtx->nAlloc += ( pCtx->nAlloc << 1 ) + nLen;
       pCtx->pBuffer = ( char * ) hb_xrealloc( pCtx->pBuffer, pCtx->nAlloc );
@@ -129,29 +129,29 @@ static void _hb_jsonCtxAdd( PHB_JSON_ENCODE_CTX pCtx, const char * szString, ULO
    }
    if( szString )
    {
-      hb_xmemcpy( pCtx->pHead, szString, nLen );
+      hb_xmemcpy( pCtx->pHead, szString, (size_t) nLen );
       pCtx->pHead += nLen;
    }
 }
 
-static void _hb_jsonCtxAddIndent( PHB_JSON_ENCODE_CTX pCtx, ULONG nCount )
+static void _hb_jsonCtxAddIndent( PHB_JSON_ENCODE_CTX pCtx, HB_SIZE nCount )
 {
    if( nCount <= 0 )
       return;
 
    if( pCtx->pHead + nCount >= pCtx->pBuffer + pCtx->nAlloc )
    {
-      ULONG nSize = pCtx->pHead - pCtx->pBuffer;
+      HB_SIZE nSize = pCtx->pHead - pCtx->pBuffer;
 
       pCtx->nAlloc += ( pCtx->nAlloc << 1 ) + nCount;
       pCtx->pBuffer = ( char * ) hb_xrealloc( pCtx->pBuffer, pCtx->nAlloc );
       pCtx->pHead = pCtx->pBuffer + nSize;
    }
-   hb_xmemset( pCtx->pHead, ' ', nCount );
+   hb_xmemset( pCtx->pHead, ' ', (size_t) nCount );
    pCtx->pHead += nCount;
 }
 
-static void _hb_jsonEncode( PHB_ITEM pValue, PHB_JSON_ENCODE_CTX pCtx, ULONG nLevel )
+static void _hb_jsonEncode( PHB_ITEM pValue, PHB_JSON_ENCODE_CTX pCtx, HB_SIZE nLevel )
 {
    if( nLevel >= pCtx->nAllocId )
    {
@@ -195,7 +195,7 @@ static void _hb_jsonEncode( PHB_ITEM pValue, PHB_JSON_ENCODE_CTX pCtx, ULONG nLe
    else if( HB_IS_STRING( pValue ) )
    {
       const char * szString = hb_itemGetCPtr( pValue );
-      ULONG nPos, nPos2, nLen = hb_itemGetCLen( pValue );
+      HB_SIZE nPos, nPos2, nLen = hb_itemGetCLen( pValue );
 
       _hb_jsonCtxAdd( pCtx, "\"", 1 );
 
@@ -278,7 +278,7 @@ static void _hb_jsonEncode( PHB_ITEM pValue, PHB_JSON_ENCODE_CTX pCtx, ULONG nLe
    }
    else if( HB_IS_ARRAY( pValue ) )
    {
-      ULONG nLen = hb_itemSize( pValue );
+      HB_SIZE nLen = hb_itemSize( pValue );
 
       if( nLen )
       {
@@ -318,7 +318,7 @@ static void _hb_jsonEncode( PHB_ITEM pValue, PHB_JSON_ENCODE_CTX pCtx, ULONG nLe
    }
    else if( HB_IS_HASH( pValue ) )
    {
-      ULONG nLen = hb_hashLen( pValue );
+      HB_SIZE nLen = hb_hashLen( pValue );
 
       if( nLen )
       {
@@ -395,7 +395,7 @@ static const char * _hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
       {
          if( szHead + 6 >= szDest + nAlloc )
          {
-            ULONG nLen = szHead - szDest;
+            HB_SIZE nLen = szHead - szDest;
             nAlloc += nAlloc << 1;
             szDest = ( char * ) hb_xrealloc( szDest, nAlloc );
             szHead = szDest + nLen;
@@ -634,11 +634,11 @@ static const char * _hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
 
 /* C level API functions */
 
-char * hb_jsonEncode( PHB_ITEM pValue, ULONG * pnLen, BOOL fHuman )
+char * hb_jsonEncode( PHB_ITEM pValue, HB_SIZE * pnLen, BOOL fHuman )
 {
    PHB_JSON_ENCODE_CTX pCtx;
    char * szRet;
-   ULONG nLen;
+   HB_SIZE nLen;
 
    pCtx = ( PHB_JSON_ENCODE_CTX ) hb_xgrab( sizeof( HB_JSON_ENCODE_CTX ) );
    pCtx->nAlloc = 16;
@@ -659,7 +659,7 @@ char * hb_jsonEncode( PHB_ITEM pValue, ULONG * pnLen, BOOL fHuman )
    return szRet;
 }
 
-ULONG hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
+HB_SIZE hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
 {
    PHB_ITEM pItem = pValue ? pValue : hb_itemNew( NULL );
    const char * sz;
@@ -681,7 +681,7 @@ HB_FUNC( HB_JSONENCODE )
 
    if( pItem )
    {
-      ULONG nLen;
+      HB_SIZE nLen;
       char * szRet = hb_jsonEncode( pItem, &nLen, hb_parl( 2 ) );
 
       hb_retclen_buffer( szRet, nLen );

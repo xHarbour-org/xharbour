@@ -192,9 +192,9 @@ typedef struct HB_EXPR_
       BOOL asLogical;      /* logical value */
       struct
       {
-         USHORT type;     /* type of datetime */
-         LONG date;       /* date value */
-         LONG time;       /* time value */
+         USHORT  type;     /* type of datetime */
+         long    date;     /* date value */
+         long    time;     /* time value */
       } asDate;
       struct
       {
@@ -255,12 +255,12 @@ typedef struct HB_EXPR_
       } asOperator;
       struct
       {
-         BYTE *pCode;                  /* pre-generated code */
-         ULONG ulLen;                  /* length of pCode */
+         BYTE   *pCode;                  /* pre-generated code */
+         HB_SIZE ulLen;                  /* length of pCode */
       } asExtBlock;
    } value;
-   ULONG ulLength;
-   ULONG Counter;
+   HB_SIZE ulLength;
+   HB_SIZE Counter;
    unsigned char ExprType;  /* internal expression type */
    USHORT ValType;          /* language level value type */
    struct HB_EXPR_ *pNext;  /* next expression in the list of expressions */
@@ -334,16 +334,16 @@ typedef  HB_EXPR_PTR HB_EXPR_ACTION( HB_EXPR_PTR pSelf, int iMessage );
 #define HB_EXPR_ISBUILTIN_SYMBOL( Exp1, BuiltInName ) HB_EXPR_ISBUILTIN_ID( Exp1->value.asSymbol.szName, BuiltInName )
 
 HB_EXPR_PTR hb_compExprNew( int );
-HB_EXPR_PTR hb_compExprNewExtBlock( BYTE *, ULONG );
+HB_EXPR_PTR hb_compExprNewExtBlock( BYTE *, HB_SIZE );
 HB_EXPR_PTR hb_compExprNewEmpty( void );
 HB_EXPR_PTR hb_compExprNewNil( void );
 HB_EXPR_PTR hb_compExprNewDouble( double, BYTE, BYTE );
 HB_EXPR_PTR hb_compExprNewLong( HB_LONG );
-HB_EXPR_PTR hb_compExprNewString( char *, ULONG, BOOL );
+HB_EXPR_PTR hb_compExprNewString( char *, HB_SIZE, BOOL );
 HB_EXPR_PTR hb_compExprNewLogical( int );
 HB_EXPR_PTR hb_compExprNewDate( HB_EXPR_PTR, HB_EXPR_PTR, HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewDateTime( HB_EXPR_PTR, HB_EXPR_PTR, HB_EXPR_PTR, HB_EXPR_PTR, HB_EXPR_PTR, HB_EXPR_PTR, int, int * );
-HB_EXPR_PTR hb_compExprNewDateTimeVal( LONG, LONG, USHORT );
+HB_EXPR_PTR hb_compExprNewDateTimeVal( long, long, USHORT );
 HB_EXPR_PTR hb_compExprNewSelf( void );
 HB_EXPR_PTR hb_compExprNewCodeBlock( void );
 HB_EXPR_PTR hb_compExprNewArray( HB_EXPR_PTR );
@@ -410,7 +410,7 @@ HB_EXPR_PTR hb_compExprAssign( HB_EXPR_PTR, HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprEqual( HB_EXPR_PTR, HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprAssignStatic( HB_EXPR_PTR, HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprClone( HB_EXPR_PTR pSrc );
-ULONG hb_compExprListLen( HB_EXPR_PTR );
+HB_ULONG hb_compExprListLen( HB_EXPR_PTR );
 void hb_compExprClear( HB_EXPR_PTR );
 char * hb_compExprDescription( HB_EXPR_PTR );
 int hb_compExprType( HB_EXPR_PTR );

@@ -33,68 +33,68 @@
 
 typedef struct tagBIOP
 {
-   char           Operator[3];
-   double         Left;
-   struct tagBIOP *Right;
-} BIOP, *PBIOP;
+   char Operator[ 3 ];
+   double Left;
+   struct tagBIOP * Right;
+} BIOP, * PBIOP;
 
 PBIOP BiOp( void );
-char * NextTokenInConstant( char **sExp );
+char * NextTokenInConstant( char ** sExp );
 static int Precedence( PBIOP Exp );
 static double Reduce( PBIOP Exp );
-double CalcConstant( char **pExp );
-#define VALUE( sToken ) ( (sToken)[0] == '0' && (sToken)[1] == 'x' ? (double) strtol( sToken, NULL, 0 ) : atof( sToken ) )
+double CalcConstant( char ** pExp );
+#define VALUE( sToken )                                        ( ( sToken )[ 0 ] == '0' && ( sToken )[ 1 ] == 'x' ? ( double ) strtol( sToken, NULL, 0 ) : atof( sToken ) )
 
 #ifdef STAND_ALONE
   #define hb_compGenError( aArray, cType, sMsg, sInfo, sMore ) printf( "Parse Error: >%s<\n", sInfo )
   #include "hbexemem.h"
 
-  int main( char argc, char *argv[] )
-  {
-     double dExp;
-     char *sExp = argv[1];
+int main( char argc, char * argv[] )
+{
+   double   dExp;
+   char *   sExp = argv[ 1 ];
 
-     dExp = CalcConstant( (char **) &sExp );
+   dExp = CalcConstant( ( char ** ) &sExp );
 
-     if( sExp[0] )
-     {
-        printf( "Parse Error: >%s<\n", sExp );
-     }
-     else
-     {
-        printf( "Result: %i\n", (int)dExp );
-     }
+   if( sExp[ 0 ] )
+   {
+      printf( "Parse Error: >%s<\n", sExp );
+   }
+   else
+   {
+      printf( "Result: %i\n", ( int ) dExp );
+   }
 
-     return 0;
-  }
+   return 0;
+}
 #else
    #include "hbpp.h"
    #include "hbcomp.h"
 
-   #define malloc( p ) hb_xgrab( p )
-   #define free( p )   hb_xfree( p )
+   #define malloc( p )  hb_xgrab( p )
+   #define free( p )    hb_xfree( p )
    #include "hbexemem.h"
 #endif
 
-double CalcConstant( char **pExp )
+double CalcConstant( char ** pExp )
 {
-   char *sToken;
-   PBIOP Exp = BiOp(), Root = Exp;
-   double dExp;
-   int bNot = 0;
+   char *   sToken;
+   PBIOP    Exp   = BiOp(), Root = Exp;
+   double   dExp;
+   int      bNot  = 0;
 
    //printf( "Process: >%s<\n", *pExp );
 
-  Top:
+ Top:
 
    sToken = NextTokenInConstant( pExp );
 
-   if( sToken[0] == '(' )
+   if( sToken[ 0 ] == '(' )
    {
       if( bNot )
       {
-         bNot = 0;
-         Exp->Left = ! CalcConstant( pExp );
+         bNot        = 0;
+         Exp->Left   = ! CalcConstant( pExp );
       }
       else
       {
@@ -103,13 +103,13 @@ double CalcConstant( char **pExp )
 
       sToken = NextTokenInConstant( pExp );
 
-      if( sToken[0] != ')' )
+      if( sToken[ 0 ] != ')' )
       {
          *pExp -= strlen( sToken );
          hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_INVALID_CONSTANT_EXPRESSION, *pExp, NULL );
       }
    }
-   else if( sToken[0] == '!' )
+   else if( sToken[ 0 ] == '!' )
    {
       bNot = ! bNot;
       goto Top;
@@ -118,8 +118,8 @@ double CalcConstant( char **pExp )
    {
       if( bNot )
       {
-         bNot = 0;
-         Exp->Left = ! VALUE( sToken );
+         bNot        = 0;
+         Exp->Left   = ! VALUE( sToken );
       }
       else
       {
@@ -129,20 +129,20 @@ double CalcConstant( char **pExp )
 
    sToken = NextTokenInConstant( pExp );
 
-   if( sToken[0] && strstr( "+;-;*;/;&;|;&&;||;==;!=;<;>;<=;>=", sToken ) )
+   if( sToken[ 0 ] && strstr( "+;-;*;/;&;|;&&;||;==;!=;<;>;<=;>=", sToken ) )
    {
       strcpy( Exp->Operator, sToken );
 
-      Exp->Right = BiOp();
+      Exp->Right  = BiOp();
 
-      Exp = Exp->Right;
+      Exp         = Exp->Right;
 
       goto Top;
    }
 
    *pExp -= strlen( sToken );
 
-   dExp = Reduce( Root );
+   dExp  = Reduce( Root );
 
    //printf( "Result: %i Next: >%s<\n", (int)dExp, *pExp );
 
@@ -151,33 +151,33 @@ double CalcConstant( char **pExp )
 
 static double Reduce( PBIOP Exp )
 {
-   PBIOP Right;
-   double dRet = 0;
+   PBIOP    Right;
+   double   dRet = 0;
 
-   if( Exp->Operator[0] == 0 )
+   if( Exp->Operator[ 0 ] == 0 )
    {
       dRet = Exp->Left;
 
-      free( (void *) Exp );
+      free( ( void * ) Exp );
 
       return dRet;
    }
 
-   if( Exp->Right->Operator[0] && Precedence( Exp ) >= Precedence( Exp->Right ) )
+   if( Exp->Right->Operator[ 0 ] && Precedence( Exp ) >= Precedence( Exp->Right ) )
    {
-      Right = Exp->Right;
+      Right             = Exp->Right;
 
-      Exp->Right = BiOp();
-      Exp->Right->Left = Right->Left;
+      Exp->Right        = BiOp();
+      Exp->Right->Left  = Right->Left;
 
-      Right->Left = Reduce( Exp );
+      Right->Left       = Reduce( Exp );
 
       return Reduce( Right );
    }
 
    //printf( "Operator: %s Left: %i Right: %i\n", Exp->Operator, (int) Exp->Left, (int) Reduce( Exp->Right ) );
 
-   switch( Exp->Operator[0] )
+   switch( Exp->Operator[ 0 ] )
    {
       case '+':
          dRet = Exp->Left + Reduce( Exp->Right );
@@ -196,7 +196,7 @@ static double Reduce( PBIOP Exp )
          break;
 
       case '&':
-         if( Exp->Operator[1] )
+         if( Exp->Operator[ 1 ] )
          {
             if( Exp->Left )
             {
@@ -209,12 +209,12 @@ static double Reduce( PBIOP Exp )
          }
          else
          {
-            dRet = (long) Exp->Left & (long) Reduce( Exp->Right );
+            dRet = ( long ) Exp->Left & ( long ) Reduce( Exp->Right );
          }
          break;
 
       case '|':
-         if( Exp->Operator[1] )
+         if( Exp->Operator[ 1 ] )
          {
             if( Exp->Left )
             {
@@ -227,225 +227,227 @@ static double Reduce( PBIOP Exp )
          }
          else
          {
-            dRet = (long) Exp->Left | (long) Reduce( Exp->Right );
+            dRet = ( long ) Exp->Left | ( long ) Reduce( Exp->Right );
          }
          break;
 
       case '=':
-         dRet = (long) Exp->Left == (long) Reduce( Exp->Right );
+         dRet = ( long ) Exp->Left == ( long ) Reduce( Exp->Right );
          break;
 
       case '!':
-         dRet = (long) Exp->Left != (long) Reduce( Exp->Right );
+         dRet = ( long ) Exp->Left != ( long ) Reduce( Exp->Right );
          break;
 
       case '<':
-         if( Exp->Operator[1] )
+         if( Exp->Operator[ 1 ] )
          {
-            dRet = (long) Exp->Left <= (long) Reduce( Exp->Right );
+            dRet = ( long ) Exp->Left <= ( long ) Reduce( Exp->Right );
          }
          else
          {
-            dRet = (long) Exp->Left < (long) Reduce( Exp->Right );
+            dRet = ( long ) Exp->Left < ( long ) Reduce( Exp->Right );
          }
          break;
 
       case '>':
-         if( Exp->Operator[1] )
+         if( Exp->Operator[ 1 ] )
          {
-            dRet = (long) Exp->Left >= (long) Reduce( Exp->Right );
+            dRet = ( long ) Exp->Left >= ( long ) Reduce( Exp->Right );
          }
          else
          {
-            dRet = (long) Exp->Left > (long) Reduce( Exp->Right );
+            dRet = ( long ) Exp->Left > ( long ) Reduce( Exp->Right );
          }
          break;
    }
 
-   free( (void *) Exp );
+   free( ( void * ) Exp );
 
    return dRet;
 }
 
-char * NextTokenInConstant( char **pExp )
+char * NextTokenInConstant( char ** pExp )
 {
-   static char sToken[32];
+   static char sToken[ 32 ];
 
    //printf( "Process: >%s<\n", *pExp );
 
-   sToken[0] = '\0';
+   sToken[ 0 ] = '\0';
 
-   if( *pExp[0] == '\0' )
+   if( *pExp[ 0 ] == '\0' )
    {
       return sToken;
    }
 
-   while( (*pExp)[0] == ' ' )
+   while( ( *pExp )[ 0 ] == ' ' )
    {
-      (*pExp)++;
+      ( *pExp )++;
    }
 
    // Numbers
-   if( HB_ISDIGIT( ( BYTE ) (*pExp)[0] ) || (*pExp)[0] == '-' || (*pExp)[0] == '+' )
+   if( HB_ISDIGIT( ( BYTE ) ( *pExp )[ 0 ] ) || ( *pExp )[ 0 ] == '-' || ( *pExp )[ 0 ] == '+' )
    {
       int i = 0;
 
-      if( (*pExp)[0] == '0' && (*pExp)[1] == 'x' )
+      if( ( *pExp )[ 0 ] == '0' && ( *pExp )[ 1 ] == 'x' )
       {
-         sToken[0] = (*pExp)[0];
-         sToken[1] = (*pExp)[1];
-         (*pExp) += 2;
+         sToken[ 0 ] = ( *pExp )[ 0 ];
+         sToken[ 1 ] = ( *pExp )[ 1 ];
+         ( *pExp )   += 2;
 
-         i = 2;
+         i           = 2;
 
          // Hex
-         while( i < 31 && isxdigit( ( BYTE ) (*pExp)[0] ) )
+         while( i < 31 && isxdigit( ( BYTE ) ( *pExp )[ 0 ] ) )
          {
-            sToken[i++] = (*pExp)[0];
-            (*pExp)++;
+            sToken[ i++ ] = ( *pExp )[ 0 ];
+            ( *pExp )++;
          }
 
-         sToken[i] = '\0';
+         sToken[ i ] = '\0';
          return sToken;
       }
       else
       {
-         sToken[0] = '\0';
+         sToken[ 0 ] = '\0';
 
-         while( (*pExp)[0] == '-' || (*pExp)[0] == '+' )
+         while( ( *pExp )[ 0 ] == '-' || ( *pExp )[ 0 ] == '+' )
          {
-            if( (*pExp)[0] == '-' )
+            if( ( *pExp )[ 0 ] == '-' )
             {
-               if( sToken[0] == '-' )
+               if( sToken[ 0 ] == '-' )
                {
-                  sToken[0] = '\0';
-                  i = 0;
+                  sToken[ 0 ] = '\0';
+                  i           = 0;
                }
                else
                {
-                  sToken[0] = '-';
-                  i = 1;
+                  sToken[ 0 ] = '-';
+                  i           = 1;
                }
             }
             else
             {
-              // Postitive is already implied!
+               // Postitive is already implied!
             }
 
-            (*pExp)++;
+            ( *pExp )++;
          }
       }
 
       // Number
       do
       {
-         sToken[i++] = (*pExp)[0];
-         (*pExp)++;
-      } while( i < 31 && HB_ISDIGIT( ( BYTE ) (*pExp)[0] ) );
+         sToken[ i++ ] = ( *pExp )[ 0 ];
+         ( *pExp )++;
+      }
+      while( i < 31 && HB_ISDIGIT( ( BYTE ) ( *pExp )[ 0 ] ) );
 
       // Decimals
-      if( i < 31 && (*pExp)[0] == '.' )
+      if( i < 31 && ( *pExp )[ 0 ] == '.' )
       {
-         sToken[i++] = (*pExp)[0];
-         (*pExp)++;
+         sToken[ i++ ] = ( *pExp )[ 0 ];
+         ( *pExp )++;
 
-         while( i < 31 && HB_ISDIGIT( ( BYTE ) (*pExp)[0] ) )
+         while( i < 31 && HB_ISDIGIT( ( BYTE ) ( *pExp )[ 0 ] ) )
          {
-            sToken[i++] = (*pExp)[0];
-            (*pExp)++;
+            sToken[ i++ ] = ( *pExp )[ 0 ];
+            ( *pExp )++;
          }
       }
 
-      sToken[i] = '\0';
+      sToken[ i ] = '\0';
    }
    // Operators
-   else if( (*pExp)[0] == '<' && (*pExp)[1] == '>' )
+   else if( ( *pExp )[ 0 ] == '<' && ( *pExp )[ 1 ] == '>' )
    {
-      sToken[0] = '!';
-      sToken[1] = '=';
-      sToken[2] = '\0';
+      sToken[ 0 ] = '!';
+      sToken[ 1 ] = '=';
+      sToken[ 2 ] = '\0';
 
-      (*pExp) += 2;
+      ( *pExp )   += 2;
    }
-   else if( strchr( "+-*/&|()!=<>", (*pExp)[0] ) )
+   else if( strchr( "+-*/&|()!=<>", ( *pExp )[ 0 ] ) )
    {
-      sToken[0] = (*pExp)[0];
-      sToken[1] = '\0';
+      sToken[ 0 ] = ( *pExp )[ 0 ];
+      sToken[ 1 ] = '\0';
 
-      (*pExp)++;
+      ( *pExp )++;
    }
-   else if( (*pExp)[0] == '#' )
+   else if( ( *pExp )[ 0 ] == '#' )
    {
-      sToken[0] = '!';
-      sToken[1] = '=';
-      sToken[2] = '\0';
+      sToken[ 0 ] = '!';
+      sToken[ 1 ] = '=';
+      sToken[ 2 ] = '\0';
 
-      (*pExp)++;
+      ( *pExp )++;
    }
-   else if( (*pExp)[0] == '.' && HB_TOUPPER( (*pExp)[1] ) == 'A' && HB_TOUPPER( (*pExp)[2] ) == 'N' && HB_TOUPPER( (*pExp)[3] ) == 'D' && HB_TOUPPER( (*pExp)[4] ) == '.' )
+   else if( ( *pExp )[ 0 ] == '.' && HB_TOUPPER( ( *pExp )[ 1 ] ) == 'A' && HB_TOUPPER( ( *pExp )[ 2 ] ) == 'N' && HB_TOUPPER( ( *pExp )[ 3 ] ) == 'D' && HB_TOUPPER( ( *pExp )[ 4 ] ) == '.' )
    {
-      sToken[0] = '&';
-      sToken[1] = '&';
-      sToken[2] = '\0';
+      sToken[ 0 ] = '&';
+      sToken[ 1 ] = '&';
+      sToken[ 2 ] = '\0';
 
-      (*pExp) += 5;
+      ( *pExp )   += 5;
    }
-   else if( (*pExp)[0] == '.' && HB_TOUPPER( (*pExp)[1] ) == 'N' && HB_TOUPPER( (*pExp)[2] ) == 'O' && HB_TOUPPER( (*pExp)[3] ) == 'T' && HB_TOUPPER( (*pExp)[4] ) == '.' )
+   else if( ( *pExp )[ 0 ] == '.' && HB_TOUPPER( ( *pExp )[ 1 ] ) == 'N' && HB_TOUPPER( ( *pExp )[ 2 ] ) == 'O' && HB_TOUPPER( ( *pExp )[ 3 ] ) == 'T' && HB_TOUPPER( ( *pExp )[ 4 ] ) == '.' )
    {
-      sToken[0] = '!';
-      sToken[1] = '\0';
+      sToken[ 0 ] = '!';
+      sToken[ 1 ] = '\0';
 
-      (*pExp) += 5;
+      ( *pExp )   += 5;
    }
-   else if( (*pExp)[0] == '.' && HB_TOUPPER( (*pExp)[1] ) == 'O' && HB_TOUPPER( (*pExp)[2] ) == 'R' && HB_TOUPPER( (*pExp)[3] ) == '.' )
+   else if( ( *pExp )[ 0 ] == '.' && HB_TOUPPER( ( *pExp )[ 1 ] ) == 'O' && HB_TOUPPER( ( *pExp )[ 2 ] ) == 'R' && HB_TOUPPER( ( *pExp )[ 3 ] ) == '.' )
    {
-      sToken[0] = '|';
-      sToken[1] = '|';
-      sToken[2] = '\0';
+      sToken[ 0 ] = '|';
+      sToken[ 1 ] = '|';
+      sToken[ 2 ] = '\0';
 
-      (*pExp) += 4;
+      ( *pExp )   += 4;
    }
-   else if( (*pExp)[0] == '.' && HB_TOUPPER( (*pExp)[1] ) == 'T' && HB_TOUPPER( (*pExp)[2] ) == '.' )
+   else if( ( *pExp )[ 0 ] == '.' && HB_TOUPPER( ( *pExp )[ 1 ] ) == 'T' && HB_TOUPPER( ( *pExp )[ 2 ] ) == '.' )
    {
-      sToken[0] = '1';
-      sToken[1] = '\0';
+      sToken[ 0 ] = '1';
+      sToken[ 1 ] = '\0';
 
-      (*pExp) += 3;
+      ( *pExp )   += 3;
    }
-   else if( (*pExp)[0] == '.' && HB_TOUPPER( (*pExp)[1] ) == 'F' && HB_TOUPPER( (*pExp)[2] ) == '.' )
+   else if( ( *pExp )[ 0 ] == '.' && HB_TOUPPER( ( *pExp )[ 1 ] ) == 'F' && HB_TOUPPER( ( *pExp )[ 2 ] ) == '.' )
    {
-      sToken[0] = '0';
-      sToken[1] = '\0';
+      sToken[ 0 ] = '0';
+      sToken[ 1 ] = '\0';
 
-      (*pExp) += 3;
+      ( *pExp )   += 3;
    }
-   else if( HB_ISALPHA( ( BYTE ) (*pExp)[0] ) || (*pExp)[0] == '_' )
+   else if( HB_ISALPHA( ( BYTE ) ( *pExp )[ 0 ] ) || ( *pExp )[ 0 ] == '_' )
    {
       int i = 0;
 
       do
       {
-         sToken[i++] = (*pExp)[0];
-         (*pExp)++;
-      } while( HB_ISALNUM( ( BYTE ) (*pExp)[0] ) || (*pExp)[0] == '_' );
+         sToken[ i++ ] = ( *pExp )[ 0 ];
+         ( *pExp )++;
+      }
+      while( HB_ISALNUM( ( BYTE ) ( *pExp )[ 0 ] ) || ( *pExp )[ 0 ] == '_' );
    }
 
    // Might be a first char of a double char operator!
-   if( sToken[1] == '\0' &&
-       ( ( sToken[0] == '&' && (*pExp)[0] == '&' ) ||
-         ( sToken[0] == '|' && (*pExp)[0] == '|' ) ||
-         ( sToken[0] == '=' && (*pExp)[0] == '=' ) ||
-         ( sToken[0] == '!' && (*pExp)[0] == '=' ) ||
-         ( sToken[0] == '<' && (*pExp)[0] == '=' ) ||
-         ( sToken[0] == '>' && (*pExp)[0] == '=' ) )
-     )
+   if( sToken[ 1 ] == '\0' &&
+       ( ( sToken[ 0 ] == '&' && ( *pExp )[ 0 ] == '&' ) ||
+         ( sToken[ 0 ] == '|' && ( *pExp )[ 0 ] == '|' ) ||
+         ( sToken[ 0 ] == '=' && ( *pExp )[ 0 ] == '=' ) ||
+         ( sToken[ 0 ] == '!' && ( *pExp )[ 0 ] == '=' ) ||
+         ( sToken[ 0 ] == '<' && ( *pExp )[ 0 ] == '=' ) ||
+         ( sToken[ 0 ] == '>' && ( *pExp )[ 0 ] == '=' ) )
+       )
    {
-      sToken[1] = (*pExp)[0];
-      sToken[2] = '\0';
+      sToken[ 1 ] = ( *pExp )[ 0 ];
+      sToken[ 2 ] = '\0';
 
-      (*pExp)++;
+      ( *pExp )++;
    }
-   else if( sToken[0] == '\0' && (*pExp)[0] )
+   else if( sToken[ 0 ] == '\0' && ( *pExp )[ 0 ] )
    {
       hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_INVALID_CONSTANT_EXPRESSION, *pExp, NULL );
    }
@@ -459,20 +461,20 @@ char * NextTokenInConstant( char **pExp )
 
 static int Precedence( PBIOP Exp )
 {
-   switch( Exp->Operator[0] )
+   switch( Exp->Operator[ 0 ] )
    {
       case '|':
-         if( Exp->Operator[1] )
+         if( Exp->Operator[ 1 ] )
          {
             return 1;
          }
          else
          {
-           return 3;
+            return 3;
          }
 
       case '&':
-         if( Exp->Operator[1] )
+         if( Exp->Operator[ 1 ] )
          {
             return 2;
          }
@@ -503,7 +505,7 @@ static int Precedence( PBIOP Exp )
 
 PBIOP BiOp( void )
 {
-   PBIOP pBiOp = (PBIOP) malloc( sizeof( BIOP ) );
+   PBIOP pBiOp = ( PBIOP ) malloc( sizeof( BIOP ) );
 
    memset( pBiOp, 0, sizeof( BIOP ) );
 

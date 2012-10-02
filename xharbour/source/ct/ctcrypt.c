@@ -54,7 +54,7 @@
 
 HB_FUNC( CRYPT )
 {
-   ULONG ulCryptLen = hb_parclen( 2 );
+   HB_SIZE ulCryptLen = hb_parclen( 2 );
 
    if( ulCryptLen >= 2 )
    {
@@ -62,7 +62,7 @@ HB_FUNC( CRYPT )
       ULONG    ulCryptPos  = 0;
 
       BYTE *   pbyString   = ( BYTE * ) hb_parcx( 1 );
-      ULONG    ulStringLen = hb_parclen( 1 );
+      HB_SIZE  ulStringLen = hb_parclen( 1 );
       ULONG    ulStringPos;
 
       BYTE *   pbyResult   = ( BYTE * ) hb_xgrab( ulStringLen + 1 );

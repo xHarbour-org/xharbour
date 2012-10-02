@@ -173,13 +173,13 @@ typedef struct __FUNC
    PVAR           pPrivates;              /* pointer to private variables list */
    PENUMDEF       pEnums;                 /* pointer to Enumeration definitions list */
    BYTE *         pCode;                  /* pointer to a memory block where pcode is stored */
-   ULONG          lPCodeSize;             /* total memory size for pcode */
-   ULONG          lPCodePos;              /* actual pcode offset */
+   HB_SIZE        lPCodeSize;             /* total memory size for pcode */
+   HB_SIZE        lPCodePos;              /* actual pcode offset */
    int            iStaticsBase;           /* base for this function statics */
-   ULONG *        pNOOPs;                 /* pointer to the NOOP array */
-   ULONG *        pJumps;                 /* pointer to the Jumps array */
-   ULONG          iNOOPs;                 /* NOOPs Counter */
-   ULONG          iJumps;                 /* Jumps Counter */
+   HB_SIZE *      pNOOPs;                 /* pointer to the NOOP array */
+   HB_SIZE *      pJumps;                 /* pointer to the Jumps array */
+   HB_SIZE        iNOOPs;                 /* NOOPs Counter */
+   HB_SIZE        iJumps;                 /* Jumps Counter */
    BYTE *         pStack;                 /* Compile Time Stack */
    USHORT         iStackSize;             /* Compile Time Stack size */
    int            iStackIndex;            /* Compile Time Stack index */
@@ -204,7 +204,7 @@ typedef struct __PINLINE
 {
    char *       szName;                   /* name of a inline function */
    BYTE *       pCode;                    /* pointer to a memory block where pcode is stored */
-   ULONG        lPCodeSize;               /* total memory size for pcode */
+   HB_SIZE      lPCodeSize;               /* total memory size for pcode */
    char *       szFileName;               /* Source file name */
    int          iLine;                    /* Source line number */
    struct __PINLINE * pNext;               /* pointer to the next defined inline */
@@ -275,9 +275,9 @@ typedef struct _AUTOOPEN
 typedef struct _HB_DEBUGINFO
 {
    char *   pszModuleName;
-   ULONG    ulFirstLine;
-   ULONG    ulLastLine;
-   ULONG    ulAllocated;
+   HB_SIZE  ulFirstLine;
+   HB_SIZE  ulLastLine;
+   HB_SIZE  ulAllocated;
    BYTE *   pLineMap;
    struct _HB_DEBUGINFO * pNext;
 } HB_DEBUGINFO, * PHB_DEBUGINFO;       /* support structure for line number info */
@@ -333,11 +333,11 @@ typedef struct
 
 /* definitions for hb_compPCodeEval() support */
 typedef void * HB_VOID_PTR;
-#define HB_PCODE_FUNC( func, type ) ULONG func( PFUNCTION pFunc, ULONG lPCodePos, type cargo )
+#define HB_PCODE_FUNC( func, type ) HB_SIZE func( PFUNCTION pFunc, HB_SIZE lPCodePos, type cargo )
 typedef  HB_PCODE_FUNC( HB_PCODE_FUNC_, HB_VOID_PTR );
 typedef  HB_PCODE_FUNC_ * HB_PCODE_FUNC_PTR;
 
-extern LONG hb_compPCodeSize( PFUNCTION, ULONG );
+extern HB_SIZE hb_compPCodeSize( PFUNCTION, HB_SIZE );
 extern void hb_compPCodeEval( PFUNCTION, const HB_PCODE_FUNC_PTR *, void * );
 extern void hb_compPCodeTrace( PFUNCTION, const HB_PCODE_FUNC_PTR *, void * );
 
@@ -530,9 +530,9 @@ extern void hb_compPrepareOptimize( void );
 
 extern BOOL hb_compVariableMacroCheck( char * ); /* checks if passed variable can be used in macro */
 
-extern ULONG hb_compGenJump( HB_LONG );                /* generates the pcode to jump to a specific offset */
-extern ULONG hb_compGenJumpFalse( HB_LONG );           /* generates the pcode to jump if false */
-extern ULONG hb_compGenJumpTrue( HB_LONG );            /* generates the pcode to jump if true */
+extern HB_SIZE hb_compGenJump( HB_LONG );                /* generates the pcode to jump to a specific offset */
+extern HB_SIZE hb_compGenJumpFalse( HB_LONG );           /* generates the pcode to jump if false */
+extern HB_SIZE hb_compGenJumpTrue( HB_LONG );            /* generates the pcode to jump if true */
 extern void hb_compGenJumpHere( HB_ULONG  );             /* returns the pcode pos where to set a jump offset */
 extern void hb_compGenJumpThere( HB_ULONG, HB_ULONG ); /* sets a jump offset */
 
@@ -552,27 +552,27 @@ extern void hb_compGenPushMemVarRef( char * szVarName ); /* generates the pcode 
 extern void hb_compGenPushInteger( int iNumber );        /* Pushes a integer number on the virtual machine stack */
 extern void hb_compGenPushLogical( int iTrueFalse );     /* pushes a logical value on the virtual machine stack */
 extern void hb_compGenPushLong( HB_LONG lNumber );       /* Pushes an integer number on the virtual machine stack */
-extern void hb_compGenPushDate( LONG lDate, LONG lTime, USHORT uType );      /* Pushes a date on the virtual machine stack */
+extern void hb_compGenPushDate( long lDate, long lTime, USHORT uType );      /* Pushes a date on the virtual machine stack */
 extern void hb_compGenPushNil( void );                   /* Pushes nil on the virtual machine stack */
-extern void hb_compGenPushString( char * szText, ULONG ulLen );       /* Pushes a string on the virtual machine stack */
+extern void hb_compGenPushString( char * szText, HB_SIZE ulLen );       /* Pushes a string on the virtual machine stack */
 extern void hb_compGenPushSymbol( char * szSymbolName, void *Namespace, int iFlags ); /* Pushes a symbol on to the Virtual machine stack */
-extern void hb_compGenPushAliasedVar( char *, BOOL, char *, LONG );
-extern void hb_compGenPopAliasedVar( char *, BOOL, char *, LONG );
+extern void hb_compGenPushAliasedVar( char *, BOOL, char *, long );
+extern void hb_compGenPopAliasedVar( char *, BOOL, char *, long );
 extern void hb_compGenPushFunRef( char * );
-extern void hb_compGenSwitchCase( LONG );         /* generates the pcode to push switchcase value on the virtual machine stack */
+extern void hb_compGenSwitchCase( long );         /* generates the pcode to push switchcase value on the virtual machine stack */
 
-extern ULONG hb_compSequenceBegin( void ); /* Generate the opcode to open BEGIN/END sequence */
-extern ULONG hb_compSequenceEnd( void );  /* Generate the opcode to close BEGIN/END sequence */
-extern ULONG hb_compTryBegin( void ); /* Generate the opcode to open TRY/END tryuence */
-extern ULONG hb_compTryEnd( void );  /* Generate the opcode to close TRY/END tryuence */
-extern void  hb_compSequenceFinish( ULONG, int );
+extern HB_SIZE hb_compSequenceBegin( void ); /* Generate the opcode to open BEGIN/END sequence */
+extern HB_SIZE hb_compSequenceEnd( void );  /* Generate the opcode to close BEGIN/END sequence */
+extern HB_SIZE hb_compTryBegin( void ); /* Generate the opcode to open TRY/END tryuence */
+extern HB_SIZE hb_compTryEnd( void );  /* Generate the opcode to close TRY/END tryuence */
+extern void  hb_compSequenceFinish( HB_SIZE, int );
 
 extern void hb_compGenPCode1( BYTE );             /* generates 1 byte of pcode */
 extern void hb_compGenPData1( BYTE );             /* generates 1 byte of pcode argument */
 extern void hb_compGenPCode2( BYTE, BYTE, BOOL );       /* generates 2 bytes of pcode + flag for optional StrongType(). */
 extern void hb_compGenPCode3( BYTE, BYTE, BYTE, BOOL ); /* generates 3 bytes of pcode + flag for optional StrongType() */
 extern void hb_compGenPCode4( BYTE, BYTE, BYTE, BYTE, BOOL ); /* generates 4 bytes of pcode + flag for optional StrongType() */
-extern void hb_compGenPCodeN( BYTE * pBuffer, ULONG ulSize, BOOL );  /* copy bytes to a pcode buffer + flag for optional StrongType() */
+extern void hb_compGenPCodeN( BYTE * pBuffer, HB_SIZE ulSize, BOOL );  /* copy bytes to a pcode buffer + flag for optional StrongType() */
 
 #if defined(HB_COMP_STRONG_TYPES)
 extern void hb_compStrongType( int iSize );
@@ -630,9 +630,9 @@ extern int hb_compMain( int argc, char * argv[] );
 /* Misc functions defined in harbour.c */
 extern void hb_compSetDeferredFlagOn( void );
 extern void hb_compFinalizeFunction( void ); /* fixes all last defined function returns jumps offsets */
-extern void hb_compNOOPadd( PFUNCTION pFunc, ULONG ulPos );
-extern void hb_compNOOPfill( PFUNCTION pFunc, ULONG ulFrom, int iCount, BOOL fPop, BOOL fCheck );
-extern BOOL hb_compIsJump( PFUNCTION pFunc, ULONG ulPos );
+extern void hb_compNOOPadd( PFUNCTION pFunc, HB_SIZE ulPos );
+extern void hb_compNOOPfill( PFUNCTION pFunc, HB_SIZE ulFrom, int iCount, BOOL fPop, BOOL fCheck );
+extern BOOL hb_compIsJump( PFUNCTION pFunc, HB_SIZE ulPos );
 /* internationalization */
 extern void hb_compAddI18nString( char *szString );
 
@@ -754,7 +754,7 @@ extern INLINES        hb_comp_inlines;
 extern int            hb_comp_iLineINLINE;
 extern int            hb_comp_iLinePRG;
 
-extern ULONG          hb_comp_Supported;
+extern HB_SIZE        hb_comp_Supported;
 
 extern PVAR           hb_comp_pGlobals;
 extern short          hb_comp_iGlobals;
@@ -793,7 +793,7 @@ extern BOOL hb_comp_bWarnUnUsedBlockParams;
 #define HB_EXITLEVEL_DELTARGET  2
 
 /* /kx command line setting types - compatibility modes
- * (turn on a bit in ULONG word)
+ * (turn on a bit in HB_SIZE word)
 */
 #define HB_COMPFLAG_HARBOUR        1    /* -kh */
 #define HB_COMPFLAG_XBASE          2    /* -kx */
@@ -809,10 +809,10 @@ extern BOOL hb_comp_bWarnUnUsedBlockParams;
 
 /* Hide Strings */
 extern int            hb_comp_iHidden;
-extern BYTE *         hb_compHideString( int iType, char * szText, ULONG ulStrLen, ULONG * ulBufferLen );
+extern BYTE *         hb_compHideString( int iType, char * szText, HB_SIZE ulStrLen, HB_SIZE * ulBufferLen );
 
 /* Date and DateTime support */
-extern void           hb_comp_datetimeEncode( LONG *plDate, LONG *plTime, int iYear, int iMonth, int iDay, int iHour, int iMinute, double dSeconds, int iAmPm, int * piOk );
+extern void           hb_comp_datetimeEncode( long *plDate, long *plTime, int iYear, int iMonth, int iDay, int iHour, int iMinute, double dSeconds, int iAmPm, int * piOk );
 
 HB_EXTERN_END
 

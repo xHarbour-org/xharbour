@@ -65,11 +65,13 @@
 
 #define READING_BLOCK      4096
 
-BYTE * hb_fsReadLine( FHANDLE hFileHandle, LONG *plBuffLen, char ** Term, int * iTermSizes, USHORT iTerms, BOOL * bFound, BOOL *bEOF  )
+BYTE * hb_fsReadLine( FHANDLE hFileHandle, HB_SIZE *plBuffLen, char ** Term, int * iTermSizes, USHORT iTerms, BOOL * bFound, BOOL *bEOF  )
 {
-   USHORT uiPosTerm = 0, iPos, uiPosition;
+   USHORT uiPosTerm = 0, uiPosition;
+   HB_SIZE iPos;
    USHORT nTries;
-   LONG lRead = 0, lOffset, lSize;
+   HB_SIZE lRead = 0;
+   HB_SIZE lOffset, lSize;
    BYTE * pBuff;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsReadLine(%p, %ld, %p, %p, %hu, %i, %i)", hFileHandle, *plBuffLen, Term, iTermSizes, iTerms, *bFound, *bEOF ));
@@ -109,7 +111,7 @@ BYTE * hb_fsReadLine( FHANDLE hFileHandle, LONG *plBuffLen, char ** Term, int * 
             for( uiPosTerm=0;uiPosTerm < iTerms;uiPosTerm++)
             {
                /* Compare with the LAST terminator byte */
-               if( pBuff[lOffset+iPos] == Term[uiPosTerm][iTermSizes[uiPosTerm]-1] && (iTermSizes[uiPosTerm]-1) <= (iPos+lOffset) )
+               if( pBuff[lOffset+iPos] == Term[uiPosTerm][iTermSizes[uiPosTerm]-1] && (iTermSizes[uiPosTerm]-1) <= ( USHORT ) (iPos+lOffset) )
                {
                   *bFound = 1;
 
@@ -142,7 +144,7 @@ BYTE * hb_fsReadLine( FHANDLE hFileHandle, LONG *plBuffLen, char ** Term, int * 
             pBuff[ *plBuffLen ] = '\0';
 
             /* Set handle pointer in the end of the line */
-            hb_fsSeek( hFileHandle, (((lRead-((LONG)iPos)))*-1)+1, FS_RELATIVE );
+            hb_fsSeek( hFileHandle, (LONG) (((lRead-iPos)*-1)+1), FS_RELATIVE );
 
             return( pBuff );
          }
@@ -183,7 +185,7 @@ HB_FUNC( HB_FREADLINE )
    char ** Term;
    BYTE * pBuffer;
    int * iTermSizes;
-   LONG lSize = hb_parnl(4);
+   HB_SIZE lSize = hb_parnl(4);
    USHORT i, iTerms;
    BOOL bFound, bEOF;
 
@@ -216,7 +218,7 @@ HB_FUNC( HB_FREADLINE )
          {
             hb_arrayGet( pTerm1, i + 1, &Opt );
             Term[i]       = (char *) (&Opt)->item.asString.value;
-            iTermSizes[i] = (&Opt)->item.asString.length;
+            iTermSizes[i] = (int) (&Opt)->item.asString.length;
          }
       }
       else
@@ -225,7 +227,7 @@ HB_FUNC( HB_FREADLINE )
          Term          = (char**) hb_xgrab( sizeof(char*) );
          iTermSizes    = (int *) hb_xgrab( sizeof(int) );
          Term[0]       = (char *) pTerm1->item.asString.value;
-         iTermSizes[0] = pTerm1->item.asString.length;
+         iTermSizes[0] = (int) pTerm1->item.asString.length;
          iTerms        = 1;
       }
    }

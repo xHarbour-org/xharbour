@@ -625,7 +625,7 @@ static BOOL hb_gt_def_Resume( PHB_GT pGT )
    return HB_GTSELF_POSTEXT( pGT );
 }
 
-static void hb_gt_def_OutStd( PHB_GT pGT, BYTE * pbyStr, ULONG ulLen )
+static void hb_gt_def_OutStd( PHB_GT pGT, BYTE * pbyStr, HB_SIZE ulLen )
 {
    if( ulLen )
    {
@@ -637,7 +637,7 @@ static void hb_gt_def_OutStd( PHB_GT pGT, BYTE * pbyStr, ULONG ulLen )
          if( pGT->fDispTrans )
          {
             BYTE * pbyStrBuff = ( BYTE * ) hb_xgrab( ulLen );
-            HB_MEMCPY( pbyStrBuff, pbyStr, ulLen );
+            HB_MEMCPY( pbyStrBuff, pbyStr, (size_t) ulLen );
             hb_cdpnTranslate( ( char * ) pbyStrBuff,
                               pGT->cdpHost, pGT->cdpTerm, ulLen );
             hb_fsWriteLarge( pGT->hStdOut, pbyStrBuff, ulLen );
@@ -650,7 +650,7 @@ static void hb_gt_def_OutStd( PHB_GT pGT, BYTE * pbyStr, ULONG ulLen )
    }
 }
 
-static void hb_gt_def_OutErr( PHB_GT pGT, BYTE * pbyStr, ULONG ulLen )
+static void hb_gt_def_OutErr( PHB_GT pGT, BYTE * pbyStr, HB_SIZE ulLen )
 {
    if( ulLen )
    {
@@ -662,7 +662,7 @@ static void hb_gt_def_OutErr( PHB_GT pGT, BYTE * pbyStr, ULONG ulLen )
          if( pGT->fDispTrans )
          {
             BYTE * pbyStrBuff = ( BYTE * ) hb_xgrab( ulLen );
-            HB_MEMCPY( pbyStrBuff, pbyStr, ulLen );
+            HB_MEMCPY( pbyStrBuff, pbyStr, (size_t) ulLen );
             hb_cdpnTranslate( ( char * ) pbyStrBuff,
                               pGT->cdpHost, pGT->cdpTerm, ulLen );
             hb_fsWriteLarge( pGT->hStdErr, pbyStrBuff, ulLen );
@@ -731,7 +731,7 @@ static BOOL hb_gt_def_PutChar( PHB_GT pGT, int iRow, int iCol,
    return FALSE;
 }
 
-static void hb_gt_def_PutText( PHB_GT pGT, int iRow, int iCol, BYTE bColor, BYTE * pText, ULONG ulLen )
+static void hb_gt_def_PutText( PHB_GT pGT, int iRow, int iCol, BYTE bColor, BYTE * pText, HB_SIZE ulLen )
 {
    while( ulLen-- )
    {
@@ -742,7 +742,7 @@ static void hb_gt_def_PutText( PHB_GT pGT, int iRow, int iCol, BYTE bColor, BYTE
 }
 
 static void hb_gt_def_Replicate( PHB_GT pGT, int iRow, int iCol, BYTE bColor,
-                                 BYTE bAttr, USHORT usChar, ULONG ulLen )
+                                 BYTE bAttr, USHORT usChar, HB_SIZE ulLen )
 {
    if( iCol < 0 )
    {
@@ -760,7 +760,7 @@ static void hb_gt_def_Replicate( PHB_GT pGT, int iRow, int iCol, BYTE bColor,
    }
 }
 
-static void hb_gt_def_WriteAt( PHB_GT pGT, int iRow, int iCol, BYTE * pText, ULONG ulLength )
+static void hb_gt_def_WriteAt( PHB_GT pGT, int iRow, int iCol, BYTE * pText, HB_SIZE ulLength )
 {
    int iMaxCol = HB_GTSELF_MAXCOL( pGT );
 
@@ -772,7 +772,7 @@ static void hb_gt_def_WriteAt( PHB_GT pGT, int iRow, int iCol, BYTE * pText, ULO
    HB_GTSELF_SETPOS( pGT, iRow, iCol + ( int ) ulLength );
 }
 
-static void hb_gt_def_Write( PHB_GT pGT, BYTE * pText, ULONG ulLength )
+static void hb_gt_def_Write( PHB_GT pGT, BYTE * pText, HB_SIZE ulLength )
 {
    int iRow, iCol;
 
@@ -782,7 +782,7 @@ static void hb_gt_def_Write( PHB_GT pGT, BYTE * pText, ULONG ulLength )
 
 #define WRITECON_BUFFER_SIZE 512
 
-static void hb_gt_def_WriteCon( PHB_GT pGT, BYTE * pText, ULONG ulLength )
+static void hb_gt_def_WriteCon( PHB_GT pGT, BYTE * pText, HB_SIZE ulLength )
 {
    int iLen = 0;
    BOOL bDisp = FALSE;
@@ -1526,7 +1526,7 @@ static BOOL hb_gt_def_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
          {
             /* get Clipboard value */
             char * pszClipData;
-            ULONG ulLen;
+            HB_SIZE ulLen;
 
             if( hb_gt_getClipboard( &pszClipData, &ulLen ) )
                pInfo->pResult = hb_itemPutCPtr( pInfo->pResult, pszClipData, ulLen );
@@ -1561,7 +1561,7 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
    if( HB_IS_STRING( pMessage ) && iOptions > 0 )
    {
       const char * szMessage = hb_itemGetCPtr( pMessage );
-      ULONG ulLen = hb_itemGetCLen( pMessage );
+      HB_SIZE ulLen = hb_itemGetCLen( pMessage );
       BOOL fScreen = FALSE, fKeyBoard = FALSE;
       int iKey = 0, i, iDspCount, iStyle, iRows, iCols,
           iRow, iCol, iTop, iLeft, iBottom, iRight, iMnuCol, iPos, iClr;
@@ -1587,7 +1587,8 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
 
       if( fScreen )
       {
-         ULONG ulLines = 0, ulWidth = 0, ulCurrWidth = 0, ul = 0, ulDst = 0,
+         HB_SIZE ulCurrWidth = 0, ulWidth = 0;
+         ULONG ulLines = 0, ul = 0, ulDst = 0,
                ulLast = 0, ulSpace1 = 0, ulSpace2 = 0, ulDefWidth, ulMaxWidth;
          char * szMsgDsp;
 
@@ -1687,10 +1688,10 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
             ulWidth = ulCurrWidth;
          if( ( ULONG ) iRows < ulLines + 4 )
             ulLines = iRows - 4;
-         iTop = ( iRows - ulLines - 4 ) >> 1;
-         iLeft = ( iCols - ulWidth - 4 ) >> 1;
-         iBottom = iTop + ulLines + 3;
-         iRight = iLeft + ulWidth + 3;
+         iTop = ( iRows - (int) ulLines - 4 ) >> 1;
+         iLeft = ( iCols - (int) ulWidth - 4 ) >> 1;
+         iBottom = iTop + (int) ulLines + 3;
+         iRight = iLeft + (int) ulWidth + 3;
 
          if( iClrNorm == 0 )
             iClrNorm = 0x4F;
@@ -1721,7 +1722,7 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
                   ulLen = ul - ulLast;
                   if( ulLen > ulWidth )
                      ulLen = ulWidth;
-                  HB_GTSELF_PUTTEXT( pGT, i, iLeft + ( ( ulWidth - ulLen + 1 ) >> 1 ) + 2,
+                  HB_GTSELF_PUTTEXT( pGT, i, iLeft + ( ( (int) ulWidth - (int) ulLen + 1 ) >> 1 ) + 2,
                                      iClrNorm, ( BYTE * ) szMsgDsp + ulLast, ulLen );
                }
                ulLast = ul + 1;
@@ -1734,7 +1735,7 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
             ulLen = ul - ulLast;
             if( ulLen > ulWidth )
                ulLen = ulWidth;
-            HB_GTSELF_PUTTEXT( pGT, i, iLeft + ( ( ulWidth - ulLen + 1 ) >> 1 ) + 2,
+            HB_GTSELF_PUTTEXT( pGT, i, iLeft + ( ( (int) ulWidth - (int) ulLen + 1 ) >> 1 ) + 2,
                                iClrNorm, ( BYTE * ) szMsgDsp + ulLast, ulLen );
          }
 
@@ -1742,7 +1743,7 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
          while( iRet == 0 )
          {
             HB_GTSELF_DISPBEGIN( pGT );
-            iMnuCol = iLeft + ( ( ulWidth - ulCurrWidth ) >> 1 ) + 3;
+            iMnuCol = iLeft + ( ( (int) ulWidth - (int) ulCurrWidth ) >> 1 ) + 3;
             for( i = 1; i <= iOptions; ++i )
             {
                iClr = i == iPos ? iClrHigh : iClrNorm;
@@ -1750,8 +1751,8 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
                HB_GTSELF_PUTTEXT( pGT, iBottom - 1, iMnuCol, iClr, ( BYTE * ) " ", 1 );
                HB_GTSELF_PUTTEXT( pGT, iBottom - 1, iMnuCol + 1, iClr,
                                   ( BYTE * ) hb_arrayGetCPtr( pOptions, i ), ulLen );
-               HB_GTSELF_PUTTEXT( pGT, iBottom - 1, iMnuCol + 1 + ulLen, iClr, ( BYTE * ) " ", 1 );
-               iMnuCol += ulLen + 4;
+               HB_GTSELF_PUTTEXT( pGT, iBottom - 1, iMnuCol + 1 + (int) ulLen, iClr, ( BYTE * ) " ", 1 );
+               iMnuCol += (int) ulLen + 4;
             }
             while( HB_GTSELF_DISPCOUNT( pGT ) )
                HB_GTSELF_DISPEND( pGT );
@@ -1784,7 +1785,7 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
                HB_GTSELF_MOUSEGETPOS( pGT, &iMRow, &iMCol );
                if( iMRow == iBottom - 1 )
                {
-                  iMnuCol = iLeft + ( ( ulWidth - ulCurrWidth ) >> 1 ) + 4;
+                  iMnuCol = iLeft + ( (int) ( ulWidth - ulCurrWidth ) >> 1 ) + 4;
                   for( i = 1; i <= iOptions; ++i )
                   {
                      ulLen = hb_arrayGetCLen( pOptions, i );
@@ -1793,7 +1794,7 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
                         iRet = i;
                         break;
                      }
-                     iMnuCol += ulLen + 4;
+                     iMnuCol += (int) ulLen + 4;
                   }
                }
             }
@@ -2406,9 +2407,9 @@ static int hb_gt_def_InkeySetLast( PHB_GT pGT, int iKey )
 }
 
 /* internal fuction to set __Keyboard() buffer size */
-static ULONG hb_gt_def_SetStrBuffer( PHB_GT pGT, ULONG ulLen )
+static HB_SIZE hb_gt_def_SetStrBuffer( PHB_GT pGT, HB_SIZE ulLen )
 {
-   ULONG ulCopyToPos;  /* return location to copy new keys to */
+   HB_SIZE ulCopyToPos;  /* return location to copy new keys to */
 #ifdef HB_C52_STRICT
    if ( pGT->StrBuffer )
    {
@@ -2433,7 +2434,7 @@ static ULONG hb_gt_def_SetStrBuffer( PHB_GT pGT, ULONG ulLen )
 }
 
 /* Set text into inkey buffer */
-static void hb_gt_def_InkeySetText( PHB_GT pGT, const char * szText, ULONG ulLen )
+static void hb_gt_def_InkeySetText( PHB_GT pGT, const char * szText, HB_SIZE ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_def_InkeySetText(%p,%s,%lu)", pGT, szText, ulLen));
 
@@ -2441,7 +2442,7 @@ static void hb_gt_def_InkeySetText( PHB_GT pGT, const char * szText, ULONG ulLen
 
    if( szText && ulLen )
    {
-      ULONG ulCopyFromPos, ulCopyToPos ;
+      HB_SIZE ulCopyFromPos, ulCopyToPos ;
 
       ulCopyToPos = hb_gt_def_SetStrBuffer( pGT, ulLen );
       if ( pGT->StrBuffer )
@@ -2462,7 +2463,7 @@ static void hb_gt_def_InkeySetText( PHB_GT pGT, const char * szText, ULONG ulLen
    */
    else if ( ulLen )
    {
-      ULONG ulCopyToPos = hb_gt_def_SetStrBuffer( pGT, 1 );
+      HB_SIZE ulCopyToPos = hb_gt_def_SetStrBuffer( pGT, 1 );
       if ( pGT->StrBuffer )
       {
          pGT->StrBuffer[ ulCopyToPos ] = (int ) ulLen ;

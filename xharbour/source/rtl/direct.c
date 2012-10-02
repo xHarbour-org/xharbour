@@ -288,7 +288,7 @@ static BOOL hb_strMatchRegExpDir( const char * szString, const char * szMask, BO
 
 static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *szFName, char* szAttributes, char* sRegEx )
 {
-   ULONG ui, uiLen = pRecurse->item.asArray.value->ulLen;
+   HB_SIZE ui, uiLen = pRecurse->item.asArray.value->ulLen;
 
    for ( ui = 0; ui < uiLen; ui ++ )
    {

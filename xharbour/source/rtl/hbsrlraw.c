@@ -87,7 +87,7 @@ HB_FUNC( HB_CREATELEN8 )
    else if( ISBYREF( 1 ) && ISCHAR(1) && ISNUM( 2 ) )
    {
       char * buffer;
-      ULONG ulLen;
+      HB_SIZE ulLen;
 
       if( hb_itemGetWriteCL( hb_param( 1, HB_IT_STRING ), &buffer, &ulLen ) && ulLen >= 8 )
       {
@@ -165,7 +165,7 @@ HB_FUNC( HB_SERIALIZESIMPLE )
          cRet = (BYTE *) hb_xgrab( ulRet + 1 );
          cRet[0] = (BYTE) 'C';
          hb_createlen8( cRet + 1, pItem->item.asString.length );
-         HB_MEMCPY( cRet + 9, pItem->item.asString.value, pItem->item.asString.length );
+         HB_MEMCPY( cRet + 9, pItem->item.asString.value, (size_t) pItem->item.asString.length );
       break;
 
       case HB_IT_LOGICAL:
@@ -450,7 +450,7 @@ HB_FUNC( HB_DESERIALBEGIN )
 
    cBuf = (BYTE *) hb_xgrab( pItem->item.asString.length + 9 );
    hb_createlen8( cBuf, 9 );
-   HB_MEMCPY( cBuf+8, pItem->item.asString.value, pItem->item.asString.length );
+   HB_MEMCPY( cBuf+8, pItem->item.asString.value, (size_t) pItem->item.asString.length );
    hb_retclenAdopt( ( char *) cBuf, 8 + pItem->item.asString.length );
 }
 
@@ -460,7 +460,7 @@ HB_FUNC( HB_DESERIALIZEARRAY )
    const char *cBuf;
    PHB_ITEM pArray, pMaxLen, pRObj, pRHash, pRArray, pRBlock;
    PHB_DYNS pHB_Deserialize;
-   LONG lLen, i, lArrayLen, lNext;
+   HB_SIZE lLen, i, lArrayLen, lNext;
 
    pArray  = hb_param( 1, HB_IT_ARRAY );
    cBuf    = hb_parc( 2 );
@@ -518,6 +518,6 @@ HB_FUNC( HB_DESERIALIZEARRAY )
          }
       }
    }
-   hb_retnl( hb_parclen( 2 ) - lLen );
+   hb_retnl( ( LONG ) ( hb_parclen( 2 ) - lLen ) );
 }
 

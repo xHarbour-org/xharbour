@@ -63,7 +63,7 @@ extern "C" {
 #endif
 
 HB_U32 hb_arc4random( void );
-void hb_arc4random_buf( void * _buf, HB_SIZE n );
+void hb_arc4random_buf( void * _buf, ULONG n );
 HB_U32 hb_arc4random_uniform( HB_U32 upper_bound );
 
 #ifdef __cplusplus

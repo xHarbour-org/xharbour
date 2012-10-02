@@ -56,7 +56,7 @@
 
 HB_FUNC( INTNEG )
 {
-   LONG  lNumber  = 0;
+   HB_LONG  lNumber  = 0;
    BOOL  b32      = ( ISLOG( 2 ) && hb_parl( 2 ) ? 1 : 0 );
 
    if( ISNUM( 1 ) )
@@ -73,7 +73,7 @@ HB_FUNC( INTNEG )
 #ifndef HB_LONG_LONG_OFF
       if( lNumber < 0 )
 #endif
-      hb_retnl( lNumber );
+      hb_retnl( ( LONG ) lNumber );
 #ifndef HB_LONG_LONG_OFF
       else
          hb_retnll( ( LONG ) lNumber );
@@ -100,7 +100,7 @@ HB_FUNC( INTNEG )
 
 HB_FUNC( INTPOS )
 {
-   LONG  lNumber  = 0;
+   HB_LONG  lNumber  = 0;
    BOOL  b32      = ( ISLOG( 2 ) && hb_parl( 2 ) ? 1 : 0 );
 
 
@@ -118,7 +118,7 @@ HB_FUNC( INTPOS )
 #ifndef HB_LONG_LONG_OFF
       if( lNumber >= 0 )
 #endif
-      hb_retnl( lNumber );
+      hb_retnl( ( ULONG ) lNumber );
 #ifndef HB_LONG_LONG_OFF
       else
          hb_retnll( ( ULONG ) lNumber );

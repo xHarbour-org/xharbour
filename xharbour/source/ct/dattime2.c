@@ -69,7 +69,6 @@
 #include "hbdate.h"
 #include "hbset.h"
 
-
 static BOOL ct_isleap( int iYear )
 {
    return ( ( iYear & 3 ) == 0 && iYear % 100 != 0 ) || iYear % 400 == 0;
@@ -109,7 +108,6 @@ static int ct_doy( LONG lDate )
    lFirst = hb_dateEncode( iYear, 1, 1 );
    return ( int ) ( lDate - lFirst + 1 );
 }
-
 
 /*  $DOC$
  *  $FUNCNAME$
@@ -177,14 +175,12 @@ HB_FUNC( CTODOW )
       {
          hb_retnl( iDow + 1 );
       }
-
    }
    else
    {
       hb_retni( 0 );
    }
 }
-
 
 /*  $DOC$
  *  $FUNCNAME$
@@ -213,6 +209,7 @@ HB_FUNC( CTODOW )
  *      NTOCMONTH()
  *  $END$
  */
+
 HB_FUNC( CTOMONTH )
 {
    if( ISCHAR( 1 ) )
@@ -257,7 +254,6 @@ HB_FUNC( CTOMONTH )
    }
 }
 
-
 /*  $DOC$
  *  $FUNCNAME$
  *      DMY()
@@ -287,6 +283,7 @@ HB_FUNC( CTOMONTH )
  *      MDY()
  *  $END$
  */
+
 HB_FUNC( DMY )
 {
    int   iYear, iMonth, iDay;
@@ -311,8 +308,9 @@ HB_FUNC( DMY )
    if( iMonth >= 1 && iMonth <= 12 )
    {
       char *   szMonth  = ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_MONTH + iMonth - 1 );
-      int      iMonLen  = strlen( szMonth );
-      int      iLen     = 0, iBufLen = iMonLen + 10;
+      HB_SIZE  iMonLen  = strlen( szMonth );
+      HB_SIZE  iLen     = 0;
+      HB_SIZE  iBufLen = iMonLen + 10;
       char *   szMDY    = ( char * ) hb_xgrab( iBufLen );
 
       if( iDay < 10 )
@@ -359,7 +357,6 @@ HB_FUNC( DMY )
    }
 }
 
-
 /*  $DOC$
  *  $FUNCNAME$
  *      MDY()
@@ -389,6 +386,7 @@ HB_FUNC( DMY )
  *      DMY()
  *  $END$
  */
+
 HB_FUNC( MDY )
 {
    int iYear, iMonth, iDay;
@@ -407,12 +405,13 @@ HB_FUNC( MDY )
    if( iMonth >= 1 && iMonth <= 12 )
    {
       char *   szMonth  = ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_MONTH + iMonth - 1 );
-      int      iLen     = strlen( szMonth );
-      int      iBufLen  = iLen + 9;
+      HB_SIZE  iLen     = strlen( szMonth );
+      HB_SIZE  iBufLen  = iLen + 9;
       char *   szMDY    = ( char * ) hb_xgrab( iBufLen );
 
       hb_strncpy( szMDY, szMonth, iBufLen - 1 );
       szMDY[ iLen++ ] = ' ';
+
       if( iDay < 10 )
       {
          szMDY[ iLen ] = iDay + 0x30;
@@ -444,7 +443,6 @@ HB_FUNC( MDY )
       hb_retc( NULL );
    }
 }
-
 
 /*  $DOC$
  *  $FUNCNAME$
@@ -516,7 +514,6 @@ HB_FUNC( ADDMONTH )
    hb_retd( iYear, iMonth, iDay );
 }
 
-
 /*  $DOC$
  *  $FUNCNAME$
  *      DOY()
@@ -565,7 +562,6 @@ HB_FUNC( DOY )
    hb_retni( ct_doy( lDate ) );
 }
 
-
 /*  $DOC$
  *  $FUNCNAME$
  *      ISLEAP()
@@ -609,7 +605,6 @@ HB_FUNC( ISLEAP )
    hb_retl( ct_isleap( iYear ) );
 }
 
-
 HB_FUNC( DAYSTOMONTH )
 {
    int   iMonth   = ( ISNUM( 1 ) ? hb_parni( 1 ) : 0 );
@@ -617,7 +612,6 @@ HB_FUNC( DAYSTOMONTH )
 
    hb_retni( ct_daystomonth( iMonth, bLeap ) );
 }
-
 
 /*  $DOC$
  *  $FUNCNAME$
@@ -655,7 +649,6 @@ HB_FUNC( DAYSINMONTH )
 
 }
 
-
 /*  $DOC$
  *  $FUNCNAME$
  *      QUARTER()
@@ -684,6 +677,7 @@ HB_FUNC( DAYSINMONTH )
  *  $SEEALSO$
  *  $END$
  */
+
 HB_FUNC( QUARTER )
 {
    int      iYear, iMonth, iDay;
@@ -708,7 +702,6 @@ HB_FUNC( QUARTER )
 
    hb_retni( ( iMonth + 2 ) / 3 );
 }
-
 
 /*  $DOC$
  *  $FUNCNAME$
@@ -740,6 +733,7 @@ HB_FUNC( QUARTER )
  *      EOM()
  *  $END$
  */
+
 HB_FUNC( LASTDAYOM )
 {
    BOOL  bLeap = 0;
@@ -773,7 +767,6 @@ HB_FUNC( LASTDAYOM )
 
 }
 
-
 /*  $DOC$
  *  $FUNCNAME$
  *      NTOCDOW()
@@ -806,7 +799,6 @@ HB_FUNC( NTOCDOW )
    hb_retc( hb_dateCDOW( hb_parni( 1 ) ) );
 }
 
-
 /*  $DOC$
  *  $FUNCNAME$
  *      NTOCMONTH()
@@ -834,11 +826,11 @@ HB_FUNC( NTOCDOW )
  *      CTOMONTH()
  *  $END$
  */
+
 HB_FUNC( NTOCMONTH )
 {
    hb_retc( hb_dateCMonth( hb_parni( 1 ) ) );
 }
-
 
 /*  $DOC$
  *  $FUNCNAME$
@@ -876,6 +868,7 @@ HB_FUNC( NTOCMONTH )
  *  $SEEALSO$
  *  $END$
  */
+
 HB_FUNC( WEEK )
 {
    int      iYear, iMonth, iDay, iWeek;

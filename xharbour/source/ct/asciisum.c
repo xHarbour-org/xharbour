@@ -58,10 +58,10 @@ HB_FUNC( ASCIISUM )
 {
    if( ISCHAR( 1 ) )
    {
-      size_t         sStrSize = hb_parclen( 1 );
-      const char *   pcString = hb_parc( 1 );
-      size_t         sPos;
-      ULONG          ulResult = 0;
+      HB_SIZE      sStrSize = hb_parclen( 1 );
+      const char * pcString = hb_parc( 1 );
+      HB_SIZE      sPos;
+      ULONG        ulResult = 0;
 
       for( sPos = 0; sPos < sStrSize; sPos++ )
          ulResult += ( BYTE ) pcString[ sPos ];

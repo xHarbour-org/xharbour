@@ -1967,7 +1967,7 @@ HB_FUNC( __DBARRANGE )
          ulSize = 0;
          for( uiCount = 1; uiCount <= dbSortInfo.uiItemCount; ++uiCount )
          {
-            ULONG ulLine = hb_arrayGetCLen( pFields, uiCount );
+            ULONG ulLine = ( ULONG ) hb_arrayGetCLen( pFields, uiCount );
             if( ulLine > ulSize )
                ulSize = ulLine;
          }

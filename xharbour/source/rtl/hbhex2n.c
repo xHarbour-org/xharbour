@@ -158,7 +158,7 @@ HB_FUNC( STRTOHEX )
    char   *c;
    const char *cSep = "";
    unsigned char  ucChar;
-   ULONG  ul, ulLen, ulLenSep = 0;
+   HB_SIZE ul, ulLen, ulLenSep = 0;
    int    iDigit;
 
    if( ! ISCHAR(1) )
@@ -188,7 +188,7 @@ HB_FUNC( STRTOHEX )
    {
       if ( ulLenSep && ul )
       {
-         HB_MEMCPY( c, cSep, ulLenSep );
+         HB_MEMCPY( c, cSep, (size_t) ulLenSep );
          c += ulLenSep;
       }
 
@@ -208,13 +208,12 @@ HB_FUNC( STRTOHEX )
    hb_xfree( cOutBuf );
 }
 
-
 HB_FUNC( HEXTOSTR )
 {
    char *cOutBuf, *cStr;
    char c;
    int  iByte, iFirst;
-   ULONG  ul, ulLen, ulPos, ulAlloc;
+   HB_SIZE ul, ulLen, ulPos, ulAlloc;
 
    if( ! ISCHAR(1) )
    {

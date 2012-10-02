@@ -174,19 +174,19 @@ typedef struct _HB_LZSSX_COMPR
 {
    HB_FHANDLE hInput;
    BYTE *     inBuffer;
-   ULONG      inBuffSize;
-   ULONG      inBuffPos;
-   ULONG      inBuffRead;
+   ULONG    inBuffSize;
+   ULONG    inBuffPos;
+   ULONG    inBuffRead;
    BOOL       fInFree;
 
    HB_FHANDLE hOutput;
    BYTE *     outBuffer;
-   ULONG      outBuffSize;
-   ULONG      outBuffPos;
+   ULONG    outBuffSize;
+   ULONG    outBuffPos;
    BOOL       fOutFree;
 
-   ULONG      ulMaxSize;
-   ULONG      ulOutSize;
+   ULONG    ulMaxSize;
+   ULONG    ulOutSize;
    BOOL       fResult;
    BOOL       fContinue;
 
@@ -210,7 +210,7 @@ static void hb_LZSSxExit( PHB_LZSSX_COMPR pCompr )
    hb_xfree( pCompr );
 }
 
-static PHB_LZSSX_COMPR hb_LZSSxInit( 
+static PHB_LZSSX_COMPR hb_LZSSxInit(
                               HB_FHANDLE hInput, BYTE * pSrcBuf, ULONG ulSrcBuf,
                               HB_FHANDLE hOutput, BYTE * pDstBuf, ULONG ulDstBuf )
 {
@@ -291,7 +291,7 @@ static int hb_LZSSxRead( PHB_LZSSX_COMPR pCompr )
 
    if( pCompr->hInput != FS_ERROR )
    {
-      pCompr->inBuffRead = hb_fsReadLarge( pCompr->hInput, pCompr->inBuffer,
+      pCompr->inBuffRead = ( ULONG ) hb_fsReadLarge( pCompr->hInput, pCompr->inBuffer,
                                            pCompr->inBuffSize );
       pCompr->inBuffPos = 0;
       if( pCompr->inBuffPos < pCompr->inBuffRead )
@@ -559,7 +559,6 @@ static ULONG hb_LZSSxEncode( PHB_LZSSX_COMPR pCompr )
    return ulSize;
 }
 
-
 BOOL hb_LZSSxCompressMem( const char * pSrcBuf, ULONG ulSrcLen,
                           char * pDstBuf, ULONG ulDstLen,
                           ULONG * pulSize )
@@ -685,7 +684,7 @@ HB_FUNC( _SX_STRCOMPRESS )
 
    if( pStr )
    {
-      ULONG ulLen = hb_parclen( 1 ), ulBuf, ulDst;
+      ULONG ulLen = ( ULONG ) hb_parclen( 1 ), ulBuf, ulDst;
 
       /* this is for strict SIX compatibility - in general very bad idea */
       ulBuf = ulLen + 257;
@@ -695,7 +694,7 @@ HB_FUNC( _SX_STRCOMPRESS )
       {
          /* It's not six compatible - it's a workaround for wrongly defined SIX behavior */
          HB_PUT_LE_UINT32( pBuf, HB_SX_UNCOMPRESED );
-         HB_MEMCPY( pBuf + 4, pStr, ulLen );
+         HB_MEMCPY( pBuf + 4, pStr, (size_t) ulLen );
          ulDst = ulLen;
       }
       hb_retclen( pBuf, ulDst + 4 );
@@ -713,7 +712,7 @@ HB_FUNC( _SX_STRDECOMPRESS )
 
    if( pStr )
    {
-      ULONG ulLen = hb_parclen( 1 ), ulBuf;
+      ULONG ulLen = ( ULONG ) hb_parclen( 1 ), ulBuf;
 
       if( ulLen >= 4 )
       {

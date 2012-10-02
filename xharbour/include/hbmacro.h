@@ -104,15 +104,15 @@ HB_EXTERN_BEGIN
  */
 extern void hb_macroError( int iError, HB_BISON_PTR pMacro );
 extern int hb_macroYYParse( HB_MACRO_PTR pMacro );
-extern ULONG hb_macroSetMacro( BOOL bSet, ULONG ulFlag );
-extern ULONG hb_macroAutoSetMacro( ULONG ulFlag );
+extern HB_SIZE hb_macroSetMacro( BOOL bSet, HB_SIZE ulFlag );
+extern HB_SIZE hb_macroAutoSetMacro( HB_SIZE ulFlag );
 
 extern void hb_compGenPCode1( BYTE byte, HB_BISON_PTR pMacro );
 extern void hb_compGenPData1( BYTE byte, HB_BISON_PTR pMacro );
 extern void hb_compGenPCode2( BYTE byte1, BYTE byte2, HB_BISON_PTR pMacro );
 extern void hb_compGenPCode3( BYTE byte1, BYTE byte2, BYTE byte3, HB_BISON_PTR pMacro );
 extern void hb_compGenPCode4( BYTE byte1, BYTE byte2, BYTE byte3, BYTE byte4, HB_BISON_PTR pMacro );
-extern void hb_compGenPCodeN( BYTE * pBuffer, ULONG ulSize, HB_BISON_PTR pMacro );
+extern void hb_compGenPCodeN( BYTE * pBuffer, HB_SIZE ulSize, HB_BISON_PTR pMacro );
 
 /* Size of pcode buffer incrementation
  */
@@ -126,11 +126,11 @@ extern void hb_compGenPCodeN( BYTE * pBuffer, ULONG ulSize, HB_BISON_PTR pMacro 
 /* Declarations for functions macro.c */
 
 extern int hb_compLocalVarGetPos( char * szVarName, HB_BISON_PTR pMacro );
-extern ULONG hb_compGenJump( LONG lOffset, HB_BISON_PTR pMacro );
-extern ULONG hb_compGenJumpFalse( LONG lOffset, HB_BISON_PTR pMacro );
-extern void hb_compGenJumpThere( ULONG ulFrom, ULONG ulTo, HB_BISON_PTR pMacro );
-extern void hb_compGenJumpHere( ULONG ulOffset, HB_BISON_PTR pMacro );
-extern ULONG hb_compGenJumpTrue( LONG lOffset, HB_BISON_PTR pMacro );
+extern HB_SIZE hb_compGenJump( LONG lOffset, HB_BISON_PTR pMacro );
+extern HB_SIZE hb_compGenJumpFalse( LONG lOffset, HB_BISON_PTR pMacro );
+extern void hb_compGenJumpThere( HB_SIZE ulFrom, HB_SIZE ulTo, HB_BISON_PTR pMacro );
+extern void hb_compGenJumpHere( HB_SIZE ulOffset, HB_BISON_PTR pMacro );
+extern HB_SIZE hb_compGenJumpTrue( LONG lOffset, HB_BISON_PTR pMacro );
 extern void hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, HB_BISON_PTR pMacro );
 extern void hb_compGenPushSymbol( char * szSymbolName, char * szNamespace, BOOL bAlias, HB_BISON_PTR pMacro );
 extern void hb_compGenPushLong( HB_LONG lNumber, HB_BISON_PTR pMacro );
@@ -152,7 +152,7 @@ extern void hb_compGenPushAliasedVar( char * szVarName,
 extern void hb_compGenPushLogical( int iTrueFalse, HB_BISON_PTR pMacro );
 extern void hb_compGenPushDouble( double dNumber, BYTE bWidth, BYTE bDec, HB_BISON_PTR pMacro );
 extern void hb_compGenPushFunCall( char * szFunName, char * szNamespace, HB_BISON_PTR pMacro );
-extern void hb_compGenPushString( char * szText, ULONG ulStrLen, HB_BISON_PTR pMacro );
+extern void hb_compGenPushString( char * szText, HB_SIZE ulStrLen, HB_BISON_PTR pMacro );
 extern void hb_compCodeBlockStart( HB_BISON_PTR pMacro );
 extern void hb_compCodeBlockEnd( HB_BISON_PTR pMacro );
 

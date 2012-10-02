@@ -28,21 +28,21 @@
 
 #include "hbcomp.h"
 
-#define SYM_NOLINK  0              /* Symbol does not have to be linked */
-#define SYM_FUNC    1              /* Defined function                  */
-#define SYM_EXTERN  2              /* Previously defined function       */
+#define SYM_NOLINK   0              /* Symbol does not have to be linked */
+#define SYM_FUNC     1              /* Defined function                  */
+#define SYM_EXTERN   2              /* Previously defined function       */
 
 void hb_compGenPortObj( PHB_FNAME pFileName )
 {
-   char szFileName[ HB_PATH_MAX ];
-   PFUNCTION pFunc /*= hb_comp_functions.pFirst */;
-   PCOMSYMBOL pSym = hb_comp_symbols.pFirst;
+   char           szFileName[ HB_PATH_MAX ];
+   PFUNCTION      pFunc /*= hb_comp_functions.pFirst */;
+   PCOMSYMBOL     pSym = hb_comp_symbols.pFirst;
    HB_SYMBOLSCOPE hSymScope;
-   ULONG lPCodePos;
-   LONG lSymbols;
-   ULONG ulCodeLength;
-   FILE * yyc;             /* file handle for C output */
-   char cInt[ 2 ];
+   ULONG          lPCodePos;
+   LONG           lSymbols;
+   HB_SIZE        ulCodeLength;
+   FILE *         yyc;     /* file handle for C output */
+   char           cInt[ 2 ];
 
    if( ! pFileName->szExtension )
    {
@@ -80,8 +80,8 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
 
    HB_PUT_LE_UINT16( cInt, HB_HRB_VER );
 
-   fputc( cInt[0], yyc );
-   fputc( cInt[1], yyc );
+   fputc( cInt[ 0 ], yyc );
+   fputc( cInt[ 1 ], yyc );
 
    if( hb_comp_UsedNamespaces.pFirst )
    {
@@ -100,12 +100,12 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
 
          pNamespace = pNamespace->pNext;
       }
-      while ( pNamespace );
+      while( pNamespace );
    }
    fputc( 0, yyc );
 
-   fputc( ( BYTE ) ( ( lSymbols       ) & 255 ), yyc ); /* Write number symbols */
-   fputc( ( BYTE ) ( ( lSymbols >> 8  ) & 255 ), yyc );
+   fputc( ( BYTE ) ( ( lSymbols ) & 255 ), yyc );       /* Write number symbols */
+   fputc( ( BYTE ) ( ( lSymbols >> 8 ) & 255 ), yyc );
    fputc( ( BYTE ) ( ( lSymbols >> 16 ) & 255 ), yyc );
    fputc( ( BYTE ) ( ( lSymbols >> 24 ) & 255 ), yyc );
 
@@ -157,9 +157,9 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
          }
          else if( ( pSym->iFlags & SYMF_NS_RESOLVE ) == SYMF_NS_RESOLVE )
          {
-            pFunc = hb_compFunctionResolve( pSym->szName, (PNAMESPACE) pSym->Namespace, pSym );
+            pFunc = hb_compFunctionResolve( pSym->szName, ( PNAMESPACE ) pSym->Namespace, pSym );
 
-            if( pFunc == (PFUNCTION) 1 )
+            if( pFunc == ( PFUNCTION ) 1 )
             {
                // Resolved to external member.
                pFunc = NULL;
@@ -186,9 +186,9 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
       {
          if( ( pSym->iFlags & SYMF_NS_EXPLICITPTR ) == SYMF_NS_EXPLICITPTR )
          {
-            if( ( ( (PNAMESPACE) pSym->Namespace )->type & NSTYPE_OPTIONAL ) != NSTYPE_OPTIONAL )
+            if( ( ( ( PNAMESPACE ) pSym->Namespace )->type & NSTYPE_OPTIONAL ) != NSTYPE_OPTIONAL )
             {
-               fputs( ( (PNAMESPACE) pSym->Namespace )->szFullPath, yyc );
+               fputs( ( ( PNAMESPACE ) pSym->Namespace )->szFullPath, yyc );
                fputc( '.', yyc );
             }
          }
@@ -196,17 +196,17 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
          {
             if( pFunc == NULL || ( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) != NSTYPE_OPTIONAL ) )
             {
-               fputs( (char *) pSym->Namespace, yyc );
+               fputs( ( char * ) pSym->Namespace, yyc );
                fputc( '.', yyc );
             }
          }
          else
          {
-            assert(0);
+            assert( 0 );
          }
       }
 
-      if ( pSym->szName[ 0 ] == '<' )
+      if( pSym->szName[ 0 ] == '<' )
       {
          fputs( "(_INITLINES)", yyc );
       }
@@ -218,8 +218,8 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
 
       hSymScope = pSym->cScope;
 
-      fputc( ( BYTE ) ( ( hSymScope       ) & 255 ), yyc );
-      fputc( ( BYTE ) ( ( hSymScope >> 8  ) & 255 ), yyc );
+      fputc( ( BYTE ) ( ( hSymScope ) & 255 ), yyc );
+      fputc( ( BYTE ) ( ( hSymScope >> 8 ) & 255 ), yyc );
       fputc( ( BYTE ) ( ( hSymScope >> 16 ) & 255 ), yyc );
       fputc( ( BYTE ) ( ( hSymScope >> 24 ) & 255 ), yyc );
 
@@ -229,7 +229,7 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
       }
       else
       {
-         if( ( pSym->iFlags & SYMF_FUNCALL ) == SYMF_FUNCALL )//hb_compFunCallFind( pSym->szName, pSym->Namespace, pSym->iFlags ) )
+         if( ( pSym->iFlags & SYMF_FUNCALL ) == SYMF_FUNCALL ) //hb_compFunCallFind( pSym->szName, pSym->Namespace, pSym->iFlags ) )
          {
             fputc( SYM_EXTERN, yyc );
          }
@@ -257,8 +257,8 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
       pFunc = pFunc->pNext;
    }
 
-   fputc( ( BYTE ) ( ( lSymbols       ) & 255 ), yyc ); /* Write number symbols */
-   fputc( ( BYTE ) ( ( lSymbols >> 8  ) & 255 ), yyc );
+   fputc( ( BYTE ) ( ( lSymbols ) & 255 ), yyc );       /* Write number symbols */
+   fputc( ( BYTE ) ( ( lSymbols >> 8 ) & 255 ), yyc );
    fputc( ( BYTE ) ( ( lSymbols >> 16 ) & 255 ), yyc );
    fputc( ( BYTE ) ( ( lSymbols >> 24 ) & 255 ), yyc );
 
@@ -282,7 +282,7 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
          }
       }
 
-      if ( pFunc->szName[ 0 ] == '<' )
+      if( pFunc->szName[ 0 ] == '<' )
       {
          fputs( "(_INITLINES)", yyc );
       }
@@ -294,8 +294,8 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
       fputc( 0, yyc );
 
       ulCodeLength = pFunc->lPCodePos;
-      fputc( ( BYTE ) ( ( ulCodeLength       ) & 255 ), yyc ); /* Write size */
-      fputc( ( BYTE ) ( ( ulCodeLength >> 8  ) & 255 ), yyc );
+      fputc( ( BYTE ) ( ( ulCodeLength ) & 255 ), yyc );       /* Write size */
+      fputc( ( BYTE ) ( ( ulCodeLength >> 8 ) & 255 ), yyc );
       fputc( ( BYTE ) ( ( ulCodeLength >> 16 ) & 255 ), yyc );
       fputc( ( BYTE ) ( ( ulCodeLength >> 24 ) & 255 ), yyc );
 

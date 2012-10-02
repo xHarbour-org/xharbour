@@ -991,7 +991,7 @@ static int hb_ctw_gt_MaxRow( PHB_GT pGT )
  */
 #define WRITECON_BUFFER_SIZE 512
 
-static void hb_ctw_gt_WriteCon( PHB_GT pGT, BYTE * pText, ULONG ulLength )
+static void hb_ctw_gt_WriteCon( PHB_GT pGT, BYTE * pText, HB_SIZE ulLength )
 {
    int   iLen  = 0;
    BOOL  bDisp = FALSE;
@@ -1477,11 +1477,11 @@ static int hb_ctw_gt_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
       }
       if( fScreen )
       {
-         ULONG    ulWidth     = 0, ulCurrWidth = 0, ul = 0, ul2, ulMaxWidth, ulLast;
+         HB_SIZE  ulWidth     = 0, ulCurrWidth = 0, ul = 0, ul2, ulMaxWidth, ulLast;
          int      iKey, iDspCount, iLines = 0, iTop, iLeft, iBottom, iRight,
                   iMnuCol, iPos, iClr, iWnd, i;
          char *   szMessage   = hb_itemGetCPtr( pMessage );
-         ULONG    ulLen       = hb_itemGetCLen( pMessage );
+         HB_SIZE  ulLen       = hb_itemGetCLen( pMessage );
 
          ulMaxWidth = iCols - 4;
          while( ul < ulLen )
@@ -1513,9 +1513,9 @@ static int hb_ctw_gt_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
          if( iRows < iLines + 4 )
             iLines = iRows - 4;
          iTop     = ( iRows - iLines - 4 ) >> 1;
-         iLeft    = ( iCols - ulWidth - 4 ) >> 1;
+         iLeft    = (int) ( ( iCols - ulWidth - 4 ) >> 1 );
          iBottom  = iTop + iLines + 3;
-         iRight   = iLeft + ulWidth + 3;
+         iRight   = (int) ( iLeft + ulWidth + 3 );
          if( iClrNorm == 0 )
             iClrNorm = 79;
          if( iClrHigh == 0 )
@@ -1539,8 +1539,8 @@ static int hb_ctw_gt_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
                   ul2 = ul - ulLast;
                   if( ul2 > ulWidth )
                      ul2 = ulWidth;
-                  HB_GTSELF_PUTTEXT( pGT, i, ( ( ulWidth - ul2 + 1 ) >> 1 ) + 1, iClrNorm,
-                                     ( BYTE * ) szMessage + ulLast, ul2 );
+                  HB_GTSELF_PUTTEXT( pGT, i, ( ( (int) ulWidth - (int) ul2 + 1 ) >> 1 ) + 1, iClrNorm,
+                                     ( BYTE * ) szMessage + ulLast, (int) ul2 );
                }
                ulLast = ul + 1;
                if( ++i >= iLines )
@@ -1552,22 +1552,22 @@ static int hb_ctw_gt_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
             ul2 = ul - ulLast;
             if( ul2 > ulWidth )
                ul2 = ulWidth;
-            HB_GTSELF_PUTTEXT( pGT, i, ( ( ulWidth - ul2 + 1 ) >> 1 ) + 1, iClrNorm,
-                               ( BYTE * ) szMessage + ulLast, ul2 );
+            HB_GTSELF_PUTTEXT( pGT, i, ( ( (int) ulWidth - (int) ul2 + 1 ) >> 1 ) + 1, iClrNorm,
+                               ( BYTE * ) szMessage + ulLast, (int) ul2 );
          }
 
          iPos = 1;
          while( iRet == 0 )
          {
             HB_GTSELF_DISPBEGIN( pGT );
-            iMnuCol = ( ( ulWidth - ulCurrWidth ) >> 1 ) + 1;
+            iMnuCol = (int) ( ( ulWidth - ulCurrWidth ) >> 1 ) + 1;
             for( i = 1; i <= iOptions; ++i )
             {
                iClr     = i == iPos ? iClrHigh : iClrNorm;
                ulLen    = hb_arrayGetCLen( pOptions, i );
                HB_GTSELF_PUTTEXT( pGT, iLines + 1, iMnuCol, iClr,
                                   ( BYTE * ) hb_arrayGetCPtr( pOptions, i ), ulLen );
-               iMnuCol  += ulLen + 3;
+               iMnuCol  += (int) ulLen + 3;
             }
             while( HB_GTSELF_DISPCOUNT( pGT ) )
                HB_GTSELF_DISPEND( pGT );
@@ -1601,7 +1601,7 @@ static int hb_ctw_gt_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
                    iMCol   = HB_GTSELF_MOUSECOL( pGT );
                if( iMRow == iLines + 1 )
                {
-                  iMnuCol = ( ( ulWidth - ulCurrWidth ) >> 1 ) + 1;
+                  iMnuCol = (int) ( ( ulWidth - ulCurrWidth ) >> 1 ) + 1;
                   for( i = 1; i <= iOptions; ++i )
                   {
                      ulLen = hb_arrayGetCLen( pOptions, i );
@@ -1610,7 +1610,7 @@ static int hb_ctw_gt_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
                         iRet = i;
                         break;
                      }
-                     iMnuCol += ulLen + 3;
+                     iMnuCol += (int) ulLen + 3;
                   }
                }
             }

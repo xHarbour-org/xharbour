@@ -745,7 +745,7 @@ PHB_FFIND hb_fsFindFirst( const char * pszFileName, ULONG ulAttr )
     else
     {
       char *pFileName ;
-      int iNameLen = strlen( pszFileName ) ;
+      HB_SIZE iNameLen = strlen( pszFileName ) ;
       pFileName = (char *) hb_xgrab( iNameLen + 4 ) ; // Allow room to add "*.*"
       info->hFindFile = INVALID_HANDLE_VALUE;
       bFound = FALSE ;

@@ -59,13 +59,13 @@ HB_FUNC( NUMAT )
    if( ( ISCHAR( 1 ) ) && ( ISCHAR( 2 ) ) )
    {
       char *         pcStringToMatch   = ( char * ) hb_parc( 1 );
-      size_t         sStrToMatchLen    = ( size_t ) hb_parclen( 1 );
+      HB_SIZE        sStrToMatchLen    = hb_parclen( 1 );
       char *         pcString          = ( char * ) hb_parc( 2 );
-      size_t         sStrLen           = ( size_t ) hb_parclen( 2 );
+      HB_SIZE        sStrLen           = hb_parclen( 2 );
       int            iMultiPass        = ct_getatmupa();
       int            iAtLike           = ct_getatlike();
       char           cAtLike           = ct_getatlikechar();
-      size_t         sIgnore, sMatchStrLen, sSubStrLen;
+      HB_SIZE        sIgnore, sMatchStrLen, sSubStrLen;
       ULONG          ulCounter;
       const char *   pc, * pcSubStr;
 
@@ -100,7 +100,6 @@ HB_FUNC( NUMAT )
 
       do
       {
-
          switch( iAtLike )
          {
             case CT_SETATLIKE_EXACT:
@@ -129,6 +128,7 @@ HB_FUNC( NUMAT )
             pcSubStr = pc + 1;
          else
             pcSubStr = pc + sMatchStrLen;
+
          sSubStrLen = sStrLen - ( pcSubStr - pcString );
 
       }
@@ -161,6 +161,5 @@ HB_FUNC( NUMAT )
    }
 
    return;
-
 }
 

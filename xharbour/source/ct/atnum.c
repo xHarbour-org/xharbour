@@ -67,15 +67,14 @@ static void do_atnum( int iSwitch )
 {
    if( ( ISCHAR( 1 ) ) && ( ISCHAR( 2 ) ) )
    {
-
       const char *   pcStringToMatch   = hb_parc( 1 );
-      size_t         sStrToMatchLen    = ( size_t ) hb_parclen( 1 );
+      HB_SIZE        sStrToMatchLen    = hb_parclen( 1 );
       const char *   pcString          = hb_parc( 2 );
-      size_t         sStrLen           = ( size_t ) hb_parclen( 2 );
+      HB_SIZE        sStrLen           = hb_parclen( 2 );
       int            iMultiPass        = ct_getatmupa();
       int            iAtLike           = ct_getatlike();
       char           cAtLike           = ct_getatlikechar();
-      size_t         sIgnore, sMatchStrLen;
+      HB_SIZE        sIgnore, sMatchStrLen;
       ULONG          ulCounter;
       const char *   pc                = NULL;
 
@@ -146,10 +145,9 @@ static void do_atnum( int iSwitch )
       /* nth match or last match ? */
       if( ISNUM( 3 ) && ( ( ulCounter = hb_parnl( 3 ) ) != 0 ) )
       {
-
          /* find the <ulCounter>th match */
          const char *   pcSubStr;
-         size_t         sSubStrLen;
+         HB_SIZE        sSubStrLen;
          ULONG          ulMatchCounter = 0;
 
          pcSubStr    = pcString;
@@ -215,7 +213,6 @@ static void do_atnum( int iSwitch )
       }
       else /* (ISNUM (3) && ((ulCounter = hb_parnl (3)) != 0) */
       {
-
          /* we have to find the last match and return the
             string after that last match */
 
@@ -286,7 +283,7 @@ static void do_atnum( int iSwitch )
          case DO_ATNUM_ATNUM:
          {
             /* ATNUM */
-            hb_retnl( pc - ( pcString - sIgnore ) + 1 );
+            hb_retns( pc - ( pcString - sIgnore ) + 1 );
          }; break;
       }
 
@@ -351,18 +348,15 @@ static void do_atnum( int iSwitch )
 HB_FUNC( AFTERATNUM )
 {
    do_atnum( DO_ATNUM_AFTERATNUM );
-   return;
 }
 
 HB_FUNC( BEFORATNUM )
 {
    do_atnum( DO_ATNUM_BEFORATNUM );
-   return;
 }
 
 HB_FUNC( ATNUM )
 {
    do_atnum( DO_ATNUM_ATNUM );
-   return;
 }
 

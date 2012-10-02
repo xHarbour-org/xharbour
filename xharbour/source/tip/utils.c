@@ -78,7 +78,7 @@ HB_FUNC( TIP_TIMESTAMP )
 {
    PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
    ULONG ulHour = hb_parnl(2);
-   int nLen;
+   HB_SIZE nLen;
    TIME_ZONE_INFORMATION tzInfo;
    LONG lDate;
    int iYear, iMonth, iDay;
@@ -92,7 +92,6 @@ HB_FUNC( TIP_TIMESTAMP )
    SYSTEMTIME st;
    DWORD retval;
    int hours, minutes;
-
 
    if ( !ulHour )
    {
@@ -406,7 +405,6 @@ static EXT_MIME_ENTRY s_extMimeTable[EXT_MIME_TABLE_SIZE] =
    /* 15*/ { "java", "text/java", 0 }
 };
 
-
 static char *s_findExtMimeType( char *cExt)
 {
    int iCount;
@@ -432,13 +430,11 @@ static char *s_findExtMimeType( char *cExt)
    return NULL;
 }
 
-
-
 static char *s_findMimeStringInTree( char *cData, int iLen, int iElem )
 {
    MIME_ENTRY *elem = s_mimeTable + iElem;
    int iPos = elem->pos;
-   int iDataLen = strlen(  elem->pattern );
+   int iDataLen = ( int ) strlen( elem->pattern );
 
    /* allow \0 to be used for matches */
    if ( iDataLen == 0 )
@@ -474,7 +470,7 @@ static char *s_findMimeStringInTree( char *cData, int iLen, int iElem )
       }
       else
       {
-         if ( (*elem->pattern == 0 && cData[iPos] == 0) || strncmp( cData + iPos, elem->pattern, iDataLen ) == 0)
+         if ( (*elem->pattern == 0 && cData[iPos] == 0) || strncmp( cData + iPos, elem->pattern, (size_t) iDataLen ) == 0)
          {
             if ( elem->next != 0 )
             {
@@ -498,7 +494,6 @@ static char *s_findMimeStringInTree( char *cData, int iLen, int iElem )
    return NULL;
 }
 
-
 static char *s_findStringMimeType( char *cData, int iLen )
 {
    int iCount;
@@ -508,7 +503,7 @@ static char *s_findStringMimeType( char *cData, int iLen )
    {
       MIME_ENTRY *elem = s_mimeTable + iCount;
       int iPos = elem->pos;
-      int iDataLen = strlen(  elem->pattern );
+      int iDataLen = ( int ) strlen( elem->pattern );
 
       if ( (elem->flags & MIME_FLAG_CONTINUE) == MIME_FLAG_CONTINUE )
       {
@@ -551,7 +546,7 @@ static char *s_findStringMimeType( char *cData, int iLen )
       }
       else
       {
-         if ( (*elem->pattern == 0 && cData[iPos] == 0) || strncmp( cData + iPos, elem->pattern, iDataLen ) == 0)
+         if ( (*elem->pattern == 0 && cData[iPos] == 0) || strncmp( cData + iPos, elem->pattern, (size_t) iDataLen ) == 0)
          {
             if ( elem->next != 0 )
             {
@@ -609,7 +604,6 @@ static char *s_findStringMimeType( char *cData, int iLen )
    return "text/plain";
 }
 
-
 static char *s_findFileMimeType( FHANDLE fileIn )
 {
    char buf[512];
@@ -628,8 +622,6 @@ static char *s_findFileMimeType( FHANDLE fileIn )
 
    return NULL;
 }
-
-
 
 HB_FUNC( TIP_FILEMIMETYPE )
 {
@@ -650,7 +642,7 @@ HB_FUNC( TIP_FILEMIMETYPE )
    {
       /* decode the extension */
       char *fname = hb_itemGetCPtr( pFile );
-      int iPos = strlen( fname )-1;
+      HB_SIZE iPos = strlen( fname )-1;
 
       while ( iPos >= 0 && fname[iPos] != '.' )
       {
@@ -692,13 +684,12 @@ HB_FUNC( TIP_FILEMIMETYPE )
    }
 }
 
-
 HB_FUNC( TIP_MIMETYPE )
 {
    PHB_ITEM pData = hb_param( 1, HB_IT_STRING );
    char *magic_type;
    char *cData;
-   ULONG ulLen;
+   HB_SIZE ulLen;
 
    if ( pData == NULL )
    {
@@ -710,7 +701,7 @@ HB_FUNC( TIP_MIMETYPE )
    ulLen = hb_itemGetCLen( pData );
    cData = hb_itemGetCPtr( pData );
 
-   magic_type = s_findStringMimeType( cData, ulLen );
+   magic_type = s_findStringMimeType( cData, (int) ulLen );
 
    if ( magic_type == NULL )
    {

@@ -32,7 +32,7 @@
 
 
 /* QUESTION: Allocate buffer dynamically ? */
-#define HB_CFG_LINE_LEN    ( HB_PATH_MAX << 1 )
+#define HB_CFG_LINE_LEN ( HB_PATH_MAX << 1 )
 
 #include "hbexemem.h"
 
@@ -40,8 +40,8 @@
 
 static char * hb_searchpath( const char * pszFile, char * pszEnv, char * pszCfg )
 {
-   char * pszPath;
-   BOOL bFound = FALSE;
+   char *   pszPath;
+   BOOL     bFound = FALSE;
 
    /* Check current dir first  */
    if( hb_fsFileExists( ( const char * ) pszFile ) )
@@ -52,7 +52,7 @@ static char * hb_searchpath( const char * pszFile, char * pszEnv, char * pszCfg 
    else
    {
       /* Check if pszFile exists somewhere in the path */
-      while( * pszEnv )
+      while( *pszEnv )
       {
          pszPath = pszEnv;
          while( *pszEnv )
@@ -84,36 +84,36 @@ static char * hb_searchpath( const char * pszFile, char * pszEnv, char * pszCfg 
 }
 
 /* Builds platform dependant object module from Harbour C output */
-void hb_compGenCObj( PHB_FNAME pFileName, const char *szSourceExtension )
+void hb_compGenCObj( PHB_FNAME pFileName, const char * szSourceExtension )
 {
-   char szFileName[ HB_PATH_MAX ];
-   char szLine[ HB_CFG_LINE_LEN + 1 ];
-   char szCompiler[ HB_CFG_LINE_LEN + 1 ] = "";
-   char szOptions[ HB_CFG_LINE_LEN + 1 ] = "";
-   char szCommandLine[ HB_CFG_LINE_LEN * 2 + 1 ];
-   char szOutPath[ HB_PATH_MAX ] = "\0";
+   char     szFileName[ HB_PATH_MAX ];
+   char     szLine[ HB_CFG_LINE_LEN + 1 ];
+   char     szCompiler[ HB_CFG_LINE_LEN + 1 ]   = "";
+   char     szOptions[ HB_CFG_LINE_LEN + 1 ]    = "";
+   char     szCommandLine[ HB_CFG_LINE_LEN * 2 + 1 ];
+   char     szOutPath[ HB_PATH_MAX ]            = "\0";
 
 #if defined( HOST_OS_UNIX_COMPATIBLE )
-   char szDefaultPath[ HB_PATH_MAX ] = "/etc:/usr/local/etc";
-   char * pszEnv = szDefaultPath;
-   #define HB_CFG_FILENAME    "harbour.cfg"   
-   #define HB_NULL_STR " > /dev/null"
-   #define HB_ACCESS_FLAG F_OK
+   char     szDefaultPath[ HB_PATH_MAX ]        = "/etc:/usr/local/etc";
+   char *   pszEnv                              = szDefaultPath;
+   #define HB_CFG_FILENAME "harbour.cfg"
+   #define HB_NULL_STR     " > /dev/null"
+   #define HB_ACCESS_FLAG  F_OK
 #elif defined( HB_OS_DOS_COMPATIBLE )
-   char szDefaultPath[ HB_PATH_MAX ] = "PATH";
-   char * pszEnv = hb_getenv( "PATH" );
-   #define HB_CFG_FILENAME    "harbour.cfg"   
-   #define HB_NULL_STR " >nul"      
-   #define HB_ACCESS_FLAG 0
+   char     szDefaultPath[ HB_PATH_MAX ]  = "PATH";
+   char *   pszEnv                        = hb_getenv( "PATH" );
+   #define HB_CFG_FILENAME "harbour.cfg"
+   #define HB_NULL_STR     " >nul"
+   #define HB_ACCESS_FLAG  0
 #else
-   char szDefaultPath[ HB_PATH_MAX ] = NULL;
+   char     szDefaultPath[ HB_PATH_MAX ] = NULL;
 #endif
-   
-   FILE * yyc;
-   char * pszCfg;
-   BOOL bVerbose = FALSE;   /* Don't show C compiler messages (default). */
-   BOOL bDelTmp = TRUE;     /* Delete intermediate C file (default). */
-   int iSuccess;
+
+   FILE *   yyc;
+   char *   pszCfg;
+   BOOL     bVerbose = FALSE; /* Don't show C compiler messages (default). */
+   BOOL     bDelTmp  = TRUE;  /* Delete intermediate C file (default). */
+   int      iSuccess;
 
    /* First pass: build the C output */
 
@@ -125,21 +125,21 @@ void hb_compGenCObj( PHB_FNAME pFileName, const char *szSourceExtension )
    /* Begin second pass */
 
    pszCfg = hb_getenv( "HB_CFG_FILE" );
-   
-   if( !pszCfg )
+
+   if( ! pszCfg )
    {
       /* Grab space */
       pszCfg = ( char * ) hb_xgrab( /*strlen( pszEnv )*/ HB_PATH_MAX );
 
       if( pszEnv && pszEnv[ 0 ] != '\0' )
-      { 
-         if( !*hb_searchpath( HB_CFG_FILENAME, pszEnv, pszCfg ) )
-         { 
+      {
+         if( ! *hb_searchpath( HB_CFG_FILENAME, pszEnv, pszCfg ) )
+         {
             pszCfg = NULL;
          }
       }
    }
-         
+
    if( pszCfg )
    {
 
@@ -152,9 +152,9 @@ void hb_compGenCObj( PHB_FNAME pFileName, const char *szSourceExtension )
 
       while( fgets( szLine, HB_CFG_LINE_LEN, yyc ) != NULL )
       {
-         ULONG ulLen;
-         char * szStr = szLine;
-         char * szToken;
+         HB_SIZE  ulLen;
+         char *   szStr = szLine;
+         char *   szToken;
 
          /* Trim left */
          while( HB_ISSPACE( *szStr ) )
@@ -206,10 +206,12 @@ void hb_compGenCObj( PHB_FNAME pFileName, const char *szSourceExtension )
 
       fclose( yyc );
 
-   } else {
-     
-      printf( "\nError: Can't find %s file in %s.\n", HB_CFG_FILENAME, szDefaultPath ); 
-      printf( "harbour.cfg is a text file that contains:\n" ); 
+   }
+   else
+   {
+
+      printf( "\nError: Can't find %s file in %s.\n", HB_CFG_FILENAME, szDefaultPath );
+      printf( "harbour.cfg is a text file that contains:\n" );
       printf( "CC=C compiler binary name eg. CC=gcc\n" );
       printf( "CFLAGS=C compiler options eg. -c -I<includes>\n" );
       printf( "       ( 'compile only' and harbour include dir are mandatory )\n" );
@@ -217,10 +219,10 @@ void hb_compGenCObj( PHB_FNAME pFileName, const char *szSourceExtension )
       printf( "DELTMP=NO|YES to delete generated C source default is YES\n" );
       printf( "remember also to properly set the C compiler env.\n" );
       return;
-      
+
    }
 
-   #if defined( HB_OS_DOS_COMPATIBLE ) 
+   #if defined( HB_OS_DOS_COMPATIBLE )
    {
       if( pszEnv )
          hb_xfree( ( void * ) pszEnv );
@@ -230,30 +232,30 @@ void hb_compGenCObj( PHB_FNAME pFileName, const char *szSourceExtension )
 
    if( ! hb_comp_bQuiet )
    {
-      printf( "\nBuilding object module for \'%s\'\nusing C compiler \'%s\' as defined in \'%s\'...\n", szFileName, szCompiler, pszCfg );         
+      printf( "\nBuilding object module for \'%s\'\nusing C compiler \'%s\' as defined in \'%s\'...\n", szFileName, szCompiler, pszCfg );
       fflush( stdout );
    }
 
    /* Check if -o<path> was used */
    if( hb_comp_pOutPath )
    {
-      PHB_FNAME pOut = hb_fsFNameSplit( ( char * ) szFileName );
-      char pszTemp[ HB_PATH_MAX ] = "";
+      PHB_FNAME   pOut                    = hb_fsFNameSplit( ( char * ) szFileName );
+      char        pszTemp[ HB_PATH_MAX ]  = "";
 
       if( hb_comp_pOutPath->szPath )
          pOut->szPath = hb_comp_pOutPath->szPath;
 
-#if defined(__BORLANDC__) || defined(_MSC_VER) || defined(__WATCOMC__)
+#if defined( __BORLANDC__ ) || defined( _MSC_VER ) || defined( __WATCOMC__ )
       pOut->szExtension = ".obj";
 #else
       pOut->szExtension = ".o";  /* Don't know if we can hardcode it for Un*x */
-#endif        
+#endif
       hb_fsFNameMerge( pszTemp, pOut );
 
-#if defined(_MSC_VER)
+#if defined( _MSC_VER )
       hb_strncat( szOutPath, "-Fo", sizeof( szOutPath ) - 1 );
-#elif defined(__WATCOMC__)
-      hb_strncat( szOutPath, "-fo=", sizeof( szOutPath ) - 1 );      
+#elif defined( __WATCOMC__ )
+      hb_strncat( szOutPath, "-fo=", sizeof( szOutPath ) - 1 );
 #else
       hb_strncat( szOutPath, "-o", sizeof( szOutPath ) - 1 );
 #endif
@@ -269,7 +271,7 @@ void hb_compGenCObj( PHB_FNAME pFileName, const char *szSourceExtension )
 
       if( bVerbose )
       {
-         printf( "Exec: %s\n", szCommandLine ) ;
+         printf( "Exec: %s\n", szCommandLine );
       }
       else
       {
@@ -297,7 +299,7 @@ void hb_compGenCObj( PHB_FNAME pFileName, const char *szSourceExtension )
       {
          if( bVerbose )
          {
-            printf( "Deleting: \"%s\"\n", szFileName );            
+            printf( "Deleting: \"%s\"\n", szFileName );
          }
 
          remove( ( char * ) szFileName );

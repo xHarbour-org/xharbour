@@ -496,8 +496,8 @@ static void DllExec( int iFlags, LPVOID lpFunction, int iParams, int iFirst, int
 
                if ( hb_parinfo( i ) & HB_IT_BYREF )
                {
-                  Parm[iCnt].pArg = malloc( hb_parclen( i ) );
-                  HB_MEMCPY( Parm[iCnt].pArg, hb_parc( i ), hb_parclen( i ) );
+                  Parm[iCnt].pArg = malloc( (size_t) hb_parclen( i ) );
+                  HB_MEMCPY( Parm[iCnt].pArg, hb_parc( i ), (size_t) hb_parclen( i ) );
                }
                else
                {

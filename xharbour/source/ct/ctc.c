@@ -89,7 +89,7 @@ USHORT ct_error( USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
    va_end( va );
    HB_TRACE( HB_TR_DEBUG, ( ")" ) );
 
-   pError = hb_errRT_New( uiSeverity, CT_SUBSYSTEM, ulGenCode, ulSubCode,
+   pError = hb_errRT_New( uiSeverity, CT_SUBSYSTEM, (HB_ERRCODE) ulGenCode, (HB_ERRCODE) ulSubCode,
                           ( char * ) szDescription, ( char * ) szOperation,
                           uiOsCode, uiFlags );
 
@@ -145,7 +145,7 @@ PHB_ITEM ct_error_subst( USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
    va_end( va );
    HB_TRACE( HB_TR_DEBUG, ( ")" ) );
 
-   pError = hb_errRT_New_Subst( uiSeverity, CT_SUBSYSTEM, ulGenCode, ulSubCode,
+   pError = hb_errRT_New_Subst( uiSeverity, CT_SUBSYSTEM, (HB_ERRCODE) ulGenCode, (HB_ERRCODE) ulSubCode,
                                 ( char * ) szDescription, ( char * ) szOperation,
                                 uiOsCode, uiFlags );
 

@@ -76,7 +76,7 @@ RETURN Self
 HB_FUNC( TIPENCODERQP_ENCODE )
 {
    const char *cData = hb_parc(1);
-   int nLen = hb_parclen(1);
+   int nLen = (int) hb_parclen(1);
    char *cRet;
    unsigned char cElem;
    int nVal, iLineLen = 0;
@@ -153,7 +153,7 @@ HB_FUNC( TIPENCODERQP_ENCODE )
 HB_FUNC( TIPENCODERQP_DECODE )
 {
    const char *cData = hb_parc(1);
-   int nLen = hb_parclen(1);
+   int nLen = (int) hb_parclen(1);
    char *cRet;
    int nPos = 0, nPosRet = 0, nVal;
    unsigned char cElem, cCipher;

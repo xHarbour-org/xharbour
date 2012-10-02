@@ -72,14 +72,14 @@ HB_FUNC( STRTRAN )
       if( pSeek )
       {
          char * szText = pText->item.asString.value;
-         ULONG ulText = pText->item.asString.length;
-         ULONG ulSeek = pSeek->item.asString.length;
+         HB_SIZE ulText = pText->item.asString.length;
+         HB_SIZE ulSeek = pSeek->item.asString.length;
 
          if( ulSeek && ulSeek <= ulText )
          {
             char * szSeek = pSeek->item.asString.value;
             char * szReplace;
-            ULONG ulStart;
+            HB_SIZE ulStart;
 
             ulStart = ( hb_param( 4, HB_IT_NUMERIC ) ? hb_parnl( 4 ) : 1 );
 
@@ -91,8 +91,8 @@ HB_FUNC( STRTRAN )
             else if( ulStart > 0 )
             {
                PHB_ITEM pReplace = hb_param( 3, HB_IT_STRING );
-               ULONG ulReplace;
-               ULONG ulCount;
+               HB_SIZE ulReplace;
+               HB_SIZE ulCount;
                BOOL bAll;
 
                if( pReplace )
@@ -119,17 +119,17 @@ HB_FUNC( STRTRAN )
 
                if( bAll || ulCount > 0 )
                {
-                  ULONG ulFound = 0;
+                  HB_SIZE ulFound = 0;
                   LONG lReplaced = 0;
-                  ULONG i = 0;
-                  ULONG ulLength = ulText;
+                  HB_SIZE i = 0;
+                  HB_SIZE ulLength = ulText;
 
                   while( i < ulText - ulSeek + 1 )
                   {
-                     if( ( bAll || lReplaced < ( LONG ) ulCount ) && memcmp( szText + i, szSeek, ulSeek ) == 0 )
+                     if( ( bAll || lReplaced < ( LONG ) ulCount ) && memcmp( szText + i, szSeek, (size_t) ulSeek ) == 0 )
                      {
                         ulFound++;
-                        
+
                         if( ulFound >= ulStart )
                         {
                            lReplaced++;
@@ -152,20 +152,20 @@ HB_FUNC( STRTRAN )
                      
                      while( i < ulText - ulSeek + 1 )
                      {
-                        if( lReplaced && memcmp( szText + i, szSeek, ulSeek ) == 0 )
+                        if( lReplaced && memcmp( szText + i, szSeek, (size_t) ulSeek ) == 0 )
                         {
                            ulFound++;
-                           
+
                            if( ulFound >= ulStart )
                            {
                               lReplaced--;
-                              HB_MEMCPY( szPtr, szReplace, ulReplace );
+                              HB_MEMCPY( szPtr, szReplace, (size_t) ulReplace );
                               szPtr += ulReplace;
                               i += ulSeek;
                               continue;
                            }
                         }
-                        
+
                         *szPtr = szText[ i ];
                         szPtr++;
                         i++;

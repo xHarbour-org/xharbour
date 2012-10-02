@@ -79,6 +79,6 @@ HB_FUNC( HB_CHECKSUM )
    }
 
    hb_retnd( (LONG)
-      adler32( ulSum, ( const BYTE *) pString->item.asString.value, pString->item.asString.length ) );
+      adler32( ulSum, ( const BYTE *) pString->item.asString.value, (uInt) pString->item.asString.length ) );
 }
 

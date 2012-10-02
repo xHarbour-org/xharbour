@@ -57,13 +57,13 @@
 HB_FUNC( STRFORMAT )
 {
    const char* pszMask = hb_parcx(1);
-   ULONG nMaskLen = hb_parclen(1);
-   ULONG nMaskPos;
-   ULONG nParNum = hb_pcount();
-   ULONG nLenTable [HB_STRFORMAT_PARNUM_MAX_];
+   HB_SIZE nMaskLen = hb_parclen(1);
+   HB_SIZE nMaskPos;
+   HB_SIZE nParNum = hb_pcount();
+   HB_SIZE nLenTable [HB_STRFORMAT_PARNUM_MAX_];
    const char* pszVarTable [HB_STRFORMAT_PARNUM_MAX_];
 
-   ULONG nRetValLen;
+   HB_SIZE nRetValLen;
    char* pszRetVal;
    char* pszRetValSave;
 
@@ -86,8 +86,8 @@ HB_FUNC( STRFORMAT )
    }
 
    nMaskPos = 0;
-
    nRetValLen = 0;
+
    while (nMaskPos < nMaskLen)
    {
       if (pszMask[nMaskPos] == '%')
@@ -140,7 +140,7 @@ HB_FUNC( STRFORMAT )
          {
             ULONG nPos = pszMask[nMaskPos] - '1';
 
-            memcpy(pszRetVal, pszVarTable[nPos], nLenTable[nPos]);
+            memcpy(pszRetVal, pszVarTable[nPos], (size_t) nLenTable[nPos] );
             pszRetVal += nLenTable[nPos];
          }
          else

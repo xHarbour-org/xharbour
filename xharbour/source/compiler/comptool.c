@@ -55,49 +55,49 @@ typedef struct _HB_MEMINFO
 {
    struct _HB_MEMINFO * pPrevBlock;
    struct _HB_MEMINFO * pNextBlock;
-   ULONG  ulSize;
-   int  iSourceLine;
+   ULONG ulSize;
+   int iSourceLine;
    UINT32 Signature;
 } HB_MEMINFO, * PHB_MEMINFO;
 
 #ifdef HB_ALLOC_ALIGNMENT
-#  define HB_MEMINFO_SIZE     ( ( sizeof( HB_MEMINFO ) + HB_ALLOC_ALIGNMENT - 1 ) - \
-                                ( sizeof( HB_MEMINFO ) + HB_ALLOC_ALIGNMENT - 1 ) % HB_ALLOC_ALIGNMENT )
+#  define HB_MEMINFO_SIZE  ( ( sizeof( HB_MEMINFO ) + HB_ALLOC_ALIGNMENT - 1 ) - \
+                             ( sizeof( HB_MEMINFO ) + HB_ALLOC_ALIGNMENT - 1 ) % HB_ALLOC_ALIGNMENT )
 #else
-#  define HB_MEMINFO_SIZE     sizeof( HB_MEMINFO )
+#  define HB_MEMINFO_SIZE  sizeof( HB_MEMINFO )
 #endif
 
-static PHB_MEMINFO s_pMemBlocks = NULL;
-static LONG s_ulMemoryBlocks = 0;      /* memory blocks used */
-static LONG s_ulMemoryMaxBlocks = 0;   /* maximum number of used memory blocks */
-static LONG s_ulMemoryMaxConsumed = 0; /* memory size consumed */
-static LONG s_ulMemoryConsumed = 0;    /* memory max size consumed */
+static PHB_MEMINFO   s_pMemBlocks            = NULL;
+static LONG          s_ulMemoryBlocks        = 0;  /* memory blocks used */
+static LONG          s_ulMemoryMaxBlocks     = 0;  /* maximum number of used memory blocks */
+static LONG          s_ulMemoryMaxConsumed   = 0;  /* memory size consumed */
+static LONG          s_ulMemoryConsumed      = 0;  /* memory max size consumed */
 
 #endif /* HB_FM_STATISTICS */
 
 #ifndef hb_xgrab
-void * hb_xgrab( ULONG ulSize )        /* allocates fixed memory, exits on failure */
+void * hb_xgrab( HB_SIZE ulSize )        /* allocates fixed memory, exits on failure */
 {
 #ifdef HB_FM_STATISTICS
    #ifdef _MSC_VER
-      void * pMem = HeapAlloc( GetProcessHeap(), 0, ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
+   void *   pMem  = HeapAlloc( GetProcessHeap(), 0, ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
    #else
-      void * pMem = malloc( ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
+   void *   pMem  = malloc( ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
    #endif
 
    if( pMem )
    {
       if( s_pMemBlocks )
          s_pMemBlocks->pPrevBlock = ( PHB_MEMINFO ) pMem;
-      ( ( PHB_MEMINFO ) pMem )->pNextBlock = s_pMemBlocks;
-      ( ( PHB_MEMINFO ) pMem )->pPrevBlock = NULL;
-      s_pMemBlocks = ( PHB_MEMINFO ) pMem;
-      ( ( PHB_MEMINFO ) pMem )->ulSize = ulSize;
-      ( ( PHB_MEMINFO ) pMem )->iSourceLine = hb_comp_iLine;
-      ( ( PHB_MEMINFO ) pMem )->Signature = HB_MEMINFO_SIGNATURE;
+      ( ( PHB_MEMINFO ) pMem )->pNextBlock   = s_pMemBlocks;
+      ( ( PHB_MEMINFO ) pMem )->pPrevBlock   = NULL;
+      s_pMemBlocks                           = ( PHB_MEMINFO ) pMem;
+      ( ( PHB_MEMINFO ) pMem )->ulSize       = ulSize;
+      ( ( PHB_MEMINFO ) pMem )->iSourceLine  = hb_comp_iLine;
+      ( ( PHB_MEMINFO ) pMem )->Signature    = HB_MEMINFO_SIGNATURE;
       HB_PUT_LE_UINT32( ( ( BYTE * ) pMem ) + HB_MEMINFO_SIZE + ulSize, HB_MEMINFO_SIGNATURE );
 
-      s_ulMemoryConsumed += ulSize;
+      s_ulMemoryConsumed                     += ulSize;
       if( s_ulMemoryMaxConsumed < s_ulMemoryConsumed )
          s_ulMemoryMaxConsumed = s_ulMemoryConsumed;
       s_ulMemoryBlocks++;
@@ -107,9 +107,9 @@ void * hb_xgrab( ULONG ulSize )        /* allocates fixed memory, exits on failu
    }
 #else
    #ifdef _MSC_VER
-      void * pMem = HeapAlloc( GetProcessHeap(), 0, ulSize );
+   void *   pMem  = HeapAlloc( GetProcessHeap(), 0, ( size_t ) ulSize );
    #else
-      void * pMem = malloc( ulSize );
+   void *   pMem  = malloc( ( size_t ) ulSize );
    #endif
 #endif
 
@@ -126,12 +126,12 @@ void * hb_xgrab( ULONG ulSize )        /* allocates fixed memory, exits on failu
 #endif
 
 #ifndef hb_xrealloc
-void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
+void * hb_xrealloc( void * pMem, HB_SIZE ulSize )       /* reallocates memory */
 {
 #ifdef HB_FM_STATISTICS
    PHB_MEMINFO pMemBlock;
-   ULONG ulMemSize;
-   void * pResult;
+   ULONG       ulMemSize;
+   void *      pResult;
 
    if( ulSize == 0 )
    {
@@ -142,8 +142,8 @@ void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
    else if( ! pMem )
       return hb_xgrab( ulSize );
 
-   pMemBlock = ( PHB_MEMINFO ) ( ( BYTE * ) pMem - HB_MEMINFO_SIZE );
-   ulMemSize = pMemBlock->ulSize;
+   pMemBlock   = ( PHB_MEMINFO ) ( ( BYTE * ) pMem - HB_MEMINFO_SIZE );
+   ulMemSize   = pMemBlock->ulSize;
 
    if( pMemBlock->Signature != HB_MEMINFO_SIGNATURE )
       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMCORRUPT, NULL, NULL );
@@ -154,9 +154,9 @@ void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
    HB_PUT_LE_UINT32( ( ( BYTE * ) pMem ) + ulMemSize, 0 );
 
    #ifdef _MSC_VER
-      pResult = HeapReAlloc( GetProcessHeap(), 0, pMemBlock, ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
+   pResult  = HeapReAlloc( GetProcessHeap(), 0, pMemBlock, ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
    #else
-      pResult = realloc( pMemBlock, ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
+   pResult  = realloc( pMemBlock, ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
    #endif
 
    if( pResult )
@@ -168,20 +168,20 @@ void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
 
       if( ( ( PHB_MEMINFO ) pResult )->pNextBlock )
          ( ( PHB_MEMINFO ) pResult )->pNextBlock->pPrevBlock = ( PHB_MEMINFO ) pResult;
-         s_ulMemoryConsumed += ( ulSize - ulMemSize );
+      s_ulMemoryConsumed += ( ulSize - ulMemSize );
 
       if( s_ulMemoryMaxConsumed < s_ulMemoryConsumed )
          s_ulMemoryMaxConsumed = s_ulMemoryConsumed;
 
       ( ( PHB_MEMINFO ) pResult )->ulSize = ulSize;  /* size of the memory block */
       HB_PUT_LE_UINT32( ( ( BYTE * ) pResult ) + ulSize + HB_MEMINFO_SIZE, HB_MEMINFO_SIGNATURE );
-      pResult = ( BYTE * ) pResult + HB_MEMINFO_SIZE;
+      pResult                             = ( BYTE * ) pResult + HB_MEMINFO_SIZE;
    }
 #else
    #ifdef _MSC_VER
-      void * pResult = HeapReAlloc( GetProcessHeap(), 0, pMem, ulSize );
+   void *   pResult  = HeapReAlloc( GetProcessHeap(), 0, pMem, ( size_t ) ulSize );
    #else
-      void * pResult = realloc( pMem, ulSize );
+   void *   pResult  = realloc( pMem, ( size_t ) ulSize );
    #endif
 #endif
 
@@ -223,12 +223,12 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
 
       pMemBlock->Signature = 0;
       HB_PUT_LE_UINT32( ( ( BYTE * ) pMem ) + pMemBlock->ulSize, 0 );
-      pMem = ( BYTE * ) pMem - HB_MEMINFO_SIZE;
+      pMem                 = ( BYTE * ) pMem - HB_MEMINFO_SIZE;
 #endif
       #if defined( _MSC_VER )
-         HeapFree( GetProcessHeap(), 0, pMem );
+      HeapFree( GetProcessHeap(), 0, pMem );
       #else
-         free( pMem );
+      free( pMem );
       #endif
    }
    else
@@ -238,7 +238,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
 }
 #endif
 
-ULONG hb_xquery( USHORT uiMode )
+HB_SIZE hb_xquery( USHORT uiMode )
 {
    ULONG ulResult = 0;
 
@@ -262,9 +262,9 @@ ULONG hb_xquery( USHORT uiMode )
 #ifdef HB_FM_STATISTICS
 static char * hb_memToStr( char * szBuffer, void * pMem, ULONG ulSize )
 {
-   unsigned char *byMem = ( BYTE * ) pMem;
-   char * pDest = szBuffer;
-   int iSize, i, iPrintable;
+   unsigned char *   byMem = ( BYTE * ) pMem;
+   char *            pDest = szBuffer;
+   int               iSize, i, iPrintable;
 
    if( ulSize > HB_MEMSTR_BLOCK_MAX )
       iSize = HB_MEMSTR_BLOCK_MAX;
@@ -281,22 +281,22 @@ static char * hb_memToStr( char * szBuffer, void * pMem, ULONG ulSize )
       /* format as string of original chars */
       for( i = 0; i < iSize; ++i )
          if( ( byMem[ i ] & 0x7f ) >= 0x20 )
-            * pDest++ = byMem[ i ];
+            *pDest++ = byMem[ i ];
          else
-            * pDest++ = '.';
+            *pDest++ = '.';
    }
    else
    {
-     /* format as hex */
+      /* format as hex */
       for( i = 0; i < iSize; ++i )
       {
          int iLo = byMem[ i ] & 0x0f, iHi = byMem[ i ] >> 4;
-         * pDest++ = '\\';
-         * pDest++ = iHi <= 9 ? '0' + iHi : 'A' - 10 + iHi;
-         * pDest++ = iLo <= 9 ? '0' + iLo : 'A' - 10 + iLo;
+         *pDest++ = '\\';
+         *pDest++ = iHi <= 9 ? '0' + iHi : 'A' - 10 + iHi;
+         *pDest++ = iLo <= 9 ? '0' + iLo : 'A' - 10 + iLo;
       }
    }
-   * pDest = '\0';
+   *pDest = '\0';
 
    return szBuffer;
 }
@@ -307,9 +307,9 @@ void hb_xexit( void )
 #ifdef HB_FM_STATISTICS
    if( s_ulMemoryBlocks /* || hb_cmdargCheck( "INFO" ) */ )
    {
-      char szBuffer[ HB_MAX( 3 * HB_MEMSTR_BLOCK_MAX + 1, 100 ) ];
+      char        szBuffer[ HB_MAX( 3 * HB_MEMSTR_BLOCK_MAX + 1, 100 ) ];
       PHB_MEMINFO pMemBlock;
-      int i;
+      int         i;
 
       hb_conOutErr( hb_conNewLine(), 0 );
       hb_conOutErr( "----------------------------------------", 0 );
@@ -328,9 +328,9 @@ void hb_xexit( void )
 
       for( i = 1, pMemBlock = s_pMemBlocks; pMemBlock; ++i, pMemBlock = pMemBlock->pNextBlock )
          HB_TRACE( HB_TR_ERROR, ( "Line %i Block %i %p (size %lu) \"%s\"", pMemBlock->iSourceLine - 1, i,
-                ( char * ) pMemBlock + HB_MEMINFO_SIZE, pMemBlock->ulSize,
-                hb_memToStr( szBuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
-                             pMemBlock->ulSize ) ) );
+                                  ( char * ) pMemBlock + HB_MEMINFO_SIZE, pMemBlock->ulSize,
+                                  hb_memToStr( szBuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
+                                               pMemBlock->ulSize ) ) );
    }
 #endif
 }
@@ -341,7 +341,7 @@ void hb_errInternal( ULONG ulIntCode, const char * szText, const char * szPar1, 
 {
    char buffer[ 1024 ];
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_errInternal(%lu, %s, %s, %s)", ulIntCode, szText, szPar1, szPar2));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_errInternal(%lu, %s, %s, %s)", ulIntCode, szText, szPar1, szPar2 ) );
 
    hb_conOutErr( hb_conNewLine(), 0 );
    hb_snprintf( buffer, sizeof( buffer ), "Unrecoverable error %lu: ", ulIntCode );
@@ -355,7 +355,7 @@ void hb_errInternal( ULONG ulIntCode, const char * szText, const char * szPar1, 
    exit( EXIT_FAILURE );
 }
 
-void hb_conOutErr( const char * pStr, ULONG ulLen )
+void hb_conOutErr( const char * pStr, HB_SIZE ulLen )
 {
    if( ulLen == 0 )
       ulLen = strlen( pStr );
@@ -373,8 +373,8 @@ const char * hb_fsNameConv( const char * szFileName, char ** pszFree )
    if( s_fFnTrim || s_cDirSep != HB_OS_PATH_DELIM_CHR ||
        s_iFileCase != HB_SET_CASE_MIXED || s_iDirCase != HB_SET_CASE_MIXED )
    {
-      PHB_FNAME pFileName;
-      ULONG ulLen;
+      PHB_FNAME   pFileName;
+      HB_SIZE     ulLen;
 
       if( pszFree )
       {
@@ -384,7 +384,7 @@ const char * hb_fsNameConv( const char * szFileName, char ** pszFree )
 
       if( s_cDirSep != HB_OS_PATH_DELIM_CHR )
       {
-         char *p = ( char * ) szFileName;
+         char * p = ( char * ) szFileName;
          while( *p )
          {
             if( *p == s_cDirSep )
@@ -401,26 +401,26 @@ const char * hb_fsNameConv( const char * szFileName, char ** pszFree )
          if( pFileName->szName )
          {
             ulLen = strlen( pFileName->szName );
-            while( ulLen && pFileName->szName[ulLen - 1] == ' ' )
+            while( ulLen && pFileName->szName[ ulLen - 1 ] == ' ' )
                --ulLen;
-            while( ulLen && pFileName->szName[0] == ' ' )
+            while( ulLen && pFileName->szName[ 0 ] == ' ' )
             {
                ++pFileName->szName;
                --ulLen;
             }
-            ( ( char * ) pFileName->szName )[ulLen] = '\0';
+            ( ( char * ) pFileName->szName )[ ulLen ] = '\0';
          }
          if( pFileName->szExtension )
          {
             ulLen = strlen( pFileName->szExtension );
-            while( ulLen && pFileName->szExtension[ulLen - 1] == ' ' )
+            while( ulLen && pFileName->szExtension[ ulLen - 1 ] == ' ' )
                --ulLen;
-            while( ulLen && pFileName->szExtension[0] == ' ' )
+            while( ulLen && pFileName->szExtension[ 0 ] == ' ' )
             {
                ++pFileName->szExtension;
                --ulLen;
             }
-            ( ( char * ) pFileName->szExtension )[ulLen] = '\0';
+            ( ( char * ) pFileName->szExtension )[ ulLen ] = '\0';
          }
       }
 

@@ -69,6 +69,7 @@ HB_FUNC( BLANK )
    {
       if( bRef )
          hb_stordl( 0, 1 );
+
       if( bRet )
          hb_retdl( 0 );
    }
@@ -76,6 +77,7 @@ HB_FUNC( BLANK )
    {
       if( bRef )
          hb_stornl( 0, 1 );
+
       if( bRet )
          hb_retnl( 0 );
    }
@@ -85,12 +87,14 @@ HB_FUNC( BLANK )
 
       if( pMode && hb_itemGetL( pMode ) )
       {
-         ULONG    lLen     = hb_itemGetCLen( pItem );
-         char *   szResult = ( char * ) hb_xgrab( lLen + 1 );
+         HB_SIZE lLen      = hb_itemGetCLen( pItem );
+         char    *szResult = ( char * ) hb_xgrab( lLen + 1 );
 
-         hb_xmemset( szResult, ' ', lLen );
+         hb_xmemset( szResult, ' ', (size_t) lLen );
+
          if( bRef )
             hb_storclen( szResult, lLen, 1 );
+
          if( bRet )
             hb_retclenAdopt( szResult, lLen );
          else
@@ -108,6 +112,7 @@ HB_FUNC( BLANK )
    {
       if( bRef )
          hb_arraySize( pItem, 0 );
+
       if( bRet )
          hb_reta( 0 );
    }
@@ -115,6 +120,7 @@ HB_FUNC( BLANK )
    {
       if( bRef )
          hb_storl( FALSE, 1 );
+
       if( bRet )
          hb_retl( FALSE );
    }
@@ -123,6 +129,7 @@ HB_FUNC( BLANK )
       if( bRet )
          hb_retl( FALSE );
    }
+
    if( ! bRet )
       hb_ret();
 }

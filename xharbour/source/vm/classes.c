@@ -1062,7 +1062,7 @@ const char * hb_objGetRealClsName( PHB_ITEM pObject, const char * szName )
    return "UNKNOWN";
 }
 
-ULONG hb_objGetOpOver( const PHB_ITEM pObject )
+HB_SIZE hb_objGetOpOver( const PHB_ITEM pObject )
 {
    USHORT uiClass = hb_objClassH( pObject );
 
@@ -3228,7 +3228,7 @@ HB_FUNC( __OBJCLONE )
    }
 }
 
-PHB_ITEM hb_objSendMsg( PHB_ITEM pObj, const char *sMsg, ULONG ulArg, ... )
+PHB_ITEM hb_objSendMsg( PHB_ITEM pObj, const char *sMsg, HB_SIZE ulArg, ... )
 {
    HB_THREAD_STUB_STACK
    PHB_DYNS pMsgSym;
@@ -3272,7 +3272,7 @@ PHB_ITEM hb_objSendMsg( PHB_ITEM pObj, const char *sMsg, ULONG ulArg, ... )
    return hb_stackReturnItem();
 }
 
-PHB_ITEM hb_objSendSymbol( PHB_ITEM pObj, PHB_SYMB pSymbol, ULONG ulArg, ... )
+PHB_ITEM hb_objSendSymbol( PHB_ITEM pObj, PHB_SYMB pSymbol, HB_SIZE ulArg, ... )
 {
    HB_THREAD_STUB_STACK
 
@@ -3299,7 +3299,7 @@ PHB_ITEM hb_objSendSymbol( PHB_ITEM pObj, PHB_SYMB pSymbol, ULONG ulArg, ... )
    return hb_stackReturnItem();
 }
 
-void hb_objSendMessage( PHB_ITEM pObject, PHB_DYNS pMsgSym, ULONG ulArg, ... )
+void hb_objSendMessage( PHB_ITEM pObject, PHB_DYNS pMsgSym, HB_SIZE ulArg, ... )
 {
    hb_vmPushSymbol( pMsgSym->pSymbol );
    hb_vmPush( pObject );
@@ -3473,7 +3473,7 @@ HB_FUNC( __CLS_CNTCLSDATA )
    if( uiClass )
    {
       PCLASS pClass = s_pClasses + ( uiClass - 1 );
-      hb_retni( pClass->pClassDatas->item.asArray.value->ulLen );
+      hb_retns( pClass->pClassDatas->item.asArray.value->ulLen );
    }
    else
    {

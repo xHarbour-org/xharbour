@@ -86,7 +86,7 @@ HB_FUNC( TIPENCODERBASE64_ENCODE )
    HB_THREAD_STUB
    const char *cData = hb_parc(1);
    char *cRet;
-   int nLen = hb_parclen(1);
+   int nLen = ( int ) hb_parclen(1);
    int nPos = 0, nPosRet = 0;
    int nPosBlock = 0, nLineCount = 0;
    ULONG nFinalLen;
@@ -218,7 +218,7 @@ HB_FUNC( TIPENCODERBASE64_DECODE )
    HB_THREAD_STUB
    const char *cData = hb_parc(1);
    unsigned char *cRet;
-   int nLen = hb_parclen(1);
+   int nLen = ( int ) hb_parclen(1);
    int nPos = 0, nPosRet = 0, nPosBlock = 0;
    unsigned char cElem;
 

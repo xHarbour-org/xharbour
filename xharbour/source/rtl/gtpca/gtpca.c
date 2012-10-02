@@ -105,7 +105,7 @@ static int          s_iCol;
 static int          s_iLineBufSize = 0;
 static BYTE *       s_sLineBuf;
 static BYTE *       s_szCrLf;
-static ULONG        s_ulCrLf;
+static HB_SIZE      s_ulCrLf;
 static int          s_iCurrentSGR, s_iFgColor, s_iBgColor, s_iBold, s_iBlink, s_iAM;
 static int          s_iCursorStyle;
 static BOOL         s_bStdinConsole;
@@ -302,7 +302,7 @@ static void hb_gt_pca_AnsiSetCursorPos( int iRow, int iCol )
    {
       char buff[16];
       hb_snprintf( buff, sizeof( buff ), "\x1B[%d;%dH", iRow + 1, iCol + 1 );
-      hb_gt_pca_termOut( ( BYTE * ) buff, strlen( buff ) );
+      hb_gt_pca_termOut( ( BYTE * ) buff, (int) strlen( buff ) );
       s_iRow = iRow;
       s_iCol = iCol;
    }
@@ -618,10 +618,10 @@ static int hb_gt_pca_ReadKey( PHB_GT pGT, int iEventMask )
             ch = s_keyTransTbl[ ch ];
       }
    }
-   else if( !_eof( s_hFilenoStdin ) )
+   else if( !_eof( (int) s_hFilenoStdin ) )
    {
       BYTE bChar;
-      if( _read( s_hFilenoStdin, &bChar, 1 ) == 1 )
+      if( _read( (int) s_hFilenoStdin, &bChar, 1 ) == 1 )
          ch = s_keyTransTbl[ bChar ];
    }
 #elif defined( HB_WIN32_IO )

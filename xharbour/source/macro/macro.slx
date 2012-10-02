@@ -197,7 +197,7 @@
             \
             szBuffer--; iSize++; \
             \
-            iLen = sClose - szBuffer; \
+            iLen = ( int ) ( sClose - szBuffer ); \
             \
             if( iLen > iPairAllocated )\
             { \
@@ -208,7 +208,7 @@
             hb_strncpy( sPair, szBuffer, iLen ); \
             sPair[ iLen ] = '\0'; \
             s_szBuffer = sClose + cTermLen; \
-            iSize -= s_szBuffer - szBuffer; \
+            iSize -= ( int ) ( s_szBuffer - szBuffer ); \
             pYYLVAL->valChar.string = hb_strdup( sPair ); \
             pYYLVAL->valChar.length = iLen; \
             \
@@ -222,7 +222,7 @@
             szBuffer[strlen(szBuffer)-1] = '\0'; \
             hb_macroError( EG_SYNTAX, YYLEX_PARAM ); \
             pYYLVAL->valChar.string = hb_strdup( szBuffer ); \
-            pYYLVAL->valChar.length = strlen( szBuffer ); \
+            pYYLVAL->valChar.length = ( int ) strlen( szBuffer ); \
             iSize = 0; \
             iPairToken = 0; \
             return LITERAL + DONT_REDUCE; \
@@ -730,7 +730,7 @@ void * hb_compFlexNew( HB_MACRO_PTR pNewMacro )
    DEBUG_INFO( printf( "*** New Macro: >>>%s<<< Len: %i\n", pMacro->string, pMacro->length ) );
    //TraceLog( NULL, "*** New Macro: >>>%s<<< Len: %i\n", pMacro->string, pMacro->length );
 
-   return yy_bytes_buffer( pMacro->string, pMacro->length );
+   return yy_bytes_buffer( pMacro->string, (int) pMacro->length );
 }
 
 void hb_compFlexDelete( void * pBuffer )

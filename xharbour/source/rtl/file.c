@@ -74,7 +74,7 @@ BOOL hb_fsFile( const char * pszFilename )
    PHB_FFIND ffind;
    char * pszFree;
    BOOL bResult = FALSE;
-   int iFileName ;
+   HB_SIZE iFileName ;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsFile(%s)", pszFilename));
 
@@ -112,7 +112,7 @@ BOOL hb_fsIsDirectory( const char * pszFilename )
 {
    BOOL bResult = FALSE;
    char * pszFree = NULL;
-   int iLen;
+   HB_SIZE iLen;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsIsDirectory(%s)", pszFilename));
 

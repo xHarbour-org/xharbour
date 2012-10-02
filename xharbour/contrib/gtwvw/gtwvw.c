@@ -5265,7 +5265,7 @@ static void hb_gt_wvwMouseEvent( WIN_DATA * pWindowData, HWND hWnd, UINT message
 
             {
                ULONG  ulSize;
-               USHORT irow, icol, j, top, left, bottom, right;
+               LONG   irow, icol, j, top, left, bottom, right;
                char * sBuffer;
                RECT   rect = { 0, 0, 0, 0 };
                RECT   colrowRC = { 0, 0, 0, 0 };

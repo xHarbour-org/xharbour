@@ -65,7 +65,7 @@ HB_FUNC( REPLICATE )
 
       if( lTimes > 0 )
       {
-         ULONG ulLen = hb_parclen( 1 );
+         HB_SIZE ulLen = hb_parclen( 1 );
 
          if( ( double ) ( ( double ) ulLen * ( double ) lTimes ) < ( double ) ULONG_MAX )
          {
@@ -76,7 +76,7 @@ HB_FUNC( REPLICATE )
 
             for( i = 0; i < lTimes; i++ )
             {
-               hb_xmemcpy( szPtr, szText, ulLen );
+               hb_xmemcpy( szPtr, szText, (size_t) ulLen );
                szPtr += ulLen;
             }
 

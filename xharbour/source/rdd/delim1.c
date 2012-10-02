@@ -80,7 +80,7 @@ static void hb_delimInitArea( DELIMAREAP pArea, char * szFileName )
    if( !szEol || !szEol[ 0 ] )
       szEol = hb_conNewLine();
    pArea->szEol = hb_strdup( szEol );
-   pArea->uiEolLen = strlen( pArea->szEol );
+   pArea->uiEolLen = ( USHORT ) strlen( pArea->szEol );
 
    /* allocate record buffer, one additional byte is for deleted flag */
    pArea->pRecord = ( BYTE * ) hb_xgrab( pArea->uiRecordLen + 1 );
@@ -203,10 +203,10 @@ static int hb_delimNextChar( DELIMAREAP pArea )
 
       if( ulLeft )
          HB_MEMCPY( pArea->pBuffer,
-                 pArea->pBuffer + pArea->ulBufferIndex, ulLeft );
+                 pArea->pBuffer + pArea->ulBufferIndex, (size_t) ulLeft );
       pArea->ulBufferStart += pArea->ulBufferIndex;
       pArea->ulBufferIndex = 0;
-      pArea->ulBufferRead = hb_fileReadAt( pArea->pFile,
+      pArea->ulBufferRead = ( ULONG ) hb_fileReadAt( pArea->pFile,
                                            pArea->pBuffer + ulLeft,
                                            pArea->ulBufferSize - ulLeft,
                                            pArea->ulBufferStart + ulLeft );
@@ -662,16 +662,16 @@ static HB_ERRCODE hb_delimPutValue( DELIMAREAP pArea, USHORT uiIndex, PHB_ITEM p
       {
          if( pField->uiType == HB_FT_STRING )
          {
-            ulSize = hb_itemGetCLen( pItem );
+            ulSize = ( ULONG ) hb_itemGetCLen( pItem );
             if( ulSize > ( ULONG ) pField->uiLen )
                ulSize = pField->uiLen;
             HB_MEMCPY( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
-                    hb_itemGetCPtr( pItem ), ulSize );
+                    hb_itemGetCPtr( pItem ), (size_t) ulSize );
 #ifndef HB_CDP_SUPPORT_OFF
             hb_cdpnTranslate( (char *) pArea->pRecord + pArea->pFieldOffset[ uiIndex ], hb_cdppage(), pArea->area.cdPage, ulSize );
 #endif
             memset( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] + ulSize,
-                    ' ', pField->uiLen - ulSize );
+                    ' ', (size_t) ( pField->uiLen - ulSize ) );
          }
          else
             uiError = EDBF_DATATYPE;

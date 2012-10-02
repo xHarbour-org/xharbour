@@ -64,9 +64,9 @@
 
 /* Alternative memcpy */
 #if defined( HB_NO_DV_MEMCPY )
-   #define HB_MEMCPY    memcpy
+   #define HB_MEMCPY  memcpy
 #else
-   #define HB_MEMCPY    dv_memcpy
+   #define HB_MEMCPY  dv_memcpy
 #endif
 
 /* Compatibility. Do not use HB_OS_WIN_32_USED anymore. */
@@ -1365,6 +1365,30 @@ typedef BYTE HB_ATTR;
 
 // UGLY hack
 #include "hbtrace.h"
+
+
+/* Harbour size type */
+#if defined( HB_OS_WIN_64 )
+#  if defined( HB_SIZE_SIGNED )
+      typedef LONGLONG        HB_SIZE;
+#  else
+      typedef ULONGLONG       HB_SIZE;        /* TODO: Currently 'unsigned', to be changed 'signed' */
+#  endif
+   typedef LONGLONG           HB_ISIZ;        /* TODO: Change to HB_SIZE, after HB_SIZE has been converted to signed type. TEMPORARY type. */
+   typedef ULONGLONG          HB_USIZ;        /* TEMPORARY type. Do not use it. */
+#else
+#  if defined( HB_SIZE_SIGNED )
+//    typedef HB_LONG         HB_SIZE;
+      typedef LONG            HB_SIZE;
+#  else
+//    typedef HB_ULONG        HB_SIZE;        /* TODO: Currently 'unsigned', to be changed 'signed' */
+      typedef ULONG           HB_SIZE;        /* TODO: Currently 'unsigned', to be changed 'signed' */
+#  endif
+   typedef LONG               HB_ISIZ;        /* TODO: Change to HB_SIZE, after HB_SIZE has been converted to signed type. TEMPORARY type. */
+   typedef ULONG              HB_USIZ;        /* TEMPORARY type. Do not use it. */
+// typedef HB_LONG            HB_ISIZ;        /* TODO: Change to HB_SIZE, after HB_SIZE has been converted to signed type. TEMPORARY type. */
+// typedef HB_ULONG           HB_USIZ;        /* TEMPORARY type. Do not use it. */
+#endif
 
 #include "hbcompat.h"
 

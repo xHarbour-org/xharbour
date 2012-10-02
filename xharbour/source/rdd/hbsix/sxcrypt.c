@@ -152,11 +152,11 @@ static BOOL _hb_sxGetKey( PHB_ITEM pKeyItem, char * pKeyVal )
    }
    if( hb_itemType( pKeyItem ) & HB_IT_STRING )
    {
-      ulKey = hb_itemGetCLen( pKeyItem );
+      ulKey = ( ULONG ) hb_itemGetCLen( pKeyItem );
       if( ulKey )
-         HB_MEMCPY( pKeyVal, hb_itemGetCPtr( pKeyItem ), HB_MIN( ulKey, 8 ) );
+         HB_MEMCPY( pKeyVal, hb_itemGetCPtr( pKeyItem ), (size_t) HB_MIN( ulKey, 8 ) );
       if( ulKey < 8 )
-         memset( pKeyVal + ulKey, 0, 8 - ulKey );
+         memset( pKeyVal + ulKey, 0, (size_t) ( 8 - ulKey ) );
       fResult = TRUE;
    }
    if( pItem )
@@ -169,7 +169,7 @@ HB_FUNC( SX_ENCRYPT )
    if( hb_pcount() > 0 )
    {
       char keyBuf[ 8 ];
-      ULONG ulLen = hb_parclen( 1 );
+      ULONG ulLen = ( ULONG ) hb_parclen( 1 );
 
       if( ulLen > 0 && _hb_sxGetKey( hb_param( 2, HB_IT_ANY ), keyBuf ) )
       {
@@ -190,7 +190,7 @@ HB_FUNC( SX_DECRYPT )
    if( hb_pcount() > 0 )
    {
       char keyBuf[ 8 ];
-      ULONG ulLen = hb_parclen( 1 );
+      ULONG ulLen = ( ULONG ) hb_parclen( 1 );
 
       if( ulLen > 0 && _hb_sxGetKey( hb_param( 2, HB_IT_ANY ), keyBuf ) )
       {

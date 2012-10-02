@@ -55,7 +55,7 @@
 
 /* NOTE: pszResult must have an allocated buffer of at least ulStringLen */
 
-static char * hb_strMemotran( char * pszResult, ULONG * ulResultLen, const char * pszString, ULONG ulStringLen, char cHardcr, char cSoftcr )
+static char * hb_strMemotran( char * pszResult, HB_SIZE * ulResultLen, const char * pszString, HB_SIZE ulStringLen, char cHardcr, char cSoftcr )
 {
    ULONG ulStringPos = 0;
    ULONG ulResultPos = 0;
@@ -96,7 +96,7 @@ HB_FUNC( MEMOTRAN )
       char * pszResult = ( char * ) hb_xgrab( hb_itemGetCLen( pString ) + 1 );
       char cHardcr = ISCHAR( 2 ) ? *hb_parc( 2 ) : ';';
       char cSoftcr = ISCHAR( 3 ) ? *hb_parc( 3 ) : ' ';
-      ULONG ulResultLen;
+      HB_SIZE ulResultLen;
 
       hb_strMemotran( pszResult, &ulResultLen, hb_itemGetCPtr( pString ), hb_itemGetCLen( pString ), cHardcr, cSoftcr );
       hb_retclen_buffer( pszResult, ulResultLen );

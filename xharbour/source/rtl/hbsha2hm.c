@@ -87,7 +87,7 @@ HB_FUNC( HB_HMAC_SHA224 )
       }
    }
    #else
-      hb_hmac_sha224_update( &ctx, hb_parcx( 1 ), hb_parclen( 1 ) );
+      hb_hmac_sha224_update( &ctx, hb_parcx( 1 ), (UINT) hb_parclen( 1 ) );
    #endif
    hb_hmac_sha224_final( &ctx, mac, HB_SIZEOFARRAY( mac ) );
 
@@ -134,7 +134,7 @@ HB_FUNC( HB_HMAC_SHA256 )
       }
    }
    #else
-      hb_hmac_sha256_update( &ctx, hb_parcx( 1 ), hb_parclen( 1 ) );
+      hb_hmac_sha256_update( &ctx, hb_parcx( 1 ), (UINT) hb_parclen( 1 ) );
    #endif
    hb_hmac_sha256_final( &ctx, mac, HB_SIZEOFARRAY( mac ) );
 
@@ -181,7 +181,7 @@ HB_FUNC( HB_HMAC_SHA384 )
       }
    }
    #else
-      hb_hmac_sha384_update( &ctx, hb_parcx( 1 ), hb_parclen( 1 ) );
+      hb_hmac_sha384_update( &ctx, hb_parcx( 1 ), (UINT) hb_parclen( 1 ) );
    #endif
    hb_hmac_sha384_final( &ctx, mac, HB_SIZEOFARRAY( mac ) );
 
@@ -228,7 +228,7 @@ HB_FUNC( HB_HMAC_SHA512 )
       }
    }
    #else
-      hb_hmac_sha512_update( &ctx, hb_parcx( 1 ), hb_parclen( 1 ) );
+      hb_hmac_sha512_update( &ctx, hb_parcx( 1 ), (UINT) hb_parclen( 1 ) );
    #endif
    hb_hmac_sha512_final( &ctx, mac, HB_SIZEOFARRAY( mac ) );
 

@@ -911,7 +911,7 @@ static HB_EXPR_FUNC( hb_compExprUseIIF )
       {
          /* this is called if all three parts of IIF expression should be generated
          */
-         LONG lPosFalse, lPosEnd;
+         HB_SIZE lPosFalse, lPosEnd;
          HB_EXPR_PTR pExpr = pSelf->value.asList.pExprList;
 
          HB_EXPR_USE( pExpr, HB_EA_PUSH_PCODE );
@@ -1188,7 +1188,7 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
 
                   if( lIndex < 0 )
                   {
-                     lIndex += hb_compExprListLen( pExpr->value.asList.pExprList ) + 1;
+                     lIndex += ( LONG ) hb_compExprListLen( pExpr->value.asList.pExprList ) + 1;
                   }
 
                   if( lIndex > 0 )
@@ -2867,7 +2867,7 @@ static HB_EXPR_FUNC( hb_compExprUseSend )
 
             if( pSelf->value.asMessage.pParms )  /* Is it a method call ? */
             {
-               int iParms = hb_compExprListLen( pSelf->value.asMessage.pParms );
+               int iParms = (int) hb_compExprListLen( pSelf->value.asMessage.pParms );
 
                /* NOTE: if method with no parameters is called then the list
                 * of parameters contain only one expression of type HB_ET_NONE
@@ -3009,7 +3009,7 @@ static HB_EXPR_FUNC( hb_compExprUseWithSend )
 
             if( pSelf->value.asMessage.pParms )  /* Is it a method call ? */
             {
-               int iParms = hb_compExprListLen( pSelf->value.asMessage.pParms );
+               int iParms = (int) hb_compExprListLen( pSelf->value.asMessage.pParms );
 
                /* NOTE: if method with no parameters is called then the list
                 * of parameters contain only one expression of type HB_ET_NONE
@@ -3316,7 +3316,7 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
                            }
                            else
                            {
-                              ULONG ulBufferLen;
+                              HB_SIZE ulBufferLen;
                               BYTE * pBuffer = hb_compHideString( hb_comp_iHidden, ( char * ) pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, &ulBufferLen );
 
                               hb_compGenPCode4( HB_P_LOCALNEARSETSTRHIDDEN, ( BYTE ) iLocal, HB_LOBYTE( iLen ), HB_HIBYTE( iLen ), FALSE );
@@ -3403,7 +3403,7 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
                            }
                            else
                            {
-                              ULONG ulBufferLen;
+                              HB_SIZE ulBufferLen;
                               BYTE * pBuffer = hb_compHideString( hb_comp_iHidden, ( char * ) pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, &ulBufferLen );
 
                               hb_compGenPCode4( HB_P_LOCALNEARSETSTRHIDDEN, ( BYTE ) iLocal, HB_LOBYTE( iLen ), HB_HIBYTE( iLen ), FALSE );
@@ -3708,7 +3708,7 @@ static HB_EXPR_FUNC( hb_compExprUseOr )
       case HB_EA_PUSH_PCODE:
          if( hb_comp_bShortCuts )
          {
-            LONG lEndPos;
+            HB_SIZE lEndPos;
 
             HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
             HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_DUPLICATE );
@@ -3731,7 +3731,7 @@ static HB_EXPR_FUNC( hb_compExprUseOr )
       case HB_EA_PUSH_POP:
          if( hb_comp_bShortCuts )
          {
-            LONG lEndPos;
+            HB_SIZE lEndPos;
 
             HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
             lEndPos = HB_EXPR_PCODE1( hb_compGenJumpTrue, 0 );
@@ -3784,7 +3784,7 @@ static HB_EXPR_FUNC( hb_compExprUseAnd )
       case HB_EA_PUSH_PCODE:
          if( hb_comp_bShortCuts )
          {
-            LONG lEndPos;
+            HB_SIZE lEndPos;
 
             HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_FALSE );
 
@@ -3816,7 +3816,7 @@ static HB_EXPR_FUNC( hb_compExprUseAnd )
          // Clipper works that way - Will evaluate pRight only if pLeft is .T. but will not apply ADD.
          if( hb_comp_bShortCuts )
          {
-            LONG lEndPos;
+            HB_SIZE lEndPos;
 
             HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
             lEndPos = HB_EXPR_PCODE1( hb_compGenJumpFalse, 0 );

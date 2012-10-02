@@ -59,7 +59,7 @@
 #include "hbapicdp.h"
 
 /* converts szText to lower case. Does not create a new string! */
-char * hb_strLower( char * szText, ULONG ulLen )
+char * hb_strLower( char * szText, HB_SIZE ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_strLower(%s, %lu)", szText, ulLen));
 
@@ -79,7 +79,7 @@ char * hb_strLower( char * szText, ULONG ulLen )
    return szText;
 }
 
-char * hb_strLowerCopy( char * szText, ULONG ulLen )
+char * hb_strLowerCopy( char * szText, HB_SIZE ulLen )
 {
    char *szCopy = (char*) hb_xgrab( ulLen + 1 );
 
@@ -102,7 +102,7 @@ char * hb_strLowerCopy( char * szText, ULONG ulLen )
    return szCopy;
 }
 
-char * hb_strUpperCopy( char * szText, ULONG ulLen )
+char * hb_strUpperCopy( char * szText, HB_SIZE ulLen )
 {
    char *szCopy = (char*) hb_xgrab( ulLen + 1 );
 
@@ -125,7 +125,7 @@ char * hb_strUpperCopy( char * szText, ULONG ulLen )
 }
 
 /* converts szText to upper case. Does not create a new string! */
-char * hb_strUpper( char * szText, ULONG ulLen )
+char * hb_strUpper( char * szText, HB_SIZE ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_strUpper(%s, %lu)", szText, ulLen));
 
@@ -177,7 +177,7 @@ HB_FUNC( LOWER )
    if( pText )
    {
       char * pszBuffer = hb_itemGetC( pText );
-      ULONG ulLen = hb_itemGetCLen( pText );
+      HB_SIZE ulLen = hb_itemGetCLen( pText );
 
       hb_retclenAdopt( hb_strLower( pszBuffer, ulLen ), ulLen );
    }
@@ -193,7 +193,7 @@ HB_FUNC( UPPER )
    if( pText )
    {
       char * pszBuffer = hb_itemGetC( pText );
-      ULONG ulLen = hb_itemGetCLen( pText );
+      HB_SIZE ulLen = hb_itemGetCLen( pText );
 
       hb_retclenAdopt( hb_strUpper( pszBuffer, ulLen ), ulLen );
    }

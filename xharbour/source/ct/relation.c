@@ -62,18 +62,18 @@ HB_FUNC( CHARRELA )
        ISCHAR( 4 ) )
    {
 
-      const char *   pcStringToMatch1  = hb_parc( 1 );
-      size_t         sStrToMatchLen1   = hb_parclen( 1 );
-      const char *   pcString1         = hb_parc( 2 );
-      size_t         sStrLen1          = hb_parclen( 2 );
-      const char *   pcStringToMatch2  = hb_parc( 3 );
-      size_t         sStrToMatchLen2   = hb_parclen( 3 );
-      const char *   pcString2         = hb_parc( 4 );
-      size_t         sStrLen2          = hb_parclen( 4 );
+      const char * pcStringToMatch1  = hb_parc( 1 );
+      HB_SIZE      sStrToMatchLen1   = hb_parclen( 1 );
+      const char * pcString1         = hb_parc( 2 );
+      HB_SIZE      sStrLen1          = hb_parclen( 2 );
+      const char * pcStringToMatch2  = hb_parc( 3 );
+      HB_SIZE      sStrToMatchLen2   = hb_parclen( 3 );
+      const char * pcString2         = hb_parc( 4 );
+      HB_SIZE      sStrLen2          = hb_parclen( 4 );
 
-      const char *   pc1, * pc2;
-      size_t         sOffset1, sOffset2;
-      size_t         sMatchStrLen;
+      const char * pc1, * pc2;
+      HB_SIZE      sOffset1, sOffset2;
+      HB_SIZE      sMatchStrLen;
 
       /* check for empty strings */
       if( ( sStrToMatchLen1 == 0 ) ||
@@ -94,15 +94,17 @@ HB_FUNC( CHARRELA )
          pc1   = ct_at_exact_forward( pcStringToMatch1, sStrToMatchLen1,
                                       pcString1 + sOffset1, sStrLen1 - sOffset1,
                                       &sMatchStrLen );
+
          pc2   = ct_at_exact_forward( pcStringToMatch2, sStrToMatchLen2,
                                       pcString2 + sOffset2, sStrLen2 - sOffset2,
                                       &sMatchStrLen );
+
          if( ( pc1 != NULL ) && ( pc2 != NULL ) )
          {
             if( ( pc1 - pcString1 ) == ( pc2 - pcString2 ) )
             {
                /* correlation found */
-               hb_retnl( ( pc1 - pcString1 ) + 1 );
+               hb_retns( ( pc1 - pcString1 ) + 1 );
                return;
             }
             else
@@ -135,6 +137,7 @@ HB_FUNC( CHARRELA )
    {
       PHB_ITEM pSubst         = NULL;
       int      iArgErrorMode  = ct_getargerrormode();
+
       if( iArgErrorMode != CT_ARGERR_IGNORE )
       {
          pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_CHARRELA,
@@ -169,22 +172,20 @@ HB_FUNC( CHARRELREP )
        ISCHAR( 5 ) )
    {
 
-      const char *   pcStringToMatch1  = hb_parc( 1 );
-      size_t         sStrToMatchLen1   = hb_parclen( 1 );
-      const char *   pcString1         = hb_parc( 2 );
-      size_t         sStrLen1          = hb_parclen( 2 );
-      const char *   pcStringToMatch2  = hb_parc( 3 );
-      size_t         sStrToMatchLen2   = hb_parclen( 3 );
-      const char *   pcString2         = hb_parc( 4 );
-      size_t         sStrLen2          = hb_parclen( 4 );
-      const char *   pcReplace         = hb_parc( 5 );
-      size_t         sReplaceLen       = hb_parclen( 5 );
-
-      char *         pcRet;
-
-      const char *   pc1, * pc2;
-      size_t         sOffset1, sOffset2;
-      size_t         sMatchStrLen;
+      const char * pcStringToMatch1  = hb_parc( 1 );
+      HB_SIZE      sStrToMatchLen1   = hb_parclen( 1 );
+      const char * pcString1         = hb_parc( 2 );
+      HB_SIZE      sStrLen1          = hb_parclen( 2 );
+      const char * pcStringToMatch2  = hb_parc( 3 );
+      HB_SIZE      sStrToMatchLen2   = hb_parclen( 3 );
+      const char * pcString2         = hb_parc( 4 );
+      HB_SIZE      sStrLen2          = hb_parclen( 4 );
+      const char * pcReplace         = hb_parc( 5 );
+      HB_SIZE      sReplaceLen       = hb_parclen( 5 );
+      char *       pcRet;
+      const char * pc1, * pc2;
+      HB_SIZE      sOffset1, sOffset2;
+      HB_SIZE      sMatchStrLen;
 
       /* check for empty strings */
       if( ( sStrToMatchLen1 == 0 ) ||
@@ -204,7 +205,7 @@ HB_FUNC( CHARRELREP )
       }
 
       pcRet    = ( char * ) hb_xgrab( sStrLen2 );
-      hb_xmemcpy( pcRet, pcString2, sStrLen2 );
+      hb_xmemcpy( pcRet, pcString2, (size_t) sStrLen2 );
 
       sOffset1 = 0;
       sOffset2 = 0;
@@ -232,7 +233,7 @@ HB_FUNC( CHARRELREP )
                   /* check if pcString2 is long enough */
                   if( ( pc2 - pcString2 ) + sCurr >= sStrLen2 )
                   {
-                     size_t sStr2Offset, sReplOffset;
+                     HB_SIZE sStr2Offset, sReplOffset;
                      sStr2Offset = ( sStrToMatchLen2 < sCurr ? sStrToMatchLen2 : sCurr );
                      sReplOffset = ( sReplaceLen < sCurr ? sReplaceLen : sCurr );
 

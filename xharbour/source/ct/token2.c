@@ -70,8 +70,8 @@
 
 typedef struct _TOKEN_POSITION
 {
-   size_t sStartPos; /* relative 0-based index of first char of token */
-   size_t sEndPos;   /* relative 0-based index of first char BEHIND token,
+   HB_SIZE sStartPos; /* relative 0-based index of first char of token */
+   HB_SIZE sEndPos;   /* relative 0-based index of first char BEHIND token,
                         so that length = sEndPos-sStartPos */
 } TOKEN_POSITION;
 
@@ -107,8 +107,7 @@ static TOKEN_ENVIRONMENT sTokEnvNew( void )
 
 static int sTokEnvAddPos( TOKEN_ENVIRONMENT * penv, TOKEN_POSITION * pPos )
 {
-
-   size_t            index;
+   HB_SIZE                 index;
    TOKEN_ENVIRONMENT env = *penv;
 
    /* new memory needed ? */
@@ -148,7 +147,7 @@ static int sTokEnvEnd( TOKEN_ENVIRONMENT env )
 /* get size of token environment in memory                              */
 /* -------------------------------------------------------------------- */
 
-static size_t sTokEnvGetSize( TOKEN_ENVIRONMENT env )
+static HB_SIZE sTokEnvGetSize( TOKEN_ENVIRONMENT env )
 {
 
    return sizeof( TOKEN_POSITION ) *
@@ -176,16 +175,14 @@ static TOKEN_POSITION * sTokEnvGetPos( TOKEN_ENVIRONMENT env )
 /* get position element pointed to by given 0-based index               */
 /* -------------------------------------------------------------------- */
 
-static TOKEN_POSITION * sTokEnvGetPosIndex( TOKEN_ENVIRONMENT env, size_t index )
+static TOKEN_POSITION * sTokEnvGetPosIndex( TOKEN_ENVIRONMENT env, HB_SIZE index )
 {
-
    if( index >= env[ 0 ].sStartPos )
    {
       return NULL;
    }
 
    return env + 2 + index; /* "+2" because of extra elements */
-
 }
 
 /* -------------------------------------------------------------------- */
@@ -250,22 +247,18 @@ static int sTokEnvSetPtr( TOKEN_ENVIRONMENT env, size_t sCnt )
 /* get value of tokenizing pointer                                      */
 /* -------------------------------------------------------------------- */
 
-static size_t sTokEnvGetPtr( TOKEN_ENVIRONMENT env )
+static HB_SIZE sTokEnvGetPtr( TOKEN_ENVIRONMENT env )
 {
-
    return env[ 1 ].sStartPos;
-
 }
 
 /* -------------------------------------------------------------------- */
 /* get token count                                                      */
 /* -------------------------------------------------------------------- */
 
-static size_t sTokEnvGetCnt( TOKEN_ENVIRONMENT env )
+static HB_SIZE sTokEnvGetCnt( TOKEN_ENVIRONMENT env )
 {
-
    return env[ 0 ].sStartPos;
-
 }
 
 /* -------------------------------------------------------------------- */
@@ -274,9 +267,7 @@ static size_t sTokEnvGetCnt( TOKEN_ENVIRONMENT env )
 
 static void sTokEnvDel( TOKEN_ENVIRONMENT env )
 {
-
    hb_xfree( env );
-
 }
 
 /* ==================================================================== */
@@ -285,27 +276,22 @@ static void sTokEnvDel( TOKEN_ENVIRONMENT env )
 
 /* static data */
 /* TODO: make thread safe */
-static const char *        spcSeparatorStr      = "\x00" "\x09" "\x0A" "\x0C" "\x1A" "\x20" "\x8A" "\x8C" ",.;:!\?/\\<>()#&%+-*";
-static const size_t        ssSeparatorStrLen    = 26;
-
-static TOKEN_ENVIRONMENT   ssTokenEnvironment   = NULL;
-
-
+static const char *      spcSeparatorStr      = "\x00" "\x09" "\x0A" "\x0C" "\x1A" "\x20" "\x8A" "\x8C" ",.;:!\?/\\<>()#&%+-*";
+static const HB_SIZE     ssSeparatorStrLen    = 26;
+static TOKEN_ENVIRONMENT ssTokenEnvironment   = NULL;
 
 HB_FUNC( TOKENINIT )
 {
-
    if( ISCHAR( 1 ) )
    {
-
       const char *      pcString = hb_parc( 1 );
-      size_t            sStrLen  = ( size_t ) hb_parclen( 1 );
+      HB_SIZE           sStrLen  = hb_parclen( 1 );
       const char *      pcSeparatorStr;
-      size_t            sSeparatorStrLen;
+      HB_SIZE           sSeparatorStrLen;
       ULONG             ulSkipCnt, ulSkip;
 
       const char *      pcSubStr, * pc;
-      size_t            sSubStrLen;
+      HB_SIZE           sSubStrLen;
 
       TOKEN_ENVIRONMENT sTokenEnvironment;
       TOKEN_POSITION    sTokenPosition;
@@ -339,6 +325,7 @@ HB_FUNC( TOKENINIT )
       if( ( sTokenEnvironment = sTokEnvNew() ) == NULL )
       {
          int iArgErrorMode = ct_getargerrormode();
+
          if( iArgErrorMode != CT_ARGERR_IGNORE )
          {
             ct_error( ( USHORT ) iArgErrorMode, EG_MEM, CT_ERROR_TOKENINIT,
@@ -359,11 +346,11 @@ HB_FUNC( TOKENINIT )
 
       while( 1 )
       {
-
-         size_t sMatchedPos = sSeparatorStrLen;
+         HB_SIZE sMatchedPos = sSeparatorStrLen;
 
          /* ulSkip */
          ulSkipCnt = 0;
+
          do
          {
             sSubStrLen  -= ( pc - pcSubStr ) + 1;
@@ -428,7 +415,6 @@ HB_FUNC( TOKENINIT )
    }
    else /* ISCHAR (1) */
    {
-
       /* if there is a token environment stored in either the 4th parameter or
          in the static variable -> rewind to first token */
       TOKEN_ENVIRONMENT sTokenEnvironment;
@@ -476,17 +462,14 @@ HB_FUNC( TOKENINIT )
       }
 
    }
-
-   return;
-
 }
 
 HB_FUNC( TOKENNEXT )
 {
    if( ISCHAR( 1 ) )
    {
-      const char *      pcString = hb_parc( 1 );
-      size_t            sStrLen  = ( size_t ) hb_parclen( 1 );
+      const char * pcString = hb_parc( 1 );
+      HB_SIZE      sStrLen  = hb_parclen( 1 );
 
       TOKEN_ENVIRONMENT sTokenEnvironment;
       TOKEN_POSITION *  psTokenPosition;
@@ -516,7 +499,6 @@ HB_FUNC( TOKENNEXT )
       }
       else
       {
-
          /* ... or static  ? */
          if( ssTokenEnvironment == NULL )
          {
@@ -612,9 +594,7 @@ HB_FUNC( TOKENNEXT )
          hb_retc( "" );
       }
    }
-
 }
-
 
 HB_FUNC( TOKENNUM )
 {
@@ -631,7 +611,7 @@ HB_FUNC( TOKENNUM )
 
    if( ( void * ) sTokenEnvironment != NULL )
    {
-      hb_retnl( sTokEnvGetCnt( sTokenEnvironment ) );
+      hb_retnl( ( LONG ) sTokEnvGetCnt( sTokenEnvironment ) );
    }
    else
    {
@@ -695,8 +675,6 @@ HB_FUNC( TOKENEND )
 
 }
 
-
-
 HB_FUNC( TOKENEXIT )
 {
    if( ssTokenEnvironment != NULL )
@@ -716,7 +694,7 @@ HB_FUNC( TOKENEXIT )
 HB_FUNC( TOKENAT )
 {
    int               iSeparatorPos = 0;
-   size_t            sCurrentIndex;
+   HB_SIZE           sCurrentIndex;
    TOKEN_ENVIRONMENT sTokenEnvironment;
    TOKEN_POSITION *  psTokenPosition;
 
@@ -731,6 +709,7 @@ HB_FUNC( TOKENAT )
    if( ( void * ) sTokenEnvironment == NULL )
    {
       int iArgErrorMode = ct_getargerrormode();
+
       if( iArgErrorMode != CT_ARGERR_IGNORE )
       {
          ct_error( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_TOKENAT,
@@ -749,9 +728,11 @@ HB_FUNC( TOKENAT )
       sCurrentIndex = sTokEnvGetPtr( sTokenEnvironment );
 
    psTokenPosition = sTokEnvGetPosIndex( sTokenEnvironment, sCurrentIndex );
+
    if( psTokenPosition == NULL )
    {
       int iArgErrorMode = ct_getargerrormode();
+
       if( iArgErrorMode != CT_ARGERR_IGNORE )
       {
          ct_error( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_TOKENAT,
@@ -759,16 +740,15 @@ HB_FUNC( TOKENAT )
                    hb_paramError( 1 ), hb_paramError( 2 ),
                    hb_paramError( 3 ) );
       }
+
       hb_retnl( 0 );
       return;
    }
 
    if( iSeparatorPos )
-      hb_retnl( psTokenPosition->sEndPos + 1 );
+      hb_retnl( ( LONG ) psTokenPosition->sEndPos + 1 );
    else
-      hb_retnl( psTokenPosition->sStartPos + 1 );
-
-   return;
+      hb_retnl( ( LONG ) psTokenPosition->sStartPos + 1 );
 }
 
 HB_FUNC( SAVETOKEN )
@@ -781,16 +761,14 @@ HB_FUNC( SAVETOKEN )
    {
       hb_retc( "" );
    }
-
-   return;
 }
 
 HB_FUNC( RESTTOKEN )
 {
    if( ISCHAR( 1 ) )
    {
-      const char *      pcString = hb_parc( 1 );
-      size_t            sStrLen  = ( size_t ) hb_parclen( 1 );
+      const char * pcString = hb_parc( 1 );
+      HB_SIZE      sStrLen  = hb_parclen( 1 );
 
       TOKEN_ENVIRONMENT sTokenEnvironment;
 
@@ -810,7 +788,8 @@ HB_FUNC( RESTTOKEN )
             hb_retc( "" );
             return;
          }
-         hb_xmemcpy( sTokenEnvironment, pcString, sStrLen );
+
+         hb_xmemcpy( sTokenEnvironment, pcString, (size_t) sStrLen );
       }
       else
       {
@@ -836,6 +815,7 @@ HB_FUNC( RESTTOKEN )
    {
       PHB_ITEM pSubst         = NULL;
       int      iArgErrorMode  = ct_getargerrormode();
+
       if( iArgErrorMode != CT_ARGERR_IGNORE )
       {
          pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG,
@@ -852,7 +832,5 @@ HB_FUNC( RESTTOKEN )
          hb_retc( "" );
       }
    }
-
-   return;
 }
 

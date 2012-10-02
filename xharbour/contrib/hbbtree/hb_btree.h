@@ -36,9 +36,6 @@
 #ifndef HB_BTREE_API
 #define HB_BTREE_API
 
-#undef   HB_ULONG
-#define  HB_ULONG ULONG
-
 HB_EXTERN_BEGIN
 
 #include "hb_btree.ch"

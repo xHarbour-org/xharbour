@@ -54,13 +54,13 @@
 
 PHB_DEBUGINFO hb_compGetDebugInfo( void )
 {
-   PHB_DEBUGINFO pLineInfo = NULL, pInfo = NULL;
-   ULONG ulPos, ulSkip, ulLine, ulBase, ulOffset;
-   char * pszModuleName = "", * ptr;
-   PFUNCTION pFunc;
+   PHB_DEBUGINFO  pLineInfo      = NULL, pInfo = NULL;
+   HB_SIZE        ulPos, ulSkip, ulLine, ulBase, ulOffset;
+   char *         pszModuleName  = "", * ptr;
+   PFUNCTION      pFunc;
 
    pFunc = hb_comp_bStartProc ? hb_comp_functions.pFirst :
-                                hb_comp_functions.pFirst->pNext;
+           hb_comp_functions.pFirst->pNext;
 
    while( pFunc )
    {
@@ -83,8 +83,8 @@ PHB_DEBUGINFO hb_compGetDebugInfo( void )
                break;
 
             case HB_P_MODULENAME:
-               pszModuleName = ( char * ) &pFunc->pCode[ ulPos + 1 ];
-               pInfo = NULL;
+               pszModuleName  = ( char * ) &pFunc->pCode[ ulPos + 1 ];
+               pInfo          = NULL;
                break;
 
             /*
@@ -103,12 +103,12 @@ PHB_DEBUGINFO hb_compGetDebugInfo( void )
 
          if( ulLine != 0 )
          {
-            if( !pInfo )
+            if( ! pInfo )
             {
                int i;
 
-               ptr = strchr( pszModuleName, ':' );
-               i = ptr ? ( int ) ( ptr - pszModuleName ) : ( int ) strlen( pszModuleName );
+               ptr   = strchr( pszModuleName, ':' );
+               i     = ptr ? ( int ) ( ptr - pszModuleName ) : ( int ) strlen( pszModuleName );
 
                pInfo = pLineInfo;
                while( pInfo != NULL )
@@ -119,31 +119,31 @@ PHB_DEBUGINFO hb_compGetDebugInfo( void )
                      break;
                   pInfo = pInfo->pNext;
                }
-               if( !pInfo )
+               if( ! pInfo )
                {
-                  pInfo = ( PHB_DEBUGINFO ) hb_xgrab( sizeof( HB_DEBUGINFO ) );
+                  pInfo                = ( PHB_DEBUGINFO ) hb_xgrab( sizeof( HB_DEBUGINFO ) );
                   pInfo->pszModuleName = hb_strndup( pszModuleName, i );
-                  pInfo->ulFirstLine = pInfo->ulLastLine = ulLine;
+                  pInfo->ulFirstLine   = pInfo->ulLastLine = ulLine;
                   /*
                    * allocate memory in 256 bytes chunks (for 2048 lines)
                    * The last 1 byte is reserved for additional 0 byte if
                    * the caller will want to use the returned buffer as
                    * parameter to hb_compGenPushString(). [druzus]
                    */
-                  pInfo->ulAllocated = ( ( ulLine >> 3 ) + 0x100 ) & 0xFFFFFF00L;
-                  pInfo->pLineMap = ( BYTE * ) hb_xgrab( pInfo->ulAllocated + 1 );
-                  memset( pInfo->pLineMap, 0, pInfo->ulAllocated + 1 );
-                  pInfo->pNext = pLineInfo;
-                  pLineInfo = pInfo;
+                  pInfo->ulAllocated   = ( ( ulLine >> 3 ) + 0x100 ) & 0xFFFFFF00L;
+                  pInfo->pLineMap      = ( BYTE * ) hb_xgrab( pInfo->ulAllocated + 1 );
+                  memset( pInfo->pLineMap, 0, ( size_t ) ( pInfo->ulAllocated + 1 ) );
+                  pInfo->pNext         = pLineInfo;
+                  pLineInfo            = pInfo;
                }
             }
             ulOffset = ulLine >> 3;
             if( pInfo->ulAllocated <= ulOffset )
             {
                ULONG ulNewSize = ( ( ulLine >> 3 ) + 0x100 ) & 0xFFFFFF00L;
-               pInfo->pLineMap = ( BYTE * ) hb_xrealloc( pInfo->pLineMap, ulNewSize + 1 );
-               memset( pInfo->pLineMap + pInfo->ulAllocated, 0, ulNewSize - pInfo->ulAllocated + 1 );
-               pInfo->ulAllocated = ulNewSize;
+               pInfo->pLineMap      = ( BYTE * ) hb_xrealloc( pInfo->pLineMap, ulNewSize + 1 );
+               memset( pInfo->pLineMap + pInfo->ulAllocated, 0, ( size_t ) ( ulNewSize - pInfo->ulAllocated + 1 ) );
+               pInfo->ulAllocated   = ulNewSize;
             }
             pInfo->pLineMap[ ulOffset ] |= 1 << ( ulLine & 0x7 );
             /*

@@ -1284,9 +1284,9 @@ HB_FHANDLE hb_fsOpenProcess( const char *pFilename, HB_FHANDLE *fhStdin,
 
    if ( *pos && *pos != '\\')
    {
-      UINT uiLen = strlen( fullCommand ) + strlen( pos ) + 2;
+      HB_SIZE uiLen = strlen( fullCommand ) + strlen( pos ) + 2;
       completeCommand = (char *) hb_xgrab( uiLen );
-      hb_snprintf( completeCommand, uiLen, "%s %s",  fullCommand, pos+1);
+      hb_snprintf( completeCommand, (size_t) uiLen, "%s %s",  fullCommand, pos+1);
    }
    else
    {
@@ -1959,11 +1959,11 @@ BOOL hb_fsSetDevMode( HB_FHANDLE hFileHandle, USHORT uiDevMode )
    switch( uiDevMode )
    {
       case FD_BINARY:
-         iRet = _setmode( ( HB_NHANDLE ) hFileHandle, _O_BINARY );
+         iRet = _setmode( ( int ) ( HB_NHANDLE ) hFileHandle, _O_BINARY );
          break;
 
       case FD_TEXT:
-         iRet = _setmode( ( HB_NHANDLE ) hFileHandle, _O_TEXT );
+         iRet = _setmode( ( int ) ( HB_NHANDLE ) hFileHandle, _O_TEXT );
          break;
    }
 
@@ -2536,7 +2536,7 @@ USHORT hb_fsWrite( HB_FHANDLE hFileHandle, const void * pBuff, USHORT uiCount )
    return uiWritten;
 }
 
-ULONG hb_fsReadLarge( HB_FHANDLE hFileHandle, void * pBuff, ULONG ulCount )
+HB_SIZE hb_fsReadLarge( HB_FHANDLE hFileHandle, void * pBuff, HB_SIZE ulCount )
 {
    HB_THREAD_STUB
    ULONG ulRead;
@@ -2550,7 +2550,7 @@ ULONG hb_fsReadLarge( HB_FHANDLE hFileHandle, void * pBuff, ULONG ulCount )
    #if defined(HB_WIN32_IO)
    {
       hb_fsSetIOError( ReadFile( DosToWinHandle( hFileHandle ),
-                                 pBuff, ulCount, &ulRead, NULL ), 0 );
+                                 pBuff, (DWORD) ulCount, &ulRead, NULL ), 0 );
    }
    #elif defined(HB_FS_LARGE_OPTIMIZED)
    {
@@ -2617,7 +2617,7 @@ ULONG hb_fsReadLarge( HB_FHANDLE hFileHandle, void * pBuff, ULONG ulCount )
    return ulRead;
 }
 
-ULONG hb_fsWriteLarge( HB_FHANDLE hFileHandle, const void * pBuff, ULONG ulCount )
+HB_SIZE hb_fsWriteLarge( HB_FHANDLE hFileHandle, const void * pBuff, HB_SIZE ulCount )
 {
    HB_THREAD_STUB
    ULONG ulWritten;
@@ -2632,7 +2632,7 @@ ULONG hb_fsWriteLarge( HB_FHANDLE hFileHandle, const void * pBuff, ULONG ulCount
       hb_vmUnlock();
       if( ulCount )
       {
-         hb_fsSetIOError( WriteFile( DosToWinHandle( hFileHandle), pBuff, ulCount, &ulWritten, NULL ), 0 );
+         hb_fsSetIOError( WriteFile( DosToWinHandle( hFileHandle), pBuff, (DWORD) ulCount, &ulWritten, NULL ), 0 );
       }
       else
       {
@@ -2718,7 +2718,7 @@ ULONG hb_fsWriteLarge( HB_FHANDLE hFileHandle, const void * pBuff, ULONG ulCount
    return ulWritten;
 }
 
-ULONG hb_fsReadAt( HB_FHANDLE hFileHandle, void * pBuff, ULONG ulCount, HB_FOFFSET llOffset )
+HB_SIZE hb_fsReadAt( HB_FHANDLE hFileHandle, void * pBuff, HB_SIZE ulCount, HB_FOFFSET llOffset )
 {
    HB_THREAD_STUB
    ULONG ulRead;
@@ -2750,7 +2750,7 @@ ULONG hb_fsReadAt( HB_FHANDLE hFileHandle, void * pBuff, ULONG ulCount, HB_FOFFS
       Overlapped.Offset     = ( DWORD ) ( llOffset & 0xFFFFFFFF ),
       Overlapped.OffsetHigh = ( DWORD ) ( llOffset >> 32 ),
       hb_fsSetIOError( ReadFile( DosToWinHandle( hFileHandle ),
-                                 pBuff, ulCount, &ulRead, &Overlapped ), 0 );
+                                 pBuff, (DWORD) ulCount, &ulRead, &Overlapped ), 0 );
       hb_vmLock();
    }
    else
@@ -2761,7 +2761,7 @@ ULONG hb_fsReadAt( HB_FHANDLE hFileHandle, void * pBuff, ULONG ulCount, HB_FOFFS
        *        file access with shared file handles in aliased work areas
        */
       if( hb_fsSeekLarge( hFileHandle, llOffset, FS_SET ) == llOffset )
-         ulRead = hb_fsReadLarge( hFileHandle, pBuff, ulCount );
+         ulRead = (ULONG) hb_fsReadLarge( hFileHandle, pBuff, ulCount );
       else
          ulRead = 0;
       hb_vmLock();
@@ -2778,7 +2778,7 @@ ULONG hb_fsReadAt( HB_FHANDLE hFileHandle, void * pBuff, ULONG ulCount, HB_FOFFS
    return ulRead;
 }
 
-ULONG hb_fsWriteAt( HB_FHANDLE hFileHandle, const void * pBuff, ULONG ulCount, HB_FOFFSET llOffset )
+HB_SIZE hb_fsWriteAt( HB_FHANDLE hFileHandle, const void * pBuff, HB_SIZE ulCount, HB_FOFFSET llOffset )
 {
    HB_THREAD_STUB
    ULONG ulWritten;
@@ -2810,7 +2810,7 @@ ULONG hb_fsWriteAt( HB_FHANDLE hFileHandle, const void * pBuff, ULONG ulCount, H
       Overlapped.Offset     = ( DWORD ) ( llOffset & 0xFFFFFFFF ),
       Overlapped.OffsetHigh = ( DWORD ) ( llOffset >> 32 ),
       hb_fsSetIOError( WriteFile( DosToWinHandle( hFileHandle ),
-                                  pBuff, ulCount, &ulWritten, &Overlapped ), 0 );
+                                  pBuff, (DWORD) ulCount, &ulWritten, &Overlapped ), 0 );
       hb_vmLock();
    }
    else
@@ -2821,7 +2821,7 @@ ULONG hb_fsWriteAt( HB_FHANDLE hFileHandle, const void * pBuff, ULONG ulCount, H
        *        file access with shared file handles in aliased work areas
        */
       if( hb_fsSeekLarge( hFileHandle, llOffset, FS_SET ) == llOffset )
-         ulWritten = hb_fsWriteLarge( hFileHandle, pBuff, ulCount );
+         ulWritten = (ULONG) hb_fsWriteLarge( hFileHandle, pBuff, ulCount );
       else
          ulWritten = 0;
       hb_vmLock();
@@ -2961,8 +2961,8 @@ void hb_fsCommit( HB_FHANDLE hFileHandle )
    hb_vmLock();
 }
 
-BOOL hb_fsLock( HB_FHANDLE hFileHandle, ULONG ulStart,
-                          ULONG ulLength, USHORT uiMode )
+BOOL hb_fsLock( HB_FHANDLE hFileHandle, HB_SIZE ulStart,
+                          HB_SIZE ulLength, USHORT uiMode )
 {
    HB_THREAD_STUB
    BOOL bResult;
@@ -2995,11 +2995,11 @@ BOOL hb_fsLock( HB_FHANDLE hFileHandle, ULONG ulStart,
             {
                dwFlags |= LOCKFILE_FAIL_IMMEDIATELY;
             }
-            bResult = LockFileEx( DosToWinHandle( hFileHandle ), dwFlags, 0, ulLength, 0, &sOlap );
+            bResult = LockFileEx( DosToWinHandle( hFileHandle ), dwFlags, 0, (DWORD) ulLength, 0, &sOlap );
          }
          else
          {
-             bResult = LockFile( DosToWinHandle( hFileHandle ), ulStart, 0, ulLength,0 );
+             bResult = LockFile( DosToWinHandle( hFileHandle ), (DWORD) ulStart, 0, (DWORD) ulLength,0 );
          }
          break;
       }
@@ -3010,11 +3010,11 @@ BOOL hb_fsLock( HB_FHANDLE hFileHandle, ULONG ulStart,
             OVERLAPPED sOlap;
             memset( &sOlap, 0, sizeof( OVERLAPPED ) );
             sOlap.Offset = ( ULONG ) ulStart;
-            bResult = UnlockFileEx( DosToWinHandle( hFileHandle ), 0, ulLength,0, &sOlap );
+            bResult = UnlockFileEx( DosToWinHandle( hFileHandle ), 0, (DWORD) ulLength,0, &sOlap );
          }
          else
          {
-            bResult = UnlockFile( DosToWinHandle( hFileHandle ), ulStart, 0, ulLength,0 );
+            bResult = UnlockFile( DosToWinHandle( hFileHandle ), (DWORD) ulStart, 0, (DWORD) ulLength,0 );
          }
          break;
 
@@ -3691,7 +3691,7 @@ const char * hb_fsCurDir( USHORT uiDrive )
 /* NOTE: Thread safe version of hb_fsCurDir() */
 /* NOTE: 0 = current drive, 1 = A, 2 = B, 3 = C, etc. */
 
-USHORT hb_fsCurDirBuff( USHORT uiDrive, char * pbyBuffer, ULONG ulLen )
+USHORT hb_fsCurDirBuff( USHORT uiDrive, char * pbyBuffer, HB_SIZE ulLen )
 {
    HB_THREAD_STUB
    USHORT uiCurDrv = uiDrive, usError;
@@ -3719,7 +3719,7 @@ USHORT hb_fsCurDirBuff( USHORT uiDrive, char * pbyBuffer, ULONG ulLen )
 
 #if defined(HB_OS_WIN)
 
-   fResult = GetCurrentDirectoryA( ulLen, ( char * ) pbyBuffer );
+   fResult = GetCurrentDirectoryA( (DWORD) ulLen, ( char * ) pbyBuffer );
    hb_fsSetIOError( fResult, 0 );
 
 #elif defined(HB_OS_OS2) && defined(__GNUC__)
@@ -3784,7 +3784,7 @@ USHORT hb_fsCurDirBuff( USHORT uiDrive, char * pbyBuffer, ULONG ulLen )
          ulLen--;
 
       if( ulLen && pbyBuffer != pbyStart )
-         memmove( pbyBuffer, pbyStart, ulLen );
+         memmove( pbyBuffer, pbyStart, (size_t) ulLen );
 
       pbyBuffer[ ulLen ] = '\0';
    }
@@ -4217,7 +4217,7 @@ char * hb_fsCurDirEx( USHORT uiDrive )
    return ( char * ) s_byDirBuffer;
 }
 
-USHORT  hb_fsCurDirBuffEx( USHORT uiDrive, char * pbyBuffer, ULONG ulLen )
+USHORT hb_fsCurDirBuffEx( USHORT uiDrive, char * pbyBuffer, HB_SIZE ulLen )
 {
 #if defined(HB_OS_WIN)
    HB_THREAD_STUB
@@ -4233,7 +4233,7 @@ USHORT  hb_fsCurDirBuffEx( USHORT uiDrive, char * pbyBuffer, ULONG ulLen )
 {
    DWORD dwResult;
 
-   dwResult = GetCurrentDirectoryA( ulLen, ( char * ) pbyBuffer );
+   dwResult = GetCurrentDirectoryA( (DWORD) ulLen, ( char * ) pbyBuffer );
    hb_fsSetIOError( dwResult != 0, 0 );
    hb_vmLock();
 }
@@ -4266,7 +4266,7 @@ USHORT  hb_fsCurDirBuffEx( USHORT uiDrive, char * pbyBuffer, ULONG ulLen )
    else
    {
       char * pbyStart = pbyBuffer;
-      ULONG ulPthLen;
+      HB_SIZE ulPthLen;
 
       /* NOTE: A trailing underscore is not returned on this platform,
                so we don't need to strip it. [vszakats] */
@@ -4280,7 +4280,7 @@ USHORT  hb_fsCurDirBuffEx( USHORT uiDrive, char * pbyBuffer, ULONG ulLen )
 
       if( pbyBuffer != pbyStart )
       {
-         memmove( pbyBuffer, pbyStart, ulLen );
+         memmove( pbyBuffer, pbyStart, (size_t) ulLen );
       }
 
       /* Strip the trailing (back)slash if there's one */
@@ -4336,7 +4336,7 @@ const char * hb_fsNameConv( const char * szFileName, char ** pszFree )
        pszCP )
    {
       PHB_FNAME pFileName;
-      ULONG ulLen;
+      HB_SIZE ulLen;
 
       if( pszFree )
       {

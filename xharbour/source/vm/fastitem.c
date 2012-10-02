@@ -505,7 +505,7 @@ void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
 
 PHB_ITEM hb_itemPutC( PHB_ITEM pItem, const char * szText )
 {
-   ULONG ulLen = 0;
+   HB_SIZE ulLen = 0;
 
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutC(%p, %s)", pItem, szText));
 
@@ -599,7 +599,7 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, const char * szText )
 */
 }
 
-PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, const char * szText, ULONG ulLen )
+PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, const char * szText, HB_SIZE ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCL(%p, %s, %lu)", pItem, szText, ulLen));
 
@@ -628,7 +628,7 @@ PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, const char * szText, ULONG ulLen )
           {
             char *sCopy = (char *) hb_xgrab( ulLen + 1 );
 
-            hb_xmemcpy( (void *) sCopy, (void *) szText, ulLen );
+            hb_xmemcpy( (void *) sCopy, (void *) szText, (size_t) ulLen );
 
             return hb_itemPutCPtr( pItem, sCopy, ulLen );
           }
@@ -638,7 +638,7 @@ PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, const char * szText, ULONG ulLen )
              __HB_STRING_REALLOC( pItem, ulLen );
 
              // Safe, no need to use memmove()
-             HB_MEMCPY( pItem->item.asString.value, szText, ulLen );
+             HB_MEMCPY( pItem->item.asString.value, szText, (size_t) ulLen );
 
              return pItem;
           }
@@ -677,13 +677,13 @@ PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, const char * szText, ULONG ulLen )
      pItem->item.asString.allocated       = ulLen + 1;
 
      // Alocation above already set the 'length and the terminator!
-     hb_xmemcpy( (void *) pItem->item.asString.value, (void *) szText, ulLen );
+     hb_xmemcpy( (void *) pItem->item.asString.value, (void *) szText, (size_t) ulLen );
    }
 
    return pItem;
 }
 
-PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
+PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, HB_SIZE ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCPtr(%p, %s, %lu)", pItem, szText, ulLen));
 
@@ -738,7 +738,7 @@ PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
 */
 }
 
-PHB_ITEM hb_itemPutCRaw( PHB_ITEM pItem, char * szText, ULONG ulLen )
+PHB_ITEM hb_itemPutCRaw( PHB_ITEM pItem, char * szText, HB_SIZE ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCRaw(%p, %s, %lu)", pItem, szText, ulLen));
 
@@ -775,7 +775,7 @@ PHB_ITEM hb_itemPutCRaw( PHB_ITEM pItem, char * szText, ULONG ulLen )
    return pItem;
 }
 
-PHB_ITEM hb_itemPutCRawStatic( PHB_ITEM pItem, const char * szText, ULONG ulLen )
+PHB_ITEM hb_itemPutCRawStatic( PHB_ITEM pItem, const char * szText, HB_SIZE ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCRawStatic(%p, %s, %lu)", pItem, szText, ulLen));
 
@@ -801,7 +801,7 @@ PHB_ITEM hb_itemPutCRawStatic( PHB_ITEM pItem, const char * szText, ULONG ulLen 
 
 PHB_ITEM hb_itemPutCStatic( PHB_ITEM pItem, const char * szText )
 {
-   ULONG ulLen = 0;
+   HB_SIZE ulLen = 0;
 
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCStatic(%p, %s)", pItem, szText) );
 
@@ -842,7 +842,7 @@ PHB_ITEM hb_itemPutCStatic( PHB_ITEM pItem, const char * szText )
 */
 }
 
-PHB_ITEM hb_itemPutCLStatic( PHB_ITEM pItem, const char * szText, ULONG ulLen )
+PHB_ITEM hb_itemPutCLStatic( PHB_ITEM pItem, const char * szText, HB_SIZE ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCLStatic(%p, %s, %lu)", pItem, szText, ulLen));
 
@@ -928,7 +928,7 @@ PHB_ITEM hb_itemPutPtrGC( PHB_ITEM pItem, void * pValue )
 }
 
 
-void hb_itemPushStaticString( const char * szText, ULONG length )
+void hb_itemPushStaticString( const char * szText, HB_SIZE length )
 {
    HB_THREAD_STUB_STACK
 
@@ -985,7 +985,7 @@ void hb_retcAdopt( char * szText )
 }
 
 #undef hb_retclenAdopt
-void hb_retclenAdopt( char * szText, ULONG ulLen )
+void hb_retclenAdopt( char * szText, HB_SIZE ulLen )
 {
    HB_THREAD_STUB
 
@@ -1022,7 +1022,7 @@ void hb_retclenAdopt( char * szText, ULONG ulLen )
 }
 
 #undef hb_retclenAdoptRaw
-void hb_retclenAdoptRaw( char * szText, ULONG ulLen )
+void hb_retclenAdoptRaw( char * szText, HB_SIZE ulLen )
 {
    HB_THREAD_STUB
 
@@ -1073,7 +1073,7 @@ void hb_retcStatic( const char * szText )
 }
 
 #undef hb_retclenStatic
-void hb_retclenStatic( const char * szText, ULONG ulLen )
+void hb_retclenStatic( const char * szText, HB_SIZE ulLen )
 {
    HB_THREAD_STUB
 

@@ -69,7 +69,7 @@ HB_FUNC( HB_SHA1 )
 
       while( nCount )
       {
-         unsigned int uiChunk;
+         UINT uiChunk;
 
          if( nCount > ( ULONG ) UINT_MAX )
          {
@@ -78,7 +78,7 @@ HB_FUNC( HB_SHA1 )
          }
          else
          {
-            uiChunk = ( unsigned int ) nCount;
+            uiChunk = ( UINT ) nCount;
             nCount = 0;
          }
 
@@ -88,7 +88,7 @@ HB_FUNC( HB_SHA1 )
       }
    }
    #else
-      hb_SHA1_Update( &ctx, hb_parcx( 1 ), hb_parclen( 1 ) );
+      hb_SHA1_Update( &ctx, hb_parcx( 1 ), (UINT) hb_parclen( 1 ) );
    #endif
 
    hb_SHA1_Final( digest, &ctx );

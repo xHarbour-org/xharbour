@@ -734,7 +734,7 @@ LANGUAGE_RULES_ARE {
             \
             szBuffer--; iSize++; \
             \
-            iLen = sClose - szBuffer; \
+            iLen = ( int ) ( sClose - szBuffer ); \
             \
             if( iLen > iPairAllocated )\
             { \
@@ -745,7 +745,7 @@ LANGUAGE_RULES_ARE {
             hb_strncpy( sPair, szBuffer, iLen ); \
             sPair[ iLen ] = '\0'; \
             s_szBuffer = sClose + 1; \
-            iSize -= s_szBuffer - szBuffer; \
+            iSize -= (unsigned int) ( s_szBuffer - szBuffer ); \
             yylval.valChar.string = hb_compIdentifierNew( sPair, TRUE ); \
             yylval.valChar.length = iLen; \
             yylval.valChar.dealloc = FALSE; \
@@ -760,7 +760,7 @@ LANGUAGE_RULES_ARE {
             szBuffer[strlen(szBuffer)-1] = '\0'; \
             hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_STRING_TERMINATOR, szBuffer, NULL ); \
             yylval.valChar.string = hb_compIdentifierNew( szBuffer, TRUE ); \
-            yylval.valChar.length = strlen( szBuffer ); \
+            yylval.valChar.length = (int) strlen( szBuffer ); \
             yylval.valChar.dealloc = FALSE; \
             iSize = 0; \
             iPairToken = 0; \
@@ -795,13 +795,13 @@ static int hb_comp_SLX_InterceptAction( int iRet )
       else if( yylval.string == NULL )
       {
          //yytext = sToken;
-         yyleng = strlen( yytext );
+         yyleng = (int) strlen( yytext );
       }
    }
    else
    {
       //yytext = sToken;
-      yyleng = strlen( yytext );
+      yyleng = (int) strlen( yytext );
 
       if( iRet == WANTS_EXP )
          { iRet = iWantsEXP; }
@@ -1479,7 +1479,7 @@ char * hb_comp_SLX_LastBlock( BOOL bReset )
 
 static void hb_compCheckIllegalChar( char * szName )
 {
-   int i, iLen = strlen( szName );
+   int i, iLen = (int) strlen( szName );
 
    for ( i = 0; i < iLen ; i++ )
    {

@@ -77,11 +77,11 @@
  */
 static void hb_arrayNewRagged( PHB_ITEM pArray, int iDimension )
 {
-   ULONG ulElements;
+   HB_SIZE ulElements;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayNewRagged(%p, %d)", pArray, iDimension));
 
-   ulElements = ( ULONG ) hb_parnl( iDimension );
+   ulElements = hb_parns( iDimension );
 
    /* create an array */
    hb_arrayNew( pArray, ulElements );
@@ -235,7 +235,7 @@ HB_FUNC( ASIZEALLOC )
 
    if( pArray && pPreAlloc )
    {
-      pArray->item.asArray.value->ulBlock = (ULONG) hb_itemGetNL( pPreAlloc );
+      pArray->item.asArray.value->ulBlock = hb_itemGetNS( pPreAlloc );
 
       /* returns the array itself */
       if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
@@ -286,7 +286,7 @@ HB_FUNC( AINS )
 
       if( ISNUM( 2 ) )
       {
-         long lIndex = hb_parnl( 2 );
+         HB_ISIZ lIndex = hb_parns( 2 );
 
        #ifndef HB_C52_STRICT
          if( lIndex < 0 )
@@ -330,11 +330,11 @@ HB_FUNC( ADEL )
    {
       if( pArray->item.asArray.value->ulLen )
       {
-         long lIndex;
+         HB_ISIZ lIndex;
 
          if( ISNUM( 2 ) )
          {
-            lIndex = hb_parnl( 2 );
+            lIndex = hb_parns( 2 );
 
             #ifndef HB_C52_STRICT
               if( lIndex < 0 )
@@ -384,8 +384,8 @@ HB_FUNC( AFILL )
 
       if( pValue )
       {
-         LONG ulStart = hb_parnl( 3 );
-         LONG ulCount = hb_parnl( 4 );
+         HB_ISIZ ulStart = hb_parnl( 3 );
+         HB_ISIZ ulCount = hb_parnl( 4 );
 
          /* Explicy ulCount of 0 - Nothing to do! */
          if( ISNUM(4) && ulCount == 0 )
@@ -453,7 +453,7 @@ HB_FUNC( AFILL )
             }
          }
 
-         hb_arrayFill( pArray, pValue, (ULONG) ulStart, (ULONG) ulCount );
+         hb_arrayFill( pArray, pValue, ulStart, ulCount );
       }
 
       /* AFill() returns the array itself */
@@ -486,14 +486,14 @@ HB_FUNC( ASCAN )
 
    if( pArray && pValue )
    {
-      ULONG ulStart   = hb_parnl( 3 );
-      ULONG ulCount   = hb_parnl( 4 );
+      HB_SIZE ulStart   = hb_parnl( 3 );
+      HB_SIZE ulCount   = hb_parnl( 4 );
 
-      hb_retnl( hb_arrayScan( pArray, pValue, ISNUM( 3 ) ? &ulStart : NULL, ISNUM( 4 ) ? &ulCount : NULL, hb_parl( 5 ), hb_parl( 6 ) ) );
+      hb_retns( hb_arrayScan( pArray, pValue, ISNUM( 3 ) ? &ulStart : NULL, ISNUM( 4 ) ? &ulCount : NULL, hb_parl( 5 ), hb_parl( 6 ) ) );
    }
    else
    {
-      hb_retnl( 0 );
+      hb_retns( 0 );
    }
 }
 
@@ -507,8 +507,8 @@ HB_FUNC( AEVAL )
 
    if( pArray && pBlock )
    {
-      ULONG ulStart = hb_parnl( 3 );
-      ULONG ulCount = hb_parnl( 4 );
+      HB_SIZE ulStart = hb_parnl( 3 );
+      HB_SIZE ulCount = hb_parnl( 4 );
 
       hb_arrayEval( pArray,
                     pBlock,
@@ -536,9 +536,9 @@ HB_FUNC( ACOPY )
       /* CA-Cl*pper works this way. */
       if( ! hb_arrayIsObject( pSrcArray ) && ! hb_arrayIsObject( pDstArray ) )
       {
-         ULONG ulStart = hb_parnl( 3 );
-         ULONG ulCount = hb_parnl( 4 );
-         ULONG ulTarget = hb_parnl( 5 );
+         HB_SIZE ulStart  = hb_parnl( 3 );
+         HB_SIZE ulCount  = hb_parnl( 4 );
+         HB_SIZE ulTarget = hb_parnl( 5 );
 
          hb_arrayCopy( pSrcArray,
                        pDstArray,
@@ -681,8 +681,8 @@ HB_FUNC( HB_AEXPRESSIONS )
 unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned int uiAlign )
 {
    PHB_BASEARRAY pBaseDef = aDef->item.asArray.value;
-   unsigned long ulLen = pBaseDef->ulLen;
-   unsigned long ulIndex;
+   HB_SIZE ulLen = pBaseDef->ulLen;
+   HB_SIZE ulIndex;
    unsigned int uiSize = 0, uiMemberSize;
    BYTE cShift;
    unsigned int uiPad;
@@ -847,8 +847,8 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
 {
    PHB_BASEARRAY pBaseVar = aVar->item.asArray.value;
    PHB_BASEARRAY pBaseDef = aDef->item.asArray.value;
-   unsigned long ulLen = pBaseDef->ulLen;
-   unsigned long ulIndex;
+   HB_SIZE ulLen = pBaseDef->ulLen;
+   HB_SIZE ulIndex;
    BYTE  *Buffer;
    unsigned int uiOffset = 0, uiMemberSize;
    BYTE cShift;
@@ -1605,11 +1605,11 @@ HB_FUNC( HB_ARRAYTOSTRUCTURE )
    }
 }
 
-PHB_ITEM StructureToArray( BYTE* Buffer, unsigned long ulBufferLen, PHB_ITEM aDef, unsigned int uiAlign, BOOL bAdoptNested, PHB_ITEM pRet )
+PHB_ITEM StructureToArray( BYTE* Buffer, HB_SIZE ulBufferLen, PHB_ITEM aDef, unsigned int uiAlign, BOOL bAdoptNested, PHB_ITEM pRet )
 {
    PHB_BASEARRAY pBaseDef = aDef->item.asArray.value;
-   unsigned long ulLen = pBaseDef->ulLen;
-   unsigned long ulIndex;
+   HB_SIZE ulLen = pBaseDef->ulLen;
+   HB_SIZE ulIndex;
    unsigned int uiOffset, uiMemberSize;
    BYTE cShift;
    //PHB_ITEM pRet = hb_itemNew( NULL );
@@ -1972,9 +1972,9 @@ HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
    if( pArray && pValue )
    {
       PHB_ITEM pItems;
-      ULONG ulLen;
-      ULONG ulStart;
-      ULONG ulCount;
+      HB_ISIZ ulLen;
+      HB_ISIZ ulStart;
+      HB_ISIZ ulCount;
       BOOL bExact = hb_parl( 5 );
       BOOL bAllowChar = hb_parl( 6 );
 
@@ -1982,9 +1982,9 @@ HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
       ulLen = pArray->item.asArray.value->ulLen;
 
       /* sanitize scan range */
-      if( ISNUM( 3 ) && hb_parni( 3 ) >= 1 )
+      if( ISNUM( 3 ) && hb_parns( 3 ) >= 1 )
       {
-         ulStart = hb_parni( 3 );
+         ulStart = hb_parns( 3 );
       }
       else
       {
@@ -1997,9 +1997,9 @@ HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
          return;
       }
 
-      if( ISNUM( 4 ) && ( ( ULONG ) hb_parni( 4 ) <= ulStart ) )
+      if( ISNUM( 4 ) && ( hb_parns( 4 ) <= ulStart ) )
       {
-         ulCount = hb_parni( 4 );
+         ulCount = hb_parns( 4 );
       }
       else
       {
@@ -2023,12 +2023,12 @@ HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
             hb_vmPush( pValue );
 
             hb_vmPush( pItems + ulStart );
-            hb_vmPushLong( ulStart + 1 );
+            hb_vmPushSize( ulStart + 1 );
             hb_vmSend( 2 );
 
             if( HB_IS_LOGICAL( hb_stackReturnItem() ) && HB_VM_STACK.Return.item.asLogical.value )
             {
-               hb_retnl( ulStart + 1 );             // arrays start from 1
+               hb_retns( ulStart + 1 );             // arrays start from 1
                return;
             }
          }
@@ -2045,7 +2045,7 @@ HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
                         hb_itemStrCmp() is significant, please don't change it. [vszakats] */
                if( HB_IS_STRING( pItem ) && hb_itemStrCmp( pItem, pValue, bExact ) == 0 )
                {
-                  hb_retnl( ulStart + 1 );             // arrays start from 1
+                  hb_retns( ulStart + 1 );             // arrays start from 1
                   return;
                }
             }
@@ -2064,13 +2064,13 @@ HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
                {
                   if( hb_itemStrCmp( pItem, pValue, bExact ) == 0 )
                   {
-                     hb_retnl( ulStart + 1 );          // arrays start from 1
+                     hb_retns( ulStart + 1 );          // arrays start from 1
                      return;
                   }
                }
                else if( HB_IS_NUMERIC( pItem ) && hb_itemGetND( pItem ) == dValue )
                {
-                  hb_retnl( ulStart + 1 );             // arrays start from 1
+                  hb_retns( ulStart + 1 );             // arrays start from 1
                   return;
                }
             }
@@ -2078,7 +2078,7 @@ HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
       }
       else if( pValue->type == HB_IT_DATE ) // Must precede HB_IS_NUMERIC()
       {
-         LONG lValue = pValue->item.asDate.value;
+         HB_ISIZ lValue = pValue->item.asDate.value;
 
          for( ulStart--; ulCount > 0; ulCount--, ulStart-- )
          {
@@ -2087,7 +2087,7 @@ HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
             if( pItem->type == HB_IT_DATE && pItem->item.asDate.value == lValue &&
                pValue->item.asDate.time == pItem->item.asDate.time )
             {
-               hb_retnl( ulStart + 1 );             // arrays start from 1
+               hb_retns( ulStart + 1 );             // arrays start from 1
                return;
             }
          }
@@ -2102,7 +2102,7 @@ HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
 
             if( HB_IS_NUMERIC( pItem ) && hb_itemGetND( pItem ) == dValue && ( bAllowChar || ! HB_IS_STRING( pItem ) ) )
             {
-               hb_retnl( ulStart + 1 );             // arrays start from 1
+               hb_retns( ulStart + 1 );             // arrays start from 1
                return;
             }
          }
@@ -2117,7 +2117,7 @@ HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
 
             if( HB_IS_LOGICAL( pItem ) && hb_itemGetL( pItem ) == bValue )
             {
-               hb_retnl( ulStart + 1 );             // arrays start from 1
+               hb_retns( ulStart + 1 );             // arrays start from 1
                return;
             }
          }
@@ -2128,7 +2128,7 @@ HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
          {
             if( HB_IS_NIL( pItems + ulStart ) )
             {
-               hb_retnl( ulStart + 1 );             // arrays start from 1
+               hb_retns( ulStart + 1 );             // arrays start from 1
                return;
             }
          }
@@ -2141,7 +2141,7 @@ HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
 
             if( pItem->type == HB_IT_ARRAY && pItem->item.asArray.value == pValue->item.asArray.value )
             {
-               hb_retnl( ulStart + 1 );             // arrays start from 1
+               hb_retns( ulStart + 1 );             // arrays start from 1
                return;
             }
          }
@@ -2160,8 +2160,8 @@ HB_FUNC( ASPLICE )
 
    if( pArray )
    {
-      ULONG ulStart, ulRemove, ulIndex, ulAdd;
-      ULONG ulLen = hb_arrayLen( pArray );
+      HB_SIZE ulStart, ulRemove, ulIndex, ulAdd;
+      HB_SIZE ulLen = hb_arrayLen( pArray );
       PHB_ITEM pReturn = hb_stackReturnItem();
 
       if( ulLen == 0 )
@@ -2172,7 +2172,7 @@ HB_FUNC( ASPLICE )
 
       if( ISNUM( 2 ) )
       {
-         ulStart = ( ULONG ) hb_parnl( 2 );
+         ulStart = hb_parns( 2 );
       }
       else
       {
@@ -2181,7 +2181,7 @@ HB_FUNC( ASPLICE )
 
       if( ISNUM( 3 ) )
       {
-         ulRemove = ( ULONG ) hb_parnl( 3 );
+         ulRemove = hb_parns( 3 );
       }
       else
       {
@@ -2215,13 +2215,13 @@ HB_FUNC( ASPLICE )
 
       if( hb_pcount() > 3 )
       {
-         ULONG ulNew = 0;
+         HB_SIZE ulNew = 0;
          ulAdd = hb_pcount() - 3;
 
          if( ulAdd > ulRemove )
          {
-            ULONG ulMore = ulAdd - ulRemove;
-            ULONG ulShift = ulLen - (ulStart + ulRemove);
+            HB_SIZE ulMore = ulAdd - ulRemove;
+            HB_SIZE ulShift = ulLen - (ulStart + ulRemove);
 
             hb_arraySize( pArray, ulLen + ulMore );
 
@@ -2236,7 +2236,7 @@ HB_FUNC( ASPLICE )
             for( ulIndex = ulStart; ++ulNew <= ulAdd; ulIndex++ )
             {
                hb_itemForwardValue( hb_arrayGetItemPtr( pArray, ulIndex + 1 ),
-                                    hb_param( 3 + ulNew, HB_IT_ANY ) );
+                                    hb_param( 3 + ( int ) ulNew, HB_IT_ANY ) );
             }
          }
          else
@@ -2244,7 +2244,7 @@ HB_FUNC( ASPLICE )
             /* Insert over the space emptied by removed items */
             for( ulIndex = ulStart; ++ulNew <= ulAdd; ulIndex++ )
             {
-               hb_itemForwardValue( hb_arrayGetItemPtr( pArray, ulIndex + 1 ), hb_param( 3 + ulNew, HB_IT_ANY ) );
+               hb_itemForwardValue( hb_arrayGetItemPtr( pArray, ulIndex + 1 ), hb_param( 3 + ( int ) ulNew, HB_IT_ANY ) );
             }
 
             if( ulRemove > ulAdd )
@@ -2287,9 +2287,9 @@ HB_FUNC( AMERGE )
 
    if( pArray1 && pArray2 )
    {
-      ULONG ulLen = hb_arrayLen( pArray1 );
-      ULONG ulAdd = hb_arrayLen( pArray2 );
-      ULONG ulIndex, ulStart;
+      HB_SIZE ulLen = hb_arrayLen( pArray1 );
+      HB_SIZE ulAdd = hb_arrayLen( pArray2 );
+      HB_SIZE ulIndex, ulStart;
 
       hb_arraySize( pArray1, ulLen + ulAdd );
 

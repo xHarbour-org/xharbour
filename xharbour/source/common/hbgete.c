@@ -70,7 +70,7 @@ char * hb_getenv( const char * szName )
 {
    char * pszBuffer = NULL;
 
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN )
 
    {
       DWORD size = GetEnvironmentVariable( szName, NULL, 0 );
@@ -82,7 +82,7 @@ char * hb_getenv( const char * szName )
       }
    }
 
-#elif defined(HB_OS_OS2)
+#elif defined( HB_OS_OS2 )
 
    {
       PSZ EnvValue = "";

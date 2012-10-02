@@ -1,12 +1,9 @@
-/*
- * $Id$
- */
-/* A Bison parser, made by GNU Bison 2.4.1.  */
+/* A Bison parser, made by GNU Bison 2.4.2.  */
 
 /* Skeleton implementation for Bison's Yacc-like parsers in C
    
-      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
-   Free Software Foundation, Inc.
+      Copyright (C) 1984, 1989-1990, 2000-2006, 2009-2010 Free Software
+   Foundation, Inc.
    
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -30,7 +27,7 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-
+   
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
@@ -48,7 +45,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "2.4.1"
+#define YYBISON_VERSION "2.4.2"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -186,7 +183,7 @@ static void hb_compLoopLoop( void );
 static void hb_compLoopExit( void );
 static void hb_compLoopHere( void );
 
-static void * hb_compElseIfGen( void * pFirstElseIf, ULONG ulOffset ); /* generates a support structure for elseifs pcode fixups */
+static void * hb_compElseIfGen( void * pFirstElseIf, HB_SIZE ulOffset ); /* generates a support structure for elseifs pcode fixups */
 static void hb_compElseIfFix( void * pIfElseIfs ); /* implements the ElseIfs pcode fixups */
 
 static void hb_compRTVariableAdd( HB_EXPR_PTR, BOOL );
@@ -200,14 +197,14 @@ static void hb_compVariableDim( char *, HB_EXPR_PTR );
 
 typedef struct __ELSEIF
 {
-   ULONG ulOffset;
+   HB_SIZE ulOffset;
    struct __ELSEIF * pNext;
    struct __ELSEIF * pPrevGroup;
 } _ELSEIF, * PELSEIF;      /* support structure for else if pcode fixups */
 
 typedef struct _LOOPEXIT
 {
-   ULONG              ulOffset;
+   HB_SIZE            ulOffset;
    BOOL               fCanLoop;
    int                iLine;
    USHORT             wSeqCounter;
@@ -234,7 +231,7 @@ USHORT hb_comp_wCaseCounter     = 0;
 USHORT hb_comp_wWithObjCounter  = 0;
 USHORT hb_comp_wFinallyCounter  = 0;
 
-ULONG  hb_comp_alLastSwitchPos[ HB_MAX_SWITCHES ];
+HB_SIZE hb_comp_alLastSwitchPos[ HB_MAX_SWITCHES ];
 USHORT hb_comp_wSwitchCounter   = 0;
 
 char * hb_comp_buffer; /* yacc input buffer */
@@ -281,7 +278,7 @@ static void hb_compDebugStart( void ) { };
 
 
 /* Line 189 of yacc.c  */
-#line 272 "obj\\VC10\\harboury.c"
+#line 282 "obj\\vc\\harboury.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -456,7 +453,7 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 200 "source\\compiler\\harbour.sly"
+#line 211 "source\\compiler\\harbour.sly"
 
    char *  string;      /* to hold a string returned by lex */
    int     iNumber;     /* to hold a temporary integer number */
@@ -491,7 +488,7 @@ typedef union YYSTYPE
 
 
 /* Line 214 of yacc.c  */
-#line 482 "obj\\VC10\\harboury.c"
+#line 492 "obj\\vc\\harboury.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -503,7 +500,7 @@ typedef union YYSTYPE
 
 
 /* Line 264 of yacc.c  */
-#line 494 "obj\\VC10\\harboury.c"
+#line 504 "obj\\vc\\harboury.c"
 
 #ifdef short
 # undef short
@@ -553,7 +550,7 @@ typedef short int yytype_int16;
 #define YYSIZE_MAXIMUM ((YYSIZE_T) -1)
 
 #ifndef YY_
-# if YYENABLE_NLS
+# if defined YYENABLE_NLS && YYENABLE_NLS
 #  if ENABLE_NLS
 #   include <libintl.h> /* INFRINGES ON USER NAME SPACE */
 #   define YY_(msgid) dgettext ("bison-runtime", msgid)
@@ -1187,97 +1184,97 @@ static const yytype_int16 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   354,   354,   354,   355,   358,   359,   360,   361,   362,
-     363,   364,   365,   366,   367,   368,   369,   370,   371,   372,
-     373,   374,   375,   376,   377,   378,   379,   380,   381,   382,
-     383,   384,   385,   386,   387,   390,   391,   394,   397,   405,
-     423,   429,   422,   466,   472,   465,   510,   511,   512,   513,
-     514,   515,   516,   517,   520,   521,   522,   522,   523,   526,
-     527,   530,   531,   532,   533,   534,   535,   536,   537,   538,
-     539,   542,   543,   544,   545,   546,   547,   548,   549,   550,
-     551,   554,   562,   575,   576,   604,   604,   605,   606,   607,
-     608,   609,   610,   615,   620,   621,   622,   623,   624,   625,
-     626,   627,   629,   629,   633,   633,   634,   634,   635,   649,
-     649,   673,   675,   673,   676,   678,   676,   680,   681,   683,
-     682,   704,   704,   705,   705,   716,   722,   731,   732,   735,
-     735,   738,   739,   740,   741,   742,   745,   746,   749,   750,
-     751,   752,   753,   754,   757,   758,   761,   762,   763,   764,
-     767,   768,   769,   770,   773,   778,   779,   780,   783,   784,
-     785,   795,   798,   803,   822,   827,   832,   833,   836,   841,
-     844,   849,   857,   860,   874,   887,   901,   914,   928,   941,
-     952,   962,   973,   983,   994,  1006,  1012,  1015,  1018,  1019,
-    1020,  1023,  1028,  1029,  1032,  1037,  1066,  1071,  1084,  1090,
-    1196,  1201,  1204,  1211,  1212,  1217,  1218,  1219,  1220,  1221,
-    1222,  1223,  1224,  1225,  1226,  1227,  1228,  1229,  1230,  1233,
-    1234,  1235,  1238,  1239,  1240,  1241,  1242,  1243,  1244,  1245,
-    1246,  1247,  1248,  1249,  1250,  1251,  1252,  1253,  1254,  1255,
-    1256,  1257,  1266,  1267,  1268,  1269,  1270,  1271,  1276,  1277,
-    1278,  1279,  1280,  1281,  1282,  1283,  1284,  1285,  1286,  1287,
-    1288,  1289,  1290,  1291,  1292,  1293,  1296,  1300,  1301,  1319,
-    1320,  1321,  1322,  1323,  1324,  1327,  1328,  1331,  1332,  1397,
-    1398,  1401,  1402,  1403,  1406,  1411,  1412,  1413,  1416,  1417,
-    1418,  1419,  1420,  1421,  1422,  1423,  1424,  1425,  1426,  1427,
-    1428,  1429,  1430,  1431,  1432,  1433,  1434,  1435,  1436,  1437,
-    1438,  1441,  1453,  1459,  1462,  1471,  1479,  1480,  1481,  1482,
-    1483,  1484,  1485,  1486,  1487,  1488,  1488,  1489,  1490,  1491,
-    1492,  1493,  1494,  1495,  1496,  1497,  1497,  1498,  1499,  1499,
-    1500,  1501,  1501,  1502,  1503,  1503,  1504,  1505,  1505,  1506,
-    1507,  1508,  1509,  1510,  1511,  1512,  1513,  1514,  1517,  1518,
-    1519,  1520,  1520,  1521,  1521,  1524,  1525,  1528,  1529,  1530,
-    1531,  1532,  1533,  1534,  1535,  1541,  1542,  1549,  1550,  1551,
-    1552,  1553,  1554,  1555,  1556,  1557,  1558,  1559,  1560,  1561,
-    1562,  1563,  1564,  1565,  1566,  1567,  1568,  1569,  1570,  1571,
-    1574,  1575,  1578,  1579,  1580,  1587,  1588,  1589,  1590,  1591,
-    1592,  1593,  1594,  1595,  1596,  1597,  1598,  1599,  1600,  1601,
-    1602,  1603,  1604,  1605,  1606,  1607,  1608,  1609,  1612,  1613,
-    1614,  1615,  1616,  1617,  1618,  1619,  1620,  1621,  1622,  1623,
-    1624,  1625,  1626,  1627,  1628,  1629,  1630,  1631,  1632,  1633,
-    1634,  1637,  1638,  1639,  1640,  1641,  1642,  1643,  1644,  1645,
-    1646,  1647,  1648,  1649,  1650,  1651,  1652,  1653,  1654,  1655,
-    1656,  1657,  1658,  1659,  1662,  1663,  1664,  1665,  1666,  1667,
-    1668,  1669,  1670,  1671,  1672,  1673,  1674,  1675,  1676,  1677,
-    1678,  1679,  1680,  1681,  1682,  1683,  1684,  1687,  1688,  1689,
-    1690,  1691,  1692,  1693,  1694,  1695,  1696,  1697,  1698,  1699,
-    1700,  1701,  1702,  1703,  1704,  1705,  1706,  1707,  1708,  1709,
-    1712,  1713,  1714,  1715,  1716,  1717,  1718,  1719,  1720,  1721,
-    1722,  1723,  1724,  1725,  1726,  1727,  1728,  1729,  1730,  1731,
-    1732,  1733,  1734,  1737,  1738,  1739,  1740,  1741,  1742,  1743,
-    1744,  1745,  1746,  1747,  1748,  1749,  1750,  1751,  1752,  1753,
-    1754,  1755,  1756,  1757,  1758,  1759,  1762,  1763,  1764,  1765,
-    1766,  1767,  1768,  1769,  1770,  1771,  1772,  1773,  1774,  1775,
-    1776,  1777,  1778,  1779,  1780,  1781,  1782,  1783,  1784,  1787,
-    1788,  1789,  1790,  1791,  1792,  1795,  1796,  1797,  1798,  1799,
-    1800,  1801,  1802,  1803,  1804,  1805,  1808,  1809,  1812,  1813,
-    1814,  1815,  1816,  1817,  1818,  1819,  1820,  1821,  1822,  1825,
-    1831,  1832,  1833,  1836,  1840,  1953,  2018,  2023,  2028,  1839,
-    2074,  2075,  2078,  2079,  2084,  2082,  2150,  2174,  2174,  2182,
-    2183,  2199,  2200,  2207,  2208,  2209,  2210,  2220,  2223,  2226,
-    2229,  2232,  2233,  2234,  2235,  2238,  2241,  2244,  2247,  2250,
-    2251,  2254,  2257,  2257,  2258,  2258,  2259,  2259,  2260,  2260,
-    2263,  2264,  2267,  2268,  2276,  2277,  2279,  2283,  2290,  2299,
-    2299,  2325,  2328,  2325,  2365,  2366,  2372,  2375,  2376,  2377,
-    2381,  2381,  2384,  2385,  2386,  2389,  2389,  2392,  2393,  2396,
-    2396,  2420,  2420,  2421,  2422,  2423,  2423,  2426,  2427,  2430,
-    2431,  2432,  2433,  2436,  2436,  2458,  2458,  2512,  2513,  2514,
-    2515,  2518,  2519,  2520,  2521,  2522,  2523,  2526,  2527,  2528,
-    2529,  2530,  2531,  2534,  2534,  2537,  2538,  2541,  2542,  2543,
-    2544,  2545,  2546,  2547,  2548,  2551,  2552,  2553,  2554,  2557,
-    2558,  2561,  2570,  2561,  2577,  2577,  2581,  2582,  2581,  2591,
-    2592,  2591,  2602,  2603,  2606,  2610,  2614,  2617,  2623,  2629,
-    2637,  2637,  2650,  2651,  2659,  2660,  2659,  2671,  2672,  2671,
-    2684,  2685,  2684,  2692,  2692,  2696,  2705,  2716,  2767,  2768,
-    2771,  2771,  2786,  2787,  2790,  2791,  2792,  2793,  2796,  2797,
-    2796,  2816,  2817,  2816,  2842,  2843,  2844,  2845,  2846,  2851,
-    2856,  2861,  2866,  2867,  2881,  2880,  2943,  2956,  2942,  2972,
-    2985,  2986,  2990,  2997,  3009,  2989,  3091,  3092,  3095,  3096,
-    3099,  3103,  3107,  3111,  3118,  3126,  3134,  3117,  3154,  3153,
-    3170,  3182,  3190,  3170,  3214,  3215,  3216,  3219,  3230,  3243,
-    3251,  3260,  3268,  3242,  3318,  3319,  3322,  3331,  3332,  3335,
-    3345,  3363,  3364,  3365,  3368,  3372,  3374,  3378,  3379,  3380,
-    3381,  3382,  3385,  3396,  3397,  3398,  3399,  3400,  3404,  3403,
-    3457,  3461,  3460,  3488,  3505,  3527,  3528,  3529,  3530,  3534,
-    3533,  3544,  3545,  3546,  3547,  3548,  3550,  3552,  3554,  3558,
-    3565,  3575,  3592,  3612,  3613
+       0,   365,   365,   365,   366,   369,   370,   371,   372,   373,
+     374,   375,   376,   377,   378,   379,   380,   381,   382,   383,
+     384,   385,   386,   387,   388,   389,   390,   391,   392,   393,
+     394,   395,   396,   397,   398,   401,   402,   405,   408,   416,
+     434,   440,   433,   477,   483,   476,   521,   522,   523,   524,
+     525,   526,   527,   528,   531,   532,   533,   533,   534,   537,
+     538,   541,   542,   543,   544,   545,   546,   547,   548,   549,
+     550,   553,   554,   555,   556,   557,   558,   559,   560,   561,
+     562,   565,   573,   586,   587,   615,   615,   616,   617,   618,
+     619,   620,   621,   626,   631,   632,   633,   634,   635,   636,
+     637,   638,   640,   640,   644,   644,   645,   645,   646,   660,
+     660,   684,   686,   684,   687,   689,   687,   691,   692,   694,
+     693,   715,   715,   716,   716,   727,   733,   742,   743,   746,
+     746,   749,   750,   751,   752,   753,   756,   757,   760,   761,
+     762,   763,   764,   765,   768,   769,   772,   773,   774,   775,
+     778,   779,   780,   781,   784,   789,   790,   791,   794,   795,
+     796,   806,   809,   814,   833,   838,   843,   844,   847,   852,
+     855,   860,   868,   871,   885,   898,   912,   925,   939,   952,
+     963,   973,   984,   994,  1005,  1017,  1023,  1026,  1029,  1030,
+    1031,  1034,  1039,  1040,  1043,  1048,  1077,  1082,  1095,  1101,
+    1207,  1212,  1215,  1222,  1223,  1228,  1229,  1230,  1231,  1232,
+    1233,  1234,  1235,  1236,  1237,  1238,  1239,  1240,  1241,  1244,
+    1245,  1246,  1249,  1250,  1251,  1252,  1253,  1254,  1255,  1256,
+    1257,  1258,  1259,  1260,  1261,  1262,  1263,  1264,  1265,  1266,
+    1267,  1268,  1277,  1278,  1279,  1280,  1281,  1282,  1287,  1288,
+    1289,  1290,  1291,  1292,  1293,  1294,  1295,  1296,  1297,  1298,
+    1299,  1300,  1301,  1302,  1303,  1304,  1307,  1311,  1312,  1330,
+    1331,  1332,  1333,  1334,  1335,  1338,  1339,  1342,  1343,  1408,
+    1409,  1412,  1413,  1414,  1417,  1422,  1423,  1424,  1427,  1428,
+    1429,  1430,  1431,  1432,  1433,  1434,  1435,  1436,  1437,  1438,
+    1439,  1440,  1441,  1442,  1443,  1444,  1445,  1446,  1447,  1448,
+    1449,  1452,  1464,  1470,  1473,  1482,  1490,  1491,  1492,  1493,
+    1494,  1495,  1496,  1497,  1498,  1499,  1499,  1500,  1501,  1502,
+    1503,  1504,  1505,  1506,  1507,  1508,  1508,  1509,  1510,  1510,
+    1511,  1512,  1512,  1513,  1514,  1514,  1515,  1516,  1516,  1517,
+    1518,  1519,  1520,  1521,  1522,  1523,  1524,  1525,  1528,  1529,
+    1530,  1531,  1531,  1532,  1532,  1535,  1536,  1539,  1540,  1541,
+    1542,  1543,  1544,  1545,  1546,  1552,  1553,  1560,  1561,  1562,
+    1563,  1564,  1565,  1566,  1567,  1568,  1569,  1570,  1571,  1572,
+    1573,  1574,  1575,  1576,  1577,  1578,  1579,  1580,  1581,  1582,
+    1585,  1586,  1589,  1590,  1591,  1598,  1599,  1600,  1601,  1602,
+    1603,  1604,  1605,  1606,  1607,  1608,  1609,  1610,  1611,  1612,
+    1613,  1614,  1615,  1616,  1617,  1618,  1619,  1620,  1623,  1624,
+    1625,  1626,  1627,  1628,  1629,  1630,  1631,  1632,  1633,  1634,
+    1635,  1636,  1637,  1638,  1639,  1640,  1641,  1642,  1643,  1644,
+    1645,  1648,  1649,  1650,  1651,  1652,  1653,  1654,  1655,  1656,
+    1657,  1658,  1659,  1660,  1661,  1662,  1663,  1664,  1665,  1666,
+    1667,  1668,  1669,  1670,  1673,  1674,  1675,  1676,  1677,  1678,
+    1679,  1680,  1681,  1682,  1683,  1684,  1685,  1686,  1687,  1688,
+    1689,  1690,  1691,  1692,  1693,  1694,  1695,  1698,  1699,  1700,
+    1701,  1702,  1703,  1704,  1705,  1706,  1707,  1708,  1709,  1710,
+    1711,  1712,  1713,  1714,  1715,  1716,  1717,  1718,  1719,  1720,
+    1723,  1724,  1725,  1726,  1727,  1728,  1729,  1730,  1731,  1732,
+    1733,  1734,  1735,  1736,  1737,  1738,  1739,  1740,  1741,  1742,
+    1743,  1744,  1745,  1748,  1749,  1750,  1751,  1752,  1753,  1754,
+    1755,  1756,  1757,  1758,  1759,  1760,  1761,  1762,  1763,  1764,
+    1765,  1766,  1767,  1768,  1769,  1770,  1773,  1774,  1775,  1776,
+    1777,  1778,  1779,  1780,  1781,  1782,  1783,  1784,  1785,  1786,
+    1787,  1788,  1789,  1790,  1791,  1792,  1793,  1794,  1795,  1798,
+    1799,  1800,  1801,  1802,  1803,  1806,  1807,  1808,  1809,  1810,
+    1811,  1812,  1813,  1814,  1815,  1816,  1819,  1820,  1823,  1824,
+    1825,  1826,  1827,  1828,  1829,  1830,  1831,  1832,  1833,  1836,
+    1842,  1843,  1844,  1847,  1851,  1964,  2029,  2034,  2039,  1850,
+    2085,  2086,  2089,  2090,  2095,  2093,  2161,  2185,  2185,  2193,
+    2194,  2210,  2211,  2218,  2219,  2220,  2221,  2231,  2234,  2237,
+    2240,  2243,  2244,  2245,  2246,  2249,  2252,  2255,  2258,  2261,
+    2262,  2265,  2268,  2268,  2269,  2269,  2270,  2270,  2271,  2271,
+    2274,  2275,  2278,  2279,  2287,  2288,  2290,  2294,  2301,  2310,
+    2310,  2336,  2339,  2336,  2376,  2377,  2383,  2386,  2387,  2388,
+    2392,  2392,  2395,  2396,  2397,  2400,  2400,  2403,  2404,  2407,
+    2407,  2431,  2431,  2432,  2433,  2434,  2434,  2437,  2438,  2441,
+    2442,  2443,  2444,  2447,  2447,  2469,  2469,  2523,  2524,  2525,
+    2526,  2529,  2530,  2531,  2532,  2533,  2534,  2537,  2538,  2539,
+    2540,  2541,  2542,  2545,  2545,  2548,  2549,  2552,  2553,  2554,
+    2555,  2556,  2557,  2558,  2559,  2562,  2563,  2564,  2565,  2568,
+    2569,  2572,  2581,  2572,  2588,  2588,  2592,  2593,  2592,  2602,
+    2603,  2602,  2613,  2614,  2617,  2621,  2625,  2628,  2634,  2640,
+    2648,  2648,  2661,  2662,  2670,  2671,  2670,  2682,  2683,  2682,
+    2695,  2696,  2695,  2703,  2703,  2707,  2716,  2727,  2778,  2779,
+    2782,  2782,  2797,  2798,  2801,  2802,  2803,  2804,  2807,  2808,
+    2807,  2827,  2828,  2827,  2853,  2854,  2855,  2856,  2857,  2862,
+    2867,  2872,  2877,  2878,  2892,  2891,  2954,  2967,  2953,  2983,
+    2996,  2997,  3001,  3008,  3020,  3000,  3102,  3103,  3106,  3107,
+    3110,  3114,  3118,  3122,  3129,  3137,  3145,  3128,  3165,  3164,
+    3181,  3193,  3201,  3181,  3225,  3226,  3227,  3230,  3241,  3254,
+    3262,  3271,  3279,  3253,  3329,  3330,  3333,  3342,  3343,  3346,
+    3356,  3374,  3375,  3376,  3379,  3383,  3385,  3389,  3390,  3391,
+    3392,  3393,  3396,  3407,  3408,  3409,  3410,  3411,  3415,  3414,
+    3468,  3472,  3471,  3499,  3516,  3538,  3539,  3540,  3541,  3545,
+    3544,  3555,  3556,  3557,  3558,  3559,  3561,  3563,  3565,  3569,
+    3576,  3586,  3603,  3623,  3624
 };
 #endif
 
@@ -4121,9 +4118,18 @@ static const yytype_uint16 yystos[] =
 
 /* Like YYERROR except do call yyerror.  This remains here temporarily
    to ease the transition to the new meaning of YYERROR, for GCC.
-   Once GCC version 2 has supplanted version 1, this can go.  */
+   Once GCC version 2 has supplanted version 1, this can go.  However,
+   YYFAIL appears to be in use.  Nevertheless, it is formally deprecated
+   in Bison 2.4.2's NEWS entry, where a plan to phase it out is
+   discussed.  */
 
 #define YYFAIL		goto yyerrlab
+#if defined YYFAIL
+  /* This is here to suppress warnings from the GCC cpp's
+     -Wunused-macros.  Normally we don't worry about that warning, but
+     some users do, and we want to make it easy for users to remove
+     YYFAIL uses, which will produce warnings from Bison 2.5.  */
+#endif
 
 #define YYRECOVERING()  (!!yyerrstatus)
 
@@ -4180,7 +4186,7 @@ while (YYID (0))
    we won't break user code: when these are the locations we know.  */
 
 #ifndef YY_LOCATION_PRINT
-# if YYLTYPE_IS_TRIVIAL
+# if defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL
 #  define YY_LOCATION_PRINT(File, Loc)			\
      fprintf (File, "%d.%d-%d.%d",			\
 	      (Loc).first_line, (Loc).first_column,	\
@@ -4619,12 +4625,12 @@ yydestruct (yymsg, yytype, yyvaluep)
     {
       case 22: /* "LITERAL" */
 
-/* Line 1000 of yacc.c  */
-#line 350 "source\\compiler\\harbour.sly"
+/* Line 1009 of yacc.c  */
+#line 361 "source\\compiler\\harbour.sly"
 	{ if( (yyvaluep->valChar).dealloc ) hb_xfree( (yyvaluep->valChar).string ); };
 
-/* Line 1000 of yacc.c  */
-#line 4615 "obj\\VC10\\harboury.c"
+/* Line 1009 of yacc.c  */
+#line 4634 "obj\\vc\\harboury.c"
 	break;
 
       default:
@@ -4928,43 +4934,43 @@ yyreduce:
     {
         case 2:
 
-/* Line 1455 of yacc.c  */
-#line 354 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 365 "source\\compiler\\harbour.sly"
     { hb_compLinePush(); ;}
     break;
 
   case 3:
 
-/* Line 1455 of yacc.c  */
-#line 354 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 365 "source\\compiler\\harbour.sly"
     { ;}
     break;
 
   case 35:
 
-/* Line 1455 of yacc.c  */
-#line 390 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 401 "source\\compiler\\harbour.sly"
     { hb_comp_iLine =  (yyvsp[(2) - (4)].iNumber); ;}
     break;
 
   case 36:
 
-/* Line 1455 of yacc.c  */
-#line 391 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 402 "source\\compiler\\harbour.sly"
     { hb_comp_iLine =  (yyvsp[(2) - (6)].iNumber); ;}
     break;
 
   case 37:
 
-/* Line 1455 of yacc.c  */
-#line 394 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 405 "source\\compiler\\harbour.sly"
     {;}
     break;
 
   case 38:
 
-/* Line 1455 of yacc.c  */
-#line 397 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 408 "source\\compiler\\harbour.sly"
     {
                if( (yyvsp[(1) - (1)].valChar).dealloc )
                {
@@ -4977,8 +4983,8 @@ yyreduce:
 
   case 39:
 
-/* Line 1455 of yacc.c  */
-#line 405 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 416 "source\\compiler\\harbour.sly"
     {
                char szFileName[ HB_PATH_MAX ];
                hb_strncat( hb_strncpy( szFileName, (yyvsp[(1) - (3)].valChar).string, HB_PATH_MAX ), (yyvsp[(3) - (3)].valChar).string, HB_PATH_MAX );
@@ -4998,8 +5004,8 @@ yyreduce:
 
   case 40:
 
-/* Line 1455 of yacc.c  */
-#line 423 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 434 "source\\compiler\\harbour.sly"
     {
                 hb_comp_cVarType = ' ';
                 hb_comp_bVarParams = FALSE;
@@ -5008,8 +5014,8 @@ yyreduce:
 
   case 41:
 
-/* Line 1455 of yacc.c  */
-#line 429 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 440 "source\\compiler\\harbour.sly"
     {
                 hb_compFunctionAdd( (yyvsp[(3) - (6)].string), ( HB_SYMBOLSCOPE ) (yyvsp[(1) - (6)].iNumber), 0 );
 
@@ -5039,8 +5045,8 @@ yyreduce:
 
   case 42:
 
-/* Line 1455 of yacc.c  */
-#line 455 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 466 "source\\compiler\\harbour.sly"
     {
                 hb_comp_wSeqCounter      = 0;
                 hb_comp_wForCounter      = 0;
@@ -5055,8 +5061,8 @@ yyreduce:
 
   case 43:
 
-/* Line 1455 of yacc.c  */
-#line 466 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 477 "source\\compiler\\harbour.sly"
     {
                 hb_comp_cVarType = ' ';
                 hb_comp_bVarParams = FALSE;
@@ -5065,8 +5071,8 @@ yyreduce:
 
   case 44:
 
-/* Line 1455 of yacc.c  */
-#line 472 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 483 "source\\compiler\\harbour.sly"
     {
                 hb_compFunctionAdd( (yyvsp[(3) - (6)].string), ( HB_SYMBOLSCOPE ) (yyvsp[(1) - (6)].iNumber), FUN_PROCEDURE );
 
@@ -5096,8 +5102,8 @@ yyreduce:
 
   case 45:
 
-/* Line 1455 of yacc.c  */
-#line 498 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 509 "source\\compiler\\harbour.sly"
     {
                 hb_comp_wSeqCounter      = 0;
                 hb_comp_wForCounter      = 0;
@@ -5112,218 +5118,218 @@ yyreduce:
 
   case 46:
 
-/* Line 1455 of yacc.c  */
-#line 510 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 521 "source\\compiler\\harbour.sly"
     { (yyval.iNumber) = HB_FS_PUBLIC; ;}
     break;
 
   case 47:
 
-/* Line 1455 of yacc.c  */
-#line 511 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 522 "source\\compiler\\harbour.sly"
     { (yyval.iNumber) = HB_FS_STATIC; ;}
     break;
 
   case 48:
 
-/* Line 1455 of yacc.c  */
-#line 512 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 523 "source\\compiler\\harbour.sly"
     { (yyval.iNumber) = ( HB_FS_UTILITY | HB_FS_PUBLIC ); ;}
     break;
 
   case 49:
 
-/* Line 1455 of yacc.c  */
-#line 513 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 524 "source\\compiler\\harbour.sly"
     { (yyval.iNumber) = ( HB_FS_UTILITY | HB_FS_STATIC ); ;}
     break;
 
   case 50:
 
-/* Line 1455 of yacc.c  */
-#line 514 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 525 "source\\compiler\\harbour.sly"
     { (yyval.iNumber) = HB_FS_INIT; ;}
     break;
 
   case 51:
 
-/* Line 1455 of yacc.c  */
-#line 515 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 526 "source\\compiler\\harbour.sly"
     { (yyval.iNumber) = HB_FS_EXIT; ;}
     break;
 
   case 52:
 
-/* Line 1455 of yacc.c  */
-#line 516 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 527 "source\\compiler\\harbour.sly"
     { (yyval.iNumber) = HB_FS_CRITICAL | HB_FS_PUBLIC; ;}
     break;
 
   case 53:
 
-/* Line 1455 of yacc.c  */
-#line 517 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 528 "source\\compiler\\harbour.sly"
     { (yyval.iNumber) = ( HB_FS_CRITICAL | HB_FS_STATIC ); ;}
     break;
 
   case 56:
 
-/* Line 1455 of yacc.c  */
-#line 522 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 533 "source\\compiler\\harbour.sly"
     { hb_comp_iVarScope = VS_PARAMETER; ;}
     break;
 
   case 58:
 
-/* Line 1455 of yacc.c  */
-#line 523 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 534 "source\\compiler\\harbour.sly"
     { hb_comp_bVarParams = TRUE; ;}
     break;
 
   case 59:
 
-/* Line 1455 of yacc.c  */
-#line 526 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 537 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = ' '; ;}
     break;
 
   case 61:
 
-/* Line 1455 of yacc.c  */
-#line 530 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 541 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = 'N'; ;}
     break;
 
   case 62:
 
-/* Line 1455 of yacc.c  */
-#line 531 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 542 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = 'C'; ;}
     break;
 
   case 63:
 
-/* Line 1455 of yacc.c  */
-#line 532 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 543 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = 'D'; ;}
     break;
 
   case 64:
 
-/* Line 1455 of yacc.c  */
-#line 533 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 544 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = 'L'; ;}
     break;
 
   case 65:
 
-/* Line 1455 of yacc.c  */
-#line 534 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 545 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = 'B'; ;}
     break;
 
   case 66:
 
-/* Line 1455 of yacc.c  */
-#line 535 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 546 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = 'O'; ;}
     break;
 
   case 67:
 
-/* Line 1455 of yacc.c  */
-#line 536 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 547 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = 'S'; hb_comp_szFromClass = (yyvsp[(2) - (2)].string); ;}
     break;
 
   case 68:
 
-/* Line 1455 of yacc.c  */
-#line 537 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 548 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = 'E'; hb_comp_szFromEnum = (yyvsp[(2) - (2)].string); ;}
     break;
 
   case 69:
 
-/* Line 1455 of yacc.c  */
-#line 538 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 549 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = ' '; ;}
     break;
 
   case 71:
 
-/* Line 1455 of yacc.c  */
-#line 542 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 553 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = 'A'; ;}
     break;
 
   case 72:
 
-/* Line 1455 of yacc.c  */
-#line 543 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 554 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = 'n'; ;}
     break;
 
   case 73:
 
-/* Line 1455 of yacc.c  */
-#line 544 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 555 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = 'c'; ;}
     break;
 
   case 74:
 
-/* Line 1455 of yacc.c  */
-#line 545 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 556 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = 'd'; ;}
     break;
 
   case 75:
 
-/* Line 1455 of yacc.c  */
-#line 546 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 557 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = 'l'; ;}
     break;
 
   case 76:
 
-/* Line 1455 of yacc.c  */
-#line 547 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 558 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = 'a'; ;}
     break;
 
   case 77:
 
-/* Line 1455 of yacc.c  */
-#line 548 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 559 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = 'b'; ;}
     break;
 
   case 78:
 
-/* Line 1455 of yacc.c  */
-#line 549 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 560 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = 'o'; ;}
     break;
 
   case 79:
 
-/* Line 1455 of yacc.c  */
-#line 550 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 561 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = 's'; hb_comp_szFromClass = (yyvsp[(2) - (2)].string); ;}
     break;
 
   case 80:
 
-/* Line 1455 of yacc.c  */
-#line 551 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 562 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = 'e'; hb_comp_szFromEnum = (yyvsp[(2) - (2)].string); ;}
     break;
 
   case 81:
 
-/* Line 1455 of yacc.c  */
-#line 554 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 565 "source\\compiler\\harbour.sly"
     {
                                                hb_comp_LocalParams = (PLOCALPARAM) hb_xgrab( sizeof( LOCALPARAM ) );
                                                hb_comp_LocalParams->szName = (yyvsp[(1) - (2)].string);
@@ -5336,8 +5342,8 @@ yyreduce:
 
   case 82:
 
-/* Line 1455 of yacc.c  */
-#line 562 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 573 "source\\compiler\\harbour.sly"
     {
                                                PLOCALPARAM pLocalParam = (PLOCALPARAM) hb_xgrab( sizeof( LOCALPARAM ) );
 
@@ -5353,15 +5359,15 @@ yyreduce:
 
   case 83:
 
-/* Line 1455 of yacc.c  */
-#line 575 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 586 "source\\compiler\\harbour.sly"
     { (yyval.string) = NULL; ;}
     break;
 
   case 84:
 
-/* Line 1455 of yacc.c  */
-#line 577 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 588 "source\\compiler\\harbour.sly"
     {
                                                        PNAMESPACE pNamespace;
 
@@ -5386,57 +5392,57 @@ yyreduce:
 
   case 85:
 
-/* Line 1455 of yacc.c  */
-#line 604 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 615 "source\\compiler\\harbour.sly"
     { hb_comp_bDontGenLineNum = TRUE; ;}
     break;
 
   case 86:
 
-/* Line 1455 of yacc.c  */
-#line 604 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 615 "source\\compiler\\harbour.sly"
     { ;}
     break;
 
   case 87:
 
-/* Line 1455 of yacc.c  */
-#line 605 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 616 "source\\compiler\\harbour.sly"
     {;}
     break;
 
   case 88:
 
-/* Line 1455 of yacc.c  */
-#line 606 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 617 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( hb_compExprGenStatement( (yyvsp[(1) - (2)].asExpr) ) ); ;}
     break;
 
   case 89:
 
-/* Line 1455 of yacc.c  */
-#line 607 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 618 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( hb_compExprGenStatement( (yyvsp[(1) - (2)].asExpr) ) ); ;}
     break;
 
   case 90:
 
-/* Line 1455 of yacc.c  */
-#line 608 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 619 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( hb_compExprGenStatement( (yyvsp[(1) - (2)].asExpr) ) ); ;}
     break;
 
   case 91:
 
-/* Line 1455 of yacc.c  */
-#line 609 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 620 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( hb_compExprGenStatement( (yyvsp[(1) - (2)].asExpr) ) ); ;}
     break;
 
   case 92:
 
-/* Line 1455 of yacc.c  */
-#line 610 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 621 "source\\compiler\\harbour.sly"
     { if( HB_COMP_ISSUPPORTED( HB_COMPFLAG_XBASE ) )
                                          hb_compExprDelete( hb_compExprGenStatement( (yyvsp[(1) - (2)].asExpr) ) );
                                       else
@@ -5446,8 +5452,8 @@ yyreduce:
 
   case 93:
 
-/* Line 1455 of yacc.c  */
-#line 615 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 626 "source\\compiler\\harbour.sly"
     { if( HB_COMP_ISSUPPORTED( HB_COMPFLAG_XBASE ) )
                                          hb_compExprDelete( hb_compExprGenStatement( (yyvsp[(1) - (2)].asExpr) ) );
                                       else
@@ -5457,72 +5463,72 @@ yyreduce:
 
   case 94:
 
-/* Line 1455 of yacc.c  */
-#line 620 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 631 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( hb_compExprGenStatement( (yyvsp[(1) - (2)].asExpr) ) ); ;}
     break;
 
   case 95:
 
-/* Line 1455 of yacc.c  */
-#line 621 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 632 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( hb_compExprGenStatement( (yyvsp[(1) - (2)].asExpr) ) ); ;}
     break;
 
   case 96:
 
-/* Line 1455 of yacc.c  */
-#line 622 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 633 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( hb_compExprGenStatement( (yyvsp[(1) - (2)].asExpr) ) ); ;}
     break;
 
   case 97:
 
-/* Line 1455 of yacc.c  */
-#line 623 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 634 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( hb_compExprGenStatement( (yyvsp[(1) - (2)].asExpr) ) ); ;}
     break;
 
   case 98:
 
-/* Line 1455 of yacc.c  */
-#line 624 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 635 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( hb_compExprGenStatement( (yyvsp[(1) - (2)].asExpr) ) ); ;}
     break;
 
   case 99:
 
-/* Line 1455 of yacc.c  */
-#line 625 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 636 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( hb_compExprGenStatement( (yyvsp[(1) - (2)].asExpr) ) ); ;}
     break;
 
   case 100:
 
-/* Line 1455 of yacc.c  */
-#line 626 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 637 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( hb_compExprGenStatement( (yyvsp[(1) - (2)].asExpr) ) ); ;}
     break;
 
   case 101:
 
-/* Line 1455 of yacc.c  */
-#line 627 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 638 "source\\compiler\\harbour.sly"
     { hb_compGenBreak(); hb_compGenPCode2( HB_P_DOSHORT, 0, ( BOOL ) 1 );
                                       hb_comp_functions.pLast->bFlags |= FUN_BREAK_CODE; ;}
     break;
 
   case 102:
 
-/* Line 1455 of yacc.c  */
-#line 629 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 640 "source\\compiler\\harbour.sly"
     { hb_compLinePushIfInside(); ;}
     break;
 
   case 103:
 
-/* Line 1455 of yacc.c  */
-#line 629 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 640 "source\\compiler\\harbour.sly"
     { hb_compGenBreak(); hb_compExprDelete( hb_compExprGenPush( (yyvsp[(3) - (4)].asExpr) ) );
                                            hb_compGenPCode2( HB_P_DOSHORT, 1, ( BOOL ) 1 );
                                            hb_comp_functions.pLast->bFlags |= FUN_BREAK_CODE;
@@ -5531,36 +5537,36 @@ yyreduce:
 
   case 104:
 
-/* Line 1455 of yacc.c  */
-#line 633 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 644 "source\\compiler\\harbour.sly"
     { hb_comp_bDontGenLineNum = !hb_comp_bDebugInfo; ;}
     break;
 
   case 105:
 
-/* Line 1455 of yacc.c  */
-#line 633 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 644 "source\\compiler\\harbour.sly"
     { hb_compLoopExit(); hb_comp_functions.pLast->bFlags |= FUN_BREAK_CODE; ;}
     break;
 
   case 106:
 
-/* Line 1455 of yacc.c  */
-#line 634 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 645 "source\\compiler\\harbour.sly"
     { hb_comp_bDontGenLineNum = !hb_comp_bDebugInfo; ;}
     break;
 
   case 107:
 
-/* Line 1455 of yacc.c  */
-#line 634 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 645 "source\\compiler\\harbour.sly"
     { hb_compLoopLoop(); hb_comp_functions.pLast->bFlags |= FUN_BREAK_CODE; ;}
     break;
 
   case 108:
 
-/* Line 1455 of yacc.c  */
-#line 635 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 646 "source\\compiler\\harbour.sly"
     {
                         if( hb_comp_wSeqCounter )
                         {
@@ -5579,15 +5585,15 @@ yyreduce:
 
   case 109:
 
-/* Line 1455 of yacc.c  */
-#line 649 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 660 "source\\compiler\\harbour.sly"
     {  hb_compLinePushIfInside(); hb_comp_cVarType = ' '; ;}
     break;
 
   case 110:
 
-/* Line 1455 of yacc.c  */
-#line 651 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 662 "source\\compiler\\harbour.sly"
     {
                         hb_comp_cCastType = hb_comp_cVarType;
                         hb_comp_cVarType = ' ';
@@ -5614,36 +5620,36 @@ yyreduce:
 
   case 111:
 
-/* Line 1455 of yacc.c  */
-#line 673 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 684 "source\\compiler\\harbour.sly"
     { hb_compLinePushIfInside(); hb_comp_iVarScope = VS_PUBLIC; ;}
     break;
 
   case 112:
 
-/* Line 1455 of yacc.c  */
-#line 675 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 686 "source\\compiler\\harbour.sly"
     { hb_compRTVariableGen( hb_compExpr_IDs.__MVPUBLIC ); hb_comp_cVarType = ' ';  hb_comp_iVarScope = VS_NONE; ;}
     break;
 
   case 114:
 
-/* Line 1455 of yacc.c  */
-#line 676 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 687 "source\\compiler\\harbour.sly"
     { hb_compLinePushIfInside(); hb_comp_iVarScope = VS_PRIVATE; ;}
     break;
 
   case 115:
 
-/* Line 1455 of yacc.c  */
-#line 678 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 689 "source\\compiler\\harbour.sly"
     { hb_compRTVariableGen( hb_compExpr_IDs.__MVPRIVATE ); hb_comp_cVarType = ' '; hb_comp_iVarScope = VS_NONE; ;}
     break;
 
   case 119:
 
-/* Line 1455 of yacc.c  */
-#line 683 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 694 "source\\compiler\\harbour.sly"
     {
                                   if( hb_comp_szAnnounce == NULL )
                                   {
@@ -5668,22 +5674,22 @@ yyreduce:
 
   case 121:
 
-/* Line 1455 of yacc.c  */
-#line 704 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 715 "source\\compiler\\harbour.sly"
     { if( hb_comp_bError == FALSE ) yyerror( NULL ); ;}
     break;
 
   case 122:
 
-/* Line 1455 of yacc.c  */
-#line 704 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 715 "source\\compiler\\harbour.sly"
     { yyclearin; yyerrok; ;}
     break;
 
   case 123:
 
-/* Line 1455 of yacc.c  */
-#line 705 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 716 "source\\compiler\\harbour.sly"
     { if( hb_comp_functions.pLast->bFlags & FUN_USES_LOCAL_PARAMS )
                           {
                              hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_PARAMETERS_NOT_ALLOWED, NULL, NULL );
@@ -5697,15 +5703,15 @@ yyreduce:
 
   case 124:
 
-/* Line 1455 of yacc.c  */
-#line 714 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 725 "source\\compiler\\harbour.sly"
     { hb_comp_iVarScope = VS_NONE; ;}
     break;
 
   case 125:
 
-/* Line 1455 of yacc.c  */
-#line 717 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 728 "source\\compiler\\harbour.sly"
     {
                hb_compExprDelete( hb_compExprGenPush( (yyvsp[(2) - (4)].asExpr) ) );
                hb_compExprDelete( hb_compExprGenPush( (yyvsp[(3) - (4)].asExpr) ) );
@@ -5715,8 +5721,8 @@ yyreduce:
 
   case 126:
 
-/* Line 1455 of yacc.c  */
-#line 723 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 734 "source\\compiler\\harbour.sly"
     {
                hb_compExprDelete( hb_compExprGenPush( (yyvsp[(4) - (6)].asExpr) ) );
                hb_compExprDelete( hb_compExprGenPush( (yyvsp[(2) - (6)].asExpr) ) );
@@ -5727,211 +5733,211 @@ yyreduce:
 
   case 127:
 
-/* Line 1455 of yacc.c  */
-#line 731 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 742 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewLong(0); ;}
     break;
 
   case 128:
 
-/* Line 1455 of yacc.c  */
-#line 732 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 743 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 129:
 
-/* Line 1455 of yacc.c  */
-#line 735 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 746 "source\\compiler\\harbour.sly"
     { hb_compLinePushIfInside(); ;}
     break;
 
   case 131:
 
-/* Line 1455 of yacc.c  */
-#line 738 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 749 "source\\compiler\\harbour.sly"
     { (yyval.lNumber) = 0; ;}
     break;
 
   case 132:
 
-/* Line 1455 of yacc.c  */
-#line 739 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 750 "source\\compiler\\harbour.sly"
     { (yyval.lNumber) = 0; ;}
     break;
 
   case 133:
 
-/* Line 1455 of yacc.c  */
-#line 740 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 751 "source\\compiler\\harbour.sly"
     { (yyval.lNumber) = 1; ;}
     break;
 
   case 134:
 
-/* Line 1455 of yacc.c  */
-#line 741 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 752 "source\\compiler\\harbour.sly"
     { (yyval.lNumber) = 1; ;}
     break;
 
   case 135:
 
-/* Line 1455 of yacc.c  */
-#line 742 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 753 "source\\compiler\\harbour.sly"
     { char LineAsString[32]; hb_snprintf( LineAsString, sizeof( LineAsString ), "at line %i", s_iLastControlLine - 1 ); hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL ); ;}
     break;
 
   case 136:
 
-/* Line 1455 of yacc.c  */
-#line 745 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 756 "source\\compiler\\harbour.sly"
     {;}
     break;
 
   case 137:
 
-/* Line 1455 of yacc.c  */
-#line 746 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 757 "source\\compiler\\harbour.sly"
     {;}
     break;
 
   case 144:
 
-/* Line 1455 of yacc.c  */
-#line 757 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 768 "source\\compiler\\harbour.sly"
     { (yyval.lNumber) = (yyvsp[(1) - (1)].lNumber); ;}
     break;
 
   case 145:
 
-/* Line 1455 of yacc.c  */
-#line 758 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 769 "source\\compiler\\harbour.sly"
     { (yyval.lNumber) += (yyvsp[(2) - (2)].lNumber); ;}
     break;
 
   case 146:
 
-/* Line 1455 of yacc.c  */
-#line 761 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 772 "source\\compiler\\harbour.sly"
     { hb_compExternAdd( (yyvsp[(1) - (1)].string), NULL, (HB_SYMBOLSCOPE) 0 ); ;}
     break;
 
   case 147:
 
-/* Line 1455 of yacc.c  */
-#line 762 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 773 "source\\compiler\\harbour.sly"
     { hb_compExternAdd( (yyvsp[(2) - (2)].string), (yyvsp[(1) - (2)].string), (HB_SYMBOLSCOPE) 0 ); ;}
     break;
 
   case 148:
 
-/* Line 1455 of yacc.c  */
-#line 763 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 774 "source\\compiler\\harbour.sly"
     { hb_compExternAdd( (yyvsp[(3) - (3)].string), NULL, (HB_SYMBOLSCOPE) 0 ); ;}
     break;
 
   case 149:
 
-/* Line 1455 of yacc.c  */
-#line 764 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 775 "source\\compiler\\harbour.sly"
     { hb_compExternAdd( (yyvsp[(4) - (4)].string), (yyvsp[(3) - (4)].string), (HB_SYMBOLSCOPE) 0 ); ;}
     break;
 
   case 150:
 
-/* Line 1455 of yacc.c  */
-#line 767 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 778 "source\\compiler\\harbour.sly"
     { hb_compExternAdd( (yyvsp[(1) - (1)].string), NULL, HB_FS_DEFERRED ); ;}
     break;
 
   case 151:
 
-/* Line 1455 of yacc.c  */
-#line 768 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 779 "source\\compiler\\harbour.sly"
     { hb_compExternAdd( (yyvsp[(2) - (2)].string), (yyvsp[(1) - (2)].string), HB_FS_DEFERRED ); ;}
     break;
 
   case 152:
 
-/* Line 1455 of yacc.c  */
-#line 769 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 780 "source\\compiler\\harbour.sly"
     { hb_compExternAdd( (yyvsp[(3) - (3)].string), NULL, HB_FS_DEFERRED ); ;}
     break;
 
   case 153:
 
-/* Line 1455 of yacc.c  */
-#line 770 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 781 "source\\compiler\\harbour.sly"
     { hb_compExternAdd( (yyvsp[(4) - (4)].string), (yyvsp[(3) - (4)].string), HB_FS_DEFERRED ); ;}
     break;
 
   case 154:
 
-/* Line 1455 of yacc.c  */
-#line 773 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 784 "source\\compiler\\harbour.sly"
     { (yyval.string) = (yyvsp[(1) - (1)].string); ;}
     break;
 
   case 155:
 
-/* Line 1455 of yacc.c  */
-#line 778 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 789 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewDouble( (yyvsp[(1) - (1)].valDouble).dNumber, (yyvsp[(1) - (1)].valDouble).bWidth, (yyvsp[(1) - (1)].valDouble).bDec ); ;}
     break;
 
   case 156:
 
-/* Line 1455 of yacc.c  */
-#line 779 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 790 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewLong( (yyvsp[(1) - (1)].valInteger).iNumber ); ;}
     break;
 
   case 157:
 
-/* Line 1455 of yacc.c  */
-#line 780 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 791 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewLong( (yyvsp[(1) - (1)].valLong).lNumber ); ;}
     break;
 
   case 158:
 
-/* Line 1455 of yacc.c  */
-#line 783 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 794 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewLong( (yyvsp[(1) - (2)].valInteger).iNumber ); ;}
     break;
 
   case 159:
 
-/* Line 1455 of yacc.c  */
-#line 784 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 795 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewLong( (yyvsp[(1) - (2)].valLong).lNumber ); ;}
     break;
 
   case 160:
 
-/* Line 1455 of yacc.c  */
-#line 785 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 796 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compErrorAlias( hb_compExprNewDouble( (yyvsp[(1) - (2)].valDouble).dNumber, (yyvsp[(1) - (2)].valDouble).bWidth, (yyvsp[(1) - (2)].valDouble).bDec ) ); ;}
     break;
 
   case 161:
 
-/* Line 1455 of yacc.c  */
-#line 795 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 806 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewNil(); ;}
     break;
 
   case 162:
 
-/* Line 1455 of yacc.c  */
-#line 798 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 809 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 163:
 
-/* Line 1455 of yacc.c  */
-#line 803 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 814 "source\\compiler\\harbour.sly"
     {
                                          (yyval.asExpr) = hb_compExprNewString( (yyvsp[(1) - (1)].valChar).string, (yyvsp[(1) - (1)].valChar).length, (yyvsp[(1) - (1)].valChar).dealloc );
                                          (yyvsp[(1) - (1)].valChar).dealloc = FALSE;
@@ -5953,57 +5959,57 @@ yyreduce:
 
   case 164:
 
-/* Line 1455 of yacc.c  */
-#line 822 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 833 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 165:
 
-/* Line 1455 of yacc.c  */
-#line 827 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 838 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 166:
 
-/* Line 1455 of yacc.c  */
-#line 832 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 843 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewLogical( TRUE ); ;}
     break;
 
   case 167:
 
-/* Line 1455 of yacc.c  */
-#line 833 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 844 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewLogical( FALSE ); ;}
     break;
 
   case 168:
 
-/* Line 1455 of yacc.c  */
-#line 836 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 847 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 169:
 
-/* Line 1455 of yacc.c  */
-#line 841 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 852 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSelf(); ;}
     break;
 
   case 170:
 
-/* Line 1455 of yacc.c  */
-#line 844 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 855 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 171:
 
-/* Line 1455 of yacc.c  */
-#line 850 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 861 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewDate( (yyvsp[(3) - (8)].asExpr), (yyvsp[(5) - (8)].asExpr), (yyvsp[(7) - (8)].asExpr) );
                                      hb_compExprDelete( (yyvsp[(3) - (8)].asExpr) );
                                      hb_compExprDelete( (yyvsp[(5) - (8)].asExpr) );
@@ -6013,15 +6019,15 @@ yyreduce:
 
   case 172:
 
-/* Line 1455 of yacc.c  */
-#line 857 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 868 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 173:
 
-/* Line 1455 of yacc.c  */
-#line 861 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 872 "source\\compiler\\harbour.sly"
     { int iOk = 0;
                                 (yyval.asExpr) = hb_compExprNewDateTime( (yyvsp[(3) - (13)].asExpr), (yyvsp[(5) - (13)].asExpr), (yyvsp[(7) - (13)].asExpr), (yyvsp[(8) - (13)].asExpr), (yyvsp[(10) - (13)].asExpr), (yyvsp[(12) - (13)].asExpr), 0, &iOk );
                                      hb_compExprDelete( (yyvsp[(3) - (13)].asExpr) );
@@ -6039,8 +6045,8 @@ yyreduce:
 
   case 174:
 
-/* Line 1455 of yacc.c  */
-#line 875 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 886 "source\\compiler\\harbour.sly"
     { int iOk = 0;
                                 (yyval.asExpr) = hb_compExprNewDateTime( (yyvsp[(3) - (11)].asExpr), (yyvsp[(5) - (11)].asExpr), (yyvsp[(7) - (11)].asExpr), (yyvsp[(8) - (11)].asExpr), (yyvsp[(10) - (11)].asExpr), NULL, 0, &iOk );
                                      hb_compExprDelete( (yyvsp[(3) - (11)].asExpr) );
@@ -6057,8 +6063,8 @@ yyreduce:
 
   case 175:
 
-/* Line 1455 of yacc.c  */
-#line 888 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 899 "source\\compiler\\harbour.sly"
     { int iOk = 0;
                                 (yyval.asExpr) = hb_compExprNewDateTime( (yyvsp[(3) - (14)].asExpr), (yyvsp[(5) - (14)].asExpr), (yyvsp[(7) - (14)].asExpr), (yyvsp[(8) - (14)].asExpr), (yyvsp[(10) - (14)].asExpr), (yyvsp[(12) - (14)].asExpr), 1, &iOk );
                                      hb_compExprDelete( (yyvsp[(3) - (14)].asExpr) );
@@ -6076,8 +6082,8 @@ yyreduce:
 
   case 176:
 
-/* Line 1455 of yacc.c  */
-#line 902 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 913 "source\\compiler\\harbour.sly"
     { int iOk = 0;
                                 (yyval.asExpr) = hb_compExprNewDateTime( (yyvsp[(3) - (12)].asExpr), (yyvsp[(5) - (12)].asExpr), (yyvsp[(7) - (12)].asExpr), (yyvsp[(8) - (12)].asExpr), (yyvsp[(10) - (12)].asExpr), NULL, 1, &iOk );
                                      hb_compExprDelete( (yyvsp[(3) - (12)].asExpr) );
@@ -6094,8 +6100,8 @@ yyreduce:
 
   case 177:
 
-/* Line 1455 of yacc.c  */
-#line 915 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 926 "source\\compiler\\harbour.sly"
     { int iOk = 0;
                                 (yyval.asExpr) = hb_compExprNewDateTime( (yyvsp[(3) - (14)].asExpr), (yyvsp[(5) - (14)].asExpr), (yyvsp[(7) - (14)].asExpr), (yyvsp[(8) - (14)].asExpr), (yyvsp[(10) - (14)].asExpr), (yyvsp[(12) - (14)].asExpr), 2, &iOk );
                                      hb_compExprDelete( (yyvsp[(3) - (14)].asExpr) );
@@ -6113,8 +6119,8 @@ yyreduce:
 
   case 178:
 
-/* Line 1455 of yacc.c  */
-#line 929 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 940 "source\\compiler\\harbour.sly"
     { int iOk = 0;
                                 (yyval.asExpr) = hb_compExprNewDateTime( (yyvsp[(3) - (12)].asExpr), (yyvsp[(5) - (12)].asExpr), (yyvsp[(7) - (12)].asExpr), (yyvsp[(8) - (12)].asExpr), (yyvsp[(10) - (12)].asExpr), NULL, 2, &iOk );
                                      hb_compExprDelete( (yyvsp[(3) - (12)].asExpr) );
@@ -6131,8 +6137,8 @@ yyreduce:
 
   case 179:
 
-/* Line 1455 of yacc.c  */
-#line 942 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 953 "source\\compiler\\harbour.sly"
     { int iOk = 0;
                                 (yyval.asExpr) = hb_compExprNewDateTime( NULL, NULL, NULL, (yyvsp[(3) - (8)].asExpr), (yyvsp[(5) - (8)].asExpr), (yyvsp[(7) - (8)].asExpr), 0, &iOk );
                                      hb_compExprDelete( (yyvsp[(3) - (8)].asExpr) );
@@ -6147,8 +6153,8 @@ yyreduce:
 
   case 180:
 
-/* Line 1455 of yacc.c  */
-#line 953 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 964 "source\\compiler\\harbour.sly"
     { int iOk = 0;
                                 (yyval.asExpr) = hb_compExprNewDateTime( NULL, NULL, NULL, (yyvsp[(3) - (6)].asExpr), (yyvsp[(5) - (6)].asExpr), NULL, 0, &iOk );
                                      hb_compExprDelete( (yyvsp[(3) - (6)].asExpr) );
@@ -6162,8 +6168,8 @@ yyreduce:
 
   case 181:
 
-/* Line 1455 of yacc.c  */
-#line 963 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 974 "source\\compiler\\harbour.sly"
     { int iOk = 0;
                                 (yyval.asExpr) = hb_compExprNewDateTime( NULL, NULL, NULL, (yyvsp[(3) - (9)].asExpr), (yyvsp[(5) - (9)].asExpr), (yyvsp[(7) - (9)].asExpr), 1, &iOk );
                                      hb_compExprDelete( (yyvsp[(3) - (9)].asExpr) );
@@ -6178,8 +6184,8 @@ yyreduce:
 
   case 182:
 
-/* Line 1455 of yacc.c  */
-#line 974 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 985 "source\\compiler\\harbour.sly"
     { int iOk = 0;
                                 (yyval.asExpr) = hb_compExprNewDateTime( NULL, NULL, NULL, (yyvsp[(3) - (7)].asExpr), (yyvsp[(5) - (7)].asExpr), NULL, 1, &iOk );
                                      hb_compExprDelete( (yyvsp[(3) - (7)].asExpr) );
@@ -6193,8 +6199,8 @@ yyreduce:
 
   case 183:
 
-/* Line 1455 of yacc.c  */
-#line 984 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 995 "source\\compiler\\harbour.sly"
     { int iOk = 0;
                                 (yyval.asExpr) = hb_compExprNewDateTime( NULL, NULL, NULL, (yyvsp[(3) - (9)].asExpr), (yyvsp[(5) - (9)].asExpr), (yyvsp[(7) - (9)].asExpr), 2, &iOk );
                                      hb_compExprDelete( (yyvsp[(3) - (9)].asExpr) );
@@ -6209,8 +6215,8 @@ yyreduce:
 
   case 184:
 
-/* Line 1455 of yacc.c  */
-#line 995 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1006 "source\\compiler\\harbour.sly"
     { int iOk = 0;
                                 (yyval.asExpr) = hb_compExprNewDateTime( NULL, NULL, NULL, (yyvsp[(3) - (7)].asExpr), (yyvsp[(5) - (7)].asExpr), NULL, 2, &iOk );
                                      hb_compExprDelete( (yyvsp[(3) - (7)].asExpr) );
@@ -6224,78 +6230,78 @@ yyreduce:
 
   case 185:
 
-/* Line 1455 of yacc.c  */
-#line 1006 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1017 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 186:
 
-/* Line 1455 of yacc.c  */
-#line 1012 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1023 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewArray( (yyvsp[(2) - (3)].asExpr) ); ;}
     break;
 
   case 187:
 
-/* Line 1455 of yacc.c  */
-#line 1015 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1026 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewFunCall( hb_compExprNewFunName( hb_compExpr_IDs.HASH ), (yyvsp[(2) - (3)].asExpr) ); ;}
     break;
 
   case 188:
 
-/* Line 1455 of yacc.c  */
-#line 1018 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1029 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = NULL; ;}
     break;
 
   case 189:
 
-/* Line 1455 of yacc.c  */
-#line 1019 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1030 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAddListExpr( hb_compExprNewArgList( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 190:
 
-/* Line 1455 of yacc.c  */
-#line 1020 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1031 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAddListExpr( hb_compExprAddListExpr( (yyvsp[(1) - (5)].asExpr), (yyvsp[(3) - (5)].asExpr) ), (yyvsp[(5) - (5)].asExpr) ); ;}
     break;
 
   case 191:
 
-/* Line 1455 of yacc.c  */
-#line 1023 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1034 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 192:
 
-/* Line 1455 of yacc.c  */
-#line 1028 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1039 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 193:
 
-/* Line 1455 of yacc.c  */
-#line 1029 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1040 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 194:
 
-/* Line 1455 of yacc.c  */
-#line 1032 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1043 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 195:
 
-/* Line 1455 of yacc.c  */
-#line 1037 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1048 "source\\compiler\\harbour.sly"
     {
                                    (yyval.asExpr) = hb_compExprNewVar( (yyvsp[(1) - (1)].string) );
 
@@ -6327,15 +6333,15 @@ yyreduce:
 
   case 196:
 
-/* Line 1455 of yacc.c  */
-#line 1066 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1077 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewAlias( (yyvsp[(1) - (2)].string) ); ;}
     break;
 
   case 197:
 
-/* Line 1455 of yacc.c  */
-#line 1071 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1082 "source\\compiler\\harbour.sly"
     {
                                 (yyval.asExpr) = hb_compExprNewMacro( NULL, '&', (yyvsp[(1) - (1)].string) );
 
@@ -6353,8 +6359,8 @@ yyreduce:
 
   case 198:
 
-/* Line 1455 of yacc.c  */
-#line 1084 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1095 "source\\compiler\\harbour.sly"
     { // Was: MACROTEXT befvore optimization.
                                 //$$ = hb_compExprNewMacro( NULL, 0, $1 );
                                 (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr);
@@ -6363,8 +6369,8 @@ yyreduce:
 
   case 199:
 
-/* Line 1455 of yacc.c  */
-#line 1090 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1101 "source\\compiler\\harbour.sly"
     {
                            HB_EXPR_PTR pPlus = NULL, pLeft = NULL, pRight, pDestExpr;
                            char *pPosition = (yyvsp[(1) - (1)].string), *pStart, *sToken;
@@ -6473,484 +6479,484 @@ yyreduce:
 
   case 200:
 
-/* Line 1455 of yacc.c  */
-#line 1196 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1207 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 201:
 
-/* Line 1455 of yacc.c  */
-#line 1201 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1212 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewMacro( (yyvsp[(2) - (2)].asExpr), 0, NULL ); ;}
     break;
 
   case 202:
 
-/* Line 1455 of yacc.c  */
-#line 1204 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1215 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 203:
 
-/* Line 1455 of yacc.c  */
-#line 1211 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1222 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewAlias( hb_compExpr_IDs.FIELD_ ); ;}
     break;
 
   case 204:
 
-/* Line 1455 of yacc.c  */
-#line 1212 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1223 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(3) - (3)].asExpr); ;}
     break;
 
   case 205:
 
-/* Line 1455 of yacc.c  */
-#line 1217 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1228 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( (yyvsp[(1) - (2)].asExpr) ); (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 206:
 
-/* Line 1455 of yacc.c  */
-#line 1218 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1229 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( (yyvsp[(1) - (2)].asExpr) ); (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 207:
 
-/* Line 1455 of yacc.c  */
-#line 1219 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1230 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( (yyvsp[(1) - (2)].asExpr) ); (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 208:
 
-/* Line 1455 of yacc.c  */
-#line 1220 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1231 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( (yyvsp[(1) - (2)].asExpr) ); (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 209:
 
-/* Line 1455 of yacc.c  */
-#line 1221 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1232 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( (yyvsp[(1) - (2)].asExpr) ); (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 210:
 
-/* Line 1455 of yacc.c  */
-#line 1222 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1233 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( (yyvsp[(1) - (2)].asExpr) ); (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 211:
 
-/* Line 1455 of yacc.c  */
-#line 1223 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1234 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( (yyvsp[(1) - (2)].asExpr) ); (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 212:
 
-/* Line 1455 of yacc.c  */
-#line 1224 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1235 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( (yyvsp[(1) - (2)].asExpr) ); (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 213:
 
-/* Line 1455 of yacc.c  */
-#line 1225 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1236 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( (yyvsp[(1) - (2)].asExpr) ); (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 214:
 
-/* Line 1455 of yacc.c  */
-#line 1226 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1237 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( (yyvsp[(1) - (2)].asExpr) ); (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 215:
 
-/* Line 1455 of yacc.c  */
-#line 1227 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1238 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( (yyvsp[(1) - (2)].asExpr) ); (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 216:
 
-/* Line 1455 of yacc.c  */
-#line 1228 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1239 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( (yyvsp[(1) - (2)].asExpr) ); (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 217:
 
-/* Line 1455 of yacc.c  */
-#line 1229 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1240 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( (yyvsp[(1) - (2)].asExpr) ); (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 218:
 
-/* Line 1455 of yacc.c  */
-#line 1230 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1241 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( (yyvsp[(1) - (2)].asExpr) ); (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 219:
 
-/* Line 1455 of yacc.c  */
-#line 1233 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1244 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewVar( (yyvsp[(1) - (1)].string) ); ;}
     break;
 
   case 220:
 
-/* Line 1455 of yacc.c  */
-#line 1234 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1245 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 221:
 
-/* Line 1455 of yacc.c  */
-#line 1235 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1246 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 222:
 
-/* Line 1455 of yacc.c  */
-#line 1238 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1249 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewAliasVar( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 223:
 
-/* Line 1455 of yacc.c  */
-#line 1239 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1250 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewAliasVar( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 224:
 
-/* Line 1455 of yacc.c  */
-#line 1240 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1251 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewAliasVar( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 225:
 
-/* Line 1455 of yacc.c  */
-#line 1241 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1252 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewAliasVar( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 226:
 
-/* Line 1455 of yacc.c  */
-#line 1242 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1253 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(1) - (2)].asExpr) ); hb_compExprDelete((yyvsp[(2) - (2)].asExpr)); ;}
     break;
 
   case 227:
 
-/* Line 1455 of yacc.c  */
-#line 1243 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1254 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(1) - (2)].asExpr) ); hb_compExprDelete((yyvsp[(2) - (2)].asExpr)); ;}
     break;
 
   case 228:
 
-/* Line 1455 of yacc.c  */
-#line 1244 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1255 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(1) - (2)].asExpr) ); hb_compExprDelete((yyvsp[(2) - (2)].asExpr)); ;}
     break;
 
   case 229:
 
-/* Line 1455 of yacc.c  */
-#line 1245 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1256 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(1) - (2)].asExpr) ); hb_compExprDelete((yyvsp[(2) - (2)].asExpr)); ;}
     break;
 
   case 230:
 
-/* Line 1455 of yacc.c  */
-#line 1246 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1257 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(1) - (2)].asExpr) ); hb_compExprDelete((yyvsp[(2) - (2)].asExpr)); ;}
     break;
 
   case 231:
 
-/* Line 1455 of yacc.c  */
-#line 1247 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1258 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(1) - (2)].asExpr) ); hb_compExprDelete((yyvsp[(2) - (2)].asExpr)); ;}
     break;
 
   case 232:
 
-/* Line 1455 of yacc.c  */
-#line 1248 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1259 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(1) - (2)].asExpr) ); hb_compExprDelete((yyvsp[(2) - (2)].asExpr)); ;}
     break;
 
   case 233:
 
-/* Line 1455 of yacc.c  */
-#line 1249 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1260 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(1) - (2)].asExpr) ); hb_compExprDelete((yyvsp[(2) - (2)].asExpr)); ;}
     break;
 
   case 234:
 
-/* Line 1455 of yacc.c  */
-#line 1250 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1261 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(1) - (2)].asExpr) ); hb_compExprDelete((yyvsp[(2) - (2)].asExpr)); ;}
     break;
 
   case 235:
 
-/* Line 1455 of yacc.c  */
-#line 1251 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1262 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(1) - (2)].asExpr) ); hb_compExprDelete((yyvsp[(2) - (2)].asExpr)); ;}
     break;
 
   case 236:
 
-/* Line 1455 of yacc.c  */
-#line 1252 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1263 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(1) - (2)].asExpr) ); hb_compExprDelete((yyvsp[(2) - (2)].asExpr)); ;}
     break;
 
   case 237:
 
-/* Line 1455 of yacc.c  */
-#line 1253 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1264 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(1) - (2)].asExpr) ); hb_compExprDelete((yyvsp[(2) - (2)].asExpr)); ;}
     break;
 
   case 238:
 
-/* Line 1455 of yacc.c  */
-#line 1254 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1265 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(1) - (2)].asExpr) ); hb_compExprDelete((yyvsp[(2) - (2)].asExpr)); ;}
     break;
 
   case 239:
 
-/* Line 1455 of yacc.c  */
-#line 1255 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1266 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewAliasVar( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 240:
 
-/* Line 1455 of yacc.c  */
-#line 1256 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1267 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewAliasVar( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 241:
 
-/* Line 1455 of yacc.c  */
-#line 1257 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1268 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewAliasVar( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 242:
 
-/* Line 1455 of yacc.c  */
-#line 1266 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1277 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewAliasExpr( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 243:
 
-/* Line 1455 of yacc.c  */
-#line 1267 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1278 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewAliasExpr( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 244:
 
-/* Line 1455 of yacc.c  */
-#line 1268 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1279 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewAliasExpr( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 245:
 
-/* Line 1455 of yacc.c  */
-#line 1269 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1280 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewAliasExpr( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 246:
 
-/* Line 1455 of yacc.c  */
-#line 1270 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1281 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewAliasExpr( (yyvsp[(1) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 247:
 
-/* Line 1455 of yacc.c  */
-#line 1271 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1282 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compErrorAlias( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 248:
 
-/* Line 1455 of yacc.c  */
-#line 1276 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1287 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 249:
 
-/* Line 1455 of yacc.c  */
-#line 1277 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1288 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 250:
 
-/* Line 1455 of yacc.c  */
-#line 1278 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1289 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 251:
 
-/* Line 1455 of yacc.c  */
-#line 1279 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1290 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 252:
 
-/* Line 1455 of yacc.c  */
-#line 1280 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1291 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 253:
 
-/* Line 1455 of yacc.c  */
-#line 1281 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1292 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 254:
 
-/* Line 1455 of yacc.c  */
-#line 1282 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1293 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 255:
 
-/* Line 1455 of yacc.c  */
-#line 1283 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1294 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 256:
 
-/* Line 1455 of yacc.c  */
-#line 1284 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1295 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 257:
 
-/* Line 1455 of yacc.c  */
-#line 1285 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1296 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 258:
 
-/* Line 1455 of yacc.c  */
-#line 1286 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1297 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 259:
 
-/* Line 1455 of yacc.c  */
-#line 1287 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1298 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 260:
 
-/* Line 1455 of yacc.c  */
-#line 1288 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1299 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 261:
 
-/* Line 1455 of yacc.c  */
-#line 1289 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1300 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 262:
 
-/* Line 1455 of yacc.c  */
-#line 1290 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1301 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 263:
 
-/* Line 1455 of yacc.c  */
-#line 1291 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1302 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 264:
 
-/* Line 1455 of yacc.c  */
-#line 1292 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1303 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 265:
 
-/* Line 1455 of yacc.c  */
-#line 1293 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1304 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 266:
 
-/* Line 1455 of yacc.c  */
-#line 1296 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1307 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 267:
 
-/* Line 1455 of yacc.c  */
-#line 1300 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1311 "source\\compiler\\harbour.sly"
     { (yyval.string) = (yyvsp[(1) - (2)].string); ;}
     break;
 
   case 268:
 
-/* Line 1455 of yacc.c  */
-#line 1301 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1312 "source\\compiler\\harbour.sly"
     { /* IdentName not NamespaceName is intentional - we don't want Global -> except when 1st! */
                                               if( (yyvsp[(1) - (3)].string)[0] == '*' )
                                               {
@@ -6969,71 +6975,71 @@ yyreduce:
 
   case 269:
 
-/* Line 1455 of yacc.c  */
-#line 1319 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1330 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewFunCall( hb_compExprNewFunName( (yyvsp[(1) - (4)].string) ), (yyvsp[(3) - (4)].asExpr) ); ;}
     break;
 
   case 270:
 
-/* Line 1455 of yacc.c  */
-#line 1320 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1331 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewFunCall( hb_compExprNewNamespaceFunName( (yyvsp[(1) - (5)].string), (yyvsp[(2) - (5)].string) ), (yyvsp[(4) - (5)].asExpr) ); ;}
     break;
 
   case 271:
 
-/* Line 1455 of yacc.c  */
-#line 1321 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1332 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewFunCall( (yyvsp[(1) - (4)].asExpr), (yyvsp[(3) - (4)].asExpr) ); ;}
     break;
 
   case 272:
 
-/* Line 1455 of yacc.c  */
-#line 1322 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1333 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewFunCall( (yyvsp[(1) - (4)].asExpr), (yyvsp[(3) - (4)].asExpr) ); ;}
     break;
 
   case 273:
 
-/* Line 1455 of yacc.c  */
-#line 1323 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1334 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 274:
 
-/* Line 1455 of yacc.c  */
-#line 1324 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1335 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 275:
 
-/* Line 1455 of yacc.c  */
-#line 1327 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1338 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewArgList( (yyvsp[(1) - (1)].asExpr) ); ;}
     break;
 
   case 276:
 
-/* Line 1455 of yacc.c  */
-#line 1328 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1339 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAddListExpr( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 277:
 
-/* Line 1455 of yacc.c  */
-#line 1331 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1342 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 278:
 
-/* Line 1455 of yacc.c  */
-#line 1332 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1343 "source\\compiler\\harbour.sly"
     {
                                           switch( (yyvsp[(2) - (2)].asExpr)->ExprType )
                                           {
@@ -7101,232 +7107,232 @@ yyreduce:
 
   case 279:
 
-/* Line 1455 of yacc.c  */
-#line 1397 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1408 "source\\compiler\\harbour.sly"
     {;}
     break;
 
   case 280:
 
-/* Line 1455 of yacc.c  */
-#line 1398 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1409 "source\\compiler\\harbour.sly"
     {;}
     break;
 
   case 281:
 
-/* Line 1455 of yacc.c  */
-#line 1401 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1412 "source\\compiler\\harbour.sly"
     { hb_compExprDelete((yyvsp[(1) - (1)].asExpr)); ;}
     break;
 
   case 282:
 
-/* Line 1455 of yacc.c  */
-#line 1402 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1413 "source\\compiler\\harbour.sly"
     {;}
     break;
 
   case 283:
 
-/* Line 1455 of yacc.c  */
-#line 1403 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1414 "source\\compiler\\harbour.sly"
     {;}
     break;
 
   case 284:
 
-/* Line 1455 of yacc.c  */
-#line 1406 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1417 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 285:
 
-/* Line 1455 of yacc.c  */
-#line 1411 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1422 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewFunName( (yyvsp[(1) - (1)].string) ); ;}
     break;
 
   case 286:
 
-/* Line 1455 of yacc.c  */
-#line 1412 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1423 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); (yyvsp[(1) - (1)].asExpr)->value.asMacro.SubType = HB_ET_MACRO_SYMBOL; ;}
     break;
 
   case 287:
 
-/* Line 1455 of yacc.c  */
-#line 1413 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1424 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); (yyvsp[(1) - (1)].asExpr)->value.asMacro.SubType = HB_ET_MACRO_SYMBOL; ;}
     break;
 
   case 288:
 
-/* Line 1455 of yacc.c  */
-#line 1416 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1427 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 289:
 
-/* Line 1455 of yacc.c  */
-#line 1417 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1428 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 290:
 
-/* Line 1455 of yacc.c  */
-#line 1418 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1429 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 291:
 
-/* Line 1455 of yacc.c  */
-#line 1419 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1430 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 292:
 
-/* Line 1455 of yacc.c  */
-#line 1420 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1431 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 293:
 
-/* Line 1455 of yacc.c  */
-#line 1421 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1432 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 294:
 
-/* Line 1455 of yacc.c  */
-#line 1422 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1433 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 295:
 
-/* Line 1455 of yacc.c  */
-#line 1423 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1434 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 296:
 
-/* Line 1455 of yacc.c  */
-#line 1424 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1435 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 297:
 
-/* Line 1455 of yacc.c  */
-#line 1425 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1436 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 298:
 
-/* Line 1455 of yacc.c  */
-#line 1426 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1437 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 299:
 
-/* Line 1455 of yacc.c  */
-#line 1427 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1438 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 300:
 
-/* Line 1455 of yacc.c  */
-#line 1428 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1439 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 301:
 
-/* Line 1455 of yacc.c  */
-#line 1429 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1440 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 302:
 
-/* Line 1455 of yacc.c  */
-#line 1430 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1441 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 303:
 
-/* Line 1455 of yacc.c  */
-#line 1431 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1442 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 304:
 
-/* Line 1455 of yacc.c  */
-#line 1432 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1443 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 305:
 
-/* Line 1455 of yacc.c  */
-#line 1433 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1444 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 306:
 
-/* Line 1455 of yacc.c  */
-#line 1434 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1445 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 307:
 
-/* Line 1455 of yacc.c  */
-#line 1435 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1446 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 308:
 
-/* Line 1455 of yacc.c  */
-#line 1436 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1447 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 309:
 
-/* Line 1455 of yacc.c  */
-#line 1437 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1448 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 310:
 
-/* Line 1455 of yacc.c  */
-#line 1438 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1449 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewSendExp( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 311:
 
-/* Line 1455 of yacc.c  */
-#line 1441 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1452 "source\\compiler\\harbour.sly"
     {
                                             if( hb_comp_wWithObjCounter == 0 )
                                             {
@@ -7341,22 +7347,22 @@ yyreduce:
 
   case 312:
 
-/* Line 1455 of yacc.c  */
-#line 1453 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1464 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 313:
 
-/* Line 1455 of yacc.c  */
-#line 1459 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1470 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewMethodCall( (yyvsp[(1) - (4)].asExpr), (yyvsp[(3) - (4)].asExpr) ); ;}
     break;
 
   case 314:
 
-/* Line 1455 of yacc.c  */
-#line 1462 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1473 "source\\compiler\\harbour.sly"
     {
                                            if( hb_comp_wWithObjCounter == 0 )
                                            {
@@ -7368,2115 +7374,2115 @@ yyreduce:
 
   case 315:
 
-/* Line 1455 of yacc.c  */
-#line 1471 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1482 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 317:
 
-/* Line 1455 of yacc.c  */
-#line 1480 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1491 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 318:
 
-/* Line 1455 of yacc.c  */
-#line 1481 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1492 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 319:
 
-/* Line 1455 of yacc.c  */
-#line 1482 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1493 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 320:
 
-/* Line 1455 of yacc.c  */
-#line 1483 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1494 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 321:
 
-/* Line 1455 of yacc.c  */
-#line 1484 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1495 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 322:
 
-/* Line 1455 of yacc.c  */
-#line 1485 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1496 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 323:
 
-/* Line 1455 of yacc.c  */
-#line 1486 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1497 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 324:
 
-/* Line 1455 of yacc.c  */
-#line 1487 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1498 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 325:
 
-/* Line 1455 of yacc.c  */
-#line 1488 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1499 "source\\compiler\\harbour.sly"
     {hb_comp_cVarType = ' ';;}
     break;
 
   case 326:
 
-/* Line 1455 of yacc.c  */
-#line 1488 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1499 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (3)].asExpr); ;}
     break;
 
   case 327:
 
-/* Line 1455 of yacc.c  */
-#line 1489 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1500 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 328:
 
-/* Line 1455 of yacc.c  */
-#line 1490 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1501 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 329:
 
-/* Line 1455 of yacc.c  */
-#line 1491 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1502 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 330:
 
-/* Line 1455 of yacc.c  */
-#line 1492 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1503 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 331:
 
-/* Line 1455 of yacc.c  */
-#line 1493 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1504 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 332:
 
-/* Line 1455 of yacc.c  */
-#line 1494 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1505 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 333:
 
-/* Line 1455 of yacc.c  */
-#line 1495 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1506 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 334:
 
-/* Line 1455 of yacc.c  */
-#line 1496 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1507 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 335:
 
-/* Line 1455 of yacc.c  */
-#line 1497 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1508 "source\\compiler\\harbour.sly"
     {hb_comp_cVarType = ' ';;}
     break;
 
   case 336:
 
-/* Line 1455 of yacc.c  */
-#line 1497 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1508 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (3)].asExpr); ;}
     break;
 
   case 337:
 
-/* Line 1455 of yacc.c  */
-#line 1498 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1509 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 338:
 
-/* Line 1455 of yacc.c  */
-#line 1499 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1510 "source\\compiler\\harbour.sly"
     {hb_comp_cVarType = ' ';;}
     break;
 
   case 339:
 
-/* Line 1455 of yacc.c  */
-#line 1499 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1510 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (3)].asExpr); ;}
     break;
 
   case 340:
 
-/* Line 1455 of yacc.c  */
-#line 1500 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1511 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 341:
 
-/* Line 1455 of yacc.c  */
-#line 1501 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1512 "source\\compiler\\harbour.sly"
     {hb_comp_cVarType = ' ';;}
     break;
 
   case 342:
 
-/* Line 1455 of yacc.c  */
-#line 1501 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1512 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (3)].asExpr); ;}
     break;
 
   case 343:
 
-/* Line 1455 of yacc.c  */
-#line 1502 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1513 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 344:
 
-/* Line 1455 of yacc.c  */
-#line 1503 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1514 "source\\compiler\\harbour.sly"
     {hb_comp_cVarType = ' ';;}
     break;
 
   case 345:
 
-/* Line 1455 of yacc.c  */
-#line 1503 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1514 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (3)].asExpr); ;}
     break;
 
   case 346:
 
-/* Line 1455 of yacc.c  */
-#line 1504 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1515 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 347:
 
-/* Line 1455 of yacc.c  */
-#line 1505 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1516 "source\\compiler\\harbour.sly"
     {hb_comp_cVarType = ' ';;}
     break;
 
   case 348:
 
-/* Line 1455 of yacc.c  */
-#line 1505 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1516 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (3)].asExpr); ;}
     break;
 
   case 349:
 
-/* Line 1455 of yacc.c  */
-#line 1506 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1517 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 350:
 
-/* Line 1455 of yacc.c  */
-#line 1507 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1518 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 351:
 
-/* Line 1455 of yacc.c  */
-#line 1508 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1519 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 352:
 
-/* Line 1455 of yacc.c  */
-#line 1509 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1520 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 353:
 
-/* Line 1455 of yacc.c  */
-#line 1510 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1521 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 354:
 
-/* Line 1455 of yacc.c  */
-#line 1511 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1522 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 355:
 
-/* Line 1455 of yacc.c  */
-#line 1512 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1523 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 356:
 
-/* Line 1455 of yacc.c  */
-#line 1513 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1524 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 357:
 
-/* Line 1455 of yacc.c  */
-#line 1514 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1525 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 358:
 
-/* Line 1455 of yacc.c  */
-#line 1517 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1528 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 359:
 
-/* Line 1455 of yacc.c  */
-#line 1518 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1529 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 360:
 
-/* Line 1455 of yacc.c  */
-#line 1519 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1530 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 361:
 
-/* Line 1455 of yacc.c  */
-#line 1520 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1531 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = ' ';;}
     break;
 
   case 362:
 
-/* Line 1455 of yacc.c  */
-#line 1520 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1531 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (3)].asExpr); ;}
     break;
 
   case 363:
 
-/* Line 1455 of yacc.c  */
-#line 1521 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1532 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = ' ';;}
     break;
 
   case 364:
 
-/* Line 1455 of yacc.c  */
-#line 1521 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1532 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (3)].asExpr); ;}
     break;
 
   case 365:
 
-/* Line 1455 of yacc.c  */
-#line 1524 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1535 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewEmpty(); ;}
     break;
 
   case 367:
 
-/* Line 1455 of yacc.c  */
-#line 1528 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1539 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewVar( (yyvsp[(1) - (1)].string) ); ;}
     break;
 
   case 374:
 
-/* Line 1455 of yacc.c  */
-#line 1535 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1546 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprListStrip( (yyvsp[(1) - (1)].asExpr), NULL ); ;}
     break;
 
   case 375:
 
-/* Line 1455 of yacc.c  */
-#line 1541 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1552 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewPostInc( (yyvsp[(0) - (1)].asExpr) ); ;}
     break;
 
   case 376:
 
-/* Line 1455 of yacc.c  */
-#line 1542 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1553 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewPostDec( (yyvsp[(0) - (1)].asExpr) ); ;}
     break;
 
   case 377:
 
-/* Line 1455 of yacc.c  */
-#line 1549 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1560 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 378:
 
-/* Line 1455 of yacc.c  */
-#line 1550 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1561 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 379:
 
-/* Line 1455 of yacc.c  */
-#line 1551 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1562 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 380:
 
-/* Line 1455 of yacc.c  */
-#line 1552 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1563 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 381:
 
-/* Line 1455 of yacc.c  */
-#line 1553 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1564 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 382:
 
-/* Line 1455 of yacc.c  */
-#line 1554 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1565 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 383:
 
-/* Line 1455 of yacc.c  */
-#line 1555 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1566 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 384:
 
-/* Line 1455 of yacc.c  */
-#line 1556 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1567 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 385:
 
-/* Line 1455 of yacc.c  */
-#line 1557 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1568 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 386:
 
-/* Line 1455 of yacc.c  */
-#line 1558 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1569 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 387:
 
-/* Line 1455 of yacc.c  */
-#line 1559 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1570 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 388:
 
-/* Line 1455 of yacc.c  */
-#line 1560 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1571 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 389:
 
-/* Line 1455 of yacc.c  */
-#line 1561 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1572 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 390:
 
-/* Line 1455 of yacc.c  */
-#line 1562 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1573 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 391:
 
-/* Line 1455 of yacc.c  */
-#line 1563 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1574 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 392:
 
-/* Line 1455 of yacc.c  */
-#line 1564 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1575 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 393:
 
-/* Line 1455 of yacc.c  */
-#line 1565 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1576 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 394:
 
-/* Line 1455 of yacc.c  */
-#line 1566 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1577 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 395:
 
-/* Line 1455 of yacc.c  */
-#line 1567 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1578 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 396:
 
-/* Line 1455 of yacc.c  */
-#line 1568 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1579 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 397:
 
-/* Line 1455 of yacc.c  */
-#line 1569 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1580 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 398:
 
-/* Line 1455 of yacc.c  */
-#line 1570 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1581 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 399:
 
-/* Line 1455 of yacc.c  */
-#line 1571 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1582 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 400:
 
-/* Line 1455 of yacc.c  */
-#line 1574 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1585 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewPreInc( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 401:
 
-/* Line 1455 of yacc.c  */
-#line 1575 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1586 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewPreDec( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 402:
 
-/* Line 1455 of yacc.c  */
-#line 1578 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1589 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewNot( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 403:
 
-/* Line 1455 of yacc.c  */
-#line 1579 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1590 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewNegate( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 404:
 
-/* Line 1455 of yacc.c  */
-#line 1580 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1591 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (2)].asExpr); ;}
     break;
 
   case 405:
 
-/* Line 1455 of yacc.c  */
-#line 1587 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1598 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 406:
 
-/* Line 1455 of yacc.c  */
-#line 1588 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1599 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 407:
 
-/* Line 1455 of yacc.c  */
-#line 1589 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1600 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 408:
 
-/* Line 1455 of yacc.c  */
-#line 1590 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1601 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 409:
 
-/* Line 1455 of yacc.c  */
-#line 1591 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1602 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 410:
 
-/* Line 1455 of yacc.c  */
-#line 1592 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1603 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 411:
 
-/* Line 1455 of yacc.c  */
-#line 1593 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1604 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 412:
 
-/* Line 1455 of yacc.c  */
-#line 1594 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1605 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 413:
 
-/* Line 1455 of yacc.c  */
-#line 1595 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1606 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 414:
 
-/* Line 1455 of yacc.c  */
-#line 1596 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1607 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 415:
 
-/* Line 1455 of yacc.c  */
-#line 1597 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1608 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 416:
 
-/* Line 1455 of yacc.c  */
-#line 1598 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1609 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); hb_comp_cCastType = hb_comp_cVarType; hb_comp_cVarType = ' ';;}
     break;
 
   case 417:
 
-/* Line 1455 of yacc.c  */
-#line 1599 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1610 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 418:
 
-/* Line 1455 of yacc.c  */
-#line 1600 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1611 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 419:
 
-/* Line 1455 of yacc.c  */
-#line 1601 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1612 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 420:
 
-/* Line 1455 of yacc.c  */
-#line 1602 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1613 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 421:
 
-/* Line 1455 of yacc.c  */
-#line 1603 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1614 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); hb_comp_cCastType = hb_comp_cVarType; hb_comp_cVarType = ' ';;}
     break;
 
   case 422:
 
-/* Line 1455 of yacc.c  */
-#line 1604 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1615 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 423:
 
-/* Line 1455 of yacc.c  */
-#line 1605 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1616 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 424:
 
-/* Line 1455 of yacc.c  */
-#line 1606 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1617 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); hb_comp_cCastType = hb_comp_cVarType; hb_comp_cVarType = ' ';;}
     break;
 
   case 425:
 
-/* Line 1455 of yacc.c  */
-#line 1607 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1618 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); hb_comp_cCastType = hb_comp_cVarType; hb_comp_cVarType = ' ';;}
     break;
 
   case 426:
 
-/* Line 1455 of yacc.c  */
-#line 1608 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1619 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 427:
 
-/* Line 1455 of yacc.c  */
-#line 1609 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1620 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 428:
 
-/* Line 1455 of yacc.c  */
-#line 1612 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1623 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 429:
 
-/* Line 1455 of yacc.c  */
-#line 1613 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1624 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 430:
 
-/* Line 1455 of yacc.c  */
-#line 1614 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1625 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 431:
 
-/* Line 1455 of yacc.c  */
-#line 1615 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1626 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 432:
 
-/* Line 1455 of yacc.c  */
-#line 1616 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1627 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 433:
 
-/* Line 1455 of yacc.c  */
-#line 1617 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1628 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 434:
 
-/* Line 1455 of yacc.c  */
-#line 1618 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1629 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 435:
 
-/* Line 1455 of yacc.c  */
-#line 1619 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1630 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 436:
 
-/* Line 1455 of yacc.c  */
-#line 1620 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1631 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 437:
 
-/* Line 1455 of yacc.c  */
-#line 1621 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1632 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 438:
 
-/* Line 1455 of yacc.c  */
-#line 1622 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1633 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 439:
 
-/* Line 1455 of yacc.c  */
-#line 1623 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1634 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 440:
 
-/* Line 1455 of yacc.c  */
-#line 1624 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1635 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 441:
 
-/* Line 1455 of yacc.c  */
-#line 1625 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1636 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 442:
 
-/* Line 1455 of yacc.c  */
-#line 1626 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1637 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 443:
 
-/* Line 1455 of yacc.c  */
-#line 1627 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1638 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 444:
 
-/* Line 1455 of yacc.c  */
-#line 1628 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1639 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 445:
 
-/* Line 1455 of yacc.c  */
-#line 1629 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1640 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 446:
 
-/* Line 1455 of yacc.c  */
-#line 1630 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1641 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 447:
 
-/* Line 1455 of yacc.c  */
-#line 1631 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1642 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 448:
 
-/* Line 1455 of yacc.c  */
-#line 1632 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1643 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 449:
 
-/* Line 1455 of yacc.c  */
-#line 1633 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1644 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 450:
 
-/* Line 1455 of yacc.c  */
-#line 1634 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1645 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAssign( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 451:
 
-/* Line 1455 of yacc.c  */
-#line 1637 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1648 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 452:
 
-/* Line 1455 of yacc.c  */
-#line 1638 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1649 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 453:
 
-/* Line 1455 of yacc.c  */
-#line 1639 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1650 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 454:
 
-/* Line 1455 of yacc.c  */
-#line 1640 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1651 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 455:
 
-/* Line 1455 of yacc.c  */
-#line 1641 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1652 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 456:
 
-/* Line 1455 of yacc.c  */
-#line 1642 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1653 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 457:
 
-/* Line 1455 of yacc.c  */
-#line 1643 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1654 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 458:
 
-/* Line 1455 of yacc.c  */
-#line 1644 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1655 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 459:
 
-/* Line 1455 of yacc.c  */
-#line 1645 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1656 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 460:
 
-/* Line 1455 of yacc.c  */
-#line 1646 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1657 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 461:
 
-/* Line 1455 of yacc.c  */
-#line 1647 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1658 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 462:
 
-/* Line 1455 of yacc.c  */
-#line 1648 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1659 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 463:
 
-/* Line 1455 of yacc.c  */
-#line 1649 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1660 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 464:
 
-/* Line 1455 of yacc.c  */
-#line 1650 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1661 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 465:
 
-/* Line 1455 of yacc.c  */
-#line 1651 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1662 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 466:
 
-/* Line 1455 of yacc.c  */
-#line 1652 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1663 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 467:
 
-/* Line 1455 of yacc.c  */
-#line 1653 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1664 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 468:
 
-/* Line 1455 of yacc.c  */
-#line 1654 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1665 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 469:
 
-/* Line 1455 of yacc.c  */
-#line 1655 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1666 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 470:
 
-/* Line 1455 of yacc.c  */
-#line 1656 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1667 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 471:
 
-/* Line 1455 of yacc.c  */
-#line 1657 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1668 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 472:
 
-/* Line 1455 of yacc.c  */
-#line 1658 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1669 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 473:
 
-/* Line 1455 of yacc.c  */
-#line 1659 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1670 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 474:
 
-/* Line 1455 of yacc.c  */
-#line 1662 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1673 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 475:
 
-/* Line 1455 of yacc.c  */
-#line 1663 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1674 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 476:
 
-/* Line 1455 of yacc.c  */
-#line 1664 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1675 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 477:
 
-/* Line 1455 of yacc.c  */
-#line 1665 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1676 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 478:
 
-/* Line 1455 of yacc.c  */
-#line 1666 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1677 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 479:
 
-/* Line 1455 of yacc.c  */
-#line 1667 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1678 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 480:
 
-/* Line 1455 of yacc.c  */
-#line 1668 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1679 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 481:
 
-/* Line 1455 of yacc.c  */
-#line 1669 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1680 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 482:
 
-/* Line 1455 of yacc.c  */
-#line 1670 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1681 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 483:
 
-/* Line 1455 of yacc.c  */
-#line 1671 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1682 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 484:
 
-/* Line 1455 of yacc.c  */
-#line 1672 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1683 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 485:
 
-/* Line 1455 of yacc.c  */
-#line 1673 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1684 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 486:
 
-/* Line 1455 of yacc.c  */
-#line 1674 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1685 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 487:
 
-/* Line 1455 of yacc.c  */
-#line 1675 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1686 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 488:
 
-/* Line 1455 of yacc.c  */
-#line 1676 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1687 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 489:
 
-/* Line 1455 of yacc.c  */
-#line 1677 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1688 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 490:
 
-/* Line 1455 of yacc.c  */
-#line 1678 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1689 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 491:
 
-/* Line 1455 of yacc.c  */
-#line 1679 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1690 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 492:
 
-/* Line 1455 of yacc.c  */
-#line 1680 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1691 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 493:
 
-/* Line 1455 of yacc.c  */
-#line 1681 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1692 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 494:
 
-/* Line 1455 of yacc.c  */
-#line 1682 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1693 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 495:
 
-/* Line 1455 of yacc.c  */
-#line 1683 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1694 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 496:
 
-/* Line 1455 of yacc.c  */
-#line 1684 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1695 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinusEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 497:
 
-/* Line 1455 of yacc.c  */
-#line 1687 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1698 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 498:
 
-/* Line 1455 of yacc.c  */
-#line 1688 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1699 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 499:
 
-/* Line 1455 of yacc.c  */
-#line 1689 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1700 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 500:
 
-/* Line 1455 of yacc.c  */
-#line 1690 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1701 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 501:
 
-/* Line 1455 of yacc.c  */
-#line 1691 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1702 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 502:
 
-/* Line 1455 of yacc.c  */
-#line 1692 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1703 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 503:
 
-/* Line 1455 of yacc.c  */
-#line 1693 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1704 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 504:
 
-/* Line 1455 of yacc.c  */
-#line 1694 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1705 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 505:
 
-/* Line 1455 of yacc.c  */
-#line 1695 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1706 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 506:
 
-/* Line 1455 of yacc.c  */
-#line 1696 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1707 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 507:
 
-/* Line 1455 of yacc.c  */
-#line 1697 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1708 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 508:
 
-/* Line 1455 of yacc.c  */
-#line 1698 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1709 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 509:
 
-/* Line 1455 of yacc.c  */
-#line 1699 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1710 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 510:
 
-/* Line 1455 of yacc.c  */
-#line 1700 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1711 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 511:
 
-/* Line 1455 of yacc.c  */
-#line 1701 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1712 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 512:
 
-/* Line 1455 of yacc.c  */
-#line 1702 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1713 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 513:
 
-/* Line 1455 of yacc.c  */
-#line 1703 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1714 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 514:
 
-/* Line 1455 of yacc.c  */
-#line 1704 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1715 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 515:
 
-/* Line 1455 of yacc.c  */
-#line 1705 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1716 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 516:
 
-/* Line 1455 of yacc.c  */
-#line 1706 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1717 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 517:
 
-/* Line 1455 of yacc.c  */
-#line 1707 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1718 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 518:
 
-/* Line 1455 of yacc.c  */
-#line 1708 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1719 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 519:
 
-/* Line 1455 of yacc.c  */
-#line 1709 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1720 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMultEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 520:
 
-/* Line 1455 of yacc.c  */
-#line 1712 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1723 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 521:
 
-/* Line 1455 of yacc.c  */
-#line 1713 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1724 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 522:
 
-/* Line 1455 of yacc.c  */
-#line 1714 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1725 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 523:
 
-/* Line 1455 of yacc.c  */
-#line 1715 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1726 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 524:
 
-/* Line 1455 of yacc.c  */
-#line 1716 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1727 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 525:
 
-/* Line 1455 of yacc.c  */
-#line 1717 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1728 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 526:
 
-/* Line 1455 of yacc.c  */
-#line 1718 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1729 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 527:
 
-/* Line 1455 of yacc.c  */
-#line 1719 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1730 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 528:
 
-/* Line 1455 of yacc.c  */
-#line 1720 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1731 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 529:
 
-/* Line 1455 of yacc.c  */
-#line 1721 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1732 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 530:
 
-/* Line 1455 of yacc.c  */
-#line 1722 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1733 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 531:
 
-/* Line 1455 of yacc.c  */
-#line 1723 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1734 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 532:
 
-/* Line 1455 of yacc.c  */
-#line 1724 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1735 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 533:
 
-/* Line 1455 of yacc.c  */
-#line 1725 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1736 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 534:
 
-/* Line 1455 of yacc.c  */
-#line 1726 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1737 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 535:
 
-/* Line 1455 of yacc.c  */
-#line 1727 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1738 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 536:
 
-/* Line 1455 of yacc.c  */
-#line 1728 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1739 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 537:
 
-/* Line 1455 of yacc.c  */
-#line 1729 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1740 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 538:
 
-/* Line 1455 of yacc.c  */
-#line 1730 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1741 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 539:
 
-/* Line 1455 of yacc.c  */
-#line 1731 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1742 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 540:
 
-/* Line 1455 of yacc.c  */
-#line 1732 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1743 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 541:
 
-/* Line 1455 of yacc.c  */
-#line 1733 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1744 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 542:
 
-/* Line 1455 of yacc.c  */
-#line 1734 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1745 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDivEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 543:
 
-/* Line 1455 of yacc.c  */
-#line 1737 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1748 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 544:
 
-/* Line 1455 of yacc.c  */
-#line 1738 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1749 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 545:
 
-/* Line 1455 of yacc.c  */
-#line 1739 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1750 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 546:
 
-/* Line 1455 of yacc.c  */
-#line 1740 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1751 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 547:
 
-/* Line 1455 of yacc.c  */
-#line 1741 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1752 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 548:
 
-/* Line 1455 of yacc.c  */
-#line 1742 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1753 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 549:
 
-/* Line 1455 of yacc.c  */
-#line 1743 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1754 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 550:
 
-/* Line 1455 of yacc.c  */
-#line 1744 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1755 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 551:
 
-/* Line 1455 of yacc.c  */
-#line 1745 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1756 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 552:
 
-/* Line 1455 of yacc.c  */
-#line 1746 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1757 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 553:
 
-/* Line 1455 of yacc.c  */
-#line 1747 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1758 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 554:
 
-/* Line 1455 of yacc.c  */
-#line 1748 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1759 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 555:
 
-/* Line 1455 of yacc.c  */
-#line 1749 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1760 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 556:
 
-/* Line 1455 of yacc.c  */
-#line 1750 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1761 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 557:
 
-/* Line 1455 of yacc.c  */
-#line 1751 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1762 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 558:
 
-/* Line 1455 of yacc.c  */
-#line 1752 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1763 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 559:
 
-/* Line 1455 of yacc.c  */
-#line 1753 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1764 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 560:
 
-/* Line 1455 of yacc.c  */
-#line 1754 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1765 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 561:
 
-/* Line 1455 of yacc.c  */
-#line 1755 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1766 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 562:
 
-/* Line 1455 of yacc.c  */
-#line 1756 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1767 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 563:
 
-/* Line 1455 of yacc.c  */
-#line 1757 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1768 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 564:
 
-/* Line 1455 of yacc.c  */
-#line 1758 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1769 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 565:
 
-/* Line 1455 of yacc.c  */
-#line 1759 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1770 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewModEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 566:
 
-/* Line 1455 of yacc.c  */
-#line 1762 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1773 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 567:
 
-/* Line 1455 of yacc.c  */
-#line 1763 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1774 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 568:
 
-/* Line 1455 of yacc.c  */
-#line 1764 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1775 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 569:
 
-/* Line 1455 of yacc.c  */
-#line 1765 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1776 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 570:
 
-/* Line 1455 of yacc.c  */
-#line 1766 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1777 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 571:
 
-/* Line 1455 of yacc.c  */
-#line 1767 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1778 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 572:
 
-/* Line 1455 of yacc.c  */
-#line 1768 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1779 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 573:
 
-/* Line 1455 of yacc.c  */
-#line 1769 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1780 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 574:
 
-/* Line 1455 of yacc.c  */
-#line 1770 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1781 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 575:
 
-/* Line 1455 of yacc.c  */
-#line 1771 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1782 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 576:
 
-/* Line 1455 of yacc.c  */
-#line 1772 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1783 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 577:
 
-/* Line 1455 of yacc.c  */
-#line 1773 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1784 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 578:
 
-/* Line 1455 of yacc.c  */
-#line 1774 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1785 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 579:
 
-/* Line 1455 of yacc.c  */
-#line 1775 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1786 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 580:
 
-/* Line 1455 of yacc.c  */
-#line 1776 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1787 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 581:
 
-/* Line 1455 of yacc.c  */
-#line 1777 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1788 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 582:
 
-/* Line 1455 of yacc.c  */
-#line 1778 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1789 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 583:
 
-/* Line 1455 of yacc.c  */
-#line 1779 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1790 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 584:
 
-/* Line 1455 of yacc.c  */
-#line 1780 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1791 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 585:
 
-/* Line 1455 of yacc.c  */
-#line 1781 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1792 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 586:
 
-/* Line 1455 of yacc.c  */
-#line 1782 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1793 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 587:
 
-/* Line 1455 of yacc.c  */
-#line 1783 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1794 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 588:
 
-/* Line 1455 of yacc.c  */
-#line 1784 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1795 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewExpEq( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 589:
 
-/* Line 1455 of yacc.c  */
-#line 1787 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1798 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 590:
 
-/* Line 1455 of yacc.c  */
-#line 1788 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1799 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 591:
 
-/* Line 1455 of yacc.c  */
-#line 1789 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1800 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 592:
 
-/* Line 1455 of yacc.c  */
-#line 1790 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1801 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 593:
 
-/* Line 1455 of yacc.c  */
-#line 1791 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1802 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 594:
 
-/* Line 1455 of yacc.c  */
-#line 1792 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1803 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 595:
 
-/* Line 1455 of yacc.c  */
-#line 1795 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1806 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPlus( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 596:
 
-/* Line 1455 of yacc.c  */
-#line 1796 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1807 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMinus( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 597:
 
-/* Line 1455 of yacc.c  */
-#line 1797 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1808 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMult( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 598:
 
-/* Line 1455 of yacc.c  */
-#line 1798 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1809 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewDiv( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 599:
 
-/* Line 1455 of yacc.c  */
-#line 1799 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1810 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMod( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 600:
 
-/* Line 1455 of yacc.c  */
-#line 1800 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1811 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewPower( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 601:
 
-/* Line 1455 of yacc.c  */
-#line 1801 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1812 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewBitAnd( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 602:
 
-/* Line 1455 of yacc.c  */
-#line 1802 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1813 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewBitOr( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 603:
 
-/* Line 1455 of yacc.c  */
-#line 1803 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1814 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewBitXOr( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 604:
 
-/* Line 1455 of yacc.c  */
-#line 1804 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1815 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewBitShiftR( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 605:
 
-/* Line 1455 of yacc.c  */
-#line 1805 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1816 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewBitShiftL( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 606:
 
-/* Line 1455 of yacc.c  */
-#line 1808 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1819 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewAnd( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 607:
 
-/* Line 1455 of yacc.c  */
-#line 1809 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1820 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewOr( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 608:
 
-/* Line 1455 of yacc.c  */
-#line 1812 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1823 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewEQ( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 609:
 
-/* Line 1455 of yacc.c  */
-#line 1813 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1824 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewLT( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 610:
 
-/* Line 1455 of yacc.c  */
-#line 1814 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1825 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewGT( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 611:
 
-/* Line 1455 of yacc.c  */
-#line 1815 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1826 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewLE( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 612:
 
-/* Line 1455 of yacc.c  */
-#line 1816 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1827 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewGE( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 613:
 
-/* Line 1455 of yacc.c  */
-#line 1817 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1828 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewNE( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 614:
 
-/* Line 1455 of yacc.c  */
-#line 1818 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1829 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewNE( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 615:
 
-/* Line 1455 of yacc.c  */
-#line 1819 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1830 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewIN( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 616:
 
-/* Line 1455 of yacc.c  */
-#line 1820 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1831 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewEqual( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 617:
 
-/* Line 1455 of yacc.c  */
-#line 1821 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1832 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewLike( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 618:
 
-/* Line 1455 of yacc.c  */
-#line 1822 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1833 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprSetOperand( hb_compExprNewMatch( (yyvsp[(1) - (3)].asExpr) ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 619:
 
-/* Line 1455 of yacc.c  */
-#line 1825 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1836 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 620:
 
-/* Line 1455 of yacc.c  */
-#line 1831 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1842 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewArrayAt( (yyvsp[(0) - (2)].asExpr), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 621:
 
-/* Line 1455 of yacc.c  */
-#line 1832 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1843 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewArrayAt( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 622:
 
-/* Line 1455 of yacc.c  */
-#line 1833 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1844 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewArrayAt( (yyvsp[(1) - (4)].asExpr), (yyvsp[(4) - (4)].asExpr) ); ;}
     break;
 
   case 623:
 
-/* Line 1455 of yacc.c  */
-#line 1836 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1847 "source\\compiler\\harbour.sly"
     { pBaseArrayName = NULL; pGetVarArray = NULL; pGetArgList = NULL; pGetFunction = NULL; ;}
     break;
 
   case 624:
 
-/* Line 1455 of yacc.c  */
-#line 1840 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1851 "source\\compiler\\harbour.sly"
     { /* $4 */
                   (yyvsp[(2) - (3)].asExpr) = hb_compExprListStripSingle( (yyvsp[(2) - (3)].asExpr), NULL );
                   (yyvsp[(2) - (3)].asExpr) = HB_EXPR_USE( (yyvsp[(2) - (3)].asExpr), HB_EA_REDUCE );
@@ -9592,8 +9598,8 @@ yyreduce:
 
   case 625:
 
-/* Line 1455 of yacc.c  */
-#line 1953 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 1964 "source\\compiler\\harbour.sly"
     { /* $6 */
                   HB_EXPR_PTR pVarName;
 
@@ -9661,8 +9667,8 @@ yyreduce:
 
   case 626:
 
-/* Line 1455 of yacc.c  */
-#line 2018 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2029 "source\\compiler\\harbour.sly"
     { /* $9 */
                   hb_compExprAddListExpr( pGetArgList, (yyvsp[(8) - (8)].asExpr) ); /* Picture    */
                ;}
@@ -9670,8 +9676,8 @@ yyreduce:
 
   case 627:
 
-/* Line 1455 of yacc.c  */
-#line 2023 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2034 "source\\compiler\\harbour.sly"
     { /* $12 */
                   hb_compExprAddListExpr( pGetArgList, (yyvsp[(11) - (11)].asExpr) ); /* ValidBlock */
                ;}
@@ -9679,8 +9685,8 @@ yyreduce:
 
   case 628:
 
-/* Line 1455 of yacc.c  */
-#line 2028 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2039 "source\\compiler\\harbour.sly"
     { /* $15 */
                   hb_compExprAddListExpr( pGetArgList, (yyvsp[(14) - (14)].asExpr) ); /* WhenBlock  */
 
@@ -9711,8 +9717,8 @@ yyreduce:
 
   case 629:
 
-/* Line 1455 of yacc.c  */
-#line 2056 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2067 "source\\compiler\\harbour.sly"
     { /* $17 */
                   if( pGetFunction == NULL )
                   {
@@ -9733,29 +9739,29 @@ yyreduce:
 
   case 630:
 
-/* Line 1455 of yacc.c  */
-#line 2074 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2085 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAddListExpr( pGetArgList, (yyvsp[(1) - (1)].asExpr) ); ;}
     break;
 
   case 631:
 
-/* Line 1455 of yacc.c  */
-#line 2075 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2086 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAddListExpr( pGetArgList, (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 632:
 
-/* Line 1455 of yacc.c  */
-#line 2078 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2089 "source\\compiler\\harbour.sly"
     { /* Nothing*/ ;}
     break;
 
   case 634:
 
-/* Line 1455 of yacc.c  */
-#line 2084 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2095 "source\\compiler\\harbour.sly"
     {
                   (yyval.asExpr) = hb_compExprNewCodeBlock();
 
@@ -9779,8 +9785,8 @@ yyreduce:
 
   case 635:
 
-/* Line 1455 of yacc.c  */
-#line 2106 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2117 "source\\compiler\\harbour.sly"
     {
                   PBLOCKSLIST pDelete = hb_comp_BlocksList;
 
@@ -9827,8 +9833,8 @@ yyreduce:
 
   case 636:
 
-/* Line 1455 of yacc.c  */
-#line 2150 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2161 "source\\compiler\\harbour.sly"
     {
                              HB_CBVAR_PTR pVar = (HB_CBVAR_PTR) (yyvsp[(1) - (1)].asExpr)->value.asList.pIndex;
 
@@ -9855,15 +9861,15 @@ yyreduce:
 
   case 637:
 
-/* Line 1455 of yacc.c  */
-#line 2174 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2185 "source\\compiler\\harbour.sly"
     { hb_compCodeBlockStart(); hb_comp_iVarScope = VS_PARAMETER; ;}
     break;
 
   case 638:
 
-/* Line 1455 of yacc.c  */
-#line 2177 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2188 "source\\compiler\\harbour.sly"
     {
                   (yyval.asExpr) = hb_compCodeBlockEnd( TRUE );
                ;}
@@ -9871,8 +9877,8 @@ yyreduce:
 
   case 640:
 
-/* Line 1455 of yacc.c  */
-#line 2184 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2195 "source\\compiler\\harbour.sly"
     {
                    while( hb_comp_LocalParams )
                    {
@@ -9888,246 +9894,246 @@ yyreduce:
 
   case 641:
 
-/* Line 1455 of yacc.c  */
-#line 2199 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2210 "source\\compiler\\harbour.sly"
     { pBlockSimple = (yyvsp[(1) - (1)].asExpr);   (yyval.asExpr) = hb_compExprAddListExpr( (yyvsp[(-2) - (1)].asExpr), (yyvsp[(1) - (1)].asExpr) ); ;}
     break;
 
   case 642:
 
-/* Line 1455 of yacc.c  */
-#line 2200 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2211 "source\\compiler\\harbour.sly"
     { pBlockSimple = NULL; (yyval.asExpr) = hb_compExprAddListExpr( (yyvsp[(-2) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 643:
 
-/* Line 1455 of yacc.c  */
-#line 2207 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2218 "source\\compiler\\harbour.sly"
     { hb_comp_iVarScope = VS_LOCAL; (yyval.asExpr) = hb_compExprCBVarAdd( (yyvsp[(0) - (2)].asExpr), (yyvsp[(1) - (2)].string),    hb_comp_cVarType ); hb_comp_cVarType = ' '; ;}
     break;
 
   case 644:
 
-/* Line 1455 of yacc.c  */
-#line 2208 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2219 "source\\compiler\\harbour.sly"
     { hb_comp_iVarScope = VS_LOCAL; (yyval.asExpr) = hb_compExprCBVarAdd( (yyvsp[(0) - (0)].asExpr), NULL , hb_comp_cVarType ); hb_comp_cVarType = ' '; ;}
     break;
 
   case 645:
 
-/* Line 1455 of yacc.c  */
-#line 2209 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2220 "source\\compiler\\harbour.sly"
     { hb_comp_iVarScope = VS_LOCAL; (yyval.asExpr) = hb_compExprCBVarAdd( (yyvsp[(1) - (4)].asExpr), (yyvsp[(3) - (4)].string),    hb_comp_cVarType ); hb_comp_cVarType = ' '; ;}
     break;
 
   case 646:
 
-/* Line 1455 of yacc.c  */
-#line 2210 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2221 "source\\compiler\\harbour.sly"
     { hb_comp_iVarScope = VS_LOCAL; (yyval.asExpr) = hb_compExprCBVarAdd( (yyvsp[(1) - (2)].asExpr), NULL,  hb_comp_cVarType ); hb_comp_cVarType = ' '; ;}
     break;
 
   case 647:
 
-/* Line 1455 of yacc.c  */
-#line 2220 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2231 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 648:
 
-/* Line 1455 of yacc.c  */
-#line 2223 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2234 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 649:
 
-/* Line 1455 of yacc.c  */
-#line 2226 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2237 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 650:
 
-/* Line 1455 of yacc.c  */
-#line 2229 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2240 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 651:
 
-/* Line 1455 of yacc.c  */
-#line 2232 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2243 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 652:
 
-/* Line 1455 of yacc.c  */
-#line 2233 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2244 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 653:
 
-/* Line 1455 of yacc.c  */
-#line 2234 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2245 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 654:
 
-/* Line 1455 of yacc.c  */
-#line 2235 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2246 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 655:
 
-/* Line 1455 of yacc.c  */
-#line 2238 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2249 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 656:
 
-/* Line 1455 of yacc.c  */
-#line 2241 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2252 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewList( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 657:
 
-/* Line 1455 of yacc.c  */
-#line 2244 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2255 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAddListExpr( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 658:
 
-/* Line 1455 of yacc.c  */
-#line 2247 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2258 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAddListExpr( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 659:
 
-/* Line 1455 of yacc.c  */
-#line 2250 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2261 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAddListExpr( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 660:
 
-/* Line 1455 of yacc.c  */
-#line 2251 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2262 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAddListExpr( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 661:
 
-/* Line 1455 of yacc.c  */
-#line 2254 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2265 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewIIF( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 662:
 
-/* Line 1455 of yacc.c  */
-#line 2257 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2268 "source\\compiler\\harbour.sly"
     { hb_comp_iVarScope =  VS_LOCAL; hb_compLinePush(); ;}
     break;
 
   case 663:
 
-/* Line 1455 of yacc.c  */
-#line 2257 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2268 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = ' '; ;}
     break;
 
   case 664:
 
-/* Line 1455 of yacc.c  */
-#line 2258 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2269 "source\\compiler\\harbour.sly"
     { hb_comp_iVarScope = VS_STATIC; hb_compLinePush(); ;}
     break;
 
   case 665:
 
-/* Line 1455 of yacc.c  */
-#line 2258 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2269 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = ' '; ;}
     break;
 
   case 666:
 
-/* Line 1455 of yacc.c  */
-#line 2259 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2270 "source\\compiler\\harbour.sly"
     { hb_comp_iVarScope = VS_GLOBAL; hb_compLinePush(); ;}
     break;
 
   case 667:
 
-/* Line 1455 of yacc.c  */
-#line 2259 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2270 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = ' '; ;}
     break;
 
   case 668:
 
-/* Line 1455 of yacc.c  */
-#line 2260 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2271 "source\\compiler\\harbour.sly"
     { hb_comp_iVarScope = VS_EXTERNGLOBAL; hb_compLinePush(); ;}
     break;
 
   case 669:
 
-/* Line 1455 of yacc.c  */
-#line 2260 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2271 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = ' '; ;}
     break;
 
   case 670:
 
-/* Line 1455 of yacc.c  */
-#line 2263 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2274 "source\\compiler\\harbour.sly"
     { (yyval.iNumber) = 1; ;}
     break;
 
   case 671:
 
-/* Line 1455 of yacc.c  */
-#line 2264 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2275 "source\\compiler\\harbour.sly"
     { (yyval.iNumber)++; ;}
     break;
 
   case 672:
 
-/* Line 1455 of yacc.c  */
-#line 2267 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2278 "source\\compiler\\harbour.sly"
     { (yyval.iNumber) = 1; ;}
     break;
 
   case 673:
 
-/* Line 1455 of yacc.c  */
-#line 2268 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2279 "source\\compiler\\harbour.sly"
     { (yyval.iNumber)++; ;}
     break;
 
   case 675:
 
-/* Line 1455 of yacc.c  */
-#line 2278 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2289 "source\\compiler\\harbour.sly"
     { hb_compRTVariableAdd( hb_compExprNewRTVar( NULL, (yyvsp[(1) - (2)].asExpr) ), FALSE ); ;}
     break;
 
   case 676:
 
-/* Line 1455 of yacc.c  */
-#line 2280 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2291 "source\\compiler\\harbour.sly"
     { hb_compExprDelete( hb_compExprGenPush( (yyvsp[(4) - (4)].asExpr) ) );
                  hb_compRTVariableAdd( hb_compExprNewRTVar( NULL, (yyvsp[(1) - (4)].asExpr) ), TRUE );
                ;}
@@ -10135,8 +10141,8 @@ yyreduce:
 
   case 677:
 
-/* Line 1455 of yacc.c  */
-#line 2284 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2295 "source\\compiler\\harbour.sly"
     {
                   USHORT uCount = (USHORT) hb_compExprListLen( (yyvsp[(2) - (2)].asExpr) );
                   hb_compExprDelete( hb_compExprGenPush( (yyvsp[(2) - (2)].asExpr) ) );
@@ -10147,8 +10153,8 @@ yyreduce:
 
   case 678:
 
-/* Line 1455 of yacc.c  */
-#line 2291 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2302 "source\\compiler\\harbour.sly"
     {
                   USHORT uCount = (USHORT) hb_compExprListLen( (yyvsp[(2) - (3)].asExpr) );
                   hb_compExprDelete( hb_compExprGenPush( (yyvsp[(2) - (3)].asExpr) ) );
@@ -10159,15 +10165,15 @@ yyreduce:
 
   case 679:
 
-/* Line 1455 of yacc.c  */
-#line 2299 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2310 "source\\compiler\\harbour.sly"
     { hb_compVariableAdd( (yyvsp[(1) - (2)].string), hb_comp_cVarType ); ;}
     break;
 
   case 680:
 
-/* Line 1455 of yacc.c  */
-#line 2300 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2311 "source\\compiler\\harbour.sly"
     {
                   if( hb_comp_iVarScope == VS_STATIC )
                   {
@@ -10196,8 +10202,8 @@ yyreduce:
 
   case 681:
 
-/* Line 1455 of yacc.c  */
-#line 2325 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2336 "source\\compiler\\harbour.sly"
     { (yyval.iNumber) = hb_comp_iVarScope;
                                 hb_compVariableAdd( (yyvsp[(1) - (2)].string), hb_comp_cVarType );
                               ;}
@@ -10205,15 +10211,15 @@ yyreduce:
 
   case 682:
 
-/* Line 1455 of yacc.c  */
-#line 2328 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2339 "source\\compiler\\harbour.sly"
     {hb_comp_cVarType = ' ';;}
     break;
 
   case 683:
 
-/* Line 1455 of yacc.c  */
-#line 2329 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2340 "source\\compiler\\harbour.sly"
     {
                   hb_comp_cCastType = hb_comp_cVarType;
                   hb_comp_cVarType = ' ';
@@ -10253,120 +10259,120 @@ yyreduce:
 
   case 684:
 
-/* Line 1455 of yacc.c  */
-#line 2365 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2376 "source\\compiler\\harbour.sly"
     { hb_compVariableDim( (yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 685:
 
-/* Line 1455 of yacc.c  */
-#line 2366 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2377 "source\\compiler\\harbour.sly"
     { hb_compVariableDim( (yyvsp[(1) - (3)].string), (yyvsp[(2) - (3)].asExpr) ); ;}
     break;
 
   case 686:
 
-/* Line 1455 of yacc.c  */
-#line 2372 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2383 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (2)].asExpr); ;}
     break;
 
   case 687:
 
-/* Line 1455 of yacc.c  */
-#line 2375 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2386 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewArgList( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 688:
 
-/* Line 1455 of yacc.c  */
-#line 2376 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2387 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAddListExpr( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 689:
 
-/* Line 1455 of yacc.c  */
-#line 2377 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2388 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAddListExpr( (yyvsp[(1) - (4)].asExpr), (yyvsp[(4) - (4)].asExpr) ); ;}
     break;
 
   case 690:
 
-/* Line 1455 of yacc.c  */
-#line 2381 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2392 "source\\compiler\\harbour.sly"
     { hb_comp_iVarScope = VS_FIELD; ;}
     break;
 
   case 691:
 
-/* Line 1455 of yacc.c  */
-#line 2381 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2392 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = ' '; ;}
     break;
 
   case 692:
 
-/* Line 1455 of yacc.c  */
-#line 2384 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2395 "source\\compiler\\harbour.sly"
     { (yyval.iNumber)=hb_compFieldsCount(); hb_compVariableAdd( (yyvsp[(1) - (2)].string), hb_comp_cVarType ); ;}
     break;
 
   case 693:
 
-/* Line 1455 of yacc.c  */
-#line 2385 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2396 "source\\compiler\\harbour.sly"
     { hb_compVariableAdd( (yyvsp[(3) - (4)].string), hb_comp_cVarType ); ;}
     break;
 
   case 694:
 
-/* Line 1455 of yacc.c  */
-#line 2386 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2397 "source\\compiler\\harbour.sly"
     { hb_compFieldSetAlias( (yyvsp[(3) - (3)].string), (yyvsp[(1) - (3)].iNumber) ); ;}
     break;
 
   case 695:
 
-/* Line 1455 of yacc.c  */
-#line 2389 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2400 "source\\compiler\\harbour.sly"
     { hb_comp_iVarScope = VS_MEMVAR; ;}
     break;
 
   case 696:
 
-/* Line 1455 of yacc.c  */
-#line 2389 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2400 "source\\compiler\\harbour.sly"
     { hb_comp_cVarType = ' '; ;}
     break;
 
   case 697:
 
-/* Line 1455 of yacc.c  */
-#line 2392 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2403 "source\\compiler\\harbour.sly"
     { hb_compVariableAdd( (yyvsp[(1) - (2)].string), hb_comp_cVarType ); ;}
     break;
 
   case 698:
 
-/* Line 1455 of yacc.c  */
-#line 2393 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2404 "source\\compiler\\harbour.sly"
     { hb_compVariableAdd( (yyvsp[(3) - (4)].string), hb_comp_cVarType ); ;}
     break;
 
   case 699:
 
-/* Line 1455 of yacc.c  */
-#line 2396 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2407 "source\\compiler\\harbour.sly"
     { hb_compDeclaredAdd( (yyvsp[(2) - (3)].string) ); hb_comp_szDeclaredFun = (yyvsp[(2) - (3)].string); ;}
     break;
 
   case 700:
 
-/* Line 1455 of yacc.c  */
-#line 2397 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2408 "source\\compiler\\harbour.sly"
     {
                if( hb_comp_pLastDeclared )
                {
@@ -10394,57 +10400,57 @@ yyreduce:
 
   case 701:
 
-/* Line 1455 of yacc.c  */
-#line 2420 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2431 "source\\compiler\\harbour.sly"
     { hb_comp_pLastClass = hb_compClassAdd( (yyvsp[(2) - (2)].string) ); ;}
     break;
 
   case 702:
 
-/* Line 1455 of yacc.c  */
-#line 2420 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2431 "source\\compiler\\harbour.sly"
     { hb_comp_iVarScope = VS_NONE; ;}
     break;
 
   case 703:
 
-/* Line 1455 of yacc.c  */
-#line 2421 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2432 "source\\compiler\\harbour.sly"
     { hb_comp_pLastClass = hb_compClassAdd( (yyvsp[(2) - (3)].string) ); hb_comp_iVarScope = VS_NONE; ;}
     break;
 
   case 704:
 
-/* Line 1455 of yacc.c  */
-#line 2422 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2433 "source\\compiler\\harbour.sly"
     { hb_comp_iVarScope = VS_NONE; hb_compLinePushIfInside(); ;}
     break;
 
   case 705:
 
-/* Line 1455 of yacc.c  */
-#line 2423 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2434 "source\\compiler\\harbour.sly"
     { hb_comp_cDataListType = hb_comp_cVarType; ;}
     break;
 
   case 706:
 
-/* Line 1455 of yacc.c  */
-#line 2423 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2434 "source\\compiler\\harbour.sly"
     { hb_comp_cDataListType = 0; hb_comp_iVarScope = VS_NONE; hb_compLinePushIfInside(); ;}
     break;
 
   case 713:
 
-/* Line 1455 of yacc.c  */
-#line 2436 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2447 "source\\compiler\\harbour.sly"
     { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastClass, (yyvsp[(1) - (2)].string) ); ;}
     break;
 
   case 714:
 
-/* Line 1455 of yacc.c  */
-#line 2437 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2448 "source\\compiler\\harbour.sly"
     {
                if( hb_comp_pLastMethod )
                {
@@ -10468,15 +10474,15 @@ yyreduce:
 
   case 715:
 
-/* Line 1455 of yacc.c  */
-#line 2458 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2469 "source\\compiler\\harbour.sly"
     { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastClass, (yyvsp[(1) - (1)].string) ); ;}
     break;
 
   case 716:
 
-/* Line 1455 of yacc.c  */
-#line 2459 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2470 "source\\compiler\\harbour.sly"
     {
                if( hb_comp_pLastMethod )
                {
@@ -10532,162 +10538,162 @@ yyreduce:
 
   case 717:
 
-/* Line 1455 of yacc.c  */
-#line 2512 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2523 "source\\compiler\\harbour.sly"
     {;}
     break;
 
   case 721:
 
-/* Line 1455 of yacc.c  */
-#line 2518 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2529 "source\\compiler\\harbour.sly"
     { hb_compDeclaredParameterAdd( (yyvsp[(1) - (2)].string), hb_comp_cVarType ); ;}
     break;
 
   case 722:
 
-/* Line 1455 of yacc.c  */
-#line 2519 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2530 "source\\compiler\\harbour.sly"
     { hb_compDeclaredParameterAdd( (yyvsp[(2) - (3)].string), hb_comp_cVarType + VT_OFFSET_BYREF ); ;}
     break;
 
   case 723:
 
-/* Line 1455 of yacc.c  */
-#line 2520 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2531 "source\\compiler\\harbour.sly"
     { hb_compDeclaredParameterAdd( (yyvsp[(2) - (5)].string), 'F' ); ;}
     break;
 
   case 724:
 
-/* Line 1455 of yacc.c  */
-#line 2521 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2532 "source\\compiler\\harbour.sly"
     { hb_compDeclaredParameterAdd( (yyvsp[(3) - (4)].string), hb_comp_cVarType ); ;}
     break;
 
   case 725:
 
-/* Line 1455 of yacc.c  */
-#line 2522 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2533 "source\\compiler\\harbour.sly"
     { hb_compDeclaredParameterAdd( (yyvsp[(4) - (5)].string), hb_comp_cVarType + VT_OFFSET_BYREF ); ;}
     break;
 
   case 726:
 
-/* Line 1455 of yacc.c  */
-#line 2523 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2534 "source\\compiler\\harbour.sly"
     { hb_compDeclaredParameterAdd( (yyvsp[(4) - (7)].string), 'F' ); ;}
     break;
 
   case 727:
 
-/* Line 1455 of yacc.c  */
-#line 2526 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2537 "source\\compiler\\harbour.sly"
     { hb_compDeclaredParameterAdd( (yyvsp[(2) - (3)].string), hb_comp_cVarType + VT_OFFSET_OPTIONAL ); ;}
     break;
 
   case 728:
 
-/* Line 1455 of yacc.c  */
-#line 2527 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2538 "source\\compiler\\harbour.sly"
     { hb_compDeclaredParameterAdd( (yyvsp[(3) - (4)].string), hb_comp_cVarType + VT_OFFSET_OPTIONAL + VT_OFFSET_BYREF ); ;}
     break;
 
   case 729:
 
-/* Line 1455 of yacc.c  */
-#line 2528 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2539 "source\\compiler\\harbour.sly"
     { hb_compDeclaredParameterAdd( (yyvsp[(3) - (6)].string), hb_comp_cVarType + VT_OFFSET_OPTIONAL + VT_OFFSET_BYREF ); ;}
     break;
 
   case 730:
 
-/* Line 1455 of yacc.c  */
-#line 2529 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2540 "source\\compiler\\harbour.sly"
     { hb_compDeclaredParameterAdd( (yyvsp[(4) - (5)].string), hb_comp_cVarType + VT_OFFSET_OPTIONAL ); ;}
     break;
 
   case 731:
 
-/* Line 1455 of yacc.c  */
-#line 2530 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2541 "source\\compiler\\harbour.sly"
     { hb_compDeclaredParameterAdd( (yyvsp[(5) - (6)].string), hb_comp_cVarType + VT_OFFSET_OPTIONAL + VT_OFFSET_BYREF ); ;}
     break;
 
   case 732:
 
-/* Line 1455 of yacc.c  */
-#line 2531 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2542 "source\\compiler\\harbour.sly"
     { hb_compDeclaredParameterAdd( (yyvsp[(5) - (8)].string), hb_comp_cVarType + VT_OFFSET_OPTIONAL + VT_OFFSET_BYREF ); ;}
     break;
 
   case 733:
 
-/* Line 1455 of yacc.c  */
-#line 2534 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2545 "source\\compiler\\harbour.sly"
     { hb_compEnumAdd( (yyvsp[(2) - (2)].string) ); ;}
     break;
 
   case 735:
 
-/* Line 1455 of yacc.c  */
-#line 2537 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2548 "source\\compiler\\harbour.sly"
     { hb_compEnumMemberAdd( (yyvsp[(1) - (1)].string) ); ;}
     break;
 
   case 736:
 
-/* Line 1455 of yacc.c  */
-#line 2538 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2549 "source\\compiler\\harbour.sly"
     { hb_compEnumMemberAdd( (yyvsp[(3) - (3)].string) ); ;}
     break;
 
   case 745:
 
-/* Line 1455 of yacc.c  */
-#line 2551 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2562 "source\\compiler\\harbour.sly"
     { hb_compGenJumpHere( (yyvsp[(1) - (2)].iNumber) ); s_iControlLevel--; ;}
     break;
 
   case 746:
 
-/* Line 1455 of yacc.c  */
-#line 2552 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2563 "source\\compiler\\harbour.sly"
     { hb_compGenJumpHere( (yyvsp[(1) - (3)].iNumber) ); s_iControlLevel--; ;}
     break;
 
   case 747:
 
-/* Line 1455 of yacc.c  */
-#line 2553 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2564 "source\\compiler\\harbour.sly"
     { hb_compGenJumpHere( (yyvsp[(1) - (3)].iNumber) ); hb_compElseIfFix( (yyvsp[(2) - (3)].pVoid) ); s_iControlLevel--; ;}
     break;
 
   case 748:
 
-/* Line 1455 of yacc.c  */
-#line 2554 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2565 "source\\compiler\\harbour.sly"
     { hb_compGenJumpHere( (yyvsp[(1) - (4)].iNumber) ); hb_compElseIfFix( (yyvsp[(2) - (4)].pVoid) ); s_iControlLevel--; ;}
     break;
 
   case 749:
 
-/* Line 1455 of yacc.c  */
-#line 2557 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2568 "source\\compiler\\harbour.sly"
     { (yyval.lNumber) = 0; ;}
     break;
 
   case 750:
 
-/* Line 1455 of yacc.c  */
-#line 2558 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2569 "source\\compiler\\harbour.sly"
     { (yyval.lNumber) = (yyvsp[(1) - (1)].lNumber); ;}
     break;
 
   case 751:
 
-/* Line 1455 of yacc.c  */
-#line 2561 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2572 "source\\compiler\\harbour.sly"
     {
                               ++hb_comp_wIfCounter; hb_compLinePush();
 
@@ -10700,48 +10706,48 @@ yyreduce:
 
   case 752:
 
-/* Line 1455 of yacc.c  */
-#line 2570 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2581 "source\\compiler\\harbour.sly"
     {
-                              hb_compExprDelete( hb_compExprGenPush( (yyvsp[(2) - (4)].asExpr) ) ); (yyval.iNumber) = hb_compGenJumpFalse( 0 );
+                              hb_compExprDelete( hb_compExprGenPush( (yyvsp[(2) - (4)].asExpr) ) ); (yyval.iNumber) = (int) hb_compGenJumpFalse( 0 );
                            ;}
     break;
 
   case 753:
 
-/* Line 1455 of yacc.c  */
-#line 2574 "source\\compiler\\harbour.sly"
-    { (yyval.iNumber) = hb_compGenJump( 0 ); hb_compGenJumpHere( (yyvsp[(5) - (6)].iNumber) ); ;}
+/* Line 1464 of yacc.c  */
+#line 2585 "source\\compiler\\harbour.sly"
+    { (yyval.iNumber) = (int) hb_compGenJump( 0 ); hb_compGenJumpHere( (yyvsp[(5) - (6)].iNumber) ); ;}
     break;
 
   case 754:
 
-/* Line 1455 of yacc.c  */
-#line 2577 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2588 "source\\compiler\\harbour.sly"
     { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; ;}
     break;
 
   case 756:
 
-/* Line 1455 of yacc.c  */
-#line 2581 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2592 "source\\compiler\\harbour.sly"
     { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; hb_compLinePush(); ;}
     break;
 
   case 757:
 
-/* Line 1455 of yacc.c  */
-#line 2582 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2593 "source\\compiler\\harbour.sly"
     { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
                   hb_compExprDelete( hb_compExprGenPush( (yyvsp[(3) - (4)].asExpr) ) );
-                  (yyval.iNumber) = hb_compGenJumpFalse( 0 );
+                  (yyval.iNumber) = (int) hb_compGenJumpFalse( 0 );
                 ;}
     break;
 
   case 758:
 
-/* Line 1455 of yacc.c  */
-#line 2587 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2598 "source\\compiler\\harbour.sly"
     { (yyval.pVoid) = hb_compElseIfGen( NULL, hb_compGenJump( 0 ) );
                   hb_compGenJumpHere( (yyvsp[(5) - (6)].iNumber) );
                 ;}
@@ -10749,25 +10755,25 @@ yyreduce:
 
   case 759:
 
-/* Line 1455 of yacc.c  */
-#line 2591 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2602 "source\\compiler\\harbour.sly"
     { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; hb_compLinePush(); ;}
     break;
 
   case 760:
 
-/* Line 1455 of yacc.c  */
-#line 2592 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2603 "source\\compiler\\harbour.sly"
     { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
                   hb_compExprDelete( hb_compExprGenPush( (yyvsp[(4) - (5)].asExpr) ) );
-                  (yyval.iNumber) = hb_compGenJumpFalse( 0 );
+                  (yyval.iNumber) = (int) hb_compGenJumpFalse( 0 );
                 ;}
     break;
 
   case 761:
 
-/* Line 1455 of yacc.c  */
-#line 2597 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2608 "source\\compiler\\harbour.sly"
     { (yyval.pVoid) = hb_compElseIfGen( (yyvsp[(1) - (7)].pVoid), hb_compGenJump( 0 ) );
                   hb_compGenJumpHere( (yyvsp[(6) - (7)].iNumber) );
                 ;}
@@ -10775,36 +10781,36 @@ yyreduce:
 
   case 762:
 
-/* Line 1455 of yacc.c  */
-#line 2602 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2613 "source\\compiler\\harbour.sly"
     { --hb_comp_wIfCounter; hb_comp_functions.pLast->bFlags &= ~ ( FUN_WITH_RETURN | FUN_BREAK_CODE ); ;}
     break;
 
   case 763:
 
-/* Line 1455 of yacc.c  */
-#line 2603 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2614 "source\\compiler\\harbour.sly"
     { --hb_comp_wIfCounter; hb_comp_functions.pLast->bFlags &= ~ ( FUN_WITH_RETURN | FUN_BREAK_CODE ); ;}
     break;
 
   case 764:
 
-/* Line 1455 of yacc.c  */
-#line 2608 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2619 "source\\compiler\\harbour.sly"
     { hb_compElseIfFix( (yyvsp[(2) - (3)].pVoid) ); ;}
     break;
 
   case 767:
 
-/* Line 1455 of yacc.c  */
-#line 2620 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2631 "source\\compiler\\harbour.sly"
     { hb_compElseIfFix( (yyvsp[(2) - (4)].pVoid) ); ;}
     break;
 
   case 768:
 
-/* Line 1455 of yacc.c  */
-#line 2624 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2635 "source\\compiler\\harbour.sly"
     {
                         --hb_comp_wCaseCounter;
                         hb_comp_functions.pLast->bFlags &= ~ ( FUN_WITH_RETURN | FUN_BREAK_CODE );
@@ -10814,8 +10820,8 @@ yyreduce:
 
   case 769:
 
-/* Line 1455 of yacc.c  */
-#line 2630 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2641 "source\\compiler\\harbour.sly"
     {
                         --hb_comp_wCaseCounter;
                         hb_comp_functions.pLast->bFlags &= ~ ( FUN_WITH_RETURN | FUN_BREAK_CODE );
@@ -10825,8 +10831,8 @@ yyreduce:
 
   case 770:
 
-/* Line 1455 of yacc.c  */
-#line 2637 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2648 "source\\compiler\\harbour.sly"
     {
                         ++hb_comp_wCaseCounter;
 
@@ -10841,15 +10847,15 @@ yyreduce:
 
   case 772:
 
-/* Line 1455 of yacc.c  */
-#line 2650 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2661 "source\\compiler\\harbour.sly"
     { ;}
     break;
 
   case 773:
 
-/* Line 1455 of yacc.c  */
-#line 2651 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2662 "source\\compiler\\harbour.sly"
     {
                         if( (yyvsp[(2) - (2)].lNumber) > 0 )
                         {
@@ -10860,25 +10866,25 @@ yyreduce:
 
   case 774:
 
-/* Line 1455 of yacc.c  */
-#line 2659 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2670 "source\\compiler\\harbour.sly"
     { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); ;}
     break;
 
   case 775:
 
-/* Line 1455 of yacc.c  */
-#line 2660 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2671 "source\\compiler\\harbour.sly"
     {
                   hb_compExprDelete( hb_compExprGenPush( (yyvsp[(3) - (4)].asExpr) ) );
-                  (yyval.iNumber) = hb_compGenJumpFalse( 0 );
+                  (yyval.iNumber) = (int) hb_compGenJumpFalse( 0 );
                ;}
     break;
 
   case 776:
 
-/* Line 1455 of yacc.c  */
-#line 2665 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2676 "source\\compiler\\harbour.sly"
     {
                   hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
                   (yyval.pVoid) = hb_compElseIfGen( 0, hb_compGenJump( 0 ) );
@@ -10888,25 +10894,25 @@ yyreduce:
 
   case 777:
 
-/* Line 1455 of yacc.c  */
-#line 2671 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2682 "source\\compiler\\harbour.sly"
     { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); ;}
     break;
 
   case 778:
 
-/* Line 1455 of yacc.c  */
-#line 2672 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2683 "source\\compiler\\harbour.sly"
     {
                   hb_compExprDelete( hb_compExprGenPush( (yyvsp[(4) - (5)].asExpr) ) );
-                  (yyval.iNumber) = hb_compGenJumpFalse( 0 );
+                  (yyval.iNumber) = (int) hb_compGenJumpFalse( 0 );
                ;}
     break;
 
   case 779:
 
-/* Line 1455 of yacc.c  */
-#line 2677 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2688 "source\\compiler\\harbour.sly"
     {
                   hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
                   (yyval.pVoid) = hb_compElseIfGen( (yyvsp[(1) - (7)].pVoid), hb_compGenJump( 0 ) );
@@ -10916,15 +10922,15 @@ yyreduce:
 
   case 780:
 
-/* Line 1455 of yacc.c  */
-#line 2684 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2695 "source\\compiler\\harbour.sly"
     { hb_compLinePushIfDebugger(); ;}
     break;
 
   case 781:
 
-/* Line 1455 of yacc.c  */
-#line 2685 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2696 "source\\compiler\\harbour.sly"
     {
                   hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
                   hb_comp_bDontGenLineNum = FALSE;
@@ -10933,15 +10939,15 @@ yyreduce:
 
   case 783:
 
-/* Line 1455 of yacc.c  */
-#line 2692 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2703 "source\\compiler\\harbour.sly"
     { hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_MAYHEM_IN_CASE, NULL, NULL ); ;}
     break;
 
   case 785:
 
-/* Line 1455 of yacc.c  */
-#line 2699 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2710 "source\\compiler\\harbour.sly"
     {
                   hb_compLoopEnd();
                   //hb_compElseIfFix( $2 ); // No default BREAK in SWITCH.
@@ -10951,8 +10957,8 @@ yyreduce:
 
   case 786:
 
-/* Line 1455 of yacc.c  */
-#line 2709 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2720 "source\\compiler\\harbour.sly"
     {
                   hb_compLoopEnd();
                   //hb_compElseIfFix( $2 );
@@ -10962,8 +10968,8 @@ yyreduce:
 
   case 787:
 
-/* Line 1455 of yacc.c  */
-#line 2717 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2728 "source\\compiler\\harbour.sly"
     {
                   --hb_comp_wCaseCounter;
 
@@ -11016,8 +11022,8 @@ yyreduce:
 
   case 790:
 
-/* Line 1455 of yacc.c  */
-#line 2771 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2782 "source\\compiler\\harbour.sly"
     {  hb_comp_bDontGenLineNum = FALSE; hb_compLinePush();
                                    hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter++ ] = 0;
                                    hb_compExprDelete( hb_compExprGenPush( (yyvsp[(2) - (2)].asExpr) ) );
@@ -11033,26 +11039,26 @@ yyreduce:
 
   case 798:
 
-/* Line 1455 of yacc.c  */
-#line 2796 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2807 "source\\compiler\\harbour.sly"
     { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); ;}
     break;
 
   case 799:
 
-/* Line 1455 of yacc.c  */
-#line 2797 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2808 "source\\compiler\\harbour.sly"
     {
                   hb_compGenSwitchCase( ( LONG ) (yyvsp[(3) - (4)].asExpr)->value.asNum.lVal );
                   hb_compExprDelete( (yyvsp[(3) - (4)].asExpr) );
-                  (yyval.iNumber) = hb_compGenJumpFalse( 0 );
+                  (yyval.iNumber) = (int) hb_compGenJumpFalse( 0 );
                ;}
     break;
 
   case 800:
 
-/* Line 1455 of yacc.c  */
-#line 2803 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2814 "source\\compiler\\harbour.sly"
     {
                   hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
 
@@ -11069,19 +11075,19 @@ yyreduce:
 
   case 801:
 
-/* Line 1455 of yacc.c  */
-#line 2816 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2827 "source\\compiler\\harbour.sly"
     { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); ;}
     break;
 
   case 802:
 
-/* Line 1455 of yacc.c  */
-#line 2817 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2828 "source\\compiler\\harbour.sly"
     {
                   hb_compGenSwitchCase( ( LONG ) (yyvsp[(4) - (5)].asExpr)->value.asNum.lVal );
                   hb_compExprDelete( (yyvsp[(4) - (5)].asExpr) );
-                  (yyval.iNumber) = hb_compGenJumpFalse( 0 );
+                  (yyval.iNumber) = (int) hb_compGenJumpFalse( 0 );
 
                   if( hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter - 1 ] )
                   {
@@ -11092,8 +11098,8 @@ yyreduce:
 
   case 803:
 
-/* Line 1455 of yacc.c  */
-#line 2828 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2839 "source\\compiler\\harbour.sly"
     {
                   hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
 
@@ -11110,36 +11116,36 @@ yyreduce:
 
   case 804:
 
-/* Line 1455 of yacc.c  */
-#line 2842 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2853 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewLong( (yyvsp[(1) - (1)].valInteger).iNumber ); ;}
     break;
 
   case 805:
 
-/* Line 1455 of yacc.c  */
-#line 2843 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2854 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewLong( - (yyvsp[(2) - (2)].valInteger).iNumber ); ;}
     break;
 
   case 806:
 
-/* Line 1455 of yacc.c  */
-#line 2844 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2855 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewLong( (yyvsp[(1) - (1)].valLong).lNumber ); ;}
     break;
 
   case 807:
 
-/* Line 1455 of yacc.c  */
-#line 2845 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2856 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewLong( - (yyvsp[(2) - (2)].valLong).lNumber ); ;}
     break;
 
   case 808:
 
-/* Line 1455 of yacc.c  */
-#line 2846 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2857 "source\\compiler\\harbour.sly"
     {
                                      (yyvsp[(1) - (3)].asExpr)->value.asNum.lVal += (yyvsp[(3) - (3)].asExpr)->value.asNum.lVal;
                                      hb_compExprDelete( (yyvsp[(3) - (3)].asExpr) );
@@ -11149,8 +11155,8 @@ yyreduce:
 
   case 809:
 
-/* Line 1455 of yacc.c  */
-#line 2851 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2862 "source\\compiler\\harbour.sly"
     {
                                      (yyvsp[(1) - (3)].asExpr)->value.asNum.lVal -= (yyvsp[(3) - (3)].asExpr)->value.asNum.lVal;
                                      hb_compExprDelete( (yyvsp[(3) - (3)].asExpr) );
@@ -11160,8 +11166,8 @@ yyreduce:
 
   case 810:
 
-/* Line 1455 of yacc.c  */
-#line 2856 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2867 "source\\compiler\\harbour.sly"
     {
                                      (yyvsp[(1) - (3)].asExpr)->value.asNum.lVal |= (yyvsp[(3) - (3)].asExpr)->value.asNum.lVal;
                                      hb_compExprDelete( (yyvsp[(3) - (3)].asExpr) );
@@ -11171,8 +11177,8 @@ yyreduce:
 
   case 811:
 
-/* Line 1455 of yacc.c  */
-#line 2861 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2872 "source\\compiler\\harbour.sly"
     {
                                      (yyvsp[(1) - (3)].asExpr)->value.asNum.lVal &= (yyvsp[(3) - (3)].asExpr)->value.asNum.lVal;
                                      hb_compExprDelete( (yyvsp[(3) - (3)].asExpr) );
@@ -11182,15 +11188,15 @@ yyreduce:
 
   case 812:
 
-/* Line 1455 of yacc.c  */
-#line 2866 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2877 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(2) - (3)].asExpr); ;}
     break;
 
   case 813:
 
-/* Line 1455 of yacc.c  */
-#line 2867 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2878 "source\\compiler\\harbour.sly"
     {
                                     if( (yyvsp[(1) - (1)].valChar).length == 1 )
                                     {
@@ -11206,8 +11212,8 @@ yyreduce:
 
   case 814:
 
-/* Line 1455 of yacc.c  */
-#line 2881 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2892 "source\\compiler\\harbour.sly"
     {
                   // NO EXIT statement precedes this DEFAULT statement.
                   if( hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter - 1 ] )
@@ -11257,8 +11263,8 @@ yyreduce:
 
   case 815:
 
-/* Line 1455 of yacc.c  */
-#line 2928 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2939 "source\\compiler\\harbour.sly"
     {
                   /*
                   // Correct last JUMP generated by SWITCHCASE to Skip the DEFAULT section.
@@ -11275,8 +11281,8 @@ yyreduce:
 
   case 816:
 
-/* Line 1455 of yacc.c  */
-#line 2943 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2954 "source\\compiler\\harbour.sly"
     {
                   if( (yyvsp[(2) - (3)].asExpr)->ValType == HB_EV_LOGICAL && (yyvsp[(2) - (3)].asExpr)->value.asLogical )
                   {
@@ -11293,8 +11299,8 @@ yyreduce:
 
   case 817:
 
-/* Line 1455 of yacc.c  */
-#line 2956 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2967 "source\\compiler\\harbour.sly"
     {
                   hb_compLoopHere();
                   hb_compGenJump( (yyvsp[(1) - (5)].lNumber) - hb_comp_functions.pLast->lPCodePos );
@@ -11303,8 +11309,8 @@ yyreduce:
 
   case 818:
 
-/* Line 1455 of yacc.c  */
-#line 2961 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2972 "source\\compiler\\harbour.sly"
     {
                   if( (yyvsp[(4) - (7)].lNumber) != -1 )
                   {
@@ -11318,8 +11324,8 @@ yyreduce:
 
   case 819:
 
-/* Line 1455 of yacc.c  */
-#line 2972 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2983 "source\\compiler\\harbour.sly"
     {
                       (yyval.lNumber) = hb_comp_functions.pLast->lPCodePos;
                       hb_compLinePushIfInside();
@@ -11335,22 +11341,22 @@ yyreduce:
 
   case 820:
 
-/* Line 1455 of yacc.c  */
-#line 2985 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2996 "source\\compiler\\harbour.sly"
     { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; s_iControlLevel--; ;}
     break;
 
   case 821:
 
-/* Line 1455 of yacc.c  */
-#line 2986 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 2997 "source\\compiler\\harbour.sly"
     { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; s_iControlLevel--; ;}
     break;
 
   case 822:
 
-/* Line 1455 of yacc.c  */
-#line 2990 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3001 "source\\compiler\\harbour.sly"
     {
                   hb_compLinePush();
                   hb_compDebugStart();
@@ -11361,8 +11367,8 @@ yyreduce:
 
   case 823:
 
-/* Line 1455 of yacc.c  */
-#line 2997 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3008 "source\\compiler\\harbour.sly"
     {
                   hb_compLoopStart( TRUE );
                   (yyval.lNumber) = hb_comp_functions.pLast->lPCodePos;  /* 9 */
@@ -11378,8 +11384,8 @@ yyreduce:
 
   case 824:
 
-/* Line 1455 of yacc.c  */
-#line 3009 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3020 "source\\compiler\\harbour.sly"
     {
                   if( (yyvsp[(8) - (10)].asExpr) )
                   {
@@ -11401,8 +11407,8 @@ yyreduce:
 
   case 825:
 
-/* Line 1455 of yacc.c  */
-#line 3027 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3038 "source\\compiler\\harbour.sly"
     {
                   short iStep, iLocal;
 
@@ -11469,22 +11475,22 @@ yyreduce:
 
   case 828:
 
-/* Line 1455 of yacc.c  */
-#line 3095 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3106 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = NULL; ;}
     break;
 
   case 829:
 
-/* Line 1455 of yacc.c  */
-#line 3096 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3107 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprReduce( (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 830:
 
-/* Line 1455 of yacc.c  */
-#line 3099 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3110 "source\\compiler\\harbour.sly"
     { hb_compLinePush();
                                                    if( hb_comp_wForCounter )
                                                       --hb_comp_wForCounter;
@@ -11493,8 +11499,8 @@ yyreduce:
 
   case 831:
 
-/* Line 1455 of yacc.c  */
-#line 3103 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3114 "source\\compiler\\harbour.sly"
     { hb_compLinePush();
                                                    if( hb_comp_wForCounter )
                                                       --hb_comp_wForCounter;
@@ -11503,8 +11509,8 @@ yyreduce:
 
   case 832:
 
-/* Line 1455 of yacc.c  */
-#line 3107 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3118 "source\\compiler\\harbour.sly"
     { hb_compLinePush();
                                                    if( hb_comp_wForCounter )
                                                       --hb_comp_wForCounter;
@@ -11513,8 +11519,8 @@ yyreduce:
 
   case 833:
 
-/* Line 1455 of yacc.c  */
-#line 3111 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3122 "source\\compiler\\harbour.sly"
     { hb_compLinePush();
                                                    if( hb_comp_wForCounter )
                                                       --hb_comp_wForCounter;
@@ -11523,8 +11529,8 @@ yyreduce:
 
   case 834:
 
-/* Line 1455 of yacc.c  */
-#line 3118 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3129 "source\\compiler\\harbour.sly"
     {  /* 3 */
                   hb_compLinePush();
                   hb_compDebugStart();
@@ -11536,8 +11542,8 @@ yyreduce:
 
   case 835:
 
-/* Line 1455 of yacc.c  */
-#line 3126 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3137 "source\\compiler\\harbour.sly"
     { /* 6 */
                   hb_compExprDelete( hb_compExprGenPush( (yyvsp[(5) - (5)].asExpr) ) );
                   hb_compGenPCode1( HB_P_FOREACH );
@@ -11549,8 +11555,8 @@ yyreduce:
 
   case 836:
 
-/* Line 1455 of yacc.c  */
-#line 3134 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3145 "source\\compiler\\harbour.sly"
     { /* 8 */
                   (yyval.lNumber) = hb_compGenJumpFalse( 0 );   /* 8 */
 
@@ -11563,8 +11569,8 @@ yyreduce:
 
   case 837:
 
-/* Line 1455 of yacc.c  */
-#line 3143 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3154 "source\\compiler\\harbour.sly"
     {
                   hb_compLoopHere();
                   hb_compGenJump( (yyvsp[(6) - (9)].lNumber) - hb_comp_functions.pLast->lPCodePos );
@@ -11577,8 +11583,8 @@ yyreduce:
 
   case 838:
 
-/* Line 1455 of yacc.c  */
-#line 3154 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3165 "source\\compiler\\harbour.sly"
     {
                   hb_compLinePush();
                   hb_compGenWithObject((yyvsp[(2) - (3)].asExpr));
@@ -11591,8 +11597,8 @@ yyreduce:
 
   case 839:
 
-/* Line 1455 of yacc.c  */
-#line 3164 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3175 "source\\compiler\\harbour.sly"
     {
                   hb_compGenEndWithObject();
                   s_iControlLevel--;
@@ -11601,8 +11607,8 @@ yyreduce:
 
   case 840:
 
-/* Line 1455 of yacc.c  */
-#line 3170 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3181 "source\\compiler\\harbour.sly"
     {
                          ++hb_comp_wSeqCounter;
 
@@ -11617,8 +11623,8 @@ yyreduce:
 
   case 841:
 
-/* Line 1455 of yacc.c  */
-#line 3182 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3193 "source\\compiler\\harbour.sly"
     {
                   /* Set jump address for HB_P_SEQBEGIN opcode - this address
                    * will be used in BREAK code if there is no RECOVER clause
@@ -11630,8 +11636,8 @@ yyreduce:
 
   case 842:
 
-/* Line 1455 of yacc.c  */
-#line 3190 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3201 "source\\compiler\\harbour.sly"
     {
                    /* Replace END address with RECOVER address in
                     * HB_P_SEQBEGIN opcode if there is RECOVER clause
@@ -11645,8 +11651,8 @@ yyreduce:
 
   case 843:
 
-/* Line 1455 of yacc.c  */
-#line 3200 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3211 "source\\compiler\\harbour.sly"
     {
                 /* Fix END address
                  * There is no line number after HB_P_SEQEND in case no
@@ -11663,15 +11669,15 @@ yyreduce:
 
   case 844:
 
-/* Line 1455 of yacc.c  */
-#line 3214 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3225 "source\\compiler\\harbour.sly"
     { (yyval.lNumber) = 0; hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; ;}
     break;
 
   case 847:
 
-/* Line 1455 of yacc.c  */
-#line 3220 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3231 "source\\compiler\\harbour.sly"
     {
                   hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
                   (yyval.lNumber) = hb_comp_functions.pLast->lPCodePos;
@@ -11684,8 +11690,8 @@ yyreduce:
 
   case 848:
 
-/* Line 1455 of yacc.c  */
-#line 3231 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3242 "source\\compiler\\harbour.sly"
     {
                   hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
                   (yyval.lNumber) = hb_comp_functions.pLast->lPCodePos;
@@ -11699,8 +11705,8 @@ yyreduce:
 
   case 849:
 
-/* Line 1455 of yacc.c  */
-#line 3243 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3254 "source\\compiler\\harbour.sly"
     {             /* 2 */
                   ++hb_comp_wSeqCounter;
                   (yyval.lNumber) = hb_compTryBegin();
@@ -11711,8 +11717,8 @@ yyreduce:
 
   case 850:
 
-/* Line 1455 of yacc.c  */
-#line 3251 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3262 "source\\compiler\\harbour.sly"
     {             /* 5 */
                   /* Set jump address for HB_P_TRYBEGIN opcode - this address
                    * will be used in BREAK code if there is no RECOVER clause
@@ -11725,8 +11731,8 @@ yyreduce:
 
   case 851:
 
-/* Line 1455 of yacc.c  */
-#line 3260 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3271 "source\\compiler\\harbour.sly"
     {             /* 7 */
                   /* Replace END address with RECOVER address in
                    * HB_P_TRYBEGIN opcode if there is RECOVER clause
@@ -11738,8 +11744,8 @@ yyreduce:
 
   case 852:
 
-/* Line 1455 of yacc.c  */
-#line 3268 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3279 "source\\compiler\\harbour.sly"
     {             /* 9 */
                   long lLoopCount = hb_compLoopCount();
                   hb_comp_functions.pLast->bFlags &= ~ ( FUN_WITH_RETURN | FUN_BREAK_CODE );
@@ -11790,15 +11796,15 @@ yyreduce:
 
   case 854:
 
-/* Line 1455 of yacc.c  */
-#line 3318 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3329 "source\\compiler\\harbour.sly"
     { (yyval.lNumber) = 0; ;}
     break;
 
   case 856:
 
-/* Line 1455 of yacc.c  */
-#line 3323 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3334 "source\\compiler\\harbour.sly"
     {
                   hb_comp_functions.pLast->bFlags &= ~ ( FUN_WITH_RETURN | FUN_BREAK_CODE );
                   (yyval.lNumber) = hb_comp_functions.pLast->lPCodePos;
@@ -11809,15 +11815,15 @@ yyreduce:
 
   case 857:
 
-/* Line 1455 of yacc.c  */
-#line 3331 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3342 "source\\compiler\\harbour.sly"
     { (yyval.lNumber) = 0; ;}
     break;
 
   case 859:
 
-/* Line 1455 of yacc.c  */
-#line 3336 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3347 "source\\compiler\\harbour.sly"
     {
                   hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
                   (yyval.lNumber) = hb_comp_functions.pLast->lPCodePos;
@@ -11831,8 +11837,8 @@ yyreduce:
 
   case 860:
 
-/* Line 1455 of yacc.c  */
-#line 3346 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3357 "source\\compiler\\harbour.sly"
     {
                   hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
                   (yyval.lNumber) = hb_comp_functions.pLast->lPCodePos;
@@ -11846,29 +11852,29 @@ yyreduce:
 
   case 861:
 
-/* Line 1455 of yacc.c  */
-#line 3363 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3374 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewFunName( (yyvsp[(1) - (1)].string) ); hb_compAutoOpenAdd( (yyvsp[(1) - (1)].string) ); ;}
     break;
 
   case 862:
 
-/* Line 1455 of yacc.c  */
-#line 3364 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3375 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 863:
 
-/* Line 1455 of yacc.c  */
-#line 3365 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3376 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 864:
 
-/* Line 1455 of yacc.c  */
-#line 3369 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3380 "source\\compiler\\harbour.sly"
     {
                   (yyval.asExpr) = hb_compExprNewFunCall( (yyvsp[(2) - (2)].asExpr), NULL );
                ;}
@@ -11876,57 +11882,57 @@ yyreduce:
 
   case 865:
 
-/* Line 1455 of yacc.c  */
-#line 3373 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3384 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewFunCall( (yyvsp[(2) - (4)].asExpr), (yyvsp[(4) - (4)].asExpr) ); ;}
     break;
 
   case 866:
 
-/* Line 1455 of yacc.c  */
-#line 3375 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3386 "source\\compiler\\harbour.sly"
     { hb_compAutoOpenAdd( hb_compExpr_IDs.WHILE_ ); (yyval.asExpr) = hb_compExprNewFunCall( hb_compExprNewFunName( hb_compExpr_IDs.WHILE_ ), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 867:
 
-/* Line 1455 of yacc.c  */
-#line 3378 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3389 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAddListExpr( hb_compExprNewArgList( hb_compExprNewNil() ), hb_compExprNewNil() ); ;}
     break;
 
   case 868:
 
-/* Line 1455 of yacc.c  */
-#line 3379 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3390 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAddListExpr( hb_compExprNewArgList( hb_compExprNewNil() ), (yyvsp[(2) - (2)].asExpr) ); ;}
     break;
 
   case 869:
 
-/* Line 1455 of yacc.c  */
-#line 3380 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3391 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewArgList( (yyvsp[(1) - (1)].asExpr) ); ;}
     break;
 
   case 870:
 
-/* Line 1455 of yacc.c  */
-#line 3381 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3392 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAddListExpr( (yyvsp[(1) - (2)].asExpr), hb_compExprNewNil() ); ;}
     break;
 
   case 871:
 
-/* Line 1455 of yacc.c  */
-#line 3382 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3393 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprAddListExpr( (yyvsp[(1) - (3)].asExpr), (yyvsp[(3) - (3)].asExpr) ); ;}
     break;
 
   case 872:
 
-/* Line 1455 of yacc.c  */
-#line 3385 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3396 "source\\compiler\\harbour.sly"
     {
                                                     if( hb_compFieldGetPos( (yyvsp[(1) - (1)].string), hb_comp_functions.pLast ) ||
                                                         ( hb_comp_bStartProc == FALSE && hb_compFieldGetPos( (yyvsp[(1) - (1)].string), hb_comp_functions.pFirst ) ) )
@@ -11942,43 +11948,43 @@ yyreduce:
 
   case 873:
 
-/* Line 1455 of yacc.c  */
-#line 3396 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3407 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewVarRef( (yyvsp[(2) - (2)].string) ); ;}
     break;
 
   case 874:
 
-/* Line 1455 of yacc.c  */
-#line 3397 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3408 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewFunRef( (yyvsp[(2) - (5)].string) ); ;}
     break;
 
   case 875:
 
-/* Line 1455 of yacc.c  */
-#line 3398 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3409 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = hb_compExprNewNamespaceFunRef( (yyvsp[(2) - (6)].string), (yyvsp[(3) - (6)].string) ); ;}
     break;
 
   case 876:
 
-/* Line 1455 of yacc.c  */
-#line 3399 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3410 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 877:
 
-/* Line 1455 of yacc.c  */
-#line 3400 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3411 "source\\compiler\\harbour.sly"
     { (yyval.asExpr) = (yyvsp[(1) - (1)].asExpr); ;}
     break;
 
   case 878:
 
-/* Line 1455 of yacc.c  */
-#line 3404 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3415 "source\\compiler\\harbour.sly"
     {
                                    PNAMESPACE pNamespace;
 
@@ -12025,8 +12031,8 @@ yyreduce:
 
   case 879:
 
-/* Line 1455 of yacc.c  */
-#line 3448 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3459 "source\\compiler\\harbour.sly"
     {
                                    PNAMESPACE pClone;
 
@@ -12038,15 +12044,15 @@ yyreduce:
 
   case 880:
 
-/* Line 1455 of yacc.c  */
-#line 3457 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3468 "source\\compiler\\harbour.sly"
     { (yyval.string) = ( (yyvsp[(1) - (1)].string) == hb_compExpr_IDs.GLOBAL_ ? (char *) "*" : (yyvsp[(1) - (1)].string) ); ;}
     break;
 
   case 881:
 
-/* Line 1455 of yacc.c  */
-#line 3461 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3472 "source\\compiler\\harbour.sly"
     {
                                    if( hb_comp_functions.pLast )
                                    {
@@ -12064,8 +12070,8 @@ yyreduce:
 
   case 882:
 
-/* Line 1455 of yacc.c  */
-#line 3476 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3487 "source\\compiler\\harbour.sly"
     {
                                    if( hb_comp_functions.pLast )
                                    {
@@ -12078,8 +12084,8 @@ yyreduce:
 
   case 883:
 
-/* Line 1455 of yacc.c  */
-#line 3489 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3500 "source\\compiler\\harbour.sly"
     {
                                    if( hb_comp_functions.pLast )
                                    {
@@ -12100,8 +12106,8 @@ yyreduce:
 
   case 884:
 
-/* Line 1455 of yacc.c  */
-#line 3506 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3517 "source\\compiler\\harbour.sly"
     {
                                    if( hb_comp_functions.pLast )
                                    {
@@ -12124,36 +12130,36 @@ yyreduce:
 
   case 885:
 
-/* Line 1455 of yacc.c  */
-#line 3527 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3538 "source\\compiler\\harbour.sly"
     { (yyval.iNumber) = NSTYPE_SPACE; ;}
     break;
 
   case 886:
 
-/* Line 1455 of yacc.c  */
-#line 3528 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3539 "source\\compiler\\harbour.sly"
     { (yyval.iNumber) = NSTYPE_RUNTIME; ;}
     break;
 
   case 887:
 
-/* Line 1455 of yacc.c  */
-#line 3529 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3540 "source\\compiler\\harbour.sly"
     { (yyval.iNumber) = NSTYPE_OPTIONAL; ;}
     break;
 
   case 888:
 
-/* Line 1455 of yacc.c  */
-#line 3530 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3541 "source\\compiler\\harbour.sly"
     { (yyval.iNumber) = NSTYPE_IMPLEMENTS; ;}
     break;
 
   case 889:
 
-/* Line 1455 of yacc.c  */
-#line 3534 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3545 "source\\compiler\\harbour.sly"
     {
                                    hb_compUsedNamespaceNew( (yyvsp[(2) - (3)].string), NSTYPE_SPACE );
                                  ;}
@@ -12161,8 +12167,8 @@ yyreduce:
 
   case 890:
 
-/* Line 1455 of yacc.c  */
-#line 3539 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3550 "source\\compiler\\harbour.sly"
     {
                                    hb_compUsedNamespaceEnd();
                                  ;}
@@ -12170,8 +12176,8 @@ yyreduce:
 
   case 899:
 
-/* Line 1455 of yacc.c  */
-#line 3559 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3570 "source\\compiler\\harbour.sly"
     {
                                    hb_compUsedNamespaceNew( (yyvsp[(2) - (3)].string), NSTYPE_MEMBER );
                                  ;}
@@ -12179,8 +12185,8 @@ yyreduce:
 
   case 900:
 
-/* Line 1455 of yacc.c  */
-#line 3566 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3577 "source\\compiler\\harbour.sly"
     {
                                                  if( (yyvsp[(2) - (3)].pVoid) )
                                                  {
@@ -12191,8 +12197,8 @@ yyreduce:
 
   case 901:
 
-/* Line 1455 of yacc.c  */
-#line 3576 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3587 "source\\compiler\\harbour.sly"
     {
                        if( hb_comp_UsedNamespaces.pFirst )
                        {
@@ -12213,8 +12219,8 @@ yyreduce:
 
   case 902:
 
-/* Line 1455 of yacc.c  */
-#line 3593 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3604 "source\\compiler\\harbour.sly"
     {
                                      if( (yyvsp[(1) - (3)].pVoid) )
                                      {
@@ -12235,22 +12241,22 @@ yyreduce:
 
   case 903:
 
-/* Line 1455 of yacc.c  */
-#line 3612 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3623 "source\\compiler\\harbour.sly"
     { hb_comp_bError = FALSE; ;}
     break;
 
   case 904:
 
-/* Line 1455 of yacc.c  */
-#line 3613 "source\\compiler\\harbour.sly"
+/* Line 1464 of yacc.c  */
+#line 3624 "source\\compiler\\harbour.sly"
     { hb_comp_bDontGenLineNum = TRUE; ;}
     break;
 
 
 
-/* Line 1455 of yacc.c  */
-#line 12241 "obj\\VC10\\harboury.c"
+/* Line 1464 of yacc.c  */
+#line 12260 "obj\\vc\\harboury.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -12461,8 +12467,8 @@ yyreturn:
 
 
 
-/* Line 1675 of yacc.c  */
-#line 3616 "source\\compiler\\harbour.sly"
+/* Line 1684 of yacc.c  */
+#line 3627 "source\\compiler\\harbour.sly"
 
 
 /*
@@ -12955,7 +12961,7 @@ void hb_compReleaseLoops( void )
    }
 }
 
-static void * hb_compElseIfGen( void * pFirst, ULONG ulOffset )
+static void * hb_compElseIfGen( void * pFirst, HB_SIZE ulOffset )
 {
    PELSEIF pElseIf = ( PELSEIF ) hb_xgrab( sizeof( _ELSEIF ) ), pLast;
 

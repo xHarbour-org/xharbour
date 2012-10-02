@@ -62,8 +62,8 @@
 
 HB_EXTERN_BEGIN
 
-extern char *  hb_jsonEncode( PHB_ITEM pValue, ULONG * pnLen, BOOL fHuman );
-extern ULONG hb_jsonDecode( const char * szSource, PHB_ITEM pValue );
+extern char *  hb_jsonEncode( PHB_ITEM pValue, HB_SIZE * pnLen, BOOL fHuman );
+extern HB_SIZE hb_jsonDecode( const char * szSource, PHB_ITEM pValue );
 
 HB_EXTERN_END
 

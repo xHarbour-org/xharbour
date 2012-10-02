@@ -59,17 +59,17 @@ HB_FUNC( TABEXPAND )
    if( ISCHAR( 1 ) )
    {
       char *   pcString    = ( char * ) hb_parc( 1 );
-      size_t   sStrLen     = ( size_t ) hb_parclen( 1 );
+      HB_SIZE  sStrLen     = hb_parclen( 1 );
       char *   pcRet;
-      size_t   sRetLen;
-      size_t   sTabWidth   = 0;
+      HB_SIZE  sRetLen;
+      HB_SIZE  sTabWidth   = 0;
       char     cFill, cTab, cCR;
       char *   pcNewLine;
-      size_t   sNewLineLen;
+      HB_SIZE  sNewLineLen;
       int      iIgnore141;
 
-      size_t   sIndex, sLineIndex;
-      size_t   sTabCnt = 0;
+      HB_SIZE  sIndex, sLineIndex;
+      HB_SIZE  sTabCnt = 0;
 
       if( ISNUM( 2 ) )
       {
@@ -106,6 +106,7 @@ HB_FUNC( TABEXPAND )
       {
          pcNewLine   = hb_conNewLine();
          sNewLineLen = 0;
+
          while( *( pcNewLine + sNewLineLen ) != 0x00 )
             sNewLineLen++;
       }
@@ -170,7 +171,8 @@ HB_FUNC( TABEXPAND )
          if( cChar == cTab )
          {
             /* tab character */
-            size_t sFillIndex;
+            HB_SIZE sFillIndex;
+
             for( sFillIndex = sTabWidth - ( sLineIndex % sTabWidth );
                  sFillIndex > 0; sFillIndex-- )
             {
@@ -204,7 +206,7 @@ HB_FUNC( TABEXPAND )
                 ( ct_at_exact_forward( pcString + sIndex, sNewLineLen,
                                        pcNewLine, sNewLineLen, NULL ) == pcString + sIndex ) )
             {
-               hb_xmemcpy( pcRet + sRetLen, pcString + sIndex, sNewLineLen );
+               hb_xmemcpy( pcRet + sRetLen, pcString + sIndex, (size_t) sNewLineLen );
                sRetLen     += sNewLineLen;
                sIndex      += sNewLineLen;
                sLineIndex  = 0;
@@ -228,7 +230,7 @@ HB_FUNC( TABEXPAND )
       }
 
       /* copy rest */
-      hb_xmemcpy( pcRet + sRetLen, pcString + sIndex, sStrLen - sIndex );
+      hb_xmemcpy( pcRet + sRetLen, pcString + sIndex, (size_t) ( sStrLen - sIndex ) );
       sRetLen += sStrLen - sIndex;
       hb_retclen( pcRet, sRetLen );
       hb_xfree( pcRet );
@@ -238,6 +240,7 @@ HB_FUNC( TABEXPAND )
    {
       PHB_ITEM pSubst         = NULL;
       int      iArgErrorMode  = ct_getargerrormode();
+
       if( iArgErrorMode != CT_ARGERR_IGNORE )
       {
          pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_TABEXPAND,
@@ -265,16 +268,15 @@ HB_FUNC( TABPACK )
    if( ISCHAR( 1 ) )
    {
       char *   pcString    = ( char * ) hb_parc( 1 );
-      size_t   sStrLen     = ( size_t ) hb_parclen( 1 );
+      HB_SIZE  sStrLen     = hb_parclen( 1 );
       char *   pcRet;
-      size_t   sRetLen;
-      size_t   sTabWidth   = 0;
+      HB_SIZE  sRetLen;
+      HB_SIZE  sTabWidth   = 0;
       char     cFill, cTab, cCR;
       char *   pcNewLine;
-      size_t   sNewLineLen;
+      HB_SIZE  sNewLineLen;
       int      iIgnore141;
-
-      size_t   sIndex, sTabIndex, sFillCount;
+      HB_SIZE  sIndex, sTabIndex, sFillCount;
 
       if( ISNUM( 2 ) )
       {
@@ -311,6 +313,7 @@ HB_FUNC( TABPACK )
       {
          pcNewLine   = hb_conNewLine();
          sNewLineLen = 0;
+
          while( *( pcNewLine + sNewLineLen ) != 0x00 )
             sNewLineLen++;
       }
@@ -426,7 +429,7 @@ HB_FUNC( TABPACK )
                   *( pcRet + sRetLen ) = cFill;
                   sRetLen++;
                }
-               hb_xmemcpy( pcRet + sRetLen, pcString + sIndex, sNewLineLen );
+               hb_xmemcpy( pcRet + sRetLen, pcString + sIndex, (size_t) sNewLineLen );
                sRetLen     += sNewLineLen;
                sIndex      += sNewLineLen;
                sTabIndex   = 0;
@@ -448,15 +451,18 @@ HB_FUNC( TABPACK )
                *( pcRet + sRetLen ) = cFill;
                sRetLen++;
                sTabIndex++;
+
                if( sTabIndex == sTabWidth - 1 )
                {
                   sTabIndex = 0;
                }
             }
+
             *( pcRet + sRetLen ) = *( pcString + sIndex );
             sRetLen++;
             sIndex++;
             sTabIndex++;
+
             if( sTabIndex == sTabWidth - 1 )
             {
                sTabIndex = 0;
@@ -480,6 +486,7 @@ HB_FUNC( TABPACK )
    {
       PHB_ITEM pSubst         = NULL;
       int      iArgErrorMode  = ct_getargerrormode();
+
       if( iArgErrorMode != CT_ARGERR_IGNORE )
       {
          pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG, CT_ERROR_TABPACK,

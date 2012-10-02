@@ -46,7 +46,7 @@ typedef struct HB_stru_genc_info
 } HB_GENC_INFO, * HB_GENC_INFO_PTR;
 
 #define HB_GENC_FUNC( func ) HB_PCODE_FUNC( func, HB_GENC_INFO_PTR )
-typedef HB_GENC_FUNC( HB_GENC_FUNC_ );
+typedef HB_GENC_FUNC ( HB_GENC_FUNC_ );
 typedef HB_GENC_FUNC_ * HB_GENC_FUNC_PTR;
 
 static HB_GENC_FUNC( hb_p_and )
@@ -90,7 +90,8 @@ static HB_GENC_FUNC( hb_p_arraydim )
    fprintf( cargo->yyc, "\tHB_P_ARRAYDIM, %i, %i,",
             pFunc->pCode[ lPCodePos + 1 ],
             pFunc->pCode[ lPCodePos + 2 ] );
-   if( cargo->bVerbose ) fprintf( cargo->yyc, "\t/* %i */", HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 1 ] ) ) );
+   if( cargo->bVerbose )
+      fprintf( cargo->yyc, "\t/* %i */", HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 1 ] ) ) );
    fprintf( cargo->yyc, "\n" );
    return 3;
 }
@@ -166,7 +167,7 @@ static HB_GENC_FUNC( hb_p_endblock )
 
 static HB_GENC_FUNC( hb_p_endproc )
 {
-   if( (lPCodePos+1) == pFunc->lPCodePos )
+   if( ( lPCodePos + 1 ) == pFunc->lPCodePos )
    {
       fprintf( cargo->yyc, "\tHB_P_ENDPROC\n" );
    }
@@ -472,7 +473,7 @@ static HB_GENC_FUNC( hb_p_line )
 
 static HB_GENC_FUNC( hb_p_localname )
 {
-   ULONG ulStart = lPCodePos;
+   HB_SIZE ulStart = lPCodePos;
 
    fprintf( cargo->yyc, "\tHB_P_LOCALNAME, %i, %i,",
             pFunc->pCode[ lPCodePos + 1 ],
@@ -488,7 +489,7 @@ static HB_GENC_FUNC( hb_p_localname )
    while( pFunc->pCode[ lPCodePos ] )
    {
       char chr = pFunc->pCode[ lPCodePos++ ];
-      if( chr == '\'' || chr == '\\')
+      if( chr == '\'' || chr == '\\' )
       {
          fprintf( cargo->yyc, " \'\\%c\',", chr );
       }
@@ -616,7 +617,7 @@ static HB_GENC_FUNC( hb_p_minus )
 
 static HB_GENC_FUNC( hb_p_modulename )
 {
-   ULONG ulStart = lPCodePos;
+   HB_SIZE ulStart = lPCodePos;
 
    fprintf( cargo->yyc, "\tHB_P_MODULENAME," );
    if( cargo->bVerbose )
@@ -628,7 +629,7 @@ static HB_GENC_FUNC( hb_p_modulename )
    while( pFunc->pCode[ lPCodePos ] )
    {
       char chr = pFunc->pCode[ lPCodePos++ ];
-      if( chr == '\'' || chr == '\\')
+      if( chr == '\'' || chr == '\\' )
       {
          fprintf( cargo->yyc, " \'\\%c\',", chr );
       }
@@ -831,11 +832,11 @@ static HB_GENC_FUNC( hb_p_poplocalnear )
 
    if( cargo->bVerbose )
    {
-      int iVar = (int) (signed char) pFunc->pCode[ lPCodePos + 1 ];
+      int iVar = ( int ) ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
 
       /* Variable with negative order are local variables
-         * referenced in a codeblock -handle it with care
-         */
+       * referenced in a codeblock -handle it with care
+       */
 
       if( cargo->iNestedCodeblock )
       {
@@ -885,9 +886,9 @@ static HB_GENC_FUNC( hb_p_popstatic )
 
    if( cargo->bVerbose )
    {
-      PVAR pVar;
-      PFUNCTION pTmp = hb_comp_functions.pFirst;
-      USHORT wVar = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 1 ] ) );
+      PVAR        pVar;
+      PFUNCTION   pTmp  = hb_comp_functions.pFirst;
+      USHORT      wVar  = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 1 ] ) );
 
       while( pTmp->pNext && pTmp->pNext->iStaticsBase < wVar )
       {
@@ -973,8 +974,8 @@ static HB_GENC_FUNC( hb_p_pushaliasedvar )
 
 static HB_GENC_FUNC( hb_p_pushblock )
 {
-   USHORT wVar, w;
-   ULONG ulStart = lPCodePos;
+   USHORT   wVar, w;
+   HB_SIZE  ulStart = lPCodePos;
 
    ++cargo->iNestedCodeblock;
 
@@ -1020,11 +1021,11 @@ static HB_GENC_FUNC( hb_p_pushblock )
       fprintf( cargo->yyc, "\t%i, %i,", pFunc->pCode[ lPCodePos ], pFunc->pCode[ lPCodePos + 1 ] );
 
       /* NOTE:
-         * When a codeblock is used to initialize a static variable
-         * the names of local variables cannot be determined
-         * because at the time of C code generation we don't know
-         * in which function was defined this local variable
-         */
+       * When a codeblock is used to initialize a static variable
+       * the names of local variables cannot be determined
+       * because at the time of C code generation we don't know
+       * in which function was defined this local variable
+       */
       if( ( pFunc->cScope & HB_FS_INITEXIT ) != HB_FS_INITEXIT )
       {
          if( cargo->bVerbose )
@@ -1069,10 +1070,10 @@ static HB_GENC_FUNC( hb_p_pushdouble )
    if( cargo->bVerbose )
    {
       fprintf( cargo->yyc, "\t/* %.*f, %d, %d */",
-      *( ( BYTE * ) &( pFunc->pCode[ lPCodePos + sizeof( double ) + sizeof( BYTE ) ] ) ),
-      HB_PCODE_MKDOUBLE( &( pFunc->pCode[ lPCodePos ] ) ),
-      *( ( BYTE * ) &( pFunc->pCode[ lPCodePos + sizeof( double ) ] ) ),
-      *( ( BYTE * ) &( pFunc->pCode[ lPCodePos + sizeof( double ) + sizeof( BYTE ) ] ) ) );
+               *( ( BYTE * ) &( pFunc->pCode[ lPCodePos + sizeof( double ) + sizeof( BYTE ) ] ) ),
+               HB_PCODE_MKDOUBLE( &( pFunc->pCode[ lPCodePos ] ) ),
+               *( ( BYTE * ) &( pFunc->pCode[ lPCodePos + sizeof( double ) ] ) ),
+               *( ( BYTE * ) &( pFunc->pCode[ lPCodePos + sizeof( double ) + sizeof( BYTE ) ] ) ) );
    }
    fprintf( cargo->yyc, "\n" );
 
@@ -1161,7 +1162,7 @@ static HB_GENC_FUNC( hb_p_pushlocalnear )
 
    if( cargo->bVerbose )
    {
-      int iVar = (int )(signed char) pFunc->pCode[ lPCodePos + 1 ];
+      int iVar = ( int ) ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
 
       /* Variable with negative order are local variables
        * referenced in a codeblock -handle it with care
@@ -1197,7 +1198,7 @@ static HB_GENC_FUNC( hb_p_localnearinc )
 
    if( cargo->bVerbose )
    {
-      int iVar = (int )(signed char) pFunc->pCode[ lPCodePos + 1 ];
+      int iVar = ( int ) ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
 
       /* Variable with negative order are local variables
        * referenced in a codeblock -handle it with care
@@ -1233,7 +1234,7 @@ static HB_GENC_FUNC( hb_p_localneardec )
 
    if( cargo->bVerbose )
    {
-      int iVar = (int )(signed char) pFunc->pCode[ lPCodePos + 1 ];
+      int iVar = ( int ) ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
 
       /* Variable with negative order are local variables
        * referenced in a codeblock -handle it with care
@@ -1269,7 +1270,7 @@ static HB_GENC_FUNC( hb_p_pushlocalnearinc )
 
    if( cargo->bVerbose )
    {
-      int iVar = (int )(signed char) pFunc->pCode[ lPCodePos + 1 ];
+      int iVar = ( int ) ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
 
       /* Variable with negative order are local variables
        * referenced in a codeblock -handle it with care
@@ -1305,7 +1306,7 @@ static HB_GENC_FUNC( hb_p_pushlocalneardec )
 
    if( cargo->bVerbose )
    {
-      int iVar = (int )(signed char) pFunc->pCode[ lPCodePos + 1 ];
+      int iVar = ( int ) ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
 
       /* Variable with negative order are local variables
        * referenced in a codeblock -handle it with care
@@ -1426,15 +1427,15 @@ static HB_GENC_FUNC( hb_p_pushdatetime )
 
    if( cargo->bVerbose )
    {
-      char szDateTime[24];
+      char szDateTime[ 24 ];
       fprintf( cargo->yyc, "\t/* %s */",
-          hb_datetimeDecStr( szDateTime, HB_PCODE_MKLONG( ( pFunc->pCode + lPCodePos + 1 ) ), HB_PCODE_MKLONG( ( pFunc->pCode + lPCodePos + 5 ) ) ) );
+               hb_datetimeDecStr( szDateTime, HB_PCODE_MKLONG( ( pFunc->pCode + lPCodePos + 1 ) ), HB_PCODE_MKLONG( ( pFunc->pCode + lPCodePos + 5 ) ) ) );
 //      printf("szDateTime=%s lDate=%d lTime=%d\n", szDateTime, HB_PCODE_MKLONG( ( pFunc->pCode + lPCodePos + 1 ) ), HB_PCODE_MKLONG( ( pFunc->pCode + lPCodePos + 5 ) ) );
    }
 
    fprintf( cargo->yyc, "\t/* HB_ET_DDATETIME */\n" );
 
-   return sizeof(double) + 1;
+   return sizeof( double ) + 1;
 }
 
 static HB_GENC_FUNC( hb_p_pushdate )
@@ -1502,9 +1503,9 @@ static HB_GENC_FUNC( hb_p_pushstatic )
             pFunc->pCode[ lPCodePos + 2 ] );
    if( cargo->bVerbose )
    {
-      PVAR pVar;
-      PFUNCTION pTmp = hb_comp_functions.pFirst;
-      USHORT wVar = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 1 ] ) );
+      PVAR        pVar;
+      PFUNCTION   pTmp  = hb_comp_functions.pFirst;
+      USHORT      wVar  = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 1 ] ) );
 
       while( pTmp->pNext && pTmp->pNext->iStaticsBase < wVar )
       {
@@ -1527,9 +1528,9 @@ static HB_GENC_FUNC( hb_p_pushstaticref )
             pFunc->pCode[ lPCodePos + 2 ] );
    if( cargo->bVerbose )
    {
-      PVAR pVar;
-      PFUNCTION pTmp = hb_comp_functions.pFirst;
-      USHORT wVar = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 1 ] ) );
+      PVAR        pVar;
+      PFUNCTION   pTmp  = hb_comp_functions.pFirst;
+      USHORT      wVar  = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 1 ] ) );
 
       while( pTmp->pNext && pTmp->pNext->iStaticsBase < wVar )
       {
@@ -1547,8 +1548,8 @@ static HB_GENC_FUNC( hb_p_pushstaticref )
 
 static HB_GENC_FUNC( hb_p_pushstr )
 {
-   ULONG ulStart = lPCodePos;
-   USHORT wLen = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 1 ] ) );
+   HB_SIZE  ulStart  = lPCodePos;
+   USHORT   wLen     = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 1 ] ) );
 
    fprintf( cargo->yyc, "\tHB_P_PUSHSTR, %i, %i,",
             pFunc->pCode[ lPCodePos + 1 ],
@@ -1593,8 +1594,8 @@ static HB_GENC_FUNC( hb_p_pushstr )
 
 static HB_GENC_FUNC( hb_p_pushstrshort )
 {
-   ULONG ulStart = lPCodePos;
-   USHORT wLen = pFunc->pCode[ lPCodePos + 1 ];
+   HB_SIZE  ulStart  = lPCodePos;
+   USHORT   wLen     = pFunc->pCode[ lPCodePos + 1 ];
 
    fprintf( cargo->yyc, "\tHB_P_PUSHSTRSHORT, %i,", pFunc->pCode[ lPCodePos + 1 ] );
 
@@ -1611,11 +1612,11 @@ static HB_GENC_FUNC( hb_p_pushstrshort )
       {
          BYTE uchr = ( BYTE ) pFunc->pCode[ lPCodePos++ ];
          /*
-            * NOTE: After optimization some CHR(n) can be converted
-            *    into a string containing nonprintable characters.
-            *
-            * TODO: add switch to use hexadecimal format "%#04x"
-            */
+          * NOTE: After optimization some CHR(n) can be converted
+          *    into a string containing nonprintable characters.
+          *
+          * TODO: add switch to use hexadecimal format "%#04x"
+          */
          if( ( uchr < ( BYTE ) ' ' ) || ( uchr >= 127 ) )
          {
             fprintf( cargo->yyc, "%i, ", uchr );
@@ -1775,7 +1776,7 @@ static HB_GENC_FUNC( hb_p_statics )
 
 static HB_GENC_FUNC( hb_p_staticname )
 {
-   ULONG ulStart = lPCodePos;
+   HB_SIZE ulStart = lPCodePos;
 
    fprintf( cargo->yyc, "\tHB_P_STATICNAME, %i, %i, %i,",
             pFunc->pCode[ lPCodePos + 1 ],
@@ -1790,7 +1791,7 @@ static HB_GENC_FUNC( hb_p_staticname )
    while( pFunc->pCode[ lPCodePos ] )
    {
       char chr = pFunc->pCode[ lPCodePos++ ];
-      if( chr == '\'' || chr == '\\')
+      if( chr == '\'' || chr == '\\' )
       {
          fprintf( cargo->yyc, " \'\\%c\',", chr );
       }
@@ -1878,13 +1879,13 @@ static HB_GENC_FUNC( hb_p_macrolistend )
 static HB_GENC_FUNC( hb_p_localnearaddint )
 {
    fprintf( cargo->yyc, "\tHB_P_LOCALNEARADDINT, %i, %i, %i,",
-                        pFunc->pCode[ lPCodePos + 1 ],
-                        pFunc->pCode[ lPCodePos + 2 ],
-                        pFunc->pCode[ lPCodePos + 3 ] );
+            pFunc->pCode[ lPCodePos + 1 ],
+            pFunc->pCode[ lPCodePos + 2 ],
+            pFunc->pCode[ lPCodePos + 3 ] );
 
    if( cargo->bVerbose )
    {
-      int iVar = (int) (signed char) pFunc->pCode[ lPCodePos + 1 ];
+      int iVar = ( int ) ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
 
       if( cargo->iNestedCodeblock )
       {
@@ -1919,7 +1920,7 @@ static HB_GENC_FUNC( hb_p_localnearsetint )
 
    if( cargo->bVerbose )
    {
-      int iVar = (int) (signed char) pFunc->pCode[ lPCodePos + 1 ];
+      int iVar = ( int ) ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
 
       if( cargo->iNestedCodeblock )
       {
@@ -1962,8 +1963,8 @@ static HB_GENC_FUNC( hb_p_addint )
 static HB_GENC_FUNC( hb_p_localnearsetstr )
 {
 
-   ULONG ulStart = lPCodePos;
-   USHORT uLen   = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 2 ] ) );
+   HB_SIZE  ulStart  = lPCodePos;
+   USHORT   uLen     = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 2 ] ) );
 
    fprintf( cargo->yyc, "\tHB_P_LOCALNEARSETSTR, %i, %i, %i,",
             pFunc->pCode[ lPCodePos + 1 ],
@@ -1972,7 +1973,7 @@ static HB_GENC_FUNC( hb_p_localnearsetstr )
 
    if( cargo->bVerbose )
    {
-      int iVar = (int) (signed char) pFunc->pCode[ lPCodePos + 1 ];
+      int iVar = ( int ) ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
 
       if( cargo->iNestedCodeblock )
       {
@@ -2195,7 +2196,7 @@ static HB_GENC_FUNC( hb_p_pushglobal )
 
    if( cargo->bVerbose )
    {
-      fprintf( cargo->yyc, "\t/* %s */", hb_compVariableFind( hb_comp_pGlobals, (USHORT) pFunc->pCode[ lPCodePos + 1 ] + 1 )->szName );
+      fprintf( cargo->yyc, "\t/* %s */", hb_compVariableFind( hb_comp_pGlobals, ( USHORT ) pFunc->pCode[ lPCodePos + 1 ] + 1 )->szName );
    }
 
    fprintf( cargo->yyc, "\n" );
@@ -2210,7 +2211,7 @@ static HB_GENC_FUNC( hb_p_popglobal )
 
    if( cargo->bVerbose )
    {
-      fprintf( cargo->yyc, "\t/* %s */", hb_compVariableFind( hb_comp_pGlobals, (USHORT) pFunc->pCode[ lPCodePos + 1 ] + 1 )->szName );
+      fprintf( cargo->yyc, "\t/* %s */", hb_compVariableFind( hb_comp_pGlobals, ( USHORT ) pFunc->pCode[ lPCodePos + 1 ] + 1 )->szName );
    }
 
    fprintf( cargo->yyc, "\n" );
@@ -2225,7 +2226,7 @@ static HB_GENC_FUNC( hb_p_pushglobalref )
 
    if( cargo->bVerbose )
    {
-      fprintf( cargo->yyc, "\t/* %s */", hb_compVariableFind( hb_comp_pGlobals, (USHORT) pFunc->pCode[ lPCodePos + 1 ] + 1 )->szName );
+      fprintf( cargo->yyc, "\t/* %s */", hb_compVariableFind( hb_comp_pGlobals, ( USHORT ) pFunc->pCode[ lPCodePos + 1 ] + 1 )->szName );
    }
 
    fprintf( cargo->yyc, "\n" );
@@ -2368,17 +2369,17 @@ static HB_GENC_FUNC( hb_p_pushwith )
 
 static HB_GENC_FUNC( hb_p_pushstrhidden )
 {
-   ULONG ulStart = lPCodePos;
-   USHORT wLen = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 1 ] ) );
-   BYTE bType = pFunc->pCode[ lPCodePos + 3 ];
-   USHORT wLenBuffer = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 4 ] ) );
+   HB_SIZE  ulStart     = lPCodePos;
+   USHORT   wLen        = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 1 ] ) );
+   BYTE     bType       = pFunc->pCode[ lPCodePos + 3 ];
+   USHORT   wLenBuffer  = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 4 ] ) );
 
    fprintf( cargo->yyc, "\tHB_P_PUSHSTRHIDDEN, %i, %i, %i, %i, %i,",
-            pFunc->pCode[ lPCodePos + 1 ],     // LO: String length
-            pFunc->pCode[ lPCodePos + 2 ],     // HI: String length
-            pFunc->pCode[ lPCodePos + 3 ],     // Hide type
-            pFunc->pCode[ lPCodePos + 4 ],     // LO: Buffer length
-            pFunc->pCode[ lPCodePos + 5 ] );   // HI: Buffer length
+            pFunc->pCode[ lPCodePos + 1 ],      // LO: String length
+            pFunc->pCode[ lPCodePos + 2 ],      // HI: String length
+            pFunc->pCode[ lPCodePos + 3 ],      // Hide type
+            pFunc->pCode[ lPCodePos + 4 ],      // LO: Buffer length
+            pFunc->pCode[ lPCodePos + 5 ] );    // HI: Buffer length
 
    if( cargo->bVerbose )
    {
@@ -2419,22 +2420,22 @@ static HB_GENC_FUNC( hb_p_pushstrhidden )
 
 static HB_GENC_FUNC( hb_p_localnearsetstrhidden )
 {
-   ULONG ulStart = lPCodePos;
-   USHORT uLen   = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 2 ] ) );
-   BYTE bType = pFunc->pCode[ lPCodePos + 4 ];
-   USHORT wLenBuffer = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 5 ] ) );
+   HB_SIZE  ulStart     = lPCodePos;
+   USHORT   uLen        = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 2 ] ) );
+   BYTE     bType       = pFunc->pCode[ lPCodePos + 4 ];
+   USHORT   wLenBuffer  = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 5 ] ) );
 
    fprintf( cargo->yyc, "\tHB_P_LOCALNEARSETSTRHIDDEN, %i, %i, %i, %i, %i, %i,",
             pFunc->pCode[ lPCodePos + 1 ],
-            pFunc->pCode[ lPCodePos + 2 ],     // LO: String length
-            pFunc->pCode[ lPCodePos + 3 ],     // HI: String length
-            pFunc->pCode[ lPCodePos + 4 ],     // Hide type
-            pFunc->pCode[ lPCodePos + 5 ],     // LO: Buffer length
-            pFunc->pCode[ lPCodePos + 6 ] );   // HI: Buffer length
+            pFunc->pCode[ lPCodePos + 2 ],      // LO: String length
+            pFunc->pCode[ lPCodePos + 3 ],      // HI: String length
+            pFunc->pCode[ lPCodePos + 4 ],      // Hide type
+            pFunc->pCode[ lPCodePos + 5 ],      // LO: Buffer length
+            pFunc->pCode[ lPCodePos + 6 ] );    // HI: Buffer length
 
    if( cargo->bVerbose )
    {
-      int iVar = (int) (signed char) pFunc->pCode[ lPCodePos + 1 ];
+      int iVar = ( int ) ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
 
       if( cargo->iNestedCodeblock )
       {
@@ -2572,11 +2573,11 @@ static HB_GENC_FUNC( hb_p_endfinally )
 static HB_GENC_FUNC( hb_p_localnearadd )
 {
    fprintf( cargo->yyc, "\tHB_P_LOCALNEARADD, %i,",
-                        pFunc->pCode[ lPCodePos + 1 ] );
+            pFunc->pCode[ lPCodePos + 1 ] );
 
    if( cargo->bVerbose )
    {
-      int iVar = (int) (signed char) pFunc->pCode[ lPCodePos + 1 ];
+      int iVar = ( int ) ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
 
       if( cargo->iNestedCodeblock )
       {
@@ -2622,7 +2623,7 @@ static HB_GENC_FUNC( hb_p_arraypopplus )
 
 static HB_GENC_FUNC( hb_p_divert )
 {
-   if( (lPCodePos+1) == pFunc->lPCodePos )
+   if( ( lPCodePos + 1 ) == pFunc->lPCodePos )
    {
       fprintf( cargo->yyc, "\tHB_P_DIVERT\n" );
    }
@@ -2635,7 +2636,7 @@ static HB_GENC_FUNC( hb_p_divert )
 
 static HB_GENC_FUNC( hb_p_divertof )
 {
-   if( (lPCodePos+1) == pFunc->lPCodePos )
+   if( ( lPCodePos + 1 ) == pFunc->lPCodePos )
    {
       fprintf( cargo->yyc, "\tHB_P_DIVERTOF\n" );
    }
@@ -2650,187 +2651,187 @@ static HB_GENC_FUNC( hb_p_divertof )
  *       mnemonics
  */
 static HB_GENC_FUNC_PTR s_verbose_table[] = {
-   hb_p_and,                                         /* HB_P_AND,                  */
-   hb_p_arraypush,                                   /* HB_P_ARRAYPUSH,            */
-   hb_p_arraypop,                                    /* HB_P_ARRAYPOP,             */
-   hb_p_arraydim,                                    /* HB_P_ARRAYDIM,             */
-   hb_p_arraygen,                                    /* HB_P_ARRAYGEN,             */
-   hb_p_equal,                                       /* HB_P_EQUAL,                */
-   hb_p_endblock,                                    /* HB_P_ENDBLOCK,             */
-   hb_p_endproc,                                     /* HB_P_ENDPROC,              */
-   hb_p_exactlyequal,                                /* HB_P_EXACTLYEQUAL,         */
-   hb_p_false,                                       /* HB_P_FALSE,                */
-   hb_p_fortest,                                     /* HB_P_FORTEST,              */
-   hb_p_function,                                    /* HB_P_FUNCTION,             */
-   hb_p_functionshort,                               /* HB_P_FUNCTIONSHORT,        */
-   hb_p_frame,                                       /* HB_P_FRAME,                */
-   hb_p_funcptr,                                     /* HB_P_FUNCPTR,              */
-   hb_p_greater,                                     /* HB_P_GREATER,              */
-   hb_p_greaterequal,                                /* HB_P_GREATEREQUAL,         */
-   hb_p_dec,                                         /* HB_P_DEC,                  */
-   hb_p_divide,                                      /* HB_P_DIVIDE,               */
-   hb_p_do,                                          /* HB_P_DO,                   */
-   hb_p_doshort,                                     /* HB_P_DOSHORT,              */
-   hb_p_duplicate,                                   /* HB_P_DUPLICATE,            */
-   hb_p_dupltwo,                                     /* HB_P_DUPLTWO,              */
-   hb_p_inc,                                         /* HB_P_INC,                  */
-   hb_p_instring,                                    /* HB_P_INSTRING,             */
-   hb_p_jumpnear,                                    /* HB_P_JUMPNEAR,             */
-   hb_p_jump,                                        /* HB_P_JUMP,                 */
-   hb_p_jumpfar,                                     /* HB_P_JUMPFAR,              */
-   hb_p_jumpfalsenear,                               /* HB_P_JUMPFALSENEAR,        */
-   hb_p_jumpfalse,                                   /* HB_P_JUMPFALSE,            */
-   hb_p_jumpfalsefar,                                /* HB_P_JUMPFALSEFAR,         */
-   hb_p_jumptruenear,                                /* HB_P_JUMPTRUENEAR,         */
-   hb_p_jumptrue,                                    /* HB_P_JUMPTRUE,             */
-   hb_p_jumptruefar,                                 /* HB_P_JUMPTRUEFAR,          */
-   hb_p_lessequal,                                   /* HB_P_LESSEQUAL,            */
-   hb_p_less,                                        /* HB_P_LESS,                 */
-   hb_p_line,                                        /* HB_P_LINE,                 */
-   hb_p_localname,                                   /* HB_P_LOCALNAME,            */
-   hb_p_macropop,                                    /* HB_P_MACROPOP,             */
-   hb_p_macropopaliased,                             /* HB_P_MACROPOPALIASED,      */
-   hb_p_macropush,                                   /* HB_P_MACROPUSH,            */
-   hb_p_macropusharg,                                /* HB_P_MACROPUSHARG,         */
-   hb_p_macropushlist,                               /* HB_P_MACROPUSHLIST,        */
-   hb_p_macropushindex,                              /* HB_P_MACROPUSHINDEX,       */
-   hb_p_macropushpare,                               /* HB_P_MACROPUSHPARE,        */
-   hb_p_macropushaliased,                            /* HB_P_MACROPUSHALIASED,     */
-   hb_p_macrosymbol,                                 /* HB_P_MACROSYMBOL,          */
-   hb_p_macrotext,                                   /* HB_P_MACROTEXT,            */
-   hb_p_message,                                     /* HB_P_MESSAGE,              */
-   hb_p_minus,                                       /* HB_P_MINUS,                */
-   hb_p_modulus,                                     /* HB_P_MODULUS,              */
-   hb_p_modulename,                                  /* HB_P_MODULENAME,           */
+   hb_p_and,                                          /* HB_P_AND,                  */
+   hb_p_arraypush,                                    /* HB_P_ARRAYPUSH,            */
+   hb_p_arraypop,                                     /* HB_P_ARRAYPOP,             */
+   hb_p_arraydim,                                     /* HB_P_ARRAYDIM,             */
+   hb_p_arraygen,                                     /* HB_P_ARRAYGEN,             */
+   hb_p_equal,                                        /* HB_P_EQUAL,                */
+   hb_p_endblock,                                     /* HB_P_ENDBLOCK,             */
+   hb_p_endproc,                                      /* HB_P_ENDPROC,              */
+   hb_p_exactlyequal,                                 /* HB_P_EXACTLYEQUAL,         */
+   hb_p_false,                                        /* HB_P_FALSE,                */
+   hb_p_fortest,                                      /* HB_P_FORTEST,              */
+   hb_p_function,                                     /* HB_P_FUNCTION,             */
+   hb_p_functionshort,                                /* HB_P_FUNCTIONSHORT,        */
+   hb_p_frame,                                        /* HB_P_FRAME,                */
+   hb_p_funcptr,                                      /* HB_P_FUNCPTR,              */
+   hb_p_greater,                                      /* HB_P_GREATER,              */
+   hb_p_greaterequal,                                 /* HB_P_GREATEREQUAL,         */
+   hb_p_dec,                                          /* HB_P_DEC,                  */
+   hb_p_divide,                                       /* HB_P_DIVIDE,               */
+   hb_p_do,                                           /* HB_P_DO,                   */
+   hb_p_doshort,                                      /* HB_P_DOSHORT,              */
+   hb_p_duplicate,                                    /* HB_P_DUPLICATE,            */
+   hb_p_dupltwo,                                      /* HB_P_DUPLTWO,              */
+   hb_p_inc,                                          /* HB_P_INC,                  */
+   hb_p_instring,                                     /* HB_P_INSTRING,             */
+   hb_p_jumpnear,                                     /* HB_P_JUMPNEAR,             */
+   hb_p_jump,                                         /* HB_P_JUMP,                 */
+   hb_p_jumpfar,                                      /* HB_P_JUMPFAR,              */
+   hb_p_jumpfalsenear,                                /* HB_P_JUMPFALSENEAR,        */
+   hb_p_jumpfalse,                                    /* HB_P_JUMPFALSE,            */
+   hb_p_jumpfalsefar,                                 /* HB_P_JUMPFALSEFAR,         */
+   hb_p_jumptruenear,                                 /* HB_P_JUMPTRUENEAR,         */
+   hb_p_jumptrue,                                     /* HB_P_JUMPTRUE,             */
+   hb_p_jumptruefar,                                  /* HB_P_JUMPTRUEFAR,          */
+   hb_p_lessequal,                                    /* HB_P_LESSEQUAL,            */
+   hb_p_less,                                         /* HB_P_LESS,                 */
+   hb_p_line,                                         /* HB_P_LINE,                 */
+   hb_p_localname,                                    /* HB_P_LOCALNAME,            */
+   hb_p_macropop,                                     /* HB_P_MACROPOP,             */
+   hb_p_macropopaliased,                              /* HB_P_MACROPOPALIASED,      */
+   hb_p_macropush,                                    /* HB_P_MACROPUSH,            */
+   hb_p_macropusharg,                                 /* HB_P_MACROPUSHARG,         */
+   hb_p_macropushlist,                                /* HB_P_MACROPUSHLIST,        */
+   hb_p_macropushindex,                               /* HB_P_MACROPUSHINDEX,       */
+   hb_p_macropushpare,                                /* HB_P_MACROPUSHPARE,        */
+   hb_p_macropushaliased,                             /* HB_P_MACROPUSHALIASED,     */
+   hb_p_macrosymbol,                                  /* HB_P_MACROSYMBOL,          */
+   hb_p_macrotext,                                    /* HB_P_MACROTEXT,            */
+   hb_p_message,                                      /* HB_P_MESSAGE,              */
+   hb_p_minus,                                        /* HB_P_MINUS,                */
+   hb_p_modulus,                                      /* HB_P_MODULUS,              */
+   hb_p_modulename,                                   /* HB_P_MODULENAME,           */
    /* start: pcodes generated by macro compiler */
-   hb_p_dummy,                                       /* HB_P_MMESSAGE,             */
-   hb_p_dummy,                                       /* HB_P_MPOPALIASEDFIELD,     */
-   hb_p_dummy,                                       /* HB_P_MPOPALIASEDVAR,       */
-   hb_p_dummy,                                       /* HB_P_MPOPFIELD,            */
-   hb_p_dummy,                                       /* HB_P_MPOPMEMVAR,           */
-   hb_p_dummy,                                       /* HB_P_MPUSHALIASEDFIELD,    */
-   hb_p_dummy,                                       /* HB_P_MPUSHALIASEDVAR,      */
-   hb_p_dummy,                                       /* HB_P_MPUSHBLOCK,           */
-   hb_p_dummy,                                       /* HB_P_MPUSHFIELD,           */
-   hb_p_dummy,                                       /* HB_P_MPUSHMEMVAR,          */
-   hb_p_dummy,                                       /* HB_P_MPUSHMEMVARREF,       */
-   hb_p_dummy,                                       /* HB_P_MPUSHSYM,             */
-   hb_p_dummy,                                       /* HB_P_MPUSHVARIABLE,        */
+   hb_p_dummy,                                        /* HB_P_MMESSAGE,             */
+   hb_p_dummy,                                        /* HB_P_MPOPALIASEDFIELD,     */
+   hb_p_dummy,                                        /* HB_P_MPOPALIASEDVAR,       */
+   hb_p_dummy,                                        /* HB_P_MPOPFIELD,            */
+   hb_p_dummy,                                        /* HB_P_MPOPMEMVAR,           */
+   hb_p_dummy,                                        /* HB_P_MPUSHALIASEDFIELD,    */
+   hb_p_dummy,                                        /* HB_P_MPUSHALIASEDVAR,      */
+   hb_p_dummy,                                        /* HB_P_MPUSHBLOCK,           */
+   hb_p_dummy,                                        /* HB_P_MPUSHFIELD,           */
+   hb_p_dummy,                                        /* HB_P_MPUSHMEMVAR,          */
+   hb_p_dummy,                                        /* HB_P_MPUSHMEMVARREF,       */
+   hb_p_dummy,                                        /* HB_P_MPUSHSYM,             */
+   hb_p_dummy,                                        /* HB_P_MPUSHVARIABLE,        */
    /* end: */
-   hb_p_mult,                                        /* HB_P_MULT,                 */
-   hb_p_negate,                                      /* HB_P_NEGATE,               */
-   hb_p_noop,                                        /* HB_P_NOOP,                 */
-   hb_p_not,                                         /* HB_P_NOT,                  */
-   hb_p_notequal,                                    /* HB_P_NOTEQUAL,             */
-   hb_p_or,                                          /* HB_P_OR,                   */
-   hb_p_parameter,                                   /* HB_P_PARAMETER,            */
-   hb_p_plus,                                        /* HB_P_PLUS,                 */
-   hb_p_pop,                                         /* HB_P_POP,                  */
-   hb_p_popalias,                                    /* HB_P_POPALIAS,             */
-   hb_p_popaliasedfield,                             /* HB_P_POPALIASEDFIELD,      */
-   hb_p_popaliasedfieldnear,                         /* HB_P_POPALIASEDFIELDNEAR,  */
-   hb_p_popaliasedvar,                               /* HB_P_POPALIASEDVAR,        */
-   hb_p_popfield,                                    /* HB_P_POPFIELD,             */
-   hb_p_poplocal,                                    /* HB_P_POPLOCAL,             */
-   hb_p_poplocalnear,                                /* HB_P_POPLOCALNEAR,         */
-   hb_p_popmemvar,                                   /* HB_P_POPMEMVAR,            */
-   hb_p_popstatic,                                   /* HB_P_POPSTATIC,            */
-   hb_p_popvariable,                                 /* HB_P_POPVARIABLE,          */
-   hb_p_power,                                       /* HB_P_POWER,                */
-   hb_p_pushalias,                                   /* HB_P_PUSHALIAS,            */
-   hb_p_pushaliasedfield,                            /* HB_P_PUSHALIASEDFIELD,     */
-   hb_p_pushaliasedfieldnear,                        /* HB_P_PUSHALIASEDFIELDNEAR, */
-   hb_p_pushaliasedvar,                              /* HB_P_PUSHALIASEDVAR,       */
-   hb_p_pushblock,                                   /* HB_P_PUSHBLOCK,            */
-   hb_p_pushblockshort,                              /* HB_P_PUSHBLOCKSHORT,       */
-   hb_p_pushfield,                                   /* HB_P_PUSHFIELD,            */
-   hb_p_pushbyte,                                    /* HB_P_PUSHBYTE,             */
-   hb_p_pushint,                                     /* HB_P_PUSHINT,              */
-   hb_p_pushlocal,                                   /* HB_P_PUSHLOCAL,            */
-   hb_p_pushlocalnear,                               /* HB_P_PUSHLOCALNEAR,        */
-   hb_p_pushlocalref,                                /* HB_P_PUSHLOCALREF,         */
-   hb_p_pushlong,                                    /* HB_P_PUSHLONG,             */
-   hb_p_pushmemvar,                                  /* HB_P_PUSHMEMVAR,           */
-   hb_p_pushmemvarref,                               /* HB_P_PUSHMEMVARREF,        */
-   hb_p_pushnil,                                     /* HB_P_PUSHNIL,              */
-   hb_p_pushdouble,                                  /* HB_P_PUSHDOUBLE,           */
-   hb_p_pushself,                                    /* HB_P_PUSHSELF,             */
-   hb_p_pushstatic,                                  /* HB_P_PUSHSTATIC,           */
-   hb_p_pushstaticref,                               /* HB_P_PUSHSTATICREF,        */
-   hb_p_pushstr,                                     /* HB_P_PUSHSTR,              */
-   hb_p_pushstrshort,                                /* HB_P_PUSHSTRSHORT,         */
-   hb_p_pushsym,                                     /* HB_P_PUSHSYM,              */
-   hb_p_pushsymnear,                                 /* HB_P_PUSHSYMNEAR,          */
-   hb_p_pushvariable,                                /* HB_P_PUSHVARIABLE,         */
-   hb_p_retvalue,                                    /* HB_P_RETVALUE,             */
-   hb_p_send,                                        /* HB_P_SEND,                 */
-   hb_p_sendshort,                                   /* HB_P_SENDSHORT,            */
-   hb_p_seqbegin,                                    /* HB_P_SEQBEGIN,             */
-   hb_p_seqend,                                      /* HB_P_SEQEND,               */
-   hb_p_seqrecover,                                  /* HB_P_SEQRECOVER,           */
-   hb_p_sframe,                                      /* HB_P_SFRAME,               */
-   hb_p_statics,                                     /* HB_P_STATICS,              */
-   hb_p_staticname,                                  /* HB_P_STATICNAME,           */
-   hb_p_swapalias,                                   /* HB_P_SWAPALIAS,            */
-   hb_p_true,                                        /* HB_P_TRUE,                 */
-   hb_p_zero,                                        /* HB_P_ZERO,                 */
-   hb_p_one,                                         /* HB_P_ONE,                  */
-   hb_p_macrolist,                                   /* HB_P_MACROLIST,            */
-   hb_p_macrolistend,                                /* HB_P_MACROLISTEND,         */
-   hb_p_localnearaddint,                             /* HB_P_LOCALNEARADDINT,      */
-   hb_p_localnearsetint,                             /* HB_P_LOCALNEARSETINT,      */
-   hb_p_localnearsetstr,                             /* HB_P_LOCALNEARSETSTR,      */
-   hb_p_addint,                                      /* HB_P_ADDINT,               */
-   hb_p_left,                                        /* HB_P_LEFT,                 */
-   hb_p_right,                                       /* HB_P_RIGHT,                */
-   hb_p_substr,                                      /* HB_P_SUBSTR,               */
-   hb_p_dummy,                                       /* HB_P_MPUSHSTR,             */
-   hb_p_baseline,                                    /* HB_P_BASELINE,             */
-   hb_p_lineoffset,                                  /* HB_P_LINEOFFSET,           */
-   hb_p_withobject,                                  /* HB_P_WITHOBJECT,           */
-   hb_p_sendwith,                                    /* HB_P_SENDWITH,             */
-   hb_p_sendwithshort,                               /* HB_P_SENDWITHSHORT,        */
-   hb_p_endwithobject,                               /* HB_P_ENDWITHOBJECT,        */
-   hb_p_foreach,                                     /* HB_P_FOREACH,              */
-   hb_p_enumerate,                                   /* HB_P_ENUMERATE,            */
-   hb_p_endenumerate,                                /* HB_P_ENDENUMERATE,         */
-   hb_p_pushglobal,                                  /* HB_P_PUSHGLOBAL,           */
-   hb_p_popglobal,                                   /* HB_P_POPGLOBAL,            */
-   hb_p_pushglobalref,                               /* HB_P_PUSHGLOBALREF,        */
-   hb_p_enumindex,                                   /* HB_P_ENUMINDEX,            */
-   hb_p_switchcase,                                  /* HB_P_SWITCHCASE,           */
-   hb_p_like,                                        /* HB_P_LIKE,                 */
-   hb_p_match,                                       /* HB_P_MATCH,                */
-   hb_p_pushmacroref,                                /* HB_P_PUSHMACROREF,         */
-   hb_p_ivarref,                                     /* HB_P_IVARREF,              */
-   hb_p_classsetmodule,                              /* HB_P_CLASSSETMODULE,       */
-   hb_p_bitand,                                      /* HB_P_BITAND,               */
-   hb_p_bitor,                                       /* HB_P_BITOR,                */
-   hb_p_bitxor,                                      /* HB_P_BITXOR,               */
-   hb_p_bitshiftr,                                   /* HB_P_SHIFTR,               */
-   hb_p_bitshiftl,                                   /* HB_P_SHIFTL,               */
-   hb_p_largeframe,                                  /* HB_P_LARGEFRAME,           */
-   hb_p_pushwith,                                    /* HB_P_PUSHWITH,             */
-   hb_p_pushlonglong,                                /* HB_P_PUSHLONGLONG,         */
-   hb_p_pushstrhidden,                               /* HB_P_PUSHSTRHIDDEN,        */
-   hb_p_localnearsetstrhidden,                       /* HB_P_LOCALNEARSETSTRHIDDEN,*/
-   hb_p_trybegin,                                    /* HB_P_TRYBEGIN,             */
-   hb_p_tryend,                                      /* HB_P_TRYEND,               */
-   hb_p_tryrecover,                                  /* HB_P_TRYRECOVER,           */
-   hb_p_finally,                                     /* HB_P_FINALLY,              */
-   hb_p_endfinally,                                  /* HB_P_ENDFINALLY,           */
-   hb_p_localnearadd,                                /* HB_P_LOCALNEARADD          */
-   hb_p_arraypushref,                                /* HB_P_ARRAYPUSHREF          */
-   hb_p_arraypopplus,                                /* HB_P_ARRAYPOPPLUS          */
-   hb_p_pushdatetime,                                /* HB_P_PUSHDATETIME          */
-   hb_p_pushdate,                                    /* HB_P_PUSHDATE              */
-   hb_p_hashgen,                                     /* HB_P_HASHGEN               */
-   hb_p_localnearinc,                                /* HB_P_LOCALNEARINC,         */
-   hb_p_localneardec,                                /* HB_P_LOCALNEARDEC,         */
-   hb_p_pushlocalnearinc,                            /* HB_P_PUSHLOCALNEARINC,     */
-   hb_p_pushlocalneardec,                            /* HB_P_PUSHLOCALNEARDEC,     */
-   hb_p_divert,                                      /* HB_P_DIVERT                */
-   hb_p_divertof                                     /* HB_P_DIVERTOF              */
+   hb_p_mult,                                         /* HB_P_MULT,                 */
+   hb_p_negate,                                       /* HB_P_NEGATE,               */
+   hb_p_noop,                                         /* HB_P_NOOP,                 */
+   hb_p_not,                                          /* HB_P_NOT,                  */
+   hb_p_notequal,                                     /* HB_P_NOTEQUAL,             */
+   hb_p_or,                                           /* HB_P_OR,                   */
+   hb_p_parameter,                                    /* HB_P_PARAMETER,            */
+   hb_p_plus,                                         /* HB_P_PLUS,                 */
+   hb_p_pop,                                          /* HB_P_POP,                  */
+   hb_p_popalias,                                     /* HB_P_POPALIAS,             */
+   hb_p_popaliasedfield,                              /* HB_P_POPALIASEDFIELD,      */
+   hb_p_popaliasedfieldnear,                          /* HB_P_POPALIASEDFIELDNEAR,  */
+   hb_p_popaliasedvar,                                /* HB_P_POPALIASEDVAR,        */
+   hb_p_popfield,                                     /* HB_P_POPFIELD,             */
+   hb_p_poplocal,                                     /* HB_P_POPLOCAL,             */
+   hb_p_poplocalnear,                                 /* HB_P_POPLOCALNEAR,         */
+   hb_p_popmemvar,                                    /* HB_P_POPMEMVAR,            */
+   hb_p_popstatic,                                    /* HB_P_POPSTATIC,            */
+   hb_p_popvariable,                                  /* HB_P_POPVARIABLE,          */
+   hb_p_power,                                        /* HB_P_POWER,                */
+   hb_p_pushalias,                                    /* HB_P_PUSHALIAS,            */
+   hb_p_pushaliasedfield,                             /* HB_P_PUSHALIASEDFIELD,     */
+   hb_p_pushaliasedfieldnear,                         /* HB_P_PUSHALIASEDFIELDNEAR, */
+   hb_p_pushaliasedvar,                               /* HB_P_PUSHALIASEDVAR,       */
+   hb_p_pushblock,                                    /* HB_P_PUSHBLOCK,            */
+   hb_p_pushblockshort,                               /* HB_P_PUSHBLOCKSHORT,       */
+   hb_p_pushfield,                                    /* HB_P_PUSHFIELD,            */
+   hb_p_pushbyte,                                     /* HB_P_PUSHBYTE,             */
+   hb_p_pushint,                                      /* HB_P_PUSHINT,              */
+   hb_p_pushlocal,                                    /* HB_P_PUSHLOCAL,            */
+   hb_p_pushlocalnear,                                /* HB_P_PUSHLOCALNEAR,        */
+   hb_p_pushlocalref,                                 /* HB_P_PUSHLOCALREF,         */
+   hb_p_pushlong,                                     /* HB_P_PUSHLONG,             */
+   hb_p_pushmemvar,                                   /* HB_P_PUSHMEMVAR,           */
+   hb_p_pushmemvarref,                                /* HB_P_PUSHMEMVARREF,        */
+   hb_p_pushnil,                                      /* HB_P_PUSHNIL,              */
+   hb_p_pushdouble,                                   /* HB_P_PUSHDOUBLE,           */
+   hb_p_pushself,                                     /* HB_P_PUSHSELF,             */
+   hb_p_pushstatic,                                   /* HB_P_PUSHSTATIC,           */
+   hb_p_pushstaticref,                                /* HB_P_PUSHSTATICREF,        */
+   hb_p_pushstr,                                      /* HB_P_PUSHSTR,              */
+   hb_p_pushstrshort,                                 /* HB_P_PUSHSTRSHORT,         */
+   hb_p_pushsym,                                      /* HB_P_PUSHSYM,              */
+   hb_p_pushsymnear,                                  /* HB_P_PUSHSYMNEAR,          */
+   hb_p_pushvariable,                                 /* HB_P_PUSHVARIABLE,         */
+   hb_p_retvalue,                                     /* HB_P_RETVALUE,             */
+   hb_p_send,                                         /* HB_P_SEND,                 */
+   hb_p_sendshort,                                    /* HB_P_SENDSHORT,            */
+   hb_p_seqbegin,                                     /* HB_P_SEQBEGIN,             */
+   hb_p_seqend,                                       /* HB_P_SEQEND,               */
+   hb_p_seqrecover,                                   /* HB_P_SEQRECOVER,           */
+   hb_p_sframe,                                       /* HB_P_SFRAME,               */
+   hb_p_statics,                                      /* HB_P_STATICS,              */
+   hb_p_staticname,                                   /* HB_P_STATICNAME,           */
+   hb_p_swapalias,                                    /* HB_P_SWAPALIAS,            */
+   hb_p_true,                                         /* HB_P_TRUE,                 */
+   hb_p_zero,                                         /* HB_P_ZERO,                 */
+   hb_p_one,                                          /* HB_P_ONE,                  */
+   hb_p_macrolist,                                    /* HB_P_MACROLIST,            */
+   hb_p_macrolistend,                                 /* HB_P_MACROLISTEND,         */
+   hb_p_localnearaddint,                              /* HB_P_LOCALNEARADDINT,      */
+   hb_p_localnearsetint,                              /* HB_P_LOCALNEARSETINT,      */
+   hb_p_localnearsetstr,                              /* HB_P_LOCALNEARSETSTR,      */
+   hb_p_addint,                                       /* HB_P_ADDINT,               */
+   hb_p_left,                                         /* HB_P_LEFT,                 */
+   hb_p_right,                                        /* HB_P_RIGHT,                */
+   hb_p_substr,                                       /* HB_P_SUBSTR,               */
+   hb_p_dummy,                                        /* HB_P_MPUSHSTR,             */
+   hb_p_baseline,                                     /* HB_P_BASELINE,             */
+   hb_p_lineoffset,                                   /* HB_P_LINEOFFSET,           */
+   hb_p_withobject,                                   /* HB_P_WITHOBJECT,           */
+   hb_p_sendwith,                                     /* HB_P_SENDWITH,             */
+   hb_p_sendwithshort,                                /* HB_P_SENDWITHSHORT,        */
+   hb_p_endwithobject,                                /* HB_P_ENDWITHOBJECT,        */
+   hb_p_foreach,                                      /* HB_P_FOREACH,              */
+   hb_p_enumerate,                                    /* HB_P_ENUMERATE,            */
+   hb_p_endenumerate,                                 /* HB_P_ENDENUMERATE,         */
+   hb_p_pushglobal,                                   /* HB_P_PUSHGLOBAL,           */
+   hb_p_popglobal,                                    /* HB_P_POPGLOBAL,            */
+   hb_p_pushglobalref,                                /* HB_P_PUSHGLOBALREF,        */
+   hb_p_enumindex,                                    /* HB_P_ENUMINDEX,            */
+   hb_p_switchcase,                                   /* HB_P_SWITCHCASE,           */
+   hb_p_like,                                         /* HB_P_LIKE,                 */
+   hb_p_match,                                        /* HB_P_MATCH,                */
+   hb_p_pushmacroref,                                 /* HB_P_PUSHMACROREF,         */
+   hb_p_ivarref,                                      /* HB_P_IVARREF,              */
+   hb_p_classsetmodule,                               /* HB_P_CLASSSETMODULE,       */
+   hb_p_bitand,                                       /* HB_P_BITAND,               */
+   hb_p_bitor,                                        /* HB_P_BITOR,                */
+   hb_p_bitxor,                                       /* HB_P_BITXOR,               */
+   hb_p_bitshiftr,                                    /* HB_P_SHIFTR,               */
+   hb_p_bitshiftl,                                    /* HB_P_SHIFTL,               */
+   hb_p_largeframe,                                   /* HB_P_LARGEFRAME,           */
+   hb_p_pushwith,                                     /* HB_P_PUSHWITH,             */
+   hb_p_pushlonglong,                                 /* HB_P_PUSHLONGLONG,         */
+   hb_p_pushstrhidden,                                /* HB_P_PUSHSTRHIDDEN,        */
+   hb_p_localnearsetstrhidden,                        /* HB_P_LOCALNEARSETSTRHIDDEN,*/
+   hb_p_trybegin,                                     /* HB_P_TRYBEGIN,             */
+   hb_p_tryend,                                       /* HB_P_TRYEND,               */
+   hb_p_tryrecover,                                   /* HB_P_TRYRECOVER,           */
+   hb_p_finally,                                      /* HB_P_FINALLY,              */
+   hb_p_endfinally,                                   /* HB_P_ENDFINALLY,           */
+   hb_p_localnearadd,                                 /* HB_P_LOCALNEARADD          */
+   hb_p_arraypushref,                                 /* HB_P_ARRAYPUSHREF          */
+   hb_p_arraypopplus,                                 /* HB_P_ARRAYPOPPLUS          */
+   hb_p_pushdatetime,                                 /* HB_P_PUSHDATETIME          */
+   hb_p_pushdate,                                     /* HB_P_PUSHDATE              */
+   hb_p_hashgen,                                      /* HB_P_HASHGEN               */
+   hb_p_localnearinc,                                 /* HB_P_LOCALNEARINC,         */
+   hb_p_localneardec,                                 /* HB_P_LOCALNEARDEC,         */
+   hb_p_pushlocalnearinc,                             /* HB_P_PUSHLOCALNEARINC,     */
+   hb_p_pushlocalneardec,                             /* HB_P_PUSHLOCALNEARDEC,     */
+   hb_p_divert,                                       /* HB_P_DIVERT                */
+   hb_p_divertof                                      /* HB_P_DIVERTOF              */
 };
 
 void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )
@@ -2841,8 +2842,8 @@ void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )
    assert( HB_P_LAST_PCODE == sizeof( s_verbose_table ) / sizeof( HB_GENC_FUNC_PTR ) );
 
    genc_info.iNestedCodeblock = 0;
-   genc_info.bVerbose = ( hb_comp_iGenCOutput == HB_COMPGENC_VERBOSE );
-   genc_info.yyc = yyc;
+   genc_info.bVerbose         = ( hb_comp_iGenCOutput == HB_COMPGENC_VERBOSE );
+   genc_info.yyc              = yyc;
 
    fprintf( yyc, "{\n   static const BYTE pcode[] =\n   {\n" );
 
@@ -2866,13 +2867,13 @@ void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )
       fprintf( yyc, "   HB_CRITICAL_UNLOCK( s_Critical%s );\n", pFunc->szName );
    }
 
-   fprintf( yyc,  "}\n" );
+   fprintf( yyc, "}\n" );
 }
 
 void hb_compGenCCompact( PFUNCTION pFunc, FILE * yyc )
 {
    ULONG lPCodePos = 0;
-   int nChar;
+   int   nChar;
 
    fprintf( yyc, "{\n   static const BYTE pcode[] =\n   {\n\t" );
 
@@ -2898,7 +2899,7 @@ void hb_compGenCCompact( PFUNCTION pFunc, FILE * yyc )
 
    }
 
-   if( nChar != 0)
+   if( nChar != 0 )
    {
       fprintf( yyc, "\n" );
    }
@@ -2917,5 +2918,5 @@ void hb_compGenCCompact( PFUNCTION pFunc, FILE * yyc )
       fprintf( yyc, "   HB_CRITICAL_UNLOCK( s_Critical%s );\n", pFunc->szName );
    }
 
-   fprintf( yyc,  "}\n" );
+   fprintf( yyc, "}\n" );
 }

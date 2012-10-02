@@ -655,7 +655,7 @@ void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] )
 */
 HB_FUNC( __HRBRUN )
 {
-   ULONG ulLen = hb_parclen( 1 );
+   ULONG ulLen = (ULONG) hb_parclen( 1 );
 
    if( ulLen > 0 )
    {
@@ -702,7 +702,7 @@ HB_FUNC( __HRBRUN )
 
 HB_FUNC( __HRBLOAD )
 {
-   ULONG ulLen = hb_parclen( 1 );
+   ULONG ulLen = (ULONG) hb_parclen( 1 );
 
    if( ulLen > 0 )
    {

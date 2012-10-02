@@ -1796,7 +1796,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
             {
                PHB_ITEM pEnumeration = &( HB_VM_STACK.aEnumCollection[ HB_VM_STACK.wEnumCollectionCounter - 1 ] );
                PHB_ITEM pEnumerator  = HB_VM_STACK.apEnumVar[ HB_VM_STACK.wEnumCollectionCounter - 1 ];
-               ULONG ulEnumIndex     = ++HB_VM_STACK.awEnumIndex[ HB_VM_STACK.wEnumCollectionCounter - 1 ];
+               HB_SIZE  ulEnumIndex  = ++HB_VM_STACK.awEnumIndex[ HB_VM_STACK.wEnumCollectionCounter - 1 ];
 
                if( hb_objGetOpOver( pEnumeration ) & HB_CLASS_OP_FOREACH )
                {
@@ -2156,7 +2156,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
                }
                else if ( HB_IS_HASH( pSelf ) )
                {
-                  ULONG ulPos = 0;
+                  HB_SIZE ulPos = 0;
                   const char * szIndex = pMsg->item.asSymbol.value->szName;
 
                   /* Following are NOT assignable, in an array form, and or byref - commented by Ron 2006-09-14
@@ -2196,7 +2196,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
             }
             else if ( HB_IS_HASH( pSelf ) )
             {
-               ULONG ulPos = 0;
+               HB_SIZE ulPos = 0;
                const char * szIndex = pMsg->item.asSymbol.value->szName;
 
                /* Following are NOT assignable, in an array form, and or byref - commented by Ron 2006-09-14
@@ -4121,7 +4121,7 @@ HB_FUNC( HB_VMEXECUTE )
 
    if( szString )
    {
-      LONG lOffset = hb_stackTopOffset();
+      HB_ISIZ lOffset = hb_stackTopOffset();
 
       hb_vmExecute( szString, (PHB_SYMB) hb_parptr(2) );
 
@@ -4331,8 +4331,8 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
    // Must be first because STRING (length 1) qualifies as NUMERIC!
    if( HB_IS_STRING( pLeft ) && HB_IS_STRING( pRight ) )
    {
-      ULONG ulLen1 = pLeft->item.asString.length;
-      ULONG ulLen2 = pRight->item.asString.length;
+      HB_SIZE ulLen1 = pLeft->item.asString.length;
+      HB_SIZE ulLen2 = pRight->item.asString.length;
 
       //printf( "Adding '%s' + '%s'\n", pItem1->item.asString.value, pItem2->item.asString.value );
 
@@ -4343,7 +4343,7 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
             //if( ( double ) ( ( double ) ulLen1 + ( double ) ulLen2 ) < ( double ) ULONG_MAX )
             if( ulLen1 < ULONG_MAX - ulLen2 )
             {
-               ULONG ulNewLen = ulLen1 + ulLen2;
+               HB_SIZE ulNewLen = ulLen1 + ulLen2;
 
                if( pResult->item.asString.allocated && ( *( pResult->item.asString.pulHolders ) == 1 ) )
                {
@@ -4351,17 +4351,17 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
 
                   if ( pLeft != pResult )
                   {
-                     hb_xmemcpy( pResult, pLeft->item.asString.value, ulLen1 );
+                     hb_xmemcpy( pResult, pLeft->item.asString.value, (size_t) ulLen1 );
                   }
-                  hb_xmemcpy( (void *) ( pResult->item.asString.value + ulLen1 ), (void *) pRight->item.asString.value, ulLen2 );
+                  hb_xmemcpy( (void *) ( pResult->item.asString.value + ulLen1 ), (void *) pRight->item.asString.value, (size_t) ulLen2 );
 
                }
                else
                {
                   char *sResult = (char *) hb_xgrab( ulNewLen + 1 );
 
-                  hb_xmemcpy( sResult, pLeft->item.asString.value, ulLen1 );
-                  hb_xmemcpy( sResult + ulLen1, pRight->item.asString.value, ulLen2 );
+                  hb_xmemcpy( sResult, pLeft->item.asString.value, (size_t) ulLen1 );
+                  hb_xmemcpy( sResult + ulLen1, pRight->item.asString.value, (size_t) ulLen2 );
                   hb_itemPutCPtr( pResult, sResult, ulNewLen );
                }
             }
@@ -4440,7 +4440,7 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
    }
    else if( HB_IS_HASH( pLeft ) && HB_IS_HASH( pRight ) )
    {
-      ULONG ulLen = pRight->item.asHash.value->ulTotalLen;
+      HB_SIZE ulLen = pRight->item.asHash.value->ulTotalLen;
       HB_ITEM_NEW( hbNum );
       HB_ITEM_NEW( HashResult );
 
@@ -4487,22 +4487,22 @@ static void hb_vmMinus( void )
    // Must be first because STRING (length 1) qualifies as NUMERIC!
    if( HB_IS_STRING( pItem1 ) && HB_IS_STRING( pItem2 ) )
    {
-      ULONG ulLen1 = pItem1->item.asString.length;
-      ULONG ulLen2 = pItem2->item.asString.length;
+      HB_SIZE ulLen1 = pItem1->item.asString.length;
+      HB_SIZE ulLen2 = pItem2->item.asString.length;
 
       if( ulLen1 < ULONG_MAX - ulLen2 )
       {
          char * szNewString = ( char * ) hb_xgrab( ulLen1 + ulLen2 + 1 );
-         ULONG ulNewLen = ulLen1 + ulLen2;
+         HB_SIZE ulNewLen = ulLen1 + ulLen2;
 
          while( ulLen1 && pItem1->item.asString.value[ ulLen1 - 1 ] == ' ' )
          {
             ulLen1--;
          }
 
-         hb_xmemcpy( szNewString, pItem1->item.asString.value, ulLen1 );
-         hb_xmemcpy( szNewString + ulLen1, pItem2->item.asString.value, ulLen2 );
-         hb_xmemset( szNewString + ulLen1 + ulLen2, ' ', pItem1->item.asString.length - ulLen1 );
+         hb_xmemcpy( szNewString, pItem1->item.asString.value, (size_t) ulLen1 );
+         hb_xmemcpy( szNewString + ulLen1, pItem2->item.asString.value, (size_t) ulLen2 );
+         hb_xmemset( szNewString + ulLen1 + ulLen2, ' ', (size_t) ( pItem1->item.asString.length - ulLen1 ) );
          szNewString[ ulNewLen ] = '\0';
 
          HB_TRACE( HB_TR_DEBUG, ( "Released hb_vmMinus() Created \"%s\"", szNewString ) );
@@ -4561,7 +4561,7 @@ static void hb_vmMinus( void )
    }
    else if( HB_IS_HASH( pItem1 ) && HB_IS_HASH( pItem2 ) )
    {
-      ULONG ulLen = pItem2->item.asHash.value->ulTotalLen;
+      HB_SIZE ulLen = pItem2->item.asHash.value->ulTotalLen;
       HB_ITEM_NEW( hbNum );
       HB_ITEM_NEW( HashResult );
 
@@ -4575,8 +4575,8 @@ static void hb_vmMinus( void )
    }
    else if( HB_IS_HASH( pItem1 ) && HB_IS_ARRAY( pItem2 ) )
    {
-      ULONG ulLen = pItem2->item.asArray.value->ulLen;
-      ULONG ulPos = 0;
+      HB_SIZE ulLen = pItem2->item.asArray.value->ulLen;
+      HB_SIZE ulPos = 0;
       HB_ITEM_NEW( HashResult );
       PHB_ITEM pRef = pItem2->item.asArray.value->pItems;
 
@@ -4597,7 +4597,7 @@ static void hb_vmMinus( void )
    else if( HB_IS_HASH( pItem1 ) && (
       pItem2->type & ( HB_IT_NUMERIC | HB_IT_STRING | HB_IT_DATE ) ) )
    {
-      ULONG ulPos = 0;
+      HB_SIZE ulPos = 0;
       HB_ITEM_NEW( HashResult );
 
       if ( hb_hashScan( pItem1, pItem2, &ulPos ) )
@@ -5636,7 +5636,7 @@ static void hb_vmInstringOrArray( void )
    }
    else if( HB_IS_HASH( pItem2 ) && ( HB_IS_ORDERABLE( pItem1 ) || ( HB_IS_HASH( pItem1 ) && hb_hashLen( pItem1 ) == 1) ) )
    {
-      ULONG ulPos = 0;
+      HB_SIZE ulPos = 0;
 
       if( HB_IS_HASH( pItem1 ) ) // length 1 by hypotesis
       {
@@ -5975,20 +5975,20 @@ static void hb_vmBitAnd( void )
    }
    else if( HB_IS_STRING( pItem1 ) &&  HB_IS_STRING( pItem2 ) )
    {
-      ULONG ulLen1 = pItem1->item.asString.length;
-      ULONG ulLen2 = pItem2->item.asString.length;
+      HB_SIZE ulLen1 = pItem1->item.asString.length;
+      HB_SIZE ulLen2 = pItem2->item.asString.length;
 
       if( ulLen1 && ulLen2 )
       {
          char * pString1 = pItem1->item.asString.value;
          char * pString2 = pItem2->item.asString.value;
-         register ULONG ulPos1;
-         register ULONG ulPos2;
+         register HB_SIZE ulPos1;
+         register HB_SIZE ulPos2;
 
          if( !HB_IS_STRINGWR( pItem1 ) )
          {
             pString1 = (char*) hb_xgrab( ulLen1 + 1 );
-            hb_xmemcpy( (void*) pString1, (void*) pItem1->item.asString.value, ulLen1 );
+            hb_xmemcpy( (void*) pString1, (void*) pItem1->item.asString.value, (size_t) ulLen1 );
             hb_itemPutCPtr( pItem1, pString1, ulLen1 );
          }
 
@@ -6007,7 +6007,7 @@ static void hb_vmBitAnd( void )
    }
    else if( HB_IS_STRING( pItem1 ) &&  HB_IS_NUMERIC( pItem2 ) )
    {
-      ULONG ulLen = pItem1->item.asString.length;
+      HB_SIZE ulLen = pItem1->item.asString.length;
 
       if( ulLen )
       {
@@ -6017,7 +6017,7 @@ static void hb_vmBitAnd( void )
          if( ! HB_IS_STRINGWR( pItem1 ) )
          {
             pString = (char*) hb_xgrab( ulLen + 1 );
-            hb_xmemcpy( (void*) pString, (void*) pItem1->item.asString.value, ulLen + 1 );
+            hb_xmemcpy( (void*) pString, (void*) pItem1->item.asString.value, (size_t) ulLen + 1 );
             hb_itemPutCPtr( pItem1, pString, ulLen );
          }
 
@@ -6031,8 +6031,8 @@ static void hb_vmBitAnd( void )
    }
    else if( HB_IS_NUMERIC( pItem1 ) &&  HB_IS_STRING( pItem2 ) )
    {
-      HB_LONG lVal = hb_itemGetNInt( pItem1 );
-      ULONG   ulLen = pItem2->item.asString.length;
+      HB_LONG lVal    = hb_itemGetNInt( pItem1 );
+      HB_SIZE ulLen   = pItem2->item.asString.length;
       char*   pString = pItem2->item.asString.value;
 
       while( ulLen )
@@ -6092,20 +6092,20 @@ static void hb_vmBitOr( void )
    }
    else if( HB_IS_STRING( pItem1 ) &&  HB_IS_STRING( pItem2 ) )
    {
-      ULONG ulLen1 = pItem1->item.asString.length;
-      ULONG ulLen2 = pItem2->item.asString.length;
+      HB_SIZE ulLen1 = pItem1->item.asString.length;
+      HB_SIZE ulLen2 = pItem2->item.asString.length;
 
       if( ulLen1 && ulLen2 )
       {
          char * pString1 = pItem1->item.asString.value;
          char * pString2 = pItem2->item.asString.value;
-         register ULONG ulPos1;
-         register ULONG ulPos2;
+         register HB_SIZE ulPos1;
+         register HB_SIZE ulPos2;
 
          if( !HB_IS_STRINGWR( pItem1 ) )
          {
             pString1 = (char*) hb_xgrab( ulLen1 + 1 );
-            hb_xmemcpy( (void*) pString1, (void*) pItem1->item.asString.value, ulLen1 );
+            hb_xmemcpy( (void*) pString1, (void*) pItem1->item.asString.value, (size_t) ulLen1 );
             hb_itemPutCPtr( pItem1, pString1, ulLen1 );
          }
 
@@ -6122,7 +6122,7 @@ static void hb_vmBitOr( void )
    }
    else if( HB_IS_STRING( pItem1 ) &&  HB_IS_NUMERIC( pItem2 ) )
    {
-      ULONG ulLen = pItem1->item.asString.length;
+      HB_SIZE ulLen = pItem1->item.asString.length;
 
       if( ulLen )
       {
@@ -6132,7 +6132,7 @@ static void hb_vmBitOr( void )
          if( !HB_IS_STRINGWR( pItem1 ) )
          {
             pString = (char*) hb_xgrab( ulLen + 1 );
-            hb_xmemcpy( (void*) pString, (void*) pItem1->item.asString.value, ulLen + 1 );
+            hb_xmemcpy( (void*) pString, (void*) pItem1->item.asString.value, (size_t) ulLen + 1 );
             hb_itemPutCPtr( pItem1, pString, ulLen );
          }
 
@@ -6145,9 +6145,9 @@ static void hb_vmBitOr( void )
    }
    else if( HB_IS_NUMERIC( pItem1 ) &&  HB_IS_STRING( pItem2 ) )
    {
-      HB_LONG lVal = hb_itemGetNInt( pItem1 );
-      ULONG   ulLen = pItem2->item.asString.length;
-      char *  pString = pItem2->item.asString.value;
+      HB_LONG lVal   = hb_itemGetNInt( pItem1 );
+      HB_SIZE ulLen = pItem2->item.asString.length;
+      char * pString = pItem2->item.asString.value;
 
       while( ulLen )
       {
@@ -6206,20 +6206,20 @@ static void hb_vmBitXor( void )
    }
    else if( HB_IS_STRING( pItem1 ) &&  HB_IS_STRING( pItem2 ) )
    {
-      ULONG ulLen1 = pItem1->item.asString.length;
-      ULONG ulLen2 = pItem2->item.asString.length;
+      HB_SIZE ulLen1 = pItem1->item.asString.length;
+      HB_SIZE ulLen2 = pItem2->item.asString.length;
 
       if( ulLen1 && ulLen2 )
       {
          char * pString1 = pItem1->item.asString.value;
          char * pString2 = pItem2->item.asString.value;
-         register ULONG ulPos1;
-     register ULONG ulPos2;
+         register HB_SIZE ulPos1;
+         register HB_SIZE ulPos2;
 
          if( !HB_IS_STRINGWR( pItem1 ) )
          {
             pString1 = (char*) hb_xgrab( ulLen1 + 1 );
-            hb_xmemcpy( (void*) pString1, (void*) pItem1->item.asString.value, ulLen1 );
+            hb_xmemcpy( (void*) pString1, (void*) pItem1->item.asString.value, (size_t) ulLen1 );
             hb_itemPutCPtr( pItem1, pString1, ulLen1 );
          }
 
@@ -6236,7 +6236,7 @@ static void hb_vmBitXor( void )
    }
    else if( HB_IS_STRING( pItem1 ) &&  HB_IS_NUMERIC( pItem2 ) )
    {
-      ULONG ulLen = pItem1->item.asString.length;
+      HB_SIZE ulLen = pItem1->item.asString.length;
 
       if( ulLen )
       {
@@ -6246,7 +6246,7 @@ static void hb_vmBitXor( void )
          if( !HB_IS_STRINGWR( pItem1 ) )
          {
             pString = (char*) hb_xgrab( ulLen + 1 );
-            hb_xmemcpy( (void*) pString, (void*) pItem1->item.asString.value, ulLen + 1 );
+            hb_xmemcpy( (void*) pString, (void*) pItem1->item.asString.value, ( size_t ) ulLen + 1 );
             hb_itemPutCPtr( pItem1, pString, ulLen );
          }
 
@@ -6259,8 +6259,8 @@ static void hb_vmBitXor( void )
    }
    else if( HB_IS_NUMERIC( pItem1 ) &&  HB_IS_STRING( pItem2 ) )
    {
-      HB_LONG lVal = hb_itemGetNInt( pItem1 );
-      ULONG   ulLen = pItem2->item.asString.length;
+      HB_LONG lVal    = hb_itemGetNInt( pItem1 );
+      HB_SIZE ulLen   = pItem2->item.asString.length;
       char *  pString = pItem2->item.asString.value;
 
       while( ulLen )
@@ -6390,7 +6390,7 @@ static void hb_vmArrayPush( void )
 
    if( HB_IS_HASH( pArray ) && HB_IS_ORDERABLE( pIndex ) )
    {
-      ULONG ulPos = 0;
+      HB_SIZE ulPos = 0;
       PHB_ITEM pTemp;
 
       if( HB_IS_NUMBER( pIndex ) && hb_hashGetCompatibility( pArray ) )
@@ -6400,7 +6400,7 @@ static void hb_vmArrayPush( void )
 
          if( lPos < 0 )
          {
-            lPos += 1 + hb_hashLen( pArray );
+            lPos += ( LONG ) ( 1 + hb_hashLen( pArray ) );
          }
 
          ulPos = hb_hashAAGetRealPos( pArray, (ULONG) lPos );
@@ -6484,7 +6484,7 @@ static void hb_vmArrayPush( void )
          {
             if( pArray->item.asArray.value->ulLen )
             {
-               lIndex += ( pArray->item.asArray.value->ulLen + 1 );
+               lIndex += ( LONG ) ( pArray->item.asArray.value->ulLen + 1 );
             }
             // Empty array and -1 Index -> return NIL.
             else if( lIndex == -1 )
@@ -6538,7 +6538,7 @@ static void hb_vmArrayPush( void )
       {
          if( pArray->item.asString.length )
          {
-            lIndex += pArray->item.asString.length;
+            lIndex += ( LONG ) pArray->item.asString.length;
          }
          else if( lIndex == -1 )
          {
@@ -6653,7 +6653,7 @@ static void hb_vmArrayPushRef( void )
 
       if( lIndex < 0 )
       {
-         lIndex += ( pArray->item.asArray.value->ulLen + 1 );
+         lIndex += ( LONG ) ( pArray->item.asArray.value->ulLen + 1 );
       }
 
       if( lIndex > 0 && (ULONG) lIndex <= pArray->item.asArray.value->ulLen )
@@ -6732,7 +6732,7 @@ static void hb_vmArrayPop( HB_PCODE pcode )
 
    if( HB_IS_HASH( pArray ) && HB_IS_ORDERABLE( pIndex ) )
    {
-      ULONG ulPos = 0;
+      HB_SIZE ulPos = 0;
 
       if( HB_IS_NUMBER( pIndex ) && hb_hashGetCompatibility( pArray ) )
       {
@@ -6741,7 +6741,7 @@ static void hb_vmArrayPop( HB_PCODE pcode )
 
          if( lPos < 0 )
          {
-            lPos += 1 + hb_hashLen( pArray );
+            lPos += ( LONG ) ( 1 + hb_hashLen( pArray ) );
          }
 
          ulPos = hb_hashAAGetRealPos( pArray, (ULONG) lPos );
@@ -6865,7 +6865,7 @@ static void hb_vmArrayPop( HB_PCODE pcode )
       #ifndef HB_C52_STRICT
          if( lIndex < 0 )
          {
-            lIndex += ( pArray->item.asArray.value->ulLen + 1 );
+            lIndex += ( LONG ) ( pArray->item.asArray.value->ulLen + 1 );
          }
       #endif
 
@@ -6910,7 +6910,7 @@ static void hb_vmArrayPop( HB_PCODE pcode )
       }
       else if( lIndex < 0 )
       {
-         lIndex += pArray->item.asString.length;
+         lIndex += ( LONG ) pArray->item.asString.length;
       }
 
       if( lIndex >= 0 && (ULONG) lIndex < pArray->item.asString.length )
@@ -6940,7 +6940,7 @@ static void hb_vmArrayPop( HB_PCODE pcode )
          {
             char *sNew = (char *) hb_xgrab( pArray->item.asString.length + 1 );
 
-            HB_MEMCPY( sNew, pArray->item.asString.value, pArray->item.asString.length );
+            HB_MEMCPY( sNew, pArray->item.asString.value, (size_t) pArray->item.asString.length );
             sNew[ pArray->item.asString.length ] = '\0';
             hb_itemPutCPtr( pArray, sNew, pArray->item.asString.length );
          }
@@ -7686,7 +7686,7 @@ void hb_vmSend( USHORT uiParams )
        }
          else
          {
-            ULONG ulPos = 0;
+            HB_SIZE ulPos = 0;
             HB_ITEM_NEW( hbIndex );
 
             hb_itemPutCRawStatic( &hbIndex, pSym->szName, strlen( pSym->szName ) );
@@ -7873,7 +7873,7 @@ static HARBOUR hb_vmDoBlock( void )
    PHB_ITEM pBlock;
    PSYMBOLS pModuleSymbols; /* = NULL; */
    int iParam;
-   LONG lStatics;
+   long lStatics;
    USHORT uiLine;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDoBlock()"));
@@ -7962,7 +7962,7 @@ HB_ITEM_PTR hb_vmEvalBlock( HB_ITEM_PTR pBlock )
  *for example:
  * retVal = hb_vmEvalBlockV( pBlock, 2, pParam1, pParam2 );
 */
-HB_ITEM_PTR hb_vmEvalBlockV( HB_ITEM_PTR pBlock, ULONG ulArgCount, ... )
+HB_ITEM_PTR hb_vmEvalBlockV( HB_ITEM_PTR pBlock, HB_SIZE ulArgCount, ... )
 {
    HB_THREAD_STUB
    va_list va;
@@ -8093,7 +8093,7 @@ static void hb_vmDebugEntry( int nMode, int nLine, char *szName, int nIndex, int
          hb_vmPushDynSym( s_pDynsDbgEntry );
          hb_vmPushNil();
          hb_vmPushInteger( HB_DBG_STATICNAME );
-         hb_vmPushLong( HB_VM_STACK.lStatics );   /* current static frame */
+         hb_vmPushSize( HB_VM_STACK.lStatics );   /* current static frame */
          hb_vmPushInteger( nIndex );                  /* variable index */
          hb_vmPushString( szName, strlen( szName ) );
          hb_vmDo( 4 );
@@ -9275,7 +9275,7 @@ void hb_vmPushPointer( void * pPointer )
    pItem->item.asPointer.collect = FALSE;
 }
 
-void hb_vmPushString( const char * szText, ULONG length )
+void hb_vmPushString( const char * szText, HB_SIZE length )
 {
    HB_THREAD_STUB
    HB_TRACE( HB_TR_DEBUG, ( "hb_vmPushString( \"%s\", %lu ) %p", szText, length, ( * HB_VM_STACK.pPos ) ) );
@@ -9292,7 +9292,7 @@ void hb_vmPushSymbol( PHB_SYMB pSym )
 
    pItem = hb_stackAllocItem();
    hb_itemPutSymbol( pItem, pSym );
-   pItem->item.asSymbol.pCargo->stackbase = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
+   pItem->item.asSymbol.pCargo->stackbase = ( long ) ( HB_VM_STACK.pBase - HB_VM_STACK.pItems );
 }
 
 void hb_vmPushDynSym( PHB_DYNS pDynSym )
@@ -9624,7 +9624,7 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
    }
    pTop->type = HB_IT_BYREF;
    pTop->item.asRefer.value = iLocal;
-   pTop->item.asRefer.offset = hb_stackBaseOffset();
+   pTop->item.asRefer.offset = ( long ) hb_stackBaseOffset();
 }
 
 static void hb_vmPushStatic( USHORT uiStatic )
@@ -11322,7 +11322,7 @@ void hb_vmRequestCancel( void )
    {
       char buffer[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 +  64 ]; // 64 for the Canceled at: (%i) overhead.
       register UINT i = 1;
-     register UINT i2;
+      register UINT i2;
       USHORT uLine = 0;
 
       hb_conOutErr( hb_conNewLine(), 0 );
@@ -11339,7 +11339,7 @@ void hb_vmRequestCancel( void )
             break;
          }
 
-         i2 = strlen( (char *) buffer );
+         i2 = ( UINT ) strlen( (char *) buffer );
          hb_snprintf( buffer + i2, sizeof( buffer ) - i2, " (%u)", uLine );
 
          hb_conOutErr( buffer, 0 );
@@ -12227,7 +12227,7 @@ BOOL hb_xvmIVarRef( void )
    else if ( HB_IS_HASH( pSelf ) )
    {
       const char * szIndex = pMsg->item.asSymbol.value->szName;
-      ULONG ulPos;
+      HB_SIZE ulPos;
 
       if( strcmp( szIndex, "CLASSNAME" ) == 0 )
       {
@@ -13201,7 +13201,7 @@ void hb_xvmHashGen( ULONG ulPairs )
    HB_VM_STACK.iExtraElements = 0;
 }
 
-static void hb_vmArrayItemPush( ULONG ulIndex )
+static void hb_vmArrayItemPush( HB_SIZE ulIndex )
 {
    HB_THREAD_STUB_STACK
 
@@ -13900,7 +13900,7 @@ BOOL hb_xvmEnumerate( void )
    {
       PHB_ITEM pEnumeration = &( HB_VM_STACK.aEnumCollection[ HB_VM_STACK.wEnumCollectionCounter - 1 ] );
       PHB_ITEM pEnumerator  = HB_VM_STACK.apEnumVar[ HB_VM_STACK.wEnumCollectionCounter - 1 ];
-      ULONG ulEnumIndex     = ++HB_VM_STACK.awEnumIndex[ HB_VM_STACK.wEnumCollectionCounter - 1 ];
+      HB_SIZE ulEnumIndex   = ++HB_VM_STACK.awEnumIndex[ HB_VM_STACK.wEnumCollectionCounter - 1 ];
 
       if( hb_objGetOpOver( pEnumeration ) & HB_CLASS_OP_FOREACH )
       {
@@ -14102,7 +14102,7 @@ HB_FUNC( HB_DBG_VMVARSLEN )
 {
    HB_THREAD_STUB
 
-   hb_retnl( hb_arrayLen( &s_aStatics ) );
+   hb_retns( hb_arrayLen( &s_aStatics ) );
 }
 
 /* $Doc$
@@ -14132,7 +14132,7 @@ HB_FUNC( HB_DBG_PROCLEVEL )
    hb_retnl( (LONG) s_ulProcLevel - 1 );   /* Don't count self */
 }
 
-ULONG hb_dbg_vmVarGCount( void )
+HB_SIZE hb_dbg_vmVarGCount( void )
 {
    return hb_arrayLen( &s_aGlobals );
 }

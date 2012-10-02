@@ -64,8 +64,8 @@
 
 static HB_USHORT          s_rddidSQLBASE = 0;
 static SQLDDCONNECTION ** s_pConnection = NULL;
-static HB_ULONG           s_ulConnectionCount = 0;
-static HB_ULONG           s_ulConnectionCurrent = 0;
+static ULONG              s_ulConnectionCount = 0;
+static ULONG              s_ulConnectionCurrent = 0;
 static char *             s_szError = NULL;
 static HB_ERRCODE         s_errCode = 0;
 static char *             s_szQuery = NULL;
@@ -125,9 +125,9 @@ static HB_ERRCODE sddDisconnect( SQLDDCONNECTION * pConnection );
 static HB_ERRCODE sddExecute( SQLDDCONNECTION * pConnection, PHB_ITEM pItem );
 static HB_ERRCODE sddOpen( SQLBASEAREAP pArea );
 static HB_ERRCODE sddClose( SQLBASEAREAP pArea );
-static HB_ERRCODE sddGoTo( SQLBASEAREAP pArea, HB_ULONG ulRecNo );
+static HB_ERRCODE sddGoTo( SQLBASEAREAP pArea, ULONG ulRecNo );
 static HB_ERRCODE sddGetValue( SQLBASEAREAP pArea, HB_USHORT uiIndex, PHB_ITEM pItem );
-static HB_ERRCODE sddGetVarLen( SQLBASEAREAP pArea, HB_USHORT uiIndex, HB_ULONG * pLength );
+static HB_ERRCODE sddGetVarLen( SQLBASEAREAP pArea, HB_USHORT uiIndex, ULONG * pLength );
 
 
 static SDDNODE sddNull = {
@@ -185,7 +185,7 @@ static HB_ERRCODE sddClose( SQLBASEAREAP pArea )
 }
 
 
-static HB_ERRCODE sddGoTo( SQLBASEAREAP pArea, HB_ULONG ulRecNo )
+static HB_ERRCODE sddGoTo( SQLBASEAREAP pArea, ULONG ulRecNo )
 {
    if ( ulRecNo == 0 || ulRecNo > pArea->ulRecCount )
    {
@@ -215,7 +215,7 @@ static HB_ERRCODE sddGetValue( SQLBASEAREAP pArea, HB_USHORT uiIndex, PHB_ITEM p
 }
 
 
-static HB_ERRCODE sddGetVarLen( SQLBASEAREAP pArea, HB_USHORT uiIndex, HB_ULONG * pLength )
+static HB_ERRCODE sddGetVarLen( SQLBASEAREAP pArea, HB_USHORT uiIndex, ULONG * pLength )
 {
    HB_SYMBOL_UNUSED( pArea );
    HB_SYMBOL_UNUSED( uiIndex );
@@ -272,7 +272,7 @@ static HB_ERRCODE sqlbaseGoBottom( SQLBASEAREAP pArea )
       return HB_FAILURE;
 
 
-   if ( ! pArea->fFetched && pArea->pSDD->GoTo( pArea, ( HB_ULONG ) -1 ) == HB_FAILURE )
+   if ( ! pArea->fFetched && pArea->pSDD->GoTo( pArea, ( ULONG ) -1 ) == HB_FAILURE )
       return HB_FAILURE;
 
    pArea->area.fTop = HB_FALSE;
@@ -285,7 +285,7 @@ static HB_ERRCODE sqlbaseGoBottom( SQLBASEAREAP pArea )
 }
 
 
-static HB_ERRCODE sqlbaseGoTo( SQLBASEAREAP pArea, HB_ULONG ulRecNo )
+static HB_ERRCODE sqlbaseGoTo( SQLBASEAREAP pArea, ULONG ulRecNo )
 {
    if ( SELF_GOCOLD( ( AREAP ) pArea ) == HB_FAILURE )
       return HB_FAILURE;
@@ -354,9 +354,9 @@ static HB_ERRCODE sqlbaseSkip( SQLBASEAREAP pArea, HB_LONG lToSkip )
 
    if ( lToSkip == 0 || hb_setGetDeleted() ||
        pArea->area.dbfi.itmCobExpr || pArea->area.dbfi.fFilter )
-      return SUPER_SKIP( ( AREAP ) pArea, lToSkip );
+      return SUPER_SKIP( ( AREAP ) pArea, (LONG) lToSkip );
 
-   errCode = SELF_SKIPRAW( ( AREAP ) pArea, lToSkip );
+   errCode = SELF_SKIPRAW( ( AREAP ) pArea, (LONG) lToSkip );
 
    /* Move first record and set Bof flag */
    if ( errCode == HB_SUCCESS && pArea->area.fBof && lToSkip < 0 )
@@ -399,14 +399,14 @@ static HB_ERRCODE sqlbaseSkipRaw( SQLBASEAREAP pArea, HB_LONG lToSkip )
       pArea->area.fBof = bBof;
       pArea->area.fEof = bEof;
    }
-   else if ( lToSkip < 0 && ( HB_ULONG ) ( -lToSkip ) >= pArea->ulRecNo )
+   else if ( lToSkip < 0 && ( ULONG ) ( -lToSkip ) >= pArea->ulRecNo )
    {
       errCode = SELF_GOTO( ( AREAP ) pArea, 1 );
       pArea->area.fBof = HB_TRUE;
    }
    else
    {
-      errCode = SELF_GOTO( ( AREAP ) pArea, pArea->ulRecNo + lToSkip );
+      errCode = SELF_GOTO( ( AREAP ) pArea, pArea->ulRecNo + (LONG) lToSkip );
    }
 
    return errCode;
@@ -473,7 +473,7 @@ static HB_ERRCODE sqlbaseGetValue( SQLBASEAREAP pArea, HB_USHORT uiIndex, PHB_IT
 }
 
 
-static HB_ERRCODE sqlbaseGetVarLen( SQLBASEAREAP pArea, HB_USHORT uiIndex, HB_ULONG * pLength )
+static HB_ERRCODE sqlbaseGetVarLen( SQLBASEAREAP pArea, HB_USHORT uiIndex, ULONG * pLength )
 {
   /*  TODO: should we use this code?
   if ( pArea->area.lpFields[ uiIndex ].uiType == HB_IT_MEMO )
@@ -582,14 +582,14 @@ static HB_ERRCODE sqlbaseRecall( SQLBASEAREAP pArea )
 }
 
 
-static HB_ERRCODE sqlbaseRecCount( SQLBASEAREAP pArea, HB_ULONG * pRecCount )
+static HB_ERRCODE sqlbaseRecCount( SQLBASEAREAP pArea, ULONG * pRecCount )
 {
    * pRecCount = pArea->ulRecCount;
    return HB_SUCCESS;
 }
 
 
-static HB_ERRCODE sqlbaseRecNo( SQLBASEAREAP pArea, HB_ULONG * ulRecNo )
+static HB_ERRCODE sqlbaseRecNo( SQLBASEAREAP pArea, ULONG * ulRecNo )
 {
    * ulRecNo = pArea->ulRecNo;
    return HB_SUCCESS;
@@ -599,7 +599,7 @@ static HB_ERRCODE sqlbaseRecNo( SQLBASEAREAP pArea, HB_ULONG * ulRecNo )
 static HB_ERRCODE sqlbaseRecId( SQLBASEAREAP pArea, PHB_ITEM pRecNo )
 {
    HB_ERRCODE errCode;
-   // HB_ULONG ulRecNo;
+   // ULONG ulRecNo;
    ULONG ulRecNo;
 
    errCode = SELF_RECNO( ( AREAP ) pArea, &ulRecNo );
@@ -621,7 +621,7 @@ static HB_ERRCODE sqlbaseClose( SQLBASEAREAP pArea )
 
    if ( pArea->pRow )
    {
-      HB_ULONG ulIndex;
+      ULONG ulIndex;
 
       for ( ulIndex = 0; ulIndex <= pArea->ulRecCount; ulIndex++ )
       {
@@ -913,7 +913,7 @@ static HB_ERRCODE sqlbaseInit( LPRDDNODE pRDD )
 
 static HB_ERRCODE sqlbaseExit( LPRDDNODE pRDD )
 {
-   HB_ULONG ul;
+   ULONG ul;
 
    HB_SYMBOL_UNUSED( pRDD );
 
@@ -950,9 +950,9 @@ static HB_ERRCODE sqlbaseExit( LPRDDNODE pRDD )
 }
 
 
-static HB_ERRCODE sqlbaseRddInfo( LPRDDNODE pRDD, HB_USHORT uiIndex, HB_ULONG ulConnect, PHB_ITEM pItem )
+static HB_ERRCODE sqlbaseRddInfo( LPRDDNODE pRDD, HB_USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem )
 {
-   HB_ULONG ulConn;
+   ULONG ulConn;
    SQLDDCONNECTION * pConn;
 
    HB_SYMBOL_UNUSED( pRDD );
@@ -972,7 +972,7 @@ static HB_ERRCODE sqlbaseRddInfo( LPRDDNODE pRDD, HB_USHORT uiIndex, HB_ULONG ul
 
       case RDDI_CONNECTION:
       {
-         HB_ULONG ulNewConnection = 0;
+         ULONG ulNewConnection = 0;
 
          if ( hb_itemType( pItem ) & HB_IT_NUMERIC )
          {
@@ -998,7 +998,7 @@ static HB_ERRCODE sqlbaseRddInfo( LPRDDNODE pRDD, HB_USHORT uiIndex, HB_ULONG ul
       case RDDI_CONNECT:
       {
          PSDDNODE     pNode = NULL;
-         HB_ULONG     ul;
+         ULONG     ul;
          const char * pStr;
 
          pStr = hb_arrayGetCPtr( pItem, 1 );

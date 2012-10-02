@@ -58,7 +58,7 @@
 /* right-pads a date, number, or string with spaces or supplied character */
 HB_FUNC( PADR )
 {
-   ULONG ulSize;
+   HB_SIZE ulSize;
    BOOL bFreeReq;
    char * szText;
 

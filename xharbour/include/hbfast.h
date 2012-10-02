@@ -62,11 +62,11 @@
     } HB_SCANNED_ARRAYS, * PHB_SCANNED_ARRAYS;
 
    extern HB_EXPORT PHB_ITEM hb_itemPutCStatic( PHB_ITEM pItem, const char * szText );
-   extern HB_EXPORT PHB_ITEM hb_itemPutCLStatic( PHB_ITEM pItem, const char * szText, ULONG ulLen );
+   extern HB_EXPORT PHB_ITEM hb_itemPutCLStatic( PHB_ITEM pItem, const char * szText, HB_SIZE ulLen );
    extern HB_EXPORT void     hb_itemPushForward( PHB_ITEM pItem );
    extern HB_EXPORT void     hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
    extern HB_EXPORT void     hb_itemReleaseString( PHB_ITEM pItem );
-   extern HB_EXPORT void     hb_itemPushStaticString( const char * szText, ULONG length );
+   extern HB_EXPORT void     hb_itemPushStaticString( const char * szText, HB_SIZE length );
 
    extern HB_EXPORT USHORT hb_itemArrayCyclicCount( PHB_ITEM pArray );
    extern HB_EXPORT USHORT hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pArray, PHB_SCANNED_ARRAYS pScannedList, PHB_BASEARRAY pTopBaseArray );

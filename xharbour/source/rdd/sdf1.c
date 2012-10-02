@@ -79,7 +79,7 @@ static void hb_sdfInitArea( SDFAREAP pArea, char * szFileName )
    if( !szEol || !szEol[ 0 ] )
       szEol = hb_conNewLine();
    pArea->szEol = hb_strdup( szEol );
-   pArea->uiEolLen = strlen( pArea->szEol );
+   pArea->uiEolLen = ( USHORT ) strlen( pArea->szEol );
 
    /* Alloc buffer */
    pArea->pRecord = ( BYTE * ) hb_xgrab( pArea->uiRecordLen + pArea->uiEolLen + 3 );

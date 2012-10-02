@@ -114,7 +114,7 @@ static BOOL hb_gt_gui_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
          else
          {
             char * szClipboardData;
-            ULONG ulLen;
+            HB_SIZE ulLen;
 
             if( hb_gt_w32_getClipboard( CF_TEXT, &szClipboardData, &ulLen ) )
             {

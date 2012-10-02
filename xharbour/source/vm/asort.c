@@ -126,9 +126,9 @@ static BOOL hb_itemIsLess( PHB_ITEM pItem1, PHB_ITEM pItem2, PHB_ITEM pBlock )
 
 /* partition array pItems[lb..ub] */
 
-static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_ITEM pBlock )
+static HB_ISIZ hb_arraySortQuickPartition( PHB_ITEM pItems, HB_ISIZ lb, HB_ISIZ ub, PHB_ITEM pBlock )
 {
-   LONG i, j, p;
+   HB_ISIZ i, j, p;
 
    /* select pivot and exchange with 1st element */
    p = lb + ( ( ub - lb ) >> 1 );
@@ -175,12 +175,12 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
 
 /* sort array pItems[lb..ub] */
 
-static void hb_arraySortQuick( PHB_ITEM pItems, LONG lb, LONG ub, PHB_ITEM pBlock )
+static void hb_arraySortQuick( PHB_ITEM pItems, HB_ISIZ lb, HB_ISIZ ub, PHB_ITEM pBlock )
 {
    while( lb < ub )
    {
       /* partition into two segments */
-      LONG m = hb_arraySortQuickPartition( pItems, lb, ub, pBlock );
+      HB_ISIZ m = hb_arraySortQuickPartition( pItems, lb, ub, pBlock );
 
       /* sort the smallest partition to minimize stack requirements */
       if( m - lb <= ub - m )
@@ -196,7 +196,7 @@ static void hb_arraySortQuick( PHB_ITEM pItems, LONG lb, LONG ub, PHB_ITEM pBloc
    }
 }
 
-BOOL hb_arraySort( PHB_ITEM pArray, ULONG * pulStart, ULONG * pulCount, PHB_ITEM pBlock )
+BOOL hb_arraySort( PHB_ITEM pArray, HB_SIZE * pulStart, HB_SIZE * pulCount, PHB_ITEM pBlock )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arraySort(%p, %p, %p, %p)", pArray, pulStart, pulCount, pBlock));
 
@@ -205,10 +205,10 @@ BOOL hb_arraySort( PHB_ITEM pArray, ULONG * pulStart, ULONG * pulCount, PHB_ITEM
    if( HB_IS_ARRAY( pArray ) )
    {
       PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
-      ULONG ulLen = pBaseArray->ulLen;
-      ULONG ulStart;
-      ULONG ulCount;
-      ULONG ulEnd;
+      HB_SIZE ulLen = pBaseArray->ulLen;
+      HB_SIZE ulStart;
+      HB_SIZE ulCount;
+      HB_SIZE ulEnd;
 
       if( pulStart && ( *pulStart >= 1 ) )
       {
@@ -258,8 +258,8 @@ HB_FUNC( ASORT )
 
    if( pArray && ! hb_arrayIsObject( pArray )  )
    {
-      ULONG ulStart = hb_parnl( 2 );
-      ULONG ulCount = hb_parnl( 3 );
+      HB_SIZE ulStart = hb_parns( 2 );
+      HB_SIZE ulCount = hb_parns( 3 );
 
       hb_arraySort( pArray,
                     ISNUM( 2 ) ? &ulStart : NULL,

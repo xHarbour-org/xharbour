@@ -64,11 +64,11 @@ HB_FUNC( POSCHAR )
    {
       if( ( hb_parclen( 2 ) > 0 ) || ISNUM( 2 ) )
       {
-         const char *   pcString = hb_parc( 1 );
-         size_t         sStrLen  = hb_parclen( 1 );
-         char *         pcRet;
-         char           cReplace;
-         size_t         sPosition;
+         const char * pcString = hb_parc( 1 );
+         HB_SIZE      sStrLen  = hb_parclen( 1 );
+         char *       pcRet;
+         char         cReplace;
+         HB_SIZE      sPosition;
 
          if( ISCHAR( 2 ) )
          {
@@ -82,6 +82,7 @@ HB_FUNC( POSCHAR )
          if( ISNUM( 3 ) )
          {
             sPosition = hb_parnl( 3 );
+
             if( sPosition == 0 )
             {
                sPosition = sStrLen;
@@ -93,7 +94,7 @@ HB_FUNC( POSCHAR )
          }
 
          pcRet                      = ( char * ) hb_xgrab( sStrLen + 1 );
-         hb_xmemcpy( pcRet, pcString, sStrLen );
+         hb_xmemcpy( pcRet, pcString, (size_t) sStrLen );
          *( pcRet + sPosition - 1 ) = cReplace;
          pcRet[ sStrLen ]           = '\0';
 
@@ -173,8 +174,8 @@ HB_FUNC( POSDEL )
    if( ISCHAR( 1 ) )
    {
       const char *   pcString = hb_parc( 1 );
-      size_t         sStrLen  = hb_parclen( 1 );
-      size_t         sStartPos, sDelLen;
+      HB_SIZE        sStrLen  = hb_parclen( 1 );
+      HB_SIZE        sStartPos, sDelLen;
       char *         pcRet;
 
       if( ISNUM( 3 ) )
@@ -211,13 +212,13 @@ HB_FUNC( POSDEL )
       /* copy first part */
       if( sStartPos > 1 )
       {
-         hb_xmemcpy( pcRet, pcString, sStartPos - 1 );
+         hb_xmemcpy( pcRet, pcString, (size_t) sStartPos - 1 );
       }
 
       /* copy second part */
       if( sStrLen > ( sStartPos - 1 + sDelLen ) )
       {
-         hb_xmemcpy( pcRet + sStartPos - 1, pcString + sStartPos - 1 + sDelLen, sStrLen - ( sStartPos - 1 + sDelLen ) );
+         hb_xmemcpy( pcRet + sStartPos - 1, pcString + sStartPos - 1 + sDelLen, (size_t) ( sStrLen - ( sStartPos - 1 + sDelLen ) ) );
       }
 
       pcRet[ sStrLen - sDelLen ] = '\0';
@@ -250,14 +251,14 @@ HB_FUNC( POSINS )
 {
    if( ISCHAR( 1 ) )
    {
-      const char *   pcString = hb_parc( 1 );
-      size_t         sStrLen  = hb_parclen( 1 );
-      const char *   pcInsert;
-      size_t         sInsLen;
+      const char * pcString = hb_parc( 1 );
+      HB_SIZE      sStrLen  = hb_parclen( 1 );
+      const char * pcInsert;
+      HB_SIZE      sInsLen;
 
       if( ( sInsLen = hb_parclen( 2 ) ) > 0 )
       {
-         size_t   sStartPos;
+         HB_SIZE  sStartPos;
          char *   pcRet;
 
          pcInsert = hb_parc( 2 );
@@ -298,16 +299,16 @@ HB_FUNC( POSINS )
          /* copy first part */
          if( sStartPos > 1 )
          {
-            hb_xmemcpy( pcRet, pcString, sStartPos - 1 );
+            hb_xmemcpy( pcRet, pcString, (size_t) sStartPos - 1 );
          }
 
          /* insert string */
-         hb_xmemcpy( pcRet + sStartPos - 1, pcInsert, sInsLen );
+         hb_xmemcpy( pcRet + sStartPos - 1, pcInsert, (size_t) sInsLen );
 
          /* copy second part */
          if( sStrLen > ( sStartPos - 1 ) )
          {
-            hb_xmemcpy( pcRet + sStartPos - 1 + sInsLen, pcString + sStartPos - 1, sStrLen - ( sStartPos - 1 ) );
+            hb_xmemcpy( pcRet + sStartPos - 1 + sInsLen, pcString + sStartPos - 1, (size_t) ( sStrLen - ( sStartPos - 1 ) ) );
          }
 
          pcRet[ sStrLen + sInsLen ] = '\0';
@@ -350,24 +351,23 @@ HB_FUNC( POSREPL )
 
    if( ISCHAR( 1 ) )
    {
-
-      const char *   pcString = hb_parc( 1 );
-      size_t         sStrLen  = hb_parclen( 1 );
-      const char *   pcReplace;
-      size_t         sReplLen;
+      const char * pcString = hb_parc( 1 );
+      HB_SIZE      sStrLen  = hb_parclen( 1 );
+      const char * pcReplace;
+      HB_SIZE      sReplLen;
 
       if( ( sReplLen = hb_parclen( 2 ) ) > 0 )
       {
-
-         size_t   sStartPos;
+         HB_SIZE  sStartPos;
          char *   pcRet;
-         size_t   sRetLen;
+         HB_SIZE  sRetLen;
 
          pcReplace = hb_parc( 2 );
 
          if( ISNUM( 3 ) )
          {
             sStartPos = hb_parnl( 3 );
+
             if( sStartPos == 0 )
             {
                if( sReplLen > sStrLen )
@@ -431,16 +431,16 @@ HB_FUNC( POSREPL )
          /* copy first part */
          if( sStartPos > 1 )
          {
-            hb_xmemcpy( pcRet, pcString, sStartPos - 1 );
+            hb_xmemcpy( pcRet, pcString, (size_t) sStartPos - 1 );
          }
 
          /* insert replacement string */
-         hb_xmemcpy( pcRet + sStartPos - 1, pcReplace, sReplLen );
+         hb_xmemcpy( pcRet + sStartPos - 1, pcReplace, (size_t) sReplLen );
 
          /* copy second part */
          if( sStrLen > ( sStartPos - 1 + sReplLen ) )
          {
-            hb_xmemcpy( pcRet + sStartPos - 1 + sReplLen, pcString + sStartPos - 1 + sReplLen, sStrLen - ( sStartPos - 1 + sReplLen ) );
+            hb_xmemcpy( pcRet + sStartPos - 1 + sReplLen, pcString + sStartPos - 1 + sReplLen, (size_t) ( sStrLen - ( sStartPos - 1 + sReplLen ) ) );
          }
 
          pcRet[ sRetLen ] = '\0';

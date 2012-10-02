@@ -53,30 +53,27 @@
 #ifndef HB_COMPAT_H_
 #define HB_COMPAT_H_
 
+#define HB_ULONG                  ULONG
 #define HB_MAXINT                 HB_LONG
 #define HB_BOOL                   BOOL
 #define HB_TRUE                   TRUE
 #define HB_FALSE                  FALSE
-#define HB_SIZE                   ULONG
 #define HB_U32                    UINT32
 #define HB_U8                     BYTE
 #define HB_UINT                   UINT
 #define HB_U16                    UINT16
 #define HB_I32                    INT32
-#define HB_ISIZ                   HB_LONG
 #define HB_ISCHAR                 ISCHAR
 #define HB_ISBYREF                ISBYREF
 #define HB_ISNUM                  ISNUM
 #define hb_parldef( l1, l2 )      ( ISLOG( l1 ) ? hb_parl( l1 )    : l2 )
 #define hb_parnidef( n1, n2 )     ( ISNUM( n1 ) ? hb_parni( n1 )   : n2 )
 #define hb_parnintdef( n1, n2 )   ( ISNUM( n1 ) ? hb_parnint( n1 ) : n2 )
-/* #define HB_ULONG               ULONG */
 #define HB_BYTE                   BYTE
 #define HB_USHORT                 USHORT
 #define HB_UCHAR                  UCHAR
 #define HB_FT_IMAGE               HB_FT_PICTURE
 #define HB_I64                    INT64
-/* #define hb_retns               hb_retnl */
 #define hb_gcMark                 hb_gcItemRef
 #define hb_vmAtQuit               hb_vmAtExit
 #define HB_FSNAMECONV             hb_fsNameConv

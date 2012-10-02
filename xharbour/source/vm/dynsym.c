@@ -116,7 +116,7 @@ PHB_SYMB hb_symbolNew( const char * szName )      /* Create a new symbol */
 
    HB_TRACE(HB_TR_DEBUG, ("hb_symbolNew(%s)", szName));
 
-   iLen = strlen( szName );
+   iLen = ( UINT ) strlen( szName );
    pHolder = ( PHB_SYM_HOLDER ) hb_xgrab( sizeof( HB_SYM_HOLDER ) + iLen );
    HB_MEMCPY( pHolder->szName, szName, iLen + 1 );
    pHolder->pNext = s_pAllocSyms;

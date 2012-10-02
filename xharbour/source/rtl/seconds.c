@@ -83,7 +83,7 @@
    #endif
 #endif
 
-void hb_dateTimeStamp( LONG * plJulian, LONG * plMilliSec )
+void hb_dateTimeStamp( long * plJulian, long * plMilliSec )
 {
 #if defined(HB_OS_WIN)
    SYSTEMTIME st;

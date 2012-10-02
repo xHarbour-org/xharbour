@@ -64,7 +64,7 @@ HB_FUNC( ENVPARAM )
       extern char ** _environ;
       char *         buffer   = NULL;
       int            x;
-      int            buffsize = 0;
+      HB_SIZE        buffsize = 0;
 
       // scan strings first and add up total size
       for( x = 0;; x++ )
@@ -91,11 +91,10 @@ HB_FUNC( ENVPARAM )
    }
 #elif defined( HB_OS_WIN )
    {
-
       char *   buffer;
       LPVOID   lpEnviron   = GetEnvironmentStrings();
       char *   sCurEnv;
-      int      buffsize    = 0;
+      HB_SIZE  buffsize    = 0;
 
       // scan strings first and add up total size
       for( sCurEnv = ( LPTSTR ) lpEnviron; *sCurEnv; sCurEnv++ )

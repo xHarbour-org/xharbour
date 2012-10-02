@@ -100,13 +100,13 @@
 //JC1: under threads, we need this to be in thread stack
 #ifndef HB_THREAD_SUPPORT
 static PHB_DYNS * s_privateStack  = NULL;
-static ULONG s_privateStackSize = 0;
-static ULONG s_privateStackCnt  = 0;
-static ULONG s_privateStackBase = 0;
+static HB_SIZE s_privateStackSize = 0;
+static HB_SIZE s_privateStackCnt  = 0;
+static HB_SIZE s_privateStackBase = 0;
 
-static ULONG s_globalTableSize = 0;
-static ULONG s_globalFirstFree = 0;
-static ULONG s_globalLastFree  = 0;
+static HB_SIZE s_globalTableSize  = 0;
+static HB_SIZE s_globalFirstFree  = 0;
+static HB_SIZE s_globalLastFree   = 0;
 static HB_VALUE_PTR s_globalTable = NULL;
 
 #else
@@ -174,7 +174,7 @@ void hb_memvarReleasePublic( PHB_ITEM pMemVar );
 void hb_memvarsClear( void )
 {
    HB_THREAD_STUB
-   ULONG ulCnt = s_globalLastFree;
+   HB_SIZE ulCnt = s_globalLastFree;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarsClear()"));
 
@@ -216,7 +216,7 @@ void hb_memvarsInit( void )
 void hb_memvarsRelease( void )
 {
    HB_THREAD_STUB
-   ULONG ulCnt = s_globalLastFree;
+   HB_SIZE ulCnt = s_globalLastFree;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarsRelease()"));
 
@@ -264,7 +264,7 @@ void hb_memvarsInit( HB_STACK *pStack )
 */
 void hb_memvarsRelease( HB_STACK *pStack )
 {
-   ULONG ulCnt;
+   HB_SIZE ulCnt;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarsRelease(%p)", pStack));
 
@@ -336,7 +336,7 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
    {
       /* There are holes in the table - get a first available hole
        */
-      hValue = s_globalFirstFree;
+      hValue = ( HB_HANDLE ) s_globalFirstFree;
       s_globalFirstFree = s_globalTable[ hValue ].hPrevMemvar;
    }
    else
@@ -345,13 +345,13 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
        */
       if( s_globalLastFree < s_globalTableSize )
       {
-         hValue = s_globalLastFree++;
+         hValue = ( HB_HANDLE ) s_globalLastFree++;
       }
       else
       {
          /* No more free values in the table - expand the table
           */
-         hValue = s_globalTableSize;
+         hValue = ( HB_HANDLE ) s_globalTableSize;
          s_globalLastFree = s_globalTableSize + 1;
          s_globalTableSize += TABLE_EXPANDHB_VALUE;
          s_globalTable = ( HB_VALUE_PTR ) hb_xrealloc( s_globalTable, sizeof( HB_VALUE ) * s_globalTableSize );
@@ -468,11 +468,11 @@ static void hb_memvarAddPrivate( PHB_DYNS pDynSym )
 /*
  * This function returns current PRIVATE variables stack base
  */
-ULONG hb_memvarGetPrivatesBase( void )
+HB_SIZE hb_memvarGetPrivatesBase( void )
 {
    HB_THREAD_STUB
 
-   ULONG ulBase = s_privateStackBase;
+   HB_SIZE ulBase = s_privateStackBase;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarGetPrivatesBase()"));
 
@@ -483,7 +483,7 @@ ULONG hb_memvarGetPrivatesBase( void )
 /*
  * This function releases PRIVATE variables created after passed base
  */
-void hb_memvarSetPrivatesBase( ULONG ulBase )
+void hb_memvarSetPrivatesBase( HB_SIZE ulBase )
 {
    HB_THREAD_STUB
 
@@ -539,7 +539,7 @@ static void hb_memvarRecycle( HB_HANDLE hValue )
 
    if( s_globalFirstFree )
    {
-      s_globalTable[ hValue ].hPrevMemvar = s_globalFirstFree;
+      s_globalTable[ hValue ].hPrevMemvar = ( HB_HANDLE ) s_globalFirstFree;
       s_globalFirstFree = hValue;
    }
    else
@@ -557,7 +557,7 @@ static void hb_memvarRecycleMT( HB_HANDLE hValue, HB_STACK *pStack )
 
    if( pStack->globalFirstFree )
    {
-      pStack->globalTable[ hValue ].hPrevMemvar = pStack->globalFirstFree;
+      pStack->globalTable[ hValue ].hPrevMemvar = ( HB_HANDLE ) pStack->globalFirstFree;
       pStack->globalFirstFree = hValue;
    }
    else
@@ -952,7 +952,7 @@ void hb_memvarNewParameter( PHB_SYMB pSymbol, PHB_ITEM pValue )
    hb_memvarCreateFromDynSymbol( pDyn, HB_MV_PRIVATE, pValue );
 }
 
-char * hb_memvarGetStrValuePtr( char * szVarName, ULONG *pulLen )
+char * hb_memvarGetStrValuePtr( char * szVarName, HB_SIZE *pulLen )
 {
    HB_THREAD_STUB
 
@@ -1105,7 +1105,7 @@ static void hb_memvarRelease( HB_ITEM_PTR pMemvar )
 
    if( HB_IS_STRING( pMemvar ) )
    {
-      ULONG ulBase = s_privateStackCnt;
+      HB_SIZE ulBase = s_privateStackCnt;
 
       /* Find the variable with a requested name that is currently visible
        * Start from the top of the stack.
@@ -1165,7 +1165,7 @@ static void hb_memvarReleaseWithMask( char *szRegEx, BOOL bInclude )
 {
    HB_THREAD_STUB
 
-   ULONG ulBase = s_privateStackCnt;
+   HB_SIZE ulBase = s_privateStackCnt;
    PHB_DYNS pDynVar;
 
    HB_REGEX RegEx;
@@ -1229,7 +1229,7 @@ static int hb_memvarScopeGet( PHB_DYNS pDynVar )
    }
    else
    {
-      ULONG ulBase = s_privateStackCnt;    /* start from the top of the stack */
+      HB_SIZE ulBase = s_privateStackCnt;    /* start from the top of the stack */
       int iMemvar = HB_MV_PUBLIC;
 
       while( ulBase )
@@ -1349,7 +1349,7 @@ void hb_memvarReleasePublic( PHB_ITEM pMemVar )
 
 /* Count the number of variables with given scope
  */
-static int hb_memvarCount( int iScope )
+static HB_ISIZ hb_memvarCount( int iScope )
 {
    HB_THREAD_STUB
 
@@ -1428,7 +1428,7 @@ static HB_ITEM_PTR hb_memvarDebugVariable( int iScope, int iPos, const char ** p
       }
       else
       {
-         if( ( ULONG ) iPos < s_privateStackCnt )
+         if( ( HB_SIZE ) iPos < s_privateStackCnt )
          {
             HB_DYNS_PTR pDynSym = s_privateStack[ iPos ];
             pValue = s_globalTable[ pDynSym->hMemvar ].pVarItem;
@@ -1450,7 +1450,7 @@ static HB_DYNS_PTR hb_memvarFindSymbol( HB_ITEM_PTR pName )
 
    if( pName )
    {
-      ULONG ulLen = pName->item.asString.length;
+      HB_SIZE ulLen = pName->item.asString.length;
 
       if( ulLen )
       {
@@ -1488,7 +1488,7 @@ HB_FUNC( __MVPUBLIC )
             {
                /* we are accepting an one-dimensional array of strings only
                 */
-               ULONG j, ulLen = hb_arrayLen( pMemvar );
+               HB_SIZE j, ulLen = hb_arrayLen( pMemvar );
 
                for( j = 1; j <= ulLen; j++ )
                {
@@ -1524,7 +1524,7 @@ HB_FUNC( __MVPRIVATE )
             {
                /* we are accepting an one-dimensional array of strings only
                 */
-               ULONG j, ulLen = hb_arrayLen( pMemvar );
+               HB_SIZE j, ulLen = hb_arrayLen( pMemvar );
 
                for( j = 1; j <= ulLen; j++ )
                {
@@ -1563,7 +1563,7 @@ HB_FUNC( __MVXRELEASE )
             {
                /* we are accepting an one-dimensional array of strings only
                 */
-               ULONG j, ulLen = hb_arrayLen( pMemvar );
+               HB_SIZE j, ulLen = hb_arrayLen( pMemvar );
 
                for( j = 1; j <= ulLen; j++ )
                {
@@ -1669,7 +1669,7 @@ HB_FUNC( __MVDBGINFO )
 
    if( iCount == 1 )          /* request for a number of variables */
    {
-      hb_retni( hb_memvarCount( hb_parni( 1 ) ) );
+      hb_retns( hb_memvarCount( hb_parni( 1 ) ) );
    }
 
    else if( iCount >= 2 )     /* request for a value of variable */
@@ -2358,7 +2358,7 @@ void hb_memvarsIsMemvarRef( void *pData )
 
    if( pStack->globalTable )
    {
-      ULONG ulCnt = pStack->globalLastFree;
+      HB_SIZE ulCnt = pStack->globalLastFree;
 
       while( --ulCnt )
       {
@@ -2381,7 +2381,7 @@ void hb_memvarsIsMemvarRef( void )
 
    if( s_globalTable )
    {
-      ULONG ulCnt = s_globalLastFree;
+      HB_SIZE ulCnt = s_globalLastFree;
 
       while( --ulCnt )
       {

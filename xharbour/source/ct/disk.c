@@ -71,17 +71,12 @@
 #include "hbapifs.h"
 
 #if defined( HB_OS_WIN )
-
-#   include <windows.h>
-#   include <winbase.h>
-#   include <shellapi.h>
-
-#   define HB_OS_WIN_USED
-
+   #include <windows.h>
+   #include <winbase.h>
+   #include <shellapi.h>
+   #define HB_OS_WIN_USED
 #elif defined( HB_OS_DOS )
-
-#   include <dos.h>
-
+   #include <dos.h>
 #endif
 
 HB_FUNC( DELETEFILE )
@@ -134,14 +129,13 @@ HB_FUNC( DIRNAME )
    hb_retc_buffer( pbyBuffer );
 }
 
-
 HB_FUNC( DRIVETYPE )
 {
 #if defined( HB_OS_WIN )
-   ULONG    ulSize   = hb_parclen( 1 ) + 2; /* allow space for '\0' & ":\" */
-   char *   pszDrive = ( char * ) hb_xgrab( ulSize + 1 );
-   LPTSTR   lpDrive;
-   int      iType;
+   HB_SIZE ulSize   = hb_parclen( 1 ) + 2; /* allow space for '\0' & ":\" */
+   char *  pszDrive = ( char * ) hb_xgrab( ulSize + 1 );
+   LPTSTR  lpDrive;
+   int     iType;
 
    hb_strncpy( pszDrive, hb_parcx( 1 ), ulSize );
 
@@ -152,6 +146,7 @@ HB_FUNC( DRIVETYPE )
       hb_strncat( pszDrive, "\\", ulSize );
 
    lpDrive = HB_TCHAR_CONVTO( pszDrive );
+
    switch( GetDriveType( lpDrive ) )
    {
       case DRIVE_RAMDISK:
@@ -215,7 +210,6 @@ HB_FUNC( NUMDISKL )
 #endif
 }
 
-
 /*
  * Volume() depends of the CSETSAFETY() setting and, if is true, does not
  * overwrite an existing label.
@@ -240,12 +234,12 @@ HB_FUNC( VOLUME )
 
    if( ! ct_getsafety() )
    {
-      PHB_FNAME      fname;
-      const char *   sDiskName;
-      char *         sRoot    = NULL;
-      char *         sVolName = NULL;
-      char           sRootBuf[ 4 ], sVolNameBuf[ 12 ];
-      char *         pszFree;
+      PHB_FNAME    fname;
+      const char * sDiskName;
+      char *       sRoot    = NULL;
+      char *       sVolName = NULL;
+      char         sRootBuf[ 4 ], sVolNameBuf[ 12 ];
+      char *       pszFree;
 
       if( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 )
       {
@@ -299,10 +293,10 @@ HB_FUNC( VOLUME )
 HB_FUNC( GETVOLINFO )
 {
 #if defined( HB_OS_WIN )
-   int            iretval;
-   const char *   sDrive = hb_parcx( 1 );
-   TCHAR          lpVolName[ 256 ];
-   LPTSTR         lpDrive;
+   int          iretval;
+   const char * sDrive = hb_parcx( 1 );
+   TCHAR        lpVolName[ 256 ];
+   LPTSTR       lpDrive;
 
    lpDrive  = sDrive[ 0 ] ? HB_TCHAR_CONVTO( sDrive ) : NULL;
    iretval  = GetVolumeInformation( lpDrive, lpVolName, 256, NULL, NULL, NULL, NULL, 0 );
@@ -336,10 +330,10 @@ HB_FUNC( GETVOLINFO )
 HB_FUNC( VOLSERIAL )
 {
 #if defined( HB_OS_WIN )
-   int            retval;
-   const char *   sDrive = hb_parcx( 1 );
-   LPTSTR         lpDrive;
-   DWORD          dSerial;
+   int          retval;
+   const char * sDrive = hb_parcx( 1 );
+   LPTSTR       lpDrive;
+   DWORD        dSerial;
 
    lpDrive  = sDrive[ 0 ] ? HB_TCHAR_CONVTO( sDrive ) : NULL;
    retval   = GetVolumeInformation( lpDrive,    /* RootPathName */
@@ -367,9 +361,9 @@ HB_FUNC( TRUENAME )
    if( szFile )
    {
 #ifdef HB_OS_WIN
-      char *   szBuffRet;
-      TCHAR    buffer[ MAX_PATH + 1 ] = { 0 };
-      LPTSTR   lpFile;
+      char * szBuffRet;
+      TCHAR  buffer[ MAX_PATH + 1 ] = { 0 };
+      LPTSTR lpFile;
 
       lpFile = HB_TCHAR_CONVTO( szFile );
       GetFullPathName( lpFile, MAX_PATH, buffer, NULL );

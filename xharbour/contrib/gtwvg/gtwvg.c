@@ -569,8 +569,8 @@ static void hb_gt_wvt_FitSize( PHB_GTWVT pWVT )
    LONG maxHeight;
    LONG borderWidth;
    LONG borderHeight;
-   SHORT left;
-   SHORT top;
+   LONG left;
+   LONG top;
 
    GetClientRect( pWVT->hWnd, &ci );
    GetWindowRect( pWVT->hWnd, &wi );
@@ -599,7 +599,7 @@ static void hb_gt_wvt_FitSize( PHB_GTWVT pWVT )
 
    {
       HFONT      hOldFont, hFont;
-      USHORT     fontHeight, fontWidth, n;
+      ULONG      fontHeight, fontWidth, n;
 
       fontHeight = maxHeight / pWVT->ROWS;
       fontWidth  = maxWidth  / pWVT->COLS;
@@ -643,7 +643,7 @@ static void hb_gt_wvt_FitSize( PHB_GTWVT pWVT )
                         ( tm.tmPitchAndFamily & TMPF_FIXED_PITCH ) == 0 &&
                         ( pWVT->PTEXTSIZE.x == tm.tmMaxCharWidth );
 #endif
-            for( n = 0; n < pWVT->COLS; n++ )
+            for( n = 0; n < (ULONG) pWVT->COLS; n++ )
                pWVT->FixedSize[ n ] = pWVT->PTEXTSIZE.x;
 
             width  = ( ( USHORT ) ( pWVT->PTEXTSIZE.x * pWVT->COLS ) ) + borderWidth;
@@ -908,7 +908,7 @@ static void hb_gt_wvt_MouseEvent( PHB_GTWVT pWVT, UINT message, WPARAM wParam, L
 
             {
                ULONG  ulSize;
-               USHORT irow, icol, j, top, left, bottom, right;
+               ULONG  irow, icol, j, top, left, bottom, right;
                char * sBuffer;
                RECT   rect = { 0, 0, 0, 0 };
                RECT   colrowRC = { 0, 0, 0, 0 };

@@ -53,10 +53,6 @@
 #ifndef HB_RDDSQL_H_
 #define HB_RDDSQL_H_
 
-// Temporary hack to pacify warnings
-#undef  HB_ULONG
-#define HB_ULONG ULONG
-
 #include "hbapirdd.h"
 #include "hbdbferr.h"
 #include "hbapierr.h"

@@ -139,7 +139,7 @@ HB_FUNC( SQLDRIVERC ) /* HB_SQLDRIVERCONNECT( hDbc, @ cConnectString ) --> nRetC
    bBuffer1[ 0 ] = '\0';
    ret =  SQLDriverConnect( ( HDBC ) hb_parnl( 1 ),
                             0,
-                            (SQLCHAR *) hb_parcx( 2 ), hb_parclen( 2 ),
+                            (SQLCHAR *) hb_parcx( 2 ), (SQLSMALLINT) hb_parclen( 2 ),
                             (SQLCHAR *) bBuffer1, 1024, &wLen, SQL_DRIVER_COMPLETE ) ;
    hb_storc( (char *) bBuffer1 , 3 );
    hb_retni( ret );
@@ -187,7 +187,7 @@ HB_FUNC( SQLFREESTM ) /* HB_SQLFREESTMT( hStmt, nType ) --> nRetCode */
 
 HB_FUNC( SQLEXECDIR )  /* HB_SQLEXECDIRECT( hStmt, cStatement ) --> nRetCode */
 {
-   hb_retni( SQLExecDirect( ( HSTMT ) hb_parnl( 1 ), (SQLCHAR *)  hb_parcx( 2 ), hb_parclen( 2 ) ) );
+   hb_retni( SQLExecDirect( ( HSTMT ) hb_parnl( 1 ), (SQLCHAR *)  hb_parcx( 2 ), (SQLINTEGER) hb_parclen( 2 ) ) );
 }
 
 HB_FUNC( SQLFETCH )   /* HB_SQLFETCH( hStmt ) --> nRetCode */
@@ -229,7 +229,7 @@ HB_FUNC( SQLGETDATA ) /* HB_SQLGETDATA( hStmt, nField, nType, nLen, @cBuffer ) -
             /* data right truncated! */
             bOut    = ( char * ) hb_xgrab( (ULONG) lLen + 1 );
             lLen = lLen - lInitBuff+2;
-            strcpy( (char *) bOut, (char *) bBuffer );
+            hb_xstrcpy( (char *) bOut, (char *) bBuffer, 0 );
             bBuffer = ( char * ) hb_xrealloc( bBuffer, (ULONG) lLen );
          }
          else
@@ -241,7 +241,7 @@ HB_FUNC( SQLGETDATA ) /* HB_SQLGETDATA( hStmt, nField, nType, nLen, @cBuffer ) -
       }
       else if( (wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO ) && iReallocs > 0 )
       {
-         strcat( (char*) bOut, (char *) bBuffer );
+         hb_xstrcat( (char*) bOut, (char *) bBuffer, 0 );
          hb_storclen( ( LPSTR ) bOut, ( ULONG ) ( lLen + lInitBuff - 1 ), 5 );
          wResult = SQL_SUCCESS;
          break;

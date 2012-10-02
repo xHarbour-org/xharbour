@@ -411,7 +411,7 @@ static S_TUPLE s_sigTable[] = {
 static LONG s_signalHandler( int type, int sig, PEXCEPTION_RECORD exc )
 {
    PHB_ITEM pFunction, pExecArray, pRet;
-   ULONG ulPos;
+   HB_SIZE ulPos;
    UINT uiSig, uiMask;
    int iRet;
 
@@ -862,7 +862,7 @@ HB_FUNC( HB_PUSHSIGNALHANDLER )
 
 HB_FUNC( HB_POPSIGNALHANDLER )
 {
-   int nLen;
+   HB_SIZE nLen;
 
    if ( sp_hooks != NULL )
    {

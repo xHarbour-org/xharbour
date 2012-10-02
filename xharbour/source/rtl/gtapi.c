@@ -493,7 +493,7 @@ HB_ERRCODE hb_gtSetSnowFlag( BOOL fNoSnow )
    return HB_FAILURE;
 }
 
-HB_ERRCODE hb_gtRectSize( int iTop, int iLeft, int iBottom, int iRight, ULONG * pulBuffSize )
+HB_ERRCODE hb_gtRectSize( int iTop, int iLeft, int iBottom, int iRight, HB_SIZE * pulBuffSize )
 {
    PHB_GT pGT;
 
@@ -668,7 +668,7 @@ HB_ERRCODE hb_gtSetMode( USHORT uiRows, USHORT uiCols )
 }
 
 HB_ERRCODE hb_gtPutText( USHORT uiRow, USHORT uiCol,
-                                BYTE * pStr, ULONG ulLength,
+                                BYTE * pStr, HB_SIZE ulLength,
                                 int iColor )
 {
    PHB_GT pGT;
@@ -689,7 +689,7 @@ HB_ERRCODE hb_gtPutText( USHORT uiRow, USHORT uiCol,
    return HB_FAILURE;
 }
 
-HB_ERRCODE hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pStr, ULONG ulLength )
+HB_ERRCODE hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pStr, HB_SIZE ulLength )
 {
    PHB_GT pGT;
 
@@ -705,7 +705,7 @@ HB_ERRCODE hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pStr, ULONG ulLength
    return HB_FAILURE;
 }
 
-HB_ERRCODE hb_gtWrite( BYTE * pStr, ULONG ulLength )
+HB_ERRCODE hb_gtWrite( BYTE * pStr, HB_SIZE ulLength )
 {
    PHB_GT pGT;
 
@@ -721,7 +721,7 @@ HB_ERRCODE hb_gtWrite( BYTE * pStr, ULONG ulLength )
    return HB_FAILURE;
 }
 
-HB_ERRCODE hb_gtWriteCon( BYTE * pStr, ULONG ulLength )
+HB_ERRCODE hb_gtWriteCon( BYTE * pStr, HB_SIZE ulLength )
 {
    PHB_GT pGT;
 
@@ -860,7 +860,7 @@ HB_ERRCODE hb_gtResume( void )
    return HB_FAILURE;
 }
 
-HB_ERRCODE hb_gtOutStd( BYTE * pbyStr, ULONG ulLen )
+HB_ERRCODE hb_gtOutStd( BYTE * pbyStr, HB_SIZE ulLen )
 {
    PHB_GT pGT;
 
@@ -875,7 +875,7 @@ HB_ERRCODE hb_gtOutStd( BYTE * pbyStr, ULONG ulLen )
    return HB_SUCCESS;
 }
 
-HB_ERRCODE hb_gtOutErr( BYTE * pbyStr, ULONG ulLen )
+HB_ERRCODE hb_gtOutErr( BYTE * pbyStr, HB_SIZE ulLen )
 {
    PHB_GT pGT;
 

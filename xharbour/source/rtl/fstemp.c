@@ -135,7 +135,8 @@ static HB_FHANDLE hb_fsCreateTempLow( const char * pszDir, const char * pszPrefi
 
       if( pszName[0] != '\0' )
       {
-         int len = strlen( pszName );
+         HB_SIZE len = strlen( pszName );
+
          if( pszName[ len - 1 ] != HB_OS_PATH_DELIM_CHR )
          {
             pszName[ len ] = HB_OS_PATH_DELIM_CHR;

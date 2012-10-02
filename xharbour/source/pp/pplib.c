@@ -62,18 +62,18 @@ static void hb_pp_ErrorMessage( void * cargo, const char * szMsgTable[],
                                 char cPrefix, int iCode,
                                 const char * szParam1, const char * szParam2 )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_pp_ErrorGen(%p, %p, %c, %d, %s, %s)", cargo, szMsgTable, cPrefix, iCode, szParam1, szParam2));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_pp_ErrorGen(%p, %p, %c, %d, %s, %s)", cargo, szMsgTable, cPrefix, iCode, szParam1, szParam2 ) );
 
    HB_SYMBOL_UNUSED( cargo );
 
    /* ignore all warning messages and errors when break or quit request */
    if( cPrefix != 'W' && hb_vmRequestQuery() == 0 )
    {
-      char szMsgBuf[ 1024 ];
+      char     szMsgBuf[ 1024 ];
       PHB_ITEM pError;
       hb_snprintf( szMsgBuf, sizeof( szMsgBuf ), szMsgTable[ iCode - 1 ],
-                szParam1, szParam2 );
-      pError = hb_errRT_New( ES_ERROR, "PP", 9999, ( ULONG ) iCode, szMsgBuf,
+                   szParam1, szParam2 );
+      pError = hb_errRT_New( ES_ERROR, "PP", 9999, ( HB_ERRCODE ) iCode, szMsgBuf,
                              NULL, 0, EF_NONE | EF_CANDEFAULT );
       hb_errLaunch( pError );
       hb_errRelease( pError );
@@ -92,22 +92,22 @@ static HB_GARBAGE_FUNC( hb_pp_Destructor )
 {
    PHB_PP_STATE * pStatePtr = ( PHB_PP_STATE * ) Cargo;
 
-   if( * pStatePtr )
+   if( *pStatePtr )
    {
-      hb_pp_free( * pStatePtr );
-      * pStatePtr = NULL;
+      hb_pp_free( *pStatePtr );
+      *pStatePtr = NULL;
    }
 }
 
 static void hb_pp_StdRules( PHB_ITEM ppItem )
 {
-   static BOOL s_fInit = TRUE;
-   static PHB_DYNS s_pDynSym;
+   static BOOL       s_fInit = TRUE;
+   static PHB_DYNS   s_pDynSym;
 
    if( s_fInit )
    {
-      s_pDynSym = hb_dynsymFind( "__PP_STDRULES" );
-      s_fInit = FALSE;
+      s_pDynSym   = hb_dynsymFind( "__PP_STDRULES" );
+      s_fInit     = FALSE;
    }
 
    if( s_pDynSym )
@@ -122,10 +122,10 @@ static void hb_pp_StdRules( PHB_ITEM ppItem )
 PHB_PP_STATE hb_pp_Param( int iParam )
 {
    PHB_PP_STATE * pStatePtr =
-                  ( PHB_PP_STATE * ) hb_parptrGC( hb_pp_Destructor, iParam );
+      ( PHB_PP_STATE * ) hb_parptrGC( hb_pp_Destructor, iParam );
 
    if( pStatePtr )
-      return * pStatePtr;
+      return *pStatePtr;
    else
       return NULL;
 }
@@ -142,13 +142,13 @@ HB_FUNC( __PP_INIT )
 
    if( pState )
    {
-      const char * szPath = hb_parc( 1 ), * szStdCh = hb_parc( 2 );
-      PHB_ITEM ppItem;
+      const char *   szPath = hb_parc( 1 ), * szStdCh = hb_parc( 2 );
+      PHB_ITEM       ppItem;
 
-      pStatePtr = ( PHB_PP_STATE * ) hb_gcAlloc( sizeof( PHB_PP_STATE ),
-                                                 hb_pp_Destructor );
-      * pStatePtr = pState;
-      ppItem = hb_itemPutPtrGC( NULL, ( void * ) pStatePtr );
+      pStatePtr   = ( PHB_PP_STATE * ) hb_gcAlloc( sizeof( PHB_PP_STATE ),
+                                                   hb_pp_Destructor );
+      *pStatePtr  = pState;
+      ppItem      = hb_itemPutPtrGC( NULL, ( void * ) pStatePtr );
 
       hb_pp_init( pState, TRUE, 0, NULL, NULL, NULL,
                   hb_pp_ErrorMessage, hb_pp_Disp, NULL, NULL, NULL );
@@ -156,7 +156,7 @@ HB_FUNC( __PP_INIT )
       if( szPath )
          hb_pp_addSearchPath( pState, szPath, TRUE );
 
-      if( !szStdCh )
+      if( ! szStdCh )
          hb_pp_StdRules( ppItem );
       else if( *szStdCh )
          hb_pp_readRules( pState, szStdCh );
@@ -204,8 +204,8 @@ HB_FUNC( __PP_ADDRULE )
 
    if( pState )
    {
-      const char * szText = hb_parc( 2 );
-      ULONG ulLen = hb_parclen( 2 );
+      const char *   szText   = hb_parc( 2 );
+      HB_SIZE        ulLen    = hb_parclen( 2 );
 
       if( szText )
       {
@@ -246,7 +246,7 @@ HB_FUNC( __PP_PROCESS )
 
    if( pState )
    {
-      ULONG ulLen = hb_parclen( 2 );
+      HB_SIZE ulLen = hb_parclen( 2 );
 
       if( ulLen )
       {

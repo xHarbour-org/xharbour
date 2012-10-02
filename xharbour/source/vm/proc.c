@@ -148,7 +148,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
       return szName;
    }
 
-   lOffset = hb_stackBaseProcOffset( iLevel );
+   lOffset = ( long ) hb_stackBaseProcOffset( iLevel );
 
    if( lOffset > 0 && ( pBase = hb_stackGetBase( iLevel ) ) != NULL )
    {

@@ -68,6 +68,12 @@
 
 //#define DEBUG_MARKERS
 
+/* Pacify MSVS2005 and above */
+#if defined(_MSC_VER) && (_MSC_VER>=1400)
+   #define _CRT_SECURE_NO_WARNINGS
+   #define _CRT_SECURE_NO_DEPRECATE
+#endif
+
 /*
  * Avoid tracing in preprocessor/compiler.
  */
@@ -2927,7 +2933,7 @@ static int WorkPseudoF( char ** ptri, char * ptro, DEFINES * stdef )
               lenreal = NextParm( ptri, NULL);
 
               ptrb = ptro;
-              while( (ifou = hb_strAt( parfict, lenfict, ptrb, lenres-(ptrb-ptro) )) > 0 )
+              while( (ifou = (int) hb_strAt( parfict, lenfict, ptrb, lenres-(ptrb-ptro) )) > 0 )
               {
                  ptrb = ptrb+ifou-1;
                  if( !ISNAME(*(ptrb-1)) && !ISNAME(*(ptrb+lenfict)) )
@@ -5455,7 +5461,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                      printf( "   Instanciated %s Len: %i\n", expnew, lennew );
                   #endif
 
-                  while( ( i = hb_strAt( exppatt, 2, expnew, lennew ) ) > 0 )
+                  while( ( i = (int) hb_strAt( exppatt, 2, expnew, lennew ) ) > 0 )
                   {
                      #ifdef DEBUG_MARKERS
                         printf( "   Expand: '%s' at %i, lennew - i: %i, strlen: %i\n", exppatt, i, lennew - i, strlen( expnew + i - 1 ) );
@@ -5572,7 +5578,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                          */
                         // *** EITHER *** this block OR the #else below!!!
                         #if 1
-                            while( ( i = hb_strAt( exppatt, 2, ptr + iOffset, lennew - iOffset ) ) > 0 )
+                            while( ( i = (int) hb_strAt( exppatt, 2, ptr + iOffset, lennew - iOffset ) ) > 0 )
                             {
                                #ifdef DEBUG_MARKERS
                                   printf( "   Expand: '%s' at %i in >%.*s< len: %i\n", exppatt, i, lennew - iOffset, ptr + iOffset, lennew - iOffset );

@@ -87,7 +87,7 @@ HB_FUNC( HB_HMAC_SHA1 )
       }
    }
    #else
-      hb_HMAC_SHA1_UpdateKey( &ctx, hb_parcx( 2 ), hb_parclen( 2 ) );
+      hb_HMAC_SHA1_UpdateKey( &ctx, hb_parcx( 2 ), (UINT) hb_parclen( 2 ) );
    #endif
    hb_HMAC_SHA1_EndKey( &ctx );
 
@@ -119,7 +119,7 @@ HB_FUNC( HB_HMAC_SHA1 )
       }
    }
    #else
-      hb_HMAC_SHA1_UpdateMessage( &ctx, hb_parcx( 1 ), hb_parclen( 1 ) );
+      hb_HMAC_SHA1_UpdateMessage( &ctx, hb_parcx( 1 ), (UINT) hb_parclen( 1 ) );
    #endif
    hb_HMAC_SHA1_EndMessage( mac, &ctx );
    hb_HMAC_SHA1_Done( &ctx );

@@ -157,7 +157,7 @@ void hb_stackFree( void )
 #ifndef HB_THREAD_SUPPORT
 
    {
-      LONG i = hb_stackST.wItems - 1;
+      long i = hb_stackST.wItems - 1;
 
       while( i >= 0 )
       {
@@ -348,9 +348,9 @@ void hb_stackPushReturn( void )
 void hb_stackIncrease( void )
 {
    HB_THREAD_STUB
-   LONG BaseIndex;   /* index of stack base */
-   LONG CurrIndex;   /* index of current top item */
-   LONG EndIndex;    /* index of current top item */
+   long BaseIndex;   /* index of stack base */
+   long CurrIndex;   /* index of current top item */
+   long EndIndex;    /* index of current top item */
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackIncrease()"));
 
@@ -358,9 +358,9 @@ void hb_stackIncrease( void )
       PHB_ITEM *pOldItems = HB_VM_STACK.pItems;
    #endif
 
-   BaseIndex = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
-   CurrIndex = HB_VM_STACK.pPos - HB_VM_STACK.pItems;
-   EndIndex  = HB_VM_STACK.pEnd - HB_VM_STACK.pItems;
+   BaseIndex = ( long ) ( HB_VM_STACK.pBase - HB_VM_STACK.pItems );
+   CurrIndex = ( long ) ( HB_VM_STACK.pPos - HB_VM_STACK.pItems );
+   EndIndex  = ( long ) ( HB_VM_STACK.pEnd - HB_VM_STACK.pItems );
 
    /* no, make more headroom: */
    /* hb_stackDispLocal(); */
@@ -404,7 +404,7 @@ void hb_stackIncrease( void )
 
 }
 
-void hb_stackRemove( LONG lUntilPos )
+void hb_stackRemove( long lUntilPos )
 {
    HB_THREAD_STUB
    HB_ITEM_PTR * pEnd = HB_VM_STACK.pItems + lUntilPos;
@@ -442,13 +442,13 @@ HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams )
 void hb_stackOldFrame( HB_STACK_STATE * pStack )
 {
    HB_THREAD_STUB
-   int iLocal;
+   long iLocal;
    PHB_ITEM pDetached;
    USHORT uiRequest;
    PHB_SYMBCARGO pCargo = (*HB_VM_STACK.pBase)->item.asSymbol.pCargo;
-   LONG stackbase = pCargo->stackbase;
+   long stackbase = pCargo->stackbase;
    int iArgs = pCargo->arguments;
-   ULONG ulPrivateBase = pCargo->privatesbase;
+   HB_SIZE ulPrivateBase = pCargo->privatesbase;
 
    uiRequest = hb_vmRequestQuery();
    hb_vmRequestReset();
@@ -457,7 +457,7 @@ void hb_stackOldFrame( HB_STACK_STATE * pStack )
    {
       PHB_ITEM pItem = *( HB_VM_STACK.pPos - 1 );
 
-      iLocal = HB_VM_STACK.pPos - HB_VM_STACK.pBase - 2;
+      iLocal = ( long ) ( HB_VM_STACK.pPos - HB_VM_STACK.pBase - 2 );
 
       if( iLocal >= 0 && iLocal <= iArgs && HB_IS_MEMVAR( pItem ) )
       {
@@ -509,24 +509,23 @@ void hb_stackClearPrivateBases( void )
 }
 
 #undef hb_stackTopOffset
-LONG hb_stackTopOffset( void )
+long hb_stackTopOffset( void )
 {
    HB_THREAD_STUB
-   return HB_VM_STACK.pPos - HB_VM_STACK.pItems;
+   return ( long ) ( HB_VM_STACK.pPos - HB_VM_STACK.pItems );
 }
 
 #undef hb_stackBaseOffset
-LONG hb_stackBaseOffset( void )
+long hb_stackBaseOffset( void )
 {
    HB_THREAD_STUB
-   return HB_VM_STACK.pBase - HB_VM_STACK.pItems + 1;
+   return ( long ) ( HB_VM_STACK.pBase - HB_VM_STACK.pItems + 1 );
 }
 
-
-LONG hb_stackBaseProcOffset( int iLevel )
+long hb_stackBaseProcOffset( int iLevel )
 {
    HB_THREAD_STUB
-   LONG lOffset = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
+   long lOffset = ( long ) ( HB_VM_STACK.pBase - HB_VM_STACK.pItems );
 
    while( iLevel-- > 0 && lOffset > 0 )
       lOffset = ( * ( HB_VM_STACK.pItems + lOffset ) )->item.asSymbol.pCargo->stackbase;
@@ -536,7 +535,6 @@ LONG hb_stackBaseProcOffset( int iLevel )
    else
       return -1;
 }
-
 
 /**
  JC1: from that point on, stack optimization is no longer needed:
@@ -552,7 +550,7 @@ LONG hb_stackBaseProcOffset( int iLevel )
 #endif
 
 #undef hb_stackTotalItems
-LONG hb_stackTotalItems( void )
+long hb_stackTotalItems( void )
 {
    return HB_VM_STACK.wItems;
 }
@@ -568,8 +566,6 @@ PHB_IOERRORS hb_stackIOErrors( void )
    return &s_IOErrors;
 }
 
-
-
 #undef hb_stackRDD
 PHB_STACKRDD hb_stackRDD( void )
 {
@@ -582,15 +578,14 @@ PHB_STACKRDD_TLS hb_stackRDDTLS( void )
    return &HB_VM_STACK.rddTls;
 }
 
-
 #undef hb_stackGetStaticsBase
-LONG hb_stackGetStaticsBase( void )
+long hb_stackGetStaticsBase( void )
 {
    return HB_VM_STACK.lStatics;
 }
 
 #undef hb_stackSetStaticsBase
-void hb_stackSetStaticsBase( LONG lBase )
+void hb_stackSetStaticsBase( long lBase )
 {
    HB_VM_STACK.lStatics = lBase;
 }
@@ -602,7 +597,7 @@ PHB_ITEM ** hb_stackItemBasePtr( void )
 }
 
 #undef hb_stackItem
-HB_ITEM_PTR hb_stackItem( LONG iItemPos )
+HB_ITEM_PTR hb_stackItem( long iItemPos )
 {
    if( iItemPos < 0 )
    {
@@ -690,7 +685,7 @@ PHB_ITEM * hb_stackGetBase( int iLevel )
 {
    if( iLevel > 0 )
    {
-      LONG lBase = (* HB_VM_STACK.pBase )->item.asSymbol.pCargo->stackbase;
+      long lBase = (* HB_VM_STACK.pBase )->item.asSymbol.pCargo->stackbase;
 
       while( ( --iLevel > 0 ) && ( lBase > 0 ) && HB_IS_SYMBOL( *( HB_VM_STACK.pItems + lBase ) ) )
       {

@@ -200,7 +200,7 @@ HB_FUNC( HB_OSNEWLINE )
 }
 
 /* Output an item to STDOUT */
-void hb_conOutStd( const char * pStr, ULONG ulLen )
+void hb_conOutStd( const char * pStr, HB_SIZE ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutStd(%s, %lu)", pStr, ulLen));
 
@@ -219,7 +219,7 @@ void hb_conOutStd( const char * pStr, ULONG ulLen )
 }
 
 /* Output an item to STDERR */
-void hb_conOutErr( const char * pStr, ULONG ulLen )
+void hb_conOutErr( const char * pStr, HB_SIZE ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutErr(%s, %lu)", pStr, ulLen));
 
@@ -247,7 +247,7 @@ void hb_conOutErr( const char * pStr, ULONG ulLen )
 }
 
 /* Output an item to the screen and/or printer and/or alternate */
-void hb_conOutAlt( const char * pStr, ULONG ulLen )
+void hb_conOutAlt( const char * pStr, HB_SIZE ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutAlt(%s, %lu)", pStr, ulLen));
 
@@ -283,7 +283,7 @@ void hb_conOutAlt( const char * pStr, ULONG ulLen )
 }
 
 /* Output an item to the screen and/or printer */
-static void hb_conOutDev( const char * pStr, ULONG ulLen )
+static void hb_conOutDev( const char * pStr, HB_SIZE ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutDev(%s, %lu)", pStr, ulLen));
 
@@ -304,9 +304,9 @@ static void hb_conOutDev( const char * pStr, ULONG ulLen )
    }
 }
 
-typedef void hb_out_func_typedef( const char *, ULONG );
+typedef void hb_out_func_typedef( const char *, HB_SIZE );
 
-static char * hb_itemStringCon( PHB_ITEM pItem, ULONG * pulLen, BOOL * pfFreeReq )
+static char * hb_itemStringCon( PHB_ITEM pItem, HB_SIZE * pulLen, BOOL * pfFreeReq )
 {
    /* logical values in device output (not console, stdout or stderr) are
       shown as single letter */
@@ -323,7 +323,7 @@ static char * hb_itemStringCon( PHB_ITEM pItem, ULONG * pulLen, BOOL * pfFreeReq
 static void hb_conOut( USHORT uiParam, hb_out_func_typedef * pOutFunc )
 {
    char * pszString;
-   ULONG ulLen;
+   HB_SIZE ulLen;
    BOOL bFreeReq;
    PHB_ITEM pItem;
 
@@ -598,7 +598,7 @@ HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or prin
 HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected by SET ALTERNATE */
 {
    char * pszString;
-   ULONG ulLen;
+   HB_SIZE ulLen;
    BOOL bFreeReq;
 
    hb_console_safe_lock();
@@ -638,7 +638,7 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
 HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position, but is not affected by SET ALTERNATE */
 {
    char * pszString = NULL;
-   ULONG ulLen;
+   HB_SIZE ulLen;
    BOOL bFreeReq = FALSE;
 
    hb_console_safe_lock();
@@ -677,7 +677,7 @@ HB_FUNC( HB_DISPOUTAT )
    if( hb_pcount() >= 3 )
    {
       char * pszString;
-      ULONG ulLen;
+      HB_SIZE ulLen;
       BOOL bFreeReq;
       int iColor;
 
@@ -701,17 +701,17 @@ HB_FUNC( HB_DISPOUTAT )
 
 HB_FUNC( HB_GETSTDIN ) /* Return Handel for STDIN */
 {
-   hb_retni( s_hFilenoStdin );
+   hb_retni( (int) s_hFilenoStdin );
 }
 
 HB_FUNC( HB_GETSTDOUT ) /* Return Handel for STDOUT */
 {
-   hb_retni( s_hFilenoStdout );
+   hb_retni( (int) s_hFilenoStdout );
 }
 
 HB_FUNC( HB_GETSTDERR ) /* Return Handel for STDERR */
 {
-   hb_retni( s_hFilenoStderr );
+   hb_retni( (int) s_hFilenoStderr );
 }
 
 /****************************************************************************/

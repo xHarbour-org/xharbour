@@ -64,30 +64,30 @@
 #include "hbapierr.h"
 #include "pragma.h"
 
-#if defined(HB_OS_DOS) && defined(__BORLANDC__)
+#if defined( HB_OS_DOS ) && defined( __BORLANDC__ )
    #include <limits.h>
-   extern unsigned _stklen = UINT_MAX;
+extern unsigned _stklen = UINT_MAX;
 #endif
 
 static void hb_compInitVars( void );
-static void hb_compGenOutput( int, const char *szSourceExtension );
+static void hb_compGenOutput( int, const char * szSourceExtension );
 static void hb_compOutputFile( void );
 
-int hb_compLocalGetPos( char * szVarName );   /* returns the order + 1 of a local variable */
-int hb_compStaticGetPos( char *, PFUNCTION ); /* return if passed name is a static variable */
-int hb_compFieldGetPos( char *, PFUNCTION );  /* return if passed name is a field variable */
-int hb_compMemvarGetPos( char *, PFUNCTION ); /* return if passed name is a memvar variable */
-USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName ); /* returns the order + 1 of a variable if defined or zero */
+int hb_compLocalGetPos( char * szVarName );                          /* returns the order + 1 of a local variable */
+int hb_compStaticGetPos( char *, PFUNCTION );                        /* return if passed name is a static variable */
+int hb_compFieldGetPos( char *, PFUNCTION );                         /* return if passed name is a field variable */
+int hb_compMemvarGetPos( char *, PFUNCTION );                        /* return if passed name is a memvar variable */
+USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName );        /* returns the order + 1 of a variable if defined or zero */
 
-static void hb_compGenFieldPCode( BYTE , int, char *, PFUNCTION );      /* generates the pcode for database field */
-static void hb_compGenVariablePCode( BYTE , char * );    /* generates the pcode for undeclared variable */
-static void hb_compGenVarPCode( BYTE , char * );    /* generates the pcode for undeclared variable */
-static void hb_compGenLocalName( USHORT wLocal, char *szVarName ); /* generates the pcode for local variable name */
+static void hb_compGenFieldPCode( BYTE, int, char *, PFUNCTION );    /* generates the pcode for database field */
+static void hb_compGenVariablePCode( BYTE, char * );                 /* generates the pcode for undeclared variable */
+static void hb_compGenVarPCode( BYTE, char * );                      /* generates the pcode for undeclared variable */
+static void hb_compGenLocalName( USHORT wLocal, char * szVarName );  /* generates the pcode for local variable name */
 
-static PFUNCTION hb_compFunctionNew( char *, HB_SYMBOLSCOPE );  /* creates and initialises the _FUNC structure */
-static PINLINE hb_compInlineNew( char * );  /* creates and initialises the _INLINE structure */
-static void hb_compCheckDuplVars( PVAR pVars, char * szVarName ); /*checks for duplicate variables definitions */
-static int hb_compProcessRSPFile( char * ); /* process response file */
+static PFUNCTION hb_compFunctionNew( char *, HB_SYMBOLSCOPE );       /* creates and initialises the _FUNC structure */
+static PINLINE hb_compInlineNew( char * );                           /* creates and initialises the _INLINE structure */
+static void hb_compCheckDuplVars( PVAR pVars, char * szVarName );    /*checks for duplicate variables definitions */
+static int hb_compProcessRSPFile( char * );                          /* process response file */
 static int hb_compCompile( char * szPrg );
 
 static void hb_compOptimizeJumps( void );
@@ -121,70 +121,70 @@ PENUMDEF       hb_comp_pEnum;
 
 char *         hb_comp_szFromEnum;
 
-int            hb_comp_iLine;                             /* currently processed line number (globaly) */
-char *         hb_comp_szFile;                            /* File Name of last compiled line */
-char *         hb_comp_PrgFileName;                       /* Original PRG File Name */
+int            hb_comp_iLine;                               /* currently processed line number (globaly) */
+char *         hb_comp_szFile;                              /* File Name of last compiled line */
+char *         hb_comp_PrgFileName;                         /* Original PRG File Name */
 PFUNCTION      hb_comp_pInitFunc;
 PFUNCTION      hb_comp_pGlobalsFunc;
 PFUNCTION      hb_comp_pLineNumberFunc;
-PHB_FNAME      hb_comp_pFileName = NULL;
+PHB_FNAME      hb_comp_pFileName          = NULL;
 
-BOOL           hb_comp_bPPO = FALSE;                      /* flag indicating, is ppo output needed */
-FILE *         hb_comp_yyppo = NULL;                      /* output .ppo file */
-BOOL           hb_comp_bStartProc = TRUE;                 /* holds if we need to create the starting procedure */
-BOOL           hb_comp_bExplicitStartProc = FALSE;        /* holds if we need to support EXPLICIT App starting procedure */
-BOOL           hb_comp_bLineNumbers = TRUE;               /* holds if we need pcodes with line numbers */
-BOOL           hb_comp_bQuiet = FALSE;                    /* quiet mode */
-BOOL           hb_comp_bShortCuts = TRUE;                 /* .and. & .or. expressions shortcuts */
-int            hb_comp_iWarnings = 0;                     /* enable parse warnings */
-BOOL           hb_comp_bAnyWarning = FALSE;               /* holds if there was any warning during the compilation process */
-BOOL           hb_comp_bAutoMemvarAssume = FALSE;         /* holds if undeclared variables are automatically assumed MEMVAR (-a)*/
-BOOL           hb_comp_bForceMemvars = FALSE;             /* holds if memvars are assumed when accesing undeclared variable (-v)*/
-BOOL           hb_comp_bDebugInfo = FALSE;                /* holds if generate debugger required info */
-char           hb_comp_szPrefix[ 21 ] = { '\0' };         /* holds the prefix added to the generated symbol init function name (in C output currently) */
-int            hb_comp_iGenCOutput = HB_COMPGENC_VERBOSE; /* C code generation should be verbose (use comments) or not */
-BOOL           hb_comp_bNoStartUp = FALSE ;               /* C code generation embed HB_FS_FIRST or not */
-int            hb_comp_iExitLevel = HB_EXITLEVEL_DEFAULT; /* holds if there was any warning during the compilation process */
+BOOL           hb_comp_bPPO               = FALSE;          /* flag indicating, is ppo output needed */
+FILE *         hb_comp_yyppo              = NULL;           /* output .ppo file */
+BOOL           hb_comp_bStartProc         = TRUE;           /* holds if we need to create the starting procedure */
+BOOL           hb_comp_bExplicitStartProc = FALSE;          /* holds if we need to support EXPLICIT App starting procedure */
+BOOL           hb_comp_bLineNumbers       = TRUE;           /* holds if we need pcodes with line numbers */
+BOOL           hb_comp_bQuiet             = FALSE;          /* quiet mode */
+BOOL           hb_comp_bShortCuts         = TRUE;           /* .and. & .or. expressions shortcuts */
+int            hb_comp_iWarnings          = 0;              /* enable parse warnings */
+BOOL           hb_comp_bAnyWarning        = FALSE;          /* holds if there was any warning during the compilation process */
+BOOL           hb_comp_bAutoMemvarAssume  = FALSE;          /* holds if undeclared variables are automatically assumed MEMVAR (-a)*/
+BOOL           hb_comp_bForceMemvars      = FALSE;          /* holds if memvars are assumed when accesing undeclared variable (-v)*/
+BOOL           hb_comp_bDebugInfo         = FALSE;          /* holds if generate debugger required info */
+char           hb_comp_szPrefix[ 21 ]     = { '\0' };       /* holds the prefix added to the generated symbol init function name (in C output currently) */
+int            hb_comp_iGenCOutput  = HB_COMPGENC_VERBOSE;  /* C code generation should be verbose (use comments) or not */
+BOOL           hb_comp_bNoStartUp   = FALSE;                /* C code generation embed HB_FS_FIRST or not */
+int            hb_comp_iExitLevel   = HB_EXITLEVEL_DEFAULT; /* holds if there was any warning during the compilation process */
 int            hb_comp_iFunctionCnt;
 int            hb_comp_iErrorCount;
-char           hb_comp_cVarType;                          /* current declared variable type */
-char           hb_comp_cDataListType;                     /* current declared variable list type */
-char           hb_comp_cCastType;                         /* current casting type */
-BOOL           hb_comp_bDontGenLineNum = FALSE;           /* suppress line number generation */
-ULONG          hb_comp_ulLastLinePos;                     /* position of last opcode with line number */
-ULONG          hb_comp_ulLastModuleNamePos;               /* position of last opcode with module name */
-ULONG          hb_comp_ulSavedModuleNamePos;              /* position of last opcode with module name saved inside a STATIC/GLOBAL definition */
-int            hb_comp_iStaticCnt;                        /* number of defined statics variables on the PRG */
-int            hb_comp_iVarScope;                         /* holds the scope for next variables to be defined */
-PHB_FNAME      hb_comp_pOutPath = NULL;
-PHB_FNAME      hb_comp_ppo_pOutPath = NULL;
-BOOL           hb_comp_bCredits = FALSE;                  /* print credits */
-BOOL           hb_comp_bBuildInfo = FALSE;                /* print build info */
-BOOL           hb_comp_bI18n = FALSE;                     /* Output i18n file */
-char *         hb_comp_szHILout = NULL;                   /* Output file name */
-FILE *         hb_comp_HILfile = NULL;                    /* output .hil file */
-BOOL           hb_comp_bLogo = TRUE;                      /* print logo */
-BOOL           hb_comp_bSyntaxCheckOnly = FALSE;          /* syntax check only */
-int            hb_comp_iLanguage = LANG_C;                /* default Harbour generated output language */
-int            hb_comp_iJumpOptimize = 1;
-char *         hb_comp_szDeclaredFun = NULL;
-char *         hb_Command_Line;	 /* Switches to be documented in generated C file */
+char           hb_comp_cVarType;                            /* current declared variable type */
+char           hb_comp_cDataListType;                       /* current declared variable list type */
+char           hb_comp_cCastType;                           /* current casting type */
+BOOL           hb_comp_bDontGenLineNum = FALSE;             /* suppress line number generation */
+HB_SIZE        hb_comp_ulLastLinePos;                       /* position of last opcode with line number */
+HB_SIZE        hb_comp_ulLastModuleNamePos;                 /* position of last opcode with module name */
+HB_SIZE        hb_comp_ulSavedModuleNamePos;                /* position of last opcode with module name saved inside a STATIC/GLOBAL definition */
+int            hb_comp_iStaticCnt;                          /* number of defined statics variables on the PRG */
+int            hb_comp_iVarScope;                           /* holds the scope for next variables to be defined */
+PHB_FNAME      hb_comp_pOutPath           = NULL;
+PHB_FNAME      hb_comp_ppo_pOutPath       = NULL;
+BOOL           hb_comp_bCredits           = FALSE;          /* print credits */
+BOOL           hb_comp_bBuildInfo         = FALSE;          /* print build info */
+BOOL           hb_comp_bI18n              = FALSE;          /* Output i18n file */
+char *         hb_comp_szHILout           = NULL;           /* Output file name */
+FILE *         hb_comp_HILfile            = NULL;           /* output .hil file */
+BOOL           hb_comp_bLogo              = TRUE;           /* print logo */
+BOOL           hb_comp_bSyntaxCheckOnly   = FALSE;          /* syntax check only */
+int            hb_comp_iLanguage          = LANG_C;         /* default Harbour generated output language */
+int            hb_comp_iJumpOptimize      = 1;
+char *         hb_comp_szDeclaredFun      = NULL;
+char *         hb_Command_Line;  /* Switches to be documented in generated C file */
 
-FILE *         hb_comp_errFile = NULL;
+FILE *         hb_comp_errFile            = NULL;
 
-BOOL           hb_comp_bAutoOpen = TRUE;
-BOOL           hb_comp_bError = FALSE;
-USHORT         hb_comp_cInlineID = 0;
+BOOL           hb_comp_bAutoOpen          = TRUE;
+BOOL           hb_comp_bError             = FALSE;
+USHORT         hb_comp_cInlineID          = 0;
 
-int            hb_comp_iLineINLINE = 0;
+int            hb_comp_iLineINLINE        = 0;
 int            hb_comp_iLinePRG;
 INLINES        hb_comp_inlines;
 
 /* various compatibility flags (-k switch) */
-ULONG          hb_comp_Supported;
+HB_SIZE        hb_comp_Supported;
 
 int            hb_comp_iBaseLine;
-int            hb_comp_ulLastOffsetPos;
+HB_SIZE        hb_comp_ulLastOffsetPos;
 
 PVAR           hb_comp_pGlobals;
 short          hb_comp_iGlobals;
@@ -196,27 +196,27 @@ int            hb_comp_iHidden = 0;
  * used to suppress error report generation
  */
 /*
-  I don't see where this is needed  - pt
-  see 3 other occurrances of this variable
+   I don't see where this is needed  - pt
+   see 3 other occurrances of this variable
 
-static BOOL hb_comp_bExternal   = FALSE;
-*/
+   static BOOL hb_comp_bExternal   = FALSE;
+ */
 
 // Ron Pinkas 2009/02/12 WHY not respect es2 for any warning - as per Clipper docs?
 #if 0
-   /* Limit the warning that stop compilation into ambiguous reference only so
-      that warnings on uninitialized locals would not stop compilation when
-      exit severity is set to 2
-   */
-   BOOL hb_comp_AmbiguousVar = FALSE;
+/* Limit the warning that stop compilation into ambiguous reference only so
+   that warnings on uninitialized locals would not stop compilation when
+   exit severity is set to 2
+ */
+BOOL        hb_comp_AmbiguousVar = FALSE;
 #endif
 
-NAMESPACES hb_comp_Namespaces, hb_comp_UsedNamespaces;
+NAMESPACES  hb_comp_Namespaces, hb_comp_UsedNamespaces;
 
 /* linked list with EXTERNAL symbols declarations
  */
-static PEXTERN hb_comp_pExterns = NULL;
-static PAUTOOPEN hb_comp_pAutoOpen = NULL;
+static PEXTERN    hb_comp_pExterns  = NULL;
+static PAUTOOPEN  hb_comp_pAutoOpen = NULL;
 static int hb_compAutoOpen( char * szPrg, BOOL * bSkipGen );
 
 /* -m Support */
@@ -228,62 +228,62 @@ extern void hb_compReleaseRTVars( void );
 extern void hb_compReleaseLoops( void );
 extern void hb_compReleaseElseIfs( void );
 /*
- The following two variables are for the purpose of
- creating Local Variable List (.var) file
-*/
-BOOL hb_comp_iGenVarList = FALSE;
-FILE *hb_comp_VariableList = NULL;
+   The following two variables are for the purpose of
+   creating Local Variable List (.var) file
+ */
+BOOL     hb_comp_iGenVarList              = FALSE;
+FILE *   hb_comp_VariableList             = NULL;
 
 /* PreProcessor Tracing support. */
-BOOL hb_comp_bTracePP = FALSE;
+BOOL     hb_comp_bTracePP                 = FALSE;
 
 /* Auto declare external function as dynamic */
-BOOL hb_comp_autoDeferred = FALSE;
+BOOL     hb_comp_autoDeferred             = FALSE;
 
-BOOL hb_comp_bWarnUnUsedLocals      = FALSE;
-BOOL hb_comp_bWarnUnUsedStatics     = FALSE;
-BOOL hb_comp_bWarnUnUsedGlobals     = FALSE;
-BOOL hb_comp_bWarnUnUsedMemvars     = FALSE;
-BOOL hb_comp_bWarnUnUsedFields      = FALSE;
-BOOL hb_comp_bWarnUnUsedBlockParams = FALSE;
+BOOL     hb_comp_bWarnUnUsedLocals        = FALSE;
+BOOL     hb_comp_bWarnUnUsedStatics       = FALSE;
+BOOL     hb_comp_bWarnUnUsedGlobals       = FALSE;
+BOOL     hb_comp_bWarnUnUsedMemvars       = FALSE;
+BOOL     hb_comp_bWarnUnUsedFields        = FALSE;
+BOOL     hb_comp_bWarnUnUsedBlockParams   = FALSE;
 
 #define MAX_MEM_COMMAND_LINE 10240
 
 // Used in hb_compAutoOpen()
-int  ArgC = 0;
-char **ArgV;
+int                  ArgC = 0;
+char **              ArgV;
 
-extern HB_COMP_IDS hb_compExpr_IDs;
+extern HB_COMP_IDS   hb_compExpr_IDs;
 
 int hb_compMain( int argc, char * argv[] )
 {
-   int iStatus = EXIT_SUCCESS;
-   int i;
-   BOOL bAnyFiles;
-   char *szBuildInfo;
+   int      iStatus = EXIT_SUCCESS;
+   int      i;
+   BOOL     bAnyFiles;
+   char *   szBuildInfo;
 
    // Stored for later use in hb_compAutoOpen().
-   ArgC = argc;
-   ArgV = (char **) argv;
+   ArgC                 = argc;
+   ArgV                 = ( char ** ) argv;
 
-   hb_comp_PP = hb_pp_new();
+   hb_comp_PP           = hb_pp_new();
 
-   hb_comp_pOutPath = NULL;
+   hb_comp_pOutPath     = NULL;
    hb_comp_ppo_pOutPath = NULL;
 #if defined( HOST_OS_UNIX_COMPATIBLE )
-   hb_comp_errFile = stderr;
+   hb_comp_errFile      = stderr;
 #else
-   hb_comp_errFile = stdout;
+   hb_comp_errFile      = stdout;
 #endif
 
    /* Activate Harbour extensions by default. */
-   hb_comp_Supported  = HB_COMPFLAG_HARBOUR;
+   hb_comp_Supported = HB_COMPFLAG_HARBOUR;
    hb_comp_Supported |= HB_COMPFLAG_XBASE;
    hb_comp_Supported |= HB_COMPFLAG_HB_INLINE;
    hb_comp_Supported |= HB_COMPFLAG_OPTJUMP;
 
    /* First check the environment variables */
-   hb_Command_Line = (char*) hb_xgrab( MAX_MEM_COMMAND_LINE );
+   hb_Command_Line   = ( char * ) hb_xgrab( MAX_MEM_COMMAND_LINE );
    hb_xmemset( hb_Command_Line, 0, MAX_MEM_COMMAND_LINE );
    hb_compChkCompilerSwitch( 0, NULL );
 
@@ -364,7 +364,7 @@ int hb_compMain( int argc, char * argv[] )
    }
    hb_compIdentifierClose();
 
-   if( (! bAnyFiles ) && (! hb_comp_bQuiet) )
+   if( ( ! bAnyFiles ) && ( ! hb_comp_bQuiet ) )
    {
       hb_compPrintUsage( argv[ 0 ] );
       iStatus = EXIT_FAILURE;
@@ -404,7 +404,7 @@ int hb_compMain( int argc, char * argv[] )
  * as they have to be placed on the symbol table later than the first
  * public symbol
  */
-PFUNCALL hb_compFunCallAdd( char *szName, void *Namespace, int iFlags )
+PFUNCALL hb_compFunCallAdd( char * szName, void * Namespace, int iFlags )
 {
    PFUNCALL pFunCall;
 
@@ -412,12 +412,12 @@ PFUNCALL hb_compFunCallAdd( char *szName, void *Namespace, int iFlags )
 
    if( pFunCall == NULL )
    {
-      pFunCall = ( PFUNCALL ) hb_xgrab( sizeof( _FUNCALL ) );
+      pFunCall             = ( PFUNCALL ) hb_xgrab( sizeof( _FUNCALL ) );
 
-      pFunCall->szName    = szName;
-      pFunCall->Namespace = Namespace;
-      pFunCall->iFlags    = iFlags;
-      pFunCall->pNext     = NULL;
+      pFunCall->szName     = szName;
+      pFunCall->Namespace  = Namespace;
+      pFunCall->iFlags     = iFlags;
+      pFunCall->pNext      = NULL;
 
       if( ! hb_comp_funcalls.iCount )
       {
@@ -427,19 +427,19 @@ PFUNCALL hb_compFunCallAdd( char *szName, void *Namespace, int iFlags )
       else
       {
          hb_comp_funcalls.pLast->pNext = pFunCall;
-         hb_comp_funcalls.pLast = pFunCall;
+         hb_comp_funcalls.pLast        = pFunCall;
       }
 
       hb_comp_funcalls.iCount++;
 
       if( ( pFunCall->iFlags & NSF_EXPLICITPATH ) == NSF_EXPLICITPATH && ( pFunCall->iFlags & NSF_DEFER ) != NSF_DEFER )
       {
-         char *szNamespace = (char *) Namespace;
-         char *pTmp = strchr( szNamespace, '.' ) ;
+         char *   szNamespace = ( char * ) Namespace;
+         char *   pTmp        = strchr( szNamespace, '.' );
 
          if( pTmp )
          {
-             pTmp[0] = '\0';
+            pTmp[ 0 ] = '\0';
          }
 
          szNamespace = hb_compIdentifierNew( szNamespace, TRUE );
@@ -452,7 +452,7 @@ PFUNCALL hb_compFunCallAdd( char *szName, void *Namespace, int iFlags )
 
          if( pTmp )
          {
-             pTmp[0] = '.';
+            pTmp[ 0 ] = '.';
          }
       }
    }
@@ -465,10 +465,10 @@ PFUNCALL hb_compFunCallAdd( char *szName, void *Namespace, int iFlags )
  * as they have to be placed on the symbol table later than the first
  * public symbol
  */
-void hb_compExternAdd( char * szExternName, char *szNamespace, HB_SYMBOLSCOPE cScope ) /* defines a new extern name */
+void hb_compExternAdd( char * szExternName, char * szNamespace, HB_SYMBOLSCOPE cScope ) /* defines a new extern name */
 {
-   PEXTERN pExtern, pLast;
-   PCOMSYMBOL pSym;
+   PEXTERN     pExtern, pLast;
+   PCOMSYMBOL  pSym;
 
    if( strcmp( "_GET_", szExternName ) == 0 )
    {
@@ -477,7 +477,7 @@ void hb_compExternAdd( char * szExternName, char *szNamespace, HB_SYMBOLSCOPE cS
       szExternName = "__GET";
    }
 
-   pExtern = ( PEXTERN ) hb_xgrab( sizeof( _EXTERN ) );
+   pExtern              = ( PEXTERN ) hb_xgrab( sizeof( _EXTERN ) );
 
    pExtern->szName      = szExternName;
    pExtern->szNamespace = szNamespace;
@@ -502,12 +502,12 @@ void hb_compExternAdd( char * szExternName, char *szNamespace, HB_SYMBOLSCOPE cS
 
    if( szNamespace )
    {
-      PNAMESPACE pNamespace;
-      char *szConcat = hb_xstrcpy( NULL, szNamespace, ".", szExternName, NULL );
+      PNAMESPACE  pNamespace;
+      char *      szConcat = hb_xstrcpy( NULL, szNamespace, ".", szExternName, NULL );
 
       szNamespace = hb_compIdentifierNew( szConcat, FALSE );
 
-      pNamespace = hb_compNamespaceFind( hb_comp_UsedNamespaces.pFirst, szNamespace, 0 );
+      pNamespace  = hb_compNamespaceFind( hb_comp_UsedNamespaces.pFirst, szNamespace, 0 );
 
       if( pNamespace )
       {
@@ -518,7 +518,7 @@ void hb_compExternAdd( char * szExternName, char *szNamespace, HB_SYMBOLSCOPE cS
          hb_compUsedNamespaceNew( szNamespace, NSF_DEFER );
       }
 
-      pSym = hb_compSymbolAdd( pExtern->szName, NULL, (void *) pExtern->szNamespace, SYMF_NS_EXPLICITPATH | SYMF_PUBLIC );
+      pSym = hb_compSymbolAdd( pExtern->szName, NULL, ( void * ) pExtern->szNamespace, SYMF_NS_EXPLICITPATH | SYMF_PUBLIC );
 
       if( pExtern->cScope & HB_FS_DEFERRED )
       {
@@ -562,60 +562,60 @@ void hb_compDeclaredParameterAdd( char * szVarName, BYTE cValueType )
       /* Find the Declared Function owner of this parameter. */
       PCOMDECLARED pDeclared = hb_compDeclaredFind( hb_comp_szDeclaredFun );
 
-      if ( pDeclared )
+      if( pDeclared )
       {
          pDeclared->iParamCount++;
 
-         if ( pDeclared->cParamTypes )
+         if( pDeclared->cParamTypes )
          {
-            pDeclared->cParamTypes = ( BYTE * ) hb_xrealloc( pDeclared->cParamTypes, pDeclared->iParamCount );
-            pDeclared->pParamClasses = ( PCOMCLASS * ) hb_xrealloc( pDeclared->pParamClasses, pDeclared->iParamCount * sizeof( PCOMCLASS ) );
+            pDeclared->cParamTypes     = ( BYTE * ) hb_xrealloc( pDeclared->cParamTypes, pDeclared->iParamCount );
+            pDeclared->pParamClasses   = ( PCOMCLASS * ) hb_xrealloc( pDeclared->pParamClasses, pDeclared->iParamCount * sizeof( PCOMCLASS ) );
          }
          else
          {
-            pDeclared->cParamTypes = ( BYTE * ) hb_xgrab( 1 );
-            pDeclared->pParamClasses = ( PCOMCLASS * ) hb_xgrab( sizeof( PCOMCLASS ) );
+            pDeclared->cParamTypes     = ( BYTE * ) hb_xgrab( 1 );
+            pDeclared->pParamClasses   = ( PCOMCLASS * ) hb_xgrab( sizeof( PCOMCLASS ) );
          }
 
          pDeclared->cParamTypes[ pDeclared->iParamCount - 1 ] = cValueType;
 
-         if ( HB_TOUPPER( cValueType ) == 'S' )
+         if( HB_TOUPPER( cValueType ) == 'S' )
          {
-            pDeclared->pParamClasses[ pDeclared->iParamCount - 1 ] = hb_compClassFind( hb_comp_szFromClass );
+            pDeclared->pParamClasses[ pDeclared->iParamCount - 1 ]   = hb_compClassFind( hb_comp_szFromClass );
 
             /* Resetting */
-            hb_comp_szFromClass = NULL;
+            hb_comp_szFromClass                                      = NULL;
          }
       }
    }
    else /* Declared Method Parameter */
    {
       /*
-      printf( "\nAdding parameter: %s Type: %c In Method: %s Class: %s FROM CLASS: %s\n", szVarName, cValueType, hb_comp_pLastMethod->szName, hb_comp_pLastClass->szName, hb_comp_szFromClass );
-      */
+         printf( "\nAdding parameter: %s Type: %c In Method: %s Class: %s FROM CLASS: %s\n", szVarName, cValueType, hb_comp_pLastMethod->szName, hb_comp_pLastClass->szName, hb_comp_szFromClass );
+       */
 
       hb_comp_pLastMethod->iParamCount++;
 
-      if ( hb_comp_pLastMethod->cParamTypes )
+      if( hb_comp_pLastMethod->cParamTypes )
       {
-         hb_comp_pLastMethod->cParamTypes = ( BYTE * ) hb_xrealloc( hb_comp_pLastMethod->cParamTypes, hb_comp_pLastMethod->iParamCount );
-         hb_comp_pLastMethod->pParamClasses = ( PCOMCLASS * ) hb_xrealloc( hb_comp_pLastMethod->pParamClasses, hb_comp_pLastMethod->iParamCount * sizeof( COMCLASS ) );
+         hb_comp_pLastMethod->cParamTypes    = ( BYTE * ) hb_xrealloc( hb_comp_pLastMethod->cParamTypes, hb_comp_pLastMethod->iParamCount );
+         hb_comp_pLastMethod->pParamClasses  = ( PCOMCLASS * ) hb_xrealloc( hb_comp_pLastMethod->pParamClasses, hb_comp_pLastMethod->iParamCount * sizeof( COMCLASS ) );
       }
       else
       {
-         hb_comp_pLastMethod->cParamTypes = ( BYTE * ) hb_xgrab( 1 );
-         hb_comp_pLastMethod->pParamClasses = ( PCOMCLASS * ) hb_xgrab( sizeof( COMCLASS ) );
+         hb_comp_pLastMethod->cParamTypes    = ( BYTE * ) hb_xgrab( 1 );
+         hb_comp_pLastMethod->pParamClasses  = ( PCOMCLASS * ) hb_xgrab( sizeof( COMCLASS ) );
       }
 
       hb_comp_pLastMethod->cParamTypes[ hb_comp_pLastMethod->iParamCount - 1 ] = cValueType;
 
-      if ( HB_TOUPPER( cValueType ) == 'S' )
+      if( HB_TOUPPER( cValueType ) == 'S' )
       {
          hb_comp_pLastMethod->pParamClasses[ hb_comp_pLastMethod->iParamCount - 1 ] = hb_compClassFind( hb_comp_szFromClass );
 
          /*
-         printf( "\nParameter: %s FROM CLASS: %s\n", szVarName, hb_comp_pLastMethod->pParamClasses[ hb_comp_pLastMethod->iParamCount - 1 ]->szName );
-         */
+            printf( "\nParameter: %s FROM CLASS: %s\n", szVarName, hb_comp_pLastMethod->pParamClasses[ hb_comp_pLastMethod->iParamCount - 1 ]->szName );
+          */
 
          /* Resetting */
          hb_comp_szFromClass = NULL;
@@ -625,15 +625,15 @@ void hb_compDeclaredParameterAdd( char * szVarName, BYTE cValueType )
 
 void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 {
-   PVAR pVar, pLastVar;
-   PFUNCTION pFunc = hb_comp_functions.pLast;
-   BOOL bUsed = FALSE;
+   PVAR        pVar, pLastVar;
+   PFUNCTION   pFunc = hb_comp_functions.pLast;
+   BOOL        bUsed = FALSE;
 
    //printf( "Variable: %s\n", szVarName );
 
    if( hb_comp_iVarScope == VS_GLOBAL || hb_comp_iVarScope == VS_EXTERNGLOBAL )
    {
-      if( (! hb_comp_bStartProc) && hb_comp_functions.iCount <= 1 )
+      if( ( ! hb_comp_bStartProc ) && hb_comp_functions.iCount <= 1 )
       {
          if( ++hb_comp_iGlobals > 255 )
          {
@@ -660,7 +660,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
     * executable statements
     * Note: FIELD and MEMVAR are executable statements
     */
-   if( ( hb_comp_functions.pLast->bFlags & FUN_STATEMENTS ) && !( hb_comp_iVarScope == VS_FIELD || ( hb_comp_iVarScope & VS_MEMVAR ) ) )
+   if( ( hb_comp_functions.pLast->bFlags & FUN_STATEMENTS ) && ! ( hb_comp_iVarScope == VS_FIELD || ( hb_comp_iVarScope & VS_MEMVAR ) ) )
    {
       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_FOLLOWS_EXEC, ( hb_comp_iVarScope == VS_LOCAL ? "LOCAL" : "STATIC" ), NULL );
    }
@@ -681,13 +681,13 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
       /*NOTE: Clipper warns if PARAMETER variable duplicates the MEMVAR
        * declaration
-      */
+       */
       if( hb_comp_iVarScope == VS_PRIVATE || hb_comp_iVarScope == VS_PUBLIC )
       {
-        if( hb_comp_bAutoMemvarAssume )
-        {
-           hb_compCheckDuplVars( pFunc->pMemvars, szVarName );
-        }
+         if( hb_comp_bAutoMemvarAssume )
+         {
+            hb_compCheckDuplVars( pFunc->pMemvars, szVarName );
+         }
       }
       else
       {
@@ -698,19 +698,19 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
    hb_compCheckDuplVars( hb_comp_pGlobals, szVarName );
    hb_compCheckDuplVars( pFunc->pLocals, szVarName );
 
-   pVar = ( PVAR ) hb_xgrab( sizeof( VAR ) );
-   pVar->szName = szVarName;
-   pVar->szAlias = NULL;
-   pVar->cType = cValueType;
-   pVar->iUsed = VU_NOT_USED;
-   pVar->pNext = NULL;
-   pVar->iDeclLine = hb_comp_iLine - 1;
+   pVar              = ( PVAR ) hb_xgrab( sizeof( VAR ) );
+   pVar->szName      = szVarName;
+   pVar->szAlias     = NULL;
+   pVar->cType       = cValueType;
+   pVar->iUsed       = VU_NOT_USED;
+   pVar->pNext       = NULL;
+   pVar->iDeclLine   = hb_comp_iLine - 1;
 
-   if ( HB_TOUPPER( cValueType ) == 'S' )
+   if( HB_TOUPPER( cValueType ) == 'S' )
    {
       /*
-      printf( "\nVariable %s is of Class: %s\n", szVarName, hb_comp_szFromClass );
-      */
+         printf( "\nVariable %s is of Class: %s\n", szVarName, hb_comp_szFromClass );
+       */
 
       pVar->Extended.pClass = hb_compClassFind( hb_comp_szFromClass );
 
@@ -724,7 +724,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
       hb_comp_szFromClass = NULL;
    }
 
-   if ( hb_comp_iVarScope & VS_PARAMETER )
+   if( hb_comp_iVarScope & VS_PARAMETER )
    {
       pVar->iUsed = VU_INITIALIZED;
    }
@@ -767,7 +767,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
             pLastVar->pNext = pVar;
          }
 
-		 bUsed = TRUE;
+         bUsed = TRUE;
       }
 
       switch( hb_comp_iVarScope )
@@ -777,23 +777,23 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
             break;
 
          case ( VS_PARAMETER | VS_PRIVATE ):
+         {
+            if( hb_comp_functions.pLast->wParamCount >= 254 )
             {
-               if( hb_comp_functions.pLast->wParamCount >= 254 )
-               {
-                  hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_TOOMANY_PARAMS, szVarName, NULL );
-               }
-
-               if( ++hb_comp_functions.pLast->wParamNum > hb_comp_functions.pLast->wParamCount )
-               {
-                  hb_comp_functions.pLast->wParamCount = hb_comp_functions.pLast->wParamNum;
-               }
-
-               hb_compSymbolAdd( szVarName, &wPos, NULL, SYMF_PUBLIC );
-
-               hb_compGenPCode4( HB_P_PARAMETER, HB_LOBYTE( wPos ), HB_HIBYTE( wPos ), HB_LOBYTE( hb_comp_functions.pLast->wParamNum ), ( BOOL ) 0 );
+               hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_TOOMANY_PARAMS, szVarName, NULL );
             }
 
-            if ( hb_comp_iWarnings >= 3 )
+            if( ++hb_comp_functions.pLast->wParamNum > hb_comp_functions.pLast->wParamCount )
+            {
+               hb_comp_functions.pLast->wParamCount = hb_comp_functions.pLast->wParamNum;
+            }
+
+            hb_compSymbolAdd( szVarName, &wPos, NULL, SYMF_PUBLIC );
+
+            hb_compGenPCode4( HB_P_PARAMETER, HB_LOBYTE( wPos ), HB_HIBYTE( wPos ), HB_LOBYTE( hb_comp_functions.pLast->wParamNum ), ( BOOL ) 0 );
+         }
+
+            if( hb_comp_iWarnings >= 3 )
             {
                PVAR pMemVar = pFunc->pMemvars;
 
@@ -829,7 +829,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
                      pLastVar->pNext = pVar;
                   }
 
-				  bUsed = TRUE;
+                  bUsed = TRUE;
                   /*printf( "\nAdded Private: %s Type %c\n", pVar->szName, pVar->cType );*/
                }
             }
@@ -839,7 +839,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
          case VS_PRIVATE:
             hb_compSymbolAdd( szVarName, &wPos, NULL, SYMF_PUBLIC );
 
-            if ( hb_comp_iWarnings >= 3 )
+            if( hb_comp_iWarnings >= 3 )
             {
                PVAR pMemVar = pFunc->pMemvars;
 
@@ -875,7 +875,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
                      pLastVar->pNext = pVar;
                   }
 
-				  bUsed = TRUE;
+                  bUsed = TRUE;
                   /*printf( "\nAdded Private: %s Type %c\n", pVar->szName, pVar->cType );*/
                }
             }
@@ -888,10 +888,10 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
             break;
       }
 
-	  if( ! bUsed )
-	  {
-	     hb_xfree( pVar );
-	  }
+      if( ! bUsed )
+      {
+         hb_xfree( pVar );
+      }
    }
    else
    {
@@ -899,56 +899,54 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
       {
          case VS_LOCAL:
          case VS_PARAMETER:
+         {
+            USHORT wLocal = 1;
+
+            if( ! pFunc->pLocals )
             {
-               USHORT wLocal = 1;
+               pFunc->pLocals = pVar;
+            }
+            else
+            {
+               pLastVar = pFunc->pLocals;
 
-               if( ! pFunc->pLocals )
+               while( pLastVar->pNext )
                {
-                  pFunc->pLocals = pVar;
-               }
-               else
-               {
-                  pLastVar = pFunc->pLocals;
-
-                  while( pLastVar->pNext )
-                  {
-                     pLastVar = pLastVar->pNext;
-                     wLocal++;
-                  }
-
-                  pLastVar->pNext = pVar;
+                  pLastVar = pLastVar->pNext;
                   wLocal++;
                }
 
-               if( hb_comp_iVarScope == VS_PARAMETER )
-               {
-                  ++hb_comp_functions.pLast->wParamCount;
-                  hb_comp_functions.pLast->bFlags |= FUN_USES_LOCAL_PARAMS;
-               }
-
-               if( hb_comp_bDebugInfo && szVarName )
-               {
-                  hb_compGenLocalName( wLocal, szVarName );
-               }
+               pLastVar->pNext = pVar;
+               wLocal++;
             }
-            break;
+
+            if( hb_comp_iVarScope == VS_PARAMETER )
+            {
+               ++hb_comp_functions.pLast->wParamCount;
+               hb_comp_functions.pLast->bFlags |= FUN_USES_LOCAL_PARAMS;
+            }
+
+            if( hb_comp_bDebugInfo && szVarName )
+            {
+               hb_compGenLocalName( wLocal, szVarName );
+            }
+         }
+         break;
 
          case VS_STATIC:
+            if( ! pFunc->pStatics )
             {
-               if( ! pFunc->pStatics )
+               pFunc->pStatics = pVar;
+            }
+            else
+            {
+               pLastVar = pFunc->pStatics;
+               while( pLastVar->pNext )
                {
-                  pFunc->pStatics = pVar;
+                  pLastVar = pLastVar->pNext;
                }
-               else
-               {
-                  pLastVar = pFunc->pStatics;
-                  while( pLastVar->pNext )
-                  {
-                     pLastVar = pLastVar->pNext;
-                  }
 
-                  pLastVar->pNext = pVar;
-               }
+               pLastVar->pNext = pVar;
             }
             break;
 
@@ -994,39 +992,39 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
    }
 }
 
-void hb_compGenGlobalName( char *szVarName )
+void hb_compGenGlobalName( char * szVarName )
 {
    if( hb_comp_bDebugInfo )
    {
-      BYTE * pBuffer;
-      int iVar;
-      int iVarLen = strlen( szVarName );
-      int i;
-      PVAR pVar;
+      BYTE *   pBuffer;
+      int      iVar;
+      HB_SIZE  iVarLen = strlen( szVarName );
+      int      i;
+      PVAR     pVar;
 
       hb_compGlobalsDefStart();
 
-      iVar = hb_compVariableGetPos( hb_comp_pGlobals, szVarName );
-      pVar = hb_compVariableFind( hb_comp_pGlobals, (USHORT)iVar );
+      iVar     = hb_compVariableGetPos( hb_comp_pGlobals, szVarName );
+      pVar     = hb_compVariableFind( hb_comp_pGlobals, ( USHORT ) iVar );
 
-      pBuffer = ( BYTE * ) hb_xgrab( iVarLen + 5 );
-      i = 0;
-      if ( !pVar->szAlias )
+      pBuffer  = ( BYTE * ) hb_xgrab( iVarLen + 5 );
+      i        = 0;
+      if( ! pVar->szAlias )
       {
          /* GLOBAL defined in the current module */
-         pBuffer[i++] = HB_P_LOCALNAME;
+         pBuffer[ i++ ] = HB_P_LOCALNAME;
       }
       else
       {
          /* GLOBAL EXTERNAL */
          /* We don't set FUN_USES_STATICS here because HB_P_STATICNAME is
           * used only as a convenience way to not create a new PCODE */
-         pBuffer[i++] = HB_P_STATICNAME;
-         pBuffer[i++] = FALSE; /* currently unused in HVM */
+         pBuffer[ i++ ] = HB_P_STATICNAME;
+         pBuffer[ i++ ] = FALSE; /* currently unused in HVM */
       }
-      pBuffer[i++] = HB_LOBYTE( iVar );
-      pBuffer[i++] = HB_HIBYTE( iVar );
-      HB_MEMCPY( ( BYTE * ) ( & ( pBuffer[ i ] ) ), szVarName, iVarLen + 1 );
+      pBuffer[ i++ ] = HB_LOBYTE( iVar );
+      pBuffer[ i++ ] = HB_HIBYTE( iVar );
+      HB_MEMCPY( ( BYTE * ) ( &( pBuffer[ i ] ) ), szVarName, ( size_t ) ( iVarLen + 1 ) );
       hb_compGenPCodeN( pBuffer, i + iVarLen + 1, 0 );
       hb_xfree( pBuffer );
 
@@ -1034,31 +1032,31 @@ void hb_compGenGlobalName( char *szVarName )
    }
 }
 
-static void hb_compGenLocalName( USHORT wLocal, char *szVarName )
+static void hb_compGenLocalName( USHORT wLocal, char * szVarName )
 {
    BYTE * pBuffer;
 
-   pBuffer = ( BYTE * ) hb_xgrab( strlen( szVarName ) + 4 );
+   pBuffer        = ( BYTE * ) hb_xgrab( strlen( szVarName ) + 4 );
 
-   pBuffer[0] = HB_P_LOCALNAME;
-   pBuffer[1] = HB_LOBYTE( wLocal );
-   pBuffer[2] = HB_HIBYTE( wLocal );
+   pBuffer[ 0 ]   = HB_P_LOCALNAME;
+   pBuffer[ 1 ]   = HB_LOBYTE( wLocal );
+   pBuffer[ 2 ]   = HB_HIBYTE( wLocal );
 
-   HB_MEMCPY( ( BYTE * ) ( & ( pBuffer[3] ) ), szVarName, strlen( szVarName ) + 1 );
+   HB_MEMCPY( ( BYTE * ) ( &( pBuffer[ 3 ] ) ), szVarName, strlen( szVarName ) + 1 );
 
-   hb_compGenPCodeN( pBuffer, strlen( szVarName ) + 4 , 0 );
+   hb_compGenPCodeN( pBuffer, strlen( szVarName ) + 4, 0 );
 
    hb_xfree( pBuffer );
 }
 
-void hb_compGenStaticName( char *szVarName )
+void hb_compGenStaticName( char * szVarName )
 {
    if( hb_comp_bDebugInfo )
    {
-      BYTE bGlobal = 0;
-      PFUNCTION pFunc;
-      BYTE * pBuffer;
-      int iVar;
+      BYTE        bGlobal = 0;
+      PFUNCTION   pFunc;
+      BYTE *      pBuffer;
+      int         iVar;
 
       if( ! hb_comp_bStartProc && hb_comp_functions.iCount <= 1 )
       {
@@ -1069,18 +1067,18 @@ void hb_compGenStaticName( char *szVarName )
          bGlobal = 1;
       }
 
-      pFunc = hb_comp_functions.pLast;
-      pBuffer = ( BYTE * ) hb_xgrab( strlen( szVarName ) + 5 );
-      iVar = hb_compStaticGetPos( szVarName, pFunc );
+      pFunc          = hb_comp_functions.pLast;
+      pBuffer        = ( BYTE * ) hb_xgrab( strlen( szVarName ) + 5 );
+      iVar           = hb_compStaticGetPos( szVarName, pFunc );
 
-      pBuffer[0] = HB_P_STATICNAME;
-      pBuffer[1] = bGlobal; /* currently unused in HVM */
-      pBuffer[2] = HB_LOBYTE( iVar );
-      pBuffer[3] = HB_HIBYTE( iVar );
+      pBuffer[ 0 ]   = HB_P_STATICNAME;
+      pBuffer[ 1 ]   = bGlobal; /* currently unused in HVM */
+      pBuffer[ 2 ]   = HB_LOBYTE( iVar );
+      pBuffer[ 3 ]   = HB_HIBYTE( iVar );
 
-      HB_MEMCPY( ( BYTE * ) ( & ( pBuffer[4] ) ), szVarName, strlen( szVarName ) + 1 );
+      HB_MEMCPY( ( BYTE * ) ( &( pBuffer[ 4 ] ) ), szVarName, strlen( szVarName ) + 1 );
 
-      hb_compGenPCodeN( pBuffer, strlen( szVarName ) + 5 , 0 );
+      hb_compGenPCodeN( pBuffer, strlen( szVarName ) + 5, 0 );
 
       hb_xfree( pBuffer );
 
@@ -1145,8 +1143,8 @@ BOOL hb_compVariableMacroCheck( char * szVarName )
 
 PCOMCLASS hb_compClassAdd( char * szClassName )
 {
-   PCOMCLASS pClass;
-   PCOMDECLARED pDeclared;
+   PCOMCLASS      pClass;
+   PCOMDECLARED   pDeclared;
 
    /*printf( "Declaring Class: %s\n", szClassName );*/
 
@@ -1155,19 +1153,19 @@ PCOMCLASS hb_compClassAdd( char * szClassName )
       return NULL;
    }
 
-   if ( ( pClass = hb_compClassFind( szClassName ) ) != NULL )
+   if( ( pClass = hb_compClassFind( szClassName ) ) != NULL )
    {
       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_DUP_DECLARATION, "Class", szClassName );
       return pClass;
    }
 
-   pClass = ( PCOMCLASS ) hb_xgrab( sizeof( COMCLASS ) );
+   pClass            = ( PCOMCLASS ) hb_xgrab( sizeof( COMCLASS ) );
 
-   pClass->szName = szClassName;
-   pClass->pMethod = NULL;
-   pClass->pNext = NULL;
+   pClass->szName    = szClassName;
+   pClass->pMethod   = NULL;
+   pClass->pNext     = NULL;
 
-   if ( hb_comp_pFirstClass == NULL )
+   if( hb_comp_pFirstClass == NULL )
    {
       hb_comp_pFirstClass = pClass;
    }
@@ -1176,11 +1174,11 @@ PCOMCLASS hb_compClassAdd( char * szClassName )
       hb_comp_pLastClass->pNext = pClass;
    }
 
-   hb_comp_pLastClass = pClass;
+   hb_comp_pLastClass         = pClass;
 
    /* Auto declaration for the Class Function. */
-   pDeclared = hb_compDeclaredAdd( szClassName );
-   pDeclared->cType = 'S';
+   pDeclared                  = hb_compDeclaredAdd( szClassName );
+   pDeclared->cType           = 'S';
    pDeclared->Extended.pClass = pClass;
 
    return pClass;
@@ -1227,28 +1225,28 @@ PCOMDECLARED hb_compMethodAdd( PCOMCLASS pClass, char * szMethodName )
       return NULL;
    }
 
-   if ( ( pMethod = hb_compMethodFind( pClass, szMethodName ) ) != NULL )
+   if( ( pMethod = hb_compMethodFind( pClass, szMethodName ) ) != NULL )
    {
       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_DUP_DECLARATION, "Method", szMethodName );
 
       /* Last Declaration override previous declarations */
-      pMethod->cParamTypes = NULL;
-      pMethod->iParamCount = 0;
-      pMethod->pParamClasses = NULL;
+      pMethod->cParamTypes    = NULL;
+      pMethod->iParamCount    = 0;
+      pMethod->pParamClasses  = NULL;
 
       return pMethod;
    }
 
-   pMethod = ( PCOMDECLARED ) hb_xgrab( sizeof( COMDECLARED ) );
+   pMethod                 = ( PCOMDECLARED ) hb_xgrab( sizeof( COMDECLARED ) );
 
-   pMethod->szName = szMethodName;
-   pMethod->cType = ' '; /* Not known yet */
-   pMethod->cParamTypes = NULL;
-   pMethod->iParamCount = 0;
-   pMethod->pParamClasses = NULL;
-   pMethod->pNext = NULL;
+   pMethod->szName         = szMethodName;
+   pMethod->cType          = ' '; /* Not known yet */
+   pMethod->cParamTypes    = NULL;
+   pMethod->iParamCount    = 0;
+   pMethod->pParamClasses  = NULL;
+   pMethod->pNext          = NULL;
 
-   if ( pClass->pMethod == NULL )
+   if( pClass->pMethod == NULL )
    {
       pClass->pMethod = pMethod;
    }
@@ -1257,9 +1255,9 @@ PCOMDECLARED hb_compMethodAdd( PCOMCLASS pClass, char * szMethodName )
       pClass->pLastMethod->pNext = pMethod;
    }
 
-   pClass->pLastMethod = pMethod;
+   pClass->pLastMethod  = pMethod;
 
-   hb_comp_pLastMethod = pMethod;
+   hb_comp_pLastMethod  = pMethod;
 
    return pMethod;
 }
@@ -1268,9 +1266,9 @@ PCOMDECLARED hb_compMethodFind( PCOMCLASS pClass, char * szMethodName )
 {
    PCOMDECLARED pMethod = NULL;
 
-   if ( pClass )
+   if( pClass )
    {
-     pMethod = pClass->pMethod;
+      pMethod = pClass->pMethod;
    }
 
    while( pMethod )
@@ -1298,440 +1296,440 @@ static void hb_compDeclaredInit( void )
 {
   #define _DECL static COMDECLARED
 
-  /*
-    \x5c -> ByRef    (+60)             '-'  -> NIL
-    \x7a -> Optional (+90)             'U'  -> Undefined
+   /*
+      \x5c -> ByRef    (+60)             '-'  -> NIL
+      \x7a -> Optional (+90)             'U'  -> Undefined
 
-    ' '  -> AnyType                    'A'  -> Array                     'B'  -> Array
-    'A'  -> Array of AnyType           'a'  -> Array of Arrays           'b'  -> Array of Blocks
-    \x7a -> Optional AnyType           \x9b -> Optional Array            \x9c -> Optional Block
-    \x94 -> Optional Array of AnyType  \xb5 -> Optional Array of Arrays  \xb6 -> Optional Array of Blocks
+      ' '  -> AnyType                    'A'  -> Array                     'B'  -> Array
+      'A'  -> Array of AnyType           'a'  -> Array of Arrays           'b'  -> Array of Blocks
+      \x7a -> Optional AnyType           \x9b -> Optional Array            \x9c -> Optional Block
+      \x94 -> Optional Array of AnyType  \xb5 -> Optional Array of Arrays  \xb6 -> Optional Array of Blocks
 
-    'C'  -> Character/String           'D'  -> Date                      'L'  -> Logical
-    'c'  -> Array of Strings           'd'  -> Array of Dates            'l'  -> Array of Logicals
-    \x9d -> Optional Character         \x9e -> Optional Date             \xa6 -> Optional Logical
-    \xb7 -> Optional Array of Strings  \xb8 -> Optional Array of Dates   \xc0 -> Optional Array of Logicals
+      'C'  -> Character/String           'D'  -> Date                      'L'  -> Logical
+      'c'  -> Array of Strings           'd'  -> Array of Dates            'l'  -> Array of Logicals
+      \x9d -> Optional Character         \x9e -> Optional Date             \xa6 -> Optional Logical
+      \xb7 -> Optional Array of Strings  \xb8 -> Optional Array of Dates   \xc0 -> Optional Array of Logicals
 
-    'N'  -> Numeric                    'O'  -> Object                    'S'  -> Class
-    'n'  -> Array of Numerics          'o'  -> Array of Objects          's'  -> Array of Classes
-    \xa8 -> Optional Numeric           \xa9 -> Optional Object           \xad -> Optional Class
-    \xc2 -> Optional Array of Numerics \xc3 -> Optional Array of Objects \xc7 -> Optional Array of Classes
-   */
+      'N'  -> Numeric                    'O'  -> Object                    'S'  -> Class
+      'n'  -> Array of Numerics          'o'  -> Array of Objects          's'  -> Array of Classes
+      \xa8 -> Optional Numeric           \xa9 -> Optional Object           \xad -> Optional Class
+      \xc2 -> Optional Array of Numerics \xc3 -> Optional Array of Objects \xc7 -> Optional Array of Classes
+    */
 
    /* ------------------------------------------------- Standard Functions -------------------------------------------------- */
 
    /*              Name        Ret  # of Prams  Param Types                                                   Ret Class  Param Classes  Next
                    ----------  ---  ----------  ------------------------------                                ---------  -------------  ------ */
-   _DECL s_001 = { "AADD"            , ' ', 2 , (BYTE*)"A "                                                   , {NULL}   , NULL , NULL  };
-   _DECL s_002 = { "ABS"             , 'N', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_001};
-   _DECL s_003 = { "ACHOICE"         , 'N', 9 , (BYTE*)"NNNNA\x7a\x9d\xa8\xa8"                                , {NULL}   , NULL , &s_002};
-   _DECL s_004 = { "ACLONE"          , 'A', 1 , (BYTE*)"A"                                                    , {NULL}   , NULL , &s_003};
-   _DECL s_005 = { "ACOPY"           , 'A', 5 , (BYTE*)"AA\xa8\xa8\xa8"                                       , {NULL}   , NULL , &s_004};
-   _DECL s_006 = { "ADEL"            , 'A', 3 , (BYTE*)"AN\xa6"                                               , {NULL}   , NULL , &s_005};
-   _DECL s_007 = { "ADIR"            , 'N', 6 , (BYTE*)"\x9d\x9b\x9b\x9b\x9b\x9b"                             , {NULL}   , NULL , &s_006};
-   _DECL s_008 = { "AEVAL"           , 'A', 4 , (BYTE*)"AB\xa8\xa8"                                           , {NULL}   , NULL , &s_007};
-   _DECL s_009 = { "AFIELDS"         , 'N', 4 , (BYTE*)"A\x9b\x9b\x9b"                                        , {NULL}   , NULL , &s_008};
-   _DECL s_010 = { "AFILL"           , 'A', 4 , (BYTE*)"A \xa8\xa8"                                           , {NULL}   , NULL , &s_009};
-   _DECL s_011 = { "AINS"            , 'A', 4 , (BYTE*)"AN\xa6\x7a"                                           , {NULL}   , NULL , &s_010};
-   _DECL s_012 = { "ALERT"           , 'N', 4 , (BYTE*)"C\x9b\x9d\xa8"                                        , {NULL}   , NULL , &s_011};
-   _DECL s_013 = { "ALIAS"           , 'C', 1 , (BYTE*)"\xa8"                                                 , {NULL}   , NULL , &s_012};
-   _DECL s_014 = { "ALLTRIM"         , 'C', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_013};
-   _DECL s_015 = { "AMPM"            , 'C', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_014};
-   _DECL s_016 = { "ARRAY"           , 'A', 3 , (BYTE*)"N\xa8\xa8"                                            , {NULL}   , NULL , &s_015};
-   _DECL s_017 = { "ASC"             , 'N', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_016};
-   _DECL s_018 = { "ASCAN"           , 'N', 4 , (BYTE*)"A\xa7\xa8\xa8"                                        , {NULL}   , NULL , &s_017};
-   _DECL s_019 = { "ASIZE"           , 'A', 2 , (BYTE*)"AN"                                                   , {NULL}   , NULL , &s_018};
-   _DECL s_020 = { "ASORT"           , 'A', 4 , (BYTE*)"A\xa8\xa8\x9c"                                        , {NULL}   , NULL , &s_019};
-   _DECL s_021 = { "AT"              , 'N', 4 , (BYTE*)"CC\xa8\xa8"                                           , {NULL}   , NULL , &s_020};
-   _DECL s_022 = { "ATAIL"           , ' ', 1 , (BYTE*)"A"                                                    , {NULL}   , NULL , &s_021};
-   _DECL s_023 = { "BIN2I"           , 'N', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_022};
-   _DECL s_024 = { "BIN2L"           , 'N', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_023};
-   _DECL s_025 = { "BIN2U"           , 'N', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_024};
-   _DECL s_026 = { "BIN2W"           , 'N', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_025};
-   _DECL s_027 = { "BOF"             , 'L', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_026};
-   _DECL s_028 = { "BROWSE"          , '-', 4 , (BYTE*)"\xa8\xa8\xa8\xa8"                                     , {NULL}   , NULL , &s_027};
-   _DECL s_029 = { "CDOW"            , 'C', 1 , (BYTE*)"D"                                                    , {NULL}   , NULL , &s_028};
-   _DECL s_030 = { "CHR"             , 'C', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_029};
-   _DECL s_031 = { "CMONTH"          , 'C', 1 , (BYTE*)"D"                                                    , {NULL}   , NULL , &s_030};
-   _DECL s_032 = { "COL"             , 'N', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_031};
-   _DECL s_033 = { "CTOD"            , 'D', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_032};
-   _DECL s_034 = { "CURDIR"          , 'C', 1 , (BYTE*)"\x9d"                                                 , {NULL}   , NULL , &s_033};
-   _DECL s_035 = { "DATE"            , 'D', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_034};
-   _DECL s_036 = { "DAY"             , 'N', 1 , (BYTE*)"D"                                                    , {NULL}   , NULL , &s_035};
-   _DECL s_037 = { "DAYS"            , 'N', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_036};
-   _DECL s_038 = { "DBAPPEND"        , '-', 1 , (BYTE*)"\xa6"                                                 , {NULL}   , NULL , &s_037};
-   _DECL s_039 = { "DBCLEARFILTER"   , '-', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_038};
-   _DECL s_040 = { "DBCLEARINDEX"    , '-', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_039};
-   _DECL s_041 = { "DBCLEARRELATION" , '-', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_040};
-   _DECL s_042 = { "DBCLOSEALL"      , '-', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_041};
-   _DECL s_043 = { "DBCLOSEAREA"     , '-', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_042};
-   _DECL s_044 = { "DBCOMMIT"        , '-', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_043};
-   _DECL s_045 = { "DBCOMMITALL"     , '-', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_044};
-   _DECL s_046 = { "DBCREATE"        , '-', 5 , (BYTE*)"CA\x9d\xa6\x9d"                                       , {NULL}   , NULL , &s_045};
-   _DECL s_047 = { "DBCREATEINDEX"   , '-', 5 , (BYTE*)"C B\xa6\xa6"                                          , {NULL}   , NULL , &s_046};
-   _DECL s_048 = { "DBDELETE"        , '-', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_047};
-   _DECL s_049 = { "DBEDIT"          , '-',12 , (BYTE*)"\xa8\xa8\xa8\xa8\x7a\x7a\x7a\x7a\x7a\x7a\x7a\x7a"     , {NULL}   , NULL , &s_048};
-   _DECL s_050 = { "DBEVAL"          , '-', 6 , (BYTE*)"B\x9c\x9cNNL"                                         , {NULL}   , NULL , &s_049};
-   _DECL s_051 = { "DBF"             , 'C', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_050};
-   _DECL s_052 = { "DBFILTER"        , ' ', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_051};
-   _DECL s_053 = { "DBGOBOTTOM"      , '-', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_052};
-   _DECL s_054 = { "DBGOTO"          , '-', 1 , (BYTE*)"\x7a"                                                 , {NULL}   , NULL , &s_053};
-   _DECL s_055 = { "DBGOTOP"         , '-', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_054};
-   _DECL s_056 = { "DBRECALL"        , '-', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_055};
-   _DECL s_057 = { "DBREINDEX"       , '-', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_056};
-   _DECL s_058 = { "DBRELATION"      , ' ', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_057};
-   _DECL s_059 = { "DBRLOCK"         , 'L', 1 , (BYTE*)"\x7a"                                                 , {NULL}   , NULL , &s_058};
-   _DECL s_060 = { "DBRLOCKLIST"     , 'A', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_059};
-   _DECL s_061 = { "DBRSELECT"       , 'N', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_060};
-   _DECL s_062 = { "DBRUNLOCK"       , '-', 1 , (BYTE*)"\x7a"                                                 , {NULL}   , NULL , &s_061};
-   _DECL s_063 = { "DBSEEK"          , 'L', 3 , (BYTE*)" \xa6\xa6"                                            , {NULL}   , NULL , &s_062};
-   _DECL s_064 = { "DBSELECTAREA"    , '-', 1 , (BYTE*)" "                                                    , {NULL}   , NULL , &s_063};
-   _DECL s_065 = { "DBSETDRIVER"     , 'C', 1 , (BYTE*)"\x9d"                                                 , {NULL}   , NULL , &s_064};
-   _DECL s_066 = { "DBSETFILTER"     , '-', 2 , (BYTE*)"B\x9d"                                                , {NULL}   , NULL , &s_065};
-   _DECL s_067 = { "DBSETINDEX"      , '-', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_066};
-   _DECL s_068 = { "DBSETORDER"      , '-', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_067};
-   _DECL s_069 = { "DBSETRELATION"   , '-', 3 , (BYTE*)" BC"                                                  , {NULL}   , NULL , &s_068};
-   _DECL s_070 = { "DBSKIP"          , '-', 1 , (BYTE*)"\xa8"                                                 , {NULL}   , NULL , &s_069};
-   _DECL s_071 = { "DBSTRUCT"        , 'A', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_070};
-   _DECL s_072 = { "DBUNLOCK"        , '-', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_071};
-   _DECL s_073 = { "DBUNLOCKALL"     , '-', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_072};
-   _DECL s_074 = { "DBUSEAREA"       , '-', 7 , (BYTE*)"\xa6\x9d""C\x9d\xa6\xa6\x9d"                          , {NULL}   , NULL , &s_073};
-   _DECL s_075 = { "DELETED"         , 'L', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_074};
-   _DECL s_076 = { "DESCEND"         , ' ', 1 , (BYTE*)" "                                                    , {NULL}   , NULL , &s_075};
-   _DECL s_077 = { "DEVOUT"          , '-', 2 , (BYTE*)" \x9d"                                                , {NULL}   , NULL , &s_076};
-   _DECL s_078 = { "DEVOUTPICT"      , '-', 3 , (BYTE*)" C\x9d"                                               , {NULL}   , NULL , &s_077};
-   _DECL s_079 = { "DEVPOS"          , '-', 2 , (BYTE*)"NN"                                                   , {NULL}   , NULL , &s_078};
-   _DECL s_080 = { "DIRECTORY"       , 'A', 3 , (BYTE*)"\x9d\x9d\xa6"                                         , {NULL}   , NULL , &s_079};
-   _DECL s_081 = { "DIRCHANGE"       , 'N', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_080};
-   _DECL s_082 = { "DIRREMOVE"       , 'N', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_081};
-   _DECL s_083 = { "DISKSPACE"       , 'N', 1 , (BYTE*)"\xa8"                                                 , {NULL}   , NULL , &s_082};
-   _DECL s_084 = { "DISPBEGIN"       , '-', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_083};
-   _DECL s_085 = { "DISPCOUNT"       , 'N', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_084};
-   _DECL s_086 = { "DISPEND"         , '-', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_085};
-   _DECL s_087 = { "DISPOUT"         , '-', 2 , (BYTE*)" \x9d"                                                , {NULL}   , NULL , &s_086};
-   _DECL s_088 = { "DOW"             , 'N', 1 , (BYTE*)"D"                                                    , {NULL}   , NULL , &s_087};
-   _DECL s_089 = { "DTOC"            , 'C', 1 , (BYTE*)"D"                                                    , {NULL}   , NULL , &s_088};
-   _DECL s_090 = { "DTOS"            , 'C', 1 , (BYTE*)"D"                                                    , {NULL}   , NULL , &s_089};
-   _DECL s_091 = { "ELAPTIME"        , 'C', 2 , (BYTE*)"CC"                                                   , {NULL}   , NULL , &s_090};
-   _DECL s_092 = { "EMPTY"           , 'L', 1 , (BYTE*)" "                                                    , {NULL}   , NULL , &s_091};
-   _DECL s_093 = { "EOF"             , 'L', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_092};
-   _DECL s_094 = { "ERRORNEW"        , 'S', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_093};
-   _DECL s_095 = { "EVAL"            , ' ', 3 , (BYTE*)"B\x7a\x7a"                                            , {NULL}   , NULL , &s_094};
-   _DECL s_096 = { "EXP"             , 'N', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_095};
-   _DECL s_097 = { "FCLOSE"          , 'L', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_096};
-   _DECL s_098 = { "FCOUNT"          , 'N', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_097};
-   _DECL s_099 = { "FCREATE"         , 'N', 2 , (BYTE*)"C\xa8"                                                , {NULL}   , NULL , &s_098};
-   _DECL s_100 = { "FERASE"          , 'N', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_099};
-   _DECL s_101 = { "FERROR"          , 'N', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_100};
-   _DECL s_102 = { "FIELD"           , 'C', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_101};
-   _DECL s_103 = { "FIELDBLOCK"      , 'B', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_102};
-   _DECL s_104 = { "FIELDGET"        , ' ', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_103};
-   _DECL s_105 = { "FIELDNAME"       , 'C', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_104};
-   _DECL s_106 = { "FIELDPOS"        , 'N', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_105};
-   _DECL s_107 = { "FIELDPUT"        , ' ', 2 , (BYTE*)"N "                                                   , {NULL}   , NULL , &s_106};
-   _DECL s_108 = { "FIELDWBLOCK"     , 'B', 2 , (BYTE*)"CN"                                                   , {NULL}   , NULL , &s_107};
-   _DECL s_109 = { "FILE"            , 'L', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_108};
-   _DECL s_110 = { "FLOCK"           , 'L', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_109};
-   _DECL s_111 = { "FOPEN"           , 'N', 2 , (BYTE*)"C\xa8"                                                , {NULL}   , NULL , &s_110};
-   _DECL s_112 = { "FOUND"           , 'L', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_111};
-   _DECL s_113 = { "FREAD"           , 'N', 3 , (BYTE*)"N\x5cN"                                               , {NULL}   , NULL , &s_112};
-   _DECL s_114 = { "FREADSTR"        , 'C', 2 , (BYTE*)"NN"                                                   , {NULL}   , NULL , &s_113};
-   _DECL s_115 = { "FRENAME"         , 'N', 2 , (BYTE*)"CC"                                                   , {NULL}   , NULL , &s_114};
-   _DECL s_116 = { "FSEEK"           , 'N', 3 , (BYTE*)"NN\xa8"                                               , {NULL}   , NULL , &s_115};
-   _DECL s_117 = { "FWRITE"          , 'N', 3 , (BYTE*)"NC\xa8"                                               , {NULL}   , NULL , &s_116};
-   _DECL s_118 = { "GETACTIVE"       , '-', 1 , (BYTE*)"O"                                                    , {NULL}   , NULL , &s_117};
-   _DECL s_119 = { "GETAPPLYKEY"     , '-', 2 , (BYTE*)"ON"                                                   , {NULL}   , NULL , &s_118};
-   _DECL s_120 = { "GETDOSETKEY"     , '-', 2 , (BYTE*)"BO"                                                   , {NULL}   , NULL , &s_119};
-   _DECL s_121 = { "GETENV"          , 'C', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_120};
-   _DECL s_122 = { "GETNEW"          , 'O', 6 , (BYTE*)"\xa8\xa8\x9c\x9d\x9d\x9d"                             , {NULL}   , NULL , &s_121};
-   _DECL s_123 = { "GETPREVALIDATE"  , 'L', 1 , (BYTE*)"O"                                                    , {NULL}   , NULL , &s_122};
-   _DECL s_124 = { "GETPOSTVALIDATE" , 'L', 1 , (BYTE*)"O"                                                    , {NULL}   , NULL , &s_123};
-   _DECL s_125 = { "GETREADER"       , '-', 1 , (BYTE*)"O"                                                    , {NULL}   , NULL , &s_124};
-   _DECL s_126 = { "HARDCR"          , 'C', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_125};
-   _DECL s_127 = { "HB_ANSITOOEM"    , 'C', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_126};
-   _DECL s_128 = { "HB_DISKSPACE"    , 'N', 2 , (BYTE*)"\x9d\xa8"                                             , {NULL}   , NULL , &s_127};
-   _DECL s_129 = { "HB_FEOF"         , 'L', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_128};
-   _DECL s_130 = { "HB_OEMTOANSI"    , 'C', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_129};
-   _DECL s_131 = { "HEADER"          , 'N', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_130};
-   _DECL s_132 = { "I2BIN"           , 'C', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_131};
-   _DECL s_133 = { "IF"              , ' ', 3 , (BYTE*)"L  "                                                  , {NULL}   , NULL , &s_132};
-   _DECL s_134 = { "INDEXEXT"        , 'N', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_133};
-   _DECL s_135 = { "INDEXKEY"        , 'C', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_134};
-   _DECL s_136 = { "INDEXORD"        , 'N', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_135};
-   _DECL s_137 = { "INKEY"           , 'N', 2 , (BYTE*)"\xa8\xa8"                                             , {NULL}   , NULL , &s_136};
-   _DECL s_138 = { "INT"             , 'N', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_137};
-   _DECL s_139 = { "ISAFFIRM"        , 'L', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_138};
-   _DECL s_140 = { "ISALPHA"         , 'L', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_139};
-   _DECL s_141 = { "ISDIGIT"         , 'L', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_140};
-   _DECL s_142 = { "ISDISK"          , 'L', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_141};
-   _DECL s_143 = { "ISLOWER"         , 'L', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_142};
-   _DECL s_144 = { "ISNEGATIVE"      , 'L', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_143};
-   _DECL s_145 = { "ISUPPER"         , 'L', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_144};
-   _DECL s_146 = { "L2BIN"           , 'C', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_145};
-   _DECL s_147 = { "LASTKEY"         , 'N', 1 , (BYTE*)"\xa8"                                                 , {NULL}   , NULL , &s_146};
-   _DECL s_148 = { "LASTREC"         , 'N', 1 , (BYTE*)" "                                                    , {NULL}   , NULL , &s_147};
-   _DECL s_149 = { "LEFT"            , 'C', 2 , (BYTE*)"CN"                                                   , {NULL}   , NULL , &s_148};
-   _DECL s_150 = { "LEN"             , 'N', 1 , (BYTE*)" "                                                    , {NULL}   , NULL , &s_149};
-   _DECL s_151 = { "LOG"             , 'N', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_150};
-   _DECL s_152 = { "LOWER"           , 'C', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_151};
-   _DECL s_153 = { "LTRIM"           , 'C', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_152};
-   _DECL s_154 = { "LUPDATE"         , 'D', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_153};
-   _DECL s_155 = { "MAKEDIR"         , 'N', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_154};
-   _DECL s_156 = { "MAX"             , ' ', 2 , (BYTE*)"  "                                                   , {NULL}   , NULL , &s_155};
-   _DECL s_157 = { "MAXCOL"          , 'N', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_156};
-   _DECL s_158 = { "MAXROW"          , 'N', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_157};
-   _DECL s_159 = { "MCOL"            , 'N', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_158};
-   _DECL s_160 = { "MEMOEDIT"        , 'C',13 , (BYTE*)"\x9d\xa8\xa8\xa8\xa8\xa6\x9d\xa8\xa8\xa8\xa8\xa8\xa8" , {NULL}   , NULL , &s_159};
-   _DECL s_161 = { "MEMOTRAN"        , 'C', 3 , (BYTE*)"C\x9d\x9d"                                            , {NULL}   , NULL , &s_160};
-   _DECL s_162 = { "MEMOLINE"        , 'C', 5 , (BYTE*)"C\xa8\xa8\xa8\xa6"                                    , {NULL}   , NULL , &s_161};
-   _DECL s_163 = { "MEMORY"          , 'N', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_162};
-   _DECL s_164 = { "MEMOREAD"        , 'C', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_163};
-   _DECL s_165 = { "MEMOTRAN"        , 'C', 3 , (BYTE*)"C\x9d\x9d"                                            , {NULL}   , NULL , &s_164};
-   _DECL s_166 = { "MEMOWRIT"        , 'L', 2 , (BYTE*)"CC"                                                   , {NULL}   , NULL , &s_165};
-   _DECL s_167 = { "MEMVARBLOCK"     , 'B', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_166};
-   _DECL s_168 = { "MIN"             , ' ', 2 , (BYTE*)"  "                                                   , {NULL}   , NULL , &s_167};
-   _DECL s_169 = { "MLCOUNT"         , 'N', 4 , (BYTE*)"C\xa8\xa8\xa6"                                        , {NULL}   , NULL , &s_168};
-   _DECL s_170 = { "MLCTOPOS"        , 'L', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_169};
-   _DECL s_171 = { "MLPOS"           , 'N', 5 , (BYTE*)"CNN\xa8\xa6"                                          , {NULL}   , NULL , &s_170};
-   _DECL s_172 = { "MOD"             , 'N', 2 , (BYTE*)"NN"                                                   , {NULL}   , NULL , &s_171};
-   _DECL s_173 = { "MONTH"           , 'N', 1 , (BYTE*)"D"                                                    , {NULL}   , NULL , &s_172};
-   _DECL s_174 = { "MPOSTOLC"        , 'L', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_173};
-   _DECL s_175 = { "MROW"            , 'N', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_174};
-   _DECL s_176 = { "NATIONMSG"       , 'C', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_175};
-   _DECL s_177 = { "NETERR"          , 'L', 1 , (BYTE*)"\xa6"                                                 , {NULL}   , NULL , &s_176};
-   _DECL s_178 = { "NETNAME"         , 'C', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_177};
-   _DECL s_179 = { "NEXTKEY"         , 'N', 1 , (BYTE*)"\xa8"                                                 , {NULL}   , NULL , &s_178};
-   _DECL s_180 = { "ORDBAGEXT"       , 'C', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_179};
-   _DECL s_181 = { "ORDBAGNAME"      , 'C', 1 , (BYTE*)" "                                                    , {NULL}   , NULL , &s_180};
-   _DECL s_182 = { "ORDCREATE"       , '-', 5 , (BYTE*)"C\x9d \x9c\xa6"                                       , {NULL}   , NULL , &s_181};
-   _DECL s_183 = { "ORDDESTROY"      , '-', 2 , (BYTE*)"C\x9d"                                                , {NULL}   , NULL , &s_182};
-   _DECL s_184 = { "ORDFOR"          , 'C', 2 , (BYTE*)" \x9d"                                                , {NULL}   , NULL , &s_183};
-   _DECL s_185 = { "ORDKEY"          , 'C', 2 , (BYTE*)" \x9d"                                                , {NULL}   , NULL , &s_184};
-   _DECL s_186 = { "ORDLISTADD"      , '-', 2 , (BYTE*)"C\x9d"                                                , {NULL}   , NULL , &s_185};
-   _DECL s_187 = { "ORDLISTCLEAR"    , '-', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_186};
-   _DECL s_188 = { "ORDLISTREBUILD"  , '-', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_187};
-   _DECL s_189 = { "ORDNAME"         , 'C', 2 , (BYTE*)"N\x9d"                                                , {NULL}   , NULL , &s_188};
-   _DECL s_190 = { "ORDNUMBER"       , 'N', 2 , (BYTE*)"C\x9d"                                                , {NULL}   , NULL , &s_189};
-   _DECL s_191 = { "ORDSETFOCUS"     , 'C', 2 , (BYTE*)"\x7a\x9d"                                             , {NULL}   , NULL , &s_190};
-   _DECL s_192 = { "OS"              , 'C', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_191};
-   _DECL s_193 = { "OUTERR"          , '-', 1 , (BYTE*)"\x7a"                                                 , {NULL}   , NULL , &s_192};
-   _DECL s_194 = { "OUTSTD"          , '-', 1 , (BYTE*)"\x7a"                                                 , {NULL}   , NULL , &s_193};
-   _DECL s_195 = { "PADC"            , 'C', 3 , (BYTE*)" N\x9d"                                               , {NULL}   , NULL , &s_194};
-   _DECL s_196 = { "PADL"            , 'C', 3 , (BYTE*)" N\x9d"                                               , {NULL}   , NULL , &s_195};
-   _DECL s_197 = { "PADR"            , 'C', 3 , (BYTE*)" N\x9d"                                               , {NULL}   , NULL , &s_196};
-   _DECL s_198 = { "PCOL"            , 'N', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_197};
-   _DECL s_199 = { "PCOUNT"          , 'N', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_198};
-   _DECL s_200 = { "PROCFILE"        , 'C', 1 , (BYTE*)"\x7a"                                                 , {NULL}   , NULL , &s_199};
-   _DECL s_201 = { "PROCLINE"        , 'N', 1 , (BYTE*)"\xa8"                                                 , {NULL}   , NULL , &s_200};
-   _DECL s_202 = { "PROCNAME"        , 'N', 1 , (BYTE*)"\xa8"                                                 , {NULL}   , NULL , &s_201};
-   _DECL s_203 = { "PROW"            , 'N', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_202};
-   _DECL s_204 = { "RAT"             , 'N', 2 , (BYTE*)"CC"                                                   , {NULL}   , NULL , &s_203};
-   _DECL s_205 = { "RDDLIST"         , 'A', 1 , (BYTE*)"\xa8"                                                 , {NULL}   , NULL , &s_204};
-   _DECL s_206 = { "RDDNAME"         , 'C', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_205};
-   _DECL s_207 = { "RDDSETDEFAULT"   , 'C', 1 , (BYTE*)"\x9d"                                                 , {NULL}   , NULL , &s_206};
-   _DECL s_208 = { "READEXIT"        , 'L', 1 , (BYTE*)"\xa6"                                                 , {NULL}   , NULL , &s_207};
-   _DECL s_209 = { "READUPDATED"     , 'L', 1 , (BYTE*)"\xa6"                                                 , {NULL}   , NULL , &s_208};
-   _DECL s_210 = { "READINSERT"      , 'L', 1 , (BYTE*)"\xa6"                                                 , {NULL}   , NULL , &s_209};
-   _DECL s_211 = { "READKEY"         , 'N', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_210};
-   _DECL s_212 = { "READFORMAT"      , 'B', 1 , (BYTE*)"B"                                                    , {NULL}   , NULL , &s_211};
-   _DECL s_213 = { "READKILL"        , 'L', 1 , (BYTE*)"\xa6"                                                 , {NULL}   , NULL , &s_212};
-   _DECL s_214 = { "READMODAL"       , 'L', 2 , (BYTE*)"A\xa8"                                                , {NULL}   , NULL , &s_213};
-   _DECL s_215 = { "READUPDATED"     , 'L', 1 , (BYTE*)"\xa6"                                                 , {NULL}   , NULL , &s_214};
-   _DECL s_216 = { "READVAR"         , 'C', 1 , (BYTE*)"\x9d"                                                 , {NULL}   , NULL , &s_215};
-   _DECL s_217 = { "RECCOUNT"        , 'N', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_216};
-   _DECL s_218 = { "RECNO"           , 'N', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_217};
-   _DECL s_219 = { "RECSIZE"         , 'N', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_218};
-   _DECL s_220 = { "REPLICATE"       , 'C', 2 , (BYTE*)"CN"                                                   , {NULL}   , NULL , &s_219};
-   _DECL s_221 = { "RESTSCREEN"      , '-', 5 , (BYTE*)"\xa8\xa8\xa8\xa8\x9d"                                 , {NULL}   , NULL , &s_220};
-   _DECL s_222 = { "RIGHT"           , 'C', 2 , (BYTE*)"CN"                                                   , {NULL}   , NULL , &s_221};
-   _DECL s_223 = { "RLOCK"           , 'L', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_222};
-   _DECL s_224 = { "ROUND"           , 'N', 2 , (BYTE*)"NN"                                                   , {NULL}   , NULL , &s_223};
-   _DECL s_225 = { "ROW"             , 'N', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_224};
-   _DECL s_226 = { "RTRIM"           , 'C', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_225};
-   _DECL s_227 = { "SAVESCREEN"      , '-', 4 , (BYTE*)"\xa8\xa8\xa8\xa8"                                     , {NULL}   , NULL , &s_226};
-   _DECL s_228 = { "SCROLL"          , '-', 6 , (BYTE*)"\xa8\xa8\xa8\xa8\xa8\xa8"                             , {NULL}   , NULL , &s_227};
-   _DECL s_229 = { "SECONDS"         , 'N', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_228};
-   _DECL s_230 = { "SECS"            , 'N', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_229};
-   _DECL s_231 = { "SELECT"          , 'N', 1 , (BYTE*)"\x9d"                                                 , {NULL}   , NULL , &s_230};
-   _DECL s_232 = { "SET"             , ' ', 3 , (BYTE*)"N\x7a\xa6"                                            , {NULL}   , NULL , &s_231};
-   _DECL s_233 = { "SETCOLOR"        , 'C', 1 , (BYTE*)"\x9d"                                                 , {NULL}   , NULL , &s_232};
-   _DECL s_234 = { "SETCURSOR"       , 'N', 1 , (BYTE*)"\xa8"                                                 , {NULL}   , NULL , &s_233};
-   _DECL s_235 = { "SETKEY"          , ' ', 3 , (BYTE*)"N\x9c\x9c"                                            , {NULL}   , NULL , &s_234};
-   _DECL s_236 = { "SETMODE"         , 'L', 2 , (BYTE*)"NN"                                                   , {NULL}   , NULL , &s_235};
-   _DECL s_237 = { "SETPOS"          , '-', 2 , (BYTE*)"NN"                                                   , {NULL}   , NULL , &s_236};
-   _DECL s_238 = { "SETPRC"          , '-', 2 , (BYTE*)"NN"                                                   , {NULL}   , NULL , &s_237};
-   _DECL s_239 = { "SETTYPEAHEAD"    , '-', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_238};
-   _DECL s_240 = { "SPACE"           , 'C', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_239};
-   _DECL s_241 = { "SQRT"            , 'N', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_240};
-   _DECL s_242 = { "STR"             , 'C', 3 , (BYTE*)"N\xa8\xa8"                                            , {NULL}   , NULL , &s_241};
-   _DECL s_243 = { "STRTRAN"         , 'C', 5 , (BYTE*)"CC\x9d\xa8\xa8"                                       , {NULL}   , NULL , &s_242};
-   _DECL s_244 = { "STRZERO"         , 'C', 3 , (BYTE*)"N\xa8\xa8"                                            , {NULL}   , NULL , &s_243};
-   _DECL s_245 = { "STUFF"           , 'C', 4 , (BYTE*)"CNNC"                                                 , {NULL}   , NULL , &s_244};
-   _DECL s_246 = { "SUBSTR"          , 'C', 3 , (BYTE*)"CN\xa8"                                               , {NULL}   , NULL , &s_245};
-   _DECL s_247 = { "TBROWSENEW"      , 'O', 4 , (BYTE*)"NNNN"                                                 , {NULL}   , NULL , &s_246};
-   _DECL s_248 = { "TBROWSEDB"       , 'O', 4 , (BYTE*)"NNNN"                                                 , {NULL}   , NULL , &s_247};
-   _DECL s_249 = { "TBCOLUMNNEW"     , 'O', 2 , (BYTE*)"CB"                                                   , {NULL}   , NULL , &s_248};
-   _DECL s_250 = { "TIME"            , 'C', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_249};
-   _DECL s_251 = { "TONE"            , '-', 2 , (BYTE*)"NN"                                                   , {NULL}   , NULL , &s_250};
-   _DECL s_252 = { "TRANSFORM"       , 'C', 2 , (BYTE*)" C"                                                   , {NULL}   , NULL , &s_251};
-   _DECL s_253 = { "TRIM"            , 'C', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_252};
-   _DECL s_254 = { "TYPE"            , 'C', 2 , (BYTE*)" N"                                                   , {NULL}   , NULL , &s_253};
-   _DECL s_255 = { "U2BIN"           , 'C', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_254};
-   _DECL s_256 = { "UPDATED"         , 'L', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_255};
-   _DECL s_257 = { "UPPER"           , 'C', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_256};
-   _DECL s_258 = { "USED"            , 'L', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_257};
-   _DECL s_259 = { "VAL"             , 'N', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_258};
-   _DECL s_260 = { "VALTYPE"         , ' ', 1 , (BYTE*)" "                                                    , {NULL}   , NULL , &s_259};
-   _DECL s_261 = { "VERSION"         , 'C', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_260};
-   _DECL s_262 = { "W2BIN"           , 'C', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_261};
-   _DECL s_263 = { "WORD"            , 'N', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_262};
-   _DECL s_264 = { "HB_FNAMESPLIT"   , '-', 5 , (BYTE*)"C\x5c\x5c\x5c\x5c"                                    , {NULL}   , NULL , &s_263};
-   _DECL s_265 = { "HB_FNAMEMERGE"   , 'C', 4 , (BYTE*)"CCCC"                                                 , {NULL}   , NULL , &s_264};
+   _DECL s_001 = { "AADD", ' ', 2, ( BYTE * ) "A ", { NULL }, NULL, NULL };
+   _DECL s_002 = { "ABS", 'N', 1, ( BYTE * ) "N", { NULL }, NULL, &s_001 };
+   _DECL s_003 = { "ACHOICE", 'N', 9, ( BYTE * ) "NNNNA\x7a\x9d\xa8\xa8", { NULL }, NULL, &s_002 };
+   _DECL s_004 = { "ACLONE", 'A', 1, ( BYTE * ) "A", { NULL }, NULL, &s_003 };
+   _DECL s_005 = { "ACOPY", 'A', 5, ( BYTE * ) "AA\xa8\xa8\xa8", { NULL }, NULL, &s_004 };
+   _DECL s_006 = { "ADEL", 'A', 3, ( BYTE * ) "AN\xa6", { NULL }, NULL, &s_005 };
+   _DECL s_007 = { "ADIR", 'N', 6, ( BYTE * ) "\x9d\x9b\x9b\x9b\x9b\x9b", { NULL }, NULL, &s_006 };
+   _DECL s_008 = { "AEVAL", 'A', 4, ( BYTE * ) "AB\xa8\xa8", { NULL }, NULL, &s_007 };
+   _DECL s_009 = { "AFIELDS", 'N', 4, ( BYTE * ) "A\x9b\x9b\x9b", { NULL }, NULL, &s_008 };
+   _DECL s_010 = { "AFILL", 'A', 4, ( BYTE * ) "A \xa8\xa8", { NULL }, NULL, &s_009 };
+   _DECL s_011 = { "AINS", 'A', 4, ( BYTE * ) "AN\xa6\x7a", { NULL }, NULL, &s_010 };
+   _DECL s_012 = { "ALERT", 'N', 4, ( BYTE * ) "C\x9b\x9d\xa8", { NULL }, NULL, &s_011 };
+   _DECL s_013 = { "ALIAS", 'C', 1, ( BYTE * ) "\xa8", { NULL }, NULL, &s_012 };
+   _DECL s_014 = { "ALLTRIM", 'C', 1, ( BYTE * ) "C", { NULL }, NULL, &s_013 };
+   _DECL s_015 = { "AMPM", 'C', 1, ( BYTE * ) "C", { NULL }, NULL, &s_014 };
+   _DECL s_016 = { "ARRAY", 'A', 3, ( BYTE * ) "N\xa8\xa8", { NULL }, NULL, &s_015 };
+   _DECL s_017 = { "ASC", 'N', 1, ( BYTE * ) "C", { NULL }, NULL, &s_016 };
+   _DECL s_018 = { "ASCAN", 'N', 4, ( BYTE * ) "A\xa7\xa8\xa8", { NULL }, NULL, &s_017 };
+   _DECL s_019 = { "ASIZE", 'A', 2, ( BYTE * ) "AN", { NULL }, NULL, &s_018 };
+   _DECL s_020 = { "ASORT", 'A', 4, ( BYTE * ) "A\xa8\xa8\x9c", { NULL }, NULL, &s_019 };
+   _DECL s_021 = { "AT", 'N', 4, ( BYTE * ) "CC\xa8\xa8", { NULL }, NULL, &s_020 };
+   _DECL s_022 = { "ATAIL", ' ', 1, ( BYTE * ) "A", { NULL }, NULL, &s_021 };
+   _DECL s_023 = { "BIN2I", 'N', 1, ( BYTE * ) "C", { NULL }, NULL, &s_022 };
+   _DECL s_024 = { "BIN2L", 'N', 1, ( BYTE * ) "C", { NULL }, NULL, &s_023 };
+   _DECL s_025 = { "BIN2U", 'N', 1, ( BYTE * ) "C", { NULL }, NULL, &s_024 };
+   _DECL s_026 = { "BIN2W", 'N', 1, ( BYTE * ) "C", { NULL }, NULL, &s_025 };
+   _DECL s_027 = { "BOF", 'L', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_026 };
+   _DECL s_028 = { "BROWSE", '-', 4, ( BYTE * ) "\xa8\xa8\xa8\xa8", { NULL }, NULL, &s_027 };
+   _DECL s_029 = { "CDOW", 'C', 1, ( BYTE * ) "D", { NULL }, NULL, &s_028 };
+   _DECL s_030 = { "CHR", 'C', 1, ( BYTE * ) "N", { NULL }, NULL, &s_029 };
+   _DECL s_031 = { "CMONTH", 'C', 1, ( BYTE * ) "D", { NULL }, NULL, &s_030 };
+   _DECL s_032 = { "COL", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_031 };
+   _DECL s_033 = { "CTOD", 'D', 1, ( BYTE * ) "C", { NULL }, NULL, &s_032 };
+   _DECL s_034 = { "CURDIR", 'C', 1, ( BYTE * ) "\x9d", { NULL }, NULL, &s_033 };
+   _DECL s_035 = { "DATE", 'D', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_034 };
+   _DECL s_036 = { "DAY", 'N', 1, ( BYTE * ) "D", { NULL }, NULL, &s_035 };
+   _DECL s_037 = { "DAYS", 'N', 1, ( BYTE * ) "N", { NULL }, NULL, &s_036 };
+   _DECL s_038 = { "DBAPPEND", '-', 1, ( BYTE * ) "\xa6", { NULL }, NULL, &s_037 };
+   _DECL s_039 = { "DBCLEARFILTER", '-', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_038 };
+   _DECL s_040 = { "DBCLEARINDEX", '-', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_039 };
+   _DECL s_041 = { "DBCLEARRELATION", '-', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_040 };
+   _DECL s_042 = { "DBCLOSEALL", '-', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_041 };
+   _DECL s_043 = { "DBCLOSEAREA", '-', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_042 };
+   _DECL s_044 = { "DBCOMMIT", '-', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_043 };
+   _DECL s_045 = { "DBCOMMITALL", '-', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_044 };
+   _DECL s_046 = { "DBCREATE", '-', 5, ( BYTE * ) "CA\x9d\xa6\x9d", { NULL }, NULL, &s_045 };
+   _DECL s_047 = { "DBCREATEINDEX", '-', 5, ( BYTE * ) "C B\xa6\xa6", { NULL }, NULL, &s_046 };
+   _DECL s_048 = { "DBDELETE", '-', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_047 };
+   _DECL s_049 = { "DBEDIT", '-', 12, ( BYTE * ) "\xa8\xa8\xa8\xa8\x7a\x7a\x7a\x7a\x7a\x7a\x7a\x7a", { NULL }, NULL, &s_048 };
+   _DECL s_050 = { "DBEVAL", '-', 6, ( BYTE * ) "B\x9c\x9cNNL", { NULL }, NULL, &s_049 };
+   _DECL s_051 = { "DBF", 'C', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_050 };
+   _DECL s_052 = { "DBFILTER", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_051 };
+   _DECL s_053 = { "DBGOBOTTOM", '-', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_052 };
+   _DECL s_054 = { "DBGOTO", '-', 1, ( BYTE * ) "\x7a", { NULL }, NULL, &s_053 };
+   _DECL s_055 = { "DBGOTOP", '-', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_054 };
+   _DECL s_056 = { "DBRECALL", '-', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_055 };
+   _DECL s_057 = { "DBREINDEX", '-', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_056 };
+   _DECL s_058 = { "DBRELATION", ' ', 1, ( BYTE * ) "N", { NULL }, NULL, &s_057 };
+   _DECL s_059 = { "DBRLOCK", 'L', 1, ( BYTE * ) "\x7a", { NULL }, NULL, &s_058 };
+   _DECL s_060 = { "DBRLOCKLIST", 'A', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_059 };
+   _DECL s_061 = { "DBRSELECT", 'N', 1, ( BYTE * ) "N", { NULL }, NULL, &s_060 };
+   _DECL s_062 = { "DBRUNLOCK", '-', 1, ( BYTE * ) "\x7a", { NULL }, NULL, &s_061 };
+   _DECL s_063 = { "DBSEEK", 'L', 3, ( BYTE * ) " \xa6\xa6", { NULL }, NULL, &s_062 };
+   _DECL s_064 = { "DBSELECTAREA", '-', 1, ( BYTE * ) " ", { NULL }, NULL, &s_063 };
+   _DECL s_065 = { "DBSETDRIVER", 'C', 1, ( BYTE * ) "\x9d", { NULL }, NULL, &s_064 };
+   _DECL s_066 = { "DBSETFILTER", '-', 2, ( BYTE * ) "B\x9d", { NULL }, NULL, &s_065 };
+   _DECL s_067 = { "DBSETINDEX", '-', 1, ( BYTE * ) "C", { NULL }, NULL, &s_066 };
+   _DECL s_068 = { "DBSETORDER", '-', 1, ( BYTE * ) "N", { NULL }, NULL, &s_067 };
+   _DECL s_069 = { "DBSETRELATION", '-', 3, ( BYTE * ) " BC", { NULL }, NULL, &s_068 };
+   _DECL s_070 = { "DBSKIP", '-', 1, ( BYTE * ) "\xa8", { NULL }, NULL, &s_069 };
+   _DECL s_071 = { "DBSTRUCT", 'A', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_070 };
+   _DECL s_072 = { "DBUNLOCK", '-', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_071 };
+   _DECL s_073 = { "DBUNLOCKALL", '-', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_072 };
+   _DECL s_074 = { "DBUSEAREA", '-', 7, ( BYTE * ) "\xa6\x9d" "C\x9d\xa6\xa6\x9d", { NULL }, NULL, &s_073 };
+   _DECL s_075 = { "DELETED", 'L', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_074 };
+   _DECL s_076 = { "DESCEND", ' ', 1, ( BYTE * ) " ", { NULL }, NULL, &s_075 };
+   _DECL s_077 = { "DEVOUT", '-', 2, ( BYTE * ) " \x9d", { NULL }, NULL, &s_076 };
+   _DECL s_078 = { "DEVOUTPICT", '-', 3, ( BYTE * ) " C\x9d", { NULL }, NULL, &s_077 };
+   _DECL s_079 = { "DEVPOS", '-', 2, ( BYTE * ) "NN", { NULL }, NULL, &s_078 };
+   _DECL s_080 = { "DIRECTORY", 'A', 3, ( BYTE * ) "\x9d\x9d\xa6", { NULL }, NULL, &s_079 };
+   _DECL s_081 = { "DIRCHANGE", 'N', 1, ( BYTE * ) "C", { NULL }, NULL, &s_080 };
+   _DECL s_082 = { "DIRREMOVE", 'N', 1, ( BYTE * ) "C", { NULL }, NULL, &s_081 };
+   _DECL s_083 = { "DISKSPACE", 'N', 1, ( BYTE * ) "\xa8", { NULL }, NULL, &s_082 };
+   _DECL s_084 = { "DISPBEGIN", '-', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_083 };
+   _DECL s_085 = { "DISPCOUNT", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_084 };
+   _DECL s_086 = { "DISPEND", '-', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_085 };
+   _DECL s_087 = { "DISPOUT", '-', 2, ( BYTE * ) " \x9d", { NULL }, NULL, &s_086 };
+   _DECL s_088 = { "DOW", 'N', 1, ( BYTE * ) "D", { NULL }, NULL, &s_087 };
+   _DECL s_089 = { "DTOC", 'C', 1, ( BYTE * ) "D", { NULL }, NULL, &s_088 };
+   _DECL s_090 = { "DTOS", 'C', 1, ( BYTE * ) "D", { NULL }, NULL, &s_089 };
+   _DECL s_091 = { "ELAPTIME", 'C', 2, ( BYTE * ) "CC", { NULL }, NULL, &s_090 };
+   _DECL s_092 = { "EMPTY", 'L', 1, ( BYTE * ) " ", { NULL }, NULL, &s_091 };
+   _DECL s_093 = { "EOF", 'L', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_092 };
+   _DECL s_094 = { "ERRORNEW", 'S', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_093 };
+   _DECL s_095 = { "EVAL", ' ', 3, ( BYTE * ) "B\x7a\x7a", { NULL }, NULL, &s_094 };
+   _DECL s_096 = { "EXP", 'N', 1, ( BYTE * ) "N", { NULL }, NULL, &s_095 };
+   _DECL s_097 = { "FCLOSE", 'L', 1, ( BYTE * ) "N", { NULL }, NULL, &s_096 };
+   _DECL s_098 = { "FCOUNT", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_097 };
+   _DECL s_099 = { "FCREATE", 'N', 2, ( BYTE * ) "C\xa8", { NULL }, NULL, &s_098 };
+   _DECL s_100 = { "FERASE", 'N', 1, ( BYTE * ) "C", { NULL }, NULL, &s_099 };
+   _DECL s_101 = { "FERROR", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_100 };
+   _DECL s_102 = { "FIELD", 'C', 1, ( BYTE * ) "N", { NULL }, NULL, &s_101 };
+   _DECL s_103 = { "FIELDBLOCK", 'B', 1, ( BYTE * ) "C", { NULL }, NULL, &s_102 };
+   _DECL s_104 = { "FIELDGET", ' ', 1, ( BYTE * ) "N", { NULL }, NULL, &s_103 };
+   _DECL s_105 = { "FIELDNAME", 'C', 1, ( BYTE * ) "N", { NULL }, NULL, &s_104 };
+   _DECL s_106 = { "FIELDPOS", 'N', 1, ( BYTE * ) "C", { NULL }, NULL, &s_105 };
+   _DECL s_107 = { "FIELDPUT", ' ', 2, ( BYTE * ) "N ", { NULL }, NULL, &s_106 };
+   _DECL s_108 = { "FIELDWBLOCK", 'B', 2, ( BYTE * ) "CN", { NULL }, NULL, &s_107 };
+   _DECL s_109 = { "FILE", 'L', 1, ( BYTE * ) "C", { NULL }, NULL, &s_108 };
+   _DECL s_110 = { "FLOCK", 'L', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_109 };
+   _DECL s_111 = { "FOPEN", 'N', 2, ( BYTE * ) "C\xa8", { NULL }, NULL, &s_110 };
+   _DECL s_112 = { "FOUND", 'L', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_111 };
+   _DECL s_113 = { "FREAD", 'N', 3, ( BYTE * ) "N\x5cN", { NULL }, NULL, &s_112 };
+   _DECL s_114 = { "FREADSTR", 'C', 2, ( BYTE * ) "NN", { NULL }, NULL, &s_113 };
+   _DECL s_115 = { "FRENAME", 'N', 2, ( BYTE * ) "CC", { NULL }, NULL, &s_114 };
+   _DECL s_116 = { "FSEEK", 'N', 3, ( BYTE * ) "NN\xa8", { NULL }, NULL, &s_115 };
+   _DECL s_117 = { "FWRITE", 'N', 3, ( BYTE * ) "NC\xa8", { NULL }, NULL, &s_116 };
+   _DECL s_118 = { "GETACTIVE", '-', 1, ( BYTE * ) "O", { NULL }, NULL, &s_117 };
+   _DECL s_119 = { "GETAPPLYKEY", '-', 2, ( BYTE * ) "ON", { NULL }, NULL, &s_118 };
+   _DECL s_120 = { "GETDOSETKEY", '-', 2, ( BYTE * ) "BO", { NULL }, NULL, &s_119 };
+   _DECL s_121 = { "GETENV", 'C', 1, ( BYTE * ) "C", { NULL }, NULL, &s_120 };
+   _DECL s_122 = { "GETNEW", 'O', 6, ( BYTE * ) "\xa8\xa8\x9c\x9d\x9d\x9d", { NULL }, NULL, &s_121 };
+   _DECL s_123 = { "GETPREVALIDATE", 'L', 1, ( BYTE * ) "O", { NULL }, NULL, &s_122 };
+   _DECL s_124 = { "GETPOSTVALIDATE", 'L', 1, ( BYTE * ) "O", { NULL }, NULL, &s_123 };
+   _DECL s_125 = { "GETREADER", '-', 1, ( BYTE * ) "O", { NULL }, NULL, &s_124 };
+   _DECL s_126 = { "HARDCR", 'C', 1, ( BYTE * ) "C", { NULL }, NULL, &s_125 };
+   _DECL s_127 = { "HB_ANSITOOEM", 'C', 1, ( BYTE * ) "C", { NULL }, NULL, &s_126 };
+   _DECL s_128 = { "HB_DISKSPACE", 'N', 2, ( BYTE * ) "\x9d\xa8", { NULL }, NULL, &s_127 };
+   _DECL s_129 = { "HB_FEOF", 'L', 1, ( BYTE * ) "N", { NULL }, NULL, &s_128 };
+   _DECL s_130 = { "HB_OEMTOANSI", 'C', 1, ( BYTE * ) "C", { NULL }, NULL, &s_129 };
+   _DECL s_131 = { "HEADER", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_130 };
+   _DECL s_132 = { "I2BIN", 'C', 1, ( BYTE * ) "N", { NULL }, NULL, &s_131 };
+   _DECL s_133 = { "IF", ' ', 3, ( BYTE * ) "L  ", { NULL }, NULL, &s_132 };
+   _DECL s_134 = { "INDEXEXT", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_133 };
+   _DECL s_135 = { "INDEXKEY", 'C', 1, ( BYTE * ) "N", { NULL }, NULL, &s_134 };
+   _DECL s_136 = { "INDEXORD", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_135 };
+   _DECL s_137 = { "INKEY", 'N', 2, ( BYTE * ) "\xa8\xa8", { NULL }, NULL, &s_136 };
+   _DECL s_138 = { "INT", 'N', 1, ( BYTE * ) "N", { NULL }, NULL, &s_137 };
+   _DECL s_139 = { "ISAFFIRM", 'L', 1, ( BYTE * ) "C", { NULL }, NULL, &s_138 };
+   _DECL s_140 = { "ISALPHA", 'L', 1, ( BYTE * ) "C", { NULL }, NULL, &s_139 };
+   _DECL s_141 = { "ISDIGIT", 'L', 1, ( BYTE * ) "C", { NULL }, NULL, &s_140 };
+   _DECL s_142 = { "ISDISK", 'L', 1, ( BYTE * ) "C", { NULL }, NULL, &s_141 };
+   _DECL s_143 = { "ISLOWER", 'L', 1, ( BYTE * ) "C", { NULL }, NULL, &s_142 };
+   _DECL s_144 = { "ISNEGATIVE", 'L', 1, ( BYTE * ) "C", { NULL }, NULL, &s_143 };
+   _DECL s_145 = { "ISUPPER", 'L', 1, ( BYTE * ) "C", { NULL }, NULL, &s_144 };
+   _DECL s_146 = { "L2BIN", 'C', 1, ( BYTE * ) "N", { NULL }, NULL, &s_145 };
+   _DECL s_147 = { "LASTKEY", 'N', 1, ( BYTE * ) "\xa8", { NULL }, NULL, &s_146 };
+   _DECL s_148 = { "LASTREC", 'N', 1, ( BYTE * ) " ", { NULL }, NULL, &s_147 };
+   _DECL s_149 = { "LEFT", 'C', 2, ( BYTE * ) "CN", { NULL }, NULL, &s_148 };
+   _DECL s_150 = { "LEN", 'N', 1, ( BYTE * ) " ", { NULL }, NULL, &s_149 };
+   _DECL s_151 = { "LOG", 'N', 1, ( BYTE * ) "N", { NULL }, NULL, &s_150 };
+   _DECL s_152 = { "LOWER", 'C', 1, ( BYTE * ) "C", { NULL }, NULL, &s_151 };
+   _DECL s_153 = { "LTRIM", 'C', 1, ( BYTE * ) "C", { NULL }, NULL, &s_152 };
+   _DECL s_154 = { "LUPDATE", 'D', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_153 };
+   _DECL s_155 = { "MAKEDIR", 'N', 1, ( BYTE * ) "C", { NULL }, NULL, &s_154 };
+   _DECL s_156 = { "MAX", ' ', 2, ( BYTE * ) "  ", { NULL }, NULL, &s_155 };
+   _DECL s_157 = { "MAXCOL", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_156 };
+   _DECL s_158 = { "MAXROW", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_157 };
+   _DECL s_159 = { "MCOL", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_158 };
+   _DECL s_160 = { "MEMOEDIT", 'C', 13, ( BYTE * ) "\x9d\xa8\xa8\xa8\xa8\xa6\x9d\xa8\xa8\xa8\xa8\xa8\xa8", { NULL }, NULL, &s_159 };
+   _DECL s_161 = { "MEMOTRAN", 'C', 3, ( BYTE * ) "C\x9d\x9d", { NULL }, NULL, &s_160 };
+   _DECL s_162 = { "MEMOLINE", 'C', 5, ( BYTE * ) "C\xa8\xa8\xa8\xa6", { NULL }, NULL, &s_161 };
+   _DECL s_163 = { "MEMORY", 'N', 1, ( BYTE * ) "N", { NULL }, NULL, &s_162 };
+   _DECL s_164 = { "MEMOREAD", 'C', 1, ( BYTE * ) "C", { NULL }, NULL, &s_163 };
+   _DECL s_165 = { "MEMOTRAN", 'C', 3, ( BYTE * ) "C\x9d\x9d", { NULL }, NULL, &s_164 };
+   _DECL s_166 = { "MEMOWRIT", 'L', 2, ( BYTE * ) "CC", { NULL }, NULL, &s_165 };
+   _DECL s_167 = { "MEMVARBLOCK", 'B', 1, ( BYTE * ) "C", { NULL }, NULL, &s_166 };
+   _DECL s_168 = { "MIN", ' ', 2, ( BYTE * ) "  ", { NULL }, NULL, &s_167 };
+   _DECL s_169 = { "MLCOUNT", 'N', 4, ( BYTE * ) "C\xa8\xa8\xa6", { NULL }, NULL, &s_168 };
+   _DECL s_170 = { "MLCTOPOS", 'L', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_169 };
+   _DECL s_171 = { "MLPOS", 'N', 5, ( BYTE * ) "CNN\xa8\xa6", { NULL }, NULL, &s_170 };
+   _DECL s_172 = { "MOD", 'N', 2, ( BYTE * ) "NN", { NULL }, NULL, &s_171 };
+   _DECL s_173 = { "MONTH", 'N', 1, ( BYTE * ) "D", { NULL }, NULL, &s_172 };
+   _DECL s_174 = { "MPOSTOLC", 'L', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_173 };
+   _DECL s_175 = { "MROW", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_174 };
+   _DECL s_176 = { "NATIONMSG", 'C', 1, ( BYTE * ) "N", { NULL }, NULL, &s_175 };
+   _DECL s_177 = { "NETERR", 'L', 1, ( BYTE * ) "\xa6", { NULL }, NULL, &s_176 };
+   _DECL s_178 = { "NETNAME", 'C', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_177 };
+   _DECL s_179 = { "NEXTKEY", 'N', 1, ( BYTE * ) "\xa8", { NULL }, NULL, &s_178 };
+   _DECL s_180 = { "ORDBAGEXT", 'C', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_179 };
+   _DECL s_181 = { "ORDBAGNAME", 'C', 1, ( BYTE * ) " ", { NULL }, NULL, &s_180 };
+   _DECL s_182 = { "ORDCREATE", '-', 5, ( BYTE * ) "C\x9d \x9c\xa6", { NULL }, NULL, &s_181 };
+   _DECL s_183 = { "ORDDESTROY", '-', 2, ( BYTE * ) "C\x9d", { NULL }, NULL, &s_182 };
+   _DECL s_184 = { "ORDFOR", 'C', 2, ( BYTE * ) " \x9d", { NULL }, NULL, &s_183 };
+   _DECL s_185 = { "ORDKEY", 'C', 2, ( BYTE * ) " \x9d", { NULL }, NULL, &s_184 };
+   _DECL s_186 = { "ORDLISTADD", '-', 2, ( BYTE * ) "C\x9d", { NULL }, NULL, &s_185 };
+   _DECL s_187 = { "ORDLISTCLEAR", '-', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_186 };
+   _DECL s_188 = { "ORDLISTREBUILD", '-', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_187 };
+   _DECL s_189 = { "ORDNAME", 'C', 2, ( BYTE * ) "N\x9d", { NULL }, NULL, &s_188 };
+   _DECL s_190 = { "ORDNUMBER", 'N', 2, ( BYTE * ) "C\x9d", { NULL }, NULL, &s_189 };
+   _DECL s_191 = { "ORDSETFOCUS", 'C', 2, ( BYTE * ) "\x7a\x9d", { NULL }, NULL, &s_190 };
+   _DECL s_192 = { "OS", 'C', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_191 };
+   _DECL s_193 = { "OUTERR", '-', 1, ( BYTE * ) "\x7a", { NULL }, NULL, &s_192 };
+   _DECL s_194 = { "OUTSTD", '-', 1, ( BYTE * ) "\x7a", { NULL }, NULL, &s_193 };
+   _DECL s_195 = { "PADC", 'C', 3, ( BYTE * ) " N\x9d", { NULL }, NULL, &s_194 };
+   _DECL s_196 = { "PADL", 'C', 3, ( BYTE * ) " N\x9d", { NULL }, NULL, &s_195 };
+   _DECL s_197 = { "PADR", 'C', 3, ( BYTE * ) " N\x9d", { NULL }, NULL, &s_196 };
+   _DECL s_198 = { "PCOL", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_197 };
+   _DECL s_199 = { "PCOUNT", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_198 };
+   _DECL s_200 = { "PROCFILE", 'C', 1, ( BYTE * ) "\x7a", { NULL }, NULL, &s_199 };
+   _DECL s_201 = { "PROCLINE", 'N', 1, ( BYTE * ) "\xa8", { NULL }, NULL, &s_200 };
+   _DECL s_202 = { "PROCNAME", 'N', 1, ( BYTE * ) "\xa8", { NULL }, NULL, &s_201 };
+   _DECL s_203 = { "PROW", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_202 };
+   _DECL s_204 = { "RAT", 'N', 2, ( BYTE * ) "CC", { NULL }, NULL, &s_203 };
+   _DECL s_205 = { "RDDLIST", 'A', 1, ( BYTE * ) "\xa8", { NULL }, NULL, &s_204 };
+   _DECL s_206 = { "RDDNAME", 'C', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_205 };
+   _DECL s_207 = { "RDDSETDEFAULT", 'C', 1, ( BYTE * ) "\x9d", { NULL }, NULL, &s_206 };
+   _DECL s_208 = { "READEXIT", 'L', 1, ( BYTE * ) "\xa6", { NULL }, NULL, &s_207 };
+   _DECL s_209 = { "READUPDATED", 'L', 1, ( BYTE * ) "\xa6", { NULL }, NULL, &s_208 };
+   _DECL s_210 = { "READINSERT", 'L', 1, ( BYTE * ) "\xa6", { NULL }, NULL, &s_209 };
+   _DECL s_211 = { "READKEY", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_210 };
+   _DECL s_212 = { "READFORMAT", 'B', 1, ( BYTE * ) "B", { NULL }, NULL, &s_211 };
+   _DECL s_213 = { "READKILL", 'L', 1, ( BYTE * ) "\xa6", { NULL }, NULL, &s_212 };
+   _DECL s_214 = { "READMODAL", 'L', 2, ( BYTE * ) "A\xa8", { NULL }, NULL, &s_213 };
+   _DECL s_215 = { "READUPDATED", 'L', 1, ( BYTE * ) "\xa6", { NULL }, NULL, &s_214 };
+   _DECL s_216 = { "READVAR", 'C', 1, ( BYTE * ) "\x9d", { NULL }, NULL, &s_215 };
+   _DECL s_217 = { "RECCOUNT", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_216 };
+   _DECL s_218 = { "RECNO", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_217 };
+   _DECL s_219 = { "RECSIZE", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_218 };
+   _DECL s_220 = { "REPLICATE", 'C', 2, ( BYTE * ) "CN", { NULL }, NULL, &s_219 };
+   _DECL s_221 = { "RESTSCREEN", '-', 5, ( BYTE * ) "\xa8\xa8\xa8\xa8\x9d", { NULL }, NULL, &s_220 };
+   _DECL s_222 = { "RIGHT", 'C', 2, ( BYTE * ) "CN", { NULL }, NULL, &s_221 };
+   _DECL s_223 = { "RLOCK", 'L', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_222 };
+   _DECL s_224 = { "ROUND", 'N', 2, ( BYTE * ) "NN", { NULL }, NULL, &s_223 };
+   _DECL s_225 = { "ROW", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_224 };
+   _DECL s_226 = { "RTRIM", 'C', 1, ( BYTE * ) "C", { NULL }, NULL, &s_225 };
+   _DECL s_227 = { "SAVESCREEN", '-', 4, ( BYTE * ) "\xa8\xa8\xa8\xa8", { NULL }, NULL, &s_226 };
+   _DECL s_228 = { "SCROLL", '-', 6, ( BYTE * ) "\xa8\xa8\xa8\xa8\xa8\xa8", { NULL }, NULL, &s_227 };
+   _DECL s_229 = { "SECONDS", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_228 };
+   _DECL s_230 = { "SECS", 'N', 1, ( BYTE * ) "C", { NULL }, NULL, &s_229 };
+   _DECL s_231 = { "SELECT", 'N', 1, ( BYTE * ) "\x9d", { NULL }, NULL, &s_230 };
+   _DECL s_232 = { "SET", ' ', 3, ( BYTE * ) "N\x7a\xa6", { NULL }, NULL, &s_231 };
+   _DECL s_233 = { "SETCOLOR", 'C', 1, ( BYTE * ) "\x9d", { NULL }, NULL, &s_232 };
+   _DECL s_234 = { "SETCURSOR", 'N', 1, ( BYTE * ) "\xa8", { NULL }, NULL, &s_233 };
+   _DECL s_235 = { "SETKEY", ' ', 3, ( BYTE * ) "N\x9c\x9c", { NULL }, NULL, &s_234 };
+   _DECL s_236 = { "SETMODE", 'L', 2, ( BYTE * ) "NN", { NULL }, NULL, &s_235 };
+   _DECL s_237 = { "SETPOS", '-', 2, ( BYTE * ) "NN", { NULL }, NULL, &s_236 };
+   _DECL s_238 = { "SETPRC", '-', 2, ( BYTE * ) "NN", { NULL }, NULL, &s_237 };
+   _DECL s_239 = { "SETTYPEAHEAD", '-', 1, ( BYTE * ) "N", { NULL }, NULL, &s_238 };
+   _DECL s_240 = { "SPACE", 'C', 1, ( BYTE * ) "N", { NULL }, NULL, &s_239 };
+   _DECL s_241 = { "SQRT", 'N', 1, ( BYTE * ) "N", { NULL }, NULL, &s_240 };
+   _DECL s_242 = { "STR", 'C', 3, ( BYTE * ) "N\xa8\xa8", { NULL }, NULL, &s_241 };
+   _DECL s_243 = { "STRTRAN", 'C', 5, ( BYTE * ) "CC\x9d\xa8\xa8", { NULL }, NULL, &s_242 };
+   _DECL s_244 = { "STRZERO", 'C', 3, ( BYTE * ) "N\xa8\xa8", { NULL }, NULL, &s_243 };
+   _DECL s_245 = { "STUFF", 'C', 4, ( BYTE * ) "CNNC", { NULL }, NULL, &s_244 };
+   _DECL s_246 = { "SUBSTR", 'C', 3, ( BYTE * ) "CN\xa8", { NULL }, NULL, &s_245 };
+   _DECL s_247 = { "TBROWSENEW", 'O', 4, ( BYTE * ) "NNNN", { NULL }, NULL, &s_246 };
+   _DECL s_248 = { "TBROWSEDB", 'O', 4, ( BYTE * ) "NNNN", { NULL }, NULL, &s_247 };
+   _DECL s_249 = { "TBCOLUMNNEW", 'O', 2, ( BYTE * ) "CB", { NULL }, NULL, &s_248 };
+   _DECL s_250 = { "TIME", 'C', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_249 };
+   _DECL s_251 = { "TONE", '-', 2, ( BYTE * ) "NN", { NULL }, NULL, &s_250 };
+   _DECL s_252 = { "TRANSFORM", 'C', 2, ( BYTE * ) " C", { NULL }, NULL, &s_251 };
+   _DECL s_253 = { "TRIM", 'C', 1, ( BYTE * ) "C", { NULL }, NULL, &s_252 };
+   _DECL s_254 = { "TYPE", 'C', 2, ( BYTE * ) " N", { NULL }, NULL, &s_253 };
+   _DECL s_255 = { "U2BIN", 'C', 1, ( BYTE * ) "N", { NULL }, NULL, &s_254 };
+   _DECL s_256 = { "UPDATED", 'L', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_255 };
+   _DECL s_257 = { "UPPER", 'C', 1, ( BYTE * ) "C", { NULL }, NULL, &s_256 };
+   _DECL s_258 = { "USED", 'L', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_257 };
+   _DECL s_259 = { "VAL", 'N', 1, ( BYTE * ) "C", { NULL }, NULL, &s_258 };
+   _DECL s_260 = { "VALTYPE", ' ', 1, ( BYTE * ) " ", { NULL }, NULL, &s_259 };
+   _DECL s_261 = { "VERSION", 'C', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_260 };
+   _DECL s_262 = { "W2BIN", 'C', 1, ( BYTE * ) "N", { NULL }, NULL, &s_261 };
+   _DECL s_263 = { "WORD", 'N', 1, ( BYTE * ) "N", { NULL }, NULL, &s_262 };
+   _DECL s_264 = { "HB_FNAMESPLIT", '-', 5, ( BYTE * ) "C\x5c\x5c\x5c\x5c", { NULL }, NULL, &s_263 };
+   _DECL s_265 = { "HB_FNAMEMERGE", 'C', 4, ( BYTE * ) "CCCC", { NULL }, NULL, &s_264 };
 
    /* TODO: Rest of Standard Functions. */
 
    /* -------------------------------------------------- Standard Classes --------------------------------------------------- */
 
-   static COMCLASS s_ERROR    = { "ERROR"   , NULL, NULL, NULL };
-   static COMCLASS s_GET      = { "GET"     , NULL, NULL, &s_ERROR };
-   static COMCLASS s_TBCOLUMN = { "TBCOLUMN", NULL, NULL, &s_GET };
-   static COMCLASS s_TBROWSE  = { "TBROWSE" , NULL, NULL, &s_TBCOLUMN };
+   static COMCLASS   s_ERROR     = { "ERROR", NULL, NULL, NULL };
+   static COMCLASS   s_GET       = { "GET", NULL, NULL, &s_ERROR };
+   static COMCLASS   s_TBCOLUMN  = { "TBCOLUMN", NULL, NULL, &s_GET };
+   static COMCLASS   s_TBROWSE   = { "TBROWSE", NULL, NULL, &s_TBCOLUMN };
 
-  /*       Name     Ret  # of Prams  Param Types   Ret Class  Param Classes  Next
-   ---------------  ---  ----------  --------------------  ---------  -------------  --------------- */
-   _DECL s_ERROR_01    = { "ARGS"         , 'A', 0 , (BYTE*)NULL , {NULL}   , NULL , NULL    };
-   _DECL s_ERROR_02    = { "CANDEFAULT"   , 'B', 0 , (BYTE*)NULL , {NULL}   , NULL , &s_ERROR_01     };
-   _DECL s_ERROR_03    = { "CANRETRY"     , 'B', 0 , (BYTE*)NULL , {NULL}   , NULL , &s_ERROR_02     };
-   _DECL s_ERROR_04    = { "CANSUBSTITUTE", 'B', 0 , (BYTE*)NULL , {NULL}   , NULL , &s_ERROR_03     };
-   _DECL s_ERROR_05    = { "CARGO"        , ' ', 0 , (BYTE*)NULL , {NULL}   , NULL , &s_ERROR_04     };
-   _DECL s_ERROR_06    = { "DESCRIPTION"  , 'S', 0 , (BYTE*)NULL , {NULL}   , NULL , &s_ERROR_05     };
-   _DECL s_ERROR_07    = { "FILENAME"     , 'S', 0 , (BYTE*)NULL , {NULL}   , NULL , &s_ERROR_06     };
-   _DECL s_ERROR_08    = { "GENCODE"      , 'N', 0 , (BYTE*)NULL , {NULL}   , NULL , &s_ERROR_07     };
-   _DECL s_ERROR_09    = { "OPERATION"    , 'S', 0 , (BYTE*)NULL , {NULL}   , NULL , &s_ERROR_08     };
-   _DECL s_ERROR_10    = { "OSCODE"       , 'N', 0 , (BYTE*)NULL , {NULL}   , NULL , &s_ERROR_09     };
-   _DECL s_ERROR_11    = { "SEVERITY"     , 'N', 0 , (BYTE*)NULL , {NULL}   , NULL , &s_ERROR_10     };
-   _DECL s_ERROR_12    = { "SUBCODE"      , 'N', 0 , (BYTE*)NULL , {NULL}   , NULL , &s_ERROR_11     };
-   _DECL s_ERROR_13    = { "SUBSYSTEM"    , 'S', 0 , (BYTE*)NULL , {NULL}   , NULL , &s_ERROR_12     };
-   _DECL s_ERROR_14    = { "TRIES"        , 'N', 0 , (BYTE*)NULL , {NULL}   , NULL , &s_ERROR_13     };
+   /*       Name     Ret  # of Prams  Param Types   Ret Class  Param Classes  Next
+      ---------------  ---  ----------  --------------------  ---------  -------------  --------------- */
+   _DECL s_ERROR_01              = { "ARGS", 'A', 0, ( BYTE * ) NULL, { NULL }, NULL, NULL };
+   _DECL s_ERROR_02              = { "CANDEFAULT", 'B', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_ERROR_01 };
+   _DECL s_ERROR_03              = { "CANRETRY", 'B', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_ERROR_02 };
+   _DECL s_ERROR_04              = { "CANSUBSTITUTE", 'B', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_ERROR_03 };
+   _DECL s_ERROR_05              = { "CARGO", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_ERROR_04 };
+   _DECL s_ERROR_06              = { "DESCRIPTION", 'S', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_ERROR_05 };
+   _DECL s_ERROR_07              = { "FILENAME", 'S', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_ERROR_06 };
+   _DECL s_ERROR_08              = { "GENCODE", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_ERROR_07 };
+   _DECL s_ERROR_09              = { "OPERATION", 'S', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_ERROR_08 };
+   _DECL s_ERROR_10              = { "OSCODE", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_ERROR_09 };
+   _DECL s_ERROR_11              = { "SEVERITY", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_ERROR_10 };
+   _DECL s_ERROR_12              = { "SUBCODE", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_ERROR_11 };
+   _DECL s_ERROR_13              = { "SUBSYSTEM", 'S', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_ERROR_12 };
+   _DECL s_ERROR_14              = { "TRIES", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_ERROR_13 };
 
-  /*       Name                             Ret  # of Prams  Param Types   Ret Class  Param Classes  Next
-   ---------------                          ---  ----------  --------------------  ---------  -------------  --------------- */
-   _DECL s_GET_01      = { "ASSIGN"       , ' ', 0 , (BYTE*)NULL   , {NULL}   , NULL , NULL    };
-   _DECL s_GET_02      = { "COLORDISP"    , 'S', 1 , (BYTE*)"\x9d" , {&s_GET} , NULL , &s_GET_01       };
-   _DECL s_GET_03      = { "DISPLAY"      , 'S', 1 , (BYTE*)"\xa6" , {&s_GET} , NULL , &s_GET_02       };
-   _DECL s_GET_04      = { "KILLFOCUS"    , 'S', 0 , (BYTE*)NULL   , {&s_GET} , NULL , &s_GET_03       };
-   _DECL s_GET_05      = { "PARSEPICT"    , 'C', 1 , (BYTE*)"C"    , {NULL}   , NULL , &s_GET_04       };
-   _DECL s_GET_06      = { "RESET"        , 'S', 0 , (BYTE*)NULL   , {&s_GET} , NULL , &s_GET_05       };
-   _DECL s_GET_07      = { "SETFOCUS"     , 'S', 0 , (BYTE*)NULL   , {&s_GET} , NULL , &s_GET_06       };
-   _DECL s_GET_08      = { "UNDO"         , 'S', 0 , (BYTE*)NULL   , {&s_GET} , NULL , &s_GET_07       };
-   _DECL s_GET_09      = { "UNTRANSFORM"  , 'S', 1 , (BYTE*)"\x9d" , {&s_GET} , NULL , &s_GET_08       };
-   _DECL s_GET_10      = { "UPDATEBUFFER" , 'S', 0 , (BYTE*)NULL   , {&s_GET} , NULL , &s_GET_09       };
-   _DECL s_GET_11      = { "VARGET"       , ' ', 0 , (BYTE*)NULL   , {NULL}   , NULL , &s_GET_10       };
-   _DECL s_GET_12      = { "VARPUT"       , ' ', 2 , (BYTE*)" \xa6", {NULL}   , NULL , &s_GET_11       };
+   /*       Name                             Ret  # of Prams  Param Types   Ret Class  Param Classes  Next
+      ---------------                          ---  ----------  --------------------  ---------  -------------  --------------- */
+   _DECL s_GET_01                = { "ASSIGN", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, NULL };
+   _DECL s_GET_02                = { "COLORDISP", 'S', 1, ( BYTE * ) "\x9d", { &s_GET }, NULL, &s_GET_01 };
+   _DECL s_GET_03                = { "DISPLAY", 'S', 1, ( BYTE * ) "\xa6", { &s_GET }, NULL, &s_GET_02 };
+   _DECL s_GET_04                = { "KILLFOCUS", 'S', 0, ( BYTE * ) NULL, { &s_GET }, NULL, &s_GET_03 };
+   _DECL s_GET_05                = { "PARSEPICT", 'C', 1, ( BYTE * ) "C", { NULL }, NULL, &s_GET_04 };
+   _DECL s_GET_06                = { "RESET", 'S', 0, ( BYTE * ) NULL, { &s_GET }, NULL, &s_GET_05 };
+   _DECL s_GET_07                = { "SETFOCUS", 'S', 0, ( BYTE * ) NULL, { &s_GET }, NULL, &s_GET_06 };
+   _DECL s_GET_08                = { "UNDO", 'S', 0, ( BYTE * ) NULL, { &s_GET }, NULL, &s_GET_07 };
+   _DECL s_GET_09                = { "UNTRANSFORM", 'S', 1, ( BYTE * ) "\x9d", { &s_GET }, NULL, &s_GET_08 };
+   _DECL s_GET_10                = { "UPDATEBUFFER", 'S', 0, ( BYTE * ) NULL, { &s_GET }, NULL, &s_GET_09 };
+   _DECL s_GET_11                = { "VARGET", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_GET_10 };
+   _DECL s_GET_12                = { "VARPUT", ' ', 2, ( BYTE * ) " \xa6", { NULL }, NULL, &s_GET_11 };
 
-   _DECL s_GET_13      = { "END"          , 'S', 0 , (BYTE*)NULL   , {&s_GET} , NULL , &s_GET_12       };
-   _DECL s_GET_14      = { "HOME"         , 'S', 0 , (BYTE*)NULL   , {&s_GET} , NULL , &s_GET_13       };
-   _DECL s_GET_15      = { "LEFT"         , 'S', 1 , (BYTE*)"\xa6" , {&s_GET} , NULL , &s_GET_14       };
-   _DECL s_GET_16      = { "RIGHT"        , 'S', 1 , (BYTE*)"\xa6" , {&s_GET} , NULL , &s_GET_15       };
-   _DECL s_GET_17      = { "TODECPOS"     , 'S', 0 , (BYTE*)NULL   , {&s_GET} , NULL , &s_GET_16       };
-   _DECL s_GET_18      = { "WORDLEFT"     , 'S', 0 , (BYTE*)NULL   , {&s_GET} , NULL , &s_GET_17       };
-   _DECL s_GET_19      = { "WORDRIGHT"    , 'S', 0 , (BYTE*)NULL   , {&s_GET} , NULL , &s_GET_18       };
+   _DECL s_GET_13                = { "END", 'S', 0, ( BYTE * ) NULL, { &s_GET }, NULL, &s_GET_12 };
+   _DECL s_GET_14                = { "HOME", 'S', 0, ( BYTE * ) NULL, { &s_GET }, NULL, &s_GET_13 };
+   _DECL s_GET_15                = { "LEFT", 'S', 1, ( BYTE * ) "\xa6", { &s_GET }, NULL, &s_GET_14 };
+   _DECL s_GET_16                = { "RIGHT", 'S', 1, ( BYTE * ) "\xa6", { &s_GET }, NULL, &s_GET_15 };
+   _DECL s_GET_17                = { "TODECPOS", 'S', 0, ( BYTE * ) NULL, { &s_GET }, NULL, &s_GET_16 };
+   _DECL s_GET_18                = { "WORDLEFT", 'S', 0, ( BYTE * ) NULL, { &s_GET }, NULL, &s_GET_17 };
+   _DECL s_GET_19                = { "WORDRIGHT", 'S', 0, ( BYTE * ) NULL, { &s_GET }, NULL, &s_GET_18 };
 
-   _DECL s_GET_20      = { "BACKSPACE"    , 'S', 1 , (BYTE*)"\xa6" , {&s_GET} , NULL , &s_GET_19       };
-   _DECL s_GET_21      = { "DELETE"       , 'S', 1 , (BYTE*)"\xa6" , {&s_GET} , NULL , &s_GET_20       };
-   _DECL s_GET_22      = { "DELEND"       , 'S', 0 , (BYTE*)NULL   , {&s_GET} , NULL , &s_GET_21       };
-   _DECL s_GET_23      = { "DELLEFT"      , 'S', 0 , (BYTE*)NULL   , {&s_GET} , NULL , &s_GET_22       };
-   _DECL s_GET_24      = { "DELRIGHT"     , 'S', 0 , (BYTE*)NULL   , {&s_GET} , NULL , &s_GET_23       };
-   _DECL s_GET_25      = { "DELWORDLEFT"  , 'S', 0 , (BYTE*)NULL   , {&s_GET} , NULL , &s_GET_24       };
-   _DECL s_GET_26      = { "DELWORDRIGHT" , 'S', 0 , (BYTE*)NULL   , {&s_GET} , NULL , &s_GET_25       };
+   _DECL s_GET_20                = { "BACKSPACE", 'S', 1, ( BYTE * ) "\xa6", { &s_GET }, NULL, &s_GET_19 };
+   _DECL s_GET_21                = { "DELETE", 'S', 1, ( BYTE * ) "\xa6", { &s_GET }, NULL, &s_GET_20 };
+   _DECL s_GET_22                = { "DELEND", 'S', 0, ( BYTE * ) NULL, { &s_GET }, NULL, &s_GET_21 };
+   _DECL s_GET_23                = { "DELLEFT", 'S', 0, ( BYTE * ) NULL, { &s_GET }, NULL, &s_GET_22 };
+   _DECL s_GET_24                = { "DELRIGHT", 'S', 0, ( BYTE * ) NULL, { &s_GET }, NULL, &s_GET_23 };
+   _DECL s_GET_25                = { "DELWORDLEFT", 'S', 0, ( BYTE * ) NULL, { &s_GET }, NULL, &s_GET_24 };
+   _DECL s_GET_26                = { "DELWORDRIGHT", 'S', 0, ( BYTE * ) NULL, { &s_GET }, NULL, &s_GET_25 };
 
-   _DECL s_GET_27      = { "INSERT"       , 'S', 1 , (BYTE*)"C"    , {&s_GET} , NULL , &s_GET_26       };
-   _DECL s_GET_28      = { "OVERSTRIKE"   , 'S', 1 , (BYTE*)"C"    , {&s_GET} , NULL , &s_GET_27       };
+   _DECL s_GET_27                = { "INSERT", 'S', 1, ( BYTE * ) "C", { &s_GET }, NULL, &s_GET_26 };
+   _DECL s_GET_28                = { "OVERSTRIKE", 'S', 1, ( BYTE * ) "C", { &s_GET }, NULL, &s_GET_27 };
 
-   _DECL s_GET_29      = { "DELETEALL"    , 'S', 0 , (BYTE*)NULL   , {&s_GET} , NULL , &s_GET_28       };
-   _DECL s_GET_30      = { "ISEDITABLE"   , 'L', 1 , (BYTE*)"N"    , {NULL}   , NULL , &s_GET_29       };
-   _DECL s_GET_31      = { "INPUT"        , 'C', 0 , (BYTE*)"C"    , {NULL}   , NULL , &s_GET_30       };
-   _DECL s_GET_32      = { "PUTMASK"      , 'C', 2 , (BYTE*)"CL"   , {NULL}   , NULL , &s_GET_31       };
-   _DECL s_GET_33      = { "HASSCROLL"    , 'L', 0 , (BYTE*)NULL   , {NULL}   , NULL , &s_GET_32       };
-   _DECL s_GET_34      = { "FIRSTEDITABLE", 'N', 0 , (BYTE*)NULL   , {NULL}   , NULL , &s_GET_33       };
-   _DECL s_GET_35      = { "LASTEDITABLE" , 'N', 0 , (BYTE*)NULL   , {NULL}   , NULL , &s_GET_34       };
+   _DECL s_GET_29                = { "DELETEALL", 'S', 0, ( BYTE * ) NULL, { &s_GET }, NULL, &s_GET_28 };
+   _DECL s_GET_30                = { "ISEDITABLE", 'L', 1, ( BYTE * ) "N", { NULL }, NULL, &s_GET_29 };
+   _DECL s_GET_31                = { "INPUT", 'C', 0, ( BYTE * ) "C", { NULL }, NULL, &s_GET_30 };
+   _DECL s_GET_32                = { "PUTMASK", 'C', 2, ( BYTE * ) "CL", { NULL }, NULL, &s_GET_31 };
+   _DECL s_GET_33                = { "HASSCROLL", 'L', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_GET_32 };
+   _DECL s_GET_34                = { "FIRSTEDITABLE", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_GET_33 };
+   _DECL s_GET_35                = { "LASTEDITABLE", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_GET_34 };
 
-  /*       Name     Ret  # of Prams  Param Types   Ret Class  Param Classes  Next
-   ---------------  ---  ----------  --------------------  ---------  -------------  --------------- */
-   _DECL s_TBCOLUMN_01 = { "BLOCK"        , ' ', 0 , (BYTE*)NULL   , {NULL}   , NULL , NULL    };
-   _DECL s_TBCOLUMN_02 = { "CARGO"        , ' ', 0 , (BYTE*)NULL   , {NULL}   , NULL , &s_TBCOLUMN_01  };
-   _DECL s_TBCOLUMN_03 = { "COLORBLOCK"   , 'A', 0 , (BYTE*)NULL   , {NULL}   , NULL , &s_TBCOLUMN_02  };
-   _DECL s_TBCOLUMN_04 = { "COLSEP"       , 'C', 0 , (BYTE*)NULL   , {NULL}   , NULL , &s_TBCOLUMN_03  };
-   _DECL s_TBCOLUMN_05 = { "DEFCOLOR"     , 'A', 0 , (BYTE*)NULL   , {NULL}   , NULL , &s_TBCOLUMN_04  };
-   _DECL s_TBCOLUMN_06 = { "FOOTING"      , 'C', 0 , (BYTE*)NULL   , {NULL}   , NULL , &s_TBCOLUMN_05  };
-   _DECL s_TBCOLUMN_07 = { "FOOTSEP"      , 'C', 0 , (BYTE*)NULL   , {NULL}   , NULL , &s_TBCOLUMN_06  };
-   _DECL s_TBCOLUMN_08 = { "HEADING"      , 'C', 0 , (BYTE*)NULL   , {NULL}   , NULL , &s_TBCOLUMN_07  };
-   _DECL s_TBCOLUMN_09 = { "PICTURE"      , ' ', 0 , (BYTE*)NULL   , {NULL}   , NULL , &s_TBCOLUMN_08  };
-   _DECL s_TBCOLUMN_10 = { "WIDTH"        , 'N', 1 , (BYTE*)"\xa8" , {NULL}   , NULL , &s_TBCOLUMN_09  };
-   _DECL s_TBCOLUMN_11 = { "COLPOS"       , ' ', 0 , (BYTE*)NULL   , {NULL}   , NULL , &s_TBCOLUMN_10  };
-   _DECL s_TBCOLUMN_12 = { "HEADSEP"      , ' ', 0 , (BYTE*)NULL   , {NULL}   , NULL , &s_TBCOLUMN_11  };
+   /*       Name     Ret  # of Prams  Param Types   Ret Class  Param Classes  Next
+      ---------------  ---  ----------  --------------------  ---------  -------------  --------------- */
+   _DECL s_TBCOLUMN_01           = { "BLOCK", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, NULL };
+   _DECL s_TBCOLUMN_02           = { "CARGO", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBCOLUMN_01 };
+   _DECL s_TBCOLUMN_03           = { "COLORBLOCK", 'A', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBCOLUMN_02 };
+   _DECL s_TBCOLUMN_04           = { "COLSEP", 'C', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBCOLUMN_03 };
+   _DECL s_TBCOLUMN_05           = { "DEFCOLOR", 'A', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBCOLUMN_04 };
+   _DECL s_TBCOLUMN_06           = { "FOOTING", 'C', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBCOLUMN_05 };
+   _DECL s_TBCOLUMN_07           = { "FOOTSEP", 'C', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBCOLUMN_06 };
+   _DECL s_TBCOLUMN_08           = { "HEADING", 'C', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBCOLUMN_07 };
+   _DECL s_TBCOLUMN_09           = { "PICTURE", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBCOLUMN_08 };
+   _DECL s_TBCOLUMN_10           = { "WIDTH", 'N', 1, ( BYTE * ) "\xa8", { NULL }, NULL, &s_TBCOLUMN_09 };
+   _DECL s_TBCOLUMN_11           = { "COLPOS", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBCOLUMN_10 };
+   _DECL s_TBCOLUMN_12           = { "HEADSEP", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBCOLUMN_11 };
 
 
-  /*       Name     Ret  # of Prams  Param Types   Ret Class  Param Classes  Next
-   ---------------  ---  ----------  --------------------  ---------  -------------  --------------- */
-   _DECL s_TBROWSE_01  = { "BORDER"         , ' ', 1 , (BYTE*)"\x7a"   , {NULL}   , NULL , NULL    };
-   _DECL s_TBROWSE_02  = { "COLORSPEC"      , ' ', 1 , (BYTE*)"\x7a"   , {NULL}   , NULL , &s_TBROWSE_01 };
-   _DECL s_TBROWSE_03  = { "NBOTTOM"        , ' ', 1 , (BYTE*)"\xa8"   , {NULL}   , NULL , &s_TBROWSE_02 };
-   _DECL s_TBROWSE_04  = { "NLEFT"          , ' ', 1 , (BYTE*)"\xa8"   , {NULL}   , NULL , &s_TBROWSE_03 };
-   _DECL s_TBROWSE_05  = { "NRIGHT"         , ' ', 1 , (BYTE*)"\xa8"   , {NULL}   , NULL , &s_TBROWSE_04 };
-   _DECL s_TBROWSE_06  = { "NTOP"           , ' ', 1 , (BYTE*)"\xa8"   , {NULL}   , NULL , &s_TBROWSE_05 };
-   _DECL s_TBROWSE_07  = { "COLSEP"         , ' ', 1 , (BYTE*)"\x7a"   , {NULL}   , NULL , &s_TBROWSE_06 };
-   _DECL s_TBROWSE_08  = { "FOOTSEP"        , ' ', 1 , (BYTE*)"\x7a"   , {NULL}   , NULL , &s_TBROWSE_07 };
-   _DECL s_TBROWSE_09  = { "HEADSEP"        , ' ', 1 , (BYTE*)"\x7a"   , {NULL}   , NULL , &s_TBROWSE_08 };
-   _DECL s_TBROWSE_10  = { "FREEZE"         , ' ', 1 , (BYTE*)"\xa8"   , {NULL}   , NULL , &s_TBROWSE_09 };
-   _DECL s_TBROWSE_11  = { "DOWN"           , ' ', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_10 };
-   _DECL s_TBROWSE_12  = { "END"            , ' ', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_11 };
-   _DECL s_TBROWSE_13  = { "GOBOTTOM"       , ' ', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_12 };
-   _DECL s_TBROWSE_14  = { "GOTOP"          , ' ', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_13 };
-   _DECL s_TBROWSE_15  = { "HOME"           , ' ', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_14 };
-   _DECL s_TBROWSE_16  = { "LEFT"           , ' ', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_15 };
-   _DECL s_TBROWSE_17  = { "PAGEDOWN"       , ' ', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_16 };
-   _DECL s_TBROWSE_18  = { "PAGEUP"         , ' ', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_17 };
-   _DECL s_TBROWSE_19  = { "PANEND"         , ' ', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_18 };
-   _DECL s_TBROWSE_20  = { "PANHOME"        , ' ', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_19 };
-   _DECL s_TBROWSE_21  = { "PANLEFT"        , ' ', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_20 };
-   _DECL s_TBROWSE_22  = { "PANRIGHT"       , ' ', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_21 };
-   _DECL s_TBROWSE_23  = { "RIGHT"          , ' ', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_22 };
-   _DECL s_TBROWSE_24  = { "UP"             , ' ', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_23 };
-   _DECL s_TBROWSE_25  = { "ADDCOLUMN"      , 'O', 1 , (BYTE*)"O"      , {NULL}   , NULL , &s_TBROWSE_24 };
-   _DECL s_TBROWSE_26  = { "DELCOLUMN"      , 'O', 1 , (BYTE*)"N"      , {NULL}   , NULL , &s_TBROWSE_25 };
-   _DECL s_TBROWSE_27  = { "INSCOLUMN"      , 'O', 2 , (BYTE*)"NO"     , {NULL}   , NULL , &s_TBROWSE_26 };
-   _DECL s_TBROWSE_28  = { "GETCOLUMN"      , 'O', 1 , (BYTE*)"N"      , {NULL}   , NULL , &s_TBROWSE_27 };
-   _DECL s_TBROWSE_29  = { "SETCOLUMN"      , 'O', 2 , (BYTE*)"NO"     , {NULL}   , NULL , &s_TBROWSE_28 };
-   _DECL s_TBROWSE_30  = { "COLWIDTH"       , ' ', 1 , (BYTE*)"N"      , {NULL}   , NULL , &s_TBROWSE_29 };
-   _DECL s_TBROWSE_31  = { "COLCOUNT"       , 'N', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_30 };
-   _DECL s_TBROWSE_32  = { "COLORRECT"      , 'O', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_31 };
-   _DECL s_TBROWSE_33  = { "CONFIGURE"      , 'O', 1 , (BYTE*)"N"      , {NULL}   , NULL , &s_TBROWSE_32 };
-   _DECL s_TBROWSE_34  = { "DEHILITE"       , 'O', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_33 };
-   _DECL s_TBROWSE_35  = { "FORCESTABLE"    , 'O', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_34 };
-   _DECL s_TBROWSE_36  = { "FORCESTABILIZE" , 'L', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_35 };
-   _DECL s_TBROWSE_37  = { "HILITE"         , 'O', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_36 };
-   _DECL s_TBROWSE_38  = { "INVALIDATE"     , 'O', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_37 };
-   _DECL s_TBROWSE_39  = { "REFRESHALL"     , 'O', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_38 };
-   _DECL s_TBROWSE_40  = { "REFRESHCURRENT" , 'O', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_39 };
-   _DECL s_TBROWSE_41  = { "STABILIZE"      , 'L', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_40 };
-   _DECL s_TBROWSE_42  = { "SETKEY"         , ' ', 2 , (BYTE*)"N\xa9"  , {NULL}   , NULL , &s_TBROWSE_41 };
-   _DECL s_TBROWSE_43  = { "APPLYKEY"       , ' ', 1 , (BYTE*)"N"      , {NULL}   , NULL , &s_TBROWSE_42 };
-   _DECL s_TBROWSE_44  = { "INITKEYS"       , ' ', 1 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_43 };
-   _DECL s_TBROWSE_45  = { "TAPPLYKEY"      , ' ', 2 , (BYTE*)"N\xa9"  , {NULL}   , NULL , &s_TBROWSE_44 };
-   _DECL s_TBROWSE_46  = { "HITTEST"        , ' ', 2 , (BYTE*)"NN"     , {NULL}   , NULL , &s_TBROWSE_45 };
-   _DECL s_TBROWSE_47  = { "SETSTYLE"       , ' ', 2 , (BYTE*)"N\xa6"  , {NULL}   , NULL , &s_TBROWSE_46 };
-   _DECL s_TBROWSE_48  = { "MGOTOYX"        , ' ', 2 , (BYTE*)"NN"     , {NULL}   , NULL , &s_TBROWSE_47 };
-   _DECL s_TBROWSE_49  = { "POSCURSOR"      , ' ', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_48 };
-   _DECL s_TBROWSE_50  = { "LEFTDETERMINE"  , ' ', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_49 };
-   _DECL s_TBROWSE_51  = { "DISPCELL"       , ' ', 3 , (BYTE*)"NN\xc2" , {NULL}   , NULL , &s_TBROWSE_50 };
-   _DECL s_TBROWSE_52  = { "HOWMANYCOL"     , ' ', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_51 };
-   _DECL s_TBROWSE_53  = { "REDRAWHEADERS"  , ' ', 1 , (BYTE*)"N"      , {NULL}   , NULL , &s_TBROWSE_52 };
-   _DECL s_TBROWSE_54  = { "MOVED"          , ' ', 0 , (BYTE*)NULL     , {NULL}   , NULL , &s_TBROWSE_53 };
-   _DECL s_TBROWSE_55  = { "WRITEMLINETEXT" , ' ', 4 , (BYTE*)"CNLC"   , {NULL}   , NULL , &s_TBROWSE_54 };
-   _DECL s_TBROWSE_56  = { "SETFROZENCOLS"  , ' ', 1 , (BYTE*)"N"      , {NULL}   , NULL , &s_TBROWSE_55 };
-   _DECL s_TBROWSE_57  = { "SETCOLUMNWIDTH" , ' ', 1 , (BYTE*)"O"      , {NULL}   , NULL , &s_TBROWSE_56 };
-   _DECL s_TBROWSE_58  = { "SETBORDER"      , ' ', 1 , (BYTE*)"C"      , {NULL}   , NULL , &s_TBROWSE_57 };
+   /*       Name     Ret  # of Prams  Param Types   Ret Class  Param Classes  Next
+      ---------------  ---  ----------  --------------------  ---------  -------------  --------------- */
+   _DECL s_TBROWSE_01   = { "BORDER", ' ', 1, ( BYTE * ) "\x7a", { NULL }, NULL, NULL };
+   _DECL s_TBROWSE_02   = { "COLORSPEC", ' ', 1, ( BYTE * ) "\x7a", { NULL }, NULL, &s_TBROWSE_01 };
+   _DECL s_TBROWSE_03   = { "NBOTTOM", ' ', 1, ( BYTE * ) "\xa8", { NULL }, NULL, &s_TBROWSE_02 };
+   _DECL s_TBROWSE_04   = { "NLEFT", ' ', 1, ( BYTE * ) "\xa8", { NULL }, NULL, &s_TBROWSE_03 };
+   _DECL s_TBROWSE_05   = { "NRIGHT", ' ', 1, ( BYTE * ) "\xa8", { NULL }, NULL, &s_TBROWSE_04 };
+   _DECL s_TBROWSE_06   = { "NTOP", ' ', 1, ( BYTE * ) "\xa8", { NULL }, NULL, &s_TBROWSE_05 };
+   _DECL s_TBROWSE_07   = { "COLSEP", ' ', 1, ( BYTE * ) "\x7a", { NULL }, NULL, &s_TBROWSE_06 };
+   _DECL s_TBROWSE_08   = { "FOOTSEP", ' ', 1, ( BYTE * ) "\x7a", { NULL }, NULL, &s_TBROWSE_07 };
+   _DECL s_TBROWSE_09   = { "HEADSEP", ' ', 1, ( BYTE * ) "\x7a", { NULL }, NULL, &s_TBROWSE_08 };
+   _DECL s_TBROWSE_10   = { "FREEZE", ' ', 1, ( BYTE * ) "\xa8", { NULL }, NULL, &s_TBROWSE_09 };
+   _DECL s_TBROWSE_11   = { "DOWN", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_10 };
+   _DECL s_TBROWSE_12   = { "END", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_11 };
+   _DECL s_TBROWSE_13   = { "GOBOTTOM", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_12 };
+   _DECL s_TBROWSE_14   = { "GOTOP", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_13 };
+   _DECL s_TBROWSE_15   = { "HOME", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_14 };
+   _DECL s_TBROWSE_16   = { "LEFT", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_15 };
+   _DECL s_TBROWSE_17   = { "PAGEDOWN", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_16 };
+   _DECL s_TBROWSE_18   = { "PAGEUP", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_17 };
+   _DECL s_TBROWSE_19   = { "PANEND", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_18 };
+   _DECL s_TBROWSE_20   = { "PANHOME", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_19 };
+   _DECL s_TBROWSE_21   = { "PANLEFT", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_20 };
+   _DECL s_TBROWSE_22   = { "PANRIGHT", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_21 };
+   _DECL s_TBROWSE_23   = { "RIGHT", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_22 };
+   _DECL s_TBROWSE_24   = { "UP", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_23 };
+   _DECL s_TBROWSE_25   = { "ADDCOLUMN", 'O', 1, ( BYTE * ) "O", { NULL }, NULL, &s_TBROWSE_24 };
+   _DECL s_TBROWSE_26   = { "DELCOLUMN", 'O', 1, ( BYTE * ) "N", { NULL }, NULL, &s_TBROWSE_25 };
+   _DECL s_TBROWSE_27   = { "INSCOLUMN", 'O', 2, ( BYTE * ) "NO", { NULL }, NULL, &s_TBROWSE_26 };
+   _DECL s_TBROWSE_28   = { "GETCOLUMN", 'O', 1, ( BYTE * ) "N", { NULL }, NULL, &s_TBROWSE_27 };
+   _DECL s_TBROWSE_29   = { "SETCOLUMN", 'O', 2, ( BYTE * ) "NO", { NULL }, NULL, &s_TBROWSE_28 };
+   _DECL s_TBROWSE_30   = { "COLWIDTH", ' ', 1, ( BYTE * ) "N", { NULL }, NULL, &s_TBROWSE_29 };
+   _DECL s_TBROWSE_31   = { "COLCOUNT", 'N', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_30 };
+   _DECL s_TBROWSE_32   = { "COLORRECT", 'O', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_31 };
+   _DECL s_TBROWSE_33   = { "CONFIGURE", 'O', 1, ( BYTE * ) "N", { NULL }, NULL, &s_TBROWSE_32 };
+   _DECL s_TBROWSE_34   = { "DEHILITE", 'O', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_33 };
+   _DECL s_TBROWSE_35   = { "FORCESTABLE", 'O', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_34 };
+   _DECL s_TBROWSE_36   = { "FORCESTABILIZE", 'L', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_35 };
+   _DECL s_TBROWSE_37   = { "HILITE", 'O', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_36 };
+   _DECL s_TBROWSE_38   = { "INVALIDATE", 'O', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_37 };
+   _DECL s_TBROWSE_39   = { "REFRESHALL", 'O', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_38 };
+   _DECL s_TBROWSE_40   = { "REFRESHCURRENT", 'O', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_39 };
+   _DECL s_TBROWSE_41   = { "STABILIZE", 'L', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_40 };
+   _DECL s_TBROWSE_42   = { "SETKEY", ' ', 2, ( BYTE * ) "N\xa9", { NULL }, NULL, &s_TBROWSE_41 };
+   _DECL s_TBROWSE_43   = { "APPLYKEY", ' ', 1, ( BYTE * ) "N", { NULL }, NULL, &s_TBROWSE_42 };
+   _DECL s_TBROWSE_44   = { "INITKEYS", ' ', 1, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_43 };
+   _DECL s_TBROWSE_45   = { "TAPPLYKEY", ' ', 2, ( BYTE * ) "N\xa9", { NULL }, NULL, &s_TBROWSE_44 };
+   _DECL s_TBROWSE_46   = { "HITTEST", ' ', 2, ( BYTE * ) "NN", { NULL }, NULL, &s_TBROWSE_45 };
+   _DECL s_TBROWSE_47   = { "SETSTYLE", ' ', 2, ( BYTE * ) "N\xa6", { NULL }, NULL, &s_TBROWSE_46 };
+   _DECL s_TBROWSE_48   = { "MGOTOYX", ' ', 2, ( BYTE * ) "NN", { NULL }, NULL, &s_TBROWSE_47 };
+   _DECL s_TBROWSE_49   = { "POSCURSOR", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_48 };
+   _DECL s_TBROWSE_50   = { "LEFTDETERMINE", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_49 };
+   _DECL s_TBROWSE_51   = { "DISPCELL", ' ', 3, ( BYTE * ) "NN\xc2", { NULL }, NULL, &s_TBROWSE_50 };
+   _DECL s_TBROWSE_52   = { "HOWMANYCOL", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_51 };
+   _DECL s_TBROWSE_53   = { "REDRAWHEADERS", ' ', 1, ( BYTE * ) "N", { NULL }, NULL, &s_TBROWSE_52 };
+   _DECL s_TBROWSE_54   = { "MOVED", ' ', 0, ( BYTE * ) NULL, { NULL }, NULL, &s_TBROWSE_53 };
+   _DECL s_TBROWSE_55   = { "WRITEMLINETEXT", ' ', 4, ( BYTE * ) "CNLC", { NULL }, NULL, &s_TBROWSE_54 };
+   _DECL s_TBROWSE_56   = { "SETFROZENCOLS", ' ', 1, ( BYTE * ) "N", { NULL }, NULL, &s_TBROWSE_55 };
+   _DECL s_TBROWSE_57   = { "SETCOLUMNWIDTH", ' ', 1, ( BYTE * ) "O", { NULL }, NULL, &s_TBROWSE_56 };
+   _DECL s_TBROWSE_58   = { "SETBORDER", ' ', 1, ( BYTE * ) "C", { NULL }, NULL, &s_TBROWSE_57 };
 
 
    /* TODO: Finish definition of GET, and add definitions for TBROWSE. */
@@ -1741,9 +1739,9 @@ static void hb_compDeclaredInit( void )
    /* ------- */
 
    /* First (bottom) Method */
-   s_ERROR.pMethod     = &s_ERROR_14;
+   s_ERROR.pMethod      = &s_ERROR_14;
    /* Last (top) Method. */
-   s_ERROR.pLastMethod = &s_ERROR_01;
+   s_ERROR.pLastMethod  = &s_ERROR_01;
 
    /* ------- */
 
@@ -1755,26 +1753,26 @@ static void hb_compDeclaredInit( void )
    /* ------- */
 
    /* First (bottom) Method */
-   s_TBCOLUMN.pMethod     = &s_TBCOLUMN_12; /* Change to BOTTOM Method. */
+   s_TBCOLUMN.pMethod      = &s_TBCOLUMN_12; /* Change to BOTTOM Method. */
    /* Last (top) Method. */
-   s_TBCOLUMN.pLastMethod = &s_TBCOLUMN_01;
+   s_TBCOLUMN.pLastMethod  = &s_TBCOLUMN_01;
 
    /* ------- */
 
    /* First (bottom) Method */
-   s_TBROWSE.pMethod     = &s_TBROWSE_58; /* Change to BOTTOM Method. */
+   s_TBROWSE.pMethod       = &s_TBROWSE_58; /* Change to BOTTOM Method. */
    /* Last (top) Method. */
-   s_TBROWSE.pLastMethod = &s_TBROWSE_01;
+   s_TBROWSE.pLastMethod   = &s_TBROWSE_01;
 
    /* ------- */
 
-   hb_comp_pFirstDeclared   = &s_265; /* Change to BOTTOM Function. */
-   hb_comp_pLastDeclared    = &s_001;
-   hb_comp_pReleaseDeclared = s_001.pNext;
+   hb_comp_pFirstDeclared     = &s_265; /* Change to BOTTOM Function. */
+   hb_comp_pLastDeclared      = &s_001;
+   hb_comp_pReleaseDeclared   = s_001.pNext;
 
-   hb_comp_pFirstClass      = &s_TBROWSE;
-   hb_comp_pLastClass       = &s_ERROR;
-   hb_comp_pReleaseClass    = s_ERROR.pNext;
+   hb_comp_pFirstClass        = &s_TBROWSE;
+   hb_comp_pLastClass         = &s_ERROR;
+   hb_comp_pReleaseClass      = s_ERROR.pNext;
 }
 
 PCOMDECLARED hb_compDeclaredAdd( char * szDeclaredName )
@@ -1788,35 +1786,35 @@ PCOMDECLARED hb_compDeclaredAdd( char * szDeclaredName )
 
    /*printf( "\nDeclaring Function: %s\n", szDeclaredName, NULL );*/
 
-   if ( ( pDeclared = hb_compDeclaredFind( szDeclaredName ) ) != NULL )
+   if( ( pDeclared = hb_compDeclaredFind( szDeclaredName ) ) != NULL )
    {
       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_DUP_DECLARATION, "Function", szDeclaredName );
 
       /* Last declaration will take effect. */
-      pDeclared->cType = ' '; /* Not known yet */
-      pDeclared->cParamTypes = NULL;
-      pDeclared->iParamCount = 0;
-      pDeclared->pParamClasses = NULL;
+      pDeclared->cType           = ' '; /* Not known yet */
+      pDeclared->cParamTypes     = NULL;
+      pDeclared->iParamCount     = 0;
+      pDeclared->pParamClasses   = NULL;
 
       return pDeclared;
    }
 
-   pDeclared = ( PCOMDECLARED ) hb_xgrab( sizeof( COMDECLARED ) );
+   pDeclared                     = ( PCOMDECLARED ) hb_xgrab( sizeof( COMDECLARED ) );
 
-   pDeclared->szName = szDeclaredName;
-   pDeclared->cType = ' '; /* Not known yet */
-   pDeclared->cParamTypes = NULL;
-   pDeclared->iParamCount = 0;
-   pDeclared->pParamClasses = NULL;
-   pDeclared->pNext = NULL;
+   pDeclared->szName             = szDeclaredName;
+   pDeclared->cType              = ' '; /* Not known yet */
+   pDeclared->cParamTypes        = NULL;
+   pDeclared->iParamCount        = 0;
+   pDeclared->pParamClasses      = NULL;
+   pDeclared->pNext              = NULL;
 
-   hb_comp_pLastDeclared->pNext = pDeclared;
-   hb_comp_pLastDeclared = pDeclared;
+   hb_comp_pLastDeclared->pNext  = pDeclared;
+   hb_comp_pLastDeclared         = pDeclared;
 
    return pDeclared;
 }
 
-PCOMSYMBOL hb_compSymbolAdd( char * szSymbolName, USHORT * pwPos, void *Namespace, int iFlags )
+PCOMSYMBOL hb_compSymbolAdd( char * szSymbolName, USHORT * pwPos, void * Namespace, int iFlags )
 {
    PCOMSYMBOL pSym;
 
@@ -1831,8 +1829,8 @@ PCOMSYMBOL hb_compSymbolAdd( char * szSymbolName, USHORT * pwPos, void *Namespac
 
       if( pSym )
       {
-         pSym->iFlags |= iFlags;
-         pSym->cScope |= ( iFlags & ( HB_FS_PUBLIC | HB_FS_STATIC ) );
+         pSym->iFlags   |= iFlags;
+         pSym->cScope   |= ( iFlags & ( HB_FS_PUBLIC | HB_FS_STATIC ) );
 
          // Can never be both!
          assert( ( pSym->cScope & ( HB_FS_PUBLIC | HB_FS_STATIC ) ) != ( HB_FS_PUBLIC | HB_FS_STATIC ) );
@@ -1840,11 +1838,11 @@ PCOMSYMBOL hb_compSymbolAdd( char * szSymbolName, USHORT * pwPos, void *Namespac
          return pSym;
       }
 
-      pSym = ( PCOMSYMBOL ) hb_xgrab( sizeof( COMSYMBOL ) );
+      pSym           = ( PCOMSYMBOL ) hb_xgrab( sizeof( COMSYMBOL ) );
 
-      pSym->szName    = szSymbolName;
-      pSym->cType     = hb_comp_cVarType;
-      pSym->iFlags    = iFlags;
+      pSym->szName   = szSymbolName;
+      pSym->cType    = hb_comp_cVarType;
+      pSym->iFlags   = iFlags;
 
       if( iFlags & SYMF_FUNCALL )
       {
@@ -1871,25 +1869,25 @@ PCOMSYMBOL hb_compSymbolAdd( char * szSymbolName, USHORT * pwPos, void *Namespac
          assert( 0 );
       }
 
-      pSym->Namespace = Namespace;
-      pSym->pNext     = NULL;
+      pSym->Namespace   = Namespace;
+      pSym->pNext       = NULL;
 
       if( ! hb_comp_symbols.iCount )
       {
-         hb_comp_symbols.pFirst = pSym;
-         hb_comp_symbols.pLast  = pSym;
+         hb_comp_symbols.pFirst  = pSym;
+         hb_comp_symbols.pLast   = pSym;
       }
       else
       {
          ( ( PCOMSYMBOL ) hb_comp_symbols.pLast )->pNext = pSym;
-         hb_comp_symbols.pLast = pSym;
+         hb_comp_symbols.pLast                           = pSym;
       }
 
       hb_comp_symbols.iCount++;
 
       if( pwPos )
       {
-         *pwPos = (USHORT)( hb_comp_symbols.iCount -1 ); /* position number starts form 0 */
+         *pwPos = ( USHORT ) ( hb_comp_symbols.iCount - 1 ); /* position number starts form 0 */
       }
    }
    else
@@ -1909,34 +1907,34 @@ static PFUNCTION hb_compFunctionNew( char * szName, HB_SYMBOLSCOPE cScope )
 
    //printf( "Function: %s\n", szName );
 
-   pFunc                  = ( PFUNCTION ) hb_xgrab( sizeof( _FUNC ) );
-   pFunc->szName          = szName;
-   pFunc->pNamespace      = hb_comp_Namespaces.pCurrent;
-   pFunc->cScope          = cScope;
-   pFunc->pLocals         = NULL;
-   pFunc->pStatics        = NULL;
-   pFunc->pFields         = NULL;
-   pFunc->pMemvars        = NULL;
-   pFunc->pPrivates       = NULL;
-   pFunc->pEnums          = NULL;
-   pFunc->pCode           = NULL;
-   pFunc->lPCodeSize      = 0;
-   pFunc->lPCodePos       = 0;
-   pFunc->pNext           = NULL;
-   pFunc->wParamCount     = 0;
-   pFunc->wParamNum       = 0;
-   pFunc->iStaticsBase    = hb_comp_iStaticCnt;
-   pFunc->pOwner          = NULL;
-   pFunc->bFlags          = 0;
-   pFunc->iNOOPs          = 0;
-   pFunc->iJumps          = 0;
-   pFunc->pNOOPs          = NULL;
-   pFunc->pJumps          = NULL;
-   pFunc->pStack          = NULL;
-   pFunc->iStackSize      = 0;
-   pFunc->iStackIndex     = 0;
-   pFunc->iStackFunctions = 0;
-   pFunc->iStackClasses   = 0;
+   pFunc                   = ( PFUNCTION ) hb_xgrab( sizeof( _FUNC ) );
+   pFunc->szName           = szName;
+   pFunc->pNamespace       = hb_comp_Namespaces.pCurrent;
+   pFunc->cScope           = cScope;
+   pFunc->pLocals          = NULL;
+   pFunc->pStatics         = NULL;
+   pFunc->pFields          = NULL;
+   pFunc->pMemvars         = NULL;
+   pFunc->pPrivates        = NULL;
+   pFunc->pEnums           = NULL;
+   pFunc->pCode            = NULL;
+   pFunc->lPCodeSize       = 0;
+   pFunc->lPCodePos        = 0;
+   pFunc->pNext            = NULL;
+   pFunc->wParamCount      = 0;
+   pFunc->wParamNum        = 0;
+   pFunc->iStaticsBase     = hb_comp_iStaticCnt;
+   pFunc->pOwner           = NULL;
+   pFunc->bFlags           = 0;
+   pFunc->iNOOPs           = 0;
+   pFunc->iJumps           = 0;
+   pFunc->pNOOPs           = NULL;
+   pFunc->pJumps           = NULL;
+   pFunc->pStack           = NULL;
+   pFunc->iStackSize       = 0;
+   pFunc->iStackIndex      = 0;
+   pFunc->iStackFunctions  = 0;
+   pFunc->iStackClasses    = 0;
 
    return pFunc;
 }
@@ -1945,14 +1943,14 @@ static PINLINE hb_compInlineNew( char * szName )
 {
    PINLINE pInline;
 
-   pInline = ( PINLINE ) hb_xgrab( sizeof( _INLINE ) );
+   pInline              = ( PINLINE ) hb_xgrab( sizeof( _INLINE ) );
 
-   pInline->szName     = szName;
-   pInline->pCode      = NULL;
-   pInline->lPCodeSize = 0;
-   pInline->pNext      = NULL;
-   pInline->szFileName = hb_strdup( hb_pp_fileName( hb_comp_PP ) );
-   pInline->iLine      = hb_comp_iLine - 1;
+   pInline->szName      = szName;
+   pInline->pCode       = NULL;
+   pInline->lPCodeSize  = 0;
+   pInline->pNext       = NULL;
+   pInline->szFileName  = hb_strdup( hb_pp_fileName( hb_comp_PP ) );
+   pInline->iLine       = hb_comp_iLine - 1;
 
    return pInline;
 }
@@ -1965,28 +1963,28 @@ static PINLINE hb_compInlineNew( char * szName )
  */
 void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
 {
-   PCOMSYMBOL   pSym;
-   PFUNCTION pFunc;
-   char * szFunction;
-   PNAMESPACE pNamespace = NULL;
+   PCOMSYMBOL  pSym;
+   PFUNCTION   pFunc;
+   char *      szFunction;
+   PNAMESPACE  pNamespace = NULL;
 
    hb_compFinalizeFunction();    /* fix all previous function returns offsets */
 
    if( cScope & HB_FS_INITEXIT & ~HB_FS_STATIC )
    {
-      int iLen = strlen( szFunName );
-      char *sDecorated = ( char * ) hb_xgrab( iLen + 2 );
+      HB_SIZE  iLen        = strlen( szFunName );
+      char *   sDecorated  = ( char * ) hb_xgrab( iLen + 2 );
 
       hb_xstrcpy( sDecorated, szFunName, 0 );
-      szFunName = sDecorated;
+      szFunName               = sDecorated;
 
-      szFunName[ iLen ] = '$';
-      szFunName[ iLen + 1 ] = '\0';
+      szFunName[ iLen ]       = '$';
+      szFunName[ iLen + 1 ]   = '\0';
 
-      szFunName = hb_compIdentifierNew( szFunName, FALSE );
+      szFunName               = hb_compIdentifierNew( szFunName, FALSE );
    }
 
-   pFunc = hb_compFunctionFind( szFunName, (void *) hb_comp_Namespaces.pCurrent, NSF_MEMBER );
+   pFunc = hb_compFunctionFind( szFunName, ( void * ) hb_comp_Namespaces.pCurrent, NSF_MEMBER );
 
    if( pFunc )
    {
@@ -2000,10 +1998,10 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
 
    if( hb_comp_Namespaces.pCurrent == NULL )
    {
-#if(!defined( HB_RESERVED_OFF ))
+#if ( ! defined( HB_RESERVED_OFF ) )
       szFunction = hb_compReservedName( szFunName );
 
-      if( szFunction && !( hb_comp_functions.iCount== 0 && !hb_comp_bStartProc ) )
+      if( szFunction && ! ( hb_comp_functions.iCount == 0 && ! hb_comp_bStartProc ) )
       {
          /* We are ignoring it when it is the name of PRG file and we are
           * not creating implicit starting procedure
@@ -2019,28 +2017,28 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
 
    hb_comp_iFunctionCnt++;
 
-   if( szFunName[0] )
+   if( szFunName[ 0 ] )
    {
-       if( hb_comp_Namespaces.pCurrent == NULL ||
-           ( cScope & ( HB_FS_INIT | HB_FS_EXIT ) & ~HB_FS_STATIC ) != 0 ||
-           ( ( hb_comp_Namespaces.pCurrent->type & ( ( NSTYPE_RUNTIME | NSTYPE_OPTIONAL ) & ~NSTYPE_SPACE ) ) != 0 &&
-             ( cScope & HB_FS_STATIC ) == 0 ) )
-       {
-          if( hb_comp_Namespaces.pCurrent )
-          {
-             pSym = hb_compSymbolAdd( szFunName, NULL, (void *) hb_comp_Namespaces.pCurrent, SYMF_NS_EXPLICITPTR | ( cScope & ( HB_FS_PUBLIC | HB_FS_STATIC ) ) );
-          }
-          else
-          {
-             pSym = hb_compSymbolAdd( szFunName, NULL, (void *) hb_comp_Namespaces.pCurrent, SYMF_FUNCALL | ( cScope & ( HB_FS_PUBLIC | HB_FS_STATIC ) ) );
-          }
+      if( hb_comp_Namespaces.pCurrent == NULL ||
+          ( cScope & ( HB_FS_INIT | HB_FS_EXIT ) & ~HB_FS_STATIC ) != 0 ||
+          ( ( hb_comp_Namespaces.pCurrent->type & ( ( NSTYPE_RUNTIME | NSTYPE_OPTIONAL ) & ~NSTYPE_SPACE ) ) != 0 &&
+            ( cScope & HB_FS_STATIC ) == 0 ) )
+      {
+         if( hb_comp_Namespaces.pCurrent )
+         {
+            pSym = hb_compSymbolAdd( szFunName, NULL, ( void * ) hb_comp_Namespaces.pCurrent, SYMF_NS_EXPLICITPTR | ( cScope & ( HB_FS_PUBLIC | HB_FS_STATIC ) ) );
+         }
+         else
+         {
+            pSym = hb_compSymbolAdd( szFunName, NULL, ( void * ) hb_comp_Namespaces.pCurrent, SYMF_FUNCALL | ( cScope & ( HB_FS_PUBLIC | HB_FS_STATIC ) ) );
+         }
 
-          pSym->cScope |= ( HB_FS_LOCAL | cScope );
-       }
+         pSym->cScope |= ( HB_FS_LOCAL | cScope );
+      }
    }
 
-   pFunc = hb_compFunctionNew( szFunName, cScope );
-   pFunc->bFlags |= (BYTE)iType;
+   pFunc          = hb_compFunctionNew( szFunName, cScope );
+   pFunc->bFlags  |= ( BYTE ) iType;
 
    if( pNamespace )
    {
@@ -2049,34 +2047,34 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
 
    if( hb_comp_functions.iCount == 0 )
    {
-      hb_comp_functions.pFirst = pFunc;
-      hb_comp_functions.pLast  = pFunc;
+      hb_comp_functions.pFirst   = pFunc;
+      hb_comp_functions.pLast    = pFunc;
    }
    else
    {
-      hb_comp_functions.pLast->pNext = pFunc;
-      hb_comp_functions.pLast = pFunc;
+      hb_comp_functions.pLast->pNext   = pFunc;
+      hb_comp_functions.pLast          = pFunc;
    }
 
    hb_comp_functions.iCount++;
 
-   hb_comp_ulLastLinePos = 0;   /* optimization of line numbers opcode generation */
-   hb_comp_ulLastOffsetPos = 0;   /* optimization of line numbers opcode generation */
+   hb_comp_ulLastLinePos   = 0;                       /* optimization of line numbers opcode generation */
+   hb_comp_ulLastOffsetPos = 0;                       /* optimization of line numbers opcode generation */
 
-   hb_compGenPCode3( HB_P_FRAME, 0, 0, ( BOOL ) 0 );   /* frame for locals and parameters */
-   hb_compGenPCode3( HB_P_SFRAME, 0, 0, ( BOOL ) 0 );     /* frame for statics variables */
+   hb_compGenPCode3( HB_P_FRAME, 0, 0, ( BOOL ) 0 );  /* frame for locals and parameters */
+   hb_compGenPCode3( HB_P_SFRAME, 0, 0, ( BOOL ) 0 ); /* frame for statics variables */
 
    hb_comp_iBaseLine = 0;
 
    if( hb_comp_bDebugInfo )
    {
-      char szFileName[ HB_PATH_MAX ];
-      PHB_FNAME hb_FileName;
+      char        szFileName[ HB_PATH_MAX ];
+      PHB_FNAME   hb_FileName;
 
-      hb_FileName = hb_fsFNameSplit( hb_pp_fileName( hb_comp_PP ) );
-      hb_FileName->szPath = NULL;
+      hb_FileName          = hb_fsFNameSplit( hb_pp_fileName( hb_comp_PP ) );
+      hb_FileName->szPath  = NULL;
       hb_fsFNameMerge( szFileName, hb_FileName );
-      hb_xfree( (void *) hb_FileName );
+      hb_xfree( ( void * ) hb_FileName );
       hb_compGenModuleName( szFileName, szFunName );
    }
 
@@ -2085,26 +2083,26 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
 
 PINLINE hb_compInlineAdd( char * szFunName )
 {
-   PINLINE pInline;
-   PCOMSYMBOL   pSym;
+   PINLINE     pInline;
+   PCOMSYMBOL  pSym;
 
    if( szFunName )
    {
-      pSym = hb_compSymbolAdd( szFunName, NULL, NULL, SYMF_FUNCALL | SYMF_STATIC );
-      pSym->cScope |= HB_FS_LOCAL;
+      pSym           = hb_compSymbolAdd( szFunName, NULL, NULL, SYMF_FUNCALL | SYMF_STATIC );
+      pSym->cScope   |= HB_FS_LOCAL;
    }
 
    pInline = hb_compInlineNew( szFunName );
 
    if( hb_comp_inlines.iCount == 0 )
    {
-      hb_comp_inlines.pFirst = pInline;
-      hb_comp_inlines.pLast  = pInline;
+      hb_comp_inlines.pFirst  = pInline;
+      hb_comp_inlines.pLast   = pInline;
    }
    else
    {
-      hb_comp_inlines.pLast->pNext = pInline;
-      hb_comp_inlines.pLast = pInline;
+      hb_comp_inlines.pLast->pNext  = pInline;
+      hb_comp_inlines.pLast         = pInline;
    }
 
    hb_comp_inlines.iCount++;
@@ -2118,7 +2116,7 @@ void hb_compAnnounce( char * szFunName )
 {
    PFUNCTION pFunc;
 
-   pFunc = hb_compFunctionFind( szFunName, (void *) hb_comp_Namespaces.pCurrent, NSF_MEMBER );
+   pFunc = hb_compFunctionFind( szFunName, ( void * ) hb_comp_Namespaces.pCurrent, NSF_MEMBER );
 
    if( pFunc )
    {
@@ -2141,18 +2139,18 @@ void hb_compAnnounce( char * szFunName )
          pSym->cScope |= HB_FS_LOCAL;
       }
 
-      pFunc = hb_compFunctionNew( szFunName, HB_FS_PUBLIC | HB_FS_LOCAL );
-      pFunc->bFlags |= FUN_PROCEDURE;
+      pFunc          = hb_compFunctionNew( szFunName, HB_FS_PUBLIC | HB_FS_LOCAL );
+      pFunc->bFlags  |= FUN_PROCEDURE;
 
       if( hb_comp_functions.iCount == 0 )
       {
-         hb_comp_functions.pFirst = pFunc;
-         hb_comp_functions.pLast  = pFunc;
+         hb_comp_functions.pFirst   = pFunc;
+         hb_comp_functions.pLast    = pFunc;
       }
       else
       {
-         hb_comp_functions.pLast->pNext = pFunc;
-         hb_comp_functions.pLast = pFunc;
+         hb_comp_functions.pLast->pNext   = pFunc;
+         hb_comp_functions.pLast          = pFunc;
       }
 
       hb_comp_functions.iCount++;
@@ -2167,12 +2165,12 @@ void hb_compAnnounce( char * szFunName )
 /* NOTE: Names of variables and functions are released in hbident.c on exit */
 PFUNCTION hb_compFunctionKill( PFUNCTION pFunc )
 {
-   PFUNCTION pNext = pFunc->pNext;
-   PVAR pVar;
+   PFUNCTION   pNext = pFunc->pNext;
+   PVAR        pVar;
 
    while( pFunc->pLocals )
    {
-      pVar = pFunc->pLocals;
+      pVar           = pFunc->pLocals;
       pFunc->pLocals = pVar->pNext;
 
       hb_xfree( ( void * ) pVar );
@@ -2180,15 +2178,15 @@ PFUNCTION hb_compFunctionKill( PFUNCTION pFunc )
 
    while( pFunc->pStatics )
    {
-      pVar = pFunc->pStatics;
-      pFunc->pStatics = pVar->pNext;
+      pVar              = pFunc->pStatics;
+      pFunc->pStatics   = pVar->pNext;
 
       hb_xfree( ( void * ) pVar );
    }
 
    while( pFunc->pFields )
    {
-      pVar = pFunc->pFields;
+      pVar           = pFunc->pFields;
       pFunc->pFields = pVar->pNext;
 
       hb_xfree( ( void * ) pVar );
@@ -2196,16 +2194,16 @@ PFUNCTION hb_compFunctionKill( PFUNCTION pFunc )
 
    while( pFunc->pMemvars )
    {
-      pVar = pFunc->pMemvars;
-      pFunc->pMemvars = pVar->pNext;
+      pVar              = pFunc->pMemvars;
+      pFunc->pMemvars   = pVar->pNext;
 
       hb_xfree( ( void * ) pVar );
    }
 
    while( pFunc->pPrivates )
    {
-      pVar = pFunc->pPrivates;
-      pFunc->pPrivates = pVar->pNext;
+      pVar              = pFunc->pPrivates;
+      pFunc->pPrivates  = pVar->pNext;
 
       hb_xfree( ( void * ) pVar );
    }
@@ -2272,7 +2270,7 @@ void hb_compGenEndWithObject( void )
       hb_comp_wWithObjCounter--;
 }
 
-PFUNCALL hb_compFunCallFind( char * szFuncName, void *Namespace, int iFlags ) /* returns a previously called defined function */
+PFUNCALL hb_compFunCallFind( char * szFuncName, void * Namespace, int iFlags ) /* returns a previously called defined function */
 {
    PFUNCALL pFunCall = hb_comp_funcalls.pFirst;
 
@@ -2291,7 +2289,7 @@ PFUNCALL hb_compFunCallFind( char * szFuncName, void *Namespace, int iFlags ) /*
    return NULL;
 }
 
-PFUNCTION hb_compFunctionFind( char * szFunctionName, void *Namespace, int iFlags ) /* returns a previously defined function */
+PFUNCTION hb_compFunctionFind( char * szFunctionName, void * Namespace, int iFlags ) /* returns a previously defined function */
 {
    PFUNCTION pFunc = hb_comp_functions.pFirst;
 
@@ -2305,21 +2303,21 @@ PFUNCTION hb_compFunctionFind( char * szFunctionName, void *Namespace, int iFlag
             {
                return pFunc;
             }
-            else if( pFunc->pNamespace && pFunc->pNamespace->szFullPath == (char *) Namespace )
+            else if( pFunc->pNamespace && pFunc->pNamespace->szFullPath == ( char * ) Namespace )
             {
                return pFunc;
             }
          }
          else if( ( iFlags & NSF_EXPLICITPTR ) == NSF_EXPLICITPTR )
          {
-            if( pFunc->pNamespace == (PNAMESPACE) Namespace )
+            if( pFunc->pNamespace == ( PNAMESPACE ) Namespace )
             {
                return pFunc;
             }
          }
          else if( ( iFlags & NSF_MEMBER ) == NSF_MEMBER )
          {
-            if( pFunc->pNamespace == (PNAMESPACE) Namespace )
+            if( pFunc->pNamespace == ( PNAMESPACE ) Namespace )
             {
                return pFunc;
             }
@@ -2353,26 +2351,26 @@ PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pCallerNames
       {
          if( ( pMember->type & NSTYPE_EXTERNAL ) == NSTYPE_EXTERNAL )
          {
-            if( pSymbol  )
+            if( pSymbol )
             {
-               pSymbol->Namespace = (void *) pNamespace;
-               pSymbol->iFlags &= ~SYMF_NS_RESOLVE;
-               pSymbol->iFlags |= SYMF_NS_EXPLICITPTR;
-               pSymbol->cScope |= ( HB_FS_INDIRECT | HB_FS_PUBLIC );
+               pSymbol->Namespace   = ( void * ) pNamespace;
+               pSymbol->iFlags      &= ~SYMF_NS_RESOLVE;
+               pSymbol->iFlags      |= SYMF_NS_EXPLICITPTR;
+               pSymbol->cScope      |= ( HB_FS_INDIRECT | HB_FS_PUBLIC );
 
                //REVIEW: pSymbol->cScope |= HB_FS_LOCAL;
             }
 
-            return (PFUNCTION) 1;
+            return ( PFUNCTION ) 1;
          }
          else
          {
-            if( pSymbol  )
+            if( pSymbol )
             {
-               pSymbol->Namespace = (void *) pNamespace;
-               pSymbol->iFlags &= ~SYMF_NS_RESOLVE;
-               pSymbol->iFlags |= SYMF_NS_EXPLICITPTR;
-               pSymbol->cScope |= HB_FS_LOCAL;
+               pSymbol->Namespace   = ( void * ) pNamespace;
+               pSymbol->iFlags      &= ~SYMF_NS_RESOLVE;
+               pSymbol->iFlags      |= SYMF_NS_EXPLICITPTR;
+               pSymbol->cScope      |= HB_FS_LOCAL;
 
                if( ( pSymbol->cScope & ( HB_FS_PUBLIC | HB_FS_STATIC ) ) == 0 )
                {
@@ -2411,9 +2409,9 @@ PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pCallerNames
          pSymbol->cScope |= HB_FS_PUBLIC;
       }
 
-      pSymbol->Namespace = NULL;
-      pSymbol->iFlags &= ~SYMF_NS_RESOLVE;
-      pSymbol->iFlags |= SYMF_FUNCALL;
+      pSymbol->Namespace   = NULL;
+      pSymbol->iFlags      &= ~SYMF_NS_RESOLVE;
+      pSymbol->iFlags      |= SYMF_FUNCALL;
    }
 
    return NULL;
@@ -2447,7 +2445,7 @@ PINLINE hb_compInlineFind( char * szFunctionName )
 /* return variable using its order after final fixing */
 PVAR hb_compLocalVariableFind( PFUNCTION pFunc, USHORT wVar )
 {
-   if( pFunc->wParamCount && !(pFunc->bFlags & FUN_USES_LOCAL_PARAMS) )
+   if( pFunc->wParamCount && ! ( pFunc->bFlags & FUN_USES_LOCAL_PARAMS ) )
    {
       wVar -= pFunc->wParamCount;
    }
@@ -2483,9 +2481,9 @@ USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName ) /* returns the orde
             pVars->iUsed |= VU_USED;
          }
          /*
-           else
-           Handled by hb_compStrongType()
-         */
+            else
+            Handled by hb_compStrongType()
+          */
 
          return wVar;
       }
@@ -2507,8 +2505,8 @@ USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName ) /* returns the orde
 
 int hb_compLocalGetPos( char * szVarName ) /* returns the order + 1 of a variable if defined or zero */
 {
-   int iVar;
-   PFUNCTION pFunc = hb_comp_functions.pLast;
+   int         iVar;
+   PFUNCTION   pFunc = hb_comp_functions.pLast;
 
    if( pFunc->szName )
    {
@@ -2531,8 +2529,8 @@ int hb_compLocalGetPos( char * szVarName ) /* returns the order + 1 of a variabl
           * we have to check the list of nested codeblocks up to a function
           * where the codeblock is defined
           */
-         PFUNCTION pOutBlock = pFunc;   /* the outermost codeblock */
-         BOOL bStatic;
+         PFUNCTION   pOutBlock = pFunc; /* the outermost codeblock */
+         BOOL        bStatic;
 
          pFunc = pFunc->pOwner;
 
@@ -2545,8 +2543,8 @@ int hb_compLocalGetPos( char * szVarName ) /* returns the order + 1 of a variabl
                /* we are in a codeblock used to initialize a static variable -
                 * skip to a function where this static variable was declared
                 */
-               pFunc = pFunc->pOwner;
-               bStatic = TRUE;
+               pFunc    = pFunc->pOwner;
+               bStatic  = TRUE;
             }
 
             iVar = hb_compVariableGetPos( pFunc->pLocals, szVarName );
@@ -2605,17 +2603,17 @@ int hb_compLocalGetPos( char * szVarName ) /* returns the order + 1 of a variabl
                      /* this variable was not referenced yet - add it to the list */
                      PVAR pVar;
 
-                     pVar = ( PVAR ) hb_xgrab( sizeof( VAR ) );
-                     pVar->szName = szVarName;
-                     pVar->cType = ' ';
-                     pVar->iUsed = VU_NOT_USED;
-                     pVar->pNext  = NULL;
-                     pVar->iDeclLine = hb_comp_iLine - 1;
+                     pVar              = ( PVAR ) hb_xgrab( sizeof( VAR ) );
+                     pVar->szName      = szVarName;
+                     pVar->cType       = ' ';
+                     pVar->iUsed       = VU_NOT_USED;
+                     pVar->pNext       = NULL;
+                     pVar->iDeclLine   = hb_comp_iLine - 1;
 
                      /* Use negative order to signal that we are accessing a local
                       * variable from a codeblock
                       */
-                     iVar = -1;  /* first variable */
+                     iVar              = -1; /* first variable */
 
                      if( ! pOutBlock->pStatics )
                      {
@@ -2641,8 +2639,8 @@ int hb_compLocalGetPos( char * szVarName ) /* returns the order + 1 of a variabl
                }
             }
 
-            pOutBlock = pFunc;
-            pFunc = pFunc->pOwner;
+            pOutBlock   = pFunc;
+            pFunc       = pFunc->pOwner;
          }
       }
    }
@@ -2774,10 +2772,10 @@ PCOMDECLARED hb_compDeclaredFind( char * szDeclaredName )
    return NULL;
 }
 
-PCOMSYMBOL hb_compSymbolFind( char * szSymbolName, USHORT * pwPos, void *Namespace, int iFlags )
+PCOMSYMBOL hb_compSymbolFind( char * szSymbolName, USHORT * pwPos, void * Namespace, int iFlags )
 {
-   PCOMSYMBOL pSym;
-   USHORT wCnt = 0;
+   PCOMSYMBOL  pSym;
+   USHORT      wCnt = 0;
 
    if( pwPos )
    {
@@ -2850,11 +2848,11 @@ PCOMSYMBOL hb_compSymbolFind( char * szSymbolName, USHORT * pwPos, void *Namespa
 
 /* returns a symbol based on its index on the symbol table
  * index starts from 0
-*/
+ */
 PCOMSYMBOL hb_compSymbolGetPos( USHORT wSymbol )
 {
-   PCOMSYMBOL pSym = hb_comp_symbols.pFirst;
-   USHORT w = 0;
+   PCOMSYMBOL  pSym  = hb_comp_symbols.pFirst;
+   USHORT      w     = 0;
 
    while( w++ < wSymbol && pSym->pNext )
    {
@@ -2866,8 +2864,8 @@ PCOMSYMBOL hb_compSymbolGetPos( USHORT wSymbol )
 
 USHORT hb_compFunctionGetPos( char * szFunctionName ) /* return 0 if not found or order + 1 */
 {
-   PFUNCTION pFunc = hb_comp_functions.pFirst;
-   USHORT wFunction = (USHORT) hb_comp_bStartProc;
+   PFUNCTION   pFunc       = hb_comp_functions.pFirst;
+   USHORT      wFunction   = ( USHORT ) hb_comp_bStartProc;
 
    while( pFunc )
    {
@@ -2892,42 +2890,42 @@ USHORT hb_compFunctionGetPos( char * szFunctionName ) /* return 0 if not found o
    return 0;
 }
 
-void hb_compNOOPadd( PFUNCTION pFunc, ULONG ulPos )
+void hb_compNOOPadd( PFUNCTION pFunc, HB_SIZE ulPos )
 {
    pFunc->iNOOPs++;
 
    if( pFunc->pNOOPs )
    {
-      pFunc->pNOOPs = ( ULONG * ) hb_xrealloc( pFunc->pNOOPs, sizeof( ULONG ) * pFunc->iNOOPs );
-      pFunc->pNOOPs[ pFunc->iNOOPs - 1 ] = ulPos;
+      pFunc->pNOOPs                       = ( HB_SIZE * ) hb_xrealloc( pFunc->pNOOPs, sizeof( HB_SIZE ) * pFunc->iNOOPs );
+      pFunc->pNOOPs[ pFunc->iNOOPs - 1 ]  = ulPos;
    }
    else
    {
-      pFunc->pNOOPs = ( ULONG * ) hb_xgrab( sizeof( ULONG ) );
-      pFunc->pNOOPs[ pFunc->iNOOPs - 1 ] = ulPos;
+      pFunc->pNOOPs                       = ( HB_SIZE * ) hb_xgrab( sizeof( HB_SIZE ) );
+      pFunc->pNOOPs[ pFunc->iNOOPs - 1 ]  = ulPos;
    }
 }
 
 void hb_compPrepareOptimize( void )
 {
-   if( HB_COMP_ISSUPPORTED(HB_COMPFLAG_OPTJUMP) )
+   if( HB_COMP_ISSUPPORTED( HB_COMPFLAG_OPTJUMP ) )
    {
       hb_comp_functions.pLast->iJumps++;
 
       if( hb_comp_functions.pLast->pJumps )
       {
-         hb_comp_functions.pLast->pJumps = ( ULONG * ) hb_xrealloc( hb_comp_functions.pLast->pJumps, sizeof( ULONG ) * hb_comp_functions.pLast->iJumps );
-         hb_comp_functions.pLast->pJumps[ hb_comp_functions.pLast->iJumps - 1 ] = ( ULONG ) ( hb_comp_functions.pLast->lPCodePos - 4 );
+         hb_comp_functions.pLast->pJumps                                         = ( HB_SIZE * ) hb_xrealloc( hb_comp_functions.pLast->pJumps, sizeof( HB_SIZE ) * hb_comp_functions.pLast->iJumps );
+         hb_comp_functions.pLast->pJumps[ hb_comp_functions.pLast->iJumps - 1 ]  = ( HB_SIZE ) ( hb_comp_functions.pLast->lPCodePos - 4 );
       }
       else
       {
-         hb_comp_functions.pLast->pJumps = ( ULONG * ) hb_xgrab( sizeof( ULONG ) );
-         hb_comp_functions.pLast->pJumps[ hb_comp_functions.pLast->iJumps - 1 ] = ( LONG ) ( hb_comp_functions.pLast->lPCodePos - 4 );
+         hb_comp_functions.pLast->pJumps                                         = ( HB_SIZE * ) hb_xgrab( sizeof( HB_SIZE ) );
+         hb_comp_functions.pLast->pJumps[ hb_comp_functions.pLast->iJumps - 1 ]  = ( LONG ) ( hb_comp_functions.pLast->lPCodePos - 4 );
       }
    }
 }
 
-ULONG hb_compGenJump( HB_LONG lOffset )
+HB_SIZE hb_compGenJump( HB_LONG lOffset )
 {
    if( HB_LIM_INT24( lOffset ) )
    {
@@ -2943,7 +2941,7 @@ ULONG hb_compGenJump( HB_LONG lOffset )
    return hb_comp_functions.pLast->lPCodePos - 3;
 }
 
-ULONG hb_compGenJumpFalse( HB_LONG lOffset )
+HB_SIZE hb_compGenJumpFalse( HB_LONG lOffset )
 {
    if( HB_LIM_INT24( lOffset ) )
    {
@@ -2959,7 +2957,7 @@ ULONG hb_compGenJumpFalse( HB_LONG lOffset )
    return hb_comp_functions.pLast->lPCodePos - 3;
 }
 
-ULONG hb_compGenJumpTrue( HB_LONG lOffset )
+HB_SIZE hb_compGenJumpTrue( HB_LONG lOffset )
 {
    if( HB_LIM_INT24( lOffset ) )
    {
@@ -2977,12 +2975,12 @@ ULONG hb_compGenJumpTrue( HB_LONG lOffset )
 
 void hb_compGenJumpThere( HB_ULONG ulFrom, HB_ULONG ulTo )
 {
-   BYTE * pCode = hb_comp_functions.pLast->pCode;
-   LONG lOffset = (LONG)( ulTo - ulFrom + 1 );
+   BYTE *   pCode    = hb_comp_functions.pLast->pCode;
+   LONG     lOffset  = ( LONG ) ( ulTo - ulFrom + 1 );
 
    if( HB_LIM_INT24( lOffset ) )
    {
-      HB_PUT_LE_UINT24( &pCode[ (ULONG)ulFrom ], lOffset );
+      HB_PUT_LE_UINT24( &pCode[ ( ULONG ) ulFrom ], lOffset );
    }
    else
    {
@@ -2995,34 +2993,34 @@ void hb_compGenJumpHere( HB_ULONG ulOffset )
    hb_compGenJumpThere( ulOffset, hb_comp_functions.pLast->lPCodePos );
 }
 
-void hb_compGenModuleName( const char *szFile, const char *szFunc )
+void hb_compGenModuleName( const char * szFile, const char * szFunc )
 {
-   int iBufLen;
-   int iFileLen = strlen( szFile );
-   int iFuncLen;
-   BYTE *pBuffer;
+   HB_SIZE  iBufLen;
+   HB_SIZE  iFileLen = strlen( szFile );
+   HB_SIZE  iFuncLen;
+   BYTE *   pBuffer;
 
    /* Use a special form "filename:" when the file changes within function */
-   if ( szFunc != NULL && *szFunc == '\0' && hb_comp_functions.pLast->pCode )
+   if( szFunc != NULL && *szFunc == '\0' && hb_comp_functions.pLast->pCode )
    {
-      char *szLast = (char *) hb_comp_functions.pLast->pCode + hb_comp_ulLastModuleNamePos + 1;
+      char * szLast = ( char * ) hb_comp_functions.pLast->pCode + hb_comp_ulLastModuleNamePos + 1;
 
-      if ( ( ! strncmp( szFile, szLast, iFileLen ) ) && ( szLast[ iFileLen ] == '\0' || szLast[ iFileLen ] == ':' ) )
+      if( ( ! strncmp( szFile, szLast, ( size_t ) iFileLen ) ) && ( szLast[ iFileLen ] == '\0' || szLast[ iFileLen ] == ':' ) )
       {
          return;
       }
    }
 
-   iFuncLen = szFunc ? strlen( szFunc ) + 1 : 0;
-   iBufLen = 1 + iFileLen + ( szFunc ? iFuncLen : 0 ) + 1;
-   pBuffer = (BYTE *)hb_xgrab( iBufLen );
-   pBuffer[ 0 ] = HB_P_MODULENAME;
-   HB_MEMCPY( (BYTE *)( &( pBuffer[ 1 ] ) ), (BYTE *)szFile, iFileLen );
+   iFuncLen       = szFunc ? strlen( szFunc ) + 1 : 0;
+   iBufLen        = 1 + iFileLen + ( szFunc ? iFuncLen : 0 ) + 1;
+   pBuffer        = ( BYTE * ) hb_xgrab( iBufLen );
+   pBuffer[ 0 ]   = HB_P_MODULENAME;
+   HB_MEMCPY( ( BYTE * ) ( &( pBuffer[ 1 ] ) ), ( BYTE * ) szFile, ( size_t ) iFileLen );
 
-   if ( szFunc )
+   if( szFunc )
    {
       pBuffer[ 1 + iFileLen ] = ':';
-      HB_MEMCPY( (BYTE *)( &( pBuffer[ 1 + iFileLen + 1 ] ) ), (BYTE *)szFunc, iFuncLen );
+      HB_MEMCPY( ( BYTE * ) ( &( pBuffer[ 1 + iFileLen + 1 ] ) ), ( BYTE * ) szFunc, ( size_t ) iFuncLen );
    }
    else
    {
@@ -3044,24 +3042,24 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
 
    if( hb_comp_bLineNumbers && ! hb_comp_bDontGenLineNum )
    {
-      int iLine = hb_comp_iLine - 1;
-      int iOffset = hb_comp_iLine - hb_comp_iBaseLine;
-      BOOL bCodeblock = ( hb_comp_functions.pLast->pOwner != NULL );
+      int   iLine       = hb_comp_iLine - 1;
+      int   iOffset     = hb_comp_iLine - hb_comp_iBaseLine;
+      BOOL  bCodeblock  = ( hb_comp_functions.pLast->pOwner != NULL );
 
       //printf( "Line: %i, Offset %i LastPos %i, Pos %i\n", hb_comp_iLine, iOffset, hb_comp_ulLastOffsetPos, hb_comp_functions.pLast->lPCodePos );
 
-      if ( !bCodeblock && hb_comp_bDebugInfo )
+      if( ! bCodeblock && hb_comp_bDebugInfo )
       {
          hb_compGenModuleName( hb_pp_fileName( hb_comp_PP ), "" );
       }
 
-      if( !bCodeblock && hb_comp_iBaseLine == 0 )
+      if( ! bCodeblock && hb_comp_iBaseLine == 0 )
       {
-         hb_comp_iBaseLine = hb_comp_iLine;
-         hb_comp_ulLastLinePos = hb_comp_functions.pLast->lPCodePos;
+         hb_comp_iBaseLine       = hb_comp_iLine;
+         hb_comp_ulLastLinePos   = hb_comp_functions.pLast->lPCodePos;
          hb_compGenPCode3( HB_P_BASELINE, HB_LOBYTE( iLine ), HB_HIBYTE( iLine ), ( BOOL ) 0 );
       }
-      else if( !bCodeblock && iOffset >= 0 && iOffset < 256 )
+      else if( ! bCodeblock && iOffset >= 0 && iOffset < 256 )
       {
          if( ( hb_comp_functions.pLast->lPCodePos - hb_comp_ulLastLinePos ) == 3 )
          {
@@ -3076,7 +3074,7 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
          {
             //printf( "Offset: %i Line: %i\n", iOffset, iLine );
             hb_comp_ulLastOffsetPos = hb_comp_functions.pLast->lPCodePos;
-            hb_compGenPCode2( HB_P_LINEOFFSET, (BYTE) iOffset, ( BOOL ) 0 );
+            hb_compGenPCode2( HB_P_LINEOFFSET, ( BYTE ) iOffset, ( BOOL ) 0 );
          }
          else
          {
@@ -3088,7 +3086,7 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
                || ( ( hb_comp_functions.pLast->lPCodePos - hb_comp_ulLastLinePos ) > 3 )
                || hb_comp_bDebugInfo )
       {
-         if ( !bCodeblock )
+         if( ! bCodeblock )
          {
             hb_comp_ulLastLinePos = hb_comp_functions.pLast->lPCodePos;
          }
@@ -3096,8 +3094,8 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
       }
       else
       {
-         hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos +1 ] = HB_LOBYTE( iLine );
-         hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos +2 ] = HB_HIBYTE( iLine );
+         hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos + 1 ] = HB_LOBYTE( iLine );
+         hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos + 2 ] = HB_HIBYTE( iLine );
       }
    }
 
@@ -3107,15 +3105,15 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_UNREACHABLE, NULL, NULL );
    }
 
-   hb_comp_bDontGenLineNum = FALSE;
+   hb_comp_bDontGenLineNum                   = FALSE;
 
    /* clear RETURN/BREAK flag */
-   hb_comp_functions.pLast->bFlags &= ~ ( FUN_WITH_RETURN | FUN_BREAK_CODE );
+   hb_comp_functions.pLast->bFlags           &= ~( FUN_WITH_RETURN | FUN_BREAK_CODE );
 
    /* Resting Compile Time Stack */
-   hb_comp_functions.pLast->iStackIndex = 0;
-   hb_comp_functions.pLast->iStackFunctions = 0;
-   hb_comp_functions.pLast->iStackClasses = 0;
+   hb_comp_functions.pLast->iStackIndex      = 0;
+   hb_comp_functions.pLast->iStackFunctions  = 0;
+   hb_comp_functions.pLast->iStackClasses    = 0;
 }
 
 /* Generates the pcode with the currently compiled source code line
@@ -3134,7 +3132,7 @@ void hb_compLinePushIfDebugger( void )
          /* previous line contained RETURN/BREAK/LOOP/EXIT statement */
          hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_UNREACHABLE, NULL, NULL );
       }
-      hb_comp_functions.pLast->bFlags &= ~ ( FUN_WITH_RETURN | FUN_BREAK_CODE );  /* clear RETURN flag */
+      hb_comp_functions.pLast->bFlags &= ~( FUN_WITH_RETURN | FUN_BREAK_CODE );   /* clear RETURN flag */
    }
 }
 
@@ -3147,10 +3145,10 @@ void hb_compLinePushIfInside( void ) /* generates the pcode with the currently c
    if( ! hb_comp_bExternal )
    {
  */
-      if( ( ! hb_comp_bStartProc && hb_comp_functions.iCount <= 1 ) || ( hb_comp_functions.pLast->bFlags & FUN_SEALED ) )
-      {
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_OUTSIDE, NULL, NULL );
-      }
+   if( ( ! hb_comp_bStartProc && hb_comp_functions.iCount <= 1 ) || ( hb_comp_functions.pLast->bFlags & FUN_SEALED ) )
+   {
+      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_OUTSIDE, NULL, NULL );
+   }
 /*
    }
  */
@@ -3165,6 +3163,7 @@ void hb_compLinePushIfInside( void ) /* generates the pcode with the currently c
 static void hb_compGenVariablePCode( BYTE bPCode, char * szVarName )
 {
    BOOL bGenCode;
+
    /*
     * NOTE:
     * Clipper always assumes a memvar variable if undeclared variable
@@ -3188,13 +3187,13 @@ static void hb_compGenVariablePCode( BYTE bPCode, char * szVarName )
 
       // Ron Pinkas 2009/02/12 - if es2 is used the compilation will be stopped without the need for this flag!
       #if 0
-         /* Clipper compatibility
-            Should not compile with /es2 eventhough /v is used
-         */
-         if( hb_comp_iExitLevel == HB_EXITLEVEL_DELTARGET )
-         {
-            hb_comp_AmbiguousVar = TRUE;
-         }
+      /* Clipper compatibility
+         Should not compile with /es2 eventhough /v is used
+       */
+      if( hb_comp_iExitLevel == HB_EXITLEVEL_DELTARGET )
+      {
+         hb_comp_AmbiguousVar = TRUE;
+      }
       #endif
 
       if( bPCode == HB_P_POPVARIABLE )
@@ -3214,7 +3213,7 @@ static void hb_compGenVariablePCode( BYTE bPCode, char * szVarName )
    {
       // Ron Pinkas 2009/02/12 - redundant flag
       #if 0
-         hb_comp_AmbiguousVar = TRUE;
+      hb_comp_AmbiguousVar = TRUE;
       #endif
 
       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_AMBIGUOUS_VAR, szVarName, NULL );
@@ -3240,12 +3239,12 @@ static void hb_compGenFieldPCode( BYTE bPCode, int wVar, char * szVarName, PFUNC
       }
    }
 
-   pField = hb_compVariableFind( pFunc->pFields, (USHORT)wVar );
+   pField = hb_compVariableFind( pFunc->pFields, ( USHORT ) wVar );
 
-   if( pField->szAlias )
-   {  /* the alias was specified in FIELD declaration
-       * Push alias symbol before the field symbol
-       */
+   if( pField->szAlias ) /* the alias was specified in FIELD declaration
+                          * Push alias symbol before the field symbol
+                          */
+   {
       if( bPCode == HB_P_POPFIELD )
       {
          bPCode = HB_P_POPALIASEDFIELD;
@@ -3343,8 +3342,8 @@ void hb_compGenMessageData( char * szMsg ) /* generates an underscore-symbol nam
  */
 void hb_compGenPopVar( char * szVarName ) /* generates the pcode to pop a value from the virtual machine stack onto a variable */
 {
-   PFUNCTION pFunc;
-   int iVar;
+   PFUNCTION   pFunc;
+   int         iVar;
 
    iVar = hb_compLocalGetPos( szVarName );
 
@@ -3356,7 +3355,7 @@ void hb_compGenPopVar( char * szVarName ) /* generates the pcode to pop a value 
        * if PARAMETERS statement will be used then it is safe to
        * use 2 bytes for LOCALNEAR
        */
-      if( HB_LIM_INT8( iVar ) && !hb_comp_functions.pLast->szName )
+      if( HB_LIM_INT8( iVar ) && ! hb_comp_functions.pLast->szName )
       {
          hb_compGenPCode2( HB_P_POPLOCALNEAR, ( BYTE ) iVar, ( BOOL ) 1 );
       }
@@ -3397,7 +3396,7 @@ void hb_compGenPopVar( char * szVarName ) /* generates the pcode to pop a value 
 
    if( iVar )
    {
-      hb_compGenPCode2( HB_P_POPGLOBAL, (BYTE)( iVar - 1 ), ( BOOL ) 1 );
+      hb_compGenPCode2( HB_P_POPGLOBAL, ( BYTE ) ( iVar - 1 ), ( BOOL ) 1 );
 
       return;
    }
@@ -3472,15 +3471,15 @@ void hb_compGenPopVar( char * szVarName ) /* generates the pcode to pop a value 
 void hb_compGenPopAliasedVar( char * szVarName,
                               BOOL bPushAliasValue,
                               char * szAlias,
-                              LONG lWorkarea )
+                              long lWorkarea )
 {
 
    if( bPushAliasValue )
    {
       if( szAlias )
       {
-         if( szAlias[ 0 ] == 'M' && szAlias[ 1 ] == '\0' )
-         {  /* M->variable */
+         if( szAlias[ 0 ] == 'M' && szAlias[ 1 ] == '\0' ) /* M->variable */
+         {
             hb_compGenVarPCode( HB_P_POPMEMVAR, szVarName );
          }
          else
@@ -3492,23 +3491,23 @@ void hb_compGenPopAliasedVar( char * szVarName,
                iCmp = strncmp( szAlias, "MEMVAR", strlen( szAlias ) );
             }
 
-            if( iCmp == 0 )
-            {  /* MEMVAR-> or MEMVA-> or MEMV-> */
+            if( iCmp == 0 ) /* MEMVAR-> or MEMVA-> or MEMV-> */
+            {
                hb_compGenVarPCode( HB_P_POPMEMVAR, szVarName );
             }
-            else
-            {  /* field variable */
+            else /* field variable */
+            {
                iCmp = strncmp( szAlias, "FIELD", 4 );
                if( iCmp == 0 )
                {
                   iCmp = strncmp( szAlias, "FIELD", strlen( szAlias ) );
                }
-               if( iCmp == 0 )
-               {  /* FIELD-> */
+               if( iCmp == 0 ) /* FIELD-> */
+               {
                   hb_compGenVarPCode( HB_P_POPFIELD, szVarName );
                }
-               else
-               {  /* database alias */
+               else /* database alias */
+               {
                   hb_compGenPushSymbol( szAlias, NULL, SYMF_PUBLIC );
                   hb_compGenVarPCode( HB_P_POPALIASEDFIELD, szVarName );
                }
@@ -3546,7 +3545,7 @@ void hb_compGenPushVar( char * szVarName )
        * if PARAMETERS statement will be used then it is safe to
        * use 2 bytes for LOCALNEAR
        */
-      if( HB_LIM_INT8( iVar ) && !hb_comp_functions.pLast->szName )
+      if( HB_LIM_INT8( iVar ) && ! hb_comp_functions.pLast->szName )
       {
          hb_compGenPCode2( HB_P_PUSHLOCALNEAR, ( BYTE ) iVar, ( BOOL ) 1 );
       }
@@ -3574,7 +3573,7 @@ void hb_compGenPushVar( char * szVarName )
 
    if( iVar )
    {
-      hb_compGenPCode2( HB_P_PUSHGLOBAL, (BYTE)( iVar - 1 ), ( BOOL ) 1 );
+      hb_compGenPCode2( HB_P_PUSHGLOBAL, ( BYTE ) ( iVar - 1 ), ( BOOL ) 1 );
 
       return;
    }
@@ -3679,7 +3678,7 @@ void hb_compGenPushVarRef( char * szVarName ) /* generates the pcode to push a v
 
    if( iVar )
    {
-      hb_compGenPCode2( HB_P_PUSHGLOBALREF, (BYTE)( iVar - 1 ), ( BOOL ) 1 );
+      hb_compGenPCode2( HB_P_PUSHGLOBALREF, ( BYTE ) ( iVar - 1 ), ( BOOL ) 1 );
 
       return;
    }
@@ -3717,7 +3716,7 @@ void hb_compGenPushVarRef( char * szVarName ) /* generates the pcode to push a v
       hb_compGenPCode3( HB_P_PUSHSTATICREF, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), ( BOOL ) 1 );
       hb_comp_functions.pLast->bFlags |= FUN_USES_STATICS;
 
-      return ;
+      return;
    }
 
    if( ! hb_comp_bStartProc )
@@ -3760,8 +3759,8 @@ void hb_compGenPushMemVarRef( char * szVarName ) /* generates the pcode to push 
 
 /* commented out because it's not used currently
 
-static BOOL hb_compVarFind( char * szVarName )
-{
+   static BOOL hb_compVarFind( char * szVarName )
+   {
    PFUNCTION pFunc = hb_comp_functions.pFirst;
 
    while( pFunc )
@@ -3774,16 +3773,16 @@ static BOOL hb_compVarFind( char * szVarName )
    }
 
    return FALSE;
-}
-*/
+   }
+ */
 
- /* generates the pcode to push an aliased variable value to the virtual
-  * machine stack
-  */
+/* generates the pcode to push an aliased variable value to the virtual
+ * machine stack
+ */
 void hb_compGenPushAliasedVar( char * szVarName,
                                BOOL bPushAliasValue,
                                char * szAlias,
-                               LONG lWorkarea )
+                               long lWorkarea )
 {
    if( bPushAliasValue )
    {
@@ -3793,8 +3792,8 @@ void hb_compGenPushAliasedVar( char * szVarName,
           * FIELD->var
           * MEMVAR->var
           */
-         if( szAlias[ 0 ] == 'M' && szAlias[ 1 ] == '\0' )
-         {  /* M->variable */
+         if( szAlias[ 0 ] == 'M' && szAlias[ 1 ] == '\0' ) /* M->variable */
+         {
             if( lWorkarea == -1 )
             {
                hb_compGenVarPCode( HB_P_PUSHMEMVARREF, szVarName );
@@ -3813,8 +3812,8 @@ void hb_compGenPushAliasedVar( char * szVarName,
                iCmp = strncmp( szAlias, "MEMVAR", strlen( szAlias ) );
             }
 
-            if( iCmp == 0 )
-            {  /* MEMVAR-> or MEMVA-> or MEMV-> */
+            if( iCmp == 0 ) /* MEMVAR-> or MEMVA-> or MEMV-> */
+            {
                if( lWorkarea == -1 )
                {
                   hb_compGenVarPCode( HB_P_PUSHMEMVARREF, szVarName );
@@ -3824,8 +3823,8 @@ void hb_compGenPushAliasedVar( char * szVarName,
                   hb_compGenVarPCode( HB_P_PUSHMEMVAR, szVarName );
                }
             }
-            else
-            {  /* field variable */
+            else /* field variable */
+            {
                iCmp = strncmp( szAlias, "FIELD", 4 );
 
                if( iCmp == 0 )
@@ -3833,12 +3832,12 @@ void hb_compGenPushAliasedVar( char * szVarName,
                   iCmp = strncmp( szAlias, "FIELD", strlen( szAlias ) );
                }
 
-               if( iCmp == 0 )
-               {  /* FIELD-> */
+               if( iCmp == 0 ) /* FIELD-> */
+               {
                   hb_compGenVarPCode( HB_P_PUSHFIELD, szVarName );
                }
-               else
-               {  /* database alias */
+               else /* database alias */
+               {
                   hb_compGenPushSymbol( szAlias, NULL, SYMF_PUBLIC );
                   hb_compGenVarPCode( HB_P_PUSHALIASEDFIELD, szVarName );
                }
@@ -3876,26 +3875,26 @@ void hb_compGenPushDouble( double dNumber, BYTE bWidth, BYTE bDec )
 {
    BYTE pBuffer[ sizeof( double ) + sizeof( BYTE ) + sizeof( BYTE ) + 1 ];
 
-   pBuffer[ 0 ] = HB_P_PUSHDOUBLE;
+   pBuffer[ 0 ]                                       = HB_P_PUSHDOUBLE;
    HB_PUT_LE_DOUBLE( &( pBuffer[ 1 ] ), dNumber );
 
-   pBuffer[ 1 + sizeof( double ) ] = bWidth;
-   pBuffer[ 1 + sizeof( double ) + sizeof( BYTE ) ] = bDec;
+   pBuffer[ 1 + sizeof( double ) ]                    = bWidth;
+   pBuffer[ 1 + sizeof( double ) + sizeof( BYTE ) ]   = bDec;
 
    hb_compGenPCodeN( pBuffer, 1 + sizeof( double ) + sizeof( BYTE ) + sizeof( BYTE ), 1 );
 }
 
-void hb_compGenPushFunCall( char *szFunName, char *szNamespace )
+void hb_compGenPushFunCall( char * szFunName, char * szNamespace )
 {
    char * szFunction;
 
-   if( ( szNamespace && szNamespace[0] == '*' ) ||
-       ( hb_comp_UsedNamespaces.pCurrent && hb_comp_UsedNamespaces.pCurrent->szName[0] == '*' ) ||
+   if( ( szNamespace && szNamespace[ 0 ] == '*' ) ||
+       ( hb_comp_UsedNamespaces.pCurrent && hb_comp_UsedNamespaces.pCurrent->szName[ 0 ] == '*' ) ||
        ( szNamespace == NULL && hb_comp_Namespaces.pCurrent == NULL && hb_comp_UsedNamespaces.pCurrent == NULL ) )
    {
       /* Abbreviated function might have been used - change it for whole name
        */
-#if(!defined( HB_RESERVED_OFF ))
+#if ( ! defined( HB_RESERVED_OFF ) )
       szFunction = hb_compReservedName( szFunName );
 #endif
    }
@@ -3917,9 +3916,9 @@ void hb_compGenPushFunCall( char *szFunName, char *szNamespace )
       {
          if( hb_comp_UsedNamespaces.pCurrent )
          {
-            if( hb_comp_UsedNamespaces.pCurrent->szName[0] == '*' )
+            if( hb_comp_UsedNamespaces.pCurrent->szName[ 0 ] == '*' )
             {
-                szNamespace = "*";
+               szNamespace = "*";
             }
             else
             {
@@ -3939,15 +3938,15 @@ void hb_compGenPushFunCall( char *szFunName, char *szNamespace )
 
       if( szNamespace )
       {
-         if( szNamespace[0] == '*' )
+         if( szNamespace[ 0 ] == '*' )
          {
             hb_compFunCallAdd( szFunName, NULL, NSF_NONE );
             hb_compGenPushSymbol( szFunName, NULL, SYMF_FUNCALL );
          }
          else
          {
-            hb_compFunCallAdd( szFunName, (void *) szNamespace, NSF_EXPLICITPATH );
-            hb_compGenPushSymbol( szFunName, (void *) szNamespace, NSF_EXPLICITPATH );
+            hb_compFunCallAdd( szFunName, ( void * ) szNamespace, NSF_EXPLICITPATH );
+            hb_compGenPushSymbol( szFunName, ( void * ) szNamespace, NSF_EXPLICITPATH );
          }
       }
       else
@@ -3959,17 +3958,17 @@ void hb_compGenPushFunCall( char *szFunName, char *szNamespace )
          }
          else
          {
-            hb_compFunCallAdd( szFunName, (void *) hb_comp_Namespaces.pCurrent, NSF_RESOLVE );
-            hb_compGenPushSymbol( szFunName, (void *) hb_comp_Namespaces.pCurrent, NSF_RESOLVE );
+            hb_compFunCallAdd( szFunName, ( void * ) hb_comp_Namespaces.pCurrent, NSF_RESOLVE );
+            hb_compGenPushSymbol( szFunName, ( void * ) hb_comp_Namespaces.pCurrent, NSF_RESOLVE );
          }
       }
    }
 }
 
-char * hb_compFunctionResolveUsed( char *szFunName )
+char * hb_compFunctionResolveUsed( char * szFunName )
 {
-   PNAMESPACE pNamespace = hb_comp_UsedNamespaces.pFirst;
-   PNAMESPACE pResolved;
+   PNAMESPACE  pNamespace = hb_comp_UsedNamespaces.pFirst;
+   PNAMESPACE  pResolved;
 
    while( pNamespace )
    {
@@ -3993,16 +3992,16 @@ char * hb_compFunctionResolveUsed( char *szFunName )
 }
 
 /* generates the pcode to push switchcase value on the virtual machine stack */
-void hb_compGenSwitchCase( LONG lValue )
+void hb_compGenSwitchCase( long lValue )
 {
-   BYTE pBuffer[ 5 ];
-   int i = 0;
+   BYTE  pBuffer[ 5 ];
+   int   i = 0;
 
-   pBuffer[i] = HB_P_SWITCHCASE;
-   while ( ++i < (int) sizeof( pBuffer ) )
+   pBuffer[ i ] = HB_P_SWITCHCASE;
+   while( ++i < ( int ) sizeof( pBuffer ) )
    {
-      pBuffer[i] = HB_LOBYTE( lValue );
-      lValue >>= 8;
+      pBuffer[ i ]   = HB_LOBYTE( lValue );
+      lValue         >>= 8;
    }
 
    hb_compGenPCodeN( pBuffer, sizeof( pBuffer ), FALSE );
@@ -4021,7 +4020,7 @@ void hb_compGenPushLong( HB_LONG lNumber )
    }
    else if( HB_LIM_INT8( lNumber ) )
    {
-      hb_compGenPCode2( HB_P_PUSHBYTE, (BYTE) lNumber, TRUE );
+      hb_compGenPCode2( HB_P_PUSHBYTE, ( BYTE ) lNumber, TRUE );
    }
    else if( HB_LIM_INT16( lNumber ) )
    {
@@ -4029,38 +4028,38 @@ void hb_compGenPushLong( HB_LONG lNumber )
    }
    else if( HB_LIM_INT32( lNumber ) )
    {
-      BYTE pBuffer[ 5 ];
-      int i = 0;
+      BYTE  pBuffer[ 5 ];
+      int   i = 0;
 
-      pBuffer[i] = HB_P_PUSHLONG;
-      while ( ++i < (int) sizeof( pBuffer ) )
+      pBuffer[ i ] = HB_P_PUSHLONG;
+      while( ++i < ( int ) sizeof( pBuffer ) )
       {
-         pBuffer[i] = HB_LOBYTE( lNumber );
-         lNumber >>= 8;
+         pBuffer[ i ]   = HB_LOBYTE( lNumber );
+         lNumber        >>= 8;
       }
 
       hb_compGenPCodeN( pBuffer, sizeof( pBuffer ), TRUE );
    }
    else
    {
-      BYTE pBuffer[ 9 ];
-      int i = 0;
+      BYTE  pBuffer[ 9 ];
+      int   i = 0;
 
-      pBuffer[i] = HB_P_PUSHLONGLONG;
-      while ( ++i < (int) sizeof( pBuffer ) )
+      pBuffer[ i ] = HB_P_PUSHLONGLONG;
+      while( ++i < ( int ) sizeof( pBuffer ) )
       {
-         pBuffer[i] = HB_LOBYTE( lNumber );
-         lNumber >>= 8;
+         pBuffer[ i ]   = HB_LOBYTE( lNumber );
+         lNumber        >>= 8;
       }
 
       hb_compGenPCodeN( pBuffer, sizeof( pBuffer ), TRUE );
    }
 }
 
-BYTE * hb_compHideString( int iType, char * szText, ULONG ulStrLen, ULONG * ulBufferLen )
+BYTE * hb_compHideString( int iType, char * szText, HB_SIZE ulStrLen, HB_SIZE * ulBufferLen )
 {
-   BYTE * pBuffer;
-   ULONG ulCount;
+   BYTE *   pBuffer;
+   ULONG    ulCount;
 
    switch( iType )
    {
@@ -4069,16 +4068,16 @@ BYTE * hb_compHideString( int iType, char * szText, ULONG ulStrLen, ULONG * ulBu
 
          for( ulCount = 0; ulCount < ulStrLen; ulCount++ )
          {
-            pBuffer[ ulCount ] = (BYTE)( szText[ ulCount ] ^ 0xf3 );
+            pBuffer[ ulCount ] = ( BYTE ) ( szText[ ulCount ] ^ 0xf3 );
          }
 
          *ulBufferLen = ulStrLen;
          break;
 
       default:             // No encode
-         pBuffer = ( BYTE * ) hb_xgrab( ulStrLen + 1 );
-         HB_MEMCPY( pBuffer, ( BYTE * ) szText, ulStrLen );
-         *ulBufferLen = ulStrLen;
+         pBuffer        = ( BYTE * ) hb_xgrab( ulStrLen + 1 );
+         HB_MEMCPY( pBuffer, ( BYTE * ) szText, ( size_t ) ulStrLen );
+         *ulBufferLen   = ulStrLen;
          break;
 
    }
@@ -4087,71 +4086,67 @@ BYTE * hb_compHideString( int iType, char * szText, ULONG ulStrLen, ULONG * ulBu
 }
 
 /* generates the pcode to push a date on the virtual machine stack */
-void hb_compGenPushDate( LONG lDate, LONG lTime, USHORT uType )
+void hb_compGenPushDate( long lDate, long lTime, USHORT uType )
 {
-   BYTE pBuffer[sizeof( UINT32 ) + sizeof( UINT32 ) + 1];
-   USHORT uLen;
+   BYTE     pBuffer[ sizeof( UINT32 ) + sizeof( UINT32 ) + 1 ];
+   USHORT   uLen;
 
-   switch ( uType )
+   switch( uType )
    {
       case HB_ET_DDATE:
-      {
-        pBuffer[0] = HB_P_PUSHDATE;
-        HB_PUT_LE_UINT32( (pBuffer + 1), lDate );
-        uLen = 1 + sizeof( UINT32 );
-        break;
-      }
+         pBuffer[ 0 ]   = HB_P_PUSHDATE;
+         HB_PUT_LE_UINT32( ( pBuffer + 1 ), lDate );
+         uLen           = 1 + sizeof( UINT32 );
+         break;
       case HB_ET_DDATETIME:
-      {
-        pBuffer[0] = HB_P_PUSHDATETIME;
-        HB_PUT_LE_UINT32( (pBuffer + 1), lDate );
-        HB_PUT_LE_UINT32( (pBuffer + 5), lTime );
-        uLen = sizeof( UINT32 ) + sizeof( UINT32 ) + 1;
-        break;
-      }
-      default :
-        pBuffer[0] = 0;
-        uLen = 2;
+         pBuffer[ 0 ]   = HB_P_PUSHDATETIME;
+         HB_PUT_LE_UINT32( ( pBuffer + 1 ), lDate );
+         HB_PUT_LE_UINT32( ( pBuffer + 5 ), lTime );
+         uLen           = sizeof( UINT32 ) + sizeof( UINT32 ) + 1;
+         break;
+      default:
+         pBuffer[ 0 ]   = 0;
+         uLen           = 2;
    }
 
    hb_compGenPCodeN( pBuffer, uLen, 1 );
 }
 
 /* generates the pcode to push a string on the virtual machine stack */
-void hb_compGenPushString( char * szText, ULONG ulStrLen )
+void hb_compGenPushString( char * szText, HB_SIZE ulStrLen )
 {
    BYTE * pBuffer;
 
    if( hb_comp_iHidden )
    {
-      ULONG ulBufferLen;
+      HB_SIZE ulBufferLen;
 
       pBuffer = hb_compHideString( hb_comp_iHidden, szText, ulStrLen, &ulBufferLen );
 
       hb_compGenPCode3( HB_P_PUSHSTRHIDDEN, HB_LOBYTE( ulStrLen ), HB_HIBYTE( ulStrLen ), TRUE );
-      hb_compGenPCode3( (BYTE)hb_comp_iHidden, HB_LOBYTE( ulBufferLen ), HB_HIBYTE( ulBufferLen ), TRUE );
+      hb_compGenPCode3( ( BYTE ) hb_comp_iHidden, HB_LOBYTE( ulBufferLen ), HB_HIBYTE( ulBufferLen ), TRUE );
       hb_compGenPCodeN( pBuffer, ulBufferLen, 1 );
    }
    else if( ulStrLen > 255 )
    {
-      pBuffer = ( BYTE * ) hb_xgrab( ulStrLen + 3 );
+      pBuffer        = ( BYTE * ) hb_xgrab( ulStrLen + 3 );
 
-      pBuffer[0] = HB_P_PUSHSTR;
-      pBuffer[1] = HB_LOBYTE( ulStrLen );
-      pBuffer[2] = HB_HIBYTE( ulStrLen );
+      pBuffer[ 0 ]   = HB_P_PUSHSTR;
+      pBuffer[ 1 ]   = HB_LOBYTE( ulStrLen );
+      pBuffer[ 2 ]   = HB_HIBYTE( ulStrLen );
 
-      HB_MEMCPY( ( BYTE *)( &( pBuffer[3] ) ), ( BYTE * ) szText, ulStrLen );
+      HB_MEMCPY( ( BYTE * ) ( &( pBuffer[ 3 ] ) ), ( BYTE * ) szText, ( size_t ) ulStrLen );
 
       hb_compGenPCodeN( pBuffer, ulStrLen + 3, 1 );
    }
    else
    {
-      pBuffer = ( BYTE * ) hb_xgrab( ulStrLen + 2 );
+      pBuffer        = ( BYTE * ) hb_xgrab( ulStrLen + 2 );
 
-      pBuffer[0] = HB_P_PUSHSTRSHORT;
-      pBuffer[1] = ( BYTE ) ulStrLen;
+      pBuffer[ 0 ]   = HB_P_PUSHSTRSHORT;
+      pBuffer[ 1 ]   = ( BYTE ) ulStrLen;
 
-      HB_MEMCPY( ( BYTE *)( &( pBuffer[2] ) ), ( BYTE * ) szText, ulStrLen );
+      HB_MEMCPY( ( BYTE * ) ( &( pBuffer[ 2 ] ) ), ( BYTE * ) szText, ( size_t ) ulStrLen );
 
       hb_compGenPCodeN( pBuffer, ulStrLen + 2, 1 );
    }
@@ -4160,7 +4155,7 @@ void hb_compGenPushString( char * szText, ULONG ulStrLen )
 }
 
 /* generates the pcode to push a symbol on the virtual machine stack */
-void hb_compGenPushSymbol( char * szSymbolName, void *Namespace, int iFlags )
+void hb_compGenPushSymbol( char * szSymbolName, void * Namespace, int iFlags )
 {
    USHORT wSym;
 
@@ -4237,11 +4232,11 @@ void hb_compFinalizeFunction( void ) /* fixes all last defined function returns 
       if( hb_comp_iWarnings )
       {
          /*
-          REVIEW: based on VU_INITIALIZED - but NIL is a default VALID value!!!
-         hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_NOT_INITIALIZED, pVar->szName, NULL );
-         */
+            REVIEW: based on VU_INITIALIZED - but NIL is a default VALID value!!!
+            hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_NOT_INITIALIZED, pVar->szName, NULL );
+          */
 
-         if( pFunc->szName && pFunc->szName[0] )
+         if( pFunc->szName && pFunc->szName[ 0 ] )
          {
             PVAR pVar;
 
@@ -4320,29 +4315,29 @@ void hb_compFinalizeFunction( void ) /* fixes all last defined function returns 
 
          /* Check if the function returned some value
           */
-         if( ( pFunc->bFlags & FUN_WITH_RETURN ) == 0 && ( pFunc->bFlags & FUN_PROCEDURE ) == 0 && ( hb_comp_functions.pLast->bFlags & FUN_BREAK_CODE ) == 0)
+         if( ( pFunc->bFlags & FUN_WITH_RETURN ) == 0 && ( pFunc->bFlags & FUN_PROCEDURE ) == 0 && ( hb_comp_functions.pLast->bFlags & FUN_BREAK_CODE ) == 0 )
          {
             hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_FUN_WITH_NO_RETURN, pFunc->szName, NULL );
          }
 
          /* Compile Time Strong Type Checking is not needed any more. */
-         if ( pFunc->pStack )
+         if( pFunc->pStack )
          {
             hb_xfree( ( void * ) pFunc->pStack );
          }
 
-         pFunc->iStackSize      = 0;
-         pFunc->iStackIndex     = 0;
-         pFunc->iStackFunctions = 0;
-         pFunc->iStackClasses   = 0;
+         pFunc->iStackSize       = 0;
+         pFunc->iStackIndex      = 0;
+         pFunc->iStackFunctions  = 0;
+         pFunc->iStackClasses    = 0;
       }
    }
 }
 
 static void hb_compOptimizeFrames( PFUNCTION pFunc )
 {
-   USHORT w;
-   int iOffset = 0;
+   USHORT   w;
+   int      iOffset = 0;
 
    if( pFunc == NULL )
    {
@@ -4369,17 +4364,17 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
          if( pFunc->pCode[ 8 ] == HB_P_ENDPROC )
          {
             pFunc->lPCodePos -= 3;
-            memmove( pFunc->pCode + 5, pFunc->pCode + 8, pFunc->lPCodePos - 5 );
+            memmove( pFunc->pCode + 5, pFunc->pCode + 8, ( size_t ) ( pFunc->lPCodePos - 5 ) );
          }
       }
    }
    else if( pFunc->pCode[ 0 ] == HB_P_FRAME &&
             pFunc->pCode[ 3 ] == HB_P_SFRAME )
    {
-      PVAR pLocal;
-      int iLocals = 0;
-      BOOL bSkipFRAME;
-      BOOL bSkipSFRAME;
+      PVAR  pLocal;
+      int   iLocals = 0;
+      BOOL  bSkipFRAME;
+      BOOL  bSkipSFRAME;
 
       pLocal = pFunc->pLocals;
 
@@ -4387,7 +4382,7 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
       {
          if( hb_comp_VariableList != NULL )
          {
-            fprintf( hb_comp_VariableList,"%s=%i\n",pLocal->szName, pLocal->iUsed );
+            fprintf( hb_comp_VariableList, "%s=%i\n", pLocal->szName, pLocal->iUsed );
          }
 
          pLocal = pLocal->pNext;
@@ -4403,7 +4398,7 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
 
          if( iLocals < 256 )
          {
-            pFunc->pCode[ 1 ] = ( BYTE )( iLocals );
+            pFunc->pCode[ 1 ] = ( BYTE ) ( iLocals );
          }
          else
          {
@@ -4414,18 +4409,18 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
                pFunc->pCode = ( BYTE * ) hb_xrealloc( pFunc->pCode, pFunc->lPCodeSize += 1 );
             }
 
-            memmove( pFunc->pCode + 3, pFunc->pCode + 2, pFunc->lPCodePos - 2 );
+            memmove( pFunc->pCode + 3, pFunc->pCode + 2, ( size_t ) ( pFunc->lPCodePos - 2 ) );
             pFunc->lPCodePos++;
 
             pFunc->pCode[ 0 ] = HB_P_LARGEFRAME;
             pFunc->pCode[ 1 ] = HB_LOBYTE( iLocals );
-            pFunc->pCode[ 2 ] = HB_HIBYTE( iLocals);
+            pFunc->pCode[ 2 ] = HB_HIBYTE( iLocals );
          }
 
          // SomeFunc( ... ) - Variable number paramaters.
          if( pFunc->pCode[ 2 + iOffset ] < HB_VAR_PARAM_FLAG )
          {
-            pFunc->pCode[ 2 + iOffset ] = ( BYTE )( pFunc->wParamCount );
+            pFunc->pCode[ 2 + iOffset ] = ( BYTE ) ( pFunc->wParamCount );
          }
 
          bSkipFRAME = FALSE;
@@ -4439,10 +4434,10 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
       {
          hb_compSymbolFind( hb_comp_pInitFunc->szName, &w, NULL, SYMF_FUNCALL );
 
-         pFunc->pCode[ 4 + iOffset ] = HB_LOBYTE( w );
-         pFunc->pCode[ 5 + iOffset ] = HB_HIBYTE( w );
+         pFunc->pCode[ 4 + iOffset ]   = HB_LOBYTE( w );
+         pFunc->pCode[ 5 + iOffset ]   = HB_HIBYTE( w );
 
-         bSkipSFRAME = FALSE;
+         bSkipSFRAME                   = FALSE;
       }
       else
       {
@@ -4454,17 +4449,17 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
       if( bSkipFRAME && bSkipSFRAME )
       {
          pFunc->lPCodePos -= 6;
-         memmove( pFunc->pCode, pFunc->pCode + 6, pFunc->lPCodePos );
+         memmove( pFunc->pCode, pFunc->pCode + 6, ( size_t ) pFunc->lPCodePos );
       }
       else if( bSkipFRAME )
       {
          pFunc->lPCodePos -= 3;
-         memmove( pFunc->pCode, pFunc->pCode + 3, pFunc->lPCodePos );
+         memmove( pFunc->pCode, pFunc->pCode + 3, ( size_t ) pFunc->lPCodePos );
       }
       else if( bSkipSFRAME )
       {
          pFunc->lPCodePos -= 3;
-         memmove( pFunc->pCode + 3 + iOffset, pFunc->pCode + 6 + iOffset, pFunc->lPCodePos - 3 );
+         memmove( pFunc->pCode + 3 + iOffset, pFunc->pCode + 6 + iOffset, ( size_t ) ( pFunc->lPCodePos - 3 ) );
       }
 
       // hb_xfree( szFunctionName );
@@ -4473,24 +4468,24 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
 
 static int hb_compSort_ULONG( const void * pLeft, const void * pRight )
 {
-    ULONG ulLeft  = *( ( ULONG * ) ( pLeft ) );
-    ULONG ulRight = *( ( ULONG * ) ( pRight ) );
+   ULONG ulLeft   = *( ( ULONG * ) ( pLeft ) );
+   ULONG ulRight  = *( ( ULONG * ) ( pRight ) );
 
-    if( ulLeft == ulRight )
-    {
-       return 0 ;
-    }
-    else if( ulLeft < ulRight )
-    {
-       return -1;
-    }
-    else
-    {
-       return 1;
-    }
+   if( ulLeft == ulRight )
+   {
+      return 0;
+   }
+   else if( ulLeft < ulRight )
+   {
+      return -1;
+   }
+   else
+   {
+      return 1;
+   }
 }
 
-void hb_compNOOPfill( PFUNCTION pFunc, ULONG ulFrom, int iCount, BOOL fPop, BOOL fCheck )
+void hb_compNOOPfill( PFUNCTION pFunc, HB_SIZE ulFrom, int iCount, BOOL fPop, BOOL fCheck )
 {
    ULONG ul;
 
@@ -4498,8 +4493,8 @@ void hb_compNOOPfill( PFUNCTION pFunc, ULONG ulFrom, int iCount, BOOL fPop, BOOL
    {
       if( fPop )
       {
-         pFunc->pCode[ ulFrom ] = HB_P_POP;
-         fPop = FALSE;
+         pFunc->pCode[ ulFrom ]  = HB_P_POP;
+         fPop                    = FALSE;
       }
       else if( fCheck && pFunc->pCode[ ulFrom ] == HB_P_NOOP && pFunc->iNOOPs )
       {
@@ -4520,19 +4515,20 @@ void hb_compNOOPfill( PFUNCTION pFunc, ULONG ulFrom, int iCount, BOOL fPop, BOOL
    }
 }
 
-BOOL hb_compIsJump( PFUNCTION pFunc, ULONG ulPos )
+BOOL hb_compIsJump( PFUNCTION pFunc, HB_SIZE ulPos )
 {
    ULONG iJump;
+
    /*
     * Do not allow any optimization (code striping) when Jump Optimization
     * is disabled and we do not have any information about jump addreses
     */
-   if( ! HB_COMP_ISSUPPORTED(HB_COMPFLAG_OPTJUMP) )
+   if( ! HB_COMP_ISSUPPORTED( HB_COMPFLAG_OPTJUMP ) )
       return TRUE;
 
    for( iJump = 0; iJump < pFunc->iJumps; iJump++ )
    {
-      ULONG ulJumpAddr = pFunc->pJumps[ iJump ];
+      HB_SIZE ulJumpAddr = pFunc->pJumps[ iJump ];
       switch( pFunc->pCode[ ulJumpAddr ] )
       {
          case HB_P_JUMPNEAR:
@@ -4561,12 +4557,12 @@ BOOL hb_compIsJump( PFUNCTION pFunc, ULONG ulPos )
 /* Jump Optimizer and dummy code eliminator */
 static void hb_compOptimizeJumps( void )
 {
-   BYTE * pCode = hb_comp_functions.pLast->pCode;
-   ULONG * pNOOPs, * pJumps;
-   ULONG ulOptimized, ulNextByte, ulBytes2Copy, ulJumpAddr, iNOOP, iJump;
-   int iPass;
+   BYTE *      pCode = hb_comp_functions.pLast->pCode;
+   HB_SIZE *   pNOOPs, * pJumps;
+   HB_SIZE     ulOptimized, ulNextByte, ulBytes2Copy, ulJumpAddr, iNOOP, iJump;
+   int         iPass;
 
-   if( ! HB_COMP_ISSUPPORTED(HB_COMPFLAG_OPTJUMP) )
+   if( ! HB_COMP_ISSUPPORTED( HB_COMPFLAG_OPTJUMP ) )
    {
       return;
    }
@@ -4584,8 +4580,8 @@ static void hb_compOptimizeJumps( void )
 
       if( hb_comp_functions.pLast->iJumps > 0 )
       {
-         pJumps = hb_comp_functions.pLast->pJumps;
-         iJump = hb_comp_functions.pLast->iJumps - 1;
+         pJumps   = hb_comp_functions.pLast->pJumps;
+         iJump    = hb_comp_functions.pLast->iJumps - 1;
 
          do
          {
@@ -4722,11 +4718,11 @@ static void hb_compOptimizeJumps( void )
             }
 
             /* remove dummy jumps (over dead code) */
-            if( pCode[ ulJumpAddr ] == HB_P_NOOP ||  pCode[ ulJumpAddr ] == HB_P_POP )
+            if( pCode[ ulJumpAddr ] == HB_P_NOOP || pCode[ ulJumpAddr ] == HB_P_POP )
             {
                if( hb_comp_functions.pLast->iJumps > iJump + 1 )
                {
-                  memmove( &pJumps[ iJump ], &pJumps[ iJump + 1 ], ( hb_comp_functions.pLast->iJumps - iJump - 1 ) * sizeof( ULONG ) );
+                  memmove( &pJumps[ iJump ], &pJumps[ iJump + 1 ], ( size_t ) ( hb_comp_functions.pLast->iJumps - iJump - 1 ) * sizeof( HB_SIZE ) );
                }
 
                hb_comp_functions.pLast->iJumps--;
@@ -4749,16 +4745,16 @@ static void hb_compOptimizeJumps( void )
       pNOOPs = hb_comp_functions.pLast->pNOOPs;
 
       /* Needed so the pasting of PCODE pieces below will work correctly */
-      qsort( ( void * ) pNOOPs, hb_comp_functions.pLast->iNOOPs, sizeof( ULONG ), hb_compSort_ULONG );
+      qsort( ( void * ) pNOOPs, ( size_t ) hb_comp_functions.pLast->iNOOPs, sizeof( HB_SIZE ), hb_compSort_ULONG );
 
       if( hb_comp_functions.pLast->iJumps )
       {
-         LONG * plSizes, * plShifts;
-         ULONG ulSize;
+         LONG *   plSizes, * plShifts;
+         HB_SIZE  ulSize;
 
-         pJumps = hb_comp_functions.pLast->pJumps;
-         ulSize = sizeof( LONG ) * hb_comp_functions.pLast->iJumps;
-         plSizes = ( LONG * ) hb_xgrab( ulSize );
+         pJumps   = hb_comp_functions.pLast->pJumps;
+         ulSize   = sizeof( HB_SIZE ) * hb_comp_functions.pLast->iJumps;
+         plSizes  = ( LONG * ) hb_xgrab( ulSize );
          plShifts = ( LONG * ) hb_xgrab( ulSize );
 
          for( iJump = 0; iJump < hb_comp_functions.pLast->iJumps; iJump++ )
@@ -4771,7 +4767,7 @@ static void hb_compOptimizeJumps( void )
          {
             /* Adjusting preceding jumps that pooint to code beyond the current NOOP
                or trailing backward jumps pointing to lower address. */
-            for( iJump = 0; iJump < hb_comp_functions.pLast->iJumps ; iJump++ )
+            for( iJump = 0; iJump < hb_comp_functions.pLast->iJumps; iJump++ )
             {
                ulJumpAddr = pJumps[ iJump ];
 
@@ -4839,7 +4835,7 @@ static void hb_compOptimizeJumps( void )
                   case HB_P_JUMPNEAR:
                   case HB_P_JUMPFALSENEAR:
                   case HB_P_JUMPTRUENEAR:
-                     lOffset += ( signed char ) pCode[ ulJumpAddr + 1 ];
+                     lOffset                 += ( signed char ) pCode[ ulJumpAddr + 1 ];
                      pCode[ ulJumpAddr + 1 ] = HB_LOBYTE( lOffset );
                      break;
 
@@ -4868,9 +4864,9 @@ static void hb_compOptimizeJumps( void )
       /* Second Scan, after all adjustements been made, we can copy the optimized code. */
       for( iNOOP = 0; iNOOP < hb_comp_functions.pLast->iNOOPs; iNOOP++ )
       {
-         ulBytes2Copy = ( pNOOPs[ iNOOP ] - ulNextByte ) ;
+         ulBytes2Copy = ( pNOOPs[ iNOOP ] - ulNextByte );
 
-         memmove( pCode + ulOptimized, pCode + ulNextByte, ulBytes2Copy );
+         memmove( pCode + ulOptimized, pCode + ulNextByte, ( size_t ) ulBytes2Copy );
 
          ulOptimized += ulBytes2Copy;
          ulNextByte  += ulBytes2Copy;
@@ -4879,16 +4875,16 @@ static void hb_compOptimizeJumps( void )
          ulNextByte++;
       }
 
-      ulBytes2Copy = ( hb_comp_functions.pLast->lPCodePos - ulNextByte ) ;
-      memmove( pCode + ulOptimized, pCode + ulNextByte, ulBytes2Copy );
-      ulOptimized += ulBytes2Copy;
+      ulBytes2Copy                        = ( hb_comp_functions.pLast->lPCodePos - ulNextByte );
+      memmove( pCode + ulOptimized, pCode + ulNextByte, ( size_t ) ulBytes2Copy );
+      ulOptimized                         += ulBytes2Copy;
 
       hb_comp_functions.pLast->lPCodePos  = ulOptimized;
       hb_comp_functions.pLast->lPCodeSize = ulOptimized;
 
       hb_xfree( hb_comp_functions.pLast->pNOOPs );
-      hb_comp_functions.pLast->pNOOPs = NULL;
-      hb_comp_functions.pLast->iNOOPs = 0;
+      hb_comp_functions.pLast->pNOOPs     = NULL;
+      hb_comp_functions.pLast->iNOOPs     = 0;
    }
 }
 
@@ -4897,7 +4893,7 @@ static void hb_compOptimizeJumps( void )
  * - either the address of HB_P_SEQEND opcode if there is no RECOVER clause
  * - or the address of RECOVER code
  */
-ULONG hb_compSequenceBegin( void )
+HB_SIZE hb_compSequenceBegin( void )
 {
    hb_compGenPCode4( HB_P_SEQBEGIN, 0, 0, 0, ( BOOL ) 0 );
 
@@ -4913,7 +4909,7 @@ ULONG hb_compSequenceBegin( void )
  * last statement in code beetwen BEGIN ... RECOVER) or if BREAK was requested
  * and there was no matching RECOVER clause.
  */
-ULONG hb_compSequenceEnd( void )
+HB_SIZE hb_compSequenceEnd( void )
 {
    hb_compGenPCode4( HB_P_SEQEND, 0, 0, 0, ( BOOL ) 0 );
 
@@ -4927,7 +4923,7 @@ ULONG hb_compSequenceEnd( void )
  * - either the address of HB_P_TRYEND opcode if there is no RECOVER clause
  * - or the address of RECOVER code
  */
-ULONG hb_compTryBegin( void )
+HB_SIZE hb_compTryBegin( void )
 {
    hb_compGenPCode4( HB_P_TRYBEGIN, 0, 0, 0, ( BOOL ) 0 );
 
@@ -4943,7 +4939,7 @@ ULONG hb_compTryBegin( void )
  * last statement in code beetwen BEGIN ... RECOVER) or if BREAK was requested
  * and there was no matching RECOVER clause.
  */
-ULONG hb_compTryEnd( void )
+HB_SIZE hb_compTryEnd( void )
 {
    hb_compGenPCode4( HB_P_TRYEND, 0, 0, 0, ( BOOL ) 0 );
 
@@ -4956,16 +4952,16 @@ ULONG hb_compTryEnd( void )
  * beetwen BEGIN and RECOVER sequence
  */
 
-void hb_compSequenceFinish( ULONG ulStartPos, int bUsualStmts )
+void hb_compSequenceFinish( HB_SIZE ulStartPos, int bUsualStmts )
 {
    if( ! hb_comp_bDebugInfo ) /* only if no debugger info is required */
    {
       if( ! bUsualStmts )
       {
-         if( ! HB_COMP_ISSUPPORTED(HB_COMPFLAG_OPTJUMP) )
+         if( ! HB_COMP_ISSUPPORTED( HB_COMPFLAG_OPTJUMP ) )
          {
-            hb_comp_functions.pLast->lPCodePos = ulStartPos - 1; /* remove also HB_P_SEQBEGIN */
-            hb_comp_ulLastLinePos = ulStartPos - 5;
+            hb_comp_functions.pLast->lPCodePos  = ulStartPos - 1; /* remove also HB_P_SEQBEGIN */
+            hb_comp_ulLastLinePos               = ulStartPos - 5;
          }
          else
          {
@@ -5005,8 +5001,8 @@ void hb_compFieldSetAlias( char * szAlias, int iField )
 
    while( pVar )
    {
-      pVar->szAlias = szAlias;
-      pVar = pVar->pNext;
+      pVar->szAlias  = szAlias;
+      pVar           = pVar->pNext;
    }
 }
 
@@ -5015,8 +5011,8 @@ void hb_compFieldSetAlias( char * szAlias, int iField )
  */
 int hb_compFieldsCount( void )
 {
-   int iFields = 0;
-   PVAR pVar = hb_comp_functions.pLast->pFields;
+   int   iFields  = 0;
+   PVAR  pVar     = hb_comp_functions.pLast->pFields;
 
    while( pVar )
    {
@@ -5042,17 +5038,17 @@ void hb_compStaticDefStart( void )
    {
       BYTE pBuffer[ 5 ];
 
-      hb_comp_pInitFunc = hb_compFunctionNew( hb_compExpr_IDs.__INITSTATICS__, HB_FS_INIT );
-      hb_comp_pInitFunc->pOwner = hb_comp_functions.pLast;
-      hb_comp_pInitFunc->bFlags = FUN_USES_STATICS | FUN_PROCEDURE;
-      hb_comp_pInitFunc->cScope = HB_FS_INITEXIT;
-      hb_comp_functions.pLast = hb_comp_pInitFunc;
+      hb_comp_pInitFunc          = hb_compFunctionNew( hb_compExpr_IDs.__INITSTATICS__, HB_FS_INIT );
+      hb_comp_pInitFunc->pOwner  = hb_comp_functions.pLast;
+      hb_comp_pInitFunc->bFlags  = FUN_USES_STATICS | FUN_PROCEDURE;
+      hb_comp_pInitFunc->cScope  = HB_FS_INITEXIT;
+      hb_comp_functions.pLast    = hb_comp_pInitFunc;
 
-      pBuffer[ 0 ] = HB_P_STATICS;
-      pBuffer[ 1 ] = 0;
-      pBuffer[ 2 ] = 0;
-      pBuffer[ 3 ] = 1; /* the number of static variables is unknown now */
-      pBuffer[ 4 ] = 0;
+      pBuffer[ 0 ]               = HB_P_STATICS;
+      pBuffer[ 1 ]               = 0;
+      pBuffer[ 2 ]               = 0;
+      pBuffer[ 3 ]               = 1; /* the number of static variables is unknown now */
+      pBuffer[ 4 ]               = 0;
 
       hb_compGenPCodeN( pBuffer, 5, 0 );
 
@@ -5066,10 +5062,10 @@ void hb_compStaticDefStart( void )
    }
    else
    {
-      hb_comp_pInitFunc->pOwner = hb_comp_functions.pLast;
-      hb_comp_functions.pLast = hb_comp_pInitFunc;
+      hb_comp_pInitFunc->pOwner  = hb_comp_functions.pLast;
+      hb_comp_functions.pLast    = hb_comp_pInitFunc;
 
-      if ( hb_comp_bDebugInfo )
+      if( hb_comp_bDebugInfo )
       {
          hb_comp_ulSavedModuleNamePos = hb_comp_ulLastModuleNamePos;
       }
@@ -5082,11 +5078,11 @@ void hb_compStaticDefStart( void )
  */
 void hb_compStaticDefEnd( void )
 {
-   hb_comp_functions.pLast = hb_comp_pInitFunc->pOwner;
-   hb_comp_pInitFunc->pOwner = NULL;
+   hb_comp_functions.pLast    = hb_comp_pInitFunc->pOwner;
+   hb_comp_pInitFunc->pOwner  = NULL;
    ++hb_comp_iStaticCnt;
 
-   if ( hb_comp_bDebugInfo )
+   if( hb_comp_bDebugInfo )
    {
       hb_comp_ulLastModuleNamePos = hb_comp_ulSavedModuleNamePos;
    }
@@ -5096,11 +5092,11 @@ void hb_compGlobalsDefStart( void )
 {
    if( ! hb_comp_pGlobalsFunc )
    {
-      hb_comp_pGlobalsFunc = hb_compFunctionNew( hb_compIdentifierNew( "[_INITGLOBALS]", TRUE ), HB_FS_INIT );
-      hb_comp_pGlobalsFunc->pOwner = hb_comp_functions.pLast;
-      hb_comp_pGlobalsFunc->bFlags = FUN_PROCEDURE;
-      hb_comp_pGlobalsFunc->cScope = HB_FS_INITEXIT;
-      hb_comp_functions.pLast = hb_comp_pGlobalsFunc;
+      hb_comp_pGlobalsFunc          = hb_compFunctionNew( hb_compIdentifierNew( "[_INITGLOBALS]", TRUE ), HB_FS_INIT );
+      hb_comp_pGlobalsFunc->pOwner  = hb_comp_functions.pLast;
+      hb_comp_pGlobalsFunc->bFlags  = FUN_PROCEDURE;
+      hb_comp_pGlobalsFunc->cScope  = HB_FS_INITEXIT;
+      hb_comp_functions.pLast       = hb_comp_pGlobalsFunc;
 
       if( hb_comp_bDebugInfo )
       {
@@ -5110,10 +5106,10 @@ void hb_compGlobalsDefStart( void )
    }
    else
    {
-      hb_comp_pGlobalsFunc->pOwner = hb_comp_functions.pLast;
-      hb_comp_functions.pLast = hb_comp_pGlobalsFunc;
+      hb_comp_pGlobalsFunc->pOwner  = hb_comp_functions.pLast;
+      hb_comp_functions.pLast       = hb_comp_pGlobalsFunc;
 
-      if ( hb_comp_bDebugInfo )
+      if( hb_comp_bDebugInfo )
       {
          hb_comp_ulSavedModuleNamePos = hb_comp_ulLastModuleNamePos;
       }
@@ -5126,10 +5122,10 @@ void hb_compGlobalsDefStart( void )
  */
 void hb_compGlobalsDefEnd( void )
 {
-   hb_comp_functions.pLast = hb_comp_pGlobalsFunc->pOwner;
-   hb_comp_pGlobalsFunc->pOwner = NULL;
+   hb_comp_functions.pLast       = hb_comp_pGlobalsFunc->pOwner;
+   hb_comp_pGlobalsFunc->pOwner  = NULL;
 
-   if ( hb_comp_bDebugInfo )
+   if( hb_comp_bDebugInfo )
    {
       hb_comp_ulLastModuleNamePos = hb_comp_ulSavedModuleNamePos;
    }
@@ -5142,21 +5138,21 @@ static void hb_compLineNumberDefStart( void )
 {
    if( ! hb_comp_pLineNumberFunc )
    {
-      hb_comp_pLineNumberFunc = hb_compFunctionNew( hb_compExpr_IDs.__INITLINES__, HB_FS_INIT );
-      hb_comp_pLineNumberFunc->pOwner = hb_comp_functions.pLast;
-      hb_comp_pLineNumberFunc->bFlags = 0;
-      hb_comp_pLineNumberFunc->cScope = HB_FS_INITEXIT;
-      hb_comp_functions.pLast = hb_comp_pLineNumberFunc;
+      hb_comp_pLineNumberFunc          = hb_compFunctionNew( hb_compExpr_IDs.__INITLINES__, HB_FS_INIT );
+      hb_comp_pLineNumberFunc->pOwner  = hb_comp_functions.pLast;
+      hb_comp_pLineNumberFunc->bFlags  = 0;
+      hb_comp_pLineNumberFunc->cScope  = HB_FS_INITEXIT;
+      hb_comp_functions.pLast          = hb_comp_pLineNumberFunc;
 
-      if ( hb_comp_bDebugInfo )
+      if( hb_comp_bDebugInfo )
       {
          hb_compGenModuleName( hb_comp_pFileName->szName, NULL );
       }
    }
    else
    {
-      hb_comp_pLineNumberFunc->pOwner = hb_comp_functions.pLast;
-      hb_comp_functions.pLast = hb_comp_pLineNumberFunc;
+      hb_comp_pLineNumberFunc->pOwner  = hb_comp_functions.pLast;
+      hb_comp_functions.pLast          = hb_comp_pLineNumberFunc;
    }
 }
 
@@ -5166,8 +5162,8 @@ static void hb_compLineNumberDefStart( void )
  */
 static void hb_compLineNumberDefEnd( void )
 {
-   hb_comp_functions.pLast = hb_comp_pLineNumberFunc->pOwner;
-   hb_comp_pLineNumberFunc->pOwner = NULL;
+   hb_comp_functions.pLast          = hb_comp_pLineNumberFunc->pOwner;
+   hb_comp_pLineNumberFunc->pOwner  = NULL;
 }
 
 /*
@@ -5179,28 +5175,28 @@ void hb_compCodeBlockStart( void )
 
    //printf( "Block start\n" );
 
-   pBlock = hb_compFunctionNew( NULL, HB_FS_STATIC );
+   pBlock                  = hb_compFunctionNew( NULL, HB_FS_STATIC );
 
-   pBlock->pOwner       = hb_comp_functions.pLast;
-   pBlock->iStaticsBase = hb_comp_functions.pLast->iStaticsBase;
+   pBlock->pOwner          = hb_comp_functions.pLast;
+   pBlock->iStaticsBase    = hb_comp_functions.pLast->iStaticsBase;
 
    hb_comp_functions.pLast = pBlock;
 }
 
 HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
 {
-   PFUNCTION pCodeblock;   /* pointer to the current codeblock */
-   PFUNCTION pFunc;/* pointer to a function that owns a codeblock */
-   char *pFuncName; /* name (if one exists) of the function that owns a codeblock */
-   USHORT wSize;
-   USHORT wLocals = 0;   /* number of referenced local variables */
-   USHORT wLocalsCnt, wLocalsLen;
-   USHORT wPos;
-   int iLocalPos;
-   PVAR pVar, pFree;
+   PFUNCTION   pCodeblock;    /* pointer to the current codeblock */
+   PFUNCTION   pFunc;         /* pointer to a function that owns a codeblock */
+   char *      pFuncName;     /* name (if one exists) of the function that owns a codeblock */
+   USHORT      wSize;
+   USHORT      wLocals = 0;   /* number of referenced local variables */
+   USHORT      wLocalsCnt, wLocalsLen;
+   USHORT      wPos;
+   int         iLocalPos;
+   PVAR        pVar, pFree;
 
    HB_EXPR_PTR pExtBlock;
-   PFUNCTION pFunExtBlock = NULL;
+   PFUNCTION   pFunExtBlock = NULL;
 
    hb_compGenPCode1( HB_P_ENDBLOCK ); /* finish the codeblock */
    //hb_compFixFuncPCode( hb_comp_functions.pLast );
@@ -5214,7 +5210,7 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
        * Container for the complete HB_P_PUSHBLOCK and the block itslef.
        * The complete PCODE will later be used in hb_compExprUseExtBlock.
        */
-      pFunExtBlock = hb_compFunctionNew( NULL, HB_FS_STATIC );
+      pFunExtBlock            = hb_compFunctionNew( NULL, HB_FS_STATIC );
       hb_comp_functions.pLast = pFunExtBlock;
    }
    else
@@ -5227,20 +5223,20 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
    }
 
    /* find the function that owns the codeblock */
-   pFunc = pCodeblock->pOwner;
-   pFuncName = pFunc->szName;
+   pFunc       = pCodeblock->pOwner;
+   pFuncName   = pFunc->szName;
 
    while( pFunc->pOwner )
    {
       pFunc = pFunc->pOwner;
 
-      if ( pFunc->szName && *pFunc->szName )
+      if( pFunc->szName && *pFunc->szName )
       {
          pFuncName = pFunc->szName;
       }
    }
 
-   pFunc->bFlags |= (BYTE)( pCodeblock->bFlags & FUN_USES_STATICS );
+   pFunc->bFlags |= ( BYTE ) ( pCodeblock->bFlags & FUN_USES_STATICS );
 
    /* generate a proper codeblock frame with a codeblock size and with
     * a number of expected parameters
@@ -5250,34 +5246,34 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
     */
 
    /* Count the number of referenced local variables */
-   wLocalsLen = 0;
-   pVar = pCodeblock->pStatics;
+   wLocalsLen  = 0;
+   pVar        = pCodeblock->pStatics;
 
    while( pVar )
    {
       if( hb_comp_bDebugInfo )
       {
-        wLocalsLen += (USHORT)( 4 + strlen(pVar->szName) );
+         wLocalsLen += ( USHORT ) ( 4 + strlen( pVar->szName ) );
       }
 
       pVar = pVar->pNext;
       ++wLocals;
    }
 
-   wLocalsCnt = wLocals;
+   wLocalsCnt  = wLocals;
 
    /* NOTE: 2 = HB_P_PUSHBLOCK | HB_P_PUSHBLOCKSHORT + BYTE( size ) + _ENDBLOCK */
-   wSize = (USHORT)( pCodeblock->lPCodePos + 2 );
+   wSize       = ( USHORT ) ( pCodeblock->lPCodePos + 2 );
 
-   if ( hb_comp_bDebugInfo )
+   if( hb_comp_bDebugInfo )
    {
-      wSize += (USHORT)( 3 + strlen( hb_pp_fileName( hb_comp_PP ) ) + strlen( pFuncName ) );
+      wSize += ( USHORT ) ( 3 + strlen( hb_pp_fileName( hb_comp_PP ) ) + strlen( pFuncName ) );
       wSize += wLocalsLen;
    }
 
    if( bExt )
    {
-      wSize += (USHORT)3; // HB_P_FRAME l, p
+      wSize += ( USHORT ) 3; // HB_P_FRAME l, p
    }
 
    if( wSize <= 255 && pCodeblock->wParamCount == 0 && wLocals == 0 )
@@ -5287,7 +5283,7 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
    else
    {
       /* NOTE: 5 = BYTE( size ) + USHORT( wParams ) + USHORT( wLocals ) */
-      wSize += (USHORT)( 5 + wLocals * 2 );
+      wSize += ( USHORT ) ( 5 + wLocals * 2 );
 
       hb_compGenPCode3( HB_P_PUSHBLOCK, HB_LOBYTE( wSize ), HB_HIBYTE( wSize ), ( BOOL ) 0 );
       hb_compGenPCode2( HB_LOBYTE( pCodeblock->wParamCount ), HB_HIBYTE( pCodeblock->wParamCount ), ( BOOL ) 0 );
@@ -5299,16 +5295,16 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
 
    while( wLocals-- )
    {
-      wPos = hb_compVariableGetPos( pFunc->pLocals, pVar->szName );
+      wPos  = hb_compVariableGetPos( pFunc->pLocals, pVar->szName );
       hb_compGenPCode2( HB_LOBYTE( wPos ), HB_HIBYTE( wPos ), ( BOOL ) 0 );
 
-      pVar = pVar->pNext;
+      pVar  = pVar->pNext;
    }
 
    if( bExt )
    {
-      wLocals = 0;
-      pVar = pCodeblock->pLocals;
+      wLocals  = 0;
+      pVar     = pCodeblock->pLocals;
       while( pVar )
       {
          wLocals++;
@@ -5320,7 +5316,7 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
          wLocals -= pCodeblock->wParamCount;
       }
 
-      hb_compGenPCode3( HB_P_FRAME, (BYTE) wLocals, (BYTE) pCodeblock->wParamCount, ( BOOL ) 0 );   /* frame for locals and parameters */
+      hb_compGenPCode3( HB_P_FRAME, ( BYTE ) wLocals, ( BYTE ) pCodeblock->wParamCount, ( BOOL ) 0 );   /* frame for locals and parameters */
    }
 
    if( hb_comp_bDebugInfo )
@@ -5328,12 +5324,12 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
       hb_compGenModuleName( hb_pp_fileName( hb_comp_PP ), pFuncName );
 
       /* generate the names of referenced local variables */
-      pVar = pCodeblock->pStatics;
-      iLocalPos = -1;
+      pVar        = pCodeblock->pStatics;
+      iLocalPos   = -1;
 
       while( wLocalsCnt-- )
       {
-         hb_compGenLocalName( (USHORT)iLocalPos, pVar->szName );
+         hb_compGenLocalName( ( USHORT ) iLocalPos, pVar->szName );
          iLocalPos--;
 
          pVar = pVar->pNext;
@@ -5374,7 +5370,7 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
       /* free used variables */
       pFree = pVar;
 
-      pVar = pVar->pNext;
+      pVar  = pVar->pNext;
       hb_xfree( ( void * ) pFree );
    }
 
@@ -5384,7 +5380,7 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
       /* free used variables */
       pFree = pVar;
 
-      pVar = pVar->pNext;
+      pVar  = pVar->pNext;
       hb_xfree( ( void * ) pFree );
    }
 
@@ -5401,17 +5397,17 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
    }
 
    /* Compile Time Strong Type Checking Stack is not needed any more. */
-   if ( pCodeblock->pStack )
+   if( pCodeblock->pStack )
    {
       hb_xfree( ( void * ) pCodeblock->pStack );
    }
 
    /*
-   pCodeblock->iStackSize      = 0;
-   pCodeblock->iStackIndex     = 0;
-   pCodeblock->iStackFunctions = 0;
-   pCodeblock->iStackClasses   = 0;
-   */
+      pCodeblock->iStackSize      = 0;
+      pCodeblock->iStackIndex     = 0;
+      pCodeblock->iStackFunctions = 0;
+      pCodeblock->iStackClasses   = 0;
+    */
 
    hb_xfree( ( void * ) pCodeblock );
 
@@ -5423,57 +5419,57 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
 /* initialize support variables */
 static void hb_compInitVars( void )
 {
-   hb_comp_functions.iCount = 0;
-   hb_comp_functions.pFirst = NULL;
-   hb_comp_functions.pLast  = NULL;
-   hb_comp_funcalls.iCount  = 0;
-   hb_comp_funcalls.pFirst  = NULL;
-   hb_comp_funcalls.pLast   = NULL;
-   hb_comp_symbols.iCount   = 0;
-   hb_comp_symbols.pFirst   = NULL;
-   hb_comp_symbols.pLast    = NULL;
-   hb_comp_szAnnounce       = NULL;
-   hb_comp_pInitFunc        = NULL;
-   hb_comp_bAnyWarning      = FALSE;
+   hb_comp_functions.iCount         = 0;
+   hb_comp_functions.pFirst         = NULL;
+   hb_comp_functions.pLast          = NULL;
+   hb_comp_funcalls.iCount          = 0;
+   hb_comp_funcalls.pFirst          = NULL;
+   hb_comp_funcalls.pLast           = NULL;
+   hb_comp_symbols.iCount           = 0;
+   hb_comp_symbols.pFirst           = NULL;
+   hb_comp_symbols.pLast            = NULL;
+   hb_comp_szAnnounce               = NULL;
+   hb_comp_pInitFunc                = NULL;
+   hb_comp_bAnyWarning              = FALSE;
 
-   hb_comp_iLine           = 1;
-   hb_comp_iBaseLine       = 0;
-   hb_comp_iFunctionCnt    = 0;
-   hb_comp_iErrorCount     = 0;
-   hb_comp_cVarType        = ' ';
-   hb_comp_ulLastLinePos   = 0;
-   hb_comp_ulLastOffsetPos = 0;
-   hb_comp_iStaticCnt      = 0;
-   hb_comp_iVarScope       = VS_LOCAL;
+   hb_comp_iLine                    = 1;
+   hb_comp_iBaseLine                = 0;
+   hb_comp_iFunctionCnt             = 0;
+   hb_comp_iErrorCount              = 0;
+   hb_comp_cVarType                 = ' ';
+   hb_comp_ulLastLinePos            = 0;
+   hb_comp_ulLastOffsetPos          = 0;
+   hb_comp_iStaticCnt               = 0;
+   hb_comp_iVarScope                = VS_LOCAL;
 
-   hb_comp_inlines.iCount = 0;
-   hb_comp_inlines.pFirst = NULL;
-   hb_comp_inlines.pLast  = NULL;
+   hb_comp_inlines.iCount           = 0;
+   hb_comp_inlines.pFirst           = NULL;
+   hb_comp_inlines.pLast            = NULL;
 
-   hb_comp_pGlobalsFunc   = NULL;
-   hb_comp_pGlobals       = NULL;
-   hb_comp_iGlobals       = 0;
+   hb_comp_pGlobalsFunc             = NULL;
+   hb_comp_pGlobals                 = NULL;
+   hb_comp_iGlobals                 = 0;
 
-   hb_comp_pEnum          = NULL;
+   hb_comp_pEnum                    = NULL;
 
-   hb_comp_pLineNumberFunc = NULL;
+   hb_comp_pLineNumberFunc          = NULL;
 
-   hb_comp_Namespaces.pFirst   = NULL;
-   hb_comp_Namespaces.pLast    = NULL;
-   hb_comp_Namespaces.pCurrent = NULL;
+   hb_comp_Namespaces.pFirst        = NULL;
+   hb_comp_Namespaces.pLast         = NULL;
+   hb_comp_Namespaces.pCurrent      = NULL;
 
-   hb_comp_UsedNamespaces.pFirst   = NULL;
-   hb_comp_UsedNamespaces.pLast    = NULL;
-   hb_comp_UsedNamespaces.pCurrent = NULL;
+   hb_comp_UsedNamespaces.pFirst    = NULL;
+   hb_comp_UsedNamespaces.pLast     = NULL;
+   hb_comp_UsedNamespaces.pCurrent  = NULL;
 }
 
-PNAMESPACE hb_compNamespaceEnumDeep( PNAMESPACE pStart, PHB_COMP_NS_ENUMFUN pEnumFunc, void **pCargo )
+PNAMESPACE hb_compNamespaceEnumDeep( PNAMESPACE pStart, PHB_COMP_NS_ENUMFUN pEnumFunc, void ** pCargo )
 {
    PNAMESPACE pNamespace = pStart->pNext;
 
-   pStart->type |= NSENUM_SPACEADVISE;
+   pStart->type   |= NSENUM_SPACEADVISE;
    pEnumFunc( pStart, pCargo );
-   pStart->type &= ~NSENUM_SPACEADVISE;
+   pStart->type   &= ~NSENUM_SPACEADVISE;
 
    while( pNamespace )
    {
@@ -5492,20 +5488,20 @@ PNAMESPACE hb_compNamespaceEnumDeep( PNAMESPACE pStart, PHB_COMP_NS_ENUMFUN pEnu
       pNamespace = pNamespace->pNext;
    }
 
-   pStart->type |= NSENUM_SPACEBEGIN;
+   pStart->type   |= NSENUM_SPACEBEGIN;
    pEnumFunc( pStart, pCargo );
-   pStart->type &= ~NSENUM_SPACEBEGIN;
+   pStart->type   &= ~NSENUM_SPACEBEGIN;
 
-   pNamespace = pStart->pNext;
+   pNamespace     = pStart->pNext;
    while( pNamespace )
    {
       pEnumFunc( pNamespace, pCargo );
 
       if( pNamespace->type & NSTYPE_END )
       {
-         pStart->type |= NSENUM_SPACEEND;
+         pStart->type   |= NSENUM_SPACEEND;
          pEnumFunc( pStart, pCargo );
-         pStart->type &= ~NSENUM_SPACEEND;
+         pStart->type   &= ~NSENUM_SPACEEND;
 
          while( ( pNamespace->type & NSTYPE_END ) && pNamespace->pNext && ( pNamespace->pNext->type & NSTYPE_SPACE ) )
          {
@@ -5526,7 +5522,7 @@ PNAMESPACE hb_compNamespaceEnumDeep( PNAMESPACE pStart, PHB_COMP_NS_ENUMFUN pEnu
       pNamespace = pNamespace->pNext;
    }
 
-   assert(0);
+   assert( 0 );
    return NULL;
 }
 
@@ -5553,12 +5549,12 @@ PNAMESPACE hb_compNamespaceEnumSkipMembers( PNAMESPACE pNamespace )
       pNamespace = pNamespace->pNext;
    }
 
-   assert(0);
+   assert( 0 );
    return NULL;
 }
 
 
-void hb_compNamespaceEnumSpaces( PNAMESPACE pStart, PHB_COMP_NS_ENUMFUN pEnumFunc, void **pCargo )
+void hb_compNamespaceEnumSpaces( PNAMESPACE pStart, PHB_COMP_NS_ENUMFUN pEnumFunc, void ** pCargo )
 {
    PNAMESPACE pNamespace;
 
@@ -5575,10 +5571,9 @@ void hb_compNamespaceEnumSpaces( PNAMESPACE pStart, PHB_COMP_NS_ENUMFUN pEnumFun
       pNamespace = pNamespace->pNext;
    }
 
-   return;
 }
 
-void hb_compNamespaceEnumerate( PHB_COMP_NS_ENUMFUN pEnumFunc, void **pCargo )
+void hb_compNamespaceEnumerate( PHB_COMP_NS_ENUMFUN pEnumFunc, void ** pCargo )
 {
    PNAMESPACE pNamespace = hb_comp_Namespaces.pFirst;
 
@@ -5590,19 +5585,19 @@ void hb_compNamespaceEnumerate( PHB_COMP_NS_ENUMFUN pEnumFunc, void **pCargo )
    }
 }
 
-PNAMESPACE hb_compNamespaceNew( char *szName, int iType )
+PNAMESPACE hb_compNamespaceNew( char * szName, int iType )
 {
    PNAMESPACE pNew;
 
-   pNew = (PNAMESPACE) hb_xgrab( sizeof( _NAMESPACE ) );
+   pNew           = ( PNAMESPACE ) hb_xgrab( sizeof( _NAMESPACE ) );
 
-   pNew->type   = iType;
-   pNew->szName = szName;
-   pNew->pNext  = NULL;
+   pNew->type     = iType;
+   pNew->szName   = szName;
+   pNew->pNext    = NULL;
 
    if( hb_comp_Namespaces.pCurrent )
    {
-      char *szFullPath = (char *) hb_xgrab( strlen( hb_comp_Namespaces.pCurrent->szFullPath ) + 1 + strlen( szName ) + 1 );
+      char * szFullPath = ( char * ) hb_xgrab( strlen( hb_comp_Namespaces.pCurrent->szFullPath ) + 1 + strlen( szName ) + 1 );
 
       hb_xstrcpy( szFullPath, hb_comp_Namespaces.pCurrent->szFullPath, ".", szName, NULL );
       pNew->szFullPath = hb_compIdentifierNew( szFullPath, FALSE );
@@ -5627,13 +5622,13 @@ PNAMESPACE hb_compNamespaceNew( char *szName, int iType )
    }
    else
    {
-      pNew->iID = 1;
+      pNew->iID                  = 1;
 
-      hb_comp_Namespaces.pFirst = pNew;
+      hb_comp_Namespaces.pFirst  = pNew;
    }
 
-   pNew->pOuter = hb_comp_Namespaces.pCurrent;
-   pNew->pFunc  = NULL;
+   pNew->pOuter   = hb_comp_Namespaces.pCurrent;
+   pNew->pFunc    = NULL;
 
    if( iType & NSTYPE_SPACE )
    {
@@ -5664,7 +5659,7 @@ void hb_compNamespaceEnd( void )
    hb_comp_Namespaces.pCurrent = hb_comp_Namespaces.pCurrent->pOuter;
 }
 
-PNAMESPACE hb_compNamespaceFind( PNAMESPACE pNamespace, char *szName, int type )
+PNAMESPACE hb_compNamespaceFind( PNAMESPACE pNamespace, char * szName, int type )
 {
    while( pNamespace )
    {
@@ -5679,7 +5674,7 @@ PNAMESPACE hb_compNamespaceFind( PNAMESPACE pNamespace, char *szName, int type )
    return NULL;
 }
 
-PNAMESPACE hb_compNamespaceFindMember( PNAMESPACE pNamespace, char *szName, int type )
+PNAMESPACE hb_compNamespaceFindMember( PNAMESPACE pNamespace, char * szName, int type )
 {
    while( pNamespace )
    {
@@ -5706,20 +5701,20 @@ PNAMESPACE hb_compNamespaceFindMember( PNAMESPACE pNamespace, char *szName, int 
    return NULL;
 }
 
-PNAMESPACE hb_compUsedNamespaceNew( char *szName, int iType )
+PNAMESPACE hb_compUsedNamespaceNew( char * szName, int iType )
 {
    PNAMESPACE pNew;
 
-   pNew = (PNAMESPACE) hb_xgrab( sizeof( _NAMESPACE ) );
+   pNew           = ( PNAMESPACE ) hb_xgrab( sizeof( _NAMESPACE ) );
 
-   pNew->type   = iType;
-   pNew->szName = szName;
-   pNew->iID    = 0;
-   pNew->pNext  = NULL;
+   pNew->type     = iType;
+   pNew->szName   = szName;
+   pNew->iID      = 0;
+   pNew->pNext    = NULL;
 
    if( hb_comp_UsedNamespaces.pCurrent && ( ( iType & NSF_EXPLICITPATH ) != NSF_EXPLICITPATH ) )
    {
-      char *szFullPath = (char *) hb_xgrab( strlen( hb_comp_UsedNamespaces.pCurrent->szFullPath ) + 1 + strlen( szName ) + 1 );
+      char * szFullPath = ( char * ) hb_xgrab( strlen( hb_comp_UsedNamespaces.pCurrent->szFullPath ) + 1 + strlen( szName ) + 1 );
 
       hb_xstrcpy( szFullPath, hb_comp_UsedNamespaces.pCurrent->szFullPath, ".", szName, NULL );
       pNew->szFullPath = hb_compIdentifierNew( szFullPath, FALSE );
@@ -5738,8 +5733,8 @@ PNAMESPACE hb_compUsedNamespaceNew( char *szName, int iType )
       hb_comp_UsedNamespaces.pFirst = pNew;
    }
 
-   pNew->pOuter = hb_comp_UsedNamespaces.pCurrent;
-   pNew->pFunc  = NULL;
+   pNew->pOuter   = hb_comp_UsedNamespaces.pCurrent;
+   pNew->pFunc    = NULL;
 
    if( iType & NSTYPE_SPACE )
    {
@@ -5770,7 +5765,7 @@ void hb_compUsedNamespaceEnd( void )
    hb_comp_UsedNamespaces.pCurrent = hb_comp_UsedNamespaces.pCurrent->pOuter;
 }
 
-static void hb_compGenOutput( int iLanguage, const char *szSourceExtension )
+static void hb_compGenOutput( int iLanguage, const char * szSourceExtension )
 {
 
    switch( iLanguage )
@@ -5791,8 +5786,8 @@ static void hb_compGenOutput( int iLanguage, const char *szSourceExtension )
 
 static void hb_compOutputFile( void )
 {
-   hb_comp_pFileName->szPath = NULL;
-   hb_comp_pFileName->szExtension = NULL;
+   hb_comp_pFileName->szPath        = NULL;
+   hb_comp_pFileName->szExtension   = NULL;
 
    /* we create the output file name */
    if( hb_comp_pOutPath )
@@ -5818,10 +5813,10 @@ static void hb_compAddInitFunc( PFUNCTION pFunc )
 {
    PCOMSYMBOL pSym = hb_compSymbolAdd( pFunc->szName, NULL, NULL, SYMF_FUNCALL | SYMF_STATIC );
 
-   pSym->cScope |= pFunc->cScope;
+   pSym->cScope                     |= pFunc->cScope;
 
-   hb_comp_functions.pLast->pNext = pFunc;
-   hb_comp_functions.pLast = pFunc;
+   hb_comp_functions.pLast->pNext   = pFunc;
+   hb_comp_functions.pLast          = pFunc;
 
    hb_compGenPCode1( HB_P_ENDPROC );
 
@@ -5830,22 +5825,22 @@ static void hb_compAddInitFunc( PFUNCTION pFunc )
 
 static int hb_compCompile( char * szPrg )
 {
-   int iStatus = EXIT_SUCCESS;
-   PHB_FNAME pFileName;
-   BOOL bFunc, bKillGlobalsFunc = FALSE;
-   char *szTempName;
-   ULONG i, u = 0;
+   int         iStatus = EXIT_SUCCESS;
+   PHB_FNAME   pFileName;
+   BOOL        bFunc, bKillGlobalsFunc = FALSE;
+   char *      szTempName;
+   ULONG       i, u = 0;
 
    hb_comp_pFileName = hb_fsFNameSplit( szPrg );
 
    if( hb_comp_pFileName->szName )
    {
-      char szFileName[ HB_PATH_MAX ];
-      char szPpoName[ HB_PATH_MAX ];
-      char szPptName[ HB_PATH_MAX ];
-      char szHILName[ HB_PATH_MAX ];
-      char szVarListName[ HB_PATH_MAX ];
-      const char *szSourceExtension;
+      char           szFileName[ HB_PATH_MAX ];
+      char           szPpoName[ HB_PATH_MAX ];
+      char           szPptName[ HB_PATH_MAX ];
+      char           szHILName[ HB_PATH_MAX ];
+      char           szVarListName[ HB_PATH_MAX ];
+      const char *   szSourceExtension;
 
       /* Clear and reinitialize preprocessor state */
       hb_pp_reset( hb_comp_PP );
@@ -5854,40 +5849,40 @@ static int hb_compCompile( char * szPrg )
          hb_pp_addDefine( hb_comp_PP, "__HRB__", "1" );
       }
 
-      if( !hb_comp_pFileName->szExtension )
+      if( ! hb_comp_pFileName->szExtension )
       {
          hb_comp_pFileName->szExtension = ".prg";
       }
 
-      szTempName = ( char * ) hb_xgrab( HB_PATH_MAX );
-      hb_comp_PrgFileName = ( char * ) hb_xgrab( HB_PATH_MAX );
-      hb_snprintf( szTempName, HB_PATH_MAX, "%s%s%s", hb_comp_pFileName->szPath ? hb_comp_pFileName->szPath : "",hb_comp_pFileName->szName,hb_comp_pFileName->szExtension);
+      szTempName           = ( char * ) hb_xgrab( HB_PATH_MAX );
+      hb_comp_PrgFileName  = ( char * ) hb_xgrab( HB_PATH_MAX );
+      hb_snprintf( szTempName, HB_PATH_MAX, "%s%s%s", hb_comp_pFileName->szPath ? hb_comp_pFileName->szPath : "", hb_comp_pFileName->szName, hb_comp_pFileName->szExtension );
 
       for( i = 0; i < strlen( szTempName ); i++ )
       {
-	 if ( szTempName[i] == '\\' )
-	 {
-	    hb_comp_PrgFileName[u++] = '\\';
-	    hb_comp_PrgFileName[u++] = '\\';
-	 }
-	 else
-	    hb_comp_PrgFileName[u++] = szTempName[i];
+         if( szTempName[ i ] == '\\' )
+         {
+            hb_comp_PrgFileName[ u++ ] = '\\';
+            hb_comp_PrgFileName[ u++ ] = '\\';
+         }
+         else
+            hb_comp_PrgFileName[ u++ ] = szTempName[ i ];
       }
-      hb_comp_PrgFileName[u] = 0;
+      hb_comp_PrgFileName[ u ]   = 0;
       hb_xfree( szTempName );
 
-      szSourceExtension = hb_comp_pFileName->szExtension;
+      szSourceExtension          = hb_comp_pFileName->szExtension;
 
       hb_fsFNameMerge( szFileName, hb_comp_pFileName );
 
       /* Local Variable List (.var) File
          hb_comp_iGenVarList is TRUE if /gcS is used
-      */
-      if ( hb_comp_iGenVarList )
+       */
+      if( hb_comp_iGenVarList )
       {
-         hb_comp_pFileName->szExtension = ".var";
+         hb_comp_pFileName->szExtension   = ".var";
          hb_fsFNameMerge( szVarListName, hb_comp_pFileName );
-         hb_comp_VariableList = hb_fopen( szVarListName, "w" );
+         hb_comp_VariableList             = hb_fopen( szVarListName, "w" );
       }
 
       if( hb_comp_bPPO )
@@ -5896,7 +5891,7 @@ static int hb_compCompile( char * szPrg )
          if( hb_comp_ppo_pOutPath )
             hb_comp_pFileName->szPath = hb_comp_ppo_pOutPath->szPath;
          hb_fsFNameMerge( szPpoName, hb_comp_pFileName );
-         if( !hb_pp_outFile( hb_comp_PP, szPpoName, NULL ) )
+         if( ! hb_pp_outFile( hb_comp_PP, szPpoName, NULL ) )
          {
             iStatus = EXIT_FAILURE;
          }
@@ -5907,7 +5902,7 @@ static int hb_compCompile( char * szPrg )
             if( hb_comp_ppo_pOutPath )
                hb_comp_pFileName->szPath = hb_comp_ppo_pOutPath->szPath;
             hb_fsFNameMerge( szPptName, hb_comp_pFileName );
-            if( !hb_pp_traceFile( hb_comp_PP, szPptName, NULL ) )
+            if( ! hb_pp_traceFile( hb_comp_PP, szPptName, NULL ) )
             {
                iStatus = EXIT_FAILURE;
             }
@@ -5915,17 +5910,17 @@ static int hb_compCompile( char * szPrg )
       }
 
       /* Giancarlo Niccolai: opening/creating i18n file */
-      if ( hb_comp_bI18n )
+      if( hb_comp_bI18n )
       {
-         const char *szExt;
+         const char * szExt;
 
          /* Get correct filename */
-         if ( hb_comp_szHILout == NULL )
+         if( hb_comp_szHILout == NULL )
          {
-            szExt = hb_comp_pFileName->szExtension;
-            hb_comp_pFileName->szExtension = ".hil";
+            szExt                            = hb_comp_pFileName->szExtension;
+            hb_comp_pFileName->szExtension   = ".hil";
             hb_fsFNameMerge( szHILName, hb_comp_pFileName );
-            hb_comp_pFileName->szExtension = szExt;
+            hb_comp_pFileName->szExtension   = szExt;
          }
          else
          {
@@ -5937,7 +5932,7 @@ static int hb_compCompile( char * szPrg )
          if( hb_comp_HILfile != NULL )
          {
             //... just go to the end
-            fseek(hb_comp_HILfile, 0, SEEK_END);
+            fseek( hb_comp_HILfile, 0, SEEK_END );
          }
          else
          {
@@ -5948,8 +5943,8 @@ static int hb_compCompile( char * szPrg )
             if( hb_comp_HILfile == NULL )
             {
                hb_compGenError( hb_comp_szErrors,
-                  'E', HB_COMP_ERR_CREATE_HIL,
-                  szHILName, NULL );
+                                'E', HB_COMP_ERR_CREATE_HIL,
+                                szHILName, NULL );
                iStatus = EXIT_FAILURE;
             }
             else
@@ -5973,7 +5968,7 @@ static int hb_compCompile( char * szPrg )
 
          if( hb_pp_inFile( hb_comp_PP, szFileName, FALSE, NULL, FALSE ) )
          {
-            BOOL bSkipGen = FALSE ;
+            BOOL bSkipGen = FALSE;
 
             hb_comp_szFile = szFileName;
 
@@ -6019,7 +6014,7 @@ static int hb_compCompile( char * szPrg )
             }
 
 #if defined( HB_FORCE_CLOSE_DUMP_AREA )
-            if ( iBeginDump != iEndDump )
+            if( iBeginDump != iEndDump )
             {
                hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_UNBALANCE_PRAGMAS, szPrg, NULL );
                iStatus = EXIT_FAILURE;
@@ -6055,9 +6050,9 @@ static int hb_compCompile( char * szPrg )
 
             if( hb_comp_bDebugInfo )
             {
-               hb_compExternAdd( hb_compIdentifierNew( "__DBGENTRY", TRUE ), NULL, (HB_SYMBOLSCOPE) 0 );
+               hb_compExternAdd( hb_compIdentifierNew( "__DBGENTRY", TRUE ), NULL, ( HB_SYMBOLSCOPE ) 0 );
                /*hb_compFunCallAdd( "__DBGENTRY", NULL, NSF_NONE );
-               pSyn*/
+                  pSyn*/
             }
 
             if( hb_comp_pInitFunc )
@@ -6065,9 +6060,9 @@ static int hb_compCompile( char * szPrg )
                char szNewName[ 32 ];
 
                /* Fix the number of static variables */
-               hb_comp_pInitFunc->pCode[ 3 ] = HB_LOBYTE( hb_comp_iStaticCnt );
-               hb_comp_pInitFunc->pCode[ 4 ] = HB_HIBYTE( hb_comp_iStaticCnt );
-               hb_comp_pInitFunc->iStaticsBase = hb_comp_iStaticCnt;
+               hb_comp_pInitFunc->pCode[ 3 ]    = HB_LOBYTE( hb_comp_iStaticCnt );
+               hb_comp_pInitFunc->pCode[ 4 ]    = HB_HIBYTE( hb_comp_iStaticCnt );
+               hb_comp_pInitFunc->iStaticsBase  = hb_comp_iStaticCnt;
 
                /* Update pseudo function name */
                hb_snprintf( szNewName, sizeof( szNewName ), "(_INITSTATICS%05d)", hb_comp_iStaticCnt );
@@ -6076,11 +6071,11 @@ static int hb_compCompile( char * szPrg )
                hb_compAddInitFunc( hb_comp_pInitFunc );
             }
 
-            if ( hb_comp_bLineNumbers && hb_comp_bDebugInfo )
+            if( hb_comp_bLineNumbers && hb_comp_bDebugInfo )
             {
                PHB_DEBUGINFO pInfo = hb_compGetDebugInfo(), pNext;
 
-               if ( pInfo )
+               if( pInfo )
                {
                   int iModules = 0;
 
@@ -6088,13 +6083,13 @@ static int hb_compCompile( char * szPrg )
 
                   do
                   {
-                     ULONG ulSkip = pInfo->ulFirstLine >> 3;
-                     ULONG ulLen = ( ( pInfo->ulLastLine + 7 ) >> 3 ) - ulSkip;
+                     HB_SIZE  ulSkip   = pInfo->ulFirstLine >> 3;
+                     HB_SIZE  ulLen    = ( ( pInfo->ulLastLine + 7 ) >> 3 ) - ulSkip;
 
                      hb_compGenPushString( pInfo->pszModuleName, strlen( pInfo->pszModuleName ) + 1 );
                      hb_compGenPushLong( ulSkip << 3 );
                      hb_compGenPushString( ( char * ) pInfo->pLineMap + ulSkip, ulLen + 1 );
-                     hb_compGenPCode3( HB_P_ARRAYGEN, 3, 0, (BOOL)0 );
+                     hb_compGenPCode3( HB_P_ARRAYGEN, 3, 0, ( BOOL ) 0 );
                      iModules++;
 
                      pNext = pInfo->pNext;
@@ -6102,9 +6097,10 @@ static int hb_compCompile( char * szPrg )
                      hb_xfree( pInfo->pLineMap );
                      hb_xfree( pInfo );
                      pInfo = pNext;
-                  } while ( pInfo );
+                  }
+                  while( pInfo );
 
-                  hb_compGenPCode3( HB_P_ARRAYGEN, HB_LOBYTE( iModules ), HB_HIBYTE( iModules ), (BOOL)0 );
+                  hb_compGenPCode3( HB_P_ARRAYGEN, HB_LOBYTE( iModules ), HB_HIBYTE( iModules ), ( BOOL ) 0 );
                   hb_compGenPCode1( HB_P_RETVALUE );
 
                   hb_compLineNumberDefEnd();
@@ -6142,8 +6138,8 @@ static int hb_compCompile( char * szPrg )
                {
                   PCOMSYMBOL pSym;
 
-                  pSym = hb_compSymbolAdd( hb_compIdentifierNew( "{_REGISTERGLOBALS}", TRUE ), NULL, NULL, SYMF_FUNCALL | SYMF_STATIC );
-                  pSym->cScope = HB_FS_INITEXIT;
+                  pSym           = hb_compSymbolAdd( hb_compIdentifierNew( "{_REGISTERGLOBALS}", TRUE ), NULL, NULL, SYMF_FUNCALL | SYMF_STATIC );
+                  pSym->cScope   = HB_FS_INITEXIT;
                }
             }
 
@@ -6159,7 +6155,7 @@ static int hb_compCompile( char * szPrg )
             {
                if( hb_comp_iErrorCount || ( hb_comp_iExitLevel == HB_EXITLEVEL_DELTARGET ) )
                {
-                  iStatus = EXIT_FAILURE;
+                  iStatus  = EXIT_FAILURE;
                   bSkipGen = TRUE;
                   printf( "\r%i error%s\n\nNo code generated\n", hb_comp_iErrorCount, ( hb_comp_iErrorCount > 1 ? "s" : "" ) );
                }
@@ -6171,8 +6167,8 @@ static int hb_compCompile( char * szPrg )
 
             if( ! hb_comp_bSyntaxCheckOnly && ! bSkipGen && ( hb_comp_iErrorCount == 0 ) )
             {
-               PFUNCTION pFunc;
-               BOOL bDoFirst = TRUE;
+               PFUNCTION   pFunc;
+               BOOL        bDoFirst = TRUE;
 
                /* we create the output file name */
                hb_compOutputFile();
@@ -6263,23 +6259,23 @@ static int hb_compCompile( char * szPrg )
 
                while( pFunc )
                {
-                  bFunc = ( ( strlen( pFunc->szName ) != 0 ) && ( strcmp(pFunc->szName,"(_INITSTATICS)") > 0  ) ) ;
+                  bFunc = ( ( strlen( pFunc->szName ) != 0 ) && ( strcmp( pFunc->szName, "(_INITSTATICS)" ) > 0 ) );
 
                   /* Using function name as section name */
                   if( bFunc && hb_comp_iGenVarList )
                   {
-                     fprintf(hb_comp_VariableList,"[%s]\n",pFunc->szName);
+                     fprintf( hb_comp_VariableList, "[%s]\n", pFunc->szName );
                   }
 
                   hb_compOptimizeFrames( pFunc );
 
                   /* Just a new line for readability */
-                  if ( bFunc && hb_comp_iGenVarList )
+                  if( bFunc && hb_comp_iGenVarList )
                   {
-                     fprintf(hb_comp_VariableList,"\n");
+                     fprintf( hb_comp_VariableList, "\n" );
                   }
 
-                  if( bDoFirst && pFunc->szName[0] && ( pFunc->cScope & HB_FS_INITEXIT & ~HB_FS_STATIC ) == 0 && ( pFunc->cScope & HB_FS_UTILITY ) != HB_FS_UTILITY )
+                  if( bDoFirst && pFunc->szName[ 0 ] && ( pFunc->cScope & HB_FS_INITEXIT & ~HB_FS_STATIC ) == 0 && ( pFunc->cScope & HB_FS_UTILITY ) != HB_FS_UTILITY )
                   {
                      PCOMSYMBOL pSym;
 
@@ -6293,9 +6289,9 @@ static int hb_compCompile( char * szPrg )
                      }
 
                      assert( pSym );
-                     pSym->cScope |= HB_FS_FIRST;
+                     pSym->cScope   |= HB_FS_FIRST;
 
-                     bDoFirst = FALSE;
+                     bDoFirst       = FALSE;
                   }
 
                   pFunc = pFunc->pNext;
@@ -6356,7 +6352,7 @@ static int hb_compCompile( char * szPrg )
       {
          hb_comp_funcalls.pFirst = pFunCall->pNext;
          hb_xfree( ( void * ) pFunCall );  /* NOTE: szName will be released by hb_compSymbolKill() */
-         pFunCall = hb_comp_funcalls.pFirst;
+         pFunCall                = hb_comp_funcalls.pFirst;
       }
       while( pFunCall );
    }
@@ -6367,8 +6363,8 @@ static int hb_compCompile( char * szPrg )
 
       do
       {
-         pDelete  = hb_comp_pExterns;
-         hb_comp_pExterns = hb_comp_pExterns->pNext;
+         pDelete           = hb_comp_pExterns;
+         hb_comp_pExterns  = hb_comp_pExterns->pNext;
          hb_xfree( ( void * ) pDelete );
       }
       while( hb_comp_pExterns );
@@ -6396,30 +6392,30 @@ static int hb_compCompile( char * szPrg )
       while( pInline );
    }
 
-   if ( hb_comp_iWarnings >= 3 && hb_comp_pReleaseDeclared )
+   if( hb_comp_iWarnings >= 3 && hb_comp_pReleaseDeclared )
    {
-      PCOMDECLARED pDeclared = hb_comp_pReleaseDeclared;
-      PCOMCLASS    pClass = hb_comp_pReleaseClass;
+      PCOMDECLARED   pDeclared   = hb_comp_pReleaseDeclared;
+      PCOMCLASS      pClass      = hb_comp_pReleaseClass;
 
       do
       {
-         hb_comp_pReleaseDeclared = pDeclared->pNext;
+         hb_comp_pReleaseDeclared   = pDeclared->pNext;
          hb_xfree( ( void * ) pDeclared );
-         pDeclared = hb_comp_pReleaseDeclared;
+         pDeclared                  = hb_comp_pReleaseDeclared;
       }
       while( pDeclared );
 
       while( pClass )
       {
-         hb_comp_pReleaseClass = pClass->pNext;
+         hb_comp_pReleaseClass   = pClass->pNext;
 
-         pDeclared = pClass->pMethod;
+         pDeclared               = pClass->pMethod;
 
-         while ( pDeclared )
+         while( pDeclared )
          {
-            hb_comp_pReleaseDeclared = pDeclared->pNext;
+            hb_comp_pReleaseDeclared   = pDeclared->pNext;
             hb_xfree( ( void * ) pDeclared );
-            pDeclared = hb_comp_pReleaseDeclared;
+            pDeclared                  = hb_comp_pReleaseDeclared;
          }
 
          hb_xfree( ( void * ) pClass );
@@ -6444,8 +6440,8 @@ static int hb_compCompile( char * szPrg )
 
       do
       {
-         pDelete = pGlobal;
-         pGlobal = pGlobal->pNext;
+         pDelete  = pGlobal;
+         pGlobal  = pGlobal->pNext;
          hb_xfree( pDelete );
       }
       while( pGlobal );
@@ -6457,8 +6453,8 @@ static int hb_compCompile( char * szPrg )
 
       do
       {
-         pDelete = pNamespace;
-         pNamespace = pNamespace->pNext;
+         pDelete     = pNamespace;
+         pNamespace  = pNamespace->pNext;
          hb_xfree( pDelete );
       }
       while( pNamespace );
@@ -6470,21 +6466,21 @@ static int hb_compCompile( char * szPrg )
 
       do
       {
-         pDelete = pNamespace;
-         pNamespace = pNamespace->pNext;
+         pDelete     = pNamespace;
+         pNamespace  = pNamespace->pNext;
          hb_xfree( pDelete );
       }
       while( pNamespace );
    }
 
    /* have we got i18n file ? */
-   if ( hb_comp_HILfile != NULL )
+   if( hb_comp_HILfile != NULL )
    {
       fclose( hb_comp_HILfile );
       hb_comp_HILfile = NULL;
    }
 
-   if ( hb_comp_szHILout != NULL )
+   if( hb_comp_szHILout != NULL )
    {
       hb_xfree( hb_comp_szHILout );
       hb_comp_szHILout = NULL;
@@ -6557,13 +6553,13 @@ static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
 
    if( hb_comp_pFileName->szName )
    {
-      char szFileName[ HB_PATH_MAX ];    /* filename to parse */
-      char szPpoName[ HB_PATH_MAX ];
+      char  szFileName[ HB_PATH_MAX ];   /* filename to parse */
+      char  szPpoName[ HB_PATH_MAX ];
 
       /* Clear and reinitialize preprocessor state */
       hb_pp_reset( hb_comp_PP );
 
-      if( !hb_comp_pFileName->szExtension )
+      if( ! hb_comp_pFileName->szExtension )
       {
          hb_comp_pFileName->szExtension = ".prg";
       }
@@ -6574,7 +6570,7 @@ static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
       {
          hb_comp_pFileName->szExtension = ".ppo";
          hb_fsFNameMerge( szPpoName, hb_comp_pFileName );
-         if( !hb_pp_outFile( hb_comp_PP, szPpoName, NULL ) )
+         if( ! hb_pp_outFile( hb_comp_PP, szPpoName, NULL ) )
          {
             iStatus = EXIT_FAILURE;
          }
@@ -6606,13 +6602,13 @@ static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
             }
 
             {
-               int i = hb_comp_iExitLevel ;
-               BOOL b = hb_comp_bAnyWarning;
+               int   i  = hb_comp_iExitLevel;
+               BOOL  b  = hb_comp_bAnyWarning;
 
                yyparse();
 
-               hb_comp_iExitLevel = ( i > hb_comp_iExitLevel ? i : hb_comp_iExitLevel );
-               hb_comp_bAnyWarning = b || hb_comp_bAnyWarning;
+               hb_comp_iExitLevel   = ( i > hb_comp_iExitLevel ? i : hb_comp_iExitLevel );
+               hb_comp_bAnyWarning  = b || hb_comp_bAnyWarning;
             }
 
             if( hb_comp_bAnyWarning )
@@ -6623,8 +6619,8 @@ static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
                }
                else if( hb_comp_iExitLevel == HB_EXITLEVEL_DELTARGET )
                {
-                  iStatus = EXIT_FAILURE;
-                  *pbSkipGen = TRUE;
+                  iStatus     = EXIT_FAILURE;
+                  *pbSkipGen  = TRUE;
                   printf( "\nNo code generated.\n" );
                }
             }
@@ -6634,7 +6630,7 @@ static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
             fprintf( hb_comp_errFile, "Cannot open %s, assumed external\n", szFileName );
          }
       }
-		
+
       hb_xfree( hb_comp_pFileName );
    }
    else
@@ -6646,16 +6642,16 @@ static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
    return iStatus;
 }
 
-void hb_compEnumAdd( char *szName )
+void hb_compEnumAdd( char * szName )
 {
-   PENUMDEF pEnum = (PENUMDEF) hb_xgrab( sizeof( ENUMDEF ) );
+   PENUMDEF pEnum = ( PENUMDEF ) hb_xgrab( sizeof( ENUMDEF ) );
 
    //printf( "New set: '%s'\n", szName );
 
-   pEnum->szName = szName;
-   pEnum->lMembers = 0;
-   pEnum->pMembers = NULL;
-   pEnum->pNext = NULL;
+   pEnum->szName     = szName;
+   pEnum->lMembers   = 0;
+   pEnum->pMembers   = NULL;
+   pEnum->pNext      = NULL;
 
    if( hb_comp_functions.pLast->pEnums )
    {
@@ -6669,26 +6665,26 @@ void hb_compEnumAdd( char *szName )
    hb_comp_pEnum = pEnum;
 }
 
-void hb_compEnumMemberAdd( char *szName )
+void hb_compEnumMemberAdd( char * szName )
 {
    //printf( "Member: '%s'\n", szName );
 
-   if ( hb_comp_pEnum->pMembers )
+   if( hb_comp_pEnum->pMembers )
    {
-      hb_comp_pEnum->pMembers = (char **) hb_xrealloc( hb_comp_pEnum->pMembers, ++hb_comp_pEnum->lMembers * sizeof( char * ) );
+      hb_comp_pEnum->pMembers = ( char ** ) hb_xrealloc( hb_comp_pEnum->pMembers, ++hb_comp_pEnum->lMembers * sizeof( char * ) );
    }
    else
    {
-      hb_comp_pEnum->pMembers = (char **) hb_xgrab( sizeof( char * ) );
+      hb_comp_pEnum->pMembers = ( char ** ) hb_xgrab( sizeof( char * ) );
    }
 
    hb_comp_pEnum->pMembers[ hb_comp_pEnum->lMembers - 1 ] = szName;
 }
 
 /* Giancarlo Niccolai: internatonalization functions */
-void hb_compAddI18nString( char *szString )
+void hb_compAddI18nString( char * szString )
 {
-   int nLen;
+   HB_SIZE nLen;
 
    nLen = strlen( szString );
 
@@ -6703,46 +6699,46 @@ void hb_compAddI18nString( char *szString )
    // hil file is an hit file without translations
    fprintf( hb_comp_HILfile, "       0" );
 
-   if ( ferror( hb_comp_HILfile ) )
+   if( ferror( hb_comp_HILfile ) )
    {
       /* TODO:Signal error */
       hb_comp_bI18n = FALSE;
    }
 }
 
-static int hb_compProcessRSPFile( char* szRspName )
+static int hb_compProcessRSPFile( char * szRspName )
 {
-   FILE *inFile;
-   int ch;
-   int i;
+   FILE *   inFile;
+   int      ch;
+   int      i;
 //   int iProcess = 1;
-   int iStatus = EXIT_SUCCESS;
-   BOOL bFirstChar = FALSE;
+   int      iStatus     = EXIT_SUCCESS;
+   BOOL     bFirstChar  = FALSE;
 
-   szRspName ++;
+   szRspName++;
 
-   inFile = hb_fopen( szRspName, "r" );
-   i = 0;
+   inFile   = hb_fopen( szRspName, "r" );
+   i        = 0;
 
-   if ( !inFile )
+   if( ! inFile )
    {
       fprintf( hb_comp_errFile, "Cannot open input file: %s\n", szRspName );
       iStatus = EXIT_FAILURE;
    }
    else
    {
-      char *szFile = (char*) hb_xgrab( HB_PATH_MAX );
+      char * szFile = ( char * ) hb_xgrab( HB_PATH_MAX );
 
       hb_xmemset( szFile, '\0', HB_PATH_MAX );
 
-      while ( ( ch = fgetc ( inFile ) ) != EOF )
+      while( ( ch = fgetc( inFile ) ) != EOF )
       {
-         if ( ch == '\n' || ch == ' ' )
+         if( ch == '\n' || ch == ' ' )
          {
-	    if ( !(*szFile) )
-	    {
-	       continue;
-	    }
+            if( ! ( *szFile ) )
+            {
+               continue;
+            }
 
             iStatus = hb_compCompile( szFile );
 
@@ -6756,47 +6752,49 @@ static int hb_compProcessRSPFile( char* szRspName )
             i = 0;
             hb_xmemset( szFile, '\0', HB_PATH_MAX );
          }
-         else if ( ch == '#' )
-	 {
-            while ( ( ch = fgetc ( inFile ) ) != '\n' && ch != EOF )
-            {;
+         else if( ch == '#' )
+         {
+            while( ( ch = fgetc( inFile ) ) != '\n' && ch != EOF )
+            {
+               ;
             }
-	 }
-         else if ( ch == ',' )
-	 {
-	    continue;
-	 }
-         else if ( ch == '"' )
-	 {
-            while ( ( ch = fgetc ( inFile ) ) != '"' && ch != '\n' && ch != EOF )
-            {;
-               szFile [ i ++ ] = (char) ch;
+         }
+         else if( ch == ',' )
+         {
+            continue;
+         }
+         else if( ch == '"' )
+         {
+            while( ( ch = fgetc( inFile ) ) != '"' && ch != '\n' && ch != EOF )
+            {
+               ;
+               szFile[ i++ ] = ( char ) ch;
             }
-	 }
-	 else
-	 {
+         }
+         else
+         {
             /* left trim() */
             if( HB_ISSPACE( ch ) )
             {
                if( bFirstChar )
                {
                   /* allow space in file name */
-                  szFile [ i ++ ] = (char) ch;
+                  szFile[ i++ ] = ( char ) ch;
                }
             }
             else
             {
-               szFile [ i ++ ] = (char) ch;
+               szFile[ i++ ] = ( char ) ch;
 
-               if( !bFirstChar )
+               if( ! bFirstChar )
                {
                   bFirstChar = TRUE;
                }
             }
-	 }
+         }
       }
 
-      fclose ( inFile );
+      fclose( inFile );
       hb_xfree( szFile );
    }
 

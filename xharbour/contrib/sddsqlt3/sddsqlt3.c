@@ -243,7 +243,7 @@ static HB_ERRCODE sqlite3Open( SQLBASEAREAP pArea )
    sqlite3_stmt * st = NULL;
    SDDDATA * pSDDData;
    const char * pszQuery;
-   HB_SIZE nQueryLen;
+   ULONG nQueryLen;
    void * hQuery;
    HB_USHORT uiFields, uiIndex;
    PHB_ITEM pItemEof, pItem;
@@ -491,8 +491,8 @@ static HB_ERRCODE sqlite3GoTo( SQLBASEAREAP pArea, HB_ULONG ulRecNo )
    }
    else
    {
-      pArea->pRecord = pArea->pRow[ ulRecNo ];
-      pArea->bRecordFlags = pArea->pRowFlags[ ulRecNo ];
+      pArea->pRecord = pArea->pRow[ (ULONG) ulRecNo ];
+      pArea->bRecordFlags = pArea->pRowFlags[ (ULONG) ulRecNo ];
       pArea->fPositioned = HB_TRUE;
    }
    return HB_SUCCESS;

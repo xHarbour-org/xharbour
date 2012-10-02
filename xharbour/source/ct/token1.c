@@ -111,7 +111,6 @@ static int  siPostSeparator   = -1; /* TODO: make this threadsafe */
 /* helper function for the token function group I */
 static void do_token1( int iSwitch )
 {
-
    int   iParamCheck = 0;
    int   iNoRef      = ct_getref() && ISBYREF( 1 );
 
@@ -134,18 +133,17 @@ static void do_token1( int iSwitch )
 
    if( iParamCheck )
    {
-
       const char *   pcString       = hb_parc( 1 );
-      size_t         sStrLen        = ( size_t ) hb_parclen( 1 );
+      HB_SIZE        sStrLen        = hb_parclen( 1 );
       const char *   pcSeparatorStr;
-      size_t         sSeparatorStrLen;
+      HB_SIZE        sSeparatorStrLen;
       ULONG          ulTokenCounter = 0;
       ULONG          ulSkip;
 
       const char *   pcSubStr;
       char *         pcRet       = NULL;
-      size_t         sSubStrLen;
-      size_t         sRetStrLen  = 0;
+      HB_SIZE        sSubStrLen;
+      HB_SIZE        sRetStrLen  = 0;
 
       ULONG          ulToken     = 0;
       ULONG          ulSkipCnt;
@@ -207,7 +205,7 @@ static void do_token1( int iSwitch )
             return;
          }
          pcRet = ( char * ) hb_xgrab( sRetStrLen = sStrLen );
-         hb_xmemcpy( pcRet, pcString, sRetStrLen );
+         hb_xmemcpy( pcRet, pcString, (size_t) sRetStrLen );
       }
 
       /* find the <ulTokenCounter>th token */
@@ -219,8 +217,7 @@ static void do_token1( int iSwitch )
 
       while( ulToken < ulTokenCounter )
       {
-
-         size_t sMatchedPos = sSeparatorStrLen;
+         HB_SIZE sMatchedPos = sSeparatorStrLen;
 
          /* Skip the left ulSkip successive separators */
          ulSkipCnt = 0;
@@ -344,7 +341,7 @@ static void do_token1( int iSwitch )
 
                for( t = pc + 1; t < pcString + sStrLen; t++ )
                {
-                  if( ! memchr( pcSeparatorStr, *t, sSeparatorStrLen ) )
+                  if( ! memchr( pcSeparatorStr, *t, (size_t) sSeparatorStrLen ) )
                   {
                      bLast = FALSE;
                      break;
@@ -397,7 +394,7 @@ static void do_token1( int iSwitch )
          {
             if( ( ulTokenCounter == HB_MKULONG( 255, 255, 255, 255 ) ) ||
                 ( ulToken == ulTokenCounter ) )
-               hb_retnl( pcSubStr - pcString + 1 );
+               hb_retnl( ( LONG ) ( pcSubStr - pcString + 1 ) );
             else
                hb_retnl( 0 );
          }; break;
@@ -539,31 +536,26 @@ static void do_token1( int iSwitch )
 HB_FUNC( ATTOKEN )
 {
    do_token1( DO_TOKEN1_ATTOKEN );
-   return;
 }
 
 HB_FUNC( TOKEN )
 {
    do_token1( DO_TOKEN1_TOKEN );
-   return;
 }
 
 HB_FUNC( NUMTOKEN )
 {
    do_token1( DO_TOKEN1_NUMTOKEN );
-   return;
 }
 
 HB_FUNC( TOKENLOWER )
 {
    do_token1( DO_TOKEN1_TOKENLOWER );
-   return;
 }
 
 HB_FUNC( TOKENUPPER )
 {
    do_token1( DO_TOKEN1_TOKENUPPER );
-   return;
 }
 
 HB_FUNC( TOKENSEP )
@@ -596,7 +588,5 @@ HB_FUNC( TOKENSEP )
          hb_retc( "" );
       }
    }
-
-   return;
 }
 

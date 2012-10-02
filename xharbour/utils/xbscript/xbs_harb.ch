@@ -1520,7 +1520,7 @@
          char sReturn[2048];
          char s2[3];
          BOOL lDontRecord;
-         size_t Counter, nLen, nStringLen = 0;
+         HB_SIZE Counter, nLen, nStringLen = 0;
 
          //#define DEBUG_TOKEN
          #ifdef DEBUG_TOKEN
@@ -1583,7 +1583,8 @@
                }
                else
                {
-                  strncpy( sReturn, sLine, ( pTmp - sLine ) + 2 );
+                  // strncpy( sReturn, sLine, ( pTmp - sLine ) + 2 );
+                  hb_strncpy( sReturn, sLine, ( pTmp - sLine ) + 2 );
                   sReturn[( pTmp - sLine ) + 2] = '\0';
                }
 
@@ -1757,7 +1758,8 @@
             }
             else
             {
-               strncpy( sReturn, sLine, ( pTmp - sLine ) + 1 );
+               // strncpy( sReturn, sLine, ( pTmp - sLine ) + 1 );
+               hb_strncpy( sReturn, sLine, ( pTmp - sLine ) + 1 );
                sReturn[( pTmp - sLine ) + 1] = '\0';
             }
 
@@ -1773,7 +1775,8 @@
             }
             else
             {
-               strncpy( sReturn, sLine, ( pTmp - sLine ) + 1 );
+               // strncpy( sReturn, sLine, ( pTmp - sLine ) + 1 );
+               hb_strncpy( sReturn, sLine, ( pTmp - sLine ) + 1 );
                sReturn[( pTmp - sLine ) + 1] = '\0';
 
                if( strchr( sReturn, '"' ) == NULL )
@@ -1802,7 +1805,8 @@
                }
                else
                {
-                  strncpy( sReturn, sLine, ( pTmp - sLine ) + 1 );
+                  // strncpy( sReturn, sLine, ( pTmp - sLine ) + 1 );
+                  hb_strncpy( sReturn, sLine, ( pTmp - sLine ) + 1 );
                   sReturn[( pTmp - sLine ) + 1] = '\0';
 
                   if( strchr( sReturn, '"' ) == NULL )
@@ -1900,7 +1904,7 @@
          PHB_ITEM pLine    = hb_param( 1, HB_IT_STRING );
          char *sLine;
          char cChar, cLastChar = ' ';
-         size_t nAt, nLen;
+         HB_SIZE nAt, nLen;
          int nStart = -1;
 
          if( pLine == NULL || pLine->item.asString.length == 0 )
@@ -1986,7 +1990,7 @@
              }
              else if( nStart == -1 && ( isalpha( (BYTE) cChar ) || cChar == '_' ) )
              {
-                nStart = nAt;
+                nStart = ( int ) nAt;
              }
 
              cLastChar = cChar;
@@ -2004,7 +2008,8 @@
 
              sIdentifier = (char *) hb_xgrab( nLen + 1 );
 
-             strncpy( sIdentifier, sLine + nStart, nLen );
+             // strncpy( sIdentifier, sLine + nStart, nLen );
+             hb_strncpy( sIdentifier, sLine + nStart, nLen );
              sIdentifier[ nLen ] = '\0';
 
              //printf( "\nLine: '%s' nStart: %i nAt: %i sIdentifier: '%s' Residual '%s'\n", sLine, nStart, nAt, sIdentifier, sLine + nAt );
@@ -2066,7 +2071,7 @@
       HB_FUNC_STATIC( DROPTRAILINGWS )
       {
          PHB_ITEM pLine = hb_param( 1, HB_IT_STRING );
-         size_t iLen, i, iDrop = 0;
+         HB_SIZE iLen, i, iDrop = 0;
 
          if( pLine == NULL || pLine->item.asString.length == 0 )
          {
@@ -2105,7 +2110,7 @@
       HB_FUNC_STATIC( DROPEXTRATRAILINGWS )
       {
          PHB_ITEM pLine = hb_param( 1, HB_IT_STRING );
-         size_t iLen, i, iDrop = 0;
+         HB_SIZE iLen, i, iDrop = 0;
 
          if( pLine == NULL || pLine->item.asString.length == 0 )
          {

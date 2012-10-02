@@ -205,7 +205,7 @@ static PHB_MEMFS_INODE memfsInodeAlloc( const char* szName )
    pInode->llSize = 0;
    pInode->llAlloc = HB_MEMFS_INITSIZE;
    pInode->pData = ( char * ) hb_xgrab( ( ULONG ) pInode->llAlloc );
-   memset( pInode->pData, 0, pInode->llAlloc );
+   memset( pInode->pData, 0, (size_t) pInode->llAlloc );
    pInode->szName = hb_strdup( szName );
 
    pInode->uiCount = 1;
@@ -551,7 +551,7 @@ HB_MEMFS_EXPORT ULONG hb_memfsWriteAt( HB_FHANDLE hFile, const void * pBuff, ULO
          llNewAlloc = llOffset + ( HB_FOFFSET ) ulCount;
 
       pInode->pData = ( char * ) hb_xrealloc( pInode->pData, ( ULONG ) llNewAlloc );
-      memset( pInode->pData + ( ULONG ) pInode->llAlloc, 0, llNewAlloc - pInode->llAlloc );
+      memset( pInode->pData + ( ULONG ) pInode->llAlloc, 0, (size_t) ( llNewAlloc - pInode->llAlloc ) );
       pInode->llAlloc = llNewAlloc;
    }
    memcpy( pInode->pData + ( ULONG ) llOffset, pBuff, ulCount );
@@ -605,7 +605,7 @@ HB_MEMFS_EXPORT BOOL hb_memfsTruncAt( HB_FHANDLE hFile, HB_FOFFSET llOffset )
          llNewAlloc = llOffset;
 
       pInode->pData = ( char * ) hb_xrealloc( pInode->pData, ( ULONG ) llNewAlloc );
-      memset( pInode->pData + ( ULONG ) pInode->llAlloc, 0, llNewAlloc - pInode->llAlloc );
+      memset( pInode->pData + ( ULONG ) pInode->llAlloc, 0, (size_t) ( llNewAlloc - pInode->llAlloc ) );
       pInode->llAlloc = llNewAlloc;
    }
    else if( ( pInode->llAlloc >> 2 ) > ( llOffset > HB_MEMFS_INITSIZE ? llOffset : HB_MEMFS_INITSIZE ) )
@@ -614,7 +614,7 @@ HB_MEMFS_EXPORT BOOL hb_memfsTruncAt( HB_FHANDLE hFile, HB_FOFFSET llOffset )
       pInode->pData = ( char * ) hb_xrealloc( pInode->pData, ( ULONG ) pInode->llAlloc );
    }
 
-   memset( pInode->pData + ( ULONG ) llOffset, 0, pInode->llAlloc - llOffset );
+   memset( pInode->pData + ( ULONG ) llOffset, 0, (size_t) ( pInode->llAlloc - llOffset ) );
 
    pInode->llSize = llOffset;
    HB_MEMFSMT_UNLOCK

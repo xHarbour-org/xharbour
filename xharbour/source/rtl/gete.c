@@ -75,7 +75,7 @@ HB_FUNC( GETENV )
    if( pName )
    {
       char * pszName = hb_itemGetC( pName );
-      ULONG ulName = strlen( pszName );
+      HB_SIZE ulName = strlen( pszName );
       ULONG ulPos;
 
       /* strip the '=' or else it will clear the variable! */

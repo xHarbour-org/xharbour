@@ -215,7 +215,7 @@ HB_FUNC( __KEYBOARD )
    {
       PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY ) ;
       ULONG ulIndex ;
-      ULONG ulElements = hb_arrayLen( pArray ) ;
+      HB_SIZE ulElements = hb_arrayLen( pArray ) ;
       for ( ulIndex = 1 ; ulIndex <= ulElements ; ulIndex++ )
       {
          PHB_ITEM pItem = hb_arrayGetItemPtr( pArray, ulIndex ) ;
@@ -240,7 +240,7 @@ HB_FUNC( HB_KEYPUT )
    {
       PHB_ITEM pText = hb_param( 1, HB_IT_STRING );
       char * szText = hb_itemGetCPtr( pText );
-      ULONG ulLen = hb_itemGetCLen( pText ), ulIndex;
+      HB_SIZE ulLen = hb_itemGetCLen( pText ), ulIndex;
 
       for( ulIndex = 0; ulIndex < ulLen; ulIndex++ )
          hb_inkeyPut( ( UCHAR ) szText[ ulIndex ] );
@@ -248,7 +248,7 @@ HB_FUNC( HB_KEYPUT )
    else if( ISARRAY( 1 ) )
    {
       PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
-      ULONG ulElements = hb_arrayLen( pArray ), ulIndex;
+      HB_SIZE ulElements = hb_arrayLen( pArray ), ulIndex;
 
       for( ulIndex = 1; ulIndex <= ulElements; ulIndex++ )
       {

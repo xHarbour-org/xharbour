@@ -235,7 +235,7 @@ int hb_ipDataReady( HB_SOCKET_T hSocket, int timeout )
 
    if( timeout == -1 )
    {
-      if( select( hSocket + 1, &set, NULL, NULL, NULL ) < 0 )
+      if( select( ( int ) hSocket + 1, &set, NULL, NULL, NULL ) < 0 )
       {
          HB_SOCKET_SET_ERROR();
          return 0;
@@ -245,7 +245,7 @@ int hb_ipDataReady( HB_SOCKET_T hSocket, int timeout )
    {
       tv.tv_sec = timeout/ 1000;
       tv.tv_usec = (timeout % 1000) * 1000;
-      if( select( hSocket + 1, &set, NULL, NULL, &tv ) < 0 )
+      if( select( ( int ) hSocket + 1, &set, NULL, NULL, &tv ) < 0 )
       {
          HB_SOCKET_SET_ERROR();
          return 0;
@@ -265,14 +265,14 @@ static int hb_selectWriteSocket( HB_SOCKET_T hSocket, int timeout )
 
    if( timeout == -1 )
    {
-      if( select( hSocket + 1, NULL, &set, NULL, NULL ) < 0 )
+      if( select( ( int ) hSocket + 1, NULL, &set, NULL, NULL ) < 0 )
          return 0;
    }
    else
    {
       tv.tv_sec = timeout / 1000;
       tv.tv_usec = (timeout % 1000) * 1000;
-      if( select( hSocket + 1, NULL, &set, NULL, &tv ) < 0 )
+      if( select( ( int ) hSocket + 1, NULL, &set, NULL, &tv ) < 0 )
          return 0;
    }
 
@@ -292,14 +292,14 @@ static int hb_selectWriteExceptSocket( HB_SOCKET_T hSocket, int timeout )
 
    if( timeout == -1 )
    {
-      if( select( hSocket + 1, NULL, &set, &eset, NULL ) < 0 )
+      if( select( ( int ) hSocket + 1, NULL, &set, &eset, NULL ) < 0 )
          return 2;
    }
    else
    {
       tv.tv_sec = timeout/ 1000;
       tv.tv_usec = (timeout % 1000) * 1000;
-      if( select( hSocket + 1, NULL, &set, &eset, &tv) < 0 )
+      if( select( ( int ) hSocket + 1, NULL, &set, &eset, &tv) < 0 )
          return 2;
    }
 
@@ -709,7 +709,7 @@ HB_FUNC( HB_IPRECV )
    }
 
    pBuffer = hb_itemUnShare( pBuffer );
-   hb_retni( hb_ipRecv( hSocket, hb_itemGetCPtr(pBuffer), hb_itemGetCLen(pBuffer) ) );
+   hb_retni( hb_ipRecv( hSocket, hb_itemGetCPtr(pBuffer), (int) hb_itemGetCLen(pBuffer) ) );
 }
 
 HB_FUNC( HB_IPSEND )
@@ -724,7 +724,7 @@ HB_FUNC( HB_IPSEND )
       return;
    }
 
-   hb_retni( hb_ipSend( hSocket, hb_itemGetCPtr(pBuffer), hb_itemGetCLen(pBuffer), timeout ) );
+   hb_retni( hb_ipSend( hSocket, hb_itemGetCPtr(pBuffer), (int) hb_itemGetCLen(pBuffer), timeout ) );
 }
 
 HB_FUNC( HB_IPSERVER )
@@ -747,7 +747,7 @@ HB_FUNC( HB_IPSERVER )
 
    hSocket = hb_ipServer( iPort, szAddress, iListen );
    if( hSocket != ( HB_SOCKET_T ) -1 )
-      hb_retnl( hSocket );
+      hb_retnl( ( long ) hSocket );
    else
       hb_ret();
 }
@@ -773,7 +773,7 @@ HB_FUNC( HB_IPACCEPT )
    {
       PHB_ITEM temp, aInfo = hb_itemArrayNew( 3 );
 
-      temp = hb_itemPutNL( NULL, incoming );
+      temp = hb_itemPutNL( NULL, (const LONG) incoming );
       hb_itemArrayPut( aInfo, 1, temp );
       hb_itemRelease( temp );
 
@@ -802,7 +802,7 @@ HB_FUNC( HB_IPCONNECT )
 
    hSocket = hb_ipConnect( hb_parc(1), htons( hb_parni(2) ), ( ISNIL(3) )? -1:hb_parni(3) );
 
-   hb_retnl( hSocket );
+   hb_retnl( ( long ) hSocket );
 }
 
 HB_FUNC( HB_IPDATAREADY )
@@ -869,7 +869,7 @@ void hb_ip_rfd_set( HB_SOCKET_T hSocket )
    HB_SOCKET_ZERO_ERROR();
 
    FD_SET( hSocket, &rd_fds );
-   rd_maxfd = ( rd_maxfd > hSocket )? rd_maxfd : hSocket;
+   rd_maxfd = ( rd_maxfd > hSocket ) ? rd_maxfd : (unsigned int) hSocket;
 }
 
 void hb_ip_rfd_clr( HB_SOCKET_T hSocket )

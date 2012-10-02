@@ -70,7 +70,7 @@ static void AddToArray( PHB_ITEM pItem, PHB_ITEM pReturn, ULONG ulPos )
 
    if( pItem->type == HB_IT_SYMBOL )
    {
-      int iLen = strlen( pItem->item.asSymbol.value->szName ) + 2;
+      int iLen = (int) strlen( pItem->item.asSymbol.value->szName ) + 2;
       char *sTemp = (char *) hb_xgrab( iLen + 1 );
 
       hb_snprintf( sTemp, iLen + 1, "[%s]", pItem->item.asSymbol.value->szName );
@@ -137,7 +137,7 @@ HB_FUNC( HB_DBG_VMSTKGLIST )
  * $FuncName$     <nVars> hb_dbg_vmStkLCount( <nProcLevel> )
  * $Description$  Returns params plus locals amount of the nProcLevel function
  * $End$ */
-static LONG hb_stackLen( int iLevel )
+static USHORT hb_stackLen( int iLevel )
 {
    PHB_ITEM * pBase = HB_VM_STACK.pBase;
    USHORT uiCount = 0;
@@ -146,7 +146,7 @@ static LONG hb_stackLen( int iLevel )
 
    while( ( iLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
    {
-      uiCount = pBase - ( HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase ) - 2;
+      uiCount = ( USHORT ) ( pBase - ( HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase ) - 2 );
       pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase;
    }
 

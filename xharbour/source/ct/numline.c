@@ -59,14 +59,14 @@ HB_FUNC( NUMLINE )
 
    if( ISCHAR( 1 ) )
    {
-      const char *   pcString = hb_parc( 1 );
-      const char *   pBuffer;
-      LONG           lStrLen  = hb_parclen( 1 );
-      LONG           lLength  = ( ISNUM( 2 ) ? hb_parnl( 2 ) : 80 );
+      const char * pcString = hb_parc( 1 );
+      const char * pBuffer;
+      HB_SIZE      lStrLen  = hb_parclen( 1 );
+      LONG         lLength  = ( ISNUM( 2 ) ? hb_parnl( 2 ) : 80 );
 
       while( lStrLen > 0 )
       {
-         pBuffer = ( char * ) memchr( pcString, 13, lStrLen );
+         pBuffer = ( char * ) memchr( pcString, 13, (size_t) lStrLen );
          if( ! pBuffer )
          {
             pBuffer = pcString + lStrLen;
@@ -79,9 +79,11 @@ HB_FUNC( NUMLINE )
          else
          {
             pBuffer++;
+
             if( *pBuffer == 10 )
                pBuffer++;
          }
+
          lStrLen  -= pBuffer - pcString;
          pcString = pBuffer;
          lLines++;

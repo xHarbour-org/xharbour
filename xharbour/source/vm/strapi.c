@@ -67,18 +67,18 @@
 ----------------------------------------------------------------------------------*/
 static const wchar_t s_szConstStr[ 1 ] = { 0 };
 
-ULONG hb_strcopy( PHB_ITEM pItem, char * pStr, ULONG nLen )
+HB_SIZE hb_strcopy( PHB_ITEM pItem, char * pStr, HB_SIZE nLen )
 {
    if( pItem && HB_IS_STRING( pItem ) )
    {
-      ULONG size = hb_itemGetCLen( pItem );
+      HB_SIZE size = hb_itemGetCLen( pItem );
 
       if( pStr )
       {
          if( size > nLen )
             size = nLen;
          if( size )
-            HB_MEMCPY( pStr, hb_itemGetCPtr( pItem ), size );
+            HB_MEMCPY( pStr, hb_itemGetCPtr( pItem ), (size_t) size );
          if( size < nLen )
             pStr[ size ] = '\0';
       }
@@ -92,7 +92,7 @@ ULONG hb_strcopy( PHB_ITEM pItem, char * pStr, ULONG nLen )
    return 0;
 }
 
-const char * hb_strget( PHB_ITEM pItem, void ** phStr, ULONG * pnLen )
+const char * hb_strget( PHB_ITEM pItem, void ** phStr, HB_SIZE * pnLen )
 {
    const char * pStr;
 
@@ -120,14 +120,14 @@ const char * hb_strnull( const char * str )
    return str ? str : "";
 }
 
-void hb_retstrlen_utf8( const char * szText, ULONG nLen )
+void hb_retstrlen_utf8( const char * szText, HB_SIZE nLen )
 {
    HB_THREAD_STUB
 
    hb_itemPutStrLenUTF8( hb_stackReturnItem(), szText, nLen );
 }
 
-const char * hb_parstr_utf8( int iParam, void ** phString, ULONG * pnLen )
+const char * hb_parstr_utf8( int iParam, void ** phString, HB_SIZE * pnLen )
 {
 	HB_THREAD_STUB
 
@@ -168,11 +168,11 @@ void hb_retstr_utf8( const char * szText )
                          szText ? strlen( szText ) : 0 );
 }
 
-PHB_ITEM hb_itemPutStrLenUTF8( PHB_ITEM pItem, const char * pStr, ULONG nLen )
+PHB_ITEM hb_itemPutStrLenUTF8( PHB_ITEM pItem, const char * pStr, HB_SIZE nLen )
 {
    PHB_CODEPAGE cdp;
    char * pszDest;
-   ULONG nDest;
+   HB_SIZE nDest;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_itemPutStrLenUTF8(%p,%p,%" HB_PFS "u)", pItem, pStr, nLen));
 
@@ -187,7 +187,7 @@ PHB_ITEM hb_itemPutStrLenUTF8( PHB_ITEM pItem, const char * pStr, ULONG nLen )
    return hb_itemPutCLPtr( pItem, pszDest, nDest );
 }
 
-const char * hb_itemGetStrUTF8( PHB_ITEM pItem, void ** phString, ULONG * pnLen )
+const char * hb_itemGetStrUTF8( PHB_ITEM pItem, void ** phString, HB_SIZE * pnLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_itemGetStrUTF8(%p,%p,%p)", pItem, phString, pnLen));
 
@@ -195,7 +195,7 @@ const char * hb_itemGetStrUTF8( PHB_ITEM pItem, void ** phString, ULONG * pnLen 
    {
 		PHB_CODEPAGE cdp = hb_cdppage(); 
      
-		ULONG nLen = hb_cdpStringInUTF8Length( cdp, FALSE,
+		HB_SIZE nLen = hb_cdpStringInUTF8Length( cdp, FALSE,
                                          pItem->item.asString.value,
                                          pItem->item.asString.length );								 
 		if( pnLen )
@@ -232,7 +232,7 @@ PHB_ITEM hb_itemPutStrUTF8( PHB_ITEM pItem, const char * pStr )
 {
    PHB_CODEPAGE cdp;
    char * pszDest;
-   ULONG nDest, nLen;
+   HB_SIZE nDest, nLen;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_itemPutStrUTF8(%p,%p)", pItem, pStr));
 
@@ -248,7 +248,7 @@ PHB_ITEM hb_itemPutStrUTF8( PHB_ITEM pItem, const char * pStr )
    return hb_itemPutCLPtr( pItem, pszDest, nDest );
 }
 
-BOOL hb_arraySetStrUTF8( PHB_ITEM pArray, ULONG nIndex, const char * pStr)
+BOOL hb_arraySetStrUTF8( PHB_ITEM pArray, HB_SIZE nIndex, const char * pStr)
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arraySetStrUTF8(%p, %lu, %p)", pArray, nIndex, pStr));
    

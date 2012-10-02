@@ -113,7 +113,7 @@ static void hb_compLoopLoop( void );
 static void hb_compLoopExit( void );
 static void hb_compLoopHere( void );
 
-static void * hb_compElseIfGen( void * pFirstElseIf, ULONG ulOffset ); /* generates a support structure for elseifs pcode fixups */
+static void * hb_compElseIfGen( void * pFirstElseIf, HB_SIZE ulOffset ); /* generates a support structure for elseifs pcode fixups */
 static void hb_compElseIfFix( void * pIfElseIfs ); /* implements the ElseIfs pcode fixups */
 
 static void hb_compRTVariableAdd( HB_EXPR_PTR, BOOL );
@@ -127,14 +127,14 @@ static void hb_compVariableDim( char *, HB_EXPR_PTR );
 
 typedef struct __ELSEIF
 {
-   ULONG ulOffset;
+   HB_SIZE ulOffset;
    struct __ELSEIF * pNext;
    struct __ELSEIF * pPrevGroup;
 } _ELSEIF, * PELSEIF;      /* support structure for else if pcode fixups */
 
 typedef struct _LOOPEXIT
 {
-   ULONG              ulOffset;
+   HB_SIZE            ulOffset;
    BOOL               fCanLoop;
    int                iLine;
    USHORT             wSeqCounter;
@@ -161,7 +161,7 @@ USHORT hb_comp_wCaseCounter     = 0;
 USHORT hb_comp_wWithObjCounter  = 0;
 USHORT hb_comp_wFinallyCounter  = 0;
 
-ULONG  hb_comp_alLastSwitchPos[ HB_MAX_SWITCHES ];
+HB_SIZE hb_comp_alLastSwitchPos[ HB_MAX_SWITCHES ];
 USHORT hb_comp_wSwitchCounter   = 0;
 
 char * hb_comp_buffer; /* yacc input buffer */
@@ -2579,10 +2579,10 @@ IfBegin    : IF Expression {
                            }
              Crlf
                            {
-                              hb_compExprDelete( hb_compExprGenPush( $2 ) ); $<iNumber>$ = hb_compGenJumpFalse( 0 );
+                              hb_compExprDelete( hb_compExprGenPush( $2 ) ); $<iNumber>$ = (int) hb_compGenJumpFalse( 0 );
                            }
              EmptyStats
-                           { $$ = hb_compGenJump( 0 ); hb_compGenJumpHere( $<iNumber>5 ); }
+                           { $$ = (int) hb_compGenJump( 0 ); hb_compGenJumpHere( $<iNumber>5 ); }
            ;
 
 IfElse     : ELSE Crlf { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; }
@@ -2592,7 +2592,7 @@ IfElse     : ELSE Crlf { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; }
 IfElseIf   : ELSEIF { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; hb_compLinePush(); } Expression Crlf
                 { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
                   hb_compExprDelete( hb_compExprGenPush( $3 ) );
-                  $<iNumber>$ = hb_compGenJumpFalse( 0 );
+                  $<iNumber>$ = (int) hb_compGenJumpFalse( 0 );
                 }
                 EmptyStats
                 { $$ = hb_compElseIfGen( NULL, hb_compGenJump( 0 ) );
@@ -2602,7 +2602,7 @@ IfElseIf   : ELSEIF { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; hb_co
            | IfElseIf ELSEIF { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; hb_compLinePush(); } Expression Crlf
                 { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
                   hb_compExprDelete( hb_compExprGenPush( $4 ) );
-                  $<iNumber>$ = hb_compGenJumpFalse( 0 );
+                  $<iNumber>$ = (int) hb_compGenJumpFalse( 0 );
                 }
                 EmptyStats
                 { $$ = hb_compElseIfGen( $1, hb_compGenJump( 0 ) );
@@ -2670,7 +2670,7 @@ DoCaseBegin : DoCaseStart            { }
 Cases      : CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Expression Crlf
                {
                   hb_compExprDelete( hb_compExprGenPush( $3 ) );
-                  $<iNumber>$ = hb_compGenJumpFalse( 0 );
+                  $<iNumber>$ = (int) hb_compGenJumpFalse( 0 );
                }
              EmptyStats
                {
@@ -2682,7 +2682,7 @@ Cases      : CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Expres
            | Cases CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Expression Crlf
                {
                   hb_compExprDelete( hb_compExprGenPush( $4 ) );
-                  $<iNumber>$ = hb_compGenJumpFalse( 0 );
+                  $<iNumber>$ = (int) hb_compGenJumpFalse( 0 );
                }
              EmptyStats
                {
@@ -2808,7 +2808,7 @@ SwitchCases : CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Const
                {
                   hb_compGenSwitchCase( ( LONG ) $3->value.asNum.lVal );
                   hb_compExprDelete( $3 );
-                  $<iNumber>$ = hb_compGenJumpFalse( 0 );
+                  $<iNumber>$ = (int) hb_compGenJumpFalse( 0 );
                }
              EmptyStats
                {
@@ -2828,7 +2828,7 @@ SwitchCases : CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Const
                {
                   hb_compGenSwitchCase( ( LONG ) $4->value.asNum.lVal );
                   hb_compExprDelete( $4 );
-                  $<iNumber>$ = hb_compGenJumpFalse( 0 );
+                  $<iNumber>$ = (int) hb_compGenJumpFalse( 0 );
 
                   if( hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter - 1 ] )
                   {
@@ -4116,7 +4116,7 @@ void hb_compReleaseLoops( void )
    }
 }
 
-static void * hb_compElseIfGen( void * pFirst, ULONG ulOffset )
+static void * hb_compElseIfGen( void * pFirst, HB_SIZE ulOffset )
 {
    PELSEIF pElseIf = ( PELSEIF ) hb_xgrab( sizeof( _ELSEIF ) ), pLast;
 

@@ -43,7 +43,7 @@ HB_FUNC( BIN2W )
    if( pItem )
    {
       char * pszString = pItem->item.asString.value;
-      ULONG ulLen = pItem->item.asString.length;
+      HB_SIZE ulLen = pItem->item.asString.length;
 
       hb_retni( HB_MKUSHORT( ( ulLen >= 1 ) ? ( BYTE ) pszString[ 0 ] : 0,
                              ( ulLen >= 2 ) ? ( BYTE ) pszString[ 1 ] : 0 ) );
@@ -59,7 +59,7 @@ HB_FUNC( BIN2I )
    if( pItem )
    {
       char * pszString = pItem->item.asString.value;
-      ULONG ulLen = pItem->item.asString.length;
+      HB_SIZE ulLen = pItem->item.asString.length;
 
       hb_retni( HB_MKSHORT( ( ulLen >= 1 ) ? ( BYTE ) pszString[ 0 ] : 0,
                             ( ulLen >= 2 ) ? ( BYTE ) pszString[ 1 ] : 0 ) );
@@ -75,7 +75,7 @@ HB_FUNC( BIN2L )
    if( pBin )
    {
       char * pszString = pBin->item.asString.value;
-      ULONG ulLen = pBin->item.asString.length;
+      HB_SIZE ulLen = pBin->item.asString.length;
 
       hb_retnl( HB_MKLONG( ( ulLen >= 1 ) ? ( BYTE ) pszString[ 0 ] : 0,
                            ( ulLen >= 2 ) ? ( BYTE ) pszString[ 1 ] : 0,

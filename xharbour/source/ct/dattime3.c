@@ -66,7 +66,6 @@
 #endif
 #include <time.h>
 
-
 /*  $DOC$
  *  $FUNCNAME$
  *      WAITPERIOD()
@@ -137,7 +136,7 @@ HB_FUNC( WAITPERIOD )
    hb_retl( d < s_dTimeCounter );
 }
 
-static BOOL _hb_timeValid( const char * szTime, ULONG ulLen, int * piDecode )
+static BOOL _hb_timeValid( const char * szTime, HB_SIZE ulLen, int * piDecode )
 {
    BOOL fValid = FALSE;
 
@@ -238,7 +237,6 @@ HB_FUNC( TIMEVALID )
    hb_retl( _hb_timeValid( hb_parc( 1 ), hb_parclen( 1 ), NULL ) );
 }
 
-
 /*  $DOC$
  *  $FUNCNAME$
  *      SETTIME()
@@ -320,7 +318,6 @@ HB_FUNC( SETTIME )
 
    hb_retl( fResult );
 }
-
 
 /*  $DOC$
  *  $FUNCNAME$

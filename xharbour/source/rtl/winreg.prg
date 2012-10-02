@@ -302,7 +302,7 @@ HB_FUNC_STATIC( WINREGSETVALUEEX )
   if ( nType != REG_DWORD )
   {
     cValue = ( BYTE *) hb_parc( 5 );
-    hb_retni( RegSetValueEx( regkeykey( hb_parnl( 1 ) ), cKey, 0, nType, ( BYTE *) cValue, hb_parclen( 5 ) + 1 ) );
+    hb_retni( RegSetValueEx( regkeykey( hb_parnl( 1 ) ), cKey, 0, nType, ( BYTE *) cValue, (DWORD) hb_parclen( 5 ) + 1 ) );
   }
   else
   {

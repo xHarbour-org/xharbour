@@ -57,54 +57,54 @@
 
 HB_EXTERN_BEGIN
 
-extern HB_EXPORT double hb_dateSeconds( void );
+extern HB_EXPORT double   hb_dateSeconds( void );
 extern HB_EXPORT HB_ULONG hb_dateMilliSeconds( void );
-extern HB_EXPORT double hb_secondsCPU( int n );
-extern HB_EXPORT void   hb_dateTimeStamp( LONG * plJulian, LONG * plMilliSec );
-extern HB_EXPORT char * hb_timeStampStr( char * szTime, LONG lMillisec );
-extern HB_EXPORT void   hb_dbaselockEncode( char * pszTimeDate );
-extern HB_EXPORT LONG   hb_timeStampEncode( int iHour, int iMinutes, int iSeconds, int iMSec );
-extern HB_EXPORT void   hb_timeStampDecode( LONG lMillisec, int * piHour, int * piMinutes, int * piSeconds, int * piMSec );
-extern HB_EXPORT void   hb_timeStrGet( const char * szTime, int * piHour, int * piMinutes, int * piSeconds, int * piMSec );
-extern HB_EXPORT char * hb_dateTimeStampStr( char * szDateTime, LONG lJulian, LONG lMillisec );
-extern HB_EXPORT void   hb_dateTimeStampStrGet( const char * szDateTime, LONG * plJulian, LONG * plMillisec );
-extern HB_EXPORT void   hb_dateToday( int * piYear, int * piMonth, int * piDay );
-extern HB_EXPORT void   hb_dateTimeStr( char * pszTime );
-extern HB_EXPORT void   hb_dateTime( int * piHour, int * piMinute, double * pdSeconds );
-extern HB_EXPORT char * hb_dateCMonth( int iMonth );
-extern HB_EXPORT char * hb_dateCDOW( int iDay );
-extern HB_EXPORT int    hb_dateDOW( int iYear, int iMonth, int iDay );
-extern HB_EXPORT int    hb_dateJulianDOW( LONG lJulian );
-extern HB_EXPORT char * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * szDateFormat );
-extern HB_EXPORT char * hb_timeFormat( const char * szDate, char * szFormattedTime, const char * szTimeFormat );
-extern HB_EXPORT char * hb_datetimeFormat( const char * szDateTime, char * szFormattedDateTime, const char * szDateFormat, const char * szTimeFormat );
-extern HB_EXPORT LONG   hb_dateEncode( int iYear, int iMonth, int iDay );
-extern HB_EXPORT void   hb_dateDecode( LONG julian, int * piYear, int * piMonth, int * piDay );
-extern HB_EXPORT void   hb_dateStrPut( char * szDate, int iYear, int iMonth, int iDay );
-extern HB_EXPORT void   hb_dateStrGet( const char * szDate, int * piYear, int * piMonth, int * piDay );
-extern HB_EXPORT char * hb_dateDecStr( char * szDate, LONG lJulian );
-extern HB_EXPORT LONG   hb_dateEncStr( const char * szDate );
+extern HB_EXPORT double   hb_secondsCPU( int n );
+extern HB_EXPORT void     hb_dateTimeStamp( long * plJulian, long * plMilliSec );
+extern HB_EXPORT char *   hb_timeStampStr( char * szTime, long lMillisec );
+extern HB_EXPORT void     hb_dbaselockEncode( char * pszTimeDate );
+extern HB_EXPORT long     hb_timeStampEncode( int iHour, int iMinutes, int iSeconds, int iMSec );
+extern HB_EXPORT void     hb_timeStampDecode( long lMillisec, int * piHour, int * piMinutes, int * piSeconds, int * piMSec );
+extern HB_EXPORT void     hb_timeStrGet( const char * szTime, int * piHour, int * piMinutes, int * piSeconds, int * piMSec );
+extern HB_EXPORT char *   hb_dateTimeStampStr( char * szDateTime, long lJulian, long lMillisec );
+extern HB_EXPORT void     hb_dateTimeStampStrGet( const char * szDateTime, long * plJulian, long * plMillisec );
+extern HB_EXPORT void     hb_dateToday( int * piYear, int * piMonth, int * piDay );
+extern HB_EXPORT void     hb_dateTimeStr( char * pszTime );
+extern HB_EXPORT void     hb_dateTime( int * piHour, int * piMinute, double * pdSeconds );
+extern HB_EXPORT char *   hb_dateCMonth( int iMonth );
+extern HB_EXPORT char *   hb_dateCDOW( int iDay );
+extern HB_EXPORT int      hb_dateDOW( int iYear, int iMonth, int iDay );
+extern HB_EXPORT int      hb_dateJulianDOW( long lJulian );
+extern HB_EXPORT char *   hb_dateFormat( const char * szDate, char * szFormattedDate, const char * szDateFormat );
+extern HB_EXPORT char *   hb_timeFormat( const char * szDate, char * szFormattedTime, const char * szTimeFormat );
+extern HB_EXPORT char *   hb_datetimeFormat( const char * szDateTime, char * szFormattedDateTime, const char * szDateFormat, const char * szTimeFormat );
+extern HB_EXPORT long     hb_dateEncode( int iYear, int iMonth, int iDay );
+extern HB_EXPORT void     hb_dateDecode( long julian, int * piYear, int * piMonth, int * piDay );
+extern HB_EXPORT void     hb_dateStrPut( char * szDate, int iYear, int iMonth, int iDay );
+extern HB_EXPORT void     hb_dateStrGet( const char * szDate, int * piYear, int * piMonth, int * piDay );
+extern HB_EXPORT char *   hb_dateDecStr( char * szDate, long lJulian );
+extern HB_EXPORT long     hb_dateEncStr( const char * szDate );
 
-extern HB_EXPORT LONG   hb_timeEncStr( const char * szTime );  /* Hecho */
-extern HB_EXPORT char * hb_timeDecStr( char * szTime, LONG lSeconds );  /* Hecho */
+extern HB_EXPORT long     hb_timeEncStr( const char * szTime );  /* Hecho */
+extern HB_EXPORT char *   hb_timeDecStr( char * szTime, long lSeconds );  /* Hecho */
 
 #define  hb_timeL2Sec( lTime )   ((double) lTime / (double)HB_DATETIMEINSEC)
 
-extern HB_EXPORT LONG     hb_timeEncode( int iHour, int iMinute, double dSeconds );  /* Hecho */
-extern HB_EXPORT void     hb_timeDecode( LONG lTime, int * piHour, int * piMinute, double * pdSeconds );  /* Hecho */
+extern HB_EXPORT long     hb_timeEncode( int iHour, int iMinute, double dSeconds );  /* Hecho */
+extern HB_EXPORT void     hb_timeDecode( long lTime, int * piHour, int * piMinute, double * pdSeconds );  /* Hecho */
 extern HB_EXPORT double   hb_timeEncodeSec( int iHour, int iMinute, double dSeconds );  /* Hecho */
 extern HB_EXPORT void     hb_timeDecodeSec( double dTime, int * piHour, int * piMinute, double * pdSeconds );  /* Hecho */
 extern HB_EXPORT void     hb_timeStrGet( const char * szTime, int * piHour, int * piMinutes, int * piSeconds, int * piMSec );
 
-extern HB_EXPORT void     hb_datetimeEncode( LONG * plDate, LONG * plTime, int iYear, int iMonth, int iDay, int iHour, int iMinute, double dSeconds, int iAmPm, int * iOk );  /* Hecho */
-extern HB_EXPORT void     hb_datetimeDecode( LONG lDate, LONG lTime, int * piYear, int * piMonth, int * piDay, int * piHour, int * piMinute, double * pdSeconds );  /* Hecho */
+extern HB_EXPORT void     hb_datetimeEncode( long * plDate, long * plTime, int iYear, int iMonth, int iDay, int iHour, int iMinute, double dSeconds, int iAmPm, int * iOk );  /* Hecho */
+extern HB_EXPORT void     hb_datetimeDecode( long lDate, long lTime, int * piYear, int * piMonth, int * piDay, int * piHour, int * piMinute, double * pdSeconds );  /* Hecho */
 
-extern HB_EXPORT void     hb_datetimeEncStr( const char * szDateTime, LONG *plDate, LONG *plTime );
-extern HB_EXPORT char     * hb_datetimeDecStr( char * szDateTime, LONG lDate, LONG lTime );
+extern HB_EXPORT void     hb_datetimeEncStr( const char * szDateTime, long *plDate, long *plTime );
+extern HB_EXPORT char *   hb_datetimeDecStr( char * szDateTime, long lDate, long lTime );
 
-extern HB_EXPORT void     hb_datetimeUnpack( double dDateTime, LONG * plDate, LONG * plTime );
-extern HB_EXPORT double   hb_datetimePack( LONG lDate, LONG lTime );
-extern HB_EXPORT double   hb_datetimePackInSec( LONG lJulian, LONG lTime );
+extern HB_EXPORT void     hb_datetimeUnpack( double dDateTime, long * plDate, long * plTime );
+extern HB_EXPORT double   hb_datetimePack( long lDate, long lTime );
+extern HB_EXPORT double   hb_datetimePackInSec( long lJulian, long lTime );
 
 extern HB_EXPORT void     hb_timeStampUnpackDT( double dTimeStamp, long * plJulian, long * plMilliSec );
 

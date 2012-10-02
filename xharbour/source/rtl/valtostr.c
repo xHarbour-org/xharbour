@@ -58,7 +58,7 @@
 
 HB_FUNC( HB_VALTOSTR )
 {
-   ULONG ulLen;
+   HB_SIZE ulLen;
    BOOL bFreeReq;
    char * buffer = hb_itemString( hb_param( 1, HB_IT_ANY ), &ulLen, &bFreeReq );
 
@@ -74,7 +74,7 @@ HB_FUNC( HB_STRTOEXP )
 
    if( pszString )
    {
-      ULONG ulLen = hb_parclen( 1 ), ulRet, ul, uQ = 0;
+      HB_SIZE ulLen = hb_parclen( 1 ), ulRet, ul, uQ = 0;
       int iType = 0;
       char ch, * pDst, * pszResult;
 
@@ -154,7 +154,7 @@ HB_FUNC( HB_STRTOEXP )
             *pDst++ = '[';
             ch = ']';
          }
-         HB_MEMCPY( pDst, pszString, ulLen );
+         HB_MEMCPY( pDst, pszString, (size_t) ulLen );
          pDst += ulLen;
          *pDst++ = ch;
       }

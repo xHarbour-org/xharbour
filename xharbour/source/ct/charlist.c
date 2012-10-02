@@ -67,7 +67,6 @@
 /* helper function for the list function */
 static void do_list( int iSwitch )
 {
-
    const char *   pcString;
    size_t         sStrLen;
 
@@ -95,7 +94,6 @@ static void do_list( int iSwitch )
    /* count characters */
    if( iSwitch == DO_LIST_CHARLIST )
    {
-
       char     pcRet[ 256 ];
       size_t   sRetStrLen = 0;
 
@@ -109,11 +107,9 @@ static void do_list( int iSwitch )
       }
 
       hb_retclen( pcRet, sRetStrLen );
-
    }
    else
    {
-
       for( sCnt = 0; sCnt < sStrLen; sCnt++ )
       {
          size_t sIndex = ( size_t ) ( unsigned char ) ( *( pcString + sCnt ) );
@@ -124,7 +120,6 @@ static void do_list( int iSwitch )
       {
          case DO_LIST_CHARSLIST:
          {
-
             char *   pcRet;
             size_t   sRetStrLen = 0;
 
@@ -172,7 +167,7 @@ static void do_list( int iSwitch )
 
             for( sCnt = 0; sCnt < 256; sCnt++ )
             {
-               hb_arraySetNL( pArray, sCnt + 1, asCharCnt[ sCnt ] );
+               hb_arraySetNS( pArray, sCnt + 1, asCharCnt[ sCnt ] );
             }
             hb_itemRelease( hb_itemReturn( pArray ) );
          }; break;
@@ -183,24 +178,20 @@ static void do_list( int iSwitch )
 HB_FUNC( CHARLIST )
 {
    do_list( DO_LIST_CHARLIST );
-   return;
 }
 
 HB_FUNC( CHARSLIST )
 {
    do_list( DO_LIST_CHARSLIST );
-   return;
 }
 
 HB_FUNC( CHARNOLIST )
 {
    do_list( DO_LIST_CHARNOLIST );
-   return;
 }
 
 HB_FUNC( CHARHIST )
 {
    do_list( DO_LIST_CHARHIST );
-   return;
 }
 

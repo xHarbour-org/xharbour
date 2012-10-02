@@ -501,8 +501,8 @@ static void hb_gt_wvt_FitSize( PHB_GTWVT pWVT )
    LONG maxHeight;
    LONG borderWidth;
    LONG borderHeight;
-   SHORT left;
-   SHORT top;
+   LONG left;
+   LONG top;
 
    GetClientRect( pWVT->hWnd, &ci );
    GetWindowRect( pWVT->hWnd, &wi );
@@ -531,7 +531,7 @@ static void hb_gt_wvt_FitSize( PHB_GTWVT pWVT )
 
    {
       HFONT      hOldFont, hFont;
-      USHORT     fontHeight, fontWidth, n;
+      LONG       fontHeight, fontWidth, n;
 
       fontHeight = maxHeight / pWVT->ROWS;
       fontWidth  = maxWidth  / pWVT->COLS;
@@ -829,7 +829,7 @@ static void hb_gt_wvt_MouseEvent( PHB_GTWVT pWVT, UINT message, WPARAM wParam, L
 
             {
                ULONG  ulSize;
-               USHORT irow, icol, j, top, left, bottom, right;
+               LONG   irow, icol, j, top, left, bottom, right;
                char * sBuffer;
                RECT   rect = { 0, 0, 0, 0 };
                RECT   colrowRC = { 0, 0, 0, 0 };
@@ -944,7 +944,7 @@ static void hb_gt_wvt_MouseEvent( PHB_GTWVT pWVT, UINT message, WPARAM wParam, L
          }
          else
          {
-            keyState = wParam;
+            keyState = (SHORT) wParam;
             switch( keyState )
             {
                case MK_LBUTTON:
@@ -1031,7 +1031,7 @@ static BOOL hb_gt_wvt_KeyEvent( PHB_GTWVT pWVT, UINT message, WPARAM wParam, LPA
                break;
             case VK_F4:
                if( pWVT->AltF4Close && bAlt )
-                  return DefWindowProc( pWVT->hWnd, message, wParam, lParam );
+                  return (BOOL) DefWindowProc( pWVT->hWnd, message, wParam, lParam );
                hb_gt_wvt_TranslateKey( pWVT, K_F4   , K_SH_F4, K_ALT_F4   , K_CTRL_F4    );
                break;
             case VK_F5:
@@ -1516,7 +1516,7 @@ static DWORD hb_gt_wvt_ProcessMessages( void )
       TranslateMessage( &msg );
       DispatchMessage( &msg );
    }
-   return msg.wParam;
+   return (DWORD) msg.wParam;
 }
 
 static BOOL hb_gt_wvt_ValidWindowSize( HWND hWnd, int rows, int cols, HFONT hFont, int iWidth )
@@ -2123,7 +2123,7 @@ static BOOL hb_gt_wvt_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
          else
          {
             char * szClipboardData;
-            ULONG ulLen;
+            HB_SIZE ulLen;
             if( hb_gt_w32_getClipboard( pWVT->CodePage == OEM_CHARSET ?
                                         CF_OEMTEXT : CF_TEXT,
                                         &szClipboardData, &ulLen ) )

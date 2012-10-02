@@ -59,46 +59,45 @@ HB_FUNC( STUFF )
    if( ISCHAR( 1 ) && ISNUM( 2 ) && ISNUM( 3 ) && ISCHAR( 4 ) )
    {
       const char * szText = hb_parcx( 1 );
-      ULONG ulText = hb_parclen( 1 );
-      ULONG ulPos = hb_parnl( 2 );
-      ULONG ulDel = hb_parnl( 3 );
-      ULONG ulInsert = hb_parclen( 4 );
-
-      ULONG ulTotalLen;
+      HB_SIZE ulText = hb_parclen( 1 );
+      HB_SIZE ulPos = hb_parnl( 2 );
+      HB_SIZE ulDel = hb_parnl( 3 );
+      HB_SIZE ulInsert = hb_parclen( 4 );
+      HB_SIZE ulTotalLen;
 
       if( ulPos > 0 )
-	  {
+      {
          ulPos--;
-	  }
+      }
 
       if( ulPos > ulText )
-	  {
+      {
          ulPos = ulText;
-	  }
+      }
 
       if( ulDel > ulText - ulPos )
-	  {
+      {
          ulDel = ulText - ulPos;
-	  }
+      }
 
       if( ( ulTotalLen = ulText + ulInsert - ulDel ) > 0 )
       {
          char * szResult = ( char * ) hb_xgrab( ulTotalLen + 1 );
 
-		 if( ulPos )
-		 {
-            hb_xmemcpy( szResult, szText, ulPos );
-		 }
+	 if( ulPos )
+	 {
+            hb_xmemcpy( szResult, szText, (size_t) ulPos );
+	 }
 
-		 if( ulInsert )
-		 {
-            hb_xmemcpy( szResult + ulPos, hb_parcx( 4 ), ulInsert );
-		 }
+	 if( ulInsert )
+	 {
+            hb_xmemcpy( szResult + ulPos, hb_parcx( 4 ), (size_t) ulInsert );
+	 }
 
-		 if( ulText - ( ulPos + ulDel ) )
-		 {
-            hb_xmemcpy( szResult + ulPos + ulInsert, szText + ulPos + ulDel, ulText - ( ulPos + ulDel ) );
-		 }
+	 if( ulText - ( ulPos + ulDel ) )
+	 {
+            hb_xmemcpy( szResult + ulPos + ulInsert, szText + ulPos + ulDel, (size_t) ( ulText - ( ulPos + ulDel ) ) );
+	 }
 
          szResult[ ulTotalLen ] = '\0';
 

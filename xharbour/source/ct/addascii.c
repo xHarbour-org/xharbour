@@ -63,11 +63,10 @@ HB_FUNC( ADDASCII )
 
    if( ISCHAR( 1 ) )
    {
-
       const char *   pcSource = hb_parc( 1 );
-      size_t         sLen     = hb_parclen( 1 );
+      HB_SIZE        sLen     = hb_parclen( 1 );
       char *         pcResult;
-      size_t         sPos;
+      HB_SIZE        sPos;
       LONG           lValue;
       int            iCarryOver;
 
@@ -97,7 +96,7 @@ HB_FUNC( ADDASCII )
       }
 
       pcResult = ( char * ) hb_xgrab( sLen );
-      hb_xmemcpy( pcResult, pcSource, sLen );
+      hb_xmemcpy( pcResult, pcSource, (size_t) sLen );
 
       lValue   = hb_parnl( 2 );
       if( ISLOG( 4 ) )
@@ -107,7 +106,7 @@ HB_FUNC( ADDASCII )
 
       if( iCarryOver )
       {
-         size_t   sCurrent;
+         HB_SIZE  sCurrent;
          LONG     lResult;
 
          for( sCurrent = sPos; ( sCurrent > 0 ) && ( lValue != 0 ); sCurrent-- )
