@@ -79,7 +79,7 @@ METHOD New() CLASS TIPEncoderURL
 HB_FUNC( TIPENCODERURL_ENCODE )
 {
    const char *cData = hb_parc(1);
-   int nLen = hb_parclen(1);
+   int nLen = ( int ) hb_parclen(1);
    BOOL bComplete = hb_parl(2);
    char *cRet;
    int nPos = 0, nPosRet = 0, nVal;
@@ -152,7 +152,7 @@ HB_FUNC( TIPENCODERURL_ENCODE )
 HB_FUNC( TIPENCODERURL_DECODE )
 {
    const char *cData = hb_parc(1);
-   int nLen = hb_parclen(1);
+   int nLen = ( int ) hb_parclen(1);
    char *cRet;
    int nPos = 0, nPosRet = 0;
    char cElem;
