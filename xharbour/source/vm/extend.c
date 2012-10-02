@@ -108,7 +108,7 @@ PHB_ITEM hb_param( int iParam, long lMask )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_param(%d, %ld)", iParam, lMask));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_param(%d, %ld)", iParam, lMask ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -144,12 +144,12 @@ PHB_ITEM  hb_paramError( int iParam )
 {
    static HB_ITEM s_NIL;
 
-   PHB_ITEM pParam = hb_param( iParam, HB_IT_ANY );
+   PHB_ITEM       pParam = hb_param( iParam, HB_IT_ANY );
 
    if( pParam == NULL )
    {
-      ( &s_NIL )->type = HB_IT_NIL;
-      pParam = &s_NIL;
+      ( &s_NIL )->type  = HB_IT_NIL;
+      pParam            = &s_NIL;
    }
 
    return pParam;
@@ -196,7 +196,7 @@ const char * hb_parc( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_parc(%d, ...)", iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_parc(%d, ...)", iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -213,8 +213,8 @@ const char * hb_parc( int iParam, ... )
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
-         va_list va;
-         ULONG ulArrayIndex;
+         va_list  va;
+         ULONG    ulArrayIndex;
 
          va_start( va, iParam );
          ulArrayIndex = va_arg( va, ULONG );
@@ -231,7 +231,7 @@ const char * hb_parcx( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_parcx(%d, ...)", iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_parcx(%d, ...)", iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -248,15 +248,15 @@ const char * hb_parcx( int iParam, ... )
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
-         char * szElement;
-         va_list va;
-         ULONG ulArrayIndex;
+         char *   szElement;
+         va_list  va;
+         ULONG    ulArrayIndex;
 
          va_start( va, iParam );
-         ulArrayIndex = va_arg( va, ULONG );
+         ulArrayIndex   = va_arg( va, ULONG );
          va_end( va );
 
-         szElement = hb_arrayGetCPtr( pItem, ulArrayIndex );
+         szElement      = hb_arrayGetCPtr( pItem, ulArrayIndex );
 
          if( szElement )
          {
@@ -272,7 +272,7 @@ HB_SIZE  hb_parclen( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_parclen(%d, ...)", iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_parclen(%d, ...)", iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -289,8 +289,8 @@ HB_SIZE  hb_parclen( int iParam, ... )
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
-         va_list va;
-         ULONG ulArrayIndex;
+         va_list  va;
+         ULONG    ulArrayIndex;
 
          va_start( va, iParam );
          ulArrayIndex = va_arg( va, ULONG );
@@ -311,7 +311,7 @@ HB_SIZE  hb_parcsiz( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_parcsiz(%d, ...)", iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_parcsiz(%d, ...)", iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -330,8 +330,8 @@ HB_SIZE  hb_parcsiz( int iParam, ... )
          }
          else if( HB_IS_ARRAY( pItem ) )
          {
-            va_list va;
-            ULONG ulArrayIndex;
+            va_list  va;
+            ULONG    ulArrayIndex;
 
             va_start( va, iParam );
             ulArrayIndex = va_arg( va, ULONG );
@@ -352,7 +352,7 @@ const char * hb_pards( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_pards(%d, ...)", iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_pards(%d, ...)", iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -369,8 +369,8 @@ const char * hb_pards( int iParam, ... )
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
-         va_list va;
-         ULONG ulArrayIndex;
+         va_list  va;
+         ULONG    ulArrayIndex;
 
          va_start( va, iParam );
          ulArrayIndex = va_arg( va, ULONG );
@@ -390,7 +390,7 @@ char  * hb_pardts( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_pardts(%d, ...)", iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_pardts(%d, ...)", iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -407,8 +407,8 @@ char  * hb_pardts( int iParam, ... )
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
-         va_list va;
-         ULONG ulArrayIndex;
+         va_list  va;
+         ULONG    ulArrayIndex;
 
          va_start( va, iParam );
          ulArrayIndex = va_arg( va, ULONG );
@@ -427,7 +427,7 @@ char  * hb_pardsbuff( char * szDate, int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_pardsbuff(%p, %d, ...)", szDate, iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_pardsbuff(%p, %d, ...)", szDate, iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -444,8 +444,8 @@ char  * hb_pardsbuff( char * szDate, int iParam, ... )
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
-         va_list va;
-         ULONG ulArrayIndex;
+         va_list  va;
+         ULONG    ulArrayIndex;
 
          va_start( va, iParam );
          ulArrayIndex = va_arg( va, ULONG );
@@ -464,7 +464,7 @@ long hb_pardl( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_pardl(%d, ...)", iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_pardl(%d, ...)", iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -481,8 +481,8 @@ long hb_pardl( int iParam, ... )
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
-         va_list va;
-         ULONG ulArrayIndex;
+         va_list  va;
+         ULONG    ulArrayIndex;
 
          va_start( va, iParam );
          ulArrayIndex = va_arg( va, ULONG );
@@ -501,7 +501,7 @@ char * hb_pardtsbuff( char * szDateTime, int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_pardtsbuff(%p, %d, ...)", szDateTime, iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_pardtsbuff(%p, %d, ...)", szDateTime, iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -518,8 +518,8 @@ char * hb_pardtsbuff( char * szDateTime, int iParam, ... )
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
-         va_list va;
-         ULONG ulArrayIndex;
+         va_list  va;
+         ULONG    ulArrayIndex;
 
          va_start( va, iParam );
          ulArrayIndex = va_arg( va, ULONG );
@@ -538,7 +538,7 @@ long hb_part( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_part(%d, ...)", iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_part(%d, ...)", iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -555,8 +555,8 @@ long hb_part( int iParam, ... )
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
-         va_list va;
-         ULONG ulArrayIndex;
+         va_list  va;
+         ULONG    ulArrayIndex;
 
          va_start( va, iParam );
          ulArrayIndex = va_arg( va, ULONG );
@@ -575,7 +575,7 @@ double hb_pardtsec( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_pardtd(%d, ...)", iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_pardtd(%d, ...)", iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -592,8 +592,8 @@ double hb_pardtsec( int iParam, ... )
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
-         va_list va;
-         ULONG ulArrayIndex;
+         va_list  va;
+         ULONG    ulArrayIndex;
 
          va_start( va, iParam );
          ulArrayIndex = va_arg( va, ULONG );
@@ -612,7 +612,7 @@ double hb_pardtd( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_pardtd(%d, ...)", iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_pardtd(%d, ...)", iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -629,8 +629,8 @@ double hb_pardtd( int iParam, ... )
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
-         va_list va;
-         ULONG ulArrayIndex;
+         va_list  va;
+         ULONG    ulArrayIndex;
 
          va_start( va, iParam );
          ulArrayIndex = va_arg( va, ULONG );
@@ -647,7 +647,7 @@ int  hb_parl( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_parl(%d, ...)", iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_parl(%d, ...)", iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -676,12 +676,12 @@ int  hb_parl( int iParam, ... )
       }
       else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
       {
-         return ( BYTE ) pItem->item.asString.value[0];
+         return ( BYTE ) pItem->item.asString.value[ 0 ];
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
-         va_list va;
-         ULONG ulArrayIndex;
+         va_list  va;
+         ULONG    ulArrayIndex;
 
          va_start( va, iParam );
          ulArrayIndex = va_arg( va, ULONG );
@@ -698,7 +698,7 @@ double  hb_parnd( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_parnd(%d, ...)", iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_parnd(%d, ...)", iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -727,12 +727,12 @@ double  hb_parnd( int iParam, ... )
       }
       else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
       {
-         return ( double ) ( BYTE ) pItem->item.asString.value[0];
+         return ( double ) ( BYTE ) pItem->item.asString.value[ 0 ];
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
-         va_list va;
-         ULONG ulArrayIndex;
+         va_list  va;
+         ULONG    ulArrayIndex;
 
          va_start( va, iParam );
          ulArrayIndex = va_arg( va, ULONG );
@@ -749,7 +749,7 @@ int  hb_parni( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_parni(%d, ...)", iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_parni(%d, ...)", iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -778,12 +778,12 @@ int  hb_parni( int iParam, ... )
       }
       else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
       {
-         return ( int ) ( BYTE ) pItem->item.asString.value[0];
+         return ( int ) ( BYTE ) pItem->item.asString.value[ 0 ];
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
-         va_list va;
-         ULONG ulArrayIndex;
+         va_list  va;
+         ULONG    ulArrayIndex;
 
          va_start( va, iParam );
          ulArrayIndex = va_arg( va, ULONG );
@@ -800,7 +800,7 @@ long hb_parnl( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_parnl(%d, ...)", iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_parnl(%d, ...)", iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -837,12 +837,12 @@ long hb_parnl( int iParam, ... )
       }
       else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
       {
-         return ( long ) ( BYTE ) pItem->item.asString.value[0];
+         return ( long ) ( BYTE ) pItem->item.asString.value[ 0 ];
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
-         va_list va;
-         ULONG ulArrayIndex;
+         va_list  va;
+         ULONG    ulArrayIndex;
 
          va_start( va, iParam );
          ulArrayIndex = va_arg( va, ULONG );
@@ -859,7 +859,7 @@ HB_LONG hb_parnint( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_parnl(%d, ...)", iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_parnl(%d, ...)", iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -896,12 +896,12 @@ HB_LONG hb_parnint( int iParam, ... )
       }
       else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
       {
-         return ( HB_LONG ) ( BYTE ) pItem->item.asString.value[0];
+         return ( HB_LONG ) ( BYTE ) pItem->item.asString.value[ 0 ];
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
-         va_list va;
-         ULONG ulArrayIndex;
+         va_list  va;
+         ULONG    ulArrayIndex;
 
          va_start( va, iParam );
          ulArrayIndex = va_arg( va, ULONG );
@@ -915,11 +915,11 @@ HB_LONG hb_parnint( int iParam, ... )
 }
 
 /* NEW function - to retrieve a pointer from a harbour level */
-void *hb_parptr( int iParam, ... )
+void * hb_parptr( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_parptr(%d, ...)", iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_parptr(%d, ...)", iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -936,8 +936,8 @@ void *hb_parptr( int iParam, ... )
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
-         va_list va;
-         ULONG ulArrayIndex;
+         va_list  va;
+         ULONG    ulArrayIndex;
 
          va_start( va, iParam );
          ulArrayIndex = va_arg( va, ULONG );
@@ -947,14 +947,14 @@ void *hb_parptr( int iParam, ... )
       }
    }
 
-   return ( void * )0;
+   return ( void * ) 0;
 }
 
 void * hb_parptrGC( HB_GARBAGE_FUNC_PTR pFunc, int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_parptrGC(%p,%d, ...)", pFunc, iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_parptrGC(%p,%d, ...)", pFunc, iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -974,14 +974,14 @@ void * hb_parptrGC( HB_GARBAGE_FUNC_PTR pFunc, int iParam, ... )
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
-         va_list va;
-         ULONG ulArrayIndex;
+         va_list  va;
+         ULONG    ulArrayIndex;
 
          va_start( va, iParam );
-         ulArrayIndex = va_arg( va, ULONG );
+         ulArrayIndex   = va_arg( va, ULONG );
          va_end( va );
 
-         pItem = hb_arrayGetItemPtr( pItem, ulArrayIndex );
+         pItem          = hb_arrayGetItemPtr( pItem, ulArrayIndex );
 
          if( pItem && HB_IS_POINTER( pItem ) && pItem->item.asPointer.collect && hb_gcFunc( pItem->item.asPointer.value ) == pFunc )
          {
@@ -997,7 +997,7 @@ HB_SIZE  hb_parinfa( int iParamNum, HB_SIZE uiArrayIndex )
 {
    PHB_ITEM pArray;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_parinfa(%d, %lu)", iParamNum, uiArrayIndex));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_parinfa(%d, %lu)", iParamNum, uiArrayIndex ) );
 
    pArray = hb_param( iParamNum, HB_IT_ARRAY );
 
@@ -1016,7 +1016,7 @@ HB_SIZE  hb_parinfo( int iParam )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_parinfo(%d)", iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_parinfo(%d)", iParam ) );
 
    if( iParam == 0 )
    {
@@ -1052,9 +1052,9 @@ int hb_pcount( void )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_pcount()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_pcount()" ) );
 
-   return (int)( hb_stackBaseItem()->item.asSymbol.pCargo->arguments );
+   return ( int ) ( hb_stackBaseItem()->item.asSymbol.pCargo->arguments );
 }
 
 #undef hb_ret
@@ -1062,7 +1062,7 @@ void hb_ret( void )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_ret()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_ret()" ) );
 
    if( HB_IS_COMPLEX( hb_stackReturnItem() ) )
    {
@@ -1077,13 +1077,13 @@ void hb_ret( void )
 /* JC1: tunrning off optimization; from now on, HB_VM_STACK is referenced just once */
 #if defined( HB_THREAD_SUPPORT )
    #undef HB_VM_STACK
-   #define HB_VM_STACK (* hb_threadGetCurrentStack() )
+   #define HB_VM_STACK ( *hb_threadGetCurrentStack() )
 #endif
 
 #undef hb_reta
 void hb_reta( HB_SIZE ulLen )  /* undocumented hb_reta() */
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_reta(%lu)", ulLen));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_reta(%lu)", ulLen ) );
 
    hb_arrayNew( hb_stackReturnItem(), ulLen );
 }
@@ -1091,7 +1091,7 @@ void hb_reta( HB_SIZE ulLen )  /* undocumented hb_reta() */
 #undef hb_retc
 void hb_retc( const char * szText )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retc(%s)", szText));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retc(%s)", szText ) );
 
    hb_itemPutC( hb_stackReturnItem(), szText );
 }
@@ -1099,7 +1099,7 @@ void hb_retc( const char * szText )
 #undef hb_retc_null
 void hb_retc_null( void )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retc_null()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retc_null()" ) );
 
    hb_itemPutC( hb_stackReturnItem(), NULL );
 }
@@ -1107,7 +1107,7 @@ void hb_retc_null( void )
 #undef hb_retclen
 void hb_retclen( const char * szText, HB_SIZE ulLen )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retclen(%s, %lu)", szText, ulLen));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retclen(%s, %lu)", szText, ulLen ) );
 
    hb_itemPutCL( hb_stackReturnItem(), szText, ulLen );
 }
@@ -1117,7 +1117,7 @@ void hb_retclen( const char * szText, HB_SIZE ulLen )
 #undef hb_retds
 void hb_retds( const char * szDate )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retds(%s)", szDate));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retds(%s)", szDate ) );
 
    hb_itemPutDS( hb_stackReturnItem(), szDate );
 }
@@ -1127,7 +1127,7 @@ void hb_retds( const char * szDate )
 #undef hb_retdts
 void hb_retdts( const char * szDateTime )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retdts(%s)", szDateTime));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retdts(%s)", szDateTime ) );
 
    hb_itemPutDTS( hb_stackReturnItem(), szDateTime );
 }
@@ -1135,7 +1135,7 @@ void hb_retdts( const char * szDateTime )
 #undef hb_retd
 void hb_retd( int iYear, int iMonth, int iDay )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retd(%04i, %02i, %02i)", iYear, iMonth, iDay));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retd(%04i, %02i, %02i)", iYear, iMonth, iDay ) );
 
    hb_itemPutD( hb_stackReturnItem(), iYear, iMonth, iDay );
 }
@@ -1143,7 +1143,7 @@ void hb_retd( int iYear, int iMonth, int iDay )
 #undef hb_retdt
 void hb_retdt( int iYear, int iMonth, int iDay, int iHour, int iMin, double dSec, int iAmPm )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retdt(%04i, %02i, %02i, %02i, %02i, %f, %d)", iYear, iMonth, iDay, iHour, iMin, dSec, iAmPm));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retdt(%04i, %02i, %02i, %02i, %02i, %f, %d)", iYear, iMonth, iDay, iHour, iMin, dSec, iAmPm ) );
 
    hb_itemPutDT( hb_stackReturnItem(), iYear, iMonth, iDay, iHour, iMin, dSec, iAmPm );
 }
@@ -1151,7 +1151,7 @@ void hb_retdt( int iYear, int iMonth, int iDay, int iHour, int iMin, double dSec
 #undef hb_retdl
 void hb_retdl( long lJulian )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retdl(%ld)", lJulian));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retdl(%ld)", lJulian ) );
 
    hb_itemPutDL( hb_stackReturnItem(), lJulian );
 }
@@ -1159,7 +1159,7 @@ void hb_retdl( long lJulian )
 #undef hb_retdtd
 void hb_retdtd( double dDateTime )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retdtd(%f)", dDateTime));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retdtd(%f)", dDateTime ) );
 
    hb_itemPutDTD( hb_stackReturnItem(), dDateTime );
 }
@@ -1167,7 +1167,7 @@ void hb_retdtd( double dDateTime )
 #undef hb_retdtl
 void hb_retdtl( long lDate, long lTime )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retdtl(%ld,%ld)", lDate, lTime));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retdtl(%ld,%ld)", lDate, lTime ) );
 
    hb_itemPutDTL( hb_stackReturnItem(), lDate, lTime );
 }
@@ -1175,7 +1175,7 @@ void hb_retdtl( long lDate, long lTime )
 #undef hb_retl
 void hb_retl( int iLogical )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retl(%d)", iLogical));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retl(%d)", iLogical ) );
 
    hb_itemPutL( hb_stackReturnItem(), iLogical ? TRUE : FALSE );
 }
@@ -1183,7 +1183,7 @@ void hb_retl( int iLogical )
 #undef hb_retnd
 void hb_retnd( double dNumber )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retnd(%lf)", dNumber));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retnd(%lf)", dNumber ) );
 
    hb_itemPutND( hb_stackReturnItem(), dNumber );
 }
@@ -1191,7 +1191,7 @@ void hb_retnd( double dNumber )
 #undef hb_retni
 void hb_retni( int iNumber )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retni(%d)", iNumber));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retni(%d)", iNumber ) );
 
    hb_itemPutNI( hb_stackReturnItem(), iNumber );
 }
@@ -1199,7 +1199,7 @@ void hb_retni( int iNumber )
 #undef hb_retnl
 void hb_retnl( long lNumber )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retnl(%ld)", lNumber));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retnl(%ld)", lNumber ) );
 
    hb_itemPutNL( hb_stackReturnItem(), lNumber );
 }
@@ -1207,7 +1207,7 @@ void hb_retnl( long lNumber )
 #undef hb_retnlen
 void hb_retnlen( double dNumber, int iWidth, int iDec )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retnlen(%lf, %d, %d)", dNumber, iWidth, iDec));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retnlen(%lf, %d, %d)", dNumber, iWidth, iDec ) );
 
    hb_itemPutNLen( hb_stackReturnItem(), dNumber, iWidth, iDec );
 }
@@ -1215,7 +1215,7 @@ void hb_retnlen( double dNumber, int iWidth, int iDec )
 #undef hb_retndlen
 void hb_retndlen( double dNumber, int iWidth, int iDec )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retndlen(%lf, %d, %d)", dNumber, iWidth, iDec));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retndlen(%lf, %d, %d)", dNumber, iWidth, iDec ) );
 
    hb_itemPutNDLen( hb_stackReturnItem(), dNumber, iWidth, iDec );
 }
@@ -1223,7 +1223,7 @@ void hb_retndlen( double dNumber, int iWidth, int iDec )
 #undef hb_retnilen
 void hb_retnilen( int iNumber, int iWidth )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retnilen(%d, %d)", iNumber, iWidth));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retnilen(%d, %d)", iNumber, iWidth ) );
 
    hb_itemPutNILen( hb_stackReturnItem(), iNumber, iWidth );
 }
@@ -1231,7 +1231,7 @@ void hb_retnilen( int iNumber, int iWidth )
 #undef hb_retnllen
 void hb_retnllen( long lNumber, int iWidth )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retnllen(%ld, %d)", lNumber, iWidth));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retnllen(%ld, %d)", lNumber, iWidth ) );
 
    hb_itemPutNLLen( hb_stackReturnItem(), lNumber, iWidth );
 }
@@ -1240,7 +1240,7 @@ void hb_retnllen( long lNumber, int iWidth )
 #undef hb_retptr
 void hb_retptr( void * voidPtr )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retptr(%p)", voidPtr));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retptr(%p)", voidPtr ) );
 
    hb_itemPutPtr( hb_stackReturnItem(), voidPtr );
 }
@@ -1248,7 +1248,7 @@ void hb_retptr( void * voidPtr )
 #undef hb_retptrGC
 void hb_retptrGC( void * voidPtr )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retptrGC(%p)", voidPtr));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retptrGC(%p)", voidPtr ) );
 
    hb_itemPutPtrGC( hb_stackReturnItem(), voidPtr );
 }
@@ -1256,7 +1256,7 @@ void hb_retptrGC( void * voidPtr )
 #undef hb_retnint
 void hb_retnint( HB_LONG lNumber )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retnint(%" PFHL "d)", lNumber));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retnint(%" PFHL "d)", lNumber ) );
 
    hb_itemPutNInt( hb_stackReturnItem(), lNumber );
 }
@@ -1264,21 +1264,21 @@ void hb_retnint( HB_LONG lNumber )
 #undef hb_retnintlen
 void hb_retnintlen( HB_LONG lNumber, int iWidth )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retnintlen(%" PFHL "d, %d)", lNumber, iWidth));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retnintlen(%" PFHL "d, %d)", lNumber, iWidth ) );
 
    hb_itemPutNIntLen( hb_stackReturnItem(), lNumber, iWidth );
 }
 
 void hb_storc( const char * szText, int iParam, ... )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_storc(%s, %d, ...)", szText, iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_storc(%s, %d, ...)", szText, iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
-      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
-      BOOL bByRef = HB_IS_BYREF( pItem );
+      PHB_ITEM pItem    = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL     bByRef   = HB_IS_BYREF( pItem );
 
-      if( bByRef  )
+      if( bByRef )
       {
          pItem = hb_itemUnRef( pItem );
       }
@@ -1286,9 +1286,9 @@ void hb_storc( const char * szText, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          PHB_ITEM pDstItem;
-         va_list va;
+         va_list  va;
          va_start( va, iParam );
-         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ) );
          if( pDstItem )
          {
             hb_itemPutC( pDstItem, szText );
@@ -1304,14 +1304,14 @@ void hb_storc( const char * szText, int iParam, ... )
 
 void hb_storclen( const char * szText, HB_SIZE ulLen, int iParam, ... )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_storclen(%s, %lu, %d, ...)", szText, ulLen, iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_storclen(%s, %lu, %d, ...)", szText, ulLen, iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
-      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
-      BOOL bByRef = HB_IS_BYREF( pItem );
+      PHB_ITEM pItem    = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL     bByRef   = HB_IS_BYREF( pItem );
 
-      if( bByRef  )
+      if( bByRef )
       {
          pItem = hb_itemUnRef( pItem );
       }
@@ -1319,9 +1319,9 @@ void hb_storclen( const char * szText, HB_SIZE ulLen, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          PHB_ITEM pDstItem;
-         va_list va;
+         va_list  va;
          va_start( va, iParam );
-         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ) );
          if( pDstItem )
          {
             hb_itemPutCL( pDstItem, szText, ulLen );
@@ -1337,14 +1337,14 @@ void hb_storclen( const char * szText, HB_SIZE ulLen, int iParam, ... )
 
 int hb_storclenAdopt( char * szText, HB_SIZE ulLen, int iParam, ... )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_storclenAdopt(%s, %lu, %d, ...)", szText, ulLen, iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_storclenAdopt(%s, %lu, %d, ...)", szText, ulLen, iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
-      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
-      BOOL bByRef = HB_IS_BYREF( pItem );
+      PHB_ITEM pItem    = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL     bByRef   = HB_IS_BYREF( pItem );
 
-      if( bByRef  )
+      if( bByRef )
       {
          pItem = hb_itemUnRef( pItem );
       }
@@ -1352,9 +1352,9 @@ int hb_storclenAdopt( char * szText, HB_SIZE ulLen, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          PHB_ITEM pDstItem;
-         va_list va;
+         va_list  va;
          va_start( va, iParam );
-         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ) );
          if( pDstItem )
          {
             hb_itemPutCPtr( pDstItem, szText, ulLen );
@@ -1376,14 +1376,14 @@ int hb_storclenAdopt( char * szText, HB_SIZE ulLen, int iParam, ... )
 
 void hb_stords( const char * szDate, int iParam, ... )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_stords(%s, %d, ...)", szDate, iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_stords(%s, %d, ...)", szDate, iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
-      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
-      BOOL bByRef = HB_IS_BYREF( pItem );
+      PHB_ITEM pItem    = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL     bByRef   = HB_IS_BYREF( pItem );
 
-      if( bByRef  )
+      if( bByRef )
       {
          pItem = hb_itemUnRef( pItem );
       }
@@ -1391,9 +1391,9 @@ void hb_stords( const char * szDate, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          PHB_ITEM pDstItem;
-         va_list va;
+         va_list  va;
          va_start( va, iParam );
-         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ) );
          if( pDstItem )
          {
             hb_itemPutDS( pDstItem, szDate );
@@ -1411,14 +1411,14 @@ void hb_stords( const char * szDate, int iParam, ... )
 
 void hb_stordts( const char * szDateTime, int iParam, ... )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_stordts(%s, %d, ...)", szDateTime, iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_stordts(%s, %d, ...)", szDateTime, iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
-      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
-      BOOL bByRef = HB_IS_BYREF( pItem );
+      PHB_ITEM pItem    = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL     bByRef   = HB_IS_BYREF( pItem );
 
-      if( bByRef  )
+      if( bByRef )
       {
          pItem = hb_itemUnRef( pItem );
       }
@@ -1426,9 +1426,9 @@ void hb_stordts( const char * szDateTime, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          PHB_ITEM pDstItem;
-         va_list va;
+         va_list  va;
          va_start( va, iParam );
-         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ) );
          if( pDstItem )
          {
             hb_itemPutDTS( pDstItem, szDateTime );
@@ -1444,14 +1444,14 @@ void hb_stordts( const char * szDateTime, int iParam, ... )
 
 void hb_stordl( long lJulian, int iParam, ... )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_stordl(%ld, %d, ...)", lJulian, iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_stordl(%ld, %d, ...)", lJulian, iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
-      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
-      BOOL bByRef = HB_IS_BYREF( pItem );
+      PHB_ITEM pItem    = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL     bByRef   = HB_IS_BYREF( pItem );
 
-      if( bByRef  )
+      if( bByRef )
       {
          pItem = hb_itemUnRef( pItem );
       }
@@ -1459,9 +1459,9 @@ void hb_stordl( long lJulian, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          PHB_ITEM pDstItem;
-         va_list va;
+         va_list  va;
          va_start( va, iParam );
-         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ) );
          if( pDstItem )
          {
             hb_itemPutDL( pDstItem, lJulian );
@@ -1477,14 +1477,14 @@ void hb_stordl( long lJulian, int iParam, ... )
 
 void hb_stordtd( double dDateTime, int iParam, ... )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_stordtd(%f, %d, ...)", dDateTime, iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_stordtd(%f, %d, ...)", dDateTime, iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
-      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
-      BOOL bByRef = HB_IS_BYREF( pItem );
+      PHB_ITEM pItem    = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL     bByRef   = HB_IS_BYREF( pItem );
 
-      if( bByRef  )
+      if( bByRef )
       {
          pItem = hb_itemUnRef( pItem );
       }
@@ -1492,9 +1492,9 @@ void hb_stordtd( double dDateTime, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          PHB_ITEM pDstItem;
-         va_list va;
+         va_list  va;
          va_start( va, iParam );
-         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ) );
          if( pDstItem )
          {
             hb_itemPutDTD( pDstItem, dDateTime );
@@ -1510,14 +1510,14 @@ void hb_stordtd( double dDateTime, int iParam, ... )
 
 void hb_stordtl( long lDate, long lTime, int iParam, ... )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_stordtl(%ld, %ld, %d, ...)", lDate, lTime, iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_stordtl(%ld, %ld, %d, ...)", lDate, lTime, iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
-      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
-      BOOL bByRef = HB_IS_BYREF( pItem );
+      PHB_ITEM pItem    = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL     bByRef   = HB_IS_BYREF( pItem );
 
-      if( bByRef  )
+      if( bByRef )
       {
          pItem = hb_itemUnRef( pItem );
       }
@@ -1525,9 +1525,9 @@ void hb_stordtl( long lDate, long lTime, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          PHB_ITEM pDstItem;
-         va_list va;
+         va_list  va;
          va_start( va, iParam );
-         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ) );
          if( pDstItem )
          {
             hb_itemPutDTL( pDstItem, lDate, lTime );
@@ -1543,14 +1543,14 @@ void hb_stordtl( long lDate, long lTime, int iParam, ... )
 
 void hb_stord( int iYear, int iMonth, int iDay, int iParam, ... )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_stord(%d, %d, %d, %d, ...)", iYear, iMonth, iDay, iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_stord(%d, %d, %d, %d, ...)", iYear, iMonth, iDay, iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
-      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
-      BOOL bByRef = HB_IS_BYREF( pItem );
+      PHB_ITEM pItem    = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL     bByRef   = HB_IS_BYREF( pItem );
 
-      if( bByRef  )
+      if( bByRef )
       {
          pItem = hb_itemUnRef( pItem );
       }
@@ -1558,9 +1558,9 @@ void hb_stord( int iYear, int iMonth, int iDay, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          PHB_ITEM pDstItem;
-         va_list va;
+         va_list  va;
          va_start( va, iParam );
-         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ) );
          if( pDstItem )
          {
             hb_itemPutD( pDstItem, iYear, iMonth, iDay );
@@ -1576,14 +1576,14 @@ void hb_stord( int iYear, int iMonth, int iDay, int iParam, ... )
 
 void hb_stordt( int iYear, int iMonth, int iDay, int iHour, int iMin, double dSec, int iAmPm, int iParam, ... )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_stord(%d, %d, %d, %d, %d, %f, %d, %d, ...)", iYear, iMonth, iDay, iHour, iMin, dSec, iAmPm, iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_stord(%d, %d, %d, %d, %d, %f, %d, %d, ...)", iYear, iMonth, iDay, iHour, iMin, dSec, iAmPm, iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
-      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
-      BOOL bByRef = HB_IS_BYREF( pItem );
+      PHB_ITEM pItem    = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL     bByRef   = HB_IS_BYREF( pItem );
 
-      if( bByRef  )
+      if( bByRef )
       {
          pItem = hb_itemUnRef( pItem );
       }
@@ -1591,9 +1591,9 @@ void hb_stordt( int iYear, int iMonth, int iDay, int iHour, int iMin, double dSe
       if( HB_IS_ARRAY( pItem ) )
       {
          PHB_ITEM pDstItem;
-         va_list va;
+         va_list  va;
          va_start( va, iParam );
-         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ) );
          if( pDstItem )
          {
             hb_itemPutDT( pDstItem, iYear, iMonth, iDay, iHour, iMin, dSec, iAmPm );
@@ -1609,14 +1609,14 @@ void hb_stordt( int iYear, int iMonth, int iDay, int iHour, int iMin, double dSe
 
 void hb_storl( int iLogical, int iParam, ... )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_storl(%d, %d, ...)", iLogical, iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_storl(%d, %d, ...)", iLogical, iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
-      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
-      BOOL bByRef = HB_IS_BYREF( pItem );
+      PHB_ITEM pItem    = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL     bByRef   = HB_IS_BYREF( pItem );
 
-      if( bByRef  )
+      if( bByRef )
       {
          pItem = hb_itemUnRef( pItem );
       }
@@ -1624,9 +1624,9 @@ void hb_storl( int iLogical, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          PHB_ITEM pDstItem;
-         va_list va;
+         va_list  va;
          va_start( va, iParam );
-         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ) );
          if( pDstItem )
          {
             hb_itemPutL( pDstItem, iLogical ? TRUE : FALSE );
@@ -1642,14 +1642,14 @@ void hb_storl( int iLogical, int iParam, ... )
 
 void hb_storni( int iValue, int iParam, ... )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_storni(%d, %d, ...)", iValue, iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_storni(%d, %d, ...)", iValue, iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
-      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
-      BOOL bByRef = HB_IS_BYREF( pItem );
+      PHB_ITEM pItem    = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL     bByRef   = HB_IS_BYREF( pItem );
 
-      if( bByRef  )
+      if( bByRef )
       {
          pItem = hb_itemUnRef( pItem );
       }
@@ -1657,9 +1657,9 @@ void hb_storni( int iValue, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          PHB_ITEM pDstItem;
-         va_list va;
+         va_list  va;
          va_start( va, iParam );
-         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ) );
          if( pDstItem )
          {
             hb_itemPutNI( pDstItem, iValue );
@@ -1675,14 +1675,14 @@ void hb_storni( int iValue, int iParam, ... )
 
 void hb_stornl( long lValue, int iParam, ... )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_stornl(%ld, %d, ...)", lValue, iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_stornl(%ld, %d, ...)", lValue, iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
-      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
-      BOOL bByRef = HB_IS_BYREF( pItem );
+      PHB_ITEM pItem    = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL     bByRef   = HB_IS_BYREF( pItem );
 
-      if( bByRef  )
+      if( bByRef )
       {
          pItem = hb_itemUnRef( pItem );
       }
@@ -1690,9 +1690,9 @@ void hb_stornl( long lValue, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          PHB_ITEM pDstItem;
-         va_list va;
+         va_list  va;
          va_start( va, iParam );
-         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ) );
          if( pDstItem )
          {
             hb_itemPutNL( pDstItem, lValue );
@@ -1708,19 +1708,19 @@ void hb_stornl( long lValue, int iParam, ... )
 
 void hb_stornint( HB_LONG lValue, int iParam, ... )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_stornint(%" PFHL "d, %d, ...)", lValue, iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_stornint(%" PFHL "d, %d, ...)", lValue, iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
-      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
-      BOOL bByRef = HB_IS_BYREF( pItem );
+      PHB_ITEM pItem    = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL     bByRef   = HB_IS_BYREF( pItem );
 
-      if( bByRef  )
+      if( bByRef )
          pItem = hb_itemUnRef( pItem );
 
       if( HB_IS_ARRAY( pItem ) )
       {
-         va_list va;
+         va_list  va;
          PHB_ITEM pItemNew = hb_itemPutNInt( NULL, lValue );
          va_start( va, iParam );
          hb_arraySet( pItem, va_arg( va, ULONG ), pItemNew );
@@ -1736,14 +1736,14 @@ void hb_stornint( HB_LONG lValue, int iParam, ... )
 
 void hb_stornd( double dNumber, int iParam, ... )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_stornd(%lf, %d, ...)", dNumber, iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_stornd(%lf, %d, ...)", dNumber, iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
-      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
-      BOOL bByRef = HB_IS_BYREF( pItem );
+      PHB_ITEM pItem    = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL     bByRef   = HB_IS_BYREF( pItem );
 
-      if( bByRef  )
+      if( bByRef )
       {
          pItem = hb_itemUnRef( pItem );
       }
@@ -1751,9 +1751,9 @@ void hb_stornd( double dNumber, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          PHB_ITEM pDstItem;
-         va_list va;
+         va_list  va;
          va_start( va, iParam );
-         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ) );
          if( pDstItem )
          {
             hb_itemPutND( pDstItem, dNumber );
@@ -1769,14 +1769,14 @@ void hb_stornd( double dNumber, int iParam, ... )
 
 void hb_storptr( void * pointer, int iParam, ... )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_storptr(%p, %d, ...)", pointer, iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_storptr(%p, %d, ...)", pointer, iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
-      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
-      BOOL bByRef = HB_IS_BYREF( pItem );
+      PHB_ITEM pItem    = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL     bByRef   = HB_IS_BYREF( pItem );
 
-      if( bByRef  )
+      if( bByRef )
       {
          pItem = hb_itemUnRef( pItem );
       }
@@ -1784,9 +1784,9 @@ void hb_storptr( void * pointer, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          PHB_ITEM pDstItem;
-         va_list va;
+         va_list  va;
          va_start( va, iParam );
-         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ) );
          if( pDstItem )
          {
             hb_itemPutPtr( pDstItem, pointer );
@@ -1804,14 +1804,14 @@ void hb_storptr( void * pointer, int iParam, ... )
 /* LONGLONG support */
 void hb_stornll( LONGLONG llNumber, int iParam, ... )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_stornll(%" PFLL "d, %d, ...)", llNumber, iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_stornll(%" PFLL "d, %d, ...)", llNumber, iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
-      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
-      BOOL bByRef = HB_IS_BYREF( pItem );
+      PHB_ITEM pItem    = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL     bByRef   = HB_IS_BYREF( pItem );
 
-      if( bByRef  )
+      if( bByRef )
       {
          pItem = hb_itemUnRef( pItem );
       }
@@ -1819,9 +1819,9 @@ void hb_stornll( LONGLONG llNumber, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          PHB_ITEM pDstItem;
-         va_list va;
+         va_list  va;
          va_start( va, iParam );
-         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ) );
          if( pDstItem )
          {
             hb_itemPutNLL( pDstItem, llNumber );
@@ -1830,14 +1830,14 @@ void hb_stornll( LONGLONG llNumber, int iParam, ... )
       }
       else if( bByRef || iParam == -1 )
       {
-        hb_itemPutNLL( pItem, llNumber );
+         hb_itemPutNLL( pItem, llNumber );
       }
    }
 }
 
 LONGLONG  hb_parnll( int iParam, ... )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_parnll(%d, ...)", iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_parnll(%d, ...)", iParam ) );
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -1874,8 +1874,8 @@ LONGLONG  hb_parnll( int iParam, ... )
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
-         va_list va;
-         ULONG ulArrayIndex;
+         va_list  va;
+         ULONG    ulArrayIndex;
 
          va_start( va, iParam );
          ulArrayIndex = va_arg( va, ULONG );
@@ -1891,15 +1891,15 @@ LONGLONG  hb_parnll( int iParam, ... )
 #undef hb_retnll
 void hb_retnll( LONGLONG llNumber )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retnll(%" PFLL "d)", llNumber));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retnll(%" PFLL "d)", llNumber ) );
 
    hb_itemPutNLL( hb_stackReturnItem(), llNumber );
 }
 
 #undef hb_retnlllen
-void hb_retnlllen( LONGLONG llNumber, int iWidth)
+void hb_retnlllen( LONGLONG llNumber, int iWidth )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retnlllen(%" PFLL "d, %d)", llNumber, iWidth));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retnlllen(%" PFLL "d, %d)", llNumber, iWidth ) );
 
    hb_itemPutNLLLen( hb_stackReturnItem(), llNumber, iWidth );
 }
@@ -1910,7 +1910,7 @@ void hb_retns( HB_ISIZ nNumber )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_retns(%" HB_PFS "d )", nNumber));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_retns(%" HB_PFS "d )", nNumber ) );
 
    hb_itemPutNS( hb_stackReturnItem(), nNumber );
 }
@@ -1919,7 +1919,7 @@ HB_ISIZ hb_parns( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_parns(%d, ...)", iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_parns(%d, ...)", iParam ) );
 
    if( iParam >= -1 && iParam <= hb_pcount() )
    {
@@ -1936,8 +1936,8 @@ HB_ISIZ hb_parns( int iParam, ... )
          return ( HB_ISIZ ) pItem->item.asDouble.value;
       else if( HB_IS_ARRAY( pItem ) )
       {
-         va_list va;
-         HB_SIZE nArrayIndex;
+         va_list  va;
+         HB_SIZE  nArrayIndex;
 
          va_start( va, iParam );
          nArrayIndex = va_arg( va, HB_SIZE );
@@ -1954,20 +1954,20 @@ int hb_storns( HB_ISIZ nValue, int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_storvns(%" HB_PFS "d, %d, ...)", nValue, iParam));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_storvns(%" HB_PFS "d, %d, ...)", nValue, iParam ) );
 
    if( iParam >= -1 && iParam <= hb_pcount() )
    {
-      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
-      HB_BOOL bByRef = HB_IS_BYREF( pItem );
+      PHB_ITEM pItem    = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      HB_BOOL  bByRef   = HB_IS_BYREF( pItem );
 
-      if( bByRef  )
+      if( bByRef )
          pItem = hb_itemUnRef( pItem );
 
       if( HB_IS_ARRAY( pItem ) )
       {
-         int iRetVal;
-         va_list va;
+         int      iRetVal;
+         va_list  va;
          va_start( va, iParam );
          iRetVal = hb_arraySetNS( pItem, va_arg( va, HB_SIZE ), nValue ) ? 1 : 0;
          va_end( va );

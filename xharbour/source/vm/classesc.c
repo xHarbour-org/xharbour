@@ -49,7 +49,7 @@
  * If you do not wish that, delete this exception notice.
  *
  */
- /*
+/*
  *  2007-04-11 08:56 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
  *    - Keep in this file only Functions for Compatibility for older versions
  *      of xharbour
@@ -59,9 +59,9 @@
  *    __CLS_PAR00
  */
 
- /* NOTE: Used by the preprocessor to implement Classy compatibility to Harbour
-         Receive an variable number of param and return an array of it.
-         No param will return a NULL array */
+/* NOTE: Used by the preprocessor to implement Classy compatibility to Harbour
+        Receive an variable number of param and return an array of it.
+        No param will return a NULL array */
 
 #define HB_THREAD_OPTIMIZE_STACK
 
@@ -79,8 +79,8 @@ HB_FUNC( __CLS_PARAM )
 {
    HB_THREAD_STUB_API
    HB_ITEM_NEW( Array );
-   USHORT uiParam = ( USHORT ) hb_pcount();
-   USHORT n;
+   USHORT   uiParam = ( USHORT ) hb_pcount();
+   USHORT   n;
 
    if( uiParam >= 1 )
    {
@@ -94,7 +94,7 @@ HB_FUNC( __CLS_PARAM )
    else
    {
       hb_arrayNew( &Array, 1 );
-      hb_itemPutCStatic( hb_arrayGetItemPtr( &Array, 1), (char *) "HBObject" );
+      hb_itemPutCStatic( hb_arrayGetItemPtr( &Array, 1 ), ( char * ) "HBObject" );
    }
 
    hb_itemReturnForward( &Array );
@@ -106,9 +106,9 @@ HB_FUNC( __CLS_PARAM )
 HB_FUNC( __CLS_PAR00 )
 {
    HB_THREAD_STUB_API
-   HB_ITEM Array;
-   USHORT uiParam = ( USHORT ) hb_pcount();
-   USHORT n;
+   HB_ITEM  Array;
+   USHORT   uiParam = ( USHORT ) hb_pcount();
+   USHORT   n;
 
    Array.type = HB_IT_NIL;
    hb_arrayNew( &Array, uiParam );
@@ -123,7 +123,7 @@ HB_FUNC( __CLS_PAR00 )
 
 USHORT hb_objGetClass( PHB_ITEM pItem )
 {
-   if ( pItem && HB_IS_ARRAY( pItem ) )
+   if( pItem && HB_IS_ARRAY( pItem ) )
       return pItem->item.asArray.value->uiClass;
    else
       return 0;

@@ -68,7 +68,7 @@
 #include "classes.h"
 #include "hboo.ch"
 
-extern char *hb_vm_sNull;
+extern char * hb_vm_sNull;
 
 HB_EXTERN_BEGIN
 
@@ -79,7 +79,7 @@ void hb_itemPushForward( PHB_ITEM pItem )
 {
    HB_THREAD_STUB_STACK
 
-   HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemPushForward(%p)", pItem ) );
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemPushForward(%p)", pItem ) );
 
    hb_itemForwardValue( hb_stackTopItem(), pItem );
    hb_stackPush();
@@ -87,7 +87,7 @@ void hb_itemPushForward( PHB_ITEM pItem )
 
 void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
 {
-   HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemForwardValue(%p, %p) %i", pDest, pSource, pDest->type ) );
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemForwardValue(%p, %p) %i", pDest, pSource, pDest->type ) );
 
    if( pDest == pSource )
    {
@@ -103,14 +103,14 @@ void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
    hb_itemRawCpy( pDest, pSource );
 
    #ifndef HB_ARRAY_USE_COUNTER
-      if( pSource->type == HB_IT_ARRAY && pSource->item.asArray.value )
-      {
-         hb_arrayResetHolder( pSource->item.asArray.value, (void *) pSource, (void *) pDest );
-      }
-      else if( pSource->type == HB_IT_BYREF && ( pSource )->item.asRefer.offset == 0 )
-      {
-         hb_arrayResetHolder( pSource->item.asRefer.BasePtr.pBaseArray, (void *) pSource, (void *) pDest );
-      }
+   if( pSource->type == HB_IT_ARRAY && pSource->item.asArray.value )
+   {
+      hb_arrayResetHolder( pSource->item.asArray.value, ( void * ) pSource, ( void * ) pDest );
+   }
+   else if( pSource->type == HB_IT_BYREF && ( pSource )->item.asRefer.offset == 0 )
+   {
+      hb_arrayResetHolder( pSource->item.asRefer.BasePtr.pBaseArray, ( void * ) pSource, ( void * ) pDest );
+   }
    #endif
 
    /* Now fake clear the transferer. */
@@ -121,7 +121,7 @@ PHB_ITEM hb_itemReturn( PHB_ITEM pItem )
 {
    HB_THREAD_STUB_STACK
 
-   HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemReturn(%p)", pItem ) );
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemReturn(%p)", pItem ) );
 
    if( pItem )
    {
@@ -135,7 +135,7 @@ PHB_ITEM hb_itemReturnForward( PHB_ITEM pItem )
 {
    HB_THREAD_STUB_STACK
 
-   HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemReturnForward(%p)", pItem ) );
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemReturnForward(%p)", pItem ) );
 
    if( pItem )
    {
@@ -149,7 +149,7 @@ void hb_itemReturnRelease( PHB_ITEM pItem )
 {
    HB_THREAD_STUB_STACK
 
-   HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemReturnRelease(%p)", pItem ) );
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemReturnRelease(%p)", pItem ) );
 
    if( pItem )
    {
@@ -166,14 +166,14 @@ void hb_itemReleaseString( PHB_ITEM pItem )
    {
       if( *( pItem->item.asString.pulHolders ) == 0 )
       {
-         assert(0);
+         assert( 0 );
          hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature String Release detected: '%s'", pItem->item.asString.value, NULL );
       }
 
       if( HB_ATOMIC_DEC( *( pItem->item.asString.pulHolders ) ) == 0 )
       {
          HB_TRACE_STEALTH( HB_TR_DEBUG, ( "Will FREE %p", pItem->item.asString.pulHolders ) );
-         hb_xfree( (void *) pItem->item.asString.pulHolders );
+         hb_xfree( ( void * ) pItem->item.asString.pulHolders );
          //pItem->item.asString.pulHolders = NULL;
 
          HB_TRACE_STEALTH( HB_TR_DEBUG, ( "Will FREE %p", pItem->item.asString.value ) );
@@ -202,7 +202,7 @@ void hb_itemClear( PHB_ITEM pItem )
    {
       if( pItem->type & HB_IT_MEMVAR )
       {
-         hb_memvarValueDecRef( (HB_HANDLE) pItem->item.asMemvar.value );
+         hb_memvarValueDecRef( ( HB_HANDLE ) pItem->item.asMemvar.value );
       }
       else if( pItem->type & HB_IT_EXTREF )
       {
@@ -214,41 +214,41 @@ void hb_itemClear( PHB_ITEM pItem )
 
          //TraceLog( NULL, "BYREF Faked %p\n", pItem->item.asRefer.BasePtr.pBaseArray );
 
-         FakeArray.type = HB_IT_ARRAY;
-         FakeArray.item.asArray.value = pItem->item.asRefer.BasePtr.pBaseArray;
+         FakeArray.type                = HB_IT_ARRAY;
+         FakeArray.item.asArray.value  = pItem->item.asRefer.BasePtr.pBaseArray;
 
          #ifdef HB_ARRAY_USE_COUNTER
-            if( pItem->item.asRefer.BasePtr.pBaseArray->ulHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
-            {
-               assert(0);
-               hb_errInternal( HB_EI_PREMATURE_RELEASE, "BYREF Premature Array/Object Release detected", NULL, NULL );
-            }
+         if( pItem->item.asRefer.BasePtr.pBaseArray->ulHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
+         {
+            assert( 0 );
+            hb_errInternal( HB_EI_PREMATURE_RELEASE, "BYREF Premature Array/Object Release detected", NULL, NULL );
+         }
 
-            if( HB_ATOMIC_DEC( pItem->item.asRefer.BasePtr.pBaseArray->ulHolders ) == 0 )
-            {
-               hb_arrayRelease( &FakeArray );
-            }
+         if( HB_ATOMIC_DEC( pItem->item.asRefer.BasePtr.pBaseArray->ulHolders ) == 0 )
+         {
+            hb_arrayRelease( &FakeArray );
+         }
          #else
-            hb_arrayResetHolder( pItem->item.asRefer.BasePtr.pBaseArray, (void *) pItem, &FakeArray );
-            hb_arrayReleaseHolder( pItem->item.asRefer.BasePtr.pBaseArray, (void *) &FakeArray );
+         hb_arrayResetHolder( pItem->item.asRefer.BasePtr.pBaseArray, ( void * ) pItem, &FakeArray );
+         hb_arrayReleaseHolder( pItem->item.asRefer.BasePtr.pBaseArray, ( void * ) &FakeArray );
          #endif
       }
    }
    else if( HB_IS_ARRAY( pItem ) )
    {
       #ifdef HB_ARRAY_USE_COUNTER
-        if( pItem->item.asArray.value->ulHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
-        {
-           assert(0);
-           hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected %p", (char *) ( pItem->item.asArray.value ), NULL );
-        }
+      if( pItem->item.asArray.value->ulHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
+      {
+         assert( 0 );
+         hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected %p", ( char * ) ( pItem->item.asArray.value ), NULL );
+      }
 
-        if( HB_ATOMIC_DEC( pItem->item.asArray.value->ulHolders ) == 0 )
-        {
-           hb_arrayRelease( pItem );
-        }
+      if( HB_ATOMIC_DEC( pItem->item.asArray.value->ulHolders ) == 0 )
+      {
+         hb_arrayRelease( pItem );
+      }
       #else
-        hb_arrayReleaseHolder( pItem->item.asArray.value, (void *) pItem );
+      hb_arrayReleaseHolder( pItem->item.asArray.value, ( void * ) pItem );
       #endif
    }
    else if( HB_IS_BLOCK( pItem ) )
@@ -264,15 +264,15 @@ void hb_itemClear( PHB_ITEM pItem )
    }
    else if( HB_IS_POINTER( pItem ) )
    {
-      if ( pItem->item.asPointer.collect )
+      if( pItem->item.asPointer.collect )
       {
-         hb_gcDecRef( (void *) pItem->item.asPointer.value );
+         hb_gcDecRef( ( void * ) pItem->item.asPointer.value );
       }
    }
    else if( HB_IS_SYMBOL( pItem ) )
    {
       assert( pItem->item.asSymbol.pCargo );
-      hb_xfree( (void *) pItem->item.asSymbol.pCargo );
+      hb_xfree( ( void * ) pItem->item.asSymbol.pCargo );
       pItem->item.asSymbol.pCargo = NULL;
    }
 
@@ -281,7 +281,7 @@ void hb_itemClear( PHB_ITEM pItem )
 
 #ifdef HB_THREAD_SUPPORT
 
-void hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack )
+void hb_itemClearMT( PHB_ITEM pItem, HB_STACK * pStack )
 {
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemClearMT(%p) type: %i", pItem, pItem->type ) );
 
@@ -293,7 +293,7 @@ void hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack )
    {
       if( pItem->type & HB_IT_MEMVAR )
       {
-         hb_memvarValueDecRefMT( (HB_HANDLE) pItem->item.asMemvar.value, pStack );
+         hb_memvarValueDecRefMT( ( HB_HANDLE ) pItem->item.asMemvar.value, pStack );
       }
       else if( pItem->type & HB_IT_EXTREF )
       {
@@ -303,41 +303,41 @@ void hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack )
       {
          HB_ITEM FakeArray;
 
-         FakeArray.type = HB_IT_NIL;
-         FakeArray.item.asArray.value = pItem->item.asRefer.BasePtr.pBaseArray;
+         FakeArray.type                = HB_IT_NIL;
+         FakeArray.item.asArray.value  = pItem->item.asRefer.BasePtr.pBaseArray;
 
          #ifdef HB_ARRAY_USE_COUNTER
-            if( pItem->item.asRefer.BasePtr.pBaseArray->ulHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
-            {
-               assert(0);
-               hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected", NULL, NULL );
-            }
+         if( pItem->item.asRefer.BasePtr.pBaseArray->ulHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
+         {
+            assert( 0 );
+            hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected", NULL, NULL );
+         }
 
-            if( HB_ATOMIC_DEC( pItem->item.asRefer.BasePtr.pBaseArray->ulHolders ) == 0 )
-            {
-               hb_arrayRelease( &FakeArray );
-            }
+         if( HB_ATOMIC_DEC( pItem->item.asRefer.BasePtr.pBaseArray->ulHolders ) == 0 )
+         {
+            hb_arrayRelease( &FakeArray );
+         }
          #else
-            hb_arrayResetHolder( pItem->item.asRefer.BasePtr.pBaseArray, (void *) pItem, &FakeArray );
-            hb_arrayReleaseHolder( pItem->item.asRefer.BasePtr.pBaseArray, (void *) &FakeArray );
+         hb_arrayResetHolder( pItem->item.asRefer.BasePtr.pBaseArray, ( void * ) pItem, &FakeArray );
+         hb_arrayReleaseHolder( pItem->item.asRefer.BasePtr.pBaseArray, ( void * ) &FakeArray );
          #endif
       }
    }
    else if( HB_IS_ARRAY( pItem ) )
    {
       #ifdef HB_ARRAY_USE_COUNTER
-        if( pItem->item.asArray.value->ulHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
-        {
-           assert(0);
-           hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected %p", (char *) ( pItem->item.asArray.value ), NULL );
-        }
+      if( pItem->item.asArray.value->ulHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
+      {
+         assert( 0 );
+         hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected %p", ( char * ) ( pItem->item.asArray.value ), NULL );
+      }
 
-        if( HB_ATOMIC_DEC( pItem->item.asArray.value->ulHolders ) == 0 )
-        {
-           hb_arrayRelease( pItem );
-        }
+      if( HB_ATOMIC_DEC( pItem->item.asArray.value->ulHolders ) == 0 )
+      {
+         hb_arrayRelease( pItem );
+      }
       #else
-        hb_arrayReleaseHolder( pItem->item.asArray.value, (void *) pItem );
+      hb_arrayReleaseHolder( pItem->item.asArray.value, ( void * ) pItem );
       #endif
    }
    else if( HB_IS_BLOCK( pItem ) )
@@ -353,15 +353,15 @@ void hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack )
    }
    else if( HB_IS_POINTER( pItem ) )
    {
-      if ( pItem->item.asPointer.collect )
+      if( pItem->item.asPointer.collect )
       {
-         hb_gcDecRef( (void *) pItem->item.asPointer.value );
+         hb_gcDecRef( ( void * ) pItem->item.asPointer.value );
       }
    }
    else if( HB_IS_SYMBOL( pItem ) )
    {
       assert( pItem->item.asSymbol.pCargo );
-      hb_xfree( (void *) pItem->item.asSymbol.pCargo );
+      hb_xfree( ( void * ) pItem->item.asSymbol.pCargo );
       pItem->item.asSymbol.pCargo = NULL;
    }
 
@@ -374,33 +374,33 @@ void hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )
 {
    HB_ITEM temp;
 
-   HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemSwap(%p, %p)", pItem1, pItem2));
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemSwap(%p, %p)", pItem1, pItem2 ) );
 
    /*
-   temp.type = HB_IT_NIL;
-   hb_itemForwardValue( &temp, pItem2 );
-   hb_itemForwardValue( pItem2, pItem1 );
-   hb_itemForwardValue( pItem1, &temp );
-   */
+      temp.type = HB_IT_NIL;
+      hb_itemForwardValue( &temp, pItem2 );
+      hb_itemForwardValue( pItem2, pItem1 );
+      hb_itemForwardValue( pItem1, &temp );
+    */
 
    #ifndef HB_ARRAY_USE_COUNTER
-      if( pItem1->type == HB_IT_ARRAY && pItem1->item.asArray.value )
-      {
-         hb_arrayResetHolder( pItem1->item.asArray.value, (void *) pItem1, (void *) pItem2 );
-      }
-      else if( pItem1->type == HB_IT_BYREF && pItem1->item.asRefer.offset == 0 )
-      {
-         hb_arrayResetHolder( pItem1->item.asRefer.BasePtr.pBaseArray, (void *) pItem1, (void *) pItem2 );
-      }
+   if( pItem1->type == HB_IT_ARRAY && pItem1->item.asArray.value )
+   {
+      hb_arrayResetHolder( pItem1->item.asArray.value, ( void * ) pItem1, ( void * ) pItem2 );
+   }
+   else if( pItem1->type == HB_IT_BYREF && pItem1->item.asRefer.offset == 0 )
+   {
+      hb_arrayResetHolder( pItem1->item.asRefer.BasePtr.pBaseArray, ( void * ) pItem1, ( void * ) pItem2 );
+   }
 
-      if( pItem2->type == HB_IT_ARRAY && pItem2->item.asArray.value )
-      {
-         hb_arrayResetHolder( pItem2->item.asArray.value, (void *) pItem2, (void *) pItem1 );
-      }
-      else if( pItem2->type == HB_IT_BYREF && pItem2->item.asRefer.offset == 0 )
-      {
-         hb_arrayResetHolder( pItem2->item.asRefer.BasePtr.pBaseArray, (void *) pItem2, (void *) pItem1 );
-      }
+   if( pItem2->type == HB_IT_ARRAY && pItem2->item.asArray.value )
+   {
+      hb_arrayResetHolder( pItem2->item.asArray.value, ( void * ) pItem2, ( void * ) pItem1 );
+   }
+   else if( pItem2->type == HB_IT_BYREF && pItem2->item.asRefer.offset == 0 )
+   {
+      hb_arrayResetHolder( pItem2->item.asRefer.BasePtr.pBaseArray, ( void * ) pItem2, ( void * ) pItem1 );
+   }
    #endif
 
    hb_itemRawCpy( &temp, pItem2 );
@@ -410,7 +410,7 @@ void hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )
 
 void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
 {
-   HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemCopy(%p, %p)", pDest, pSource));
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemCopy(%p, %p)", pDest, pSource ) );
 
    if( pDest == pSource )
    {
@@ -438,7 +438,7 @@ void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
       {
          if( pSource->type & HB_IT_MEMVAR ) // intentionally & instead of ==
          {
-            hb_memvarValueIncRef( (HB_HANDLE) pSource->item.asMemvar.value );
+            hb_memvarValueIncRef( ( HB_HANDLE ) pSource->item.asMemvar.value );
          }
          else if( pSource->type & HB_IT_ENUM )    /* enumerators cannnot be copied */
          {
@@ -451,15 +451,15 @@ void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
          else if( pSource->item.asRefer.offset == 0 /* && pSource->item.asRefer.value >= 0 */ )
          {
             #ifdef HB_ARRAY_USE_COUNTER
-               HB_ATOMIC_INC( pSource->item.asRefer.BasePtr.pBaseArray->ulHolders );
+            HB_ATOMIC_INC( pSource->item.asRefer.BasePtr.pBaseArray->ulHolders );
             #else
-               hb_arrayRegisterHolder( pSource->item.asRefer.BasePtr.pBaseArray, (void *) pSource->item.asRefer.BasePtr.pBaseArray );
+            hb_arrayRegisterHolder( pSource->item.asRefer.BasePtr.pBaseArray, ( void * ) pSource->item.asRefer.BasePtr.pBaseArray );
             #endif
          }
 
          if( hb_itemUnRef( pSource ) == pDest )
          {
-            assert(0);
+            assert( 0 );
             //hb_errRT_BASE( EG_ARG, 9000, NULL, "Cyclic Reference assignment", 2, pSource, pDest );
             hb_errInternal( HB_EI_ERRUNRECOV, "Cyclic Reference assignment.", NULL, NULL );
          }
@@ -467,9 +467,9 @@ void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
       else if( HB_IS_ARRAY( pSource ) )
       {
          #ifdef HB_ARRAY_USE_COUNTER
-            HB_ATOMIC_INC( pSource->item.asArray.value->ulHolders );
+         HB_ATOMIC_INC( pSource->item.asArray.value->ulHolders );
          #else
-             hb_arrayRegisterHolder( pDest->item.asArray.value, (void *) pDest );
+         hb_arrayRegisterHolder( pDest->item.asArray.value, ( void * ) pDest );
          #endif
       }
       else if( HB_IS_BLOCK( pSource ) )
@@ -484,15 +484,15 @@ void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
       {
          if( pSource->item.asPointer.collect )
          {
-             hb_gcIncRef( (void *) pSource->item.asPointer.value );
+            hb_gcIncRef( ( void * ) pSource->item.asPointer.value );
          }
       }
       else if( HB_IS_SYMBOL( pSource ) )
       {
-         PHB_SYMBCARGO pSymCargo = (PHB_SYMBCARGO) hb_xgrab( sizeof( HB_SYMBCARGO ) );
+         PHB_SYMBCARGO pSymCargo = ( PHB_SYMBCARGO ) hb_xgrab( sizeof( HB_SYMBCARGO ) );
 
          assert( pSource->item.asSymbol.pCargo );
-         HB_MEMCPY( pSymCargo, (void *) pSource->item.asSymbol.pCargo, sizeof( HB_SYMBCARGO ) );
+         HB_MEMCPY( pSymCargo, ( void * ) pSource->item.asSymbol.pCargo, sizeof( HB_SYMBCARGO ) );
 
          pDest->item.asSymbol.pCargo = pSymCargo;
       }
@@ -507,11 +507,11 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, const char * szText )
 {
    HB_SIZE ulLen = 0;
 
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutC(%p, %s)", pItem, szText));
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemPutC(%p, %s)", pItem, szText ) );
 
    if( szText )
    {
-     ulLen = strlen( szText );
+      ulLen = strlen( szText );
    }
 
    return hb_itemPutCL( pItem, szText, ulLen );
@@ -585,7 +585,7 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, const char * szText )
          pItem->item.asString.value[ ulLen ]  = '\0';
 
          pItem->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-         *( pItem->item.asString.pulHolders ) = 1;
+   *( pItem->item.asString.pulHolders ) = 1;
 
          pItem->item.asString.length          = ulLen;
          pItem->item.asString.allocated       = ulLen + 1;
@@ -596,12 +596,12 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, const char * szText )
    }
 
    return pItem;
-*/
+ */
 }
 
 PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, const char * szText, HB_SIZE ulLen )
 {
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCL(%p, %s, %lu)", pItem, szText, ulLen));
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemPutCL(%p, %s, %lu)", pItem, szText, ulLen ) );
 
    if( pItem == NULL )
    {
@@ -611,43 +611,43 @@ PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, const char * szText, HB_SIZE ulLen )
    {
       if( HB_IS_STRING( pItem ) )
       {
-        // Recycle!
-        if( pItem->item.asString.allocated &&  *( pItem->item.asString.pulHolders ) == 1 )
-        {
-          // Reset MEMO flag if any.
-          pItem->type = HB_IT_STRING;
+         // Recycle!
+         if( pItem->item.asString.allocated && *( pItem->item.asString.pulHolders ) == 1 )
+         {
+            // Reset MEMO flag if any.
+            pItem->type = HB_IT_STRING;
 
-          if( szText == pItem->item.asString.value )
-          {
-            pItem->item.asString.value[ ulLen ] = '\0';
-            pItem->item.asString.length = ulLen;
+            if( szText == pItem->item.asString.value )
+            {
+               pItem->item.asString.value[ ulLen ] = '\0';
+               pItem->item.asString.length         = ulLen;
 
-            return pItem;
-          }
-          else if( szText > pItem->item.asString.value && szText <= pItem->item.asString.value + pItem->item.asString.length )
-          {
-            char *sCopy = (char *) hb_xgrab( ulLen + 1 );
+               return pItem;
+            }
+            else if( szText > pItem->item.asString.value && szText <= pItem->item.asString.value + pItem->item.asString.length )
+            {
+               char * sCopy = ( char * ) hb_xgrab( ulLen + 1 );
 
-            hb_xmemcpy( (void *) sCopy, (void *) szText, (size_t) ulLen );
+               hb_xmemcpy( ( void * ) sCopy, ( void * ) szText, ( size_t ) ulLen );
 
-            return hb_itemPutCPtr( pItem, sCopy, ulLen );
-          }
-          else
-          {
-             // Safe to realocate if needed.
-             __HB_STRING_REALLOC( pItem, ulLen );
+               return hb_itemPutCPtr( pItem, sCopy, ulLen );
+            }
+            else
+            {
+               // Safe to realocate if needed.
+               __HB_STRING_REALLOC( pItem, ulLen );
 
-             // Safe, no need to use memmove()
-             HB_MEMCPY( pItem->item.asString.value, szText, (size_t) ulLen );
+               // Safe, no need to use memmove()
+               HB_MEMCPY( pItem->item.asString.value, szText, ( size_t ) ulLen );
 
-             return pItem;
-          }
-        }
-        else
-        {
-           // No need to check buffer overlapping - string is will NOT be released!
-           hb_itemReleaseString( pItem );
-        }
+               return pItem;
+            }
+         }
+         else
+         {
+            // No need to check buffer overlapping - string is will NOT be released!
+            hb_itemReleaseString( pItem );
+         }
       }
       else if( HB_IS_COMPLEX( pItem ) )
       {
@@ -655,29 +655,29 @@ PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, const char * szText, HB_SIZE ulLen )
       }
    }
 
-   pItem->type = HB_IT_STRING;
-   pItem->item.asString.value = hb_vm_sNull;
-   pItem->item.asString.allocated = 0;
-   pItem->item.asString.length = 0;
+   pItem->type                      = HB_IT_STRING;
+   pItem->item.asString.value       = hb_vm_sNull;
+   pItem->item.asString.allocated   = 0;
+   pItem->item.asString.length      = 0;
 
    if( ulLen == 1 )
    {
-     pItem->item.asString.value  = ( char * ) hb_szAscii[ ( UCHAR ) szText[0] ];
-     pItem->item.asString.length = 1;
+      pItem->item.asString.value    = ( char * ) hb_szAscii[ ( UCHAR ) szText[ 0 ] ];
+      pItem->item.asString.length   = 1;
    }
    else if( ulLen > 1 )
    {
-     pItem->item.asString.value           = ( char * ) hb_xgrab( ulLen + 1 );
-     pItem->item.asString.value[ ulLen ]  = '\0';
+      pItem->item.asString.value             = ( char * ) hb_xgrab( ulLen + 1 );
+      pItem->item.asString.value[ ulLen ]    = '\0';
 
-     pItem->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-     *( pItem->item.asString.pulHolders ) = 1;
+      pItem->item.asString.pulHolders        = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
+      *( pItem->item.asString.pulHolders )   = 1;
 
-     pItem->item.asString.length          = ulLen;
-     pItem->item.asString.allocated       = ulLen + 1;
+      pItem->item.asString.length            = ulLen;
+      pItem->item.asString.allocated         = ulLen + 1;
 
-     // Alocation above already set the 'length and the terminator!
-     hb_xmemcpy( (void *) pItem->item.asString.value, (void *) szText, (size_t) ulLen );
+      // Alocation above already set the 'length and the terminator!
+      hb_xmemcpy( ( void * ) pItem->item.asString.value, ( void * ) szText, ( size_t ) ulLen );
    }
 
    return pItem;
@@ -685,12 +685,12 @@ PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, const char * szText, HB_SIZE ulLen )
 
 PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, HB_SIZE ulLen )
 {
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCPtr(%p, %s, %lu)", pItem, szText, ulLen));
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemPutCPtr(%p, %s, %lu)", pItem, szText, ulLen ) );
 
    if( ulLen )
    {
-      szText[ulLen] = '\0';
-      pItem = hb_itemPutCRaw( pItem, szText, ulLen );
+      szText[ ulLen ]   = '\0';
+      pItem             = hb_itemPutCRaw( pItem, szText, ulLen );
       pItem->item.asString.allocated++;
    }
    else
@@ -720,7 +720,7 @@ PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, HB_SIZE ulLen )
       szText[ulLen] = '\0';
 
       pItem->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-      *( pItem->item.asString.pulHolders ) = 1;
+   *( pItem->item.asString.pulHolders ) = 1;
       pItem->item.asString.allocated       = ulLen + 1;
       pItem->item.asString.value           = szText;
    }
@@ -735,12 +735,12 @@ PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, HB_SIZE ulLen )
    pItem->item.asString.length    = ulLen;
 
    return pItem;
-*/
+ */
 }
 
 PHB_ITEM hb_itemPutCRaw( PHB_ITEM pItem, char * szText, HB_SIZE ulLen )
 {
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCRaw(%p, %s, %lu)", pItem, szText, ulLen));
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemPutCRaw(%p, %s, %lu)", pItem, szText, ulLen ) );
 
    if( pItem )
    {
@@ -757,27 +757,27 @@ PHB_ITEM hb_itemPutCRaw( PHB_ITEM pItem, char * szText, HB_SIZE ulLen )
    pItem->type = HB_IT_STRING;
    if( ulLen )
    {
-     pItem->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-     *( pItem->item.asString.pulHolders ) = 1;
+      pItem->item.asString.pulHolders        = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
+      *( pItem->item.asString.pulHolders )   = 1;
    }
    else
    {
-     if( szText )
-     {
-       hb_xfree( szText );
-     }
-     szText = hb_vm_sNull;
+      if( szText )
+      {
+         hb_xfree( szText );
+      }
+      szText = hb_vm_sNull;
    }
-   pItem->item.asString.length    = ulLen;
-   pItem->item.asString.value     = szText;
-   pItem->item.asString.allocated = ulLen;
+   pItem->item.asString.length      = ulLen;
+   pItem->item.asString.value       = szText;
+   pItem->item.asString.allocated   = ulLen;
 
    return pItem;
 }
 
 PHB_ITEM hb_itemPutCRawStatic( PHB_ITEM pItem, const char * szText, HB_SIZE ulLen )
 {
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCRawStatic(%p, %s, %lu)", pItem, szText, ulLen));
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemPutCRawStatic(%p, %s, %lu)", pItem, szText, ulLen ) );
 
    if( pItem )
    {
@@ -791,10 +791,10 @@ PHB_ITEM hb_itemPutCRawStatic( PHB_ITEM pItem, const char * szText, HB_SIZE ulLe
       pItem = hb_itemNew( NULL );
    }
 
-   pItem->type = HB_IT_STRING;
-   pItem->item.asString.allocated = 0;
-   pItem->item.asString.length    = ulLen;
-   pItem->item.asString.value     = (char *) szText;
+   pItem->type                      = HB_IT_STRING;
+   pItem->item.asString.allocated   = 0;
+   pItem->item.asString.length      = ulLen;
+   pItem->item.asString.value       = ( char * ) szText;
 
    return pItem;
 }
@@ -803,11 +803,11 @@ PHB_ITEM hb_itemPutCStatic( PHB_ITEM pItem, const char * szText )
 {
    HB_SIZE ulLen = 0;
 
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCStatic(%p, %s)", pItem, szText) );
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemPutCStatic(%p, %s)", pItem, szText ) );
 
    if( szText )
    {
-     ulLen = strlen( szText);
+      ulLen = strlen( szText );
    }
 
    return hb_itemPutCLStatic( pItem, szText, ulLen );
@@ -839,12 +839,12 @@ PHB_ITEM hb_itemPutCStatic( PHB_ITEM pItem, const char * szText )
    }
 
    return pItem;
-*/
+ */
 }
 
 PHB_ITEM hb_itemPutCLStatic( PHB_ITEM pItem, const char * szText, HB_SIZE ulLen )
 {
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCLStatic(%p, %s, %lu)", pItem, szText, ulLen));
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemPutCLStatic(%p, %s, %lu)", pItem, szText, ulLen ) );
 
    if( pItem )
    {
@@ -858,13 +858,13 @@ PHB_ITEM hb_itemPutCLStatic( PHB_ITEM pItem, const char * szText, HB_SIZE ulLen 
       pItem = hb_itemNew( NULL );
    }
 
-   pItem->type = HB_IT_STRING;
-   pItem->item.asString.value = hb_vm_sNull;
-   pItem->item.asString.length = ulLen;
-   pItem->item.asString.allocated = 0;
+   pItem->type                      = HB_IT_STRING;
+   pItem->item.asString.value       = hb_vm_sNull;
+   pItem->item.asString.length      = ulLen;
+   pItem->item.asString.allocated   = 0;
    if( ulLen )
    {
-     pItem->item.asString.value = ( char * ) szText;
+      pItem->item.asString.value = ( char * ) szText;
    }
 
    return pItem;
@@ -872,7 +872,7 @@ PHB_ITEM hb_itemPutCLStatic( PHB_ITEM pItem, const char * szText, HB_SIZE ulLen 
 
 PHB_ITEM hb_itemPutPtr( PHB_ITEM pItem, void * pValue )
 {
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutPtr(%p, %p)", pItem, pValue));
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemPutPtr(%p, %p)", pItem, pValue ) );
 
    if( pItem )
    {
@@ -886,8 +886,8 @@ PHB_ITEM hb_itemPutPtr( PHB_ITEM pItem, void * pValue )
       pItem = hb_itemNew( NULL );
    }
 
-   pItem->type = HB_IT_POINTER;
-   pItem->item.asPointer.value = pValue;
+   pItem->type                   = HB_IT_POINTER;
+   pItem->item.asPointer.value   = pValue;
    pItem->item.asPointer.collect = FALSE;
 
    return pItem;
@@ -895,11 +895,11 @@ PHB_ITEM hb_itemPutPtr( PHB_ITEM pItem, void * pValue )
 
 PHB_ITEM hb_itemPutPtrGC( PHB_ITEM pItem, void * pValue )
 {
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutPtr(%p, %p)", pItem, pValue));
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemPutPtr(%p, %p)", pItem, pValue ) );
 
    hb_gcIncRef( pValue );
 
-   pItem = hb_itemPutPtr( pItem, pValue );
+   pItem                         = hb_itemPutPtr( pItem, pValue );
    pItem->item.asPointer.collect = TRUE;
 
    return pItem;
@@ -924,7 +924,7 @@ PHB_ITEM hb_itemPutPtrGC( PHB_ITEM pItem, void * pValue )
    pItem->item.asPointer.collect = TRUE;
 
    return pItem;
-*/
+ */
 }
 
 
@@ -934,9 +934,9 @@ void hb_itemPushStaticString( const char * szText, HB_SIZE length )
 
    PHB_ITEM pTop = hb_stackTopItem();
 
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ( "hb_itemPushStaticString( \"%s\", %lu ) %p %p", szText, length, pTop, szText ) );
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemPushStaticString( \"%s\", %lu ) %p %p", szText, length, pTop, szText ) );
 
-   pTop->type = HB_IT_STRING;
+   pTop->type                    = HB_IT_STRING;
    pTop->item.asString.length    = length;
    pTop->item.asString.value     = ( char * ) szText;
    pTop->item.asString.allocated = 0;
@@ -949,39 +949,39 @@ void hb_retcAdopt( char * szText )
 {
    HB_THREAD_STUB
 
-   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcAdopt(%s)", szText ) );
+   HB_TRACE_STEALTH( HB_TR_INFO, ( "hb_retcAdopt(%s)", szText ) );
 
-   if( ( &(HB_VM_STACK.Return) )->type )
+   if( ( &( HB_VM_STACK.Return ) )->type )
    {
-      hb_itemClear( &(HB_VM_STACK.Return) );
+      hb_itemClear( &( HB_VM_STACK.Return ) );
    }
 
-   ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
+   ( &( HB_VM_STACK.Return ) )->type = HB_IT_STRING;
 
    if( szText )
    {
-      ( &(HB_VM_STACK.Return) )->item.asString.length = strlen( szText );
+      ( &( HB_VM_STACK.Return ) )->item.asString.length = strlen( szText );
 
-      if( ( &(HB_VM_STACK.Return) )->item.asString.length )
+      if( ( &( HB_VM_STACK.Return ) )->item.asString.length )
       {
-         ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-         *( ( &(HB_VM_STACK.Return) )->item.asString.pulHolders ) = 1;
-         ( &(HB_VM_STACK.Return) )->item.asString.allocated  = ( &(HB_VM_STACK.Return) )->item.asString.length + 1;
+         ( &( HB_VM_STACK.Return ) )->item.asString.pulHolders       = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
+         *( ( &( HB_VM_STACK.Return ) )->item.asString.pulHolders )  = 1;
+         ( &( HB_VM_STACK.Return ) )->item.asString.allocated        = ( &( HB_VM_STACK.Return ) )->item.asString.length + 1;
       }
       else
       {
          hb_xfree( szText );
-         szText = hb_vm_sNull;
-         ( &(HB_VM_STACK.Return) )->item.asString.allocated = 0;
+         szText                                                = hb_vm_sNull;
+         ( &( HB_VM_STACK.Return ) )->item.asString.allocated  = 0;
       }
    }
    else
    {
-      szText = hb_vm_sNull;
-      ( &(HB_VM_STACK.Return) )->item.asString.allocated = 0;
+      szText                                                = hb_vm_sNull;
+      ( &( HB_VM_STACK.Return ) )->item.asString.allocated  = 0;
    }
 
-   ( &(HB_VM_STACK.Return) )->item.asString.value = szText;
+   ( &( HB_VM_STACK.Return ) )->item.asString.value = szText;
 }
 
 #undef hb_retclenAdopt
@@ -989,23 +989,23 @@ void hb_retclenAdopt( char * szText, HB_SIZE ulLen )
 {
    HB_THREAD_STUB
 
-   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdopt( '%s', %lu )", szText, ulLen ) );
+   HB_TRACE_STEALTH( HB_TR_INFO, ( "hb_retclenAdopt( '%s', %lu )", szText, ulLen ) );
 
 
-   if( ( &(HB_VM_STACK.Return) )->type )
+   if( ( &( HB_VM_STACK.Return ) )->type )
    {
-      hb_itemClear( &(HB_VM_STACK.Return) );
+      hb_itemClear( &( HB_VM_STACK.Return ) );
    }
 
-   ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
+   ( &( HB_VM_STACK.Return ) )->type = HB_IT_STRING;
 
    if( ulLen )
    {
-      szText[ulLen] = '\0';
+      szText[ ulLen ]                                             = '\0';
 
-      ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-      *( ( &(HB_VM_STACK.Return) )->item.asString.pulHolders ) = 1;
-      ( &(HB_VM_STACK.Return) )->item.asString.allocated  = ulLen + 1;
+      ( &( HB_VM_STACK.Return ) )->item.asString.pulHolders       = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
+      *( ( &( HB_VM_STACK.Return ) )->item.asString.pulHolders )  = 1;
+      ( &( HB_VM_STACK.Return ) )->item.asString.allocated        = ulLen + 1;
    }
    else
    {
@@ -1013,12 +1013,12 @@ void hb_retclenAdopt( char * szText, HB_SIZE ulLen )
       {
          hb_xfree( szText );
       }
-      szText = hb_vm_sNull;
-      ( &(HB_VM_STACK.Return) )->item.asString.allocated = 0;
+      szText                                                = hb_vm_sNull;
+      ( &( HB_VM_STACK.Return ) )->item.asString.allocated  = 0;
    }
 
-   ( &(HB_VM_STACK.Return) )->item.asString.value     = szText;
-   ( &(HB_VM_STACK.Return) )->item.asString.length    = ulLen;
+   ( &( HB_VM_STACK.Return ) )->item.asString.value   = szText;
+   ( &( HB_VM_STACK.Return ) )->item.asString.length  = ulLen;
 }
 
 #undef hb_retclenAdoptRaw
@@ -1026,19 +1026,19 @@ void hb_retclenAdoptRaw( char * szText, HB_SIZE ulLen )
 {
    HB_THREAD_STUB
 
-   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdoptRaw( '%s', %lu )", szText, ulLen ) );
+   HB_TRACE_STEALTH( HB_TR_INFO, ( "hb_retclenAdoptRaw( '%s', %lu )", szText, ulLen ) );
 
-   if( ( &(HB_VM_STACK.Return) )->type )
+   if( ( &( HB_VM_STACK.Return ) )->type )
    {
-      hb_itemClear( &(HB_VM_STACK.Return) );
+      hb_itemClear( &( HB_VM_STACK.Return ) );
    }
 
-   ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
+   ( &( HB_VM_STACK.Return ) )->type = HB_IT_STRING;
 
    if( ulLen )
    {
-      ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-      *( ( &(HB_VM_STACK.Return) )->item.asString.pulHolders ) = 1;
+      ( &( HB_VM_STACK.Return ) )->item.asString.pulHolders       = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
+      *( ( &( HB_VM_STACK.Return ) )->item.asString.pulHolders )  = 1;
    }
    else
    {
@@ -1049,9 +1049,9 @@ void hb_retclenAdoptRaw( char * szText, HB_SIZE ulLen )
       szText = hb_vm_sNull;
    }
 
-   ( &(HB_VM_STACK.Return) )->item.asString.value     = szText;
-   ( &(HB_VM_STACK.Return) )->item.asString.length    = ulLen;
-   ( &(HB_VM_STACK.Return) )->item.asString.allocated = ulLen;
+   ( &( HB_VM_STACK.Return ) )->item.asString.value      = szText;
+   ( &( HB_VM_STACK.Return ) )->item.asString.length     = ulLen;
+   ( &( HB_VM_STACK.Return ) )->item.asString.allocated  = ulLen;
 }
 
 #undef hb_retcStatic
@@ -1059,17 +1059,17 @@ void hb_retcStatic( const char * szText )
 {
    HB_THREAD_STUB
 
-   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcStatic(%s)", szText ) );
+   HB_TRACE_STEALTH( HB_TR_INFO, ( "hb_retcStatic(%s)", szText ) );
 
-   if( ( &(HB_VM_STACK.Return) )->type )
+   if( ( &( HB_VM_STACK.Return ) )->type )
    {
-      hb_itemClear( &(HB_VM_STACK.Return) );
+      hb_itemClear( &( HB_VM_STACK.Return ) );
    }
 
-   ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
-   ( &(HB_VM_STACK.Return) )->item.asString.allocated = 0;
-   ( &(HB_VM_STACK.Return) )->item.asString.value     = ( char * ) szText;
-   ( &(HB_VM_STACK.Return) )->item.asString.length    = szText?strlen( szText ):0;
+   ( &( HB_VM_STACK.Return ) )->type                     = HB_IT_STRING;
+   ( &( HB_VM_STACK.Return ) )->item.asString.allocated  = 0;
+   ( &( HB_VM_STACK.Return ) )->item.asString.value      = ( char * ) szText;
+   ( &( HB_VM_STACK.Return ) )->item.asString.length     = szText ? strlen( szText ) : 0;
 }
 
 #undef hb_retclenStatic
@@ -1077,37 +1077,37 @@ void hb_retclenStatic( const char * szText, HB_SIZE ulLen )
 {
    HB_THREAD_STUB
 
-   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenStatic(%s)", szText ) );
+   HB_TRACE_STEALTH( HB_TR_INFO, ( "hb_retclenStatic(%s)", szText ) );
 
-   if( ( &(HB_VM_STACK.Return) )->type )
+   if( ( &( HB_VM_STACK.Return ) )->type )
    {
-      hb_itemClear( &(HB_VM_STACK.Return) );
+      hb_itemClear( &( HB_VM_STACK.Return ) );
    }
 
-   ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
-   ( &(HB_VM_STACK.Return) )->item.asString.allocated = 0;
-   ( &(HB_VM_STACK.Return) )->item.asString.value     = ( char * ) szText;
-   ( &(HB_VM_STACK.Return) )->item.asString.length    = ulLen;
+   ( &( HB_VM_STACK.Return ) )->type                     = HB_IT_STRING;
+   ( &( HB_VM_STACK.Return ) )->item.asString.allocated  = 0;
+   ( &( HB_VM_STACK.Return ) )->item.asString.value      = ( char * ) szText;
+   ( &( HB_VM_STACK.Return ) )->item.asString.length     = ulLen;
 }
 
 BYTE hb_itemParamId( PHB_ITEM pItem )
 {
    HB_THREAD_STUB
 
-   PHB_ITEM *pBase = HB_VM_STACK.pBase + 1;
-   PHB_ITEM *pTop;
-   BYTE iId = 1;
+   PHB_ITEM *  pBase = HB_VM_STACK.pBase + 1;
+   PHB_ITEM *  pTop;
+   BYTE        iId   = 1;
 
    pTop = pBase + hb_stackBaseItem()->item.asSymbol.pCargo->arguments + 1;
    while( pBase < pTop )
    {
-     if( *pBase == pItem )
-     {
-        //printf( "\nId: %i", iId );
-        return iId;
-     }
-     pBase++;
-     iId++;
+      if( *pBase == pItem )
+      {
+         //printf( "\nId: %i", iId );
+         return iId;
+      }
+      pBase++;
+      iId++;
    }
 
    return 0;

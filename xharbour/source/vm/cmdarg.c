@@ -62,23 +62,23 @@
 #include "hbverbld.h"
 
 /* Command line argument management */
-static char *argv = "";
-static int     s_argc = 0;
-static char ** s_argv = &argv;
+static char *  argv     = "";
+static int     s_argc   = 0;
+static char ** s_argv   = &argv;
 
 #if defined( HB_OS_WIN ) && defined( HB_OS_WIN_USED )
 
 HB_EXTERN_BEGIN
 
-HANDLE hb_hInstance     = 0;
-HANDLE hb_hPrevInstance = 0;
-int    hb_iCmdShow      = 0;
-BOOL   s_WinMainParam   = FALSE;
+HANDLE   hb_hInstance      = 0;
+HANDLE   hb_hPrevInstance  = 0;
+int      hb_iCmdShow       = 0;
+BOOL     s_WinMainParam    = FALSE;
 
 #if defined( HB_VM_ALL )
    #if defined( _MSC_VER ) || defined( __DMC__ )
-      extern HB_EXPORT void hb_winmainArgInit( HANDLE hInstance, HANDLE hPrevInstance, int iCmdShow );
-      extern HB_EXPORT BOOL hb_winmainArgGet( HANDLE * phInstance, HANDLE * phPrevInstance, int * piCmdShow );
+extern HB_EXPORT void hb_winmainArgInit( HANDLE hInstance, HANDLE hPrevInstance, int iCmdShow );
+extern HB_EXPORT BOOL hb_winmainArgGet( HANDLE * phInstance, HANDLE * phPrevInstance, int * piCmdShow );
    #endif
 #endif
 
@@ -86,10 +86,10 @@ HB_EXTERN_END
 
 void hb_winmainArgInit( HANDLE hInstance, HANDLE hPrevInstance, int iCmdShow )
 {
-   hb_hInstance = hInstance;
-   hb_hPrevInstance = hPrevInstance;
-   hb_iCmdShow = iCmdShow;
-   s_WinMainParam = TRUE;
+   hb_hInstance      = hInstance;
+   hb_hPrevInstance  = hPrevInstance;
+   hb_iCmdShow       = iCmdShow;
+   s_WinMainParam    = TRUE;
 }
 
 BOOL hb_winmainArgGet( HANDLE * phInstance, HANDLE * phPrevInstance, int * piCmdShow )
@@ -108,10 +108,10 @@ BOOL hb_winmainArgGet( HANDLE * phInstance, HANDLE * phPrevInstance, int * piCmd
 
 void hb_cmdargInit( int argc, char * argv[] )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_cmdargInit(%d, %p)", argc, argv));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_cmdargInit(%d, %p)", argc, argv ) );
 
-   s_argc = argc;
-   s_argv = argv;
+   s_argc   = argc;
+   s_argv   = argv;
 }
 
 int hb_cmdargARGC( void )
@@ -126,18 +126,18 @@ char ** hb_cmdargARGV( void )
 
 BOOL hb_cmdargIsInternal( const char * szArg )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_cmdargIsInternal(%s)", szArg));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_cmdargIsInternal(%s)", szArg ) );
 
    return szArg[ 0 ] == '/' && szArg[ 1 ] == '/';
 }
 
 static char * hb_cmdargGet( const char * pszName, BOOL bRetValue )
 {
-   int i;
-   char * pszEnvVar;
-   char * tmp;
+   int      i;
+   char *   pszEnvVar;
+   char *   tmp;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_cmdargGet(%s, %d)", pszName, (int) bRetValue));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_cmdargGet(%s, %d)", pszName, ( int ) bRetValue ) );
 
    /* Check the command line first */
 
@@ -147,8 +147,8 @@ static char * hb_cmdargGet( const char * pszName, BOOL bRetValue )
       {
          if( bRetValue )
          {
-            char * pszPos = s_argv[ i ] + 2 + strlen( pszName );
-            char * pszRetVal;
+            char *   pszPos = s_argv[ i ] + 2 + strlen( pszName );
+            char *   pszRetVal;
 
             if( *pszPos == ':' )
                pszPos++;
@@ -169,7 +169,7 @@ static char * hb_cmdargGet( const char * pszName, BOOL bRetValue )
 
    pszEnvVar = hb_getenv( "HARBOUR" );
 
-   if( !pszEnvVar || pszEnvVar[ 0 ] == '\0' )
+   if( ! pszEnvVar || pszEnvVar[ 0 ] == '\0' )
    {
       if( pszEnvVar )
       {
@@ -195,8 +195,8 @@ static char * hb_cmdargGet( const char * pszName, BOOL bRetValue )
 
       while( *pszNext )
       {
-         static const char * szSeparator = " ;,\t";
-         char * pszEnd;
+         static const char *  szSeparator = " ;,\t";
+         char *               pszEnd;
 
          /* Search for the end of this switch */
          while( *pszNext && strchr( szSeparator, *pszNext ) == NULL )
@@ -218,19 +218,19 @@ static char * hb_cmdargGet( const char * pszName, BOOL bRetValue )
          {
             if( bRetValue )
             {
-               char * pszPos = pszEnvVar + strlen( pszName );
+               char *   pszPos = pszEnvVar + strlen( pszName );
 
-               HB_SIZE ulLen; /* NOTE: Use this variable as a workaround for MSC 8 internal error. [vszakats] */
+               HB_SIZE  ulLen; /* NOTE: Use this variable as a workaround for MSC 8 internal error. [vszakats] */
 
                /* Skip value separator colon. */
                if( *pszPos == ':' )
                   pszPos++;
 
-               ulLen = pszEnd - pszPos;
+               ulLen                = pszEnd - pszPos;
 
-               pszEnvVar = ( char * ) hb_xgrab( ulLen + 1 );
+               pszEnvVar            = ( char * ) hb_xgrab( ulLen + 1 );
                hb_strncpy( pszEnvVar, pszPos, ulLen );
-               pszEnvVar[ ulLen ] = '\0';
+               pszEnvVar[ ulLen ]   = '\0';
             }
             hb_xfree( ( void * ) tmp );
             return pszEnvVar;
@@ -263,7 +263,7 @@ int hb_cmdargNum( const char * pszName )
 {
    char * pszValue;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_cmdargNum(%s)", pszName));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_cmdargNum(%s)", pszName ) );
 
    pszValue = hb_cmdargGet( pszName, TRUE );
    if( pszValue )
@@ -357,11 +357,11 @@ void hb_cmdargProcessVM( void )
       }
 
       {
-         char buffer[ 128 ];
-         PHB_ITEM pMT = hb_itemDoC( "HB_MULTITHREAD", 0, NULL, NULL );
-         BOOL lMT = pMT->item.asLogical.value;
-         PHB_ITEM pOpt = hb_itemDoC( "HB_VMMODE", 0, NULL, NULL );
-         int iOpt = pOpt->item.asInteger.value;
+         char     buffer[ 128 ];
+         PHB_ITEM pMT   = hb_itemDoC( "HB_MULTITHREAD", 0, NULL, NULL );
+         BOOL     lMT   = pMT->item.asLogical.value;
+         PHB_ITEM pOpt  = hb_itemDoC( "HB_VMMODE", 0, NULL, NULL );
+         int      iOpt  = pOpt->item.asInteger.value;
          //hb_snprintf( buffer, sizeof( buffer ), "DS avail=%luKB  OS avail=%luKB  EMM avail=%luKB", hb_xquery( HB_MEM_BLOCK ), hb_xquery( HB_MEM_VM ), hb_xquery( HB_MEM_EMS ) );
          hb_snprintf( buffer, sizeof( buffer ), "DS avail=%luKB  OS avail=%luKB  EMM avail=%luKB  MemStat:%s  MT:%s  Opt:%i", hb_xquery( HB_MEM_BLOCK ), hb_xquery( HB_MEM_VM ), hb_xquery( HB_MEM_EMS ), hb_xquery( HB_MEM_USEDMAX ) ? "On" : "Off", lMT ? "On" : "Off", iOpt );
          hb_conOutErr( buffer, 0 );
@@ -379,12 +379,12 @@ void hb_cmdargProcessVM( void )
 
    iHandles = hb_cmdargNum( "F" );
 
-   if ( iHandles > 20 )
+   if( iHandles > 20 )
    {
-      #if defined(HB_OS_DOS) && defined(__WATCOMC__)
+      #if defined( HB_OS_DOS ) && defined( __WATCOMC__ )
       _grow_handles( iHandles );
 
-      #elif defined(HB_OS_OS2) //&& defined(__INNOTEK_LIBC__)
+      #elif defined( HB_OS_OS2 ) //&& defined(__INNOTEK_LIBC__)
       /* 28/04/2004 - <maurilio.longo@libero.it>
          A standard OS/2 program has 20 file handles available upon startup. If xHarbour is compiled with
          Innotek GCC we need to increase this number while using EMX/GCC this numeber is increased by EMX
@@ -393,8 +393,8 @@ void hb_cmdargProcessVM( void )
          From Innotek forum I've come to know that this is a bug of current Innotek libc.dll, next one will
          not need this and will increase available file handles when needed, that said, this change is "needed"
          to support //F: clipper envar switch
-      */
-      DosSetMaxFH( (ULONG) iHandles );
+       */
+      DosSetMaxFH( ( ULONG ) iHandles );
       #endif
    }
 
@@ -452,27 +452,29 @@ const char * hb_verFlagsPRG( void )
 
 HB_FUNC( HB_CMDARGARGV )
 {
-   hb_retc( hb_cmdargARGV()[0] );
+   hb_retc( hb_cmdargARGV()[ 0 ] );
 }
 
 #if 0
-#define __PRG_SOURCE__ __FILE__
+#define __PRG_SOURCE__     __FILE__
 
 HB_FUNC_EXTERN( HB_VMMODE );
 HB_FUNC_EXTERN( HB_MULTITHREAD );
 
 #undef HB_PRG_PCODE_VER
-#define HB_PRG_PCODE_VER HB_PCODE_VER
+#define HB_PRG_PCODE_VER   HB_PCODE_VER
 
 HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_CMDARG )
-{ "HB_VMMODE",      {HB_FS_PUBLIC}, {HB_FUNCNAME( HB_VMMODE )}, NULL },
-{ "HB_MULTITHREAD", {HB_FS_PUBLIC}, {HB_FUNCNAME( HB_MULTITHREAD )}, NULL }
+{
+   "HB_VMMODE", { HB_FS_PUBLIC }, { HB_FUNCNAME( HB_VMMODE ) }, NULL
+},
+{ "HB_MULTITHREAD", { HB_FS_PUBLIC }, { HB_FUNCNAME( HB_MULTITHREAD ) }, NULL }
 HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_CMDARG )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup hb_vm_SymbolInit_CMDARG
 #elif defined( HB_DATASEG_STARTUP )
-   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( hb_vm_SymbolInit_CMDARG )
+   #define HB_DATASEG_BODY HB_DATASEG_FUNC( hb_vm_SymbolInit_CMDARG )
    #include "hbiniseg.h"
 #endif
 #endif

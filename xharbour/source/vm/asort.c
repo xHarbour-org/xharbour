@@ -78,7 +78,7 @@ static BOOL hb_itemIsLess( PHB_ITEM pItem1, PHB_ITEM pItem2, PHB_ITEM pBlock )
       hb_vmPush( pItem2 );
       hb_vmSend( 2 );
 
-      if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) )
+      if( HB_IS_LOGICAL( &( HB_VM_STACK.Return ) ) )
          return HB_VM_STACK.Return.item.asLogical.value;
    }
 
@@ -91,9 +91,9 @@ static BOOL hb_itemIsLess( PHB_ITEM pItem1, PHB_ITEM pItem2, PHB_ITEM pBlock )
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
       return hb_itemGetND( pItem1 ) < hb_itemGetND( pItem2 );
    else if( HB_IS_DATE( pItem1 ) && HB_IS_DATE( pItem2 ) )
-      return ((hb_itemGetDL( pItem1 ) < hb_itemGetDL( pItem2 )) ||
-              (hb_itemGetDL( pItem1 ) == hb_itemGetDL( pItem2 ) &&
-               hb_itemGetT( pItem1 ) < hb_itemGetT( pItem2 )));
+      return ( hb_itemGetDL( pItem1 ) < hb_itemGetDL( pItem2 ) ) ||
+             ( hb_itemGetDL( pItem1 ) == hb_itemGetDL( pItem2 ) &&
+               hb_itemGetT( pItem1 ) < hb_itemGetT( pItem2 ) );
    else if( HB_IS_LOGICAL( pItem1 ) && HB_IS_LOGICAL( pItem2 ) )
       return hb_itemGetL( pItem1 ) < hb_itemGetL( pItem2 );
    else
@@ -101,24 +101,38 @@ static BOOL hb_itemIsLess( PHB_ITEM pItem1, PHB_ITEM pItem2, PHB_ITEM pBlock )
       /* NOTE: For non-matching types CA-Cl*pper sorts always like this:
                Array/Object Block String Logical Date Numeric NIL [jlalin] */
 
-      int iWeight1;
-      int iWeight2;
+      int   iWeight1;
+      int   iWeight2;
 
-      if( HB_IS_ARRAY( pItem1 ) ) iWeight1 = 1;
-      else if( HB_IS_BLOCK( pItem1 ) ) iWeight1 = 2;
-      else if( HB_IS_STRING( pItem1 ) ) iWeight1 = 3;
-      else if( HB_IS_LOGICAL( pItem1 ) ) iWeight1 = 4;
-      else if( HB_IS_DATE( pItem1 ) ) iWeight1 = 5;
-      else if( HB_IS_NUMERIC( pItem1 ) ) iWeight1 = 6;
-      else iWeight1 = 7;
+      if( HB_IS_ARRAY( pItem1 ) )
+         iWeight1 = 1;
+      else if( HB_IS_BLOCK( pItem1 ) )
+         iWeight1 = 2;
+      else if( HB_IS_STRING( pItem1 ) )
+         iWeight1 = 3;
+      else if( HB_IS_LOGICAL( pItem1 ) )
+         iWeight1 = 4;
+      else if( HB_IS_DATE( pItem1 ) )
+         iWeight1 = 5;
+      else if( HB_IS_NUMERIC( pItem1 ) )
+         iWeight1 = 6;
+      else
+         iWeight1 = 7;
 
-      if( HB_IS_ARRAY( pItem2 ) ) iWeight2 = 1;
-      else if( HB_IS_BLOCK( pItem2 ) ) iWeight2 = 2;
-      else if( HB_IS_STRING( pItem2 ) ) iWeight2 = 3;
-      else if( HB_IS_LOGICAL( pItem2 ) ) iWeight2 = 4;
-      else if( HB_IS_DATE( pItem2 ) ) iWeight2 = 5;
-      else if( HB_IS_NUMERIC( pItem2 ) ) iWeight2 = 6;
-      else iWeight2 = 7;
+      if( HB_IS_ARRAY( pItem2 ) )
+         iWeight2 = 1;
+      else if( HB_IS_BLOCK( pItem2 ) )
+         iWeight2 = 2;
+      else if( HB_IS_STRING( pItem2 ) )
+         iWeight2 = 3;
+      else if( HB_IS_LOGICAL( pItem2 ) )
+         iWeight2 = 4;
+      else if( HB_IS_DATE( pItem2 ) )
+         iWeight2 = 5;
+      else if( HB_IS_NUMERIC( pItem2 ) )
+         iWeight2 = 6;
+      else
+         iWeight2 = 7;
 
       return iWeight1 < iWeight2;
    }
@@ -138,8 +152,8 @@ static HB_ISIZ hb_arraySortQuickPartition( PHB_ITEM pItems, HB_ISIZ lb, HB_ISIZ 
    }
 
    /* sort lb+1..ub based on pivot */
-   i = lb + 1;
-   j = ub;
+   i  = lb + 1;
+   j  = ub;
 
    while( TRUE )
    {
@@ -198,17 +212,17 @@ static void hb_arraySortQuick( PHB_ITEM pItems, HB_ISIZ lb, HB_ISIZ ub, PHB_ITEM
 
 BOOL hb_arraySort( PHB_ITEM pArray, HB_SIZE * pulStart, HB_SIZE * pulCount, PHB_ITEM pBlock )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_arraySort(%p, %p, %p, %p)", pArray, pulStart, pulCount, pBlock));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_arraySort(%p, %p, %p, %p)", pArray, pulStart, pulCount, pBlock ) );
 
    //TraceLog( NULL, "*** Sorting: %p ***\n", pArray );
 
    if( HB_IS_ARRAY( pArray ) )
    {
-      PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
-      HB_SIZE ulLen = pBaseArray->ulLen;
-      HB_SIZE ulStart;
-      HB_SIZE ulCount;
-      HB_SIZE ulEnd;
+      PHB_BASEARRAY  pBaseArray  = pArray->item.asArray.value;
+      HB_SIZE        ulLen       = pBaseArray->ulLen;
+      HB_SIZE        ulStart;
+      HB_SIZE        ulCount;
+      HB_SIZE        ulEnd;
 
       if( pulStart && ( *pulStart >= 1 ) )
       {
@@ -256,10 +270,10 @@ HB_FUNC( ASORT )
 {
    PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
 
-   if( pArray && ! hb_arrayIsObject( pArray )  )
+   if( pArray && ! hb_arrayIsObject( pArray ) )
    {
-      HB_SIZE ulStart = hb_parns( 2 );
-      HB_SIZE ulCount = hb_parns( 3 );
+      HB_SIZE  ulStart  = hb_parns( 2 );
+      HB_SIZE  ulCount  = hb_parns( 3 );
 
       hb_arraySort( pArray,
                     ISNUM( 2 ) ? &ulStart : NULL,

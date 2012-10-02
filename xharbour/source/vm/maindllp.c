@@ -64,18 +64,18 @@ HB_EXTERN_BEGIN
 
 static HMODULE hModule = NULL;
 static FARPROC pExtIsArray = NULL;
-static FARPROC hb_GetProcAddress( char* szFuncName );
+static FARPROC hb_GetProcAddress( char * szFuncName );
 
-#if defined(HB_DLL_REQUIRED_DLLMAIN)
+#if defined( HB_DLL_REQUIRED_DLLMAIN )
 BOOL WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {
    HB_TRACE( HB_TR_DEBUG, ( "DllMain( %p, %p, %d )", hInstance, fdwReason,
-             pvReserved ) );
+                            pvReserved ) );
 #else
 BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {
    HB_TRACE( HB_TR_DEBUG, ( "DllEntryPoint( %p, %p, %d )", hInstance, fdwReason,
-             pvReserved ) );
+                            pvReserved ) );
 #endif
 
    HB_SYMBOL_UNUSED( hInstance );
@@ -84,12 +84,12 @@ BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserve
    switch( fdwReason )
    {
       case DLL_PROCESS_ATTACH:
-         hModule = GetModuleHandle( NULL );
+         hModule     = GetModuleHandle( NULL );
          pExtIsArray = hb_GetProcAddress( "_hb_extIsArray" );
          break;
 
       case DLL_PROCESS_DETACH:
-         hModule = NULL;
+         hModule     = NULL;
          pExtIsArray = NULL;
          break;
    }
@@ -97,31 +97,31 @@ BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserve
    return TRUE;
 }
 
-static FARPROC hb_GetProcAddress( char* szFuncName )
+static FARPROC hb_GetProcAddress( char * szFuncName )
 {
    /* Try #1: Conventional cdecl flavor */
    FARPROC pFunc = GetProcAddress( hModule, szFuncName );
 
-   if ( !pFunc )
+   if( ! pFunc )
    {
       /* Try #2: Microsoft cdecl flavor */
       pFunc = GetProcAddress( hModule, szFuncName + 1 );
 
-      if ( !pFunc )
+      if( ! pFunc )
       {
          /* Try #3: Watcom register calling flavor */
-         char * szFuncName_ = (char*) malloc( strlen( szFuncName ) + 1 );
+         char * szFuncName_ = ( char * ) malloc( strlen( szFuncName ) + 1 );
          hb_snprintf( szFuncName_, strlen( szFuncName ) + 1, "%s_", szFuncName + 1 );
          pFunc = GetProcAddress( hModule, szFuncName_ );
          free( szFuncName_ );
 
-         if ( !pFunc )
+         if( ! pFunc )
          {
             /*
-              Hands-up ...
-              Application will exit here ...
-            */
-            char __szError[256];
+               Hands-up ...
+               Application will exit here ...
+             */
+            char __szError[ 256 ];
             hb_snprintf( __szError, sizeof( __szError ), "Cannot find function address: %s", szFuncName );
             MessageBox( NULL, __szError, szFuncName, MB_ICONSTOP );
             exit( 0 );
@@ -133,7 +133,7 @@ static FARPROC hb_GetProcAddress( char* szFuncName )
 }
 
 /* module symbols initialization */
-PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
+PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, int iPCodeVer, PHB_ITEM * pGlobals ) /* module symbols initialization */
 {
    /* notice hb_vmProcessSysDllSymbols() must be used, and not
     * hb_vmProcessSymbols(), as some special symbols pointers
@@ -143,12 +143,12 @@ PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const c
    static VM_PROCESS_DLL_SYMBOLS
 #else
    static VM_PROCESS_DLL_SYMBOLS pProcessSymbols = NULL;
-   if ( !pProcessSymbols )
+   if( ! pProcessSymbols )
 #endif
-      pProcessSymbols = (VM_PROCESS_DLL_SYMBOLS) hb_GetProcAddress( "_hb_vmProcessSysDllSymbols" );
+   pProcessSymbols = ( VM_PROCESS_DLL_SYMBOLS ) hb_GetProcAddress( "_hb_vmProcessSysDllSymbols" );
 
    HB_SYMBOL_UNUSED( pGlobals );
-   return pProcessSymbols ( pSymbols, uiModuleSymbols, szModule, iPCodeVer, pGlobals );
+   return pProcessSymbols( pSymbols, uiModuleSymbols, szModule, iPCodeVer, pGlobals );
 }
 
 void hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
@@ -157,9 +157,9 @@ void hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
    static VM_DLL_EXECUTE
 #else
    static VM_DLL_EXECUTE pExecute = NULL;
-   if ( !pExecute )
+   if( ! pExecute )
 #endif
-      pExecute = (VM_DLL_EXECUTE) hb_GetProcAddress( "_hb_vmExecute" );
+   pExecute = ( VM_DLL_EXECUTE ) hb_GetProcAddress( "_hb_vmExecute" );
 
    pExecute( pCode, pSymbols );
 }
@@ -172,14 +172,14 @@ const char * hb_parc( int iParam, ... )
    static EXT_PARC2
 #else
    static EXT_PARC2 pParC = NULL;
-   if ( !pParC )
+   if( ! pParC )
 #endif
-      pParC = (EXT_PARC2) hb_GetProcAddress( "_hb_parc" );
+   pParC = ( EXT_PARC2 ) hb_GetProcAddress( "_hb_parc" );
 
    if( ( ( EXT_IS_ARRAY ) pExtIsArray )( iParam ) )
    {
-      va_list va;
-      ULONG ulArrayIndex;
+      va_list  va;
+      ULONG    ulArrayIndex;
 
       va_start( va, iParam );
       ulArrayIndex = va_arg( va, ULONG );
@@ -199,11 +199,11 @@ PHB_ITEM hb_param( int iParam, LONG lMask ) /* retrieve a generic parameter */
    static HB_PARAM
 #else
    static HB_PARAM pParam = NULL;
-   if ( !pParam )
+   if( ! pParam )
 #endif
-      pParam = (HB_PARAM) hb_GetProcAddress( "_hb_param" );
+   pParam = ( HB_PARAM ) hb_GetProcAddress( "_hb_param" );
 
-   return pParam( iParam,lMask );
+   return pParam( iParam, lMask );
 }
 
 PHB_ITEM hb_paramError( int iParam ) /* Returns either the generic parameter or a NIL item if param not provided */
@@ -212,9 +212,9 @@ PHB_ITEM hb_paramError( int iParam ) /* Returns either the generic parameter or 
    static HB_PARAMERROR
 #else
    static HB_PARAMERROR pParamError = NULL;
-   if ( !pParamError )
+   if( ! pParamError )
 #endif
-      pParamError = (HB_PARAMERROR) hb_GetProcAddress( "_hb_paramError" );
+   pParamError = ( HB_PARAMERROR ) hb_GetProcAddress( "_hb_paramError" );
 
    return pParamError( iParam );
 }
@@ -226,9 +226,9 @@ int  hb_pcount( void )          /* returns the number of suplied parameters */
    static HB_PCOUNTS
 #else
    static HB_PCOUNTS pCounts = NULL;
-   if ( !pCounts )
+   if( ! pCounts )
 #endif
-      pCounts = (HB_PCOUNTS) hb_GetProcAddress( "_hb_pcount" );
+   pCounts = ( HB_PCOUNTS ) hb_GetProcAddress( "_hb_pcount" );
 
    return pCounts();
 }
@@ -241,11 +241,11 @@ void hb_ret( void )
    static HB_RET
 #else
    static HB_RET pFunc = NULL;
-   if ( !pFunc )
+   if( ! pFunc )
 #endif
-      pFunc = (HB_RET) hb_GetProcAddress( "_hb_ret" );
+   pFunc = ( HB_RET ) hb_GetProcAddress( "_hb_ret" );
 
-   pFunc ();
+   pFunc();
 }
 
 #undef hb_retc
@@ -255,9 +255,9 @@ void hb_retc( const char * szText )   /* returns a string */
    static HB_RETC
 #else
    static HB_RETC pRetc = NULL;
-   if ( !pRetc )
+   if( ! pRetc )
 #endif
-      pRetc = (HB_RETC) hb_GetProcAddress( "_hb_retc" );
+   pRetc = ( HB_RETC ) hb_GetProcAddress( "_hb_retc" );
 
    pRetc( szText );
 }
@@ -269,11 +269,11 @@ void hb_retclen( const char * szText, ULONG ulLen ) /* returns a string with a s
    static HB_RETCLEN
 #else
    static HB_RETCLEN pRetclen = NULL;
-   if ( !pRetclen )
+   if( ! pRetclen )
 #endif
-      pRetclen = (HB_RETCLEN) hb_GetProcAddress( "_hb_retclen" );
+   pRetclen = ( HB_RETCLEN ) hb_GetProcAddress( "_hb_retclen" );
 
-   pRetclen( szText,ulLen );
+   pRetclen( szText, ulLen );
 }
 
 #undef hb_retds
@@ -283,9 +283,9 @@ void hb_retds( const char * szDate )  /* returns a date, must use yyyymmdd forma
    static HB_RETDS
 #else
    static HB_RETDS pRetds = NULL;
-   if ( !pRetds )
+   if( ! pRetds )
 #endif
-      pRetds = (HB_RETDS) hb_GetProcAddress( "_hb_retds" );
+   pRetds = ( HB_RETDS ) hb_GetProcAddress( "_hb_retds" );
 
    pRetds( szDate );
 }
@@ -297,9 +297,9 @@ void hb_retd( int iYear, int iMonth, int iDay ) /* returns a date */
    static HB_RETD
 #else
    static HB_RETD pRetd = NULL;
-   if ( !pRetd )
+   if( ! pRetd )
 #endif
-      pRetd = (HB_RETD) hb_GetProcAddress( "_hb_retd" );
+   pRetd = ( HB_RETD ) hb_GetProcAddress( "_hb_retd" );
 
    pRetd( iYear, iMonth, iDay );
 }
@@ -311,9 +311,9 @@ void hb_retdl( LONG lJulian )   /* returns a LONG value as a julian date */
    static HB_RETDL
 #else
    static HB_RETDL pRet = NULL;
-   if ( !pRet )
+   if( ! pRet )
 #endif
-      pRet = (HB_RETDL) hb_GetProcAddress( "_hb_retdl" );
+   pRet = ( HB_RETDL ) hb_GetProcAddress( "_hb_retdl" );
 
    pRet( lJulian );
 }
@@ -325,9 +325,9 @@ void hb_retl( int iTrueFalse ) /*  returns a logical integer */
    static HB_RETDL
 #else
    static HB_RETDL pRet = NULL;
-   if ( !pRet )
+   if( ! pRet )
 #endif
-      pRet = (HB_RETDL) hb_GetProcAddress( "_hb_retl" );
+   pRet = ( HB_RETDL ) hb_GetProcAddress( "_hb_retl" );
 
    pRet( iTrueFalse );
 }
@@ -339,9 +339,9 @@ void hb_retnd( double dNumber ) /* returns a double */
    static HB_RETND
 #else
    static HB_RETND pRet = NULL;
-   if ( !pRet )
+   if( ! pRet )
 #endif
-      pRet = (HB_RETND) hb_GetProcAddress( "_hb_retnd" );
+   pRet = ( HB_RETND ) hb_GetProcAddress( "_hb_retnd" );
 
    pRet( dNumber );
 }
@@ -353,9 +353,9 @@ void hb_retni( int iNumber )    /* returns a integer number */
    static HB_RETNI
 #else
    static HB_RETNI pRet = NULL;
-   if ( !pRet )
+   if( ! pRet )
 #endif
-      pRet = (HB_RETNI) hb_GetProcAddress( "_hb_retni" );
+   pRet = ( HB_RETNI ) hb_GetProcAddress( "_hb_retni" );
 
    pRet( iNumber );
 }
@@ -367,9 +367,9 @@ void hb_retnl( LONG lNumber )   /* returns a LONG number */
    static HB_RETNL
 #else
    static HB_RETNL pRet = NULL;
-   if ( !pRet )
+   if( ! pRet )
 #endif
-      pRet = (HB_RETNL) hb_GetProcAddress( "_hb_retnl" );
+   pRet = ( HB_RETNL ) hb_GetProcAddress( "_hb_retnl" );
 
    pRet( lNumber );
 }
@@ -381,11 +381,11 @@ void hb_retnlen( double dNumber, int iWidth, int iDec ) /* returns a double, wit
    static HB_RETNLEN
 #else
    static HB_RETNLEN pRet = NULL;
-   if ( !pRet )
+   if( ! pRet )
 #endif
-      pRet = (HB_RETNLEN) hb_GetProcAddress( "_hb_retnlen" );
+   pRet = ( HB_RETNLEN ) hb_GetProcAddress( "_hb_retnlen" );
 
-   pRet( dNumber,iWidth,iDec );
+   pRet( dNumber, iWidth, iDec );
 }
 
 #undef hb_retndlen
@@ -395,25 +395,25 @@ void hb_retndlen( double dNumber, int iWidth, int iDec ) /* returns a double, wi
    static HB_RETNDLEN
 #else
    static HB_RETNDLEN pRet = NULL;
-   if ( !pRet )
+   if( ! pRet )
 #endif
-      pRet = (HB_RETNDLEN) hb_GetProcAddress( "_hb_retndlen" );
+   pRet = ( HB_RETNDLEN ) hb_GetProcAddress( "_hb_retndlen" );
 
-   pRet( dNumber,iWidth,iDec );
+   pRet( dNumber, iWidth, iDec );
 }
 
 #undef hb_retnilen
 void hb_retnilen( int iNumber, int iWidth ) /* returns a integer number, with specific width */
 {
 #if defined( __cplusplus )
-    static HB_RETNILEN
+   static HB_RETNILEN
 #else
-    static HB_RETNILEN pRet = NULL;
-    if ( !pRet )
+   static HB_RETNILEN pRet = NULL;
+   if( ! pRet )
 #endif
-       pRet = (HB_RETNILEN) hb_GetProcAddress( "_hb_retnilen" );
+   pRet = ( HB_RETNILEN ) hb_GetProcAddress( "_hb_retnilen" );
 
-    pRet( iNumber,iWidth );
+   pRet( iNumber, iWidth );
 }
 
 #undef hb_retnllen
@@ -423,9 +423,9 @@ void hb_retnllen( LONG lNumber, int iWidth ) /* returns a LONG number, with spec
    static HB_RETNLLEN
 #else
    static HB_RETNLLEN pRet = NULL;
-   if ( !pRet )
+   if( ! pRet )
 #endif
-      pRet = (HB_RETNLLEN) hb_GetProcAddress( "_hb_retnilen" );
+   pRet = ( HB_RETNLLEN ) hb_GetProcAddress( "_hb_retnilen" );
 
    pRet( lNumber, iWidth );
 }
@@ -437,9 +437,9 @@ void hb_reta( ULONG ulLen )  /* returns an array with a specific length */
    static HB_RETA
 #else
    static HB_RETA pRet = NULL;
-   if ( !pRet )
+   if( ! pRet )
 #endif
-      pRet = (HB_RETA) hb_GetProcAddress( "_hb_reta" );
+   pRet = ( HB_RETA ) hb_GetProcAddress( "_hb_reta" );
 
    pRet( ulLen );
 }
@@ -451,11 +451,11 @@ ULONG hb_parinfa( int iParamNum, ULONG uiArrayIndex ) /* retrieve length or elem
    static HB_PARINFA
 #else
    static HB_PARINFA pParinfa = NULL;
-   if ( !pParinfa )
+   if( ! pParinfa )
 #endif
-      pParinfa = (HB_PARINFA) hb_GetProcAddress( "_hb_parinfa" );
+   pParinfa = ( HB_PARINFA ) hb_GetProcAddress( "_hb_parinfa" );
 
-   return pParinfa( iParamNum,uiArrayIndex );
+   return pParinfa( iParamNum, uiArrayIndex );
 }
 
 #undef hb_parinfo
@@ -465,9 +465,9 @@ ULONG hb_parinfo( int iParam ) /* Determine the param count or data type */
    static HB_PARINFO
 #else
    static HB_PARINFO pParinfo = NULL;
-   if ( !pParinfo )
+   if( ! pParinfo )
 #endif
-      pParinfo = (HB_PARINFO) hb_GetProcAddress( "_hb_parinfo" );
+   pParinfo = ( HB_PARINFO ) hb_GetProcAddress( "_hb_parinfo" );
 
    return pParinfo( iParam );
 }
@@ -479,14 +479,14 @@ ULONG hb_parclen( int iParam, ... ) /* retrieve a string parameter length */
    static HB_PARCLEN2
 #else
    static HB_PARCLEN2 pParC = NULL;
-   if ( !pParC )
+   if( ! pParC )
 #endif
-      pParC = (HB_PARCLEN2) hb_GetProcAddress( "_hb_parclen" );
+   pParC = ( HB_PARCLEN2 ) hb_GetProcAddress( "_hb_parclen" );
 
    if( ( ( EXT_IS_ARRAY ) pExtIsArray )( iParam ) )
    {
-      va_list va;
-      ULONG ulArrayIndex;
+      va_list  va;
+      ULONG    ulArrayIndex;
 
       va_start( va, iParam );
       ulArrayIndex = va_arg( va, ULONG );
@@ -507,14 +507,14 @@ ULONG hb_parcsiz( int iParam, ... ) /* retrieve a by-reference string parameter 
    static HB_PARCSIZ2
 #else
    static HB_PARCSIZ2 pParcSiz = NULL;
-   if ( !pParcSiz )
+   if( ! pParcSiz )
 #endif
-      pParcSiz = (HB_PARCSIZ2) hb_GetProcAddress( "_hb_parcsiz" );
+   pParcSiz = ( HB_PARCSIZ2 ) hb_GetProcAddress( "_hb_parcsiz" );
 
    if( ( ( EXT_IS_ARRAY ) pExtIsArray )( iParam ) )
    {
-      va_list va;
-      ULONG ulArrayIndex;
+      va_list  va;
+      ULONG    ulArrayIndex;
 
       va_start( va, iParam );
       ulArrayIndex = va_arg( va, ULONG );
@@ -535,14 +535,14 @@ const char * hb_pards( int iParam, ... ) /* retrieve a date as a string yyyymmdd
    static HB_PARDS2
 #else
    static HB_PARDS2 pParDs = NULL;
-   if ( !pParDs )
+   if( ! pParDs )
 #endif
-      pParDs = (HB_PARDS2) hb_GetProcAddress( "_hb_pards" );
+   pParDs = ( HB_PARDS2 ) hb_GetProcAddress( "_hb_pards" );
 
    if( ( ( EXT_IS_ARRAY ) pExtIsArray )( iParam ) )
    {
-      va_list va;
-      ULONG ulArrayIndex;
+      va_list  va;
+      ULONG    ulArrayIndex;
 
       va_start( va, iParam );
       ulArrayIndex = va_arg( va, ULONG );
@@ -563,14 +563,14 @@ char * hb_pardsbuff( char * szDate, int iParam, ... ) /* retrieve a date as a st
    static HB_PARDSBUFF2
 #else
    static HB_PARDSBUFF2 pParDsBuff = NULL;
-   if ( !pParDsBuff )
+   if( ! pParDsBuff )
 #endif
-      pParDsBuff = (HB_PARDSBUFF2) hb_GetProcAddress( "_hb_pardsbuff" );
+   pParDsBuff = ( HB_PARDSBUFF2 ) hb_GetProcAddress( "_hb_pardsbuff" );
 
    if( ( ( EXT_IS_ARRAY ) pExtIsArray )( iParam ) )
    {
-      va_list va;
-      ULONG ulArrayIndex;
+      va_list  va;
+      ULONG    ulArrayIndex;
 
       va_start( va, iParam );
       ulArrayIndex = va_arg( va, ULONG );
@@ -591,14 +591,14 @@ int hb_parl( int iParam, ... ) /* retrieve a logical parameter as an int */
    static HB_PARL2
 #else
    static HB_PARL2 pParL = NULL;
-   if ( !pParL )
+   if( ! pParL )
 #endif
-      pParL = (HB_PARL2) hb_GetProcAddress( "_hb_parl" );
+   pParL = ( HB_PARL2 ) hb_GetProcAddress( "_hb_parl" );
 
    if( ( ( EXT_IS_ARRAY ) pExtIsArray )( iParam ) )
    {
-      va_list va;
-      ULONG ulArrayIndex;
+      va_list  va;
+      ULONG    ulArrayIndex;
 
       va_start( va, iParam );
       ulArrayIndex = va_arg( va, ULONG );
@@ -619,14 +619,14 @@ double hb_parnd( int iParam, ... ) /* retrieve a numeric parameter as a double *
    static HB_PARND2
 #else
    static HB_PARND2 pParNd = NULL;
-   if ( !pParNd )
+   if( ! pParNd )
 #endif
-      pParNd = (HB_PARND2) hb_GetProcAddress( "_hb_parnd" );
+   pParNd = ( HB_PARND2 ) hb_GetProcAddress( "_hb_parnd" );
 
    if( ( ( EXT_IS_ARRAY ) pExtIsArray )( iParam ) )
    {
-      va_list va;
-      ULONG ulArrayIndex;
+      va_list  va;
+      ULONG    ulArrayIndex;
 
       va_start( va, iParam );
       ulArrayIndex = va_arg( va, ULONG );
@@ -647,14 +647,14 @@ int hb_parni( int iParam, ... ) /* retrieve a numeric parameter as a integer */
    static HB_PARNI2
 #else
    static HB_PARNI2 pParNi = NULL;
-   if ( !pParNi )
+   if( ! pParNi )
 #endif
-      pParNi = (HB_PARNI2) hb_GetProcAddress( "_hb_parni" );
+   pParNi = ( HB_PARNI2 ) hb_GetProcAddress( "_hb_parni" );
 
    if( ( ( EXT_IS_ARRAY ) pExtIsArray )( iParam ) )
    {
-      va_list va;
-      ULONG ulArrayIndex;
+      va_list  va;
+      ULONG    ulArrayIndex;
 
       va_start( va, iParam );
       ulArrayIndex = va_arg( va, ULONG );
@@ -675,14 +675,14 @@ LONG hb_parnl( int iParam, ... ) /* retrieve a numeric parameter as a LONG */
    static HB_PARNL2
 #else
    static HB_PARNL2 pParNl = NULL;
-   if ( !pParNl )
+   if( ! pParNl )
 #endif
-      pParNl = (HB_PARNL2) hb_GetProcAddress( "_hb_parnl" );
+   pParNl = ( HB_PARNL2 ) hb_GetProcAddress( "_hb_parnl" );
 
    if( ( ( EXT_IS_ARRAY ) pExtIsArray )( iParam ) )
    {
-      va_list va;
-      ULONG ulArrayIndex;
+      va_list  va;
+      ULONG    ulArrayIndex;
 
       va_start( va, iParam );
       ulArrayIndex = va_arg( va, ULONG );
@@ -703,14 +703,14 @@ void hb_storc( const char * szText, int iParam, ... )
    static HB_STORC2
 #else
    static HB_STORC2 pStorC = NULL;
-   if ( !pStorC )
+   if( ! pStorC )
 #endif
-      pStorC = (HB_STORC2) hb_GetProcAddress( "_hb_storc" );
+   pStorC = ( HB_STORC2 ) hb_GetProcAddress( "_hb_storc" );
 
    if( ( ( EXT_IS_ARRAY ) pExtIsArray )( iParam ) )
    {
-      va_list va;
-      ULONG ulArrayIndex;
+      va_list  va;
+      ULONG    ulArrayIndex;
 
       va_start( va, iParam );
       ulArrayIndex = va_arg( va, ULONG );
@@ -731,20 +731,20 @@ void hb_storclen( const char * szText, ULONG ulLen, int iParam, ... )
    static HB_STORCLEN2
 #else
    static HB_STORCLEN2 pStorC = NULL;
-   if ( !pStorC )
+   if( ! pStorC )
 #endif
-      pStorC = (HB_STORCLEN2) hb_GetProcAddress( "_hb_storclen" );
+   pStorC = ( HB_STORCLEN2 ) hb_GetProcAddress( "_hb_storclen" );
 
    if( ( ( EXT_IS_ARRAY ) pExtIsArray )( iParam ) )
    {
-      va_list va;
-      ULONG ulArrayIndex;
+      va_list  va;
+      ULONG    ulArrayIndex;
 
       va_start( va, iParam );
       ulArrayIndex = va_arg( va, ULONG );
       va_end( va );
 
-     pStorC( szText, ulLen, iParam, ulArrayIndex );
+      pStorC( szText, ulLen, iParam, ulArrayIndex );
    }
    else
    {
@@ -759,14 +759,14 @@ void hb_stords( const char * szDate, int iParam, ... )
    static HB_STORDS2
 #else
    static HB_STORDS2 pStorDs = NULL;
-   if ( !pStorDs )
+   if( ! pStorDs )
 #endif
-      pStorDs = (HB_STORDS2) hb_GetProcAddress( "_hb_stords" );
+   pStorDs = ( HB_STORDS2 ) hb_GetProcAddress( "_hb_stords" );
 
    if( ( ( EXT_IS_ARRAY ) pExtIsArray )( iParam ) )
    {
-      va_list va;
-      ULONG ulArrayIndex;
+      va_list  va;
+      ULONG    ulArrayIndex;
 
       va_start( va, iParam );
       ulArrayIndex = va_arg( va, ULONG );
@@ -787,14 +787,14 @@ void hb_storl( int iLogical, int iParam, ... )
    static HB_STORL2
 #else
    static HB_STORL2 pStorL = NULL;
-   if ( !pStorL )
+   if( ! pStorL )
 #endif
-      pStorL = (HB_STORL2) hb_GetProcAddress( "_hb_storl" );
+   pStorL = ( HB_STORL2 ) hb_GetProcAddress( "_hb_storl" );
 
    if( ( ( EXT_IS_ARRAY ) pExtIsArray )( iParam ) )
    {
-      va_list va;
-      ULONG ulArrayIndex;
+      va_list  va;
+      ULONG    ulArrayIndex;
 
       va_start( va, iParam );
       ulArrayIndex = va_arg( va, ULONG );
@@ -815,14 +815,14 @@ void hb_storni( int iValue, int iParam, ... )
    static HB_STORNI2
 #else
    static HB_STORNI2 pStorNi = NULL;
-   if ( !pStorNi )
+   if( ! pStorNi )
 #endif
-      pStorNi = (HB_STORNI2) hb_GetProcAddress( "_hb_storni" );
+   pStorNi = ( HB_STORNI2 ) hb_GetProcAddress( "_hb_storni" );
 
    if( ( ( EXT_IS_ARRAY ) pExtIsArray )( iParam ) )
    {
-      va_list va;
-      ULONG ulArrayIndex;
+      va_list  va;
+      ULONG    ulArrayIndex;
 
       va_start( va, iParam );
       ulArrayIndex = va_arg( va, ULONG );
@@ -843,14 +843,14 @@ void hb_stornl( LONG lValue, int iParam, ... )
    static HB_STORNL2
 #else
    static HB_STORNL2 pStorNl = NULL;
-   if ( !pStorNl )
+   if( ! pStorNl )
 #endif
-      pStorNl = (HB_STORNL2) hb_GetProcAddress( "_hb_stornl" );
+   pStorNl = ( HB_STORNL2 ) hb_GetProcAddress( "_hb_stornl" );
 
    if( ( ( EXT_IS_ARRAY ) pExtIsArray )( iParam ) )
    {
-      va_list va;
-      ULONG ulArrayIndex;
+      va_list  va;
+      ULONG    ulArrayIndex;
 
       va_start( va, iParam );
       ulArrayIndex = va_arg( va, ULONG );
@@ -871,14 +871,14 @@ void hb_stornd( double dNumber, int iParam, ... )
    static HB_STORND2
 #else
    static HB_STORND2 pStorNd = NULL;
-   if ( !pStorNd )
+   if( ! pStorNd )
 #endif
-      pStorNd = (HB_STORND2) hb_GetProcAddress( "_hb_stornd" );
+   pStorNd = ( HB_STORND2 ) hb_GetProcAddress( "_hb_stornd" );
 
    if( ( ( EXT_IS_ARRAY ) pExtIsArray )( iParam ) )
    {
-      va_list va;
-      ULONG ulArrayIndex;
+      va_list  va;
+      ULONG    ulArrayIndex;
 
       va_start( va, iParam );
       ulArrayIndex = va_arg( va, ULONG );
@@ -898,9 +898,9 @@ BOOL hb_arrayNew( PHB_ITEM pItem, ULONG ulLen )  /* creates a new array */
    static HB_ARRAYNEW
 #else
    static HB_ARRAYNEW pArrayNew = NULL;
-   if ( !pArrayNew )
+   if( ! pArrayNew )
 #endif
-      pArrayNew = ( HB_ARRAYNEW ) hb_GetProcAddress( "_hb_arrayNew" );
+   pArrayNew = ( HB_ARRAYNEW ) hb_GetProcAddress( "_hb_arrayNew" );
 
    return pArrayNew( pItem, ulLen );
 }
@@ -911,9 +911,9 @@ ULONG hb_arrayLen( PHB_ITEM pArray )  /* retrives the array len */
    static HB_ARRAYLEN
 #else
    static HB_ARRAYLEN pArrayLen = NULL;
-   if ( !pArrayLen )
+   if( ! pArrayLen )
 #endif
-      pArrayLen = ( HB_ARRAYLEN ) hb_GetProcAddress( "_hb_arrayLen" );
+   pArrayLen = ( HB_ARRAYLEN ) hb_GetProcAddress( "_hb_arrayLen" );
 
    return pArrayLen( pArray );
 }
@@ -924,9 +924,9 @@ BOOL hb_arrayIsObject( PHB_ITEM pArray )  /* retrives if the array is an object 
    static HB_ARRAYISOBJECT
 #else
    static HB_ARRAYISOBJECT pArrayIsObject = NULL;
-   if ( !pArrayIsObject )
+   if( ! pArrayIsObject )
 #endif
-      pArrayIsObject = ( HB_ARRAYISOBJECT ) hb_GetProcAddress( "_hb_arrayIsObject" );
+   pArrayIsObject = ( HB_ARRAYISOBJECT ) hb_GetProcAddress( "_hb_arrayIsObject" );
 
    return pArrayIsObject( pArray );
 }
@@ -937,9 +937,9 @@ BOOL hb_arrayAdd( PHB_ITEM pArray, PHB_ITEM pItemValue )  /* add a new item to t
    static HB_ARRAYADD
 #else
    static HB_ARRAYADD pArrayAdd = NULL;
-   if ( !pArrayAdd )
+   if( ! pArrayAdd )
 #endif
-      pArrayAdd = ( HB_ARRAYADD ) hb_GetProcAddress( "_hb_arrayAdd" );
+   pArrayAdd = ( HB_ARRAYADD ) hb_GetProcAddress( "_hb_arrayAdd" );
 
    return pArrayAdd( pArray, pItemValue );
 }
@@ -950,9 +950,9 @@ BOOL hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex )  /* insert a nil item into an
    static HB_ARRAYINS
 #else
    static HB_ARRAYINS pArrayIns = NULL;
-   if ( !pArrayIns )
+   if( ! pArrayIns )
 #endif
-      pArrayIns = ( HB_ARRAYINS ) hb_GetProcAddress( "_hb_arrayIns" );
+   pArrayIns = ( HB_ARRAYINS ) hb_GetProcAddress( "_hb_arrayIns" );
 
    return pArrayIns( pArray, ulIndex );
 }
@@ -963,9 +963,9 @@ BOOL hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )  /* delete an array item, wit
    static HB_ARRAYDEL
 #else
    static HB_ARRAYDEL pArrayDel = NULL;
-   if ( !pArrayDel )
+   if( ! pArrayDel )
 #endif
-      pArrayDel = ( HB_ARRAYDEL ) hb_GetProcAddress( "_hb_arrayDel" );
+   pArrayDel = ( HB_ARRAYDEL ) hb_GetProcAddress( "_hb_arrayDel" );
 
    return pArrayDel( pArray, ulIndex );
 }
@@ -976,9 +976,9 @@ BOOL hb_arraySize( PHB_ITEM pArray, ULONG ulLen )  /* sets the array total lengt
    static HB_ARRAYSIZE
 #else
    static HB_ARRAYSIZE pArraySize = NULL;
-   if ( !pArraySize )
+   if( ! pArraySize )
 #endif
-      pArraySize = ( HB_ARRAYSIZE ) hb_GetProcAddress( "_hb_arraySize" );
+   pArraySize = ( HB_ARRAYSIZE ) hb_GetProcAddress( "_hb_arraySize" );
 
    return pArraySize( pArray, ulLen );
 }
@@ -989,9 +989,9 @@ BOOL hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult )  /* retrieve last item in
    static HB_ARRAYLAST
 #else
    static HB_ARRAYLAST pArrayLast = NULL;
-   if ( !pArrayLast )
+   if( ! pArrayLast )
 #endif
-      pArrayLast = ( HB_ARRAYLAST ) hb_GetProcAddress( "_hb_arrayLast" );
+   pArrayLast = ( HB_ARRAYLAST ) hb_GetProcAddress( "_hb_arrayLast" );
 
    return pArrayLast( pArray, pResult );
 }
@@ -1002,9 +1002,9 @@ BOOL hb_arrayRelease( PHB_ITEM pArray )  /* releases an array - don't call it - 
    static HB_ARRAYRELEASE
 #else
    static HB_ARRAYRELEASE pArrayRelease = NULL;
-   if ( !pArrayRelease )
+   if( ! pArrayRelease )
 #endif
-      pArrayRelease = ( HB_ARRAYRELEASE ) hb_GetProcAddress( "_hb_arrayRelease" );
+   pArrayRelease = ( HB_ARRAYRELEASE ) hb_GetProcAddress( "_hb_arrayRelease" );
 
    return pArrayRelease( pArray );
 }
@@ -1015,9 +1015,9 @@ BOOL hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )  /* sets an a
    static HB_ARRAYSET
 #else
    static HB_ARRAYSET pArraySet = NULL;
-   if ( !pArraySet )
+   if( ! pArraySet )
 #endif
-      pArraySet = ( HB_ARRAYSET ) hb_GetProcAddress( "_hb_arraySet" );
+   pArraySet = ( HB_ARRAYSET ) hb_GetProcAddress( "_hb_arraySet" );
 
    return pArraySet( pArray, ulIndex, pItem );
 }
@@ -1028,9 +1028,9 @@ BOOL hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )  /* retrieves
    static HB_ARRAYGET
 #else
    static HB_ARRAYGET pArrayGet = NULL;
-   if ( !pArrayGet )
+   if( ! pArrayGet )
 #endif
-      pArrayGet = ( HB_ARRAYGET ) hb_GetProcAddress( "_hb_arrayGet" );
+   pArrayGet = ( HB_ARRAYGET ) hb_GetProcAddress( "_hb_arrayGet" );
 
    return pArrayGet( pArray, ulIndex, pItem );
 }
@@ -1042,9 +1042,9 @@ int hb_xinit( void )                         /* Initialize fixed memory subsyste
    static HB_XINIT
 #else
    static HB_XINIT pXinit = NULL;
-   if ( !pXinit )
+   if( ! pXinit )
 #endif
-      pXinit = ( HB_XINIT ) hb_GetProcAddress( "_hb_xinit" );
+   pXinit = ( HB_XINIT ) hb_GetProcAddress( "_hb_xinit" );
 
    pXinit();
    return 1;
@@ -1057,9 +1057,9 @@ void hb_xexit( void )                         /* Deinitialize fixed memory subsy
    static HB_XEXIT
 #else
    static HB_XEXIT pXexit = NULL;
-   if ( !pXexit )
+   if( ! pXexit )
 #endif
-      pXexit = ( HB_XEXIT ) hb_GetProcAddress( "_hb_xexit" );
+   pXexit = ( HB_XEXIT ) hb_GetProcAddress( "_hb_xexit" );
 
    pXexit();
 }
@@ -1071,9 +1071,9 @@ void * hb_xalloc( ULONG ulSize )                /* allocates memory, returns NUL
    static HB_XALLOC
 #else
    static HB_XALLOC pXalloc = NULL;
-   if ( !pXalloc )
+   if( ! pXalloc )
 #endif
-      pXalloc = ( HB_XALLOC ) hb_GetProcAddress( "_hb_xalloc" );
+   pXalloc = ( HB_XALLOC ) hb_GetProcAddress( "_hb_xalloc" );
 
    return pXalloc( ulSize );
 }
@@ -1085,9 +1085,9 @@ void * hb_xgrab( ULONG ulSize )                 /* allocates memory, exits on fa
    static HB_XGRAB
 #else
    static HB_XGRAB pXgrab = NULL;
-   if ( !pXgrab )
+   if( ! pXgrab )
 #endif
-      pXgrab = ( HB_XGRAB ) hb_GetProcAddress( "_hb_xgrab" );
+   pXgrab = ( HB_XGRAB ) hb_GetProcAddress( "_hb_xgrab" );
 
    return pXgrab( ulSize );
 }
@@ -1099,9 +1099,9 @@ void hb_xfree( void * pMem )                  /* frees memory */
    static HB_XFREE
 #else
    static HB_XFREE pXfree = NULL;
-   if ( !pXfree )
+   if( ! pXfree )
 #endif
-      pXfree = ( HB_XFREE ) hb_GetProcAddress( "_hb_xfree" );
+   pXfree = ( HB_XFREE ) hb_GetProcAddress( "_hb_xfree" );
 
    pXfree( pMem );
 }
@@ -1113,11 +1113,11 @@ void * hb_xrealloc( void * pMem, ULONG ulSize ) /* reallocates memory */
    static HB_XREALLOC
 #else
    static HB_XREALLOC pXrealloc = NULL;
-   if ( !pXrealloc )
+   if( ! pXrealloc )
 #endif
-      pXrealloc =  ( HB_XREALLOC ) hb_GetProcAddress( "_hb_xrealloc" );
+   pXrealloc = ( HB_XREALLOC ) hb_GetProcAddress( "_hb_xrealloc" );
 
-   return ( void* ) pXrealloc( pMem, ulSize );
+   return ( void * ) pXrealloc( pMem, ulSize );
 }
 
 #undef hb_xsize
@@ -1127,9 +1127,9 @@ ULONG hb_xsize( void * pMem )                  /* returns the size of an allocat
    static HB_XSIZE
 #else
    static HB_XSIZE pXsize = NULL;
-   if ( !pXsize )
+   if( ! pXsize )
 #endif
-      pXsize = ( HB_XSIZE ) hb_GetProcAddress( "_hb_xsize" );
+   pXsize = ( HB_XSIZE ) hb_GetProcAddress( "_hb_xsize" );
 
    return pXsize( ( void * ) pMem );
 }
@@ -1142,11 +1142,11 @@ BOOL hb_fsDelete( BYTE * pszFileName )
    static HB_FSDELETE
 #else
    static HB_FSDELETE pFunc = NULL;
-   if ( !pFunc )
+   if( ! pFunc )
 #endif
-      pFunc = (HB_FSDELETE) hb_GetProcAddress( "_hb_fsDelete" );
+   pFunc = ( HB_FSDELETE ) hb_GetProcAddress( "_hb_fsDelete" );
 
-   return pFunc ( pszFileName );
+   return pFunc( pszFileName );
 }
 
 //----------------------------------------------------------------------------//
@@ -1157,11 +1157,11 @@ USHORT hb_fsWrite( HB_FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount )
    static HB_FSWRITE pFunc = NULL;
 #else
    static HB_FSWRITE pFunc = NULL;
-   if ( !pFunc )
+   if( ! pFunc )
 #endif
-      pFunc = (HB_FSWRITE) hb_GetProcAddress( "_hb_fsWrite" );
+   pFunc = ( HB_FSWRITE ) hb_GetProcAddress( "_hb_fsWrite" );
 
-   return pFunc ( hFileHandle, pBuff, ulCount );
+   return pFunc( hFileHandle, pBuff, ulCount );
 }
 
 //----------------------------------------------------------------------------//
@@ -1172,11 +1172,11 @@ ULONG hb_fsSeek( HB_FHANDLE hFileHandle, LONG lOffset, USHORT uiMode )
    static HB_FSSEEK
 #else
    static HB_FSSEEK pFunc = NULL;
-   if ( !pFunc )
+   if( ! pFunc )
 #endif
-      pFunc = (HB_FSSEEK) hb_GetProcAddress( "_hb_fsSeek" );
+   pFunc = ( HB_FSSEEK ) hb_GetProcAddress( "_hb_fsSeek" );
 
-   return pFunc ( hFileHandle, lOffset, uiMode );
+   return pFunc( hFileHandle, lOffset, uiMode );
 }
 
 //----------------------------------------------------------------------------//
@@ -1187,11 +1187,11 @@ HB_FHANDLE hb_fsCreate( BYTE * pszFileName, USHORT uiAttr )
    static HB_FSCREATE
 #else
    static HB_FSCREATE pFunc = NULL;
-   if ( !pFunc )
+   if( ! pFunc )
 #endif
-      pFunc = (HB_FSCREATE) hb_GetProcAddress( "_hb_fsCreate" );
+   pFunc = ( HB_FSCREATE ) hb_GetProcAddress( "_hb_fsCreate" );
 
-   return pFunc ( pszFileName, uiAttr );
+   return pFunc( pszFileName, uiAttr );
 }
 
 //----------------------------------------------------------------------------//
@@ -1202,11 +1202,11 @@ USHORT hb_fsRead( HB_FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount )
    static HB_FSREAD
 #else
    static HB_FSREAD pFunc = NULL;
-   if ( !pFunc )
+   if( ! pFunc )
 #endif
-      pFunc = (HB_FSREAD) hb_GetProcAddress( "_hb_fsRead" );
+   pFunc = ( HB_FSREAD ) hb_GetProcAddress( "_hb_fsRead" );
 
-   return pFunc ( hFileHandle, pBuff, ulCount );
+   return pFunc( hFileHandle, pBuff, ulCount );
 }
 
 //----------------------------------------------------------------------------//
@@ -1217,11 +1217,11 @@ HB_FHANDLE hb_fsOpen( BYTE * pszFileName, USHORT uiFlags )
    static HB_FSOPEN
 #else
    static HB_FSOPEN pFunc = NULL;
-   if ( !pFunc )
+   if( ! pFunc )
 #endif
-      pFunc = (HB_FSOPEN) hb_GetProcAddress( "_hb_fsOpen" );
+   pFunc = ( HB_FSOPEN ) hb_GetProcAddress( "_hb_fsOpen" );
 
-   return pFunc ( pszFileName, uiFlags );
+   return pFunc( pszFileName, uiFlags );
 }
 
 //----------------------------------------------------------------------------//
@@ -1232,11 +1232,11 @@ void hb_fsClose( HB_FHANDLE hFileHandle  )
    static HB_FSCLOSE
 #else
    static HB_FSCLOSE pFunc = NULL;
-   if ( !pFunc )
+   if( ! pFunc )
 #endif
-      pFunc = (HB_FSCLOSE) hb_GetProcAddress( "_hb_fsClose" );
+   pFunc = ( HB_FSCLOSE ) hb_GetProcAddress( "_hb_fsClose" );
 
-   pFunc ( hFileHandle );
+   pFunc( hFileHandle );
 }
 
 #undef _HB_SNPRINTF_ADD_EOS
@@ -1244,20 +1244,20 @@ void hb_fsClose( HB_FHANDLE hFileHandle  )
 /* NOTE: The full size of the buffer is expected as nSize. [vszakats] */
 int hb_snprintf( char * buffer, size_t nSize, const char * format, ... )
 {
-   va_list arglist;
-   ULONG result;
+   va_list  arglist;
+   ULONG    result;
 
    va_start( arglist, format );
 
 #if defined( _MSC_VER ) && _MSC_VER >= 1400
-   result = _vsnprintf_s( buffer, nSize, _TRUNCATE, format, arglist );
-#elif ( defined( _MSC_VER ) || defined( __DMC__ ) ) && !defined( __XCC__ )
-   result = _vsnprintf( buffer, nSize, format, arglist );
+   result   = _vsnprintf_s( buffer, nSize, _TRUNCATE, format, arglist );
+#elif ( defined( _MSC_VER ) || defined( __DMC__ ) ) && ! defined( __XCC__ )
+   result   = _vsnprintf( buffer, nSize, format, arglist );
    #define _HB_SNPRINTF_ADD_EOS
 #elif defined( __WATCOMC__ ) && __WATCOMC__ < 1200
-   result = _vbprintf( buffer, nSize, format, arglist );
+   result   = _vbprintf( buffer, nSize, format, arglist );
 #else
-   result = vsnprintf( buffer, nSize, format, arglist );
+   result   = vsnprintf( buffer, nSize, format, arglist );
 #endif
 
    va_end( arglist );

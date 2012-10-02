@@ -76,8 +76,8 @@ HB_FUNC( DO )
 
       if( pDynSym )
       {
-         USHORT uiPCount;
-         USHORT uiParam;
+         USHORT   uiPCount;
+         USHORT   uiParam;
 
          hb_vmPushSymbol( pDynSym->pSymbol );
 
@@ -98,8 +98,8 @@ HB_FUNC( DO )
    }
    else if( HB_IS_BLOCK( pItem ) )
    {
-      USHORT uiPCount = hb_pcount();
-      USHORT uiParam;
+      USHORT   uiPCount = hb_pcount();
+      USHORT   uiParam;
 
       hb_vmPushSymbol( &hb_symEval );
       hb_vmPush( pItem );
@@ -109,8 +109,8 @@ HB_FUNC( DO )
    }
    else if( HB_IS_SYMBOL( pItem ) )
    {
-      USHORT uiPCount = hb_pcount();
-      USHORT uiParam;
+      USHORT   uiPCount = hb_pcount();
+      USHORT   uiParam;
 
       hb_vmPushSymbol( pItem->item.asSymbol.value );
       hb_vmPushNil();

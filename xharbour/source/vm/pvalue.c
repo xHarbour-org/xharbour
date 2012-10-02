@@ -57,14 +57,14 @@
 
 HB_FUNC( PVALUE )
 {
-   USHORT uiParam = hb_parni( 1 ), uiParams;
-   PHB_ITEM *pBase = HB_VM_STACK.pItems + ( hb_stackBaseItem() )->item.asSymbol.pCargo->stackbase; /* Skip function + self */
+   USHORT      uiParam  = hb_parni( 1 ), uiParams;
+   PHB_ITEM *  pBase    = HB_VM_STACK.pItems + ( hb_stackBaseItem() )->item.asSymbol.pCargo->stackbase; /* Skip function + self */
 
    uiParams = ( *pBase )->item.asSymbol.pCargo->arguments;
 
    if( uiParam && uiParam <= uiParams ) /* Valid number */
    {
-      USHORT uiOffset;
+      USHORT   uiOffset;
       PHB_ITEM pItem;
 
       if( ( *pBase )->item.asSymbol.pCargo->params == HB_VAR_PARAM_FLAG )
@@ -80,7 +80,7 @@ HB_FUNC( PVALUE )
 
       hb_itemReturn( pItem );
 
-      if ( hb_pcount() > 1 && HB_IS_BYREF( pItem ) )
+      if( hb_pcount() > 1 && HB_IS_BYREF( pItem ) )
       {
          hb_itemCopy( pItem, hb_param( 2, HB_IT_ANY ) );
       }

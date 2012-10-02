@@ -57,30 +57,30 @@
 
 #if defined( HB_OS_WIN )
 
-#define HB_GT_NAME GUI
+#define HB_GT_NAME   GUI
 #include "hbgtcore.h"
 
-#define MAX_ARGS 128
+#define MAX_ARGS     128
 
-static int    s_argc = 0;
-static char * s_argv[ MAX_ARGS ];
-static char   s_szAppName[ 256 ];
+static int     s_argc = 0;
+static char *  s_argv[ MAX_ARGS ];
+static char    s_szAppName[ 256 ];
 
 int APIENTRY WinMain( HINSTANCE hInstance,      /* handle to current instance */
-                    HINSTANCE hPrevInstance,  /* handle to previous instance */
-                    LPSTR lpCmdLine,          /* pointer to command line */
-                    int iCmdShow )            /* show state of window */
+                      HINSTANCE hPrevInstance,  /* handle to previous instance */
+                      LPSTR lpCmdLine,          /* pointer to command line */
+                      int iCmdShow )            /* show state of window */
 {
 #ifdef HB_FM_WIN32_ALLOC
    LPSTR pArgs = ( LPSTR ) LocalAlloc( LMEM_FIXED, strlen( lpCmdLine ) + 1 );
 #else
-   LPSTR pArgs = ( LPSTR ) malloc(strlen( lpCmdLine ) + 1 );
+   LPSTR pArgs = ( LPSTR ) malloc( strlen( lpCmdLine ) + 1 );
 #endif
    LPSTR pStart, pArg = pArgs;
-   BOOL bInQuotedParam;
-   int iResult ;
+   BOOL  bInQuotedParam;
+   int   iResult;
 
-   HB_TRACE(HB_TR_DEBUG, ("WinMain(%p, %p, %s, %d)", hInstance, hPrevInstance, lpCmdLine, iCmdShow));
+   HB_TRACE( HB_TR_DEBUG, ( "WinMain(%p, %p, %s, %d)", hInstance, hPrevInstance, lpCmdLine, iCmdShow ) );
 
    HB_SYMBOL_UNUSED( iCmdShow );
 
@@ -89,40 +89,40 @@ int APIENTRY WinMain( HINSTANCE hInstance,      /* handle to current instance */
    GetModuleFileName( hInstance, s_szAppName, sizeof( s_szAppName ) - 1 );
    s_argv[ s_argc++ ] = s_szAppName;
 
-   while ( *lpCmdLine && s_argc < MAX_ARGS )
+   while( *lpCmdLine && s_argc < MAX_ARGS )
    {
-      while (*lpCmdLine== ' ')  // Skip over any white space
+      while( *lpCmdLine == ' ' )  // Skip over any white space
       {
-         lpCmdLine++ ;
+         lpCmdLine++;
       }
-      if (*lpCmdLine)
+      if( *lpCmdLine )
       {
-         pStart= NULL ;
-         bInQuotedParam= FALSE;
-         while (*lpCmdLine)
+         pStart         = NULL;
+         bInQuotedParam = FALSE;
+         while( *lpCmdLine )
          {
-            if (*lpCmdLine == '"')
+            if( *lpCmdLine == '"' )
             {
                lpCmdLine++;
-               if ( bInQuotedParam )
+               if( bInQuotedParam )
                {
-                  if (pStart == NULL)
+                  if( pStart == NULL )
                   {
                      pStart = pArg;
                   }
-                  break ;
+                  break;
                }
                else
                {
-                  bInQuotedParam = TRUE ;
+                  bInQuotedParam = TRUE;
                }
             }
-            else if (*lpCmdLine== ' ')
+            else if( *lpCmdLine == ' ' )
             {
-               if ( bInQuotedParam )
+               if( bInQuotedParam )
                {
-                  *pArg = *lpCmdLine++ ;
-                  if (pStart == NULL)
+                  *pArg = *lpCmdLine++;
+                  if( pStart == NULL )
                   {
                      pStart = pArg;
                   }
@@ -130,24 +130,24 @@ int APIENTRY WinMain( HINSTANCE hInstance,      /* handle to current instance */
                }
                else
                {
-                  lpCmdLine++ ;
-                  break ;
+                  lpCmdLine++;
+                  break;
                }
             }
             else
             {
-               *pArg = *lpCmdLine++ ;
-               if (pStart == NULL)
+               *pArg = *lpCmdLine++;
+               if( pStart == NULL )
                {
                   pStart = pArg;
                }
                pArg++;
             }
          }
-         if (pStart)
+         if( pStart )
          {
-            *pArg++ = '\0';
-            s_argv[ s_argc++ ] = pStart ;
+            *pArg++              = '\0';
+            s_argv[ s_argc++ ]   = pStart;
          }
       }
    }
@@ -167,10 +167,12 @@ int APIENTRY WinMain( HINSTANCE hInstance,      /* handle to current instance */
 }
 
 #if 0
-   #if ( /* defined( __DMC__ ) || */ defined( __WATCOMC__ ) /* || defined( __MINGW32__ ) */ ) && !defined(__EXPORT__)
-      HB_EXTERN_BEGIN
-      void hb_forceLinkMainWin( void ) {}
-      HB_EXTERN_END
+   #if ( /* defined( __DMC__ ) || */ defined( __WATCOMC__ ) /* || defined( __MINGW32__ ) */ ) && ! defined( __EXPORT__ )
+HB_EXTERN_BEGIN
+void hb_forceLinkMainWin( void )
+{
+}
+HB_EXTERN_END
    #endif
 #endif
 

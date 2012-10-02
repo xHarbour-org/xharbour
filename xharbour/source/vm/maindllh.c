@@ -56,32 +56,32 @@
  */
 
 /*
-  NOTE: This is a system source linked into harbour.dll
+   NOTE: This is a system source linked into harbour.dll
 
-  WARNING: Do NOT link this into other dll!
+   WARNING: Do NOT link this into other dll!
 
            DLL applications which are staticly linked
            against harbour.dll, should be linked to maindlle.c
            by means of dllmain.lib!
-*/
+ */
 
 #define HB_OS_WIN_USED
 
 #include "hbtypes.h"
 
 
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN )
 HB_EXTERN_BEGIN
-#if defined(HB_DLL_REQUIRED_DLLMAIN)
+#if defined( HB_DLL_REQUIRED_DLLMAIN )
 HB_EXPORT BOOL WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {
-   HB_TRACE( HB_TR_DEBUG, ("DllMain(%p, %p, %d)", hInstance, fdwReason,
-             pvReserved ) );
+   HB_TRACE( HB_TR_DEBUG, ( "DllMain(%p, %p, %d)", hInstance, fdwReason,
+                            pvReserved ) );
 #else
 HB_EXPORT BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {
-   HB_TRACE( HB_TR_DEBUG, ("DllEntryPoint(%p, %p, %d)", hInstance, fdwReason,
-             pvReserved ) );
+   HB_TRACE( HB_TR_DEBUG, ( "DllEntryPoint(%p, %p, %d)", hInstance, fdwReason,
+                            pvReserved ) );
 #endif
 
    HB_SYMBOL_UNUSED( hInstance );
@@ -99,7 +99,7 @@ HB_EXPORT BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID
    return TRUE;
 }
 
-HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
+HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, int iPCodeVer, PHB_ITEM * pGlobals ) /* module symbols initialization */
 {
    return hb_vmProcessSysDllSymbols( pSymbols, uiModuleSymbols, szModule, iPCodeVer, pGlobals );
 }

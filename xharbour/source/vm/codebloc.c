@@ -88,9 +88,9 @@ HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer,
 {
    HB_CODEBLOCK_PTR pCBlock;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_codeblockNew(%p, %hu, %p, %p)", pBuffer, uiLocals, pLocalPosTable, pSymbol));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_codeblockNew(%p, %hu, %p, %p)", pBuffer, uiLocals, pLocalPosTable, pSymbol ) );
 
-   pCBlock = ( HB_CODEBLOCK_PTR ) hb_gcAlloc( sizeof( HB_CODEBLOCK ), hb_codeblockDeleteGarbage );
+   pCBlock           = ( HB_CODEBLOCK_PTR ) hb_gcAlloc( sizeof( HB_CODEBLOCK ), hb_codeblockDeleteGarbage );
 
    /* Store the number of referenced local variables
     */
@@ -102,7 +102,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer,
        * uiLocal have to be ZERO
        * uiLocal will be also ZERO if it is a nested codeblock
        */
-      USHORT ui = 1;
+      USHORT   ui = 1;
       PHB_ITEM pLocal;
 
       /* Create a table that will store the values of local variables
@@ -111,19 +111,19 @@ HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer,
        * NOTE: This table can be shared by codeblocks created during
        * evaluation of this codeblock
        */
-      pCBlock->pLocals = ( PHB_ITEM ) hb_xgrab( ( uiLocals + 1 ) * sizeof( HB_ITEM ) );
-      pCBlock->pLocals[ 0 ].type = HB_IT_LONG;
-      pCBlock->pLocals[ 0 ].item.asLong.value = 1;
+      pCBlock->pLocals                          = ( PHB_ITEM ) hb_xgrab( ( uiLocals + 1 ) * sizeof( HB_ITEM ) );
+      pCBlock->pLocals[ 0 ].type                = HB_IT_LONG;
+      pCBlock->pLocals[ 0 ].item.asLong.value   = 1;
 
       while( uiLocals-- )
       {
          /*
           * Swap the current value of local variable with the reference to this value.
           */
-         pLocal = hb_stackItemFromBase( HB_PCODE_MKUSHORT( pLocalPosTable ) );
+         pLocal         = hb_stackItemFromBase( HB_PCODE_MKUSHORT( pLocalPosTable ) );
          pLocalPosTable += 2;
 
-         pLocal = hb_memvarDetachLocal( pLocal );
+         pLocal         = hb_memvarDetachLocal( pLocal );
          hb_itemRawCpy( pCBlock->pLocals + ui, pLocal );
          /* Increment the reference counter so this value will not be
           * released if other codeblock will be deleted
@@ -145,11 +145,11 @@ HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer,
       {
          HB_CODEBLOCK_PTR pOwner = pLocal->item.asBlock.value;
 
-         pCBlock->pLocals = pOwner->pLocals;
+         pCBlock->pLocals  = pOwner->pLocals;
          pCBlock->uiLocals = uiLocals = pOwner->uiLocals;
 
-         if( pOwner->pLocals )
-         {  /* the outer codeblock have the table with local references - reuse it */
+         if( pOwner->pLocals ) /* the outer codeblock have the table with local references - reuse it */
+         {
             while( uiLocals )
             {
                hb_memvarValueIncRef( ( HB_HANDLE ) pCBlock->pLocals[ uiLocals ].item.asMemvar.value );
@@ -171,17 +171,17 @@ HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer,
     * The only allowed operation on a codeblock is evaluating it then
     * there is no need to duplicate its pcode - just store the pointer to it
     */
-   pCBlock->pCode     = ( BYTE * ) pBuffer;
+   pCBlock->pCode       = ( BYTE * ) pBuffer;
 
-   pCBlock->symbol  = pSymbol;
-   pCBlock->ulCounter = 1;
+   pCBlock->symbol      = pSymbol;
+   pCBlock->ulCounter   = 1;
 
    //pCBlock->dynBuffer = FALSE;
    //pCBlock->bPrivVars = FALSE;
    //pCBlock->bDynamic = FALSE;
    pCBlock->uiFlags = 0;
 
-   HB_TRACE(HB_TR_INFO, ("codeblock created (%i) %lx", pCBlock->ulCounter, pCBlock));
+   HB_TRACE( HB_TR_INFO, ( "codeblock created (%i) %lx", pCBlock->ulCounter, pCBlock ) );
 
    return pCBlock;
 }
@@ -190,9 +190,9 @@ HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
 {
    HB_CODEBLOCK_PTR pCBlock;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_codeblockMacroNew(%p, %i)", pBuffer, usLen));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_codeblockMacroNew(%p, %i)", pBuffer, usLen ) );
 
-   pCBlock = ( HB_CODEBLOCK_PTR ) hb_gcAlloc( sizeof( HB_CODEBLOCK ), hb_codeblockDeleteGarbage );
+   pCBlock           = ( HB_CODEBLOCK_PTR ) hb_gcAlloc( sizeof( HB_CODEBLOCK ), hb_codeblockDeleteGarbage );
 
    /* Store the number of referenced local variables
     */
@@ -203,18 +203,18 @@ HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
     * can be deallocated after creation of a codeblock. We have to duplicate
     * the passed buffer
     */
-   pCBlock->pCode = ( BYTE * ) hb_xgrab( usLen );
+   pCBlock->pCode    = ( BYTE * ) hb_xgrab( usLen );
    HB_MEMCPY( pCBlock->pCode, pBuffer, usLen );
 
    //pCBlock->dynBuffer = TRUE;
    //pCBlock->bPrivVars = FALSE;
    //pCBlock->bDynamic = TRUE;
-   pCBlock->uiFlags = ( CBF_DYNAMIC_BUFFER | CBF_DYNAMIC );
+   pCBlock->uiFlags     = ( CBF_DYNAMIC_BUFFER | CBF_DYNAMIC );
 
-   pCBlock->symbol = NULL; /* macro-compiled codeblock cannot acces a local symbol table */
-   pCBlock->ulCounter = 1;
+   pCBlock->symbol      = NULL; /* macro-compiled codeblock cannot acces a local symbol table */
+   pCBlock->ulCounter   = 1;
 
-   HB_TRACE(HB_TR_INFO, ("codeblock created (%li) %lx", pCBlock->ulCounter, pCBlock));
+   HB_TRACE( HB_TR_INFO, ( "codeblock created (%li) %lx", pCBlock->ulCounter, pCBlock ) );
 
    return pCBlock;
 }
@@ -225,7 +225,7 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
 {
    HB_CODEBLOCK_PTR pCBlock = pItem->item.asBlock.value;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_codeblockDelete(%p)", pItem));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_codeblockDelete(%p)", pItem ) );
 
    if( pCBlock && HB_ATOMIC_DEC( pCBlock->ulCounter ) == 0 )
    {
@@ -239,7 +239,7 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
             hb_memvarValueDecRef( ( HB_HANDLE ) pCBlock->pLocals[ ui ].item.asMemvar.value );
             //TraceLog( NULL, "DONE Release Detached %i\n", ui );
 
-			ui--;
+            ui--;
          }
 
          /* decrement the table reference counter and release memory if
@@ -263,7 +263,7 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
       }
 
       /* free space allocated for a CODEBLOCK structure
-      */
+       */
       hb_gcFree( pCBlock );
    }
 }
@@ -274,7 +274,7 @@ HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage )
 {
    HB_CODEBLOCK_PTR pCBlock = ( HB_CODEBLOCK_PTR ) Cargo;
 
-   HB_TRACE(HB_TR_INFO, ("hb_codeblockDeleteGarbage(%p)", Cargo));
+   HB_TRACE( HB_TR_INFO, ( "hb_codeblockDeleteGarbage(%p)", Cargo ) );
 
    /* free space allocated for local variables
     */
@@ -314,11 +314,11 @@ PHB_ITEM hb_codeblockGetVar( PHB_ITEM pItem, long iItemPos )
 {
    HB_CODEBLOCK_PTR pCBlock = pItem->item.asBlock.value;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_codeblockGetVar(%p, %ld)", pItem, iItemPos));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_codeblockGetVar(%p, %ld)", pItem, iItemPos ) );
 
    if( pCBlock->uiLocals < -iItemPos )
    {
-      hb_errInternal( HB_EI_ERRUNRECOV, "Codeblock %p does not export %li detached locals", (const char *) pCBlock, (const char *) -iItemPos );
+      hb_errInternal( HB_EI_ERRUNRECOV, "Codeblock %p does not export %li detached locals", ( const char * ) pCBlock, ( const char * ) -iItemPos );
    }
 
    /* local variables accessed in a codeblock are always stored as reference */
@@ -329,7 +329,7 @@ PHB_ITEM hb_codeblockGetVar( PHB_ITEM pItem, long iItemPos )
  */
 PHB_ITEM  hb_codeblockGetRef( HB_CODEBLOCK_PTR pCBlock, PHB_ITEM pRefer )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_codeblockGetRef(%p, %p)", pCBlock, pRefer));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_codeblockGetRef(%p, %p)", pCBlock, pRefer ) );
 
    return pCBlock->pLocals - pRefer->item.asRefer.value;
 }

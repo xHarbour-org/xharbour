@@ -53,16 +53,20 @@
 #include "hbsetup.ch"
 #include "inkey.ch"
 
-ANNOUNCE SysInit
+   ANNOUNCE SysInit
 
-/* NOTE: For complete compatibility */
+   /* NOTE: For complete compatibility */
+
 PROCEDURE CLIPPER520()
+
    RETURN
 
 #ifdef HB_COMPAT_C53
 
-/* NOTE: For complete compatibility */
+   /* NOTE: For complete compatibility */
+
 PROCEDURE CLIPPER530()
+
    RETURN
 
 #endif
@@ -79,31 +83,38 @@ PROCEDURE ClipInit
    /* NOTE: In Clipper __SETHELPK() is called *after* ERRORSYS(). */
    __SetHelpK()
 
-RETURN
+   RETURN
 
 PROCEDURE __SetHelpK()
 
    /* 2008/JAN/15 - E.F. - Set key K_F1 ON only if user help() exists.
                            Clipper compliance */
-   if _ExistHelp()
-      SET KEY K_F1 TO __XHELP
-   endif
 
-RETURN
+   IF _ExistHelp()
+      SET KEY K_F1 TO __XHELP
+   ENDIF
+
+   RETURN
 
 FUNCTION __BreakBlock()
-RETURN {|e| Break(e) }
+
+   RETURN {|e| Break( e ) }
 
 FUNCTION __ErrorBlock( )
-RETURN {|e| __MinimalErrorHandler(e) }
+
+   RETURN {|e| __MinimalErrorHandler( e ) }
 
 PROCEDURE __MinimalErrorHandler( oError )
 
-   #ifdef __PLATFORM__Windows
-      #define EOL Chr(13) + Chr(10)
-   #else
-      #define EOL Chr(10)
-   #endif
+#ifdef __PLATFORM__Windows
+
+#define EOL Chr(13) + Chr(10)
+
+#else
+
+#define EOL Chr(10)
+
+#endif
 
    LOCAL cError := "Error!" + EOL
 
@@ -127,7 +138,7 @@ PROCEDURE __MinimalErrorHandler( oError )
 
    QUIT
 
-RETURN
+   RETURN
 
 #pragma BEGINDUMP
 #include "hbapi.h"
@@ -143,4 +154,5 @@ HB_FUNC_STATIC( _EXISTHELP )
    }
    hb_retl( bResult );
 }
+
 #pragma ENDDUMP

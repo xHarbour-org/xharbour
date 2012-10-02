@@ -81,13 +81,13 @@
 
 BOOL hb_evalNew( PEVALINFO pEvalInfo, PHB_ITEM pItem )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_evalNew(%p, %p)", pEvalInfo, pItem));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_evalNew(%p, %p)", pEvalInfo, pItem ) );
 
    if( pEvalInfo )
    {
       memset( pEvalInfo, 0, sizeof( EVALINFO ) );
-      pEvalInfo->pItems[ 0 ] = pItem;
-      pEvalInfo->paramCount = 0;
+      pEvalInfo->pItems[ 0 ]  = pItem;
+      pEvalInfo->paramCount   = 0;
 
       return TRUE;
    }
@@ -110,7 +110,7 @@ BOOL hb_evalNew( PEVALINFO pEvalInfo, PHB_ITEM pItem )
 
 BOOL hb_evalPutParam( PEVALINFO pEvalInfo, PHB_ITEM pItem )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_evalPutParam(%p, %p)", pEvalInfo, pItem));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_evalPutParam(%p, %p)", pEvalInfo, pItem ) );
 
    if( pEvalInfo && pItem && pEvalInfo->paramCount < HB_EVAL_PARAM_MAX_ )
    {
@@ -128,7 +128,7 @@ PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
 
    PHB_ITEM pResult = NULL;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_evalLaunch(%p)", pEvalInfo));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_evalLaunch(%p)", pEvalInfo ) );
 
    if( pEvalInfo )
    {
@@ -136,7 +136,7 @@ PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
 
       if( HB_IS_STRING( pEvalInfo->pItems[ 0 ] ) )
       {
-         const char *ptr = pEvalInfo->pItems[ 0 ]->item.asString.value;
+         const char * ptr = pEvalInfo->pItems[ 0 ]->item.asString.value;
 
          hb_vmPushSymbol( hb_dynsymFindName( ptr )->pSymbol );
 
@@ -150,7 +150,7 @@ PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
          hb_vmDo( pEvalInfo->paramCount );
 
          pResult = hb_itemNew( NULL );
-         hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
+         hb_itemForwardValue( pResult, &( HB_VM_STACK.Return ) );
       }
       else if( HB_IS_BLOCK( pEvalInfo->pItems[ 0 ] ) )
       {
@@ -165,7 +165,7 @@ PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
          hb_vmSend( pEvalInfo->paramCount );
 
          pResult = hb_itemNew( NULL );
-         hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
+         hb_itemForwardValue( pResult, &( HB_VM_STACK.Return ) );
       }
    }
 
@@ -178,12 +178,12 @@ PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
 
 BOOL hb_evalRelease( PEVALINFO pEvalInfo )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_evalRelease(%p)", pEvalInfo));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_evalRelease(%p)", pEvalInfo ) );
 
    if( pEvalInfo )
    {
-      register USHORT uiParam;
-      register USHORT uiParamCount;
+      register USHORT   uiParam;
+      register USHORT   uiParamCount;
 
       uiParamCount = pEvalInfo->paramCount;
       for( uiParam = 0; uiParam <= uiParamCount; uiParam++ )
@@ -204,7 +204,7 @@ BOOL hb_evalRelease( PEVALINFO pEvalInfo )
          don't need to be duplicated when passed as argument, one line is
          enough to initiate a call, the number of parameters is not limited.
          [vszakats]
-*/
+ */
 
 PHB_ITEM hb_itemDo( PHB_ITEM pItem, HB_SIZE ulPCount, ... )
 {
@@ -212,7 +212,7 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, HB_SIZE ulPCount, ... )
 
    PHB_ITEM pResult = NULL;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_itemDo(%p, %hu, ...)", pItem, ulPCount));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_itemDo(%p, %hu, ...)", pItem, ulPCount ) );
 
    if( pItem )
    {
@@ -246,7 +246,7 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, HB_SIZE ulPCount, ... )
          if( ulPCount )
          {
             register ULONG ulParam;
-            va_list va;
+            va_list        va;
 
             va_start( va, ulPCount );
             for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
@@ -259,7 +259,7 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, HB_SIZE ulPCount, ... )
          hb_vmDo( ( USHORT ) ulPCount );
 
          pResult = hb_itemNew( NULL );
-         hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
+         hb_itemForwardValue( pResult, &( HB_VM_STACK.Return ) );
 
          hb_vmPopState();
       }
@@ -273,7 +273,7 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, HB_SIZE ulPCount, ... )
          if( ulPCount )
          {
             register ULONG ulParam;
-            va_list va;
+            va_list        va;
 
             va_start( va, ulPCount );
             for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
@@ -286,7 +286,7 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, HB_SIZE ulPCount, ... )
          hb_vmSend( ( USHORT ) ulPCount );
 
          pResult = hb_itemNew( NULL );
-         hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
+         hb_itemForwardValue( pResult, &( HB_VM_STACK.Return ) );
 
          hb_vmPopState();
       }
@@ -296,7 +296,7 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, HB_SIZE ulPCount, ... )
          if( hb_execFromArray( pItem ) )
          {
             pResult = hb_itemNew( NULL );
-            hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
+            hb_itemForwardValue( pResult, &( HB_VM_STACK.Return ) );
          }
          hb_vmPopState();
       }
@@ -307,14 +307,14 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, HB_SIZE ulPCount, ... )
 
 /* NOTE: Same as hb_itemDo(), but even simpler, since the function name can be
          directly passed as a zero terminated string. [vszakats]
-*/
+ */
 PHB_ITEM hb_itemDoC( const char * szFunc, HB_SIZE ulPCount, ... )
 {
    HB_THREAD_STUB
 
    PHB_ITEM pResult = NULL;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_itemDoC(%s, %hu, ...)", szFunc, ulPCount));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_itemDoC(%s, %hu, ...)", szFunc, ulPCount ) );
 
    if( szFunc )
    {
@@ -332,7 +332,7 @@ PHB_ITEM hb_itemDoC( const char * szFunc, HB_SIZE ulPCount, ... )
          if( ulPCount )
          {
             register ULONG ulParam;
-            va_list va;
+            va_list        va;
 
             va_start( va, ulPCount );
             for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
@@ -345,7 +345,7 @@ PHB_ITEM hb_itemDoC( const char * szFunc, HB_SIZE ulPCount, ... )
          hb_vmDo( ( USHORT ) ulPCount );
 
          pResult = hb_itemNew( NULL );
-         hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
+         hb_itemForwardValue( pResult, &( HB_VM_STACK.Return ) );
 
          hb_vmPopState();
       }
@@ -356,14 +356,14 @@ PHB_ITEM hb_itemDoC( const char * szFunc, HB_SIZE ulPCount, ... )
 
 /* NOTE: Same as hb_itemDoC(), but has additional second parameter
          which set the reference mask for 1-st 32/64 parametes [druzus]
-*/
+ */
 PHB_ITEM hb_itemDoCRef( char * szFunc, HB_SIZE ulRefMask, HB_SIZE ulPCount, ... )
 {
    HB_THREAD_STUB
 
    PHB_ITEM pResult = NULL;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_itemDoCRef(%s, %hu, %hu, ...)", szFunc, ulRefMask, ulPCount));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_itemDoCRef(%s, %hu, %hu, ...)", szFunc, ulRefMask, ulPCount ) );
 
    if( szFunc )
    {
@@ -379,19 +379,19 @@ PHB_ITEM hb_itemDoCRef( char * szFunc, HB_SIZE ulRefMask, HB_SIZE ulPCount, ... 
 
          if( ulPCount )
          {
-	    PHB_ITEM pItemRefBuf[ sizeof(HB_SIZE) * 8 ];
-            HB_ITEM itmRef;
-            register HB_SIZE ulParam;
-  	    HB_SIZE ulRef = 0;
-            va_list va;
-	    PHB_ITEM *pRefBase;
-            PHB_ITEM pParam;
+            PHB_ITEM          pItemRefBuf[ sizeof( HB_SIZE ) * 8 ];
+            HB_ITEM           itmRef;
+            register HB_SIZE  ulParam;
+            HB_SIZE           ulRef = 0;
+            va_list           va;
+            PHB_ITEM *        pRefBase;
+            PHB_ITEM          pParam;
 
-            pRefBase = pItemRefBuf;
+            pRefBase                                  = pItemRefBuf;
             /* initialize the reference item */
-            itmRef.type = HB_IT_BYREF;
-            itmRef.item.asRefer.offset = -1;
-            itmRef.item.asRefer.BasePtr.itemsbasePtr = &pRefBase;
+            itmRef.type                               = HB_IT_BYREF;
+            itmRef.item.asRefer.offset                = -1;
+            itmRef.item.asRefer.BasePtr.itemsbasePtr  = &pRefBase;
 
             va_start( va, ulPCount );
             for( ulParam = 0; ulParam < ulPCount; ulParam++ )
@@ -401,10 +401,10 @@ PHB_ITEM hb_itemDoCRef( char * szFunc, HB_SIZE ulRefMask, HB_SIZE ulPCount, ... 
                {
                   /* when item is passed by reference then we have to put
                      the reference on the stack instead of the item itself */
-                  pItemRefBuf[ ulRef++ ] = pParam;
-                  itmRef.item.asRefer.value = (LONG) ulRef;
+                  pItemRefBuf[ ulRef++ ]     = pParam;
+                  itmRef.item.asRefer.value  = ( LONG ) ulRef;
 //                hb_vmPush( &itmRef );
-                  pParam = &itmRef;
+                  pParam                     = &itmRef;
                }
                hb_vmPush( pParam );
             }
@@ -414,7 +414,7 @@ PHB_ITEM hb_itemDoCRef( char * szFunc, HB_SIZE ulRefMask, HB_SIZE ulPCount, ... 
          hb_vmDo( ( USHORT ) ulPCount );
 
          pResult = hb_itemNew( NULL );
-         hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
+         hb_itemForwardValue( pResult, &( HB_VM_STACK.Return ) );
 
          hb_vmPopState();
       }
@@ -448,8 +448,8 @@ void hb_evalBlock1( PHB_ITEM pCodeBlock, PHB_ITEM pParam )
 /* same functionality but with a NULL terminated list of parameters */
 void hb_evalBlock( PHB_ITEM pCodeBlock, ... )
 {
-   va_list args;
-   UINT uiParams = 0;
+   va_list  args;
+   UINT     uiParams = 0;
    PHB_ITEM pParam;
 
    hb_vmPushSymbol( &hb_symEval );
@@ -467,51 +467,51 @@ void hb_evalBlock( PHB_ITEM pCodeBlock, ... )
 }
 
 /**********************************************************
-* Indirect execution section
-* HB_ExecFromArray() & relative API
-***********************************************************/
+ * Indirect execution section
+ * HB_ExecFromArray() & relative API
+ ***********************************************************/
 
 
 /* JC1: HB_ExecFromArray executes a function using contents of an array as parameter list
-* Format is:
-* HB_ExecFromArray( aArray ) // aArray = { @Func(),...} or any other format
-* HB_ExecFromArray( @Func(), aArray )
-* HB_ExecFromArray( oObject, @Method(), aArray )
-*
-* 18/11/2003 - FSG - changed to support this new syntax with optional params
-*
-* HB_ExecFromArray( "Func" )
-* HB_ExecFromArray( "Func", aParams )
-* HB_ExecFromArray( @Func() )
-* HB_ExecFromArray( @Func(), aParams )
-* HB_ExecFromArray( bCode )
-* HB_ExecFromArray( bCode, aParams )
-* HB_ExecFromArray( oObject, @Method() )
-* HB_ExecFromArray( oObject, "Method" )
-* HB_ExecFromArray( oObject, @Method(), aArray )
-* HB_ExecFromArray( oObject, "Method", aArray )
-* HB_ExecFromArray( aArray )
-*/
+ * Format is:
+ * HB_ExecFromArray( aArray ) // aArray = { @Func(),...} or any other format
+ * HB_ExecFromArray( @Func(), aArray )
+ * HB_ExecFromArray( oObject, @Method(), aArray )
+ *
+ * 18/11/2003 - FSG - changed to support this new syntax with optional params
+ *
+ * HB_ExecFromArray( "Func" )
+ * HB_ExecFromArray( "Func", aParams )
+ * HB_ExecFromArray( @Func() )
+ * HB_ExecFromArray( @Func(), aParams )
+ * HB_ExecFromArray( bCode )
+ * HB_ExecFromArray( bCode, aParams )
+ * HB_ExecFromArray( oObject, @Method() )
+ * HB_ExecFromArray( oObject, "Method" )
+ * HB_ExecFromArray( oObject, @Method(), aArray )
+ * HB_ExecFromArray( oObject, "Method", aArray )
+ * HB_ExecFromArray( aArray )
+ */
 
 HB_FUNC( HB_EXECFROMARRAY )
 {
    HB_THREAD_STUB_API
 
    register ULONG i;
-   HB_SIZE ulLen = 0;
-   ULONG ulStart = 1;
-   UINT uiPcount = (UINT) hb_pcount();
-   PHB_ITEM pFirst = hb_param( 1, HB_IT_ANY );
-   PHB_ITEM pArgs = NULL;
-   PHB_ITEM pSelf = NULL;
-   PHB_ITEM pString;
-   PHB_DYNS pExecSym = NULL;
-   PHB_SYMB pSymbol = NULL;
+   HB_SIZE        ulLen    = 0;
+   ULONG          ulStart  = 1;
+   UINT           uiPcount = ( UINT ) hb_pcount();
+   PHB_ITEM       pFirst   = hb_param( 1, HB_IT_ANY );
+   PHB_ITEM       pArgs    = NULL;
+   PHB_ITEM       pSelf    = NULL;
+   PHB_ITEM       pString;
+   PHB_DYNS       pExecSym = NULL;
+   PHB_SYMB       pSymbol  = NULL;
 
-   if( HB_IS_OBJECT( pFirst ) && uiPcount == 2)  /* hb_ExecFromArray( oObject, cMessage | pMessage )  */
+   if( HB_IS_OBJECT( pFirst ) && uiPcount == 2 )  /* hb_ExecFromArray( oObject, cMessage | pMessage )  */
    {
-      pSelf = pFirst;
-      pString = hb_param( 2, HB_IT_ANY );
+      pSelf    = pFirst;
+      pString  = hb_param( 2, HB_IT_ANY );
 
       if( pString->type == HB_IT_STRING )
       {
@@ -519,13 +519,13 @@ HB_FUNC( HB_EXECFROMARRAY )
       }
       else if( pString->type == HB_IT_POINTER )
       {
-         pSymbol = (PHB_SYMB) hb_itemGetPtr( pString );
+         pSymbol = ( PHB_SYMB ) hb_itemGetPtr( pString );
       }
    }
-   else if( HB_IS_OBJECT( pFirst ) && uiPcount == 3) /* hb_ExecFromArray( oObject, cMessage | pMessage, { params,... } )  */
+   else if( HB_IS_OBJECT( pFirst ) && uiPcount == 3 ) /* hb_ExecFromArray( oObject, cMessage | pMessage, { params,... } )  */
    {
-      pSelf = pFirst;
-      pString = hb_param( 2, HB_IT_ANY );
+      pSelf    = pFirst;
+      pString  = hb_param( 2, HB_IT_ANY );
 
       if( pString->type == HB_IT_STRING )
       {
@@ -533,49 +533,49 @@ HB_FUNC( HB_EXECFROMARRAY )
       }
       else if( pString->type == HB_IT_POINTER )
       {
-         pSymbol = (PHB_SYMB) hb_itemGetPtr( pString );
+         pSymbol = ( PHB_SYMB ) hb_itemGetPtr( pString );
       }
 
       pArgs = hb_param( 3, HB_IT_ARRAY );
    }
-   else if( pFirst->type == HB_IT_STRING && uiPcount == 1) /* hb_ExecFromArray( cFunc )  */
+   else if( pFirst->type == HB_IT_STRING && uiPcount == 1 ) /* hb_ExecFromArray( cFunc )  */
    {
       pExecSym = hb_dynsymFindName( pFirst->item.asString.value );
    }
-   else if( pFirst->type == HB_IT_STRING && uiPcount == 2) /* hb_ExecFromArray( cFunc, { params,... } )  */
+   else if( pFirst->type == HB_IT_STRING && uiPcount == 2 ) /* hb_ExecFromArray( cFunc, { params,... } )  */
    {
       pExecSym = hb_dynsymFindName( pFirst->item.asString.value );
-      pArgs = hb_param( 2, HB_IT_ARRAY );
+      pArgs    = hb_param( 2, HB_IT_ARRAY );
    }
-   else if( pFirst->type == HB_IT_POINTER && uiPcount == 1)   /* hb_ExecFromArray( pFunc )  */
+   else if( pFirst->type == HB_IT_POINTER && uiPcount == 1 )  /* hb_ExecFromArray( pFunc )  */
    {
-      pSymbol = (PHB_SYMB) hb_itemGetPtr( pFirst );
+      pSymbol = ( PHB_SYMB ) hb_itemGetPtr( pFirst );
    }
-   else if( pFirst->type == HB_IT_POINTER && uiPcount == 2)   /* hb_ExecFromArray( pFunc, { params,... } )  */
+   else if( pFirst->type == HB_IT_POINTER && uiPcount == 2 )  /* hb_ExecFromArray( pFunc, { params,... } )  */
    {
-      pSymbol = (PHB_SYMB) hb_itemGetPtr( pFirst );
-      pArgs = hb_param( 2, HB_IT_ARRAY );
+      pSymbol  = ( PHB_SYMB ) hb_itemGetPtr( pFirst );
+      pArgs    = hb_param( 2, HB_IT_ARRAY );
    }
-   else if ( HB_IS_BLOCK( pFirst ) && uiPcount == 1)       /* hb_ExecFromArray( bCode )  */
+   else if( HB_IS_BLOCK( pFirst ) && uiPcount == 1 )       /* hb_ExecFromArray( bCode )  */
    {
-      pSymbol = &hb_symEval;
-      pSelf = pFirst;
+      pSymbol  = &hb_symEval;
+      pSelf    = pFirst;
    }
    else if( HB_IS_BLOCK( pFirst ) && uiPcount == 2 )      /* hb_ExecFromArray( bCode, { params,... } )  */
    {
-      pSymbol = &hb_symEval;
-      pSelf = pFirst;
-      pArgs = hb_param( 2, HB_IT_ARRAY );
+      pSymbol  = &hb_symEval;
+      pSelf    = pFirst;
+      pArgs    = hb_param( 2, HB_IT_ARRAY );
    }
    else if( HB_IS_ARRAY( pFirst ) )                       /* hb_ExecFromArray( aArray )  */
    {
-      pString = hb_arrayGetItemPtr( pFirst, 1 );
-      pArgs = pFirst;
+      pString  = hb_arrayGetItemPtr( pFirst, 1 );
+      pArgs    = pFirst;
 
-      if( HB_IS_OBJECT( pString ) &&  hb_arrayLen( pFirst ) >= 2 )
+      if( HB_IS_OBJECT( pString ) && hb_arrayLen( pFirst ) >= 2 )
       {
-         pSelf = pString;
-         pString = hb_arrayGetItemPtr( pFirst, 2 );
+         pSelf    = pString;
+         pString  = hb_arrayGetItemPtr( pFirst, 2 );
 
          if( pString->type == HB_IT_STRING )
          {
@@ -583,7 +583,7 @@ HB_FUNC( HB_EXECFROMARRAY )
          }
          else if( pString->type == HB_IT_POINTER )
          {
-            pSymbol = (PHB_SYMB) hb_itemGetPtr( pString );
+            pSymbol = ( PHB_SYMB ) hb_itemGetPtr( pString );
          }
 
          ulStart = 3;
@@ -591,35 +591,35 @@ HB_FUNC( HB_EXECFROMARRAY )
       else if( pString->type == HB_IT_STRING )
       {
          pExecSym = hb_dynsymFindName( pString->item.asString.value );
-         ulStart = 2;
+         ulStart  = 2;
       }
       else if( pString->type == HB_IT_POINTER )
       {
-         pSymbol = (PHB_SYMB) hb_itemGetPtr( pString );
-         ulStart = 2;
+         pSymbol  = ( PHB_SYMB ) hb_itemGetPtr( pString );
+         ulStart  = 2;
       }
-      else if ( HB_IS_BLOCK( pString ) )
+      else if( HB_IS_BLOCK( pString ) )
       {
-         pSelf = pString;
-         pSymbol = &hb_symEval;
-         ulStart = 2;
+         pSelf    = pString;
+         pSymbol  = &hb_symEval;
+         ulStart  = 2;
       }
    }
 
    if( pExecSym )
    {
-     pSymbol =  pExecSym->pSymbol;
+      pSymbol = pExecSym->pSymbol;
    }
 
    if( pSymbol == NULL )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_ExecFromArray", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+      hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_ExecFromArray", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
       return;
    }
 
    hb_vmPushSymbol( pSymbol );
 
-   if ( pSelf )
+   if( pSelf )
    {
       hb_vmPush( pSelf );
    }
@@ -641,11 +641,11 @@ HB_FUNC( HB_EXECFROMARRAY )
 
    if( pSelf )
    {
-      hb_vmSend( (USHORT) ( ulLen - ulStart + 1 ) );
+      hb_vmSend( ( USHORT ) ( ulLen - ulStart + 1 ) );
    }
    else
    {
-      hb_vmDo( (USHORT) ( ulLen - ulStart + 1 ) );
+      hb_vmDo( ( USHORT ) ( ulLen - ulStart + 1 ) );
    }
 }
 
@@ -658,31 +658,31 @@ HB_FUNC( HB_EXECFROMARRAY )
    Returns TRUE if the routine call is sucessful (object returned by
    the called xharbour routine is in HB_VM_STACK.Return), and false if
    call is not possible (e.g. incorrect callable array)
-*/
+ */
 
 BOOL hb_execFromArray( PHB_ITEM pFirst )
 {
    register ULONG i;
-   HB_SIZE ulLen;
-   ULONG ulStart = 1;
-   PHB_ITEM pArgs;
-   PHB_ITEM pString;
-   PHB_ITEM pSelf = NULL;
-   PHB_DYNS pExecSym = NULL;
-   PHB_SYMB pSymbol = NULL;
+   HB_SIZE        ulLen;
+   ULONG          ulStart  = 1;
+   PHB_ITEM       pArgs;
+   PHB_ITEM       pString;
+   PHB_ITEM       pSelf    = NULL;
+   PHB_DYNS       pExecSym = NULL;
+   PHB_SYMB       pSymbol  = NULL;
 
    if( pFirst == NULL || pFirst->type != HB_IT_ARRAY )
    {
       return FALSE;
    }
 
-   pString = hb_arrayGetItemPtr( pFirst, 1 );
-   pArgs = pFirst;
+   pString  = hb_arrayGetItemPtr( pFirst, 1 );
+   pArgs    = pFirst;
 
-   if( HB_IS_OBJECT( pString ) &&  hb_arrayLen( pFirst ) >= 2 )
+   if( HB_IS_OBJECT( pString ) && hb_arrayLen( pFirst ) >= 2 )
    {
-      pSelf = pString;
-      pString = hb_arrayGetItemPtr( pFirst, 2 );
+      pSelf    = pString;
+      pString  = hb_arrayGetItemPtr( pFirst, 2 );
 
       if( pString->type == HB_IT_STRING )
       {
@@ -690,7 +690,7 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
       }
       else if( pString->type == HB_IT_POINTER )
       {
-         pSymbol = (PHB_SYMB) hb_itemGetPtr( pString );
+         pSymbol = ( PHB_SYMB ) hb_itemGetPtr( pString );
       }
 
       ulStart = 3;
@@ -698,17 +698,17 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
    else if( pString->type == HB_IT_STRING )
    {
       pExecSym = hb_dynsymFindName( pString->item.asString.value );
-      ulStart = 2;
+      ulStart  = 2;
    }
    else if( pString->type == HB_IT_POINTER )
    {
-      pSymbol = (PHB_SYMB) hb_itemGetPtr( pString );
-      ulStart = 2;
+      pSymbol  = ( PHB_SYMB ) hb_itemGetPtr( pString );
+      ulStart  = 2;
    }
-   else if ( HB_IS_BLOCK( pString ) )
+   else if( HB_IS_BLOCK( pString ) )
    {
-      pSymbol = &hb_symEval;
-      ulStart = 2;
+      pSymbol  = &hb_symEval;
+      ulStart  = 2;
    }
 
    if( pExecSym )
@@ -723,7 +723,7 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
 
    hb_vmPushSymbol( pSymbol );
 
-   if ( pSelf )
+   if( pSelf )
    {
       hb_vmPush( pSelf );
    }
@@ -742,11 +742,11 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
 
    if( pSelf )
    {
-      hb_vmSend( (USHORT) ( ulLen - ulStart + 1 ) );
+      hb_vmSend( ( USHORT ) ( ulLen - ulStart + 1 ) );
    }
    else
    {
-      hb_vmDo( (USHORT) ( ulLen - ulStart + 1 ) );
+      hb_vmDo( ( USHORT ) ( ulLen - ulStart + 1 ) );
    }
 
    return TRUE;
@@ -763,9 +763,9 @@ HB_FUNC( HB_EXEC )
 
    if( pPointer )
    {
-      PHB_SYMB pSymbol = (PHB_SYMB) hb_itemGetPtr( pPointer );
-      int iParams;
-      BOOL bSend = FALSE;
+      PHB_SYMB pSymbol  = ( PHB_SYMB ) hb_itemGetPtr( pPointer );
+      int      iParams;
+      BOOL     bSend    = FALSE;
 
       if( pSymbol )
       {
@@ -796,16 +796,16 @@ HB_FUNC( HB_EXEC )
       // Changing the Pointer item to a Symbol Item, so that we don't have to re-push paramters.
       hb_itemPutSymbol( pPointer, pSymbol );
       HB_MEMCPY( pPointer->item.asSymbol.pCargo, hb_stackBaseItem()->item.asSymbol.pCargo, sizeof( HB_SYMBCARGO ) );
-      pPointer->item.asSymbol.pCargo->stackbase = ( long ) ( HB_VM_STACK.pBase - HB_VM_STACK.pItems );
+      pPointer->item.asSymbol.pCargo->stackbase    = ( long ) ( HB_VM_STACK.pBase - HB_VM_STACK.pItems );
       pPointer->item.asSymbol.pCargo->uiSuperClass = 0;
 
       if( bSend )
       {
-         hb_vmSend( (USHORT) iParams );
+         hb_vmSend( ( USHORT ) iParams );
       }
       else
       {
-         hb_vmDo( (USHORT) iParams );
+         hb_vmDo( ( USHORT ) iParams );
       }
 
       return;

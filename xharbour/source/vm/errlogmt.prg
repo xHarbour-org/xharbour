@@ -53,14 +53,15 @@
 
 PROCEDURE HB_ERROR_MT( nHandle, oErr, bBlock )
 
-   #ifdef HB_THREAD_SUPPORT
-      Fwrite( nHandle, "Running threads ...: " + Eval( bBlock, oErr:RunningThreads() ) + HB_OsNewLine() )
-      Fwrite( nHandle, "VM thread ID ......: " + Eval( bBlock, oErr:VmThreadId() ) + HB_OsNewLine() )
-      Fwrite( nHandle, "OS thread ID ......: " + Eval( bBlock, oErr:OsThreadId() ) + HB_OsNewLine() )
-   #else
-      HB_SYMBOL_UNUSED( nHandle )
-      HB_SYMBOL_UNUSED( oErr )
-      HB_SYMBOL_UNUSED( bBlock )
-   #endif
+#ifdef HB_THREAD_SUPPORT
+
+   FWrite( nHandle, "Running threads ...: " + Eval( bBlock, oErr:RunningThreads() ) + hb_osNewLine() )
+   FWrite( nHandle, "VM thread ID ......: " + Eval( bBlock, oErr:VmThreadId() ) + hb_osNewLine() )
+   FWrite( nHandle, "OS thread ID ......: " + Eval( bBlock, oErr:OsThreadId() ) + hb_osNewLine() )
+#else
+   HB_SYMBOL_UNUSED( nHandle )
+   HB_SYMBOL_UNUSED( oErr )
+   HB_SYMBOL_UNUSED( bBlock )
+#endif
 
    RETURN

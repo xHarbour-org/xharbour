@@ -42,9 +42,9 @@ HB_FUNC( THROW )
 
    if( pError && HB_IS_OBJECT( pError ) )
    {
-      pError = hb_itemNew( pError );
+      pError   = hb_itemNew( pError );
 
-      pResult = hb_errLaunchSubst( pError );
+      pResult  = hb_errLaunchSubst( pError );
 
       hb_itemRelease( pError );
 

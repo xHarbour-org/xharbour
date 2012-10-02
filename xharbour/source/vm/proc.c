@@ -110,21 +110,21 @@ HB_FUNC( PROCFILE )
 
 /* NOTE: szName size must be an at least: HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 */
 
-char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName  )
+char * hb_procinfo( int iLevel, char * szName, USHORT * uLine, char * szModuleName  )
 {
-   PHB_ITEM * pBase, pSelf;
-   USHORT uiSuperClass;
-   long lOffset;
+   PHB_ITEM *  pBase, pSelf;
+   USHORT      uiSuperClass;
+   long        lOffset;
 
    // Default and safety to empty string.
    if( szName )
    {
-      szName[0] = '\0';
+      szName[ 0 ] = '\0';
    }
 
    if( szModuleName )
    {
-      szModuleName[0] = '\0';
+      szModuleName[ 0 ] = '\0';
    }
 
    if( uLine )
@@ -169,7 +169,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
                hb_xstrcpy( szName, hb_objGetClsName( pSelf ), 0 );
             }
 
-            hb_xstrcat( szName, ":", ( *pBase )->item.asSymbol.value->szName , 0 );
+            hb_xstrcat( szName, ":", ( *pBase )->item.asSymbol.value->szName, 0 );
          }
          else if( HB_IS_BLOCK( pSelf ) )  /* it is a Block Evaluation. */
          {
@@ -191,7 +191,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
          }
          else
          {
-            const char *pPureName = strrchr( ( *pBase )->item.asSymbol.value->szName, '.' );
+            const char * pPureName = strrchr( ( *pBase )->item.asSymbol.value->szName, '.' );
 
             if( pPureName )
             {
@@ -223,84 +223,84 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
       if( szModuleName )
       {
          #if 0
-            if( HB_IS_OBJECT( pSelf ) ) /* it is a method name */
+         if( HB_IS_OBJECT( pSelf ) )    /* it is a method name */
+         {
+            // Find the real module where the Method is defined.
+            if( ( *pBase )->item.asSymbol.pCargo->uiSuperClass )
             {
-               // Find the real module where the Method is defined.
-               if( ( *pBase )->item.asSymbol.pCargo->uiSuperClass )
+               uiSuperClass = ( *pBase )->item.asSymbol.uiSuperClass;
+            }
+            else
+            {
+               if( pSelf->item.asArray.value->puiClsTree && pSelf->item.asArray.value->puiClsTree[ 0 ] )
                {
-                  uiSuperClass = ( *pBase )->item.asSymbol.uiSuperClass;
+                  // Save.
+                  UINT uiPos = pSelf->item.asArray.value->puiClsTree[ 0 ];
+
+                  // Hide.
+                  pSelf->item.asArray.value->puiClsTree[ 0 ]   = 0;
+
+                  uiSuperClass                                 = hb_objGetRealCls( pSelf, ( *pBase )->item.asSymbol.value->szName );
+
+                  // Restore.
+                  pSelf->item.asArray.value->puiClsTree[ 0 ]   = uiPos;
                }
                else
                {
-                  if( pSelf->item.asArray.value->puiClsTree && pSelf->item.asArray.value->puiClsTree[0] )
-                  {
-                     // Save.
-                     UINT uiPos = pSelf->item.asArray.value->puiClsTree[0];
-
-                     // Hide.
-                     pSelf->item.asArray.value->puiClsTree[0] = 0;
-
-                     uiSuperClass = hb_objGetRealCls( pSelf, ( *pBase )->item.asSymbol.value->szName );
-
-                     // Restore.
-                     pSelf->item.asArray.value->puiClsTree[0] = uiPos;
-                  }
-                  else
-                  {
-                     uiSuperClass = hb_objGetRealCls( pSelf, ( *pBase )->item.asSymbol.value->szName );
-                  }
-
-                  if( uiSuperClass == 0 )
-                  {
-                     uiSuperClass = pSelf->item.asArray.value->uiClass;
-                  }
+                  uiSuperClass = hb_objGetRealCls( pSelf, ( *pBase )->item.asSymbol.value->szName );
                }
 
-               if( uiSuperClass <= hb_clsMaxClasses() )
+               if( uiSuperClass == 0 )
                {
-                  PCLASS pClass = hb_clsClassesArray() + uiSuperClass - 1;
-
-                  if( pClass->pModuleSymbols && pClass->pModuleSymbols->szModuleName )
-                  {
-                     hb_xstrcpy( szModuleName, pClass->pModuleSymbols->szModuleName, 0 );
-                  }
-               }
-               else
-               {
-                  TraceLog( "Error.log", "Corrupted object, points to invalid class id: %i of %i", pSelf->item.asArray.value->uiClass, hb_clsMaxClasses() );
-                  hb_errInternal( HB_EI_ERRUNRECOV, "Corrupted object, points to invalid class id!", NULL, NULL );
+                  uiSuperClass = pSelf->item.asArray.value->uiClass;
                }
             }
-            else if( HB_IS_BLOCK( pSelf ) )  /* it is a Block Evaluation. */
-            {
-               PSYMBOLS pBlockModuleSymbols = pSelf->item.asBlock.value->pModuleSymbols;
 
-               if( pBlockModuleSymbols && pBlockModuleSymbols->szModuleName )
+            if( uiSuperClass <= hb_clsMaxClasses() )
+            {
+               PCLASS pClass = hb_clsClassesArray() + uiSuperClass - 1;
+
+               if( pClass->pModuleSymbols && pClass->pModuleSymbols->szModuleName )
                {
-                  hb_xstrcpy( szModuleName, pBlockModuleSymbols->szModuleName, 0 );
+                  hb_xstrcpy( szModuleName, pClass->pModuleSymbols->szModuleName, 0 );
                }
             }
             else
+            {
+               TraceLog( "Error.log", "Corrupted object, points to invalid class id: %i of %i", pSelf->item.asArray.value->uiClass, hb_clsMaxClasses() );
+               hb_errInternal( HB_EI_ERRUNRECOV, "Corrupted object, points to invalid class id!", NULL, NULL );
+            }
+         }
+         else if( HB_IS_BLOCK( pSelf ) )     /* it is a Block Evaluation. */
+         {
+            PSYMBOLS pBlockModuleSymbols = pSelf->item.asBlock.value->pModuleSymbols;
+
+            if( pBlockModuleSymbols && pBlockModuleSymbols->szModuleName )
+            {
+               hb_xstrcpy( szModuleName, pBlockModuleSymbols->szModuleName, 0 );
+            }
+         }
+         else
 
          #else
 
+         {
+            if( pBase )
             {
-               if( pBase )
+               PSYMBOLS pModuleSymbols = HB_BASE_GETMODULESYM( pBase );
+
+               //TraceLog( NULL, "Sym: %s Dyn: %p Module: %p\n", hb_itemGetSymbol( *pBase )->szName, hb_itemGetSymbol( *pBase )->pDynSym, pModuleSymbols );
+
+               if( pModuleSymbols && pModuleSymbols->szModuleName )
                {
-                  PSYMBOLS pModuleSymbols = HB_BASE_GETMODULESYM( pBase );
-
-                  //TraceLog( NULL, "Sym: %s Dyn: %p Module: %p\n", hb_itemGetSymbol( *pBase )->szName, hb_itemGetSymbol( *pBase )->pDynSym, pModuleSymbols );
-
-                  if( pModuleSymbols && pModuleSymbols->szModuleName )
-                  {
-                     hb_xstrcpy( szModuleName, pModuleSymbols->szModuleName, 0 );
-                  }
+                  hb_xstrcpy( szModuleName, pModuleSymbols->szModuleName, 0 );
                }
             }
+         }
 
          #endif
-      }
-   }
+            }
+            }
 
-   return szName;
-}
+            return szName;
+      }

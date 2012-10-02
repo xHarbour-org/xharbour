@@ -62,7 +62,7 @@
 #include "hbstack.h"
 #include "hbvm.h"
 
-#if defined(HB_OS_UNIX) && !defined(__WATCOMC__)
+#if defined( HB_OS_UNIX ) && ! defined( __WATCOMC__ )
 #include <dlfcn.h>
 #endif
 
@@ -70,38 +70,39 @@
 
 HB_FUNC( LIBLOAD )
 {
-   #if defined(HB_OS_OS2)
-   UCHAR LoadError[256] = "";    /* Area for Load failure information */
-   HMODULE hDynModule;
+   #if defined( HB_OS_OS2 )
+   UCHAR    LoadError[ 256 ] = ""; /* Area for Load failure information */
+   HMODULE  hDynModule;
    #endif
 
-   void * hDynLib = NULL;
+   void *   hDynLib = NULL;
 
-#if defined(HB_OS_WIN) || ( defined(HB_OS_LINUX) && !defined(__WATCOMC__) ) || defined(HB_OS_OS2)
+#if defined( HB_OS_WIN ) || ( defined( HB_OS_LINUX ) && ! defined( __WATCOMC__ ) ) || defined( HB_OS_OS2 )
 
    if( hb_parclen( 1 ) > 0 )
    {
-      int argc = hb_pcount() - 1, i;
-      char **argv = NULL;
+      int      argc  = hb_pcount() - 1, i;
+      char **  argv  = NULL;
 
       if( argc > 0 )
       {
-         argv = ( char** ) hb_xgrab( sizeof( char* ) * argc );
+         argv = ( char ** ) hb_xgrab( sizeof( char * ) * argc );
          for( i = 0; i < argc; ++i )
          {
-            argv[i] = (char*) hb_parcx( i + 2 );
+            argv[ i ] = ( char * ) hb_parcx( i + 2 );
          }
       }
 
       /* use stack address as first level marker */
       hb_vmBeginSymbolGroup( ( void * ) &HB_VM_STACK, TRUE );
 
-      #if defined(HB_OS_WIN)
-      hDynLib = ( void * ) LoadLibrary( hb_parc( 1 ) );
-      #elif defined(HB_OS_LINUX) && !defined(__WATCOMC__)
-      hDynLib = ( void * ) dlopen( hb_parc( 1 ), RTLD_LAZY | RTLD_GLOBAL );
-      #elif defined(HB_OS_OS2)
-      if ( DosLoadModule( LoadError, sizeof( LoadError ), hb_parc( 1 ), &hDynModule ) == NO_ERROR ) {
+      #if defined( HB_OS_WIN )
+      hDynLib  = ( void * ) LoadLibrary( hb_parc( 1 ) );
+      #elif defined( HB_OS_LINUX ) && ! defined( __WATCOMC__ )
+      hDynLib  = ( void * ) dlopen( hb_parc( 1 ), RTLD_LAZY | RTLD_GLOBAL );
+      #elif defined( HB_OS_OS2 )
+      if( DosLoadModule( LoadError, sizeof( LoadError ), hb_parc( 1 ), &hDynModule ) == NO_ERROR )
+      {
          hDynLib = ( void * ) hDynModule;
       }
       #endif
@@ -122,7 +123,7 @@ HB_FUNC( LIBLOAD )
 
 HB_FUNC( LIBFREE )
 {
-#if defined(HB_OS_WIN) || ( defined(HB_OS_UNIX) && !defined(__WATCOMC__) ) || defined(HB_OS_OS2)
+#if defined( HB_OS_WIN ) || ( defined( HB_OS_UNIX ) && ! defined( __WATCOMC__ ) ) || defined( HB_OS_OS2 )
 
    void * hDynLib = hb_parptr( 1 );
 
@@ -130,12 +131,12 @@ HB_FUNC( LIBFREE )
    {
       hb_vmExitSymbolGroup( hDynLib );
 
-      #if defined(HB_OS_WIN)
+      #if defined( HB_OS_WIN )
       hb_retl( FreeLibrary( ( HMODULE ) hDynLib ) );
-      #elif defined(HB_OS_UNIX) && !defined(__WATCOMC__)
+      #elif defined( HB_OS_UNIX ) && ! defined( __WATCOMC__ )
       hb_retl( dlclose( hDynLib ) == 0 );
-      #elif defined(HB_OS_OS2)
-      hb_retl( DosFreeModule( (HMODULE) hDynLib ) == NO_ERROR );
+      #elif defined( HB_OS_OS2 )
+      hb_retl( DosFreeModule( ( HMODULE ) hDynLib ) == NO_ERROR );
       #endif
 
    }
@@ -150,7 +151,7 @@ HB_FUNC( LIBFREE )
 
 HB_FUNC( LIBERROR )
 {
-#if defined(HB_OS_UNIX) && !defined(__WATCOMC__)
+#if defined( HB_OS_UNIX ) && ! defined( __WATCOMC__ )
    hb_retc( dlerror() );
 #else
    hb_retc( NULL );
@@ -171,8 +172,8 @@ HB_FUNC( HB_LIBDO )
 
       if( pDynSym )
       {
-         USHORT uiPCount = hb_pcount();
-         USHORT uiParam;
+         USHORT   uiPCount = hb_pcount();
+         USHORT   uiParam;
 
          hb_vmPushSymbol( pDynSym->pSymbol );
          hb_vmPushNil();

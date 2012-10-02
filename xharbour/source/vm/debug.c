@@ -66,12 +66,12 @@ static void AddToArray( PHB_ITEM pItem, PHB_ITEM pReturn, ULONG ulPos )
 {
    HB_ITEM_NEW( Temp );
 
-   HB_TRACE(HB_TR_DEBUG, ("AddToArray(%p, %p, %lu)", pItem, pReturn, ulPos));
+   HB_TRACE( HB_TR_DEBUG, ( "AddToArray(%p, %p, %lu)", pItem, pReturn, ulPos ) );
 
    if( pItem->type == HB_IT_SYMBOL )
    {
-      int iLen = (int) strlen( pItem->item.asSymbol.value->szName ) + 2;
-      char *sTemp = (char *) hb_xgrab( iLen + 1 );
+      int      iLen  = ( int ) strlen( pItem->item.asSymbol.value->szName ) + 2;
+      char *   sTemp = ( char * ) hb_xgrab( iLen + 1 );
 
       hb_snprintf( sTemp, iLen + 1, "[%s]", pItem->item.asSymbol.value->szName );
 
@@ -92,10 +92,10 @@ static void AddToArray( PHB_ITEM pItem, PHB_ITEM pReturn, ULONG ulPos )
  * $End$ */
 static USHORT hb_stackLenGlobal( void )
 {
-   PHB_ITEM * pItem;
-   USHORT uiCount = 0;
+   PHB_ITEM *  pItem;
+   USHORT      uiCount = 0;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_stackLenGlobal()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_stackLenGlobal()" ) );
 
    for( pItem = HB_VM_STACK.pItems; pItem <= HB_VM_STACK.pPos; uiCount++ )
    {
@@ -116,11 +116,11 @@ HB_FUNC( HB_DBG_VMSTKGCOUNT )
  * $End$ */
 HB_FUNC( HB_DBG_VMSTKGLIST )
 {
-   HB_ITEM Return;
-   PHB_ITEM * pItem;
+   HB_ITEM     Return;
+   PHB_ITEM *  pItem;
 
-   USHORT uiLen = hb_stackLenGlobal();
-   USHORT uiPos = 1;
+   USHORT      uiLen = hb_stackLenGlobal();
+   USHORT      uiPos = 1;
 
    Return.type = HB_IT_NIL;
    hb_arrayNew( &Return, uiLen );           /* Create a transfer array  */
@@ -139,15 +139,15 @@ HB_FUNC( HB_DBG_VMSTKGLIST )
  * $End$ */
 static USHORT hb_stackLen( int iLevel )
 {
-   PHB_ITEM * pBase = HB_VM_STACK.pBase;
-   USHORT uiCount = 0;
+   PHB_ITEM *  pBase    = HB_VM_STACK.pBase;
+   USHORT      uiCount  = 0;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_stackLen()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_stackLen()" ) );
 
    while( ( iLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
    {
-      uiCount = ( USHORT ) ( pBase - ( HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase ) - 2 );
-      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase;
+      uiCount  = ( USHORT ) ( pBase - ( HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase ) - 2 );
+      pBase    = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase;
    }
 
    return uiCount;
@@ -171,12 +171,12 @@ HB_FUNC( HB_DBG_VMSTKLCOUNT )
  * $End$ */
 HB_FUNC( HB_DBG_VMSTKLLIST )
 {
-   HB_ITEM Return;
-   PHB_ITEM * pItem;
-   PHB_ITEM * pBase = HB_VM_STACK.pItems + hb_stackBaseItem()->item.asSymbol.pCargo->stackbase;
+   HB_ITEM     Return;
+   PHB_ITEM *  pItem;
+   PHB_ITEM *  pBase = HB_VM_STACK.pItems + hb_stackBaseItem()->item.asSymbol.pCargo->stackbase;
 
-   USHORT uiLen = (USHORT) hb_stackLen( 1 );
-   USHORT uiPos = 1;
+   USHORT      uiLen = ( USHORT ) hb_stackLen( 1 );
+   USHORT      uiPos = 1;
 
    Return.type = HB_IT_NIL;
    hb_arrayNew( &Return, uiLen );           /* Create a transfer array  */
@@ -193,23 +193,23 @@ HB_FUNC( HB_DBG_VMSTKLLIST )
  * $FuncName$     <aParam> hb_dbg_vmParLGet()
  * $Description$  Returns the passed parameters of the calling function
  * $End$ */
-               /* TODO : put bLocals / bParams      */
-               /* somewhere for declared parameters */
-               /* and locals                        */
+/* TODO : put bLocals / bParams      */
+/* somewhere for declared parameters */
+/* and locals                        */
 HB_FUNC( HB_DBG_VMPARLLIST )
 {
-   int iLevel = hb_parni( 1 ) + 1;
-   PHB_ITEM * pBase = HB_VM_STACK.pBase;
-   HB_ITEM Return;
-   PHB_ITEM * pItem;
-   USHORT uiLen, uiPos = 1;
+   int         iLevel   = hb_parni( 1 ) + 1;
+   PHB_ITEM *  pBase    = HB_VM_STACK.pBase;
+   HB_ITEM     Return;
+   PHB_ITEM *  pItem;
+   USHORT      uiLen, uiPos = 1;
 
    while( iLevel-- > 0 && pBase != HB_VM_STACK.pItems )
    {
       pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase;
    }
 
-   uiLen = ( * pBase )->item.asSymbol.pCargo->arguments;
+   uiLen       = ( *pBase )->item.asSymbol.pCargo->arguments;
 
    Return.type = HB_IT_NIL;
    hb_arrayNew( &Return, uiLen );           /* Create a transfer array  */
@@ -222,7 +222,7 @@ HB_FUNC( HB_DBG_VMPARLLIST )
    hb_itemReturnForward( &Return );
 }
 
-static void hb_dbgStop(void)
+static void hb_dbgStop( void )
 {
 }
 
@@ -245,11 +245,11 @@ PHB_ITEM hb_dbg_vmVarLGet( int iLevel, int iLocal )
 
    if( iLocal >= 0 )
    {
-      return hb_itemUnRef( *(pBase + 1 + iLocal) );
+      return hb_itemUnRef( *( pBase + 1 + iLocal ) );
    }
-   if ( HB_IS_BLOCK( *(pBase+1) ) )
+   if( HB_IS_BLOCK( *( pBase + 1 ) ) )
    {
-      return hb_codeblockGetVar( *(pBase+1), ( LONG ) iLocal );
+      return hb_codeblockGetVar( *( pBase + 1 ), ( LONG ) iLocal );
    }
    return NULL;
 }
@@ -257,9 +257,9 @@ HB_EXTERN_END
 
 HB_FUNC( HB_DBG_VMVARLGET )
 {
-   int iLevel = hb_parni( 1 ) + 1;
-   int iLocal = hb_parni( 2 );
-   PHB_ITEM pLocal = hb_dbg_vmVarLGet( iLevel, iLocal );
+   int      iLevel   = hb_parni( 1 ) + 1;
+   int      iLocal   = hb_parni( 2 );
+   PHB_ITEM pLocal   = hb_dbg_vmVarLGet( iLevel, iLocal );
 
    if( pLocal )
    {
@@ -273,10 +273,10 @@ HB_FUNC( HB_DBG_VMVARLGET )
 
 HB_FUNC( HB_DBG_VMVARLSET )
 {
-   int iLevel = hb_parni( 1 ) + 1;
-   int iLocal = hb_parni( 2 );
-   PHB_ITEM * pBase = HB_VM_STACK.pBase;
-   PHB_ITEM pLocal;
+   int         iLevel   = hb_parni( 1 ) + 1;
+   int         iLocal   = hb_parni( 2 );
+   PHB_ITEM *  pBase    = HB_VM_STACK.pBase;
+   PHB_ITEM    pLocal;
 
    while( ( iLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
    {
@@ -289,11 +289,11 @@ HB_FUNC( HB_DBG_VMVARLSET )
       iLocal--;
    }
    if( iLocal >= 0 )
-     pLocal = *(pBase + 1 + iLocal);
+      pLocal = *( pBase + 1 + iLocal );
    else
-     pLocal = hb_codeblockGetVar( *(pBase+1), ( LONG ) iLocal );
+      pLocal = hb_codeblockGetVar( *( pBase + 1 ), ( LONG ) iLocal );
 
-   hb_itemCopy( hb_itemUnRef(pLocal), *(HB_VM_STACK.pBase + 4) );
+   hb_itemCopy( hb_itemUnRef( pLocal ), *( HB_VM_STACK.pBase + 4 ) );
 }
 
 HB_FUNC( __VMSTKLCOUNT )

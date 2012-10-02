@@ -53,7 +53,7 @@
 
 #define _HB_STACK_LOCAL_MACROS_
 
-#  if !defined( HB_VM_ALL )
+#  if ! defined( HB_VM_ALL )
       #define HB_VM_ALL
 #  endif
 
@@ -62,13 +62,13 @@
 #include "thread.h"
 
 #  if defined( HB_THREAD_SUPPORT )
-      static DWORD    hb_dwCurrentStack;
-      static HB_STACK hb_stackMT;
+static DWORD      hb_dwCurrentStack;
+static HB_STACK   hb_stackMT;
 #  else
-      static HB_STACK hb_stackST;
+static HB_STACK   hb_stackST;
 #  endif
 
-   static BOOL hb_stack_ready = FALSE;
+static BOOL       hb_stack_ready = FALSE;
 
 #include "hvm.c"
 #include "itemapi.c"

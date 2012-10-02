@@ -88,25 +88,25 @@ typedef struct HB_SET_LISTENER_
 
 typedef struct
 {
-   PHB_SET_LISTENER  first;
-   PHB_SET_LISTENER  last;
-   int               counter;
+   PHB_SET_LISTENER first;
+   PHB_SET_LISTENER last;
+   int counter;
 } HB_SET_LISTENER_LST, * PHB_SET_LISTENER_LST;
 
-#if defined(HB_OS_WIN) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
-      extern BOOL hb_PrinterExists(LPTSTR pPrinterName) ;
-      extern LONG hb_PrintFileRaw( const char * cPrinterName, const char * cFileName, const char * cDocName ) ;
-      extern BOOL hb_GetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize);
-      extern BOOL hb_isLegacyDevice( LPTSTR pPrinterName);
+#if defined( HB_OS_WIN ) && ( ! defined( __RSXNT__ ) ) && ( ! defined( __CYGWIN__ ) )
+extern BOOL hb_PrinterExists( LPTSTR pPrinterName );
+extern LONG hb_PrintFileRaw( const char * cPrinterName, const char * cFileName, const char * cDocName );
+extern BOOL hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize );
+extern BOOL hb_isLegacyDevice( LPTSTR pPrinterName );
 #endif
-char s_PrintFileName[ HB_PATH_MAX ], s_PrinterName[ HB_PATH_MAX ];
-BOOL s_isDefaultPrinterDevice;    // Printer is the default device
+char  s_PrintFileName[ HB_PATH_MAX ], s_PrinterName[ HB_PATH_MAX ];
+BOOL  s_isDefaultPrinterDevice;   // Printer is the default device
 
 static char set_char( PHB_ITEM pItem, char oldChar )
 {
    char newChar = oldChar;
 
-   HB_TRACE(HB_TR_DEBUG, ("set_char(%p, %c)", pItem, oldChar));
+   HB_TRACE( HB_TR_DEBUG, ( "set_char(%p, %c)", pItem, oldChar ) );
 
    if( HB_IS_STRING( pItem ) )
    {
@@ -129,23 +129,23 @@ static BOOL set_logical( PHB_ITEM pItem, BOOL bDefault )
 {
    BOOL bLogical = bDefault;
 
-   HB_TRACE(HB_TR_DEBUG, ("set_logical(%p)", pItem));
+   HB_TRACE( HB_TR_DEBUG, ( "set_logical(%p)", pItem ) );
 
    if( HB_IS_LOGICAL( pItem ) )
       bLogical = hb_itemGetL( pItem );
    else if( HB_IS_STRING( pItem ) )
    {
-      char * szString = hb_itemGetCPtr( pItem );
-      HB_SIZE ulLen = hb_itemGetCLen( pItem );
+      char *   szString = hb_itemGetCPtr( pItem );
+      HB_SIZE  ulLen    = hb_itemGetCLen( pItem );
 
       if( ulLen >= 2
-       && HB_TOUPPER( ( UCHAR ) szString[ 0 ] ) == 'O'
-       && HB_TOUPPER( ( UCHAR ) szString[ 1 ] ) == 'N' )
+          && HB_TOUPPER( ( UCHAR ) szString[ 0 ] ) == 'O'
+          && HB_TOUPPER( ( UCHAR ) szString[ 1 ] ) == 'N' )
          bLogical = TRUE;
       else if( ulLen >= 3
-       && HB_TOUPPER( ( UCHAR ) szString[ 0 ] ) == 'O'
-       && HB_TOUPPER( ( UCHAR ) szString[ 1 ] ) == 'F'
-       && HB_TOUPPER( ( UCHAR ) szString[ 2 ] ) == 'F' )
+               && HB_TOUPPER( ( UCHAR ) szString[ 0 ] ) == 'O'
+               && HB_TOUPPER( ( UCHAR ) szString[ 1 ] ) == 'F'
+               && HB_TOUPPER( ( UCHAR ) szString[ 2 ] ) == 'F' )
          bLogical = FALSE;
    }
 
@@ -154,7 +154,7 @@ static BOOL set_logical( PHB_ITEM pItem, BOOL bDefault )
 
 static int set_number( PHB_ITEM pItem, int iOldValue )
 {
-   HB_TRACE(HB_TR_DEBUG, ("set_number(%p, %d)", pItem, iOldValue));
+   HB_TRACE( HB_TR_DEBUG, ( "set_number(%p, %d)", pItem, iOldValue ) );
 
    return HB_IS_NUMERIC( pItem ) ? hb_itemGetNI( pItem ) : iOldValue;
 }
@@ -163,7 +163,7 @@ static char * set_string( PHB_ITEM pItem, char * szOldString )
 {
    char * szString;
 
-   HB_TRACE(HB_TR_DEBUG, ("set_string(%p, %s)", pItem, szOldString));
+   HB_TRACE( HB_TR_DEBUG, ( "set_string(%p, %s)", pItem, szOldString ) );
 
    if( HB_IS_STRING( pItem ) || HB_IS_NIL( pItem ) )
    {
@@ -180,7 +180,7 @@ static char * set_string( PHB_ITEM pItem, char * szOldString )
 
 static void close_binary( PHB_SET_STRUCT pSet, HB_FHANDLE handle )
 {
-   HB_TRACE(HB_TR_DEBUG, ("close_binary(%p,%p)", pSet, ( void * ) ( HB_PTRDIFF ) handle));
+   HB_TRACE( HB_TR_DEBUG, ( "close_binary(%p,%p)", pSet, ( void * ) ( HB_PTRDIFF ) handle ) );
 
    if( handle != FS_ERROR )
    {
@@ -189,13 +189,13 @@ static void close_binary( PHB_SET_STRUCT pSet, HB_FHANDLE handle )
       USHORT user_ferror = hb_fsError();
       hb_fsClose( handle );
       hb_fsSetError( user_ferror );
-#if defined(HB_OS_WIN) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
-      if ( pSet->hb_set_winprinter && ( pSet->hb_set_printhan == handle ) && s_PrintFileName[0] )
+#if defined( HB_OS_WIN ) && ( ! defined( __RSXNT__ ) ) && ( ! defined( __CYGWIN__ ) )
+      if( pSet->hb_set_winprinter && ( pSet->hb_set_printhan == handle ) && s_PrintFileName[ 0 ] )
       {
-         if ( hb_fsFSize( s_PrintFileName, FALSE ) > 0 )
+         if( hb_fsFSize( s_PrintFileName, FALSE ) > 0 )
          {
             hb_PrintFileRaw( s_PrinterName, s_PrintFileName,
-                            ( pSet->hb_set_printerjob ? pSet->hb_set_printerjob : s_PrintFileName ) ) ;
+                             ( pSet->hb_set_printerjob ? pSet->hb_set_printerjob : s_PrintFileName ) );
          }
          hb_fsDelete( s_PrintFileName );
       }
@@ -207,7 +207,7 @@ static void close_binary( PHB_SET_STRUCT pSet, HB_FHANDLE handle )
 
 static void close_text( PHB_SET_STRUCT pSet, HB_FHANDLE handle )
 {
-   HB_TRACE(HB_TR_DEBUG, ("close_text(%p,%p)", pSet, ( void * ) ( HB_PTRDIFF ) handle));
+   HB_TRACE( HB_TR_DEBUG, ( "close_text(%p,%p)", pSet, ( void * ) ( HB_PTRDIFF ) handle ) );
 
    if( handle != FS_ERROR )
    {
@@ -225,19 +225,20 @@ static void close_text( PHB_SET_STRUCT pSet, HB_FHANDLE handle )
 
 static HB_FHANDLE open_handle( PHB_SET_STRUCT pSet, const char * file_name, BOOL bAppend, const char * def_ext, HB_set_enum set_specifier )
 {
-   USHORT user_ferror;
-   HB_FHANDLE handle;
-   char path[ HB_PATH_MAX ];
-   const char * szPrnFile;
-   BOOL bPipe = FALSE, bTemp = FALSE;
-   HB_TRACE(HB_TR_DEBUG, ("open_handle(%p, %s, %d, %s, %d)", pSet, file_name, (int) bAppend, def_ext, (int) set_specifier));
+   USHORT         user_ferror;
+   HB_FHANDLE     handle;
+   char           path[ HB_PATH_MAX ];
+   const char *   szPrnFile;
+   BOOL           bPipe = FALSE, bTemp = FALSE;
+
+   HB_TRACE( HB_TR_DEBUG, ( "open_handle(%p, %s, %d, %s, %d)", pSet, file_name, ( int ) bAppend, def_ext, ( int ) set_specifier ) );
 
    user_ferror = hb_fsError(); /* Save the current user file error code */
    /* Create full filename */
 
-   szPrnFile = path;
-#if defined(HB_OS_UNIX)
-   bPipe = set_specifier == HB_SET_PRINTFILE && file_name[ 0 ] == '|';
+   szPrnFile   = path;
+#if defined( HB_OS_UNIX )
+   bPipe       = set_specifier == HB_SET_PRINTFILE && file_name[ 0 ] == '|';
    if( bPipe )
    {
       szPrnFile = file_name;
@@ -256,22 +257,22 @@ static HB_FHANDLE open_handle( PHB_SET_STRUCT pSet, const char * file_name, BOOL
       hb_fsFNameMerge( path, pFilename );
       hb_xfree( pFilename );
 
-      hb_xstrcpy(s_PrinterName, file_name, 0) ;
-#if defined(HB_OS_WIN) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
-      if ( set_specifier == HB_SET_PRINTFILE )
+      hb_xstrcpy( s_PrinterName, file_name, 0 );
+#if defined( HB_OS_WIN ) && ( ! defined( __RSXNT__ ) ) && ( ! defined( __CYGWIN__ ) )
+      if( set_specifier == HB_SET_PRINTFILE )
       {
-         if ( hb_stricmp( s_PrinterName, "prn" ) == 0 )
+         if( hb_stricmp( s_PrinterName, "prn" ) == 0 )
          {
             DWORD nSize = HB_PATH_MAX - 1;
-            hb_GetDefaultPrinter( (LPTSTR) s_PrinterName, &nSize );
-            if ( !s_PrinterName[0] )
-               hb_xstrcpy( s_PrinterName, "lpt1", 0 ) ;
+            hb_GetDefaultPrinter( ( LPTSTR ) s_PrinterName, &nSize );
+            if( ! s_PrinterName[ 0 ] )
+               hb_xstrcpy( s_PrinterName, "lpt1", 0 );
          }
          pSet->hb_set_winprinter = hb_PrinterExists( s_PrinterName );
-         if ( pSet->hb_set_winprinter )
+         if( pSet->hb_set_winprinter )
          {
-            szPrnFile = s_PrintFileName;
-            bTemp = TRUE;
+            szPrnFile   = s_PrintFileName;
+            bTemp       = TRUE;
          }
       }
 #endif
@@ -289,49 +290,48 @@ static HB_FHANDLE open_handle( PHB_SET_STRUCT pSet, const char * file_name, BOOL
 
       if( bPipe )
          handle = hb_fsPOpen( file_name, "w" );
-      else if ( bTemp )
+      else if( bTemp )
          handle = hb_fsCreateTemp( NULL, NULL, FC_NORMAL, s_PrintFileName );
       else
       {
-         if( bAppend )
-         {  /* Append mode */
-            if( hb_fsFile( szPrnFile ) )
-            {  /* If the file already exists, open it (in read-write mode, in
-                  case of non-Unix and text modes). */
-               handle = hb_fsOpen( szPrnFile, FO_READWRITE);
-               if( handle != FS_ERROR )
-               {  /* Position to EOF */
-                  /* Special binary vs. text file handling - even for UN*X, now
+         if( bAppend ) /* Append mode */
+         {
+            if( hb_fsFile( szPrnFile ) ) /* If the file already exists, open it (in read-write mode, in
+                                            case of non-Unix and text modes). */
+            {
+               handle = hb_fsOpen( szPrnFile, FO_READWRITE );
+               if( handle != FS_ERROR ) /* Position to EOF */
+               {  /* Special binary vs. text file handling - even for UN*X, now
                      that there's an HB_SET_EOF flag. */
-                  if( set_specifier == HB_SET_PRINTFILE )
-                  {  /* PRINTFILE is always binary and needs no special handling. */
+                  if( set_specifier == HB_SET_PRINTFILE ) /* PRINTFILE is always binary and needs no special handling. */
+                  {
                      hb_fsSeek( handle, 0, FS_END );
                   }
-                  else
-                  {  /* All other files are text files and may have an EOF
-                        ('\x1A') character at the end (both UN*X and non-UN*X,
-                        now that theres an HB_SET_EOF flag). */
+                  else /* All other files are text files and may have an EOF
+                          ('\x1A') character at the end (both UN*X and non-UN*X,
+                          now that theres an HB_SET_EOF flag). */
+                  {
                      char cEOF = '\0';
-                     hb_fsSeek( handle, -1, FS_END ); /* Position to last char. */
-                     hb_fsRead( handle, ( BYTE * ) &cEOF, 1 );   /* Read the last char. */
-                     if( cEOF == '\x1A' )             /* If it's an EOF, */
+                     hb_fsSeek( handle, -1, FS_END );          /* Position to last char. */
+                     hb_fsRead( handle, ( BYTE * ) &cEOF, 1 ); /* Read the last char. */
+                     if( cEOF == '\x1A' )                      /* If it's an EOF, */
                      {
-                        hb_fsSeek( handle, -1, FS_END ); /* Then write over it. */
+                        hb_fsSeek( handle, -1, FS_END );       /* Then write over it. */
                      }
                   }
                }
             }
             else
-               bCreate = TRUE; /* Otherwise create a new file. */
+               bCreate = TRUE;  /* Otherwise create a new file. */
          }
          else
-            bCreate = TRUE; /* Always create a new file for overwrite mode. */
+            bCreate = TRUE;  /* Always create a new file for overwrite mode. */
 
          if( bCreate )
          {
-#if defined(HB_OS_WIN) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
-           if ( hb_isLegacyDevice( s_PrinterName ) )
-            {  // according to the Win SDK devices should be opened not created
+#if defined( HB_OS_WIN ) && ( ! defined( __RSXNT__ ) ) && ( ! defined( __CYGWIN__ ) )
+            if( hb_isLegacyDevice( s_PrinterName ) ) // according to the Win SDK devices should be opened not created
+            {
                handle = hb_fsOpen( szPrnFile, FO_READWRITE );
             }
             else
@@ -371,30 +371,30 @@ static void hb_set_OSCODEPAGE( PHB_SET_STRUCT pSet )
 
    for( i = 0; i < 256; ++i )
    {
-      pSet->hb_set_oscptransto[ i ] = ( UCHAR ) i;
-      pSet->hb_set_oscptransfrom[ i ] = ( UCHAR ) i;
+      pSet->hb_set_oscptransto[ i ]    = ( UCHAR ) i;
+      pSet->hb_set_oscptransfrom[ i ]  = ( UCHAR ) i;
    }
 
 #ifndef HB_CDP_SUPPORT_OFF
 
    {
-      const char * pszHostCDP = hb_cdpID();
-      char * pszFileCDP = pSet->HB_SET_OSCODEPAGE;
+      const char *   pszHostCDP  = hb_cdpID();
+      char *         pszFileCDP  = pSet->HB_SET_OSCODEPAGE;
 
       if( pszFileCDP && pszFileCDP[ 0 ] && pszHostCDP )
       {
-         PHB_CODEPAGE cdpFile = hb_cdpFind( pszFileCDP );
-         PHB_CODEPAGE cdpHost = hb_cdpFind( pszHostCDP );
+         PHB_CODEPAGE   cdpFile  = hb_cdpFind( pszFileCDP );
+         PHB_CODEPAGE   cdpHost  = hb_cdpFind( pszHostCDP );
 
          if( cdpFile && cdpHost && cdpFile != cdpHost &&
              cdpFile->nChars && cdpFile->nChars == cdpHost->nChars )
          {
             for( i = 0; i < cdpHost->nChars; ++i )
             {
-               pSet->hb_set_oscptransto[ ( UCHAR ) cdpHost->CharsUpper[ i ] ] = ( UCHAR ) cdpFile->CharsUpper[ i ];
-               pSet->hb_set_oscptransto[ ( UCHAR ) cdpHost->CharsLower[ i ] ] = ( UCHAR ) cdpFile->CharsLower[ i ];
-               pSet->hb_set_oscptransfrom[ ( UCHAR ) cdpFile->CharsUpper[ i ] ] = ( UCHAR ) cdpHost->CharsUpper[ i ];
-               pSet->hb_set_oscptransfrom[ ( UCHAR ) cdpFile->CharsLower[ i ] ] = ( UCHAR ) cdpHost->CharsLower[ i ];
+               pSet->hb_set_oscptransto[ ( UCHAR ) cdpHost->CharsUpper[ i ] ]    = ( UCHAR ) cdpFile->CharsUpper[ i ];
+               pSet->hb_set_oscptransto[ ( UCHAR ) cdpHost->CharsLower[ i ] ]    = ( UCHAR ) cdpFile->CharsLower[ i ];
+               pSet->hb_set_oscptransfrom[ ( UCHAR ) cdpFile->CharsUpper[ i ] ]  = ( UCHAR ) cdpHost->CharsUpper[ i ];
+               pSet->hb_set_oscptransfrom[ ( UCHAR ) cdpFile->CharsLower[ i ] ]  = ( UCHAR ) cdpHost->CharsLower[ i ];
             }
          }
       }
@@ -411,12 +411,12 @@ static void hb_set_SetDefaultPrinter( PHB_SET_STRUCT pSet )
    }
 
    #ifdef HB_OS_UNIX
-      pSet->HB_SET_PRINTFILE = hb_strdup( "|lpr" );
+   pSet->HB_SET_PRINTFILE     = hb_strdup( "|lpr" );
    #else
-      pSet->HB_SET_PRINTFILE = hb_strdup( "PRN" );
+   pSet->HB_SET_PRINTFILE     = hb_strdup( "PRN" );
    #endif
 
-   s_isDefaultPrinterDevice = TRUE;
+   s_isDefaultPrinterDevice   = TRUE;
 }
 
 // Initializes printer if needed
@@ -424,7 +424,7 @@ BOOL hb_set_SetPrinterStart( void )
 {
    HB_THREAD_STUB
 
-   BOOL bDone;
+   BOOL           bDone;
    PHB_SET_STRUCT pSet = hb_stackSetStruct();
 
    if( pSet->hb_set_printhan != FS_ERROR )
@@ -440,8 +440,8 @@ BOOL hb_set_SetPrinterStart( void )
    else
    {
       // Opens printer
-      pSet->hb_set_printhan = open_handle( pSet, pSet->HB_SET_PRINTFILE, FALSE, ".prn", HB_SET_PRINTER );
-      bDone = ( pSet->hb_set_printhan != FS_ERROR );
+      pSet->hb_set_printhan   = open_handle( pSet, pSet->HB_SET_PRINTFILE, FALSE, ".prn", HB_SET_PRINTER );
+      bDone                   = ( pSet->hb_set_printhan != FS_ERROR );
    }
 
    return bDone;
@@ -454,10 +454,10 @@ void hb_set_SetPrinterStop( void )
 
    PHB_SET_STRUCT pSet = hb_stackSetStruct();
 
-   if( pSet->hb_set_printhan != FS_ERROR  &&  // It's open
-       s_isDefaultPrinterDevice            &&  // It's the default printer device
-       ! pSet->HB_SET_PRINTER             &&  // SET PRINTER OFF
-       hb_stricmp( pSet->HB_SET_DEVICE, "PRINTER" ) != 0 )   // SET DEVICE TO SCREEN
+   if( pSet->hb_set_printhan != FS_ERROR &&                 // It's open
+       s_isDefaultPrinterDevice &&                          // It's the default printer device
+       ! pSet->HB_SET_PRINTER &&                            // SET PRINTER OFF
+       hb_stricmp( pSet->HB_SET_DEVICE, "PRINTER" ) != 0 )  // SET DEVICE TO SCREEN
    {
       // Closes printer
       close_binary( pSet, pSet->hb_set_printhan );
@@ -468,8 +468,8 @@ void hb_set_SetPrinterStop( void )
 BOOL hb_setSetCentury( BOOL new_century_setting )
 {
    HB_THREAD_STUB
-   PHB_SET_STRUCT pSet = hb_stackSetStruct();
-   BOOL old_century_setting = pSet->hb_set_century;
+   PHB_SET_STRUCT pSet                 = hb_stackSetStruct();
+   BOOL           old_century_setting  = pSet->hb_set_century;
 
    pSet->hb_set_century = new_century_setting;
    /*
@@ -478,13 +478,13 @@ BOOL hb_setSetCentury( BOOL new_century_setting )
     */
    if( old_century_setting != new_century_setting )
    {
-      int count, digit, size, y_size, y_start, y_stop;
-      char * szDateFormat, * szNewFormat;
+      int      count, digit, size, y_size, y_start, y_stop;
+      char *   szDateFormat, * szNewFormat;
 
       /* Convert to upper case and determine where year is */
-      y_start = y_stop = -1;
-      szDateFormat = pSet->HB_SET_DATEFORMAT;
-      size = ( int ) strlen( szDateFormat );
+      y_start        = y_stop = -1;
+      szDateFormat   = pSet->HB_SET_DATEFORMAT;
+      size           = ( int ) strlen( szDateFormat );
       for( count = 0; count < size; count++ )
       {
          digit = HB_TOUPPER( ( UCHAR ) szDateFormat[ count ] );
@@ -500,24 +500,26 @@ BOOL hb_setSetCentury( BOOL new_century_setting )
       /* Determine size of year in current format */
       if( y_start < 0 )
       {
-         y_start = 0; /* There is no year in the current format */
-         y_stop = 0;
+         y_start  = 0; /* There is no year in the current format */
+         y_stop   = 0;
       }
       else if( y_stop < 0 )
-         y_stop = size; /* All digits are year digits */
-      y_size = y_stop - y_start;
+         y_stop = size;  /* All digits are year digits */
+      y_size   = y_stop - y_start;
       /* Calculate size of new format */
-      size -= y_size;
+      size     -= y_size;
       if( new_century_setting )
          size += 4;
-      else size += 2;
+      else
+         size += 2;
 
       /* Create the new date format */
       szNewFormat = ( char * ) hb_xgrab( size + 1 );
 
       {
          int format_len;
-         if( y_start > 0 ) HB_MEMCPY( szNewFormat, szDateFormat, y_start );
+         if( y_start > 0 )
+            HB_MEMCPY( szNewFormat, szDateFormat, y_start );
          szNewFormat[ y_start ] = '\0';
          hb_strncat( szNewFormat, "YY", size );
          if( new_century_setting )
@@ -540,8 +542,8 @@ BOOL hb_setSetCentury( BOOL new_century_setting )
 
 HB_FUNC( __SETCENTURY )
 {
-   BOOL old_century_setting = hb_setGetCentury();
-   PHB_ITEM pNewVal = hb_param( 1, HB_IT_ANY );
+   BOOL     old_century_setting  = hb_setGetCentury();
+   PHB_ITEM pNewVal              = hb_param( 1, HB_IT_ANY );
 
    if( pNewVal )
       hb_setSetCentury( set_logical( pNewVal, old_century_setting ) );
@@ -559,13 +561,13 @@ HB_FUNC( SETCANCEL )
 HB_FUNC( SET )
 {
    HB_THREAD_STUB
-   PHB_SET_STRUCT pSet = hb_stackSetStruct();
-   int args = hb_pcount();
-   BOOL bFlag;
+   PHB_SET_STRUCT pSet           = hb_stackSetStruct();
+   int            args           = hb_pcount();
+   BOOL           bFlag;
 
-   HB_set_enum set_specifier = ( args > 0 ) ? ( HB_set_enum ) hb_parni( 1 ) : HB_SET_INVALID_;
-   PHB_ITEM pArg2 = ( args > 1 ) ? hb_param( 2, HB_IT_ANY ) : NULL;
-   PHB_ITEM pArg3 = ( args > 2 ) ? hb_param( 3, HB_IT_ANY ) : NULL;
+   HB_set_enum    set_specifier  = ( args > 0 ) ? ( HB_set_enum ) hb_parni( 1 ) : HB_SET_INVALID_;
+   PHB_ITEM       pArg2          = ( args > 1 ) ? hb_param( 2, HB_IT_ANY ) : NULL;
+   PHB_ITEM       pArg3          = ( args > 2 ) ? hb_param( 3, HB_IT_ANY ) : NULL;
 
    if( args > 1 )
       hb_setListenerNotify( set_specifier, HB_SET_LISTENER_BEFORE );
@@ -667,8 +669,8 @@ HB_FUNC( SET )
          hb_retc( pSet->HB_SET_DATEFORMAT );
          if( args > 1 )
          {
-            char * value;
-            int year = 0;
+            char *   value;
+            int      year = 0;
 
             value = pSet->HB_SET_DATEFORMAT = set_string( pArg2, pSet->HB_SET_DATEFORMAT );
             while( *value )
@@ -919,17 +921,17 @@ HB_FUNC( SET )
             bFlag = FALSE;
          if( args > 1 && ! HB_IS_NIL( pArg2 ) )
          {
-            pSet->HB_SET_PRINTFILE = set_string( pArg2, pSet->HB_SET_PRINTFILE );
+            pSet->HB_SET_PRINTFILE  = set_string( pArg2, pSet->HB_SET_PRINTFILE );
 
             close_binary( pSet, pSet->hb_set_printhan );
-            pSet->hb_set_printhan = FS_ERROR;
+            pSet->hb_set_printhan   = FS_ERROR;
             if( pSet->HB_SET_PRINTFILE && pSet->HB_SET_PRINTFILE[ 0 ] != '\0' )
             {
-               pSet->hb_set_printhan = open_handle( pSet, pSet->HB_SET_PRINTFILE, bFlag, ".prn", HB_SET_PRINTFILE );
-               s_isDefaultPrinterDevice = FALSE;
+               pSet->hb_set_printhan      = open_handle( pSet, pSet->HB_SET_PRINTFILE, bFlag, ".prn", HB_SET_PRINTFILE );
+               s_isDefaultPrinterDevice   = FALSE;
             }
             else
-               hb_set_SetDefaultPrinter( pSet ); // Make sure there is a default print file name "PRN"
+               hb_set_SetDefaultPrinter( pSet );  // Make sure there is a default print file name "PRN"
          }
          break;
       case HB_SET_SCOREBOARD:
@@ -954,7 +956,7 @@ HB_FUNC( SET )
             /* Set the value and limit the range */
             pSet->HB_SET_TYPEAHEAD = set_number( pArg2, pSet->HB_SET_TYPEAHEAD );
             if( pSet->HB_SET_TYPEAHEAD == 0 )
-               /* Do nothing */ ;
+               /* Do nothing */;
             else if( pSet->HB_SET_TYPEAHEAD < 16 )
                pSet->HB_SET_TYPEAHEAD = 16;
             else if( pSet->HB_SET_TYPEAHEAD > 4096 )
@@ -1004,40 +1006,40 @@ HB_FUNC( SET )
             pSet->HB_SET_TRACE = set_logical( pArg2, pSet->HB_SET_TRACE );
          break;
       case HB_SET_TRACEFILE:
-          hb_retc( (char *) ( pSet->HB_SET_TRACEFILE ) );
+         hb_retc( ( char * ) ( pSet->HB_SET_TRACEFILE ) );
 
-          if( args > 1 && HB_IS_STRING( pArg2 ) )
-          {
-             FILE *fpTrace;
-             BOOL bAppend = FALSE;
+         if( args > 1 && HB_IS_STRING( pArg2 ) )
+         {
+            FILE *   fpTrace;
+            BOOL     bAppend = FALSE;
 
-             hb_xstrcpy( pSet->HB_SET_TRACEFILE, pArg2->item.asString.value, 0 );
+            hb_xstrcpy( pSet->HB_SET_TRACEFILE, pArg2->item.asString.value, 0 );
 
-             /* Create trace.log for tracing. */
-             if( args > 2 && HB_IS_LOGICAL( pArg3 ) )
-             {
-                bAppend = pArg3->item.asLogical.value;
-             }
+            /* Create trace.log for tracing. */
+            if( args > 2 && HB_IS_LOGICAL( pArg3 ) )
+            {
+               bAppend = pArg3->item.asLogical.value;
+            }
 
-             if( bAppend )
-             {
-                fpTrace = hb_fopen( (char *) (pSet->HB_SET_TRACEFILE), "a" );
-             }
-             else
-             {
-                fpTrace = hb_fopen( (char *) (pSet->HB_SET_TRACEFILE), "w" );
-             }
+            if( bAppend )
+            {
+               fpTrace = hb_fopen( ( char * ) ( pSet->HB_SET_TRACEFILE ), "a" );
+            }
+            else
+            {
+               fpTrace = hb_fopen( ( char * ) ( pSet->HB_SET_TRACEFILE ), "w" );
+            }
 
-             if( fpTrace )
-             {
-                fclose( fpTrace );
-             }
-             else
-             {
-                //hb_errInternal( HB_EI_ERRUNRECOV, "Unable to create trace.log file", NULL, NULL );
-             }
-          }
-          break;
+            if( fpTrace )
+            {
+               fclose( fpTrace );
+            }
+            else
+            {
+               //hb_errInternal( HB_EI_ERRUNRECOV, "Unable to create trace.log file", NULL, NULL );
+            }
+         }
+         break;
 
       case HB_SET_TRACESTACK:
          hb_retni( pSet->HB_SET_TRACESTACK );
@@ -1070,7 +1072,7 @@ HB_FUNC( SET )
                }
                else
                {
-                  pSet->HB_SET_TRACESTACK = (char) set_number( pArg2, pSet->HB_SET_TRACESTACK );
+                  pSet->HB_SET_TRACESTACK = ( char ) set_number( pArg2, pSet->HB_SET_TRACESTACK );
                }
             }
             else
@@ -1081,19 +1083,19 @@ HB_FUNC( SET )
          break;
       case HB_SET_PRINTERJOB:
          hb_retc( pSet->hb_set_printerjob );
-         if ( args > 1 && ISCHAR( 2 ) )
+         if( args > 1 && ISCHAR( 2 ) )
          {
-           HB_SIZE ulLength = hb_parclen( 2 ) ;
-           if ( pSet->hb_set_printerjob )
-           {
-              hb_xfree( pSet->hb_set_printerjob ) ;
-              pSet->hb_set_printerjob = NULL ;
-           }
+            HB_SIZE ulLength = hb_parclen( 2 );
+            if( pSet->hb_set_printerjob )
+            {
+               hb_xfree( pSet->hb_set_printerjob );
+               pSet->hb_set_printerjob = NULL;
+            }
 
-           if ( ulLength > 0 )
-           {
-             pSet->hb_set_printerjob = hb_strdup( hb_parc( 2 ) );
-           }
+            if( ulLength > 0 )
+            {
+               pSet->hb_set_printerjob = hb_strdup( hb_parc( 2 ) );
+            }
          }
          break;
       case HB_SET_FILECASE:
@@ -1153,8 +1155,8 @@ HB_FUNC( SET )
       case HB_SET_DIRSEPARATOR:
       {
          char szDirSep[ 2 ];
-         szDirSep[ 0 ] = ( char ) pSet->HB_SET_DIRSEPARATOR;
-         szDirSep[ 1 ] = '\0';
+         szDirSep[ 0 ]  = ( char ) pSet->HB_SET_DIRSEPARATOR;
+         szDirSep[ 1 ]  = '\0';
          hb_retc( szDirSep );
          if( args > 1 )
             pSet->HB_SET_DIRSEPARATOR = set_char( pArg2, pSet->HB_SET_DIRSEPARATOR );
@@ -1181,8 +1183,8 @@ HB_FUNC( SET )
 
       case HB_SET_OUTPUTSAFETY:
          hb_retl( pSet->HB_SET_OUTPUTSAFETY );
-         if ( args > 1 )
-            pSet->HB_SET_OUTPUTSAFETY = set_logical(pArg2, TRUE );
+         if( args > 1 )
+            pSet->HB_SET_OUTPUTSAFETY = set_logical( pArg2, TRUE );
          break;
       case HB_SET_DBFLOCKSCHEME:
          hb_retni( pSet->HB_SET_DBFLOCKSCHEME );
@@ -1236,7 +1238,7 @@ HB_FUNC( SET )
          break;
       case HB_SET_ERRORLOG:
          hb_reta( 2 );
-         hb_storc( (char *) ( pSet->HB_SET_ERRORLOG ), -1, 1 );
+         hb_storc( ( char * ) ( pSet->HB_SET_ERRORLOG ), -1, 1 );
          hb_storl( pSet->HB_SET_APPENDERROR, -1, 2 );
 /*
          if( args > 1 && HB_IS_STRING( pArg2 ) )
@@ -1248,7 +1250,7 @@ HB_FUNC( SET )
                pSet->HB_SET_APPENDERROR = pArg3->item.asLogical.value;
             }
          }
-*/
+ */
          if( args > 1 )
          {
             if( HB_IS_STRING( pArg2 ) )
@@ -1326,31 +1328,31 @@ HB_FUNC( SET )
 }
 
 /* Listener test (1 of 2)
-static void test_callback( HB_set_enum set, HB_set_listener_enum when )
-{
+   static void test_callback( HB_set_enum set, HB_set_listener_enum when )
+   {
    printf("\ntest_callback( %d, %d )", set, when);
-}
-End listener test (1 of 2) */
+   }
+   End listener test (1 of 2) */
 
 void hb_setInitialize( PHB_SET_STRUCT pSet )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_setInitialize(%p)", pSet));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_setInitialize(%p)", pSet ) );
 
-   pSet->HB_SET_ALTERNATE = FALSE;
-   pSet->HB_SET_ALTFILE = NULL;
-   pSet->hb_set_althan = FS_ERROR;
-   pSet->HB_SET_AUTOPEN = TRUE;
-   pSet->HB_SET_AUTORDER = 0;
-   pSet->HB_SET_AUTOSHARE = 0;
-   pSet->HB_SET_BELL = FALSE;
-   pSet->HB_SET_CANCEL = TRUE;
-   pSet->hb_set_century = FALSE;
-   pSet->HB_SET_COLOR = ( char * ) hb_xgrab( HB_CLRSTR_LEN + 1 );
+   pSet->HB_SET_ALTERNATE     = FALSE;
+   pSet->HB_SET_ALTFILE       = NULL;
+   pSet->hb_set_althan        = FS_ERROR;
+   pSet->HB_SET_AUTOPEN       = TRUE;
+   pSet->HB_SET_AUTORDER      = 0;
+   pSet->HB_SET_AUTOSHARE     = 0;
+   pSet->HB_SET_BELL          = FALSE;
+   pSet->HB_SET_CANCEL        = TRUE;
+   pSet->hb_set_century       = FALSE;
+   pSet->HB_SET_COLOR         = ( char * ) hb_xgrab( HB_CLRSTR_LEN + 1 );
    hb_strncpy( pSet->HB_SET_COLOR, "W/N,N/W,N/N,N/N,N/W", HB_CLRSTR_LEN );
-   pSet->HB_SET_CONFIRM = FALSE;
-   pSet->HB_SET_CONSOLE = TRUE;
-   pSet->HB_SET_DATEFORMAT = hb_strdup( "mm/dd/yy" );
-   pSet->HB_SET_TIMEFORMAT = hb_strdup( "hh:mm:ss.ccc" );
+   pSet->HB_SET_CONFIRM       = FALSE;
+   pSet->HB_SET_CONSOLE       = TRUE;
+   pSet->HB_SET_DATEFORMAT    = hb_strdup( "mm/dd/yy" );
+   pSet->HB_SET_TIMEFORMAT    = hb_strdup( "hh:mm:ss.ccc" );
    /*
     * Tests shows that Clipper has two different flags to control ALT+D
     * and ALTD() behavior and on startup these flags are not synchronized.
@@ -1366,97 +1368,97 @@ void hb_setInitialize( PHB_SET_STRUCT pSet )
     * we should not try to emulate it [druzus].
     */
    /* pSet->HB_SET_DEBUG = FALSE; */
-   pSet->HB_SET_DEBUG = hb_dynsymFind( "__DBGENTRY" ) ? TRUE : FALSE;
-   pSet->HB_SET_DECIMALS = 2;
-   pSet->HB_SET_DEFAULT = hb_strdup( "" );
-   pSet->HB_SET_DELETED = FALSE;
-   pSet->HB_SET_DELIMCHARS = hb_strdup( "::" );
-   pSet->HB_SET_DELIMITERS = FALSE;
-   pSet->HB_SET_DEVICE = hb_strdup( "SCREEN" );
-#if defined(HB_OS_UNIX)
-   pSet->HB_SET_EOF = FALSE;
+   pSet->HB_SET_DEBUG         = hb_dynsymFind( "__DBGENTRY" ) ? TRUE : FALSE;
+   pSet->HB_SET_DECIMALS      = 2;
+   pSet->HB_SET_DEFAULT       = hb_strdup( "" );
+   pSet->HB_SET_DELETED       = FALSE;
+   pSet->HB_SET_DELIMCHARS    = hb_strdup( "::" );
+   pSet->HB_SET_DELIMITERS    = FALSE;
+   pSet->HB_SET_DEVICE        = hb_strdup( "SCREEN" );
+#if defined( HB_OS_UNIX )
+   pSet->HB_SET_EOF           = FALSE;
 #else
-   pSet->HB_SET_EOF = TRUE;
+   pSet->HB_SET_EOF           = TRUE;
 #endif
-   pSet->HB_SET_EPOCH = 1900;
-   pSet->HB_SET_ESCAPE = TRUE;
-   pSet->HB_SET_EVENTMASK = INKEY_KEYBOARD;
-   pSet->HB_SET_EXACT = FALSE;
-   pSet->HB_SET_EXCLUSIVE = TRUE;
-   pSet->HB_SET_EXIT = FALSE;
-   pSet->HB_SET_EXTRA = FALSE;
-   pSet->HB_SET_EXTRAFILE = NULL;
-   pSet->hb_set_extrahan = FS_ERROR;
-   pSet->HB_SET_FIXED = FALSE;
-   pSet->HB_SET_FORCEOPT = FALSE;
-   pSet->HB_SET_HARDCOMMIT = TRUE;
-   pSet->HB_SET_IDLEREPEAT = TRUE;
-   pSet->HB_SET_INSERT = FALSE;
-   pSet->HB_SET_INTENSITY = TRUE;
-   pSet->HB_SET_MARGIN = 0;
-   pSet->HB_SET_MBLOCKSIZE = 0;
-   pSet->HB_SET_MCENTER = FALSE;
-   pSet->HB_SET_MESSAGE = 0;
-   pSet->HB_SET_MFILEEXT = hb_strdup( "" );
-   pSet->HB_SET_OPTIMIZE = TRUE;
-   pSet->HB_SET_PATH = hb_strdup( "" );
-   pSet->hb_set_path = NULL;
-   pSet->HB_SET_PRINTER = FALSE;
+   pSet->HB_SET_EPOCH         = 1900;
+   pSet->HB_SET_ESCAPE        = TRUE;
+   pSet->HB_SET_EVENTMASK     = INKEY_KEYBOARD;
+   pSet->HB_SET_EXACT         = FALSE;
+   pSet->HB_SET_EXCLUSIVE     = TRUE;
+   pSet->HB_SET_EXIT          = FALSE;
+   pSet->HB_SET_EXTRA         = FALSE;
+   pSet->HB_SET_EXTRAFILE     = NULL;
+   pSet->hb_set_extrahan      = FS_ERROR;
+   pSet->HB_SET_FIXED         = FALSE;
+   pSet->HB_SET_FORCEOPT      = FALSE;
+   pSet->HB_SET_HARDCOMMIT    = TRUE;
+   pSet->HB_SET_IDLEREPEAT    = TRUE;
+   pSet->HB_SET_INSERT        = FALSE;
+   pSet->HB_SET_INTENSITY     = TRUE;
+   pSet->HB_SET_MARGIN        = 0;
+   pSet->HB_SET_MBLOCKSIZE    = 0;
+   pSet->HB_SET_MCENTER       = FALSE;
+   pSet->HB_SET_MESSAGE       = 0;
+   pSet->HB_SET_MFILEEXT      = hb_strdup( "" );
+   pSet->HB_SET_OPTIMIZE      = TRUE;
+   pSet->HB_SET_PATH          = hb_strdup( "" );
+   pSet->hb_set_path          = NULL;
+   pSet->HB_SET_PRINTER       = FALSE;
 
-   pSet->HB_SET_PRINTFILE = NULL;
+   pSet->HB_SET_PRINTFILE     = NULL;
    hb_set_SetDefaultPrinter( pSet );
 
-   pSet->hb_set_printhan = FS_ERROR;
-   pSet->hb_set_winhan = FS_ERROR;
-   pSet->HB_SET_SCOREBOARD = TRUE;
-   pSet->HB_SET_SCROLLBREAK = TRUE;
-   pSet->HB_SET_SOFTSEEK = FALSE;
-   pSet->HB_SET_STRICTREAD = FALSE;
-   pSet->HB_SET_TYPEAHEAD = HB_DEFAULT_INKEY_BUFSIZE;
-   pSet->HB_SET_UNIQUE = FALSE;
-   pSet->HB_SET_FILECASE = HB_SET_CASE_MIXED;
-   pSet->HB_SET_DIRCASE = HB_SET_CASE_MIXED;
-   pSet->HB_SET_DIRSEPARATOR = HB_OS_PATH_DELIM_CHR;
-   pSet->HB_SET_VIDEOMODE = 0;
-   pSet->HB_SET_WRAP = FALSE;
+   pSet->hb_set_printhan      = FS_ERROR;
+   pSet->hb_set_winhan        = FS_ERROR;
+   pSet->HB_SET_SCOREBOARD    = TRUE;
+   pSet->HB_SET_SCROLLBREAK   = TRUE;
+   pSet->HB_SET_SOFTSEEK      = FALSE;
+   pSet->HB_SET_STRICTREAD    = FALSE;
+   pSet->HB_SET_TYPEAHEAD     = HB_DEFAULT_INKEY_BUFSIZE;
+   pSet->HB_SET_UNIQUE        = FALSE;
+   pSet->HB_SET_FILECASE      = HB_SET_CASE_MIXED;
+   pSet->HB_SET_DIRCASE       = HB_SET_CASE_MIXED;
+   pSet->HB_SET_DIRSEPARATOR  = HB_OS_PATH_DELIM_CHR;
+   pSet->HB_SET_VIDEOMODE     = 0;
+   pSet->HB_SET_WRAP          = FALSE;
    pSet->HB_SET_DBFLOCKSCHEME = 0;
    pSet->HB_SET_DEFEXTENSIONS = TRUE;
-   pSet->HB_SET_EOL = hb_strdup( hb_conNewLine() );
-   pSet->HB_SET_TRIMFILENAME = FALSE;
-   pSet->HB_SET_OSCODEPAGE = hb_strdup( "" );
+   pSet->HB_SET_EOL           = hb_strdup( hb_conNewLine() );
+   pSet->HB_SET_TRIMFILENAME  = FALSE;
+   pSet->HB_SET_OSCODEPAGE    = hb_strdup( "" );
    hb_set_OSCODEPAGE( pSet );
 
-   pSet->hb_set_listener = NULL;
+   pSet->hb_set_listener      = NULL;
 
-   pSet->HB_SET_TRACE = TRUE; /* Default Trace to ON */
+   pSet->HB_SET_TRACE         = TRUE; /* Default Trace to ON */
 
-   hb_xstrcpy( (char *) (pSet->HB_SET_TRACEFILE), "trace.log", 0 );
+   hb_xstrcpy( ( char * ) ( pSet->HB_SET_TRACEFILE ), "trace.log", 0 );
 
-   hb_xstrcpy( (char *) (pSet->HB_SET_ERRORLOG), "error.log", 0 );
-   pSet->HB_SET_APPENDERROR = FALSE;
+   hb_xstrcpy( ( char * ) ( pSet->HB_SET_ERRORLOG ), "error.log", 0 );
+   pSet->HB_SET_APPENDERROR      = FALSE;
 
-   pSet->HB_SET_TRACESTACK = HB_SET_TRACESTACK_ALL;
+   pSet->HB_SET_TRACESTACK       = HB_SET_TRACESTACK_ALL;
 
-   pSet->HB_SET_ERRORLOOP = 8;
+   pSet->HB_SET_ERRORLOOP        = 8;
 
 /* JC1: Set for output thread safety */
-   pSet->HB_SET_OUTPUTSAFETY = TRUE;
+   pSet->HB_SET_OUTPUTSAFETY     = TRUE;
 
-   pSet->HB_SET_BACKGROUNDTASKS = FALSE;
-   pSet->HB_SET_BACKGROUNDTICK = 1000;
+   pSet->HB_SET_BACKGROUNDTASKS  = FALSE;
+   pSet->HB_SET_BACKGROUNDTICK   = 1000;
 
-   pSet->hb_set_winprinter=FALSE;
-   pSet->hb_set_printerjob=NULL;
-   pSet->hb_set_winprinter=FALSE;
+   pSet->hb_set_winprinter       = FALSE;
+   pSet->hb_set_printerjob       = NULL;
+   pSet->hb_set_winprinter       = FALSE;
 
 
-   pSet->HB_SET_MACROBLOCKVARS = FALSE;
+   pSet->HB_SET_MACROBLOCKVARS   = FALSE;
    pSet->HB_SET_WORKAREAS_SHARED = TRUE;
 }
 
 void hb_setRelease( PHB_SET_STRUCT pSet )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_setRelease(%p)", pSet));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_setRelease(%p)", pSet ) );
 
    close_text( pSet, pSet->hb_set_althan );
    close_text( pSet, pSet->hb_set_extrahan );
@@ -1504,7 +1506,7 @@ void hb_setRelease( PHB_SET_STRUCT pSet )
       pSet->HB_SET_EXTRAFILE = NULL;
    }
 
-   if( pSet->HB_SET_MFILEEXT  )
+   if( pSet->HB_SET_MFILEEXT )
    {
       hb_xfree( pSet->HB_SET_MFILEEXT );
       pSet->HB_SET_MFILEEXT = NULL;
@@ -1570,34 +1572,47 @@ PHB_SET_STRUCT hb_setClone( PHB_SET_STRUCT pSrc )
 {
    PHB_SET_STRUCT pSet;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_setClone(%p)", pSrc));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_setClone(%p)", pSrc ) );
 
    pSet = ( PHB_SET_STRUCT ) hb_xgrab( sizeof( HB_SET_STRUCT ) );
 
    HB_MEMCPY( pSet, pSrc, sizeof( HB_SET_STRUCT ) );
 
-   pSet->hb_set_althan = pSet->hb_set_extrahan = pSet->hb_set_printhan = FS_ERROR;
+   pSet->hb_set_althan     = pSet->hb_set_extrahan = pSet->hb_set_printhan = FS_ERROR;
 
-   pSet->hb_set_listener = NULL;
+   pSet->hb_set_listener   = NULL;
 
-   pSet->HB_SET_TYPEAHEAD = HB_DEFAULT_INKEY_BUFSIZE;
+   pSet->HB_SET_TYPEAHEAD  = HB_DEFAULT_INKEY_BUFSIZE;
 
-   pSet->HB_SET_COLOR = ( char * ) hb_xgrab( HB_CLRSTR_LEN + 1 );
+   pSet->HB_SET_COLOR      = ( char * ) hb_xgrab( HB_CLRSTR_LEN + 1 );
    hb_strncpy( pSet->HB_SET_COLOR, pSrc->HB_SET_COLOR, HB_CLRSTR_LEN );
 
-   if( pSet->HB_SET_ALTFILE )      pSet->HB_SET_ALTFILE      = hb_strdup( pSet->HB_SET_ALTFILE );
-   if( pSet->HB_SET_DATEFORMAT )   pSet->HB_SET_DATEFORMAT   = hb_strdup( pSet->HB_SET_DATEFORMAT );
-   if( pSet->HB_SET_TIMEFORMAT )   pSet->HB_SET_TIMEFORMAT   = hb_strdup( pSet->HB_SET_TIMEFORMAT );
-   if( pSet->HB_SET_DEFAULT )      pSet->HB_SET_DEFAULT      = hb_strdup( pSet->HB_SET_DEFAULT );
-   if( pSet->HB_SET_DELIMCHARS )   pSet->HB_SET_DELIMCHARS   = hb_strdup( pSet->HB_SET_DELIMCHARS );
-   if( pSet->HB_SET_DEVICE )       pSet->HB_SET_DEVICE       = hb_strdup( pSet->HB_SET_DEVICE );
-   if( pSet->HB_SET_EXTRAFILE )    pSet->HB_SET_EXTRAFILE    = hb_strdup( pSet->HB_SET_EXTRAFILE );
-   if( pSet->HB_SET_MFILEEXT  )    pSet->HB_SET_MFILEEXT     = hb_strdup( pSet->HB_SET_MFILEEXT );
-   if( pSet->HB_SET_PATH )         pSet->HB_SET_PATH         = hb_strdup( pSet->HB_SET_PATH );
-   if( pSet->HB_SET_PRINTFILE )    pSet->HB_SET_PRINTFILE    = hb_strdup( pSet->HB_SET_PRINTFILE );
-   if( pSet->HB_SET_EOL )          pSet->HB_SET_EOL          = hb_strdup( pSet->HB_SET_EOL );
-   if( pSet->HB_SET_OSCODEPAGE )   pSet->HB_SET_OSCODEPAGE   = hb_strdup( pSet->HB_SET_OSCODEPAGE );
-   if( pSet->hb_set_printerjob )   pSet->hb_set_printerjob   = hb_strdup( pSet->hb_set_printerjob );
+   if( pSet->HB_SET_ALTFILE )
+      pSet->HB_SET_ALTFILE = hb_strdup( pSet->HB_SET_ALTFILE );
+   if( pSet->HB_SET_DATEFORMAT )
+      pSet->HB_SET_DATEFORMAT = hb_strdup( pSet->HB_SET_DATEFORMAT );
+   if( pSet->HB_SET_TIMEFORMAT )
+      pSet->HB_SET_TIMEFORMAT = hb_strdup( pSet->HB_SET_TIMEFORMAT );
+   if( pSet->HB_SET_DEFAULT )
+      pSet->HB_SET_DEFAULT = hb_strdup( pSet->HB_SET_DEFAULT );
+   if( pSet->HB_SET_DELIMCHARS )
+      pSet->HB_SET_DELIMCHARS = hb_strdup( pSet->HB_SET_DELIMCHARS );
+   if( pSet->HB_SET_DEVICE )
+      pSet->HB_SET_DEVICE = hb_strdup( pSet->HB_SET_DEVICE );
+   if( pSet->HB_SET_EXTRAFILE )
+      pSet->HB_SET_EXTRAFILE = hb_strdup( pSet->HB_SET_EXTRAFILE );
+   if( pSet->HB_SET_MFILEEXT )
+      pSet->HB_SET_MFILEEXT = hb_strdup( pSet->HB_SET_MFILEEXT );
+   if( pSet->HB_SET_PATH )
+      pSet->HB_SET_PATH = hb_strdup( pSet->HB_SET_PATH );
+   if( pSet->HB_SET_PRINTFILE )
+      pSet->HB_SET_PRINTFILE = hb_strdup( pSet->HB_SET_PRINTFILE );
+   if( pSet->HB_SET_EOL )
+      pSet->HB_SET_EOL = hb_strdup( pSet->HB_SET_EOL );
+   if( pSet->HB_SET_OSCODEPAGE )
+      pSet->HB_SET_OSCODEPAGE = hb_strdup( pSet->HB_SET_OSCODEPAGE );
+   if( pSet->hb_set_printerjob )
+      pSet->hb_set_printerjob = hb_strdup( pSet->hb_set_printerjob );
 
    return pSet;
 }
@@ -1605,20 +1620,20 @@ PHB_SET_STRUCT hb_setClone( PHB_SET_STRUCT pSrc )
 int hb_setListenerAdd( HB_SET_LISTENER_CALLBACK * callback )
 {
    HB_THREAD_STUB
-   PHB_SET_STRUCT pSet = hb_stackSetStruct();
-   PHB_SET_LISTENER p_sl = (PHB_SET_LISTENER) hb_xgrab( sizeof( HB_SET_LISTENER ) );
+   PHB_SET_STRUCT       pSet  = hb_stackSetStruct();
+   PHB_SET_LISTENER     p_sl  = ( PHB_SET_LISTENER ) hb_xgrab( sizeof( HB_SET_LISTENER ) );
    PHB_SET_LISTENER_LST pList;
 
-   if( !pSet->hb_set_listener )
+   if( ! pSet->hb_set_listener )
    {
       pSet->hb_set_listener = hb_xgrab( sizeof( HB_SET_LISTENER_LST ) );
       memset( pSet->hb_set_listener, 0, sizeof( HB_SET_LISTENER_LST ) );
    }
-   pList = ( PHB_SET_LISTENER_LST ) pSet->hb_set_listener;
+   pList          = ( PHB_SET_LISTENER_LST ) pSet->hb_set_listener;
 
    p_sl->callback = callback;
    p_sl->listener = ++pList->counter;
-   p_sl->next = NULL;
+   p_sl->next     = NULL;
 
    if( pList->last )
       pList->last->next = p_sl;
@@ -1633,12 +1648,13 @@ void hb_setListenerNotify( HB_set_enum set, HB_set_listener_enum when )
 {
    HB_THREAD_STUB
    PHB_SET_LISTENER_LST pList = ( PHB_SET_LISTENER_LST ) hb_stackSetStruct()->hb_set_listener;
+
    if( pList )
    {
       PHB_SET_LISTENER p_sl = pList->first;
       while( p_sl )
       {
-         (* p_sl->callback)( set, when );
+         ( *p_sl->callback )( set, when );
          p_sl = p_sl->next;
       }
    }
@@ -1648,10 +1664,11 @@ int hb_setListenerRemove( int listener )
 {
    HB_THREAD_STUB
    PHB_SET_LISTENER_LST pList = ( PHB_SET_LISTENER_LST ) hb_stackSetStruct()->hb_set_listener;
+
    if( pList )
    {
-      PHB_SET_LISTENER p_sl = pList->first;
-      PHB_SET_LISTENER p_sl_prev = NULL;
+      PHB_SET_LISTENER  p_sl        = pList->first;
+      PHB_SET_LISTENER  p_sl_prev   = NULL;
       while( p_sl )
       {
          if( listener == p_sl->listener )
@@ -1666,8 +1683,8 @@ int hb_setListenerRemove( int listener )
             hb_xfree( p_sl );
             break;
          }
-         p_sl_prev = p_sl;
-         p_sl = p_sl->next;
+         p_sl_prev   = p_sl;
+         p_sl        = p_sl->next;
       }
    }
    return listener;
@@ -1685,7 +1702,7 @@ static BOOL hb_setSetFile( PHB_SET_STRUCT pSet, HB_set_enum set_specifier, const
          /* Limit size of SET strings to 64K, truncating if source is longer */
          pSet->HB_SET_ALTFILE = szFile ? hb_strndup( szFile, USHRT_MAX ) : NULL;
          close_text( pSet, pSet->hb_set_althan );
-         pSet->hb_set_althan = FS_ERROR;
+         pSet->hb_set_althan  = FS_ERROR;
          if( pSet->HB_SET_ALTFILE && pSet->HB_SET_ALTFILE[ 0 ] != '\0' )
             pSet->hb_set_althan = open_handle( pSet, pSet->HB_SET_ALTFILE,
                                                fAdditive, ".txt", HB_SET_ALTFILE );
@@ -1732,10 +1749,10 @@ static BOOL hb_setSetFile( PHB_SET_STRUCT pSet, HB_set_enum set_specifier, const
 BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
 {
    HB_THREAD_STUB
-   PHB_SET_STRUCT pSet = hb_stackSetStruct();
-   BOOL fResult = FALSE;
-   char * szValue;
-   int iValue;
+   PHB_SET_STRUCT pSet     = hb_stackSetStruct();
+   BOOL           fResult  = FALSE;
+   char *         szValue;
+   int            iValue;
 
    if( pItem )
    {
@@ -1759,211 +1776,211 @@ BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
          case HB_SET_ALTERNATE:
             if( HB_IS_LOGICAL( pItem ) )
             {
-               pSet->HB_SET_ALTERNATE = hb_itemGetL( pItem );
-               fResult = TRUE;
+               pSet->HB_SET_ALTERNATE  = hb_itemGetL( pItem );
+               fResult                 = TRUE;
             }
             break;
          case HB_SET_AUTOPEN:
             if( HB_IS_LOGICAL( pItem ) )
             {
                pSet->HB_SET_AUTOPEN = hb_itemGetL( pItem );
-               fResult = TRUE;
+               fResult              = TRUE;
             }
             break;
          case HB_SET_BACKGROUNDTASKS:
             if( HB_IS_LOGICAL( pItem ) )
             {
-               pSet->HB_SET_BACKGROUNDTASKS = hb_itemGetL( pItem );
-               fResult = TRUE;
+               pSet->HB_SET_BACKGROUNDTASKS  = hb_itemGetL( pItem );
+               fResult                       = TRUE;
             }
             break;
          case HB_SET_BELL:
             if( HB_IS_LOGICAL( pItem ) )
             {
                pSet->HB_SET_BELL = hb_itemGetL( pItem );
-               fResult = TRUE;
+               fResult           = TRUE;
             }
             break;
          case HB_SET_CANCEL:
             if( HB_IS_LOGICAL( pItem ) )
             {
-               pSet->HB_SET_CANCEL = hb_itemGetL( pItem );
-               fResult = TRUE;
+               pSet->HB_SET_CANCEL  = hb_itemGetL( pItem );
+               fResult              = TRUE;
             }
             break;
          case HB_SET_CONFIRM:
             if( HB_IS_LOGICAL( pItem ) )
             {
                pSet->HB_SET_CONFIRM = hb_itemGetL( pItem );
-               fResult = TRUE;
+               fResult              = TRUE;
             }
             break;
          case HB_SET_CONSOLE:
             if( HB_IS_LOGICAL( pItem ) )
             {
                pSet->HB_SET_CONSOLE = hb_itemGetL( pItem );
-               fResult = TRUE;
+               fResult              = TRUE;
             }
             break;
          case HB_SET_DEBUG:
             if( HB_IS_LOGICAL( pItem ) )
             {
-               pSet->HB_SET_DEBUG = hb_itemGetL( pItem );
-               fResult = TRUE;
+               pSet->HB_SET_DEBUG   = hb_itemGetL( pItem );
+               fResult              = TRUE;
             }
             break;
          case HB_SET_DELETED:
             if( HB_IS_LOGICAL( pItem ) )
             {
                pSet->HB_SET_DELETED = hb_itemGetL( pItem );
-               fResult = TRUE;
+               fResult              = TRUE;
             }
             break;
          case HB_SET_DELIMITERS:
             if( HB_IS_LOGICAL( pItem ) )
             {
                pSet->HB_SET_DELIMITERS = hb_itemGetL( pItem );
-               fResult = TRUE;
+               fResult                 = TRUE;
             }
             break;
          case HB_SET_EOF:
             if( HB_IS_LOGICAL( pItem ) )
             {
-               pSet->HB_SET_EOF = hb_itemGetL( pItem );
-               fResult = TRUE;
+               pSet->HB_SET_EOF  = hb_itemGetL( pItem );
+               fResult           = TRUE;
             }
             break;
          case HB_SET_ESCAPE:
             if( HB_IS_LOGICAL( pItem ) )
             {
-               pSet->HB_SET_ESCAPE = hb_itemGetL( pItem );
-               fResult = TRUE;
+               pSet->HB_SET_ESCAPE  = hb_itemGetL( pItem );
+               fResult              = TRUE;
             }
             break;
          case HB_SET_EXACT:
             if( HB_IS_LOGICAL( pItem ) )
             {
-               pSet->HB_SET_EXACT = hb_itemGetL( pItem );
-               fResult = TRUE;
+               pSet->HB_SET_EXACT   = hb_itemGetL( pItem );
+               fResult              = TRUE;
             }
             break;
          case HB_SET_EXCLUSIVE:
             if( HB_IS_LOGICAL( pItem ) )
             {
-               pSet->HB_SET_EXCLUSIVE = hb_itemGetL( pItem );
-               fResult = TRUE;
+               pSet->HB_SET_EXCLUSIVE  = hb_itemGetL( pItem );
+               fResult                 = TRUE;
             }
             break;
          case HB_SET_EXIT:
             if( HB_IS_LOGICAL( pItem ) )
             {
                pSet->HB_SET_EXIT = hb_itemGetL( pItem );
-               fResult = TRUE;
+               fResult           = TRUE;
             }
             break;
          case HB_SET_EXTRA:
             if( HB_IS_LOGICAL( pItem ) )
             {
-               pSet->HB_SET_EXTRA = hb_itemGetL( pItem );
-               fResult = TRUE;
+               pSet->HB_SET_EXTRA   = hb_itemGetL( pItem );
+               fResult              = TRUE;
             }
             break;
          case HB_SET_FIXED:
             if( HB_IS_LOGICAL( pItem ) )
             {
-               pSet->HB_SET_FIXED = hb_itemGetL( pItem );
-               fResult = TRUE;
+               pSet->HB_SET_FIXED   = hb_itemGetL( pItem );
+               fResult              = TRUE;
             }
             break;
          case HB_SET_IDLEREPEAT:
             if( HB_IS_LOGICAL( pItem ) )
             {
                pSet->HB_SET_IDLEREPEAT = hb_itemGetL( pItem );
-               fResult = TRUE;
+               fResult                 = TRUE;
             }
             break;
          case HB_SET_INSERT:
             if( HB_IS_LOGICAL( pItem ) )
             {
-               pSet->HB_SET_INSERT = hb_itemGetL( pItem );
-               fResult = TRUE;
+               pSet->HB_SET_INSERT  = hb_itemGetL( pItem );
+               fResult              = TRUE;
             }
             break;
          case HB_SET_INTENSITY:
             if( HB_IS_LOGICAL( pItem ) )
             {
-               pSet->HB_SET_INTENSITY = hb_itemGetL( pItem );
-               fResult = TRUE;
+               pSet->HB_SET_INTENSITY  = hb_itemGetL( pItem );
+               fResult                 = TRUE;
             }
             break;
          case HB_SET_MCENTER:
             if( HB_IS_LOGICAL( pItem ) )
             {
                pSet->HB_SET_MCENTER = hb_itemGetL( pItem );
-               fResult = TRUE;
+               fResult              = TRUE;
             }
             break;
          case HB_SET_OPTIMIZE:
             if( HB_IS_LOGICAL( pItem ) )
             {
-               pSet->HB_SET_OPTIMIZE = hb_itemGetL( pItem );
-               fResult = TRUE;
+               pSet->HB_SET_OPTIMIZE   = hb_itemGetL( pItem );
+               fResult                 = TRUE;
             }
             break;
          case HB_SET_FORCEOPT:
             if( HB_IS_LOGICAL( pItem ) )
             {
-               pSet->HB_SET_FORCEOPT = hb_itemGetL( pItem );
-               fResult = TRUE;
+               pSet->HB_SET_FORCEOPT   = hb_itemGetL( pItem );
+               fResult                 = TRUE;
             }
             break;
          case HB_SET_OUTPUTSAFETY:
             if( HB_IS_LOGICAL( pItem ) )
             {
-               pSet->HB_SET_OUTPUTSAFETY = hb_itemGetL( pItem );
-               fResult = TRUE;
+               pSet->HB_SET_OUTPUTSAFETY  = hb_itemGetL( pItem );
+               fResult                    = TRUE;
             }
             break;
          case HB_SET_PRINTER:
             if( HB_IS_LOGICAL( pItem ) )
             {
                pSet->HB_SET_PRINTER = hb_itemGetL( pItem );
-               fResult = TRUE;
+               fResult              = TRUE;
             }
             break;
          case HB_SET_SCOREBOARD:
             if( HB_IS_LOGICAL( pItem ) )
             {
                pSet->HB_SET_SCOREBOARD = hb_itemGetL( pItem );
-               fResult = TRUE;
+               fResult                 = TRUE;
             }
             break;
          case HB_SET_SCROLLBREAK:
             if( HB_IS_LOGICAL( pItem ) )
             {
-               pSet->HB_SET_SCROLLBREAK = hb_itemGetL( pItem );
-               fResult = TRUE;
+               pSet->HB_SET_SCROLLBREAK   = hb_itemGetL( pItem );
+               fResult                    = TRUE;
             }
             break;
          case HB_SET_SOFTSEEK:
             if( HB_IS_LOGICAL( pItem ) )
             {
-               pSet->HB_SET_SOFTSEEK = hb_itemGetL( pItem );
-               fResult = TRUE;
+               pSet->HB_SET_SOFTSEEK   = hb_itemGetL( pItem );
+               fResult                 = TRUE;
             }
             break;
          case HB_SET_STRICTREAD:
             if( HB_IS_LOGICAL( pItem ) )
             {
                pSet->HB_SET_STRICTREAD = hb_itemGetL( pItem );
-               fResult = TRUE;
+               fResult                 = TRUE;
             }
             break;
          case HB_SET_UNIQUE:
             if( HB_IS_LOGICAL( pItem ) )
             {
-               pSet->HB_SET_UNIQUE = hb_itemGetL( pItem );
-               fResult = TRUE;
+               pSet->HB_SET_UNIQUE  = hb_itemGetL( pItem );
+               fResult              = TRUE;
             }
             break;
          case HB_SET_WORKAREAS_SHARED:
@@ -1973,7 +1990,7 @@ BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
                if( hb_rddChangeSetWorkareasShared( pSet->HB_SET_WORKAREAS_SHARED, hb_itemGetL( pItem ) ) )
                {
                   pSet->HB_SET_WORKAREAS_SHARED = hb_itemGetL( pItem );
-                  fResult = TRUE;
+                  fResult                       = TRUE;
                }
             }
 #endif
@@ -1982,28 +1999,28 @@ BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
             if( HB_IS_LOGICAL( pItem ) )
             {
                pSet->HB_SET_WRAP = hb_itemGetL( pItem );
-               fResult = TRUE;
+               fResult           = TRUE;
             }
             break;
          case HB_SET_HARDCOMMIT:
             if( HB_IS_LOGICAL( pItem ) )
             {
                pSet->HB_SET_HARDCOMMIT = hb_itemGetL( pItem );
-               fResult = TRUE;
+               fResult                 = TRUE;
             }
             break;
          case HB_SET_DEFEXTENSIONS:
             if( HB_IS_LOGICAL( pItem ) )
             {
                pSet->HB_SET_DEFEXTENSIONS = hb_itemGetL( pItem );
-               fResult = TRUE;
+               fResult                    = TRUE;
             }
             break;
          case HB_SET_TRIMFILENAME:
             if( HB_IS_LOGICAL( pItem ) )
             {
-               pSet->HB_SET_TRIMFILENAME = hb_itemGetL( pItem );
-               fResult = TRUE;
+               pSet->HB_SET_TRIMFILENAME  = hb_itemGetL( pItem );
+               fResult                    = TRUE;
             }
             break;
 
@@ -2013,8 +2030,8 @@ BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
                iValue = hb_itemGetNI( pItem );
                if( iValue >= 0 )
                {
-                  pSet->HB_SET_BACKGROUNDTICK = iValue ? iValue : 1000;
-                  fResult = TRUE;
+                  pSet->HB_SET_BACKGROUNDTICK   = iValue ? iValue : 1000;
+                  fResult                       = TRUE;
                }
             }
             break;
@@ -2025,8 +2042,8 @@ BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
                iValue = hb_itemGetNI( pItem );
                if( iValue >= 0 )
                {
-                  pSet->HB_SET_DECIMALS = iValue;
-                  fResult = TRUE;
+                  pSet->HB_SET_DECIMALS   = iValue;
+                  fResult                 = TRUE;
                }
             }
             break;
@@ -2036,8 +2053,8 @@ BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
                iValue = hb_itemGetNI( pItem );
                if( iValue >= 0 )
                {
-                  pSet->HB_SET_EPOCH = iValue;
-                  fResult = TRUE;
+                  pSet->HB_SET_EPOCH   = iValue;
+                  fResult              = TRUE;
                }
             }
             break;
@@ -2047,8 +2064,8 @@ BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
                iValue = hb_itemGetNI( pItem );
                if( iValue >= 0 )
                {
-                  pSet->HB_SET_ERRORLOOP = iValue ? iValue : 8;
-                  fResult = TRUE;
+                  pSet->HB_SET_ERRORLOOP  = iValue ? iValue : 8;
+                  fResult                 = TRUE;
                }
             }
             break;
@@ -2059,7 +2076,7 @@ BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
                if( iValue >= 0 )
                {
                   pSet->HB_SET_MBLOCKSIZE = iValue;
-                  fResult = TRUE;
+                  fResult                 = TRUE;
                }
             }
             break;
@@ -2070,7 +2087,7 @@ BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
                if( iValue >= 0 )
                {
                   pSet->HB_SET_DBFLOCKSCHEME = iValue;
-                  fResult = TRUE;
+                  fResult                    = TRUE;
                }
             }
             break;
@@ -2080,8 +2097,8 @@ BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
                iValue = hb_itemGetNI( pItem );
                if( iValue >= 0 )
                {
-                  pSet->HB_SET_AUTORDER = iValue;
-                  fResult = TRUE;
+                  pSet->HB_SET_AUTORDER   = iValue;
+                  fResult                 = TRUE;
                }
             }
             break;
@@ -2091,8 +2108,8 @@ BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
                iValue = hb_itemGetNI( pItem );
                if( iValue >= 0 )
                {
-                  pSet->HB_SET_AUTOSHARE = iValue;
-                  fResult = TRUE;
+                  pSet->HB_SET_AUTOSHARE  = iValue;
+                  fResult                 = TRUE;
                }
             }
             break;
@@ -2109,8 +2126,8 @@ BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
                iValue = hb_itemGetNI( pItem );
                if( iValue >= 0 )
                {
-                  pSet->HB_SET_EVENTMASK = iValue;
-                  fResult = TRUE;
+                  pSet->HB_SET_EVENTMASK  = iValue;
+                  fResult                 = TRUE;
                }
             }
             break;
@@ -2120,8 +2137,8 @@ BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
                iValue = hb_itemGetNI( pItem );
                if( iValue >= 0 )
                {
-                  pSet->HB_SET_MARGIN = iValue;
-                  fResult = TRUE;
+                  pSet->HB_SET_MARGIN  = iValue;
+                  fResult              = TRUE;
                }
             }
             break;
@@ -2132,7 +2149,7 @@ BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
                if( iValue >= 0 )
                {
                   pSet->HB_SET_MESSAGE = iValue;
-                  fResult = TRUE;
+                  fResult              = TRUE;
                }
             }
             break;
@@ -2142,7 +2159,7 @@ BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
                /* Set the value and limit the range */
                pSet->HB_SET_TYPEAHEAD = hb_itemGetNI( pItem );
                if( pSet->HB_SET_TYPEAHEAD == 0 )
-                  /* Do nothing */ ;
+                  /* Do nothing */;
                else if( pSet->HB_SET_TYPEAHEAD < 16 )
                   pSet->HB_SET_TYPEAHEAD = 16;
                else if( pSet->HB_SET_TYPEAHEAD > 4096 )
@@ -2155,8 +2172,8 @@ BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
          case HB_SET_VIDEOMODE:
             if( HB_IS_NUMERIC( pItem ) )
             {
-               pSet->HB_SET_VIDEOMODE = hb_itemGetNI( pItem );
-               fResult = TRUE;
+               pSet->HB_SET_VIDEOMODE  = hb_itemGetNI( pItem );
+               fResult                 = TRUE;
             }
             break;
 
@@ -2212,7 +2229,7 @@ BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
             {
                int iYear = 0;
 
-               szValue = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
+               szValue                 = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
                if( pSet->HB_SET_DATEFORMAT )
                   hb_xfree( pSet->HB_SET_DATEFORMAT );
                pSet->HB_SET_DATEFORMAT = szValue;
@@ -2227,33 +2244,33 @@ BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
                /* CENTURY is not controlled directly by SET, so there is no
                   notification for changing it indirectly via DATE FORMAT. */
                pSet->hb_set_century = iYear >= 4;
-               fResult = TRUE;
+               fResult              = TRUE;
             }
             break;
          case HB_SET_TIMEFORMAT:
             if( HB_IS_STRING( pItem ) )
             {
-               szValue = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
+               szValue                 = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
                if( pSet->HB_SET_TIMEFORMAT )
                   hb_xfree( pSet->HB_SET_TIMEFORMAT );
                pSet->HB_SET_TIMEFORMAT = szValue;
-               fResult = TRUE;
+               fResult                 = TRUE;
             }
             break;
          case HB_SET_DIRSEPARATOR:
             if( hb_itemGetCLen( pItem ) > 0 )
             {
-               pSet->HB_SET_DIRSEPARATOR = hb_itemGetCPtr( pItem )[ 0 ];
-               fResult = TRUE;
+               pSet->HB_SET_DIRSEPARATOR  = hb_itemGetCPtr( pItem )[ 0 ];
+               fResult                    = TRUE;
             }
             break;
          case HB_SET_DEVICE:
             if( HB_IS_STRING( pItem ) )
             {
-               szValue = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
+               szValue              = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
                if( pSet->HB_SET_DEVICE )
                   hb_xfree( pSet->HB_SET_DEVICE );
-               pSet->HB_SET_DEVICE = szValue;
+               pSet->HB_SET_DEVICE  = szValue;
 
                /* If the print file is not already open, open it in overwrite mode. */
                if( hb_stricmp( szValue, "PRINTER" ) == 0 && pSet->hb_set_printhan == FS_ERROR &&
@@ -2266,27 +2283,27 @@ BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
          case HB_SET_MFILEEXT:
             if( HB_IS_STRING( pItem ) || HB_IS_NIL( pItem ) )
             {
-               szValue = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
+               szValue                 = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
                if( pSet->HB_SET_MFILEEXT )
                   hb_xfree( pSet->HB_SET_MFILEEXT );
-               pSet->HB_SET_MFILEEXT = szValue;
-               fResult = TRUE;
+               pSet->HB_SET_MFILEEXT   = szValue;
+               fResult                 = TRUE;
             }
             break;
          case HB_SET_DEFAULT:
             if( HB_IS_STRING( pItem ) || HB_IS_NIL( pItem ) )
             {
-               szValue = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
+               szValue              = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
                if( pSet->HB_SET_DEFAULT )
                   hb_xfree( pSet->HB_SET_DEFAULT );
                pSet->HB_SET_DEFAULT = szValue;
-               fResult = TRUE;
+               fResult              = TRUE;
             }
             break;
          case HB_SET_PATH:
             if( HB_IS_STRING( pItem ) || HB_IS_NIL( pItem ) )
             {
-               szValue = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
+               szValue           = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
                if( pSet->HB_SET_PATH )
                   hb_xfree( pSet->HB_SET_PATH );
                pSet->HB_SET_PATH = szValue;
@@ -2295,38 +2312,38 @@ BOOL hb_setSetItem( HB_set_enum set_specifier, PHB_ITEM pItem )
                pSet->hb_set_path = NULL;
                hb_fsAddSearchPath( pSet->HB_SET_PATH, &pSet->hb_set_path );
 
-               fResult = TRUE;
+               fResult           = TRUE;
             }
             break;
          case HB_SET_DELIMCHARS:
             if( HB_IS_STRING( pItem ) || HB_IS_NIL( pItem ) )
             {
-               szValue = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
+               szValue                 = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
                if( pSet->HB_SET_DELIMCHARS )
                   hb_xfree( pSet->HB_SET_DELIMCHARS );
                pSet->HB_SET_DELIMCHARS = szValue;
-               fResult = TRUE;
+               fResult                 = TRUE;
             }
             break;
          case HB_SET_EOL:
             if( HB_IS_STRING( pItem ) || HB_IS_NIL( pItem ) )
             {
-               szValue = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
+               szValue           = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
                if( pSet->HB_SET_EOL )
                   hb_xfree( pSet->HB_SET_EOL );
-               pSet->HB_SET_EOL = szValue;
-               fResult = TRUE;
+               pSet->HB_SET_EOL  = szValue;
+               fResult           = TRUE;
             }
             break;
          case HB_SET_OSCODEPAGE:
             if( HB_IS_STRING( pItem ) || HB_IS_NIL( pItem ) )
             {
-               szValue = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
+               szValue                 = hb_strndup( hb_itemGetCPtr( pItem ), USHRT_MAX );
                if( pSet->HB_SET_OSCODEPAGE )
                   hb_xfree( pSet->HB_SET_OSCODEPAGE );
                pSet->HB_SET_OSCODEPAGE = szValue;
                hb_set_OSCODEPAGE( pSet );
-               fResult = TRUE;
+               fResult                 = TRUE;
             }
             break;
 
@@ -3150,13 +3167,13 @@ const char * hb_osEncodeCP( const char * szName, char ** pszFree, HB_SIZE * pulS
          PHB_CODEPAGE cdpHost = hb_cdppage();
          if( cdpHost && cdpHost != cdpOS )
          {
-            HB_SIZE ulSize = 0;
-            char * pszBuf;
+            HB_SIZE  ulSize = 0;
+            char *   pszBuf;
 
             if( pszFree == NULL )
             {
-               pszFree = ( char ** ) &szName;
-               ulSize = strlen( szName );
+               pszFree  = ( char ** ) &szName;
+               ulSize   = strlen( szName );
             }
             pszBuf = *pszFree;
             if( pulSize == NULL )
@@ -3188,13 +3205,13 @@ const char * hb_osDecodeCP( const char * szName, char ** pszFree, HB_SIZE * pulS
          PHB_CODEPAGE cdpHost = hb_cdppage();
          if( cdpHost && cdpHost != cdpOS )
          {
-            HB_SIZE ulSize = 0;
-            char * pszBuf;
+            HB_SIZE  ulSize = 0;
+            char *   pszBuf;
 
             if( pszFree == NULL )
             {
-               pszFree = ( char ** ) &szName;
-               ulSize = strlen( szName );
+               pszFree  = ( char ** ) &szName;
+               ulSize   = strlen( szName );
             }
             pszBuf = *pszFree;
             if( pulSize == NULL )

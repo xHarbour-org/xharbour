@@ -56,108 +56,112 @@
 
 PROCEDURE HB_TRPCCLIENT_ASYNC( self )
 
-   #ifdef HB_THREAD_SUPPORT
-      IF ::lAsyncMode
-         HB_MutexLock( ::mtxBusy )
-         ::thTCPAccept := StartThread( Self, "TCPAccept" )
-         HB_MutexUnlock( ::mtxBusy )
-      ELSE
-         ::TCPAccept()
-      ENDIF
-   #else
+#ifdef HB_THREAD_SUPPORT
+
+   IF ::lAsyncMode
+      hb_mutexLock( ::mtxBusy )
+      ::thTCPAccept := StartThread( Self, "TCPAccept" )
+      hb_mutexUnlock( ::mtxBusy )
+   ELSE
       ::TCPAccept()
-   #endif
+   ENDIF
+#else
+   ::TCPAccept()
+#endif
 
    RETURN
 
-
 PROCEDURE HB_TRPCCLIENT_STOPCALL( self )
 
-   #ifdef HB_THREAD_SUPPORT
-      HB_MutexLock( ::mtxBusy )
-      IF IsValidThread( ::thTCPAccept )
-         KillThread( ::thTCPAccept )
-         ::thTCPAccept := NIL
-         ::nStatus := RPC_STATUS_LOGGED
-         HB_MutexUnlock( ::mtxBusy )
-         ::OnFunctionReturn( NIL )
-      ELSE
-         HB_MutexUnlock( ::mtxBusy )
-      ENDIF
-   #else
-     ::nStatus := RPC_STATUS_LOGGED
-     ::OnFunctionReturn( NIL )
-   #endif
+#ifdef HB_THREAD_SUPPORT
+
+   hb_mutexLock( ::mtxBusy )
+   IF IsValidThread( ::thTCPAccept )
+      KillThread( ::thTCPAccept )
+      ::thTCPAccept := NIL
+      ::nStatus := RPC_STATUS_LOGGED
+      hb_mutexUnlock( ::mtxBusy )
+      ::OnFunctionReturn( NIL )
+   ELSE
+      hb_mutexUnlock( ::mtxBusy )
+   ENDIF
+#else
+   ::nStatus := RPC_STATUS_LOGGED
+   ::OnFunctionReturn( NIL )
+#endif
 
    RETURN
 
 FUNCTION HB_TRPCCLIENT_CALL( self )
 
-   #ifdef HB_THREAD_SUPPORT
-      HB_MutexLock( ::mtxBusy )
-      // already active or not already connected
-      IF IsValidThread( ::thTcpAccept ) .or. ::skTCP == NIL .or. ::nStatus < RPC_STATUS_LOGGED
-         HB_MutexUnlock( ::mtxBusy )
-         RETURN NIL
-      ENDIF
-      HB_MutexUnlock( ::mtxBusy )
-   #else
-      IF ::skTCP == NIL .or. ::nStatus < RPC_STATUS_LOGGED
-         RETURN NIL
-      ENDIF
-   #endif
+#ifdef HB_THREAD_SUPPORT
+
+   hb_mutexLock( ::mtxBusy )
+// already active or not already connected
+   IF IsValidThread( ::thTcpAccept ) .OR. ::skTCP == NIL .OR. ::nStatus < RPC_STATUS_LOGGED
+      hb_mutexUnlock( ::mtxBusy )
+      RETURN NIL
+   ENDIF
+   hb_mutexUnlock( ::mtxBusy )
+#else
+   IF ::skTCP == NIL .OR. ::nStatus < RPC_STATUS_LOGGED
+      RETURN NIL
+   ENDIF
+#endif
 
    RETURN NIL
 
 PROCEDURE HB_TRPCCLIENT_STOPSCAN( self )
 
-   #ifdef HB_THREAD_SUPPORT
-      HB_MutexLock( ::mtxBusy )
-      IF IsValidThread( ::thUDPAccept )
-         KillThread( ::thUDPAccept )
-         ::thUDPAccept := NIL
-         HB_MutexUnlock( ::mtxBusy )
-         ::OnScanComplete()
-      ELSE
-         HB_MutexUnlock( ::mtxBusy )
-      ENDIF
-   #else
-     ::OnScanComplete()
-   #endif
+#ifdef HB_THREAD_SUPPORT
+
+   hb_mutexLock( ::mtxBusy )
+   IF IsValidThread( ::thUDPAccept )
+      KillThread( ::thUDPAccept )
+      ::thUDPAccept := NIL
+      hb_mutexUnlock( ::mtxBusy )
+      ::OnScanComplete()
+   ELSE
+      hb_mutexUnlock( ::mtxBusy )
+   ENDIF
+#else
+   ::OnScanComplete()
+#endif
 
    RETURN
 
-
 PROCEDURE HB_TRPCCLIENT_STARTSCAN( self )
 
-   #ifdef HB_THREAD_SUPPORT
-      IF ::lAsyncMode
-         HB_MutexLock( ::mtxBusy )
-            ::thUdpAccept := StartThread( Self, "UDPAccept" )
-         HB_MutexUnlock( ::mtxBusy )
-      ELSE
-         ::UDPAccept()
-      ENDIF
-   #else
+#ifdef HB_THREAD_SUPPORT
+
+   IF ::lAsyncMode
+      hb_mutexLock( ::mtxBusy )
+      ::thUdpAccept := StartThread( Self, "UDPAccept" )
+      hb_mutexUnlock( ::mtxBusy )
+   ELSE
       ::UDPAccept()
-   #endif
+   ENDIF
+#else
+   ::UDPAccept()
+#endif
 
    RETURN
 
 PROCEDURE HB_TRPCCLIENT_DESTROY( self )
 
-   #ifdef HB_THREAD_SUPPORT
-      IF IsValidThread( ::thUdpAccept )
-         KillThread( ::thUdpAccept )
-         ::thUdpAccept := NIL
-      ENDIF
-      IF IsValidThread( ::thTcpAccept )
-         KillThread( ::thTcpAccept )
-         ::thTcpAccept := NIL
-      ENDIF
-   #else
-      HB_SYMBOL_UNUSED( self )
-   #endif
+#ifdef HB_THREAD_SUPPORT
+
+   IF IsValidThread( ::thUdpAccept )
+      KillThread( ::thUdpAccept )
+      ::thUdpAccept := NIL
+   ENDIF
+   IF IsValidThread( ::thTcpAccept )
+      KillThread( ::thTcpAccept )
+      ::thTcpAccept := NIL
+   ENDIF
+#else
+   HB_SYMBOL_UNUSED( self )
+#endif
 
    RETURN
 

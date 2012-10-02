@@ -52,35 +52,36 @@
 PROCEDURE HB_LOGOPEN( oLog )
 
 #ifdef HB_THREAD_SUPPORT
-   oLog:mtxBusy := HB_MutexCreate()
+
+   oLog:mtxBusy := hb_mutexCreate()
    oLog:nThread := StartThread( oLog, "AcceptCon" )
 #else
-   // If we have not threads, we have to sync accept incoming connection
-   // when we log a message
+// If we have not threads, we have to sync accept incoming connection
+// when we log a message
    InetSetTimeout( oLog:skIn, 50 )
 #endif
 
    RETURN
-
 
 PROCEDURE HB_LOGACCEPTCON( oLog )
 
    LOCAL sk
 
 #ifdef HB_THREAD_SUPPORT
+
    InetSetTimeout( oLog:skIn, 250 )
-   DO WHILE .not. oLog:bTerminate
+   DO WHILE .NOT. oLog:bTerminate
       sk := InetAccept( oLog:skIn )
       // A gentle termination request, or an error
       IF sk != NIL
-         HB_MutexLock( oLog:mtxBusy )
+         hb_mutexLock( oLog:mtxBusy )
          AAdd( oLog:aListeners, sk )
-         HB_MutexUnlock( oLog:mtxBusy )
+         hb_mutexUnlock( oLog:mtxBusy )
       ENDIF
    ENDDO
 #else
    sk := InetAccept( oLog:skIn )
-   // A gentle termination request, or an error
+// A gentle termination request, or an error
    IF sk != NIL
       AAdd( oLog:aListeners, sk )
       IF oLog:bOnConnect <> NIL
@@ -91,13 +92,14 @@ PROCEDURE HB_LOGACCEPTCON( oLog )
 
    RETURN
 
-
 PROCEDURE HB_LOGBROADCASTMESSAGE( oLog )
 
 #ifdef HB_THREAD_SUPPORT
-   // be sure thread is not busy now
-   HB_MutexLock( oLog:mtxBusy )
+
+// be sure thread is not busy now
+   hb_mutexLock( oLog:mtxBusy )
 #else
    oLog:AcceptCon()
 #endif
+
    RETURN

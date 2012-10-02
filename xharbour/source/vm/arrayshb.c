@@ -79,7 +79,7 @@ static void hb_arrayNewRagged( PHB_ITEM pArray, int iDimension )
 {
    HB_SIZE ulElements;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_arrayNewRagged(%p, %d)", pArray, iDimension));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_arrayNewRagged(%p, %d)", pArray, iDimension ) );
 
    ulElements = hb_parns( iDimension );
 
@@ -103,15 +103,15 @@ HB_FUNC( ARRAY )
 
    if( iPCount > 0 )
    {
-      BOOL bError = FALSE;
-      int iParam;
+      BOOL  bError = FALSE;
+      int   iParam;
 
       for( iParam = 1; iParam <= iPCount; iParam++ )
       {
 
-         if ( ! hb_param( iParam, HB_IT_NUMERIC ) )
-         // if( ! ISNUM( iParam ) )
+         if( ! hb_param( iParam, HB_IT_NUMERIC ) )
          {
+            // if( ! ISNUM( iParam ) )
             bError = TRUE;
             break;
          }
@@ -157,7 +157,7 @@ HB_FUNC( AADD )
    }
    else
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "AADD", HB_MIN( hb_pcount(), 2 ), hb_paramError(1), hb_paramError( 2 ) );
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "AADD", HB_MIN( hb_pcount(), 2 ), hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 }
 
@@ -172,7 +172,7 @@ HB_FUNC( HB_ARRAYID )  /* for debugging: returns the array's "address" so dual r
 HB_FUNC( HB_THISARRAY )
 {
    PHB_ITEM pArrayID = hb_param( 1, HB_IT_POINTER | HB_IT_NUMINT );
-   PHB_ITEM pArray = hb_stackReturnItem();
+   PHB_ITEM pArray   = hb_stackReturnItem();
 
    hb_itemClear( pArray );
 
@@ -182,17 +182,17 @@ HB_FUNC( HB_THISARRAY )
 
       if( HB_IS_POINTER( pArrayID ) )
       {
-         pArray->item.asArray.value = (PHB_BASEARRAY) hb_itemGetPtr( pArrayID );
+         pArray->item.asArray.value = ( PHB_BASEARRAY ) hb_itemGetPtr( pArrayID );
       }
       else
       {
-         pArray->item.asArray.value = (PHB_BASEARRAY) hb_itemGetNL( pArrayID );
+         pArray->item.asArray.value = ( PHB_BASEARRAY ) hb_itemGetNL( pArrayID );
       }
 
       #ifdef HB_ARRAY_USE_COUNTER
-         HB_ATOMIC_INC( pArray->item.asArray.value->ulHolders );
+      HB_ATOMIC_INC( pArray->item.asArray.value->ulHolders );
       #else
-         hb_arrayRegisterHolder( pArray->item.asArray.value, (void *) pArray );
+      hb_arrayRegisterHolder( pArray->item.asArray.value, ( void * ) pArray );
       #endif
    }
 }
@@ -230,8 +230,8 @@ HB_FUNC( ASIZE )
 
 HB_FUNC( ASIZEALLOC )
 {
-   PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
-   PHB_ITEM pPreAlloc = hb_param( 2, HB_IT_NUMERIC );
+   PHB_ITEM pArray      = hb_param( 1, HB_IT_ARRAY );
+   PHB_ITEM pPreAlloc   = hb_param( 2, HB_IT_NUMERIC );
 
    if( pArray && pPreAlloc )
    {
@@ -255,7 +255,7 @@ HB_FUNC( ALENALLOC )
 
    if( pArray )
    {
-      hb_retnl( (LONG) pArray->item.asArray.value->ulBlock );
+      hb_retnl( ( LONG ) pArray->item.asArray.value->ulBlock );
    }
 }
 
@@ -337,10 +337,10 @@ HB_FUNC( ADEL )
             lIndex = hb_parns( 2 );
 
             #ifndef HB_C52_STRICT
-              if( lIndex < 0 )
-              {
-                 lIndex += pArray->item.asArray.value->ulLen + 1;
-              }
+            if( lIndex < 0 )
+            {
+               lIndex += pArray->item.asArray.value->ulLen + 1;
+            }
             #endif
          }
          else
@@ -351,12 +351,12 @@ HB_FUNC( ADEL )
          if( hb_arrayDel( pArray, lIndex ) )
          {
             #ifndef HB_C52_STRICT
-               PHB_ITEM pShrink = hb_param( 3, HB_IT_LOGICAL );
+            PHB_ITEM pShrink = hb_param( 3, HB_IT_LOGICAL );
 
-               if( pShrink && pShrink->item.asLogical.value )
-               {
-                  hb_arraySize( pArray, pArray->item.asArray.value->ulLen - 1 );
-               }
+            if( pShrink && pShrink->item.asLogical.value )
+            {
+               hb_arraySize( pArray, pArray->item.asArray.value->ulLen - 1 );
+            }
             #endif
          }
       }
@@ -384,11 +384,11 @@ HB_FUNC( AFILL )
 
       if( pValue )
       {
-         HB_ISIZ ulStart = hb_parnl( 3 );
-         HB_ISIZ ulCount = hb_parnl( 4 );
+         HB_ISIZ  ulStart  = hb_parnl( 3 );
+         HB_ISIZ  ulCount  = hb_parnl( 4 );
 
          /* Explicy ulCount of 0 - Nothing to do! */
-         if( ISNUM(4) && ulCount == 0 )
+         if( ISNUM( 4 ) && ulCount == 0 )
          {
             /* AFill() returns the array itself */
             if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
@@ -469,25 +469,25 @@ HB_FUNC( AFILL )
    else
    {
       #ifdef HB_C52_STRICT
-        /* NOTE: In CA-Cl*pper AFILL() is written in a manner that it will
-               call AEVAL() to do the job, so the error (if any) will also be
-               thrown by AEVAL().  [vszakats] */
-        hb_errRT_BASE( EG_ARG, 2017, NULL, "AEVAL", HB_MIN( hb_pcount(), 4 ), hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
+      /* NOTE: In CA-Cl*pper AFILL() is written in a manner that it will
+             call AEVAL() to do the job, so the error (if any) will also be
+             thrown by AEVAL().  [vszakats] */
+      hb_errRT_BASE( EG_ARG, 2017, NULL, "AEVAL", HB_MIN( hb_pcount(), 4 ), hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
       #else
-        hb_errRT_BASE( EG_ARG, 9999, NULL, "AFILL", HB_MIN( hb_pcount(), 4 ), hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
+      hb_errRT_BASE( EG_ARG, 9999, NULL, "AFILL", HB_MIN( hb_pcount(), 4 ), hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
       #endif
    }
 }
 
 HB_FUNC( ASCAN )
 {
-   PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
-   PHB_ITEM pValue = hb_param( 2, HB_IT_ANY );
+   PHB_ITEM pArray   = hb_param( 1, HB_IT_ARRAY );
+   PHB_ITEM pValue   = hb_param( 2, HB_IT_ANY );
 
    if( pArray && pValue )
    {
-      HB_SIZE ulStart   = hb_parnl( 3 );
-      HB_SIZE ulCount   = hb_parnl( 4 );
+      HB_SIZE  ulStart  = hb_parnl( 3 );
+      HB_SIZE  ulCount  = hb_parnl( 4 );
 
       hb_retns( hb_arrayScan( pArray, pValue, ISNUM( 3 ) ? &ulStart : NULL, ISNUM( 4 ) ? &ulCount : NULL, hb_parl( 5 ), hb_parl( 6 ) ) );
    }
@@ -502,13 +502,13 @@ HB_FUNC( ASCAN )
 
 HB_FUNC( AEVAL )
 {
-   PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
-   PHB_ITEM pBlock = hb_param( 2, HB_IT_BLOCK );
+   PHB_ITEM pArray   = hb_param( 1, HB_IT_ARRAY );
+   PHB_ITEM pBlock   = hb_param( 2, HB_IT_BLOCK );
 
    if( pArray && pBlock )
    {
-      HB_SIZE ulStart = hb_parnl( 3 );
-      HB_SIZE ulCount = hb_parnl( 4 );
+      HB_SIZE  ulStart  = hb_parnl( 3 );
+      HB_SIZE  ulCount  = hb_parnl( 4 );
 
       hb_arrayEval( pArray,
                     pBlock,
@@ -528,17 +528,17 @@ HB_FUNC( AEVAL )
 
 HB_FUNC( ACOPY )
 {
-   PHB_ITEM pSrcArray = hb_param( 1, HB_IT_ARRAY );
-   PHB_ITEM pDstArray = hb_param( 2, HB_IT_ARRAY );
+   PHB_ITEM pSrcArray   = hb_param( 1, HB_IT_ARRAY );
+   PHB_ITEM pDstArray   = hb_param( 2, HB_IT_ARRAY );
 
    if( pSrcArray && pDstArray )
    {
       /* CA-Cl*pper works this way. */
       if( ! hb_arrayIsObject( pSrcArray ) && ! hb_arrayIsObject( pDstArray ) )
       {
-         HB_SIZE ulStart  = hb_parnl( 3 );
-         HB_SIZE ulCount  = hb_parnl( 4 );
-         HB_SIZE ulTarget = hb_parnl( 5 );
+         HB_SIZE  ulStart  = hb_parnl( 3 );
+         HB_SIZE  ulCount  = hb_parnl( 4 );
+         HB_SIZE  ulTarget = hb_parnl( 5 );
 
          hb_arrayCopy( pSrcArray,
                        pDstArray,
@@ -573,7 +573,7 @@ HB_FUNC( ACLONE )
 
 HB_FUNC( HB_APARAMS )
 {
-   PHB_ITEM *pBase = hb_stackGetBase( hb_parnl(1) + 1 );
+   PHB_ITEM * pBase = hb_stackGetBase( hb_parnl( 1 ) + 1 );
 
    if( pBase )
    {
@@ -587,14 +587,14 @@ HB_FUNC( HB_APARAMS )
 
 HB_FUNC( HB_AEXPRESSIONS )
 {
-   PHB_ITEM pLine  = hb_param( 1, HB_IT_STRING );
-   size_t i, iOffset = 0;
-   int iParans = 0, iArrays = 0, iIndexs = 0;
-   BOOL bArray = FALSE;
+   PHB_ITEM pLine    = hb_param( 1, HB_IT_STRING );
+   size_t   i, iOffset = 0;
+   int      iParans  = 0, iArrays = 0, iIndexs = 0;
+   BOOL     bArray   = FALSE;
 
    if( pLine == NULL )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HB_AEXPRESSIONS", 1, hb_paramError(1) );
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HB_AEXPRESSIONS", 1, hb_paramError( 1 ) );
       return;
    }
 
@@ -602,68 +602,74 @@ HB_FUNC( HB_AEXPRESSIONS )
 
    for( i = 0; i < pLine->item.asString.length; i++ )
    {
-      switch( pLine->item.asString.value[i] )
+      switch( pLine->item.asString.value[ i ] )
       {
-         case '(' :
+         case '(':
             iParans++;
             bArray = FALSE;
             break;
 
-         case ')' :
+         case ')':
             iParans--;
             bArray = TRUE;
             break;
 
-         case '{' :
+         case '{':
             iArrays++;
             bArray = FALSE;
             break;
 
-         case '}' :
+         case '}':
             iArrays--;
             bArray = TRUE;
             break;
 
-         case '[' :
-            if( bArray || ( i && HB_ISALNUM( ( BYTE ) pLine->item.asString.value[i - 1] ) ) )
+         case '[':
+            if( bArray || ( i && HB_ISALNUM( ( BYTE ) pLine->item.asString.value[ i - 1 ] ) ) )
             {
                iIndexs++;
             }
             else
             {
-               while( ++i < pLine->item.asString.length  && pLine->item.asString.value[i] != ']'  ) {}
+               while( ++i < pLine->item.asString.length && pLine->item.asString.value[ i ] != ']' )
+               {
+               }
             }
             bArray = FALSE;
             break;
 
-         case ']' :
+         case ']':
             iIndexs--;
             bArray = TRUE;
             break;
 
-         case '"' :
-            while( ++i < pLine->item.asString.length && pLine->item.asString.value[i] != '"'  ) {}
+         case '"':
+            while( ++i < pLine->item.asString.length && pLine->item.asString.value[ i ] != '"' )
+            {
+            }
             bArray = FALSE;
             break;
 
-         case '\'' :
-            while( ++i < pLine->item.asString.length && pLine->item.asString.value[i] != '\''  ) {}
+         case '\'':
+            while( ++i < pLine->item.asString.length && pLine->item.asString.value[ i ] != '\'' )
+            {
+            }
             bArray = FALSE;
             break;
 
-         case ',' :
+         case ',':
             if( iParans == 0 && iArrays == 0 && iIndexs == 0 )
             {
-               HB_ITEM_NEW ( Exp );
+               HB_ITEM_NEW( Exp );
 
-               hb_arrayAddForward( &(HB_VM_STACK).Return, hb_itemPutCL( &Exp, pLine->item.asString.value + iOffset, i - iOffset ) );
+               hb_arrayAddForward( &( HB_VM_STACK ).Return, hb_itemPutCL( &Exp, pLine->item.asString.value + iOffset, i - iOffset ) );
                iOffset = i + 1;
 
             }
             bArray = FALSE;
             break;
 
-         default :
+         default:
             bArray = FALSE;
             break;
       }
@@ -671,21 +677,21 @@ HB_FUNC( HB_AEXPRESSIONS )
 
    if( iOffset < pLine->item.asString.length - 1 )
    {
-      HB_ITEM_NEW ( Exp );
+      HB_ITEM_NEW( Exp );
 
-      hb_arrayAddForward( &(HB_VM_STACK).Return, hb_itemPutCL( &Exp, pLine->item.asString.value + iOffset, pLine->item.asString.length - iOffset ) );
+      hb_arrayAddForward( &( HB_VM_STACK ).Return, hb_itemPutCL( &Exp, pLine->item.asString.value + iOffset, pLine->item.asString.length - iOffset ) );
 
    }
 }
 
 unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned int uiAlign )
 {
-   PHB_BASEARRAY pBaseDef = aDef->item.asArray.value;
-   HB_SIZE ulLen = pBaseDef->ulLen;
-   HB_SIZE ulIndex;
-   unsigned int uiSize = 0, uiMemberSize;
-   BYTE cShift;
-   unsigned int uiPad;
+   PHB_BASEARRAY  pBaseDef = aDef->item.asArray.value;
+   HB_SIZE        ulLen    = pBaseDef->ulLen;
+   HB_SIZE        ulIndex;
+   unsigned int   uiSize   = 0, uiMemberSize;
+   BYTE           cShift;
+   unsigned int   uiPad;
 
    for( ulIndex = 0; ulIndex < ulLen; ulIndex++ )
    {
@@ -697,69 +703,69 @@ unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned int uiAlign )
 
       switch( ( pBaseDef->pItems + ulIndex )->item.asInteger.value )
       {
-         case CTYPE_CHAR : // char
-         case CTYPE_UNSIGNED_CHAR : // unsigned char
+         case CTYPE_CHAR:           // char
+         case CTYPE_UNSIGNED_CHAR:  // unsigned char
             uiMemberSize = sizeof( char );
             break;
 
-         case CTYPE_CHAR_PTR : // char *
-         case CTYPE_UNSIGNED_CHAR_PTR : // unsigned char *
+         case CTYPE_CHAR_PTR:          // char *
+         case CTYPE_UNSIGNED_CHAR_PTR: // unsigned char *
             uiMemberSize = sizeof( char * );
             break;
 
-         case CTYPE_SHORT : // short
-         case CTYPE_UNSIGNED_SHORT : // unsigned short
+         case CTYPE_SHORT:          // short
+         case CTYPE_UNSIGNED_SHORT: // unsigned short
             uiMemberSize = sizeof( short );
             break;
 
-         case CTYPE_SHORT_PTR : // short
-         case CTYPE_UNSIGNED_SHORT_PTR : // unsigned short
+         case CTYPE_SHORT_PTR:            // short
+         case CTYPE_UNSIGNED_SHORT_PTR:   // unsigned short
             uiMemberSize = sizeof( short * );
             break;
 
-         case CTYPE_INT : // int
-         case CTYPE_UNSIGNED_INT : // unsigned int
+         case CTYPE_INT:            // int
+         case CTYPE_UNSIGNED_INT:   // unsigned int
             uiMemberSize = sizeof( int );
             break;
 
-         case CTYPE_INT_PTR : // int *
-         case CTYPE_UNSIGNED_INT_PTR : // unsigned int *
+         case CTYPE_INT_PTR:           // int *
+         case CTYPE_UNSIGNED_INT_PTR:  // unsigned int *
             uiMemberSize = sizeof( int * );
             break;
 
-         case CTYPE_LONG : // long
-         case CTYPE_UNSIGNED_LONG : // unsigned long
+         case CTYPE_LONG:           // long
+         case CTYPE_UNSIGNED_LONG:  // unsigned long
             uiMemberSize = sizeof( long );
             break;
 
-         case CTYPE_LONG_PTR : // long *
-         case CTYPE_UNSIGNED_LONG_PTR : // unsigned long *
+         case CTYPE_LONG_PTR:          // long *
+         case CTYPE_UNSIGNED_LONG_PTR: // unsigned long *
             uiMemberSize = sizeof( long * );
             break;
 
-         case CTYPE_FLOAT : // float
+         case CTYPE_FLOAT:  // float
             uiMemberSize = sizeof( float );
             break;
 
-         case CTYPE_FLOAT_PTR : // float *
+         case CTYPE_FLOAT_PTR:  // float *
             uiMemberSize = sizeof( float * );
             break;
 
-         case CTYPE_DOUBLE : // double
+         case CTYPE_DOUBLE:  // double
             uiMemberSize = sizeof( double );
             break;
 
-         case CTYPE_DOUBLE_PTR : // double *
+         case CTYPE_DOUBLE_PTR:  // double *
             uiMemberSize = sizeof( double * );
             break;
 
-         case CTYPE_VOID_PTR : // void * (pointer)
+         case CTYPE_VOID_PTR:  // void * (pointer)
             uiMemberSize = sizeof( void * );
             break;
 
          default:
          {
-            HB_ITEM_NEW ( ID );
+            HB_ITEM_NEW( ID );
 
             hb_itemPutNI( &ID, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
 
@@ -774,7 +780,7 @@ unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned int uiAlign )
                if( HB_IS_OBJECT( pStructure ) )
                {
                   hb_objSendMsg( pStructure, "SizeOf", 0 );
-                  uiMemberSize = (unsigned int) hb_itemGetNL( &HB_VM_STACK.Return );
+                  uiMemberSize = ( unsigned int ) hb_itemGetNL( &HB_VM_STACK.Return );
                   hb_itemRelease( pStructure );
                }
                else
@@ -820,15 +826,15 @@ unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned int uiAlign )
 
 HB_FUNC( HB_SIZEOFCSTRUCTURE )
 {
-   PHB_ITEM aDef = hb_param( 1, HB_IT_ARRAY );
-   PHB_ITEM pAlign = hb_param( 2, HB_IT_INTEGER );
-   unsigned int uiAlign;
+   PHB_ITEM       aDef     = hb_param( 1, HB_IT_ARRAY );
+   PHB_ITEM       pAlign   = hb_param( 2, HB_IT_INTEGER );
+   unsigned int   uiAlign;
 
    if( aDef )
    {
       if( pAlign )
       {
-         uiAlign = (BYTE) pAlign->item.asInteger.value;
+         uiAlign = ( BYTE ) pAlign->item.asInteger.value;
       }
       else
       {
@@ -845,19 +851,19 @@ HB_FUNC( HB_SIZEOFCSTRUCTURE )
 
 BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, unsigned int * puiSize )
 {
-   PHB_BASEARRAY pBaseVar = aVar->item.asArray.value;
-   PHB_BASEARRAY pBaseDef = aDef->item.asArray.value;
-   HB_SIZE ulLen = pBaseDef->ulLen;
-   HB_SIZE ulIndex;
-   BYTE  *Buffer;
-   unsigned int uiOffset = 0, uiMemberSize;
-   BYTE cShift;
+   PHB_BASEARRAY  pBaseVar = aVar->item.asArray.value;
+   PHB_BASEARRAY  pBaseDef = aDef->item.asArray.value;
+   HB_SIZE        ulLen    = pBaseDef->ulLen;
+   HB_SIZE        ulIndex;
+   BYTE *         Buffer;
+   unsigned int   uiOffset = 0, uiMemberSize;
+   BYTE           cShift;
 
-   *puiSize = SizeOfCStructure( aDef, uiAlign ) ;
+   *puiSize = SizeOfCStructure( aDef, uiAlign );
 
    //printf( "Size: %i\n", *puiSize );
 
-   Buffer = (BYTE *) hb_xgrab( *puiSize );
+   Buffer = ( BYTE * ) hb_xgrab( *puiSize );
 
    for( ulIndex = 0; ulIndex < ulLen; ulIndex++ )
    {
@@ -865,134 +871,134 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
 
       switch( ( pBaseDef->pItems + ulIndex )->item.asInteger.value )
       {
-         case CTYPE_CHAR : // char
-         case CTYPE_UNSIGNED_CHAR : // unsigned char
-            if( ( pBaseVar->pItems + ulIndex  )->type && ! HB_IS_NUMERIC( pBaseVar->pItems + ulIndex  ) )
+         case CTYPE_CHAR:           // char
+         case CTYPE_UNSIGNED_CHAR:  // unsigned char
+            if( ( pBaseVar->pItems + ulIndex )->type && ! HB_IS_NUMERIC( pBaseVar->pItems + ulIndex  ) )
             {
-               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
                return NULL;
             }
 
             uiMemberSize = sizeof( char );
             break;
 
-         case CTYPE_CHAR_PTR : // char *
-         case CTYPE_UNSIGNED_CHAR_PTR : // unsigned char *
-            if( ( pBaseVar->pItems + ulIndex  )->type && ( pBaseVar->pItems + ulIndex  )->type != HB_IT_STRING
-                                                      && ( pBaseVar->pItems + ulIndex  )->type != HB_IT_POINTER
-                                                      && ( pBaseVar->pItems + ulIndex  )->type != HB_IT_LONG )
+         case CTYPE_CHAR_PTR:          // char *
+         case CTYPE_UNSIGNED_CHAR_PTR: // unsigned char *
+            if( ( pBaseVar->pItems + ulIndex )->type && ( pBaseVar->pItems + ulIndex )->type != HB_IT_STRING
+                && ( pBaseVar->pItems + ulIndex )->type != HB_IT_POINTER
+                && ( pBaseVar->pItems + ulIndex )->type != HB_IT_LONG )
             {
-               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
                return NULL;;
             }
 
             uiMemberSize = sizeof( char * );
             break;
 
-         case CTYPE_SHORT : // short
-         case CTYPE_UNSIGNED_SHORT : // unsigned short
+         case CTYPE_SHORT:          // short
+         case CTYPE_UNSIGNED_SHORT: // unsigned short
             // Type check performed in actual translation...
             uiMemberSize = sizeof( short );
             break;
 
-         case CTYPE_SHORT_PTR : // short *
-         case CTYPE_UNSIGNED_SHORT_PTR : // unsigned short *
-            if( ( pBaseVar->pItems + ulIndex  )->type && ( pBaseVar->pItems + ulIndex  )->type != HB_IT_POINTER
-                                                      && ( pBaseVar->pItems + ulIndex  )->type != HB_IT_LONG )
+         case CTYPE_SHORT_PTR:            // short *
+         case CTYPE_UNSIGNED_SHORT_PTR:   // unsigned short *
+            if( ( pBaseVar->pItems + ulIndex )->type && ( pBaseVar->pItems + ulIndex )->type != HB_IT_POINTER
+                && ( pBaseVar->pItems + ulIndex )->type != HB_IT_LONG )
             {
-               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
                return NULL;;
             }
 
             uiMemberSize = sizeof( short * );
             break;
 
-         case CTYPE_INT : // int
-         case CTYPE_UNSIGNED_INT : // unsigned int
+         case CTYPE_INT:            // int
+         case CTYPE_UNSIGNED_INT:   // unsigned int
             // Type check performed in actual translation...
             uiMemberSize = sizeof( int );
             break;
 
-         case CTYPE_INT_PTR : // int *
-         case CTYPE_UNSIGNED_INT_PTR : // unsigned int *
-            if( ( pBaseVar->pItems + ulIndex  )->type && ( pBaseVar->pItems + ulIndex  )->type != HB_IT_POINTER
-                                                      && ( pBaseVar->pItems + ulIndex  )->type != HB_IT_LONG )
+         case CTYPE_INT_PTR:           // int *
+         case CTYPE_UNSIGNED_INT_PTR:  // unsigned int *
+            if( ( pBaseVar->pItems + ulIndex )->type && ( pBaseVar->pItems + ulIndex )->type != HB_IT_POINTER
+                && ( pBaseVar->pItems + ulIndex )->type != HB_IT_LONG )
             {
-               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
                return NULL;;
             }
 
             uiMemberSize = sizeof( int * );
             break;
 
-         case CTYPE_LONG : // long
-         case CTYPE_UNSIGNED_LONG : // unsigned long
+         case CTYPE_LONG:           // long
+         case CTYPE_UNSIGNED_LONG:  // unsigned long
             // Type check performed in actual translation...
             uiMemberSize = sizeof( long );
             break;
 
-         case CTYPE_LONG_PTR : // long *
-         case CTYPE_UNSIGNED_LONG_PTR : // unsigned long *
-            if( ( pBaseVar->pItems + ulIndex  )->type && ( pBaseVar->pItems + ulIndex  )->type != HB_IT_POINTER
-                                                      && ( pBaseVar->pItems + ulIndex  )->type != HB_IT_LONG )
+         case CTYPE_LONG_PTR:          // long *
+         case CTYPE_UNSIGNED_LONG_PTR: // unsigned long *
+            if( ( pBaseVar->pItems + ulIndex )->type && ( pBaseVar->pItems + ulIndex )->type != HB_IT_POINTER
+                && ( pBaseVar->pItems + ulIndex )->type != HB_IT_LONG )
             {
-               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
                return NULL;;
             }
 
             uiMemberSize = sizeof( long * );
             break;
 
-         case CTYPE_FLOAT : // float
-            if( ( pBaseVar->pItems + ulIndex  )->type && ( pBaseVar->pItems + ulIndex  )->type != HB_IT_DOUBLE )
+         case CTYPE_FLOAT:  // float
+            if( ( pBaseVar->pItems + ulIndex )->type && ( pBaseVar->pItems + ulIndex )->type != HB_IT_DOUBLE )
             {
-               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
                return NULL;
             }
 
             uiMemberSize = sizeof( float );
             break;
 
-         case CTYPE_FLOAT_PTR : // float *
-            if( ( pBaseVar->pItems + ulIndex  )->type && ( pBaseVar->pItems + ulIndex  )->type != HB_IT_DOUBLE
-                                                      && ( pBaseVar->pItems + ulIndex  )->type != HB_IT_POINTER
-                                                      && ( pBaseVar->pItems + ulIndex  )->type != HB_IT_LONG )
+         case CTYPE_FLOAT_PTR:  // float *
+            if( ( pBaseVar->pItems + ulIndex )->type && ( pBaseVar->pItems + ulIndex )->type != HB_IT_DOUBLE
+                && ( pBaseVar->pItems + ulIndex )->type != HB_IT_POINTER
+                && ( pBaseVar->pItems + ulIndex )->type != HB_IT_LONG )
             {
-               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
                return NULL;
             }
 
             uiMemberSize = sizeof( float * );
             break;
 
-         case CTYPE_DOUBLE : // double
-            if( ( pBaseVar->pItems + ulIndex  )->type && ( pBaseVar->pItems + ulIndex  )->type != HB_IT_DOUBLE )
+         case CTYPE_DOUBLE:  // double
+            if( ( pBaseVar->pItems + ulIndex )->type && ( pBaseVar->pItems + ulIndex )->type != HB_IT_DOUBLE )
             {
-               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
                return NULL;
             }
 
             uiMemberSize = sizeof( double );
             break;
 
-         case CTYPE_DOUBLE_PTR : // double *
-            if( ( pBaseVar->pItems + ulIndex  )->type && ( pBaseVar->pItems + ulIndex  )->type != HB_IT_DOUBLE
-                                                      && ( pBaseVar->pItems + ulIndex  )->type != HB_IT_POINTER
-                                                      && ( pBaseVar->pItems + ulIndex  )->type != HB_IT_LONG )
+         case CTYPE_DOUBLE_PTR:  // double *
+            if( ( pBaseVar->pItems + ulIndex )->type && ( pBaseVar->pItems + ulIndex )->type != HB_IT_DOUBLE
+                && ( pBaseVar->pItems + ulIndex )->type != HB_IT_POINTER
+                && ( pBaseVar->pItems + ulIndex )->type != HB_IT_LONG )
             {
-               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
                return NULL;
             }
 
             uiMemberSize = sizeof( double * );
             break;
 
-         case CTYPE_VOID_PTR : // void * (pointer)
-            if( ( pBaseVar->pItems + ulIndex  )->type && ( pBaseVar->pItems + ulIndex  )->type != HB_IT_POINTER
-                                                      && ( pBaseVar->pItems + ulIndex  )->type != HB_IT_LONG
-                                                      && ( pBaseVar->pItems + ulIndex  )->type != HB_IT_STRING )
+         case CTYPE_VOID_PTR:  // void * (pointer)
+            if( ( pBaseVar->pItems + ulIndex )->type && ( pBaseVar->pItems + ulIndex )->type != HB_IT_POINTER
+                && ( pBaseVar->pItems + ulIndex )->type != HB_IT_LONG
+                && ( pBaseVar->pItems + ulIndex )->type != HB_IT_STRING )
             {
-               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
                return NULL;
             }
 
@@ -1001,7 +1007,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
 
          default:
          {
-            HB_ITEM_NEW ( ID );
+            HB_ITEM_NEW( ID );
 
             hb_itemPutNI( &ID, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
 
@@ -1016,19 +1022,19 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
                if( HB_IS_OBJECT( pStructure ) )
                {
                   hb_objSendMsg( pStructure, "SizeOf", 0 );
-                  uiMemberSize = (unsigned int) hb_itemGetNL( &HB_VM_STACK.Return );
+                  uiMemberSize = ( unsigned int ) hb_itemGetNL( &HB_VM_STACK.Return );
                   hb_itemRelease( pStructure );
                }
                else
                {
                   hb_itemRelease( pStructure );
-                  hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+                  hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
                   return NULL;
                }
             }
             else
             {
-               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
                return NULL;
             }
          }
@@ -1048,456 +1054,455 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
 
       switch( ( pBaseDef->pItems + ulIndex )->item.asInteger.value )
       {
-         case CTYPE_CHAR : // char
-            if( ( pBaseVar->pItems + ulIndex  )->type )
+         case CTYPE_CHAR:  // char
+            if( ( pBaseVar->pItems + ulIndex )->type )
             {
-               *( (char *) ( Buffer + uiOffset ) ) = (char) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+               *( ( char * ) ( Buffer + uiOffset ) ) = ( char ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
             }
             else
             {
-               *( (char *) ( Buffer + uiOffset ) ) = 0;
+               *( ( char * ) ( Buffer + uiOffset ) ) = 0;
             }
             break;
 
-         case CTYPE_UNSIGNED_CHAR : // unsigned char
-            if( ( pBaseVar->pItems + ulIndex  )->type )
+         case CTYPE_UNSIGNED_CHAR:  // unsigned char
+            if( ( pBaseVar->pItems + ulIndex )->type )
             {
-               *( (BYTE*) ( Buffer + uiOffset ) ) = (BYTE) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+               *( ( BYTE * ) ( Buffer + uiOffset ) ) = ( BYTE ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
             }
             else
             {
-               *( (BYTE*) ( Buffer + uiOffset ) ) = 0;
+               *( ( BYTE * ) ( Buffer + uiOffset ) ) = 0;
             }
             break;
 
-         case CTYPE_CHAR_PTR : // char *
-            switch( ( pBaseVar->pItems + ulIndex  )->type )
+         case CTYPE_CHAR_PTR:  // char *
+            switch( ( pBaseVar->pItems + ulIndex )->type )
             {
                case HB_IT_STRING:
-                  *( (char **) ( Buffer + uiOffset ) ) = ( pBaseVar->pItems + ulIndex  )->item.asString.value;
+                  *( ( char ** ) ( Buffer + uiOffset ) ) = ( pBaseVar->pItems + ulIndex )->item.asString.value;
                   break;
 
                case HB_IT_POINTER:
-                  *( (char **) ( Buffer + uiOffset ) ) = (char *) ( pBaseVar->pItems + ulIndex  )->item.asPointer.value;
+                  *( ( char ** ) ( Buffer + uiOffset ) ) = ( char * ) ( pBaseVar->pItems + ulIndex )->item.asPointer.value;
                   break;
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( (char **) ( Buffer + uiOffset ) ) = (char *) ( HB_PTRDIFF ) ( pBaseVar->pItems + ulIndex  )->item.asInteger.value;
+                  *( ( char ** ) ( Buffer + uiOffset ) ) = ( char * ) ( HB_PTRDIFF ) ( pBaseVar->pItems + ulIndex )->item.asInteger.value;
                   break;
 #endif
                case HB_IT_LONG:
-                  *( (char **) ( Buffer + uiOffset ) ) = (char *) ( HB_PTRDIFF ) ( pBaseVar->pItems + ulIndex  )->item.asLong.value;
+                  *( ( char ** ) ( Buffer + uiOffset ) ) = ( char * ) ( HB_PTRDIFF ) ( pBaseVar->pItems + ulIndex )->item.asLong.value;
                   break;
 
                default:
-                 *( (char **) ( Buffer + uiOffset ) ) = NULL;
+                  *( ( char ** ) ( Buffer + uiOffset ) ) = NULL;
                   break;
             }
             break;
 
-         case CTYPE_UNSIGNED_CHAR_PTR : // unsigned char *
-            switch( ( pBaseVar->pItems + ulIndex  )->type )
+         case CTYPE_UNSIGNED_CHAR_PTR:  // unsigned char *
+            switch( ( pBaseVar->pItems + ulIndex )->type )
             {
                case HB_IT_STRING:
-                  *( (BYTE **) ( Buffer + uiOffset ) ) = (BYTE *) ( ( pBaseVar->pItems + ulIndex  )->item.asString.value );
+                  *( ( BYTE ** ) ( Buffer + uiOffset ) ) = ( BYTE * ) ( ( pBaseVar->pItems + ulIndex )->item.asString.value );
                   break;
 
                case HB_IT_POINTER:
-                  *( (BYTE **) ( Buffer + uiOffset ) ) = (BYTE *) ( ( pBaseVar->pItems + ulIndex  )->item.asPointer.value );
+                  *( ( BYTE ** ) ( Buffer + uiOffset ) ) = ( BYTE * ) ( ( pBaseVar->pItems + ulIndex )->item.asPointer.value );
                   break;
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( (BYTE **) ( Buffer + uiOffset ) ) = (BYTE *) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+                  *( ( BYTE ** ) ( Buffer + uiOffset ) ) = ( BYTE * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( (BYTE **) ( Buffer + uiOffset ) ) = (BYTE *) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
+                  *( ( BYTE ** ) ( Buffer + uiOffset ) ) = ( BYTE * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                default:
-                 *( (BYTE **) ( Buffer + uiOffset ) ) = NULL;
+                  *( ( BYTE ** ) ( Buffer + uiOffset ) ) = NULL;
                   break;
             }
             break;
 
-         case CTYPE_SHORT : // short
-            if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_INTEGER )
+         case CTYPE_SHORT:  // short
+            if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_INTEGER )
             {
-               *( (short *) ( Buffer + uiOffset ) ) = (short) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+               *( ( short * ) ( Buffer + uiOffset ) ) = ( short ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
             }
-            else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_LONG )
+            else if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_LONG )
             {
-               *( (short *) ( Buffer + uiOffset ) ) = (short) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
+               *( ( short * ) ( Buffer + uiOffset ) ) = ( short ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
             }
-            else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_DOUBLE )
+            else if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_DOUBLE )
             {
-               *( (short *) ( Buffer + uiOffset ) ) = (short) ( ( pBaseVar->pItems + ulIndex  )->item.asDouble.value );
+               *( ( short * ) ( Buffer + uiOffset ) ) = ( short ) ( ( pBaseVar->pItems + ulIndex )->item.asDouble.value );
             }
-            else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_NIL )
+            else if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_NIL )
             {
-               *( (short *) ( Buffer + uiOffset ) ) = 0;
+               *( ( short * ) ( Buffer + uiOffset ) ) = 0;
             }
             else
             {
-               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
                return NULL;
             }
             break;
 
-         case CTYPE_UNSIGNED_SHORT : // unsigned short
-            if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_INTEGER )
+         case CTYPE_UNSIGNED_SHORT:  // unsigned short
+            if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_INTEGER )
             {
-               *( (unsigned short *) ( Buffer + uiOffset ) ) = (unsigned short) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+               *( ( unsigned short * ) ( Buffer + uiOffset ) ) = ( unsigned short ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
             }
-            else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_LONG )
+            else if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_LONG )
             {
-               *( (unsigned short *) ( Buffer + uiOffset ) ) = (unsigned short) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
+               *( ( unsigned short * ) ( Buffer + uiOffset ) ) = ( unsigned short ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
             }
-            else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_DOUBLE )
+            else if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_DOUBLE )
             {
-               *( (unsigned short *) ( Buffer + uiOffset ) ) = (unsigned short) ( ( pBaseVar->pItems + ulIndex  )->item.asDouble.value );
+               *( ( unsigned short * ) ( Buffer + uiOffset ) ) = ( unsigned short ) ( ( pBaseVar->pItems + ulIndex )->item.asDouble.value );
             }
-            else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_NIL )
+            else if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_NIL )
             {
-               *( (unsigned short *) ( Buffer + uiOffset ) ) = 0;
+               *( ( unsigned short * ) ( Buffer + uiOffset ) ) = 0;
             }
             else
             {
-               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
                return NULL;
             }
             break;
 
-         case CTYPE_SHORT_PTR : // short *
-            switch( ( pBaseVar->pItems + ulIndex  )->type )
+         case CTYPE_SHORT_PTR:  // short *
+            switch( ( pBaseVar->pItems + ulIndex )->type )
             {
                case HB_IT_POINTER:
-                  *( (short **) ( Buffer + uiOffset ) ) = (short *) ( ( pBaseVar->pItems + ulIndex  )->item.asPointer.value );
+                  *( ( short ** ) ( Buffer + uiOffset ) ) = ( short * ) ( ( pBaseVar->pItems + ulIndex )->item.asPointer.value );
                   break;
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( (short **) ( Buffer + uiOffset ) ) = (short *) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+                  *( ( short ** ) ( Buffer + uiOffset ) ) = ( short * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( (short **) ( Buffer + uiOffset ) ) = (short *) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
+                  *( ( short ** ) ( Buffer + uiOffset ) ) = ( short * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                default:
-                 *( (short **) ( Buffer + uiOffset ) ) = NULL;
+                  *( ( short ** ) ( Buffer + uiOffset ) ) = NULL;
                   break;
             }
             break;
 
-         case CTYPE_UNSIGNED_SHORT_PTR : // unsigned short *
-            switch( ( pBaseVar->pItems + ulIndex  )->type )
+         case CTYPE_UNSIGNED_SHORT_PTR:  // unsigned short *
+            switch( ( pBaseVar->pItems + ulIndex )->type )
             {
                case HB_IT_POINTER:
-                  *( (unsigned short **) ( Buffer + uiOffset ) ) = (unsigned short *) ( ( pBaseVar->pItems + ulIndex  )->item.asPointer.value );
+                  *( ( unsigned short ** ) ( Buffer + uiOffset ) ) = ( unsigned short * ) ( ( pBaseVar->pItems + ulIndex )->item.asPointer.value );
                   break;
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( (unsigned short **) ( Buffer + uiOffset ) ) = (unsigned short *) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+                  *( ( unsigned short ** ) ( Buffer + uiOffset ) ) = ( unsigned short * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( (unsigned short **) ( Buffer + uiOffset ) ) = (unsigned short *) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
+                  *( ( unsigned short ** ) ( Buffer + uiOffset ) ) = ( unsigned short * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                default:
-                 *( (unsigned short **) ( Buffer + uiOffset ) ) = NULL;
+                  *( ( unsigned short ** ) ( Buffer + uiOffset ) ) = NULL;
                   break;
             }
             break;
 
-         case CTYPE_INT : // int
-            if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_INTEGER )
+         case CTYPE_INT:  // int
+            if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_INTEGER )
             {
-               *( (int *) ( Buffer + uiOffset ) ) = (int) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+               *( ( int * ) ( Buffer + uiOffset ) ) = ( int ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
             }
-            else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_LONG )
+            else if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_LONG )
             {
-               *( (int *) ( Buffer + uiOffset ) ) = (int) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
+               *( ( int * ) ( Buffer + uiOffset ) ) = ( int ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
             }
-            else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_DOUBLE )
+            else if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_DOUBLE )
             {
-               *( (int *) ( Buffer + uiOffset ) ) = (int) ( ( pBaseVar->pItems + ulIndex  )->item.asDouble.value );
+               *( ( int * ) ( Buffer + uiOffset ) ) = ( int ) ( ( pBaseVar->pItems + ulIndex )->item.asDouble.value );
             }
-            else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_NIL )
+            else if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_NIL )
             {
-               *( (int *) ( Buffer + uiOffset ) ) = 0;
+               *( ( int * ) ( Buffer + uiOffset ) ) = 0;
             }
             else
             {
-               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
                return NULL;
             }
             break;
 
-         case CTYPE_UNSIGNED_INT : // unsigned int
-            if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_INTEGER )
+         case CTYPE_UNSIGNED_INT:  // unsigned int
+            if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_INTEGER )
             {
-               *( (unsigned int *) ( Buffer + uiOffset ) ) = (unsigned int) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+               *( ( unsigned int * ) ( Buffer + uiOffset ) ) = ( unsigned int ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
             }
-            else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_LONG )
+            else if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_LONG )
             {
-               *( (unsigned int *) ( Buffer + uiOffset ) ) = (unsigned int) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
+               *( ( unsigned int * ) ( Buffer + uiOffset ) ) = ( unsigned int ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
             }
-            else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_DOUBLE )
+            else if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_DOUBLE )
             {
-               *( (unsigned int *) ( Buffer + uiOffset ) ) = (unsigned int) ( ( pBaseVar->pItems + ulIndex  )->item.asDouble.value );
+               *( ( unsigned int * ) ( Buffer + uiOffset ) ) = ( unsigned int ) ( ( pBaseVar->pItems + ulIndex )->item.asDouble.value );
             }
-            else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_NIL )
+            else if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_NIL )
             {
-               *( (unsigned int *) ( Buffer + uiOffset ) ) = 0;
+               *( ( unsigned int * ) ( Buffer + uiOffset ) ) = 0;
             }
             else
             {
-               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
                return NULL;
             }
 
             break;
 
-         case CTYPE_INT_PTR : // int *
-            switch( ( pBaseVar->pItems + ulIndex  )->type )
+         case CTYPE_INT_PTR:  // int *
+            switch( ( pBaseVar->pItems + ulIndex )->type )
             {
                case HB_IT_POINTER:
-                  *( (int **) ( Buffer + uiOffset ) ) = (int *) ( ( pBaseVar->pItems + ulIndex  )->item.asPointer.value );
+                  *( ( int ** ) ( Buffer + uiOffset ) ) = ( int * ) ( ( pBaseVar->pItems + ulIndex )->item.asPointer.value );
                   break;
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( (int **) ( Buffer + uiOffset ) ) = (int *) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+                  *( ( int ** ) ( Buffer + uiOffset ) ) = ( int * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( (int **) ( Buffer + uiOffset ) ) = (int *) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
+                  *( ( int ** ) ( Buffer + uiOffset ) ) = ( int * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                default:
-                 *( (int **) ( Buffer + uiOffset ) ) = NULL;
+                  *( ( int ** ) ( Buffer + uiOffset ) ) = NULL;
                   break;
             }
             break;
 
-         case CTYPE_UNSIGNED_INT_PTR : // unsigned int *
-            switch( ( pBaseVar->pItems + ulIndex  )->type )
+         case CTYPE_UNSIGNED_INT_PTR:  // unsigned int *
+            switch( ( pBaseVar->pItems + ulIndex )->type )
             {
                case HB_IT_POINTER:
-                  *( (unsigned int **) ( Buffer + uiOffset ) ) = (unsigned int *) ( ( pBaseVar->pItems + ulIndex  )->item.asPointer.value );
+                  *( ( unsigned int ** ) ( Buffer + uiOffset ) ) = ( unsigned int * ) ( ( pBaseVar->pItems + ulIndex )->item.asPointer.value );
                   break;
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( (unsigned int **) ( Buffer + uiOffset ) ) = (unsigned int *) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+                  *( ( unsigned int ** ) ( Buffer + uiOffset ) ) = ( unsigned int * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( (unsigned int **) ( Buffer + uiOffset ) ) = (unsigned int *) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
+                  *( ( unsigned int ** ) ( Buffer + uiOffset ) ) = ( unsigned int * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                default:
-                 *( (unsigned int **) ( Buffer + uiOffset ) ) = NULL;
+                  *( ( unsigned int ** ) ( Buffer + uiOffset ) ) = NULL;
                   break;
             }
             break;
 
-         case CTYPE_LONG : // long
-            if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_INTEGER )
+         case CTYPE_LONG:  // long
+            if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_INTEGER )
             {
-               *( (long *) ( Buffer + uiOffset ) ) = (long) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+               *( ( long * ) ( Buffer + uiOffset ) ) = ( long ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
             }
-            else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_LONG )
+            else if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_LONG )
             {
-               *( (long *) ( Buffer + uiOffset ) ) = (long) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
+               *( ( long * ) ( Buffer + uiOffset ) ) = ( long ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
             }
-            else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_DOUBLE )
+            else if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_DOUBLE )
             {
-               *( (long *) ( Buffer + uiOffset ) ) = (long) ( ( pBaseVar->pItems + ulIndex  )->item.asDouble.value );
+               *( ( long * ) ( Buffer + uiOffset ) ) = ( long ) ( ( pBaseVar->pItems + ulIndex )->item.asDouble.value );
             }
-            else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_NIL )
+            else if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_NIL )
             {
-               *( (long *) ( Buffer + uiOffset ) ) = 0;
+               *( ( long * ) ( Buffer + uiOffset ) ) = 0;
             }
             else
             {
-               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
                return NULL;
             }
             break;
 
-         case CTYPE_UNSIGNED_LONG : // unsigned long
-            if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_INTEGER )
+         case CTYPE_UNSIGNED_LONG:  // unsigned long
+            if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_INTEGER )
             {
-               *( (unsigned long *) ( Buffer + uiOffset ) ) = (unsigned long) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+               *( ( unsigned long * ) ( Buffer + uiOffset ) ) = ( unsigned long ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
             }
-            else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_LONG )
+            else if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_LONG )
             {
-               *( (unsigned long *) ( Buffer + uiOffset ) ) = (unsigned long) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
+               *( ( unsigned long * ) ( Buffer + uiOffset ) ) = ( unsigned long ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
             }
-            else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_DOUBLE )
+            else if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_DOUBLE )
             {
-               *( (unsigned long *) ( Buffer + uiOffset ) ) = (unsigned long) ( ( pBaseVar->pItems + ulIndex  )->item.asDouble.value );
+               *( ( unsigned long * ) ( Buffer + uiOffset ) ) = ( unsigned long ) ( ( pBaseVar->pItems + ulIndex )->item.asDouble.value );
             }
-            else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_NIL )
+            else if( ( pBaseVar->pItems + ulIndex )->type == HB_IT_NIL )
             {
-               *( (unsigned long *) ( Buffer + uiOffset ) ) = 0;
+               *( ( unsigned long * ) ( Buffer + uiOffset ) ) = 0;
             }
             else
             {
-               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
                return NULL;
             }
             break;
 
-         case CTYPE_LONG_PTR : // long *
-            switch( ( pBaseVar->pItems + ulIndex  )->type )
+         case CTYPE_LONG_PTR:  // long *
+            switch( ( pBaseVar->pItems + ulIndex )->type )
             {
                case HB_IT_POINTER:
-                  *( (long **) ( Buffer + uiOffset ) ) = (long *) ( ( pBaseVar->pItems + ulIndex  )->item.asPointer.value );
+                  *( ( long ** ) ( Buffer + uiOffset ) ) = ( long * ) ( ( pBaseVar->pItems + ulIndex )->item.asPointer.value );
                   break;
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( (long **) ( Buffer + uiOffset ) ) = (long *) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+                  *( ( long ** ) ( Buffer + uiOffset ) ) = ( long * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( (long **) ( Buffer + uiOffset ) ) = (long *) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
+                  *( ( long ** ) ( Buffer + uiOffset ) ) = ( long * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                default:
-                 *( (long **) ( Buffer + uiOffset ) ) = NULL;
+                  *( ( long ** ) ( Buffer + uiOffset ) ) = NULL;
                   break;
             }
             break;
 
-         case CTYPE_UNSIGNED_LONG_PTR : // unsigned long *
-            switch( ( pBaseVar->pItems + ulIndex  )->type )
+         case CTYPE_UNSIGNED_LONG_PTR:  // unsigned long *
+            switch( ( pBaseVar->pItems + ulIndex )->type )
             {
                case HB_IT_POINTER:
-                  *( (unsigned long **) ( Buffer + uiOffset ) ) = (unsigned long *) ( ( pBaseVar->pItems + ulIndex  )->item.asPointer.value );
+                  *( ( unsigned long ** ) ( Buffer + uiOffset ) ) = ( unsigned long * ) ( ( pBaseVar->pItems + ulIndex )->item.asPointer.value );
                   break;
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( (unsigned long **) ( Buffer + uiOffset ) ) = (unsigned long *) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+                  *( ( unsigned long ** ) ( Buffer + uiOffset ) ) = ( unsigned long * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( (unsigned long **) ( Buffer + uiOffset ) ) = (unsigned long *) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
+                  *( ( unsigned long ** ) ( Buffer + uiOffset ) ) = ( unsigned long * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                default:
-                 *( (unsigned long **) ( Buffer + uiOffset ) ) = NULL;
+                  *( ( unsigned long ** ) ( Buffer + uiOffset ) ) = NULL;
                   break;
             }
             break;
 
-         case CTYPE_FLOAT : // float
-            if( ( pBaseVar->pItems + ulIndex  )->type )
+         case CTYPE_FLOAT:  // float
+            if( ( pBaseVar->pItems + ulIndex )->type )
             {
-               *( (float *) ( Buffer + uiOffset ) ) = (float) ( pBaseVar->pItems + ulIndex  )->item.asDouble.value;
+               *( ( float * ) ( Buffer + uiOffset ) ) = ( float ) ( pBaseVar->pItems + ulIndex )->item.asDouble.value;
             }
             else
             {
-               *( (float *) ( Buffer + uiOffset ) ) = 0;
+               *( ( float * ) ( Buffer + uiOffset ) ) = 0;
             }
             break;
 
-         case CTYPE_FLOAT_PTR : // float *
-            switch( ( pBaseVar->pItems + ulIndex  )->type )
+         case CTYPE_FLOAT_PTR:  // float *
+            switch( ( pBaseVar->pItems + ulIndex )->type )
             {
                case HB_IT_POINTER:
-                  *( (float **) ( Buffer + uiOffset ) ) = (float *) ( ( pBaseVar->pItems + ulIndex  )->item.asPointer.value );
+                  *( ( float ** ) ( Buffer + uiOffset ) ) = ( float * ) ( ( pBaseVar->pItems + ulIndex )->item.asPointer.value );
                   break;
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( (float **) ( Buffer + uiOffset ) ) = (float *) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+                  *( ( float ** ) ( Buffer + uiOffset ) ) = ( float * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( (float **) ( Buffer + uiOffset ) ) = (float *) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
+                  *( ( float ** ) ( Buffer + uiOffset ) ) = ( float * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                /* Is this correct??? IMHO It's a bug */
                case HB_IT_DOUBLE:
-                  **( (float **) ( Buffer + uiOffset ) ) = (float) ( ( pBaseVar->pItems + ulIndex  )->item.asDouble.value );
+                  **( ( float ** ) ( Buffer + uiOffset ) ) = ( float ) ( ( pBaseVar->pItems + ulIndex )->item.asDouble.value );
                   break;
 
                default:
-                 *( (float **) ( Buffer + uiOffset ) ) = NULL;
+                  *( ( float ** ) ( Buffer + uiOffset ) ) = NULL;
                   break;
             }
             break;
 
-         case CTYPE_DOUBLE : // double
-            if( ( pBaseVar->pItems + ulIndex  )->type )
+         case CTYPE_DOUBLE:  // double
+            if( ( pBaseVar->pItems + ulIndex )->type )
             {
-               *( (double *) ( Buffer + uiOffset ) ) = ( pBaseVar->pItems + ulIndex  )->item.asDouble.value;
+               *( ( double * ) ( Buffer + uiOffset ) ) = ( pBaseVar->pItems + ulIndex )->item.asDouble.value;
             }
             else
             {
-               *( (double *) ( Buffer + uiOffset ) ) = 0;
+               *( ( double * ) ( Buffer + uiOffset ) ) = 0;
             }
             break;
 
-         case CTYPE_DOUBLE_PTR : // double *
-            switch( ( pBaseVar->pItems + ulIndex  )->type )
+         case CTYPE_DOUBLE_PTR:  // double *
+            switch( ( pBaseVar->pItems + ulIndex )->type )
             {
                case HB_IT_POINTER:
-                  *( (double **) ( Buffer + uiOffset ) ) = (double *) ( ( pBaseVar->pItems + ulIndex  )->item.asPointer.value );
+                  *( ( double ** ) ( Buffer + uiOffset ) ) = ( double * ) ( ( pBaseVar->pItems + ulIndex )->item.asPointer.value );
                   break;
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( (double **) ( Buffer + uiOffset ) ) = (double *) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+                  *( ( double ** ) ( Buffer + uiOffset ) ) = ( double * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( (double **) ( Buffer + uiOffset ) ) = (double *) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
+                  *( ( double ** ) ( Buffer + uiOffset ) ) = ( double * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                /* Is this correct??? IMHO It's a bug */
                case HB_IT_DOUBLE:
-                  **( (double **) ( Buffer + uiOffset ) ) = ( ( pBaseVar->pItems + ulIndex  )->item.asDouble.value );
+                  **( ( double ** ) ( Buffer + uiOffset ) ) = ( ( pBaseVar->pItems + ulIndex )->item.asDouble.value );
                   break;
 
                default:
-                 *( (double **) ( Buffer + uiOffset ) ) = NULL;
+                  *( ( double ** ) ( Buffer + uiOffset ) ) = NULL;
                   break;
             }
             break;
 
-         case CTYPE_VOID_PTR : // void *
-            switch( ( pBaseVar->pItems + ulIndex  )->type )
+         case CTYPE_VOID_PTR:  // void *
+            switch( ( pBaseVar->pItems + ulIndex )->type )
             {
                case HB_IT_POINTER:
-                  *( (void **) ( Buffer + uiOffset ) ) = (void *) ( ( pBaseVar->pItems + ulIndex  )->item.asPointer.value );
+                  *( ( void ** ) ( Buffer + uiOffset ) ) = ( void * ) ( ( pBaseVar->pItems + ulIndex )->item.asPointer.value );
                   break;
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( (void **) ( Buffer + uiOffset ) ) = (void *) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+                  *( ( void ** ) ( Buffer + uiOffset ) ) = ( void * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( (void **) ( Buffer + uiOffset ) ) = (void *) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
+                  *( ( void ** ) ( Buffer + uiOffset ) ) = ( void * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                default:
-                 *( (void **) ( Buffer + uiOffset ) ) = NULL;
+                  *( ( void ** ) ( Buffer + uiOffset ) ) = NULL;
                   break;
             }
             break;
 
          default:
-         {
             if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value > CTYPE_STRUCTURE )
             {
                PHB_ITEM pStructure = pBaseVar->pItems + ulIndex;
@@ -1506,11 +1511,11 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
                {
                   if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value > CTYPE_STRUCTURE_PTR )
                   {
-                     *( (void **) ( Buffer + uiOffset ) ) = (void *) ( HB_PTRDIFF ) pStructure->item.asLong.value;
+                     *( ( void ** ) ( Buffer + uiOffset ) ) = ( void * ) ( HB_PTRDIFF ) pStructure->item.asLong.value;
                   }
                   else
                   {
-                     HB_MEMCPY( (void *) ( Buffer + uiOffset ), (void *) ( HB_PTRDIFF ) pStructure->item.asLong.value, uiMemberSize );
+                     HB_MEMCPY( ( void * ) ( Buffer + uiOffset ), ( void * ) ( HB_PTRDIFF ) pStructure->item.asLong.value, uiMemberSize );
                   }
                }
 #if UINT_MAX == ULONG_MAX
@@ -1518,11 +1523,11 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
                {
                   if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value > CTYPE_STRUCTURE_PTR )
                   {
-                     *( (void **) ( Buffer + uiOffset ) ) = (void *) ( HB_PTRDIFF ) pStructure->item.asInteger.value;
+                     *( ( void ** ) ( Buffer + uiOffset ) ) = ( void * ) ( HB_PTRDIFF ) pStructure->item.asInteger.value;
                   }
                   else
                   {
-                     HB_MEMCPY( (void *) ( Buffer + uiOffset ), (void *) ( HB_PTRDIFF ) pStructure->item.asInteger.value, uiMemberSize );
+                     HB_MEMCPY( ( void * ) ( Buffer + uiOffset ), ( void * ) ( HB_PTRDIFF ) pStructure->item.asInteger.value, uiMemberSize );
                   }
                }
 #endif
@@ -1530,40 +1535,39 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
                {
                   if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value > CTYPE_STRUCTURE_PTR )
                   {
-                     *( (void **) ( Buffer + uiOffset ) ) = NULL;
+                     *( ( void ** ) ( Buffer + uiOffset ) ) = NULL;
                   }
                   else
                   {
-                     TraceLog( NULL,"ArrayToStructure() - Empty Inplace\n" );
-                     memset( (void *) ( Buffer + uiOffset ), 0, uiMemberSize );
+                     TraceLog( NULL, "ArrayToStructure() - Empty Inplace\n" );
+                     memset( ( void * ) ( Buffer + uiOffset ), 0, uiMemberSize );
                   }
                }
                else if( strncmp( hb_objGetClsName( pStructure ), "C Structure", 11 ) == 0 )
                {
-                  PHB_BASEARRAY pBaseStructure = pStructure->item.asArray.value;
-                  PHB_ITEM pInternalBuffer = pBaseStructure->pItems + pBaseStructure->ulLen - 1;
+                  PHB_BASEARRAY  pBaseStructure    = pStructure->item.asArray.value;
+                  PHB_ITEM       pInternalBuffer   = pBaseStructure->pItems + pBaseStructure->ulLen - 1;
 
                   hb_objSendMsg( pStructure, "VALUE", 0 );
 
                   if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value > CTYPE_STRUCTURE_PTR )
                   {
-                     *( (void **) ( Buffer + uiOffset ) ) = (void *) pInternalBuffer->item.asString.value;
+                     *( ( void ** ) ( Buffer + uiOffset ) ) = ( void * ) pInternalBuffer->item.asString.value;
                   }
                   else
                   {
-                     HB_MEMCPY( (void *) ( Buffer + uiOffset ), (void *) pInternalBuffer->item.asString.value, uiMemberSize );
+                     HB_MEMCPY( ( void * ) ( Buffer + uiOffset ), ( void * ) pInternalBuffer->item.asString.value, uiMemberSize );
                   }
                }
                else
                {
-                  hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+                  hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
                }
             }
             else
             {
-               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+               hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
             }
-         }
       }
 
       //printf( "Wrote %i bytes at Offset %i\n", uiMemberSize, uiOffset );
@@ -1576,19 +1580,19 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
 
 HB_FUNC( HB_ARRAYTOSTRUCTURE )
 {
-   PHB_ITEM aVar = hb_param( 1, HB_IT_ARRAY );
-   PHB_ITEM aDef = hb_param( 2, HB_IT_ARRAY );
-   PHB_ITEM pAlign = hb_param( 3, HB_IT_INTEGER );
+   PHB_ITEM aVar     = hb_param( 1, HB_IT_ARRAY );
+   PHB_ITEM aDef     = hb_param( 2, HB_IT_ARRAY );
+   PHB_ITEM pAlign   = hb_param( 3, HB_IT_INTEGER );
 
    if( aVar && aDef )
    {
-      unsigned int uiSize;
-      unsigned int uiAlign;
-      BYTE *Buffer;
+      unsigned int   uiSize;
+      unsigned int   uiAlign;
+      BYTE *         Buffer;
 
       if( pAlign )
       {
-         uiAlign = (BYTE) pAlign->item.asInteger.value;
+         uiAlign = ( BYTE ) pAlign->item.asInteger.value;
       }
       else
       {
@@ -1597,23 +1601,23 @@ HB_FUNC( HB_ARRAYTOSTRUCTURE )
 
       Buffer = ArrayToStructure( aVar, aDef, uiAlign, &uiSize );
 
-      hb_itemPutCRaw( hb_stackReturnItem(), (char *) Buffer, uiSize );
+      hb_itemPutCRaw( hb_stackReturnItem(), ( char * ) Buffer, uiSize );
    }
    else
    {
-      hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+      hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
    }
 }
 
-PHB_ITEM StructureToArray( BYTE* Buffer, HB_SIZE ulBufferLen, PHB_ITEM aDef, unsigned int uiAlign, BOOL bAdoptNested, PHB_ITEM pRet )
+PHB_ITEM StructureToArray( BYTE * Buffer, HB_SIZE ulBufferLen, PHB_ITEM aDef, unsigned int uiAlign, BOOL bAdoptNested, PHB_ITEM pRet )
 {
-   PHB_BASEARRAY pBaseDef = aDef->item.asArray.value;
-   HB_SIZE ulLen = pBaseDef->ulLen;
-   HB_SIZE ulIndex;
-   unsigned int uiOffset, uiMemberSize;
-   BYTE cShift;
+   PHB_BASEARRAY  pBaseDef = aDef->item.asArray.value;
+   HB_SIZE        ulLen    = pBaseDef->ulLen;
+   HB_SIZE        ulIndex;
+   unsigned int   uiOffset, uiMemberSize;
+   BYTE           cShift;
    //PHB_ITEM pRet = hb_itemNew( NULL );
-   PHB_BASEARRAY pBaseVar;
+   PHB_BASEARRAY  pBaseVar;
 
    //TraceLog( NULL, "StructureToArray(%p, %p, %u, %i) ->%u\n", Buffer, aDef, uiAlign, bAdoptNested, ulLen );
 
@@ -1625,69 +1629,69 @@ PHB_ITEM StructureToArray( BYTE* Buffer, HB_SIZE ulBufferLen, PHB_ITEM aDef, uns
    {
       switch( ( pBaseDef->pItems + ulIndex )->item.asInteger.value )
       {
-         case CTYPE_CHAR : // char
-         case CTYPE_UNSIGNED_CHAR : // unsigned char
+         case CTYPE_CHAR:           // char
+         case CTYPE_UNSIGNED_CHAR:  // unsigned char
             uiMemberSize = sizeof( char );
             break;
 
-         case CTYPE_CHAR_PTR : // char *
-         case CTYPE_UNSIGNED_CHAR_PTR : // unsigned char *
+         case CTYPE_CHAR_PTR:          // char *
+         case CTYPE_UNSIGNED_CHAR_PTR: // unsigned char *
             uiMemberSize = sizeof( char * );
             break;
 
-         case CTYPE_SHORT : // short
-         case CTYPE_UNSIGNED_SHORT : // unsigned short
+         case CTYPE_SHORT:          // short
+         case CTYPE_UNSIGNED_SHORT: // unsigned short
             uiMemberSize = sizeof( short );
             break;
 
-         case CTYPE_SHORT_PTR : // short *
-         case CTYPE_UNSIGNED_SHORT_PTR : // unsigned short *
+         case CTYPE_SHORT_PTR:            // short *
+         case CTYPE_UNSIGNED_SHORT_PTR:   // unsigned short *
             uiMemberSize = sizeof( short * );
             break;
 
-         case CTYPE_INT : // int
-         case CTYPE_UNSIGNED_INT : // unsigned int
+         case CTYPE_INT:            // int
+         case CTYPE_UNSIGNED_INT:   // unsigned int
             uiMemberSize = sizeof( int );
             break;
 
-         case CTYPE_INT_PTR : // int *
-         case CTYPE_UNSIGNED_INT_PTR : // unsigned int *
+         case CTYPE_INT_PTR:           // int *
+         case CTYPE_UNSIGNED_INT_PTR:  // unsigned int *
             uiMemberSize = sizeof( int * );
             break;
 
-         case CTYPE_LONG : // long
-         case CTYPE_UNSIGNED_LONG : // unsigned long
+         case CTYPE_LONG:           // long
+         case CTYPE_UNSIGNED_LONG:  // unsigned long
             uiMemberSize = sizeof( long );
             break;
 
-         case CTYPE_LONG_PTR : // long *
-         case CTYPE_UNSIGNED_LONG_PTR : // unsigned long *
+         case CTYPE_LONG_PTR:          // long *
+         case CTYPE_UNSIGNED_LONG_PTR: // unsigned long *
             uiMemberSize = sizeof( long * );
             break;
 
-         case CTYPE_FLOAT : // float
+         case CTYPE_FLOAT:  // float
             uiMemberSize = sizeof( float );
             break;
 
-         case CTYPE_FLOAT_PTR : // float *
+         case CTYPE_FLOAT_PTR:  // float *
             uiMemberSize = sizeof( float * );
             break;
 
-         case CTYPE_DOUBLE : // double
+         case CTYPE_DOUBLE:  // double
             uiMemberSize = sizeof( double );
             break;
 
-         case CTYPE_DOUBLE_PTR : // double *
+         case CTYPE_DOUBLE_PTR:  // double *
             uiMemberSize = sizeof( double * );
             break;
 
-         case CTYPE_VOID_PTR : // void * (pointer)
+         case CTYPE_VOID_PTR:  // void * (pointer)
             uiMemberSize = sizeof( void * );
             break;
 
          default:
          {
-            HB_ITEM_NEW ( ID );
+            HB_ITEM_NEW( ID );
 
             hb_itemPutNI( &ID, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
 
@@ -1702,7 +1706,7 @@ PHB_ITEM StructureToArray( BYTE* Buffer, HB_SIZE ulBufferLen, PHB_ITEM aDef, uns
                if( HB_IS_OBJECT( pStructure ) )
                {
                   hb_objSendMsg( pStructure, "SizeOf", 0 );
-                  uiMemberSize = (unsigned int) hb_itemGetNL( &HB_VM_STACK.Return );
+                  uiMemberSize = ( unsigned int ) hb_itemGetNL( &HB_VM_STACK.Return );
                   hb_itemRelease( pStructure );
                }
                else
@@ -1714,7 +1718,7 @@ PHB_ITEM StructureToArray( BYTE* Buffer, HB_SIZE ulBufferLen, PHB_ITEM aDef, uns
             }
             else
             {
-               hb_errRT_BASE( EG_ARG, 2023, NULL, "StructureToArray", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+               hb_errRT_BASE( EG_ARG, 2023, NULL, "StructureToArray", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
                return pRet;;
             }
          }
@@ -1743,109 +1747,109 @@ PHB_ITEM StructureToArray( BYTE* Buffer, HB_SIZE ulBufferLen, PHB_ITEM aDef, uns
 
       switch( ( pBaseDef->pItems + ulIndex )->item.asInteger.value )
       {
-         case CTYPE_CHAR : // char
-            hb_itemPutNI( pBaseVar->pItems + ulIndex , (int) *( (char *) ( Buffer + uiOffset ) ) );
+         case CTYPE_CHAR:  // char
+            hb_itemPutNI( pBaseVar->pItems + ulIndex, ( int ) *( ( char * ) ( Buffer + uiOffset ) ) );
             break;
 
-         case CTYPE_UNSIGNED_CHAR : // unsigned char
-            hb_itemPutNI( pBaseVar->pItems + ulIndex , (int) *( (BYTE *) ( Buffer + uiOffset ) ) );
+         case CTYPE_UNSIGNED_CHAR:  // unsigned char
+            hb_itemPutNI( pBaseVar->pItems + ulIndex, ( int ) *( ( BYTE * ) ( Buffer + uiOffset ) ) );
             break;
 
-         case CTYPE_CHAR_PTR : // char *
-            if( HB_IS_STRING( pBaseVar->pItems + ulIndex ) && ( pBaseVar->pItems + ulIndex )->item.asString.value == *( (char **) ( Buffer + uiOffset ) ) )
+         case CTYPE_CHAR_PTR:  // char *
+            if( HB_IS_STRING( pBaseVar->pItems + ulIndex ) && ( pBaseVar->pItems + ulIndex )->item.asString.value == *( ( char ** ) ( Buffer + uiOffset ) ) )
             {
                //TraceLog( NULL, "IDENTICAL: %s\n", *( (char **) ( Buffer + uiOffset ) ) );
             }
             else if( bAdoptNested )
             {
                //TraceLog( NULL, "Adopt: %s\n", *( (char **) ( Buffer + uiOffset ) ) );
-               hb_itemPutC( pBaseVar->pItems + ulIndex , *( (char **) ( Buffer + uiOffset ) ) );
+               hb_itemPutC( pBaseVar->pItems + ulIndex, *( ( char ** ) ( Buffer + uiOffset ) ) );
             }
             else
             {
                //TraceLog( NULL, "Static: %s\n", *( (char **) ( Buffer + uiOffset ) ) );
-               hb_itemPutCStatic( pBaseVar->pItems + ulIndex , *( (char **) ( Buffer + uiOffset ) ) );
+               hb_itemPutCStatic( pBaseVar->pItems + ulIndex, *( ( char ** ) ( Buffer + uiOffset ) ) );
             }
             break;
 
-         case CTYPE_UNSIGNED_CHAR_PTR : // unsigned char *
-            if( HB_IS_STRING( pBaseVar->pItems + ulIndex ) && ( pBaseVar->pItems + ulIndex )->item.asString.value == *( (char **) ( Buffer + uiOffset ) ) )
+         case CTYPE_UNSIGNED_CHAR_PTR:  // unsigned char *
+            if( HB_IS_STRING( pBaseVar->pItems + ulIndex ) && ( pBaseVar->pItems + ulIndex )->item.asString.value == *( ( char ** ) ( Buffer + uiOffset ) ) )
             {
                //TraceLog( NULL, "IDENTICAL: %s\n", *( (char **) ( Buffer + uiOffset ) ) );
             }
             else if( bAdoptNested )
             {
                //TraceLog( NULL, "Adopt: %s\n", *( (char **) ( Buffer + uiOffset ) ) );
-               hb_itemPutC( pBaseVar->pItems + ulIndex , *( (char **) ( Buffer + uiOffset ) ) );
+               hb_itemPutC( pBaseVar->pItems + ulIndex, *( ( char ** ) ( Buffer + uiOffset ) ) );
             }
             else
             {
                //TraceLog( NULL, "Static: %s\n", *( (char **) ( Buffer + uiOffset ) ) );
-               hb_itemPutCStatic( pBaseVar->pItems + ulIndex , *( (char **) ( Buffer + uiOffset ) ) );
+               hb_itemPutCStatic( pBaseVar->pItems + ulIndex, *( ( char ** ) ( Buffer + uiOffset ) ) );
             }
             break;
 
-         case CTYPE_SHORT : // short
-            hb_itemPutNI( pBaseVar->pItems + ulIndex , *( (short *) ( Buffer + uiOffset ) ) );
+         case CTYPE_SHORT:  // short
+            hb_itemPutNI( pBaseVar->pItems + ulIndex, *( ( short * ) ( Buffer + uiOffset ) ) );
             break;
 
-         case CTYPE_UNSIGNED_SHORT : // unsigned short
-            hb_itemPutNI( pBaseVar->pItems + ulIndex , (short) *( (unsigned short *) ( Buffer + uiOffset ) ) );
+         case CTYPE_UNSIGNED_SHORT:  // unsigned short
+            hb_itemPutNI( pBaseVar->pItems + ulIndex, ( short ) *( ( unsigned short * ) ( Buffer + uiOffset ) ) );
             break;
 
-         case CTYPE_SHORT_PTR : // short *
-         case CTYPE_UNSIGNED_SHORT_PTR : // unsigned short *
-            hb_itemPutPtr( pBaseVar->pItems + ulIndex , (void *) ( Buffer + uiOffset ) );
+         case CTYPE_SHORT_PTR:            // short *
+         case CTYPE_UNSIGNED_SHORT_PTR:   // unsigned short *
+            hb_itemPutPtr( pBaseVar->pItems + ulIndex, ( void * ) ( Buffer + uiOffset ) );
             break;
 
-         case CTYPE_INT : // int
-            hb_itemPutNI( pBaseVar->pItems + ulIndex , *( (int *) ( Buffer + uiOffset ) ) );
+         case CTYPE_INT:  // int
+            hb_itemPutNI( pBaseVar->pItems + ulIndex, *( ( int * ) ( Buffer + uiOffset ) ) );
             break;
 
-         case CTYPE_UNSIGNED_INT : // unsigned int
-            hb_itemPutNI( pBaseVar->pItems + ulIndex , (int) *( (unsigned int *) ( Buffer + uiOffset ) ) );
+         case CTYPE_UNSIGNED_INT:  // unsigned int
+            hb_itemPutNI( pBaseVar->pItems + ulIndex, ( int ) *( ( unsigned int * ) ( Buffer + uiOffset ) ) );
             break;
 
-         case CTYPE_INT_PTR : // int *
-         case CTYPE_UNSIGNED_INT_PTR : // unsigned int *
-            hb_itemPutPtr( pBaseVar->pItems + ulIndex , (void *) ( Buffer + uiOffset ) );
+         case CTYPE_INT_PTR:           // int *
+         case CTYPE_UNSIGNED_INT_PTR:  // unsigned int *
+            hb_itemPutPtr( pBaseVar->pItems + ulIndex, ( void * ) ( Buffer + uiOffset ) );
             break;
 
-         case CTYPE_LONG : // long
-            hb_itemPutNL( pBaseVar->pItems + ulIndex , *( (long *) ( Buffer + uiOffset ) ) );
+         case CTYPE_LONG:  // long
+            hb_itemPutNL( pBaseVar->pItems + ulIndex, *( ( long * ) ( Buffer + uiOffset ) ) );
             break;
 
-         case CTYPE_UNSIGNED_LONG : // unsigned long
-            hb_itemPutNL( pBaseVar->pItems + ulIndex , (long) *( (unsigned long  *) ( Buffer + uiOffset ) ) );
+         case CTYPE_UNSIGNED_LONG:  // unsigned long
+            hb_itemPutNL( pBaseVar->pItems + ulIndex, ( long ) *( ( unsigned long  * ) ( Buffer + uiOffset ) ) );
             break;
 
-         case CTYPE_LONG_PTR : // long *
-         case CTYPE_UNSIGNED_LONG_PTR : // unsigned long *
-            hb_itemPutPtr( pBaseVar->pItems + ulIndex , (void *) ( Buffer + uiOffset ) );
+         case CTYPE_LONG_PTR:          // long *
+         case CTYPE_UNSIGNED_LONG_PTR: // unsigned long *
+            hb_itemPutPtr( pBaseVar->pItems + ulIndex, ( void * ) ( Buffer + uiOffset ) );
             break;
 
-         case CTYPE_FLOAT : // float
-            hb_itemPutND( pBaseVar->pItems + ulIndex , (double) *( (float *) ( Buffer + uiOffset ) ) );
+         case CTYPE_FLOAT:  // float
+            hb_itemPutND( pBaseVar->pItems + ulIndex, ( double ) *( ( float * ) ( Buffer + uiOffset ) ) );
             break;
 
-         case CTYPE_FLOAT_PTR : // float *
-            hb_itemPutPtr( pBaseVar->pItems + ulIndex , (void *) ( Buffer + uiOffset ) );
+         case CTYPE_FLOAT_PTR:  // float *
+            hb_itemPutPtr( pBaseVar->pItems + ulIndex, ( void * ) ( Buffer + uiOffset ) );
             break;
 
-         case CTYPE_DOUBLE : // double
-            hb_itemPutND( pBaseVar->pItems + ulIndex , *( (double *) ( Buffer + uiOffset ) ) );
+         case CTYPE_DOUBLE:  // double
+            hb_itemPutND( pBaseVar->pItems + ulIndex, *( ( double * ) ( Buffer + uiOffset ) ) );
             break;
 
-         case CTYPE_DOUBLE_PTR : // double *
-         case CTYPE_VOID_PTR : // void *
-            hb_itemPutPtr( pBaseVar->pItems + ulIndex , (void *) ( Buffer + uiOffset ) );
+         case CTYPE_DOUBLE_PTR:  // double *
+         case CTYPE_VOID_PTR:    // void *
+            hb_itemPutPtr( pBaseVar->pItems + ulIndex, ( void * ) ( Buffer + uiOffset ) );
             break;
 
          default:
          {
-            HB_ITEM_NEW ( ID );
-            PHB_ITEM pStructure;
-            unsigned int uiNestedSize /*, uiNestedAlign */ ;
+            HB_ITEM_NEW( ID );
+            PHB_ITEM       pStructure;
+            unsigned int   uiNestedSize /*, uiNestedAlign */;
 
             hb_itemPutNI( &ID, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
 
@@ -1862,7 +1866,7 @@ PHB_ITEM StructureToArray( BYTE* Buffer, HB_SIZE ulBufferLen, PHB_ITEM aDef, uns
             // uiNestedAlign = ( hb_stackReturnItem() )->item.asInteger.value;
 
             hb_objSendMsg( pStructure, "SizeOf", 0 );
-            uiNestedSize = (unsigned int) hb_itemGetNL( &HB_VM_STACK.Return );
+            uiNestedSize = ( unsigned int ) hb_itemGetNL( &HB_VM_STACK.Return );
 
             //TraceLog( NULL, "* NestedSize: %i Offset: %i\n", uiNestedSize, uiOffset );
 
@@ -1870,18 +1874,18 @@ PHB_ITEM StructureToArray( BYTE* Buffer, HB_SIZE ulBufferLen, PHB_ITEM aDef, uns
             {
                //printf( "Offset %i Pointer: %p\n", uiOffset, *(char **) ( (long ** )( Buffer + uiOffset ) ) );
 
-               if( *(char **) ( (long ** )( Buffer + uiOffset ) ) )
+               if( *( char ** ) ( ( long ** ) ( Buffer + uiOffset ) ) )
                {
-                  PHB_BASEARRAY pBaseStructure = pStructure->item.asArray.value;
-                  PHB_ITEM pInternalBuffer = pBaseStructure->pItems + pBaseStructure->ulLen - 1;
+                  PHB_BASEARRAY  pBaseStructure    = pStructure->item.asArray.value;
+                  PHB_ITEM       pInternalBuffer   = pBaseStructure->pItems + pBaseStructure->ulLen - 1;
 
                   if( bAdoptNested )
                   {
-                     hb_itemPutCRaw( pInternalBuffer, *(char **) ( (long **)( Buffer + uiOffset ) ), uiNestedSize );
+                     hb_itemPutCRaw( pInternalBuffer, *( char ** ) ( ( long ** ) ( Buffer + uiOffset ) ), uiNestedSize );
                   }
                   else
                   {
-                     hb_itemPutCRawStatic( pInternalBuffer, *(char **) ( (long **)( Buffer + uiOffset ) ), uiNestedSize );
+                     hb_itemPutCRawStatic( pInternalBuffer, *( char ** ) ( ( long ** ) ( Buffer + uiOffset ) ), uiNestedSize );
                   }
 
                   hb_objSendMsg( pStructure, "DEVALUE", 0 );
@@ -1894,16 +1898,16 @@ PHB_ITEM StructureToArray( BYTE* Buffer, HB_SIZE ulBufferLen, PHB_ITEM aDef, uns
             }
             else
             {
-               PHB_BASEARRAY pBaseStructure = pStructure->item.asArray.value;
-               PHB_ITEM pInternalBuffer = pBaseStructure->pItems + pBaseStructure->ulLen - 1;
-               HB_ITEM Adopt;
+               PHB_BASEARRAY  pBaseStructure    = pStructure->item.asArray.value;
+               PHB_ITEM       pInternalBuffer   = pBaseStructure->pItems + pBaseStructure->ulLen - 1;
+               HB_ITEM        Adopt;
 
-               Adopt.type = HB_IT_LOGICAL;
+               Adopt.type                 = HB_IT_LOGICAL;
                Adopt.item.asLogical.value = bAdoptNested;
 
                //TraceLog( NULL, "Before Devalue\n" );
 
-               hb_itemPutCRawStatic( pInternalBuffer, (char *) (BYTE *)( Buffer + uiOffset ), uiNestedSize );
+               hb_itemPutCRawStatic( pInternalBuffer, ( char * ) ( BYTE * ) ( Buffer + uiOffset ), uiNestedSize );
 
                hb_objSendMsg( pStructure, "DEVALUE", 1, &Adopt );
 
@@ -1926,21 +1930,21 @@ PHB_ITEM StructureToArray( BYTE* Buffer, HB_SIZE ulBufferLen, PHB_ITEM aDef, uns
 
 HB_FUNC( HB_STRUCTURETOARRAY )
 {
-   PHB_ITEM Structure = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM aDef      = hb_param( 2, HB_IT_ARRAY );
-   PHB_ITEM pAlign    = hb_param( 3, HB_IT_INTEGER );
-   PHB_ITEM pAdopt    = hb_param( 4, HB_IT_LOGICAL );
-   PHB_ITEM pRet      = hb_param( 5, HB_IT_ARRAY );
-   BOOL bAdopt;
+   PHB_ITEM Structure   = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM aDef        = hb_param( 2, HB_IT_ARRAY );
+   PHB_ITEM pAlign      = hb_param( 3, HB_IT_INTEGER );
+   PHB_ITEM pAdopt      = hb_param( 4, HB_IT_LOGICAL );
+   PHB_ITEM pRet        = hb_param( 5, HB_IT_ARRAY );
+   BOOL     bAdopt;
 
    if( Structure && aDef )
    {
-      BYTE  *Buffer = (BYTE *) Structure->item.asString.value;
-      unsigned int uiAlign;
+      BYTE *         Buffer = ( BYTE * ) Structure->item.asString.value;
+      unsigned int   uiAlign;
 
       if( pAlign )
       {
-         uiAlign = (BYTE) pAlign->item.asInteger.value;
+         uiAlign = ( BYTE ) pAlign->item.asInteger.value;
       }
       else
       {
@@ -1966,20 +1970,20 @@ HB_FUNC( HB_STRUCTURETOARRAY )
 
 HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
 {
-   PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
-   PHB_ITEM pValue = hb_param( 2, HB_IT_ANY );
+   PHB_ITEM pArray   = hb_param( 1, HB_IT_ARRAY );
+   PHB_ITEM pValue   = hb_param( 2, HB_IT_ANY );
 
    if( pArray && pValue )
    {
       PHB_ITEM pItems;
-      HB_ISIZ ulLen;
-      HB_ISIZ ulStart;
-      HB_ISIZ ulCount;
-      BOOL bExact = hb_parl( 5 );
-      BOOL bAllowChar = hb_parl( 6 );
+      HB_ISIZ  ulLen;
+      HB_ISIZ  ulStart;
+      HB_ISIZ  ulCount;
+      BOOL     bExact      = hb_parl( 5 );
+      BOOL     bAllowChar  = hb_parl( 6 );
 
-      pItems = pArray->item.asArray.value->pItems;
-      ulLen = pArray->item.asArray.value->ulLen;
+      pItems   = pArray->item.asArray.value->pItems;
+      ulLen    = pArray->item.asArray.value->ulLen;
 
       /* sanitize scan range */
       if( ISNUM( 3 ) && hb_parns( 3 ) >= 1 )
@@ -2085,7 +2089,7 @@ HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
             PHB_ITEM pItem = pItems + ulStart;
 
             if( pItem->type == HB_IT_DATE && pItem->item.asDate.value == lValue &&
-               pValue->item.asDate.time == pItem->item.asDate.time )
+                pValue->item.asDate.time == pItem->item.asDate.time )
             {
                hb_retns( ulStart + 1 );             // arrays start from 1
                return;
@@ -2160,9 +2164,9 @@ HB_FUNC( ASPLICE )
 
    if( pArray )
    {
-      HB_SIZE ulStart, ulRemove, ulIndex, ulAdd;
-      HB_SIZE ulLen = hb_arrayLen( pArray );
-      PHB_ITEM pReturn = hb_stackReturnItem();
+      HB_SIZE  ulStart, ulRemove, ulIndex, ulAdd;
+      HB_SIZE  ulLen    = hb_arrayLen( pArray );
+      PHB_ITEM pReturn  = hb_stackReturnItem();
 
       if( ulLen == 0 )
       {
@@ -2176,7 +2180,7 @@ HB_FUNC( ASPLICE )
       }
       else
       {
-         ulStart = ulLen + ( hb_pcount() > 3 && !ISNUM( 3 ) ? 1 : 0 );
+         ulStart = ulLen + ( hb_pcount() > 3 && ! ISNUM( 3 ) ? 1 : 0 );
       }
 
       if( ISNUM( 3 ) )
@@ -2220,8 +2224,8 @@ HB_FUNC( ASPLICE )
 
          if( ulAdd > ulRemove )
          {
-            HB_SIZE ulMore = ulAdd - ulRemove;
-            HB_SIZE ulShift = ulLen - (ulStart + ulRemove);
+            HB_SIZE  ulMore   = ulAdd - ulRemove;
+            HB_SIZE  ulShift  = ulLen - ( ulStart + ulRemove );
 
             hb_arraySize( pArray, ulLen + ulMore );
 
@@ -2282,14 +2286,14 @@ HB_FUNC( AREMOVE )
 /* aMerge( <aTarget>, <aSource> [, <nPos>] ) => aTarget */
 HB_FUNC( AMERGE )
 {
-   PHB_ITEM pArray1 = hb_param( 1, HB_IT_ARRAY );
-   PHB_ITEM pArray2 = hb_param( 2, HB_IT_ARRAY );
+   PHB_ITEM pArray1  = hb_param( 1, HB_IT_ARRAY );
+   PHB_ITEM pArray2  = hb_param( 2, HB_IT_ARRAY );
 
    if( pArray1 && pArray2 )
    {
-      HB_SIZE ulLen = hb_arrayLen( pArray1 );
-      HB_SIZE ulAdd = hb_arrayLen( pArray2 );
-      HB_SIZE ulIndex, ulStart;
+      HB_SIZE  ulLen = hb_arrayLen( pArray1 );
+      HB_SIZE  ulAdd = hb_arrayLen( pArray2 );
+      HB_SIZE  ulIndex, ulStart;
 
       hb_arraySize( pArray1, ulLen + ulAdd );
 

@@ -58,28 +58,28 @@ HB_EXTERN_BEGIN
 int _CRT_glob = 0;
 #endif
 
-#if defined(HB_OS_WIN) || defined(HB_OS_WIN_32_USED)
+#if defined( HB_OS_WIN ) || defined( HB_OS_WIN_32_USED )
    #include "hbgtcore.h"
 
-   // Save
+// Save
    #define __PRESET_WIN WIN
 
-   // Reset
+// Reset
    #undef WIN
 
-   HB_GT_REQUEST( WIN )
+HB_GT_REQUEST( WIN )
 
-   // Restore
-   #define WIN __PRESET_WIN
+// Restore
+   #define WIN          __PRESET_WIN
    #undef __PRESET_WIN
 #endif
 
 int main( int argc, char * argv[] )
 {
-   HB_TRACE(HB_TR_DEBUG, ("main(%d, %p)", argc, argv));
+   HB_TRACE( HB_TR_DEBUG, ( "main(%d, %p)", argc, argv ) );
 
-   #if defined(HB_OS_WIN)
-      hb_gtSetDefault( "win" );
+   #if defined( HB_OS_WIN )
+   hb_gtSetDefault( "win" );
    #endif
 
    hb_cmdargInit( argc, argv );
@@ -88,7 +88,7 @@ int main( int argc, char * argv[] )
    return hb_vmQuit();
 }
 
-#if defined(__DJGPP__)
+#if defined( __DJGPP__ )
 char ** __crt0_glob_function( char * _arg )
 {
    /* This function disables command line wildcard expansion. */
@@ -98,8 +98,10 @@ char ** __crt0_glob_function( char * _arg )
 }
 #endif
 
-#if defined(HB_OS_LINUX) && defined(__WATCOMC__)
-void hb_forceLinkMainStd( void ) {}
+#if defined( HB_OS_LINUX ) && defined( __WATCOMC__ )
+void hb_forceLinkMainStd( void )
+{
+}
 #endif
 
 HB_EXTERN_END

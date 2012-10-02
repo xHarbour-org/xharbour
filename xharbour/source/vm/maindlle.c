@@ -56,34 +56,34 @@
  */
 
 /*
-  NOTE: This source should be compiled into dllmain.lib
+   NOTE: This source should be compiled into dllmain.lib
         and linked to any dll of prg code, which will be
         staticly linked against harbour.dll
 
-  WARNING: Do NOT link this into any EXE application!
+   WARNING: Do NOT link this into any EXE application!
 
            EXE applications which are staticly linked
            against harbour.dll, should be linked to usedll.c
            by means of use_dll.lib!
-*/
+ */
 
 #define HB_OS_WIN_USED
 
 #include "hbtypes.h"
 
 
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN )
 HB_EXTERN_BEGIN
-#if defined(HB_DLL_REQUIRED_DLLMAIN)
+#if defined( HB_DLL_REQUIRED_DLLMAIN )
 BOOL WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {
-   HB_TRACE( HB_TR_DEBUG, ("DllMain(%p, %p, %d)", hInstance, fdwReason,
-             pvReserved ) );
+   HB_TRACE( HB_TR_DEBUG, ( "DllMain(%p, %p, %d)", hInstance, fdwReason,
+                            pvReserved ) );
 #else
 BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {
-   HB_TRACE( HB_TR_DEBUG, ("DllEntryPoint(%p, %p, %d)", hInstance, fdwReason,
-             pvReserved ) );
+   HB_TRACE( HB_TR_DEBUG, ( "DllEntryPoint(%p, %p, %d)", hInstance, fdwReason,
+                            pvReserved ) );
 #endif
 
    HB_SYMBOL_UNUSED( hInstance );
@@ -101,7 +101,7 @@ BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserve
    return TRUE;
 }
 
-HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
+HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, int iPCodeVer, PHB_ITEM * pGlobals ) /* module symbols initialization */
 {
    return hb_vmProcessPrgDllSymbols( pSymbols, uiModuleSymbols, szModule, iPCodeVer, pGlobals );
 }
