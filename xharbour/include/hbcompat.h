@@ -53,7 +53,6 @@
 #ifndef HB_COMPAT_H_
 #define HB_COMPAT_H_
 
-#define HB_ULONG                  ULONG
 #define HB_MAXINT                 HB_LONG
 #define HB_BOOL                   BOOL
 #define HB_TRUE                   TRUE

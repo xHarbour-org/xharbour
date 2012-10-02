@@ -110,7 +110,7 @@ static HB_ERRCODE odbcDisconnect( SQLDDCONNECTION * pConnection );
 static HB_ERRCODE odbcExecute( SQLDDCONNECTION * pConnection, PHB_ITEM pItem );
 static HB_ERRCODE odbcOpen( SQLBASEAREAP pArea );
 static HB_ERRCODE odbcClose( SQLBASEAREAP pArea );
-static HB_ERRCODE odbcGoTo( SQLBASEAREAP pArea, HB_ULONG ulRecNo );
+static HB_ERRCODE odbcGoTo( SQLBASEAREAP pArea, ULONG ulRecNo );
 
 
 static SDDNODE odbcdd =
@@ -597,7 +597,7 @@ static HB_ERRCODE odbcClose( SQLBASEAREAP pArea )
 }
 
 
-static HB_ERRCODE odbcGoTo( SQLBASEAREAP pArea, HB_ULONG ulRecNo )
+static HB_ERRCODE odbcGoTo( SQLBASEAREAP pArea, ULONG ulRecNo )
 {
    SQLHSTMT     hStmt = ( ( SDDDATA * ) pArea->pSDDData )->hStmt;
    SQLRETURN    res;

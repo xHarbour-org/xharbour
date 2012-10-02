@@ -117,7 +117,7 @@ HB_FUNC( NUMTOHEX )
 
    if( ISNUM( 1 ) )
    {
-      ulNum = hb_parnint( 1 );
+      ulNum = ( HB_ULONG ) hb_parnint( 1 );
    }
    else if( ISPOINTER( 1 ) )
    {

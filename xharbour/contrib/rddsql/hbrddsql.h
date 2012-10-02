@@ -109,28 +109,28 @@ typedef struct _SQLBASEAREA
 
    LPDBRELINFO                lpdbPendingRel;
 
-   HB_ULONG                   ulConnection;
+   ULONG                   ulConnection;
    struct _SQLDDCONNECTION *  pConnection;
-   struct _SDDNODE *          pSDD;
+   struct _SDDNODE *       pSDD;
 
-   char *                     szQuery;       /* SQL query */
+   char *                  szQuery;       /* SQL query */
 
-   HB_ULONG                   ulRecNo;       /* Current record number */
-   HB_ULONG                   ulRecCount;    /* Total records */
-   HB_ULONG                   ulRecMax;      /* Size of pRow, pRowFlags buffer */
+   ULONG                   ulRecNo;       /* Current record number */
+   ULONG                   ulRecCount;    /* Total records */
+   ULONG                   ulRecMax;      /* Size of pRow, pRowFlags buffer */
 
-   void **                    pRow;          /* array of native pointers or cached PHB_ITEM */
-   HB_BYTE *                  pRowFlags;
+   void **                 pRow;          /* array of native pointers or cached PHB_ITEM */
+   HB_BYTE *               pRowFlags;
 
-   void *                     pRecord;       /* current record */
-   HB_BYTE                    bRecordFlags;
+   void *                  pRecord;       /* current record */
+   HB_BYTE                 bRecordFlags;
 
-   HB_BOOL                    fFetched;
-   HB_BOOL                    fPositioned;
-   HB_BOOL                    fAppend;
-   HB_BOOL                    fRecordChanged;
+   HB_BOOL                 fFetched;
+   HB_BOOL                 fPositioned;
+   HB_BOOL                 fAppend;
+   HB_BOOL                 fRecordChanged;
 
-   void *                     pSDDData;      /* SDD specific data */
+   void *                  pSDDData;      /* SDD specific data */
 } SQLBASEAREA, * SQLBASEAREAP;
 
 
@@ -158,7 +158,7 @@ typedef struct _SQLDDCONNECTION
 
 typedef struct _MIXKEY
 {
-   HB_ULONG  rec;
+   ULONG  rec;
    HB_BYTE   notnul;
    HB_BYTE   val[ 1 ];
 } MIXKEY, * PMIXKEY;
@@ -238,9 +238,9 @@ typedef HB_ERRCODE (* SDDFUNC_DISCONNECT )( SQLDDCONNECTION * pConnection );
 typedef HB_ERRCODE (* SDDFUNC_EXECUTE    )( SQLDDCONNECTION * pConnection, PHB_ITEM pItem );
 typedef HB_ERRCODE (* SDDFUNC_OPEN       )( SQLBASEAREAP pArea );
 typedef HB_ERRCODE (* SDDFUNC_CLOSE      )( SQLBASEAREAP pArea );
-typedef HB_ERRCODE (* SDDFUNC_GOTO       )( SQLBASEAREAP pArea, HB_ULONG ulRecNo );
+typedef HB_ERRCODE (* SDDFUNC_GOTO       )( SQLBASEAREAP pArea, ULONG ulRecNo );
 typedef HB_ERRCODE (* SDDFUNC_GETVALUE   )( SQLBASEAREAP pArea, HB_USHORT uiIndex, PHB_ITEM pItem );
-typedef HB_ERRCODE (* SDDFUNC_GETVARLEN  )( SQLBASEAREAP pArea, HB_USHORT uiIndex, HB_ULONG * pLength );
+typedef HB_ERRCODE (* SDDFUNC_GETVARLEN  )( SQLBASEAREAP pArea, HB_USHORT uiIndex, ULONG * pLength );
 
 
 typedef struct _SDDNODE
