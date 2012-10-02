@@ -62,18 +62,18 @@ HB_FUNC( RAT )
 
       if( lPos >= 0 )
       {
-         const char * pszSub = hb_parcx( 1 );
-         const char * pszText = hb_parcx( 2 );
-         LONG lEnd = ISNUM( 4 ) ? hb_parnl( 4 ) - 1 : 0;
-         BOOL bFound = FALSE;
+         const char *   pszSub   = hb_parcx( 1 );
+         const char *   pszText  = hb_parcx( 2 );
+         LONG           lEnd     = ISNUM( 4 ) ? hb_parnl( 4 ) - 1 : 0;
+         BOOL           bFound   = FALSE;
 
-         if ( ISNUM( 3 ) )
-             lPos = hb_parnl( 3 ) - 1;
+         if( ISNUM( 3 ) )
+            lPos = hb_parnl( 3 ) - 1;
 
-         while( lPos >= lEnd && !bFound )
+         while( lPos >= lEnd && ! bFound )
          {
             if( *( pszText + lPos ) == *pszSub )
-               bFound = ( memcmp( pszSub, pszText + lPos, (size_t) ulSubLen ) == 0 );
+               bFound = ( memcmp( pszSub, pszText + lPos, ( size_t ) ulSubLen ) == 0 );
             lPos--;
          }
          hb_retnl( bFound ? lPos + 2 : 0 );

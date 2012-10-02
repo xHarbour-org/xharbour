@@ -55,7 +55,8 @@
 #ifdef HB_C52_UNDOC
 
 FUNCTION SetTypeahead( nSize )
-   RETURN Set( _SET_TYPEAHEAD, nSize )
+
+   RETURN SET( _SET_TYPEAHEAD, nSize )
 
 #endif
 

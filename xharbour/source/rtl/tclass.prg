@@ -70,15 +70,15 @@
  *
  */
 
-/* Harbour Class HBClass to build classes */
+   /* Harbour Class HBClass to build classes */
 
 #include "common.ch"
 #include "hboo.ch"
 #include "divert.ch"
 
-REQUEST HBObject
-REQUEST __CLSISACTIVE
-REQUEST __CLSACTIVE
+   REQUEST HBObject
+   REQUEST __CLSISACTIVE
+   REQUEST __CLSACTIVE
 
 FUNCTION HBClass()
 
@@ -110,8 +110,8 @@ FUNCTION HBClass()
       __clsAddMsg( s_hClass, "Refresh"              , @Refresh()              , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "AddFriends"           , @AddFriends()           , HB_OO_MSG_METHOD )
 
-      __clsAddMsg( s_hClass, "cSuper"         , {| Self | IIF( ::acSuper == NIL .OR. Len( ::acSuper ) == 0, NIL, ::acSuper[ 1 ] ) }, HB_OO_MSG_INLINE )
-      __clsAddMsg( s_hClass, "_cSuper"        , {| Self, xVal | IIF( ::acSuper == NIL .OR. Len( ::acSuper ) == 0, ( ::acSuper := { xVal } ), ::acSuper[ 1 ] := xVal ), xVal }, HB_OO_MSG_INLINE )
+      __clsAddMsg( s_hClass, "cSuper"         , {| Self | iif( ::acSuper == NIL .OR. Len( ::acSuper ) == 0, NIL, ::acSuper[ 1 ] ) }, HB_OO_MSG_INLINE )
+      __clsAddMsg( s_hClass, "_cSuper"        , {| Self, xVal | iif( ::acSuper == NIL .OR. Len( ::acSuper ) == 0, ( ::acSuper := { xVal } ), ::acSuper[ 1 ] := xVal ), xVal }, HB_OO_MSG_INLINE )
 
       __clsAddMsg( s_hClass, "hClass"         ,  1, HB_OO_MSG_PROPERTY )
       __clsAddMsg( s_hClass, "cName"          ,  2, HB_OO_MSG_PROPERTY )
@@ -130,13 +130,14 @@ FUNCTION HBClass()
 
    ENDIF
 
-RETURN __clsInst( s_hClass )
+   RETURN __clsInst( s_hClass )
 
 //----------------------------------------------------------------------------//
 // xSuper is used here as the new preprocessor file (HBCLASS.CH) send here
 // always an array (if no superclass, this will be an empty one)
 // In case of direct class creation (without the help of preprocessor) xSuper can be
 // either NIL or contain the name of the superclass.
+
 STATIC FUNCTION New( cClassName, xSuper )
 
    LOCAL Self := QSelf()
@@ -144,7 +145,7 @@ STATIC FUNCTION New( cClassName, xSuper )
 
    IF ISARRAY( xSuper ) .AND. Len( xSuper ) >= 1
       ::acSuper := xSuper
-   ELSEIF ISCHARACTER( xSuper ) .AND. ! empty( xSuper )
+   ELSEIF ISCHARACTER( xSuper ) .AND. ! Empty( xSuper )
       ::acSuper := { xSuper }
    ELSE
       ::acSuper := {}
@@ -163,19 +164,21 @@ STATIC FUNCTION New( cClassName, xSuper )
    ::aFriends    := {}
 
    FOR EACH cSuper IN ::acSuper
-      IF ! HB_ISSTRING( cSuper ) .And. ! HB_ISNUMERIC( cSuper )
-         ASize( ::acSuper, HB_EnumIndex() - 1)
+      IF ! HB_ISSTRING( cSuper ) .AND. ! HB_ISNUMERIC( cSuper )
+         ASize( ::acSuper, HB_EnumIndex() - 1 )
          EXIT
       ENDIF
    NEXT
 
-RETURN Self
+   RETURN Self
 
 //----------------------------------------------------------------------------//
-STATIC PROCEDURE Create()
+
+STATIC PROCEDURE CREATE()
 
    LOCAL Self := QSelf()
-   //LOCAL n
+
+//LOCAL n
    LOCAL nLen := Len( ::acSuper )
    LOCAL nLenDatas := Len( ::aDatas ) //Datas local to the class !!
    LOCAL nDataBegin := 0
@@ -186,9 +189,9 @@ STATIC PROCEDURE Create()
    LOCAL cDato
    LOCAL hSuper
    LOCAL nClassModule := 1
-   LOCAl xFriend
+   LOCAL xFriend
 
-   // This code allows HBClass itself to be inherited
+// This code allows HBClass itself to be inherited
    WHILE Self == HB_QSelf( nClassModule )
       nClassModule++
    ENDDO
@@ -196,14 +199,14 @@ STATIC PROCEDURE Create()
    IF nLen == 0
       //Maybe this class is a super class, and the oop engine store
       //in the first element a real self, when call a super method
-      hClass := __ClsNew( ::cName, nLenDatas + 1, nExtraMsgs, , nClassModule )
+      hClass := __clsNew( ::cName, nLenDatas + 1, nExtraMsgs, , nClassModule )
       nDataBegin := 1
    ELSE                                         // Multi inheritance
       FOR EACH cDato IN ::acSuper
 
          IF HB_ISNUMERIC( cDato )
             ahSuper[ HB_EnumIndex() ]   := cDato
-            ::acSuper[ HB_EnumIndex() ] := __CLASSNAME( cDato )
+            ::acSuper[ HB_EnumIndex() ] := __className( cDato )
          ELSE
             hSuper := __ClsGetHandleFromName( cDato )
             IF hSuper == 0
@@ -218,7 +221,7 @@ STATIC PROCEDURE Create()
          ENDIF
       NEXT
 
-      hClass := __ClsNew( ::cName, nLenDatas , nExtraMsgs, ahSuper, nClassModule )
+      hClass := __clsNew( ::cName, nLenDatas , nExtraMsgs, ahSuper, nClassModule )
 
       FOR EACH cDato IN ahSuper
          nDataBegin   += __cls_CntData( cDato )        // Get offset for new Datas
@@ -238,34 +241,34 @@ STATIC PROCEDURE Create()
 
    ::hClass := hClass
 
-   // We will work here on the MetaClass object to add the Class Method
-   // as needed
+// We will work here on the MetaClass object to add the Class Method
+// as needed
    FOR EACH cDato IN ::aClsMethods
-       IF !( __objHasMsg( Self, cDato[ HB_OO_MTHD_SYMBOL ] ) )
-          __clsAddMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ], cDato[ HB_OO_MTHD_PFUNCTION ], HB_OO_MSG_METHOD, NIL, cDato[ HB_OO_MTHD_SCOPE ] )
-       ENDIF
+      IF !( __objHasMsg( Self, cDato[ HB_OO_MTHD_SYMBOL ] ) )
+         __clsAddMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ], cDato[ HB_OO_MTHD_PFUNCTION ], HB_OO_MSG_METHOD, NIL, cDato[ HB_OO_MTHD_SCOPE ] )
+      ENDIF
    NEXT
 
    FOR EACH cDato IN ::aDatas
       __clsAddMsg( hClass, cDato[ HB_OO_DATA_SYMBOL ]       , HB_EnumIndex() + nDataBegin, ;
-                   HB_OO_MSG_PROPERTY, cDato[ HB_OO_DATA_VALUE ], cDato[ HB_OO_DATA_SCOPE ],;
-                   cDato[ HB_OO_DATA_PERSISTENT ] )
+         HB_OO_MSG_PROPERTY, cDato[ HB_OO_DATA_VALUE ], cDato[ HB_OO_DATA_SCOPE ], ;
+         cDato[ HB_OO_DATA_PERSISTENT ] )
    NEXT
 
    FOR EACH cDato IN ::aMethods
-      __clsAddMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ], cDato[ HB_OO_MTHD_PFUNCTION ], HB_OO_MSG_METHOD, NIL, cDato[ HB_OO_MTHD_SCOPE ],;
-                   cDato[ HB_OO_MTHD_PERSISTENT ] )
+      __clsAddMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ], cDato[ HB_OO_MTHD_PFUNCTION ], HB_OO_MSG_METHOD, NIL, cDato[ HB_OO_MTHD_SCOPE ], ;
+         cDato[ HB_OO_MTHD_PERSISTENT ] )
    NEXT
 
    FOR EACH cDato IN ::aClsDatas
-      __clsAddMsg( hClass, cDato[ HB_OO_CLSD_SYMBOL ]      , HB_EnumIndex() + nClassBegin,;
-                   HB_OO_MSG_CLASSPROPERTY, cDato[ HB_OO_CLSD_VALUE ], cDato[ HB_OO_CLSD_SCOPE ] )
+      __clsAddMsg( hClass, cDato[ HB_OO_CLSD_SYMBOL ]      , HB_EnumIndex() + nClassBegin, ;
+         HB_OO_MSG_CLASSPROPERTY, cDato[ HB_OO_CLSD_VALUE ], cDato[ HB_OO_CLSD_SCOPE ] )
    NEXT
 
    FOR EACH cDato IN ::aInlines
-      __clsAddMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ], cDato[ HB_OO_MTHD_PFUNCTION ],;
-                   HB_OO_MSG_INLINE, NIL, cDato[ HB_OO_MTHD_SCOPE ],;
-                   cDato[ HB_OO_MTHD_PERSISTENT ] )
+      __clsAddMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ], cDato[ HB_OO_MTHD_PFUNCTION ], ;
+         HB_OO_MSG_INLINE, NIL, cDato[ HB_OO_MTHD_SCOPE ], ;
+         cDato[ HB_OO_MTHD_PERSISTENT ] )
    NEXT
 
    FOR EACH cDato IN ::aVirtuals
@@ -273,8 +276,8 @@ STATIC PROCEDURE Create()
    NEXT
 
    FOR EACH cDato IN ::aDelegates
-      __clsAddMsg( ::hClass, cDato[ HB_OO_MTHD_SYMBOL ], cDato[ HB_OO_MTHD_DELEGNAME ], HB_OO_MSG_DELEGATE, cDato[ HB_OO_MTHD_DELEGOBJ ], cDato[ HB_OO_MTHD_SCOPE ],;
-                   cDato[ HB_OO_MTHD_PERSISTENT ] )
+      __clsAddMsg( ::hClass, cDato[ HB_OO_MTHD_SYMBOL ], cDato[ HB_OO_MTHD_DELEGNAME ], HB_OO_MSG_DELEGATE, cDato[ HB_OO_MTHD_DELEGOBJ ], cDato[ HB_OO_MTHD_SCOPE ], ;
+         cDato[ HB_OO_MTHD_PERSISTENT ] )
    NEXT
 
    FOR EACH xFriend IN ::aFriends
@@ -289,55 +292,61 @@ STATIC PROCEDURE Create()
       __clsAddMsg( hClass, "__Destructor", ::nDestructor, HB_OO_MSG_DESTRUCTOR )
    ENDIF
 
-RETURN
+   RETURN
 
 //----------------------------------------------------------------------------//
 
 STATIC PROCEDURE Refresh()
+
    LOCAL Self := QSelf()
    LOCAL nLen := Len( ::acSuper )
    LOCAL ahSuper := Array( nLen )
    LOCAL cDato, hClass := ::hClass
 
-      FOR EACH cDato IN ::acSuper
-         ahSuper[ HB_EnumIndex() ] := __clsInstSuper( Upper( cDato ) )
-      NEXT
+   FOR EACH cDato IN ::acSuper
+      ahSuper[ HB_EnumIndex() ] := __clsInstSuper( Upper( cDato ) )
+   NEXT
 
-      FOR EACH cDato IN ::aClsMethods
-          IF __clsHasMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ] )
-             __clsModMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ], cDato[ HB_OO_MTHD_PFUNCTION ] )
-          ENDIF
-      NEXT
-
-      FOR EACH cDato IN ::aMethods
-          IF __clsHasMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ] )
-             __clsModMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ], cDato[ HB_OO_MTHD_PFUNCTION ] )
-          ENDIF
-      NEXT
-
-      IF ::nOnError != NIL
-         __clsModMsg( hClass, "__OnError", ::nOnError )
+   FOR EACH cDato IN ::aClsMethods
+      IF __clsHasMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ] )
+         __clsModMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ], cDato[ HB_OO_MTHD_PFUNCTION ] )
       ENDIF
+   NEXT
 
-      IF ::nDestructor != NIL
-         __clsModMsg( hClass, "__Destructor", ::nDestructor )
+   FOR EACH cDato IN ::aMethods
+      IF __clsHasMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ] )
+         __clsModMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ], cDato[ HB_OO_MTHD_PFUNCTION ] )
       ENDIF
-RETURN
+   NEXT
+
+   IF ::nOnError != NIL
+      __clsModMsg( hClass, "__OnError", ::nOnError )
+   ENDIF
+
+   IF ::nDestructor != NIL
+      __clsModMsg( hClass, "__Destructor", ::nDestructor )
+   ENDIF
+
+   RETURN
 
 //----------------------------------------------------------------------------//
+
 STATIC FUNCTION Instance( )
+
    LOCAL Self := QSelf()
-RETURN __clsInst( ::hClass )
+
+   RETURN __clsInst( ::hClass )
 
 //----------------------------------------------------------------------------//
+
 STATIC PROCEDURE AddData( cData, xInit, cType, nScope, lNoinit, lPersistent )
 
    LOCAL Self := QSelf()
 
-   if lNoInit==NIL; lNoInit:=.F.; endif
-   if lPersistent == nil; lpersistent := .f.; endif
+   IF lNoInit == NIL; lNoInit := .F. ; ENDIF
+   IF lPersistent == nil; lpersistent := .F. ; ENDIF
 
-   // Default Init for Logical and numeric
+// Default Init for Logical and numeric
    IF ! lNoInit .AND. cType != NIL .AND. xInit == NIL
       IF Upper( Left( cType, 1 ) ) == "L"
          xInit := .F.
@@ -348,9 +357,10 @@ STATIC PROCEDURE AddData( cData, xInit, cType, nScope, lNoinit, lPersistent )
 
    AAdd( ::aDatas, { cData, xInit, cType, nScope, lPersistent } )
 
-RETURN
+   RETURN
 
 //----------------------------------------------------------------------------//
+
 STATIC PROCEDURE AddMultiData( cType, xInit, nScope, aData, lNoInit, lPersistent )
 
    LOCAL Self := QSelf()
@@ -361,7 +371,7 @@ STATIC PROCEDURE AddMultiData( cType, xInit, nScope, aData, lNoInit, lPersistent
          ASize( aData, HB_EnumIndex() - 1 )
          EXIT
       ENDIF
-//      i++
+      //      i++
    NEXT
 
 
@@ -369,16 +379,17 @@ STATIC PROCEDURE AddMultiData( cType, xInit, nScope, aData, lNoInit, lPersistent
       ::AddData( cData, xInit, cType, nScope, lNoInit, lPersistent )
    NEXT
 
-RETURN
+   RETURN
 
 //----------------------------------------------------------------------------//
+
 STATIC PROCEDURE AddClassData( cData, xInit, cType, nScope, lNoInit )
 
    LOCAL Self := QSelf()
 
-   if lNoInit==NIL;lNoInit:=.F.;endif
+   IF lNoInit == NIL;lNoInit := .F. ;ENDIF
 
-   // Default Init for Logical and numeric
+// Default Init for Logical and numeric
    IF ! lNoInit .AND. cType != NIL .AND. xInit == NIL
       IF Upper( Left( cType, 1 ) ) == "L"
          xInit := .F.
@@ -389,9 +400,10 @@ STATIC PROCEDURE AddClassData( cData, xInit, cType, nScope, lNoInit )
 
    AAdd( ::aClsDatas, { cData, xInit, cType, nScope } )
 
-RETURN
+   RETURN
 
 //----------------------------------------------------------------------------//
+
 STATIC PROCEDURE AddMultiClsData( cType, xInit, nScope, aData, lNoInit )
 
    LOCAL Self := QSelf()
@@ -402,7 +414,7 @@ STATIC PROCEDURE AddMultiClsData( cType, xInit, nScope, aData, lNoInit )
          ASize( aData, HB_EnumIndex() - 1 )
          EXIT
       ENDIF
-//      i++
+      //      i++
    NEXT
 
 
@@ -410,119 +422,129 @@ STATIC PROCEDURE AddMultiClsData( cType, xInit, nScope, aData, lNoInit )
       ::AddClassData( cData, xInit, cType, nScope, lNoInit )
    NEXT
 
-RETURN
+   RETURN
 
 //----------------------------------------------------------------------------//
+
 STATIC PROCEDURE AddInline( cMethod, bCode, nScope, lPersistent )
 
    LOCAL Self := QSelf()
 
    AAdd( ::aInlines, { cMethod, bCode, nScope, lPersistent } )
 
-RETURN
+   RETURN
 
 //----------------------------------------------------------------------------//
+
 STATIC PROCEDURE AddMethod( cMethod, nFuncPtr, nScope, lPersistent )
 
    LOCAL Self := QSelf()
 
    AAdd( ::aMethods, { cMethod, nFuncPtr, nScope, lPersistent } )
 
-RETURN
+   RETURN
 
 //----------------------------------------------------------------------------//
+
 STATIC PROCEDURE AddClsMethod( cMethod, nFuncPtr, nScope )
 
    LOCAL Self := QSelf()
 
    AAdd( ::aClsMethods, { cMethod, nFuncPtr, nScope } )
 
-RETURN
+   RETURN
 
 //----------------------------------------------------------------------------//
+
 STATIC PROCEDURE AddVirtual( cMethod )
 
    LOCAL Self := QSelf()
 
    AAdd( ::aVirtuals, cMethod )
 
-RETURN
+   RETURN
 
 //----------------------------------------------------------------------------//
+
 STATIC PROCEDURE AddDelegate( cMethod, cDelegate, cObject, nScope, lPersistent )
 
    LOCAL Self := QSelf()
 
    AAdd( ::aDelegates, { cMethod, cDelegate, nScope, lPersistent, cObject } )
 
-RETURN
+   RETURN
 
 //----------------------------------------------------------------------------//
+
 STATIC PROCEDURE AddFriends( ... )
 
    LOCAL Self := QSelf()
 
-   aMerge( ::aFriends, hb_aParams() )
-RETURN
+   aMerge( ::aFriends, hb_AParams() )
 
+   RETURN
 
 //----------------------------------------------------------------------------//
+
 STATIC PROCEDURE ModInline( cMethod, bCode, nScope, lPersistent )
 
    LOCAL Self := QSelf(), nAt
 
-   if ( nAt := AScan( ::aInlines, {|a| a[1] == cMethod } ) ) > 0
+   IF ( nAt := AScan( ::aInlines, {|a| a[1] == cMethod } ) ) > 0
       ::aInlines[ nAt ] := { cMethod, bCode, nScope, lPersistent }
-   else
+   ELSE
       AAdd( ::aInlines, { cMethod, bCode, nScope, lPersistent } )
-   endif
+   ENDIF
 
-RETURN
+   RETURN
 
 //----------------------------------------------------------------------------//
+
 STATIC PROCEDURE ModMethod( cMethod, nFuncPtr, nScope, lPersistent )
 
    LOCAL Self := QSelf(), nAt
 
-   if ( nAt := AScan( ::aMethods, {|a| a[1] == cMethod } ) ) > 0
+   IF ( nAt := AScan( ::aMethods, {|a| a[1] == cMethod } ) ) > 0
       ::aMethods[ nAt ] := { cMethod, nFuncPtr, nScope, lPersistent }
-   else
+   ELSE
       AAdd( ::aMethods, { cMethod, nFuncPtr, nScope, lPersistent } )
-   endif
+   ENDIF
 
-RETURN
+   RETURN
 
 //----------------------------------------------------------------------------//
+
 STATIC PROCEDURE ModClsMethod( cMethod, nFuncPtr, nScope )
 
    LOCAL Self := QSelf(), nAt
 
-   if ( nAt := AScan( ::aClsMethods, {|a| a[1] == cMethod } ) ) > 0
+   IF ( nAt := AScan( ::aClsMethods, {|a| a[1] == cMethod } ) ) > 0
       ::aClsMethods[ nAt ] := { cMethod, nFuncPtr, nScope }
-   else
+   ELSE
       AAdd( ::aClsMethods, { cMethod, nFuncPtr, nScope } )
-   endif
+   ENDIF
 
-RETURN
+   RETURN
 
 //----------------------------------------------------------------------------//
+
 STATIC PROCEDURE SetOnError( nFuncPtr )
 
    LOCAL Self := QSelf()
 
    ::nOnError := nFuncPtr
 
-RETURN
-
+   RETURN
 
 //----------------------------------------------------------------------------//
+
 STATIC PROCEDURE SetDestructor( nFuncPtr )
 
    LOCAL Self := QSelf()
 
    ::nDestructor := nFuncPtr
 
-RETURN
+   RETURN
 
 //----------------------------------------------------------------------------//
 /*
@@ -532,7 +554,9 @@ RETURN
  *
  * FSG 2003/11/05 - Fixed with right check of class constructor method
 */
+
 STATIC FUNCTION ConstructorCall( oClass, aParams )
+
    LOCAL Self := QSelf()
    LOCAL aConstrMethods
    LOCAL lOldScope, nPos
@@ -542,12 +566,12 @@ STATIC FUNCTION ConstructorCall( oClass, aParams )
       lOldScope := __SetClassScope( .F. )
 
       // Get method full list but limited to those with class type as constructor
-      aConstrMethods  := __objGetMsgFullList( oClass, .F., HB_MSGLISTALL, HB_OO_CLSTP_CTOR )
+      aConstrMethods  := __objGetMsgFullList( oClass, .F. , HB_MSGLISTALL, HB_OO_CLSTP_CTOR )
 
       // Search the constructor which is not derived from a parent class
       //aEval( aConstrMethods, {|aMth| TraceLog( "aScan",  aMth[HB_OO_DATA_SYMBOL], aMth[HB_OO_DATA_SCOPE], ;
       //                                         hb_BitAnd( aMth[HB_OO_DATA_SCOPE], HB_OO_CLSTP_SUPER ) ) } )
-      nPos := aScan( aConstrMethods, {|aMth| hb_BitAnd( aMth[HB_OO_DATA_SCOPE], HB_OO_CLSTP_SUPER ) == 0 } )
+      nPos := AScan( aConstrMethods, {|aMth| hb_bitAnd( aMth[HB_OO_DATA_SCOPE], HB_OO_CLSTP_SUPER ) == 0 } )
 
       // Revert class scoping
       __SetClassScope( lOldScope )
@@ -555,13 +579,13 @@ STATIC FUNCTION ConstructorCall( oClass, aParams )
       IF nPos > 0
          // Exec method - i have found the constructor in this class
          //TraceLog( "Search this class constructor:", aConstrMethods[ nPos ][HB_OO_DATA_SYMBOL] )
-         RETURN HB_ExecFromArray( oClass, aConstrMethods[ nPos ][ HB_OO_DATA_SYMBOL ], aParams )
+         RETURN hb_ExecFromArray( oClass, aConstrMethods[ nPos ][ HB_OO_DATA_SYMBOL ], aParams )
       ELSE
          // Get LAST constructor from parent (NOTE: this can be a default and faster way,
          // but i prefer check rightly before)
          IF !Empty( aConstrMethods )
             //TraceLog( "Search parent class constructor:", aTail( aConstrMethods )[HB_OO_DATA_SYMBOL] )
-            RETURN HB_ExecFromArray( oClass, aConstrMethods[-1][ HB_OO_DATA_SYMBOL ], aParams )
+            RETURN hb_ExecFromArray( oClass, aConstrMethods[-1][ HB_OO_DATA_SYMBOL ], aParams )
          ELSE
             //TraceLog( "Call new default constructor:", "NEW" )
             // If i have no constructor i call NEW method that is defined is HBOBJECT class
@@ -572,30 +596,31 @@ STATIC FUNCTION ConstructorCall( oClass, aParams )
 
    ENDIF
 
-RETURN Self
+   RETURN Self
 
 STATIC PROCEDURE DivertConstructorCall( ... )
-   // From DIVERT parent!
-   local oClassInstance
-   local nScope
-   // End
+
+// From DIVERT parent!
+   LOCAL oClassInstance
+   LOCAL nScope
+// End
 
    LOCAL aConstrMethods
    LOCAL lOldScope, nPos
 
-   (nScope)
+   ( nScope )
 
    IF __SetClassAutoInit() //.AND. PCount() > 0
       // Set class scoping off
       lOldScope := __SetClassScope( .F. )
 
       // Get method full list but limited to those with class type as constructor
-      aConstrMethods  := __objGetMsgFullList( oClassInstance, .F., HB_MSGLISTALL, HB_OO_CLSTP_CTOR )
+      aConstrMethods  := __objGetMsgFullList( oClassInstance, .F. , HB_MSGLISTALL, HB_OO_CLSTP_CTOR )
 
       // Search the constructor which is not derived from a parent class
       //aEval( aConstrMethods, {|aMth| TraceLog( "aScan",  aMth[HB_OO_DATA_SYMBOL], aMth[HB_OO_DATA_SCOPE], ;
       //                                         hb_BitAnd( aMth[HB_OO_DATA_SCOPE], HB_OO_CLSTP_SUPER ) ) } )
-      nPos := aScan( aConstrMethods, {|aMth| hb_BitAnd( aMth[HB_OO_DATA_SCOPE], HB_OO_CLSTP_SUPER ) == 0 } )
+      nPos := AScan( aConstrMethods, {|aMth| hb_bitAnd( aMth[HB_OO_DATA_SCOPE], HB_OO_CLSTP_SUPER ) == 0 } )
 
       // Revert class scoping
       __SetClassScope( lOldScope )
@@ -621,4 +646,4 @@ STATIC PROCEDURE DivertConstructorCall( ... )
       ENDIF
    ENDIF
 
-RETURN
+   RETURN

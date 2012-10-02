@@ -56,10 +56,10 @@ HB_FUNC( HB_COLORINDEX )
 {
    if( ISCHAR( 1 ) && ISNUM( 2 ) )
    {
-      const char * pszColor = hb_parc( 1 );
-      ULONG ulColorPos;
-      ULONG ulColorLen;
-      USHORT uiColorIndex = ( USHORT ) hb_parni( 2 );
+      const char *   pszColor       = hb_parc( 1 );
+      ULONG          ulColorPos;
+      ULONG          ulColorLen;
+      USHORT         uiColorIndex   = ( USHORT ) hb_parni( 2 );
 
       /* Skip the given number of commas */
       for( ulColorPos = 0; pszColor[ ulColorPos ] != '\0' && uiColorIndex > 0; ulColorPos++ )

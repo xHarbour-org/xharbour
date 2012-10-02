@@ -60,16 +60,16 @@ HB_LANG_REQUEST( HB_LANG_DEFAULT );
 
 /* NOTE: This is the maximum number of registered languages, later this can be
          made dynamic. */
-#define HB_LANG_MAX_ 128
+#define HB_LANG_MAX_             128
 
-#define HB_LANG_ITEM_ID_ID         0
-#define HB_LANG_ITEM_ID_NAME       1
-#define HB_LANG_ITEM_ID_NAMENAT    2
-#define HB_LANG_ITEM_ID_RFCID      3
-#define HB_LANG_ITEM_ID_CODEPAGE   4
+#define HB_LANG_ITEM_ID_ID       0
+#define HB_LANG_ITEM_ID_NAME     1
+#define HB_LANG_ITEM_ID_NAMENAT  2
+#define HB_LANG_ITEM_ID_RFCID    3
+#define HB_LANG_ITEM_ID_CODEPAGE 4
 
-static PHB_LANG s_langList[ HB_LANG_MAX_ ];
-static PHB_LANG s_lang = NULL;
+static PHB_LANG   s_langList[ HB_LANG_MAX_ ];
+static PHB_LANG   s_lang = NULL;
 
 static int hb_langFindPos( const char * pszID )
 {
@@ -89,7 +89,7 @@ static int hb_langFindPos( const char * pszID )
 
 BOOL hb_langRegister( PHB_LANG lang )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_langRegister(%p)", lang));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_langRegister(%p)", lang ) );
 
    if( lang )
    {
@@ -120,7 +120,7 @@ BOOL hb_langDeRegister( char * pszID )
 {
    int iPos;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_langDeRegister(%s)", pszID));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_langDeRegister(%s)", pszID ) );
 
    iPos = hb_langFindPos( pszID );
 
@@ -137,7 +137,7 @@ PHB_LANG hb_langFind( const char * pszID )
 {
    int iPos;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_langFind(%s)", pszID));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_langFind(%s)", pszID ) );
 
    iPos = hb_langFindPos( pszID );
 
@@ -148,7 +148,7 @@ PHB_LANG hb_langSelect( PHB_LANG lang )
 {
    PHB_LANG langOld = s_lang;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_langSelect(%p)", lang));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_langSelect(%p)", lang ) );
 
    if( lang )
    {
@@ -157,15 +157,15 @@ PHB_LANG hb_langSelect( PHB_LANG lang )
    else
    {
       /*
-      // Intentionally not using generic rutines which might require valid language setup.
-      printf( "Internal error: invalid language selected.\n" );
-      exit(1);
+         // Intentionally not using generic rutines which might require valid language setup.
+         printf( "Internal error: invalid language selected.\n" );
+         exit(1);
 
-      druzus: in hb_errInternal(...) s_lang is checked before so we only have
+         druzus: in hb_errInternal(...) s_lang is checked before so we only have
               to set it to NULL to avoid recursion
-      */
+       */
       s_lang = NULL;
-      hb_errInternal( HB_EI_ERRUNRECOV, "invalid language selected", NULL, NULL);
+      hb_errInternal( HB_EI_ERRUNRECOV, "invalid language selected", NULL, NULL );
    }
 
    return langOld;
@@ -175,7 +175,7 @@ char * hb_langSelectID( const char * pszID )
 {
    char * pszIDOld = hb_langID();
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_langSelectID(%s)", pszID));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_langSelectID(%s)", pszID ) );
 
    hb_langSelect( hb_langFind( pszID ) );
 
@@ -184,11 +184,11 @@ char * hb_langSelectID( const char * pszID )
 
 char * hb_langDGetItem( int iIndex )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_langDGetItem(%i)", iIndex));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_langDGetItem(%i)", iIndex ) );
 
    if( s_lang && iIndex >= 0 && iIndex < HB_LANG_ITEM_MAX_ )
    {
-      return (char *) s_lang->pItemList[ iIndex ];
+      return ( char * ) s_lang->pItemList[ iIndex ];
    }
    else
    {
@@ -198,7 +198,7 @@ char * hb_langDGetItem( int iIndex )
 
 char * hb_langID( void )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_langID()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_langID()" ) );
 
    if( s_lang )
       return ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ID + HB_LANG_ITEM_ID_ID );
@@ -214,9 +214,9 @@ char * hb_langName( void )
 
    if( s_lang )
       hb_snprintf( pszName, 128, "Harbour Language: %s %s (%s)",
-         ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ID + HB_LANG_ITEM_ID_ID ),
-         ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ID + HB_LANG_ITEM_ID_NAME ),
-         ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ID + HB_LANG_ITEM_ID_NAMENAT ) );
+                   ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ID + HB_LANG_ITEM_ID_ID ),
+                   ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ID + HB_LANG_ITEM_ID_NAME ),
+                   ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ID + HB_LANG_ITEM_ID_NAMENAT ) );
    else
       hb_xstrcpy( pszName, "Harbour Language: (not installed)", 0 );
 
@@ -227,7 +227,7 @@ char * hb_langName( void )
 
 char * hb_langDGetErrorDesc( ULONG ulIndex )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_langDGetErrorDesc(%lu)", ulIndex));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_langDGetErrorDesc(%lu)", ulIndex ) );
 
    return ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ERRDESC + ulIndex );
 }
@@ -247,6 +247,7 @@ HB_FUNC( HB_LANGSELECT )
 HB_FUNC( HB_LANGNAME )
 {
    char * pszName = hb_langName();
+
    hb_retcAdopt( pszName );
 }
 

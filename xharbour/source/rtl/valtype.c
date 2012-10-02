@@ -116,15 +116,13 @@ HB_FUNC( HB_ISBYREF )
          pItem = hb_itemUnRefOnce( pItem );
 
          if( HB_IS_BYREF( pItem ) )
-
             hb_retl( TRUE );
 
          else
-
             hb_retl( FALSE );
       }
       else
-         hb_ret( );
+         hb_ret();
    }
 }
 
@@ -155,7 +153,7 @@ HB_FUNC( HB_ISDATETIME )
 
 HB_FUNC( HB_ISTIMESTAMP )
 {
-   hb_retl( ( hb_parinfo( 1 ) & HB_IT_TIMEFLAG ) != 0 );   
+   hb_retl( ( hb_parinfo( 1 ) & HB_IT_TIMEFLAG ) != 0 );
 }
 
 HB_FUNC( HB_ISBLOCK )

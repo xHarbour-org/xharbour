@@ -69,7 +69,7 @@ HB_EXTERN_END
 
 void hb_traceInit( void )
 {
-   FILE *fpTrace;
+   FILE *   fpTrace;
    PHB_DYNS pTraceLog = hb_dynsymFind( "TRACELOG" );
 
    if( s_bDoInit && pTraceLog && pTraceLog->pSymbol->value.pFunPtr && hb_fsFile( "trace.log" ) )
@@ -100,8 +100,8 @@ void hb_traceExit( void )
 
 void TraceLog( const char * sFile, const char * sTraceMsg, ... )
 {
-   FILE *hFile;
-   BOOL bEmpty = FALSE;
+   FILE *   hFile;
+   BOOL     bEmpty = FALSE;
 
    if( ! sTraceMsg )
    {
@@ -110,8 +110,8 @@ void TraceLog( const char * sFile, const char * sTraceMsg, ... )
 
    if( s_bDoInit )
    {
-      s_bDoInit = FALSE;
-      bEmpty = TRUE;
+      s_bDoInit   = FALSE;
+      bEmpty      = TRUE;
 
       hb_trace_critical_Init();
    }
@@ -161,7 +161,7 @@ HB_FUNC( HB_TRACELEVEL )
 
 HB_FUNC( HB_TRACESTRING )
 {
-   HB_TRACE(HB_TR_ALWAYS, (hb_parcx( 1 )) );
+   HB_TRACE( HB_TR_ALWAYS, ( hb_parcx( 1 ) ) );
 }
 
 #endif

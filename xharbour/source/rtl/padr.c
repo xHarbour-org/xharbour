@@ -58,11 +58,11 @@
 /* right-pads a date, number, or string with spaces or supplied character */
 HB_FUNC( PADR )
 {
-   HB_SIZE ulSize;
-   BOOL bFreeReq;
-   char * szText;
+   HB_SIZE  ulSize;
+   BOOL     bFreeReq;
+   char *   szText;
 
-   if ( ISNUM( 2 ) )
+   if( ISNUM( 2 ) )
    {
       szText = hb_itemPadConv( hb_param( 1, HB_IT_ANY ), &ulSize, &bFreeReq );
    }
@@ -77,9 +77,9 @@ HB_FUNC( PADR )
 
       if( lLen > ( LONG ) ulSize )
       {
-         char * szResult = ( char * ) hb_xgrab( lLen + 1 );
-         LONG lPos;
-         char cPad;
+         char *   szResult = ( char * ) hb_xgrab( lLen + 1 );
+         LONG     lPos;
+         char     cPad;
 
          hb_xmemcpy( szResult, szText, ( LONG ) ulSize );
 
@@ -102,7 +102,7 @@ HB_FUNC( PADR )
          hb_retclen( szText, lLen );
       }
 
-      if ( bFreeReq )
+      if( bFreeReq )
       {
          hb_xfree( szText );
       }

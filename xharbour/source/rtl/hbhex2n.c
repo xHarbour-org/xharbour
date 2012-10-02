@@ -58,28 +58,29 @@
 #include "hbvm.h"
 #include "hbapierr.h"
 
-HB_ULONG hb_hextonum( const char *cHex )
+HB_ULONG hb_hextonum( const char * cHex )
 {
-   HB_ULONG   ulNum = 0;
-   char       c;
-   int        iDigit;
+   HB_ULONG ulNum = 0;
+   char     c;
+   int      iDigit;
 
-   while ( *cHex && (*cHex == ' ') ) cHex++;
+   while( *cHex && ( *cHex == ' ' ) )
+      cHex++;
 
-   while ( *cHex )
+   while( *cHex )
    {
       ulNum <<= 4;
- 
-      c = *cHex;
-      if ( c >= '0' && c <= '9' )
+
+      c     = *cHex;
+      if( c >= '0' && c <= '9' )
       {
          iDigit = c - '0';
       }
-      else if ( c >= 'A' && c <= 'F' )
+      else if( c >= 'A' && c <= 'F' )
       {
          iDigit = c - 'A' + 10;
       }
-      else if ( c >= 'a' && c <= 'f' )
+      else if( c >= 'a' && c <= 'f' )
       {
          iDigit = c - 'a' + 10;
       }
@@ -97,30 +98,30 @@ HB_ULONG hb_hextonum( const char *cHex )
 
 HB_FUNC( NUMTOHEX )
 {
-   int       iDigit;
-   char      ret[ 33 ];
-   int       iLen, iDefaultLen;
-   HB_ULONG  ulNum;
+   int      iDigit;
+   char     ret[ 33 ];
+   int      iLen, iDefaultLen;
+   HB_ULONG ulNum;
 
    if( ISNUM( 2 ) )
    {
-      iLen = hb_parni( 2 );
-      iLen = ( iLen < 1 ) ? 1 : ( ( iLen > 32 ) ? 32 : iLen );
+      iLen        = hb_parni( 2 );
+      iLen        = ( iLen < 1 ) ? 1 : ( ( iLen > 32 ) ? 32 : iLen );
       iDefaultLen = 0;
    }
    else
    {
-      iLen = 32;
+      iLen        = 32;
       iDefaultLen = 1;
    }
-                    
+
    if( ISNUM( 1 ) )
    {
       ulNum = hb_parnint( 1 );
    }
-   else if ( ISPOINTER( 1 ) )
+   else if( ISPOINTER( 1 ) )
    {
-      ulNum = (HB_PTRDIFF) hb_parptr( 1 );
+      ulNum = ( HB_PTRDIFF ) hb_parptr( 1 );
    }
    else
    {
@@ -129,11 +130,13 @@ HB_FUNC( NUMTOHEX )
    }
 
    ret[ iLen ] = '\0';
-   do {
-      iDigit = (int) ( ulNum & 0x0F );
-      ret[ --iLen ] = iDigit + ( iDigit < 10 ? '0' : 'A' - 10 ); 
-      ulNum >>= 4;
-   } while ( iDefaultLen ? ulNum > 0 : iLen > 0 );
+   do
+   {
+      iDigit         = ( int ) ( ulNum & 0x0F );
+      ret[ --iLen ]  = iDigit + ( iDigit < 10 ? '0' : 'A' - 10 );
+      ulNum          >>= 4;
+   }
+   while( iDefaultLen ? ulNum > 0 : iLen > 0 );
 
    hb_retc( &ret[ iLen ] );
 }
@@ -141,7 +144,7 @@ HB_FUNC( NUMTOHEX )
 
 HB_FUNC( HEXTONUM )
 {
-   if( ! ISCHAR(1) )
+   if( ! ISCHAR( 1 ) )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HEXTONUM", 1, hb_paramError( 1 ) );
       return;
@@ -153,27 +156,27 @@ HB_FUNC( HEXTONUM )
 
 HB_FUNC( STRTOHEX )
 {
-   char   *cOutBuf;
-   const char *cStr;
-   char   *c;
-   const char *cSep = "";
+   char *         cOutBuf;
+   const char *   cStr;
+   char *         c;
+   const char *   cSep = "";
    unsigned char  ucChar;
-   HB_SIZE ul, ulLen, ulLenSep = 0;
-   int    iDigit;
+   HB_SIZE        ul, ulLen, ulLenSep = 0;
+   int            iDigit;
 
-   if( ! ISCHAR(1) )
+   if( ! ISCHAR( 1 ) )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "STRTOHEX", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
       return;
    }
 
-   if ( ISCHAR( 2 ) )
+   if( ISCHAR( 2 ) )
    {
-     cSep = hb_parc( 2 );
-     ulLenSep = hb_parclen( 2 );
+      cSep     = hb_parc( 2 );
+      ulLenSep = hb_parclen( 2 );
    }
-  
-   cStr = hb_parc( 1 );
+
+   cStr  = hb_parc( 1 );
    ulLen = hb_parclen( 1 );
 
    if( ! ulLen )
@@ -182,27 +185,27 @@ HB_FUNC( STRTOHEX )
       return;
    }
 
-   c = cOutBuf = (char*) hb_xgrab( ulLen * 2 + ( ulLen - 1 ) * ulLenSep + 1 );
+   c = cOutBuf = ( char * ) hb_xgrab( ulLen * 2 + ( ulLen - 1 ) * ulLenSep + 1 );
 
    for( ul = 0; ul < ulLen; ul++ )
    {
-      if ( ulLenSep && ul )
+      if( ulLenSep && ul )
       {
-         HB_MEMCPY( c, cSep, (size_t) ulLenSep );
+         HB_MEMCPY( c, cSep, ( size_t ) ulLenSep );
          c += ulLenSep;
       }
 
-      ucChar = (unsigned char) cStr[ ul ];
+      ucChar   = ( unsigned char ) cStr[ ul ];
 
-      iDigit = (int) ( ucChar & 0x0F );
-      c[ 1 ] = iDigit + ( iDigit < 10 ? '0' : 'A' - 10 );
+      iDigit   = ( int ) ( ucChar & 0x0F );
+      c[ 1 ]   = iDigit + ( iDigit < 10 ? '0' : 'A' - 10 );
 
-      ucChar >>= 4;
+      ucChar   >>= 4;
 
-      iDigit = (int) ucChar;
-      c[ 0 ] = iDigit + ( iDigit < 10 ? '0' : 'A' - 10 );
+      iDigit   = ( int ) ucChar;
+      c[ 0 ]   = iDigit + ( iDigit < 10 ? '0' : 'A' - 10 );
 
-      c += 2;
+      c        += 2;
    }
    hb_retclen( cOutBuf, c - cOutBuf );
    hb_xfree( cOutBuf );
@@ -210,53 +213,53 @@ HB_FUNC( STRTOHEX )
 
 HB_FUNC( HEXTOSTR )
 {
-   char *cOutBuf, *cStr;
-   char c;
-   int  iByte, iFirst;
-   HB_SIZE ul, ulLen, ulPos, ulAlloc;
+   char *   cOutBuf, * cStr;
+   char     c;
+   int      iByte, iFirst;
+   HB_SIZE  ul, ulLen, ulPos, ulAlloc;
 
-   if( ! ISCHAR(1) )
+   if( ! ISCHAR( 1 ) )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HEXTOSTR", 1, hb_paramError( 1 ) );
       return;
    }
 
-   cStr = (char *) hb_parc( 1 );
-   ulLen = hb_parclen( 1 );
-   ulAlloc = (int) ( ulLen / 2 );
-   cOutBuf = (char *) hb_xgrab( ulAlloc + 1 );
+   cStr     = ( char * ) hb_parc( 1 );
+   ulLen    = hb_parclen( 1 );
+   ulAlloc  = ( int ) ( ulLen / 2 );
+   cOutBuf  = ( char * ) hb_xgrab( ulAlloc + 1 );
 
-   ulPos = 0;
-   iByte = 0;
-   iFirst = 1;
+   ulPos    = 0;
+   iByte    = 0;
+   iFirst   = 1;
 
-   for ( ul = 0; ul < ulLen; ul++ )
+   for( ul = 0; ul < ulLen; ul++ )
    {
       iByte <<= 4;
 
-      c = *cStr++;
-      if ( c >= '0' && c <= '9' )
+      c     = *cStr++;
+      if( c >= '0' && c <= '9' )
       {
          iByte += c - '0';
       }
-      else if ( c >= 'A' && c <= 'F' )
+      else if( c >= 'A' && c <= 'F' )
       {
          iByte += c - 'A' + 10;
       }
-      else if ( c >= 'a' && c <= 'f' )
+      else if( c >= 'a' && c <= 'f' )
       {
          iByte += c - 'a' + 10;
       }
-      else 
+      else
       {
-        continue;
+         continue;
       }
 
       iFirst ^= 1;
-      if ( iFirst )
+      if( iFirst )
       {
-        cOutBuf[ ulPos++ ] = (char) iByte;
-        iByte = 0;
+         cOutBuf[ ulPos++ ]   = ( char ) iByte;
+         iByte                = 0;
       }
    }
    hb_retclen( cOutBuf, ulPos );

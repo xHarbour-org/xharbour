@@ -66,21 +66,21 @@ HB_FUNC( MAX )
    // Must precede HB_IS_NUMERIC() because DATE is also NUMERIC.
    if( HB_IS_DATE( p1 ) && HB_IS_DATE( p2 ) )
    {
-      register LONG ld1 = p1->item.asDate.value;
-      register LONG ld2 = p2->item.asDate.value;
+      register LONG  ld1   = p1->item.asDate.value;
+      register LONG  ld2   = p2->item.asDate.value;
       if( ld1 > ld2 || ( ld1 == ld2 && p1->item.asDate.time >= p2->item.asDate.time ) )
          hb_itemReturn( p1 );
       else
          hb_itemReturn( p2 );
    }
-   else if ( HB_IS_DATE( p1 ) || HB_IS_DATE( p2 ) )
+   else if( HB_IS_DATE( p1 ) || HB_IS_DATE( p2 ) )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1093, NULL, "MAX", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
    else if( HB_IS_NUMINT( p1 ) && HB_IS_NUMINT( p2 ) )
    {
-      HB_LONG l1 = hb_itemGetNInt( p1 );
-      HB_LONG l2 = hb_itemGetNInt( p2 );
+      HB_LONG  l1 = hb_itemGetNInt( p1 );
+      HB_LONG  l2 = hb_itemGetNInt( p2 );
 
       hb_retnint( l1 >= l2 ? l1 : l2 );
    }
@@ -91,11 +91,11 @@ HB_FUNC( MAX )
 
       if( HB_IS_DOUBLE( p1 ) || HB_IS_DOUBLE( p2 ) )
       {
-         double d1 = hb_itemGetND( p1 );
-         double d2 = hb_itemGetND( p2 );
+         double   d1 = hb_itemGetND( p1 );
+         double   d2 = hb_itemGetND( p2 );
 
-         int iDec1;
-         int iDec2;
+         int      iDec1;
+         int      iDec2;
 
          hb_itemGetNLen( p1, NULL, &iDec1 );
          hb_itemGetNLen( p2, NULL, &iDec2 );
@@ -107,23 +107,23 @@ HB_FUNC( MAX )
       }
       else if( HB_IS_LONG( p1 ) || HB_IS_LONG( p2 ) )
       {
-         HB_LONG l1 = hb_itemGetNInt( p1 );
-         HB_LONG l2 = hb_itemGetNInt( p2 );
+         HB_LONG  l1 = hb_itemGetNInt( p1 );
+         HB_LONG  l2 = hb_itemGetNInt( p2 );
 
          hb_retnint( l1 >= l2 ? l1 : l2 );
       }
       else
       {
-         int i1 = hb_itemGetNI( p1 );
-         int i2 = hb_itemGetNI( p2 );
+         int   i1 = hb_itemGetNI( p1 );
+         int   i2 = hb_itemGetNI( p2 );
 
          hb_retni( i1 >= i2 ? i1 : i2 );
       }
    }
    else if( HB_IS_LOGICAL( p1 ) && HB_IS_LOGICAL( p2 ) )
    {
-      BOOL b1 = hb_itemGetL( p1 );
-      BOOL b2 = hb_itemGetL( p2 );
+      BOOL  b1 = hb_itemGetL( p1 );
+      BOOL  b2 = hb_itemGetL( p2 );
 
       hb_retl( b1 >= b2 ? b1 : b2 );
    }
@@ -142,21 +142,21 @@ HB_FUNC( MIN )
    // Must precede HB_IS_NUMERIC() because DATE is also NUMERIC.
    if( HB_IS_DATE( p1 ) && HB_IS_DATE( p2 ) )
    {
-      register LONG ld1 = p1->item.asDate.value;
-      register LONG ld2 = p2->item.asDate.value;
+      register LONG  ld1   = p1->item.asDate.value;
+      register LONG  ld2   = p2->item.asDate.value;
       if( ld1 < ld2 || ( ld1 == ld2 && p1->item.asDate.time <= p2->item.asDate.time ) )
          hb_itemReturn( p1 );
       else
          hb_itemReturn( p2 );
    }
-   else if ( HB_IS_DATE( p1 ) || HB_IS_DATE( p2 ) )
+   else if( HB_IS_DATE( p1 ) || HB_IS_DATE( p2 ) )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1092, NULL, "MIN", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
    else if( HB_IS_NUMINT( p1 ) && HB_IS_NUMINT( p2 ) )
    {
-      HB_LONG l1 = hb_itemGetNInt( p1 );
-      HB_LONG l2 = hb_itemGetNInt( p2 );
+      HB_LONG  l1 = hb_itemGetNInt( p1 );
+      HB_LONG  l2 = hb_itemGetNInt( p2 );
 
       hb_retnint( l1 <= l2 ? l1 : l2 );
    }
@@ -167,11 +167,11 @@ HB_FUNC( MIN )
 
       if( HB_IS_DOUBLE( p1 ) || HB_IS_DOUBLE( p2 ) )
       {
-         double d1 = hb_itemGetND( p1 );
-         double d2 = hb_itemGetND( p2 );
+         double   d1 = hb_itemGetND( p1 );
+         double   d2 = hb_itemGetND( p2 );
 
-         int iDec1;
-         int iDec2;
+         int      iDec1;
+         int      iDec2;
 
          hb_itemGetNLen( p1, NULL, &iDec1 );
          hb_itemGetNLen( p2, NULL, &iDec2 );
@@ -183,23 +183,23 @@ HB_FUNC( MIN )
       }
       else if( HB_IS_LONG( p1 ) || HB_IS_LONG( p2 ) )
       {
-         HB_LONG l1 = hb_itemGetNInt( p1 );
-         HB_LONG l2 = hb_itemGetNInt( p2 );
+         HB_LONG  l1 = hb_itemGetNInt( p1 );
+         HB_LONG  l2 = hb_itemGetNInt( p2 );
 
          hb_retnint( l1 <= l2 ? l1 : l2 );
       }
       else
       {
-         int i1 = hb_itemGetNI( p1 );
-         int i2 = hb_itemGetNI( p2 );
+         int   i1 = hb_itemGetNI( p1 );
+         int   i2 = hb_itemGetNI( p2 );
 
          hb_retni( i1 <= i2 ? i1 : i2 );
       }
    }
    else if( HB_IS_LOGICAL( p1 ) && HB_IS_LOGICAL( p2 ) )
    {
-      BOOL b1 = hb_itemGetL( p1 );
-      BOOL b2 = hb_itemGetL( p2 );
+      BOOL  b1 = hb_itemGetL( p1 );
+      BOOL  b2 = hb_itemGetL( p2 );
 
       hb_retl( b1 <= b2 ? b1 : b2 );
    }

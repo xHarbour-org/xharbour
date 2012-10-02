@@ -52,14 +52,14 @@
 
 PROCEDURE DevOutPict( xValue, cPicture, cColor, nRow, nCol )
 
-   LOCAL cCurrentColor := iif(pCount() >= 3, SetColor(), NIL)
+   LOCAL cCurrentColor := iif( PCount() >= 3, SetColor(), NIL )
 
-   IF Valtype( xValue ) IN "CMNDL"
+   IF ValType( xValue ) IN "CMNDL"
       DevOut( Transform( xValue, cPicture ), cColor, nRow, nCol )
    ENDIF
 
-   IF ! Empty(cCurrentColor)
-      SetColor(cCurrentColor)
+   IF ! Empty( cCurrentColor )
+      SetColor( cCurrentColor )
    ENDIF
 
-RETURN
+   RETURN

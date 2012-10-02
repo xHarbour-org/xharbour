@@ -250,58 +250,58 @@ const HB_BLOWFISH s_blowFishInit =
 #define c( x )    ( ( x >> 8 ) & 0xFF )
 #define d( x )    ( x & 0xFF )
 
-#define F( x )    ( ( ( S1( a(x) ) + S2( b(x) ) ) ^ S3( c(x) ) ) + S4( d(x) ) )
+#define F( x )    ( ( ( S1( a( x ) ) + S2( b( x ) ) ) ^ S3( c( x ) ) ) + S4( d( x ) ) )
 #define R( X, n ) ( F( X ) ^ P( n ) )
 
 void hb_blowfishEncrypt( const HB_BLOWFISH * bf, HB_U32 * xl, HB_U32 * xr )
 {
    HB_U32 xL = *xl, xR = *xr;
 
-   xL ^= P( 0 );
-   xR ^= R( xL, 1 );  xL ^= R( xR, 2 );
-   xR ^= R( xL, 3 );  xL ^= R( xR, 4 );
-   xR ^= R( xL, 5 );  xL ^= R( xR, 6 );
-   xR ^= R( xL, 7 );  xL ^= R( xR, 8 );
-   xR ^= R( xL, 9 );  xL ^= R( xR, 10 );
-   xR ^= R( xL, 11 ); xL ^= R( xR, 12 );
-   xR ^= R( xL, 13 ); xL ^= R( xR, 14 );
-   xR ^= R( xL, 15 ); xL ^= R( xR, 16 );
-   xR ^= P( 17 );
+   xL    ^= P( 0 );
+   xR    ^= R( xL, 1 );  xL ^= R( xR, 2 );
+   xR    ^= R( xL, 3 );  xL ^= R( xR, 4 );
+   xR    ^= R( xL, 5 );  xL ^= R( xR, 6 );
+   xR    ^= R( xL, 7 );  xL ^= R( xR, 8 );
+   xR    ^= R( xL, 9 );  xL ^= R( xR, 10 );
+   xR    ^= R( xL, 11 ); xL ^= R( xR, 12 );
+   xR    ^= R( xL, 13 ); xL ^= R( xR, 14 );
+   xR    ^= R( xL, 15 ); xL ^= R( xR, 16 );
+   xR    ^= P( 17 );
 
-   *xr = xL;
-   *xl = xR;
+   *xr   = xL;
+   *xl   = xR;
 }
 
 void hb_blowfishDecrypt( const HB_BLOWFISH * bf, HB_U32 * xl, HB_U32 * xr )
 {
    HB_U32 xL = *xl, xR = *xr;
 
-   xL ^= P( 17 );
-   xR ^= R( xL, 16 ); xL ^= R( xR, 15 );
-   xR ^= R( xL, 14 ); xL ^= R( xR, 13 );
-   xR ^= R( xL, 12 ); xL ^= R( xR, 11 );
-   xR ^= R( xL, 10 ); xL ^= R( xR, 9 );
-   xR ^= R( xL, 8 );  xL ^= R( xR, 7 );
-   xR ^= R( xL, 6 );  xL ^= R( xR, 5 );
-   xR ^= R( xL, 4 );  xL ^= R( xR, 3 );
-   xR ^= R( xL, 2 );  xL ^= R( xR, 1 );
-   xR ^= P( 0 );
+   xL    ^= P( 17 );
+   xR    ^= R( xL, 16 ); xL ^= R( xR, 15 );
+   xR    ^= R( xL, 14 ); xL ^= R( xR, 13 );
+   xR    ^= R( xL, 12 ); xL ^= R( xR, 11 );
+   xR    ^= R( xL, 10 ); xL ^= R( xR, 9 );
+   xR    ^= R( xL, 8 );  xL ^= R( xR, 7 );
+   xR    ^= R( xL, 6 );  xL ^= R( xR, 5 );
+   xR    ^= R( xL, 4 );  xL ^= R( xR, 3 );
+   xR    ^= R( xL, 2 );  xL ^= R( xR, 1 );
+   xR    ^= P( 0 );
 
-   *xr = xL;
-   *xl = xR;
+   *xr   = xL;
+   *xl   = xR;
 }
 
-#define INITARRAY( a, n )     for( i = 0; i < n; ++i ) \
-                              { \
-                                 hb_blowfishEncrypt( bf, &xL, &xR ); \
-                                 bf->a[ i ] = xL; bf->a[ ++i ] = xR; \
-                              }
+#define INITARRAY( a, n ) for( i = 0; i < n; ++i ) \
+   { \
+      hb_blowfishEncrypt( bf, &xL, &xR ); \
+      bf->a[ i ] = xL; bf->a[ ++i ] = xR; \
+   }
 
 void hb_blowfishInit( HB_BLOWFISH * bf, const void * keydata, int keylen )
 {
-   const unsigned char * key = ( const unsigned char * ) keydata;
-   HB_U32 xL, xR;
-   int i, j, l;
+   const unsigned char *   key = ( const unsigned char * ) keydata;
+   HB_U32                  xL, xR;
+   int                     i, j, l;
 
    memcpy( bf, &s_blowFishInit, sizeof( s_blowFishInit ) );
 

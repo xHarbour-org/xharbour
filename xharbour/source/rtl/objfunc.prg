@@ -83,7 +83,7 @@ FUNCTION __objHasData( oObject, cSymbol )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
    ENDIF
 
-RETURN __objHasMsg( oObject, cSymbol ) .AND. __objHasMsg( oObject, "_" + cSymbol )
+   RETURN __objHasMsg( oObject, cSymbol ) .AND. __objHasMsg( oObject, "_" + cSymbol )
 
 FUNCTION __objHasMethod( oObject, cSymbol )
 
@@ -91,7 +91,7 @@ FUNCTION __objHasMethod( oObject, cSymbol )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
    ENDIF
 
-RETURN __objHasMsg( oObject, cSymbol ) .AND. ! __objHasMsg( oObject, "_" + cSymbol )
+   RETURN __objHasMsg( oObject, cSymbol ) .AND. ! __objHasMsg( oObject, "_" + cSymbol )
 
 // nCLassType can be 0, 1 or 2 see hbOO.ch
 //#define HB_MSGLISTALL   0
@@ -113,12 +113,12 @@ FUNCTION __objGetMsgList( oObject, lData, nRange, nScope )
       lData := .T.
    ENDIF
 
-   // nRange is already defaulted in ClassSel in classes.c
+// nRange is already defaulted in ClassSel in classes.c
 
    aMessages := ASort( oObject:ClassSel( nRange, nScope ) )
    aReturn   := {}
 
-   nFirstProperty := aScan( aMessages, { | cElement | cElement[1] == '_' } )
+   nFirstProperty := AScan( aMessages, { | cElement | cElement[1] == '_' } )
 
    FOR EACH cMsg IN aMessages
       IF cMsg[1] = '_'
@@ -132,13 +132,14 @@ FUNCTION __objGetMsgList( oObject, lData, nRange, nScope )
 
    __SetClassScope( lOldScope )
 
-RETURN aReturn
+   RETURN aReturn
 
 /*
  * (C) 2003 - Francesco Saverio Giudice
  *
  * return all informations about classes, included type and scope
 */
+
 FUNCTION __objGetMsgFullList( oObject, lData, nRange, nScope, nNoScope )
 
    LOCAL aMessages
@@ -158,12 +159,12 @@ FUNCTION __objGetMsgFullList( oObject, lData, nRange, nScope, nNoScope )
       nNoScope := 0
    ENDIF
 
-   // nRange is already defaulted in ClassFullSel in classes.c
+// nRange is already defaulted in ClassFullSel in classes.c
 
-   aMessages := ASort( oObject:ClassFullSel( nRange, nScope ),,, {|x,y| x[HB_OO_DATA_SYMBOL] < y[HB_OO_DATA_SYMBOL] } )
+   aMessages := ASort( oObject:ClassFullSel( nRange, nScope ), , , {|x, y| x[HB_OO_DATA_SYMBOL] < y[HB_OO_DATA_SYMBOL] } )
    aReturn   := {}
 
-   nFirstProperty := aScan( aMessages, { | aElement | aElement[HB_OO_DATA_SYMBOL][1] == '_' } )
+   nFirstProperty := AScan( aMessages, { | aElement | aElement[HB_OO_DATA_SYMBOL][1] == '_' } )
 
    FOR EACH aMsg IN aMessages
 
@@ -172,7 +173,7 @@ FUNCTION __objGetMsgFullList( oObject, lData, nRange, nScope, nNoScope )
       ENDIF
 
       IF ( AScan( aMessages, { | aElement | aElement[HB_OO_DATA_SYMBOL] == "_" + aMsg[HB_OO_DATA_SYMBOL] }, nFirstProperty ) != 0 ) == lData
-         IF nNoScope == 0 .OR. HB_BITAND( aMsg[HB_OO_DATA_SCOPE], nNoScope ) == 0
+         IF nNoScope == 0 .OR. hb_bitAnd( aMsg[HB_OO_DATA_SCOPE], nNoScope ) == 0
             AAdd( aReturn, aMsg )
          ENDIF
       ENDIF
@@ -180,7 +181,7 @@ FUNCTION __objGetMsgFullList( oObject, lData, nRange, nScope, nNoScope )
 
    __SetClassScope( lOldScope )
 
-RETURN aReturn
+   RETURN aReturn
 
 FUNCTION __objGetMethodList( oObject, nScope )
 
@@ -188,9 +189,9 @@ FUNCTION __objGetMethodList( oObject, nScope )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
    ENDIF
 
-RETURN __objGetMsgList( oObject, .F., HB_MSGLISTALL, nScope )
+   RETURN __objGetMsgList( oObject, .F. , HB_MSGLISTALL, nScope )
 
-FUNCTION __objGetValueList( oObject, aExcept, nScope )
+FUNCTION __objGetValueLIST( oObject, aExcept, nScope )
 
    LOCAL aVars
    LOCAL aReturn
@@ -205,7 +206,7 @@ FUNCTION __objGetValueList( oObject, aExcept, nScope )
       aExcept := {}
    ENDIF
 
-   aVars   := __objGetMsgList( oObject, .T., HB_MSGLISTALL, nScope )
+   aVars   := __objGetMsgList( oObject, .T. , HB_MSGLISTALL, nScope )
    aReturn := {}
 
    FOR EACH cVar IN aVars
@@ -216,13 +217,14 @@ FUNCTION __objGetValueList( oObject, aExcept, nScope )
 
    __SetClassScope( lOldScope )
 
-RETURN aReturn
+   RETURN aReturn
 
 /*
  * (C) 2003 - Francesco Saverio Giudice
  *
  * return all values from classes, included type and scope
 */
+
 FUNCTION __objGetValueFullList( oObject, aExcept, nScope, nNoScope )
 
    LOCAL aVars
@@ -237,7 +239,7 @@ FUNCTION __objGetValueFullList( oObject, aExcept, nScope, nNoScope )
       aExcept := {}
    ENDIF
 
-   aVars   := __objGetMsgFullList( oObject, .T., HB_MSGLISTALL, nScope, nNoScope )
+   aVars   := __objGetMsgFullList( oObject, .T. , HB_MSGLISTALL, nScope, nNoScope )
    aReturn := {}
 
    FOR EACH aVar IN aVars
@@ -247,7 +249,7 @@ FUNCTION __objGetValueFullList( oObject, aExcept, nScope, nNoScope )
       ENDIF
    NEXT
 
-RETURN aReturn
+   RETURN aReturn
 
 FUNCTION __ObjGetValueDiff( oObject, oBase, nScope )
 
@@ -260,7 +262,7 @@ FUNCTION __ObjGetValueDiff( oObject, oBase, nScope )
    ENDIF
 
    IF oBase == NIL
-      oBase := __ClsInst( oObject:ClassH )
+      oBase := __clsInst( oObject:ClassH )
    ENDIF
 
    IF nScope == NIL
@@ -276,12 +278,12 @@ FUNCTION __ObjGetValueDiff( oObject, oBase, nScope )
       IF HB_EnumIndex() > Len( aBaseVars ) .OR. ;
             ValType( aVar[2] ) != ValType( aBaseVars[ HB_EnumIndex() ][ 2 ] ) .OR. ;
             ValType( aVar[2] ) == 'B' .OR. ;
-         ! ( aVar[2] == aBaseVars[ HB_EnumIndex() ][ 2 ] )
+            ! ( aVar[2] == aBaseVars[ HB_EnumIndex() ][ 2 ] )
          AAdd( aReturn, aVar )
       ENDIF
    NEXT
 
-RETURN aReturn
+   RETURN aReturn
 
 FUNCTION __ObjGetDerivedDiff( oObject, oBase, nScope )
 
@@ -294,15 +296,15 @@ FUNCTION __ObjGetDerivedDiff( oObject, oBase, nScope )
    ENDIF
 
    IF oBase == NIL
-      oBase := __ClsInst( oObject:ClassH )
+      oBase := __clsInst( oObject:ClassH )
    ENDIF
 
    IF nScope == NIL
       nScope := HB_OO_CLSTP_EXPORTED
    ENDIF
 
-   aBaseVars   := aSort( __clsGetIVarNamesAndValues( oBase  , nScope ), , , {|x, y| x[1] < y[1] } )
-   aObjectVars := aSort( __clsGetIVarNamesAndValues( oObject, nScope ), , , {|x, y| x[1] < y[1] } )
+   aBaseVars   := ASort( __clsGetIVarNamesAndValues( oBase  , nScope ), , , {|x, y| x[1] < y[1] } )
+   aObjectVars := ASort( __clsGetIVarNamesAndValues( oObject, nScope ), , , {|x, y| x[1] < y[1] } )
 
    aReturn := {}
 
@@ -313,7 +315,7 @@ FUNCTION __ObjGetDerivedDiff( oObject, oBase, nScope )
          ELSE
             WHILE Len( aObjectVars ) >= HB_EnumIndex() .AND. ! ( aVar[1] == aObjectVars[ HB_EnumIndex() ][ 1 ] )
                AAdd( aReturn, aObjectVars[ HB_EnumIndex() ] )
-               aDel( aObjectVars, HB_EnumIndex(), .T. )
+               ADel( aObjectVars, HB_EnumIndex(), .T. )
             ENDDO
          ENDIF
       ELSE
@@ -322,23 +324,22 @@ FUNCTION __ObjGetDerivedDiff( oObject, oBase, nScope )
    NEXT
 
    FOR EACH aVar IN aObjectVars
-       IF aVar != NIL
-          AAdd( aReturn, aVar )
-       ENDIF
+      IF aVar != NIL
+         AAdd( aReturn, aVar )
+      ENDIF
    NEXT
 
-RETURN aReturn
+   RETURN aReturn
 
-
-FUNCTION __ObjSetValueList( oObject, aData )
+FUNCTION __objSetValueList( oObject, aData )
 
    IF !ISOBJECT( oObject )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
    ELSE
-      aEval( aData, { | aItem | __objSendMsg( oObject, "_" + aItem[ HB_OO_DATA_SYMBOL ], aItem[ HB_OO_DATA_VALUE ] ) } )
+      AEval( aData, { | aItem | __objSendMsg( oObject, "_" + aItem[ HB_OO_DATA_SYMBOL ], aItem[ HB_OO_DATA_VALUE ] ) } )
    ENDIF
 
-RETURN oObject
+   RETURN oObject
 
 FUNCTION __objAddMethod( oObject, cSymbol, pFuncPtr, nScope, lPersistent, lCase )
 
@@ -349,11 +350,11 @@ FUNCTION __objAddMethod( oObject, cSymbol, pFuncPtr, nScope, lPersistent, lCase 
          nScope := HB_OO_CLSTP_EXPORTED
       ENDIF
 
-    //__clsAddMsg( <hClass/pObject>, <cMessage>, <Func_or_Block_or_ID>, <nType>,         [<Super_or_Init>], [<nScope>], [<lPersistent>], [<lCase> ] )
+      //__clsAddMsg( <hClass/pObject>, <cMessage>, <Func_or_Block_or_ID>, <nType>,         [<Super_or_Init>], [<nScope>], [<lPersistent>], [<lCase> ] )
       __clsAddMsg( oObject:ClassH,    cSymbol,    pFuncPtr,              HB_OO_MSG_METHOD, NIL,               nScope,     lPersistent,     lCase )
    ENDIF
 
-RETURN oObject
+   RETURN oObject
 
 FUNCTION __objAddInline( oObject, cSymbol, bInline, nScope, lPersistent, lCase )
 
@@ -364,11 +365,11 @@ FUNCTION __objAddInline( oObject, cSymbol, bInline, nScope, lPersistent, lCase )
          nScope := HB_OO_CLSTP_EXPORTED
       ENDIF
 
-    //__clsAddMsg( <hClass/pObject>, <cMessage>, <Func_or_Block_or_ID>, <nType>,         [<Super_or_Init>], [<nScope>], [<lPersistent>], [<lCase> ] )
+      //__clsAddMsg( <hClass/pObject>, <cMessage>, <Func_or_Block_or_ID>, <nType>,         [<Super_or_Init>], [<nScope>], [<lPersistent>], [<lCase> ] )
       __clsAddMsg( oObject:ClassH,    cSymbol,    bInline,               HB_OO_MSG_INLINE, NIL,               nScope, lPersistent, lCase )
    ENDIF
 
-RETURN oObject
+   RETURN oObject
 
 FUNCTION __objAddData( oObject, cSymbol, nScope, lPersistent, lCase )
 
@@ -384,11 +385,11 @@ FUNCTION __objAddData( oObject, cSymbol, nScope, lPersistent, lCase )
          nScope := HB_OO_CLSTP_EXPORTED
       ENDIF
 
-    //__clsAddMsg( <hClass/pObject>, <cMessage>, <Func_or_Block_or_ID>, <nType>,           [<Super_or_Init>], [<nScope>], [<lPersistent>], [<lCase> ] )
+      //__clsAddMsg( <hClass/pObject>, <cMessage>, <Func_or_Block_or_ID>, <nType>,           [<Super_or_Init>], [<nScope>], [<lPersistent>], [<lCase> ] )
       __clsAddMsg( hClass,            cSymbol,    nSeq,                  HB_OO_MSG_PROPERTY, NIL,               nScope, lPersistent, lCase )
    ENDIF
 
-RETURN oObject
+   RETURN oObject
 
 FUNCTION __objAddAccessAssign( oObject, cSymbol, bInLine, nScope, lPersistent, lCase )
 
@@ -399,12 +400,12 @@ FUNCTION __objAddAccessAssign( oObject, cSymbol, bInLine, nScope, lPersistent, l
    ELSEIF !__objHasMsg( oObject, cSymbol ) .AND. !__objHasMsg( oObject, "_" + cSymbol )
       hClass := oObject:ClassH
 
-    //__clsAddMsg( <hClass/pObject>, <cMessage>, <Func_or_Block_or_ID>, <nType>,         [<Super_or_Init>], [<nScope>], [<lPersistent>], [<lCase> ] )
+      //__clsAddMsg( <hClass/pObject>, <cMessage>, <Func_or_Block_or_ID>, <nType>,         [<Super_or_Init>], [<nScope>], [<lPersistent>], [<lCase> ] )
       __clsAddMsg( hClass,            cSymbol,    bInLine,               HB_OO_MSG_INLINE, NIL,              nScope, lPersistent, lCase )
       __clsAddMsg( hClass, "_" + cSymbol, bInLine, HB_OO_MSG_INLINE, NIL, 1 )
    ENDIF
 
-RETURN oObject
+   RETURN oObject
 
 FUNCTION __objModMethod( oObject, cSymbol, pFuncPtr )
 
@@ -414,7 +415,7 @@ FUNCTION __objModMethod( oObject, cSymbol, pFuncPtr )
       __clsModMsg( oObject, cSymbol, pFuncPtr )
    ENDIF
 
-RETURN oObject
+   RETURN oObject
 
 FUNCTION __objModInline( oObject, cSymbol, bInline )
 
@@ -424,7 +425,7 @@ FUNCTION __objModInline( oObject, cSymbol, bInline )
       __clsModMsg( oObject, cSymbol, bInline )
    ENDIF
 
-RETURN oObject
+   RETURN oObject
 
 FUNCTION __objDelMethod( oObject, cSymbol )
 
@@ -434,11 +435,11 @@ FUNCTION __objDelMethod( oObject, cSymbol )
       __clsDelMsg( oObject:ClassH, cSymbol )
    ENDIF
 
-RETURN oObject
+   RETURN oObject
 
 FUNCTION __objDelInline( oObject, cSymbol )
 
-RETURN __objDelMethod( oObject, cSymbol )              // Same story
+   RETURN __objDelMethod( oObject, cSymbol )              // Same story
 
 FUNCTION __objSetMethod( oObject, cMsg, FuncOrBlock, nScope )
 
@@ -447,14 +448,15 @@ FUNCTION __objSetMethod( oObject, cMsg, FuncOrBlock, nScope )
    ENDIF
 
    IF __objHasMsg( oObject, cMsg )
-      __ClsModMsg( oObject, cMsg, FuncOrBlock )
+      __clsModMsg( oObject, cMsg, FuncOrBlock )
    ELSE
-      __ClsAddMsg( oObject, cMsg, FuncOrBlock, IIF( ValType( FuncOrBlock ) == 'B', HB_OO_MSG_INLINE, HB_OO_MSG_METHOD ), NIL, nScope )
+      __clsAddMsg( oObject, cMsg, FuncOrBlock, iif( ValType( FuncOrBlock ) == 'B', HB_OO_MSG_INLINE, HB_OO_MSG_METHOD ), NIL, nScope )
    ENDIF
 
-RETURN oObject
+   RETURN oObject
 
 // WARNING - do NOT use this Function, not supported yet!!!
+
 FUNCTION __objDelData( oObject, cSymbol )
 
    IF !ISOBJECT( oObject ) .OR. !ISCHARACTER( cSymbol )
@@ -465,9 +467,10 @@ FUNCTION __objDelData( oObject, cSymbol )
       __cls_DecData( oObject:ClassH )         // Decrease wData
    ENDIF
 
-RETURN oObject
+   RETURN oObject
 
 FUNCTION __objDerivedFrom( oObject, xSuper )
+
    LOCAL cClassName
 
    IF !ISOBJECT( oObject )
@@ -482,4 +485,4 @@ FUNCTION __objDerivedFrom( oObject, xSuper )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
    ENDIF
 
-RETURN __clsParent( oObject:ClassH, cClassName )
+   RETURN __clsParent( oObject:ClassH, cClassName )

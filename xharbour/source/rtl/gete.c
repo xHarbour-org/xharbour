@@ -74,9 +74,9 @@ HB_FUNC( GETENV )
 
    if( pName )
    {
-      char * pszName = hb_itemGetC( pName );
-      HB_SIZE ulName = strlen( pszName );
-      ULONG ulPos;
+      char *   pszName  = hb_itemGetC( pName );
+      HB_SIZE  ulName   = strlen( pszName );
+      ULONG    ulPos;
 
       /* strip the '=' or else it will clear the variable! */
 
@@ -96,8 +96,8 @@ HB_FUNC( GETENV )
          /* NOTE: Convert the envvar name to uppercase. This is required for
                   DOS and OS/2 systems. [vszakats] */
 
-         #if defined(HB_OS_DOS) || defined(HB_OS_OS2)
-            hb_strupr( pszName );
+         #if defined( HB_OS_DOS ) || defined( HB_OS_OS2 )
+         hb_strupr( pszName );
          #endif
 
          szValue = hb_getenv( pszName );
@@ -120,5 +120,5 @@ HB_FUNC( GETENV )
 
 HB_FUNC( GETE )
 {
-   HB_FUNCNAME( GETENV )();
+   HB_FUNCNAME( GETENV ) ();
 }

@@ -60,7 +60,7 @@ CLASS MssgLine
    DATA Row
    DATA Left
    DATA Right
-   DATA Color
+   DATA COLOR
    DATA aMsg            // for backwards compatibility
 
 /*
@@ -77,7 +77,7 @@ CLASS MssgLine
    METHOD SaveScreen()
    METHOD Show( cMsg )
    METHOD RestScreen()
-   MESSAGE Erase() METHOD RestScreen()
+   MESSAGE ERASE() METHOD RestScreen()
 
 ENDCLASS
 
@@ -88,50 +88,51 @@ METHOD New( nRow, nLeft, nRight, cColor ) CLASS MssgLine
    ::Right := nRight
    ::Color := cColor
 
-   ::Flag := ( VALTYPE(nRow) + VALTYPE(nLeft) + VALTYPE(nRight) == "NNN" )
+   ::Flag := ( ValType( nRow ) + ValType( nLeft ) + ValType( nRight ) == "NNN" )
 
-   IF !( VALTYPE(cColor) == "C" )
+   IF !( ValType( cColor ) == "C" )
       ::Color := GetClrPair( SetColor(), 1 )
    ENDIF
 
-   ::aMsg := { ::Flag, nRow, nLeft, nRight, ::Color ,,,,, }
-                                                 // GUI not yet supported
-return Self
+   ::aMsg := { ::Flag, nRow, nLeft, nRight, ::Color , , , , , }
+// GUI not yet supported
+
+   RETURN Self
 
 METHOD SaveScreen() CLASS MssgLine
 
-   ::ScreenSaved := saveScreen( ::row, ::left, ::row, ::right )
+   ::ScreenSaved := SaveScreen( ::row, ::left, ::row, ::right )
 
-return Self
+   RETURN Self
 
 METHOD RestScreen() CLASS MssgLine
 
-   restScreen( ::row, ::left, ::row, ::right, ::ScreenSaved )
+   RestScreen( ::row, ::left, ::row, ::right, ::ScreenSaved )
 
-return Self
+   RETURN Self
 
 /***
 *
 *  ShowMsg() --> NIL
 *
 ***/
+
 METHOD Show( cMsg ) CLASS MssgLine
 
-   local nRow, nCol
+   LOCAL nRow, nCol
 
    IF ::Right == NIL
       RETURN Self
    ENDIF
 
-   nRow := row()
-   nCol := col()
+   nRow := Row()
+   nCol := Col()
 
    @ ::row, ::left SAY PadC( cMsg, ::right - ::left + 1 ) COLOR ::Color
 
-   setPos( nRow, nCol )
+   SetPos( nRow, nCol )
 
-return Self
-
+   RETURN Self
 
 CLASS GetMssgLine FROM MssgLine
 
@@ -144,17 +145,17 @@ ENDCLASS
 *  ShowGetMsg() --> NIL
 *
 ***/
+
 METHOD Show( oGet ) CLASS GetMssgLine
 
-   local cMsg := IIF( VALTYPE( oGet:Control ) == "O", ;
-                               oGet:Control:Message, oGet:Message )
+   LOCAL cMsg := iif( ValType( oGet:Control ) == "O", ;
+      oGet:Control:Message, oGet:Message )
 
-   IF !EMPTY( cMsg )
+   IF !Empty( cMsg )
       ::super:Show( cMsg )
    ENDIF
 
-return Self
-
+   RETURN Self
 
 CLASS MenuMssgLine FROM MssgLine
 
@@ -173,6 +174,7 @@ ENDCLASS
 *  Message area in both text or graphics mode.
 *
 ***/
+
 METHOD Show( oMenu, lMode ) CLASS MenuMssgLine
 
    LOCAL nCurrent, cMsg := NIL
@@ -185,9 +187,9 @@ METHOD Show( oMenu, lMode ) CLASS MenuMssgLine
 
    IF lMode
       IF ( ::Flag .AND. ;
-         ( nCurrent := oMenu:oMenu:Current ) != 0 )
+            ( nCurrent := oMenu:oMenu:Current ) != 0 )
 
-         IF !EMPTY( cMsg := oMenu:oMenu:GetItem( nCurrent ):Message )
+         IF !Empty( cMsg := oMenu:oMenu:GetItem( nCurrent ):Message )
             ::super:show( cMsg )
          ENDIF
       ENDIF
@@ -198,6 +200,6 @@ METHOD Show( oMenu, lMode ) CLASS MenuMssgLine
    ENDIF
    MSetCursor( mlOldState )
 
-RETURN .T.
+   RETURN .T.
 
 #endif

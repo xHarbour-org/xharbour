@@ -54,7 +54,7 @@
    Either way you have to clean up the memory on exit. The best way to
    do this is to add a hb_setkeyInit() and hb_setkeyExit() function
    and call them from CONSOLE.C Init/Exit functions.
-*/
+ */
 
 #include "hbvm.h"
 #include "hbapi.h"
@@ -92,7 +92,7 @@ void hb_setkeyExit( void )
 
       sk_list_tmp = s_sk_list->next;
       hb_xfree( ( void * ) s_sk_list );
-      s_sk_list = sk_list_tmp;
+      s_sk_list   = sk_list_tmp;
    }
 
    s_sk_list = NULL;
@@ -119,18 +119,18 @@ static void sk_add( BOOL bReturn, SHORT iKeyCode, PHB_ITEM pAction, PHB_ITEM pIs
       PHB_SETKEY sk_list_tmp, sk_list_end;
 
       // Verify to allow only codeblock in pIsActive
-      pIsActive = ( pIsActive && HB_IS_BLOCK( pIsActive ) ) ? pIsActive : NULL;
+      pIsActive   = ( pIsActive && HB_IS_BLOCK( pIsActive ) ) ? pIsActive : NULL;
 
       sk_list_tmp = sk_findkey( iKeyCode, &sk_list_end );
       if( sk_list_tmp == NULL )
       {
          if( pAction )
          {
-            sk_list_tmp = ( PHB_SETKEY ) hb_xgrab( sizeof( HB_SETKEY ) );
-            sk_list_tmp->next = NULL;
-            sk_list_tmp->iKeyCode = iKeyCode;
-            sk_list_tmp->pAction = hb_itemNew( pAction );
-            sk_list_tmp->pIsActive = pIsActive ? hb_itemNew( pIsActive ) : NULL;
+            sk_list_tmp             = ( PHB_SETKEY ) hb_xgrab( sizeof( HB_SETKEY ) );
+            sk_list_tmp->next       = NULL;
+            sk_list_tmp->iKeyCode   = iKeyCode;
+            sk_list_tmp->pAction    = hb_itemNew( pAction );
+            sk_list_tmp->pIsActive  = pIsActive ? hb_itemNew( pIsActive ) : NULL;
 
             if( sk_list_end == NULL )
             {
@@ -160,8 +160,8 @@ static void sk_add( BOOL bReturn, SHORT iKeyCode, PHB_ITEM pAction, PHB_ITEM pIs
 
          if( pAction )
          {
-            sk_list_tmp->pAction = hb_itemNew( pAction );
-            sk_list_tmp->pIsActive = pIsActive ? hb_itemNew( pIsActive ) : NULL;
+            sk_list_tmp->pAction    = hb_itemNew( pAction );
+            sk_list_tmp->pIsActive  = pIsActive ? hb_itemNew( pIsActive ) : NULL;
          }
          else
          {
@@ -170,7 +170,7 @@ static void sk_add( BOOL bReturn, SHORT iKeyCode, PHB_ITEM pAction, PHB_ITEM pIs
             {
                sk_list_tmp = s_sk_list->next;
                hb_xfree( s_sk_list );
-               s_sk_list = sk_list_tmp;
+               s_sk_list   = sk_list_tmp;
             }
             else
             {
@@ -208,7 +208,7 @@ HB_FUNC( SETKEY )
             }
             else
 #endif
-               hb_itemReturn( sk_list_tmp->pAction );
+            hb_itemReturn( sk_list_tmp->pAction );
          }
       }
       else
@@ -216,11 +216,11 @@ HB_FUNC( SETKEY )
          /* Set a SETKEY value */
 
          sk_add( TRUE, hb_itemGetNI( pKeyCode ),
-            hb_param( 2, HB_IT_BLOCK ),
+                 hb_param( 2, HB_IT_BLOCK ),
 #if defined( HB_EXTENSION )
-            hb_param( 3, HB_IT_BLOCK ) );
+                 hb_param( 3, HB_IT_BLOCK ) );
 #else
-            NULL );
+                 NULL );
 #endif
       }
    }
@@ -232,14 +232,14 @@ HB_FUNC( SETKEY )
 
 HB_FUNC( HB_SETKEYARRAY )
 {
-   PHB_ITEM pKeyCodeArray = hb_param( 1, HB_IT_ARRAY );
-   PHB_ITEM pAction = hb_param( 2, HB_IT_BLOCK );
+   PHB_ITEM pKeyCodeArray  = hb_param( 1, HB_IT_ARRAY );
+   PHB_ITEM pAction        = hb_param( 2, HB_IT_BLOCK );
 
    if( pKeyCodeArray && pAction )
    {
-      PHB_ITEM pIsActive = hb_param( 3, HB_IT_BLOCK );
-      HB_SIZE nLen = hb_arrayLen( pKeyCodeArray );
-      ULONG nPos;
+      PHB_ITEM pIsActive   = hb_param( 3, HB_IT_BLOCK );
+      HB_SIZE  nLen        = hb_arrayLen( pKeyCodeArray );
+      ULONG    nPos;
 
       for( nPos = 1; nPos <= nLen; nPos++ )
          sk_add( FALSE, hb_arrayGetNI( pKeyCodeArray, nPos ), pAction, pIsActive );
@@ -273,9 +273,9 @@ HB_FUNC( HB_SETKEYGET )
 
 HB_FUNC( HB_SETKEYSAVE )
 {
-   PHB_ITEM pKeys, pParam;
-   PHB_SETKEY sk_list_tmp;
-   HB_SIZE itemcount, nitem;
+   PHB_ITEM    pKeys, pParam;
+   PHB_SETKEY  sk_list_tmp;
+   HB_SIZE     itemcount, nitem;
 
    /* build an multi-dimensional array from existing hot-keys, and return it */
 
@@ -293,9 +293,9 @@ HB_FUNC( HB_SETKEYSAVE )
    {
       PHB_ITEM pKeyElements, pTmp;
 
-      pKeyElements = hb_itemArrayNew( 3 );
+      pKeyElements   = hb_itemArrayNew( 3 );
 
-      pTmp = hb_itemPutNI( NULL, sk_list_tmp->iKeyCode );
+      pTmp           = hb_itemPutNI( NULL, sk_list_tmp->iKeyCode );
       hb_arraySet( pKeyElements, 1, pTmp );
       hb_itemRelease( pTmp );
 
@@ -330,8 +330,8 @@ HB_FUNC( HB_SETKEYSAVE )
             PHB_ITEM itmKeyElements = hb_arrayGetItemPtr( pParam, nitem );
 
             sk_add( FALSE, ( SHORT ) hb_arrayGetNI( itmKeyElements, 1 ),
-                           hb_arrayGetItemPtr( itmKeyElements, 2 ),
-                           hb_arrayGetItemPtr( itmKeyElements, 3 ) );
+                    hb_arrayGetItemPtr( itmKeyElements, 2 ),
+                    hb_arrayGetItemPtr( itmKeyElements, 3 ) );
          }
       }
    }
@@ -339,8 +339,8 @@ HB_FUNC( HB_SETKEYSAVE )
 
 HB_FUNC( HB_SETKEYCHECK )
 {
-   PHB_ITEM pKeyCode = hb_param( 1, HB_IT_NUMERIC );
-   BOOL bIsKeySet = FALSE;
+   PHB_ITEM pKeyCode    = hb_param( 1, HB_IT_NUMERIC );
+   BOOL     bIsKeySet   = FALSE;
 
    if( pKeyCode )
    {
@@ -359,10 +359,10 @@ HB_FUNC( HB_SETKEYCHECK )
 
             switch( hb_pcount() )
             {
-            case 1:  hb_vmEvalBlockV( sk_list_tmp->pAction, 1, pKeyCode ); break;
-            case 2:  hb_vmEvalBlockV( sk_list_tmp->pAction, 2, hb_param( 2, HB_IT_ANY ), pKeyCode ); break;
-            case 3:  hb_vmEvalBlockV( sk_list_tmp->pAction, 3, hb_param( 2, HB_IT_ANY ), hb_param( 3, HB_IT_ANY ), pKeyCode ); break;
-            default: hb_vmEvalBlockV( sk_list_tmp->pAction, 4, hb_param( 2, HB_IT_ANY ), hb_param( 3, HB_IT_ANY ), hb_param( 4, HB_IT_ANY ), pKeyCode ); break;
+               case 1:  hb_vmEvalBlockV( sk_list_tmp->pAction, 1, pKeyCode ); break;
+               case 2:  hb_vmEvalBlockV( sk_list_tmp->pAction, 2, hb_param( 2, HB_IT_ANY ), pKeyCode ); break;
+               case 3:  hb_vmEvalBlockV( sk_list_tmp->pAction, 3, hb_param( 2, HB_IT_ANY ), hb_param( 3, HB_IT_ANY ), pKeyCode ); break;
+               default: hb_vmEvalBlockV( sk_list_tmp->pAction, 4, hb_param( 2, HB_IT_ANY ), hb_param( 3, HB_IT_ANY ), hb_param( 4, HB_IT_ANY ), pKeyCode ); break;
             }
          }
       }

@@ -92,23 +92,24 @@ HB_FUNC( HB_COMCLOSE )
 
 HB_FUNC( HB_COMDISCARDCHAR )
 {
-   hb_retl( hb_comDiscardChar( hb_parni( 1 ), HB_ISCHAR( 2 ) ? hb_parc( 2 ) [ 0 ] : hb_parni( 2 ) ) == 0 );
+   hb_retl( hb_comDiscardChar( hb_parni( 1 ), HB_ISCHAR( 2 ) ? hb_parc( 2 )[ 0 ] : hb_parni( 2 ) ) == 0 );
 }
 
 HB_FUNC( HB_COMERRORCHAR )
 {
-   hb_retl( hb_comErrorChar( hb_parni( 1 ), HB_ISCHAR( 2 ) ? hb_parc( 2 ) [ 0 ] : hb_parni( 2 ) ) == 0 );
+   hb_retl( hb_comErrorChar( hb_parni( 1 ), HB_ISCHAR( 2 ) ? hb_parc( 2 )[ 0 ] : hb_parni( 2 ) ) == 0 );
 }
 
 HB_FUNC( HB_COMFLOWCHARS )
 {
-   hb_retl( hb_comFlowChars( hb_parni( 1 ), HB_ISCHAR( 2 ) ? hb_parc( 2 ) [ 0 ] : hb_parni( 2 ),
-                             HB_ISCHAR( 3 ) ? hb_parc( 3 ) [ 0 ] : hb_parni( 3 ) ) == 0 );
+   hb_retl( hb_comFlowChars( hb_parni( 1 ), HB_ISCHAR( 2 ) ? hb_parc( 2 )[ 0 ] : hb_parni( 2 ),
+                             HB_ISCHAR( 3 ) ? hb_parc( 3 )[ 0 ] : hb_parni( 3 ) ) == 0 );
 }
 
 HB_FUNC( HB_COMFLOWCONTROL )
 {
    int iValue = 0;
+
    hb_retl( hb_comFlowControl( hb_parni( 1 ), &iValue, hb_parnidef( 3, -1 ) ) == 0 );
    hb_storni( iValue, 2 );
 }
@@ -125,8 +126,9 @@ HB_FUNC( HB_COMFLUSH )
 
 HB_FUNC( HB_COMGETDEVICE )
 {
-   char buffer[ HB_COM_DEV_NAME_MAX ];
-   const char * name = hb_comGetDevice( hb_parni( 1 ), buffer, sizeof( buffer ) );
+   char           buffer[ HB_COM_DEV_NAME_MAX ];
+   const char *   name = hb_comGetDevice( hb_parni( 1 ), buffer, sizeof( buffer ) );
+
    hb_retc( name );
 }
 
@@ -147,7 +149,7 @@ HB_FUNC( HB_COMGETOSERROR )
 
 HB_FUNC( HB_COMINIT )
 {
-   hb_retl( hb_comInit( hb_parni( 1 ), hb_parni( 2 ), HB_ISCHAR( 3 ) ? hb_parc( 3 ) [ 0 ] : 0,
+   hb_retl( hb_comInit( hb_parni( 1 ), hb_parni( 2 ), HB_ISCHAR( 3 ) ? hb_parc( 3 )[ 0 ] : 0,
                         hb_parni( 4 ), hb_parni( 5 ) ) == 0 );
 }
 
@@ -169,6 +171,7 @@ HB_FUNC( HB_COMLASTNUM )
 HB_FUNC( HB_COMLSR )
 {
    int iValue = 0;
+
    hb_retl( hb_comLSR( hb_parni( 1 ), &iValue ) == 0 );
    hb_storni( iValue, 2 );
 }
@@ -176,6 +179,7 @@ HB_FUNC( HB_COMLSR )
 HB_FUNC( HB_COMMCR )
 {
    int iValue = 0;
+
    hb_retl( hb_comMCR( hb_parni( 1 ), &iValue, hb_parni( 3 ), hb_parni( 4 ) ) == 0 );
    hb_storni( iValue, 2 );
 }
@@ -183,6 +187,7 @@ HB_FUNC( HB_COMMCR )
 HB_FUNC( HB_COMMSR )
 {
    int iValue = 0;
+
    hb_retl( hb_comMSR( hb_parni( 1 ), &iValue ) == 0 );
    hb_storni( iValue, 2 );
 }
@@ -221,8 +226,8 @@ HB_FUNC( HB_COMSETERROR )
 HB_FUNC( HB_COMRECV )
 {
    PHB_ITEM pItem = hb_param( 2, HB_IT_STRING );
-   char * pBuffer;
-   HB_SIZE nLen;
+   char *   pBuffer;
+   HB_SIZE  nLen;
 
    if( pItem && HB_ISBYREF( 2 ) && hb_itemGetWriteCL( pItem, &pBuffer, &nLen ) )
    {
@@ -240,7 +245,7 @@ HB_FUNC( HB_COMRECV )
 
 HB_FUNC( HB_COMSEND )
 {
-   long  lLen = ( long ) hb_parclen( 2 );
+   long lLen = ( long ) hb_parclen( 2 );
 
    if( HB_ISNUM( 3 ) )
    {

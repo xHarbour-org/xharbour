@@ -60,8 +60,8 @@ HB_FUNC( ABS )
 
    if( pNumber )
    {
-      int iWidth;
-      int iDec;
+      int   iWidth;
+      int   iDec;
 
       hb_itemGetNLen( pNumber, &iWidth, &iDec );
 
@@ -74,9 +74,9 @@ HB_FUNC( ABS )
 #if -HB_INT_MAX > HB_INT_MIN
          else if( iNumber < -HB_INT_MAX )
 #if HB_LONG_MAX > HB_INT_MAX
-            hb_retnint( - ( HB_LONG ) iNumber );
+            hb_retnint( -( HB_LONG ) iNumber );
 #else
-            hb_retndlen( - ( double ) iNumber, 0, iDec );
+            hb_retndlen( -( double ) iNumber, 0, iDec );
 #endif
 #endif
          else
@@ -90,7 +90,7 @@ HB_FUNC( ABS )
             hb_retnintlen( lNumber, iWidth );
 #if -HB_LONG_MAX > HB_LONG_MIN
          else if( lNumber < -HB_LONG_MAX )
-            hb_retndlen( - ( double ) lNumber, 0, iDec );
+            hb_retndlen( -( double ) lNumber, 0, iDec );
 #endif
          else
             hb_retnint( -lNumber );

@@ -62,52 +62,53 @@
 #include "hbfast.h"
 
 /* Returns a string containing 8 characters in network byte order
-* HB_CreateLen8( nLen ) --> returns the bytes containing the code
-*/
+ * HB_CreateLen8( nLen ) --> returns the bytes containing the code
+ */
 
-static void hb_createlen8( BYTE *ret, HB_LONG uRet )
+static void hb_createlen8( BYTE * ret, HB_LONG uRet )
 {
    int i;
+
    for( i = 7; i >= 0; i-- )
    {
-      ret[i] = (BYTE) (uRet & 0xff );
-      uRet >>= 8;
+      ret[ i ] = ( BYTE ) ( uRet & 0xff );
+      uRet     >>= 8;
    }
 }
 
 HB_FUNC( HB_CREATELEN8 )
 {
-   BYTE ret[8];
+   BYTE ret[ 8 ];
 
-   if( ISNUM(1) )
+   if( ISNUM( 1 ) )
    {
       hb_createlen8( ret, hb_parnint( 1 ) );
-      hb_retclen( ( char *) ret, 8 );
+      hb_retclen( ( char * ) ret, 8 );
    }
-   else if( ISBYREF( 1 ) && ISCHAR(1) && ISNUM( 2 ) )
+   else if( ISBYREF( 1 ) && ISCHAR( 1 ) && ISNUM( 2 ) )
    {
-      char * buffer;
-      HB_SIZE ulLen;
+      char *   buffer;
+      HB_SIZE  ulLen;
 
       if( hb_itemGetWriteCL( hb_param( 1, HB_IT_STRING ), &buffer, &ulLen ) && ulLen >= 8 )
       {
-         hb_createlen8( ( BYTE *) buffer, hb_parnint( 2 ) );
+         hb_createlen8( ( BYTE * ) buffer, hb_parnint( 2 ) );
       }
    }
 }
 
 
 /* Returns a numeric length using the first 4 bytes of the given string
-* HB_GetLen8( cStr ) --> nLength
-*/
-static HB_LONG hb_getlen8( BYTE *cStr )
+ * HB_GetLen8( cStr ) --> nLength
+ */
+static HB_LONG hb_getlen8( BYTE * cStr )
 {
-   int i, iShift;
-   HB_LONG ulRet = 0;
+   int      i, iShift;
+   HB_LONG  ulRet = 0;
 
-   for ( i = 7, iShift = 0; i >= 0; i--, iShift += 8 )
+   for( i = 7, iShift = 0; i >= 0; i--, iShift += 8 )
    {
-      ulRet += (( HB_LONG ) cStr[i]) << iShift;
+      ulRet += ( ( HB_LONG ) cStr[ i ] ) << iShift;
    }
    return ulRet;
 }
@@ -127,14 +128,14 @@ HB_FUNC( HB_GETLEN8 )
 
 
 /* Serializes a variable into a serialization stream, socket or string
-* HB_SERIALIZE( oVariuous )--> cData
-*/
+ * HB_SERIALIZE( oVariuous )--> cData
+ */
 HB_FUNC( HB_SERIALIZESIMPLE )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_ANY );
 
-   BYTE *cRet;
-   ULONG ulRet;
+   BYTE *   cRet;
+   ULONG    ulRet;
 
    if( pItem == NULL )
    {
@@ -152,105 +153,105 @@ HB_FUNC( HB_SERIALIZESIMPLE )
    {
       HB_VALUE_PTR pValue;
 
-      pValue = *( pItem->item.asMemvar.itemsbase ) + pItem->item.asMemvar.offset +
-                  pItem->item.asMemvar.value;
-      pItem = pValue->pVarItem;
+      pValue   = *( pItem->item.asMemvar.itemsbase ) + pItem->item.asMemvar.offset +
+                 pItem->item.asMemvar.value;
+      pItem    = pValue->pVarItem;
    }
 
    switch( pItem->type )
    {
       case HB_IT_STRING:
       case HB_IT_MEMOFLAG | HB_IT_STRING:
-         ulRet = (ULONG) (pItem->item.asString.length + 9);
-         cRet = (BYTE *) hb_xgrab( ulRet + 1 );
-         cRet[0] = (BYTE) 'C';
+         ulRet       = ( ULONG ) ( pItem->item.asString.length + 9 );
+         cRet        = ( BYTE * ) hb_xgrab( ulRet + 1 );
+         cRet[ 0 ]   = ( BYTE ) 'C';
          hb_createlen8( cRet + 1, pItem->item.asString.length );
-         HB_MEMCPY( cRet + 9, pItem->item.asString.value, (size_t) pItem->item.asString.length );
-      break;
+         HB_MEMCPY( cRet + 9, pItem->item.asString.value, ( size_t ) pItem->item.asString.length );
+         break;
 
       case HB_IT_LOGICAL:
-         ulRet = 2;
-         cRet = (BYTE *)hb_xgrab( ulRet + 1 );
-         cRet[0] = (BYTE)'L';
-         cRet[1] = (BYTE) ( pItem->item.asLogical.value ? 'T' : 'F' );
-      break;
+         ulRet       = 2;
+         cRet        = ( BYTE * ) hb_xgrab( ulRet + 1 );
+         cRet[ 0 ]   = ( BYTE ) 'L';
+         cRet[ 1 ]   = ( BYTE ) ( pItem->item.asLogical.value ? 'T' : 'F' );
+         break;
 
       case HB_IT_INTEGER:
-         ulRet = 10;
-         cRet = (BYTE *) hb_xgrab( ulRet + 1 );
-         cRet[0] = (BYTE)'N';
-         cRet[1] = (BYTE)'I';
+         ulRet       = 10;
+         cRet        = ( BYTE * ) hb_xgrab( ulRet + 1 );
+         cRet[ 0 ]   = ( BYTE ) 'N';
+         cRet[ 1 ]   = ( BYTE ) 'I';
          hb_createlen8( cRet + 2, pItem->item.asInteger.value );
-      break;
+         break;
 
       case HB_IT_LONG:
-         ulRet = HB_LONG_LENGTH( pItem->item.asLong.value );
-         cRet = (BYTE *) hb_xgrab( ulRet + 1 );
-         cRet[0] = (BYTE)'N';
+         ulRet       = HB_LONG_LENGTH( pItem->item.asLong.value );
+         cRet        = ( BYTE * ) hb_xgrab( ulRet + 1 );
+         cRet[ 0 ]   = ( BYTE ) 'N';
 
-         if ( ulRet == 20 )
+         if( ulRet == 20 )
          {
-            cRet[1] = (BYTE)'X';
+            cRet[ 1 ] = ( BYTE ) 'X';
          }
          else
          {
-            cRet[1] = (BYTE)'L';
+            cRet[ 1 ] = ( BYTE ) 'L';
          }
 
          hb_createlen8( cRet + 2, pItem->item.asLong.value );
-      break;
+         break;
 
       case HB_IT_DOUBLE:
-         ulRet = 2 + sizeof( double );
-         cRet = (BYTE *)hb_xgrab( ulRet + 1 );
-         cRet[0] = (BYTE)'N';
-         cRet[1] = (BYTE)'D';
-         HB_MEMCPY( cRet + 2, &(pItem->item.asDouble.value), sizeof( double ) );
-      break;
+         ulRet       = 2 + sizeof( double );
+         cRet        = ( BYTE * ) hb_xgrab( ulRet + 1 );
+         cRet[ 0 ]   = ( BYTE ) 'N';
+         cRet[ 1 ]   = ( BYTE ) 'D';
+         HB_MEMCPY( cRet + 2, &( pItem->item.asDouble.value ), sizeof( double ) );
+         break;
 
       case HB_IT_DATE:
          if( pItem->item.asDate.time == 0 )
          {
-            ulRet = 9;
-            cRet = (BYTE *)hb_xgrab( ulRet + 1 );
-            cRet[0] = (BYTE)'D';
+            ulRet       = 9;
+            cRet        = ( BYTE * ) hb_xgrab( ulRet + 1 );
+            cRet[ 0 ]   = ( BYTE ) 'D';
             hb_createlen8( cRet + 1, pItem->item.asDate.value );
          }
          else
          {
             double dDateTime = hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time );
-            ulRet = 1 + sizeof( double );
-            cRet = (BYTE *)hb_xgrab( ulRet + 1 );
-            cRet[0] = (BYTE)'T';
-            HB_MEMCPY( cRet + 1, &(dDateTime), sizeof( double ) );
+            ulRet       = 1 + sizeof( double );
+            cRet        = ( BYTE * ) hb_xgrab( ulRet + 1 );
+            cRet[ 0 ]   = ( BYTE ) 'T';
+            HB_MEMCPY( cRet + 1, &( dDateTime ), sizeof( double ) );
          }
-      break;
+         break;
 
       case HB_IT_NIL:
-         ulRet = 1;
-         cRet = (BYTE *)hb_xgrab( ulRet + 1 );
-         cRet[0] = (BYTE)'Z';
-      break;
+         ulRet       = 1;
+         cRet        = ( BYTE * ) hb_xgrab( ulRet + 1 );
+         cRet[ 0 ]   = ( BYTE ) 'Z';
+         break;
 
       /* not implemented ? */
       default:
          hb_ret();
-      return;
+         return;
    }
 
-   hb_retclenAdopt( (char *)cRet, ulRet );
+   hb_retclenAdopt( ( char * ) cRet, ulRet );
 }
 
 /* Deserializes a variable and get the value back
-*/
+ */
 HB_FUNC( HB_DESERIALIZESIMPLE )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
-   LONG ulMaxlen;
-   ULONG ulData;
-   char *cBuf;
+   LONG     ulMaxlen;
+   ULONG    ulData;
+   char *   cBuf;
 
-   if ( ISNUM( 2 ) )
+   if( ISNUM( 2 ) )
    {
       ulMaxlen = hb_parnl( 2 );
    }
@@ -268,11 +269,11 @@ HB_FUNC( HB_DESERIALIZESIMPLE )
 
    cBuf = pItem->item.asString.value;
 
-   switch( cBuf[0] )
+   switch( cBuf[ 0 ] )
    {
       case 'C':
-         ulData = (ULONG) hb_getlen8( ( BYTE * )cBuf + 1 );
-         if ( ulMaxlen > 0 && ulData > (ULONG) ulMaxlen )
+         ulData = ( ULONG ) hb_getlen8( ( BYTE * ) cBuf + 1 );
+         if( ulMaxlen > 0 && ulData > ( ULONG ) ulMaxlen )
          {
             hb_ret();
          }
@@ -280,148 +281,148 @@ HB_FUNC( HB_DESERIALIZESIMPLE )
          {
             hb_retclen( cBuf + 9, ulData );
          }
-      break;
+         break;
 
       case 'L':
-         hb_retl( cBuf[1] == 'T' );
-      break;
+         hb_retl( cBuf[ 1 ] == 'T' );
+         break;
 
       case 'N':
-         if( cBuf[1] == 'I' )
+         if( cBuf[ 1 ] == 'I' )
          {
-            ulData = (ULONG) hb_getlen8( ( BYTE * )cBuf + 2 );
-            hb_retni( (int) ulData );
+            ulData = ( ULONG ) hb_getlen8( ( BYTE * ) cBuf + 2 );
+            hb_retni( ( int ) ulData );
          }
-         else if( cBuf[1] == 'L' )
+         else if( cBuf[ 1 ] == 'L' )
          {
-            ulData = (ULONG) hb_getlen8( ( BYTE * )cBuf + 2 );
-            hb_retnl( (LONG) ulData );
+            ulData = ( ULONG ) hb_getlen8( ( BYTE * ) cBuf + 2 );
+            hb_retnl( ( LONG ) ulData );
          }
-         else if( cBuf[1] == 'X' )
+         else if( cBuf[ 1 ] == 'X' )
          {
-            hb_retnint( (HB_LONG) hb_getlen8( ( BYTE * )cBuf + 2 ) );
+            hb_retnint( ( HB_LONG ) hb_getlen8( ( BYTE * ) cBuf + 2 ) );
          }
          else
          {
-            hb_retnd( *((double *) (cBuf +2) ) );
+            hb_retnd( *( ( double * ) ( cBuf + 2 ) ) );
          }
-      break;
+         break;
 
       case 'D':
-         ulData = (ULONG) hb_getlen8( (BYTE *)(cBuf + 1) );
+         ulData = ( ULONG ) hb_getlen8( ( BYTE * ) ( cBuf + 1 ) );
          hb_retdl( ulData );
-      break;
-            
-      case 'T' :
-         hb_retdtd( *((double *) (cBuf + 1) ) );
-      break;
+         break;
+
+      case 'T':
+         hb_retdtd( *( ( double * ) ( cBuf + 1 ) ) );
+         break;
 
       case 'Z':
          // ulData = 1;
          hb_ret();
 
-      break;
+         break;
    }
 }
 
 
-ULONG hb_serialNextRaw( const char *cBuf )
+ULONG hb_serialNextRaw( const char * cBuf )
 {
    ULONG ulData, ulNext;
    ULONG ulCount;
 
-   switch( cBuf[0] )
+   switch( cBuf[ 0 ] )
    {
       case 'C':
-         ulData = (ULONG) hb_getlen8( ( BYTE * )cBuf + 1 );
-      return ulData + 9;
+         ulData = ( ULONG ) hb_getlen8( ( BYTE * ) cBuf + 1 );
+         return ulData + 9;
 
       case 'L':
-      return 2;
+         return 2;
 
       case 'N':
-         if( cBuf[1] == 'I' || cBuf[1] == 'X' || cBuf[1] == 'L' )
+         if( cBuf[ 1 ] == 'I' || cBuf[ 1 ] == 'X' || cBuf[ 1 ] == 'L' )
          {
             return 10;
          }
-      return 2 + sizeof(double);
+         return 2 + sizeof( double );
 
       case 'D':
-      return 9;
+         return 9;
 
       case 'T':
-      return 1 + sizeof( double );
+         return 1 + sizeof( double );
 
       case 'A':
-         ulData = ulNext = 9;
-         ulCount = (ULONG) hb_getlen8( ( BYTE *) (cBuf + 1) );
+         ulData   = ulNext = 9;
+         ulCount  = ( ULONG ) hb_getlen8( ( BYTE * ) ( cBuf + 1 ) );
 
-         while ( ulCount > 0 )
+         while( ulCount > 0 )
          {
-            cBuf += ulNext;
-            ulNext = hb_serialNextRaw( cBuf );
-            ulData += ulNext;
-            ulCount --;
+            cBuf     += ulNext;
+            ulNext   = hb_serialNextRaw( cBuf );
+            ulData   += ulNext;
+            ulCount--;
          }
-      return ulData;
+         return ulData;
 
       case 'H':
-         ulData = ulNext = 9;
-         ulCount = (ULONG) hb_getlen8( ( BYTE *) (cBuf + 1) );
+         ulData   = ulNext = 9;
+         ulCount  = ( ULONG ) hb_getlen8( ( BYTE * ) ( cBuf + 1 ) );
 
-         while ( ulCount > 0 )
+         while( ulCount > 0 )
          {
-            cBuf += ulNext;
-            ulNext = hb_serialNextRaw( cBuf );
-            cBuf += ulNext;
-            ulData += ulNext;
-            ulNext = hb_serialNextRaw( cBuf );
-            ulData += ulNext;
-            ulCount --;
+            cBuf     += ulNext;
+            ulNext   = hb_serialNextRaw( cBuf );
+            cBuf     += ulNext;
+            ulData   += ulNext;
+            ulNext   = hb_serialNextRaw( cBuf );
+            ulData   += ulNext;
+            ulCount--;
          }
-      return ulData;
+         return ulData;
 
       case 'O':
-         ulNext = 9;
-         ulCount = (ULONG) hb_getlen8( ( BYTE *) (cBuf + 1) );
+         ulNext   = 9;
+         ulCount  = ( ULONG ) hb_getlen8( ( BYTE * ) ( cBuf + 1 ) );
          // remove class name
-         ulNext += hb_serialNextRaw( ( char *) ( cBuf + 9 )  );
-         ulData = ulNext;
+         ulNext   += hb_serialNextRaw( ( char * ) ( cBuf + 9 ) );
+         ulData   = ulNext;
 
-         while ( ulCount > 0 )
+         while( ulCount > 0 )
          {
             // remove property name
-            cBuf += ulNext;
-            ulNext = hb_serialNextRaw( cBuf );
-            ulData += ulNext;
+            cBuf     += ulNext;
+            ulNext   = hb_serialNextRaw( cBuf );
+            ulData   += ulNext;
             // remove property value
-            cBuf += ulNext;
-            ulNext = hb_serialNextRaw( cBuf );
-            ulData += ulNext;
-            ulCount --;
+            cBuf     += ulNext;
+            ulNext   = hb_serialNextRaw( cBuf );
+            ulData   += ulNext;
+            ulCount--;
          }
-      return ulData;
+         return ulData;
 
       case 'B':
-         ulCount = (ULONG) hb_getlen8( ( BYTE *) (cBuf + 2) );
-         return ulCount+10;
+         ulCount = ( ULONG ) hb_getlen8( ( BYTE * ) ( cBuf + 2 ) );
+         return ulCount + 10;
 
       case 'R': return 10;
 
       case 'Q':
          /* ulNext = 9; */
-         ulCount = (ULONG) hb_getlen8( ( BYTE *) (cBuf + 1) );
-         return ulCount+9;
+         ulCount = ( ULONG ) hb_getlen8( ( BYTE * ) ( cBuf + 1 ) );
+         return ulCount + 9;
 
       case 'Z': return 1;
-    }
-    return 0;
+   }
+   return 0;
 }
 
 HB_FUNC( HB_SERIALNEXT )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
-   char *cBuf;
+   char *   cBuf;
 
    if( pItem == NULL )
    {
@@ -438,7 +439,7 @@ HB_FUNC( HB_SERIALNEXT )
 
 HB_FUNC( HB_DESERIALBEGIN )
 {
-   BYTE *cBuf;
+   BYTE *   cBuf;
    PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
 
    if( pItem == NULL )
@@ -448,36 +449,36 @@ HB_FUNC( HB_DESERIALBEGIN )
       return;
    }
 
-   cBuf = (BYTE *) hb_xgrab( pItem->item.asString.length + 9 );
+   cBuf = ( BYTE * ) hb_xgrab( pItem->item.asString.length + 9 );
    hb_createlen8( cBuf, 9 );
-   HB_MEMCPY( cBuf+8, pItem->item.asString.value, (size_t) pItem->item.asString.length );
-   hb_retclenAdopt( ( char *) cBuf, 8 + pItem->item.asString.length );
+   HB_MEMCPY( cBuf + 8, pItem->item.asString.value, ( size_t ) pItem->item.asString.length );
+   hb_retclenAdopt( ( char * ) cBuf, 8 + pItem->item.asString.length );
 }
 
 
 HB_FUNC( HB_DESERIALIZEARRAY )
 {
-   const char *cBuf;
-   PHB_ITEM pArray, pMaxLen, pRObj, pRHash, pRArray, pRBlock;
-   PHB_DYNS pHB_Deserialize;
-   HB_SIZE lLen, i, lArrayLen, lNext;
+   const char *   cBuf;
+   PHB_ITEM       pArray, pMaxLen, pRObj, pRHash, pRArray, pRBlock;
+   PHB_DYNS       pHB_Deserialize;
+   HB_SIZE        lLen, i, lArrayLen, lNext;
 
-   pArray  = hb_param( 1, HB_IT_ARRAY );
-   cBuf    = hb_parc( 2 );
-   lLen    = hb_parclen( 2 );
-   pMaxLen = hb_param( 3, HB_IT_ANY );
-   pRObj   = hb_param( 4, HB_IT_ANY );
-   pRHash  = hb_param( 5, HB_IT_ANY );
-   pRArray = hb_param( 6, HB_IT_ANY );
-   pRBlock = hb_param( 7, HB_IT_ANY );
+   pArray            = hb_param( 1, HB_IT_ARRAY );
+   cBuf              = hb_parc( 2 );
+   lLen              = hb_parclen( 2 );
+   pMaxLen           = hb_param( 3, HB_IT_ANY );
+   pRObj             = hb_param( 4, HB_IT_ANY );
+   pRHash            = hb_param( 5, HB_IT_ANY );
+   pRArray           = hb_param( 6, HB_IT_ANY );
+   pRBlock           = hb_param( 7, HB_IT_ANY );
 
-   pHB_Deserialize = hb_dynsymFind( "HB_DESERIALIZE" );
+   pHB_Deserialize   = hb_dynsymFind( "HB_DESERIALIZE" );
 
    if( pArray && cBuf && pHB_Deserialize )
    {
-      lArrayLen  = hb_arrayLen( pArray );
+      lArrayLen = hb_arrayLen( pArray );
 
-      for( i = 1 ; i <= lArrayLen ; i++ )
+      for( i = 1; i <= lArrayLen; i++ )
       {
          hb_vmPushDynSym( pHB_Deserialize );    // HB_Deserialize(
          hb_vmPushNil();
@@ -510,8 +511,8 @@ HB_FUNC( HB_DESERIALIZEARRAY )
          hb_arraySetForward( pArray, i, hb_stackReturnItem() );
 
          lNext = hb_serialNextRaw( cBuf );
-         cBuf += lNext;
-         lLen -= lNext;
+         cBuf  += lNext;
+         lLen  -= lNext;
          if( lLen < 0 )
          {
             lLen = 0;

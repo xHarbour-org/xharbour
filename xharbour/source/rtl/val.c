@@ -61,15 +61,15 @@ HB_FUNC( VAL )
 
    if( pText )
    {
-      char * szText = hb_itemGetCPtr( pText );
-      int iWidth, iDec, iLen = ( int ) hb_itemGetCLen( pText );
-      BOOL fDbl;
-      HB_LONG lValue;
-      double dValue;
+      char *   szText = hb_itemGetCPtr( pText );
+      int      iWidth, iDec, iLen = ( int ) hb_itemGetCLen( pText );
+      BOOL     fDbl;
+      HB_LONG  lValue;
+      double   dValue;
 
-      fDbl = hb_valStrnToNum( szText, iLen, &lValue, &dValue , &iDec, &iWidth );
+      fDbl = hb_valStrnToNum( szText, iLen, &lValue, &dValue, &iDec, &iWidth );
 
-      if( !fDbl )
+      if( ! fDbl )
          hb_retnintlen( lValue, iWidth );
       else
          hb_retndlen( dValue, iWidth, iDec );

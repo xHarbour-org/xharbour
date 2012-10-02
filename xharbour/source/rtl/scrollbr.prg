@@ -58,6 +58,7 @@
 #ifdef HB_COMPAT_C53
 
 CLASS HBScrollBar
+
    DATA BarLength
    DATA Cargo
    DATA sBlock
@@ -65,7 +66,7 @@ CLASS HBScrollBar
    DATA ClassName INIT "SCROLLBAR"
    DATA ColorSpec
 
-   METHOD Display()
+   METHOD DISPLAY()
    METHOD HitTest()
    METHOD Update()
    METHOD New( nStart, nEnd, nOffSet, bsBlock, nOrient )
@@ -102,6 +103,7 @@ CLASS HBScrollBar
    METHOD GetTotal( nTotal )
    METHOD GetOffSet( nOffSet )
    METHOD GetOrient( nOrient )
+
 ENDCLASS
 
 METHOD New( nStart, nEnd, nOffSet, bsBlock, nOrient ) CLASS HBScrollBar
@@ -118,9 +120,9 @@ METHOD New( nStart, nEnd, nOffSet, bsBlock, nOrient ) CLASS HBScrollBar
    ::Barlength := nEnd - nStart - 1
    ::Current   := 1
    ::Cargo     := Nil
-   cColor      := Setcolor()
-   ::ColorSpec := __guicolor( cColor, CLR_UNSELECTED + 1 ) + "," + ;
-                  __guicolor( cColor, CLR_ENHANCED + 1 )
+   cColor      := SetColor()
+   ::ColorSpec := __GUIColor( cColor, CLR_UNSELECTED + 1 ) + "," + ;
+      __GUIColor( cColor, CLR_ENHANCED + 1 )
    ::End       := nEnd
    ::OffSet    := nOffSet
    ::Orient    := nOrient
@@ -130,9 +132,9 @@ METHOD New( nStart, nEnd, nOffSet, bsBlock, nOrient ) CLASS HBScrollBar
    ::Thumbpos  := 1
    ::total     := 1
 
-RETURN Self
+   RETURN Self
 
-METHOD Display() CLASS HBScrollBar
+METHOD DISPLAY() CLASS HBScrollBar
 
    LOCAL nCurRow
    LOCAL nCurCol
@@ -146,7 +148,7 @@ METHOD Display() CLASS HBScrollBar
    LOCAL nPos
    LOCAL lDisplay  := .F.
 
-   cCurColor := Setcolor()
+   cCurColor := SetColor()
    nCurRow   := Row()
    nCurCol   := Col()
 
@@ -155,20 +157,20 @@ METHOD Display() CLASS HBScrollBar
       cStyle   := ::Style
       cOffSet  := ::OffSet
 
-      Dispbegin()
-      cColor1 := __guicolor( ::ColorSpec, 1 )
-      cColor2 := __guicolor( ::ColorSpec, 2 )
+      DispBegin()
+      cColor1 := __GUIColor( ::ColorSpec, 1 )
+      cColor2 := __GUIColor( ::ColorSpec, 2 )
 
       IF ::Orient == 1
          nStart := ::Start
          nEnd   := ::End - 1
 
-         SET COLOR TO (cColor1)
+         SET COLOR TO ( cColor1 )
          FOR nPos := nStart + 1 TO nEnd
             DispOutAt( nPos, cOffSet, cStyle[ 2 ] )
          NEXT
 
-         SET COLOR TO (cColor2)
+         SET COLOR TO ( cColor2 )
          DispOutAt( nStart, cOffSet, cStyle[ 1 ] )
          DispOutAt( nStart + ::ThumbPos, cOffSet, cStyle[ 3 ] )
          DispOutAt( nEnd + 1, cOffSet, cStyle[ 4 ] )
@@ -180,27 +182,45 @@ METHOD Display() CLASS HBScrollBar
 
          DispOutAt( cOffSet, nStart + 1, Replicate( cStyle[ 2 ], nEnd - nStart ), cColor1 )
 
-         SET COLOR TO (cColor2)
+         SET COLOR TO ( cColor2 )
          DispOutAt( cOffSet, nStart, cStyle[ 1 ] )
          DispOutAt( cOffSet, nStart + ::ThumbPos, cStyle[ 3 ] )
          DispOutAt( cOffSet, nEnd + 1, cStyle[ 4 ] )
 
       ENDIF
 
-      Dispend()
+      DispEnd()
 
-      SET COLOR TO (cCurColor)
-      Setpos( nCurRow, nCurCol )
+      SET COLOR TO ( cCurColor )
+      SetPos( nCurRow, nCurCol )
    ENDIF
 
-RETURN lDisplay
+   RETURN lDisplay
 
 METHOD HitTest( nRow, nCol ) CLASS HBScrollBar
 
    IF ::Orient == 1
 
       DO CASE
-         CASE nCol != ::OffSet
+      CASE nCol != ::OffSet
+      CASE nRow < ::Start
+      CASE nRow > ::End
+      CASE nRow == ::Start
+         RETURN HTSCROLLUNITDEC
+      CASE nRow == ::End
+         RETURN HTSCROLLUNITINC
+      CASE nRow < ::ThumbPos + ::Start
+         RETURN HTSCROLLBLOCKDEC
+      CASE nRow > ::ThumbPos + ::Start
+         RETURN HTSCROLLBLOCKINC
+      CASE nRow == ::ThumbPos + ::Start
+         RETURN HTSCROLLTHUMBDRAG
+      ENDCASE
+
+      IF nCol == ::OffSet + 1 .OR. nCol == ::OffSet
+
+         DO CASE
+         CASE nCol != ::OffSet .AND. nCol != ::OffSet + 1
          CASE nRow < ::Start
          CASE nRow > ::End
          CASE nRow == ::Start
@@ -213,24 +233,6 @@ METHOD HitTest( nRow, nCol ) CLASS HBScrollBar
             RETURN HTSCROLLBLOCKINC
          CASE nRow == ::ThumbPos + ::Start
             RETURN HTSCROLLTHUMBDRAG
-      ENDCASE
-
-      IF nCol == ::OffSet + 1 .or. nCol == ::OffSet
-
-         DO CASE
-            CASE nCol != ::OffSet .and. nCol != ::OffSet + 1
-            CASE nRow < ::Start
-            CASE nRow > ::End
-            CASE nRow == ::Start
-               RETURN HTSCROLLUNITDEC
-            CASE nRow == ::End
-               RETURN HTSCROLLUNITINC
-            CASE nRow < ::ThumbPos + ::Start
-               RETURN HTSCROLLBLOCKDEC
-            CASE nRow > ::ThumbPos + ::Start
-               RETURN HTSCROLLBLOCKINC
-            CASE nRow == ::ThumbPos + ::Start
-               RETURN HTSCROLLTHUMBDRAG
          ENDCASE
 
       ENDIF
@@ -238,24 +240,24 @@ METHOD HitTest( nRow, nCol ) CLASS HBScrollBar
    ELSEIF ::Orient == 2
 
       DO CASE
-         CASE nRow != ::OffSet
-         CASE nCol < ::Start
-         CASE nCol > ::End
-         CASE nCol == ::Start
-            RETURN HTSCROLLUNITDEC
-         CASE nCol == ::End
-            RETURN HTSCROLLUNITINC
-         CASE nCol < ::ThumbPos + ::Start
-            RETURN HTSCROLLBLOCKDEC
-         CASE nCol > ::ThumbPos + ::Start
-            RETURN HTSCROLLBLOCKINC
-         CASE nCol == ::ThumbPos + ::Start
-            RETURN HTSCROLLTHUMBDRAG
+      CASE nRow != ::OffSet
+      CASE nCol < ::Start
+      CASE nCol > ::End
+      CASE nCol == ::Start
+         RETURN HTSCROLLUNITDEC
+      CASE nCol == ::End
+         RETURN HTSCROLLUNITINC
+      CASE nCol < ::ThumbPos + ::Start
+         RETURN HTSCROLLBLOCKDEC
+      CASE nCol > ::ThumbPos + ::Start
+         RETURN HTSCROLLBLOCKINC
+      CASE nCol == ::ThumbPos + ::Start
+         RETURN HTSCROLLTHUMBDRAG
       ENDCASE
 
    ENDIF
 
-RETURN HTNOWHERE
+   RETURN HTNOWHERE
 
 METHOD Update() CLASS HBScrollBar
 
@@ -270,22 +272,22 @@ METHOD Update() CLASS HBScrollBar
       nCurRow   := Row()
       nCurCol   := Col()
 
-      Dispbegin()
+      DispBegin()
 
       IF ::Orient == 1
-         DispOutAt( ::Start + nThumbPos, ::OffSet, ::Style[ 2 ], __guicolor( ::ColorSpec, 1 ) )
-         DispOutAt( ::Start + ::ThumbPos, ::OffSet, ::Style[ 3 ], __guicolor( ::ColorSpec, 2 ) )
+         DispOutAt( ::Start + nThumbPos, ::OffSet, ::Style[ 2 ], __GUIColor( ::ColorSpec, 1 ) )
+         DispOutAt( ::Start + ::ThumbPos, ::OffSet, ::Style[ 3 ], __GUIColor( ::ColorSpec, 2 ) )
       ELSE
-         DispOutAt( ::OffSet, ::Start + nThumbPos, ::Style[ 2 ], __guicolor( ::ColorSpec, 1 ) )
-         DispOutAt( ::OffSet, ::Start + ::ThumbPos, ::Style[ 3 ], __guicolor( ::ColorSpec, 2 ) )
+         DispOutAt( ::OffSet, ::Start + nThumbPos, ::Style[ 2 ], __GUIColor( ::ColorSpec, 1 ) )
+         DispOutAt( ::OffSet, ::Start + ::ThumbPos, ::Style[ 3 ], __GUIColor( ::ColorSpec, 2 ) )
       ENDIF
 
-      Dispend()
+      DispEnd()
 
-      Setpos( nCurRow, nCurCol )
+      SetPos( nCurRow, nCurCol )
    ENDIF
 
-RETURN lUpdated
+   RETURN lUpdated
 
 /*
 METHOD GetColor(xColor) CLASS HBScrollBar
@@ -297,59 +299,60 @@ METHOD GetColor(xColor) CLASS HBScrollBar
    endif
 return ::Color
 */
+
 METHOD GetCurrent( nCurrent ) CLASS HBScrollBar
 
-   IF ! Isnumber( nCurrent )
+   IF ! ISNUMBER( nCurrent )
    ELSEIF nCurrent > ::nTotal
    ELSEIF nCurrent != ::nCurrent
       ::nCurrent := nCurrent
    ENDIF
 
-RETURN ::nCurrent
+   RETURN ::nCurrent
 
 METHOD GetEnd( nEnd ) CLASS HBScrollBar
 
-   IF !Isnumber( nEnd )
+   IF !ISNUMBER( nEnd )
    ELSEIF nEnd < ::nStart
    ELSEIF nEnd != ::nEnd
       ::nEnd      := nEnd
       ::barlength := nEnd - ::nStart - 1
    ENDIF
 
-RETURN ::nEnd
+   RETURN ::nEnd
 
 METHOD GetOffSet( nOffSet ) CLASS HBScrollBar
 
-   IF ! Isnumber( nOffSet )
+   IF ! ISNUMBER( nOffSet )
    ELSEIF nOffSet != ::nOffSet
       ::nOffSet := nOffSet
    ENDIF
 
-RETURN ::nOffSet
+   RETURN ::nOffSet
 
 METHOD GetOrient( nOrient ) CLASS HBScrollBar
 
-   IF ! Isnumber( nOrient )
-   ELSEIF nOrient == 1 .or. nOrient == 2
+   IF ! ISNUMBER( nOrient )
+   ELSEIF nOrient == 1 .OR. nOrient == 2
       ::nOrient := nOrient
    ENDIF
 
-RETURN ::nOrient
+   RETURN ::nOrient
 
 METHOD GetStart( nStart ) CLASS HBScrollBar
 
-   IF ! Isnumber( nStart )
+   IF ! ISNUMBER( nStart )
    ELSEIF nStart > ::End
    ELSEIF nStart != ::nStart
       ::nStart    := nStart
       ::barlength := ::nEnd - nStart - 1
    ENDIF
 
-RETURN ::nStart
+   RETURN ::nStart
 
 METHOD GetThumbPos( nPos ) CLASS HBScrollBar
 
-   IF Isnumber( nPos )
+   IF ISNUMBER( nPos )
       IF nPos < 1
          ::nThumbPos := 1
       ELSEIF nPos >= ::barlength
@@ -369,17 +372,17 @@ METHOD GetThumbPos( nPos ) CLASS HBScrollBar
 
    ENDIF
 
-RETURN ::nThumbPos
+   RETURN ::nThumbPos
 
 METHOD GetTotal( nTotal ) CLASS HBScrollBar
 
-   IF ! Isnumber( nTotal )
+   IF ! ISNUMBER( nTotal )
    ELSEIF nTotal < 2
    ELSEIF nTotal != ::nTotal
       ::nTotal := nTotal
    ENDIF
 
-RETURN ::nTotal
+   RETURN ::nTotal
 
 STATIC FUNCTION ThumbPos( oScroll )
 
@@ -407,23 +410,24 @@ STATIC FUNCTION ThumbPos( oScroll )
    nTotal     := oScroll:Total
 /*
    nPos      := ( ( nBarLength - 1 ) * nCurrent + nTotal - 2 * nBarLength + 1 ) / ;
-*/              ( nTotal - nBarLength )
-   if nCurrent > 1 
-      nPos := Max(1, Min(nBarLength, Round( (nCurrent/nTotal) * nBarLength,0) ) )
-   else
+*/
+   ( nTotal - nBarLength )
+   IF nCurrent > 1
+      nPos := Max( 1, Min( nBarLength, Round( (nCurrent/nTotal ) * nBarLength,0 ) ) )
+   ELSE
       nPos := 1
-   endif
+   ENDIF
 
    oScroll:ThumbPos := nPos
 
-RETURN .T.
+   RETURN .T.
 
-FUNCTION Scrollbar( nStart, nEnd, nOffSet, bsBlock, nOrient )
+FUNCTION ScrollBar( nStart, nEnd, nOffSet, bsBlock, nOrient )
 
    LOCAL oScroll
    LOCAL cStyle
 
-   IF !( Isnumber( nStart ) ) .or. !( Isnumber( nEnd ) ) .or. !( Isnumber( nOffSet ) )
+   IF !( ISNUMBER( nStart ) ) .OR. !( ISNUMBER( nEnd ) ) .OR. !( ISNUMBER( nOffSet ) )
       RETURN Nil
    ENDIF
 
@@ -448,5 +452,6 @@ FUNCTION Scrollbar( nStart, nEnd, nOffSet, bsBlock, nOrient )
    oScroll:sBlock    := bsBlock
    oScroll:Start     := nStart
 
-RETURN oScroll
+   RETURN oScroll
+
 #endif

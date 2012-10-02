@@ -71,10 +71,10 @@ PROCEDURE __TextSave( cFile )
 PROCEDURE __TextRestore()
 
    IF s_cFile == "PRINTER"
-      Set( _SET_PRINTER, s_lOldPrinter )
+      SET( _SET_PRINTER, s_lOldPrinter )
    ELSE
-      Set( _SET_EXTRAFILE, s_cOldExtraFile )
-      Set( _SET_EXTRA, s_lOldExtra )
+      SET( _SET_EXTRAFILE, s_cOldExtraFile )
+      SET( _SET_EXTRA, s_lOldExtra )
    ENDIF
 
    RETURN

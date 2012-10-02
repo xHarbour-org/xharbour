@@ -99,15 +99,15 @@ HB_FUNC_EXTERN( TSSECS );
 
 static int hb_datectod( char const * szDate, int * pd_value, int * pm_value, int * py_value )
 {
-   int d_value = 0, m_value = 0, y_value = 0;
-   int fin = 0;
+   int   d_value  = 0, m_value = 0, y_value = 0;
+   int   fin      = 0;
 
    if( szDate )
    {
-      int d_pos = 0, m_pos = 0, y_pos = 0;
-      const char * szFormat = hb_setGetDateFormat();
-      int count, digit, non_digit;
-      int size = ( int ) strlen( szFormat );
+      int            d_pos    = 0, m_pos = 0, y_pos = 0;
+      const char *   szFormat = hb_setGetDateFormat();
+      int            count, digit, non_digit;
+      int            size     = ( int ) strlen( szFormat );
 
       for( count = 0; count < size; count++ )
       {
@@ -117,9 +117,12 @@ static int hb_datectod( char const * szDate, int * pd_value, int * pm_value, int
             case 'd':
                if( d_pos == 0 )
                {
-                  if( m_pos == 0 && y_pos == 0 ) d_pos = 1;
-                  else if( m_pos == 0 || y_pos == 0 ) d_pos = 2;
-                  else d_pos = 3;
+                  if( m_pos == 0 && y_pos == 0 )
+                     d_pos = 1;
+                  else if( m_pos == 0 || y_pos == 0 )
+                     d_pos = 2;
+                  else
+                     d_pos = 3;
                }
                break;
 
@@ -127,9 +130,12 @@ static int hb_datectod( char const * szDate, int * pd_value, int * pm_value, int
             case 'm':
                if( m_pos == 0 )
                {
-                  if( d_pos == 0 && y_pos == 0 ) m_pos = 1;
-                  else if( d_pos == 0 || y_pos == 0 ) m_pos = 2;
-                  else m_pos = 3;
+                  if( d_pos == 0 && y_pos == 0 )
+                     m_pos = 1;
+                  else if( d_pos == 0 || y_pos == 0 )
+                     m_pos = 2;
+                  else
+                     m_pos = 3;
                }
                break;
 
@@ -137,17 +143,20 @@ static int hb_datectod( char const * szDate, int * pd_value, int * pm_value, int
             case 'y':
                if( y_pos == 0 )
                {
-                  if( m_pos == 0 && d_pos == 0 ) y_pos = 1;
-                  else if( m_pos == 0 || d_pos == 0 ) y_pos = 2;
-                  else y_pos = 3;
+                  if( m_pos == 0 && d_pos == 0 )
+                     y_pos = 1;
+                  else if( m_pos == 0 || d_pos == 0 )
+                     y_pos = 2;
+                  else
+                     y_pos = 3;
                }
          }
       }
 
       /* If there are non-digits at the start of the date field,
          they are not to be treated as date field separators */
-      non_digit = 1;
-      fin = size = ( int ) strlen( szDate );
+      non_digit   = 1;
+      fin         = size = ( int ) strlen( szDate );
 
       for( count = 0; count < size; count++ )
       {
@@ -212,23 +221,23 @@ static int hb_datectod( char const * szDate, int * pd_value, int * pm_value, int
          }
       }
    }
-   *pd_value = d_value;
-   *pm_value = m_value;
-   *py_value = y_value;
+   *pd_value   = d_value;
+   *pm_value   = m_value;
+   *py_value   = y_value;
 
-   return (int) fin;
+   return ( int ) fin;
 }
 
 static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, double * ps_value )
 {
-   int h_value = 0, m_value = 0;
-   double s_value = 0;
-   int h_pos = 0, m_pos = 0, s_pos = 0, c_pos = 0, p_pos = 0;
-   const char * szFormat = hb_setGetTimeFormat();
-   int count, digit, non_digit;
-   int size = ( int ) strlen( szFormat );
-   int fin = 0;
-   int pm = 0, divisor = 10;
+   int            h_value  = 0, m_value = 0;
+   double         s_value  = 0;
+   int            h_pos    = 0, m_pos = 0, s_pos = 0, c_pos = 0, p_pos = 0;
+   const char *   szFormat = hb_setGetTimeFormat();
+   int            count, digit, non_digit;
+   int            size     = ( int ) strlen( szFormat );
+   int            fin      = 0;
+   int            pm       = 0, divisor = 10;
 
    if( szTime )
    {
@@ -261,7 +270,8 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
             case 'c':
                if( c_pos == 0 )
                {
-                  if( s_pos != 0 ) c_pos = s_pos;
+                  if( s_pos != 0 )
+                     c_pos = s_pos;
                }
             case 'P':
             case 'p':
@@ -279,8 +289,8 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
 
       /* If there are non-digits at the start of the date field,
          they are not to be treated as date field separators */
-      non_digit = 1;
-      fin = size = ( int ) strlen( szTime );
+      non_digit   = 1;
+      fin         = size = ( int ) strlen( szTime );
       for( count = 0; count < size; count++ )
       {
          digit = szTime[ count ];
@@ -295,8 +305,8 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
                s_value = ( s_value * 10 ) + digit - '0';
             else if( c_pos == 1 )
             {
-               s_value += (double)( digit - '0' ) / divisor;
-               divisor *= 10;
+               s_value  += ( double ) ( digit - '0' ) / divisor;
+               divisor  *= 10;
             }
             /* Treat the next non-digit as a date field separator */
             non_digit = 0;
@@ -305,7 +315,7 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
          {
             s_pos = 0;
          }
-         else if( ( digit == 'A' || digit == 'P' ) && p_pos == 1 && szTime[ count+1 ] == 'M' )
+         else if( ( digit == 'A' || digit == 'P' ) && p_pos == 1 && szTime[ count + 1 ] == 'M' )
          {
             if( digit == 'P' )
             {
@@ -358,7 +368,7 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
       if( pm )
       {
          h_value %= 12;
-         if( pm == 1)
+         if( pm == 1 )
          {
             h_value += 12;
          }
@@ -366,24 +376,24 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
 
       if( h_value > 23 || m_value > 59 || s_value >= 60.0 )
       {
-         h_value = 0;
-         m_value = 0;
-         s_value = 0;
+         h_value  = 0;
+         m_value  = 0;
+         s_value  = 0;
       }
    }
-   *ph_value = h_value;
-   *pm_value = m_value;
-   *ps_value = s_value;
+   *ph_value   = h_value;
+   *pm_value   = m_value;
+   *ps_value   = s_value;
 
-   return (int) fin;
+   return ( int ) fin;
 }
 
 HB_FUNC( CTOD )
 {
    if( ISCHAR( 1 ) )
    {
-      const char * szDate = hb_parcx( 1 );
-      int d_value = 0, m_value = 0, y_value = 0;
+      const char *   szDate   = hb_parcx( 1 );
+      int            d_value  = 0, m_value = 0, y_value = 0;
 
       hb_datectod( szDate, &d_value, &m_value, &y_value );
 
@@ -397,8 +407,8 @@ HB_FUNC( DTOC )
 {
    if( ISDATETIME( 1 ) )
    {
-      char szDate[ 9 ];
-      char szFormatted[ 11 ];
+      char  szDate[ 9 ];
+      char  szFormatted[ 11 ];
 
       hb_retc( hb_dateFormat( hb_pardsbuff( szDate, 1 ), szFormatted, hb_setGetDateFormat() ) );
    }
@@ -420,22 +430,23 @@ HB_FUNC( DTOS )
 
 HB_FUNC( STOD )
 {
-   HB_SIZE iLen = hb_parclen( 1 ) ;
-   if ( iLen == 8 )
+   HB_SIZE iLen = hb_parclen( 1 );
+
+   if( iLen == 8 )
    {
-     hb_retds( hb_parc( 1 ) );
+      hb_retds( hb_parc( 1 ) );
    }
-   else if ( iLen < 8 )
+   else if( iLen < 8 )
    {
-     hb_retds( NULL );
+      hb_retds( NULL );
    }
    else
    {
-     char szDate[ 9 ] ;
-     const char *pDate = hb_parcx( 1 ) ;
-     HB_MEMCPY( szDate, pDate, 8 ) ;
-     szDate[ 8 ] = '\0' ;
-     hb_retds( szDate );
+      char           szDate[ 9 ];
+      const char *   pDate = hb_parcx( 1 );
+      HB_MEMCPY( szDate, pDate, 8 );
+      szDate[ 8 ] = '\0';
+      hb_retds( szDate );
    }
 }
 
@@ -494,6 +505,7 @@ HB_FUNC( DAY )
 HB_FUNC( TIME )
 {
    char szResult[ 9 ];
+
    hb_dateTimeStr( szResult );
    hb_retclen( szResult, 8 );
 }
@@ -503,16 +515,16 @@ HB_FUNC( TIMEOFDAY )
 {
    char szResult[ 9 ];
 
-   if ( hb_pcount() == 0 )
+   if( hb_pcount() == 0 )
    {
       hb_dateTimeStr( szResult );
    }
    else
    {
-      int iSeconds = hb_parni(1);
-      iSeconds %= 3600*24;
+      int iSeconds = hb_parni( 1 );
+      iSeconds %= 3600 * 24;
       hb_snprintf( szResult, sizeof( szResult ), "%02d:%02d:%02d",
-      iSeconds/3600 , (iSeconds % 3600)/60, iSeconds % 60 );
+                   iSeconds / 3600, ( iSeconds % 3600 ) / 60, iSeconds % 60 );
    }
    hb_retclen( szResult, 8 );
 }
@@ -522,6 +534,7 @@ HB_FUNC( TIMEOFDAY )
 HB_FUNC( DATE )
 {
    int iYear, iMonth, iDay;
+
    hb_dateToday( &iYear, &iMonth, &iDay );
    hb_retd( iYear, iMonth, iDay );
 }
@@ -538,10 +551,10 @@ HB_FUNC( DOW )
 
 HB_FUNC( DATETIME )
 {
-   if ( hb_pcount() == 0 )
+   if( hb_pcount() == 0 )
    {
-      int iYear, iMonth, iDay, iHour, iMinute;
-      double dSeconds;
+      int      iYear, iMonth, iDay, iHour, iMinute;
+      double   dSeconds;
       hb_dateToday( &iYear, &iMonth, &iDay );
       hb_dateTime( &iHour, &iMinute, &dSeconds );
       hb_retdt( iYear, iMonth, iDay, iHour, iMinute, dSeconds, 0 );
@@ -578,12 +591,12 @@ HB_FUNC( TTOC )
 {
    if( ISDATETIME( 1 ) )
    {
-      char szDate[ 19 ];
-      char * szFormatted = ( char * ) hb_xgrab( 26 );
+      char     szDate[ 19 ];
+      char *   szFormatted = ( char * ) hb_xgrab( 26 );
 
-      hb_pardtsbuff( szDate, 1);
+      hb_pardtsbuff( szDate, 1 );
 
-      if( (ISNUM(2) && hb_parni(2) == 2) || (ISLOG(2) && !hb_parl(2) ) )
+      if( ( ISNUM( 2 ) && hb_parni( 2 ) == 2 ) || ( ISLOG( 2 ) && ! hb_parl( 2 ) ) )
          hb_retcAdopt( hb_datetimeFormat( szDate, szFormatted, NULL, hb_setGetTimeFormat() ) );
       else
          hb_retcAdopt( hb_datetimeFormat( szDate, szFormatted, hb_setGetDateFormat(), hb_setGetTimeFormat() ) );
@@ -636,7 +649,7 @@ HB_FUNC( SECS )
    }
    else
    {
-      HB_FUNCNAME( TSSECS )();
+      HB_FUNCNAME( TSSECS ) ();
    }
 }
 
@@ -644,18 +657,18 @@ HB_FUNC( CTOT )
 {
    if( ISCHAR( 1 ) )
    {
-      const char * szDate = hb_parcx( 1 );
-      int len = (int) hb_parclen( 1 );
-      int d_value = 0, m_value = 0, y_value = 0;
-      int h_value = 0, n_value = 0, fin;
-      double s_value = 0;
+      const char *   szDate   = hb_parcx( 1 );
+      int            len      = ( int ) hb_parclen( 1 );
+      int            d_value  = 0, m_value = 0, y_value = 0;
+      int            h_value  = 0, n_value = 0, fin;
+      double         s_value  = 0;
 
-      if( (ISNUM(2) && hb_parni(2) == 2) || (ISLOG(2) && !hb_parl(2) ) )
+      if( ( ISNUM( 2 ) && hb_parni( 2 ) == 2 ) || ( ISLOG( 2 ) && ! hb_parl( 2 ) ) )
       {
-         fin = -1;
-         d_value = 30;
-         m_value = 12;
-         y_value = 1899;
+         fin      = -1;
+         d_value  = 30;
+         m_value  = 12;
+         y_value  = 1899;
       }
       else
       {
@@ -666,10 +679,10 @@ HB_FUNC( CTOT )
       {
          char szTime[ 13 ];
 
-         len -= fin;
+         len            -= fin;
          memset( szTime, ' ', 12 );
-         HB_MEMCPY( szTime, szDate+fin+1, (len>12?12:len) );
-         szTime[12] = '\0';
+         HB_MEMCPY( szTime, szDate + fin + 1, ( len > 12 ? 12 : len ) );
+         szTime[ 12 ]   = '\0';
          hb_timectot( szTime, &h_value, &n_value, &s_value );
       }
 
@@ -681,16 +694,17 @@ HB_FUNC( CTOT )
 
 HB_FUNC( STOT )
 {
-   int len = (int) hb_parclen( 1 );
+   int len = ( int ) hb_parclen( 1 );
+
    if( ISCHAR( 1 ) && len >= 8 )
    {
-      const char * szDate = hb_parcx( 1 );
-      long lDate = 0, lTime = 0;
-      char szTime[ 19 ];
+      const char *   szDate   = hb_parcx( 1 );
+      long           lDate    = 0, lTime = 0;
+      char           szTime[ 19 ];
 
       memset( szTime, ' ', 18 );
-      szTime[18] = '\0';
-      HB_MEMCPY( szTime, szDate, (len>18?18:len) );
+      szTime[ 18 ] = '\0';
+      HB_MEMCPY( szTime, szDate, ( len > 18 ? 18 : len ) );
       hb_datetimeEncStr( szTime, &lDate, &lTime );
 
       hb_retdtl( lDate, lTime );
@@ -701,9 +715,9 @@ HB_FUNC( STOT )
 
 HB_FUNC( HMS2D )
 {
-   int iHour = hb_parni(1);
-   int iMin  = hb_parni(2);
-   double dSec  = hb_parnd(3);
+   int      iHour = hb_parni( 1 );
+   int      iMin  = hb_parni( 2 );
+   double   dSec  = hb_parnd( 3 );
 
    hb_retnd( hb_timeEncode( iHour, iMin, dSec ) );
 }

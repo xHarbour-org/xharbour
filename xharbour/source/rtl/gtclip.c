@@ -61,8 +61,8 @@
 #endif
 
 /* TODO: add protection for MT mode */
-static char *     s_szClipboardData;
-static HB_SIZE    s_ulClipboardLen;
+static char *  s_szClipboardData;
+static HB_SIZE s_ulClipboardLen;
 
 BOOL hb_gt_setClipboard( const char * szClipData, HB_SIZE ulLen )
 {
@@ -71,22 +71,22 @@ BOOL hb_gt_setClipboard( const char * szClipData, HB_SIZE ulLen )
    s_ulClipboardLen = ulLen;
    if( s_ulClipboardLen )
    {
-      s_szClipboardData = ( char * ) hb_xgrab( s_ulClipboardLen + 1 );
-      HB_MEMCPY( s_szClipboardData, szClipData, (size_t) s_ulClipboardLen );
-      s_szClipboardData[ s_ulClipboardLen ] = '\0';
+      s_szClipboardData                      = ( char * ) hb_xgrab( s_ulClipboardLen + 1 );
+      HB_MEMCPY( s_szClipboardData, szClipData, ( size_t ) s_ulClipboardLen );
+      s_szClipboardData[ s_ulClipboardLen ]  = '\0';
    }
    return TRUE;
 }
 
-BOOL hb_gt_getClipboard( char ** pszClipData, HB_SIZE *pulLen )
+BOOL hb_gt_getClipboard( char ** pszClipData, HB_SIZE * pulLen )
 {
-   *pszClipData = NULL;
-   *pulLen = s_ulClipboardLen;
+   *pszClipData   = NULL;
+   *pulLen        = s_ulClipboardLen;
    if( s_ulClipboardLen )
    {
-      *pszClipData = ( char * ) hb_xgrab( s_ulClipboardLen + 1 );
-      HB_MEMCPY( *pszClipData, s_szClipboardData, (size_t) s_ulClipboardLen );
-      ( *pszClipData )[ s_ulClipboardLen ] = '\0';
+      *pszClipData                           = ( char * ) hb_xgrab( s_ulClipboardLen + 1 );
+      HB_MEMCPY( *pszClipData, s_szClipboardData, ( size_t ) s_ulClipboardLen );
+      ( *pszClipData )[ s_ulClipboardLen ]   = '\0';
    }
    return s_ulClipboardLen != 0;
 }
@@ -104,7 +104,7 @@ BOOL hb_gt_w32_setClipboard( UINT uFormat, const char * szClipData, HB_SIZE ulLe
       EmptyClipboard();
 
       /* Allocate a global memory object for the text. */
-      hglbCopy = GlobalAlloc( GMEM_MOVEABLE, uFormat == CF_UNICODETEXT ? ( (size_t) ulLen + 1 ) * sizeof( wchar_t ) : (size_t) ulLen + 1 );
+      hglbCopy = GlobalAlloc( GMEM_MOVEABLE, uFormat == CF_UNICODETEXT ? ( ( size_t ) ulLen + 1 ) * sizeof( wchar_t ) : ( size_t ) ulLen + 1 );
       if( hglbCopy )
       {
          /* Lock the handle and copy the text to the buffer. */
@@ -113,12 +113,12 @@ BOOL hb_gt_w32_setClipboard( UINT uFormat, const char * szClipData, HB_SIZE ulLe
          {
             if( uFormat == CF_UNICODETEXT )
             {
-               hb_mbtowcset( ( LPWSTR ) lptstrCopy, szClipData, (ULONG) ulLen );
-               * ( ( ( LPWSTR ) lptstrCopy ) + ulLen ) = L'\0';
+               hb_mbtowcset( ( LPWSTR ) lptstrCopy, szClipData, ( ULONG ) ulLen );
+               *( ( ( LPWSTR ) lptstrCopy ) + ulLen ) = L'\0';
             }
             else
             {
-               HB_MEMCPY( lptstrCopy, szClipData, (size_t) ulLen );
+               HB_MEMCPY( lptstrCopy, szClipData, ( size_t ) ulLen );
                lptstrCopy[ ulLen ] = '\0';
             }
             fResult = TRUE;
@@ -132,7 +132,7 @@ BOOL hb_gt_w32_setClipboard( UINT uFormat, const char * szClipData, HB_SIZE ulLe
 #if 1
             GlobalLock( hglbLocale );
 #else
-            DWORD lcid = (DWORD) GlobalLock( hglbLocale );
+            DWORD lcid = ( DWORD ) GlobalLock( hglbLocale );
             lcid = LOCALE_USER_DEFAULT;
 #endif
             GlobalUnlock( hglbLocale );
@@ -144,10 +144,10 @@ BOOL hb_gt_w32_setClipboard( UINT uFormat, const char * szClipData, HB_SIZE ulLe
    return fResult;
 }
 
-BOOL hb_gt_w32_getClipboard( UINT uFormat, char ** pszClipData, HB_SIZE *pulLen )
+BOOL hb_gt_w32_getClipboard( UINT uFormat, char ** pszClipData, HB_SIZE * pulLen )
 {
-   *pulLen = 0;
-   *pszClipData = NULL;
+   *pulLen        = 0;
+   *pszClipData   = NULL;
    if( IsClipboardFormatAvailable( uFormat ) && OpenClipboard( NULL ) )
    {
       HGLOBAL hglb = GetClipboardData( uFormat );
@@ -168,18 +168,18 @@ BOOL hb_gt_w32_getClipboard( UINT uFormat, char ** pszClipData, HB_SIZE *pulLen 
                   *pulLen = strlen( ( char * ) lptstr );
                   if( *pulLen )
                   {
-                     *pszClipData = ( char * ) hb_xgrab( *pulLen + 1 );
-                     HB_TCHAR_GETFROM( *pszClipData, lptstr, (size_t) *pulLen );
-                     ( *pszClipData )[ *pulLen ] = '\0';
+                     *pszClipData                  = ( char * ) hb_xgrab( *pulLen + 1 );
+                     HB_TCHAR_GETFROM( *pszClipData, lptstr, ( size_t ) *pulLen );
+                     ( *pszClipData )[ *pulLen ]   = '\0';
                   }
                   break;
                default:
                   *pulLen = GlobalSize( hglb );
                   if( *pulLen )
                   {
-                     *pszClipData = ( char * ) hb_xgrab( *pulLen + 1 );
-                     HB_MEMCPY( *pszClipData, lptstr, (size_t) *pulLen );
-                     ( *pszClipData )[ *pulLen ] = '\0';
+                     *pszClipData                  = ( char * ) hb_xgrab( *pulLen + 1 );
+                     HB_MEMCPY( *pszClipData, lptstr, ( size_t ) *pulLen );
+                     ( *pszClipData )[ *pulLen ]   = '\0';
                   }
                   break;
             }

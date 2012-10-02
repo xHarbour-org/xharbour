@@ -83,18 +83,18 @@ HB_FUNC( __ACCEPTSTR )
 
 HB_FUNC( __ACCEPT )
 {
-   char szAcceptResult[ ACCEPT_BUFFER_LEN ];
+   char  szAcceptResult[ ACCEPT_BUFFER_LEN ];
    ULONG ulLen;
-   int input;
+   int   input;
 
    /* cPrompt(s) passed ? */
    if( hb_pcount() >= 1 )
       HB_FUNC_EXEC( QOUT );
 
-   ulLen = 0;
-   input = 0;
+   ulLen                = 0;
+   input                = 0;
 
-   szAcceptResult[ 0 ] = '\0';
+   szAcceptResult[ 0 ]  = '\0';
 
    while( input != K_ENTER && hb_vmRequestQuery() == 0 )
    {
@@ -107,16 +107,16 @@ HB_FUNC( __ACCEPT )
             if( ulLen > 0 )
             {
                hb_conOutAlt( "\x8", sizeof( char ) ); /* Erase it from the screen. */
-               ulLen--; /* Adjust input count to get rid of last character */
+               ulLen--;                               /* Adjust input count to get rid of last character */
             }
             break;
 
          default:
             if( ulLen < ( ACCEPT_BUFFER_LEN - 1 ) && input >= 32 && input <= 255 )
             {
-               szAcceptResult[ ulLen ] = input; /* Accept the input */
-               hb_conOutAlt( &szAcceptResult[ ulLen ], sizeof( char ) ); /* Then display it */
-               ulLen++;  /* Then adjust the input count */
+               szAcceptResult[ ulLen ] = input;                            /* Accept the input */
+               hb_conOutAlt( &szAcceptResult[ ulLen ], sizeof( char ) );   /* Then display it */
+               ulLen++;                                                    /* Then adjust the input count */
             }
       }
    }

@@ -56,140 +56,140 @@
 
 
 /*******************************
-* check for invalid parameters and report error
-*/
+ * check for invalid parameters and report error
+ */
 
-static BOOL s_invalid_params( char *szFname, PHB_ITEM pParam1, PHB_ITEM pParam2,
-      LONG *ret1, LONG *ret2 )
+static BOOL s_invalid_params( char * szFname, PHB_ITEM pParam1, PHB_ITEM pParam2,
+                              LONG * ret1, LONG * ret2 )
 {
-   if ( pParam1 == NULL || pParam2 == NULL ||
-      (pParam1->type & ( HB_IT_INTEGER | HB_IT_LONG )) == 0 ||
-      (pParam2->type & ( HB_IT_INTEGER | HB_IT_LONG )) == 0
-      )
+   if( pParam1 == NULL || pParam2 == NULL ||
+       ( pParam1->type & ( HB_IT_INTEGER | HB_IT_LONG ) ) == 0 ||
+       ( pParam2->type & ( HB_IT_INTEGER | HB_IT_LONG ) ) == 0
+       )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1089, "Non-integer parameters",
-               szFname, 2, pParam1, pParam2 );
+                            szFname, 2, pParam1, pParam2 );
       return TRUE;
    }
 
    *ret1 = pParam1->type == HB_IT_INTEGER ?
-         (LONG) hb_itemGetNI( pParam1 ) : hb_itemGetNL( pParam1 );
+           ( LONG ) hb_itemGetNI( pParam1 ) : hb_itemGetNL( pParam1 );
 
-   if ( ret2 != NULL )
+   if( ret2 != NULL )
    {
       *ret2 = pParam2->type == HB_IT_INTEGER ?
-         (LONG) hb_itemGetNI( pParam2 ) : hb_itemGetNL( pParam2 );
+              ( LONG ) hb_itemGetNI( pParam2 ) : hb_itemGetNL( pParam2 );
    }
 
    return FALSE;
 }
 
 /*******************************
-* HB_BitAnd( nAnd1, nAnd2 ) --> nResult
-*/
+ * HB_BitAnd( nAnd1, nAnd2 ) --> nResult
+ */
 HB_FUNC( HB_BITAND )
 {
-   PHB_ITEM pAnd1 = hb_param(1, HB_IT_ANY );
-   PHB_ITEM pAnd2 = hb_param(2, HB_IT_ANY );
-   LONG ret1, ret2;
+   PHB_ITEM pAnd1 = hb_param( 1, HB_IT_ANY );
+   PHB_ITEM pAnd2 = hb_param( 2, HB_IT_ANY );
+   LONG     ret1, ret2;
 
-   if ( s_invalid_params( "HB_BITAND", pAnd1, pAnd2, &ret1, &ret2 ) )
+   if( s_invalid_params( "HB_BITAND", pAnd1, pAnd2, &ret1, &ret2 ) )
    {
       return;
    }
 
-   if (pAnd1->type ==  HB_IT_LONG || pAnd2->type ==  HB_IT_LONG )
+   if( pAnd1->type == HB_IT_LONG || pAnd2->type == HB_IT_LONG )
    {
       hb_retnl( ret1 & ret2 );
    }
    else
    {
 
-      hb_retni( (int) (ret1 & ret2) );
+      hb_retni( ( int ) ( ret1 & ret2 ) );
    }
 }
 
 /*******************************
-* HB_BitOr( nAnd1, nAnd2 ) --> nOr
-*/
+ * HB_BitOr( nAnd1, nAnd2 ) --> nOr
+ */
 HB_FUNC( HB_BITOR )
 {
-   PHB_ITEM pAnd1 = hb_param(1, HB_IT_ANY );
-   PHB_ITEM pAnd2 = hb_param(2, HB_IT_ANY );
-   LONG ret1, ret2;
+   PHB_ITEM pAnd1 = hb_param( 1, HB_IT_ANY );
+   PHB_ITEM pAnd2 = hb_param( 2, HB_IT_ANY );
+   LONG     ret1, ret2;
 
-   if ( s_invalid_params( "HB_BITOR", pAnd1, pAnd2, &ret1, &ret2 ) )
+   if( s_invalid_params( "HB_BITOR", pAnd1, pAnd2, &ret1, &ret2 ) )
    {
       return;
    }
 
-   if (pAnd1->type ==  HB_IT_LONG || pAnd2->type ==  HB_IT_LONG )
+   if( pAnd1->type == HB_IT_LONG || pAnd2->type == HB_IT_LONG )
    {
       hb_retnl( ret1 | ret2 );
    }
    else
    {
-      hb_retni( (int) (ret1 | ret2) );
+      hb_retni( ( int ) ( ret1 | ret2 ) );
    }
 }
 
 /*******************************
-* HB_BitXor( nAnd1, nAnd2 ) --> nXor
-*/
+ * HB_BitXor( nAnd1, nAnd2 ) --> nXor
+ */
 HB_FUNC( HB_BITXOR )
 {
-   PHB_ITEM pAnd1 = hb_param(1, HB_IT_ANY );
-   PHB_ITEM pAnd2 = hb_param(2, HB_IT_ANY );
-   LONG ret1, ret2;
+   PHB_ITEM pAnd1 = hb_param( 1, HB_IT_ANY );
+   PHB_ITEM pAnd2 = hb_param( 2, HB_IT_ANY );
+   LONG     ret1, ret2;
 
-   if ( s_invalid_params( "HB_BITXOR", pAnd1, pAnd2, &ret1, &ret2 ) )
+   if( s_invalid_params( "HB_BITXOR", pAnd1, pAnd2, &ret1, &ret2 ) )
    {
       return;
    }
 
-   if (pAnd1->type ==  HB_IT_LONG || pAnd2->type ==  HB_IT_LONG )
+   if( pAnd1->type == HB_IT_LONG || pAnd2->type == HB_IT_LONG )
    {
       hb_retnl( ret1 ^ ret2 );
    }
    else
    {
-      hb_retni( (int) (ret1 ^ ret2) );
+      hb_retni( ( int ) ( ret1 ^ ret2 ) );
    }
 }
 
 /*******************************
-* HB_BitNot( nAnd1 ) --> nNot
-*/
+ * HB_BitNot( nAnd1 ) --> nNot
+ */
 HB_FUNC( HB_BITNOT )
 {
-   PHB_ITEM pAnd1 = hb_param(1, HB_IT_ANY );
-   LONG ret1;
+   PHB_ITEM pAnd1 = hb_param( 1, HB_IT_ANY );
+   LONG     ret1;
 
-   if ( s_invalid_params( "HB_BITNOT", pAnd1, pAnd1, &ret1, NULL ) )
+   if( s_invalid_params( "HB_BITNOT", pAnd1, pAnd1, &ret1, NULL ) )
    {
       return;
    }
 
-   if (pAnd1->type ==  HB_IT_LONG )
+   if( pAnd1->type == HB_IT_LONG )
    {
-      hb_retnl( ~ ret1 );
+      hb_retnl( ~ret1 );
    }
    else
    {
-      hb_retni( ~ ((int) ret1) );
+      hb_retni( ~( ( int ) ret1 ) );
    }
 }
 
 /*******************************
-* HB_BitIsSet( nNumber, nBit ) --> lIsSet
-*/
+ * HB_BitIsSet( nNumber, nBit ) --> lIsSet
+ */
 HB_FUNC( HB_BITISSET )
 {
-   PHB_ITEM pAnd1 = hb_param(1, HB_IT_ANY );
-   PHB_ITEM pAnd2 = hb_param(2, HB_IT_ANY );
-   LONG ret1, ret2;
+   PHB_ITEM pAnd1 = hb_param( 1, HB_IT_ANY );
+   PHB_ITEM pAnd2 = hb_param( 2, HB_IT_ANY );
+   LONG     ret1, ret2;
 
-   if ( s_invalid_params( "HB_BITISSET", pAnd1, pAnd2, &ret1, &ret2 ) )
+   if( s_invalid_params( "HB_BITISSET", pAnd1, pAnd2, &ret1, &ret2 ) )
    {
       return;
    }
@@ -198,72 +198,72 @@ HB_FUNC( HB_BITISSET )
 }
 
 /*******************************
-* HB_BitSet( nNumber, nBit ) --> nResult
-*/
+ * HB_BitSet( nNumber, nBit ) --> nResult
+ */
 HB_FUNC( HB_BITSET )
 {
-   PHB_ITEM pAnd1 = hb_param(1, HB_IT_ANY );
-   PHB_ITEM pAnd2 = hb_param(2, HB_IT_ANY );
-   LONG ret1, ret2;
+   PHB_ITEM pAnd1 = hb_param( 1, HB_IT_ANY );
+   PHB_ITEM pAnd2 = hb_param( 2, HB_IT_ANY );
+   LONG     ret1, ret2;
 
-   if ( s_invalid_params( "HB_BITSET", pAnd1, pAnd2, &ret1, &ret2 ) )
+   if( s_invalid_params( "HB_BITSET", pAnd1, pAnd2, &ret1, &ret2 ) )
    {
       return;
    }
 
-   if (pAnd1->type ==  HB_IT_LONG )
+   if( pAnd1->type == HB_IT_LONG )
    {
-      hb_retnl( ret1 | ( 1 << ret2 ));
+      hb_retnl( ret1 | ( 1 << ret2 ) );
    }
    else
    {
-      hb_retni( (int) (ret1 | ( 1 << ret2)) );
+      hb_retni( ( int ) ( ret1 | ( 1 << ret2 ) ) );
    }
 }
 
 /*******************************
-* HB_BitReset( nNumber, nBit ) --> nResult
-*/
+ * HB_BitReset( nNumber, nBit ) --> nResult
+ */
 HB_FUNC( HB_BITRESET )
 {
-   PHB_ITEM pAnd1 = hb_param(1, HB_IT_ANY );
-   PHB_ITEM pAnd2 = hb_param(2, HB_IT_ANY );
-   LONG ret1, ret2;
+   PHB_ITEM pAnd1 = hb_param( 1, HB_IT_ANY );
+   PHB_ITEM pAnd2 = hb_param( 2, HB_IT_ANY );
+   LONG     ret1, ret2;
 
-   if ( s_invalid_params( "HB_BITRESET", pAnd1, pAnd2, &ret1, &ret2 ) )
+   if( s_invalid_params( "HB_BITRESET", pAnd1, pAnd2, &ret1, &ret2 ) )
    {
       return;
    }
 
-   if (pAnd1->type ==  HB_IT_LONG )
+   if( pAnd1->type == HB_IT_LONG )
    {
-      hb_retnl( ret1 & (~( 1 << ret2 )));
+      hb_retnl( ret1 & ( ~( 1 << ret2 ) ) );
    }
    else
    {
-      hb_retni( (int) ( ret1 & (~( 1 << ret2 ))));
+      hb_retni( ( int ) ( ret1 & ( ~( 1 << ret2 ) ) ) );
    }
 }
 
 /*******************************
-* HB_BitShift( nNumber, nBit ) --> nResult
-*/
+ * HB_BitShift( nNumber, nBit ) --> nResult
+ */
 HB_FUNC( HB_BITSHIFT )
 {
-   PHB_ITEM pAnd1 = hb_param(1, HB_IT_ANY );
-   PHB_ITEM pAnd2 = hb_param(2, HB_IT_ANY );
-   LONG ret1, ret2;
+   PHB_ITEM pAnd1 = hb_param( 1, HB_IT_ANY );
+   PHB_ITEM pAnd2 = hb_param( 2, HB_IT_ANY );
+   LONG     ret1, ret2;
 
-   if ( s_invalid_params( "HB_BITRESET", pAnd1, pAnd2, &ret1, &ret2 ) )
+   if( s_invalid_params( "HB_BITRESET", pAnd1, pAnd2, &ret1, &ret2 ) )
    {
       return;
    }
 
-   if (pAnd1->type ==  HB_IT_LONG )
+   if( pAnd1->type == HB_IT_LONG )
    {
-      if (ret2 < 0 )
+      if( ret2 < 0 )
       {
-         hb_retnl( ret1 >> (-ret2) );
+         hb_retnl( ret1 >> ( -ret2 ) );
       }
       else
       {
@@ -272,13 +272,13 @@ HB_FUNC( HB_BITSHIFT )
    }
    else
    {
-      if (ret2 < 0 )
+      if( ret2 < 0 )
       {
-         hb_retni( (int) ret1 >> (-ret2) );
+         hb_retni( ( int ) ret1 >> ( -ret2 ) );
       }
       else
       {
-         hb_retni( (int) ret1 << ret2 );
+         hb_retni( ( int ) ret1 << ret2 );
       }
 
    }

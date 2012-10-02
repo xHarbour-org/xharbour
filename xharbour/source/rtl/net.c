@@ -66,33 +66,33 @@
 #include "hbapi.h"
 #include "hbfast.h"
 
-#if defined(HB_OS_OS2) && defined(__GNUC__)
+#if defined( HB_OS_OS2 ) && defined( __GNUC__ )
 
    #include "hb_io.h"
 
-   /* 25/03/2004 - <maurilio.longo@libero.it>
-      not needed anymore as of GCC 3.2.2 */
+/* 25/03/2004 - <maurilio.longo@libero.it>
+   not needed anymore as of GCC 3.2.2 */
 
    #include <pwd.h>
    #include <sys/types.h>
 
-   #if defined(__EMX__) && __GNUC__ * 1000 + __GNUC_MINOR__ < 3002
+   #if defined( __EMX__ ) && __GNUC__ * 1000 + __GNUC_MINOR__ < 3002
       #include <emx/syscalls.h>
-      #define gethostname __gethostname
+      #define gethostname  __gethostname
    #endif
 
-   #define MAXGETHOSTNAME 256      /* should be enough for a host name */
+   #define MAXGETHOSTNAME  256     /* should be enough for a host name */
 
-#elif defined(HB_OS_DOS)
+#elif defined( HB_OS_DOS )
 
-   #if defined(__DJGPP__) || defined(__RSX32__) || defined(__GNUC__)
+   #if defined( __DJGPP__ ) || defined( __RSX32__ ) || defined( __GNUC__ )
       #include "hb_io.h"
       #include <sys/param.h>
    #endif
 
-#elif defined(HB_OS_UNIX)
+#elif defined( HB_OS_UNIX )
 
-   #if !defined(__WATCOMC__)
+   #if ! defined( __WATCOMC__ )
       #include <pwd.h>
       #include <sys/types.h>
    #endif
@@ -103,46 +103,46 @@
 
 void hb_netname( char * pszNetName, BOOL bGetUser )
 {
-#if defined(HB_OS_OS2) || defined(HB_OS_UNIX)
+#if defined( HB_OS_OS2 ) || defined( HB_OS_UNIX )
 
-   #if defined(__WATCOMC__)
-      pszNetName = hb_getenv( "HOSTNAME" );
+   #if defined( __WATCOMC__ )
+   pszNetName        = hb_getenv( "HOSTNAME" );
    #else
-      pszNetName[ 0 ] = '\0';
-      gethostname( pszNetName, MAXGETHOSTNAME );
+   pszNetName[ 0 ]   = '\0';
+   gethostname( pszNetName, MAXGETHOSTNAME );
    #endif
 
-#elif defined(HB_OS_DOS)
+#elif defined( HB_OS_DOS )
 
-   #if defined(__DJGPP__) || defined(__RSX32__) || defined(__GNUC__)
-      pszNetName[ 0 ] = '\0';
-      gethostname( pszNetName, MAXGETHOSTNAME );
-   #elif defined(__WATCOMC__)
-      pszNetName = hb_getenv( "COMPUTERNAME" );
+   #if defined( __DJGPP__ ) || defined( __RSX32__ ) || defined( __GNUC__ )
+   pszNetName[ 0 ]   = '\0';
+   gethostname( pszNetName, MAXGETHOSTNAME );
+   #elif defined( __WATCOMC__ )
+   pszNetName        = hb_getenv( "COMPUTERNAME" );
    #else
+   {
+      char        szValue[ 16 ];
+      union REGS  regs;
+
+      regs.HB_XREGS.ax = 0x5E00;
+
       {
-         char szValue[ 16 ];
-         union REGS regs;
+         struct SREGS sregs;
 
-         regs.HB_XREGS.ax = 0x5E00;
+         regs.HB_XREGS.dx  = FP_OFF( szValue );
+         sregs.ds          = FP_SEG( szValue );
 
-         {
-            struct SREGS sregs;
-
-            regs.HB_XREGS.dx = FP_OFF( szValue );
-            sregs.ds = FP_SEG( szValue );
-
-            HB_DOS_INT86X( 0x21, &regs, &regs, &sregs );
-         }
-
-         if( regs.h.ch == 0 )
-            pszNetName[ 0 ] = '\0';
-         else
-            HB_MEMCPY( pszNetName, szValue, 16 );
+         HB_DOS_INT86X( 0x21, &regs, &regs, &sregs );
       }
+
+      if( regs.h.ch == 0 )
+         pszNetName[ 0 ] = '\0';
+      else
+         HB_MEMCPY( pszNetName, szValue, 16 );
+   }
    #endif
 
-#elif defined(HB_OS_WIN)
+#elif defined( HB_OS_WIN )
    {
       DWORD ulLen = MAX_COMPUTERNAME_LENGTH + 1;
 
@@ -164,7 +164,7 @@ void hb_netname( char * pszNetName, BOOL bGetUser )
          And it will be padded with spaces. Harbour does the same on the
          DOS platform.
          [vszakats] */
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN )
 #define MAXGETHOSTNAME  MAX_COMPUTERNAME_LENGTH
 #endif
 #ifndef MAXGETHOSTNAME

@@ -86,25 +86,25 @@
 
 /* list of background tasks
  * A pointer into an array of pointers to items with a codeblock
-*/
-static HB_ITEM_PTR * s_pIdleTasks = NULL;
+ */
+static HB_ITEM_PTR * s_pIdleTasks            = NULL;
 
 /* flag to prevent recursive calls of hb_idleState() */
-static BOOL s_bIamIdle = FALSE;
+static BOOL          s_bIamIdle              = FALSE;
 
 /* current task to be executed */
-static USHORT s_uiIdleTask = 0;
+static USHORT        s_uiIdleTask            = 0;
 
 /* number of tasks in the list */
-static USHORT s_uiIdleMaxTask = 0;
+static USHORT        s_uiIdleMaxTask         = 0;
 
 /* sleep idle time in milli-seconds */
-static USHORT s_uiIdleSleepMsec = 0;
+static USHORT        s_uiIdleSleepMsec       = 0;
 /* indicates if OS wait state is to be used instead of sleep() type function */
-static int s_iIdleWaitNoCpu = 0;
+static int           s_iIdleWaitNoCpu        = 0;
 
 /* flag to indicate GarbageCollection should be done in idle state. */
-BOOL hb_vm_bCollectGarbage = TRUE;
+BOOL                 hb_vm_bCollectGarbage   = TRUE;
 
 HB_EXTERN_BEGIN
 extern void hb_idle_releaseCPU( USHORT uiIdleSleepMsec, BOOL bIdleWaitNoCpu );
@@ -113,12 +113,12 @@ HB_EXTERN_END
 
 void hb_releaseCPU( BOOL bIndefinite )
 {
-   BOOL bIdleWaitNoCpu = ( s_iIdleWaitNoCpu && bIndefinite && !s_uiIdleMaxTask ) ;   /* Only if No idle tasks */
+   BOOL bIdleWaitNoCpu = ( s_iIdleWaitNoCpu && bIndefinite && ! s_uiIdleMaxTask );   /* Only if No idle tasks */
 
    if( s_uiIdleSleepMsec == 0 )
-       s_uiIdleSleepMsec = hb_idle_msec_default();
+      s_uiIdleSleepMsec = hb_idle_msec_default();
 
-   HB_TRACE(HB_TR_DEBUG, ("releaseCPU()"));
+   HB_TRACE( HB_TR_DEBUG, ( "releaseCPU()" ) );
 
    /* TODO: Add code to release time slices on all platforms */
    hb_idle_releaseCPU( s_uiIdleSleepMsec, bIdleWaitNoCpu );
@@ -136,7 +136,7 @@ void hb_idleState( BOOL bIndefinite )
          hb_vm_bCollectGarbage = FALSE;
          hb_gcCollectAll( FALSE );
       }
-      else if ( s_uiIdleTask < s_uiIdleMaxTask )
+      else if( s_uiIdleTask < s_uiIdleMaxTask )
       {
          hb_itemRelease( hb_itemDo( s_pIdleTasks[ s_uiIdleTask ], 0 ) );
          ++s_uiIdleTask;
@@ -146,8 +146,8 @@ void hb_idleState( BOOL bIndefinite )
          if( s_uiIdleMaxTask && hb_setGetIdleRepeat() &&
              s_uiIdleTask == s_uiIdleMaxTask )
          {
-            s_uiIdleTask = 0;
-            hb_vm_bCollectGarbage = TRUE;
+            s_uiIdleTask            = 0;
+            hb_vm_bCollectGarbage   = TRUE;
          }
          hb_releaseCPU( bIndefinite );
       }
@@ -159,8 +159,8 @@ void hb_idleReset( void )
 {
    if( s_uiIdleTask == s_uiIdleMaxTask )
    {
-      s_uiIdleTask = 0;
-      hb_vm_bCollectGarbage = TRUE;
+      s_uiIdleTask            = 0;
+      hb_vm_bCollectGarbage   = TRUE;
    }
 }
 
@@ -214,13 +214,13 @@ HB_FUNC( HB_IDLESLEEP )
 
 void * hb_idleAddFunc( PHB_ITEM pBlock )
 {
-   if( !HB_IS_BLOCK( pBlock ) && !HB_IS_ARRAY( pBlock ) )
+   if( ! HB_IS_BLOCK( pBlock ) && ! HB_IS_ARRAY( pBlock ) )
    {
       return NULL;
    }
 
    ++s_uiIdleMaxTask;
-   if( !s_pIdleTasks )
+   if( ! s_pIdleTasks )
    {
       s_pIdleTasks = ( HB_ITEM_PTR * ) hb_xgrab( sizeof( HB_ITEM_PTR ) );
    }
@@ -229,12 +229,12 @@ void * hb_idleAddFunc( PHB_ITEM pBlock )
       s_pIdleTasks = ( HB_ITEM_PTR * ) hb_xrealloc( s_pIdleTasks, sizeof( HB_ITEM_PTR ) * s_uiIdleMaxTask );
    }
    /* store a copy of passed codeblock
-   */
+    */
    s_pIdleTasks[ s_uiIdleMaxTask - 1 ] = hb_itemNew( pBlock );
 
    /* return a pointer as a handle to this idle task
-   */
-   if ( HB_IS_ARRAY( pBlock ) )
+    */
+   if( HB_IS_ARRAY( pBlock ) )
    {
       return ( void * ) pBlock->item.asArray.value;    /* TODO: access to pointers from harbour code */
    }
@@ -259,7 +259,7 @@ HB_FUNC( HB_IDLEADD )
 
 PHB_ITEM hb_idleDelFunc( void * pID )
 {
-   SHORT iTask;
+   SHORT    iTask;
    PHB_ITEM pItem = NULL;
 
    iTask = 0;
@@ -271,16 +271,15 @@ PHB_ITEM hb_idleDelFunc( void * pID )
             pID == ( void * ) pItem->item.asBlock.value ) ||
           ( pItem->type == HB_IT_ARRAY &&
             pID == ( void * ) pItem->item.asArray.value ) )
-
       {
          --s_uiIdleMaxTask;
-         hb_itemRelease( pItem ) ;  // 23/02/2004 1:58p.m. Peter Rees: added line to fix memory leak
+         hb_itemRelease( pItem );   // 23/02/2004 1:58p.m. Peter Rees: added line to fix memory leak
          if( s_uiIdleMaxTask )
          {
             if( iTask != s_uiIdleMaxTask )
             {
                HB_MEMCPY( &s_pIdleTasks[ iTask ], &s_pIdleTasks[ iTask + 1 ],
-                        sizeof( HB_ITEM_PTR ) * ( s_uiIdleMaxTask - iTask ) );
+                          sizeof( HB_ITEM_PTR ) * ( s_uiIdleMaxTask - iTask ) );
             }
             s_pIdleTasks = ( HB_ITEM_PTR * ) hb_xrealloc( s_pIdleTasks, sizeof( HB_ITEM_PTR ) * s_uiIdleMaxTask );
          }
@@ -309,7 +308,7 @@ HB_FUNC( HB_IDLEDEL )
    {
       void * pID = hb_parptr( 1 );   /* TODO: access to pointers from harbour code */
 
-      if ( pID )
+      if( pID )
       {
          pItem = hb_idleDelFunc( pID );
       }
@@ -328,10 +327,10 @@ HB_FUNC( HB_IDLEDEL )
 HB_FUNC( HB_IDLESLEEPMSEC )
 {
    if( s_uiIdleSleepMsec == 0 )
-       s_uiIdleSleepMsec = hb_idle_msec_default();
+      s_uiIdleSleepMsec = hb_idle_msec_default();
 
    hb_retnl( s_uiIdleSleepMsec );
-   if ( hb_pcount() > 0 )
+   if( hb_pcount() > 0 )
    {
       s_uiIdleSleepMsec = ( USHORT ) hb_parnl( 1 );
    }
@@ -340,7 +339,7 @@ HB_FUNC( HB_IDLESLEEPMSEC )
 HB_FUNC( HB_IDLEWAITNOCPU )
 {
    hb_retnl( ( LONG ) s_iIdleWaitNoCpu );
-   if ( hb_pcount() > 0 )
+   if( hb_pcount() > 0 )
    {
       s_iIdleWaitNoCpu = ( int ) hb_parnl( 1 );
    }

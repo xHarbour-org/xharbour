@@ -49,6 +49,7 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
 //-------------------------------------------------------------------//
 
 #include "hbclass.ch"
@@ -59,71 +60,70 @@
 
 CLASS TBColumn
 
-
    ACCESS Block      INLINE ::bBlock
-   ASSIGN Block(b)   INLINE ::bBlock := ::SetValue(b,@::bBlock,"B")
+   ASSIGN Block( b )   INLINE ::bBlock := ::SetValue( b, @::bBlock, "B" )
 
    ACCESS Cargo      INLINE ::xCargo
-   ASSIGN Cargo(x)   INLINE ::xCargo := iif(!hb_IsNil(x),x,::xCargo)
+   ASSIGN Cargo( x )   INLINE ::xCargo := iif( !HB_ISNIL( x ), x, ::xCargo )
 
    ACCESS ColorBlock      INLINE ::bColorBlock
-   ASSIGN ColorBlock(b)   INLINE ::SetValue(b,@::bColorBlock,"B")
+   ASSIGN ColorBlock( b )   INLINE ::SetValue( b, @::bColorBlock, "B" )
 
    ACCESS ColSep      INLINE ::cColSep
-   ASSIGN ColSep(c)   INLINE ::SetValue(c,@::cColSep,"C")
+   ASSIGN ColSep( c )   INLINE ::SetValue( c, @::cColSep, "C" )
 
    ACCESS DefColor      INLINE ::aDefColor
-   ASSIGN DefColor(a)   INLINE ::aDefColor := ::SetDefColor(a)
+   ASSIGN DefColor( a )   INLINE ::aDefColor := ::SetDefColor( a )
 
    ACCESS Footing      INLINE ::cFooting
-   ASSIGN Footing(c)   INLINE ::SetValue(c,@::cFooting,"C")
+   ASSIGN Footing( c )   INLINE ::SetValue( c, @::cFooting, "C" )
 
    ACCESS FootSep      INLINE ::cFootSep
-   ASSIGN FootSep(c)   INLINE ::SetValue(c,@::cFootSep,"C")
+   ASSIGN FootSep( c )   INLINE ::SetValue( c, @::cFootSep, "C" )
 
    ACCESS Heading      INLINE ::cHeading
-   ASSIGN Heading(c)   INLINE ::SetValue(c,@::cHeading,"C")
+   ASSIGN Heading( c )   INLINE ::SetValue( c, @::cHeading, "C" )
 
    ACCESS HeadSep      INLINE ::cHeadSep
-   ASSIGN HeadSep(c)   INLINE ::SetValue(c,@::cHeadSep,"C")
+   ASSIGN HeadSep( c )   INLINE ::SetValue( c, @::cHeadSep, "C" )
 
-   ACCESS Picture      INLINE ::cPicture
-   ASSIGN Picture(c)   INLINE ::SetValue(c,@::cPicture,"C")
+   ACCESS PICTURE      INLINE ::cPicture
+   ASSIGN Picture( c )   INLINE ::SetValue( c, @::cPicture, "C" )
 
    ACCESS Width      INLINE ::nWidth
-   ASSIGN Width(n)   INLINE ::nWidth := ::SetValue(n,@::nWidth,"N")
+   ASSIGN Width( n )   INLINE ::nWidth := ::SetValue( n, @::nWidth, "N" )
 
 
-   METHOD  New(cHeading, bBlock)
+   METHOD  New( cHeading, bBlock )
 
-   #ifdef HB_COMPAT_C53
+#ifdef HB_COMPAT_C53
    ACCESS PreBlock      INLINE ::bPreBlock
-   ASSIGN PreBlock(b)   INLINE ::SetValue(b,@::bPreBlock,"B")
+   ASSIGN PreBlock( b )   INLINE ::SetValue( b, @::bPreBlock, "B" )
 
    ACCESS PostBlock      INLINE ::bPostBlock
-   ASSIGN PostBlock(b)   INLINE ::SetValue(b,@::bPostBlock,"B")
-   #endif
+   ASSIGN PostBlock( b )   INLINE ::SetValue( b, @::bPostBlock, "B" )
+#endif
 
 
-   METHOD  Block(b)         INLINE ::SetValue(b,@::bBlock,"B")
-   METHOD  Cargo(x)         INLINE ::xCargo := iif(!hb_IsNil(x),x,::xCargo)
-   METHOD  ColorBlock(b)    INLINE ::SetValue(b,@::bColorBlock,"B")
-   METHOD  ColSep(c)        INLINE ::SetValue(c,@::cColSep,"C")
-   METHOD  DefColor(a)      INLINE ::aDefColor := ::SetDefColor(a)
-   METHOD  Footing(c)       INLINE ::SetValue(c,@::cFooting,"C")
-   METHOD  FootSep(c)       INLINE ::SetValue(c,@::cFootSep,"C")
-   METHOD  Heading(c)       INLINE ::SetValue(c,@::cHeading,"C")
-   METHOD  HeadSep(c)       INLINE ::SetValue(c,@::cHeadSep,"C")
-   METHOD  Picture(c)       INLINE ::SetValue(c,@::cPicture,"C")
-   METHOD  Width(n)         INLINE ::SetValue(n,@::nWidth,"N")
+   METHOD  Block( b )         INLINE ::SetValue( b, @::bBlock, "B" )
+   METHOD  Cargo( x )         INLINE ::xCargo := iif( !HB_ISNIL( x ), x, ::xCargo )
+   METHOD  ColorBlock( b )    INLINE ::SetValue( b, @::bColorBlock, "B" )
+   METHOD  ColSep( c )        INLINE ::SetValue( c, @::cColSep, "C" )
+   METHOD  DefColor( a )      INLINE ::aDefColor := ::SetDefColor( a )
+   METHOD  Footing( c )       INLINE ::SetValue( c, @::cFooting, "C" )
+   METHOD  FootSep( c )       INLINE ::SetValue( c, @::cFootSep, "C" )
+   METHOD  Heading( c )       INLINE ::SetValue( c, @::cHeading, "C" )
+   METHOD  HeadSep( c )       INLINE ::SetValue( c, @::cHeadSep, "C" )
+   METHOD  Picture( c )       INLINE ::SetValue( c, @::cPicture, "C" )
+   METHOD  Width( n )         INLINE ::SetValue( n, @::nWidth, "N" )
 
 
-   #ifdef HB_COMPAT_C53
-   METHOD PreBlock(b)      INLINE ::SetValue(b,@::bPreBlock,"B")
-   METHOD PostBlock(b)     INLINE ::SetValue(b,@::bPostBlock,"B")
+#ifdef HB_COMPAT_C53
+   METHOD PreBlock( b )      INLINE ::SetValue( b, @::bPreBlock, "B" )
+   METHOD PostBlock( b )     INLINE ::SetValue( b, @::bPostBlock, "B" )
    METHOD SetStyle( nMode, lSetting )
    METHOD AddStyle( nMode, lSetting )
-   #endif
+#endif
 
    PROTECTED:     /* P R O T E C T E D */
 
@@ -131,11 +131,11 @@ CLASS TBColumn
    DATA   xCargo                         // User-definable variable
    DATA   bColorBlock   INIT {|| NIL }   // Code block that determines color of data items
    DATA   cColSep                        // Column separator character
-   #ifdef HB_COMPAT_C53
-   DATA   aDefColor     INIT {1,2,1,1}   // Array of numeric indexes into the color table
-   #else
-   DATA   aDefColor     INIT {1,2}
-   #endif
+#ifdef HB_COMPAT_C53
+   DATA   aDefColor     INIT { 1, 2, 1, 1 }   // Array of numeric indexes into the color table
+#else
+   DATA   aDefColor     INIT { 1, 2 }
+#endif
    DATA   cFooting                       // Column footing character
    DATA   cFootSep                       // Footing separator character
    DATA   cHeading                       // Column heading character
@@ -143,19 +143,19 @@ CLASS TBColumn
    DATA   cPicture                       // Column picture string
    DATA   nWidth                         // Column diplay width
 
-   #ifdef HB_COMPAT_C53
+#ifdef HB_COMPAT_C53
    DATA   bPreBlock
    DATA   bPostBlock
-   #endif
+#endif
 
    HIDDEN:     /* H I D D E N */
 
-   METHOD   SetDefColor(a)
-   METHOD   SetValue(uValue,uData,cType)
+   METHOD   SetDefColor( a )
+   METHOD   SetValue( uValue, uData, cType )
 
-   #ifdef HB_COMPAT_C53
+#ifdef HB_COMPAT_C53
    DATA     aSetStyle
-   #endif
+#endif
 
 ENDCLASS
 
@@ -165,117 +165,128 @@ METHOD New( cHeading, bBlock ) CLASS TBColumn
 
    DEFAULT cHeading TO ""
 
-   #ifdef HB_COMPAT_C53
+#ifdef HB_COMPAT_C53
    ::DefColor := { 1, 2, 1, 1 }
-   #else
+#else
    ::DefColor := { 1, 2 }
-   #endif
+#endif
    ::ColSep   := nil
 
    ::nWidth   := nil
-   ::Heading  := if( valtype( cHeading ) == 'C', cHeading, ' ' )
+   ::Heading  := if( ValType( cHeading ) == 'C', cHeading, ' ' )
 
    /* NOTE: needs to be initialized to an empty string or TBrowse()::WriteMLineText() does not work
             if there are columns which have a footing and others which don't
    */
    ::Footing  := ""
 //   ::block    := bBlock
-   if HB_Isblock( bBlock )
-     ::block := bBlock
-   else
-     ::block := {|| NIL }
-   endif
+   IF HB_ISBLOCK( bBlock )
+      ::block := bBlock
+   ELSE
+      ::block := {|| NIL }
+   ENDIF
 
-   #ifdef HB_COMPAT_C53
-   ::aSetStyle := ARRAY( 4 )
+#ifdef HB_COMPAT_C53
+   ::aSetStyle := Array( 4 )
 
-   ::aSetStyle[ TBC_READWRITE ] := .f.
-   ::aSetStyle[ TBC_MOVE ]      := .f.
-   ::aSetStyle[ TBC_SIZE ]      := .f.
-   ::aSetStyle[ TBC_CUSTOM ]    := .f.
-   #endif
+   ::aSetStyle[ TBC_READWRITE ] := .F.
+   ::aSetStyle[ TBC_MOVE ]      := .F.
+   ::aSetStyle[ TBC_SIZE ]      := .F.
+   ::aSetStyle[ TBC_CUSTOM ]    := .F.
+#endif
 
-return Self
+   RETURN Self
 
 //-------------------------------------------------------------------//
-METHOD SetValue(uValue,uData,cType) CLASS TBColumn
- uData := iif( Valtype( uValue ) == cType, uValue, uData )
-RETURN ( uData )
+
+METHOD SetValue( uValue, uData, cType ) CLASS TBColumn
+
+   uData := iif( ValType( uValue ) == cType, uValue, uData )
+
+   RETURN ( uData )
+
 //-------------------------------------------------------------------//
+
 METHOD SetDefColor( aDef ) CLASS TBColumn
-  LOCAL a
 
-  a := ::aDefColor
+   LOCAL a
 
-  if HB_ISARRAY( aDef )  .and. !Empty( aDef )
-     a := aDef
-     if Len(a) == 1
-        aadd( a, aDef[1])
+   a := ::aDefColor
+
+   IF HB_ISARRAY( aDef )  .AND. !Empty( aDef )
+      a := aDef
+      IF Len( a ) == 1
+         AAdd( a, aDef[1] )
 #ifdef HB_COMPAT_C53
-        aadd( a, aDef[1] )
-        aadd( a, aDef[1] )
-     elseif Len(a) == 2 
-        aadd( a, aDef[1] )
-        aadd( a, aDef[2] )
-     elseif Len(a) == 3
-        aadd( a, aDef[1] )
+         AAdd( a, aDef[1] )
+         AAdd( a, aDef[1] )
+      ELSEIF Len( a ) == 2
+         AAdd( a, aDef[1] )
+         AAdd( a, aDef[2] )
+      ELSEIF Len( a ) == 3
+         AAdd( a, aDef[1] )
 #endif
-     endif
+      ENDIF
 
 #ifdef HB_COMPAT_C53
-     if len(a) > 4
-        ASize(a,4)
-     endif
+      IF Len( a ) > 4
+         ASize( a, 4 )
+      ENDIF
 #else
-     if len(a) > 2
-        ASize(a,2)
-     endif
+      IF Len( a ) > 2
+         ASize( a, 2 )
+      ENDIF
 #endif
-  endif
+   ENDIF
 
-RETURN a
+   RETURN a
+
 //-------------------------------------------------------------------//
 
 #ifdef HB_COMPAT_C53
+
 METHOD SetStyle( nMode, lSetting ) CLASS TBColumn
-  LOCAL lRet := .F.
 
-  IF nMode > LEN( ::aSetStyle )
-     RETURN .F.
-  ENDIF
+   LOCAL lRet := .F.
 
-  lRet := ::aSetStyle[ nMode ]
+   IF nMode > Len( ::aSetStyle )
+      RETURN .F.
+   ENDIF
 
-  IF ISLOGICAL( lSetting )
-     ::aSetStyle[ nMode ] := lSetting
-  ENDIF
+   lRet := ::aSetStyle[ nMode ]
 
-RETURN lRet
+   IF ISLOGICAL( lSetting )
+      ::aSetStyle[ nMode ] := lSetting
+   ENDIF
+
+   RETURN lRet
 
 //-------------------------------------------------------------------//
 
 METHOD AddStyle( nMode, lSetting ) CLASS TBColumn
-LOCAL lRet := .F.
-LOCAL nLen := LEN( ::aSetStyle )
 
-   IF nMode != nLen+1
+   LOCAL lRet := .F.
+   LOCAL nLen := Len( ::aSetStyle )
+
+   IF nMode != nLen + 1
       RETURN .F.
    ENDIF
 
    IF ISLOGICAL( lSetting )
-      AADD( ::aSetStyle, lSetting )
+      AAdd( ::aSetStyle, lSetting )
    ENDIF
 
-   lRet := ( Len(::aSetStyle) == nLen + 1 )
+   lRet := ( Len( ::aSetStyle ) == nLen + 1 )
 
-Return lRet
+   RETURN lRet
+
 #endif
 
 //-------------------------------------------------------------------//
 
-function TBColumnNew(cHeading, bBlock)
+FUNCTION TBColumnNew( cHeading, bBlock )
 
-return TBColumn():New(cHeading, bBlock)
+   RETURN TBColumn():New( cHeading, bBlock )
 
 //-------------------------------------------------------------------//
 

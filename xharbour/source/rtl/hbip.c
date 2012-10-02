@@ -76,15 +76,15 @@
 #endif
 
 #if defined( HB_OS_WIN )
-   #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
-   #define HB_SOCKET_T SOCKET
+   #define _WINSOCKAPI_    /* Prevents inclusion of Winsock.h in Windows.h */
+   #define HB_SOCKET_T     SOCKET
    #include <winsock2.h>
    #include <windows.h>
 
-   #define HB_IP_CLOSE( x )    closesocket( x )
+   #define HB_IP_CLOSE( x ) closesocket( x )
 #else
 
-   #define HB_SOCKET_T int
+   #define HB_SOCKET_T     int
    #include <unistd.h>
    #include <sys/types.h>
    #include <sys/socket.h>
@@ -92,35 +92,35 @@
    #include <netinet/in.h>
    #include <arpa/inet.h>
 
-   #if defined(__WATCOMC__)
+   #if defined( __WATCOMC__ )
       #define h_errno errno
    #else
-      extern int h_errno;
+extern int h_errno;
    #endif
-   #define HB_IP_CLOSE( x )    close( x )
+   #define HB_IP_CLOSE( x ) close( x )
    #include <errno.h>
 #endif
 
 #define HB_SOCKET_ZERO_ERROR()   \
-            do { errorCode = 0; errorDesc = ""; } while( 0 )
+   do { errorCode = 0; errorDesc = ""; } while( 0 )
 
 #if defined( HB_OS_WIN )
     #define HB_SOCKET_SET_ERROR()   \
-            do { \
-               errorCode = WSAGetLastError(); \
-               errorDesc = hb_strerror( errorCode );\
-               WSASetLastError( 0 ); \
-            } while( 0 )
+   do { \
+      errorCode   = WSAGetLastError(); \
+      errorDesc   = hb_strerror( errorCode ); \
+      WSASetLastError( 0 ); \
+   } while( 0 )
 
 #else
     #define HB_SOCKET_SET_ERROR()      \
-            do { errorCode = errno; errorDesc = hb_strerror( errno ); } while( 0 )
+   do { errorCode = errno; errorDesc = hb_strerror( errno ); } while( 0 )
 #endif
 
 #define HB_SOCKET_SET_ERROR1( code )   \
-            do { errorCode = code; errorDesc = hb_strerror( code ); } while( 0 )
+   do { errorCode = code; errorDesc = hb_strerror( code ); } while( 0 )
 #define HB_SOCKET_SET_ERROR2( code, desc )   \
-            do { errorCode = code; errorDesc = desc; } while( 0 )
+   do { errorCode = code; errorDesc = desc; } while( 0 )
 
 #ifndef MSG_NOSIGNAL
    #define MSG_NOSIGNAL 0
@@ -132,18 +132,18 @@
    #define MSG_WAITALL  0
 #endif
 
-#if !defined( HB_OS_WIN_CE )
+#if ! defined( HB_OS_WIN_CE )
    #include <fcntl.h>
    #include <errno.h>
 #endif
 
-#if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE ) || defined( HB_OS_BSD ) || defined(HB_OS_OS2)
+#if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE ) || defined( HB_OS_BSD ) || defined( HB_OS_OS2 )
    #include <sys/time.h>
 #endif
 
 #ifdef HB_OS_LINUX
 #include <signal.h>
-#define HB_IP_LINUX_INTERRUPT     SIGUSR1+90
+#define HB_IP_LINUX_INTERRUPT SIGUSR1 + 90
 static void hb_ipLinuxSigusrHandle( int sig )
 {
    /* nothing to do */
@@ -151,19 +151,19 @@ static void hb_ipLinuxSigusrHandle( int sig )
 }
 #endif
 
-#if defined(_MSC_VER)
-   #define SOCKOPT4  char*
+#if defined( _MSC_VER )
+   #define SOCKOPT4  char *
 #else
-   #define SOCKOPT4  void*
+   #define SOCKOPT4  void *
 #endif
 
-#define BUFFER_SIZE 65536 //8192
+#define BUFFER_SIZE  65536 //8192
 
-static volatile int s_iSessions = 0;
-static char *errorDesc;
-static int errorCode;
-static fd_set rd_fds, active_fds;
-static unsigned int rd_maxfd;
+static volatile int  s_iSessions = 0;
+static char *        errorDesc;
+static int           errorCode;
+static fd_set        rd_fds, active_fds;
+static unsigned int  rd_maxfd;
 
 int hb_iperrorcode( void )
 {
@@ -178,11 +178,11 @@ void hb_ipInit( void )
    }
    else
    {
-      #if defined(HB_OS_WIN)
-         WSADATA wsadata;
-         WSAStartup( MAKEWORD(1,1), &wsadata );
+      #if defined( HB_OS_WIN )
+      WSADATA wsadata;
+      WSAStartup( MAKEWORD( 1, 1 ), &wsadata );
       #elif defined( HB_OS_LINUX )
-         signal( HB_IP_LINUX_INTERRUPT, hb_ipLinuxSigusrHandle );
+      signal( HB_IP_LINUX_INTERRUPT, hb_ipLinuxSigusrHandle );
       #endif
       s_iSessions = 1;
    }
@@ -192,46 +192,46 @@ void hb_ipCleanup( void )
 {
    if( --s_iSessions == 0 )
    {
-      #if defined(HB_OS_WIN)
-         WSACleanup();
+      #if defined( HB_OS_WIN )
+      WSACleanup();
       #endif
    }
 }
 
 void hb_ipSetBufSize( HB_SOCKET_T hSocket, int iBufSend, int iBufRecv )
 {
-   int value;
-   int len = sizeof( value );
+   int   value;
+   int   len = sizeof( value );
 
-   if( iBufSend && !getsockopt( (unsigned) hSocket, (int) SOL_SOCKET, (int) SO_SNDBUF, (char*) (SOCKOPT4) &value, (int*) &len ) )
+   if( iBufSend && ! getsockopt( ( unsigned ) hSocket, ( int ) SOL_SOCKET, ( int ) SO_SNDBUF, ( char * ) ( SOCKOPT4 ) &value, ( int * ) &len ) )
    {
-       if( value < iBufSend )
-       {
-           value = iBufSend;
-           setsockopt( (unsigned) hSocket, (int) SOL_SOCKET, (int) SO_SNDBUF, (char const *) (SOCKOPT4) &value, (int) sizeof( value ) );
-       }
+      if( value < iBufSend )
+      {
+         value = iBufSend;
+         setsockopt( ( unsigned ) hSocket, ( int ) SOL_SOCKET, ( int ) SO_SNDBUF, ( char const * ) ( SOCKOPT4 ) &value, ( int ) sizeof( value ) );
+      }
    }
 
-   if( iBufRecv && !getsockopt( (unsigned) hSocket, (int) SOL_SOCKET, (int) SO_RCVBUF, (char*) (SOCKOPT4) &value, (int*) &len ) )
+   if( iBufRecv && ! getsockopt( ( unsigned ) hSocket, ( int ) SOL_SOCKET, ( int ) SO_RCVBUF, ( char * ) ( SOCKOPT4 ) &value, ( int * ) &len ) )
    {
-       if( value < iBufRecv )
-       {
-           value = iBufRecv;
-           setsockopt( (unsigned) hSocket, (int) SOL_SOCKET, (int) SO_RCVBUF, (char const *) (SOCKOPT4) &value, (int) sizeof( value ) );
-       }
+      if( value < iBufRecv )
+      {
+         value = iBufRecv;
+         setsockopt( ( unsigned ) hSocket, ( int ) SOL_SOCKET, ( int ) SO_RCVBUF, ( char const * ) ( SOCKOPT4 ) &value, ( int ) sizeof( value ) );
+      }
    }
-   getsockopt( (unsigned) hSocket, (int) SOL_SOCKET, (int) SO_RCVBUF, (char*) (SOCKOPT4) &value, (int*) len );
+   getsockopt( ( unsigned ) hSocket, ( int ) SOL_SOCKET, ( int ) SO_RCVBUF, ( char * ) ( SOCKOPT4 ) &value, ( int * ) len );
 }
 
 int hb_ipDataReady( HB_SOCKET_T hSocket, int timeout )
 {
-   fd_set set;
+   fd_set         set;
    struct timeval tv;
 
    HB_SOCKET_ZERO_ERROR();
 
    FD_ZERO( &set );
-   FD_SET( hSocket, &set);
+   FD_SET( hSocket, &set );
 
    if( timeout == -1 )
    {
@@ -243,8 +243,8 @@ int hb_ipDataReady( HB_SOCKET_T hSocket, int timeout )
    }
    else
    {
-      tv.tv_sec = timeout/ 1000;
-      tv.tv_usec = (timeout % 1000) * 1000;
+      tv.tv_sec   = timeout / 1000;
+      tv.tv_usec  = ( timeout % 1000 ) * 1000;
       if( select( ( int ) hSocket + 1, &set, NULL, NULL, &tv ) < 0 )
       {
          HB_SOCKET_SET_ERROR();
@@ -257,7 +257,7 @@ int hb_ipDataReady( HB_SOCKET_T hSocket, int timeout )
 
 static int hb_selectWriteSocket( HB_SOCKET_T hSocket, int timeout )
 {
-   fd_set set;
+   fd_set         set;
    struct timeval tv;
 
    FD_ZERO( &set );
@@ -270,8 +270,8 @@ static int hb_selectWriteSocket( HB_SOCKET_T hSocket, int timeout )
    }
    else
    {
-      tv.tv_sec = timeout / 1000;
-      tv.tv_usec = (timeout % 1000) * 1000;
+      tv.tv_sec   = timeout / 1000;
+      tv.tv_usec  = ( timeout % 1000 ) * 1000;
       if( select( ( int ) hSocket + 1, NULL, &set, NULL, &tv ) < 0 )
          return 0;
    }
@@ -279,10 +279,10 @@ static int hb_selectWriteSocket( HB_SOCKET_T hSocket, int timeout )
    return FD_ISSET( hSocket, &set );
 }
 
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN )
 static int hb_selectWriteExceptSocket( HB_SOCKET_T hSocket, int timeout )
 {
-   fd_set set, eset;
+   fd_set         set, eset;
    struct timeval tv;
 
    FD_ZERO( &set );
@@ -297,13 +297,13 @@ static int hb_selectWriteExceptSocket( HB_SOCKET_T hSocket, int timeout )
    }
    else
    {
-      tv.tv_sec = timeout/ 1000;
-      tv.tv_usec = (timeout % 1000) * 1000;
-      if( select( ( int ) hSocket + 1, NULL, &set, &eset, &tv) < 0 )
+      tv.tv_sec   = timeout / 1000;
+      tv.tv_usec  = ( timeout % 1000 ) * 1000;
+      if( select( ( int ) hSocket + 1, NULL, &set, &eset, &tv ) < 0 )
          return 2;
    }
 
-   if( FD_ISSET( hSocket, &eset) )
+   if( FD_ISSET( hSocket, &eset ) )
    {
       return 2;
    }
@@ -322,19 +322,19 @@ static ULONG hb_getAddr( const char * name )
 
    if( ulAddr == INADDR_NONE )
    {
-      struct hostent *Host = gethostbyname( name );
+      struct hostent * Host = gethostbyname( name );
 
       if( Host )
-         return (*(UINT *)Host->h_addr_list[0]);
+         return *( UINT * ) Host->h_addr_list[ 0 ];
       else
       {
-#if defined(HB_OS_WIN)
-         HB_SOCKET_SET_ERROR2( WSAGetLastError() , "Generic error in GetHostByName()" );
+#if defined( HB_OS_WIN )
+         HB_SOCKET_SET_ERROR2( WSAGetLastError(), "Generic error in GetHostByName()" );
          WSASetLastError( 0 );
-#elif defined(HB_OS_OS2) || defined(HB_OS_HPUX) || defined(__WATCOMC__)
+#elif defined( HB_OS_OS2 ) || defined( HB_OS_HPUX ) || defined( __WATCOMC__ )
          HB_SOCKET_SET_ERROR2( h_errno, "Generic error in GetHostByName()" );
 #else
-         HB_SOCKET_SET_ERROR2( h_errno, (char *) hstrerror( h_errno ) );
+         HB_SOCKET_SET_ERROR2( h_errno, ( char * ) hstrerror( h_errno ) );
 #endif
          return INADDR_NONE;
       }
@@ -355,7 +355,7 @@ static void hb_socketSetNonBlocking( HB_SOCKET_T hSocket )
    if( flags != -1 )
    {
       flags |= O_NONBLOCK;
-      fcntl( hSocket, F_SETFL, (LONG) flags );
+      fcntl( hSocket, F_SETFL, ( LONG ) flags );
    }
 #endif
 }
@@ -363,10 +363,10 @@ static void hb_socketSetNonBlocking( HB_SOCKET_T hSocket )
 static void hb_socketSetBlocking( HB_SOCKET_T hSocket )
 {
 #ifdef HB_OS_WIN
-   ULONG mode = 0;
+   ULONG mode  = 0;
    ioctlsocket( hSocket, FIONBIO, &mode );
 #else
-   int flags = fcntl( hSocket, F_GETFL, 0 );
+   int   flags = fcntl( hSocket, F_GETFL, 0 );
    if( flags != -1 )
    {
       flags &= ~O_NONBLOCK;
@@ -375,24 +375,25 @@ static void hb_socketSetBlocking( HB_SOCKET_T hSocket )
 #endif
 }
 
-int hb_socketConnect_( HB_SOCKET_T hSocket, struct sockaddr_in *remote, int timeout )
+int hb_socketConnect_( HB_SOCKET_T hSocket, struct sockaddr_in * remote, int timeout )
 {
-   int iErr1;
-   #if ! defined(HB_OS_WIN)
-      int iErrval;
-      socklen_t iErrvalLen;
-   #endif
-   int iOpt = 1;
+   int         iErr1;
 
-   setsockopt( hSocket, SOL_SOCKET, SO_KEEPALIVE, (const char *) &iOpt , sizeof( iOpt ));
+   #if ! defined( HB_OS_WIN )
+   int         iErrval;
+   socklen_t   iErrvalLen;
+   #endif
+   int         iOpt = 1;
+
+   setsockopt( hSocket, SOL_SOCKET, SO_KEEPALIVE, ( const char * ) &iOpt, sizeof( iOpt ) );
 
    /* we'll be using a nonblocking function */
    hb_socketSetNonBlocking( hSocket );
 
-   iErr1 = connect( hSocket, (struct sockaddr *) remote, sizeof(*remote) );
+   iErr1 = connect( hSocket, ( struct sockaddr * ) remote, sizeof( *remote ) );
    if( iErr1 != 0 )
    {
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN )
       if( WSAGetLastError() != WSAEWOULDBLOCK )
 #else
       if( errno != EINPROGRESS )
@@ -403,8 +404,8 @@ int hb_socketConnect_( HB_SOCKET_T hSocket, struct sockaddr_in *remote, int time
       else
       {
          /* Now we wait for socket connection or timeout */
-#if defined(HB_OS_WIN)
-         iErr1 = hb_selectWriteExceptSocket( hSocket,timeout );
+#if defined( HB_OS_WIN )
+         iErr1 = hb_selectWriteExceptSocket( hSocket, timeout );
          if( iErr1 == 2 )
          {
             HB_SOCKET_SET_ERROR2( 2, "Connection failed" );
@@ -414,12 +415,12 @@ int hb_socketConnect_( HB_SOCKET_T hSocket, struct sockaddr_in *remote, int time
             /* success */
          }
 #else
-         if( hb_selectWriteSocket( hSocket,timeout ) )
+         if( hb_selectWriteSocket( hSocket, timeout ) )
          {
             /* Connection has been completed with a failure or a success */
-            iErrvalLen = sizeof( iErrval );
-            iErr1 = getsockopt( hSocket, SOL_SOCKET, SO_ERROR,
-                           (SOCKOPT4) &iErrval, &iErrvalLen );
+            iErrvalLen  = sizeof( iErrval );
+            iErr1       = getsockopt( hSocket, SOL_SOCKET, SO_ERROR,
+                                      ( SOCKOPT4 ) &iErrval, &iErrvalLen );
 
             if( iErr1 )
             {
@@ -442,7 +443,7 @@ int hb_socketConnect_( HB_SOCKET_T hSocket, struct sockaddr_in *remote, int time
 
    hb_socketSetBlocking( hSocket );
 
-   return ( errorCode == 0 );
+   return errorCode == 0;
 }
 
 int hb_ipRecv( HB_SOCKET_T hSocket, char * szBuffer, int iBufferLen )
@@ -462,17 +463,17 @@ int hb_ipRecv( HB_SOCKET_T hSocket, char * szBuffer, int iBufferLen )
       HB_SOCKET_SET_ERROR();
    }
 
-   return iLen ;
+   return iLen;
 }
 
 
-int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout )
+int hb_ipSend( HB_SOCKET_T hSocket, char * szBuffer, int iSend, int timeout )
 {
-   int iSent, iBufferLen;
-   int iBufferMax;
-   int iLen = sizeof( iBufferMax );
+   int   iSent, iBufferLen;
+   int   iBufferMax;
+   int   iLen = sizeof( iBufferMax );
 
-   getsockopt( (unsigned) hSocket, (int) SOL_SOCKET, (int) SO_SNDBUF, (char*) (SOCKOPT4) &iBufferMax, (int*) &iLen );
+   getsockopt( ( unsigned ) hSocket, ( int ) SOL_SOCKET, ( int ) SO_SNDBUF, ( char * ) ( SOCKOPT4 ) &iBufferMax, ( int * ) &iLen );
 
    iSent = iLen = 0;
 
@@ -480,7 +481,7 @@ int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout )
 
    while( iSent < iSend )
    {
-      iBufferLen = ( iBufferMax > iSend - iSent )? iSend - iSent : iBufferMax;
+      iBufferLen = ( iBufferMax > iSend - iSent ) ? iSend - iSent : iBufferMax;
 
       if( hb_selectWriteSocket( hSocket, timeout ) )
          iLen = send( hSocket, szBuffer + iSent, iBufferLen, MSG_NOSIGNAL );
@@ -491,7 +492,7 @@ int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout )
       {
          if( iLen == 0 )
          {
-            HB_SOCKET_SET_ERROR2( -1 , "Timeout" );
+            HB_SOCKET_SET_ERROR2( -1, "Timeout" );
          }
          else
          {
@@ -514,9 +515,9 @@ int hb_ipSend( HB_SOCKET_T hSocket, char *szBuffer, int iSend, int timeout )
 
 HB_SOCKET_T hb_ipConnect( const char * szHost, int iPort, int timeout )
 {
-   HB_SOCKET_T hSocket = -1;
-   ULONG ulAddr;
-   struct sockaddr_in remote;
+   HB_SOCKET_T          hSocket = -1;
+   ULONG                ulAddr;
+   struct sockaddr_in   remote;
 
    HB_SOCKET_ZERO_ERROR();
 
@@ -526,10 +527,10 @@ HB_SOCKET_T hb_ipConnect( const char * szHost, int iPort, int timeout )
    if( ulAddr != INADDR_NONE )
    {
       /* Creates comm socket */
-#if defined(HB_OS_WIN)
-      hSocket = socket( AF_INET, SOCK_STREAM, 0);
+#if defined( HB_OS_WIN )
+      hSocket  = socket( AF_INET, SOCK_STREAM, 0 );
 #else
-      hSocket = socket( PF_INET, SOCK_STREAM, 0);
+      hSocket  = socket( PF_INET, SOCK_STREAM, 0 );
 #endif
 
       if( hSocket == ( HB_SOCKET_T ) -1 )
@@ -538,14 +539,14 @@ HB_SOCKET_T hb_ipConnect( const char * szHost, int iPort, int timeout )
       }
       else
       {
-         remote.sin_family = AF_INET;
-         remote.sin_port= iPort;
-         remote.sin_addr.s_addr = ulAddr;
+         remote.sin_family       = AF_INET;
+         remote.sin_port         = iPort;
+         remote.sin_addr.s_addr  = ulAddr;
 
 
          /* Set internal socket send buffer to 64k,
-         * this should fix the speed problems some users have reported
-         */
+          * this should fix the speed problems some users have reported
+          */
          hb_ipSetBufSize( hSocket, BUFFER_SIZE, BUFFER_SIZE );
 
          if( ! hb_socketConnect_( hSocket, &remote, timeout ) )
@@ -557,17 +558,17 @@ HB_SOCKET_T hb_ipConnect( const char * szHost, int iPort, int timeout )
 
 HB_SOCKET_T hb_ipServer( int iPort, const char * szAddress, int iListen )
 {
-   HB_SOCKET_T hSocket;
-   int iOpt = 1;
-   struct sockaddr_in remote;
+   HB_SOCKET_T          hSocket;
+   int                  iOpt = 1;
+   struct sockaddr_in   remote;
 
    HB_SOCKET_ZERO_ERROR();
 
    /* Creates comm socket */
-#if defined(HB_OS_WIN)
-   hSocket = socket( AF_INET, SOCK_STREAM, 0 );
+#if defined( HB_OS_WIN )
+   hSocket  = socket( AF_INET, SOCK_STREAM, 0 );
 #else
-   hSocket = socket( PF_INET, SOCK_STREAM, 0 );
+   hSocket  = socket( PF_INET, SOCK_STREAM, 0 );
 #endif
 
    if( hSocket == ( HB_SOCKET_T ) -1 )
@@ -576,14 +577,14 @@ HB_SOCKET_T hb_ipServer( int iPort, const char * szAddress, int iListen )
    }
 
    /* Reusable socket; under unix, do not wait it is unused */
-   setsockopt( hSocket, SOL_SOCKET, SO_REUSEADDR, (const char *) &iOpt, sizeof( iOpt ));
+   setsockopt( hSocket, SOL_SOCKET, SO_REUSEADDR, ( const char * ) &iOpt, sizeof( iOpt ) );
 
-   remote.sin_family = AF_INET;
-   remote.sin_port = htons( iPort );
+   remote.sin_family       = AF_INET;
+   remote.sin_port         = htons( iPort );
 
-   remote.sin_addr.s_addr = szAddress ? inet_addr( szAddress ) : INADDR_ANY;
+   remote.sin_addr.s_addr  = szAddress ? inet_addr( szAddress ) : INADDR_ANY;
 
-   if( bind( hSocket, (struct sockaddr *) &remote, sizeof( remote ) ) )
+   if( bind( hSocket, ( struct sockaddr * ) &remote, sizeof( remote ) ) )
    {
       HB_SOCKET_SET_ERROR();
       HB_IP_CLOSE( hSocket );
@@ -603,45 +604,45 @@ HB_SOCKET_T hb_ipServer( int iPort, const char * szAddress, int iListen )
 
 HB_SOCKET_T hb_ipAccept( HB_SOCKET_T hSocket, int timeout, char * szAddr, long int * lPort )
 {
-#if !defined(EAGAIN)
+#if ! defined( EAGAIN )
 #define EAGAIN -1
 #endif
-   HB_SOCKET_T incoming = 0;
-   int iError = EAGAIN;
-   struct sockaddr_in si_remote;
-#if defined(_XOPEN_SOURCE_EXTENDED)
-   socklen_t Len;
-#elif defined(HB_OS_WIN)
-   int Len;
+   HB_SOCKET_T          incoming = 0;
+   int                  iError   = EAGAIN;
+   struct sockaddr_in   si_remote;
+#if defined( _XOPEN_SOURCE_EXTENDED )
+   socklen_t            Len;
+#elif defined( HB_OS_WIN )
+   int                  Len;
 #else
-   unsigned int Len;
+   unsigned int         Len;
 #endif
 
    Len = sizeof( struct sockaddr_in );
 
    /*
-   * Accept can (and should) be asynchronously stopped by closing the
-   * accepting socket. this will make the wait to terminate, and the
-   * calling program will be notified through the status of the
-   * returned socket.
-   */
+    * Accept can (and should) be asynchronously stopped by closing the
+    * accepting socket. this will make the wait to terminate, and the
+    * calling program will be notified through the status of the
+    * returned socket.
+    */
 
    HB_SOCKET_ZERO_ERROR();
 
    /* Connection incoming */
    while( iError == EAGAIN )
    {
-      if( hb_ipDataReady( hSocket,timeout ) )
+      if( hb_ipDataReady( hSocket, timeout ) )
       {
          /* On error (e.g. async connection closed) , com will be -1 and
             errno == 22 (invalid argument ) */
-         incoming = accept( hSocket, (struct sockaddr *) &si_remote, &Len );
+         incoming = accept( hSocket, ( struct sockaddr * ) &si_remote, &Len );
          if( incoming == ( HB_SOCKET_T ) -1 )
          {
-#if defined(HB_OS_WIN)
-            iError = WSAGetLastError();
+#if defined( HB_OS_WIN )
+            iError   = WSAGetLastError();
 #else
-            iError = errno;
+            iError   = errno;
 #endif
          }
          else
@@ -664,16 +665,16 @@ HB_SOCKET_T hb_ipAccept( HB_SOCKET_T hSocket, int timeout, char * szAddr, long i
    }
    else
    {
-      char * ptr = inet_ntoa( si_remote.sin_addr );
-      int iOpt = 1;
-      HB_MEMCPY( szAddr, ptr, strlen(ptr) );
-      szAddr[strlen(ptr)] = '\0';
-      *lPort = ntohs( si_remote.sin_port );
-      setsockopt( incoming, SOL_SOCKET, SO_KEEPALIVE, (const char *) &iOpt , sizeof( iOpt ));
+      char *   ptr   = inet_ntoa( si_remote.sin_addr );
+      int      iOpt  = 1;
+      HB_MEMCPY( szAddr, ptr, strlen( ptr ) );
+      szAddr[ strlen( ptr ) ] = '\0';
+      *lPort                  = ntohs( si_remote.sin_port );
+      setsockopt( incoming, SOL_SOCKET, SO_KEEPALIVE, ( const char * ) &iOpt, sizeof( iOpt ) );
 
       /* Set internal socket send buffer to 64k,
-      * this should fix the speed problems some users have reported
-      */
+       * this should fix the speed problems some users have reported
+       */
       hb_ipSetBufSize( hSocket, BUFFER_SIZE, BUFFER_SIZE );
       return incoming;
    }
@@ -683,56 +684,56 @@ void hb_ipclose( HB_SOCKET_T hSocket )
 {
 
    #if defined( HB_OS_WIN )
-      shutdown( hSocket, SD_BOTH );
-   #elif defined(HB_OS_OS2)
-      shutdown( hSocket, SO_RCV_SHUTDOWN + SO_SND_SHUTDOWN );
-   #elif !defined(__WATCOMC__)
-      shutdown( hSocket, SHUT_RDWR );
+   shutdown( hSocket, SD_BOTH );
+   #elif defined( HB_OS_OS2 )
+   shutdown( hSocket, SO_RCV_SHUTDOWN + SO_SND_SHUTDOWN );
+   #elif ! defined( __WATCOMC__ )
+   shutdown( hSocket, SHUT_RDWR );
    #endif
 
    hb_retni( HB_IP_CLOSE( hSocket ) );
 
    #ifdef HB_OS_LINUX
-      kill( 0, HB_IP_LINUX_INTERRUPT );
+   kill( 0, HB_IP_LINUX_INTERRUPT );
    #endif
 }
 
 HB_FUNC( HB_IPRECV )
 {
-   HB_SOCKET_T hSocket = (HB_SOCKET_T)hb_parnl(1);
-   PHB_ITEM pBuffer = hb_param( 2, HB_IT_STRING );
+   HB_SOCKET_T hSocket  = ( HB_SOCKET_T ) hb_parnl( 1 );
+   PHB_ITEM    pBuffer  = hb_param( 2, HB_IT_STRING );
 
-   if( !hSocket || pBuffer == NULL || !ISBYREF( 2 ) )
+   if( ! hSocket || pBuffer == NULL || ! ISBYREF( 2 ) )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
       return;
    }
 
    pBuffer = hb_itemUnShare( pBuffer );
-   hb_retni( hb_ipRecv( hSocket, hb_itemGetCPtr(pBuffer), (int) hb_itemGetCLen(pBuffer) ) );
+   hb_retni( hb_ipRecv( hSocket, hb_itemGetCPtr( pBuffer ), ( int ) hb_itemGetCLen( pBuffer ) ) );
 }
 
 HB_FUNC( HB_IPSEND )
 {
-   HB_SOCKET_T hSocket = (HB_SOCKET_T)hb_parnl(1);
-   PHB_ITEM pBuffer = hb_param( 2, HB_IT_STRING );
-   int timeout = ( ISNIL(3) )? -1 : hb_parni(3);
+   HB_SOCKET_T hSocket  = ( HB_SOCKET_T ) hb_parnl( 1 );
+   PHB_ITEM    pBuffer  = hb_param( 2, HB_IT_STRING );
+   int         timeout  = ( ISNIL( 3 ) ) ? -1 : hb_parni( 3 );
 
-   if( !hSocket || !pBuffer )
+   if( ! hSocket || ! pBuffer )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
       return;
    }
 
-   hb_retni( hb_ipSend( hSocket, hb_itemGetCPtr(pBuffer), (int) hb_itemGetCLen(pBuffer), timeout ) );
+   hb_retni( hb_ipSend( hSocket, hb_itemGetCPtr( pBuffer ), ( int ) hb_itemGetCLen( pBuffer ), timeout ) );
 }
 
 HB_FUNC( HB_IPSERVER )
 {
-   HB_SOCKET_T hSocket;
-   const char * szAddress;
-   int iPort;
-   int iListen;
+   HB_SOCKET_T    hSocket;
+   const char *   szAddress;
+   int            iPort;
+   int            iListen;
 
    /* Parameter error checking */
    if( ! ISNUM( 1 ) )
@@ -741,11 +742,11 @@ HB_FUNC( HB_IPSERVER )
       return;
    }
 
-   iPort = hb_parni( 1 );
-   szAddress = (ISNIL(2))? NULL :  hb_parc( 2 );
-   iListen = ISNUM( 3 ) ? hb_parni( 3 ) : 10;
+   iPort       = hb_parni( 1 );
+   szAddress   = ( ISNIL( 2 ) ) ? NULL :  hb_parc( 2 );
+   iListen     = ISNUM( 3 ) ? hb_parni( 3 ) : 10;
 
-   hSocket = hb_ipServer( iPort, szAddress, iListen );
+   hSocket     = hb_ipServer( iPort, szAddress, iListen );
    if( hSocket != ( HB_SOCKET_T ) -1 )
       hb_retnl( ( long ) hSocket );
    else
@@ -754,13 +755,13 @@ HB_FUNC( HB_IPSERVER )
 
 HB_FUNC( HB_IPACCEPT )
 {
-   HB_SOCKET_T hSocket = (HB_SOCKET_T)hb_parnl(1);
+   HB_SOCKET_T hSocket  = ( HB_SOCKET_T ) hb_parnl( 1 );
    HB_SOCKET_T incoming;
-   int timeout = ( ISNIL(2) )? -1 : hb_parni(2);
-   long int lPort;
-   char szAddr[18];
+   int         timeout  = ( ISNIL( 2 ) ) ? -1 : hb_parni( 2 );
+   long int    lPort;
+   char        szAddr[ 18 ];
 
-   if( !hSocket )
+   if( ! hSocket )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
       return;
@@ -773,7 +774,7 @@ HB_FUNC( HB_IPACCEPT )
    {
       PHB_ITEM temp, aInfo = hb_itemArrayNew( 3 );
 
-      temp = hb_itemPutNL( NULL, (const LONG) incoming );
+      temp = hb_itemPutNL( NULL, ( const LONG ) incoming );
       hb_itemArrayPut( aInfo, 1, temp );
       hb_itemRelease( temp );
 
@@ -794,28 +795,28 @@ HB_FUNC( HB_IPCONNECT )
 {
    HB_SOCKET_T hSocket;
 
-   if( !ISCHAR( 1 ) || !ISNUM( 2 ) )
+   if( ! ISCHAR( 1 ) || ! ISNUM( 2 ) )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
       return;
    }
 
-   hSocket = hb_ipConnect( hb_parc(1), htons( hb_parni(2) ), ( ISNIL(3) )? -1:hb_parni(3) );
+   hSocket = hb_ipConnect( hb_parc( 1 ), htons( hb_parni( 2 ) ), ( ISNIL( 3 ) ) ? -1 : hb_parni( 3 ) );
 
    hb_retnl( ( long ) hSocket );
 }
 
 HB_FUNC( HB_IPDATAREADY )
 {
-   HB_SOCKET_T hSocket = (HB_SOCKET_T)hb_parnl(1);
+   HB_SOCKET_T hSocket = ( HB_SOCKET_T ) hb_parnl( 1 );
 
-   if( !hSocket || ( hb_pcount() == 2 && ! ISNUM( 2 ) ) )
+   if( ! hSocket || ( hb_pcount() == 2 && ! ISNUM( 2 ) ) )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
       return;
    }
 
-   if( hb_ipDataReady( hSocket, ( ISNIL(2) )? 0 : hb_parni(2) ) )
+   if( hb_ipDataReady( hSocket, ( ISNIL( 2 ) ) ? 0 : hb_parni( 2 ) ) )
       hb_retni( 1 );
    else
       hb_retni( 0 );
@@ -838,9 +839,9 @@ char * hb_ipErrorDesc( void )
 
 HB_FUNC( HB_IPCLOSE )
 {
-   HB_SOCKET_T hSocket = (HB_SOCKET_T)hb_parnl(1);
+   HB_SOCKET_T hSocket = ( HB_SOCKET_T ) hb_parnl( 1 );
 
-   if( !hSocket )
+   if( ! hSocket )
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
    else
       hb_ipclose( hSocket );
@@ -863,18 +864,18 @@ BOOL hb_ip_rfd_isset( HB_SOCKET_T hSocket )
 
 void hb_ip_rfd_set( HB_SOCKET_T hSocket )
 {
-   if( !hSocket )
+   if( ! hSocket )
       return;
 
    HB_SOCKET_ZERO_ERROR();
 
    FD_SET( hSocket, &rd_fds );
-   rd_maxfd = ( rd_maxfd > hSocket ) ? rd_maxfd : (unsigned int) hSocket;
+   rd_maxfd = ( rd_maxfd > hSocket ) ? rd_maxfd : ( unsigned int ) hSocket;
 }
 
 void hb_ip_rfd_clr( HB_SOCKET_T hSocket )
 {
-   if( !hSocket )
+   if( ! hSocket )
       return;
    FD_CLR( hSocket, &rd_fds );
 }
@@ -887,23 +888,24 @@ void hb_ip_rfd_zero( void )
 
 int hb_ip_rfd_select( int iTimeOut )
 {
-   struct timeval tv = {0,0};
+   struct timeval tv = { 0, 0 };
 
    if( iTimeOut != -1 )
    {
-      tv.tv_sec = iTimeOut / 1000;
-      tv.tv_usec = (iTimeOut % 1000) * 1000;
+      tv.tv_sec   = iTimeOut / 1000;
+      tv.tv_usec  = ( iTimeOut % 1000 ) * 1000;
    }
-   active_fds = rd_fds;
+   active_fds  = rd_fds;
 
-   iTimeOut = select( rd_maxfd + 1, &active_fds, NULL, NULL, &tv);
+   iTimeOut    = select( rd_maxfd + 1, &active_fds, NULL, NULL, &tv );
 
    return iTimeOut;
 }
 
 HB_FUNC( HB_IP_RFD_SET )
 {
-   HB_SOCKET_T hSocket = (HB_SOCKET_T)hb_parnl(1);
+   HB_SOCKET_T hSocket = ( HB_SOCKET_T ) hb_parnl( 1 );
+
    hb_ip_rfd_set( hSocket );
 }
 
@@ -914,19 +916,21 @@ HB_FUNC( HB_IP_RFD_ZERO )
 
 HB_FUNC( HB_IP_RFD_CLR )
 {
-   HB_SOCKET_T hSocket = (HB_SOCKET_T)hb_parnl(1);
+   HB_SOCKET_T hSocket = ( HB_SOCKET_T ) hb_parnl( 1 );
+
    hb_ip_rfd_clr( hSocket );
 }
 
 HB_FUNC( HB_IP_RFD_SELECT )
 {
-   int iTimeOut = (ISNIL(1))? -1 : hb_parni(1);
+   int iTimeOut = ( ISNIL( 1 ) ) ? -1 : hb_parni( 1 );
 
    hb_retni( hb_ip_rfd_select( iTimeOut ) );
 }
 
 HB_FUNC( HB_IP_RFD_ISSET )
 {
-   HB_SOCKET_T hSocket = (HB_SOCKET_T)hb_parnl(1);
+   HB_SOCKET_T hSocket = ( HB_SOCKET_T ) hb_parnl( 1 );
+
    hb_retl( FD_ISSET( hSocket, &active_fds ) );
 }

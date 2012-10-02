@@ -61,14 +61,14 @@
 /* converts an ASCII code to a character value */
 HB_FUNC( CHR )
 {
-   if ( hb_param( 1, HB_IT_NUMERIC ) )
+   if( hb_param( 1, HB_IT_NUMERIC ) )
    {
       /* NOTE: CA-Cl*pper's compiler optimizer will be wrong for those
                CHR() cases where the passed parameter is a constant which
                can be divided by 256 but it's not zero, in this case it
                will return an empty string instead of a Chr(0). [vszakats] */
 
-      hb_retclenStatic( ( char * ) hb_szAscii[ (UCHAR) hb_parni( 1 ) ], 1 );
+      hb_retclenStatic( ( char * ) hb_szAscii[ ( UCHAR ) hb_parni( 1 ) ], 1 );
    }
    else
    {
@@ -83,7 +83,7 @@ HB_FUNC( ASC )
 
    if( pText )
    {
-      hb_retni( ( pText->item.asString.length > 0 ) ? ( BYTE ) * pText->item.asString.value : 0 );
+      hb_retni( ( pText->item.asString.length > 0 ) ? ( BYTE ) *pText->item.asString.value : 0 );
    }
    else
       hb_errRT_BASE_SubstR( EG_ARG, 1107, NULL, "ASC", 1, hb_paramError( 1 ) );

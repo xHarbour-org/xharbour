@@ -55,28 +55,30 @@
 /* *********************************************************************** */
 
 /* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_NAME      NUL
+#define HB_GT_NAME NUL
 
 #include "hbgtcore.h"
 
 #if defined( HB_GT_DEFAULT )
-   HB_GT_REQUEST( HB_GT_DEFAULT )
+HB_GT_REQUEST( HB_GT_DEFAULT )
 #elif defined( HB_GT_LIB )
-   HB_GT_REQUEST( HB_GT_LIB )
+HB_GT_REQUEST( HB_GT_LIB )
 #elif defined( HB_OS_LINUX )
-   HB_GT_REQUEST( CRS )
+HB_GT_REQUEST( CRS )
 #elif defined( HB_OS_WIN_CE )
-   HB_GT_REQUEST( WVT )
+HB_GT_REQUEST( WVT )
 #elif defined( HB_OS_WIN )
-   /*HB_GT_REQUEST( WIN )*/
+/*HB_GT_REQUEST( WIN )*/
 #elif defined( HB_OS_DOS )
-   HB_GT_REQUEST( DOS )
+HB_GT_REQUEST( DOS )
 #elif defined( HB_OS_OS2 )
-   HB_GT_REQUEST( OS2 )
+HB_GT_REQUEST( OS2 )
 #elif defined( HB_OS_UNIX )
-   HB_GT_REQUEST( TRM )
+HB_GT_REQUEST( TRM )
 #else
-   HB_GT_REQUEST( STD )
+HB_GT_REQUEST( STD )
 #endif
 
-HB_FUNC( HB_GTSYS ) {}
+HB_FUNC( HB_GTSYS )
+{
+}

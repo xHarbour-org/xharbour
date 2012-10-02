@@ -72,14 +72,14 @@ HB_FUNC( MOD )
 
    if( pNumber && pNumber2 )
    {
-      double dNumber = hb_itemGetND( pNumber );
-      double dBase = hb_parnd( 2 ); /* dBase! Cool! */
+      double   dNumber  = hb_itemGetND( pNumber );
+      double   dBase    = hb_parnd( 2 ); /* dBase! Cool! */
 
       if( dBase )
       {
          double dResult = fmod( dNumber, dBase );
 
-         if ( dResult && ( dNumber > 0 ? dBase < 0 : dBase > 0 ) )
+         if( dResult && ( dNumber > 0 ? dBase < 0 : dBase > 0 ) )
             dResult += dBase;
          hb_retnd( dResult );
       }
@@ -104,8 +104,8 @@ HB_FUNC( MOD )
 }
 
 /*
-FUNCTION MOD( cl_num, cl_base )
+   FUNCTION MOD( cl_num, cl_base )
    LOCAL cl_result := cl_num % cl_base
 
    RETURN iif( cl_base = 0, cl_num, iif( cl_result * cl_base < 0, cl_result + cl_base, cl_result ) )
-*/
+ */

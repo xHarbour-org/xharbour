@@ -64,13 +64,13 @@
 #include "hbapierr.h"
 #include "hbapifs.h"
 
-#if defined(HB_OS_BSD)
+#if defined( HB_OS_BSD )
 #  include <sys/param.h>
 #  include <sys/mount.h>
-#elif defined(HB_OS_SUNOS)
+#elif defined( HB_OS_SUNOS )
 #  include <sys/statvfs.h>
-#elif defined(HB_OS_UNIX)
-#  if defined(__WATCOMC__)
+#elif defined( HB_OS_UNIX )
+#  if defined( __WATCOMC__ )
 #     include <sys/stat.h>
 #  else
 #     include <sys/vfs.h>
@@ -79,17 +79,17 @@
 
 HB_FUNC( DISKSPACE )
 {
-   USHORT uiDrive = ISNUM( 1 ) ? hb_parni( 1 ) : 0;
-   double dSpace = 0.0;
-   BOOL bError = FALSE;
+   USHORT   uiDrive  = ISNUM( 1 ) ? hb_parni( 1 ) : 0;
+   double   dSpace   = 0.0;
+   BOOL     bError   = FALSE;
 
-#if defined(HB_OS_DOS)
+#if defined( HB_OS_DOS )
 
    {
       union REGS regs;
 
-      regs.HB_XREGS.dx = uiDrive;
-      regs.h.ah = 0x36;
+      regs.HB_XREGS.dx  = uiDrive;
+      regs.h.ah         = 0x36;
       HB_DOS_INT86( 0x21, &regs, &regs );
 
       if( regs.HB_XREGS.ax != 0xFFFF )
@@ -100,15 +100,15 @@ HB_FUNC( DISKSPACE )
          bError = TRUE;
    }
 
-#elif defined(HB_OS_WIN)
+#elif defined( HB_OS_WIN )
 
    {
       typedef BOOL ( WINAPI * P_GDFSE )( LPCTSTR, PULARGE_INTEGER,
                                          PULARGE_INTEGER, PULARGE_INTEGER );
 
-      char szPath[ 4 ];
-      P_GDFSE pGetDiskFreeSpaceEx;
-      UINT uiErrMode;
+      char     szPath[ 4 ];
+      P_GDFSE  pGetDiskFreeSpaceEx;
+      UINT     uiErrMode;
 
       /* Get the default drive */
 
@@ -126,12 +126,12 @@ HB_FUNC( DISKSPACE )
       szPath[ 2 ] = '\\';
       szPath[ 3 ] = '\0';
 
-      uiErrMode = SetErrorMode( SEM_FAILCRITICALERRORS );
+      uiErrMode   = SetErrorMode( SEM_FAILCRITICALERRORS );
 
       SetLastError( 0 );
 
       pGetDiskFreeSpaceEx = ( P_GDFSE ) GetProcAddress( GetModuleHandle( "kernel32.dll" ),
-                                                        "GetDiskFreeSpaceExA");
+                                                        "GetDiskFreeSpaceExA" );
 
       if( pGetDiskFreeSpaceEx )
       {
@@ -147,23 +147,23 @@ HB_FUNC( DISKSPACE )
          {
             HB_MEMCPY( &i64RetVal, &i64FreeBytesToCaller, sizeof( ULARGE_INTEGER ) );
 
-            #if (defined(__GNUC__) || defined(_MSC_VER)  || defined(__LCC__) ) && !defined(__RSXNT__)
+            #if ( defined( __GNUC__ ) || defined( _MSC_VER ) || defined( __LCC__ ) ) && ! defined( __RSXNT__ )
 
-               dSpace  = ( double ) i64RetVal.LowPart +
-                         ( double ) i64RetVal.HighPart +
-                         ( double ) i64RetVal.HighPart *
-                         ( double ) 0xFFFFFFFF;
+            dSpace = ( double ) i64RetVal.LowPart +
+                     ( double ) i64RetVal.HighPart +
+                     ( double ) i64RetVal.HighPart *
+                     ( double ) 0xFFFFFFFF;
 
             #else
 
-               /* NOTE: Borland doesn't seem to deal with the un-named
-                        struct that is part of ULARGE_INTEGER
-                        [pt] */
+            /* NOTE: Borland doesn't seem to deal with the un-named
+                     struct that is part of ULARGE_INTEGER
+                     [pt] */
 
-               dSpace  = ( double ) i64RetVal.u.LowPart +
-                         ( double ) i64RetVal.u.HighPart +
-                         ( double ) i64RetVal.u.HighPart *
-                         ( double ) 0xFFFFFFFF;
+            dSpace = ( double ) i64RetVal.u.LowPart +
+                     ( double ) i64RetVal.u.HighPart +
+                     ( double ) i64RetVal.u.HighPart *
+                     ( double ) 0xFFFFFFFF;
 
             #endif
          }
@@ -193,7 +193,7 @@ HB_FUNC( DISKSPACE )
          bError = TRUE;
    }
 
-#elif defined(HB_OS_OS2)
+#elif defined( HB_OS_OS2 )
 
    {
       struct _FSALLOCATE fsa;
@@ -207,22 +207,22 @@ HB_FUNC( DISKSPACE )
          bError = TRUE;
    }
 
-#elif defined(HB_OS_UNIX)
+#elif defined( HB_OS_UNIX )
 
    {
-      char *szName = ISCHAR( 1 ) ? hb_parc( 1 ) : ( char * ) "/";
+      char *      szName = ISCHAR( 1 ) ? hb_parc( 1 ) : ( char * ) "/";
 
-#if defined(__WATCOMC__)
+#if defined( __WATCOMC__ )
       struct stat st;
-      if ( stat( szName, &st) == 0 )
+      if( stat( szName, &st ) == 0 )
          dSpace = ( double ) st.st_blocks * ( double ) st.st_blksize;
 #else
-#  if defined(HB_OS_SUNOS)
+#  if defined( HB_OS_SUNOS )
       struct statvfs st;
-      if ( statvfs( szName, &st) == 0 )
+      if( statvfs( szName, &st ) == 0 )
 #  else
-      struct statfs st;
-      if ( statfs( szName, &st) == 0 )
+      struct statfs  st;
+      if( statfs( szName, &st ) == 0 )
 #  endif
          dSpace = ( double ) st.f_blocks * ( double ) st.f_bsize;
 #endif

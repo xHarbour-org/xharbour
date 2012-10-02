@@ -52,6 +52,7 @@
 #include "hbclass.ch"
 
 CLASS HB_LogEmail FROM HB_LogChannel
+
    DATA cServer
    DATA cAddress        INIT "log@xharbour.org"
    DATA cSubject        INIT "Log message from xharbour application"
@@ -64,26 +65,27 @@ CLASS HB_LogEmail FROM HB_LogChannel
 
    METHOD New( nLevel, cHelo, cServer, cSendTo, cSubject, cFrom )
    METHOD Open()
-   METHOD Close()
+   METHOD CLOSE()
 
-PROTECTED:
+   PROTECTED:
    METHOD Send( nStyle, cMessage, cProgName, nPrio )
 
-HIDDEN:
+   HIDDEN:
    METHOD GetOk()
    METHOD Prepare( nStyle, cMessage, cProgName, nPrio )
 
 ENDCLASS
 
 METHOD New(  nLevel, cHelo, cServer, cSendTo, cSubject, cFrom ) CLASS HB_LogEmail
+
    LOCAL nPos
 
    ::Super:New( nLevel )
 
    nPos := At( ":", cServer )
    IF nPos > 0
-      ::nPort := Val(Substr( cServer, nPos + 1 ) )
-      cServer := Substr( cServer , 1, nPos -1 )
+      ::nPort := Val( SubStr( cServer, nPos + 1 ) )
+      cServer := SubStr( cServer , 1, nPos - 1 )
    ENDIF
 
    ::cServer := cServer
@@ -101,21 +103,27 @@ METHOD New(  nLevel, cHelo, cServer, cSendTo, cSubject, cFrom ) CLASS HB_LogEmai
       ::cAddress := cFrom
    ENDIF
 
-RETURN SELF
+   RETURN SELF
 
 /**
 * Inet init must be called here
 */
+
 METHOD Open( ) CLASS HB_LogEmail
+
    InetInit()
-RETURN .T.
+
+   RETURN .T.
 
 /**
 * InetCleanup to be called here
 */
-METHOD Close() CLASS HB_LogEmail
+
+METHOD CLOSE() CLASS HB_LogEmail
+
    InetCleanup()
-RETURN .T.
+
+   RETURN .T.
 
 
 /**
@@ -123,78 +131,82 @@ RETURN .T.
 */
 
 METHOD Send( nStyle, cMessage, cName, nPrio ) CLASS HB_LogEmail
-   LOCAL skCon := InetCreate()
 
+   LOCAL skCon := InetCreate()
 
    InetSetTimeout( skCon, 10000 )
 
    InetConnect( ::cServer, ::nPort, skCon )
 
-   IF InetErrorCode( skCon ) != 0 .or. .not. ::GetOk( skCon )
+   IF InetErrorCode( skCon ) != 0 .OR. .NOT. ::GetOk( skCon )
       RETURN .F.
    ENDIF
 
    InetSendAll( skCon, "HELO " + ::cHelo + InetCRLF() )
-   IF .not. ::GetOk( skCon )
+   IF .NOT. ::GetOk( skCon )
       RETURN .F.
    ENDIF
 
-   InetSendAll( skCon, "MAIL FROM: <" + ::cAddress +">" + InetCRLF() )
-   IF .not. ::GetOk( skCon )
+   InetSendAll( skCon, "MAIL FROM: <" + ::cAddress + ">" + InetCRLF() )
+   IF .NOT. ::GetOk( skCon )
       RETURN .F.
    ENDIF
 
-   InetSendAll( skCon, "RCPT TO: <" + ::cSendTo +">" + InetCRLF() )
-   IF .not. ::GetOk( skCon )
+   InetSendAll( skCon, "RCPT TO: <" + ::cSendTo + ">" + InetCRLF() )
+   IF .NOT. ::GetOk( skCon )
       RETURN .F.
    ENDIF
 
    InetSendAll( skCon, "DATA" + InetCRLF() )
-   IF .not. ::GetOk( skCon )
+   IF .NOT. ::GetOk( skCon )
       RETURN .F.
    ENDIF
 
    cMessage := ::Prepare( nStyle, cMessage, cName, nPrio )
 
    InetSendAll( skCon,  cMessage + InetCRLF() + "." + InetCRLF() )
-   IF .not. ::GetOk( skCon )
+   IF .NOT. ::GetOk( skCon )
       RETURN .F.
    ENDIF
 
    InetSendAll( skCon, "QUIT" + InetCRLF() )
 
-RETURN ::GetOk( skCon )  // if quit fails, the mail does not go!
+   RETURN ::GetOk( skCon )  // if quit fails, the mail does not go!
 
 /**
 * Get the reply and returns true if it is allright
 */
 
 METHOD GetOk( skCon ) CLASS HB_LogEmail
+
    LOCAL nLen, cReply
 
    cReply := InetRecvLine( skCon, @nLen, 128 )
-   IF InetErrorCode( skcon ) != 0 .or. Substr( cReply, 1, 1 ) == '5'
+   IF InetErrorCode( skcon ) != 0 .OR. SubStr( cReply, 1, 1 ) == '5'
       RETURN .F.
    ENDIF
-RETURN .T.
+
+   RETURN .T.
 
 METHOD Prepare( nStyle, cMessage, cName, nPrio ) CLASS HB_LogEmail
-   LOCAL cPre
-   cPre := "FROM: " + ::cAddress + InetCRLF() + ;
-               "TO: " + ::cSendTo + InetCRLF() +;
-               "Subject:" + ::cSubject + InetCRLF() + InetCRLF()
 
-   IF .not. Empty( ::cPrefix )
+   LOCAL cPre
+
+   cPre := "FROM: " + ::cAddress + InetCRLF() + ;
+      "TO: " + ::cSendTo + InetCRLF() + ;
+      "Subject:" + ::cSubject + InetCRLF() + InetCRLF()
+
+   IF .NOT. Empty( ::cPrefix )
       cPre += ::cPrefix + InetCRLF() + InetCRLF()
    ENDIF
 
    cPre += ::Format( nStyle, cMessage, cName, nPrio )
 
-   IF .not. Empty( ::cPostfix )
-      cPre += InetCRLF() +InetCRLF() + ::cPostfix + InetCRLF()
+   IF .NOT. Empty( ::cPostfix )
+      cPre += InetCRLF() + InetCRLF() + ::cPostfix + InetCRLF()
    ENDIF
 
-RETURN cPre
+   RETURN cPre
 
 
 
@@ -203,6 +215,7 @@ RETURN cPre
 *************************************************/
 
 CLASS HB_LogInetPort FROM HB_LogChannel
+
    DATA nPort           INIT 7761
    DATA aListeners      INIT {}
    DATA skIn
@@ -214,19 +227,19 @@ CLASS HB_LogInetPort FROM HB_LogChannel
 
    METHOD New( nLevel, nPort )
    METHOD Open( cName )
-   METHOD Close( cName )
+   METHOD CLOSE( cName )
    METHOD Connections()
    METHOD BroadcastMessage( cMessage )
    METHOD AcceptCon()
 
-PROTECTED:
+   PROTECTED:
    METHOD Send( nStyle, cMessage, cName, nPrio )
 
 /* HIDDEN:
    METHOD AcceptCon()
 */
-ENDCLASS
 
+ENDCLASS
 
 METHOD New( nLevel, nPort ) CLASS HB_LogInetPort
 
@@ -236,10 +249,10 @@ METHOD New( nLevel, nPort ) CLASS HB_LogInetPort
       ::nPort := nPort
    ENDIF
 
-RETURN Self
-
+   RETURN Self
 
 METHOD Open() CLASS HB_LogInetPort
+
    InetInit()
 
    ::skIn := InetServer( ::nPort )
@@ -250,23 +263,23 @@ METHOD Open() CLASS HB_LogInetPort
 
    HB_LOGOPEN( self )
 
-RETURN .T.
+   RETURN .T.
 
+METHOD CLOSE( ) CLASS HB_LogInetPort
 
-METHOD Close( ) CLASS HB_LogInetPort
    LOCAL sk
 
    IF ::skIn == NIL
       RETURN .F.
    ENDIF
 
-   // kind termination request
+// kind termination request
    ::bTerminate := .T.
    JoinThread( ::nThread )
 
    InetClose( ::skIn )
 
-   // we now are sure that incoming thread index is not used.
+// we now are sure that incoming thread index is not used.
 
    DO WHILE  Len( ::aListeners ) > 0
       sk := ATail( ::aListeners )
@@ -275,19 +288,19 @@ METHOD Close( ) CLASS HB_LogInetPort
    ENDDO
 
    InetCleanup()
-RETURN .T.
 
+   RETURN .T.
 
 METHOD Send( nStyle, cMessage, cName, nPrio ) CLASS HB_LogInetPort
 
-   // now we transmit the message to all the available channels
+// now we transmit the message to all the available channels
    cMessage := ::Format( nStyle, cMessage, cName, nPrio )
    ::BroadcastMessage( cMessage + InetCRLF() )
 
-RETURN .T.
-
+   RETURN .T.
 
 METHOD BroadcastMessage( cMessage ) CLASS HB_LogInetPort
+
    LOCAL sk, nCount
 
    IF cMessage == NIL
@@ -303,32 +316,33 @@ METHOD BroadcastMessage( cMessage ) CLASS HB_LogInetPort
       // if there is an error, we remove the listener
       IF InetErrorCode( sk ) != 0
          ADel( ::aListeners, nCount )
-         ASize( ::aListeners , Len( ::aListeners ) - 1)
+         ASize( ::aListeners , Len( ::aListeners ) - 1 )
       ELSE
          nCount ++
       ENDIF
    ENDDO
 
-   HB_MutexUnlock( ::mtxBusy )
+   hb_mutexUnlock( ::mtxBusy )
 
-RETURN .T.
+   RETURN .T.
 
 METHOD Connections() CLASS HB_LogInetPort
+
    LOCAL nCount
 
-   ::BroadcastMessage( Chr(0) )
+   ::BroadcastMessage( Chr( 0 ) )
 
-   // be sure thread is not busy now
-   HB_MutexLock( ::mtxBusy )
+// be sure thread is not busy now
+   hb_mutexLock( ::mtxBusy )
 
    nCount := Len( ::aListeners )
 
-   HB_MutexUnlock( ::mtxBusy )
+   hb_mutexUnlock( ::mtxBusy )
 
-RETURN nCount
+   RETURN nCount
 
 METHOD AcceptCon() CLASS HB_LogInetPort
 
    HB_LOGACCEPTCON( self )
 
-RETURN .T.
+   RETURN .T.

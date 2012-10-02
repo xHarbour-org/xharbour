@@ -59,10 +59,10 @@ HB_FUNC( STRZERO )
 {
    if( hb_pcount() >= 1 && hb_pcount() <= 3 )
    {
-      BOOL bValid;
-      PHB_ITEM pNumber = hb_param( 1, HB_IT_NUMERIC );
-      PHB_ITEM pWidth  = NULL;
-      PHB_ITEM pDec    = NULL;
+      BOOL     bValid;
+      PHB_ITEM pNumber  = hb_param( 1, HB_IT_NUMERIC );
+      PHB_ITEM pWidth   = NULL;
+      PHB_ITEM pDec     = NULL;
 
       if( pNumber )
       {
@@ -71,14 +71,14 @@ HB_FUNC( STRZERO )
          if( hb_pcount() >= 2 )
          {
             pWidth = hb_param( 2, HB_IT_NUMERIC );
-            if( !pWidth )
+            if( ! pWidth )
                bValid = FALSE;
          }
 
          if( hb_pcount() >= 3 )
          {
             pDec = hb_param( 3, HB_IT_NUMERIC );
-            if( !pDec )
+            if( ! pDec )
                bValid = FALSE;
          }
       }
@@ -102,7 +102,7 @@ HB_FUNC( STRZERO )
 
                szResult[ ulPos ] = ' ';
 
-               ulPos = 0;
+               ulPos             = 0;
                while( szResult[ ulPos ] != '\0' && szResult[ ulPos ] == ' ' )
                   szResult[ ulPos++ ] = '0';
 

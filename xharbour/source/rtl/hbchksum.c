@@ -64,21 +64,21 @@
 
 HB_FUNC( HB_CHECKSUM )
 {
-   PHB_ITEM pString = hb_param( 1, HB_IT_STRING );
-   ULONG ulSum = 0;
+   PHB_ITEM pString  = hb_param( 1, HB_IT_STRING );
+   ULONG    ulSum    = 0;
 
-   if(pString == NULL)
+   if( pString == NULL )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "Must be a string", 1, hb_param(1, HB_IT_ANY) );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "Must be a string", 1, hb_param( 1, HB_IT_ANY ) );
       return;
    }
 
-   if( ISNUM(2) )
+   if( ISNUM( 2 ) )
    {
-      ulSum = (ULONG) hb_parnl( 2 );
+      ulSum = ( ULONG ) hb_parnl( 2 );
    }
 
-   hb_retnd( (LONG)
-      adler32( ulSum, ( const BYTE *) pString->item.asString.value, (uInt) pString->item.asString.length ) );
+   hb_retnd( ( LONG )
+             adler32( ulSum, ( const BYTE * ) pString->item.asString.value, ( uInt ) pString->item.asString.length ) );
 }
 

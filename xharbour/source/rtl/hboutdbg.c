@@ -54,7 +54,7 @@
    to be managed from the main thread. Every thread may use it,
    but only the main thread should be allowed to activate the
    debug window.
-*/
+ */
 
 #define HB_OS_WIN_USED
 
@@ -74,17 +74,17 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-static int s_iDebugFd = 0;
+static int  s_iDebugFd        = 0;
 static char s_szDebugName[ 128 ];
-static int s_iUseDebugName = 0;
-static int s_iXtermPid = 0;
+static int  s_iUseDebugName   = 0;
+static int  s_iXtermPid       = 0;
 
 static void debugInit( void )
 {
-   int iPid, iFifoResult;
-   char szDebugTitle[ 30 ];
-   PHB_FNAME pFileName = NULL;
-   char szDebugName[ 128 ];
+   int         iPid, iFifoResult;
+   char        szDebugTitle[ 30 ];
+   PHB_FNAME   pFileName = NULL;
+   char        szDebugName[ 128 ];
 
    if( ! s_iUseDebugName )
    {
@@ -94,7 +94,7 @@ static void debugInit( void )
    }
    else
    {
-      hb_snprintf(szDebugName, sizeof( szDebugName ), "/tmp/%s_dbg", s_szDebugName );
+      hb_snprintf( szDebugName, sizeof( szDebugName ), "/tmp/%s_dbg", s_szDebugName );
       pFileName = hb_fsFNameSplit( szDebugName );
    }
 
@@ -116,7 +116,7 @@ static void debugInit( void )
       iPid = fork();
       if( iPid != 0 )
       {
-         s_iDebugFd = open( szDebugName, O_WRONLY );
+         s_iDebugFd  = open( szDebugName, O_WRONLY );
          s_iXtermPid = iPid;
       }
       else
@@ -124,7 +124,7 @@ static void debugInit( void )
          if( iFifoResult != EEXIST )
          {
             s_iXtermPid = execlp( "xterm", "xterm", "-T", szDebugTitle, "-e",
-               "cat", szDebugName, NULL );
+                                  "cat", szDebugName, NULL );
 
             if( s_iXtermPid <= 0 )
             {
@@ -149,17 +149,17 @@ BOOL hb_OutDebugName( PHB_ITEM pName )
    BOOL bRet;
 
 #if defined( HB_OS_UNIX )
-   if( s_iDebugFd == 0 && pName != NULL)
+   if( s_iDebugFd == 0 && pName != NULL )
    {
       hb_strncpy( s_szDebugName, hb_itemGetCPtr( pName ), sizeof( s_szDebugName ) - 1 );
-      s_iUseDebugName = 1;
+      s_iUseDebugName   = 1;
 
-      bRet = TRUE;
+      bRet              = TRUE;
    }
-   else if( pName == NULL)
+   else if( pName == NULL )
    {
-      s_iUseDebugName = 0;
-      bRet = TRUE;
+      s_iUseDebugName   = 0;
+      bRet              = TRUE;
    }
    else
       bRet = FALSE;
@@ -195,34 +195,36 @@ void hb_OutDebug( const char * szMsg, HB_SIZE ulMsgLen )
       /* Chech if display process has terminated in the meanwhile */
       if( ! s_iUseDebugName )
       {
-         iPid = waitpid( s_iXtermPid, &iStatus,  WNOHANG );
+         iPid = waitpid( s_iXtermPid, &iStatus, WNOHANG );
          if( iPid == s_iXtermPid || iPid == -1 )
          {
             s_iXtermPid = 0;
             /* close( s_iDebugFd ); */
-            s_iDebugFd = 0;
+            s_iDebugFd  = 0;
             return;
          }
       }
 
-      if( s_iDebugFd > 0 && ISCHAR(1) )
+      if( s_iDebugFd > 0 && ISCHAR( 1 ) )
       {
-         fd_set wrds;
+         fd_set         wrds;
          struct timeval tv = { 0, 100000 }; /* wait each time a tenth of second */
-         FD_ZERO(&wrds);
-         FD_SET(s_iDebugFd, &wrds);
+         FD_ZERO( &wrds );
+         FD_SET( s_iDebugFd, &wrds );
 
          if( select( s_iDebugFd + 1, NULL, &wrds, NULL, &tv ) > 0 )
          {
             if( ( ULONG ) write( s_iDebugFd, szMsg, ulMsgLen ) == ulMsgLen )
             {
-               tv.tv_sec = 0;
-               tv.tv_usec = 100000;
-               FD_ZERO(&wrds);
-               FD_SET(s_iDebugFd, &wrds);
+               tv.tv_sec   = 0;
+               tv.tv_usec  = 100000;
+               FD_ZERO( &wrds );
+               FD_SET( s_iDebugFd, &wrds );
                if( select( s_iDebugFd + 1, NULL, &wrds, NULL, &tv ) > 0 )
                {
-                  if( write( s_iDebugFd, "\n", 1 ) != 1 ) {}
+                  if( write( s_iDebugFd, "\n", 1 ) != 1 )
+                  {
+                  }
                }
             }
          }
@@ -236,7 +238,7 @@ void hb_OutDebug( const char * szMsg, HB_SIZE ulMsgLen )
       OutputDebugString( lpMsg );
       HB_TCHAR_FREE( lpMsg );
 
-      HB_SYMBOL_UNUSED(ulMsgLen);
+      HB_SYMBOL_UNUSED( ulMsgLen );
    }
 
 #else

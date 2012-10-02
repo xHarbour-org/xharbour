@@ -75,16 +75,16 @@
 #include "error.ch"
 
 //----------------------------------------------------------------------------//
-/* Work Like Class(y)) */
+   /* Work Like Class(y)) */
 
 CLASS HBObject
 
-   MESSAGE New          IS Init
+   MESSAGE NEW          IS Init
    METHOD Init          INLINE   Self
 
-   // methods to return string representation of object.  asExpStr is
-   // dynamically mapped to asString so subclasses don't need to define both
-   // unless asExpStr result differs from asString, as in the scalar classes.
+// methods to return string representation of object.  asExpStr is
+// dynamically mapped to asString so subclasses don't need to define both
+// unless asExpStr result differs from asString, as in the scalar classes.
 
    METHOD asString      INLINE   ::ClassName + " Object"
    METHOD asExpStr      INLINE   ::asString()
@@ -98,15 +98,15 @@ CLASS HBObject
    METHOD ClassSel      INLINE __ClassSel( Self:ClassH )
    */
 
-   METHOD Copy
+   METHOD COPY
    METHOD deepCopy
 
    METHOD isEqual( o )  INLINE Self == o
 
    METHOD isKindOf
 
-   // ScalarObject class overrides this
-   METHOD isScalar      INLINE (Self), .F.
+// ScalarObject class overrides this
+   METHOD isScalar      INLINE ( Self ), .F.
 
    METHOD Eval          VIRTUAL
    METHOD Exec          VIRTUAL
@@ -120,7 +120,6 @@ CLASS HBObject
    /* Begin xBase++ */
    MESSAGE isDerivedFrom   METHOD isKindOf
 
-
 ENDCLASS
 
 //----------------------------------------------------------------------------//
@@ -131,7 +130,8 @@ ENDCLASS
     variables.
 */
 
-METHOD Copy() CLASS HBObject
+METHOD COPY() CLASS HBObject
+
    LOCAL NewSelf := __clsInst( ::ClassH )
    LOCAL xItem
 
@@ -139,7 +139,7 @@ METHOD Copy() CLASS HBObject
       NewSelf[ HB_EnumIndex() ] := Self[ HB_EnumIndex() ]
    NEXT
 
-RETURN NewSelf
+   RETURN NewSelf
 
 //----------------------------------------------------------------------------//
 /*
@@ -149,12 +149,14 @@ RETURN NewSelf
 */
 
 METHOD DeepCopy() CLASS HBObject
-RETURN __objClone( self )
+
+   RETURN __objClone( self )
 
 //----------------------------------------------------------------------------//
 
 METHOD IsKindOf( o ) CLASS HBObject
-   RETURN __ObjDerivedFrom( Self, o )
+
+   RETURN __objDerivedFrom( Self, o )
 
 //----------------------------------------------------------------------------//
 
@@ -165,11 +167,11 @@ METHOD Error( cDesc, cClassName, cMsg, nSubCode, aArgs ) CLASS HBObject
    DEFAULT nSubCode TO 1004
 
    IF nSubCode == 1005
-     nGenCode := EG_NOVARMETHOD
+      nGenCode := EG_NOVARMETHOD
    ENDIF
 
-   RETURN EVAL( ErrorBlock(), ErrorNew( "BASE", nGenCode, nSubCode, cClassName + ":" + cMsg, cDesc,;
-                   aArgs, ProcFile(3), ProcName(3), ProcLine(3) ) )
+   RETURN Eval( ErrorBlock(), ErrorNew( "BASE", nGenCode, nSubCode, cClassName + ":" + cMsg, cDesc,;
+      aArgs, ProcFile( 3 ), ProcName( 3 ), ProcLine( 3 ) ) )
 
 //----------------------------------------------------------------------------//
 
@@ -202,10 +204,11 @@ HB_FUNC_STATIC( HBOBJECT_ERRORHANDLER )
 //----------------------------------------------------------------------------//
 
 METHOD MsgNotFound( cMsg ) CLASS HBObject
-   RETURN ::Error( "Message not found", __OBJGETCLSNAME( Self ), cMsg, if(substr(cMsg,1,1)=="_",1005,1004) )
 
+   RETURN ::Error( "Message not found", __objGetClsName( Self ), cMsg, if( SubStr(cMsg,1,1 ) == "_",1005,1004 ) )
 
 FUNCTION TAssociativeArray( ... )
+
    LOCAL hHash
 
    IF PCount() == 0
@@ -215,7 +218,7 @@ FUNCTION TAssociativeArray( ... )
       RETURN hHash
    ENDIF
 
-RETURN Throw( ErrorNew( "TObject", 0, 1001, ProcName(), "No longer supported, please use Hash().", HB_aParams() ) )
+   RETURN Throw( ErrorNew( "TObject", 0, 1001, ProcName(), "No longer supported, please use Hash().", hb_AParams() ) )
 
 #if 0
 
@@ -230,67 +233,68 @@ FUNCTION TAssociativeArray( aInit, lCase )
       lCaseSensitive := lCase
    ENDIF
 
-   // Intentionally creating NEW Class for every instance - Don't change!
+// Intentionally creating NEW Class for every instance - Don't change!
    IF ValType( aInit ) == 'A'
       hClass := __clsNew( "TASSOCIATIVEARRAY", Len( aInit ), 1 )
 
-      aKeys := Array(Len( aInit ))
+      aKeys := Array( Len( aInit ) )
 
       FOR EACH aMember IN aInit
-         __clsAddMsg( hClass, aMember[1], nSeq++, HB_OO_MSG_PROPERTY, aMember[2], HB_OO_CLSTP_EXPORTED, .T., .T. )
-//         aAdd( aKeys, aMember[1] )
+         __clsAddMsg( hClass, aMember[1], nSeq++, HB_OO_MSG_PROPERTY, aMember[2], HB_OO_CLSTP_EXPORTED, .T. , .T. )
+         //         aAdd( aKeys, aMember[1] )
          aKeys[HB_EnumIndex()] := aMember[1]
       NEXT
    ELSE
       hClass := __clsNew( "TASSOCIATIVEARRAY", 0, 1 )
    ENDIF
 
-   __clsAddMsg( hClass, "lCaseSensitive", {|Self, lNew, lOld| lOld := lCaseSensitive, IIF( lNew <> NIL, lCaseSensitive := lNew, ), lOld }, HB_OO_MSG_INLINE )
-   // Intentionally using DEATCHED Local.
-   __clsAddMsg( hClass, "Keys"     , {|Self, cKey | IIF( cKey == NIL, , aAdd( aKeys, cKey ) ), aKeys }, HB_OO_MSG_INLINE )
+   __clsAddMsg( hClass, "lCaseSensitive", {|Self, lNew, lOld| lOld := lCaseSensitive, iif( lNew <> NIL, lCaseSensitive := lNew, ), lOld }, HB_OO_MSG_INLINE )
+// Intentionally using DEATCHED Local.
+   __clsAddMsg( hClass, "Keys"     , {|Self, cKey | iif( cKey == NIL, , AAdd( aKeys, cKey ) ), aKeys }, HB_OO_MSG_INLINE )
 
    __clsAddMsg( hClass, "SendKey"  , @TAssociativeArray_SendKey(), HB_OO_MSG_METHOD )
    __clsAddMsg( hClass, "GetKeyPos", @TAssociativeArray_GetKeyPos(), HB_OO_MSG_METHOD )
    __clsAddMsg( hClass, "GetKey"   , @TAssociativeArray_GetKey(), HB_OO_MSG_METHOD )
    __clsAddMsg( hClass, "__OnError", @TAssociativeArray_OnError(), HB_OO_MSG_ONERROR )
 
-RETURN __clsInst( hClass )
+   RETURN __clsInst( hClass )
 
 STATIC FUNCTION TAssociativeArray_OnError( xParam )
-    LOCAL Self := QSelf()
-    LOCAL cMsg, cProperty
-    LOCAL hClass, nSeq
-    LOCAL aUpperKeys := {}
-    LOCAL lCaseSensitive := ::lCaseSensitive
 
-    cMsg := __GetMessage()
-    //TraceLog( "OnError: cMsg, xParam", cMsg, xParam )
-    //TraceLog( "lCaseSensitive", lCaseSensitive )
-    IF !lCaseSensitive
-       cMsg := Upper( cMsg )
-    ENDIF
+   LOCAL Self := QSelf()
+   LOCAL cMsg, cProperty
+   LOCAL hClass, nSeq
+   LOCAL aUpperKeys := {}
+   LOCAL lCaseSensitive := ::lCaseSensitive
 
-    IF cMsg[1] == '_'
-       hClass    := ::ClassH
-       nSeq      := __cls_IncData( hClass )
+   cMsg := __GetMessage()
+//TraceLog( "OnError: cMsg, xParam", cMsg, xParam )
+//TraceLog( "lCaseSensitive", lCaseSensitive )
+   IF !lCaseSensitive
+      cMsg := Upper( cMsg )
+   ENDIF
 
-       cProperty := SubStr( cMsg, 2 )
+   IF cMsg[1] == '_'
+      hClass    := ::ClassH
+      nSeq      := __cls_IncData( hClass )
 
-       __clsAddMsg( hClass, cProperty, nSeq, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_EXPORTED, .T., .T. )
-       __ObjSendMsgCase( Self, cMsg, xParam )
+      cProperty := SubStr( cMsg, 2 )
 
-       ::Keys( cProperty )
-       //TraceLog( "OnError - Added MSG: cMsg, cProperty, xParam", cMsg, cProperty, xParam )
-    ELSE
-       IF cMsg IN ::Keys
-          //TraceLog( "OnError - Query MSG: cMsg, xParam", cMsg, xParam )
-          RETURN __ObjSendMsgCase( Self, cMsg )
-       ELSE
-          Eval( ErrorBlock(), ErrorNew( "TAssociativeArray", 1001, cMsg, "Message Not found.", HB_aParams() ) )
-       ENDIF
-    ENDIF
+      __clsAddMsg( hClass, cProperty, nSeq, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_EXPORTED, .T. , .T. )
+      __ObjSendMsgCase( Self, cMsg, xParam )
 
-RETURN NIL
+      ::Keys( cProperty )
+      //TraceLog( "OnError - Added MSG: cMsg, cProperty, xParam", cMsg, cProperty, xParam )
+   ELSE
+      IF cMsg IN ::Keys
+         //TraceLog( "OnError - Query MSG: cMsg, xParam", cMsg, xParam )
+         RETURN __ObjSendMsgCase( Self, cMsg )
+      ELSE
+         Eval( ErrorBlock(), ErrorNew( "TAssociativeArray", 1001, cMsg, "Message Not found.", hb_AParams() ) )
+      ENDIF
+   ENDIF
+
+   RETURN NIL
 
 /*
  * (C) 2003 - Francesco Saverio Giudice
@@ -298,30 +302,32 @@ RETURN NIL
  * set/get a key within an associative array
  *
 */
+
 STATIC FUNCTION TAssociativeArray_SendKey( cKey, xParam )
-    LOCAL Self := QSelf()
-    LOCAL cMsg, cProperty
-    LOCAL hClass, nSeq  //, aKeys
-    LOCAL xRet
 
-    //cKey := Upper( cKey )
-    //aKeys := __ObjSendMsg( Self, "Keys" )
-    //TraceLog( "PCOUNT(), cKey, xParam", PCOUNT(), cKey, xParam )
+   LOCAL Self := QSelf()
+   LOCAL cMsg, cProperty
+   LOCAL hClass, nSeq  //, aKeys
+   LOCAL xRet
 
-    IF !( cKey IN ::Keys )
-       hClass    := ::ClassH
-       nSeq      := __cls_IncData( hClass )
+//cKey := Upper( cKey )
+//aKeys := __ObjSendMsg( Self, "Keys" )
+//TraceLog( "PCOUNT(), cKey, xParam", PCOUNT(), cKey, xParam )
 
-       __clsAddMsg( hClass, cKey, nSeq, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_EXPORTED, .T., .T. )
-       ::Keys( cKey )
-    ENDIF
-    IF PCount() > 1
-       xRet := __ObjSendMsgCase( Self, "_" + cKey, xParam )
-    ELSE
-       xRet := __ObjSendMsgCase( Self, cKey )
-    ENDIF
+   IF !( cKey IN ::Keys )
+      hClass    := ::ClassH
+      nSeq      := __cls_IncData( hClass )
 
-RETURN xRet
+      __clsAddMsg( hClass, cKey, nSeq, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_EXPORTED, .T. , .T. )
+      ::Keys( cKey )
+   ENDIF
+   IF PCount() > 1
+      xRet := __ObjSendMsgCase( Self, "_" + cKey, xParam )
+   ELSE
+      xRet := __ObjSendMsgCase( Self, cKey )
+   ENDIF
+
+   RETURN xRet
 
 /*
  * (C) 2003 - Francesco Saverio Giudice
@@ -329,8 +335,10 @@ RETURN xRet
  * get a key position within an associative array
  *
 */
+
 STATIC FUNCTION TAssociativeArray_GetKeyPos( cKey )
-RETURN aScan( QSelf():Keys, cKey, .T. )
+
+   RETURN AScan( QSelf():Keys, cKey, .T. )
 
 /*
  * (C) 2003 - Francesco Saverio Giudice
@@ -338,34 +346,36 @@ RETURN aScan( QSelf():Keys, cKey, .T. )
  * get a key value or NIL within an associative array
  *
 */
+
 STATIC FUNCTION TAssociativeArray_GetKey( cKey, lCaseSensitive )
-    LOCAL Self := QSelf()
-    LOCAL aKeys, xRet, cMsg, nPos
-    LOCAL lGlobalCase
 
-    IF !( ValType( lCaseSensitive ) == "L" )
-       lGlobalCase    := __SetAssociativeCaseSensitive()
-       IF lGlobalCase <> NIL
-          lCaseSensitive := lGlobalCase
-       ELSE
-          lCaseSensitive := ::lCaseSensitive
-       ENDIF
-    ENDIF
+   LOCAL Self := QSelf()
+   LOCAL aKeys, xRet, cMsg, nPos
+   LOCAL lGlobalCase
 
-    aKeys := __ObjSendMsg( Self, "Keys" )
+   IF !( ValType( lCaseSensitive ) == "L" )
+      lGlobalCase    := __SetAssociativeCaseSensitive()
+      IF lGlobalCase <> NIL
+         lCaseSensitive := lGlobalCase
+      ELSE
+         lCaseSensitive := ::lCaseSensitive
+      ENDIF
+   ENDIF
 
-    IF !lCaseSensitive
-       cMsg := Upper( cKey )
-       IF (nPos := aScan( aKeys, {|e| Upper( e ) == cMsg } )) > 0
-          xRet := __ObjSendMsgCase( Self, aKeys[ nPos ] )
-       ENDIF
-    ELSE
-       IF ( cKey IN aKeys )
-          xRet := __ObjSendMsgCase( Self, cKey )
-       ENDIF
-    ENDIF
+   aKeys := __objSendMsg( Self, "Keys" )
 
-RETURN xRet
+   IF !lCaseSensitive
+      cMsg := Upper( cKey )
+      IF ( nPos := AScan( aKeys, {|e| Upper( e ) == cMsg } ) ) > 0
+         xRet := __ObjSendMsgCase( Self, aKeys[ nPos ] )
+      ENDIF
+   ELSE
+      IF ( cKey IN aKeys )
+         xRet := __ObjSendMsgCase( Self, cKey )
+      ENDIF
+   ENDIF
+
+   RETURN xRet
 
 /*
  * (C) 2003 - Francesco Saverio Giudice
@@ -373,18 +383,20 @@ RETURN xRet
  * set case sensitive for associative arrays
  *
 */
-FUNCTION __SetAssociativeCaseSensitive( lNew )
-  STATIC s_lCase // Can be: TRUE or FALSE to force Case Sensitive or NIL to leave every associative to do itself
-  LOCAL lOld := s_lCase
 
-  IF PCount() == 1 .AND. ;
-     ( ValType( lNew ) == "L" .OR. lNew == NIL )
-     s_lCase := lNew
-  ENDIF
-RETURN lOld
+FUNCTION __SetAssociativeCaseSensitive( lNew )
+
+   STATIC s_lCase // Can be: TRUE or FALSE to force Case Sensitive or NIL to leave every associative to do itself
+   LOCAL lOld := s_lCase
+
+   IF PCount() == 1 .AND. ;
+         ( ValType( lNew ) == "L" .OR. lNew == NIL )
+      s_lCase := lNew
+   ENDIF
+
+   RETURN lOld
 
 #endif
-
 
 FUNCTION HashEntry()
 
@@ -396,20 +408,22 @@ FUNCTION HashEntry()
 
    hClass := __clsNew( "HASHENTRY", 3, 2 )
 
-   __clsAddMsg( hClass, "HPARENT",         1, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_READONLY, .T., .T. )
-   __clsAddMsg( hClass, "KEY",             2, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_READONLY, .T., .T. )
-   __clsAddMsg( hClass, "HASHENTRY_VALUE", 3, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_HIDDEN,  .T., .T. )
+   __clsAddMsg( hClass, "HPARENT",         1, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_READONLY, .T. , .T. )
+   __clsAddMsg( hClass, "KEY",             2, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_READONLY, .T. , .T. )
+   __clsAddMsg( hClass, "HASHENTRY_VALUE", 3, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_HIDDEN,  .T. , .T. )
 
    __clsAddMsg( hClass, "VALUE" , @HashEntry_GetValue(), HB_OO_MSG_METHOD )
    __clsAddMsg( hClass, "_VALUE", @HashEntry_SetValue(), HB_OO_MSG_METHOD )
 
-RETURN __clsInst( hClass )
+   RETURN __clsInst( hClass )
 
 STATIC FUNCTION HashEntry_GetValue()
-RETURN QSelf():HashEntry_Value
+
+   RETURN QSelf():HashEntry_Value
 
 STATIC FUNCTION HashEntry_SetValue( xVal )
-RETURN QSelf():HashEntry_Value := QSelf():hParent[ QSelf():Key ] := xVal
+
+   RETURN QSelf():HashEntry_Value := QSelf():hParent[ QSelf():Key ] := xVal
 
 
 
@@ -423,81 +437,81 @@ RETURN QSelf():HashEntry_Value := QSelf():hParent[ QSelf():Key ] := xVal
  *
 */
 
-procedure HashAddMember( aName, cType, uInit, oObj )
+PROCEDURE HashAddMember( aName, cType, uInit, oObj )
 
-   local cName
+   LOCAL cName
 
-   if !( cType == nil )
+   IF !( cType == nil )
 
       switch Upper( Left( cType, 1 ) )
 
-         case "S" // STRING
+      CASE "S" // STRING
 
-              if uInit == nil
-                 uInit := ""
-              endif
+         IF uInit == nil
+            uInit := ""
+         ENDIF
 
-              exit
+         EXIT
 
-         case "N" // NUMERIC
+      CASE "N" // NUMERIC
 
-              if uInit == nil
-                 uInit := 0
-              endif
+         IF uInit == nil
+            uInit := 0
+         ENDIF
 
-              exit
+         EXIT
 
-         case "L" // LOGICAL
+      CASE "L" // LOGICAL
 
-              if uInit == nil
-                 uInit := .f.
-              endif
+         IF uInit == nil
+            uInit := .F.
+         ENDIF
 
-              exit
+         EXIT
 
-         case "D" // DATE or DATETIME
+      CASE "D" // DATE or DATETIME
 
-              if uInit == nil
-                 uInit := IIf( cType == "DATE", CtoD( "" ), {^0/0/0} )
-              endif
+         IF uInit == nil
+            uInit := iif( cType == "DATE", CToD( "" ), { ^ 0/0/0 } )
+         ENDIF
 
-              exit
+         EXIT
 
-         case "C" // CODEBLOCK
+      CASE "C" // CODEBLOCK
 
-              if uInit == nil
-                 uInit := { || nil }
-              endif
+         IF uInit == nil
+            uInit := { || nil }
+         ENDIF
 
-              exit
+         EXIT
 
-         case "A" // ARRAY
+      CASE "A" // ARRAY
 
-              if uInit == nil
-                 uInit := {}
-              endif
+         IF uInit == nil
+            uInit := {}
+         ENDIF
 
-              exit
+         EXIT
 
-         case "O" // OBJECT
-              exit
+      CASE "O" // OBJECT
+         EXIT
 
-         case "H" // HASH
+      CASE "H" // HASH
 
-              if uInit == nil
-                 uInit := Hash()
-              endif
+         IF uInit == nil
+            uInit := Hash()
+         ENDIF
 
-              exit
+         EXIT
 
       end switch
 
-   endif
+   ENDIF
 
-   for each cName in aName
-       oObj[ cName ] := uInit
-   next
+   FOR EACH cName in aName
+      oObj[ cName ] := uInit
+   NEXT
 
-return
+   RETURN
 
 

@@ -53,14 +53,14 @@
 
 #include "common.ch"
 
-/* NOTE: In CA-Cl*pper 5.2/5.3 the cMethod argument seems to be ignored. */
+   /* NOTE: In CA-Cl*pper 5.2/5.3 the cMethod argument seems to be ignored. */
 
-FUNCTION __eInstVar53( oVar, cMethod, xValue, cType, nSubCode, bValid )
+FUNCTION __EInstVar53( oVar, cMethod, xValue, cType, nSubCode, bValid )
 
    LOCAL oError
 
    IF !( ValType( xValue ) == cType ) .OR. ;
-      ( bValid != NIL .AND. !Eval( bValid, oVar, xValue ) )
+         ( bValid != NIL .AND. !Eval( bValid, oVar, xValue ) )
       oError := ErrorNew()
       oError:description := hb_langErrMsg( 1 )
       oError:gencode := 1
@@ -76,7 +76,7 @@ FUNCTION __eInstVar53( oVar, cMethod, xValue, cType, nSubCode, bValid )
       oError:args := { xValue }
       xValue := Eval( ErrorBlock(), oError )
       IF !( ValType( xValue ) == cType )
-         __errInHandler()
+         __ErrInHandler()
       ENDIF
    ENDIF
 

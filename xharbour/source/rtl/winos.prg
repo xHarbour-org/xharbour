@@ -69,64 +69,70 @@
 #include "directry.ch"
 
 FUNCTION OS_NETREGOK( lSetIt, lDoVista )
-  LOCAL rVal:= .T., cKeySrv, cKeyWks
-  IF lSetIt == NIL
-    lSetIt:= .F.
-  ENDIF
-  IF lDoVista == NIL
-    lDoVista:= .T.
-  ENDIF
-  IF !lDoVista .AND. OS_ISWINVISTA_OR_LATER() // 06/12/09 changed from OS_ISWINVISTA()
-    *
-  ELSEIF OS_ISWIN9X()
-    rVal:= QueryRegistry( 0,"System\CurrentControlSet\Services\VxD\VREDIR","DiscardCacheOnOpen",1, lSetIt )
-  ELSE
-    cKeySrv:="System\CurrentControlSet\Services\LanmanServer\Parameters"
-    cKeyWks:="System\CurrentControlSet\Services\LanmanWorkStation\Parameters"
-    lSetIt:= lSetIt .AND. ( OS_ISWINNT() .OR. OS_ISUSERANADMIN() ) // 06/12/09 Only Try to set registry if Admin authority for Win2000 or later
-    // Server settings
-    rVal:= rVal .AND. QueryRegistry( 0, cKeySrv, "CachedOpenLimit", 0, lSetIt )
-    rVal:= rVal .AND. QueryRegistry( 0, cKeySrv, "EnableOpLocks", 0, lSetIt) // Q124916
-    rVal:= rVal .AND. QueryRegistry( 0, cKeySrv, "EnableOpLockForceClose", 1, lSetIt)
-    rVal:= rVal .AND. QueryRegistry( 0, cKeySrv, "SharingViolationDelay", 0, lSetIt)
-    rVal:= rVal .AND. QueryRegistry( 0, cKeySrv, "SharingViolationRetries", 0, lSetIt)
-    IF OS_ISWINVISTA_OR_LATER()
-      // // 06/12/09 If SMB2 is enabled then turning off oplocks does not work so SMB2 is required to be turned off on Server
-      rVal:= rVal .AND. QueryRegistry( 0, cKeySrv,"SMB2",0, lSetIt )
-    ENDIF
 
-    // Workstation settings
-    rVal:= rVal .AND. QueryRegistry( 0, cKeyWks, "UseOpportunisticLocking", 0, lSetIt)
-    rVal:= rVal .AND. QueryRegistry( 0, cKeyWks, "EnableOpLocks", 0, lSetIt)
-    rVal:= rVal .AND. QueryRegistry( 0, cKeyWks, "EnableOpLockForceClose", 1, lSetIt)
-    rVal:= rVal .AND. QueryRegistry( 0, cKeyWks, "UtilizeNtCaching", 0, lSetIt)
-    rVal:= rVal .AND. QueryRegistry( 0, cKeyWks, "UseLockReadUnlock", 0, lSetIt)
+   LOCAL rVal := .T. , cKeySrv, cKeyWks
 
-    IF OS_ISWIN2000_OR_LATER()
-      rVal:= rVal .AND. QueryRegistry( 0, "System\CurrentControlSet\Services\MRXSmb\Parameters","OpLocksDisabled",1, lSetIt )
-    ENDIF
-  ENDIF
-  RETURN( rVal )
+   IF lSetIt == NIL
+      lSetIt := .F.
+   ENDIF
+   IF lDoVista == NIL
+      lDoVista := .T.
+   ENDIF
+   IF !lDoVista .AND. OS_ISWINVISTA_OR_LATER() // 06/12/09 changed from OS_ISWINVISTA()
+      //
+   ELSEIF OS_ISWIN9X()
+      rVal := QueryRegistry( 0, "System\CurrentControlSet\Services\VxD\VREDIR", "DiscardCacheOnOpen", 1, lSetIt )
+   ELSE
+      cKeySrv := "System\CurrentControlSet\Services\LanmanServer\Parameters"
+      cKeyWks := "System\CurrentControlSet\Services\LanmanWorkStation\Parameters"
+      lSetIt := lSetIt .AND. ( OS_ISWINNT() .OR. OS_ISUSERANADMIN() ) // 06/12/09 Only Try to set registry if Admin authority for Win2000 or later
+      // Server settings
+      rVal := rVal .AND. QueryRegistry( 0, cKeySrv, "CachedOpenLimit", 0, lSetIt )
+      rVal := rVal .AND. QueryRegistry( 0, cKeySrv, "EnableOpLocks", 0, lSetIt ) // Q124916
+      rVal := rVal .AND. QueryRegistry( 0, cKeySrv, "EnableOpLockForceClose", 1, lSetIt )
+      rVal := rVal .AND. QueryRegistry( 0, cKeySrv, "SharingViolationDelay", 0, lSetIt )
+      rVal := rVal .AND. QueryRegistry( 0, cKeySrv, "SharingViolationRetries", 0, lSetIt )
+      IF OS_ISWINVISTA_OR_LATER()
+         // // 06/12/09 If SMB2 is enabled then turning off oplocks does not work so SMB2 is required to be turned off on Server
+         rVal := rVal .AND. QueryRegistry( 0, cKeySrv, "SMB2", 0, lSetIt )
+      ENDIF
+
+      // Workstation settings
+      rVal := rVal .AND. QueryRegistry( 0, cKeyWks, "UseOpportunisticLocking", 0, lSetIt )
+      rVal := rVal .AND. QueryRegistry( 0, cKeyWks, "EnableOpLocks", 0, lSetIt )
+      rVal := rVal .AND. QueryRegistry( 0, cKeyWks, "EnableOpLockForceClose", 1, lSetIt )
+      rVal := rVal .AND. QueryRegistry( 0, cKeyWks, "UtilizeNtCaching", 0, lSetIt )
+      rVal := rVal .AND. QueryRegistry( 0, cKeyWks, "UseLockReadUnlock", 0, lSetIt )
+
+      IF OS_ISWIN2000_OR_LATER()
+         rVal := rVal .AND. QueryRegistry( 0, "System\CurrentControlSet\Services\MRXSmb\Parameters", "OpLocksDisabled", 1, lSetIt )
+      ENDIF
+   ENDIF
+
+   RETURN( rVal )
 
 FUNCTION OS_NETVREDIROK( nResult )
-  LOCAL cWinDir, cFile, a
-  nResult:= 0
-  IF OS_ISWIN9X()
-    cWinDir:= GETENV( "WINDIR" )  // Get the folder that Windows is installed in
-    IF EMPTY( cWinDir )
-      cWinDir:= "C:\WINDOWS"
-    ENDIF
-    cFile:= cWinDir+"\SYSTEM\VREDIR.VXD"
-    a:= DIRECTORY( cFile )  // Check for faulty files.
-    IF !EMPTY( a )
-      IF a[ 1, F_SIZE ] == 156749 .AND. a[ 1, F_TIME ] == "11:11:10"
-        nResult:= 1111
-      ELSEIF a[ 1, F_SIZE ] == 140343 .AND. a[ 1, F_TIME ] == "09:50:00"
-        nResult:= 950
+
+   LOCAL cWinDir, cFile, a
+
+   nResult := 0
+   IF OS_ISWIN9X()
+      cWinDir := GetEnv( "WINDIR" )  // Get the folder that Windows is installed in
+      IF Empty( cWinDir )
+         cWinDir := "C:\WINDOWS"
       ENDIF
-    ENDIF
-  ENDIF
-  RETURN( EMPTY( nResult ) )
+      cFile := cWinDir + "\SYSTEM\VREDIR.VXD"
+      a := Directory( cFile )  // Check for faulty files.
+      IF !Empty( a )
+         IF a[ 1, F_SIZE ] == 156749 .AND. a[ 1, F_TIME ] == "11:11:10"
+            nResult := 1111
+         ELSEIF a[ 1, F_SIZE ] == 140343 .AND. a[ 1, F_TIME ] == "09:50:00"
+            nResult := 950
+         ENDIF
+      ENDIF
+   ENDIF
+
+   RETURN( Empty( nResult ) )
 
 
 #pragma BEGINDUMP
@@ -407,4 +413,5 @@ HB_FUNC( OS_ISWIN8 )
 hb_retl( 0 ) ;
 }
 #endif
+
 #pragma ENDDUMP

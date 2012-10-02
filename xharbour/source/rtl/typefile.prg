@@ -56,7 +56,8 @@
 
 #define BUFFER_LENGTH 2048
 
-FUNCTION __TYPEFILE( cFile, lPrint )
+FUNCTION __TypeFile( cFile, lPrint )
+
    LOCAL nHandle, cBuffer
    LOCAL oErr, xRecover, nRetries
    LOCAL aSaveSet[ 2 ]
@@ -76,28 +77,28 @@ FUNCTION __TYPEFILE( cFile, lPrint )
       Eval( ErrorBlock(), oErr )
    ENDIF
 
-   // If no drive/dir specified, search the SET DEFAULT and PATH directories
+// If no drive/dir specified, search the SET DEFAULT and PATH directories
 
    hb_FNameSplit( cFile, @cDir, @cName, @cExt )
    IF Empty( cDir )
-      cTmp := SET( _SET_DEFAULT ) + ";" + SET( _SET_PATH )
+      cTmp := Set( _SET_DEFAULT ) + ";" + Set( _SET_PATH )
       cTmp := StrTran( cTmp, ",", ";" )
-      i := len( cTmp )
-      IF substr( cTmp, i, 1 ) == ";"            // remove last ";"
-         cTmp := substr( cTmp, 1, i - 1 )
+      i := Len( cTmp )
+      IF SubStr( cTmp, i, 1 ) == ";"            // remove last ";"
+         cTmp := SubStr( cTmp, 1, i - 1 )
       ENDIF
       aPath := aDvd( cTmp )
-      FOR i := 1 TO len( aPath )
+      FOR i := 1 TO Len( aPath )
          cTmp := hb_FNameMerge( aPath[ i ], cName, cExt )
-         IF file( cTmp )
+         IF File( cTmp )
             cFile := cTmp
-            exit
+            EXIT
          ENDIF
       NEXT
    ENDIF
 
    nRetries := 0
-   DO WHILE ( nHandle := FOPEN( cFile, FO_READWRITE ) ) == F_ERROR
+   DO WHILE ( nHandle := FOpen( cFile, FO_READWRITE ) ) == F_ERROR
       oErr := ErrorNew()
       oErr:severity    := ES_ERROR
       oErr:genCode     := EG_OPEN
@@ -106,57 +107,58 @@ FUNCTION __TYPEFILE( cFile, lPrint )
       oErr:Description := "Open Error: " + cFile
       oErr:canDefault  := .T.
       oErr:canRetry    := .T.
-      oErr:OsCode      := FERROR()
+      oErr:OsCode      := FError()
       oErr:tries       := ++nRetries
       xRecover := Eval( ErrorBlock(), oErr )
-      IF ISLOGICAL( xRecover ) .and. !xRecover      // user select "Default"
+      IF ISLOGICAL( xRecover ) .AND. !xRecover      // user select "Default"
          RETURN NIL
       ENDIF
    ENDDO
 
-   // NOTE: the NG say you should explicitly SET CONSOLE OFF if you wish to
-   //       suppress output to screen. [ckedem]
+// NOTE: the NG say you should explicitly SET CONSOLE OFF if you wish to
+//       suppress output to screen. [ckedem]
 
    IF lPrint
       aSaveSet[ 1 ] := Set( _SET_DEVICE, "PRINTER" )
       aSaveSet[ 2 ] := Set( _SET_PRINTER, .T. )
    ENDIF
 
-   // here we try to read a line at a time but I think we could just
-   // display the whole buffer since it said: "without any headings or formating"
+// here we try to read a line at a time but I think we could just
+// display the whole buffer since it said: "without any headings or formating"
 
-   cbuffer := SPACE( BUFFER_LENGTH )
+   cbuffer := Space( BUFFER_LENGTH )
    ?                                                      // start in a new line
-   DO WHILE fread( nHandle, @cbuffer, BUFFER_LENGTH ) > 0
-      ?? Alltrim( cBuffer )
-      cbuffer := SPACE( BUFFER_LENGTH )
+   DO WHILE FRead( nHandle, @cbuffer, BUFFER_LENGTH ) > 0
+      ?? AllTrim( cBuffer )
+      cbuffer := Space( BUFFER_LENGTH )
    ENDDO
 
-   FCLOSE( nHandle )
+   FClose( nHandle )
 
    IF lPrint
-      Set( _SET_DEVICE,  aSaveSet[ 1 ] )
-      Set( _SET_PRINTER, aSaveSet[ 2 ] )
+      SET( _SET_DEVICE,  aSaveSet[ 1 ] )
+      SET( _SET_PRINTER, aSaveSet[ 2 ] )
    ENDIF
 
    RETURN NIL
 
-/*----------------------------------------------------------------------------*/
-/*         Function aDvd : Divide string to tokens and put tokens into array  */
-/*         Parameters : cString - String to be splited          ( C )         */
-/*                      cDelim  - Delimiter of tokens in string ( C )         */
-/*         Return :     Array of tokens or empty array                        */
-/*----------------------------------------------------------------------------*/
+   /*----------------------------------------------------------------------------*/
+   /*         Function aDvd : Divide string to tokens and put tokens into array  */
+   /*         Parameters : cString - String to be splited          ( C )         */
+   /*                      cDelim  - Delimiter of tokens in string ( C )         */
+   /*         Return :     Array of tokens or empty array                        */
+   /*----------------------------------------------------------------------------*/
 
 STATIC FUNCTION aDvd( cString, cDelim )
+
    LOCAL aProm := {}
    LOCAL nPos
 
    DEFAULT cDelim TO ";"
 
-   DO WHILE ( nPos := at( cDelim, cString ) ) != 0
-      AAdd( aProm, substr( cString, 1, nPos - 1 ) )
-      cString := substr( cString, nPos + len( cDelim ) )
+   DO WHILE ( nPos := At( cDelim, cString ) ) != 0
+      AAdd( aProm, SubStr( cString, 1, nPos - 1 ) )
+      cString := SubStr( cString, nPos + Len( cDelim ) )
    ENDDO
    AAdd( aProm, cString )
 

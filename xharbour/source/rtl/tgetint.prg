@@ -62,24 +62,25 @@
 //---------------------------------------------------------------------------//
 
 FUNCTION GetNew( nRow, nCol, bVarBlock, cVarName, cPicture, cColor )
+
    RETURN Get():New( nRow, nCol, bVarBlock, cVarName, cPicture, cColor )
 
 //---------------------------------------------------------------------------//
 
-FUNCTION __GET( bSetGet, cVarName, cPicture, bValid, bWhen )
+FUNCTION __Get( bSetGet, cVarName, cPicture, bValid, bWhen )
 
    LOCAL oGet
 
    IF bSetGet == NIL
       IF Left( cVarName, 3 ) == "M->"
          cVarName := SubStr( cVarName, 4 )
-         bSetGet := {|_1| IIF( _1 == NIL,  __MVGET( cVarName ), __MVPUT( cVarName, _1 ) ) }
+         bSetGet := {|_1| iif( _1 == NIL,  __mvGet( cVarName ), __mvPut( cVarName, _1 ) ) }
       ELSEIF FieldPos( cVarName ) > 0
          // "{|_1| IIF( _1 == NIL, FIELD->&cVarName, FIELD->&cVarName := _1 )"
          bSetGet := &( "{|_1| IIF( _1 == NIL, FIELD->" + cVarName + ", FIELD->" + cVarName + " := _1 ) }" )
-      ELSEIF __MVEXIST( cVarName )
+      ELSEIF __mvExist( cVarName )
          // "{|_1| IIF( _1 == NIL, M->&cVarName, M->&cVarName := _1 )"
-         bSetGet := {|_1| iif( _1 == NIL,  __MVGET( cVarName ), __MVPUT( cVarName, _1 ) ) }
+         bSetGet := {|_1| iif( _1 == NIL,  __mvGet( cVarName ), __mvPut( cVarName, _1 ) ) }
       ELSE
          bSetGet := &( "{|_1| IIF( _1 == NIL, " + cVarName + ", " + cVarName + " := _1 ) }" )
       ENDIF
@@ -92,20 +93,20 @@ FUNCTION __GET( bSetGet, cVarName, cPicture, bValid, bWhen )
 
    RETURN oGet
 
-FUNCTION __GETA( bGetArray, cVarName, cPicture, bValid, bWhen, aIndex )
+FUNCTION __GetA( bGetArray, cVarName, cPicture, bValid, bWhen, aIndex )
 
    LOCAL oGet
 
    IF bGetArray == NIL
       IF Left( cVarName, 3 ) == "M->"
          cVarName := SubStr( cVarName, 4 )
-         bGetArray := {|| __MVGET( cVarName ) }
+         bGetArray := {|| __mvGet( cVarName ) }
       ELSEIF FieldPos( cVarName ) > 0
          // "{|| FIELD->&cVarName )"
          bGetArray := &( "{|| FIELD->" + cVarName + "}" )
-      ELSEIF __MVEXIST( cVarName )
+      ELSEIF __mvExist( cVarName )
          // "{|| M->&cVarName )"
-         bGetArray := {|| __MVGET( cVarName ) }
+         bGetArray := {|| __mvGet( cVarName ) }
       ELSE
          // "{|| &cVarName )"
          bGetArray := &( "{|| " + cVarName + "}" )

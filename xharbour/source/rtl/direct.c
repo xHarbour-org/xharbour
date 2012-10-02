@@ -110,24 +110,24 @@ static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT ui
    PHB_FFIND ffind;
 
    /* Get the file list */
-   if( ( ffind = hb_fsFindFirst( (const char *) szDirSpec, uiMask ) ) != NULL )
+   if( ( ffind = hb_fsFindFirst( ( const char * ) szDirSpec, uiMask ) ) != NULL )
    {
       do
       {
-         if( !( ( ( uiMask & HB_FA_HIDDEN    ) == 0 && ( ffind->attr & HB_FA_HIDDEN    ) != 0 ) ||
-                ( ( uiMask & HB_FA_SYSTEM    ) == 0 && ( ffind->attr & HB_FA_SYSTEM    ) != 0 ) ||
-                ( ( uiMask & HB_FA_LABEL     ) == 0 && ( ffind->attr & HB_FA_LABEL     ) != 0 ) ||
-                ( ( uiMask & HB_FA_DIRECTORY ) == 0 && ( ffind->attr & HB_FA_DIRECTORY ) != 0 ) ))
+         if( ! ( ( ( uiMask & HB_FA_HIDDEN ) == 0 && ( ffind->attr & HB_FA_HIDDEN ) != 0 ) ||
+                 ( ( uiMask & HB_FA_SYSTEM ) == 0 && ( ffind->attr & HB_FA_SYSTEM ) != 0 ) ||
+                 ( ( uiMask & HB_FA_LABEL ) == 0 && ( ffind->attr & HB_FA_LABEL ) != 0 ) ||
+                 ( ( uiMask & HB_FA_DIRECTORY ) == 0 && ( ffind->attr & HB_FA_DIRECTORY ) != 0 ) ) )
          {
-            char buffer[ 32 ];
-            BOOL bAddEntry = TRUE;
+            char  buffer[ 32 ];
+            BOOL  bAddEntry = TRUE;
             HB_ITEM_NEW( Subarray );
 
             hb_arrayNew( &Subarray, 5 );
 
-            if ( bFullPath )
+            if( bFullPath )
             {
-               char *szFullName = hb_xstrcpy(NULL,fDirSpec->szPath?fDirSpec->szPath:"",ffind->szName,NULL);
+               char * szFullName = hb_xstrcpy( NULL, fDirSpec->szPath ? fDirSpec->szPath : "", ffind->szName, NULL );
                hb_arraySetC( &Subarray, F_NAME, szFullName );
                hb_xfree( szFullName );
             }
@@ -142,13 +142,13 @@ static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT ui
             hb_arraySetC( &Subarray, F_ATTR, hb_fsAttrDecode( ffind->attr, buffer ) );
 
             /* Don't exit when array limit is reached */
-            if ( bDirOnly )
+            if( bDirOnly )
             {
                /* 30/07/04 - <maurilio.longo@libero.it>
                              why do we issue a hb_fsIsDirectory() when hb_fsFindFirst() already returns
                              such info for every entry?
-               bAddEntry = hb_fsIsDirectory( ( BYTE * ) ffind->szName );
-               */
+                  bAddEntry = hb_fsIsDirectory( ( BYTE * ) ffind->szName );
+                */
                bAddEntry = ( ( ffind->attr & HB_FA_DIRECTORY ) == HB_FA_DIRECTORY );
             }
 
@@ -156,7 +156,7 @@ static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT ui
             {
                hb_arrayAddForward( pDir, &Subarray );
             }
-	    else
+            else
                hb_itemClear( &Subarray );
 
          }
@@ -168,69 +168,69 @@ static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT ui
    }
 }
 
-void hb_fsDirectory( PHB_ITEM pDir, const char* szSkleton, const char* szAttributes, BOOL bDirOnly, BOOL bFullPath )
+void hb_fsDirectory( PHB_ITEM pDir, const char * szSkleton, const char * szAttributes, BOOL bDirOnly, BOOL bFullPath )
 {
-   USHORT    uiMask, uiMaskNoLabel;
+   USHORT         uiMask, uiMaskNoLabel;
    const char *   szDirSpec;
    char *         pszFree = NULL;
 
 /*
-#if defined(__MINGW32__) || ( defined(_MSC_VER) && _MSC_VER >= 910 )
+   #if defined(__MINGW32__) || ( defined(_MSC_VER) && _MSC_VER >= 910 )
    PHB_ITEM pEightDotThree = hb_param( 3, HB_IT_LOGICAL );
    BOOL     bEightDotThree;
 
    // Do we want 8.3 support?
    bEightDotThree = ( pEightDotThree ? hb_itemGetL( pEightDotThree ) : FALSE );
-#endif
-*/
+   #endif
+ */
 
    PHB_FNAME fDirSpec = NULL;
-   
+
    /* Get the passed attributes and convert them to Harbour Flags */
 
    uiMask = HB_FA_ARCHIVE
-          | HB_FA_READONLY
-          | HB_FA_NORMAL
-          | HB_FA_DEVICE
-          | HB_FA_TEMPORARY
-          | HB_FA_SPARSE
-          | HB_FA_REPARSE
-          | HB_FA_COMPRESSED
-          | HB_FA_OFFLINE
-          | HB_FA_NOTINDEXED
-          | HB_FA_ENCRYPTED
-          | HB_FA_VOLCOMP;
+            | HB_FA_READONLY
+            | HB_FA_NORMAL
+            | HB_FA_DEVICE
+            | HB_FA_TEMPORARY
+            | HB_FA_SPARSE
+            | HB_FA_REPARSE
+            | HB_FA_COMPRESSED
+            | HB_FA_OFFLINE
+            | HB_FA_NOTINDEXED
+            | HB_FA_ENCRYPTED
+            | HB_FA_VOLCOMP;
 
    uiMaskNoLabel = uiMask;
 
    hb_arrayNew( pDir, 0 );
 
-   if ( bDirOnly )
+   if( bDirOnly )
    {
       szAttributes = "D";
    }
 
    if( szAttributes && strlen( szAttributes ) > 0 )
    {
-      if ( ( uiMask |= hb_fsAttrEncode( szAttributes ) ) & HB_FA_LABEL )
+      if( ( uiMask |= hb_fsAttrEncode( szAttributes ) ) & HB_FA_LABEL )
       {
          /* NOTE: This is Clipper Doc compatible. (not operationally) */
          uiMask = HB_FA_LABEL;
       }
    }
 
-   if ( szSkleton && strlen( szSkleton ) > 0 )
+   if( szSkleton && strlen( szSkleton ) > 0 )
       szDirSpec = hb_fsNameConv( szSkleton, &pszFree );
    else
       szDirSpec = HB_OS_ALLFILE_MASK;
 
    if( bDirOnly || bFullPath )
    {
-      if( (fDirSpec = hb_fsFNameSplit( szDirSpec )) != NULL )
+      if( ( fDirSpec = hb_fsFNameSplit( szDirSpec ) ) != NULL )
       {
          if( fDirSpec->szDrive )
          {
-            hb_fsChDrv( (BYTE) ( fDirSpec->szDrive[0] - 'A' ) );
+            hb_fsChDrv( ( BYTE ) ( fDirSpec->szDrive[ 0 ] - 'A' ) );
          }
 
          if( fDirSpec->szPath )
@@ -243,14 +243,14 @@ void hb_fsDirectory( PHB_ITEM pDir, const char* szSkleton, const char* szAttribu
    /* Get the file list */
    hb_fsGrabDirectory( pDir, szDirSpec, uiMask, fDirSpec, bFullPath, bDirOnly );
 
-   if ( uiMask == HB_FA_LABEL )
+   if( uiMask == HB_FA_LABEL )
    {
-      uiMaskNoLabel |= hb_fsAttrEncode( szAttributes );
-      uiMaskNoLabel &= ~HB_FA_LABEL;
+      uiMaskNoLabel  |= hb_fsAttrEncode( szAttributes );
+      uiMaskNoLabel  &= ~HB_FA_LABEL;
       hb_fsGrabDirectory( pDir, szDirSpec, uiMaskNoLabel, fDirSpec, bFullPath, bDirOnly );
    }
 
-   if ( fDirSpec != NULL )
+   if( fDirSpec != NULL )
    {
       hb_xfree( fDirSpec );
    }
@@ -261,16 +261,16 @@ void hb_fsDirectory( PHB_ITEM pDir, const char* szSkleton, const char* szAttribu
 
 static BOOL hb_strMatchRegExpDir( const char * szString, const char * szMask, BOOL bInit )
 {
-   static HB_REGEX RegEx;
-   static BOOL bInitReg = FALSE;
+   static HB_REGEX   RegEx;
+   static BOOL       bInitReg = FALSE;
 
-   if ( bInit || !bInitReg )
+   if( bInit || ! bInitReg )
    {
       /* compile only once here */
       bInitReg = hb_regexCompile( &RegEx, szMask, 0, 0 );
    }
 
-   if( !szString && !szMask )
+   if( ! szString && ! szMask )
    {
       /* resetting initialization flag */
       hb_regexFree( &RegEx );
@@ -280,26 +280,26 @@ static BOOL hb_strMatchRegExpDir( const char * szString, const char * szMask, BO
 
    if( bInitReg )
    {
-      return ( hb_regexMatch( &RegEx, szString, TRUE ) );
+      return hb_regexMatch( &RegEx, szString, TRUE );
    }
 
    return FALSE;
 }
 
-static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *szFName, char* szAttributes, char* sRegEx )
+static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char * szFName, char * szAttributes, char * sRegEx )
 {
    HB_SIZE ui, uiLen = pRecurse->item.asArray.value->ulLen;
 
-   for ( ui = 0; ui < uiLen; ui ++ )
+   for( ui = 0; ui < uiLen; ui++ )
    {
-      PHB_ITEM pEntry = hb_arrayGetItemPtr( pRecurse, ui + 1 );
-      char *szEntry = hb_arrayGetC( pEntry, 1 );
+      PHB_ITEM pEntry   = hb_arrayGetItemPtr( pRecurse, ui + 1 );
+      char *   szEntry  = hb_arrayGetC( pEntry, 1 );
 
       if( szEntry[ strlen( szEntry ) - 1 ] != '.' )
       {
-         if ( hb_fsIsDirectory( szEntry ) )
+         if( hb_fsIsDirectory( szEntry ) )
          {
-            char *szSubdir = hb_xstrcpy( NULL, szEntry, HB_OS_PATH_DELIM_CHR_STRING, HB_OS_ALLFILE_MASK, NULL );
+            char * szSubdir = hb_xstrcpy( NULL, szEntry, HB_OS_PATH_DELIM_CHR_STRING, HB_OS_ALLFILE_MASK, NULL );
             HB_ITEM_NEW( SubDir );
 
             hb_fsDirectory( &SubDir, szSubdir, szAttributes, FALSE, TRUE );
@@ -312,7 +312,7 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *sz
          }
          else
          {
-            char *sFileName = strrchr( szEntry, HB_OS_PATH_DELIM_CHR );
+            char * sFileName = strrchr( szEntry, HB_OS_PATH_DELIM_CHR );
 
             if( sFileName == NULL )
             {
@@ -323,7 +323,7 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *sz
                sFileName++;
             }
 
-            if( hb_strMatchRegExpDir( (const char *) sFileName, (const char *) sRegEx, FALSE ) )
+            if( hb_strMatchRegExpDir( ( const char * ) sFileName, ( const char * ) sRegEx, FALSE ) )
             {
                hb_arrayAddForward( pResult, pEntry );
             }
@@ -334,11 +334,12 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *sz
    }
 }
 
-void hb_fsDirectoryRecursive( PHB_ITEM pResult, char *szSkleton, char *szFName, char* szAttributes, BOOL bMatchCase )
+void hb_fsDirectoryRecursive( PHB_ITEM pResult, char * szSkleton, char * szFName, char * szAttributes, BOOL bMatchCase )
 {
    static BOOL s_bTop = TRUE;
-   char cCurDsk;
-   char *pCurDir;
+   char        cCurDsk;
+   char *      pCurDir;
+
    HB_ITEM_NEW( Dir );
    /* An arbitrary value which should be enough */
    char sRegEx[ HB_PATH_MAX + HB_PATH_MAX ];
@@ -347,14 +348,14 @@ void hb_fsDirectoryRecursive( PHB_ITEM pResult, char *szSkleton, char *szFName, 
 
    if( s_bTop )
    {
-      cCurDsk = hb_fsCurDrv() ;
-      pCurDir = hb_strdup( hb_fsCurDir( (char) cCurDsk ) );
-      s_bTop = FALSE;
+      cCurDsk  = hb_fsCurDrv();
+      pCurDir  = hb_strdup( hb_fsCurDir( ( char ) cCurDsk ) );
+      s_bTop   = FALSE;
    }
    else
    {
-      cCurDsk = 0;
-      pCurDir = NULL;
+      cCurDsk  = 0;
+      pCurDir  = NULL;
    }
 
    hb_fsDirectory( &Dir, szSkleton, szAttributes, FALSE, TRUE );
@@ -362,7 +363,7 @@ void hb_fsDirectoryRecursive( PHB_ITEM pResult, char *szSkleton, char *szFName, 
    hb_arrayNew( pResult, 0 );
 
    /* initialize regex */
-   hb_strMatchRegExpDir( (const char *) szFName, (const char *) sRegEx, TRUE );
+   hb_strMatchRegExpDir( ( const char * ) szFName, ( const char * ) sRegEx, TRUE );
 
    hb_fsDirectoryCrawler( &Dir, pResult, szFName, szAttributes, sRegEx );
 
@@ -373,12 +374,12 @@ void hb_fsDirectoryRecursive( PHB_ITEM pResult, char *szSkleton, char *szFName, 
 
    if( pCurDir )
    {
-      char sRoot[2];
+      char sRoot[ 2 ];
 
-      sRoot[0] = HB_OS_PATH_DELIM_CHR;
-      sRoot[1] = '\0';
+      sRoot[ 0 ]  = HB_OS_PATH_DELIM_CHR;
+      sRoot[ 1 ]  = '\0';
 
-      hb_fsChDrv( (BYTE ) cCurDsk );
+      hb_fsChDrv( ( BYTE ) cCurDsk );
       hb_fsChDir( sRoot );
       hb_fsChDir( pCurDir );
 
@@ -390,32 +391,33 @@ void hb_fsDirectoryRecursive( PHB_ITEM pResult, char *szSkleton, char *szFName, 
 
 HB_FUNC( DIRECTORYRECURSE )
 {
-   PHB_ITEM pDirSpec = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pAttribute = hb_param( 2, HB_IT_STRING );
-   BOOL bMatchCase = hb_parl( 3 );
-   char *szRecurse = NULL;
-   PHB_FNAME fDirSpec;
+   PHB_ITEM    pDirSpec    = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM    pAttribute  = hb_param( 2, HB_IT_STRING );
+   BOOL        bMatchCase  = hb_parl( 3 );
+   char *      szRecurse   = NULL;
+   PHB_FNAME   fDirSpec;
+
    HB_ITEM_NEW( Dir );
-   char *szFName = NULL;
+   char *      szFName     = NULL;
 #if defined( HB_OS_HAS_DRIVE_LETTER )
-   BOOL bAddDrive = TRUE;
+   BOOL        bAddDrive   = TRUE;
 #endif
-   char *szAttributes;
+   char *      szAttributes;
 
    if( pDirSpec && pDirSpec->item.asString.length < HB_PATH_MAX )
    {
-      szAttributes = (char*) hb_xgrab( 3 + 1 ); // DHS
+      szAttributes      = ( char * ) hb_xgrab( 3 + 1 );  // DHS
       hb_xmemset( szAttributes, 0, 4 );
-      szAttributes[0] = 'D';                    // Compulsory
+      szAttributes[ 0 ] = 'D';                           // Compulsory
 
-      if ( pAttribute )
+      if( pAttribute )
       {
-         if ( strpbrk( pAttribute->item.asString.value, "hH" ) != NULL )
+         if( strpbrk( pAttribute->item.asString.value, "hH" ) != NULL )
          {
             hb_xstrcat( szAttributes, "H", 0 );
          }
 
-         if ( strpbrk( pAttribute->item.asString.value, "sS" ) != NULL )
+         if( strpbrk( pAttribute->item.asString.value, "sS" ) != NULL )
          {
             hb_xstrcat( szAttributes, "S", 0 );
          }
@@ -426,9 +428,9 @@ HB_FUNC( DIRECTORYRECURSE )
 #if defined( HB_OS_HAS_DRIVE_LETTER )
          if( fDirSpec->szDrive == NULL )
          {
-            char szDrive[1];
-            szDrive[ 0 ] = ( ( char ) hb_fsCurDrv() ) + 'A';
-            fDirSpec->szDrive = ( char * ) hb_szAscii[(UCHAR)szDrive[0]];
+            char szDrive[ 1 ];
+            szDrive[ 0 ]      = ( ( char ) hb_fsCurDrv() ) + 'A';
+            fDirSpec->szDrive = ( char * ) hb_szAscii[ ( UCHAR ) szDrive[ 0 ] ];
          }
          else
          {
@@ -438,45 +440,45 @@ HB_FUNC( DIRECTORYRECURSE )
          if( fDirSpec->szPath == NULL )
          {
             #if defined( HB_OS_UNIX )
-               fDirSpec->szPath = (char*) hb_fsCurDirEx( hb_fsCurDrv() );
+            fDirSpec->szPath  = ( char * ) hb_fsCurDirEx( hb_fsCurDrv() );
             #else
-               fDirSpec->szPath = (char*) hb_fsCurDir( hb_fsCurDrv() );
+            fDirSpec->szPath  = ( char * ) hb_fsCurDir( hb_fsCurDrv() );
             #endif
          }
 
 #if defined( HB_OS_HAS_DRIVE_LETTER )
          if( bAddDrive )
          {
-            char *szDrvDelim[2];
+            char * szDrvDelim[ 2 ];
 
-            szDrvDelim[ 0 ] = (char *) HB_OS_DRIVE_DELIM_CHR;
-            szDrvDelim[ 1 ] = '\0';
+            szDrvDelim[ 0 ]   = ( char * ) HB_OS_DRIVE_DELIM_CHR;
+            szDrvDelim[ 1 ]   = '\0';
 
-            szRecurse = hb_xstrcpy( NULL, fDirSpec->szDrive, szDrvDelim, HB_OS_PATH_DELIM_CHR_STRING, fDirSpec->szPath, HB_OS_PATH_DELIM_CHR_STRING, HB_OS_ALLFILE_MASK, NULL );
+            szRecurse         = hb_xstrcpy( NULL, fDirSpec->szDrive, szDrvDelim, HB_OS_PATH_DELIM_CHR_STRING, fDirSpec->szPath, HB_OS_PATH_DELIM_CHR_STRING, HB_OS_ALLFILE_MASK, NULL );
          }
          else
 #endif
          {
-#if defined(__DMC__)
-	    /*
+#if defined( __DMC__ )
+            /*
                AJ: 11-30-2007
-	       I found these funny lines have to be added for DMC 8.50.4
-	       otherwise GPF on tests/dirtest4.prg.
-	       Anybody to find where the bug may hide please... ?
-	    */
-	    char szDMCBug[1];
-	    sprintf( szDMCBug, "%s", "" );
+               I found these funny lines have to be added for DMC 8.50.4
+               otherwise GPF on tests/dirtest4.prg.
+               Anybody to find where the bug may hide please... ?
+             */
+            char szDMCBug[ 1 ];
+            sprintf( szDMCBug, "%s", "" );
 #endif
             szRecurse = hb_xstrcpy( NULL, fDirSpec->szPath, HB_OS_ALLFILE_MASK, NULL );
          }
          /*
-           AJ: 2011-02-27
-           Fixing *.* not pulling file with no extension
-         */
-         if ( ( strlen( fDirSpec->szName ) == 1 ) && ( hb_strnicmp( fDirSpec->szName, "*", 1 ) == 0 ) &&
-              ( strlen( fDirSpec->szExtension ) == 2 ) && ( hb_strnicmp( fDirSpec->szExtension, ".*", 2 ) == 0 ) )
+            AJ: 2011-02-27
+            Fixing *.* not pulling file with no extension
+          */
+         if( ( strlen( fDirSpec->szName ) == 1 ) && ( hb_strnicmp( fDirSpec->szName, "*", 1 ) == 0 ) &&
+             ( strlen( fDirSpec->szExtension ) == 2 ) && ( hb_strnicmp( fDirSpec->szExtension, ".*", 2 ) == 0 ) )
          {
-            ( (char*) fDirSpec->szExtension ) [0] = 0;
+            ( ( char * ) fDirSpec->szExtension )[ 0 ] = 0;
          }
          szFName = hb_xstrcpy( NULL, fDirSpec->szName, fDirSpec->szExtension, NULL );
       }
@@ -514,6 +516,7 @@ HB_FUNC( DIRECTORYRECURSE )
 HB_FUNC( DIRECTORY )
 {
    PHB_ITEM pDir = hb_itemNew( NULL );
-   hb_fsDirectory( pDir, hb_parcx(1), hb_parcx(2), hb_parl(3), hb_parl(4) );
+
+   hb_fsDirectory( pDir, hb_parcx( 1 ), hb_parcx( 2 ), hb_parl( 3 ), hb_parl( 4 ) );
    hb_itemRelease( hb_itemReturnForward( pDir ) );
 }

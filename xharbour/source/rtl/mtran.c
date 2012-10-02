@@ -60,29 +60,29 @@ static char * hb_strMemotran( char * pszResult, HB_SIZE * ulResultLen, const cha
    ULONG ulStringPos = 0;
    ULONG ulResultPos = 0;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_strMemotran(%s, %p, %s, %lu, %x, %x)", pszResult, ulResultLen, pszString, ulStringLen, cHardcr, cSoftcr));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strMemotran(%s, %p, %s, %lu, %x, %x)", pszResult, ulResultLen, pszString, ulStringLen, cHardcr, cSoftcr ) );
 
    while( ulStringPos < ulStringLen )
    {
-      if(      pszString[ ulStringPos ]     == HB_CHAR_HARD1 &&
-               pszString[ ulStringPos + 1 ] == HB_CHAR_HARD2 )
+      if( pszString[ ulStringPos ] == HB_CHAR_HARD1 &&
+          pszString[ ulStringPos + 1 ] == HB_CHAR_HARD2 )
       {
          pszResult[ ulResultPos++ ] = cHardcr;
-         ulStringPos += 2;
+         ulStringPos                += 2;
       }
-      else if( pszString[ ulStringPos ]     == HB_CHAR_SOFT1 &&
+      else if( pszString[ ulStringPos ] == HB_CHAR_SOFT1 &&
                pszString[ ulStringPos + 1 ] == HB_CHAR_SOFT2 )
       {
          pszResult[ ulResultPos++ ] = cSoftcr;
-         ulStringPos += 2;
+         ulStringPos                += 2;
       }
       else
          pszResult[ ulResultPos++ ] = pszString[ ulStringPos++ ];
    }
 
-   pszResult[ ulResultPos ] = '\0';
+   pszResult[ ulResultPos ]   = '\0';
 
-   *ulResultLen = ulResultPos;
+   *ulResultLen               = ulResultPos;
 
    return pszResult;
 }
@@ -93,10 +93,10 @@ HB_FUNC( MEMOTRAN )
 
    if( pString )
    {
-      char * pszResult = ( char * ) hb_xgrab( hb_itemGetCLen( pString ) + 1 );
-      char cHardcr = ISCHAR( 2 ) ? *hb_parc( 2 ) : ';';
-      char cSoftcr = ISCHAR( 3 ) ? *hb_parc( 3 ) : ' ';
-      HB_SIZE ulResultLen;
+      char *   pszResult   = ( char * ) hb_xgrab( hb_itemGetCLen( pString ) + 1 );
+      char     cHardcr     = ISCHAR( 2 ) ? *hb_parc( 2 ) : ';';
+      char     cSoftcr     = ISCHAR( 3 ) ? *hb_parc( 3 ) : ' ';
+      HB_SIZE  ulResultLen;
 
       hb_strMemotran( pszResult, &ulResultLen, hb_itemGetCPtr( pString ), hb_itemGetCLen( pString ), cHardcr, cSoftcr );
       hb_retclen_buffer( pszResult, ulResultLen );

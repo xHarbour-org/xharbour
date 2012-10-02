@@ -56,9 +56,9 @@
  */
 
 /*
-MD5 digest (based on RFC 1321 only). [x]Harbour implementation
+   MD5 digest (based on RFC 1321 only). [x]Harbour implementation
 
-PRG functions:
+   PRG functions:
 
    HB_MD5( <cString> ) -> <cMD5>
          Calculates RFC 1321 MD5 digest (128-bit checksum)
@@ -77,7 +77,7 @@ PRG functions:
          ASCII hex MD5 digest as 32-byte string
          empty string on error
 
-C functions:
+   C functions:
 
    void hb_md5( const void * data, ULONG datalen, char * digest )
       Parameters:
@@ -92,7 +92,7 @@ C functions:
          digest   - raw (unformatted) MD5 digest buffer
                     (at least 16 bytes long)
 
-*/
+ */
 
 #include "hbapi.h"
 #include "hbapifs.h"
@@ -101,8 +101,8 @@ C functions:
 /* MD5 buffer */
 typedef struct
 {
-   UINT32   accum[ 4 ];
-   BYTE     buf[ 64 ];
+   UINT32 accum[ 4 ];
+   BYTE buf[ 64 ];
 } MD5_BUF;
 
 /*
@@ -110,20 +110,20 @@ typedef struct
    A[x] - accumulators[4]
    T[x] - Value table[64]
    X[x] - buffer[16]
-*/
-#define ROTL(x,n) ((x << n) | (x >> (32 - n)))
-#define PF1(a,b,c,d,k,s,i) \
-   A[a] = A[a] + ((A[b] & A[c]) | ((~A[b]) & A[d])) + X[k] + T[i]; \
-   A[a] = ROTL(A[a], s) + A[b]
-#define PF2(a,b,c,d,k,s,i) \
-   A[a] = A[a] + ((A[b] & A[d]) | (A[c] & (~A[d]))) + X[k] + T[i]; \
-   A[a] = ROTL(A[a], s) + A[b]
-#define PF3(a,b,c,d,k,s,i) \
-   A[a] = A[a] + (A[b] ^ A[c] ^ A[d]) + X[k] + T[i]; \
-   A[a] = ROTL(A[a], s) + A[b]
-#define PF4(a,b,c,d,k,s,i) \
-   A[a] = A[a] + (A[c] ^(A[b] | (~A[d]))) + X[k] + T[i]; \
-   A[a] = ROTL(A[a], s) + A[b]
+ */
+#define ROTL( x, n ) ( ( x << n ) | ( x >> ( 32 - n ) ) )
+#define PF1( a, b, c, d, k, s, i ) \
+   A[ a ]   = A[ a ] + ( ( A[ b ] & A[ c ] ) | ( ( ~A[ b ] ) & A[ d ] ) ) + X[ k ] + T[ i ]; \
+   A[ a ]   = ROTL( A[ a ], s ) + A[ b ]
+#define PF2( a, b, c, d, k, s, i ) \
+   A[ a ]   = A[ a ] + ( ( A[ b ] & A[ d ] ) | ( A[ c ] & ( ~A[ d ] ) ) ) + X[ k ] + T[ i ]; \
+   A[ a ]   = ROTL( A[ a ], s ) + A[ b ]
+#define PF3( a, b, c, d, k, s, i ) \
+   A[ a ]   = A[ a ] + ( A[ b ] ^ A[ c ] ^ A[ d ] ) + X[ k ] + T[ i ]; \
+   A[ a ]   = ROTL( A[ a ], s ) + A[ b ]
+#define PF4( a, b, c, d, k, s, i ) \
+   A[ a ]   = A[ a ] + ( A[ c ] ^ ( A[ b ] | ( ~A[ d ] ) ) ) + X[ k ] + T[ i ]; \
+   A[ a ]   = ROTL( A[ a ], s ) + A[ b ]
 
 /* Defines for file ops */
 #define MAX_FBUF 0x20000 /* file read buffer size, MUST be 64*n */
@@ -150,16 +150,16 @@ static const UINT32 T[ 64 ] = {
 
 static const BYTE pad[ 64 ] = {
    0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
 static void hb_md5go( MD5_BUF * md5 )
 {
-   UINT32 X[ 16 ], A[ 4 ];
-   BYTE * ptr;
-   int i;
+   UINT32   X[ 16 ], A[ 4 ];
+   BYTE *   ptr;
+   int      i;
 
    /* copy accumulators first */
    HB_MEMCPY( A, md5->accum, sizeof( A ) );
@@ -169,85 +169,85 @@ static void hb_md5go( MD5_BUF * md5 )
       X[ i ] = HB_GET_LE_UINT32( ptr );
 
    /* process buffer */
-   PF1( 0, 1, 2, 3,  0,  7,  0 );
-   PF1( 3, 0, 1, 2,  1, 12,  1 );
-   PF1( 2, 3, 0, 1,  2, 17,  2 );
-   PF1( 1, 2, 3, 0,  3, 22,  3 );
-   PF1( 0, 1, 2, 3,  4,  7,  4 );
-   PF1( 3, 0, 1, 2,  5, 12,  5 );
-   PF1( 2, 3, 0, 1,  6, 17,  6 );
-   PF1( 1, 2, 3, 0,  7, 22,  7 );
-   PF1( 0, 1, 2, 3,  8,  7,  8 );
-   PF1( 3, 0, 1, 2,  9, 12,  9 );
+   PF1( 0, 1, 2, 3, 0, 7, 0 );
+   PF1( 3, 0, 1, 2, 1, 12, 1 );
+   PF1( 2, 3, 0, 1, 2, 17, 2 );
+   PF1( 1, 2, 3, 0, 3, 22, 3 );
+   PF1( 0, 1, 2, 3, 4, 7, 4 );
+   PF1( 3, 0, 1, 2, 5, 12, 5 );
+   PF1( 2, 3, 0, 1, 6, 17, 6 );
+   PF1( 1, 2, 3, 0, 7, 22, 7 );
+   PF1( 0, 1, 2, 3, 8, 7, 8 );
+   PF1( 3, 0, 1, 2, 9, 12, 9 );
    PF1( 2, 3, 0, 1, 10, 17, 10 );
    PF1( 1, 2, 3, 0, 11, 22, 11 );
-   PF1( 0, 1, 2, 3, 12,  7, 12 );
+   PF1( 0, 1, 2, 3, 12, 7, 12 );
    PF1( 3, 0, 1, 2, 13, 12, 13 );
    PF1( 2, 3, 0, 1, 14, 17, 14 );
    PF1( 1, 2, 3, 0, 15, 22, 15 );
-   PF2( 0, 1, 2, 3,  1,  5, 16 );
-   PF2( 3, 0, 1, 2,  6,  9, 17 );
+   PF2( 0, 1, 2, 3, 1, 5, 16 );
+   PF2( 3, 0, 1, 2, 6, 9, 17 );
    PF2( 2, 3, 0, 1, 11, 14, 18 );
-   PF2( 1, 2, 3, 0,  0, 20, 19 );
-   PF2( 0, 1, 2, 3,  5,  5, 20 );
-   PF2( 3, 0, 1, 2, 10,  9, 21 );
+   PF2( 1, 2, 3, 0, 0, 20, 19 );
+   PF2( 0, 1, 2, 3, 5, 5, 20 );
+   PF2( 3, 0, 1, 2, 10, 9, 21 );
    PF2( 2, 3, 0, 1, 15, 14, 22 );
-   PF2( 1, 2, 3, 0,  4, 20, 23 );
-   PF2( 0, 1, 2, 3,  9,  5, 24 );
-   PF2( 3, 0, 1, 2, 14,  9, 25 );
-   PF2( 2, 3, 0, 1,  3, 14, 26 );
-   PF2( 1, 2, 3, 0,  8, 20, 27 );
-   PF2( 0, 1, 2, 3, 13,  5, 28 );
-   PF2( 3, 0, 1, 2,  2,  9, 29 );
-   PF2( 2, 3, 0, 1,  7, 14, 30 );
+   PF2( 1, 2, 3, 0, 4, 20, 23 );
+   PF2( 0, 1, 2, 3, 9, 5, 24 );
+   PF2( 3, 0, 1, 2, 14, 9, 25 );
+   PF2( 2, 3, 0, 1, 3, 14, 26 );
+   PF2( 1, 2, 3, 0, 8, 20, 27 );
+   PF2( 0, 1, 2, 3, 13, 5, 28 );
+   PF2( 3, 0, 1, 2, 2, 9, 29 );
+   PF2( 2, 3, 0, 1, 7, 14, 30 );
    PF2( 1, 2, 3, 0, 12, 20, 31 );
-   PF3( 0, 1, 2, 3,  5,  4, 32 );
-   PF3( 3, 0, 1, 2,  8, 11, 33 );
+   PF3( 0, 1, 2, 3, 5, 4, 32 );
+   PF3( 3, 0, 1, 2, 8, 11, 33 );
    PF3( 2, 3, 0, 1, 11, 16, 34 );
    PF3( 1, 2, 3, 0, 14, 23, 35 );
-   PF3( 0, 1, 2, 3,  1,  4, 36 );
-   PF3( 3, 0, 1, 2,  4, 11, 37 );
-   PF3( 2, 3, 0, 1,  7, 16, 38 );
+   PF3( 0, 1, 2, 3, 1, 4, 36 );
+   PF3( 3, 0, 1, 2, 4, 11, 37 );
+   PF3( 2, 3, 0, 1, 7, 16, 38 );
    PF3( 1, 2, 3, 0, 10, 23, 39 );
-   PF3( 0, 1, 2, 3, 13,  4, 40 );
-   PF3( 3, 0, 1, 2,  0, 11, 41 );
-   PF3( 2, 3, 0, 1,  3, 16, 42 );
-   PF3( 1, 2, 3, 0,  6, 23, 43 );
-   PF3( 0, 1, 2, 3,  9,  4, 44 );
+   PF3( 0, 1, 2, 3, 13, 4, 40 );
+   PF3( 3, 0, 1, 2, 0, 11, 41 );
+   PF3( 2, 3, 0, 1, 3, 16, 42 );
+   PF3( 1, 2, 3, 0, 6, 23, 43 );
+   PF3( 0, 1, 2, 3, 9, 4, 44 );
    PF3( 3, 0, 1, 2, 12, 11, 45 );
    PF3( 2, 3, 0, 1, 15, 16, 46 );
-   PF3( 1, 2, 3, 0,  2, 23, 47 );
-   PF4( 0, 1, 2, 3,  0,  6, 48 );
-   PF4( 3, 0, 1, 2,  7, 10, 49 );
+   PF3( 1, 2, 3, 0, 2, 23, 47 );
+   PF4( 0, 1, 2, 3, 0, 6, 48 );
+   PF4( 3, 0, 1, 2, 7, 10, 49 );
    PF4( 2, 3, 0, 1, 14, 15, 50 );
-   PF4( 1, 2, 3, 0,  5, 21, 51 );
-   PF4( 0, 1, 2, 3, 12,  6, 52 );
-   PF4( 3, 0, 1, 2,  3, 10, 53 );
+   PF4( 1, 2, 3, 0, 5, 21, 51 );
+   PF4( 0, 1, 2, 3, 12, 6, 52 );
+   PF4( 3, 0, 1, 2, 3, 10, 53 );
    PF4( 2, 3, 0, 1, 10, 15, 54 );
-   PF4( 1, 2, 3, 0,  1, 21, 55 );
-   PF4( 0, 1, 2, 3,  8,  6, 56 );
+   PF4( 1, 2, 3, 0, 1, 21, 55 );
+   PF4( 0, 1, 2, 3, 8, 6, 56 );
    PF4( 3, 0, 1, 2, 15, 10, 57 );
-   PF4( 2, 3, 0, 1,  6, 15, 58 );
+   PF4( 2, 3, 0, 1, 6, 15, 58 );
    PF4( 1, 2, 3, 0, 13, 21, 59 );
-   PF4( 0, 1, 2, 3,  4,  6, 60 );
+   PF4( 0, 1, 2, 3, 4, 6, 60 );
    PF4( 3, 0, 1, 2, 11, 10, 61 );
-   PF4( 2, 3, 0, 1,  2, 15, 62 );
-   PF4( 1, 2, 3, 0,  9, 21, 63 );
+   PF4( 2, 3, 0, 1, 2, 15, 62 );
+   PF4( 1, 2, 3, 0, 9, 21, 63 );
 
    /* Update accumulators */
-   md5->accum[ 0 ] += A[ 0 ];
-   md5->accum[ 1 ] += A[ 1 ];
-   md5->accum[ 2 ] += A[ 2 ];
-   md5->accum[ 3 ] += A[ 3 ];
+   md5->accum[ 0 ]   += A[ 0 ];
+   md5->accum[ 1 ]   += A[ 1 ];
+   md5->accum[ 2 ]   += A[ 2 ];
+   md5->accum[ 3 ]   += A[ 3 ];
 }
 
 static void hb_md5accinit( UINT32 accum[] )
 {
    /* fill initial accumulator state */
-   accum[ 0 ] = 0x67452301;
-   accum[ 1 ] = 0xEFCDAB89;
-   accum[ 2 ] = 0x98BADCFE;
-   accum[ 3 ] = 0x10325476;
+   accum[ 0 ]  = 0x67452301;
+   accum[ 1 ]  = 0xEFCDAB89;
+   accum[ 2 ]  = 0x98BADCFE;
+   accum[ 3 ]  = 0x10325476;
 }
 
 static void hb_md5val( UINT32 accum[], char * md5val )
@@ -267,24 +267,24 @@ static void hb_md5digest( BYTE * md5val, char * digest )
 
    for( i = 0; i < 16; i++ )
    {
-      b = ( md5val[ i ] >> 4 ) & 0x0F;
-      *digest++ = b + ( b > 9 ? 'a' - 10 : '0' );
-      b = md5val[ i ] & 0x0F;
-      *digest++ = b + ( b > 9 ? 'a' - 10 : '0' );
+      b           = ( md5val[ i ] >> 4 ) & 0x0F;
+      *digest++   = b + ( b > 9 ? 'a' - 10 : '0' );
+      b           = md5val[ i ] & 0x0F;
+      *digest++   = b + ( b > 9 ? 'a' - 10 : '0' );
    }
 }
 
 void hb_md5( const void * data, HB_SIZE ulLen, char * digest )
 {
-   const unsigned char * ucdata = ( const unsigned char * ) data;
-   UCHAR buf[ 128 ];
-   MD5_BUF md5;
-   int i, n;
+   const unsigned char *   ucdata = ( const unsigned char * ) data;
+   UCHAR                   buf[ 128 ];
+   MD5_BUF                 md5;
+   int                     i, n;
 
    /* perform startup procedures */
    hb_md5accinit( md5.accum );
    /* count full 512bit blocks in data*/
-   n = (int) ulLen >> 6;
+   n = ( int ) ulLen >> 6;
    /* process full blocks */
    for( i = 0; i < n; i++, ucdata += 64 )
    {
@@ -292,7 +292,7 @@ void hb_md5( const void * data, HB_SIZE ulLen, char * digest )
       hb_md5go( &md5 );
    }
    /* prepare additional block(s) */
-   n = (int) ulLen & 63;
+   n = ( int ) ulLen & 63;
    if( n )
       HB_MEMCPY( buf, ucdata, n );
    HB_MEMCPY( buf + n, pad, 64 );
@@ -304,12 +304,12 @@ void hb_md5( const void * data, HB_SIZE ulLen, char * digest )
       HB_MEMCPY( md5.buf, buf, 64 );
       hb_md5go( &md5 );
    }
-   buf[ i++ ] = ( UCHAR ) ( ( ulLen << 3 ) & 0xF8 );
-   ulLen >>= 5;
+   buf[ i++ ]  = ( UCHAR ) ( ( ulLen << 3 ) & 0xF8 );
+   ulLen       >>= 5;
    for( n = 7; n; --n )
    {
-      buf[ i++ ] = ( UCHAR ) ( ulLen & 0xFF );
-      ulLen >>= 8;
+      buf[ i++ ]  = ( UCHAR ) ( ulLen & 0xFF );
+      ulLen       >>= 8;
    }
    HB_MEMCPY( md5.buf, buf + i - 64, 64 );
    hb_md5go( &md5 );
@@ -319,16 +319,16 @@ void hb_md5( const void * data, HB_SIZE ulLen, char * digest )
 
 void hb_md5file( HB_FHANDLE hFile, char * digest )
 {
-   MD5_BUF md5;
-   HB_SIZE n;
-   int i;
-   HB_FOFFSET flen = 0;
-   UCHAR buf[ 128 ];
-   BYTE * readbuf = ( BYTE * ) hb_xgrab( MAX_FBUF );
+   MD5_BUF     md5;
+   HB_SIZE     n;
+   int         i;
+   HB_FOFFSET  flen     = 0;
+   UCHAR       buf[ 128 ];
+   BYTE *      readbuf  = ( BYTE * ) hb_xgrab( MAX_FBUF );
 
    hb_md5accinit( md5.accum );
-   n = hb_fsReadLarge( hFile, readbuf, MAX_FBUF );
-   flen += n;
+   n     = hb_fsReadLarge( hFile, readbuf, MAX_FBUF );
+   flen  += n;
    while( n == MAX_FBUF )
    {
       for( i = 0; i < ( MAX_FBUF >> 6 ); i++ )
@@ -336,8 +336,8 @@ void hb_md5file( HB_FHANDLE hFile, char * digest )
          HB_MEMCPY( md5.buf, readbuf + ( i << 6 ), 64 );
          hb_md5go( &md5 );
       }
-      n = hb_fsReadLarge( hFile, readbuf, MAX_FBUF );
-      flen += n;
+      n     = hb_fsReadLarge( hFile, readbuf, MAX_FBUF );
+      flen  += n;
    }
    hb_fsClose( hFile );
    i = 0;
@@ -345,11 +345,11 @@ void hb_md5file( HB_FHANDLE hFile, char * digest )
    {
       HB_MEMCPY( md5.buf, readbuf + i, 64 );
       hb_md5go( &md5 );
-      i += 64;
-      n -= 64;
+      i  += 64;
+      n  -= 64;
    }
    if( n )
-      HB_MEMCPY( buf, readbuf + i, (size_t) n );
+      HB_MEMCPY( buf, readbuf + i, ( size_t ) n );
    HB_MEMCPY( buf + n, pad, 64 );
    i = 56;
    if( n >= 56 )
@@ -358,12 +358,12 @@ void hb_md5file( HB_FHANDLE hFile, char * digest )
       HB_MEMCPY( md5.buf, buf, 64 );
       hb_md5go( &md5 );
    }
-   buf[ i++ ] = ( UCHAR ) ( ( flen << 3 ) & 0xF8 );
-   flen >>= 5;
+   buf[ i++ ]  = ( UCHAR ) ( ( flen << 3 ) & 0xF8 );
+   flen        >>= 5;
    for( n = 7; n; --n )
    {
-      buf[ i++ ] = ( UCHAR ) ( flen & 0xFF );
-      flen >>= 8;
+      buf[ i++ ]  = ( UCHAR ) ( flen & 0xFF );
+      flen        >>= 8;
    }
    HB_MEMCPY( md5.buf, buf + i - 64, 64 );
    hb_md5go( &md5 );
@@ -377,16 +377,16 @@ HB_FUNC( HB_MD5 )
 
    if( pszStr )
    {
-      HB_SIZE ulLen = hb_parclen( 1 );
-      char dststr[ 16 ];
-      char digest[ 33 ];
+      HB_SIZE  ulLen = hb_parclen( 1 );
+      char     dststr[ 16 ];
+      char     digest[ 33 ];
 
       hb_md5( pszStr, ulLen, dststr );
       hb_md5digest( ( BYTE * ) dststr, digest );
       hb_retclen( digest, 32 );
    }
    else
-      hb_retc_null(); /* return empty string on wrong call */
+      hb_retc_null();  /* return empty string on wrong call */
 }
 
 HB_FUNC( HB_MD5FILE )
@@ -399,8 +399,8 @@ HB_FUNC( HB_MD5FILE )
 
       if( hFile != FS_ERROR )
       {
-         char dststr[ 16 ];
-         char digest[ 33 ];
+         char  dststr[ 16 ];
+         char  digest[ 33 ];
 
          hb_md5file( hFile, dststr );
          hb_md5digest( ( BYTE * ) dststr, digest );

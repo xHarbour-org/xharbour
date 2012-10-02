@@ -66,7 +66,7 @@ HB_FUNC( STRPEEK )
       ULONG ulPos = hb_parnl( 2 );
 
       if( ulPos > 0 && ulPos <= pText->item.asString.length )
-         hb_retni( ( BYTE ) * ( pText->item.asString.value + ulPos - 1 ) );
+         hb_retni( ( BYTE ) *( pText->item.asString.value + ulPos - 1 ) );
       else
          hb_retni( 0 );
    }
@@ -81,9 +81,9 @@ HB_FUNC( STRPOKE )
 
    if( pText && ISNUM( 2 ) && ISNUM( 3 ) )
    {
-      ULONG ulPos = hb_parnl( 2 );
-      HB_SIZE ulLen;
-      char * pszText;
+      ULONG    ulPos = hb_parnl( 2 );
+      HB_SIZE  ulLen;
+      char *   pszText;
 
       if( ulPos > 0 && hb_itemGetWriteCL( pText, &pszText, &ulLen ) &&
           ulPos <= ulLen )

@@ -55,14 +55,15 @@
 #include "common.ch"
 #include "button.ch"
 
-#IFdef HB_COMPAT_C53
+#ifdef HB_COMPAT_C53
+
 CLASS HBRadioGroup
 
    export:
 
    METHOD AddItem( xItem )
    METHOD DelItem( xItem )
-   METHOD Display()
+   METHOD DISPLAY()
    METHOD GetAccel( xItem )
    METHOD GetItem( Xitem )
    METHOD HitTest( nRow, nCol )
@@ -70,26 +71,26 @@ CLASS HBRadioGroup
    METHOD KillFocus( )
    METHOD NextItem( )
    METHOD PrevItem( )
-   MESSAGE Select( xItem ) METHOD _Select( xItem )
+   MESSAGE SELECT( xItem ) METHOD _Select( xItem )
    MESSAGE SetColor( xItem ) METHOD _SetColor( xItem )
    METHOD SetFocus( )
    METHOD SetStyle( xItem )
    METHOD New( nTop, nLeft, nBottom, nRight )
 //   METHOD GetColor( xColor )
-   DATA Bottom
+   DATA BOTTOM
 
    DATA Buffer INIT  NIL
    DATA CapCol
    DATA CapRow
-   DATA Caption 
+   DATA Caption
    DATA Cargo  INIT  NIL
    DATA ColdBox  INIT  "ÚÄ¿³ÙÄÀ³"
    DATA fBlock  INIT  NIL
    DATA HasFocus  INIT  .F.
    DATA HotBox INIT  "ÉÍ»º¼ÍÈº"
    DATA ItemCount INIT 0
-   DATA Left 
-   DATA Message INIT ""
+   DATA Left
+   DATA MESSAGE INIT ""
 
    DATA Right
    DATA aItems INIT {}
@@ -97,67 +98,67 @@ CLASS HBRadioGroup
 
    DATA TextValue INIT ""
 
-   DATA Top
+   DATA TOP
    DATA TypeOut INIT .F.
 
    DATA Value INIT 0
-   DATA Color
-   Data colorspec INIT ""
+   DATA COLOR
+   DATA colorspec INIT ""
 //   ASSIGN Colorspec( xColor ) inline IIF( xColor != NIL, ::GetColor( xColor ), )
 
 ENDCLASS
 
 METHOD New( nTop, nLeft, nBottom, nRight ) CLASS HBRadioGroup
 
-   Local cColor
+   LOCAL cColor
 
-   IF IsDefColor()
+   IF IsDefcolor()
       ::ColorSpec := "W/N,W/N,W+/N"
    ELSE
       cColor := SetColor()
-      ::ColorSpec := __guicolor( cColor, CLR_BORDER + 1 ) + "," + ;
-                     __guicolor( cColor, CLR_STANDARD + 1 ) + "," + ;
-                     __guicolor( cColor, CLR_BACKGROUND + 1 )
+      ::ColorSpec := __GUIColor( cColor, CLR_BORDER + 1 ) + "," + ;
+         __GUIColor( cColor, CLR_STANDARD + 1 ) + "," + ;
+         __GUIColor( cColor, CLR_BACKGROUND + 1 )
    ENDIF
 
    ::Bottom := nBottom
-   ::CapCol := nLeft+2
+   ::CapCol := nLeft + 2
    ::CapRow := nTop
    ::Left   := nLeft
    ::right  := nRight
    ::top    := nTop
 
-RETURN Self
+   RETURN Self
 
 METHOD ADDITEM( xItem ) CLASS HBRadioGroup
 
    IF ! ISOBJECT( xItem )
-   ELSEIF Left(xItem:classname(),10) == "RADIOBUTTO"
-      Aadd( ::aItems, xItem )
+   ELSEIF Left( xItem:classname(), 10 ) == "RADIOBUTTO"
+      AAdd( ::aItems, xItem )
       ::ItemCount++
    ENDIF
 
-RETURN Self
+   RETURN Self
 
 METHOD SetStyle( xStyle ) CLASS HBRadioGroup
    
-   Local oItems
+   LOCAL oItems
 
    FOR EACH oItems IN ::aItems
       oItems:style( xStyle )
    NEXT
 
-RETURN Self
+   RETURN Self
 
 METHOD SetFocus() CLASS HBRadioGroup
 
-   Local oItems
+   LOCAL oItems
 
    IF ! ::HasFocus
-      ::lCursor  := setcursor( 0 )
+      ::lCursor  := SetCursor( 0 )
       ::HasFocus := .T.
 
-      dispbegin()
+      DispBegin()
 
       FOR EACH oItems IN ::aItems
          oItems:SetFocus()
@@ -165,7 +166,7 @@ METHOD SetFocus() CLASS HBRadioGroup
 
       ::display()
 
-      dispend()
+      DispEnd()
 
       IF ISBLOCK( ::fBlock )
          Eval( ::fBlock )
@@ -173,23 +174,23 @@ METHOD SetFocus() CLASS HBRadioGroup
 
    ENDIF
 
-RETURN self
+   RETURN self
 
 METHOD _SetColor( cColor ) CLASS HBRadioGroup
 
-   Local oItems
+   LOCAL oItems
 
    FOR EACH oItems IN ::aItems
       oItems:ColorSpec := cColor
    NEXT
 
-RETURN Self
+   RETURN Self
 
 METHOD _Select( xValue ) CLASS HBRadioGroup
 
-   Local nPos := -1
-   Local cType := ValType( xValue )
-   Local oItems
+   LOCAL nPos := - 1
+   LOCAL cType := ValType( xValue )
+   LOCAL oItems
 
    IF cType == "C"
 
@@ -200,7 +201,7 @@ METHOD _Select( xValue ) CLASS HBRadioGroup
             nPos := HB_EnumIndex()
             changebutt( Self, ::Value, nPos )
 
-            exit
+            EXIT
          ENDIF
 
       NEXT
@@ -210,29 +211,29 @@ METHOD _Select( xValue ) CLASS HBRadioGroup
       ENDIF
 
    ELSE
-      IF !( cType != "U" .AND. xValue < 1 ) .AND.;
-           ( cType != "U" .AND. xValue <= ::ItemCount )
-         default ::Buffer to 0
+      IF !( cType != "U" .AND. xValue < 1 ) .AND. ;
+            ( cType != "U" .AND. xValue <= ::ItemCount )
+         default ::Buffer TO 0
          changebutt( self, ::Value, xValue )
       ENDIF
    ENDIF
 
-RETURN Self
+   RETURN Self
 
 METHOD PrevItem()        CLASS HBRadioGroup
 
-   local xValue := ::Value, nPos
+   LOCAL xValue := ::Value, nPos
 
    IF ::HasFocus .AND. ::ItemCount > 0
 
       Switch xValue
       CASE 0
          nPos := 1
-         exit
+         EXIT
       CASE 1
          nPos := ::ItemCount
-         exit
-      Default
+         EXIT
+         DEFAULT
          nPos := xValue - 1
       End
 
@@ -240,11 +241,11 @@ METHOD PrevItem()        CLASS HBRadioGroup
 
    ENDIF
 
-RETURN self
+   RETURN self
 
 METHOD NextItem()        CLASS HBRadioGroup
 
-   local xValue, nPos
+   LOCAL xValue, nPos
 
    IF ::HasFocus .AND. ::ItemCount > 0
 
@@ -258,11 +259,11 @@ METHOD NextItem()        CLASS HBRadioGroup
 
    ENDIF
 
-RETURN Self
+   RETURN Self
 
 METHOD KillFocus()       CLASS HBRadioGroup
 
-   Local oItems
+   LOCAL oItems
 
    IF ::HasFocus
 
@@ -271,7 +272,7 @@ METHOD KillFocus()       CLASS HBRadioGroup
          Eval( ::fBlock )
       ENDIF
 
-      dispbegin()
+      DispBegin()
 
       FOR EACH oItems IN ::aItems
          oItems:KillFocus()
@@ -279,32 +280,32 @@ METHOD KillFocus()       CLASS HBRadioGroup
 
       ::display()
 
-      dispend()
+      DispEnd()
 
-      setcursor(::lCursor )
+      SetCursor( ::lCursor )
 
    ENDIF
 
-RETURN self
+   RETURN self
 
 METHOD InsItem( nPos, oButtom ) CLASS HBRadioGroup
 
    IF ! ISOBJECT( oButtom )
    ELSEIF ! oButtom:classname() == "RADIOBUTTN"
    ELSEIF nPos < ::ItemCount
-//      asize(::aItems, ++::ItemCount )
-      ains(::aItems, nPos, oButtom, .T. )
-//      ::aItems[ nPos ] := oButtom
+      //      asize(::aItems, ++::ItemCount )
+      AIns( ::aItems, nPos, oButtom, .T. )
+      //      ::aItems[ nPos ] := oButtom
    ENDIF
 
-RETURN ::aItems[ nPos ]
+   RETURN ::aItems[ nPos ]
 
 METHOD HitTest( nRow, nCol )    CLASS HBRadioGroup
 
-   Local nLen, nPosition
-   Local oItems
+   LOCAL nLen, nPosition
+   LOCAL oItems
 
-   do CASE
+   DO CASE
    CASE Empty( ::Coldbox + ::HotBox )
    CASE nRow == ::Top
       IF nCol == ::Left
@@ -323,13 +324,13 @@ METHOD HitTest( nRow, nCol )    CLASS HBRadioGroup
          RETURN HTBOTTOMRIGHT
       ENDIF
    CASE nCol == ::Left
-      IF nRow >= ::Top .AND. nRow <= ::Bottom
+      IF nRow >= ::TOP .AND. nRow <= ::Bottom
          RETURN HTLEFT
       ELSE
          RETURN HTNOWHERE
       ENDIF
    CASE nCol == ::Right
-      IF nRow >= ::Top .AND. nRow <= ::Bottom
+      IF nRow >= ::TOP .AND. nRow <= ::Bottom
          RETURN HTRIGHT
       ELSE
          RETURN HTNOWHERE
@@ -343,7 +344,7 @@ METHOD HitTest( nRow, nCol )    CLASS HBRadioGroup
       nLen--
    ENDIF
 
-   do CASE
+   DO CASE
    CASE Empty( ::Caption )
    CASE nRow != ::CapRow
    CASE nCol < ::CapCol
@@ -351,38 +352,39 @@ METHOD HitTest( nRow, nCol )    CLASS HBRadioGroup
       RETURN HTCAPTION
    ENDCASE
 
-   do CASE
+   DO CASE
    CASE nRow < ::Top
    CASE nRow > ::Bottom
    CASE nCol < ::Left
    CASE nCol <= ::Right
-//      nPos := 1
+      //      nPos := 1
       FOR EACH oItems IN ::aItems
          IF oItems:HitTest( nRow, nCol ) != 0
             RETURN HB_EnumIndex()
          ENDIF
-//         nPos++
+         //         nPos++
       NEXT
       RETURN HTCLIENT
    ENDCASE
 
-RETURN HTNOWHERE
+   RETURN HTNOWHERE
 
 METHOD GetItem( xValue )        CLASS HBRadioGroup
-   local xReturn := NIL
+
+   LOCAL xReturn := NIL
 
    IF xValue >= 1 .AND. xValue <= ::ItemCount
       xReturn := ::aItems[ xValue ]
    ENDIF
 
-RETURN xReturn
+   RETURN xReturn
 
 METHOD GetAccel( xValue )       CLASS HBRadioGroup
 
 //   Local nPos
-   Local oItems
+   LOCAL oItems
 
-   Do CASE
+   DO CASE
    CASE ISNUMBER( xValue )
       xValue := Chr( xValue )
    CASE !ISCHARACTER( xValue )
@@ -396,19 +398,19 @@ METHOD GetAccel( xValue )       CLASS HBRadioGroup
       IF oItems:IsAccel( xValue )
          RETURN HB_EnumIndex()
       ENDIF
-//      nPos++
+      //      nPos++
    NEXT
 
-RETURN 0
+   RETURN 0
 
-METHOD Display() CLASS HBRadioGroup
+METHOD DISPLAY() CLASS HBRadioGroup
 
-   Local cColor := SetColor(), ;
-         nCurRow := Row(), nCurCol := Col(), cSelBox, ;
-         cUnSelBox, cCaption, nPosition
-   Local oItems
+   LOCAL cColor := SetColor(), ;
+      nCurRow := Row(), nCurCol := Col(), cSelBox, ;
+      cUnSelBox, cCaption, nPosition
+   LOCAL oItems
 
-   dispbegin()
+   DispBegin()
 
    IF ::HasFocus
       cSelBox := ::HotBox
@@ -418,12 +420,12 @@ METHOD Display() CLASS HBRadioGroup
       cUnSelBox := ::HotBox
    ENDIF
 
-   set color to ( __guicolor( ::ColorSpec, 1 ) )
+   SET COLOR to ( __GUIColor( ::ColorSpec, 1 ) )
 
    IF !Empty( cSelBox )
-      @ ::Top, ::Left, ::Bottom, ::Right box cSelBox
+      @ ::Top, ::Left, ::Bottom, ::Right BOX cSelBox
    ELSEIF !Empty( cUnSelBox )
-      @ ::Top, ::Left, ::Bottom, ::Right box cUnSelBox
+      @ ::Top, ::Left, ::Bottom, ::Right BOX cUnSelBox
    ENDIF
 
    IF !Empty( cCaption := ::Caption )
@@ -432,16 +434,16 @@ METHOD Display() CLASS HBRadioGroup
          IF nPosition == Len( cCaption )
             nPosition := 0
          ELSE
-            cCaption := stuff( cCaption, nPosition, 1, "" )
+            cCaption := Stuff( cCaption, nPosition, 1, "" )
          ENDIF
       ENDIF
 
-      set color to ( __guicolor( ::ColorSpec, 2 ) )
+      SET COLOR to ( __GUIColor( ::ColorSpec, 2 ) )
       SetPos( ::CapRow, ::CapCol )
       ?? cCaption
 
       IF nPosition != 0
-         set color to ( __guicolor( ::ColorSpec, 3 ) )
+         SET COLOR to ( __GUIColor( ::ColorSpec, 3 ) )
          SetPos( ::CapRow, ::CapCol + nPosition - 1 )
          ?? SubStr( cCaption, nPosition, 1 )
       ENDIF
@@ -452,18 +454,18 @@ METHOD Display() CLASS HBRadioGroup
       oItems:Display()
    NEXT
 
-   dispend()
+   DispEnd()
 
-   set color to ( cColor )
+   SET COLOR to ( cColor )
    SetPos( nCurRow, nCurCol )
 
-RETURN self
+   RETURN self
 
 METHOD DelItem( xItem ) CLASS HBRadioGroup
 
    IF xItem >= 1 .AND. xItem <= ::ItemCount
-      Adel( ::aItems[ xItem ], .T. )
-//      asize(::aItems, --::ItemCount )
+      ADel( ::aItems[ xItem ], .T. )
+      //      asize(::aItems, --::ItemCount )
       ::ItemCount--
    ENDIF
 
@@ -480,7 +482,7 @@ METHOD DelItem( xItem ) CLASS HBRadioGroup
 
    ENDIF
 
-RETURN self
+   RETURN self
 
 /*METHOD GetColor(xColor )  CLASS HBRadioGroup
 
@@ -494,23 +496,23 @@ RETURN self
 RETURN ::Color
 */
 
-static function  ChangeButt( oItems, xVal, nPos )
+STATIC FUNCTION  ChangeButt( oItems, xVal, nPos )
 
    IF xVal != nPos
 
-      dispbegin()
+      DispBegin()
 
       IF xVal > 0
-         oItems:aItems[ xVal ]:select( .F. )
+         oItems:aItems[ xVal ]:Select( .F. )
          oItems:aItems[ xVal ]:display()
       ENDIF
 
       IF nPos > 0
-         oItems:aItems[ nPos ]:select( .T. )
+         oItems:aItems[ nPos ]:Select( .T. )
          oItems:aItems[ nPos ]:display()
       ENDIF
 
-      dispend()
+      DispEnd()
 
       oItems:Value := nPos
       oItems:TextValue := oItems:aItems[ nPos ]:data
@@ -523,47 +525,47 @@ static function  ChangeButt( oItems, xVal, nPos )
 
    ENDIF
 
-RETURN .T.
+   RETURN .T.
 
 // Radio Group Class Constructor Function
 
-function RadioGroup( nTop, nLeft, nBottom, nRight )
+FUNCTION RadioGroup( nTop, nLeft, nBottom, nRight )
 
-   IF ISNUMBER( nTop ) .and. ;
-      ISNUMBER( nLeft ) .and. ;
-      ISNUMBER( nBottom ) .and. ;
-      ISNUMBER( nright )
+   IF ISNUMBER( nTop ) .AND. ;
+         ISNUMBER( nLeft ) .AND. ;
+         ISNUMBER( nBottom ) .AND. ;
+         ISNUMBER( nright )
       RETURN HBRadioGroup():New( nTop, nLeft, nBottom, nRight )
    ENDIF
 
-RETURN NIL
+   RETURN NIL
 
+FUNCTION _RADIOGRP_( nTop, nLeft, nBottom, nRight, xValue, aItems, cCaption, cMessage, ;
+      cColor, bFblock )
 
-function _RADIOGRP_( nTop, nLeft, nBottom, nRight, xValue, aItems, cCaption, cMessage, ;
-   cColor, bFblock )
+   LOCAL oRadioGroup
+   LOCAL xItems
 
-   Local oRadioGroup
-   Local xItems
-
-   default ccaption to ""
+   DEFAULT ccaption TO ""
 
    oRadioGroup := RadioGroup( nTop, nLeft, nBottom, nRight )
 
    IF ! ISNIL( oRadioGroup )
 
-      oRadioGroup:caption   := IIF( cCaption != NIL, cCaption, )
-      oRadioGroup:colorspec := IIF( cColor != NIL, cColor, )
-      oRadioGroup:message   := IIF( cMessage != NIL, cMessage, )
-      oRadioGroup:fblock    := IIF( bFblock != NIL, bFblock, )
+      oRadioGroup:caption   := iif( cCaption != NIL, cCaption, )
+      oRadioGroup:colorspec := iif( cColor != NIL, cColor, )
+      oRadioGroup:message   := iif( cMessage != NIL, cMessage, )
+      oRadioGroup:fblock    := iif( bFblock != NIL, bFblock, )
 
       FOR EACH xItems IN aItems
          oRadioGroup:AddItem( xItems )
       NEXT
 
-      oRadioGroup:select( xValue )
+      oRadioGroup:Select( xValue )
 
    ENDIF
 
    RETURN oRadioGroup
 
-#ENDIF
+#endif
+

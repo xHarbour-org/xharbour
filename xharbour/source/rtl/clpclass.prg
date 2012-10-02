@@ -54,30 +54,33 @@
 STATIC s_nDataId
 
 //----------------------------------------------------------------------------//
-FUNCTION __ClassNew( cName, nDatas )
 
-    LOCAL hClass := __ClsNew( cName, nDatas )
+FUNCTION __classNew( cName, nDatas )
 
-    __ClsSetModule( hClass )
+   LOCAL hClass := __clsNew( cName, nDatas )
 
-    s_nDataId := 0
+   __ClsSetModule( hClass )
 
-RETURN hClass
+   s_nDataId := 0
+
+   RETURN hClass
 
 //----------------------------------------------------------------------------//
-FUNCTION __ClassAdd( hClass, cProperty, cFunction )
+
+FUNCTION __classAdd( hClass, cProperty, cFunction )
 
    cProperty := Upper( cProperty )
 
    IF cProperty[1] == '_'
-      RETURN __ClsAddMsg( hClass, cProperty, ++s_nDataId, HB_OO_MSG_DATA )
+      RETURN __clsAddMsg( hClass, cProperty, ++s_nDataId, HB_OO_MSG_DATA )
    ENDIF
 
-RETURN __ClsAddMsg( hClass, cProperty, HB_FuncPtr( cFunction ), HB_OO_MSG_METHOD )
+   RETURN __clsAddMsg( hClass, cProperty, HB_FuncPtr( cFunction ), HB_OO_MSG_METHOD )
 
 //----------------------------------------------------------------------------//
+
 FUNCTION __ClassIns( hClass )
 
-RETURN __ClsInst( hClass )
+   RETURN __clsInst( hClass )
 
 //----------------------------------------------------------------------------//

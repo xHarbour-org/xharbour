@@ -65,110 +65,110 @@ int hb_gt_dos_keyCodeTranslate( int iKey )
    switch( iKey )
    {
       case -1:  /* No key available */
-         iKey = 0;
+         iKey  = 0;
          break;
       case 328:  /* Up arrow */
-         iKey = K_UP;
+         iKey  = K_UP;
          break;
       case 336:  /* Down arrow */
-         iKey = K_DOWN;
+         iKey  = K_DOWN;
          break;
       case 331:  /* Left arrow */
-         iKey = K_LEFT;
+         iKey  = K_LEFT;
          break;
       case 333:  /* Right arrow */
-         iKey = K_RIGHT;
+         iKey  = K_RIGHT;
          break;
       case 327:  /* Home */
-         iKey = K_HOME;
+         iKey  = K_HOME;
          break;
       case 335:  /* End */
-         iKey = K_END;
+         iKey  = K_END;
          break;
       case 329:  /* Page Up */
-         iKey = K_PGUP;
+         iKey  = K_PGUP;
          break;
       case 337:  /* Page Down */
-         iKey = K_PGDN;
+         iKey  = K_PGDN;
          break;
       case 371:  /*  Ctrl + Left arrow */
-         iKey = K_CTRL_LEFT;
+         iKey  = K_CTRL_LEFT;
          break;
       case 372:  /* Ctrl + Right arrow */
-         iKey = K_CTRL_RIGHT;
+         iKey  = K_CTRL_RIGHT;
          break;
       case 375:  /* Ctrl + Home */
-         iKey = K_CTRL_HOME;
+         iKey  = K_CTRL_HOME;
          break;
       case 373:  /* Ctrl + End */
-         iKey = K_CTRL_END;
+         iKey  = K_CTRL_END;
          break;
       case 388:  /* Ctrl + Page Up */
-         iKey = K_CTRL_PGUP;
+         iKey  = K_CTRL_PGUP;
          break;
       case 374:  /* Ctrl + Page Down */
-         iKey = K_CTRL_PGDN;
+         iKey  = K_CTRL_PGDN;
          break;
       case 338:  /* Insert */
-         iKey = K_INS;
+         iKey  = K_INS;
          break;
       case 339:  /* Delete */
-         iKey = K_DEL;
+         iKey  = K_DEL;
          break;
       case 315:  /* F1 */
-         iKey = K_F1;
+         iKey  = K_F1;
          break;
-      case 316:  /* F2 */
-      case 317:  /* F3 */
-      case 318:  /* F4 */
-      case 319:  /* F5 */
-      case 320:  /* F6 */
-      case 321:  /* F7 */
-      case 322:  /* F8 */
-      case 323:  /* F9 */
-      case 324:  /* F10 */
+      case 316:   /* F2 */
+      case 317:   /* F3 */
+      case 318:   /* F4 */
+      case 319:   /* F5 */
+      case 320:   /* F6 */
+      case 321:   /* F7 */
+      case 322:   /* F8 */
+      case 323:   /* F9 */
+      case 324:   /* F10 */
          iKey = 315 - iKey;
          break;
-      case 340:  /* Shift + F1 */
-      case 341:  /* Shift + F2 */
-      case 342:  /* Shift + F3 */
-      case 343:  /* Shift + F4 */
-      case 344:  /* Shift + F5 */
-      case 345:  /* Shift + F6 */
-      case 346:  /* Shift + F7 */
-      case 347:  /* Shift + F8 */
-      case 348:  /* Shift + F9 */
-      case 349:  /* Shift + F10 */
-      case 350:  /* Ctrl + F1 */
-      case 351:  /* Ctrl + F2 */
-      case 352:  /* Ctrl + F3 */
-      case 353:  /* Ctrl + F4 */
-      case 354:  /* Ctrl + F5 */
-      case 355:  /* Ctrl + F6 */
-      case 356:  /* Ctrl + F7 */
-      case 357:  /* Ctrl + F8 */
-      case 358:  /* Ctrl + F9 */
-      case 359:  /* Ctrl + F10 */
-      case 360:  /* Alt + F1 */
-      case 361:  /* Alt + F2 */
-      case 362:  /* Alt + F3 */
-      case 363:  /* Alt + F4 */
-      case 364:  /* Alt + F5 */
-      case 365:  /* Alt + F6 */
-      case 366:  /* Alt + F7 */
-      case 367:  /* Alt + F8 */
-      case 368:  /* Alt + F9 */
-      case 369:  /* Alt + F10 */
+      case 340:   /* Shift + F1 */
+      case 341:   /* Shift + F2 */
+      case 342:   /* Shift + F3 */
+      case 343:   /* Shift + F4 */
+      case 344:   /* Shift + F5 */
+      case 345:   /* Shift + F6 */
+      case 346:   /* Shift + F7 */
+      case 347:   /* Shift + F8 */
+      case 348:   /* Shift + F9 */
+      case 349:   /* Shift + F10 */
+      case 350:   /* Ctrl + F1 */
+      case 351:   /* Ctrl + F2 */
+      case 352:   /* Ctrl + F3 */
+      case 353:   /* Ctrl + F4 */
+      case 354:   /* Ctrl + F5 */
+      case 355:   /* Ctrl + F6 */
+      case 356:   /* Ctrl + F7 */
+      case 357:   /* Ctrl + F8 */
+      case 358:   /* Ctrl + F9 */
+      case 359:   /* Ctrl + F10 */
+      case 360:   /* Alt + F1 */
+      case 361:   /* Alt + F2 */
+      case 362:   /* Alt + F3 */
+      case 363:   /* Alt + F4 */
+      case 364:   /* Alt + F5 */
+      case 365:   /* Alt + F6 */
+      case 366:   /* Alt + F7 */
+      case 367:   /* Alt + F8 */
+      case 368:   /* Alt + F9 */
+      case 369:   /* Alt + F10 */
          iKey = 330 - iKey;
          break;
-      case 389:  /* F11 */
-      case 390:  /* F12 */
-      case 391:  /* Shift + F11 */
-      case 392:  /* Shift + F12 */
-      case 393:  /* Ctrl + F11 */
-      case 394:  /* Ctrl + F12 */
-      case 395:  /* Alt + F11 */
-      case 396:  /* Alt + F12 */
+      case 389:   /* F11 */
+      case 390:   /* F12 */
+      case 391:   /* Shift + F11 */
+      case 392:   /* Shift + F12 */
+      case 393:   /* Ctrl + F11 */
+      case 394:   /* Ctrl + F12 */
+      case 395:   /* Alt + F11 */
+      case 396:   /* Alt + F12 */
          iKey = 349 - iKey;
    }
 

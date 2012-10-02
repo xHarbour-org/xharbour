@@ -55,10 +55,10 @@
 #include "hbapiitm.h"
 #include "hbapifs.h"
 
-#if defined(HB_OS_UNIX)
+#if defined( HB_OS_UNIX )
    #include <sys/stat.h>
    #include <unistd.h>
-#elif ( defined( HB_OS_WIN ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
+#elif ( defined( HB_OS_WIN ) || defined( __MINGW32__ ) ) && ! defined( __CYGWIN__ )
    #include <windows.h>
 #endif
 
@@ -68,11 +68,11 @@ static void blockeval( EVALINFO, PHB_ITEM, ULONG );
 
 static BOOL hb_fsCopy( const char * szSource, const char * szDest, PHB_ITEM block )
 {
-   BOOL bRetVal = FALSE;
-   FHANDLE fhndSource;
+   BOOL     bRetVal = FALSE;
+   FHANDLE  fhndSource;
    EVALINFO info;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsCopy(%s, %s)", szSource, szDest));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_fsCopy(%s, %s)", szSource, szDest ) );
 
    while( ( fhndSource = hb_spOpen( szSource, FO_READ | FO_SHARED | FO_PRIVATE ) ) == FS_ERROR )
    {
@@ -100,19 +100,19 @@ static BOOL hb_fsCopy( const char * szSource, const char * szDest, PHB_ITEM bloc
 
       if( fhndDest != FS_ERROR )
       {
-#if defined(HB_OS_UNIX)
-         struct stat struFileInfo;
-         int iSuccess = fstat( fhndSource, &struFileInfo );
-#elif ( defined( HB_OS_WIN ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
+#if defined( HB_OS_UNIX )
+         struct stat                struFileInfo;
+         int                        iSuccess = fstat( fhndSource, &struFileInfo );
+#elif ( defined( HB_OS_WIN ) || defined( __MINGW32__ ) ) && ! defined( __CYGWIN__ )
          BY_HANDLE_FILE_INFORMATION hFileInfo;
-         BOOL bSuccess = GetFileInformationByHandle( (HANDLE) fhndSource, &hFileInfo);
+         BOOL                       bSuccess = GetFileInformationByHandle( ( HANDLE ) fhndSource, &hFileInfo );
 #endif
-         BYTE * buffer;
-         USHORT usRead;
+         BYTE *                     buffer;
+         USHORT                     usRead;
 
-         buffer = ( BYTE * ) hb_xgrab( BUFFER_SIZE );
+         buffer   = ( BYTE * ) hb_xgrab( BUFFER_SIZE );
 
-         bRetVal = TRUE;
+         bRetVal  = TRUE;
 
          if( block )
          {
@@ -145,22 +145,22 @@ static BOOL hb_fsCopy( const char * szSource, const char * szDest, PHB_ITEM bloc
             hb_evalRelease( &info );
          }
 
-#if defined(HB_OS_UNIX)
+#if defined( HB_OS_UNIX )
          if( iSuccess == 0 )
             fchmod( fhndDest, struFileInfo.st_mode );
-#elif ( defined( HB_OS_WIN ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
+#elif ( defined( HB_OS_WIN ) || defined( __MINGW32__ ) ) && ! defined( __CYGWIN__ )
          if( bSuccess )
-            SetFileTime( (HANDLE) fhndDest,
-    &hFileInfo.ftCreationTime,
-    &hFileInfo.ftLastAccessTime,
-    &hFileInfo.ftLastWriteTime);
+            SetFileTime( ( HANDLE ) fhndDest,
+                         &hFileInfo.ftCreationTime,
+                         &hFileInfo.ftLastAccessTime,
+                         &hFileInfo.ftLastWriteTime );
 #endif
 
          hb_fsClose( fhndDest );
-#if ( defined( HB_OS_WIN ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
+#if ( defined( HB_OS_WIN ) || defined( __MINGW32__ ) ) && ! defined( __CYGWIN__ )
          if( bSuccess )
          {
-            SetFileAttributes( (LPCSTR) szSource, hFileInfo.dwFileAttributes );
+            SetFileAttributes( ( LPCSTR ) szSource, hFileInfo.dwFileAttributes );
          }
 #endif
       }
@@ -175,14 +175,13 @@ static void blockeval( EVALINFO info, PHB_ITEM block, ULONG count )
 {
    if( hb_itemType( block ) == HB_IT_BLOCK )
    {
-     HB_ITEM_NEW( Count );
+      HB_ITEM_NEW( Count );
 
-     hb_evalPutParam( &info, hb_itemPutNL( &Count, count ) );
+      hb_evalPutParam( &info, hb_itemPutNL( &Count, count ) );
 
-     hb_itemRelease( hb_evalLaunch( &info ) );
+      hb_itemRelease( hb_evalLaunch( &info ) );
    }
 
-   return;
 }
 
 /* Clipper returns .F. on failure and NIL on success */

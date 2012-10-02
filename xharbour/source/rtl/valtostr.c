@@ -58,9 +58,9 @@
 
 HB_FUNC( HB_VALTOSTR )
 {
-   HB_SIZE ulLen;
-   BOOL bFreeReq;
-   char * buffer = hb_itemString( hb_param( 1, HB_IT_ANY ), &ulLen, &bFreeReq );
+   HB_SIZE  ulLen;
+   BOOL     bFreeReq;
+   char *   buffer = hb_itemString( hb_param( 1, HB_IT_ANY ), &ulLen, &bFreeReq );
 
    if( bFreeReq )
       hb_retclenAdopt( buffer, ulLen );
@@ -74,9 +74,9 @@ HB_FUNC( HB_STRTOEXP )
 
    if( pszString )
    {
-      HB_SIZE ulLen = hb_parclen( 1 ), ulRet, ul, uQ = 0;
-      int iType = 0;
-      char ch, * pDst, * pszResult;
+      HB_SIZE  ulLen = hb_parclen( 1 ), ulRet, ul, uQ = 0;
+      int      iType = 0;
+      char     ch, * pDst, * pszResult;
 
       for( ul = 0; ul < ulLen; ++ul )
       {
@@ -102,40 +102,40 @@ HB_FUNC( HB_STRTOEXP )
                break;
             case '\0':
                iType |= 7;
-               uQ += 3;
+               uQ    += 3;
                break;
          }
       }
       if( iType == 7 )
       {
-         ulRet = ulLen + 3 + uQ;
-         pDst = pszResult = ( char * ) hb_xgrab( ulRet + 1 );
-         *pDst++ = 'e';
-         *pDst++ = '"';
+         ulRet    = ulLen + 3 + uQ;
+         pDst     = pszResult = ( char * ) hb_xgrab( ulRet + 1 );
+         *pDst++  = 'e';
+         *pDst++  = '"';
          for( ul = 0; ul < ulLen; ++ul )
          {
             ch = pszString[ ul ];
             switch( ch )
             {
                case '\r':
-                  *pDst++ = '\\';
-                  *pDst++ = 'r';
+                  *pDst++  = '\\';
+                  *pDst++  = 'r';
                   break;
                case '\n':
-                  *pDst++ = '\\';
-                  *pDst++ = 'n';
+                  *pDst++  = '\\';
+                  *pDst++  = 'n';
                   break;
                case '\0':
-                  *pDst++ = '\\';
-                  *pDst++ = '0';
-                  *pDst++ = '0' + ( ch >> 3 );
-                  *pDst++ = '0' + ( ch & 7 );
+                  *pDst++  = '\\';
+                  *pDst++  = '0';
+                  *pDst++  = '0' + ( ch >> 3 );
+                  *pDst++  = '0' + ( ch & 7 );
                   break;
                case '\\':
                case '"':
-                  *pDst++ = '\\';
+                  *pDst++  = '\\';
                default:
-                  *pDst++ = ch;
+                  *pDst++  = ch;
                   break;
             }
          }
@@ -144,19 +144,19 @@ HB_FUNC( HB_STRTOEXP )
       else
       {
          ulRet = ulLen + 2;
-         pDst = pszResult = ( char * ) hb_xgrab( ulRet + 1 );
+         pDst  = pszResult = ( char * ) hb_xgrab( ulRet + 1 );
          if( ( iType & 1 ) == 0 )
             *pDst++ = ch = '"';
          else if( ( iType & 2 ) == 0 )
             *pDst++ = ch = '\'';
          else
          {
-            *pDst++ = '[';
-            ch = ']';
+            *pDst++  = '[';
+            ch       = ']';
          }
-         HB_MEMCPY( pDst, pszString, (size_t) ulLen );
-         pDst += ulLen;
-         *pDst++ = ch;
+         HB_MEMCPY( pDst, pszString, ( size_t ) ulLen );
+         pDst     += ulLen;
+         *pDst++  = ch;
       }
       *pDst = '\0';
       hb_retclenAdopt( pszResult, ulRet );

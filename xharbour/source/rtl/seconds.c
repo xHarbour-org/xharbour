@@ -60,9 +60,9 @@
 
 #include <time.h>
 
-#if ( defined( HB_OS_BSD ) || defined( HB_OS_LINUX ) || defined(HB_OS_UNIX) ) && !defined( __WATCOMC__ )
+#if ( defined( HB_OS_BSD ) || defined( HB_OS_LINUX ) || defined( HB_OS_UNIX ) ) && ! defined( __WATCOMC__ )
    #include <sys/time.h>
-#elif !( defined( HB_OS_WIN_CE ) && defined( _MSC_VER ) )
+#elif ! ( defined( HB_OS_WIN_CE ) && defined( _MSC_VER ) )
    #include <sys/timeb.h>
 #endif
 #if defined( HB_OS_UNIX )
@@ -71,9 +71,9 @@
 #endif
 #if defined( HB_OS_WIN )
    #include <windows.h>
-#elif defined(_MSC_VER)
-   #define timeb _timeb
-   #define ftime _ftime
+#elif defined( _MSC_VER )
+   #define timeb     _timeb
+   #define ftime     _ftime
 #endif
 #if defined( HB_OS_OS2 )
    #define BUFSIZE   16 * 1024
@@ -85,54 +85,54 @@
 
 void hb_dateTimeStamp( long * plJulian, long * plMilliSec )
 {
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN )
    SYSTEMTIME st;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateTimeStamp(%p,%p)", plJulian, plMilliSec));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateTimeStamp(%p,%p)", plJulian, plMilliSec ) );
 
    GetLocalTime( &st );
 
-   *plJulian = hb_dateEncode( st.wYear, st.wMonth, st.wDay );
+   *plJulian   = hb_dateEncode( st.wYear, st.wMonth, st.wDay );
    *plMilliSec = ( ( st.wHour * 60 + st.wMinute ) * 60 + st.wSecond ) * 1000 +
                  st.wMilliseconds;
-#elif (defined( HB_OS_LINUX )|| defined(HB_OS_UNIX)) && !defined( __WATCOMC__ )
+#elif ( defined( HB_OS_LINUX ) || defined( HB_OS_UNIX ) ) && ! defined( __WATCOMC__ )
    struct timeval tv;
-   struct tm st;
-   time_t seconds;
+   struct tm      st;
+   time_t         seconds;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateTimeStamp(%p,%p)", plJulian, plMilliSec));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateTimeStamp(%p,%p)", plJulian, plMilliSec ) );
 
    gettimeofday( &tv, NULL );
-   seconds = tv.tv_sec;
+   seconds     = tv.tv_sec;
    localtime_r( &seconds, &st );
-   *plJulian = hb_dateEncode( st.tm_year + 1900, st.tm_mon + 1, st.tm_mday );
+   *plJulian   = hb_dateEncode( st.tm_year + 1900, st.tm_mon + 1, st.tm_mday );
    *plMilliSec = ( ( st.tm_hour * 60 + st.tm_min ) * 60 + st.tm_sec ) * 1000 +
                  tv.tv_usec / 1000;
 #elif defined( HB_OS_BSD )
    struct timeval tv;
-   struct tm * st;
-   time_t seconds;
+   struct tm *    st;
+   time_t         seconds;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateTimeStamp(%p,%p)", plJulian, plMilliSec));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateTimeStamp(%p,%p)", plJulian, plMilliSec ) );
 
    gettimeofday( &tv, NULL );
-   seconds = tv.tv_sec;
-   st = localtime( &seconds );
-   *plJulian = hb_dateEncode( st->tm_year + 1900, st->tm_mon + 1, st->tm_mday );
+   seconds     = tv.tv_sec;
+   st          = localtime( &seconds );
+   *plJulian   = hb_dateEncode( st->tm_year + 1900, st->tm_mon + 1, st->tm_mday );
    *plMilliSec = ( ( st->tm_hour * 60 + st->tm_min ) * 60 + st->tm_sec ) * 1000 +
                  tv.tv_usec / 1000.0;
 #else
-   struct timeb tb;
-   struct tm * st;
-   time_t seconds;
+   struct timeb   tb;
+   struct tm *    st;
+   time_t         seconds;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateTimeStamp(%p,%p)", plJulian, plMilliSec));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateTimeStamp(%p,%p)", plJulian, plMilliSec ) );
 
    ftime( &tb );
-   seconds = tb.time;
-   st = localtime( &seconds );
+   seconds     = tb.time;
+   st          = localtime( &seconds );
 
-   *plJulian = hb_dateEncode( st->tm_year + 1900, st->tm_mon + 1, st->tm_mday );
+   *plJulian   = hb_dateEncode( st->tm_year + 1900, st->tm_mon + 1, st->tm_mday );
    *plMilliSec = ( ( st->tm_hour * 60 + st->tm_min ) * 60 + st->tm_sec ) * 1000 +
                  tb.millitm;
 #endif
@@ -140,20 +140,20 @@ void hb_dateTimeStamp( long * plJulian, long * plMilliSec )
 
 HB_ULONG hb_dateMilliSeconds( void )
 {
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN )
    SYSTEMTIME st;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateMilliSeconds()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateMilliSeconds()" ) );
 
    GetLocalTime( &st );
 
    return ( HB_ULONG ) hb_dateEncode( st.wYear, st.wMonth, st.wDay ) * 86400000L +
           ( ( st.wHour * 60 + st.wMinute ) * 60 + st.wSecond ) * 1000 +
           st.wMilliseconds;
-#elif ( defined( HB_OS_LINUX ) || defined( HB_OS_BSD ) || defined(HB_OS_UNIX) ) && !defined( __WATCOMC__ )
+#elif ( defined( HB_OS_LINUX ) || defined( HB_OS_BSD ) || defined( HB_OS_UNIX ) ) && ! defined( __WATCOMC__ )
    struct timeval tv;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateMilliSeconds()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateMilliSeconds()" ) );
 
    gettimeofday( &tv, NULL );
 
@@ -161,7 +161,7 @@ HB_ULONG hb_dateMilliSeconds( void )
 #else
    struct timeb tb;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateMilliSeconds()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateMilliSeconds()" ) );
 
    ftime( &tb );
 
@@ -171,59 +171,59 @@ HB_ULONG hb_dateMilliSeconds( void )
 
 double hb_dateSeconds( void )
 {
-#if defined(HB_OS_WIN)
+#if defined( HB_OS_WIN )
    SYSTEMTIME SystemTime;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateSeconds()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateSeconds()" ) );
 
    GetLocalTime( &SystemTime );
 
    return ( SystemTime.wHour * 3600 ) +
           ( SystemTime.wMinute * 60 ) +
-            SystemTime.wSecond +
+          SystemTime.wSecond +
           ( ( double ) SystemTime.wMilliseconds / 1000.0 );
-#elif (defined( HB_OS_LINUX ) || defined(HB_OS_UNIX)) && !defined( __WATCOMC__ )
+#elif ( defined( HB_OS_LINUX ) || defined( HB_OS_UNIX ) ) && ! defined( __WATCOMC__ )
    struct timeval tv;
-   struct tm oTime;
-   time_t seconds;
+   struct tm      oTime;
+   time_t         seconds;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateSeconds()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateSeconds()" ) );
 
    gettimeofday( &tv, NULL );
    seconds = tv.tv_sec;
    localtime_r( &seconds, &oTime );
    return ( oTime.tm_hour * 3600 ) +
           ( oTime.tm_min * 60 ) +
-            oTime.tm_sec +
+          oTime.tm_sec +
           ( ( double ) tv.tv_usec / 1000000.0 );
 #elif defined( HB_OS_BSD )
    struct timeval tv;
-   struct tm * oTime;
-   time_t seconds;
+   struct tm *    oTime;
+   time_t         seconds;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateSeconds()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateSeconds()" ) );
 
    gettimeofday( &tv, NULL );
-   seconds = tv.tv_sec;
-   oTime = localtime( &seconds );
+   seconds  = tv.tv_sec;
+   oTime    = localtime( &seconds );
    return ( oTime->tm_hour * 3600 ) +
           ( oTime->tm_min * 60 ) +
-            oTime->tm_sec +
+          oTime->tm_sec +
           ( ( double ) tv.tv_usec / 1000000.0 );
 #else
-   struct timeb tb;
-   struct tm * oTime;
-   time_t seconds;
+   struct timeb   tb;
+   struct tm *    oTime;
+   time_t         seconds;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateSeconds()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dateSeconds()" ) );
 
    ftime( &tb );
-   seconds = tb.time;
-   oTime = localtime( &seconds );
+   seconds  = tb.time;
+   oTime    = localtime( &seconds );
 
    return ( oTime->tm_hour * 3600 ) +
           ( oTime->tm_min * 60 ) +
-            oTime->tm_sec +
+          oTime->tm_sec +
           ( ( double ) tb.millitm / 1000.0 );
 #endif
 }
@@ -262,25 +262,26 @@ HB_FUNC( HB_CLOCKS2SECS )
     n == 11 cutime -> sum of the user CPU time of the current + child process
     n == 12 cstime -> sum of the system CPU time of the current + child process
     n == 13 cu+cs  -> sum of cutime + cstime
-*/
+ */
 double hb_secondsCPU( int n )
 {
-   double d = 0.0;
-#if defined( HB_OS_WIN ) && !defined( HB_OS_UNIX )
-   FILETIME Create, Exit, Kernel, User;
+   double      d = 0.0;
+
+#if defined( HB_OS_WIN ) && ! defined( HB_OS_UNIX )
+   FILETIME    Create, Exit, Kernel, User;
    static BOOL s_fInit = FALSE, s_fWinNT = FALSE;
 
-   if( !s_fInit )
+   if( ! s_fInit )
    {
-      s_fInit = TRUE ;
-      s_fWinNT = hb_iswinnt() ;
+      s_fInit  = TRUE;
+      s_fWinNT = hb_iswinnt();
    }
 #endif
 
 #if defined( HB_OS_OS2 )
-   static ULONG s_timer_interval = 0;
+   static ULONG   s_timer_interval = 0;
 
-   QSGREC ** pBuf;
+   QSGREC **      pBuf;
 #endif
 
    if( ( n < 1 || n > 3 ) && ( n < 11 || n > 13 ) )
@@ -290,7 +291,7 @@ double hb_secondsCPU( int n )
    {
       struct tms tm;
 
-      times(&tm);
+      times( &tm );
 
       if( n > 10 )
       {
@@ -307,7 +308,7 @@ double hb_secondsCPU( int n )
 
       /* In POSIX-1996 the CLK_TCK symbol is mentioned as obsolescent */
       /* d /= CLK_TCK; */
-      d /= (double) sysconf(_SC_CLK_TCK);
+      d /= ( double ) sysconf( _SC_CLK_TCK );
    }
 #else
    if( n > 10 )
@@ -319,12 +320,12 @@ double hb_secondsCPU( int n )
       if( n & 1 )
       {
          d += ( double ) ( ( ( HB_LONG ) User.dwHighDateTime << 32 ) +
-                             ( HB_LONG ) User.dwLowDateTime );
+                           ( HB_LONG ) User.dwLowDateTime );
       }
       if( n & 2 )
       {
          d += ( double ) ( ( ( HB_LONG ) Kernel.dwHighDateTime << 32 ) +
-                             ( HB_LONG ) Kernel.dwLowDateTime );
+                           ( HB_LONG ) Kernel.dwLowDateTime );
       }
       d /= 10000000.0;
    }
@@ -339,18 +340,18 @@ double hb_secondsCPU( int n )
    if( pBuf )
    {
 #if defined( __GNUC__ )
-      APIRET rc = DosQuerySysState( QS_PROCESS, 0L, _getpid(), 0L, pBuf, BUFSIZE );
+      APIRET   rc = DosQuerySysState( QS_PROCESS, 0L, _getpid(), 0L, pBuf, BUFSIZE );
 #else
-      APIRET rc = DosQuerySysState( QS_PROCESS, 0L, getpid(), 0L, pBuf, BUFSIZE );
+      APIRET   rc = DosQuerySysState( QS_PROCESS, 0L, getpid(), 0L, pBuf, BUFSIZE );
 #endif
 
       if( rc == NO_ERROR )
       {
-         QSGREC * pGrec = * pBuf;
+         QSGREC * pGrec = *pBuf;
          QSPREC * pPrec = ( QSPREC * ) ( ( ULONG ) pGrec + sizeof( QSGREC ) );
          QSTREC * pTrec = pPrec->pThrdRec;
 
-         int i;
+         int      i;
 
          for( i = 0; i < pPrec->cTCB; i++, pTrec++ )
          {

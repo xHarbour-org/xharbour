@@ -76,14 +76,14 @@
 #include "hbset.h"
 #include "hbvm.h"
 
-static PHB_ITEM s_inKeyBlockBefore = NULL;
-static PHB_ITEM s_inKeyBlockAfter  = NULL;
+static PHB_ITEM   s_inKeyBlockBefore   = NULL;
+static PHB_ITEM   s_inKeyBlockAfter    = NULL;
 
 HB_FUNC( INKEY )
 {
-   USHORT uiPCount = hb_pcount();
-   PHB_ITEM pKey = NULL;
-   int iKey;
+   USHORT   uiPCount = hb_pcount();
+   PHB_ITEM pKey     = NULL;
+   int      iKey;
 
    if( s_inKeyBlockBefore )
    {
@@ -96,11 +96,11 @@ HB_FUNC( INKEY )
                        hb_parnd( 1 ),
                        ISNUM( 2 ) ? hb_parni( 2 ) : hb_setGetEventMask() );
 
-      if( iKey == 0 || !s_inKeyBlockAfter )
+      if( iKey == 0 || ! s_inKeyBlockAfter )
          break;
 
-      pKey = hb_itemPutNI( pKey, iKey );
-      iKey = hb_itemGetNI( hb_vmEvalBlockV( s_inKeyBlockAfter, 1, pKey ) );
+      pKey  = hb_itemPutNI( pKey, iKey );
+      iKey  = hb_itemGetNI( hb_vmEvalBlockV( s_inKeyBlockAfter, 1, pKey ) );
       hb_inkeySetLast( iKey );
    }
    while( iKey == 0 );
@@ -131,7 +131,7 @@ static void hb_inKeyBlockFree( void * cargo )
 
 static void hb_inKeySetDestructor( void )
 {
-   if( !s_fInit )
+   if( ! s_fInit )
    {
       s_fInit = TRUE;
       hb_vmAtExit( hb_inKeyBlockFree, NULL );
@@ -196,10 +196,10 @@ HB_FUNC( __KEYBOARD )
 {
    /* Clear the typeahead buffer without reallocating the keyboard buffer */
 #ifndef HB_C52_STRICT
-   if ( !hb_parl( 2 ) )
+   if( ! hb_parl( 2 ) )
 #endif
    {
-     hb_inkeyReset();
+      hb_inkeyReset();
    }
 
    if( ISCHAR( 1 ) )
@@ -209,23 +209,23 @@ HB_FUNC( __KEYBOARD )
 #ifndef HB_C52_STRICT
    else if( ISNUM( 1 ) )
    {
-      hb_inkeySetText( NULL, ( ULONG) hb_parnl( 1 ) );
+      hb_inkeySetText( NULL, ( ULONG ) hb_parnl( 1 ) );
    }
-   else if ( ISARRAY( 1 ) )
+   else if( ISARRAY( 1 ) )
    {
-      PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY ) ;
-      ULONG ulIndex ;
-      HB_SIZE ulElements = hb_arrayLen( pArray ) ;
-      for ( ulIndex = 1 ; ulIndex <= ulElements ; ulIndex++ )
+      PHB_ITEM pArray      = hb_param( 1, HB_IT_ARRAY );
+      ULONG    ulIndex;
+      HB_SIZE  ulElements  = hb_arrayLen( pArray );
+      for( ulIndex = 1; ulIndex <= ulElements; ulIndex++ )
       {
-         PHB_ITEM pItem = hb_arrayGetItemPtr( pArray, ulIndex ) ;
-         if ( HB_IS_NUMBER( pItem ) )
+         PHB_ITEM pItem = hb_arrayGetItemPtr( pArray, ulIndex );
+         if( HB_IS_NUMBER( pItem ) )
          {
-            hb_inkeySetText( NULL,  (  ULONG ) HB_ITEM_GET_NUMINTRAW( pItem ) ) ;
+            hb_inkeySetText( NULL, ( ULONG ) HB_ITEM_GET_NUMINTRAW( pItem ) );
          }
-         else if ( HB_IS_STRING( pItem ) )
+         else if( HB_IS_STRING( pItem ) )
          {
-           hb_inkeySetText( (const char *) hb_itemGetCPtr( pItem ), hb_itemGetCLen( pItem ) );
+            hb_inkeySetText( ( const char * ) hb_itemGetCPtr( pItem ), hb_itemGetCLen( pItem ) );
          }
       }
    }
@@ -238,17 +238,17 @@ HB_FUNC( HB_KEYPUT )
       hb_inkeyPut( hb_parni( 1 ) );
    else if( ISCHAR( 1 ) )
    {
-      PHB_ITEM pText = hb_param( 1, HB_IT_STRING );
-      char * szText = hb_itemGetCPtr( pText );
-      HB_SIZE ulLen = hb_itemGetCLen( pText ), ulIndex;
+      PHB_ITEM pText    = hb_param( 1, HB_IT_STRING );
+      char *   szText   = hb_itemGetCPtr( pText );
+      HB_SIZE  ulLen    = hb_itemGetCLen( pText ), ulIndex;
 
       for( ulIndex = 0; ulIndex < ulLen; ulIndex++ )
          hb_inkeyPut( ( UCHAR ) szText[ ulIndex ] );
    }
    else if( ISARRAY( 1 ) )
    {
-      PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
-      HB_SIZE ulElements = hb_arrayLen( pArray ), ulIndex;
+      PHB_ITEM pArray      = hb_param( 1, HB_IT_ARRAY );
+      HB_SIZE  ulElements  = hb_arrayLen( pArray ), ulIndex;
 
       for( ulIndex = 1; ulIndex <= ulElements; ulIndex++ )
       {

@@ -61,8 +61,8 @@ HB_FUNC( __XHELP )
    {
       /* awhite: push the existing params after the dyn symbol */
 
-      USHORT uiPCount = (USHORT)hb_pcount();
-      USHORT uiParam;
+      USHORT   uiPCount = ( USHORT ) hb_pcount();
+      USHORT   uiParam;
 
       hb_vmPushSymbol( pDynSym->pSymbol );
       hb_vmPushNil();
@@ -78,7 +78,7 @@ HB_FUNC( __XHELP )
       hb_vmPushSymbol( pDynSym->pSymbol );
       hb_vmPushNil();
       hb_vmDo( 0 );
-*/
+ */
       /* NOTE: Leave the return value as it is. */
    }
 }

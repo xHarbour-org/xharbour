@@ -62,11 +62,11 @@ HB_FUNC( TYPE )
    if( pItem )
    {
       PHB_ITEM pFlags = hb_param( 2, HB_IT_INTEGER );
-      BYTE Flags;
+      BYTE     Flags;
 
       if( pFlags )
       {
-         Flags = (BYTE) ( pFlags->item.asInteger.value );
+         Flags = ( BYTE ) ( pFlags->item.asInteger.value );
       }
       else
       {

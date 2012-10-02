@@ -56,13 +56,13 @@
 #include "hbapises.h"
 #include "hbapierr.h"
 
-#define HB_SESSION_MAX_  1024
+#define HB_SESSION_MAX_ 1024
 
 static HB_SESSION s_session = { 1, "XHARBOUR", 0 };
 
 HB_SESSION_ANNOUNCE()
 
-static PHB_SESSION s_SessionList[HB_SESSION_MAX_] = { &s_session };
+static PHB_SESSION s_SessionList[ HB_SESSION_MAX_ ] = { &s_session };
 PHB_SESSION pSession = &s_session;
 
 PHB_SESSION hb_session( void )
@@ -76,9 +76,9 @@ static int hb_sessionFindPos( const int sessionID )
 
    if( sessionID )
    {
-      for( iPos = 0; iPos < HB_SESSION_MAX_ && s_SessionList[iPos]; iPos++ )
+      for( iPos = 0; iPos < HB_SESSION_MAX_ && s_SessionList[ iPos ]; iPos++ )
       {
-         if( s_SessionList[iPos]->id == sessionID )
+         if( s_SessionList[ iPos ]->id == sessionID )
             return iPos;
       }
    }
@@ -94,7 +94,7 @@ PHB_SESSION hb_sessionFind( const int sessionID )
 
    iPos = hb_sessionFindPos( sessionID );
 
-   return ( iPos != -1 ) ? s_SessionList[iPos] : NULL;
+   return ( iPos != -1 ) ? s_SessionList[ iPos ] : NULL;
 }
 
 PHB_SESSION hb_sessionSelect( PHB_SESSION session )
@@ -129,8 +129,8 @@ int hb_sessionSelectID( const int sessionID )
 }
 
 /*
-void hb_sessionReleaseAll( void )
-{
+   void hb_sessionReleaseAll( void )
+   {
    int iPos = 0;
 
    while( iPos < HB_SESSION_MAX_ && s_SessionList[iPos] )
@@ -139,8 +139,8 @@ void hb_sessionReleaseAll( void )
          hb_xfree( s_SessionList[iPos]->username );
       iPos++;
    }
-}
-*/
+   }
+ */
 
 BOOL hb_sessionRegister( PHB_SESSION session )
 {
@@ -154,10 +154,10 @@ BOOL hb_sessionRegister( PHB_SESSION session )
       {
          for( iPos = 0; iPos < HB_SESSION_MAX_; iPos++ )
          {
-            if( !s_SessionList[iPos] )
+            if( ! s_SessionList[ iPos ] )
             {
-               session->id = iPos;
-               s_SessionList[iPos] = session;            
+               session->id             = iPos;
+               s_SessionList[ iPos ]   = session;
                return TRUE;
             }
          }

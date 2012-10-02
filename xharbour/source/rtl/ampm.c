@@ -55,14 +55,14 @@
 
 HB_FUNC( AMPM )
 {
-   const char * pszTime = hb_parcx( 1 );
-   HB_SIZE ulTimeLen = hb_parclen( 1 );
-   char * pszResult = ( char * ) hb_xgrab( HB_MAX( ulTimeLen, 2 ) + 3 + 1 );
-   USHORT uiHour = ( USHORT ) hb_strVal( pszTime, ulTimeLen );
-   BOOL   bAM;
+   const char *   pszTime     = hb_parcx( 1 );
+   HB_SIZE        ulTimeLen   = hb_parclen( 1 );
+   char *         pszResult   = ( char * ) hb_xgrab( HB_MAX( ulTimeLen, 2 ) + 3 + 1 );
+   USHORT         uiHour      = ( USHORT ) hb_strVal( pszTime, ulTimeLen );
+   BOOL           bAM;
 
    memset( pszResult, '\0', 3 );
-   HB_MEMCPY( pszResult, pszTime, (size_t) ulTimeLen );
+   HB_MEMCPY( pszResult, pszTime, ( size_t ) ulTimeLen );
 
    if( uiHour == 0 || uiHour == 24 )
    {
@@ -71,14 +71,14 @@ HB_FUNC( AMPM )
 
       pszResult[ 0 ] = '1';
       pszResult[ 1 ] = '2';
-      bAM = TRUE;
+      bAM            = TRUE;
    }
    else if( uiHour > 12 )
    {
       if( ulTimeLen < 2 )
          ulTimeLen = 2;
 
-      uiHour -= 12;
+      uiHour         -= 12;
       pszResult[ 0 ] = ( char ) ( uiHour / 10 ) + '0';
       pszResult[ 1 ] = ( char ) ( uiHour % 10 ) + '0';
 

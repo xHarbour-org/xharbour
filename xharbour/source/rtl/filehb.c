@@ -51,12 +51,12 @@
  */
 
 /*
-* IsDirectory( cPath ) -- determine if a given file is a directory
-* Copyright 2004 Giancarlo Niccolai
-*
-* Changed by Miguel Angel Marchuet to fix IsDirectory( "\\machine\c" ) style call.
-* under windows platforms. (2009)
-*/
+ * IsDirectory( cPath ) -- determine if a given file is a directory
+ * Copyright 2004 Giancarlo Niccolai
+ *
+ * Changed by Miguel Angel Marchuet to fix IsDirectory( "\\machine\c" ) style call.
+ * under windows platforms. (2009)
+ */
 
 #include "hbapi.h"
 #include "hbapifs.h"

@@ -102,10 +102,10 @@ HB_FUNC( DIRREMOVE )
 
 HB_FUNC( ISDISK )
 {
-   USHORT uiErrorOld = hb_fsError();
+   USHORT         uiErrorOld  = hb_fsError();
 
-   BOOL fResult = FALSE;
-   const char * szDrive = hb_parc( 1 );
+   BOOL           fResult     = FALSE;
+   const char *   szDrive     = hb_parc( 1 );
 
    if( szDrive )
    {
@@ -121,10 +121,10 @@ HB_FUNC( ISDISK )
 
 HB_FUNC( DISKCHANGE )
 {
-   USHORT uiErrorOld = hb_fsError();
+   USHORT         uiErrorOld  = hb_fsError();
 
-   BOOL fResult = FALSE;
-   const char * szDrive = hb_parc( 1 );
+   BOOL           fResult     = FALSE;
+   const char *   szDrive     = hb_parc( 1 );
 
    if( szDrive )
    {
@@ -141,8 +141,8 @@ HB_FUNC( DISKCHANGE )
 HB_FUNC( DISKNAME )
 {
 #if defined( HB_OS_HAS_DRIVE_LETTER )
-   USHORT uiErrorOld = hb_fsError();
-   char szDrive[ 1 ];
+   USHORT   uiErrorOld = hb_fsError();
+   char     szDrive[ 1 ];
 
    szDrive[ 0 ] = ( ( char ) hb_fsCurDrv() ) + 'A';
    hb_retclen( szDrive, 1 );

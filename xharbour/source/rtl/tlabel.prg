@@ -105,15 +105,15 @@ CLASS HBLabelForm
    DATA lOneMoreBand AS LOGICAL init .T.
    DATA nCurrentCol AS NUMERIC // The current column in the band
    METHOD New( cLBLName, lPrinter, cAltFile, lNoConsole, bFor, ;
-                          bWhile, nNext, nRecord, lRest, lSample )
+      bWhile, nNext, nRecord, lRest, lSample )
    METHOD ExecuteLabel()
    METHOD SampleLabels()
-   METHOD LoadLabel(cLblFile)
+   METHOD LoadLabel( cLblFile )
 
 ENDCLASS
 
 METHOD New( cLBLName, lPrinter, cAltFile, lNoConsole, bFor, ;
-                       bWhile, nNext, nRecord, lRest, lSample ) CLASS HBLabelForm
+      bWhile, nNext, nRecord, lRest, lSample ) CLASS HBLabelForm
 
    LOCAL lPrintOn := .F.               // PRINTER status
    LOCAL lConsoleOn                    // CONSOLE status
@@ -123,18 +123,18 @@ METHOD New( cLBLName, lPrinter, cAltFile, lNoConsole, bFor, ;
    LOCAL OldMargin
    LOCAL cExt
 
-   ::aBandToPrint:={} // ARRAY(5)
+   ::aBandToPrint := {} // ARRAY(5)
    ::nCurrentCol := 1
-   // Resolve parameters
+// Resolve parameters
    IF cLBLName == NIL
       err := ErrorNew()
       err:severity := ES_ERROR
       err:genCode := EG_ARG
       err:subSystem := "FRMLBL"
-      Eval(ErrorBlock(), err)
+      Eval( ErrorBlock(), err )
 
    ELSE
-      /* NOTE: CA-Cl*pper does an RTrim() on the filename here, 
+      /* NOTE: CA-Cl*pper does an RTrim() on the filename here,
                but in Harbour we're using _SET_TRIMFILENAME. [vszakats] */
       IF Set( _SET_DEFEXTENSIONS )
          hb_FNameSplit( cLBLName, NIL, NIL, @cExt )

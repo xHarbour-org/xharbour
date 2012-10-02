@@ -66,11 +66,11 @@ HB_FUNC( ISALPHA )
 
    if( szString != NULL )
    {
-      if( HB_ISALPHA( ( BYTE ) * szString ) )
+      if( HB_ISALPHA( ( BYTE ) *szString ) )
          hb_retl( TRUE );
 #ifndef HB_CDP_SUPPORT_OFF
-      else if( (hb_cdppage())->nChars && szString[0] &&
-           ( strchr( (hb_cdppage())->CharsUpper, *szString ) || strchr( (hb_cdppage())->CharsLower, *szString ) ) )
+      else if( ( hb_cdppage() )->nChars && szString[ 0 ] &&
+               ( strchr( ( hb_cdppage() )->CharsUpper, *szString ) || strchr( ( hb_cdppage() )->CharsLower, *szString ) ) )
          hb_retl( TRUE );
 #endif
       else
@@ -87,7 +87,7 @@ HB_FUNC( ISDIGIT )
    const char * szString = hb_parc( 1 );
 
    if( szString != NULL )
-      hb_retl( HB_ISDIGIT( ( BYTE ) * szString ) );
+      hb_retl( HB_ISDIGIT( ( BYTE ) *szString ) );
    else
       hb_retl( FALSE );
 }
@@ -100,10 +100,10 @@ HB_FUNC( ISUPPER )
 
    if( szString != NULL )
    {
-      if( HB_ISUPPER( ( BYTE ) * szString ) )
+      if( HB_ISUPPER( ( BYTE ) *szString ) )
          hb_retl( TRUE );
 #ifndef HB_CDP_SUPPORT_OFF
-      else if( (hb_cdppage())->nChars && szString[0] && strchr( (hb_cdppage())->CharsUpper, *szString ) )
+      else if( ( hb_cdppage() )->nChars && szString[ 0 ] && strchr( ( hb_cdppage() )->CharsUpper, *szString ) )
          hb_retl( TRUE );
 #endif
       else
@@ -121,10 +121,10 @@ HB_FUNC( ISLOWER )
 
    if( szString != NULL )
    {
-      if( HB_ISLOWER( ( BYTE ) * szString ) )
+      if( HB_ISLOWER( ( BYTE ) *szString ) )
          hb_retl( TRUE );
 #ifndef HB_CDP_SUPPORT_OFF
-      else if( (hb_cdppage())->nChars && szString[0] && strchr( (hb_cdppage())->CharsLower, *szString ) )
+      else if( ( hb_cdppage() )->nChars && szString[ 0 ] && strchr( ( hb_cdppage() )->CharsLower, *szString ) )
          hb_retl( TRUE );
 #endif
       else
@@ -142,7 +142,7 @@ HB_FUNC( ISALNUM )
 
    if( szString != NULL )
    {
-      hb_retl( HB_ISALNUM( ( BYTE ) * szString ) );
+      hb_retl( HB_ISALNUM( ( BYTE ) *szString ) );
    }
    else
       hb_retl( FALSE );
@@ -150,7 +150,7 @@ HB_FUNC( ISALNUM )
 
 /* determines if first char of a string is a control character;
    that is, if it is in the range 0 - 31 or 127 (0x00 - 0x1f or 0x7f).
-*/
+ */
 
 HB_FUNC( ISCNTRL )
 {
@@ -158,7 +158,7 @@ HB_FUNC( ISCNTRL )
 
    if( szString != NULL )
    {
-      hb_retl( iscntrl( ( BYTE ) * szString ) );
+      hb_retl( iscntrl( ( BYTE ) *szString ) );
    }
    else
       hb_retl( FALSE );
@@ -166,7 +166,7 @@ HB_FUNC( ISCNTRL )
 
 /* determines if first char of a string is a printable character.
    The space character (' ') is not considered a printable character.
-*/
+ */
 
 HB_FUNC( ISGRAPH )
 {
@@ -174,7 +174,7 @@ HB_FUNC( ISGRAPH )
 
    if( szString != NULL )
    {
-      hb_retl( isgraph( ( BYTE ) * szString ) );
+      hb_retl( isgraph( ( BYTE ) *szString ) );
    }
    else
       hb_retl( FALSE );
@@ -183,7 +183,7 @@ HB_FUNC( ISGRAPH )
 /* determines if first char of a string is a printable character.
    Printable characters have an ASCII value between 32 - 126, (0x20 - 0x7e),
    a space and the tilde, inclusive.
-*/
+ */
 
 HB_FUNC( ISPRINT )
 {
@@ -191,7 +191,7 @@ HB_FUNC( ISPRINT )
 
    if( szString != NULL )
    {
-      hb_retl( isprint( ( BYTE ) * szString ) ) ;
+      hb_retl( isprint( ( BYTE ) *szString ) );
    }
    else
       hb_retl( FALSE );
@@ -200,7 +200,7 @@ HB_FUNC( ISPRINT )
 /* determines if first char of a string is a punctuation character.
    A punctuation character is one that is not alphabetic, not numeric,
    not a control character, and not a white space.
-*/
+ */
 
 HB_FUNC( ISPUNCT )
 {
@@ -208,7 +208,7 @@ HB_FUNC( ISPUNCT )
 
    if( szString != NULL )
    {
-      hb_retl( ispunct( ( BYTE ) * szString ) );
+      hb_retl( ispunct( ( BYTE ) *szString ) );
    }
    else
       hb_retl( FALSE );
@@ -217,7 +217,7 @@ HB_FUNC( ISPUNCT )
 /* determines if first char of a string is a whiteÄspace character;
    that is, a horizontal tab, a newÄline, a vertical tab, a formÄfeed,
    a carriageÄreturn or a space.
-*/
+ */
 
 HB_FUNC( ISSPACE )
 {
@@ -225,15 +225,15 @@ HB_FUNC( ISSPACE )
 
    if( szString != NULL )
    {
-      hb_retl( isspace( ( BYTE ) * szString ) );
+      hb_retl( isspace( ( BYTE ) *szString ) );
    }
    else
       hb_retl( FALSE );
 }
 
 /* determines if first char of a string is a hexadecimal digit
-  ('A' Ä 'F', 'a' Ä 'f', or '0' Ä'9').
-*/
+   ('A' Ä 'F', 'a' Ä 'f', or '0' Ä'9').
+ */
 
 HB_FUNC( ISXDIGIT )
 {
@@ -241,7 +241,7 @@ HB_FUNC( ISXDIGIT )
 
    if( szString != NULL )
    {
-      hb_retl( isxdigit( ( BYTE ) * szString ) );
+      hb_retl( isxdigit( ( BYTE ) *szString ) );
    }
    else
       hb_retl( FALSE );
@@ -249,7 +249,7 @@ HB_FUNC( ISXDIGIT )
 
 /* determines if first char of a string is a member of the 7-bit ASCII
    character set; that is, if: 0  <=  c  <= 127
-*/
+ */
 
 HB_FUNC( ISASCII )
 {
@@ -257,7 +257,7 @@ HB_FUNC( ISASCII )
 
    if( szString != NULL )
    {
-      hb_retl( isascii( ( BYTE ) * szString ) );
+      hb_retl( isascii( ( BYTE ) *szString ) );
    }
    else
       hb_retl( FALSE );

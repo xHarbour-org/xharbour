@@ -80,17 +80,18 @@
 
 #include "fileio.ch"
 
-GLOBAL cLineComment := ";"
-GLOBAL cHalfLineComment := "#"
-
+   GLOBAL cLineComment := ";"
+   GLOBAL cHalfLineComment := "#"
 
 PROCEDURE HB_SetIniComment( cLc, cHlc )
+
    cLineComment := cLc
    cHalfLineComment := cHlc
-RETURN
 
+   RETURN
 
 FUNCTION HB_ReadIni( cFileSpec, bKeyCaseSens, cSplitters, bAutoMain )
+
    LOCAL hIni := Hash()
 
    IF bAutoMain == NIL
@@ -101,9 +102,10 @@ FUNCTION HB_ReadIni( cFileSpec, bKeyCaseSens, cSplitters, bAutoMain )
       hIni[ "MAIN" ] := Hash()
    END
 
-RETURN HB_ReadIni2( hIni, cFileSpec, bKeyCaseSens, cSplitters, bAutoMain )
+   RETURN HB_ReadIni2( hIni, cFileSpec, bKeyCaseSens, cSplitters, bAutoMain )
 
 STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSplitters, bAutoMain )
+
    LOCAL aFiles
    LOCAL cFile, nLen
    LOCAL aKeyVal, hCurrentSection
@@ -111,25 +113,25 @@ STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSplitters, bAutoMai
    LOCAL cData, cBuffer, cLine
    LOCAL reComment
 
-   reComment := HB_RegexComp( cHalfLineComment + "|^[ \t]*" + cLineComment )
+   reComment := hb_regexComp( cHalfLineComment + "|^[ \t]*" + cLineComment )
 
-   aFiles := HB_RegexSplit( ";", cFileSpec )
+   aFiles := hb_regexSplit( ";", cFileSpec )
    IF Empty( aFiles )
       aFiles := { cFileSpec }
    ENDIF
 
    FOR EACH cFile IN aFiles
       IF File( cFile )
-         fHandle := fopen( cFile )
+         fHandle := FOpen( cFile )
          EXIT
       ENDIF
    NEXT
 
-   IF Empty( fHandle ) .or. fHandle <= 0
+   IF Empty( fHandle ) .OR. fHandle <= 0
       RETURN NIL
    ENDIF
 
-   // Default case sensitiveness for keys
+// Default case sensitiveness for keys
    IF bKeyCaseSens == NIL
       bKeyCaseSens := .T.
    ENDIF
@@ -141,10 +143,10 @@ STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSplitters, bAutoMai
    /* we'll read the whole file, then we'll break it in lines. */
    cBuffer := Space( 1024 )
    cData := ""
-   DO WHILE ( nLen := Fread( fHandle, @cBuffer, 1024 ) ) > 0
-      cData += substr( cBuffer, 1, nLen )
+   DO WHILE ( nLen := FRead( fHandle, @cBuffer, 1024 ) ) > 0
+      cData += SubStr( cBuffer, 1, nLen )
    ENDDO
-   Fclose( fHandle )
+   FClose( fHandle )
 
    /* Always begin with the MAIN section */
    IF bAutoMain
@@ -155,11 +157,11 @@ STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSplitters, bAutoMai
 
    cLine := ""
    DO WHILE Len( cData ) > 0
-      nLineEnd := At( chr(10), Left( cData, 256) )
+      nLineEnd := At( Chr( 10 ), Left( cData, 256 ) )
       IF nLineEnd == 0
          IF nLineEnd == 0
             // Support for MAC line termination (13)
-            nLineEnd := At( chr(13), Left( cData, 256) )
+            nLineEnd := At( Chr( 13 ), Left( cData, 256 ) )
             IF nLineEnd == 0
                nLineEnd := Len( cData ) + 1
             ENDIF
@@ -180,7 +182,7 @@ STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSplitters, bAutoMai
       ENDIF
 
       // remove current line
-      cData := Substr( cData, nLineEnd + 1 )
+      cData := SubStr( cData, nLineEnd + 1 )
 
       //Skip void lines
       IF Len( cLine ) == 0
@@ -188,8 +190,8 @@ STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSplitters, bAutoMai
       ENDIF
 
       //Sum up lines terminating with "<space>||" ...
-      IF Len( cLine ) > 3 .and. cLine[ -1 ] == "|" .and. cLine[ -2 ] == "|" .and. cLine[ -3 ] == " "
-         cLine := Substr( cLine, 1, Len( cLine ) -2 )
+      IF Len( cLine ) > 3 .AND. cLine[ -1 ] == "|" .AND. cLine[ -2 ] == "|" .AND. cLine[ -3 ] == " "
+         cLine := SubStr( cLine, 1, Len( cLine ) - 2 )
 
          // ... but proceed if stream over
          IF Len( cData ) > 0
@@ -199,8 +201,8 @@ STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSplitters, bAutoMai
       ENDIF
 
       // remove eventual comments
-      aKeyVal := HB_RegexSplit( reComment, cLine )
-      IF .not. Empty( aKeyVal )
+      aKeyVal := hb_regexSplit( reComment, cLine )
+      IF .NOT. Empty( aKeyVal )
          cLine := AllTrim( aKeyVal[1] )
       ENDIF
 
@@ -210,26 +212,26 @@ STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSplitters, bAutoMai
       ENDIF
 
       // Is it an "INCLUDE" statement ?
-      aKeyVal := HB_RegEx("include (.*)", cLine )
-      IF .not. Empty( aKeyVal )
+      aKeyVal := hb_regex( "include (.*)", cLine )
+      IF .NOT. Empty( aKeyVal )
          // ignore void includes
-         aKeyVal[2] := AllTrim(aKeyVal[2])
+         aKeyVal[2] := AllTrim( aKeyVal[2] )
          IF Len( aKeyVal[2] ) == 0
             LOOP
          ENDIF
-         HB_ReadIni2( aIni, AllTrim(aKeyVal[2]), bKeyCaseSens, cSplitters, bAutoMain )
+         HB_ReadIni2( aIni, AllTrim( aKeyVal[2] ), bKeyCaseSens, cSplitters, bAutoMain )
          cLine := ""
          LOOP
       ENDIF
 
       //Is it a NEW section?
-      aKeyVal := HB_Regex( "[[](.*)[]]", cLine )
-      IF .not. Empty( aKeyVal )
+      aKeyVal := hb_regex( "[[](.*)[]]", cLine )
+      IF .NOT. Empty( aKeyVal )
          cLine := AllTrim( aKeyVal[2] )
          //Sanitizing
          IF Len( cLine ) != 0
             hCurrentSection := Hash()
-            IF .not. bKeyCaseSens
+            IF .NOT. bKeyCaseSens
                cLine := Upper( cLine )
             ENDIF
             aIni[ cLine ] := hCurrentSection
@@ -240,7 +242,7 @@ STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSplitters, bAutoMai
 
       //Is it a valid key?
 
-      aKeyVal := HB_RegexSplit( cSplitters, cLine,,,2 )
+      aKeyVal := hb_regexSplit( cSplitters, cLine, , , 2 )
       IF Len( aKeyVal ) == 1
          //TODO: Signal error
          cLine := ""
@@ -248,35 +250,33 @@ STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSplitters, bAutoMai
       ENDIF
 
       // If not case sensitive, use upper keys
-      IF .not. bKeyCaseSens
+      IF .NOT. bKeyCaseSens
          aKeyVal[1] := Upper( aKeyVal[1] )
       ENDIF
 
-      hCurrentSection[ AllTrim(aKeyVal[1]) ] := AllTrim(aKeyVal[2])
+      hCurrentSection[ AllTrim(aKeyVal[1] ) ] := AllTrim( aKeyVal[2] )
       cLine := ""
    ENDDO
 
-RETURN aIni
+   RETURN aIni
 
+FUNCTION HB_WriteIni( cFileName, hIni, cCommentBegin, cCommentEnd, bAutoMain )
 
-
-function HB_WriteIni( cFileName, hIni, cCommentBegin, cCommentEnd, bAutoMain )
-
-   local nFileId := 0
-   local cSection
-   local hCurrentSection
-   local cNewLine := HB_OSNewLine()
+   LOCAL nFileId := 0
+   LOCAL cSection
+   LOCAL hCurrentSection
+   LOCAL cNewLine := hb_osNewLine()
 
    IF bAutoMain == NIL
       bAutoMain := .T.
    END
 
-   IF !HB_IsString( cFileName )
+   IF !HB_ISSTRING( cFileName )
       nFileId = cFileName
    ELSE
       nFileId = FCreate( cFileName )
       IF nFileId <= 0
-         RETURN .f.
+         RETURN .F.
       ENDIF
    ENDIF
 
@@ -284,21 +284,21 @@ function HB_WriteIni( cFileName, hIni, cCommentBegin, cCommentEnd, bAutoMain )
       FWrite( nFileId, cCommentBegin + cNewLine )
    ENDIF
 
-   // Write toplevel section
+// Write toplevel section
 
    IF bAutoMain
       // When automain is on, write the main section
       hCurrentSection = hIni[ "MAIN" ]
 
       HEval( hCurrentSection, ;
-            { | cKey, xVal |  FWrite( nFileId, Cstr(cKey) + " = " + CStr(xVal) + cNewLine ) };
+         { | cKey, xVal |  FWrite( nFileId, Cstr( cKey ) + " = " + CStr( xVal ) + cNewLine ) };
          )
    ELSE
       // When automain is off, just write all the toplevel variables.
       HEval( hIni, ;
-            { | cKey, xVal | ;
-                 IIF( .not. HB_IsHash( xVal ),;
-                 FWrite( nFileId, Cstr(cKey) + " = " + CStr(xVal) + cNewLine ), /* nothing */ ) };
+         { | cKey, xVal | ;
+         iif( .NOT. HB_ISHASH( xVal ), ;
+         FWrite( nFileId, Cstr( cKey ) + " = " + CStr( xVal ) + cNewLine ), /* nothing */ ) };
          )
    ENDIF
 
@@ -311,27 +311,27 @@ function HB_WriteIni( cFileName, hIni, cCommentBegin, cCommentEnd, bAutoMain )
          IF cSection == "MAIN"
             LOOP
          ENDIF
-          hCurrentSection = hIni[ cSection ]
+         hCurrentSection = hIni[ cSection ]
       ELSE
          // When automain is off, skip all the toplevel variables.
          hCurrentSection = hIni[ cSection ]
-         IF .not. HB_IsHash( hCurrentSection )
+         IF .NOT. HB_ISHASH( hCurrentSection )
             LOOP
          END
       ENDIF
 
-       IF FWrite( nFileId, cNewLine + "[" + CStr(cSection) + "]" + cNewLine ) <= 0
-          RETURN .f.
-       ENDIF
+      IF FWrite( nFileId, cNewLine + "[" + CStr( cSection ) + "]" + cNewLine ) <= 0
+         RETURN .F.
+      ENDIF
 
-       HEval( hCurrentSection, ;
-              { | cKey, xVal |  FWrite( nFileId, CStr(cKey) + "=" + CStr(xVal) + cNewLine ) };
-            )
+      HEval( hCurrentSection, ;
+         { | cKey, xVal |  FWrite( nFileId, CStr( cKey ) + "=" + CStr( xVal ) + cNewLine ) };
+         )
    NEXT
 
    IF !Empty( cCommentEnd )
       IF FWrite( nFileId, cCommentEnd + cNewLine ) <= 0
-         RETURN .f.
+         RETURN .F.
       ENDIF
    ENDIF
 
@@ -339,4 +339,5 @@ function HB_WriteIni( cFileName, hIni, cCommentBegin, cCommentEnd, bAutoMain )
       FClose( nFileId )
    ENDIF
 
-RETURN .t.
+   RETURN .T.
+

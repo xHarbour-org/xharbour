@@ -66,11 +66,11 @@
 
 #if defined( HB_OS_WIN )
 
-#if defined( HB_ARCH_32BIT ) && !defined( _M_ARM ) && \
-    ( defined(__BORLANDC__) || defined(_MSC_VER) || \
-      defined(__WATCOMC__) || defined(__MINGW32__) )
+#if defined( HB_ARCH_32BIT ) && ! defined( _M_ARM ) && \
+   ( defined( __BORLANDC__ ) || defined( _MSC_VER ) || \
+   defined( __WATCOMC__ ) || defined( __MINGW32__ ) )
 
-#if defined(_MSC_VER) || defined(__WATCOMC__)
+#if defined( _MSC_VER ) || defined( __WATCOMC__ )
    #include <conio.h>
 #endif
 
@@ -78,34 +78,34 @@ static int hb_Inp9x( USHORT usPort )
 {
    USHORT usVal;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_Inp9x(%hu)", usPort));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_Inp9x(%hu)", usPort ) );
 
    #if defined( __BORLANDC__ ) || defined( __DMC__ )
 
-      _DX = usPort;
-      __emit__(0xEC);         /* ASM  IN AL, DX */
-      __emit__(0x32,0xE4);    /* ASM XOR AH, AH */
-      usVal = _AX;
+   _DX   = usPort;
+   __emit__( 0xEC );          /* ASM  IN AL, DX */
+   __emit__( 0x32, 0xE4 );    /* ASM XOR AH, AH */
+   usVal = _AX;
 
    #elif ( defined( __XCC__ ) || defined( __POCC__ ) ) && defined( _M_IX86 )
 
-      __asm {
-               mov   dx, usPort
-               xor   ax, ax
-               in    al, dx
-               mov   usVal, ax
-            }
+   __asm {
+      mov dx, usPort
+      xor   ax, ax
+      in al, dx
+      mov usVal, ax
+   }
 
    #elif defined( __MINGW32__ )
-      __asm__ __volatile__ ("inb %w1,%b0":"=a" (usVal):"Nd" (usPort));
+   __asm__ __volatile__ ( "inb %w1,%b0" : "=a" ( usVal ) : "Nd" ( usPort ) );
 
    #elif defined( __WATCOMC__ )
 
-      usVal = ( USHORT ) inp( usPort );
+   usVal = ( USHORT ) inp( usPort );
 
    #else
 
-      usVal = ( USHORT ) _inp( usPort );
+   usVal = ( USHORT ) _inp( usPort );
 
    #endif
 
@@ -116,33 +116,33 @@ static int hb_Inp9x( USHORT usPort )
 
 static int hb_Outp9x( USHORT usPort, USHORT usVal )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_Outp9x(%hu, %hu)", usPort, usVal));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_Outp9x(%hu, %hu)", usPort, usVal ) );
 
    #if defined( __BORLANDC__ ) || defined( __DMC__ )
 
-      _DX = usPort;
-      _AL = usVal;
-      __emit__(0xEE);        /* ASM OUT DX, AL */
+   _DX   = usPort;
+   _AL   = usVal;
+   __emit__( 0xEE );         /* ASM OUT DX, AL */
 
    #elif ( defined( __XCC__ ) || defined( __POCC__ ) ) && defined( _M_IX86 )
 
-      __asm {
-               mov   dx, usPort
-               mov   ax, usVal
-               out   dx, al
-            }
+   __asm {
+      mov dx, usPort
+      mov ax, usVal
+      out dx, al
+   }
 
    #elif defined( __MINGW32__ )
 
-      __asm__ __volatile__ ("outb %b0,%w1": :"a" (usVal), "Nd" (usPort));
+   __asm__ __volatile__ ( "outb %b0,%w1" : : "a" ( usVal ), "Nd" ( usPort ) );
 
    #elif defined( __WATCOMC__ )
 
-       outp( usPort, usVal );
+   outp( usPort, usVal );
 
    #else
 
-      _outp( usPort, usVal );
+   _outp( usPort, usVal );
 
    #endif
 
@@ -153,10 +153,10 @@ static int hb_Outp9x( USHORT usPort, USHORT usVal )
 /* dDurat is in seconds */
 static void hb_gt_w9xTone( double dFreq, double dDurat )
 {
-   INT uLSB,uMSB;
+   INT   uLSB, uMSB;
    ULONG lAdjFreq;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_w9xtone(%lf, %lf)", dFreq, dDurat));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_w9xtone(%lf, %lf)", dFreq, dDurat ) );
 
    /* sync with internal clock with very small time period */
    hb_idleSleep( 0.01 );
@@ -167,16 +167,16 @@ static void hb_gt_w9xTone( double dFreq, double dDurat )
    if( dFreq >= 20.0 )
    {
       /* Setup Sound Control Port Registers and timer channel 2 */
-      hb_Outp9x( 67, 182 ) ;
+      hb_Outp9x( 67, 182 );
 
-      lAdjFreq = (ULONG)( 1193180 / dFreq ) ;
+      lAdjFreq = ( ULONG ) ( 1193180 / dFreq );
 
-      if( (LONG) lAdjFreq < 0 )
+      if( ( LONG ) lAdjFreq < 0 )
          uLSB = lAdjFreq + 65536;
       else
          uLSB = lAdjFreq % 256;
 
-      if( (LONG) lAdjFreq < 0 )
+      if( ( LONG ) lAdjFreq < 0 )
          uMSB = lAdjFreq + 65536;
       else
          uMSB = lAdjFreq / 256;
@@ -184,15 +184,15 @@ static void hb_gt_w9xTone( double dFreq, double dDurat )
 
       /* set the frequency (LSB,MSB) */
 
-      hb_Outp9x(66, ( USHORT ) uLSB);
-      hb_Outp9x(66, ( USHORT ) uMSB);
+      hb_Outp9x( 66, ( USHORT ) uLSB );
+      hb_Outp9x( 66, ( USHORT ) uMSB );
 
       /* Get current Port setting */
       /* enable Speaker Data & Timer gate bits */
       /* (00000011B is bitmask to enable sound) */
       /* Turn on Speaker - sound Tone for duration.. */
 
-      hb_Outp9x(97, ( USHORT ) hb_Inp9x( 97 ) | 3);
+      hb_Outp9x( 97, ( USHORT ) hb_Inp9x( 97 ) | 3 );
 
       hb_idleSleep( dDurat );
 
@@ -212,14 +212,14 @@ static void hb_gt_w9xTone( double dFreq, double dDurat )
 /* dDurat is in seconds */
 static void hb_gt_wNtTone( double dFreq, double dDurat )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_wNtTone(%lf, %lf)", dFreq, dDurat));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_wNtTone(%lf, %lf)", dFreq, dDurat ) );
 
    /* Clipper ignores Tone() requests (but delays anyway) if Frequency is
       less than < 20 hz.  Windows NT minimum is 37... */
 
    if( dFreq >= 37.0 )
    {
-      Beep( (ULONG) dFreq, (ULONG) ( dDurat * 1000 ) ); /* Beep wants Milliseconds */
+      Beep( ( ULONG ) dFreq, ( ULONG ) ( dDurat * 1000 ) ); /* Beep wants Milliseconds */
    }
    else
    {
@@ -231,7 +231,7 @@ static void hb_gt_wNtTone( double dFreq, double dDurat )
 /* dDuration is in 'Ticks' (18.2 per second) */
 void hb_gt_w32_tone( double dFrequency, double dDuration )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_w32_tone(%lf, %lf)", dFrequency, dDuration));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_w32_tone(%lf, %lf)", dFrequency, dDuration ) );
 
    /*
     * According to the Clipper NG, the duration in 'ticks' is truncated to the
@@ -239,10 +239,10 @@ void hb_gt_w32_tone( double dFrequency, double dDuration )
     * resolution, but the minimum is 1 tick (for compatibility)
     */
    /* Convert from ticks to seconds */
-   dDuration  = ( HB_MIN( HB_MAX( 1.0, dDuration ), ULONG_MAX ) ) / 18.2;
+   dDuration   = ( HB_MIN( HB_MAX( 1.0, dDuration ), ULONG_MAX ) ) / 18.2;
 
    /* keep the frequency in an acceptable range */
-   dFrequency =   HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 );
+   dFrequency  = HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 );
 
    /* If Windows NT or NT2k, use wNtTone, which provides TONE()
       reset sequence support (new) */
@@ -252,12 +252,12 @@ void hb_gt_w32_tone( double dFrequency, double dDuration )
    }
    else  /* If Windows 95 or 98, use w9xTone for chosen C compilers */
    {
-      #if defined( HB_ARCH_32BIT ) && !defined( _M_ARM ) && \
-          ( defined( __BORLANDC__ ) || defined( _MSC_VER ) || \
-            defined( __WATCOMC__ ) || defined( __MINGW32__ ) )
-         hb_gt_w9xTone( dFrequency, dDuration );
+      #if defined( HB_ARCH_32BIT ) && ! defined( _M_ARM ) && \
+      ( defined( __BORLANDC__ ) || defined( _MSC_VER ) || \
+      defined( __WATCOMC__ ) || defined( __MINGW32__ ) )
+      hb_gt_w9xTone( dFrequency, dDuration );
       #else
-         hb_gt_wNtTone( dFrequency, dDuration );
+      hb_gt_wNtTone( dFrequency, dDuration );
       #endif
    }
 }

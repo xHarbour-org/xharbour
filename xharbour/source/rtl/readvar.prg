@@ -53,6 +53,7 @@
 #include "common.ch"
 
 FUNCTION ReadVar( cVarName )
+
    STATIC s_cVarName := ""
 
    LOCAL cOldVarName

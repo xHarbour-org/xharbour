@@ -75,650 +75,738 @@
 
 #ifndef __PLATFORM__Windows
 
-   Function WIN32PRN()
-   Return nil
+FUNCTION WIN32PRN()
+
+   RETURN nil
 
 #else
 
 #include "hbclass.ch"
-#include "common.ch"
-#include "win32prn.ch"
 
+#include "common.ch"
+
+#include "win32prn.ch"
 
 CLASS WIN32PRN
 
-  METHOD New(cPrinter)
-  METHOD Create()                // CreatesDC and sets "Courier New" font, set Orientation, Copies, Bin#
-                                 // Create() ( & StartDoc() ) must be called before printing can start.
-  METHOD Destroy()               // Calls EndDoc() - restores default font, Deletes DC.
-                                 // Destroy() must be called to avoid memory leaks
-  METHOD StartDoc(cDocame)       // Calls StartPage()
-  METHOD EndDoc(lAbortDoc)       // Calls EndPage() if lAbortDoc not .T.
-  METHOD StartPage()
-  METHOD EndPage(lStartNewPage)      // If lStartNewPage = .T. then StartPage() is called for the next page of output
-  METHOD NewLine()
-  METHOD NewPage()
-  METHOD SetFont(cFontName, nPointSize, nWidth, nBold, lUnderline, lItalic, nCharSet)
-                                                                // NB: nWidth is in "CharactersPerInch"
-                                                                //     _OR_ { nMul, nDiv } which equates to "CharactersPerInch"
-                                                                //     _OR_ ZERO ( 0 ) which uses the default width of the font
-                                                                //          for the nPointSize
-                                                                //   IF nWidth (or nDiv) is < 0 then Fixed font is emulated
+   METHOD New( cPrinter )
+   METHOD CREATE()                // CreatesDC and sets "Courier New" font, set Orientation, Copies, Bin#
+// Create() ( & StartDoc() ) must be called before printing can start.
+   METHOD Destroy()               // Calls EndDoc() - restores default font, Deletes DC.
+// Destroy() must be called to avoid memory leaks
+   METHOD StartDoc( cDocame )       // Calls StartPage()
+   METHOD EndDoc( lAbortDoc )       // Calls EndPage() if lAbortDoc not .T.
+   METHOD StartPage()
+   METHOD EndPage( lStartNewPage )      // If lStartNewPage = .T. then StartPage() is called for the next page of output
+   METHOD NewLine()
+   METHOD NewPage()
+   METHOD SetFont( cFontName, nPointSize, nWidth, nBold, lUnderline, lItalic, nCharSet )
+// NB: nWidth is in "CharactersPerInch"
+//     _OR_ { nMul, nDiv } which equates to "CharactersPerInch"
+//     _OR_ ZERO ( 0 ) which uses the default width of the font
+//          for the nPointSize
+//   IF nWidth (or nDiv) is < 0 then Fixed font is emulated
 
-  METHOD SetDefaultFont()
+   METHOD SetDefaultFont()
 
-  METHOD GetFonts()                                   // Returns array of { "FontName", lFixed, lTrueType, nCharSetRequired }
-  METHOD Bold(nBoldWeight)
-  METHOD UnderLine(lOn)
-  METHOD Italic(lOn)
-  METHOD SetDuplexType(nDuplexType)                       // Get/Set current Duplexmode
-  METHOD SetPrintQuality(nPrintQuality)               // Get/Set Printquality
-  METHOD CharSet(nCharSet)
-
-
-  METHOD SetPos(nX, nY)                               // **WARNING** : (Col,Row) _NOT_ (Row,Col)
-  METHOD SetColor(nClrText, nClrPane, nAlign) INLINE (;
-         ::TextColor:=nClrText, ::BkColor:=nClrPane, ::TextAlign:=nAlign,;
-         SetColor( ::hPrinterDC, nClrText, nClrPane, nAlign) )
-
-  METHOD TextOut(cString, lNewLine, lUpdatePosX, nAlignHori, nAlighVert)     // set TA_* defines above
-  METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX, nAlignHori, nAlighVert) // **WARNING** : (Col,Row) _NOT_ (Row,Col)
-  METHOD TextOutW(wString, lNewLine, lUpdatePosX, nAlignHori, nAlighVert)     // set TA_* defines above
-  METHOD TextOutWAt(nPosX,nPosY, wString, lNewLine, lUpdatePosX, nAlignHori, nAlighVert) // **WARNING** : (Col,Row) _NOT_ (Row,Col)
+   METHOD GetFonts()                                   // Returns array of { "FontName", lFixed, lTrueType, nCharSetRequired }
+   METHOD Bold( nBoldWeight )
+   METHOD UnderLine( lOn )
+   METHOD Italic( lOn )
+   METHOD SetDuplexType( nDuplexType )                       // Get/Set current Duplexmode
+   METHOD SetPrintQuality( nPrintQuality )               // Get/Set Printquality
+   METHOD CharSet( nCharSet )
 
 
+   METHOD SetPos( nX, nY )                               // **WARNING** : (Col,Row) _NOT_ (Row,Col)
+   METHOD SetColor( nClrText, nClrPane, nAlign ) INLINE ( ;
+      ::TextColor := nClrText, ::BkColor := nClrPane, ::TextAlign := nAlign, ;
+      SetColor( ::hPrinterDC, nClrText, nClrPane, nAlign ) )
 
-  METHOD SetPen(nStyle, nWidth, nColor) INLINE (;
-         ::PenStyle:=nStyle, ::PenWidth:=nWidth, ::PenColor:=nColor,;
-         SetPen(::hPrinterDC, nStyle, nWidth, nColor) )
-  METHOD Line(nX1, nY1, nX2, nY2) INLINE LineTo(::hPrinterDC, nX1, nY1, nX2, nY2)
-  METHOD Box(nX1, nY1, nX2, nY2, nWidth, nHeight) INLINE Rectangle(::hPrinterDC, nX1, nY1, nX2, nY2, nWidth, nHeight)
-  METHOD Arc(nX1, nY1, nX2, nY2) INLINE Arc(::hPrinterDC, nX1, nY1, nX2, nY2)
-  METHOD Ellipse(nX1, nY1, nX2, nY2) INLINE Ellipse(::hPrinterDC, nX1, nY1, nX2, nY2)
-  METHOD FillRect(nX1, nY1, nX2, nY2, nColor, nStyle, nHatch ) INLINE FillRect(::hPrinterDC, nX1, nY1, nX2, nY2, nColor, nStyle, nHatch )
-  METHOD GetCharWidth()
-  METHOD GetCharHeight()
-  METHOD GetTextWidth(cString)
-  METHOD GetTextHeight(cString)
-  METHOD DrawBitMap(oBmp)
-  METHOD DrawText(nX1, nY1, nX2, nY2, cString, nAlign ) INLINE DrawText(::hPrinterDC, nX1, nY1, nX2, nY2, cString, nAlign )
+   METHOD TextOut( cString, lNewLine, lUpdatePosX, nAlignHori, nAlighVert )     // set TA_* defines above
+   METHOD TextOutAt( nPosX, nPosY, cString, lNewLine, lUpdatePosX, nAlignHori, nAlighVert ) // **WARNING** : (Col,Row) _NOT_ (Row,Col)
+   METHOD TextOutW( wString, lNewLine, lUpdatePosX, nAlignHori, nAlighVert )     // set TA_* defines above
+   METHOD TextOutWAt( nPosX, nPosY, wString, lNewLine, lUpdatePosX, nAlignHori, nAlighVert ) // **WARNING** : (Col,Row) _NOT_ (Row,Col)
+
+
+
+   METHOD SetPen( nStyle, nWidth, nColor ) INLINE ( ;
+      ::PenStyle := nStyle, ::PenWidth := nWidth, ::PenColor := nColor, ;
+      SetPen( ::hPrinterDC, nStyle, nWidth, nColor ) )
+   METHOD Line( nX1, nY1, nX2, nY2 ) INLINE LineTo( ::hPrinterDC, nX1, nY1, nX2, nY2 )
+   METHOD Box( nX1, nY1, nX2, nY2, nWidth, nHeight ) INLINE Rectangle( ::hPrinterDC, nX1, nY1, nX2, nY2, nWidth, nHeight )
+   METHOD Arc( nX1, nY1, nX2, nY2 ) INLINE Arc( ::hPrinterDC, nX1, nY1, nX2, nY2 )
+   METHOD Ellipse( nX1, nY1, nX2, nY2 ) INLINE Ellipse( ::hPrinterDC, nX1, nY1, nX2, nY2 )
+   METHOD FillRect( nX1, nY1, nX2, nY2, nColor, nStyle, nHatch ) INLINE FillRect( ::hPrinterDC, nX1, nY1, nX2, nY2, nColor, nStyle, nHatch )
+   METHOD GetCharWidth()
+   METHOD GetCharHeight()
+   METHOD GetTextWidth( cString )
+   METHOD GetTextHeight( cString )
+   METHOD DrawBitMap( oBmp )
+   METHOD DrawText( nX1, nY1, nX2, nY2, cString, nAlign ) INLINE DrawText( ::hPrinterDC, nX1, nY1, nX2, nY2, cString, nAlign )
 
 //  Clipper DOS compatible functions.
-  METHOD SetPrc(nRow, nCol)        // Based on ::LineHeight and current ::CharWidth
-  METHOD PRow()
-  METHOD PCol()
-  METHOD MaxRow()                  // Based on ::LineHeight & Form dimensions
-  METHOD MaxCol()                  // Based on ::CharWidth & Form dimensions
+   METHOD SetPRC( nRow, nCol )        // Based on ::LineHeight and current ::CharWidth
+   METHOD PRow()
+   METHOD PCol()
+   METHOD MaxRow()                  // Based on ::LineHeight & Form dimensions
+   METHOD MaxCol()                  // Based on ::CharWidth & Form dimensions
 
-  METHOD MM_TO_POSX( nMm )      // Convert position on page from MM to pixel location Column
-  METHOD MM_TO_POSY( nMm )      //   "       "      "    "    "   "  "   "      "     Row
-  METHOD INCH_TO_POSX( nInch )  // Convert position on page from INCH to pixel location Column
-  METHOD INCH_TO_POSY( nInch )  //   "       "      "    "    "   "    "   "       "    Row
+   METHOD MM_TO_POSX( nMm )      // Convert position on page from MM to pixel location Column
+   METHOD MM_TO_POSY( nMm )      //   "       "      "    "    "   "  "   "      "     Row
+   METHOD INCH_TO_POSX( nInch )  // Convert position on page from INCH to pixel location Column
+   METHOD INCH_TO_POSY( nInch )  //   "       "      "    "    "   "    "   "       "    Row
 
-  METHOD TextAtFont( nPosX, nPosY, cString, cFont, nPointSize,;     // Print text string at location
-                     nWidth, nBold, lUnderLine, lItalic, lNewLine,; // in specified font and color.
-                     lUpdatePosX, nColor, nAlignHori, nAlignVert )                  // Restore original font and colour
-                                                                    // after printing.
-  METHOD SetBkMode( nMode )  INLINE SetBkMode( ::hPrinterDc, nMode ) // OPAQUE= 2 or TRANSPARENT= 1
-                                                                     // Set Background mode
+   METHOD TextAtFont( nPosX, nPosY, cString, cFont, nPointSize, ;     // Print text string at location
+      nWidth, nBold, lUnderLine, lItalic, lNewLine, ; // in specified font and color.
+   lUpdatePosX, nColor, nAlignHori, nAlignVert )                  // Restore original font and colour
+// after printing.
+   METHOD SetBkMode( nMode )  INLINE SetBkMode( ::hPrinterDc, nMode ) // OPAQUE= 2 or TRANSPARENT= 1
+// Set Background mode
 
-  METHOD GetDeviceCaps( nCaps ) INLINE GetDeviceCaps( ::hPrinterDC, nCaps)
+   METHOD GetDeviceCaps( nCaps ) INLINE GetDeviceCaps( ::hPrinterDC, nCaps )
 
-  VAR PrinterName    INIT ""
-  VAR Printing       INIT .F.
-  VAR HavePrinted    INIT .F.
-  VAR hPrinterDc     INIT 0
+   VAR PrinterName    INIT ""
+   VAR Printing       INIT .F.
+   VAR HavePrinted    INIT .F.
+   VAR hPrinterDc     INIT 0
 
-  VAR AskProperties  INIT .f.
+   VAR AskProperties  INIT .F.
 
 // These next 4 variables must be set before calling ::Create() if
 // you wish to alter the defaults
-  VAR FormType       INIT 0
-  VAR BinNumber      INIT 0
-  VAR Landscape      INIT .F.
-  VAR Copies         INIT 1
+   VAR FormType       INIT 0
+   VAR BinNumber      INIT 0
+   VAR Landscape      INIT .F.
+   VAR Copies         INIT 1
 
-  VAR PaperLength    INIT 0                        // Value is * 1/10 of mm   1000 = 10cm
-  VAR PaperWidth     INIT 0                        //   "    "    "     "       "     "
+   VAR PaperLength    INIT 0                        // Value is * 1/10 of mm   1000 = 10cm
+   VAR PaperWidth     INIT 0                        //   "    "    "     "       "     "
 
-  VAR SetTextHori    INIT TA_LEFT    // Default horizontal alignment SetTextAlign() (TEXTOUT)
-  VAR SetTextVert    INIT TA_BOTTOM  // Default vertical alignment for SetTextAlign() (TEXTOUT)
+   VAR SetTextHori    INIT TA_LEFT    // Default horizontal alignment SetTextAlign() (TEXTOUT)
+   VAR SetTextVert    INIT TA_BOTTOM  // Default vertical alignment for SetTextAlign() (TEXTOUT)
 
-  VAR SetFontOk      INIT .F.
-  VAR FontName       INIT ""                        // Current Point size for font
-  VAR FontPointSize  INIT 12                        // Point size for font
-  VAR FontWidth      INIT {0,0}                     // {Mul, Div} Calc width: nWidth:= MulDiv(nMul, GetDeviceCaps(shDC,LOGPIXELSX), nDiv)
-                                                    // If font width is specified it is in "characters per inch" to emulate DotMatrix
-  VAR fBold           INIT 0      HIDDEN            // font darkness weight ( Bold). See wingdi.h or WIN SDK CreateFont() for valid values
-  VAR fUnderLine      INIT .F.    HIDDEN            // UnderLine is on or off
-  VAR fItalic         INIT .F.    HIDDEN            // Italic is on or off
-  VAR fCharSet        INIT 1      HIDDEN            // Default character set == DEFAULT_CHARSET ( see wingdi.h )
+   VAR SetFontOk      INIT .F.
+   VAR FontName       INIT ""                        // Current Point size for font
+   VAR FontPointSize  INIT 12                        // Point size for font
+   VAR FontWidth      INIT { 0, 0 }                     // {Mul, Div} Calc width: nWidth:= MulDiv(nMul, GetDeviceCaps(shDC,LOGPIXELSX), nDiv)
+// If font width is specified it is in "characters per inch" to emulate DotMatrix
+   VAR fBold           INIT 0      HIDDEN            // font darkness weight ( Bold). See wingdi.h or WIN SDK CreateFont() for valid values
+   VAR fUnderLine      INIT .F.    HIDDEN            // UnderLine is on or off
+   VAR fItalic         INIT .F.    HIDDEN            // Italic is on or off
+   VAR fCharSet        INIT 1      HIDDEN            // Default character set == DEFAULT_CHARSET ( see wingdi.h )
 
-  VAR PixelsPerInchY
-  VAR PixelsPerInchX
-  VAR PageHeight       INIT 0
-  VAR PageWidth        INIT 0
-  VAR TopMargin        INIT 0
-  VAR BottomMargin     INIT 0
-  VAR LeftMargin       INIT 0
-  VAR RightMargin      INIT 0
-  VAR LineHeight       INIT 0
-  VAR CharHeight       INIT 0
-  VAR CharWidth        INIT 0
-  VAR fCharWidth       INIT 0      HIDDEN
-  VAR BitmapsOk        INIT .F.
-  VAR NumColors        INIT 1
+   VAR PixelsPerInchY
+   VAR PixelsPerInchX
+   VAR PageHeight       INIT 0
+   VAR PageWidth        INIT 0
+   VAR TopMargin        INIT 0
+   VAR BottomMargin     INIT 0
+   VAR LeftMargin       INIT 0
+   VAR RightMargin      INIT 0
+   VAR LineHeight       INIT 0
+   VAR CharHeight       INIT 0
+   VAR CharWidth        INIT 0
+   VAR fCharWidth       INIT 0      HIDDEN
+   VAR BitmapsOk        INIT .F.
+   VAR NumColors        INIT 1
 
-  VAR fDuplexType      INIT 0      HIDDEN              //DMDUP_SIMPLEX, 22/02/2007 change to 0 to use default printer settings
-  VAR fPrintQuality    INIT 0      HIDDEN              //DMRES_HIGH, 22/02/2007 change to 0 to use default printer settings
-  VAR fNewDuplexType   INIT 0      HIDDEN
-  VAR fNewPrintQuality INIT 0      HIDDEN
-  VAR fOldLandScape    INIT .F.    HIDDEN
-  VAR fOldBinNumber    INIT 0      HIDDEN
-  VAR fOldFormType     INIT 0      HIDDEN
-  VAR fOldPaperLength  INIT 0      HIDDEN
-  VAR fOldPaperWidth   INIT 0      HIDDEN
+   VAR fDuplexType      INIT 0      HIDDEN              //DMDUP_SIMPLEX, 22/02/2007 change to 0 to use default printer settings
+   VAR fPrintQuality    INIT 0      HIDDEN              //DMRES_HIGH, 22/02/2007 change to 0 to use default printer settings
+   VAR fNewDuplexType   INIT 0      HIDDEN
+   VAR fNewPrintQuality INIT 0      HIDDEN
+   VAR fOldLandScape    INIT .F.    HIDDEN
+   VAR fOldBinNumber    INIT 0      HIDDEN
+   VAR fOldFormType     INIT 0      HIDDEN
+   VAR fOldPaperLength  INIT 0      HIDDEN
+   VAR fOldPaperWidth   INIT 0      HIDDEN
 
-  VAR PosX             INIT 0
-  VAR PosY             INIT 0
+   VAR PosX             INIT 0
+   VAR PosY             INIT 0
 
-  VAR TextColor
-  VAR BkColor
-  VAR TextAlign
+   VAR TextColor
+   VAR BkColor
+   VAR TextAlign
 
-  VAR PenStyle
-  VAR PenWidth
-  VAR PenColor
-
+   VAR PenStyle
+   VAR PenWidth
+   VAR PenColor
 
 ENDCLASS
 
 METHOD New( cPrinter ) CLASS WIN32PRN
-  ::PrinterName := IIF(!EMPTY(cPrinter), cPrinter, GetDefaultPrinter())
-  RETURN(Self)
 
-METHOD Create() CLASS WIN32PRN
-  LOCAL Result:= .F.
-  ::Destroy()                            // Finish current print job if any
-  IF !EMPTY(::hPrinterDC:= CreateDC(::PrinterName))
+   ::PrinterName := iif( !Empty( cPrinter ), cPrinter, GetDefaultPrinter() )
 
-    // Set Form Type
-    // Set Number of Copies
-    // Set Orientation
-    // Set Duplex mode
-    // Set PrintQuality
+   RETURN( Self )
 
-    if !::AskProperties
-       * old code, //x added some error possibility
-       if !SetDocumentProperties(::hPrinterDC, ::PrinterName, ::FormType, ::Landscape, ::Copies, ::BinNumber, ::fDuplexType, ::fPrintQuality, ::PaperLength, ::PaperWidth)
-          ::Destroy()
-          return .f.
-       endif
-    else
-       * pass some vars byref
-       if !SetDocumentProperties(::hPrinterDC, ::PrinterName, @::FormType, @::Landscape, @::Copies, @::BinNumber, @::fDuplexType, @::fPrintQuality, @::PaperLength, @::PaperWidth )
-          * might be an error, or cancelled
-          ::Destroy()
-          return .f.
-       endif
-       * must update fnew* if * was changed
-    endif
+METHOD CREATE() CLASS WIN32PRN
 
-    // Set mapping mode to pixels, topleft down
-    SetMapMode(::hPrinterDC,MM_TEXT)
-//    SetTextCharacterExtra(::hPrinterDC,0); // do not add extra char spacing even if bold
-    // Get Margins etc... here
-    ::PageWidth        := GetDeviceCaps(::hPrinterDC,PHYSICALWIDTH)
-    ::PageHeight       := GetDeviceCaps(::hPrinterDC,PHYSICALHEIGHT)
-    ::LeftMargin       := GetDeviceCaps(::hPrinterDC,PHYSICALOFFSETX)
-    ::RightMargin      := (::PageWidth - ::LeftMargin)+1
-    ::PixelsPerInchY   := GetDeviceCaps(::hPrinterDC,LOGPIXELSY)
-    ::PixelsPerInchX   := GetDeviceCaps(::hPrinterDC,LOGPIXELSX)
-    ::LineHeight       := INT(::PixelsPerInchY / 6)  // Default 6 lines per inch == # of pixels per line
-    ::TopMargin        := GetDeviceCaps(::hPrinterDC,PHYSICALOFFSETY)
-    ::BottomMargin     := (::PageHeight - ::TopMargin)+1
+   LOCAL Result := .F.
 
-    // Set .T. if can print bitmaps
-    ::BitMapsOk :=  BitMapsOk(::hPrinterDC)
+   ::Destroy()                            // Finish current print job if any
+   IF !Empty( ::hPrinterDC := CreateDC( ::PrinterName ) )
 
-    // supports Colour
-    ::NumColors := GetDeviceCaps(::hPrinterDC,NUMCOLORS)
+      // Set Form Type
+      // Set Number of Copies
+      // Set Orientation
+      // Set Duplex mode
+      // Set PrintQuality
+
+      IF !::AskProperties
+         // old code, //x added some error possibility
+         IF !SetDocumentProperties( ::hPrinterDC, ::PrinterName, ::FormType, ::Landscape, ::Copies, ::BinNumber, ::fDuplexType, ::fPrintQuality, ::PaperLength, ::PaperWidth )
+            ::Destroy()
+            RETURN .F.
+         ENDIF
+      ELSE
+         // pass some vars byref
+         IF !SetDocumentProperties( ::hPrinterDC, ::PrinterName, @::FormType, @::Landscape, @::Copies, @::BinNumber, @::fDuplexType, @::fPrintQuality, @::PaperLength, @::PaperWidth )
+            // might be an error, or cancelled
+            ::Destroy()
+            RETURN .F.
+         ENDIF
+         // must update fnew* if * was changed
+      ENDIF
+
+      // Set mapping mode to pixels, topleft down
+      SetMapMode( ::hPrinterDC, MM_TEXT )
+      //    SetTextCharacterExtra(::hPrinterDC,0); // do not add extra char spacing even if bold
+      // Get Margins etc... here
+      ::PageWidth        := GetDeviceCaps( ::hPrinterDC, PHYSICALWIDTH )
+      ::PageHeight       := GetDeviceCaps( ::hPrinterDC, PHYSICALHEIGHT )
+      ::LeftMargin       := GetDeviceCaps( ::hPrinterDC, PHYSICALOFFSETX )
+      ::RightMargin      := ( ::PageWidth - ::LeftMargin ) + 1
+      ::PixelsPerInchY   := GetDeviceCaps( ::hPrinterDC, LOGPIXELSY )
+      ::PixelsPerInchX   := GetDeviceCaps( ::hPrinterDC, LOGPIXELSX )
+      ::LineHeight       := Int( ::PixelsPerInchY / 6 )  // Default 6 lines per inch == # of pixels per line
+      ::TopMargin        := GetDeviceCaps( ::hPrinterDC, PHYSICALOFFSETY )
+      ::BottomMargin     := ( ::PageHeight - ::TopMargin ) + 1
+
+      // Set .T. if can print bitmaps
+      ::BitMapsOk :=  BitMapsOk( ::hPrinterDC )
+
+      // supports Colour
+      ::NumColors := GetDeviceCaps( ::hPrinterDC, NUMCOLORS )
 
 
-    // Set the standard font
-    ::SetDefaultFont()
-    ::HavePrinted:= ::Printing:= .F.
-    ::fOldFormType:= ::FormType  // Last formtype used
-    ::fOldLandScape:= ::LandScape
-    ::fOldBinNumber:= ::BinNumber
-    ::fNewDuplexType := ::fDuplexType
-    ::fNewPrintQuality := ::fPrintQuality
-    ::fOldPaperLength  := ::PaperLength
-    ::fOldPaperWidth   := ::PaperWidth
+      // Set the standard font
+      ::SetDefaultFont()
+      ::HavePrinted := ::Printing := .F.
+      ::fOldFormType := ::FormType  // Last formtype used
+      ::fOldLandScape := ::LandScape
+      ::fOldBinNumber := ::BinNumber
+      ::fNewDuplexType := ::fDuplexType
+      ::fNewPrintQuality := ::fPrintQuality
+      ::fOldPaperLength  := ::PaperLength
+      ::fOldPaperWidth   := ::PaperWidth
 
-    Result:= .T.
-  ENDIF
-  RETURN(Result)
+      Result := .T.
+   ENDIF
+
+   RETURN( Result )
 
 METHOD Destroy() CLASS WIN32PRN
-  IF !EMPTY(::hPrinterDc)
-    IF ::Printing
-      ::EndDoc()
-    ENDIF
-    ::hPrinterDC:= DeleteDC(::hPrinterDC)
-  ENDIF
-  RETURN(.T.)
 
-METHOD StartDoc(cDocName) CLASS WIN32PRN
-  LOCAL Result:= .F.
-  IF cDocName == NIL
-    cDocName:= GetExeFileName()+" ["+DTOC(DATE())+' - '+TIME()+"]"
-  ENDIF
-  IF (Result:= StartDoc(::hPrinterDc, cDocName))
-    IF !(Result:= ::StartPage(::hPrinterDc))
-      ::EndDoc(.T.)
-    ELSE
-      ::Printing:= .T.
-    ENDIF
-  ENDIF
-  RETURN(Result)
+   IF !Empty( ::hPrinterDc )
+      IF ::Printing
+         ::EndDoc()
+      ENDIF
+      ::hPrinterDC := DeleteDC( ::hPrinterDC )
+   ENDIF
 
-METHOD EndDoc(lAbortDoc) CLASS WIN32PRN
-  IF lAbortDoc == NIL
-    lAbortDoc:= .F.
-  ENDIF
-  IF !::HavePrinted
-    lAbortDoc:= .T.
-  ENDIF
-  IF !lAbortDoc
-    ::EndPage(.F.)
-  ENDIF
-  EndDoc(::hPrinterDC,lAbortDoc)
-  ::Printing:= .F.
-  ::HavePrinted:= .F.
-  RETURN(.T.)
+   RETURN( .T. )
+
+METHOD StartDoc( cDocName ) CLASS WIN32PRN
+
+   LOCAL Result := .F.
+
+   IF cDocName == NIL
+      cDocName := GetExeFileName() + " [" + DToC( Date() ) + ' - ' + Time() + "]"
+   ENDIF
+   IF ( Result := StartDoc( ::hPrinterDc, cDocName ) )
+      IF !( Result := ::StartPage( ::hPrinterDc ) )
+         ::EndDoc( .T. )
+      ELSE
+         ::Printing := .T.
+      ENDIF
+   ENDIF
+
+   RETURN( Result )
+
+METHOD EndDoc( lAbortDoc ) CLASS WIN32PRN
+
+   IF lAbortDoc == NIL
+      lAbortDoc := .F.
+   ENDIF
+   IF !::HavePrinted
+      lAbortDoc := .T.
+   ENDIF
+   IF !lAbortDoc
+      ::EndPage( .F. )
+   ENDIF
+   EndDoc( ::hPrinterDC, lAbortDoc )
+   ::Printing := .F.
+   ::HavePrinted := .F.
+
+   RETURN( .T. )
 
 METHOD StartPage() CLASS WIN32PRN
-  LOCAL lLLandScape, nLBinNumber, nLFormType, nLDuplexType, nLPrintQuality
-  LOCAL lChangeDP:= .F., nLPaperLength, nLPaperWidth
-  IF ::LandScape <> ::fOldLandScape  // Direct-modify property
-    lLLandScape:= ::fOldLandScape := ::LandScape
-    lChangeDP:= .T.
-  ENDIF
-  IF ::BinNumber <> ::fOldBinNumber  // Direct-modify property
-    nLBinNumber:= ::fOldBinNumber := ::BinNumber
-    lChangeDP:= .T.
-  ENDIF
-  IF ::FormType <> ::fOldFormType  // Direct-modify property
-    nLFormType:= ::fOldFormType := ::FormType
-    lChangeDP:= .T.
-  ENDIF
-  IF ::fDuplexType <> ::fNewDuplexType  // Get/Set property
-    nLDuplexType:= ::fDuplexType:= ::fNewDuplexType
-    lChangeDP:= .T.
-  ENDIF
-  IF ::fPrintQuality <> ::fNewPrintQuality  // Get/Set property
-    nLPrintQuality:= ::fPrintQuality:= ::fNewPrintQuality
-    lChangeDP:= .T.
-  ENDIF
-  IF ::fOldPaperLength <> ::PaperLength  // Get/Set property
-    nLPaperLength:= ::fOldPaperLength:= ::PaperLength
-    lChangeDP:= .T.
-  ENDIF
-  IF ::fOldPaperWidth <> ::PaperWidth  // Get/Set property
-    nLPaperWidth:= ::fOldPaperWidth:= ::PaperWidth
-    lChangeDP:= .T.
-  ENDIF
-  IF lChangeDP
-    SetDocumentProperties(::hPrinterDC, ::PrinterName, nLFormType, lLLandscape, , nLBinNumber, nLDuplexType, nLPrintQuality, nLPaperLength, nLPaperWidth)
-  ENDIF
-  StartPage(::hPrinterDC)
-  ::PosX:= ::LeftMargin
-  ::PosY:= ::TopMargin
-  RETURN(.T.)
 
-METHOD EndPage(lStartNewPage) CLASS WIN32PRN
-  IF lStartNewPage == NIL
-    lStartNewPage:= .T.
-  ENDIF
-  EndPage(::hPrinterDC)
-  IF lStartNewPage
-    ::StartPage()
-    IF OS_ISWIN9X() // Reset font on Win9X
-      ::SetFont()
-    ENDIF
-  ENDIF
-  RETURN(.T.)
+   LOCAL lLLandScape, nLBinNumber, nLFormType, nLDuplexType, nLPrintQuality
+   LOCAL lChangeDP := .F. , nLPaperLength, nLPaperWidth
+
+   IF ::LandScape <> ::fOldLandScape  // Direct-modify property
+      lLLandScape := ::fOldLandScape := ::LandScape
+      lChangeDP := .T.
+   ENDIF
+   IF ::BinNumber <> ::fOldBinNumber  // Direct-modify property
+      nLBinNumber := ::fOldBinNumber := ::BinNumber
+      lChangeDP := .T.
+   ENDIF
+   IF ::FormType <> ::fOldFormType  // Direct-modify property
+      nLFormType := ::fOldFormType := ::FormType
+      lChangeDP := .T.
+   ENDIF
+   IF ::fDuplexType <> ::fNewDuplexType  // Get/Set property
+      nLDuplexType := ::fDuplexType := ::fNewDuplexType
+      lChangeDP := .T.
+   ENDIF
+   IF ::fPrintQuality <> ::fNewPrintQuality  // Get/Set property
+      nLPrintQuality := ::fPrintQuality := ::fNewPrintQuality
+      lChangeDP := .T.
+   ENDIF
+   IF ::fOldPaperLength <> ::PaperLength  // Get/Set property
+      nLPaperLength := ::fOldPaperLength := ::PaperLength
+      lChangeDP := .T.
+   ENDIF
+   IF ::fOldPaperWidth <> ::PaperWidth  // Get/Set property
+      nLPaperWidth := ::fOldPaperWidth := ::PaperWidth
+      lChangeDP := .T.
+   ENDIF
+   IF lChangeDP
+      SetDocumentProperties( ::hPrinterDC, ::PrinterName, nLFormType, lLLandscape, , nLBinNumber, nLDuplexType, nLPrintQuality, nLPaperLength, nLPaperWidth )
+   ENDIF
+   StartPage( ::hPrinterDC )
+   ::PosX := ::LeftMargin
+   ::PosY := ::TopMargin
+
+   RETURN( .T. )
+
+METHOD EndPage( lStartNewPage ) CLASS WIN32PRN
+
+   IF lStartNewPage == NIL
+      lStartNewPage := .T.
+   ENDIF
+   EndPage( ::hPrinterDC )
+   IF lStartNewPage
+      ::StartPage()
+      IF OS_ISWIN9X() // Reset font on Win9X
+         ::SetFont()
+      ENDIF
+   ENDIF
+
+   RETURN( .T. )
 
 METHOD NewLine() CLASS WIN32PRN
-  ::PosX:= ::LeftMargin
-  ::PosY+= ::LineHeight
-  RETURN(::PosY)
+
+   ::PosX := ::LeftMargin
+   ::PosY += ::LineHeight
+
+   RETURN( ::PosY )
 
 METHOD NewPage() CLASS WIN32PRN
-  ::EndPage(.T.)
-  RETURN(.T.)
 
+   ::EndPage( .T. )
+
+   RETURN( .T. )
 
 // If font width is specified it is in "characters per inch" to emulate DotMatrix
 // An array {nMul,nDiv} is used to get precise size such a the Dot Matric equivalent
 // of Compressed print == 16.67 char per inch == { 3,-50 }
 // If nDiv is < 0 then Fixed width printing is forced via ExtTextOut()
-METHOD SetFont(cFontName, nPointSize, nWidth, nBold, lUnderline, lItalic, nCharSet) CLASS WIN32PRN
-  LOCAL cType
-  IF cFontName !=NIL
-    ::FontName:= cFontName
-  ENDIF
-  IF nPointSize!=NIL
-    ::FontPointSize:= nPointSize
-  ENDIF
-  IF nWidth != NIL
-    cType:= VALTYPE(nWidth)
-    IF cType='A'
-      ::FontWidth     := nWidth
-    ELSEIF cType='N' .AND. !EMPTY(nWidth)
-      ::FontWidth     := {1,nWidth }
-    ELSE
-      ::FontWidth     := {0, 0 }
-    ENDIF
-  ENDIF
-  IF nBold != NIL
-    ::fBold := nBold
-  ENDIF
-  IF lUnderLine != NIL
-    ::fUnderline:= lUnderLine
-  ENDIF
-  IF lItalic != NIL
-    ::fItalic := lItalic
-  ENDIF
-  IF nCharSet != NIL
-    ::fCharSet := nCharSet
-  ENDIF
-  IF (::SetFontOk:= CreateFont( ::hPrinterDC, ::FontName, ::FontPointSize, ::FontWidth[1], ::FontWidth[2], ::fBold, ::fUnderLine, ::fItalic, ::fCharSet))
-    ::fCharWidth        := ::GetCharWidth()
-    ::CharWidth:= ABS(::fCharWidth)
-    ::CharHeight:= ::GetCharHeight()
-  ENDIF
-  ::FontName:= GetPrinterFontName(::hPrinterDC)  // Get the font name that Windows actually used
-  RETURN(::SetFontOk)
+
+METHOD SetFont( cFontName, nPointSize, nWidth, nBold, lUnderline, lItalic, nCharSet ) CLASS WIN32PRN
+
+   LOCAL cType
+
+   IF cFontName != NIL
+      ::FontName := cFontName
+   ENDIF
+   IF nPointSize != NIL
+      ::FontPointSize := nPointSize
+   ENDIF
+   IF nWidth != NIL
+      cType := ValType( nWidth )
+      IF cType = 'A'
+         ::FontWidth     := nWidth
+      ELSEIF cType = 'N' .AND. !Empty( nWidth )
+         ::FontWidth     := { 1, nWidth }
+      ELSE
+         ::FontWidth     := { 0, 0 }
+      ENDIF
+   ENDIF
+   IF nBold != NIL
+      ::fBold := nBold
+   ENDIF
+   IF lUnderLine != NIL
+      ::fUnderline := lUnderLine
+   ENDIF
+   IF lItalic != NIL
+      ::fItalic := lItalic
+   ENDIF
+   IF nCharSet != NIL
+      ::fCharSet := nCharSet
+   ENDIF
+   IF ( ::SetFontOk := CreateFont( ::hPrinterDC, ::FontName, ::FontPointSize, ::FontWidth[1], ::FontWidth[2], ::fBold, ::fUnderLine, ::fItalic, ::fCharSet ) )
+      ::fCharWidth        := ::GetCharWidth()
+      ::CharWidth := Abs( ::fCharWidth )
+      ::CharHeight := ::GetCharHeight()
+   ENDIF
+   ::FontName := GetPrinterFontName( ::hPrinterDC )  // Get the font name that Windows actually used
+
+   RETURN( ::SetFontOk )
 
 METHOD SetDefaultFont()
-  RETURN(::SetFont("Courier New",12,{1, 10}, 0, .F., .F., 0))
 
-METHOD Bold(nWeight) CLASS WIN32PRN
-  LOCAL Result:= ::fBold
-  IF nWeight!= NIL
-    ::fBold:= nWeight
-    IF ::Printing
-      ::SetFont()
-    ENDIF
-  ENDIF
-  RETURN(Result)
+   RETURN( ::SetFont( "Courier New",12,{ 1, 10 }, 0, .F. , .F. , 0 ) )
 
-METHOD Underline(lUnderLine) CLASS WIN32PRN
-  LOCAL Result:= ::fUnderline
-  IF lUnderLine!= NIL
-    ::fUnderLine:= lUnderLine
-    IF ::Printing
-      ::SetFont()
-    ENDIF
-  ENDIF
-  RETURN(Result)
+METHOD Bold( nWeight ) CLASS WIN32PRN
 
-METHOD Italic(lItalic) CLASS WIN32PRN
-  LOCAL Result:= ::fItalic
-  IF lItalic!= NIL
-    ::fItalic:= lItalic
-    IF ::Printing
-      ::SetFont()
-    ENDIF
-  ENDIF
-  RETURN(Result)
+   LOCAL Result := ::fBold
 
-METHOD CharSet(nCharSet) CLASS WIN32PRN
-  LOCAL Result:= ::fCharSet
-  IF nCharSet!= NIL
-    ::fCharSet:= nCharSet
-    IF ::Printing
-      ::SetFont()
-    ENDIF
-  ENDIF
-  RETURN(Result)
+   IF nWeight != NIL
+      ::fBold := nWeight
+      IF ::Printing
+         ::SetFont()
+      ENDIF
+   ENDIF
 
-METHOD SetDuplexType(nDuplexType) CLASS WIN32PRN
-  LOCAL Result:= ::fDuplexType
-  IF nDuplexType!= NIL
-    ::fNewDuplexType:= nDuplexType
-    IF !::Printing
-      ::fDuplexType:= nDuplexType
-    ENDIF
-  ENDIF
-  RETURN(Result)
+   RETURN( Result )
 
-METHOD SetPrintQuality(nPrintQuality) CLASS WIN32PRN
-  LOCAL Result:= ::fPrintQuality
-  IF nPrintQuality!= NIL
-    ::fNewPrintQuality:= nPrintQuality
-    IF !::Printing
-      ::fPrintQuality:= nPrintQuality
-    ENDIF
-  ENDIF
-  RETURN(Result)
+METHOD Underline( lUnderLine ) CLASS WIN32PRN
+
+   LOCAL Result := ::fUnderline
+
+   IF lUnderLine != NIL
+      ::fUnderLine := lUnderLine
+      IF ::Printing
+         ::SetFont()
+      ENDIF
+   ENDIF
+
+   RETURN( Result )
+
+METHOD Italic( lItalic ) CLASS WIN32PRN
+
+   LOCAL Result := ::fItalic
+
+   IF lItalic != NIL
+      ::fItalic := lItalic
+      IF ::Printing
+         ::SetFont()
+      ENDIF
+   ENDIF
+
+   RETURN( Result )
+
+METHOD CharSet( nCharSet ) CLASS WIN32PRN
+
+   LOCAL Result := ::fCharSet
+
+   IF nCharSet != NIL
+      ::fCharSet := nCharSet
+      IF ::Printing
+         ::SetFont()
+      ENDIF
+   ENDIF
+
+   RETURN( Result )
+
+METHOD SetDuplexType( nDuplexType ) CLASS WIN32PRN
+
+   LOCAL Result := ::fDuplexType
+
+   IF nDuplexType != NIL
+      ::fNewDuplexType := nDuplexType
+      IF !::Printing
+         ::fDuplexType := nDuplexType
+      ENDIF
+   ENDIF
+
+   RETURN( Result )
+
+METHOD SetPrintQuality( nPrintQuality ) CLASS WIN32PRN
+
+   LOCAL Result := ::fPrintQuality
+
+   IF nPrintQuality != NIL
+      ::fNewPrintQuality := nPrintQuality
+      IF !::Printing
+         ::fPrintQuality := nPrintQuality
+      ENDIF
+   ENDIF
+
+   RETURN( Result )
 
 METHOD GetFonts() CLASS WIN32PRN
-  RETURN(ENUMFONTS(::hPrinterDC))
 
-METHOD SetPos(nPosX, nPosY) CLASS WIN32PRN
-  LOCAL Result:= {::PosX, ::PosY}
-  IF nPosX != NIL
-    ::PosX:= INT(nPosX)
-  ENDIF
-  IF nPosY != NIL
-    ::PosY:= INT(nPosY)
-  ENDIF
-  RETURN(Result)
+   RETURN( ENUMFONTS( ::hPrinterDC ) )
 
-METHOD TextOut(cString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert) CLASS WIN32PRN
-  LOCAL nPosX
-  IF nAlignHori == NIL
-     nAlignHori:= ::SetTextHori
-  ENDIF
-  IF nAlignVert == NIL
-     nAlignVert:= ::SetTextVert
-  ENDIF
-  IF lUpdatePosX == NIL
-     lUpdatePosX:=.T.
-  ENDIF
-  IF lNewLine == NIL
-    lNewLine:= .F.
-  ENDIF
-  IF cString!=NIL
-    nPosX:= TextOut(::hPrinterDC,::PosX, ::PosY, cString, LEN(cString), ::fCharWidth, nAlignHori, nAlignVert)
-    ::HavePrinted:= .T.
-    IF lUpdatePosX
-      ::PosX+= nPosX
-    ENDIF
-    IF lNewLine
-      ::NewLine()
-    ENDIF
-  ENDIF
-  RETURN( .T. )
+METHOD SetPos( nPosX, nPosY ) CLASS WIN32PRN
 
-METHOD TextOutW(wString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert) CLASS WIN32PRN
-  LOCAL nPosX
-  IF nAlignHori == NIL
-     nAlignHori:= ::SetTextHori
-  ENDIF
-  IF nAlignVert == NIL
-     nAlignVert:= ::SetTextVert
-  ENDIF
-  IF lUpdatePosX == NIL
-     lUpdatePosX:=.T.
-  ENDIF
-  IF lNewLine == NIL
-    lNewLine:= .F.
-  ENDIF
-  IF wString!=NIL
-    //#TODO: count len of unicode, for now assume as 2 bytes per charactor
-    nPosX:= TextOutW(::hPrinterDC, ::PosX, ::PosY, wString, LEN(wString)/2, ::fCharWidth, nAlignHori, nAlignVert)
-    ::HavePrinted:= .T.
-    IF lUpdatePosX
-      ::PosX+= nPosX
-    ENDIF
-    IF lNewLine
-      ::NewLine()
-    ENDIF
-  ENDIF
-  RETURN( .T. )
+   LOCAL Result := { ::PosX, ::PosY }
 
+   IF nPosX != NIL
+      ::PosX := Int( nPosX )
+   ENDIF
+   IF nPosY != NIL
+      ::PosY := Int( nPosY )
+   ENDIF
 
-METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert) CLASS WIN32PRN
-  IF lNewLine == NIL
-    lNewLine:= .F.
-  ENDIF
-  IF lUpdatePosX == NIL
-    lUpdatePosX:= .T.
-  ENDIF
-  ::SetPos(nPosX,nPosY)
-  ::TextOut(cString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert)
-  RETURN(.T.)
+   RETURN( Result )
 
-METHOD TextOutWAt(nPosX,nPosY, wString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert) CLASS WIN32PRN
-  IF lNewLine == NIL
-    lNewLine:= .F.
-  ENDIF
-  IF lUpdatePosX == NIL
-    lUpdatePosX:= .T.
-  ENDIF
-  ::SetPos(nPosX,nPosY)
-  ::TextOutW(wString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert)
-  RETURN(.T.)
+METHOD TextOut( cString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert ) CLASS WIN32PRN
 
+   LOCAL nPosX
+
+   IF nAlignHori == NIL
+      nAlignHori := ::SetTextHori
+   ENDIF
+   IF nAlignVert == NIL
+      nAlignVert := ::SetTextVert
+   ENDIF
+   IF lUpdatePosX == NIL
+      lUpdatePosX := .T.
+   ENDIF
+   IF lNewLine == NIL
+      lNewLine := .F.
+   ENDIF
+   IF cString != NIL
+      nPosX := TextOut( ::hPrinterDC, ::PosX, ::PosY, cString, Len( cString ), ::fCharWidth, nAlignHori, nAlignVert )
+      ::HavePrinted := .T.
+      IF lUpdatePosX
+         ::PosX += nPosX
+      ENDIF
+      IF lNewLine
+         ::NewLine()
+      ENDIF
+   ENDIF
+
+   RETURN( .T. )
+
+METHOD TextOutW( wString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert ) CLASS WIN32PRN
+
+   LOCAL nPosX
+
+   IF nAlignHori == NIL
+      nAlignHori := ::SetTextHori
+   ENDIF
+   IF nAlignVert == NIL
+      nAlignVert := ::SetTextVert
+   ENDIF
+   IF lUpdatePosX == NIL
+      lUpdatePosX := .T.
+   ENDIF
+   IF lNewLine == NIL
+      lNewLine := .F.
+   ENDIF
+   IF wString != NIL
+      //#TODO: count len of unicode, for now assume as 2 bytes per charactor
+      nPosX := TextOutW( ::hPrinterDC, ::PosX, ::PosY, wString, Len( wString )/2, ::fCharWidth, nAlignHori, nAlignVert )
+      ::HavePrinted := .T.
+      IF lUpdatePosX
+         ::PosX += nPosX
+      ENDIF
+      IF lNewLine
+         ::NewLine()
+      ENDIF
+   ENDIF
+
+   RETURN( .T. )
+
+METHOD TextOutAt( nPosX, nPosY, cString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert ) CLASS WIN32PRN
+
+   IF lNewLine == NIL
+      lNewLine := .F.
+   ENDIF
+   IF lUpdatePosX == NIL
+      lUpdatePosX := .T.
+   ENDIF
+   ::SetPos( nPosX, nPosY )
+   ::TextOut( cString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert )
+
+   RETURN( .T. )
+
+METHOD TextOutWAt( nPosX, nPosY, wString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert ) CLASS WIN32PRN
+
+   IF lNewLine == NIL
+      lNewLine := .F.
+   ENDIF
+   IF lUpdatePosX == NIL
+      lUpdatePosX := .T.
+   ENDIF
+   ::SetPos( nPosX, nPosY )
+   ::TextOutW( wString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert )
+
+   RETURN( .T. )
 
 METHOD GetCharWidth() CLASS WIN32PRN
-  LOCAL nWidth:= 0
-  IF ::FontWidth[2] < 0 .AND. !EMPTY(::FontWidth[1])
-    nWidth:= MulDiv(::FontWidth[1], ::PixelsPerInchX,::FontWidth[2])
-  ELSE
-    nWidth:= GetCharSize(::hPrinterDC)
-  ENDIF
-  RETURN(nWidth)
+
+   LOCAL nWidth := 0
+
+   IF ::FontWidth[2] < 0 .AND. !Empty( ::FontWidth[1] )
+      nWidth := MulDiv( ::FontWidth[1], ::PixelsPerInchX, ::FontWidth[2] )
+   ELSE
+      nWidth := GetCharSize( ::hPrinterDC )
+   ENDIF
+
+   RETURN( nWidth )
 
 METHOD GetCharHeight() CLASS WIN32PRN
-  RETURN(GetCharSize(::hPrinterDC, .T.))
 
-METHOD GetTextWidth(cString) CLASS WIN32PRN
-  LOCAL nWidth:= 0
-  IF ::FontWidth[2] < 0 .AND. !EMPTY(::FontWidth[1])
-    nWidth:= LEN(cString) * ::CharWidth
-  ELSE
-    nWidth:= GetTextSize(::hPrinterDC, cString, LEN(cString))  // Return Width in device units
-  ENDIF
-  RETURN(nWidth)
+   RETURN( GetCharSize( ::hPrinterDC, .T. ) )
 
-METHOD GetTextHeight(cString) CLASS WIN32PRN
-  RETURN(GetTextSize(::hPrinterDC, cString, LEN(cString), .F.))  // Return Height in device units
+METHOD GetTextWidth( cString ) CLASS WIN32PRN
 
-METHOD DrawBitMap(oBmp) CLASS WIN32PRN
-  LOCAL Result:= .F.
-  IF ::BitMapsOk .AND. ::Printing .AND. !EMPTY(oBmp:BitMap)
-    IF (Result:= DrawBitMap(::hPrinterDc, oBmp:BitMap,oBmp:Rect[1], oBmp:Rect[2], oBmp:rect[3], oBmp:Rect[4]))
-      ::HavePrinted:= .T.
-    ENDIF
-  ENDIF
-  RETURN(Result)
+   LOCAL nWidth := 0
 
-METHOD SetPrc(nRow, nCol) CLASS WIN32PRN
-  ::SetPos((nCol * ::CharWidth)+ ::LeftMArgin, (nRow * ::LineHeight) + ::TopMargin)
-  RETURN(NIL)
+   IF ::FontWidth[2] < 0 .AND. !Empty( ::FontWidth[1] )
+      nWidth := Len( cString ) * ::CharWidth
+   ELSE
+      nWidth := GetTextSize( ::hPrinterDC, cString, Len( cString ) )  // Return Width in device units
+   ENDIF
 
-METHOD PROW() CLASS WIN32PRN
-  RETURN(INT((::PosY- ::TopMargin)/::LineHeight))   // No test for Div by ZERO
+   RETURN( nWidth )
 
-METHOD PCOL() CLASS WIN32PRN
-  RETURN(INT((::PosX - ::LeftMargin)/::CharWidth))   // Uses width of current character
+METHOD GetTextHeight( cString ) CLASS WIN32PRN
+
+   RETURN( GetTextSize( ::hPrinterDC, cString, Len(cString ), .F. ) )  // Return Height in device units
+
+METHOD DrawBitMap( oBmp ) CLASS WIN32PRN
+
+   LOCAL Result := .F.
+
+   IF ::BitMapsOk .AND. ::Printing .AND. !Empty( oBmp:BitMap )
+      IF ( Result := DrawBitMap( ::hPrinterDc, oBmp:BitMap,oBmp:Rect[1], oBmp:Rect[2], oBmp:rect[3], oBmp:Rect[4] ) )
+         ::HavePrinted := .T.
+      ENDIF
+   ENDIF
+
+   RETURN( Result )
+
+METHOD SetPRC( nRow, nCol ) CLASS WIN32PRN
+
+   ::SetPos( ( nCol * ::CharWidth ) + ::LeftMArgin, ( nRow * ::LineHeight ) + ::TopMargin )
+
+   RETURN( NIL )
+
+METHOD PRow() CLASS WIN32PRN
+
+   RETURN( Int( (::PosY - ::TopMargin )/::LineHeight ) )   // No test for Div by ZERO
+
+METHOD PCol() CLASS WIN32PRN
+
+   RETURN( Int( (::PosX - ::LeftMargin )/::CharWidth ) )   // Uses width of current character
 
 METHOD MaxRow() CLASS WIN32PRN
-  RETURN(INT(((::BottomMargin-::TopMargin)+1) / ::LineHeight) - 1)
+
+   RETURN( Int( ((::BottomMargin - ::TopMargin ) + 1 ) / ::LineHeight ) - 1 )
 
 METHOD MaxCol() CLASS WIN32PRN
-  RETURN(INT(((::RightMargin-::LeftMargin)+1 ) / ::CharWidth) - 1)
+
+   RETURN( Int( ((::RightMargin - ::LeftMargin ) + 1 ) / ::CharWidth ) - 1 )
 
 METHOD MM_TO_POSX( nMm ) CLASS WIN32PRN
-  RETURN( INT( ( ( nMM * ::PixelsPerInchX ) / MM_TO_INCH ) - ::LeftMargin ) )
+
+   RETURN( Int( ( ( nMM * ::PixelsPerInchX ) / MM_TO_INCH ) - ::LeftMargin ) )
 
 METHOD MM_TO_POSY( nMm ) CLASS WIN32PRN
-  RETURN( INT( ( ( nMM * ::PixelsPerInchY ) / MM_TO_INCH ) - ::TopMargin ) )
+
+   RETURN( Int( ( ( nMM * ::PixelsPerInchY ) / MM_TO_INCH ) - ::TopMargin ) )
 
 METHOD INCH_TO_POSX( nInch ) CLASS WIN32PRN
-  RETURN( INT( ( nInch * ::PixelsPerInchX  ) - ::LeftMargin ) )
+
+   RETURN( Int( ( nInch * ::PixelsPerInchX  ) - ::LeftMargin ) )
 
 METHOD INCH_TO_POSY( nInch ) CLASS WIN32PRN
-  RETURN( INT( ( nInch * ::PixelsPerInchY ) - ::TopMargin ) )
+
+   RETURN( Int( ( nInch * ::PixelsPerInchY ) - ::TopMargin ) )
 
 METHOD TextAtFont( nPosX, nPosY, cString, cFont, nPointSize, nWidth, nBold, lUnderLine, lItalic, nCharSet, lNewLine, lUpdatePosX, nColor, nAlignHori, nAlignVert ) CLASS WIN32PRN
-  LOCAL lCreated:= .F., nDiv:= 0, cType
-  DEFAULT nPointSize TO ::FontPointSize
-  IF cFont != NIL
-      cType:= VALTYPE(nWidth)
-      IF cType='A'
-        nDiv  := nWidth[ 1 ]
-        nWidth:= nWidth[ 2 ]
-      ELSEIF cType='N' .AND. !EMPTY(nWidth)
-        nDiv:= 1
+
+   LOCAL lCreated := .F. , nDiv := 0, cType
+
+   DEFAULT nPointSize TO ::FontPointSize
+   IF cFont != NIL
+      cType := ValType( nWidth )
+      IF cType = 'A'
+         nDiv  := nWidth[ 1 ]
+         nWidth := nWidth[ 2 ]
+      ELSEIF cType = 'N' .AND. !Empty( nWidth )
+         nDiv := 1
       ENDIF
-      lCreated:= CreateFont( ::hPrinterDC, cFont, nPointSize, nDiv, nWidth, nBold, lUnderLine, lItalic, nCharSet )
-  ENDIF
-  IF nColor != NIL
-    nColor:= SetColor( ::hPrinterDC, nColor )
-  ENDIF
-  ::TextOutAt( nPosX, nPosY, cString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert)
-  IF lCreated
-    ::SetFont()  // Reset font
-  ENDIF
-  IF nColor != NIL
-    SetColor( ::hPrinterDC, nColor )  // Reset Color
-  ENDIF
-  RETURN( .T. )
+      lCreated := CreateFont( ::hPrinterDC, cFont, nPointSize, nDiv, nWidth, nBold, lUnderLine, lItalic, nCharSet )
+   ENDIF
+   IF nColor != NIL
+      nColor := SetColor( ::hPrinterDC, nColor )
+   ENDIF
+   ::TextOutAt( nPosX, nPosY, cString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert )
+   IF lCreated
+      ::SetFont()  // Reset font
+   ENDIF
+   IF nColor != NIL
+      SetColor( ::hPrinterDC, nColor )  // Reset Color
+   ENDIF
+
+   RETURN( .T. )
 
 // Bitmap class
 
 CLASS WIN32BMP
 
-EXPORTED:
+   EXPORTED:
 
-  METHOD New()
-  METHOD LoadFile(cFileName)
-  METHOD Create()
-  METHOD Destroy()
-  METHOD Draw(oPrn,arectangle)
-  VAR Rect     INIT { 0,0,0,0 }        // Coordinates to print BitMap
-                                       //   XDest,                    // x-coord of destination upper-left corner
-                                       //   YDest,                    // y-coord of destination upper-left corner
-                                       //   nDestWidth,               // width of destination rectangle
-                                       //   nDestHeight,              // height of destination rectangle
-                                       // See WinApi StretchDIBits()
-  VAR BitMap   INIT ""
-  VAR FileName INIT ""
+   METHOD New()
+   METHOD LoadFile( cFileName )
+   METHOD CREATE()
+   METHOD Destroy()
+   METHOD Draw( oPrn, arectangle )
+   VAR Rect     INIT { 0, 0, 0, 0 }        // Coordinates to print BitMap
+//   XDest,                    // x-coord of destination upper-left corner
+//   YDest,                    // y-coord of destination upper-left corner
+//   nDestWidth,               // width of destination rectangle
+//   nDestHeight,              // height of destination rectangle
+// See WinApi StretchDIBits()
+   VAR BitMap   INIT ""
+   VAR FileName INIT ""
+
 ENDCLASS
 
 METHOD New() CLASS WIN32BMP
-  RETURN(Self)
 
-METHOD LoadFile(cFileName) CLASS WIN32BMP
-  ::FileName:= cFileName
-  ::Bitmap := LoadBitMapFile(::FileName)
-  RETURN(!EMPTY(::Bitmap))
+   RETURN( Self )
 
-METHOD Create() CLASS WIN32BMP  // Compatibility function for Alaska Xbase++
-  Return(Self)
+METHOD LoadFile( cFileName ) CLASS WIN32BMP
+
+   ::FileName := cFileName
+   ::Bitmap := LoadBitMapFile( ::FileName )
+
+   RETURN( !Empty( ::Bitmap ) )
+
+METHOD CREATE() CLASS WIN32BMP  // Compatibility function for Alaska Xbase++
+
+   RETURN( Self )
 
 METHOD Destroy() CLASS WIN32BMP  // Compatibility function for Alaska Xbase++
-  RETURN(NIL)
 
-METHOD Draw(oPrn, aRectangle) CLASS WIN32BMP // Pass a TPRINT class reference & Rectangle array
-  ::Rect:= aRectangle
-  RETURN(oPrn:DrawBitMap(Self))
+   RETURN( NIL )
+
+METHOD Draw( oPrn, aRectangle ) CLASS WIN32BMP // Pass a TPRINT class reference & Rectangle array
+
+   ::Rect := aRectangle
+
+   RETURN( oPrn:DrawBitMap( Self ) )
 
 CLASS XBPBITMAP FROM WIN32BMP // Compatibility Class for Alaska Xbase++
 
@@ -1481,15 +1569,15 @@ HB_FUNC_STATIC ( DRAWTEXT )
 
    if ( iStyle == 0 )
    {
-	 uFormat =  uFormat | DT_LEFT ;
+  uFormat =  uFormat | DT_LEFT ;
    }
    else if ( iStyle == 2 )
    {
-	 uFormat = uFormat | DT_RIGHT ;
+  uFormat = uFormat | DT_RIGHT ;
    }
    else if ( iStyle == 1 )
    {
- 	 uFormat = uFormat | DT_CENTER ;
+   uFormat = uFormat | DT_CENTER ;
    }
 
    hb_retni( DrawText(hDC, pszData, -1, &rect, uFormat ) );

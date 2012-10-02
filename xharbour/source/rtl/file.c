@@ -51,10 +51,10 @@
  */
 
 /*
-* hb_fsIsDirectory( const char * pFilename ) -- determine if a given file is a directory
-*     Copyright 2004 Giancarlo Niccolai
-* modified by Miguel Angel Marchuet at 2009, to fix hb_fsIsDirectory( "\\MACHINE\UNIT" ) style calls
-*/
+ * hb_fsIsDirectory( const char * pFilename ) -- determine if a given file is a directory
+ *     Copyright 2004 Giancarlo Niccolai
+ * modified by Miguel Angel Marchuet at 2009, to fix hb_fsIsDirectory( "\\MACHINE\UNIT" ) style calls
+ */
 
 #include "hbapi.h"
 #include "hbapifs.h"
@@ -66,59 +66,59 @@
 #endif
 
 #ifndef INVALID_FILE_ATTRIBUTES
-#define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
+#define INVALID_FILE_ATTRIBUTES ( ( DWORD ) -1 )
 #endif
 
 BOOL hb_fsFile( const char * pszFilename )
 {
-   PHB_FFIND ffind;
-   char * pszFree;
-   BOOL bResult = FALSE;
-   HB_SIZE iFileName ;
+   PHB_FFIND   ffind;
+   char *      pszFree;
+   BOOL        bResult = FALSE;
+   HB_SIZE     iFileName;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsFile(%s)", pszFilename));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_fsFile(%s)", pszFilename ) );
 
    pszFilename = hb_fsNameConv( pszFilename, &pszFree );
 
-   iFileName = strlen( pszFilename ) ;
-   if ( iFileName && pszFilename[iFileName-1] != HB_OS_PATH_DELIM_CHR ) // A directory cannot possibly be a FILE
+   iFileName   = strlen( pszFilename );
+   if( iFileName && pszFilename[ iFileName - 1 ] != HB_OS_PATH_DELIM_CHR ) // A directory cannot possibly be a FILE
    {                                                                    // so only do this is the last char is not
-                                                                        // a directory separator character
-     if( ( ffind = hb_fsFindFirst( pszFilename, HB_FA_ALL ) ) != NULL )
-     {
-       if (( ffind->attr & HB_FA_DIRECTORY ) != HB_FA_DIRECTORY ) // If it's not a directory it's a file
-       {
-          bResult = TRUE;
-       }
-       else if ( strchr( pszFilename, '*' ) || strchr( pszFilename, '?' ) ) // Clipper compatibility
-       {                                                                    // FindFirst may have found a directory first
-       	 while( !bResult && hb_fsFindNext( ffind ) )
-       	 {
-           bResult = (( ffind->attr & HB_FA_DIRECTORY ) != HB_FA_DIRECTORY ) ;
+                                                                           // a directory separator character
+      if( ( ffind = hb_fsFindFirst( pszFilename, HB_FA_ALL ) ) != NULL )
+      {
+         if( ( ffind->attr & HB_FA_DIRECTORY ) != HB_FA_DIRECTORY ) // If it's not a directory it's a file
+         {
+            bResult = TRUE;
          }
-       }
-       hb_fsFindClose( ffind );
-     }
+         else if( strchr( pszFilename, '*' ) || strchr( pszFilename, '?' ) ) // Clipper compatibility
+         {                                                                  // FindFirst may have found a directory first
+            while( ! bResult && hb_fsFindNext( ffind ) )
+            {
+               bResult = ( ( ffind->attr & HB_FA_DIRECTORY ) != HB_FA_DIRECTORY );
+            }
+         }
+         hb_fsFindClose( ffind );
+      }
    }
 
    hb_fsSetError( 0 );
    if( pszFree )
-         hb_xfree( pszFree );
+      hb_xfree( pszFree );
 
    return bResult;
 }
 
 BOOL hb_fsIsDirectory( const char * pszFilename )
 {
-   BOOL bResult = FALSE;
-   char * pszFree = NULL;
-   HB_SIZE iLen;
+   BOOL     bResult  = FALSE;
+   char *   pszFree  = NULL;
+   HB_SIZE  iLen;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsIsDirectory(%s)", pszFilename));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_fsIsDirectory(%s)", pszFilename ) );
 
    pszFilename = hb_fsNameConv( pszFilename, &pszFree );
 
-   iLen = strlen( pszFilename );
+   iLen        = strlen( pszFilename );
    while( iLen && strchr( HB_OS_PATH_DELIM_CHR_LIST, pszFilename[ iLen - 1 ] ) )
       --iLen;
 

@@ -69,127 +69,142 @@ extern "C" {
 #endif
 
 /* Filler bytes: */
-#define IPAD_BYTE   0x36
-#define OPAD_BYTE   0x5c
-#define ZERO_BYTE   0x00
+#define IPAD_BYTE 0x36
+#define OPAD_BYTE 0x5c
+#define ZERO_BYTE 0x00
 
-void hb_HMAC_SHA1_Init(HMAC_SHA1_CTX *ctx) {
-    memset(&(ctx->key[0]), ZERO_BYTE, HMAC_SHA1_BLOCK_LENGTH);
-    memset(&(ctx->ipad[0]), IPAD_BYTE, HMAC_SHA1_BLOCK_LENGTH);
-    memset(&(ctx->opad[0]), OPAD_BYTE, HMAC_SHA1_BLOCK_LENGTH);
-    ctx->keylen = 0;
-    ctx->hashkey = 0;
+void hb_HMAC_SHA1_Init( HMAC_SHA1_CTX * ctx )
+{
+   memset( &( ctx->key[ 0 ] ), ZERO_BYTE, HMAC_SHA1_BLOCK_LENGTH );
+   memset( &( ctx->ipad[ 0 ] ), IPAD_BYTE, HMAC_SHA1_BLOCK_LENGTH );
+   memset( &( ctx->opad[ 0 ] ), OPAD_BYTE, HMAC_SHA1_BLOCK_LENGTH );
+   ctx->keylen    = 0;
+   ctx->hashkey   = 0;
 }
 
-void hb_HMAC_SHA1_UpdateKey(HMAC_SHA1_CTX *ctx, const void *key, unsigned int keylen) {
+void hb_HMAC_SHA1_UpdateKey( HMAC_SHA1_CTX * ctx, const void * key, unsigned int keylen )
+{
 
-    /* Do we have anything to work with?  If not, return right away. */
-    if (keylen < 1)
-        return;
+   /* Do we have anything to work with?  If not, return right away. */
+   if( keylen < 1 )
+      return;
 
-    /*
-     * Is the total key length (current data and any previous data)
-     * longer than the hash block length?
-     */
-    if (ctx->hashkey !=0 || (keylen + ctx->keylen) > HMAC_SHA1_BLOCK_LENGTH) {
-        /*
-         * Looks like the key data exceeds the hash block length,
-         * so that means we use a hash of the key as the key data
-         * instead.
-         */
-        if (ctx->hashkey == 0) {
-            /*
-             * Ah, we haven't started hashing the key
-             * data yet, so we must init. the hash
-             * monster to begin feeding it.
-             */
+   /*
+    * Is the total key length (current data and any previous data)
+    * longer than the hash block length?
+    */
+   if( ctx->hashkey != 0 || ( keylen + ctx->keylen ) > HMAC_SHA1_BLOCK_LENGTH )
+   {
+      /*
+       * Looks like the key data exceeds the hash block length,
+       * so that means we use a hash of the key as the key data
+       * instead.
+       */
+      if( ctx->hashkey == 0 )
+      {
+         /*
+          * Ah, we haven't started hashing the key
+          * data yet, so we must init. the hash
+          * monster to begin feeding it.
+          */
 
-            /* Set the hash key flag to true (non-zero) */
-            ctx->hashkey = 1;
+         /* Set the hash key flag to true (non-zero) */
+         ctx->hashkey = 1;
 
-            /* Init. the hash beastie... */
-            hb_SHA1_Init(&ctx->shactx);
+         /* Init. the hash beastie... */
+         hb_SHA1_Init( &ctx->shactx );
 
-            /* If there's any previous key data, use it */
-            if (ctx->keylen > 0) {
-                hb_SHA1_Update(&ctx->shactx, &(ctx->key[0]), ctx->keylen);
-            }
+         /* If there's any previous key data, use it */
+         if( ctx->keylen > 0 )
+         {
+            hb_SHA1_Update( &ctx->shactx, &( ctx->key[ 0 ] ), ctx->keylen );
+         }
 
-            /*
-             * Reset the key length to the future true
-             * key length, HMAC_SHA1_DIGEST_LENGTH
-             */
-            ctx->keylen = HMAC_SHA1_DIGEST_LENGTH;
-        }
-        /* Now feed the latest key data to the has monster */
-        hb_SHA1_Update(&ctx->shactx, key, keylen);
-    } else {
-        /*
-         * Key data length hasn't yet exceeded the hash
-         * block length (HMAC_SHA1_BLOCK_LENGTH), so theres
-         * no need to hash the key data (yet).  Copy it
-         * into the key buffer.
-         */
-        HB_MEMCPY(&(ctx->key[ctx->keylen]), key, keylen);
-        ctx->keylen += keylen;
-    }
+         /*
+          * Reset the key length to the future true
+          * key length, HMAC_SHA1_DIGEST_LENGTH
+          */
+         ctx->keylen = HMAC_SHA1_DIGEST_LENGTH;
+      }
+      /* Now feed the latest key data to the has monster */
+      hb_SHA1_Update( &ctx->shactx, key, keylen );
+   }
+   else
+   {
+      /*
+       * Key data length hasn't yet exceeded the hash
+       * block length (HMAC_SHA1_BLOCK_LENGTH), so theres
+       * no need to hash the key data (yet).  Copy it
+       * into the key buffer.
+       */
+      HB_MEMCPY( &( ctx->key[ ctx->keylen ] ), key, keylen );
+      ctx->keylen += keylen;
+   }
 }
 
-void hb_HMAC_SHA1_EndKey(HMAC_SHA1_CTX *ctx) {
-    unsigned char   *ipad, *opad, *key;
-    unsigned int     i;
+void hb_HMAC_SHA1_EndKey( HMAC_SHA1_CTX * ctx )
+{
+   unsigned char *   ipad, * opad, * key;
+   unsigned int      i;
 
-    /* Did we end up hashing the key? */
-    if (ctx->hashkey) {
-        memset(&(ctx->key[0]), ZERO_BYTE, HMAC_SHA1_BLOCK_LENGTH);
-        /* Yes, so finish up and copy the key data */
-        hb_SHA1_Final(&(ctx->key[0]), &ctx->shactx);
-        /* ctx->keylen was already set correctly */
-    }
-    /* Pad the key if necessary with zero bytes */
-    if ((i = HMAC_SHA1_BLOCK_LENGTH - ctx->keylen) > 0) {
-        memset(&(ctx->key[ctx->keylen]), ZERO_BYTE, i);
-    }
+   /* Did we end up hashing the key? */
+   if( ctx->hashkey )
+   {
+      memset( &( ctx->key[ 0 ] ), ZERO_BYTE, HMAC_SHA1_BLOCK_LENGTH );
+      /* Yes, so finish up and copy the key data */
+      hb_SHA1_Final( &( ctx->key[ 0 ] ), &ctx->shactx );
+      /* ctx->keylen was already set correctly */
+   }
+   /* Pad the key if necessary with zero bytes */
+   if( ( i = HMAC_SHA1_BLOCK_LENGTH - ctx->keylen ) > 0 )
+   {
+      memset( &( ctx->key[ ctx->keylen ] ), ZERO_BYTE, i );
+   }
 
-    ipad = &(ctx->ipad[0]);
-    opad = &(ctx->opad[0]);
+   ipad  = &( ctx->ipad[ 0 ] );
+   opad  = &( ctx->opad[ 0 ] );
 
-    /* Precompute the respective pads XORed with the key */
-    key = &(ctx->key[0]);
-    for (i = 0; i < ctx->keylen; i++, key++) {
-        /* XOR the key byte with the appropriate pad filler byte */
-        *ipad++ ^= *key;
-        *opad++ ^= *key;
-    }
+   /* Precompute the respective pads XORed with the key */
+   key   = &( ctx->key[ 0 ] );
+   for( i = 0; i < ctx->keylen; i++, key++ )
+   {
+      /* XOR the key byte with the appropriate pad filler byte */
+      *ipad++  ^= *key;
+      *opad++  ^= *key;
+   }
 }
 
-void hb_HMAC_SHA1_StartMessage(HMAC_SHA1_CTX *ctx) {
-    hb_SHA1_Init(&ctx->shactx);
-    hb_SHA1_Update(&ctx->shactx, &(ctx->ipad[0]), HMAC_SHA1_BLOCK_LENGTH);
+void hb_HMAC_SHA1_StartMessage( HMAC_SHA1_CTX * ctx )
+{
+   hb_SHA1_Init( &ctx->shactx );
+   hb_SHA1_Update( &ctx->shactx, &( ctx->ipad[ 0 ] ), HMAC_SHA1_BLOCK_LENGTH );
 }
 
-void hb_HMAC_SHA1_UpdateMessage(HMAC_SHA1_CTX *ctx, const void *data, unsigned int datalen) {
-    hb_SHA1_Update(&ctx->shactx, data, datalen);
+void hb_HMAC_SHA1_UpdateMessage( HMAC_SHA1_CTX * ctx, const void * data, unsigned int datalen )
+{
+   hb_SHA1_Update( &ctx->shactx, data, datalen );
 }
 
-void hb_HMAC_SHA1_EndMessage(unsigned char *out, HMAC_SHA1_CTX *ctx) {
-    unsigned char   buf[HMAC_SHA1_DIGEST_LENGTH];
-    SHA_CTX     *c = &ctx->shactx;
+void hb_HMAC_SHA1_EndMessage( unsigned char * out, HMAC_SHA1_CTX * ctx )
+{
+   unsigned char  buf[ HMAC_SHA1_DIGEST_LENGTH ];
+   SHA_CTX *      c = &ctx->shactx;
 
-    hb_SHA1_Final(&(buf[0]), c);
-    hb_SHA1_Init(c);
-    hb_SHA1_Update(c, &(ctx->opad[0]), HMAC_SHA1_BLOCK_LENGTH);
-    hb_SHA1_Update(c, buf, HMAC_SHA1_DIGEST_LENGTH);
-    hb_SHA1_Final(out, c);
+   hb_SHA1_Final( &( buf[ 0 ] ), c );
+   hb_SHA1_Init( c );
+   hb_SHA1_Update( c, &( ctx->opad[ 0 ] ), HMAC_SHA1_BLOCK_LENGTH );
+   hb_SHA1_Update( c, buf, HMAC_SHA1_DIGEST_LENGTH );
+   hb_SHA1_Final( out, c );
 }
 
-void hb_HMAC_SHA1_Done(HMAC_SHA1_CTX *ctx) {
-    /* Just to be safe, toast all context data */
-    memset(&(ctx->ipad[0]), ZERO_BYTE, HMAC_SHA1_BLOCK_LENGTH);
-    memset(&(ctx->ipad[0]), ZERO_BYTE, HMAC_SHA1_BLOCK_LENGTH);
-    memset(&(ctx->key[0]), ZERO_BYTE, HMAC_SHA1_BLOCK_LENGTH);
-    ctx->keylen = 0;
-    ctx->hashkey = 0;
+void hb_HMAC_SHA1_Done( HMAC_SHA1_CTX * ctx )
+{
+   /* Just to be safe, toast all context data */
+   memset( &( ctx->ipad[ 0 ] ), ZERO_BYTE, HMAC_SHA1_BLOCK_LENGTH );
+   memset( &( ctx->ipad[ 0 ] ), ZERO_BYTE, HMAC_SHA1_BLOCK_LENGTH );
+   memset( &( ctx->key[ 0 ] ), ZERO_BYTE, HMAC_SHA1_BLOCK_LENGTH );
+   ctx->keylen    = 0;
+   ctx->hashkey   = 0;
 }
 
 #ifdef  __cplusplus

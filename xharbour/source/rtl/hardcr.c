@@ -58,11 +58,11 @@ char * hb_strHardCR( char * pszString, HB_SIZE ulStringLen )
 {
    HB_SIZE ulStringPos;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_strHardCR(%s, %lu)", pszString, ulStringLen));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strHardCR(%s, %lu)", pszString, ulStringLen ) );
 
    for( ulStringPos = 0; ulStringPos < ulStringLen; ulStringPos++ )
    {
-      if( pszString[ ulStringPos ]     == HB_CHAR_SOFT1 &&
+      if( pszString[ ulStringPos ] == HB_CHAR_SOFT1 &&
           pszString[ ulStringPos + 1 ] == HB_CHAR_SOFT2 )
       {
          pszString[ ulStringPos ] = HB_CHAR_HARD1;
@@ -78,8 +78,8 @@ HB_FUNC( HARDCR )
 
    if( pString )
    {
-      char * pszBuffer = hb_itemGetC( pString );
-      HB_SIZE ulStringLen = pString->item.asString.length;
+      char *   pszBuffer   = hb_itemGetC( pString );
+      HB_SIZE  ulStringLen = pString->item.asString.length;
 
       /* hb_strHardCR() actually returns its 1st paramater, in this case pszBuffer. */
       hb_retclenAdopt( hb_strHardCR( pszBuffer, ulStringLen ), ulStringLen );

@@ -58,30 +58,30 @@ static char * hb_SecToTimeStr( char * pszTime, ULONG ulTime )
 {
    USHORT uiValue;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_SecToTimeStr(%s, %lu)", pszTime, ulTime));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_SecToTimeStr(%s, %lu)", pszTime, ulTime ) );
 
-   uiValue = ( USHORT ) ( ( ulTime / 3600 ) % 24 );
-   pszTime[ 0 ] = ( char ) ( uiValue / 10 ) + '0';
-   pszTime[ 1 ] = ( char ) ( uiValue % 10 ) + '0';
-   pszTime[ 2 ] = ':';
-   uiValue = ( USHORT ) ( ( ulTime / 60 ) % 60 );
-   pszTime[ 3 ] = ( char ) ( uiValue / 10 ) + '0';
-   pszTime[ 4 ] = ( char ) ( uiValue % 10 ) + '0';
-   pszTime[ 5 ] = ':';
-   uiValue = ( USHORT ) ( ulTime % 60 );
-   pszTime[ 6 ] = ( char ) ( uiValue / 10 ) + '0';
-   pszTime[ 7 ] = ( char ) ( uiValue % 10 ) + '0';
-   pszTime[ 8 ] = '\0';
+   uiValue        = ( USHORT ) ( ( ulTime / 3600 ) % 24 );
+   pszTime[ 0 ]   = ( char ) ( uiValue / 10 ) + '0';
+   pszTime[ 1 ]   = ( char ) ( uiValue % 10 ) + '0';
+   pszTime[ 2 ]   = ':';
+   uiValue        = ( USHORT ) ( ( ulTime / 60 ) % 60 );
+   pszTime[ 3 ]   = ( char ) ( uiValue / 10 ) + '0';
+   pszTime[ 4 ]   = ( char ) ( uiValue % 10 ) + '0';
+   pszTime[ 5 ]   = ':';
+   uiValue        = ( USHORT ) ( ulTime % 60 );
+   pszTime[ 6 ]   = ( char ) ( uiValue / 10 ) + '0';
+   pszTime[ 7 ]   = ( char ) ( uiValue % 10 ) + '0';
+   pszTime[ 8 ]   = '\0';
 
    return pszTime;
 }
 
 static ULONG hb_TimeStrToSec( const char * pszTime )
 {
-   HB_SIZE ulLen;
-   ULONG ulTime = 0;
+   HB_SIZE  ulLen;
+   ULONG    ulTime = 0;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_TimeStrToSec(%s)", pszTime));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_TimeStrToSec(%s)", pszTime ) );
 
    ulLen = strlen( pszTime );
 
@@ -104,9 +104,9 @@ HB_FUNC( DAYS )
 
 HB_FUNC( ELAPTIME )
 {
-   ULONG ulStart = hb_TimeStrToSec( hb_parcx( 1 ) );
-   ULONG ulEnd = hb_TimeStrToSec( hb_parcx( 2 ) );
-   char szTime[ 9 ];
+   ULONG ulStart  = hb_TimeStrToSec( hb_parcx( 1 ) );
+   ULONG ulEnd    = hb_TimeStrToSec( hb_parcx( 2 ) );
+   char  szTime[ 9 ];
 
    hb_retc( hb_SecToTimeStr( szTime, ( ulEnd < ulStart ? 86400 : 0 ) + ulEnd - ulStart ) );
 }

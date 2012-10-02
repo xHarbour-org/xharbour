@@ -56,16 +56,16 @@
 
 HB_FUNC( HB_SHA1 )
 {
-   sha1_byte digest[ SHA1_DIGEST_LENGTH ];
-   SHA_CTX ctx;
+   sha1_byte   digest[ SHA1_DIGEST_LENGTH ];
+   SHA_CTX     ctx;
 
    hb_SHA1_Init( &ctx );
 
    #if ULONG_MAX > UINT_MAX
    {
-      const char * buffer = hb_parcx( 1 );
-      ULONG nCount = hb_parclen( 1 );
-      ULONG nDone = 0;
+      const char *   buffer   = hb_parcx( 1 );
+      ULONG          nCount   = hb_parclen( 1 );
+      ULONG          nDone    = 0;
 
       while( nCount )
       {
@@ -73,13 +73,13 @@ HB_FUNC( HB_SHA1 )
 
          if( nCount > ( ULONG ) UINT_MAX )
          {
-            uiChunk = UINT_MAX;
-            nCount -= ( ULONG ) uiChunk;
+            uiChunk  = UINT_MAX;
+            nCount   -= ( ULONG ) uiChunk;
          }
          else
          {
-            uiChunk = ( UINT ) nCount;
-            nCount = 0;
+            uiChunk  = ( UINT ) nCount;
+            nCount   = 0;
          }
 
          hb_SHA1_Update( &ctx, buffer + nDone, uiChunk );
@@ -88,7 +88,7 @@ HB_FUNC( HB_SHA1 )
       }
    }
    #else
-      hb_SHA1_Update( &ctx, hb_parcx( 1 ), (UINT) hb_parclen( 1 ) );
+   hb_SHA1_Update( &ctx, hb_parcx( 1 ), ( UINT ) hb_parclen( 1 ) );
    #endif
 
    hb_SHA1_Final( digest, &ctx );

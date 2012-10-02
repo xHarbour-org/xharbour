@@ -56,10 +56,10 @@
 
 CLASS ScalarObject
 
-   METHOD  Copy
-   MESSAGE DeepCopy     METHOD Copy
+   METHOD  COPY
+   MESSAGE DeepCopy     METHOD COPY
 
-   METHOD  IsScalar     INLINE (Self), .T.
+   METHOD  IsScalar     INLINE ( Self ), .T.
 
    METHOD  asString
    METHOD  asExpStr
@@ -68,81 +68,87 @@ ENDCLASS
 
 //----------------------------------------------------------------------------//
 
-METHOD Copy       CLASS ScalarObject
+METHOD COPY       CLASS ScalarObject
+
    RETURN Self
 
 //----------------------------------------------------------------------------//
 
 METHOD asString   CLASS ScalarObject
 
-   SWITCH Valtype( Self )
+   SWITCH ValType( Self )
 
-      CASE 'A' ; RETURN '{ ... }'
-      CASE 'H' ; RETURN '{ => }'
-      CASE 'B' ; RETURN '{ || ... }'
-      CASE 'C' ; RETURN Self
-      CASE 'D' ; RETURN DTOC( Self )
-      CASE 'L' ; RETURN If( Self, '.T.', '.F.' )
-      CASE 'N' ; RETURN LTRIM( STR( Self ))
-      CASE 'U' ; RETURN 'Nil'
+   CASE 'A' ; RETURN '{ ... }'
+   CASE 'H' ; RETURN '{ => }'
+   CASE 'B' ; RETURN '{ || ... }'
+   CASE 'C' ; RETURN Self
+   CASE 'D' ; RETURN DToC( Self )
+   CASE 'L' ; RETURN IF( Self, '.T.', '.F.' )
+   CASE 'N' ; RETURN LTrim( Str( Self ) )
+   CASE 'U' ; RETURN 'Nil'
 
    END
 
-RETURN 'Errror!!'
+   RETURN 'Errror!!'
 
 //----------------------------------------------------------------------------//
 
 METHOD asExpStr   CLASS ScalarObject
+
    LOCAL cTemp
 
-   SWITCH Valtype( Self )
+   SWITCH ValType( Self )
 
-      CASE 'A' ; RETURN '{ ... }'
-      CASE 'H' ; RETURN '{ => }'
-      CASE 'C' ; RETURN '"' + Self + '"'
-      CASE 'D'
-         cTemp := DtoS( Self )
-        RETURN '{^' + SubStr( cTemp, 1 , 4 ) + '/' +;
-                      SubStr( cTemp, 5, 2 ) + '/' +;
-                      SubStr( cTemp, 7, 2 ) + '}'
+   CASE 'A' ; RETURN '{ ... }'
+   CASE 'H' ; RETURN '{ => }'
+   CASE 'C' ; RETURN '"' + Self + '"'
+   CASE 'D'
+      cTemp := DToS( Self )
+      RETURN '{^' + SubStr( cTemp, 1 , 4 ) + '/' + ;
+         SubStr( cTemp, 5, 2 ) + '/' + ;
+         SubStr( cTemp, 7, 2 ) + '}'
    END
 
-RETURN ::asString
+   RETURN ::asString
 
 //----------------------------------------------------------------------------//
 
 CLASS Array FROM ScalarObject FUNCTION _Array
 
-   MESSAGE Add             METHOD Append
+   MESSAGE Add             METHOD APPEND
    METHOD  AddAll
-   METHOD  Append
-   METHOD  asString        INLINE (Self), ValtoPrg( HB_QSelf() )
+   METHOD  APPEND
+   METHOD  asString        INLINE ( Self ), ValtoPrg( HB_QSelf() )
    METHOD  At( n )         INLINE Self[ n ]
    METHOD  AtIndex( n )    INLINE Self[ n ]
    METHOD  AtPut( n, x )   INLINE Self[ n ] := x
    METHOD  Collect
-   METHOD  Copy            INLINE aCopy( Self, Array( Len( Self ) ) )
+   METHOD  COPY            INLINE ACopy( Self, Array( Len( Self ) ) )
    METHOD  DeleteAt
-   METHOD  Do
+   METHOD  DO
    METHOD  IndexOf
-   METHOD  Init( nLen )    INLINE ::Size := IIF( nLen == NIL, 0, nLen ), Self
+   METHOD  Init( nLen )    INLINE ::Size := iif( nLen == NIL, 0, nLen ), Self
    METHOD  InsertAt
    METHOD  Remove
-   METHOD  Scan( bScan )   INLINE aScan( Self, bScan )
-   METHOD  _Size( nLen )   INLINE aSize( Self, nLen ), nLen
+   METHOD  Scan( bScan )   INLINE AScan( Self, bScan )
+   METHOD  _Size( nLen )   INLINE ASize( Self, nLen ), nLen
 
 ENDCLASS
 
 //----------------------------------------------------------------------------//
 
 METHOD AddAll( otherCollection ) CLASS Array
-   otherCollection:Do( {|x| ::Add(x) } )
+
+   otherCollection:Do( {|x| ::Add( x ) } )
+
    RETURN Self
 
 //----------------------------------------------------------------------------//
 
-METHOD Append( x )   CLASS Array
-   aAdd( Self, x )
+METHOD APPEND( x )   CLASS Array
+
+   AAdd( Self, x )
+
    RETURN Self
 
 //----------------------------------------------------------------------------//
@@ -153,36 +159,38 @@ METHOD Collect( bCollect ) CLASS Array
 
    FOR EACH xElement IN Self
       IF Eval( bCollect, UnRef( xElement ) )
-         aAdd( aResult, UnRef( xElement ) )
+         AAdd( aResult, UnRef( xElement ) )
       END
    NEXT
 
-RETURN aResult
+   RETURN aResult
 
 //----------------------------------------------------------------------------//
 
 METHOD deleteAt( nPos ) CLASS Array
 
    IF nPos > 0 .AND. nPos <= Len( Self )
-      aDel( Self, nPos, .T. )
+      ADel( Self, nPos, .T. )
    ENDIF
 
-RETURN Self
+   RETURN Self
 
 //----------------------------------------------------------------------------//
 
-METHOD Do( bEval ) CLASS Array
+METHOD DO( bEval ) CLASS Array
+
    LOCAL xElement
 
    FOR EACH xElement IN Self
       bEval:Eval( UnRef( xElement ), HB_EnumIndex() )
    NEXT
 
-RETURN Self
+   RETURN Self
 
 //----------------------------------------------------------------------------//
 
 METHOD IndexOf( xValue ) CLASS Array
+
    LOCAL xElement, cType := ValType( xValue )
 
    FOR EACH xElement IN Self
@@ -191,44 +199,45 @@ METHOD IndexOf( xValue ) CLASS Array
       END
    NEXT
 
-RETURN 0
+   RETURN 0
 
 //----------------------------------------------------------------------------//
 
 METHOD InsertAt( nPos, xValue ) CLASS Array
 
    IF nPos > Len( self )
-      aSize( Self, nPos )
+      ASize( Self, nPos )
       Self[ nPos ] := xValue
    ELSEIF nPos > 0
-      aIns( Self, nPos, xValue, .T. )
+      AIns( Self, nPos, xValue, .T. )
    ENDIF
 
-RETURN Self
+   RETURN Self
 
 //----------------------------------------------------------------------------//
 
 METHOD Remove( xValue ) CLASS Array
+
    ::DeleteAt( ::IndexOf( xValue ) )
-RETURN Self
+
+   RETURN Self
 
 //----------------------------------------------------------------------------//
 
 CLASS HASH FROM SCALAROBJECT FUNCTION _HASH
 
-
    METHOD Add( xKey, xValue )      INLINE Self[ xKey ] := xValue, Self
    METHOD AddAll( oCollection )
    METHOD AtIndex( nPos )          INLINE HGetValueAt( Self, nPos )
    METHOD AtPut( nPos, xValue )    INLINE HSetValueAt( Self, nPos, xValue )
-   METHOD Append( xKey, xValue )   INLINE Self[ xKey ] := xValue, Self
-   METHOD AsString()               INLINE (Self), ValToPrg( HB_QSelf() )
+   METHOD APPEND( xKey, xValue )   INLINE Self[ xKey ] := xValue, Self
+   METHOD AsString()               INLINE ( Self ), ValToPrg( HB_QSelf() )
    METHOD Collect( bCollect )
-   METHOD Copy()                   INLINE hCopy( Self, Hash() )
+   METHOD COPY()                   INLINE hCopy( Self, Hash() )
    METHOD DeleteAt( nPos )         INLINE hDelat( Self, nPos )
-   METHOD Do( bBlock )
+   METHOD DO( bBlock )
    METHOD IndexOf( xValue )        INLINE hScan( Self, xValue )
-   METHOD Init( nLen )             INLINE ::Size := IIF( nLen == NIL, 0, nLen ), Self
+   METHOD Init( nLen )             INLINE ::Size := iif( nLen == NIL, 0, nLen ), Self
    METHOD Remove( xValue )         INLINE hDel( Self, xValue )
    METHOD Scan( bScan )            INLINE hScan( Self, bScan )
    METHOD _Size( nLen )
@@ -241,7 +250,7 @@ METHOD AddAll( oCollection ) CLASS HASH
 
    oCollection:Do( { |xKey, xValue| Self[ xKey ] := xValue } )
 
-RETURN Self
+   RETURN Self
 
 //----------------------------------------------------------------------------//
 
@@ -251,15 +260,15 @@ METHOD Collect( bCollect ) CLASS HASH
 
    FOR EACH xElement IN Self:Values
       IF Eval( bCollect, UnRef( xElement ) )
-         aAdd( aResult, UnRef( xElement ) )
+         AAdd( aResult, UnRef( xElement ) )
       END
    NEXT
 
-RETURN aResult
+   RETURN aResult
 
 //----------------------------------------------------------------------------//
 
-METHOD Do( bDo ) CLASS HASH
+METHOD DO( bDo ) CLASS HASH
 
    LOCAL xKey
 
@@ -267,72 +276,86 @@ METHOD Do( bDo ) CLASS HASH
       Eval( bDo, xKey, Self[ xKey ] )
    NEXT
 
-RETURN Self
+   RETURN Self
 
 //----------------------------------------------------------------------------//
 
 METHOD _Size( nLen ) CLASS HASH
 
-	 LOCAL nOldLen := Len( Self ), Counter
+   LOCAL nOldLen := Len( Self ), Counter
 
-	 IF nLen == nOldLen
-			RETURN nLen
-	 ELSEIF nLen > nOldLen
+   IF nLen == nOldLen
+      RETURN nLen
+   ELSEIF nLen > nOldLen
       hAllocate( Self, nLen )
 
-			FOR Counter := nOldLen + 1 TO nLen
-				 Self[ "_SIZED_" + LTrim( Str( Counter ) ) ] := NIL
-			NEXT
-	 ELSE
-			FOR Counter := nOldLen TO nLen + 1
-				 hDelAt( Self, nLen + 1 )
-			NEXT
-	 ENDIF
+      FOR Counter := nOldLen + 1 TO nLen
+         Self[ "_SIZED_" + LTrim( Str( Counter ) ) ] := NIL
+      NEXT
+   ELSE
+      FOR Counter := nOldLen TO nLen + 1
+         hDelAt( Self, nLen + 1 )
+      NEXT
+   ENDIF
 
-RETURN nLen
+   RETURN nLen
 
 //----------------------------------------------------------------------------//
 
 CLASS BLOCK FROM SCALAROBJECT FUNCTION _BLOCK
-   METHOD AsString() INLINE (Self), "{||...}"
-   //METHOD Exec  // Implemented at hbvm.c
+
+   METHOD AsString() INLINE ( Self ), "{||...}"
+//METHOD Exec  // Implemented at hbvm.c
+
 ENDCLASS
 
 //----------------------------------------------------------------------------//
 
 CLASS CHARACTER FROM SCALAROBJECT FUNCTION _CHARACTER
-   METHOD AsString INLINE (Self), HB_QSelf()
+
+   METHOD AsString INLINE ( Self ), HB_QSelf()
+
 ENDCLASS
 
 //----------------------------------------------------------------------------//
 
 CLASS DATE FROM SCALAROBJECT FUNCTION _DATE
-   METHOD AsString INLINE (Self), DToc( HB_QSelf() )
+
+   METHOD AsString INLINE ( Self ), DToC( HB_QSelf() )
+
 ENDCLASS
 
 //----------------------------------------------------------------------------//
 
 CLASS LOGICAL FROM SCALAROBJECT FUNCTION _LOGICAL
-   METHOD AsString INLINE (Self), IIF( HB_QSelf(), ".T.", ".F." )
+
+   METHOD AsString INLINE ( Self ), iif( HB_QSelf(), ".T.", ".F." )
+
 ENDCLASS
 
 //----------------------------------------------------------------------------//
 
 CLASS NIL FROM SCALAROBJECT FUNCTION _NIL
-   METHOD AsString INLINE (Self), "NIL"
+
+   METHOD AsString INLINE ( Self ), "NIL"
+
 ENDCLASS
 
 //----------------------------------------------------------------------------//
 
 CLASS NUMERIC FROM SCALAROBJECT FUNCTION _NUMERIC
-   METHOD AsString INLINE (Self), LTrim( Str( ( HB_QSelf() ) ) )
+
+   METHOD AsString INLINE ( Self ), LTrim( Str( ( HB_QSelf() ) ) )
+
 ENDCLASS
 
 //----------------------------------------------------------------------------//
 
 CLASS POINTER FROM SCALAROBJECT FUNCTION _POINTER
-   METHOD AsString INLINE (Self), "0x" + NumToHex( HB_QSelf() )
+
+   METHOD AsString INLINE ( Self ), "0x" + NumToHex( HB_QSelf() )
    METHOD FuncName
+
 ENDCLASS
 
 //----------------------------------------------------------------------------//
@@ -353,8 +376,10 @@ HB_FUNC_STATIC( POINTER_FUNCNAME )
 #pragma ENDDUMP
 
 //----------------------------------------------------------------------------//
+
 FUNCTION UnRef( xValue )
-RETURN xValue
+
+   RETURN xValue
 
 //----------------------------------------------------------------------------//
 

@@ -67,38 +67,38 @@ FUNCTION hb_RegexReplace( cRegex, cString, cReplace, lCaseSensitive, lNewLine, n
    LOCAL cSearch, nStart, nEnd, nLenSearch, nLenReplace
 
    IF HB_ISREGEXSTRING( cRegex )
-     pRegex := cRegEx
+      pRegex := cRegEx
    ELSE
-     pRegex := HB_RegExComp( cRegEx, lCaseSensitive, lNewLine )
+      pRegex := hb_regexComp( cRegEx, lCaseSensitive, lNewLine )
    ENDIF
 
    cReturn := cString
 
-   // lCaseSensitive and lNewLine already defined by HB_RegExComp()!
-   aMatches := HB_RegExAll( pRegEx, cString, /* lCaseSensitive */, /*lNewLine*/, nMaxMatches, nGetMatch, .F. )
+// lCaseSensitive and lNewLine already defined by HB_RegExComp()!
+   aMatches := hb_regexAll( pRegEx, cString, /* lCaseSensitive */, /*lNewLine*/, nMaxMatches, nGetMatch, .F. )
 
    IF ! ( aMatches == NIL )
       FOR EACH aMatch IN aMatches
-          //TraceLog( "ValToPrg( aMatch ), cReturn", ValToPrg( aMatch ), cReturn )
-          IF Len( aMatch ) == 1 .AND. Len( aMatch[1] ) == 3 // if regex matches I must have an array of 3 elements
-             cSearch := aMatch[1][ MATCH_STRING ]
-             nStart  := aMatch[1][ MATCH_START ]
-             nEnd    := aMatch[1][ MATCH_END ]
+         //TraceLog( "ValToPrg( aMatch ), cReturn", ValToPrg( aMatch ), cReturn )
+         IF Len( aMatch ) == 1 .AND. Len( aMatch[1] ) == 3 // if regex matches I must have an array of 3 elements
+            cSearch := aMatch[1][ MATCH_STRING ]
+            nStart  := aMatch[1][ MATCH_START ]
+            nEnd    := aMatch[1][ MATCH_END ]
 
-             nLenSearch  := Len( cSearch ) //nEnd - nStart + 1
-             nLenReplace := Len( cReplace )
-             //TraceLog( "SubStr( cString, nStart, nLenSearch )", ;
-             //          SubStr( cString, nStart - nOffSet, nLenSearch ) )
+            nLenSearch  := Len( cSearch ) //nEnd - nStart + 1
+            nLenReplace := Len( cReplace )
+            //TraceLog( "SubStr( cString, nStart, nLenSearch )", ;
+            //          SubStr( cString, nStart - nOffSet, nLenSearch ) )
 
-             cReturn := Stuff( cReturn, nStart - nOffSet, nLenSearch, cReplace )
-             nOffSet += nLenSearch - nLenReplace
-             //TraceLog( "cSearch, nStart, nEnd, nLenSearch, nLenReplace, nOffSet, cReturn",;
-             //          cSearch, nStart, nEnd, nLenSearch, nLenReplace, nOffSet, cReturn )
-          ENDIF
+            cReturn := Stuff( cReturn, nStart - nOffSet, nLenSearch, cReplace )
+            nOffSet += nLenSearch - nLenReplace
+            //TraceLog( "cSearch, nStart, nEnd, nLenSearch, nLenReplace, nOffSet, cReturn",;
+            //          cSearch, nStart, nEnd, nLenSearch, nLenReplace, nOffSet, cReturn )
+         ENDIF
       NEXT
    ENDIF
 
-RETURN cReturn
+   RETURN cReturn
 
 //--------------------------------------------------------------//
 
@@ -133,17 +133,17 @@ RETURN cReturn
 * Please correct the descriptions and comments in "English" :)
 *************************************************************************/
 
-FUNCTION hb_RegExStrTran(cString,cpSearch,cReplace,nStart,nCount,lCase,lNewLine)
+FUNCTION hb_RegExStrTran( cString, cpSearch, cReplace, nStart, nCount, lCase, lNewLine )
 
    LOCAL aMatch, nFind := 0, cRet := ""
-   LOCAL cRep :="", cRep0, pos, xG1, xG2, lAll
+   LOCAL cRep := "", cRep0, pos, xG1, xG2, lAll
 
-   IF !ValType(cString)$"CM"
+   IF !ValType( cString ) $ "CM"
       // do error ???
       RETURN nil  // or ""
    ENDIF
 
-   IF !ValType(cpSearch)$"CM"
+   IF !ValType( cpSearch ) $ "CM"
       // IF !HB_ISREGEX(cpSearch)
       IF !HB_ISREGEXSTRING( cpSearch )
          // do error ???
@@ -151,37 +151,37 @@ FUNCTION hb_RegExStrTran(cString,cpSearch,cReplace,nStart,nCount,lCase,lNewLine)
       ENDIF
    ENDIF
 
-   IF !ValType(cReplace)$"CM"
-     cReplace := ""
+   IF !ValType( cReplace ) $ "CM"
+      cReplace := ""
    ENDIF
 
-   IF !ValType(nStart) == "N"
-     nStart := 1
+   IF !ValType( nStart ) == "N"
+      nStart := 1
    ENDIF
 
-   IF !ValType(nCount) == "N"
-     nCount := 0
-     lAll   := .T.
+   IF !ValType( nCount ) == "N"
+      nCount := 0
+      lAll   := .T.
    ELSE
-     lAll   := .F.
+      lAll   := .F.
    ENDIF
 
-   //  StrTran() work this way:
+//  StrTran() work this way:
    IF !lAll .AND. nCount == 0
-       RETURN ""
+      RETURN ""
    ENDIF
    IF nCount < 0
-       RETURN cString
+      RETURN cString
    ENDIF
    IF nStart < 1
       RETURN cString
    ENDIF
 
-   // START SEARCH
+// START SEARCH
    DO WHILE lAll .OR. nCount > 0
-      aMatch := HB_REGEXATX( cpSearch, cString, lCase, lNewLine )
+      aMatch := hb_regexAtX( cpSearch, cString, lCase, lNewLine )
       //aMatch: { {Find,Start,End} [,{FindGr1,StartGr1,EndGr1},...] }
-      IF EMPTY( aMatch )   //not found
+      IF Empty( aMatch )   //not found
          EXIT
       ENDIF
       nFind++
@@ -189,54 +189,55 @@ FUNCTION hb_RegExStrTran(cString,cpSearch,cReplace,nStart,nCount,lCase,lNewLine)
          // now change in cReplace "$..."
          cRep0 := cReplace
          cRep  := ""
-         DO WHILE ( pos := AT( "$", cRep0 ) ) > 0
-            xG1 := SUBSTR( cRep0, pos+1, 1 )
-            xG2 := SUBSTR( cRep0, pos+2, 1 )
+         DO WHILE ( pos := At( "$", cRep0 ) ) > 0
+            xG1 := SubStr( cRep0, pos + 1, 1 )
+            xG2 := SubStr( cRep0, pos + 2, 1 )
             IF xG1 == "$"                         // '$$' -> '$'
-               cRep  += LEFT( cRep0, pos )
-               cRep0 := SUBSTR( cRep0, pos + 2 )
-            ELSEIF xG1$"&0"                     // all found text
-               cRep  += LEFT( cRep0, pos - 1 ) + aMatch[ 1, 1 ]
-               cRep0 := SUBSTR( cRep0, pos + 2 )
-            ELSEIF xG1$"123456789"             // $1 .. $9
-               IF xG2$"0123456789"             // test $10 .. $99
-                  IF (xG2  := VAL( xG1 + xG2 ) + 1 ) <= LEN( aMatch )   //try group > 9
-                     cRep  += LEFT( cRep0, pos - 1 ) + aMatch[ xG2, 1 ]
-                     cRep0 := SUBSTR( cRep0, pos + 3 )
-                  ELSEIF (xG1 := VAL( xG1 ) + 1 ) <= LEN( aMatch )   //try '$xy'- >GroupX+'y'
-                     cRep  += LEFT( cRep0, pos - 1 ) + aMatch[ xG1, 1 ]
-                     cRep0 := SUBSTR( cRep0, pos + 2 )
+               cRep  += Left( cRep0, pos )
+               cRep0 := SubStr( cRep0, pos + 2 )
+            ELSEIF xG1 $ "&0"                     // all found text
+               cRep  += Left( cRep0, pos - 1 ) + aMatch[ 1, 1 ]
+               cRep0 := SubStr( cRep0, pos + 2 )
+            ELSEIF xG1 $ "123456789"             // $1 .. $9
+               IF xG2 $ "0123456789"             // test $10 .. $99
+                  IF ( xG2  := Val( xG1 + xG2 ) + 1 ) <= Len( aMatch )   //try group > 9
+                     cRep  += Left( cRep0, pos - 1 ) + aMatch[ xG2, 1 ]
+                     cRep0 := SubStr( cRep0, pos + 3 )
+                  ELSEIF ( xG1 := Val( xG1 ) + 1 ) <= Len( aMatch )   //try '$xy'- >GroupX+'y'
+                     cRep  += Left( cRep0, pos - 1 ) + aMatch[ xG1, 1 ]
+                     cRep0 := SubStr( cRep0, pos + 2 )
                   ELSE                           //group not exist ->remove
-                     cRep  += LEFT( cRep0, pos - 1 )
-                     cRep0 := SUBSTR( cRep0, pos + 2 )
+                     cRep  += Left( cRep0, pos - 1 )
+                     cRep0 := SubStr( cRep0, pos + 2 )
                      //  *** OR as is ???  ***
                      // cRep  += LEFT( cRep0, pos + 1 )
                      // cRep0 := SUBSTR( cRep0, pos + 2 )
                   ENDIF
                ELSE                            // not $10..$99
-                  IF (xG1 := VAL( xG1 ) + 1 ) <= LEN( aMatch )   //gropu exist
-                     cRep  += LEFT( cRep0, pos - 1 ) + aMatch[ xG1, 1 ]
-                     cRep0 := SUBSTR( cRep0, pos + 2 )
+                  IF ( xG1 := Val( xG1 ) + 1 ) <= Len( aMatch )   //gropu exist
+                     cRep  += Left( cRep0, pos - 1 ) + aMatch[ xG1, 1 ]
+                     cRep0 := SubStr( cRep0, pos + 2 )
                   ELSE                         //group not exist-> remove
-                     cRep  += LEFT( cRep0, pos -1 )
-                     cRep0 := SUBSTR( cRep0, pos + 2 )
+                     cRep  += Left( cRep0, pos - 1 )
+                     cRep0 := SubStr( cRep0, pos + 2 )
                      //  *** OR as is ???  ***
                      // cRep  += LEFT( cRep0, pos + 1 )
                      // cRep0 := SUBSTR( cRep0, pos + 2 )
                   ENDIF
                ENDIF
             ELSE                          // '$x' -> copy as is
-               cRep  += LEFT( cRep0, pos + 1 )
-               cRep0 := SUBSTR( cRep0, pos + 2 )
+               cRep  += Left( cRep0, pos + 1 )
+               cRep0 := SubStr( cRep0, pos + 2 )
             ENDIF
          ENDDO
          cRep    += cRep0
-         cRet    += LEFT( cString, aMatch[ 1, 2 ] - 1 ) + cRep
-         cString := SUBSTR( cString, aMatch[ 1, 3 ] + 1 )
+         cRet    += Left( cString, aMatch[ 1, 2 ] - 1 ) + cRep
+         cString := SubStr( cString, aMatch[ 1, 3 ] + 1 )
          nCount--
       ENDIF
    ENDDO
    cRet += cString
 
    RETURN cRet
+
 // ****** END *********

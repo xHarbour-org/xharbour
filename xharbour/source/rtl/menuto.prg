@@ -11,7 +11,7 @@
  *
  */
 
-/* NOTE: Recursive use is supported. */
+   /* NOTE: Recursive use is supported. */
 
 #include "color.ch"
 #include "common.ch"
@@ -20,285 +20,286 @@
 #include "setcurs.ch"
 #xtranslate COLORARRAY(<x>) => &( '{"' + strtran(<x>, ',', '","') + '"}' )
 
-static s_aLevel   := {}
-static s_nPointer := 1
+   STATIC s_aLevel   := {}
+   STATIC s_nPointer := 1
 
-function __AtPrompt( nRow, nCol, cPrompt, cMsg, cColor)
+FUNCTION __AtPrompt( nRow, nCol, cPrompt, cMsg, cColor )
 
-   if s_nPointer < 1
+   IF s_nPointer < 1
       s_nPointer := 1
-   endif
+   ENDIF
 
-   // add the current level empty array.
-   do while len( s_aLevel ) < s_nPointer
-      aadd( s_aLevel, {} )
-   enddo
+// add the current level empty array.
+   DO WHILE Len( s_aLevel ) < s_nPointer
+      AAdd( s_aLevel, {} )
+   ENDDO
 
-   // add to the static array
-   aadd( s_aLevel[ s_nPointer ], { nRow, nCol, cPrompt, cMsg, cColor } )
+// add to the static array
+   AAdd( s_aLevel[ s_nPointer ], { nRow, nCol, cPrompt, cMsg, cColor } )
 
-   // put this prompt on the screen right now
+// put this prompt on the screen right now
    DispOutAt( nRow, nCol, cPrompt, cColor, .T. )
 
-   return .f.
+   RETURN .F.
 
-function __MenuTo( bBlock, cVariable )
+FUNCTION __MenuTo( bBlock, cVariable )
 
-   local nKey
-   local y
-   local q
-   local n
-   local lExit
-   local nArrLen
-   local xMsg
-   local nMsgCol
-   local nMsgRow
-   local lMsgCenter
-   local nSaveCursor
-   local cSaveReadVar
+   LOCAL nKey
+   LOCAL y
+   LOCAL q
+   LOCAL n
+   LOCAL lExit
+   LOCAL nArrLen
+   LOCAL xMsg
+   LOCAL nMsgCol
+   LOCAL nMsgRow
+   LOCAL lMsgCenter
+   LOCAL nSaveCursor
+   LOCAL cSaveReadVar
 
-   local lDeclared
-   local bAction
-   local nMouseClik
+   LOCAL lDeclared
+   LOCAL bAction
+   LOCAL nMouseClik
 
-   local nPointer
-   local aColor
-   local cBackColor
-   local cFrontColor
+   LOCAL nPointer
+   LOCAL aColor
+   LOCAL cBackColor
+   LOCAL cFrontColor
 
-   // Detect if a memvar was passed
+// Detect if a memvar was passed
 
-   if __mvSCOPE( cVariable ) <= HB_MV_ERROR
-      __mvPUBLIC( cVariable )
+   IF __mvScope( cVariable ) <= HB_MV_ERROR
+      __mvPublic( cVariable )
       lDeclared := .T.
-   else
+   ELSE
       lDeclared := .F.
-   endif
+   ENDIF
 
-   n := eval( bBlock )
+   n := Eval( bBlock )
 
-   // if no prompts were defined, exit with 0
+// if no prompts were defined, exit with 0
 
-   if s_nPointer < 1 .or. s_nPointer > len( s_aLevel )
+   IF s_nPointer < 1 .OR. s_nPointer > Len( s_aLevel )
 
       n := 0
 
-   else
+   ELSE
 
       s_nPointer ++
       nPointer := s_nPointer
 
-      nArrLen := len( s_aLevel[ nPointer - 1 ] )
+      nArrLen := Len( s_aLevel[ nPointer - 1 ] )
 
       // put choice in a valid range
 
-      if !ISNUMBER( n ) .OR. n < 1
+      IF !ISNUMBER( n ) .OR. n < 1
          n := 1
-      endif
+      ENDIF
 
-      if n > nArrLen
+      IF n > nArrLen
          n := nArrLen
-      endif
+      ENDIF
 
       //
 
-      nSaveCursor := setcursor( IIF( Set( _SET_INTENSITY ), SC_NONE, NIL ) )
-      cSaveReadVar := ReadVar( upper( cVariable ) )
+      nSaveCursor := SetCursor( iif( Set( _SET_INTENSITY ), SC_NONE, NIL ) )
+      cSaveReadVar := ReadVar( Upper( cVariable ) )
       xMsg := ""
       nMsgCol := 0
-      nMsgRow := set( _SET_MESSAGE )
-      lMsgCenter := set( _SET_MCENTER )
+      nMsgRow := Set( _SET_MESSAGE )
+      lMsgCenter := Set( _SET_MCENTER )
       lExit := .F.
 
 
-      do while n <> 0
+      DO WHILE n <> 0
 
          // should we display messages?
-         if nMsgRow > 0
+         IF nMsgRow > 0
 
-            if ! Empty( xMsg )
+            IF ! Empty( xMsg )
                DispOutAt( nMsgRow, nMsgCol, Space( Len( xMsg ) ), .T. )
-            endif
+            ENDIF
 
             xMsg := s_aLevel[ nPointer - 1, n, 4 ]
 
             // Code Block messages ( yes, they are documented! )
-            if ISBLOCK( xMsg )
-               xMsg := eval( xMsg )
-            endif
+            IF ISBLOCK( xMsg )
+               xMsg := Eval( xMsg )
+            ENDIF
 
-            if !ISCHARACTER( xMsg )
+            IF !ISCHARACTER( xMsg )
                xMsg := ""
-            endif
+            ENDIF
 
-            if lMsgCenter
-               nMsgCol := int( ( maxcol() - len( xMsg ) ) / 2 )
-            endif
+            IF lMsgCenter
+               nMsgCol := Int( ( MaxCol() - Len( xMsg ) ) / 2 )
+            ENDIF
 
-            DispOutAt( nMsgRow, nMsgCol, xMsg,, .T. )
+            DispOutAt( nMsgRow, nMsgCol, xMsg, , .T. )
 
-         endif
+         ENDIF
 
          // save the current row
          q := n
 
-         if s_aLevel[ s_nPointer - 1 , n , 5 ] <> nil
-             aColor := COLORARRAY( s_aLevel[ s_nPointer - 1 , n , 5 ] )
-             cFrontColor := IIF( EMPTY( aColor[ 1 ] ) , NIL , aColor[ 1 ] )
-             cBackColor  := IIF( LEN( aColor ) > 1 , aColor[2], NIL )
-         endif
+         IF s_aLevel[ s_nPointer - 1 , n , 5 ] <> nil
+            aColor := COLORARRAY( s_aLevel[ s_nPointer - 1 , n , 5 ] )
+            cFrontColor := iif( Empty( aColor[ 1 ] ) , NIL , aColor[ 1 ] )
+            cBackColor  := iif( Len( aColor ) > 1 , aColor[2], NIL )
+         ENDIF
 
-         IF Set( _SET_INTENSITY )
+         IF SET( _SET_INTENSITY )
             IF cBackColor == Nil    // Only select Color Enhace if no color was passed
                ColorSelect( CLR_ENHANCED )
             ENDIF
          ENDIF
 
          // highlight the prompt
-         DispOutAt( s_aLevel[ nPointer - 1, n, 1 ],;
-                    s_aLevel[ nPointer - 1, n, 2 ],;
-                    s_aLevel[ nPointer - 1, n, 3 ],;
-                    cBackColor, .T. )
+         DispOutAt( s_aLevel[ nPointer - 1, n, 1 ], ;
+            s_aLevel[ nPointer - 1, n, 2 ], ;
+            s_aLevel[ nPointer - 1, n, 3 ], ;
+            cBackColor, .T. )
 
-         IF Set( _SET_INTENSITY )
+         IF SET( _SET_INTENSITY )
             IF cFrontColor == NIL    // Only select Color Enhace if no color was passed
-              ColorSelect( CLR_STANDARD )
+               ColorSelect( CLR_STANDARD )
             ENDIF
          ENDIF
 
-         if lExit
-            exit
-         endif
+         IF lExit
+            EXIT
+         ENDIF
 
          nKey := 0
-         do while nKey == 0
+         DO WHILE nKey == 0
 
             // wait for a keystroke
-            nKey := inkey( 0 )
+            nKey := Inkey( 0 )
 
-            if ( bAction := setkey( nKey ) ) <> NIL
+            IF ( bAction := SetKey( nKey ) ) <> NIL
 
-               eval( bBlock, n )
-               eval( bAction, procname( 1 ), procline( 1 ), upper( cVariable ) )
-               n := eval( bBlock )
+               Eval( bBlock, n )
+               Eval( bAction, ProcName( 1 ), ProcLine( 1 ), Upper( cVariable ) )
+               n := Eval( bBlock )
 
-               if n < 1
+               IF n < 1
                   n := 1
-               elseif n > nArrLen
+               ELSEIF n > nArrLen
                   n := nArrLen
-               endif
+               ENDIF
 
                nKey := 0
 
-            endif
-         enddo
+            ENDIF
+         ENDDO
 
          // check for keystrokes
          Switch nKey
 
-         case K_MOUSEMOVE
-            if ( ( nMouseClik := hittest(s_aLevel[ nPointer-1 ], ;
-                   MRow(), MCol()) ) > 0 )
-                n := nMouseClik
-            endif
+         CASE K_MOUSEMOVE
+            IF ( ( nMouseClik := HitTest(s_aLevel[ nPointer-1 ], ;
+                  MRow(), MCol() ) ) > 0 )
+               n := nMouseClik
+            ENDIF
             EXIT
 
-         case K_LBUTTONDOWN
-         case K_LDBLCLK
-            if ( ( nMouseClik := hittest(s_aLevel[ nPointer-1 ], ;
-                   MRow(), MCol()) ) > 0 )
-                n := nMouseClik
-            endif
+         CASE K_LBUTTONDOWN
+         CASE K_LDBLCLK
+            IF ( ( nMouseClik := HitTest(s_aLevel[ nPointer-1 ], ;
+                  MRow(), MCol() ) ) > 0 )
+               n := nMouseClik
+            ENDIF
             /** JC: TEMPORARY CHANGE
               I want to know the opinion of other developers about dbl click in menuto
             */
             //if ( nKey == 1006 )
-                lExit := .T.
-            //endif
-            exit
-
-         case K_DOWN
-         case K_RIGHT
-            if ++n > nArrLen
-               n := IIF( Set( _SET_WRAP ), 1, nArrLen )
-            endif
-            exit
-
-         case K_UP
-         case K_LEFT
-            if --n < 1
-               n := IIF( Set( _SET_WRAP ), nArrLen, 1 )
-            endif
-            exit
-
-         case K_HOME
-            n := 1
-            exit
-
-         case K_END
-            n := nArrLen
-            exit
-
-         case K_ENTER
-         case K_PGUP
-         case K_PGDN
             lExit := .T.
-            exit
+            //endif
+            EXIT
 
-         case K_ESC
+         CASE K_DOWN
+         CASE K_RIGHT
+            if ++n > nArrLen
+               n := iif( Set( _SET_WRAP ), 1, nArrLen )
+            ENDIF
+            EXIT
+
+         CASE K_UP
+         CASE K_LEFT
+            if --n < 1
+               n := iif( Set( _SET_WRAP ), nArrLen, 1 )
+            ENDIF
+            EXIT
+
+         CASE K_HOME
+            n := 1
+            EXIT
+
+         CASE K_END
+            n := nArrLen
+            EXIT
+
+         CASE K_ENTER
+         CASE K_PGUP
+         CASE K_PGDN
+            lExit := .T.
+            EXIT
+
+         CASE K_ESC
             n := 0
-            exit
+            EXIT
 
-         default
+            DEFAULT
             // did user hit a hot key?
-            for y := 1 to nArrLen
-               if upper( left( ltrim( s_aLevel[ nPointer - 1, y, 3 ] ), 1 ) ) == upper( chr( nKey ) )
+            FOR y := 1 TO nArrLen
+               IF Upper( Left( LTrim( s_aLevel[ nPointer - 1, y, 3 ] ), 1 ) ) == Upper( Chr( nKey ) )
                   n := y
                   lExit := .T.
-                  exit
-               endif
-            next
+                  EXIT
+               ENDIF
+            NEXT
          end
 
-         if n <> 0
-            DispOutAt( s_aLevel[ nPointer - 1, q, 1 ],;
-                       s_aLevel[ nPointer - 1, q, 2 ],;
-                       s_aLevel[ nPointer - 1, q, 3 ],;
-                       cFrontColor, .T. )
-         endif
+         IF n <> 0
+            DispOutAt( s_aLevel[ nPointer - 1, q, 1 ], ;
+               s_aLevel[ nPointer - 1, q, 2 ], ;
+               s_aLevel[ nPointer - 1, q, 3 ], ;
+               cFrontColor, .T. )
+         ENDIF
 
-      enddo
+      ENDDO
 
       ReadVar( cSaveReadVar )
       SetCursor( nSaveCursor )
 
       s_nPointer := nPointer
       s_nPointer --
-      asize( s_aLevel, s_nPointer - 1 )
+      ASize( s_aLevel, s_nPointer - 1 )
 
-   endif
+   ENDIF
 
-   eval( bBlock, n )
+   Eval( bBlock, n )
 
-   if lDeclared
-      __mvXRELEASE( cVariable )
-   endif
+   IF lDeclared
+      __mvXRelease( cVariable )
+   ENDIF
 
-   SetPos( MaxRow() - 1, 0)
+   SetPos( MaxRow() - 1, 0 )
 
-   return n
+   RETURN n
 
-static function HITTEST( aMenu, nMouseRow, nMouseCol )
+STATIC FUNCTION HitTest( aMenu, nMouseRow, nMouseCol )
 
 //   LOCAL nPos:=1
    LOCAL xMenu
 
    FOR EACH xMenu IN aMenu
-     IF nMouseRow == xMenu[ 1 ] .AND. nMouseCol >= xMenu[ 2 ] .AND.;
-          nMouseCol < xMenu[ 2 ] + Len( xMenu[ 3 ] )
-//        RETURN nPos
-        RETURN HB_EnumIndex()
-     ENDIF
-//     nPos++
+      IF nMouseRow == xMenu[ 1 ] .AND. nMouseCol >= xMenu[ 2 ] .AND. ;
+            nMouseCol < xMenu[ 2 ] + Len( xMenu[ 3 ] )
+         //        RETURN nPos
+         RETURN HB_EnumIndex()
+      ENDIF
+      //     nPos++
    NEXT
-   return 0
+
+   RETURN 0

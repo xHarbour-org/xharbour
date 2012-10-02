@@ -71,8 +71,8 @@ int hb_MaxRow( BOOL bVisible )
     */
    if( bVisible )
    {
-      PHB_GT pGT = hb_gt_Base();
-      HB_GT_INFO gtInfo;
+      PHB_GT      pGT = hb_gt_Base();
+      HB_GT_INFO  gtInfo;
 
       gtInfo.pNewVal = gtInfo.pResult = NULL;
 
@@ -103,8 +103,8 @@ int hb_MaxCol( BOOL bVisible )
    /* See the note about MaxRow(.t.) above */
    if( bVisible )
    {
-      PHB_GT pGT = hb_gt_Base();
-      HB_GT_INFO gtInfo;
+      PHB_GT      pGT = hb_gt_Base();
+      HB_GT_INFO  gtInfo;
 
       gtInfo.pNewVal = gtInfo.pResult = NULL;
 

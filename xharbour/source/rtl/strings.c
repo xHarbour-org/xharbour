@@ -56,13 +56,13 @@
 
 BOOL hb_strEmpty( const char * szText, HB_SIZE ulLen )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_strEmpty(%s, %lu)", szText, ulLen));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strEmpty(%s, %lu)", szText, ulLen ) );
 
    while( ulLen-- )
    {
       char c = szText[ ulLen ];
 
-      if( !HB_ISSPACE( c ) )
+      if( ! HB_ISSPACE( c ) )
          return FALSE;
    }
 

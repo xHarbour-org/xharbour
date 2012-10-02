@@ -58,7 +58,7 @@ char * hb_conSetColor( const char * szColor )
 {
    char * szOldColor;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_conSetColor(%s)", szColor));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_conSetColor(%s)", szColor ) );
 
    szOldColor = hb_setGetColor();
    hb_gtGetColorStr( szOldColor );
@@ -104,8 +104,8 @@ HB_FUNC( HB_NTOCOLOR )
 {
    if( ISNUM( 1 ) )
    {
-      char szColorString[ 10 ];
-      int colors[ 1 ];
+      char  szColorString[ 10 ];
+      int   colors[ 1 ];
 
       colors[ 0 ] = hb_parni( 1 );
 

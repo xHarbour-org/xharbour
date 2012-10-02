@@ -51,20 +51,21 @@
 
 #include "set.ch"
 
-#DEFINE  CRLF HB_OsNewLine()
+#define  CRLF HB_OsNewLine()
 #xtranslate Write( <cString> ) => FWrite( FileHandle, <cString> ) //;HB_OutDebug( <cString> )
 
 //--------------------------------------------------------------//
+
 FUNCTION TraceLog( ... )
 
-   // Using PRIVATE instead of LOCALs so TraceLog() is DIVERT friendly.
+// Using PRIVATE instead of LOCALs so TraceLog() is DIVERT friendly.
    MEMVAR cFile, FileHandle, nLevel, ProcName, xParam
 
-   IF ! SET( _SET_TRACE )
+   IF ! Set( _SET_TRACE )
       RETURN .T.
    ENDIF
 
-   PRIVATE cFile := SET( _SET_TRACEFILE ), FileHandle, nLevel := SET( _SET_TRACESTACK ), ProcName, xParam
+   PRIVATE cFile := Set( _SET_TRACEFILE ), FileHandle, nLevel := Set( _SET_TRACESTACK ), ProcName, xParam
 
    /* File() and FOpen()/FCreate() make different assumptions rgdg path,
       so we have to make sure cFile contains path to avoid ambiguity */
@@ -79,33 +80,34 @@ FUNCTION TraceLog( ... )
    FSeek( FileHandle, 0, 2 )
 
    IF nLevel > 0
-      Write( '[' + ProcFile(1) + "->" + ProcName( 1 ) + '] (' + LTrim( Str( Procline(1) ) ) + ')' )
+      Write( '[' + ProcFile( 1 ) + "->" + ProcName( 1 ) + '] (' + LTrim( Str( ProcLine(1 ) ) ) + ')' )
    ENDIF
 
    IF nLevel > 1 .AND. ! ( ProcName( 2 ) == '' )
       Write( ' Called from: '  + CRLF )
       nLevel := 1
       DO WHILE ! ( ( ProcName := ProcName( ++nLevel ) ) == '' )
-         Write( space(30) + ProcFile( nLevel ) + "->" + ProcName + '(' + LTrim( Str( Procline( nLevel ) ) ) + ')' + CRLF )
+         Write( Space( 30 ) + ProcFile( nLevel ) + "->" + ProcName + '(' + LTrim( Str( ProcLine( nLevel ) ) ) + ')' + CRLF )
       ENDDO
    ELSE
       Write( CRLF )
    ENDIF
 
-   FOR EACH xParam IN HB_aParams()
+   FOR EACH xParam IN hb_AParams()
       Write( 'Type: ' + ValType( xParam ) + ' >>>' + CStr( xParam ) + '<<<' + CRLF )
    NEXT
 
    Write( CRLF )
 
-   FClose(FileHandle)
+   FClose( FileHandle )
 
-RETURN .T.
+   RETURN .T.
+
 //--------------------------------------------------------------//
 
-
-static function cWithPath(cFilename)
+STATIC FUNCTION cWithPath( cFilename )
 /* Ensure cFilename contains path. If it doesn't, add current directory to the front of it */
    local cPath
    hb_fnamesplit(cFilename, @cPath)
 return iif(empty(cPath), "." + hb_ospathseparator(), "") + cFilename
+

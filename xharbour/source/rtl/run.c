@@ -59,10 +59,10 @@
 
 HB_FUNC( __RUN )
 {
-#if defined(__TURBOC__) || defined(__BORLANDC__) || defined(_MSC_VER) || \
-    defined(__WATCOMC__) || defined(__IBMCPP__) || defined(__GNUC__) || defined(__DMC__)
+#if defined( __TURBOC__ ) || defined( __BORLANDC__ ) || defined( _MSC_VER ) || \
+   defined( __WATCOMC__ ) || defined( __IBMCPP__ ) || defined( __GNUC__ ) || defined( __DMC__ )
 
-	int iret;
+   int iret;
 
    if( ISCHAR( 1 ) && hb_gtSuspend() == 0 )
    {
@@ -75,8 +75,9 @@ HB_FUNC( __RUN )
       }
 
       /* A second, byref, parameter gets the result code */
-      if ( ISBYREF( 2 ) ) {
-      	hb_storni( iret, 2 ) ;
+      if( ISBYREF( 2 ) )
+      {
+         hb_storni( iret, 2 );
       }
    }
 #else

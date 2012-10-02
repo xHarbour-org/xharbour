@@ -72,14 +72,14 @@ HB_FUNC( SETMOUSE )
    if( ISLOG( 1 ) )
       hb_mouseSetCursor( hb_parl( 1 ) );
 
-   fRow = ISNUM( 2 );
-   fCol = ISNUM( 3 );
+   fRow  = ISNUM( 2 );
+   fCol  = ISNUM( 3 );
 
    if( fRow || fCol )
    {
       int iRow = 0, iCol = 0;
 
-      if( !fRow || !fCol )
+      if( ! fRow || ! fCol )
          hb_mouseGetPos( &iRow, &iCol );
 
       if( fRow )

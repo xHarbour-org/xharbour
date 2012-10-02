@@ -55,12 +55,12 @@
 #include "hbapi.h"
 #include "hbapiitm.h"
 
-#define SOUNDEX_LEN_MAX         4
+#define SOUNDEX_LEN_MAX 4
 
 HB_FUNC( SOUNDEX )
 {
    PHB_ITEM pString = hb_param( 1, HB_IT_STRING );
-   char szResult[ SOUNDEX_LEN_MAX + 1 ];
+   char     szResult[ SOUNDEX_LEN_MAX + 1 ];
 
    /* NOTE: The result will always be a zero terminated string without any
             embedded zeros and special characters. [vszakats] */
@@ -70,11 +70,11 @@ HB_FUNC( SOUNDEX )
 
    if( pString )
    {
-      char * pszString = pString->item.asString.value;
-      HB_SIZE ulLen = pString->item.asString.length;
-      HB_SIZE nPos = 0;
-      HB_SIZE nResultPos = 0;
-      char cCharPrev = '0';
+      char *   pszString   = pString->item.asString.value;
+      HB_SIZE  ulLen       = pString->item.asString.length;
+      HB_SIZE  nPos        = 0;
+      HB_SIZE  nResultPos  = 0;
+      char     cCharPrev   = '0';
 
       while( nPos < ulLen && nResultPos < SOUNDEX_LEN_MAX )
       {
@@ -87,14 +87,14 @@ HB_FUNC( SOUNDEX )
 
          /* Convert to uppercase: HB_TOUPPER() */
          if( cChar >= 'a' && cChar <= 'z' )
-            cChar -= (char) ( 'a' - 'A' );
+            cChar -= ( char ) ( 'a' - 'A' );
 
          /* Check if HB_ISALPHA() */
          if( cChar >= 'A' && cChar <= 'Z' )
          {
-            static const char s_szTable[] = "01230120022455012623010202"; /* NOTE: SoundEx result codes for letters from "A" to "Z" */
-                                         /* "ABCDEFGHIJKLMNOPQRSTUVWXYZ" */
-            char cCharConverted = ( ( cChar - 'A' ) > ( (char) sizeof( s_szTable ) - 1 ) ) ? (char) '9' : (char) s_szTable[ cChar - 'A' ];
+            static const char s_szTable[]    = "01230120022455012623010202"; /* NOTE: SoundEx result codes for letters from "A" to "Z" */
+            /* "ABCDEFGHIJKLMNOPQRSTUVWXYZ" */
+            char              cCharConverted = ( ( cChar - 'A' ) > ( ( char ) sizeof( s_szTable ) - 1 ) ) ? ( char ) '9' : ( char ) s_szTable[ cChar - 'A' ];
 
             if( nResultPos == 0 )
                szResult[ nResultPos++ ] = cChar;

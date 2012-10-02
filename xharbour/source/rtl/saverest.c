@@ -66,42 +66,43 @@ static void hb_getScreenRange( USHORT * pusMin, USHORT * pusMax,
    }
    else
    {
-      iMax = hb_gtMaxCol();
+      iMax  = hb_gtMaxCol();
       iFrom = hb_parni( 2 );
       iTo   = ISNUM( 4 ) ? hb_parni( 4 ) : iMax;
    }
 
    if( iFrom < 0 )
       iFrom = 0;
-   else if( iFrom > iMax && !fNoCheck )
+   else if( iFrom > iMax && ! fNoCheck )
       iFrom = iMax;
 
    if( iTo < 0 )
       iTo = 0;
-   else if( iTo > iMax && !fNoCheck )
+   else if( iTo > iMax && ! fNoCheck )
       iTo = iMax;
 
    if( iFrom > iTo )
    {
-      *pusMin = ( USHORT ) iTo;
-      *pusMax = ( USHORT ) iFrom;
+      *pusMin  = ( USHORT ) iTo;
+      *pusMax  = ( USHORT ) iFrom;
    }
    else
    {
-      *pusMin = ( USHORT ) iFrom;
-      *pusMax = ( USHORT ) iTo;
+      *pusMin  = ( USHORT ) iFrom;
+      *pusMax  = ( USHORT ) iTo;
    }
 }
 
 HB_FUNC( SAVESCREEN )
 {
-   USHORT uiTop, uiLeft, uiBottom, uiRight;
-   HB_SIZE ulSize;
-   void * pBuffer;
+   USHORT   uiTop, uiLeft, uiBottom, uiRight;
+   HB_SIZE  ulSize;
+   void *   pBuffer;
+
 #if defined( HB_EXTENSION )
-   BOOL fNoCheck = hb_parl( 5 );
+   BOOL     fNoCheck = hb_parl( 5 );
 #else
-   BOOL fNoCheck = FALSE;
+   BOOL     fNoCheck = FALSE;
 #endif
 
    hb_getScreenRange( &uiTop, &uiBottom, fNoCheck, TRUE );
@@ -118,11 +119,11 @@ HB_FUNC( RESTSCREEN )
 {
    if( ISCHAR( 5 ) )
    {
-      USHORT uiTop, uiLeft, uiBottom, uiRight;
+      USHORT   uiTop, uiLeft, uiBottom, uiRight;
 #if defined( HB_EXTENSION )
-      BOOL fNoCheck = hb_parl( 6 );
+      BOOL     fNoCheck = hb_parl( 6 );
 #else
-      BOOL fNoCheck = FALSE;
+      BOOL     fNoCheck = FALSE;
 #endif
 
       hb_getScreenRange( &uiTop, &uiBottom, fNoCheck, TRUE );

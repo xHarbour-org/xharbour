@@ -55,11 +55,11 @@
 
 BOOL hb_spFile( const char * pFilename, char * pRetPath )
 {
-   char *Path;
-   BOOL bIsFile = FALSE;
-   PHB_FNAME pFilepath;
+   char *      Path;
+   BOOL        bIsFile = FALSE;
+   PHB_FNAME   pFilepath;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_spFile(%s, %p)", pFilename, pRetPath));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_spFile(%s, %p)", pFilename, pRetPath ) );
 
    if( pRetPath )
       Path = pRetPath;
@@ -80,10 +80,10 @@ BOOL hb_spFile( const char * pFilename, char * pRetPath )
       {
          pFilepath->szPath = szDefault;
          hb_fsFNameMerge( Path, pFilepath );
-         bIsFile = hb_fsFile( Path );
+         bIsFile           = hb_fsFile( Path );
       }
 
-      if( !bIsFile && hb_setGetPath() )
+      if( ! bIsFile && hb_setGetPath() )
       {
          HB_PATHNAMES * NextPath = hb_setGetFirstSetPath();
 
@@ -91,8 +91,8 @@ BOOL hb_spFile( const char * pFilename, char * pRetPath )
          {
             pFilepath->szPath = NextPath->szPath;
             hb_fsFNameMerge( Path, pFilepath );
-            bIsFile = hb_fsFile( Path );
-            NextPath = NextPath->pNext;
+            bIsFile           = hb_fsFile( Path );
+            NextPath          = NextPath->pNext;
          }
       }
 
@@ -119,11 +119,11 @@ BOOL hb_spFile( const char * pFilename, char * pRetPath )
 
 BOOL hb_spFileExists( const char * pFilename, char * pRetPath )
 {
-   char *Path;
-   BOOL bIsFile = FALSE;
-   PHB_FNAME pFilepath;
+   char *      Path;
+   BOOL        bIsFile = FALSE;
+   PHB_FNAME   pFilepath;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_spFile(%s, %p)", pFilename, pRetPath));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_spFile(%s, %p)", pFilename, pRetPath ) );
 
    if( pRetPath )
       Path = pRetPath;
@@ -144,10 +144,10 @@ BOOL hb_spFileExists( const char * pFilename, char * pRetPath )
       {
          pFilepath->szPath = szDefault;
          hb_fsFNameMerge( Path, pFilepath );
-         bIsFile = hb_fsFileExists( Path );
+         bIsFile           = hb_fsFileExists( Path );
       }
 
-      if( !bIsFile && hb_setGetPath() )
+      if( ! bIsFile && hb_setGetPath() )
       {
          HB_PATHNAMES * NextPath = hb_setGetFirstSetPath();
 
@@ -155,8 +155,8 @@ BOOL hb_spFileExists( const char * pFilename, char * pRetPath )
          {
             pFilepath->szPath = NextPath->szPath;
             hb_fsFNameMerge( Path, pFilepath );
-            bIsFile = hb_fsFileExists( Path );
-            NextPath = NextPath->pNext;
+            bIsFile           = hb_fsFileExists( Path );
+            NextPath          = NextPath->pNext;
          }
       }
 
@@ -185,7 +185,7 @@ HB_FHANDLE hb_spOpen( const char * pFilename, USHORT uiFlags )
 {
    char path[ HB_PATH_MAX ];
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_spOpen(%p, %hu)", pFilename, uiFlags));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_spOpen(%p, %hu)", pFilename, uiFlags ) );
 
    if( hb_spFile( pFilename, path ) )
       return hb_fsOpen( path, uiFlags );
@@ -195,10 +195,10 @@ HB_FHANDLE hb_spOpen( const char * pFilename, USHORT uiFlags )
 
 HB_FHANDLE hb_spCreate( const char * pFilename, ULONG ulAttr )
 {
-   char path[ HB_PATH_MAX ];
-   PHB_FNAME pFilepath;
+   char        path[ HB_PATH_MAX ];
+   PHB_FNAME   pFilepath;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_spCreate(%p, %lu)", pFilename, ulAttr));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_spCreate(%p, %lu)", pFilename, ulAttr ) );
 
    pFilepath = hb_fsFNameSplit( pFilename );
    if( ! pFilepath->szPath )
@@ -212,10 +212,10 @@ HB_FHANDLE hb_spCreate( const char * pFilename, ULONG ulAttr )
 
 HB_FHANDLE hb_spCreateEx( const char * pFilename, ULONG ulAttr, USHORT uiFlags )
 {
-   char path[ HB_PATH_MAX ];
-   PHB_FNAME pFilepath;
+   char        path[ HB_PATH_MAX ];
+   PHB_FNAME   pFilepath;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_spCreateEx(%p, %lu, %hu)", pFilename, ulAttr, uiFlags));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_spCreateEx(%p, %lu, %hu)", pFilename, ulAttr, uiFlags ) );
 
    pFilepath = hb_fsFNameSplit( pFilename );
    if( ! pFilepath->szPath )

@@ -61,10 +61,10 @@
 /* Escaping delimited strings. Need to be cleaned/optimized/improved */
 static char * hb_strescape( const char * szInput, int lLen, const char * cDelim )
 {
-   int     lCnt = 0;
-   const char * szChr;
-   char  * szEscape;
-   char  * szReturn;
+   int            lCnt = 0;
+   const char *   szChr;
+   char *         szEscape;
+   char *         szReturn;
 
    szReturn = szEscape = ( char * ) hb_xgrab( lLen * 2 + 4 );
 
@@ -75,7 +75,7 @@ static char * hb_strescape( const char * szInput, int lLen, const char * cDelim 
 
    szChr = szInput;
 
-   while ( *szChr && lCnt++ < lLen )
+   while( *szChr && lCnt++ < lLen )
    {
       if( *szChr == *cDelim )
       {
@@ -100,11 +100,11 @@ static BOOL hb_ExportVar( HB_FHANDLE handle, PHB_ITEM pValue, const char * cDeli
       /* a "C" field */
       case HB_IT_STRING:
       {
-         char * szStrEsc;
-         char * szString;
+         char *   szStrEsc;
+         char *   szString;
 
          szStrEsc = hb_strescape( hb_itemGetCPtr( pValue ),
-                                  (int) hb_itemGetCLen( pValue ), cDelim );
+                                  ( int ) hb_itemGetCLen( pValue ), cDelim );
 #ifndef HB_CDP_SUPPORT_OFF
          if( cdp )
          {
@@ -114,7 +114,7 @@ static BOOL hb_ExportVar( HB_FHANDLE handle, PHB_ITEM pValue, const char * cDeli
          szString = hb_xstrcpy( NULL, cDelim, szStrEsc, cDelim, NULL );
 
          /* FWrite( handle, szString ) */
-         hb_fsWriteLarge( handle, (BYTE*) szString, strlen( szString ) );
+         hb_fsWriteLarge( handle, ( BYTE * ) szString, strlen( szString ) );
 
          /* Orphaned, get rif off it */
          hb_xfree( szStrEsc );
@@ -127,36 +127,34 @@ static BOOL hb_ExportVar( HB_FHANDLE handle, PHB_ITEM pValue, const char * cDeli
          char * szDate = ( char * ) hb_xgrab( 9 );
 
          hb_itemGetDS( pValue, szDate );
-         hb_fsWriteLarge( handle, (BYTE*) szDate, strlen( szDate ) );
+         hb_fsWriteLarge( handle, ( BYTE * ) szDate, strlen( szDate ) );
          hb_xfree( szDate );
          break;
       }
       /* an "L" field */
       case HB_IT_LOGICAL:
-      {
-         hb_fsWriteLarge( handle, (BYTE*) ( hb_itemGetL( pValue ) ? "T" : "F" ), 1 );
+         hb_fsWriteLarge( handle, ( BYTE * ) ( hb_itemGetL( pValue ) ? "T" : "F" ), 1 );
          break;
-      }
       /* an "N" field */
       case HB_IT_INTEGER:
       case HB_IT_LONG:
       case HB_IT_DOUBLE:
       {
-         char *szResult = hb_itemStr( pValue, NULL, NULL );
+         char * szResult = hb_itemStr( pValue, NULL, NULL );
 
-         if ( szResult )
+         if( szResult )
          {
-            HB_SIZE ulLen = strlen( szResult );
-            const char * szTrimmed = hb_strLTrim( szResult, &ulLen );
+            HB_SIZE        ulLen       = strlen( szResult );
+            const char *   szTrimmed   = hb_strLTrim( szResult, &ulLen );
 
-            hb_fsWriteLarge( handle, (BYTE*) szTrimmed, strlen( szTrimmed ) );
+            hb_fsWriteLarge( handle, ( BYTE * ) szTrimmed, strlen( szTrimmed ) );
             hb_xfree( szResult );
          }
          break;
       }
       /* an "M" field or the other, might be a "V" in SixDriver */
       default:
-      /* We do not want MEMO contents */
+         /* We do not want MEMO contents */
          return FALSE;
    }
    return TRUE;
@@ -164,32 +162,33 @@ static BOOL hb_ExportVar( HB_FHANDLE handle, PHB_ITEM pValue, const char * cDeli
 
 HB_FUNC( DBF2TEXT )
 {
-   PHB_ITEM pWhile   = hb_param( 1, HB_IT_BLOCK );
-   PHB_ITEM pFor     = hb_param( 2, HB_IT_BLOCK );
-   PHB_ITEM pFields  = hb_param( 3, HB_IT_ARRAY );
+   PHB_ITEM       pWhile   = hb_param( 1, HB_IT_BLOCK );
+   PHB_ITEM       pFor     = hb_param( 2, HB_IT_BLOCK );
+   PHB_ITEM       pFields  = hb_param( 3, HB_IT_ARRAY );
 
-   const char * cDelim = hb_parc( 4 );
-   HB_FHANDLE handle = ( HB_FHANDLE ) hb_parnint( 5 );
-   const char * cSep = hb_parc( 6 );
-   int nCount        = hb_parni( 7 );
+   const char *   cDelim   = hb_parc( 4 );
+   HB_FHANDLE     handle   = ( HB_FHANDLE ) hb_parnint( 5 );
+   const char *   cSep     = hb_parc( 6 );
+   int            nCount   = hb_parni( 7 );
+
 #ifndef HB_CDP_SUPPORT_OFF
-   PHB_CODEPAGE cdp  = hb_cdpFind( (char *) hb_parc( 8 ) );
+   PHB_CODEPAGE   cdp      = hb_cdpFind( ( char * ) hb_parc( 8 ) );
 #endif
 
-   AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
+   AREAP          pArea    = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    /* Export DBF content to text file */
 
-   int iSepLen;
-   USHORT uiFields = 0;
-   USHORT ui;
+   int      iSepLen;
+   USHORT   uiFields       = 0;
+   USHORT   ui;
    PHB_ITEM pTmp;
-   BOOL bWriteSep = FALSE;
+   BOOL     bWriteSep      = FALSE;
 
-   BOOL bEof = TRUE;
-   BOOL bBof = TRUE;
+   BOOL     bEof           = TRUE;
+   BOOL     bBof           = TRUE;
 
-   BOOL bNoFieldPassed = ( pFields == NULL || hb_arrayLen( pFields ) == 0 );
+   BOOL     bNoFieldPassed = ( pFields == NULL || hb_arrayLen( pFields ) == 0 );
 
    if( ! pArea )
    {
@@ -210,17 +209,17 @@ HB_FUNC( DBF2TEXT )
 
    pTmp = hb_itemNew( NULL );
 
-   if ( ! cDelim )
+   if( ! cDelim )
    {
       cDelim = "\"";
    }
 
    if( cSep )
-      iSepLen = (int) hb_parclen( 6 );
+      iSepLen = ( int ) hb_parclen( 6 );
    else
    {
-      cSep = ",";
-      iSepLen = 1;
+      cSep     = ",";
+      iSepLen  = 1;
    }
 
    SELF_FIELDCOUNT( pArea, &uiFields );
@@ -244,18 +243,18 @@ HB_FUNC( DBF2TEXT )
          /* User does not request fields, copy all fields */
          if( bNoFieldPassed )
          {
-            for ( ui = 1; ui <= uiFields; ui ++ )
+            for( ui = 1; ui <= uiFields; ui++ )
             {
-               if ( bWriteSep )
+               if( bWriteSep )
                {
                   hb_fsWriteLarge( handle, ( BYTE * ) cSep, iSepLen );
                }
 
                SELF_GETVALUE( pArea, ui, pTmp );
 #ifndef HB_CDP_SUPPORT_OFF
-               bWriteSep = hb_ExportVar( handle, pTmp, cDelim, cdp );
+               bWriteSep   = hb_ExportVar( handle, pTmp, cDelim, cdp );
 #else
-               bWriteSep = hb_ExportVar( handle, pTmp, cDelim );
+               bWriteSep   = hb_ExportVar( handle, pTmp, cDelim );
 #endif
                hb_itemClear( pTmp );
             }
@@ -263,10 +262,10 @@ HB_FUNC( DBF2TEXT )
          /* Only requested fields are exported here */
          else
          {
-            USHORT uiFieldCopy = ( USHORT ) hb_arrayLen( pFields );
-            USHORT uiItter;
+            USHORT   uiFieldCopy = ( USHORT ) hb_arrayLen( pFields );
+            USHORT   uiItter;
 
-            for ( uiItter = 1; uiItter <= uiFieldCopy; uiItter++ )
+            for( uiItter = 1; uiItter <= uiFieldCopy; uiItter++ )
             {
                const char * szFieldName = hb_arrayGetCPtr( pFields, uiItter );
                if( szFieldName )
@@ -275,28 +274,28 @@ HB_FUNC( DBF2TEXT )
 
                   if( iPos )
                   {
-                     if ( bWriteSep )
+                     if( bWriteSep )
                      {
                         hb_fsWriteLarge( handle, ( BYTE * ) cSep, iSepLen );
                      }
                      SELF_GETVALUE( pArea, iPos, pTmp );
 #ifndef HB_CDP_SUPPORT_OFF
-                     bWriteSep = hb_ExportVar( handle, pTmp, cDelim, cdp );
+                     bWriteSep   = hb_ExportVar( handle, pTmp, cDelim, cdp );
 #else
-                     bWriteSep = hb_ExportVar( handle, pTmp, cDelim );
+                     bWriteSep   = hb_ExportVar( handle, pTmp, cDelim );
 #endif
                      hb_itemClear( pTmp );
                   }
                }
             }
          }
-         hb_fsWriteLarge( handle, (BYTE*) "\r\n", 2 );
+         hb_fsWriteLarge( handle, ( BYTE * ) "\r\n", 2 );
          bWriteSep = FALSE;
       }
 
-      if ( nCount != -1 )
+      if( nCount != -1 )
       {
-         nCount-- ;
+         nCount--;
       }
 
       /* DBSKIP() */
@@ -304,6 +303,6 @@ HB_FUNC( DBF2TEXT )
    }
 
    /* Writing EOF */
-   hb_fsWriteLarge( handle, (BYTE*) "\x1A", 1 );
+   hb_fsWriteLarge( handle, ( BYTE * ) "\x1A", 1 );
    hb_itemRelease( pTmp );
 }

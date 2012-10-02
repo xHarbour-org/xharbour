@@ -61,13 +61,16 @@
 #ifndef __PLATFORM__Windows
 
 FUNCTION QueryRegistry()
-  RETURN( .F. )
+
+   RETURN( .F. )
 
 FUNCTION GetRegistry()
-  RETURN( NIL )
+
+   RETURN( NIL )
 
 FUNCTION SetRegistry()
-  RETURN( .F. )
+
+   RETURN( .F. )
 
 #else
 
@@ -84,7 +87,7 @@ FUNCTION SetRegistry()
 #define REG_NONE                    ( 0 )   // No value type
 #define REG_SZ                      ( 1 )   // Unicode nul terminated string
 #define REG_EXPAND_SZ               ( 2 )   // Unicode nul terminated string
-                                            // (with environment variable references)
+// (with environment variable references)
 #define REG_BINARY                  ( 3 )   // Free form binary
 #define REG_DWORD                   ( 4 )   // 32-bit number
 #define REG_DWORD_LITTLE_ENDIAN     ( 4 )   // 32-bit number (same as REG_DWORD)
@@ -98,80 +101,89 @@ FUNCTION SetRegistry()
 //---- QueryRegistry ------------------------
 
 FUNCTION QueryRegistry( nHKEYHandle, cKeyName, cEntryName, xValue, lSetIt )
-  LOCAL rVal:= .F., xKey:= GetRegistry( nHKEYHandle, cKeyName, cEntryName )
-  LOCAL cValType:= VALTYPE( xValue )
-  IF lSetIt == NIL
-    lSetIt:= .F.
-  ENDIF
-  IF cValType == "L"
-    xValue:= IIF(xValue,1,0)
-    cValType:= VALTYPE( xValue )
-  ELSEIF cValType == "D"
-    xValue:= DTOS( xValue )
-    cValType:= VALTYPE( xValue )
-  ENDIF
-  rVal:= ( xKey != NIL .AND. xValue != NIL .AND. cValType == VALTYPE( xKey ) .AND. xValue == xKey )
-  IF !rVal .AND. lSetIt
-    rVal:= SetRegistry( nHKEYHandle, cKeyName, cEntryName, xValue )
-  ENDIF
-  RETURN(  rVal )
+
+   LOCAL rVal := .F. , xKey := GetRegistry( nHKEYHandle, cKeyName, cEntryName )
+   LOCAL cValType := ValType( xValue )
+
+   IF lSetIt == NIL
+      lSetIt := .F.
+   ENDIF
+   IF cValType == "L"
+      xValue := iif( xValue, 1, 0 )
+      cValType := ValType( xValue )
+   ELSEIF cValType == "D"
+      xValue := DToS( xValue )
+      cValType := ValType( xValue )
+   ENDIF
+   rVal := ( xKey != NIL .AND. xValue != NIL .AND. cValType == ValType( xKey ) .AND. xValue == xKey )
+   IF !rVal .AND. lSetIt
+      rVal := SetRegistry( nHKEYHandle, cKeyName, cEntryName, xValue )
+   ENDIF
+
+   RETURN(  rVal )
 
 //---- GetRegistry ------------------------
 
 FUNCTION GetRegistry( nHKEYHandle, cKeyName, cEntryName )
-  LOCAL cName := NIL, nKeyHandle:=0, nValueType
-  IF nHKeyHandle== NIL
-     nHKeyHandle:= 0
-  ENDIF
-  IF EMPTY( WinRegOpenKeyEx(nHKEYHandle, cKeyName,0, KEY_QUERY_VALUE, @nKeyHandle))
-    nValueType  := 0
-    // retrieve the length of the value
-    IF WinRegQueryValueEx(nKeyHandle, cEntryName,0, @nValueType,@cName) > 0
-      IF nValueType== REG_DWORD .OR. ;
-        nValueType== REG_DWORD_LITTLE_ENDIAN .OR. ;
-        nValueType== REG_DWORD_BIG_ENDIAN .OR. ;
-        nValueType== REG_BINARY
-        cName:= BIN2U(cName)
-      ELSE
-        cName:= STRTRAN(CSTR(cName),CHR(0))
+
+   LOCAL cName := NIL, nKeyHandle := 0, nValueType
+
+   IF nHKeyHandle == NIL
+      nHKeyHandle := 0
+   ENDIF
+   IF Empty( WinRegOpenKeyEx( nHKEYHandle, cKeyName,0, KEY_QUERY_VALUE, @nKeyHandle ) )
+      nValueType  := 0
+      // retrieve the length of the value
+      IF WinRegQueryValueEx( nKeyHandle, cEntryName, 0, @nValueType, @cName ) > 0
+         IF nValueType == REG_DWORD .OR. ;
+               nValueType == REG_DWORD_LITTLE_ENDIAN .OR. ;
+               nValueType == REG_DWORD_BIG_ENDIAN .OR. ;
+               nValueType == REG_BINARY
+            cName := BIN2U( cName )
+         ELSE
+            cName := StrTran( CSTR( cName ), Chr( 0 ) )
+         ENDIF
       ENDIF
-    ENDIF
-    WinRegCloseKey( nKeyHandle)
-  ENDIF
-RETURN( cName )
+      WinRegCloseKey( nKeyHandle )
+   ENDIF
+
+   RETURN( cName )
 
 //---- SetRegistry ------------------------
 
 FUNCTION SetRegistry( nHKEYHandle, cKeyName, cEntryName, xValue )
-  LOCAL cName := NIL, nKeyHandle, nValueType
-  LOCAL rVal:= .F.
-  LOCAL cType, nResult:=1
-  IF nHKeyHandle== NIL
-     nHKeyHandle:= 0
-  ENDIF
-  nKeyHandle := 0
-  IF WinRegCreateKeyEx(nHKEYHandle, cKeyName,0,0,0, KEY_SET_VALUE,0, @nKeyHandle, @nResult) = 0
-    cType:= VALTYPE(xValue) // no support for Arrays, Codeblock ...
-    DO CASE
-    CASE cType== 'L'
-      nValueType  := REG_DWORD
-      cName:= IIF(xValue,1,0)
-    CASE cType== 'D'
-      nValueType  := REG_SZ
-      cName:= DTOS(xValue)
-    CASE cType == 'N'
-      nValueType  := REG_DWORD
-      cName:= xValue
-    CASE cType$'CM'
-      nValueType  := REG_SZ
-      cName:= xValue
-    ENDCASE
-    IF cName != NIL
-      rVal:= EMPTY( WinRegSetValueEx(nKeyHandle, cEntryName,0, nValueType, cName) )
-    ENDIF
-    WinRegCloseKey( nKeyHandle)
-  ENDIF
-  RETURN( rVal )
+
+   LOCAL cName := NIL, nKeyHandle, nValueType
+   LOCAL rVal := .F.
+   LOCAL cType, nResult := 1
+
+   IF nHKeyHandle == NIL
+      nHKeyHandle := 0
+   ENDIF
+   nKeyHandle := 0
+   IF WinRegCreateKeyEx( nHKEYHandle, cKeyName, 0, 0, 0, KEY_SET_VALUE, 0, @nKeyHandle, @nResult ) = 0
+      cType := ValType( xValue ) // no support for Arrays, Codeblock ...
+      DO CASE
+      CASE cType == 'L'
+         nValueType  := REG_DWORD
+         cName := iif( xValue, 1, 0 )
+      CASE cType == 'D'
+         nValueType  := REG_SZ
+         cName := DToS( xValue )
+      CASE cType == 'N'
+         nValueType  := REG_DWORD
+         cName := xValue
+      CASE cType $ 'CM'
+         nValueType  := REG_SZ
+         cName := xValue
+      ENDCASE
+      IF cName != NIL
+         rVal := Empty( WinRegSetValueEx( nKeyHandle, cEntryName,0, nValueType, cName ) )
+      ENDIF
+      WinRegCloseKey( nKeyHandle )
+   ENDIF
+
+   RETURN( rVal )
 
 #pragma BEGINDUMP
 
@@ -317,4 +329,5 @@ HB_FUNC_STATIC( WINREGCLOSEKEY )
 }
 
 #pragma ENDDUMP
+
 #endif

@@ -55,14 +55,15 @@
 
 CLASS HBTextLine
 
-   DATA cText     
-   DATA lSoftCR   
+   DATA cText
+   DATA lSoftCR
 
    METHOD New( cLine, lEOL )
 
 ENDCLASS
 
 // Create a new line of text
+
 METHOD New( cLine, lEOL ) CLASS HBTextLine
 
    DEFAULT cLine TO ""
@@ -71,5 +72,5 @@ METHOD New( cLine, lEOL ) CLASS HBTextLine
    ::cText   := cLine
    ::lSoftCR := lEOL
 
-RETURN Self
+   RETURN Self
 

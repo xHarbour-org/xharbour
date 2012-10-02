@@ -50,10 +50,10 @@
  *
  */
 
-/* NOTE: Harbour internal function to set and get the active GetList */
+   /* NOTE: Harbour internal function to set and get the active GetList */
 
-STATIC s_oGetListActive
-STATIC s_oGetListLast
+   STATIC s_oGetListActive
+   STATIC s_oGetListLast
 
 PROCEDURE __GetListSetActive( oGetList )
 
@@ -69,15 +69,17 @@ PROCEDURE __GetListSetActive( oGetList )
 
    RETURN
 
-/* NOTE: Using a separate function for maximum speed */
+   /* NOTE: Using a separate function for maximum speed */
 
 FUNCTION __GetListActive()
+
    RETURN s_oGetListActive
 
 FUNCTION __GetListLast( oGetListLast )
 
-   if oGetListLast != NIL
+   IF oGetListLast != NIL
       s_oGetListLast := oGetListLast
-   endif
+   ENDIF
+
    RETURN s_oGetListLast
 

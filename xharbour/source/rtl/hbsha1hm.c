@@ -56,15 +56,15 @@
 
 HB_FUNC( HB_HMAC_SHA1 )
 {
-   unsigned char mac[ HMAC_SHA1_DIGEST_LENGTH ];
-   HMAC_SHA1_CTX ctx;
+   unsigned char  mac[ HMAC_SHA1_DIGEST_LENGTH ];
+   HMAC_SHA1_CTX  ctx;
 
    hb_HMAC_SHA1_Init( &ctx );
    #if ULONG_MAX > UINT_MAX
    {
-      const char * buffer = hb_parcx( 2 );
-      ULONG nCount = hb_parclen( 2 );
-      ULONG nDone = 0;
+      const char *   buffer   = hb_parcx( 2 );
+      ULONG          nCount   = hb_parclen( 2 );
+      ULONG          nDone    = 0;
 
       while( nCount )
       {
@@ -72,13 +72,13 @@ HB_FUNC( HB_HMAC_SHA1 )
 
          if( nCount > ( ULONG ) UINT_MAX )
          {
-            uiChunk = UINT_MAX;
-            nCount -= ( ULONG ) uiChunk;
+            uiChunk  = UINT_MAX;
+            nCount   -= ( ULONG ) uiChunk;
          }
          else
          {
-            uiChunk = ( unsigned int ) nCount;
-            nCount = 0;
+            uiChunk  = ( unsigned int ) nCount;
+            nCount   = 0;
          }
 
          hb_HMAC_SHA1_UpdateKey( &ctx, buffer + nDone, uiChunk );
@@ -87,16 +87,16 @@ HB_FUNC( HB_HMAC_SHA1 )
       }
    }
    #else
-      hb_HMAC_SHA1_UpdateKey( &ctx, hb_parcx( 2 ), (UINT) hb_parclen( 2 ) );
+   hb_HMAC_SHA1_UpdateKey( &ctx, hb_parcx( 2 ), ( UINT ) hb_parclen( 2 ) );
    #endif
    hb_HMAC_SHA1_EndKey( &ctx );
 
    hb_HMAC_SHA1_StartMessage( &ctx );
    #if ULONG_MAX > UINT_MAX
    {
-      const char * buffer = hb_parcx( 1 );
-      ULONG nCount = hb_parclen( 1 );
-      ULONG nDone = 0;
+      const char *   buffer   = hb_parcx( 1 );
+      ULONG          nCount   = hb_parclen( 1 );
+      ULONG          nDone    = 0;
 
       while( nCount )
       {
@@ -104,13 +104,13 @@ HB_FUNC( HB_HMAC_SHA1 )
 
          if( nCount > ( ULONG ) UINT_MAX )
          {
-            uiChunk = UINT_MAX;
-            nCount -= ( ULONG ) uiChunk;
+            uiChunk  = UINT_MAX;
+            nCount   -= ( ULONG ) uiChunk;
          }
          else
          {
-            uiChunk = ( unsigned int ) nCount;
-            nCount = 0;
+            uiChunk  = ( unsigned int ) nCount;
+            nCount   = 0;
          }
 
          hb_HMAC_SHA1_UpdateMessage( &ctx, buffer + nDone, uiChunk );
@@ -119,7 +119,7 @@ HB_FUNC( HB_HMAC_SHA1 )
       }
    }
    #else
-      hb_HMAC_SHA1_UpdateMessage( &ctx, hb_parcx( 1 ), (UINT) hb_parclen( 1 ) );
+   hb_HMAC_SHA1_UpdateMessage( &ctx, hb_parcx( 1 ), ( UINT ) hb_parclen( 1 ) );
    #endif
    hb_HMAC_SHA1_EndMessage( mac, &ctx );
    hb_HMAC_SHA1_Done( &ctx );

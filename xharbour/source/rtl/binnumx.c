@@ -63,12 +63,12 @@ HB_FUNC( BIN2U )
 
    if( pItem )
    {
-      char * pszString = pItem->item.asString.value;
-      HB_SIZE ulLen = pItem->item.asString.length;
-      ULONG value = HB_MKULONG( ( ulLen >= 1 ) ? ( BYTE ) pszString[ 0 ] : 0,
-                                ( ulLen >= 2 ) ? ( BYTE ) pszString[ 1 ] : 0,
-                                ( ulLen >= 3 ) ? ( BYTE ) pszString[ 2 ] : 0,
-                                ( ulLen >= 4 ) ? ( BYTE ) pszString[ 3 ] : 0 );
+      char *   pszString   = pItem->item.asString.value;
+      HB_SIZE  ulLen       = pItem->item.asString.length;
+      ULONG    value       = HB_MKULONG( ( ulLen >= 1 ) ? ( BYTE ) pszString[ 0 ] : 0,
+                                         ( ulLen >= 2 ) ? ( BYTE ) pszString[ 1 ] : 0,
+                                         ( ulLen >= 3 ) ? ( BYTE ) pszString[ 2 ] : 0,
+                                         ( ulLen >= 4 ) ? ( BYTE ) pszString[ 3 ] : 0 );
 
 #ifndef HB_LONG_LONG_OFF
       hb_retnll( value );
@@ -88,13 +88,13 @@ HB_FUNC( W2BIN )
    {
       USHORT uiValue = ( USHORT ) hb_parni( 1 );
 
-      szString[ 0 ] = ( uiValue & 0x00FF );
-      szString[ 1 ] = ( uiValue & 0xFF00 ) >> 8;
+      szString[ 0 ]  = ( uiValue & 0x00FF );
+      szString[ 1 ]  = ( uiValue & 0xFF00 ) >> 8;
    }
    else
    {
-      szString[ 0 ] =
-      szString[ 1 ] = '\0';
+      szString[ 0 ]     =
+         szString[ 1 ]  = '\0';
    }
 
    hb_retclen( szString, 2 );
@@ -108,17 +108,17 @@ HB_FUNC( U2BIN )
    {
       ULONG ulValue = ( ULONG ) hb_parnl( 1 );
 
-      szString[ 0 ] = ( char ) ( ulValue & 0x000000FF );
-      szString[ 1 ] = ( char ) ( ( ulValue & 0x0000FF00 ) >> 8 );
-      szString[ 2 ] = ( char ) ( ( ulValue & 0x00FF0000 ) >> 16 );
-      szString[ 3 ] = ( char ) ( ( ulValue & 0xFF000000 ) >> 24 );
+      szString[ 0 ]  = ( char ) ( ulValue & 0x000000FF );
+      szString[ 1 ]  = ( char ) ( ( ulValue & 0x0000FF00 ) >> 8 );
+      szString[ 2 ]  = ( char ) ( ( ulValue & 0x00FF0000 ) >> 16 );
+      szString[ 3 ]  = ( char ) ( ( ulValue & 0xFF000000 ) >> 24 );
    }
    else
    {
-      szString[ 0 ] =
-      szString[ 1 ] =
-      szString[ 2 ] =
-      szString[ 3 ] = '\0';
+      szString[ 0 ]           =
+         szString[ 1 ]        =
+            szString[ 2 ]     =
+               szString[ 3 ]  = '\0';
    }
 
    hb_retclen( szString, 4 );

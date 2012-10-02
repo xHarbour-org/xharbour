@@ -52,11 +52,12 @@
 
 #include "hbsetup.ch"
 
-FUNCTION TBrowseDB( nTop, nLeft, nBottom, nRight )
+FUNCTION TBRowseDb( nTop, nLeft, nBottom, nRight )
 
-LOCAL oBrowse := TBrowseNew( nTop, nLeft, nBottom, nRight )
+   LOCAL oBrowse := TBRowseNew( nTop, nLeft, nBottom, nRight )
 
 #ifdef HB_COMPAT_XPP
+
    oBrowse:SkipBlock     := { | nRecs | DBSkipper( nRecs ) }
 #else
    oBrowse:SkipBlock     := { | nRecs | Skipped( nRecs ) }
@@ -64,9 +65,10 @@ LOCAL oBrowse := TBrowseNew( nTop, nLeft, nBottom, nRight )
    oBrowse:GoTopBlock    := { || dbGoTop() }
    oBrowse:GoBottomBlock := { || dbGoBottom() }
 
-RETURN oBrowse
+   RETURN oBrowse
 
 #ifndef HB_COMPAT_XPP
+
 STATIC FUNCTION Skipped( nRecs )
 
    LOCAL nSkipped := 0
@@ -77,16 +79,16 @@ STATIC FUNCTION Skipped( nRecs )
       ELSEIF nRecs > 0 .AND. RecNo() != LastRec() + 1
          DO WHILE nSkipped < nRecs
             dbSkip( 1 )
-            IF Eof()
-               dbSkip( -1 )
+            IF EOF()
+               dbSkip( - 1 )
                EXIT
             ENDIF
             nSkipped++
          ENDDO
       ELSEIF nRecs < 0
          DO WHILE nSkipped > nRecs
-            dbSkip( -1 )
-            IF Bof()
+            dbSkip( - 1 )
+            IF BOF()
                EXIT
             ENDIF
             nSkipped--
@@ -95,5 +97,6 @@ STATIC FUNCTION Skipped( nRecs )
    ENDIF
 
    RETURN nSkipped
+
 #endif
 

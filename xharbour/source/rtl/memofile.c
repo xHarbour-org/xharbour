@@ -76,7 +76,7 @@ HB_FUNC( MEMOREAD )
 
             /* Don't read the file terminating EOF character */
 
-            #if ! defined(HB_OS_UNIX)
+            #if ! defined( HB_OS_UNIX )
             {
                BYTE byEOF = HB_CHAR_NUL;
 
@@ -109,9 +109,9 @@ HB_FUNC( MEMOREAD )
 
 static BOOL hb_memowrit( BOOL bWriteEOF )
 {
-   PHB_ITEM pFileName = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pString   = hb_param( 2, HB_IT_STRING );
-   BOOL bRetVal       = FALSE;
+   PHB_ITEM pFileName   = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pString     = hb_param( 2, HB_IT_STRING );
+   BOOL     bRetVal     = FALSE;
 
    if( pFileName && pString )
    {
@@ -125,7 +125,7 @@ static BOOL hb_memowrit( BOOL bWriteEOF )
 
          /* NOTE: CA-Cl*pper will add the EOF even if the write failed. [vszakats] */
          /* NOTE: CA-Cl*pper will not return .F. when the EOF could not be written. [vszakats] */
-#if ! defined(HB_OS_UNIX)
+#if ! defined( HB_OS_UNIX )
          if( bWriteEOF )  /* if true, then write EOF */
          {
             BYTE byEOF = HB_CHAR_EOF;
@@ -150,7 +150,7 @@ HB_FUNC( HB_MEMOWRIT )
 HB_FUNC( MEMOWRIT )
 {
 #ifdef HB_EXTENSION
-   hb_retl( hb_memowrit( hb_parinfo(0) == 3 && ISLOG( 3 ) ? hb_parl( 3 ) : TRUE ) );
+   hb_retl( hb_memowrit( hb_parinfo( 0 ) == 3 && ISLOG( 3 ) ? hb_parl( 3 ) : TRUE ) );
 #else
    hb_retl( hb_memowrit( TRUE ) );
 #endif

@@ -56,21 +56,21 @@
 HB_FUNC( HB_SHADOW )
 {
    if( hb_pcount() >= 4 )
-      hb_gtDrawShadow( (USHORT) hb_parni( 1 ),
-                       (USHORT) hb_parni( 2 ),
-                       (USHORT) hb_parni( 3 ),
-                       (USHORT) hb_parni( 4 ),
-                       ISNUM( 5 ) ?  (BYTE)hb_parni( 5 ) : (BYTE) 7 );
+      hb_gtDrawShadow( ( USHORT ) hb_parni( 1 ),
+                       ( USHORT ) hb_parni( 2 ),
+                       ( USHORT ) hb_parni( 3 ),
+                       ( USHORT ) hb_parni( 4 ),
+                       ISNUM( 5 ) ?  ( BYTE ) hb_parni( 5 ) : ( BYTE ) 7 );
 }
 
 HB_FUNC( HB_CLRAREA )
 {
    if( hb_pcount() > 4 )
-      hb_gtSetAttribute( (USHORT) hb_parni( 1 ),
-                         (USHORT) hb_parni( 2 ),
-                         (USHORT) hb_parni( 3 ),
-                         (USHORT) hb_parni( 4 ),
-                         (BYTE) hb_parni( 5 ) );
+      hb_gtSetAttribute( ( USHORT ) hb_parni( 1 ),
+                         ( USHORT ) hb_parni( 2 ),
+                         ( USHORT ) hb_parni( 3 ),
+                         ( USHORT ) hb_parni( 4 ),
+                         ( BYTE ) hb_parni( 5 ) );
 }
 
 #ifdef HB_C52_UNDOC

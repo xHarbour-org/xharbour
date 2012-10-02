@@ -80,19 +80,19 @@ HB_FUNC( HB_BLOWFISHENCRYPT )
 
          if( nLen )
          {
-            char * pszData;
-            const HB_BLOWFISH * bf = ( const HB_BLOWFISH * ) hb_parc( 1 );
-            BOOL fRaw = hb_parl( 3 );
+            char *               pszData;
+            const HB_BLOWFISH *  bf    = ( const HB_BLOWFISH * ) hb_parc( 1 );
+            BOOL                 fRaw  = hb_parl( 3 );
 
             /* In raw mode passed string is padded to 8 bytes with '\0'
              * otherwise ANSI X.923 padding is using
              */
-            nSize = ( fRaw ? ( ( nLen + 7 ) >> 3 ) :
-                             ( ( nLen >> 3 ) + 1 ) ) << 3;
-            pszData = ( char * ) hb_xgrab( nSize + 1 );
-            HB_MEMCPY( pszData, hb_itemGetCPtr( pData ), (size_t) nLen );
-            memset( pszData + nLen, '\0', (size_t) ( nSize - nLen ) );
-            if( !fRaw )
+            nSize    = ( fRaw ? ( ( nLen + 7 ) >> 3 ) :
+                         ( ( nLen >> 3 ) + 1 ) ) << 3;
+            pszData  = ( char * ) hb_xgrab( nSize + 1 );
+            HB_MEMCPY( pszData, hb_itemGetCPtr( pData ), ( size_t ) nLen );
+            memset( pszData + nLen, '\0', ( size_t ) ( nSize - nLen ) );
+            if( ! fRaw )
                pszData[ nSize - 1 ] = ( char ) ( nSize - nLen );
             for( nLen = 0; nLen < nSize; nLen += 8 )
             {
@@ -123,13 +123,13 @@ HB_FUNC( HB_BLOWFISHDECRYPT )
 
          if( nSize >= 8 && ( nSize & 0x07 ) == 0 )
          {
-            const char * pszSource;
-            char * pszData;
-            const HB_BLOWFISH * bf = ( const HB_BLOWFISH * ) hb_parc( 1 );
-            BOOL fRaw = hb_parl( 3 );
+            const char *         pszSource;
+            char *               pszData;
+            const HB_BLOWFISH *  bf    = ( const HB_BLOWFISH * ) hb_parc( 1 );
+            BOOL                 fRaw  = hb_parl( 3 );
 
-            pszData = ( char * ) hb_xgrab( nSize + ( fRaw ? 1 : 0 ) );
-            pszSource = hb_itemGetCPtr( pData );
+            pszData     = ( char * ) hb_xgrab( nSize + ( fRaw ? 1 : 0 ) );
+            pszSource   = hb_itemGetCPtr( pData );
             for( nLen = 0; nLen < nSize; nLen += 8 )
             {
                HB_U32 xl, xr;
@@ -139,10 +139,10 @@ HB_FUNC( HB_BLOWFISHDECRYPT )
                HB_PUT_BE_UINT32( &pszData[ nLen ], xl );
                HB_PUT_BE_UINT32( &pszData[ nLen + 4 ], xr );
             }
-            if( !fRaw )
+            if( ! fRaw )
             {
                nSize = ( unsigned char ) pszData[ nSize - 1 ];
-               nLen -= ( ( nSize - 1 ) & ~0x07 ) == 0 ? nSize : nLen;
+               nLen  -= ( ( nSize - 1 ) & ~0x07 ) == 0 ? nSize : nLen;
             }
             if( nLen )
                hb_retclen_buffer( pszData, nLen );

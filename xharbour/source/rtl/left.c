@@ -61,11 +61,11 @@ HB_FUNC( LEFT )
 
    if( pText && hb_param( 2, HB_IT_NUMERIC ) )
    {
-      char *sLeft, *sString = pText->item.asString.value;
-      LONG lLeft = hb_parnl( 2 );
-      HB_SIZE ulLen = pText->item.asString.length;
+      char *   sLeft, * sString = pText->item.asString.value;
+      LONG     lLeft = hb_parnl( 2 );
+      HB_SIZE  ulLen = pText->item.asString.length;
 
-      HB_TRACE( HB_TR_DEBUG, ("Left( '%s', %i ) %i", sString, lLeft, ulLen ) );
+      HB_TRACE( HB_TR_DEBUG, ( "Left( '%s', %i ) %i", sString, lLeft, ulLen ) );
 
       /* Must come first, because negative signed always greater than unsigned! */
       if( lLeft <= 0 )
@@ -73,14 +73,14 @@ HB_FUNC( LEFT )
          hb_retclen( "", 0 );
          return;
       }
-      else if( (ULONG) lLeft >= ulLen )
+      else if( ( ULONG ) lLeft >= ulLen )
       {
          /* No need to retain the 1st parameter - Recycle. */
          hb_itemReturn( pText );
          return;
       }
 
-      sLeft = (char*) hb_xgrab( lLeft + 1 );
+      sLeft          = ( char * ) hb_xgrab( lLeft + 1 );
       HB_MEMCPY( sLeft, sString, lLeft );
       sLeft[ lLeft ] = '\0';
 

@@ -59,148 +59,148 @@
 
 #ifdef HB_OS_UNIX
 
-#define MAX_CHAR_VAL    0xff
-#define HB_CHRMAP(a,c)  ( ( (a) << 16 ) | (c) )
+#define MAX_CHAR_VAL 0xff
+#define HB_CHRMAP( a, c ) ( ( ( a ) << 16 ) | ( c ) )
 
 char * s_szDefaultCharMapFile = "/etc/harbour/hb-charmap.def";
 
-static void chrmap_init( int *piTransTbl )
+static void chrmap_init( int * piTransTbl )
 {
    int i;
 
    for( i = 0; i < 256; ++i )
-      piTransTbl[i] = HB_CHRMAP( i < 128 ? 1 : 0, i );
+      piTransTbl[ i ] = HB_CHRMAP( i < 128 ? 1 : 0, i );
 
-   piTransTbl[155] = HB_CHRMAP( 1, '.' );
+   piTransTbl[ 155 ] = HB_CHRMAP( 1, '.' );
 }
 
-static void chrmap_dotctrl( int *piTransTbl )
+static void chrmap_dotctrl( int * piTransTbl )
 {
    int i;
 
    for( i = 0; i < 32; ++i )
-      piTransTbl[i] = piTransTbl[i+128] = HB_CHRMAP( 1, '.' );
+      piTransTbl[ i ] = piTransTbl[ i + 128 ] = HB_CHRMAP( 1, '.' );
 }
 
-static void chrmap_ascictrl( int *piTransTbl )
+static void chrmap_ascictrl( int * piTransTbl )
 {
-   piTransTbl[04] = HB_CHRMAP( 1, '#' );
-   piTransTbl[16] = HB_CHRMAP( 1, '>' );
-   piTransTbl[17] = HB_CHRMAP( 1, '<' );
-   piTransTbl[30] = HB_CHRMAP( 1, '^' );
-   piTransTbl[31] = HB_CHRMAP( 1, 'v' );
-   piTransTbl[24] = HB_CHRMAP( 1, '^' );
-   piTransTbl[25] = HB_CHRMAP( 1, 'v' );
-   piTransTbl[26] = HB_CHRMAP( 1, '>' );
-   piTransTbl[27] = HB_CHRMAP( 1, '<' );
+   piTransTbl[ 04 ]  = HB_CHRMAP( 1, '#' );
+   piTransTbl[ 16 ]  = HB_CHRMAP( 1, '>' );
+   piTransTbl[ 17 ]  = HB_CHRMAP( 1, '<' );
+   piTransTbl[ 30 ]  = HB_CHRMAP( 1, '^' );
+   piTransTbl[ 31 ]  = HB_CHRMAP( 1, 'v' );
+   piTransTbl[ 24 ]  = HB_CHRMAP( 1, '^' );
+   piTransTbl[ 25 ]  = HB_CHRMAP( 1, 'v' );
+   piTransTbl[ 26 ]  = HB_CHRMAP( 1, '>' );
+   piTransTbl[ 27 ]  = HB_CHRMAP( 1, '<' );
 }
 
-static void chrmap_acscbox( int *piTransTbl )
+static void chrmap_acscbox( int * piTransTbl )
 {
-   piTransTbl[ 04] = HB_CHRMAP( 5, '`' ); /* ACS_DIAMOND */
-   piTransTbl[ 16] = HB_CHRMAP( 5, '+' ); /* ACS_RARROW */
-   piTransTbl[ 17] = HB_CHRMAP( 5, ',' ); /* ACS_LARROW */
-   piTransTbl[ 24] = HB_CHRMAP( 5, '-' ); /* ACS_UARROW */
-   piTransTbl[ 25] = HB_CHRMAP( 5, '.' ); /* ACS_DARROW */
-   piTransTbl[ 26] = HB_CHRMAP( 5, '+' ); /* ACS_RARROW */
-   piTransTbl[ 27] = HB_CHRMAP( 5, ',' ); /* ACS_LARROW */
-   piTransTbl[ 30] = HB_CHRMAP( 5, '-' ); /* ACS_UARROW */
-   piTransTbl[ 31] = HB_CHRMAP( 5, '.' ); /* ACS_DARROW */
+   piTransTbl[ 04 ]  = HB_CHRMAP( 5, '`' );  /* ACS_DIAMOND */
+   piTransTbl[ 16 ]  = HB_CHRMAP( 5, '+' );  /* ACS_RARROW */
+   piTransTbl[ 17 ]  = HB_CHRMAP( 5, ',' );  /* ACS_LARROW */
+   piTransTbl[ 24 ]  = HB_CHRMAP( 5, '-' );  /* ACS_UARROW */
+   piTransTbl[ 25 ]  = HB_CHRMAP( 5, '.' );  /* ACS_DARROW */
+   piTransTbl[ 26 ]  = HB_CHRMAP( 5, '+' );  /* ACS_RARROW */
+   piTransTbl[ 27 ]  = HB_CHRMAP( 5, ',' );  /* ACS_LARROW */
+   piTransTbl[ 30 ]  = HB_CHRMAP( 5, '-' );  /* ACS_UARROW */
+   piTransTbl[ 31 ]  = HB_CHRMAP( 5, '.' );  /* ACS_DARROW */
 
-   piTransTbl[176] = HB_CHRMAP( 5, 'h' ); /* ACS_BOARD */
-   piTransTbl[177] = HB_CHRMAP( 5, 'a' ); /* ACS_CKBOARD */
-   piTransTbl[178] = HB_CHRMAP( 5, '0' ); /* ACS_BLOCK */
-   piTransTbl[179] = HB_CHRMAP( 5, 'x' ); /* ACS_VLINE */
-   piTransTbl[180] = HB_CHRMAP( 5, 'u' ); /* ACS_RTEE */
-   piTransTbl[181] = HB_CHRMAP( 5, 'u' ); /* ACS_RTEE */
-   piTransTbl[182] = HB_CHRMAP( 5, 'u' ); /* ACS_RTEE */
-   piTransTbl[183] = HB_CHRMAP( 5, 'k' ); /* ACS_URCORNER */
-   piTransTbl[184] = HB_CHRMAP( 5, 'k' ); /* ACS_URCORNER */
-   piTransTbl[185] = HB_CHRMAP( 5, 'u' ); /* ACS_RTEE */
-   piTransTbl[186] = HB_CHRMAP( 5, 'x' ); /* ACS_VLINE */
-   piTransTbl[187] = HB_CHRMAP( 5, 'k' ); /* ACS_URCORNER */
-   piTransTbl[188] = HB_CHRMAP( 5, 'j' ); /* ACS_LRCORNER */
-   piTransTbl[189] = HB_CHRMAP( 5, 'j' ); /* ACS_LRCORNER */
-   piTransTbl[190] = HB_CHRMAP( 5, 'j' ); /* ACS_LRCORNER */
-   piTransTbl[191] = HB_CHRMAP( 5, 'k' ); /* ACS_URCORNER */
-   piTransTbl[192] = HB_CHRMAP( 5, 'm' ); /* ACS_LLCORNER */
-   piTransTbl[193] = HB_CHRMAP( 5, 'v' ); /* ACS_BTEE */
-   piTransTbl[194] = HB_CHRMAP( 5, 'w' ); /* ACS_TTEE */
-   piTransTbl[195] = HB_CHRMAP( 5, 't' ); /* ACS_LTEE */
-   piTransTbl[196] = HB_CHRMAP( 5, 'q' ); /* ACS_HLINE */
-   piTransTbl[197] = HB_CHRMAP( 5, 'n' ); /* ACS_PLUS */
-   piTransTbl[198] = HB_CHRMAP( 5, 't' ); /* ACS_LTEE */
-   piTransTbl[199] = HB_CHRMAP( 5, 't' ); /* ACS_LTEE */
-   piTransTbl[200] = HB_CHRMAP( 5, 'm' ); /* ACS_LLCORNER */
-   piTransTbl[201] = HB_CHRMAP( 5, 'l' ); /* ACS_ULCORNER */
-   piTransTbl[202] = HB_CHRMAP( 5, 'v' ); /* ACS_BTEE */
-   piTransTbl[203] = HB_CHRMAP( 5, 'w' ); /* ACS_TTEE */
-   piTransTbl[204] = HB_CHRMAP( 5, 't' ); /* ACS_LTEE */
-   piTransTbl[205] = HB_CHRMAP( 5, 'q' ); /* ACS_HLINE */
-   piTransTbl[206] = HB_CHRMAP( 5, 'n' ); /* ACS_PLUS */
-   piTransTbl[207] = HB_CHRMAP( 5, 'v' ); /* ACS_BTEE */
-   piTransTbl[208] = HB_CHRMAP( 5, 'v' ); /* ACS_BTEE */
-   piTransTbl[209] = HB_CHRMAP( 5, 'w' ); /* ACS_TTEE */
-   piTransTbl[210] = HB_CHRMAP( 5, 'w' ); /* ACS_TTEE */
-   piTransTbl[211] = HB_CHRMAP( 5, 'm' ); /* ACS_LLCORNER */
-   piTransTbl[212] = HB_CHRMAP( 5, 'm' ); /* ACS_LLCORNER */
-   piTransTbl[213] = HB_CHRMAP( 5, 'l' ); /* ACS_ULCORNER */
-   piTransTbl[214] = HB_CHRMAP( 5, 'l' ); /* ACS_ULCORNER */
-   piTransTbl[215] = HB_CHRMAP( 5, 'n' ); /* ACS_PLUS */
-   piTransTbl[216] = HB_CHRMAP( 5, 'n' ); /* ACS_PLUS */
-   piTransTbl[217] = HB_CHRMAP( 5, 'j' ); /* ACS_LRCORNER */
-   piTransTbl[218] = HB_CHRMAP( 5, 'l' ); /* ACS_ULCORNER */
+   piTransTbl[ 176 ] = HB_CHRMAP( 5, 'h' );  /* ACS_BOARD */
+   piTransTbl[ 177 ] = HB_CHRMAP( 5, 'a' );  /* ACS_CKBOARD */
+   piTransTbl[ 178 ] = HB_CHRMAP( 5, '0' );  /* ACS_BLOCK */
+   piTransTbl[ 179 ] = HB_CHRMAP( 5, 'x' );  /* ACS_VLINE */
+   piTransTbl[ 180 ] = HB_CHRMAP( 5, 'u' );  /* ACS_RTEE */
+   piTransTbl[ 181 ] = HB_CHRMAP( 5, 'u' );  /* ACS_RTEE */
+   piTransTbl[ 182 ] = HB_CHRMAP( 5, 'u' );  /* ACS_RTEE */
+   piTransTbl[ 183 ] = HB_CHRMAP( 5, 'k' );  /* ACS_URCORNER */
+   piTransTbl[ 184 ] = HB_CHRMAP( 5, 'k' );  /* ACS_URCORNER */
+   piTransTbl[ 185 ] = HB_CHRMAP( 5, 'u' );  /* ACS_RTEE */
+   piTransTbl[ 186 ] = HB_CHRMAP( 5, 'x' );  /* ACS_VLINE */
+   piTransTbl[ 187 ] = HB_CHRMAP( 5, 'k' );  /* ACS_URCORNER */
+   piTransTbl[ 188 ] = HB_CHRMAP( 5, 'j' );  /* ACS_LRCORNER */
+   piTransTbl[ 189 ] = HB_CHRMAP( 5, 'j' );  /* ACS_LRCORNER */
+   piTransTbl[ 190 ] = HB_CHRMAP( 5, 'j' );  /* ACS_LRCORNER */
+   piTransTbl[ 191 ] = HB_CHRMAP( 5, 'k' );  /* ACS_URCORNER */
+   piTransTbl[ 192 ] = HB_CHRMAP( 5, 'm' );  /* ACS_LLCORNER */
+   piTransTbl[ 193 ] = HB_CHRMAP( 5, 'v' );  /* ACS_BTEE */
+   piTransTbl[ 194 ] = HB_CHRMAP( 5, 'w' );  /* ACS_TTEE */
+   piTransTbl[ 195 ] = HB_CHRMAP( 5, 't' );  /* ACS_LTEE */
+   piTransTbl[ 196 ] = HB_CHRMAP( 5, 'q' );  /* ACS_HLINE */
+   piTransTbl[ 197 ] = HB_CHRMAP( 5, 'n' );  /* ACS_PLUS */
+   piTransTbl[ 198 ] = HB_CHRMAP( 5, 't' );  /* ACS_LTEE */
+   piTransTbl[ 199 ] = HB_CHRMAP( 5, 't' );  /* ACS_LTEE */
+   piTransTbl[ 200 ] = HB_CHRMAP( 5, 'm' );  /* ACS_LLCORNER */
+   piTransTbl[ 201 ] = HB_CHRMAP( 5, 'l' );  /* ACS_ULCORNER */
+   piTransTbl[ 202 ] = HB_CHRMAP( 5, 'v' );  /* ACS_BTEE */
+   piTransTbl[ 203 ] = HB_CHRMAP( 5, 'w' );  /* ACS_TTEE */
+   piTransTbl[ 204 ] = HB_CHRMAP( 5, 't' );  /* ACS_LTEE */
+   piTransTbl[ 205 ] = HB_CHRMAP( 5, 'q' );  /* ACS_HLINE */
+   piTransTbl[ 206 ] = HB_CHRMAP( 5, 'n' );  /* ACS_PLUS */
+   piTransTbl[ 207 ] = HB_CHRMAP( 5, 'v' );  /* ACS_BTEE */
+   piTransTbl[ 208 ] = HB_CHRMAP( 5, 'v' );  /* ACS_BTEE */
+   piTransTbl[ 209 ] = HB_CHRMAP( 5, 'w' );  /* ACS_TTEE */
+   piTransTbl[ 210 ] = HB_CHRMAP( 5, 'w' );  /* ACS_TTEE */
+   piTransTbl[ 211 ] = HB_CHRMAP( 5, 'm' );  /* ACS_LLCORNER */
+   piTransTbl[ 212 ] = HB_CHRMAP( 5, 'm' );  /* ACS_LLCORNER */
+   piTransTbl[ 213 ] = HB_CHRMAP( 5, 'l' );  /* ACS_ULCORNER */
+   piTransTbl[ 214 ] = HB_CHRMAP( 5, 'l' );  /* ACS_ULCORNER */
+   piTransTbl[ 215 ] = HB_CHRMAP( 5, 'n' );  /* ACS_PLUS */
+   piTransTbl[ 216 ] = HB_CHRMAP( 5, 'n' );  /* ACS_PLUS */
+   piTransTbl[ 217 ] = HB_CHRMAP( 5, 'j' );  /* ACS_LRCORNER */
+   piTransTbl[ 218 ] = HB_CHRMAP( 5, 'l' );  /* ACS_ULCORNER */
 
 #if 0
-   piTransTbl[219] = HB_CHRMAP( 5, '`' ); /* ACS_DIAMOND */
-   piTransTbl[220] = HB_CHRMAP( 5, '`' ); /* ACS_DIAMOND */
-   piTransTbl[221] = HB_CHRMAP( 5, '`' ); /* ACS_DIAMOND */
-   piTransTbl[222] = HB_CHRMAP( 5, '`' ); /* ACS_DIAMOND */
-   piTransTbl[223] = HB_CHRMAP( 5, '`' ); /* ACS_DIAMOND */
+   piTransTbl[ 219 ] = HB_CHRMAP( 5, '`' );  /* ACS_DIAMOND */
+   piTransTbl[ 220 ] = HB_CHRMAP( 5, '`' );  /* ACS_DIAMOND */
+   piTransTbl[ 221 ] = HB_CHRMAP( 5, '`' );  /* ACS_DIAMOND */
+   piTransTbl[ 222 ] = HB_CHRMAP( 5, '`' );  /* ACS_DIAMOND */
+   piTransTbl[ 223 ] = HB_CHRMAP( 5, '`' );  /* ACS_DIAMOND */
 #endif
 }
 
-static void skip_blank( char **buf )
+static void skip_blank( char ** buf )
 {
    while( **buf != '\0' && **buf == ' ' )
-      ++(*buf);
+      ++( *buf );
 }
 
-static int get_val( char **buf )
+static int get_val( char ** buf )
 {
-   int n = -1;
-   char c;
+   int   n = -1;
+   char  c;
 
-   if( (*buf)[0] == '\'' && (*buf)[1] != '\0' && (*buf)[2] == '\'' )
+   if( ( *buf )[ 0 ] == '\'' && ( *buf )[ 1 ] != '\0' && ( *buf )[ 2 ] == '\'' )
    {
-      n = (*buf)[1] & 0xff;
-      *buf+=3;
+      n     = ( *buf )[ 1 ] & 0xff;
+      *buf  += 3;
    }
-   else if( (*buf)[0] == '0' && ((*buf)[1] == 'x' || (*buf)[1] == 'X') )
+   else if( ( *buf )[ 0 ] == '0' && ( ( *buf )[ 1 ] == 'x' || ( *buf )[ 1 ] == 'X' ) )
    {
-      n = 0;
-      *buf+=2;
-      for(; (**buf >= '0' && **buf <= '9') ||
-            (**buf >= 'A' && **buf <= 'F') ||
-            (**buf >= 'a' && **buf <= 'f'); (*buf)++ )
+      n     = 0;
+      *buf  += 2;
+      for(; ( **buf >= '0' && **buf <= '9' ) ||
+          ( **buf >= 'A' && **buf <= 'F' ) ||
+          ( **buf >= 'a' && **buf <= 'f' ); ( *buf )++ )
       {
-         c = **buf | 0x20;
-         n = (n << 4) + c - (c > '9' ? ('a' - 10) : '0');
+         c  = **buf | 0x20;
+         n  = ( n << 4 ) + c - ( c > '9' ? ( 'a' - 10 ) : '0' );
       }
    }
    else if( **buf >= '0' && **buf <= '9' )
    {
       n = 0;
-      for(; (**buf >= '0' && **buf <= '9'); (*buf)++ )
-         n = n * 10 + (**buf - '0');
+      for(; ( **buf >= '0' && **buf <= '9' ); ( *buf )++ )
+         n = n * 10 + ( **buf - '0' );
    }
    return n > 0xff ? -1 : n;
 }
 
-static int parse_line( char *buf, int *from, int *to, char *op, int *val, int *mod )
+static int parse_line( char * buf, int * from, int * to, char * op, int * val, int * mod )
 {
-   char *s, *s2;
-   int ret = 0, ina = 0;
+   char *   s, * s2;
+   int      ret = 0, ina = 0;
 
    s = buf;
    while( *s != '\0' )
@@ -208,10 +208,10 @@ static int parse_line( char *buf, int *from, int *to, char *op, int *val, int *m
       switch( *s )
       {
          case '\t':
-            *s = ' ';
+            *s    = ' ';
             break;
          case '\'':
-            ina ^= 1;
+            ina   ^= 1;
             if( ina )
                ++s;
             break;
@@ -231,16 +231,16 @@ static int parse_line( char *buf, int *from, int *to, char *op, int *val, int *m
    if( *s == '@' )
    {
       ++s;
-      s2 = buf;
+      s2    = buf;
       while( *s != '\0' && *s != ' ' )
          *s2++ = *s++;
-      *s2 = '\0';
-      ret = strlen( buf ) > 0 ? 2 : -1;
+      *s2   = '\0';
+      ret   = strlen( buf ) > 0 ? 2 : -1;
    }
    else if( *s != '\0' )
    {
-      ret = *from = *to = *val = *mod = -1;
-      *op = '=';
+      ret   = *from = *to = *val = *mod = -1;
+      *op   = '=';
 
       *from = get_val( &s );
       if( *from >= 0 )
@@ -254,16 +254,16 @@ static int parse_line( char *buf, int *from, int *to, char *op, int *val, int *m
             *to = *from;
       }
 
-      if( *to >= 0 && *s == ':' && s[1] == ' ' )
+      if( *to >= 0 && *s == ':' && s[ 1 ] == ' ' )
       {
          ++s;
          skip_blank( &s );
-         if( *s == '*' && (s[1] == '+' || s[1] == '-' || s[1] == '&' ||
-                           s[1] == '|' || s[1] == '^' || s[1] == '=' ||
-                           s[1] == ' ') )
+         if( *s == '*' && ( s[ 1 ] == '+' || s[ 1 ] == '-' || s[ 1 ] == '&' ||
+                            s[ 1 ] == '|' || s[ 1 ] == '^' || s[ 1 ] == '=' ||
+                            s[ 1 ] == ' ' ) )
          {
-            *op = s[1];
-            s+=2;
+            *op   = s[ 1 ];
+            s     += 2;
          }
          *val = *op == ' ' ? 0 : get_val( &s );
          if( *val >= 0 )
@@ -271,7 +271,7 @@ static int parse_line( char *buf, int *from, int *to, char *op, int *val, int *m
             skip_blank( &s );
             *mod = get_val( &s );
             skip_blank( &s );
-            if( *mod >=0 && *mod <= 5 && *s == '\0' )
+            if( *mod >= 0 && *mod <= 5 && *s == '\0' )
                ret = 1;
          }
       }
@@ -279,17 +279,17 @@ static int parse_line( char *buf, int *from, int *to, char *op, int *val, int *m
    return ret;
 }
 
-static int chrmap_parse( FILE *fp, const char *pszTerm, int *nTransTbl, const char *pszFile )
+static int chrmap_parse( FILE * fp, const char * pszTerm, int * nTransTbl, const char * pszFile )
 {
-   int line = 0, from = 0, to = 0, val = 0, mod = 0, i, n;
-   char buf[256], *s, op = 0;
-   int isTerm = 0;
-   fpos_t pos;
+   int      line     = 0, from = 0, to = 0, val = 0, mod = 0, i, n;
+   char     buf[ 256 ], * s, op = 0;
+   int      isTerm   = 0;
+   fpos_t   pos;
 
    fgetpos( fp, &pos );
    fseek( fp, 0, SEEK_SET );
 
-   while( !feof( fp ) && isTerm < 2 )
+   while( ! feof( fp ) && isTerm < 2 )
    {
       ++line;
       if( fgets( buf, sizeof( buf ), fp ) != NULL )
@@ -301,18 +301,18 @@ static int chrmap_parse( FILE *fp, const char *pszTerm, int *nTransTbl, const ch
                isTerm = 2;
             else
             {
-               *buf = '|';
-               s = buf;
+               *buf  = '|';
+               s     = buf;
                while( *s != '\0' && *s != ' ' && *s != '\t' &&
                       *s != '\n' && *s != '\r' )
                   ++s;
                *s = '\0';
-               s = buf;
-               i = strlen( pszTerm );
+               s  = buf;
+               i  = strlen( pszTerm );
                while( isTerm == 0 && ( s = strstr( s + 1, pszTerm ) ) != NULL )
                {
-                  if( *(s-1) == '|' &&
-                      ( s[i] == '|' || s[i] == '\0' ) )
+                  if( *( s - 1 ) == '|' &&
+                      ( s[ i ] == '|' || s[ i ] == '\0' ) )
                      isTerm = 1;
                }
             }
@@ -334,30 +334,30 @@ static int chrmap_parse( FILE *fp, const char *pszTerm, int *nTransTbl, const ch
                switch( op )
                {
                   case '|':
-                     nTransTbl[i] = ( i | val );
+                     nTransTbl[ i ] = ( i | val );
                      break;
                   case '&':
-                     nTransTbl[i] = ( i & val );
+                     nTransTbl[ i ] = ( i & val );
                      break;
                   case '^':
-                     nTransTbl[i] = ( i ^ val );
+                     nTransTbl[ i ] = ( i ^ val );
                      break;
                   case '+':
-                     nTransTbl[i] = ( i + val ) & 0xff;
+                     nTransTbl[ i ] = ( i + val ) & 0xff;
                      break;
                   case '-':
-                     nTransTbl[i] = ( i - val ) & 0xff;
+                     nTransTbl[ i ] = ( i - val ) & 0xff;
                      break;
                   case '=':
-                     nTransTbl[i] = val;
+                     nTransTbl[ i ] = val;
                      break;
                   case '*':
                   case ' ':
                   default:
-                     nTransTbl[i] = i;
+                     nTransTbl[ i ] = i;
                      break;
                }
-               nTransTbl[i] |= mod << 16;
+               nTransTbl[ i ] |= mod << 16;
             }
          }
          else if( n == -1 )
@@ -372,19 +372,19 @@ static int chrmap_parse( FILE *fp, const char *pszTerm, int *nTransTbl, const ch
    return isTerm;
 }
 
-static int hb_gt_chrmapread( const char *pszFile, const char *pszTerm, int *nTransTbl )
+static int hb_gt_chrmapread( const char * pszFile, const char * pszTerm, int * nTransTbl )
 {
-   FILE *fp;
-   char buf[256], *ptr, *pTerm;
-   int isTerm = -1;
+   FILE *   fp;
+   char     buf[ 256 ], * ptr, * pTerm;
+   int      isTerm = -1;
 
    fp = hb_fopen( pszFile, "r" );
 
    if( fp != NULL )
    {
       hb_strncpy( buf, pszTerm, sizeof( buf ) - 1 );
-      isTerm = 0;
-      pTerm = buf;
+      isTerm   = 0;
+      pTerm    = buf;
       while( pTerm )
       {
          if( ( ptr = strchr( pTerm, '/' ) ) != NULL )
@@ -401,20 +401,20 @@ static int hb_gt_chrmapread( const char *pszFile, const char *pszTerm, int *nTra
    return isTerm;
 }
 
-int hb_gt_chrmapinit( int *piTransTbl, const char *pszTerm, BOOL fSetACSC )
+int hb_gt_chrmapinit( int * piTransTbl, const char * pszTerm, BOOL fSetACSC )
 {
-   char *pszFree = NULL, *pszFile, szFile[ HB_PATH_MAX ];
-   int nRet = -1;
+   char *   pszFree  = NULL, * pszFile, szFile[ HB_PATH_MAX ];
+   int      nRet     = -1;
 
    chrmap_init( piTransTbl );
 
    if( pszTerm == NULL || *pszTerm == '\0' )
-      pszTerm = pszFree = hb_getenv("HB_TERM");
+      pszTerm = pszFree = hb_getenv( "HB_TERM" );
    if( pszTerm == NULL || *pszTerm == '\0' )
    {
       if( pszFree )
          hb_xfree( pszFree );
-      pszTerm = pszFree = hb_getenv("TERM");
+      pszTerm = pszFree = hb_getenv( "TERM" );
    }
 
    if( pszTerm != NULL && *pszTerm != '\0' )
@@ -428,7 +428,7 @@ int hb_gt_chrmapinit( int *piTransTbl, const char *pszTerm, BOOL fSetACSC )
             hb_xfree( pszFile );
          pszFile = hb_getenv( "HB_ROOT" );
          if( pszFile != NULL && sizeof( szFile ) >
-                        strlen( pszFile ) + strlen( s_szDefaultCharMapFile ) )
+             strlen( pszFile ) + strlen( s_szDefaultCharMapFile ) )
          {
             hb_strncpy( szFile, pszFile, sizeof( szFile ) - 1 );
             hb_strncat( szFile, s_szDefaultCharMapFile, sizeof( szFile ) - 1 );
@@ -457,8 +457,8 @@ int hb_gt_chrmapinit( int *piTransTbl, const char *pszTerm, BOOL fSetACSC )
 }
 
 /*
-int main(int argc, char **argv)
-{
+   int main(int argc, char **argv)
+   {
    int piTransTbl[256], i;
 
    if( hb_gt_chrmapinit( piTransTbl, NULL ) == -1 )
@@ -471,7 +471,7 @@ int main(int argc, char **argv)
       printf("%3d -> %3d : %d\n", i, piTransTbl[i]&0xff, piTransTbl[i]>>16);
 
    return 0;
-}
-*/
+   }
+ */
 
 #endif /* HB_OS_UNIX */

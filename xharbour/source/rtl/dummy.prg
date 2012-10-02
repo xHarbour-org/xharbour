@@ -52,9 +52,10 @@
 
 #include "hbsetup.ch"
 
-/* TODO: Dummy functions, should be removed when implemented. */
+   /* TODO: Dummy functions, should be removed when implemented. */
 
-/* NOTE: Internal functions */
+   /* NOTE: Internal functions */
+
 FUNCTION __dbFList()       ; RETURN {}
 
 #PRAGMA BEGINDUMP
@@ -65,4 +66,5 @@ HB_EXTERN_BEGIN
 */
 void hb_compSetDeferredFlagOn( void ) {;}
 HB_EXTERN_END
-#PRAGMA ENDDUMP
+
+#pragma ENDDUMP

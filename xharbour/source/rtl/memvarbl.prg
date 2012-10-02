@@ -1,4 +1,4 @@
-/* 
+/*
  * $Id$
  */
 
@@ -54,10 +54,10 @@
 
 #include "common.ch"
 
-FUNCTION MEMVARBLOCK( cMemvar )
+FUNCTION MemVarBlock( cMemvar )
 
-   IF ISCHARACTER( cMemvar ) .AND. __mvSCOPE( cMemvar ) > HB_MV_ERROR
-      RETURN {| x | iif( x == NIL, __mvGET( cMemvar ), __mvPUT( cMemvar, x ) ) }
+   IF ISCHARACTER( cMemvar ) .AND. __mvScope( cMemvar ) > HB_MV_ERROR
+      RETURN {| x | iif( x == NIL, __mvGet( cMemvar ), __mvPut( cMemvar, x ) ) }
    ENDIF
 
    RETURN NIL

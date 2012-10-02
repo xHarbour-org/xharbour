@@ -69,14 +69,14 @@ HB_FUNC( REPLICATE )
 
          if( ( double ) ( ( double ) ulLen * ( double ) lTimes ) < ( double ) ULONG_MAX )
          {
-            const char * szText = hb_parcx( 1 );
-            char * szResult = ( char * ) hb_xgrab( ( ulLen * lTimes ) + 1 );
-            char * szPtr = szResult;
-            LONG i;
+            const char *   szText   = hb_parcx( 1 );
+            char *         szResult = ( char * ) hb_xgrab( ( ulLen * lTimes ) + 1 );
+            char *         szPtr    = szResult;
+            LONG           i;
 
             for( i = 0; i < lTimes; i++ )
             {
-               hb_xmemcpy( szPtr, szText, (size_t) ulLen );
+               hb_xmemcpy( szPtr, szText, ( size_t ) ulLen );
                szPtr += ulLen;
             }
 

@@ -62,19 +62,19 @@
 #include "hbinit.h"
 #include "hbdate.h"
 
-#if defined( HB_OS_UNIX ) && ( !defined( __WATCOMC__ ) || __WATCOMC__ > 1290 ) && \
-    !defined( HB_OS_SYMBIAN ) /* || defined( __DJGPP__ ) */
+#if defined( HB_OS_UNIX ) && ( ! defined( __WATCOMC__ ) || __WATCOMC__ > 1290 ) && \
+   ! defined( HB_OS_SYMBIAN ) /* || defined( __DJGPP__ ) */
 #  if defined( HB_OS_VXWORKS )
-#     if !defined( HB_HAS_SIOLIB )
+#     if ! defined( HB_HAS_SIOLIB )
 #        define HB_HAS_SIOLIB
 #     endif
 #  else
-#     if !defined( HB_HAS_TERMIOS )
+#     if ! defined( HB_HAS_TERMIOS )
 #        define HB_HAS_TERMIOS
 #     endif
 #  endif
 #  if defined( HB_OS_SUNOS )
-#     if !defined( BSD_COMP )
+#     if ! defined( BSD_COMP )
 #        define BSD_COMP
 #     endif
 #  endif
@@ -115,24 +115,24 @@
 typedef struct
 {
 #if defined( HB_HAS_TERMIOS )
-   HB_FHANDLE     fd;
-#  if !defined( HB_OS_UNIX )
-   HB_MAXINT      rdtimeout;
+   HB_FHANDLE fd;
+#  if ! defined( HB_OS_UNIX )
+   HB_MAXINT rdtimeout;
 #  endif
 #elif defined( HB_OS_WIN )
-   HANDLE         hComm;
-   HB_MAXINT      rdtimeout;
-   HB_MAXINT      wrtimeout;
+   HANDLE hComm;
+   HB_MAXINT rdtimeout;
+   HB_MAXINT wrtimeout;
 #elif defined( HB_OS_OS2 )
-   HFILE          hFile;
-   USHORT         rdtimeout;
-   USHORT         wrtimeout;
+   HFILE hFile;
+   USHORT rdtimeout;
+   USHORT wrtimeout;
 #endif
-   int            status;
-   int            error;
-   int            oserr;
-   int            port;
-   char *         name;
+   int status;
+   int error;
+   int oserr;
+   int port;
+   char * name;
 /* struct termios tio; */
 }
 HB_COM, * PHB_COM;
@@ -214,8 +214,8 @@ static const char * hb_comGetName( PHB_COM pCom, char * buffer, int size )
 
 const char * hb_comGetDevice( int iPort, char * buffer, int size )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_ANY );
-   const char * pszName = NULL;
+   PHB_COM        pCom     = hb_comGetPort( iPort, HB_COM_ANY );
+   const char *   pszName  = NULL;
 
    if( pCom )
    {
@@ -244,8 +244,8 @@ int hb_comSetDevice( int iPort, const char * szDevName )
 
 HB_FHANDLE hb_comGetDeviceHandle( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_ANY );
-   HB_FHANDLE hFile = FS_ERROR;
+   PHB_COM     pCom  = hb_comGetPort( iPort, HB_COM_ANY );
+   HB_FHANDLE  hFile = FS_ERROR;
 
    if( pCom )
    {
@@ -264,6 +264,7 @@ HB_FHANDLE hb_comGetDeviceHandle( int iPort )
 void hb_comSetError( int iPort, int iError )
 {
    PHB_COM pCom = hb_comGetPort( iPort, HB_COM_ANY );
+
    if( pCom )
       pCom->error = iError;
 }
@@ -271,12 +272,14 @@ void hb_comSetError( int iPort, int iError )
 int hb_comGetError( int iPort )
 {
    PHB_COM pCom = hb_comGetPort( iPort, HB_COM_ANY );
+
    return pCom ? pCom->error : HB_COM_ERR_WRONGPORT;
 }
 
 int hb_comGetOsError( int iPort )
 {
    PHB_COM pCom = hb_comGetPort( iPort, HB_COM_ANY );
+
    return pCom ? pCom->oserr : 0;
 }
 
@@ -294,9 +297,9 @@ int hb_comLastNum( void )
 
 #if defined( HB_HAS_TERMIOS )
 
-#define HB_COM_IS_EINTR()     ( errno == EINTR )
-#define HB_COM_IS_EBADF()     ( errno == EBADF )
-#define HB_COM_GETERROR()     ( errno )
+#define HB_COM_IS_EINTR()  ( errno == EINTR )
+#define HB_COM_IS_EBADF()  ( errno == EBADF )
+#define HB_COM_GETERROR()  ( errno )
 
 #if defined( HB_OS_LINUX )
 #  define HB_HAS_SELECT_TIMER
@@ -338,26 +341,27 @@ static void hb_comSetOsError( PHB_COM pCom, HB_BOOL fError )
 static int hb_comCanRead( PHB_COM pCom, HB_MAXINT timeout )
 {
    struct timeval tv;
-   fd_set rfds;
-   int iResult;
-#if !defined( HB_HAS_SELECT_TIMER )
-   HB_MAXUINT timer = timeout <= 0 ? 0 : hb_dateMilliSeconds();
+   fd_set         rfds;
+   int            iResult;
+
+#if ! defined( HB_HAS_SELECT_TIMER )
+   HB_MAXUINT     timer = timeout <= 0 ? 0 : hb_dateMilliSeconds();
 #endif
 
-   for( ;; )
+   for(;; )
    {
       FD_ZERO( &rfds );
       FD_SET( pCom->fd, &rfds );
 
       if( timeout < 0 )
       {
-         tv.tv_sec = 1;
-         tv.tv_usec = 0;
+         tv.tv_sec   = 1;
+         tv.tv_usec  = 0;
       }
       else
       {
-         tv.tv_sec = ( long ) ( timeout / 1000 );
-         tv.tv_usec = ( timeout % 1000 ) * 1000;
+         tv.tv_sec   = ( long ) ( timeout / 1000 );
+         tv.tv_usec  = ( timeout % 1000 ) * 1000;
       }
 
       iResult = select( ( int ) ( pCom->fd + 1 ), &rfds, NULL, NULL, &tv );
@@ -367,7 +371,7 @@ static int hb_comCanRead( PHB_COM pCom, HB_MAXINT timeout )
       if( iResult != -1 || timeout == 0 || ! HB_COM_IS_EINTR() ||
           hb_vmRequestQuery() != 0 )
          break;
-#if !defined( HB_HAS_SELECT_TIMER )
+#if ! defined( HB_HAS_SELECT_TIMER )
       else if( timeout > 0 )
       {
          HB_MAXUINT timecurr = hb_dateMilliSeconds();
@@ -388,26 +392,27 @@ static int hb_comCanRead( PHB_COM pCom, HB_MAXINT timeout )
 static int hb_comCanWrite( PHB_COM pCom, HB_MAXINT timeout )
 {
    struct timeval tv;
-   fd_set wfds;
-   int iResult;
-#if !defined( HB_HAS_SELECT_TIMER )
-   HB_MAXUINT timer = timeout <= 0 ? 0 : hb_dateMilliSeconds();
+   fd_set         wfds;
+   int            iResult;
+
+#if ! defined( HB_HAS_SELECT_TIMER )
+   HB_MAXUINT     timer = timeout <= 0 ? 0 : hb_dateMilliSeconds();
 #endif
 
-   for( ;; )
+   for(;; )
    {
       FD_ZERO( &wfds );
       FD_SET( pCom->fd, &wfds );
 
       if( timeout < 0 )
       {
-         tv.tv_sec = 1;
-         tv.tv_usec = 0;
+         tv.tv_sec   = 1;
+         tv.tv_usec  = 0;
       }
       else
       {
-         tv.tv_sec = ( long ) ( timeout / 1000 );
-         tv.tv_usec = ( timeout % 1000 ) * 1000;
+         tv.tv_sec   = ( long ) ( timeout / 1000 );
+         tv.tv_usec  = ( timeout % 1000 ) * 1000;
       }
 
       iResult = select( ( int ) ( pCom->fd + 1 ), NULL, &wfds, NULL, &tv );
@@ -417,7 +422,7 @@ static int hb_comCanWrite( PHB_COM pCom, HB_MAXINT timeout )
       if( iResult != -1 || timeout == 0 || ! HB_COM_IS_EINTR() ||
           hb_vmRequestQuery() != 0 )
          break;
-#if !defined( HB_HAS_SELECT_TIMER )
+#if ! defined( HB_HAS_SELECT_TIMER )
       else if( timeout > 0 )
       {
          HB_MAXUINT timecurr = hb_dateMilliSeconds();
@@ -439,8 +444,8 @@ static int hb_comCanWrite( PHB_COM pCom, HB_MAXINT timeout )
 
 int hb_comInputCount( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iCount = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iCount   = 0;
 
    if( pCom )
    {
@@ -449,7 +454,7 @@ int hb_comInputCount( int iPort )
       if( iResult == -1 )
          iCount = 0;
       hb_comSetOsError( pCom, iResult == -1 );
-#elif defined( FIONREAD ) && !defined( HB_OS_CYGWIN )
+#elif defined( FIONREAD ) && ! defined( HB_OS_CYGWIN )
       /* Cygwin sys/termios.h explicitly says that "TIOCINQ is
        * utilized instead of FIONREAD which has been accupied for
        * other purposes under CYGWIN", so don't give Cygwin
@@ -471,8 +476,8 @@ int hb_comInputCount( int iPort )
 
 int hb_comOutputCount( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iCount = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iCount   = 0;
 
    if( pCom )
    {
@@ -499,8 +504,8 @@ int hb_comOutputCount( int iPort )
 
 int hb_comFlush( int iPort, int iType )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
 
    if( pCom )
    {
@@ -528,41 +533,41 @@ int hb_comFlush( int iPort, int iType )
 }
 
 /*
-TIOCM_LE          DSR (data set ready/line enable)
-TIOCM_DTR         DTR (data terminal ready)
-TIOCM_RTS         RTS (request to send)
-TIOCM_ST          Secondary TXD (transmit)
-TIOCM_SR          Secondary RXD (receive)
-TIOCM_CTS         CTS (clear to send)
-TIOCM_CAR         DCD (data carrier detect)
-TIOCM_CD           see TIOCM_CAR
-TIOCM_RNG         RNG (ring)
-TIOCM_RI           see TIOCM_RNG
-TIOCM_DSR         DSR (data set ready)
+   TIOCM_LE          DSR (data set ready/line enable)
+   TIOCM_DTR         DTR (data terminal ready)
+   TIOCM_RTS         RTS (request to send)
+   TIOCM_ST          Secondary TXD (transmit)
+   TIOCM_SR          Secondary RXD (receive)
+   TIOCM_CTS         CTS (clear to send)
+   TIOCM_CAR         DCD (data carrier detect)
+   TIOCM_CD           see TIOCM_CAR
+   TIOCM_RNG         RNG (ring)
+   TIOCM_RI           see TIOCM_RNG
+   TIOCM_DSR         DSR (data set ready)
 
-supported only by few platforms (i.e. newer Linux kernels >= 2.4)
-TIOCM_OUT1        OUT 1 (auxiliary user-designated output 2)
-TIOCM_OUT2        OUT 2 (auxiliary user-designated output 1)
-TIOCM_LOOP        LOOP (loopback mode)
-*/
+   supported only by few platforms (i.e. newer Linux kernels >= 2.4)
+   TIOCM_OUT1        OUT 1 (auxiliary user-designated output 2)
+   TIOCM_OUT2        OUT 2 (auxiliary user-designated output 1)
+   TIOCM_LOOP        LOOP (loopback mode)
+ */
 
 #ifdef HB_OS_LINUX
-   /* hack for missing defintions in standard header files */
+/* hack for missing defintions in standard header files */
 #  ifndef TIOCM_OUT1
-#     define TIOCM_OUT1    0x2000
+#     define TIOCM_OUT1 0x2000
 #  endif
 #  ifndef TIOCM_OUT2
-#     define TIOCM_OUT2    0x4000
+#     define TIOCM_OUT2 0x4000
 #  endif
 #  ifndef TIOCM_LOOP
-#     define TIOCM_LOOP    0x8000
+#     define TIOCM_LOOP 0x8000
 #  endif
 #endif
 
 int hb_comMCR( int iPort, int * piValue, int iClr, int iSet )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1, iValue = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1, iValue = 0;
 
    if( pCom )
    {
@@ -640,8 +645,8 @@ int hb_comMCR( int iPort, int * piValue, int iClr, int iSet )
 
 int hb_comMSR( int iPort, int * piValue )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1, iValue = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1, iValue = 0;
 
    if( pCom )
    {
@@ -675,8 +680,8 @@ int hb_comMSR( int iPort, int * piValue )
 
 int hb_comLSR( int iPort, int * piValue )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1, iValue = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1, iValue = 0;
 
    if( pCom )
    {
@@ -699,8 +704,8 @@ int hb_comLSR( int iPort, int * piValue )
 
 int hb_comSendBreak( int iPort, int iDurationInMilliSecs )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
 
    if( pCom )
    {
@@ -717,42 +722,42 @@ int hb_comSendBreak( int iPort, int iDurationInMilliSecs )
 }
 
 #if defined( CCTS_OFLOW ) && defined( CRTS_IFLOW )
-   #define _HB_OCRTSCTS       CCTS_OFLOW
-   #define _HB_ICRTSCTS       CRTS_IFLOW
+   #define _HB_OCRTSCTS    CCTS_OFLOW
+   #define _HB_ICRTSCTS    CRTS_IFLOW
 #elif defined( CRTSCTS ) && defined( CRTSXOFF )
-   #define _HB_OCRTSCTS       CRTSCTS
-   #define _HB_ICRTSCTS       CRTSXOFF
+   #define _HB_OCRTSCTS    CRTSCTS
+   #define _HB_ICRTSCTS    CRTSXOFF
 #elif defined( CRTSCTS )
-   #define _HB_OCRTSCTS       CRTSCTS
-   #define _HB_ICRTSCTS       CRTSCTS
+   #define _HB_OCRTSCTS    CRTSCTS
+   #define _HB_ICRTSCTS    CRTSCTS
 #elif defined( CNEW_RTSCTS )
-   #define _HB_OCRTSCTS       CNEW_RTSCTS
-   #define _HB_ICRTSCTS       CNEW_RTSCTS
+   #define _HB_OCRTSCTS    CNEW_RTSCTS
+   #define _HB_ICRTSCTS    CNEW_RTSCTS
 #elif defined( CCTS_OFLOW )
-   #define _HB_OCRTSCTS       CCTS_OFLOW
-   #define _HB_ICRTSCTS       0
+   #define _HB_OCRTSCTS    CCTS_OFLOW
+   #define _HB_ICRTSCTS    0
 #elif defined( CRTS_IFLOW )
-   #define _HB_OCRTSCTS       0
-   #define _HB_ICRTSCTS       CCTS_IFLOW
+   #define _HB_OCRTSCTS    0
+   #define _HB_ICRTSCTS    CCTS_IFLOW
 #elif defined( CRTSXOFF )
-   #define _HB_OCRTSCTS       0
-   #define _HB_ICRTSCTS       CRTSXOFF
+   #define _HB_OCRTSCTS    0
+   #define _HB_ICRTSCTS    CRTSXOFF
 #else
-   /* if you find compiler which does not support it then please check
-    * if such flow control is supported by OS. If yes then check exact
-    * value for this switch on given OS and define it only for given
-    * compiler and OS
-    */
+/* if you find compiler which does not support it then please check
+ * if such flow control is supported by OS. If yes then check exact
+ * value for this switch on given OS and define it only for given
+ * compiler and OS
+ */
    #if defined( HB_OS_LINUX ) && defined( __WATCOMC__ )
-      #define _HB_OCRTSCTS    020000000000
-      #define _HB_ICRTSCTS    020000000000
+      #define _HB_OCRTSCTS 020000000000
+      #define _HB_ICRTSCTS 020000000000
    #endif
 #endif
 
-int hb_comFlowControl( int iPort, int *piFlow, int iFlow )
+int hb_comFlowControl( int iPort, int * piFlow, int iFlow )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1, iValue = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1, iValue = 0;
 
    if( pCom )
    {
@@ -770,8 +775,8 @@ int hb_comFlowControl( int iPort, int *piFlow, int iFlow )
       hb_comSetOsError( pCom, iResult == -1 );
       if( iResult == 0 )
       {
-         tcflag_t c_cflag = tio.c_cflag;
-         tcflag_t c_iflag = tio.c_iflag;
+         tcflag_t c_cflag  = tio.c_cflag;
+         tcflag_t c_iflag  = tio.c_iflag;
 
 #if defined( _HB_OCRTSCTS )
          if( ( tio.c_cflag & _HB_OCRTSCTS ) == _HB_OCRTSCTS )
@@ -841,8 +846,8 @@ int hb_comFlowControl( int iPort, int *piFlow, int iFlow )
 
 int hb_comFlowSet( int iPort, int iFlow )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
 
    if( pCom )
    {
@@ -875,8 +880,8 @@ int hb_comFlowSet( int iPort, int iFlow )
 
 int hb_comFlowChars( int iPort, int iXONchar, int iXOFFchar )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
 
    if( pCom )
    {
@@ -900,14 +905,14 @@ int hb_comFlowChars( int iPort, int iXONchar, int iXOFFchar )
    return iResult;
 }
 
-#if !defined( _POSIX_VDISABLE )
-#  define _POSIX_VDISABLE  '\0'
+#if ! defined( _POSIX_VDISABLE )
+#  define _POSIX_VDISABLE '\0'
 #endif
 
 int hb_comDiscardChar( int iPort, int iChar )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
 
    if( pCom )
    {
@@ -927,15 +932,15 @@ int hb_comDiscardChar( int iPort, int iChar )
          {
             if( iChar == -1 )
             {
-               tio.c_lflag &= ~IEXTEN;
+               tio.c_lflag          &= ~IEXTEN;
                tio.c_cc[ VDISCARD ] = _POSIX_VDISABLE;
             }
             else
             {
-               tio.c_lflag |= IEXTEN;
+               tio.c_lflag          |= IEXTEN;
                tio.c_cc[ VDISCARD ] = iChar;
 #if defined( VLNEXT )
-               tio.c_cc[ VLNEXT ] = _POSIX_VDISABLE;
+               tio.c_cc[ VLNEXT ]   = _POSIX_VDISABLE;
 #endif
             }
             if( tcsetattr( pCom->fd, TCSANOW, &tio ) == -1 )
@@ -957,8 +962,8 @@ int hb_comDiscardChar( int iPort, int iChar )
 
 int hb_comErrorChar( int iPort, int iChar )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
 
    if( pCom )
    {
@@ -987,8 +992,8 @@ int hb_comOutputState( int iPort )
 
 int hb_comInputState( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
 
    if( pCom )
    {
@@ -1001,8 +1006,8 @@ int hb_comInputState( int iPort )
 
 long hb_comSend( int iPort, const void * data, long len, HB_MAXINT timeout )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   long lSent = -1;
+   PHB_COM  pCom  = hb_comGetPort( iPort, HB_COM_OPEN );
+   long     lSent = -1;
 
    if( pCom )
    {
@@ -1043,8 +1048,8 @@ long hb_comSend( int iPort, const void * data, long len, HB_MAXINT timeout )
 
 long hb_comRecv( int iPort, void * data, long len, HB_MAXINT timeout )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   long lReceived = -1;
+   PHB_COM  pCom        = hb_comGetPort( iPort, HB_COM_OPEN );
+   long     lReceived   = -1;
 
    if( pCom )
    {
@@ -1091,8 +1096,8 @@ long hb_comRecv( int iPort, void * data, long len, HB_MAXINT timeout )
 
 int hb_comInit( int iPort, int iBaud, int iParity, int iSize, int iStop )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
 
    if( pCom )
    {
@@ -1106,58 +1111,59 @@ int hb_comInit( int iPort, int iBaud, int iParity, int iSize, int iStop )
          /* Raw input from device */
          cfmakeraw( &tio );
 #endif
-         tio.c_iflag &= ~( IGNBRK | IGNPAR | BRKINT | PARMRK | ISTRIP |
-                           INLCR | IGNCR | ICRNL | IXON | IXANY | IXOFF );
-         tio.c_oflag &= ~OPOST;
-         tio.c_lflag &= ~( ECHO | ECHONL | ICANON | ISIG | IEXTEN );
-         tio.c_cflag &= ~( CSIZE | PARENB );
+         tio.c_iflag       &= ~( IGNBRK | IGNPAR | BRKINT | PARMRK | ISTRIP |
+                                 INLCR | IGNCR | ICRNL | IXON | IXANY | IXOFF );
+         tio.c_oflag       &= ~OPOST;
+         tio.c_lflag       &= ~( ECHO | ECHONL | ICANON | ISIG | IEXTEN );
+         tio.c_cflag       &= ~( CSIZE | PARENB );
          /* Enable the receiver and set local mode... */
-         tio.c_cflag |= ( CLOCAL | CREAD );
+         tio.c_cflag       |= ( CLOCAL | CREAD );
 
          tio.c_cc[ VTIME ] = 0;  /* inter-character timer in 1/10 sec. */
          tio.c_cc[ VMIN ]  = 0;  /* minimum number of characters for read */
 
-         if( iBaud ) switch( iBaud )
-         {
-            case        0: iBaud =      B0; break;
-            case       50: iBaud =     B50; break;
-            case       75: iBaud =     B75; break;
-            case      110: iBaud =    B110; break;
-            case      150: iBaud =    B150; break;
-            case      200: iBaud =    B200; break;
-            case      300: iBaud =    B300; break;
-            case      600: iBaud =    B600; break;
-            case     1200: iBaud =   B1200; break;
-            case     1800: iBaud =   B1800; break;
-            case     2400: iBaud =   B2400; break;
-            case     4800: iBaud =   B4800; break;
-            case     9600: iBaud =   B9600; break;
-            case    19200: iBaud =  B19200; break;
-            case    38400: iBaud =  B38400; break;
+         if( iBaud )
+            switch( iBaud )
+            {
+               case        0: iBaud = B0; break;
+               case       50: iBaud = B50; break;
+               case       75: iBaud = B75; break;
+               case      110: iBaud = B110; break;
+               case      150: iBaud = B150; break;
+               case      200: iBaud = B200; break;
+               case      300: iBaud = B300; break;
+               case      600: iBaud = B600; break;
+               case     1200: iBaud = B1200; break;
+               case     1800: iBaud = B1800; break;
+               case     2400: iBaud = B2400; break;
+               case     4800: iBaud = B4800; break;
+               case     9600: iBaud = B9600; break;
+               case    19200: iBaud = B19200; break;
+               case    38400: iBaud = B38400; break;
 #ifdef B57600
-            case    57600: iBaud =  B57600; break;
+               case    57600: iBaud = B57600; break;
 #endif
 #ifdef B115200
-            case   115200: iBaud = B115200; break;
+               case   115200: iBaud = B115200; break;
 #endif
 #ifdef B230400
-            case   230400: iBaud = B230400; break;
+               case   230400: iBaud = B230400; break;
 #endif
 #ifdef B460800
-            case   460800: iBaud = B460800; break;
+               case   460800: iBaud = B460800; break;
 #endif
 #ifdef B500000
-            case   500000: iBaud = B500000; break;
+               case   500000: iBaud = B500000; break;
 #endif
 #ifdef B576000
-            case   576000: iBaud = B576000; break;
+               case   576000: iBaud = B576000; break;
 #endif
 #ifdef B921600
-            case   921600: iBaud = B921600; break;
+               case   921600: iBaud = B921600; break;
 #endif
-            default:
-               iResult = -1;
-         }
+               default:
+                  iResult           = -1;
+            }
          switch( iParity )
          {
             case 0:
@@ -1196,20 +1202,20 @@ int hb_comInit( int iPort, int iBaud, int iParity, int iSize, int iStop )
          switch( iSize )
          {
             case 0:
-            case 8: tio.c_cflag |= CS8; break;
-            case 7: tio.c_cflag |= CS7; break;
-            case 6: tio.c_cflag |= CS6; break;
-            case 5: tio.c_cflag |= CS5; break;
+            case 8: tio.c_cflag  |= CS8; break;
+            case 7: tio.c_cflag  |= CS7; break;
+            case 6: tio.c_cflag  |= CS6; break;
+            case 5: tio.c_cflag  |= CS5; break;
             default:
-               iResult = -1;
+               iResult           = -1;
          }
          switch( iStop )
          {
             case 0:
-            case 1: tio.c_cflag &= ~CSTOPB; break;
-            case 2: tio.c_cflag |= CSTOPB; break;
+            case 1: tio.c_cflag  &= ~CSTOPB; break;
+            case 2: tio.c_cflag  |= CSTOPB; break;
             default:
-               iResult = -1;
+               iResult           = -1;
          }
 
          if( iResult == 0 )
@@ -1221,7 +1227,7 @@ int hb_comInit( int iPort, int iBaud, int iParity, int iSize, int iStop )
             }
 
             iResult = tcsetattr( pCom->fd, TCSAFLUSH, &tio );
-#if !defined( HB_OS_UNIX )
+#if ! defined( HB_OS_UNIX )
             if( iResult == 0 )
                pCom->rdtimeout = 0;
 #endif
@@ -1237,8 +1243,8 @@ int hb_comInit( int iPort, int iBaud, int iParity, int iSize, int iStop )
 
 int hb_comClose( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
 
    if( pCom )
    {
@@ -1255,8 +1261,8 @@ int hb_comClose( int iPort )
 
       if( iResult != -1 || HB_COM_IS_EBADF() )
       {
-         pCom->fd = ( HB_FHANDLE ) FS_ERROR;
-         pCom->status &= ~HB_COM_OPEN;
+         pCom->fd       = ( HB_FHANDLE ) FS_ERROR;
+         pCom->status   &= ~HB_COM_OPEN;
       }
       hb_vmLock();
    }
@@ -1266,8 +1272,8 @@ int hb_comClose( int iPort )
 
 int hb_comOpen( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_ENABLED );
-   int iResult = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_ENABLED );
+   int      iResult  = -1;
 
    if( pCom )
    {
@@ -1277,8 +1283,8 @@ int hb_comOpen( int iPort )
       }
       else
       {
-         char buffer[ HB_COM_DEV_NAME_MAX ];
-         const char * name = hb_comGetName( pCom, buffer, sizeof( buffer ) );
+         char           buffer[ HB_COM_DEV_NAME_MAX ];
+         const char *   name = hb_comGetName( pCom, buffer, sizeof( buffer ) );
 
          hb_vmUnlock();
 
@@ -1297,7 +1303,7 @@ int hb_comOpen( int iPort )
 #else
             iResult = 0;
 #endif
-            pCom->status |= HB_COM_OPEN;
+               pCom->status |= HB_COM_OPEN;
          }
          hb_comSetOsError( pCom, iResult == -1 );
 
@@ -1332,8 +1338,8 @@ static void hb_comSetOsError( PHB_COM pCom, BOOL fError )
 
 int hb_comInputCount( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iCount = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iCount   = 0;
 
    if( pCom )
    {
@@ -1355,8 +1361,8 @@ int hb_comInputCount( int iPort )
 
 int hb_comOutputCount( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iCount = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iCount   = 0;
 
    if( pCom )
    {
@@ -1378,8 +1384,8 @@ int hb_comOutputCount( int iPort )
 
 int hb_comFlush( int iPort, int iType )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   BOOL fResult = FALSE;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   BOOL     fResult  = FALSE;
 
    if( pCom )
    {
@@ -1387,15 +1393,15 @@ int hb_comFlush( int iPort, int iType )
       {
          case HB_COM_IFLUSH:
             fResult = PurgeComm( pCom->hComm, PURGE_RXCLEAR );
-            hb_comSetOsError( pCom, !fResult );
+            hb_comSetOsError( pCom, ! fResult );
             break;
          case HB_COM_OFLUSH:
             fResult = PurgeComm( pCom->hComm, PURGE_TXCLEAR );
-            hb_comSetOsError( pCom, !fResult );
+            hb_comSetOsError( pCom, ! fResult );
             break;
          case HB_COM_IOFLUSH:
             fResult = PurgeComm( pCom->hComm, PURGE_TXCLEAR | PURGE_RXCLEAR );
-            hb_comSetOsError( pCom, !fResult );
+            hb_comSetOsError( pCom, ! fResult );
             break;
          default:
             hb_comSetComError( pCom, HB_COM_ERR_PARAMVALUE );
@@ -1407,9 +1413,9 @@ int hb_comFlush( int iPort, int iType )
 
 int hb_comMCR( int iPort, int * piValue, int iClr, int iSet )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   BOOL fResult = FALSE;
-   int iValue = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   BOOL     fResult  = FALSE;
+   int      iValue   = 0;
 
    if( pCom )
    {
@@ -1426,7 +1432,7 @@ int hb_comMCR( int iPort, int * piValue, int iClr, int iSet )
       /* MCR_OUT1, MCR_OUT2, MCR_LOOP and reading current state
        * is unsupported
        */
-      hb_comSetOsError( pCom, !fResult );
+      hb_comSetOsError( pCom, ! fResult );
    }
 
    if( piValue )
@@ -1437,9 +1443,9 @@ int hb_comMCR( int iPort, int * piValue, int iClr, int iSet )
 
 int hb_comMSR( int iPort, int * piValue )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   BOOL fResult = FALSE;
-   int iValue = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   BOOL     fResult  = FALSE;
+   int      iValue   = 0;
 
    if( pCom )
    {
@@ -1462,7 +1468,7 @@ int hb_comMSR( int iPort, int * piValue )
           */
 
       }
-      hb_comSetOsError( pCom, !fResult );
+      hb_comSetOsError( pCom, ! fResult );
    }
 
    if( piValue )
@@ -1473,9 +1479,9 @@ int hb_comMSR( int iPort, int * piValue )
 
 int hb_comLSR( int iPort, int * piValue )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   BOOL fResult = FALSE;
-   int iValue = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   BOOL     fResult  = FALSE;
+   int      iValue   = 0;
 
    if( pCom )
    {
@@ -1497,7 +1503,7 @@ int hb_comLSR( int iPort, int * piValue )
           * are unsupported
           */
       }
-      hb_comSetOsError( pCom, !fResult );
+      hb_comSetOsError( pCom, ! fResult );
    }
 
    if( piValue )
@@ -1508,8 +1514,8 @@ int hb_comLSR( int iPort, int * piValue )
 
 int hb_comSendBreak( int iPort, int iDurationInMilliSecs )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   BOOL fResult = FALSE;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   BOOL     fResult  = FALSE;
 
    if( pCom )
    {
@@ -1519,23 +1525,23 @@ int hb_comSendBreak( int iPort, int iDurationInMilliSecs )
          Sleep( iDurationInMilliSecs );
          fResult = ClearCommBreak( pCom->hComm );
       }
-      hb_comSetOsError( pCom, !fResult );
+      hb_comSetOsError( pCom, ! fResult );
    }
    return fResult ? 0 : -1;
 }
 
-int hb_comFlowControl( int iPort, int *piFlow, int iFlow )
+int hb_comFlowControl( int iPort, int * piFlow, int iFlow )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   BOOL fResult = FALSE;
-   int iValue = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   BOOL     fResult  = FALSE;
+   int      iValue   = 0;
 
    if( pCom )
    {
       DCB dcb;
 
-      dcb.DCBlength = sizeof( DCB );
-      fResult = GetCommState( pCom->hComm, &dcb );
+      dcb.DCBlength  = sizeof( DCB );
+      fResult        = GetCommState( pCom->hComm, &dcb );
       if( fResult )
       {
          if( dcb.fRtsControl == RTS_CONTROL_HANDSHAKE )
@@ -1565,15 +1571,15 @@ int hb_comFlowControl( int iPort, int *piFlow, int iFlow )
                dcb.fDtrControl = DTR_CONTROL_HANDSHAKE;
             else if( dcb.fDtrControl == DTR_CONTROL_HANDSHAKE )
                dcb.fDtrControl = DTR_CONTROL_DISABLE;
-            dcb.fOutxDsrFlow = ( iFlow & HB_COM_FLOW_ODTRDSR ) != 0;
+            dcb.fOutxDsrFlow  = ( iFlow & HB_COM_FLOW_ODTRDSR ) != 0;
 
-            dcb.fInX = ( iFlow & HB_COM_FLOW_XOFF ) != 0;
-            dcb.fOutX = ( iFlow & HB_COM_FLOW_XON ) != 0;
+            dcb.fInX          = ( iFlow & HB_COM_FLOW_XOFF ) != 0;
+            dcb.fOutX         = ( iFlow & HB_COM_FLOW_XON ) != 0;
 
-            fResult = SetCommState( pCom->hComm, &dcb );
+            fResult           = SetCommState( pCom->hComm, &dcb );
          }
       }
-      hb_comSetOsError( pCom, !fResult );
+      hb_comSetOsError( pCom, ! fResult );
    }
 
    if( piFlow )
@@ -1584,8 +1590,8 @@ int hb_comFlowControl( int iPort, int *piFlow, int iFlow )
 
 int hb_comFlowSet( int iPort, int iFlow )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   BOOL fResult = FALSE, fNotSup = FALSE;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   BOOL     fResult  = FALSE, fNotSup = FALSE;
 
    if( pCom )
    {
@@ -1597,7 +1603,7 @@ int hb_comFlowSet( int iPort, int iFlow )
             fResult = EscapeCommFunction( pCom->hComm, SETXON );
          else
             fNotSup = TRUE;
-         hb_comSetOsError( pCom, !fResult );
+         hb_comSetOsError( pCom, ! fResult );
       }
       else if( iFlow & HB_COM_FL_RTSCTS )
       {
@@ -1623,7 +1629,7 @@ int hb_comFlowSet( int iPort, int iFlow )
       if( fNotSup )
          hb_comSetComError( pCom, HB_COM_ERR_NOSUPPORT );
       else
-         hb_comSetOsError( pCom, !fResult );
+         hb_comSetOsError( pCom, ! fResult );
    }
 
    return fResult ? 0 : -1;
@@ -1631,8 +1637,8 @@ int hb_comFlowSet( int iPort, int iFlow )
 
 int hb_comFlowChars( int iPort, int iXONchar, int iXOFFchar )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   BOOL fResult = FALSE;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   BOOL     fResult  = FALSE;
 
    if( pCom )
    {
@@ -1641,8 +1647,8 @@ int hb_comFlowChars( int iPort, int iXONchar, int iXOFFchar )
       {
          DCB dcb;
 
-         dcb.DCBlength = sizeof( DCB );
-         fResult = GetCommState( pCom->hComm, &dcb );
+         dcb.DCBlength  = sizeof( DCB );
+         fResult        = GetCommState( pCom->hComm, &dcb );
          if( fResult )
          {
             if( iXONchar >= 0 )
@@ -1652,15 +1658,15 @@ int hb_comFlowChars( int iPort, int iXONchar, int iXOFFchar )
             fResult = SetCommState( pCom->hComm, &dcb );
          }
       }
-      hb_comSetOsError( pCom, !fResult );
+      hb_comSetOsError( pCom, ! fResult );
    }
    return fResult ? 0 : -1;
 }
 
 int hb_comDiscardChar( int iPort, int iChar )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
 
    if( pCom )
    {
@@ -1676,36 +1682,36 @@ int hb_comDiscardChar( int iPort, int iChar )
 
 int hb_comErrorChar( int iPort, int iChar )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   BOOL fResult = FALSE;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   BOOL     fResult  = FALSE;
 
    if( pCom )
    {
       DCB dcb;
 
-      dcb.DCBlength = sizeof( DCB );
-      fResult = GetCommState( pCom->hComm, &dcb );
+      dcb.DCBlength  = sizeof( DCB );
+      fResult        = GetCommState( pCom->hComm, &dcb );
       if( fResult )
       {
          if( iChar >= 0 )
          {
             dcb.fErrorChar = TRUE;
-            dcb.ErrorChar = ( char ) iChar;
+            dcb.ErrorChar  = ( char ) iChar;
          }
          else
             dcb.fErrorChar = FALSE;
          fResult = SetCommState( pCom->hComm, &dcb );
       }
-      hb_comSetOsError( pCom, !fResult );
+      hb_comSetOsError( pCom, ! fResult );
    }
    return fResult ? 0 : -1;
 }
 
 int hb_comOutputState( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   BOOL fResult = FALSE;
-   int iValue = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   BOOL     fResult  = FALSE;
+   int      iValue   = 0;
 
    if( pCom )
    {
@@ -1727,7 +1733,7 @@ int hb_comOutputState( int iPort )
          if( comStat.cbOutQue == 0 )
             iValue |= HB_COM_TX_EMPTY;
       }
-      hb_comSetOsError( pCom, !fResult );
+      hb_comSetOsError( pCom, ! fResult );
    }
 
    return fResult ? iValue : -1;
@@ -1735,9 +1741,9 @@ int hb_comOutputState( int iPort )
 
 int hb_comInputState( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   BOOL fResult = FALSE;
-   int iValue = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   BOOL     fResult  = FALSE;
+   int      iValue   = 0;
 
    if( pCom )
    {
@@ -1749,38 +1755,38 @@ int hb_comInputState( int iPort )
          if( comStat.fXoffSent )
             iValue |= HB_COM_RX_XOFF;
       }
-      hb_comSetOsError( pCom, !fResult );
+      hb_comSetOsError( pCom, ! fResult );
    }
 
    return fResult ? iValue : -1;
 }
 
 static BOOL hb_comSetTimeouts( PHB_COM pCom, HB_MAXINT rdtimeout,
-                                             HB_MAXINT wrtimeout )
+                               HB_MAXINT wrtimeout )
 {
-   COMMTIMEOUTS timeouts;
-   BOOL fResult;
+   COMMTIMEOUTS   timeouts;
+   BOOL           fResult;
 
    if( rdtimeout == 0 )
    {
-      timeouts.ReadIntervalTimeout = MAXDWORD;
+      timeouts.ReadIntervalTimeout        = MAXDWORD;
       timeouts.ReadTotalTimeoutMultiplier = 0;
-      timeouts.ReadTotalTimeoutConstant = 0;
+      timeouts.ReadTotalTimeoutConstant   = 0;
    }
    else
    {
-      timeouts.ReadIntervalTimeout = MAXDWORD;
+      timeouts.ReadIntervalTimeout        = MAXDWORD;
       timeouts.ReadTotalTimeoutMultiplier = MAXDWORD;
-      timeouts.ReadTotalTimeoutConstant = ( DWORD ) rdtimeout;
+      timeouts.ReadTotalTimeoutConstant   = ( DWORD ) rdtimeout;
    }
-   timeouts.WriteTotalTimeoutMultiplier = 0;
-   timeouts.WriteTotalTimeoutConstant = ( DWORD ) HB_MAX( wrtimeout, 1 );
+   timeouts.WriteTotalTimeoutMultiplier   = 0;
+   timeouts.WriteTotalTimeoutConstant     = ( DWORD ) HB_MAX( wrtimeout, 1 );
 
-   fResult = SetCommTimeouts( pCom->hComm, &timeouts );
+   fResult                                = SetCommTimeouts( pCom->hComm, &timeouts );
    if( fResult )
    {
-      pCom->rdtimeout = rdtimeout;
-      pCom->wrtimeout = wrtimeout;
+      pCom->rdtimeout   = rdtimeout;
+      pCom->wrtimeout   = wrtimeout;
    }
 
    return fResult;
@@ -1788,8 +1794,8 @@ static BOOL hb_comSetTimeouts( PHB_COM pCom, HB_MAXINT rdtimeout,
 
 long hb_comSend( int iPort, const void * data, long len, HB_MAXINT timeout )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   long lSent = -1;
+   PHB_COM  pCom  = hb_comGetPort( iPort, HB_COM_OPEN );
+   long     lSent = -1;
 
    if( pCom )
    {
@@ -1802,17 +1808,17 @@ long hb_comSend( int iPort, const void * data, long len, HB_MAXINT timeout )
           hb_comSetTimeouts( pCom, pCom->rdtimeout, timeout ) )
       {
          DWORD dwWritten = 0;
-         BOOL fResult;
+         BOOL  fResult;
 
-         fResult = WriteFile( pCom->hComm, data, ( DWORD ) len, &dwWritten, NULL );
-         lSent = fResult ? ( long ) dwWritten : -1;
+         fResult  = WriteFile( pCom->hComm, data, ( DWORD ) len, &dwWritten, NULL );
+         lSent    = fResult ? ( long ) dwWritten : -1;
          if( lSent == 0 )
          {
             hb_comSetComError( pCom, HB_COM_ERR_TIMEOUT );
             lSent = -1;
          }
          else
-            hb_comSetOsError( pCom, !fResult );
+            hb_comSetOsError( pCom, ! fResult );
       }
       else
          hb_comSetOsError( pCom, HB_TRUE );
@@ -1825,8 +1831,8 @@ long hb_comSend( int iPort, const void * data, long len, HB_MAXINT timeout )
 
 long hb_comRecv( int iPort, void * data, long len, HB_MAXINT timeout )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   long lReceived = -1;
+   PHB_COM  pCom        = hb_comGetPort( iPort, HB_COM_OPEN );
+   long     lReceived   = -1;
 
    if( pCom )
    {
@@ -1839,17 +1845,17 @@ long hb_comRecv( int iPort, void * data, long len, HB_MAXINT timeout )
           hb_comSetTimeouts( pCom, timeout, pCom->wrtimeout ) )
       {
          DWORD dwRead = 0;
-         BOOL fResult;
+         BOOL  fResult;
 
-         fResult = ReadFile( pCom->hComm, data, ( DWORD ) len, &dwRead, NULL );
-         lReceived = fResult ? ( long ) dwRead : -1;
+         fResult     = ReadFile( pCom->hComm, data, ( DWORD ) len, &dwRead, NULL );
+         lReceived   = fResult ? ( long ) dwRead : -1;
          if( lReceived == 0 )
          {
             hb_comSetComError( pCom, HB_COM_ERR_TIMEOUT );
             lReceived = -1;
          }
          else
-            hb_comSetOsError( pCom, !fResult );
+            hb_comSetOsError( pCom, ! fResult );
       }
       else
          hb_comSetOsError( pCom, HB_TRUE );
@@ -1862,15 +1868,15 @@ long hb_comRecv( int iPort, void * data, long len, HB_MAXINT timeout )
 
 int hb_comInit( int iPort, int iBaud, int iParity, int iSize, int iStop )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   BOOL fResult = FALSE;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   BOOL     fResult  = FALSE;
 
    if( pCom )
    {
       DCB dcb;
 
-      dcb.DCBlength = sizeof( DCB );
-      fResult = GetCommState( pCom->hComm, &dcb );
+      dcb.DCBlength  = sizeof( DCB );
+      fResult        = GetCommState( pCom->hComm, &dcb );
       if( fResult )
       {
          switch( iParity )
@@ -1894,10 +1900,10 @@ int hb_comInit( int iPort, int iBaud, int iParity, int iSize, int iStop )
                break;
             case 'M':
             case 'm':
-               iParity = MARKPARITY;
+               iParity  = MARKPARITY;
                break;
             default:
-               fResult = FALSE;
+               fResult  = FALSE;
          }
          switch( iSize )
          {
@@ -1914,50 +1920,50 @@ int hb_comInit( int iPort, int iBaud, int iParity, int iSize, int iStop )
          switch( iStop )
          {
             case 0:
-            case 1: iStop = ONESTOPBIT; break;
-            case 2: iStop = TWOSTOPBITS; break;
+            case 1: iStop  = ONESTOPBIT; break;
+            case 2: iStop  = TWOSTOPBITS; break;
             default:
-               fResult = FALSE;
+               fResult     = FALSE;
          }
          if( fResult )
          {
             if( iBaud )
                dcb.BaudRate = ( DWORD ) iBaud;
-            dcb.fBinary = 1;
-            dcb.fParity = 0;
-            dcb.fOutxCtsFlow = 0;
-            dcb.fOutxDsrFlow = 0;
-            dcb.fDtrControl = DTR_CONTROL_DISABLE;
-            dcb.fDsrSensitivity = 0;
-            dcb.fTXContinueOnXoff = 1;
-            dcb.fOutX = 0;
-            dcb.fInX = 0;
-            dcb.fErrorChar = 0;
-            dcb.fNull = 0;
-            dcb.fRtsControl = RTS_CONTROL_DISABLE;
-            dcb.fAbortOnError = 0;
-          /*dcb.XonLim*/
-          /*dcb.XoffLim*/
-            dcb.ByteSize = ( BYTE ) iSize;
-            dcb.Parity = ( BYTE ) iParity;
-            dcb.StopBits = ( BYTE ) iStop;
-          /*dcb.XonChar*/
-          /*dcb.XoffChar*/
-            dcb.ErrorChar = '?';
-          /*dcb.EofChar*/
-          /*dcb.EvtChar*/
+            dcb.fBinary             = 1;
+            dcb.fParity             = 0;
+            dcb.fOutxCtsFlow        = 0;
+            dcb.fOutxDsrFlow        = 0;
+            dcb.fDtrControl         = DTR_CONTROL_DISABLE;
+            dcb.fDsrSensitivity     = 0;
+            dcb.fTXContinueOnXoff   = 1;
+            dcb.fOutX               = 0;
+            dcb.fInX                = 0;
+            dcb.fErrorChar          = 0;
+            dcb.fNull               = 0;
+            dcb.fRtsControl         = RTS_CONTROL_DISABLE;
+            dcb.fAbortOnError       = 0;
+            /*dcb.XonLim*/
+            /*dcb.XoffLim*/
+            dcb.ByteSize            = ( BYTE ) iSize;
+            dcb.Parity              = ( BYTE ) iParity;
+            dcb.StopBits            = ( BYTE ) iStop;
+            /*dcb.XonChar*/
+            /*dcb.XoffChar*/
+            dcb.ErrorChar           = '?';
+            /*dcb.EofChar*/
+            /*dcb.EvtChar*/
 
             fResult = SetCommState( pCom->hComm, &dcb );
             if( fResult )
                fResult = hb_comSetTimeouts( pCom, 0, 0 );
 
-            hb_comSetOsError( pCom, !fResult );
+            hb_comSetOsError( pCom, ! fResult );
          }
          else
             hb_comSetComError( pCom, HB_COM_ERR_PARAMVALUE );
       }
       else
-         hb_comSetOsError( pCom, !fResult );
+         hb_comSetOsError( pCom, ! fResult );
    }
 
    return fResult ? 0 : -1;
@@ -1965,17 +1971,17 @@ int hb_comInit( int iPort, int iBaud, int iParity, int iSize, int iStop )
 
 int hb_comClose( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   BOOL fResult = FALSE;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   BOOL     fResult  = FALSE;
 
    if( pCom )
    {
       hb_vmUnlock();
       /* FlushFileBuffers( pCom->hComm ); */
-      fResult = CloseHandle( pCom->hComm );
-      pCom->hComm = INVALID_HANDLE_VALUE;
-      pCom->status &= ~HB_COM_OPEN;
-      hb_comSetOsError( pCom, !fResult );
+      fResult        = CloseHandle( pCom->hComm );
+      pCom->hComm    = INVALID_HANDLE_VALUE;
+      pCom->status   &= ~HB_COM_OPEN;
+      hb_comSetOsError( pCom, ! fResult );
       hb_vmLock();
    }
 
@@ -1984,8 +1990,8 @@ int hb_comClose( int iPort )
 
 int hb_comOpen( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_ENABLED );
-   BOOL fResult = FALSE;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_ENABLED );
+   BOOL     fResult  = FALSE;
 
    if( pCom )
    {
@@ -1995,10 +2001,10 @@ int hb_comOpen( int iPort )
       }
       else
       {
-         char buffer[ HB_COM_DEV_NAME_MAX ];
-         const char * szName = hb_comGetName( pCom, buffer, sizeof( buffer ) );
-         LPCTSTR lpName;
-         LPTSTR lpFree;
+         char           buffer[ HB_COM_DEV_NAME_MAX ];
+         const char *   szName = hb_comGetName( pCom, buffer, sizeof( buffer ) );
+         LPCTSTR        lpName;
+         LPTSTR         lpFree;
 
          lpName = HB_FSNAMECONV( szName, &lpFree );
 
@@ -2012,10 +2018,10 @@ int hb_comOpen( int iPort )
                                    FILE_FLAG_NO_BUFFERING, NULL );
          if( pCom->hComm != INVALID_HANDLE_VALUE )
          {
-            fResult = TRUE;
-            pCom->status |= HB_COM_OPEN;
+            fResult        = TRUE;
+            pCom->status   |= HB_COM_OPEN;
          }
-         hb_comSetOsError( pCom, !fResult );
+         hb_comSetOsError( pCom, ! fResult );
 
          hb_vmLock();
 
@@ -2047,13 +2053,13 @@ static void hb_comSetOsError( PHB_COM pCom, APIRET rc )
 
 int hb_comInputCount( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iCount = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iCount   = -1;
 
    if( pCom )
    {
-      APIRET rc;
-      RXQUEUE rxqueue;
+      APIRET   rc;
+      RXQUEUE  rxqueue;
 
       memset( &rxqueue, 0, sizeof( rxqueue ) );
       rc = DosDevIOCtl( pCom->hFile, IOCTL_ASYNC, ASYNC_GETINQUECOUNT,
@@ -2069,13 +2075,13 @@ int hb_comInputCount( int iPort )
 
 int hb_comOutputCount( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iCount = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iCount   = -1;
 
    if( pCom )
    {
-      APIRET rc;
-      RXQUEUE rxqueue;
+      APIRET   rc;
+      RXQUEUE  rxqueue;
 
       memset( &rxqueue, 0, sizeof( rxqueue ) );
       rc = DosDevIOCtl( pCom->hFile, IOCTL_ASYNC, ASYNC_GETOUTQUECOUNT,
@@ -2091,13 +2097,13 @@ int hb_comOutputCount( int iPort )
 
 int hb_comFlush( int iPort, int iType )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   APIRET rc = ERROR_INVALID_HANDLE;
+   PHB_COM  pCom  = hb_comGetPort( iPort, HB_COM_OPEN );
+   APIRET   rc    = ERROR_INVALID_HANDLE;
 
    if( pCom )
    {
-      UCHAR cmdinfo = 0;
-      USHORT reserved = 0;
+      UCHAR    cmdinfo  = 0;
+      USHORT   reserved = 0;
 
       switch( iType )
       {
@@ -2108,12 +2114,12 @@ int hb_comFlush( int iPort, int iType )
                               &reserved, sizeof( reserved ), NULL );
             if( iType == HB_COM_IFLUSH )
                break;
-            cmdinfo = 0;
+            cmdinfo  = 0;
             reserved = 0;
          case HB_COM_OFLUSH:
-            rc = DosDevIOCtl( pCom->hFile, IOCTL_GENERAL, DEV_FLUSHOUTPUT,
-                              &cmdinfo, sizeof( cmdinfo ), NULL,
-                              &reserved, sizeof( reserved ), NULL );
+            rc       = DosDevIOCtl( pCom->hFile, IOCTL_GENERAL, DEV_FLUSHOUTPUT,
+                                    &cmdinfo, sizeof( cmdinfo ), NULL,
+                                    &reserved, sizeof( reserved ), NULL );
             break;
          default:
             rc = ERROR_INVALID_PARAMETER;
@@ -2127,14 +2133,14 @@ int hb_comFlush( int iPort, int iType )
 
 int hb_comMCR( int iPort, int * piValue, int iClr, int iSet )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
-   int iValue = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
+   int      iValue   = 0;
 
    if( pCom )
    {
-      APIRET rc;
-      UCHAR mcos = 0;
+      APIRET   rc;
+      UCHAR    mcos = 0;
 
       rc = DosDevIOCtl( pCom->hFile, IOCTL_ASYNC, ASYNC_GETMODEMOUTPUT,
                         NULL, 0, NULL, &mcos, sizeof( mcos ), NULL );
@@ -2150,8 +2156,8 @@ int hb_comMCR( int iPort, int * piValue, int iClr, int iSet )
          if( mcos & RTS_ON )
             iValue |= HB_COM_MCR_RTS;
 
-         ms.fbModemOn = 0x00;
-         ms.fbModemOff = 0xFF;
+         ms.fbModemOn   = 0x00;
+         ms.fbModemOff  = 0xFF;
          if( iSet & HB_COM_MCR_DTR )
             ms.fbModemOn |= DTR_ON;
          else if( iClr & HB_COM_MCR_DTR )
@@ -2182,15 +2188,15 @@ int hb_comMCR( int iPort, int * piValue, int iClr, int iSet )
 
 int hb_comMSR( int iPort, int * piValue )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
-   int iValue = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
+   int      iValue   = 0;
 
    if( pCom )
    {
-      APIRET rc;
-      UCHAR mcis = 0;
-      USHORT comEvent = 0;
+      APIRET   rc;
+      UCHAR    mcis     = 0;
+      USHORT   comEvent = 0;
 
       rc = DosDevIOCtl( pCom->hFile, IOCTL_ASYNC, ASYNC_GETMODEMINPUT,
                         NULL, 0, NULL, &mcis, sizeof( mcis ), NULL );
@@ -2232,14 +2238,14 @@ int hb_comMSR( int iPort, int * piValue )
 
 int hb_comLSR( int iPort, int * piValue )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
-   int iValue = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
+   int      iValue   = 0;
 
    if( pCom )
    {
-      APIRET rc;
-      USHORT comError = 0;
+      APIRET   rc;
+      USHORT   comError = 0;
 
       rc = DosDevIOCtl( pCom->hFile, IOCTL_ASYNC, ASYNC_GETCOMMERROR,
                         NULL, 0, NULL, &comError, sizeof( comError ), NULL );
@@ -2268,13 +2274,13 @@ int hb_comLSR( int iPort, int * piValue )
 
 int hb_comSendBreak( int iPort, int iDurationInMilliSecs )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
 
    if( pCom )
    {
-      APIRET rc;
-      USHORT comError = 0;
+      APIRET   rc;
+      USHORT   comError = 0;
 
       rc = DosDevIOCtl( pCom->hFile, IOCTL_ASYNC, ASYNC_SETBREAKON,
                         NULL, 0, NULL, &comError, sizeof( comError ), NULL );
@@ -2293,15 +2299,15 @@ int hb_comSendBreak( int iPort, int iDurationInMilliSecs )
 }
 
 /* some missing defines in bsedev.h */
-#define MODE_RTS_MASK         ( MODE_RTS_CONTROL | MODE_RTS_HANDSHAKE )
-#define MODE_DTR_MASK         ( MODE_DTR_CONTROL | MODE_RTS_HANDSHAKE )
-#define MODE_FULL_DUPLEX      0x20
+#define MODE_RTS_MASK      ( MODE_RTS_CONTROL | MODE_RTS_HANDSHAKE )
+#define MODE_DTR_MASK      ( MODE_DTR_CONTROL | MODE_RTS_HANDSHAKE )
+#define MODE_FULL_DUPLEX   0x20
 
-int hb_comFlowControl( int iPort, int *piFlow, int iFlow )
+int hb_comFlowControl( int iPort, int * piFlow, int iFlow )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   APIRET rc = ERROR_INVALID_HANDLE;
-   int iValue = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   APIRET   rc       = ERROR_INVALID_HANDLE;
+   int      iValue   = 0;
 
    if( pCom )
    {
@@ -2378,8 +2384,8 @@ int hb_comFlowControl( int iPort, int *piFlow, int iFlow )
             dcb.fbCtlHndShake &= ~MODE_DSR_SENSITIVITY;
             dcb.fbFlowReplace |= MODE_FULL_DUPLEX;
 
-            rc = DosDevIOCtl( pCom->hFile, IOCTL_ASYNC, ASYNC_SETDCBINFO,
-                              &dcb, sizeof( dcb ), NULL, NULL, 0, NULL );
+            rc                = DosDevIOCtl( pCom->hFile, IOCTL_ASYNC, ASYNC_SETDCBINFO,
+                                             &dcb, sizeof( dcb ), NULL, NULL, 0, NULL );
          }
       }
       hb_comSetOsError( pCom, rc );
@@ -2393,8 +2399,8 @@ int hb_comFlowControl( int iPort, int *piFlow, int iFlow )
 
 int hb_comFlowSet( int iPort, int iFlow )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   APIRET rc = ERROR_INVALID_HANDLE, fNotSup = FALSE;
+   PHB_COM  pCom  = hb_comGetPort( iPort, HB_COM_OPEN );
+   APIRET   rc    = ERROR_INVALID_HANDLE, fNotSup = FALSE;
 
    if( pCom )
    {
@@ -2423,8 +2429,8 @@ int hb_comFlowSet( int iPort, int iFlow )
 
 int hb_comFlowChars( int iPort, int iXONchar, int iXOFFchar )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   APIRET rc = ERROR_INVALID_HANDLE;
+   PHB_COM  pCom  = hb_comGetPort( iPort, HB_COM_OPEN );
+   APIRET   rc    = ERROR_INVALID_HANDLE;
 
    if( pCom )
    {
@@ -2452,8 +2458,8 @@ int hb_comFlowChars( int iPort, int iXONchar, int iXOFFchar )
 
 int hb_comDiscardChar( int iPort, int iChar )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
 
    if( pCom )
    {
@@ -2469,8 +2475,8 @@ int hb_comDiscardChar( int iPort, int iChar )
 
 int hb_comErrorChar( int iPort, int iChar )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   APIRET rc = ERROR_INVALID_HANDLE;
+   PHB_COM  pCom  = hb_comGetPort( iPort, HB_COM_OPEN );
+   APIRET   rc    = ERROR_INVALID_HANDLE;
 
    if( pCom )
    {
@@ -2482,8 +2488,8 @@ int hb_comErrorChar( int iPort, int iChar )
       {
          if( iChar >= 0 )
          {
-            dcb.fbFlowReplace |= MODE_ERROR_CHAR;
-            dcb.bErrorReplacementChar = ( BYTE ) iChar;
+            dcb.fbFlowReplace          |= MODE_ERROR_CHAR;
+            dcb.bErrorReplacementChar  = ( BYTE ) iChar;
          }
          else
             dcb.fbFlowReplace &= ~MODE_ERROR_CHAR;
@@ -2497,9 +2503,9 @@ int hb_comErrorChar( int iPort, int iChar )
 
 int hb_comOutputState( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   APIRET rc = ERROR_INVALID_HANDLE;
-   int iValue = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   APIRET   rc       = ERROR_INVALID_HANDLE;
+   int      iValue   = 0;
 
    if( pCom )
    {
@@ -2532,8 +2538,8 @@ int hb_comOutputState( int iPort )
 
 int hb_comInputState( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
 
    if( pCom )
    {
@@ -2546,8 +2552,8 @@ int hb_comInputState( int iPort )
 
 long hb_comSend( int iPort, const void * data, long len, HB_MAXINT timeout )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   long lSent = -1;
+   PHB_COM  pCom  = hb_comGetPort( iPort, HB_COM_OPEN );
+   long     lSent = -1;
 
    if( pCom )
    {
@@ -2613,8 +2619,8 @@ long hb_comSend( int iPort, const void * data, long len, HB_MAXINT timeout )
 
 long hb_comRecv( int iPort, void * data, long len, HB_MAXINT timeout )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   long lReceived = -1;
+   PHB_COM  pCom        = hb_comGetPort( iPort, HB_COM_OPEN );
+   long     lReceived   = -1;
 
    if( pCom )
    {
@@ -2642,12 +2648,12 @@ long hb_comRecv( int iPort, void * data, long len, HB_MAXINT timeout )
             dcb.fbTimeout &= ~( MODE_READ_TIMEOUT | MODE_NOWAIT_READ_TIMEOUT );
             if( timeout )
             {
-               dcb.fbTimeout |= MODE_READ_TIMEOUT;
+               dcb.fbTimeout     |= MODE_READ_TIMEOUT;
                dcb.usReadTimeout = ( USHORT ) ( timeout - 1 );
             }
             else
             {
-               dcb.fbTimeout |= MODE_NOWAIT_READ_TIMEOUT;
+               dcb.fbTimeout     |= MODE_NOWAIT_READ_TIMEOUT;
                dcb.usReadTimeout = 0;
             }
 
@@ -2683,8 +2689,8 @@ long hb_comRecv( int iPort, void * data, long len, HB_MAXINT timeout )
 
 int hb_comInit( int iPort, int iBaud, int iParity, int iSize, int iStop )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   APIRET rc = ERROR_INVALID_HANDLE;
+   PHB_COM  pCom  = hb_comGetPort( iPort, HB_COM_OPEN );
+   APIRET   rc    = ERROR_INVALID_HANDLE;
 
    if( pCom )
    {
@@ -2699,31 +2705,31 @@ int hb_comInit( int iPort, int iBaud, int iParity, int iSize, int iStop )
          case 7:
          case 6:
          case 5:
-            lctrl.bDataBits = iSize;
+            lctrl.bDataBits   = iSize;
             break;
          default:
-            rc = ERROR_INVALID_PARAMETER;
+            rc                = ERROR_INVALID_PARAMETER;
       }
       switch( iParity )
       {
          case 0:
          case 'N':
          case 'n':
-            lctrl.bParity = 0; break;
+            lctrl.bParity  = 0; break;
          case 'O':
          case 'o':
-            lctrl.bParity = 1; break;
+            lctrl.bParity  = 1; break;
          case 'E':
          case 'e':
-            lctrl.bParity = 2; break;
+            lctrl.bParity  = 2; break;
          case 'M':
          case 'm':
-            lctrl.bParity = 3; break;
+            lctrl.bParity  = 3; break;
          case 'S':
          case 's':
-            lctrl.bParity = 4; break;
+            lctrl.bParity  = 4; break;
          default:
-            rc = ERROR_INVALID_PARAMETER;
+            rc             = ERROR_INVALID_PARAMETER;
       }
       switch( iStop )
       {
@@ -2731,7 +2737,7 @@ int hb_comInit( int iPort, int iBaud, int iParity, int iSize, int iStop )
          case 1: lctrl.bStopBits = 0; break;
          case 2: lctrl.bStopBits = 2; break;
          default:
-            rc = ERROR_INVALID_PARAMETER;
+            rc                   = ERROR_INVALID_PARAMETER;
       }
       lctrl.fTransBreak = 0;
 
@@ -2760,17 +2766,17 @@ int hb_comInit( int iPort, int iBaud, int iParity, int iSize, int iStop )
                            NULL, 0, NULL, &dcb, sizeof( dcb ), NULL );
          if( rc == NO_ERROR )
          {
-            dcb.usWriteTimeout = 0;
-            dcb.usReadTimeout  = 0;
+            dcb.usWriteTimeout   = 0;
+            dcb.usReadTimeout    = 0;
 
-            dcb.fbCtlHndShake = 0x00;
-            dcb.fbFlowReplace = MODE_FULL_DUPLEX;
-            dcb.fbTimeout &= ~MODE_NO_WRITE_TIMEOUT;
-            dcb.fbTimeout |= MODE_NOWAIT_READ_TIMEOUT;
+            dcb.fbCtlHndShake    = 0x00;
+            dcb.fbFlowReplace    = MODE_FULL_DUPLEX;
+            dcb.fbTimeout        &= ~MODE_NO_WRITE_TIMEOUT;
+            dcb.fbTimeout        |= MODE_NOWAIT_READ_TIMEOUT;
 
-            rc = DosDevIOCtl( pCom->hFile, IOCTL_ASYNC, ASYNC_SETDCBINFO,
-                              &dcb, sizeof( dcb ), NULL, NULL, 0, NULL );
-            pCom->rdtimeout = pCom->wrtimeout = 0;
+            rc                   = DosDevIOCtl( pCom->hFile, IOCTL_ASYNC, ASYNC_SETDCBINFO,
+                                                &dcb, sizeof( dcb ), NULL, NULL, 0, NULL );
+            pCom->rdtimeout      = pCom->wrtimeout = 0;
          }
       }
       hb_comSetOsError( pCom, rc );
@@ -2781,16 +2787,16 @@ int hb_comInit( int iPort, int iBaud, int iParity, int iSize, int iStop )
 
 int hb_comClose( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   APIRET rc = ERROR_INVALID_HANDLE;
+   PHB_COM  pCom  = hb_comGetPort( iPort, HB_COM_OPEN );
+   APIRET   rc    = ERROR_INVALID_HANDLE;
 
    if( pCom )
    {
       hb_vmUnlock();
       /* DosResetBuffer( pCom->hFile ); */
-      rc = DosClose( pCom->hFile );
-      pCom->hFile = 0;
-      pCom->status &= ~HB_COM_OPEN;
+      rc             = DosClose( pCom->hFile );
+      pCom->hFile    = 0;
+      pCom->status   &= ~HB_COM_OPEN;
       hb_comSetOsError( pCom, rc );
       hb_vmLock();
    }
@@ -2800,8 +2806,8 @@ int hb_comClose( int iPort )
 
 int hb_comOpen( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_ENABLED );
-   APIRET rc = ERROR_INVALID_HANDLE;
+   PHB_COM  pCom  = hb_comGetPort( iPort, HB_COM_ENABLED );
+   APIRET   rc    = ERROR_INVALID_HANDLE;
 
    if( pCom )
    {
@@ -2811,9 +2817,9 @@ int hb_comOpen( int iPort )
       }
       else
       {
-         char buffer[ HB_COM_DEV_NAME_MAX ];
-         const char * pszName = hb_comGetName( pCom, buffer, sizeof( buffer ) );
-         ULONG ulAction = 0;
+         char           buffer[ HB_COM_DEV_NAME_MAX ];
+         const char *   pszName  = hb_comGetName( pCom, buffer, sizeof( buffer ) );
+         ULONG          ulAction = 0;
 
          hb_vmUnlock();
 
@@ -2860,8 +2866,8 @@ static void hb_comSetOsError( PHB_COM pCom, int iError )
 
 int hb_comInputCount( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iCount = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iCount   = -1;
 
    if( pCom )
       iCount = COMTXBufferUsed( iPort - 1 );
@@ -2871,8 +2877,8 @@ int hb_comInputCount( int iPort )
 
 int hb_comOutputCount( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iCount = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iCount   = -1;
 
    if( pCom )
       iCount = COMRXBufferUsed( iPort - 1 );
@@ -2882,8 +2888,8 @@ int hb_comOutputCount( int iPort )
 
 int hb_comFlush( int iPort, int iType )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
 
    if( pCom )
    {
@@ -2912,9 +2918,9 @@ int hb_comFlush( int iPort, int iType )
 
 int hb_comMCR( int iPort, int * piValue, int iClr, int iSet )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
-   int iValue = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
+   int      iValue   = 0;
 
    if( pCom )
    {
@@ -2942,9 +2948,9 @@ int hb_comMCR( int iPort, int * piValue, int iClr, int iSet )
 
 int hb_comMSR( int iPort, int * piValue )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
-   int iValue = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
+   int      iValue   = 0;
 
    if( pCom )
    {
@@ -2979,8 +2985,8 @@ int hb_comMSR( int iPort, int * piValue )
 
 int hb_comLSR( int iPort, int * piValue )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1, iValue = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1, iValue = 0;
 
    if( pCom )
       hb_comSetComError( pCom, HB_COM_ERR_NOSUPPORT );
@@ -3003,10 +3009,10 @@ int hb_comSendBreak( int iPort, int iDurationInMilliSecs )
    return -1;
 }
 
-int hb_comFlowControl( int iPort, int *piFlow, int iFlow )
+int hb_comFlowControl( int iPort, int * piFlow, int iFlow )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1, iValue = 0;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1, iValue = 0;
 
    if( pCom )
    {
@@ -3071,8 +3077,8 @@ int hb_comFlowSet( int iPort, int iFlow )
 
 int hb_comFlowChars( int iPort, int iXONchar, int iXOFFchar )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
 
    if( pCom )
    {
@@ -3109,8 +3115,8 @@ int hb_comErrorChar( int iPort, int iChar )
 
 int hb_comOutputState( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
 
    if( pCom )
    {
@@ -3126,8 +3132,8 @@ int hb_comOutputState( int iPort )
 
 int hb_comInputState( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
 
    if( pCom )
       hb_comSetComError( pCom, HB_COM_ERR_NOSUPPORT );
@@ -3137,13 +3143,13 @@ int hb_comInputState( int iPort )
 
 long hb_comSend( int iPort, const void * data, long len, HB_MAXINT timeout )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   long lSent = -1;
+   PHB_COM  pCom  = hb_comGetPort( iPort, HB_COM_OPEN );
+   long     lSent = -1;
 
    if( pCom )
    {
-      const char * buffer = ( const char * ) data;
-      HB_MAXUINT timer = timeout <= 0 ? 0 : ( hb_dateMilliSeconds() + timeout );
+      const char *   buffer   = ( const char * ) data;
+      HB_MAXUINT     timer    = timeout <= 0 ? 0 : ( hb_dateMilliSeconds() + timeout );
 
       hb_comSetOsError( pCom, 0 );
       lSent = 0;
@@ -3154,12 +3160,12 @@ long hb_comSend( int iPort, const void * data, long len, HB_MAXINT timeout )
       {
          int iSent, iErr;
 
-         iErr = COMWriteBuffer( iPort - 1, buffer, NULL, len, &iSent );
+         iErr  = COMWriteBuffer( iPort - 1, buffer, NULL, len, &iSent );
          lSent += iSent;
          if( iErr == COMERR_TXOVERFLOW )
          {
-            buffer += iSent;
-            len -= iSent;
+            buffer   += iSent;
+            len      -= iSent;
             if( timer == 0 || timer < hb_dateMilliSeconds() )
             {
                if( lSent == 0 )
@@ -3183,13 +3189,13 @@ long hb_comSend( int iPort, const void * data, long len, HB_MAXINT timeout )
 
 long hb_comRecv( int iPort, void * data, long len, HB_MAXINT timeout )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   long lReceived = -1;
+   PHB_COM  pCom        = hb_comGetPort( iPort, HB_COM_OPEN );
+   long     lReceived   = -1;
 
    if( pCom )
    {
-      char * buffer = ( char * ) data;
-      HB_MAXUINT timer = timeout <= 0 ? 0 : ( hb_dateMilliSeconds() + timeout );
+      char *      buffer   = ( char * ) data;
+      HB_MAXUINT  timer    = timeout <= 0 ? 0 : ( hb_dateMilliSeconds() + timeout );
 
       hb_comSetOsError( pCom, 0 );
       lReceived = 0;
@@ -3232,8 +3238,8 @@ long hb_comRecv( int iPort, void * data, long len, HB_MAXINT timeout )
    return lReceived;
 }
 
-static int s_comChkPortParam( int *piBaud, int *piParity,
-                              int *piSize, int *piStop )
+static int s_comChkPortParam( int * piBaud, int * piParity,
+                              int * piSize, int * piStop )
 {
    int iResult = 0;
 
@@ -3285,8 +3291,8 @@ static int s_comChkPortParam( int *piBaud, int *piParity,
 
 int hb_comInit( int iPort, int iBaud, int iParity, int iSize, int iStop )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
 
    if( pCom )
    {
@@ -3305,16 +3311,16 @@ int hb_comInit( int iPort, int iBaud, int iParity, int iSize, int iStop )
 
 int hb_comClose( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
-   int iResult = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_OPEN );
+   int      iResult  = -1;
 
    if( pCom )
    {
       hb_vmUnlock();
       COMPortClose( iPort - 1 );
-      pCom->status &= ~HB_COM_OPEN;
+      pCom->status   &= ~HB_COM_OPEN;
       hb_comSetOsError( pCom, 0 );
-      iResult = 0;
+      iResult        = 0;
       hb_vmLock();
    }
 
@@ -3323,8 +3329,8 @@ int hb_comClose( int iPort )
 
 int hb_comOpen( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_ENABLED );
-   int iResult = -1;
+   PHB_COM  pCom     = hb_comGetPort( iPort, HB_COM_ENABLED );
+   int      iResult  = -1;
 
    if( pCom )
    {
@@ -3338,11 +3344,11 @@ int hb_comOpen( int iPort )
 
          hb_vmUnlock();
 
-         iBaud = iParity = iSize = iStop = 0;
-         iFlowControl = 0;
+         iBaud          = iParity = iSize = iStop = 0;
+         iFlowControl   = 0;
          s_comChkPortParam( &iBaud, &iParity, &iSize, &iStop );
-         iResult = COMPortOpen( iPort - 1, iBaud, iSize, iParity, iStop,
-                                iFlowControl, NULL );
+         iResult        = COMPortOpen( iPort - 1, iBaud, iSize, iParity, iStop,
+                                       iFlowControl, NULL );
          if( iResult == 0 )
          {
             pCom->status |= HB_COM_OPEN;
@@ -3447,7 +3453,7 @@ int hb_comSendBreak( int iPort, int iDurationInMilliSecs )
    return -1;
 }
 
-int hb_comFlowControl( int iPort, int *piFlow, int iFlow )
+int hb_comFlowControl( int iPort, int * piFlow, int iFlow )
 {
    PHB_COM pCom = hb_comGetPort( iPort, HB_COM_OPEN );
 
@@ -3584,8 +3590,8 @@ int hb_comClose( int iPort )
 
 int hb_comOpen( int iPort )
 {
-   PHB_COM pCom = hb_comGetPort( iPort, HB_COM_ENABLED );
-   int iTODO_serial_port_support;
+   PHB_COM  pCom = hb_comGetPort( iPort, HB_COM_ENABLED );
+   int      iTODO_serial_port_support;
 
    if( pCom )
       hb_comSetComError( pCom, HB_COM_ERR_NOSUPPORT );
@@ -3598,7 +3604,7 @@ int hb_comOpen( int iPort )
 
 static int s_iComInit = 0;
 
-static void hb_com_exit( void* cargo )
+static void hb_com_exit( void * cargo )
 {
    HB_SYMBOL_UNUSED( cargo );
 
@@ -3609,7 +3615,7 @@ static void hb_com_exit( void* cargo )
    }
 }
 
-static void hb_com_init( void* cargo )
+static void hb_com_init( void * cargo )
 {
    HB_SYMBOL_UNUSED( cargo );
 
@@ -3619,8 +3625,8 @@ static void hb_com_init( void* cargo )
 
       for( iPort = 0; iPort < HB_COM_PORT_MAX; ++iPort )
       {
-         s_comList[ iPort ].port = iPort + 1;
-         s_comList[ iPort ].status = HB_COM_ENABLED;
+         s_comList[ iPort ].port    = iPort + 1;
+         s_comList[ iPort ].status  = HB_COM_ENABLED;
       }
 
       hb_vmAtQuit( hb_com_exit, NULL );
@@ -3630,12 +3636,12 @@ static void hb_com_init( void* cargo )
 }
 
 HB_CALL_ON_STARTUP_BEGIN( _hb_com_init_ )
-   hb_vmAtInit( hb_com_init, NULL );
+hb_vmAtInit( hb_com_init, NULL );
 HB_CALL_ON_STARTUP_END( _hb_com_init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_com_init_
 #elif defined( HB_DATASEG_STARTUP )
-   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( _hb_com_init_ )
+   #define HB_DATASEG_BODY HB_DATASEG_FUNC( _hb_com_init_ )
    #include "hbiniseg.h"
 #endif

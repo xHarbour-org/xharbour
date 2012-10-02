@@ -75,46 +75,51 @@ extern int hb_arrayMode( void );
 HB_FUNC( OS )
 {
    char * pszPlatform = hb_verPlatform();
+
    hb_retcAdopt( pszPlatform );
 }
 
 HB_FUNC( HB_COMPILER )
 {
    char * pszCompiler = hb_verCompiler();
+
    hb_retcAdopt( pszCompiler );
 }
 
 HB_FUNC( VERSION )
 {
    char * pszVersion = hb_verHarbour();
+
    hb_retcAdopt( pszVersion );
 }
 
 HB_FUNC( HB_PCODEVER )
 {
    char * pszPCodeVersion = hb_verPCode();
+
    hb_retcAdopt( pszPCodeVersion );
 }
 
 HB_FUNC( HB_BUILDDATE )
 {
-   char *szBldDate = hb_builddate() ;
+   char * szBldDate = hb_builddate();
+
    hb_retcAdopt( szBldDate );
 }
 
 HB_FUNC( HB_BUILDINFO )
 {
-   PHB_ITEM pQuery = hb_param( 1, HB_IT_INTEGER );
-   HB_ITEM hbInfo;
-   HB_ITEM Return;
-   int iWords = 0;
-   int ui;
-   HB_ITEM Temp;
-   char * pszBuildInfo = hb_verBuildInfo( FALSE );
+   PHB_ITEM pQuery         = hb_param( 1, HB_IT_INTEGER );
+   HB_ITEM  hbInfo;
+   HB_ITEM  Return;
+   int      iWords         = 0;
+   int      ui;
+   HB_ITEM  Temp;
+   char *   pszBuildInfo   = hb_verBuildInfo( FALSE );
 
    ( &hbInfo )->type = HB_IT_NIL;
    ( &Return )->type = HB_IT_NIL;
-   ( &Temp   )->type = HB_IT_NIL;
+   ( &Temp )->type   = HB_IT_NIL;
 
    hb_arrayNew( &hbInfo, 0 );
 
@@ -123,10 +128,10 @@ HB_FUNC( HB_BUILDINFO )
 
    hb_arrayNew( &Return, iWords );
 
-   for ( ui=0; ui<iWords; ui++ )
+   for( ui = 0; ui < iWords; ui++ )
    {
-      char * szInfo = hb_arrayGetC( &hbInfo, ui + 1 );
-      HB_SIZE iLen = strlen( szInfo );
+      char *   szInfo   = hb_arrayGetC( &hbInfo, ui + 1 );
+      HB_SIZE  iLen     = strlen( szInfo );
 
       if( hb_stricmp( szInfo, "yes" ) == 0 )
       {
@@ -136,7 +141,7 @@ HB_FUNC( HB_BUILDINFO )
       {
          hb_arraySetForward( &Return, ui + 1, hb_itemPutL( &Temp, FALSE ) );
       }
-      else if ( iLen > 5 && ( szInfo[iLen-1] == ')' && szInfo[iLen-2] == 'm' && szInfo[iLen-3] == 'u' && szInfo[iLen-4] == 'n' && szInfo[iLen-5] == '(') )
+      else if( iLen > 5 && ( szInfo[ iLen - 1 ] == ')' && szInfo[ iLen - 2 ] == 'm' && szInfo[ iLen - 3 ] == 'u' && szInfo[ iLen - 4 ] == 'n' && szInfo[ iLen - 5 ] == '(' ) )
       {
          szInfo[ iLen - 5 ] = 0;
          hb_arraySetForward( &Return, ui + 1, hb_itemPutNI( &Temp, atoi( szInfo ) ) );
@@ -151,10 +156,10 @@ HB_FUNC( HB_BUILDINFO )
 
    // add info on MT and VM Optimization
    {
-      PHB_ITEM pMT = hb_itemDoC( "HB_MULTITHREAD", 0, NULL, NULL );
-      BOOL lMT = pMT->item.asLogical.value;
-      PHB_ITEM pOpt = hb_itemDoC( "HB_VMMODE", 0, NULL, NULL );
-      int iOpt = pOpt->item.asInteger.value;
+      PHB_ITEM pMT   = hb_itemDoC( "HB_MULTITHREAD", 0, NULL, NULL );
+      BOOL     lMT   = pMT->item.asLogical.value;
+      PHB_ITEM pOpt  = hb_itemDoC( "HB_VMMODE", 0, NULL, NULL );
+      int      iOpt  = pOpt->item.asInteger.value;
 
       hb_arrayAddForward( &Return, hb_itemPutL( &Temp, lMT ) );
       hb_arrayAddForward( &Return, hb_itemPutNI( &Temp, iOpt ) );
@@ -171,8 +176,8 @@ HB_FUNC( HB_BUILDINFO )
 
    // Contributors
    {
-      HB_ITEM Credits;
-      char *szCredits = hb_credits();
+      HB_ITEM  Credits;
+      char *   szCredits = hb_credits();
 
       ( &Credits )->type = HB_IT_NIL;
       hb_arrayNew( &Credits, 0 );
@@ -202,22 +207,24 @@ HB_FUNC( HB_BUILDINFO )
 
 }
 
-#define __PRG_SOURCE__ __FILE__
+#define __PRG_SOURCE__     __FILE__
 
 HB_FUNC_EXTERN( HB_VMMODE );
 HB_FUNC_EXTERN( HB_MULTITHREAD );
 
 #undef HB_PRG_PCODE_VER
-#define HB_PRG_PCODE_VER HB_PCODE_VER
+#define HB_PRG_PCODE_VER   HB_PCODE_VER
 
 HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_HBVER )
-{ "HB_VMMODE",      {HB_FS_PUBLIC}, {HB_FUNCNAME( HB_VMMODE )},      NULL },
-{ "HB_MULTITHREAD", {HB_FS_PUBLIC}, {HB_FUNCNAME( HB_MULTITHREAD )}, NULL }
+{
+   "HB_VMMODE", { HB_FS_PUBLIC }, { HB_FUNCNAME( HB_VMMODE ) }, NULL
+},
+{ "HB_MULTITHREAD", { HB_FS_PUBLIC }, { HB_FUNCNAME( HB_MULTITHREAD ) }, NULL }
 HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_HBVER )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup hb_vm_SymbolInit_HBVER
 #elif defined( HB_DATASEG_STARTUP )
-   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( hb_vm_SymbolInit_HBVER )
+   #define HB_DATASEG_BODY HB_DATASEG_FUNC( hb_vm_SymbolInit_HBVER )
    #include "hbiniseg.h"
 #endif

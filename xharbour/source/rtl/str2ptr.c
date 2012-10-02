@@ -62,15 +62,15 @@ HB_FUNC( HB_POINTER2STRING )
 
    if( HB_IS_POINTER( pPointer ) && pLen )
    {
-      hb_retclenStatic( (char *) hb_itemGetPtr( pPointer ), (ULONG) hb_itemGetNL( pLen ) );
+      hb_retclenStatic( ( char * ) hb_itemGetPtr( pPointer ), ( ULONG ) hb_itemGetNL( pLen ) );
    }
    else if( HB_IS_INTEGER( pPointer ) && pLen )
    {
-      hb_retclenStatic( (char *) hb_itemGetNI( pPointer ), (ULONG) hb_itemGetNL( pLen ) );
+      hb_retclenStatic( ( char * ) hb_itemGetNI( pPointer ), ( ULONG ) hb_itemGetNL( pLen ) );
    }
    else if( HB_IS_LONG( pPointer ) && pLen )
    {
-      hb_retclenStatic( (char *) hb_itemGetNL( pPointer ), (ULONG) hb_itemGetNL( pLen ) );
+      hb_retclenStatic( ( char * ) hb_itemGetNL( pPointer ), ( ULONG ) hb_itemGetNL( pLen ) );
    }
    else
    {

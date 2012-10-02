@@ -58,11 +58,11 @@
 
 HB_FUNC( STR )
 {
-   PHB_ITEM pNumber = hb_param( 1, HB_IT_NUMERIC );
-   PHB_ITEM pWidth  = NULL;
-   PHB_ITEM pDec    = NULL;
-   BOOL bValid = FALSE;
-   BOOL bLtrim = FALSE;
+   PHB_ITEM pNumber  = hb_param( 1, HB_IT_NUMERIC );
+   PHB_ITEM pWidth   = NULL;
+   PHB_ITEM pDec     = NULL;
+   BOOL     bValid   = FALSE;
+   BOOL     bLtrim   = FALSE;
 
    if( pNumber )
    {
@@ -80,23 +80,23 @@ HB_FUNC( STR )
       {
          pDec = hb_param( 3, HB_IT_NUMERIC );
 
-         if ( ! pDec && iParams < 4 )
+         if( ! pDec && iParams < 4 )
             bValid = FALSE;
       }
       if( bValid && iParams >= 4 )
       {
          PHB_ITEM pLtrim = hb_param( 4, HB_IT_LOGICAL );
 
-         if ( pLtrim )
+         if( pLtrim )
             bLtrim = pLtrim->item.asLogical.value;
       }
    }
 
    if( bValid )
    {
-      char * szResult;
-      BOOL bLogical = hb_setGetFixed();
-      PHB_ITEM pSet = hb_itemPutL( NULL, FALSE );
+      char *   szResult;
+      BOOL     bLogical = hb_setGetFixed();
+      PHB_ITEM pSet     = hb_itemPutL( NULL, FALSE );
 
       hb_setSetItem( HB_SET_FIXED, pSet );
 
@@ -123,15 +123,15 @@ HB_FUNC( STR )
 
          hb_retcAdopt( szResult );
       }
-      else if ( ( pWidth ) && ( pDec ) && ( hb_itemGetNI( pWidth ) - ( hb_itemGetNI( pDec ) + 1) == 0 ) )
+      else if( ( pWidth ) && ( pDec ) && ( hb_itemGetNI( pWidth ) - ( hb_itemGetNI( pDec ) + 1 ) == 0 ) )
       {
-        int iLen = hb_itemGetNI( pWidth ) ;
-        char *szTemp = (char *) hb_xgrab( iLen + 1  ) ;
+         int      iLen     = hb_itemGetNI( pWidth );
+         char *   szTemp   = ( char * ) hb_xgrab( iLen + 1  );
 
-        hb_xmemset( szTemp, '*', iLen );
-		  szTemp[ iLen + 1 ] = '\0';
+         hb_xmemset( szTemp, '*', iLen );
+         szTemp[ iLen + 1 ] = '\0';
 
-        hb_retcAdopt( szTemp ) ;
+         hb_retcAdopt( szTemp );
       }
       else
       {

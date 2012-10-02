@@ -65,23 +65,23 @@
 
 void hb_readLine( const char * szText, HB_SIZE ulTextLen, HB_SIZE uiLineLen, USHORT uiTabLen, BOOL bWrap, char ** Term, int * iTermSizes, USHORT uiTerms, BOOL * bFound, BOOL * bEOF, HB_SIZE * lEnd, HB_SIZE * ulEndOffset )
 {
-   USHORT uiPosTerm, uiPosition;
-   ULONG ulPos, ulCurrCol, ulLastBlk;
-   BOOL bBreak = 0;
+   USHORT   uiPosTerm, uiPosition;
+   ULONG    ulPos, ulCurrCol, ulLastBlk;
+   BOOL     bBreak = 0;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_readLine(%p, %i, %i, %i, %i, %p, %p, %i, %i, %i, %i, %i)", szText, ulTextLen, uiLineLen, uiTabLen, bWrap, ** Term, * iTermSizes, uiTerms, *bFound, *bEOF, *lEnd, *ulEndOffset ));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_readLine(%p, %i, %i, %i, %i, %p, %p, %i, %i, %i, %i, %i)", szText, ulTextLen, uiLineLen, uiTabLen, bWrap, **Term, *iTermSizes, uiTerms, *bFound, *bEOF, *lEnd, *ulEndOffset ) );
 
-   *bFound    = 0;
-   *bEOF      = 0;
-   *lEnd      = 0;
-   ulCurrCol  = 0;
-   ulLastBlk  = 0;
+   *bFound     = 0;
+   *bEOF       = 0;
+   *lEnd       = 0;
+   ulCurrCol   = 0;
+   ulLastBlk   = 0;
 
    if( ulTextLen <= 0 )
    {
-      *lEnd        = -1;
-      *ulEndOffset = 0;
-      *bEOF        = 1;
+      *lEnd          = -1;
+      *ulEndOffset   = 0;
+      *bEOF          = 1;
       return;
    }
 
@@ -95,13 +95,13 @@ void hb_readLine( const char * szText, HB_SIZE ulTextLen, HB_SIZE uiLineLen, USH
       // Check for line terminators
       for( uiPosTerm = 0; uiPosTerm < uiTerms; uiPosTerm++ )
       {
-         if( szText[ulPos] == Term[uiPosTerm][0] && (ulPos + iTermSizes[uiPosTerm] - 1) < ulTextLen )
+         if( szText[ ulPos ] == Term[ uiPosTerm ][ 0 ] && ( ulPos + iTermSizes[ uiPosTerm ] - 1 ) < ulTextLen )
          {
             *bFound = 1;
 
-            for( uiPosition = 1; uiPosition < iTermSizes[uiPosTerm]; uiPosition++ )
+            for( uiPosition = 1; uiPosition < iTermSizes[ uiPosTerm ]; uiPosition++ )
             {
-               if( Term[uiPosTerm][uiPosition] != szText[ ulPos+uiPosition ] )
+               if( Term[ uiPosTerm ][ uiPosition ] != szText[ ulPos + uiPosition ] )
                {
                   *bFound = 0;
                   break;
@@ -112,29 +112,29 @@ void hb_readLine( const char * szText, HB_SIZE ulTextLen, HB_SIZE uiLineLen, USH
             {
                if( ulPos == 0 )
                {
-                  *lEnd = -1;
-                  *ulEndOffset = iTermSizes[uiPosTerm];
+                  *lEnd          = -1;
+                  *ulEndOffset   = iTermSizes[ uiPosTerm ];
                }
                else
                {
-                  *lEnd = ulPos - 1;
-                  *ulEndOffset = ulPos + iTermSizes[uiPosTerm];
+                  *lEnd          = ulPos - 1;
+                  *ulEndOffset   = ulPos + iTermSizes[ uiPosTerm ];
                }
                break;
             }
          }
       }
 
-      if(  szText[ulPos] == HB_CHAR_HT )
+      if( szText[ ulPos ] == HB_CHAR_HT )
       {
          ulCurrCol += uiTabLen - ( ulCurrCol % uiTabLen );
       }
-      else if(  szText[ulPos] == HB_CHAR_SOFT1 &&  szText[ulPos + 1] == HB_CHAR_SOFT2 )
+      else if( szText[ ulPos ] == HB_CHAR_SOFT1 && szText[ ulPos + 1 ] == HB_CHAR_SOFT2 )
       {
          // Clipper does NOT considers SOFT CR as a word seperator - WHY?
          // Should we not fix that?
          #if 0
-            ulLastBlk = ulPos;
+         ulLastBlk = ulPos;
          #endif
 
          ulPos++;
@@ -149,7 +149,7 @@ void hb_readLine( const char * szText, HB_SIZE ulTextLen, HB_SIZE uiLineLen, USH
          break;
       }
 
-      if( szText[ulPos] == ' ' || szText[ulPos] == HB_CHAR_HT )
+      if( szText[ ulPos ] == ' ' || szText[ ulPos ] == HB_CHAR_HT )
       {
          ulLastBlk = ulPos;
       }
@@ -158,16 +158,16 @@ void hb_readLine( const char * szText, HB_SIZE ulTextLen, HB_SIZE uiLineLen, USH
       {
          if( bWrap == FALSE || ulLastBlk == 0 )
          {
-            *lEnd = ulPos-1;
-            *ulEndOffset = ulPos;
-            bBreak = 1;
+            *lEnd          = ulPos - 1;
+            *ulEndOffset   = ulPos;
+            bBreak         = 1;
             break;
          }
          else if( bWrap && ulLastBlk != 0 )
          {
-            *lEnd = ulLastBlk;
-            *ulEndOffset = ulLastBlk + 1;
-            bBreak = 1;
+            *lEnd          = ulLastBlk;
+            *ulEndOffset   = ulLastBlk + 1;
+            bBreak         = 1;
             break;
          }
       }
@@ -175,13 +175,13 @@ void hb_readLine( const char * szText, HB_SIZE ulTextLen, HB_SIZE uiLineLen, USH
 
    if( *bFound == FALSE && bBreak == FALSE )
    {
-      *lEnd        = ulTextLen - 1;
-      *ulEndOffset = ulTextLen - 1;
-      *bEOF        = 1;
+      *lEnd          = ulTextLen - 1;
+      *ulEndOffset   = ulTextLen - 1;
+      *bEOF          = 1;
    }
 }
 
-LONG hb_tabexpand(const char * szString, char * szRet, HB_SIZE lEnd, USHORT uiTabLen )
+LONG hb_tabexpand( const char * szString, char * szRet, HB_SIZE lEnd, USHORT uiTabLen )
 {
    LONG lPos, lSpAdded = 0;
 
@@ -189,9 +189,9 @@ LONG hb_tabexpand(const char * szString, char * szRet, HB_SIZE lEnd, USHORT uiTa
    {
       if( szString[ lPos ] == HB_CHAR_HT )
       {
-         lSpAdded += ( (uiTabLen > 0) ? uiTabLen - ( ( lPos + lSpAdded ) % uiTabLen ) - 1 : 0);
+         lSpAdded += ( ( uiTabLen > 0 ) ? uiTabLen - ( ( lPos + lSpAdded ) % uiTabLen ) - 1 : 0 );
       }
-      else if ( ( lPos < ( LONG ) lEnd && szString[ lPos ] == HB_CHAR_SOFT1 && szString[ lPos + 1 ] == HB_CHAR_SOFT2 ) || szString[ lPos ] == HB_CHAR_LF )
+      else if( ( lPos < ( LONG ) lEnd && szString[ lPos ] == HB_CHAR_SOFT1 && szString[ lPos + 1 ] == HB_CHAR_SOFT2 ) || szString[ lPos ] == HB_CHAR_LF )
       {
          lSpAdded--;
       }
@@ -206,32 +206,32 @@ LONG hb_tabexpand(const char * szString, char * szRet, HB_SIZE lEnd, USHORT uiTa
 
 HB_FUNC( HB_TABEXPAND )
 {
-   const char * szText = hb_parcx( 1 );
-   HB_SIZE lStrLen    = hb_parclen( 1 );
-   USHORT uiTabLen = (USHORT) hb_parni( 2 );
-   USHORT uiTabCount = 0;
-   HB_SIZE lPos, lSize;
-   char * szRet;
+   const char *   szText      = hb_parcx( 1 );
+   HB_SIZE        lStrLen     = hb_parclen( 1 );
+   USHORT         uiTabLen    = ( USHORT ) hb_parni( 2 );
+   USHORT         uiTabCount  = 0;
+   HB_SIZE        lPos, lSize;
+   char *         szRet;
 
-   for (lPos = 0; lPos < lStrLen; lPos ++ )
+   for( lPos = 0; lPos < lStrLen; lPos++ )
    {
       if( szText[ lPos ] == HB_CHAR_HT )
       {
-         uiTabCount ++;
+         uiTabCount++;
       }
    }
 
-   if( (lStrLen == 0) || (uiTabCount == 0) || (uiTabLen == 0) )
+   if( ( lStrLen == 0 ) || ( uiTabCount == 0 ) || ( uiTabLen == 0 ) )
    {
       hb_retc( szText );
    }
    else
    {
-      lSize = lStrLen + uiTabCount*(uiTabLen - 1);
-      szRet = (char *) hb_xgrab( lSize + 1 );
-      memset( szRet, ' ', (size_t) lSize );
-      lStrLen = hb_tabexpand( szText, szRet, lStrLen, uiTabLen );
-      hb_retclenAdopt( szRet, lStrLen);
+      lSize    = lStrLen + uiTabCount * ( uiTabLen - 1 );
+      szRet    = ( char * ) hb_xgrab( lSize + 1 );
+      memset( szRet, ' ', ( size_t ) lSize );
+      lStrLen  = hb_tabexpand( szText, szRet, lStrLen, uiTabLen );
+      hb_retclenAdopt( szRet, lStrLen );
    }
 
 }
@@ -239,29 +239,29 @@ HB_FUNC( HB_TABEXPAND )
 // HB_READLINE( <cText>, [<aTerminators | cTerminator>], <nLineLen>, <nTabLen>, <lWrap>, [<nStartOffset>], @nOffSet, @nEnd, @lFound, @lEOF )
 HB_FUNC( HB_READLINE )
 {
-   PHB_ITEM pTerm1;
-   const char * szText = hb_parcx( 1 );
-   char ** Term;
-   int * iTermSizes;
-   USHORT uiTabLen, uiTerms;
-   ULONG ulLineSize = hb_parni(3);
-   USHORT i;
-   BOOL bWrap = hb_parl(5);
-   BOOL bFound, bEOF;
-   ULONG ulStartOffset;
-   HB_SIZE ulEndOffset, ulTextLen;
-   HB_SIZE lEnd;
-   HB_ITEM Opt;
-   BOOL bAlloc_Term1 = FALSE;
+   PHB_ITEM       pTerm1;
+   const char *   szText = hb_parcx( 1 );
+   char **        Term;
+   int *          iTermSizes;
+   USHORT         uiTabLen, uiTerms;
+   ULONG          ulLineSize  = hb_parni( 3 );
+   USHORT         i;
+   BOOL           bWrap       = hb_parl( 5 );
+   BOOL           bFound, bEOF;
+   ULONG          ulStartOffset;
+   HB_SIZE        ulEndOffset, ulTextLen;
+   HB_SIZE        lEnd;
+   HB_ITEM        Opt;
+   BOOL           bAlloc_Term1 = FALSE;
 
-   if( !ISCHAR( 1 ) )
+   if( ! ISCHAR( 1 ) )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "READLINE", 9, hb_paramError(1), hb_paramError(2), hb_paramError(3), hb_paramError(4),  hb_paramError(5), hb_paramError(6), hb_paramError(7), hb_paramError(8), hb_paramError(9), hb_paramError(10) );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "READLINE", 9, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ), hb_paramError( 7 ), hb_paramError( 8 ), hb_paramError( 9 ), hb_paramError( 10 ) );
       return;
    }
 
-   ulTextLen = hb_parclen(1);
-   uiTabLen  = (USHORT) hb_parclen(4);
+   ulTextLen   = hb_parclen( 1 );
+   uiTabLen    = ( USHORT ) hb_parclen( 4 );
 
    if( ISNUM( 6 ) )
    {
@@ -274,8 +274,8 @@ HB_FUNC( HB_READLINE )
 
    if( ! ( ISARRAY( 2 ) || ISCHAR( 2 ) ) )
    {
-      pTerm1 = hb_itemPutC( NULL, hb_setGetEOL() );
-      bAlloc_Term1 = TRUE;
+      pTerm1         = hb_itemPutC( NULL, hb_setGetEOL() );
+      bAlloc_Term1   = TRUE;
    }
    else
    {
@@ -286,24 +286,24 @@ HB_FUNC( HB_READLINE )
 
    if( HB_IS_ARRAY( pTerm1 ) )
    {
-      uiTerms = (USHORT) pTerm1->item.asArray.value->ulLen;
-      Term  = (char**) hb_xgrab( sizeof(char*) * uiTerms );
-      iTermSizes = (int *) hb_xgrab( sizeof(int) * uiTerms );
+      uiTerms     = ( USHORT ) pTerm1->item.asArray.value->ulLen;
+      Term        = ( char ** ) hb_xgrab( sizeof( char * ) * uiTerms );
+      iTermSizes  = ( int * ) hb_xgrab( sizeof( int ) * uiTerms );
 
       for( i = 0; i < uiTerms; i++ )
       {
          hb_arrayGet( pTerm1, i + 1, &Opt );
-         Term[i]       = (char *) (&Opt)->item.asString.value;
-         iTermSizes[i] = (int) (&Opt)->item.asString.length;
+         Term[ i ]         = ( char * ) ( &Opt )->item.asString.value;
+         iTermSizes[ i ]   = ( int ) ( &Opt )->item.asString.length;
       }
    }
    else
    {
-      Term          = (char**) hb_xgrab( sizeof(char*) );
-      iTermSizes    = (int *) hb_xgrab( sizeof(int) );
-      Term[0]       = (char *) pTerm1->item.asString.value;
-      iTermSizes[0] = (int) pTerm1->item.asString.length;
-      uiTerms       = 1;
+      Term              = ( char ** ) hb_xgrab( sizeof( char * ) );
+      iTermSizes        = ( int * ) hb_xgrab( sizeof( int ) );
+      Term[ 0 ]         = ( char * ) pTerm1->item.asString.value;
+      iTermSizes[ 0 ]   = ( int ) pTerm1->item.asString.length;
+      uiTerms           = 1;
    }
 
    ulStartOffset--;

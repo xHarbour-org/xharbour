@@ -71,19 +71,19 @@ HB_FUNC( STRTRAN )
 
       if( pSeek )
       {
-         char * szText = pText->item.asString.value;
-         HB_SIZE ulText = pText->item.asString.length;
-         HB_SIZE ulSeek = pSeek->item.asString.length;
+         char *   szText   = pText->item.asString.value;
+         HB_SIZE  ulText   = pText->item.asString.length;
+         HB_SIZE  ulSeek   = pSeek->item.asString.length;
 
          if( ulSeek && ulSeek <= ulText )
          {
-            char * szSeek = pSeek->item.asString.value;
-            char * szReplace;
-            HB_SIZE ulStart;
+            char *   szSeek = pSeek->item.asString.value;
+            char *   szReplace;
+            HB_SIZE  ulStart;
 
             ulStart = ( hb_param( 4, HB_IT_NUMERIC ) ? hb_parnl( 4 ) : 1 );
 
-            if( !ulStart )
+            if( ! ulStart )
             {
                /* Clipper seems to work this way */
                hb_retc( "" );
@@ -91,42 +91,42 @@ HB_FUNC( STRTRAN )
             else if( ulStart > 0 )
             {
                PHB_ITEM pReplace = hb_param( 3, HB_IT_STRING );
-               HB_SIZE ulReplace;
-               HB_SIZE ulCount;
-               BOOL bAll;
+               HB_SIZE  ulReplace;
+               HB_SIZE  ulCount;
+               BOOL     bAll;
 
                if( pReplace )
                {
-                  szReplace = pReplace->item.asString.value;
-                  ulReplace = pReplace->item.asString.length;
+                  szReplace   = pReplace->item.asString.value;
+                  ulReplace   = pReplace->item.asString.length;
                }
                else
                {
-                  szReplace = ""; /* shouldn't matter that we don't allocate */
-                  ulReplace = 0;
+                  szReplace   = ""; /* shouldn't matter that we don't allocate */
+                  ulReplace   = 0;
                }
 
                if( ISNUM( 5 ) )
                {
-                  ulCount = hb_parnl( 5 );
-                  bAll = FALSE;
+                  ulCount  = hb_parnl( 5 );
+                  bAll     = FALSE;
                }
                else
                {
-                  ulCount = 0;
-                  bAll = TRUE;
+                  ulCount  = 0;
+                  bAll     = TRUE;
                }
 
                if( bAll || ulCount > 0 )
                {
-                  HB_SIZE ulFound = 0;
-                  LONG lReplaced = 0;
-                  HB_SIZE i = 0;
-                  HB_SIZE ulLength = ulText;
+                  HB_SIZE  ulFound     = 0;
+                  LONG     lReplaced   = 0;
+                  HB_SIZE  i           = 0;
+                  HB_SIZE  ulLength    = ulText;
 
                   while( i < ulText - ulSeek + 1 )
                   {
-                     if( ( bAll || lReplaced < ( LONG ) ulCount ) && memcmp( szText + i, szSeek, (size_t) ulSeek ) == 0 )
+                     if( ( bAll || lReplaced < ( LONG ) ulCount ) && memcmp( szText + i, szSeek, ( size_t ) ulSeek ) == 0 )
                      {
                         ulFound++;
 
@@ -134,34 +134,34 @@ HB_FUNC( STRTRAN )
                         {
                            lReplaced++;
                            ulLength = ulLength - ulSeek + ulReplace;
-                           i += ulSeek;
+                           i        += ulSeek;
                            continue;
                         }
                      }
-                     
+
                      i++;
                   }
-                  
+
                   if( ulFound )
                   {
-                     char * szResult = ( char * ) hb_xgrab( ulLength + 1 );
-                     char * szPtr = szResult;
+                     char *   szResult = ( char * ) hb_xgrab( ulLength + 1 );
+                     char *   szPtr    = szResult;
 
-                     ulFound = 0;
-                     i = 0;
-                     
+                     ulFound  = 0;
+                     i        = 0;
+
                      while( i < ulText - ulSeek + 1 )
                      {
-                        if( lReplaced && memcmp( szText + i, szSeek, (size_t) ulSeek ) == 0 )
+                        if( lReplaced && memcmp( szText + i, szSeek, ( size_t ) ulSeek ) == 0 )
                         {
                            ulFound++;
 
                            if( ulFound >= ulStart )
                            {
                               lReplaced--;
-                              HB_MEMCPY( szPtr, szReplace, (size_t) ulReplace );
+                              HB_MEMCPY( szPtr, szReplace, ( size_t ) ulReplace );
                               szPtr += ulReplace;
-                              i += ulSeek;
+                              i     += ulSeek;
                               continue;
                            }
                         }
@@ -177,7 +177,7 @@ HB_FUNC( STRTRAN )
                         szPtr++;
                         i++;
                      }
-                     
+
                      hb_retclenAdopt( szResult, ulLength );
                   }
                   else

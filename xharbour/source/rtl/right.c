@@ -60,8 +60,8 @@ HB_FUNC( RIGHT )
 
    if( pText && ISNUM( 2 ) )
    {
-      LONG lLen = hb_parnl( 2 );
-      LONG lTextLen = ( LONG ) pText->item.asString.length;
+      LONG  lLen     = hb_parnl( 2 );
+      LONG  lTextLen = ( LONG ) pText->item.asString.length;
 
       if( lLen > lTextLen )
       {

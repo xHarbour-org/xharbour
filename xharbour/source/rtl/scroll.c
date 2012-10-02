@@ -57,13 +57,13 @@
 
 HB_FUNC( SCROLL )
 {
-   int iMaxRow = hb_gtMaxRow();
-   int iMaxCol = hb_gtMaxCol();
+   int   iMaxRow  = hb_gtMaxRow();
+   int   iMaxCol  = hb_gtMaxCol();
 
-   int iTop;
-   int iLeft;
-   int iBottom;
-   int iRight;
+   int   iTop;
+   int   iLeft;
+   int   iBottom;
+   int   iRight;
 
    /* Enforce limits of (0,0) to (MAXROW(),MAXCOL()) */
 
@@ -125,8 +125,8 @@ HB_FUNC( SCROLL )
                 ( USHORT ) iLeft,
                 ( USHORT ) iBottom,
                 ( USHORT ) iRight,
-                ( SHORT ) hb_parni( 5 ), /* Defaults to zero on bad type */
-                ( SHORT ) hb_parni( 6 ) ); /* Defaults to zero on bad type */
+                ( SHORT ) hb_parni( 5 ),     /* Defaults to zero on bad type */
+                ( SHORT ) hb_parni( 6 ) );   /* Defaults to zero on bad type */
 }
 
 //-------------------------------------------------------------------//
@@ -137,22 +137,22 @@ HB_FUNC( SCROLLFIXED )
                 ( USHORT ) hb_parni( 2 ),
                 ( USHORT ) hb_parni( 3 ),
                 ( USHORT ) hb_parni( 4 ),
-                ( SHORT ) hb_parni( 5 ),   /* Defaults to zero on bad type */
-                ( SHORT ) hb_parni( 6 ) ); /* Defaults to zero on bad type */
+                ( SHORT ) hb_parni( 5 ),     /* Defaults to zero on bad type */
+                ( SHORT ) hb_parni( 6 ) );   /* Defaults to zero on bad type */
 }
 
 
 HB_FUNC( HB_SCROLL )
 {
-   int iMaxRow = hb_gtMaxRow();
-   int iMaxCol = hb_gtMaxCol();
+   int   iMaxRow  = hb_gtMaxRow();
+   int   iMaxCol  = hb_gtMaxCol();
 
-   int iTop;
-   int iLeft;
-   int iBottom;
-   int iRight;
-   int iColor;
-   int iChar;
+   int   iTop;
+   int   iLeft;
+   int   iBottom;
+   int   iRight;
+   int   iColor;
+   int   iChar;
 
    /* Enforce limits of (0,0) to (MAXROW(),MAXCOL()) */
 
@@ -200,7 +200,7 @@ HB_FUNC( HB_SCROLL )
    if( ISNUM( 8 ) )
       iChar = hb_parni( 8 );
    else if( ISCHAR( 8 ) )
-      iChar = ( UCHAR ) hb_parc( 8 )[0];
+      iChar = ( UCHAR ) hb_parc( 8 )[ 0 ];
    else
       iChar = -1;
 
@@ -210,6 +210,6 @@ HB_FUNC( HB_SCROLL )
                   iRight,
                   iColor,
                   iChar,
-                  hb_parni( 5 ), /* Defaults to zero on bad type */
-                  hb_parni( 6 ) ); /* Defaults to zero on bad type */
+                  hb_parni( 5 ),    /* Defaults to zero on bad type */
+                  hb_parni( 6 ) );  /* Defaults to zero on bad type */
 }

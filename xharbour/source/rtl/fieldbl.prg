@@ -52,20 +52,20 @@
 
 #include "common.ch"
 
-FUNCTION FIELDBLOCK( cFieldName )
+FUNCTION FieldBlock( cFieldName )
 
    IF ISCHARACTER( cFieldName )
-      RETURN {| x | iif( x == NIL, FieldGet( FieldPos( cFieldName ) ),;
-                                   FieldPut( FieldPos( cFieldName ), x ) ) }
+      RETURN {| x | iif( x == NIL, FieldGet( FieldPos( cFieldName ) ), ;
+         FieldPut( FieldPos( cFieldName ), x ) ) }
    ENDIF
 
    RETURN NIL
 
-FUNCTION FIELDWBLOCK( cFieldName, nWorkArea )
+FUNCTION FieldWBlock( cFieldName, nWorkArea )
 
    IF ISCHARACTER( cFieldName ) .AND. ISNUMBER( nWorkArea )
-      RETURN {| x | iif( x == NIL, ( nWorkArea )->( FieldGet( FieldPos( cFieldName ) ) ),;
-                                   ( nWorkArea )->( FieldPut( FieldPos( cFieldName ), x ) ) ) }
+      RETURN {| x | iif( x == NIL, ( nWorkArea )->( FieldGet( FieldPos( cFieldName ) ) ), ;
+         ( nWorkArea )->( FieldPut( FieldPos( cFieldName ), x ) ) ) }
    ENDIF
 
    RETURN NIL

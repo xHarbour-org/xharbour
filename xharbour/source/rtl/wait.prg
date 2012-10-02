@@ -53,6 +53,7 @@
 #include "inkey.ch"
 
 FUNCTION __Wait( xPrompt )
+
    LOCAL nKey
    LOCAL bBlock
 
@@ -66,7 +67,7 @@ FUNCTION __Wait( xPrompt )
       IF ( bBlock := SetKey( nKey ) ) != NIL
          Eval( bBlock, ProcName( 1 ), ProcLine( 1 ), "" )
       ELSE
-         IF nKey >= 32 .and. nKey <= 255
+         IF nKey >= 32 .AND. nKey <= 255
             QQOut( Chr( nKey ) )
          ELSE
             nKey := 0

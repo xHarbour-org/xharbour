@@ -55,10 +55,11 @@
 /* NOTE: Xbase++ has a standard function named dbSkipper(), it's not a
          standard CA-Cl*pper 5.x function, though. */
 
-/* NOTE: This function is exactly the same as Skipped() in BROWDB.PRG */
+   /* NOTE: This function is exactly the same as Skipped() in BROWDB.PRG */
 
 #ifdef HB_COMPAT_XPP
 #ifdef __USE_OLD__
+
 FUNCTION dbSkipper( nRecs )
 
    LOCAL nSkipped := 0
@@ -69,16 +70,16 @@ FUNCTION dbSkipper( nRecs )
       ELSEIF nRecs > 0 .AND. RecNo() != LastRec() + 1
          DO WHILE nSkipped < nRecs
             dbSkip( 1 )
-            IF Eof()
-               dbSkip( -1 )
+            IF EOF()
+               dbSkip( - 1 )
                EXIT
             ENDIF
             nSkipped++
          ENDDO
       ELSEIF nRecs < 0
          DO WHILE nSkipped > nRecs
-            dbSkip( -1 )
-            IF Bof()
+            dbSkip( - 1 )
+            IF BOF()
                EXIT
             ENDIF
             nSkipped--
@@ -89,4 +90,5 @@ FUNCTION dbSkipper( nRecs )
    RETURN nSkipped
 
 #endif
+
 #endif

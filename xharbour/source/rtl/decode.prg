@@ -92,198 +92,201 @@ RETURN
 *
 *                   Decode a value from a list.
 *******************/
-FUNCTION HB_Decode(...)
 
-  LOCAL aParams, nParams, xDefault
-  LOCAL xVal, cKey, xRet
-  LOCAL aValues, aResults, n, i, nPos, nLen
+FUNCTION HB_Decode( ... )
 
-  aParams  := hb_aParams()
-  nParams  := PCount()
-  xDefault := NIL
+   LOCAL aParams, nParams, xDefault
+   LOCAL xVal, cKey, xRet
+   LOCAL aValues, aResults, n, i, nPos, nLen
 
-  DO CASE
+   aParams  := hb_AParams()
+   nParams  := PCount()
+   xDefault := NIL
 
-     CASE nParams > 1     // More parameters, real case
+   DO CASE
 
-          xVal := aParams[ 1 ]
+   CASE nParams > 1     // More parameters, real case
 
-          aDel( aParams, 1, TRUE ) // Resize params
-          nParams := Len( aParams )
+      xVal := aParams[ 1 ]
 
-          // if I have a odd number of members, last is default
-          IF ( nParams % 2 <> 0 )
-             xDefault := aTail( aParams )
-             // Resize again deleting last
-             aDel( aParams, nParams, TRUE )
-             nParams := Len( aParams )
-          ENDIF
+      ADel( aParams, 1, TRUE ) // Resize params
+      nParams := Len( aParams )
 
-          // Ok because I have no other value than default, I will check if it is a complex value
-          // like an array or an hash, so I can get it to decode values
-          IF xDefault <> NIL .AND. ;
-             ( ValType( xDefault ) == "A" .OR. ;
-               ValType( xDefault ) == "H" )
+      // if I have a odd number of members, last is default
+      IF ( nParams % 2 <> 0 )
+         xDefault := ATail( aParams )
+         // Resize again deleting last
+         ADel( aParams, nParams, TRUE )
+         nParams := Len( aParams )
+      ENDIF
 
-             // If it is an array I will restart this function creating a linear call
-             IF ValType( xDefault ) == "A" .AND. Len( xDefault ) > 0
+      // Ok because I have no other value than default, I will check if it is a complex value
+      // like an array or an hash, so I can get it to decode values
+      IF xDefault <> NIL .AND. ;
+            ( ValType( xDefault ) == "A" .OR. ;
+            ValType( xDefault ) == "H" )
 
-                // I can have a linear array like { 1, "A", 2, "B", 3, "C" }
-                // or an array of array couples like { { 1, "A" }, { 2, "B" }, { 3, "C" } }
-                // first element tell me what type is
+         // If it is an array I will restart this function creating a linear call
+         IF ValType( xDefault ) == "A" .AND. Len( xDefault ) > 0
 
-                // couples of values
-                IF ValType( xDefault[ 1 ] ) == "A"
+            // I can have a linear array like { 1, "A", 2, "B", 3, "C" }
+            // or an array of array couples like { { 1, "A" }, { 2, "B" }, { 3, "C" } }
+            // first element tell me what type is
 
-                   //// If i have an array as default, this contains couples of key / value
-                   //// so I have to convert in a linear array
+            // couples of values
+            IF ValType( xDefault[ 1 ] ) == "A"
 
-                   nLen := Len( xDefault )
+               //// If i have an array as default, this contains couples of key / value
+               //// so I have to convert in a linear array
 
-                   // Check if array has a default value, this will be last value and has a value
-                   // different from an array
-                   IF !( ValType( xDefault[ nLen ] ) == "A" )
+               nLen := Len( xDefault )
 
-                      aParams := Array( ( nLen - 1 ) * 2 )
+               // Check if array has a default value, this will be last value and has a value
+               // different from an array
+               IF !( ValType( xDefault[ nLen ] ) == "A" )
 
-                      n := 1
-                      FOR i := 1 TO nLen - 1
-                          aParams[ n++ ] := xDefault[ i ][ 1 ]
-                          aParams[ n++ ] := xDefault[ i ][ 2 ]
-                      NEXT
+                  aParams := Array( ( nLen - 1 ) * 2 )
 
-                      aAdd( aParams, xDefault[ nLen ] )
+                  n := 1
+                  FOR i := 1 TO nLen - 1
+                     aParams[ n++ ] := xDefault[ i ][ 1 ]
+                     aParams[ n++ ] := xDefault[ i ][ 2 ]
+                  NEXT
 
-                   ELSE
+                  AAdd( aParams, xDefault[ nLen ] )
 
-                      // I haven't a default
+               ELSE
 
-                      aParams := Array( Len( xDefault ) * 2 )
+                  // I haven't a default
 
-                      n := 1
-                      FOR i := 1 TO Len( xDefault )
-                          aParams[ n++ ] := xDefault[ i ][ 1 ]
-                          aParams[ n++ ] := xDefault[ i ][ 2 ]
-                      NEXT
+                  aParams := Array( Len( xDefault ) * 2 )
 
-                   ENDIF
-                ELSE
-                   // I have a linear array
+                  n := 1
+                  FOR i := 1 TO Len( xDefault )
+                     aParams[ n++ ] := xDefault[ i ][ 1 ]
+                     aParams[ n++ ] := xDefault[ i ][ 2 ]
+                  NEXT
 
-                   aParams := xDefault
-                ENDIF
+               ENDIF
+            ELSE
+               // I have a linear array
 
-
-             // If it is an hash, translate it in an array
-             ELSEIF ValType( xDefault ) == "H"
-
-                aParams := Array( Len( xDefault ) * 2 )
-
-                i := 1
-                FOR EACH cKey IN xDefault:Keys
-                    aParams[ i++ ] := cKey
-                    aParams[ i++ ] := xDefault[ cKey ]
-                NEXT
-
-             ENDIF
-
-             // Then add Decoding value at beginning
-             aIns( aParams, 1, xVal, TRUE )
-
-             // And run decode() again
-             xRet := hb_ExecFromArray( @hb_Decode(), aParams )
-
-          ELSE
-
-             // Ok let's go ahead with real function
-
-             // Combine in 2 lists having elements as { value } and { decode }
-             aValues  := Array( nParams / 2 )
-             aResults := Array( nParams / 2 )
-
-             i := 1
-             FOR n := 1 TO nParams - 1 STEP 2
-                 aValues[ i ]  := aParams[ n ]
-                 aResults[ i ] := aParams[ n + 1 ]
-                 i++
-             NEXT
-
-             // Check if value exists (valtype of values MUST be same of xVal,
-             // otherwise I will get a runtime error)
-             // TODO: Have I to check also between different valtypes, jumping different ?
-             nPos := aScan( aValues, {|e| e == xVal } )
-
-             IF nPos == 0 // Not Found, returning default
-
-                xRet := xDefault   // it could be also nil because not present
-
-             ELSE
-
-                xRet := aResults[ nPos ]
-
-             ENDIF
-
-          ENDIF
-
-     CASE nParams == 0    // No parameters
-          xRet := NIL
-
-     CASE nParams == 1    // Only value to decode as parameter, return an empty value of itself
-          xRet := EmptyValue( aParams[ 1 ] )
-
-  ENDCASE
+               aParams := xDefault
+            ENDIF
 
 
-RETURN xRet
+            // If it is an hash, translate it in an array
+         ELSEIF ValType( xDefault ) == "H"
 
-FUNCTION HB_DecodeOrEmpty(...)
-  LOCAL aParams := hb_aParams()
-  LOCAL xVal    := hb_ExecFromArray( @hb_decode(), aParams )
-RETURN IIF( xVal == NIL, EmptyValue( aParams[ 1 ] ), xVal )
+            aParams := Array( Len( xDefault ) * 2 )
+
+            i := 1
+            FOR EACH cKey IN xDefault:Keys
+               aParams[ i++ ] := cKey
+               aParams[ i++ ] := xDefault[ cKey ]
+            NEXT
+
+         ENDIF
+
+         // Then add Decoding value at beginning
+         AIns( aParams, 1, xVal, TRUE )
+
+         // And run decode() again
+         xRet := hb_ExecFromArray( @hb_Decode(), aParams )
+
+      ELSE
+
+         // Ok let's go ahead with real function
+
+         // Combine in 2 lists having elements as { value } and { decode }
+         aValues  := Array( nParams / 2 )
+         aResults := Array( nParams / 2 )
+
+         i := 1
+         FOR n := 1 TO nParams - 1 STEP 2
+            aValues[ i ]  := aParams[ n ]
+            aResults[ i ] := aParams[ n + 1 ]
+            i++
+         NEXT
+
+         // Check if value exists (valtype of values MUST be same of xVal,
+         // otherwise I will get a runtime error)
+         // TODO: Have I to check also between different valtypes, jumping different ?
+         nPos := AScan( aValues, {|e| e == xVal } )
+
+         IF nPos == 0 // Not Found, returning default
+
+            xRet := xDefault   // it could be also nil because not present
+
+         ELSE
+
+            xRet := aResults[ nPos ]
+
+         ENDIF
+
+      ENDIF
+
+   CASE nParams == 0    // No parameters
+      xRet := NIL
+
+   CASE nParams == 1    // Only value to decode as parameter, return an empty value of itself
+      xRet := EmptyValue( aParams[ 1 ] )
+
+   ENDCASE
+
+   RETURN xRet
+
+FUNCTION HB_DecodeOrEmpty( ... )
+
+   LOCAL aParams := hb_AParams()
+   LOCAL xVal    := hb_ExecFromArray( @hb_decode(), aParams )
+
+   RETURN iif( xVal == NIL, EmptyValue( aParams[ 1 ] ), xVal )
 
 STATIC FUNCTION EmptyValue( xVal )
-  LOCAL xRet
-  LOCAL cType := ValType( xVal )
 
-  SWITCH ( cType )
+   LOCAL xRet
+   LOCAL cType := ValType( xVal )
 
-     CASE 'C'  // Char
-     CASE 'M'  // Memo
-          xRet := ""
-          EXIT
-     CASE 'D'  // Date
-          xRet := CTOD('')
-          EXIT
-     CASE 'L'  // Logical
-          xRet := .F.
-          EXIT
-     CASE 'N'  // Number
-          xRet := 0
-          EXIT
-     CASE 'B'  // code block
-          xRet := {|| NIL }
-          EXIT
-     CASE 'A'  // array
-          xRet := {}
-          EXIT
-     CASE 'H'  // hash
-          xRet := {=>}
-          EXIT
-     CASE 'U'  // undefined
-          xRet := NIL
-          EXIT
-     CASE 'O'  // Object
-          xRet := NIL   // Or better another value ?
-          EXIT
+   SWITCH ( cType )
 
-     DEFAULT
-          // Create a runtime error for new datatypes
-          xRet := ""
-          IF xRet == 0 // BANG!
-          ENDIF
-  END
+   CASE 'C'  // Char
+   CASE 'M'  // Memo
+      xRet := ""
+      EXIT
+   CASE 'D'  // Date
+      xRet := CToD( '' )
+      EXIT
+   CASE 'L'  // Logical
+      xRet := .F.
+      EXIT
+   CASE 'N'  // Number
+      xRet := 0
+      EXIT
+   CASE 'B'  // code block
+      xRet := {|| NIL }
+      EXIT
+   CASE 'A'  // array
+      xRet := {}
+      EXIT
+   CASE 'H'  // hash
+      xRet := { => }
+      EXIT
+   CASE 'U'  // undefined
+      xRet := NIL
+      EXIT
+   CASE 'O'  // Object
+      xRet := NIL   // Or better another value ?
+      EXIT
 
-RETURN xRet
+      DEFAULT
+      // Create a runtime error for new datatypes
+      xRet := ""
+      IF xRet == 0 // BANG!
+      ENDIF
+   END
+
+   RETURN xRet
 
 // DECODE
 

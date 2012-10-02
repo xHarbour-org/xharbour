@@ -58,6 +58,7 @@
 #define _DIR_HEADER             1
 
 PROCEDURE __Dir( cFileMask )
+
    LOCAL cPath
    LOCAL cName
    LOCAL cExt
@@ -75,7 +76,7 @@ PROCEDURE __Dir( cFileMask )
       QOut( NationMsg( _DIR_HEADER ) )
 #endif
 
-      AEval( Directory( hb_FNameMerge( Set( _SET_DEFAULT ), "*", ".dbf" ) ),;
+      AEval( Directory( hb_FNameMerge( Set( _SET_DEFAULT ), "*", ".dbf" ) ), ;
          {| aDirEntry | PutDbf( aDirEntry ) } )
    ELSE
 
@@ -84,7 +85,7 @@ PROCEDURE __Dir( cFileMask )
          cPath := Set( _SET_DEFAULT )
       ENDIF
 
-      AEval( Directory( hb_FNameMerge( cPath, cName, cExt ) ),;
+      AEval( Directory( hb_FNameMerge( cPath, cName, cExt ) ), ;
          {| aDirEntry | PutNormal( aDirEntry ) } )
    ENDIF
 
@@ -93,6 +94,7 @@ PROCEDURE __Dir( cFileMask )
    RETURN
 
 STATIC PROCEDURE PutDBF( aDirEntry )
+
    LOCAL fhnd
    LOCAL buffer
    LOCAL nRecCount := 0
@@ -103,12 +105,12 @@ STATIC PROCEDURE PutDBF( aDirEntry )
       buffer := Replicate( Chr( 0 ), 8 )
 
       IF FRead( fhnd, @buffer, 8 ) == 8 .AND. ;
-         ( ASC( Left( buffer, 1 ) ) IN { 0x03, 0x06, 0x30, 0x31, 0x83, 0x86, 0xE5, 0xE6, 0xF5, 0xF6 } )
+            ( Asc( Left( buffer, 1 ) ) IN { 0x03, 0x06, 0x30, 0x31, 0x83, 0x86, 0xE5, 0xE6, 0xF5, 0xF6 } )
 
          nRecCount := Bin2L( SubStr( buffer, 5, 4 ) )
-         dLastUpdate := SToD( StrZero( Bin2W( SubStr( buffer, 2, 1 ) ) + 1900, 4 ) +;
-                              StrZero( Bin2W( SubStr( buffer, 3, 1 ) ), 2 ) +;
-                              StrZero( Bin2W( SubStr( buffer, 4, 1 ) ), 2 ) )
+         dLastUpdate := SToD( StrZero( Bin2W( SubStr( buffer, 2, 1 ) ) + 1900, 4 ) + ;
+            StrZero( Bin2W( SubStr( buffer, 3, 1 ) ), 2 ) + ;
+            StrZero( Bin2W( SubStr( buffer, 4, 1 ) ), 2 ) )
 
       ENDIF
 
@@ -116,22 +118,23 @@ STATIC PROCEDURE PutDBF( aDirEntry )
 
    ENDIF
 
-   QOut( PadR( aDirEntry[ F_NAME ], 21 ) +;
-         Str( nRecCount, 12 ) + "    " +;
-         DToC( dLastUpdate ) +;
-         Str( aDirEntry[ F_SIZE ], 12 ) )
+   QOut( PadR( aDirEntry[ F_NAME ], 21 ) + ;
+      Str( nRecCount, 12 ) + "    " + ;
+      DToC( dLastUpdate ) + ;
+      Str( aDirEntry[ F_SIZE ], 12 ) )
 
    RETURN
 
 STATIC PROCEDURE PutNormal( aDirEntry )
+
    LOCAL cName
    LOCAL cExt
 
    hb_FNameSplit( aDirEntry[ F_NAME ], NIL, @cName, @cExt )
 
-   cName := PADR(cName+cExt, 21 )
+   cName := PadR( cName + cExt, 21 )
    QOut( cName + " " + ;
-         Str( aDirEntry[ F_SIZE ], 12 ) + "  " +;
-         DToC( aDirEntry[ F_DATE ] ) )
+      Str( aDirEntry[ F_SIZE ], 12 ) + "  " + ;
+      DToC( aDirEntry[ F_DATE ] ) )
 
    RETURN

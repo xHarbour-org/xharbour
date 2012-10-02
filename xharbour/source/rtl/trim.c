@@ -57,7 +57,7 @@
 /* also returns the new length in lLen */
 char * hb_strLTrim( const char * szText, HB_SIZE * ulLen )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_strLTrim(%s, %p)", szText, ulLen));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strLTrim(%s, %p)", szText, ulLen ) );
 
    while( *ulLen && HB_ISSPACE( *szText ) )
    {
@@ -71,7 +71,7 @@ char * hb_strLTrim( const char * szText, HB_SIZE * ulLen )
 /* return length of szText ignoring trailing white space (or true spaces) */
 HB_SIZE hb_strRTrimLen( const char * szText, HB_SIZE ulLen, BOOL bAnySpace )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_strRTrimLen(%s, %lu. %d)", szText, ulLen, (int) bAnySpace));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strRTrimLen(%s, %lu. %d)", szText, ulLen, ( int ) bAnySpace ) );
 
    if( bAnySpace )
    {
@@ -95,11 +95,11 @@ HB_FUNC( LTRIM )
 
    if( pText )
    {
-      HB_SIZE ulLen, ulSrc;
-      char * szText;
+      HB_SIZE  ulLen, ulSrc;
+      char *   szText;
 
-      ulLen = ulSrc = pText->item.asString.length;
-      szText = hb_strLTrim( pText->item.asString.value, &ulLen );
+      ulLen    = ulSrc = pText->item.asString.length;
+      szText   = hb_strLTrim( pText->item.asString.value, &ulLen );
 
       if( ulLen == ulSrc )
       {
@@ -126,8 +126,8 @@ HB_FUNC( RTRIM )
 
    if( pText )
    {
-      HB_SIZE ulLen, ulSrc;
-      char * szText = pText->item.asString.value;
+      HB_SIZE  ulLen, ulSrc;
+      char *   szText = pText->item.asString.value;
 
       ulSrc = pText->item.asString.length;
 #ifdef HB_EXTENSION
@@ -166,16 +166,16 @@ HB_FUNC( ALLTRIM )
 
    if( pText )
    {
-      HB_SIZE ulLen, ulSrc;
-      char * szText = pText->item.asString.value;
+      HB_SIZE  ulLen, ulSrc;
+      char *   szText = pText->item.asString.value;
 
-      ulSrc = pText->item.asString.length;
+      ulSrc    = pText->item.asString.length;
 #ifdef HB_EXTENSION
-      ulLen = hb_strRTrimLen( szText, ulSrc, ISLOG( 2 ) && hb_parl( 2 ) );
+      ulLen    = hb_strRTrimLen( szText, ulSrc, ISLOG( 2 ) && hb_parl( 2 ) );
 #else
-      ulLen = hb_strRTrimLen( szText, ulSrc, FALSE );
+      ulLen    = hb_strRTrimLen( szText, ulSrc, FALSE );
 #endif
-      szText = hb_strLTrim( szText, &ulLen );
+      szText   = hb_strLTrim( szText, &ulLen );
 
       if( ulLen == ulSrc )
       {
@@ -188,7 +188,7 @@ HB_FUNC( ALLTRIM )
    }
    else
 #ifdef HB_COMPAT_C53
-      hb_errRT_BASE_SubstR( EG_ARG, 2022, NULL, "ALLTRIM", 1, hb_paramError( 1 ) ); /* NOTE: This appeared in CA-Cl*pper 5.3 [vszakats] */
+      hb_errRT_BASE_SubstR( EG_ARG, 2022, NULL, "ALLTRIM", 1, hb_paramError( 1 ) );  /* NOTE: This appeared in CA-Cl*pper 5.3 [vszakats] */
 #else
       hb_retc( "" );
 #endif

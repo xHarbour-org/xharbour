@@ -72,12 +72,12 @@ HB_FUNC( HB_FNAMESPLIT )
 HB_FUNC( HB_FNAMEMERGE )
 {
    HB_FNAME pFileName;
-   char szFileName[ HB_PATH_MAX ];
+   char     szFileName[ HB_PATH_MAX ];
 
-   pFileName.szPath = hb_parc( 1 );
-   pFileName.szName = hb_parc( 2 );
-   pFileName.szExtension = hb_parc( 3 );
-   pFileName.szDrive = hb_parc( 4 );
+   pFileName.szPath        = hb_parc( 1 );
+   pFileName.szName        = hb_parc( 2 );
+   pFileName.szExtension   = hb_parc( 3 );
+   pFileName.szDrive       = hb_parc( 4 );
 
    hb_retc( hb_fsFNameMerge( szFileName, &pFileName ) );
 }

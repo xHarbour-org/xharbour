@@ -60,22 +60,22 @@ PROCEDURE __SetFunction( nFunctionKey, xString )
             This is a Harbour extension. [vszakats] */
 
    SWITCH nFunctionKey
-      CASE 1
-         nFunctionKey := K_F1
-         EXIT
+   CASE 1
+      nFunctionKey := K_F1
+      EXIT
 
-     #ifdef HB_EXTENSION
-      CASE 11
-         nFunctionKey := K_F11
-         EXIT
+#ifdef HB_EXTENSION
+   CASE 11
+      nFunctionKey := K_F11
+      EXIT
 
-      CASE 12
-         nFunctionKey := K_F12
-         EXIT
-     #endif
+   CASE 12
+      nFunctionKey := K_F12
+      EXIT
+#endif
 
       DEFAULT
-         nFunctionKey := -nFunctionKey + 1
+      nFunctionKey := - nFunctionKey + 1
    END
 
    IF ISCHARACTER( xString ) .OR. ISNUMBER( xString ) .OR. ISARRAY( xString )
@@ -84,5 +84,5 @@ PROCEDURE __SetFunction( nFunctionKey, xString )
       SetKey( nFunctionKey, NIL )
    ENDIF
 
-RETURN
+   RETURN
 

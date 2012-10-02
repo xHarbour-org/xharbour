@@ -100,9 +100,9 @@ HB_FUNC( HB_GTINFO )
    {
       HB_GT_INFO gtInfo;
 
-      gtInfo.pNewVal  = hb_param( 2, HB_IT_ANY );
-      gtInfo.pNewVal2 = hb_param( 3, HB_IT_ANY );
-      gtInfo.pResult  = NULL;
+      gtInfo.pNewVal    = hb_param( 2, HB_IT_ANY );
+      gtInfo.pNewVal2   = hb_param( 3, HB_IT_ANY );
+      gtInfo.pResult    = NULL;
 
       hb_gtInfo( hb_parni( 1 ), &gtInfo );
       if( gtInfo.pResult )
@@ -119,8 +119,8 @@ HB_FUNC( HB_GTVERSION )
 
 HB_FUNC( HB_GTALERT )
 {
-   int iClrNorm = ISCHAR( 3 ) ? hb_gtColorToN( hb_parc( 3 ) ) : hb_parni( 3 ),
-       iClrHigh = ISCHAR( 4 ) ? hb_gtColorToN( hb_parc( 4 ) ) : hb_parni( 4 );
+   int iClrNorm   = ISCHAR( 3 ) ? hb_gtColorToN( hb_parc( 3 ) ) : hb_parni( 3 ),
+       iClrHigh   = ISCHAR( 4 ) ? hb_gtColorToN( hb_parc( 4 ) ) : hb_parni( 4 );
 
    hb_retni( hb_gtAlert( hb_param( 1, HB_IT_ANY ), hb_param( 2, HB_IT_ANY ),
                          iClrNorm, iClrHigh, hb_parnd( 5 ) ) );
@@ -128,30 +128,30 @@ HB_FUNC( HB_GTALERT )
 
 HB_FUNC( HB_GFXPRIMITIVE )
 {
-   PHB_ITEM pType   = hb_param( 1, HB_IT_NUMERIC );
-   PHB_ITEM pTop    = hb_param( 2, HB_IT_NUMERIC );
-   PHB_ITEM pLeft   = hb_param( 3, HB_IT_NUMERIC );
-   PHB_ITEM pBottom = hb_param( 4, HB_IT_NUMERIC );
-   PHB_ITEM pRight  = hb_param( 5, HB_IT_NUMERIC );
-   PHB_ITEM pColor  = hb_param( 6, HB_IT_NUMERIC );
+   PHB_ITEM pType    = hb_param( 1, HB_IT_NUMERIC );
+   PHB_ITEM pTop     = hb_param( 2, HB_IT_NUMERIC );
+   PHB_ITEM pLeft    = hb_param( 3, HB_IT_NUMERIC );
+   PHB_ITEM pBottom  = hb_param( 4, HB_IT_NUMERIC );
+   PHB_ITEM pRight   = hb_param( 5, HB_IT_NUMERIC );
+   PHB_ITEM pColor   = hb_param( 6, HB_IT_NUMERIC );
 
-   hb_retni( hb_gtGfxPrimitive( hb_itemGetNI(pType),
-                                hb_itemGetNI(pTop), hb_itemGetNI(pLeft),
-                                hb_itemGetNI(pBottom), hb_itemGetNI(pRight),
-                                hb_itemGetNI(pColor) ) );
+   hb_retni( hb_gtGfxPrimitive( hb_itemGetNI( pType ),
+                                hb_itemGetNI( pTop ), hb_itemGetNI( pLeft ),
+                                hb_itemGetNI( pBottom ), hb_itemGetNI( pRight ),
+                                hb_itemGetNI( pColor ) ) );
 }
 
 HB_FUNC( HB_GFXTEXT )
 {
-   PHB_ITEM pTop     = hb_param( 1, HB_IT_NUMERIC );
-   PHB_ITEM pLeft    = hb_param( 2, HB_IT_NUMERIC );
-   const char *cText = hb_parc(3);
-   PHB_ITEM pColor   = hb_param( 4, HB_IT_NUMERIC );
-   PHB_ITEM pSize    = hb_param( 5, HB_IT_NUMERIC );
-   PHB_ITEM pWidth   = hb_param( 6, HB_IT_NUMERIC );
+   PHB_ITEM       pTop     = hb_param( 1, HB_IT_NUMERIC );
+   PHB_ITEM       pLeft    = hb_param( 2, HB_IT_NUMERIC );
+   const char *   cText    = hb_parc( 3 );
+   PHB_ITEM       pColor   = hb_param( 4, HB_IT_NUMERIC );
+   PHB_ITEM       pSize    = hb_param( 5, HB_IT_NUMERIC );
+   PHB_ITEM       pWidth   = hb_param( 6, HB_IT_NUMERIC );
 
-   hb_gtGfxText( hb_itemGetNI(pTop),
-                 hb_itemGetNI(pLeft), cText, hb_itemGetNI(pColor),
-                 hb_itemGetNI(pSize), hb_itemGetNI(pWidth) );
+   hb_gtGfxText( hb_itemGetNI( pTop ),
+                 hb_itemGetNI( pLeft ), cText, hb_itemGetNI( pColor ),
+                 hb_itemGetNI( pSize ), hb_itemGetNI( pWidth ) );
 }
 

@@ -97,43 +97,43 @@ HB_EXTERN_END
  */
 
 /* length of buffer for CR/LF characters */
-#if !defined(HB_OS_EOL_LEN) || HB_OS_EOL_LEN < 4
-#  define CRLF_BUFFER_LEN   4
+#if ! defined( HB_OS_EOL_LEN ) || HB_OS_EOL_LEN < 4
+#  define CRLF_BUFFER_LEN  4
 #else
-#  define CRLF_BUFFER_LEN   HB_OS_EOL_LEN + 1
+#  define CRLF_BUFFER_LEN  HB_OS_EOL_LEN + 1
 #endif
 
-#if defined(HB_OS_UNIX) && !defined(HB_EOL_CRLF)
-   static const char s_szCrLf[ CRLF_BUFFER_LEN ] = { HB_CHAR_LF, 0 };
-   static const int  s_iCrLfLen = 1;
+#if defined( HB_OS_UNIX ) && ! defined( HB_EOL_CRLF )
+static const char s_szCrLf[ CRLF_BUFFER_LEN ] = { HB_CHAR_LF, 0 };
+static const int  s_iCrLfLen = 1;
 #else
-   static const char s_szCrLf[ CRLF_BUFFER_LEN ] = { HB_CHAR_CR, HB_CHAR_LF, 0 };
-   static const int  s_iCrLfLen = 2;
+static const char s_szCrLf[ CRLF_BUFFER_LEN ] = { HB_CHAR_CR, HB_CHAR_LF, 0 };
+static const int  s_iCrLfLen        = 2;
 #endif
 
-static BOOL    s_bInit = FALSE;
-static FHANDLE s_hFilenoStdin  = 0;
-static FHANDLE s_hFilenoStdout = 1;
-static FHANDLE s_hFilenoStderr = 2;
+static BOOL       s_bInit           = FALSE;
+static FHANDLE    s_hFilenoStdin    = 0;
+static FHANDLE    s_hFilenoStdout   = 1;
+static FHANDLE    s_hFilenoStderr   = 2;
 
-static USHORT  s_uiPRow;
-static USHORT  s_uiPCol;
+static USHORT     s_uiPRow;
+static USHORT     s_uiPCol;
 extern BOOL hb_set_SetPrinterStart( void );
 extern void hb_set_SetPrinterStop( void );
 
 void hb_conInit( void )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_conInit()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_conInit()" ) );
 
-#if !defined( HB_WIN32_IO )
+#if ! defined( HB_WIN32_IO )
    /* when HB_WIN32_IO is set file handles with numbers 0, 1, 2 are
       transalted inside filesys to:
       GetStdHandle( STD_INPUT_HANDLE ), GetStdHandle( STD_OUTPUT_HANDLE ),
       GetStdHandle( STD_ERROR_HANDLE ) */
 
-   s_hFilenoStdin  = fileno( stdin );
-   s_hFilenoStdout = fileno( stdout );
-   s_hFilenoStderr = fileno( stderr );
+   s_hFilenoStdin    = fileno( stdin );
+   s_hFilenoStdout   = fileno( stdout );
+   s_hFilenoStderr   = fileno( stderr );
 
 #endif
 
@@ -144,7 +144,7 @@ void hb_conInit( void )
 
       if( hStderr == 0 )      /* //STDERR with no parameter or 0 */
          s_hFilenoStderr = s_hFilenoStdout;
-      else if( hStderr > 0 ) /* //STDERR:x */
+      else if( hStderr > 0 )  /* //STDERR:x */
          s_hFilenoStderr = hStderr;
    }
 #endif
@@ -167,7 +167,7 @@ void hb_conInit( void )
 
 void hb_conRelease( void )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_conRelease()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_conRelease()" ) );
 
    /*
     * Clipper does not restore screen size on exit so I removed the code with:
@@ -189,7 +189,7 @@ void hb_conRelease( void )
 
 char * hb_conNewLine( void )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_conNewLine()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_conNewLine()" ) );
 
    return ( char * ) s_szCrLf;
 }
@@ -202,7 +202,7 @@ HB_FUNC( HB_OSNEWLINE )
 /* Output an item to STDOUT */
 void hb_conOutStd( const char * pStr, HB_SIZE ulLen )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_conOutStd(%s, %lu)", pStr, ulLen));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_conOutStd(%s, %lu)", pStr, ulLen ) );
 
    if( ulLen == 0 )
    {
@@ -221,10 +221,10 @@ void hb_conOutStd( const char * pStr, HB_SIZE ulLen )
 /* Output an item to STDERR */
 void hb_conOutErr( const char * pStr, HB_SIZE ulLen )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_conOutErr(%s, %lu)", pStr, ulLen));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_conOutErr(%s, %lu)", pStr, ulLen ) );
 
    #ifdef HB_OS_WIN
-      OutputDebugString( pStr );
+   OutputDebugString( pStr );
    #endif
 
    if( ulLen == 0 )
@@ -249,7 +249,7 @@ void hb_conOutErr( const char * pStr, HB_SIZE ulLen )
 /* Output an item to the screen and/or printer and/or alternate */
 void hb_conOutAlt( const char * pStr, HB_SIZE ulLen )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_conOutAlt(%s, %lu)", pStr, ulLen));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_conOutAlt(%s, %lu)", pStr, ulLen ) );
 
    if( hb_setGetConsole() )
    {
@@ -259,25 +259,25 @@ void hb_conOutAlt( const char * pStr, HB_SIZE ulLen )
    if( hb_setGetAlternate() && hb_setGetAltHan() != FS_ERROR )
    {
       /* Print to alternate file if SET ALTERNATE ON and valid alternate file */
-      USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
+      USHORT uiErrorOld = hb_fsError();   /* Save current user file error code */
       hb_fsWriteLarge( hb_setGetAltHan(), ( BYTE * ) pStr, ulLen );
-      hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
+      hb_fsSetError( uiErrorOld );        /* Restore last user file error code */
    }
 
    if( hb_setGetExtraHan() != FS_ERROR )
    {
       /* Print to extra file if valid alternate file */
-      USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
+      USHORT uiErrorOld = hb_fsError();   /* Save current user file error code */
       hb_fsWriteLarge( hb_setGetExtraHan(), ( BYTE * ) pStr, ulLen );
-      hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
+      hb_fsSetError( uiErrorOld );        /* Restore last user file error code */
    }
 
    if( hb_setGetPrinter() && hb_setGetPrintHan() != FS_ERROR )
    {
       /* Print to printer if SET PRINTER ON and valid printer file */
-      USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
+      USHORT uiErrorOld = hb_fsError();   /* Save current user file error code */
       hb_fsWriteLarge( hb_setGetPrintHan(), ( BYTE * ) pStr, ulLen );
-      hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
+      hb_fsSetError( uiErrorOld );        /* Restore last user file error code */
       s_uiPCol += ( USHORT ) ulLen;
    }
 }
@@ -285,16 +285,16 @@ void hb_conOutAlt( const char * pStr, HB_SIZE ulLen )
 /* Output an item to the screen and/or printer */
 static void hb_conOutDev( const char * pStr, HB_SIZE ulLen )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_conOutDev(%s, %lu)", pStr, ulLen));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_conOutDev(%s, %lu)", pStr, ulLen ) );
 
    if( hb_setGetPrintHan() != FS_ERROR &&
        hb_stricmp( hb_setGetDevice(), "PRINTER" ) == 0 )
    {
       /* Display to printer if SET DEVICE TO PRINTER and valid printer file */
 
-      USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
+      USHORT uiErrorOld = hb_fsError();   /* Save current user file error code */
       hb_fsWriteLarge( hb_setGetPrintHan(), ( BYTE * ) pStr, ulLen );
-      hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
+      hb_fsSetError( uiErrorOld );        /* Restore last user file error code */
       s_uiPCol += ( USHORT ) ulLen;
    }
    else
@@ -304,7 +304,7 @@ static void hb_conOutDev( const char * pStr, HB_SIZE ulLen )
    }
 }
 
-typedef void hb_out_func_typedef( const char *, HB_SIZE );
+typedef void hb_out_func_typedef ( const char *, HB_SIZE );
 
 static char * hb_itemStringCon( PHB_ITEM pItem, HB_SIZE * pulLen, BOOL * pfFreeReq )
 {
@@ -312,8 +312,8 @@ static char * hb_itemStringCon( PHB_ITEM pItem, HB_SIZE * pulLen, BOOL * pfFreeR
       shown as single letter */
    if( HB_IS_LOGICAL( pItem ) )
    {
-      *pulLen = 1;
-      *pfFreeReq = FALSE;
+      *pulLen     = 1;
+      *pfFreeReq  = FALSE;
       return ( char * ) ( hb_itemGetL( pItem ) ? "T" : "F" );
    }
    return hb_itemString( pItem, pulLen, pfFreeReq );
@@ -322,12 +322,12 @@ static char * hb_itemStringCon( PHB_ITEM pItem, HB_SIZE * pulLen, BOOL * pfFreeR
 /* Format items for output, then call specified output function */
 static void hb_conOut( USHORT uiParam, hb_out_func_typedef * pOutFunc )
 {
-   char * pszString;
-   HB_SIZE ulLen;
-   BOOL bFreeReq;
+   char *   pszString;
+   HB_SIZE  ulLen;
+   BOOL     bFreeReq;
    PHB_ITEM pItem;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_conOut(%hu, %p)", uiParam, pOutFunc));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_conOut(%hu, %p)", uiParam, pOutFunc ) );
 
    pItem = hb_param( uiParam, HB_IT_ANY );
 
@@ -336,15 +336,15 @@ static void hb_conOut( USHORT uiParam, hb_out_func_typedef * pOutFunc )
    else
 
    if( HB_IS_LOGICAL( pItem ) )
-      {
-      ulLen = 3;
-      bFreeReq = FALSE;
-      pszString = ( char * ) ( hb_itemGetL( pItem ) ? ".T." : ".F." );
-      }
+   {
+      ulLen       = 3;
+      bFreeReq    = FALSE;
+      pszString   = ( char * ) ( hb_itemGetL( pItem ) ? ".T." : ".F." );
+   }
    else
       pszString = hb_itemString( pItem, &ulLen, &bFreeReq );
 
-   if ( ulLen )
+   if( ulLen )
    {
       pOutFunc( pszString, ulLen );
    }
@@ -360,8 +360,9 @@ static void hb_conOut( USHORT uiParam, hb_out_func_typedef * pOutFunc )
 
 HB_FUNC( OUTSTD ) /* writes a list of values to the standard output device */
 {
-   USHORT uiPCount = hb_pcount();
-   USHORT uiParam;
+   USHORT   uiPCount = hb_pcount();
+   USHORT   uiParam;
+
    hb_console_safe_lock();
 
    for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
@@ -376,8 +377,8 @@ HB_FUNC( OUTSTD ) /* writes a list of values to the standard output device */
 
 HB_FUNC( OUTERR ) /* writes a list of values to the standard error device */
 {
-   USHORT uiPCount = hb_pcount();
-   USHORT uiParam;
+   USHORT   uiPCount = hb_pcount();
+   USHORT   uiParam;
 
    hb_console_safe_lock();
 
@@ -393,8 +394,8 @@ HB_FUNC( OUTERR ) /* writes a list of values to the standard error device */
 
 HB_FUNC( QQOUT ) /* writes a list of values to the current device (screen or printer) and is affected by SET ALTERNATE */
 {
-   USHORT uiPCount = hb_pcount();
-   USHORT uiParam;
+   USHORT   uiPCount = hb_pcount();
+   USHORT   uiParam;
 
    hb_console_safe_lock();
 
@@ -416,8 +417,8 @@ HB_FUNC( QOUT )
 
    if( hb_setGetPrinter() && hb_setGetPrintHan() != FS_ERROR )
    {
-      USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
-      BYTE buf[ 80 ];
+      USHORT   uiErrorOld = hb_fsError(); /* Save current user file error code */
+      BYTE     buf[ 80 ];
 
       s_uiPRow++;
       s_uiPCol = hb_setGetMargin();
@@ -450,10 +451,10 @@ HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
 
    if( hb_set_SetPrinterStart() )
    {
-      USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
-      static const BYTE s_byEop[ 4 ] = { 0x0C, 0x0D, 0x00, 0x00 }; /* Buffer is 4 bytes to make CodeGuard happy */
+      USHORT            uiErrorOld     = hb_fsError();               /* Save current user file error code */
+      static const BYTE s_byEop[ 4 ]   = { 0x0C, 0x0D, 0x00, 0x00 }; /* Buffer is 4 bytes to make CodeGuard happy */
       hb_fsWrite( hb_setGetPrintHan(), s_byEop, 2 );
-      hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
+      hb_fsSetError( uiErrorOld );                                   /* Restore last user file error code */
       hb_set_SetPrinterStop();
    }
 
@@ -474,7 +475,7 @@ HB_FUNC( PCOL ) /* Returns the current printer row position */
 
 static void hb_conDevPos( SHORT iRow, SHORT iCol )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_conDevPos(%hd, %hd)", iRow, iCol));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_conDevPos(%hd, %hd)", iRow, iCol ) );
 
    /* Position printer if SET DEVICE TO PRINTER and valid printer file
       otherwise position console */
@@ -482,21 +483,21 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
    if( hb_setGetPrintHan() != FS_ERROR &&
        hb_stricmp( hb_setGetDevice(), "PRINTER" ) == 0 )
    {
-      USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
-      USHORT uiPRow = ( USHORT ) iRow;
-      USHORT uiPCol = ( USHORT ) iCol + ( USHORT ) hb_setGetMargin();
+      USHORT   uiErrorOld  = hb_fsError(); /* Save current user file error code */
+      USHORT   uiPRow      = ( USHORT ) iRow;
+      USHORT   uiPCol      = ( USHORT ) iCol + ( USHORT ) hb_setGetMargin();
 
       if( s_uiPRow != uiPRow || s_uiPCol != uiPCol )
       {
-         BYTE buf[ 256 ];
-         int iPtr = 0;
+         BYTE  buf[ 256 ];
+         int   iPtr = 0;
 
          if( s_uiPRow != uiPRow )
          {
             if( ++s_uiPRow > uiPRow )
             {
                HB_MEMCPY( &buf[ iPtr ], "\x0C\x0D\x00\x00", 2 );  /* Source buffer is 4 bytes to make CodeGuard happy */
-               iPtr += 2;
+               iPtr     += 2;
                s_uiPRow = 0;
             }
             else
@@ -520,8 +521,8 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
          }
          else if( s_uiPCol > uiPCol )
          {
-            buf[ iPtr++ ] = '\x0D';
-            s_uiPCol = 0;
+            buf[ iPtr++ ]  = '\x0D';
+            s_uiPCol       = 0;
          }
 
          while( s_uiPCol < uiPCol )
@@ -597,9 +598,9 @@ HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or prin
 
 HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected by SET ALTERNATE */
 {
-   char * pszString;
-   HB_SIZE ulLen;
-   BOOL bFreeReq;
+   char *   pszString;
+   HB_SIZE  ulLen;
+   BOOL     bFreeReq;
 
    hb_console_safe_lock();
 
@@ -637,9 +638,9 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
 
 HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position, but is not affected by SET ALTERNATE */
 {
-   char * pszString = NULL;
-   HB_SIZE ulLen;
-   BOOL bFreeReq = FALSE;
+   char *   pszString   = NULL;
+   HB_SIZE  ulLen;
+   BOOL     bFreeReq    = FALSE;
 
    hb_console_safe_lock();
 
@@ -676,10 +677,10 @@ HB_FUNC( HB_DISPOUTAT )
 {
    if( hb_pcount() >= 3 )
    {
-      char * pszString;
-      HB_SIZE ulLen;
-      BOOL bFreeReq;
-      int iColor;
+      char *   pszString;
+      HB_SIZE  ulLen;
+      BOOL     bFreeReq;
+      int      iColor;
 
       pszString = hb_itemStringCon( hb_param( 3, HB_IT_ANY ), &ulLen, &bFreeReq );
 
@@ -701,22 +702,22 @@ HB_FUNC( HB_DISPOUTAT )
 
 HB_FUNC( HB_GETSTDIN ) /* Return Handel for STDIN */
 {
-   hb_retni( (int) s_hFilenoStdin );
+   hb_retni( ( int ) s_hFilenoStdin );
 }
 
 HB_FUNC( HB_GETSTDOUT ) /* Return Handel for STDOUT */
 {
-   hb_retni( (int) s_hFilenoStdout );
+   hb_retni( ( int ) s_hFilenoStdout );
 }
 
 HB_FUNC( HB_GETSTDERR ) /* Return Handel for STDERR */
 {
-   hb_retni( (int) s_hFilenoStderr );
+   hb_retni( ( int ) s_hFilenoStderr );
 }
 
 /****************************************************************************/
 /* JC1: WARNING: This must not be used if thread is subject to async cancellation
-* Well... they should not be used at all.*/
+ * Well... they should not be used at all.*/
 
 HB_FUNC( HBCONSOLELOCK )
 {

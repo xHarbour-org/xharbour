@@ -66,9 +66,9 @@
 /* NOTE: In original CA-Cl*pper 5.x these functions are written in Clipper
          [vszakats] */
 
-static SHORT s_iRow;
-static SHORT s_iCol;
-static void * s_pBuffer = NULL;
+static SHORT   s_iRow;
+static SHORT   s_iCol;
+static void *  s_pBuffer = NULL;
 
 void hb_conXSaveRestRelease( void )
 {
@@ -92,7 +92,7 @@ HB_FUNC( __XSAVESCREEN )
 }
 
 /* NOTE: There's no check about the screen size on restore, so this will
-         fail if the user has changed the screen resolution between calling 
+         fail if the user has changed the screen resolution between calling
          save and restore.
          [vszakats] */
 

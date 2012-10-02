@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-02 17:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/*.*
+    ! code reformatting
+
 2012-10-02 16:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rdd/*.*
     ! code reformatting

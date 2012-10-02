@@ -60,79 +60,79 @@
 
 #ifdef HB_C52_STRICT
 
-    HB_FUNC( AT )
-    {
-       PHB_ITEM pSub = hb_param( 1, HB_IT_STRING );
-       PHB_ITEM pText = hb_param( 2, HB_IT_STRING );
+HB_FUNC( AT )
+{
+   PHB_ITEM pSub  = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pText = hb_param( 2, HB_IT_STRING );
 
-       if( pText && pSub )
-       {
-          hb_retnl( hb_strAt( pSub->item.asString.value, pSub->item.asString.length, pText->item.asString.value, pText->item.asString.length ) );
-       }
-       else
-       {
-          hb_errRT_BASE_SubstR( EG_ARG, 1108, NULL, "AT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-       }
-    }
+   if( pText && pSub )
+   {
+      hb_retnl( hb_strAt( pSub->item.asString.value, pSub->item.asString.length, pText->item.asString.value, pText->item.asString.length ) );
+   }
+   else
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1108, NULL, "AT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   }
+}
 
 #else
 
-    HB_FUNC( AT )
-    {
-       PHB_ITEM pSub = hb_param( 1, HB_IT_STRING );
-       PHB_ITEM pText = hb_param( 2, HB_IT_STRING );
-       PHB_ITEM pStart = hb_param( 3, HB_IT_NUMERIC );
-       PHB_ITEM pEnd = hb_param( 4, HB_IT_NUMERIC );
+HB_FUNC( AT )
+{
+   PHB_ITEM pSub     = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pText    = hb_param( 2, HB_IT_STRING );
+   PHB_ITEM pStart   = hb_param( 3, HB_IT_NUMERIC );
+   PHB_ITEM pEnd     = hb_param( 4, HB_IT_NUMERIC );
 
-       if( pText && pSub )
-       {
-          LONG lStart = pStart ? hb_itemGetNL( pStart ) : 1;
-          LONG lEnd = pEnd ? hb_itemGetNL( pEnd ) : ( LONG ) pText->item.asString.length;
-          HB_SIZE ulPos;
+   if( pText && pSub )
+   {
+      LONG     lStart   = pStart ? hb_itemGetNL( pStart ) : 1;
+      LONG     lEnd     = pEnd ? hb_itemGetNL( pEnd ) : ( LONG ) pText->item.asString.length;
+      HB_SIZE  ulPos;
 
-          if( lStart < 0 )
-          {
-             lStart += ( LONG ) pText->item.asString.length;
+      if( lStart < 0 )
+      {
+         lStart += ( LONG ) pText->item.asString.length;
 
-             if( lStart < 0 )
-             {
-                lStart = 0;
-             }
-          }
-          else if( lStart )
-          {
-             lStart--;
-          }
+         if( lStart < 0 )
+         {
+            lStart = 0;
+         }
+      }
+      else if( lStart )
+      {
+         lStart--;
+      }
 
-          if( lEnd < 0 )
-          {
-             lEnd += ( LONG ) pText->item.asString.length + 1;
-          }
+      if( lEnd < 0 )
+      {
+         lEnd += ( LONG ) pText->item.asString.length + 1;
+      }
 
-          if( lEnd > ( LONG ) pText->item.asString.length )
-          {
-             lEnd = ( LONG ) pText->item.asString.length;
-          }
+      if( lEnd > ( LONG ) pText->item.asString.length )
+      {
+         lEnd = ( LONG ) pText->item.asString.length;
+      }
 
-          // Stop searching if starting past beyond end.
-          if( lStart >= lEnd )
-          {
-             //TraceLog( NULL, "Start: %i End: %i\n", lStart, lEnd );
-             hb_retnl( 0 );
-             return;
-          }
+      // Stop searching if starting past beyond end.
+      if( lStart >= lEnd )
+      {
+         //TraceLog( NULL, "Start: %i End: %i\n", lStart, lEnd );
+         hb_retnl( 0 );
+         return;
+      }
 
-          //TraceLog( NULL, "Search >%s< for >%s< from %i to %i\n", pText->item.asString.value, pSub->item.asString.value, lStart, lEnd );
+      //TraceLog( NULL, "Search >%s< for >%s< from %i to %i\n", pText->item.asString.value, pSub->item.asString.value, lStart, lEnd );
 
-          ulPos = hb_strAt( pSub->item.asString.value, pSub->item.asString.length, pText->item.asString.value + lStart, lEnd - lStart );
+      ulPos = hb_strAt( pSub->item.asString.value, pSub->item.asString.length, pText->item.asString.value + lStart, lEnd - lStart );
 
-          hb_retnl( (LONG) ( ulPos ? ulPos + lStart : 0 ) );
-       }
-       else
-       {
-          hb_errRT_BASE_SubstR( EG_ARG, 1108, NULL, "AT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-       }
-    }
+      hb_retnl( ( LONG ) ( ulPos ? ulPos + lStart : 0 ) );
+   }
+   else
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1108, NULL, "AT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   }
+}
 
 #endif
 
@@ -140,11 +140,11 @@ HB_SIZE hb_AtSkipStrings( const char * szSub, HB_SIZE ulSubLen, const char * szT
 {
    char cLastChar = ' ';
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_AtSkipStrings(%s, %lu, %s, %lu)", szSub, ulSubLen, szText, ulLen));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_AtSkipStrings(%s, %lu, %s, %lu)", szSub, ulSubLen, szText, ulLen ) );
 
    if( ulSubLen > 0 && ulLen >= ulSubLen )
    {
-      ULONG ulPos = 0;
+      ULONG ulPos    = 0;
       ULONG ulSubPos = 0;
 
       while( ulPos < ulLen && ulSubPos < ulSubLen )
@@ -163,7 +163,7 @@ HB_SIZE hb_AtSkipStrings( const char * szSub, HB_SIZE ulSubLen, const char * szT
             continue;
          }
 
-         if( szText[ ulPos ] == '"' && szSub[0] != '"' )
+         if( szText[ ulPos ] == '"' && szSub[ 0 ] != '"' )
          {
             while( ++ulPos < ulLen && szText[ ulPos ] != '"' )
             {
@@ -175,7 +175,7 @@ HB_SIZE hb_AtSkipStrings( const char * szSub, HB_SIZE ulSubLen, const char * szT
             continue;
          }
 
-         if( szText[ ulPos ] == '\'' && szSub[0] != '\'' )
+         if( szText[ ulPos ] == '\'' && szSub[ 0 ] != '\'' )
          {
             while( ++ulPos < ulLen && szText[ ulPos ] != '\'' )
             {
@@ -187,9 +187,9 @@ HB_SIZE hb_AtSkipStrings( const char * szSub, HB_SIZE ulSubLen, const char * szT
             continue;
          }
 
-         if( szText[ ulPos ] == '[' && szSub[0] != '[' )
+         if( szText[ ulPos ] == '[' && szSub[ 0 ] != '[' )
          {
-            if( ! ( HB_ISALPHA( (BYTE) cLastChar ) || HB_ISDIGIT( (BYTE) cLastChar ) || strchr( "])}_.", cLastChar ) ) )
+            if( ! ( HB_ISALPHA( ( BYTE ) cLastChar ) || HB_ISDIGIT( ( BYTE ) cLastChar ) || strchr( "])}_.", cLastChar ) ) )
             {
                while( ++ulPos < ulLen && szText[ ulPos ] != ']' )
                {
@@ -211,7 +211,7 @@ HB_SIZE hb_AtSkipStrings( const char * szSub, HB_SIZE ulSubLen, const char * szT
          {
             /* Go back to the first character after the first match,
                or else tests like "22345" $ "012223456789" will fail. */
-            ulPos -= ( ulSubPos - 1 );
+            ulPos    -= ( ulSubPos - 1 );
             ulSubPos = 0;
          }
          else
@@ -235,7 +235,7 @@ HB_FUNC( ATSKIPSTRINGS ) // cFind, cWhere, nStart
 
    if( pFind && pWhere )
    {
-      unsigned long ulStart = (unsigned long) hb_parnl(3);
+      unsigned long ulStart = ( unsigned long ) hb_parnl( 3 );
 
       if( ulStart > 0 )
       {
@@ -247,7 +247,7 @@ HB_FUNC( ATSKIPSTRINGS ) // cFind, cWhere, nStart
          HB_SIZE ulRet;
 
          ulRet = hb_AtSkipStrings( pFind->item.asString.value, pFind->item.asString.length,
-                                      pWhere->item.asString.value + ulStart, pWhere->item.asString.length - ulStart );
+                                   pWhere->item.asString.value + ulStart, pWhere->item.asString.length - ulStart );
 
          if( ulRet )
          {

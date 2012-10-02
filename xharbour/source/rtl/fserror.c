@@ -58,18 +58,18 @@
 #include "hbapifs.h"
 #include "hbstack.h"
 #include "hb_io.h"
-#if !(defined(HB_WIN32_IO) || defined(HB_OS_WIN))
+#if ! ( defined( HB_WIN32_IO ) || defined( HB_OS_WIN ) )
 #  include <errno.h>
 #endif
 
 
 /* Try to translate C errno into DOS error code */
-#if !defined(HB_WIN32_IO)
+#if ! defined( HB_WIN32_IO )
 static int hb_errnoToDosError( int ErrCode )
 {
    int iResult;
 
-#if defined(__BORLANDC__)
+#if defined( __BORLANDC__ )
    /* These C compilers use DOS error codes in errno */
    iResult = ErrCode;
 #else
@@ -96,13 +96,13 @@ static int hb_errnoToDosError( int ErrCode )
 #if defined( ETXTBSY )
       case ETXTBSY:
 #endif
-         iResult = 5;   /* Access denied */
+         iResult  = 5;  /* Access denied */
          break;
       case EBADF:
-         iResult = 6;   /* Invalid handle */
+         iResult  = 6;  /* Invalid handle */
          break;
       case ENOMEM:
-         iResult = 8;   /* Insufficient memory */
+         iResult  = 8;  /* Insufficient memory */
          break;
 #if defined( EFAULT )
       case EFAULT:
@@ -128,16 +128,16 @@ static int hb_errnoToDosError( int ErrCode )
          break;
 #endif
       case EPIPE:
-         iResult = 29;  /* Write fault */
+         iResult  = 29; /* Write fault */
          break;
       case EEXIST:
-         iResult = 32;  /* Sharing violation */
+         iResult  = 32; /* Sharing violation */
          break;
       case EAGAIN:
-         iResult = 33;  /* Lock violation */
+         iResult  = 33; /* Lock violation */
          break;
       default:
-         iResult = ErrCode;
+         iResult  = ErrCode;
          break;
    }
 #endif
@@ -146,7 +146,7 @@ static int hb_errnoToDosError( int ErrCode )
 }
 #endif
 
-#if defined(HB_WIN32_IO) || defined(HB_OS_WIN)
+#if defined( HB_WIN32_IO ) || defined( HB_OS_WIN )
 static int hb_WinToDosError( ULONG ulError )
 {
    int iResult;
@@ -154,19 +154,19 @@ static int hb_WinToDosError( ULONG ulError )
    switch( ulError )
    {
       case ERROR_ALREADY_EXISTS:
-         iResult = 5;
+         iResult  = 5;
          break;
       case ERROR_FILE_NOT_FOUND:
-         iResult = 2;
+         iResult  = 2;
          break;
       case ERROR_PATH_NOT_FOUND:
-         iResult = 3;
+         iResult  = 3;
          break;
       case ERROR_TOO_MANY_OPEN_FILES:
-         iResult = 4;
+         iResult  = 4;
          break;
       case ERROR_INVALID_HANDLE:
-         iResult = 6;
+         iResult  = 6;
          break;
 
       default:
@@ -181,7 +181,7 @@ static int hb_WinToDosError( ULONG ulError )
 /* return FERROR() code */
 USHORT hb_fsGetFError( void )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsGetFError()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_fsGetFError()" ) );
 
    return hb_stackIOErrors()->uiFError;
 }
@@ -190,7 +190,7 @@ USHORT hb_fsGetFError( void )
 USHORT hb_fsError( void )
 {
    HB_THREAD_STUB
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsError()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_fsError()" ) );
 
    return hb_stackIOErrors()->uiErrorLast;
 }
@@ -199,7 +199,7 @@ USHORT hb_fsError( void )
 USHORT hb_fsOsError( void )
 {
    HB_THREAD_STUB
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsOsError()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_fsOsError()" ) );
 
    return hb_stackIOErrors()->uiOsErrorLast;
 }
@@ -208,7 +208,7 @@ USHORT hb_fsOsError( void )
 void hb_fsSetFError( USHORT uiError )
 {
    HB_THREAD_STUB
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsSetFError(%hu)", uiError));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_fsSetFError(%hu)", uiError ) );
 
    hb_stackIOErrors()->uiFError = uiError;
 }
@@ -219,18 +219,18 @@ void  hb_fsSetError( USHORT uiError )
    HB_THREAD_STUB
    PHB_IOERRORS pIOErrors;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsSetError(%hu)", uiError));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_fsSetError(%hu)", uiError ) );
 
-   pIOErrors = hb_stackIOErrors();
+   pIOErrors                  = hb_stackIOErrors();
    /* TODO: untranslate uiError into errno */
-   pIOErrors->uiOsErrorLast = pIOErrors->uiErrorLast = uiError;
+   pIOErrors->uiOsErrorLast   = pIOErrors->uiErrorLast = uiError;
 }
 
 /* set error code for last operation */
 void  hb_fsSetIOError( BOOL fResult, USHORT uiOperation )
 {
-   USHORT uiOsErrorLast, uiErrorLast;
-   PHB_IOERRORS pIOErrors;
+   USHORT         uiOsErrorLast, uiErrorLast;
+   PHB_IOERRORS   pIOErrors;
 
    /* TODO: implement it */
    HB_SYMBOL_UNUSED( uiOperation );
@@ -241,14 +241,14 @@ void  hb_fsSetIOError( BOOL fResult, USHORT uiOperation )
    }
    else
    {
-#if defined(HB_WIN32_IO) || defined(HB_OS_WIN)
-      uiOsErrorLast = ( USHORT ) GetLastError();
-      uiErrorLast = ( USHORT ) hb_WinToDosError( uiOsErrorLast );
-#elif defined(_MSC_VER) || defined(__DMC__)
+#if defined( HB_WIN32_IO ) || defined( HB_OS_WIN )
+      uiOsErrorLast  = ( USHORT ) GetLastError();
+      uiErrorLast    = ( USHORT ) hb_WinToDosError( uiOsErrorLast );
+#elif defined( _MSC_VER ) || defined( __DMC__ )
       #ifdef __XCC__
-         extern unsigned long _doserrno;
-         extern void __cdecl _dosmaperr( unsigned long oserrno );
-         _dosmaperr( GetLastError() );
+      extern unsigned long _doserrno;
+      extern void __cdecl _dosmaperr( unsigned long oserrno );
+      _dosmaperr( GetLastError() );
       #endif
       if( _doserrno != 0 )
       {
@@ -256,15 +256,15 @@ void  hb_fsSetIOError( BOOL fResult, USHORT uiOperation )
       }
       else
       {
-         uiOsErrorLast = errno;
-         uiErrorLast = hb_errnoToDosError( errno );
+         uiOsErrorLast  = errno;
+         uiErrorLast    = hb_errnoToDosError( errno );
       }
 #else
-      uiOsErrorLast = errno;
-      uiErrorLast = hb_errnoToDosError( uiOsErrorLast );
+      uiOsErrorLast  = errno;
+      uiErrorLast    = hb_errnoToDosError( uiOsErrorLast );
 #endif
    }
-   pIOErrors = hb_stackIOErrors();
-   pIOErrors->uiOsErrorLast = uiOsErrorLast;
-   pIOErrors->uiErrorLast = uiErrorLast;
+   pIOErrors                  = hb_stackIOErrors();
+   pIOErrors->uiOsErrorLast   = uiOsErrorLast;
+   pIOErrors->uiErrorLast     = uiErrorLast;
 }

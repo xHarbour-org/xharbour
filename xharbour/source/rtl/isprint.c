@@ -68,17 +68,17 @@
 #include "hbset.h"
 #include "hbapiitm.h"
 
-#if defined(HB_OS_WIN) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
+#if defined( HB_OS_WIN ) && ( ! defined( __RSXNT__ ) ) && ( ! defined( __CYGWIN__ ) )
 
    #include <stdio.h>
    #include <winspool.h>
 
-   static DWORD IsPrinterError(HANDLE hPrinter);
+static DWORD IsPrinterError( HANDLE hPrinter );
 
-   static BOOL GetJobs(HANDLE hPrinter,JOB_INFO_2 **ppJobInfo,int *pcJobs);
-          DWORD hb_printerIsReadyn( const char * pszPrinterName );
-   static DWORD IsPrinterErrorn(HANDLE hPrinter);
-   extern BOOL hb_GetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize);
+static BOOL GetJobs( HANDLE hPrinter, JOB_INFO_2 ** ppJobInfo, int * pcJobs );
+DWORD hb_printerIsReadyn( const char * pszPrinterName );
+static DWORD IsPrinterErrorn( HANDLE hPrinter );
+extern BOOL hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize );
 #endif
 #define MAXBUFFERSIZE 255    // 7/10/2003 12:51p.m.
 
@@ -86,7 +86,7 @@ BOOL hb_printerIsReady( const char * pszPrinterName )
 {
    BOOL bIsPrinter;
 
-#if defined(HB_OS_DOS)
+#if defined( HB_OS_DOS )
 
    /* NOTE: DOS specific solution, using BIOS interrupt */
 
@@ -97,8 +97,8 @@ BOOL hb_printerIsReady( const char * pszPrinterName )
       {
          union REGS regs;
 
-         regs.h.ah = 2;
-         regs.HB_XREGS.dx = 0; /* LPT1 */
+         regs.h.ah         = 2;
+         regs.HB_XREGS.dx  = 0; /* LPT1 */
 
          HB_DOS_INT86( 0x17, &regs, &regs );
 
@@ -110,8 +110,8 @@ BOOL hb_printerIsReady( const char * pszPrinterName )
       {
          union REGS regs;
 
-         regs.h.ah = 2;
-         regs.HB_XREGS.dx = uiPort - 1;
+         regs.h.ah         = 2;
+         regs.HB_XREGS.dx  = uiPort - 1;
 
          HB_DOS_INT86( 0x17, &regs, &regs );
 
@@ -121,20 +121,22 @@ BOOL hb_printerIsReady( const char * pszPrinterName )
          bIsPrinter = FALSE;
    }
 
-#elif defined(HB_OS_WIN) && !defined(__RSXNT__)
+#elif defined( HB_OS_WIN ) && ! defined( __RSXNT__ )
 
    {
       HANDLE hPrinter;
 
-      if (*pszPrinterName) {
-        bIsPrinter= OpenPrinter( (LPSTR) pszPrinterName, &hPrinter, NULL ) ;
-        if (bIsPrinter ) {
-          bIsPrinter = (BOOL) !IsPrinterError( hPrinter );
-          CloseHandle(hPrinter) ;
-        }
+      if( *pszPrinterName )
+      {
+         bIsPrinter = OpenPrinter( ( LPSTR ) pszPrinterName, &hPrinter, NULL );
+         if( bIsPrinter )
+         {
+            bIsPrinter = ( BOOL ) ! IsPrinterError( hPrinter );
+            CloseHandle( hPrinter );
+         }
       }
       else
-        bIsPrinter = FALSE ;
+         bIsPrinter = FALSE;
    }
 
 #else
@@ -163,53 +165,59 @@ BOOL hb_printerIsReady( const char * pszPrinterName )
 
 HB_FUNC( ISPRINTER )
 {
-   #if defined(HB_OS_WIN) && !defined(__RSXNT__)
+   #if defined( HB_OS_WIN ) && ! defined( __RSXNT__ )
    {
-      char DefaultPrinter[MAXBUFFERSIZE];
+      char  DefaultPrinter[ MAXBUFFERSIZE ];
       DWORD pdwBufferSize = MAXBUFFERSIZE;
-      hb_GetDefaultPrinter( ( LPTSTR ) &DefaultPrinter, &pdwBufferSize);
-      hb_retl( hb_printerIsReady( ISCHAR( 1 ) ? hb_parcx( 1 ) : (char*)DefaultPrinter ) );
+      hb_GetDefaultPrinter( ( LPTSTR ) &DefaultPrinter, &pdwBufferSize );
+      hb_retl( hb_printerIsReady( ISCHAR( 1 ) ? hb_parcx( 1 ) : ( char * ) DefaultPrinter ) );
    }
    #else
-      hb_retl( hb_printerIsReady( ISCHAR( 1 ) ? hb_parcx( 1 ) : ( char * ) "LPT1" ) );
+   hb_retl( hb_printerIsReady( ISCHAR( 1 ) ? hb_parcx( 1 ) : ( char * ) "LPT1" ) );
    #endif
 }
 
 /* The code below does the check for the printer under Win32 */
 
-#if defined(HB_OS_WIN) && !defined(__RSXNT__) && !defined(__CYGWIN__)
+#if defined( HB_OS_WIN ) && ! defined( __RSXNT__ ) && ! defined( __CYGWIN__ )
 
-static DWORD IsPrinterError( HANDLE hPrinter ) {
-  BOOL Result = -1 ;
-  PRINTER_INFO_2 * pPrinterInfo;
-  DWORD cByteNeeded;
-  HB_TRACE(HB_TR_DEBUG, ("isprint.c IsPrinterError()"));
-  GetPrinter(hPrinter, 2, NULL, 0, &cByteNeeded);
-  if (cByteNeeded>0) {
-    pPrinterInfo = (PRINTER_INFO_2 *) hb_xgrab(cByteNeeded);
-    if (pPrinterInfo) {
-      if (GetPrinter(hPrinter,2,(LPBYTE)pPrinterInfo,cByteNeeded,&cByteNeeded))
-        Result = pPrinterInfo->Status;
-      hb_xfree(pPrinterInfo) ;
-    }
-  }
-  return Result;
+static DWORD IsPrinterError( HANDLE hPrinter )
+{
+   BOOL              Result = -1;
+   PRINTER_INFO_2 *  pPrinterInfo;
+   DWORD             cByteNeeded;
+
+   HB_TRACE( HB_TR_DEBUG, ( "isprint.c IsPrinterError()" ) );
+   GetPrinter( hPrinter, 2, NULL, 0, &cByteNeeded );
+   if( cByteNeeded > 0 )
+   {
+      pPrinterInfo = ( PRINTER_INFO_2 * ) hb_xgrab( cByteNeeded );
+      if( pPrinterInfo )
+      {
+         if( GetPrinter( hPrinter, 2, ( LPBYTE ) pPrinterInfo, cByteNeeded, &cByteNeeded ) )
+            Result = pPrinterInfo->Status;
+         hb_xfree( pPrinterInfo );
+      }
+   }
+   return Result;
 }
 
 
-static DWORD IsPrinterErrorn( HANDLE hPrinter ) {
-  JOB_INFO_2  *pJobs;
-  int         cJobs,i;
-  DWORD       dwError;
-  dwError = IsPrinterError(hPrinter) ;  // Just return the PrinterStatus
+static DWORD IsPrinterErrorn( HANDLE hPrinter )
+{
+   JOB_INFO_2 *   pJobs;
+   int            cJobs, i;
+   DWORD          dwError;
+
+   dwError = IsPrinterError( hPrinter ); // Just return the PrinterStatus
 /*
 
-// This original logic is flawed - it works if there is only one error on the printer
-//   but the WinApi allows a combination of flags.
-//   The caller to XISPRINTER() should take the return value and determine the error(s).
-//   8/10/2003 12:46p.m. Peter Rees
+   // This original logic is flawed - it works if there is only one error on the printer
+   //   but the WinApi allows a combination of flags.
+   //   The caller to XISPRINTER() should take the return value and determine the error(s).
+   //   8/10/2003 12:46p.m. Peter Rees
 
-  if (dwError) {
+   if (dwError) {
     switch (dwPrinterStatus &
         (PRINTER_STATUS_ERROR |
          PRINTER_STATUS_PAPER_JAM |
@@ -253,77 +261,91 @@ static DWORD IsPrinterErrorn( HANDLE hPrinter ) {
       dwError = 19;
       break;
     }
-*/
-  if (!dwError) {
-    if (GetJobs(hPrinter, &pJobs, &cJobs)) {
-      for (i=0; !dwError && i < cJobs; i++) {
-        if (pJobs[i].Status & JOB_STATUS_ERROR)
-          dwError = -20 ;
-        else if (pJobs[i].Status & JOB_STATUS_OFFLINE)
-          dwError = -21 ;
-        else if (pJobs[i].Status & JOB_STATUS_PAPEROUT)
-          dwError = -22 ;
-        else if (pJobs[i].Status & JOB_STATUS_BLOCKED_DEVQ)
-          dwError = -23 ;
+ */
+   if( ! dwError )
+   {
+      if( GetJobs( hPrinter, &pJobs, &cJobs ) )
+      {
+         for( i = 0; ! dwError && i < cJobs; i++ )
+         {
+            if( pJobs[ i ].Status & JOB_STATUS_ERROR )
+               dwError = -20;
+            else if( pJobs[ i ].Status & JOB_STATUS_OFFLINE )
+               dwError = -21;
+            else if( pJobs[ i ].Status & JOB_STATUS_PAPEROUT )
+               dwError = -22;
+            else if( pJobs[ i ].Status & JOB_STATUS_BLOCKED_DEVQ )
+               dwError = -23;
+         }
+         hb_xfree( pJobs );
       }
-      hb_xfree(pJobs) ;
-    }
-  }
-  return dwError;
+   }
+   return dwError;
 }
 
-static BOOL GetJobs(HANDLE hPrinter,JOB_INFO_2 **ppJobInfo,int *pcJobs) {
-  DWORD Result = FALSE ;
-  DWORD cByteNeeded;
-  DWORD nReturned;
-  DWORD cByteUsed;
-  JOB_INFO_2 * pJobStorage;
-  PRINTER_INFO_2 * pPrinterInfo;
-  HB_TRACE(HB_TR_DEBUG, ("isprint.c GetJobs()"));
-  GetPrinter(hPrinter, 2, NULL, 0, &cByteNeeded);
-  if (cByteNeeded>0) {
-    pPrinterInfo = (PRINTER_INFO_2 *) hb_xgrab(cByteNeeded);
-    if (pPrinterInfo) {
-      if (GetPrinter(hPrinter,2,(LPBYTE)pPrinterInfo,cByteNeeded,&cByteUsed)) {
-        EnumJobs(hPrinter,0,pPrinterInfo->cJobs,2,NULL,0,(LPDWORD)&cByteNeeded,(LPDWORD)&nReturned) ;
-        if (cByteNeeded>0) {
-          pJobStorage = (JOB_INFO_2 *) hb_xgrab(cByteNeeded);
-          if (pJobStorage) {
-            if (EnumJobs(hPrinter,0,nReturned,2,(LPBYTE)pJobStorage,cByteNeeded,(LPDWORD)&cByteUsed,(LPDWORD)&nReturned)) {
-              *pcJobs = nReturned;
-              *ppJobInfo = pJobStorage;
-              Result = TRUE ;
+static BOOL GetJobs( HANDLE hPrinter, JOB_INFO_2 ** ppJobInfo, int * pcJobs )
+{
+   DWORD             Result = FALSE;
+   DWORD             cByteNeeded;
+   DWORD             nReturned;
+   DWORD             cByteUsed;
+   JOB_INFO_2 *      pJobStorage;
+   PRINTER_INFO_2 *  pPrinterInfo;
+
+   HB_TRACE( HB_TR_DEBUG, ( "isprint.c GetJobs()" ) );
+   GetPrinter( hPrinter, 2, NULL, 0, &cByteNeeded );
+   if( cByteNeeded > 0 )
+   {
+      pPrinterInfo = ( PRINTER_INFO_2 * ) hb_xgrab( cByteNeeded );
+      if( pPrinterInfo )
+      {
+         if( GetPrinter( hPrinter, 2, ( LPBYTE ) pPrinterInfo, cByteNeeded, &cByteUsed ) )
+         {
+            EnumJobs( hPrinter, 0, pPrinterInfo->cJobs, 2, NULL, 0, ( LPDWORD ) &cByteNeeded, ( LPDWORD ) &nReturned );
+            if( cByteNeeded > 0 )
+            {
+               pJobStorage = ( JOB_INFO_2 * ) hb_xgrab( cByteNeeded );
+               if( pJobStorage )
+               {
+                  if( EnumJobs( hPrinter, 0, nReturned, 2, ( LPBYTE ) pJobStorage, cByteNeeded, ( LPDWORD ) &cByteUsed, ( LPDWORD ) &nReturned ) )
+                  {
+                     *pcJobs     = nReturned;
+                     *ppJobInfo  = pJobStorage;
+                     Result      = TRUE;
+                  }
+                  else
+                  {
+                     hb_xfree( pJobStorage );
+                  }
+               }
             }
-            else {
-              hb_xfree(pJobStorage) ;
-            }
-          }
-        }
+         }
+         hb_xfree( pPrinterInfo );
       }
-      hb_xfree(pPrinterInfo);
-    }
-  }
-  return Result;
+   }
+   return Result;
 }
 
 DWORD hb_printerIsReadyn( const char * pszPrinterName )
 {
-  DWORD dwPrinter= -1;
-  HANDLE hPrinter;
+   DWORD    dwPrinter = -1;
+   HANDLE   hPrinter;
 
-  if (*pszPrinterName && OpenPrinter( (LPSTR) pszPrinterName, &hPrinter, NULL )) {
-    dwPrinter =  IsPrinterErrorn( hPrinter );
-    CloseHandle(hPrinter) ;
-  }
-  return dwPrinter;
+   if( *pszPrinterName && OpenPrinter( ( LPSTR ) pszPrinterName, &hPrinter, NULL ) )
+   {
+      dwPrinter = IsPrinterErrorn( hPrinter );
+      CloseHandle( hPrinter );
+   }
+   return dwPrinter;
 }
 
 HB_FUNC( XISPRINTER )
 {
-  char DefaultPrinter[MAXBUFFERSIZE];
-  DWORD pdwBufferSize = MAXBUFFERSIZE;
-  hb_GetDefaultPrinter( ( LPTSTR ) &DefaultPrinter, &pdwBufferSize);
-  hb_retnl( hb_printerIsReadyn( ISCHAR( 1 ) ? hb_parcx( 1 ) : DefaultPrinter ) );
+   char  DefaultPrinter[ MAXBUFFERSIZE ];
+   DWORD pdwBufferSize = MAXBUFFERSIZE;
+
+   hb_GetDefaultPrinter( ( LPTSTR ) &DefaultPrinter, &pdwBufferSize );
+   hb_retnl( hb_printerIsReadyn( ISCHAR( 1 ) ? hb_parcx( 1 ) : DefaultPrinter ) );
 }
 
 #endif

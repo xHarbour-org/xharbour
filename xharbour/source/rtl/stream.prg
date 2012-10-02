@@ -58,11 +58,11 @@
 
 FUNCTION FileReader( cFile, nMode )
 
-RETURN TStreamFileReader():New( cFile, nMode )
+   RETURN TStreamFileReader():New( cFile, nMode )
 
 FUNCTION FileWriter( cFile, nMode )
 
-RETURN TStreamFileWriter():New( cFile, nMode )
+   RETURN TStreamFileWriter():New( cFile, nMode )
 
 CLASS TStream
 
@@ -73,17 +73,17 @@ CLASS TStream
    DATA nLength   INIT 0
    DATA nPosition INIT 0
 
-   //METHOD BeginRead( sBuffer, nOffset, nCount, bCallback, oState )
-   //METHOD EndRead( oAsync ) VIRTUAL
+//METHOD BeginRead( sBuffer, nOffset, nCount, bCallback, oState )
+//METHOD EndRead( oAsync ) VIRTUAL
 
-   //METHOD BeginWrite( sBuffer, nOffset, nCount, bCallback, oState )
-   //METHOD EndWrite( oAsync ) VIRTUAL
+//METHOD BeginWrite( sBuffer, nOffset, nCount, bCallback, oState )
+//METHOD EndWrite( oAsync ) VIRTUAL
 
-   METHOD Close() VIRTUAL
+   METHOD CLOSE() VIRTUAL
    METHOD Flush() VIRTUAL
-   METHOD Seek( nOffset, Origin ) VIRTUAL
+   METHOD SEEK( nOffset, Origin ) VIRTUAL
 
-   METHOD Read( sBuffer, nOffset, nCount ) VIRTUAL
+   METHOD READ( sBuffer, nOffset, nCount ) VIRTUAL
    METHOD ReadByte() VIRTUAL
 
    METHOD Write( sBuffer, nOffset, nCount ) VIRTUAL
@@ -101,10 +101,10 @@ PROCEDURE CopyTo( oTargetStream ) CLASS TStream
    LOCAL nPosition
 
    IF oTargetStream:lCanWrite == .F.
-      Throw( ErrorNew( "Stream", 0, 1001, ProcName(), "Target not writable.", HB_aParams() ) )
+      Throw( ErrorNew( "Stream", 0, 1001, ProcName(), "Target not writable.", hb_AParams() ) )
    ENDIF
 
-   // Save.
+// Save.
    nPosition := ::nPosition
 
    ::Seek( 0, FS_SET )
@@ -116,13 +116,13 @@ PROCEDURE CopyTo( oTargetStream ) CLASS TStream
       nBytesToRead -= nRead
    END
 
-   //Truncate incase it was a bigger file.
+//Truncate incase it was a bigger file.
    oTargetStream:Write( "", 0, 0 )
 
-   // Restore.
+// Restore.
    ::Seek( nPosition, FS_SET )
 
-RETURN
+   RETURN
 
 CLASS TStreamFileReader FROM TStream
 
@@ -131,10 +131,10 @@ CLASS TStreamFileReader FROM TStream
 
    METHOD New( cFile ) CONSTRUCTOR
 
-   METHOD Close() INLINE IIF( ::Handle > 0, FClose( ::Handle ), ), ::Handle := -2
-   METHOD Seek( nOffset Origin ) INLINE FSeek( ::Handle, nOffset, Origin )
+   METHOD CLOSE() INLINE iif( ::Handle > 0, FClose( ::Handle ), ), ::Handle := - 2
+   METHOD SEEK( nOffset Origin ) INLINE FSeek( ::Handle, nOffset, Origin )
 
-   METHOD Read( sBuffer, nOffset, nCount )
+   METHOD READ( sBuffer, nOffset, nCount )
    METHOD ReadByte()
 
    DESTRUCTOR Finalize
@@ -153,7 +153,7 @@ METHOD New( cFile, nMode ) CLASS TStreamFileReader
 
    ::Handle := FOpen( cFile, nMode )
    IF ::Handle <= 0
-      Throw( ErrorNew( "Stream", 0, 1004, ProcName(), "Open Error: " + Str( FError() ), HB_aParams() ) )
+      Throw( ErrorNew( "Stream", 0, 1004, ProcName(), "Open Error: " + Str( FError() ), hb_AParams() ) )
    ENDIF
 
    ::nPosition := 0
@@ -161,25 +161,27 @@ METHOD New( cFile, nMode ) CLASS TStreamFileReader
 
    FSeek( ::Handle, 0, FS_SET )
 
-RETURN Self
+   RETURN Self
 
 PROCEDURE Finalize CLASS TStreamFileReader
-   ::Close()
-RETURN
 
-METHOD Read( sBuffer, nOffset, nCount ) CLASS TStreamFileReader
+   ::Close()
+
+   RETURN
+
+METHOD READ( sBuffer, nOffset, nCount ) CLASS TStreamFileReader
 
    LOCAL nRead
 
    IF ! HB_IsByRef( @sBuffer )
-      Throw( ErrorNew( "Stream", 0, 1002, ProcName(), "Buffer not BYREF.", HB_aParams() ) )
+      Throw( ErrorNew( "Stream", 0, 1002, ProcName(), "Buffer not BYREF.", hb_AParams() ) )
    ENDIF
 
    nRead := FRead( ::Handle, @sBuffer, nCount, nOffset )
 
    ::nPosition += nRead
 
-RETURN nRead
+   RETURN nRead
 
 METHOD ReadByte()  CLASS TStreamFileReader
 
@@ -190,7 +192,7 @@ METHOD ReadByte()  CLASS TStreamFileReader
       RETURN sBuffer
    ENDIF
 
-RETURN ""
+   RETURN ""
 
 CLASS TStreamFileWriter FROM TStream
 
@@ -199,8 +201,8 @@ CLASS TStreamFileWriter FROM TStream
 
    METHOD New( cFile ) CONSTRUCTOR
 
-   METHOD Close() INLINE IIF( ::Handle > 0, FClose( ::Handle ), ), ::Handle := -2
-   METHOD Seek( nOffset Origin ) INLINE ::nPosition := FSeek( ::Handle, nOffset, Origin )
+   METHOD CLOSE() INLINE iif( ::Handle > 0, FClose( ::Handle ), ), ::Handle := - 2
+   METHOD SEEK( nOffset Origin ) INLINE ::nPosition := FSeek( ::Handle, nOffset, Origin )
 
    METHOD Write( sBuffer, nOffset, nCount )
    METHOD WriteByte( cByte )
@@ -222,7 +224,7 @@ METHOD New( cFile, nMode ) CLASS TStreamFileWriter
 
       ::Handle := FOpen( cFile, nMode )
       IF ::Handle <= 0
-         Throw( ErrorNew( "Stream", 0, 1004, ProcName(), "Open Error: " + Str( FError() ), HB_aParams() ) )
+         Throw( ErrorNew( "Stream", 0, 1004, ProcName(), "Open Error: " + Str( FError() ), hb_AParams() ) )
       ENDIF
 
       ::nLength := FSeek( ::Handle, 0, FS_END )
@@ -234,18 +236,20 @@ METHOD New( cFile, nMode ) CLASS TStreamFileWriter
 
       ::Handle := FCreate( cFile, nMode )
       IF ::Handle <= 0
-         Throw( ErrorNew( "Stream", 0, 1004, ProcName(), "Create Error: " + Str( FError() ), HB_aParams() ) )
+         Throw( ErrorNew( "Stream", 0, 1004, ProcName(), "Create Error: " + Str( FError() ), hb_AParams() ) )
       ENDIF
 
       ::nPosition := 0
       ::nLength := 0
    ENDIF
 
-RETURN Self
+   RETURN Self
 
 PROCEDURE Finalize CLASS TStreamFileWriter
+
    ::Close()
-RETURN
+
+   RETURN
 
 METHOD Write( sBuffer, nOffset, nCount ) CLASS TStreamFileWriter
 
@@ -256,10 +260,10 @@ METHOD Write( sBuffer, nOffset, nCount ) CLASS TStreamFileWriter
    ::nPosition += nWritten
 
    IF nWritten != nCount
-      Throw( ErrorNew( "Stream", 0, 1003, ProcName(), "Write failed - written:" + Str( nWritten ) + " bytes", HB_aParams() ) )
+      Throw( ErrorNew( "Stream", 0, 1003, ProcName(), "Write failed - written:" + Str( nWritten ) + " bytes", hb_AParams() ) )
    ENDIF
 
-RETURN nWritten
+   RETURN nWritten
 
 PROCEDURE WriteByte( cByte ) CLASS TStreamFileWriter
 
@@ -268,7 +272,7 @@ PROCEDURE WriteByte( cByte ) CLASS TStreamFileWriter
    ::nPosition += nWritten
 
    IF nWritten != 1
-      Throw( ErrorNew( "Stream", 0, 1006, ProcName(), "Write failed", HB_aParams() ) )
+      Throw( ErrorNew( "Stream", 0, 1006, ProcName(), "Write failed", hb_AParams() ) )
    ENDIF
 
-RETURN
+   RETURN

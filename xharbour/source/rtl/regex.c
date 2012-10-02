@@ -68,27 +68,27 @@
  * any modifications in internal structures (also use native
  * platform regex library which exists in most of *nixes), Druzus
  */
-#if !defined( HB_ALLOC_ALIGNMENT ) || ( HB_ALLOC_ALIGNMENT + 1 == 1 )
-#  define HB_ALLOC_ALIGNMENT     8
+#if ! defined( HB_ALLOC_ALIGNMENT ) || ( HB_ALLOC_ALIGNMENT + 1 == 1 )
+#  define HB_ALLOC_ALIGNMENT 8
 #endif
 
 /* #define hb_isregexstring( x )  ( ( x->item.asString.length > 3 && memcmp( x->item.asString.value, "***", 3 ) == 0 ) ) */
-#define hb_isregexstring( x )  ( ( hb_itemGetCLen(x) > 3 && memcmp( hb_itemGetCPtr(x), "***", 3 ) == 0 ) )
+#define hb_isregexstring( x ) ( ( hb_itemGetCLen( x ) > 3 && memcmp( hb_itemGetCPtr( x ), "***", 3 ) == 0 ) )
 
 extern void HB_PCREPOS_LIBRARY( void );
 
-regex_t * hb_getregex( PHB_ITEM pRegEx, BOOL lIgnCase, BOOL lNL, BOOL *fFree )
+regex_t * hb_getregex( PHB_ITEM pRegEx, BOOL lIgnCase, BOOL lNL, BOOL * fFree )
 {
-   char * szRegEx = hb_itemGetCPtr( pRegEx );
-   regex_t * pRetReg = NULL;
+   char *      szRegEx  = hb_itemGetCPtr( pRegEx );
+   regex_t *   pRetReg  = NULL;
 
    *fFree = FALSE;
    if( szRegEx && *szRegEx )
    {
       if( memcmp( szRegEx, "***", 3 ) == 0 )
       {
-         pRetReg = (regex_t *) ( szRegEx + HB_ALLOC_ALIGNMENT );
-         pRetReg->re_pcre = (pcre *) ( ( BYTE * ) pRetReg + sizeof( regex_t ) );
+         pRetReg           = ( regex_t * ) ( szRegEx + HB_ALLOC_ALIGNMENT );
+         pRetReg->re_pcre  = ( pcre * ) ( ( BYTE * ) pRetReg + sizeof( regex_t ) );
       }
       else
       {
@@ -112,18 +112,18 @@ regex_t * hb_getregex( PHB_ITEM pRegEx, BOOL lIgnCase, BOOL lNL, BOOL *fFree )
    return pRetReg;
 }
 
-void hb_freeregex( regex_t *pReg )
+void hb_freeregex( regex_t * pReg )
 {
    regfree( pReg );
    hb_xfree( pReg );
 }
 
-BOOL hb_regexCompile( PHB_REGEX pRegEx, const char *szRegEx, int iCFlags, int iEFlags )
+BOOL hb_regexCompile( PHB_REGEX pRegEx, const char * szRegEx, int iCFlags, int iEFlags )
 {
-   pRegEx->pReg    = NULL;
-   pRegEx->fFree   = FALSE;
-   pRegEx->iCFlags = REG_EXTENDED | iCFlags;
-   pRegEx->iEFlags = iEFlags;
+   pRegEx->pReg      = NULL;
+   pRegEx->fFree     = FALSE;
+   pRegEx->iCFlags   = REG_EXTENDED | iCFlags;
+   pRegEx->iEFlags   = iEFlags;
 
    if( szRegEx && *szRegEx )
    {
@@ -141,26 +141,26 @@ BOOL hb_regexCompile( PHB_REGEX pRegEx, const char *szRegEx, int iCFlags, int iE
 
 BOOL hb_regexGet( PHB_REGEX pRegEx, PHB_ITEM pRegExItm, int iCFlags, int iEFlags )
 {
-   char *szRegEx = hb_itemGetCPtr( pRegExItm );
-   BOOL fResult = FALSE;
+   char *   szRegEx  = hb_itemGetCPtr( pRegExItm );
+   BOOL     fResult  = FALSE;
 
    if( szRegEx && *szRegEx )
    {
       if( memcmp( szRegEx, "***", 3 ) == 0 )
       {
-         pRegEx->pReg = (regex_t *) ( szRegEx + HB_ALLOC_ALIGNMENT );
-         pRegEx->pReg->re_pcre = (pcre *) ( ( BYTE * ) pRegEx->pReg + sizeof( regex_t ) );
-         pRegEx->fFree   = FALSE;
-         pRegEx->iCFlags = REG_EXTENDED | iCFlags;
-         pRegEx->iEFlags = iEFlags;
-         fResult = TRUE;
+         pRegEx->pReg            = ( regex_t * ) ( szRegEx + HB_ALLOC_ALIGNMENT );
+         pRegEx->pReg->re_pcre   = ( pcre * ) ( ( BYTE * ) pRegEx->pReg + sizeof( regex_t ) );
+         pRegEx->fFree           = FALSE;
+         pRegEx->iCFlags         = REG_EXTENDED | iCFlags;
+         pRegEx->iEFlags         = iEFlags;
+         fResult                 = TRUE;
       }
       else
       {
          fResult = hb_regexCompile( pRegEx, hb_itemGetCPtr( pRegExItm ), iCFlags, iEFlags );
       }
    }
-   if( !fResult )
+   if( ! fResult )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, "Invalid Regular expression", "Regex subsystem", 1, pRegExItm );
       return FALSE;
@@ -176,21 +176,21 @@ void hb_regexFree( PHB_REGEX pRegEx )
       {
          regfree( pRegEx->pReg );
          hb_xfree( pRegEx->pReg );
-         pRegEx->pReg = NULL;
-         pRegEx->fFree = FALSE;
+         pRegEx->pReg   = NULL;
+         pRegEx->fFree  = FALSE;
       }
    }
 }
 
-BOOL hb_regexMatch( PHB_REGEX pRegEx, const char *szString, BOOL fFull )
+BOOL hb_regexMatch( PHB_REGEX pRegEx, const char * szString, BOOL fFull )
 {
    BOOL fMatch;
 
    fMatch = regexec( pRegEx->pReg, szString, 1, pRegEx->aMatches, pRegEx->iEFlags ) == 0;
 
-   return fMatch && ( !fFull ||
-            ( pRegEx->aMatches[0].rm_so == 0 &&
-              pRegEx->aMatches[0].rm_eo == (int) strlen( szString ) ) );
+   return fMatch && ( ! fFull ||
+                      ( pRegEx->aMatches[ 0 ].rm_so == 0 &&
+                        pRegEx->aMatches[ 0 ].rm_eo == ( int ) strlen( szString ) ) );
 }
 
 /*
@@ -205,21 +205,21 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
       #define REGEX_MAX_GROUPS 16
    #endif
 
-   regex_t *pReg;
-   regmatch_t aMatches[REGEX_MAX_GROUPS];
-   int EFlags = 0;//REG_BACKR;
-   int i, iMatches = 0;
-   int iMaxMatch = REGEX_MAX_GROUPS;
+   regex_t *   pReg;
+   regmatch_t  aMatches[ REGEX_MAX_GROUPS ];
+   int         EFlags         = 0; //REG_BACKR;
+   int         i, iMatches = 0;
+   int         iMaxMatch      = REGEX_MAX_GROUPS;
 
-   PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
-   PHB_ITEM pNewLine = hb_param( 4, HB_IT_LOGICAL );
+   PHB_ITEM    pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
+   PHB_ITEM    pNewLine       = hb_param( 4, HB_IT_LOGICAL );
    HB_ITEM_NEW( pRetArray );
-   BOOL fFree = FALSE;
+   BOOL        fFree          = FALSE;
 
    if( pRegEx == NULL )
    {
-      pRegEx = hb_param( 1, HB_IT_STRING );
-      pString = hb_param( 2, HB_IT_STRING );
+      pRegEx   = hb_param( 1, HB_IT_STRING );
+      pString  = hb_param( 2, HB_IT_STRING );
    }
 
    if( pRegEx == NULL || pString == NULL || ( ! HB_IS_STRING( pRegEx ) ) || ( ! HB_IS_STRING( pString ) ) )
@@ -233,7 +233,7 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                        pCaseSensitive && ! pCaseSensitive->item.asLogical.value,
                        pNewLine != NULL && pNewLine->item.asLogical.value,
                        &fFree );
-*/
+ */
 
    pReg = hb_getregex( pRegEx,
                        pCaseSensitive && ! hb_itemGetL( pCaseSensitive ),
@@ -250,20 +250,19 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
       iMaxMatch = 1;
    }
 
-   aMatches[0].rm_so = 0;
-   aMatches[0].rm_eo = (regoff_t) pString->item.asString.length;
+   aMatches[ 0 ].rm_so  = 0;
+   aMatches[ 0 ].rm_eo  = ( regoff_t ) pString->item.asString.length;
 
    /* if( regexec( pReg, pString->item.asString.value, iMaxMatch, aMatches, EFlags ) == 0 ) */
    if( regexec( pReg, hb_itemGetCPtr( pString ), iMaxMatch, aMatches, EFlags ) == 0 )
    {
-      switch ( cRequest )
+      switch( cRequest )
       {
          case 0: // Wants Results
-         {
             // Count sucessful matches
-            for ( i = 0; i < iMaxMatch; i ++ )
+            for( i = 0; i < iMaxMatch; i++ )
             {
-               if ( aMatches[i].rm_eo != -1 )
+               if( aMatches[ i ].rm_eo != -1 )
                {
                   iMatches = i;
                }
@@ -272,17 +271,17 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             iMatches++;
             hb_arrayNew( &pRetArray, iMatches );
 
-            for ( i = 0; i < iMatches; i++ )
+            for( i = 0; i < iMatches; i++ )
             {
-               if (aMatches[i].rm_eo > -1 )
+               if( aMatches[ i ].rm_eo > -1 )
                {
 /*                 hb_arraySetCL( &pRetArray, i + 1,
                                 pString->item.asString.value + aMatches[i].rm_so,
                                 aMatches[i].rm_eo - aMatches[i].rm_so ); */
 
-                   hb_arraySetCL( &pRetArray, i + 1,
-                                hb_itemGetCPtr( pString ) + aMatches[i].rm_so,
-                                aMatches[i].rm_eo - aMatches[i].rm_so );
+                  hb_arraySetCL( &pRetArray, i + 1,
+                                 hb_itemGetCPtr( pString ) + aMatches[ i ].rm_so,
+                                 aMatches[ i ].rm_eo - aMatches[ i ].rm_so );
                }
                else
                {
@@ -298,7 +297,6 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             hb_itemReturnForward( &pRetArray );
 
             return TRUE;
-         }
 
          case 1: // HB_P_LIKE
             if( fFree )
@@ -307,7 +305,7 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                hb_freeregex( pReg );
             }
 
-            return aMatches[0].rm_so == 0 && (ULONG) (aMatches[0].rm_eo) == pString->item.asString.length;
+            return aMatches[ 0 ].rm_so == 0 && ( ULONG ) ( aMatches[ 0 ].rm_eo ) == pString->item.asString.length;
 
          case 2: // HB_P_MATCH
             if( fFree )
@@ -322,20 +320,20 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
          {
             HB_ITEM_NEW( Match );
             /* char *str = pString->item.asString.value; */
-            char *str = hb_itemGetCPtr( pString );
-            int iMax = hb_parni( 5 );
-            int iCount = 1;
+            char *   str      = hb_itemGetCPtr( pString );
+            int      iMax     = hb_parni( 5 );
+            int      iCount   = 1;
 
             hb_arrayNew( &pRetArray, 0 );
 
             do
             {
-               hb_itemPutCL( &Match, str, aMatches[0].rm_so );
+               hb_itemPutCL( &Match, str, aMatches[ 0 ].rm_so );
                hb_arrayAddForward( &pRetArray, &Match );
                str += aMatches[ 0 ].rm_eo;
                iCount++;
             }
-            while( *str && (iMax == 0 || iMax > iCount) && regexec( pReg, str, 1, aMatches, EFlags ) == 0 );
+            while( *str && ( iMax == 0 || iMax > iCount ) && regexec( pReg, str, 1, aMatches, EFlags ) == 0 );
 
             /* last match must be done also in case that str is empty; this would
                mean an empty split field at the end of the string */
@@ -357,9 +355,9 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             HB_ITEM aSingleMatch;
 
             // Count sucessful matches
-            for ( i = 0; i < iMaxMatch; i ++ )
+            for( i = 0; i < iMaxMatch; i++ )
             {
-               if ( aMatches[i].rm_eo != -1 )
+               if( aMatches[ i ].rm_eo != -1 )
                {
                   iMatches = i;
                }
@@ -368,22 +366,22 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             iMatches++;
             hb_arrayNew( &pRetArray, iMatches );
 
-            for ( i = 0; i < iMatches; i++ )
+            for( i = 0; i < iMatches; i++ )
             {
                aSingleMatch.type = HB_IT_NIL;
                hb_arrayNew( &aSingleMatch, 3 );
 
-               if ( aMatches[i].rm_eo != -1 )
+               if( aMatches[ i ].rm_eo != -1 )
                {
                   // matched string
                   // hb_arraySetCL( &aSingleMatch, 1, pString->item.asString.value + aMatches[i].rm_so, aMatches[i].rm_eo - aMatches[i].rm_so );
-                  hb_arraySetCL( &aSingleMatch, 1, hb_itemGetCPtr( pString ) + aMatches[i].rm_so, aMatches[i].rm_eo - aMatches[i].rm_so );
+                  hb_arraySetCL( &aSingleMatch, 1, hb_itemGetCPtr( pString ) + aMatches[ i ].rm_so, aMatches[ i ].rm_eo - aMatches[ i ].rm_so );
 
                   // begin of match
-                  hb_arraySetNI( &aSingleMatch, 2, aMatches[i].rm_so + 1 );
+                  hb_arraySetNI( &aSingleMatch, 2, aMatches[ i ].rm_so + 1 );
 
                   // End of match
-                  hb_arraySetNI( &aSingleMatch, 3, aMatches[i].rm_eo );
+                  hb_arraySetNI( &aSingleMatch, 3, aMatches[ i ].rm_eo );
                }
                else
                {
@@ -395,7 +393,7 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                hb_arraySetForward( &pRetArray, i + 1, &aSingleMatch );
             }
 
-            if ( fFree )
+            if( fFree )
                hb_freeregex( pReg );
 
             hb_itemReturnForward( &pRetArray );
@@ -406,17 +404,17 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
          case 5: // Wants *ALL* Results AND positions
          {
             HB_ITEM_NEW( pAtxArray );
-            HB_ITEM aSingleMatch;
+            HB_ITEM  aSingleMatch;
 
             // char  *str = pString->item.asString.value;
-            char  *str       = hb_itemGetCPtr( pString );
-            int   iMax       = hb_parni( 5 );  // max nuber of matches I want, 0 = unlimited
-            int   iGetMatch  = hb_parni( 6 );  // Gets if want only one single match or a sub-match
-            BOOL  fOnlyMatch = TRUE;           // if TRUE returns only matches and sub-matches, not positions
-            ULONG ulOffSet   = 0;
-            int   iCount     = 1;
+            char *   str         = hb_itemGetCPtr( pString );
+            int      iMax        = hb_parni( 5 );  // max nuber of matches I want, 0 = unlimited
+            int      iGetMatch   = hb_parni( 6 );  // Gets if want only one single match or a sub-match
+            BOOL     fOnlyMatch  = TRUE;           // if TRUE returns only matches and sub-matches, not positions
+            ULONG    ulOffSet    = 0;
+            int      iCount      = 1;
 
-            if ( hb_parinfo( 7 ) & HB_IT_LOGICAL )
+            if( hb_parinfo( 7 ) & HB_IT_LOGICAL )
             {
                fOnlyMatch = hb_parl( 7 );
             }
@@ -427,9 +425,9 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             do
             {
                // Count sucessful matches
-               for ( i = 0; i < iMaxMatch; i ++ )
+               for( i = 0; i < iMaxMatch; i++ )
                {
-                  if ( aMatches[i].rm_eo != -1 )
+                  if( aMatches[ i ].rm_eo != -1 )
                   {
                      iMatches = i;
                      //TraceLog( NULL, "iMatches = %i, Pos = %i\n\r", iMatches, aMatches[i].rm_eo );
@@ -441,53 +439,53 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                //TraceLog( NULL, "iMatches %i\n\r", iMatches );
 
                // If I want all matches
-               if ( iGetMatch == 0 || // Check boundaries
-                    ( iGetMatch < 0 || iGetMatch > iMatches  )
-                  )
+               if( iGetMatch == 0 ||  // Check boundaries
+                   ( iGetMatch < 0 || iGetMatch > iMatches )
+                   )
                {
                   hb_arrayNew( &pAtxArray, iMatches );
 
-                  for ( i = 0; i < iMatches; i++ )
+                  for( i = 0; i < iMatches; i++ )
                   {
-                      aSingleMatch.type = HB_IT_NIL;
-                      hb_arrayNew( &aSingleMatch, 3 );
+                     aSingleMatch.type = HB_IT_NIL;
+                     hb_arrayNew( &aSingleMatch, 3 );
 
-                      if ( !fOnlyMatch )
-                      {
+                     if( ! fOnlyMatch )
+                     {
 
-                         if ( aMatches[i].rm_eo != -1 )
-                         {
+                        if( aMatches[ i ].rm_eo != -1 )
+                        {
 
-                            //matched string
-                            hb_arraySetCL( &aSingleMatch, 1, str + aMatches[i].rm_so, ( aMatches[i].rm_eo - aMatches[i].rm_so ) );
+                           //matched string
+                           hb_arraySetCL( &aSingleMatch, 1, str + aMatches[ i ].rm_so, ( aMatches[ i ].rm_eo - aMatches[ i ].rm_so ) );
 
-                            // begin of match
-                            hb_arraySetNI( &aSingleMatch, 2, ulOffSet + aMatches[i].rm_so + 1 );
+                           // begin of match
+                           hb_arraySetNI( &aSingleMatch, 2, ulOffSet + aMatches[ i ].rm_so + 1 );
 
-                            // End of match
-                            hb_arraySetNI( &aSingleMatch, 3, ulOffSet + aMatches[i].rm_eo );
-                         }
-                         else
-                         {
-                            hb_arraySetCL( &aSingleMatch, 1, "", 0 );
-                            hb_arraySetNI( &aSingleMatch, 2, 0 );
-                            hb_arraySetNI( &aSingleMatch, 3, 0 );
-                         }
-                      }
-                      else
-                      {
-                         if ( aMatches[i].rm_eo != -1 )
-                         {
-                            //matched string
-                            hb_itemPutCL( &aSingleMatch, str + aMatches[i].rm_so, ( aMatches[i].rm_eo - aMatches[i].rm_so ) );
-                         }
-                         else
-                         {
-                            hb_itemPutCL( &aSingleMatch, "", 0 );
-                         }
-                      }
+                           // End of match
+                           hb_arraySetNI( &aSingleMatch, 3, ulOffSet + aMatches[ i ].rm_eo );
+                        }
+                        else
+                        {
+                           hb_arraySetCL( &aSingleMatch, 1, "", 0 );
+                           hb_arraySetNI( &aSingleMatch, 2, 0 );
+                           hb_arraySetNI( &aSingleMatch, 3, 0 );
+                        }
+                     }
+                     else
+                     {
+                        if( aMatches[ i ].rm_eo != -1 )
+                        {
+                           //matched string
+                           hb_itemPutCL( &aSingleMatch, str + aMatches[ i ].rm_so, ( aMatches[ i ].rm_eo - aMatches[ i ].rm_so ) );
+                        }
+                        else
+                        {
+                           hb_itemPutCL( &aSingleMatch, "", 0 );
+                        }
+                     }
 
-                      hb_arraySetForward( &pAtxArray, i + 1, &aSingleMatch );
+                     hb_arraySetForward( &pAtxArray, i + 1, &aSingleMatch );
                   }
 
                   hb_arrayAddForward( &pRetArray, &pAtxArray );
@@ -496,24 +494,24 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                else // Here I get only single matches
                {
 
-                  i = iGetMatch - 1;
+                  i                 = iGetMatch - 1;
 
                   aSingleMatch.type = HB_IT_NIL;
 
-                  if ( !fOnlyMatch )
+                  if( ! fOnlyMatch )
                   {
                      hb_arrayNew( &aSingleMatch, 3 );
 
-                     if ( aMatches[i].rm_eo != -1 )
+                     if( aMatches[ i ].rm_eo != -1 )
                      {
                         //matched string
-                        hb_arraySetCL( &aSingleMatch, 1, str + aMatches[i].rm_so, ( aMatches[i].rm_eo - aMatches[i].rm_so ) );
+                        hb_arraySetCL( &aSingleMatch, 1, str + aMatches[ i ].rm_so, ( aMatches[ i ].rm_eo - aMatches[ i ].rm_so ) );
 
                         // begin of match
-                        hb_arraySetNI( &aSingleMatch, 2, ulOffSet + aMatches[i].rm_so + 1 );
+                        hb_arraySetNI( &aSingleMatch, 2, ulOffSet + aMatches[ i ].rm_so + 1 );
 
                         // End of match
-                        hb_arraySetNI( &aSingleMatch, 3, ulOffSet + aMatches[i].rm_eo );
+                        hb_arraySetNI( &aSingleMatch, 3, ulOffSet + aMatches[ i ].rm_eo );
                      }
                      else
                      {
@@ -524,10 +522,10 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                   }
                   else
                   {
-                     if ( aMatches[i].rm_eo != -1 )
+                     if( aMatches[ i ].rm_eo != -1 )
                      {
                         //matched string
-                        hb_itemPutCL( &aSingleMatch, str + aMatches[i].rm_so, ( aMatches[i].rm_eo - aMatches[i].rm_so ) );
+                        hb_itemPutCL( &aSingleMatch, str + aMatches[ i ].rm_so, ( aMatches[ i ].rm_eo - aMatches[ i ].rm_so ) );
                      }
                      else
                      {
@@ -538,12 +536,12 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                   hb_arrayAddForward( &pRetArray, &aSingleMatch );
                }
 
-               str += aMatches[ 0 ].rm_eo;
+               str      += aMatches[ 0 ].rm_eo;
                //TraceLog( NULL, "iCount, ulOffSet, aMatches[0].rm_so, aMatches[0].rm_eo: %i, %i, %i, %i \n\r", iCount, ulOffSet, aMatches[0].rm_so, aMatches[0].rm_eo );
-               ulOffSet += aMatches[0].rm_eo;
+               ulOffSet += aMatches[ 0 ].rm_eo;
                iCount++;
             }
-            while( *str && (iMax == 0 || iMax >= iCount) && regexec( pReg, str, iMaxMatch, aMatches, EFlags ) == 0 );
+            while( *str && ( iMax == 0 || iMax >= iCount ) && regexec( pReg, str, iMaxMatch, aMatches, EFlags ) == 0 );
 
             if( fFree )
             {
@@ -559,7 +557,7 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
    /* If we have no match, we must anyway return an array of one element
       for request kind == 3 (split) */
-   if ( fFree )
+   if( fFree )
    {
       hb_freeregex( pReg );
    }
@@ -576,15 +574,15 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 }
 
 /*
- Converts OS Directory Wild Mask to an equivalent RegEx
- Caller must allocate sRegEx with enough space for conversion.
- returns the length of the resulting RegEx.
+   Converts OS Directory Wild Mask to an equivalent RegEx
+   Caller must allocate sRegEx with enough space for conversion.
+   returns the length of the resulting RegEx.
  */
-int Wild2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase )
+int Wild2RegEx( const char * sWild, char * sRegEx, BOOL bMatchCase )
 {
-   char cChar;
-   HB_SIZE iLen = strlen( sWild );
-   int i, iLenResult = 0;
+   char     cChar;
+   HB_SIZE  iLen = strlen( sWild );
+   int      i, iLenResult = 0;
 
    if( bMatchCase == FALSE )
    {
@@ -597,7 +595,7 @@ int Wild2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase )
 
    for( i = 0; i < iLen; i++ )
    {
-      cChar = sWild[i];
+      cChar = sWild[ i ];
 
       switch( cChar )
       {
@@ -629,7 +627,7 @@ int Wild2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase )
    }
 
    hb_strncpy( sRegEx + iLenResult, "\\b", 2 );
-   iLenResult += 2;
+   iLenResult           += 2;
 
    sRegEx[ iLenResult ] = '\0';
 
@@ -637,16 +635,16 @@ int Wild2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase )
 }
 
 /*
- Converts Clipper Symbol Mask to an equivalent RegEx
- Caller must allocate sRegEx with enough space for conversion.
- returns the length of the resulting RegEx.
+   Converts Clipper Symbol Mask to an equivalent RegEx
+   Caller must allocate sRegEx with enough space for conversion.
+   returns the length of the resulting RegEx.
  */
-int Mask2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase )
+int Mask2RegEx( const char * sWild, char * sRegEx, BOOL bMatchCase )
 {
-   char cChar;
-   HB_SIZE iLen = strlen( sWild );
-   HB_SIZE i;
-   int iLenResult = 0;
+   char     cChar;
+   HB_SIZE  iLen        = strlen( sWild );
+   HB_SIZE  i;
+   int      iLenResult  = 0;
 
    if( bMatchCase == FALSE )
    {
@@ -656,14 +654,14 @@ int Mask2RegEx( const char *sWild, char* sRegEx, BOOL bMatchCase )
 
    for( i = 0; i < iLen; i++ )
    {
-      cChar = sWild[i];
+      cChar = sWild[ i ];
 
       switch( cChar )
       {
          case '*':
             hb_strncpy( sRegEx + iLenResult, ".*", 2 );
-            iLenResult += 2;
-            i = iLen; //Skip rest if any!
+            iLenResult  += 2;
+            i           = iLen; //Skip rest if any!
             break;
 
          case '?':
@@ -685,25 +683,25 @@ HB_FUNC( HB_ATX )
 {
    HB_THREAD_STUB_API
    #define REGEX_MAX_GROUPS 16
-   regex_t *pReg ;
-   regmatch_t aMatches[REGEX_MAX_GROUPS];
-   int EFlags = 0;//REG_BACKR;
-   ULONG ulLen;
-   BOOL fFree;
+   regex_t * pReg;
+   regmatch_t  aMatches[ REGEX_MAX_GROUPS ];
+   int         EFlags = 0; //REG_BACKR;
+   ULONG       ulLen;
+   BOOL        fFree;
 
-   PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
-   PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
-   HB_SIZE lStart = hb_parnl(4), lEnd = hb_parnl(5);
+   PHB_ITEM    pRegEx         = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM    pString        = hb_param( 2, HB_IT_STRING );
+   PHB_ITEM    pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
+   HB_SIZE     lStart         = hb_parnl( 4 ), lEnd = hb_parnl( 5 );
 
    // if( pRegEx && pString && lStart <= pString->item.asString.length )
    if( pRegEx && pString && lStart <= hb_itemGetCLen( pString ) )
    {
       /*
-      pReg = hb_getregex( pRegEx,
+         pReg = hb_getregex( pRegEx,
                           pCaseSensitive && ! pCaseSensitive->item.asLogical.value,
                           FALSE, &fFree );
-      */
+       */
       pReg = hb_getregex( pRegEx,
                           pCaseSensitive && ! hb_itemGetL( pCaseSensitive ),
                           FALSE, &fFree );
@@ -743,12 +741,12 @@ HB_FUNC( HB_ATX )
             lEnd += hb_itemGetCLen( pString );
 
             /* Let it fail for: lStart > lEnd
-            if( lEnd < 0 )
-            {
+               if( lEnd < 0 )
+               {
                // lEnd = lStart ? pString->item.asString.length : 0;
                lEnd = lStart ? hb_itemGetCLen( pString ) : 0;
-            }
-            */
+               }
+             */
          }
          else
          {
@@ -763,7 +761,7 @@ HB_FUNC( HB_ATX )
          {
             if( fFree )
             {
-              hb_freeregex( pReg );
+               hb_freeregex( pReg );
             }
 
             if( hb_pcount() > 3 )
@@ -782,29 +780,29 @@ HB_FUNC( HB_ATX )
          /* lEnd ALWAYS set if lStart is set*/
          if( /*lStart ||*/ lEnd )
          {
-            EFlags |= REG_STARTEND;
+            EFlags               |= REG_STARTEND;
 
-            aMatches[0].rm_so = ( regoff_t ) lStart;
-            aMatches[0].rm_eo = ( regoff_t ) lEnd;
+            aMatches[ 0 ].rm_so  = ( regoff_t ) lStart;
+            aMatches[ 0 ].rm_eo  = ( regoff_t ) lEnd;
          }
 
          // if( regexec( pReg, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
          if( regexec( pReg, hb_itemGetCPtr( pString ), REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
          {
-            ulLen = aMatches[0].rm_eo - aMatches[0].rm_so;
+            ulLen = aMatches[ 0 ].rm_eo - aMatches[ 0 ].rm_so;
 
             if( hb_pcount() > 3 )
             {
-               hb_stornl( ( LONG ) ( aMatches[0].rm_so + 1 + lStart ), 4 );
+               hb_stornl( ( LONG ) ( aMatches[ 0 ].rm_so + 1 + lStart ), 4 );
             }
 
             if( hb_pcount() > 4 )
             {
-               hb_stornl( aMatches[0].rm_eo - aMatches[0].rm_so, 5 );
+               hb_stornl( aMatches[ 0 ].rm_eo - aMatches[ 0 ].rm_so, 5 );
             }
 
             // hb_retclen( pString->item.asString.value + aMatches[0].rm_so + lStart, ulLen );
-            hb_retclen( hb_itemGetCPtr( pString ) + aMatches[0].rm_so + lStart, ulLen );
+            hb_retclen( hb_itemGetCPtr( pString ) + aMatches[ 0 ].rm_so + lStart, ulLen );
 
             if( fFree )
             {
@@ -835,8 +833,8 @@ HB_FUNC( HB_ATX )
 HB_FUNC( WILD2REGEX )
 {
    HB_THREAD_STUB_API
-   char sRegEx[ HB_PATH_MAX ];
-   int iLen = Wild2RegEx( hb_parcx( 1 ), sRegEx, hb_parl( 2 ) );
+   char  sRegEx[ HB_PATH_MAX ];
+   int   iLen = Wild2RegEx( hb_parcx( 1 ), sRegEx, hb_parl( 2 ) );
 
    hb_retclen( sRegEx, iLen );
 }
@@ -854,13 +852,13 @@ HB_FUNC( HB_REGEXATX )
 }
 
 /*-------------------------------------------------------------------------
-  2005-12-16 - Francesco Saverio Giudice
-  HB_RegExAll( cRegex, cString, lCaseSensitive, lNewLine, nMaxMatches, nGetMatch, lOnlyMatch ) -> aAllRegexMatches
+   2005-12-16 - Francesco Saverio Giudice
+   HB_RegExAll( cRegex, cString, lCaseSensitive, lNewLine, nMaxMatches, nGetMatch, lOnlyMatch ) -> aAllRegexMatches
 
-  This function return all matches from a Regex search.
-  It is a mix from hb_RegEx() and hb_RegExAtX()
+   This function return all matches from a Regex search.
+   It is a mix from hb_RegEx() and hb_RegExAtX()
 
-  PARAMETERS:
+   PARAMETERS:
     cRegex         - Regex pattern string or precompiled Regex
     cString        - The string you want to search
     lCaseSensitive - default = FALSE
@@ -869,7 +867,7 @@ HB_FUNC( HB_REGEXATX )
     nGetMatch      - default = unlimited, this returns only one from Match + Sub-Matches
     lOnlyMatch     - default = TRUE, if TRUE returns Matches, otherwise it returns also start and end positions
 
-  -------------------------------------------------------------------------*/
+   -------------------------------------------------------------------------*/
 HB_FUNC( HB_REGEXALL )
 {
    hb_regex( 5, NULL, NULL );
@@ -892,30 +890,30 @@ HB_FUNC( HB_REGEXCOMP )
 {
    HB_THREAD_STUB_API
 
-   regex_t re;
-   char *cRegex;
-   int CFlags = REG_EXTENDED;
+   regex_t  re;
+   char *   cRegex;
+   int      CFlags         = REG_EXTENDED;
 
-   PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pRegEx         = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pCaseSensitive = hb_param( 2, HB_IT_LOGICAL );
-   PHB_ITEM pNewLine = hb_param( 3, HB_IT_LOGICAL );
+   PHB_ITEM pNewLine       = hb_param( 3, HB_IT_LOGICAL );
 
    if( pRegEx == NULL )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameter count/type",
-         NULL,
-         2, hb_param( 1, HB_IT_ANY ), hb_param( 2, HB_IT_ANY ));
+                            NULL,
+                            2, hb_param( 1, HB_IT_ANY ), hb_param( 2, HB_IT_ANY ) );
       return;
    }
 
    // if( pCaseSensitive != NULL && pCaseSensitive->item.asLogical.value == ( int )FALSE )
-   if( pCaseSensitive != NULL && hb_itemGetL( pCaseSensitive ) == ( int )FALSE )
+   if( pCaseSensitive != NULL && hb_itemGetL( pCaseSensitive ) == ( int ) FALSE )
    {
       CFlags |= REG_ICASE;
    }
 
    // if( pNewLine != NULL && pNewLine->item.asLogical.value == ( int )TRUE )
-   if( pNewLine != NULL && hb_itemGetL( pNewLine ) == ( int )TRUE )
+   if( pNewLine != NULL && hb_itemGetL( pNewLine ) == ( int ) TRUE )
    {
       CFlags |= REG_NEWLINE;
    }
@@ -923,32 +921,34 @@ HB_FUNC( HB_REGEXCOMP )
    // if( regcomp( &re, pRegEx->item.asString.value, CFlags ) == 0 )
    if( regcomp( &re, hb_itemGetCPtr( pRegEx ), CFlags ) == 0 )
    {
-      ULONG nSize = ((real_pcre *) re.re_pcre)->size;
-      cRegex = (char *) hb_xgrab( HB_ALLOC_ALIGNMENT + sizeof( re ) + nSize );
+      ULONG nSize = ( ( real_pcre * ) re.re_pcre )->size;
+      cRegex      = ( char * ) hb_xgrab( HB_ALLOC_ALIGNMENT + sizeof( re ) + nSize );
       HB_MEMCPY( cRegex + HB_ALLOC_ALIGNMENT + sizeof( re ), re.re_pcre, nSize );
-      (pcre_free)(re.re_pcre);
-      re.re_pcre = (pcre *) ( cRegex + HB_ALLOC_ALIGNMENT + sizeof( re ) );
+      ( pcre_free ) ( re.re_pcre );
+      re.re_pcre  = ( pcre * ) ( cRegex + HB_ALLOC_ALIGNMENT + sizeof( re ) );
       HB_MEMCPY( cRegex, "***", 3 );
       HB_MEMCPY( cRegex + HB_ALLOC_ALIGNMENT, &re, sizeof( re ) );
       hb_retclenAdoptRaw( cRegex, HB_ALLOC_ALIGNMENT + sizeof( re ) + nSize );
    }
-   else {
+   else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, "Invalid Regular expression",
-      "Regex subsystem",
-      3, pRegEx, hb_paramError( 3 ), hb_paramError( 4 ));
+                            "Regex subsystem",
+                            3, pRegEx, hb_paramError( 3 ), hb_paramError( 4 ) );
    }
 }
 
 HB_FUNC( HB_PCRE_VERSION )
 {
    HB_THREAD_STUB_API
-   hb_retc( pcre_version () );
+   hb_retc( pcre_version() );
 }
 
 HB_FUNC( HB_ISREGEXSTRING )
 {
    HB_THREAD_STUB_API
    PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
+
    hb_retl( pRegEx && hb_isregexstring( pRegEx ) );
 }
 

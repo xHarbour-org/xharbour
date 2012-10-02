@@ -100,7 +100,7 @@ HB_FUNC( SETMODE )
  * GT checks this setting like gtwvt does. -- Ph. */
 HB_FUNC( SETGTCLOSEHANDLER )
 {
-   if ( hb_gtSetCloseHandler( hb_param(1, HB_IT_ANY ) ) == FALSE )
+   if( hb_gtSetCloseHandler( hb_param( 1, HB_IT_ANY ) ) == FALSE )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "SETGTCLOSEHANDLER", 1, hb_paramError( 1 ) );
    }
@@ -109,11 +109,13 @@ HB_FUNC( SETGTCLOSEHANDLER )
 HB_FUNC( GETGTCLOSEHANDLER )
 {
    PHB_ITEM pi = hb_gtGetCloseHandler();
+
    if( pi == 0 )
    {
       hb_ret();
    }
-   else {
+   else
+   {
       hb_itemReturn( pi );
    }
 }
@@ -121,11 +123,13 @@ HB_FUNC( GETGTCLOSEHANDLER )
 HB_FUNC( SETCLOSEEVENT )
 {
    PHB_ITEM pEvent = hb_param( 1, HB_IT_NUMERIC );
-   if ( pEvent == NULL )
+
+   if( pEvent == NULL )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "SETCLOSEEVENT", 1, hb_paramError( 1 ) );
    }
-   else {
+   else
+   {
       hb_gtSetCloseEvent( hb_itemGetNL( pEvent ) );
    }
 }
@@ -133,11 +137,13 @@ HB_FUNC( SETCLOSEEVENT )
 HB_FUNC( SETSHUTDOWNEVENT )
 {
    PHB_ITEM pEvent = hb_param( 1, HB_IT_NUMERIC );
-   if ( pEvent == NULL )
+
+   if( pEvent == NULL )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "SETSHUTDOWNEVENT", 1, hb_paramError( 1 ) );
    }
-   else {
+   else
+   {
       hb_gtSetShutdownEvent( hb_itemGetNL( pEvent ) );
    }
 }
@@ -145,11 +151,13 @@ HB_FUNC( SETSHUTDOWNEVENT )
 HB_FUNC( SETGTRESIZEEVENT )
 {
    PHB_ITEM pEvent = hb_param( 1, HB_IT_NUMERIC );
-   if ( pEvent == NULL )
+
+   if( pEvent == NULL )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "SETRESIZEEVENT", 1, hb_paramError( 1 ) );
    }
-   else {
+   else
+   {
       hb_gtSetResizeEvent( hb_itemGetNL( pEvent ) );
    }
 }

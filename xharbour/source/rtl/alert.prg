@@ -29,7 +29,7 @@
 #include "setcurs.ch"
 #include "hbgtinfo.ch"
 
-/* TOFIX: Clipper defines a clipped window for Alert() [vszakats] */
+   /* TOFIX: Clipper defines a clipped window for Alert() [vszakats] */
 
 /* NOTE: Clipper will return NIL if the first parameter is not a string, but
          this is not documented. This implementation converts the first
@@ -39,13 +39,14 @@
 /* NOTE: Clipper handles these buttons { "Ok", "", "Cancel" } in a buggy way.
          This is fixed. [vszakats] */
 
-/* NOTE: nDelay parameter is a Harbour extension. */
+   /* NOTE: nDelay parameter is a Harbour extension. */
 
 #ifdef HB_C52_UNDOC
-STATIC s_lNoAlert
+   STATIC s_lNoAlert
 #endif
 
 FUNCTION Alert( xMessage, aOptions, cColor, nDelay )
+
    LOCAL cMessage
    LOCAL cColorBox
    LOCAL cColorButton
@@ -88,30 +89,30 @@ FUNCTION Alert( xMessage, aOptions, cColor, nDelay )
    ELSE
 
       SWITCH ValType( xMessage )
-         CASE "C"
-         CASE "M" 
-           cMessage := StrTran( xMessage, ";", Chr( 10 ) )
-           EXIT
-         CASE "N"
-           cMessage := LTrim( Str( xMessage ) )
-           EXIT
-         CASE "D"
-           cMessage := DToC( xMessage )
-           EXIT
-          CASE "L"
-           cMessage := iif( xMessage, ".T.", ".F." )
-           EXIT
-         CASE "O"
-           cMessage := xMessage:className + " Object"
-           EXIT
-         CASE "S"
-           cMessage := "@" + xMessage:Name + "()"
-           EXIT
-         CASE "B" 
-           cMessage := "{||...}"
-           EXIT
+      CASE "C"
+      CASE "M"
+         cMessage := StrTran( xMessage, ";", Chr( 10 ) )
+         EXIT
+      CASE "N"
+         cMessage := LTrim( Str( xMessage ) )
+         EXIT
+      CASE "D"
+         cMessage := DToC( xMessage )
+         EXIT
+      CASE "L"
+         cMessage := iif( xMessage, ".T.", ".F." )
+         EXIT
+      CASE "O"
+         cMessage := xMessage:className + " Object"
+         EXIT
+      CASE "S"
+         cMessage := "@" + xMessage:Name + "()"
+         EXIT
+      CASE "B"
+         cMessage := "{||...}"
+         EXIT
          DEFAULT
-           cMessage := "NIL"
+         cMessage := "NIL"
       END
 
    ENDIF
@@ -131,29 +132,29 @@ FUNCTION Alert( xMessage, aOptions, cColor, nDelay )
    ENDIF
 
 
-   IF ! HB_ISSTRING( cColor ) .or. EMPTY( cColor )
+   IF ! HB_ISSTRING( cColor ) .OR. Empty( cColor )
       cColorBox    := "W+/R"  // first color pair:  (Box)
       cColorButton := "W+/B"  // second color pair: (Buttons)
    ELSE
 /*
       cColorButton := StrTran( StrTran( iif( At( "/", cColor ) == 0, "N", SubStr( cColor, At( "/", cColor ) + 1 ) ) + "/" +;
                                         iif( At( "/", cColor ) == 0, cColor, Left( cColor, At( "/", cColor ) - 1 ) ), "+", "" ), "*", "" )
-*/  
-      nAt := At(",",cColor)
-      if nAt == 0
+*/
+      nAt := At( ",", cColor )
+      IF nAt == 0
          cColorBox := cColor
-         nAt := At("/",cColor)
-         if nAt != 0
-            cColorButton := SubStr( cColor, nAt+1 )+"/"+ SubStr( cColor, 1, nAt - 1 ) 
-            cColorButton := StrTran( cColorButton, "+","") 
-            cColorButton := StrTran( cColorButton, "*","") 
-         else
-            cColorButton := "W+/B" 
-         endif
-      else
+         nAt := At( "/", cColor )
+         IF nAt != 0
+            cColorButton := SubStr( cColor, nAt + 1 ) + "/" + SubStr( cColor, 1, nAt - 1 )
+            cColorButton := StrTran( cColorButton, "+", "" )
+            cColorButton := StrTran( cColorButton, "*", "" )
+         ELSE
+            cColorButton := "W+/B"
+         ENDIF
+      ELSE
          cColorBox    := Left( cColor, nAt - 1 )
          cColorButton := SubStr( cColor, nAt + 1 )
-      endif
+      ENDIF
 
    ENDIF
 
@@ -176,7 +177,7 @@ FUNCTION Alert( xMessage, aOptions, cColor, nDelay )
    IF Len( aOptionsOK ) == 0
       aOptionsOK := { 'Ok' }
 #ifdef HB_C52_STRICT
-   /* NOTE: Clipper allows only four options [vszakats] */
+      /* NOTE: Clipper allows only four options [vszakats] */
    ELSEIF Len( aOptionsOK ) > 4
       ASize( aOptionsOK, 4 )
 #endif
@@ -184,9 +185,9 @@ FUNCTION Alert( xMessage, aOptions, cColor, nDelay )
 
    RETURN hb_gtAlert( cMessage, aOptionsOK, cColorBox, cColorButton, nDelay );
 
-#ifdef HB_C52_UNDOC
+      # ifdef HB_C52_UNDOC
 
-PROCEDURE __NONOALERT()
+PROCEDURE __NoNoAlert()
 
    s_lNoAlert := .F.
 
