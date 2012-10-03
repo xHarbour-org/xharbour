@@ -28,7 +28,9 @@ LINEFLAGS=-l
 !if ("$(HB_ARCH)"=="64")
 C64FLAGS=-DHB_OS_WIN_64 -DNODLL
 HB64FLAGS=-DNODLL
+HB_MACHINE=X64
 !else
+HB_MACHINE=X86
 CPLUSPLUS=1
 !endif
 
@@ -158,8 +160,8 @@ CLIBFLAGS_C =-DHB_NO_DV_MEMCPY $(CLIBFLAGS_C)
 CC_CMD       =CL $(C64FLAGS) $(CLIBFLAGS) -Fo$@ $**
 CCC_CMD      =CL $(C64FLAGS) $(CLIBFLAGS_C) -Fo$@ $**
 CC_CMD_FMSTAT=CL $(C64FLAGS) $(CLIBFLAGS) -DHB_FM_STATISTICS -Fo$@ $**
-LIB_CMD      =LIB /NOLOGO /OUT:$@ $**
-LINK_CMD     =LINK /NOLOGO /OUT:$@ $** $(LINKERFLAGS) $(MANIFESTFLAGS)
+LIB_CMD      =LIB /MACHINE:$(HB_MACHINE) /NOLOGO /OUT:$@ $**
+LINK_CMD     =LINK /MACHINE:$(HB_MACHINE) /NOLOGO /OUT:$@ $** $(LINKERFLAGS) $(MANIFESTFLAGS)
 BISON_CMD1   =bison -v -d $** -o$@
 BISON_CMD2   =bison -v -p hb_comp -d $** -o$@
 
@@ -409,6 +411,7 @@ DLLFLAGS=\
 	/OUT:$(HARBOUR_DLL)\
 	/DLL\
 	/IMPLIB:$(HARBOUR_DLL_LIB)\
+	/MACHINE:$(HB_MACHINE)\
 	/NOLOGO\
         /LIBPATH:"$(CC_DIR)\LIB" /LIBPATH:$(LIB_DIR) $(ACE_LIBPATH)\
 	/SUBSYSTEM:WINDOWS\
@@ -416,7 +419,7 @@ DLLFLAGS=\
 	$(HARBOUR_DLL_OBJS)
 
 EXEFLAGS=\
-	/NOLOGO /LIBPATH:"$(CC_DIR)\LIB"\
+	/NOLOGO /MACHINE:$(HB_MACHINE) /LIBPATH:"$(CC_DIR)\LIB"\
 	/LIBPATH:$(LIB_DIR)\
 	/SUBSYSTEM:CONSOLE
 
@@ -643,7 +646,7 @@ CC_CMD_ZIP  =CL\
 	/D_WIN32 /DNDEBUG /D_MBCS /D_LIB\
 	/Fp"$(OBJ_DIR)\hbzip.pch" /Fd"$(OBJ_DIR)\\"\
 	/FD /EHsc /D_CRT_SECURE_NO_WARNINGS /c /Fo$@ $**
-LIB_CMD     =LIB /NOLOGO /OUT:$@ $**
+LIB_CMD     =LIB /MACHINE:$(HB_MACHINE) /NOLOGO /OUT:$@ $**
 
 #===============================================================================
 # Libraries dependencies and build rules

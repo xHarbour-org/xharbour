@@ -66,6 +66,12 @@
  * See doc/license.txt for licensing terms.
  *
  */
+#if defined( _MSC_VER ) && defined( HB_OS_WIN_64 )
+   #pragma warning ( disable:4334 )
+   /* '<<' : result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)
+    * yes, intended.
+   */
+#endif
 
 /*JC1: say we are going to optimze MT stack */
 #define HB_THREAD_OPTIMIZE_STACK

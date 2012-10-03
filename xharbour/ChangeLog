@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-03 07:38 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/eval.c
+   ! pacify MSVC-64 warning
+
+  * winmake/makefile.vc
+    ! explicitely define machine target in building LIBs, EXEs and DLL
+
 2012-10-03 06:13 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/tip/encurl.prg
    ! pacify MSVC-64 warning
