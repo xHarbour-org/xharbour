@@ -8,6 +8,12 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-02 21:20 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/sqlrdd0.prg
+    ! fixed sr_renametable under postgresql
+  * source/utils.prg  
+    ! minor fix
+
 2012-09-18 19:16 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
   * source/sqlrdd0.prg
     ! fixed sr_renametable under postgresql

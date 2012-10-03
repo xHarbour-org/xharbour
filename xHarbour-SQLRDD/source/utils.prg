@@ -13,7 +13,7 @@
 #include "msg.ch"
 #include "error.ch"
 #include "sqlrddsetup.ch"
-
+request HB_Deserialize,HB_DeserialNext
 #define FH_ALLOC_BLOCK     32
 
 Static DtAtiv, lHistorico
@@ -854,8 +854,14 @@ Return .F.
 /*------------------------------------------------------------------------*/
 
 Function SR_Deserialize( uData )
-
-Return HB_Deserialize( SR_HEXTOSTR(SubStr( uData, 21, val( substr(uData,11,10) ) ) ) )
+* Local ctemp,cdes,chex
+* cTemp := udata
+* altd()
+* cHex := SR_HEXTOSTR(SubStr( uData, 21, val( substr(uData,11,10) ) ) ) 
+* cdes := sr_Deserialize1( cHex)
+* tracelog(udata,chex,cdes)
+* return cdes
+Return SR_Deserialize1( SR_HEXTOSTR(SubStr( uData, 21, val( substr(uData,11,10) ) ) ) )
 
 /*------------------------------------------------------------------------*/
 
@@ -1962,4 +1968,7 @@ RETURN NIL
       
 
 
-   
+
+
+FUNCTION SR_Deserialize1( cSerial, nMaxLen, lRecursive, aObj, aHash, aArray, aBlock )
+return HB_Deserialize( cSerial, nMaxLen, lRecursive, aObj, aHash, aArray, aBlock )
