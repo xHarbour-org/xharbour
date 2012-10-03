@@ -263,7 +263,7 @@ void hb_retc( const char * szText )   /* returns a string */
 }
 
 #undef hb_retclen
-void hb_retclen( const char * szText, ULONG ulLen ) /* returns a string with a specific length */
+void hb_retclen( const char * szText, HB_SIZE ulLen ) /* returns a string with a specific length */
 {
 #if defined( __cplusplus )
    static HB_RETCLEN
@@ -374,6 +374,20 @@ void hb_retnl( LONG lNumber )   /* returns a LONG number */
    pRet( lNumber );
 }
 
+#undef hb_retns
+void hb_retns( HB_ISIZ lNumber )   /* returns a LONG number */
+{
+#if defined( __cplusplus )
+   static HB_RETNS
+#else
+   static HB_RETNS pRet = NULL;
+   if( ! pRet )
+#endif
+   pRet = ( HB_RETNS ) hb_GetProcAddress( "_hb_retns" );
+
+   pRet( lNumber );
+}
+
 #undef hb_retnlen
 void hb_retnlen( double dNumber, int iWidth, int iDec ) /* returns a double, with specific width and decimals */
 {
@@ -431,7 +445,7 @@ void hb_retnllen( LONG lNumber, int iWidth ) /* returns a LONG number, with spec
 }
 
 #undef hb_reta
-void hb_reta( ULONG ulLen )  /* returns an array with a specific length */
+void hb_reta( HB_SIZE ulLen )  /* returns an array with a specific length */
 {
 #if defined( __cplusplus )
    static HB_RETA
@@ -445,7 +459,7 @@ void hb_reta( ULONG ulLen )  /* returns an array with a specific length */
 }
 
 #undef hb_parinfa
-ULONG hb_parinfa( int iParamNum, ULONG uiArrayIndex ) /* retrieve length or element type of an array parameter */
+HB_SIZE hb_parinfa( int iParamNum, HB_SIZE uiArrayIndex ) /* retrieve length or element type of an array parameter */
 {
 #if defined( __cplusplus )
    static HB_PARINFA
@@ -459,7 +473,7 @@ ULONG hb_parinfa( int iParamNum, ULONG uiArrayIndex ) /* retrieve length or elem
 }
 
 #undef hb_parinfo
-ULONG hb_parinfo( int iParam ) /* Determine the param count or data type */
+HB_SIZE hb_parinfo( int iParam ) /* Determine the param count or data type */
 {
 #if defined( __cplusplus )
    static HB_PARINFO
@@ -473,7 +487,7 @@ ULONG hb_parinfo( int iParam ) /* Determine the param count or data type */
 }
 
 #undef hb_parclen
-ULONG hb_parclen( int iParam, ... ) /* retrieve a string parameter length */
+HB_SIZE hb_parclen( int iParam, ... ) /* retrieve a string parameter length */
 {
 #if defined( __cplusplus )
    static HB_PARCLEN2
@@ -501,7 +515,7 @@ ULONG hb_parclen( int iParam, ... ) /* retrieve a string parameter length */
 }
 
 #undef hb_parcsiz
-ULONG hb_parcsiz( int iParam, ... ) /* retrieve a by-reference string parameter length, including terminator */
+HB_SIZE hb_parcsiz( int iParam, ... ) /* retrieve a by-reference string parameter length, including terminator */
 {
 #if defined( __cplusplus )
    static HB_PARCSIZ2
@@ -696,6 +710,34 @@ LONG hb_parnl( int iParam, ... ) /* retrieve a numeric parameter as a LONG */
    }
 }
 
+#undef hb_parns
+HB_ISIZ hb_parns( int iParam, ... ) /* retrieve a numeric parameter as a LONG */
+{
+#if defined( __cplusplus )
+   static HB_PARNS2
+#else
+   static HB_PARNS2 pParNS = NULL;
+   if( ! pParNS )
+#endif
+   pParNS = ( HB_PARNS2 ) hb_GetProcAddress( "_hb_parns" );
+
+   if( ( ( EXT_IS_ARRAY ) pExtIsArray )( iParam ) )
+   {
+      va_list  va;
+      ULONG    ulArrayIndex;
+
+      va_start( va, iParam );
+      ulArrayIndex = va_arg( va, ULONG );
+      va_end( va );
+
+      return pParNS( iParam, ulArrayIndex );
+   }
+   else
+   {
+      return ( ( HB_PARNS ) pParNS )( iParam );
+   }
+}
+
 #undef hb_storc
 void hb_storc( const char * szText, int iParam, ... )
 {
@@ -725,7 +767,7 @@ void hb_storc( const char * szText, int iParam, ... )
 }
 
 #undef hb_storclen
-void hb_storclen( const char * szText, ULONG ulLen, int iParam, ... )
+void hb_storclen( const char * szText, HB_SIZE ulLen, int iParam, ... )
 {
 #if defined( __cplusplus )
    static HB_STORCLEN2
@@ -864,6 +906,37 @@ void hb_stornl( LONG lValue, int iParam, ... )
    }
 }
 
+#undef hb_storns
+int hb_storns( HB_ISIZ lValue, int iParam, ... )
+{
+#if defined( __cplusplus )
+   static HB_STORNS2
+#else
+   static HB_STORNS2 pStorNS = NULL;
+   if( ! pStorNS )
+#endif
+   pStorNS = ( HB_STORNS2 ) hb_GetProcAddress( "_hb_storns" );
+
+   if( ( ( EXT_IS_ARRAY ) pExtIsArray )( iParam ) )
+   {
+      va_list  va;
+      ULONG    ulArrayIndex;
+
+      va_start( va, iParam );
+      ulArrayIndex = va_arg( va, ULONG );
+      va_end( va );
+
+      pStorNS( lValue, iParam, ulArrayIndex );
+      return 1;
+   }
+   else
+   {
+      ( ( HB_STORNS ) pStorNS )(  lValue, iParam );
+   }
+
+   return 0;
+}
+
 #undef hb_stornd
 void hb_stornd( double dNumber, int iParam, ... )
 {
@@ -892,7 +965,7 @@ void hb_stornd( double dNumber, int iParam, ... )
    }
 }
 
-BOOL hb_arrayNew( PHB_ITEM pItem, ULONG ulLen )  /* creates a new array */
+BOOL hb_arrayNew( PHB_ITEM pItem, HB_SIZE ulLen )  /* creates a new array */
 {
 #if defined( __cplusplus )
    static HB_ARRAYNEW
@@ -905,7 +978,7 @@ BOOL hb_arrayNew( PHB_ITEM pItem, ULONG ulLen )  /* creates a new array */
    return pArrayNew( pItem, ulLen );
 }
 
-ULONG hb_arrayLen( PHB_ITEM pArray )  /* retrives the array len */
+HB_SIZE hb_arrayLen( PHB_ITEM pArray )  /* retrives the array len */
 {
 #if defined( __cplusplus )
    static HB_ARRAYLEN
@@ -944,7 +1017,7 @@ BOOL hb_arrayAdd( PHB_ITEM pArray, PHB_ITEM pItemValue )  /* add a new item to t
    return pArrayAdd( pArray, pItemValue );
 }
 
-BOOL hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex )  /* insert a nil item into an array, without changing the length */
+BOOL hb_arrayIns( PHB_ITEM pArray, HB_SIZE ulIndex )  /* insert a nil item into an array, without changing the length */
 {
 #if defined( __cplusplus )
    static HB_ARRAYINS
@@ -957,7 +1030,7 @@ BOOL hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex )  /* insert a nil item into an
    return pArrayIns( pArray, ulIndex );
 }
 
-BOOL hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )  /* delete an array item, without changing length */
+BOOL hb_arrayDel( PHB_ITEM pArray, HB_SIZE ulIndex )  /* delete an array item, without changing length */
 {
 #if defined( __cplusplus )
    static HB_ARRAYDEL
@@ -970,7 +1043,7 @@ BOOL hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )  /* delete an array item, wit
    return pArrayDel( pArray, ulIndex );
 }
 
-BOOL hb_arraySize( PHB_ITEM pArray, ULONG ulLen )  /* sets the array total length */
+BOOL hb_arraySize( PHB_ITEM pArray, HB_SIZE ulLen )  /* sets the array total length */
 {
 #if defined( __cplusplus )
    static HB_ARRAYSIZE
@@ -1009,7 +1082,7 @@ BOOL hb_arrayRelease( PHB_ITEM pArray )  /* releases an array - don't call it - 
    return pArrayRelease( pArray );
 }
 
-BOOL hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )  /* sets an array element */
+BOOL hb_arraySet( PHB_ITEM pArray, HB_SIZE ulIndex, PHB_ITEM pItem )  /* sets an array element */
 {
 #if defined( __cplusplus )
    static HB_ARRAYSET
@@ -1022,7 +1095,7 @@ BOOL hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )  /* sets an a
    return pArraySet( pArray, ulIndex, pItem );
 }
 
-BOOL hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )  /* retrieves an item */
+BOOL hb_arrayGet( PHB_ITEM pArray, HB_SIZE ulIndex, PHB_ITEM pItem )  /* retrieves an item */
 {
 #if defined( __cplusplus )
    static HB_ARRAYGET
@@ -1065,7 +1138,7 @@ void hb_xexit( void )                         /* Deinitialize fixed memory subsy
 }
 
 #undef hb_xalloc
-void * hb_xalloc( ULONG ulSize )                /* allocates memory, returns NULL on failure */
+void * hb_xalloc( HB_SIZE ulSize )                /* allocates memory, returns NULL on failure */
 {
 #if defined( __cplusplus )
    static HB_XALLOC
@@ -1079,7 +1152,7 @@ void * hb_xalloc( ULONG ulSize )                /* allocates memory, returns NUL
 }
 
 #undef hb_xgrab
-void * hb_xgrab( ULONG ulSize )                 /* allocates memory, exits on failure */
+void * hb_xgrab( HB_SIZE ulSize )                 /* allocates memory, exits on failure */
 {
 #if defined( __cplusplus )
    static HB_XGRAB
@@ -1107,7 +1180,7 @@ void hb_xfree( void * pMem )                  /* frees memory */
 }
 
 #undef hb_xrealloc
-void * hb_xrealloc( void * pMem, ULONG ulSize ) /* reallocates memory */
+void * hb_xrealloc( void * pMem, HB_SIZE ulSize ) /* reallocates memory */
 {
 #if defined( __cplusplus )
    static HB_XREALLOC
@@ -1121,7 +1194,7 @@ void * hb_xrealloc( void * pMem, ULONG ulSize ) /* reallocates memory */
 }
 
 #undef hb_xsize
-ULONG hb_xsize( void * pMem )                  /* returns the size of an allocated memory block */
+HB_SIZE hb_xsize( void * pMem )                  /* returns the size of an allocated memory block */
 {
 #if defined( __cplusplus )
    static HB_XSIZE

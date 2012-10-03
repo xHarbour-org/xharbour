@@ -23,6 +23,7 @@ _hb_retl
 _hb_retnd
 _hb_retni
 _hb_retnl
+_hb_retns
 _hb_retnlen
 _hb_retndlen
 _hb_retnilen
@@ -38,6 +39,7 @@ _hb_parl
 _hb_parnd
 _hb_parni
 _hb_parnl
+_hb_parns
 _hb_storc
 _hb_storclen
 _hb_stords
@@ -45,6 +47,7 @@ _hb_storl
 _hb_storni
 _hb_stornl
 _hb_stornd
+_hb_storns
 _hb_arrayNew
 _hb_arrayLen
 _hb_arrayIsObject

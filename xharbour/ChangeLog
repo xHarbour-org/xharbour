@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-03 10:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbtypes.h
+  * source/vm/maindllp.c
+  * source/vm/bcc.def
+  * source/vm/export.def
+    ! added hb_parns, hb_retns, hb_storns
+
 2012-10-03 08:04 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/classes.c
    ! pacify one BCC warning
