@@ -124,10 +124,15 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
          hOldBitmap := SelectObject( hMemDC, hMemBitmap)
          DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
          FillRect( hMemDC, rc, hParBrush )
-         rc:top    := 9
-         rc:left   += 2
-         rc:right  -= 2
-         rc:bottom -= 2
+
+         rc:top    ++
+         IF ! Empty( ::Text )
+            rc:top    := 9
+         ENDIF
+         rc:left   ++
+         rc:right  --
+         rc:bottom --
+         
          FillRect( hMemDC, rc, hBrush )
    
          rc:left   := 0
@@ -138,8 +143,7 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
    ENDIF
 
    hFont := SelectObject( hMemDC, ::Font:Handle )
-
-   GetTextExtentPoint32( hMemDC, ::Caption, @sz )
+   GetTextExtentPoint32( hMemDC, ::Text, @sz )
 
    rc:top    := sz:cy / 2 
    IF ::Theming .AND. ::Application:IsThemedXP
@@ -147,23 +151,26 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
     ELSE
       DrawEdge( hMemDC, rc, EDGE_ETCHED, BF_RECT )
    ENDIF
-   rcalc:left   := 7
-   rcalc:top    := 9
-   rcalc:right  := sz:cx + 12
-   rcalc:bottom := sz:cy
-   FillRect( hMemDC, rcalc, hBrush )
-   _FillRect( hMemDC, {rcalc:left,rcalc:top-9,rcalc:right,rcalc:top}, hParBrush )
 
-   IF ::ForeColor != NIL
-      SetTextColor( hMemDC, ::ForeColor )
+   IF ! Empty( ::Text )
+      rcalc:left   := 7
+      rcalc:top    := 9
+      rcalc:right  := sz:cx + 12
+      rcalc:bottom := sz:cy
+      FillRect( hMemDC, rcalc, hBrush )
+      _FillRect( hMemDC, {rcalc:left,rcalc:top-9,rcalc:right,rcalc:top}, hParBrush )
+
+      IF ::ForeColor != NIL
+         SetTextColor( hMemDC, ::ForeColor )
+      ENDIF
+      rc:top    := 0
+      rc:left   := 10
+
+      SetBkMode( hMemDC, TRANSPARENT )
+      DrawText( hMemDC, ::Text, rc, DT_LEFT | DT_SINGLELINE )
    ENDIF
-   rc:top    := 0
-   rc:left   := 10
-   SetBkMode( hMemDC, TRANSPARENT )
-
-
-   DrawText( hMemDC, ::Caption, rc, DT_LEFT | DT_SINGLELINE )
    SelectObject( hMemDC, hFont )
+
    IF hMemBitmap != NIL
       FOR EACH oChild IN ::Children
           IF oChild:__hBrush != NIL
