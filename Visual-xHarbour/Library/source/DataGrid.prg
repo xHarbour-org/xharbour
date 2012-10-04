@@ -4034,8 +4034,8 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
             cOrd := ::Parent:DataSource:OrdSetFocus()
          ENDIF
          IF ! Empty(cOrd) .AND. Upper( cOrd ) == Upper( ::Tag )
-            nColor1 := ::System:Color:Gray //::System:CurrentScheme:ButtonCheckedGradientBegin
-            nColor2 := ::System:Color:LtGray  //::System:CurrentScheme:ButtonCheckedGradientEnd
+            nColor1 := RGB(171,173,178) //::System:Color:Gray //::System:CurrentScheme:ButtonCheckedGradientBegin
+            nColor2 := RGB(230,233,239) //::System:Color:LtGray  //::System:CurrentScheme:ButtonCheckedGradientEnd
             hBorderPen := ::System:CurrentScheme:Pen:ButtonPressedBorder
           ELSE
             nColor1 := ::System:Color:LtGray //::System:CurrentScheme:ButtonSelectedGradientBegin
@@ -4045,8 +4045,8 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
          //nColor1 := ::System:Color:White
          //nColor2 := ::System:Color:LtGray
        ELSE
-         nColor1 := ::System:Color:LtGray //::System:CurrentScheme:ButtonPressedGradientBegin
-         nColor2 := ::System:Color:Gray   //::System:CurrentScheme:ButtonPressedGradientEnd
+         nColor1 := ::System:Color:Gray //::System:CurrentScheme:ButtonPressedGradientBegin
+         nColor2 := ::System:Color:LtGray   //::System:CurrentScheme:ButtonPressedGradientEnd
          hBorderPen := ::System:CurrentScheme:Pen:ButtonPressedBorder
       ENDIF
 
