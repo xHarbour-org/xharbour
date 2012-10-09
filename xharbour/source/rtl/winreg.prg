@@ -191,12 +191,10 @@ FUNCTION SetRegistry( nHKEYHandle, cKeyName, cEntryName, xValue )
 #include "hbapi.h"
 #include "hbapiitm.h"
 
-
-
-static HKEY regkeykey(ULONG nKey)
+static HKEY regkeykey( HB_PTRUINT nKey)
 {
   HKEY Result ;
-  if (nKey >= (ULONG) HKEY_CLASSES_ROOT && nKey <= (ULONG) HKEY_DYN_DATA )
+  if (nKey >= (HB_PTRUINT) HKEY_CLASSES_ROOT && nKey <= (HB_PTRUINT) HKEY_DYN_DATA )
      return (HKEY) nKey;
   switch ( nKey )
   {
@@ -226,7 +224,7 @@ static HKEY regkeykey(ULONG nKey)
 
 HB_FUNC_STATIC( WINREGCREATEKEYEX  )
 {
-  HKEY hWnd = ( HKEY ) hb_parnl( 8 );
+  HKEY hWnd = ( HKEY ) hb_parns( 8 );
   ULONG rVal= -1, nresult = hb_parnl( 9 );
 
   if ( RegCreateKeyEx( regkeykey( hb_parnl( 1 ) ), ( const char *) hb_parc( 2 ), hb_parnl( 3 ), NULL, hb_parnl( 5 ), hb_parnl( 6 ), NULL, &hWnd, &nresult ) == ERROR_SUCCESS )
@@ -234,7 +232,8 @@ HB_FUNC_STATIC( WINREGCREATEKEYEX  )
     rVal = ERROR_SUCCESS;
     if ( ISBYREF( 8 ) )
     {
-      hb_stornl( ( ULONG ) hWnd, 8 );
+      // hb_stornl( ( ULONG ) hWnd, 8 );
+      hb_storns( ( HB_SIZE ) hWnd, 8 );
     }
     if ( ISBYREF( 9 ) )
     {
@@ -253,7 +252,8 @@ HB_FUNC_STATIC( WINREGOPENKEYEX )
     rVal = ERROR_SUCCESS;
     if ( ISBYREF( 5 ) )
     {
-      hb_stornl( ( ULONG ) hWnd, 5 );
+      // hb_stornl( ( ULONG ) hWnd, 5 );
+      hb_storns( ( HB_SIZE ) hWnd, 5 );
     }
   }
   hb_retnl( rVal ) ;
@@ -325,7 +325,7 @@ HB_FUNC_STATIC( WINREGSETVALUEEX )
 
 HB_FUNC_STATIC( WINREGCLOSEKEY )
 {
-  hb_retnl( RegCloseKey( (HKEY) hb_parnl( 1 ) ) );
+  hb_retnl( RegCloseKey( (HKEY) hb_parns( 1 ) ) );
 }
 
 #pragma ENDDUMP

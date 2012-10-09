@@ -51,6 +51,10 @@
  *
  */
 
+#if defined(__POCC__)
+   #pragma warn (disable:2130) // Result of comparison is constant.
+#endif
+
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbdate.h"

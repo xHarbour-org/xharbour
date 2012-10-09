@@ -122,7 +122,7 @@ pdf_data_source_BMP_fill(PDF *p, PDF_data_source *src)
         if (image->info.bmp.pos < image->info.bmp.end)
         {
             pdc_ushort pixel, ppixel;
-            int ilast = image->info.bmp.rowbytes_buf - 3;
+            int ilast = ( int ) image->info.bmp.rowbytes_buf - 3;
 
             i = 0;
             for (j = 0; j < (int) image->info.bmp.rowbytes; j += 2)

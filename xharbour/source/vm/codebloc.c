@@ -318,7 +318,13 @@ PHB_ITEM hb_codeblockGetVar( PHB_ITEM pItem, long iItemPos )
 
    if( pCBlock->uiLocals < -iItemPos )
    {
-      hb_errInternal( HB_EI_ERRUNRECOV, "Codeblock %p does not export %li detached locals", ( const char * ) pCBlock, ( const char * ) -iItemPos );
+      hb_errInternal( HB_EI_ERRUNRECOV,
+         "Codeblock %p does not export %li detached locals", ( const char * ) pCBlock,
+#if defined( HB_OS_WIN_64 )
+         ( const char * ) ( HB_LONG ) -iItemPos );
+#else
+         ( const char * ) -iItemPos );
+#endif
    }
 
    /* local variables accessed in a codeblock are always stored as reference */

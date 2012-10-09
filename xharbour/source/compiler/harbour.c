@@ -6692,7 +6692,7 @@ void hb_compAddI18nString( char * szString )
    /* writing 8 characters in ASCII numeric format,
       so it can be read from xharbour without conversions, and is
       portable across architectures */
-   fprintf( hb_comp_HILfile, "%8d", nLen + 1 );
+   fprintf( hb_comp_HILfile, "%8d", ( int ) nLen + 1 );
    fputs( szString, hb_comp_HILfile );
    // I want the trailing 0 to be in the file as a validity marker
    fputc( 0, hb_comp_HILfile );

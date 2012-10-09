@@ -117,7 +117,7 @@ void * hb_xgrab( HB_SIZE ulSize )        /* allocates fixed memory, exits on fai
    {
       char szSize[ 32 ];
 
-      hb_snprintf( szSize, sizeof( szSize ), "%lu", ulSize );
+      hb_snprintf( szSize, sizeof( szSize ), "%lu", (long unsigned int) ulSize );
       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMALLOC, szSize, NULL );
    }
 
@@ -189,7 +189,7 @@ void * hb_xrealloc( void * pMem, HB_SIZE ulSize )       /* reallocates memory */
    {
       char szSize[ 32 ];
 
-      hb_snprintf( szSize, sizeof( szSize ), "%lu", ulSize );
+      hb_snprintf( szSize, sizeof( szSize ), "%lu", (long unsigned int) ulSize );
       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMREALLOC, szSize, NULL );
    }
 

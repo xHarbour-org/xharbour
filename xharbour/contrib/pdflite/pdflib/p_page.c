@@ -527,7 +527,7 @@ grow_group(PDF *p, pg_group *group, int pageno, int n)
 
     group->capacity += n;
 
-    for (i = group - dp->groups + 1; i < dp->n_groups; ++i)
+    for (i = ( int ) ( group - dp->groups + 1 ); i < dp->n_groups; ++i)
 	dp->groups[i].start += n;
 }
 

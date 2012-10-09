@@ -400,7 +400,7 @@ pdc_getenv_filename(pdc_core *pdc, const char *envname)
         if (pdc_logg_is_enabled(pdc, 3, trc_filesearch))
             flags |= PDC_CONV_LOGGING;
 
-        envvalue = pdc_convert_name(pdc, (char *) wenvvalue, wlen, flags);
+        envvalue = pdc_convert_name(pdc, (char *) wenvvalue, ( int ) wlen, flags);
     }
 
 #else /* WIN32 */

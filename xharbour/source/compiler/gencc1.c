@@ -452,7 +452,7 @@ static HB_GENC_FUNC( hb_p_line )
 {
    if( cargo->bVerbose )
    {
-      fprintf( cargo->yyc, "/* %05li */ ", lPCodePos );
+      fprintf( cargo->yyc, "/* %05li */ ", ( long int ) lPCodePos );
    }
    else
    {
@@ -1706,7 +1706,7 @@ static HB_GENC_FUNC( hb_p_seqbegin )
    if( cargo->bVerbose )
    {
       LONG lOffset = HB_PCODE_MKINT24( &( pFunc->pCode[ lPCodePos + 1 ] ) );
-      fprintf( cargo->yyc, "\t/* %li (abs: %08li) */", lOffset, lPCodePos + lOffset );
+      fprintf( cargo->yyc, "\t/* %li (abs: %08li) */", lOffset, ( long int ) ( lPCodePos + lOffset ) );
    }
    fprintf( cargo->yyc, "\n" );
    return 4;
@@ -1716,7 +1716,7 @@ static HB_GENC_FUNC( hb_p_seqend )
 {
    if( cargo->bVerbose )
    {
-      fprintf( cargo->yyc, "/* %05li */ ", lPCodePos );
+      fprintf( cargo->yyc, "/* %05li */ ", ( long int ) lPCodePos );
    }
    else
    {
@@ -1729,7 +1729,7 @@ static HB_GENC_FUNC( hb_p_seqend )
    if( cargo->bVerbose )
    {
       LONG lOffset = HB_PCODE_MKINT24( &( pFunc->pCode[ lPCodePos + 1 ] ) );
-      fprintf( cargo->yyc, "\t/* %li (abs: %08li) */", lOffset, lPCodePos + lOffset );
+      fprintf( cargo->yyc, "\t/* %li (abs: %08li) */", lOffset, ( long int ) ( lPCodePos + lOffset ) );
    }
    fprintf( cargo->yyc, "\n" );
    return 4;
@@ -2079,7 +2079,7 @@ static HB_GENC_FUNC( hb_p_lineoffset )
 {
    if( cargo->bVerbose )
    {
-      fprintf( cargo->yyc, "/* %05li */ ", lPCodePos );
+      fprintf( cargo->yyc, "/* %05li */ ", ( long int ) lPCodePos );
    }
    else
    {
@@ -2101,7 +2101,7 @@ static HB_GENC_FUNC( hb_p_baseline )
 {
    if( cargo->bVerbose )
    {
-      fprintf( cargo->yyc, "/* %05li */ ", lPCodePos );
+      fprintf( cargo->yyc, "/* %05li */ ", ( long int ) lPCodePos );
    }
    else
    {
@@ -2500,7 +2500,7 @@ static HB_GENC_FUNC( hb_p_trybegin )
    if( cargo->bVerbose )
    {
       LONG lOffset = HB_PCODE_MKINT24( &( pFunc->pCode[ lPCodePos + 1 ] ) );
-      fprintf( cargo->yyc, "\t/* %li (abs: %08li) */", lOffset, lPCodePos + lOffset );
+      fprintf( cargo->yyc, "\t/* %li (abs: %08li) */", lOffset, ( long int ) ( lPCodePos + lOffset ) );
    }
    fprintf( cargo->yyc, "\n" );
    return 4;
@@ -2510,7 +2510,7 @@ static HB_GENC_FUNC( hb_p_tryend )
 {
    if( cargo->bVerbose )
    {
-      fprintf( cargo->yyc, "/* %05li */ ", lPCodePos );
+      fprintf( cargo->yyc, "/* %05li */ ", ( long int ) lPCodePos );
    }
    else
    {
@@ -2523,7 +2523,7 @@ static HB_GENC_FUNC( hb_p_tryend )
    if( cargo->bVerbose )
    {
       LONG lOffset = HB_PCODE_MKINT24( &( pFunc->pCode[ lPCodePos + 1 ] ) );
-      fprintf( cargo->yyc, "\t/* %li (abs: %08li) */", lOffset, lPCodePos + lOffset );
+      fprintf( cargo->yyc, "\t/* %li (abs: %08li) */", lOffset, ( long int ) ( lPCodePos + lOffset ) );
    }
    fprintf( cargo->yyc, "\n" );
    return 4;
@@ -2533,7 +2533,7 @@ static HB_GENC_FUNC( hb_p_tryrecover )
 {
    if( cargo->bVerbose )
    {
-      fprintf( cargo->yyc, "/* %05li */ ", lPCodePos );
+      fprintf( cargo->yyc, "/* %05li */ ", ( long int ) lPCodePos );
    }
    else
    {
@@ -2546,7 +2546,7 @@ static HB_GENC_FUNC( hb_p_tryrecover )
    if( cargo->bVerbose )
    {
       LONG lOffset = HB_PCODE_MKINT24( &( pFunc->pCode[ lPCodePos + 1 ] ) );
-      fprintf( cargo->yyc, "\t/* %li (abs: %08li) */", lOffset, lPCodePos + lOffset );
+      fprintf( cargo->yyc, "\t/* %li (abs: %08li) */", lOffset, ( long int ) ( lPCodePos + lOffset ) );
    }
    fprintf( cargo->yyc, "\n" );
    return 4;
@@ -2850,7 +2850,7 @@ void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )
    hb_compPCodeEval( pFunc, ( HB_PCODE_FUNC_PTR * ) s_verbose_table, ( void * ) &genc_info );
    if( genc_info.bVerbose )
    {
-      fprintf( yyc, "/* %05li */\n", pFunc->lPCodePos );
+      fprintf( yyc, "/* %05li */\n", ( long int ) pFunc->lPCodePos );
    }
 
    fprintf( yyc, "   };\n\n" );

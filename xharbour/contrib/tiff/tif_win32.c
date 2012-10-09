@@ -24,6 +24,12 @@
  * OF THIS SOFTWARE.
  */
 
+#if defined(_MSC_VER) && (_MSC_VER>=1400)
+   #if !defined(_CRT_SECURE_NO_WARNINGS)
+      #define _CRT_SECURE_NO_WARNINGS
+   #endif
+#endif
+
 /*
  * TIFF Library Win32-specific Routines.  Adapted from tif_unix.c 4/5/95 by
  * Scott Wagner (wagner@itek.com), Itek Graphix, Rochester, NY USA

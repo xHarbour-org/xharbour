@@ -610,7 +610,7 @@ USHORT hb_fileNetCurDirBuffEx( USHORT uiDrive, char * pbyBuffer, HB_SIZE ulLen )
       int   nSend;
 
       /* USHORT hb_fsCurDirBuffEx( USHORT uiDrive, char * pbyBuffer, ULONG ulLen ) */
-      nSend = sprintf( szData + HB_LENGTH_ACK, "W|%hu|%lu|\r\n", uiDrive, ulLen );
+      nSend = sprintf( szData + HB_LENGTH_ACK, "W|%hu|%lu|\r\n", uiDrive, ( long unsigned int ) ulLen );
       HB_PUT_BE_UINT32( szData, nSend );
       if( hb_NetSingleSendRecv( hSocket, szData, nSend + HB_LENGTH_ACK, 1020 ) )
       {
@@ -935,7 +935,7 @@ HB_SIZE hb_fileNetReadAt( PHB_FILE pFile, void * pBuffer, HB_SIZE ulSize, HB_FOF
       ULONG ulLen;
       int   nSend;
 
-      nSend = sprintf( szData + HB_LENGTH_ACK, "D|%p|%lu|%" PFHL "i|\r\n", ( void * ) pFile->hFile, ulSize, llOffset );
+      nSend = sprintf( szData + HB_LENGTH_ACK, "D|%p|%lu|%" PFHL "i|\r\n", ( void * ) pFile->hFile, ( long unsigned int ) ulSize, llOffset );
       HB_PUT_BE_UINT32( szData, nSend );
 
       ulLen = hb_NetSingleSendRecv( pFile->hSocket, szData, nSend + HB_LENGTH_ACK, 1004 );
@@ -975,7 +975,7 @@ HB_SIZE hb_fileNetReadLarge( PHB_FILE pFile, void * pBuffer, HB_SIZE ulSize )
       ULONG ulLen;
       int   nSend;
 
-      nSend = sprintf( szData + HB_LENGTH_ACK, "K|%p|%lu|\r\n", ( void * ) pFile->hFile, ulSize );
+      nSend = sprintf( szData + HB_LENGTH_ACK, "K|%p|%lu|\r\n", ( void * ) pFile->hFile, ( long unsigned int ) ulSize );
       HB_PUT_BE_UINT32( szData, nSend );
       ulLen = hb_NetSingleSendRecv( pFile->hSocket, szData, nSend + HB_LENGTH_ACK, 1008 );
       if( ulLen )
@@ -1015,7 +1015,7 @@ HB_SIZE hb_fileNetWriteAt( PHB_FILE pFile, const void * buffer, HB_SIZE ulSize, 
       ULONG    ulLen;
 
       szData   = ( char * ) hb_xgrab( 40 + ulSize );
-      ulLen    = sprintf( szData + HB_LENGTH_ACK, "E|%p|%lu|%" PFHL "i|", ( void * ) pFile->hFile, ulSize, llOffset );
+      ulLen    = sprintf( szData + HB_LENGTH_ACK, "E|%p|%lu|%" PFHL "i|", ( void * ) pFile->hFile, ( long unsigned int ) ulSize, llOffset );
       ptr      = szData + HB_LENGTH_ACK + ulLen;
       HB_MEMCPY( ptr, ( char * ) buffer, ( size_t ) ulSize );
       ptr      = ptr + ulSize;
@@ -1027,7 +1027,7 @@ HB_SIZE hb_fileNetWriteAt( PHB_FILE pFile, const void * buffer, HB_SIZE ulSize, 
 
          ptr = hb_NetFirstChar();
          hb_NetGetCmdItem( &ptr, szData ); ptr++;
-         sscanf( szData, "%lu|", &ulWrite );
+         sscanf( szData, "%lu|", (unsigned long int *) &ulWrite );
          hb_NetGetCmdItem( &ptr, szData );
          sscanf( szData, "%hu|", &uiError );
          hb_fsSetError( uiError );
@@ -1059,7 +1059,7 @@ HB_SIZE hb_fileNetWriteLarge( PHB_FILE pFile, const void * pBuffer, HB_SIZE ulSi
       ULONG    ulLen;
 
       szData   = ( char * ) hb_xgrab( 36 + ulSize + HB_LENGTH_ACK );
-      ulLen    = sprintf( szData + HB_LENGTH_ACK, "J|%p|%lu|", ( void * ) pFile->hFile, ulSize );
+      ulLen    = sprintf( szData + HB_LENGTH_ACK, "J|%p|%lu|", ( void * ) pFile->hFile, ( long unsigned int ) ulSize );
       ptr      = szData + HB_LENGTH_ACK + ulLen;
       HB_MEMCPY( ptr, ( char * ) pBuffer, ( size_t ) ulSize );
       ptr      = ptr + ulSize;
@@ -1072,7 +1072,7 @@ HB_SIZE hb_fileNetWriteLarge( PHB_FILE pFile, const void * pBuffer, HB_SIZE ulSi
 
          ptr = hb_NetFirstChar();
          hb_NetGetCmdItem( &ptr, szData ); ptr++;
-         sscanf( szData, "%lu", &ulWrite );
+         sscanf( szData, "%lu", (unsigned long int *) &ulWrite );
          hb_NetGetCmdItem( &ptr, szData );
          sscanf( szData, "%hu", &uiError );
          hb_fsSetError( uiError );
@@ -1439,7 +1439,7 @@ PHB_NETFFIND hb_FileNetFindFirst( const char * pszFileName, HB_SIZE ulAttr )
       pszFileName += NETIO_FILE_PREFIX_LEN;
 
    /* hb_fsFindFirst( const char * pszFileName, ULONG ulAttr ); */
-   nSend = sprintf( szData + HB_LENGTH_ACK, "P|%s|%lu|\r\n", pszFileName, ulAttr );
+   nSend = sprintf( szData + HB_LENGTH_ACK, "P|%s|%lu|\r\n", pszFileName, ( long unsigned int ) ulAttr );
    HB_PUT_BE_UINT32( szData, nSend );
    ulLen = hb_NetSingleSendRecv( hSocket, szData, nSend + HB_LENGTH_ACK, 1013 );
    if( ulLen )
@@ -1708,7 +1708,7 @@ HB_SIZE hb_fileNetGetFileAttributes( char * pFilename )
 
       ptrBuf   = hb_NetFirstChar();
       ptr      = hb_strToken( ptrBuf, ulLen, 1, &ulSize );
-      sscanf( ptr, "%lu", &ulFileAttributes );
+      sscanf( ptr, "%lu", (unsigned long int *) &ulFileAttributes );
       return ulFileAttributes;
    }
    else

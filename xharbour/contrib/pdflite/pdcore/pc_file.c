@@ -1510,7 +1510,7 @@ pdc_read_textfile(pdc_core *pdc, pdc_file *sfp, int flags, char ***linelist)
                                                  sizeof(char *), fn);
                 }
 
-                is += sumlen + 1;
+                is += ( int ) sumlen + 1;
                 strlist[nlines] = &content[is];
                 nlines++;
                 sumlen = 0;
@@ -1656,11 +1656,11 @@ pdc_temppath(
 	inlen = strlen(inbuf);
 
     if (inlen != 0)
-	MD5_Update(&md5, (unsigned char *) inbuf, inlen);
+	MD5_Update(&md5, (unsigned char *) inbuf, (unsigned int) inlen );
 
     dirlen = dirname ? strlen(dirname) : 0;
     if (dirlen)
-	MD5_Update(&md5, (const unsigned char *) dirname, dirlen);
+	MD5_Update(&md5, (const unsigned char *) dirname, (unsigned int) dirlen);
 
     MD5_Final(digest, &md5);
 

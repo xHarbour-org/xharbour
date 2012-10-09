@@ -182,7 +182,7 @@ pdf_register_JPEG_segment(PDF *p, pdf_image *image, long pos, size_t length)
         jpeg->number++;
 
         length -= len;
-        pos += len;
+        pos += ( long ) len;
     }
 }
 
@@ -1207,7 +1207,7 @@ pdf_process_JPEG_data(
 
 #define PDF_STRING_JFIF  "\x4A\x46\x49\x46"
 
-                slen = strlen(PDF_STRING_JFIF);
+                slen = ( unsigned long ) strlen(PDF_STRING_JFIF);
                 if (len > slen &&
                     !strncmp(PDF_STRING_JFIF, (char *) appstring, slen))
                 {
@@ -1295,7 +1295,7 @@ pdf_process_JPEG_data(
 
 #define PDF_STRING_Adobe   "\x41\x64\x6F\x62\x65"
 
-                slen = strlen(PDF_STRING_Adobe);
+                slen = (unsigned long) strlen(PDF_STRING_Adobe);
                 if (len > slen &&
                     !strncmp(PDF_STRING_Adobe, (char *) appstring, slen))
                 {

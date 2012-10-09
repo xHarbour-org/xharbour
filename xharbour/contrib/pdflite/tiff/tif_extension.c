@@ -103,7 +103,7 @@ void TIFFSetClientInfo( TIFF *tif, void *data, const char *name )
     ilink = (TIFFClientInfoLink *) _TIFFmalloc(sizeof(TIFFClientInfoLink));
     assert (ilink != NULL);
     ilink->next = tif->tif_clientinfo;
-    ilink->name = (char *) _TIFFmalloc(strlen(name)+1);
+    ilink->name = (char *) _TIFFmalloc((tsize_t)strlen(name)+1);
     assert (ilink->name != NULL);
     strcpy(ilink->name, name);
     ilink->data = data;

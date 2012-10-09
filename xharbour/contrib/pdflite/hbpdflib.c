@@ -50,6 +50,10 @@
  *
  */
 
+#if defined( _MSC_VER ) && ( _MSC_VER>=1400 )
+   #pragma warning (disable:4995)
+#endif
+
 #define HB_OS_WIN_USED
 
 #include "hbapi.h"

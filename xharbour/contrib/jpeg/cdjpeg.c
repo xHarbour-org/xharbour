@@ -9,6 +9,10 @@
  * programs (cjpeg, djpeg, jpegtran).
  */
 
+#if defined(_MSC_VER) && (_MSC_VER>=1400)
+   #pragma warning(disable:4996)
+#endif
+
 #include "cdjpeg.h"		/* Common decls for cjpeg/djpeg applications */
 #include <ctype.h>		/* to declare isupper(), tolower() */
 #ifdef NEED_SIGNAL_CATCHER

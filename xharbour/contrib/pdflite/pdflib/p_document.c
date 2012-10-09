@@ -1627,11 +1627,11 @@ pdf_write_names(PDF *p, pdf_nametree_type type)
             pdc_begin_array(p->out);
 
             name = pdf_get_numbered_name(p, type, ia, NULL, 1);
-            pdc_put_pdfstring(p->out, name, pdc_strlen(name));
+            pdc_put_pdfstring(p->out, name, ( int ) pdc_strlen(name));
 
             nn = (ik == nnodes - 1) ? p->names_number : nleafs;
             name = pdf_get_numbered_name(p, type, ia, NULL, nn);
-            pdc_put_pdfstring(p->out, name, pdc_strlen(name));
+            pdc_put_pdfstring(p->out, name, ( int ) pdc_strlen(name));
 
             pdc_end_array(p->out);
 
@@ -1644,7 +1644,7 @@ pdf_write_names(PDF *p, pdf_nametree_type type)
                 if (name == NULL)
                     break;
 
-                pdc_put_pdfstring(p->out, name, pdc_strlen(name));
+                pdc_put_pdfstring(p->out, name, ( int ) pdc_strlen(name));
                 pdc_objref(p->out, "", p->names[ia].obj_id);
                 ia++;
             }
@@ -1703,7 +1703,7 @@ pdf_write_pages_and_catalog(PDF *p, pdc_id orig_root_id)
 
         for (i = 0; i < p->names_number; i++)
         {
-            inlen = strlen(p->names[i].name);
+            inlen = ( int ) strlen(p->names[i].name);
             name = pdf_convert_pdfstring(p, p->names[i].name, inlen,
                                 PDC_CONV_WITHBOM | PDC_CONV_TRYBYTES, &outlen);
 

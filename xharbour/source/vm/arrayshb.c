@@ -186,7 +186,7 @@ HB_FUNC( HB_THISARRAY )
       }
       else
       {
-         pArray->item.asArray.value = ( PHB_BASEARRAY ) hb_itemGetNL( pArrayID );
+         pArray->item.asArray.value = ( PHB_BASEARRAY ) hb_itemGetNS( pArrayID );
       }
 
       #ifdef HB_ARRAY_USE_COUNTER

@@ -1292,7 +1292,11 @@ static HB_DYNS_FUNC( hb_memvarClear )
 
    if( pDynSymbol->hMemvar )
    {
+#if defined( HB_OS_WIN_64 )
+      if( pDynSymbol->hMemvar != ( HB_HANDLE ) ( HB_ULONG ) Cargo )
+#else
       if( pDynSymbol->hMemvar != ( HB_HANDLE ) Cargo )
+#endif
       {
          s_globalTable[ pDynSymbol->hMemvar ].counter = 1;
          hb_memvarValueDecRef( pDynSymbol->hMemvar );
@@ -1650,7 +1654,11 @@ static void hb_memvarClearAll( void )
 
    if( pGetList && pGetList->hMemvar )
    {
+#if defined( HB_OS_WIN_64 )
+      hb_dynsymEval( hb_memvarClear, ( void * ) ( HB_ULONG ) pGetList->hMemvar );
+#else
       hb_dynsymEval( hb_memvarClear, ( void * ) pGetList->hMemvar );
+#endif
    }
    else
    {

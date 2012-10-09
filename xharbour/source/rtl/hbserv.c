@@ -501,7 +501,6 @@ static LONG s_signalHandler( int type, int sig, PEXCEPTION_RECORD exc )
    return EXCEPTION_EXECUTE_HANDLER;
 }
 
-
 static LRESULT CALLBACK s_exceptionFilter( PEXCEPTION_POINTERS exInfo )
 {
    return s_signalHandler( 0, exInfo->ExceptionRecord->ExceptionCode, exInfo->ExceptionRecord );
@@ -625,7 +624,7 @@ static void s_serviceSetHBSig( void )
       SEM_FAILCRITICALERRORS | SEM_NOALIGNMENTFAULTEXCEPT | SEM_NOGPFAULTERRORBOX |
       SEM_NOOPENFILEERRORBOX );
 
-   SetUnhandledExceptionFilter( s_exceptionFilter );
+   SetUnhandledExceptionFilter( (LPTOP_LEVEL_EXCEPTION_FILTER) s_exceptionFilter );
    s_hMsgHook = SetWindowsHookEx( WH_GETMESSAGE, ( HOOKPROC ) s_MsgFilterFunc, NULL, GetCurrentThreadId() );
    SetConsoleCtrlHandler( s_ConsoleHandlerRoutine, TRUE );
 

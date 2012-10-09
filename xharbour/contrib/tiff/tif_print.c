@@ -393,8 +393,8 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 		for (cp = td->td_inknames; 
 		     i > 0 && cp < td->td_inknames + td->td_inknameslen; 
 		     cp = strchr(cp,'\0')+1, i--) {
-			int max_chars = 
-				td->td_inknameslen - (cp - td->td_inknames);
+			int max_chars =
+				( int ) ( td->td_inknameslen - (cp - td->td_inknames) );
 			fputs(sep, fd);
 			_TIFFprintAsciiBounded(fd, cp, max_chars);
 			sep = ", ";
@@ -673,7 +673,7 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 void
 _TIFFprintAscii(FILE* fd, const char* cp)
 {
-	_TIFFprintAsciiBounded( fd, cp, strlen(cp));
+	_TIFFprintAsciiBounded( fd, cp, ( int ) strlen(cp));
 }
 
 static void

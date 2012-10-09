@@ -1645,7 +1645,7 @@ OJPEGSetupDecode(register TIFF *tif)
             the SOI marker through the "metadata" tables, then append an EOI
             marker and flag the "JPEGTables" TIFF record as "present".
          */
-            sp->jpegtables_length = p - (unsigned char*)sp->jpegtables + 2;
+            sp->jpegtables_length = (uint32) (p - (unsigned char*)sp->jpegtables + 2);
             p = (unsigned char *) sp->jpegtables;
             if (!(sp->jpegtables = _TIFFmalloc(sp->jpegtables_length)))
               {

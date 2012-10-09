@@ -721,7 +721,7 @@ pdc_hvtr_reclaim_item(pdc_hvtr *v)
 	/* install new chunk.
 	*/
 	const int	cs = v->chunk_size;
-	const int	es = v->ced.size;
+	const int	es = (const int) v->ced.size;
 	pdc_chunk *	new_chunk;
 	pdc_link *	link;
 	int		base;
@@ -754,7 +754,7 @@ pdc_hvtr_reclaim_item(pdc_hvtr *v)
 	}
 
 	new_chunk->data = (char *)pdc_malloc(v->pdc, cs * es, fn);
-	base = cs * (new_chunk - &v->ctab[0]);
+	base = ( int ) ( cs * (new_chunk - &v->ctab[0]) );
 
 	for (idx = 1; idx < cs; ++idx)
 	{

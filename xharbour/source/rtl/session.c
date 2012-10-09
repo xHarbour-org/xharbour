@@ -113,7 +113,7 @@ int hb_sessionID( void )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_sessionID()" ) );
 
-   return pSession ? ( int ) pSession->id : ( int ) NULL;
+   return pSession ? ( int ) pSession->id : 0;
 }
 
 int hb_sessionSelectID( const int sessionID )

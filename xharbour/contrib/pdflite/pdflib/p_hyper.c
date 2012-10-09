@@ -1310,7 +1310,7 @@ pdf_feed_digest_info(PDF *p)
         for (info = p->userinfo; info != NULL; info = info->next)
         {
             pdc_update_digest(p->out,
-                (unsigned char *) info->key, strlen(info->key));
+                (unsigned char *) info->key, (unsigned int) strlen(info->key));
         }
     }
 }

@@ -465,7 +465,7 @@ pdf_process_PNG_data(
 	png_read_update_info(image->info.png.png_ptr, image->info.png.info_ptr);
 
 	image->info.png.rowbytes =
-	    png_get_rowbytes(image->info.png.png_ptr, image->info.png.info_ptr);
+	    (png_uint_32) png_get_rowbytes(image->info.png.png_ptr, image->info.png.info_ptr);
 
 	/* Check for overflow */
 	bytecount = image->info.png.rowbytes * height;

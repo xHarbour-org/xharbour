@@ -742,7 +742,7 @@ pdf_get_opt_filename(PDF *p, const char *keyword, pdc_resopt *resopts,
 
         if (logg3)
             pdc_logg_hexdump(p->pdc, "output filename", "\t\t",
-                             (char *) filename, strlen((char *) filename));
+                             (char *) filename, ( int ) strlen((char *) filename));
     }
 
     return (char *) filename;

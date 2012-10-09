@@ -451,7 +451,7 @@ TIFFMergeFieldInfo(TIFF* tif, const TIFFFieldInfo info[], int n)
 	if (tif->tif_nfields > 0) {
 		tif->tif_fieldinfo = (TIFFFieldInfo**)
 		    _TIFFrealloc(tif->tif_fieldinfo,
-			(tif->tif_nfields+n) * sizeof (TIFFFieldInfo*));
+			(tsize_t)((tif->tif_nfields+n) * sizeof (TIFFFieldInfo*)));
 	} else {
 		tif->tif_fieldinfo = (TIFFFieldInfo**)
 		    _TIFFmalloc(n * sizeof (TIFFFieldInfo*));
@@ -599,7 +599,7 @@ TIFFFindFieldInfo(TIFF* tif, ttag_t tag, TIFFDataType dt)
 						   tif->tif_nfields,
 						   sizeof(TIFFFieldInfo),
 						   tagCompare));
-        } else for (i = 0, n = tif->tif_nfields; i < n; i++) {
+        } else for (i = 0, n = (int) tif->tif_nfields; i < n; i++) {
 		const TIFFFieldInfo* fip = tif->tif_fieldinfo[i];
 		if (fip->field_tag == tag &&
 		    (dt == TIFF_ANY || fip->field_type == dt))
@@ -630,7 +630,7 @@ _TIFFFindFieldInfoByName(TIFF* tif, const char *field_name, TIFFDataType dt)
 						 sizeof(TIFFFieldInfo),
 						 tagNameCompare));
         } else
-		for (i = 0, n = tif->tif_nfields; i < n; i++) {
+		for (i = 0, n = (int) tif->tif_nfields; i < n; i++) {
 			const TIFFFieldInfo* fip = tif->tif_fieldinfo[i];
 			if (streq(fip->field_name, field_name) &&
 			    (dt == TIFF_ANY || fip->field_type == dt))

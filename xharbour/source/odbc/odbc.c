@@ -215,7 +215,7 @@ HB_FUNC( SQLGETDATA ) /* HB_SQLGETDATA( hStmt, nField, nType, nLen, @cBuffer ) -
 #if defined( __POCC__ ) && defined( HB_OS_WIN_64 )
       wResult  = SQLGetData( ( HSTMT ) hb_parnl( 1 ), hb_parni( 2 ), wType, ( PTR ) bBuffer, lLen, ( long long int * ) &lLen );
 #else
-      wResult  = SQLGetData( ( HSTMT ) hb_parnl( 1 ), hb_parni( 2 ), wType, ( PTR ) bBuffer, lLen, &lLen );
+      wResult  = SQLGetData( ( HSTMT ) hb_parnl( 1 ), hb_parni( 2 ), wType, ( PTR ) bBuffer, lLen, (SQLLEN *) &lLen );
 #endif
       if( wResult == SQL_SUCCESS && iReallocs == 0 )
       {
@@ -291,7 +291,7 @@ HB_FUNC( SQLDESCRIB )
 #else
    WORD wResult = SQLDescribeCol( ( HSTMT ) hb_parnl( 1 ), hb_parni( 2 ),
                                   ( SQLCHAR * ) bBuffer, hb_parni( 4 ), &wBufLen,
-                                  &wDataType, &wColSize, &wDecimals,
+                                  &wDataType, (SQLULEN *) &wColSize, &wDecimals,
                                   &wNullable );
 #endif
 
@@ -346,7 +346,7 @@ HB_FUNC( SQLEXTENDE )
    WORD           wResult        = SQLExtendedFetch( ( HSTMT ) hb_parnl( 1 ),
                                                      ( USHORT ) hb_parnl( 2 ),
                                                      ( USHORT ) hb_parnl( 3 ),
-                                                     &uiRowCountPtr,
+                                                     (SQLULEN *) &uiRowCountPtr,
                                                      &siRowStatus );
 
    if( wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO )
@@ -483,7 +483,7 @@ HB_FUNC( SQLEXECUTESCALAR )
 #if defined( __POCC__ ) && defined( HB_OS_WIN_64 )
             wResult  = SQLGetData( ( HSTMT ) hStmt, 1, SQL_C_CHAR, bBuffer, sizeof( bBuffer ), ( long long int * ) &lLen );
 #else
-            wResult  = SQLGetData( ( HSTMT ) hStmt, 1, SQL_C_CHAR, bBuffer, sizeof( bBuffer ), &lLen );
+            wResult  = SQLGetData( ( HSTMT ) hStmt, 1, SQL_C_CHAR, bBuffer, sizeof( bBuffer ), (SQLLEN *) &lLen );
 #endif
             hb_storc( ( char * ) bBuffer, 3 );
          }

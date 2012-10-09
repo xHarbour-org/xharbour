@@ -1,3 +1,4 @@
+/* $Id$ */
 /* $Header: /cvs/maptools/cvsroot/libtiff/libtiff/tif_extension.c,v 1.7 2010-03-10 18:56:48 bfriesen Exp $ */
 
 /*
@@ -24,11 +25,17 @@
  * OF THIS SOFTWARE.
  */
 
+#if defined(_MSC_VER) && (_MSC_VER>=1400)
+   #if !defined(_CRT_SECURE_NO_WARNINGS)
+      #define _CRT_SECURE_NO_WARNINGS
+   #endif
+#endif
+
 /*
  * TIFF Library.
  *
  * Various routines support external extension of the tag set, and other
- * application extension capabilities. 
+ * application extension capabilities.
  */
 
 #include "tiffiop.h"

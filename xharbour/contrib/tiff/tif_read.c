@@ -96,7 +96,7 @@ TIFFFillStripPartial( TIFF *tif, int strip, tmsize_t read_ahead, int restart )
         if( unused_data > 0 )
         {
 		assert((tif->tif_flags&TIFF_BUFFERMMAP)==0);
-                memmove( tif->tif_rawdata, tif->tif_rawcp, unused_data );
+                memmove( tif->tif_rawdata, tif->tif_rawcp, (size_t) unused_data );
         }
 
         /*
@@ -115,12 +115,12 @@ TIFFFillStripPartial( TIFF *tif, int strip, tmsize_t read_ahead, int restart )
         /*
         ** How much do we want to read?
         */
-        to_read = tif->tif_rawdatasize - unused_data;
-        if( (uint64) to_read > td->td_stripbytecount[strip] 
+        to_read = (tmsize_t) ( tif->tif_rawdatasize - unused_data );
+        if( (uint64) to_read > td->td_stripbytecount[strip]
             - tif->tif_rawdataoff - tif->tif_rawdataloaded )
         {
-                to_read = td->td_stripbytecount[strip]
-                        - tif->tif_rawdataoff - tif->tif_rawdataloaded;
+                to_read = (tmsize_t) ( td->td_stripbytecount[strip]
+                        - tif->tif_rawdataoff - tif->tif_rawdataloaded );
         }
 
 	assert((tif->tif_flags&TIFF_BUFFERMMAP)==0);
@@ -143,8 +143,8 @@ TIFFFillStripPartial( TIFF *tif, int strip, tmsize_t read_ahead, int restart )
                 return 0;
         }
         
-        tif->tif_rawdataoff = tif->tif_rawdataoff + tif->tif_rawdataloaded - unused_data ;
-        tif->tif_rawdataloaded = unused_data + to_read;
+        tif->tif_rawdataoff =(tmsize_t) ( tif->tif_rawdataoff + tif->tif_rawdataloaded - unused_data );
+        tif->tif_rawdataloaded = (tmsize_t) ( unused_data + to_read );
 
         tif->tif_rawcp = tif->tif_rawdata;
                         

@@ -183,7 +183,7 @@ TIFFClientOpen(
         tif->pdflib_error = error_h;
         tif->pdflib_warn = warn_h;
 
-	tif = (TIFF *)_TIFFmalloc(sizeof (TIFF) + strlen(name) + 1);
+	tif = (TIFF *)_TIFFmalloc(sizeof (TIFF) + (tsize_t) strlen(name) + 1);
 	if (tif == NULL) {
 		_TIFFError(tif, module,
 			"%s: Out of memory (TIFF structure)", name);

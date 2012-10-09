@@ -53,6 +53,11 @@
  *
  */
 
+#if defined(__POCC__)
+   #pragma warn (disable:2130) // Result of comparison is constant.
+   #pragma warn (disable:2154) // Unreachable code.
+#endif
+
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "inet.h"

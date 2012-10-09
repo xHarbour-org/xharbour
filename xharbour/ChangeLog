@@ -8,6 +8,66 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-10 02:50 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/harbour.c
+  * source/compiler/gencc1.c
+  * source/rtl/chruni.c
+  * source/rtl/filenet.c
+  * source/rtl/hbserv.c
+  * source/rtl/winreg.prg
+  * source/rtl/hbsrlraw.c
+  * source/rtl/session.c
+  * source/rtl/str2ptr.c
+  * source/rtl/errorsys.prg
+  * source/rtl/win32prn.prg
+  * source/rtl/pcre/pcre_compile.c
+  * source/rtl/pcre/pcre_exec.c
+  * source/rtl/zlib/gzguts.h
+  * source/vm/arrayshb.c
+  * source/vm/codebloc.c
+  * source/vm/memvars.c
+  * source/vm/cmdarg.c
+  * source/vm/thread.c
+  * source/odbc/odbc.c
+  * source/tip/utils.c
+  * source/compiler/comptool.c
+  * contrib/tiff/tif_codec.c
+  * contrib/tiff/tif_compress.c
+  * contrib/tiff/tif_dirinfo.c
+  * contrib/tiff/tif_extension.c
+  * contrib/tiff/tif_fax3.c
+  * contrib/tiff/tif_getimage.c
+  * contrib/tiff/tif_open.c
+  * contrib/tiff/tif_print.c
+  * contrib/tiff/tif_read.c
+  * contrib/tiff/tif_win32.c
+  * contrib/tiff/tif_zip.c
+  * contrib/pdflite/hbpdflib.c
+  * contrib/pdflite/pdcore/pc_contain.c
+  * contrib/pdflite/pdcore/pc_file.c
+  * contrib/pdflite/pdcore/pc_unicode.c
+  * contrib/pdflite/pdcore/pc_util.c
+  * contrib/pdflite/pdflib/p_bmp.c
+  * contrib/pdflite/pdflib/p_document.c
+  * contrib/pdflite/pdflib/p_hyper.c
+  * contrib/pdflite/pdflib/p_jpeg.c
+  * contrib/pdflite/pdflib/p_page.c
+  * contrib/pdflite/pdflib/p_util.c
+  * contrib/pdflite/tiff/tif_auxx.c
+  * contrib/pdflite/tiff/tif_dirinfo.c
+  * contrib/pdflite/tiff/tif_extension.c
+  * contrib/pdflite/tiff/tif_luv.c
+  * contrib/pdflite/tiff/tif_ojpeg.c
+  * contrib/pdflite/tiff/tif_dir.c
+  * contrib/pdflite/tiff/tif_open.c
+  * contrib/pdflite/tiff/tif_strip.c
+  * contrib/pdflite/tiff/tif_tile.c
+  * contrib/pdflite/pdflib/p_png.c
+  * contrib/jpeg/jdatadst.c
+  * contrib/jpeg/jmemmgr.c
+  * contrib/jpeg/cdjpeg.c
+    ! pacify MSVC64 warnings
+
 2012-10-03 10:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbtypes.h
   * source/vm/maindllp.c

@@ -363,7 +363,16 @@ void hb_cmdargProcessVM( void )
          PHB_ITEM pOpt  = hb_itemDoC( "HB_VMMODE", 0, NULL, NULL );
          int      iOpt  = pOpt->item.asInteger.value;
          //hb_snprintf( buffer, sizeof( buffer ), "DS avail=%luKB  OS avail=%luKB  EMM avail=%luKB", hb_xquery( HB_MEM_BLOCK ), hb_xquery( HB_MEM_VM ), hb_xquery( HB_MEM_EMS ) );
-         hb_snprintf( buffer, sizeof( buffer ), "DS avail=%luKB  OS avail=%luKB  EMM avail=%luKB  MemStat:%s  MT:%s  Opt:%i", hb_xquery( HB_MEM_BLOCK ), hb_xquery( HB_MEM_VM ), hb_xquery( HB_MEM_EMS ), hb_xquery( HB_MEM_USEDMAX ) ? "On" : "Off", lMT ? "On" : "Off", iOpt );
+
+         hb_snprintf(
+            buffer,
+            sizeof( buffer ),
+            "DS avail=%luKB  OS avail=%luKB  EMM avail=%luKB  MemStat:%s  MT:%s  Opt:%i",
+            ( long unsigned int ) hb_xquery( HB_MEM_BLOCK ),
+            ( long unsigned int ) hb_xquery( HB_MEM_VM ),
+            ( long unsigned int ) hb_xquery( HB_MEM_EMS ),
+            ( long unsigned int ) hb_xquery( HB_MEM_USEDMAX ) ? "On" : "Off",
+            lMT ? "On" : "Off", iOpt );
          hb_conOutErr( buffer, 0 );
          hb_conOutErr( hb_conNewLine(), 0 );
          hb_itemRelease( pMT );

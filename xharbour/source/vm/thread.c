@@ -457,7 +457,7 @@ void hb_threadFillStack( HB_STACK * pStack, PHB_ITEM pArgs )
    else if( HB_IS_BLOCK( pPointer ) )
    {
       hb_itemPutSymbol( *pPos, &hb_symEval );
-      ( *pPos )->item.asSymbol.pCargo->stackbase   = pPos - pStack->pItems;
+      ( *pPos )->item.asSymbol.pCargo->stackbase   = (long) (pPos - pStack->pItems);
 
       pPos++;
       ( *pPos )->type                              = HB_IT_NIL;
@@ -2613,7 +2613,7 @@ HB_FUNC( STARTTHREAD )
 
       // Converting it to its Symbol.
       hb_itemPutSymbol( pPointer, pSymbol );
-      pPointer->item.asSymbol.pCargo->stackbase = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
+      pPointer->item.asSymbol.pCargo->stackbase = ( long ) ( HB_VM_STACK.pBase - HB_VM_STACK.pItems );
    }
    /* Is it an object? */
    else if( hb_pcount() >= 2 && pPointer->type == HB_IT_OBJECT )
@@ -2647,7 +2647,7 @@ HB_FUNC( STARTTHREAD )
       hb_itemSwap( pPointer, hb_arrayGetItemPtr( pArgs, 2 ) );
 
       hb_itemPutSymbol( pPointer, pSymbol );
-      pPointer->item.asSymbol.pCargo->stackbase = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
+      pPointer->item.asSymbol.pCargo->stackbase = ( long ) ( HB_VM_STACK.pBase - HB_VM_STACK.pItems );
    }
    /* Is it a function name? */
    else if( pPointer->type == HB_IT_STRING )
@@ -2662,7 +2662,7 @@ HB_FUNC( STARTTHREAD )
       }
 
       hb_itemPutSymbol( pPointer, pExecSym->pSymbol );
-      pPointer->item.asSymbol.pCargo->stackbase = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
+      pPointer->item.asSymbol.pCargo->stackbase = ( long ) ( HB_VM_STACK.pBase - HB_VM_STACK.pItems );
    }
    /* Is it a code block? */
    else if( pPointer->type != HB_IT_BLOCK )

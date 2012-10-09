@@ -1301,7 +1301,7 @@ pdc_convert_textstring(pdc_core *pdc,
                 goto PDC_CONV_ERROR;
             }
 
-            inlen = instra - instr;
+            inlen = ( int ) ( instra - instr );
         }
 
         if (inalloc)
