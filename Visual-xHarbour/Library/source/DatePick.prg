@@ -58,7 +58,7 @@ CLASS DateTimePicker INHERIT Control
    PROPERTY ShowNone     INDEX DTS_SHOWNONE    READ xShowNone     WRITE SetStyle  DEFAULT .F. PROTECTED
    PROPERTY RightAlign   INDEX DTS_RIGHTALIGN  READ xRightAlign   WRITE SetStyle  DEFAULT .F. PROTECTED
 
-   PROPERTY InitialEmpty                       READ xInitialEmpty WRITE __SetInitialEmpty DEFAULT .F.  PROTECTED
+   PROPERTY BlankDate                          READ xBlankDate WRITE __SetBlankDate DEFAULT .F.  PROTECTED
 
    DATA     PUBLISHED INIT .F.
    DATA __nLast   PROTECTED INIT 0
@@ -100,7 +100,7 @@ CLASS DateTimePicker INHERIT Control
    METHOD OnSetFocus          VIRTUAL
 
    METHOD OnKeyDown()
-   METHOD __SetInitialEmpty() INLINE ::Sendmessage( DTM_SETFORMAT, 0, IIF( ::InitialEmpty, " ", NIL ) )
+   METHOD __SetBlankDate() INLINE ::Sendmessage( DTM_SETFORMAT, 0, IIF( ::BlankDate, " ", NIL ) )
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -168,7 +168,7 @@ METHOD Create() CLASS DateTimePicker
    ::MaxTime := STRZERO(::MinRange:Hour,2) +":"+ STRZERO(::MinRange:Minute,2) +":"+ STRZERO(::MinRange:Second,2)
 
    ::SetSystemTime()
-   IF ::InitialEmpty
+   IF ::BlankDate
       ::Sendmessage( DTM_SETFORMAT, 0, " " )
    ENDIF
 RETURN Self
@@ -188,8 +188,8 @@ RETURN st
 //-----------------------------------------------------------------------------------------------
 
 METHOD OnKeyDown() CLASS DateTimePicker
-   IF ::InitialEmpty
-      ::xInitialEmpty := .F.
+   IF ::BlankDate
+      ::xBlankDate := .F.
       ::Sendmessage( DTM_SETFORMAT, 0, NIL )
       ::Sendmessage( WM_KEYDOWN, VK_RIGHT, 0 )
    ENDIF
@@ -280,8 +280,8 @@ METHOD OnParentNotify( nwParam, nlParam ) CLASS DateTimePicker
    (nwParam)
    DO CASE
       CASE ::Parent:hdr:code == DTN_CLOSEUP
-           IF ::InitialEmpty
-              ::xInitialEmpty := .F.
+           IF ::BlankDate
+              ::xBlankDate := .F.
               ::Sendmessage( DTM_SETFORMAT, 0, NIL )
               ::Sendmessage( WM_KEYDOWN, VK_RIGHT, 0 )
            ENDIF
