@@ -8,6 +8,12 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-08 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added MessageWait METHOD SetText( cText )
+     oWnd := ::Messagewait( "This is the first text" )
+     oWnd:SetText( "Second text" )
+   * Changed DateTimePicker:InitialEmpty to allow assigning on the fly.
+   
 2012-10-03 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed GroupBox GAP when text is empty.
    ! Fixed GroupBox Background color to respect rounded theme.

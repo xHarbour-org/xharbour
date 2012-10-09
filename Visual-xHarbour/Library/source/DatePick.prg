@@ -58,7 +58,9 @@ CLASS DateTimePicker INHERIT Control
    PROPERTY ShowNone     INDEX DTS_SHOWNONE    READ xShowNone     WRITE SetStyle  DEFAULT .F. PROTECTED
    PROPERTY RightAlign   INDEX DTS_RIGHTALIGN  READ xRightAlign   WRITE SetStyle  DEFAULT .F. PROTECTED
 
-   DATA InitialEmpty     PUBLISHED INIT .F.
+   PROPERTY InitialEmpty                       READ xInitialEmpty WRITE __SetInitialEmpty DEFAULT .F.  PROTECTED
+
+   DATA     PUBLISHED INIT .F.
    DATA __nLast   PROTECTED INIT 0
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -98,6 +100,7 @@ CLASS DateTimePicker INHERIT Control
    METHOD OnSetFocus          VIRTUAL
 
    METHOD OnKeyDown()
+   METHOD __SetInitialEmpty() INLINE ::Sendmessage( DTM_SETFORMAT, 0, IIF( ::InitialEmpty, " ", NIL ) )
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
