@@ -13,6 +13,8 @@
 
 static __pCallBackPtr
 static __pPicture
+static __hText
+
 static aSize
 static nSecs, __aCenter, s_lProgress, s_cCancel, s_hFont, s_cText, s_hProgress
 
@@ -118,6 +120,7 @@ CLASS MessageWait
    ACCESS Position      INLINE ::xPosition PERSISTENT
    ASSIGN Position( n ) INLINE ::xPosition := n, ::SetPosition()
 
+   METHOD SetText()
    METHOD Init() CONSTRUCTOR
    METHOD SetPosition()
    METHOD Destroy()  INLINE DestroyWindow( ::hWnd )
@@ -126,6 +129,11 @@ ENDCLASS
 //-------------------------------------------------------------------------------------------------------------------------------------
 METHOD Init( cText, cTitle, lProgress, cCancel ) CLASS MessageWait
    ::hWnd := __MsgWait( cText, cTitle, lProgress, cCancel )
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------------------------------------
+METHOD SetText( cText ) CLASS MessageWait
+   SetWindowText( __hText, cText )
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------
@@ -182,7 +190,7 @@ RETURN hWnd
 
 //-------------------------------------------------------------------------------------------------------------------------------------
 FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
-   LOCAL aClient, nLeft, nTop, aRect, aPar, hDC, aSize, hBtn, hText, hFont, rc := (struct RECT)
+   LOCAL aClient, nLeft, nTop, aRect, aPar, hDC, aSize, hBtn, hFont, rc := (struct RECT)
    LOCAL nBorder, aCenter
 
    SWITCH nMsg
@@ -218,12 +226,13 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
 
            aRect[2] := (aRect[4]-rc:bottom)/2
            aRect[4] := rc:bottom
-           hText := CreateWindowEx( 0, "static", s_cText,;
+
+           __hText := CreateWindowEx( 0, "static", s_cText,;
                               WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | SS_CENTER,;
                               aRect[1], aRect[2], aRect[3], aRect[4],;
                               hWnd, 4002, __GetApplication():Instance, NIL )
 
-           SendMessage( hText, WM_SETFONT, s_hFont )
+           SendMessage( __hText, WM_SETFONT, s_hFont )
 
            aSize := {0,0}
 

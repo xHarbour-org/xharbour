@@ -189,7 +189,7 @@ RETURN st
 
 METHOD OnKeyDown() CLASS DateTimePicker
    IF ::InitialEmpty
-      ::InitialEmpty := .F.
+      ::xInitialEmpty := .F.
       ::Sendmessage( DTM_SETFORMAT, 0, NIL )
       ::Sendmessage( WM_KEYDOWN, VK_RIGHT, 0 )
    ENDIF
@@ -281,7 +281,7 @@ METHOD OnParentNotify( nwParam, nlParam ) CLASS DateTimePicker
    DO CASE
       CASE ::Parent:hdr:code == DTN_CLOSEUP
            IF ::InitialEmpty
-              ::InitialEmpty := .F.
+              ::xInitialEmpty := .F.
               ::Sendmessage( DTM_SETFORMAT, 0, NIL )
               ::Sendmessage( WM_KEYDOWN, VK_RIGHT, 0 )
            ENDIF

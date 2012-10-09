@@ -12,7 +12,8 @@
    + Added MessageWait METHOD SetText( cText )
      oWnd := ::Messagewait( "This is the first text" )
      oWnd:SetText( "Second text" )
-   * Changed DateTimePicker:InitialEmpty to allow assigning on the fly.
+   * Changed DateTimePicker:InitialEmpty to BlankDate and allowed assigning
+     its value on the fly.
    
 2012-10-03 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed GroupBox GAP when text is empty.
