@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-10 03:21 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/pdflite/tiff/tif_fax3.c
+    ! pacify MSVC64 warnings
+
 2012-10-10 02:50 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/harbour.c
   * source/compiler/gencc1.c
