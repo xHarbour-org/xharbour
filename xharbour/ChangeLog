@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-11 01:03 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbsqlit3/sqlite3.c
+  * contrib/hbsqlit3/sqlite3.h
+    ! updated to version 3.7.14.1
+
 2012-10-10 19:39 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/ct/ctwin.c
     ! pacify BCC warning
