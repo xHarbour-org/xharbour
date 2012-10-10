@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-11 02:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/harbour.c
+    ! variable initialization to pacify GCC warnings
+
 2012-10-11 01:03 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbsqlit3/sqlite3.c
   * contrib/hbsqlit3/sqlite3.h

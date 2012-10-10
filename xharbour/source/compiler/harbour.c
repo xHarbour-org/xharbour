@@ -731,7 +731,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
    if( hb_comp_iVarScope & VS_MEMVAR )
    {
-      USHORT wPos;
+      USHORT wPos = 0;
 
       /*printf( "\nAdding: %s in Function: %s\n", pVar->szName, pFunc->szName );*/
 
@@ -3266,7 +3266,7 @@ static void hb_compGenFieldPCode( BYTE bPCode, int wVar, char * szVarName, PFUNC
  */
 static void hb_compGenVarPCode( BYTE bPCode, char * szVarName )
 {
-   USHORT wVar;
+   USHORT wVar = 0;
 
    hb_compSymbolAdd( szVarName, &wVar, NULL, SYMF_PUBLIC );
 
@@ -3313,7 +3313,7 @@ static void hb_compGenVarPCode( BYTE bPCode, char * szVarName )
 
 void hb_compGenMessage( char * szMsgName )       /* sends a message to an object */
 {
-   USHORT wSym;
+   USHORT wSym = 0;
 
    hb_compSymbolAdd( szMsgName, &wSym, NULL, SYMF_PUBLIC );
 
@@ -4157,7 +4157,7 @@ void hb_compGenPushString( char * szText, HB_SIZE ulStrLen )
 /* generates the pcode to push a symbol on the virtual machine stack */
 void hb_compGenPushSymbol( char * szSymbolName, void * Namespace, int iFlags )
 {
-   USHORT wSym;
+   USHORT wSym = 0;
 
    hb_compSymbolAdd( szSymbolName, &wSym, Namespace, iFlags );
 
