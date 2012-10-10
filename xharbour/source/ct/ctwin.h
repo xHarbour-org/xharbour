@@ -53,6 +53,19 @@
 #ifndef HB_CTWIN_H_
 #define HB_CTWIN_H_
 
+#define HB_CTW_UNDEF          -1
+#define HB_CTW_HIDDEN         0
+#define HB_CTW_VISIBLE        1
+
+#define HB_CTW_SHADOW_OFF     -1
+#define HB_CTW_SHADOW_UNDEF   -2
+#define HB_CTW_SHADOW_EXT     -3
+#define HB_CTW_SHADOW_EXT2    -4
+
+#define HB_CTW_BOTTOM         0
+#define HB_CTW_DEFAULT        1
+#define HB_CTW_TOP            2
+
 HB_EXTERN_BEGIN
 
 extern HB_EXPORT BOOL hb_ctwInit( void );
@@ -74,6 +87,8 @@ extern HB_EXPORT int  hb_ctwMoveWindow( int iWindow, int iRow, int iCol );
 extern HB_EXPORT int  hb_ctwCenterWindow( int iWindow, BOOL fCenter );
 extern HB_EXPORT int  hb_ctwAddWindowBox( int iWindow, BYTE * szBox, int iColor );
 extern HB_EXPORT int  hb_ctwLastKey( void );
+extern HB_EXPORT int  hb_ctwChangeWindowHandle( int iNewWindow );
+extern HB_EXPORT int  hb_ctwGetWindowStack( const int ** piStack );
 
 HB_EXTERN_END
 

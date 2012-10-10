@@ -8,6 +8,41 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-10 19:18 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/hbip.c
+  * source/rtl/hbwinole.c
+  * source/rtl/errorsys.prg
+  * source/ct/ctmisc.prg
+  * source/odbc/odbc.c
+  * contrib/tiff/tif_dirinfo.c
+  * contrib/tiff/tif_predict.c
+  * contrib/tiff/tif_open.c
+  * contrib/tiff/tif_win32.c
+  * contrib/pdflite/tiff/tif_fax3.c
+    ! pacify GCC64 warnings
+
+  * source/ct/ctwfunc.c
+  * source/ct/ctwin.c
+  * source/ct/ctwin.h
+    + added undocumented CT3 window functions (borrowed from Harbour):
+         WALIAS( <nHandle> ) -> <nHandle> | -1
+            change current window handle to <nHandle>
+            if <nHandle> is not used by other window.
+            return <nHandle> on success or -1 to indicate error.
+            Warning: I replicated CT3 limit here so <nHandle>
+                     cannot be bigger then 255
+         WLIST() -> <cHandleList>
+         _WSTACK() -> <cHandleList>
+            return string with window handles in each character,
+            the ASCII value of the first character is handle of the
+            most bottm window and the last character is the top window.
+            Warning: this is compatibility only function
+                     which works correctly for first 255 windows.
+                     Harbour does not have any internal limits on
+                     maximum number of windows so it's possible
+                     to create more then 255 windows and this function
+                     will return wrong results.
+
 2012-10-10 03:21 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/pdflite/tiff/tif_fax3.c
     ! pacify MSVC64 warnings

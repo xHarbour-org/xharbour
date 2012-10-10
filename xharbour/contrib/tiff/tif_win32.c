@@ -220,13 +220,21 @@ TIFFFdOpen(int ifd, const char* name, const char* mode)
 			break;
 		}
 	}
+#if defined(__MINGW32__) && defined(HB_OS_WIN_64)
+	tif = TIFFClientOpen(name, mode, (thandle_t)(int64)ifd,
+#else
 	tif = TIFFClientOpen(name, mode, (thandle_t)ifd,
+#endif
 			_tiffReadProc, _tiffWriteProc,
 			_tiffSeekProc, _tiffCloseProc, _tiffSizeProc,
 			fSuppressMap ? _tiffDummyMapProc : _tiffMapProc,
 			fSuppressMap ? _tiffDummyUnmapProc : _tiffUnmapProc);
 	if (tif)
+#if defined(__MINGW32__) && defined(HB_OS_WIN_64)
+		tif->tif_fd = (FILE*) (int64) ifd;
+#else
 		tif->tif_fd = (FILE*) ifd;
+#endif
 	return (tif);
 }
 
@@ -265,7 +273,11 @@ TIFFOpen(const char* name, const char* mode)
 		return ((TIFF *)0);
 	}
 
+#if defined(__MINGW32__) && defined(HB_OS_WIN_64)
+	tif = TIFFFdOpen((int)(int64)fd, name, mode);
+#else
 	tif = TIFFFdOpen((int)fd, name, mode);
+#endif
 	if(!tif)
 		CloseHandle(fd);
 	return tif;
@@ -320,7 +332,11 @@ TIFFOpenW(const wchar_t* name, const char* mode)
 				    NULL, NULL);
 	}
 
+#if defined(__MINGW32__) && defined(HB_OS_WIN_64)
+	tif = TIFFFdOpen((int)(int64)fd,
+#else
 	tif = TIFFFdOpen((int)fd,
+#endif
 			 (mbname != NULL) ? mbname : "<unknown>", mode);
 	if(!tif)
 		CloseHandle(fd);

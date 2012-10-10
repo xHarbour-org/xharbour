@@ -613,7 +613,11 @@ PredictorEncodeTile(TIFF* tif, uint8* bp0, tmsize_t cc0, uint16 s)
         {
             TIFFErrorExt(tif->tif_clientdata, module,
                          "Out of memory allocating " TIFF_SSIZE_FORMAT " byte temp buffer.",
+#if defined(__MINGW32__) && defined( HB_OS_WIN_64 )
+                         (long long int) cc0 );
+#else
                          (long int) cc0 );
+#endif
             return 0;
         }
         memcpy( working_copy, bp0, cc0 );

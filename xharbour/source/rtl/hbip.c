@@ -220,7 +220,8 @@ void hb_ipSetBufSize( HB_SOCKET_T hSocket, int iBufSend, int iBufRecv )
          setsockopt( ( unsigned ) hSocket, ( int ) SOL_SOCKET, ( int ) SO_RCVBUF, ( char const * ) ( SOCKOPT4 ) &value, ( int ) sizeof( value ) );
       }
    }
-   getsockopt( ( unsigned ) hSocket, ( int ) SOL_SOCKET, ( int ) SO_RCVBUF, ( char * ) ( SOCKOPT4 ) &value, ( int * ) len );
+   // getsockopt( ( unsigned ) hSocket, ( int ) SOL_SOCKET, ( int ) SO_RCVBUF, ( char * ) ( SOCKOPT4 ) &value, ( int * ) len );
+   getsockopt( ( unsigned ) hSocket, ( int ) SOL_SOCKET, ( int ) SO_RCVBUF, ( char * ) ( SOCKOPT4 ) &value, &len );
 }
 
 int hb_ipDataReady( HB_SOCKET_T hSocket, int timeout )

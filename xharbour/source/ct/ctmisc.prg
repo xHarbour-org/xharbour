@@ -141,7 +141,8 @@ HB_FUNC( EXENAME )
 {
    char szBuffer[ MAX_PATH + 1 ] = {0} ;
 
-   GetModuleFileName( ISNIL(1) ? GetModuleHandle( NULL ) : (HMODULE) hb_parnl( 1 ), szBuffer ,MAX_PATH );
+   // GetModuleFileName( ISNIL(1) ? GetModuleHandle( NULL ) : (HMODULE) hb_parnl( 1 ), szBuffer ,MAX_PATH );
+   GetModuleFileName( ISNIL(1) ? GetModuleHandle( NULL ) : (HMODULE) hb_parns( 1 ), szBuffer ,MAX_PATH );
 
    hb_retc( szBuffer );
 }

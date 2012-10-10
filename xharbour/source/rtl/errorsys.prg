@@ -696,7 +696,11 @@ HB_FUNC( SETUNHANDLEDEXCEPTIONFILTER )
    pDefaultHandler = SetUnhandledExceptionFilter( PRGUnhandledExceptionFilter );
    //TraceLog( NULL, "Default: %p\n", pDefaultHandler );
 #if defined( HB_OS_WIN_64 )
-   hb_retnl( ( long ) pDefaultHandler );
+   #if defined( __MINGW32__ )
+      hb_retnl( ( HB_LONG ) pDefaultHandler );
+   #else
+      hb_retnl( ( long ) pDefaultHandler );
+   #endif
 #else
    hb_retnl( (LONG) pDefaultHandler );
 #endif

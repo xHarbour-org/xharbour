@@ -72,6 +72,9 @@ static HB_GT_FUNCS   SuperTable;
 #define HB_CTWIN_MAXROWS   255
 #define HB_CTWIN_MAXCOLS   255
 
+#define HB_GTCTW_GET(p)       ( ( PHB_GTCTW ) HB_GTLOCAL( p ) )
+#define HB_CTW_GETCURRENT(p)  hb_ctw_CurrentWindow(p)
+
 typedef struct
 {
    int iHandle;
@@ -1872,6 +1875,85 @@ int  hb_ctwLastKey( void )
          hb_ctw_Init( pGT );
    }
    return s_iLastKey;
+}
+
+static int hb_ctw_ChangeWindowHandle( PHB_GT pGT, int iNewWindow )
+{
+   int iWindow, i;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_ctw_ChangeWindowHandle(%p,%d)", pGT, iNewWindow));
+
+   iWindow = HB_CTW_GETCURRENT( pGT );
+   if( iWindow != iNewWindow )
+   {
+      if( iWindow > 0 && iNewWindow > 0 && iNewWindow <= 255 &&
+          ( iNewWindow > s_iMaxWindow ||
+            s_windows[ iNewWindow ] == NULL ) )
+      {
+         PHB_CT_WND pWnd = s_windows[ iWindow ];
+
+         if( iNewWindow > s_iMaxWindow )
+         {
+            i = s_iMaxWindow;
+            while( iNewWindow > s_iMaxWindow )
+               s_iMaxWindow += HB_CTWIN_ALLOC;
+            s_windows = ( PHB_CT_WND * ) hb_xrealloc( s_windows, ( s_iMaxWindow + 1 ) * sizeof( PHB_CT_WND ) );
+            s_windowStack = ( int * ) hb_xrealloc( s_windowStack, s_iMaxWindow * sizeof( int ) );
+            do
+            {
+               s_windows[ i + 1 ] = NULL;
+               s_windowStack[ i ] = 0;
+            }
+            while( ++i < s_iMaxWindow );
+         }
+         pWnd->iHandle = iNewWindow;
+         s_windows[ iWindow ] = NULL;
+         s_windows[ iNewWindow ] = pWnd;
+
+         i = s_iOpenWindows - 1;
+         while( i >= 0 && s_windowStack[ i ] != iWindow )
+            --i;
+         if( i >= 0 )
+         {
+            s_windowStack[ i ] = iNewWindow;
+            if( !pWnd->fHidden )
+            {
+               if( pWnd->iShadowAttr == HB_CTW_SHADOW_EXT2 )
+                  i = 0;
+               hb_ctw_RemapAllWindows( pGT );
+            }
+         }
+      }
+      else
+         iNewWindow = -1;
+   }
+   return iNewWindow;
+}
+
+int hb_ctwChangeWindowHandle( int iNewWindow )
+{
+   int    iResult = -1;
+   PHB_GT pGT     = hb_gt_Base();
+
+   if( pGT )
+   {
+      iResult = hb_ctw_ChangeWindowHandle( pGT, iNewWindow );
+   }
+   return iResult;
+}
+
+int hb_ctwGetWindowStack( const int ** piStack )
+{
+   int    iResult = -1;
+   PHB_GT pGT     = hb_gt_Base();
+
+   if( pGT )
+   {
+      *piStack = s_windowStack;
+      iResult  = s_iOpenWindows;
+   }
+
+   return iResult;
 }
 
 HB_EXTERN_END

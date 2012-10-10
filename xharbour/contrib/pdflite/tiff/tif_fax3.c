@@ -92,7 +92,11 @@ typedef struct {
 
 #define	is2DEncoding(sp) \
 	(sp->b.groupoptions & GROUP3OPT_2DENCODING)
+#if defined(__MINGW32__) && defined(HB_OS_WIN_64)
+#define	isAligned(p,t)	((((unsigned long long)(p)) & (sizeof (t)-1)) == 0)
+#else
 #define	isAligned(p,t)	((((unsigned long)(p)) & (sizeof (t)-1)) == 0)
+#endif
 
 /*
  * Group 3 and Group 4 Decoding.
