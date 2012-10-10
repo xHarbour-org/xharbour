@@ -1918,8 +1918,10 @@ static int hb_ctw_ChangeWindowHandle( PHB_GT pGT, int iNewWindow )
             s_windowStack[ i ] = iNewWindow;
             if( !pWnd->fHidden )
             {
+               #if 0
                if( pWnd->iShadowAttr == HB_CTW_SHADOW_EXT2 )
                   i = 0;
+               #endif
                hb_ctw_RemapAllWindows( pGT );
             }
          }
