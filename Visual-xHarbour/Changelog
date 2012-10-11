@@ -8,6 +8,9 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-11 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed ToolStripComboBox to have all same properties as a ComboBox
+
 2012-10-10 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed DateTimePicker to accept ESCAPE keystrokes and dispatch the correct
      event and not to force ::xBlankDate := .F. if the return from the event is 0.

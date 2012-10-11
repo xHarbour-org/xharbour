@@ -2774,7 +2774,7 @@ RETURN CallNextHookEx( s_hMenuDialogHook, nCode, nwParam, nlParam)
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
 
-CLASS ToolStripComboBox INHERIT ComboBox, ToolStripItem
+CLASS ToolStripComboBox INHERIT ToolStripItem, ComboBox
    PROPERTY Width         INDEX 3 READ xWidth  WRITE __SetSizePos      DEFAULT 25
    PROPERTY Height        INDEX 4 READ xHeight WRITE __SetSizePos      DEFAULT 0
    PROPERTY Alignment     READ xAlignment DEFAULT 1
@@ -2795,14 +2795,14 @@ ENDCLASS
 
 METHOD Init( oParent ) CLASS ToolStripComboBox
    ::__xCtrlName   := "ToolStripComboBox"
-   ::Super:Init( oParent )
+   ::ComboBox:Init( oParent )
    ::Width         := 100
    ::Events        := {  {"Command", { { "OnCBNSelEndOk", "", "" } } } }
 RETURN Self
 
 METHOD Create() CLASS ToolStripComboBox
    ::ToolStripItem:Create()
-   ::Super:Create()
+   ::ComboBox:Create()
    ::Top := ((::Parent:Height-5) - ::SelectionHeight)/2
    ::SelectionHeight := ::SelectionHeight//::Parent:Height - 10
 
