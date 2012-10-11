@@ -43,7 +43,7 @@
  *
  * NOTE: The second field (field_readcount) and third field (field_writecount)
  *       sometimes use the values TIFF_VARIABLE (-1), TIFF_VARIABLE2 (-3)
- *       and TIFFTAG_SPP (-2). The macros should be used but would throw off
+ *       and TIFF_SPP (-2). The macros should be used but would throw off
  *       the formatting of the code, so please interprete the -1, -2 and -3
  *       values accordingly.
  */
@@ -196,9 +196,23 @@ tiffFields[] = {
 	{ TIFFTAG_ASSHOTPREPROFILEMATRIX, -1, -1, TIFF_SRATIONAL, 0, TIFF_SETGET_C16_FLOAT, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 1, "AsShotPreProfileMatrix", NULL },
 	{ TIFFTAG_CURRENTICCPROFILE, -1, -1, TIFF_UNDEFINED, 0, TIFF_SETGET_C16_UINT8, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 1, "CurrentICCProfile", NULL },
 	{ TIFFTAG_CURRENTPREPROFILEMATRIX, -1, -1, TIFF_SRATIONAL, 0, TIFF_SETGET_C16_FLOAT, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 1, "CurrentPreProfileMatrix", NULL },
+	{ TIFFTAG_PERSAMPLE, 0, 0, TIFF_SHORT, 0, TIFF_SETGET_UNDEFINED, TIFF_SETGET_UNDEFINED, FIELD_PSEUDO, TRUE, FALSE, "PerSample", NULL},
+	/* end DNG tags */
+	/* begin TIFF/FX tags */
+    { TIFFTAG_INDEXED, 1, 1, TIFF_SHORT, 0, TIFF_SETGET_UINT16, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "Indexed" },
+    { TIFFTAG_GLOBALPARAMETERSIFD, 1, 1, TIFF_IFD, 0, TIFF_SETGET_UINT32, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "GlobalParametersIFD", NULL },
+    { TIFFTAG_PROFILETYPE, 1, 1, TIFF_LONG, 0, TIFF_SETGET_UINT32, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "ProfileType", NULL },
+    { TIFFTAG_FAXPROFILE, 1, 1, TIFF_BYTE, 0, TIFF_SETGET_UINT8, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "FaxProfile", NULL },
+    { TIFFTAG_CODINGMETHODS, 1, 1, TIFF_LONG, 0, TIFF_SETGET_UINT32, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "CodingMethods", NULL },
+    { TIFFTAG_VERSIONYEAR, 4, 4, TIFF_BYTE, 0, TIFF_SETGET_C0_UINT8, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "VersionYear", NULL },
+    { TIFFTAG_MODENUMBER, 1, 1, TIFF_BYTE, 0, TIFF_SETGET_UINT8, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "ModeNumber", NULL },
+    { TIFFTAG_DECODE, -1, -1, TIFF_SRATIONAL, 0, TIFF_SETGET_C16_FLOAT, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 1, "Decode", NULL },
+    { TIFFTAG_IMAGEBASECOLOR, -1, -1, TIFF_SHORT, 0, TIFF_SETGET_C16_UINT16, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 1, "ImageBaseColor", NULL },
+    { TIFFTAG_T82OPTIONS, 1, 1, TIFF_LONG, 0, TIFF_SETGET_UINT32, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "T82Options", NULL },
+    { TIFFTAG_STRIPROWCOUNTS, -1, -1, TIFF_LONG, 0, TIFF_SETGET_C16_UINT32, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 1, "StripRowCounts", NULL },
+    { TIFFTAG_IMAGELAYER, 2, 2, TIFF_LONG, 0, TIFF_SETGET_C0_UINT32, TIFF_SETGET_UNDEFINED, FIELD_CUSTOM, 0, 0, "ImageLayer", NULL },
 	/* end DNG tags */
 	/* begin pseudo tags */
-	{ TIFFTAG_PERSAMPLE, 0, 0, TIFF_SHORT, 0, TIFF_SETGET_UNDEFINED, TIFF_SETGET_UNDEFINED, FIELD_PSEUDO, TRUE, FALSE, "PerSample", NULL},
 };
 
 static TIFFField
@@ -354,7 +368,7 @@ _TIFFMergeFields(TIFF* tif, const TIFFField info[], uint32 n)
 {
 	static const char module[] = "_TIFFMergeFields";
 	static const char reason[] = "for fields array";
-	// TIFFField** tp;
+	/* TIFFField** tp; */
 	uint32 i;
 
         tif->tif_foundfield = NULL;
@@ -375,7 +389,7 @@ _TIFFMergeFields(TIFF* tif, const TIFFField info[], uint32 n)
 		return 0;
 	}
 
-	//tp = tif->tif_fields + tif->tif_nfields;
+	/* tp = tif->tif_fields + tif->tif_nfields; */
 	for (i = 0; i < n; i++) {
 		const TIFFField *fip =
 			TIFFFindField(tif, info[i].field_tag, TIFF_ANY);
@@ -560,6 +574,42 @@ TIFFFieldWithName(TIFF* tif, const char *field_name)
 			     "Internal error, unknown tag %s", field_name);
 	}
 	return (fip);
+}
+
+uint32
+TIFFFieldTag(const TIFFField* fip)
+{
+	return fip->field_tag;
+}
+
+const char *
+TIFFFieldName(const TIFFField* fip)
+{
+	return fip->field_name;
+}
+
+TIFFDataType
+TIFFFieldDataType(const TIFFField* fip)
+{
+	return fip->field_type;
+}
+
+int
+TIFFFieldPassCount(const TIFFField* fip)
+{
+	return fip->field_passcount;
+}
+
+int
+TIFFFieldReadCount(const TIFFField* fip)
+{
+	return fip->field_readcount;
+}
+
+int
+TIFFFieldWriteCount(const TIFFField* fip)
+{
+	return fip->field_writecount;
 }
 
 const TIFFField*

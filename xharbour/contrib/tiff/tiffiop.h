@@ -201,13 +201,6 @@ struct tiff {
 	 * setting up an old tag extension scheme. */
 	TIFFFieldArray*      tif_fieldscompat;
 	size_t               tif_nfieldscompat;
-        /* for pdflite lib*/
-        void*           pdflib_opaque;  /* for PDFlib memory handling */
-        TIFFmallocHandler pdflib_malloc;  /* for PDFlib memory handling */
-        TIFFreallocHandler pdflib_realloc;  /* for PDFlib memory handling */
-        TIFFfreeHandler pdflib_free;    /* for PDFlib memory handling */
-        TIFFErrorHandler pdflib_error;  /* for PDFlib */
-        TIFFErrorHandler pdflib_warn;  /* for PDFlib */
 };
 
 #define isPseudoTag(t) (t > 0xffff)            /* is tag value normal or pseudo */

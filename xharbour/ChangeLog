@@ -8,6 +8,23 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-11 08:28 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/tiff/tif_pixarlog.c
+  * contrib/tiff/tif_packbits.c
+  * contrib/tiff/tif_fax3.c
+  * contrib/tiff/tif_jpeg.c
+  * contrib/tiff/tif_dirwrite.c
+  * contrib/tiff/tif_read.c
+  * contrib/tiff/tiffio.h
+  * contrib/tiff/tiffiop.h
+  * contrib/tiff/tif_write.c
+  * contrib/tiff/tif_dirinfo.c
+  * contrib/tiff/tif_dirread.c
+  * contrib/tiff/tiff.h
+  * contrib/tiff/tif_print.c
+  * contrib/tiff/tiffvers.h
+    ! updated to version 4.0.3
+
 2012-10-11 02:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/harbour.c
     ! variable initialization to pacify GCC warnings

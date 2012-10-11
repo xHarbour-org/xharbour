@@ -767,7 +767,7 @@ static enum TIFFReadDirEntryErr TIFFReadDirEntryArray(TIFF* tif, TIFFDirEntry* d
 	int typesize;
 	uint32 datasize;
 	void* data;
-	typesize=TIFFDataWidth((TIFFDataType)direntry->tdir_type);
+	typesize=TIFFDataWidth(direntry->tdir_type);
 	if ((direntry->tdir_count==0)||(typesize==0))
 	{
 		*value=0;
@@ -3194,7 +3194,7 @@ static enum TIFFReadDirEntryErr TIFFReadDirEntryCheckRangeLongSlong(int32 value)
 /*
  * Largest 32-bit unsigned integer value.
  */
-#if defined(__WIN32__) && (defined(_MSC_VER)||defined(__BORLANDC__))
+#if defined(__WIN32__) && defined(_MSC_VER)
 # define TIFF_UINT32_MAX 0xFFFFFFFFI64
 #else
 # define TIFF_UINT32_MAX 0xFFFFFFFFLL
@@ -3286,7 +3286,7 @@ TIFFReadDirEntryCheckRangeLong8Slong8(int64 value)
 /*
  * Largest 64-bit signed integer value.
  */
-#if defined(__WIN32__) && (defined(_MSC_VER)||defined(__BORLANDC__))
+#if defined(__WIN32__) && defined(_MSC_VER)
 # define TIFF_INT64_MAX 0x7FFFFFFFFFFFFFFFI64
 #else
 # define TIFF_INT64_MAX 0x7FFFFFFFFFFFFFFFLL
@@ -3313,10 +3313,15 @@ TIFFReadDirEntryData(TIFF* tif, uint64 offset, tmsize_t size, void* dest)
 		if (!ReadOK(tif,dest,size))
 			return(TIFFReadDirEntryErrIo);
 	} else {
-		tmsize_t ma,mb;
-		ma=(tmsize_t)offset;
+		size_t ma,mb;
+		ma=(size_t)offset;
 		mb=ma+size;
-		if (((uint64)ma!=offset)||(mb<ma)||(mb<size)||(mb>tif->tif_size))
+		if (((uint64)ma!=offset)
+		    || (mb < ma)
+		    || (mb - ma != (size_t) size)
+		    || (mb < (size_t)size)
+		    || (mb > (size_t)tif->tif_size)
+		    )
 			return(TIFFReadDirEntryErrIo);
 		_TIFFmemcpy(dest,tif->tif_base+ma,size);
 	}
@@ -3435,7 +3440,7 @@ TIFFReadDirectory(TIFF* tif)
 	if (!dircount)
 	{
 		TIFFErrorExt(tif->tif_clientdata,module,
-		    "Failed to read directory at offset " TIFF_UINT64_FORMAT,(UINT64) nextdiroff);
+		    "Failed to read directory at offset " TIFF_UINT64_FORMAT,nextdiroff);
 		return 0;
 	}
 	TIFFReadDirectoryCheckOrder(tif,dir,dircount);
@@ -4165,7 +4170,7 @@ TIFFReadCustomDirectory(TIFF* tif, toff_t diroff,
 	if (!dircount)
 	{
 		TIFFErrorExt(tif->tif_clientdata,module,
-		    "Failed to read custom directory at offset " TIFF_UINT64_FORMAT,(UINT64) diroff);
+		    "Failed to read custom directory at offset " TIFF_UINT64_FORMAT,diroff);
 		return 0;
 	}
 	TIFFFreeDirectory(tif);
@@ -4412,14 +4417,14 @@ CheckDirCount(TIFF* tif, TIFFDirEntry* dir, uint32 count)
 		TIFFWarningExt(tif->tif_clientdata, tif->tif_name,
 	"incorrect count for field \"%s\" (" TIFF_UINT64_FORMAT ", expecting %u); tag ignored",
 		    fip ? fip->field_name : "unknown tagname",
-		    (UINT64) dir->tdir_count, count);
+		    dir->tdir_count, count);
 		return (0);
 	} else if ((uint64)count < dir->tdir_count) {
 		const TIFFField* fip = TIFFFieldWithTag(tif, dir->tdir_tag);
 		TIFFWarningExt(tif->tif_clientdata, tif->tif_name,
 	"incorrect count for field \"%s\" (" TIFF_UINT64_FORMAT ", expecting %u); tag trimmed",
 		    fip ? fip->field_name : "unknown tagname",
-		    (UINT64) dir->tdir_count, count);
+		    dir->tdir_count, count);
 		dir->tdir_count = count;
 		return (1);
 	}
@@ -4738,7 +4743,7 @@ TIFFFetchNormalTag(TIFF* tif, TIFFDirEntry* dp, int recover)
 						if ((uint32)dp->tdir_count+1!=dp->tdir_count+1)
 							o=NULL;
 						else
-							o=(uint8 *)_TIFFmalloc((uint32)dp->tdir_count+1);
+							o=_TIFFmalloc((uint32)dp->tdir_count+1);
 						if (o==NULL)
 						{
 							if (data!=NULL)
@@ -4761,7 +4766,7 @@ TIFFFetchNormalTag(TIFF* tif, TIFFDirEntry* dp, int recover)
 			break;
 		case TIFF_SETGET_UINT8:
 			{
-				uint8 data = 0;
+				uint8 data=0;
 				assert(fip->field_readcount==1);
 				assert(fip->field_passcount==0);
 				err=TIFFReadDirEntryByte(tif,dp,&data);
@@ -4826,7 +4831,7 @@ TIFFFetchNormalTag(TIFF* tif, TIFFDirEntry* dp, int recover)
 			break;
 		case TIFF_SETGET_DOUBLE:
 			{
-				double data = 0;
+				double data;
 				assert(fip->field_readcount==1);
 				assert(fip->field_passcount==0);
 				err=TIFFReadDirEntryDouble(tif,dp,&data);
@@ -4855,8 +4860,12 @@ TIFFFetchNormalTag(TIFF* tif, TIFFDirEntry* dp, int recover)
 				uint16* data;
 				assert(fip->field_readcount==2);
 				assert(fip->field_passcount==0);
-				if (dp->tdir_count!=2)
+				if (dp->tdir_count!=2) {
+					TIFFWarningExt(tif->tif_clientdata,module,
+						       "incorrect count for field \"%s\", expected 2, got %d",
+						       fip->field_name,(int)dp->tdir_count);
 					return(0);
+				}
 				err=TIFFReadDirEntryShortArray(tif,dp,&data);
 				if (err==TIFFReadDirEntryErrOk)
 				{
@@ -4873,8 +4882,12 @@ TIFFFetchNormalTag(TIFF* tif, TIFFDirEntry* dp, int recover)
 				uint8* data;
 				assert(fip->field_readcount>=1);
 				assert(fip->field_passcount==0);
-				if (dp->tdir_count!=(uint64)fip->field_readcount)
-                                    /* corrupt file */;
+				if (dp->tdir_count!=(uint64)fip->field_readcount) {
+					TIFFWarningExt(tif->tif_clientdata,module,
+						       "incorrect count for field \"%s\", expected %d, got %d",
+						       fip->field_name,(int) fip->field_readcount, (int)dp->tdir_count);
+					return 0;
+				}
 				else
 				{
 					err=TIFFReadDirEntryByteArray(tif,dp,&data);
