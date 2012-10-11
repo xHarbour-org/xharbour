@@ -1,5 +1,10 @@
 /* PDFlib GmbH cvsid:
  * $Id$ */
+
+#if defined(__POCC__)
+  #pragma warn (disable:2030)
+#endif
+
 #include "pdflite_tiffiop.h"
 #ifdef OJPEG_SUPPORT
 
@@ -2021,7 +2026,7 @@ OJPEGVSetField(register TIFF *tif,ttag_t tag,va_list ap)
 	  {
             if ( (td->td_refblackwhite =
                   (float *) _TIFFmalloc(6*sizeof(float))) )
-              { register long top = 1 << td->td_bitspersample;
+              { register long top = ( 1 << td->td_bitspersample );
 
                 td->td_refblackwhite[0] = 0;
                 td->td_refblackwhite[1] = td->td_refblackwhite[3] =
@@ -2202,8 +2207,7 @@ OJPEGVSetField(register TIFF *tif,ttag_t tag,va_list ap)
 				* sizeof(uint16));
                if(sp->jpeglosslesspredictors==NULL){return(0);}
                for(i2=0;i2<sp->jpeglosslesspredictors_length;i2++){
-                ((uint16*)sp->jpeglosslesspredictors)[i2] =
-			((uint16*)sp->cinfo.d.Ss)[i2];
+                ((uint16*)sp->jpeglosslesspredictors)[i2] = ((uint16*)sp->cinfo.d.Ss)[i2];
                }
                sp->jpeglosslesspredictors_length*=sizeof(uint16);
                break;
@@ -2626,7 +2630,9 @@ OJPEGCleanUp(register TIFF *tif)
 	jmp_buf pdflib_jbuf;
 #endif
 
-    if ( (sp = OJState(tif)) )
+    /* if ( (sp = OJState(tif)) ) */
+    sp = OJState(tif);
+    if ( sp )
       {
         CALLVJPEG(sp,jpeg_destroy(&sp->cinfo.comm)); /* Free JPEG Lib. vars. */
         if (sp->jpegtables) {_TIFFfree(sp->jpegtables);sp->jpegtables=0;}

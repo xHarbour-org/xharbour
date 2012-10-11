@@ -995,7 +995,9 @@ JPEGDecodeRaw(TIFF* tif, tidata_t buf, tsize_t cc, tsample_t s)
     (void) s;
 
     /* data is expected to be read in multiples of a scanline */
-    if ( (nrows = sp->cinfo.d.image_height) ) {
+    /* if ( (nrows = sp->cinfo.d.image_height) ) { */
+    nrows = sp->cinfo.d.image_height;
+    if ( nrows ) {
         /* Cb,Cr both have sampling factors 1, so this is correct */
         JDIMENSION clumps_per_line = sp->cinfo.d.comp_info[1].downsampled_width;
         int samples_per_clump = sp->samplesperclump;

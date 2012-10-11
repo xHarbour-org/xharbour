@@ -9,6 +9,19 @@
 #
 #===============================================================================
 
+!if ("$(__COMP__)"=="__XCC__")
+CC        =XCC
+LINKEXE   =XLINK
+LIBEXE    =XLIB
+OLDFLAG   =
+HB_MACHINE=IX86
+!else
+CC        =POCC
+LINKEXE   =POLINK
+LIBEXE    =POLIB
+OLDFLAG   =/Go
+!endif
+
 !ifndef DEL
 DEL=del
 !endif
@@ -33,7 +46,9 @@ HB_MACHINE=AMD64
 WS32DEF=winmake\ws2_32pc.def
 !else
 HB_TARGET=/Tx86-coff
+!if !("$(__COMP__)"=="__XCC__")
 HB_MACHINE=X86
+!endif
 !endif
 
 # Comment the following line when using version lower than 5.00
@@ -56,6 +71,9 @@ INCLUDE_DIR =$(INCLUDE_DIR) /I"$(ZLIB_DIR)" /I"$(PNG_DIR)" /I"$(PDFLITE_DIR)\inc
 INCLUDE_DIR =$(INCLUDE_DIR) /I"$(TIFF_DIR)" /I"$(JPEG_DIR)"
 HARBOURFLAGS=$(HARBOURFLAGS) $(INCLUDE_DIR) -q0 -w2 -es2 -gc0
 HARBOURFLAGS=$(HARBOURFLAGS) $(HB64FLAGS)
+!if ("$(__COMP__)"=="__XCC__")
+HARBOURFLAGS=$(HARBOURFLAGS) -d"__XCC__"
+!endif
 #-------------------------------------------------------------------------------
 # AJ: 2008-04-26
 # NOTE ON HB_CMD/HB_CMD_MAIN:
@@ -68,7 +86,7 @@ HARBOURFLAGS=$(HARBOURFLAGS) $(HB64FLAGS)
 HB_CMD       =$(HARBOUR_EXE) /n1 $(LINEFLAGS) $(HB_MT_FLAGS) $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN  =$(HARBOUR_EXE) /n0 $(LINEFLAGS) $(HB_MT_FLAGS) $(HARBOURFLAGS) $** -o$@
 
-CLIBFLAGS    =$(CLIBFLAGS) /Ze /Zx $(HB_TARGET) /Go $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"NULL=0" /D"HAVE_CONFIG_H"
+CLIBFLAGS    =$(CLIBFLAGS) /Ze /Zx $(HB_TARGET) $(OLDFLAG) $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"NULL=0" /D"HAVE_CONFIG_H"
 !ifndef HB_NO_FM_DL_ALLOC
 CLIBFLAGS    =/D"HB_FM_DL_ALLOC" $(CLIBFLAGS)
 !endif
@@ -79,15 +97,18 @@ CLIBFLAGS    =/D"HB_VM_ALL" $(CLIBFLAGS)
 CLIBFLAGS    =/D"HB_NO_DV_MEMCPY" $(CLIBFLAGS)
 !endif
 CLIBFLAGS=$(CLIBFLAGS) $(C64FLAGS)
-CC_CMD       =POCC $(__MT__) $(CLIBFLAGS) /Fo$@ $**
+!if ("$(__COMP__)"=="__XCC__")
+CLIBFLAGS=$(CLIBFLAGS) -D"__XCC__"
+!endif
+CC_CMD       =$(CC) $(__MT__) $(CLIBFLAGS) /Fo$@ $**
 CCC_CMD      =$(CC_CMD)
-CC_CMD_FMSTAT=POCC $(__MT__) /DHB_FM_STATISTICS $(CLIBFLAGS) /Fo$@ $**
+CC_CMD_FMSTAT=$(CC) $(__MT__) /DHB_FM_STATISTICS $(CLIBFLAGS) /Fo$@ $**
 #--------------------------------------------------------
 # Pelles C v.5x need /alternatename flag. It seems a bug.
 #--------------------------------------------------------
 LINKERFLAGS  =/LIBPATH:$(LIB_DIR) /LIBPATH:"$(CC_DIR)\LIB" /LIBPATH:"$(CC_DIR)\LIB\WIN$(HB_ARCH)" /MACHINE:$(HB_MACHINE) /SUBSYSTEM:CONSOLE
-LINK_CMD     =POLINK /OUT:$@ $** $(LINKERFLAGS)
-LIB_CMD      =POLIB /OUT:$@ $**
+LINK_CMD     =$(LINKEXE) /OUT:$@ $** $(LINKERFLAGS)
+LIB_CMD      =$(LIBEXE) /OUT:$@ $**
 BISON_CMD1   =bison -v -d $** -o$@
 BISON_CMD2   =bison -v -p hb_comp -d $** -o$@
 HRB_LIBS     =$(COMMON_LIB) $(PP_LIB) $(COMPILER_LIB)
@@ -98,6 +119,30 @@ CMN_LIBS     =$(COMMON_LIB)
 # Macro Definitions
 #===============================================================================
 !include winmake\common.mak
+
+# XCC cannot compiler PDFLITE, due internal compiler error
+!if ("$(__COMP__)"=="__XCC__")
+PDFLITE_LIB=
+HBDOC_EXE_OBJS=\
+	$(OBJ_DIR)\hbdoc.obj\
+	$(OBJ_DIR)\genasc.obj\
+	$(OBJ_DIR)\teeasc.obj\
+	$(OBJ_DIR)\genhpc.obj\
+	$(OBJ_DIR)\genhtm.obj\
+	$(OBJ_DIR)\genchm.obj\
+	$(OBJ_DIR)\genng.obj\
+	$(OBJ_DIR)\genos2.obj\
+	$(OBJ_DIR)\genrtf.obj\
+	$(OBJ_DIR)\gentrf.obj\
+	$(OBJ_DIR)\html.obj\
+	$(OBJ_DIR)\ng.obj\
+	$(OBJ_DIR)\os2.obj\
+	$(OBJ_DIR)\rtf.obj\
+	$(OBJ_DIR)\troff.obj\
+	$(OBJ_DIR)\fclass1.obj\
+	$(OBJ_DIR)\ffile1.obj\
+	$(OBJ_DIR)\ft_funcs.obj
+!endif
 
 # Hack for 64-bit compilation -> unresolved: __WSAFDIsSet
 !if ("$(HB_ARCH)"=="64")
@@ -113,7 +158,6 @@ WS2_32PC_LIB=$(LIB_DIR)\ws2_32pc.lib
 PROJECT=$(PROJECT) $(FMSTAT_LIB)
 !endif
 
-
 !if ("$(HB_ARCH)"=="64")
 PROJECT=$(PROJECT) $(WS2_32PC_LIB)
 !endif
@@ -125,7 +169,7 @@ ALL: $(PROJECT)
 #===============================================================================
 !if ("$(HB_ARCH)"=="64")
 $(WS2_32PC_LIB) : $(WS32DEF)
-	POLIB /DEF:$(WS32DEF) /OUT:$(WS2_32PC_LIB) /MACHINE:AMD64
+	$(LIBEXE) /DEF:$(WS32DEF) /OUT:$(WS2_32PC_LIB) /MACHINE:AMD64
 !endif
 
 $(COMPILER_LIB) : $(COMPILER_LIB_OBJS)
@@ -259,8 +303,10 @@ $(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
 $(FMSTAT_LIB) : $(FMSTAT_LIB_OBJS)
 	$(LIB_CMD)
 
+!if !("$(__COMP__)"=="__XCC__")
 $(PDFLITE_LIB) : $(PDFLITE_LIB_OBJS)
         $(LIB_CMD)
+!endif
 
 $(PNG_LIB) : $(PNG_LIB_OBJS)
 	$(LIB_CMD)
@@ -278,6 +324,29 @@ $(TIFF_LIB) : $(TIFF_LIB_OBJS)
 # Macro Definitions
 #===============================================================================
 !include winmake\common.mak
+
+!if ("$(__COMP__)"=="__XCC__")
+HBDOC_EXE_OBJS=\
+	$(OBJ_DIR)\hbdoc.obj\
+	$(OBJ_DIR)\genasc.obj\
+	$(OBJ_DIR)\teeasc.obj\
+	$(OBJ_DIR)\genhpc.obj\
+	$(OBJ_DIR)\genhtm.obj\
+	$(OBJ_DIR)\genchm.obj\
+	$(OBJ_DIR)\genng.obj\
+	$(OBJ_DIR)\genos2.obj\
+	$(OBJ_DIR)\genrtf.obj\
+	$(OBJ_DIR)\gentrf.obj\
+	$(OBJ_DIR)\html.obj\
+	$(OBJ_DIR)\ng.obj\
+	$(OBJ_DIR)\os2.obj\
+	$(OBJ_DIR)\rtf.obj\
+	$(OBJ_DIR)\troff.obj\
+	$(OBJ_DIR)\fclass1.obj\
+	$(OBJ_DIR)\ffile1.obj\
+	$(OBJ_DIR)\ft_funcs.obj
+PDFLITE_LIB=
+!endif
 
 # Hack for 64-bit compilation -> unresolved: __WSAFDIsSet
 !if ("$(HB_ARCH)"=="64")
@@ -299,12 +368,17 @@ INCLUDE_DIR =/I"include" /I"$(CC_DIR)\include" /I"$(CC_DIR)\include\win" /I"$(OB
 INCLUDE_DIR =$(INCLUDE_DIR) /I"$(ZLIB_DIR)" /I"$(PNG_DIR)" /I"$(PDFLITE_DIR)\include"
 INCLUDE_DIR =$(INCLUDE_DIR) /I"$(JPEG_DIR)" /I"$(TIFF_DIR)"
 
+!if ("$(__COMP__)"=="__XCC__")
+__FLAGS=/NOEXPOBJ
+!else
+__FLAGS=/DEF:$(EXPORT_DEF) /IMPLIB:$(HARBOUR_DLL_LIB)
+!endif
+
 DLLFLAGS=\
-	/DEF:$(EXPORT_DEF)\
+	$(__FLAGS)\
 	/OUT:$(HARBOUR_DLL)\
 	/DLL\
 	/MACHINE:$(HB_MACHINE)\
-	/IMPLIB:$(HARBOUR_DLL_LIB)\
 	/LIBPATH:"$(CC_DIR)\LIB" /LIBPATH:$(LIB_DIR) /LIBPATH:"$(CC_DIR)\LIB\WIN$(HB_ARCH)"\
 	/SUBSYSTEM:WINDOWS\
 	$(HARBOUR_DLL_OBJS) $(WS2_32PC_LIB)
@@ -315,7 +389,7 @@ EXEFLAGS=\
 	/LIBPATH:$(LIB_DIR) /LIBPATH:"$(CC_DIR)\LIB\WIN$(HB_ARCH)"\
 	/SUBSYSTEM:CONSOLE
 
-CLIBFLAGS   =$(CLIBFLAGS) /Ze /Zx $(HB_TARGET) /Go $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"NULL=0" /D"HB_NO_DUPLICATE_HVMPROCESSSYMBOL" /D"__EXPORT__" /D"HAVE_CONFIG_H"
+CLIBFLAGS   =$(CLIBFLAGS) /Ze /Zx $(HB_TARGET) $(OLDFLAG) $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"NULL=0" /D"HB_NO_DUPLICATE_HVMPROCESSSYMBOL" /D"__EXPORT__" /D"HAVE_CONFIG_H"
 HARBOURFLAGS=$(HARBOURFLAGS) -d__EXPORT__ -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 -gc0
 !ifndef HB_NO_FM_DL_ALLOC
 CLIBFLAGS    =/D"HB_FM_DL_ALLOC" $(CLIBFLAGS)
@@ -328,14 +402,18 @@ CLIBFLAGS    =/D"HB_NO_DV_MEMCPY" $(CLIBFLAGS)
 !endif
 CLIBFLAGS   =$(CLIBFLAGS) $(C64FLAGS)
 HARBOURFLAGS=$(HARBOURFLAGS) $(HB64FLAGS)
-CC_CMD      =POCC $(CLIBFLAGS) /Fo$@ $**
+!if ("$(__COMP__)"=="__XCC__")
+CLIBFLAGS=$(CLIBFLAGS) -D"__XCC__"
+HARBOURFLAGS=$(HARBOURFLAGS) -d"__XCC__"
+!endif
+CC_CMD      =$(CC) $(CLIBFLAGS) /Fo$@ $**
 CCC_CMD     =$(CC_CMD)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
-DLL_LINK_CMD=POLINK $(DLLFLAGS)
-DLLEXE_LINK_CMD=POLINK $(EXEFLAGS) /OUT:$@ $** $(USE_DLL_LIB) $(HARBOUR_DLL_LIB) $(ZLIB_LIB) $(PNG_LIB) $(PDFLITE_LIB)
+DLL_LINK_CMD=$(LINKEXE) $(DLLFLAGS)
+DLLEXE_LINK_CMD=$(LINKEXE) $(EXEFLAGS) /OUT:$@ $** $(USE_DLL_LIB) $(HARBOUR_DLL_LIB) $(ZLIB_LIB) $(PNG_LIB) $(PDFLITE_LIB)
 
 #===============================================================================
 # The Project
@@ -403,12 +481,16 @@ INCLUDE_DIR =$(INCLUDE_DIR) /I"$(SIXAPI_DIR)\include"
 HARBOURFLAGS=$(HARBOURFLAGS) $(INCLUDE_DIR) -q0 -w2 -es2 -gc0
 CLIBFLAGS   =$(CLIBFLAGS) $(C64FLAGS)
 HARBOURFLAGS=$(HARBOURFLAGS) $(HB64FLAGS)
+!if ("$(__COMP__)"=="__XCC__")
+CLIBFLAGS   =$(CLIBFLAGS) -D"__XCC__"
+HARBOURFLAGS=$(HARBOURFLAGS) -d"__XCC__"
+!endif
 HB_CMD      =$(HARBOUR_EXE) /n1 $(HARBOURFLAGS) $** -o$@
-CLIBFLAGS   =$(CLIBFLAGS) /Ze /Zx $(HB_TARGET) /Go $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"NULL=0" /D"_HAVE_SQLITE_CONFIG_H" /D"HARBOUR_CONF"
+CLIBFLAGS   =$(CLIBFLAGS) /Ze /Zx $(HB_TARGET) $(OLDFLAG) $(INCLUDE_DIR) /D"NEED_DUMMY_RETURN" /D"__WIN32__" /D"NULL=0" /D"_HAVE_SQLITE_CONFIG_H" /D"HARBOUR_CONF"
 CLIBFLAGS   =$(CLIBFLAGS) /D"HAVE_CONFIG_H" /D"MINILZO_HAVE_CONFIG_H"
-CC_CMD      =POCC $(__MT__) $(CLIBFLAGS) /Fo$@ $**
+CC_CMD      =$(CC) $(__MT__) $(CLIBFLAGS) /Fo$@ $**
 CCC_CMD     =$(CC_CMD)
-LIB_CMD     =POLIB /OUT:$@ $**
+LIB_CMD     =$(LIBEXE) /OUT:$@ $**
 
 #===============================================================================
 # Macro Definitions

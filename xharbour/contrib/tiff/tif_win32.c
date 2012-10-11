@@ -386,7 +386,7 @@ _TIFFmemcmp(const void* p1, const void* p2, tmsize_t c)
 
 #ifndef _WIN32_WCE
 
-#if (_MSC_VER < 1500)
+#if (_MSC_VER < 1500) && !defined( __XCC__ )
 #  define vsnprintf _vsnprintf
 #endif
 

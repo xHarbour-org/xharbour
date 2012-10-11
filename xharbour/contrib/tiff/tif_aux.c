@@ -321,6 +321,8 @@ _TIFFUInt64ToFloat(uint64 ui64)
 {
 	_Int64 i;
 
+	i.part.high = 0;
+
 	i.value = ui64;
 	if (i.part.high >= 0) {
 		return (float)i.value;
@@ -336,6 +338,8 @@ double
 _TIFFUInt64ToDouble(uint64 ui64)
 {
 	_Int64 i;
+
+	i.part.high = 0;
 
 	i.value = ui64;
 	if (i.part.high >= 0) {

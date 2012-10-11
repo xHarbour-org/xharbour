@@ -80,7 +80,9 @@
 #define HAVE_IO_H 1
 
 /* Define to 1 if you have the <search.h> header file. */
+#if !defined( __XCC__ )
 #define HAVE_SEARCH_H 1
+#endif
 
 /* Define to 1 if you have the `setmode' function. */
 #define HAVE_SETMODE 1

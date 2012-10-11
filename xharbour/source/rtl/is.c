@@ -257,7 +257,11 @@ HB_FUNC( ISASCII )
 
    if( szString != NULL )
    {
+#if defined( __XCC__ )
+      hb_retl( (unsigned)(( BYTE ) *szString) < 0x80 );
+#else
       hb_retl( isascii( ( BYTE ) *szString ) );
+#endif
    }
    else
       hb_retl( FALSE );

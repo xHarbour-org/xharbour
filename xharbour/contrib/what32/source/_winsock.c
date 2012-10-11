@@ -12,6 +12,9 @@
 #include "hbvm.h"
 // #include "hbstack.h"
 #include "hbapiitm.h"
+#if defined( __XCC__ )
+#define _MSWSOCK_H
+#endif
 #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
 #include <time.h>
 #include <winsock2.h>

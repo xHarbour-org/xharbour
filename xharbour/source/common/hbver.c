@@ -83,12 +83,21 @@
 #include "hbmemory.ch"
 #include "hbexemem.h"
 
+#if defined(__XCC__)
+#include "source/vm/dlmalloc.c"
+#include "contrib/tiff/tiffvers.h"
+#include "contrib/jpeg/jpeglib.h"
+#include "contrib/png/png.h"
+#include "source/rtl/pcre/pcre.h.generic"
+#include "source/rtl/zlib/zlib.h"
+#else
 #include "../source/vm/dlmalloc.c"
 #include "../contrib/tiff/tiffvers.h"
 #include "../contrib/jpeg/jpeglib.h"
 #include "../contrib/png/png.h"
 #include "../source/rtl/pcre/pcre.h"
 #include "../source/rtl/zlib/zlib.h"
+#endif
 
 #if defined( HB_OS_WIN )
 

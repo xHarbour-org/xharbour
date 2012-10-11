@@ -348,7 +348,11 @@ HB_FUNC( SQLEXTENDE )
    WORD           wResult        = SQLExtendedFetch( ( HSTMT ) hb_parns( 1 ),
                                                      ( USHORT ) hb_parnl( 2 ),
                                                      ( USHORT ) hb_parnl( 3 ),
+#if defined(__POCC__) && defined( HB_OS_WIN_64 )
+                                                     &uiRowCountPtr,
+#else
                                                      (SQLULEN *) &uiRowCountPtr,
+#endif
                                                      &siRowStatus );
 
    if( wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO )

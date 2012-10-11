@@ -3194,7 +3194,7 @@ static enum TIFFReadDirEntryErr TIFFReadDirEntryCheckRangeLongSlong(int32 value)
 /*
  * Largest 32-bit unsigned integer value.
  */
-#if defined(__WIN32__) && defined(_MSC_VER)
+#if defined(__WIN32__) && defined(_MSC_VER) && !defined(__XCC__)
 # define TIFF_UINT32_MAX 0xFFFFFFFFI64
 #else
 # define TIFF_UINT32_MAX 0xFFFFFFFFLL
@@ -3286,7 +3286,7 @@ TIFFReadDirEntryCheckRangeLong8Slong8(int64 value)
 /*
  * Largest 64-bit signed integer value.
  */
-#if defined(__WIN32__) && defined(_MSC_VER)
+#if defined(__WIN32__) && defined(_MSC_VER) && !defined(__XCC__)
 # define TIFF_INT64_MAX 0x7FFFFFFFFFFFFFFFI64
 #else
 # define TIFF_INT64_MAX 0x7FFFFFFFFFFFFFFFLL
@@ -3440,7 +3440,7 @@ TIFFReadDirectory(TIFF* tif)
 	if (!dircount)
 	{
 		TIFFErrorExt(tif->tif_clientdata,module,
-		    "Failed to read directory at offset " TIFF_UINT64_FORMAT,nextdiroff);
+		    "Failed to read directory at offset " TIFF_UINT64_FORMAT,(long long unsigned int)nextdiroff);
 		return 0;
 	}
 	TIFFReadDirectoryCheckOrder(tif,dir,dircount);
@@ -4170,7 +4170,7 @@ TIFFReadCustomDirectory(TIFF* tif, toff_t diroff,
 	if (!dircount)
 	{
 		TIFFErrorExt(tif->tif_clientdata,module,
-		    "Failed to read custom directory at offset " TIFF_UINT64_FORMAT,diroff);
+		    "Failed to read custom directory at offset " TIFF_UINT64_FORMAT,(long long unsigned int)diroff);
 		return 0;
 	}
 	TIFFFreeDirectory(tif);
@@ -4417,14 +4417,14 @@ CheckDirCount(TIFF* tif, TIFFDirEntry* dir, uint32 count)
 		TIFFWarningExt(tif->tif_clientdata, tif->tif_name,
 	"incorrect count for field \"%s\" (" TIFF_UINT64_FORMAT ", expecting %u); tag ignored",
 		    fip ? fip->field_name : "unknown tagname",
-		    dir->tdir_count, count);
+		    (long long unsigned int)dir->tdir_count, count);
 		return (0);
 	} else if ((uint64)count < dir->tdir_count) {
 		const TIFFField* fip = TIFFFieldWithTag(tif, dir->tdir_tag);
 		TIFFWarningExt(tif->tif_clientdata, tif->tif_name,
 	"incorrect count for field \"%s\" (" TIFF_UINT64_FORMAT ", expecting %u); tag trimmed",
 		    fip ? fip->field_name : "unknown tagname",
-		    dir->tdir_count, count);
+		    (long long unsigned int)dir->tdir_count, count);
 		dir->tdir_count = count;
 		return (1);
 	}
@@ -4831,7 +4831,7 @@ TIFFFetchNormalTag(TIFF* tif, TIFFDirEntry* dp, int recover)
 			break;
 		case TIFF_SETGET_DOUBLE:
 			{
-				double data;
+				double data = 0.0;
 				assert(fip->field_readcount==1);
 				assert(fip->field_passcount==0);
 				err=TIFFReadDirEntryDouble(tif,dp,&data);

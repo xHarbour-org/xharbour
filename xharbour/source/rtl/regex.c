@@ -50,6 +50,10 @@
  *
  */
 
+#if defined(__POCC__)
+   #pragma warn (disable:2130)
+#endif
+
 #define HB_THREAD_OPTIMIZE_STACK
 
 // #include "hbvmopt.h"

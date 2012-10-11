@@ -8,6 +8,42 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-12 06:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/tiff/tif_aux.c
+  * contrib/tiff/tif_dirread.c
+    ! pacify GCC warnings
+
+  * source/rtl/regex.c
+  * source/odbc/odbc.c
+  * contrib/pdflite/tiff/tif_jpeg.c
+  * contrib/pdflite/tiff/tif_ojpeg.c
+  * contrib/pdflite/tiff/tif_predict.c
+    ! pacify POCC warnings
+
+  + make_xc.bat
+  * winmake/makefile.pc
+    ! added XCC build stuffs
+
+  * source/common/hbver.c
+  * source/compiler/hbslex.c
+    ! provide working paths for XCC
+
+  * contrib/tiff/tif_config.h
+    ! undef HAVE_SEARCH_H for XCC
+
+  * contrib/tiff/tif_win32.c
+    ! definition of vsnprintf for XCC
+
+  * contrib/tiff/tif_dirread.c
+    ! definition of TIFF_UINT32_MAX and TIFF_INT64_MAX for XCC
+
+  * source/rtl/is.c
+    ! temporary hack for isacii to enable XCC to compile
+
+  * contrib/what32/source/_winsock.c
+  * source/vm/dlmalloc.c
+    ! fix to compile with XCC and MT linking with PellesC 5 and below
+
 2012-10-11 08:28 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/tiff/tif_pixarlog.c
   * contrib/tiff/tif_packbits.c
