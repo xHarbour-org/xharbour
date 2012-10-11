@@ -1000,7 +1000,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
        ELSEIF !( ::CurObj == oControl ) .AND. !( oControl == Self )
          ::Application:MainForm:StatusBarPanel7:Caption := "Next Tab " + XSTR( oControl:Parent:__CurrentPos )
          ::CurObj := oControl
-
+         ::__lModified := .T.
          ::UpdateSelection()
          ::Selected    := { { oControl, , NIL } }
          ::CtrlOldPt := NIL

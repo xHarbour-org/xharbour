@@ -9,7 +9,8 @@
 */
 
 2012-10-11 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
-   ! Fixed ToolStripComboBox to have all same properties as a ComboBox
+   ! Fixed ToolStripComboBox to have all same properties as a ComboBox.
+   ! Fixed TabOrder to mark current form as Modified.
 
 2012-10-10 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed DateTimePicker to accept ESCAPE keystrokes and dispatch the correct
