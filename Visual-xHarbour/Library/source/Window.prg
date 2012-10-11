@@ -2582,9 +2582,9 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                  RETURN nRet
               ENDIF
            ENDIF
-           nRet := ExecuteEvent( "OnKeyDown", Self, nwParam, nlParam )
-           ODEFAULT nRet TO __Evaluate( ::OnWMKeyDown, Self, nwParam, nlParam, nRet )
            ODEFAULT nRet TO ::OnKeyDown( nwParam, nlParam )
+           ODEFAULT nRet TO ExecuteEvent( "OnKeyDown", Self, nwParam, nlParam )
+           ODEFAULT nRet TO __Evaluate( ::OnWMKeyDown, Self, nwParam, nlParam, nRet )
            EXIT
 
       CASE WM_NEXTDLGCTL

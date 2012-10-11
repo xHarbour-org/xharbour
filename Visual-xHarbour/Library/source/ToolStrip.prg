@@ -1691,10 +1691,6 @@ METHOD OnLButtonUp() CLASS ToolStripItem
       ::__lPushed   := .F.
       ::__lSelected  := .F.
       
-      IF ::Role == 2
-         ::xChecked := !::xChecked
-      ENDIF
-
       pt := (struct POINT)
       GetCursorPos( @pt )
       ::ScreenToClient( @pt )
@@ -1702,6 +1698,10 @@ METHOD OnLButtonUp() CLASS ToolStripItem
       ::__lSelected := _PtInRect( { 0, 0, ::Width, ::Height }, { pt:x, pt:y } )
       
       IF ::__lSelected
+         IF ::Role == 2
+            ::xChecked := !::xChecked
+         ENDIF
+
          IF VALTYPE( ::Action ) == "B"
             EVAL( ::Action, Self )
           ELSE

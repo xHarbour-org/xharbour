@@ -99,6 +99,8 @@ CLASS DateTimePicker INHERIT Control
    METHOD OnKillFocus         VIRTUAL
    METHOD OnSetFocus          VIRTUAL
 
+   METHOD OnGetDlgCode( msg ) INLINE IIF( msg != NIL .AND. msg:message == WM_KEYDOWN .AND. msg:wParam == VK_ESCAPE, DLGC_WANTMESSAGE, NIL )
+
    METHOD OnKeyDown()
    METHOD __SetBlankDate() INLINE ::Sendmessage( DTM_SETFORMAT, 0, IIF( ::BlankDate, " ", NIL ) )
 ENDCLASS
@@ -126,7 +128,9 @@ METHOD Init( oParent ) CLASS DateTimePicker
                                   { "OnCloseUp"         , "", "" },;
                                   { "OnDateTimeChange"  , "", "" } } },;
                   {"Keyboard",    {;
-                                  { "OnKeyDown"         , "", "" } } } }
+                                  { "OnChar"            , "", "" },;
+                                  { "OnKeyDown"         , "", "" },;
+                                  { "OnSysKeyDown"      , "", "" } } } }
    ENDIF
 
 RETURN Self
@@ -187,13 +191,14 @@ RETURN st
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD OnKeyDown() CLASS DateTimePicker
-   IF ::BlankDate
+METHOD OnKeyDown( nwParam, nlParam ) CLASS DateTimePicker
+   LOCAL nRet := ExecuteEvent( "OnKeyDown", Self, nwParam, nlParam )
+   IF ValType( nRet ) != "N" .AND. ::BlankDate
       ::xBlankDate := .F.
       ::Sendmessage( DTM_SETFORMAT, 0, NIL )
       ::Sendmessage( WM_KEYDOWN, VK_RIGHT, 0 )
    ENDIF
-RETURN NIL
+RETURN 0
 
 //-----------------------------------------------------------------------------------------------
 

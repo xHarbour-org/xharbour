@@ -157,6 +157,7 @@ CLASS IDE INHERIT Application
    DATA AddOnPath        EXPORTED
 
    DATA CControls        EXPORTED INIT {}
+   DATA DisableWhenRunning EXPORTED INIT .F.
 
    METHOD Init() CONSTRUCTOR
    METHOD SetEditorPos()
@@ -249,6 +250,8 @@ METHOD Init( ... ) CLASS IDE
 
    ::ShowGrid   := ::IniFile:ReadInteger( "General", "ShowGrid", 0 )
    ::RulerType  := ::IniFile:ReadInteger( "General", "RulerType", 1 )
+   ::DisableWhenRunning := ::IniFile:ReadLogical( "General", "DisableWhenRunning", .F. )
+
 
    IF( n := ::IniFile:ReadInteger( "General", "ShowTip", 1 ) ) == 0
       ::ShowTip := .F.
@@ -422,6 +425,8 @@ METHOD OnClose() CLASS IDE_MainForm
       ::Application:IniFile:WriteNumber( "ToolBox",       "Width",  Round( ( ::ToolBox1:Width / aSize[5] ) * 100, 0 ) )
 
       ::Application:IniFile:WriteNumber( "General", "RunMode", ::Application:RunMode )
+
+      ::Application:IniFile:WriteNumber( "General", "DisableWhenRunning", IIF( ::Application:DisableWhenRunning, 1, 0 ) )
 
       ::Application:IniFile:DelSection( "CustomControls" )
       FOR n := 1 TO LEN( ::Application:CControls )
@@ -5588,7 +5593,11 @@ METHOD Run( lRunOnly ) CLASS Project
             ELSE
                ::Application:DebuggerPanel:Hide()
 
-               WaitExecute( cExe, ::Properties:Parameters, SW_SHOW )
+               IF ::Application:DisableWhenRunning
+                  WaitExecute( cExe, ::Properties:Parameters, SW_SHOW )
+                ELSE
+                  ShellExecute( GetActiveWindow(), "open", cExe, ::Properties:Parameters, , SW_SHOW )
+               ENDIF
 
                ::Application:DebugWindow:Hide()
                ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .F.
