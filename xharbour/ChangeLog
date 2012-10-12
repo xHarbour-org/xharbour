@@ -8,6 +8,21 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-12 15:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/fm.c
+    ! minor formatting
+
+  * source/vm/dlmalloc.c
+    ! updated to version 2.8.6, changelog:
+        v2.8.6 Wed Aug 29 06:57:58 2012  Doug Lea
+        * fix bad comparison in dlposix_memalign
+        * don't reuse adjusted asize in sys_alloc
+        * add LOCK_AT_FORK -- thanks to Kirill Artamonov for the suggestion
+        * reduce compiler warnings -- thanks to all who reported/suggested these
+
+  * contrib/tiff/tif_dirread.c
+    ! fixed to compile under MSVC 6
+
 2012-10-12 07:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/tiff/tif_dirread.c
   * contrib/tiff/tif_dirwrite.c
