@@ -68,6 +68,10 @@
  * Giancarlo Niccolai <giancarlo@niccolai.org>
  */
 
+#if defined( __WATCOMC__ )
+   #pragma disable_message ( 136 )
+#endif
+
 #include <stdio.h>
 #include <ctype.h>
 

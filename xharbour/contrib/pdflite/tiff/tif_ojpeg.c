@@ -1,8 +1,10 @@
 /* PDFlib GmbH cvsid:
  * $Id$ */
 
-#if defined(__POCC__)
-  #pragma warn (disable:2030)
+#if defined(__WATCOMC__)
+   #pragma disable_message ( 302 )
+#elif defined(__POCC__)
+   #pragma warn (disable:2030)
 #endif
 
 #include "pdflite_tiffiop.h"

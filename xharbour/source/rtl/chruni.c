@@ -52,7 +52,10 @@
  *
  */
 
-#if defined(__POCC__)
+#if defined(__WATCOMC__)
+   #pragma disable_message ( 124 )
+   #pragma disable_message ( 136 )
+#elif defined(__POCC__)
    #pragma warn (disable:2130) // Result of comparison is constant.
    #pragma warn (disable:2154) // Unreachable code.
 #endif
