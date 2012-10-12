@@ -355,7 +355,7 @@ typedef struct _HB_GT_BASE
 
 } HB_GT_BASE, * PHB_GT_BASE, * PHB_GT;
 
-extern PHB_GT hb_gt_Base( void );
+extern HB_EXPORT PHB_GT hb_gt_Base( void );
 
 #define HB_GTLOCAL(g)   (g)->pGTData[*HB_GTID_PTR]
 

@@ -767,7 +767,7 @@ static enum TIFFReadDirEntryErr TIFFReadDirEntryArray(TIFF* tif, TIFFDirEntry* d
 	int typesize;
 	uint32 datasize;
 	void* data;
-	typesize=TIFFDataWidth(direntry->tdir_type);
+	typesize=TIFFDataWidth((TIFFDataType)direntry->tdir_type);
 	if ((direntry->tdir_count==0)||(typesize==0))
 	{
 		*value=0;
@@ -4743,7 +4743,7 @@ TIFFFetchNormalTag(TIFF* tif, TIFFDirEntry* dp, int recover)
 						if ((uint32)dp->tdir_count+1!=dp->tdir_count+1)
 							o=NULL;
 						else
-							o=_TIFFmalloc((uint32)dp->tdir_count+1);
+							o=(uint8 *)_TIFFmalloc((uint32)dp->tdir_count+1);
 						if (o==NULL)
 						{
 							if (data!=NULL)

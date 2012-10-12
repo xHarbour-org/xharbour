@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-12 07:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/tiff/tif_dirread.c
+  * contrib/tiff/tif_dirwrite.c
+  * contrib/tiff/tif_read.c
+    ! casting to compile under C++ mode
+
+  * include/hbgtcore.h
+    ! exporting hb_gt_Base()
+
 2012-10-12 06:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/tiff/tif_aux.c
   * contrib/tiff/tif_dirread.c
