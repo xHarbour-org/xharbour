@@ -625,10 +625,11 @@ alloc_downsampled_buffers(TIFF *tif,jpeg_component_info *comp_info,
 		    JPOOL_IMAGE,compptr->width_in_data_units*size,
 		    compptr->v_samp_factor*size))))
 #           else
-            if (!(buf = CALLJPEG(sp,0,
+            buf = CALLJPEG(sp,0,
 		(*sp->cinfo.comm.mem->alloc_sarray)(&sp->cinfo.comm,
 		JPOOL_IMAGE,compptr->width_in_blocks*size,
-		compptr->v_samp_factor*size))))
+		compptr->v_samp_factor*size));
+            if (!buf)
 #           endif
               return 0;
             sp->ds_buffer[ci] = buf;
@@ -1654,7 +1655,8 @@ OJPEGSetupDecode(register TIFF *tif)
          */
             sp->jpegtables_length = (uint32) (p - (unsigned char*)sp->jpegtables + 2);
             p = (unsigned char *) sp->jpegtables;
-            if (!(sp->jpegtables = _TIFFmalloc(sp->jpegtables_length)))
+            sp->jpegtables = _TIFFmalloc(sp->jpegtables_length);
+            if (!sp->jpegtables)
               {
                 _TIFFError(tif, module,no_jtable_space);
                 return 0;
@@ -1830,10 +1832,11 @@ OJPEGSetupDecode(register TIFF *tif)
  /* Some of our initialization must wait until the JPEG Library is initialized
     above, in order to override its defaults.
  */
-    if (   (sp->cinfo.d.raw_data_out = downsampled_output)
+    sp->cinfo.d.raw_data_out = downsampled_output
         && !alloc_downsampled_buffers(tif,sp->cinfo.d.comp_info,
-                                      sp->cinfo.d.num_components)
-       ) return 0;
+                                      sp->cinfo.d.num_components);
+    if (sp->cinfo.d.raw_data_out)
+       return 0;
     sp->cinfo.d.jpeg_color_space = jpeg_color_space;
     sp->cinfo.d.out_color_space = out_color_space;
     sp->cinfo.d.dither_mode = JDITHER_NONE; /* Reduce image "noise" */
@@ -2022,12 +2025,12 @@ OJPEGVSetField(register TIFF *tif,ttag_t tag,va_list ap)
         white reference levels.
      */
         case TIFFTAG_PHOTOMETRIC           :
-          if (   (v32 = (*sp->vsetparent)(tif,tag,ap))
-              && td->td_photometric == PHOTOMETRIC_YCBCR
-             )
+          v32 = (*sp->vsetparent)(tif,tag,ap);
+          if (v32 && td->td_photometric == PHOTOMETRIC_YCBCR )
 	  {
-            if ( (td->td_refblackwhite =
-                  (float *) _TIFFmalloc(6*sizeof(float))) )
+            td->td_refblackwhite =
+                  (float *) _TIFFmalloc(6*sizeof(float));
+            if (td->td_refblackwhite)
               { register long top = ( 1 << td->td_bitspersample );
 
                 td->td_refblackwhite[0] = 0;
@@ -2280,10 +2283,9 @@ OJPEGVSetField(register TIFF *tif,ttag_t tag,va_list ap)
                   register UINT16 *to;
                   register int j = DCTSIZE2;
 
-                  if (!( sp->cinfo.d.quant_tbl_ptrs[i]
-                       = CALLJPEG(sp,0,jpeg_alloc_quant_table(&sp->cinfo.comm))
-                       )
-                     )
+                  sp->cinfo.d.quant_tbl_ptrs[i]
+                       = CALLJPEG(sp,0,jpeg_alloc_quant_table(&sp->cinfo.comm));
+                  if (!sp->cinfo.d.quant_tbl_ptrs[i])
                     {
                       _TIFFError(tif, JPEGLib_name,
 				"No space for quantization table");
@@ -2414,10 +2416,8 @@ OJPEGVSetField(register TIFF *tif,ttag_t tag,va_list ap)
                   suffixed to a 0 Byte when copied, followed by a variable
                   number of Bytes whose length is the sum of the first 16.
                */
-                  if (!( *h
-                       = CALLJPEG(sp,0,jpeg_alloc_huff_table(&sp->cinfo.comm))
-                       )
-                     )
+                  *h = CALLJPEG(sp,0,jpeg_alloc_huff_table(&sp->cinfo.comm));
+                  if (!*h)
                     {
                       _TIFFError(tif,JPEGLib_name,"No space for Huffman table");
                       return 0;
@@ -2710,9 +2710,10 @@ TIFFInitOJPEG(register TIFF *tif,int scheme)
         client application tries to process a file so big that we can't buffer
         it entirely, then tough shit: we'll give up and exit!
      */
-        if (!(tif->tif_base =
+        tif->tif_base =
 		(unsigned char *) _TIFFmalloc(
-			    tif->tif_size=TIFFGetFileSize(tif))))
+			    tif->tif_size=TIFFGetFileSize(tif));
+        if (!tif->tif_base)
           {
             _TIFFError(tif, tif->tif_name,"Cannot allocate file buffer");
             return 0;
@@ -2728,7 +2729,8 @@ TIFFInitOJPEG(register TIFF *tif,int scheme)
 
  /* Allocate storage for this module's per-file variables. */
 
-    if (!(tif->tif_data = (tidata_t)_TIFFmalloc(sizeof *sp)))
+    tif->tif_data = (tidata_t)_TIFFmalloc(sizeof *sp);
+    if (!tif->tif_data)
       {
         _TIFFError(tif, "TIFFInitOJPEG","No space for JPEG state block");
         return 0;

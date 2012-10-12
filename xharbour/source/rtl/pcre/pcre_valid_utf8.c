@@ -113,7 +113,7 @@ register PCRE_PUCHAR p;
 
 if (length < 0)
   {
-  for (p = string; *p != 0; p++);
+  for (p = string; *p != 0; p++)
   length = (int)(p - string);
   }
 

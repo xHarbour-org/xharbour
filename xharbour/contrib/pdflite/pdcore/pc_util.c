@@ -441,7 +441,8 @@ pdc_check_lang_code(pdc_core *pdc, const char* lang_code)
     if ((lang_code != NULL) && *lang_code)
     {
         /* do not check for IANA or private languages */
-        if (!(valid = ((lang_code[0] == 'i') || (lang_code[0] == 'x'))))
+        valid = ((lang_code[0] == 'i') || (lang_code[0] == 'x'));
+        if (!valid)
         {
             language = pdc_strdup(pdc, lang_code);
             for (i = 0; i < (int)strlen(language); i++)

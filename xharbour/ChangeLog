@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-13 05:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/pcre/pcre_valid_utf8.c
+  * contrib/tiff/tif_aux.c
+  * contrib/tiff/tif_fax3.c
+  * contrib/tiff/tif_packbits.c
+  * contrib/pdflite/pdcore/pc_util.c
+  * contrib/pdflite/tiff/tif_auxx.c
+  * contrib/pdflite/tiff/tif_ojpeg.c
+    ! pacify DigitalMars warnings
+
 2012-10-13 04:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/chruni.c
   * source/rtl/hbsrlraw.c

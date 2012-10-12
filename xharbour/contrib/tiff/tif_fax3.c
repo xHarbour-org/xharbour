@@ -814,7 +814,8 @@ find0span(unsigned char* bp, int32 bs, int32 be)
 	/*
 	 * Check partial byte on lhs.
 	 */
-	if (bits > 0 && (n = (bs & 7))) {
+	n = (bs & 7);
+	if (bits > 0 && n) {
 		span = zeroruns[(*bp << n) & 0xff];
 		if (span > 8-n)		/* table value too generous */
 			span = 8-n;
@@ -873,7 +874,8 @@ find1span(unsigned char* bp, int32 bs, int32 be)
 	/*
 	 * Check partial byte on lhs.
 	 */
-	if (bits > 0 && (n = (bs & 7))) {
+	n = (bs & 7);
+	if (bits > 0 && n) {
 		span = oneruns[(*bp << n) & 0xff];
 		if (span > 8-n)		/* table value too generous */
 			span = 8-n;
@@ -1180,8 +1182,9 @@ Fax3VSetField(TIFF* tif, uint32 tag, va_list ap)
 	default:
 		return (*sp->vsetparent)(tif, tag, ap);
 	}
-	
-	if ((fip = TIFFFieldWithTag(tif, tag)))
+
+	fip = TIFFFieldWithTag(tif, tag);
+	if (fip)
 		TIFFSetFieldBit(tif, fip->field_bit);
 	else
 		return 0;

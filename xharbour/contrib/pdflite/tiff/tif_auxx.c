@@ -63,7 +63,8 @@ TIFFDefaultTransferFunction(TIFF* tif, TIFFDirectory* td)
  
  	n = 1<<td->td_bitspersample;
  	nbytes = n * sizeof (uint16);
- 	if (!(tf[0] = (uint16 *)_TIFFmalloc(nbytes)))
+ 	tf[0] = (uint16 *)_TIFFmalloc(nbytes);
+ 	if (tf[0])
  		return 0;
 	tf[0][0] = 0;
 	for (i = 1; i < n; i++) {
@@ -72,10 +73,12 @@ TIFFDefaultTransferFunction(TIFF* tif, TIFFDirectory* td)
 	}
 
 	if (td->td_samplesperpixel - td->td_extrasamples > 1) {
- 		if (!(tf[1] = (uint16 *)_TIFFmalloc(nbytes)))
+ 		tf[1] = (uint16 *)_TIFFmalloc(nbytes);
+ 		if (!tf[1])
  			goto bad;
  		_TIFFmemcpy(tf[1], tf[0], nbytes);
- 		if (!(tf[2] = (uint16 *)_TIFFmalloc(nbytes)))
+ 		tf[2] = (uint16 *)_TIFFmalloc(nbytes);
+ 		if (!tf[2])
  			goto bad;
  		_TIFFmemcpy(tf[2], tf[0], nbytes);
 	}
@@ -97,7 +100,8 @@ TIFFDefaultRefBlackWhite(TIFF *tif, TIFFDirectory* td)
 {
         int i;
 
-        if (!(td->td_refblackwhite = (float *)_TIFFmalloc(6*sizeof (float))))
+        td->td_refblackwhite = (float *)_TIFFmalloc(6*sizeof (float));
+        if (!td->td_refblackwhite)
                 return 0;
         if (td->td_photometric == PHOTOMETRIC_YCBCR) {
                 /*
