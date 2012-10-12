@@ -267,7 +267,7 @@ ENDCLASS
 
 METHOD OnGetDlgCode( msg ) CLASS DataGrid
    IF msg != NIL
-      IF Len(::Children) == 0 .OR. ! ::Children[ ::ColPos ]:AutoEdit .AND. msg != NIL .AND. msg:message == WM_KEYDOWN .AND. msg:wParam == VK_RETURN
+      IF Len(::Children) == 0 //.OR. ( ! ::Children[ ::ColPos ]:AutoEdit .AND. msg != NIL .AND. msg:message == WM_KEYDOWN .AND. msg:wParam == VK_RETURN )
          RETURN NIL
       ENDIF
       IF msg:message == WM_KEYDOWN .AND. msg:wParam == VK_ESCAPE

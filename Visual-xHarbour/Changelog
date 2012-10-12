@@ -8,6 +8,10 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-12 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed RTE modifying structure 
+   ! Fixed DataGrid in-cell edition bug when pressing ENTER.
+
 2012-10-11 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed ToolStripComboBox to have all same properties as a ComboBox.
    ! Fixed TabOrder to mark current form as Modified.

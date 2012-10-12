@@ -733,8 +733,8 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS StrEditor
       ::DataSource:Fields:Type     := "C"
       ::DataSource:Fields:Size     := 10
       ::DataSource:Fields:Decimals := 0
-      ::Update()
       ::ColPos := 1
+      ::Update()
       IF nwParam == VK_DOWN
          ::End()
       ENDIF

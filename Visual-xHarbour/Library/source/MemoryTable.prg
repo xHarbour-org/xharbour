@@ -178,21 +178,24 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Seek( xKey, lSoft, lCaseSensitive, lPartial ) CLASS MemoryTable
-   LOCAL bBlock := {|a| a[ ::FieldPos( ::Tag ) ] == xKey }
+   LOCAL bBlock
    (lSoft)
-   DEFAULT lCaseSensitive TO .T., lPartial TO .f.  // only affect string values
-   IF valtype( xKey ) == "C"
-      IF lPartial
-         bBlock := {|a, xVal | xVal := a[ ::FieldPos( ::Tag ) ], ;
-                               if( lCaseSensitive, (xVal = xKey),;
-                                   ( upper(xVal) = upper(xKey) ) ) }
-      ELSEIF lCaseSensitive // default block handles this
-      ELSE
-         bBlock := {|a, xVal | xVal := a[ ::FieldPos( ::Tag ) ], ;
-                                   ( upper(xVal) == upper(xKey) )  }
+   IF ! Empty( ::Tag )
+      bBlock := {|a| a[ ::FieldPos( ::Tag ) ] == xKey }
+      DEFAULT lCaseSensitive TO .T., lPartial TO .f.  // only affect string values
+      IF valtype( xKey ) == "C"
+         IF lPartial
+            bBlock := {|a, xVal | xVal := a[ ::FieldPos( ::Tag ) ], ;
+                                  if( lCaseSensitive, (xVal = xKey),;
+                                      ( upper(xVal) = upper(xKey) ) ) }
+         ELSEIF lCaseSensitive // default block handles this
+         ELSE
+            bBlock := {|a, xVal | xVal := a[ ::FieldPos( ::Tag ) ], ;
+                                      ( upper(xVal) == upper(xKey) )  }
+         ENDIF
       ENDIF
+      ::lEof := ( ::Record := ASCAN( ::Table, bBlock ) ) == 0
    ENDIF
-   ::lEof := ( ::Record := ASCAN( ::Table, bBlock ) ) == 0
    IF ::Record == 0
       ::Record := ::RecCount()+1
    ENDIF
@@ -200,7 +203,7 @@ RETURN !::lEof
 
 //-------------------------------------------------------------------------------------------------------
 METHOD FieldPos( cField ) CLASS MemoryTable
-RETURN aScan( ::Structure, {|a| a[1] == UPPER( cField ) } )
+RETURN aScan( ::Structure, {|a| ! Empty(cField) .AND. a[1] == UPPER( cField ) } )
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OrdSetFocus( cOrder ) CLASS MemoryTable
