@@ -3197,7 +3197,11 @@ static enum TIFFReadDirEntryErr TIFFReadDirEntryCheckRangeLongSlong(int32 value)
 #if defined(__WIN32__) && defined(_MSC_VER) && !defined(__XCC__)
 # define TIFF_UINT32_MAX 0xFFFFFFFFI64
 #else
+#if defined(__BORLANDC__) && (__BORLANDC__<0x580)
+# define TIFF_UINT32_MAX 0xFFFFFFFF
+#else
 # define TIFF_UINT32_MAX 0xFFFFFFFFLL
+#endif
 #endif
 
 static enum TIFFReadDirEntryErr
@@ -3289,7 +3293,11 @@ TIFFReadDirEntryCheckRangeLong8Slong8(int64 value)
 #if defined(__WIN32__) && defined(_MSC_VER) && !defined(__XCC__)
 # define TIFF_INT64_MAX 0x7FFFFFFFFFFFFFFFI64
 #else
+#if defined(__BORLANDC__) && (__BORLANDC__<0x580)
+# define TIFF_INT64_MAX 0x7FFFFFFFFFFFFFFF
+#else
 # define TIFF_INT64_MAX 0x7FFFFFFFFFFFFFFFLL
+#endif
 #endif
 
 static enum TIFFReadDirEntryErr
