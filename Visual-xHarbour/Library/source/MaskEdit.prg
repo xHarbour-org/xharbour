@@ -141,7 +141,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnGetDlgCode( msg ) CLASS MaskEdit
-   IF msg != NIL .AND. msg:message == WM_KEYDOWN .AND. msg:wParam IN {13,9,40,38}
+   IF msg != NIL .AND. msg:hwnd == ::hWnd .AND. msg:message == WM_KEYDOWN .AND. msg:wParam IN {13,9,40,38}
       ::oGet:assign()
       ::oGet:updatebuffer()
       IF ::oGet:baddate()
@@ -152,7 +152,7 @@ METHOD OnGetDlgCode( msg ) CLASS MaskEdit
       ::SendMessage( WM_INVALID, 0, 0 )
 
       IF ::IsValid
-         ::TabNextControl()
+         ::TabNextControl( IIF( msg:wParam == VK_UP, .T., NIL ) )
        ELSE
          SetFocus( ::hWnd )
       ENDIF
@@ -386,8 +386,9 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS MaskEdit
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
-METHOD TabNextControl() CLASS MaskEdit
-   LOCAL h, lShift := IsKeyDown( VK_SHIFT )
+METHOD TabNextControl( lShift ) CLASS MaskEdit
+   LOCAL h
+   DEFAULT lShift TO IsKeyDown( VK_SHIFT )
    IF ( h := GetNextDlgTabItem( ::Form:hWnd, ::hWnd, lShift ) ) > 0
       IF ::Form:Modal
          PostMessage( ::Form:hWnd, WM_NEXTDLGCTL, h, MAKELPARAM( 1, 0 ) )
