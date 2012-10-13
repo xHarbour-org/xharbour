@@ -436,6 +436,7 @@ extern HB_EXPORT BYTE *    hb_fileNameConv( char * str );
 
 extern int GnuErrtoDosErr( int ErrCode );
 
+extern HB_EXPORT HB_ERRCODE hb_fsTempDir( char * pszTempDir );
 
 HB_EXTERN_END
 

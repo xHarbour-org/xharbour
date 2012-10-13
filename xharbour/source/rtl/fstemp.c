@@ -300,3 +300,102 @@ HB_FUNC( HB_FTEMPCREATEEX )
 
    hb_storc( szName, 1 );
 }
+
+/* NOTE: pszTempDir must be at least HB_PATH_MAX long. */
+HB_ERRCODE hb_fsTempDir( char * pszTempDir )
+{
+   HB_ERRCODE nResult = ( HB_ERRCODE ) FS_ERROR;
+
+   pszTempDir[ 0 ] = '\0';
+
+#if defined( HB_OS_UNIX )
+   {
+      char * pszTempDirEnv = hb_getenv( "TMPDIR" );
+
+      if( fsGetTempDirByCase( pszTempDir, pszTempDirEnv, HB_FALSE ) )
+         nResult = 0;
+#ifdef P_tmpdir
+      else if( fsGetTempDirByCase( pszTempDir, P_tmpdir, HB_TRUE ) )
+         nResult = 0;
+#endif
+      else if( fsGetTempDirByCase( pszTempDir, "/tmp", HB_TRUE ) )
+         nResult = 0;
+
+      if( pszTempDirEnv )
+         hb_xfree( pszTempDirEnv );
+   }
+#elif defined( HB_OS_WIN )
+   {
+      TCHAR lpDir[ HB_PATH_MAX ];
+
+      if( GetTempPath( HB_PATH_MAX, lpDir ) )
+      {
+         nResult = 0;
+         lpDir[ HB_PATH_MAX - 1 ] = TEXT( '\0' );
+         // HB_OSSTRDUP2( lpDir, pszTempDir, HB_PATH_MAX - 1 );
+         hb_strncpy( pszTempDir, lpDir, HB_PATH_MAX - 1 );
+      }
+   }
+#else
+   {
+#if !defined( HB_OS_OS2 )
+      char szBuffer[ L_tmpnam ];
+
+      if( tmpnam( szBuffer ) != NULL )
+      {
+         PHB_FNAME pTempName = hb_fsFNameSplit( szBuffer );
+         if( fsGetTempDirByCase( pszTempDir, pTempName->szPath, HB_TRUE ) )
+            nResult = 0;
+         hb_xfree( pTempName );
+      }
+      if( nResult != 0 )
+#endif
+      {
+         static const char * env_tmp[] = { "TEMP", "TMP", "TMPDIR", NULL };
+
+         const char ** tmp = env_tmp;
+
+         while( *tmp && nResult != 0 )
+         {
+            char * pszTempDirEnv = hb_getenv( *tmp++ );
+
+            if( pszTempDirEnv )
+            {
+               if( fsGetTempDirByCase( pszTempDir, pszTempDirEnv, HB_FALSE ) )
+                  nResult = 0;
+               hb_xfree( pszTempDirEnv );
+            }
+         }
+      }
+   }
+#endif
+
+   if( nResult == 0 && pszTempDir[ 0 ] != '\0' )
+   {
+      int len = ( int ) strlen( pszTempDir );
+      if( pszTempDir[ len - 1 ] != HB_OS_PATH_DELIM_CHR &&
+          len < HB_PATH_MAX - 1 )
+      {
+         pszTempDir[ len ] = HB_OS_PATH_DELIM_CHR;
+         pszTempDir[ len + 1 ] = '\0';
+      }
+   }
+   else
+   {
+      pszTempDir[ 0 ] = '.';
+      pszTempDir[ 1 ] = HB_OS_PATH_DELIM_CHR;
+      pszTempDir[ 2 ] = '\0';
+   }
+
+   return nResult;
+}
+
+HB_FUNC( HB_DIRTEMP )
+{
+   char szTempDir[ HB_PATH_MAX ];
+
+   if( hb_fsTempDir( szTempDir ) != ( HB_ERRCODE ) FS_ERROR )
+      hb_retc( szTempDir );
+   else
+      hb_retc_null();
+}

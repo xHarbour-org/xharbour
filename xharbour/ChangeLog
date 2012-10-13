@@ -8,6 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-13 22:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/fstemp.c
+  * include/hbapifs.h
+    + Added HB_DIRTEMP() .prg level function. Returns name of temp dir,
+      with closing backslash (borrowed from Harbour)
+
+  * contrib/firebird/firebird.c
+  * contrib/firebird/tfirebird.prg
+  * contrib/firebird/tests/simple.prg
+  * contrib/firebird/tests/stress.prg
+  * contrib/firebird/tests/test.prg
+  * contrib/firebird/tests/testapi.c
+    ! synched with Harbour
+
 2012-10-13 19:16 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbhpdf/hpdf_fontdef_tt.c
   * contrib/hbhpdf/hpdf_image.c
