@@ -4,8 +4,9 @@
 
 /*
  * Harbour Project source code:
- * PostgreSQL RDBMS low level (client api) interface code.
+ * PostgreSQL RDBMS wrapper header.
  *
+ * Copyright 2010 Viktor Szakats (harbour syenar.net) (GC support)
  * Copyright 2003 Rodrigo Moreno rodrigo_moreno@yahoo.com
  * www - http://harbour-project.org
  *
@@ -52,41 +53,40 @@
  *
  */
 
-#ifndef HBPOSTGRES_CH_
-#define HBPOSTGRES_CH_
+#include "hbapi.h"
 
-#define CONNECTION_OK                   0
-#define CONNECTION_BAD                  1
-#define CONNECTION_STARTED              2
-#define CONNECTION_MADE                 3
-#define CONNECTION_AWAITING_RESPONSE    4
-#define CONNECTION_AUTH_OK              5
-#define CONNECTION_SETENV               6
-#define CONNECTION_SSL_STARTUP          7
-#define CONNECTION_NEEDED               8
+#include "libpq-fe.h"
+#include "pg_config.h"
 
-#define PGRES_EMPTY_QUERY               0
-#define PGRES_COMMAND_OK                1
-#define PGRES_TUPLES_OK                 2
-#define PGRES_COPY_OUT                  3
-#define PGRES_COPY_IN                   4
-#define PGRES_BAD_RESPONSE              5
-#define PGRES_NONFATAL_ERROR            6
-#define PGRES_FATAL_ERROR               7
+#define VARHDRSZ              4
+#define BOOLOID               16
+#define INT8OID               20
+#define INT2OID               21
+#define INT4OID               23
+#define TEXTOID               25
+#define OIDOID                26
+#define FLOAT4OID             700
+#define FLOAT8OID             701
+#define CASHOID               790
+#define BPCHAROID             1042
+#define VARCHAROID            1043
+#define DATEOID               1082
+#define TIMEOID               1083
+#define TIMESTAMPOID          1114
+#define TIMESTAMPTZOID        1184
+#define TIMETZOID             1266
+#define BITOID                1560
+#define VARBITOID             1562
+#define NUMERICOID            1700
 
-#define PQTRANS_IDLE                    0
-#define PQTRANS_ACTIVE                  1
-#define PQTRANS_INTRANS                 2
-#define PQTRANS_INERROR                 3
-#define PQTRANS_UNKNOWN                 4
+#define INV_WRITE             0x00020000
+#define INV_READ              0x00040000
 
-/* PQMETADATA() positions for array returned */
-#define HBPG_META_FIELDNAME             1
-#define HBPG_META_FIELDTYPE             2
-#define HBPG_META_FIELDLEN              3
-#define HBPG_META_FIELDDEC              4
-#define HBPG_META_TABLE                 5
-#define HBPG_META_TABLECOL              6
-#define HBPG_META_LEN_                  6
-
+#ifndef PG_VERSION_NUM
+#define PG_VERSION_NUM 0
 #endif
+
+extern void hb_PGconn_ret( PGconn * p );
+extern PGconn * hb_PGconn_par( int iParam );
+extern void hb_PGresult_ret( PGresult * p );
+extern PGresult * hb_PGresult_par( int iParam );

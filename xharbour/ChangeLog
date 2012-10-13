@@ -8,6 +8,22 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-13 11:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + contrib/pgsql/hbpgsql.h
+  * contrib/pgsql/postgres.c
+  * contrib/pgsql/postgres.ch
+  * contrib/pgsql/tpostgres.prg
+  * contrib/pgsql/tests/async.prg
+  * contrib/pgsql/tests/cache.prg
+  * contrib/pgsql/tests/dbf2pg.prg
+  * contrib/pgsql/tests/simple.prg
+  * contrib/pgsql/tests/stress.prg
+  * contrib/pgsql/tests/test.prg
+    ! sync with Harbour
+
+  - contrib/pgsql/pellesc
+    ! remove unused folder
+
 2012-10-13 09:03 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.vc
     ! added missing -MT flag in contrib part which caused some module not
