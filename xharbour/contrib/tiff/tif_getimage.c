@@ -24,9 +24,13 @@
  * OF THIS SOFTWARE.
  */
 
-#if defined(_MSC_VER) && (_MSC_VER>=1400)
-   #if !defined(_CRT_SECURE_NO_WARNINGS)
-      #define _CRT_SECURE_NO_WARNINGS
+#if defined(_MSC_VER)
+   #if (_MSC_VER>=1400)
+      #if !defined(_CRT_SECURE_NO_WARNINGS)
+         #define _CRT_SECURE_NO_WARNINGS
+      #endif
+   #else
+      #pragma warning (disable:4550)
    #endif
 #endif
 
@@ -629,7 +633,7 @@ gtTileContig(TIFFRGBAImage* img, uint32* raster, uint32 w, uint32 h)
     	nrow = (row + rowstoread > h ? h - row : rowstoread);
 	for (col = 0; col < w; col += tw) 
         {
-	    if (TIFFReadTile(tif, buf, col+img->col_offset,  
+	    if (TIFFReadTile(tif, buf, col+img->col_offset,
 			     row+img->row_offset, 0, 0)==(tmsize_t)(-1) && img->stoponerr)
             {
                 ret = 0;
@@ -769,16 +773,16 @@ gtTileSeparate(TIFFRGBAImage* img, uint32* raster, uint32 w, uint32 h)
 				break;
 			}
 			if (colorchannels > 1 
-                            && TIFFReadTile(tif, p2, col+img->col_offset,  
-                                            row+img->row_offset,0,2) == (tmsize_t)(-1) 
+                            && TIFFReadTile(tif, p2, col+img->col_offset,
+                                            row+img->row_offset,0,2) == (tmsize_t)(-1)
                             && img->stoponerr)
 			{
 				ret = 0;
 				break;
 			}
 			if (alpha
-                            && TIFFReadTile(tif,pa,col+img->col_offset,  
-                                            row+img->row_offset,0,colorchannels) == (tmsize_t)(-1) 
+                            && TIFFReadTile(tif,pa,col+img->col_offset,
+                                            row+img->row_offset,0,(uint16)colorchannels) == (tmsize_t)(-1)
                             && img->stoponerr)
                         {
                             ret = 0;
@@ -1007,7 +1011,7 @@ gtStripSeparate(TIFFRGBAImage* img, uint32* raster, uint32 w, uint32 h)
 		}
 		if (alpha)
 		{
-			if (TIFFReadEncodedStrip(tif, TIFFComputeStrip(tif, offset_row, colorchannels),
+			if (TIFFReadEncodedStrip(tif, TIFFComputeStrip(tif, offset_row, (uint16)colorchannels),
 			    pa, ((row + img->row_offset)%rowsperstrip + nrow) * scanline)==(tmsize_t)(-1)
 			    && img->stoponerr)
 			{
@@ -1684,10 +1688,10 @@ DECLAREContigPutFunc(putcontig8bitCIELab)
  * for difficult blocks.
  */
 #ifdef notdef
-static void putcontig8bitYCbCrGenericTile( 
-    TIFFRGBAImage* img, 
-    uint32* cp, 
-    uint32 x, uint32 y, 
+static void putcontig8bitYCbCrGenericTile(
+    TIFFRGBAImage* img,
+    uint32* cp,
+    uint32 x, uint32 y,
     uint32 w, uint32 h, 
     int32 fromskew, int32 toskew, 
     unsigned char* pp,

@@ -4319,7 +4319,7 @@ static HB_ERRCODE hb_fptDoPackRec( FPTAREAP pArea )
             case HB_VF_ARRAY:
                from     = FPT_BLOCK_OFFSET( ulBlock );
                errCode  = hb_fptCountSMTDataLength( pArea, &from );
-               ulSize   = ( ULONG ) from - FPT_BLOCK_OFFSET( ulBlock );
+               ulSize   = ( ULONG ) ( from - FPT_BLOCK_OFFSET( ulBlock ) );
                break;
             case HB_VF_DNUM:
                if( pField->uiLen <= 12 )

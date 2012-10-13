@@ -32,12 +32,14 @@
 #include "sha1.h"
 #include "hbapi.h"
 
+#if 0
 #if defined( __XCC__ )
 /* ugly workaround for bugs in XCC preprocessor */
 static sha1_quadbyte rol( sha1_quadbyte value, int bits )
 {
    return ( value << bits ) | ( value >> ( 32 - bits ) );
 }
+#endif
 #endif
 
 #define rol( value, bits )       ( ( ( value ) << ( bits ) ) | ( ( value ) >> ( 32 - ( bits ) ) ) )

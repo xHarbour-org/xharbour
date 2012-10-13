@@ -216,7 +216,7 @@ finish_pass (j_compress_ptr cinfo)
  */
 
 LOCAL(void)
-arith_encode (j_compress_ptr cinfo, unsigned char *st, int val) 
+arith_encode (j_compress_ptr cinfo, unsigned char *st, int val)
 {
   register arith_entropy_ptr e = (arith_entropy_ptr) cinfo->entropy;
   register unsigned char nl, nm;
@@ -228,8 +228,8 @@ arith_encode (j_compress_ptr cinfo, unsigned char *st, int val)
    */
   sv = *st;
   qe = jpeg_aritab[sv & 0x7F];	/* => Qe_Value */
-  nl = qe & 0xFF; qe >>= 8;	/* Next_Index_LPS + Switch_MPS */
-  nm = qe & 0xFF; qe >>= 8;	/* Next_Index_MPS */
+  nl = (unsigned char) qe & 0xFF; qe >>= 8;	/* Next_Index_LPS + Switch_MPS */
+  nm = (unsigned char) qe & 0xFF; qe >>= 8;	/* Next_Index_MPS */
 
   /* Encode & estimation procedures per sections D.1.4 & D.1.5 */
   e->a -= qe;

@@ -1322,7 +1322,7 @@ static void hb_gt_wvt_PaintText( PHB_GTWVT pWVT, RECT updateRect )
    PAINTSTRUCT ps;
    HDC         hdc;
    RECT        rcRect;
-   int         iRow, iCol, startCol, len;
+   USHORT      iRow, iCol, startCol, len;
    BYTE        bColor, bAttr, bOldColor = 0;
    USHORT      usChar;
    TCHAR       text[ WVT_MAX_ROWS ];
@@ -1332,9 +1332,9 @@ static void hb_gt_wvt_PaintText( PHB_GTWVT pWVT, RECT updateRect )
 
    rcRect   = hb_gt_wvt_GetColRowFromXYRect( pWVT, updateRect );
 
-   for( iRow = rcRect.top; iRow <= rcRect.bottom; ++iRow )
+   for( iRow = (USHORT)rcRect.top; iRow <= rcRect.bottom; ++iRow )
    {
-      iCol  = startCol = rcRect.left;
+      iCol  = startCol = (USHORT)rcRect.left;
       len   = 0;
 
       while( iCol <= rcRect.right )

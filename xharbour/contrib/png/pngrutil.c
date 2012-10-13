@@ -402,6 +402,9 @@ png_inflate(png_structp png_ptr, png_bytep data, png_size_t size,
        */
       return 0;
    }
+#if defined( NEED_DUMMY_RETURN )
+   return 0;
+#endif
 }
 
 /*

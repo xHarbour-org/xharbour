@@ -8,6 +8,26 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-13 07:12 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rdd/dbffpt/redbffpt1.c
+  * contrib/jpeg/jcarith.c
+  * contrib/jpeg/jdarith.c
+  * contrib/pdflite/hbpdflib.c
+  * utils/hbdoc/pdfhbdoc.c
+    ! pacify MSVC 7 warnings
+
+  * source/rtl/gtwvt/gtwvt.c
+  * contrib/tiff/tif_dirwrite.c
+  * contrib/tiff/tif_getimage.c
+  * contrib/pdflite/pdcore/pc_output.c
+    ! pacify MSVC 6 warnings
+
+  * source/rtl/sha1.c
+    ! remmed doubly defined function rol (XCC), just use the define constant.
+
+  * contrib/png/pngrutil.c
+    ! added dummy return value for XCC
+
 2012-10-13 05:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/pcre/pcre_valid_utf8.c
   * contrib/tiff/tif_aux.c

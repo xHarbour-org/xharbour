@@ -51,7 +51,7 @@
  */
 
 /* Pacify MSVS2005 and above */
-#if defined(_MSC_VER) && (_MSC_VER>=1400)
+#if defined(_MSC_VER) && (_MSC_VER>=1300)
    #pragma warning (disable:4995)
 #endif
 
