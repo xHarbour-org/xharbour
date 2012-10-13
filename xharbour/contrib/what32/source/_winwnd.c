@@ -16,10 +16,18 @@ extern void Rect2ArrayEx( RECT *pt  , PHB_ITEM aRect);
 extern void Size2ArrayEx( SIZE *siz  ,  PHB_ITEM aSize);
 
 #if ( (defined(_MSC_VER) && _MSC_VER<=1200 && !defined(__POCC__)) || defined(__DMC__) )
+#ifndef GetWindowLongPtr
 #define GetWindowLongPtr  GetWindowLong
+#endif
+#ifndef SetWindowLongPtr
 #define SetWindowLongPtr  SetWindowLong
+#endif
+#ifndef GetClassLongPtr
 #define GetClassLongPtr   GetClassLong
+#endif
+#ifndef SetClassLongPtr
 #define SetClassLongPtr   SetClassLong
+#endif
 #define LONG_PTR          LONG
 #define ULONG_PTR         ULONG
 #endif

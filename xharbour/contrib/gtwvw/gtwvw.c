@@ -230,7 +230,7 @@ static int K_Ctrl[] = {
 /*                                                                   */
 /*                  private functions declaration                    */
 /*                                                                   */
-HB_EXTERN_BEGIN
+// HB_EXTERN_BEGIN
 static void    hb_gtInitStatics( UINT usWinNum, LPCTSTR lpszWinName, USHORT usRow1, USHORT usCol1, USHORT usRow2, USHORT usCol2,PHB_GT pGT );
 static void    hb_gt_wvwAddCharToInputQueue ( int data );
 static HWND    hb_gt_wvwCreateWindow( HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow );
@@ -392,7 +392,7 @@ static HB_GT_FUNCS   SuperTable;
 #define HB_GTSUPER   (&SuperTable)
 #define HB_GTID_PTR  (&s_GtId)
 
-HB_EXTERN_END
+//HB_EXTERN_END
 
 LONG  GetFontDialogUnits(HWND h,HFONT f)
 {

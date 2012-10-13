@@ -8,6 +8,25 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-13 09:03 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/makefile.vc
+    ! added missing -MT flag in contrib part which caused some module not
+      compiled under some older MSVC compilers.
+
+  * contrib/gtwvw/gtwvw.c
+    ! MSVC 6 does not want HB_EXTERN_BEGIN/END on static functions, removed.
+
+  * contrib/hbzebra/pdf417.c
+  * contrib/hblzf/lzf_c.c
+  * contrib/hbmzip/ioapi.c
+  * contrib/gtwvw/wvwfuncs.c
+  * contrib/gtwvg/gtwvg.c
+  * contrib/gtwvg/wvtcore.c
+    ! castings
+
+  * contrib/what32/source/_winwnd.c
+    ! avoid redefinition of some WINAPI
+
 2012-10-13 07:12 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rdd/dbffpt/redbffpt1.c
   * contrib/jpeg/jcarith.c

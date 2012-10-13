@@ -748,13 +748,13 @@ static int _pdf417_encode_byte( const char * szCode, int iLen, int * pCW, int iP
          if( iPos + 5 > MAX_CODEWORD_COUNT )
             return -1;
 
-         pCW[ iPos + 4 ] = ill % 900;
+         pCW[ iPos + 4 ] = ( int ) ( ill % 900 );
          ill /= 900;
-         pCW[ iPos + 3 ] = ill % 900;
+         pCW[ iPos + 3 ] = ( int ) ( ill % 900 );
          ill /= 900;
-         pCW[ iPos + 2 ] = ill % 900;
+         pCW[ iPos + 2 ] = ( int ) ( ill % 900 );
          ill /= 900;
-         pCW[ iPos + 1 ] = ill % 900;
+         pCW[ iPos + 1 ] = ( int ) ( ill % 900 );
          pCW[ iPos     ] = ( int ) ( ill / 900 );
          iPos += 5;
       }
@@ -1037,7 +1037,7 @@ static int _pdf417_encode_numeric( const char * szCode, int iLen, int * pCW, int
       k = k / 3 + 1;
       for( j = k - 1; j >= 0; j-- )
       {
-         pCW[ iPos + j ] = ill % 900;
+         pCW[ iPos + j ] = ( int ) ( ill % 900 );
          ill /= 900;
       }
       iPos += k;

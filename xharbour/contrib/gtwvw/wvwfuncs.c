@@ -1982,8 +1982,8 @@ HB_FUNC( WVW_SETMOUSEPOS )
 HB_FUNC( WVW_FILLRECTANGLE )
 {
    UINT usWinNum = WVW_WHICH_WINDOW;
-   WVW_DATA *  p = hb_getWvwData();	         
-   WIN_DATA * pWindowData = hb_gt_wvw_GetWindowsData( usWinNum );            
+   WVW_DATA *  p = hb_getWvwData();
+   WIN_DATA * pWindowData = hb_gt_wvw_GetWindowsData( usWinNum );
    POINT xy = { 0 };
    int   iTop, iLeft, iBottom, iRight;
    int   iOffTop, iOffLeft, iOffBottom, iOffRight;
@@ -2012,7 +2012,7 @@ HB_FUNC( WVW_FILLRECTANGLE )
    iTop    = bTight ? xy.y+2 : xy.y;
    iLeft   = bTight ? xy.x+2 : xy.x;
 
-   xy      = hb_gt_wvwGetXYFromColRow( pWindowData, usRight + 1, usBottom + 1 );
+   xy      = hb_gt_wvwGetXYFromColRow( pWindowData, ( USHORT ) (usRight + 1), ( USHORT ) (usBottom + 1 ));
 
    xy.y   -= pWindowData->byLineSpacing;
 
@@ -2642,8 +2642,8 @@ HB_FUNC( WVW_SETASNORMAL )
 HB_FUNC( WVW_SAVESCREEN )
 {
    UINT usWinNum = WVW_WHICH_WINDOW;
-   WIN_DATA * pWindowData = hb_gt_wvw_GetWindowsData( usWinNum );                  
-   
+   WIN_DATA * pWindowData = hb_gt_wvw_GetWindowsData( usWinNum );
+
    HBITMAP  hBmp, oldBmp;
    POINT    xy = { 0 };
    int      iTop, iLeft, iBottom, iRight, iWidth, iHeight;
@@ -2664,7 +2664,7 @@ HB_FUNC( WVW_SAVESCREEN )
    iTop    = xy.y;
    iLeft   = xy.x;
 
-   xy      = hb_gt_wvwGetXYFromColRow( pWindowData, usRight + 1, usBottom + 1 );
+   xy      = hb_gt_wvwGetXYFromColRow( pWindowData, ( USHORT ) (usRight + 1), ( USHORT ) (usBottom + 1) );
    iBottom = xy.y-1;
    iRight  = xy.x-1;
 
@@ -2721,7 +2721,7 @@ HB_FUNC( WVW_RESTSCREEN )
    iTop    = xy.y;
    iLeft   = xy.x;
 
-   xy      = hb_gt_wvwGetXYFromColRow( pWindowData, usRight + 1, usBottom + 1 );
+   xy      = hb_gt_wvwGetXYFromColRow( pWindowData, ( USHORT ) (usRight + 1), ( USHORT ) (usBottom + 1) );
    iBottom = xy.y-1;
    iRight  = xy.x-1;
 
