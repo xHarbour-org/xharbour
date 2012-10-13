@@ -62,40 +62,6 @@
 
 #include <ocilib.h>
 
-#if !defined( __XHARBOUR__ )
-#if defined( OCI_CHARSET_UNICODE ) || defined( OCI_CHARSET_WIDE )
-   #define M_HB_ARRAYGETSTR( arr, n, phstr, plen ) arrayGetStrU16( arr, n, HB_CDP_ENDIAN_NATIVE, phstr, plen )
-   #define M_HB_ITEMCOPYSTR( itm, str, len )       hb_itemCopyStrU16( itm, HB_CDP_ENDIAN_NATIVE, str, len )
-   #define M_HB_ITEMGETSTR( itm, phstr, plen )     hb_itemGetStrU16( itm, HB_CDP_ENDIAN_NATIVE, phstr, plen )
-   #define M_HB_ITEMPUTSTR( itm, str )             hb_itemPutStrU16( itm, HB_CDP_ENDIAN_NATIVE, str )
-   #define M_HB_ITEMPUTSTRLEN( itm, str, len )     hb_itemPutStrLenU16( itm, HB_CDP_ENDIAN_NATIVE, str, len )
-   #define M_HB_CHAR HB_WCHAR
-#else
-   #define M_HB_ARRAYGETSTR( arr, n, phstr, plen ) hb_arrayGetStr( arr, n, hb_setGetOSCP(), phstr, plen )
-   #define M_HB_ITEMCOPYSTR( itm, str, len )       hb_itemCopyStr( itm, hb_setGetOSCP(), str, len )
-   #define M_HB_ITEMGETSTR( itm, phstr, plen )     hb_itemGetStr( itm, hb_setGetOSCP(), phstr, plen )
-   #define M_HB_ITEMPUTSTR( itm, str )             hb_itemPutStr( itm, hb_setGetOSCP(), str )
-   #define M_HB_ITEMPUTSTRLEN( itm, str, len )     hb_itemPutStrLen( itm, hb_setGetOSCP(), str, len )
-   #define M_HB_CHAR char
-#endif
-
-#if defined( OCI_CHARSET_UNICODE ) || defined( OCI_CHARSET_WIDE ) || defined( OCI_CHARSET_MIXED )
-   #define D_HB_ARRAYGETSTR( arr, n, phstr, plen ) hb_arrayGetStrU16( arr, n, HB_CDP_ENDIAN_NATIVE, phstr, plen )
-   #define D_HB_ITEMCOPYSTR( itm, str, len )       hb_itemCopyStrU16( itm, HB_CDP_ENDIAN_NATIVE, str, len )
-   #define D_HB_ITEMGETSTR( itm, phstr, plen )     hb_itemGetStrU16( itm, HB_CDP_ENDIAN_NATIVE, phstr, plen )
-   #define D_HB_ITEMPUTSTR( itm, str )             hb_itemPutStrU16( itm, HB_CDP_ENDIAN_NATIVE, str )
-   #define D_HB_ITEMPUTSTRLEN( itm, str, len )     hb_itemPutStrLenU16( itm, HB_CDP_ENDIAN_NATIVE, str, len )
-   #define D_HB_CHAR HB_WCHAR
-#else
-   #define D_HB_ARRAYGETSTR( arr, n, phstr, plen ) hb_arrayGetStr( arr, n, hb_setGetOSCP(), phstr, plen )
-   #define D_HB_ITEMCOPYSTR( itm, str, len )       hb_itemCopyStr( itm, hb_setGetOSCP(), str, len )
-   #define D_HB_ITEMGETSTR( itm, phstr, plen )     hb_itemGetStr( itm, hb_setGetOSCP(), phstr, plen )
-   #define D_HB_ITEMPUTSTR( itm, str )             hb_itemPutStr( itm, hb_setGetOSCP(), str )
-   #define D_HB_ITEMPUTSTRLEN( itm, str, len )     hb_itemPutStrLen( itm, hb_setGetOSCP(), str, len )
-   #define D_HB_CHAR char
-#endif
-#endif
-
 typedef struct
 {
    OCI_Connection * pConn;
@@ -106,14 +72,12 @@ typedef struct
    OCI_Statement * pStmt;
 } SDDDATA;
 
-
 static HB_ERRCODE ocilibConnect( SQLDDCONNECTION * pConnection, PHB_ITEM pItem );
 static HB_ERRCODE ocilibDisconnect( SQLDDCONNECTION * pConnection );
 static HB_ERRCODE ocilibExecute( SQLDDCONNECTION * pConnection, PHB_ITEM pItem );
 static HB_ERRCODE ocilibOpen( SQLBASEAREAP pArea );
 static HB_ERRCODE ocilibClose( SQLBASEAREAP pArea );
-static HB_ERRCODE ocilibGoTo( SQLBASEAREAP pArea, HB_ULONG ulRecNo );
-
+static HB_ERRCODE ocilibGoTo( SQLBASEAREAP pArea, ULONG ulRecNo );
 
 static SDDNODE ocidd =
 {
@@ -128,7 +92,6 @@ static SDDNODE ocidd =
    ( SDDFUNC_GETVALUE )   NULL,
    ( SDDFUNC_GETVARLEN )  NULL
 };
-
 
 static void hb_ocidd_init( void * cargo )
 {
@@ -177,7 +140,6 @@ HB_CALL_ON_STARTUP_END( _hb_ocidd_init_ )
    #include "hbiniseg.h"
 #endif
 
-
 /*=====================================================================================*/
 static HB_USHORT hb_errRT_OCIDD( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, const char * szDescription, const char * szOperation, HB_ERRCODE errOsCode )
 {
@@ -189,7 +151,6 @@ static HB_USHORT hb_errRT_OCIDD( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, c
    hb_itemRelease( pError );
    return uiAction;
 }
-
 
 static char * ocilibGetError( HB_ERRCODE * pErrCode )
 {
@@ -218,7 +179,6 @@ static char * ocilibGetError( HB_ERRCODE * pErrCode )
    return szRet;
 }
 
-
 /*============= SDD METHODS =============================================================*/
 
 static HB_ERRCODE ocilibConnect( SQLDDCONNECTION * pConnection, PHB_ITEM pItem )
@@ -246,7 +206,6 @@ static HB_ERRCODE ocilibConnect( SQLDDCONNECTION * pConnection, PHB_ITEM pItem )
    return HB_FAILURE;
 }
 
-
 static HB_ERRCODE ocilibDisconnect( SQLDDCONNECTION * pConnection )
 {
    HB_ERRCODE errCode;
@@ -255,7 +214,6 @@ static HB_ERRCODE ocilibDisconnect( SQLDDCONNECTION * pConnection )
    hb_xfree( pConnection->pSDDConn );
    return errCode;
 }
-
 
 static HB_ERRCODE ocilibExecute( SQLDDCONNECTION * pConnection, PHB_ITEM pItem )
 {
@@ -290,7 +248,6 @@ static HB_ERRCODE ocilibExecute( SQLDDCONNECTION * pConnection, PHB_ITEM pItem )
    OCI_StatementFree( st );
    return HB_FAILURE;
 }
-
 
 static HB_ERRCODE ocilibOpen( SQLBASEAREAP pArea )
 {
@@ -514,7 +471,6 @@ static HB_ERRCODE ocilibOpen( SQLBASEAREAP pArea )
    return HB_SUCCESS;
 }
 
-
 static HB_ERRCODE ocilibClose( SQLBASEAREAP pArea )
 {
    SDDDATA * pSDDData = ( SDDDATA * ) pArea->pSDDData;
@@ -530,8 +486,7 @@ static HB_ERRCODE ocilibClose( SQLBASEAREAP pArea )
    return HB_SUCCESS;
 }
 
-
-static HB_ERRCODE ocilibGoTo( SQLBASEAREAP pArea, HB_ULONG ulRecNo )
+static HB_ERRCODE ocilibGoTo( SQLBASEAREAP pArea, ULONG ulRecNo )
 {
    OCI_Statement * st = ( ( SDDDATA * ) pArea->pSDDData )->pStmt;
    OCI_Resultset * rs = OCI_GetResultset( st );

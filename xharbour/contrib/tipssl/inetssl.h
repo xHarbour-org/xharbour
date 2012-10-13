@@ -75,6 +75,7 @@
             #pragma warn -aus
             #pragma warn -prc
             #pragma warn -use
+            #pragma warn -8012
          #endif
          #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
          #define _WINSOCK2API_ /* Prevents inclusion of Winsock.h in Windows.h */

@@ -16,7 +16,7 @@
 #include <windows.h>
 #include <vfw.h>
 
-#if (defined( __GNUC__ ) || defined( __WATCOMC__ ))
+#if ( ( defined( __GNUC__ )&&( __GNUC__ < 4 ) ) || defined( __WATCOMC__ ))
 #define WM_CAP_START                    WM_USER
 #define WM_CAP_ABORT                    (WM_CAP_START+  69)
 #define WM_CAP_SEQUENCE                 (WM_CAP_START+  62)

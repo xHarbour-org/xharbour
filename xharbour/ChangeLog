@@ -8,6 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-13 19:16 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbhpdf/hpdf_fontdef_tt.c
+  * contrib/hbhpdf/hpdf_image.c
+  * contrib/hbhpdf/hpdf_u3d.c
+  * contrib/what32/source/_winmmcap.c
+    ! pacify GCC warnings
+
+  * contrib/tipssl/inetssl.h
+  * contrib/sddoci/sddoci.c
+  * contrib/sddmy/sddmy.c
+  * contrib/sddfb/sddfb.c
+    ! pacify BCC warning
+
 2012-10-13 11:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   + contrib/pgsql/hbpgsql.h
   * contrib/pgsql/postgres.c

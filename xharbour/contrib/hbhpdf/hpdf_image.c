@@ -374,6 +374,16 @@ HPDF_Image_LoadRawImageFromMem  (HPDF_MMgr          mmgr,
             size *= 4;
             ret = HPDF_Dict_AddName (image, "ColorSpace", COL_CMYK);
             break;
+        case HPDF_CS_CAL_GRAY:
+        case HPDF_CS_CAL_RGB:
+        case HPDF_CS_LAB:
+        case HPDF_CS_ICC_BASED:
+        case HPDF_CS_SEPARATION:
+        case HPDF_CS_DEVICE_N:
+        case HPDF_CS_INDEXED:
+        case HPDF_CS_PATTERN:
+        case HPDF_CS_EOF:
+            break;         	
     }
 
     if (ret != HPDF_OK)

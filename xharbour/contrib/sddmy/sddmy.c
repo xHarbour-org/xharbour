@@ -66,7 +66,6 @@ typedef int my_socket;
 #define MYSQL_TYPE_NEWDECIMAL   246
 #endif
 
-
 typedef struct
 {
    MYSQL * pMySql;
@@ -79,15 +78,13 @@ typedef struct
    unsigned long * pNatLength;
 } SDDDATA;
 
-
 static HB_ERRCODE mysqlConnect( SQLDDCONNECTION * pConnection, PHB_ITEM pItem );
 static HB_ERRCODE mysqlDisconnect( SQLDDCONNECTION * pConnection );
 static HB_ERRCODE mysqlExecute( SQLDDCONNECTION * pConnection, PHB_ITEM pItem );
 static HB_ERRCODE mysqlOpen( SQLBASEAREAP pArea );
 static HB_ERRCODE mysqlClose( SQLBASEAREAP pArea );
-static HB_ERRCODE mysqlGoTo( SQLBASEAREAP pArea, HB_ULONG ulRecNo );
+static HB_ERRCODE mysqlGoTo( SQLBASEAREAP pArea, ULONG ulRecNo );
 static HB_ERRCODE mysqlGetValue( SQLBASEAREAP pArea, HB_USHORT uiIndex, PHB_ITEM pItem );
-
 
 static SDDNODE mysqldd =
 {
@@ -102,7 +99,6 @@ static SDDNODE mysqldd =
    ( SDDFUNC_GETVALUE )   mysqlGetValue,
    ( SDDFUNC_GETVARLEN )  NULL
 };
-
 
 static void hb_mysqldd_init( void * cargo )
 {
@@ -142,7 +138,6 @@ HB_CALL_ON_STARTUP_END( _hb_mysqldd_init_ )
    #include "hbiniseg.h"
 #endif
 
-
 /*=====================================================================================*/
 static HB_USHORT hb_errRT_MySQLDD( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, const char * szDescription, const char * szOperation, HB_ERRCODE errOsCode )
 {
@@ -181,14 +176,12 @@ static HB_ERRCODE mysqlConnect( SQLDDCONNECTION * pConnection, PHB_ITEM pItem )
    return HB_SUCCESS;
 }
 
-
 static HB_ERRCODE mysqlDisconnect( SQLDDCONNECTION * pConnection )
 {
    mysql_close( ( ( SDDCONN * ) pConnection->pSDDConn )->pMySql );
    hb_xfree( pConnection->pSDDConn );
    return HB_SUCCESS;
 }
-
 
 static HB_ERRCODE mysqlExecute( SQLDDCONNECTION * pConnection, PHB_ITEM pItem )
 {
@@ -231,7 +224,6 @@ static HB_ERRCODE mysqlExecute( SQLDDCONNECTION * pConnection, PHB_ITEM pItem )
    }
    return HB_SUCCESS;
 }
-
 
 static HB_ERRCODE mysqlOpen( SQLBASEAREAP pArea )
 {
@@ -450,8 +442,7 @@ static HB_ERRCODE mysqlClose( SQLBASEAREAP pArea )
    return HB_SUCCESS;
 }
 
-
-static HB_ERRCODE mysqlGoTo( SQLBASEAREAP pArea, HB_ULONG ulRecNo )
+static HB_ERRCODE mysqlGoTo( SQLBASEAREAP pArea, ULONG ulRecNo )
 {
    SDDDATA * pSDDData = ( SDDDATA * ) pArea->pSDDData;
 
@@ -478,7 +469,6 @@ static HB_ERRCODE mysqlGoTo( SQLBASEAREAP pArea, HB_ULONG ulRecNo )
    }
    return HB_SUCCESS;
 }
-
 
 static HB_ERRCODE mysqlGetValue( SQLBASEAREAP pArea, HB_USHORT uiIndex, PHB_ITEM pItem )
 {

@@ -142,7 +142,7 @@ HPDF_U3D_LoadU3D   (HPDF_MMgr        mmgr,
 					HPDF_Xref        xref)
 {
 	HPDF_Dict u3d;
-	const char *type;
+	const char *type = NULL;
 
 	HPDF_PTRACE ((" HPDF_U3D_LoadU3D\n"));
 

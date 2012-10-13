@@ -1961,7 +1961,7 @@ HPDF_TTFontDef_SaveFontData  (HPDF_FontDef   fontdef,
     HPDF_Stream tmp_stream;
     HPDF_UINT32 *new_offsets;
     HPDF_UINT i;
-    HPDF_UINT32 check_sum_ptr;
+    HPDF_UINT32 check_sum_ptr = 0;
     HPDF_STATUS ret;
     HPDF_UINT32 offset_base;
     HPDF_UINT32 tmp_check_sum = 0xB1B0AFBA;

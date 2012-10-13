@@ -81,8 +81,7 @@ static HB_ERRCODE fbDisconnect( SQLDDCONNECTION * pConnection );
 static HB_ERRCODE fbExecute( SQLDDCONNECTION * pConnection, PHB_ITEM pItem );
 static HB_ERRCODE fbOpen( SQLBASEAREAP pArea );
 static HB_ERRCODE fbClose( SQLBASEAREAP pArea );
-static HB_ERRCODE fbGoTo( SQLBASEAREAP pArea, HB_ULONG ulRecNo );
-
+static HB_ERRCODE fbGoTo( SQLBASEAREAP pArea, ULONG ulRecNo );
 
 static SDDNODE firebirddd = {
    NULL,
@@ -96,7 +95,6 @@ static SDDNODE firebirddd = {
    ( SDDFUNC_GETVALUE )   NULL,
    ( SDDFUNC_GETVARLEN )  NULL
 };
-
 
 static void hb_firebirddd_init( void * cargo )
 {
@@ -134,7 +132,6 @@ HB_CALL_ON_STARTUP_END( _hb_firebirddd_init_ )
                               HB_DATASEG_FUNC( _hb_firebirddd_init_ )
    #include "hbiniseg.h"
 #endif
-
 
 /* ===================================================================================== */
 static HB_USHORT hb_errRT_FireBirdDD( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, const char * szDescription, const char * szOperation, HB_ERRCODE errOsCode )
@@ -189,7 +186,6 @@ static HB_ERRCODE fbConnect( SQLDDCONNECTION * pConnection, PHB_ITEM pItem )
    return HB_SUCCESS;
 }
 
-
 static HB_ERRCODE fbDisconnect( SQLDDCONNECTION * pConnection )
 {
    ISC_STATUS_ARRAY status;
@@ -199,14 +195,12 @@ static HB_ERRCODE fbDisconnect( SQLDDCONNECTION * pConnection )
    return HB_SUCCESS;
 }
 
-
 static HB_ERRCODE fbExecute( SQLDDCONNECTION * pConnection, PHB_ITEM pItem )
 {
    HB_SYMBOL_UNUSED( pConnection );
    HB_SYMBOL_UNUSED( pItem );
    return HB_SUCCESS;
 }
-
 
 static HB_ERRCODE fbOpen( SQLBASEAREAP pArea )
 {
@@ -433,7 +427,6 @@ static HB_ERRCODE fbOpen( SQLBASEAREAP pArea )
    return HB_SUCCESS;
 }
 
-
 static HB_ERRCODE fbClose( SQLBASEAREAP pArea )
 {
    SDDDATA *        pSDDData = ( SDDDATA * ) pArea->pSDDData;
@@ -459,8 +452,7 @@ static HB_ERRCODE fbClose( SQLBASEAREAP pArea )
    return HB_SUCCESS;
 }
 
-
-static HB_ERRCODE fbGoTo( SQLBASEAREAP pArea, HB_ULONG ulRecNo )
+static HB_ERRCODE fbGoTo( SQLBASEAREAP pArea, ULONG ulRecNo )
 {
    SDDDATA *        pSDDData = ( SDDDATA * ) pArea->pSDDData;
    ISC_STATUS_ARRAY status;
