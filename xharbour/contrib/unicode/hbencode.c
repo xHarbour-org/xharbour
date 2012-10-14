@@ -258,7 +258,7 @@ static int yEncode(FILE * fDes, char * postname, FILE * fSrc, long filelen, int 
          srclen=4096;
       }
 
-      id=fread(srcbuf,srclen,1,fSrc);
+      id=(int)fread(srcbuf,srclen,1,fSrc);
 
       if (id != 1)
       {
@@ -301,7 +301,7 @@ static int yEncode(FILE * fDes, char * postname, FILE * fSrc, long filelen, int 
             deslen++;
             *desp=10;
             deslen++;
-            id=fwrite(desbuf,deslen,1,fDes);
+            id=(int)fwrite(desbuf,deslen,1,fDes);
 
             if (id!=1)
             {
@@ -571,7 +571,7 @@ static int uuencode_file ( BYTE *strIn, BYTE *strOut )
 
    while ( TRUE )
    {
-      iLineLen = fread (strLine, sizeof (char), 45, fpin);
+      iLineLen = (USHORT)fread (strLine, sizeof (char), 45, fpin);
 
       if (iLineLen <= 0)
       {
@@ -631,7 +631,7 @@ static int uuencode_file_by_chunk ( BYTE *strIn, BYTE *sMask, ULONG nlines )
 
    while ( TRUE )
    {
-     iLineLen = fread (strLine, sizeof (char), 45, fpin);
+     iLineLen = (USHORT)fread (strLine, sizeof (char), 45, fpin);
 
      if (iLineLen <= 0)
      {

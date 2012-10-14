@@ -718,7 +718,7 @@ HB_FUNC( ADSEVALAOF )
 
       if( ISCHAR( 1 ) )
       {
-         char * pucFilter = hb_adsOemToAnsi( hb_parc( 1 ), hb_parclen( 1 ) );
+         char * pucFilter = hb_adsOemToAnsi( hb_parc( 1 ), ( ULONG ) hb_parclen( 1 ) );
 
          AdsEvalAOF( pArea->hTable,
                      ( UNSIGNED8 * ) pucFilter,
@@ -902,7 +902,7 @@ HB_FUNC( ADSSETAOF )
       if( pArea )
       {
          UNSIGNED16 usResolve = ( UNSIGNED16 ) ( hb_pcount() > 1 ? hb_parni( 2 ) : ADS_RESOLVE_DYNAMIC ); /* ADS_RESOLVE_IMMEDIATE */
-         char * pucFilter = hb_adsOemToAnsi( hb_parc( 1 ), hb_parclen( 1 ) );
+         char * pucFilter = hb_adsOemToAnsi( hb_parc( 1 ), ( ULONG ) hb_parclen( 1 ) );
 
          UNSIGNED32 ulRetVal = AdsSetAOF( pArea->hTable,
                                           ( UNSIGNED8 * ) pucFilter,
@@ -1613,7 +1613,7 @@ HB_FUNC( ADSVERSION )
          ucVersion[ 0 ] = '\0';
    }
 
-   iPos = strlen( ucVersion ) - 1;
+   iPos = ( int ) strlen( ucVersion ) - 1;
    while( iPos >= 0 && ucVersion[ iPos ] == ' ' )  /* remove trailing spaces */
       ucVersion[ iPos-- ] = '\0';
 

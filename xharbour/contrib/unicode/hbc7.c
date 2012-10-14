@@ -120,7 +120,7 @@ HB_FUNC(HB_URLENCODE)
    if (phbstr)
    {
       srcstr=(BYTE*) hb_itemGetCPtr(phbstr);
-      srclen=hb_itemGetCLen(phbstr);
+      srclen=(ULONG)hb_itemGetCLen(phbstr);
       dstlen=str2ue7(srcstr,srclen,NULL);
       dststr=(BYTE *) hb_xgrab(dstlen+1);
       str2ue7(srcstr,srclen,dststr);
@@ -141,7 +141,7 @@ HB_FUNC(HB_QPENCODE)
    if (phbstr)
    {
       srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
-      srclen=hb_itemGetCLen(phbstr);
+      srclen=(ULONG)hb_itemGetCLen(phbstr);
       dstlen=str2qp7(srcstr,srclen,NULL);
       dststr=(BYTE *) hb_xgrab(dstlen+1);
       str2qp7(srcstr,srclen,dststr);
@@ -162,7 +162,7 @@ HB_FUNC(HB_URLDECODE)
    if (phbstr)
    {
       srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
-      srclen=hb_itemGetCLen(phbstr);
+      srclen=(ULONG)hb_itemGetCLen(phbstr);
       dstlen=ue72str(srcstr,srclen,NULL);
       dststr=(BYTE *) hb_xgrab(dstlen);
       ue72str(srcstr,srclen,dststr);
@@ -183,7 +183,7 @@ HB_FUNC(HB_QPDECODE)
    if (phbstr)
    {
       srcstr=(BYTE*) hb_itemGetCPtr(phbstr);
-      srclen=hb_itemGetCLen(phbstr);
+      srclen=(ULONG)hb_itemGetCLen(phbstr);
       dstlen=qp72str(srcstr,srclen,NULL);
       dststr=(BYTE *) hb_xgrab(dstlen);
       qp72str(srcstr,srclen,dststr);

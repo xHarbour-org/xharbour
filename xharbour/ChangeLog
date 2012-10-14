@@ -8,6 +8,98 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-14 10:28 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbhpdf/harupdf.c
+  * contrib/hbhpdf/hpdf_streams.c
+  * contrib/hbhpdf/hpdf_fontdef_type1.c
+  * contrib/hbhpdf/hpdf_image_png.c
+  * contrib/hbhpdf/hpdf_u3d.c
+  * contrib/hbhpdf/hpdf_encrypt.c
+  * contrib/hbhpdf/hpdf_fontdef_tt.c
+  * contrib/hbhpdf/hpdf_fontdef_type1.c
+  * contrib/hbhpdf/hpdf_font_cid.c
+  * contrib/hbhpdf/hpdf_font_tt.c
+  * contrib/hbhpdf/hpdf_image.c
+  * contrib/hbhpdf/hpdf_image_png.c
+  * contrib/hbhpdf/hpdf_pages.c
+  * contrib/hbhpdf/hpdf_streams.c
+  * contrib/hbhpdf/hpdf_string.c
+  * contrib/hbhpdf/hpdf_u3d.c
+  * contrib/hbhpdf/hpdf_pdfa.c
+  * contrib/hbbz2/bzlib.c
+  * contrib/hbbz2/compress.c
+  * contrib/hbbz2/core.c
+  * contrib/hbbz2/bzlib.c
+  * contrib/sixapi/source/alias.c
+  * contrib/sixapi/source/append.c
+  * contrib/sixapi/source/dbcopy.c
+  * contrib/sixapi/source/dbdelim.c
+  * contrib/sixapi/source/dbsort.c
+  * contrib/sixapi/source/dbstru.c
+  * contrib/sixapi/source/decrypt.c
+  * contrib/sixapi/source/encrypt.c
+  * contrib/sixapi/source/get.c
+  * contrib/sixapi/source/index.c
+  * contrib/sixapi/source/lock.c
+  * contrib/sixapi/source/str.c
+  * contrib/sixapi/source/use.c
+  * contrib/sixapi/source/global.c
+  * contrib/unicode/hbcc.c
+  * contrib/unicode/hbc7.c
+  * contrib/unicode/hbcu.c
+  * contrib/unicode/hbcx.c
+  * contrib/unicode/hbcy.c
+  * contrib/unicode/hbcy.c
+  * contrib/unicode/hbcrc16.c
+  * contrib/unicode/hbcrc32.c
+  * contrib/unicode/hbcrpt32.c
+  * contrib/unicode/hbcrpt128.c
+  * contrib/unicode/hbencode.c
+  * contrib/unicode/hbcctool.c
+  * contrib/unicode/unitool.c
+  * contrib/hbzebra/codabar.c
+  * contrib/hbzebra/code11.c
+  * contrib/hbzebra/code128.c
+  * contrib/hbzebra/code39.c
+  * contrib/hbzebra/code93.c
+  * contrib/hbzebra/datamtrx.c
+  * contrib/hbzebra/eanupc.c
+  * contrib/hbzebra/itf.c
+  * contrib/hbzebra/msi.c
+  * contrib/hbzebra/pdf417.c
+  * contrib/hbzebra/qrcode.c
+  * contrib/gtwvw/gtwvw.c
+  * contrib/rdd_ads/ads1.c
+  * contrib/rdd_ads/adsfunc.c
+  * contrib/sddpg/sddpg.c
+  * contrib/sddmy/sddmy.c
+  * contrib/filemem/filemem.c
+  * contrib/gd/source/gdwrp.c
+  * contrib/libnf/proper.c
+  * contrib/libnf/getenvrn.c
+  * contrib/libnf/dispc.c
+  * contrib/libnf/fttext.c
+  * contrib/libnf/ftattr.c
+  * contrib/tp_/win32.c
+  * contrib/tp_/telepath.prg
+  * contrib/hbmlzo/core.c
+  * contrib/hblzf/core.c
+  * contrib/hblzf/lzf_c.c
+  * contrib/hblzf/lzf_d.c
+  * contrib/rddsql/sqlmix.c
+  * contrib/sddsqlt3/sddsqlt3.c
+  * contrib/freeimage/source/fi_wrp.c
+  * contrib/hbmzip/hbmzip.c
+  * contrib/hbexpat/xmlparse.c
+  * contrib/hbcab/compress.c
+  * contrib/hbcab/decompress.c
+  * contrib/hbsqlit3/xhbsqlite3.c
+  * contrib/tipssl/inetssl.c
+  * contrib/hbcurl/hbcurl.c
+  * contrib/hbcairo/core.c
+  * contrib/pgsql/postgres.c
+    ! pacify MSVC64 warnings in contrib-stuffs
+
 2012-10-13 22:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/fstemp.c
   * include/hbapifs.h

@@ -52,7 +52,7 @@ HB_FUNC( HB_DECOMPRESSCAB ) //  ( cCabFile, cDestDir )
 
       if( ISCHAR( 2 ) )
       {
-         int i = hb_parclen( 2 );
+         int i = ( int ) hb_parclen( 2 );
 
          if( i )
          {
@@ -127,7 +127,7 @@ static char * _decompressCab( char * cabinet_fullpath, void * vCallBack, BOOL bE
    /*
     * Is this file really a cabinet?
     */
-   hf = file_open(
+   hf = ( int ) file_open(
       cabinet_fullpath,
       _O_BINARY | _O_RDONLY | _O_SEQUENTIAL,
       0
@@ -240,22 +240,22 @@ static INT_PTR file_open( LPSTR pszFile, int oflag, int pmode )
 
 static UINT file_read( INT_PTR hf, void * pv, UINT cb )
 {
-   return _read( hf, pv, cb );
+   return _read( ( int ) hf, pv, cb );
 }
 
 static UINT file_write( INT_PTR hf, void * pv, UINT cb )
 {
-   return _write( hf, pv, cb );
+   return _write( ( int ) hf, pv, cb );
 }
 
 static int file_close( INT_PTR hf )
 {
-   return _close( hf );
+   return _close( ( int ) hf );
 }
 
 static long file_seek( INT_PTR hf, long dist, int seektype )
 {
-   return _lseek( hf, dist, seektype );
+   return _lseek( ( int ) hf, dist, seektype );
 }
 
 static INT_PTR notification_function( FDINOTIFICATIONTYPE fdint, PFDINOTIFICATION pfdin )
@@ -297,7 +297,7 @@ static INT_PTR notification_function( FDINOTIFICATIONTYPE fdint, PFDINOTIFICATIO
             pfdin->psz1
             );
 
-         handle = file_open(
+         handle = ( int ) file_open(
             destination,
             _O_BINARY | _O_CREAT | _O_WRONLY | _O_SEQUENTIAL,
             _S_IREAD | _S_IWRITE

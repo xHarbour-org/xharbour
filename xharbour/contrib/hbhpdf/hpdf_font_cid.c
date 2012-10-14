@@ -367,9 +367,9 @@ CIDFontType2_New (HPDF_Font parent, HPDF_Xref xref)
     if (HPDF_Dict_Add (font, "DW2", array) != HPDF_OK)
         return NULL;
 
-    ret += HPDF_Array_AddNumber (array, fontdef->font_bbox.bottom);
-    ret += HPDF_Array_AddNumber (array, fontdef->font_bbox.bottom -
-                fontdef->font_bbox.top);
+    ret += HPDF_Array_AddNumber (array, (HPDF_INT32) fontdef->font_bbox.bottom);
+    ret += HPDF_Array_AddNumber (array, (HPDF_INT32) (fontdef->font_bbox.bottom -
+                fontdef->font_bbox.top));
 
     HPDF_MemSet (tmp_map, 0, sizeof(HPDF_UNICODE) * 65536);
 
@@ -441,7 +441,7 @@ CIDFontType2_New (HPDF_Font parent, HPDF_Xref xref)
                 HPDF_UINT16 gid = tmp_map[i];
 
                 u[0] = gid >> 8;
-                u[1] = gid;
+                u[1] = (HPDF_BYTE) gid;
 
                 HPDF_MemCpy ((HPDF_BYTE *)(tmp_map + i), u, 2);
             }
@@ -577,8 +577,8 @@ TextWidth  (HPDF_Font         font,
                     (HPDF_CIDFontDefAttr)attr->fontdef->attr;
         dw2 = cid_fontdef_attr->DW2[1];
     } else {
-        dw2 = attr->fontdef->font_bbox.bottom -
-                    attr->fontdef->font_bbox.top;
+        dw2 = (HPDF_INT) (attr->fontdef->font_bbox.bottom -
+                    attr->fontdef->font_bbox.top);
     }
 
     HPDF_Encoder_SetParseText (encoder, &parse_state, text, len);
@@ -662,8 +662,8 @@ MeasureText  (HPDF_Font          font,
                 (HPDF_CIDFontDefAttr)attr->fontdef->attr;
         dw2 = cid_fontdef_attr->DW2[1];
     } else {
-        dw2 = attr->fontdef->font_bbox.bottom -
-                    attr->fontdef->font_bbox.top;
+        dw2 = (HPDF_INT) (attr->fontdef->font_bbox.bottom -
+                    attr->fontdef->font_bbox.top);
     }
 
     HPDF_Encoder_SetParseText (encoder, &parse_state, text, len);
@@ -733,7 +733,7 @@ MeasureText  (HPDF_Font          font,
                 w += char_space;
         }
 
-        w += (HPDF_DOUBLE)tmp_w * font_size / 1000;
+        w += (HPDF_REAL)(tmp_w * font_size / 1000);
 
         /* 2006.08.04 break when it encountered  line feed */
         if (w > width || b == 0x0A)

@@ -80,7 +80,7 @@ static int _ftIsLower( char );
 
 HB_FUNC( FT_PROPER )
 {
-   int      iLen = hb_parclen( 1 );
+   int      iLen = (int) hb_parclen( 1 );
    char *   cStr;
 
    int      i, fCap = TRUE; /*, iPos = 0; */

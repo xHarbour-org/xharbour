@@ -75,7 +75,7 @@ HB_FUNC( SX_SETSOFTSEEK )
       lSoftSeekIsOn = hb_parl( 1 );
    else if( ISCHAR( 1 ) )
    {
-      int      iLen    = hb_parclen( 1 ) + 1;
+      int      iLen    = ( int ) hb_parclen( 1 ) + 1;
       char *   szTmp   = ( char * ) hb_xgrab( iLen );
 
       hb_snprintf( szTmp, iLen, "%s", hb_parc( 1 ) );
@@ -129,7 +129,7 @@ HB_FUNC( SX_SETEXACT )
       bSetExactIsOn = hb_parl( 1 );
    else if( ISCHAR( 1 ) )
    {
-      int      iLen    = hb_parclen( 1 ) + 1;
+      int      iLen    = ( int ) hb_parclen( 1 ) + 1;
       char *   szTmp   = ( char * ) hb_xgrab( iLen );
 
       hb_snprintf( szTmp, iLen, "%s", hb_parc( 1 ) );
@@ -226,7 +226,7 @@ HB_FUNC( SX_SETDELETED )
       lDeletedIsOn = hb_parl( 1 );
    else if( ISCHAR( 1 ) )
    {
-      int      iLen    = hb_parclen( 1 ) + 1;
+      int      iLen    = ( int ) hb_parclen( 1 ) + 1;
       char *   szTmp   = ( char * ) hb_xgrab( iLen );
 
       hb_snprintf( szTmp, iLen, "%s", hb_parc( 1 ) );
@@ -249,7 +249,7 @@ HB_FUNC( SX_SETDELETED )
 static char * set_string( char * cDateFormat )
 {
    char *   szString;
-   ULONG    ulLen = strlen( cDateFormat );
+   ULONG    ulLen = ( ULONG ) strlen( cDateFormat );
 
    if( ulLen > USHRT_MAX )
       ulLen = USHRT_MAX;
@@ -334,7 +334,7 @@ HB_FUNC( SX_SETDATEFORMAT )
 
    if( ISCHAR( 1 ) )
    {
-      int      iLen    = hb_parclen( 1 ) + 1;
+      int      iLen    = ( int ) hb_parclen( 1 ) + 1;
       char *   szTmp   = ( char * ) hb_xgrab( iLen );
 
       hb_snprintf( szTmp, iLen, "%s", hb_parc( 1 ) );
@@ -405,7 +405,7 @@ HB_FUNC( SX_SETCENTURY )
       bCenturyIsOn = hb_parl( 1 );
    else if( ISCHAR( 1 ) )
    {
-      int      iLen    = hb_parclen( 1 ) + 1;
+      int      iLen    = ( int ) hb_parclen( 1 ) + 1;
       char *   szTmp   = ( char * ) hb_xgrab( iLen );
 
       hb_snprintf( szTmp, iLen, "%s", hb_parc( 1 ) );
@@ -447,7 +447,7 @@ HB_FUNC( SX_SETCHRCOLLATE )
    if( vParam )
    {
       char * szChrCollate[255];
-      ULONG ulLen = HB_ARRAY_LEN( vParam );
+      ULONG ulLen = ( ULONG ) HB_ARRAY_LEN( vParam );
       ULONG u;
 
       for ( u = 0; u < ulLen ; u ++ )
@@ -563,7 +563,7 @@ HB_FUNC( SX_SETOEMCOLLATE )
    if( vParam )
    {
       char * sxOEMCollate[255];
-      ULONG ulLen = HB_ARRAY_LEN( vParam );
+      ULONG ulLen = ( ULONG ) HB_ARRAY_LEN( vParam );
       ULONG u;
 
       for ( u = 0; u < ulLen ; u ++ )
@@ -756,7 +756,7 @@ HB_FUNC( SX_SETGETTRIMMED )
       bSetTrimmedON = hb_parl( 1 );
    else if( ISCHAR( 1 ) )
    {
-      int      iLen    = hb_parclen( 1 ) + 1;
+      int      iLen    = ( int ) hb_parclen( 1 ) + 1;
       char *   szTmp   = ( char * ) hb_xgrab( iLen );
 
       hb_snprintf( szTmp, iLen, "%s", hb_parc( 1 ) );

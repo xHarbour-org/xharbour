@@ -89,7 +89,7 @@ HB_FUNC(HB_ENCRYPT32) //(cStr)->cEnc
 
    if (phbpsw)
    {
-      int_cryptbl((BYTE*) hb_itemGetCPtr(phbpsw),hb_itemGetCLen(phbpsw));
+      int_cryptbl((BYTE*) hb_itemGetCPtr(phbpsw),(ULONG)hb_itemGetCLen(phbpsw));
    }
    else
    {
@@ -99,7 +99,7 @@ HB_FUNC(HB_ENCRYPT32) //(cStr)->cEnc
    if (phbstr)
    {
       srcstr=(BYTE*) hb_itemGetCPtr(phbstr);
-      srclen=hb_itemGetCLen(phbstr);
+      srclen=(ULONG)hb_itemGetCLen(phbstr);
       dstlen=8*((srclen+15)/8);
       crc=hbcc_crc32(srcstr,srclen,0l);
       dststr=(BYTE *) hb_xgrab(dstlen);
@@ -130,7 +130,7 @@ HB_FUNC(HB_DECRYPT32) //(cEnc)->cStr
 
    if (phbpsw)
    {
-      int_cryptbl((BYTE*)hb_itemGetCPtr(phbpsw),hb_itemGetCLen(phbpsw));
+      int_cryptbl((BYTE*)hb_itemGetCPtr(phbpsw),(ULONG)hb_itemGetCLen(phbpsw));
    }
    else
    {
@@ -140,7 +140,7 @@ HB_FUNC(HB_DECRYPT32) //(cEnc)->cStr
    if (phbstr)
    {
       srcstr=(BYTE *)hb_itemGetCPtr(phbstr);
-      srclen=hb_itemGetCLen(phbstr);
+      srclen=(ULONG)hb_itemGetCLen(phbstr);
       dststr=(BYTE *) hb_xgrab(srclen);
       memcpy(dststr,srcstr,srclen);
       int_decrypt(dststr,srclen);

@@ -160,7 +160,7 @@ HB_FUNC( SX_DBINFO )
       {
          PHB_ITEM aSingleInfo   = hb_itemNew( NULL );
          char *   szAlias       = ISCHAR( 1 ) ? ( char * ) hb_parc( 1 ) : ( char * ) sx_Alias( ( WORD ) hb_parni( 1 ) );
-         int      iLen          = strlen( szAlias ) + 1;
+         int      iLen          = ( int ) strlen( szAlias ) + 1;
 
          hb_arrayNew( aSingleInfo, 0 );
 

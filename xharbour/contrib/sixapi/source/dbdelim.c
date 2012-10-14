@@ -36,7 +36,7 @@ static void _sx_GetLine( PHB_ITEM pArray, FILE * hFileHandle, char * cDelimiter 
 
    if( HB_IS_ARRAY( pArray ) )
    {
-      uiLen = HB_ARRAY_LEN( pArray );
+      uiLen = (LONG) HB_ARRAY_LEN( pArray );
       if( uiLen > 0 )
       {
          for( i = 0; i < uiLen; i++ )

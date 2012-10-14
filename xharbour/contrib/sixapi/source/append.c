@@ -230,7 +230,7 @@ static int _checkDelimChar( const char * _cDelim )
 {
    int      ui;
    int      iResult = -1;
-   int      iLen    = strlen( _cDelim ) + 1;
+   int      iLen    = ( int ) strlen( _cDelim ) + 1;
    char *   szTmp   = ( char * ) hb_xgrab( iLen );
 
    hb_snprintf( szTmp, iLen, "%s", _cDelim );

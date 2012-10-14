@@ -135,7 +135,7 @@ HB_FUNC( HB_UNISTRLEN )
 
    if ( hb_param( 1, HB_IT_STRING ) )
    {
-      ULONG uInLen = hb_parclen( 1 );
+      ULONG uInLen = (ULONG) hb_parclen( 1 );
       const char* szStr = hb_parc( 1 );
       ULONG i = 0;
 
@@ -183,7 +183,7 @@ HB_FUNC( HB_UNIAVAILABLE )
 static USHORT *hb_getCP( const char* szCP )
 {
    UINT t = 0;
-   ULONG lszCPLen = strlen( szCP );
+   ULONG lszCPLen = (ULONG) strlen( szCP );
 
    do
    {
@@ -227,7 +227,7 @@ HB_FUNC( HB_STR2UNI )
 
    if( uCP && ISCHAR(1) )
    {
-      ULONG uLen = hb_parclen( 1 );
+      ULONG uLen = (ULONG) hb_parclen( 1 );
 
       if( uLen > 0 )
       {
@@ -273,7 +273,7 @@ HB_FUNC( HB_UNI2STR )
 
    if( uCP && ISCHAR(1) )
    {
-      ULONG uLen = hb_parclen( 1 );
+      ULONG uLen = (ULONG) hb_parclen( 1 );
 
       if( uLen > 0 )
       {

@@ -101,7 +101,7 @@ HB_FUNC(MKCRYPTKEY) //(cPass) -> ckey(32)
     if (phbstr)
     {
        srcStr=(BYTE *)hb_itemGetCPtr(phbstr);
-       srcLen=hb_itemGetCLen(phbstr);
+       srcLen=(ULONG)hb_itemGetCLen(phbstr);
     }
     else
     {
@@ -151,7 +151,7 @@ HB_FUNC(ENCRYPT128) //(cStr)->cEnc
     if (phbstr)
     {
        srcstr=(BYTE*) hb_itemGetCPtr(phbstr);
-       srclen=hb_itemGetCLen(phbstr);
+       srclen=(ULONG)hb_itemGetCLen(phbstr);
        dstlen=32*((srclen+39)/32);
        crc=hbcc_crc32(srcstr,srclen,0l);
        dststr=(BYTE *) hb_xgrab(dstlen);
@@ -186,7 +186,7 @@ HB_FUNC(DECRYPT128) //(cEnc)->cStr
     if (phbstr)
     {
        srcstr=(BYTE *)hb_itemGetCPtr(phbstr);
-       srclen=hb_itemGetCLen(phbstr);
+       srclen=(ULONG)hb_itemGetCLen(phbstr);
        dststr=(BYTE *) hb_xgrab(srclen);
        memcpy(dststr,srcstr,srclen);
        int_decrypt(dststr,srclen);

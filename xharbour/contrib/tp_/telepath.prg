@@ -58,18 +58,12 @@
    so you can always retrieve them (see CVS docs on how to)
 */
 
-
 #include "common.ch"
 #include "fileio.ch"
 #include "telepath.ch"
 
-
-
 STATIC   aPorts               // Array with port info
 STATIC   nErrorCode := 0      // Error code from last operation, 0 if no error
-
-
-
 
 function tp_baud( nPort, nNewBaud )
 
@@ -102,23 +96,17 @@ function tp_baud( nPort, nNewBaud )
 
 return aPorts[ nPort, TPFP_BAUD ]
 
-
-
 function tp_inkey( nSecs )
    if valtype( nSecs ) == "U"
       return inkey()
    endif
 return inkey( nSecs )
 
-
-
 function tp_idle( lNewval )
    if lNewval == .t.
       return .t.
    endif
 return .f.
-
-
 
 function tp_delay( nTime )
 
@@ -135,8 +123,6 @@ function tp_delay( nTime )
    ThreadSleep( nTime * 1000 )
 
 return nil
-
-
 
 function tp_close( nPort, nTimeout )
 
@@ -165,8 +151,6 @@ function tp_close( nPort, nTimeout )
 
 return 0
 
-
-
 function tp_reopen( nPort, nInSize, nOutSize )
 
    LOCAL nBaud, nData, cParity, nStop, cPortName
@@ -184,8 +168,6 @@ function tp_reopen( nPort, nInSize, nOutSize )
    nStop       := aPorts[ nPort, TPFP_SBITS  ]
 
 return tp_open( nPort, nInSize, nOutSize, nBaud, nData, cParity, nStop, cPortName )
-
-
 
 function tp_open( nPort, nInSize, nOutSize, nBaud, nData, cParity, nStop, cPortname )
 
@@ -285,8 +267,6 @@ function tp_open( nPort, nInSize, nOutSize, nBaud, nData, cParity, nStop, cPortn
 
 return TE_CONFL   // maybe should return something different?
 
-
-
 function tp_recv( nPort, nLength, nTimeout )
 
    local nDone
@@ -319,8 +299,6 @@ function tp_recv( nPort, nLength, nTimeout )
    endif
 
 return cRet
-
-
 
 function tp_send( nPort, cString, nTimeout )
 
@@ -367,15 +345,11 @@ function tp_send( nPort, cString, nTimeout )
 
 return nTotWritten
 
-
-
 function tp_sendsub( nPort, cString, nStart, nLength, nTimeout )
 
    default nStart to 1, nLength to Len( cString )
 
 return tp_send( nPort, SubStr( cString, nStart, nLength ), nTimeout )
-
-
 
 function tp_recvto( nPort, cDelim, nMaxlen, nTimeout )
 
@@ -461,8 +435,6 @@ function tp_recvto( nPort, cDelim, nMaxlen, nTimeout )
 
 return cRet
 
-
-
 /*
     here's an improvement over original TP... you can "lookfor" a string
     here rather than just a char.  yay me.
@@ -479,8 +451,6 @@ function tp_lookfor( nPort, cLookfor )
 
 return At( cLookfor, aPorts[ nPort, TPFP_INBUF ] )
 
-
-
 function tp_inchrs( nPort )
 
    if ! isopenport( nPort )
@@ -491,8 +461,6 @@ function tp_inchrs( nPort )
 
 return Len( aPorts[ nPort, TPFP_INBUF ] )
 
-
-
 function tp_outfree( nPort )
 
    if ! isopenport( nPort )
@@ -500,8 +468,6 @@ function tp_outfree( nPort )
    endif
 
 return p_OutFree( aPorts[ nPort, TPFP_HANDLE ] )
-
-
 
 function tp_clearin( nPort )
 
@@ -512,26 +478,17 @@ function tp_clearin( nPort )
 
 return nil
 
-
-
 function tp_clrkbd()
 
    clear typeahead
 
 return nil
 
-
-
 function tp_crc16( cString )
-
 return p_CRC16( cString )
 
-
-
 function tp_crc32( cString )
-
 return p_CRC32( cString )
-
 
 /*                   nPort, nTimeout, acList|cString..., lIgnorecase */
 function tp_waitfor( ... )
@@ -596,8 +553,6 @@ function tp_waitfor( ... )
 
 return 0
 
-
-
 /* We cannot set, well, _I_ think we cannot, CTS without setting RTS flowcontrol, so this
    function and tp_ctrlrts() do the same thing, that is set/reset CRTSCTS flowcontol */
 function tp_ctrlcts( nPort, nNewCtrl )
@@ -618,13 +573,10 @@ function tp_ctrlcts( nPort, nNewCtrl )
 
 return nCurValue
 
-
 // Simply calls tp_ctrlcts()
 function tp_ctrlrts( nPort, nNewCtrl )
 
 return tp_ctrlcts( nPort, nNewCtrl )
-
-
 
 /*
 
@@ -666,8 +618,6 @@ function tp_ctrldtr( nPort, nParamNewval )
 return noldval
 */
 
-
-
 function tp_isdcd( nPort )
 
    if ! isopenport( nPort )
@@ -675,8 +625,6 @@ function tp_isdcd( nPort )
    endif
 
 return p_isdcd( aPorts[ nPort, TPFP_HANDLE ] )
-
-
 
 function tp_isri( nPort )
 
@@ -686,8 +634,6 @@ function tp_isri( nPort )
 
 return p_isri( aPorts[ nPort, TPFP_HANDLE ] )
 
-
-
 function tp_isdsr( nPort )
 
    if ! isopenport( nPort )
@@ -696,8 +642,6 @@ function tp_isdsr( nPort )
 
 return p_isdsr( aPorts[ nPort, TPFP_HANDLE ] )
 
-
-
 function tp_iscts( nPort )
 
    if ! isopenport( nPort )
@@ -705,8 +649,6 @@ function tp_iscts( nPort )
    endif
 
 return p_iscts( aPorts[ nPort, TPFP_HANDLE ] )
-
-
 
 #ifdef __PLATFORM__Linux
 // NB: On linux i don't know how to make a drain with a timeout, so here
@@ -761,8 +703,6 @@ function tp_flush( nPort, nTimeout )
 return iif( tp_OutFree( nPort ) > 0, TE_TMOUT, 0 )
 #endif
 
-
-
 /*
 
 /// sorry, but ctrldsr and ctrlcts will act like isdsr and iscts... if you want
@@ -776,9 +716,6 @@ return 0
 
 function tp_setport
 return 0
-
-
-
 */
 
 // internal (static) functions ---------------------------------------------------
@@ -791,8 +728,6 @@ static function isopenport( nPort )
 
 return aPorts[ nPort, TPFP_OC ]
 
-
-
 static function isport( nPort )
 
    if valtype( nPort ) != "N" .or. nPort < 1 .or. nPort > TP_MAXPORTS
@@ -800,8 +735,6 @@ static function isport( nPort )
    endif
 
 return .t.
-
-
 
 static function FetchChars( nPort )
 
@@ -819,8 +752,6 @@ static function FetchChars( nPort )
 
 return Len( cStr )
 
-
-
 INIT PROCEDURE _tpinit()
 
    local x
@@ -834,9 +765,6 @@ INIT PROCEDURE _tpinit()
    endif
 
 return
-
-
-
 
 /*
 /// you can uncomment the following section for compatability with TP code... I figured
@@ -886,15 +814,12 @@ function tp_debug( nDebugLevel, cString )
 return nil
 */
 
-
-
 /* ----- platform neutral C code -------------------------------------- */
 
 #pragma begindump
 
 #define _CLIPDEFS_H     // Don't ridefine basic types
-#include "hbapifs.h"
-#include "extend.api"
+#include "hbapi.h"
 
 /* crctab calculated by Mark G. Mendel, Network Systems Corporation */
 static unsigned short crctab[ 256 ] = {
@@ -932,15 +857,13 @@ static unsigned short crctab[ 256 ] = {
     0x6e17,  0x7e36,  0x4e55,  0x5e74,  0x2e93,  0x3eb2,  0x0ed1,  0x1ef0
 };
 
-
 /* updcrc() macro by Pete Disdale */
 #define updcrc(cp, crc)  ( ( crc << 8 ) ^ ( crctab[ ( ( crc >> 8 ) ^ cp ) & 0xFF ] ) )
 
-
-HB_FUNC( P_CRC16 ) {
-
-   const char *ptr = _parc( 1 );
-   int count = _parclen( 1 );
+HB_FUNC( P_CRC16 )
+{
+   const char *ptr = hb_parc( 1 );
+   int count = (int) hb_parclen( 1 );
 
    register unsigned short crc = 0;
 
@@ -949,10 +872,8 @@ HB_FUNC( P_CRC16 ) {
    }
 
    /* swap Hi and Lo byte */
-   _retnl( ( crc >> 8 ) | ( ( crc << 8 ) & 0xFF00 ) );
+   hb_retnl( ( crc >> 8 ) | ( ( crc << 8 ) & 0xFF00 ) );
 }
-
-
 
 /* Taken from: contrib/unicode/hbcrc32.c
 
@@ -1002,15 +923,12 @@ static ULONG crc32tbl[ 256 ] = {
 0xBDBDF21Cl,0xCABAC28Al,0x53B39330l,0x24B4A3A6l,0xBAD03605l,0xCDD70693l,0x54DE5729l,0x23D967BFl,
 0xB3667A2El,0xC4614AB8l,0x5D681B02l,0x2A6F2B94l,0xB40BBE37l,0xC30C8EA1l,0x5A05DF1Bl,0x2D02EF8Dl };
 
-
-
 #define updcrc32(cp, crc)  ( crc32tbl[ ( crc ^ cp ) & 0xff ] ^ ( crc >> 8 ) )
 
-
-HB_FUNC( P_CRC32 ) {
-
-   const char *ptr = _parc( 1 );
-   int count = _parclen( 1 );
+HB_FUNC( P_CRC32 )
+{
+   const char *ptr = hb_parc( 1 );
+   int count = (int) hb_parclen( 1 );
 
    register ULONG crc = CRC32INIT;
 
@@ -1018,8 +936,7 @@ HB_FUNC( P_CRC32 ) {
       crc = updcrc32( *ptr++, crc );
    }
 
-   _retnl( crc ^ CRC32INIT );
+   hb_retnl( crc ^ CRC32INIT );
 }
 
 #pragma enddump
-

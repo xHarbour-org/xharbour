@@ -88,7 +88,6 @@
 #define FOX_EXCLUSIVE  48
 #define FOX_DENYFLAGS  48
 
-
 typedef struct _HB_MEMFS_INODE
 {
    HB_FOFFSET     llSize;
@@ -100,14 +99,12 @@ typedef struct _HB_MEMFS_INODE
    USHORT         uiDeny;
 } HB_MEMFS_INODE, * PHB_MEMFS_INODE;
 
-
 typedef struct _HB_MEMFS_FILE
 {
    PHB_MEMFS_INODE  pInode;
    HB_FOFFSET       llPos;
    USHORT           uiFlags;
 } HB_MEMFS_FILE, * PHB_MEMFS_FILE;
-
 
 typedef struct _HB_MEMFS_FS
 {
@@ -118,7 +115,6 @@ typedef struct _HB_MEMFS_FS
    ULONG              ulFileLast;
    PHB_MEMFS_FILE *   pFiles;
 } HB_MEMFS_FS, * PHB_MEMFS_FS;
-
 
 static HB_MEMFS_FS s_fs;
 static USHORT      s_error;
@@ -135,7 +131,6 @@ static HB_CRITICAL_T  s_mtx;
 #endif
 
 static void memfsInodeFree( PHB_MEMFS_INODE pInode );
-
 
 static void memfsExit( void * cargo )
 {
@@ -156,7 +151,6 @@ static void memfsExit( void * cargo )
    hb_xfree( s_fs.pInodes );
 }
 
-
 static void memfsInit( void )
 {
    /* HB_MEMFSMT_INIT( s_mtx ); */
@@ -170,7 +164,6 @@ static void memfsInit( void )
    s_fs.ulFileLast = 0;
    hb_vmAtExit( memfsExit, NULL );
 }
-
 
 /* Note: returns 1 based index! */
 static ULONG memfsInodeFind( const char * szName, ULONG * pulPos )
@@ -195,7 +188,6 @@ static ULONG memfsInodeFind( const char * szName, ULONG * pulPos )
       *pulPos = ulLeft;
    return 0;
 }
-
 
 static PHB_MEMFS_INODE memfsInodeAlloc( const char* szName )
 {
@@ -234,14 +226,12 @@ static PHB_MEMFS_INODE memfsInodeAlloc( const char* szName )
    return pInode;
 }
 
-
 static void memfsInodeFree( PHB_MEMFS_INODE pInode )
 {
    hb_xfree( pInode->pData );
    hb_xfree( pInode->szName );
    hb_xfree( pInode );
 }
-
 
 static PHB_MEMFS_FILE memfsFileAlloc( PHB_MEMFS_INODE pInode )
 {
@@ -254,7 +244,6 @@ static PHB_MEMFS_FILE memfsFileAlloc( PHB_MEMFS_INODE pInode )
    return pFile;
 }
 
-
 static PHB_MEMFS_FILE memfsHandleToFile( HB_FHANDLE hFile )
 {
    if( hFile == FS_ERROR || ( ULONG ) hFile == 0 || ( ULONG ) hFile > s_fs.ulFileAlloc || s_fs.pFiles[ ( ULONG ) hFile - 1 ] == NULL )
@@ -265,7 +254,6 @@ static PHB_MEMFS_FILE memfsHandleToFile( HB_FHANDLE hFile )
    else
       return s_fs.pFiles[ ( ULONG ) hFile - 1 ];
 }
-
 
 static HB_FHANDLE memfsHandleAlloc( PHB_MEMFS_FILE pFile )
 {
@@ -301,14 +289,12 @@ static HB_FHANDLE memfsHandleAlloc( PHB_MEMFS_FILE pFile )
    return ( HB_FHANDLE ) ( ul + 1 );
 }
 
-
 /* ======== Public Memory FS functions ======== */
 
 HB_MEMFS_EXPORT USHORT hb_memfsError( void )
 {
    return s_error;
 }
-
 
 HB_MEMFS_EXPORT BOOL hb_memfsFileExists( const char * szName )
 {
@@ -319,7 +305,6 @@ HB_MEMFS_EXPORT BOOL hb_memfsFileExists( const char * szName )
    HB_MEMFSMT_UNLOCK
    return bRet;
 }
-
 
 HB_MEMFS_EXPORT BOOL hb_memfsDelete( const char * szName )
 {
@@ -345,7 +330,6 @@ HB_MEMFS_EXPORT BOOL hb_memfsDelete( const char * szName )
    return 1;
 }
 
-
 HB_MEMFS_EXPORT BOOL hb_memfsRename( const char * szName, const char * szNewName )
 {
    ULONG  ulInode;
@@ -368,7 +352,6 @@ HB_MEMFS_EXPORT BOOL hb_memfsRename( const char * szName, const char * szNewName
    HB_MEMFSMT_UNLOCK
    return 1;
 }
-
 
 HB_MEMFS_EXPORT HB_FHANDLE hb_memfsOpen( const char * szName, USHORT uiFlags )
 {
@@ -464,7 +447,6 @@ HB_MEMFS_EXPORT HB_FHANDLE hb_memfsOpen( const char * szName, USHORT uiFlags )
    return hFile;
 }
 
-
 HB_MEMFS_EXPORT void hb_memfsClose( HB_FHANDLE hFile )
 {
    PHB_MEMFS_FILE   pFile;
@@ -495,12 +477,11 @@ HB_MEMFS_EXPORT void hb_memfsClose( HB_FHANDLE hFile )
    hb_xfree( ( void * ) pFile );
 }
 
-
-HB_MEMFS_EXPORT ULONG hb_memfsReadAt( HB_FHANDLE hFile, void * pBuff, ULONG ulCount, HB_FOFFSET llOffset )
+HB_MEMFS_EXPORT HB_SIZE hb_memfsReadAt( HB_FHANDLE hFile, void * pBuff, HB_SIZE ulCount, HB_FOFFSET llOffset )
 {
    PHB_MEMFS_FILE   pFile;
    PHB_MEMFS_INODE  pInode;
-   ULONG            ulRead;
+   HB_SIZE          ulRead;
 
    if( ( pFile = memfsHandleToFile( hFile ) ) == NULL )
       return 0; /* invalid handle */
@@ -524,8 +505,7 @@ HB_MEMFS_EXPORT ULONG hb_memfsReadAt( HB_FHANDLE hFile, void * pBuff, ULONG ulCo
    return ulRead;
 }
 
-
-HB_MEMFS_EXPORT ULONG hb_memfsWriteAt( HB_FHANDLE hFile, const void * pBuff, ULONG ulCount, HB_FOFFSET llOffset )
+HB_MEMFS_EXPORT HB_SIZE hb_memfsWriteAt( HB_FHANDLE hFile, const void * pBuff, HB_SIZE ulCount, HB_FOFFSET llOffset )
 {
    PHB_MEMFS_FILE   pFile;
    PHB_MEMFS_INODE  pInode;
@@ -570,13 +550,11 @@ HB_MEMFS_EXPORT ULONG hb_memfsRead( HB_FHANDLE hFile, void * pBuff, ULONG ulCoun
    return hb_memfsReadAt( hFile, pBuff, ulCount, ( ( PHB_MEMFS_FILE ) pFile )->llPos );
 }
 
-
 HB_MEMFS_EXPORT ULONG hb_memfsWrite( HB_FHANDLE hFile, const void * pBuff, ULONG ulCount )
 {
    return hb_memfsWriteAt( hFile, pBuff, ulCount, ( ( PHB_MEMFS_FILE ) pFile )->llPos );
 }
 #endif
-
 
 HB_MEMFS_EXPORT BOOL hb_memfsTruncAt( HB_FHANDLE hFile, HB_FOFFSET llOffset )
 {
@@ -621,7 +599,6 @@ HB_MEMFS_EXPORT BOOL hb_memfsTruncAt( HB_FHANDLE hFile, HB_FOFFSET llOffset )
    return 1;
 }
 
-
 HB_MEMFS_EXPORT HB_FOFFSET hb_memfsSeek( HB_FHANDLE hFile, HB_FOFFSET llOffset, USHORT uiFlags )
 {
    PHB_MEMFS_FILE   pFile;
@@ -651,7 +628,6 @@ HB_MEMFS_EXPORT HB_FOFFSET hb_memfsSeek( HB_FHANDLE hFile, HB_FOFFSET llOffset, 
    return llPos;
 }
 
-
 HB_MEMFS_EXPORT void hb_memfsFlush( HB_FHANDLE hFile, BOOL fDirty )
 {
    HB_SYMBOL_UNUSED( hFile );
@@ -659,13 +635,11 @@ HB_MEMFS_EXPORT void hb_memfsFlush( HB_FHANDLE hFile, BOOL fDirty )
    return;
 }
 
-
 HB_MEMFS_EXPORT void hb_memfsCommit( HB_FHANDLE hFile )
 {
    HB_SYMBOL_UNUSED( hFile );
    return;
 }
-
 
 HB_MEMFS_EXPORT BOOL hb_memfsLock( HB_FHANDLE hFile, HB_FOFFSET ulStart, HB_FOFFSET ulLength, int iMode )
 {
@@ -692,15 +666,12 @@ typedef struct _HB_FILE
 }
 HB_FILE;
 
-
 static PHB_FILE s_fileNew( HB_FHANDLE hFile );
-
 
 static BOOL s_fileAccept( const char * pFilename )
 {
    return hb_strnicmp( pFilename, FILE_PREFIX, FILE_PREFIX_LEN ) == 0;
 }
-
 
 static BOOL s_fileExists( const char * pFilename, char * pRetPath )
 {
@@ -714,13 +685,11 @@ static BOOL s_fileExists( const char * pFilename, char * pRetPath )
    return 0;
 }
 
-
 static BOOL s_fileDelete( const char * pFilename, USHORT uiRemote )
 {
    HB_SYMBOL_UNUSED( uiRemote );
    return hb_memfsDelete( pFilename + FILE_PREFIX_LEN );
 }
-
 
 static BOOL s_fileRename( const char * szName, const char * szNewName )
 {
@@ -747,7 +716,7 @@ static PHB_FILE s_fileOpen( const char * szName, const char * szDefExt, USHORT u
 
    hb_strncpy( szNameNew, szName + FILE_PREFIX_LEN, HB_PATH_MAX );
 
-   ulLen = strlen( szNameNew );
+   ulLen = (ULONG) strlen( szNameNew );
    do {
       if( ulLen == 0 || strchr( HB_OS_PATH_DELIM_CHR_LIST, szNameNew[ ulLen - 1 ] ) )
       {
@@ -783,13 +752,11 @@ static PHB_FILE s_fileOpen( const char * szName, const char * szDefExt, USHORT u
    }
 }
 
-
 static void s_fileClose( PHB_FILE pFile )
 {
    hb_memfsClose( pFile->hFile );
    hb_xfree( pFile );
 }
-
 
 static BOOL s_fileLock( PHB_FILE pFile, HB_FOFFSET ulStart,
                         HB_FOFFSET ulLen, int iType )
@@ -797,26 +764,22 @@ static BOOL s_fileLock( PHB_FILE pFile, HB_FOFFSET ulStart,
    return hb_memfsLock( pFile->hFile, ulStart, ulLen, iType );
 }
 
-
-static ULONG s_fileReadAt( PHB_FILE pFile, void * buffer,
-                           ULONG ulSize, HB_FOFFSET llOffset )
+static HB_SIZE s_fileReadAt( PHB_FILE pFile, void * buffer,
+                           HB_SIZE ulSize, HB_FOFFSET llOffset )
 {
    return hb_memfsReadAt( pFile->hFile, buffer, ulSize, llOffset );
 }
 
-
-static ULONG s_fileWriteAt( PHB_FILE pFile, const void * buffer,
-                               ULONG ulSize, HB_FOFFSET llOffset )
+static HB_SIZE s_fileWriteAt( PHB_FILE pFile, const void * buffer,
+                               HB_SIZE ulSize, HB_FOFFSET llOffset )
 {
    return hb_memfsWriteAt( pFile->hFile, buffer, ulSize, llOffset );
 }
-
 
 static BOOL s_fileTruncAt( PHB_FILE pFile, HB_FOFFSET llOffset )
 {
    return hb_memfsTruncAt( pFile->hFile, llOffset );
 }
-
 
 static HB_FOFFSET s_fileSize( PHB_FILE pFile )
 {
@@ -828,7 +791,7 @@ static HB_FOFFSET s_fileSeekLarge( PHB_FILE pFile, HB_FOFFSET llOffset, USHORT u
    return hb_memfsSeek( pFile->hFile, llOffset, uiFlags );
 }
 
-static ULONG s_fileWriteLarge( PHB_FILE pFile, const void * pBuff, ULONG ulCount )
+static HB_SIZE s_fileWriteLarge( PHB_FILE pFile, const void * pBuff, HB_SIZE ulCount )
 {
    HB_SYMBOL_UNUSED( pFile );
    HB_SYMBOL_UNUSED( pBuff );
@@ -836,7 +799,7 @@ static ULONG s_fileWriteLarge( PHB_FILE pFile, const void * pBuff, ULONG ulCount
    return 0;
 }
 
-static ULONG s_fileReadLarge( PHB_FILE pFile, void * pBuff, ULONG ulCount )
+static HB_SIZE s_fileReadLarge( PHB_FILE pFile, void * pBuff, HB_SIZE ulCount )
 {
    HB_SYMBOL_UNUSED( pFile );
    HB_SYMBOL_UNUSED( pBuff );
@@ -849,18 +812,15 @@ static void s_fileFlush( PHB_FILE pFile, BOOL fDirty )
    hb_memfsFlush( pFile->hFile, fDirty );
 }
 
-
 static void s_fileCommit( PHB_FILE pFile )
 {
    hb_memfsCommit( pFile->hFile );
 }
 
-
 static HB_FHANDLE s_fileHandle( PHB_FILE pFile )
 {
    return pFile ? pFile->hFile : FS_ERROR;
 }
-
 
 static const HB_FILE_FUNCS s_fileFuncs =
 {
@@ -882,7 +842,6 @@ static const HB_FILE_FUNCS s_fileFuncs =
    s_fileCommit,
    s_fileHandle
 };
-
 
 static PHB_FILE s_fileNew( HB_FHANDLE hFile )
 {

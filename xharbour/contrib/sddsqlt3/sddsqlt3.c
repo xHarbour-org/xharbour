@@ -243,7 +243,7 @@ static HB_ERRCODE sqlite3Open( SQLBASEAREAP pArea )
    sqlite3_stmt * st = NULL;
    SDDDATA * pSDDData;
    const char * pszQuery;
-   ULONG nQueryLen;
+   HB_SIZE nQueryLen;
    void * hQuery;
    HB_USHORT uiFields, uiIndex;
    PHB_ITEM pItemEof, pItem;

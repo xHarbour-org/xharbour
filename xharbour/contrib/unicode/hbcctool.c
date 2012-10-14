@@ -131,7 +131,7 @@ static int alltrim(char *ins)
 {
    int i, j, k;
 
-   j = strlen( ins ) - 1;
+   j = (int) strlen( ins ) - 1;
 
    for ( i = 0; i < j; i++ )
    {
@@ -259,12 +259,12 @@ int hbcc_txt2cst( const char *szInputFile )
            if ( c_leads[(i>>8)&(MAX_CHAR-1)] )
            {
               fnew = strchr( s_cleads, (i>>8)&(MAX_CHAR-1) );
-              k    = ( fnew - s_cleads );
+              k    = (int) ( fnew - s_cleads );
            }
            else
            {
               c_leads[(i>>8)&(MAX_CHAR-1)] = (char) 1;
-              k = strlen( s_cleads );
+              k = (int) strlen( s_cleads );
               s_cleads[k] = (char) ((i>>8)&(MAX_CHAR-1));
               s_aleads    = (char *) hb_xrealloc( s_aleads, (k+1)*(MAX_2CHAR) );
 
@@ -333,7 +333,7 @@ int hbcc_txt2cst( const char *szInputFile )
       fputc( fout[i], hout );
 
    fputc( 0, hout );
-   fputc( strlen( s_cleads ) + 1, hout );
+   fputc( (int) strlen( s_cleads ) + 1, hout );
 
    for ( i = 0; i < MAX_2CHAR; i++ )
       fputc( s_tuni[i], hout );

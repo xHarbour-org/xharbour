@@ -793,7 +793,7 @@ HB_FUNC( GDIMAGEPOLYGON ) // original: void gdImagePolygon(gdImagePtr im, gdPoin
 
       /* Retrieve point array */
       pPoints     = hb_param( 2, HB_IT_ARRAY );
-      pointsTotal = hb_arrayLen( pPoints );
+      pointsTotal = (int) hb_arrayLen( pPoints );
 
       for( i = 0; i < pointsTotal; i ++ )
       {
@@ -850,7 +850,7 @@ HB_FUNC( GDIMAGEOPENPOLYGON ) // original: void gdImageOpenPolygon(gdImagePtr im
 
       /* Retrieve point array */
       pPoints     = hb_param( 2, HB_IT_ARRAY );
-      pointsTotal = hb_arrayLen( pPoints );
+      pointsTotal = (int) hb_arrayLen( pPoints );
 
       for( i = 0; i < pointsTotal; i ++ )
       {
@@ -999,7 +999,7 @@ HB_FUNC( GDIMAGEFILLEDPOLYGON ) // original: void gdImageFilledPolygon(gdImagePt
 
       /* Retrieve point array */
       pPoints     = hb_param( 2, HB_IT_ARRAY );
-      pointsTotal = hb_arrayLen( pPoints );
+      pointsTotal = (int) hb_arrayLen( pPoints );
 
       for( i = 0; i < pointsTotal; i ++ )
       {
@@ -1471,7 +1471,7 @@ HB_FUNC( GDIMAGESETSTYLE ) // original: void gdImageSetStyle(gdImagePtr im, int 
 
       /* Retrieve style array */
       pStyles     = hb_param( 2, HB_IT_ARRAY );
-      styleLength = hb_arrayLen( pStyles );
+      styleLength = (int) hb_arrayLen( pStyles );
 
       for( i = 0; i < styleLength; i ++ )
       {

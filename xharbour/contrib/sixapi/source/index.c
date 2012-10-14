@@ -30,7 +30,7 @@ static int _sx_CheckIndexMode( char * szIndexMode )
    int      ui;
    int      iIndexMode    = 0;
 
-   int      iLen          = strlen( szIndexMode ) + 1;
+   int      iLen          = ( int ) strlen( szIndexMode ) + 1;
    char *   szTmp         = ( char * ) hb_xgrab( iLen );
 
    hb_snprintf( szTmp, iLen, "%s", szIndexMode );
@@ -281,7 +281,7 @@ HB_FUNC( SX_INDEXOPEN )
    {
       if( ISCHAR( 1 ) )
       {
-         int      iLen    = hb_parclen( 1 ) + 1;
+         int      iLen    = ( int ) hb_parclen( 1 ) + 1;
          char *   szTmp   = ( char * ) hb_xgrab( iLen );
 
          hb_snprintf( szTmp, iLen, "%s", ( char * ) hb_parc( 1 ) );

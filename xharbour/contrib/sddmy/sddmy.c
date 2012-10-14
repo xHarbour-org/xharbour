@@ -187,7 +187,7 @@ static HB_ERRCODE mysqlExecute( SQLDDCONNECTION * pConnection, PHB_ITEM pItem )
 {
    MYSQL *      pMySql = ( ( SDDCONN * ) pConnection->pSDDConn )->pMySql;
    MYSQL_RES *  pResult;
-   HB_ULONG     ulAffectedRows;
+   ULONG        ulAffectedRows;
    PHB_ITEM     pNewID = NULL;
 
    if ( mysql_real_query( pMySql, hb_itemGetCPtr( pItem ), ( unsigned long ) hb_itemGetCLen( pItem ) ) )
@@ -199,7 +199,7 @@ static HB_ERRCODE mysqlExecute( SQLDDCONNECTION * pConnection, PHB_ITEM pItem )
    pResult = mysql_store_result( pMySql );
    if ( pResult )
    {
-      ulAffectedRows = ( HB_ULONG ) mysql_num_rows( pResult );
+      ulAffectedRows = (ULONG) mysql_num_rows( pResult );
       mysql_free_result( pResult );
       hb_rddsqlSetError( 0, NULL, hb_itemGetCPtr( pItem ), NULL, ulAffectedRows );
    }
@@ -207,7 +207,7 @@ static HB_ERRCODE mysqlExecute( SQLDDCONNECTION * pConnection, PHB_ITEM pItem )
    {
       if ( mysql_field_count( pMySql ) == 0 )
       {
-         ulAffectedRows = ( HB_ULONG ) mysql_affected_rows( pMySql );
+         ulAffectedRows = (ULONG) mysql_affected_rows( pMySql );
          if( mysql_insert_id( pMySql ) != 0 )
          {
             pNewID = hb_itemPutNInt( NULL, mysql_insert_id( pMySql ) );
@@ -403,7 +403,7 @@ static HB_ERRCODE mysqlOpen( SQLBASEAREAP pArea )
      return HB_FAILURE;
    }
 
-   pArea->ulRecCount = ( HB_ULONG ) mysql_num_rows( pSDDData->pResult );
+   pArea->ulRecCount = ( ULONG ) mysql_num_rows( pSDDData->pResult );
 
    pArea->pRow = ( void ** ) hb_xgrab( ( pArea->ulRecCount + 1 ) * sizeof( void * ) );
    pArea->pRowFlags = ( HB_BYTE * ) hb_xgrab( ( pArea->ulRecCount + 1 ) * sizeof( HB_BYTE ) );

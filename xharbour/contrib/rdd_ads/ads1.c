@@ -398,7 +398,7 @@ static HB_ERRCODE hb_adsCheckLock( ADSAREAP pArea )
       u32RetVal = AdsIsRecordLocked( pArea->hTable, 0, &u16Locked );
       if( u32RetVal != AE_SUCCESS )
       {
-         hb_errRT_DBCMD( EG_UNLOCKED, u32RetVal, "Lock Required by TestRecLocks", "ADSISRECORDLOCKED" );
+         hb_errRT_DBCMD( EG_UNLOCKED, (HB_ERRCODE) u32RetVal, "Lock Required by TestRecLocks", "ADSISRECORDLOCKED" );
          return HB_FAILURE;
       }
       if( !u16Locked )
@@ -1451,7 +1451,7 @@ static HB_ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
       uiDec = ( USHORT ) iData;
       dbFieldInfo.uiDec = 0;
       szFieldType = hb_arrayGetCPtr( pFieldDesc, 2 );
-      iNameLen = strlen( szFieldType );
+      iNameLen = ( int ) strlen( szFieldType );
       iData = HB_TOUPPER( szFieldType[ 0 ] );
       switch( iData )
       {
@@ -2480,7 +2480,7 @@ static HB_ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             ULONG ulLen;
 
             bTypeError = FALSE;
-            ulLen = hb_itemGetCLen( pItem );
+            ulLen = ( ULONG ) hb_itemGetCLen( pItem );
 
             /* ToninhoFwi - 09/12/2006 - In the previous code ulLen was limited to 0xFFFF
                so, I comment it, because ADS support up to 4Gb in memo/binary/image fields.
@@ -2811,7 +2811,7 @@ static HB_ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
 
       if( uiFldLen == 0 )
       {
-         uiFldLen = strlen( ( char * ) ucBuffer );  /* should have been set by hb_snprintf above. */
+         uiFldLen = (UNSIGNED32) strlen( ( char * ) ucBuffer );  /* should have been set by hb_snprintf above. */
       }
       if( uiFldLen >= uiLen )
       {
@@ -3103,7 +3103,7 @@ static HB_ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
       u32RetVal = AdsCreateSQLStatement( hConnection, &hStatement );
       if( u32RetVal == AE_SUCCESS )
       {
-         char * szSQL = hb_adsOemToAnsi( szFile, strlen( szFile ) );
+         char * szSQL = hb_adsOemToAnsi( szFile, ( ULONG ) strlen( szFile ) );
 
 #if ADS_LIB_VERSION >= 900
          if( pArea->iFileType == ADS_CDX ||
@@ -4397,7 +4397,7 @@ static HB_ERRCODE adsSetFilter( ADSAREAP pArea, LPDBFILTERINFO pFilterInfo )
       if( bValidExpr )
       {
          char * szFilter = hb_adsOemToAnsi( pucFilter,
-                                 hb_itemGetCLen( pFilterInfo->abFilterText ) );
+                                 ( ULONG ) hb_itemGetCLen( pFilterInfo->abFilterText ) );
 
          if( hb_setGetL( HB_SET_OPTIMIZE ) )
             u32RetVal = AdsSetAOF( pArea->hTable, ( UNSIGNED8 * ) szFilter, usResolve );
@@ -5134,7 +5134,7 @@ HB_FUNC( ADSCUSTOMIZEAOF )
          ulRecord = hb_parnl( 1 );
       }
       else if( ISARRAY( 1 ) )           /* convert array of recnos to C array */
-         u32NumRecs = hb_parinfa( 1, 0 );
+         u32NumRecs = (UNSIGNED32) hb_parinfa( 1, 0 );
 
       if( u32NumRecs )
       {

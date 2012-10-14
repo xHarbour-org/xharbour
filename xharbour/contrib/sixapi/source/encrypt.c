@@ -49,7 +49,7 @@ HB_FUNC( _SX_ENCRYPT )
 {
    if( ISCHAR( 1 ) )
    {
-      int   iLen       = hb_parclen( 1 ) + 1;
+      int   iLen       = ( int ) hb_parclen( 1 ) + 1;
       PBYTE cpBuffer   = ( PBYTE ) hb_xgrab( iLen );
       hb_snprintf( ( char * ) cpBuffer, iLen, "%s", hb_parc( 1 ) );
 

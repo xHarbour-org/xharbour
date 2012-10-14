@@ -18,10 +18,13 @@
  *
  */
 
+#if defined(_MSC_VER) && (_MSC_VER>=1400)
+   #define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include <time.h>
 #include "hpdf_utils.h"
 #include "hpdf.h"
-
 
 #define XMP_HEADER "<?xpacket begin='' id='W5M0MpCehiHzreSzNTczkc9d'?><?adobe-xap-filters esc=\"CRLF\"?><x:xmpmeta xmlns:x='adobe:ns:meta/' x:xmptk='XMP toolkit 2.9.1-13, framework 1.6'><rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#' xmlns:iX='http://ns.adobe.com/iX/1.0/'>"
 #define XMP_FOOTER "</rdf:RDF></x:xmpmeta><?xpacket end='w'?>"

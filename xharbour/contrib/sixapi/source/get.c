@@ -174,7 +174,7 @@ char * _sx_GetDateValue( PBYTE cFieldName )
                digit,
                non_digit;
       char *   szDF = ( char * ) hb_setGetDateFormat();
-      int      size = strlen( hb_setGetDateFormat() );
+      int      size = ( int ) strlen( hb_setGetDateFormat() );
 
       for( count = 0; count < size; count++ )
       {
@@ -223,7 +223,7 @@ char * _sx_GetDateValue( PBYTE cFieldName )
       /* If there are non-digits at the start of the date field,
          they are not to be treated as date field separators */
       non_digit  = 1;
-      size       = strlen( szDate );
+      size       = ( int ) strlen( szDate );
       for( count = 0; count < size; count++ )
       {
          digit = szDate[ count ];

@@ -426,7 +426,7 @@ HPDF_Stream_WriteEscapeText2  (HPDF_Stream    stream,
 {
     char buf[HPDF_TEXT_DEFAULT_LEN];
     HPDF_UINT idx = 0;
-    HPDF_INT i;
+    HPDF_UINT i;
     const char* p = text;
     HPDF_STATUS ret;
 
@@ -804,7 +804,7 @@ HPDF_FileReader_ReadFunc  (HPDF_Stream  stream,
     HPDF_PTRACE((" HPDF_FileReader_ReadFunc\n"));
 
     HPDF_MemSet(ptr, 0, *siz);
-    rsiz = HPDF_FREAD(ptr, 1, *siz, fp);
+    rsiz = (HPDF_UINT)HPDF_FREAD(ptr, 1, *siz, fp);
 
     if (rsiz != *siz) {
         if (HPDF_FEOF(fp)) {
@@ -971,7 +971,7 @@ HPDF_FileWriter_WriteFunc  (HPDF_Stream      stream,
     HPDF_PTRACE((" HPDF_FileWriter_WriteFunc\n"));
 
     fp = (HPDF_FILEP)stream->attr;
-    ret = HPDF_FWRITE (ptr, 1, siz, fp);
+    ret = (HPDF_UINT)HPDF_FWRITE (ptr, 1, siz, fp);
 
     if (ret != siz) {
         return HPDF_SetError (stream->error, HPDF_FILE_IO_ERROR, HPDF_FERROR(fp));
@@ -1097,7 +1097,7 @@ HPDF_MemStream_SeekFunc  (HPDF_Stream      stream,
     } else if (mode == HPDF_SEEK_END)
         pos = stream->size - pos;
 
-    if (pos > stream->size) {
+    if (pos > (HPDF_INT) stream->size) {
         return HPDF_SetError (stream->error, HPDF_STREAM_EOF, 0);
     }
 

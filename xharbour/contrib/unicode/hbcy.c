@@ -183,7 +183,7 @@ HB_FUNC( YYDECODE_FILE )
       {
          if ( string )
          {
-            srclen = strlen( string );
+            srclen = (ULONG)strlen( string );
             dstlen = yye2str((BYTE*) string,srclen,NULL);
             if ( dstlen )
             {
@@ -192,7 +192,7 @@ HB_FUNC( YYDECODE_FILE )
 
                if ( bOutFile )
                {
-                  nBytesWritten += fwrite( dststr, sizeof(BYTE), dstlen, outFile );
+                  nBytesWritten += (ULONG) fwrite( dststr, sizeof(BYTE), dstlen, outFile );
                }
 
                hb_xfree(dststr);
@@ -225,9 +225,9 @@ HB_FUNC( YYDECODE_FILE )
 
                     if ( strstr ( string ,"=ybegin" ) != NULL )
                     {
-                       ulHeader = strlen( string );
+                       ulHeader = (ULONG)strlen( string );
 
-                       n_At = hb_strAt( "name=", 5, string, ulHeader );
+                       n_At = (int) hb_strAt( "name=", 5, string, ulHeader );
 
                        szFile = string + n_At + 4 ;
 
@@ -278,7 +278,7 @@ HB_FUNC(HB_YYENCODE)
    if (phbstr)
    {
       srcstr=(BYTE *)hb_itemGetCPtr(phbstr);
-      srclen=hb_itemGetCLen(phbstr);
+      srclen=(ULONG)hb_itemGetCLen(phbstr);
       dstlen=str2yye(srcstr,srclen,NULL);
       dststr=(BYTE *) hb_xgrab(dstlen);
       str2yye(srcstr,srclen,dststr);
@@ -299,7 +299,7 @@ HB_FUNC(HB_YYDECODE)
    if (phbstr)
    {
       srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
-      srclen=hb_itemGetCLen(phbstr);
+      srclen=(ULONG)hb_itemGetCLen(phbstr);
       dstlen=yye2str(srcstr,srclen,NULL);
       dststr=(BYTE *) hb_xgrab(dstlen);
       yye2str(srcstr,srclen,dststr);

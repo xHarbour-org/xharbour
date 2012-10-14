@@ -58,7 +58,7 @@ char * _sx_AutoAlias( const char * cpFileName )
       char *      szAlias;
       PHB_FNAME   pFileName = hb_fsFNameSplit( cpFileName );
 
-      uiLenAlias = strlen( ( char * ) pFileName->szName ) + 1;
+      uiLenAlias = ( int ) strlen( ( char * ) pFileName->szName ) + 1;
       szAlias    = ( char * ) hb_xgrab( uiLenAlias );
       hb_snprintf( szAlias, uiLenAlias, "%s", pFileName->szName );
       hb_xfree( pFileName );

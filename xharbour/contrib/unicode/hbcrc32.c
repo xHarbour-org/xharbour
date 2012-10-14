@@ -136,7 +136,7 @@ HB_FUNC(HB_CRC32)
    if (phbstr)
    {
       srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
-      srclen=hb_itemGetCLen(phbstr);
+      srclen=(ULONG)hb_itemGetCLen(phbstr);
       crc=hbcc_crc32(srcstr,srclen,0l);
       dststr[0]=(BYTE )(0xFF&(crc>>24));
       dststr[1]=(BYTE )(0xFF&(crc>>16));
@@ -161,7 +161,7 @@ HB_FUNC(HB_NCRC32)
       }
 
       srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
-      srclen=hb_itemGetCLen(phbstr);
+      srclen=(ULONG)hb_itemGetCLen(phbstr);
       crc=hbcc_crc32(srcstr,srclen,crc);
    }
 

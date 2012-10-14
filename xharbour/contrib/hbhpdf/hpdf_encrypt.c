@@ -601,7 +601,7 @@ HPDF_Encrypt_InitKey  (HPDF_Encrypt  attr,
     attr->encryption_key[attr->key_len] = object_id;
     attr->encryption_key[attr->key_len + 1] = (object_id >> 8);
     attr->encryption_key[attr->key_len + 2] = (object_id >> 16);
-    attr->encryption_key[attr->key_len + 3] = gen_no;
+    attr->encryption_key[attr->key_len + 3] = (HPDF_UINT32) gen_no;
     attr->encryption_key[attr->key_len + 4] = (gen_no >> 8);
 
     HPDF_PTRACE(("@@@ OID=%u, gen_no=%u\n", (HPDF_INT)object_id, gen_no));

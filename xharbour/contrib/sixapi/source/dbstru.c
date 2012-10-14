@@ -37,7 +37,7 @@ HB_FUNC( SX_COPYSTRUCTURE )
       PHB_ITEM paFields      = hb_param( 2, HB_IT_ARRAY );
       int      uilenpArray   = 0;
       WORD     iWorkArea     = SX_DUMMY_NUMBER;
-      int      iLen          = hb_parclen( 1 ) + 1;
+      int      iLen          = ( int ) hb_parclen( 1 ) + 1;
       char *   szTmp         = ( char * ) hb_xgrab( iLen );
 
       hb_snprintf( szTmp, iLen, "%s", hb_parc( 1 ) );
@@ -46,7 +46,7 @@ HB_FUNC( SX_COPYSTRUCTURE )
          iWorkArea = _sx_select( hb_param( 3, HB_IT_ANY ) );
 
       if( paFields )
-         uilenpArray = HB_ARRAY_LEN( paFields );
+         uilenpArray = ( int ) HB_ARRAY_LEN( paFields );
 
       if( uilenpArray == 0 )
       {
@@ -97,7 +97,7 @@ BOOL _sx_CopyStructure( PBYTE cpFileName, PHB_ITEM paFields )
    BOOL     bSuccess = FALSE;
 
    if( paFields )
-      uilenpArray = HB_ARRAY_LEN( paFields );
+      uilenpArray = ( int ) HB_ARRAY_LEN( paFields );
 
    if( uilenpArray )
    {
@@ -133,7 +133,7 @@ BOOL _sx_CopyStructure( PBYTE cpFileName, PHB_ITEM paFields )
    }
 
    // Reuse variable for new array
-   uilenpArray = HB_ARRAY_LEN( pStruct );
+   uilenpArray = ( int ) HB_ARRAY_LEN( pStruct );
 
    // OK Now we Get new array in &hb_stack.Return
    // Will create DBF as per new array

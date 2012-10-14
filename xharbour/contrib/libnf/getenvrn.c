@@ -215,7 +215,7 @@ HB_FUNC( FT_GETE )
                   // null string, we're done
                   break;
                // add length of this string plus 2 for the crlf
-               buffsize += ( strlen( ( char * ) sCurEnv ) + 2 );
+               buffsize += (int) ( strlen( ( char * ) sCurEnv ) + 2 );
             }
             // add 1 more byte for final nul character
             buffsize++;

@@ -248,7 +248,7 @@ HB_FUNC( XXDECODE_FILE )
                }
             } // end if ( !bOutFile )
 
-            srclen = strlen( string );
+            srclen = (ULONG)strlen( string );
             dstlen = int_xxdec((BYTE*) string,srclen,NULL);
             if ( dstlen )
             {
@@ -257,7 +257,7 @@ HB_FUNC( XXDECODE_FILE )
 
                if ( bOutFile )
                {
-                  nBytesWritten += fwrite( dststr, sizeof(BYTE), dstlen, outFile );
+                  nBytesWritten += (ULONG) fwrite( dststr, sizeof(BYTE), dstlen, outFile );
                }
 
                hb_xfree(dststr);
@@ -592,7 +592,7 @@ HB_FUNC(HB_XXENCODE)
    if (phbstr)
    {
       srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
-      srclen=hb_itemGetCLen(phbstr);
+      srclen=(ULONG)hb_itemGetCLen(phbstr);
       dstlen=int_xxenc(srcstr,srclen,NULL);
       dststr=(BYTE *) hb_xgrab(dstlen);
       int_xxenc(srcstr,srclen,dststr);
@@ -613,7 +613,7 @@ HB_FUNC(HB_XXDECODE)
    if (phbstr)
    {
       srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
-      srclen=hb_itemGetCLen(phbstr);
+      srclen=(ULONG)hb_itemGetCLen(phbstr);
       dstlen=int_xxdec(srcstr,srclen,NULL);
       dststr=(BYTE *) hb_xgrab(dstlen);
       int_xxdec(srcstr,srclen,dststr);

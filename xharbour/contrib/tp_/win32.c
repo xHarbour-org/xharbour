@@ -59,10 +59,8 @@
 #include "extend.api"
 #include "item.api"
 
-
-
-HB_FUNC( P_INITPORTSPEED ) {
-
+HB_FUNC( P_INITPORTSPEED )
+{
    DCB dcb;
    char values[20];
 
@@ -97,10 +95,8 @@ HB_FUNC( P_INITPORTSPEED ) {
    }
 }
 
-
-
-HB_FUNC( P_READPORT ) {
-
+HB_FUNC( P_READPORT )
+{
    char  Buffer[512];
    DWORD nRead = 0;
    BOOL  bRet;
@@ -115,15 +111,13 @@ HB_FUNC( P_READPORT ) {
    }
 }
 
-
-
-HB_FUNC( P_WRITEPORT ) {
-
+HB_FUNC( P_WRITEPORT )
+{
    DWORD nWritten = 0;
    BOOL  bRet;
    OVERLAPPED Overlapped = {0};
 
-   bRet = WriteFile( (HANDLE) hb_parnl( 1 ), hb_parcx( 2 ), hb_parclen( 2 ), &nWritten, &Overlapped );
+   bRet = WriteFile( (HANDLE) hb_parnl( 1 ), hb_parcx( 2 ), (DWORD) hb_parclen( 2 ), &nWritten, &Overlapped );
 
    if ( bRet ) {
       hb_retnl( nWritten );
@@ -132,6 +126,3 @@ HB_FUNC( P_WRITEPORT ) {
       hb_retnl( -1 );
    }
 }
-
-
-

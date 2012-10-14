@@ -54,7 +54,6 @@
 #include "hbapiitm.h"
 #include "hbapierr.h"
 
-
 static const char s_code[] = {
    0x60,   /* 0 */
    0x30,   /* 1 */
@@ -87,7 +86,7 @@ static int _codabar_charno( char ch )
    {
       const char * ptr = strchr( s_symbols, ch );
       if( ptr && *ptr )
-         return ptr - s_symbols + 10;
+         return (int) (ptr - s_symbols + 10);
    }
    return -1;
 }
@@ -168,13 +167,12 @@ PHB_ZEBRA hb_zebra_create_codabar( const char * szCode, ULONG nLen, int iFlags )
    return pZebra;
 }
 
-
 HB_FUNC( HB_ZEBRA_CREATE_CODABAR )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
    if( pItem )
    {
-      hb_zebra_ret( hb_zebra_create_codabar( hb_itemGetCPtr( pItem ), hb_itemGetCLen( pItem ), hb_parni( 2 ) ) );
+      hb_zebra_ret( hb_zebra_create_codabar( hb_itemGetCPtr( pItem ), (ULONG) hb_itemGetCLen( pItem ), hb_parni( 2 ) ) );
    }
    else
       hb_errRT_BASE( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );

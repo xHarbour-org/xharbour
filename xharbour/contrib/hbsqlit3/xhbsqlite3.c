@@ -594,7 +594,7 @@ HB_FUNC( SQLITE3_BIND_TEXT )
 	if( pStmt )
 	{
 		void *         hSQLText;
-		ULONG          nSQLText;
+		HB_SIZE        nSQLText;
 
 		const char *   pszSQLText = hb_parstr_utf8( 3, &hSQLText, &nSQLText );
 
@@ -1603,7 +1603,7 @@ HB_FUNC( SQLITE3_FILE_TO_BUFF )
 		nSize = hb_fsSeek( handle, 0, FS_END );
 		hb_fsSeek( handle, 0, FS_SET );
 		buffer = ( char * ) hb_xgrab( nSize + 1 );
-		nSize = hb_fsReadLarge( handle, buffer, nSize );
+		nSize = ( int ) hb_fsReadLarge( handle, buffer, nSize );
 		buffer[ nSize ] = '\0';
 		hb_fsClose( handle );
 
@@ -1616,7 +1616,7 @@ HB_FUNC( SQLITE3_FILE_TO_BUFF )
 HB_FUNC( SQLITE3_BUFF_TO_FILE )
 {
 	HB_FHANDLE  handle = hb_fsCreate( hb_parcx( 1 ), FC_NORMAL );
-	unsigned int nSize = hb_parcsiz( 2 ) - 1;
+	unsigned int nSize = ( unsigned int ) (hb_parcsiz( 2 ) - 1);
 
 	if( handle != FS_ERROR && nSize > 0 )
 	{

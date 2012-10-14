@@ -41,7 +41,7 @@ HB_FUNC( SX_RLOCK )
    else if( ISARRAY( 1 ) )
    {
       PHB_ITEM vLock      = hb_param( 1, HB_IT_ARRAY );
-      int      uilenLock  = HB_ARRAY_LEN( vLock );
+      int      uilenLock  = ( int ) HB_ARRAY_LEN( vLock );
       int      ui,
                iRecNo;
       BOOL     bSucces    = TRUE;
@@ -167,7 +167,7 @@ HB_FUNC( SX_UNLOCK )
    else if( ISARRAY( 1 ) )
    {
       PHB_ITEM vLock      = hb_param( 1, HB_IT_ARRAY );
-      int      uilenLock  = HB_ARRAY_LEN( vLock );
+      int      uilenLock  = ( int ) HB_ARRAY_LEN( vLock );
       int      ui,
                iRecNo;
       for( ui = 0; ui < uilenLock; ui++ )

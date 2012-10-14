@@ -58,13 +58,13 @@ HB_FUNC( _SX_DECRYPT )
       {
          hb_retc( ( char * ) sx_Decrypt( ( PBYTE ) hb_parc( 1 ),  /* pbBuffer */
                                          ( PBYTE ) hb_parc( 2 ),  /* cpPassword */
-                                         hb_parclen( 1 ) ) );
+                                         ( int ) hb_parclen( 1 ) ) );
       }
       else
       {
          hb_retc( ( char * ) sx_Decrypt( ( PBYTE ) hb_parc( 1 ),  /* pbBuffer */
                                          ( PBYTE ) NULL,          /* cpPassword */
-                                         hb_parclen( 1 ) ) );
+                                         ( int ) hb_parclen( 1 ) ) );
       }
    }
    else

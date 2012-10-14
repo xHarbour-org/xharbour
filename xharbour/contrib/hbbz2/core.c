@@ -226,7 +226,7 @@ HB_FUNC( HB_BZ2_VERSION )
 HB_FUNC( HB_BZ2_COMPRESSBOUND )
 {
    if( ISCHAR( 1 ) )
-      hb_retnint( hb_bz2CompressBound( hb_parclen( 1 ) ) );
+      hb_retnint( hb_bz2CompressBound( ( ULONG ) hb_parclen( 1 ) ) );
    else if( ISNUM( 1 ) )
       hb_retnint( hb_bz2CompressBound( ( ULONG ) hb_parnint( 1 ) ) );
    else
@@ -243,7 +243,7 @@ HB_FUNC( HB_BZ2_UNCOMPRESSLEN )
 
    if( szData )
    {
-      ULONG nLen = hb_parclen( 1 );
+      ULONG nLen = ( ULONG ) hb_parclen( 1 );
       int iResult = BZ_OK;
 
       if( nLen )
@@ -269,12 +269,12 @@ HB_FUNC( HB_BZ2_COMPRESS )
    const char * szData = hb_parc( 1 );
    if( szData )
    {
-      ULONG nLen = hb_parclen( 1 );
+      ULONG nLen = ( ULONG ) hb_parclen( 1 );
 
       if( nLen )
       {
          PHB_ITEM pBuffer = ISBYREF( 2 ) ? hb_param( 2, HB_IT_STRING ) : NULL;
-         ULONG nDstLen;
+         HB_SIZE nDstLen;
          char * pDest;
          int iResult;
 
@@ -292,7 +292,7 @@ HB_FUNC( HB_BZ2_COMPRESS )
 
          if( pDest )
          {
-            iResult = hb_bz2Compress( szData, nLen, pDest, &nDstLen,
+            iResult = hb_bz2Compress( szData, nLen, pDest, (ULONG*) &nDstLen,
                                       hb_parnidef( 4, HB_BZ_COMPRESSION_DEFAULT ) );
             if( !pBuffer )
             {
@@ -330,11 +330,11 @@ HB_FUNC( HB_BZ2_UNCOMPRESS )
 
    if( szData )
    {
-      ULONG nLen = hb_parclen( 1 );
+      ULONG nLen = ( ULONG ) hb_parclen( 1 );
 
       if( nLen )
       {
-         ULONG nDstLen;
+         HB_SIZE nDstLen;
          char * pDest = NULL;
          int iResult = BZ_OK;
 
@@ -357,7 +357,7 @@ HB_FUNC( HB_BZ2_UNCOMPRESS )
 
          if( iResult == BZ_OK )
          {
-            iResult = hb_bz2Uncompress( szData, nLen, pDest, &nDstLen );
+            iResult = hb_bz2Uncompress( szData, nLen, pDest, (ULONG*) &nDstLen );
 
             if( !pBuffer )
             {

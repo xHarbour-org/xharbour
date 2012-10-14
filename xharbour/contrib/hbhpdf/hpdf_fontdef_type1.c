@@ -198,16 +198,16 @@ LoadAfm (HPDF_FontDef  fontdef,
             char buf[HPDF_INT_LEN + 1];
 
             s = GetKeyword (s, buf, HPDF_INT_LEN + 1);
-            fontdef->font_bbox.left = HPDF_AToI (buf);
+            fontdef->font_bbox.left = (HPDF_REAL) HPDF_AToI (buf);
 
             s = GetKeyword (s, buf, HPDF_INT_LEN + 1);
-            fontdef->font_bbox.bottom = HPDF_AToI (buf);
+            fontdef->font_bbox.bottom = (HPDF_REAL) HPDF_AToI (buf);
 
             s = GetKeyword (s, buf, HPDF_INT_LEN + 1);
-            fontdef->font_bbox.right = HPDF_AToI (buf);
+            fontdef->font_bbox.right = (HPDF_REAL) HPDF_AToI (buf);
 
             GetKeyword (s, buf, HPDF_INT_LEN + 1);
-            fontdef->font_bbox.top = HPDF_AToI (buf);
+            fontdef->font_bbox.top = (HPDF_REAL) HPDF_AToI (buf);
         } else
         if (HPDF_StrCmp (keyword, "EncodingScheme") == 0) {
             HPDF_StrCpy (attr->encoding_scheme, s,
@@ -338,7 +338,7 @@ LoadFontData (HPDF_FontDef  fontdef,
 
                /* length1 indicate the size of ascii-data of font-file. */
                if (s1)
-                  attr->length1 = attr->font_data->size + (s1 - buf) + 6;
+                  attr->length1 = (HPDF_UINT)(attr->font_data->size + (s1 - buf) + 6);
             }
 
             if (attr->length1 > 0 && attr->length2 == 0) {
@@ -346,8 +346,8 @@ LoadFontData (HPDF_FontDef  fontdef,
                         len + 11);
 
                 if (s2)
-                    attr->length2 = attr->font_data->size + - 520 -
-                        attr->length1 + (s2 - buf);
+                    attr->length2 = (HPDF_UINT)(attr->font_data->size + - 520 -
+                        attr->length1 + (s2 - buf));
                 /*  length1 indicate the size of binary-data.
                  *  in most fonts, it is all right at 520 bytes . but it need
                  *  to modify because it does not fully satisfy the

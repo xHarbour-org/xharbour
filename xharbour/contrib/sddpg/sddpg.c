@@ -464,7 +464,7 @@ static HB_ERRCODE pgsqlOpen( SQLBASEAREAP pArea )
      return HB_FAILURE;
    }
 
-   pArea->ulRecCount = ( HB_ULONG ) PQntuples( pResult );
+   pArea->ulRecCount = ( ULONG ) PQntuples( pResult );
 
    pArea->pRow = ( void ** ) hb_xgrab( ( pArea->ulRecCount + 1 ) * sizeof( void * ) );
    pArea->pRowFlags = ( HB_BYTE * ) hb_xgrab( ( pArea->ulRecCount + 1 ) * sizeof( HB_BYTE ) );

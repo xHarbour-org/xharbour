@@ -59,7 +59,7 @@ HB_FUNC( HB_CREATECAB )
    /* Destination Directory */
    if( ISCHAR( 3 ) )
    {
-      int i = hb_parclen( 3 );
+      int i = ( int ) hb_parclen( 3 );
       strcpy( szDestinationDir, hb_parc( 3 ) );
 
       if( ! ( szDestinationDir[ i ] == '\\' ) )
@@ -98,7 +98,7 @@ HB_FUNC( HB_CREATECAB )
    if( ISCHAR( 8 ) )
       szCabStrID = ( char * ) hb_parc( 8 );
 
-   uArrayLen = hb_arrayLen( paFile );
+   uArrayLen = ( ULONG ) hb_arrayLen( paFile );
 
    set_cab_parameters( &cab_parms, szDestinationDir, uSize, uTreshHold, iCabID, szCabStrID );
 
@@ -267,7 +267,7 @@ static UINT fci_read( INT_PTR hf, void * memory, UINT cb, int * err, void * pv )
 {
    unsigned int result;
 
-   result = ( unsigned int ) _read( hf, memory, cb );
+   result = ( unsigned int ) _read( (int) hf, memory, cb );
 
    if( result != cb )
       *err = ERROR_NO;
@@ -279,7 +279,7 @@ static UINT fci_write( INT_PTR hf, void * memory, UINT cb, int * err, void * pv 
 {
    unsigned int result;
 
-   result = ( unsigned int ) _write( hf, memory, cb );
+   result = ( unsigned int ) _write( ( int ) hf, memory, cb );
 
    if( result != cb )
       *err = ERROR_NO;
@@ -291,7 +291,7 @@ static int fci_close( INT_PTR hf, int * err, void * pv )
 {
    int result;
 
-   result = _close( hf );
+   result = _close( ( int ) hf );
 
    if( result != 0 )
       *err = ERROR_NO;
@@ -303,7 +303,7 @@ static long fci_seek( INT_PTR hf, long dist, int seektype, int * err, void * pv 
 {
    long result;
 
-   result = _lseek( hf, dist, seektype );
+   result = _lseek( ( int ) hf, dist, seektype );
 
    if( result == -1 )
       *err = ERROR_NO;

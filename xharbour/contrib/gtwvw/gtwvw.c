@@ -92,10 +92,11 @@
 *
 */
 
-#if defined( _MSC_VER ) && ( _MSC_VER >= 1400 )
-   #if !defined( _CRT_SECURE_NO_WARNINGS )
+#if defined( _MSC_VER )
+   #if ( _MSC_VER >= 1400 ) && !defined( _CRT_SECURE_NO_WARNINGS )
       #define _CRT_SECURE_NO_WARNINGS
    #endif
+   #pragma warning (disable:4065) // switch statement contains 'default' but no 'case' labels
 #endif
 
 #include "hbole.h"

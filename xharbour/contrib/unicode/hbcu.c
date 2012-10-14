@@ -237,7 +237,7 @@ HB_FUNC( UUDECODE_FILE )
                }
             } // end if ( !bOutFile )
 
-            srclen = strlen( string );
+            srclen = (ULONG)strlen( string );
             dstlen = int_uudec((BYTE*) string,srclen,NULL);
             if ( dstlen )
             {
@@ -246,7 +246,7 @@ HB_FUNC( UUDECODE_FILE )
 
                if ( bOutFile )
                {
-                  nBytesWritten += fwrite( dststr, sizeof(BYTE), dstlen, outFile );
+                  nBytesWritten += (ULONG)fwrite( dststr, sizeof(BYTE), dstlen, outFile );
                }
 
                hb_xfree(dststr);
@@ -280,7 +280,7 @@ HB_FUNC(HB_UUENCODE)
    if (phbstr)
    {
       srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
-      srclen=hb_itemGetCLen(phbstr);
+      srclen=(ULONG)hb_itemGetCLen(phbstr);
       dstlen=int_uuenc(srcstr,srclen,NULL);
       dststr=(BYTE *) hb_xgrab(dstlen);
       int_uuenc(srcstr,srclen,dststr);
@@ -301,7 +301,7 @@ HB_FUNC(HB_UUDECODE)
    if (phbstr)
    {
       srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
-      srclen=hb_itemGetCLen(phbstr);
+      srclen=(ULONG)hb_itemGetCLen(phbstr);
       dstlen=int_uudec(srcstr,srclen,NULL);
       dststr=(BYTE *) hb_xgrab(dstlen);
       int_uudec(srcstr,srclen,dststr);

@@ -144,7 +144,7 @@ HB_FUNC( __SX_DBCOPY ) // (file,afields,bfor,bwhile,nnext,nrec,lrest,rdd)
       iFieldCount   = sx_FieldCount();
 
       // Checking Array of Fields
-      uilenpArray   = HB_ARRAY_LEN( pArray );
+      uilenpArray   = ( int ) HB_ARRAY_LEN( pArray );
       if( uilenpArray == 0 )               // Not Field Not Specified assumed ALL
       {
          PHB_ITEM pFieldName = hb_itemNew( NULL );
@@ -415,7 +415,7 @@ static void __sx_Copy( PBYTE cTarget, PBYTE cSource, PHB_ITEM pArray,
                        int iFieldCount )
 {
    char  cRecord[ 256 ];
-   int   uiLen = HB_ARRAY_LEN( pArray );
+   int   uiLen = ( int ) HB_ARRAY_LEN( pArray );
 
    if( uiLen == 0 )   /* Assumed all fields are copied */
    {

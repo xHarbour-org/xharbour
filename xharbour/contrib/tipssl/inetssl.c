@@ -267,9 +267,9 @@ int hb_inetSSLWrite(HB_SSL_SOCKET_STRUCT *Socket, char *msg, int length, int *iR
       }
 
       if (Socket->timeout > 0)
-         r = select(Socket->com + 1, &fd_r, &fd_w, NULL, &tv);
+         r = select((int)(Socket->com + 1), &fd_r, &fd_w, NULL, &tv);
       else
-         r = select(Socket->com + 1, &fd_r, &fd_w, NULL, NULL);
+         r = select((int)(Socket->com + 1), &fd_r, &fd_w, NULL, NULL);
    } while (ret == -1 && r != 0);
 
    if (r == 0) return -1;
@@ -346,9 +346,9 @@ int hb_inetSSLRead(HB_SSL_SOCKET_STRUCT *Socket, char *msg, int length, int *iRe
       }
 
       if (Socket->timeout > 0)
-         r = select(Socket->com + 1, &fd_r, NULL, NULL, &tv);
+         r = select((int)(Socket->com + 1), &fd_r, NULL, NULL, &tv);
       else
-         r = select(Socket->com + 1, &fd_r, NULL, NULL, NULL);
+         r = select((int)(Socket->com + 1), &fd_r, NULL, NULL, NULL);
    } while (ret == -1 && r != 0);
 
    if (r == 0) return -1;
@@ -367,13 +367,13 @@ static int hb_selectReadSocket(HB_SSL_SOCKET_STRUCT *Socket)
 
    if (Socket->timeout == -1)
    {
-      r = select(Socket->com + 1, &set, NULL, NULL, NULL);
+      r = select((int)(Socket->com + 1), &set, NULL, NULL, NULL);
       return r;
    }
 
    tv.tv_sec = Socket->timeout / 1000;
    tv.tv_usec = (Socket->timeout % 1000) * 1000;
-   r = select(Socket->com + 1, &set, NULL, NULL, &tv);
+   r = select((int)(Socket->com + 1), &set, NULL, NULL, &tv);
    return r;
 
    // }
@@ -391,13 +391,13 @@ static int hb_selectWriteSocket(HB_SSL_SOCKET_STRUCT *Socket)
 
    if (Socket->timeout == -1)
    {
-      r = select(Socket->com + 1, NULL, &set, NULL, NULL);
+      r = select((int)(Socket->com + 1), NULL, &set, NULL, NULL);
       return r;
    }
 
    tv.tv_sec = Socket->timeout / 1000;
    tv.tv_usec = (Socket->timeout % 1000) * 1000;
-   r = select(Socket->com + 1, NULL, &set, NULL, &tv);
+   r = select((int)(Socket->com + 1), NULL, &set, NULL, &tv);
    return r;
 
    //   return FD_ISSET( Socket->com, &set );
@@ -416,13 +416,13 @@ int hb_selectWriteExceptSocketSslSsl(HB_SSL_SOCKET_STRUCT *Socket)
 
    if (Socket->timeout == -1)
    {
-      if (select(Socket->com + 1, NULL, &set, &eset, NULL) < 0) return 2;
+      if (select((int)(Socket->com + 1), NULL, &set, &eset, NULL) < 0) return 2;
    }
    else
    {
       tv.tv_sec = Socket->timeout / 1000;
       tv.tv_usec = (Socket->timeout % 1000) * 1000;
-      if (select(Socket->com + 1, NULL, &set, &eset, &tv) < 0) return 2;
+      if (select((int)(Socket->com + 1), NULL, &set, &eset, &tv) < 0) return 2;
    }
 
    if (FD_ISSET(Socket->com, &eset))
@@ -708,7 +708,7 @@ HB_FUNC(INETSSLCREATE)
    }
 
    //  SSL_CTX_set_info_callback( Socket->pCTX, apps_ssl_info_callback );
-   Socket->pBio = BIO_new_socket(Socket->com, BIO_NOCLOSE);
+   Socket->pBio = BIO_new_socket((int)(Socket->com), BIO_NOCLOSE);
 
    Socket->pSSL = SSL_new(Socket->pCTX);
 
@@ -1111,7 +1111,7 @@ static void s_inetRecvInternal(char *szFuncName, int iMode)
 
    pBuffer = hb_itemUnShare(pBuffer);
    Buffer = hb_itemGetCPtr(pBuffer);
-   iLen = hb_itemGetCLen(pBuffer);
+   iLen = (int)hb_itemGetCLen(pBuffer);
 
    if (ISNIL(3))
    {
@@ -1448,7 +1448,7 @@ HB_FUNC( INETSSLRECVENDBLOCK )
          {
             PHB_ITEM pItem = hb_arrayGetItemPtr(pProto, i + 1);
             Proto[i] = hb_itemGetCPtr(pItem);
-            iprotosize[i] = hb_itemGetCLen(pItem);
+            iprotosize[i] = (int)hb_itemGetCLen(pItem);
          }
       }
       else
@@ -1456,7 +1456,7 @@ HB_FUNC( INETSSLRECVENDBLOCK )
          Proto = (char **) hb_xgrab(sizeof(char *));
          iprotosize = (int *) hb_xgrab(sizeof(int));
          Proto[0] = hb_itemGetCPtr(pProto);
-         iprotosize[0] = hb_itemGetCLen(pProto);
+         iprotosize[0] = (int)hb_itemGetCLen(pProto);
          iprotos = 1;
       }
    }
@@ -1643,7 +1643,7 @@ HB_FUNC( INETSSLDATAREADY )
    HB_STACK_UNLOCK;
    HB_TEST_CANCEL_ENABLE_ASYN;
 
-   iLen = select(Socket->com + 1, &rfds, NULL, NULL, &tv);
+   iLen = select((int)(Socket->com + 1), &rfds, NULL, NULL, &tv);
 
    HB_DISABLE_ASYN_CANC;
    HB_STACK_LOCK;
@@ -2101,7 +2101,7 @@ int waitForInput(HB_SSL_SOCKET_STRUCT *Socket)
       return 0;
    }
 
-   return can_read(Socket->com, Socket->timeout);
+   return can_read((int)(Socket->com), Socket->timeout);
 }
 
 HB_FUNC( INETSSLCONNECT )
@@ -2168,7 +2168,7 @@ HB_FUNC( INETSSLCONNECT )
          hb_socketConnect(Socket);
          hb_socketSetNonBlocking(Socket);
          SSL_set_bio(Socket->pSSL, Socket->pBio, Socket->pBio);
-         iRet = SSL_set_fd(Socket->pSSL, Socket->com);
+         iRet = SSL_set_fd(Socket->pSSL, (int)Socket->com);
          SSL_set_connect_state(Socket->pSSL);
          iRet2 = 0;
 

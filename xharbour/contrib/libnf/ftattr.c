@@ -383,7 +383,7 @@ HB_FUNC( FT_SAVEATT )
 
 HB_FUNC( FT_RESTATT )
 {
-   ULONG ulLen = hb_parclen( 5 );
+   ULONG ulLen = (ULONG) hb_parclen( 5 );
 
    if( ulLen )
    {

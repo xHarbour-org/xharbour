@@ -170,7 +170,7 @@ static long getblock( long offset )
    /* read in the file and set the buffer bottom variable equal */
    /*  to the number of bytes actually read in.                 */
 
-   buffbot = hb_fsReadLarge( infile, ( BYTE * ) buffer, buffsize );
+   buffbot = (int) hb_fsReadLarge( infile, ( BYTE * ) buffer, buffsize );
 
    /* if a full buffer's worth was not read in, make it full.   */
 
@@ -181,7 +181,7 @@ static long getblock( long offset )
       else
          hb_fsSeek( infile, ( long ) buffsize, FS_SET );
 
-      buffbot = hb_fsReadLarge( infile, ( BYTE * ) buffer, buffsize );
+      buffbot = (int) hb_fsReadLarge( infile, ( BYTE * ) buffer, buffsize );
    }
 
    /* return the actual file position */
@@ -505,7 +505,7 @@ static void filebot( void )
 HB_FUNC( _FT_DFINIT )
 {
    int   rval, i, j;
-   ULONG ulSize;
+   HB_SIZE ulSize;
 
    rval     = 0;
 
@@ -551,7 +551,7 @@ HB_FUNC( _FT_DFINIT )
       if( hb_parinfo( 9 ) & HB_IT_ARRAY ) /* if array */
       {
          keytype  = K_LIST;
-         kcount   = hb_parinfa( 9, 0 );
+         kcount   = (int) hb_parinfa( 9, 0 );
          if( kcount > 24 )
             kcount = 24;
          for( i = 1; i <= kcount; i++ )
@@ -560,7 +560,7 @@ HB_FUNC( _FT_DFINIT )
       else
       {
          keytype  = K_STRING;
-         kcount   = hb_parclen( 9 );
+         kcount   = (int) hb_parclen( 9 );
          if( kcount > 24 )
             kcount = 24;
          strcpyn( kstr, hb_parcx( 9 ), kcount );  /* get exit key string */

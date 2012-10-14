@@ -68,9 +68,9 @@ HB_FUNC( HB_LZO_COMPRESSBOUND )
 {
    if( ISCHAR( 1 ) || ISNUM( 1 ) )
    {
-      ULONG nLen = ISCHAR( 1 ) ? hb_parclen( 1 ) : ( ULONG ) hb_parnl( 1 );
+      ULONG nLen = ISCHAR( 1 ) ? ( ULONG ) hb_parclen( 1 ) : ( ULONG ) hb_parnl( 1 );
 
-      hb_retnl( hb_lzo_compressbound( nLen ) );
+      hb_retnl( ( long ) hb_lzo_compressbound( nLen ) );
    }
    else
       hb_errRT_BASE( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
@@ -147,7 +147,7 @@ HB_FUNC( HB_LZO1X_1_COMPRESS )
 
          if( r == LZO_E_OK )
          {
-            hb_stornl( dst_len, 2 );
+            hb_stornl( ( long ) dst_len, 2 );
 
             if( dst_len >= src_len )
                hb_storni( LZO_E_NOT_COMPRESSIBLE, 3 );  /* incompressible data */
@@ -195,7 +195,7 @@ HB_FUNC( HB_LZO1X_DECOMPRESS )
 
          if( r == LZO_E_OK )
          {
-            hb_stornl( dst_len, 2 );
+            hb_stornl( ( long ) dst_len, 2 );
             hb_retclen_buffer( ( char * ) dst, dst_len );
             return;
          }
@@ -230,7 +230,7 @@ HB_FUNC( HB_LZO1X_DECOMPRESS_SAFE )
 
          if( r == LZO_E_OK )
          {
-            hb_stornl( dst_len, 2 );
+            hb_stornl( ( long ) dst_len, 2 );
             hb_retclen_buffer( ( char * ) dst, dst_len );
             return;
          }

@@ -148,7 +148,7 @@ HPDF_String_Write  (HPDF_String   obj,
 
         HPDF_Encoder_SetParseText (obj->encoder, &parse_state, src, len);
 
-        for (i = 0; i < len; i++) {
+        for (i = 0; i < (HPDF_UINT) len; i++) {
             HPDF_BYTE b = src[i];
             HPDF_UNICODE tmp_unicode;
             HPDF_ByteType btype = HPDF_Encoder_ByteType (obj->encoder,

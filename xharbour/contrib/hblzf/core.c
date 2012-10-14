@@ -79,7 +79,7 @@ HB_FUNC( HB_LZF_COMPRESSBOUND )
 {
    if( ISCHAR( 1 ) || ISNUM( 1 ) )
    {
-      ULONG nLen = ISCHAR( 1 ) ? hb_parclen( 1 ) : ( ULONG ) hb_parnl( 1 );
+      ULONG nLen = ISCHAR( 1 ) ? ( ULONG ) hb_parclen( 1 ) : ( ULONG ) hb_parnl( 1 );
       hb_retnl( hb_lzf_compressbound( nLen ) );
    }
    else
@@ -109,14 +109,14 @@ HB_FUNC( HB_LZF_COMPRESS )
 
    if( pArg )
    {
-      ULONG in_len = hb_itemGetCLen( pArg );
+      ULONG in_len = ( ULONG ) hb_itemGetCLen( pArg );
 
       if( in_len )
       {
          PHB_ITEM       pBuffer = ISBYREF( 2 ) ? hb_param( 2, HB_IT_STRING ) : NULL;
          const char *   in_data = hb_itemGetCPtr( pArg );
          char *         out_data;
-         ULONG        out_len;
+         HB_SIZE        out_len;
 
          if( pBuffer )
          {
@@ -134,7 +134,7 @@ HB_FUNC( HB_LZF_COMPRESS )
 
          if( out_data )
          {
-            unsigned int uiResult = lzf_compress( in_data, in_len, out_data, out_len );
+            unsigned int uiResult = lzf_compress( in_data, in_len, out_data, (unsigned int) out_len );
 
             if( uiResult != 0 )
             {
@@ -173,14 +173,14 @@ HB_FUNC( HB_LZF_DECOMPRESS )
 
    if( pArg )
    {
-      ULONG in_len = hb_itemGetCLen( pArg );
+      ULONG in_len = ( ULONG ) hb_itemGetCLen( pArg );
 
       if( in_len )
       {
          PHB_ITEM       pBuffer = ISBYREF( 2 ) ? hb_param( 2, HB_IT_STRING ) : NULL;
          const char *   in_data = hb_itemGetCPtr( pArg );
          char *         buffer;
-         ULONG        buffer_size;
+         HB_SIZE        buffer_size;
 
          if( pBuffer )
          {
@@ -204,7 +204,7 @@ HB_FUNC( HB_LZF_DECOMPRESS )
                buffer_size <<= 1;
                buffer = ( char * ) hb_xrealloc( buffer, buffer_size + 1 );
 
-               uiResult = lzf_decompress( in_data, in_len, buffer, buffer_size );
+               uiResult = lzf_decompress( in_data, in_len, buffer, (unsigned int) buffer_size );
             }
             while( uiResult == 0
 #if ! AVOID_ERRNO

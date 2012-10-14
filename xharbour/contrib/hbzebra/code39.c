@@ -115,7 +115,7 @@ static int _code39_charno( char ch )
    {
       const char * ptr = strchr( s_symbols, ch );
       if( ptr && *ptr )
-         return ptr - s_symbols + 36;
+         return (int)(ptr - s_symbols + 36);
    }
    return -1;
 }
@@ -209,7 +209,7 @@ HB_FUNC( HB_ZEBRA_CREATE_CODE39 )
    PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
    if( pItem )
    {
-      hb_zebra_ret( hb_zebra_create_code39( hb_itemGetCPtr( pItem ), hb_itemGetCLen( pItem ), hb_parni( 2 ) ) );
+      hb_zebra_ret( hb_zebra_create_code39( hb_itemGetCPtr( pItem ), (ULONG) hb_itemGetCLen( pItem ), hb_parni( 2 ) ) );
    }
    else
       hb_errRT_BASE( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );

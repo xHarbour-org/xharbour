@@ -372,7 +372,7 @@ HB_FUNC( CAIRO_PATH_ITERATOR_SET_POINTS )
       cairo_path_data_t * pData;
       ULONG             nLen;
 
-      nLen = hb_arrayLen( pArray );
+      nLen = ( ULONG ) hb_arrayLen( pArray );
       if( pIterator->iPos < pPath->num_data && pIterator->iPos != -1 &&
           ( ULONG ) pPath->data[ pIterator->iPos ].header.length == nLen + 1 )
       {

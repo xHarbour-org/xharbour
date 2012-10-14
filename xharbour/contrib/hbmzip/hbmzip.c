@@ -231,7 +231,7 @@ HB_FUNC( HB_ZIPFILEWRITE )
    if( pData )
    {
       zipFile hZip = hb_zipfileParam( 1 );
-      ULONG   ulLen = hb_parclen( 2 );
+      ULONG   ulLen = (ULONG) hb_parclen( 2 );
 
       if( ISNUM( 3 ) && (ULONG) hb_parnl( 3 ) < ulLen )
          ulLen = (ULONG) hb_parnl( 3 );
@@ -465,7 +465,7 @@ HB_FUNC( HB_UNZIPFILEREAD )
 {
    PHB_ITEM  pBuffer = hb_param( 2, HB_IT_STRING );
    char *    buffer;
-   ULONG     ulSize;
+   HB_SIZE   ulSize;
 
    if( pBuffer && ISBYREF( 2 ) &&
        hb_itemGetWriteCL( pBuffer, &buffer, &ulSize ) )
@@ -483,7 +483,7 @@ HB_FUNC( HB_UNZIPFILEREAD )
                ulSize = ulRead;
          }
 
-         iResult = unzReadCurrentFile( hUnzip, buffer, ulSize );
+         iResult = unzReadCurrentFile( hUnzip, buffer, (unsigned int) ulSize );
          hb_retnl( iResult );
       }
    }
@@ -624,7 +624,7 @@ static int hb_zipStoreFile( zipFile hZip, const char* szFileName, const char* sz
       /* change path separators to '/' */
       szZipName = hb_strdup( szName );
 
-      ulLen = strlen( szZipName );
+      ulLen = (ULONG) strlen( szZipName );
       pString = szZipName;
       while( ulLen-- )
       {
@@ -637,7 +637,7 @@ static int hb_zipStoreFile( zipFile hZip, const char* szFileName, const char* sz
       /* get file name */
       szZipName = hb_strdup( szFileName );
 
-      ulLen = strlen( szZipName );
+      ulLen = (ULONG) strlen( szZipName );
       pString = szZipName;
 
       while( ulLen-- )
@@ -841,7 +841,7 @@ static int hb_zipStoreFile( zipFile hZip, const char* szFileName, const char* sz
          if( iResult == 0 )
          {
             pString = ( char* ) hb_xgrab( HB_Z_IOBUF_SIZE );
-            while( ( ulLen = hb_fsReadLarge( hFile, (BYTE*) pString, HB_Z_IOBUF_SIZE ) ) > 0 )
+            while( ( ulLen = (ULONG) hb_fsReadLarge( hFile, (BYTE*) pString, HB_Z_IOBUF_SIZE ) ) > 0 )
             {
                zipWriteInFileInZip( hZip, pString, ulLen );
             }
@@ -902,7 +902,7 @@ static int hb_unzipExtractCurrentFile( unzFile hUnzip, const char* szFileName, c
       hb_strncpy( szName, szFileName, sizeof( szName ) - 1 );
    }
 
-   ulLen = strlen( szName );
+   ulLen = (ULONG) strlen( szName );
 
    /* Test shows that files in subfolders can be stored to zip file without
       explicitly adding folder. So, let's create a requred path */

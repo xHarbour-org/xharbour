@@ -615,7 +615,7 @@ HB_FUNC( HB_CSTOCS )
       if ( pstr && h1 && h2 )
       {
          BYTE *srcstr = (BYTE*) hb_itemGetCPtr( pstr );
-         ULONG srclen = hb_itemGetCLen( pstr );
+         ULONG srclen = (ULONG) hb_itemGetCLen( pstr );
 
          LastError = HB_CSERR_OK;
 
@@ -736,7 +736,7 @@ HB_FUNC(HB_B64ENCODE)
    if (phbstr)
    {
       srcstr=(BYTE*) hb_itemGetCPtr(phbstr);
-      srclen=hb_itemGetCLen(phbstr);
+      srclen=(ULONG) hb_itemGetCLen(phbstr);
       i=b64enc(srcstr,srclen,NULL);
       k=i&3;
 
@@ -795,7 +795,7 @@ HB_FUNC(HB_B64DECODE)
    if (phbstr)
    {
       srcstr=(BYTE *)hb_itemGetCPtr(phbstr);
-      srclen=hb_itemGetCLen(phbstr);
+      srclen=(ULONG) hb_itemGetCLen(phbstr);
       tmpstr=(BYTE *) hb_xgrab(srclen);
 
       while (i<srclen)
@@ -1001,7 +1001,7 @@ static ULONG chr2uni( ULONG h, BYTE *chrstr, ULONG chrlen, BYTE *unistr )
          if ( x )
          {
             n = 2;
-            c = (x+1 - pcs[h]->leads) * MAX_CHARSIZE + chrstr[i+1];
+            c = (ULONG)((x+1 - pcs[h]->leads) * MAX_CHARSIZE + chrstr[i+1]);
          }
          else
          {
@@ -1179,10 +1179,10 @@ static ULONG ut72uni( BYTE *utfstr, ULONG utflen, BYTE *unistr )
             else
                c = utfstr[i];
 
-            j = b64dec( dummy, i - ( dummy - utfstr ), NULL );
+            j = b64dec( dummy, (ULONG)(i - ( dummy - utfstr )), NULL );
 
             if ( unistr )
-               b64dec( dummy, i - ( dummy - utfstr ), unistr + unilen );
+               b64dec( dummy, (ULONG)(i - ( dummy - utfstr )), unistr + unilen );
 
             unilen += j;
 
@@ -1217,10 +1217,10 @@ static ULONG ut72uni( BYTE *utfstr, ULONG utflen, BYTE *unistr )
 
    if ( state == 1 )
    {
-      j = b64dec( dummy, utflen - ( dummy - utfstr ), NULL );
+      j = b64dec( dummy, (ULONG) (utflen - ( dummy - utfstr )), NULL );
 
       if ( unistr )
-         b64dec( dummy, utflen - ( dummy - utfstr ), unistr + unilen );
+         b64dec( dummy, (ULONG) (utflen - ( dummy - utfstr )), unistr + unilen );
 
       unilen += j;
    }
@@ -1239,12 +1239,12 @@ static ULONG uni2ut7( BYTE *unistr, ULONG unilen, BYTE *utfstr )
       {
          if ( state == 1 )
          {
-            j = b64enc( dummy, i - ( dummy - unistr ), NULL );
+            j = b64enc( dummy, (ULONG)(i - ( dummy - unistr )), NULL );
 
             if ( utfstr )
             {
                utfstr[utflen++] = '+';
-               b64enc( dummy, i - ( dummy - unistr ), utfstr + utflen );
+               b64enc( dummy, (ULONG)(i - ( dummy - unistr )), utfstr + utflen );
                utflen += j;
                utfstr[utflen++] = '-';
             }
@@ -1266,12 +1266,12 @@ static ULONG uni2ut7( BYTE *unistr, ULONG unilen, BYTE *utfstr )
       {
          if ( state == 1 )
          {
-            j = b64enc( dummy, i - ( dummy - unistr ), NULL );
+            j = b64enc( dummy, (ULONG)(i - ( dummy - unistr )), NULL );
 
             if ( utfstr )
             {
                utfstr[utflen++] = '+';
-               b64enc( dummy, i - ( dummy - unistr ), utfstr + utflen );
+               b64enc( dummy, (ULONG)(i - ( dummy - unistr )), utfstr + utflen );
                utflen += j;
                utfstr[utflen++] = '-';
             }
@@ -1290,12 +1290,12 @@ static ULONG uni2ut7( BYTE *unistr, ULONG unilen, BYTE *utfstr )
       {
          if ( state == 1 )
          {
-            j = b64enc( dummy, i - ( dummy - unistr ), NULL );
+            j = b64enc( dummy, (ULONG)(i - ( dummy - unistr )), NULL );
 
             if ( utfstr )
             {
                utfstr[utflen++] = '+';
-               b64enc( dummy, i - ( dummy - unistr ), utfstr + utflen );
+               b64enc( dummy, (ULONG)(i - ( dummy - unistr )), utfstr + utflen );
                utflen += j;
                utfstr[utflen++] = '-';
             }
@@ -1314,12 +1314,12 @@ static ULONG uni2ut7( BYTE *unistr, ULONG unilen, BYTE *utfstr )
       {
          if ( state == 1 )
          {
-            j = b64enc( dummy, i - ( dummy - unistr ), NULL );
+            j = b64enc( dummy, (ULONG)(i - ( dummy - unistr )), NULL );
 
             if ( utfstr )
             {
                utfstr[utflen++] = '+';
-               b64enc( dummy, i - ( dummy - unistr ), utfstr + utflen );
+               b64enc( dummy, (ULONG)(i - ( dummy - unistr )), utfstr + utflen );
                utflen += j;
             }
             else
@@ -1342,12 +1342,12 @@ static ULONG uni2ut7( BYTE *unistr, ULONG unilen, BYTE *utfstr )
 
    if ( state == 1 )
    {
-      j = b64enc( dummy, unilen - ( dummy - unistr ), NULL );
+      j = b64enc( dummy, (ULONG) (unilen - ( dummy - unistr )), NULL );
 
       if ( utfstr )
       {
          utfstr[utflen++] = '+';
-         b64enc( dummy, unilen - ( dummy - unistr ), utfstr + utflen );
+         b64enc( dummy, (ULONG) (unilen - ( dummy - unistr )), utfstr + utflen );
          utflen += j;
       }
       else
@@ -1527,7 +1527,7 @@ HB_FUNC( B64DECODE_FILE )
 
       while ( hbcc_file_read ( inFile, string ) )
       {
-         srclen = strlen( string );
+         srclen = (ULONG) strlen( string );
 
          if ( srclen )
          {
@@ -1555,7 +1555,7 @@ HB_FUNC( B64DECODE_FILE )
             dststr=(BYTE *) hb_xgrab(dstlen);
             b64dec(tmpstr,tmplen,dststr);
 
-            nBytesWritten += fwrite( dststr, sizeof(BYTE), dstlen, outFile );
+            nBytesWritten += (ULONG) fwrite( dststr, sizeof(BYTE), dstlen, outFile );
 
             hb_xfree(dststr);
             hb_xfree(tmpstr);

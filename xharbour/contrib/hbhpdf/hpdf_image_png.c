@@ -111,7 +111,7 @@ ReadPngData_Interlaced  (HPDF_Dict    image,
                          png_structp  png_ptr,
                          png_infop    info_ptr)
 {
-    png_uint_32 len = png_get_rowbytes(png_ptr, info_ptr);
+    png_uint_32 len = (png_uint_32) png_get_rowbytes(png_ptr, info_ptr);
     png_uint_32 height = png_get_image_height(png_ptr, info_ptr);
     png_bytep* row_pointers = (png_bytep*) HPDF_GetMem (image->mmgr,
                 height * sizeof (png_bytep));
@@ -154,7 +154,7 @@ ReadPngData  (HPDF_Dict    image,
               png_structp  png_ptr,
               png_infop    info_ptr)
 {
-    png_uint_32 len = png_get_rowbytes(png_ptr, info_ptr);
+    png_uint_32 len = (png_uint_32) png_get_rowbytes(png_ptr, info_ptr);
     png_uint_32 height = png_get_image_height(png_ptr, info_ptr);
     png_bytep buf_ptr = (png_bytep) HPDF_GetMem (image->mmgr, len);
 
@@ -194,7 +194,7 @@ ReadTransparentPaletteData  (HPDF_Dict    image,
 	if (!row_ptr) {
 		return HPDF_FAILD_TO_ALLOC_MEM;
 	} else {
-		png_uint_32 len = png_get_rowbytes(png_ptr, info_ptr);
+		png_uint_32 len = (png_uint_32) png_get_rowbytes(png_ptr, info_ptr);
 
 		for (i = 0; i < (HPDF_UINT)height; i++) {
 			row_ptr[i] = (png_bytep) HPDF_GetMem(image->mmgr, len);
@@ -258,7 +258,7 @@ ReadTransparentPngData  (HPDF_Dict    image,
 	if (!row_ptr) {
 		return HPDF_FAILD_TO_ALLOC_MEM;
 	} else {
-		png_uint_32 len = png_get_rowbytes(png_ptr, info_ptr);
+		png_uint_32 len = (png_uint_32) png_get_rowbytes(png_ptr, info_ptr);
 
 		for (i = 0; i < (HPDF_UINT)height; i++) {
 			row_ptr[i] = (png_bytep) HPDF_GetMem(image->mmgr, len);
@@ -350,7 +350,7 @@ CreatePallet (HPDF_Dict    image,
         return image->error->error_no;
 
     p = ppallet;
-    for (i = 0; i < num_pl; i++, src_pl++) {
+    for (i = 0; i < (HPDF_UINT) num_pl; i++, src_pl++) {
         *p++ = src_pl->red;
         *p++ = src_pl->green;
         *p++ = src_pl->blue;
@@ -449,7 +449,7 @@ LoadPngData  (HPDF_Dict     image,
 	}
 
 	png_set_sig_bytes (png_ptr, HPDF_PNG_BYTES_TO_CHECK);
-	png_set_read_fn (png_ptr, (void *)png_data, PngReadFunc);
+	png_set_read_fn (png_ptr, (void *)png_data, (png_rw_ptr)PngReadFunc);
 	// png_set_read_fn (png_ptr, (void *)png_data, (png_rw_ptr)&PngReadFunc);
 
 	/* reading info structure. */

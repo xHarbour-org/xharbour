@@ -156,7 +156,7 @@ static PMIXKEY hb_mixKeyPutItem( PMIXKEY pKey, PHB_ITEM pItem, ULONG ulRecNo, PM
    {
       case 'C':
       {
-         ULONG ul = hb_itemGetCLen( pItem );
+         ULONG ul = ( ULONG ) hb_itemGetCLen( pItem );
 
          if ( ul > pTag->uiKeyLen )
             ul = pTag->uiKeyLen;

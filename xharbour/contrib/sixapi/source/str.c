@@ -34,7 +34,7 @@
  */
 char * _sx_randomname( const char * szPrefix )
 {
-   int         iLen    = szPrefix ? strlen( szPrefix ) : 0;
+   int         iLen    = szPrefix ? ( int ) strlen( szPrefix ) : 0;
    char *      szRet   = ( char * ) hb_xgrab( iLen + 8 ); // _011200
    SYSTEMTIME  t;
 
@@ -95,7 +95,7 @@ char * _sx_padr( char * strbuf, char chrtofill, unsigned len )
 {
    while( strlen( strbuf ) < len )
    {
-      _sx_insertchar( strbuf, chrtofill, strlen( strbuf ) );
+      _sx_insertchar( strbuf, chrtofill, ( int ) strlen( strbuf ) );
    }
 
    return strbuf;
