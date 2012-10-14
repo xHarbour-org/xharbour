@@ -967,6 +967,12 @@ extern short  FtsVerify( long, unsigned char *, unsigned char *, short );
 typedef char * ( WINAPI * FTSVERSION )( void );
 extern char *  FtsVersion( void );
 
+#if defined( __MINGW32__ ) && defined( HB_OS_WIN_64 )
+   #define SX_CONVFUNC( funcname )   ( HB_LONG ) funcname
+#else
+   #define SX_CONVFUNC( funcname )  funcname
+#endif
+
 #ifdef __cplusplus
 }
 #endif
