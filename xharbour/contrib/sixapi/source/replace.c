@@ -61,7 +61,8 @@ HB_FUNC( SX_REPLACE )  /* ( cpFieldName, xData, cArea ) */
          case HB_IT_STRING:
          {
             PVOID    pValue     = ( PVOID ) hb_parc( 2 );
-            char *   cFieldType = ( char * ) sx_FieldType( cFieldName );
+            char *   cFieldType = ( char * ) SX_CONVFUNC( sx_FieldType( cFieldName ) );
+
             switch( *cFieldType )
             {
                case 'C':
@@ -264,7 +265,11 @@ HB_FUNC( SX_REPLACEEX )      /* ( aReplace, cArea ) */
                case HB_IT_STRING:
                {
                   PBYTE    cVar       = ( PBYTE ) hb_arrayGetC( pInfo, 2 );
+#if defined( __MINGW32__ ) && defined( HB_OS_WIN_64 )
+                  char *   cFieldType = ( char * ) ( HB_LONG ) sx_FieldType( cFieldName );
+#else
                   char *   cFieldType = ( char * ) sx_FieldType( cFieldName );
+#endif
                   switch( *cFieldType )
                   {
                      case 'C':
@@ -308,7 +313,11 @@ HB_FUNC( SX_BLOBTOFILE )
          iWorkArea = _sx_select( hb_param( 1, HB_IT_ANY ) );
 
       // Check if the field is of MEMO type
+#if defined( __MINGW32__ ) && defined( HB_OS_WIN_64 )
+      pFieldType = ( char * ) ( HB_LONG ) sx_FieldType( cpFieldName );
+#else
       pFieldType = ( char * ) sx_FieldType( cpFieldName );
+#endif
       switch( *pFieldType )
       {
          case 'P':

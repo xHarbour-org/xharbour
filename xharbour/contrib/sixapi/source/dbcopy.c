@@ -151,7 +151,7 @@ HB_FUNC( __SX_DBCOPY ) // (file,afields,bfor,bwhile,nnext,nrec,lrest,rdd)
          hb_arraySize( pArray, iFieldCount );
          for( ui = 0; ui < iFieldCount; ui++ )
          {
-            cFieldToCopy  = ( char * ) sx_FieldName( ( WORD ) ( ui + 1 ) );
+            cFieldToCopy  = ( char * ) SX_CONVFUNC( sx_FieldName( ( WORD ) ( ui + 1 ) ) );
             pTemp         = hb_itemPutC( NULL, cFieldToCopy );
             hb_arraySet( pArray, ui + 1, pTemp );
             hb_itemRelease( pTemp );
@@ -443,7 +443,8 @@ static void __sx_Copy( PBYTE cTarget, PBYTE cSource, PHB_ITEM pArray,
 
       for( ui = 1; ui <= iFieldCount; ui++ )             /* Field Names of Source */
       {
-         cFieldName = ( char * ) sx_FieldName( ( WORD ) ui );
+         cFieldName = ( char * ) SX_CONVFUNC( sx_FieldName( ( WORD ) ui ) );
+
          for( uiNew = 1; uiNew <= uiLen; uiNew++ )        /* Check The ARray Passed */
          {
             cFieldToCopy = ( char * ) hb_arrayGetC( pArray, uiNew );
@@ -452,7 +453,8 @@ static void __sx_Copy( PBYTE cTarget, PBYTE cSource, PHB_ITEM pArray,
                if( strcmp( cFieldToCopy, cFieldName ) == 0 )
                {
                   sx_Select( sx_WorkArea( cSource ) );       /* Select Source Area */
-                  cFieldType = ( char * ) sx_FieldType( ( PBYTE ) cFieldName );
+                  cFieldType = ( char * ) SX_CONVFUNC( sx_FieldType( ( PBYTE ) cFieldName ) );
+
                   switch( *cFieldType )
                   {
                      case 'N':
@@ -462,13 +464,13 @@ static void __sx_Copy( PBYTE cTarget, PBYTE cSource, PHB_ITEM pArray,
                         break;
 
                      case 'C':
-                        vVariant = ( PVOID ) sx_GetString( ( PBYTE ) cFieldName );
+                        vVariant = ( PVOID ) SX_CONVFUNC( sx_GetString( ( PBYTE ) cFieldName ) );
                         sx_Select( sx_WorkArea( cTarget ) ); /* Select New Area */
                         sx_Replace( ( PBYTE ) cFieldToCopy, R_CHAR, vVariant );
                         break;
 
                      case 'M':
-                        cMemo = ( PBYTE ) sx_GetMemo( ( PBYTE ) cFieldName, 0 );
+                        cMemo = ( PBYTE ) SX_CONVFUNC( sx_GetMemo( ( PBYTE ) cFieldName, 0 ) );
                         sx_Select( sx_WorkArea( cTarget ) ); /* Select New Area */
                         sx_Replace( ( PBYTE ) cFieldToCopy, R_MEMO, ( PVOID ) cMemo );
                         if( lstrlen( ( char * ) cMemo ) )
@@ -476,7 +478,7 @@ static void __sx_Copy( PBYTE cTarget, PBYTE cSource, PHB_ITEM pArray,
                         break;
 
                      case 'D':
-                        vVariant = ( PVOID ) sx_GetDateString( ( PBYTE ) cFieldName );
+                        vVariant = ( PVOID ) SX_CONVFUNC( sx_GetDateString( ( PBYTE ) cFieldName ) );
                         sx_Select( sx_WorkArea( cTarget ) ); /* Select New Area */
                         sx_Replace( ( PBYTE ) cFieldToCopy, R_DATESTR, vVariant );
                         break;

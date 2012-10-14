@@ -56,15 +56,15 @@ HB_FUNC( _SX_DECRYPT )
    {
       if( ISCHAR( 2 ) )
       {
-         hb_retc( ( char * ) sx_Decrypt( ( PBYTE ) hb_parc( 1 ),  /* pbBuffer */
+         hb_retc( ( char * ) SX_CONVFUNC( sx_Decrypt( ( PBYTE ) hb_parc( 1 ),  /* pbBuffer */
                                          ( PBYTE ) hb_parc( 2 ),  /* cpPassword */
-                                         ( int ) hb_parclen( 1 ) ) );
+                                         ( int ) hb_parclen( 1 ) ) ) );
       }
       else
       {
-         hb_retc( ( char * ) sx_Decrypt( ( PBYTE ) hb_parc( 1 ),  /* pbBuffer */
+         hb_retc( ( char * ) SX_CONVFUNC( sx_Decrypt( ( PBYTE ) hb_parc( 1 ),  /* pbBuffer */
                                          ( PBYTE ) NULL,          /* cpPassword */
-                                         ( int ) hb_parclen( 1 ) ) );
+                                         ( int ) hb_parclen( 1 ) ) ) );
       }
    }
    else

@@ -72,7 +72,8 @@ HB_FUNC( SX_GETBLOBLENGTH )
 HB_FUNC( SX_GETBITMAP )
 {
    WORD  iWorkArea  = SX_DUMMY_NUMBER;
-   HWND  hWnd       = ( HWND ) hb_parnl( 2 );
+   // HWND  hWnd       = ( HWND ) hb_parnl( 2 );
+   HWND  hWnd       = ( HWND ) hb_parns( 2 );
 
    if( ! _sx_Used() )
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "SX_GETBITMAP" );
@@ -84,7 +85,7 @@ HB_FUNC( SX_GETBITMAP )
                           hWnd /* Window Handle */
                           ) );
 
-   hb_stornl( ( LONG ) hWnd, 2 );
+   hb_stornl( ( long ) ( HB_LONG ) hWnd, 2 );
 
    if( iWorkArea != SX_DUMMY_NUMBER )
       sx_Select( iWorkArea );
@@ -100,7 +101,7 @@ HB_FUNC( SX_GETBYTE )
    if( ! ISNIL( 2 ) )
       iWorkArea = _sx_select( hb_param( 2, HB_IT_ANY ) );
 
-   hb_retc( ( char * ) sx_GetByte( ( PBYTE ) hb_parc( 1 ) /* cpFieldName */ ) );
+   hb_retc( ( char * ) SX_CONVFUNC( sx_GetByte( ( PBYTE ) hb_parc( 1 ) ) /* cpFieldName */ ) );
 
    if( iWorkArea != SX_DUMMY_NUMBER )
       sx_Select( iWorkArea );
@@ -150,7 +151,7 @@ HB_FUNC( SX_GETDATESTRING )
    if( ! ISNIL( 2 ) )
       iWorkArea = _sx_select( hb_param( 2, HB_IT_ANY ) );
 
-   hb_retc( ( char * ) sx_GetDateString( ( PBYTE ) hb_parc( 1 ) /* cpFieldname */ ) );
+   hb_retc( ( char * ) SX_CONVFUNC( sx_GetDateString( ( PBYTE ) hb_parc( 1 ) ) /* cpFieldname */ ) );
 
    if( iWorkArea != SX_DUMMY_NUMBER )
       sx_Select( iWorkArea );
@@ -158,7 +159,7 @@ HB_FUNC( SX_GETDATESTRING )
 
 char * _sx_GetDateValue( PBYTE cFieldName )
 {
-   char *   szDate  = ( char * ) sx_GetVariant( cFieldName );
+   char *   szDate  = ( char * ) SX_CONVFUNC( sx_GetVariant( cFieldName ) );
    int      d_value = 0,
             m_value = 0,
             y_value = 0;
@@ -359,7 +360,7 @@ HB_FUNC( SX_GETMEMO )
       else
          uiLineWidth = 0;
 
-      cpMemo = ( PBYTE ) sx_GetMemo( cpFieldName, uiLineWidth );
+      cpMemo = ( PBYTE ) SX_CONVFUNC( sx_GetMemo( cpFieldName, uiLineWidth ) );
 
       hb_retc( ( char * ) cpMemo );
 
@@ -417,7 +418,7 @@ HB_FUNC( SX_GETRECORDEX )
 
    for( i = 0; i < uiFieldCount; i++ )
    {
-      cpFieldName   = ( PBYTE ) sx_FieldName( ( WORD ) ( i + 1 ) );
+      cpFieldName   = ( PBYTE ) SX_CONVFUNC( sx_FieldName( ( WORD ) ( i + 1 ) ) );
       iOffSet       = sx_FieldOffset( cpFieldName );
       iFieldWidth   = sx_FieldWidth( cpFieldName );
       pString       = hb_itemPutCL( NULL, ( char * ) ( cpRecord + iOffSet - 1 ),
@@ -442,7 +443,7 @@ HB_FUNC( SX_GETSCOPE )
    if( ! ISNIL( 2 ) )
       iWorkArea = _sx_select( hb_param( 2, HB_IT_ANY ) );
 
-   hb_retc( ( char * ) sx_GetScope( ( WORD ) hb_parni( 1 ) /* iWhichScope */ ) );
+   hb_retc( ( char * ) SX_CONVFUNC( sx_GetScope( ( WORD ) hb_parni( 1 ) ) /* iWhichScope */ ) );
 
    if( iWorkArea != SX_DUMMY_NUMBER )
       sx_Select( iWorkArea );
@@ -455,7 +456,7 @@ HB_FUNC( SX_GETSTRING )
    if( ! ISNIL( 2 ) )
       iWorkArea = _sx_select( hb_param( 2, HB_IT_ANY ) );
 
-   hb_retc( ( char * ) sx_GetString( ( PBYTE ) hb_parc( 1 ) ) );   /* Field name  */
+   hb_retc( ( char * ) SX_CONVFUNC( sx_GetString( ( PBYTE ) hb_parc( 1 ) ) ) );   /* Field name  */
 
    if( iWorkArea != SX_DUMMY_NUMBER )
       sx_Select( iWorkArea );
@@ -468,7 +469,7 @@ HB_FUNC( SX_GETTRIMSTRING )
    if( ! ISNIL( 2 ) )
       iWorkArea = _sx_select( hb_param( 2, HB_IT_ANY ) );
 
-   hb_retc( ( LPSTR ) sx_GetTrimString( ( PBYTE ) hb_parc( 1 ) /* cpFieldName */ ) );
+   hb_retc( ( LPSTR ) SX_CONVFUNC( sx_GetTrimString( ( PBYTE ) hb_parc( 1 ) ) /* cpFieldName */ ) );
 
    if( iWorkArea != SX_DUMMY_NUMBER )
       sx_Select( iWorkArea );
@@ -490,7 +491,7 @@ HB_FUNC( SX_GETVALUEDTOS )   // ( cpFieldName )
    if( ISCHAR( 1 ) )
    {
       PBYTE    cFieldName = ( PBYTE ) hb_parc( 1 );
-      char *   cFieldType = ( char * ) sx_FieldType( cFieldName );
+      char *   cFieldType = ( char * ) SX_CONVFUNC( sx_FieldType( cFieldName ) );
       char     szDate[ 9 ];
 
       hb_retc( cFieldType[ 0 ] == 'D' ? hb_dateDecStr( szDate, sx_GetDateJulian( cFieldName ) ) : "" );
@@ -516,18 +517,18 @@ HB_FUNC( SX_GETVALUESTR )    // ( cpFieldName )
 
    if( ISCHAR( 1 ) )
    {
-      char *   cFieldType = ( char * ) sx_FieldType( ( PBYTE ) hb_parc( 1 ) );
+      char *   cFieldType = ( char * ) SX_CONVFUNC( sx_FieldType( ( PBYTE ) hb_parc( 1 ) ) );
       PBYTE    cFieldName = ( PBYTE ) hb_parc( 1 );
 
       switch( *cFieldType )
       {
          case 'D':
-            hb_retc( ( char * ) sx_GetDateString( cFieldName ) );
+            hb_retc( ( char * ) SX_CONVFUNC( sx_GetDateString( cFieldName ) ) );
             break;
 
          case 'N':
          case 'M':
-            hb_retc( ( char * ) sx_GetVariant( cFieldName ) );
+            hb_retc( ( char * ) SX_CONVFUNC( sx_GetVariant( cFieldName ) ) );
             break;
 
          case 'L':
@@ -537,7 +538,7 @@ HB_FUNC( SX_GETVALUESTR )    // ( cpFieldName )
          case 'C':
             bTrim = ISLOG( 2 ) ? hb_parl( 2 ) : FALSE;
             hb_retc( ( bTrim || bSetTrimmedON
-                       ) ? ( char * ) sx_GetTrimString( cFieldName ) : ( char * ) sx_GetString( cFieldName ) );
+                       ) ? ( char * ) SX_CONVFUNC( sx_GetTrimString( cFieldName ) ) : ( char * ) SX_CONVFUNC( sx_GetString( cFieldName ) ) );
             break;
 
          default:
@@ -568,7 +569,8 @@ HB_FUNC( SX_GETVALUE )       // ( cpFieldName )
    if( ISCHAR( 1 ) )
    {
       PBYTE    cFieldName = ( PBYTE ) hb_parc( 1 );
-      char *   cFieldType = ( char * ) sx_FieldType( cFieldName );
+      char *   cFieldType = ( char * ) SX_CONVFUNC( sx_FieldType( cFieldName ) );
+
       switch( *cFieldType )
       {
          case 'N':
@@ -599,7 +601,7 @@ HB_FUNC( SX_GETVALUE )       // ( cpFieldName )
          break;
 
          case 'M':
-            hb_retc( ( char * ) sx_GetVariant( cFieldName ) );
+            hb_retc( ( char * ) SX_CONVFUNC( sx_GetVariant( cFieldName ) ) );
             break;
 
          case 'L':
@@ -609,7 +611,7 @@ HB_FUNC( SX_GETVALUE )       // ( cpFieldName )
          case 'C':
             bTrim = ISLOG( 2 ) ? hb_parl( 2 ) : FALSE;
             hb_retc( ( bTrim || bSetTrimmedON
-                       ) ? ( char * ) sx_GetTrimString( cFieldName ) : ( char * ) sx_GetString( cFieldName ) );
+                       ) ? ( char * ) SX_CONVFUNC( sx_GetTrimString( cFieldName ) ) : ( char * ) SX_CONVFUNC( sx_GetString( cFieldName ) ) );
             break;
       }  // end switch ( *cFieldType )
    }
@@ -639,8 +641,9 @@ HB_FUNC( SX_GETVALUEEX )  // ( area )
 
    for( i = 0; i < iField; i++ )
    {
-      PBYTE    cFieldName = ( PBYTE ) sx_FieldName( ( WORD ) ( i + 1 ) );
-      char *   cFieldType = ( char * ) sx_FieldType( cFieldName );
+      PBYTE    cFieldName = ( PBYTE ) SX_CONVFUNC( sx_FieldName( ( WORD ) ( i + 1 ) ) );
+      char *   cFieldType = ( char * ) SX_CONVFUNC( sx_FieldType( cFieldName ) );
+
       switch( *cFieldType )
       {
          case 'N':
@@ -654,7 +657,7 @@ HB_FUNC( SX_GETVALUEEX )  // ( area )
             break;
 
          case 'M':
-            HB_STORC( ( char * ) sx_GetVariant( cFieldName ), -1, i + 1 );
+            HB_STORC( ( char * ) SX_CONVFUNC( sx_GetVariant( cFieldName ) ), -1, i + 1 );
             break;
 
          case 'L':
@@ -663,9 +666,9 @@ HB_FUNC( SX_GETVALUEEX )  // ( area )
 
          case 'C':
             if( bSetTrimmedON )
-               HB_STORC( ( char * ) sx_GetTrimString( cFieldName ), -1, i + 1 );
+               HB_STORC( ( char * ) SX_CONVFUNC( sx_GetTrimString( cFieldName ) ), -1, i + 1 );
             else
-               HB_STORC( ( char * ) sx_GetString( cFieldName ), -1, i + 1 );
+               HB_STORC( ( char * ) SX_CONVFUNC( sx_GetString( cFieldName ) ), -1, i + 1 );
             break;
       }  // end switch ( *cFieldType )
    }
@@ -684,7 +687,7 @@ HB_FUNC( SX_GETVARIANT )
    if( ! ISNIL( 2 ) )
       iWorkArea = _sx_select( hb_param( 2, HB_IT_ANY ) );
 
-   hb_retc( ( char * ) sx_GetVariant( ( PBYTE ) hb_parc( 1 ) ) );  /* Field name  */
+   hb_retc( ( char * ) SX_CONVFUNC( sx_GetVariant( ( PBYTE ) hb_parc( 1 ) ) ) );  /* Field name  */
 
    if( iWorkArea != SX_DUMMY_NUMBER )
       sx_Select( iWorkArea );

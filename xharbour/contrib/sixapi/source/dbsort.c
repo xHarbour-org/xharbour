@@ -156,7 +156,8 @@ HB_FUNC( __SX_DBSORT ) // (file,afields,bfor,bwhile,nnext,nrec,lrest,rdd,ldescen
          for( ui = 0; ui < uilenpArray; ui++ )
          {
             cFieldName = ( char * ) hb_arrayGetC( pArray, ui + 1 );
-            cFieldType = ( char * ) sx_FieldType( ( PBYTE ) cFieldName );
+            cFieldType = ( char * ) SX_CONVFUNC( sx_FieldType( ( PBYTE ) cFieldName ) );
+
             switch( *cFieldType )
             {
                case 'C':

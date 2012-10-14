@@ -107,7 +107,6 @@ HB_FUNC( SX_RECSIZE )
 
 HB_FUNC( SX_RECTOSTRING )
 {
-   hb_retc( ( char * ) sx_RecToString( ( PBYTE ) hb_parc( 1 ) /* cpRecStruc */,
-                                       ( WORD ) hb_parni( 2 ) /* iLength */
-                                       ) );
+   hb_retc( ( char * ) SX_CONVFUNC( sx_RecToString( ( PBYTE ) hb_parc( 1 ),
+                                       ( WORD ) hb_parni( 2 ) ) ) );
 }

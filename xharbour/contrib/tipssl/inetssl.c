@@ -685,8 +685,8 @@ HB_FUNC(INETSSLCLEANUP)
 HB_FUNC(INETSSLCREATE)
 {
    PHB_ITEM             pSocket = NULL;
-   int                  iRet1;
-   int                  iRet2;
+   //int                iRet1;
+   //int                iRet2;
    const char           *szCAPath;
    const char           *szCAFile;
    HB_SSL_SOCKET_STRUCT *Socket;
@@ -701,8 +701,10 @@ HB_FUNC(INETSSLCREATE)
    {
       szCAPath = ISCHAR(3) ? hb_parc(3) : NULL;
       szCAFile = ISCHAR(2) ? hb_parc(2) : NULL;
-      iRet1 = SSL_CTX_load_verify_locations(Socket->pCTX, szCAFile, szCAPath);
-      iRet2 = SSL_CTX_set_default_verify_paths(Socket->pCTX);
+      //iRet1 = SSL_CTX_load_verify_locations(Socket->pCTX, szCAFile, szCAPath);
+      //iRet2 = SSL_CTX_set_default_verify_paths(Socket->pCTX);
+      SSL_CTX_load_verify_locations(Socket->pCTX, szCAFile, szCAPath);
+      SSL_CTX_set_default_verify_paths(Socket->pCTX);
       Socket->store = SSL_CTX_get_cert_store(Socket->pCTX);
       X509_STORE_set_flags(Socket->store, 0);
    }

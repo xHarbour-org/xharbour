@@ -43,7 +43,7 @@ HB_FUNC( SX_EVALDATE )
    if( ! ISNIL( 2 ) )
       iWorkArea = _sx_select( hb_param( 2, HB_IT_ANY ) );
 
-   szDateStr = ( char * ) sx_EvalString( ( PBYTE ) hb_parc( 1 ) );
+   szDateStr = ( char * ) SX_CONVFUNC( sx_EvalString( ( PBYTE ) hb_parc( 1 ) ) );
 
    hb_retds( szDateStr );
 
@@ -93,7 +93,7 @@ HB_FUNC( SX_EVALSTRING )
    if( ! ISNIL( 2 ) )
       iWorkArea = _sx_select( hb_param( 2, HB_IT_ANY ) );
 
-   hb_retc( ( char * ) sx_EvalString( ( PBYTE ) hb_parc( 1 ) /* cpExpression */ ) );
+   hb_retc( ( char * ) SX_CONVFUNC( sx_EvalString( ( PBYTE ) hb_parc( 1 ) ) /* cpExpression */ ) );
 
    if( iWorkArea != SX_DUMMY_NUMBER )
       sx_Select( iWorkArea );

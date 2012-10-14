@@ -42,10 +42,12 @@ static void _sx_GetLine( PHB_ITEM pArray, FILE * hFileHandle, char * cDelimiter 
          for( i = 0; i < uiLen; i++ )
          {
             cFieldName = ( char * ) hb_arrayGetC( pArray, i + 1 );
-            cFieldType = ( char * ) sx_FieldType( ( PBYTE ) cFieldName );
+            cFieldType = ( char * ) SX_CONVFUNC( sx_FieldType( ( PBYTE ) cFieldName ) );
+
             if( ! ( strcmp( cFieldType, "M" ) == 0 ) )
             {
-               cTemp = ( char * ) sx_GetVariant( ( PBYTE ) cFieldName );
+               cTemp = ( char * ) SX_CONVFUNC( sx_GetVariant( ( PBYTE ) cFieldName ) );
+
                if( ! bSDF )
                   cTemp = _sx_rtrim( cTemp );
                else
@@ -71,11 +73,13 @@ static void _sx_GetLine( PHB_ITEM pArray, FILE * hFileHandle, char * cDelimiter 
          uiLen = sx_FieldCount();
          for( i = 0; i < uiLen; i++ )
          {
-            cFieldName = ( char * ) sx_FieldName( ( WORD ) ( i + 1 ) );
-            cFieldType = ( char * ) sx_FieldType( ( PBYTE ) cFieldName );
+            cFieldName = ( char * ) SX_CONVFUNC( sx_FieldName( ( WORD ) ( i + 1 ) ) );
+            cFieldType = ( char * ) SX_CONVFUNC( sx_FieldType( ( PBYTE ) cFieldName ) );
+
             if( ! ( strcmp( cFieldType, "M" ) == 0 ) )
             {
-               cTemp = ( char * ) sx_GetVariant( ( PBYTE ) cFieldName );
+               cTemp = ( char * ) SX_CONVFUNC( sx_GetVariant( ( PBYTE ) cFieldName ) );
+
                if( ! bSDF )
                   cTemp = _sx_rtrim( cTemp );
                else

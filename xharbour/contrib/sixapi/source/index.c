@@ -193,7 +193,7 @@ HB_FUNC( SX_INDEXCONDITION )
    if( ! ISNIL( 1 ) )
       iWorkArea = _sx_select( hb_param( 1, HB_IT_ANY ) );
 
-   hb_retc( ( char * ) sx_IndexCondition() );
+   hb_retc( ( char * ) SX_CONVFUNC( sx_IndexCondition() ) );
 
    if( iWorkArea != SX_DUMMY_NUMBER )
       sx_Select( iWorkArea );
@@ -225,7 +225,7 @@ HB_FUNC( SX_INDEXKEY )
    if( ! ISNIL( 1 ) )
       iWorkArea = _sx_select( hb_param( 1, HB_IT_ANY ) );
 
-   hb_retc( ( char * ) sx_IndexKey() );
+   hb_retc( ( char * ) SX_CONVFUNC( sx_IndexKey() ) );
 
    if( ! ( iWorkArea == SX_DUMMY_NUMBER ) )
       sx_Select( iWorkArea );
@@ -246,7 +246,7 @@ HB_FUNC( SX_INDEXKEYFIELD )
    if( ! ISNIL( 1 ) )
       iWorkArea = _sx_select( hb_param( 1, HB_IT_ANY ) );
 
-   hb_retc( ( char * ) sx_IndexKeyField() );
+   hb_retc( ( char * ) SX_CONVFUNC( sx_IndexKeyField() ) );
 
    if( ! ( iWorkArea == SX_DUMMY_NUMBER ) )
       sx_Select( iWorkArea );
@@ -266,7 +266,8 @@ HB_FUNC( SX_INDEXNAME )
    if( ISNUM( 1 ) )
    {
       iIndex = ( WORD ) hb_parni( 1 );
-      hb_retc( ( char * ) sx_IndexName( iIndex ) );
+
+      hb_retc( ( char * ) SX_CONVFUNC( sx_IndexName( iIndex ) ) );
    }
    else
       hb_retc( "" );
@@ -436,7 +437,7 @@ HB_FUNC( SX_KEYDATA )
    if( ! ISNIL( 1 ) )
       iWorkArea = _sx_select( hb_param( 1, HB_IT_ANY ) );
 
-   hb_retc( ( char * ) sx_KeyData() );
+   hb_retc( ( char * ) SX_CONVFUNC( sx_KeyData() ) );
 
    if( iWorkArea != SX_DUMMY_NUMBER )
       sx_Select( iWorkArea );
@@ -572,17 +573,17 @@ HB_FUNC( SX_TAGINFO )
       {
          sx_SetOrder( uiCount );
          hb_arrayNew( pItem, 8 );
-         hb_arraySet( pItem, 1, hb_itemPutC( pData, ( char * ) sx_TagName( uiCount ) ) );
-         hb_arraySet( pItem, 2, hb_itemPutC( pData, ( char * ) sx_IndexKey() ) );
-         hb_arraySet( pItem, 3, hb_itemPutC( pData, ( char * ) sx_IndexCondition() ) );
+         hb_arraySet( pItem, 1, hb_itemPutC( pData, ( char * ) SX_CONVFUNC(sx_TagName( uiCount ) ) ) );
+         hb_arraySet( pItem, 2, hb_itemPutC( pData, ( char * ) SX_CONVFUNC(sx_IndexKey() ) ) );
+         hb_arraySet( pItem, 3, hb_itemPutC( pData, ( char * ) SX_CONVFUNC(sx_IndexCondition() ) ) );
          hb_arraySet( pItem, 4, hb_itemPutNI( pData, sx_IndexType() ) );
          hb_arraySet( pItem, 5, hb_itemPutL( pData,
                                              ( BOOL ) sx_SysProp( SDE_SP_GETDESCENDING, ( PVOID ) &uiCount )
                                              ) );
          hb_arraySet( pItem, 6, hb_itemPutL( pData, ( BOOL ) ( ( int ) sx_SysProp(
                                                                   SDE_SP_GETEMPTY, ( PVOID ) &uiCount ) == 2 ) ) );
-         hb_arraySet( pItem, 7, hb_itemPutC( pData, ( char * ) sx_IndexName( uiCount ) ) );
-         hb_arraySet( pItem, 8, hb_itemPutC( pData, ( char * ) sx_IndexKeyField() ) );
+         hb_arraySet( pItem, 7, hb_itemPutC( pData, ( char * ) SX_CONVFUNC(sx_IndexName( uiCount ) ) ) );
+         hb_arraySet( pItem, 8, hb_itemPutC( pData, ( char * ) SX_CONVFUNC(sx_IndexKeyField() ) ) );
          hb_arrayAdd( pTagInfo, pItem );
       }
 
@@ -605,7 +606,7 @@ HB_FUNC( SX_TAGNAME )
    if( ! ISNIL( 2 ) )
       iWorkArea = _sx_select( hb_param( 2, HB_IT_ANY ) );
 
-   hb_retc( ( char * ) sx_TagName( ( WORD ) hb_parni( 1 ) /* iTagArea */ ) );
+   hb_retc( ( char * ) SX_CONVFUNC(sx_TagName( ( WORD ) hb_parni( 1 ) ) /* iTagArea */ ) );
 
    if( iWorkArea != SX_DUMMY_NUMBER )
       sx_Select( iWorkArea );

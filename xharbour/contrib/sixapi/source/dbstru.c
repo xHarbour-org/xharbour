@@ -105,7 +105,8 @@ BOOL _sx_CopyStructure( PBYTE cpFileName, PHB_ITEM paFields )
 
       for( i = 0; i < iLenSource; i++ )
       {
-         cpFieldName = ( char * ) sx_FieldName( ( WORD ) ( i + 1 ) );
+         cpFieldName = ( char * ) SX_CONVFUNC( sx_FieldName( ( WORD ) ( i + 1 ) ) );
+
          for( ui = 0; ui < uilenpArray; ui++ )
          {
             cFieldToCopy = ( char * ) hb_arrayGetCPtr( paFields, ui + 1 );
@@ -115,7 +116,7 @@ BOOL _sx_CopyStructure( PBYTE cpFileName, PHB_ITEM paFields )
                pTemp   = hb_itemPutC( NULL, cpFieldName );
                hb_arraySet( pItem, 1, pTemp );
                hb_itemRelease( pTemp );
-               pTemp   = hb_itemPutC( NULL, ( char * ) sx_FieldType( ( PBYTE ) cpFieldName ) );
+               pTemp   = hb_itemPutC( NULL, ( char * ) SX_CONVFUNC( sx_FieldType( ( PBYTE ) cpFieldName ) ) );
                hb_arraySet( pItem, 2, pTemp );
                hb_itemRelease( pTemp );
                hb_arraySet( pItem, 3, hb_itemPutNI( pData, sx_FieldWidth( ( PBYTE ) cpFieldName ) ) );
@@ -223,7 +224,7 @@ PHB_ITEM _sx_DbStruct( void )
    {
       int   iWidth;
       int   iDec;
-      PBYTE cFieldName = ( PBYTE ) sx_FieldName( ( WORD ) uiCount );
+      PBYTE cFieldName = ( PBYTE ) SX_CONVFUNC( sx_FieldName( ( WORD ) uiCount ) );
 
       iWidth  = sx_FieldWidth( cFieldName );
       iDec    = sx_FieldDecimals( cFieldName );
@@ -236,7 +237,7 @@ PHB_ITEM _sx_DbStruct( void )
        */
       hb_arrayNew( pItem, 4 );
       hb_arraySet( pItem, 1, hb_itemPutC( pData, ( char * ) cFieldName ) );
-      hb_arraySet( pItem, 2, hb_itemPutC( pData, ( char * ) sx_FieldType( cFieldName ) ) );
+      hb_arraySet( pItem, 2, hb_itemPutC( pData, ( char * ) SX_CONVFUNC( sx_FieldType( cFieldName ) ) ) );
       hb_arraySet( pItem, 3, hb_itemPutNI( pData, iWidth ) );
       hb_arraySet( pItem, 4, hb_itemPutNI( pData, iDec ) );
       hb_arrayAdd( pStruct, pItem );
@@ -258,11 +259,11 @@ PHB_ITEM _sx_FieldNames( void )
 
    hb_arrayNew( pStruct, 0 );
 
-   uiFields = sx_FieldCount();
+   uiFields = ( USHORT ) sx_FieldCount();
 
    for( uiCount = 1; uiCount <= uiFields; uiCount++ )
    {
-      cFieldName = ( char * ) sx_FieldName( uiCount );
+      cFieldName = ( char * ) SX_CONVFUNC( sx_FieldName( uiCount ) );
       pItem      = hb_itemPutC( NULL, cFieldName );
       hb_arrayAdd( pStruct, pItem );
       hb_itemRelease( pItem );

@@ -365,7 +365,11 @@ HB_FUNC( HPDF_LOADTTFONTFROMFILE2 )
 //
 HB_FUNC( HPDF_ADDPAGELABEL )
 {
+#if defined( __MINGW32__ ) && defined( HB_OS_WIN_64 )
+   hb_retnl( (long) ( HB_LONG ) HPDF_AddPageLabel( (HPDF_Doc) ( HB_LONG ) hb_parni( 1 ), hb_parni( 2 ), (HPDF_PageNumStyle) hb_parni( 3 ), hb_parni( 4 ), hb_parc( 5 ) ) );
+#else
    hb_retnl( (long) HPDF_AddPageLabel( (HPDF_Doc) hb_parni( 1 ), hb_parni( 2 ), (HPDF_PageNumStyle) hb_parni( 3 ), hb_parni( 4 ), hb_parc( 5 ) ) );
+#endif
 }
 //----------------------------------------------------------------------//
 // HPdf_UseJPFonts( hDoc ) -> hStatus
@@ -661,7 +665,11 @@ HB_FUNC( HPDF_PAGE_CREATETEXTANNOT )
    rc.right  = (HPDF_REAL) hb_parnd( 2, 3 );
    rc.bottom = (HPDF_REAL) hb_parnd( 2, 4 );
 
+#if defined( __MINGW32__ ) && defined( HB_OS_WIN_64 )
+   hb_retnl( (long) (HB_LONG) HPDF_Page_CreateTextAnnot( (HPDF_Page) hb_parptr( 1 ), rc, hb_parc( 3 ), (HPDF_Encoder) hb_parptr( 4 ) ) );
+#else
    hb_retnl( (long) HPDF_Page_CreateTextAnnot( (HPDF_Page) hb_parptr( 1 ), rc, hb_parc( 3 ), (HPDF_Encoder) hb_parptr( 4 ) ) );
+#endif
 }
 //----------------------------------------------------------------------//
 // HPdf_Page_CreateLinkAnnot( hPage, aRect, hDestn ) -> hStatus
@@ -675,7 +683,11 @@ HB_FUNC( HPDF_PAGE_CREATELINKANNOT )
    rc.right  = (HPDF_REAL) hb_parnd( 2, 3 );
    rc.bottom = (HPDF_REAL) hb_parnd( 2, 4 );
 
+#if defined( __MINGW32__ ) && defined( HB_OS_WIN_64 )
+   hb_retnl( (long) ( HB_LONG ) HPDF_Page_CreateLinkAnnot( (HPDF_Page) hb_parptr( 1 ), rc, (HPDF_Destination) hb_parptr( 3 ) ) );
+#else
    hb_retnl( (long) HPDF_Page_CreateLinkAnnot( (HPDF_Page) hb_parptr( 1 ), rc, (HPDF_Destination) hb_parptr( 3 ) ) );
+#endif
 }
 //----------------------------------------------------------------------//
 // HPdf_Page_CreateURILinkAnnot( hPage, aRect, cURI ) -> hStatus
@@ -689,7 +701,11 @@ HB_FUNC( HPDF_PAGE_CREATEURILINKANNOT )
    rc.right  = (HPDF_REAL) hb_parnd( 2, 3 );
    rc.bottom = (HPDF_REAL) hb_parnd( 2, 4 );
 
+#if defined( __MINGW32__ ) && defined( HB_OS_WIN_64 )
+   hb_retnl( (long) ( HB_LONG ) HPDF_Page_CreateURILinkAnnot( (HPDF_Page) hb_parptr( 1 ), rc, hb_parc( 3 ) ) );
+#else
    hb_retnl( (long) HPDF_Page_CreateURILinkAnnot( (HPDF_Page) hb_parptr( 1 ), rc, hb_parc( 3 ) ) );
+#endif
 }
 //----------------------------------------------------------------------//
 // HPdf_Page_TextWidth( hPage, cText ) -> nTextWidth

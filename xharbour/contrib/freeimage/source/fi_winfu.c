@@ -135,7 +135,7 @@ HB_FUNC( FI_BITMAPTOFI )
       HBITMAP bitmap;
 
       /* Retrieve parameters */
-      bitmap = (HBITMAP) hb_parnl( 1 );
+      bitmap = (HBITMAP) hb_parns( 1 );
 
       /* run function */
       dib = NULL;
@@ -196,7 +196,7 @@ HB_FUNC( FI_WINDRAW )
 
       /* Retrieve parameters */
       dib  = (FIBITMAP *) hb_parptr( 1 );
-      hDC  = (HDC) hb_parnl( 2 );
+      hDC  = (HDC) hb_parns( 2 );
       rcDest.top    = hb_parni( 3 );
       rcDest.left   = hb_parni( 4 );
       rcDest.bottom = hb_parni( 5 );

@@ -8,6 +8,32 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-14 17:47 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/tp_/win32.c
+  * contrib/hbhpdf/harupdf.c
+  * contrib/sevenzip/sevenzip.c
+  * contrib/freeimage/source/fi_winfu.c
+  * contrib/sixapi/source/base.c
+  * contrib/sixapi/source/dbcopy.c
+  * contrib/sixapi/source/dbdelim.c
+  * contrib/sixapi/source/dbsort.c
+  * contrib/sixapi/source/dbstru.c
+  * contrib/sixapi/source/decrypt.c
+  * contrib/sixapi/source/encrypt.c
+  * contrib/sixapi/source/eval.c
+  * contrib/sixapi/source/field.c
+  * contrib/sixapi/source/filter.c
+  * contrib/sixapi/source/get.c
+  * contrib/sixapi/source/index.c
+  * contrib/sixapi/source/put.c
+  * contrib/sixapi/source/rec.c
+  * contrib/sixapi/source/replace.c
+  * contrib/sixapi/source/sysprop.c
+  * contrib/sixapi/source/use.c
+  * contrib/sixapi/source/global.c
+  * contrib/tipssl/inetssl.c
+    ! pacify GCC64 warnings in contrib-stuffs
+
 2012-10-14 10:28 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbhpdf/harupdf.c
   * contrib/hbhpdf/hpdf_streams.c

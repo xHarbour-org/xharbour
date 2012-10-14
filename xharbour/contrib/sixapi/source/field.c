@@ -64,7 +64,7 @@ HB_FUNC( SX_FIELDDECIMALS )
    if( ISCHAR( 1 ) )
       hb_retni( sx_FieldDecimals( ( PBYTE ) hb_parc( 1 ) ) );
    else if( ISNUM( 1 ) )
-      hb_retni( sx_FieldDecimals( ( PBYTE ) sx_FieldName( ( WORD ) hb_parni( 1 ) ) ) );
+      hb_retni( sx_FieldDecimals( ( PBYTE ) SX_CONVFUNC( sx_FieldName( ( WORD ) hb_parni( 1 ) ) ) ) );
    else
       hb_retni( -1 );
 
@@ -86,7 +86,7 @@ HB_FUNC( SX_FIELDNAME )
       iWorkArea = _sx_select( hb_param( 2, HB_IT_ANY ) );
 
    if( ISNUM( 1 ) )
-      hb_retc( ( char * ) sx_FieldName( ( WORD ) hb_parni( 1 ) ) );
+      hb_retc( ( char * ) SX_CONVFUNC( sx_FieldName( ( WORD ) hb_parni( 1 ) ) ) );
    else
       hb_retc( "" );
 
@@ -154,9 +154,9 @@ HB_FUNC( SX_FIELDTYPE )
       iWorkArea = _sx_select( hb_param( 2, HB_IT_ANY ) );
 
    if( ISCHAR( 1 ) )
-      hb_retc( ( char * ) sx_FieldType( ( PBYTE ) hb_parc( 1 ) ) );
+      hb_retc( ( char * ) SX_CONVFUNC( sx_FieldType( ( PBYTE ) hb_parc( 1 ) ) ) );
    else if( ISNUM( 1 ) )
-      hb_retc( ( char * ) sx_FieldType( ( PBYTE ) sx_FieldName( ( WORD ) hb_parni( 1 ) ) ) );
+      hb_retc( ( char * ) SX_CONVFUNC( sx_FieldType( ( PBYTE ) SX_CONVFUNC( sx_FieldName( ( WORD ) hb_parni( 1 ) ) ) ) ) );
    else
       hb_retc( "" );
 
@@ -180,7 +180,7 @@ HB_FUNC( SX_FIELDWIDTH )
    if( ISCHAR( 1 ) )
       hb_retni( sx_FieldWidth( ( PBYTE ) hb_parc( 1 ) ) );
    else if( ISNUM( 1 ) )
-      hb_retni( sx_FieldWidth( ( PBYTE ) sx_FieldName( ( WORD ) hb_parni( 1 ) ) ) );
+      hb_retni( sx_FieldWidth( ( PBYTE ) SX_CONVFUNC( sx_FieldName( ( WORD ) hb_parni( 1 ) ) ) ) );
    else
       hb_retni( -1 );
 

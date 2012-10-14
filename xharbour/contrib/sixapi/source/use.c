@@ -64,7 +64,7 @@ void _sx_SetDBFInfo( int iOpenedArea, const char * szAlias, int iOpenMode,
    PHB_ITEM       pStruct = _sx_DbStruct();
 
    OpenInfo.uiArea        = ( USHORT ) iOpenedArea;
-   OpenInfo.cFilename     = ( char * ) sx_BaseName();
+   OpenInfo.cFilename     = ( char * ) SX_CONVFUNC( sx_BaseName() );
    OpenInfo.cAlias        = szAlias;
    OpenInfo.fShared       = ( ( iOpenMode == 0 ) ? TRUE : FALSE );
    OpenInfo.fReadonly     = ( ( iOpenMode == READONLY ) ? TRUE : FALSE );

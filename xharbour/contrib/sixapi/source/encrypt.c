@@ -55,12 +55,11 @@ HB_FUNC( _SX_ENCRYPT )
 
       if( ISCHAR( 2 ) )
       {
-         hb_retc( ( char * ) sx_Encrypt( cpBuffer,
-                                         ( PBYTE ) hb_parc( 2 ) /* cpPassword */, iLen ) );
+         hb_retc( ( char * ) SX_CONVFUNC( sx_Encrypt( cpBuffer, ( PBYTE ) hb_parc( 2 ), iLen ) ) );
       }
       else
       {
-         hb_retc( ( char * ) sx_Encrypt( cpBuffer, ( PBYTE ) NULL /* cpPassword */, iLen ) );
+         hb_retc( ( char * ) SX_CONVFUNC( sx_Encrypt( cpBuffer, ( PBYTE ) NULL, iLen ) ) );
       }
 
       hb_xfree( cpBuffer );

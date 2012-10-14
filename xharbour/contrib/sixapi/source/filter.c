@@ -34,7 +34,7 @@ HB_FUNC( SX_DBFILTER )
    if( ! ISNIL( 1 ) )
       iWorkArea = _sx_select( hb_param( 1, HB_IT_ANY ) );
 
-   hb_retc( ( char * ) sx_DBFilter() );
+   hb_retc( ( char * ) SX_CONVFUNC( sx_DBFilter() ) );
 
    if( ! ( iWorkArea == SX_DUMMY_NUMBER ) )
       sx_Select( iWorkArea );

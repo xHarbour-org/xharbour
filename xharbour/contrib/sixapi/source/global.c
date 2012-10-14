@@ -426,7 +426,7 @@ HB_FUNC( SX_SETAUTOOPEN )
    BOOL lAuto = ! _sx_SysProp( SDE_SP_GETDISABLEAUTO, NULL );
 
    if( ISLOG( 1 ) )
-      _sx_SysProp( SDE_SP_SETDISABLEAUTO, ( PVOID ) ( ! hb_parl( 1 ) ) );
+      _sx_SysProp( SDE_SP_SETDISABLEAUTO, ( PVOID ) SX_CONVFUNC( ( ! hb_parl( 1 ) ) ) );
    hb_retl( lAuto );
 }
 
@@ -685,7 +685,7 @@ HB_FUNC( SX_SETUDFPATH )
 
 HB_FUNC( SX_GETCHRCOLLATE )
 {
-   hb_retc( ( char * ) sx_SysProp( SDE_SP_GETCHRCOLLATE, ( PVOID ) NULL ) );
+   hb_retc( ( char * ) SX_CONVFUNC( sx_SysProp( SDE_SP_GETCHRCOLLATE, ( PVOID ) NULL ) ) );
 }
 
 HB_FUNC( SX_CLOSEALL )
@@ -723,7 +723,7 @@ HB_FUNC( SX_GETDATEFORMAT )
 
 HB_FUNC( SX_GETOEMCOLLATE )
 {
-   hb_retc( ( char * ) sx_SysProp( SDE_SP_GETOEMCOLLATE, ( PVOID ) NULL ) );
+   hb_retc( ( char * ) SX_CONVFUNC( sx_SysProp( SDE_SP_GETOEMCOLLATE, ( PVOID ) NULL ) ) );
 }
 
 HB_FUNC( SX_GETQUERYBIT )

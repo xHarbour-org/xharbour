@@ -26,7 +26,7 @@
 
 HB_FUNC( SX_VERSION )
 {
-   char * szVersion = ( char * ) sx_Version();
+   char * szVersion = ( char * ) SX_CONVFUNC( sx_Version() );
 
    hb_retc( szVersion );
 }
@@ -46,7 +46,7 @@ HB_FUNC( SX_BASEDATE )
    if( ! ISNIL( 1 ) )
       iWorkArea = _sx_select( hb_param( 1, HB_IT_ANY ) );
 
-   hb_retc( ( char * ) sx_BaseDate() );
+   hb_retc( ( char * ) SX_CONVFUNC( sx_BaseDate() ) );
 
    if( ! ( iWorkArea == SX_DUMMY_NUMBER ) )
       sx_Select( iWorkArea );
@@ -62,7 +62,7 @@ HB_FUNC( SX_BASENAME )
    if( ! ISNIL( 1 ) )
       iWorkArea = _sx_select( hb_param( 1, HB_IT_ANY ) );
 
-   hb_retc( ( char * ) sx_BaseName() );
+   hb_retc( ( char * ) SX_CONVFUNC( sx_BaseName() ) );
 
    if( ! ( iWorkArea == SX_DUMMY_NUMBER ) )
       sx_Select( iWorkArea );

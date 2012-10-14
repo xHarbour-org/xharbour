@@ -73,7 +73,7 @@ HB_FUNC( P_INITPORTSPEED )
       hb_retnl(-1);
 
    } else {
-      if ( ! SetCommState( (HANDLE) hb_parnl(1), &dcb) ) {
+      if ( ! SetCommState( (HANDLE) hb_parns(1), &dcb) ) {
          hb_retnl(-1);
 
       } else {
@@ -86,7 +86,7 @@ HB_FUNC( P_INITPORTSPEED )
          timeouts.WriteTotalTimeoutMultiplier = 0;
          timeouts.WriteTotalTimeoutConstant = 0;
 
-         if ( SetCommTimeouts( (HANDLE) hb_parnl(1), &timeouts ) ) {
+         if ( SetCommTimeouts( (HANDLE) hb_parns(1), &timeouts ) ) {
             hb_retnl(0);
          } else {
             hb_retnl(-1);
@@ -102,7 +102,7 @@ HB_FUNC( P_READPORT )
    BOOL  bRet;
    OVERLAPPED Overlapped = {0};
 
-   bRet = ReadFile( (HANDLE) hb_parnl( 1 ), Buffer, 512, &nRead, &Overlapped );
+   bRet = ReadFile( (HANDLE) hb_parns( 1 ), Buffer, 512, &nRead, &Overlapped );
 
    if ( bRet ) {
       hb_retclen( Buffer, nRead );
@@ -117,7 +117,7 @@ HB_FUNC( P_WRITEPORT )
    BOOL  bRet;
    OVERLAPPED Overlapped = {0};
 
-   bRet = WriteFile( (HANDLE) hb_parnl( 1 ), hb_parcx( 2 ), (DWORD) hb_parclen( 2 ), &nWritten, &Overlapped );
+   bRet = WriteFile( (HANDLE) hb_parns( 1 ), hb_parcx( 2 ), (DWORD) hb_parclen( 2 ), &nWritten, &Overlapped );
 
    if ( bRet ) {
       hb_retnl( nWritten );
