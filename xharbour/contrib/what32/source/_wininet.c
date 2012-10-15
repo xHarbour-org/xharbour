@@ -35,7 +35,7 @@
 #define DWORD_PTR DWORD
 #endif
 
-#if (defined(_MSC_VER) && _MSC_VER<=1200 && !defined(__POCC__))
+#if (defined(_MSC_VER) && _MSC_VER<1400 && !defined(__POCC__))
 #define FtpCommand FtpCommandA
 BOOLAPI
 FtpCommandA(

@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-15 10:22 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/what32/source/_wininet.c
+    * commit was missing
+
 2012-10-15 10:17 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/what32/source/_wininet.c
     ! _MSC_VER<=1200 -> _MSC_VER<1400: FtpCommand also does not exist in MVCS 7
