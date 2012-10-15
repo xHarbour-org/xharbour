@@ -587,12 +587,12 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
 {
    HB_THREAD_STUB
 
-   HB_SIZE              ulSize;
+   HB_SIZE              ulSize = 0;
    HB_ITEM              FakedItem;
-   PHB_ITEM             pKey;
-   PHB_ITEM             pValue;
-   HB_CODEBLOCK_PTR     pCBlock;
-   USHORT               ui;
+   PHB_ITEM             pKey = NULL;
+   PHB_ITEM             pValue = NULL;
+   HB_CODEBLOCK_PTR     pCBlock = NULL;
+   USHORT               ui = 0;
 
    #ifdef SIMULATE_ITEMREF_RECURSION
    PITEMREF_RESUMEINFO  pResumeInfo    = ( PITEMREF_RESUMEINFO ) hb_xgrab( sizeof( ITEMREF_RESUMEINFO ) );

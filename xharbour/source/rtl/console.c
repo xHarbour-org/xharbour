@@ -360,7 +360,7 @@ static void hb_conOut( USHORT uiParam, hb_out_func_typedef * pOutFunc )
 
 HB_FUNC( OUTSTD ) /* writes a list of values to the standard output device */
 {
-   USHORT   uiPCount = hb_pcount();
+   USHORT   uiPCount = ( USHORT ) hb_pcount();
    USHORT   uiParam;
 
    hb_console_safe_lock();
@@ -377,7 +377,7 @@ HB_FUNC( OUTSTD ) /* writes a list of values to the standard output device */
 
 HB_FUNC( OUTERR ) /* writes a list of values to the standard error device */
 {
-   USHORT   uiPCount = hb_pcount();
+   USHORT   uiPCount = ( USHORT ) hb_pcount();
    USHORT   uiParam;
 
    hb_console_safe_lock();
@@ -394,7 +394,7 @@ HB_FUNC( OUTERR ) /* writes a list of values to the standard error device */
 
 HB_FUNC( QQOUT ) /* writes a list of values to the current device (screen or printer) and is affected by SET ALTERNATE */
 {
-   USHORT   uiPCount = hb_pcount();
+   USHORT   uiPCount = ( USHORT ) hb_pcount();
    USHORT   uiParam;
 
    hb_console_safe_lock();
@@ -421,7 +421,7 @@ HB_FUNC( QOUT )
       BYTE     buf[ 80 ];
 
       s_uiPRow++;
-      s_uiPCol = hb_setGetMargin();
+      s_uiPCol = ( USHORT ) hb_setGetMargin();
       if( s_uiPCol )
       {
          if( s_uiPCol > sizeof( buf ) )
@@ -553,7 +553,7 @@ HB_FUNC( DEVPOS ) /* Sets the screen and/or printer position */
    hb_console_safe_lock();
    if( ISNUM( 1 ) && ISNUM( 2 ) )
    {
-      hb_conDevPos( hb_parni( 1 ), hb_parni( 2 ) );
+      hb_conDevPos( ( USHORT ) hb_parni( 1 ), ( USHORT ) hb_parni( 2 ) );
    }
    hb_console_safe_unlock();
 }
@@ -661,7 +661,7 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
    {
       pszString = hb_itemStringCon( hb_param( 3, HB_IT_ANY ), &ulLen, &bFreeReq );
 
-      hb_gtWriteAt( hb_parni( 1 ), hb_parni( 2 ), ( BYTE * ) pszString, ulLen );
+      hb_gtWriteAt( ( USHORT ) hb_parni( 1 ), ( USHORT ) hb_parni( 2 ), ( BYTE * ) pszString, ulLen );
    }
    hb_console_safe_unlock();
 

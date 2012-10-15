@@ -1516,7 +1516,7 @@ static void hb_pp_getLine( PHB_PP_STATE pState )
 }
 
 static int hb_pp_tokenStr( PHB_PP_TOKEN pToken, PHB_MEM_BUFFER pBuffer,
-                           BOOL fSpaces, BOOL fQuote, USHORT ltype )
+                           BOOL fSpaces, BOOL fQuote, int ltype )
 {
    int iLines = 0, iSpace = fSpaces ? pToken->spaces : 0;
 

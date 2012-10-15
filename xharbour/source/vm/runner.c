@@ -282,7 +282,7 @@ static void hb_hrbInit( PHRB_BODY pHrbBody, int argc, char * argv[] )
             for( i = 0; i < argc; i++ ) /* Push other cmdline params*/
                hb_vmPushString( argv[ i ], strlen( argv[ i ] ) );
 
-            hb_vmDo( argc );            /* Run init function        */
+            hb_vmDo( ( USHORT ) argc ); /* Run init function        */
          }
       }
    }
@@ -489,13 +489,13 @@ PHRB_BODY hb_hrbLoad( const char * szHrbBody, ULONG ulBodySize, char * szHrb )
 
       for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )
       {
-         if( pSymRead[ ul ].value.pCodeFunc == ( PHB_PCODEFUNC ) SYM_FUNC )
+         if( pSymRead[ ul ].value.pCodeFunc == ( PHB_PCODEFUNC ) ( HB_LONG ) SYM_FUNC )
          {
             ulPos = hb_hrbFindSymbol( pSymRead[ ul ].szName, pHrbBody->pDynFunc, pHrbBody->ulFuncs );
 
             if( ulPos == SYM_NOT_FOUND )
             {
-               pSymRead[ ul ].value.pCodeFunc = ( PHB_PCODEFUNC ) SYM_EXTERN;
+               pSymRead[ ul ].value.pCodeFunc = ( PHB_PCODEFUNC ) ( HB_LONG ) SYM_EXTERN;
             }
             else
             {
@@ -505,7 +505,7 @@ PHRB_BODY hb_hrbLoad( const char * szHrbBody, ULONG ulBodySize, char * szHrb )
          }
 
          /* External function */
-         if( pSymRead[ ul ].value.pCodeFunc == ( PHB_PCODEFUNC ) SYM_EXTERN )
+         if( pSymRead[ ul ].value.pCodeFunc == ( PHB_PCODEFUNC ) ( HB_LONG ) SYM_EXTERN )
          {
             pDynSym = hb_dynsymFind( pSymRead[ ul ].szName );
 
@@ -629,7 +629,7 @@ void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] )
          hb_vmPush( hb_param( i + 2, HB_IT_ANY ) );  /* Push other cmdline params*/
       }
 
-      hb_vmDo( hb_pcount() - 1 );                    /* Run the thing !!!        */
+      hb_vmDo( ( USHORT ) ( hb_pcount() - 1 ) );                    /* Run the thing !!!        */
 
       pRetVal = hb_itemNew( NULL );
       hb_itemCopy( pRetVal, hb_stackReturnItem() );
@@ -844,7 +844,7 @@ HB_FUNC( __HRBDOFU )
       for( i = 2; i <= argc; i++ )  /* Push other  params  */
          hb_vmPush( hb_stackItemFromBase( i ) );
 
-      hb_vmDo( argc - 1 );          /* Run function        */
+      hb_vmDo( ( USHORT ) ( argc - 1 ) );          /* Run function        */
    }
    else
    {

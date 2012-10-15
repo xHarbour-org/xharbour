@@ -185,7 +185,7 @@ HB_FUNC_STATIC( HBOBJECT_ERRORHANDLER )
 {
    PHB_ITEM pBase    = hb_stackBaseItem();
    PHB_DYNS pDynSym  = hb_dynsymGetCase( "MSGNOTFOUND" );
-   USHORT   uiPCount = hb_pcount(), i;
+   USHORT   uiPCount = ( USHORT ) hb_pcount(), i;
 
    hb_vmPushSymbol( pDynSym->pSymbol );
    hb_vmPush( hb_stackSelfItem() );

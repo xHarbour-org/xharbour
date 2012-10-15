@@ -1944,7 +1944,7 @@ static HB_DYNS_FUNC( hb_memvarSave )
             buffer[ uMemLen + 6 ]   = HB_LOBYTE( uiLength );
             buffer[ uMemLen + 7 ]   = HB_HIBYTE( uiLength );
 
-            hb_fsWrite( fhnd, buffer, uMLen );
+            hb_fsWrite( fhnd, buffer, ( USHORT ) uMLen );
             hb_fsWrite( fhnd, ( BYTE * ) pItem->item.asString.value, uiLength );
          }
          else if( HB_IS_TIMEFLAG( pItem ) )
@@ -1957,7 +1957,7 @@ static HB_DYNS_FUNC( hb_memvarSave )
 
             HB_PUT_LE_DOUBLE( byNum, ( double ) hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time ) );
 
-            hb_fsWrite( fhnd, buffer, uMLen );
+            hb_fsWrite( fhnd, buffer, ( USHORT ) uMLen );
             hb_fsWrite( fhnd, byNum, sizeof( byNum ) );
          }
          else if( HB_IS_DATE( pItem ) )
@@ -1970,7 +1970,7 @@ static HB_DYNS_FUNC( hb_memvarSave )
 
             HB_PUT_LE_DOUBLE( byNum, ( double ) pItem->item.asDate.value );
 
-            hb_fsWrite( fhnd, buffer, uMLen );
+            hb_fsWrite( fhnd, buffer, ( USHORT ) uMLen );
             hb_fsWrite( fhnd, byNum, sizeof( byNum ) );
          }
          else if( HB_IS_NUMERIC( pItem ) )
@@ -1987,13 +1987,13 @@ static HB_DYNS_FUNC( hb_memvarSave )
             buffer[ uMemLen + 6 ]   = ( BYTE ) iWidth + ( HB_IS_DOUBLE( pItem ) ? iDec + 1 : 0 );
 #else
 /* NOTE: This would be the correct method, but Clipper is buggy here. [vszakats] */
-            buffer[ uMemLen + 6 ]   = ( BYTE ) iWidth + ( iDec == 0 ? 0 : iDec + 1 );
+            buffer[ uMemLen + 6 ]   = ( BYTE ) ( iWidth + ( iDec == 0 ? 0 : iDec + 1 ) );
 #endif
             buffer[ uMemLen + 7 ]   = ( BYTE ) iDec;
 
             HB_PUT_LE_DOUBLE( byNum, hb_itemGetND( pItem ) );
 
-            hb_fsWrite( fhnd, buffer, uMLen );
+            hb_fsWrite( fhnd, buffer, ( USHORT ) uMLen );
             hb_fsWrite( fhnd, byNum, sizeof( byNum ) );
          }
          else if( HB_IS_LOGICAL( pItem ) )
@@ -2006,7 +2006,7 @@ static HB_DYNS_FUNC( hb_memvarSave )
 
             byLogical[ 0 ]          = hb_itemGetL( pItem ) ? 1 : 0;
 
-            hb_fsWrite( fhnd, buffer, uMLen );
+            hb_fsWrite( fhnd, buffer, ( USHORT ) uMLen );
             hb_fsWrite( fhnd, byLogical, sizeof( BYTE ) );
          }
       }
@@ -2186,7 +2186,7 @@ HB_FUNC( __MVRESTORE )
             hb_errInternal( 9100, "Invalid mask passed as MEMVAR filter '%s' -> '%s'\n", ( char * ) pszMask, szRegEx );
          }
 
-         while( hb_fsRead( fhnd, buffer, uLen ) == ( USHORT ) uLen )
+         while( hb_fsRead( fhnd, buffer, ( USHORT ) uLen ) == ( USHORT ) uLen )
          {
             USHORT   uiType   = ( USHORT ) ( buffer[ 1 + uMemLen ] - 128 );
             USHORT   uiWidth  = ( USHORT ) buffer[ 6 + uMemLen ];

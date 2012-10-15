@@ -79,7 +79,7 @@
 
 HB_FUNC( DISKSPACE )
 {
-   USHORT   uiDrive  = ISNUM( 1 ) ? hb_parni( 1 ) : 0;
+   USHORT   uiDrive  = ISNUM( 1 ) ? ( USHORT ) hb_parni( 1 ) : 0;
    double   dSpace   = 0.0;
    BOOL     bError   = FALSE;
 
@@ -121,7 +121,7 @@ HB_FUNC( DISKSPACE )
          hb_fsSetError( uiErrorOld );
       }
 
-      szPath[ 0 ] = uiDrive + 'A' - 1;
+      szPath[ 0 ] = ( char ) ( uiDrive + 'A' - 1 );
       szPath[ 1 ] = ':';
       szPath[ 2 ] = '\\';
       szPath[ 3 ] = '\0';

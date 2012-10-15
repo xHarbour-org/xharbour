@@ -159,7 +159,7 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
          {
             pFunc = hb_compFunctionResolve( pSym->szName, ( PNAMESPACE ) pSym->Namespace, pSym );
 
-            if( pFunc == ( PFUNCTION ) 1 )
+            if( pFunc == ( PFUNCTION ) ( HB_LONG ) 1 )
             {
                // Resolved to external member.
                pFunc = NULL;

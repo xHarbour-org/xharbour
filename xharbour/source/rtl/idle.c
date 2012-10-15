@@ -116,7 +116,7 @@ void hb_releaseCPU( BOOL bIndefinite )
    BOOL bIdleWaitNoCpu = ( s_iIdleWaitNoCpu && bIndefinite && ! s_uiIdleMaxTask );   /* Only if No idle tasks */
 
    if( s_uiIdleSleepMsec == 0 )
-      s_uiIdleSleepMsec = hb_idle_msec_default();
+      s_uiIdleSleepMsec = ( USHORT ) hb_idle_msec_default();
 
    HB_TRACE( HB_TR_DEBUG, ( "releaseCPU()" ) );
 
@@ -327,7 +327,7 @@ HB_FUNC( HB_IDLEDEL )
 HB_FUNC( HB_IDLESLEEPMSEC )
 {
    if( s_uiIdleSleepMsec == 0 )
-      s_uiIdleSleepMsec = hb_idle_msec_default();
+      s_uiIdleSleepMsec = ( USHORT ) hb_idle_msec_default();
 
    hb_retnl( s_uiIdleSleepMsec );
    if( hb_pcount() > 0 )

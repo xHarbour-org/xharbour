@@ -516,7 +516,7 @@ int hb_ipSend( HB_SOCKET_T hSocket, char * szBuffer, int iSend, int timeout )
 
 HB_SOCKET_T hb_ipConnect( const char * szHost, int iPort, int timeout )
 {
-   HB_SOCKET_T          hSocket = -1;
+   HB_SOCKET_T          hSocket = ( HB_SOCKET_T ) -1;
    ULONG                ulAddr;
    struct sockaddr_in   remote;
 
@@ -541,7 +541,7 @@ HB_SOCKET_T hb_ipConnect( const char * szHost, int iPort, int timeout )
       else
       {
          remote.sin_family       = AF_INET;
-         remote.sin_port         = iPort;
+         remote.sin_port         = ( USHORT ) iPort;
          remote.sin_addr.s_addr  = ulAddr;
 
 
@@ -581,7 +581,7 @@ HB_SOCKET_T hb_ipServer( int iPort, const char * szAddress, int iListen )
    setsockopt( hSocket, SOL_SOCKET, SO_REUSEADDR, ( const char * ) &iOpt, sizeof( iOpt ) );
 
    remote.sin_family       = AF_INET;
-   remote.sin_port         = htons( iPort );
+   remote.sin_port         = htons( ( u_short ) iPort );
 
    remote.sin_addr.s_addr  = szAddress ? inet_addr( szAddress ) : INADDR_ANY;
 
@@ -589,13 +589,13 @@ HB_SOCKET_T hb_ipServer( int iPort, const char * szAddress, int iListen )
    {
       HB_SOCKET_SET_ERROR();
       HB_IP_CLOSE( hSocket );
-      return -1;
+      return ( SOCKET ) -1;
    }
    else if( listen( hSocket, iListen ) )
    {
       HB_SOCKET_SET_ERROR();
       HB_IP_CLOSE( hSocket );
-      return -1;
+      return ( SOCKET ) -1;
    }
    else
    {
@@ -611,6 +611,7 @@ HB_SOCKET_T hb_ipAccept( HB_SOCKET_T hSocket, int timeout, char * szAddr, long i
    HB_SOCKET_T          incoming = 0;
    int                  iError   = EAGAIN;
    struct sockaddr_in   si_remote;
+
 #if defined( _XOPEN_SOURCE_EXTENDED )
    socklen_t            Len;
 #elif defined( HB_OS_WIN )
@@ -619,6 +620,7 @@ HB_SOCKET_T hb_ipAccept( HB_SOCKET_T hSocket, int timeout, char * szAddr, long i
    unsigned int         Len;
 #endif
 
+   si_remote.sin_port = 0;
    Len = sizeof( struct sockaddr_in );
 
    /*
@@ -657,12 +659,12 @@ HB_SOCKET_T hb_ipAccept( HB_SOCKET_T hSocket, int timeout, char * szAddr, long i
    if( iError == -1 )
    {
       HB_SOCKET_SET_ERROR2( -1, "Timeout" );
-      return -1;
+      return ( SOCKET ) -1;
    }
    else if( iError > 0 )
    {
       HB_SOCKET_SET_ERROR1( iError );
-      return -1;
+      return ( SOCKET ) -1;
    }
    else
    {
@@ -802,7 +804,7 @@ HB_FUNC( HB_IPCONNECT )
       return;
    }
 
-   hSocket = hb_ipConnect( hb_parc( 1 ), htons( hb_parni( 2 ) ), ( ISNIL( 3 ) ) ? -1 : hb_parni( 3 ) );
+   hSocket = hb_ipConnect( hb_parc( 1 ), htons( ( u_short ) hb_parni( 2 ) ), ( ISNIL( 3 ) ) ? -1 : hb_parni( 3 ) );
 
    hb_retnl( ( long ) hSocket );
 }

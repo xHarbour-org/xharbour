@@ -399,7 +399,7 @@ int hb_matherr( HB_MATH_EXCEPTION * pexc )
          This is forbidden according to the original Cl*pper docs, but I think this reflects the situation best here:
          The error handler can either substitute the errorneous value (by returning a numeric value) or choose the
          default error handling (by returning .F., as usual) [martin vogel]*/
-      pError = hb_errRT_New_Subst( ES_ERROR, "MATH", EG_NUMERR, pexc->type,
+      pError = hb_errRT_New_Subst( ES_ERROR, "MATH", EG_NUMERR, ( HB_ERRCODE ) pexc->type,
                                    pexc->error, pexc->funcname, 0, EF_CANSUBSTITUTE |
                                    ( mode == HB_MATH_ERRMODE_USER ? 0 : EF_CANDEFAULT ) );
 

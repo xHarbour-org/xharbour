@@ -7369,7 +7369,7 @@ static void hb_vmMinus( void )
 
             if( HB_VM_STACK.iExtraParamsIndex && HB_IS_SYMBOL( pItem = hb_stackItemFromTop( -( uiParams + HB_VM_STACK.aiExtraParams[ HB_VM_STACK.iExtraParamsIndex - 1 ] + 2 ) ) ) && pItem->item.asSymbol.value == HB_VM_STACK.apExtraParamsSymbol[ HB_VM_STACK.iExtraParamsIndex - 1 ] )
             {
-               uiParams += HB_VM_STACK.aiExtraParams[ --HB_VM_STACK.iExtraParamsIndex ];
+               uiParams += ( USHORT ) HB_VM_STACK.aiExtraParams[ --HB_VM_STACK.iExtraParamsIndex ];
             }
 
             if( hb_stackItemFromTop( -( uiParams + 1 ) )->type )
@@ -7556,7 +7556,7 @@ static void hb_vmMinus( void )
 
             if( HB_VM_STACK.iExtraParamsIndex && HB_IS_SYMBOL( pItem = hb_stackItemFromTop( -( uiParams + HB_VM_STACK.aiExtraParams[ HB_VM_STACK.iExtraParamsIndex - 1 ] + 2 ) ) ) && pItem->item.asSymbol.value == HB_VM_STACK.apExtraParamsSymbol[ HB_VM_STACK.iExtraParamsIndex - 1 ] )
             {
-               uiParams += HB_VM_STACK.aiExtraParams[ --HB_VM_STACK.iExtraParamsIndex ];
+               uiParams += ( USHORT ) HB_VM_STACK.aiExtraParams[ --HB_VM_STACK.iExtraParamsIndex ];
             }
 
    #ifndef HB_NO_PROFILER
@@ -10143,7 +10143,7 @@ static void hb_vmMinus( void )
                       pSym < pLastSymbols->pSymbolTable + pLastSymbols->uiModuleSymbols )
                   {
                      *pSymbols   = pLastSymbols->pSymbolTable;
-                     *puiSymbols = pLastSymbols->uiModuleSymbols;
+                     *puiSymbols = ( USHORT ) pLastSymbols->uiModuleSymbols;
                      return TRUE;
                   }
                   pLastSymbols = pLastSymbols->pNext;

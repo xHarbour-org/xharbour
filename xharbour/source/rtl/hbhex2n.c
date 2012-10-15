@@ -133,7 +133,7 @@ HB_FUNC( NUMTOHEX )
    do
    {
       iDigit         = ( int ) ( ulNum & 0x0F );
-      ret[ --iLen ]  = iDigit + ( iDigit < 10 ? '0' : 'A' - 10 );
+      ret[ --iLen ]  = ( char ) ( iDigit + ( iDigit < 10 ? '0' : 'A' - 10 ) );
       ulNum          >>= 4;
    }
    while( iDefaultLen ? ulNum > 0 : iLen > 0 );
@@ -198,12 +198,12 @@ HB_FUNC( STRTOHEX )
       ucChar   = ( unsigned char ) cStr[ ul ];
 
       iDigit   = ( int ) ( ucChar & 0x0F );
-      c[ 1 ]   = iDigit + ( iDigit < 10 ? '0' : 'A' - 10 );
+      c[ 1 ]   = ( char ) ( iDigit + ( iDigit < 10 ? '0' : 'A' - 10 ) );
 
       ucChar   >>= 4;
 
       iDigit   = ( int ) ucChar;
-      c[ 0 ]   = iDigit + ( iDigit < 10 ? '0' : 'A' - 10 );
+      c[ 0 ]   = ( char ) ( iDigit + ( iDigit < 10 ? '0' : 'A' - 10 ) );
 
       c        += 2;
    }

@@ -195,7 +195,7 @@ HB_FUNC( SETKEY )
          PHB_SETKEY sk_list_tmp, sk_list_end;
 
          /* sk_list_end is not used in this context */
-         sk_list_tmp = sk_findkey( hb_itemGetNI( pKeyCode ), &sk_list_end );
+         sk_list_tmp = sk_findkey( ( SHORT ) hb_itemGetNI( pKeyCode ), &sk_list_end );
 
          if( sk_list_tmp )
          {
@@ -215,7 +215,7 @@ HB_FUNC( SETKEY )
       {
          /* Set a SETKEY value */
 
-         sk_add( TRUE, hb_itemGetNI( pKeyCode ),
+         sk_add( TRUE, ( SHORT ) hb_itemGetNI( pKeyCode ),
                  hb_param( 2, HB_IT_BLOCK ),
 #if defined( HB_EXTENSION )
                  hb_param( 3, HB_IT_BLOCK ) );
@@ -242,7 +242,7 @@ HB_FUNC( HB_SETKEYARRAY )
       ULONG    nPos;
 
       for( nPos = 1; nPos <= nLen; nPos++ )
-         sk_add( FALSE, hb_arrayGetNI( pKeyCodeArray, nPos ), pAction, pIsActive );
+         sk_add( FALSE, ( SHORT ) hb_arrayGetNI( pKeyCodeArray, nPos ), pAction, pIsActive );
    }
 }
 
@@ -255,7 +255,7 @@ HB_FUNC( HB_SETKEYGET )
       PHB_SETKEY sk_list_tmp, sk_list_end;
 
       /* sk_list_end is not used in this context */
-      sk_list_tmp = sk_findkey( hb_itemGetNI( pKeyCode ), &sk_list_end );
+      sk_list_tmp = sk_findkey( ( SHORT ) hb_itemGetNI( pKeyCode ), &sk_list_end );
 
       if( sk_list_tmp )
       {
@@ -347,7 +347,7 @@ HB_FUNC( HB_SETKEYCHECK )
       PHB_SETKEY sk_list_tmp, sk_list_end;
 
       /* sk_list_end is not used in this context */
-      sk_list_tmp = sk_findkey( hb_itemGetNI( pKeyCode ), &sk_list_end );
+      sk_list_tmp = sk_findkey( ( SHORT ) hb_itemGetNI( pKeyCode ), &sk_list_end );
 
       if( sk_list_tmp )
       {

@@ -168,7 +168,7 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
       HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
 
       /* increase operation */
-      HB_EXPR_GENPCODE1( hb_compGenPCode1, bOpEq );
+      HB_EXPR_GENPCODE1( hb_compGenPCode1, ( BYTE ) bOpEq );
 
       if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND )
       {
@@ -318,7 +318,7 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
       HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
 
       /* perform operation and duplicate the new value */
-      HB_EXPR_GENPCODE1( hb_compGenPCode1, bOpEq );
+      HB_EXPR_GENPCODE1( hb_compGenPCode1, ( BYTE ) bOpEq );
       HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_DUPLICATE );
 
       /* pop the new value into variable and leave the copy on the stack */
@@ -378,7 +378,7 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
       HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
 
       /* Operator */
-      HB_EXPR_GENPCODE1( hb_compGenPCode1, bOpEq );
+      HB_EXPR_GENPCODE1( hb_compGenPCode1, ( BYTE ) bOpEq );
 
       /* Now do the assignment - call pop message with one argument */
       if( pObj->ExprType == HB_ET_SEND )
@@ -516,7 +516,7 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
       HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
 
       /* Operator */
-      HB_EXPR_GENPCODE1( hb_compGenPCode1, bOpEq );
+      HB_EXPR_GENPCODE1( hb_compGenPCode1, ( BYTE ) bOpEq );
 
       /* pop the new value into variable and remove it from the stack */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_POP_PCODE );

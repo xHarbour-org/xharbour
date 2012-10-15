@@ -268,9 +268,9 @@ static void hb_md5digest( BYTE * md5val, char * digest )
    for( i = 0; i < 16; i++ )
    {
       b           = ( md5val[ i ] >> 4 ) & 0x0F;
-      *digest++   = b + ( b > 9 ? 'a' - 10 : '0' );
+      *digest++   = ( char ) ( b + ( b > 9 ? 'a' - 10 : '0' ) );
       b           = md5val[ i ] & 0x0F;
-      *digest++   = b + ( b > 9 ? 'a' - 10 : '0' );
+      *digest++   = ( char ) ( b + ( b > 9 ? 'a' - 10 : '0' ) );
    }
 }
 

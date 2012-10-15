@@ -70,6 +70,9 @@ BOOL hb_GetPrinterNameByPort( LPTSTR pPrinterName, LPDWORD pdwBufferSize, const 
 
 #define MAXBUFFERSIZE 255
 
+#undef HWND_BROADCAST
+#define HWND_BROADCAST  ((HWND)(HB_LONG)0xffff)
+
 BOOL hb_isLegacyDevice( LPTSTR pPrinterName )
 {
    BOOL     bLegacyDev  = FALSE;
@@ -539,25 +542,25 @@ LONG hb_PrintFileRaw( const char * cPrinterName, const char * cFileName, const c
             }
             else
             {
-               Result = -6;
+               Result = ( DWORD ) -6;
             }
             EndPagePrinter( hPrinter );
          }
          else
          {
-            Result = -4;
+            Result = ( DWORD ) -4;
          }
          EndDocPrinter( hPrinter );
       }
       else
       {
-         Result = -3;
+         Result = ( DWORD ) -3;
       }
       ClosePrinter( hPrinter );
    }
    else
    {
-      Result = -2;
+      Result = ( DWORD ) -2;
    }
    return Result;
 }
@@ -565,7 +568,7 @@ LONG hb_PrintFileRaw( const char * cPrinterName, const char * cFileName, const c
 HB_FUNC( PRINTFILERAW )
 {
    const char *   cPrinterName, * cFileName, * cDocName;
-   DWORD          Result = -1;
+   DWORD          Result = ( DWORD ) -1;
 
    if( ISCHAR( 1 ) && ISCHAR( 2 ) )
    {

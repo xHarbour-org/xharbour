@@ -1159,7 +1159,7 @@ HB_FUNC( SET )
          szDirSep[ 1 ]  = '\0';
          hb_retc( szDirSep );
          if( args > 1 )
-            pSet->HB_SET_DIRSEPARATOR = set_char( pArg2, pSet->HB_SET_DIRSEPARATOR );
+            pSet->HB_SET_DIRSEPARATOR = set_char( pArg2, ( char ) pSet->HB_SET_DIRSEPARATOR );
          break;
       }
 

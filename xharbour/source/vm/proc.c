@@ -158,7 +158,7 @@ char * hb_procinfo( int iLevel, char * szName, USHORT * uLine, char * szModuleNa
       {
          if( HB_IS_OBJECT( pSelf ) )  /* it is a method name */
          {
-            uiSuperClass = ( *pBase )->item.asSymbol.pCargo->uiSuperClass;
+            uiSuperClass = ( USHORT ) ( *pBase )->item.asSymbol.pCargo->uiSuperClass;
 
             if( uiSuperClass && uiSuperClass <= hb_clsMaxClasses() )
             {

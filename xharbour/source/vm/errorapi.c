@@ -672,11 +672,11 @@ HB_FUNC( ERRORNEW )
    }
    if( ISNUM( 2 ) )
    {
-      hb_errPutGenCode( pError, hb_parni( 2 ) );
+      hb_errPutGenCode( pError, ( HB_ERRCODE ) hb_parni( 2 ) );
    }
    if( ISNUM( 3 ) )
    {
-      hb_errPutSubCode( pError, hb_parni( 3 ) );
+      hb_errPutSubCode( pError, ( HB_ERRCODE ) hb_parni( 3 ) );
    }
    if( ISCHAR( 4 ) )
    {

@@ -278,7 +278,7 @@ HB_FUNC( DBF2TEXT )
                      {
                         hb_fsWriteLarge( handle, ( BYTE * ) cSep, iSepLen );
                      }
-                     SELF_GETVALUE( pArea, iPos, pTmp );
+                     SELF_GETVALUE( pArea, ( USHORT ) iPos, pTmp );
 #ifndef HB_CDP_SUPPORT_OFF
                      bWriteSep   = hb_ExportVar( handle, pTmp, cDelim, cdp );
 #else

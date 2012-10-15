@@ -745,7 +745,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
             }
          }
 
-         if( pFunc == ( PFUNCTION ) 1 )
+         if( pFunc == ( PFUNCTION ) (HB_LONG) 1 )
          {
             fprintf( yyc, "/* Skipped: call to '%s' resolved to external */\n", pFunCall->szName );
          }
@@ -1018,7 +1018,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
 
                   pFunc = hb_compFunctionResolve( pSym->szName, ( PNAMESPACE ) pSym->Namespace, pSym );
 
-                  if( pFunc == ( PFUNCTION ) 1 )
+                  if( pFunc == ( PFUNCTION ) ( HB_LONG ) 1 )
                   {
                      // Resolved to external member.
                      pFunc = NULL;

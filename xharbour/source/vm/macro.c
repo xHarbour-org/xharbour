@@ -1582,7 +1582,7 @@ void hb_compGenPushVarRef( char * szVarName, HB_MACRO_DECL )
 {
    USHORT iVar;
 
-   iVar = hb_compLocalVarGetPos( szVarName, HB_MACRO_PARAM );
+   iVar = ( USHORT ) hb_compLocalVarGetPos( szVarName, HB_MACRO_PARAM );
    if( iVar )
       hb_compGenPCode3( HB_P_PUSHLOCALREF, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), HB_MACRO_PARAM );
    else

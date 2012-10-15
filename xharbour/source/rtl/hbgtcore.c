@@ -122,8 +122,8 @@ static void * hb_gt_def_New( PHB_GT pGT )
    for( i = 0; i < pGT->iHeight; ++i )
       pGT->pLines[ i ] = TRUE;
 
-   usChar   = HB_GTSELF_GETCLEARCHAR( pGT );
-   bColor   = HB_GTSELF_GETCLEARCOLOR( pGT );
+   usChar   = ( USHORT ) HB_GTSELF_GETCLEARCHAR( pGT );
+   bColor   = ( BYTE ) HB_GTSELF_GETCLEARCOLOR( pGT );
    bAttr    = 0;
    for( ulIndex = 0; ulIndex < ulSize; ++ulIndex )
    {
@@ -279,7 +279,7 @@ static int  hb_gt_def_GetClearColor( PHB_GT pGT )
 
 static void hb_gt_def_SetClearColor( PHB_GT pGT, int iColor )
 {
-   pGT->bClearColor = iColor;
+   pGT->bClearColor = ( BYTE ) iColor;
 }
 
 static int  hb_gt_def_GetClearChar( PHB_GT pGT )
@@ -289,7 +289,7 @@ static int  hb_gt_def_GetClearChar( PHB_GT pGT )
 
 static void hb_gt_def_SetClearChar( PHB_GT pGT, int iChar )
 {
-   pGT->uiClearChar = iChar;
+   pGT->uiClearChar = ( USHORT ) iChar;
 }
 
 /* helper internal function */
@@ -766,7 +766,7 @@ static void hb_gt_def_WriteAt( PHB_GT pGT, int iRow, int iCol, BYTE * pText, HB_
    int iMaxCol = HB_GTSELF_MAXCOL( pGT );
 
    /* Truncate the text if the cursor will end up off the right edge */
-   HB_GTSELF_PUTTEXT( pGT, iRow, iCol, HB_GTSELF_GETCOLOR( pGT ), pText,
+   HB_GTSELF_PUTTEXT( pGT, iRow, iCol, ( BYTE ) HB_GTSELF_GETCOLOR( pGT ), pText,
                       HB_MIN( ulLength, ( ULONG ) ( iMaxCol - iCol + 1 ) ) );
 
    /* Finally, save the new cursor position, even if off-screen */
@@ -899,8 +899,8 @@ static void hb_gt_def_WriteCon( PHB_GT pGT, BYTE * pText, HB_SIZE ulLength )
          if( iRow > iMaxRow )
          {
             /* Normal scroll */
-            HB_GTSELF_SCROLL( pGT, 0, 0, iMaxRow, iMaxCol, HB_GTSELF_GETCOLOR( pGT ),
-                              HB_GTSELF_GETCLEARCHAR( pGT ), iRow - iMaxRow, 0 );
+            HB_GTSELF_SCROLL( pGT, 0, 0, iMaxRow, iMaxCol, ( BYTE ) HB_GTSELF_GETCOLOR( pGT ),
+                              ( BYTE ) HB_GTSELF_GETCLEARCHAR( pGT ), iRow - iMaxRow, 0 );
             iRow  = iMaxRow;
             iCol  = 0;
          }
@@ -908,8 +908,8 @@ static void hb_gt_def_WriteCon( PHB_GT pGT, BYTE * pText, HB_SIZE ulLength )
          {
             /* Special case scroll when newline
                and cursor off top edge of display */
-            HB_GTSELF_SCROLL( pGT, 0, 0, iMaxRow, iMaxCol, HB_GTSELF_GETCOLOR( pGT ),
-                              HB_GTSELF_GETCLEARCHAR( pGT ), 1, 0 );
+            HB_GTSELF_SCROLL( pGT, 0, 0, iMaxRow, iMaxCol, ( BYTE ) HB_GTSELF_GETCOLOR( pGT ),
+                              ( BYTE ) HB_GTSELF_GETCLEARCHAR( pGT ), 1, 0 );
          }
          HB_GTSELF_SETPOS( pGT, iRow, iCol );
          bDisp    = FALSE;
@@ -953,8 +953,8 @@ static void hb_gt_def_Save( PHB_GT pGT, int iTop, int iLeft, int iBottom, int iR
       {
          if( ! HB_GTSELF_GETCHAR( pGT, iTop, iCol, &bColor, &bAttr, &usChar ) )
          {
-            usChar   = HB_GTSELF_GETCLEARCHAR( pGT );
-            bColor   = HB_GTSELF_GETCLEARCOLOR( pGT );
+            usChar   = ( BYTE ) HB_GTSELF_GETCLEARCHAR( pGT );
+            bColor   = ( BYTE ) HB_GTSELF_GETCLEARCOLOR( pGT );
             bAttr    = 0x00;
          }
          if( pGT->fVgaCell )
@@ -1263,7 +1263,7 @@ static void hb_gt_def_Box( PHB_GT pGT, int iTop, int iLeft, int iBottom, int iRi
    if( iTop <= iMaxRow && iLeft <= iMaxCol && iBottom >= 0 && iRight >= 0 )
    {
       BYTE  szBox[ 10 ];
-      BYTE  bPadCh = HB_GTSELF_GETCLEARCHAR( pGT );
+      BYTE  bPadCh = ( BYTE ) HB_GTSELF_GETCLEARCHAR( pGT );
 
       if( pbyFrame )
       {
@@ -1466,7 +1466,7 @@ static BOOL hb_gt_def_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
          /* Clear screen */
          HB_GTSELF_DISPBEGIN( pGT );
          HB_GTSELF_SCROLL( pGT, 0, 0, HB_GTSELF_MAXROW( pGT ), HB_GTSELF_MAXCOL( pGT ),
-                           HB_GTSELF_GETCOLOR( pGT ), HB_GTSELF_GETCLEARCHAR( pGT ), 0, 0 );
+                           ( BYTE ) HB_GTSELF_GETCOLOR( pGT ), ( BYTE ) HB_GTSELF_GETCLEARCHAR( pGT ), 0, 0 );
          HB_GTSELF_SETPOS( pGT, 0, 0 );
          HB_GTSELF_SETCURSORSTYLE( pGT, SC_NORMAL );
          HB_GTSELF_DISPEND( pGT );
@@ -1713,8 +1713,8 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
             pBuffer = ( BYTE * ) hb_xgrab( ulLen );
             HB_GTSELF_SAVE( pGT, iTop, iLeft, iBottom, iRight, pBuffer );
          }
-         HB_GTSELF_BOXS( pGT, iTop, iLeft, iBottom, iRight, NULL, iClrNorm );
-         HB_GTSELF_BOXS( pGT, iTop + 1, iLeft + 1, iBottom - 1, iRight - 1, ( BYTE * ) "         ", iClrNorm );
+         HB_GTSELF_BOXS( pGT, iTop, iLeft, iBottom, iRight, NULL, ( BYTE ) iClrNorm );
+         HB_GTSELF_BOXS( pGT, iTop + 1, iLeft + 1, iBottom - 1, iRight - 1, ( BYTE * ) "         ", ( BYTE ) iClrNorm );
          ulLast   = 0;
          i        = iTop + 1;
          for( ul = 0; ul < ulDst; ++ul )
@@ -1727,7 +1727,7 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
                   if( ulLen > ulWidth )
                      ulLen = ulWidth;
                   HB_GTSELF_PUTTEXT( pGT, i, iLeft + ( ( ( int ) ulWidth - ( int ) ulLen + 1 ) >> 1 ) + 2,
-                                     iClrNorm, ( BYTE * ) szMsgDsp + ulLast, ulLen );
+                                     ( BYTE ) iClrNorm, ( BYTE * ) szMsgDsp + ulLast, ulLen );
                }
                ulLast = ul + 1;
                if( ++i >= iBottom - 1 )
@@ -1740,7 +1740,7 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
             if( ulLen > ulWidth )
                ulLen = ulWidth;
             HB_GTSELF_PUTTEXT( pGT, i, iLeft + ( ( ( int ) ulWidth - ( int ) ulLen + 1 ) >> 1 ) + 2,
-                               iClrNorm, ( BYTE * ) szMsgDsp + ulLast, ulLen );
+                               ( BYTE ) iClrNorm, ( BYTE * ) szMsgDsp + ulLast, ulLen );
          }
 
          iPos = 1;
@@ -1752,10 +1752,10 @@ static int hb_gt_def_Alert( PHB_GT pGT, PHB_ITEM pMessage, PHB_ITEM pOptions,
             {
                iClr  = i == iPos ? iClrHigh : iClrNorm;
                ulLen = hb_arrayGetCLen( pOptions, i );
-               HB_GTSELF_PUTTEXT( pGT, iBottom - 1, iMnuCol, iClr, ( BYTE * ) " ", 1 );
-               HB_GTSELF_PUTTEXT( pGT, iBottom - 1, iMnuCol + 1, iClr,
+               HB_GTSELF_PUTTEXT( pGT, iBottom - 1, iMnuCol, ( BYTE ) iClr, ( BYTE * ) " ", 1 );
+               HB_GTSELF_PUTTEXT( pGT, iBottom - 1, iMnuCol + 1, ( BYTE ) iClr,
                                   ( BYTE * ) hb_arrayGetCPtr( pOptions, i ), ulLen );
-               HB_GTSELF_PUTTEXT( pGT, iBottom - 1, iMnuCol + 1 + ( int ) ulLen, iClr, ( BYTE * ) " ", 1 );
+               HB_GTSELF_PUTTEXT( pGT, iBottom - 1, iMnuCol + 1 + ( int ) ulLen, ( BYTE ) iClr, ( BYTE * ) " ", 1 );
                iMnuCol += ( int ) ulLen + 4;
             }
             while( HB_GTSELF_DISPCOUNT( pGT ) )
@@ -1953,8 +1953,8 @@ static BOOL hb_gt_def_Resize( PHB_GT pGT, int iRows, int iCols )
             pGT->pLines[ i ] = TRUE;
          for( ulIndex = 0; ulIndex < ulLen; ++ulIndex )
          {
-            pGT->screenBuffer[ ulIndex ].c.usChar  = HB_GTSELF_GETCLEARCHAR( pGT );
-            pGT->screenBuffer[ ulIndex ].c.bColor  = HB_GTSELF_GETCLEARCOLOR( pGT );
+            pGT->screenBuffer[ ulIndex ].c.usChar  = ( BYTE ) HB_GTSELF_GETCLEARCHAR( pGT );
+            pGT->screenBuffer[ ulIndex ].c.bColor  = ( BYTE ) HB_GTSELF_GETCLEARCOLOR( pGT );
             pGT->screenBuffer[ ulIndex ].c.bAttr   = 0x00;
             pGT->prevBuffer[ ulIndex ].c.bAttr     = HB_GT_ATTR_REFRESH;
          }

@@ -83,7 +83,7 @@ HB_FUNC( DO )
 
          hb_vmPushNil();
 
-         uiPCount = hb_pcount();
+         uiPCount = ( USHORT ) hb_pcount();
          for( uiParam = 2; uiParam <= uiPCount; uiParam++ )
          {
             hb_vmPush( hb_stackItemFromBase( uiParam ) );
@@ -98,7 +98,7 @@ HB_FUNC( DO )
    }
    else if( HB_IS_BLOCK( pItem ) )
    {
-      USHORT   uiPCount = hb_pcount();
+      USHORT   uiPCount = ( USHORT ) hb_pcount();
       USHORT   uiParam;
 
       hb_vmPushSymbol( &hb_symEval );
@@ -109,7 +109,7 @@ HB_FUNC( DO )
    }
    else if( HB_IS_SYMBOL( pItem ) )
    {
-      USHORT   uiPCount = hb_pcount();
+      USHORT   uiPCount = ( USHORT ) hb_pcount();
       USHORT   uiParam;
 
       hb_vmPushSymbol( pItem->item.asSymbol.value );

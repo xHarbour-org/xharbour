@@ -802,7 +802,7 @@ unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned int uiAlign )
       {
          uiPad = ( ( uiMemberSize < uiAlign ) ? uiMemberSize : uiAlign );
 
-         if( ( cShift = ( uiSize % uiPad ) ) > 0 )
+         if( ( cShift = ( BYTE ) ( uiSize % uiPad ) ) > 0 )
          {
             uiSize += ( uiPad - cShift );
          }
@@ -814,7 +814,7 @@ unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned int uiAlign )
 
    }
 
-   if( ( cShift = ( uiSize % uiAlign ) ) > 0 )
+   if( ( cShift = ( BYTE ) ( uiSize % uiAlign ) ) > 0 )
    {
       uiSize += ( uiAlign - cShift );
    }
@@ -1044,7 +1044,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
       {
          unsigned int uiPad = ( ( uiMemberSize < uiAlign ) ? uiMemberSize : uiAlign );
 
-         if( ( cShift = ( uiOffset % uiPad ) ) > 0 )
+         if( ( cShift = ( BYTE ) ( uiOffset % uiPad ) ) > 0 )
          {
             uiOffset += ( uiPad - cShift );
          }
@@ -1728,7 +1728,7 @@ PHB_ITEM StructureToArray( BYTE * Buffer, HB_SIZE ulBufferLen, PHB_ITEM aDef, un
       {
          unsigned int uiPad = ( ( uiMemberSize < uiAlign ) ? uiMemberSize : uiAlign );
 
-         if( ( cShift = ( uiOffset % uiPad ) ) > 0 )
+         if( ( cShift = ( BYTE ) ( uiOffset % uiPad ) ) > 0 )
          {
             uiOffset += ( uiPad - cShift );
          }

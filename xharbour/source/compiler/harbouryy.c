@@ -116,9 +116,9 @@
 #if defined( __POCC__ )
    #pragma warn(push)
    #pragma warn(disable:2154)
-#endif
-
-#if defined( __BORLANDC__ )
+#elif defined( _MSC_VER )
+   #pragma warning(disable:4702) // unreachable code
+#elif defined( __BORLANDC__ )
    #pragma warn -aus
    #pragma warn -ccc
    #pragma warn -rch
@@ -4767,7 +4767,7 @@ yyparse ()
   yyssp++;
 
  yysetstate:
-  *yyssp = yystate;
+  *yyssp = (yytype_int16) yystate;
 
   if (yyss + yystacksize - 1 <= yyssp)
     {
@@ -11431,7 +11431,7 @@ yyreduce:
                      iStep = 1;
                   }
 
-                  if( iStep && ( iLocal = hb_compLocalGetPos( (yyvsp[(2) - (12)].asExpr)->value.asSymbol.szName ) ) != 0 && HB_LIM_INT8( iLocal ) )
+                  if( iStep && ( iLocal = (short) hb_compLocalGetPos( (yyvsp[(2) - (12)].asExpr)->value.asSymbol.szName ) ) != 0 && HB_LIM_INT8( iLocal ) )
                   {
                      if( iStep == 1 )
                      {

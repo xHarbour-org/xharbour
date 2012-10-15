@@ -115,7 +115,7 @@ HB_FUNC( NATIONMSG )
       /* TODO: Replace this with Language API call. */
       hb_retc( "Invalid argument" );
    else if( ISNUM( 1 ) )
-      hb_retc( hb_nationGetMsg( hb_parni( 1 ) ) );
+      hb_retc( hb_nationGetMsg( ( USHORT ) hb_parni( 1 ) ) );
    else
       hb_retc( "" );
 }

@@ -472,8 +472,8 @@ extern PFUNCALL hb_compFunCallFind( char * szFunName, void *Namespace, int iFlag
 extern void     hb_compFunCallCheck( char *, int );
 
 extern void hb_compVariableAdd( char * szVarName, BYTE cType ); /* add a new param, local, static variable to a function definition or a public or private */
-extern PVAR hb_compVariableFind( PVAR pVars, USHORT wOrder ); /* returns a variable if defined or zero */
-extern PVAR hb_compLocalVariableFind( PFUNCTION pFunc, USHORT wVar );
+extern PVAR hb_compVariableFind( PVAR pVars, int wOrder ); /* returns a variable if defined or zero */
+extern PVAR hb_compLocalVariableFind( PFUNCTION pFunc, int wVar );
 extern USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName ); /* returns the order + 1 of a variable if defined or zero */
 extern int hb_compLocalGetPos( char * szVarName );   /* returns the order + 1 of a local variable */
 extern int hb_compStaticGetPos( char *, PFUNCTION ); /* return if passed name is a static variable */

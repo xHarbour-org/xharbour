@@ -439,7 +439,7 @@ static long int hb_Net_Recv( HB_SOCKET_T hSocket )
 
 static void hb_NetOpenConnection( const char * szAddr, int iPort )
 {
-   hSocket = hb_ipConnect( szAddr, htons( iPort ), 5000 );
+   hSocket = hb_ipConnect( szAddr, htons( ( u_short ) iPort ), 5000 );
 
    if( hSocket != ( HB_SOCKET_T ) -1 )
    {
@@ -478,7 +478,7 @@ static int hb_NetSingleSendRecv( HB_SOCKET_T hCurSocket, char * sData, HB_SIZE u
       hb_errRT_BASE( EG_DATATYPE, 1000, NULL, "Sending error", 0 );
    else if( *szBuffer == '-' && iErr )
    {
-      hb_errRT_BASE( EG_DATATYPE, iErr, NULL, szBuffer, 0 );
+      hb_errRT_BASE( EG_DATATYPE, ( HB_ERRCODE ) iErr, NULL, szBuffer, 0 );
       return 0;
    }
    return lRet;
@@ -525,7 +525,7 @@ static int hb_NetSendSingleRecv( HB_SOCKET_T hCurSocket, char * sData, HB_SIZE u
       hb_errRT_BASE( EG_DATATYPE, 1000, NULL, "Server don't answer", 0 );
    else if( *szBuffer == '-' && iErr )
    {
-      hb_errRT_BASE( EG_DATATYPE, iErr, NULL, szBuffer, 0 );
+      hb_errRT_BASE( EG_DATATYPE, ( HB_ERRCODE ) iErr, NULL, szBuffer, 0 );
       return 0;
    }
    return lRet;
@@ -553,7 +553,7 @@ static int hb_NetSingleSendSingleRecv( HB_SOCKET_T hCurSocket, char * sData, HB_
       hb_errRT_BASE( EG_DATATYPE, 1000, NULL, "Sending error", 0 );
    else if( *szBuffer == '-' && iErr )
    {
-      hb_errRT_BASE( EG_DATATYPE, iErr, NULL, szBuffer, 0 );
+      hb_errRT_BASE( EG_DATATYPE, ( HB_ERRCODE ) iErr, NULL, szBuffer, 0 );
       return 0;
    }
    return lRet;
@@ -1790,7 +1790,7 @@ static BOOL hb_FileNetCopyTo( const char * szSource, const char * szDest, PHB_IT
 {
    BOOL     bRetVal = FALSE;
    FHANDLE  fhndSource;
-   EVALINFO info;
+   EVALINFO info = { 0, { 0 } };
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_FileNetCopyTo(%s, %s)", szSource, szDest ) );
 
@@ -1908,7 +1908,7 @@ static BOOL hb_FileNetCopyFrom( const char * szSource, const char * szDest, PHB_
 {
    BOOL     bRetVal = FALSE;
    PHB_FILE pfSource;
-   EVALINFO info;
+   EVALINFO info = { 0, { 0 } };
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_FileNetCopyFrom(%s, %s)", szSource, szDest ) );
 
@@ -2010,7 +2010,7 @@ static BOOL hb_FileNetCopyFile( const char * szSource, const char * szDest, PHB_
 {
    BOOL     bRetVal = FALSE;
    PHB_FILE pfSource;
-   EVALINFO info;
+   EVALINFO info = { 0, { 0 } };
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_FileNetCopyFile(%s, %s)", szSource, szDest ) );
 

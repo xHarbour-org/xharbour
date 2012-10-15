@@ -559,8 +559,8 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
       else if ( iRet == NUM_DOUBLE )
       {
          pYYLVAL->valDouble.dNumber = dNumber;
-         pYYLVAL->valDouble.bDec = iDec;
-         pYYLVAL->valDouble.bWidth = iWidth;
+         pYYLVAL->valDouble.bDec = ( unsigned char ) iDec;
+         pYYLVAL->valDouble.bWidth = ( unsigned char ) iWidth;
          pYYLVAL->valDouble.szValue = yytext;
       }
       else

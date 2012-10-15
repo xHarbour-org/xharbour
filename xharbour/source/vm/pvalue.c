@@ -57,7 +57,7 @@
 
 HB_FUNC( PVALUE )
 {
-   USHORT      uiParam  = hb_parni( 1 ), uiParams;
+   USHORT      uiParam  = ( USHORT ) hb_parni( 1 ), uiParams;
    PHB_ITEM *  pBase    = HB_VM_STACK.pItems + ( hb_stackBaseItem() )->item.asSymbol.pCargo->stackbase; /* Skip function + self */
 
    uiParams = ( *pBase )->item.asSymbol.pCargo->arguments;

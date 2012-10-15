@@ -63,7 +63,7 @@ HB_FUNC( EVAL )
 
    if( pItem )
    {
-      USHORT   uiPCount = hb_pcount();
+      USHORT   uiPCount = ( USHORT ) hb_pcount();
       USHORT   uiParam;
 
       hb_vmPushSymbol( &hb_symEval );

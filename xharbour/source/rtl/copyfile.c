@@ -70,7 +70,7 @@ static BOOL hb_fsCopy( const char * szSource, const char * szDest, PHB_ITEM bloc
 {
    BOOL     bRetVal = FALSE;
    FHANDLE  fhndSource;
-   EVALINFO info;
+   EVALINFO info = { 0, { 0 } };
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_fsCopy(%s, %s)", szSource, szDest ) );
 

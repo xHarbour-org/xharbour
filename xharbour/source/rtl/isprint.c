@@ -269,13 +269,13 @@ static DWORD IsPrinterErrorn( HANDLE hPrinter )
          for( i = 0; ! dwError && i < cJobs; i++ )
          {
             if( pJobs[ i ].Status & JOB_STATUS_ERROR )
-               dwError = -20;
+               dwError = ( DWORD ) -20;
             else if( pJobs[ i ].Status & JOB_STATUS_OFFLINE )
-               dwError = -21;
+               dwError = ( DWORD ) -21;
             else if( pJobs[ i ].Status & JOB_STATUS_PAPEROUT )
-               dwError = -22;
+               dwError = ( DWORD ) -22;
             else if( pJobs[ i ].Status & JOB_STATUS_BLOCKED_DEVQ )
-               dwError = -23;
+               dwError = ( DWORD ) -23;
          }
          hb_xfree( pJobs );
       }
@@ -328,7 +328,7 @@ static BOOL GetJobs( HANDLE hPrinter, JOB_INFO_2 ** ppJobInfo, int * pcJobs )
 
 DWORD hb_printerIsReadyn( const char * pszPrinterName )
 {
-   DWORD    dwPrinter = -1;
+   DWORD    dwPrinter = ( DWORD ) -1;
    HANDLE   hPrinter;
 
    if( *pszPrinterName && OpenPrinter( ( LPSTR ) pszPrinterName, &hPrinter, NULL ) )

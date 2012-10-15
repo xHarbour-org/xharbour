@@ -92,7 +92,7 @@ HB_FUNC( I2BIN )
 
    if( ISNUM( 1 ) )
    {
-      SHORT iValue = hb_parni( 1 );
+      SHORT iValue = ( SHORT ) hb_parni( 1 );
 
       szString[ 0 ]  = ( char ) ( ( iValue & 0x00FF ) );
       szString[ 1 ]  = ( char ) ( ( iValue & 0xFF00 ) >> 8 );

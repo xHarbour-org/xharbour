@@ -895,7 +895,7 @@ static HB_GENC_FUNC( hb_p_popstatic )
          pTmp = pTmp->pNext;
       }
 
-      pVar = hb_compVariableFind( pTmp->pStatics, wVar - pTmp->iStaticsBase );
+      pVar = hb_compVariableFind( pTmp->pStatics, ( USHORT ) ( wVar - pTmp->iStaticsBase ) );
 
       fprintf( cargo->yyc, "\t/* %s */", pVar->szName );
    }
@@ -1512,7 +1512,7 @@ static HB_GENC_FUNC( hb_p_pushstatic )
          pTmp = pTmp->pNext;
       }
 
-      pVar = hb_compVariableFind( pTmp->pStatics, wVar - pTmp->iStaticsBase );
+      pVar = hb_compVariableFind( pTmp->pStatics, ( USHORT ) ( wVar - pTmp->iStaticsBase ) );
       fprintf( cargo->yyc, "\t/* %s */", pVar->szName );
    }
 
@@ -1537,7 +1537,7 @@ static HB_GENC_FUNC( hb_p_pushstaticref )
          pTmp = pTmp->pNext;
       }
 
-      pVar = hb_compVariableFind( pTmp->pStatics, wVar - pTmp->iStaticsBase );
+      pVar = hb_compVariableFind( pTmp->pStatics, ( USHORT) ( wVar - pTmp->iStaticsBase ) );
       fprintf( cargo->yyc, "\t/* %s */", pVar->szName );
    }
 

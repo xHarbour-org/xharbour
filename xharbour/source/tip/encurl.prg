@@ -131,9 +131,9 @@ HB_FUNC( TIPENCODERURL_ENCODE )
       {
          cRet[ nPosRet++] = '%';
          nVal = ((unsigned char) cElem) >> 4;
-         cRet[ nPosRet++] = nVal < 10 ? '0' + nVal : 'A' + nVal - 10;
+         cRet[ nPosRet++] = ( char ) ( nVal < 10 ? '0' + nVal : 'A' + nVal - 10 );
          nVal = ((unsigned char) cElem) & 0x0f;
-         cRet[ nPosRet ] = nVal < 10 ? '0' + nVal : 'A' + nVal - 10;
+         cRet[ nPosRet ] = ( char ) ( nVal < 10 ? '0' + nVal : 'A' + nVal - 10 );
       }
 
       nPosRet++;

@@ -330,7 +330,7 @@ static int rulecmp( const void * pLeft, const void * pRight );
             { \
                iStartLen = 1; \
                \
-               chrStart = LEX_CASE( *szBuffer ); \
+               chrStart = ( unsigned char ) LEX_CASE( *szBuffer ); \
                \
                while( aPairs[i].sStart[iStartLen] ) \
                { \
@@ -341,7 +341,7 @@ static int rulecmp( const void * pLeft, const void * pRight );
                   \
                   iStartLen++; \
                   \
-                  chrStart = LEX_CASE( *( szBuffer + iStartLen - 1 ) ); \
+                  chrStart = ( unsigned char ) LEX_CASE( *( szBuffer + iStartLen - 1 ) ); \
                } \
                \
                /* Match */ \
@@ -396,7 +396,7 @@ static int rulecmp( const void * pLeft, const void * pRight );
             { \
                sSelf[0] = chr; \
                iSelfLen = 1; \
-               chrSelf = LEX_CASE( *szBuffer ); \
+               chrSelf = ( unsigned char ) LEX_CASE( *szBuffer ); \
                \
                while( aSelfs[i].sWord[iSelfLen] ) \
                { \
@@ -411,7 +411,7 @@ static int rulecmp( const void * pLeft, const void * pRight );
                   \
                   iSelfLen++; \
                   \
-                  chrSelf = LEX_CASE( *( szBuffer + iSelfLen - 1 ) ); \
+                  chrSelf = ( unsigned char ) LEX_CASE( *( szBuffer + iSelfLen - 1 ) ); \
                } \
                \
                /* Match */ \
@@ -452,7 +452,7 @@ static int rulecmp( const void * pLeft, const void * pRight );
                      }\
                      \
                      /* Last charcter read. */\
-                     if( iSelfLen > 1 ) chr = chrSelf;\
+                     if( iSelfLen > 1 ) chr = ( int ) chrSelf;\
                      \
                      return iRet; \
                   } \
@@ -647,9 +647,9 @@ int SimpLex_GetNextToken( void )
                }
             }
 
-            chr = LEX_CASE(chr);
+            chr = ( char ) LEX_CASE(chr);
 
-            CHECK_SELF_CONTAINED(chr);
+            CHECK_SELF_CONTAINED( chr );
 
             /* New Pair ? */
             IF_BEGIN_PAIR( chr )

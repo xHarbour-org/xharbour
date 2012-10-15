@@ -356,7 +356,7 @@ PHB_ITEM hb_i18n_read_table( FHANDLE handle, int count )
             if( nStrLen > 0 )  // sanitizing unwritten strings
             {
                char * str = ( char * ) hb_xgrab( nStrLen );
-               nRead = hb_fsRead( handle, ( BYTE * ) str, nStrLen );
+               nRead = hb_fsRead( handle, ( BYTE * ) str, ( USHORT ) nStrLen );
                // using trailing zero as file integrity check
                // (zero is the last character read, so we check nStrLen-1)
                if( nRead != nStrLen || str[ nStrLen - 1 ] != 0 )
@@ -515,7 +515,7 @@ BOOL hb_i18n_write_table( FHANDLE handle, PHB_ITEM pTable )
             return FALSE;
          }
 
-         if( hb_fsWrite( handle, ( BYTE * ) hb_arrayGetCPtr( pRow, j ), nStrLen ) != nStrLen )
+         if( hb_fsWrite( handle, ( BYTE * ) hb_arrayGetCPtr( pRow, j ), ( USHORT ) nStrLen ) != nStrLen )
          {
             return FALSE;
          }

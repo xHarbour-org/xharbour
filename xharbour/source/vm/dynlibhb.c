@@ -172,7 +172,7 @@ HB_FUNC( HB_LIBDO )
 
       if( pDynSym )
       {
-         USHORT   uiPCount = hb_pcount();
+         USHORT   uiPCount = ( USHORT ) hb_pcount();
          USHORT   uiParam;
 
          hb_vmPushSymbol( pDynSym->pSymbol );

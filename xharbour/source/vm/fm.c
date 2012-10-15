@@ -1343,7 +1343,7 @@ HB_SIZE hb_xquery( USHORT uiMode )
 HB_FUNC( MEMORY )
 {
    HB_THREAD_STUB_API
-   hb_retns( hb_xquery( hb_parni( 1 ) ) );
+   hb_retns( hb_xquery( ( USHORT ) hb_parni( 1 ) ) );
 }
 
 #ifdef HB_FM_STATISTICS

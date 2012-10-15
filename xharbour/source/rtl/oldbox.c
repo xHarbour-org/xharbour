@@ -65,10 +65,10 @@ HB_FUNC( __BOX )
 
    if( pTop && pLeft && pBottom && pRight && ISCHAR( 5 ) )
    {
-      hb_gtBox( hb_itemGetNI( pTop ),
-                hb_itemGetNI( pLeft ),
-                hb_itemGetNI( pBottom ),
-                hb_itemGetNI( pRight ),
+      hb_gtBox( ( USHORT ) hb_itemGetNI( pTop ),
+                ( USHORT ) hb_itemGetNI( pLeft ),
+                ( USHORT ) hb_itemGetNI( pBottom ),
+                ( USHORT ) hb_itemGetNI( pRight ),
                 ( BYTE * ) ( hb_parclen( 5 ) == 0 ? "         " : hb_parcx( 5 ) ) );
    }
 }
@@ -81,10 +81,10 @@ HB_FUNC( __BOXD )
    PHB_ITEM pRight   = hb_param( 4, HB_IT_NUMERIC );
 
    if( pTop && pLeft && pBottom && pRight )
-      hb_gtBoxD( hb_itemGetNI( pTop ),
-                 hb_itemGetNI( pLeft ),
-                 hb_itemGetNI( pBottom ),
-                 hb_itemGetNI( pRight ) );
+      hb_gtBoxD( ( USHORT ) hb_itemGetNI( pTop ),
+                 ( USHORT ) hb_itemGetNI( pLeft ),
+                 ( USHORT ) hb_itemGetNI( pBottom ),
+                 ( USHORT ) hb_itemGetNI( pRight ) );
 }
 
 HB_FUNC( __BOXS )
@@ -95,10 +95,10 @@ HB_FUNC( __BOXS )
    PHB_ITEM pRight   = hb_param( 4, HB_IT_NUMERIC );
 
    if( pTop && pLeft && pBottom && pRight )
-      hb_gtBoxS( hb_itemGetNI( pTop ),
-                 hb_itemGetNI( pLeft ),
-                 hb_itemGetNI( pBottom ),
-                 hb_itemGetNI( pRight ) );
+      hb_gtBoxS( ( USHORT ) hb_itemGetNI( pTop ),
+                 ( USHORT ) hb_itemGetNI( pLeft ),
+                 ( USHORT ) hb_itemGetNI( pBottom ),
+                 ( USHORT ) hb_itemGetNI( pRight ) );
 }
 
 #endif

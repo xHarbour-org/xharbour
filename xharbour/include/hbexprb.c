@@ -2828,7 +2828,7 @@ static HB_EXPR_FUNC( hb_compExprUseSend )
             #ifdef HB_MACRO_SUPPORT
                if( (pSelf->value.asMessage.pObject)->ExprType == HB_ET_VARIABLE )
                {
-                  USHORT usVar = hb_compLocalVarGetPos( (pSelf->value.asMessage.pObject)->value.asSymbol.szName, HB_MACRO_PARAM );
+                  USHORT usVar = ( USHORT ) hb_compLocalVarGetPos( (pSelf->value.asMessage.pObject)->value.asSymbol.szName, HB_MACRO_PARAM );
 
                   if( usVar == 0 )
                   {

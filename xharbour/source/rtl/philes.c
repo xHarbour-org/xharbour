@@ -454,7 +454,7 @@ HB_FUNC( HB_OPENPROCESS )
    PHB_ITEM       pBackground = hb_param( 5, HB_IT_LOGICAL );
    PHB_ITEM       pProcID     = hb_param( 6, HB_IT_BYREF );
 
-   FHANDLE        fhIn, fhOut, fhErr;
+   FHANDLE        fhIn = 0, fhOut = 0, fhErr = 0;
    FHANDLE *      pfhIn, * pfhOut, * pfhErr;
    FHANDLE        fhProcess;
    BOOL           bBackground;

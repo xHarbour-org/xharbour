@@ -58,8 +58,8 @@
 /* centre-pads a date, number, or string with spaces or supplied character */
 HB_FUNC( PADC )
 {
-   HB_SIZE  ulSize;
-   BOOL     bFreeReq;
+   HB_SIZE  ulSize = 0;
+   BOOL     bFreeReq = FALSE;
    char *   szText;
 
    if( ISNUM( 2 ) )

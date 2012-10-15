@@ -981,7 +981,7 @@ USHORT hb_objGetRealCls( PHB_ITEM pObject, const char * szName )
       return 0;
    }
 
-   uiCurCls = pBase->item.asSymbol.pCargo->uiSuperClass;
+   uiCurCls = ( USHORT ) pBase->item.asSymbol.pCargo->uiSuperClass;
    if( uiCurCls == 0 )
    {
       uiCurCls = hb_objClassH( pObject );
@@ -2119,13 +2119,13 @@ HB_FUNC( __CLSADDMSG )
       else
       {
          //3 Alternate
-         uiID = hb_parni( 3 );
+         uiID = ( USHORT ) hb_parni( 3 );
       }
    }
    else
    {
       //3 Alternate
-      uiID = hb_parni( 3 );
+      uiID = ( USHORT ) hb_parni( 3 );
    }
 
    // 4
@@ -3623,9 +3623,9 @@ HB_FUNC( __GETMEMBERS )
 {
    PHB_ITEM pReturn  = hb_itemArrayNew( 0 );
    PHB_ITEM pObject  = hb_param( 1, HB_IT_ARRAY );
-   USHORT   nParam   = hb_parni( 2 );
-   USHORT   uiScope  = hb_parni( 3 );
-   USHORT   uiType   = hb_parni( 4 );
+   USHORT   nParam   = ( USHORT ) hb_parni( 2 );
+   USHORT   uiScope  = ( USHORT ) hb_parni( 3 );
+   USHORT   uiType   = ( USHORT ) hb_parni( 4 );
    USHORT   uiClass  = hb_objClassH( pObject );
 
    if( ( ! uiClass ) && HB_IS_BYREF( pObject ) )
@@ -3693,7 +3693,7 @@ HB_FUNC( __GETMESSAGE )
 HB_FUNC( __CLSPARENT )
 {
    HB_THREAD_STUB_API
-   hb_retl( hb_clsIsParent( hb_parni( 1 ), hb_parcx( 2 ) ) );
+   hb_retl( hb_clsIsParent( ( USHORT ) hb_parni( 1 ), hb_parcx( 2 ) ) );
 }
 
 HB_FUNC( __SENDER )
@@ -3910,7 +3910,7 @@ static HARBOUR hb___msgClsFullSel( void )
    HB_ITEM_PTR pSelf    = hb_stackSelfItem();
    USHORT      uiClass;
    HB_ITEM     Return;
-   USHORT      nParam   = hb_parni( 1 ), uiScope = hb_parni( 2 );
+   USHORT      nParam   = ( USHORT ) hb_parni( 1 ), uiScope = ( USHORT ) hb_parni( 2 );
 
    uiClass     = hb_objClassH( pSelf );
 
@@ -3990,7 +3990,7 @@ static HARBOUR hb___msgClsSel( void )
    HB_ITEM_PTR pSelf    = hb_stackSelfItem();
    USHORT      uiClass;
    HB_ITEM     Return;
-   USHORT      nParam   = hb_parni( 1 ), uiScope = hb_parni( 2 );
+   USHORT      nParam   = ( USHORT ) hb_parni( 1 ), uiScope = ( USHORT ) hb_parni( 2 );
 
    uiClass     = hb_objClassH( pSelf );
 
@@ -4676,7 +4676,7 @@ HB_FUNC( __CLSGETPROPERTIESANDVALUES )
 HB_FUNC( __CLSGETIVARNAMESANDVALUES )
 {
    PHB_ITEM pObject  = hb_param( 1, HB_IT_ANY );
-   USHORT   uiScope  = hb_parni( 2 );
+   USHORT   uiScope  = ( USHORT ) hb_parni( 2 );
    USHORT   uiClass;
 
    uiClass = hb_objClassH( pObject );
@@ -4810,7 +4810,7 @@ HB_FUNC( __CLSGETHANDLEFROMNAME )
 
       szClass = hb_strUpperCopy( ( char * ) hb_parcx( 1 ), hb_parclen( 1 ) );
 
-   uiClass = hb_clsGetHandleFromName( szClass );
+   uiClass = ( USHORT ) hb_clsGetHandleFromName( szClass );
 
    if( uiClass == 0 )
    {
@@ -4913,7 +4913,7 @@ static BOOL __clsAddFriend( USHORT uiClass, PHB_ITEM pFriend )
 
       if( HB_IS_OBJECT( pFriend ) )
       {
-         USHORT uiFriendClass = pFriend->item.asArray.value->uiClass;
+         USHORT uiFriendClass = ( USHORT ) pFriend->item.asArray.value->uiClass;
 
          if( uiFriendClass <= s_uiClasses )
          {
@@ -4923,7 +4923,7 @@ static BOOL __clsAddFriend( USHORT uiClass, PHB_ITEM pFriend )
       else if( HB_IS_STRING( pFriend ) )
       {
          char *   szFriendClass  = hb_strUpperCopy( hb_itemGetCPtr( pFriend ), hb_itemGetCLen( pFriend ) );
-         USHORT   uiFriendClass  = hb_clsGetHandleFromName( szFriendClass );
+         USHORT   uiFriendClass  = ( USHORT ) hb_clsGetHandleFromName( szFriendClass );
 
          hb_xfree( szFriendClass );
 
@@ -4948,7 +4948,7 @@ static BOOL __clsAddFriend( USHORT uiClass, PHB_ITEM pFriend )
 
 HB_FUNC( __CLSADDFRIEND )
 {
-   __clsAddFriend( hb_parni( 1 ), hb_param( 2, HB_IT_OBJECT | HB_IT_POINTER | HB_IT_STRING ) );
+   __clsAddFriend( ( USHORT ) hb_parni( 1 ), hb_param( 2, HB_IT_OBJECT | HB_IT_POINTER | HB_IT_STRING ) );
 }
 
 // __ClsFriendly( oObj, oFriend | @FriendFunc() ) -> aFriendSymbols  Is it really useful?
@@ -5063,7 +5063,7 @@ HB_FUNC( __CLSINSTNAME )
       USHORT   uiClass;
       PHB_DYNS pDynSym;
 
-      uiClass = hb_clsGetHandleFromName( szClassName );
+      uiClass = ( USHORT ) hb_clsGetHandleFromName( szClassName );
       //TraceLog( NULL, "uiClass: %i\n", uiClass );
 
       if( uiClass && uiClass <= s_uiClasses )

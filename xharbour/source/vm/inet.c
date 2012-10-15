@@ -1006,7 +1006,7 @@ static void s_inetRecvPattern( char * szFuncName, char * szPattern )
    PHB_ITEM             pMaxSize    = hb_param( 3, HB_IT_NUMERIC );
    PHB_ITEM             pBufferSize = hb_param( 4, HB_IT_NUMERIC );
 
-   char                 cChar;
+   char                 cChar = 0;
    char *               Buffer;
    int                  iAllocated, iBufferSize, iMax;
    int                  iLen  = 0;
@@ -1176,7 +1176,7 @@ HB_FUNC( INETRECVENDBLOCK )
    PHB_ITEM             pMaxSize    = hb_param( 4, HB_IT_NUMERIC );
    PHB_ITEM             pBufferSize = hb_param( 5, HB_IT_NUMERIC );
 
-   char                 cChar;
+   char                 cChar          = 0;
    char *               Buffer;
    char **              Proto;
    int                  iAllocated, iBufferSize, iMax;
@@ -1675,10 +1675,10 @@ HB_FUNC( INETSERVER )
    /* Reusable socket; under unix, do not wait it is unused */
    setsockopt( Socket->com, SOL_SOCKET, SO_REUSEADDR, ( const char * ) &iOpt, sizeof( iOpt ) );
 
-   iPort                      = htons( hb_parni( 1 ) );
+   iPort                      = htons( ( u_short ) hb_parni( 1 ) );
 
    Socket->remote.sin_family  = AF_INET;
-   Socket->remote.sin_port    = iPort;
+   Socket->remote.sin_port    = ( USHORT ) iPort;
 
    if( ! ISCHAR( 2 ) )
    {
@@ -1856,10 +1856,10 @@ HB_FUNC( INETCONNECT )
       }
       else
       {
-         iPort                            = htons( hb_parni( 2 ) );
+         iPort                            = htons( ( u_short ) hb_parni( 2 ) );
 
          Socket->remote.sin_family        = AF_INET;
-         Socket->remote.sin_port          = iPort;
+         Socket->remote.sin_port          = ( USHORT ) iPort;
          Socket->remote.sin_addr.s_addr   = ( *( UINT * ) Host->h_addr_list[ 0 ] );
 
          HB_STACK_UNLOCK;
@@ -1914,10 +1914,10 @@ HB_FUNC( INETCONNECTIP )
    }
    else
    {
-      iPort                            = htons( iPort );
+      iPort                            = htons( ( u_short ) iPort );
 
       Socket->remote.sin_family        = AF_INET;
-      Socket->remote.sin_port          = iPort;
+      Socket->remote.sin_port          = ( USHORT ) iPort;
       Socket->remote.sin_addr.s_addr   = inet_addr( szHost );
 
       HB_STACK_UNLOCK;
@@ -1981,10 +1981,10 @@ HB_FUNC( INETDGRAMBIND )
    }
 
    /* Binding here */
-   iPort                      = htons( iPort );
+   iPort                      = htons( ( u_short ) iPort );
 
    Socket->remote.sin_family  = AF_INET;
-   Socket->remote.sin_port    = iPort;
+   Socket->remote.sin_port    = ( USHORT ) iPort;
 
    if( ! ISCHAR( 2 ) )
    {
@@ -2096,7 +2096,7 @@ HB_FUNC( INETDGRAMSEND )
    }
 
    Socket->remote.sin_family        = AF_INET;
-   Socket->remote.sin_port          = htons( iPort );
+   Socket->remote.sin_port          = htons( ( u_short ) iPort );
    Socket->remote.sin_addr.s_addr   = inet_addr( szAddress );
    szBuffer                         = hb_itemGetCPtr( pBuffer );
 

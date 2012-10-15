@@ -200,7 +200,7 @@ HB_FUNC( HB_FREADLINE )
       if( ISARRAY( 3 ) )
       {
          pTerm1   = hb_param( 3, HB_IT_ARRAY );
-         iTerms   = ( int ) pTerm1->item.asArray.value->ulLen;
+         iTerms   = ( int ) ( USHORT ) pTerm1->item.asArray.value->ulLen;
 
          if( iTerms <= 0 )
          {

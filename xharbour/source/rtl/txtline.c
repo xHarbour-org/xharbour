@@ -79,7 +79,7 @@ void hb_readLine( const char * szText, HB_SIZE ulTextLen, HB_SIZE uiLineLen, USH
 
    if( ulTextLen <= 0 )
    {
-      *lEnd          = -1;
+      *lEnd          = ( HB_SIZE ) -1;
       *ulEndOffset   = 0;
       *bEOF          = 1;
       return;
@@ -112,7 +112,7 @@ void hb_readLine( const char * szText, HB_SIZE ulTextLen, HB_SIZE uiLineLen, USH
             {
                if( ulPos == 0 )
                {
-                  *lEnd          = -1;
+                  *lEnd          = ( HB_SIZE ) -1;
                   *ulEndOffset   = iTermSizes[ uiPosTerm ];
                }
                else

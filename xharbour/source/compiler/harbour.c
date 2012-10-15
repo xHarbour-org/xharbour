@@ -1005,7 +1005,7 @@ void hb_compGenGlobalName( char * szVarName )
       hb_compGlobalsDefStart();
 
       iVar     = hb_compVariableGetPos( hb_comp_pGlobals, szVarName );
-      pVar     = hb_compVariableFind( hb_comp_pGlobals, ( USHORT ) iVar );
+      pVar     = hb_compVariableFind( hb_comp_pGlobals, iVar );
 
       pBuffer  = ( BYTE * ) hb_xgrab( iVarLen + 5 );
       i        = 0;
@@ -2361,7 +2361,7 @@ PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pCallerNames
                //REVIEW: pSymbol->cScope |= HB_FS_LOCAL;
             }
 
-            return ( PFUNCTION ) 1;
+            return ( PFUNCTION ) ( HB_LONG ) 1;
          }
          else
          {
@@ -2443,7 +2443,7 @@ PINLINE hb_compInlineFind( char * szFunctionName )
 }
 
 /* return variable using its order after final fixing */
-PVAR hb_compLocalVariableFind( PFUNCTION pFunc, USHORT wVar )
+PVAR hb_compLocalVariableFind( PFUNCTION pFunc, int wVar )
 {
    if( pFunc->wParamCount && ! ( pFunc->bFlags & FUN_USES_LOCAL_PARAMS ) )
    {
@@ -2453,9 +2453,9 @@ PVAR hb_compLocalVariableFind( PFUNCTION pFunc, USHORT wVar )
    return hb_compVariableFind( pFunc->pLocals, wVar );
 }
 
-PVAR hb_compVariableFind( PVAR pVars, USHORT wOrder ) /* returns variable if defined or zero */
+PVAR hb_compVariableFind( PVAR pVars, int wOrder ) /* returns variable if defined or zero */
 {
-   USHORT w = 1;
+   int w = 1;
 
    if( pVars )
    {
@@ -3239,7 +3239,7 @@ static void hb_compGenFieldPCode( BYTE bPCode, int wVar, char * szVarName, PFUNC
       }
    }
 
-   pField = hb_compVariableFind( pFunc->pFields, ( USHORT ) wVar );
+   pField = hb_compVariableFind( pFunc->pFields, wVar );
 
    if( pField->szAlias ) /* the alias was specified in FIELD declaration
                           * Push alias symbol before the field symbol
@@ -3862,7 +3862,7 @@ void hb_compGenPushAliasedVar( char * szVarName,
 
 void hb_compGenPushLogical( int iTrueFalse ) /* pushes a logical value on the virtual machine stack */
 {
-   hb_compGenPCode1( iTrueFalse ? HB_P_TRUE : HB_P_FALSE );
+   hb_compGenPCode1( iTrueFalse ? ( BYTE ) HB_P_TRUE : ( BYTE ) HB_P_FALSE );
 }
 
 void hb_compGenPushNil( void )

@@ -779,7 +779,7 @@ static int hb_comp_SLX_InterceptAction( int iRet )
 {
    if( iRet < 256 )
    {
-      yytext[0] = iRet;
+      yytext[0] = (char) iRet;
       yytext[1] = '\0';
       yyleng = 1;
    }
@@ -1012,8 +1012,8 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
       else if ( iElement == NUM_DOUBLE )
       {
          yylval.valDouble.dNumber = dNumber;
-         yylval.valDouble.bDec = iDec;
-         yylval.valDouble.bWidth = iWidth;
+         yylval.valDouble.bDec = ( UCHAR ) iDec;
+         yylval.valDouble.bWidth = ( UCHAR ) iWidth;
          yylval.valDouble.szValue = yytext;
       }
       else if( HB_LIM_INT16( lNumber ) )

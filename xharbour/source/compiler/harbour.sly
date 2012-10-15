@@ -46,9 +46,9 @@
 #if defined( __POCC__ )
    #pragma warn(push)
    #pragma warn(disable:2154)
-#endif
-
-#if defined( __BORLANDC__ )
+#elif defined( _MSC_VER )
+   #pragma warning(disable:4702) // unreachable code
+#elif defined( __BORLANDC__ )
    #pragma warn -aus
    #pragma warn -ccc
    #pragma warn -rch
@@ -3057,7 +3057,7 @@ ForNext    : FOR LValue ForAssign Expression          /* 1  2  3  4 */
                      iStep = 1;
                   }
 
-                  if( iStep && ( iLocal = hb_compLocalGetPos( $<asExpr>2->value.asSymbol.szName ) ) != 0 && HB_LIM_INT8( iLocal ) )
+                  if( iStep && ( iLocal = (short) hb_compLocalGetPos( $<asExpr>2->value.asSymbol.szName ) ) != 0 && HB_LIM_INT8( iLocal ) )
                   {
                      if( iStep == 1 )
                      {

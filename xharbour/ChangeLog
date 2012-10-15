@@ -8,6 +8,75 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-15 20:56 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbcomp.h
+  * include/hbexprb.c
+  * include/hbexprc.c
+  * include/simplex.c
+  * source/pp/ppcore.c
+  * source/compiler/harbour.c
+  * source/compiler/harbouryy.c
+  * source/compiler/harbour.sly
+  * source/compiler/gencc1.c
+  * source/compiler/genc.c
+  * source/compiler/genhrb.c
+  * source/compiler/harbour.slx
+  * source/macro/macro.slx
+  * source/macro/macroyy.c
+  * source/vm/hvm.c
+  * source/vm/hash.c
+  * source/vm/arrayshb.c
+  * source/vm/classes.c
+  * source/vm/macro.c
+  * source/vm/set.c
+  * source/vm/memvars.c
+  * source/vm/fm.c
+  * source/vm/do.c
+  * source/vm/dynlibhb.c
+  * source/vm/errorapi.c
+  * source/vm/evalhb.c
+  * source/vm/proc.c
+  * source/vm/pvalue.c
+  * source/vm/garbage.c
+  * source/vm/hbi18n.c
+  * source/vm/inet.c
+  * source/vm/runner.c
+  * source/rtl/accept.c
+  * source/rtl/binnum.c
+  * source/rtl/box.c
+  * source/rtl/console.c
+  * source/rtl/copyfile.c
+  * source/rtl/dbf2txt.c
+  * source/rtl/direct.c
+  * source/rtl/diskspac.c
+  * source/rtl/filenet.c
+  * source/rtl/fkmax.c
+  * source/rtl/gtapi.c
+  * source/rtl/hbgtcore.c
+  * source/rtl/hbhex2n.c
+  * source/rtl/hbip.c
+  * source/rtl/hbmd5.c
+  * source/rtl/hbxml.c
+  * source/rtl/idle.c
+  * source/rtl/inkey.c
+  * source/rtl/isprint.c
+  * source/rtl/math.c
+  * source/rtl/natmsg.c
+  * source/rtl/oldbox.c
+  * source/rtl/oldclear.c
+  * source/rtl/padc.c
+  * source/rtl/padl.c
+  * source/rtl/padr.c
+  * source/rtl/philes.c
+  * source/rtl/readline.c
+  * source/rtl/setkey.c
+  * source/rtl/tprinter.c
+  * source/rtl/txtline.c
+  * source/rtl/winreg.prg
+  * source/rtl/tobject.prg
+  * source/tip/encurl.prg
+    ! more MSVC warnings (W4) suppressed - a lot to come
+
 2012-10-15 11:24 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * ChangeLog
     ! correction on last log:
