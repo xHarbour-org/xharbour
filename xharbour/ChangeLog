@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-15 10:17 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/what32/source/_wininet.c
+    ! _MSC_VER<=1200 -> _MSC_VER<1400: FtpCommand also does not exist in MVCS 7
+
+  * source/vm/dlmalloc.c
+    ! __POCC__<600 -> __POCC__<=600: Fixed compilation of dlmalloc.c
+
 2012-10-14 17:53 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/sixapi/include/sxapi.h
     ! pacify GCC64 warnings in contrib-stuffs

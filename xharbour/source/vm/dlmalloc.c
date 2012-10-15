@@ -1525,7 +1525,7 @@ LONG __cdecl _InterlockedExchange( LONG volatile * Target, LONG Value );
 #endif   /* __cplusplus */
 #endif   /* _M_AMD64 */
 
-#if ( defined( __POCC__ ) && ( __POCC__ < 600 ) )
+#if ( defined( __POCC__ ) && ( __POCC__ <= 600 ) )
 #else
 #pragma intrinsic (_InterlockedCompareExchange)
 #pragma intrinsic (_InterlockedExchange)
@@ -1546,7 +1546,7 @@ LONG __cdecl _InterlockedExchange( LONG volatile * Target, LONG Value );
 #endif
 
 #if defined( __BORLANDC__ ) || defined( __WATCOMC__ ) || defined( __DMC__ ) || \
-   defined( __XCC__ ) || ( defined( __POCC__ ) && ( __POCC__ < 600 ) )
+   defined( __XCC__ ) || ( defined( __POCC__ ) && ( __POCC__ <= 600 ) )
 #undef  interlockedcompareexchange
 #undef  interlockedexchange
 #define interlockedcompareexchange  InterlockedCompareExchange
@@ -2079,7 +2079,7 @@ static void init_malloc_global_mutex( void )
          return;
       /* transition to < 0 while initializing, then to > 0) */
       if( stat == 0 &&
-#if defined( __XCC__ ) || ( defined( __POCC__ ) && ( __POCC__ < 600 ) )
+#if defined( __XCC__ ) || ( defined( __POCC__ ) && ( __POCC__ <= 600 ) )
           interlockedcompareexchange( ( long int * ) &malloc_global_mutex_status, ( LONG ) -1, ( LONG ) 0 ) == 0 )
 #elif defined( __DMC__ )
           interlockedcompareexchange( ( void ** ) &malloc_global_mutex_status, ( void * ) ( LONG ) -1, ( LONG ) 0 ) == 0 )
@@ -2088,7 +2088,7 @@ static void init_malloc_global_mutex( void )
 #endif
       {
          InitializeCriticalSection( &malloc_global_mutex );
-#if defined( __XCC__ ) || ( defined( __POCC__ ) && ( __POCC__ < 600 ) )
+#if defined( __XCC__ ) || ( defined( __POCC__ ) && ( __POCC__ <= 600 ) )
          interlockedexchange( ( long int * ) &malloc_global_mutex_status, ( LONG ) 1 );
 #elif defined( __DMC__ )
          interlockedexchange( ( long * ) &malloc_global_mutex_status, ( LONG ) 1 );
