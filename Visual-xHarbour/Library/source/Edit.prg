@@ -211,8 +211,6 @@ METHOD Init( oParent ) CLASS EditBox
    ::BackSysColor := GetSysColor( COLOR_WINDOW )
    ::ForeSysColor := GetSysColor( COLOR_WINDOWTEXT )
 
-   ::AutoHScroll  := .F.
-
    IF ::__ClassInst != NIL
       ::__PropFilter := { "HIGHLIGHTCAPTION", "SMALLCAPTION", "ALLOWMAXIMIZE" }
       ::Events := ;
@@ -303,6 +301,8 @@ METHOD Create() CLASS EditBox
    IF ! Empty( ::xCueBanner )
       ::SetCueBanner()
    ENDIF
+   ::__SetAutoScroll( ES_AUTOVSCROLL, ::xAutoVScroll )
+   ::__SetAutoScroll( ES_AUTOHSCROLL, ::xAutoHScroll )
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
