@@ -8,9 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-15 11:24 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * ChangeLog
+    ! correction on last log:
+      contrib/firebird/tests/simple.prg -> contrib/pgsql/tests/simple.prg
+
 2012-10-15 11:15 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/firebird/tests/simple.prg
-    ! corected query syntax (thanks to F. Trautwein via comp.lang.xharbour)
+    ! corrected query syntax (thanks to F. Trautwein via comp.lang.xharbour)
 
 2012-10-15 10:22 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/what32/source/_wininet.c
