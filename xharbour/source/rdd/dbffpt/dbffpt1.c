@@ -459,7 +459,7 @@ static void hb_fptPackGCitems( LPMEMOGCTABLE pGCtable )
          j++;
       }
    }
-   pGCtable->usItems = j;
+   pGCtable->usItems = ( BYTE ) j;
 }
 
 /*
@@ -2878,7 +2878,7 @@ static HB_ERRCODE hb_fptPutMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem,
    HB_ERRCODE  errCode;
    HB_LONG     iVal;
    LONG        lVal;
-   BYTE        uiFlags = uiIndex ? pArea->area.lpFields[ uiIndex - 1 ].uiFlags : 0;
+   BYTE        uiFlags = uiIndex ? ( BYTE ) pArea->area.lpFields[ uiIndex - 1 ].uiFlags : 0;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_fptPutMemo(%p, %hu, %p, %p)", pArea, uiIndex, pItem, pulBlock ) );
 
@@ -3773,7 +3773,7 @@ static HB_ERRCODE hb_fptCreateMemFile( FPTAREAP pArea, LPDBOPENINFO pCreateInfo 
             hb_itemRelease( pItem );
             return HB_FAILURE;
          }
-         pArea->bMemoType = hb_itemGetNI( pItem );
+         pArea->bMemoType = ( BYTE ) hb_itemGetNI( pItem );
 /*
          if( !pArea->bMemoType )
          {
@@ -3803,7 +3803,7 @@ static HB_ERRCODE hb_fptCreateMemFile( FPTAREAP pArea, LPDBOPENINFO pCreateInfo 
                hb_itemRelease( pItem );
                return HB_FAILURE;
             }
-            pArea->uiMemoVersion = hb_itemGetNI( pItem );
+            pArea->uiMemoVersion = ( BYTE ) hb_itemGetNI( pItem );
          }
          else
             pArea->uiMemoVersion = DB_MEMOVER_STD;
@@ -4679,7 +4679,7 @@ static HB_ERRCODE hb_fptInfo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          break;
 
       case DBI_MEMOPACK:
-         return hb_fptDoPack( pArea, hb_arrayGetNI( pItem, 1 ),
+         return hb_fptDoPack( pArea, ( USHORT ) hb_arrayGetNI( pItem, 1 ),
                               hb_arrayGetItemPtr( pItem, 2 ),
                               hb_arrayGetNL( pItem, 3 ) );
 
@@ -4696,7 +4696,7 @@ static HB_ERRCODE hb_fptInfo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
             if( ulBlock && szFile && *szFile )
                errCode = hb_fptGetVarFile( pArea, ulBlock, szFile,
-                                           hb_arrayGetNI( pItem, 3 ) );
+                                           ( USHORT ) hb_arrayGetNI( pItem, 3 ) );
          }
          hb_itemPutL( pItem, errCode == HB_SUCCESS );
          break;
@@ -5208,7 +5208,7 @@ static void hb_dbffptRegisterRDD( USHORT * pusRddId )
 
    uiCount  = ( USHORT * ) hb_parptr( 1 );
    pTable   = ( RDDFUNCS * ) hb_parptr( 2 );
-   uiRddId  = hb_parni( 4 );
+   uiRddId  = ( USHORT ) hb_parni( 4 );
 
    HB_TRACE( HB_TR_DEBUG, ( "DBFFPT_GETFUNCTABLE(%p, %p)", uiCount, pTable ) );
 

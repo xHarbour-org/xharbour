@@ -750,7 +750,7 @@ static int hb_hsxHdrRead( int iHandle )
       return HSX_BADREAD;
 
    pHSX->ulRecCount     = HB_GET_LE_UINT32( pHeader->recCount );
-   pHSX->uiRecordSize   = HB_GET_LE_UINT32( pHeader->recSize );
+   pHSX->uiRecordSize   = ( USHORT ) HB_GET_LE_UINT32( pHeader->recSize );
    pHSX->fIgnoreCase    = HB_GET_LE_UINT16( pHeader->ignoreCase ) != 0;
    pHSX->iFilterType    = HB_GET_LE_UINT16( pHeader->filterType );
    pHSX->fUseHash       = HB_GET_LE_UINT32( pHeader->hashLetters ) != 0;

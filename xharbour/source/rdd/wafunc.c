@@ -721,7 +721,7 @@ HB_ERRCODE hb_rddCreateTable( const char * szFileName, const char * szDriver,
    else
       szDriver = hb_rddDefaultDrv( NULL );
 
-   uiPrevArea = hb_rddGetCurrentWorkAreaNumber();
+   uiPrevArea = ( USHORT ) hb_rddGetCurrentWorkAreaNumber();
 
    /*
     * 0 means chose first available in hb_rddInsertAreaNode()
@@ -793,7 +793,7 @@ HB_ERRCODE hb_rddCreateTableTemp( const char * szDriver,
    else
       szDriver = hb_rddDefaultDrv( NULL );
 
-   uiPrevArea = hb_rddGetCurrentWorkAreaNumber();
+   uiPrevArea = ( USHORT ) hb_rddGetCurrentWorkAreaNumber();
 
    /* 0 means chose first available in hb_rddInsertAreaNode() */
    hb_rddSelectWorkAreaNumber( 0 );
@@ -856,7 +856,7 @@ static void hb_fldStructure( AREAP pArea, USHORT uiField, USHORT uiSize,
    hb_arrayNew( pField, uiSize );
    for( uiCount = 0; uiCount < uiSize; ++uiCount )
    {
-      SELF_FIELDINFO( pArea, uiField, s_uiActions[ uiCount ],
+      SELF_FIELDINFO( pArea, uiField, ( USHORT ) s_uiActions[ uiCount ],
                       hb_arrayGetItemPtr( pField, uiCount + 1 ) );
    }
 }
@@ -1116,7 +1116,7 @@ HB_ERRCODE hb_rddTransRecords( AREAP pArea,
    HB_ERRCODE  errCode;
 
    memset( &dbTransInfo, 0, sizeof( DBTRANSINFO ) );
-   uiPrevArea = hb_rddGetCurrentWorkAreaNumber();
+   uiPrevArea = ( USHORT ) hb_rddGetCurrentWorkAreaNumber();
 
    if( szDriver == NULL )
       /* szDriver = SELF_RDDNODE( pArea )->szName; */

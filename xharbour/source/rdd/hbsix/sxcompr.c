@@ -318,7 +318,7 @@ static BOOL hb_LZSSxDecode( PHB_LZSSX_COMPR pCompr )
          if( ( c = hb_LZSSxRead( pCompr ) ) == -1 )
             break;
          /* simple trick to reduce number of shift operations */
-         itemMask = c | 0xff00;
+         itemMask = ( USHORT) c | 0xff00 ;
       }
       if( ( c = hb_LZSSxRead( pCompr ) ) == -1 )
          break;
@@ -385,8 +385,8 @@ static void hb_LZSSxNodeInsert( PHB_LZSSX_COMPR pCompr, int r )
             p = pCompr->right[ p ];
          else
          {
-            pCompr->right[ p ]   = r;
-            pCompr->parent[ r ]  = p;
+            pCompr->right[ p ]   = ( SHORT ) r;
+            pCompr->parent[ r ]  = ( SHORT ) p;
             return;
          }
       }
@@ -396,8 +396,8 @@ static void hb_LZSSxNodeInsert( PHB_LZSSX_COMPR pCompr, int r )
             p = pCompr->left[ p ];
          else
          {
-            pCompr->left[ p ]    = r;
-            pCompr->parent[ r ]  = p;
+            pCompr->left[ p ]    = ( SHORT ) r;
+            pCompr->parent[ r ]  = ( SHORT ) p;
             return;
          }
       }
@@ -408,8 +408,8 @@ static void hb_LZSSxNodeInsert( PHB_LZSSX_COMPR pCompr, int r )
       }
       if( i > pCompr->match_length )
       {
-         pCompr->match_offset = p;
-         pCompr->match_length = i;
+         pCompr->match_offset = ( SHORT ) p;
+         pCompr->match_length = ( SHORT ) i;
          if( i >= MAXLENGTH )
             break;
       }
@@ -417,12 +417,12 @@ static void hb_LZSSxNodeInsert( PHB_LZSSX_COMPR pCompr, int r )
    pCompr->parent[ r ]                    = pCompr->parent[ p ];
    pCompr->left[ r ]                      = pCompr->left[ p ];
    pCompr->right[ r ]                     = pCompr->right[ p ];
-   pCompr->parent[ pCompr->left[ p ] ]    = r;
-   pCompr->parent[ pCompr->right[ p ] ]   = r;
+   pCompr->parent[ pCompr->left[ p ] ]    = ( SHORT ) r;
+   pCompr->parent[ pCompr->right[ p ] ]   = ( SHORT ) r;
    if( pCompr->right[ pCompr->parent[ p ] ] == p )
-      pCompr->right[ pCompr->parent[ p ] ] = r;
+      pCompr->right[ pCompr->parent[ p ] ] = ( SHORT ) r;
    else
-      pCompr->left[ pCompr->parent[ p ] ] = r;
+      pCompr->left[ pCompr->parent[ p ] ] = ( SHORT ) r;
    pCompr->parent[ p ] = DUMMYNODE;
 }
 
@@ -448,16 +448,16 @@ static void hb_LZSSxNodeDelete( PHB_LZSSX_COMPR pCompr, int p )
             pCompr->right[ pCompr->parent[ q ] ]   = pCompr->left[ q ];
             pCompr->parent[ pCompr->left[ q ] ]    = pCompr->parent[ q ];
             pCompr->left[ q ]                      = pCompr->left[ p ];
-            pCompr->parent[ pCompr->left[ p ] ]    = q;
+            pCompr->parent[ pCompr->left[ p ] ]    = ( SHORT ) q;
          }
          pCompr->right[ q ]                     = pCompr->right[ p ];
-         pCompr->parent[ pCompr->right[ p ] ]   = q;
+         pCompr->parent[ pCompr->right[ p ] ]   = ( SHORT ) q;
       }
       pCompr->parent[ q ] = pCompr->parent[ p ];
       if( pCompr->right[ pCompr->parent[ p ] ] == p )
-         pCompr->right[ pCompr->parent[ p ] ] = q;
+         pCompr->right[ pCompr->parent[ p ] ] = ( SHORT ) q;
       else
-         pCompr->left[ pCompr->parent[ p ] ] = q;
+         pCompr->left[ pCompr->parent[ p ] ] = ( SHORT ) q;
       pCompr->parent[ p ] = DUMMYNODE;
    }
 }
@@ -482,7 +482,7 @@ static ULONG hb_LZSSxEncode( PHB_LZSSX_COMPR pCompr )
 
    for( len = 0; len < MAXLENGTH; len++ )
    {
-      if( ( c = hb_LZSSxRead( pCompr ) ) == -1 )
+      if( ( c = ( short ) hb_LZSSxRead( pCompr ) ) == -1 )
          break;
       pCompr->ring_buffer[ r + len ] = ( BYTE ) c;
    }
@@ -523,7 +523,7 @@ static ULONG hb_LZSSxEncode( PHB_LZSSX_COMPR pCompr )
       }
       last_match_length = pCompr->match_length;
       for( i = 0; i < last_match_length &&
-           ( c = hb_LZSSxRead( pCompr ) ) != -1; i++ )
+           ( c = ( short ) hb_LZSSxRead( pCompr ) ) != -1; i++ )
       {
          hb_LZSSxNodeDelete( pCompr, s );
          pCompr->ring_buffer[ s ]   = ( BYTE ) c;

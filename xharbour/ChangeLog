@@ -8,6 +8,32 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-17 03:55 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/makefile.vc
+    ! applying highest warning level -W4 with safe-warnings disabled
+      (-wd4127 -wd4054 -wd4055). Temporarily applied to core stuff only.
+
+  * source/rdd/dbcmd.c
+  * source/rdd/dbcmd53.c
+  * source/rdd/workarea.c
+  * source/rdd/wacore.c
+  * source/rdd/wafunc.c
+  * source/rdd/dbf1.c
+  * source/rdd/dbf1net.c
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rdd/dbffpt/redbffpt1.c
+  * source/rdd/hbsix/sxcompr.c
+  * source/rdd/hsx/hsx.c
+  * source/rdd/usrrdd/usrrdd.c
+    ! yet more MSVC warnings (W4) suppressed
+
+    /*
+    NOTE: Still, there are truncation on HB_PUT_LE_UINT32 and HB_PUT_BE_UINT32
+    macro implementation used in some DBFFPT and Six Compression routines. I am
+    not sure if these are critical, but logically speaking, truncation is
+    usually not a good thing.
+    */
+
 2012-10-16 22:26 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/firebird/firebird.c
   * contrib/firebird/tfirebird.prg

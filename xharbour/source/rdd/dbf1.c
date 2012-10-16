@@ -2767,7 +2767,7 @@ static HB_ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
          pArea->lpdbOpenInfo = NULL;
          return HB_FAILURE;
       }
-      pArea->bLockType = hb_itemGetNI( pItem );
+      pArea->bLockType = ( BYTE ) hb_itemGetNI( pItem );
       if( pArea->bLockType == 0 )
       {
          pArea->bLockType = DB_DBFLOCK_CLIP;
@@ -3683,7 +3683,7 @@ static HB_ERRCODE hb_dbfNewArea( DBFAREAP pArea )
    {
       PHB_ITEM pItem = hb_itemPutNI( NULL, 0 );
       if( SELF_RDDINFO( SELF_RDDNODE( &pArea->area ), RDDI_TABLETYPE, 0, pItem ) == HB_SUCCESS )
-         pArea->bTableType = hb_itemGetNI( pItem );
+         pArea->bTableType = ( BYTE ) hb_itemGetNI( pItem );
       hb_itemRelease( pItem );
    }
 
@@ -3753,7 +3753,7 @@ static HB_ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
          pArea->lpdbOpenInfo = NULL;
          return HB_FAILURE;
       }
-      pArea->bLockType = hb_itemGetNI( pItem );
+      pArea->bLockType = ( BYTE ) hb_itemGetNI( pItem );
       if( ! pArea->bLockType )
          pArea->bLockType = DB_DBFLOCK_CLIP;
    }
@@ -5770,7 +5770,7 @@ static HB_ERRCODE hb_dbfRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect
             case DB_DBF_STD:        /* standard dBase/Clipper DBF file */
             case DB_DBF_VFP:        /* VFP DBF file */
             case DB_DBF_IV:         /* dBase IV DBF file */
-               pData->bTableType = iType;
+               pData->bTableType = ( BYTE ) iType;
          }
          break;
       }
@@ -5789,7 +5789,7 @@ static HB_ERRCODE hb_dbfRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect
 #ifndef HB_LONG_LONG_OFF
             case DB_DBFLOCK_XHB64:
 #endif
-               pData->bLockType = ( int ) iScheme;
+               pData->bLockType = ( BYTE ) iScheme;
          }
          break;
       }

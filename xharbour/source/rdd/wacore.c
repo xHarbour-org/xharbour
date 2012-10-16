@@ -111,7 +111,7 @@ static void hb_waNodeInsert( PHB_STACKRDD pRddInfo, PHB_STACKRDD_TLS pRddTls, AR
          pRddInfo->waNums = ( USHORT * ) hb_xrealloc( pRddInfo->waNums, iSize * sizeof( USHORT ) );
       }
       memset( &pRddInfo->waNums[ pRddInfo->uiWaNumMax ], 0, ( iSize - pRddInfo->uiWaNumMax ) * sizeof( USHORT ) );
-      pRddInfo->uiWaNumMax = iSize;
+      pRddInfo->uiWaNumMax = ( USHORT ) iSize;
    }
 
    if( pRddInfo->uiWaSpace == 0 )
@@ -406,7 +406,7 @@ void hb_rddFlushAll( void )
 {
    PHB_STACKRDD      pRddInfo = hb_stackRDD();
    PHB_STACKRDD_TLS  pRddTls  = hb_stackRDDTLS();
-   USHORT            uiArea   = hb_rddGetCurrentWorkAreaNumber(), uiIndex;
+   USHORT            uiArea   = ( USHORT ) hb_rddGetCurrentWorkAreaNumber(), uiIndex;
 
    hb_rdd_wacore_Lock( pRddInfo );
 
@@ -425,7 +425,7 @@ void hb_rddUnLockAll( void )
 {
    PHB_STACKRDD      pRddInfo = hb_stackRDD();
    PHB_STACKRDD_TLS  pRddTls  = hb_stackRDDTLS();
-   USHORT            uiArea   = hb_rddGetCurrentWorkAreaNumber(), uiIndex;
+   USHORT            uiArea   = ( USHORT ) hb_rddGetCurrentWorkAreaNumber(), uiIndex;
 
    hb_rdd_wacore_Lock( pRddInfo );
 
@@ -571,7 +571,7 @@ HB_ERRCODE hb_rddSelectWorkAreaNumber( int iArea )
    if( iArea < 1 || iArea > HB_RDD_MAX_AREA_NUM )
       HB_SET_WA( 0 );
    else
-      HB_SET_WA( iArea );
+      HB_SET_WA( ( USHORT ) iArea );
 
    hb_rdd_wacore_Unlock( pRddInfo );
 
