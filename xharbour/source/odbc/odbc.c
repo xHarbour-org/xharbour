@@ -412,7 +412,7 @@ HB_FUNC( SQLGETINFO ) // hDbc, nType, @cResult
 HB_FUNC( SQLSETCONNECTOPTION ) // hDbc, nOption, uOption
 {
    hb_retns( ( HB_ISIZ ) SQLSetConnectOption( ( HDBC ) hb_parns( 1 ), ( UWORD ) hb_parns( 2 ),
-#if defined( __MINGW32__ ) && defined( HB_OS_WIN_64 )
+#if ( defined( __MINGW32__ ) || defined( _MSC_VER ) ) && defined( HB_OS_WIN_64 )
                                            ( UDWORD ) ISCHAR( 3 ) ? ( HB_LONG ) hb_parcx( 3 ) : hb_parns( 3 ) ) );
 #else
                                            ( UDWORD ) ISCHAR( 3 ) ? ( LONG ) hb_parcx( 3 ) : hb_parns( 3 ) ) );
@@ -422,7 +422,7 @@ HB_FUNC( SQLSETCONNECTOPTION ) // hDbc, nOption, uOption
 HB_FUNC( SQLSETSTMTOPTION ) // hStmt, nOption, uOption )  --> nRetCode
 {
    hb_retns( ( HB_ISIZ ) SQLSetStmtOption( ( SQLHSTMT ) hb_parns( 1 ), ( UWORD ) hb_parns( 2 ),
-#if defined( __MINGW32__ ) && defined( HB_OS_WIN_64 )
+#if ( defined( __MINGW32__ ) || defined( _MSC_VER ) ) && defined( HB_OS_WIN_64 )
                                         ( UDWORD ) ISCHAR( 3 ) ? ( HB_LONG ) hb_parcx( 3 ) : hb_parns( 3 ) ) );
 #else
                                         ( UDWORD ) ISCHAR( 3 ) ? ( LONG ) hb_parcx( 3 ) : hb_parns( 3 ) ) );

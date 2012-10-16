@@ -4,12 +4,8 @@
 #ifndef _CONFIG_H
    #define _CONFIG_H
 
-   #if defined( _MSC_VER )
-      #pragma warning( disable: 4018 )
-      #pragma warning( disable: 4065 )
-      #if ( _MSC_VER >= 1400 )
-         #define _CRT_SECURE_NO_WARNINGS
-      #endif
+   #if defined( _MSC_VER ) && ( _MSC_VER >= 1400 )
+      #define _CRT_SECURE_NO_WARNINGS
    #endif
 
    #include "hbsetup.h"
@@ -21,6 +17,10 @@
       #pragma warn(push)
       #pragma warn(disable:2154)
       #pragma warn(disable:2229)
+   #elif defined( _MSC_VER )
+      #pragma warning( disable: 4018 )
+      #pragma warning( disable: 4065 )
+      #pragma warning( disable: 4244 )
    #elif defined( __WATCOMC__ )
       #pragma disable_message ( 201 )
    #elif defined( __BORLANDC__ )

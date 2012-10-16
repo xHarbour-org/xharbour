@@ -658,7 +658,7 @@ pdc_check_filename(pdc_core *pdc, char *filename)
         pdc_error(pdc, PDC_E_IO_UNSUPP_UNINAME, 0, 0, 0, 0);
     filename = (char *) ffname;
 #endif
-
+    ( void ) pdc;
     return filename;
 }
 

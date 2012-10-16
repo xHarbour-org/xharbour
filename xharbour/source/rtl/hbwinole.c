@@ -2207,6 +2207,8 @@ HB_FUNC( PTR2INT )  // Ptr2Int( <pPointer> ) -> <nInteger>
 {
 #if defined( __MINGW32__ ) && defined( HB_OS_WIN_64 )
    hb_retni( ( int ) ( HB_LONG ) hb_parptr( 1 ) );
+#elif defined( _MSC_VER ) && defined( HB_OS_WIN_64 )
+   hb_retni( ( int ) ( HB_LONG ) hb_parptr( 1 ) );
 #else
    hb_retni( ( int ) hb_parptr( 1 ) );
 #endif

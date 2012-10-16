@@ -1343,7 +1343,7 @@ typedef BYTE HB_ATTR;
 #define HB_CHAR_HARD1           ( ( char ) HB_CHAR_CR )
 #define HB_CHAR_HARD2           ( ( char ) HB_CHAR_LF )
 
-#define HB_CHAR_SOFT1           ( ( char ) 141 )
+#define HB_CHAR_SOFT1           ( ( unsigned char ) 141 )
 #define HB_CHAR_SOFT2           ( ( char ) HB_CHAR_LF )
 
 #define HB_ISUPPER( c )         ( ( c ) >= 'A' && ( c ) <= 'Z' )

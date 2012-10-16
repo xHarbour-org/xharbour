@@ -235,7 +235,7 @@ pdf__shading(
     pdf_colorspace *cs;
     pdc_resopt *results;
     pdc_scalar N = 1.0;
-    pdc_scalar r_0, r_1;
+    pdc_scalar r_0 = 0.0, r_1 = 0.0;
     pdc_bool extend0 = pdc_false, extend1 = pdc_false, antialias = pdc_false;
     int retval = -1;
 

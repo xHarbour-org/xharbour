@@ -954,7 +954,7 @@ pdf_fit_xobject_internal(PDF *p, pdf_xobject_options *xo, pdf_fit_options *fit,
     pdc_vector tmpscale, elemscale, fitscale, purescale;
     pdc_vector elemsize, mirror, shift, relpos;
     pdc_vector polyline[5];
-    pdc_box fitbox, clipbox, elembox, redbox;
+    pdc_box fitbox, clipbox = {{0,0},{0,0}}, elembox, redbox;
     pdc_scalar x, y, ss;
     pdc_scalar rowsize = 1, lastratio = 1;
     pdc_scalar dpi_x, dpi_y, tx = 0, ty = 0, boxwidth, boxheight;

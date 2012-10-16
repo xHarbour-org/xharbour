@@ -357,7 +357,7 @@ void * hb_xalloc( HB_SIZE ulSize )         /* allocates fixed memory, returns NU
        * function/line info - this is a location of code that called
        * hb_xalloc/hb_xgrab
        */
-      pMem->uiProcLine = hb_tr_line_; /* C line number */
+      pMem->uiProcLine = ( USHORT ) hb_tr_line_; /* C line number */
       hb_xstrcpy( pMem->szProcName, hb_tr_file_, 0 );
    }
    else
@@ -454,7 +454,7 @@ void * hb_xgrab( HB_SIZE ulSize )         /* allocates fixed memory, exits on fa
        * function/line info - this is a location of code that called
        * hb_xalloc/hb_xgrab
        */
-      pMem->uiProcLine = hb_tr_line_; /* C line number */
+      pMem->uiProcLine = ( USHORT ) hb_tr_line_; /* C line number */
       hb_xstrcpy( pMem->szProcName, hb_tr_file_, 0 );
    }
    else
@@ -863,9 +863,9 @@ static char * hb_mem2str( char * membuffer, void * pMem, UINT uiSize )
          hinibble                      = cMem[ uiIndex ] >> 4;
          lownibble                     = cMem[ uiIndex ] & 0x0F;
          membuffer[ uiIndex * 2 ]      = hinibble <= 9 ?
-                                         ( '0' + hinibble ) : ( 'A' + hinibble - 10 );
+                                         ( char ) ( '0' + hinibble ) : ( char ) ( 'A' + hinibble - 10 );
          membuffer[ uiIndex * 2 + 1 ]  = lownibble <= 9 ?
-                                         ( '0' + lownibble ) : ( 'A' + lownibble - 10 );
+                                         ( char ) ( '0' + lownibble ) : ( char ) ( 'A' + lownibble - 10 );
       }
       membuffer[ uiIndex * 2 ] = '\0';
    }

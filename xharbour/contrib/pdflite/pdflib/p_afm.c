@@ -613,7 +613,7 @@ pdf_process_metrics_data(
                             {
                                 j = i + 1;
                                 ftm->widths[k] = ftm->glw[i].width;
-                                font->ft.code2gid[k] = j;
+                                font->ft.code2gid[k] = (pdc_ushort) j;
                                 foundglyphs++;
                             }
                         }
@@ -686,7 +686,7 @@ pdf_process_metrics_data(
                 {
                     j = i + 1;
                     ftm->widths[code] = ftm->glw[i].width;
-                    font->ft.code2gid[code] = j;
+                    font->ft.code2gid[code] = (pdc_ushort) j;
                     if (ev != NULL)
                     {
                         ev->codes[code] = ftm->glw[i].unicode;

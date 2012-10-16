@@ -3721,7 +3721,7 @@ TIFFReadDirectory(TIFF* tif)
 			case TIFFTAG_SMAXSAMPLEVALUE:
 				{
 
-					double *data;
+					double *data = 0;
 					enum TIFFReadDirEntryErr err;
 					uint32 saved_flags;
 					int m;

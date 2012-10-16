@@ -103,8 +103,11 @@ HB_FUNC( GAUGENEW )
       !( ISNUM( B_RIGHT ) &&
       ISNUM( B_LEFT ) &&
       ( hb_parni( B_RIGHT ) < hb_parni( B_LEFT ) + 9 ) ) );
-
+#if defined( _MSC_VER ) && defined( HB_OS_WIN_64 )
+   hb_itemPutC( hb_arrayGetItemPtr( &Return, B_BARCHAR),( ISCHAR( B_BARCHAR ) ? (char*) hb_parcx( B_BARCHAR ) : ( char * ) ( HB_LONG ) '\xdb'));
+#else
    hb_itemPutC( hb_arrayGetItemPtr( &Return, B_BARCHAR),( ISCHAR( B_BARCHAR ) ? (char*) hb_parcx( B_BARCHAR ) : ( char * ) '\xdb'));
+#endif
    hb_itemPutC( hb_arrayGetItemPtr( &Return, B_PERCENT), 0 );
 
    hb_itemReturnForward( &Return );

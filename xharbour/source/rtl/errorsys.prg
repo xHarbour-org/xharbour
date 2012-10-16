@@ -699,7 +699,7 @@ HB_FUNC( SETUNHANDLEDEXCEPTIONFILTER )
    #if defined( __MINGW32__ )
       hb_retnl( ( HB_LONG ) pDefaultHandler );
    #else
-      hb_retnl( ( long ) pDefaultHandler );
+      hb_retnl( ( long ) ( HB_LONG ) pDefaultHandler );
    #endif
 #else
    hb_retnl( (LONG) pDefaultHandler );

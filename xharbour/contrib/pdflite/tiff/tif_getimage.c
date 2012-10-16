@@ -466,7 +466,7 @@ TIFFReadRGBAImageOriented(TIFF* tif,
 
     if (TIFFRGBAImageOK(tif, emsg) &&
 	TIFFRGBAImageBegin(&img, tif, stop, emsg)) {
-	img.req_orientation = orientation;
+	img.req_orientation = (uint16) orientation;
 	/* XXX verify rwidth and rheight against width and height */
 	ok = TIFFRGBAImageGet(&img, raster+(rheight-img.height)*rwidth,
 	    rwidth, img.height);

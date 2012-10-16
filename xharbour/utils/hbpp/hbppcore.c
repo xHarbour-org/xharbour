@@ -1244,7 +1244,7 @@ int hb_pp_ParseDefine( char * sLine )
               iParams++;
 
               sMarker[0] = '\1';
-              sMarker[1] = iParams + 64;
+              sMarker[1] = (char) ( iParams + 64 );
               sMarker[2] = '\0';
 
               pTmp = (char *) sLine;
@@ -1257,7 +1257,7 @@ int hb_pp_ParseDefine( char * sLine )
               }
 
               sParams[iParamsLen++] = '\1';
-              sParams[iParamsLen++] = iParams + 64;
+              sParams[iParamsLen++] = (char) ( iParams + 64 );
               sParams[iParamsLen++] = ',';
 
               HB_SKIPTABSPACES( sLine );
@@ -7065,7 +7065,7 @@ static int NextWord( char ** sSource, char * sDest, BOOL lLower )
 
   while( **sSource != '\0' && **sSource != ' ' && **sSource != '\t' && **sSource != '(')
   {
-     *sDest++ = (lLower)? tolower(**sSource):**sSource;
+     *sDest++ = (lLower)? ( char ) tolower(**sSource):**sSource;
      (*sSource)++;
      i++;
   }

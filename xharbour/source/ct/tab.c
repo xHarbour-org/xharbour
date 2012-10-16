@@ -186,7 +186,7 @@ HB_FUNC( TABEXPAND )
          else if( ( unsigned char ) cChar == 141 )
          {
             /* soft carriage return */
-            *( pcRet + sRetLen ) = ( char ) 141;
+            *( pcRet + sRetLen ) = ( unsigned char ) 141;
             sRetLen++;
             sIndex++;
             if( iIgnore141 )
@@ -409,7 +409,7 @@ HB_FUNC( TABPACK )
                *( pcRet + sRetLen ) = cFill;
                sRetLen++;
             }
-            *( pcRet + sRetLen ) = ( char ) 141;
+            *( pcRet + sRetLen ) = ( unsigned char ) 141;
             sRetLen++;
             sTabIndex            = 0;
             sIndex++;

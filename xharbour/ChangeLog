@@ -8,6 +8,49 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-16 20:12 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbdefs.h
+  * source/ct/tab.c
+    ! HB_CHAR_SOFT1/(char) 141 is a truncated value, redefined as unsigned
+
+  * source/rtl/errorsys.prg
+  * source/rtl/hbwinole.c
+  * source/rtl/pcre/config.h
+  * source/vm/fm.c
+  * source/vm/extend.c
+  * source/odbc/odbc.c
+  * contrib/misc/gauge.c
+  * contrib/jpeg/jquant2.c
+  * contrib/tiff/tif_dirread.c
+  * contrib/tiff/tif_dirwrite.c
+  * contrib/tiff/tif_getimage.c
+  * contrib/tiff/tif_lzw.c
+  * contrib/tiff/tif_predict.c
+  * contrib/tiff/tif_read.c
+  * contrib/tiff/tif_open.c
+  * contrib/tiff/tif_win32.c
+  * contrib/pdflite/font/ft_truetype.c
+  * contrib/pdflite/pdcore/pc_file.c
+  * contrib/pdflite/pdcore/pc_output.c
+  * contrib/pdflite/pdflib/p_afm.c
+  * contrib/pdflite/pdflib/p_bmp.c
+  * contrib/pdflite/pdflib/p_image.c
+  * contrib/pdflite/pdflib/p_jpeg.c
+  * contrib/pdflite/pdflib/p_shading.c
+  * contrib/pdflite/pdflib/p_type3.c
+  * contrib/pdflite/pdflib/p_gif.c
+  * contrib/pdflite/tiff/tif_fax3.c
+  * contrib/pdflite/tiff/tif_getimage.c
+  * contrib/pdflite/tiff/tif_lzw.c
+  * contrib/pdflite/tiff/tif_ojpeg.c
+  * contrib/pdflite/tiff/tif_predict.c
+  * contrib/pdflite/tiff/tif_unix.c
+  * source/vm/thread.c
+  * utils/hbpp/hbppcore.c
+  * utils/hbmake/hbmlang.c
+    ! yet more MSVC warnings (W4) suppressed
+
+
 2012-10-16 11:16 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/jpeg/jdsample.c
     ! more MSVC warnings (W4) suppressed

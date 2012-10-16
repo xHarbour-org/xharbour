@@ -1908,7 +1908,9 @@ void hb_retnlllen( LONGLONG llNumber, int iWidth )
 #undef hb_retns
 void hb_retns( HB_ISIZ nNumber )
 {
+#if 0
    HB_THREAD_STUB_ANY
+#endif
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_retns(%" HB_PFS "d )", nNumber ) );
 
@@ -1917,7 +1919,9 @@ void hb_retns( HB_ISIZ nNumber )
 
 HB_ISIZ hb_parns( int iParam, ... )
 {
+#if 0
    HB_THREAD_STUB_ANY
+#endif
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_parns(%d, ...)", iParam ) );
 
@@ -1952,7 +1956,9 @@ HB_ISIZ hb_parns( int iParam, ... )
 
 int hb_storns( HB_ISIZ nValue, int iParam, ... )
 {
+#if 0
    HB_THREAD_STUB_ANY
+#endif
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_storvns(%" HB_PFS "d, %d, ...)", nValue, iParam ) );
 

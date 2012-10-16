@@ -522,7 +522,7 @@ TIFFSetFileName(TIFF* tif, const char *name)
 int
 TIFFFileno(TIFF* tif)
 {
-#if defined(__MINGW32__) && defined(HB_OS_WIN_64)
+#if ( defined(__MINGW32__) || defined( _MSC_VER ) ) && defined(HB_OS_WIN_64)
 	return ((int)(int64)tif->tif_fd);
 #else
 	return ((int)tif->tif_fd);
@@ -535,7 +535,7 @@ TIFFFileno(TIFF* tif)
 int
 TIFFSetFileno(TIFF* tif, int fd)
 {
-#if defined(__MINGW32__) && defined(HB_OS_WIN_64)
+#if ( defined(__MINGW32__) || defined( _MSC_VER ) ) && defined(HB_OS_WIN_64)
         int old_fd = (int) (int64) tif->tif_fd;
 	tif->tif_fd = (FILE*) (int64) fd;
 #else

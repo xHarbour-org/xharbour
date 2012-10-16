@@ -220,7 +220,7 @@ TIFFFdOpen(int ifd, const char* name, const char* mode)
 			break;
 		}
 	}
-#if defined(__MINGW32__) && defined(HB_OS_WIN_64)
+#if ( defined(__MINGW32__) || defined( _MSC_VER ) ) && defined(HB_OS_WIN_64)
 	tif = TIFFClientOpen(name, mode, (thandle_t)(int64)ifd,
 #else
 	tif = TIFFClientOpen(name, mode, (thandle_t)ifd,
@@ -230,7 +230,7 @@ TIFFFdOpen(int ifd, const char* name, const char* mode)
 			fSuppressMap ? _tiffDummyMapProc : _tiffMapProc,
 			fSuppressMap ? _tiffDummyUnmapProc : _tiffUnmapProc);
 	if (tif)
-#if defined(__MINGW32__) && defined(HB_OS_WIN_64)
+#if ( defined(__MINGW32__) || defined( _MSC_VER ) ) && defined(HB_OS_WIN_64)
 		tif->tif_fd = (FILE*) (int64) ifd;
 #else
 		tif->tif_fd = (FILE*) ifd;
@@ -273,7 +273,7 @@ TIFFOpen(const char* name, const char* mode)
 		return ((TIFF *)0);
 	}
 
-#if defined(__MINGW32__) && defined(HB_OS_WIN_64)
+#if ( defined(__MINGW32__) || defined( _MSC_VER ) ) && defined(HB_OS_WIN_64)
 	tif = TIFFFdOpen((int)(int64)fd, name, mode);
 #else
 	tif = TIFFFdOpen((int)fd, name, mode);
@@ -332,7 +332,7 @@ TIFFOpenW(const wchar_t* name, const char* mode)
 				    NULL, NULL);
 	}
 
-#if defined(__MINGW32__) && defined(HB_OS_WIN_64)
+#if ( defined(__MINGW32__) || defined( _MSC_VER ) ) && defined(HB_OS_WIN_64)
 	tif = TIFFFdOpen((int)(int64)fd,
 #else
 	tif = TIFFFdOpen((int)fd,

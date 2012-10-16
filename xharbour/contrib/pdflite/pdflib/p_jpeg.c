@@ -782,7 +782,7 @@ pdf_process_JPEG_data(
     const char *filename = NULL;
     pdc_bool ismem = pdc_false;
     void  *filebase = NULL;
-    size_t filelen;
+    size_t filelen = 0;
     pdf_image *image;
     int transform = 0;
     pdc_bool marker_found = pdc_false;
@@ -1134,11 +1134,11 @@ pdf_process_JPEG_data(
 		    /* We don't support more than 4 components */
 		    if (comp==JPEG_MAX_COMPS) break;
 
-		    image->info.jpeg.id[comp] = pdc_fgetc(image->fp);
-		    b = pdc_fgetc(image->fp);
+		    image->info.jpeg.id[comp] = (pdc_byte) pdc_fgetc(image->fp);
+		    b = (pdc_byte) pdc_fgetc(image->fp);
 		    image->info.jpeg.hsamp[comp] = (b >> 4) & 0x0F;
 		    image->info.jpeg.vsamp[comp] = b & 0x0F;
-		    image->info.jpeg.table[comp] = pdc_fgetc(image->fp);
+		    image->info.jpeg.table[comp] = (pdc_byte) pdc_fgetc(image->fp);
 		    length -= 3;
 		}
 
@@ -1337,7 +1337,7 @@ pdf_process_JPEG_data(
             /* check for start of scan marker */
             case M_SOS:
             {
-                pdc_byte comps = pdc_fgetc(image->fp);
+                pdc_byte comps = (pdc_byte) pdc_fgetc(image->fp);
                 length -= 1;
 
                 if (logg5)

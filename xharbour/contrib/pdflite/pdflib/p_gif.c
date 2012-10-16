@@ -699,7 +699,7 @@ ReadImage(PDF *p, pdf_image *image, PDF_data_source *src)
 		if ((v = readLWZ(p, image)) < 0)
 		    goto fini;
 
-		*dp++ = v;
+		*dp++ = (pdc_byte) v;
 	    }
 	    if ((ypos += step) >= h) {
 		do {
@@ -716,7 +716,7 @@ ReadImage(PDF *p, pdf_image *image, PDF_data_source *src)
 		if ((v = readLWZ(p, image)) < 0)
 		    goto fini;
 
-		*dp++ = v;
+		*dp++ = (pdc_byte) v;
 	    }
 	}
     }

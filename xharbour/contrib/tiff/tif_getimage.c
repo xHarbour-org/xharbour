@@ -504,7 +504,7 @@ TIFFReadRGBAImageOriented(TIFF* tif,
     int ok;
 
 	if (TIFFRGBAImageOK(tif, emsg) && TIFFRGBAImageBegin(&img, tif, stop, emsg)) {
-		img.req_orientation = orientation;
+		img.req_orientation = (uint16)orientation;
 		/* XXX verify rwidth and rheight against width and height */
 		ok = TIFFRGBAImageGet(&img, raster+(rheight-img.height)*rwidth,
 			rwidth, img.height);
@@ -2685,7 +2685,7 @@ BuildMapUaToAa(TIFFRGBAImage* img)
 	for (na=0; na<256; na++)
 	{
 		for (nv=0; nv<256; nv++)
-			*m++=(nv*na+127)/255;
+			*m++=(uint8)((nv*na+127)/255);
 	}
 	return(1);
 }
@@ -2705,7 +2705,7 @@ BuildMapBitdepth16To8(TIFFRGBAImage* img)
 	}
 	m=img->Bitdepth16To8;
 	for (n=0; n<65536; n++)
-		*m++=(n+128)/257;
+		*m++=(uint8)((n+128)/257);
 	return(1);
 }
 

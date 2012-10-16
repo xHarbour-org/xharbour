@@ -438,7 +438,7 @@ pdf_process_BMP_data(
     pdc_uint32 ncolors = 0, importcolors = 0, compression = PDF_BMP_RGB;
     pdc_ushort /* usdummy, */ bpp = 0, bpp_pdf = 0;
     pdc_sint32 width = 0, height = 0, dpi_x = 0, dpi_y = 0;
-    pdc_uint32 redmask = 0, greenmask = 0, bluemask = 0, ccmax;
+    pdc_uint32 redmask = 0, greenmask = 0, bluemask = 0, ccmax = 0;
     size_t nbytes;
     pdf_colorspace cs;
     pdf_colormap colormap;
@@ -639,8 +639,8 @@ pdf_process_BMP_data(
                     break;
             }
             image->info.bmp.redmask = redmask;
-            image->info.bmp.redmax = ccmax;
-            image->info.bmp.redmove = i;
+            image->info.bmp.redmax = (pdc_ushort) ccmax;
+            image->info.bmp.redmove = (pdc_ushort) i;
 
 
             for (i = 0; i < 32; i++)
@@ -650,8 +650,8 @@ pdf_process_BMP_data(
                     break;
             }
             image->info.bmp.greenmask = greenmask;
-            image->info.bmp.greenmax = ccmax;
-            image->info.bmp.greenmove = i;
+            image->info.bmp.greenmax = (pdc_ushort) ccmax;
+            image->info.bmp.greenmove = (pdc_ushort) i;
 
             for (i = 0; i < 32; i++)
             {
@@ -660,8 +660,8 @@ pdf_process_BMP_data(
                     break;
             }
             image->info.bmp.bluemask = bluemask;
-            image->info.bmp.bluemax = ccmax;
-            image->info.bmp.bluemove = i;
+            image->info.bmp.bluemax = (pdc_ushort) ccmax;
+            image->info.bmp.bluemove = (pdc_ushort) i;
         }
     }
 

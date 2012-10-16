@@ -816,8 +816,8 @@ pdc_put_pdffilename(pdc_output *out, const char *text, int len)
 
     if (isuni)
     {
-        ttext[0] = (char)PDF_BOM0;
-        ttext[1] = (char)PDF_BOM1;
+        ttext[0] = PDF_BOM0;
+        ttext[1] = PDF_BOM1;
         ia = 2;
         j = 2;
     }

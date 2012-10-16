@@ -828,7 +828,7 @@ TIFFWriteDirectorySec(TIFF* tif, int isimage, int imagedone, uint64* pdiroff)
 		uint32 nTmp;
 		TIFFDirEntry* o;
 		n=(uint8 *)dirmem;
-		*(uint16*)n=ndir;
+		*(uint16*)n=(uint16)ndir;
 		if (tif->tif_flags&TIFF_SWAB)
 			TIFFSwabShort((uint16*)n);
 		n+=2;

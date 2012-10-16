@@ -197,8 +197,8 @@ pdf_handle_t3font(PDF *p, const char *fontname, pdc_encoding enc,
             /* code found */
             if (code < font->ft.numcodes)
             {
-                font->ft.code2gid[code] = gid;
-                font->ft.gid2code[gid] = code;
+                font->ft.code2gid[code] = (pdc_ushort) gid;
+                font->ft.gid2code[gid] = (pdc_ushort) code;
 
                 if (!gid)
                     font->gid0code = code;

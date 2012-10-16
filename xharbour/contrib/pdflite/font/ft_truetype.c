@@ -1248,7 +1248,7 @@ tt_get_tab_post(tt_file *ttf)
     tp->maxMemType42 = tt_get_ulong(ttf);
     tp->minMemType1 = tt_get_ulong(ttf);
     tp->maxMemType1 = tt_get_ulong(ttf);
-    tp->numberOfGlyphs = ttf->numGlyphs;
+    tp->numberOfGlyphs = (tt_ushort) ttf->numGlyphs;
 
     /* there are subset fonts with different number of glyphs
      * see bug #1418
@@ -2017,7 +2017,7 @@ fnt_check_and_read_ttc(pdc_core *pdc, pdc_file *fp,
     pdc_bool retval = pdc_false;
     pdc_text_format textformat = PDC_UTF8;
     pdc_text_format targettextformat = pdc_utf16be;
-    int i, inlen, outlen;
+    int i, inlen, outlen = 0;
     int ift = -1;
 
     /* initialize */

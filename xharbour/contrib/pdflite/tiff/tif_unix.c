@@ -82,7 +82,7 @@ _tiffSeekProc(void* fd, toff_t off, int whence)
     }
     else
     {
-        return (-1);
+        return (toff_t)(-1);
     }
 
     /* return ((toff_t) fseek((FILE *)fd, (long) off, whence));*/

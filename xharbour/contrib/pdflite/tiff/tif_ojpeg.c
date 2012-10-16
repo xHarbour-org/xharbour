@@ -2212,7 +2212,11 @@ OJPEGVSetField(register TIFF *tif,ttag_t tag,va_list ap)
 				* sizeof(uint16));
                if(sp->jpeglosslesspredictors==NULL){return(0);}
                for(i2=0;i2<sp->jpeglosslesspredictors_length;i2++){
+#if ( defined (_MSC_VER) || defined(__MINGW32__) ) && defined(HB_OS_WIN_64)
+                ((uint16*)sp->jpeglosslesspredictors)[i2] = ((uint16*)(__int64)sp->cinfo.d.Ss)[i2];
+#else
                 ((uint16*)sp->jpeglosslesspredictors)[i2] = ((uint16*)sp->cinfo.d.Ss)[i2];
+#endif
                }
                sp->jpeglosslesspredictors_length*=sizeof(uint16);
                break;
@@ -2236,7 +2240,11 @@ OJPEGVSetField(register TIFF *tif,ttag_t tag,va_list ap)
                if(sp->jpegpointtransform==NULL){return(0);}
                for(i2=0;((uint16)i2)<sp->jpegpointtransform_length;i2++) {
                 ((uint16*)sp->jpegpointtransform)[i2] =
+#if ( defined (_MSC_VER) || defined(__MINGW32__) ) && defined(HB_OS_WIN_64)
+			((uint16*)(__int64)sp->cinfo.d.Al)[i2];
+#else
 			((uint16*)sp->cinfo.d.Al)[i2];
+#endif
                }
                sp->jpegpointtransform_length*=sizeof(uint16);
                break;
@@ -2447,7 +2455,7 @@ OJPEGVSetField(register TIFF *tif,ttag_t tag,va_list ap)
         we make a feeble effort to handle.
      */
         case TIFFTAG_WANG_PAGECONTROL      :
-          if (v32 == 0) v32 = -1;
+          if (v32 == 0) v32 = (uint32) -1;
           sp->is_WANG = v32;
           tag = TIFFTAG_JPEGPROC+FIELD_WANG_PAGECONTROL-FIELD_JPEGPROC;
           break;

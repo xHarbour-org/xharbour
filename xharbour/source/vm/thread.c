@@ -886,11 +886,11 @@ void * hb_create_a_thread( void * Cargo )
 
    if( _pStack_->bIsMethod )
    {
-      hb_vmSend( HB_VM_STACK.uiParams - 2 );
+      hb_vmSend( ( USHORT ) ( HB_VM_STACK.uiParams - 2 ) );
    }
    else
    {
-      hb_vmDo( HB_VM_STACK.uiParams - 1 );
+      hb_vmDo( ( USHORT ) ( HB_VM_STACK.uiParams - 1 ) );
    }
 
    #if defined( HB_OS_WIN ) || defined( HB_OS_OS2 )
