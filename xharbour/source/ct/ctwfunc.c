@@ -214,7 +214,7 @@ HB_FUNC( WBOX )
       HB_MEMCPY( szBoxBuf, pWBoxFrames[ iFrame ], 9 );
       if( ( iFrame & 4 ) == 0 )
       {
-         szBoxBuf[ 8 ] = hb_gtGetClearChar();
+         szBoxBuf[ 8 ] = ( BYTE ) hb_gtGetClearChar();
       }
       szBoxBuf[ 9 ]  = '0';
       szBox          = szBoxBuf;

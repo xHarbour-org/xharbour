@@ -8,6 +8,23 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-16 09:36 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/ct/atadjust.c
+  * source/ct/atnum.c
+  * source/ct/atrepl.c
+  * source/ct/ctstr.c
+  * source/ct/ctwfunc.c
+  * source/ct/ctwin.c
+  * source/ct/dattime2.c
+  * source/ct/numat.c
+  * source/ct/pack.c
+  * source/ct/print.c
+  * source/ct/screen1.c
+  * source/ct/settime.c
+  * source/ct/dattime3.c
+  * source/ct/screen2.c
+    ! more MSVC warnings (W4) suppressed
+
 2012-10-15 20:56 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbcomp.h
   * include/hbexprb.c

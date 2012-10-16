@@ -77,7 +77,7 @@ HB_FUNC( SAYDOWN )
 
       if( iRow >= 0 && iCol >= 0 && iRow <= iMaxRow && iCol <= iMaxCol )
       {
-         BYTE bColor = hb_gtGetCurrColor();
+         BYTE bColor = ( BYTE ) hb_gtGetCurrColor();
 
          if( ulLen > ( ULONG ) ( iMaxRow - iRow + 1 ) )
             ulLen = ( ULONG ) ( iMaxRow - iRow + 1 );
@@ -85,7 +85,7 @@ HB_FUNC( SAYDOWN )
          hb_gtBeginWrite();
          while( ulLen-- )
          {
-            hb_gtPutChar( iRow++, iCol, bColor, 0, *szText++ );
+            hb_gtPutChar( ( USHORT ) iRow++, ( USHORT ) iCol, bColor, 0, *szText++ );
             if( lDelay )
             {
                hb_gtEndWrite();
@@ -122,7 +122,7 @@ HB_FUNC( SAYSPREAD )
 
       if( iRow >= 0 && iCol >= 0 && iRow <= iMaxRow && iCol <= iMaxCol )
       {
-         BYTE bColor = hb_gtGetCurrColor();
+         BYTE bColor = ( BYTE ) hb_gtGetCurrColor();
 
          ulPos = ulLen >> 1;
          ulLen = ulLen & 1;
@@ -137,7 +137,7 @@ HB_FUNC( SAYSPREAD )
          do
          {
             for( ul = 0; ul < ulLen && iCol + ( int ) ul <= iMaxCol; ++ul )
-               hb_gtPutChar( iRow, iCol + ( int ) ul, bColor, 0, szText[ ulPos + ul ] );
+               hb_gtPutChar( ( USHORT ) iRow, ( USHORT ) ( iCol + ( int ) ul ), bColor, 0, szText[ ulPos + ul ] );
             ulLen += 2;
             if( lDelay )
             {
@@ -179,10 +179,10 @@ HB_FUNC( SAYMOVEIN )
 
       if( iRow >= 0 && iCol >= 0 && iRow <= iMaxRow && iCol <= iMaxCol )
       {
-         BYTE bColor = hb_gtGetCurrColor();
+         BYTE bColor = ( BYTE ) hb_gtGetCurrColor();
 
-         sRow  = iRow;
-         sCol  = iCol + ( int ) ulLen;
+         sRow  = ( SHORT ) iRow;
+         sCol  = ( SHORT ) ( iCol + ( int ) ulLen );
 
          if( fBack )
             iCol += (int) ulLen - 1;
@@ -200,14 +200,14 @@ HB_FUNC( SAYMOVEIN )
                if( iCol <= iMaxCol )
                {
                   for( ul = 0; ul < ulChars; ++ul )
-                     hb_gtPutChar( iRow, iCol + ( int ) ul, bColor, 0, szText[ ul ] );
+                     hb_gtPutChar( ( USHORT ) iRow, ( USHORT ) ( iCol + ( int ) ul ), bColor, 0, szText[ ul ] );
                }
                --iCol;
             }
             else
             {
                for( ul = 0; ul < ulChars; ++ul )
-                  hb_gtPutChar( iRow, iCol + ( int ) ul, bColor, 0, szText[ ul ] );
+                  hb_gtPutChar( ( USHORT ) iRow, ( USHORT ) ( iCol + ( int ) ul ), bColor, 0, szText[ ul ] );
                --szText;
             }
             if( ( int ) ulChars + iCol <= iMaxCol )
@@ -440,7 +440,7 @@ HB_FUNC( _HB_CTDSPTIME )
          iHour -= 12;
       else if( iHour == 0 )
          iHour = 12;
-      szTime[ 0 ] = ( iHour / 10 ) + '0';
+      szTime[ 0 ] = ( char ) ( ( iHour / 10 ) + '0' );
       szTime[ 1 ] = ( iHour % 10 ) + '0';
    }
 
@@ -449,7 +449,7 @@ HB_FUNC( _HB_CTDSPTIME )
 
    hb_gtDispBegin();
    for( i = 0; i < iLen; ++sCol, ++i )
-      hb_gtPutScrChar( sRow, sCol, iColor, 0, szTime[ i ] );
+      hb_gtPutScrChar( ( USHORT ) sRow, ( USHORT ) sCol, ( BYTE ) iColor, 0, szTime[ i ] );
    hb_gtDispEnd();
 }
 

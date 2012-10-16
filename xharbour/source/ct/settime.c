@@ -79,10 +79,10 @@ HB_FUNC( SETNEWDATE )
       // BOOL lMode;
       SYSTEMTIME  st;
 
-      wNewYear       = hb_parni( 1 );
-      wNewMonth      = hb_parni( 2 );
-      wNewDay        = hb_parni( 3 );
-      wNewDayOfWeek  = hb_parni( 4 );
+      wNewYear       = ( WORD ) hb_parni( 1 );
+      wNewMonth      = ( WORD ) hb_parni( 2 );
+      wNewDay        = ( WORD ) hb_parni( 3 );
+      wNewDayOfWeek  = ( WORD ) hb_parni( 4 );
       // lMode = hb_parl(5);
 
       GetLocalTime( &st );

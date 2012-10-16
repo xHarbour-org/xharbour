@@ -387,7 +387,7 @@ void ct_setatlikechar( char cNewChar )
 char ct_getatlikechar( void )
 {
    HB_TRACE( HB_TR_DEBUG, ( "ct_getatlikechar()" ) );
-   return scAtLikeChar;
+   return ( char ) scAtLikeChar;
 }
 
 HB_FUNC( SETATLIKE )

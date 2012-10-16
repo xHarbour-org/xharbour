@@ -315,7 +315,7 @@ HB_FUNC( DMY )
 
       if( iDay < 10 )
       {
-         szMDY[ iLen ] = iDay + 0x30;
+         szMDY[ iLen ] = ( char ) ( iDay + 0x30 );
          iLen++;
       }
       else
@@ -414,7 +414,7 @@ HB_FUNC( MDY )
 
       if( iDay < 10 )
       {
-         szMDY[ iLen ] = iDay + 0x30;
+         szMDY[ iLen ] = ( char ) ( iDay + 0x30 );
          iLen++;
       }
       else

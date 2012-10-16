@@ -65,7 +65,7 @@ HB_FUNC( NUMAT )
       int            iMultiPass        = ct_getatmupa();
       int            iAtLike           = ct_getatlike();
       char           cAtLike           = ct_getatlikechar();
-      HB_SIZE        sIgnore, sMatchStrLen, sSubStrLen;
+      HB_SIZE        sIgnore, sMatchStrLen = 0, sSubStrLen;
       ULONG          ulCounter;
       const char *   pc, * pcSubStr;
 
