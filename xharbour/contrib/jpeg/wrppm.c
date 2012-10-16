@@ -93,6 +93,8 @@ put_pixel_rows (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
 {
   ppm_dest_ptr dest = (ppm_dest_ptr) dinfo;
 
+  ( void ) cinfo;
+  ( void ) rows_supplied;
   (void) JFWRITE(dest->pub.output_file, dest->iobuffer, dest->buffer_width);
 }
 
@@ -110,6 +112,9 @@ copy_pixel_rows (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
   register char * bufferptr;
   register JSAMPROW ptr;
   register JDIMENSION col;
+
+  ( void ) rows_supplied;
+  ( void ) cinfo;
 
   ptr = dest->pub.buffer[0];
   bufferptr = dest->iobuffer;
@@ -138,6 +143,8 @@ put_demapped_rgb (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
   register JSAMPROW color_map2 = cinfo->colormap[2];
   register JDIMENSION col;
 
+  ( void ) rows_supplied;
+
   ptr = dest->pub.buffer[0];
   bufferptr = dest->iobuffer;
   for (col = cinfo->output_width; col > 0; col--) {
@@ -159,6 +166,8 @@ put_demapped_gray (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
   register JSAMPROW ptr;
   register JSAMPROW color_map = cinfo->colormap[0];
   register JDIMENSION col;
+
+  ( void ) rows_supplied;
 
   ptr = dest->pub.buffer[0];
   bufferptr = dest->iobuffer;

@@ -78,6 +78,8 @@ put_pixel_rows (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
   register JDIMENSION col;
   int pad;
 
+  ( void ) rows_supplied;
+
   /* Access next row in virtual array */
   image_ptr = (*cinfo->mem->access_virt_sarray)
     ((j_common_ptr) cinfo, dest->whole_image,
@@ -113,6 +115,8 @@ put_gray_rows (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
   register JDIMENSION col;
   int pad;
 
+  ( void ) rows_supplied;
+
   /* Access next row in virtual array */
   image_ptr = (*cinfo->mem->access_virt_sarray)
     ((j_common_ptr) cinfo, dest->whole_image,
@@ -141,6 +145,8 @@ put_gray_rows (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
 METHODDEF(void)
 start_output_bmp (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
 {
+  ( void ) dinfo;
+  ( void ) cinfo;
   /* no work here */
 }
 

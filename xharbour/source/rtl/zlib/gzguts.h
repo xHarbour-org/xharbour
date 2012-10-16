@@ -6,9 +6,13 @@
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
-#if defined( _MSC_VER ) && ( _MSC_VER >= 1400 ) && !defined( _CRT_SECURE_NO_WARNINGS )
-   #define _CRT_SECURE_NO_WARNINGS
+#if defined( __POCC__ )
+#elif defined( _MSC_VER )
+   #if ( _MSC_VER >= 1400 ) && !defined( _CRT_SECURE_NO_WARNINGS )
+      #define _CRT_SECURE_NO_WARNINGS
+   #endif
    #pragma warning (disable:4996)
+   #pragma warning (disable:4244)
 #endif
 
 #ifdef _LARGEFILE64_SOURCE

@@ -986,9 +986,9 @@ decode_mcu_AC_refine (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
 	    if (GET_BITS(1)) {
 	      if ((*thiscoef & p1) == 0) { /* do nothing if already set it */
 		if (*thiscoef >= 0)
-		  *thiscoef += p1;
+		  *thiscoef += (JCOEF) p1;
 		else
-		  *thiscoef += m1;
+		  *thiscoef += (JCOEF) m1;
 	      }
 	    }
 	  } else {
@@ -1020,9 +1020,9 @@ decode_mcu_AC_refine (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
 	  if (GET_BITS(1)) {
 	    if ((*thiscoef & p1) == 0) { /* do nothing if already changed it */
 	      if (*thiscoef >= 0)
-		*thiscoef += p1;
+		*thiscoef += (JCOEF) p1;
 	      else
-		*thiscoef += m1;
+		*thiscoef += (JCOEF) m1;
 	    }
 	  }
 	}

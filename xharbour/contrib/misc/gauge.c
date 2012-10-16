@@ -138,8 +138,8 @@ HB_FUNC( GAUGEDISPLAY )
                 (BYTE *) B_BOXLINES );
 
       if( hb_arrayGetL( pArray, B_DISPLAYNUM ) )
-         hb_gtWriteAt( (USHORT) hb_arrayGetNL( pArray, B_TOP ),
-                       iCenter, ( BYTE * ) "[      ]", 8 );
+         hb_gtWriteAt( ( USHORT ) hb_arrayGetNL( pArray, B_TOP ),
+                       ( USHORT ) iCenter, ( BYTE * ) "[      ]", 8 );
 
       hb_gtSetColorStr( szOldColor );
 
@@ -195,9 +195,9 @@ static void hb_gaugeUpdate( PHB_ITEM pArray, float fPercent )
    iMax = hb_arrayGetNL( pArray, B_BOTTOM ) - hb_arrayGetNL( pArray, B_TOP ) - 1;
    for( iRow = 1; iRow <= iMax; iRow++ )
    {
-      hb_gtRepChar( (USHORT) (iRow + hb_arrayGetNL( pArray, B_TOP )),
-                    (USHORT) (hb_arrayGetNL( pArray, B_LEFT ) + 1),
-                    ( BYTE ) * hb_arrayGetCPtr( pArray, B_BARCHAR ), iCols );
+      hb_gtRepChar( ( USHORT ) (iRow + hb_arrayGetNL( pArray, B_TOP )),
+                    ( USHORT ) (hb_arrayGetNL( pArray, B_LEFT ) + 1),
+                    ( BYTE ) * hb_arrayGetCPtr( pArray, B_BARCHAR ), ( USHORT ) iCols );
    }
 
    hb_gtSetColorStr( szOldColor );

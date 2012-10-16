@@ -8,6 +8,33 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-16 11:06 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/zlib/zutil.h
+  * source/rtl/zlib/gzguts.h
+  * source/odbc/odbc.c
+  * contrib/misc/hb_f.c
+  * contrib/misc/gauge.c
+  * contrib/jpeg/jctrans.c
+  * contrib/jpeg/jdatadst.c
+  * contrib/jpeg/jmemansi.c
+  * contrib/jpeg/jccoefct.c
+  * contrib/jpeg/jccolor.c
+  * contrib/jpeg/jcsample.c
+  * contrib/jpeg/jdatasrc.c
+  * contrib/jpeg/jdhuff.c
+  * contrib/jpeg/jdcoefct.c
+  * contrib/jpeg/jdpostct.c
+  * contrib/jpeg/jdcolor.c
+  * contrib/jpeg/jquant1.c
+  * contrib/jpeg/jdmerge.c
+  * contrib/jpeg/jdarith.c
+  * contrib/jpeg/wrbmp.c
+  * contrib/jpeg/wrgif.c
+  * contrib/jpeg/wrppm.c
+  * contrib/jpeg/wrtarga.c
+    ! more MSVC warnings (W4) suppressed
+
 2012-10-16 09:36 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/ct/atadjust.c
   * source/ct/atnum.c

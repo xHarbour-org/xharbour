@@ -105,6 +105,8 @@ put_pixel_rows (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
   register char * outptr;
   register JDIMENSION col;
 
+  ( void ) rows_supplied;
+
   inptr = dest->pub.buffer[0];
   outptr = dest->iobuffer;
   for (col = cinfo->output_width; col > 0; col--) {
@@ -125,6 +127,8 @@ put_gray_rows (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
   register JSAMPROW inptr;
   register char * outptr;
   register JDIMENSION col;
+
+  ( void ) rows_supplied;
 
   inptr = dest->pub.buffer[0];
   outptr = dest->iobuffer;
@@ -149,6 +153,8 @@ put_demapped_gray (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
   register char * outptr;
   register JSAMPROW color_map0 = cinfo->colormap[0];
   register JDIMENSION col;
+
+  ( void ) rows_supplied;
 
   inptr = dest->pub.buffer[0];
   outptr = dest->iobuffer;
