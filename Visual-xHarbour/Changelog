@@ -8,6 +8,10 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-16 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed RTE in DataGrid after processing OnRowChanging event.
+   ! Fixed RTE in DataGrid processing keystrokes when no header Tag has been set.
+
 2012-10-15 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed EditBox AutoH/VScroll initial values.
 

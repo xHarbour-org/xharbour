@@ -107,6 +107,7 @@ CLASS DataGrid INHERIT Control
    DATA aSelected               EXPORTED INIT {}
    DATA aTagged                 EXPORTED  INIT {}
    DATA CurPos                  EXPORTED INIT 1
+   DATA CurTag                  EXPORTED
 
    ACCESS RowCount              INLINE LEN( ::__DisplayArray )
    ACCESS ColCount              INLINE LEN( ::Children )
@@ -1269,6 +1270,7 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
                IF ! Empty( ::Children[ nClickCol ]:Tag )
                   ::DataSource:OrdSetFocus( ::Children[ nClickCol ]:Tag )
                   ::Children[ nClickCol ]:DrawHeader( ::Drawing:hDC,,,, .T. )
+                  ::CurTag := ::Children[ nClickCol ]:Tag
                   ::Update()
                ENDIF
 
@@ -1378,6 +1380,9 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    IF nClickRow != ::RowPos
       lRes := ::OnRowChanging()
       DEFAULT lRes TO ExecuteEvent( "OnRowChanging", Self )
+      IF ValType( lRes ) != "L"
+         lRes := NIL
+      ENDIF
       DEFAULT lRes TO .T.
       IF !lRes
          RETURN NIL
@@ -1386,6 +1391,9 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    IF nClickCol != ::ColPos
       lRes := ::OnColChanging()
       DEFAULT lRes TO ExecuteEvent( "OnColChanging", Self )
+      IF ValType( lRes ) != "L"
+         lRes := NIL
+      ENDIF
       DEFAULT lRes TO .T.
       IF !lRes
          RETURN NIL
@@ -1688,30 +1696,32 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS DataGrid
            ENDIF
 
       OTHERWISE
-           IF EMPTY( ::__cSearch )
-              // Start auto clearing timer
-              ::SetTimer( 10, 2000 )
-           ENDIF
-           IF nwParam == VK_BACK 
-              IF ! EMPTY( ::__cSearch )
-                 ::__cSearch := LEFT( ::__cSearch, LEN( ::__cSearch )-1 )
+           IF ! nwParam IN { VK_RETURN, VK_DELETE, VK_TAB, VK_SHIFT } .AND. ! Empty( ::CurTag )
+              IF EMPTY( ::__cSearch )
+                 // Start auto clearing timer
+                 ::SetTimer( 10, 2000 )
               ENDIF
-            ELSE
-              ::KillTimer( 10 )
-              ::__cSearch += CHR( nwParam )
-           ENDIF
-           IF EMPTY( ::__cSearch )
-              ::KillTimer( 10 )
-            ELSE
-              nRec := ::DataSource:recno()
-              IF ::DataSource:Seek( ::__cSearch )
-                 ::Update()
-                 ::OnRowChanged()
-                 ExecuteEvent( "OnRowChanged", Self )
+              IF nwParam == VK_BACK 
+                 IF ! EMPTY( ::__cSearch )
+                    ::__cSearch := LEFT( ::__cSearch, LEN( ::__cSearch )-1 )
+                 ENDIF
                ELSE
-                 ::DataSource:Goto( nRec )
+                 ::KillTimer( 10 )
+                 ::__cSearch += CHR( nwParam )
               ENDIF
-              ::SetTimer( 10, 2000 )
+              IF EMPTY( ::__cSearch )
+                 ::KillTimer( 10 )
+               ELSE
+                 nRec := ::DataSource:recno()
+                 IF ::DataSource:Seek( ::__cSearch )
+                    ::Update()
+                    ::OnRowChanged()
+                    ExecuteEvent( "OnRowChanged", Self )
+                  ELSE
+                    ::DataSource:Goto( nRec )
+                 ENDIF
+                 ::SetTimer( 10, 2000 )
+              ENDIF
            ENDIF
    ENDCASE
    IF lVUpdate
@@ -3114,6 +3124,9 @@ METHOD Down() CLASS DataGrid
 
    lRes := ::OnRowChanging()
    DEFAULT lRes TO ExecuteEvent( "OnRowChanging", Self )
+   IF ValType( lRes ) != "L"
+      lRes := NIL
+   ENDIF
    DEFAULT lRes TO .T.
    IF !lRes
       RETURN NIL
@@ -3221,6 +3234,9 @@ METHOD Up() CLASS DataGrid
    
    lRes := ::OnRowChanging()
    DEFAULT lRes TO ExecuteEvent( "OnRowChanging", Self )
+   IF ValType( lRes ) != "L"
+      lRes := NIL
+   ENDIF
    DEFAULT lRes TO .T.
    IF !lRes
       RETURN NIL
@@ -3325,6 +3341,9 @@ METHOD PageDown( nCount ) CLASS DataGrid
 
    lRes := ::OnRowChanging()
    DEFAULT lRes TO ExecuteEvent( "OnRowChanging", Self )
+   IF ValType( lRes ) != "L"
+      lRes := NIL
+   ENDIF
    DEFAULT lRes TO .T.
    IF !lRes
       RETURN NIL
@@ -3422,6 +3441,9 @@ METHOD PageUp() CLASS DataGrid
 
    lRes := ::OnRowChanging()
    DEFAULT lRes TO ExecuteEvent( "OnRowChanging", Self )
+   IF ValType( lRes ) != "L"
+      lRes := NIL
+   ENDIF
    DEFAULT lRes TO .T.
    IF !lRes
       RETURN NIL
@@ -3496,6 +3518,9 @@ METHOD Home() CLASS DataGrid
 
    lRes := ::OnRowChanging()
    DEFAULT lRes TO ExecuteEvent( "OnRowChanging", Self )
+   IF ValType( lRes ) != "L"
+      lRes := NIL
+   ENDIF
    DEFAULT lRes TO .T.
    IF !lRes
       RETURN NIL
@@ -3546,6 +3571,9 @@ METHOD End( lVUpdate ) CLASS DataGrid
 
    lRes := ::OnRowChanging()
    DEFAULT lRes TO ExecuteEvent( "OnRowChanging", Self )
+   IF ValType( lRes ) != "L"
+      lRes := NIL
+   ENDIF
    DEFAULT lRes TO .T.
    IF !lRes
       RETURN NIL
