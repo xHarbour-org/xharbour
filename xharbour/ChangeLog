@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-16 22:26 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/firebird/firebird.c
+  * contrib/firebird/tfirebird.prg
+    + added missing support for aliases in sql queries
+    ! proper translation sql TIMESTAMP -> Harbour's T value type
+    (updated via hrb)
+
 2012-10-16 21:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/hardcr.c
   * source/rtl/mtran.c

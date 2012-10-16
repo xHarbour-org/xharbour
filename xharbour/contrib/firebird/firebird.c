@@ -71,8 +71,6 @@
    #define ISC_INT64_FORMAT PFLL
 #endif
 
-#define HB_ISPOINTER ISPOINTER
-
 /* GC object handlers */
 
 static HB_GARBAGE_FUNC( FB_db_handle_release )
@@ -197,6 +195,7 @@ HB_FUNC( FBCLOSE )
       hb_errRT_BASE( EG_ARG, 2020, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }
 
+
 HB_FUNC( FBERROR )
 {
    char msg[ 1024 ];
@@ -271,7 +270,7 @@ HB_FUNC( FBEXECUTE )
       ISC_STATUS      status_rollback[ 20 ];
       unsigned short  dialect = ( unsigned short ) hb_parni( 3 );
 
-      if( HB_ISPOINTER( 4 ) )
+      if( ISPOINTER( 4 ) )
          trans = ( isc_tr_handle ) ( HB_PTRDIFF ) hb_parptr( 4 );
       else
       {
@@ -284,14 +283,14 @@ HB_FUNC( FBEXECUTE )
 
       if( isc_dsql_execute_immediate( status, &db, &trans, 0, exec_str, dialect, NULL ) )
       {
-         if( ! HB_ISPOINTER( 4 ) )
+         if( ! ISPOINTER( 4 ) )
             isc_rollback_transaction( status_rollback, &trans );
 
          hb_retnl( isc_sqlcode( status ) );
          return;
       }
 
-      if( ! HB_ISPOINTER( 4 ) )
+      if( ! ISPOINTER( 4 ) )
       {
          if( isc_commit_transaction( status, &trans ) )
          {
@@ -326,7 +325,7 @@ HB_FUNC( FBQUERY )
       PHB_ITEM aNew;
       PHB_ITEM aTemp;
 
-      if( HB_ISPOINTER( 4 ) )
+      if( ISPOINTER( 4 ) )
          trans = ( isc_tr_handle ) ( HB_PTRDIFF ) hb_parptr( 4 );
       else if( isc_start_transaction( status, &trans, 1, &db, 0, NULL ) )
       {
@@ -407,13 +406,15 @@ HB_FUNC( FBQUERY )
          if( var->sqltype & 1 )
             var->sqlind = ( short * ) hb_xgrab( sizeof( short ) );
 
-         hb_arrayNew( aTemp, 5 );
+         hb_arrayNew( aTemp, 7 );
 
          hb_arraySetC(  aTemp, 1, sqlda->sqlvar[ i ].sqlname );
          hb_arraySetNL( aTemp, 2, ( long ) dtype );
          hb_arraySetNL( aTemp, 3, sqlda->sqlvar[ i ].sqllen );
          hb_arraySetNL( aTemp, 4, sqlda->sqlvar[ i ].sqlscale );
          hb_arraySetC(  aTemp, 5, sqlda->sqlvar[ i ].relname );
+         hb_arraySetNL( aTemp, 6, sqlda->sqlvar[ i ].aliasname_length ); /* support for aliases */
+         hb_arraySetC(  aTemp, 7, sqlda->sqlvar[ i ].aliasname ); /* support for aliases */
 
          hb_arraySetForward( aNew, i + 1, aTemp );
       }
@@ -445,7 +446,7 @@ HB_FUNC( FBQUERY )
       hb_arraySetPtr( qry_handle, 1, ( void * ) ( HB_PTRDIFF ) stmt );
       hb_arraySetPtr( qry_handle, 2, ( void * ) ( HB_PTRDIFF ) sqlda );
 
-      if( ! HB_ISPOINTER( 4 ) )
+      if( ! ISPOINTER( 4 ) )
          hb_arraySetPtr( qry_handle, 3, ( void * ) ( HB_PTRDIFF ) trans );
 
       hb_arraySetNL( qry_handle, 4, ( long ) num_cols );
@@ -703,7 +704,7 @@ HB_FUNC( FBGETBLOB )
       char             p[ 1024 ];
       ISC_STATUS       blob_stat;
 
-      if( HB_ISPOINTER( 3 ) )
+      if( ISPOINTER( 3 ) )
          trans = ( isc_tr_handle ) ( HB_PTRDIFF ) hb_parptr( 3 );
       else
       {
@@ -753,7 +754,7 @@ HB_FUNC( FBGETBLOB )
          return;
       }
 
-      if( ! HB_ISPOINTER( 3 ) )
+      if( ! ISPOINTER( 3 ) )
       {
          if( isc_commit_transaction( status, &trans ) )
          {

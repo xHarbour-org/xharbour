@@ -522,7 +522,9 @@ METHOD New( nDB, cQuery, nDialect ) CLASS TFbQuery
    ::dialect := nDialect
    ::closed := .T.
    ::aKeys := NIL
+
    ::Refresh()
+
    RETURN self
 
 METHOD Refresh() CLASS TFbQuery
@@ -551,13 +553,14 @@ METHOD Refresh() CLASS TFbQuery
 
       /* TOFIX: This is faulty code. ::aStruct will become zero length, out of sync with ::numcols. */
       ::aStruct := StructConvert( qry[ 6 ], ::db, ::dialect )
+
       ::lError := .F.
       ::nError := 0
       ::qry := qry
 
       /* Tables in query */
       FOR i := 1 TO Len( ::aStruct )
-         IF AScan( aTable, ::aStruct[ i ][ 5 ] ) == 0
+         IF ASCAN( aTable, ::aStruct[ i ][ 5 ], , , .T. ) == 0
             AAdd( aTable, ::aStruct[ i ][ 5 ] )
          ENDIF
       NEXT
@@ -568,6 +571,7 @@ METHOD Refresh() CLASS TFbQuery
       ::lError := .T.
       ::nError := qry
    ENDIF
+
    RETURN result
 
 METHOD Destroy() CLASS TFbQuery
@@ -697,9 +701,9 @@ METHOD FieldGet( nField ) CLASS TFbQuery
 
       ELSEIF cType == "D"
          IF result != NIL
-            result := SToD( Left( result, 4 ) + SubStr( result, 5, 2 ) + SubStr( result, 7, 2 ) )
+            result := STOD( Left( result, 4 ) + SubStr( result, 5, 2 ) + SubStr( result, 7, 2 ) )
          ELSE
-            result := SToD()
+            result := STOD()
          ENDIF
 
       ELSEIF cType == "L"
@@ -755,7 +759,7 @@ METHOD GetBlankRow() CLASS TFbQuery
             aRow[ i ] := .F.
             EXIT
          CASE "D"
-            aRow[ i ] := SToD()
+            aRow[ i ] := STOD()
             EXIT
          ENDSWITCH
       NEXT
@@ -978,13 +982,15 @@ STATIC FUNCTION StructConvert( aStru, db, dialect )
    IF HB_ISARRAY( qry )
 
       DO WHILE FBFetch( qry ) == 0
-         AAdd( aDomains, { FBGetdata( qry, 1 ), FBGetdata( qry, 2 ), FBGetdata( qry, 3 ) } )
+         AAdd( aDomains, { iif( FBGetdata( qry, 1 ) == NIL, "", FBGetdata( qry, 1 ) ),;
+                           iif( FBGetdata( qry, 2 ) == NIL, "", FBGetdata( qry, 2 ) ),;
+                           iif( FBGetdata( qry, 3 ) == NIL, "", FBGetdata( qry, 3 ) ) } )
       ENDDO
 
       FBFree( qry )
 
       FOR i := 1 TO Len( aStru )
-         cField := RTrim( aStru[ i ][ 1 ] )
+         cField := RTrim( aStru[ i ][ 7 ] )
          nType := aStru[ i ][ 2 ]
          nSize := aStru[ i ][ 3 ]
          nDec := aStru[ i ][ 4 ] * -1
@@ -1006,8 +1012,8 @@ STATIC FUNCTION StructConvert( aStru, db, dialect )
             cType := "C"
             EXIT
          CASE SQL_SHORT
-               /* Firebird doesn't have boolean field, so if you define domain with BOOL then i will consider logical, ex:
-              create domain boolean_field as smallint default 0 not null check (value in (0,1)) */
+            /* Firebird doesn't have boolean field, so if you define domain with BOOL then i will consider logical, ex:
+               create domain boolean_field as smallint default 0 not null check (value in (0,1)) */
 
             IF "BOOL" $ cDomain
                cType := "L"
@@ -1035,7 +1041,7 @@ STATIC FUNCTION StructConvert( aStru, db, dialect )
             nSize := 15
             EXIT
          CASE SQL_TIMESTAMP
-            cType := "D"
+            cType := "T"
             nSize := 8
             EXIT
          CASE SQL_TYPE_DATE
