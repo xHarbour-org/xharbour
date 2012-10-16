@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-16 21:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/hardcr.c
+  * source/rtl/mtran.c
+  * source/rtl/mlcfunc.c
+  * source/rtl/txtline.c
+    ! required casting due to recent change in HB_CHAR_SOFT1
+
 2012-10-16 20:12 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbdefs.h
   * source/ct/tab.c
@@ -49,7 +56,6 @@
   * utils/hbpp/hbppcore.c
   * utils/hbmake/hbmlang.c
     ! yet more MSVC warnings (W4) suppressed
-
 
 2012-10-16 11:16 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/jpeg/jdsample.c

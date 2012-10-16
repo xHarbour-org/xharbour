@@ -129,7 +129,7 @@ void hb_readLine( const char * szText, HB_SIZE ulTextLen, HB_SIZE uiLineLen, USH
       {
          ulCurrCol += uiTabLen - ( ulCurrCol % uiTabLen );
       }
-      else if( szText[ ulPos ] == HB_CHAR_SOFT1 && szText[ ulPos + 1 ] == HB_CHAR_SOFT2 )
+      else if( ( unsigned char ) szText[ ulPos ] == HB_CHAR_SOFT1 && szText[ ulPos + 1 ] == HB_CHAR_SOFT2 )
       {
          // Clipper does NOT considers SOFT CR as a word seperator - WHY?
          // Should we not fix that?
@@ -191,7 +191,7 @@ LONG hb_tabexpand( const char * szString, char * szRet, HB_SIZE lEnd, USHORT uiT
       {
          lSpAdded += ( ( uiTabLen > 0 ) ? uiTabLen - ( ( lPos + lSpAdded ) % uiTabLen ) - 1 : 0 );
       }
-      else if( ( lPos < ( LONG ) lEnd && szString[ lPos ] == HB_CHAR_SOFT1 && szString[ lPos + 1 ] == HB_CHAR_SOFT2 ) || szString[ lPos ] == HB_CHAR_LF )
+      else if( ( lPos < ( LONG ) lEnd && ( unsigned char ) szString[ lPos ] == HB_CHAR_SOFT1 && szString[ lPos + 1 ] == HB_CHAR_SOFT2 ) || szString[ lPos ] == HB_CHAR_LF )
       {
          lSpAdded--;
       }

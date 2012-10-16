@@ -87,7 +87,7 @@ static HB_SIZE hb_mlGetLine( const char * pszString, HB_SIZE ulLen, HB_SIZE ulOf
 
    while( ulOffset < ulLen && ( ulMaxPos == 0 || ulOffset < ulMaxPos ) )
    {
-      if( pszString[ ulOffset ] == HB_CHAR_SOFT1 &&
+      if( ( unsigned char ) pszString[ ulOffset ] == HB_CHAR_SOFT1 &&
           pszString[ ulOffset + 1 ] == HB_CHAR_SOFT2 )
       {
          ulOffset += 2;
@@ -124,7 +124,7 @@ static HB_SIZE hb_mlGetLine( const char * pszString, HB_SIZE ulLen, HB_SIZE ulOf
                ulCol = ulLineLength;
                if( pszString[ ulOffset ] == ' ' )
                   ++ulOffset;
-               if( pszString[ ulOffset ] == HB_CHAR_SOFT1 &&
+               if( ( unsigned char ) pszString[ ulOffset ] == HB_CHAR_SOFT1 &&
                    pszString[ ulOffset + 1 ] == HB_CHAR_SOFT2 )
                   ulOffset += 2;
             }
@@ -301,7 +301,7 @@ HB_FUNC( MEMOLINE )
             }
             while( --ul && ulCol < ulCols );
          }
-         else if( pszString[ ulOffset ] == HB_CHAR_SOFT1 &&
+         else if( ( unsigned char ) pszString[ ulOffset ] == HB_CHAR_SOFT1 &&
                   pszString[ ulOffset + 1 ] == HB_CHAR_SOFT2 )
          {
             ulOffset++;
@@ -463,11 +463,11 @@ HB_FUNC( MPOSTOLC )
 
             if( ulLine && ulCol == ulLineLength && ulPos <= ulLen &&
                 ( hb_mlEol( pszString + ulPos, ulLen - ulPos, pEOLs, iEOLs ) >= 0 ||
-                  ( pszString[ ulPos ] == HB_CHAR_SOFT1 &&
+                  ( ( unsigned char ) pszString[ ulPos ] == HB_CHAR_SOFT1 &&
                     pszString[ ulPos + 1 ] == HB_CHAR_SOFT2 ) ||
-                  ( ulPos > 0 && pszString[ ulPos - 1 ] == HB_CHAR_SOFT1 &&
+                  ( ulPos > 0 && ( unsigned char ) pszString[ ulPos - 1 ] == HB_CHAR_SOFT1 &&
                     pszString[ ulPos ] == HB_CHAR_SOFT2 ) ||
-                  ( ulPos > 1 && pszString[ ulPos - 2 ] == HB_CHAR_SOFT1 &&
+                  ( ulPos > 1 && ( unsigned char ) pszString[ ulPos - 2 ] == HB_CHAR_SOFT1 &&
                     pszString[ ulPos - 1 ] == HB_CHAR_SOFT2 ) ) )
             {
                ulCol = 0;

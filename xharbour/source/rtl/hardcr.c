@@ -62,7 +62,7 @@ char * hb_strHardCR( char * pszString, HB_SIZE ulStringLen )
 
    for( ulStringPos = 0; ulStringPos < ulStringLen; ulStringPos++ )
    {
-      if( pszString[ ulStringPos ] == HB_CHAR_SOFT1 &&
+      if( ( unsigned char ) pszString[ ulStringPos ] == HB_CHAR_SOFT1 &&
           pszString[ ulStringPos + 1 ] == HB_CHAR_SOFT2 )
       {
          pszString[ ulStringPos ] = HB_CHAR_HARD1;
