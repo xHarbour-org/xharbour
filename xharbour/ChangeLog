@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-17 07:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/hvm.c
+    ! code reformatting
+
+  * make_vc.bat
+  * make_gc.bat
+  * make_pc.bat
+    ! append '64' to library names build in 64-bit mode (ex. vm.lib -> vm64.lib)
+
 2012-10-17 03:55 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.vc
     ! applying highest warning level -W4 with safe-warnings disabled

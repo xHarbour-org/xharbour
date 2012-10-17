@@ -21,7 +21,7 @@ IF "%SUB_DIR%"=="" SET SUB_DIR=pc
 IF "%HB_GT_LIB%"=="" SET HB_GT_LIB=$(GTWIN_LIB)
 
 IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
- 
+
 :FIND_POCC
    IF EXIST "%ProgramFiles%\PellesC" GOTO SET_POCC
    IF EXIST \PellesC                 GOTO SET_POCC2
@@ -49,7 +49,7 @@ IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
    SET BISON_DIR=\GnuWin32\Bin
    GOTO READY
 
-:READY   
+:READY
 SET _PATH=%PATH%
 SET PATH=%CC_DIR%\BIN;%BISON_DIR%;%PATH%
 
@@ -57,8 +57,8 @@ rem ============================================================================
 rem The followings should never change
 rem Do not hard-code in makefile because there are needed for clean build
 rem ============================================================================
-SET LIBEXT=.lib
-SET OBJEXT=.obj
+SET LIBEXT=%HB_ARCH%.lib
+SET OBJEXT=%HB_ARCH%.obj
 SET DIR_SEP=\
 REM SET LIBPREFIX=
 rem ============================================================================

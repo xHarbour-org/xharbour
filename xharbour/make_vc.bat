@@ -67,7 +67,7 @@ IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
    IF NOT "%BISON_DIR%"=="" GOTO READY
    IF EXIST "%ProgramFiles(x86)%\GnuWin32\Bin" GOTO SET_BISONX86
    IF EXIST "%ProgramFiles%\GnuWin32\Bin"      GOTO SET_BISON1
-   IF EXIST \GnuWin32\Bin                      GOTO SET_BISON2 
+   IF EXIST \GnuWin32\Bin                      GOTO SET_BISON2
    GOTO READY
 
 :SET_BISONX86
@@ -94,8 +94,8 @@ rem ============================================================================
 rem The followings should never change
 rem Do not hard-code in makefile because there are needed for clean build
 rem ============================================================================
-SET LIBEXT=.lib
-SET OBJEXT=.obj
+SET LIBEXT=%HB_ARCH%.lib
+SET OBJEXT=%HB_ARCH%.obj
 SET DIR_SEP=\
 REM SET LIBPREFIX=
 rem ============================================================================

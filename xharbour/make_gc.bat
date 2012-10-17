@@ -30,8 +30,8 @@ rem The followings should never change
 rem Do not hard-code in makefile because there are needed for clean build
 rem ============================================================================
 SET DIR_SEP=/
-SET OBJEXT=.o
-SET LIBEXT=.a
+SET OBJEXT=%HB_ARCH%.o
+SET LIBEXT=%HB_ARCH%.a
 SET LIBPREFIX=lib
 
 if "%1"=="/?"      goto SYNTAX
