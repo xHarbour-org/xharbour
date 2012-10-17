@@ -198,7 +198,7 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS DateTimePicker
       ::Sendmessage( DTM_SETFORMAT, 0, NIL )
       ::Sendmessage( WM_KEYDOWN, VK_RIGHT, 0 )
    ENDIF
-RETURN 0
+RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 
