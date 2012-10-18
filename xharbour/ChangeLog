@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-19 05:11 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * make_vc.bat
+  * winmake/makefile.vc
+    + compiler and linker debug flags when HB_DEBUG=d
+    + append 'd' in library and executable file names when HB_DEBUG=d
+
 2012-10-19 03:43 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * ChangeLog
     ! corrected last entry to avoid confusion:

@@ -9,20 +9,29 @@
 #
 #===============================================================================
 
-!ifndef DEL
+!if ("$(DEL)"=="")
 DEL=del
 !endif
 
-!ifndef COPY
+!if ("$(COPY)"=="")
 COPY=copy
 !endif
 
-!ifndef TYPE
+!if ("$(TYPE)"=="")
 TYPE=type
 !endif
 
-!ifndef HB_HAS_LINENO
+!if ("$(HB_HAS_LINENO)"=="")
 LINEFLAGS=-l
+!endif
+
+!if ("$(HB_DEBUG)"=="d")
+CC_DEBUGFLAGS=-Zi
+LNK_DEBUGFLAGS=/DEBUG
+PCODE_FLAG=-gc2
+LINEFLAGS=
+!else
+PCODE_FLAG=-gc0
 !endif
 
 !if ("$(HB_ARCH)"=="64")
@@ -48,7 +57,7 @@ CPLUSPLUS=1
 #===============================================================================
 !include winmake\common.mak
 
-!ifdef HB_GTALLEG
+!if !("$(HB_GTALLEG)"=="")
 HB_GT_LIBS=\
 	$(HB_GT_LIBS)\
 	$(GTALLEG_LIB)
@@ -63,7 +72,7 @@ PROJECT=$(ST_PROJECT)
 PROJECT=$(MT_PROJECT)
 !endif
 
-!ifdef HB_NO_VM_ALL
+!if ("$(HB_NO_VM_ALL)"=="1")
 PROJECT=$(PROJECT) $(FMSTAT_LIB)
 !endif
 
@@ -103,7 +112,7 @@ CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
 CLIBFLAGS_C =$(CLIBFLAGS_C) -D__WIN32__ -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H -c $(OPTFLAGS) -GA -Gs -W4 -wd4127 -wd4054 -wd4055 -nologo $(INCLUDE_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) -D__WIN32__ -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H -c $(OPTFLAGS) -GA -Gs -W4 -wd4127 -wd4054 -wd4055 -nologo $(INCLUDE_DIR)
-HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 -gc0
+HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 $(PCODE_FLAG)
 !if ("$(HB_THREAD_SUPPORT)"=="1")
 CLIBFLAGS   =$(CLIBFLAGS) -DHB_THREAD_SUPPORT
 HARBOURFLAGS=-dHB_THREAD_SUPPORT $(HARBOURFLAGS)
@@ -150,26 +159,29 @@ MANIFESTFLAGS=/MANIFEST:NO
 !endif
 !endif
 
-!ifndef HB_NO_FM_DL_ALLOC
+!if ("$(HB_NO_FM_DL_ALLOC)"=="")
 CLIBFLAGS    =-DHB_FM_DL_ALLOC $(CLIBFLAGS)
 CLIBFLAGS_C  =-DHB_FM_DL_ALLOC $(CLIBFLAGS_C)
 !endif
 
-!ifndef HB_NO_VM_ALL
+!if ("$(HB_NO_VM_ALL)"=="")
 CLIBFLAGS    =-DHB_VM_ALL $(CLIBFLAGS)
 CLIBFLAGS_C  =-DHB_VM_ALL $(CLIBFLAGS_C)
 !endif
 
-!ifdef HB_NO_DV_MEMCPY
+!if ("$(HB_NO_DV_MEMCPY)"=="1")
 CLIBFLAGS   =-DHB_NO_DV_MEMCPY $(CLIBFLAGS)
 CLIBFLAGS_C =-DHB_NO_DV_MEMCPY $(CLIBFLAGS_C)
 !endif
+
+CLIBFLAGS   =$(CC_DEBUGFLAGS) $(CLIBFLAGS)
+CLIBFLAGS_C =$(CC_DEBUGFLAGS) $(CLIBFLAGS_C)
 
 CC_CMD       =CL $(C64FLAGS) $(CLIBFLAGS) -Fo$@ $**
 CCC_CMD      =CL $(C64FLAGS) $(CLIBFLAGS_C) -Fo$@ $**
 CC_CMD_FMSTAT=CL $(C64FLAGS) $(CLIBFLAGS) -DHB_FM_STATISTICS -Fo$@ $**
 LIB_CMD      =LIB /MACHINE:$(HB_MACHINE) /NOLOGO /OUT:$@ $**
-LINK_CMD     =LINK /MACHINE:$(HB_MACHINE) /NOLOGO /OUT:$@ $** $(LINKERFLAGS) $(MANIFESTFLAGS)
+LINK_CMD     =LINK $(LNK_DEBUGFLAGS) /MACHINE:$(HB_MACHINE) /NOLOGO /OUT:$@ $** $(LINKERFLAGS) $(MANIFESTFLAGS)
 BISON_CMD1   =bison -v -d $** -o$@
 BISON_CMD2   =bison -v -p hb_comp -d $** -o$@
 
@@ -198,7 +210,7 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
 $(CT_LIB) : $(CT_LIB_OBJS)
 	$(LIB_CMD)
 
-!ifndef HB_NO_VM_ALL
+!if ("$(HB_NO_VM_ALL)"=="")
 VM_LIB_OBJS=\
 	$(VM_ALL_OBJS)
 !endif
@@ -401,15 +413,16 @@ MT_CMD_DLL  =MT -nologo -manifest "$(OBJ_DIR)\intermediate.manifest" -outputreso
 MT_CMD      =MT -nologo -manifest "$(OBJ_DIR)\intermediate.manifest" -outputresource:$@;1
 !endif
 !else
-CLIBFLAGS=$(CLIBFLAGS) -MT
-CLIBFLAGS_C=$(CLIBFLAGS_C) -MT
+CLIBFLAGS   =$(CLIBFLAGS) -MT
+CLIBFLAGS_C =$(CLIBFLAGS_C) -MT
 !endif
 !endif
 
-!ifdef HB_DIR_ADS
+!if !("$(HB_DIR_ADS)"=="")
 ACEH_DIR    =-I"$(HB_DIR_ADS)"
 !endif
-!ifdef HB_DIR_OPENSSL
+
+!if !("$(HB_DIR_OPENSSL)"=="")
 OPENSSL_DIR    =-I"$(HB_DIR_OPENSSL)\include"
 !endif
 
@@ -436,19 +449,19 @@ CLIBFLAGS_C =$(CLIBFLAGS_C) -c -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H $(ACEH_DI
 CLIBFLAGS   =$(CLIBFLAGS) -I"$(PDFLITE_DIR)\include" -I"$(PNG_DIR)" -I"$(TIFF_DIR)" -I"$(JPEG_DIR)"
 CLIBFLAGS_C =$(CLIBFLAGS_C) -I"$(PDFLITE_DIR)\include" -I"$(PNG_DIR)" -I"$(TIFF_DIR)" -I"$(JPEG_DIR)"
 
-HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 -gc0
+HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 $(PCODE_FLAG)
 
-!ifndef HB_NO_FM_DL_ALLOC
+!if ("$(HB_NO_FM_DL_ALLOC)"=="")
 CLIBFLAGS    =-DHB_FM_DL_ALLOC $(CLIBFLAGS)
 CLIBFLAGS_C  =-DHB_FM_DL_ALLOC $(CLIBFLAGS_C)
 !endif
 
-!ifndef HB_NO_VM_ALL
+!if ("$(HB_NO_VM_ALL)"=="")
 CLIBFLAGS    =-DHB_VM_ALL $(CLIBFLAGS)
 CLIBFLAGS_C  =-DHB_VM_ALL $(CLIBFLAGS_C)
 !endif
 
-!ifdef HB_NO_DV_MEMCPY
+!if ("$(HB_NO_VM_MEMCPY)"=="1")
 CLIBFLAGS   =-DHB_NO_DV_MEMCPY $(CLIBFLAGS)
 CLIBFLAGS_C =-DHB_NO_DV_MEMCPY $(CLIBFLAGS_C)
 !endif
@@ -463,14 +476,17 @@ CLIBFLAGS   =-DHB_NO_BACKGROUND $(CLIBFLAGS)
 CLIBFLAGS_C =-DHB_NO_BACKGROUND $(CLIBFLAGS_C)
 !endif
 
-CC_CMD     =CL $(C64FLAGS) $(CLIBFLAGS) -Fo$@ $**
-CCC_CMD    =CL $(C64FLAGS) $(CLIBFLAGS_C) -Fo$@ $**
-HB_CMD     =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HB64FLAGS) $(HARBOURFLAGS) $** -o$@
-HB_CMD_MAIN=$(HARBOUR_EXE) -n0 $(LINEFLAGS) $(HB64FLAGS) $(HARBOURFLAGS) $** -o$@
-BISON_CMD1 =bison -v -d $** -o$@
-BISON_CMD2 =bison -v -p hb_comp -d $** -o$@
-DLL_LINK_CMD=LINK $(DLLFLAGS)
-DLLEXE_LINK_CMD=LINK $(EXEFLAGS) $(LFLAGS) /OUT:$@ $** $(USE_DLL_LIB) $(PDFLITE_LIB) $(HARBOUR_DLL_LIB)
+CLIBFLAGS   =$(CC_DEBUGFLAGS) $(CLIBFLAGS)
+CLIBFLAGS_C =$(CC_DEBUGFLAGS) $(CLIBFLAGS_C)
+
+CC_CMD      =CL $(C64FLAGS) $(CLIBFLAGS) -Fo$@ $**
+CCC_CMD     =CL $(C64FLAGS) $(CLIBFLAGS_C) -Fo$@ $**
+HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HB64FLAGS) $(HARBOURFLAGS) $** -o$@
+HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(LINEFLAGS) $(HB64FLAGS) $(HARBOURFLAGS) $** -o$@
+BISON_CMD1  =bison -v -d $** -o$@
+BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
+DLL_LINK_CMD=LINK $(LNK_DEBUGFLAGS) $(DLLFLAGS)
+DLLEXE_LINK_CMD=LINK $(LNK_DEBUGFLAGS) $(EXEFLAGS) $(LFLAGS) /OUT:$@ $** $(USE_DLL_LIB) $(PDFLITE_LIB) $(HARBOUR_DLL_LIB)
 
 #===============================================================================
 # The Project
@@ -480,7 +496,7 @@ ALL: $(DLL_PROJECT)
 #===============================================================================
 # HARBOUR.DLL rules
 #===============================================================================
-!ifndef HB_NO_VM_ALL
+!if ("$(HB_NO_VM_ALL)"=="")
 VM_LIB_OBJS=\
 	$(VM_ALL_OBJS)
 !endif
@@ -521,39 +537,48 @@ CONTRIB_PROJECT=\
 	$(HBZIP_LIB)
 !endif
 
-!ifdef HB_DIR_ADS
+!if !("$(HB_DIR_ADS)"=="")
+ACEH_DIR       =-I"$(HB_DIR_ADS)"
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(RDDADS_LIB)
 !endif
 
-!ifdef HB_DIR_OPENSSL
+!if !("$(HB_DIR_OPENSSL)"=="")
+OPENSSL_DIR    =-I"$(HB_DIR_OPENSSL)\include"
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(TIPSSL_LIB)
 !endif
 
-!ifdef HB_DIR_CURL
+!if !("$(HB_DIR_CURL)"=="")
+CURL_DIR       =-I"$(HB_DIR_CURL)\include"
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBCURL_LIB)
 !endif
 
-!ifdef HB_DIR_CAIRO
+!if !("$(HB_DIR_CAIRO)"=="")
+CAIRO_DIR      =-I"$(HB_DIR_CAIRO)\include\cairo"
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBCAIRO_LIB)
 !endif
 
-!ifdef HB_DIR_POSTGRESQL
+!if !("$(HB_DIR_POSTGRESQL)"=="")
+RDDSQL_INCLUDE =-I"$(HB_DIR_POSTGRESQL)\include" $(RDDSQL_INCLUDE)
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(PGSQL_LIB) $(SDDPG_LIB)
 !endif
 
-!ifdef HB_DIR_OCILIB
+!if !("$(HB_DIR_OCILIB)"=="")
+RDDSQL_INCLUDE =-I"$(HB_DIR_OCILIB)\include" $(RDDSQL_INCLUDE)
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(SDDOCI_LIB)
 !endif
 
-!ifdef HB_DIR_MYSQL
+!if !("$(HB_DIR_MYSQL)"=="")
+RDDSQL_INCLUDE =-I"$(HB_DIR_MYSQL)\include" $(RDDSQL_INCLUDE)
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(SDDMY_LIB) $(MYSQL_LIB)
 !endif
 
-!ifdef HB_DIR_FIREBIRD
+!if !("$(HB_DIR_FIREBIRD)"=="")
+RDDSQL_INCLUDE =-I"$(HB_DIR_FIREBIRD)\include" $(RDDSQL_INCLUDE)
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(FIREBIRD_LIB) $(SDDFB_LIB)
 !endif
 
-!ifdef HB_DIR_MAGIC
+!if !("$(HB_DIR_MAGIC)"=="")
+RDDSQL_INCLUDE =-I"$(HB_DIR_MAGIC)\include" $(RDDSQL_INCLUDE)
 CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBMAGIC_LIB)
 !endif
 
@@ -570,12 +595,12 @@ HARBOURFLAGS=$(HARBOURFLAGS)
 CLIBFLAGS   =$(CLIBFLAGS)
 CLIBFLAGS_C =$(CLIBFLAGS_C)
 
-!ifndef HB_NO_VM_ALL
+!if ("$(HB_NO_VM_ALL)"=="")
 CLIBFLAGS    =-DHB_VM_ALL $(CLIBFLAGS)
 CLIBFLAGS_C  =-DHB_VM_ALL $(CLIBFLAGS_C)
 !endif
 
-!ifdef HB_NO_DV_MEMCPY
+!if ("$(HB_NO_DV_MEMCPY)"=="")
 CLIBFLAGS   =-DHB_NO_DV_MEMCPY $(CLIBFLAGS)
 CLIBFLAGS_C =-DHB_NO_DV_MEMCPY $(CLIBFLAGS_C)
 !endif
@@ -590,42 +615,6 @@ OPTFLAGS=-Otyb1
 !endif
 
 OPTFLAGS=-EHsc $(OPTFLAGS)
-
-!ifdef HB_DIR_ADS
-ACEH_DIR=-I"$(HB_DIR_ADS)"
-!endif
-
-!ifdef HB_DIR_OPENSSL
-OPENSSL_DIR=-I"$(HB_DIR_OPENSSL)\include"
-!endif
-
-!ifdef HB_DIR_CURL
-CURL_DIR=-I"$(HB_DIR_CURL)\include"
-!endif
-
-!ifdef HB_DIR_CAIRO
-CAIRO_DIR=-I"$(HB_DIR_CAIRO)\include\cairo"
-!endif
-
-!ifdef HB_DIR_POSTGRESQL
-RDDSQL_INCLUDE=-I"$(HB_DIR_POSTGRESQL)\include" $(RDDSQL_INCLUDE)
-!endif
-
-!ifdef HB_DIR_OCILIB
-RDDSQL_INCLUDE=-I"$(HB_DIR_OCILIB)\include" $(RDDSQL_INCLUDE)
-!endif
-
-!ifdef HB_DIR_MYSQL
-RDDSQL_INCLUDE=-I"$(HB_DIR_MYSQL)\include" $(RDDSQL_INCLUDE)
-!endif
-
-!ifdef HB_DIR_FIREBIRD
-RDDSQL_INCLUDE=-I"$(HB_DIR_FIREBIRD)\include" $(RDDSQL_INCLUDE)
-!endif
-
-!ifdef HB_DIR_MAGIC
-RDDSQL_INCLUDE=-I"$(HB_DIR_MAGIC)\include" $(RDDSQL_INCLUDE)
-!endif
 
 !if ("$(USE_MSVCRT)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -MD
@@ -645,7 +634,7 @@ CLIBFLAGS   =$(CLIBFLAGS) -c $(OPTFLAGS) -GA -Gs -W3 -nologo $(ACEH_DIR) $(INCLU
 CLIBFLAGS   =$(CLIBFLAGS) -I"$(FREEIMAGE_DIR)\include" -I"$(GDLIB_DIR)\include" -I"$(XWT_DIR)\include" -I"$(XWT_DIR)\src\xwt_win" -I"$(PNG_DIR)" -I"$(ZLIB_DIR)"
 CLIBFLAGS_C =$(CLIBFLAGS_C) -c $(OPTFLAGS) -GA -Gs -W3 -nologo $(ACEH_DIR) $(INCLUDE_DIR) -D_WIN32 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
 CLIBFLAGS_C =$(CLIBFLAGS_C) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(ZLIB_DIR)
-HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i"$(SIXAPI_DIR)\include" -i$(GDLIB_DIR)\include -i$(WHAT32_DIR)\include -i$(XWT_DIR)\include -q0 -w2 -es2 -gc0
+HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i"$(SIXAPI_DIR)\include" -i$(GDLIB_DIR)\include -i$(WHAT32_DIR)\include -i$(XWT_DIR)\include -q0 -w2 -es2 $(PCODE_FLAG)
 
 !if ("$(HB_THREAD_SUPPORT)"=="1")
 CLIBFLAGS   =$(CLIBFLAGS) -DHB_THREAD_SUPPORT
@@ -656,15 +645,22 @@ CLIBFLAGS_C =$(CLIBFLAGS_C) -MT
 !endif
 !endif
 
-CLIBFLAGS   =$(CLIBFLAGS) $(CFLAGS)
-CLIBFLAGS_C =$(CLIBFLAGS_C) $(CFLAGS)
+CLIBFLAGS   =$(CC_DEBUGFLAGS) $(CLIBFLAGS) $(CFLAGS)
+CLIBFLAGS_C =$(CC_DEBUGFLAGS) $(CLIBFLAGS_C) $(CFLAGS)
+
 HB_CMD      =$(HARBOUR_EXE) -n1 $(HB64FLAGS) $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 CC_CMD      =CL $(C64FLAGS) $(CLIBFLAGS) -Fo$@ $**
 CCC_CMD     =CL $(C64FLAGS) $(CLIBFLAGS_C) -Fo$@ $**
 
+!if ("$(HB_DEBUG)"=="d")
+ZIP_DEBUGFLAGS=$(CC_DEBUGFLAGS)
+!else
+ZIP_DEBUGFLAGS=/DNDEBUG
+!endif
+
 CC_CMD_ZIP  =CL\
 	$(OPTFLAGS) /GA /Gs /W3 /nologo /I"$(HBZIP_DIR)\INCLUDE" /I"include" /I"$(CC_DIR)\include" /TP\
-	/D_WIN32 /DNDEBUG /D_MBCS /D_LIB\
+	/D_WIN32 $(ZIP_DEBUGFLAGS) /D_MBCS /D_LIB\
 	/Fp"$(OBJ_DIR)\hbzip.pch" /Fd"$(OBJ_DIR)\\"\
 	/FD /EHsc /D_CRT_SECURE_NO_WARNINGS /c /Fo$@ $**
 LIB_CMD     =LIB /MACHINE:$(HB_MACHINE) /NOLOGO /OUT:$@ $**
@@ -732,7 +728,7 @@ $(PGSQL_LIB) : $(PGSQL_LIB_OBJS)
 $(XWT_LIB) : $(XWT_LIB_OBJS)
 	$(LIB_CMD)
 
-!if ("$(HB_ADS_IMPLIB)" == "no")
+!if ("$(HB_ADS_IMPLIB)"=="no")
 RDDADS_LIB_OBJS=\
 	$(RDDADS_LIB_OBJS)\
 	$(OBJ_DIR)\ace32.obj

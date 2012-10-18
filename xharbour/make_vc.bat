@@ -11,10 +11,23 @@ rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
 
-rem SET HB_ARCH=64
+REM SET HB_ARCH=64
+REM SET HB_WARNING_FLAGS=
+REM SET HB_DEBUG=d
+REM SET HB_GUI=1
+REM SET HB_NO_BACKGROUND=1
+REM SET HB_DIR_POSTGRESQL=
+REM SET HB_DIR_OCILIB=
+REM SET HB_DIR_MYSQL=
+REM SET HB_DIR_FIREBIRD=
+REM SET HB_DIR_CAIRO=
+REM SET HB_DIR_CURL=
+REM SET HB_DIR_OPENSSL=
+REM SET HB_DIR_MAGIC=
+REM SET HB_DIR_ADS=
 
 IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
- 
+
 :FIND_VC
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc" GOTO SET_VC2012X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 11.0\vc"      GOTO SET_VC2012
@@ -94,8 +107,8 @@ rem ============================================================================
 rem The followings should never change
 rem Do not hard-code in makefile because there are needed for clean build
 rem ============================================================================
-SET LIBEXT=%HB_ARCH%.lib
-SET OBJEXT=%HB_ARCH%.obj
+SET LIBEXT=%HB_ARCH%%HB_DEBUG%.lib
+SET OBJEXT=%HB_ARCH%%HB_DEBUG%.obj
 SET DIR_SEP=\
 REM SET LIBPREFIX=
 rem ============================================================================
