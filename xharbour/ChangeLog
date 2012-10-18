@@ -8,11 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-19 03:43 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * ChangeLog
+    ! corrected last entry to avoid confusion:
+      .. when HB_DEBUG=1 -> when HB_DEBUG=d
+
 2012-10-19 03:36 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * make_gc.bat
   * winmake/makefile.gc
     ! corrected syntax error: if -> ifeq
-    + append 'd' in library and executable file names when HB_DEBUG=1
+    + append 'd' in library and executable file names when HB_DEBUG=d
 
 2012-10-18 21:52 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/gtwvw/hbgtwvw.h
