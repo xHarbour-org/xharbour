@@ -30,6 +30,14 @@ else
 HB_TARGET=-mtune=pentium -march=i586
 endif
 
+ifeq ($(HB_DEBUG),d)
+CC_DEBUGFLAGS=-g
+LINEFLAGS=
+PCODE_FLAGS=-gc2
+else
+PCODE_FLAGS=-gc0
+endif
+
 #*******************************************************************************
 ifeq ($(__BLD__),CORE_BLD)
 #*******************************************************************************
@@ -58,7 +66,7 @@ CLIBFLAGS   +=
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
 INCLUDE_DIR  =include
-HARBOURFLAGS+=-i$(INCLUDE_DIR) -i$(PDFLITE_DIR)/include -q0 -w2 -es2 -gc0
+HARBOURFLAGS+=-i$(INCLUDE_DIR) -i$(PDFLITE_DIR)/include -q0 -w2 -es2 $(PCODE_FLAGS)
 CLIBFLAGS   +=-DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -D__WIN32__ -Wall $(NOCYGWIN) -O3 $(HB_TARGET) -c -fomit-frame-pointer -fno-strict-aliasing -I$(INCLUDE_DIR) -I$(OBJ_DIR)
 CLIBFLAGS   +=-I$(ZLIB_DIR) -I$(PNG_DIR) -I$(PDFLITE_DIR)/include
 CLIBFLAGS   +=-I$(JPEG_DIR) -I$(TIFF_DIR)
@@ -95,64 +103,71 @@ ifdef HB_NO_DV_MEMCPY
 CLIBFLAGS    +=-DHB_NO_DV_MEMCPY
 endif
 
-if ($(HB_NO_BACKGROUND),1)
+ifeq ($(HB_NO_BACKGROUND),1)
 CLIBFLAGS    +=-DHB_NO_BACKGROUND
 endif
 
-if ($(HB_GUI),1)
+ifeq ($(HB_GUI),1)
 CLIBFLAGS    +=-DHB_GUI
 endif
 
-CLIBFLAGS    +=$(C64FLAGS)
+CLIBFLAGS    +=$(C64FLAGS) $(CC_DEBUGFLAGS)
 
 CC_CMD       =GCC $(CLIBFLAGS) -o $@ $^
 CCC_CMD      =$(CC_CMD)
 CC_CMD_FMSTAT=GCC $(CLIBFLAGS) -DHB_FM_STATISTICS -o $@ $^
 BISON_CMD1   =bison -v -p yy -d -o $@ $^
 BISON_CMD2   =bison -v -p hb_comp -d -o $@ $^
+ifeq ($(HB_DEBUG),d)
+LIB_CMD      =\
+		RM -f $@ &&\
+		AR cru $@ $^ &&\
+		RANLIB $@
+else
 LIB_CMD      =\
 		RM -f $@ &&\
 		AR cru $@ $^ &&\
 		RANLIB $@ &&\
 		STRIP -g $@
+endif
 HARBOUR_LIBS=\
 	-L$(LIB_DIR)\
 	-Wl,--start-group\
-	-lvm$(HB_MT)\
-	-lrtl\
-	-lrdd\
-	-lct\
-	-lpng\
-	-lzlib\
-	-ltiff\
-	-ljpeg\
-	-lpdflite\
-	-lgtwin\
-	-llibmisc\
-	-lcodepage\
-	-lmacro\
-	-ldbfcdx\
-	-lbmdbfcdx\
-	-lsixcdx\
-	-ldbfntx\
-	-ldbfnsx\
-	-ldbffpt\
-	-lhbsix\
-	-lhsx\
-	-lpcrepos\
-	-lcommon\
-	-lpp\
-	-llang\
+	-lvm$(HB_MT)$(HB_ARCH)$(HB_DEBUG)\
+	-lrtl$(HB_ARCH)$(HB_DEBUG)\
+	-lrdd$(HB_ARCH)$(HB_DEBUG)\
+	-lct$(HB_ARCH)$(HB_DEBUG)\
+	-lpng$(HB_ARCH)$(HB_DEBUG)\
+	-lzlib$(HB_ARCH)$(HB_DEBUG)\
+	-ltiff$(HB_ARCH)$(HB_DEBUG)\
+	-ljpeg$(HB_ARCH)$(HB_DEBUG)\
+	-lpdflite$(HB_ARCH)$(HB_DEBUG)\
+	-lgtwin$(HB_ARCH)$(HB_DEBUG)\
+	-llibmisc$(HB_ARCH)$(HB_DEBUG)\
+	-lcodepage$(HB_ARCH)$(HB_DEBUG)\
+	-lmacro$(HB_ARCH)$(HB_DEBUG)\
+	-ldbfcdx$(HB_ARCH)$(HB_DEBUG)\
+	-lbmdbfcdx$(HB_ARCH)$(HB_DEBUG)\
+	-lsixcdx$(HB_ARCH)$(HB_DEBUG)\
+	-ldbfntx$(HB_ARCH)$(HB_DEBUG)\
+	-ldbfnsx$(HB_ARCH)$(HB_DEBUG)\
+	-ldbffpt$(HB_ARCH)$(HB_DEBUG)\
+	-lhbsix$(HB_ARCH)$(HB_DEBUG)\
+	-lhsx$(HB_ARCH)$(HB_DEBUG)\
+	-lpcrepos$(HB_ARCH)$(HB_DEBUG)\
+	-lcommon$(HB_ARCH)$(HB_DEBUG)\
+	-lpp$(HB_ARCH)$(HB_DEBUG)\
+	-llang$(HB_ARCH)$(HB_DEBUG)\
 	-Wl,--end-group
 COMPILERLIBS=\
 	-L$(CC_DIR)/lib\
 	-luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr\
 	-lole32 -luuid -loleaut32 -lws2_32
-START_UP_OBJ=$(OBJ_DIR)/mainstd.o
+START_UP_OBJ=$(OBJ_DIR)/mainstd$(HB_DEBUG).o
 EXE_LIBS=$(HARBOUR_LIBS) $(COMPILERLIBS)
-HRB_LIBS=-L$(LIB_DIR) -Wl,--start-group -lpp -lcommon -lcompiler -Wl,--end-group $(COMPILERLIBS)
-CMN_LIBS=-L$(LIB_DIR) -lcommon $(COMPILERLIBS)
-LINK_CMD=GCC -mconsole -Wall -o $@ $^ $(NOCYGWIN)
+HRB_LIBS=-L$(LIB_DIR) -Wl,--start-group -lpp$(HB_ARCH)$(HB_DEBUG) -lcommon$(HB_ARCH)$(HB_DEBUG) -lcompiler$(HB_ARCH)$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
+CMN_LIBS=-L$(LIB_DIR) -lcommon$(HB_ARCH)$(HB_DEBUG) $(COMPILERLIBS)
+LINK_CMD=GCC $(CC_DEBUGFLAGS) -mconsole -Wall -o $@ $^ $(NOCYGWIN)
 
 #===============================================================================
 # The Project
@@ -337,7 +352,7 @@ include winmake/common.mak
 COMPILERLIBS=\
 	-L$(CC_DIR)/lib -L$(BIN_DIR) -L$(LIB_DIR)\
 	-luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr\
-	-lole32 -luuid -loleaut32 -lws2_32 -ldllmain -lharbour
+	-lole32 -luuid -loleaut32 -lws2_32 -ldllmain$(HB_ARCH)$(HB_DEBUG) -lxharbour$(HB_ARCH)$(HB_DEBUG)
 
 COMPILERLIBS1=\
 	-L$(CC_DIR)/lib -L$(BIN_DIR) -L$(LIB_DIR)\
@@ -389,7 +404,7 @@ INCLUDE_DIR =include
 CLIBFLAGS   +=-DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -Wall -mdll -fomit-frame-pointer $(HB_TARGET) $(NOCYGWIN) -O3 -c -fno-strict-aliasing $(ACEH_DIR) -I$(INCLUDE_DIR) -I$(OBJ_DIR)
 CLIBFLAGS   +=-I$(ZLIB_DIR) -I$(PNG_DIR) -I$(PDFLITE_DIR)/include
 CLIBFLAGS   +=-I$(TIFF_DIR) -I$(JPEG_DIR) -D__WIN32__
-HARBOURFLAGS+=-i$(INCLUDE_DIR) -i$(PDFLITE_DIR)/include -q0 -w2 -es2 -gc0
+HARBOURFLAGS+=-i$(INCLUDE_DIR) -i$(PDFLITE_DIR)/include -q0 -w2 -es2 $(PCODE_FLAGS)
 
 ifndef HB_NO_FM_DL_ALLOC
 CLIBFLAGS    +=-DHB_FM_DL_ALLOC
@@ -403,15 +418,15 @@ ifdef HB_NO_DV_MEMCPY
 CLIBFLAGS    +=-DHB_NO_DV_MEMCPY
 endif
 
-if ($(HB_NO_BACKGROUND),1)
+ifeq ($(HB_NO_BACKGROUND),1)
 CLIBFLAGS    +=-DHB_NO_BACKGROUND
 endif
 
-if ($(HB_GUI),1)
+ifeq ($(HB_GUI),1)
 CLIBFLAGS    +=-DHB_GUI
 endif
 
-CLIBFLAGS+=$(C64FLAGS)
+CLIBFLAGS   +=$(C64FLAGS) $(CC_DEBUGFLAGS)
 HARBOURFLAGS+=$(HB64FLAGS)
 CC_CMD      =GCC $(CLIBFLAGS) -o $@ $^
 CCC_CMD     =$(CC_CMD)
@@ -419,8 +434,8 @@ HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) -o$@ $^
 HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(LINEFLAGS) -d_USE_APPMAIN_ $(HARBOURFLAGS) -o$@ $^
 BISON_CMD1  =bison -v -p yy -d -o $@ $^
 BISON_CMD2  =bison -v -p hb_comp -d -o $@ $^
-DLL_LINK_CMD=GCC -shared -W $(EXPORT_DEF) -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1)
-DLLEXE_LINK_CMD=GCC -Wall $(NOCYGWIN) -o $@ $^ $(HARBOUR_DLL) $(USE_DLL_LIB) -Wl,--start-group -lpdflite -Wl,--end-group  $(COMPILERLIBS)
+DLL_LINK_CMD=GCC $(CC_DEBUGFLAGS) -shared -W $(EXPORT_DEF) -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1)
+DLLEXE_LINK_CMD=GCC $(CC_DEBUGFLAGS) -Wall $(NOCYGWIN) -o $@ $^ $(HARBOUR_DLL) $(USE_DLL_LIB) -Wl,--start-group -lpdflite$(HB_ARCH)$(HB_DEBUG) -Wl,--end-group  $(COMPILERLIBS)
 
 #===============================================================================
 # The Project
@@ -499,7 +514,7 @@ ifdef HB_DIR_MAGIC
 RDDSQL_INCLUDE+=-I"$(HB_DIR_MAGIC)/include"
 endif
 
-HARBOURFLAGS+=-iinclude -i$(SIXAPI_DIR)/include -i$(GDLIB_DIR)/include -i$(WHAT32_DIR)/include -i$(XWT_DIR)/include -q0 -w2 -es2 -gc0
+HARBOURFLAGS+=-iinclude -i$(SIXAPI_DIR)/include -i$(GDLIB_DIR)/include -i$(WHAT32_DIR)/include -i$(XWT_DIR)/include -q0 -w2 -es2 $(PCODE_FLAGS)
 CLIBFLAGS   +=-D__WIN32__ -DHARBOUR_CONF -D_HAVE_SQLITE_CONFIG_H -Wall $(NOCYGWIN) -O3 -fomit-frame-pointer $(HB_TARGET) -c -fno-strict-aliasing
 CLIBFLAGS   +=$(RDDSQL_INCLUDE) $(ACEH_DIR) -Iinclude -I"$(FREEIMAGE_DIR)/include" -I"$(GDLIB_DIR)/include" -I"$(XWT_DIR)/include" -I"$(XWT_DIR)/src/xwt_win" -I"$(ZLIB_DIR)" -I"$(PNG_DIR)" $(OPENSSL_DIR) $(CURL_DIR)
 CLIBFLAGS   +=$(CAIRO_DIR) -I"$(SIXAPI_DIR)/include"
@@ -509,19 +524,25 @@ ifeq ($(HB_THREAD_SUPPORT),1)
 	HARBOURFLAGS+=-dHB_THREAD_SUPPORT
 endif
 
-CLIBFLAGS+=$(C64FLAGS)
+CLIBFLAGS   +=$(C64FLAGS) $(CC_DEBUGFLAGS)
 HARBOURFLAGS+=$(HB64FLAGS)
 
 HB_CMD =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) -o$@ $^
 CC_CMD =GCC $(CLIBFLAGS) -o $@ $^
 CCC_CMD =$(CC_CMD)
-CC_CMD_ZIP=G++ -Iinclude -I"$(HBZIP_DIR)/include" -D_WIN32 -DNDEBUG -fpermissive -c -o $@ $^
+CC_CMD_ZIP=G++ $(CC_DEBUGFLAGS) -Iinclude -I"$(HBZIP_DIR)/include" -D_WIN32 -DNDEBUG -fpermissive -c -o $@ $^
+ifeq ($(HB_DEBUG),d)
+LIB_CMD=\
+	RM -f $@ &&\
+	AR cru $@ $^ &&\
+	RANLIB $@
+else
 LIB_CMD=\
 	RM -f $@ &&\
 	AR cru $@ $^ &&\
 	RANLIB $@ &&\
 	STRIP -g $@
-
+endif
 #===============================================================================
 # Macro Definitions
 #===============================================================================
@@ -683,7 +704,7 @@ $(HBCC_LIB) : $(HBCC_LIB_OBJS)
 	$(LIB_CMD)
 
 WHAT32_LIB_OBJS+=\
-	$(OBJ_DIR)/_wincall.o
+	$(OBJ_DIR)/_wincall$(HB_DEBUG).o
 $(WHAT32_LIB) : $(WHAT32_LIB_OBJS)
 	$(LIB_CMD)
 
