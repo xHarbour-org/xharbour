@@ -81,6 +81,12 @@
 #include <commctrl.h>
 #include <commdlg.h>
 
+/* add parens to avoid warning */
+#if defined(__BORLANDC__) && (__BORLANDC__<=0x620)
+#undef  MAKELONG
+#define MAKELONG(a, b)      ((LONG)(((WORD)(((DWORD_PTR)(a)) & 0xffff)) | (((DWORD)((WORD)(((DWORD_PTR)(b)) & 0xffff))) << 16)))
+#endif
+
 #if defined(__MINGW32__) || defined(__WATCOMC__) || defined(_MSC_VER) || defined(__DMC__)
    #include <unknwn.h>
    #include <ole2.h>

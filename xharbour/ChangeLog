@@ -8,6 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-18 21:52 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/gtwvw/hbgtwvw.h
+  * source/vm/inet.c
+  * source/rtl/hbip.c
+  * contrib/what32/source/_wincomm.c
+  * contrib/what32/source/_winhead.c
+  * contrib/what32/source/_winlv.c
+  * contrib/what32/source/_winsys.c
+  * contrib/what32/source/_wintab.c
+    ! redefine MAKEWORD/MAKELONG macro for BCC version lower then 6.2
+
+  * contrib/hbhpdf/hpdf_utils.c
+    ! add parens as suggested
+
 2012-10-18 07:38 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/harbour.c
     ! fix memory leak on commands: harbour /build or harbour /credits

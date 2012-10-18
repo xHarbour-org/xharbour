@@ -1,12 +1,8 @@
-
-
 /*
  * Some parts Copyright 2001 Alexander S.Kresin <alex@belacy.belgorod.su>
  * with author's permission granted on 27 MAy 2002
    Last change:  WN   27 May 2002   10:37 am
  */
-
-
 
 #define _WIN32_WINNT   0x0400
 #define _WIN32_IE      0x0500
@@ -23,6 +19,14 @@
 #include "item.api"
 
 extern PHB_ITEM Rect2Array( RECT *rc  );
+
+/* add parens to avoid warning */
+#if defined(__BORLANDC__) && (__BORLANDC__<=0x620)
+   #undef  MAKEWORD
+   #undef  MAKELONG
+   #define MAKEWORD(a, b)      ((WORD)(((BYTE)(((DWORD_PTR)(a)) & 0xff)) | (((WORD)((BYTE)(((DWORD_PTR)(b)) & 0xff))) << 8)))
+   #define MAKELONG(a, b)      ((LONG)(((WORD)(((DWORD_PTR)(a)) & 0xffff)) | (((DWORD)((WORD)(((DWORD_PTR)(b)) & 0xffff))) << 16)))
+#endif
 
 #ifdef __DMC__
 //typedef struct tagINITCOMMONCONTROLSEX {

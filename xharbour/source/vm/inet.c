@@ -125,6 +125,12 @@ static void hb_inetLinuxSigusrHandle( int sig )
 #define SOCKET_ERROR ( -1 )
 #endif
 
+/* add parens to avoid warning */
+#if defined(__BORLANDC__) && (__BORLANDC__<=0x620)
+   #undef  MAKEWORD
+   #define MAKEWORD(a, b)      ((WORD)(((BYTE)(((DWORD_PTR)(a)) & 0xff)) | (((WORD)((BYTE)(((DWORD_PTR)(b)) & 0xff))) << 8)))
+#endif
+
 #ifndef HB_NO_DEFAULT_INET
 //JC1: we need it volatile to be minimally thread safe.
 static volatile int s_iSessions = 0;
@@ -446,7 +452,7 @@ HB_FUNC( INETINIT )
    {
       #if defined( HB_OS_WIN )
       WSADATA wsadata;
-      WSAStartup( MAKEWORD( 1, 1 ), &wsadata );
+      WSAStartup( MAKEWORD( 1,1 ), &wsadata );
       #elif defined( HB_OS_LINUX )
       signal( HB_INET_LINUX_INTERRUPT, hb_inetLinuxSigusrHandle );
       #endif

@@ -81,6 +81,11 @@
    #include <winsock2.h>
    #include <windows.h>
 
+   /* add parens to avoid warning */
+   #if defined(__BORLANDC__) && (__BORLANDC__<=0x620)
+      #undef  MAKEWORD
+      #define MAKEWORD(a, b)      ((WORD)(((BYTE)(((DWORD_PTR)(a)) & 0xff)) | (((WORD)((BYTE)(((DWORD_PTR)(b)) & 0xff))) << 8)))
+   #endif
    #define HB_IP_CLOSE( x ) closesocket( x )
 #else
 

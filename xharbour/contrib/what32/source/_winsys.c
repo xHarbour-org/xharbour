@@ -1,4 +1,3 @@
-
 /*
  * $Id$
  */
@@ -64,6 +63,14 @@ typedef struct _OSVERSIONINFOEX {
 #include "hbvm.h"
 #include "hbstack.h"
 #include "hbapiitm.h"
+
+/* add parens to avoid warning */
+#if defined(__BORLANDC__) && (__BORLANDC__<=0x620)
+   #undef  MAKEWORD
+   #undef  MAKELONG
+   #define MAKEWORD(a, b)      ((WORD)(((BYTE)(((DWORD_PTR)(a)) & 0xff)) | (((WORD)((BYTE)(((DWORD_PTR)(b)) & 0xff))) << 8)))
+   #define MAKELONG(a, b)      ((LONG)(((WORD)(((DWORD_PTR)(a)) & 0xffff)) | (((DWORD)((WORD)(((DWORD_PTR)(b)) & 0xffff))) << 16)))
+#endif
 
 //-------------------------------------------------------------------//
 
@@ -428,7 +435,8 @@ HB_FUNC( HIWORD )
 HB_FUNC( MAKELONG )
 {
 
-   hb_retnl( ((LONG) (((WORD) (hb_parni(1))) | ((DWORD) ((WORD) (hb_parni(2)))) << 16)) ) ;
+   hb_retnl( ( long ) MAKELONG( hb_parni(1), hb_parni(2) ) );
+   // hb_retnl( ((LONG) (((WORD) (hb_parni(1))) | ((DWORD) ((WORD) (hb_parni(2)))) << 16)) ) ;
 }
 
 //-------------------------------------------------------------------//

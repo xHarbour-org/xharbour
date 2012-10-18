@@ -446,6 +446,6 @@ HPDF_UInt16Swap  (HPDF_UINT16  *value)
     HPDF_BYTE u[2];
 
     HPDF_MemCpy (u, (HPDF_BYTE*)value, 2);
-    *value = (HPDF_UINT16)((HPDF_UINT16)u[0] << 8 | (HPDF_UINT16)u[1]);
+    *value = ((HPDF_UINT16)((HPDF_UINT16)u[0] << 8 ) | (HPDF_UINT16)u[1]);
 }
 
