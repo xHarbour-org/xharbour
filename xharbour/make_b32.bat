@@ -11,12 +11,25 @@ rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
 
+REM SET HB_WARNING_FLAGS=
+REM SET HB_DEBUG=d
+REM SET HB_GUI=1
+REM SET HB_NO_BACKGROUND=1
+
+REM SET HB_DIR_POSTGRESQL=
+REM SET HB_DIR_OCILIB=
+REM SET HB_DIR_MYSQL=
+REM SET HB_DIR_FIREBIRD=
+REM SET HB_DIR_CAIRO=
+REM SET HB_DIR_CURL=
+REM SET HB_DIR_OPENSSL=
+REM SET HB_DIR_MAGIC=
+REM SET HB_DIR_ADS=
+
 IF "%SUB_DIR%"=="" SET SUB_DIR=b32
 IF "%HB_GT_LIB%"=="" SET HB_GT_LIB=$(GTWIN_LIB)
-
-
 IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
- 
+
 :FIND_BCC
    IF EXIST "%ProgramFiles%\Borland\BDS\4.0" GOTO SET_BDS_40
    IF EXIST \Borland\bcc58                   GOTO SET_BORLAND_58
@@ -71,6 +84,8 @@ rem ============================================================================
 SET LIBEXT=.lib
 SET OBJEXT=.obj
 SET DIR_SEP=\
+IF "%HB_DEBUG%"=="d" SET LIBEXT=%HB_DEBUG%.lib
+IF "%HB_DEBUG%"=="d" SET OBJEXT=%HB_DEBUG%.obj
 REM SET LIBPREFIX=
 rem ============================================================================
 

@@ -202,29 +202,29 @@ CGILIB_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)cgilib$(LIBEXT)
 #===============================================================================
 # Macros For DLL Build
 #===============================================================================
-HARBOUR_DLL     =$(BIN_DIR)$(DIR_SEP)harbour.dll
-HBRUNDLL_EXE    =$(BIN_DIR)$(DIR_SEP)hbrundll.exe
-HBTESTDLL_EXE   =$(BIN_DIR)$(DIR_SEP)hbtestdll.exe
-HBMAKEDLL_EXE   =$(BIN_DIR)$(DIR_SEP)hbmakedll.exe
-HBDOCDLL_EXE    =$(BIN_DIR)$(DIR_SEP)hbdocdll.exe
-XBSCRIPTDLL_EXE =$(BIN_DIR)$(DIR_SEP)xbscriptdll.exe
-HARBOUR_DLL_LIB =$(BIN_DIR)$(DIR_SEP)$(LIBPREFIX)harbour$(LIBEXT)
+HARBOUR_DLL     =$(BIN_DIR)$(DIR_SEP)xharbour$(HB_DEBUG).dll
+HBRUNDLL_EXE    =$(BIN_DIR)$(DIR_SEP)hbrundll$(HB_DEBUG).exe
+HBTESTDLL_EXE   =$(BIN_DIR)$(DIR_SEP)hbtestdll$(HB_DEBUG).exe
+HBMAKEDLL_EXE   =$(BIN_DIR)$(DIR_SEP)hbmakedll$(HB_DEBUG).exe
+HBDOCDLL_EXE    =$(BIN_DIR)$(DIR_SEP)hbdocdll$(HB_DEBUG).exe
+XBSCRIPTDLL_EXE =$(BIN_DIR)$(DIR_SEP)xbscriptdll$(HB_DEBUG).exe
+HARBOUR_DLL_LIB =$(BIN_DIR)$(DIR_SEP)$(LIBPREFIX)xharbour$(LIBEXT)
 
 #===============================================================================
 # Macros For Standard Executable
 #===============================================================================
-HARBOUR_EXE =$(BIN_DIR)$(DIR_SEP)harbour.exe
-HBPP_EXE    =$(BIN_DIR)$(DIR_SEP)hbpp.exe
-PPGEN_EXE   =$(BIN_DIR)$(DIR_SEP)ppgen.exe
-HBFILERE_EXE=$(BIN_DIR)$(DIR_SEP)hbfilere.exe
-HBRUN_EXE   =$(BIN_DIR)$(DIR_SEP)hbrun$(HB_MT).exe
-HBTEST_EXE  =$(BIN_DIR)$(DIR_SEP)hbtest$(HB_MT).exe
-HBDOC_EXE   =$(BIN_DIR)$(DIR_SEP)hbdoc.exe
-HBDICT_EXE  =$(BIN_DIR)$(DIR_SEP)hbdict.exe
-HBMAKE_EXE  =$(BIN_DIR)$(DIR_SEP)hbmake.exe
-HBEXTERN_EXE=$(BIN_DIR)$(DIR_SEP)hbextern.exe
-HBFORMAT_EXE=$(BIN_DIR)$(DIR_SEP)hbformat.exe
-XBSCRIPT_EXE=$(BIN_DIR)$(DIR_SEP)xbscript.exe
+HARBOUR_EXE =$(BIN_DIR)$(DIR_SEP)harbour$(HB_DEBUG).exe
+HBPP_EXE    =$(BIN_DIR)$(DIR_SEP)hbpp$(HB_DEBUG).exe
+PPGEN_EXE   =$(BIN_DIR)$(DIR_SEP)ppgen$(HB_DEBUG).exe
+HBFILERE_EXE=$(BIN_DIR)$(DIR_SEP)hbfilere$(HB_DEBUG).exe
+HBRUN_EXE   =$(BIN_DIR)$(DIR_SEP)hbrun$(HB_MT)$(HB_DEBUG).exe
+HBTEST_EXE  =$(BIN_DIR)$(DIR_SEP)hbtest$(HB_MT)$(HB_DEBUG).exe
+HBDOC_EXE   =$(BIN_DIR)$(DIR_SEP)hbdoc$(HB_DEBUG).exe
+HBDICT_EXE  =$(BIN_DIR)$(DIR_SEP)hbdict$(HB_DEBUG).exe
+HBMAKE_EXE  =$(BIN_DIR)$(DIR_SEP)hbmake$(HB_DEBUG).exe
+HBEXTERN_EXE=$(BIN_DIR)$(DIR_SEP)hbextern$(HB_DEBUG).exe
+HBFORMAT_EXE=$(BIN_DIR)$(DIR_SEP)hbformat$(HB_DEBUG).exe
+XBSCRIPT_EXE=$(BIN_DIR)$(DIR_SEP)xbscript$(HB_DEBUG).exe
 
 #===============================================================================
 # xHarbour Libraries for building standard executables
@@ -232,6 +232,7 @@ XBSCRIPT_EXE=$(BIN_DIR)$(DIR_SEP)xbscript.exe
 HARBOUR_LIBS=\
 	$(PP_LIB)\
 	$(COMMON_LIB)\
+	$(DEBUG_LIB)\
 	$(VM_LIB)\
 	$(RTL_LIB)\
 	$(PCREPOS_LIB)\

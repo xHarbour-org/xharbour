@@ -8,6 +8,40 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-18 07:38 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/harbour.c
+    ! fix memory leak on commands: harbour /build or harbour /credits
+
+  * winmake/makefile.dc
+  * winmake/makefile.bc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+  * winmake/makefile.pc
+  * winmake/makefile.gc
+  * winmake/readme.txt
+  * source/vm/hvm.c
+    + option to not using background task routines in ST mode (save some CPU
+      cycles). we should: SET HB_NO_BACKGROUND=1
+    + keyboard interrupt, which may be useful in console mode, is enabled by
+      default. option to disregard keyboard interrupt now added to yet save
+      some CPU cycles. we should: SET HB_GUI=1 (recommended for GUI apps)
+
+  * winmake/common.mak
+    + added missing DEBUG_LIB to HARBOUR_LIBRARY macro
+    ! rename: harbour.dll -> xharbour.dll due to name conflict (harbour.tds)
+      when building xHarbour in BCC debug mode
+
+  * make_b32.bat
+  * winmake/mdir.bat
+  * winmake/makefile.bc
+    ! explicitely change envar argument to 1 (f.e.) ifdef HB_X -> if ("$(HB_X)"=="1")
+    + added parameter: HB_WARNING_FLAGS, default=-w -w-8071 -w-8061 -w-8080
+      can be overriden by (f.e.) SET HB_WARNING_FLAGS=-w
+    + added parameter: HB_DEBUG, default: not set (empty)
+      can be overriden by (f.e.) SET HB_DEBUG=d -> creates libraries and
+      executables in debug mode (requires: CG32.DLL). Files created with this
+      option will be appended with a 'd', f.e: vm.lib -> vmd.lib for debug mode
+
 2012-10-17 07:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/hvm.c
     ! code reformatting

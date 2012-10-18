@@ -95,6 +95,14 @@ ifdef HB_NO_DV_MEMCPY
 CLIBFLAGS    +=-DHB_NO_DV_MEMCPY
 endif
 
+if ($(HB_NO_BACKGROUND),1)
+CLIBFLAGS    +=-DHB_NO_BACKGROUND
+endif
+
+if ($(HB_GUI),1)
+CLIBFLAGS    +=-DHB_GUI
+endif
+
 CLIBFLAGS    +=$(C64FLAGS)
 
 CC_CMD       =GCC $(CLIBFLAGS) -o $@ $^
@@ -394,6 +402,15 @@ endif
 ifdef HB_NO_DV_MEMCPY
 CLIBFLAGS    +=-DHB_NO_DV_MEMCPY
 endif
+
+if ($(HB_NO_BACKGROUND),1)
+CLIBFLAGS    +=-DHB_NO_BACKGROUND
+endif
+
+if ($(HB_GUI),1)
+CLIBFLAGS    +=-DHB_GUI
+endif
+
 CLIBFLAGS+=$(C64FLAGS)
 HARBOURFLAGS+=$(HB64FLAGS)
 CC_CMD      =GCC $(CLIBFLAGS) -o $@ $^

@@ -6,6 +6,13 @@
 The following are some environment set-ups which are required to build
 custom xHarbour:
 
+SET HB_NO_BACKGROUND=
+When set to 1, xHarbour will not use background task routines in ST mode
+
+SET HB_GUI=
+When set to 1, xHarbour will disregard keyboard interrupt wiich is not very
+useful in GUI mode
+
 SET HB_NO_VM_ALL=
 When set, VM modules will not be amalgamated.
 

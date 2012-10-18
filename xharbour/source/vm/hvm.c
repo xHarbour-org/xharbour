@@ -332,8 +332,8 @@ ULONG _System OS2TermHandler( PEXCEPTIONREPORTRECORD p1,
                               PVOID pv );
 #endif
 
-#ifndef HB_THREAD_SUPPORT
-/* background function counter */
+#if !defined( HB_THREAD_SUPPORT ) && !defined( HB_NO_BACKGROUND )
+/* abackground function counter */
 static int     s_iBackground  = 0;
 #endif
 
@@ -996,10 +996,12 @@ int hb_vmQuit( void )
    TraceLog( NULL, "After Idle\n" );
    #endif
 
+#if !defined( HB_NO_BACKGROUND )
    hb_backgroundShutDown();
-   #ifdef TRACE_QUIT
+#ifdef TRACE_QUIT
    TraceLog( NULL, "After Background\n" );
-   #endif
+#endif
+#endif
 
    if( HB_VM_STACK.pPos == HB_VM_STACK.pItems )
    {
@@ -1351,13 +1353,15 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
    BOOL           bCanRecover             = FALSE;
    BOOL           bCanFinalize            = FALSE;
    BOOL           bDynCode                = pSymbols == NULL || ( pSymbols->scope.value & HB_FS_DYNCODE ) != 0;
+#if ! defined( HB_GUI ) || ! defined( HB_NO_BACKGROUND )
    PHB_SET_STRUCT pSet                    = hb_stackSetStruct();
+#endif
 
-#ifndef HB_GUI
+#if !defined( HB_GUI )
    static USHORT  uiPolls                 = 1;
 #endif
 
-#ifndef HB_NO_PROFILER
+#if !defined( HB_NO_PROFILER )
    ULONG ulLastOpcode   = 0;  /* opcodes profiler support */
    ULONG ulPastClock    = 0;  /* opcodes profiler support */
 #endif
@@ -1405,7 +1409,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
       }
 #endif
 
-#if ! defined( HB_THREAD_SUPPORT )
+#if ! defined( HB_THREAD_SUPPORT ) && ! defined( HB_NO_BACKGROUND )
       if( pSet->HB_SET_BACKGROUNDTASKS && ( ++s_iBackground > pSet->HB_SET_BACKGROUNDTICK ) )
       {
          hb_backgroundRun();
@@ -2073,7 +2077,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
                hb_vmSend( usParams );
             }
 
- SEND_Finalization:
+            SEND_Finalization:
 
             w += 2;
             if( pCode[ w ] == HB_P_POP )
@@ -2628,9 +2632,9 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
          case HB_P_FINALLY:
             HB_TRACE( HB_TR_DEBUG, ( "HB_P_FINALLY" ) );
 
-           #ifdef DEBUG_FINALLY
+            #ifdef DEBUG_FINALLY
             printf( "%s->Finally status: %p request: %i Top: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, HB_VM_STACK.pSequence->uiStatus, HB_VM_STACK.pSequence->uiActionRequest, hb_stackItemFromTop( -1 )->type );
-           #endif
+            #endif
 
             HB_VM_STACK.pSequence->uiStatus |= HB_SEQ_FINALIZED;
             w++;
@@ -2678,9 +2682,9 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
             HB_VM_STACK.pSequence   = HB_VM_STACK.pSequence->pPrev;
             hb_xfree( ( void * ) pFree );
 
-           #ifdef DEBUG_FINALLY
+            #ifdef DEBUG_FINALLY
             printf( "%s->Completed execution: %p Restored: %p Finally: %li Pending: %i bCanFinalize: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, pFree, HB_VM_STACK.pSequence, HB_VM_STACK.pSequence ? HB_VM_STACK.pSequence->lFinally : 0, hb_stackGetActionRequest(), bCanFinalize );
-           #endif
+            #endif
 
             w++;
             break;
@@ -4021,7 +4025,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
             }
             else if( bCanRecover && ( HB_VM_STACK.pSequence->uiStatus & HB_SEQ_RECOVERED ) == 0 )
             {
- hb_vmExecute_CanRecover:
+               hb_vmExecute_CanRecover:
 
                // Reset FOR EACH.
                while( HB_VM_STACK.wEnumCollectionCounter > HB_VM_STACK.pSequence->wEnumCollectionCounter )
@@ -4087,10 +4091,12 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
          HB_STACK_LOCK;
 
          /* Run background functions every unlock period */
+#if ! defined( HB_NO_BACKGROUND )
          if( pSet->HB_SET_BACKGROUNDTASKS )
          {
             hb_backgroundRun();
          }
+#endif
       }
 #endif
 
@@ -4678,7 +4684,7 @@ static void hb_vmMinus( void )
          }
       }
       else
-Datetime_Error:
+         Datetime_Error:
       {
          PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1082, NULL, "-", 2, pItem1, pItem2 );
 
@@ -6689,15 +6695,15 @@ static void hb_vmArrayPushRef( void )
             hb_errRT_BASE( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
          }
       }
-   else
-   {
-      hb_errRT_BASE( EG_BOUND, 1132, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
-   }
-      }
       else
       {
-         hb_errRT_BASE( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
+         hb_errRT_BASE( EG_BOUND, 1132, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
       }
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
+   }
 }
 
 static void hb_vmArrayPop( HB_PCODE pcode )

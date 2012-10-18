@@ -65,6 +65,14 @@ CLIBFLAGS    =-dHB_VM_ALL $(CLIBFLAGS)
 CLIBFLAGS   =-dHB_NO_DV_MEMCPY $(CLIBFLAGS)
 !endif
 
+!if ("$(HB_GUI)"=="1")
+CLIBFLAGS   =-dHB_GUI $(CLIBFLAGS)
+!endif
+
+!if ("$(HB_NO_BACKGROUND)"=="1")
+CLIBFLAGS   =-dHB_NO_BACKGROUND $(CLIBFLAGS)
+!endif
+
 #-------------------------------------------------------------------------------
 # AJ: 2008-04-26
 # NOTE ON HB_CMD/HB_CMD_MAIN:
@@ -345,6 +353,12 @@ CLIBFLAGS    =-dHB_VM_ALL $(CLIBFLAGS)
 !endif
 !ifdef HB_NO_DV_MEMCPY
 CLIBFLAGS    =-dHB_NO_DV_MEMCPY $(CLIBFLAGS)
+!endif
+!if ("$(HB_GUI)"=="1")
+CLIBFLAGS   =-dHB_GUI $(CLIBFLAGS)
+!endif
+!if ("$(HB_NO_BACKGROUND)"=="1")
+CLIBFLAGS   =-dHB_NO_BACKGROUND $(CLIBFLAGS)
 !endif
 HARBOURFLAGS=$(HARBOURFLAGS) -d_USE_APPMAIN_ -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 -gc0
 MAINWIN_OBJ =$(OBJ_DIR)\mainstdW32.obj

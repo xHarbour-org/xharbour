@@ -285,23 +285,26 @@ int hb_compMain( int argc, char * argv[] )
    /* First check the environment variables */
    hb_Command_Line   = ( char * ) hb_xgrab( MAX_MEM_COMMAND_LINE );
    hb_xmemset( hb_Command_Line, 0, MAX_MEM_COMMAND_LINE );
+
    hb_compChkCompilerSwitch( 0, NULL );
 
    /* Then check command line arguments
       This will override duplicated environment settings */
    hb_compChkCompilerSwitch( argc, argv );
-
+#if 0
    if( hb_comp_bLogo )
    {
       hb_compPrintLogo();
    }
-
+#endif
    if( hb_comp_bBuildInfo )
    {
       printf( "\n" );
       szBuildInfo = hb_verBuildInfo( TRUE );
       hb_xfree( szBuildInfo );
       hb_xfree( hb_Command_Line );
+      if( hb_comp_PP )
+         hb_pp_free( hb_comp_PP );
       return iStatus;
    }
 
@@ -309,6 +312,8 @@ int hb_compMain( int argc, char * argv[] )
    {
       hb_compPrintCredits();
       hb_xfree( hb_Command_Line );
+      if( hb_comp_PP )
+         hb_pp_free( hb_comp_PP );
       return iStatus;
    }
 

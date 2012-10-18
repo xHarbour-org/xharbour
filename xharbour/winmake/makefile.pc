@@ -98,7 +98,13 @@ CLIBFLAGS    =/D"HB_NO_DV_MEMCPY" $(CLIBFLAGS)
 !endif
 CLIBFLAGS=$(CLIBFLAGS) $(C64FLAGS)
 !if ("$(__COMP__)"=="__XCC__")
-CLIBFLAGS=$(CLIBFLAGS) -D"__XCC__"
+CLIBFLAGS=$(CLIBFLAGS) /D"__XCC__"
+!endif
+!if ("$(HB_GUI)"=="1")
+CLIBFLAGS    =/D"HB_GUI" $(CLIBFLAGS)
+!endif
+!if ("$(HB_NO_BACKGROUND)"=="1")
+CLIBFLAGS    =/D"HB_NO_BACKGROUND" $(CLIBFLAGS)
 !endif
 CC_CMD       =$(CC) $(__MT__) $(CLIBFLAGS) /Fo$@ $**
 CCC_CMD      =$(CC_CMD)
@@ -364,6 +370,15 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 HARBOURFLAGS=$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
 CLIBFLAGS   =$(CLIBFLAGS) /MT /DHB_THREAD_SUPPORT
+!if ("$(HB_GUI)"=="1")
+CLIBFLAGS   =/D"HB_GUI" $(CLIBFLAGS)
+!endif
+!if ("$(HB_NO_BACKGROUND)"=="1")
+CLIBFLAGS   =/D"HB_NO_BACKGROUND" $(CLIBFLAGS)
+!endif
+!if ("$(__COMP__)"=="__XCC__")
+CLIBFLAGS   =/D"__XCC__" $(CLIBFLAGS)
+!endif
 INCLUDE_DIR =/I"include" /I"$(CC_DIR)\include" /I"$(CC_DIR)\include\win" /I"$(OBJ_DIR)"
 INCLUDE_DIR =$(INCLUDE_DIR) /I"$(ZLIB_DIR)" /I"$(PNG_DIR)" /I"$(PDFLITE_DIR)\include"
 INCLUDE_DIR =$(INCLUDE_DIR) /I"$(JPEG_DIR)" /I"$(TIFF_DIR)"

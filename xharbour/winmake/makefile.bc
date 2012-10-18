@@ -9,20 +9,33 @@
 #
 #===============================================================================
 
-!if !$d(DEL)
+!if ("$(DEL)"=="")
 DEL=del
 !endif
 
-!if !$d(TYPE)
+!if ("$(TYPE)"=="")
 TYPE=type
 !endif
 
-!if !$d(COPY)
+!if ("$(COPY)"=="")
 COPY=copy
 !endif
 
-!ifndef HB_HAS_LINENO
+!if ("$(HB_HAS_LINENO)"=="")
 LINEFLAGS=-l
+!endif
+
+!if ("$(HB_DEBUG)"=="d")
+LINEFLAGS=
+CC_DEBUG_FLAGS=-y -v -vG -DHB_FM_STATISTICS -DHB_PRG_TRACE
+CC_LINKER_DEBUG_FLAGS=-v
+HB_NO_VM_ALL=1
+HB_NO_FM_DL_ALLOC=1
+HB_NO_DV_MEMCPY=1
+HB_CG32=1
+HB_PCODE_FLAG=-gc2
+!else
+HB_PCODE_FLAG=-gc0
 !endif
 
 #===============================================================================
@@ -30,8 +43,12 @@ LINEFLAGS=-l
 # debug info is requested with -v -y
 # if debug info is requested, set ARFLAGS to /P64 in your environment
 #===============================================================================
-!if !$d(ARFLAGS)
+!if ("$(ARFLAGS)"=="")
 ARFLAGS=/0 /C /P256
+!endif
+
+!if ("$(HB_WARNING_FLAGS)"=="")
+HB_WARNING_FLAGS=-w -w-8071 -w-8061 -w-8080
 !endif
 
 #*******************************************************************************
@@ -49,30 +66,38 @@ CLIBFLAGS   =$(CLIBFLAGS)
 INCLUDE_DIR  =$(INCLUDE_DIR) -Iinclude -I$(OBJ_DIR) -I$(ZLIB_DIR)
 INCLUDE_DIR  =$(INCLUDE_DIR) -I$(PDFLITE_DIR)\include -I$(PNG_DIR) -I$(JPEG_DIR) -I$(TIFF_DIR)
 CLIBFLAGS    =$(CLIBFLAGS) -OS -O2 -q -c $(INCLUDE_DIR) -d -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H
-HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 -gc0
-LINK_CMD     =ILINK32 -ap -Tpe -x -Gn -C -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" -Llib\b32 $(LFLAGS) "$(CC_DIR)\lib\c0x32.obj" $**,$@,,
+HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 $(HB_PCODE_FLAG)
+LINK_CMD     =ILINK32 $(CC_LINKER_DEBUG_FLAGS) -ap -Tpe -x -Gn -C -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" -Llib\b32 $(LFLAGS) "$(CC_DIR)\lib\c0x32.obj" $**,$@,,
 CLIBFLAGS    =$(CLIBFLAGS) -tWM
 
-!if $d(HB_THREAD_SUPPORT)
+!if ("$(HB_MT)"=="mt") || defined(HB_THREAD_SUPPORT)
 HARBOURFLAGS =$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
 CLIBFLAGS    =$(CLIBFLAGS) -DHB_THREAD_SUPPORT
 HB_MT_FLAGS  =-DHB_THREAD_SUPPORT
 !endif
 
-!ifndef HB_NO_FM_DL_ALLOC
+!if !("$(HB_NO_FM_DL_ALLOC)"=="1")
 CLIBFLAGS    =-DHB_FM_DL_ALLOC $(CLIBFLAGS)
 !endif
 
-!ifndef HB_NO_VM_ALL
+!if !("$(HB_NO_VM_ALL)"=="1")
 CLIBFLAGS    =-DHB_VM_ALL $(CLIBFLAGS)
 !endif
 
-!ifdef HB_NO_DV_MEMCPY
+!if !("$(HB_NO_DV_MEMCPY)"=="1")
 CLIBFLAGS    =-DHB_NO_DV_MEMCPY $(CLIBFLAGS)
 !endif
 
+!if ("$(HB_GUI)"=="1")
+CLIBFLAGS    =-DHB_GUI $(CLIBFLAGS)
+!endif
+
+!if ("$(HB_NO_BACKGROUND)"=="1")
+CLIBFLAGS    =-DHB_NO_BACKGROUND $(CLIBFLAGS)
+!endif
+
 # User flags should be able to override everything!
-CLIBFLAGS    =$(CLIBFLAGS)  $(CFLAGS)
+CLIBFLAGS    =$(HB_WARNING_FLAGS) $(CLIBFLAGS)  $(CFLAGS)
 LINKERFLAGS  =$(LINKERFLAGS) $(LFLAGS)
 
 #-------------------------------------------------------------------------------
@@ -87,7 +112,7 @@ LINKERFLAGS  =$(LINKERFLAGS) $(LFLAGS)
 HB_CMD       =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN  =$(HARBOUR_EXE) -n $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 
-CC_CMD       =BCC32 $(CLIBFLAGS) -o$@ $**
+CC_CMD       =BCC32 $(CC_DEBUG_FLAGS) $(CLIBFLAGS) -o$@ $**
 CCC_CMD      =$(CC_CMD)
 CC_CMD_FMSTAT=BCC32 $(CLIBFLAGS) -DHB_FM_STATISTICS -o$@ $**
 BISON_CMD1   =bison -v -d $** -o$@
@@ -97,7 +122,7 @@ COMPILERLIBS=\
 	cw32mt.lib\
 	import32.lib
 
-!if $d(HB_CG32)
+!if ("$(HB_CG32)"=="1")
 COMPILERLIBS=\
 	cg32.lib\
 	$(COMPILERLIBS)
@@ -112,7 +137,7 @@ CMN_LIBS=$(COMMON_LIB) $(COMPILERLIBS)
 #===============================================================================
 !include winmake\common.mak
 
-!ifdef HB_GTALLEG
+!if ("$(HB_GTALLEG)"=="1")
 HB_GT_LIBS=\
 	$(HB_GT_LIBS)\
 	$(GTALLEG_LIB)
@@ -121,8 +146,7 @@ HB_GT_LIBS=\
 #===============================================================================
 # The Project
 #===============================================================================
-
-!if !$d(HB_THREAD_SUPPORT)
+!if !defined(HB_THREAD_SUPPORT)
 PROJECT=$(ST_PROJECT)
 !if ( defined(HB_DIR_ADS) && !("$(HB_ADS_IMPLIB)"=="no") )
 PROJECT=\
@@ -133,7 +157,7 @@ PROJECT=\
 PROJECT=$(MT_PROJECT)
 !endif
 
-!ifdef HB_NO_VM_ALL
+!if ("$(HB_NO_VM_ALL)"=="1")
 PROJECT=$(PROJECT) $(FMSTAT_LIB)
 !endif
 
@@ -167,7 +191,7 @@ $(CT_LIB) : $(CT_LIB_OBJS)
 +)
 !
 
-!ifndef HB_NO_VM_ALL
+!if !("$(HB_NO_VM_ALL)"=="1")
 VM_LIB_OBJS=\
 	$(VM_ALL_OBJS)
 !endif
@@ -489,8 +513,8 @@ DLL_MT=mt
 #===============================================================================
 # RDDADS
 #===============================================================================
-!ifdef HB_DIR_ADS  ##!if $d(HB_RDDADS)
-!if "$(HB_ADS_IMPLIB)" == "no"
+!if !("$(HB_DIR_ADS)"=="")
+!if ("$(HB_ADS_IMPLIB)"=="no")
 !else
 COMPILERLIBS=\
 	$(LIB_DIR)$(DIR_SEP)ace32.lib
@@ -501,7 +525,7 @@ HARBOUR_DLL_OBJS=\
 	$(RDDADS_LIB_OBJS)
 !endif
 
-!ifndef HB_NO_VM_ALL
+!if !("$(HB_NO_VM_ALL)"=="1")
 VM_LIB_OBJS=\
 	$(VM_ALL_OBJS)
 !endif
@@ -512,7 +536,7 @@ VM_LIB_OBJS=\
 #===============================================================================
 # WVG
 #===============================================================================
-!if $d(HB_WVG)
+!if ("$(HB_WVG)"=="1")
 HARBOUR_DLL_OBJS=\
 	$(HARBOUR_DLL_OBJS)\
 	$(GTWVG_LIB_OBJS)
@@ -527,16 +551,16 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
-!if $d(DLL_MT)
+!if ("$(DLL_MT)"=="mt")
 CLIBFLAGS   =$(CLIBFLAGS) -tWM -DHB_THREAD_SUPPORT
 HARBOURFLAGS=$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
 !else
 CLIBFLAGS   =$(CLIBFLAGS) -tWD
 !endif
-!ifdef HB_DIR_ADS
+!if !("$(HB_DIR_ADS)"=="")
 ACEH_DIR    =-I"$(HB_DIR_ADS)"
 !endif
-!ifdef HB_DIR_OPENSSL
+!if !("$(HB_DIR_OPENSSL)"=="")
 OPENSSL_DIR    =-I"$(HB_DIR_OPENSSL)\include"
 !endif
 
@@ -545,7 +569,7 @@ INCLUDE_DIR =$(INCLUDE_DIR) -I"$(JPEG_DIR)" -I"$(TIFF_DIR)"
 DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
 CLIBFLAGS   =$(CLIBFLAGS) -DHAVE_CONFIG_H -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -q -a8 -OS -O2 -6 -c $(ACEH_DIR) $(OPENSSL_DIR) $(INCLUDE_DIR) -d -w3 -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H
-HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 -gc0
+HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 $(HB_PCODE_FLAG)
 
 # User flags should be able to override everything!
 DLLFLAGS    =$(DLLFLAGS) $(LFLAGS)
@@ -553,31 +577,39 @@ EXEFLAGS    =$(EXEFLAGS) $(LFLAGS)
 CLIBFLAGS   =$(CLIBFLAGS) $(CFLAGS)
 LINKERFLAGS =$(LINKERFLAGS) $(LFLAGS)
 
-!ifndef HB_NO_VM_ALL
+!if !("$(HB_NO_VM_ALL)"=="1")
 CLIBFLAGS   =-DHB_VM_ALL $(CLIBFLAGS)
 !endif
 
-!ifndef HB_NO_FM_DL_ALLOC
+!if !("$(HB_NO_FM_DL_ALLOC)"=="1")
 CLIBFLAGS    =-DHB_FM_DL_ALLOC $(CLIBFLAGS)
 !endif
 
-!ifdef HB_NO_DV_MEMCPY
+!if ("$(HB_NO_DV_MEMCPY)"=="1")
 CLIBFLAGS    =-DHB_NO_DV_MEMCPY $(CLIBFLAGS)
 !endif
 
-CC_CMD      =BCC32 $(CLIBFLAGS) -o$@ $**
+!if ("$(HB_GUI)"=="1")
+CLIBFLAGS    =-DHB_GUI $(CLIBFLAGS)
+!endif
+
+!if ("$(HB_NO_BACKGROUND)"=="1")
+CLIBFLAGS    =-DHB_NO_BACKGROUND $(CLIBFLAGS)
+!endif
+
+CC_CMD      =BCC32 $(CC_DEBUG_FLAGS) $(HB_WARNING_FLAGS) $(CLIBFLAGS) -o$@ $**
 CCC_CMD     =$(CC_CMD)
 HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 BISON_CMD1  =bison -v -d $** -o$@
 BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
 
-DLLEXE_LINK_CMD=ILINK32 $(LINKERFLAGS) -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" "$(CC_DIR)\lib\c0x32.obj" $**,$@,,$(USE_DLL_LIB) $(PDFLITE_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+DLLEXE_LINK_CMD=ILINK32 $(CC_LINKER_DEBUG_FLAGS) $(LINKERFLAGS) -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" "$(CC_DIR)\lib\c0x32.obj" $**,$@,,$(USE_DLL_LIB) $(PDFLITE_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # Compiler and 3rd Party libraries need to be linked
 #===============================================================================
-!if $d(HB_CG32)
+!if ("$(HB_CG32)"=="1")
 COMPILERLIBS=\
 	cg32.lib\
 	$(COMPILERLIBS)\
@@ -601,19 +633,18 @@ ALL: $(DLL_PROJECT)
 # HARBOUR.DLL rules
 #===============================================================================
 $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
-	ILINK32 $(DLLFLAGS) -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" @&&!
+	ILINK32 $(CC_LINKER_DEBUG_FLAGS) $(DLLFLAGS) -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" @&&!
 "$(CC_DIR)\lib\c0d32.obj" $**, $@,, $(COMPILERLIBS), $(RTL_DIR)\bcc.def
 !
 
 #*******************************************************************************
 !elif ("$(__BLD__)"=="CONTRIB_BLD")
 #*******************************************************************************
-
-!ifndef HB_NO_VM_ALL
+!if !("$(HB_NO_VM_ALL)"=="1")
 CLIBFLAGS    =-DHB_VM_ALL $(CLIBFLAGS)
 !endif
 
-!ifdef HB_NO_DV_MEMCPY
+!if ("$(HB_NO_DV_MEMCPY)"=="1")
 CLIBFLAGS    =-DHB_NO_DV_MEMCPY $(CLIBFLAGS)
 !endif
 
@@ -628,57 +659,66 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 RDDSQL_INCLUDE=-I$(RDDSQL_DIR) -I$(HBSQLIT3_DIR)
 
-!ifdef HB_DIR_ADS
+!if !("$(HB_DIR_ADS)"=="")
 ACEH_DIR     =-I"$(HB_DIR_ADS)"
+OPTIONAL_PRJ =$(OPTIONAL_PRJ) $(RDDADS_LIB)
 !endif
 
-!ifdef HB_DIR_OPENSSL
+!if !("$(HB_DIR_OPENSSL)"=="")
 OPENSSL_DIR    =-I"$(HB_DIR_OPENSSL)\include"
+OPTIONAL_PRJ   =$(OPTIONAL_PRJ) $(TIPSSL_LIB)
 !endif
 
-!ifdef HB_DIR_CURL
+!if !("$(HB_DIR_CURL)"=="")
 CURL_DIR    =-I"$(HB_DIR_CURL)\include"
+OPTIONAL_PRJ=$(OPTIONAL_PRJ) $(HBCURL_LIB)
 !endif
 
-!ifdef HB_DIR_CAIRO
+!if !("$(HB_DIR_CAIRO)"=="")
 CAIRO_DIR   =-I"$(HB_DIR_CAIRO)\include\cairo"
+OPTIONAL_PRJ=$(OPTIONAL_PRJ) $(HBCAIRO_LIB)
 !endif
 
-!ifdef HB_DIR_POSTGRESQL
+!if !("$(HB_DIR_POSTGRESQL)"=="")
 RDDSQL_INCLUDE=-I"$(HB_DIR_POSTGRESQL)\include" $(RDDSQL_INCLUDE)
+OPTIONAL_PRJ  =$(OPTIONAL_PRJ) $(PGSQL_LIB) $(SDDPG_LIB)
 !endif
 
-!ifdef HB_DIR_OCILIB
+!if !("$(HB_DIR_OCILIB)"=="")
 RDDSQL_INCLUDE=-I"$(HB_DIR_OCILIB)\include" $(RDDSQL_INCLUDE)
+OPTIONAL_PRJ  =$(OPTIONAL_PRJ) $(SDDOCI_LIB)
 !endif
 
-!ifdef HB_DIR_MYSQL
+!if !("$(HB_DIR_MYSQL)"=="")
 RDDSQL_INCLUDE=-I"$(HB_DIR_MYSQL)\include" $(RDDSQL_INCLUDE)
+OPTIONAL_PRJ  =$(OPTIONAL_PRJ) $(MYSQL_LIB) $(SDDMY_LIB)
 !endif
 
-!ifdef HB_DIR_FIREBIRD
+!if !("$(HB_DIR_FIREBIRD)"=="")
 RDDSQL_INCLUDE=-I"$(HB_DIR_FIREBIRD)\include" $(RDDSQL_INCLUDE)
+OPTIONAL_PRJ  =$(OPTIONAL_PRJ) $(FIREBIRD_LIB) $(SDDFB_LIB)
 !endif
 
-!ifdef HB_DIR_MAGIC
+!if !("$(HB_DIR_MAGIC)"=="")
 RDDSQL_INCLUDE=-I"$(HB_DIR_MAGIC)\include" $(RDDSQL_INCLUDE)
+OPTIONAL_PRJ  =$(OPTIONAL_PRJ) $(HBMAGIC_LIB)
 !endif
 
 INCLUDE_DIR  =-Iinclude $(RDDSQL_INCLUDE) -I$(SIXAPI_DIR)\include
 CLIBFLAGS    =$(CLIBFLAGS) -OS -O2 -c -q $(ACEH_DIR) $(CAIRO_DIR) $(CURL_DIR) $(OPENSSL_DIR) $(INCLUDE_DIR) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(HBHPDF_DIR) -I$(ZLIB_DIR) -d -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
-HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -i$(GDLIB_DIR)\include -i$(SIXAPI_DIR)\include -i$(WHAT32_DIR)\include -i$(XWT_DIR)\include -q0 -w2 -es2 -gc0
+HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -i$(GDLIB_DIR)\include -i$(SIXAPI_DIR)\include -i$(WHAT32_DIR)\include -i$(XWT_DIR)\include -q0 -w2 -es2 $(HB_PCODE_FLAG)
 CLIBFLAGS    =$(CLIBFLAGS) -tWM
-!if $d(HB_THREAD_SUPPORT)
+!if defined(HB_THREAD_SUPPORT)
 CLIBFLAGS    =$(CLIBFLAGS) -DHB_THREAD_SUPPORT
 HARBOURFLAGS =-dHB_THREAD_SUPPORT $(HARBOURFLAGS)
 !endif
 
 # User flags should be able to override everything!
-CLIBFLAGS    =$(CLIBFLAGS)  $(CFLAGS)
+CLIBFLAGS    =$(HB_WARNING_FLAGS) $(CLIBFLAGS) $(CFLAGS)
 HB_CMD       =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
-CC_CMD       =BCC32 $(CLIBFLAGS) -o$@ $**
+CC_CMD       =BCC32 $(CC_DEBUG_FLAGS) $(CLIBFLAGS) -o$@ $**
 CCC_CMD      =$(CC_CMD)
-CC_CMD_ZIP   =BCC32 -tWM -q -c -I$(HBZIP_DIR)\include;include -Ve -6 -R- -H- -5 -OS -w- -O2 -X- -a8 -b -k- -o$@ $**
+CC_CMD_ZIP   =BCC32 $(CC_DEBUG_FLAGS) -tWM -q -c -I$(HBZIP_DIR)\include;include -Ve -6 -R- -H- -5 -OS -w- -O2 -X- -a8 -b -k- -o$@ $**
 
 #===============================================================================
 # Macro Definitions
@@ -692,43 +732,9 @@ CONTRIB_PROJECT=\
 	$(HBSQLIT3_LIB)\
 	$(WHAT32_LIB)\
 	$(GTWVG_LIB)\
-	$(HBZIP_LIB)
-
-!ifdef HB_DIR_ADS
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(RDDADS_LIB)
-!endif
-
-!ifdef HB_DIR_OPENSSL
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(TIPSSL_LIB)
-!endif
-
-!ifdef HB_DIR_CURL
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBCURL_LIB)
-!endif
-
-!ifdef HB_DIR_CAIRO
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBCAIRO_LIB)
-!endif
-
-!ifdef HB_DIR_POSTGRESQL
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(PGSQL_LIB) $(SDDPG_LIB)
-!endif
-
-!ifdef HB_DIR_OCILIB
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(SDDOCI_LIB)
-!endif
-
-!ifdef HB_DIR_MYSQL
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(MYSQL_LIB) $(SDDMY_LIB)
-!endif
-
-!ifdef HB_DIR_FIREBIRD
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(FIREBIRD_LIB) $(SDDFB_LIB)
-!endif
-
-!ifdef HB_DIR_MAGIC
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBMAGIC_LIB)
-!endif
+	$(HBZIP_LIB)\
+	\
+	$(OPTIONAL_PRJ)
 
 ALL: $(CONTRIB_PROJECT)
 
