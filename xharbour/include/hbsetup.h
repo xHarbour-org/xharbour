@@ -84,26 +84,27 @@
         defined( HB_OS_BEOS ) ) )
 
    #undef  HAVE_INTTYPES_H
-   #define HAVE_INTTYPES_H     1
+   #define HAVE_INTTYPES_H        1
    #undef  HAVE_STDINT_H
-   #define HAVE_STDINT_H       1
+   #define HAVE_STDINT_H          1
 
 #elif defined( _MSC_VER )
    #undef  HAVE_INTTYPES_H
-   #define HAVE_INTTYPES_H     0
+   #define HAVE_INTTYPES_H        0
    #if ( _MSC_VER >= 1600 )
       #undef  HAVE_STDINT_H
-      #define HAVE_STDINT_H    1
+      #define HAVE_STDINT_H       1
    #else
       #undef  HAVE_STDINT_H
-      #define HAVE_STDINT_H    0
+      #define HAVE_STDINT_H       0
+      #define HAVE_INTSAFE_H      1
    #endif
 
 #else
    #undef  HAVE_STDINT_H
-   #define HAVE_STDINT_H       0
+   #define HAVE_STDINT_H          0
    #undef  HAVE_INTTYPES_H
-   #define HAVE_INTTYPES_H     0
+   #define HAVE_INTTYPES_H        0
    #undef  INT64_MAX
 #endif
 

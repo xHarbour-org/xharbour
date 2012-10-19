@@ -8,6 +8,26 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-20 06:37 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbsetup.h
+  * include/hbdefs.h
+    ! use native intsafe.h for MSVS older than MCVS 2010 (This pacify many
+      warnings on typedefs redefinitions in older MSVS versions)
+
+  * source/rtl/gttone.c
+    ! MSVC 71 (Windows DDK) does not have _inp and _outp in LIBC*.LIB, hence
+    linking application compiled with -MT flag will fail. xHabour will now use
+    the ASM codes for MSVC 71 MT and will only use the proprietary functions
+    when compiled with MD flag (SET USE_MSVCRT=1)
+
+  * winmake/makefile.bc
+  * winmake/makefile.gc
+  * winmake/makefile.vc
+    ! changed hard-coded .obj and .o -> $(OBJEXT)
+
+  * winmake/makefile.vc
+    ! removed -Og2 flag (global optimization) for MSVC 7/71 which caused random GPF
+
 2012-10-19 18:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/harbour.c
     ! restore logo printing which was unintentionally remmed

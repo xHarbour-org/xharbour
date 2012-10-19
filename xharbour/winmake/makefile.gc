@@ -163,7 +163,7 @@ COMPILERLIBS=\
 	-L$(CC_DIR)/lib\
 	-luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr\
 	-lole32 -luuid -loleaut32 -lws2_32
-START_UP_OBJ=$(OBJ_DIR)/mainstd$(HB_DEBUG).o
+START_UP_OBJ=$(OBJ_DIR)/mainstd$(OBJEXT)
 EXE_LIBS=$(HARBOUR_LIBS) $(COMPILERLIBS)
 HRB_LIBS=-L$(LIB_DIR) -Wl,--start-group -lpp$(HB_ARCH)$(HB_DEBUG) -lcommon$(HB_ARCH)$(HB_DEBUG) -lcompiler$(HB_ARCH)$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
 CMN_LIBS=-L$(LIB_DIR) -lcommon$(HB_ARCH)$(HB_DEBUG) $(COMPILERLIBS)
@@ -689,7 +689,7 @@ $(XWT_LIB) : $(XWT_LIB_OBJS)
 
 ifeq ($(HB_ADS_IMPLIB),no)
 RDDADS_LIB_OBJS+=\
-	$(OBJ_DIR)/ace32.o
+	$(OBJ_DIR)/ace32$(OBJEXT)
 endif
 $(RDDADS_LIB) : $(RDDADS_LIB_OBJS)
 	$(LIB_CMD)
@@ -704,7 +704,7 @@ $(HBCC_LIB) : $(HBCC_LIB_OBJS)
 	$(LIB_CMD)
 
 WHAT32_LIB_OBJS+=\
-	$(OBJ_DIR)/_wincall$(HB_DEBUG).o
+	$(OBJ_DIR)/_wincall$(OBJEXT)
 $(WHAT32_LIB) : $(WHAT32_LIB_OBJS)
 	$(LIB_CMD)
 

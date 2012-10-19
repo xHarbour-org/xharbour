@@ -89,6 +89,10 @@
    #endif
 #endif
 
+#if HAVE_INTSAFE_H
+   #include <intsafe.h>
+#endif
+
 /*
 #define HB_CLIPPER_INT_ITEMS
 #define HB_LONG_LONG_OFF

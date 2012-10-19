@@ -8,7 +8,6 @@
 # version, changes should only be made on your local copy.(AJ:2008-04-26)
 #
 #===============================================================================
-# -W4 -wd4127 -wd4054 -wd4055
 
 !if ("$(DEL)"=="")
 DEL=del
@@ -27,22 +26,43 @@ LINEFLAGS=-l
 !endif
 
 !if ("$(HB_DEBUG)"=="d")
-CC_DEBUGFLAGS=-Zi
+CC_DEBUGFLAGS =-Zi
 LNK_DEBUGFLAGS=/DEBUG
-PCODE_FLAG=-gc2
-LINEFLAGS=
+PCODE_FLAG    =-gc2
+LINEFLAGS     =
 !else
-PCODE_FLAG=-gc0
+PCODE_FLAG    =-gc0
 !endif
 
 !if ("$(HB_ARCH)"=="64")
-C64FLAGS=-DHB_OS_WIN_64 -DNODLL
-HB64FLAGS=-DNODLL
+C64FLAGS  =-DHB_OS_WIN_64 -DNODLL
+HB64FLAGS =-DNODLL
 HB_MACHINE=X64
 !else
 HB_MACHINE=X86
-CPLUSPLUS=1
+CPLUSPLUS =1
 !endif
+
+!if ("$(__MSC__)"=="6")
+OPTFLAGS    =-Ogt2yb1p -G6
+WARNINGFLAGS=-W3
+!else if ("$(__MSC__)"=="7") || ("$(__MSC__)"=="71")
+OPTFLAGS    =-Otyb1p -G7
+WARNINGFLAGS=-W4 -wd4127 -wd4054 -wd4055 -wd4244
+! if ("$(__MSC__)"=="71")
+IGNOREFLAGS =/IGNORE:4078
+WARNINGFLAGS=-W4 -wd4127 -wd4054 -wd4055 -wd4244
+!endif
+!else
+OPTFLAGS    =-Otyb1
+!if ("$(__MSC__)"=="8") || ("$(__MSC__)"=="9")
+WARNINGFLAGS=-W4 -wd4127 -wd4054 -wd4055 -wd4244
+!else
+WARNINGFLAGS=-W4 -wd4127 -wd4054 -wd4055
+!endif
+!endif
+
+OPTFLAGS    =-EHsc $(OPTFLAGS)
 
 #*******************************************************************************
 !if ("$(__BLD__)"=="CORE_BLD")
@@ -93,12 +113,6 @@ CLIBFLAGS_C =$(CLIBFLAGS_C)
 #===============================================================================
 # Option to use MSVCRT rather than LIBC*.LIB
 #===============================================================================
-!if ("$(__MSC__)"=="6")	|| ("$(__MSC__)"=="7") || ("$(__MSC__)"=="71")
-OPTFLAGS=-Ogt2yb1p
-!else
-OPTFLAGS=-Otyb1
-!endif
-OPTFLAGS=-EHsc $(OPTFLAGS)
 INCLUDE_DIR =-I"include" -I"$(OBJ_DIR)" -I"$(CC_DIR)\include" -I"$(ZLIB_DIR)"
 INCLUDE_DIR =$(INCLUDE_DIR) -I"$(PDFLITE_DIR)\include" -I"$(PNG_DIR)" -I"$(TIFF_DIR)" -I"$(JPEG_DIR)"
 !if ("$(USE_MSVCRT)"=="1")
@@ -111,8 +125,8 @@ CLIBFLAGS_C=$(CLIBFLAGS_C) -MT
 !if ("$(CPLUSPLUS)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
-CLIBFLAGS_C =$(CLIBFLAGS_C) -D__WIN32__ -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H -c $(OPTFLAGS) -GA -Gs -W4 -wd4127 -wd4054 -wd4055 -nologo $(INCLUDE_DIR)
-CLIBFLAGS   =$(CLIBFLAGS) -D__WIN32__ -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H -c $(OPTFLAGS) -GA -Gs -W4 -wd4127 -wd4054 -wd4055 -nologo $(INCLUDE_DIR)
+CLIBFLAGS_C =$(CLIBFLAGS_C) -D__WIN32__ -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H -c $(OPTFLAGS) -GA -Gs $(WARNINGFLAGS) -nologo $(INCLUDE_DIR)
+CLIBFLAGS   =$(CLIBFLAGS) -D__WIN32__ -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H -c $(OPTFLAGS) -GA -Gs $(WARNINGFLAGS) -nologo $(INCLUDE_DIR)
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 $(PCODE_FLAG)
 !if ("$(HB_THREAD_SUPPORT)"=="1")
 CLIBFLAGS   =$(CLIBFLAGS) -DHB_THREAD_SUPPORT
@@ -137,7 +151,7 @@ LINKERFLAGS=$(LINKERFLAGS) /FORCE:MULTIPLE
 # User flags should be able to override everything!
 CLIBFLAGS   =$(CLIBFLAGS) $(CFLAGS)
 CLIBFLAGS_C =$(CLIBFLAGS_C) $(CFLAGS_C)
-LINKERFLAGS =$(LINKERFLAGS) $(LFLAGS)
+LINKERFLAGS =$(IGNOREFLAGS) $(LINKERFLAGS) $(LFLAGS)
 
 #-------------------------------------------------------------------------------
 # AJ: 2008-04-26
@@ -392,12 +406,6 @@ CLIBFLAGS_C =$(CLIBFLAGS_C)
 #===============================================================================
 # C compiler definition and C flags. These should never have to change.
 #===============================================================================
-!if ("$(__MSC__)"=="6")	|| ("$(__MSC__)"=="7") || ("$(__MSC__)"=="71")
-OPTFLAGS=-Ogt2yb1p
-!else
-OPTFLAGS=-Otyb1
-!endif
-OPTFLAGS=-EHsc $(OPTFLAGS)
 !if ("$(CPLUSPLUS)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -TP
 !endif
@@ -432,6 +440,7 @@ DLLFLAGS=\
 	/DEF:$(EXPORT_DEF)\
 	/OUT:$(HARBOUR_DLL)\
 	/DLL\
+	/$(IGNOREFLAGS)\
 	/IMPLIB:$(HARBOUR_DLL_LIB)\
 	/MACHINE:$(HB_MACHINE)\
 	/NOLOGO\
@@ -441,12 +450,12 @@ DLLFLAGS=\
 	$(HARBOUR_DLL_OBJS)
 
 EXEFLAGS=\
-	/NOLOGO /MACHINE:$(HB_MACHINE) /LIBPATH:"$(CC_DIR)\LIB"\
+	/NOLOGO $(IGNOREFLAGS) /MACHINE:$(HB_MACHINE) /LIBPATH:"$(CC_DIR)\LIB"\
 	/LIBPATH:$(LIB_DIR)\
 	/SUBSYSTEM:CONSOLE
 
-CLIBFLAGS   =$(CLIBFLAGS) -c -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H $(ACEH_DIR) $(OPENSSL_DIR) -I"$(ZLIB_DIR)" -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ $(OPTFLAGS) -Gs -W4 -wd4127 -wd4054 -wd4055 -DOPENSSL_NO_DEPRECATED -nologo $(CFLAGS)
-CLIBFLAGS_C =$(CLIBFLAGS_C) -c -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H $(ACEH_DIR) $(OPENSSL_DIR) -I"$(ZLIB_DIR)" -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ $(OPTFLAGS) -Gs -W4 -wd4127 -wd4054 -wd4055 -DOPENSSL_NO_DEPRECATED -nologo $(CFLAGS)
+CLIBFLAGS   =$(CLIBFLAGS) -c -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H $(ACEH_DIR) $(OPENSSL_DIR) -I"$(ZLIB_DIR)" -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ $(OPTFLAGS) -Gs $(WARNINGFLAGS) -DOPENSSL_NO_DEPRECATED -nologo $(CFLAGS)
+CLIBFLAGS_C =$(CLIBFLAGS_C) -c -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H $(ACEH_DIR) $(OPENSSL_DIR) -I"$(ZLIB_DIR)" -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ $(OPTFLAGS) -Gs $(WARNINGFLAGS) -DOPENSSL_NO_DEPRECATED -nologo $(CFLAGS)
 CLIBFLAGS   =$(CLIBFLAGS) -I"$(PDFLITE_DIR)\include" -I"$(PNG_DIR)" -I"$(TIFF_DIR)" -I"$(JPEG_DIR)"
 CLIBFLAGS_C =$(CLIBFLAGS_C) -I"$(PDFLITE_DIR)\include" -I"$(PNG_DIR)" -I"$(TIFF_DIR)" -I"$(JPEG_DIR)"
 
@@ -609,14 +618,6 @@ CLIBFLAGS_C =-DHB_NO_DV_MEMCPY $(CLIBFLAGS_C)
 #===============================================================================
 # Option to use MSVCRT rather than LIBC*.LIB
 #===============================================================================
-!if ("$(__MSC__)"=="6")	|| ("$(__MSC__)"=="7") || ("$(__MSC__)"=="71")
-OPTFLAGS=-Ogt2yb1p
-!else
-OPTFLAGS=-Otyb1
-!endif
-
-OPTFLAGS=-EHsc $(OPTFLAGS)
-
 !if ("$(USE_MSVCRT)"=="1")
 CLIBFLAGS=$(CLIBFLAGS) -MD
 CLIBFLAGS_C=$(CLIBFLAGS_C) -MD
@@ -631,9 +632,9 @@ CLIBFLAGS=$(CLIBFLAGS) -TP
 
 INCLUDE_DIR =-I"include" -I"$(CC_DIR)\include" $(CAIRO_DIR) $(CURL_DIR) $(OPENSSL_DIR)
 INCLUDE_DIR =$(INCLUDE_DIR) $(RDDSQL_INCLUDE) -I"$(SIXAPI_DIR)\include"
-CLIBFLAGS   =$(CLIBFLAGS) -c $(OPTFLAGS) -GA -Gs -W4 -wd4127 -wd4054 -wd4055 -nologo $(ACEH_DIR) $(INCLUDE_DIR) -D_WIN32 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
+CLIBFLAGS   =$(CLIBFLAGS) -c $(OPTFLAGS) -GA -Gs $(WARNINGFLAGS) -nologo $(ACEH_DIR) $(INCLUDE_DIR) -D_WIN32 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
 CLIBFLAGS   =$(CLIBFLAGS) -I"$(FREEIMAGE_DIR)\include" -I"$(GDLIB_DIR)\include" -I"$(XWT_DIR)\include" -I"$(XWT_DIR)\src\xwt_win" -I"$(PNG_DIR)" -I"$(ZLIB_DIR)"
-CLIBFLAGS_C =$(CLIBFLAGS_C) -c $(OPTFLAGS) -GA -Gs -W4 -wd4127 -wd4054 -wd4055 -nologo $(ACEH_DIR) $(INCLUDE_DIR) -D_WIN32 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
+CLIBFLAGS_C =$(CLIBFLAGS_C) -c $(OPTFLAGS) -GA -Gs $(WARNINGFLAGS) -nologo $(ACEH_DIR) $(INCLUDE_DIR) -D_WIN32 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
 CLIBFLAGS_C =$(CLIBFLAGS_C) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(ZLIB_DIR)
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i"$(SIXAPI_DIR)\include" -i$(GDLIB_DIR)\include -i$(WHAT32_DIR)\include -i$(XWT_DIR)\include -q0 -w2 -es2 $(PCODE_FLAG)
 
@@ -732,7 +733,7 @@ $(XWT_LIB) : $(XWT_LIB_OBJS)
 !if ("$(HB_ADS_IMPLIB)"=="no")
 RDDADS_LIB_OBJS=\
 	$(RDDADS_LIB_OBJS)\
-	$(OBJ_DIR)\ace32.obj
+	$(OBJ_DIR)\ace32$(OBJEXT)
 !endif
 $(RDDADS_LIB) : $(RDDADS_LIB_OBJS)
 	$(LIB_CMD)
@@ -754,7 +755,7 @@ $(HBCC_LIB) : $(HBCC_LIB_OBJS)
 
 WHAT32_LIB_OBJS=\
 	$(WHAT32_LIB_OBJS)\
-	$(OBJ_DIR)\_wincall.obj
+	$(OBJ_DIR)\_wincall$(OBJEXT)
 $(WHAT32_LIB) : $(WHAT32_LIB_OBJS)
 	$(LIB_CMD)
 

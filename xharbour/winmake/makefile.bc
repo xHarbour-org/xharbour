@@ -940,7 +940,7 @@ $(XWT_LIB) : $(XWT_LIB_OBJS)
 !if ("$(HB_ADS_IMPLIB)" == "no")
 RDDADS_LIB_OBJS=\
 	$(RDDADS_LIB_OBJS)\
-	$(OBJ_DIR)\ace32.obj
+	$(OBJ_DIR)\ace32$(OBJEXT)
 !endif
 $(RDDADS_LIB) : $(RDDADS_LIB_OBJS)
 	IF EXIST "$(RDDADS_LIB)" $(DEL) "$(RDDADS_LIB)" > NUL
