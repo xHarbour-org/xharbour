@@ -8,6 +8,67 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-19 15:25 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/makefile.vc
+  * contrib/gd/source/gdwrp.c
+  * contrib/libnf/descend.c
+  * contrib/libnf/dispc.c
+  * contrib/libnf/ftattr.c
+  * contrib/unicode/hbcrc16.c
+  * contrib/unicode/hbencode.c
+  * contrib/hbhpdf/harupdf.c
+  * contrib/hbzebra/datamtrx.c
+  * contrib/hblzf/lzf_c.c
+  * contrib/hbbz2/bzlib.c
+  * contrib/hbbz2/bzlib_pr.h
+  * contrib/hbbz2/compress.c
+  * contrib/hbbz2/decompre.c
+  * contrib/hbbz2/huffman.c
+  * contrib/hbmzip/unzip.c
+  * contrib/hbmzip/hbmzip.c
+  * contrib/hbhpdf/hpdf_encoder.c
+  * contrib/hbhpdf/hpdf_encrypt.c
+  * contrib/hbhpdf/hpdf_encryptdict.c
+  * contrib/hbhpdf/hpdf_fontdef_type1.c
+  * contrib/hbhpdf/hpdf_font_cid.c
+  * contrib/hbhpdf/hpdf_doc.c
+  * contrib/hbhpdf/hpdf_pages.c
+  * contrib/hbhpdf/hpdf_outline.c
+  * contrib/hbhpdf/hpdf_encoder_jp.c
+  * contrib/hbhpdf/hpdf_encoder_kr.c
+  * contrib/hbhpdf/hpdf_encoder_cns.c
+  * contrib/hbhpdf/hpdf_encoder_cnt.c
+  * contrib/hbhpdf/hpdf_namedict.c
+  * contrib/hbexpat/core.c
+  * contrib/hbexpat/xmlrole.c
+  * contrib/hbexpat/xmltok.c
+  * contrib/hbexpat/xmltok_i.c
+  * contrib/hbtinymt/tinymt32.h
+  * contrib/hbcab/compress.c
+  * contrib/hbcab/fdi.h
+  * contrib/sddpg/sddpg.c
+  * contrib/sddmy/sddmy.c
+  * contrib/tipssl/inetssl.c
+  * contrib/rdd_ads/adsfunc.c
+  * contrib/gtwvg/wvtutils.c
+  * contrib/gtwvg/wvtcore.c
+  * contrib/gtwvg/gtwvg.h
+  * contrib/gtwvw/hbgtwvw.h
+  * contrib/gtwvg/gtwvg.c
+  * contrib/gtwvw/gtwvw.c
+  * contrib/xwt/src/xwt_win/xwt_win.c
+  * contrib/hbsqlit3/xhbsqlite3.c
+  * contrib/what32/source/_winclpb.c
+  * contrib/what32/source/_windlg.c
+  * contrib/what32/source/_wininet.c
+  * contrib/what32/source/_winmapi.c
+  * contrib/what32/source/_winmisc.c
+  * contrib/what32/source/_winsock.c
+  * contrib/what32/source/wincorec.c
+  * contrib/hbsqlit3/config.h
+  * contrib/hbsqlit3/sqlite3.c
+    ! MSVC highest warning level -W4 applied to contrib stuffs
+
 2012-10-19 05:11 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * make_vc.bat
   * winmake/makefile.vc

@@ -117,6 +117,8 @@ HPDF_EncryptDict_CreateID  (HPDF_EncryptDict  dict,
 
     }
 #endif
+    ( void ) xref;
+    ( void ) info; 
     HPDF_MD5Final(attr->encrypt_id, &ctx);
 }
 

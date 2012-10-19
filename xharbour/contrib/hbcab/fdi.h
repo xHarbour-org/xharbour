@@ -170,6 +170,8 @@ typedef enum
 #if __POCC__ >= 290
 #pragma warn(push)
 #pragma warn(disable:2198)  /* Nameless field is not standard */
+#elif defined(_MSC_VER)
+#pragma warning (disable:4201)
 #endif
 typedef struct
 {

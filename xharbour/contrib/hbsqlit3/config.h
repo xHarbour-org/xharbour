@@ -35,6 +35,8 @@
          #pragma warning(disable:4049)
          #pragma warning(disable:4056)
       #endif
+      #pragma warning(disable:4232)
+      #pragma warning(disable:4706)
    #endif
 
 #endif /* SQLLITE3_CONFIG_H */

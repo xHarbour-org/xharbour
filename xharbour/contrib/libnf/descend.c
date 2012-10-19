@@ -55,7 +55,7 @@ HB_FUNC( FT_DESCEND )
    {
 
       PHB_ITEM iP       = hb_itemParam( 1 );
-      USHORT   uiType   = hb_itemType( iP );
+      USHORT   uiType   = ( USHORT ) hb_itemType( iP );
 
       PHB_ITEM iR       = NULL;
       USHORT   uiLen, n;

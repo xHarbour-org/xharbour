@@ -469,7 +469,7 @@ HB_FUNC( WSASTARTUP )
 {
    WSADATA WSAData  ;
 
-   hb_retni( (int ) WSAStartup( hb_parni( 1 ), &WSAData ) ) ;
+   hb_retni( (int ) WSAStartup( ( WORD ) hb_parni( 1 ), &WSAData ) ) ;
 
    if ( ISBYREF( 2 ) )
      hb_storclen( ( char * ) &WSAData, sizeof( WSADATA ), 2 );

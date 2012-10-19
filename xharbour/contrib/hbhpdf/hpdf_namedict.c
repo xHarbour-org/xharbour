@@ -228,5 +228,6 @@ HPDF_EmbeddedFile_New  (HPDF_MMgr  mmgr,
 HPDF_BOOL
 HPDF_EmbeddedFile_Validate  (HPDF_EmbeddedFile  emfile)
 {
+	  ( void ) emfile;
     return HPDF_TRUE;
 }

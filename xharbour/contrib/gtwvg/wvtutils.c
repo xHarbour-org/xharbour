@@ -139,11 +139,11 @@ HB_FUNC( WVT_CHOOSEFONT )
    lf.lfHeight         = PointSize;
    lf.lfWidth          = ISNIL( 3 ) ? 0 : hb_parni( 3 );
    lf.lfWeight         = ISNIL( 4 ) ? 0 : hb_parni( 4 );
-   lf.lfItalic         = ISNIL( 6 ) ? 0 : hb_parl( 6 );
-   lf.lfUnderline      = ISNIL( 7 ) ? 0 : hb_parl( 7 );
-   lf.lfStrikeOut      = ISNIL( 8 ) ? 0 : hb_parl( 8 );
+   lf.lfItalic         = ISNIL( 6 ) ? 0 : ( BYTE ) hb_parl( 6 );
+   lf.lfUnderline      = ISNIL( 7 ) ? 0 : ( BYTE ) hb_parl( 7 );
+   lf.lfStrikeOut      = ISNIL( 8 ) ? 0 : ( BYTE ) hb_parl( 8 );
    lf.lfCharSet        = DEFAULT_CHARSET;
-   lf.lfQuality        = ISNIL( 5 ) ? DEFAULT_QUALITY : hb_parni( 5 );
+   lf.lfQuality        = ISNIL( 5 ) ? DEFAULT_QUALITY : ( BYTE ) hb_parni( 5 );
    lf.lfPitchAndFamily = FF_DONTCARE;
    if ( ISCHAR( 1 ) )
    {
@@ -297,11 +297,11 @@ HB_FUNC( WVT_SETTOOLTIP )
    {
       LPTSTR text = HB_TCHAR_CONVTO( hb_parcx( 5 ) );
 
-      xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
+      xy      = hb_wvt_gtGetXYFromColRow( ( USHORT ) hb_parni( 2 ), ( USHORT ) hb_parni( 1 ) );
       iTop    = xy.y;
       iLeft   = xy.x;
 
-      xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 4 )+1, hb_parni( 3 )+1 );
+      xy      = hb_wvt_gtGetXYFromColRow( ( USHORT ) hb_parni( 4 )+1, ( USHORT ) ( hb_parni( 3 )+1 ) );
       iBottom = xy.y - 1;
       iRight  = xy.x - 1;
 
@@ -492,7 +492,7 @@ HB_FUNC( WVT_SETMOUSEPOS )
 
    POINT xy = { 0,0 };
 
-   xy = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
+   xy = hb_wvt_gtGetXYFromColRow( ( USHORT ) hb_parni( 2 ), ( USHORT ) hb_parni( 1 ) );
 
    if ( ClientToScreen( _s->hWnd, &xy ) )
    {
@@ -624,7 +624,7 @@ HB_FUNC( WVT_GETXYFROMROWCOL )
    PHB_ITEM info = hb_itemArrayNew( 2 );
    POINT    xy = { 0,0 };
 
-   xy = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
+   xy = hb_wvt_gtGetXYFromColRow( ( USHORT ) hb_parni( 2 ), ( USHORT ) hb_parni( 1 ) );
 
    hb_arraySetNL( info, 1, xy.x );
    hb_arraySetNL( info, 2, xy.y );
@@ -845,10 +845,10 @@ HB_FUNC( WVT_INVALIDATERECT )
    RECT  rc = { 0,0,0,0 };
    POINT xy = { 0,0 };
 
-   xy           = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
+   xy           = hb_wvt_gtGetXYFromColRow( ( USHORT ) hb_parni( 2 ), ( USHORT ) hb_parni( 1 ) );
    rc.top       = xy.y;
    rc.left      = xy.x;
-   xy           = hb_wvt_gtGetXYFromColRow( hb_parni( 4 )+1, hb_parni( 3 )+1 );
+   xy           = hb_wvt_gtGetXYFromColRow( ( USHORT ) hb_parni( 4 )+1, ( USHORT ) ( hb_parni( 3 )+1 ) );
    rc.bottom    = xy.y - 1;
    rc.right     = xy.x - 1;
 
@@ -871,7 +871,7 @@ HB_FUNC( WVT_CLIENTTOSCREEN )
    PHB_ITEM info = hb_itemArrayNew( 2 );
    POINT    xy = { 0,0 };
 
-   xy = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
+   xy = hb_wvt_gtGetXYFromColRow( ( USHORT ) hb_parni( 2 ), ( USHORT ) hb_parni( 1 ) );
 
    ClientToScreen( _s->hWnd, &xy );
 
@@ -1167,7 +1167,7 @@ HB_FUNC( WVT_CREATEDIALOGMODAL )
 HB_FUNC( WVT__MAKEDLGTEMPLATE )
 {
    WORD  *p, *pdlgtemplate ;
-   WORD  nItems = hb_parni( 1, 4 ) ;
+   WORD  nItems = ( WORD ) hb_parni( 1, 4 ) ;
    int   i, nchar ;
    DWORD lStyle ;
 
@@ -1568,7 +1568,7 @@ HB_FUNC( WIN_GETDLGITEMTEXT )
    char * szText;
    USHORT iResult;
 
-   iResult = GetDlgItemText( ( HWND ) hb_parnl( 1 ),   // handle of dialog box
+   iResult = ( USHORT ) GetDlgItemText( ( HWND ) hb_parnl( 1 ),   // handle of dialog box
                              hb_parni( 2 ),            // identifier of control
                              cText,                    // address of buffer for text
                              iLen                      // maximum size of string

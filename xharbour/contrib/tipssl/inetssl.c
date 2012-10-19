@@ -1924,10 +1924,10 @@ HB_FUNC( INETSSLSERVER )
    setsockopt(Socket->com, SOL_SOCKET, SO_REUSEADDR, (const char *) &iOpt,
               sizeof(iOpt));
 
-   iPort = htons(hb_parni(1));
+   iPort = htons((u_short)hb_parni(1));
 
-   Socket->remote.sin_family = AF_INET;
-   Socket->remote.sin_port = iPort;
+   Socket->remote.sin_family = (u_short) AF_INET;
+   Socket->remote.sin_port = ( u_short ) iPort;
 
    if (!ISCHAR(2))
    {
@@ -2158,10 +2158,10 @@ HB_FUNC( INETSSLCONNECT )
       }
       else
       {
-         iPort = htons(hb_parni(2));
+         iPort = htons((u_short) hb_parni(2));
 
          Socket->remote.sin_family = AF_INET;
-         Socket->remote.sin_port = iPort;
+         Socket->remote.sin_port = (u_short) iPort;
          Socket->remote.sin_addr.s_addr = (*(UINT *) Host->h_addr_list[0]);
 
          HB_STACK_UNLOCK;
@@ -2239,10 +2239,10 @@ HB_FUNC( INETSSLCONNECTIP )
    }
    else
    {
-      iPort = htons(iPort);
+      iPort = htons((u_short) iPort);
 
       Socket->remote.sin_family = AF_INET;
-      Socket->remote.sin_port = iPort;
+      Socket->remote.sin_port = (u_short) iPort;
       Socket->remote.sin_addr.s_addr = inet_addr(szHost);
 
       HB_STACK_UNLOCK;
@@ -2308,10 +2308,10 @@ HB_FUNC( INETSSLDGRAMBIND )
    }
 
    /* Binding here */
-   iPort = htons(iPort);
+   iPort = htons((u_short) iPort);
 
    Socket->remote.sin_family = AF_INET;
-   Socket->remote.sin_port = iPort;
+   Socket->remote.sin_port = (u_short) iPort;
 
    if (!ISCHAR(2))
    {
@@ -2425,7 +2425,7 @@ HB_FUNC( INETSSLDGRAMSEND )
    }
 
    Socket->remote.sin_family = AF_INET;
-   Socket->remote.sin_port = htons(iPort);
+   Socket->remote.sin_port = htons((u_short) iPort);
    Socket->remote.sin_addr.s_addr = inet_addr(szAddress);
    szBuffer = hb_itemGetCPtr(pBuffer);
 

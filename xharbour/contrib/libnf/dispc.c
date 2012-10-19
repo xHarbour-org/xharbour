@@ -344,7 +344,7 @@ static void disp_update( int offset )
       line     += 1;
       offset   += 2;
    }
-   hb_gtRest( sline, scol, eline, ecol, vseg );
+   hb_gtRest( ( USHORT ) sline, ( USHORT ) scol, ( USHORT ) eline, ( USHORT ) ecol, vseg );
 }
 
 /*
@@ -520,7 +520,7 @@ HB_FUNC( _FT_DFINIT )
    hb_gtRectSize( sline, scol, eline, ecol, &ulSize );
    vseg     = ( char * ) hb_xalloc( ulSize );
    if( vseg != NULL )
-      hb_gtSave( sline, scol, eline, ecol, vseg );
+      hb_gtSave( ( USHORT ) sline, ( USHORT ) scol, ( USHORT ) eline, ( USHORT ) ecol, vseg );
 
    maxlin      = hb_parni( 12 );
    buffsize    = hb_parni( 13 );                      /* yes - load value */
@@ -605,7 +605,7 @@ HB_FUNC( _FT_DFINIT )
       for( i = 1; i < j; i++ )
          linedown();
 
-      hb_gtRest( sline, scol, eline, ecol, vseg );
+      hb_gtRest( ( USHORT ) sline, ( USHORT ) scol, ( USHORT ) eline, ( USHORT ) ecol, vseg );
 
    }
 
@@ -705,7 +705,7 @@ HB_FUNC( FT_DISPFILE )
       for( i = 0; i < height; i++ )
          chattr( 0, i, width, norm );
 
-      hb_gtRest( sline, scol, eline, ecol, vseg );
+      hb_gtRest( ( USHORT ) sline, ( USHORT ) scol, ( USHORT ) eline, ( USHORT ) ecol, vseg );
 
       /* main processing loop -- terminated by user key press */
 
@@ -714,16 +714,16 @@ HB_FUNC( FT_DISPFILE )
          if( refresh )               /* redraw window contents? */
             disp_update( wintop );
 
-         hb_gtRest( sline, scol, eline, ecol, vseg );
+         hb_gtRest( ( USHORT ) sline, ( USHORT ) scol, ( USHORT ) eline, ( USHORT ) ecol, vseg );
 
          /* if not browse, highlight the current line */
 
          if( brows == NO )
             chattr( 0, winrow - sline, width, hlight );
 
-         hb_gtRest( sline, scol, eline, ecol, vseg );
+         hb_gtRest( ( USHORT ) sline, ( USHORT ) scol, ( USHORT ) eline, ( USHORT ) ecol, vseg );
 
-         hb_gtSetPos( winrow, scol );
+         hb_gtSetPos( ( SHORT ) winrow, ( SHORT ) scol );
 
          ch = keyin();                      /* get user key press */
 
@@ -732,7 +732,7 @@ HB_FUNC( FT_DISPFILE )
          if( brows == NO )
             chattr( 0, winrow - sline, width, norm );
 
-         hb_gtRest( sline, scol, eline, ecol, vseg );
+         hb_gtRest( ( USHORT ) sline, ( USHORT ) scol, ( USHORT ) eline, ( USHORT ) ecol, vseg );
 
          /* figure out what the user wants to do */
 

@@ -255,6 +255,7 @@ static INT_PTR fci_open( LPSTR pszFile, int oflag, int pmode, int * err, void * 
 {
    int result;
 
+   (void) pv;
    result = _OPEN( pszFile, oflag, pmode );
 
    if( result == -1 )
@@ -267,6 +268,7 @@ static UINT fci_read( INT_PTR hf, void * memory, UINT cb, int * err, void * pv )
 {
    unsigned int result;
 
+   (void) pv;
    result = ( unsigned int ) _read( (int) hf, memory, cb );
 
    if( result != cb )
@@ -279,6 +281,7 @@ static UINT fci_write( INT_PTR hf, void * memory, UINT cb, int * err, void * pv 
 {
    unsigned int result;
 
+   (void) pv;
    result = ( unsigned int ) _write( ( int ) hf, memory, cb );
 
    if( result != cb )
@@ -291,6 +294,7 @@ static int fci_close( INT_PTR hf, int * err, void * pv )
 {
    int result;
 
+   (void) pv;
    result = _close( ( int ) hf );
 
    if( result != 0 )
@@ -303,6 +307,7 @@ static long fci_seek( INT_PTR hf, long dist, int seektype, int * err, void * pv 
 {
    long result;
 
+   (void) pv;
    result = _lseek( ( int ) hf, dist, seektype );
 
    if( result == -1 )
@@ -315,6 +320,7 @@ static int fci_delete( LPSTR pszFile, int * err, void * pv )
 {
    int result;
 
+   (void) pv;
    SetFileAttributes( pszFile, FA_ARCH );
    result = hb_fsDelete( pszFile );
 
@@ -347,6 +353,7 @@ static BOOL get_temp_file( char * pszTempName, int cbTempName, void * pv )
 {
    char * psz = TEMPNAME();            // Get a name
 
+   (void) pv;
    if( ( psz != NULL ) && ( strlen( psz ) < ( unsigned ) cbTempName ) )
    {
       strcpy( pszTempName, psz );      // Copy to caller's buffer
@@ -391,6 +398,8 @@ static void store_cab_name( char * cabname, int iCab )
 
 static BOOL get_next_cabinet( PCCAB pccab, ULONG cbPrevCab, void * pv )
 {
+   (void) pv;
+   (void) cbPrevCab;
    iFile++;
    store_cab_name( pccab->szCab, pccab->iCab );
    return 1;
@@ -403,7 +412,8 @@ static INT_PTR get_open_info( char * pszName, USHORT * pdate, USHORT * ptime, US
    HANDLE                     handle;
    DWORD                      attrs;
    int                        hf;
-
+   ( void ) err;
+   ( void ) pv;
    handle = CreateFile(
       pszName,
       GENERIC_READ,

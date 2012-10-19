@@ -475,8 +475,8 @@ typedef
 
 #define SET_LL4(i,n)                                          \
    { if (((i) & 0x1) == 0)                                    \
-        s->ll4[(i) >> 1] = (s->ll4[(i) >> 1] & 0xf0) | (n); else    \
-        s->ll4[(i) >> 1] = (s->ll4[(i) >> 1] & 0x0f) | ((n) << 4);  \
+        s->ll4[(i) >> 1] = (UChar) ((s->ll4[(i) >> 1] & 0xf0) | (n)); else    \
+        s->ll4[(i) >> 1] = (UChar) ((s->ll4[(i) >> 1] & 0x0f) | ((n) << 4));  \
    }
 
 #define GET_LL4(i)                             \
@@ -493,7 +493,7 @@ typedef
 #define BZ_GET_SMALL(cccc)                            \
     /* c_tPos is unsigned, hence test < 0 is pointless. */ \
     if (s->tPos >= (UInt32)100000 * (UInt32)s->blockSize100k) return True; \
-    cccc = BZ2_indexIntoF ( s->tPos, s->cftab );    \
+    cccc = ( UChar ) BZ2_indexIntoF ( s->tPos, s->cftab );    \
     s->tPos = GET_LL(s->tPos);
 
 

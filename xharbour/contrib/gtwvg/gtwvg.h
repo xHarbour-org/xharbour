@@ -70,6 +70,10 @@
 
 //-------------------------------------------------------------------//
 
+#if defined( _MSC_VER )
+   #pragma warning ( disable:4201 )
+#endif
+
 #include <windows.h>
 #include <winuser.h>
 #include <commctrl.h>

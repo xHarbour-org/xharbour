@@ -132,18 +132,22 @@
 static int PTRFASTCALL
 isNever(const ENCODING *enc, const char *p)
 {
+  (void) enc;
+  (void) p;
   return 0;
 }
 
 static int PTRFASTCALL
 utf8_isName2(const ENCODING *enc, const char *p)
 {
+  (void) enc;
   return UTF8_GET_NAMING2(namePages, (const unsigned char *)p);
 }
 
 static int PTRFASTCALL
 utf8_isName3(const ENCODING *enc, const char *p)
 {
+  (void) enc;
   return UTF8_GET_NAMING3(namePages, (const unsigned char *)p);
 }
 
@@ -152,12 +156,14 @@ utf8_isName3(const ENCODING *enc, const char *p)
 static int PTRFASTCALL
 utf8_isNmstrt2(const ENCODING *enc, const char *p)
 {
+  (void) enc;
   return UTF8_GET_NAMING2(nmstrtPages, (const unsigned char *)p);
 }
 
 static int PTRFASTCALL
 utf8_isNmstrt3(const ENCODING *enc, const char *p)
 {
+  (void) enc;
   return UTF8_GET_NAMING3(nmstrtPages, (const unsigned char *)p);
 }
 
@@ -166,18 +172,21 @@ utf8_isNmstrt3(const ENCODING *enc, const char *p)
 static int PTRFASTCALL
 utf8_isInvalid2(const ENCODING *enc, const char *p)
 {
+  (void) enc;
   return UTF8_INVALID2((const unsigned char *)p);
 }
 
 static int PTRFASTCALL
 utf8_isInvalid3(const ENCODING *enc, const char *p)
 {
+  (void) enc;
   return UTF8_INVALID3((const unsigned char *)p);
 }
 
 static int PTRFASTCALL
 utf8_isInvalid4(const ENCODING *enc, const char *p)
 {
+  (void) enc;
   return UTF8_INVALID4((const unsigned char *)p);
 }
 
@@ -344,6 +353,7 @@ utf8_toUtf8(const ENCODING *enc,
 {
   char *to;
   const char *from;
+  (void) enc;
   if (fromLim - *fromP > toLim - *toP) {
     /* Avoid copying partial characters. */
     for (fromLim = *fromP + (toLim - *toP); fromLim > *fromP; fromLim--)
@@ -449,6 +459,7 @@ latin1_toUtf8(const ENCODING *enc,
               const char **fromP, const char *fromLim,
               char **toP, const char *toLim)
 {
+  (void) enc;
   for (;;) {
     unsigned char c;
     if (*fromP == fromLim)
@@ -474,6 +485,7 @@ latin1_toUtf16(const ENCODING *enc,
                const char **fromP, const char *fromLim,
                unsigned short **toP, const unsigned short *toLim)
 {
+  (void) enc;
   while (*fromP != fromLim && *toP != toLim)
     *(*toP)++ = (unsigned char)*(*fromP)++;
 }
@@ -507,6 +519,7 @@ ascii_toUtf8(const ENCODING *enc,
              const char **fromP, const char *fromLim,
              char **toP, const char *toLim)
 {
+  (void) enc;
   while (*fromP != fromLim && *toP != toLim)
     *(*toP)++ = *(*fromP)++;
 }
@@ -554,6 +567,7 @@ unicode_byte_type(char hi, char lo)
   return BT_NONASCII;
 }
 
+
 #define DEFINE_UTF16_TO_UTF8(E) \
 static void  PTRCALL \
 E ## toUtf8(const ENCODING *enc, \
@@ -561,6 +575,7 @@ E ## toUtf8(const ENCODING *enc, \
             char **toP, const char *toLim) \
 { \
   const char *from; \
+  (void) enc; \
   for (from = *fromP; from != fromLim; from += 2) { \
     int plane; \
     unsigned char lo2; \
@@ -602,7 +617,7 @@ E ## toUtf8(const ENCODING *enc, \
         return; \
       } \
       plane = (((hi & 0x3) << 2) | ((lo >> 6) & 0x3)) + 1; \
-      *(*toP)++ = ((plane >> 2) | UTF8_cval4); \
+      *(*toP)++ = (((char)plane >> 2) | UTF8_cval4); \
       *(*toP)++ = (((lo >> 2) & 0xF) | ((plane & 0x3) << 4) | 0x80); \
       from += 2; \
       lo2 = GET_LO(from); \
@@ -623,6 +638,7 @@ E ## toUtf16(const ENCODING *enc, \
              const char **fromP, const char *fromLim, \
              unsigned short **toP, const unsigned short *toLim) \
 { \
+  (void) enc; \
   /* Avoid copying first half only of surrogate */ \
   if (fromLim - *fromP > ((toLim - *toP) << 1) \
       && (GET_HI(fromLim - 2) & 0xF8) == 0xD8) \
@@ -960,6 +976,7 @@ static void PTRCALL
 initUpdatePosition(const ENCODING *enc, const char *ptr,
                    const char *end, POSITION *pos)
 {
+  (void) enc;
   normal_updatePosition(&utf8_encoding.enc, ptr, end, pos);
 }
 

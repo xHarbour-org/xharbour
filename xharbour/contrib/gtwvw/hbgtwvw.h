@@ -75,6 +75,10 @@
    #define CINTERFACE 1
 #endif
 
+#if defined( _MSC_VER )
+   #pragma warning ( disable:4201 )
+#endif
+
 #include <math.h>       /* fmod */
 #include <windows.h>
 #include <winuser.h>

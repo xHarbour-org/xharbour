@@ -69,7 +69,7 @@ HB_FUNC( POKEL )
 
 HB_FUNC( POKEB )
 {
-   * ( LPBYTE ) hb_parnl( 1 ) = hb_parni( 2 ) ;
+   * ( LPBYTE ) hb_parnl( 1 ) = ( BYTE ) hb_parni( 2 ) ;
 }
 
 

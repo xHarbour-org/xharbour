@@ -630,7 +630,7 @@ HB_FUNC( HPDF_PAGE_SETSIZE )
 //
 HB_FUNC( HPDF_PAGE_SETROTATE )
 {
-   hb_retnl( (long) HPDF_Page_SetRotate( (HPDF_Page) hb_parptr( 1 ), hb_parni( 2 ) ) );
+   hb_retnl( (long) HPDF_Page_SetRotate( (HPDF_Page) hb_parptr( 1 ), ( HPDF_UINT16 ) hb_parni( 2 ) ) );
 }
 //----------------------------------------------------------------------//
 // HPdf_Page_GetWidth( hPage ) -> nWidth
@@ -1081,7 +1081,7 @@ HB_FUNC( HPDF_PAGE_SETDASH )
 
    for ( i = 0; i < nPtns; i++ )
    {
-      dash.ptn[ i ] = hb_parni( 2, i+1 );
+      dash.ptn[ i ] = ( HPDF_UINT16 ) hb_parni( 2, i+1 );
    }
 
    hb_retnl( (long) HPDF_Page_SetDash( (HPDF_Page) hb_parptr( 1 ), dash.ptn, nPtns, hb_parni( 4 ) ) );
@@ -1606,7 +1606,7 @@ HB_FUNC( HPDF_ENCODER_GETBYTETYPE )
 //
 HB_FUNC( HPDF_ENCODER_GETUNICODE )
 {
-   hb_retni( (int) HPDF_Encoder_GetUnicode( (HPDF_Encoder) hb_parptr( 1 ), hb_parni( 2 ) ) );
+   hb_retni( (int) HPDF_Encoder_GetUnicode( (HPDF_Encoder) hb_parptr( 1 ), ( HPDF_UINT16 ) hb_parni( 2 ) ) );
 }
 //----------------------------------------------------------------------//
 // HPDF_Encoder_GetWritingMode( hEncoder ) -> nWriteMode
@@ -1641,7 +1641,7 @@ HB_FUNC( HPDF_LINKANNOT_SETHIGHLIGHTMODE )
 //
 HB_FUNC( HPDF_LINKANNOT_SETBORDERSTYLE )
 {
-   hb_retnl( (long) HPDF_LinkAnnot_SetBorderStyle( (HPDF_Annotation) hb_parptr( 1 ), (HPDF_REAL) hb_parnd( 2 ), hb_parni( 3 ), hb_parni( 4 ) ) );
+   hb_retnl( (long) HPDF_LinkAnnot_SetBorderStyle( (HPDF_Annotation) hb_parptr( 1 ), (HPDF_REAL) hb_parnd( 2 ), ( HPDF_UINT16 ) hb_parni( 3 ), ( HPDF_UINT16 ) hb_parni( 4 ) ) );
 }
 //----------------------------------------------------------------------//
 // HPDF_TextAnnot_SetIcon( hAnnot, nIconID ) -> hStatus

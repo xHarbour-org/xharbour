@@ -649,7 +649,7 @@ static int uuencode_file_by_chunk ( BYTE *strIn, BYTE *sMask, ULONG nlines )
      {
         putc('\n', fpOutFile);
         fclose( fpOutFile );
-        nlinedone = -1;
+        nlinedone = ( ULONG ) -1;
         filenumber ++;
 
         hb_snprintf( cfile, sizeof( cfile ), "%s%02d.uue", sMask, filenumber );
@@ -891,7 +891,7 @@ HB_FUNC( YYENCODE_FILE )
       if (( pLineLength->item.asInteger.value > 0 ) &&
           ( pLineLength->item.asInteger.value <= 255 ))
       {
-         YYELineLength = pLineLength->item.asInteger.value;
+         YYELineLength = ( USHORT ) pLineLength->item.asInteger.value;
       }
       else if ( pLineLength->item.asInteger.value > 255 )
       {

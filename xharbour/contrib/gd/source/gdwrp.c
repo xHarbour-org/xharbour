@@ -297,7 +297,7 @@ static void GDImageSaveTo( int nType )
    {
       gdImagePtr im;
       const char *szFile;
-      int sz;
+      int sz = 0;
       void *iptr = NULL;
       FHANDLE fhandle;
       int level = 0, fg = 0;

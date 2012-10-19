@@ -112,7 +112,7 @@ void makeMaps_e ( EState* s )
    s->nInUse = 0;
    for (i = 0; i < 256; i++)
       if (s->inUse[i]) {
-         s->unseqToSeq[i] = s->nInUse;
+         s->unseqToSeq[i] = (UChar) s->nInUse;
          s->nInUse++;
       }
 }
@@ -206,7 +206,7 @@ void generateMTFValues ( EState* s )
             };
             yy[0] = rtmp;
             j = (Int32)(ryy_j - &(yy[0]));
-            mtfv[wr] = j+1; wr++; s->mtfFreq[j+1]++;
+            mtfv[wr] = (UInt16)(j+1); wr++; s->mtfFreq[j+1]++;
          }
 
       }
@@ -228,7 +228,7 @@ void generateMTFValues ( EState* s )
       zPend = 0;
    }
 
-   mtfv[wr] = EOB; wr++; s->mtfFreq[EOB]++;
+   mtfv[wr] = (UInt16)EOB; wr++; s->mtfFreq[EOB]++;
 
    s->nMTF = wr;
 }
@@ -404,7 +404,7 @@ void sendMTFValues ( EState* s )
             if (cost[t] < bc) { bc = cost[t]; bt = t; };
          totc += bc;
          fave[bt]++;
-         s->selector[nSelectors] = bt;
+         s->selector[nSelectors] = (UChar) bt;
          nSelectors++;
 
          /*-- 
@@ -464,7 +464,7 @@ void sendMTFValues ( EState* s )
    /*--- Compute MTF values for the selectors. ---*/
    {
       UChar pos[BZ_N_GROUPS], ll_i, tmp2, tmp;
-      for (i = 0; i < nGroups; i++) pos[i] = i;
+      for (i = 0; i < nGroups; i++) pos[i] = (UChar) i;
       for (i = 0; i < nSelectors; i++) {
          ll_i = s->selector[i];
          j = 0;
@@ -476,7 +476,7 @@ void sendMTFValues ( EState* s )
             pos[j] = tmp2;
          };
          pos[0] = tmp;
-         s->selectorMtf[i] = j;
+         s->selectorMtf[i] = (UChar) j;
       }
    };
 

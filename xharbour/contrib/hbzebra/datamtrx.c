@@ -130,7 +130,7 @@ static int _datamatrix_isdigit( char ch )
    return '0' <= ch && ch <= '9';
 }
 
-static int _datamatrix_encode( const char * szCode, int iLen, char * pCW )
+static int _datamatrix_encode( const char * szCode, int iLen, unsigned char * pCW )
 {
    int i, iPos = 0;
    for( i = 0; i < iLen; i++ )
@@ -146,7 +146,7 @@ static int _datamatrix_encode( const char * szCode, int iLen, char * pCW )
       }
       else
       {
-         pCW[ iPos++ ] = ( char ) 235; /* Shift to extended ASCII for 1 character */
+         pCW[ iPos++ ] = 235; /* Shift to extended ASCII for 1 character */
          pCW[ iPos++ ] = szCode[ i ] - 127;
       }
    }
@@ -178,7 +178,7 @@ static void _reed_solomon_encode( unsigned char * pData, int iDataLen, unsigned 
    }
 }
 
-static void _datamatrix_reed_solomon( char * pData, const DATAMATRIX_SIZE * pSize )
+static void _datamatrix_reed_solomon( unsigned char * pData, const DATAMATRIX_SIZE * pSize )
 {
    int * pPoly, * pExp, * pLog;
    int i, j, iBits, iMod, iPoly, iECLen, iIndex, iBlocks;
@@ -325,7 +325,7 @@ static void _datamatrix_place_d( int * pArr, int iPRow, int iPCol, int iIndex )
    _datamatrix_place_bit( pArr, iPRow, iPCol,         1, iPCol - 1, ( iIndex << 3 ) + 0 );
 }
 
-static void _datamatrix_do_placement( PHB_BITBUFFER pBits, char * pCW, const DATAMATRIX_SIZE * pSize )
+static void _datamatrix_do_placement( PHB_BITBUFFER pBits, unsigned char * pCW, const DATAMATRIX_SIZE * pSize )
 {
    int * pArr;
    int i, iR, iC, iPRow, iPCol;
@@ -404,7 +404,7 @@ PHB_ZEBRA hb_zebra_create_datamatrix( const char * szCode, ULONG nLen, int iFlag
 {
    PHB_ZEBRA  pZebra;
    const DATAMATRIX_SIZE * pSize;
-   char *     pCW;
+   unsigned char *  pCW;
    int        i, j, iDataCount, iErrorSize, iLen = ( int ) nLen;
 
    pZebra = hb_zebra_create();
@@ -416,7 +416,7 @@ PHB_ZEBRA hb_zebra_create_datamatrix( const char * szCode, ULONG nLen, int iFlag
       return pZebra;
    }
 
-   pCW = ( char * ) hb_xgrab( sizeof( char ) * iLen * 2 );
+   pCW = ( unsigned char * ) hb_xgrab( sizeof( char ) * iLen * 2 );
    iDataCount = _datamatrix_encode( szCode, iLen, pCW );
 
    if( iDataCount > 3116 )
@@ -448,10 +448,10 @@ PHB_ZEBRA hb_zebra_create_datamatrix( const char * szCode, ULONG nLen, int iFlag
 
    iErrorSize = ( pSize->iDataSize + 2 ) / pSize->iBlockSize * pSize->iBlockErrorSize;
 
-   pCW = ( char * ) hb_xrealloc( pCW, pSize->iDataSize + iErrorSize );
+   pCW = ( unsigned char * ) hb_xrealloc( pCW, pSize->iDataSize + iErrorSize );
    for( i = iDataCount; i < pSize->iDataSize; i++ )
    {
-      pCW[ i ] = ( char ) ( unsigned char ) PADDING;
+      pCW[ i ] = ( unsigned char ) PADDING;
    }
 
    /* Reed-Solomon error correction */

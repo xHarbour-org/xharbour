@@ -172,7 +172,7 @@ HB_FUNC( INTERNETCONNECT )
 {
    HINTERNET     hInternet      = ( HINTERNET ) hb_parnl( 1 ) ;
    LPCTSTR       lpszServerName = hb_parcx( 2 )  ;
-   INTERNET_PORT nServerPort    = ISNIL( 3 ) ? INTERNET_DEFAULT_HTTP_PORT : hb_parni( 3 ) ;
+   INTERNET_PORT nServerPort    = ISNIL( 3 ) ? INTERNET_DEFAULT_HTTP_PORT : ( INTERNET_PORT ) hb_parni( 3 ) ;
    LPCTSTR       lpszUserName   = ISNIL( 4 ) ? NULL : hb_parcx( 4 ) ;
    LPCTSTR       lpszPassword   = ISNIL( 5 ) ? NULL : hb_parcx( 5 ) ;
    DWORD         dwService      = ISNIL( 6 ) ? INTERNET_SERVICE_HTTP : hb_parnl( 6 ) ;

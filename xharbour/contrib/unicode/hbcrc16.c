@@ -159,7 +159,7 @@ HB_FUNC(HB_NCRC16)
    {
       if (hb_pcount()>1)
       {
-         crc=hb_parni(2);
+         crc=(USHORT)hb_parni(2);
       }
 
       srcstr=(BYTE *) hb_itemGetCPtr(phbstr);

@@ -221,7 +221,7 @@ static HB_ERRCODE pgsqlExecute( SQLDDCONNECTION * pConnection, PHB_ITEM pItem )
    status = PQresultStatus( pResult );
    if ( status != PGRES_TUPLES_OK && status != PGRES_COMMAND_OK )
    {
-      hb_rddsqlSetError( status, PQresultErrorMessage( pResult ), hb_itemGetCPtr( pItem ), NULL, 0 );
+      hb_rddsqlSetError( ( HB_ERRCODE ) status, PQresultErrorMessage( pResult ), hb_itemGetCPtr( pItem ), NULL, 0 );
       return HB_FAILURE;
    }
 

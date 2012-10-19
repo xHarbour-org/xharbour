@@ -393,7 +393,7 @@ static void * hb_sqlite3_itemGet( PHB_ITEM pItem, int iType, BOOL fError )
       return pStructHolder->hbsqlite3;
 
    if( fError )
-      hb_errRT_BASE_SubstR( EG_ARG, iError, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
+      hb_errRT_BASE_SubstR( (HB_ERRCODE) EG_ARG, (HB_ERRCODE) iError, NULL, HB_ERR_FUNCNAME, ( ULONG ) HB_ERR_ARGS_BASEPARAMS );
 
    return NULL;
 }

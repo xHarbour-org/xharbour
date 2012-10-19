@@ -1689,6 +1689,8 @@ HPDF_Page_Create3DView    (HPDF_Page       page,
     HPDF_Dict view;
 
     HPDF_PTRACE((" HPDF_Page_Create3DView\n"));
+    
+    (void) annot3d;
 
     if (!HPDF_Page_Validate (page))
         return NULL;

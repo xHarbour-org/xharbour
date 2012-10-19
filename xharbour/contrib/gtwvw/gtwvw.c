@@ -1462,7 +1462,7 @@ static int hb_Inp9x( USHORT usPort )
 
   #else
 
-     usVal = (int) _inp( usPort );
+     usVal = (USHORT) _inp( usPort );
   #endif
 
   return( usVal );

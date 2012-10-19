@@ -2680,7 +2680,8 @@ HPDF_CMapEncoder_Write  (HPDF_Encoder  encoder,
                          HPDF_Stream   out)
 {
     HPDF_STATUS ret = HPDF_OK;
-
+    ( void ) encoder;
+    ( void ) out;
     return ret;
 }
 
@@ -2692,6 +2693,8 @@ HPDF_Encoder_SetParseText  (HPDF_Encoder        encoder,
                             HPDF_UINT           len)
 {
     HPDF_PTRACE ((" HPDF_CMapEncoder_SetParseText\n"));
+
+    ( void ) encoder;
 
     state->text = text;
     state->index = 0;

@@ -556,7 +556,7 @@ HB_FUNC( _MAKEDLGTEMPLATE )
 
 {
    WORD *p, *pdlgtemplate ;
-   WORD  nItems = hb_parni( 1, 4 ) ;
+   WORD  nItems = ( WORD ) hb_parni( 1, 4 ) ;
    int   i, nchar ;
    DWORD lStyle ;
 

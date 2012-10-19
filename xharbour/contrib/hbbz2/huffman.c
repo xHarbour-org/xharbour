@@ -119,7 +119,7 @@ void BZ2_hbMakeCodeLengths ( UChar *len,
          j = 0;
          k = i;
          while (parent[k] >= 0) { k = parent[k]; j++; }
-         len[i-1] = j;
+         len[i-1] = ( UChar ) j;
          if (j > maxLen) tooLong = True;
       }
       

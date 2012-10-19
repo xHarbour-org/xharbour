@@ -726,7 +726,7 @@ MeasureText  (HPDF_Font          font,
                             unicode);
                 }
             } else {
-                tmp_w = -dw2;
+                tmp_w = (HPDF_UINT16) -dw2;
             }
 
             if (i > 0)

@@ -139,7 +139,7 @@ HB_FUNC( GETDLGITEMTEXT )  // GETDLGITMTEXT
 
 HB_FUNC( GETLBITEMTEXT )  // GETDLGITMTEXT
 {
-   USHORT iLen = ISNIL(3) ? 255 : hb_parni( 3 );
+   USHORT iLen = ISNIL(3) ? 255 : ( USHORT ) hb_parni( 3 );
    char *cText = (char*) hb_xgrab( iLen+1 );
 
    SendMessage(
@@ -219,7 +219,7 @@ HB_FUNC( DLGDIRLIST )
 HB_FUNC( DLGDIRSELECTEX )
 {
 
-   USHORT iLen = ISNIL(3) ? MAX_PATH : hb_parni( 3 );
+   USHORT iLen = ISNIL(3) ? MAX_PATH : ( USHORT ) hb_parni( 3 );
    char *cText = (char*) hb_xgrab( iLen+1 );
 
    hb_retl( DlgDirSelectEx( (HWND) hb_parnl( 1 ),
@@ -259,7 +259,7 @@ HB_FUNC( DLGDIRLISTCOMBOBOX )
 HB_FUNC( DLGDIRSELECTCOMBOBOXEX )
 {
 
-   USHORT iLen = ISNIL(3) ? MAX_PATH : hb_parni( 3 );
+   USHORT iLen = ISNIL(3) ? MAX_PATH : ( USHORT ) hb_parni( 3 );
    char *cText = (char*) hb_xgrab( iLen+1 );
 
    hb_retl( DlgDirSelectComboBoxEx( (HWND) hb_parnl( 1 ),

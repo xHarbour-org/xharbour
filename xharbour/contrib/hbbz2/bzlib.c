@@ -107,12 +107,14 @@ static
 void* default_bzalloc ( void* opaque, Int32 items, Int32 size )
 {
    void* v = malloc ( items * size );
+   ( void ) opaque;
    return v;
 }
 
 static
 void default_bzfree ( void* opaque, void* addr )
 {
+   ( void ) opaque;
    if (addr != NULL) free ( addr );
 }
 
@@ -566,7 +568,7 @@ Bool unRLE_obuf_to_output_FAST ( DState* s )
             return True;
    
          s->state_out_len = 1;
-         s->state_out_ch = s->k0;
+         s->state_out_ch = (UChar) s->k0;
          BZ_GET_FAST(k1); BZ_RAND_UPD_MASK; 
          k1 ^= BZ_RAND_MASK; s->nblock_used++;
          if (s->nblock_used == s->save_nblock+1) continue;
@@ -642,7 +644,7 @@ Bool unRLE_obuf_to_output_FAST ( DState* s )
          if (c_nblock_used == s_save_nblockPP) {
             c_state_out_len = 0; goto return_notr;
          };   
-         c_state_out_ch = c_k0;
+         c_state_out_ch = (UChar) c_k0;
          BZ_GET_FAST_C(k1); c_nblock_used++;
          if (k1 != c_k0) { 
             c_k0 = k1; goto s_state_out_len_eq_one; 
@@ -736,25 +738,25 @@ Bool unRLE_obuf_to_output_SMALL ( DState* s )
             return True;
    
          s->state_out_len = 1;
-         s->state_out_ch = s->k0;
-         BZ_GET_SMALL(k1); BZ_RAND_UPD_MASK; 
+         s->state_out_ch = (UChar) s->k0;
+         BZ_GET_SMALL(k1); BZ_RAND_UPD_MASK;
          k1 ^= BZ_RAND_MASK; s->nblock_used++;
          if (s->nblock_used == s->save_nblock+1) continue;
          if (k1 != s->k0) { s->k0 = k1; continue; };
-   
+
          s->state_out_len = 2;
-         BZ_GET_SMALL(k1); BZ_RAND_UPD_MASK; 
+         BZ_GET_SMALL(k1); BZ_RAND_UPD_MASK;
          k1 ^= BZ_RAND_MASK; s->nblock_used++;
          if (s->nblock_used == s->save_nblock+1) continue;
          if (k1 != s->k0) { s->k0 = k1; continue; };
    
          s->state_out_len = 3;
-         BZ_GET_SMALL(k1); BZ_RAND_UPD_MASK; 
+         BZ_GET_SMALL(k1); BZ_RAND_UPD_MASK;
          k1 ^= BZ_RAND_MASK; s->nblock_used++;
          if (s->nblock_used == s->save_nblock+1) continue;
          if (k1 != s->k0) { s->k0 = k1; continue; };
    
-         BZ_GET_SMALL(k1); BZ_RAND_UPD_MASK; 
+         BZ_GET_SMALL(k1); BZ_RAND_UPD_MASK;
          k1 ^= BZ_RAND_MASK; s->nblock_used++;
          s->state_out_len = ((Int32)k1) + 4;
          BZ_GET_SMALL(s->k0); BZ_RAND_UPD_MASK; 
@@ -785,7 +787,7 @@ Bool unRLE_obuf_to_output_SMALL ( DState* s )
             return True;
    
          s->state_out_len = 1;
-         s->state_out_ch = s->k0;
+         s->state_out_ch = (UChar) s->k0;
          BZ_GET_SMALL(k1); s->nblock_used++;
          if (s->nblock_used == s->save_nblock+1) continue;
          if (k1 != s->k0) { s->k0 = k1; continue; };
@@ -799,7 +801,7 @@ Bool unRLE_obuf_to_output_SMALL ( DState* s )
          BZ_GET_SMALL(k1); s->nblock_used++;
          if (s->nblock_used == s->save_nblock+1) continue;
          if (k1 != s->k0) { s->k0 = k1; continue; };
-   
+
          BZ_GET_SMALL(k1); s->nblock_used++;
          s->state_out_len = ((Int32)k1) + 4;
          BZ_GET_SMALL(s->k0); s->nblock_used++;
@@ -1511,6 +1513,7 @@ int BZ_API(BZ2_bzwrite) (BZFILE* b, void* buf, int len )
 int BZ_API(BZ2_bzflush) (BZFILE *b)
 {
    /* do nothing now... */
+   ( void ) b;
    return 0;
 }
 

@@ -285,7 +285,7 @@ BOOL xwt_drv_process_events( void )
    MSG msg;
    BYTE bRet;
 
-   while( (bRet = GetMessage( &msg, NULL, 0, 0 )) != 0 )
+   while( (bRet = ( BYTE ) GetMessage( &msg, NULL, 0, 0 )) != 0 )
    {
       if ( bRet > 0 )
       {

@@ -37,7 +37,7 @@ HB_FUNC( MAPISENDMAIL )
 
    file.ulReserved         = 0            ;  // Reserved for future usage
    file.flFlags            = 0            ;  // Flags ?
-   file.nPosition          = -1           ;  // Character of text to be replaced by attachment
+   file.nPosition          = ( ULONG ) -1             ;  // Character of text to be replaced by attachment
    file.lpszPathName       = ( LPTSTR ) hb_parcx( 8 ) ;  // Full Path Name with Extension of the attached file
    file.lpszFileName       = NULL         ;  // Original File Name ( optional )
    file.lpFileType         = NULL         ;  // Attachment file type ( can be lpMapiFileTagExt )

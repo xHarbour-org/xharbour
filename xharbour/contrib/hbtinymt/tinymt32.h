@@ -62,6 +62,7 @@ _HB_INLINE_ static int tinymt32_get_mexp(
 }
 #else
 _HB_INLINE_ static int tinymt32_get_mexp(tinymt32_t * random) {
+    ( void ) random;
     return TINYMT32_MEXP;
 }
 #endif

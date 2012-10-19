@@ -33,7 +33,7 @@ void makeMaps_d ( DState* s )
    s->nInUse = 0;
    for (i = 0; i < 256; i++)
       if (s->inUse[i]) {
-         s->seqToUnseq[s->nInUse] = i;
+         s->seqToUnseq[s->nInUse] = (UChar) i;
          s->nInUse++;
       }
 }
@@ -51,7 +51,7 @@ void makeMaps_d ( DState* s )
          v = (s->bsBuff >>                        \
              (s->bsLive-nnn)) & ((1 << nnn)-1);   \
          s->bsLive -= nnn;                        \
-         vvv = v;                                 \
+         vvv = (UChar) v;                         \
          break;                                   \
       }                                           \
       if (s->strm->avail_in == 0) RETURN(BZ_OK);  \
@@ -299,7 +299,7 @@ Int32 BZ2_decompress ( DState* s )
             j++;
             if (j >= nGroups) RETURN(BZ_DATA_ERROR);
          }
-         s->selectorMtf[i] = j;
+         s->selectorMtf[i] = (UChar) j;
       }
 
       /*--- Undo the MTF values for the selectors. ---*/
@@ -327,7 +327,7 @@ Int32 BZ2_decompress ( DState* s )
                GET_BIT(BZ_X_CODING_3, uc);
                if (uc == 0) curr++; else curr--;
             }
-            s->len[t][i] = curr;
+            s->len[t][i] = (UChar) curr;
          }
       }
 

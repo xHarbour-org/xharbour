@@ -2162,13 +2162,13 @@ HB_FUNC( ADSCREATEFTSINDEX )
    UNSIGNED32 ulPageSize               = ISNUM( 4 ) ? hb_parnl( 4 ) : ADS_DEFAULT;
    UNSIGNED32 ulMinWordLen             = ISNUM( 5 ) ? hb_parnl( 5 ) : 3;
    UNSIGNED32 ulMaxWordLen             = ISNUM( 6 ) ? hb_parnl( 6 ) : 30;
-   UNSIGNED16 usUseDefaultDelim        = ISLOG( 7 ) ? hb_parl( 7 ) : TRUE;
+   UNSIGNED16 usUseDefaultDelim        = ISLOG( 7 ) ? (UNSIGNED16) hb_parl( 7 ) : TRUE;
    UNSIGNED8  *pucDelimiters           = (UNSIGNED8 *) hb_parc( 8 );
-   UNSIGNED16 usUseDefaultNoise        = ISLOG( 9 ) ? hb_parl( 9 ) : TRUE;
+   UNSIGNED16 usUseDefaultNoise        = ISLOG( 9 ) ? (UNSIGNED16) hb_parl( 9 ) : TRUE;
    UNSIGNED8  *pucNoiseWords           = (UNSIGNED8 *) hb_parc( 10 );
-   UNSIGNED16 usUseDefaultDrop         = ISLOG( 11 ) ? hb_parl( 11 ) : TRUE;
+   UNSIGNED16 usUseDefaultDrop         = ISLOG( 11 ) ? (UNSIGNED16) hb_parl( 11 ) : TRUE;
    UNSIGNED8  *pucDropChars            = (UNSIGNED8 *) hb_parc( 12 );
-   UNSIGNED16 usUseDefaultConditionals = ISLOG( 13 ) ? hb_parl( 13 ) : TRUE;
+   UNSIGNED16 usUseDefaultConditionals = ISLOG( 13 ) ? (UNSIGNED16) hb_parl( 13 ) : TRUE;
    UNSIGNED8  *pucConditionalChars     = (UNSIGNED8 *) hb_parc( 14 );
    UNSIGNED8  *pucReserved1            = (UNSIGNED8 *) hb_parc( 15 );
    UNSIGNED8  *pucReserved2            = (UNSIGNED8 *) hb_parc( 16 );

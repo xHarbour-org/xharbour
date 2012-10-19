@@ -167,7 +167,7 @@ static HB_ERRCODE mysqlConnect( SQLDDCONNECTION * pConnection, PHB_ITEM pItem )
                               pItemUnixSocket && HB_IS_STRING( pItemUnixSocket ) ? hb_itemGetCPtr( pItemUnixSocket ) : NULL,
                               hb_arrayGetNI( pItem, 8 ) /* flags*/ ) )
    {
-      hb_rddsqlSetError( mysql_errno( pMySql ), mysql_error( pMySql ), NULL, NULL, 0 );
+      hb_rddsqlSetError( (HB_ERRCODE) mysql_errno( pMySql ), mysql_error( pMySql ), NULL, NULL, 0 );
       mysql_close( pMySql );
       return HB_FAILURE;
    }
@@ -192,7 +192,7 @@ static HB_ERRCODE mysqlExecute( SQLDDCONNECTION * pConnection, PHB_ITEM pItem )
 
    if ( mysql_real_query( pMySql, hb_itemGetCPtr( pItem ), ( unsigned long ) hb_itemGetCLen( pItem ) ) )
    {
-      hb_rddsqlSetError( mysql_errno( pMySql ), mysql_error( pMySql ), hb_itemGetCPtr( pItem ), NULL, 0 );
+      hb_rddsqlSetError( (HB_ERRCODE) mysql_errno( pMySql ), mysql_error( pMySql ), hb_itemGetCPtr( pItem ), NULL, 0 );
       return HB_FAILURE;
    }
 
@@ -218,7 +218,7 @@ static HB_ERRCODE mysqlExecute( SQLDDCONNECTION * pConnection, PHB_ITEM pItem )
       }
       else /* error */
       {
-         hb_rddsqlSetError( mysql_errno( pMySql ), mysql_error( pMySql ), hb_itemGetCPtr( pItem ), NULL, 0 );
+         hb_rddsqlSetError( (HB_ERRCODE) mysql_errno( pMySql ), mysql_error( pMySql ), hb_itemGetCPtr( pItem ), NULL, 0 );
          return HB_FAILURE;
       }
    }
@@ -244,14 +244,14 @@ static HB_ERRCODE mysqlOpen( SQLBASEAREAP pArea )
    if ( mysql_real_query( pMySql, pArea->szQuery, ( unsigned long ) strlen( pArea->szQuery ) ) )
    {
       hb_errRT_MySQLDD( EG_OPEN, ESQLDD_INVALIDQUERY, ( const char * ) mysql_error( pMySql ), pArea->szQuery,
-                        mysql_errno( pMySql ) );
+                        (HB_ERRCODE) mysql_errno( pMySql ) );
       return HB_FAILURE;
    }
 
    if ( ( pSDDData->pResult = mysql_store_result( pMySql ) ) == NULL )
    {
       hb_errRT_MySQLDD( EG_MEM, ESQLDD_INVALIDQUERY, ( const char * ) mysql_error( pMySql ), pArea->szQuery,
-                        mysql_errno( pMySql ) );
+                        (HB_ERRCODE) mysql_errno( pMySql ) );
       return HB_FAILURE;
    }
 

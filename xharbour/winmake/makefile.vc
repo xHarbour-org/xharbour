@@ -8,6 +8,7 @@
 # version, changes should only be made on your local copy.(AJ:2008-04-26)
 #
 #===============================================================================
+# -W4 -wd4127 -wd4054 -wd4055
 
 !if ("$(DEL)"=="")
 DEL=del
@@ -630,9 +631,9 @@ CLIBFLAGS=$(CLIBFLAGS) -TP
 
 INCLUDE_DIR =-I"include" -I"$(CC_DIR)\include" $(CAIRO_DIR) $(CURL_DIR) $(OPENSSL_DIR)
 INCLUDE_DIR =$(INCLUDE_DIR) $(RDDSQL_INCLUDE) -I"$(SIXAPI_DIR)\include"
-CLIBFLAGS   =$(CLIBFLAGS) -c $(OPTFLAGS) -GA -Gs -W3 -nologo $(ACEH_DIR) $(INCLUDE_DIR) -D_WIN32 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
+CLIBFLAGS   =$(CLIBFLAGS) -c $(OPTFLAGS) -GA -Gs -W4 -wd4127 -wd4054 -wd4055 -nologo $(ACEH_DIR) $(INCLUDE_DIR) -D_WIN32 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
 CLIBFLAGS   =$(CLIBFLAGS) -I"$(FREEIMAGE_DIR)\include" -I"$(GDLIB_DIR)\include" -I"$(XWT_DIR)\include" -I"$(XWT_DIR)\src\xwt_win" -I"$(PNG_DIR)" -I"$(ZLIB_DIR)"
-CLIBFLAGS_C =$(CLIBFLAGS_C) -c $(OPTFLAGS) -GA -Gs -W3 -nologo $(ACEH_DIR) $(INCLUDE_DIR) -D_WIN32 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
+CLIBFLAGS_C =$(CLIBFLAGS_C) -c $(OPTFLAGS) -GA -Gs -W4 -wd4127 -wd4054 -wd4055 -nologo $(ACEH_DIR) $(INCLUDE_DIR) -D_WIN32 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
 CLIBFLAGS_C =$(CLIBFLAGS_C) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(ZLIB_DIR)
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i"$(SIXAPI_DIR)\include" -i$(GDLIB_DIR)\include -i$(WHAT32_DIR)\include -i$(XWT_DIR)\include -q0 -w2 -es2 $(PCODE_FLAG)
 

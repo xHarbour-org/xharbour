@@ -176,7 +176,7 @@ lzf_compress (const void *const in_data, unsigned int in_len,
             if (op - !lit + 3 + 1 >= out_end) /* second the exact but rare test */
               return 0;
 
-          op [- lit - 1] = lit - 1; /* stop run */
+          op [- lit - 1] = ( u8 ) ( lit - 1 ); /* stop run */
           op -= !lit; /* undo run if length is zero */
 
           for (;;)
@@ -221,7 +221,7 @@ lzf_compress (const void *const in_data, unsigned int in_len,
           else
             {
               *op++ = (unsigned char)((off >> 8) + (  7 << 5));
-              *op++ = len - 7;
+              *op++ = ( u8 ) ( len - 7 );
             }
 
           *op++ = (unsigned char) off;
@@ -271,7 +271,7 @@ lzf_compress (const void *const in_data, unsigned int in_len,
 
           if (expect_false (lit == MAX_LIT))
             {
-              op [- lit - 1] = lit - 1; /* stop run */
+              op [- lit - 1] = ( u8 ) ( lit - 1 ); /* stop run */
               lit = 0; op++; /* start run */
             }
         }
@@ -286,12 +286,12 @@ lzf_compress (const void *const in_data, unsigned int in_len,
 
       if (expect_false (lit == MAX_LIT))
         {
-          op [- lit - 1] = lit - 1; /* stop run */
+          op [- lit - 1] = ( u8 ) ( lit - 1 ); /* stop run */
           lit = 0; op++; /* start run */
         }
     }
 
-  op [- lit - 1] = lit - 1; /* end run */
+  op [- lit - 1] = ( u8 ) ( lit - 1 ); /* end run */
   op -= !lit; /* undo run if length is zero */
 
   return (unsigned int)(op - (u8 *)out_data);

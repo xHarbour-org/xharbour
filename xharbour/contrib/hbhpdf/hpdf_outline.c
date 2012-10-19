@@ -238,7 +238,7 @@ BeforeWrite  (HPDF_Dict obj)
         return HPDF_Dict_RemoveElement (obj, "Count");
 
     if (!HPDF_Outline_GetOpened ((HPDF_Outline)obj))
-        count *= -1;
+        count *= (HPDF_UINT) -1;
 
     if (n)
         n->value = count;
