@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-19 18:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/harbour.c
+    ! restore logo printing which was unintentionally remmed
+
 2012-10-19 15:25 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.vc
   * contrib/gd/source/gdwrp.c

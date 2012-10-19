@@ -291,12 +291,12 @@ int hb_compMain( int argc, char * argv[] )
    /* Then check command line arguments
       This will override duplicated environment settings */
    hb_compChkCompilerSwitch( argc, argv );
-#if 0
+
    if( hb_comp_bLogo )
    {
       hb_compPrintLogo();
    }
-#endif
+
    if( hb_comp_bBuildInfo )
    {
       printf( "\n" );
