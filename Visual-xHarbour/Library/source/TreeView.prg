@@ -20,8 +20,8 @@
 //----------------------------------------------------------------------------//
 
 CLASS TreeView FROM Control
-
-   DATA Items        EXPORTED INIT {}
+   DATA AutoDragDrop     PUBLISHED INIT .F.   
+   DATA Items            EXPORTED INIT {}
    DATA Header
    DATA OnSelDelete      EXPORTED
    DATA OnBeginLabelEdit EXPORTED
@@ -109,9 +109,9 @@ CLASS TreeView FROM Control
    METHOD __SetScrollBars() INLINE NIL
    METHOD GetExpandedCount()
 
-   //METHOD OnMouseMove()
-   //METHOD OnLButtonDown()
-   //METHOD OnLButtonUp()
+   METHOD OnMouseMove()
+   METHOD OnLButtonDown()
+   METHOD OnLButtonUp()
 ENDCLASS
 
 //----------------------------------------------------------------------------//
@@ -477,11 +477,10 @@ METHOD HitTest( x, y ) CLASS TreeView
 RETURN oItem
 
 //----------------------------------------------------------------------------------------------------------
-/*
 METHOD OnMouseMove(n,x,y) CLASS TreeView
    LOCAL oItem, pt
    (n)
-   IF ::DragImage != NIL .AND. ::__oDragItem != NIL
+   IF ::AutoDragDrop .AND. ::DragImage != NIL .AND. ::__oDragItem != NIL
       pt := (struct POINT)
       pt:x := x
       pt:y := y
@@ -506,7 +505,7 @@ RETURN Self
 METHOD OnLButtonUp() CLASS TreeView
    LOCAL oItem, oColumn, oSubItem
 
-   IF ::DragImage != NIL
+   IF ::AutoDragDrop .AND. ::DragImage != NIL
       ::DragImage:EndDrag()
       ::DragImage:Destroy()
       ::DragImage := NIL
@@ -544,11 +543,12 @@ RETURN Self
 METHOD OnLButtonDown( n,x,y ) CLASS TreeView
    LOCAL oItem
    (n)
-   ::__oTargetItem := NIL
-   ::SetFocus()
-   IF ( oItem := ::HitTest( x, y ) ) != NIL
-      oItem:Select()
+   IF ::AutoDragDrop
+      ::__oTargetItem := NIL
+      ::SetFocus()
+      IF ( oItem := ::HitTest( x, y ) ) != NIL
+         oItem:Select()
+      ENDIF
+      ::Application:Yield()
    ENDIF
-   ::Application:Yield()
 RETURN Self
-*/
