@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-21 03:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/makefile.bc
+    ! typo on disabling dv_memcpy
+
 2012-10-21 02:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.vc
     ! fixed small typo causing DLL not created
