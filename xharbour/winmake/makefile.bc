@@ -26,6 +26,7 @@ LINEFLAGS=-l
 !endif
 
 !if ("$(HB_DEBUG)"=="d")
+OPTIMFLAGS=-Od
 LINEFLAGS=
 CC_DEBUG_FLAGS=-y -v -vG -DHB_FM_STATISTICS -DHB_PRG_TRACE
 CC_LINKER_DEBUG_FLAGS=-v
@@ -35,6 +36,7 @@ HB_NO_DV_MEMCPY=1
 HB_CG32=1
 HB_PCODE_FLAG=-gc2
 !else
+OPTIMFLAGS=-O2 -OS
 HB_PCODE_FLAG=-gc0
 !endif
 
@@ -74,7 +76,7 @@ CLIBFLAGS   =$(CLIBFLAGS)
 #===============================================================================
 INCLUDE_DIR  =$(INCLUDE_DIR) -Iinclude -I$(OBJ_DIR) -I$(ZLIB_DIR)
 INCLUDE_DIR  =$(INCLUDE_DIR) -I$(PDFLITE_DIR)\include -I$(PNG_DIR) -I$(JPEG_DIR) -I$(TIFF_DIR)
-CLIBFLAGS    =$(CLIBFLAGS) -OS -O2 -q -c $(INCLUDE_DIR) -d -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H
+CLIBFLAGS    =$(CLIBFLAGS) $(OPTIMFLAGS) -q -c $(INCLUDE_DIR) -d -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H
 HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 $(HB_PCODE_FLAG)
 LINK_CMD     =ILINK32 $(CC_LINKER_DEBUG_FLAGS) -ap -Tpe -x -Gn -C -L"$(CC_DIR)\lib" -L"$(CC_DIR)\lib\psdk" -Llib\b32 $(LFLAGS) "$(CC_DIR)\lib\c0x32.obj" $**,$@,,
 CLIBFLAGS    =$(CLIBFLAGS) -tWM
@@ -532,11 +534,10 @@ COMPILERLIBS=\
 	$(COMPILERLIBS)\
 	$(LIB_DIR)$(DIR_SEP)ace32$(LIBEXT)
 !endif
-!endif
-
 HARBOUR_DLL_OBJS=\
 	$(HARBOUR_DLL_OBJS)\
 	$(RDDADS_LIB_OBJS)
+!endif
 
 !if !("$(HB_NO_VM_ALL)"=="1")
 VM_LIB_OBJS=\
@@ -581,7 +582,7 @@ INCLUDE_DIR =-I"include" -I"$(OBJ_DIR)" -I"$(ZLIB_DIR)" -I"$(PDFLITE_DIR)\includ
 INCLUDE_DIR =$(INCLUDE_DIR) -I"$(JPEG_DIR)" -I"$(TIFF_DIR)"
 DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
 EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
-CLIBFLAGS   =$(CLIBFLAGS) -DHAVE_CONFIG_H -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -q -a8 -OS -O2 -6 -c $(ACEH_DIR) $(OPENSSL_DIR) $(INCLUDE_DIR) -d -w3 -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H
+CLIBFLAGS   =$(CLIBFLAGS) -DHAVE_CONFIG_H -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -q -a8 $(OPTIMFLAGS) -6 -c $(ACEH_DIR) $(OPENSSL_DIR) $(INCLUDE_DIR) -d -w3 -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H
 HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 $(HB_PCODE_FLAG)
 
 # User flags should be able to override everything!
@@ -714,7 +715,7 @@ OPTIONAL_PRJ  =$(OPTIONAL_PRJ) $(HBMAGIC_LIB)
 !endif
 
 INCLUDE_DIR  =-Iinclude $(RDDSQL_INCLUDE) -I$(SIXAPI_DIR)\include
-CLIBFLAGS    =$(CLIBFLAGS) -OS -O2 -c -q $(ACEH_DIR) $(CAIRO_DIR) $(CURL_DIR) $(OPENSSL_DIR) $(INCLUDE_DIR) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(HBHPDF_DIR) -I$(ZLIB_DIR) -d -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
+CLIBFLAGS    =$(CLIBFLAGS) $(OPTIMFLAGS) -c -q $(ACEH_DIR) $(CAIRO_DIR) $(CURL_DIR) $(OPENSSL_DIR) $(INCLUDE_DIR) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(HBHPDF_DIR) -I$(ZLIB_DIR) -d -6 -a8 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
 HARBOURFLAGS =$(HARBOURFLAGS) -iinclude -i$(GDLIB_DIR)\include -i$(SIXAPI_DIR)\include -i$(WHAT32_DIR)\include -i$(XWT_DIR)\include -q0 -w2 -es2 $(HB_PCODE_FLAG)
 CLIBFLAGS    =$(CLIBFLAGS) -tWM
 !if defined(HB_THREAD_SUPPORT)
@@ -727,7 +728,7 @@ CLIBFLAGS    =$(HB_WARNING_FLAGS) $(CLIBFLAGS) $(CFLAGS)
 HB_CMD       =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
 CC_CMD       =BCC32 $(CC_DEBUG_FLAGS) $(CLIBFLAGS) -o$@ $**
 CCC_CMD      =$(CC_CMD)
-CC_CMD_ZIP   =BCC32 $(CC_DEBUG_FLAGS) -tWM -q -c -I$(HBZIP_DIR)\include;include -Ve -6 -R- -H- -5 -OS -w- -O2 -X- -a8 -b -k- -o$@ $**
+CC_CMD_ZIP   =BCC32 $(CC_DEBUG_FLAGS) -tWM -q -c -I$(HBZIP_DIR)\include;include -Ve -6 -R- -H- -5 $(OPTIMFLAGS) -w- -X- -a8 -b -k- -o$@ $**
 
 #===============================================================================
 # Macro Definitions
