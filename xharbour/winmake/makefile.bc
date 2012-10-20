@@ -38,6 +38,15 @@ HB_PCODE_FLAG=-gc2
 HB_PCODE_FLAG=-gc0
 !endif
 
+# HB_ADS_IMPLIB==no --> do not create import library (instead use ace32.c)
+!if !("$(HB_DIR_ADS)"=="")
+!if !("$(HB_ADS_IMPLIB)"=="no") && !("$(HB_ADS_IMPLIB)"=="0")
+HB_ADS_CREATEIMPLIB=1
+!else
+HB_ADS_CREATEIMPLIB=0
+!endif
+!endif
+
 #===============================================================================
 # This is needed, otherwise the libs may overflow when
 # debug info is requested with -v -y
@@ -122,7 +131,7 @@ COMPILERLIBS=\
 	cw32mt.lib\
 	import32.lib
 
-!if ("$(HB_CG32)"=="1")
+!if ("$(HB_CG32)"=="1") || ("$(HB_DEBUG)"=="d")
 COMPILERLIBS=\
 	cg32.lib\
 	$(COMPILERLIBS)
@@ -146,9 +155,9 @@ HB_GT_LIBS=\
 #===============================================================================
 # The Project
 #===============================================================================
-!if !defined(HB_THREAD_SUPPORT)
+!if ("$(HB_MT)"=="")
 PROJECT=$(ST_PROJECT)
-!if ( defined(HB_DIR_ADS) && !("$(HB_ADS_IMPLIB)"=="no") )
+!if ("$(HB_ADS_CREATEIMPLIB)"=="1")
 PROJECT=\
 	$(PROJECT)\
 	$(ACE32_LIB)
@@ -514,16 +523,20 @@ DLL_MT=mt
 # RDDADS
 #===============================================================================
 !if !("$(HB_DIR_ADS)"=="")
-!if ("$(HB_ADS_IMPLIB)"=="no")
+!if ("$(HB_ADS_CREATEIMPLIB)"=="0")
+RDDADS_LIB_OBJS=\
+	$(RDDADS_LIB_OBJS)\
+	$(OBJ_DIR)\ace32$(OBJEXT)
 !else
 COMPILERLIBS=\
-	$(LIB_DIR)$(DIR_SEP)ace32.lib
+	$(COMPILERLIBS)\
+	$(LIB_DIR)$(DIR_SEP)ace32$(LIBEXT)
+!endif
 !endif
 
 HARBOUR_DLL_OBJS=\
 	$(HARBOUR_DLL_OBJS)\
 	$(RDDADS_LIB_OBJS)
-!endif
 
 !if !("$(HB_NO_VM_ALL)"=="1")
 VM_LIB_OBJS=\
@@ -609,19 +622,15 @@ DLLEXE_LINK_CMD=ILINK32 $(CC_LINKER_DEBUG_FLAGS) $(LINKERFLAGS) -L"$(CC_DIR)\lib
 #===============================================================================
 # Compiler and 3rd Party libraries need to be linked
 #===============================================================================
-!if ("$(HB_CG32)"=="1")
+COMPILERLIBS=\
+	$(COMPILERLIBS)\
+	cw32mt.lib\
+	ws2_32.lib\
+	import32.lib
+!if ("$(HB_DEBUG)"=="1")
 COMPILERLIBS=\
 	cg32.lib\
-	$(COMPILERLIBS)\
-	cw32mt.lib\
-	ws2_32.lib\
-	import32.lib
-!else
-COMPILERLIBS=\
-	$(COMPILERLIBS)\
-	cw32mt.lib\
-	ws2_32.lib\
-	import32.lib
+	$(COMPILERLIBS)
 !endif
 
 #===============================================================================
@@ -937,7 +946,7 @@ $(XWT_LIB) : $(XWT_LIB_OBJS)
 +)
 !
 
-!if ("$(HB_ADS_IMPLIB)" == "no")
+!if ("$(HB_ADS_CREATEIMPLIB)"=="0")
 RDDADS_LIB_OBJS=\
 	$(RDDADS_LIB_OBJS)\
 	$(OBJ_DIR)\ace32$(OBJEXT)

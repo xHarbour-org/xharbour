@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-21 02:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/makefile.vc
+    ! fixed small typo causing DLL not created
+
+  * winmake/makefile.bc
+    ! missing dependency of ace32.obj when SET HB_ADS_IMPLIB=0 in creating DLL
+
 2012-10-20 13:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/common/hbdate.c
     ! hb_dateStrGet() synced with hrb to bring hbtest.exe error down to 38 from 40
