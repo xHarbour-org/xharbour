@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-20 08:34 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * utils/hbformat/hbfmtcls.prg
+    ! patch by Maurizio via hrb
+
 2012-10-20 07:32 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/fm.c
     ! remove inclusion of intsafe.h as it is now done in hbdefs.h
