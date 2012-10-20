@@ -157,9 +157,6 @@
 #     define USE_DL_PREFIX
 #  endif
 #  include "errno.h"
-#  if defined( _MSC_VER ) && ( _MSC_VER < 1600 ) && ! defined( __POCC__ )
-#     include "intsafe.h"
-#  endif
 #  if defined( __POCC__ )
 #     pragma warn(push)
 #     pragma warn(disable:2154)

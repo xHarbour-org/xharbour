@@ -8,10 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-20 07:32 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/fm.c
+    ! remove inclusion of intsafe.h as it is now done in hbdefs.h
+
 2012-10-20 06:37 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbsetup.h
   * include/hbdefs.h
-    ! use native intsafe.h for MSVS older than MCVS 2010 (This pacify many
+    ! use native intsafe.h for MSVS older than MSVS 2010 (This pacify many
       warnings on typedefs redefinitions in older MSVS versions)
 
   * source/rtl/gttone.c
