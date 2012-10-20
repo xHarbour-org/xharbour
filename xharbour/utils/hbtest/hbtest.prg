@@ -624,7 +624,7 @@ STATIC FUNCTION CMDLGetValue( cCommandLine, cName, cRetVal )
 
    RETURN cRetVal
 
-#if defined( __XPP__ ) || defined( __HARBOUR )
+#if defined( __XPP__ ) || defined( __HARBOUR__ )
 FUNCTION HB_SToD( cDate )
    RETURN SToD( cDate )
 #else
