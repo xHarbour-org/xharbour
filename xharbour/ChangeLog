@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-20 13:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/common/hbdate.c
+    ! hb_dateStrGet() synced with hrb to bring hbtest.exe error down to 38 from 40
+
 2012-10-20 13:12 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * utils/hbtest/hbtest.prg
     ! line #627: __HARBOUR -> __HARBOUR__ (IMO, it was unintentionally altered)

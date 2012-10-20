@@ -107,10 +107,11 @@
 #endif
 
 #define HB_STR_DATE_BASE      1721060     /* 0000/01/01 */
+#define HB_SYS_DATE_BASE      2440588     /* 1970/01/01 */
 
 long hb_dateEncode( int iYear, int iMonth, int iDay )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_dateEncode(%d, %d, %d)", iYear, iMonth, iDay ) );
+   HB_TRACE(HB_TR_DEBUG, ("hb_dateEncode(%d, %d, %d)", iYear, iMonth, iDay));
 
    /* Perform date validation */
    if( iYear >= 0 && iYear <= HB_DATE_YEAR_LIMIT &&
@@ -127,9 +128,9 @@ long hb_dateEncode( int iYear, int iMonth, int iDay )
       {
          int iFactor = ( iMonth < 3 ) ? -1 : 0;
 
-         return ( ( long ) ( iFactor + 4800 + iYear ) * 1461 / 4 ) +
-                ( ( long ) ( iMonth - 2 - ( iFactor * 12 ) ) * 367 ) / 12 -
-                ( ( long ) ( ( iFactor + 4900 + iYear ) / 100 ) * 3 / 4 ) +
+         return ( ( long )( iFactor + 4800 + iYear ) * 1461 / 4 ) +
+                ( ( long )( iMonth - 2 - ( iFactor * 12 ) ) * 367 ) / 12 -
+                ( ( long )( ( iFactor + 4900 + iYear ) / 100 ) * 3 / 4 ) +
                 ( long ) iDay - 32075;
       }
    }
@@ -190,24 +191,36 @@ void hb_dateStrPut( char * szDate, int iYear, int iMonth, int iDay )
 
 void hb_dateStrGet( const char * szDate, int * piYear, int * piMonth, int * piDay )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_dateStrGet(%s, %p, %p, %p)", szDate, piYear, piMonth, piDay ) );
+   HB_TRACE(HB_TR_DEBUG, ("hb_dateStrGet(%.8s, %p, %p, %p)", szDate, piYear, piMonth, piDay));
 
-   if( szDate && hb_strnlen( szDate, 8 ) == 8 )
+#if defined( HB_C52_STRICT ) || 1
+   if( szDate )
+#else
+   if( szDate &&
+       szDate[ 0 ] >= '0' && szDate[ 0 ] <= '9' &&
+       szDate[ 1 ] >= '0' && szDate[ 1 ] <= '9' &&
+       szDate[ 2 ] >= '0' && szDate[ 2 ] <= '9' &&
+       szDate[ 3 ] >= '0' && szDate[ 3 ] <= '9' &&
+       szDate[ 4 ] >= '0' && szDate[ 4 ] <= '9' &&
+       szDate[ 5 ] >= '0' && szDate[ 5 ] <= '9' &&
+       szDate[ 6 ] >= '0' && szDate[ 6 ] <= '9' &&
+       szDate[ 7 ] >= '0' && szDate[ 7 ] <= '9' )
+#endif
    {
       /* Date string has correct length, so attempt to convert */
-      *piYear = ( ( USHORT ) ( szDate[ 0 ] - '0' ) * 1000 ) +
-                ( ( USHORT ) ( szDate[ 1 ] - '0' ) * 100 ) +
-                ( ( USHORT ) ( szDate[ 2 ] - '0' ) * 10 ) +
-                ( USHORT ) ( szDate[ 3 ] - '0' );
-      *piMonth = ( ( szDate[ 4 ] - '0' ) * 10 ) + ( szDate[ 5 ] - '0' );
-      *piDay   = ( ( szDate[ 6 ] - '0' ) * 10 ) + ( szDate[ 7 ] - '0' );
+      *piYear  = ( ( ( int ) ( szDate[ 0 ] - '0' )   * 10 +
+                     ( int ) ( szDate[ 1 ] - '0' ) ) * 10 +
+                     ( int ) ( szDate[ 2 ] - '0' ) ) * 10 +
+                     ( int ) ( szDate[ 3 ] - '0' );
+      *piMonth = ( szDate[ 4 ] - '0' ) * 10 + ( szDate[ 5 ] - '0' );
+      *piDay   = ( szDate[ 6 ] - '0' ) * 10 + ( szDate[ 7 ] - '0' );
    }
    else
    {
       /* Date string missing or bad length, so force an empty date */
-      *piYear        =
-         *piMonth    =
-            *piDay   = 0;
+      *piYear  =
+      *piMonth =
+      *piDay   = 0;
    }
 }
 
