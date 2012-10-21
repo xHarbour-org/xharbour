@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-22 03:26 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbsetup.h
+    ! MSVS 2005 does not have intsafe.h, use xHarbour defines.
+
+  * source/vm/fm.c
+    + add DEBUG flag for dlmalloc (when forced to be linked during debugging)
+    ! modified BCC warning flags
+
 2012-10-21 05:41 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.bc
     ! rddads stuffs was included eventhough HB_DIR_ADS is not defined, fixed.

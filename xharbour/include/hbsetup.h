@@ -97,7 +97,9 @@
    #else
       #undef  HAVE_STDINT_H
       #define HAVE_STDINT_H       0
-      #define HAVE_INTSAFE_H      1
+      #if ( _MSC_VER > 1400 )
+         #define HAVE_INTSAFE_H   1
+      #endif
    #endif
 
 #else

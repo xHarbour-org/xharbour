@@ -120,6 +120,11 @@
 /* #  define NO_MALLINFO 1 */
 /* #  define INSECURE */
 /* #  define USE_DL_PREFIX */
+#  if defined( HB_DEBUG )
+#     if ! defined( DEBUG )
+#        defined DEBUG     1
+#     endif
+#  endif
 #  undef FORCEINLINE
 #  if ! defined( FORCEINLINE )
 #     define FORCEINLINE   HB_FORCEINLINE
@@ -131,13 +136,10 @@
 #     define USE_LOCKS     0
 #  endif
 #  if defined( __BORLANDC__ )
-#     pragma warn -aus
-#     pragma warn -ccc
-#     pragma warn -eff
-#     pragma warn -ngu
-#     pragma warn -prc
-#     pragma warn -rch
-#     pragma warn -inl
+#     pragma warn -8019
+#     pragma warn -8027
+#     pragma warn -8084
+#     pragma warn -8041
 #  elif defined( _MSC_VER ) || defined( __DMC__ ) || defined( __WATCOMC__ )
 #     if (( defined( __DMC__ ) || defined( _MSC_VER ) ) && ! defined( __POCC__ ) )
          HB_EXTERN_BEGIN
@@ -170,13 +172,10 @@
 #     pragma warn(pop)
 #  endif
 #  if defined( __BORLANDC__ )
-#     pragma warn +aus
-#     pragma warn +ccc
-#     pragma warn +eff
-#     pragma warn +ngu
-#     pragma warn +prc
-#     pragma warn +rch
-#     pragma warn +inl
+#     pragma warn +8019
+#     pragma warn +8027
+#     pragma warn +8084
+#     pragma warn +8041
 #  endif
 #  if defined( USE_DL_PREFIX )
 #     define malloc( n )      dlmalloc( ( n ) )
