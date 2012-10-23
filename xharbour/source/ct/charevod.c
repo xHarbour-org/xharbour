@@ -129,18 +129,15 @@ static void do_charevod( int iSwitch )
          hb_retc( "" );
       }
    }
-
 }
 
 HB_FUNC( CHAREVEN )
 {
    do_charevod( DO_CHAREVOD_CHAREVEN );
-   return;
 }
 
 HB_FUNC( CHARODD )
 {
    do_charevod( DO_CHAREVOD_CHARODD );
-   return;
 }
 

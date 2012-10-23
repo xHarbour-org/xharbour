@@ -196,23 +196,19 @@ static void do_charonly( int iSwitch )
 HB_FUNC( CHARONLY )
 {
    do_charonly( DO_CHARONLY_CHARONLY );
-   return;
 }
 
 HB_FUNC( WORDONLY )
 {
    do_charonly( DO_CHARONLY_WORDONLY );
-   return;
 }
 
 HB_FUNC( CHARREM )
 {
    do_charonly( DO_CHARONLY_CHARREM );
-   return;
 }
 
 HB_FUNC( WORDREM )
 {
    do_charonly( DO_CHARONLY_WORDREM );
-   return;
 }

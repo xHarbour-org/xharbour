@@ -303,7 +303,5 @@ HB_FUNC( ATADJUST )
             hb_retc( "" );
       }
    }
-
-   return;
 }
 

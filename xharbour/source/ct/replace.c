@@ -76,7 +76,6 @@ static void do_replace( int iSwitch )
    if( ( ISCHAR( 1 ) ) &&
        ( ( hb_parclen( 2 ) > 0 ) || ( ISNUM( 2 ) ) ) )
    {
-
       char *   pcString = ( char * ) hb_parc( 1 );
       size_t   sStrLen  = ( size_t ) hb_parclen( 1 );
       char *   pcRet, * pc;
@@ -175,25 +174,20 @@ static void do_replace( int iSwitch )
          else
             hb_retc( "" );
       }
-      return;
    }
-
 }
 
 HB_FUNC( REPLALL )
 {
    do_replace( DO_REPLACE_REPLALL );
-   return;
 }
 
 HB_FUNC( REPLLEFT )
 {
    do_replace( DO_REPLACE_REPLLEFT );
-   return;
 }
 
 HB_FUNC( REPLRIGHT )
 {
    do_replace( DO_REPLACE_REPLRIGHT );
-   return;
 }

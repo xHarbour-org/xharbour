@@ -116,8 +116,6 @@ HB_FUNC( STRSWAP )
       }
 
       hb_retc( "" );
-
-
    }
    else /* ((sStrLen1 = (size_t)hb_parclen (1)) > 0) &&
            ((sStrLen2 = (size_t)hb_parclen (2)) > 0))   */
@@ -139,10 +137,6 @@ HB_FUNC( STRSWAP )
       {
          hb_retc( "" );
       }
-      return;
    }
-
-   return;
-
 }
 

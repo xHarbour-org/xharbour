@@ -155,8 +155,6 @@ HB_FUNC( CHARRELA )
          hb_retnl( 0 );
       }
    }
-
-   return;
 }
 
 HB_FUNC( CHARRELREP )
@@ -314,7 +312,5 @@ HB_FUNC( CHARRELREP )
          }
       }
    }
-
-   return;
 }
 

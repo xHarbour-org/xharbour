@@ -254,29 +254,24 @@ static void do_pos1( int iSwitch )
          hb_retnl( 0 );
       }
    }
-
 }
 
 HB_FUNC( POSALPHA )
 {
    do_pos1( DO_POS1_POSALPHA );
-   return;
 }
 
 HB_FUNC( POSLOWER )
 {
    do_pos1( DO_POS1_POSLOWER );
-   return;
 }
 
 HB_FUNC( POSRANGE )
 {
    do_pos1( DO_POS1_POSRANGE );
-   return;
 }
 
 HB_FUNC( POSUPPER )
 {
    do_pos1( DO_POS1_POSUPPER );
-   return;
 }

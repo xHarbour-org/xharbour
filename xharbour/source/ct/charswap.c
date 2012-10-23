@@ -218,11 +218,9 @@ static void do_charswap( int iSwitch )
 HB_FUNC( CHARSWAP )
 {
    do_charswap( DO_CHARSWAP_CHARSWAP );
-   return;
 }
 
 HB_FUNC( WORDSWAP )
 {
    do_charswap( DO_CHARSWAP_WORDSWAP );
-   return;
 }

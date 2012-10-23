@@ -157,9 +157,6 @@ HB_FUNC( NUMAT )
       {
          hb_retnl( 0 );
       }
-      return;
    }
-
-   return;
 }
 

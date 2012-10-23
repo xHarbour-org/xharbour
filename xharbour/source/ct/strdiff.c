@@ -206,10 +206,6 @@ HB_FUNC( STRDIFF )
       {
          hb_retni( 0 );
       }
-      return;
    }
-
-   return;
-
 }
 

@@ -633,8 +633,6 @@ HB_FUNC( TOKENNUM )
          hb_retnl( 0 );
       }
    }
-   return;
-
 }
 
 HB_FUNC( TOKENEND )
@@ -671,8 +669,6 @@ HB_FUNC( TOKENEND )
          hb_retl( 1 );
       }
    }
-   return;
-
 }
 
 HB_FUNC( TOKENEXIT )
@@ -687,8 +683,6 @@ HB_FUNC( TOKENEXIT )
    {
       hb_retl( 0 );
    }
-
-   return;
 }
 
 HB_FUNC( TOKENAT )

@@ -127,7 +127,6 @@ HB_FUNC( FV )
          hb_retnd( 0.0 );
       }
    }
-   return;
 }
 
 HB_FUNC( PV )
@@ -193,7 +192,6 @@ HB_FUNC( PV )
          hb_retnd( 0.0 );
       }
    }
-   return;
 }
 
 HB_FUNC( PAYMENT )
@@ -259,8 +257,6 @@ HB_FUNC( PAYMENT )
          hb_retnd( 0.0 );
       }
    }
-
-   return;
 }
 
 HB_FUNC( PERIODS )
@@ -336,8 +332,6 @@ HB_FUNC( PERIODS )
          hb_retnd( 0.0 );
       }
    }
-
-   return;
 }
 
 HB_FUNC( RATE )
@@ -418,7 +412,5 @@ HB_FUNC( RATE )
          hb_retnd( 0.0 );
       }
    }
-
-   return;
 }
 

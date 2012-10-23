@@ -75,7 +75,6 @@
 HB_FUNC( PI )
 {
    hb_retnd( CT_PI );
-   return;
 }
 
 HB_FUNC( SIN )
@@ -127,8 +126,6 @@ HB_FUNC( SIN )
          hb_retnd( 0.0 );
       }
    }
-
-   return;
 }
 
 HB_FUNC( COS )
@@ -180,8 +177,6 @@ HB_FUNC( COS )
          hb_retnd( 0.0 );
       }
    }
-
-   return;
 }
 
 HB_FUNC( TAN )
@@ -233,8 +228,6 @@ HB_FUNC( TAN )
          hb_retnd( 0.0 );
       }
    }
-
-   return;
 }
 
 HB_FUNC( COT )
@@ -285,8 +278,6 @@ HB_FUNC( COT )
          hb_retnd( 0.0 );
       }
    }
-
-   return;
 }
 
 HB_FUNC( ASIN )
@@ -338,8 +329,6 @@ HB_FUNC( ASIN )
          hb_retnd( 0.0 );
       }
    }
-
-   return;
 }
 
 HB_FUNC( ACOS )
@@ -392,8 +381,6 @@ HB_FUNC( ACOS )
          hb_retnd( 0.0 );
       }
    }
-
-   return;
 }
 
 HB_FUNC( ATAN )
@@ -454,8 +441,6 @@ HB_FUNC( ATAN )
          hb_retnd( 0.0 );
       }
    }
-
-   return;
 }
 
 HB_FUNC( ATN2 )
@@ -530,8 +515,6 @@ HB_FUNC( ATN2 )
          hb_retnd( 0.0 );
       }
    }
-
-   return;
 }
 
 HB_FUNC( SINH )
@@ -591,8 +574,6 @@ HB_FUNC( SINH )
          hb_retnd( 0.0 );
       }
    }
-
-   return;
 }
 
 HB_FUNC( COSH )
@@ -644,8 +625,6 @@ HB_FUNC( COSH )
          hb_retnd( 0.0 );
       }
    }
-
-   return;
 }
 
 HB_FUNC( TANH )
@@ -706,8 +685,6 @@ HB_FUNC( TANH )
          hb_retnd( 0.0 );
       }
    }
-
-   return;
 }
 
 HB_FUNC( RTOD )
@@ -738,8 +715,6 @@ HB_FUNC( RTOD )
          hb_retnd( 0.0 );
       }
    }
-
-   return;
 }
 
 HB_FUNC( DTOR )
@@ -769,7 +744,5 @@ HB_FUNC( DTOR )
          hb_retnd( 0.0 );
       }
    }
-
-   return;
 }
 

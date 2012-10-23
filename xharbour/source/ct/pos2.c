@@ -166,7 +166,6 @@ HB_FUNC( POSCHAR )
             hb_retc( "" );
       }
    }
-
 }
 
 HB_FUNC( POSDEL )

@@ -69,7 +69,6 @@ int ct_str_exit( void )
    return 1;
 }
 
-
 /* -------------------------- */
 /* search for exact substring */
 /* -------------------------- */
@@ -77,7 +76,6 @@ const char * ct_at_exact_forward( const char * pcString, HB_SIZE sStrLen,
                                   const char * pcMatch, HB_SIZE sMatchLen,
                                   HB_SIZE * psMatchStrLen )
 {
-
    HB_SIZE sPos;
 
    HB_TRACE( HB_TR_DEBUG, ( "ct_at_exact_forward (\"%s\", %u, \"%s\", %u, %p)",
@@ -107,7 +105,6 @@ const char * ct_at_exact_backward( const char * pcString, HB_SIZE sStrLen,
                                    const char * pcMatch, HB_SIZE sMatchLen,
                                    HB_SIZE * psMatchStrLen )
 {
-
    HB_SIZE         sIndex;
    const char *   pcRet;
 
@@ -132,7 +129,6 @@ const char * ct_at_exact_backward( const char * pcString, HB_SIZE sStrLen,
    }
 
    return NULL;
-
 }
 
 /* ----------------------------------- */
@@ -169,7 +165,6 @@ const char * ct_at_wildcard_forward( const char * pcString, HB_SIZE sStrLen,
    }
 
    return NULL;
-
 }
 
 /* --------------------------------------------------------- */
@@ -206,9 +201,7 @@ const char * ct_at_wildcard_backward( const char * pcString, HB_SIZE sStrLen,
    }
 
    return NULL;
-
 }
-
 
 /* ------------------------------- */
 /* search for character from a set */
@@ -287,7 +280,6 @@ void ct_setref( int iNewSwitch )
    siRefSwitch = iNewSwitch;
 }
 
-
 int ct_getref( void )
 {
    HB_TRACE( HB_TR_DEBUG, ( "ct_getref()" ) );
@@ -296,7 +288,6 @@ int ct_getref( void )
 
 HB_FUNC( CSETREF )
 {
-
    hb_retl( ct_getref() );
 
    if( ISLOG( 1 ) )
@@ -312,9 +303,6 @@ HB_FUNC( CSETREF )
                    NULL, "CSETREF", 0, EF_CANDEFAULT, 1, hb_paramError( 1 ) );
       }
    }
-
-   return;
-
 }
 
 /*
@@ -329,7 +317,6 @@ void ct_setatmupa( int iNewSwitch )
    siAtMupaSwitch = iNewSwitch;
 }
 
-
 int ct_getatmupa( void )
 {
    HB_TRACE( HB_TR_DEBUG, ( "ct_getatmupa()" ) );
@@ -338,7 +325,6 @@ int ct_getatmupa( void )
 
 HB_FUNC( CSETATMUPA )
 {
-
    hb_retl( ct_getatmupa() );
 
    if( ISLOG( 1 ) )
@@ -354,9 +340,6 @@ HB_FUNC( CSETATMUPA )
                    NULL, "CSETATMUPA", 0, EF_CANDEFAULT, 1, hb_paramError( 1 ) );
       }
    }
-
-   return;
-
 }
 
 /*
@@ -392,7 +375,6 @@ char ct_getatlikechar( void )
 
 HB_FUNC( SETATLIKE )
 {
-
    hb_retni( ct_getatlike() );
 
    /* set new mode if first parameter is CT_SETATLIKE_EXACT (==0)
@@ -444,7 +426,5 @@ HB_FUNC( SETATLIKE )
                    hb_paramError( 1 ), hb_paramError( 2 ) );
       }
    }
-
-   return;
 }
 

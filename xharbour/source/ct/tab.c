@@ -258,9 +258,6 @@ HB_FUNC( TABEXPAND )
          hb_retc( "" );
       }
    }
-
-   return;
-
 }
 
 HB_FUNC( TABPACK )
@@ -504,7 +501,4 @@ HB_FUNC( TABPACK )
          hb_retc( "" );
       }
    }
-
-   return;
-
 }

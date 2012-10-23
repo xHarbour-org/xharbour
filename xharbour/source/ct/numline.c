@@ -88,7 +88,6 @@ HB_FUNC( NUMLINE )
          pcString = pBuffer;
          lLines++;
       }
-
    }
 
    hb_retnl( lLines );

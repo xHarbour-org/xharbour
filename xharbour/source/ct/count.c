@@ -104,7 +104,6 @@ static void do_count( int iSwitch )
       }
 
       hb_retns( sRetVal );
-
    }
    else /* if (ISCHAR (1)) */
    {
@@ -129,17 +128,14 @@ static void do_count( int iSwitch )
          hb_retnl( 0 );
       }
    }
-
 }
 
 HB_FUNC( COUNTLEFT )
 {
    do_count( DO_COUNT_COUNTLEFT );
-   return;
 }
 
 HB_FUNC( COUNTRIGHT )
 {
    do_count( DO_COUNT_COUNTRIGHT );
-   return;
 }

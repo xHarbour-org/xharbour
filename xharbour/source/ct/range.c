@@ -143,10 +143,7 @@ HB_FUNC( RANGEREM )
             hb_retc( "" );
          }
       }
-      return;
    }
-
-   return;
 }
 
 HB_FUNC( RANGEREPL )
@@ -279,11 +276,6 @@ HB_FUNC( RANGEREPL )
             }
          }
       }
-      return;
-
    }
-
-   return;
-
 }
 

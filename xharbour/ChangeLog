@@ -8,6 +8,51 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-24 04:23 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/makefile.bc
+    ! missing CG32.LIB whe ncreating DLL in debug mode
+    ! rearrange and simplify logics
+
+  * source/ct/trig.c
+  * source/ct/token2.c
+  * source/ct/tab.c
+  * source/ct/strswap.c
+  * source/ct/strdiff.c
+  * source/ct/screen1.c
+  * source/ct/replace.c
+  * source/ct/remove.c
+  * source/ct/relation.c
+  * source/ct/range.c
+  * source/ct/posdiff.c
+  * source/ct/pos2.c
+  * source/ct/pos1.c
+  * source/ct/numlohi.c
+  * source/ct/numline.c
+  * source/ct/numat.c
+  * source/ct/num1.c
+  * source/ct/justify.c
+  * source/ct/intneg.c
+  * source/ct/finan.c
+  * source/ct/dattime3.c
+  * source/ct/dattime2.c
+  * source/ct/ctstr.c
+  * source/ct/ctpad.c
+  * source/ct/ctnet.c
+  * source/ct/ctmath2.c
+  * source/ct/ctc.c
+  * source/ct/count.c
+  * source/ct/charswap.c
+  * source/ct/charrepl.c
+  * source/ct/charonly.c
+  * source/ct/charmirr.c
+  * source/ct/charevod.c
+  * source/ct/atrepl.c
+  * source/ct/atadjust.c
+  * source/ct/ascpos.c
+  * source/ct/asciisum.c
+    ! code clean-ups: remove spurious return statement and, doc parts as they
+      already presented in doc/en/ct/*.txt
+
 2012-10-22 03:26 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbsetup.h
     ! MSVS 2005 does not have intsafe.h, use xHarbour defines.

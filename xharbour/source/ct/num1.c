@@ -92,8 +92,6 @@ HB_FUNC( CELSIUS )
          hb_retnd( 0.0 );
       }
    }
-
-   return;
 }
 
 HB_FUNC( FAHRENHEIT )
@@ -125,8 +123,6 @@ HB_FUNC( FAHRENHEIT )
          hb_retnd( 0.0 );
       }
    }
-
-   return;
 }
 
 HB_FUNC( INFINITY )
@@ -139,7 +135,5 @@ HB_FUNC( INFINITY )
    {
       hb_retnd( 93786976294838206460.00 );
    }
-   return;
-
 }
 

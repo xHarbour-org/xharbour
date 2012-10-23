@@ -123,12 +123,10 @@ static void do_ascpos( int iSwitch )
 HB_FUNC( ASCPOS )
 {
    do_ascpos( DO_ASCPOS_ASCPOS );
-   return;
 }
 
 HB_FUNC( VALPOS )
 {
    do_ascpos( DO_ASCPOS_VALPOS );
-   return;
 }
 

@@ -87,6 +87,5 @@ HB_FUNC( ASCIISUM )
          hb_retnl( 0 );
       }
    }
-   return;
 }
 

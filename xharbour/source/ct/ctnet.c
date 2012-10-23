@@ -174,7 +174,6 @@ HB_FUNC( NETCANCEL )
    hb_retl( dwResult == NO_ERROR );
 }
 
-
 HB_FUNC( NETPRINTER )
 {
    const char * cPrn = hb_setGetCPtr( HB_SET_PRINTFILE );   /* query default local printer port. */
@@ -192,7 +191,6 @@ HB_FUNC( NETPRINTER )
    hb_retl( hb_IsNetShared( cPrn ) );
 }
 
-
 HB_FUNC( NETDISK )
 {
    char cDrive[ 3 ];
@@ -203,7 +201,6 @@ HB_FUNC( NETDISK )
 
    hb_retl( hb_IsNetShared( cDrive ) );
 }
-
 
 HB_FUNC( NETREDIR )
 {
@@ -256,7 +253,6 @@ HB_FUNC( NETRMTNAME )
    HB_TCHAR_FREE( szRemoteDevice );
 }
 
-
 HB_FUNC( NETWORK )
 {
    DWORD dwResult;
@@ -277,7 +273,6 @@ HB_FUNC( NETWORK )
 
    hb_retl( dwResult == NO_ERROR );
 }
-
 
 HB_FUNC( NNETWORK )
 {

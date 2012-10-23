@@ -150,19 +150,15 @@ static void do_pad( int iSwitch )
       {
          hb_retc( "" );
       }
-      return;
    }
-
 }
 
 HB_FUNC( PADLEFT )
 {
    do_pad( DO_PAD_PADLEFT );
-   return;
 }
 
 HB_FUNC( PADRIGHT )
 {
    do_pad( DO_PAD_PADRIGHT );
-   return;
 }

@@ -95,8 +95,6 @@ HB_FUNC( FLOOR )
          hb_retnd( 0.0 );
       }
    }
-
-   return;
 }
 
 HB_FUNC( CEILING )
@@ -130,8 +128,6 @@ HB_FUNC( CEILING )
          hb_retnd( 0.0 );
       }
    }
-
-   return;
 }
 
 HB_FUNC( SIGN )
@@ -171,8 +167,6 @@ HB_FUNC( SIGN )
          hb_retni( 0 );
       }
    }
-
-   return;
 }
 
 HB_FUNC( LOG10 )
@@ -234,8 +228,6 @@ HB_FUNC( LOG10 )
          hb_retni( 0 );
       }
    }
-
-   return;
 }
 
 HB_FUNC( FACT )
@@ -278,7 +270,5 @@ HB_FUNC( FACT )
          hb_retnd( 0.0 );
       }
    }
-
-   return;
 }
 

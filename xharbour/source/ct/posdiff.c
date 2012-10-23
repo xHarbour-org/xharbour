@@ -133,11 +133,7 @@ HB_FUNC( POSDIFF )
          else
             hb_retnl( 0 );
       }
-
    }
-
-   return;
-
 }
 
 HB_FUNC( POSEQUAL )
@@ -245,7 +241,5 @@ HB_FUNC( POSEQUAL )
          hb_retnl( 0 );
       }
    }
-
-   return;
 }
 

@@ -70,7 +70,6 @@ HB_FUNC( NUMLOW )
    hb_retni( n & 0xFF );
 }
 
-
 HB_FUNC( NUMHIGH )
 {
    unsigned n;

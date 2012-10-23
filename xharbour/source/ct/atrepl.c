@@ -306,8 +306,5 @@ HB_FUNC( ATREPL )
          hb_retclen( hb_parc( 2 ), hb_parclen( 2 ) );
       }
    }
-
-   return;
-
 }
 

@@ -64,7 +64,6 @@ HB_FUNC( CHARMIRR )
    /* param check */
    if( ISCHAR( 1 ) )
    {
-
       const char *   pcString = hb_parc( 1 );
       size_t         sStrLen  = ( size_t ) hb_parclen( 1 );
       const char *   pc1;
@@ -148,7 +147,5 @@ HB_FUNC( CHARMIRR )
             hb_retc( "" );
       }
    }
-
-   return;
 }
 

@@ -132,24 +132,20 @@ static void do_remove( int iSwitch )
       {
          hb_retc( "" );
       }
-      return;
    }
 }
 
 HB_FUNC( REMALL )
 {
    do_remove( DO_REMOVE_REMALL );
-   return;
 }
 
 HB_FUNC( REMLEFT )
 {
    do_remove( DO_REMOVE_REMLEFT );
-   return;
 }
 
 HB_FUNC( REMRIGHT )
 {
    do_remove( DO_REMOVE_REMRIGHT );
-   return;
 }

@@ -95,14 +95,12 @@ HB_FUNC( INTNEG )
          hb_retni( ( SHORT ) ( lNumber & 0xFFFF ) );
       }
    }
-
 }
 
 HB_FUNC( INTPOS )
 {
    HB_LONG  lNumber  = 0;
    BOOL  b32      = ( ISLOG( 2 ) && hb_parl( 2 ) ? 1 : 0 );
-
 
    if( ISNUM( 1 ) )
    {
@@ -140,5 +138,4 @@ HB_FUNC( INTPOS )
          hb_retni( ( USHORT ) ( lNumber & 0xFFFF ) );
       }
    }
-
 }

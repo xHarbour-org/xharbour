@@ -64,7 +64,6 @@ USHORT ct_error( USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
 {
    USHORT   uiAction;
    PHB_ITEM pError;
-
    PHB_ITEM pArray;
    va_list  va;
    ULONG    uiArgPos;
@@ -113,7 +112,6 @@ USHORT ct_error( USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
 
    return uiAction;
 }
-
 
 /* throwing a CT-subsystem error with value substitution
    - function adapted from errorapi.c */
@@ -165,7 +163,6 @@ PHB_ITEM ct_error_subst( USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
    return pRetVal;
 }
 
-
 /* argument error behaviour */
 static int s_iArgErrMode = CT_ARGERR_IGNORE;
 
@@ -181,10 +178,8 @@ int ct_getargerrormode( void )
    return s_iArgErrMode;
 }
 
-
 HB_FUNC( CSETARGERR )
 {
-
    hb_retni( ct_getargerrormode() );
 
    if( ISNUM( 1 ) )
@@ -217,8 +212,6 @@ HB_FUNC( CSETARGERR )
                    NULL, "CSETARGERR", 0, EF_CANDEFAULT, 1, hb_paramError( 1 ) );
       }
    }
-
-   return;
 }
 
 /* initialization */
@@ -226,7 +219,6 @@ static int s_initialized = 0;  /* TODO: make this thread safe */
 
 HB_FUNC( CTCINIT )
 {
-
    if( s_initialized == 0 )
    {
       int iSuccess;
@@ -244,6 +236,4 @@ HB_FUNC( CTCEXIT )
    ct_math_exit();
 
    s_initialized = 0;
-
-   hb_ret();
 }
