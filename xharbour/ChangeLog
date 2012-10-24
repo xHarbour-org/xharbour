@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-24 18:16 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * include/simplex.c
+    ! Fixed bug, where EOF was reached while trying to match extended pattern.
+
 2012-10-25 05:17 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/what32/source/_winmmcap.c
   * contrib/what32/source/_winhead.c
@@ -1302,7 +1306,7 @@
 2012-09-29 10:19 UTC-0300 Luiz Rafael Culik <luiz/at/xharbour.com>
    * source/vm/thread.c
      ! fixes to compile in mt mode under linux
-     
+
 2012-09-29 19:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
    * contrib/rddsql/hbrddsql.h
      ! temporarily sync with xHarbour RDDAPI
@@ -1372,7 +1376,7 @@
     ! updated to version 1.5.13
 
 2012-09-27 23:19  UTC-0300 Luiz Rafael Culik <luiz/at/xharbour.com>
-  * contrib/hbcairo/Makefile 
+  * contrib/hbcairo/Makefile
     ! corrected libname
 
 2012-09-24 09:57 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>

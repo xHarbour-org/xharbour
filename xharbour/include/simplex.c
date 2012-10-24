@@ -939,6 +939,8 @@ int SimpLex_GetNextToken( void )
             {
                 if( iLen )
                 {
+                   iLastLen = 0;
+
                    /* <EOF> */
                    HOLD_TOKEN( -1 );
 
@@ -1478,11 +1480,17 @@ void SimpLex_CheckWords( void )
             /* Saving Token Length. */
             iSavedLen = iLen;
 
-            // Held Token at this point may only be acOmmit, acReturn, acNewLine, or sSelf.
+            // Held Token at this point may only be EOF, acOmmit, acReturn, acNewLine, or sSelf.
             if( iHold || iPairToken )
             {
                if( iHold )
                {
+                  if( iHold == 1 && aiHold[0] == -1 )
+                  {
+                     DEBUG_INFO( printf( "Gave-Up! EOF!\n" ) );
+                     break;
+                  }
+
                   iHold--;
 
                   iLen = iLastLen;
