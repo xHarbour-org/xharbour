@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-25 06:02 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/firebird/firebird.c
+    ! update by Jacek via hrb
+
 2012-10-24 18:16 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * include/simplex.c
     ! Fixed bug, where EOF was reached while trying to match extended pattern.
