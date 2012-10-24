@@ -24,6 +24,9 @@
 #define DWORD_PTR DWORD
 #endif
 
+#if defined(__WATCOMC__)
+extern int PASCAL WSAUnhookBlockingHook( void );
+#endif
 //-----------------------------------------------------------------------------
 //  SOCKET  accept( IN SOCKET s, OUT struct sockaddr * addr, IN OUT int * addrlen );
 
@@ -46,7 +49,6 @@ HB_FUNC( ACCEPT )
    }
 }
 
-
 //-----------------------------------------------------------------------------
 //  int  bind( IN SOCKET s, IN const struct sockaddr * name, IN int namelen );
 
@@ -68,7 +70,6 @@ HB_FUNC( CLOSESOCKET )
    hb_retni( closesocket( (SOCKET) hb_parnl(1) ) ) ;
 }
 
-
 //-----------------------------------------------------------------------------
 //  int  connect( IN SOCKET s, IN const struct sockaddr * name, IN int namelen );
 
@@ -80,7 +81,6 @@ HB_FUNC( CONNECT )
 
    hb_retni( (int ) connect((SOCKET) hb_parnl( 1 ), ( struct sockaddr *) name, hb_parni( 3 ) ) ) ;
 }
-
 
 //-----------------------------------------------------------------------------
 //  int  ioctlsocket( IN SOCKET s, IN long cmd, IN OUT u_long * argp );
@@ -94,7 +94,6 @@ HB_FUNC( IOCTLSOCKET )
    hb_retni( (int ) ioctlsocket((SOCKET) hb_parnl( 1 ), hb_parnl( 2 ), &arg ) ) ;
    hb_stornl( arg, 3 );
 }
-
 
 //-----------------------------------------------------------------------------
 //  int  getpeername( IN SOCKET s, OUT struct sockaddr * name, IN OUT int * namelen );
@@ -111,7 +110,6 @@ HB_FUNC( GETPEERNAME )
    hb_storni( addrlen, 3);
 }
 
-
 //-----------------------------------------------------------------------------
 //  int  getsockname( IN SOCKET s, OUT struct sockaddr * name, IN OUT int * namelen );
 
@@ -126,7 +124,6 @@ HB_FUNC( GETSOCKNAME )
    hb_storclen( name, addrlen, 2 );
    hb_storni( addrlen, 3);
 }
-
 
 //-----------------------------------------------------------------------------
 //  int  getsockopt( IN SOCKET s, IN int level, IN int optname, OUT char * optval, IN OUT int * optlen );
@@ -158,7 +155,6 @@ HB_FUNC( HTONL )
    hb_retnl( (ULONG) htonl( hb_parnl( 1 ) ) ) ;
 }
 
-
 //-----------------------------------------------------------------------------
 //  u_short  htons( IN u_short hostshort );
 
@@ -167,7 +163,6 @@ HB_FUNC( HTONS )
    hb_retni( (USHORT) htons( (USHORT) hb_parni( 1 ) ) ) ;
 }
 
-
 //-----------------------------------------------------------------------------
 //  unsigned long  inet_addr( IN const char * cp );
 
@@ -175,7 +170,6 @@ HB_FUNC( INET_ADDR )
 {
    hb_retnl( (ULONG) inet_addr( hb_parcx( 1 ) ) ) ;
 }
-
 
 //-----------------------------------------------------------------------------
 //  char *  inet_ntoa( IN struct in_addr in );
@@ -187,7 +181,6 @@ HB_FUNC( INET_NTOA )
    hb_retc( inet_ntoa( *in ) ) ;
 }
 
-
 //-----------------------------------------------------------------------------
 //  int  listen( IN SOCKET s, IN int backlog );
 
@@ -195,7 +188,6 @@ HB_FUNC( LISTEN )
 {
  hb_retni( (int) listen((SOCKET) hb_parnl( 1 ), hb_parni( 2 ) ) ) ;
 }
-
 
 //-----------------------------------------------------------------------------
 //  u_long  ntohl( IN u_long netlong );
@@ -205,7 +197,6 @@ HB_FUNC( NTOHL )
    hb_retnl( (ULONG) ntohl( hb_parnl(1 ) ) ) ;
 }
 
-
 //-----------------------------------------------------------------------------
 //  u_short  ntohs( IN u_short netshort );
 
@@ -213,7 +204,6 @@ HB_FUNC( NTOHS )
 {
    hb_retni( ( USHORT ) ntohs( (USHORT) hb_parni(1) ) ) ;
 }
-
 
 //-----------------------------------------------------------------------------
 //  int  recv( IN SOCKET s, OUT char * buf, IN int len, IN int flags );
@@ -233,7 +223,6 @@ HB_FUNC( RECV )
    hb_retni( iRet );
    hb_xfree( buf ) ;
 }
-
 
 //-----------------------------------------------------------------------------
 //  int  recvfrom( IN SOCKET s, OUT char * buf, IN int len, IN int flags, OUT ( struct sockaddr *) from, IN OUT int * fromlen );
@@ -266,7 +255,6 @@ HB_FUNC( RECVFROM )
    hb_xfree( buf ) ;
 
 }
-
 
 //-----------------------------------------------------------------------------
 //  int  select( IN int nfds, IN OUT fd_set * readfds, IN OUT fd_set * writefds, IN OUT fd_set *exceptfds, IN const struct timeval * timeout );
@@ -307,7 +295,6 @@ HB_FUNC( SOCKSELECT )
        hb_storclen( ( char *) exceptfds, sizeof(fd_set), 4 );
 
  }
-
 
 //-----------------------------------------------------------------------------
 //  int  send( IN SOCKET s, IN const char * buf, IN int len, IN int flags );

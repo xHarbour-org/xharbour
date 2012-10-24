@@ -107,7 +107,7 @@ RESULT DynaCall(int Flags, DWORD lpFunction,
     // proper stack and take care of correct return value processing.
     RESULT  Res = { 0 };
     int     i, nInd, nSize;
-    DWORD   dwEAX, dwEDX, dwVal, *pStack, dwStSize = 0;
+    DWORD   dwEAX = 0, dwEDX = 0, dwVal, *pStack = NULL, dwStSize = 0;
     BYTE   *pArg;
 
     // Reserve 256 bytes of stack space for our arguments

@@ -7,8 +7,13 @@
 
 #include <windows.h>
 #include <shlobj.h>
-//#include <commctrl.h>
 
+#if defined( __WATCOMC__ )
+   #define DateTime_GetSystemtime DateTime_GetSystemTime
+   #define DateTime_SetSystemtime DateTime_SetSystemTime
+#endif
+
+// #include <commctrl.h>
 #include "hbapi.h"
 #include "hbvm.h"
 #include "hbstack.h"

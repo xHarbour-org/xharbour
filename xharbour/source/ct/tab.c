@@ -60,7 +60,7 @@ HB_FUNC( TABEXPAND )
    {
       char *   pcString    = ( char * ) hb_parc( 1 );
       HB_SIZE  sStrLen     = hb_parclen( 1 );
-      char *   pcRet;
+      unsigned char *   pcRet;
       HB_SIZE  sRetLen;
       HB_SIZE  sTabWidth   = 0;
       char     cFill, cTab, cCR;
@@ -159,7 +159,7 @@ HB_FUNC( TABEXPAND )
          hb_retclen( pcString, sStrLen );
          return;
       }
-      pcRet       = ( char * ) hb_xgrab( sStrLen + ( sTabCnt * ( sTabWidth - 1 ) ) );
+      pcRet       = ( unsigned char * ) hb_xgrab( sStrLen + ( sTabCnt * ( sTabWidth - 1 ) ) );
 
       /* now copy the string */
       sIndex      = 0;
@@ -232,7 +232,7 @@ HB_FUNC( TABEXPAND )
       /* copy rest */
       hb_xmemcpy( pcRet + sRetLen, pcString + sIndex, (size_t) ( sStrLen - sIndex ) );
       sRetLen += sStrLen - sIndex;
-      hb_retclen( pcRet, sRetLen );
+      hb_retclen( ( const char *) pcRet, sRetLen );
       hb_xfree( pcRet );
 
    }
@@ -266,7 +266,7 @@ HB_FUNC( TABPACK )
    {
       char *   pcString    = ( char * ) hb_parc( 1 );
       HB_SIZE  sStrLen     = hb_parclen( 1 );
-      char *   pcRet;
+      unsigned char *   pcRet;
       HB_SIZE  sRetLen;
       HB_SIZE  sTabWidth   = 0;
       char     cFill, cTab, cCR;
@@ -356,7 +356,7 @@ HB_FUNC( TABPACK )
       }
       /* estimate maximum return length by assuming that there's
          nothing to pack */
-      pcRet       = ( char * ) hb_xgrab( sStrLen );
+      pcRet       = ( unsigned char * ) hb_xgrab( sStrLen );
 
       /* now copy the string */
       sIndex      = 0;
@@ -475,7 +475,7 @@ HB_FUNC( TABPACK )
          sRetLen++;
       }
 
-      hb_retclen( pcRet, sRetLen );
+      hb_retclen( ( const char *) pcRet, sRetLen );
       hb_xfree( pcRet );
 
    }

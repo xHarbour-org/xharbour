@@ -26,7 +26,7 @@ extern BOOL Array2Rect(PHB_ITEM aRect, RECT *rc );
 extern PHB_ITEM Point2Array( POINT *pt  );
 extern BOOL Array2Point(PHB_ITEM aPoint, POINT *pt );
 
-#if ( (defined(_MSC_VER) && _MSC_VER<=1200 && !defined(__POCC__)) || (defined(__GNUC__) || defined(__WATCOMC__)) || defined(__DMC__))
+#if ( (defined(_MSC_VER) && _MSC_VER<=1200 && !defined(__POCC__)) || (defined(__GNUC__) || (defined(__WATCOMC__)&&(__WATCOMC__<1290) ) ) || defined(__DMC__))
 #define HDM_SETBITMAPMARGIN          (HDM_FIRST + 20)
 #define Header_SetBitmapMargin(hwnd, iWidth) \
         (int)SNDMSG((hwnd), HDM_SETBITMAPMARGIN, (WPARAM)(iWidth), 0)
@@ -261,14 +261,10 @@ HB_FUNC(  HEADER_SETORDERARRAY )
       }
    else
       hb_retl( 0 );
-
 }
-
 
 //-----------------------------------------------------------------------------
 // Header_GetItemRect(hwnd, iItem, lprc) (BOOL)SNDMSG((hwnd), HDM_GETITEMRECT, (WPARAM)(iItem), (LPARAM)(lprc))
-
-
 // SYNTAX:
 // aRect:=Header_GetItemRect(hWnd,i)
 
@@ -282,45 +278,32 @@ HB_FUNC( HEADER_GETITEMRECT )
       aRc = Rect2Array( &rc );
       _itemReturn( aRc );
       _itemRelease( aRc );
-
    }
-
 }
-
 
 //-----------------------------------------------------------------------------
 // Header_GetImageList(hwnd) (HIMAGELIST)SNDMSG((hwnd), HDM_GETIMAGELIST, 0, 0)
 
-
 HB_FUNC( HEADER_GETIMAGELIST )
 {
-
     hb_retnl( (ULONG)Header_GetImageList((HWND) hb_parnl(1) ) ) ;
-
 }
-
 
 //-----------------------------------------------------------------------------
 // Header_SetImageList(hwnd, himl) (HIMAGELIST)SNDMSG((hwnd), HDM_SETIMAGELIST, 0, (LPARAM)(himl))
 
 HB_FUNC( HEADER_SETIMAGELIST )
 {
-
    hb_retnl( (ULONG) Header_SetImageList((HWND) hb_parnl(1), (LPARAM) hb_parnl(2) ) ) ;
-
 }
-
 
 //-----------------------------------------------------------------------------
 // Header_OrderToIndex(hwnd, i) (int)SNDMSG((hwnd), HDM_ORDERTOINDEX, (WPARAM)(i), 0)
 
 HB_FUNC( HEADER_ORDERTOINDEX )
 {
-
    hb_retni( Header_OrderToIndex((HWND) hb_parnl(1), hb_parni(2) ) ) ;
-
 }
-
 
 //-----------------------------------------------------------------------------
 // Header_SetHotDivider(hwnd, fPos, dw) (int)SNDMSG((hwnd), HDM_SETHOTDIVIDER, (WPARAM)(fPos), (LPARAM)(dw))
@@ -331,88 +314,68 @@ HB_FUNC( HEADER_ORDERTOINDEX )
 
 HB_FUNC( HEADER_SETHOTDIVIDER )
 {
-
    hb_retni( Header_SetHotDivider((HWND) hb_parnl(1), hb_parl(2), (LPARAM) hb_parnl(3)));
-
 }
-
 
 //-----------------------------------------------------------------------------
 // Header_SetBitmapMargin(hwnd, iWidth) (int)SNDMSG((hwnd), HDM_SETBITMAPMARGIN, (WPARAM)(iWidth), 0)
 
 HB_FUNC( HEADER_SETBITMAPMARGIN )
 {
-
    hb_retni( Header_SetBitmapMargin( (HWND) hb_parnl(1), hb_parni(2) ) ) ;
-
 }
-
 
 //-----------------------------------------------------------------------------
 // Header_GetBitmapMargin(hwnd) (int)SNDMSG((hwnd), HDM_GETBITMAPMARGIN, 0, 0)
 
 HB_FUNC( HEADER_GETBITMAPMARGIN )
 {
-
+#if defined( __WATCOMC__ )
+   hb_retni( Header_GetBitmapMargin( (HWND) hb_parnl(1), NULL ) ) ;
+#else
    hb_retni( Header_GetBitmapMargin( (HWND) hb_parnl(1) ) ) ;
-
+#endif
 }
-
 
 //-----------------------------------------------------------------------------
 // Header_SetUnicodeFormat(hwnd, fUnicode) (BOOL)SNDMSG((hwnd), HDM_SETUNICODEFORMAT, (WPARAM)(fUnicode), 0)
 
 HB_FUNC( HEADER_SETUNICODEFORMAT )
 {
-
    hb_retl( Header_SetUnicodeFormat( (HWND) hb_parnl(1), hb_parl( 2 ) ) ) ;
-
 }
-
 
 //-----------------------------------------------------------------------------
 // Header_GetUnicodeFormat(hwnd) (BOOL)SNDMSG((hwnd), HDM_GETUNICODEFORMAT, 0, 0)
 
 HB_FUNC( HEADER_GETUNICODEFORMAT )
 {
-
    hb_retl( Header_GetUnicodeFormat((HWND) hb_parnl(1) ) ) ;
-
 }
-
 
 //-----------------------------------------------------------------------------
 // Header_SetFilterChangeTimeout(hwnd, i) (int)SNDMSG((hwnd), HDM_SETFILTERCHANGETIMEOUT, 0, (LPARAM)(i))
 
 HB_FUNC( HEADER_SETFILTERCHANGETIMEOUT )
 {
-
    hb_retni( Header_SetFilterChangeTimeout((HWND) hb_parnl(1), hb_parni( 2 ) ) ) ;
-
 }
-
 
 //-----------------------------------------------------------------------------
 // Header_EditFilter(hwnd, i, fDiscardChanges) (int)SNDMSG((hwnd), HDM_EDITFILTER, (WPARAM)(i), MAKELPARAM(fDiscardChanges, 0))
 
 HB_FUNC( HEADER_EDITFILTER )
 {
-
    hb_retni( Header_EditFilter( (HWND) hb_parnl(1), hb_parni( 2 ), hb_parl( 3 ) ) ) ;
-
 }
-
 
 //-----------------------------------------------------------------------------
 // Header_ClearAllFilters(hwnd) (int)SNDMSG((hwnd), HDM_CLEARFILTER, (WPARAM)-1, 0)
 
 HB_FUNC( HEADER_CLEARALLFILTERS )
 {
-
    hb_retni( Header_ClearAllFilters( (HWND) hb_parnl(1) ) ) ;
-
 }
-
 
 //-----------------------------------------------------------------------------
 // Header_ClearFilter(hwnd, i) (int)SNDMSG((hwnd), HDM_CLEARFILTER, (WPARAM)(i), 0)
@@ -422,11 +385,8 @@ HB_FUNC( HEADER_CLEARALLFILTERS )
 
 HB_FUNC( HEADER_CLEARFILTER )
 {
-
    hb_retni( Header_ClearFilter( (HWND) hb_parnl(1), hb_parni( 2 ) ) ) ;
-
 }
-
 
 //-----------------------------------------------------------------------------
 // Header_Layout(hwndHD, playout) (BOOL)SNDMSG((hwndHD), HDM_LAYOUT, 0, (LPARAM)(HD_LAYOUT FAR*)(playout))
@@ -437,7 +397,5 @@ HB_FUNC( HEADER_LAYOUT )
    hb_retl( Header_Layout( (HWND) hb_parnl(1), hdLayout ) );
 }
 
-
 //--------- eof.
 //
-

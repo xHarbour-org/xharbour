@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-25 05:17 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/what32/source/_winmmcap.c
+  * contrib/what32/source/_winhead.c
+  * contrib/what32/source/_windate.c
+  * contrib/what32/source/_winsock.c
+  * contrib/what32/source/_wincall.c
+    ! fix to compile under OpenWatcom 12.9
+
+  * source/ct/tab.c
+    ! char -> unsigned char to satisfy OpenWatcom
+
 2012-10-24 04:23 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.bc
     ! missing CG32.LIB whe ncreating DLL in debug mode
