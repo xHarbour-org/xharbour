@@ -1729,12 +1729,14 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
             {
                hb_errInternal( HB_EI_ERRUNRECOV, "WITH OBJECT excessive nesting!", NULL, NULL );
 
+               #if 0
                // Release ALL WITH OBJECT.
                while( HB_VM_STACK.wWithObjectCounter )
                {
                   --HB_VM_STACK.wWithObjectCounter;
                   hb_itemClear( &( HB_VM_STACK.aWithObject[ HB_VM_STACK.wWithObjectCounter ] ) );
                }
+               #endif
             }
 
             hb_stackPop();
@@ -1788,7 +1790,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
             if( HB_VM_STACK.wEnumCollectionCounter == HB_MAX_ENUMERATIONS )
             {
                hb_errInternal( HB_EI_ERRUNRECOV, "FOR EACH excessive nesting!", NULL, NULL );
-
+               #if 0
                /* Release ALL FOR EACH. */
                while( HB_VM_STACK.wEnumCollectionCounter )
                {
@@ -1796,6 +1798,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
                   hb_itemClear( pEnumeration );
                   HB_VM_STACK.awEnumIndex[ HB_VM_STACK.wEnumCollectionCounter ] = 0;
                }
+               #endif
             }
             w++;
             break;
@@ -10875,71 +10878,71 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, const char
 }
 
 #if ! defined( HB_NO_DUPLICATE_HVMPROCESSSYMBOL )
-         PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, int iPCodeVer, PHB_ITEM * pGlobals ) /* module symbols initialization */
-         {
-            HB_TRACE( HB_TR_DEBUG, ( "hb_vmProcessSymbols(%p, %dl )", pSymbols ) );
+PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, int iPCodeVer, PHB_ITEM * pGlobals ) /* module symbols initialization */
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_vmProcessSymbols(%p, %dl )", pSymbols ) );
 
 #ifdef HB_THREAD_SUPPORT
-            /* initialize internal mutex for MT mode */
-            hb_threadInit();
+   /* initialize internal mutex for MT mode */
+   hb_threadInit();
 #endif
 
-            if( iPCodeVer != HB_PCODE_VER )
-            {
-               char szPCode[ 12 ];
+   if( iPCodeVer != HB_PCODE_VER )
+   {
+      char szPCode[ 12 ];
 
-               hb_snprintf( szPCode, sizeof( szPCode ), "%i", iPCodeVer );
+      hb_snprintf( szPCode, sizeof( szPCode ), "%i", iPCodeVer );
 
-               hb_errInternal( HB_EI_ERRUNRECOV,
-                               "Module: '%s' was compiled into PCODE version: %s,"
-                               "this version of xHarbour expects version: " __STR( HB_PCODE_VER ), szModule, szPCode );
-            }
+      hb_errInternal( HB_EI_ERRUNRECOV,
+                      "Module: '%s' was compiled into PCODE version: %s,"
+                      "this version of xHarbour expects version: " __STR( HB_PCODE_VER ), szModule, szPCode );
+   }
 
 #if ( ! defined( __BORLANDC__ ) || defined( __EXPORT__ ) )
-            if( s_Do_xinit )
-            {
-               s_Do_xinit = FALSE;
+   if( s_Do_xinit )
+   {
+      s_Do_xinit = FALSE;
 
-               hb_xinit();
-            }
+      hb_xinit();
+   }
 #endif
 
-            return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, s_bDynamicSymbols, s_fCloneSym, pGlobals );
-         }
+   return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, s_bDynamicSymbols, s_fCloneSym, pGlobals );
+}
 #endif
 
 /* HVM & RTL in harbour.dll */
-         PSYMBOLS hb_vmProcessSysDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, int iPCodeVer, PHB_ITEM * pGlobals )
-         {
-            HB_TRACE( HB_TR_DEBUG, ( "hb_vmProcessSysDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols ) );
+PSYMBOLS hb_vmProcessSysDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, int iPCodeVer, PHB_ITEM * pGlobals )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_vmProcessSysDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols ) );
 
 #ifdef HB_THREAD_SUPPORT
-            /* initialize internal mutex for MT mode */
-            hb_threadInit();
+   /* initialize internal mutex for MT mode */
+   hb_threadInit();
 #endif
 
-            if( iPCodeVer != HB_PCODE_VER )
-            {
-               char szPCode[ 12 ];
+   if( iPCodeVer != HB_PCODE_VER )
+   {
+      char szPCode[ 12 ];
 
-               hb_snprintf( szPCode, sizeof( szPCode ), "%i", iPCodeVer );
+      hb_snprintf( szPCode, sizeof( szPCode ), "%i", iPCodeVer );
 
-               hb_errInternal( HB_EI_ERRUNRECOV,
-                               "Module: '%s' was compiled into PCODE version: %s,"
-                               "this version of xHarbour expects version: " __STR( HB_PCODE_VER ), szModule, szPCode );
-            }
+      hb_errInternal( HB_EI_ERRUNRECOV,
+                      "Module: '%s' was compiled into PCODE version: %s,"
+                      "this version of xHarbour expects version: " __STR( HB_PCODE_VER ), szModule, szPCode );
+   }
 
 #if ( ! defined( __BORLANDC__ ) || defined( __EXPORT__ ) )
-            if( s_Do_xinit )
-            {
-               s_Do_xinit = FALSE;
+   if( s_Do_xinit )
+   {
+      s_Do_xinit = FALSE;
 
-               hb_xinit();
-            }
+      hb_xinit();
+   }
 #endif
 
-            return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, TRUE, s_fCloneSym, pGlobals );
-         }
+   return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, TRUE, s_fCloneSym, pGlobals );
+}
 
 /*
    This is the worker function for the hb_vmProcessSymbols() variation from maindlle.c
@@ -10948,45 +10951,45 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, const char
    will be used to process the prg dll's symbols, instead of the vmProcessSymbols() from
    maindllh.c which is a wrapper of vmProcessSysDllSymbols() and is included in harbour.dll
  */
-         PSYMBOLS hb_vmProcessPrgDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, int iPCodeVer, PHB_ITEM * pGlobals )
-         {
-            PSYMBOLS pNewSymbols;
-            PHB_SYMB pSymStart = s_pSymStart;
+PSYMBOLS hb_vmProcessPrgDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, int iPCodeVer, PHB_ITEM * pGlobals )
+{
+   PSYMBOLS pNewSymbols;
+   PHB_SYMB pSymStart = s_pSymStart;
 
-            HB_TRACE( HB_TR_DEBUG, ( "hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols ) );
 
 #ifdef HB_THREAD_SUPPORT
-            /* initialize internal mutex for MT mode */
-            hb_threadInit();
+   /* initialize internal mutex for MT mode */
+   hb_threadInit();
 #endif
 
-            if( iPCodeVer != HB_PCODE_VER )
-            {
-               char szPCode[ 12 ];
+   if( iPCodeVer != HB_PCODE_VER )
+   {
+      char szPCode[ 12 ];
 
-               hb_snprintf( szPCode, sizeof( szPCode ), "%i", iPCodeVer );
+      hb_snprintf( szPCode, sizeof( szPCode ), "%i", iPCodeVer );
 
-               hb_errInternal( HB_EI_ERRUNRECOV,
-                               "Module: '%s' was compiled into PCODE version: %s,"
-                               "this version of xHarbour expects version: " __STR( HB_PCODE_VER ), szModule, szPCode );
-            }
+      hb_errInternal( HB_EI_ERRUNRECOV,
+                      "Module: '%s' was compiled into PCODE version: %s,"
+                      "this version of xHarbour expects version: " __STR( HB_PCODE_VER ), szModule, szPCode );
+   }
 
 #if ( ! defined( __BORLANDC__ ) || defined( __EXPORT__ ) )
-            if( s_Do_xinit )
-            {
-               s_Do_xinit = FALSE;
+   if( s_Do_xinit )
+   {
+      s_Do_xinit = FALSE;
 
-               hb_xinit();
-            }
+      hb_xinit();
+   }
 #endif
 
-            // s_bDynamicSymbols used instead of TRUE, because we still want to support that functionality.
-            pNewSymbols = hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, FALSE, s_bDynamicSymbols, pGlobals );
-            // Incase any of the prg dll's sources was *not* compiled with -n0!
-            s_pSymStart = pSymStart;
+   // s_bDynamicSymbols used instead of TRUE, because we still want to support that functionality.
+   pNewSymbols = hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, FALSE, s_bDynamicSymbols, pGlobals );
+   // Incase any of the prg dll's sources was *not* compiled with -n0!
+   s_pSymStart = pSymStart;
 
-            return pNewSymbols;
-         }
+   return pNewSymbols;
+}
 
 /*
    This is the worker function for the hb_vmProcessSymbols() variation from usedll.c
@@ -10995,65 +10998,64 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, const char
    will be used to process the client exe symbols, instead of the vmProcessSymbols() from
    maindllh.c which is a wrapper of vmProcessSysDllSymbols() and is included in harbour.dll
  */
-         PSYMBOLS hb_vmProcessExeUsesDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, int iPCodeVer, PHB_ITEM * pGlobals )
-         {
-            HB_TRACE( HB_TR_DEBUG, ( "hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols ) );
+PSYMBOLS hb_vmProcessExeUsesDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, int iPCodeVer, PHB_ITEM * pGlobals )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols ) );
 
 #ifdef HB_THREAD_SUPPORT
-            /* initialize internal mutex for MT mode */
-            hb_threadInit();
+   /* initialize internal mutex for MT mode */
+   hb_threadInit();
 #endif
 
-            if( iPCodeVer != HB_PCODE_VER )
-            {
-               char szPCode[ 12 ];
+   if( iPCodeVer != HB_PCODE_VER )
+   {
+      char szPCode[ 12 ];
 
-               hb_snprintf( szPCode, sizeof( szPCode ), "%i", iPCodeVer );
+      hb_snprintf( szPCode, sizeof( szPCode ), "%i", iPCodeVer );
 
-               hb_errInternal( HB_EI_ERRUNRECOV,
-                               "Module: '%s' was compiled into PCODE version: %s,"
-                               "this version of xHarbour expects version: " __STR( HB_PCODE_VER ), szModule, szPCode );
-            }
+      hb_errInternal( HB_EI_ERRUNRECOV,
+                      "Module: '%s' was compiled into PCODE version: %s,"
+                      "this version of xHarbour expects version: " __STR( HB_PCODE_VER ), szModule, szPCode );
+   }
 
 #if ( ! defined( __BORLANDC__ ) || defined( __EXPORT__ ) )
-            if( s_Do_xinit )
-            {
-               s_Do_xinit = FALSE;
+   if( s_Do_xinit )
+   {
+      s_Do_xinit = FALSE;
 
-               hb_xinit();
-            }
+      hb_xinit();
+   }
 #endif
 
-            // s_bDynamicSymbols used instead of TRUE, because we still want to support that functionality.
-            return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, FALSE, s_bDynamicSymbols, pGlobals );
-         }
+   // s_bDynamicSymbols used instead of TRUE, because we still want to support that functionality.
+   return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, FALSE, s_bDynamicSymbols, pGlobals );
+}
 
-         PSYMBOLS * hb_vmSymbols( void )
-         {
-            return &s_pSymbols;
-         }
+PSYMBOLS * hb_vmSymbols( void )
+{
+   return &s_pSymbols;
+}
 
-         PSYMBOLS hb_vmLastModule( void )
-         {
-            PSYMBOLS pLastModule = s_pSymbols;
+PSYMBOLS hb_vmLastModule( void )
+{
+   PSYMBOLS pLastModule = s_pSymbols;
 
-            if( pLastModule )
-            {
-               while( pLastModule->pNext )
-               {
-                  pLastModule = pLastModule->pNext;
-               }
-            }
+   if( pLastModule )
+   {
+      while( pLastModule->pNext )
+      {
+         pLastModule = pLastModule->pNext;
+      }
+   }
 
-            return pLastModule;
-         }
+   return pLastModule;
+}
 
-         void hb_vmExplicitStartup( PHB_SYMB pSymbol )
-         {
-            s_pSymStart = pSymbol; /* first public defined symbol to start execution */
-            /* printf( "Startup: '%s' Func: %p\n", pSymbol->szName, pSymbol->value.pFunPtr ); */
-         }
-
+void hb_vmExplicitStartup( PHB_SYMB pSymbol )
+{
+   s_pSymStart = pSymbol; /* first public defined symbol to start execution */
+   /* printf( "Startup: '%s' Func: %p\n", pSymbol->szName, pSymbol->value.pFunPtr ); */
+}
 
 /* This calls all _INITSTATICS functions defined in the application.
  * We are using a special symbol's scope HB_FS_INITEXIT to mark
@@ -13798,11 +13800,13 @@ BOOL hb_xvmWithObject( void )
    {
       hb_errInternal( HB_EI_ERRUNRECOV, "WITH OBJECT excessive nesting!", NULL, NULL );
 
+      #if 0
       while( HB_VM_STACK.wWithObjectCounter )
       {
          --HB_VM_STACK.wWithObjectCounter;
          hb_itemClear( &( HB_VM_STACK.aWithObject[ HB_VM_STACK.wWithObjectCounter ] ) );
       }
+      #endif
    }
    hb_stackPop();
 
@@ -13885,6 +13889,7 @@ BOOL hb_xvmForEach( void )
    {
       hb_errInternal( HB_EI_ERRUNRECOV, "FOR EACH excessive nesting!", NULL, NULL );
 
+      #if 0
       // Release ALL FOR EACH.
       while( HB_VM_STACK.wEnumCollectionCounter )
       {
@@ -13892,6 +13897,7 @@ BOOL hb_xvmForEach( void )
          hb_itemClear( pEnumeration );
          HB_VM_STACK.awEnumIndex[ HB_VM_STACK.wEnumCollectionCounter ] = 0;
       }
+      #endif
    }
 
    HB_XVM_RETURN

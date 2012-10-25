@@ -2286,7 +2286,9 @@ HB_FUNC( __MVRESTORE )
 
                   hb_snprintf( szType, sizeof( szType ), "%i", uiType );
                   hb_errInternal( 9100, "Restore failed, unsupported type: %s for: '%s'\n", szType, hb_itemGetCPtr( &Name ) );
+                  #if 0
                   hb_itemClear( &Item );
+                  #endif
                }
             }
 

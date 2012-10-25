@@ -763,10 +763,15 @@ void * hb_xRefResize( void * pMem, HB_SIZE ulSave, HB_SIZE ulSize )
       pMem = realloc( ( void * ) HB_FM_PTR( pMem ), HB_ALLOC_SIZE( ulSize ) );
       if( pMem )
          return HB_MEM_PTR( pMem );
+      else
+         hb_errInternal( HB_EI_XREALLOC, NULL, NULL, NULL );
    }
-
+   #if 0
    hb_errInternal( HB_EI_XREALLOC, NULL, NULL, NULL );
    return NULL;
+   #else
+   return NULL;
+   #endif
 #endif
 }
 

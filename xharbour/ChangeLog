@@ -8,6 +8,32 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-25 09:04 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/arrays.c  line#   621
+  * source/vm/arrays.c  line#  1919
+  * source/vm/fm.c      line#   769
+  * source/vm/hvm.c     line#  1733
+  * source/vm/hvm.c     line#  1735
+  * source/vm/hvm.c     line#  1793
+  * source/vm/hvm.c     line#  1795
+  * source/vm/hvm.c     line# 13801
+  * source/vm/hvm.c     line# 13803
+  * source/vm/hvm.c     line# 13889
+  * source/vm/hvm.c     line# 13891
+  * source/vm/classes.c line#  2018
+  * source/vm/memvars.c line#  2289
+    ! remmed codes after hb_errInternal() because they are obviously unreachable
+      (hb_errInternal() invokes exit() ) to satisfy some compiler's.
+
+  * source/vm/hvm.c
+    ! minor reformat -> remove bad indentation on some lines
+
+  * source/vm/fm.c
+    ! minor reconstuction on function hb_xrefResize to kill no return value warning
+
+  * source/vm/arrays.c  line# 1919
+    ! in function: hb_arrayFromParams, initialize pArray = NULL
+
 2012-10-25 06:02 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/firebird/firebird.c
     ! update by Jacek via hrb

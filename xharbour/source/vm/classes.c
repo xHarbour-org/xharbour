@@ -2015,7 +2015,9 @@ static BOOL hb_clsAddMsg( USHORT uiClass, const char * szMessage,
 
          default:
             hb_errInternal( HB_EI_CLSINVMETHOD, NULL, "__clsAddMsg", NULL );
+            #if 0
             return FALSE;
+            #endif
       }
 
       /*

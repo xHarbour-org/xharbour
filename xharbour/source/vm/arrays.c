@@ -618,7 +618,9 @@ BOOL hb_arrayGetByRef( PHB_ITEM pArray, HB_SIZE ulIndex, PHB_ITEM pItem )
          hb_errInternal( HB_EI_ERRUNRECOV, "Cyclic Reference assignment.", NULL, NULL );
          #endif
 
+         #if 0
          return FALSE;
+         #endif
       }
 
       pItem->type                            = HB_IT_BYREF;
@@ -1882,7 +1884,7 @@ PHB_ITEM hb_arrayFromStack( USHORT uiLen )
 
 PHB_ITEM hb_arrayFromParams( PHB_ITEM * pBase )
 {
-   PHB_ITEM pArray;
+   PHB_ITEM pArray = NULL;
 
    if( pBase && HB_IS_SYMBOL( *pBase ) )
    {
@@ -1916,7 +1918,9 @@ PHB_ITEM hb_arrayFromParams( PHB_ITEM * pBase )
    else
    {
       hb_errInternal( HB_EI_ERRUNRECOV, "Invalid argument to hb_arrayFromParams().", NULL, NULL );
+      #if 0
       return NULL;
+      #endif
    }
 
    return pArray;
