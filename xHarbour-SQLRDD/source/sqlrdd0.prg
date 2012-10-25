@@ -1,4 +1,4 @@
-﻿/* $CATEGORY$SQLRDD/Utils$FILES$sql.lib$
+/* $CATEGORY$SQLRDD/Utils$FILES$sql.lib$
 * SQLRDD Startup
 * Copyright (c) 2003 - Marcelo Lombardo  <lombardo@uol.com.br>
 * All Rights Reserved
