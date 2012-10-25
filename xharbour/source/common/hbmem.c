@@ -53,16 +53,7 @@
 **
 *******************************************************************/
 #if defined( __BORLANDC__ )
-#   pragma warn -8066
-#   pragma warn -8070
 #   pragma warn -8004
-#elif defined( __WATCOMC__ )
-#   pragma disable_message (107)
-#elif defined( __POCC__ )
-#   pragma warn(push)
-#   pragma warn(disable:2235)
-#elif defined( _MSC_VER )
-#   pragma warning(disable:4715)
 #endif
 
 #include "hbdefs.h" /* Added for xHarbour */
@@ -80,14 +71,11 @@
 /********************************************************************
 ** Includes for size_t definition
 *******************************************************************/
-
 #include <stddef.h>
-
 
 /********************************************************************
 ** Typedefs
 *******************************************************************/
-
 typedef unsigned char UInt8;
 typedef unsigned short UInt16;
 typedef unsigned int UInt32;
@@ -109,7 +97,6 @@ typedef UInt32 UIntN;
 #define TYPE_WIDTH   4L
 #endif
 
-
 /********************************************************************
 ** Remove definitions when INDEXED_COPY is defined.
 *******************************************************************/
@@ -119,7 +106,6 @@ typedef UInt32 UIntN;
 #undef PRE_INC_PTRS
 #endif   /*PRE_INC_PTRS*/
 #endif   /*INDEXED_COPY*/
-
 
 /********************************************************************
 ** Definitions for pre and post increment of pointers.
@@ -145,8 +131,6 @@ typedef UInt32 UIntN;
 
 #endif /*PRE_INC_PTRS*/
 
-
-
 /********************************************************************
 ** Definitions for endians
 *******************************************************************/
@@ -163,43 +147,37 @@ typedef UInt32 UIntN;
 
 #endif /* LITTLE_ENDIAN */
 
-
-
 /********************************************************************
 ** Macros for copying words of  different alignment.
 ** Uses incremening pointers.
 *******************************************************************/
 
-#define CP_INCR()                   {                         \
-      INC_VAL( dstN ) = INC_VAL( srcN );          \
+#define CP_INCR()                   {       \
+      INC_VAL( dstN ) = INC_VAL( srcN );    \
 }
 
-#define CP_INCR_SH( shl, shr )      {              \
-      dstWord           = srcWord SHL shl;            \
-      srcWord           = INC_VAL( srcN );              \
-      dstWord           |= srcWord SHR shr;            \
-      INC_VAL( dstN )   = dstWord;                \
+#define CP_INCR_SH( shl, shr )      {       \
+      dstWord           = srcWord SHL shl;  \
+      srcWord           = INC_VAL( srcN );  \
+      dstWord           |= srcWord SHR shr; \
+      INC_VAL( dstN )   = dstWord;          \
 }
-
-
 
 /********************************************************************
 ** Macros for copying words of  different alignment.
 ** Uses array indexes.
 *******************************************************************/
 
-#define CP_INDEX( idx )             {                     \
-      dstN[ idx ] = srcN[ idx ];                  \
+#define CP_INDEX( idx )             {  \
+      dstN[ idx ] = srcN[ idx ];       \
 }
 
-#define CP_INDEX_SH( x, shl, shr )  {          \
-      dstWord     = srcWord SHL shl;            \
-      srcWord     = srcN[ x ];                    \
-      dstWord     |= srcWord SHR shr;            \
-      dstN[ x ]   = dstWord;                     \
+#define CP_INDEX_SH( x, shl, shr )  {  \
+      dstWord     = srcWord SHL shl;   \
+      srcWord     = srcN[ x ];         \
+      dstWord     |= srcWord SHR shr;  \
+      dstN[ x ]   = dstWord;           \
 }
-
-
 
 /********************************************************************
 ** Macros for copying words of different alignment.
@@ -223,98 +201,91 @@ typedef UInt32 UIntN;
 
 #endif /* INDEXED_COPY */
 
-
-#define COPY_REMAINING( count )     {                                     \
-      START_VAL( dst8 );                                                \
-      START_VAL( src8 );                                                \
-                                                                    \
-      switch( count ) {                                                \
-         case 7: INC_VAL( dst8 ) = INC_VAL( src8 );                          \
-         case 6: INC_VAL( dst8 ) = INC_VAL( src8 );                          \
-         case 5: INC_VAL( dst8 ) = INC_VAL( src8 );                          \
-         case 4: INC_VAL( dst8 ) = INC_VAL( src8 );                          \
-         case 3: INC_VAL( dst8 ) = INC_VAL( src8 );                          \
-         case 2: INC_VAL( dst8 ) = INC_VAL( src8 );                          \
-         case 1: INC_VAL( dst8 ) = INC_VAL( src8 );                          \
-         case 0:                                                         \
-         default: break;                                                 \
-      }                                                               \
+#define COPY_REMAINING( count )     {               \
+      START_VAL( dst8 );                            \
+      START_VAL( src8 );                            \
+                                                    \
+      switch( count ) {                             \
+         case 7: INC_VAL( dst8 ) = INC_VAL( src8 ); \
+         case 6: INC_VAL( dst8 ) = INC_VAL( src8 ); \
+         case 5: INC_VAL( dst8 ) = INC_VAL( src8 ); \
+         case 4: INC_VAL( dst8 ) = INC_VAL( src8 ); \
+         case 3: INC_VAL( dst8 ) = INC_VAL( src8 ); \
+         case 2: INC_VAL( dst8 ) = INC_VAL( src8 ); \
+         case 1: INC_VAL( dst8 ) = INC_VAL( src8 ); \
+         case 0:                                    \
+         default: break;                            \
+      }                                             \
 }
 
 #define COPY_NO_SHIFT()             {                                           \
-      UIntN * dstN   = ( UIntN * ) ( dst8 PRE_LOOP_ADJUST );                   \
-      UIntN * srcN   = ( UIntN * ) ( src8 PRE_LOOP_ADJUST );                   \
-      size_t length  = count / TYPE_WIDTH;                             \
-                                                                    \
-      while( length& 7 ) {                                            \
-         CP_INCR();                                                  \
-         length --;                                                   \
-      }                                                               \
-                                                                    \
-      length /= 8;                                                    \
-                                                                    \
-      while( length -- ) {                                              \
-         CP( 0 );                                                      \
-         CP( 1 );                                                      \
-         CP( 2 );                                                      \
-         CP( 3 );                                                      \
-         CP( 4 );                                                      \
-         CP( 5 );                                                      \
-         CP( 6 );                                                      \
-         CP( 7 );                                                      \
-                                                                    \
-         INC_INDEX( dstN, 8 );                                         \
-         INC_INDEX( srcN, 8 );                                         \
-      }                                                               \
-                                                                    \
-      src8  = CAST_TO_U8( srcN, 0 );                                     \
-      dst8  = CAST_TO_U8( dstN, 0 );                                     \
-                                                                    \
-      COPY_REMAINING( count& ( TYPE_WIDTH - 1 ) );                       \
-                                                                    \
-      return dest;                                                    \
+      UIntN * dstN   = ( UIntN * ) ( dst8 PRE_LOOP_ADJUST ); \
+      UIntN * srcN   = ( UIntN * ) ( src8 PRE_LOOP_ADJUST ); \
+      size_t length  = count / TYPE_WIDTH;                   \
+                                                             \
+      while( length& 7 ) {                                   \
+         CP_INCR();                                          \
+         length --;                                          \
+      }                                                      \
+                                                             \
+      length /= 8;                                           \
+                                                             \
+      while( length -- ) {                                   \
+         CP( 0 );                                            \
+         CP( 1 );                                            \
+         CP( 2 );                                            \
+         CP( 3 );                                            \
+         CP( 4 );                                            \
+         CP( 5 );                                            \
+         CP( 6 );                                            \
+         CP( 7 );                                            \
+                                                             \
+         INC_INDEX( dstN, 8 );                               \
+         INC_INDEX( srcN, 8 );                               \
+      }                                                      \
+                                                             \
+      src8  = CAST_TO_U8( srcN, 0 );                         \
+      dst8  = CAST_TO_U8( dstN, 0 );                         \
+                                                             \
+      COPY_REMAINING( count& ( TYPE_WIDTH - 1 ) );           \
+                                                             \
+      return dest;                                           \
 }
-
-
 
 #define COPY_SHIFT( shift )         {                                         \
-      UIntN * dstN   = ( UIntN * ) ( ( ( ( UIntN ) dst8 ) PRE_LOOP_ADJUST )&       \
-                                     ~( TYPE_WIDTH - 1 ) );                    \
-      UIntN * srcN   = ( UIntN * ) ( ( ( ( UIntN ) src8 ) PRE_LOOP_ADJUST )&       \
-                                     ~( TYPE_WIDTH - 1 ) );                    \
-      size_t length  = count / TYPE_WIDTH;                            \
-      UIntN srcWord  = INC_VAL( srcN );                                  \
-      UIntN dstWord;                                                  \
-                                                                    \
-      while( length& 7 ) {                                            \
-         CP_INCR_SH( 8 * shift, 8 * ( TYPE_WIDTH - shift ) );            \
-         length --;                                                   \
-      }                                                               \
-                                                                    \
-      length /= 8;                                                    \
-                                                                    \
-      while( length -- ) {                                              \
-         CP_SH( 0, 8 * shift, 8 * ( TYPE_WIDTH - shift ) );              \
-         CP_SH( 1, 8 * shift, 8 * ( TYPE_WIDTH - shift ) );              \
-         CP_SH( 2, 8 * shift, 8 * ( TYPE_WIDTH - shift ) );              \
-         CP_SH( 3, 8 * shift, 8 * ( TYPE_WIDTH - shift ) );              \
-         CP_SH( 4, 8 * shift, 8 * ( TYPE_WIDTH - shift ) );              \
-         CP_SH( 5, 8 * shift, 8 * ( TYPE_WIDTH - shift ) );              \
-         CP_SH( 6, 8 * shift, 8 * ( TYPE_WIDTH - shift ) );              \
-         CP_SH( 7, 8 * shift, 8 * ( TYPE_WIDTH - shift ) );              \
-                                                                    \
-         INC_INDEX( dstN, 8 );                                         \
-         INC_INDEX( srcN, 8 );                                         \
-      }                                                               \
-                                                                    \
-      src8  = CAST_TO_U8( srcN, ( shift - TYPE_WIDTH ) );                  \
-      dst8  = CAST_TO_U8( dstN, 0 );                                     \
-                                                                    \
-      COPY_REMAINING( count& ( TYPE_WIDTH - 1 ) );                       \
-                                                                    \
-      return dest;                                                    \
+      UIntN * dstN   = ( UIntN * ) ( ( ( ( UIntN ) dst8 ) PRE_LOOP_ADJUST )&  \
+                                     ~( TYPE_WIDTH - 1 ) );                   \
+      UIntN * srcN   = ( UIntN * ) ( ( ( ( UIntN ) src8 ) PRE_LOOP_ADJUST )&  \
+                                     ~( TYPE_WIDTH - 1 ) );   \
+      size_t length  = count / TYPE_WIDTH;                    \
+      UIntN srcWord  = INC_VAL( srcN );                       \
+      UIntN dstWord;                                          \
+                                                              \
+      while( length& 7 ) {                                    \
+         CP_INCR_SH( 8 * shift, 8 * ( TYPE_WIDTH - shift ) ); \
+         length --;                                           \
+      }                                                       \
+                                                              \
+      length /= 8;                                            \
+                                                              \
+      while( length -- ) {                                    \
+         CP_SH( 0, 8 * shift, 8 * ( TYPE_WIDTH - shift ) );   \
+         CP_SH( 1, 8 * shift, 8 * ( TYPE_WIDTH - shift ) );   \
+         CP_SH( 2, 8 * shift, 8 * ( TYPE_WIDTH - shift ) );   \
+         CP_SH( 3, 8 * shift, 8 * ( TYPE_WIDTH - shift ) );   \
+         CP_SH( 4, 8 * shift, 8 * ( TYPE_WIDTH - shift ) );   \
+         CP_SH( 5, 8 * shift, 8 * ( TYPE_WIDTH - shift ) );   \
+         CP_SH( 6, 8 * shift, 8 * ( TYPE_WIDTH - shift ) );   \
+         CP_SH( 7, 8 * shift, 8 * ( TYPE_WIDTH - shift ) );   \
+                                                              \
+         INC_INDEX( dstN, 8 );                                \
+         INC_INDEX( srcN, 8 );                                \
+      }                                                       \
+      src8  = CAST_TO_U8( srcN, ( shift - TYPE_WIDTH ) );     \
+      dst8  = CAST_TO_U8( dstN, 0 );                          \
+      COPY_REMAINING( count& ( TYPE_WIDTH - 1 ) );            \
+      return dest;                                            \
 }
-
 
 /********************************************************************
 **
@@ -359,15 +330,15 @@ HB_EXPORT void * dv_memcpy( void * dest, const void * src, size_t count )
 
    switch( ( ( ( UIntN ) src8 )PRE_SWITCH_ADJUST ) & ( TYPE_WIDTH - 1 ) )
    {
-      case 0: COPY_NO_SHIFT(); break;
-      case 1: COPY_SHIFT( 1 );   break;
-      case 2: COPY_SHIFT( 2 );   break;
-      case 3: COPY_SHIFT( 3 );   break;
+      case 0: COPY_NO_SHIFT();
+      case 1: COPY_SHIFT( 1 );
+      case 2: COPY_SHIFT( 2 );
+      case 3: COPY_SHIFT( 3 );
 #if TYPE_WIDTH > 4
-      case 4: COPY_SHIFT( 4 );   break;
-      case 5: COPY_SHIFT( 5 );   break;
-      case 6: COPY_SHIFT( 6 );   break;
-      case 7: COPY_SHIFT( 7 );   break;
+      case 4: COPY_SHIFT( 4 );
+      case 5: COPY_SHIFT( 5 );
+      case 6: COPY_SHIFT( 6 );
+      case 7: COPY_SHIFT( 7 );
 #endif
    }
 

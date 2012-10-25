@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-25 18:28 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+   * source/common/hbmem.c:
+     - remove most hack silencing compiler flags and beautify the codes ;-D
+
 2012-10-25 09:04 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/arrays.c  line#   621
   * source/vm/arrays.c  line#  1919
