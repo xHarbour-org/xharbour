@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-27 12:09 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * source/rdd/dbstrux.prg
+     ! Fixed dbModifyStructure() to support deletion of field[s]
+
+   * source/vm/fm.c
+     * Corrected typo
+
 2012-10-25 18:28 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
    * source/common/hbmem.c:
      - remove most hack silencing compiler flags and beautify the codes ;-D

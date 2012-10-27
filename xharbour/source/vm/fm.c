@@ -122,7 +122,7 @@
 /* #  define USE_DL_PREFIX */
 #  if defined( HB_DEBUG )
 #     if ! defined( DEBUG )
-#        defined DEBUG     1
+#        define DEBUG     1
 #     endif
 #  endif
 #  undef FORCEINLINE

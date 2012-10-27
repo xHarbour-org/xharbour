@@ -233,6 +233,7 @@ FUNCTION dbModifyStructure( cFile )
 
       Browse( 0, 0, Min( 20, MaxRow() - 1 ), Min( MaxCol() - 30, 50 ) )
 
+      PACK
       CLOSE
 
       CREATE ( cNewFile ) FROM ( cStructureFile ) ALIAS NEW_MODIFIED NEW
