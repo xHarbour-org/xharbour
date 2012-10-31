@@ -77,7 +77,7 @@
 
 #include <windows.h>
 
-#include "hbdll.ch"
+#include "hbdll.h"
 
 #define EXEC_DLL 0x45584543
 

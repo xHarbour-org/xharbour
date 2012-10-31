@@ -8,7 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2012-11-01 19:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+2012-11-01 04:16 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/dllcall.c
+    ! hbdll.ch -> hbdll.h (missed from previous commit)
+
+2012-11-01 04:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * make_xc.bat
     ! modify OBJ and LIB extension on debug mode
 
