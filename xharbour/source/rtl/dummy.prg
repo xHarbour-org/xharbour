@@ -65,6 +65,11 @@ HB_EXTERN_BEGIN
    Defined here to resolve 'unresolved external' when linking pp.lib to application
 */
 void hb_compSetDeferredFlagOn( void ) {;}
+
+/*
+  Function to override command-line's gc
+*/
+void hb_compSetCOutput( int iOutput ) { HB_SYMBOL_UNUSED( iOutput ); };
 HB_EXTERN_END
 
 #pragma ENDDUMP

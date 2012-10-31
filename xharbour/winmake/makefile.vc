@@ -8,35 +8,19 @@
 # version, changes should only be made on your local copy.(AJ:2008-04-26)
 #
 #===============================================================================
+!include winmake\msvcerr.vc
+!include winmake\common.mak
 
-!if ("$(DEL)"=="")
-DEL=del
-!endif
-
-!if ("$(COPY)"=="")
-COPY=copy
-!endif
-
-!if ("$(TYPE)"=="")
-TYPE=type
-!endif
-
-!if ("$(HB_HAS_LINENO)"=="")
-LINEFLAGS=-l
-!endif
+CC        =CL
+LINKEXE   =LINK
+LIBEXE    =LIB
 
 !if ("$(HB_DEBUG)"=="d")
 CC_DEBUGFLAGS =-Zi
-LNK_DEBUGFLAGS=/DEBUG
-PCODE_FLAG    =-gc2
-LINEFLAGS     =
-!else
-PCODE_FLAG    =-gc0
+LNK_DEBUGFLAGS=-DEBUG
 !endif
 
 !if ("$(HB_ARCH)"=="64")
-C64FLAGS  =-DHB_OS_WIN_64 -DNODLL
-HB64FLAGS =-DNODLL
 HB_MACHINE=X64
 !else
 HB_MACHINE=X86
@@ -50,8 +34,7 @@ WARNINGFLAGS=-W3
 OPTFLAGS    =-Otyb1p -G7
 WARNINGFLAGS=-W4 -wd4127 -wd4054 -wd4055 -wd4244
 ! if ("$(__MSC__)"=="71")
-IGNOREFLAGS =/IGNORE:4078
-WARNINGFLAGS=-W4 -wd4127 -wd4054 -wd4055 -wd4244
+IGNOREFLAGS =-IGNORE:4078
 !endif
 !else
 OPTFLAGS    =-Otyb1
@@ -62,21 +45,41 @@ WARNINGFLAGS=-W4 -wd4127 -wd4054 -wd4055
 !endif
 !endif
 
-OPTFLAGS    =-EHsc $(OPTFLAGS)
+!if ("$(__MSC__)"=="8") || ("$(__MSC__)"=="9") || ("$(__MSC__)"=="10") || ("$(__MSC__)"=="11")
+!if ("$(USE_MSVCRT)"=="1")
+MANIFESTFLAGS=-MANIFEST -MANIFESTFILE:"$(OBJ_DIR)\intermediate.manifest"
+MT_CMD_DLL   =MT -nologo -manifest "$(OBJ_DIR)\intermediate.manifest" -outputresource:$@;2
+MT_CMD       =MT -nologo -manifest "$(OBJ_DIR)\intermediate.manifest" -outputresource:$@;1
+!else
+MANIFESTFLAGS=-MANIFEST:NO
+!endif
+!endif
+
+!if ("$(CPLUSPLUS)"=="1")
+CPPFLAGS  =-TP
+!endif
+
+!if ("$(__MSC__)"=="9") || ("$(__MSC__)"=="10") || ("$(__MSC__)"=="11")
+LINKERFLAGS=-NXCOMPAT -DYNAMICBASE -FIXED:NO
+!endif
+
+OPTFLAGS    =-c -GA -Gs -EHsc -nologo $(OPTFLAGS)
+
+!if ("$(USE_MSVCRT)"=="1")
+CLIBFLAGS   =-MD $(CLIBFLAGS)
+!else
+CLIBFLAGS   =-MT $(CLIBFLAGS)
+!endif
+
+!include winmake\common3.mak
 
 #*******************************************************************************
 !if ("$(__BLD__)"=="CORE_BLD")
 #*******************************************************************************
 
-# Uncomment this line if linking with MSVCRT is preferred
-# USE_MSVCRT=1
-
-!include winmake\msvcerr.vc
-
-#===============================================================================
-# Macro Definitions
-#===============================================================================
-!include winmake\common.mak
+HBDOC_EXE_OBJS=\
+	$(HBDOC_EXE_OBJS)\
+	$(HBDOC_PDF_OBJS)
 
 !if !("$(HB_GTALLEG)"=="")
 HB_GT_LIBS=\
@@ -84,454 +87,88 @@ HB_GT_LIBS=\
 	$(GTALLEG_LIB)
 !endif
 
-#===============================================================================
-# The Project
-#===============================================================================
-!if !("$(HB_THREAD_SUPPORT)"=="1")
+!if ("$(HB_MT)"=="")
 PROJECT=$(ST_PROJECT)
 !else
 PROJECT=$(MT_PROJECT)
 !endif
 
-!if ("$(HB_NO_VM_ALL)"=="1")
-PROJECT=$(PROJECT) $(FMSTAT_LIB)
-!endif
-
 ALL: $(PROJECT)
 
-#===============================================================================
-# C compiler definition and C flags. These should never have to change.
-#===============================================================================
-
-#===============================================================================
-# Append your own build flags here
-#===============================================================================
-HARBOURFLAGS=$(HARBOURFLAGS)
-CLIBFLAGS   =$(CLIBFLAGS)
-CLIBFLAGS_C =$(CLIBFLAGS_C)
-
-#===============================================================================
-# Option to use MSVCRT rather than LIBC*.LIB
-#===============================================================================
-INCLUDE_DIR =-I"include" -I"$(OBJ_DIR)" -I"$(CC_DIR)\include" -I"$(ZLIB_DIR)"
-INCLUDE_DIR =$(INCLUDE_DIR) -I"$(PDFLITE_DIR)\include" -I"$(PNG_DIR)" -I"$(TIFF_DIR)" -I"$(JPEG_DIR)"
-!if ("$(USE_MSVCRT)"=="1")
-CLIBFLAGS=$(CLIBFLAGS) -MD
-CLIBFLAGS_C=$(CLIBFLAGS_C) -MD
-!else
-CLIBFLAGS=$(CLIBFLAGS) -MT
-CLIBFLAGS_C=$(CLIBFLAGS_C) -MT
-!endif
-!if ("$(CPLUSPLUS)"=="1")
-CLIBFLAGS=$(CLIBFLAGS) -TP
-!endif
-CLIBFLAGS_C =$(CLIBFLAGS_C) -D__WIN32__ -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H -c $(OPTFLAGS) -GA -Gs $(WARNINGFLAGS) -nologo $(INCLUDE_DIR)
-CLIBFLAGS   =$(CLIBFLAGS) -D__WIN32__ -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H -c $(OPTFLAGS) -GA -Gs $(WARNINGFLAGS) -nologo $(INCLUDE_DIR)
-HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 $(PCODE_FLAG)
-!if ("$(HB_THREAD_SUPPORT)"=="1")
-CLIBFLAGS   =$(CLIBFLAGS) -DHB_THREAD_SUPPORT
-HARBOURFLAGS=-dHB_THREAD_SUPPORT $(HARBOURFLAGS)
-!endif
-!if ("$(HB_GUI)"=="1")
-CLIBFLAGS   =-DHB_GUI $(CLIBFLAGS)
-CLIBFLAGS_C =-DHB_GUI $(CLIBFLAGS_C)
-!endif
-!if ("$(HB_NO_BACKGROUND)"=="1")
-CLIBFLAGS   =-DHB_NO_BACKGROUND $(CLIBFLAGS)
-CLIBFLAGS_C =-DHB_NO_BACKGROUND $(CLIBFLAGS_C)
-!endif
-
 LINKERFLAGS=$(LINKERFLAGS)\
-	/NOLOGO /LIBPATH:"$(CC_DIR)\LIB" /LIBPATH:$(LIB_DIR) /SUBSYSTEM:CONSOLE
+	-NOLOGO -LIBPATH:"$(CC_DIR)\LIB" -LIBPATH:$(LIB_DIR) -SUBSYSTEM:CONSOLE $(IGNOREFLAGS) $(LFLAGS)
 
 !if ("$(USE_MSVCRT)"=="")
-LINKERFLAGS=$(LINKERFLAGS) /FORCE:MULTIPLE
+LINKERFLAGS=$(LINKERFLAGS) -FORCE:MULTIPLE
 !endif
 
-# User flags should be able to override everything!
-CLIBFLAGS   =$(CLIBFLAGS) $(CFLAGS)
-CLIBFLAGS_C =$(CLIBFLAGS_C) $(CFLAGS_C)
-LINKERFLAGS =$(IGNOREFLAGS) $(LINKERFLAGS) $(LFLAGS)
-
-#-------------------------------------------------------------------------------
-# AJ: 2008-04-26
-# NOTE ON HB_CMD/HB_CMD_MAIN:
-#  -n1 is used for non-executing module (fe. library's modules), because in
-#  some cases, if the module is compiled with -n, it will execute upon
-#  initialization, thus RTE.
-#  -n is ONLY applied to main module to make sure that only that module will
-#  execute upon running the executable.
-#-------------------------------------------------------------------------------
-HARBOURFLAGS =$(HARBOURFLAGS) $(HB64FLAGS)
-HB_CMD       =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
-HB_CMD_MAIN  =$(HARBOUR_EXE) -n $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
-!if ("$(__MSC__)"=="8") || ("$(__MSC__)"=="9") || ("$(__MSC__)"=="10") || ("$(__MSC__)"=="11")
-!if ("$(USE_MSVCRT)"=="1")
-MANIFESTFLAGS=/MANIFEST /MANIFESTFILE:"$(OBJ_DIR)\intermediate.manifest"
-MT_CMD       =MT -nologo -manifest "$(OBJ_DIR)\intermediate.manifest" -outputresource:$@;1
-!else
-MANIFESTFLAGS=/MANIFEST:NO
-!endif
-!endif
-
-!if ("$(HB_NO_FM_DL_ALLOC)"=="")
-CLIBFLAGS    =-DHB_FM_DL_ALLOC $(CLIBFLAGS)
-CLIBFLAGS_C  =-DHB_FM_DL_ALLOC $(CLIBFLAGS_C)
-!endif
-
-!if ("$(HB_NO_VM_ALL)"=="")
-CLIBFLAGS    =-DHB_VM_ALL $(CLIBFLAGS)
-CLIBFLAGS_C  =-DHB_VM_ALL $(CLIBFLAGS_C)
-!endif
-
-!if ("$(HB_NO_DV_MEMCPY)"=="1")
-CLIBFLAGS   =-DHB_NO_DV_MEMCPY $(CLIBFLAGS)
-CLIBFLAGS_C =-DHB_NO_DV_MEMCPY $(CLIBFLAGS_C)
-!endif
-
-CLIBFLAGS   =$(CC_DEBUGFLAGS) $(CLIBFLAGS)
-CLIBFLAGS_C =$(CC_DEBUGFLAGS) $(CLIBFLAGS_C)
-
-CC_CMD       =CL $(C64FLAGS) $(CLIBFLAGS) -Fo$@ $**
-CCC_CMD      =CL $(C64FLAGS) $(CLIBFLAGS_C) -Fo$@ $**
-CC_CMD_FMSTAT=CL $(C64FLAGS) $(CLIBFLAGS) -DHB_FM_STATISTICS -Fo$@ $**
-LIB_CMD      =LIB /MACHINE:$(HB_MACHINE) /NOLOGO /OUT:$@ $**
-LINK_CMD     =LINK $(LNK_DEBUGFLAGS) /MACHINE:$(HB_MACHINE) /NOLOGO /OUT:$@ $** $(LINKERFLAGS) $(MANIFESTFLAGS)
-BISON_CMD1   =bison -v -d $** -o$@
-BISON_CMD2   =bison -v -p hb_comp -d $** -o$@
-
-COMPILERLIBS=\
-	user32.lib\
-	ws2_32.lib\
-	winspool.lib\
-	ole32.lib\
-	oleaut32.lib\
-	advapi32.lib\
-	winmm.lib\
-	mpr.lib
-HRB_LIBS=$(COMMON_LIB) $(PP_LIB) $(COMPILER_LIB)
-EXE_LIBS=$(HARBOUR_LIBS)
-CMN_LIBS=$(COMMON_LIB)
-
-#===============================================================================
-# Library dependencies and build rules
-#===============================================================================
-$(COMPILER_LIB) : $(COMPILER_LIB_OBJS)
-	$(LIB_CMD)
-
-$(RTL_LIB) : $(RTL_LIB_OBJS)
-	$(LIB_CMD)
-
-$(CT_LIB) : $(CT_LIB_OBJS)
-	$(LIB_CMD)
-
-!if ("$(HB_NO_VM_ALL)"=="")
-VM_LIB_OBJS=\
-	$(VM_ALL_OBJS)
-!endif
 VM_LIB_OBJS=\
 	$(VM_LIB_OBJS)\
-	$(VM_COMMON_OBJS)\
 	$(VM_MAIN_OBJS)
-$(VM_LIB) : $(VM_LIB_OBJS)
-	$(LIB_CMD)
-
-$(ZLIB_LIB) : $(ZLIB_LIB_OBJS)
-	$(LIB_CMD)
-
-$(COMMON_LIB) : $(COMMON_LIB_OBJS)
-	$(LIB_CMD)
-
-$(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
-	$(LIB_CMD)
-
-$(REDBFFPT_LIB) : $(REDBFFPT_LIB_OBJS)
-	$(LIB_CMD)
-
-$(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
-	$(LIB_CMD)
-
-$(DBFMDX_LIB) : $(DBFMDX_LIB_OBJS)
-	$(LIB_CMD)
-
-$(BMDBFCDX_LIB) : $(BMDBFCDX_LIB_OBJS)
-	$(LIB_CMD)
-
-$(REDBFCDX_LIB) : $(REDBFCDX_LIB_OBJS)
-	$(LIB_CMD)
-
-$(SIXCDX_LIB) : $(SIXCDX_LIB_OBJS)
-	$(LIB_CMD)
-
-$(BMSIXCDX_LIB) : $(BMSIXCDX_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBSIX_LIB) : $(HBSIX_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HSX_LIB) : $(HSX_LIB_OBJS)
-	$(LIB_CMD)
-
-$(USRRDD_LIB) : $(USRRDD_LIB_OBJS)
-	$(LIB_CMD)
-
-$(RDDS_LIB) : $(RDDS_LIB_OBJS)
-	$(LIB_CMD)
-
-$(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)
-	$(LIB_CMD)
-
-$(DBFNSX_LIB) : $(DBFNSX_LIB_OBJS)
-	$(LIB_CMD)
-
-$(DEBUG_LIB) : $(DEBUG_LIB_OBJS)
-	$(LIB_CMD)
-
-$(LANG_LIB) : $(LANG_LIB_OBJS)
-	$(LIB_CMD)
-
-$(MACRO_LIB) : $(MACRO_LIB_OBJS)
-	$(LIB_CMD)
-
-$(NULSYS_LIB) : $(NULSYS_LIB_OBJS)
-	$(LIB_CMD)
-
-$(PP_LIB) : $(PP_LIB_OBJS)
-	$(LIB_CMD)
-
-$(RDD_LIB) : $(RDD_LIB_OBJS)
-	$(LIB_CMD)
-
-$(PCREPOS_LIB) : $(PCREPOS_LIB_OBJS)
-	$(LIB_CMD)
-
-$(TIP_LIB) : $(TIP_LIB_OBJS)
-	$(LIB_CMD)
-
-$(FMSTAT_LIB) : $(FMSTAT_LIB_OBJS)
-	$(LIB_CMD)
-
-$(GTCGI_LIB) : $(GTCGI_LIB_OBJS)
-	$(LIB_CMD)
-
-$(GTPCA_LIB) : $(GTPCA_LIB_OBJS)
-	$(LIB_CMD)
-
-$(GTSTD_LIB) : $(GTSTD_LIB_OBJS)
-	$(LIB_CMD)
-
-$(GTWIN_LIB) : $(GTWIN_LIB_OBJS)
-	$(LIB_CMD)
-
-$(GTWVT_LIB) : $(GTWVT_LIB_OBJS)
-	$(LIB_CMD)
-
-$(GTGUI_LIB) : $(GTGUI_LIB_OBJS)
-	$(LIB_CMD)
-
-$(GTALLEG_LIB) : $(GTALLEG_LIB_OBJS)
-	$(LIB_CMD)
-
-$(CODEPAGE_LIB) : $(CODEPAGE_LIB_OBJS)
-	$(LIB_CMD)
-
-$(ODBC_LIB) : $(ODBC_LIB_OBJS)
-	$(LIB_CMD)
-
-$(MISC_LIB) : $(MISC_LIB_OBJS)
-	$(LIB_CMD)
-
-$(DLL_MAIN_LIB) : $(DLL_MAIN_LIB_OBJS)
-	$(LIB_CMD)
-
-$(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
-        $(LIB_CMD)
-
-$(PDFLITE_LIB) : $(PDFLITE_LIB_OBJS)
-	$(LIB_CMD)
-
-$(PNG_LIB) : $(PNG_LIB_OBJS)
-	$(LIB_CMD)
-
-$(JPEG_LIB) : $(JPEG_LIB_OBJS)
-	$(LIB_CMD)
-
-$(TIFF_LIB) : $(TIFF_LIB_OBJS)
-	$(LIB_CMD)
 
 #*******************************************************************************
 !elseif ("$(__BLD__)"=="DLL_BLD")
 #*******************************************************************************
-
 # Uncomment this line if linking with MSVCRT is preferred
 # USE_MSVCRT=1
 
-!include winmake\msvcerr.vc
+HARBOUR_DLL_OBJS=\
+	$(HARBOUR_DLL_OBJS)\
+	$(TIFF_LIB_OBJS)
 
-# Comment this line if ST mode is preferred
-DLL_MT=mt
-
-# Uncomment this line when including RDDADS
-# HB_RDDADS=1
-
-#===============================================================================
-# Macro Definitions
-#===============================================================================
-!include winmake\common.mak
-
-#===============================================================================
-# RDDADS
-#===============================================================================
-!ifdef HB_DIR_ADS  ##!ifdef HB_RDDADS
+!if !("$(HB_DIR_ADS)"=="")
+!if ("$(HB_DLL_HAVE_ADS)"=="1")
+INCLUDE_DIR=-I"$(HB_DIR_ADS)" $(INCLUDE_DIR)
 !if ("$(HB_ADS_IMPLIB)"=="no")
 !else
 COMPILERLIBS=\
     "$(HB_DIR_ADS)\ace32.lib"
 ACE_LIBPATH=\
-    /LIBPATH:"$(HB_DIR_ADS)"
+    -LIBPATH:"$(HB_DIR_ADS)"
 !endif
-
 HARBOUR_DLL_OBJS=\
 	$(HARBOUR_DLL_OBJS)\
 	$(RDDADS_LIB_OBJS)
 !endif
-
-#===============================================================================
-# Append your own build flags here
-#===============================================================================
-HARBOURFLAGS=$(HARBOURFLAGS)
-CLIBFLAGS   =$(CLIBFLAGS)
-CLIBFLAGS_C =$(CLIBFLAGS_C)
-
-#===============================================================================
-# C compiler definition and C flags. These should never have to change.
-#===============================================================================
-!if ("$(CPLUSPLUS)"=="1")
-CLIBFLAGS=$(CLIBFLAGS) -TP
-!endif
-!if ("$(DLL_MT)"=="mt")
-CLIBFLAGS_C =$(CLIBFLAGS_C) -DHB_THREAD_SUPPORT
-CLIBFLAGS   =$(CLIBFLAGS) -DHB_THREAD_SUPPORT
-HARBOURFLAGS=$(HARBOURFLAGS) -dHB_THREAD_SUPPORT
-!if ("$(USE_MSVCRT)"=="1")
-CLIBFLAGS=$(CLIBFLAGS) -MD
-CLIBFLAGS_C=$(CLIBFLAGS_C) -MD
-!if ("$(__MSC__)"=="8") || ("$(__MSC__)"=="9") || ("$(__MSC__)"=="10") || ("$(__MSC__)"=="11")
-MANIFESTFLAGS=/MANIFEST /MANIFESTFILE:"$(OBJ_DIR)\intermediate.manifest"
-MT_CMD_DLL  =MT -nologo -manifest "$(OBJ_DIR)\intermediate.manifest" -outputresource:$@;2
-MT_CMD      =MT -nologo -manifest "$(OBJ_DIR)\intermediate.manifest" -outputresource:$@;1
-!endif
-!else
-CLIBFLAGS   =$(CLIBFLAGS) -MT
-CLIBFLAGS_C =$(CLIBFLAGS_C) -MT
-!endif
-!endif
-
-!if !("$(HB_DIR_ADS)"=="")
-ACEH_DIR    =-I"$(HB_DIR_ADS)"
-!endif
-
-!if !("$(HB_DIR_OPENSSL)"=="")
-OPENSSL_DIR    =-I"$(HB_DIR_OPENSSL)\include"
 !endif
 
 DLLFLAGS=\
-  	/MAP\
-	/DEF:$(EXPORT_DEF)\
-	/OUT:$(HARBOUR_DLL)\
-	/DLL\
+  	-MAP\
+	-DEF:$(EXPORT_DEF)\
+	-OUT:$(HARBOUR_DLL)\
+	-DLL\
 	$(IGNOREFLAGS)\
-	/IMPLIB:$(HARBOUR_DLL_LIB)\
-	/MACHINE:$(HB_MACHINE)\
-	/NOLOGO\
-        /LIBPATH:"$(CC_DIR)\LIB" /LIBPATH:$(LIB_DIR) $(ACE_LIBPATH)\
-	/SUBSYSTEM:WINDOWS\
+	-IMPLIB:$(HARBOUR_DLL_LIB)\
+	-MACHINE:$(HB_MACHINE)\
+	-NOLOGO\
+        -LIBPATH:"$(CC_DIR)\LIB" -LIBPATH:$(LIB_DIR) $(ACE_LIBPATH)\
+	-SUBSYSTEM:WINDOWS\
+	$(LINKERFLAGS)\
 	$(LFLAGS) $(MANIFESTFLAGS)\
 	$(HARBOUR_DLL_OBJS)
 
 EXEFLAGS=\
-	/NOLOGO $(IGNOREFLAGS) /MACHINE:$(HB_MACHINE) /LIBPATH:"$(CC_DIR)\LIB"\
-	/LIBPATH:$(LIB_DIR)\
-	/SUBSYSTEM:CONSOLE
+	-NOLOGO $(LINKERFLAGS) $(IGNOREFLAGS) -MACHINE:$(HB_MACHINE) -LIBPATH:"$(CC_DIR)\LIB"\
+	-LIBPATH:$(LIB_DIR)\
+	-SUBSYSTEM:CONSOLE
 
-CLIBFLAGS   =$(CLIBFLAGS) -c -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H $(ACEH_DIR) $(OPENSSL_DIR) -I"$(ZLIB_DIR)" -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ $(OPTFLAGS) -Gs $(WARNINGFLAGS) -DOPENSSL_NO_DEPRECATED -nologo $(CFLAGS)
-CLIBFLAGS_C =$(CLIBFLAGS_C) -c -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H $(ACEH_DIR) $(OPENSSL_DIR) -I"$(ZLIB_DIR)" -Iinclude -I"$(CC_DIR)\include" -I$(OBJ_DIR) -D__WIN32__ -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ $(OPTFLAGS) -Gs $(WARNINGFLAGS) -DOPENSSL_NO_DEPRECATED -nologo $(CFLAGS)
-CLIBFLAGS   =$(CLIBFLAGS) -I"$(PDFLITE_DIR)\include" -I"$(PNG_DIR)" -I"$(TIFF_DIR)" -I"$(JPEG_DIR)"
-CLIBFLAGS_C =$(CLIBFLAGS_C) -I"$(PDFLITE_DIR)\include" -I"$(PNG_DIR)" -I"$(TIFF_DIR)" -I"$(JPEG_DIR)"
-
-HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i$(PDFLITE_DIR)\include -q0 -w2 -es2 $(PCODE_FLAG)
-
-!if ("$(HB_NO_FM_DL_ALLOC)"=="")
-CLIBFLAGS    =-DHB_FM_DL_ALLOC $(CLIBFLAGS)
-CLIBFLAGS_C  =-DHB_FM_DL_ALLOC $(CLIBFLAGS_C)
-!endif
-
-!if ("$(HB_NO_VM_ALL)"=="")
-CLIBFLAGS    =-DHB_VM_ALL $(CLIBFLAGS)
-CLIBFLAGS_C  =-DHB_VM_ALL $(CLIBFLAGS_C)
-!endif
-
-!if ("$(HB_NO_VM_MEMCPY)"=="1")
-CLIBFLAGS   =-DHB_NO_DV_MEMCPY $(CLIBFLAGS)
-CLIBFLAGS_C =-DHB_NO_DV_MEMCPY $(CLIBFLAGS_C)
-!endif
-
-!if ("$(HB_GUI)"=="1")
-CLIBFLAGS   =-DHB_GUI $(CLIBFLAGS)
-CLIBFLAGS_C =-DHB_GUI $(CLIBFLAGS_C)
-!endif
-
-!if ("$(HB_NO_BACKGROUND)"=="1")
-CLIBFLAGS   =-DHB_NO_BACKGROUND $(CLIBFLAGS)
-CLIBFLAGS_C =-DHB_NO_BACKGROUND $(CLIBFLAGS_C)
-!endif
-
-CLIBFLAGS   =$(CC_DEBUGFLAGS) $(CLIBFLAGS)
-CLIBFLAGS_C =$(CC_DEBUGFLAGS) $(CLIBFLAGS_C)
-
-CC_CMD      =CL $(C64FLAGS) $(CLIBFLAGS) -Fo$@ $**
-CCC_CMD     =CL $(C64FLAGS) $(CLIBFLAGS_C) -Fo$@ $**
-HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HB64FLAGS) $(HARBOURFLAGS) $** -o$@
-HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(LINEFLAGS) $(HB64FLAGS) $(HARBOURFLAGS) $** -o$@
-BISON_CMD1  =bison -v -d $** -o$@
-BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
-DLL_LINK_CMD=LINK $(LNK_DEBUGFLAGS) $(DLLFLAGS)
-DLLEXE_LINK_CMD=LINK $(LNK_DEBUGFLAGS) $(EXEFLAGS) $(LFLAGS) /OUT:$@ $** $(USE_DLL_LIB) $(PDFLITE_LIB) $(HARBOUR_DLL_LIB)
-
-#===============================================================================
-# The Project
-#===============================================================================
 ALL: $(DLL_PROJECT)
-
-#===============================================================================
-# HARBOUR.DLL rules
-#===============================================================================
-!if ("$(HB_NO_VM_ALL)"=="")
-VM_LIB_OBJS=\
-	$(VM_ALL_OBJS)
-!endif
-VM_LIB_OBJS=\
-	$(VM_LIB_OBJS)\
-	$(VM_COMMON_OBJS)
-$(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
-	$(DLL_LINK_CMD)
-	$(MT_CMD_DLL)
 
 #*******************************************************************************
 !elseif ("$(__BLD__)"=="CONTRIB_BLD")
 #*******************************************************************************
 
-# Uncomment this line if linking with MSVCRT is preferred
-# USE_MSVCRT=1
+!if ("$(HB_ADS_IMPLIB)"=="no")
+RDDADS_LIB_OBJS=\
+	$(RDDADS_LIB_OBJS)\
+	$(OBJ_DIR)\ace32$(OBJEXT)
+!endif
 
-!include winmake\msvcerr.vc
+WHAT32_LIB_OBJS=\
+	$(WHAT32_LIB_OBJS)\
+	$(OBJ_DIR)\_wincall$(OBJEXT)
 
-#===============================================================================
-# Macro Definitions
-#===============================================================================
-!include winmake\common.mak
-
-RDDSQL_INCLUDE=-I"$(RDDSQL_DIR)" -I"$(HBSQLIT3_DIR)"
+!include winmake\common1.mak
 
 CONTRIB_PROJECT=\
 	$(CONTRIB_PROJECT)\
@@ -547,284 +184,45 @@ CONTRIB_PROJECT=\
 	$(HBZIP_LIB)
 !endif
 
-!if !("$(HB_DIR_ADS)"=="")
-ACEH_DIR       =-I"$(HB_DIR_ADS)"
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(RDDADS_LIB)
-!endif
-
-!if !("$(HB_DIR_OPENSSL)"=="")
-OPENSSL_DIR    =-I"$(HB_DIR_OPENSSL)\include"
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(TIPSSL_LIB)
-!endif
-
-!if !("$(HB_DIR_CURL)"=="")
-CURL_DIR       =-I"$(HB_DIR_CURL)\include"
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBCURL_LIB)
-!endif
-
-!if !("$(HB_DIR_CAIRO)"=="")
-CAIRO_DIR      =-I"$(HB_DIR_CAIRO)\include\cairo"
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBCAIRO_LIB)
-!endif
-
-!if !("$(HB_DIR_POSTGRESQL)"=="")
-RDDSQL_INCLUDE =-I"$(HB_DIR_POSTGRESQL)\include" $(RDDSQL_INCLUDE)
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(PGSQL_LIB) $(SDDPG_LIB)
-!endif
-
-!if !("$(HB_DIR_OCILIB)"=="")
-RDDSQL_INCLUDE =-I"$(HB_DIR_OCILIB)\include" $(RDDSQL_INCLUDE)
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(SDDOCI_LIB)
-!endif
-
-!if !("$(HB_DIR_MYSQL)"=="")
-RDDSQL_INCLUDE =-I"$(HB_DIR_MYSQL)\include" $(RDDSQL_INCLUDE)
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(SDDMY_LIB) $(MYSQL_LIB)
-!endif
-
-!if !("$(HB_DIR_FIREBIRD)"=="")
-RDDSQL_INCLUDE =-I"$(HB_DIR_FIREBIRD)\include" $(RDDSQL_INCLUDE)
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(FIREBIRD_LIB) $(SDDFB_LIB)
-!endif
-
-!if !("$(HB_DIR_MAGIC)"=="")
-RDDSQL_INCLUDE =-I"$(HB_DIR_MAGIC)\include" $(RDDSQL_INCLUDE)
-CONTRIB_PROJECT=$(CONTRIB_PROJECT) $(HBMAGIC_LIB)
-!endif
-
-ALL: $(CONTRIB_PROJECT)
-
-#===============================================================================
-# C compiler definition and C flags. These should never have to change.
-#===============================================================================
-
-#===============================================================================
-# Append your own build flags here
-#===============================================================================
-HARBOURFLAGS=$(HARBOURFLAGS)
-CLIBFLAGS   =$(CLIBFLAGS)
-CLIBFLAGS_C =$(CLIBFLAGS_C)
-
-!if ("$(HB_NO_VM_ALL)"=="")
-CLIBFLAGS    =-DHB_VM_ALL $(CLIBFLAGS)
-CLIBFLAGS_C  =-DHB_VM_ALL $(CLIBFLAGS_C)
-!endif
-
-!if ("$(HB_NO_DV_MEMCPY)"=="")
-CLIBFLAGS   =-DHB_NO_DV_MEMCPY $(CLIBFLAGS)
-CLIBFLAGS_C =-DHB_NO_DV_MEMCPY $(CLIBFLAGS_C)
-!endif
-
-#===============================================================================
-# Option to use MSVCRT rather than LIBC*.LIB
-#===============================================================================
-!if ("$(USE_MSVCRT)"=="1")
-CLIBFLAGS=$(CLIBFLAGS) -MD
-CLIBFLAGS_C=$(CLIBFLAGS_C) -MD
-!else
-CLIBFLAGS=$(CLIBFLAGS) -MT
-CLIBFLAGS_C=$(CLIBFLAGS_C) -MT
-!endif
-
-!if ("$(CPLUSPLUS)"=="1")
-CLIBFLAGS=$(CLIBFLAGS) -TP
-!endif
-
-INCLUDE_DIR =-I"include" -I"$(CC_DIR)\include" $(CAIRO_DIR) $(CURL_DIR) $(OPENSSL_DIR)
-INCLUDE_DIR =$(INCLUDE_DIR) $(RDDSQL_INCLUDE) -I"$(SIXAPI_DIR)\include"
-CLIBFLAGS   =$(CLIBFLAGS) -c $(OPTFLAGS) -GA -Gs $(WARNINGFLAGS) -nologo $(ACEH_DIR) $(INCLUDE_DIR) -D_WIN32 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
-CLIBFLAGS   =$(CLIBFLAGS) -I"$(FREEIMAGE_DIR)\include" -I"$(GDLIB_DIR)\include" -I"$(XWT_DIR)\include" -I"$(XWT_DIR)\src\xwt_win" -I"$(PNG_DIR)" -I"$(ZLIB_DIR)"
-CLIBFLAGS_C =$(CLIBFLAGS_C) -c $(OPTFLAGS) -GA -Gs $(WARNINGFLAGS) -nologo $(ACEH_DIR) $(INCLUDE_DIR) -D_WIN32 -D__WIN32__ -DOPENSSL_NO_DEPRECATED -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
-CLIBFLAGS_C =$(CLIBFLAGS_C) -I$(FREEIMAGE_DIR)\include -I$(GDLIB_DIR)\include -I$(XWT_DIR)\include -I$(XWT_DIR)\src\xwt_win -I$(PNG_DIR) -I$(ZLIB_DIR)
-HARBOURFLAGS=$(HARBOURFLAGS) -iinclude -i"$(SIXAPI_DIR)\include" -i$(GDLIB_DIR)\include -i$(WHAT32_DIR)\include -i$(XWT_DIR)\include -q0 -w2 -es2 $(PCODE_FLAG)
-
-!if ("$(HB_THREAD_SUPPORT)"=="1")
-CLIBFLAGS   =$(CLIBFLAGS) -DHB_THREAD_SUPPORT
-CLIBFLAGS_C =$(CLIBFLAGS_C) -DHB_THREAD_SUPPORT
-!if !("$(USE_MSVCRT)"=="1")
-CLIBFLAGS   =$(CLIBFLAGS) -MT
-CLIBFLAGS_C =$(CLIBFLAGS_C) -MT
-!endif
-!endif
-
-CLIBFLAGS   =$(CC_DEBUGFLAGS) $(CLIBFLAGS) $(CFLAGS)
-CLIBFLAGS_C =$(CC_DEBUGFLAGS) $(CLIBFLAGS_C) $(CFLAGS)
-
-HB_CMD      =$(HARBOUR_EXE) -n1 $(HB64FLAGS) $(LINEFLAGS) $(HARBOURFLAGS) $** -o$@
-CC_CMD      =CL $(C64FLAGS) $(CLIBFLAGS) -Fo$@ $**
-CCC_CMD     =CL $(C64FLAGS) $(CLIBFLAGS_C) -Fo$@ $**
+CONTRIB_PROJECT=\
+	$(CONTRIB_PROJECT)\
+	$(OPTIONAL_PRJ)
 
 !if ("$(HB_DEBUG)"=="d")
 ZIP_DEBUGFLAGS=$(CC_DEBUGFLAGS)
 !else
-ZIP_DEBUGFLAGS=/DNDEBUG
+ZIP_DEBUGFLAGS=-DNDEBUG
 !endif
 
-CC_CMD_ZIP  =CL\
-	$(OPTFLAGS) /GA /Gs /W3 /nologo /I"$(HBZIP_DIR)\INCLUDE" /I"include" /I"$(CC_DIR)\include" /TP\
-	/D_WIN32 $(ZIP_DEBUGFLAGS) /D_MBCS /D_LIB\
-	/Fp"$(OBJ_DIR)\hbzip.pch" /Fd"$(OBJ_DIR)\\"\
-	/FD /EHsc /D_CRT_SECURE_NO_WARNINGS /c /Fo$@ $**
-LIB_CMD     =LIB /MACHINE:$(HB_MACHINE) /NOLOGO /OUT:$@ $**
-
-#===============================================================================
-# Libraries dependencies and build rules
-#===============================================================================
-$(HBMAGIC_LIB) : $(HBMAGIC_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBTINYMT_LIB) : $(HBTINYMT_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBEXPAT_LIB) : $(HBEXPAT_LIB_OBJS)
-	$(LIB_CMD)
-
-$(CGILIB_LIB) : $(CGILIB_LIB_OBJS)
-	$(LIB_CMD)
-
-$(SDDFB_LIB) : $(SDDFB_LIB_OBJS)
-	$(LIB_CMD)
-
-$(SDDMY_LIB) : $(SDDMY_LIB_OBJS)
-	$(LIB_CMD)
-
-$(SDDOCI_LIB) : $(SDDOCI_LIB_OBJS)
-	$(LIB_CMD)
-
-$(SDDODBC_LIB) : $(SDDODBC_LIB_OBJS)
-	$(LIB_CMD)
-
-$(SDDSQLT3_LIB) : $(SDDSQLT3_LIB_OBJS)
-	$(LIB_CMD)
-
-$(SDDPG_LIB) : $(SDDPG_LIB_OBJS)
-	$(LIB_CMD)
-
-$(RDDSQL_LIB) : $(RDDSQL_LIB_OBJS)
-	$(LIB_CMD)
-
-$(FIREBIRD_LIB) : $(FIREBIRD_LIB_OBJS)
-	$(LIB_CMD)
-
-$(FREEIMAGE_LIB) : $(FREEIMAGE_LIB_OBJS)
-	$(LIB_CMD)
-
-$(GDLIB_LIB) : $(GDLIB_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBMZIP_LIB) : $(HBMZIP_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBZIP_LIB) : $(HBZIP_LIB_OBJS)
-	$(LIB_CMD)
-
-$(LIBNF_LIB) : $(LIBNF_LIB_OBJS)
-	$(LIB_CMD)
-
-$(MYSQL_LIB) : $(MYSQL_LIB_OBJS)
-	$(LIB_CMD)
-
-$(PGSQL_LIB) : $(PGSQL_LIB_OBJS)
-	$(LIB_CMD)
-
-$(XWT_LIB) : $(XWT_LIB_OBJS)
-	$(LIB_CMD)
-
-!if ("$(HB_ADS_IMPLIB)"=="no")
-RDDADS_LIB_OBJS=\
-	$(RDDADS_LIB_OBJS)\
-	$(OBJ_DIR)\ace32$(OBJEXT)
-!endif
-$(RDDADS_LIB) : $(RDDADS_LIB_OBJS)
-	$(LIB_CMD)
-
-$(GTWVG_LIB) : $(GTWVG_LIB_OBJS)
-	$(LIB_CMD)
-
-$(FILEMEM_LIB) : $(FILEMEM_LIB_OBJS)
-	$(LIB_CMD)
-
-$(GTWVW_LIB) : $(GTWVW_LIB_OBJS)
-	$(LIB_CMD)
-
-$(TELEPATH_LIB) : $(TELEPATH_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBCC_LIB) : $(HBCC_LIB_OBJS)
-	$(LIB_CMD)
-
-WHAT32_LIB_OBJS=\
-	$(WHAT32_LIB_OBJS)\
-	$(OBJ_DIR)\_wincall$(OBJEXT)
-$(WHAT32_LIB) : $(WHAT32_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBHPDF_LIB) : $(HBHPDF_LIB_OBJS)
-	$(LIB_CMD)
-
-$(LIBHARU_LIB) : $(LIBHARU_LIB_OBJS)
-	$(LIB_CMD)
-
-$(SEVENZIP_LIB) : $(SEVENZIP_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBSQLIT3_LIB) : $(HBSQLIT3_LIB_OBJS)
-	$(LIB_CMD)
-
-$(TIPSSL_LIB) : $(TIPSSL_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBCURL_LIB) : $(HBCURL_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBZEBRA_LIB) : $(HBZEBRA_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBCAIRO_LIB) : $(HBCAIRO_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBBZ2_LIB) : $(HBBZ2_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBLZF_LIB) : $(HBLZF_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBMLZO_LIB) : $(HBMLZO_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBBTREE_LIB) : $(HBBTREE_LIB_OBJS)
-	$(LIB_CMD)
-
-$(SIXAPI_LIB) : $(SIXAPI_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBCAB_LIB) : $(HBCAB_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBCOMM_LIB) : $(HBCOMM_LIB_OBJS)
-	$(LIB_CMD)
+ALL: $(CONTRIB_PROJECT)
 
 !endif
+
+HB_CMD         =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
+HB_CMD_MAIN    =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) -d_USE_APPMAIN_ $** -o$@
+CC_CMD         =$(CC) $(CLIBFLAGS) $(CPPFLAGS) -Fo$@ $**
+CCC_CMD        =$(CC) $(CLIBFLAGS) -Fo$@ $**
+LIB_CMD        =$(LIBEXE) -MACHINE:$(HB_MACHINE) -NOLOGO -OUT:$@ $**
+LINK_CMD       =$(LINKEXE) $(LNK_DEBUGFLAGS) -MACHINE:$(HB_MACHINE) -NOLOGO -OUT:$@ $** $(LINKERFLAGS) $(MANIFESTFLAGS)
+DLL_LINK_CMD   =$(LINKEXE) $(LNK_DEBUGFLAGS) $(DLLFLAGS)
+DLLEXE_LINK_CMD=$(LINKEXE) $(LNK_DEBUGFLAGS) $(EXEFLAGS) $(LFLAGS) -OUT:$@ $** $(PDFLITE_LIB) $(HARBOUR_DLL_LIB)
+CC_CMD_ZIP     =$(CC)\
+	$(OPTFLAGS) -W3 -I"$(HBZIP_DIR)\INCLUDE" -I"include" -I"$(CC_DIR)\include" -TP\
+	-D_WIN32 $(ZIP_DEBUGFLAGS) -D_MBCS -D"_LIB"\
+	-Fp"$(OBJ_DIR)\hbzip.pch" -Fd"$(OBJ_DIR)\\"\
+	-D_CRT_SECURE_NO_WARNINGS -Fo$@ $**
+
 #===============================================================================
 # Building rules of Object files
 #===============================================================================
-!if ("$(HB_USE_BISON)"=="1")
-$(OBJ_DIR)\harboury.c : $(COMPILER_DIR)\harbour.sly
-	$(BISON_CMD1)
+$(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
+	$(DLL_LINK_CMD)
 
-$(OBJ_DIR)\harboury$(OBJEXT) : $(OBJ_DIR)\harboury.c
-	$(CC_CMD)
+$(RTL_LIB) : $(RTL_LIB_OBJS)
+	$(LIB_CMD)
 
-$(OBJ_DIR)\macroy.c : $(MACRO_DIR)\macro.y
-	$(BISON_CMD2)
+$(CT_LIB) : $(CT_LIB_OBJS)
+	$(LIB_CMD)
 
-$(OBJ_DIR)\macroy$(HB_MT)$(OBJEXT) : $(OBJ_DIR)\macroy.c
-	$(CC_CMD)
-!else
-$(OBJ_DIR)\harboury$(OBJEXT) : $(COMPILER_DIR)\harbouryy.c
-	$(CC_CMD)
-
-$(OBJ_DIR)\macroy$(HB_MT)$(OBJEXT) : $(MACRO_DIR)\macroyy.c
-	$(CC_CMD)
-!endif
+!include winmake\common2.mak
 !include winmake\compile.mak
