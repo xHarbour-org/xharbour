@@ -8,42 +8,28 @@
 # version, changes should only be made on your local copy.(AJ:2008-04-26)
 #
 #===============================================================================
+!include winmake\common.mak
 
-!if ("$(DEL)"=="")
-DEL=del
-!endif
+CC        =BCC32
+LINKEXE   =ILINK32
+LIBEXE    =TLIB
+IMPLIBEXE =IMPLIB
 
-!if ("$(TYPE)"=="")
-TYPE=type
-!endif
-
-!if ("$(COPY)"=="")
-COPY=copy
-!endif
-
-!if ("$(HB_HAS_LINENO)"=="")
-LINEFLAGS=-l
-!endif
+OPTFLAGS=-c -q -d -6 -a8
 
 !if ("$(HB_CG32)"=="1") || ("$(HB_DEBUG)"=="d")
 COMPILERLIBS=\
 	cg32.lib\
 	$(COMPILERLIBS)
-OPTIMFLAGS=-Od
-LINEFLAGS=
-CC_DEBUG_FLAGS=-y -v -vG -DHB_FM_STATISTICS -DHB_PRG_TRACE
-CC_LINKER_DEBUG_FLAGS=-v
-HB_NO_VM_ALL=1
-HB_NO_FM_DL_ALLOC=1
-HB_NO_DV_MEMCPY=1
-HB_CG32=1
-HB_PCODE_FLAG=-gc2
+OPTFLAGS              =-Od $(OPTFLAGS)
+LINEFLAGS             =
+CC_DEBUGFLAGS         =-y -v -vG
+CC_LINKER_DEBUG_FLAGS =-v
+HB_CG32               =1
 !else
-OPTIMFLAGS=-O2 -OS -Ov -Oi -Oc
-HB_PCODE_FLAG=-gc0
+OPTFLAGS              =-O2 -OS -Ov -Oi -Oc $(OPTFLAGS)
 !endif
 
-# HB_ADS_IMPLIB==no --> do not create import library (instead use ace32.c)
 !if !("$(HB_DIR_ADS)"=="")
 !if !("$(HB_ADS_IMPLIB)"=="no") && !("$(HB_ADS_IMPLIB)"=="0")
 HB_ADS_CREATEIMPLIB=1
@@ -58,67 +44,28 @@ COMPILERLIBS=\
 	cw32mt.lib\
 	import32.lib
 
-BISON_CMD1  =bison -v -d $** -o$@
-BISON_CMD2  =bison -v -p hb_comp -d $** -o$@
-HARBOURFLAGS=$(HARBOURFLAGS)
-CLIBFLAGS   =$(CC_DEBUG_FLAGS) $(CLIBFLAGS)
-
 !if ("$(ARFLAGS)"=="")
 ARFLAGS=/0 /C /P256
 !endif
 
-!if ("$(HB_WARNING_FLAGS)"=="")
-HB_WARNING_FLAGS=-w -w-8071 -w-8061 -w-8080
+!if ("$(WARNINGFLAGS)"=="")
+WARNINGFLAGS =-w -w-8071 -w-8061 -w-8080
 !endif
 
-CLIBFLAGS    =$(HB_WARNING_FLAGS) $(CLIBFLAGS)
+IMPLIB_CMD    =$(IMPLIBEXE) $@ $**
 
-!if ("$(HB_MT)"=="mt") || defined(HB_THREAD_SUPPORT)
-HARBOURFLAGS =-d"HB_THREAD_SUPPORT" $(HARBOURFLAGS)
-CLIBFLAGS    =-D"HB_THREAD_SUPPORT" $(CLIBFLAGS)
-!endif
-
-!if !("$(HB_NO_FM_DL_ALLOC)"=="1")
-CLIBFLAGS    =-D"HB_FM_DL_ALLOC" $(CLIBFLAGS)
-!endif
-
-!if !("$(HB_NO_VM_ALL)"=="1")
-CLIBFLAGS    =-D"HB_VM_ALL" $(CLIBFLAGS)
-!endif
-
-!if ("$(HB_NO_DV_MEMCPY)"=="1")
-CLIBFLAGS    =-D"HB_NO_DV_MEMCPY" $(CLIBFLAGS)
-!endif
-
-!if ("$(HB_GUI)"=="1")
-CLIBFLAGS    =-D"HB_GUI" $(CLIBFLAGS)
-!endif
-
-!if ("$(HB_NO_BACKGROUND)"=="1")
-CLIBFLAGS    =-D"HB_NO_BACKGROUND" $(CLIBFLAGS)
-!endif
-
-CC           =BCC32
-LINKER       =ILINK32
-LIBRARIAN    =TLIB
-CLIBFLAGS    =-tWM $(CLIBFLAGS)
-INCLUDE_DIR  =-I"include" -I"$(OBJ_DIR)" -I"$(ZLIB_DIR)" -I"$(PDFLITE_DIR)\include" -I"$(PNG_DIR)" -I"$(JPEG_DIR)" -I"$(TIFF_DIR)" -I"$(SIXAPI_DIR)\include" $(INCLUDE_DIR)
-INCLUDE_DIR  =-I"$(FREEIMAGE_DIR)\include" -I"$(GDLIB_DIR)\include" -I"$(XWT_DIR)\include" -I"$(XWT_DIR)\src\xwt_win" -I"$(HBHPDF_DIR)" $(INCLUDE_DIR)
-HB_INCLUDE   =-i"include" -i"$(PDFLITE_DIR)\include" -i"$(GDLIB_DIR)\include" -i"$(SIXAPI_DIR)\include" -i"$(WHAT32_DIR)\include" -i"$(XWT_DIR)\include"
-CC_DEFINES   =-D"__WIN32__" -D"OPENSSL_NO_DEPRECATED" -D"HAVE_CONFIG_H" -D"_HAVE_SQLITE_CONFIG_H" -D"HARBOUR_CONF"
+!include winmake\common3.mak
 
 #*******************************************************************************
 !if ("$(__BLD__)"=="CORE_BLD")
 #*******************************************************************************
-LINK_CMD     =$(LINKER) $(CC_LINKER_DEBUG_FLAGS) -ap -Tpe -x -Gn -C -L$(LIB_DIR) $(LFLAGS) c0x32.obj $**,$@,,
-HRB_LIBS     =$(COMMON_LIB) $(PP_LIB) $(COMPILER_LIB) $(COMPILERLIBS)
-EXE_LIBS     =$(HARBOUR_LIBS) $(COMPILERLIBS)
-CMN_LIBS     =$(COMMON_LIB) $(COMPILERLIBS)
+VM_LIB_OBJS=\
+	$(VM_LIB_OBJS)\
+	$(VM_MAIN_OBJS)
 
-#===============================================================================
-# Macro Definitions
-#===============================================================================
-!include winmake\common.mak
+HBDOC_EXE_OBJS=\
+	$(HBDOC_EXE_OBJS)\
+	$(HBDOC_PDF_OBJS)
 
 !if ("$(HB_GTALLEG)"=="1")
 HB_GT_LIBS=\
@@ -126,24 +73,9 @@ HB_GT_LIBS=\
 	$(GTALLEG_LIB)
 !endif
 
-!if !("$(HB_NO_VM_ALL)"=="1")
-VM_LIB_OBJS=\
-	$(VM_ALL_OBJS)
-!endif
-VM_LIB_OBJS=\
-	$(VM_LIB_OBJS)\
-	$(VM_COMMON_OBJS)
-!if ("$(__BLD__)"=="CORE_BLD")
-VM_LIB_OBJS=\
-	$(VM_LIB_OBJS)\
-	$(VM_MAIN_OBJS)
-!endif
-
-#===============================================================================
-# The Project
-#===============================================================================
 !if ("$(HB_MT)"=="")
-PROJECT=$(ST_PROJECT)
+PROJECT=\
+	$(ST_PROJECT)
 !if ("$(HB_ADS_CREATEIMPLIB)"=="1")
 PROJECT=\
 	$(PROJECT)\
@@ -158,16 +90,14 @@ ALL: $(PROJECT)
 #*******************************************************************************
 !elif ("$(__BLD__)"=="DLL_BLD")
 #*******************************************************************************
-# Comment this line if ST mode is preferred
-DLL_MT=mt
 
-#===============================================================================
-# Macro Definitions
-#===============================================================================
-!include winmake\common.mak
+HARBOUR_DLL_OBJS=\
+	$(HARBOUR_DLL_OBJS)\
+	$(TIFF_LIB_OBJS)
 
 !if !("$(HB_DIR_ADS)"=="")
-MORE_INCLUDE =-I"$(HB_DIR_ADS)" $(MORE_INCLUDE)
+!if ("$(HB_DLL_HAVE_ADS)"=="1")
+INCLUDE_DIR =-I"$(HB_DIR_ADS)" $(INCLUDE_DIR)
 !if ("$(HB_ADS_CREATEIMPLIB)"=="0")
 RDDADS_LIB_OBJS=\
 	$(RDDADS_LIB_OBJS)\
@@ -181,111 +111,26 @@ HARBOUR_DLL_OBJS=\
 	$(HARBOUR_DLL_OBJS)\
 	$(RDDADS_LIB_OBJS)
 !endif
+!endif
 
-CLIBFLAGS  =-D"__EXPORT__" -D"HB_NO_DUPLICATE_HVMPROCESSSYMBOL" $(CLIBFLAGS)
-
-#===============================================================================
-# WVG
-#===============================================================================
 !if ("$(HB_WVG)"=="1")
 HARBOUR_DLL_OBJS=\
 	$(HARBOUR_DLL_OBJS)\
 	$(GTWVG_LIB_OBJS)
 !endif
 
-#===============================================================================
-# C compiler definition and C flags. These should never have to change.
-#===============================================================================
-!if ("$(DLL_MT)"=="mt")
-CLIBFLAGS   =$(CLIBFLAGS) -D"HB_THREAD_SUPPORT"
-HARBOURFLAGS=$(HARBOURFLAGS) -d"HB_THREAD_SUPPORT"
-!else
-CLIBFLAGS   =$(CLIBFLAGS) -tWD
-!endif
-
-!if !("$(HB_DIR_OPENSSL)"=="")
-MORE_INCLUDE =-I"$(HB_DIR_OPENSSL)\include" $(MORE_INCLUDE)
-!endif
-
-INCLUDE_DIR =$(MORE_INCLUDE) $(INCLUDE_DIR)
-DLLFLAGS    =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR)
-EXEFLAGS    =-ap -Tpe -Gn -C -L$(LIB_DIR) -L$(BIN_DIR)
-
-# User flags should be able to override everything!
-DLLFLAGS    =$(DLLFLAGS) $(LFLAGS)
-EXEFLAGS    =$(EXEFLAGS) $(LFLAGS)
-LINKERFLAGS =$(LINKERFLAGS) $(LFLAGS)
-DLLEXE_LINK_CMD=$(LINKER) $(CC_LINKER_DEBUG_FLAGS) $(LINKERFLAGS) c0x32.obj $**,$@,,$(USE_DLL_LIB) $(PDFLITE_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
-#===============================================================================
-# The Project
-#===============================================================================
 !if ("$(HB_ADS_CREATEIMPLIB)"=="1")
 DLL_PROJECT=\
 	$(ACE32_LIB)\
 	$(DLL_PROJECT)
 !endif
+
 ALL: $(DLL_PROJECT)
 
 #*******************************************************************************
 !elif ("$(__BLD__)"=="CONTRIB_BLD")
 #*******************************************************************************
-
-#===============================================================================
-# C compiler definition and C flags. These should never have to change.
-#===============================================================================
-MORE_INCLUDE =-I"$(RDDSQL_DIR)" -I"$(HBSQLIT3_DIR)"
-
-!if !("$(HB_DIR_ADS)"=="")
-MORE_INCLUDE =-I"$(HB_DIR_ADS)" $(MORE_INCLUDE)
-OPTIONAL_PRJ =$(OPTIONAL_PRJ) $(RDDADS_LIB)
-!endif
-
-!if !("$(HB_DIR_OPENSSL)"=="")
-MORE_INCLUDE =-I"$(HB_DIR_OPENSSL)\include" $(MORE_INCLUDE)
-OPTIONAL_PRJ =$(OPTIONAL_PRJ) $(TIPSSL_LIB)
-!endif
-
-!if !("$(HB_DIR_CURL)"=="")
-MORE_INCLUDE =-I"$(HB_DIR_CURL)\include" $(MORE_INCLUDE)
-OPTIONAL_PRJ =$(OPTIONAL_PRJ) $(HBCURL_LIB)
-!endif
-
-!if !("$(HB_DIR_CAIRO)"=="")
-MORE_INCLUDE =-I"$(HB_DIR_CAIRO)\include\cairo" $(MORE_INCLUDE)
-OPTIONAL_PRJ =$(OPTIONAL_PRJ) $(HBCAIRO_LIB)
-!endif
-
-!if !("$(HB_DIR_POSTGRESQL)"=="")
-MORE_INCLUDE =-I"$(HB_DIR_POSTGRESQL)\include" $(MORE_INCLUDE)
-OPTIONAL_PRJ =$(OPTIONAL_PRJ) $(PGSQL_LIB) $(SDDPG_LIB)
-!endif
-
-!if !("$(HB_DIR_OCILIB)"=="")
-MORE_INCLUDE =-I"$(HB_DIR_OCILIB)\include" $(MORE_INCLUDE)
-OPTIONAL_PRJ =$(OPTIONAL_PRJ) $(SDDOCI_LIB)
-!endif
-
-!if !("$(HB_DIR_MYSQL)"=="")
-MORE_INCLUDE =-I"$(HB_DIR_MYSQL)\include" $(MORE_INCLUDE)
-OPTIONAL_PRJ =$(OPTIONAL_PRJ) $(MYSQL_LIB) $(SDDMY_LIB)
-!endif
-
-!if !("$(HB_DIR_FIREBIRD)"=="")
-MORE_INCLUDE =-I"$(HB_DIR_FIREBIRD)\include" $(MORE_INCLUDE)
-OPTIONAL_PRJ =$(OPTIONAL_PRJ) $(FIREBIRD_LIB) $(SDDFB_LIB)
-!endif
-
-!if !("$(HB_DIR_MAGIC)"=="")
-MORE_INCLUDE =-I"$(HB_DIR_MAGIC)\include" $(MORE_INCLUDE)
-OPTIONAL_PRJ =$(OPTIONAL_PRJ) $(HBMAGIC_LIB)
-!endif
-
-INCLUDE_DIR  =$(MORE_INCLUDE) $(INCLUDE_DIR)
-
-#===============================================================================
-# Macro Definitions
-#===============================================================================
-!include winmake\common.mak
+!include winmake\common1.mak
 
 CONTRIB_PROJECT=\
 	$(CONTRIB_PROJECT)\
@@ -298,679 +143,641 @@ CONTRIB_PROJECT=\
 	\
 	$(OPTIONAL_PRJ)
 
+!if ("$(BCC_HAS_TASM)"=="1")
+WHAT32_LIB_OBJS=\
+	$(WHAT32_LIB_OBJS)\
+	$(OBJ_DIR)\_wincall$(OBJEXT)
+!else
+WHAT32_LIB_OBJS=\
+	$(WHAT32_LIB_OBJS)\
+        $(WHAT32_DIR)\source\_wincall.obj
+!endif
+
 ALL: $(CONTRIB_PROJECT)
 
 !endif
 
-#===============================================================================
-# COMMAND LINES
-#===============================================================================
-CLIBFLAGS    =$(CLIBFLAGS) $(CC_DEFINES) $(INCLUDE_DIR) $(OPTIMFLAGS) -c -q -d -6 -a8
-HARBOURFLAGS =$(HARBOURFLAGS) $(HB_INCLUDE) $(LINEFLAGS) -q0 -w2 -es2 $(HB_PCODE_FLAG)
-HB_CMD       =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
-HB_CMD_MAIN  =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) $** -o$@
-CC_CMD       =$(CC) $(CLIBFLAGS) $(CFLAGS) -o$@ $**
-CCC_CMD      =$(CC_CMD)
-CC_CMD_ZIP   =$(CC) $(CC_DEBUG_FLAGS) -q -c -I"$(HBZIP_DIR)\include" -I"include" -Ve -6 -R- -H- $(OPTIMFLAGS) -w- -X- -a8 -b -k- -o$@ $**
+DLLFLAGS       =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR) $(LFLAGS)
+LINKERFLAGS    =$(LINKERFLAGS) $(LFLAGS)
+HB_CMD         =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
+HB_CMD_MAIN    =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) -d_USE_APPMAIN_ $** -o$@
+CC_CMD         =$(CC) -tWM $(CLIBFLAGS) -o$@ $**
+CCC_CMD        =$(CC_CMD)
+CC_CMD_ZIP     =$(CC) -tWM $(CC_DEBUGFLAGS) -I"$(HBZIP_DIR)\include" -I"include" -Ve -R- -H- $(OPTFLAGS) -w- -X- -b -k- -o$@ $**
+LINK_CMD       =$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) -ap -Tpe -x -Gn -C -L$(LIB_DIR) $(LFLAGS) c0x32.obj $**,$@,,
+DLLEXE_LINK_CMD=$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) $(LINKERFLAGS) c0x32.obj $**,$@,,$(PDFLITE_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # Building rules of Object files
 #===============================================================================
 $(ACE32_LIB) : "$(HB_DIR_ADS)\ace32.dll"
-	ECHO Creating $(ACE32_LIB) import library
-	implib "$(ACE32_LIB)" "$(HB_DIR_ADS)\ace32.dll"
+	$(IMPLIB_CMD)
 
 $(COMPILER_LIB) : $(COMPILER_LIB_OBJS)
 	IF EXIST "$(COMPILER_LIB)" $(DEL) "$(COMPILER_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(RTL_LIB) : $(RTL_LIB_OBJS)
 	IF EXIST "$(RTL_LIB)" $(DEL) "$(RTL_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(CT_LIB) : $(CT_LIB_OBJS)
 	IF EXIST "$(CT_LIB)" $(DEL) "$(CT_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
-!if !("$(HB_NO_VM_ALL)"=="1")
-VM_LIB_OBJS=\
-	$(VM_ALL_OBJS)
-!endif
-VM_LIB_OBJS=\
-	$(VM_LIB_OBJS)\
-	$(VM_COMMON_OBJS)
-!if ("$(__BLD__)"=="CORE_BLD")
-VM_LIB_OBJS=\
-	$(VM_LIB_OBJS)\
-	$(VM_MAIN_OBJS)
-!endif
-
 $(VM_LIB) : $(VM_LIB_OBJS)
 	IF EXIST "$(VM_LIB)" $(DEL) "$(VM_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(ZLIB_LIB) : $(ZLIB_LIB_OBJS)
 	IF EXIST "$(ZLIB_LIB)" $(DEL) "$(ZLIB_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
 	IF EXIST "$(COMMON_LIB)" $(DEL) "$(COMMON_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
 	IF EXIST "$(DBFFPT_LIB)" $(DEL) "$(DBFFPT_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(REDBFFPT_LIB) : $(REDBFFPT_LIB_OBJS)
 	IF EXIST "$(REDBFFPT_LIB)" $(DEL) "$(REDBFFPT_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
 	IF EXIST "$(DBFCDX_LIB)" $(DEL) "$(DBFCDX_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(DBFMDX_LIB) : $(DBFMDX_LIB_OBJS)
 	IF EXIST "$(DBFMDX_LIB)" $(DEL) "$(DBFMDX_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(BMDBFCDX_LIB) : $(BMDBFCDX_LIB_OBJS)
 	IF EXIST "$(BMDBFCDX_LIB)" $(DEL) "$(BMDBFCDX_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(REDBFCDX_LIB) : $(REDBFCDX_LIB_OBJS)
 	IF EXIST "$(REDBFCDX_LIB)" $(DEL) "$(REDBFCDX_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(SIXCDX_LIB) : $(SIXCDX_LIB_OBJS)
 	IF EXIST "$(SIXCDX_LIB)" $(DEL) "$(SIXCDX_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(BMSIXCDX_LIB) : $(BMSIXCDX_LIB_OBJS)
 	IF EXIST "$(BMSIXCDX_LIB)" $(DEL) "$(BMSIXCDX_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(HBSIX_LIB) : $(HBSIX_LIB_OBJS)
 	IF EXIST "$(HBSIX_LIB)" $(DEL) "$(HBSIX_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(HSX_LIB) : $(HSX_LIB_OBJS)
 	IF EXIST "$(HSX_LIB)" $(DEL) "$(HSX_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(USRRDD_LIB) : $(USRRDD_LIB_OBJS)
 	IF EXIST "$(USRRDD_LIB)" $(DEL) "$(USRRDD_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(RDDS_LIB) : $(RDDS_LIB_OBJS)
 	IF EXIST "$(RDDS_LIB)" $(DEL) "$(RDDS_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)
 	IF EXIST "$(DBFNTX_LIB)" $(DEL) "$(DBFNTX_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(DBFNSX_LIB) : $(DBFNSX_LIB_OBJS)
 	IF EXIST "$(DBFNSX_LIB)" $(DEL) "$(DBFNSX_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(DEBUG_LIB) : $(DEBUG_LIB_OBJS)
 	IF EXIST "$(DEBUG_LIB)" $(DEL) "$(DEBUG_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(LANG_LIB) : $(LANG_LIB_OBJS)
 	IF EXIST "$(LANG_LIB)" $(DEL) "$(LANG_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(MACRO_LIB) : $(MACRO_LIB_OBJS)
 	IF EXIST "$(MACRO_LIB)" $(DEL) "$(MACRO_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(NULSYS_LIB) : $(NULSYS_LIB_OBJS)
 	IF EXIST "$(NULSYS_LIB)" $(DEL) "$(NULSYS_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(PP_LIB) : $(PP_LIB_OBJS)
 	IF EXIST "$(PP_LIB)" $(DEL) "$(PP_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(RDD_LIB) : $(RDD_LIB_OBJS)
 	IF EXIST "$(RDD_LIB)" $(DEL) "$(RDD_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(PCREPOS_LIB) : $(PCREPOS_LIB_OBJS)
 	IF EXIST "$(PCREPOS_LIB)" $(DEL) "$(PCREPOS_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(TIP_LIB) : $(TIP_LIB_OBJS)
 	IF EXIST "$(TIP_LIB)" $(DEL) "$(TIP_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(GTCGI_LIB) : $(GTCGI_LIB_OBJS)
 	IF EXIST "$(GTCGI_LIB)" $(DEL) "$(GTCGI_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(GTPCA_LIB) : $(GTPCA_LIB_OBJS)
 	IF EXIST "$(GTPCA_LIB)" $(DEL) "$(GTPCA_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(GTSTD_LIB) : $(GTSTD_LIB_OBJS)
 	IF EXIST "$(GTSTD_LIB)" $(DEL) "$(GTSTD_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(GTWIN_LIB) : $(GTWIN_LIB_OBJS)
 	IF EXIST "$(GTWIN_LIB)" $(DEL) "$(GTWIN_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(GTWVT_LIB) : $(GTWVT_LIB_OBJS)
 	IF EXIST "$(GTWVT_LIB)" $(DEL) "$(GTWVT_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(GTGUI_LIB) : $(GTGUI_LIB_OBJS)
 	IF EXIST "$(GTGUI_LIB)" $(DEL) "$(GTGUI_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(GTALLEG_LIB) : $(GTALLEG_LIB_OBJS)
 	IF EXIST "$(GTALLEG_LIB)" $(DEL) "$(GTALLEG_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(CODEPAGE_LIB) : $(CODEPAGE_LIB_OBJS)
 	IF EXIST "$(CODEPAGE_LIB)" $(DEL) "$(CODEPAGE_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(ODBC_LIB) : $(ODBC_LIB_OBJS)
 	IF EXIST "$(ODBC_LIB)" $(DEL) "$(ODBC_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(MISC_LIB) : $(MISC_LIB_OBJS)
 	IF EXIST "$(MISC_LIB)" $(DEL) "$(MISC_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(DLL_MAIN_LIB) : $(DLL_MAIN_LIB_OBJS)
 	IF EXIST "$(DLL_MAIN_LIB)" $(DEL) "$(DLL_MAIN_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
 	IF EXIST "$(USE_DLL_LIB)" $(DEL) "$(USE_DLL_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(PDFLITE_LIB) : $(PDFLITE_LIB_OBJS)
 	IF EXIST "$(PDFLITE_LIB)" $(DEL) "$(PDFLITE_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(PNG_LIB) : $(PNG_LIB_OBJS)
 	IF EXIST "$(PNG_LIB)" $(DEL) "$(PNG_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(JPEG_LIB) : $(JPEG_LIB_OBJS)
 	IF EXIST "$(JPEG_LIB)" $(DEL) "$(JPEG_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(TIFF_LIB) : $(TIFF_LIB_OBJS)
 	IF EXIST "$(TIFF_LIB)" $(DEL) "$(TIFF_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
-	$(LINKER) $(CC_LINKER_DEBUG_FLAGS) $(DLLFLAGS) @&&!
+	$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) $(DLLFLAGS) @&&!
 c0d32.obj $**, $@,, $(COMPILERLIBS), $(RTL_DIR)\bcc.def
 !
 
 $(HBMAGIC_LIB) : $(HBMAGIC_LIB_OBJS)
 	IF EXIST "$(HBMAGIC_LIB)" $(DEL) "$(HBMAGIC_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(HBTINYMT_LIB) : $(HBTINYMT_LIB_OBJS)
 	IF EXIST "$(HBTINYMT_LIB)" $(DEL) "$(HBTINYMT_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(HBEXPAT_LIB) : $(HBEXPAT_LIB_OBJS)
 	IF EXIST "$(HBEXPAT_LIB)" $(DEL) "$(HBEXPAT_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(CGILIB_LIB) : $(CGILIB_LIB_OBJS)
 	IF EXIST "$(CGILIB_LIB)" $(DEL) "$(CGILIB_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(SDDFB_LIB) : $(SDDFB_LIB_OBJS)
 	IF EXIST "$(SDDFB_LIB)" $(DEL) "$(SDDFB_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(SDDMY_LIB) : $(SDDMY_LIB_OBJS)
 	IF EXIST "$(SDDMY_LIB)" $(DEL) "$(SDDMY_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(SDDOCI_LIB) : $(SDDOCI_LIB_OBJS)
 	IF EXIST "$(SDDOCI_LIB)" $(DEL) "$(SDDOCI_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(SDDODBC_LIB) : $(SDDODBC_LIB_OBJS)
 	IF EXIST "$(SDDODBC_LIB)" $(DEL) "$(SDDODBC_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(SDDSQLT3_LIB) : $(SDDSQLT3_LIB_OBJS)
 	IF EXIST "$(SDDSQLT3_LIB)" $(DEL) "$(SDDSQLT3_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(SDDPG_LIB) : $(SDDPG_LIB_OBJS)
 	IF EXIST "$(SDDPG_LIB)" $(DEL) "$(SDDPG_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(RDDSQL_LIB) : $(RDDSQL_LIB_OBJS)
 	IF EXIST "$(RDDSQL_LIB)" $(DEL) "$(RDDSQL_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(HBBZ2_LIB) : $(HBBZ2_LIB_OBJS)
 	IF EXIST "$(HBBZ2_LIB)" $(DEL) "$(HBBZ2_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(HBLZF_LIB) : $(HBLZF_LIB_OBJS)
 	IF EXIST "$(HBLZF_LIB)" $(DEL) "$(HBLZF_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(HBMLZO_LIB) : $(HBMLZO_LIB_OBJS)
 	IF EXIST "$(HBMLZO_LIB)" $(DEL) "$(HBMLZO_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(HBCAIRO_LIB) : $(HBCAIRO_LIB_OBJS)
 	IF EXIST "$(HBCAIRO_LIB)" $(DEL) "$(HBCAIRO_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(HBZEBRA_LIB) : $(HBZEBRA_LIB_OBJS)
 	IF EXIST "$(HBZEBRA_LIB)" $(DEL) "$(HBZEBRA_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(HBCURL_LIB) : $(HBCURL_LIB_OBJS)
 	IF EXIST "$(HBCURL_LIB)" $(DEL) "$(HBCURL_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(HBSQLIT3_LIB) : $(HBSQLIT3_LIB_OBJS)
 	IF EXIST "$(HBSQLIT3_LIB)" $(DEL) "$(HBSQLIT3_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(SEVENZIP_LIB) : $(SEVENZIP_LIB_OBJS)
 	IF EXIST "$(SEVENZIP_LIB)" $(DEL) "$(SEVENZIP_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(FIREBIRD_LIB) : $(FIREBIRD_LIB_OBJS)
 	IF EXIST "$(FIREBIRD_LIB)" $(DEL) "$(FIREBIRD_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(FREEIMAGE_LIB) : $(FREEIMAGE_LIB_OBJS)
 	IF EXIST "$(FREEIMAGE_LIB)" $(DEL) "$(FREEIMAGE_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(GDLIB_LIB) : $(GDLIB_LIB_OBJS)
 	IF EXIST "$(GDLIB_LIB)" $(DEL) "$(GDLIB_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(HBMZIP_LIB) : $(HBMZIP_LIB_OBJS)
 	IF EXIST "$(HBMZIP_LIB)" $(DEL) "$(HBMZIP_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(HBZIP_LIB) : $(HBZIP_LIB_OBJS)
 	IF EXIST "$(HBZIP_LIB)" $(DEL) "$(HBZIP_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(LIBNF_LIB) : $(LIBNF_LIB_OBJS)
 	IF EXIST "$(LIBNF_LIB)" $(DEL) "$(LIBNF_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(MYSQL_LIB) : $(MYSQL_LIB_OBJS)
 	IF EXIST "$(MYSQL_LIB)" $(DEL) "$(MYSQL_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(PGSQL_LIB) : $(PGSQL_LIB_OBJS)
 	IF EXIST "$(PGSQL_LIB)" $(DEL) "$(PGSQL_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(XWT_LIB) : $(XWT_LIB_OBJS)
 	IF EXIST "$(XWT_LIB)" $(DEL) "$(XWT_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
-!if ("$(HB_ADS_CREATEIMPLIB)"=="0")
-RDDADS_LIB_OBJS=\
-	$(RDDADS_LIB_OBJS)\
-	$(OBJ_DIR)\ace32$(OBJEXT)
-!endif
 $(RDDADS_LIB) : $(RDDADS_LIB_OBJS)
 	IF EXIST "$(RDDADS_LIB)" $(DEL) "$(RDDADS_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(GTWVW_LIB) : $(GTWVW_LIB_OBJS)
 	IF EXIST "$(GTWVW_LIB)" $(DEL) "$(GTWVW_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(TELEPATH_LIB) : $(TELEPATH_LIB_OBJS)
 	IF EXIST "$(TELEPATH_LIB)" $(DEL) "$(TELEPATH_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(HBCC_LIB) : $(HBCC_LIB_OBJS)
 	IF EXIST "$(HBCC_LIB)" $(DEL) "$(HBCC_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
-!if ("$(BCC_HAS_TASM)"=="1")
-WHAT32_LIB_OBJS=\
-	$(WHAT32_LIB_OBJS)\
-	$(OBJ_DIR)\_wincall.obj
-!else
-WHAT32_LIB_OBJS=\
-	$(WHAT32_LIB_OBJS)\
-        $(WHAT32_DIR)\source\_wincall.obj
-!endif
 $(WHAT32_LIB) : $(WHAT32_LIB_OBJS)
 	IF EXIST "$(WHAT32_LIB)" $(DEL) "$(WHAT32_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(FILEMEM_LIB) : $(FILEMEM_LIB_OBJS)
 	IF EXIST "$(FILEMEM_LIB)" $(DEL) "$(FILEMEM_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(GTWVG_LIB) : $(GTWVG_LIB_OBJS)
 	IF EXIST "$(GTWVG_LIB)" $(DEL) "$(GTWVG_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(HBHPDF_LIB) : $(HBHPDF_LIB_OBJS)
 	IF EXIST "$(HBHPDF_LIB)" $(DEL) "$(HBHPDF_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(LIBHARU_LIB) : $(LIBHARU_LIB_OBJS)
 	IF EXIST "$(LIBHARU_LIB)" $(DEL) "$(LIBHARU_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(TIPSSL_LIB) : $(TIPSSL_LIB_OBJS)
 	IF EXIST "$(TIPSSL_LIB)" $(DEL) "$(TIPSSL_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(HBBTREE_LIB) : $(HBBTREE_LIB_OBJS)
 	IF EXIST "$(HBBTREE_LIB)" $(DEL) "$(HBBTREE_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(SIXAPI_LIB) : $(SIXAPI_LIB_OBJS)
 	IF EXIST "$(SIXAPI_LIB)" $(DEL) "$(SIXAPI_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(HBCAB_LIB) : $(HBCAB_LIB_OBJS)
 	IF EXIST "$(HBCAB_LIB)" $(DEL) "$(HBCAB_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
 $(HBCOMM_LIB) : $(HBCOMM_LIB_OBJS)
 	IF EXIST "$(HBCOMM_LIB)" $(DEL) "$(HBCOMM_LIB)" > NUL
-	$(LIBRARIAN) $@ $(ARFLAGS) @&&!
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 
-!if ("$(HB_USE_BISON)"=="1")
-$(OBJ_DIR)\harboury.c : $(COMPILER_DIR)\harbour.sly
-	$(BISON_CMD1)
-
-$(OBJ_DIR)\harboury$(OBJEXT) : $(OBJ_DIR)\harboury.c
-	$(CC_CMD)
-
-$(OBJ_DIR)\macroy.c : $(MACRO_DIR)\macro.y
-	$(BISON_CMD2)
-
-$(OBJ_DIR)\macroy$(OBJEXT) : $(OBJ_DIR)\macroy.c
-	$(CC_CMD)
-!else
-$(OBJ_DIR)\harboury$(OBJEXT) : $(COMPILER_DIR)\harbouryy.c
-	$(CC_CMD)
-
-$(OBJ_DIR)\macroy$(OBJEXT) : $(MACRO_DIR)\macroyy.c
-	$(CC_CMD)
-!endif
 !include winmake\compile.mak

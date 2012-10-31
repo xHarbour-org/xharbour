@@ -416,6 +416,12 @@ int hb_verCvsID( void )
    return HB_VER_CVSID;
 }
 
+/* ChangeLog CVS Date in YYYYMMDD */
+int hb_verSVNDateID( void )
+{
+   return HB_VER_BUILDDATE;
+}
+
 /* ChangeLog ID string */
 const char * hb_verCvsChangeLogID( void )
 {

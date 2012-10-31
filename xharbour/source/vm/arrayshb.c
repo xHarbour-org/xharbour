@@ -69,7 +69,7 @@
 #include "hbapiitm.h"
 #include "hbapierr.h"
 #include "hbapilng.h"
-#include "cstruct.ch"
+#include "cstruct.h"
 #include "hbset.h"
 
 /* This function creates an array item using 'iDimension' as an index

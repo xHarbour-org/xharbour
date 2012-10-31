@@ -72,6 +72,9 @@
 #include "hbvm.h"
 #include "hbgfxdef.ch"
 
+#if defined( __DMC__ )
+   typedef DWORD UINT_PTR;
+#endif
 
 #define WVT_CHAR_QUEUE_SIZE   128
 #define WVT_MAX_TITLE_SIZE    128

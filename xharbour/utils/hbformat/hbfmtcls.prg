@@ -55,6 +55,11 @@
 #include "fileio.ch"
 #include "common.ch"
 
+// forcing this module to be compiled with gc0 flags due to compile error in
+// pragma __streaminclude "hbextern.ch" | RETURN %s
+// when compiled with gc2 or gc3
+#pragma gc0
+
 #define RF_STATE_FUNC   1
 #define RF_STATE_VAR    2
 #define RF_STATE_CODE   3

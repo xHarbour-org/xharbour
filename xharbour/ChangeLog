@@ -8,6 +8,73 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-31 18:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/mysql/mysql.c
+    - remove definition of HB_SIZE and hb_parnidef
+
+  * include/cstruct.ch
+  + include/cstruct.h
+  * include/hbdll.ch
+  + include/hbdll.h
+    ! separate C defines from PRG ones. This kills annoying warnings by XCC and
+      earlier version of PellesC
+
+  * source/vm/dllcall.c
+    ! hbdll.ch -> hbdll.h
+
+  * source/vm/arrayshb.c
+    ! cstruct.ch -> cstruct.h
+
+  * source/rtl/gtwvt/gtwvt.h
+    + define UINT_PTR for __DMC__
+
+  + winmake/common1.mak
+  + winmake/common2.mak
+  + winmake/common3.mak
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/makefile.bc
+  * winmake/makefile.dc
+  * winmake/makefile.pc
+  * winmake/makefile.wc
+  * winmake/makefile.gc
+  * make_b32.bat
+  * make_dc.bat
+  * make_gc.bat
+  * make_pc.bat
+  * make_vc.bat
+  * make_w32.bat
+  * make_xc.bat
+    ! normalize makefile variables
+
+  * source/compiler/harbour.c
+  * source/compiler/genc.c
+  * source/compiler/genhrb.c
+  * source/vm/runner.c
+  * source/rtl/direct.c
+  * source/rtl/tprinter.c
+    ! uncastings for __XCC__
+
+  * source/common/hbver.c
+  * source/compiler/hbusage.c
+  * source/pp/ppgen.c
+  * source/pp/ppcore.c
+  * source/vm/cmdarg.c
+  * tests/version.prg
+  * include/hbapi.h
+  * include/hbver.h
+    ! revised xHarbour build info from SVN Changelog version number to SVN Changelog date
+
+  * source/rtl/dummy.c
+  * source/pp/ppcore.c
+  * source/pp/ppgen.c
+    + added pragma gc<n> to override command line's one (see sample of implementation
+      in: source/utils/hbfmtcls.prg)
+
+  * utils/hbformat/hbfmtcls.prg
+    + #pragma gc0 -> to force this module compiled with gc0 option because
+      gc2 and gc3 cause error in stream-line include
+
 2012-10-27 12:09 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * source/rdd/dbstrux.prg
      ! Fixed dbModifyStructure() to support deletion of field[s]

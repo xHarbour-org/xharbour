@@ -2365,8 +2365,11 @@ PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pCallerNames
 
                //REVIEW: pSymbol->cScope |= HB_FS_LOCAL;
             }
-
+#if defined( __XCC__ )
+            return ( PFUNCTION ) 1;
+#else
             return ( PFUNCTION ) ( HB_LONG ) 1;
+#endif
          }
          else
          {

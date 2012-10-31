@@ -450,8 +450,11 @@ HB_FUNC( DIRECTORYRECURSE )
          if( bAddDrive )
          {
             char * szDrvDelim[ 2 ];
-
+#if defined( __XCC__ )
+            szDrvDelim[ 0 ]   = ( char * ) HB_OS_DRIVE_DELIM_CHR;
+#else
             szDrvDelim[ 0 ]   = ( char * ) ( HB_LONG ) HB_OS_DRIVE_DELIM_CHR;
+#endif
             szDrvDelim[ 1 ]   = '\0';
 
             szRecurse         = hb_xstrcpy( NULL, fDirSpec->szDrive, szDrvDelim, HB_OS_PATH_DELIM_CHR_STRING, fDirSpec->szPath, HB_OS_PATH_DELIM_CHR_STRING, HB_OS_ALLFILE_MASK, NULL );

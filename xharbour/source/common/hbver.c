@@ -807,8 +807,8 @@ char * hb_verHarbour( void )
       CA-Clipper 5.3b returns: "Clipper (R) 5.3b Intl. (Rev. 338) (1997.04.25)"
     */
 
-   hb_snprintf( pszVersion, 80, "xHarbour build %d.%d.%d Intl. (%s) (Rev. %d)",
-                HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX, hb_verCvsID() );
+   hb_snprintf( pszVersion, 80, "xHarbour %d.%d.%d Intl. (%s) (Build %d)",
+                HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX, hb_verSVNDateID() );
 
    return pszVersion;
 }

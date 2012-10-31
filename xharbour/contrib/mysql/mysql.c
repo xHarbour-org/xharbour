@@ -67,9 +67,6 @@
 #include "hbapiitm.h"
 #include "hbapifs.h"
 
-#define HB_SIZE ULONG
-#define hb_parnidef( n1, n2 )      ( ISNUM( n1 ) ? hb_parni( n1 ) : n2 )
-
 #if defined( HB_OS_WIN )
    /* NOTE: To satisfy MySQL headers. */
    #include <winsock2.h>

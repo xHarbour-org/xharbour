@@ -11,7 +11,7 @@ rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
 
-REM SET HB_WARNING_FLAGS=
+REM SET HB_OPTIMFLAGS=-gc3
 REM SET HB_DEBUG=d
 REM SET HB_GUI=1
 REM SET HB_NO_BACKGROUND=1

@@ -132,7 +132,6 @@ PCREPOS_LIB =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)pcrepos$(LIBEXT)
 ZLIB_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)zlib$(LIBEXT)
 TIP_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)tip$(LIBEXT)
 VM_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)vm$(HB_MT)$(LIBEXT)
-FMSTAT_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)fmstat$(HB_MT)$(LIBEXT)
 ODBC_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbodbc$(LIBEXT)
 DLL_MAIN_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)dllmain$(LIBEXT)
 USE_DLL_LIB =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)use_dll$(LIBEXT)
@@ -202,6 +201,7 @@ CGILIB_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)cgilib$(LIBEXT)
 #===============================================================================
 # Macros For DLL Build
 #===============================================================================
+HB_STARTUP_OBJ  =$(OBJ_DIR)$(DIR_SEP)mainstd$(OBJEXT)
 HARBOUR_DLL     =$(BIN_DIR)$(DIR_SEP)xharbour$(HB_DEBUG).dll
 HBRUNDLL_EXE    =$(BIN_DIR)$(DIR_SEP)hbrundll$(HB_DEBUG).exe
 HBTESTDLL_EXE   =$(BIN_DIR)$(DIR_SEP)hbtestdll$(HB_DEBUG).exe
@@ -1360,12 +1360,6 @@ VM_MAIN_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)mainwin$(OBJEXT)
 
 #===============================================================================
-# FMSTAT.LIB rules
-#===============================================================================
-FMSTAT_LIB_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)fmSTAT$(HB_MT)$(OBJEXT)
-
-#===============================================================================
 # GTCGI.LIB rules
 #===============================================================================
 GTCGI_LIB_OBJS=\
@@ -1682,18 +1676,21 @@ CT_LIB_OBJS=\
 # HBDICT.EXE rules
 #===============================================================================
 HBDICT_EXE_OBJS=\
+	$(HB_STARTUP_OBJ)\
 	$(OBJ_DIR)$(DIR_SEP)hbdict$(OBJEXT)
 
 #===============================================================================
 # HBEXTERN.EXE rules
 #===============================================================================
 HBEXTERN_EXE_OBJS=\
+	$(HB_STARTUP_OBJ)\
 	$(OBJ_DIR)$(DIR_SEP)hbextern$(OBJEXT)
 
 #===============================================================================
 # HBFORMAT.EXE rules
 #===============================================================================
 HBFORMAT_EXE_OBJS=\
+	$(HB_STARTUP_OBJ)\
 	$(OBJ_DIR)$(DIR_SEP)hbformat$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)filereadHBFORMAT$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbfmtcls$(OBJEXT)
@@ -1758,6 +1755,7 @@ COMPILER_LIB_OBJS=\
 # HBRUN.EXE rules
 #===============================================================================
 HBRUN_EXE_OBJS=\
+	$(HB_STARTUP_OBJ)\
 	$(OBJ_DIR)$(DIR_SEP)hbrun$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)external$(OBJEXT)\
 
@@ -1765,6 +1763,7 @@ HBRUN_EXE_OBJS=\
 # HBTEST.EXE rules
 #===============================================================================
 HBTEST_EXE_OBJS=\
+	$(HB_STARTUP_OBJ)\
 	$(OBJ_DIR)$(DIR_SEP)hbtest$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)rt_hvm$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)rt_hvma$(OBJEXT)\
@@ -1782,6 +1781,7 @@ HBTEST_EXE_OBJS=\
 # HBDOC.EXE rules
 #===============================================================================
 HBDOC_EXE_OBJS=\
+	$(HB_STARTUP_OBJ)\
 	$(OBJ_DIR)$(DIR_SEP)hbdoc$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)genasc$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)teeasc$(OBJEXT)\
@@ -1799,8 +1799,9 @@ HBDOC_EXE_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)troff$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)fclass1$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)ffile1$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)ft_funcs$(OBJEXT)\
-	\
+	$(OBJ_DIR)$(DIR_SEP)ft_funcs$(OBJEXT)
+
+HBDOC_PDF_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)genpdf1$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)pdfhbdoc$(OBJEXT)
 
@@ -1808,6 +1809,7 @@ HBDOC_EXE_OBJS=\
 # HBMAKE.EXE rules
 #===============================================================================
 HBMAKE_EXE_OBJS=\
+	$(HB_STARTUP_OBJ)\
 	$(OBJ_DIR)$(DIR_SEP)hbmake$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)tmake$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbmutils$(OBJEXT)\
@@ -1826,6 +1828,7 @@ HBMAKE_EXE_OBJS=\
 # XBSCRIPT.EXE rules
 #===============================================================================
 XBSCRIPT_EXE_OBJS=\
+	$(HB_STARTUP_OBJ)\
 	$(OBJ_DIR)$(DIR_SEP)xbscript$(OBJEXT)
 
 #===============================================================================
@@ -1907,7 +1910,6 @@ HARBOUR_DLL_OBJS=\
 	$(CT_LIB_OBJS)\
 	$(MISC_LIB_OBJS)\
 	$(JPEG_LIB_OBJS)\
-	$(TIFF_LIB_OBJS)\
 	$(PNG_LIB_OBJS)\
 	\
 	$(GTWIN_LIB_OBJS)\
@@ -1977,7 +1979,6 @@ GTWVW_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)wvwcheck$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)wvwedit$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)wvwfuncs$(OBJEXT)
-
 
 #===============================================================================
 # FIREBIRD.LIB dependencies
@@ -2166,7 +2167,6 @@ MYQSL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)tmysql$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)tsqlbrw$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)mysql$(OBJEXT)
-
 
 #===============================================================================
 # PQSQL.LIB dependencies

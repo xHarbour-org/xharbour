@@ -11,6 +11,21 @@ rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
 
+REM SET HB_OPTIMFLAGS=-gc3
+REM SET HB_DEBUG=d
+REM SET HB_GUI=1
+REM SET HB_NO_BACKGROUND=1
+
+REM SET HB_DIR_POSTGRESQL=
+REM SET HB_DIR_OCILIB=
+REM SET HB_DIR_MYSQL=
+REM SET HB_DIR_FIREBIRD=
+REM SET HB_DIR_CAIRO=
+REM SET HB_DIR_CURL=
+REM SET HB_DIR_OPENSSL=
+REM SET HB_DIR_MAGIC=
+REM SET HB_DIR_ADS=
+
 SET CC_DIR=E:\DM
 REM SET BISON_DIR=D:\BISON\BIN
 SET SUB_DIR=dc
@@ -30,8 +45,8 @@ rem ============================================================================
 rem The followings should never change
 rem Do not hard-code in makefile because there are needed for clean build
 rem ============================================================================
-SET LIBEXT=.lib
-SET OBJEXT=.obj
+SET OBJEXT=%HB_ARCH%%HB_DEBUG%.obj
+SET LIBEXT=%HB_ARCH%%HB_DEBUG%.lib
 SET DIR_SEP=\
 REM SET LIBPREFIX=
 rem ============================================================================

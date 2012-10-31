@@ -8,128 +8,110 @@
 # version, changes should only be made on your local copy.(AJ: 2008-04-26)
 #
 #===============================================================================
-# Using Bison parser is an option
-# HB_USE_BISON=1
+include winmake/common.mak
 
-TYPE=cat
-DEL=RM -f
-COPY=cp
+CC    =GCC
+CCP   =G++
+TYPE  =cat
+DEL   =RM -f
+COPY  =cp
 
 ifneq ($(NO_CYGWIN),1)
-NOCYGWIN=-mno-cygwin
-endif
-
-ifneq ($(HB_HAS_LINENO),1)
-LINEFLAGS=-l
+NOCYGWIN  =-mno-cygwin
 endif
 
 ifeq ($(HB_ARCH),64)
-C64FLAGS=-DHB_OS_WIN_64 -DNODLL
-HB64FLAGS=-DNODLL
+C64FLAGS  =-DHB_OS_WIN_64 -DNODLL
+HB64FLAGS =-dNODLL
 else
-HB_TARGET=-mtune=pentium -march=i586
+HB_TARGET =-mtune=pentium -march=i586
+endif
+
+ifeq ($(HB_OPTIMFLAGS),)
+HB_OPTIMFLAGS     =-gc0
 endif
 
 ifeq ($(HB_DEBUG),d)
-CC_DEBUGFLAGS=-g
-LINEFLAGS=
-PCODE_FLAGS=-gc2
+CC_DEBUGFLAGS     =-g
+ifneq ($(HB_DBG_VMALL),1)
+HB_NO_VM_ALL      =1
+endif
+ifneq ($(HB_DBG_DLMALLOC),1)
+HB_NO_FM_DL_ALLOC =1
+endif
+ifneq ($(HB_DBG_DVMEMCPY),1)
+HB_NO_DV_MEMCPY   =1
+endif
 else
-PCODE_FLAGS=-gc0
+HB_OPTIMFLAGS     +=-l
+endif
+
+OPTFLAGS    =-Wall -fomit-frame-pointer $(HB_TARGET) -O3 -c -fno-strict-aliasing $(NOCYGWIN)
+HB_INCLUDE  =-i"include" -i"$(PDFLITE_DIR)/include" -i"$(SIXAPI_DIR)/include" -i"$(GDLIB_DIR)/include" -i"$(WHAT32_DIR)/include" -i"$(XWT_DIR)/include"
+CC_DEFINES  =-D__WIN32__ -DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
+INCLUDE_DIR =-I"include" -I"$(ZLIB_DIR)" -I"$(PNG_DIR)" -I"$(PDFLITE_DIR)/include" -I"$(OBJ_DIR)" -I"$(JPEG_DIR)" -I"$(TIFF_DIR)"
+INCLUDE_DIR +=-I"$(FREEIMAGE_DIR)/include" -I"$(GDLIB_DIR)/include" -I"$(XWT_DIR)/include" -I"$(XWT_DIR)/src/xwt_win" -I"$(SIXAPI_DIR)/include"
+
+ifneq ($(HB_NO_FM_DL_ALLOC),1)
+CC_DEFINES  +=-DHB_FM_DL_ALLOC
+endif
+
+ifneq ($(HB_NO_VM_ALL),1)
+CC_DEFINES  +=-DHB_VM_ALL
+endif
+
+ifeq ($(HB_NO_DV_MEMCPY),1)
+CC_DEFINES  +=-DHB_NO_DV_MEMCPY
+endif
+
+ifeq ($(HB_NO_BACKGROUND),1)
+CC_DEFINES  +=-DHB_NO_BACKGROUND
+endif
+
+ifeq ($(HB_GUI),1)
+CC_DEFINES  +=-DHB_GUI
+endif
+
+ifeq ($(HB_MT),mt)
+CC_DEFINES   +=-DHB_THREAD_SUPPORT -mthreads
+HARBOURFLAGS +=-dHB_THREAD_SUPPORT
+endif
+
+ifneq ($(HB_NO_VM_ALL),1)
+VM_LIB_OBJS=\
+	$(VM_ALL_OBJS)
+endif
+
+VM_LIB_OBJS+=\
+	$(VM_COMMON_OBJS)
+
+HARBOURFLAGS  +=$(HB_INCLUDE) $(HB64FLAGS) -q0 -w2 -es2 $(HB_OPTIMFLAGS)
+CLIBFLAGS     +=$(CC_DEFINES) $(INCLUDE_DIR) $(OPTFLAGS) $(C64FLAGS) $(CC_DEBUGFLAGS)
+
+ifeq ($(HB_USE_BISON),1)
+HARBOUR_Y    =$(COMPILER_DIR)$(DIR_SEP)harbour.sly
+MACRO_Y      =$(MACRO_DIR)$(DIR_SEP)macro.y
+BISON_CMD1   =bison -v -p yy -d -o $@ $^
+BISON_CMD2   =bison -v -p hb_comp -d -o $@ $^
+else
+HARBOUR_Y    =$(COMPILER_DIR)$(DIR_SEP)harbouryy.c
+MACRO_Y      =$(MACRO_DIR)$(DIR_SEP)macroyy.c
+BISON_CMD1   =$(TYPE) $(COMPILER_DIR)$(DIR_SEP)harbouryy.c > $(OBJ_DIR)$(DIR_SEP)harboury.c
+BISON_CMD2   =$(TYPE) $(MACRO_DIR)$(DIR_SEP)macroyy.c > $(OBJ_DIR)$(DIR_SEP)macroy.c
 endif
 
 #*******************************************************************************
 ifeq ($(__BLD__),CORE_BLD)
 #*******************************************************************************
-#===============================================================================
-# Macro Definitions
-#===============================================================================
-include winmake/common.mak
 
-CONSOLE_LIB =$(LIB_DIR)/libconsole.a
-WINDOW_LIB  =$(LIB_DIR)/libwindow.a
+HBDOC_EXE_OBJS+=\
+	$(HBDOC_PDF_OBJS)
 
-HBFILERE_EXE=
-
-ifeq ($(HB_GTALLEG),yes)
+ifeq ($(HB_GTALLEG),1)
 HB_GT_LIBS+=\
 	$(GTALLEG_LIB)
 endif
 
-#===============================================================================
-# Append your own build flags here
-#===============================================================================
-HARBOURFLAGS+=
-CLIBFLAGS   +=
-
-#===============================================================================
-# C compiler definition and C flags. These should never have to change.
-#===============================================================================
-INCLUDE_DIR  =include
-HARBOURFLAGS+=-i$(INCLUDE_DIR) -i$(PDFLITE_DIR)/include -q0 -w2 -es2 $(PCODE_FLAGS)
-CLIBFLAGS   +=-DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -D__WIN32__ -Wall $(NOCYGWIN) -O3 $(HB_TARGET) -c -fomit-frame-pointer -fno-strict-aliasing -I$(INCLUDE_DIR) -I$(OBJ_DIR)
-CLIBFLAGS   +=-I$(ZLIB_DIR) -I$(PNG_DIR) -I$(PDFLITE_DIR)/include
-CLIBFLAGS   +=-I$(JPEG_DIR) -I$(TIFF_DIR)
-
-ifeq ($(HB_THREAD_SUPPORT),1)
-	CLIBFLAGS+=-DHB_THREAD_SUPPORT -mthreads
-	HARBOURFLAGS+=-dHB_THREAD_SUPPORT
-endif
-
-#===============================================================================
-# NOTE ON HB_CMD/HB_CMD_MAIN:
-#  -n1 is used for non-executing module (fe. library's modules), because in
-#  some cases, if the module is compiled with -n, it will execute upon
-#  initialization, thus RTE.
-#  -n is ONLY applied to main module to make sure that only that module will
-#  execute upon running the executable.(AJ: 2008-04-26)
-#===============================================================================
-HARBOURFLAGS+=$(HB64FLAGS)
-HB_CMD     =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) -o$@ $^
-HB_CMD_MAIN=$(HARBOUR_EXE) -n0 $(LINEFLAGS) -d_USE_APPMAIN_ $(HARBOURFLAGS) $(HB_MT_FLAGS) -o$@ $^
-
-#===============================================================================
-# C compiler definition and C flags. These should never have to change.
-#===============================================================================
-ifndef HB_NO_FM_DL_ALLOC
-CLIBFLAGS    +=-DHB_FM_DL_ALLOC
-endif
-
-ifndef HB_NO_VM_ALL
-CLIBFLAGS    +=-DHB_VM_ALL
-endif
-
-ifdef HB_NO_DV_MEMCPY
-CLIBFLAGS    +=-DHB_NO_DV_MEMCPY
-endif
-
-ifeq ($(HB_NO_BACKGROUND),1)
-CLIBFLAGS    +=-DHB_NO_BACKGROUND
-endif
-
-ifeq ($(HB_GUI),1)
-CLIBFLAGS    +=-DHB_GUI
-endif
-
-CLIBFLAGS    +=$(C64FLAGS) $(CC_DEBUGFLAGS)
-
-CC_CMD       =GCC $(CLIBFLAGS) -o $@ $^
-CCC_CMD      =$(CC_CMD)
-CC_CMD_FMSTAT=GCC $(CLIBFLAGS) -DHB_FM_STATISTICS -o $@ $^
-BISON_CMD1   =bison -v -p yy -d -o $@ $^
-BISON_CMD2   =bison -v -p hb_comp -d -o $@ $^
-ifeq ($(HB_DEBUG),d)
-LIB_CMD      =\
-		RM -f $@ &&\
-		AR cru $@ $^ &&\
-		RANLIB $@
-else
-LIB_CMD      =\
-		RM -f $@ &&\
-		AR cru $@ $^ &&\
-		RANLIB $@ &&\
-		STRIP -g $@
-endif
 HARBOUR_LIBS=\
 	-L$(LIB_DIR)\
 	-Wl,--start-group\
@@ -159,196 +141,31 @@ HARBOUR_LIBS=\
 	-lpp$(HB_ARCH)$(HB_DEBUG)\
 	-llang$(HB_ARCH)$(HB_DEBUG)\
 	-Wl,--end-group
+
 COMPILERLIBS=\
 	-L$(CC_DIR)/lib\
 	-luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr\
 	-lole32 -luuid -loleaut32 -lws2_32
-START_UP_OBJ=$(OBJ_DIR)/mainstd$(OBJEXT)
-EXE_LIBS=$(HARBOUR_LIBS) $(COMPILERLIBS)
-HRB_LIBS=-L$(LIB_DIR) -Wl,--start-group -lpp$(HB_ARCH)$(HB_DEBUG) -lcommon$(HB_ARCH)$(HB_DEBUG) -lcompiler$(HB_ARCH)$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
-CMN_LIBS=-L$(LIB_DIR) -lcommon$(HB_ARCH)$(HB_DEBUG) $(COMPILERLIBS)
-LINK_CMD=GCC $(CC_DEBUGFLAGS) -mconsole -Wall -o $@ $^ $(NOCYGWIN)
 
-#===============================================================================
-# The Project
-#===============================================================================
-ifeq ($(HB_THREAD_SUPPORT),)
-PROJECT=$(ST_PROJECT)
+EXE_LIBS     =$(HARBOUR_LIBS) $(COMPILERLIBS)
+HRB_LIBS     =-L$(LIB_DIR) -Wl,--start-group -lpp$(HB_ARCH)$(HB_DEBUG) -lcommon$(HB_ARCH)$(HB_DEBUG) -lcompiler$(HB_ARCH)$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
+CMN_LIBS     =-L$(LIB_DIR) -lcommon$(HB_ARCH)$(HB_DEBUG) $(COMPILERLIBS)
+
+ifeq ($(HB_MT),)
+PROJECT =$(ST_PROJECT)
 else
-PROJECT=$(MT_PROJECT)
-endif
-
-ifdef HB_NO_VM_ALL
-PROJECT+=$(FMSTAT_LIB)
+PROJECT =$(MT_PROJECT)
 endif
 
 ALL: $(PROJECT)
 
-#===============================================================================
-# Libraries dependencies and build rules (ST & MT )
-#===============================================================================
-
-#===============================================================================
-# Libraries dependencies and build rules (ST)
-#===============================================================================
-$(COMPILER_LIB) : $(COMPILER_LIB_OBJS)
-	$(LIB_CMD)
-
-$(RTL_LIB) : $(RTL_LIB_OBJS)
-	$(LIB_CMD)
-
-$(CT_LIB) : $(CT_LIB_OBJS)
-	$(LIB_CMD)
-
-ifndef HB_NO_VM_ALL
-VM_LIB_OBJS=\
-	$(VM_ALL_OBJS)
-endif
-VM_LIB_OBJS+=\
-	$(VM_COMMON_OBJS)
-$(VM_LIB) : $(VM_LIB_OBJS)
-	$(LIB_CMD)
-
-$(ZLIB_LIB) : $(ZLIB_LIB_OBJS)
-	$(LIB_CMD)
-
-$(COMMON_LIB) : $(COMMON_LIB_OBJS)
-	$(LIB_CMD)
-
-$(CODEPAGE_LIB) : $(CODEPAGE_LIB_OBJS)
-	$(LIB_CMD)
-
-$(LANG_LIB) : $(LANG_LIB_OBJS)
-	$(LIB_CMD)
-
-$(DLL_MAIN_LIB) : $(DLL_MAIN_LIB_OBJS)
-	$(LIB_CMD)
-
-$(GTSTD_LIB) : $(GTSTD_LIB_OBJS)
-	$(LIB_CMD)
-
-$(GTWIN_LIB) : $(GTWIN_LIB_OBJS)
-	$(LIB_CMD)
-
-$(GTCGI_LIB) : $(GTCGI_LIB_OBJS)
-	$(LIB_CMD)
-
-$(GTPCA_LIB) : $(GTPCA_LIB_OBJS)
-	$(LIB_CMD)
-
-$(GTGUI_LIB) : $(GTGUI_LIB_OBJS)
-	$(LIB_CMD)
-
-$(PCREPOS_LIB) : $(PCREPOS_LIB_OBJS)
-	$(LIB_CMD)
-
-$(DEBUG_LIB) : $(DEBUG_LIB_OBJS)
-	$(LIB_CMD)
-
-$(NULSYS_LIB) : $(NULSYS_LIB_OBJS)
-	$(LIB_CMD)
-
-$(ODBC_LIB) : $(ODBC_LIB_OBJS)
-	$(LIB_CMD)
-
-$(TIP_LIB) : $(TIP_LIB_OBJS)
-	$(LIB_CMD)
-
-$(MISC_LIB) : $(MISC_LIB_OBJS)
-	$(LIB_CMD)
-
-$(GTWVT_LIB) : $(GTWVT_LIB_OBJS)
-	$(LIB_CMD)
-
-$(MACRO_LIB) : $(MACRO_LIB_OBJS)
-	$(LIB_CMD)
-
-$(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
-	$(LIB_CMD)
-
-$(REDBFFPT_LIB) : $(REDBFFPT_LIB_OBJS)
-	$(LIB_CMD)
-
-$(REDBFCDX_LIB) : $(REDBFCDX_LIB_OBJS)
-	$(LIB_CMD)
-
-$(DBFMDX_LIB) : $(DBFMDX_LIB_OBJS)
-	$(LIB_CMD)
-
-$(USRRDD_LIB) : $(USRRDD_LIB_OBJS)
-	$(LIB_CMD)
-
-$(RDDS_LIB) : $(RDDS_LIB_OBJS)
-	$(LIB_CMD)
-
-$(BMDBFCDX_LIB) : $(BMDBFCDX_LIB_OBJS)
-	$(LIB_CMD)
-
-$(BMSIXCDX_LIB) : $(BMSIXCDX_LIB_OBJS)
-	$(LIB_CMD)
-
-$(SIXCDX_LIB) : $(SIXCDX_LIB_OBJS)
-	$(LIB_CMD)
-
-$(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
-	$(LIB_CMD)
-
-$(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)
-	$(LIB_CMD)
-
-$(DBFNSX_LIB) : $(DBFNSX_LIB_OBJS)
-	$(LIB_CMD)
-
-$(FMSTAT_LIB) : $(FMSTAT_LIB_OBJS)
-	$(LIB_CMD)
-
-$(PP_LIB) : $(PP_LIB_OBJS)
-	$(LIB_CMD)
-
-$(RDD_LIB) : $(RDD_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBSIX_LIB) : $(HBSIX_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HSX_LIB) : $(HSX_LIB_OBJS)
-	$(LIB_CMD)
-
-$(USE_DLL_LIB) : $(USE_DLL_LIB_OBJS)
-	$(LIB_CMD)
-
-$(PDFLITE_LIB) : $(PDFLITE_LIB_OBJS)
-	$(LIB_CMD)
-
-$(PNG_LIB) : $(PNG_LIB_OBJS)
-	$(LIB_CMD)
-
-$(JPEG_LIB) : $(JPEG_LIB_OBJS)
-	$(LIB_CMD)
-
-$(TIFF_LIB) : $(TIFF_LIB_OBJS)
-	$(LIB_CMD)
-
 #*******************************************************************************
 else ifeq ($(__BLD__),DLL_BLD)
 #*******************************************************************************
-# Comment this line if ST mode is preferred
-DLL_MT=mt
 
-# Uncomment this line when including RDDADS
-# HB_RDDADS=1
+HARBOUR_DLL_OBJS+=\
+	$(TIFF_LIB_OBJS)
 
-# Uncomment this line when including WVTGUI
-# HB_WVTGUI=1
-
-#===============================================================================
-# Macro Definitions
-#===============================================================================
-include winmake/common.mak
-
-#===============================================================================
-# Compiler and 3rd Party libraries need to be linked
-#===============================================================================
 COMPILERLIBS=\
 	-L$(CC_DIR)/lib -L$(BIN_DIR) -L$(LIB_DIR)\
 	-luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr\
@@ -359,10 +176,9 @@ COMPILERLIBS1=\
 	-lws2_32 -lwinmm -lgdi32 -lole32 -lwinspool\
 	-loleaut32 -luuid -lmpr
 
-#===============================================================================
-# RDDADS
-#===============================================================================
-ifeq ($(HB_RDDADS),1)
+ifneq ($(HB_DIR_ADS),)
+ifeq ($(HB_DLL_HAVE_ADS),1)
+CLIBFLAGS +=-I"$(HB_DIR_ADS)"
 ifeq ($(HB_ADS_IMPLIB),no)
 else
 COMPILERLIBS+=\
@@ -370,183 +186,80 @@ COMPILERLIBS+=\
 COMPILERLIBS1+=\
 	-lace32
 endif
-
 HARBOUR_DLL_OBJS+=\
 	$(RDDADS_LIB_OBJS)
 endif
-
-#===============================================================================
-# WVTGUI
-#===============================================================================
-ifeq ($(HB_WVTGUI),1)
-HARBOUR_DLL_OBJS+=\
-	$(WVTGUI_LIB_OBJS)
 endif
 
-#===============================================================================
-# Append your own build flags here
-#===============================================================================
-HARBOURFLAGS+=
-CLIBFLAGS   +=
+CLIBFLAGS    +=-DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -mdll
 
-#===============================================================================
-# C compiler definition and C flags. These should never have to change.
-#===============================================================================
-ifeq ($(DLL_MT),mt)
-CLIBFLAGS   +=-DHB_THREAD_SUPPORT -mthreads
-HARBOURFLAGS+=-dHB_THREAD_SUPPORT
+ifeq ($(HB_DLL_ISMT),1)
+CLIBFLAGS    +=-DHB_THREAD_SUPPORT -mthreads
+HARBOURFLAGS +=-dHB_THREAD_SUPPORT
 endif
 
-ifdef HB_DIR_ADS
-ACEH_DIR    =-I"$(HB_DIR_ADS)"
-endif
-INCLUDE_DIR =include
-CLIBFLAGS   +=-DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -DHB_NO_DUPLICATE_HVMPROCESSSYMBOL -D__EXPORT__ -Wall -mdll -fomit-frame-pointer $(HB_TARGET) $(NOCYGWIN) -O3 -c -fno-strict-aliasing $(ACEH_DIR) -I$(INCLUDE_DIR) -I$(OBJ_DIR)
-CLIBFLAGS   +=-I$(ZLIB_DIR) -I$(PNG_DIR) -I$(PDFLITE_DIR)/include
-CLIBFLAGS   +=-I$(TIFF_DIR) -I$(JPEG_DIR) -D__WIN32__
-HARBOURFLAGS+=-i$(INCLUDE_DIR) -i$(PDFLITE_DIR)/include -q0 -w2 -es2 $(PCODE_FLAGS)
-
-ifndef HB_NO_FM_DL_ALLOC
-CLIBFLAGS    +=-DHB_FM_DL_ALLOC
-endif
-
-ifndef HB_NO_VM_ALL
-CLIBFLAGS    +=-DHB_VM_ALL
-endif
-
-ifdef HB_NO_DV_MEMCPY
-CLIBFLAGS    +=-DHB_NO_DV_MEMCPY
-endif
-
-ifeq ($(HB_NO_BACKGROUND),1)
-CLIBFLAGS    +=-DHB_NO_BACKGROUND
-endif
-
-ifeq ($(HB_GUI),1)
-CLIBFLAGS    +=-DHB_GUI
-endif
-
-CLIBFLAGS   +=$(C64FLAGS) $(CC_DEBUGFLAGS)
-HARBOURFLAGS+=$(HB64FLAGS)
-CC_CMD      =GCC $(CLIBFLAGS) -o $@ $^
-CCC_CMD     =$(CC_CMD)
-HB_CMD      =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) -o$@ $^
-HB_CMD_MAIN =$(HARBOUR_EXE) -n0 $(LINEFLAGS) -d_USE_APPMAIN_ $(HARBOURFLAGS) -o$@ $^
-BISON_CMD1  =bison -v -p yy -d -o $@ $^
-BISON_CMD2  =bison -v -p hb_comp -d -o $@ $^
-DLL_LINK_CMD=GCC $(CC_DEBUGFLAGS) -shared -W $(EXPORT_DEF) -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1)
-DLLEXE_LINK_CMD=GCC $(CC_DEBUGFLAGS) -Wall $(NOCYGWIN) -o $@ $^ $(HARBOUR_DLL) $(USE_DLL_LIB) -Wl,--start-group -lpdflite$(HB_ARCH)$(HB_DEBUG) -Wl,--end-group  $(COMPILERLIBS)
-
-#===============================================================================
-# The Project
-#===============================================================================
 ALL: $(DLL_PROJECT)
-
-#===============================================================================
-# HARBOUR.DLL rules
-#===============================================================================
-ifndef HB_NO_VM_ALL
-VM_LIB_OBJS=\
-	$(VM_ALL_OBJS)
-endif
-VM_LIB_OBJS+=\
-	$(VM_COMMON_OBJS)
-$(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
-	$(DLL_LINK_CMD)
 
 #*******************************************************************************
 else ifeq ($(__BLD__),CONTRIB_BLD)
 #*******************************************************************************
-# Uncomment this section if you have want to build the libraries.
 
-#===============================================================================
-# Append your own build flags here
-#===============================================================================
-HARBOURFLAGS+=
-CLIBFLAGS   +=
+MORE_INCLUDE=-I"$(RDDSQL_DIR)" -I"$(HBSQLIT3_DIR)"
 
-ifndef HB_NO_VM_ALL
-CLIBFLAGS   +=-DHB_VM_ALL
+ifneq ($(HB_DIR_ADS),)
+OPTIONAL_PRJ+=$(RDDADS_LIB)
+MORE_INCLUDE+=-I"$(HB_DIR_ADS)"
 endif
 
-ifdef HB_NO_DV_MEMCPY
-CLIBFLAGS   +=-DHB_NO_DV_MEMCPY
+ifneq ($(HB_DIR_OPENSSL),)
+OPTIONAL_PRJ+=$(TIPSSL_LIB)
+MORE_INCLUDE+=-I"$(HB_DIR_OPENSSL)/include"
 endif
 
-#===============================================================================
-# C compiler definition and C flags. These should never have to change.
-#===============================================================================
-RDDSQL_INCLUDE=-I$(RDDSQL_DIR) -I$(HBSQLIT3_DIR)
-
-ifdef HB_DIR_ADS
-ACEH_DIR    =-I"$(HB_DIR_ADS)"
+ifneq ($(HB_DIR_CURL),)
+OPTIONAL_PRJ+=$(HBCURL_LIB)
+MORE_INCLUDE+=-I"$(HB_DIR_CURL)/include"
 endif
 
-ifdef HB_DIR_OPENSSL
-OPENSSL_DIR =-I"$(HB_DIR_OPENSSL)/include"
+ifneq ($(HB_DIR_CAIRO),)
+OPTIONAL_PRJ+=$(HBCAIRO_LIB)
+MORE_INCLUDE+=-I"$(HB_DIR_CAIRO)/include/cairo"
 endif
 
-ifdef HB_DIR_CURL
-CURL_DIR    =-I"$(HB_DIR_CURL)/include"
+ifneq ($(HB_DIR_POSTGRESQL),)
+OPTIONAL_PRJ+=$(PGSQL_LIB) $(SDDPG_LIB)
+MORE_INCLUDE+=-I"$(HB_DIR_POSTGRESQL)/include"
 endif
 
-ifdef HB_DIR_CAIRO
-CAIRO_DIR   =-I"$(HB_DIR_CAIRO)/include/cairo"
+ifneq ($(HB_DIR_OCILIB),)
+OPTIONAL_PRJ+=$(SDDOCI_LIB)
+MORE_INCLUDE+=-I"$(HB_DIR_OCILIB)/include"
 endif
 
-ifdef HB_DIR_POSTGRESQL
-RDDSQL_INCLUDE+=-I"$(HB_DIR_POSTGRESQL)/include"
+ifneq ($(HB_DIR_MYSQL),)
+OPTIONAL_PRJ+=$(MYSQL_LIB) $(SDDMY_LIB)
+MORE_INCLUDE+=-I"$(HB_DIR_MYSQL)/include"
 endif
 
-ifdef HB_DIR_OCILIB
-RDDSQL_INCLUDE+=-I"$(HB_DIR_OCILIB)/include"
+ifneq ($(HB_DIR_FIREBIRD),)
+OPTIONAL_PRJ+=$(FIREBIRD_LIB) $(SDDFB_LIB)
+MORE_INCLUDE+=-I"$(HB_DIR_FIREBIRD)/include"
 endif
 
-ifdef HB_DIR_MYSQL
-RDDSQL_INCLUDE+=-I"$(HB_DIR_MYSQL)/include"
+ifneq ($(HB_DIR_MAGIC),)
+OPTIONAL_PRJ+=$(HBMAGIC_LIB)
+MORE_INCLUDE+=-I"$(HB_DIR_MAGIC)/include"
 endif
 
-ifdef HB_DIR_FIREBIRD
-RDDSQL_INCLUDE+=-I"$(HB_DIR_FIREBIRD)/include"
+CLIBFLAGS  +=$(MORE_INCLUDE)
+
+ifeq ($(HB_ADS_IMPLIB),no)
+RDDADS_LIB_OBJS+=\
+	$(OBJ_DIR)/ace32$(OBJEXT)
 endif
 
-ifdef HB_DIR_MAGIC
-RDDSQL_INCLUDE+=-I"$(HB_DIR_MAGIC)/include"
-endif
-
-HARBOURFLAGS+=-iinclude -i$(SIXAPI_DIR)/include -i$(GDLIB_DIR)/include -i$(WHAT32_DIR)/include -i$(XWT_DIR)/include -q0 -w2 -es2 $(PCODE_FLAGS)
-CLIBFLAGS   +=-D__WIN32__ -DHARBOUR_CONF -D_HAVE_SQLITE_CONFIG_H -Wall $(NOCYGWIN) -O3 -fomit-frame-pointer $(HB_TARGET) -c -fno-strict-aliasing
-CLIBFLAGS   +=$(RDDSQL_INCLUDE) $(ACEH_DIR) -Iinclude -I"$(FREEIMAGE_DIR)/include" -I"$(GDLIB_DIR)/include" -I"$(XWT_DIR)/include" -I"$(XWT_DIR)/src/xwt_win" -I"$(ZLIB_DIR)" -I"$(PNG_DIR)" $(OPENSSL_DIR) $(CURL_DIR)
-CLIBFLAGS   +=$(CAIRO_DIR) -I"$(SIXAPI_DIR)/include"
-
-ifeq ($(HB_THREAD_SUPPORT),1)
-	CLIBFLAGS+=-DHB_THREAD_SUPPORT -mthreads
-	HARBOURFLAGS+=-dHB_THREAD_SUPPORT
-endif
-
-CLIBFLAGS   +=$(C64FLAGS) $(CC_DEBUGFLAGS)
-HARBOURFLAGS+=$(HB64FLAGS)
-
-HB_CMD =$(HARBOUR_EXE) -n1 $(LINEFLAGS) $(HARBOURFLAGS) -o$@ $^
-CC_CMD =GCC $(CLIBFLAGS) -o $@ $^
-CCC_CMD =$(CC_CMD)
-CC_CMD_ZIP=G++ $(CC_DEBUGFLAGS) -Iinclude -I"$(HBZIP_DIR)/include" -D_WIN32 -DNDEBUG -fpermissive -c -o $@ $^
-ifeq ($(HB_DEBUG),d)
-LIB_CMD=\
-	RM -f $@ &&\
-	AR cru $@ $^ &&\
-	RANLIB $@
-else
-LIB_CMD=\
-	RM -f $@ &&\
-	AR cru $@ $^ &&\
-	RANLIB $@ &&\
-	STRIP -g $@
-endif
-#===============================================================================
-# Macro Definitions
-#===============================================================================
-include winmake/common.mak
+WHAT32_LIB_OBJS+=\
+	$(OBJ_DIR)/_wincall$(OBJEXT)
 
 CONTRIB_PROJECT+=\
 	$(HBSQLIT3_LIB)
@@ -558,214 +271,37 @@ CONTRIB_PROJECT+=\
 	$(HBZIP_LIB)
 endif
 
-ifneq ($(HB_DIR_ADS),)
-CONTRIB_PROJECT+=$(RDDADS_LIB)
-endif
-
-ifneq ($(HB_DIR_OPENSSL),)
-CONTRIB_PROJECT+=$(TIPSSL_LIB)
-endif
-
-ifneq ($(HB_DIR_CURL),)
-CONTRIB_PROJECT+=$(HBCURL_LIB)
-endif
-
-ifneq ($(HB_DIR_CAIRO),)
-CONTRIB_PROJECT+=$(HBCAIRO_LIB)
-endif
-
-ifdef HB_DIR_POSTGRESQL
-CONTRIB_PROJECT+=$(PGSQL_LIB) $(SDDPG_LIB)
-endif
-
-ifdef HB_DIR_OCILIB
-CONTRIB_PROJECT+=$(SDDOCI_LIB)
-endif
-
-ifdef HB_DIR_MYSQL
-CONTRIB_PROJECT+=$(MYSQL_LIB) $(SDDMY_LIB)
-endif
-
-ifdef HB_DIR_FIREBIRD
-CONTRIB_PROJECT+=$(FIREBIRD_LIB) $(SDDFB_LIB)
-endif
-
-ifdef HB_DIR_MAGIC
-CONTRIB_PROJECT+=$(HBMAGIC_LIB)
-endif
+CONTRIB_PROJECT += $(OPTIONAL_PRJ)
 
 ALL: $(CONTRIB_PROJECT)
 
-#===============================================================================
-# Libraries dependencies and build rules (ST & MT )
-#===============================================================================
-
-#===============================================================================
-# Libraries dependencies and build rules (ST)
-#===============================================================================
-$(HBTINYMT_LIB) : $(HBTINYMT_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBMAGIC_LIB) : $(HBMAGIC_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBEXPAT_LIB) : $(HBEXPAT_LIB_OBJS)
-	$(LIB_CMD)
-
-$(CGILIB_LIB) : $(CGILIB_LIB_OBJS)
-	$(LIB_CMD)
-
-$(SDDFB_LIB) : $(SDDFB_LIB_OBJS)
-	$(LIB_CMD)
-
-$(SDDMY_LIB) : $(SDDMY_LIB_OBJS)
-	$(LIB_CMD)
-
-$(SDDOCI_LIB) : $(SDDOCI_LIB_OBJS)
-	$(LIB_CMD)
-
-$(SDDODBC_LIB) : $(SDDODBC_LIB_OBJS)
-	$(LIB_CMD)
-
-$(SDDSQLT3_LIB) : $(SDDSQLT3_LIB_OBJS)
-	$(LIB_CMD)
-
-$(SDDPG_LIB) : $(SDDPG_LIB_OBJS)
-	$(LIB_CMD)
-
-$(RDDSQL_LIB) : $(RDDSQL_LIB_OBJS)
-	$(LIB_CMD)
-
-$(TIPSSL_LIB) : $(TIPSSL_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBZEBRA_LIB) : $(HBZEBRA_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBCURL_LIB) : $(HBCURL_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBCAIRO_LIB) : $(HBCAIRO_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBSQLIT3_LIB) : $(HBSQLIT3_LIB_OBJS)
-	$(LIB_CMD)
-
-$(SEVENZIP_LIB) : $(SEVENZIP_LIB_OBJS)
-	$(LIB_CMD)
-
-$(GTWVG_LIB) : $(GTWVG_LIB_OBJS)
-	$(LIB_CMD)
-
-$(FILEMEM_LIB) : $(FILEMEM_LIB_OBJS)
-	$(LIB_CMD)
-
-$(FIREBIRD_LIB) : $(FIREBIRD_LIB_OBJS)
-	$(LIB_CMD)
-
-$(FREEIMAGE_LIB) : $(FREEIMAGE_LIB_OBJS)
-	$(LIB_CMD)
-
-$(GDLIB_LIB) : $(GDLIB_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBMZIP_LIB) : $(HBMZIP_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBZIP_LIB) : $(HBZIP_LIB_OBJS)
-	$(LIB_CMD)
-
-$(LIBNF_LIB) : $(LIBNF_LIB_OBJS)
-	$(LIB_CMD)
-
-$(MYSQL_LIB) : $(MYSQL_LIB_OBJS)
-	$(LIB_CMD)
-
-$(PGSQL_LIB) : $(PGSQL_LIB_OBJS)
-	$(LIB_CMD)
-
-$(XWT_LIB) : $(XWT_LIB_OBJS)
-	$(LIB_CMD)
-
-ifeq ($(HB_ADS_IMPLIB),no)
-RDDADS_LIB_OBJS+=\
-	$(OBJ_DIR)/ace32$(OBJEXT)
 endif
-$(RDDADS_LIB) : $(RDDADS_LIB_OBJS)
-	$(LIB_CMD)
 
-$(GTWVW_LIB) : $(GTWVW_LIB_OBJS)
-	$(LIB_CMD)
-
-$(TELEPATH_LIB) : $(TELEPATH_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBCC_LIB) : $(HBCC_LIB_OBJS)
-	$(LIB_CMD)
-
-WHAT32_LIB_OBJS+=\
-	$(OBJ_DIR)/_wincall$(OBJEXT)
-$(WHAT32_LIB) : $(WHAT32_LIB_OBJS)
-	$(LIB_CMD)
-
-$(WVTGUI_LIB) : $(WVTGUI_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBHPDF_LIB) : $(HBHPDF_LIB_OBJS)
-	$(LIB_CMD)
-
-$(LIBHARU_LIB) : $(LIBHARU_LIB_OBJS)
-	$(LIB_CMD)
-
-$SEVENZIP_LIB) : $(SEVENZIP_LIB_OBJS)
-	$(LIB_CMD)
-
-$HBSQLIT3_LIB) : $(HBSQLIT3_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBBZ2_LIB) : $(HBBZ2_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBLZF_LIB) : $(HBLZF_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBMLZO_LIB) : $(HBMLZO_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBBTREE_LIB) : $(HBBTREE_LIB_OBJS)
-	$(LIB_CMD)
-
-$(SIXAPI_LIB) : $(SIXAPI_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBCAB_LIB) : $(HBCAB_LIB_OBJS)
-	$(LIB_CMD)
-
-$(HBCOMM_LIB) : $(HBCOMM_LIB_OBJS)
-	$(LIB_CMD)
-
+ifneq ($(HB_DEBUG),d)
+ZIP_DEBUGFLAGS  =-DNDEBUG
 endif
+
+LIB_CMD         =RM -f $@ && AR cru $@ $^
+DLL_LINK_CMD    =$(CC) $(CC_DEBUGFLAGS) -shared -W $(EXPORT_DEF) -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1)
+DLLEXE_LINK_CMD =$(CC) $(CC_DEBUGFLAGS) -Wall $(NOCYGWIN) -o $@ $^ $(HARBOUR_DLL) -Wl,--start-group -lpdflite$(HB_ARCH)$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
+LINK_CMD        =$(CC) $(CC_DEBUGFLAGS) -mconsole -Wall -o $@ $^ $(NOCYGWIN)
+HB_CMD          =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) -o$@ $^
+HB_CMD_MAIN     =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) -d"_USE_APPMAIN_" -o$@ $^
+CC_CMD          =$(CC) $(CLIBFLAGS) -o $@ $^
+CCC_CMD         =$(CC_CMD)
+CC_CMD_ZIP      =$(CCP) $(CC_DEBUGFLAGS) -I"include" -I"$(HBZIP_DIR)/include" -D_WIN32 $(ZIP_DEBUGFLAGS) -fpermissive -c -o $@ $^
 
 #===============================================================================
 # Building rules of Object files
 #===============================================================================
-ifeq ($(HB_USE_BISON),1)
-$(OBJ_DIR)/harboury.c : $(COMPILER_DIR)/harbour.sly
-	$(BISON_CMD1)
+$(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
+	$(DLL_LINK_CMD)
 
-$(OBJ_DIR)/harboury$(OBJEXT) : $(OBJ_DIR)/harboury.c
-	$(CC_CMD)
+$(RTL_LIB) : $(RTL_LIB_OBJS)
+	$(LIB_CMD)
 
-$(OBJ_DIR)/macroy.c : $(MACRO_DIR)/macro.y
-	$(BISON_CMD2)
+$(CT_LIB) : $(CT_LIB_OBJS)
+	$(LIB_CMD)
 
-$(OBJ_DIR)/macroy$(OBJEXT) : $(OBJ_DIR)/macroy.c
-	$(CC_CMD)
-else
-$(OBJ_DIR)/harboury$(OBJEXT) : $(COMPILER_DIR)/harbouryy.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/macroy$(OBJEXT) : $(MACRO_DIR)/macroyy.c
-	$(CC_CMD)
-endif
+include winmake/common2.mak
 include winmake/compile.mak

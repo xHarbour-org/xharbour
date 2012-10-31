@@ -71,7 +71,11 @@ BOOL hb_GetPrinterNameByPort( LPTSTR pPrinterName, LPDWORD pdwBufferSize, const 
 #define MAXBUFFERSIZE 255
 
 #undef HWND_BROADCAST
-#define HWND_BROADCAST  ((HWND)(HB_LONG)0xffff)
+#if defined( __XCC__ )
+   #define HWND_BROADCAST  ((HWND)0xffff)
+#else
+   #define HWND_BROADCAST  ((HWND)(HB_LONG)0xffff)
+#endif
 
 BOOL hb_isLegacyDevice( LPTSTR pPrinterName )
 {

@@ -3,11 +3,10 @@
  */
 
 /*
- * Harbour Project source code:
- * Header file for version information
+ * xHarbour Project source code:
  *
- * Copyright 1999 David G. Holm <dholm@jsd-llc.com>
- * www - http://www.harbour-project.org
+ * Copyright 2000 Ron Pinkas <ronpinkas@profit-master.com>
+ * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,38 +49,40 @@
  *
  */
 
-#ifndef HB_VER_H_
-#define HB_VER_H_
+#ifndef CTYPE_CHAR
 
-#define HB_VER_LEX "SimpLex"
-#define HB_VER_MAJOR    1       /* Major version number */
-#define HB_VER_MINOR    2       /* Minor version number */
-#define HB_VER_REVISION 3       /* Revision number */
+   #define CTYPE_VOID 0
 
-#if defined( __XHARBOUR__ )
-   #undef __XHARBOUR__
+   #define CTYPE_CHAR 1
+   #define CTYPE_UNSIGNED_CHAR -1
+   #define CTYPE_CHAR_PTR 10
+   #define CTYPE_UNSIGNED_CHAR_PTR -10
+
+   #define CTYPE_SHORT 2
+   #define CTYPE_UNSIGNED_SHORT -2
+   #define CTYPE_SHORT_PTR 20
+   #define CTYPE_UNSIGNED_SHORT_PTR -20
+
+   #define CTYPE_INT 3
+   #define CTYPE_UNSIGNED_INT -3
+   #define CTYPE_INT_PTR 30
+   #define CTYPE_UNSIGNED_INT_PTR -30
+
+   #define CTYPE_LONG 4
+   #define CTYPE_UNSIGNED_LONG -4
+   #define CTYPE_LONG_PTR 40
+   #define CTYPE_UNSIGNED_LONG_PTR -40
+
+   #define CTYPE_FLOAT 5
+   #define CTYPE_FLOAT_PTR 50
+
+   #define CTYPE_DOUBLE 6
+   #define CTYPE_DOUBLE_PTR 60
+
+   #define CTYPE_VOID_PTR 7
+
+   // ***Must*** be smaller than CTYPE_STRUCTURE_PTR
+   #define CTYPE_STRUCTURE 1000
+   #define CTYPE_STRUCTURE_PTR 10000
+
 #endif
-#define __XHARBOUR__    0x0123
-
-#if defined( __HARBOUR__ )
-   #undef __HARBOUR__
-#endif
-#define __HARBOUR__     0x0123
-
-/* TOFIX: Ideally these should be generated dynamically, until
-          then, they should be updated by the builder. [vszakats] */
-/* Automatic update implemented upon clean build. [AJ:2008-05-05] */
-
-/* The following constants are no longer significant as they are now overridden
-   in hbverbld.h [AJ:2008-05-05] */
-#define HB_VER_LENTRY   "2009-03-26 10:41 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>"
-#define HB_VER_CHLCVS   "ChangeLog,v 1.6406"
-
-#define HB_VER_C_USR    ""
-#define HB_VER_L_USR    ""
-#define HB_VER_PRG_USR  ""
-
-#include "hbver.ch"
-/* #include "hb_ver_.h" */
-
-#endif /* HB_VER_H_ */

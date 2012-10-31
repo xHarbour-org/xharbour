@@ -57,7 +57,6 @@
 #include "pragma.h"
 #include "hbset.h"
 
-
 /*
  * library functions used by PP core code
  * necessary to create standalone binaries
@@ -69,6 +68,7 @@ void * hb_xgrab( HB_SIZE ulSize )
    return malloc( ( size_t ) ulSize );
 }
 #endif
+
 #ifndef hb_xrealloc
 void * hb_xrealloc( void * pMem, HB_SIZE ulSize )
 {
@@ -86,51 +86,72 @@ char * hb_conNewLine( void )
 {
    return "\n";
 }
+
 void hb_conOutErr( const char * pStr, HB_SIZE ulLen )
 {
    fprintf( stderr, "%.*s", ( int ) ( ulLen ? ulLen : strlen( pStr ) ), pStr );
 }
+
 HB_SIZE hb_xquery( USHORT uiMode )
 {
    HB_SYMBOL_UNUSED( uiMode ); return 0;
 }
+
 const char * hb_fsNameConv( const char * szFileName, char ** pszFree )
 {
    if( pszFree )
       *pszFree = NULL;
    return szFileName;
 }
+
 int hb_setGetDirSeparator( void )
 {
    return HB_OS_PATH_DELIM_CHR;
 }
+
 int hb_verCvsID( void )
 {
    return 0;
 }
+
+int hb_verSVNDateID( void )
+{
+   return 0;
+}
+
 const char * hb_verCvsChangeLogID( void )
 {
    return NULL;
 }
+
 const char * hb_verCvsLastEntry( void )
 {
    return NULL;
 }
+
 const char * hb_verFlagsC( void )
 {
    return NULL;
 }
+
 const char * hb_verFlagsL( void )
 {
    return NULL;
 }
+
 const char * hb_verFlagsPRG( void )
 {
    return NULL;
 }
+
 void hb_compSetDeferredFlagOn( void )
 {
    ;
+}
+
+void hb_compSetCOutput( int iOutput )
+{
+   HB_SYMBOL_UNUSED( iOutput );
 }
 
 /*
@@ -362,7 +383,7 @@ static int hb_pp_preprocesfile( PHB_PP_STATE pState, char * szRuleFile )
    return iResult;
 }
 
-static int hb_pp_generateVerInfo( char * szVerFile, char * szCVSID, char * szChangeLogID, char * szLastEntry )
+static int hb_pp_generateVerInfo( char * szVerFile, char * szCVSID, char * szCVSDateID, char * szChangeLogID, char * szLastEntry )
 {
    int      iResult = 0;
    char *   pszEnv;
@@ -393,7 +414,15 @@ static int hb_pp_generateVerInfo( char * szVerFile, char * szCVSID, char * szCha
       fprintf( fout, "\n#define __HBVERBLD_INCLUDED\n" );
 
       if( szCVSID )
-         fprintf( fout, "\n#define HB_VER_CVSID\t%s\n", szCVSID );
+         fprintf( fout, "\n#define HB_VER_CVSID\t\t%s\n", szCVSID );
+
+      if( szCVSDateID )
+      {
+         fprintf( fout, "\n#if defined(HB_VER_BUILDDATE)" );
+         fprintf( fout, "\n#undef HB_VER_BUILDDATE" );
+         fprintf( fout, "\n#endif\n" );
+         fprintf( fout, "#define HB_VER_BUILDDATE\t%s\n", szCVSDateID );
+      }
 
       if( szChangeLogID )
       {
@@ -444,7 +473,7 @@ static int hb_pp_generateVerInfo( char * szVerFile, char * szCVSID, char * szCha
 }
 
 static int hb_pp_parseChangelog( PHB_PP_STATE pState, const char * pszFileName,
-                                 BOOL fQuiet, char * piSVNID,
+                                 BOOL fQuiet, char * piSVNID, char * piSVNDateID,
                                  char ** pszChangeLogID, char ** pszLastEntry )
 {
    int            iResult = 0;
@@ -477,12 +506,13 @@ static int hb_pp_parseChangelog( PHB_PP_STATE pState, const char * pszFileName,
    else
    {
       char     szLine[ 256 ];
+      char     szLine1[ 256 ];
       char     szId[ 128 ];
       char     szLog[ 128 ];
       char *   szFrom, * szTo;
       int      iLen;
 
-      *szId = *szLog = '\0';
+      *szId = *szLog = *szLine1 = '\0';
 
       do
       {
@@ -496,11 +526,15 @@ static int hb_pp_parseChangelog( PHB_PP_STATE pState, const char * pszFileName,
             {
                szFrom   += 5;
                szTo     = strstr( szFrom, " $" );
+
                if( szTo )
                {
                   *szTo = 0;
-                  hb_strncpy( szId, szFrom, sizeof( szId ) - 1 );
                }
+
+               hb_strncpy( szId, szFrom, sizeof( szId ) - 1 );
+               hb_strncpy( szLine1, szLine + 1, sizeof( szLine1 ) - 1 );
+               printf( "szLine1=%s\n", szLine1 );
             }
          }
          else if( ! *szLog )
@@ -548,6 +582,7 @@ static int hb_pp_parseChangelog( PHB_PP_STATE pState, const char * pszFileName,
          *pszChangeLogID   = hb_strdup( szId );
 
          szFrom            = strchr( szLine, ' ' );
+
          if( szFrom )
          {
             while( *szFrom == ' ' )
@@ -575,8 +610,48 @@ static int hb_pp_parseChangelog( PHB_PP_STATE pState, const char * pszFileName,
             else
                _szId[ 0 ] = 0;
          }
+
          if( _szId[ 0 ] )
          {
+            char szSVNDateID[ 10 ];
+            int iLen     = 0, u = 0, wLen = ( int ) strlen( szLine1 );
+            char *szDate = NULL;
+
+            *szSVNDateID ='\0';
+
+            do
+            {
+               if ( szLine1[ u ] == ' ' )
+                  iLen ++;
+
+               if ( iLen == 4 )
+               {
+                  iLen = u;
+                  szDate = szLine1 + iLen + 1;
+                  break;
+               }
+
+               ++u;
+            } while ( u < wLen );
+
+            iLen = 0;
+            u    = 0;
+
+            do
+            {
+               if (! ( szDate[ iLen ] == '-' ) )
+                  szSVNDateID[ u++ ] = szDate[ iLen ];
+
+               if ( szDate[ iLen ] == ' ' )
+                  break;
+
+               ++iLen;
+            } while( szDate [ iLen ] );
+
+            szSVNDateID[ u ] = 0;
+            hb_strncpy( piSVNDateID, szSVNDateID, u );
+
+            hb_pp_addDefine( pState, "HB_VER_BUILDDATE", szSVNDateID );
             hb_pp_addDefine( pState, "HB_VER_CVSID", _szId );
          }
          else
@@ -688,6 +763,7 @@ int main( int argc, char * argv[] )
       if( hb_pp_inFile( pState, szFile, TRUE, NULL, TRUE ) )
       {
          char * szSVNID = ( char * ) hb_xgrab( 10 );
+         char * szSVNDateID = ( char * ) hb_xgrab( 10 );
          if( fWrite )
          {
             char        szFileName[ HB_PATH_MAX ];
@@ -703,16 +779,17 @@ int main( int argc, char * argv[] )
 
          if( fChgLog )
             iResult = hb_pp_parseChangelog( pState, szLogFile, fQuiet,
-                                            szSVNID, &szChangeLogID, &szLastEntry );
+                                            szSVNID, szSVNDateID, &szChangeLogID, &szLastEntry );
 
          if( iResult == 0 )
             iResult = hb_pp_preprocesfile( pState, szRuleFile );
 
          if( iResult == 0 && szVerFile )
-            iResult = hb_pp_generateVerInfo( szVerFile, szSVNID,
+            iResult = hb_pp_generateVerInfo( szVerFile, szSVNID, szSVNDateID,
                                              szChangeLogID, szLastEntry );
 
          hb_xfree( szSVNID );
+         hb_xfree( szSVNDateID );
       }
       else
          iResult = 1;

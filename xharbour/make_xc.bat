@@ -14,9 +14,23 @@ REM SET __MAKE__=D:\VC9\BIN\NMAKE.EXE
 REM NOTE: POMAKE 6.50 is buggy. In this case, please use NMAKE.EXE of MSVC.
 REM NOTE: POMAKE 7.00 is working fine
 
-rem SET CC_DIR=..\XCC
+REM SET HB_OPTIMFLAGS=-gc3
+REM SET HB_DEBUG=d
+REM SET HB_GUI=1
+REM SET HB_NO_BACKGROUND=1
 
-rem Must set because using makefile.pc
+REM SET HB_DIR_POSTGRESQL=
+REM SET HB_DIR_OCILIB=
+REM SET HB_DIR_MYSQL=
+REM SET HB_DIR_FIREBIRD=
+REM SET HB_DIR_CAIRO=
+REM SET HB_DIR_CURL=
+REM SET HB_DIR_OPENSSL=
+REM SET HB_DIR_MAGIC=
+REM SET HB_DIR_ADS=
+
+REM SET CC_DIR=..\XCC
+REM Must set because using makefile.pc
 SET __COMP__=__XCC__
 
 IF "%__MAKE__%"=="" SET __MAKE__=POMAKE
@@ -30,7 +44,7 @@ IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
    IF EXIST "%ProgramFiles%\GnuWin32\Bin" GOTO SET_BISON1
    IF EXIST \GnuWin32\Bin                 GOTO SET_BISON2
    GOTO READY
- 
+
 :SET_BISON1
    SET BISON_DIR=%ProgramFiles%\GnuWin32\Bin
    GOTO READY
@@ -77,9 +91,6 @@ rem=============================================================================
    SET __BLD__=CORE_BLD
    SET HB_MT=
    SET HB_MT_DIR=
-   SET __MT__=
-   SET HB_MT_FLAGS=
-   SET PROJECT=$(ST_PROJECT)
    @CALL winmake\mdir.bat
    %__MAKE__% /F winmake\makefile.pc >make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
@@ -90,9 +101,6 @@ rem=============================================================================
 
    SET HB_MT=mt
    SET HB_MT_DIR=
-   SET __MT__=-MT -DHB_THREAD_SUPPORT
-   SET HB_MT_FLAGS=-dHB_THREAD_SUPPORT
-   SET PROJECT=$(MT_PROJECT)
    @CALL winmake\mdir.bat
    %__MAKE__% /F winmake\makefile.pc >>make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
@@ -125,7 +133,6 @@ rem=============================================================================
    SET __BLD__=DLL_BLD
    SET HB_MT=
    SET __MT__=
-   SET HB_MT_FLAGS=
    SET HB_MT_DIR=\dll
    @CALL winmake\mdir.bat dllcreate
    %__MAKE__% /F winmake\makefile.pc >dll_%SUB_DIR%.log
@@ -156,7 +163,6 @@ rem=============================================================================
    SET __BLD__=CONTRIB_BLD
    SET HB_MT=
    SET __MT__=
-   SET HB_MT_FLAGS=
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
    %__MAKE__% /F winmake\makefile.pc >cont_%SUB_DIR%.log
@@ -204,8 +210,5 @@ rem=============================================================================
 rem=============================================================================
 :EXIT
 rem=============================================================================
-   SET HB_MT_FLAGS=
-   SET PROJECT=
    SET HB_MT=
-   SET __MT__=
    @CALL winmake\mdir.bat resetenvar

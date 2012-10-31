@@ -489,13 +489,21 @@ PHRB_BODY hb_hrbLoad( const char * szHrbBody, ULONG ulBodySize, char * szHrb )
 
       for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )
       {
+#if defined( __XCC__ )
+         if( pSymRead[ ul ].value.pCodeFunc == ( PHB_PCODEFUNC ) SYM_FUNC )
+#else
          if( pSymRead[ ul ].value.pCodeFunc == ( PHB_PCODEFUNC ) ( HB_LONG ) SYM_FUNC )
+#endif
          {
             ulPos = hb_hrbFindSymbol( pSymRead[ ul ].szName, pHrbBody->pDynFunc, pHrbBody->ulFuncs );
 
             if( ulPos == SYM_NOT_FOUND )
             {
+#if defined( __XCC__ )
+               pSymRead[ ul ].value.pCodeFunc = ( PHB_PCODEFUNC ) SYM_EXTERN;
+#else
                pSymRead[ ul ].value.pCodeFunc = ( PHB_PCODEFUNC ) ( HB_LONG ) SYM_EXTERN;
+#endif
             }
             else
             {
@@ -505,7 +513,11 @@ PHRB_BODY hb_hrbLoad( const char * szHrbBody, ULONG ulBodySize, char * szHrb )
          }
 
          /* External function */
+#if defined( __XCC__ )
+         if( pSymRead[ ul ].value.pCodeFunc == ( PHB_PCODEFUNC ) SYM_EXTERN )
+#else
          if( pSymRead[ ul ].value.pCodeFunc == ( PHB_PCODEFUNC ) ( HB_LONG ) SYM_EXTERN )
+#endif
          {
             pDynSym = hb_dynsymFind( pSymRead[ ul ].szName );
 

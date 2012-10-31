@@ -88,6 +88,21 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
 	$(MT_CMD)
 
 #===============================================================================
+# PARSER related
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)harboury.c : $(HARBOUR_Y)
+	$(BISON_CMD1)
+
+$(OBJ_DIR)$(DIR_SEP)macroy.c : $(MACRO_Y)
+	$(BISON_CMD2)
+
+$(OBJ_DIR)$(DIR_SEP)harboury$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)harboury.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)macroy$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)macroy.c
+	$(CC_CMD)
+
+#===============================================================================
 # HBCOMM.LIB
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)commHBCOMM$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)commHBCOMM.c

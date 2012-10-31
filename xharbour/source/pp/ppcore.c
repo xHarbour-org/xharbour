@@ -73,6 +73,7 @@
 
 HB_EXTERN_BEGIN
 extern void hb_compSetDeferredFlagOn( void );
+extern void hb_compSetCOutput( int iOutput );
 HB_EXTERN_END
 
 #ifdef __XHARBOUR__
@@ -2625,6 +2626,26 @@ static void hb_pp_pragmaNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
       else if( hb_pp_tokenValueCmp( pToken, "DEFERRED", HB_PP_CMP_DBASE ) )
       {
          hb_compSetDeferredFlagOn();
+      }
+      else if( hb_pp_tokenValueCmp( pToken, "GC0", HB_PP_CMP_DBASE ) )
+      {
+         hb_compSetCOutput( 0 );
+      }
+      else if( hb_pp_tokenValueCmp( pToken, "GC1", HB_PP_CMP_DBASE ) )
+      {
+         hb_compSetCOutput( 1 );
+      }
+      else if( hb_pp_tokenValueCmp( pToken, "GC2", HB_PP_CMP_DBASE ) )
+      {
+         hb_compSetCOutput( 2 );
+      }
+      else if( hb_pp_tokenValueCmp( pToken, "GC3", HB_PP_CMP_DBASE ) )
+      {
+         hb_compSetCOutput( 3 );
+      }
+      else if( hb_pp_tokenValueCmp( pToken, "GC4", HB_PP_CMP_DBASE ) )
+      {
+         hb_compSetCOutput( 4 );
       }
       else if( hb_pp_tokenValueCmp( pToken, "RECURSELEVEL", HB_PP_CMP_DBASE ) )
       {
@@ -5581,11 +5602,17 @@ void hb_pp_initDynDefines( PHB_PP_STATE pState )
 #endif
 
 #if defined( __HARBOUR__ ) || defined( __XHARBOUR__ )
+
+#if 0
 #if defined( __PPGEN__ )
    hb_snprintf( szResult, sizeof( szResult ), "%05d", HB_MAX( ( HB_VER_MAJOR << 8 ) | HB_VER_MINOR, 1 ) );
 #else
    hb_snprintf( szResult, sizeof( szResult ), "%05d", HB_VER_CVSID );
 #endif
+#endif
+
+   hb_snprintf( szResult, sizeof( szResult ), "0x%02i%i%i", HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION );
+
 #ifdef __HARBOUR__
    /* __HARBOUR__ */
    hb_pp_addDefine( pState, "__HARBOUR__", szResult );

@@ -158,8 +158,11 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
          else if( ( pSym->iFlags & SYMF_NS_RESOLVE ) == SYMF_NS_RESOLVE )
          {
             pFunc = hb_compFunctionResolve( pSym->szName, ( PNAMESPACE ) pSym->Namespace, pSym );
-
+#if defined( __XCC__ )
+            if( pFunc == ( PFUNCTION ) 1 )
+#else
             if( pFunc == ( PFUNCTION ) ( HB_LONG ) 1 )
+#endif
             {
                // Resolved to external member.
                pFunc = NULL;
