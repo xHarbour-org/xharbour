@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-31 19:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbcomp.h
+  * source/compiler/comptool.c
+    ! yet, missing from previous commits
+
 2012-10-31 18:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/mysql/mysql.c
     - remove definition of HB_SIZE and hb_parnidef
@@ -65,7 +70,7 @@
   * include/hbver.h
     ! revised xHarbour build info from SVN Changelog version number to SVN Changelog date
 
-  * source/rtl/dummy.c
+  * source/rtl/dummy.prg
   * source/pp/ppcore.c
   * source/pp/ppgen.c
     + added pragma gc<n> to override command line's one (see sample of implementation

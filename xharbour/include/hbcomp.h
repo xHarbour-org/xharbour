@@ -629,6 +629,7 @@ extern int hb_compMain( int argc, char * argv[] );
 
 /* Misc functions defined in harbour.c */
 extern void hb_compSetDeferredFlagOn( void );
+extern void hb_compSetCOutput( int iOutput );
 extern void hb_compFinalizeFunction( void ); /* fixes all last defined function returns jumps offsets */
 extern void hb_compNOOPadd( PFUNCTION pFunc, HB_SIZE ulPos );
 extern void hb_compNOOPfill( PFUNCTION pFunc, HB_SIZE ulFrom, int iCount, BOOL fPop, BOOL fCheck );

@@ -469,6 +469,12 @@ int hb_verCvsID( void )
    return HB_VER_CVSID;
 }
 
+/* ChangeLog CVS Date in YYYYMMDD */
+int hb_verSVNDateID( void )
+{
+   return HB_VER_BUILDDATE;
+}
+
 /* ChangeLog ID string */
 const char * hb_verCvsChangeLogID( void )
 {
@@ -515,4 +521,30 @@ const char * hb_verFlagsPRG( void )
 void hb_compSetDeferredFlagOn( void )
 {
    hb_comp_autoDeferred = TRUE;
+}
+
+void hb_compSetCOutput( int iOutput )
+{
+   switch( iOutput )
+   {
+      case '0':
+         hb_comp_iGenCOutput = HB_COMPGENC_COMPACT;
+         break;
+
+      case '1':
+         hb_comp_iGenCOutput = HB_COMPGENC_NORMAL;
+         break;
+
+      case '2':
+         hb_comp_iGenCOutput = HB_COMPGENC_VERBOSE;
+         break;
+
+      case '3':
+         hb_comp_iGenCOutput = HB_COMPGENC_REALCODE;
+         break;
+
+      case '4':
+         hb_comp_iGenVarList = TRUE;
+         break;
+   }
 }
