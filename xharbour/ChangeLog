@@ -13,6 +13,11 @@
   * source/compiler/comptool.c
     ! yet, missing from previous commits
 
+2012-10-31 18:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/dummy.prg
+  * winmake/makefile.vc
+    ! missing from previous commit
+
 2012-10-31 18:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/mysql/mysql.c
     - remove definition of HB_SIZE and hb_parnidef
