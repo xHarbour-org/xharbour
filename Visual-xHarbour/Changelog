@@ -8,6 +8,11 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-10-31 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed GridColumn_OnHeaderClick event not working
+   ! Fixed DataGrid Record Drag and Drop problem
+   ! Fixed TabPage name problem after changing position.
+
 2012-10-18 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    * Re-enabled treeview auto drag and drop and added property AutoDragDrop
      to enable the feature.

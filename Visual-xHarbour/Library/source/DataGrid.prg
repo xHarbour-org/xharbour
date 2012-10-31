@@ -1090,7 +1090,7 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
    ENDIF
 
    nPos := Int( Ceiling( (yPos-::__GetHeaderHeight() ) / ::ItemHeight ) )
-   nPos := MIN( nPos, ::RowCountUsable )
+   nPos := MAX( 1, MIN( nPos, ::RowCountUsable ) )
    IF nPos <> ::RowPos .AND. ::__hDragRecImage != NIL .AND. nPos > 0
       ::__nDragRec := -1
       ::__nDragPos := -1
@@ -1161,7 +1161,7 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
       ::Children[ ::__DragColumn ]:DrawHeader( ::Drawing:hDC )
    ENDIF
 
-   IF !::__lSizeMouseDown .AND. ::__DragColumn == 0 .AND. ::__SelCol > 0 .AND. Len( ::Children ) >= ::__SelCol
+   IF !::__lSizeMouseDown .AND. ::__DragColumn == ::__SelCol .AND. ::__SelCol > 0 .AND. Len( ::Children ) >= ::__SelCol
       IF ::Children[ ::__SelCol ]:HeaderMenu != NIL
          pt := (struct POINT)
          pt:x := ::Children[::__SelCol]:aSelRect[1]
@@ -1171,6 +1171,10 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
          ::Children[ ::__SelCol ]:HeaderMenu:Show( pt:x, pt:y )
          ::Children[ ::__SelCol ]:DrawHeader( , , , , .F. )
        ELSE
+         ::__lSizeMouseDown := .F.
+         ::__lMoveMouseDown := .F.
+         ::__DragColumn := 0
+         ::__SelWidth   := 0
          ::OnHeaderClick( ::__SelCol )
       ENDIF      
    ENDIF
