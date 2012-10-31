@@ -53,7 +53,7 @@ IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
    SET BISON_DIR=\GnuWin32\Bin
    GOTO READY
 
-:READY   
+:READY
 SET _PATH=%PATH%
 SET PATH=%CC_DIR%\BIN;%BISON_DIR%;%PATH%
 
@@ -61,8 +61,8 @@ rem ============================================================================
 rem The followings should never change
 rem Do not hard-code in makefile because there are needed for clean build
 rem ============================================================================
-SET LIBEXT=.lib
-SET OBJEXT=.obj
+SET OBJEXT=%HB_ARCH%%HB_DEBUG%.obj
+SET LIBEXT=%HB_ARCH%%HB_DEBUG%.lib
 SET DIR_SEP=\
 REM SET LIBPREFIX=
 rem ============================================================================

@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-01 19:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * make_xc.bat
+    ! modify OBJ and LIB extension on debug mode
+
 2012-10-31 19:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbcomp.h
   * source/compiler/comptool.c
