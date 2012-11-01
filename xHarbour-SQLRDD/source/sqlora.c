@@ -86,7 +86,7 @@ const char * _sqlo_sqloraID="$Id$";
 //#define DEBUG_XGRAB
 
 #include "sqlora.h"
-
+#define HAVE_OCISTMTFETCH2
 #if defined (__STDC__) || defined (_AIX) || defined(PROTOTYPES) ||\
             (defined (__mips) && defined (_SYSTYPE_SVR4)) ||\
              defined(WIN32) || defined(__cplusplus)\

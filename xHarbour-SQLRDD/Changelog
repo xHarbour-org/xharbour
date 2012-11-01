@@ -8,6 +8,12 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-01 20:12 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/sqlrdd2.prg
+    * fixes for seek last and ordscope
+  * source/sqlora.c
+    ! enable ocismttfetch2
+  
 2012-10-02 21:20 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
   * source/sqlrdd0.prg
     ! fixed sr_renametable under postgresql

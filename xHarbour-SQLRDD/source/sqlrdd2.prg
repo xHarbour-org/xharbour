@@ -3552,6 +3552,7 @@ METHOD sqlSeek( uKey, lSoft, lLast ) CLASS SR_WORKAREA
    Local cField,nfieldPos
    Local lLikeSep   := .F.
    Local cKeyValue
+   Local lIsIndKey := .F.
 
    (lLast) // to remove warning
 
@@ -3596,7 +3597,7 @@ METHOD sqlSeek( uKey, lSoft, lLast ) CLASS SR_WORKAREA
       cJoin1 := " " + ::cQualifiedTableName + " A "
       cJoin3 := ::GetSelectList()
 
-      if ::aInfo[ AINFO_REVERSE_INDEX ]
+      if ::aInfo[ AINFO_REVERSE_INDEX ] .or. lLast
          cSql  := 'SELECT /*+ INDEX( A ' + 'D$' + ::aIndex[ ::aInfo[ AINFO_INDEXORD ],VIRTUAL_INDEX_NAME ] + ") */ " + cJoin3 + "FROM" + cJoin1 + ::WhereVMinor( uKey ) + " AND ROWNUM <= 1"
       Else
          cSql  := 'SELECT /*+ INDEX( A ' + 'A$' + ::aIndex[ ::aInfo[ AINFO_INDEXORD ],VIRTUAL_INDEX_NAME ] + ") */ " + cJoin3 + "FROM" + cJoin1 + ::WhereVMajor( uKey ) + " AND ROWNUM <= 1"
@@ -3711,7 +3712,7 @@ METHOD sqlSeek( uKey, lSoft, lLast ) CLASS SR_WORKAREA
             ENDIF   
          EndIf
 
-         If ::aInfo[ AINFO_REVERSE_INDEX ]
+         If ::aInfo[ AINFO_REVERSE_INDEX ]  .or. lLast
             cSep  := if( cQot == "NULL", " IS ", if( lSoft, " <= ", IF( lLikeSep, " Like ", " = " ) ) )  
          Else
             cSep  := if( cQot == "NULL", " IS ", if( lSoft, " >= ", IF( lLikeSep, " Like ", " = " ) ) )
@@ -3811,7 +3812,7 @@ METHOD sqlSeek( uKey, lSoft, lLast ) CLASS SR_WORKAREA
                      EndIf
                   EndIf
                Else
-                  If ::aInfo[ AINFO_REVERSE_INDEX ]
+                  If ::aInfo[ AINFO_REVERSE_INDEX ]  .or. lLast
                      cSep := if( lSoft, if(i != nLen - j + 1 .or. j == 1, " <= ", " < "), if(cQot == "NULL", " IS ", " = " ))
                   Else
                      cSep := if( lSoft, if(i != nLen - j + 1 .or. j == 1, " >= ", " > "), if(cQot == "NULL", " IS ", " = " ))
@@ -3967,7 +3968,7 @@ METHOD sqlSeek( uKey, lSoft, lLast ) CLASS SR_WORKAREA
             cQot  := ::QuotedNull(uKey,, nFLen, nFDec,, lNull)
          endif
 
-         If ::aInfo[ AINFO_REVERSE_INDEX ]
+         If ::aInfo[ AINFO_REVERSE_INDEX ]  .or. lLast
             cSep  := if( cQot == "NULL", " IS ", if( lSoft, " <= ", IF( lLikeSep, " Like ", " = " ) ) )
          Else
             cSep  := if( cQot == "NULL", " IS ", if( lSoft, " >= ", IF( lLikeSep, " Like ", " = " ) ) )
@@ -4065,7 +4066,7 @@ METHOD sqlSeek( uKey, lSoft, lLast ) CLASS SR_WORKAREA
          cJoin1 := " " + ::cQualifiedTableName + " A "
          cJoin3 := ::GetSelectList()
 
-         If ::aInfo[ AINFO_REVERSE_INDEX ]
+         If ::aInfo[ AINFO_REVERSE_INDEX ] .or. lLast
             aTemp := ::WherePgsMinor( ::aQuoted, lPartialSeek .or. lSoft )
          Else
             aTemp := ::WherePgsMajor( ::aQuoted, lPartialSeek .or. lSoft )
@@ -4312,18 +4313,18 @@ METHOD ReadPage( nDirection, lWasDel ) CLASS SR_WORKAREA
       If len(::aIndex) > 0 .and. ::aInfo[ AINFO_INDEXORD ] > 0 .and. ::aIndex[ ::aInfo[ AINFO_INDEXORD ],VIRTUAL_INDEX_NAME ] != NIL
          if ::aInfo[ AINFO_REVERSE_INDEX ]
             cTemp := if( nDirection != ORD_DIR_FWD, ::WhereVMajor(), ::WhereVMinor() )
-            cSql  := 'SELECT /*+ INDEX( A ' + if( nDirection != ORD_DIR_FWD, 'A$', 'D$') + ::aIndex[ ::aInfo[ AINFO_INDEXORD ],VIRTUAL_INDEX_NAME ] + ") */ " + cJoin3 + "FROM" + cJoin1 + cTemp + " AND ROWNUM <= " + str(::nCurrentFetch+2)+;
-                     if(::oSql:lComments," /* Skip " + if( nDirection == ORD_DIR_FWD,"FWD","BWD") + " */","")
+            cSql  := 'SELECT /*+ INDEX( A ' + if( nDirection != ORD_DIR_FWD, 'A$', 'D$') + ::aIndex[ ::aInfo[ AINFO_INDEXORD ],VIRTUAL_INDEX_NAME ] + ") */ " + cJoin3 + "FROM" + cJoin1 + cTemp + " AND ROWNUM <= " + str(::nCurrentFetch+2)+ ' '+;
+                    ::OrderBy(NIL,nDirection == ORD_DIR_FWD) +  if(::oSql:lComments," /* Skip " + if( nDirection == ORD_DIR_FWD,"FWD","BWD") + " */","")
          Else
             cTemp := if( nDirection == ORD_DIR_FWD, ::WhereVMajor(), ::WhereVMinor() )
-            cSql  := 'SELECT /*+ INDEX( A ' + if( nDirection == ORD_DIR_FWD, 'A$', 'D$') + ::aIndex[ ::aInfo[ AINFO_INDEXORD ],VIRTUAL_INDEX_NAME ] + ") */ " + cJoin3 + "FROM" + cJoin1 + cTemp + " AND ROWNUM <= " + str(::nCurrentFetch+2)+;
-                     if(::oSql:lComments," /* Skip " + if( nDirection == ORD_DIR_FWD,"FWD","BWD") + " */","")
+            cSql  := 'SELECT /*+ INDEX( A ' + if( nDirection == ORD_DIR_FWD, 'A$', 'D$') + ::aIndex[ ::aInfo[ AINFO_INDEXORD ],VIRTUAL_INDEX_NAME ] + ") */ " + cJoin3 + "FROM" + cJoin1 + cTemp + " AND ROWNUM <= " + str(::nCurrentFetch+2)+ ' '+;
+                  ::OrderBy(NIL,nDirection == ORD_DIR_FWD) +    if(::oSql:lComments," /* Skip " + if( nDirection == ORD_DIR_FWD,"FWD","BWD") + " */","")
          EndIf
          Exit  // Leave this exist HERE !!!!
       EndIf
 
    Default
-      if ::aInfo[ AINFO_REVERSE_INDEX ]
+      if ::aInfo[ AINFO_REVERSE_INDEX ] 
          cTemp := if( nDirection != ORD_DIR_FWD, ::WhereMajor(), ::WhereMinor() )
       Else
          cTemp := if( nDirection == ORD_DIR_FWD, ::WhereMajor(), ::WhereMinor() )
@@ -7119,6 +7120,12 @@ METHOD sqlSetScope( nType, uValue ) CLASS SR_WORKAREA
          Exit
       Case BOTTOMSCOPE
          ::aIndex[::aInfo[ AINFO_INDEXORD ], BOTTOM_SCOPE] := uKey
+         
+         IF ::aIndex[::aInfo[ AINFO_INDEXORD ], TOP_SCOPE] == ::aIndex[::aInfo[ AINFO_INDEXORD ], BOTTOM_SCOPE]         
+            IF valtype(uKey) == "C"
+               ::aIndex[::aInfo[ AINFO_INDEXORD ], BOTTOM_SCOPE] := uKey+"|"
+            endif
+         endif
          Exit
       Case TOP_BOTTOM_SCOPE
          ::aIndex[::aInfo[ AINFO_INDEXORD ], TOP_SCOPE]    := uKey
@@ -7258,6 +7265,11 @@ METHOD sqlSetScope( nType, uValue ) CLASS SR_WORKAREA
          For nScoping = TOPSCOPE to BOTTOMSCOPE
 
             uKey      := ::aIndex[::aInfo[ AINFO_INDEXORD ], TOP_SCOPE + nScoping]
+            IF ValType( uKey ) == "C"
+               if uKey[ -1 ] == "|"
+                  uKey := Left( uKey, len(uKey)-1)
+               endif
+            endif      
 
             If valtype(uKey) $ "NDL"       /* One field, piece of cake! */
 
@@ -7391,6 +7403,13 @@ METHOD sqlSetScope( nType, uValue ) CLASS SR_WORKAREA
                            aadd( aNotNulls, cNam )
                         EndIf
                      Else
+                     
+                        IF ::oSql:nSystemID == SYSTEMID_POSTGR
+                           IF 'INDKEY_' IN UPPER( cNam )
+                              cnam := "substr( " + cNam + ",1,"+str(len(cQot)-3) +")"
+                          ENDIF   
+                        ENDIF                             
+                        
                         cExpr += if(nFeitos>1," AND ","") + cNam + cSep + cQot + " "
                      EndIf
 
@@ -8116,6 +8135,10 @@ METHOD WherePgsMinor( aQuotedCols ) CLASS SR_WORKAREA
                cSep := " IS "
             Case j == nLen
                cSep := " <= "
+               if 'INDKEY_' IN UPPER(CNAM)
+                  cnam := "substr( " + cnam + ",1,"+str(len(cQot)-3) +")"
+               ENDIF   
+
             Case i = j
                cSep := " < "
             Case i + 1 = j
@@ -8125,6 +8148,9 @@ METHOD WherePgsMinor( aQuotedCols ) CLASS SR_WORKAREA
                   cSep := " IS "
                Else
                   cSep := " <= "
+                  if 'INDKEY_' IN UPPER(CNAM)
+                     cnam := "substr( " + cnam + ",1,"+str(len(cQot)-3) +")"
+                  ENDIF   
                EndIf
             EndCase
 
