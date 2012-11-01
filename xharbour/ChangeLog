@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-02 03:01 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/pp/ppgen.c
+    ! remove debugging codes
+
 2012-11-01 04:16 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/dllcall.c
     ! hbdll.ch -> hbdll.h (missed from previous commit)

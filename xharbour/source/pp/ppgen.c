@@ -534,7 +534,6 @@ static int hb_pp_parseChangelog( PHB_PP_STATE pState, const char * pszFileName,
 
                hb_strncpy( szId, szFrom, sizeof( szId ) - 1 );
                hb_strncpy( szLine1, szLine + 1, sizeof( szLine1 ) - 1 );
-               printf( "szLine1=%s\n", szLine1 );
             }
          }
          else if( ! *szLog )
