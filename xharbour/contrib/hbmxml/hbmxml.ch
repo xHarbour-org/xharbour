@@ -4,9 +4,9 @@
 
 /*
  * Harbour Project source code:
- * Header file for compiler and runtime basic type declarations
+ *    MINIXML functions wrapper
  *
- * Copyright 1999 {list of individual authors and e-mail addresses}
+ * Copyright 2010-2011 Petr Chornyj <myorg63@mail.ru>
  * www - http://harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,39 +50,47 @@
  *
  */
 
-#ifndef HB_COMPAT_H_
-#define HB_COMPAT_H_
+#ifndef HBMXML_CH_
+#define HBMXML_CH_
 
-#define HB_MAXINT                 HB_LONG
-#define HB_BOOL                   BOOL
-#define HB_TRUE                   TRUE
-#define HB_FALSE                  FALSE
-#define HB_U32                    UINT32
-#define HB_U8                     BYTE
-#define HB_UINT                   UINT
-#define HB_U16                    UINT16
-#define HB_I32                    INT32
-#define HB_ISCHAR                 ISCHAR
-#define HB_ISBLOCK                ISBLOCK
-#define HB_ISNIL                  ISNIL
-#define HB_ISBYREF                ISBYREF
-#define HB_ISNUM                  ISNUM
-#define hb_parldef( l1, l2 )      ( ISLOG( l1 ) ? hb_parl( l1 )    : l2 )
-#define hb_parnidef( n1, n2 )     ( ISNUM( n1 ) ? hb_parni( n1 )   : n2 )
-#define hb_parnintdef( n1, n2 )   ( ISNUM( n1 ) ? hb_parnint( n1 ) : n2 )
-#define HB_BYTE                   BYTE
-#define HB_USHORT                 USHORT
-#define HB_UCHAR                  UCHAR
-#define HB_FT_IMAGE               HB_FT_PICTURE
-#define HB_I64                    INT64
-#define hb_gcMark                 hb_gcItemRef
-#define hb_vmAtQuit               hb_vmAtExit
-#define HB_FSNAMECONV             hb_fsNameConv
-#define hb_cdpFindExt             hb_cdpFind
-#define hb_itemPutTS              hb_itemPutDTS
-#define HB_IS_TIMESTAMP           HB_IS_TIMEFLAG
-#define HB_CDP_ISBINSORT(cdp)     0
+#define MXML_TAB                8 /* Tabs every N columns */
 
-#define HB_PFS                    PFLL
+#define MXML_NO_CALLBACK        0 /* Don't use a type callback */
+#define MXML_INTEGER_CALLBACK   1 /* Treat all data as integers */
+#define MXML_OPAQUE_CALLBACK    2 /* Treat all data as opaque */
+#define MXML_REAL_CALLBACK      3 /* Treat all data as real numbers */
+#define MXML_TEXT_CALLBACK      4 /* Treat all data as text */
+#define MXML_IGNORE_CALLBACK    5 /* Ignore all non-element content */
 
-#endif /* HB_COMPAT_H_ */
+#define MXML_NO_PARENT          0
+
+#define MXML_IGNORE            -1 
+
+#define MXML_ELEMENT            0
+#define MXML_INTEGER            1
+#define MXML_OPAQUE             2
+#define MXML_REAL               3
+#define MXML_TEXT               4
+#define MXML_CUSTOM             5
+
+#define MXML_DESCEND            1 /* Descend when finding/walking */
+#define MXML_NO_DESCEND         0 /* Don't descend when finding/walking */
+#define MXML_DESCEND_FIRST     -1 /* Descend for first find */
+
+#define MXML_WS_BEFORE_OPEN     0 /* Callback for before open tag */
+#define MXML_WS_AFTER_OPEN      1 /* Callback for after open tag */
+#define MXML_WS_BEFORE_CLOSE    2 /* Callback for before close tag */
+#define MXML_WS_AFTER_CLOSE     3 /* Callback for after close tag */
+
+#define MXML_ADD_BEFORE         0   /* Add node before specified node */
+#define MXML_ADD_AFTER          1   /* Add node after specified node */
+#define MXML_ADD_TO_PARENT      NIL /* Add node relative to parent */
+
+#define MXML_SAX_CDATA          1
+#define MXML_SAX_COMMENT        2
+#define MXML_SAX_DATA           3
+#define MXML_SAX_DIRECTIVE      4
+#define MXML_SAX_ELEMENT_CLOSE  5
+#define MXML_SAX_ELEMENT_OPEN   6
+
+#endif /* HBMXML_CH_ */

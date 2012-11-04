@@ -103,6 +103,42 @@ $(OBJ_DIR)$(DIR_SEP)macroy$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)macroy.c
 	$(CC_CMD)
 
 #===============================================================================
+# HBMXML.LIB
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)hbmxml$(OBJEXT) : $(HBMXML_DIR)$(DIR_SEP)hbmxml.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)mxml_att$(OBJEXT) : $(HBMXML_DIR)$(DIR_SEP)mxml_att.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)mxml_ent$(OBJEXT) : $(HBMXML_DIR)$(DIR_SEP)mxml_ent.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)mxml_fil$(OBJEXT) : $(HBMXML_DIR)$(DIR_SEP)mxml_fil.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)mxml_get$(OBJEXT) : $(HBMXML_DIR)$(DIR_SEP)mxml_get.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)mxml_ind$(OBJEXT) : $(HBMXML_DIR)$(DIR_SEP)mxml_ind.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)mxml_nod$(OBJEXT) : $(HBMXML_DIR)$(DIR_SEP)mxml_nod.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)mxml_pri$(OBJEXT) : $(HBMXML_DIR)$(DIR_SEP)mxml_pri.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)mxml_sea$(OBJEXT) : $(HBMXML_DIR)$(DIR_SEP)mxml_sea.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)mxml_set$(OBJEXT) : $(HBMXML_DIR)$(DIR_SEP)mxml_set.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)mxml_str$(OBJEXT) : $(HBMXML_DIR)$(DIR_SEP)mxml_str.c
+	$(CC_CMD)
+
+#===============================================================================
 # HBCOMM.LIB
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)commHBCOMM$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)commHBCOMM.c

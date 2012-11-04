@@ -96,6 +96,7 @@ HBBTREE_DIR   =contrib$(DIR_SEP)hbbtree
 SIXAPI_DIR    =contrib$(DIR_SEP)sixapi
 HBCAB_DIR     =contrib$(DIR_SEP)hbcab
 HBCOMM_DIR    =contrib$(DIR_SEP)hbcomm
+HBMXML_DIR    =contrib$(DIR_SEP)hbmxml
 
 INCLUDE_DIR2  =include
 
@@ -149,6 +150,7 @@ HB_GT_LIBS  =$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTWVT_LIB) $(
 #===============================================================================
 # Contrib Library Names
 #===============================================================================
+HBMXML_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbmxml$(LIBEXT)
 HBCOMM_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbcomm$(LIBEXT)
 HBCAB_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbcab$(LIBEXT)
 SIXAPI_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)sixapi$(LIBEXT)
@@ -261,6 +263,22 @@ HARBOUR_LIBS=\
 #===============================================================================
 # List Of Library and Executable Dependencies
 #===============================================================================
+
+#===============================================================================
+# HBMXML.LIB
+#===============================================================================
+HBMXML_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)hbmxml$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)mxml_att$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)mxml_ent$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)mxml_fil$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)mxml_get$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)mxml_ind$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)mxml_nod$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)mxml_pri$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)mxml_sea$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)mxml_set$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)mxml_str$(OBJEXT)
 
 #===============================================================================
 # HBCOMM.LIB
@@ -2500,5 +2518,6 @@ CONTRIB_PROJECT=\
 	$(HBBTREE_LIB)\
 	$(SIXAPI_LIB)\
 	$(HBCAB_LIB)\
-	$(HBCOMM_LIB)
+	$(HBCOMM_LIB)\
+	$(HBMXML_LIB)
 

@@ -36,6 +36,10 @@ HB_OPTIMFLAGS=-l $(HB_OPTIMFLAGS)
 HARBOURFLAGS =$(HARBOURFLAGS)
 CLIBFLAGS    =$(CLIBFLAGS)
 
+!if ("$(HB_DEBUGGER_OFF)"=="1")
+CC_DEFINES   =-DHB_NO_DEBUG $(CC_DEFINES)
+!endif
+
 !if ("$(HB_MT)"=="mt") || ("$(HB_THREAD_SUPPORT)"=="1")
 CC_DEFINES   =-DHB_THREAD_SUPPORT $(CC_DEFINES)
 HARBOURFLAGS =-dHB_THREAD_SUPPORT $(HARBOURFLAGS)
@@ -77,8 +81,8 @@ HARBOURFLAGS =-dHB_THREAD_SUPPORT $(HARBOURFLAGS)
 !if ("$(HB_USE_BISON)"=="1")
 HARBOUR_Y    =$(COMPILER_DIR)$(DIR_SEP)harbour.sly
 MACRO_Y      =$(MACRO_DIR)$(DIR_SEP)macro.y
-BISON_CMD1   =bison --verbose -d $** -o$@
-BISON_CMD2   =bison --verbose --name-prefix=hb_comp -d $** -o$@
+BISON_CMD1   =bison --no-line --verbose -d $** -o$@
+BISON_CMD2   =bison --no-line --verbose --name-prefix=hb_comp -d $** -o$@
 !else
 HARBOUR_Y    =$(COMPILER_DIR)$(DIR_SEP)harbouryy.c
 MACRO_Y      =$(MACRO_DIR)$(DIR_SEP)macroyy.c

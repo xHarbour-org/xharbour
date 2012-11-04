@@ -197,13 +197,22 @@ static void    hb_vmSwapAlias( void );                         /* swaps items on
 /* Hash */
 static void    hb_vmHashGen( ULONG ulPairs ); /* generates an ulElements Hash and fills it from the stack values */
 
-/* Execution */
-static HARBOUR hb_vmDoBlock( void );                                       /* executes a codeblock */
+#ifndef HB_NO_DEBUG
 static void    hb_vmDebugEntry( int nMode, int nLine, char * szName, int nIndex, int nFrame );
 static void    hb_vmDebuggerExit( void );                                  /* shuts down the debugger */
 static void    hb_vmLocalName( USHORT uiLocal, char * szLocalName );       /* locals and parameters index and name information for the debugger */
 static void    hb_vmStaticName( USHORT uiStatic, char * szStaticName );    /* statics vars information for the debugger */
 static void    hb_vmModuleName( char * szModuleName );                     /* PRG and function name information for the debugger */
+static void    hb_vmDebuggerShowLine( USHORT uiLine );            /* makes the debugger shows a specific source code line */
+static void    hb_vmDebuggerEndProc( void );                      /* notifies the debugger for an endproc */
+static BOOL             s_bDebugging;
+static BOOL             s_bDebugRequest      = FALSE; /* debugger invoked via the VM */
+static PHB_DYNS         s_pDynsDbgEntry      = NULL;  /* Cached __DBGENTRY symbol */
+static HB_DBGENTRY_FUNC s_pFunDbgEntry;               /* C level debugger entry */
+#endif
+
+/* Execution */
+static HARBOUR hb_vmDoBlock( void );                                       /* executes a codeblock */
 static void    hb_vmFrame( unsigned short iLocals, BYTE bParams );         /* increases the stack pointer for the amount of locals and params suplied */
 static void    hb_vmDivertFrame( unsigned short iLocals, BYTE bParams );   /* increases the stack pointer for the amount of locals and params suplied */
 static void    hb_vmSetDivert( BOOL bDivertOf );
@@ -212,8 +221,6 @@ static void    hb_vmSFrame( PHB_SYMB pSym );                      /* sets the st
 static void    hb_vmStatics( PHB_SYMB pSym, USHORT uiStatics );   /* increases the global statics array to hold a PRG statics */
 static void    hb_vmEndBlock( void );                             /* copies the last codeblock pushed value into the return value */
 static void    hb_vmRetValue( void );                             /* pops the latest stack value into stack.Return */
-static void    hb_vmDebuggerShowLine( USHORT uiLine );            /* makes the debugger shows a specific source code line */
-static void    hb_vmDebuggerEndProc( void );                      /* notifies the debugger for an endproc */
 
 /* Push */
 static void    hb_vmPushAlias( void );                                                    /* pushes the current workarea number */
@@ -294,17 +301,17 @@ static BOOL             s_fCloneSym          = FALSE;                           
 
 static int              s_iErrorLevel        = 0;                                            /* application exit errorlevel */
 
-static BOOL             s_bDebugging;
-static BOOL             s_bDebugRequest      = FALSE; /* debugger invoked via the VM */
-static PHB_DYNS         s_pDynsDbgEntry      = NULL;  /* Cached __DBGENTRY symbol */
-static HB_DBGENTRY_FUNC s_pFunDbgEntry;               /* C level debugger entry */
+#ifndef HB_NO_DEBUG
 /* Stores level of procedures call stack */
 static ULONG            s_ulProcLevel        = 0;
+#endif
 
 char *                  hb_vm_sNull          = "";
 
+#if 0
 /* init GUI Error Message */
 BOOL                    b_GUIErrorMessage    = FALSE;
+#endif
 
 /* static, for now */
 BOOL                    hb_vm_bQuitRequest   = FALSE;
@@ -619,13 +626,16 @@ void hb_vmInit( BOOL bStartMainProc )
    /* initialize internal data structures */
    s_aStatics.type   = HB_IT_NIL;
    s_iErrorLevel     = 0;
+#ifndef HB_NO_DEBUG
    s_bDebugging      = FALSE;
 
    s_pDynsDbgEntry   = hb_dynsymFind( "__DBGENTRY" );
+#endif
 
+#if 0
    if( hb_dynsymFind( "HB_GUIERRORMESSAGE" ) )
       b_GUIErrorMessage = TRUE;
-
+#endif
    /*
       Moved to hb_vmProcessSymbols() to avoid GPF trap.
       hb_xinit();
@@ -735,6 +745,7 @@ void hb_vmInit( BOOL bStartMainProc )
    HB_TRACE( HB_TR_INFO, ( "InitError" ) );
    hb_vmDoInitError();
 
+#ifndef HB_NO_DEBUG
    if( s_pDynsDbgEntry )
    {
       /* Try to get C dbgEntry() function pointer */
@@ -748,6 +759,7 @@ void hb_vmInit( BOOL bStartMainProc )
          s_pFunDbgEntry = hb_vmDebugEntry;
       }
    }
+#endif
 
    /* Call functions that initializes static variables
     * Static variables have to be initialized before any INIT functions
@@ -1025,11 +1037,13 @@ int hb_vmQuit( void )
    TraceLog( NULL, "After setkey\n" );
    #endif
 
+#ifndef HB_NO_DEBUG
    /* deactivate debugger */
    hb_vmDebuggerExit();
    #ifdef TRACE_QUIT
    TraceLog( NULL, "After Debugger\n" );
    #endif
+#endif
 
    /* release all known items stored in subsystems */
    hb_stackSetActionRequest( 0 );
@@ -2271,10 +2285,12 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
 
             /* printf( "BASE Proc: %s Line: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, hb_stackBaseItem()->item.asSymbol.pCargo->lineno ); */
 
+#ifndef HB_NO_DEBUG
             if( s_bDebugging )
             {
                hb_vmDebuggerShowLine( ( USHORT ) s_iBaseLine );
             }
+#endif
             HB_TRACE( HB_TR_INFO, ( "Opcode: HB_P_LINE: %s (%i)", hb_stackBaseItem()->item.asSymbol.value->szName, hb_stackBaseItem()->item.asSymbol.pCargo->lineno ) );
             w += 3;
             break;
@@ -2286,10 +2302,12 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
 
             hb_stackBaseItem()->item.asSymbol.pCargo->lineno = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
 
+#ifndef HB_NO_DEBUG
             if( s_bDebugging )
             {
                hb_vmDebuggerShowLine( hb_stackBaseItem()->item.asSymbol.pCargo->lineno );
             }
+#endif
             w += 3;
             break;
 
@@ -2298,11 +2316,12 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
 
             hb_stackBaseItem()->item.asSymbol.pCargo->lineno = ( USHORT ) ( s_iBaseLine + ( BYTE ) pCode[ w + 1 ] );
 
+#ifndef HB_NO_DEBUG
             if( s_bDebugging )
             {
                hb_vmDebuggerShowLine( hb_stackBaseItem()->item.asSymbol.pCargo->lineno );
             }
-
+#endif
             HB_TRACE( HB_TR_INFO, ( "Opcode: HB_P_LINEOFFSET: %s (%i)", hb_stackBaseItem()->item.asSymbol.value->szName, hb_stackBaseItem()->item.asSymbol.pCargo->lineno ) );
             w += 2;
             break;
@@ -2345,8 +2364,10 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
 
          case HB_P_LOCALNAME:
             HB_TRACE( HB_TR_DEBUG, ( "HB_P_LOCALNAME" ) );
+#ifndef HB_NO_DEBUG
             hb_vmLocalName( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ),
                             ( char * ) pCode + w + 3 );
+#endif
             w += 3;
             while( pCode[ w++ ] )
             {
@@ -2355,12 +2376,14 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
 
          case HB_P_STATICNAME:
             HB_TRACE( HB_TR_DEBUG, ( "HB_P_STATICNAME" ) );
+#ifndef HB_NO_DEBUG
             hb_vmStaticName( HB_PCODE_MKUSHORT( &( pCode[ w + 2 ] ) ),
                              ( char * ) pCode + w + 4 );
 /*
             hb_vmStaticName( pCode[ w + 1 ], HB_PCODE_MKUSHORT( &( pCode[ w + 2 ] ) ),
                             ( char * ) pCode + w + 4 );
  */
+#endif
             w += 4;
             while( pCode[ w++ ] )
             {
@@ -2369,7 +2392,9 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
 
          case HB_P_MODULENAME:
             HB_TRACE( HB_TR_DEBUG, ( "HB_P_MODULENAME" ) );
+#ifndef HB_NO_DEBUG
             hb_vmModuleName( ( char * ) pCode + w + 1 );
+#endif
             while( pCode[ w++ ] )
             {
             }
@@ -7362,7 +7387,10 @@ void hb_vmDo( USHORT uiParams )
    PHB_FUNC       pFunc;
    HB_STACK_STATE sStackState;
    int            iPresetBase = s_iBaseLine;
+
+#ifndef HB_NO_DEBUG
    BOOL           bDebugPrevState;
+#endif
 
 #ifndef HB_NO_PROFILER
    ULONG          ulClock     = 0;
@@ -7373,7 +7401,9 @@ void hb_vmDo( USHORT uiParams )
 
    //printf( "\VmDo nItems: %i Params: %i \n", HB_VM_STACK.pPos - HB_VM_STACK.pBase, uiParams );
 
+#ifndef HB_NO_DEBUG
    s_ulProcLevel++;
+#endif
 
    if( HB_VM_STACK.iExtraParamsIndex && HB_IS_SYMBOL( pItem = hb_stackItemFromTop( -( uiParams + HB_VM_STACK.aiExtraParams[ HB_VM_STACK.iExtraParamsIndex - 1 ] + 2 ) ) ) && pItem->item.asSymbol.value == HB_VM_STACK.apExtraParamsSymbol[ HB_VM_STACK.iExtraParamsIndex - 1 ] )
    {
@@ -7399,8 +7429,10 @@ void hb_vmDo( USHORT uiParams )
    pItem             = hb_stackNewFrame( &sStackState, uiParams );
    pSym              = pItem->item.asSymbol.value;
    pSelf             = hb_stackSelfItem(); /* NIL, OBJECT or BLOCK */
+#ifndef HB_NO_DEBUG
    bDebugPrevState   = s_bDebugging;
    s_bDebugging      = FALSE;
+#endif
 
    //TraceLog( NULL, "Symbol: '%s'\n", pSym->szName );
 
@@ -7477,10 +7509,12 @@ void hb_vmDo( USHORT uiParams )
 
    HB_TRACE( HB_TR_DEBUG, ( "DONE hb_vmDo(%hu)", uiParams ) );
 
+#ifndef HB_NO_DEBUG
    if( s_bDebugging )
    {
       hb_vmDebuggerEndProc();
    }
+#endif
 
    if( ( HB_VM_STACK.uiVMFlags & HB_SUSPEND_QUIT ) == 0 || ( hb_stackGetActionRequest() & HB_QUIT_REQUESTED ) == 0 )
    {
@@ -7489,8 +7523,10 @@ void hb_vmDo( USHORT uiParams )
 
    HB_TRACE( HB_TR_DEBUG, ( "Restored OldFrame hb_vmDo(%hu)", uiParams ) );
 
+#ifndef HB_NO_DEBUG
    s_bDebugging   = bDebugPrevState;
    s_ulProcLevel--;
+#endif
 
    s_iBaseLine    = iPresetBase;
 }
@@ -7540,7 +7576,9 @@ void hb_vmSend( USHORT uiParams )
    int            iPresetBase    = s_iBaseLine;
    BOOL           bConstructor   = FALSE;
    BOOL           bSymbol        = FALSE;
+#ifndef HB_NO_DEBUG
    BOOL           bDebugPrevState;
+#endif
 
 #ifdef HB_THREAD_SUPPORT
    USHORT         uiClass = 0;
@@ -7560,7 +7598,9 @@ void hb_vmSend( USHORT uiParams )
 
    //printf( "\n VmSend nItems: %i Params: %i Extra %i\n", HB_VM_STACK.pPos - HB_VM_STACK.pBase, uiParams, hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] );
 
+#ifndef HB_NO_DEBUG
    s_ulProcLevel++;
+#endif
 
    if( HB_VM_STACK.iExtraParamsIndex && HB_IS_SYMBOL( pItem = hb_stackItemFromTop( -( uiParams + HB_VM_STACK.aiExtraParams[ HB_VM_STACK.iExtraParamsIndex - 1 ] + 2 ) ) ) && pItem->item.asSymbol.value == HB_VM_STACK.apExtraParamsSymbol[ HB_VM_STACK.iExtraParamsIndex - 1 ] )
    {
@@ -7579,8 +7619,10 @@ void hb_vmSend( USHORT uiParams )
 
    pSelf             = ( *( HB_VM_STACK.pBase + 1 ) ); /* NIL, OBJECT or BLOCK */
 
+#ifndef HB_NO_DEBUG
    bDebugPrevState   = s_bDebugging;
    s_bDebugging      = FALSE;
+#endif
 
    if( HB_IS_BYREF( pSelf ) )
    {
@@ -7868,13 +7910,14 @@ void hb_vmSend( USHORT uiParams )
 
    HB_TRACE( HB_TR_DEBUG, ( "Done hb_vmSend()" ) );
 
+#ifndef HB_NO_DEBUG
    if( s_bDebugging )
    {
       hb_vmDebuggerEndProc();
    }
    s_bDebugging = bDebugPrevState;
    s_ulProcLevel--;
-
+#endif
 
    if( ( HB_VM_STACK.uiVMFlags & HB_SUSPEND_QUIT ) == 0 || ( hb_stackGetActionRequest() & HB_QUIT_REQUESTED ) == 0 )
    {
@@ -8082,7 +8125,7 @@ void hb_vmFunction( USHORT uiParams )
    hb_itemCopy( hb_stackAllocItem(), &( HB_VM_STACK.Return ) );
 }
 
-
+#ifndef HB_NO_DEBUG
 static void hb_vmDebugEntry( int nMode, int nLine, char * szName, int nIndex, int nFrame )
 {
    HB_THREAD_STUB
@@ -8238,6 +8281,7 @@ static void hb_vmDebuggerShowLine( USHORT uiLine ) /* makes the debugger shows a
    s_pFunDbgEntry( HB_DBG_SHOWLINE, uiLine, NULL, 0, 0 );
    s_bDebugging   = bDebugging;
 }
+#endif
 
 static void hb_vmFrame( unsigned short iLocals, BYTE bParams )
 {
@@ -11827,9 +11871,11 @@ HB_FUNC( HB_RESTOREBLOCK )
    }
 }
 
+#if 0
 HB_FUNC( HB_GUIERRORMESSAGE )
 {
 }
+#endif
 
 HB_FUNC( HB_NOMOUSE )
 {
@@ -12135,8 +12181,10 @@ void hb_xvmSetLine( USHORT uiLine )
    HB_TRACE( HB_TR_DEBUG, ( "hb_xvmSetLine(%hu)", uiLine ) );
 
    hb_stackBaseItem()->item.asSymbol.pCargo->lineno = uiLine;
+#ifndef HB_NO_DEBUG
    if( s_bDebugging )
       hb_vmDebuggerShowLine( uiLine );
+#endif
 }
 
 void hb_xvmBaseLine( USHORT uiLine )
@@ -12146,8 +12194,10 @@ void hb_xvmBaseLine( USHORT uiLine )
    HB_TRACE( HB_TR_DEBUG, ( "hb_xvmBaseLine(%hu)", uiLine ) );
 
    s_iBaseLine = hb_stackBaseItem()->item.asSymbol.pCargo->lineno = uiLine;
+#ifndef HB_NO_DEBUG
    if( s_bDebugging )
       hb_vmDebuggerShowLine( uiLine );
+#endif
 }
 
 void hb_xvmLineOffset( BYTE bLine )
@@ -12160,10 +12210,12 @@ void hb_xvmLineOffset( BYTE bLine )
 
    hb_stackBaseItem()->item.asSymbol.pCargo->lineno = uiLineno;
 
+#ifndef HB_NO_DEBUG
    if( s_bDebugging )
    {
       hb_vmDebuggerShowLine( uiLineno );
    }
+#endif
 }
 
 BOOL hb_xvmClassSetModule( void )
@@ -13495,7 +13547,12 @@ void hb_xvmLocalName( USHORT uiLocal, char * szLocalName )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_xvmLocalName(%hu, %s)", uiLocal, szLocalName ) );
 
+#ifndef HB_NO_DEBUG
    hb_vmLocalName( uiLocal, szLocalName );
+#else
+   HB_SYMBOL_UNUSED( uiLocal );
+   HB_SYMBOL_UNUSED( szLocalName );
+#endif
 }
 
 void hb_xvmStaticName( BYTE bIsGlobal, USHORT uiStatic, char * szStaticName )
@@ -13503,14 +13560,22 @@ void hb_xvmStaticName( BYTE bIsGlobal, USHORT uiStatic, char * szStaticName )
    HB_TRACE( HB_TR_DEBUG, ( "hb_xvmStaticName(%d, %hu, %s)", ( int ) bIsGlobal, uiStatic, szStaticName ) );
 
    HB_SYMBOL_UNUSED( bIsGlobal );
+#ifndef HB_NO_DEBUG
    hb_vmStaticName( uiStatic, szStaticName );
+#else
+   HB_SYMBOL_UNUSED( uiStatic );
+   HB_SYMBOL_UNUSED( szStaticName );
+#endif
 }
 
 void hb_xvmModuleName( char * szModuleName )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_xvmModuleName(%s)", szModuleName ) );
-
+#ifndef HB_NO_DEBUG
    hb_vmModuleName( szModuleName );
+#else
+   HB_SYMBOL_UNUSED( szModuleName );
+#endif
 }
 
 void hb_xvmMacroList( void )
@@ -14041,26 +14106,38 @@ void hb_xvmDivert( BOOL bDivertOf )
 
 void hb_vmRequestDebug( void )
 {
+#ifndef HB_NO_DEBUG
    HB_TRACE( HB_TR_DEBUG, ( "hb_vmRequestDebug()" ) );
    s_bDebugRequest = TRUE;
+#endif
 }
 
 BOOL hb_dbg_InvokeDebug( BOOL bInvoke )
 {
+#ifndef HB_NO_DEBUG
    BOOL bRequest = s_bDebugRequest;
 
    s_bDebugRequest = bInvoke;
    return bRequest;
+#else
+   HB_SYMBOL_UNUSED( bInvoke );
+   return FALSE;
+#endif
 }
 
 HB_DBGENTRY_FUNC hb_dbg_SetEntry( HB_DBGENTRY_FUNC pFunDbgEntry )
 {
+#ifndef HB_NO_DEBUG
    HB_DBGENTRY_FUNC pPrevFunc = s_pFunDbgEntry;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_dbg_SetEntry(%p)", pFunDbgEntry ) );
 
    s_pFunDbgEntry = pFunDbgEntry;
    return pPrevFunc;
+#else
+   HB_SYMBOL_UNUSED( pFunDbgEntry );
+   return NULL;
+#endif
 }
 
 PHB_ITEM hb_dbg_vmVarSGet( int nStatic, int nOffset )
@@ -14070,7 +14147,11 @@ PHB_ITEM hb_dbg_vmVarSGet( int nStatic, int nOffset )
 
 ULONG hb_dbg_ProcLevel( void )
 {
+#ifndef HB_NO_DEBUG
    return s_ulProcLevel;
+#else
+   return 0;
+#endif
 }
 
 /*
@@ -14081,6 +14162,7 @@ HB_FUNC( HB_DBG_INVOKEDEBUG )
 {
    HB_THREAD_STUB_API
 
+#ifndef HB_NO_DEBUG
    BOOL bRequest = s_bDebugRequest;
 
    if( hb_pcount() > 0 )
@@ -14092,6 +14174,9 @@ HB_FUNC( HB_DBG_INVOKEDEBUG )
       s_bDebugRequest = FALSE;
    }
    hb_retl( bRequest );
+#else
+   hb_retl( FALSE );
+#endif
 }
 
 /* $Doc$
@@ -14141,7 +14226,11 @@ HB_FUNC( HB_DBG_PROCLEVEL )
 {
    HB_THREAD_STUB_API
 
+#ifndef HB_NO_DEBUG
    hb_retnl( ( LONG ) s_ulProcLevel - 1 ); /* Don't count self */
+#else
+   hb_retnl( 0 );
+#endif
 }
 
 HB_SIZE hb_dbg_vmVarGCount( void )

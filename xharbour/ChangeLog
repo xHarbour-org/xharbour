@@ -8,6 +8,25 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-04 11:55 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + contrib/hbmxml/*.*
+  * winmake/common.mak
+  * winmake/common2.mak
+  * winmake/compile.mak
+    + Mini-XML interface for xHarbour copied from hrb
+      TODO: mxmlRelease() does not release memory (per: testmxml.prg)
+
+  * include/hbcompat.h
+    + xHarbour equivalent for HB_ISNIL and HB_ISBLOCK
+
+  * source/vm/dlmalloc.c
+    ! pacify BCC 5.5.1 warnings
+
+  * source/vm/hvm.c
+  * winmake/common3.mak
+  * winmake/makefile.gc
+    ! save some CPU cycles by turning debugger off: SET HB_DEBUGGER_OFF=1
+
 2012-11-02 03:01 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/pp/ppgen.c
     ! remove debugging codes

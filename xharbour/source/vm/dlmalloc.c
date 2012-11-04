@@ -2083,6 +2083,8 @@ static void init_malloc_global_mutex( void )
           interlockedcompareexchange( ( long int * ) &malloc_global_mutex_status, ( LONG ) -1, ( LONG ) 0 ) == 0 )
 #elif defined( __DMC__ )
           interlockedcompareexchange( ( void ** ) &malloc_global_mutex_status, ( void * ) ( LONG ) -1, ( LONG ) 0 ) == 0 )
+#elif defined( __BORLANDC__ ) && ( __BORLANDC__ < 0x0582 )
+          interlockedcompareexchange( ( PLONG ) &malloc_global_mutex_status, ( long ) -1, ( long ) 0 ) == 0 )
 #else
           interlockedcompareexchange( &malloc_global_mutex_status, ( LONG ) -1, ( LONG ) 0 ) == 0 )
 #endif
@@ -2092,6 +2094,8 @@ static void init_malloc_global_mutex( void )
          interlockedexchange( ( long int * ) &malloc_global_mutex_status, ( LONG ) 1 );
 #elif defined( __DMC__ )
          interlockedexchange( ( long * ) &malloc_global_mutex_status, ( LONG ) 1 );
+#elif defined( __BORLANDC__ ) && ( __BORLANDC__ < 0x0582 )
+         interlockedexchange( ( PLONG ) &malloc_global_mutex_status, ( long ) 1 );
 #else
          interlockedexchange( &malloc_global_mutex_status, ( LONG ) 1 );
 #endif
