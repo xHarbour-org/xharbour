@@ -780,4 +780,11 @@ $(HBCOMM_LIB) : $(HBCOMM_LIB_OBJS)
 +)
 !
 
+$(HBMXML_LIB) : $(HBMXML_LIB_OBJS)
+	IF EXIST "$(HBMXML_LIB)" $(DEL) "$(HBMXML_LIB)" > NUL
+	$(LIBEXE) $@ $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+
 !include winmake\compile.mak
