@@ -201,7 +201,7 @@ static BOOL hb_fsFileStats(
       hFind = FindFirstFileA( ( char * ) pszFileName, &ffind );
       if( hFind != INVALID_HANDLE_VALUE )
       {
-         CloseHandle( hFind );
+         FindClose( hFind );
 
          /* get file times and work them out */
          *llSize = ( HB_FOFFSET ) ffind.nFileSizeLow + ( ( HB_FOFFSET ) ffind.nFileSizeHigh << 32 );
