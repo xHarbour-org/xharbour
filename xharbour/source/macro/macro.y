@@ -884,8 +884,8 @@ SimpleExpression :
            | ExprRelation                     { $$ = $1; }
 ;
 
-Expression : SimpleExpression                 { $$ = $1; HB_MACRO_CHECK( $$ ) }
-           | PareExpList                      { $$ = $1; HB_MACRO_CHECK( $$ ) }
+Expression : SimpleExpression                 { $$ = $1; HB_MACRO_CHECK( $$ ); }
+           | PareExpList                      { $$ = $1; HB_MACRO_CHECK( $$ ); }
 ;
 
 RootParamList : Argument ',' {
