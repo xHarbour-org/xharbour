@@ -179,8 +179,11 @@ $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 c0d32.obj $**, $@,, $(COMPILERLIBS), $(RTL_DIR)\bcc.def
 !
 
-$(HBLIB_EXE) : $(HBLIB_SRC)
-	$(CC) $(OPTFLAGS) -e$(HBLIB_EXE) $(HBLIB_SRC)
+$(OBJ_DIR)\hblib.obj : $(HBLIB_SRC)
+	$(CC) -c -tWM $(OPTFLAGS) -o$(OBJ_DIR)\hblib.obj $(HBLIB_SRC)
+
+$(HBLIB_EXE) : $(OBJ_DIR)\hblib.obj
+	$(LINKEXE) -ap -Tpe -x -Gn -C c0x32.obj $(OBJ_DIR)\hblib.obj,$(HBLIB_EXE),,$(COMPILERLIBS)
 
 $(ACE32_LIB) : "$(HB_DIR_ADS)\ace32.dll"
 	$(IMPLIB_CMD)
