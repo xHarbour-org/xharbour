@@ -1146,6 +1146,7 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
     ELSEIF LEN( ::__DisplayArray ) > 0 .AND. nPos > 0
       IF ::__nDragRec != -1
          ::__nDragRec := -1
+         ::__nDragPos := -1
          ::__DisplayData()
       ENDIF
       ::UpdateRow()
