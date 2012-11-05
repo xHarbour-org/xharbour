@@ -8,10 +8,29 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-05 19:55 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/makefile.bc
+  * winmake/mdir.bat
+  + utils/misc/hblib.c
+    + small librarian helper to simplify makefiles for BCC which has its own syntax
+      in creating libraries, so that BCC can share the most of common variables used
+      by most Windows compilers
+      TODO: RTL.LIB and XHARBOUR.DLL still cause 'Command line too long', hence
+      native syntax are still used. Have to split make process into some parts.
+
+  * winmake/makefile.bc
+  * winmake/makefile.pc
+  * winmake/makefile.dc
+  * winmake/makefile.gc
+  * winmake/makefile.wc
+  * winmake/makefile.vc
+  * winmake/common2.mak
+    ! more simplification by using same variables
+
 2012-11-04 21:40 UTC-200 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/rtl/filestat.c
     ! Change CloseHandle() to FindClose()
-    
+
 2012-11-04 17:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/macro/macro.y
     ! added missing ';' at the end of C code as future version of Bison will not

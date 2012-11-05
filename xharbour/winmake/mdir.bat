@@ -133,6 +133,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%hbbtree%LIBEXT%  copy lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%sixapi%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%sixapi%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbcab%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%hbcab%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbcomm%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%hbcomm%LIBEXT% lib >NUL
+if exist lib\%SUB_DIR%\%LIBPREFIX%hbmxml%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%hbmxml%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbcairo%LIBEXT%  copy lib\%SUB_DIR%\%LIBPREFIX%hbcairo%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbmagic%LIBEXT%  copy lib\%SUB_DIR%\%LIBPREFIX%hbmagic%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbtinymt%LIBEXT% copy lib\%SUB_DIR%\%LIBPREFIX%hbtinymt%LIBEXT% lib >NUL
@@ -217,6 +218,11 @@ if exist bin\ppgen%HB_DEBUG%.tds      del bin\ppgen%HB_DEBUG%.tds
 if exist bin\ppgen%HB_DEBUG%.map      del bin\ppgen%HB_DEBUG%.map
 if exist bin\ppgen%HB_DEBUG%.cgl      del bin\ppgen%HB_DEBUG%.cgl
 
+if exist bin\hblib%HB_DEBUG%.exe      del bin\hblib%HB_DEBUG%.exe
+if exist bin\hblib%HB_DEBUG%.tds      del bin\hblib%HB_DEBUG%.tds
+if exist bin\hblib%HB_DEBUG%.map      del bin\hblib%HB_DEBUG%.map
+if exist bin\hblib%HB_DEBUG%.cgl      del bin\hblib%HB_DEBUG%.cgl
+
 if exist bin\hbextern%HB_DEBUG%.exe   del bin\hbextern%HB_DEBUG%.exe
 if exist bin\hbextern%HB_DEBUG%.tds   del bin\hbextern%HB_DEBUG%.tds
 if exist bin\hbextern%HB_DEBUG%.map   del bin\hbextern%HB_DEBUG%.map
@@ -284,6 +290,7 @@ if exist lib\%LIBPREFIX%hbbtree%LIBEXT%              del lib\%LIBPREFIX%hbbtree%
 if exist lib\%LIBPREFIX%sixapi%LIBEXT%               del lib\%LIBPREFIX%sixapi%LIBEXT%
 if exist lib\%LIBPREFIX%hbcab%LIBEXT%                del lib\%LIBPREFIX%hbcab%LIBEXT%
 if exist lib\%LIBPREFIX%hbcomm%LIBEXT%               del lib\%LIBPREFIX%hbcomm%LIBEXT%
+if exist lib\%LIBPREFIX%hbmxml%LIBEXT%               del lib\%LIBPREFIX%hbmxml%LIBEXT%
 if exist lib\%LIBPREFIX%hblzf%LIBEXT%                del lib\%LIBPREFIX%hblzf%LIBEXT%
 if exist lib\%LIBPREFIX%hbbz2%LIBEXT%                del lib\%LIBPREFIX%hbbz2%LIBEXT%
 if exist lib\%LIBPREFIX%hbcairo%LIBEXT%              del lib\%LIBPREFIX%hbcairo%LIBEXT%
@@ -322,6 +329,7 @@ if exist bin\%SUB_DIR%\hbtest%HB_DEBUG%.exe         del bin\%SUB_DIR%\hbtest%HB_
 if exist bin\%SUB_DIR%\hbformat%HB_DEBUG%.exe       del bin\%SUB_DIR%\hbformat%HB_DEBUG%.exe
 if exist bin\%SUB_DIR%\hbtestmt%HB_DEBUG%.exe       del bin\%SUB_DIR%\hbtestmt%HB_DEBUG%.exe
 if exist bin\%SUB_DIR%\ppgen%HB_DEBUG%.exe          del bin\%SUB_DIR%\ppgen%HB_DEBUG%.exe
+if exist bin\%SUB_DIR%\hblib%HB_DEBUG%.exe          del bin\%SUB_DIR%\hblib%HB_DEBUG%.exe
 if exist bin\%SUB_DIR%\hbextern%HB_DEBUG%.exe       del bin\%SUB_DIR%\hbextern%HB_DEBUG%.exe
 if exist bin\%SUB_DIR%\hbdict%HB_DEBUG%.exe         del bin\%SUB_DIR%\hbdict%HB_DEBUG%.exe
 if exist bin\%SUB_DIR%\xbscript%HB_DEBUG%.exe       del bin\%SUB_DIR%\xbscript%HB_DEBUG%.exe
@@ -407,6 +415,7 @@ if exist bin\%SUB_DIR%\hbrunMT.exp                   del bin\%SUB_DIR%\hbrunMT.e
 if exist bin\%SUB_DIR%\hbtest.exp                    del bin\%SUB_DIR%\hbtest.exp
 if exist bin\%SUB_DIR%\hbtestMT.exp                  del bin\%SUB_DIR%\hbtestMT.exp
 if exist bin\%SUB_DIR%\ppgen.exp                     del bin\%SUB_DIR%\ppgen.exp
+if exist bin\%SUB_DIR%\hblib.exp                     del bin\%SUB_DIR%\hblib.exp
 if exist bin\%SUB_DIR%\xbscript.exp                  del bin\%SUB_DIR%\xbscript.exp
 
 if exist bin\%SUB_DIR%\harbour%LIBEXT%               del bin\%SUB_DIR%\harbour%LIBEXT%
@@ -524,6 +533,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%hbbtree%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%sixapi%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%sixapi%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbcab%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%hbcab%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbcomm%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%hbcomm%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%hbmxml%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%hbmxml%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbcairo%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%hbcairo%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbmagic%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%hbmagic%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbtinymt%LIBEXT%  del lib\%SUB_DIR%\%LIBPREFIX%hbtinymt%LIBEXT%

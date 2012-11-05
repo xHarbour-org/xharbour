@@ -137,11 +137,6 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
 $**
 !
 
-$(CT_LIB) : $(CT_LIB_OBJS)
-	$(LIBEXE) -c -n -p256 $@ @&&!
-$**
-!
-
 $(ACE32_LIB) : "$(HB_DIR_ADS)$(DIR_SEP)ace32.dll"
 	$(IMPLIB_CMD)
 

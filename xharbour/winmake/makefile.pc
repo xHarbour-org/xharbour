@@ -194,8 +194,5 @@ $(WS2_32PC_LIB) : $(WS32DEF)
 $(RTL_LIB) : $(RTL_LIB_OBJS)
 	$(LIB_CMD)
 
-$(CT_LIB) : $(CT_LIB_OBJS)
-	$(LIB_CMD)
-
 !include winmake\common2.mak
 !include winmake\compile.mak
