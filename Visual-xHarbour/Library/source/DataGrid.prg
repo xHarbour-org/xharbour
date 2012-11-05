@@ -1162,7 +1162,7 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
       ::Children[ ::__DragColumn ]:DrawHeader( ::Drawing:hDC )
    ENDIF
 
-   IF !::__lSizeMouseDown .AND. ::__DragColumn == ::__SelCol .AND. ::__SelCol > 0 .AND. Len( ::Children ) >= ::__SelCol
+   IF !::__lSizeMouseDown .AND. (::__DragColumn == 0 .OR. ::__DragColumn == ::__SelCol) .AND. ::__SelCol > 0 .AND. Len( ::Children ) >= ::__SelCol
       IF ::Children[ ::__SelCol ]:HeaderMenu != NIL
          pt := (struct POINT)
          pt:x := ::Children[::__SelCol]:aSelRect[1]
