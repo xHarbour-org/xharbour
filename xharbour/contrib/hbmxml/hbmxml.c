@@ -52,7 +52,7 @@
 /*
  TODO: Fixed GC features. GC features are currently GPFing test applications.
 */
-#define HBMXML_USE_RAW_POINTER
+// #define HBMXML_USE_RAW_POINTER
 
 #include "hbapi.h"
 #include "hbapiitm.h"

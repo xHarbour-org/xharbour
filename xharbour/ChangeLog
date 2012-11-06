@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-06 10:32 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbmxml/hbmxml.c
+  * contrib/hbmxml/mxml_nod.c
+    ! now discard using raw pointer because GC features are already fixed by
+      Przemek's patch. mxml_nod.c has therefore been synched with hrb.
+
 2012-11-06 07:06 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbmxml/hbmxml.c
   * contrib/hbmxml/tests/testmxml.prg
