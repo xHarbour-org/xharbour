@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-06 11:47 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * utils/misc/hblib.c
+    ! fix memory leak trap
+
 2012-11-06 10:32 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbmxml/hbmxml.c
   * contrib/hbmxml/mxml_nod.c
@@ -230,7 +234,7 @@
 
 2012-10-24 04:23 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.bc
-    ! missing CG32.LIB whe ncreating DLL in debug mode
+    ! missing CG32.LIB when creating DLL in debug mode
     ! rearrange and simplify logics
 
   * source/ct/trig.c

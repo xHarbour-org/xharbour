@@ -4,7 +4,6 @@
 
 /*
  * Harbour Project source code:
- * Harbour Unicode Support
  *
  * BCC Librarian Helpers for the purpose of building xHarbour
  *
@@ -82,7 +81,10 @@ static ULONG runlib( char* szCmd, char* szRsp )
    sprintf( szCommandLine, "%s /c %s @%s", pEnvCMD, szCmd, szRsp );
 
    if ( !CreateProcess( NULL, szCommandLine, NULL, NULL, FALSE, 0x0000, NULL, NULL, &StartupInfo, &ProcessInfo ) )
+   {
+      free( szCommandLine );
       return GetLastError();
+   }
 
    WaitForSingleObject( ProcessInfo.hProcess, INFINITE );
 
@@ -105,7 +107,7 @@ int main( int argc, char *argv[] )
 {
    int i;
    ULONG rc;
-   int iResult = EXIT_SUCCESS;
+   int iResult = EXIT_FAILURE;
 
    if ( argc >= 6 )
    {
@@ -160,8 +162,8 @@ int main( int argc, char *argv[] )
 
       rc = runlib( argv[ 2 ], szRsp );
 
-      if ( rc )
-         iResult = EXIT_FAILURE;
+      if ( rc == 0 )
+         iResult = EXIT_SUCCESS;
 
       DeleteFile( szRsp );
    }
