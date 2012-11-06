@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-06 07:06 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbmxml/hbmxml.c
+  * contrib/hbmxml/tests/testmxml.prg
+  * contrib/hbmxml/tests/custom.prg
+    ! fixed memory leaks
+    NOTE: Using raw pointer because GC features cause GPF. Anybody helps?
+
 2012-11-05 23:28 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.bc
     ! redirect creation of hblib.exe's dependencies to proper folder

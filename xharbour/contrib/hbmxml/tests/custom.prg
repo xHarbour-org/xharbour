@@ -41,12 +41,15 @@ PROCEDURE main()
    ENDIF
 
    xData := mxmlGetCustom( node )
+
    IF HB_ISHASH( xData ) .AND. hHasKey( xData, "Today" )
       OutStd( xData[ "Today" ], hb_osnewline() )
    ENDIF
 
    mxmlSetErrorCallback( NIL )
    mxmlSetCustomHandlers( NIL, NIL )
+
+   mxmlDelete( tree )
 
    ErrorLevel( 0 )
    RETURN
@@ -80,7 +83,6 @@ PROCEDURE my_mxmlError( cErrorMsg )
 FUNCTION load_c( node, cString )
 
    mxmlSetCustom( node, hb_deserialize( hb_b64decode( cString ) ) )
-
    RETURN 0  /* 0 on success or non-zero on error */
 
 FUNCTION save_c( node )

@@ -461,6 +461,8 @@ PROCEDURE _APPMain( cFileArg )
       QUIT
    ENDIF
 
+   mxmlDelete( hTree )
+
    /*
     * Open the file...
     */

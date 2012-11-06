@@ -49,6 +49,11 @@
  * If you do not wish that, delete this exception notice.
  */
 
+/*
+ TODO: Fixed GC features. GC features are currently GPFing test applications.
+*/
+#define HBMXML_USE_RAW_POINTER
+
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
@@ -93,6 +98,16 @@ static HB_ERROR_CB_VAR   *s_error_cb_var   = NULL;
 
 /* ======================= mxml_node_t * support ============================ */
 
+static void mxmlRemoveRef( mxml_node_t * node )
+{
+   if( node->parent )
+   {
+      mxmlRemove( node );
+      mxmlRelease( node );
+   }
+}
+
+#ifndef HBMXML_USE_RAW_POINTER
 static int hbmxml_release( mxml_node_t * node )
 {
    void * user_data;
@@ -107,12 +122,59 @@ static int hbmxml_release( mxml_node_t * node )
       if( ( user_data = mxmlGetUserData( node ) ) != NULL )
       {
          mxmlSetUserData( node, NULL );
+
          hb_itemRelease( ( PHB_ITEM ) user_data );
       }
    }
 
    return mxmlRelease( node );
 }
+
+/* ======================= mxml_node_t * support =========================== */
+static HB_GARBAGE_FUNC( hbmxml_nodeDestructor )
+{
+   mxml_node_t ** pHbnode = ( mxml_node_t ** ) Cargo;
+
+   if( pHbnode && *pHbnode )
+   {
+      hbmxml_release( *pHbnode );
+      *pHbnode = NULL;
+   }
+}
+
+static mxml_node_t * mxml_node_param( int iParam )
+{
+   mxml_node_t ** pHbnode = ( mxml_node_t ** ) hb_parptrGC( hbmxml_nodeDestructor,
+                                                          iParam );
+
+   return ( pHbnode && *pHbnode) ? *pHbnode : NULL;
+}
+
+static mxml_node_t ** mxml_node_new( mxml_node_t * node, int iNew )
+{
+   mxml_node_t ** pHbnode = ( mxml_node_t ** ) hb_gcAlloc( sizeof( mxml_node_t * ),
+                                                           hbmxml_nodeDestructor );
+
+   *pHbnode = node;
+
+   if( iNew == 0 )
+      mxmlRetain( node );
+
+   return pHbnode;
+}
+
+static void mxml_node_push( mxml_node_t * node, int iNew )
+{
+   hb_itemPutPtrGC( hb_stackAllocItem(), mxml_node_new( node, iNew ) );
+}
+
+static void mxml_node_ret( mxml_node_t * node, int iNew )
+{
+   if( node )
+      hb_itemPutPtrGC( hb_stackReturnItem(), mxml_node_new( node, iNew ) );
+}
+
+#else
 
 static mxml_node_t * mxml_node_param( int iParam )
 {
@@ -136,6 +198,7 @@ static void mxml_node_ret( mxml_node_t * node, int iNew )
    }
 }
 
+#endif
 /* ======================= mxml_index_t * support =========================== */
 
 static HB_GARBAGE_FUNC( hbmxml_indexDestructor )
@@ -633,7 +696,6 @@ HB_FUNC( MXMLLOADFILE )
       node = mxmlLoadFile( node_top, file, cb );
 
       mxml_node_ret( node, ( node_top == MXML_NO_PARENT ) ? 1 : 0 );
-
       fclose( file );
    }
 
@@ -712,7 +774,10 @@ HB_FUNC( MXMLNEWCDATA )
 HB_FUNC( MXMLNEWELEMENT )
 {
    if( HB_ISNIL( 1 ) || ( HB_ISNUM( 1 ) && hb_parni( 1 ) == MXML_NO_PARENT ) )
-      mxml_node_ret( mxmlNewElement( MXML_NO_PARENT, hb_parc( 2 ) ), 1 );
+   {
+      mxml_node_t * node = mxmlNewElement( MXML_NO_PARENT, hb_parc( 2 ) );
+      mxml_node_ret( node, 1 );
+   }
    else
    {
       mxml_node_t * node_parent = mxml_node_param( 1 );
@@ -806,14 +871,6 @@ HB_FUNC( MXMLNEWXML )
  * wrapper which does it [druzus]
  */
 
-static void mxmlRemoveRef( mxml_node_t * node )
-{
-   if( node->parent )
-   {
-      mxmlRemove( node );
-      mxmlRelease( node );
-   }
-}
 
 HB_FUNC( MXMLREMOVE )
 {
@@ -826,15 +883,31 @@ HB_FUNC( MXMLREMOVE )
 }
 
 /* void mxmlDelete( mxml_node_t * node ) */
-
 HB_FUNC( MXMLDELETE )
 {
-   mxml_node_t * node = mxml_node_param( 1 );
-   if( node )
+#if !defined( HBMXML_USE_RAW_POINTER )
+   mxml_node_t ** pHbnode = ( mxml_node_t ** ) hb_parptrGC( hbmxml_nodeDestructor, 1 );
+
+   if( pHbnode && *pHbnode )
    {
-      mxmlRemoveRef( node );
-      hb_retni( hbmxml_release( node ) );
+      mxmlRemoveRef( *pHbnode );
+      hbmxml_release( *pHbnode );
+      *pHbnode = NULL;
    }
+#else
+   mxml_node_t * pHbnode = ( mxml_node_t * ) hb_parptr( 1 );
+
+   if( pHbnode )
+   {
+      mxmlRemoveRef( pHbnode );
+      #if 1
+      mxmlDelete( pHbnode );
+      #else
+      hbmxml_release( pHbnode );
+      #endif
+   }
+#endif
+
    else
       MXML_ERR_ARGS;
 }
@@ -957,7 +1030,9 @@ HB_FUNC( MXMLSAXLOADFILE )
       node = mxmlSAXLoadFile( node_top, file, cb, cb_sax, pData );
 
       mxml_node_ret( node, ( node_top == MXML_NO_PARENT ) ? 1 : 0 );
-
+#ifdef HBMXML_USE_RAW_POINTER
+      mxmlDelete( node );
+#endif
       fclose( file );
    }
 
@@ -1383,7 +1458,12 @@ static void custom_destroy_cb( void * Cargo )
    PHB_ITEM pItem = ( PHB_ITEM ) Cargo;
 
    if( pItem != NULL )
+   {
       hb_itemRelease( pItem );
+#ifdef HBMXML_USE_RAW_POINTER
+      s_custom_cbs_var->data_cb = NULL;
+#endif
+   }
 }
 
 /*
@@ -1659,8 +1739,11 @@ static void hb_hbxmlExit ( void * cargo )
       if( s_custom_cbs_var->save_cb )
          hb_itemRelease( s_custom_cbs_var->save_cb );
 
-      if ( s_custom_cbs_var->data_cb )
+#ifdef HBMXML_USE_RAW_POINTER
+      if( s_custom_cbs_var->data_cb )
          hb_itemRelease( s_custom_cbs_var->data_cb );
+
+#endif
 
       hb_xfree( s_custom_cbs_var );
    }
