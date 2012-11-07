@@ -265,39 +265,25 @@ int main( int argc, char * argv[] )
             fprintf( h, ( iComp == 1 ) ? "+ %s &\n" : "%s\n", argv[ i ] );
       }
 
-      if( iComp == 1 )
+      if( ! bDll && ( iComp == 1 ) )
+         fprintf( h, "+\n" );
+
+      if( bDll )
       {
-         if( ! bDll )
-            fprintf( h, "+\n" );
-         else
+         if( argc >= 9 && argv[ 9 ] )
          {
-            if( argc >= 9 && argv[ 9 ] )
-            {
-               int u;
+            int u;
 
-               for( u = 9; u < argc; u++ )
-                  fprintf( h, "%s ", argv[ u ] );
-            }
+            for( u = 9; u < argc; u++ )
+               fprintf( h, "%s ", argv[ u ] );
+         }
 
+         if( iComp == 1 )
             fprintf( h, ",%s,%s.map,%s,%s\n", argv[ 4 ], argv[ 4 ],
                      "cw32mt.lib import32.lib ws2_32.lib", bIsDef ? "" : argv[ 8 ] );
-         }
-      }
-      else
-      {
-         if( bDll )
-         {
-            if( argc >= 9 && argv[ 9 ] )
-            {
-               int u;
-
-               for( u = 9; u < argc; u++ )
-                  fprintf( h, "%s ", argv[ u ] );
-            }
-
+         else
             fprintf( h, ",%s,%s.map,%s,%s\n", argv[ 4 ], argv[ 4 ],
                      "", bIsDef ? "" : argv[ 8 ] );
-         }
       }
 
       fclose( h );

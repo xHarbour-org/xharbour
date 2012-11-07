@@ -8,9 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-07 21:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * utils/misc/hblib.c
+    ! minor optimization
+
 2012-11-07 21:19 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * utils/misc/hblib.c
-    + replace hard-coded .obj with environmental OBJEXT setup in bat files
+    * replace hard-coded .obj with environmental OBJEXT setup in bat files
 
 2012-11-07 21:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * utils/misc/hblib.c
