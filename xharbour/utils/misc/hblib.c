@@ -205,8 +205,7 @@ int main( int argc, char * argv[] )
 
       if( bDll && argc >= 8 && argv[ 8 ] )
       {
-         const char * szDef = upper( argv[ 8 ] );
-
+         const char * szDef = upper( ( char * ) file_ext( ( const char * ) argv[ 8 ] ) );
          bIsDef = ( strcmp( szDef, "DEF" ) == NULL );
       }
 
@@ -280,7 +279,7 @@ int main( int argc, char * argv[] )
 
          if( iComp == 1 )
             fprintf( h, ",%s,%s.map,%s,%s\n", argv[ 4 ], argv[ 4 ],
-                     "cw32mt.lib import32.lib ws2_32.lib", bIsDef ? "" : argv[ 8 ] );
+                     "cw32mt.lib import32.lib ws2_32.lib", bIsDef ? argv[ 8 ] : "" );
          else
             fprintf( h, ",%s,%s.map,%s,%s\n", argv[ 4 ], argv[ 4 ],
                      "", bIsDef ? "" : argv[ 8 ] );
