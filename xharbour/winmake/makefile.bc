@@ -10,8 +10,6 @@
 #===============================================================================
 !include winmake\common.mak
 
-HBLIB_EXE =$(BIN_DIR)\hblib.exe
-HBLIB_SRC =utils\misc\hblib.c
 CC        =BCC32
 LINKEXE   =ILINK32
 LIBEXE    =TLIB
@@ -169,31 +167,13 @@ CCC_CMD        =$(CC_CMD)
 CC_CMD_ZIP     =$(CC) -c -tWM $(CC_DEBUGFLAGS) -I"$(HBZIP_DIR)\include" -I"include" -Ve -R- -H- $(OPTFLAGS) -w- -X- -b -k- -o$@ $**
 LINK_CMD       =$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) -ap -Tpe -x -Gn -C -L$(LIB_DIR) $(LFLAGS) c0x32.obj $**,$@,,
 LIB_CMD        =$(HBLIB_EXE) __BORLANDC__ $(LIBEXE) "$(ARFLAGS)" $@ $**
+LIB_CMD_1      =$(HBLIB_EXE) __BORLANDC__ $(LIBEXE) "$(ARFLAGS)" $@ "winmake\rtl.lst" $(OBJ_DIR)
+DLL_LINK_CMD   =@$(HBLIB_EXE) __BORLANDC__ $(LINKEXE) "-C -aa -Tpd -Gn -Gi" $@ "winmake\dll.lst" $(OBJ_DIR) DLL $(RTL_DIR)\bcc.def $(VM_LIB_OBJS) $(TIFF_LIB_OBJS)
 DLLEXE_LINK_CMD=$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) $(LINKERFLAGS) c0x32.obj $**,$@,,$(PDFLITE_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
 
 #===============================================================================
 # Building rules of Object files
 #===============================================================================
-$(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
-	$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) $(DLLFLAGS) @&&!
-c0d32.obj $**, $@,, $(COMPILERLIBS), $(RTL_DIR)\bcc.def
-!
-
-$(OBJ_DIR)\hblib.obj : $(HBLIB_SRC)
-	$(CC) -c -tWM $(OPTFLAGS) -o$(OBJ_DIR)\hblib.obj $(HBLIB_SRC)
-
-$(HBLIB_EXE) : $(OBJ_DIR)\hblib.obj
-	$(LINKEXE) -ap -Tpe -x -Gn -C c0x32.obj $(OBJ_DIR)\hblib.obj,$(HBLIB_EXE),,$(COMPILERLIBS)
-
-$(ACE32_LIB) : "$(HB_DIR_ADS)\ace32.dll"
-	$(IMPLIB_CMD)
-
-$(RTL_LIB) : $(RTL_LIB_OBJS)
-	IF EXIST "$(RTL_LIB)" $(DEL) "$(RTL_LIB)" > NUL
-	$(LIBEXE) $@ $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-!
 
 !include winmake\common2.mak
 !include winmake\compile.mak

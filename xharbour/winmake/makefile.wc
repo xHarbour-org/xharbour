@@ -218,6 +218,7 @@ CCC_CMD         =$(CC_CMD)
 CC_CMD_OW32     =$(CC) $(CLIBFLAGS_OW32) -fo$@ $**
 CC_CMD_ZIP      =$(CCP) $(CLIBFLAGS) -i=$(HBZIP_DIR)\include -fo$@ $**
 LIB_CMD         =$(LIBEXE) -nologo -out:$@ $**
+LIB_CMD_1       =$(LIB_CMD)
 LINK_CMD        =$(LINKEXE) $(LNK_DEBUGFLAGS) -nologo -subsystem:console -out:$@ $**
 DLL_LINK_CMD    =$(LINKEXE) $(LNK_DEBUGFLAGS) $(DLLFLAGS)
 DLLEXE_LINK_CMD =$(LINKEXE) $(LNK_DEBUGFLAGS) -nologo -subsystem:console -out:$@ $** $(HARBOUR_DLL_LIB) $(PDFLITE_LIB)
@@ -359,15 +360,6 @@ $(OBJ_DIR)\hbmlangOW32$(OBJEXT) : $(HBMAKE_DIR)\hbmlang.c
 
 $(OBJ_DIR)\xbscriptOW32$(OBJEXT) : $(OBJ_DIR)\xbscript.c
 	$(CC_CMD_OW32)
-
-$(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
-	$(DLL_LINK_CMD)
-
-$(ACE32_LIB) : "$(HB_DIR_ADS)\ace32.dll"
-	$(IMPLIB_CMD)
-
-$(RTL_LIB) : $(RTL_LIB_OBJS)
-	$(LIB_CMD)
 
 !include winmake\common2.mak
 !include winmake\compile.mak

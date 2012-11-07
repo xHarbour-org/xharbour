@@ -88,6 +88,21 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
 	$(MT_CMD)
 
 #===============================================================================
+# ACE32.LIB
+#===============================================================================
+$(ACE32_LIB) : "$(HB_DIR_ADS)$(DIR_SEP)ace32.dll"
+	$(IMPLIB_CMD)
+
+#===============================================================================
+# HBLIB.EXE
+#===============================================================================
+$(HBLIB_EXE) : $(OBJ_DIR)$(DIR_SEP)hblib$(OBJEXT)
+	$(LINK_CMD) $(COMPILERLIBS)
+
+$(OBJ_DIR)$(DIR_SEP)hblib$(OBJEXT) : utils$(DIR_SEP)misc$(DIR_SEP)hblib.c
+	$(CC_CMD)
+
+#===============================================================================
 # PARSER related
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)harboury.c : $(HARBOUR_Y)
@@ -3142,7 +3157,7 @@ $(OBJ_DIR)$(DIR_SEP)sxtrig$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)sxtrig.c
 #===============================================================================
 # HSX.LIB rules
 #===============================================================================
-$(OBJ_DIR)$(DIR_SEP)hsx$(HB_MT)$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)hsx$(DIR_SEP)hsx.c
+$(OBJ_DIR)$(DIR_SEP)hsx$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)hsx$(DIR_SEP)hsx.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)cftsfunc$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)hsx$(DIR_SEP)cftsfunc.c
@@ -3362,7 +3377,8 @@ $(OBJ_DIR)$(DIR_SEP)gtwin$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)gtwin$(DIR_SEP)gtwin.c
 # GTWVT.LIB rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)gtwvt$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)gtwvt$(DIR_SEP)gtwvt.c
-	$(CCC_CMD)
+	$(CC_CMD)
+#	$(CCC_CMD)
 
 #===============================================================================
 # FILEMEM.LIB rules

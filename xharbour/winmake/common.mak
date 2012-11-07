@@ -215,6 +215,7 @@ HARBOUR_DLL_LIB =$(BIN_DIR)$(DIR_SEP)$(LIBPREFIX)xharbour$(LIBEXT)
 #===============================================================================
 # Macros For Standard Executable
 #===============================================================================
+HBLIB_EXE   =$(BIN_DIR)$(DIR_SEP)hblib$(HB_DEBUG).exe
 HARBOUR_EXE =$(BIN_DIR)$(DIR_SEP)harbour$(HB_DEBUG).exe
 HBPP_EXE    =$(BIN_DIR)$(DIR_SEP)hbpp$(HB_DEBUG).exe
 PPGEN_EXE   =$(BIN_DIR)$(DIR_SEP)ppgen$(HB_DEBUG).exe
@@ -1237,7 +1238,7 @@ HBSIX_LIB_OBJS=\
 # HSX.LIB rules
 #===============================================================================
 HSX_LIB_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)hsx$(HB_MT)$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hsx$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)cftsfunc$(OBJEXT)
 
 #===============================================================================
@@ -1932,7 +1933,7 @@ HARBOUR_DLL_OBJS=\
 	\
 	$(GTWIN_LIB_OBJS)\
 	$(GTWVT_LIB_OBJS)\
-	$(GTGUI_LIB_OJS)
+	$(GTGUI_LIB_OBJS)
 
 #===============================================================================
 # XBSCRIPTDLL.EXE rules
@@ -2488,6 +2489,7 @@ MT_PROJECT=\
 
 DLL_PROJECT=\
 	$(HARBOUR_DLL)\
+	$(DMC_IMPORT_LIB)\
 	$(HBDOCDLL_EXE)\
 	$(HBRUNDLL_EXE)\
 	$(HBTESTDLL_EXE)\

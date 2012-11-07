@@ -286,6 +286,7 @@ ZIP_DEBUGFLAGS  =-DNDEBUG
 endif
 
 LIB_CMD         =RM -f $@ && AR cru $@ $^
+LIB_CMD_1       =$(LIB_CMD)
 DLL_LINK_CMD    =$(CC) $(CC_DEBUGFLAGS) -shared -W $(EXPORT_DEF) -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1)
 DLLEXE_LINK_CMD =$(CC) $(CC_DEBUGFLAGS) -Wall $(NOCYGWIN) -o $@ $^ $(HARBOUR_DLL) -Wl,--start-group -lpdflite$(HB_ARCH)$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
 LINK_CMD        =$(CC) $(CC_DEBUGFLAGS) -mconsole -Wall -o $@ $^ $(NOCYGWIN)
@@ -298,11 +299,6 @@ CC_CMD_ZIP      =$(CCP) $(CC_DEBUGFLAGS) -I"include" -I"$(HBZIP_DIR)/include" -D
 #===============================================================================
 # Building rules of Object files
 #===============================================================================
-$(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
-	$(DLL_LINK_CMD)
-
-$(RTL_LIB) : $(RTL_LIB_OBJS)
-	$(LIB_CMD)
 
 include winmake/common2.mak
 include winmake/compile.mak

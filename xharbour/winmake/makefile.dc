@@ -15,6 +15,7 @@ LINKEXE   =LINK
 LIBEXE    =LIB
 IMPLIBEXE =IMPLIB
 CPPFLAGS  =-cpp
+ARFLAGS   =-c -n -p256
 
 !if ("$(HB_MT)"=="mt") || ("$(HB_THREAD_SUPPORT)"=="1")
 CC_DEFINES     =D_MT
@@ -27,9 +28,9 @@ CC_LINKER_DEBUG_FLAGS =-map -co
 
 CC_DEFINES     =-DSTRICT -DNULL=0 $(CC_DEFINES)
 INCLUDE_DIR    =-I"$(CC_DIR)\include\win32" $(INCLUDE_DIR)
-GTWVT_LIB_OBJS =$(OBJ_DIR)$(DIR_SEP)gtwvtDMC$(OBJEXT)
 OPTFLAGS       =-o+s -mn -c -6 -WD
 HB_STARTUP_OBJ =$(OBJ_DIR)\mainstd$(OBJEXT)
+DMC_IMPORT_LIB =$(HARBOUR_DLL_LIB)
 IMPLIB_CMD     =$(IMPLIBEXE) $@ $** /system /noi /p:64
 
 !include winmake\common3.mak
@@ -47,7 +48,7 @@ HB_GT_LIBS=\
 # TIFF Library 4.02 is not working with DMC
 
 !if ("$(HB_MT)"=="")
-PROJECT=$(ST_PROJECT)
+PROJECT=$(HBLIB_EXE) $(ST_PROJECT)
 !else
 PROJECT=$(MT_PROJECT)
 !endif
@@ -118,27 +119,15 @@ DLLEXE_LINK_CMD=$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) -exetype:nt -subsystem:conso
 CC_CMD         =$(CC) $(CLIBFLAGS) $(CPPFLAGS) -o$@ $**
 CCC_CMD        =$(CC) $(CLIBFLAGS) -o$@ $**
 CC_CMD_ZIP     =$(CC) -o+s -cpp -mn -I"include" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(HBZIP_DIR)\include" -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -o$@ $**
-LIB_CMD        =$(LIBEXE) -c -n -p256 $@ $**
+LIB_CMD        =$(LIBEXE) $(ARFLAGS) $@ $**
+LIB_CMD_1      =$(HBLIB_EXE) __DMC__ $(LIBEXE) "$(ARFLAGS)" $@ "winmake\rtl.lst" $(OBJ_DIR)
+DLL_LINK_CMD   =$(HBLIB_EXE) __DMC__ $(LINKEXE) "-exetype:nt -su:console -noi" $@ "winmake\dll.lst" $(OBJ_DIR) DLL $(EXPORT_DEF) $(VM_LIB_OBJS)
 
 #===============================================================================
 # Building rules of Object files
 #===============================================================================
-$(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
-	$(LINKEXE) -exetype:nt -su:console -noi @&&!
-$(HARBOUR_DLL_OBJS),$@,,$(COMPILERLIBS),$(EXPORT_DEF)
-!
-	$(IMPLIBEXE) $(HARBOUR_DLL_LIB) $(HARBOUR_DLL) /system /noi
-
-$(OBJ_DIR)$(DIR_SEP)gtwvtDMC$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)gtwvt$(DIR_SEP)gtwvt.c
-	$(CC_CMD)
-
-$(RTL_LIB) : $(RTL_LIB_OBJS)
-	$(LIBEXE) -c -n -p256 $@ @&&!
-$**
-!
-
-$(ACE32_LIB) : "$(HB_DIR_ADS)$(DIR_SEP)ace32.dll"
-	$(IMPLIB_CMD)
+$(DMC_IMPORT_LIB) : $(HARBOUR_DLL)
+	$(IMPLIBEXE) $(DMC_IMPORT_LIB) $(HARBOUR_DLL) /system /noi
 
 !include winmake\common2.mak
 !include winmake\compile.mak

@@ -176,6 +176,7 @@ HB_CMD_MAIN    =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) -d_USE_APPMAIN_ $** -o$@
 CC_CMD         =$(CC) $(CLIBFLAGS) -Fo$@ $**
 CCC_CMD        =$(CC_CMD)
 LIB_CMD        =$(LIBEXE) -OUT:$@ $**
+LIB_CMD_1      =$(LIB_CMD)
 LINK_CMD       =$(LINKEXE) $(LNK_DEBUGFLAGS) -OUT:$@ $** $(LINKERFLAGS)
 DLL_LINK_CMD   =$(LINKEXE) $(LNK_DEBUGFLAGS) $(DLLFLAGS)
 DLLEXE_LINK_CMD=$(LINKEXE) $(LNK_DEBUGFLAGS) $(EXEFLAGS) -OUT:$@ $** $(HARBOUR_DLL_LIB) $(ZLIB_LIB) $(PNG_LIB) $(PDFLIB)
@@ -183,16 +184,11 @@ DLLEXE_LINK_CMD=$(LINKEXE) $(LNK_DEBUGFLAGS) $(EXEFLAGS) -OUT:$@ $** $(HARBOUR_D
 #===============================================================================
 # Building rules of Object files
 #===============================================================================
-$(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
-	$(DLL_LINK_CMD)
 
 !if ("$(HB_ARCH)"=="64")
 $(WS2_32PC_LIB) : $(WS32DEF)
 	$(LIBEXE) -DEF:$(WS32DEF) -OUT:$(WS2_32PC_LIB) -MACHINE:AMD64
 !endif
-
-$(RTL_LIB) : $(RTL_LIB_OBJS)
-	$(LIB_CMD)
 
 !include winmake\common2.mak
 !include winmake\compile.mak

@@ -203,6 +203,7 @@ HB_CMD_MAIN    =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) -d_USE_APPMAIN_ $** -o$@
 CC_CMD         =$(CC) $(CLIBFLAGS) $(CPPFLAGS) -Fo$@ $**
 CCC_CMD        =$(CC) $(CLIBFLAGS) -Fo$@ $**
 LIB_CMD        =$(LIBEXE) -MACHINE:$(HB_MACHINE) -NOLOGO -OUT:$@ $**
+LIB_CMD_1      =$(LIB_CMD)
 LINK_CMD       =$(LINKEXE) $(LNK_DEBUGFLAGS) -MACHINE:$(HB_MACHINE) -NOLOGO -OUT:$@ $** $(LINKERFLAGS) $(MANIFESTFLAGS)
 DLL_LINK_CMD   =$(LINKEXE) $(LNK_DEBUGFLAGS) $(DLLFLAGS)
 DLLEXE_LINK_CMD=$(LINKEXE) $(LNK_DEBUGFLAGS) $(EXEFLAGS) $(LFLAGS) -OUT:$@ $** $(PDFLITE_LIB) $(HARBOUR_DLL_LIB)
@@ -215,11 +216,6 @@ CC_CMD_ZIP     =$(CC)\
 #===============================================================================
 # Building rules of Object files
 #===============================================================================
-$(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
-	$(DLL_LINK_CMD)
-
-$(RTL_LIB) : $(RTL_LIB_OBJS)
-	$(LIB_CMD)
 
 !include winmake\common2.mak
 !include winmake\compile.mak

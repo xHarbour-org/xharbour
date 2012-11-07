@@ -8,6 +8,27 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-07 20:53 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/fm.c
+    ! pacify BCC warnings when HB_NO_VM_ALL is defined
+
+  + winmake/dll.lst
+  + winmake/rtl.lst
+  * winmake/common2.mak
+  * winmake/makefile.bc
+  * winmake/makefile.vc
+  * winmake/makefile.gc
+  * winmake/makefile.wc
+  * winmake/makefile.pc
+  * winmake/makefile.dc
+    ! rtl.lib and xHarbour.dll now using common command
+
+  * winmake/compile.mak
+    ! compile GTWVT in C++ mode for __DMC__
+
+  * winmake/common.mak
+    ! corrected typo causing GTGUI not linked into xHarbour.dll
+
 2012-11-06 11:47 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * utils/misc/hblib.c
     ! fix memory leak trap
