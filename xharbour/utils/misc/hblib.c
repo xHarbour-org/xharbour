@@ -127,6 +127,7 @@ static void createfromlst( FILE * fList, FILE * h, char * szObjDir, int iComp, B
    int      c, i = 0, u = 1;
    char     string[ 256 ];
    char *   szList;
+   char *   szObjExt = getenv( "OBJEXT" );
 
    if( bDll )
    {
@@ -151,13 +152,13 @@ static void createfromlst( FILE * fList, FILE * h, char * szObjDir, int iComp, B
                if( u > 1 )
                   szList = ( char * ) realloc( szList, u * 256 );
 
-               sprintf( s, "%s\\%s.obj ", szObjDir, string );
+               sprintf( s, "%s\\%s%s ", szObjDir, string, szObjExt );
 
                strcat( szList, s );
                u++;
             }
             else
-               fprintf( h, ( iComp == 1 ) ? "+ %s\\%s.obj &\n" : "%s\\%s.obj\n", szObjDir, string );
+               fprintf( h, ( iComp == 1 ) ? "+ %s\\%s%s &\n" : "%s\\%s%s\n", szObjDir, string, szObjExt );
          }
 
          *string  = 0;
