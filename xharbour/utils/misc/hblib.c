@@ -282,7 +282,7 @@ int main( int argc, char * argv[] )
                      "cw32mt.lib import32.lib ws2_32.lib", bIsDef ? argv[ 8 ] : "" );
          else
             fprintf( h, ",%s,%s.map,%s,%s\n", argv[ 4 ], argv[ 4 ],
-                     "", bIsDef ? "" : argv[ 8 ] );
+                     "", bIsDef ? argv[ 8 ] : "" );
       }
 
       fclose( h );

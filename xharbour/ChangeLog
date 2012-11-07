@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-07 22:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * utils/misc/hblib.c
+    ! fixed: DMC command not receiving DEF file when passed
+
 2012-11-07 22:01 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * utils/misc/hblib.c
     ! yet another minor optimization
