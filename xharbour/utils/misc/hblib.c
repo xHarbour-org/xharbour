@@ -62,7 +62,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static ULONG runlib( char * szCmd, char * szRsp, BOOL bDll, char * szFlags )
+typedef enum
+{
+   UNKNOWN,
+   BORLANDC,
+   DMC
+} COMPILERS;
+
+static ULONG runlib( char * szCmd, char * szRsp, char * szFlags )
 {
    ULONG                rc             = 0;
    char *               pEnvCMD        = getenv( "COMSPEC" );
@@ -78,10 +85,7 @@ static ULONG runlib( char * szCmd, char * szRsp, BOOL bDll, char * szFlags )
    StartupInfo.dwFlags     = STARTF_USESHOWWINDOW;
    StartupInfo.wShowWindow = SW_NORMAL;
 
-   if( ! bDll )
-      sprintf( szCommandLine, "%s /c %s @%s", pEnvCMD, szCmd, szRsp );
-   else
-      sprintf( szCommandLine, "%s /c %s %s @%s", pEnvCMD, szCmd, szFlags, szRsp );
+   sprintf( szCommandLine, "%s /c %s %s @%s", pEnvCMD, szCmd, szFlags, szRsp );
 
    if( ! CreateProcess( NULL, szCommandLine, NULL, NULL, FALSE, 0x0000, NULL, NULL, &StartupInfo, &ProcessInfo ) )
    {
@@ -104,7 +108,7 @@ static ULONG runlib( char * szCmd, char * szRsp, BOOL bDll, char * szFlags )
 
 static const char * file_ext( const char * filename )
 {
-   const char * dot = strchr( filename, '.' );
+   const char * dot = strrchr( filename, '.' );
 
    if( ! dot || dot == filename )
       return "";
@@ -124,16 +128,13 @@ char * upper( char * pszText )
 
 static void createfromlst( FILE * fList, FILE * h, char * szObjDir, int iComp, BOOL bDll )
 {
-   int      c, i = 0, u = 1;
-   char     string[ 256 ];
-   char *   szList;
+   int      c, i = 0;
+   char *   string   = ( char * ) malloc( 256 );
+   char     szList[ 256 * 1000 ]; /* should be enough for 1000 modules */
    char *   szObjExt = getenv( "OBJEXT" );
 
-   if( bDll )
-   {
-      szList = ( char * ) malloc( 256 );
-      memset( szList, 0, 256 );
-   }
+   *szList = 0;
+   memset( string, 0, 256 );
 
    do
    {
@@ -143,22 +144,66 @@ static void createfromlst( FILE * fList, FILE * h, char * szObjDir, int iComp, B
       {
          string[ i ] = 0;
 
-         if( *string && ! ( string[ 0 ] == ';' ) )
+         while( *string == ' ' )
+            string++;
+
+         if( *string && ( string[ 0 ] == '!' ) )
+         {
+            char *   inc = ( char * ) malloc( 256 );
+            char *   s;
+
+            memset( inc, 0, 256 );
+            memcpy( inc, upper( string ), strlen( string ) );
+
+            s = strstr( inc, "INCLUDE" );
+
+            if( s && *s )
+            {
+               char * sz = strchr( s, ' ' );
+
+               if( ! sz )
+               {
+                  printf( "Error: Invalid include directive\n" );
+                  free( inc );
+                  exit( EXIT_FAILURE );
+               }
+               else
+               {
+                  FILE * hInc;
+
+                  while( *sz == ' ' )
+                     sz++;
+
+                  hInc = fopen( sz, "r" );
+
+                  if( hInc )
+                  {
+                     /* recursive, i love it :-) */
+                     createfromlst( hInc, h, szObjDir, iComp, bDll );
+                     fclose( hInc );
+                  }
+                  else
+                  {
+                     printf( "Error: %s not found\n", sz );
+                     free( inc );
+                     exit( EXIT_FAILURE );
+                  }
+               }
+            }
+
+            free( inc );
+         }
+         else if( *string && ! ( string[ 0 ] == ';' ) )
          {
             if( bDll )
             {
                char s[ 256 ];
 
-               if( u > 1 )
-                  szList = ( char * ) realloc( szList, u * 256 );
-
                sprintf( s, "%s\\%s%s ", szObjDir, string, szObjExt );
-
                strcat( szList, s );
-               u++;
             }
             else
-               fprintf( h, ( iComp == 1 ) ? "+ %s\\%s%s &\n" : "%s\\%s%s\n", szObjDir, string, szObjExt );
+               fprintf( h, ( iComp == BORLANDC ) ? "+ %s\\%s%s &\n" : "%s\\%s%s\n", szObjDir, string, szObjExt );
          }
 
          *string  = 0;
@@ -171,11 +216,10 @@ static void createfromlst( FILE * fList, FILE * h, char * szObjDir, int iComp, B
    }
    while( c != EOF );
 
+   free( string );
+
    if( bDll )
-   {
       fprintf( h, "%s", szList );
-      free( szList );
-   }
 }
 
 /* Syntax:  HBLIB <libexe> <flags> <compiler> <out.lib> <a.obj ....>
@@ -196,6 +240,7 @@ int main( int argc, char * argv[] )
       BOOL           bDll        = FALSE;
       BOOL           bIsDef      = FALSE;
       const char *   szFileExt   = upper( ( char * ) file_ext( ( const char * ) argv[ 5 ] ) );
+      char *         szLibs;
 
       if( argc >= 7 && argv[ 7 ] )
       {
@@ -220,28 +265,32 @@ int main( int argc, char * argv[] )
       }
 
       if( strcmp( argv[ 1 ], "__BORLANDC__" ) == NULL )
-         iComp = 1;
+      {
+         szLibs   = "cw32mt.lib import32.lib ws2_32.lib";
+         iComp    = BORLANDC;
+      }
       else if( strcmp( argv[ 1 ], "__DMC__" ) == NULL )
-         iComp = 2;
+      {
+         szLibs   = "";
+         iComp    = DMC;
+      }
 
       h = fopen( szRsp, "wb" );
 
       if( ! bDll )
       {
-         if( iComp == 1 )
+         if( iComp == BORLANDC )
          {
-            fprintf( h, "%s &\n", argv[ 3 ] );  // flags
             fprintf( h, "%s &\n", argv[ 4 ] );  // library name
          }
-         else if( iComp == 2 )
+         else if( iComp == DMC )
          {
-            fprintf( h, "%s\n", argv[ 3 ] ); // flags
             fprintf( h, "%s\n", argv[ 4 ] ); // library name
          }
       }
       else
       {
-         if( iComp == 1 )
+         if( iComp == BORLANDC )
             fprintf( h, "%s", "c0d32.obj " );
       }
 
@@ -261,10 +310,10 @@ int main( int argc, char * argv[] )
       else
       {
          for( i = 5; i < argc; i++ )
-            fprintf( h, ( iComp == 1 ) ? "+ %s &\n" : "%s\n", argv[ i ] );
+            fprintf( h, ( iComp == BORLANDC ) ? "+ %s &\n" : "%s\n", argv[ i ] );
       }
 
-      if( ! bDll && ( iComp == 1 ) )
+      if( ! bDll && ( iComp == BORLANDC ) )
          fprintf( h, "+\n" );
 
       if( bDll )
@@ -277,19 +326,14 @@ int main( int argc, char * argv[] )
                fprintf( h, "%s ", argv[ u ] );
          }
 
-         if( iComp == 1 )
-            fprintf( h, ",%s,%s.map,%s,%s\n", argv[ 4 ], argv[ 4 ],
-                     "cw32mt.lib import32.lib ws2_32.lib", bIsDef ? argv[ 8 ] : "" );
-         else
-            fprintf( h, ",%s,%s.map,%s,%s\n", argv[ 4 ], argv[ 4 ],
-                     "", bIsDef ? argv[ 8 ] : "" );
+         fprintf( h, ",%s,%s.map,%s,%s\n", argv[ 4 ], argv[ 4 ], szLibs, bIsDef ? argv[ 8 ] : "" );
       }
 
       fclose( h );
 
       DeleteFile( argv[ 4 ] );
 
-      rc = runlib( argv[ 2 ], szRsp, bDll, argv[ 3 ] );
+      rc = runlib( argv[ 2 ], szRsp, argv[ 3 ] );
 
       if( rc == 0 )
          iResult = EXIT_SUCCESS;

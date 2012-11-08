@@ -49,11 +49,6 @@
  * If you do not wish that, delete this exception notice.
  */
 
-/*
- TODO: Fixed GC features. GC features are currently GPFing test applications.
-*/
-// #define HBMXML_USE_RAW_POINTER
-
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
@@ -74,7 +69,6 @@
 
 typedef struct
 {
-   PHB_ITEM data_cb;
    PHB_ITEM type_cb;
    PHB_ITEM save_cb;
    PHB_ITEM sax_cb;
@@ -82,7 +76,6 @@ typedef struct
 
 typedef struct
 {
-   PHB_ITEM data_cb;
    PHB_ITEM load_cb;
    PHB_ITEM save_cb;
 } HB_CUSTOM_CBS_VAR;
@@ -92,9 +85,9 @@ typedef struct
    PHB_ITEM error_cb;
 } HB_ERROR_CB_VAR;
 
-static HB_CBS_VAR        *s_cbs_var        = NULL;
-static HB_CUSTOM_CBS_VAR *s_custom_cbs_var = NULL;
-static HB_ERROR_CB_VAR   *s_error_cb_var   = NULL;
+static HB_CBS_VAR *        s_cbs_var         = NULL;
+static HB_CUSTOM_CBS_VAR * s_custom_cbs_var  = NULL;
+static HB_ERROR_CB_VAR *   s_error_cb_var    = NULL;
 
 /* ======================= mxml_node_t * support ============================ */
 
@@ -107,7 +100,6 @@ static void mxmlRemoveRef( mxml_node_t * node )
    }
 }
 
-#ifndef HBMXML_USE_RAW_POINTER
 static int hbmxml_release( mxml_node_t * node )
 {
    void * user_data;
@@ -145,9 +137,9 @@ static HB_GARBAGE_FUNC( hbmxml_nodeDestructor )
 static mxml_node_t * mxml_node_param( int iParam )
 {
    mxml_node_t ** pHbnode = ( mxml_node_t ** ) hb_parptrGC( hbmxml_nodeDestructor,
-                                                          iParam );
+                                                            iParam );
 
-   return ( pHbnode && *pHbnode) ? *pHbnode : NULL;
+   return ( pHbnode && *pHbnode ) ? *pHbnode : NULL;
 }
 
 static mxml_node_t ** mxml_node_new( mxml_node_t * node, int iNew )
@@ -174,31 +166,6 @@ static void mxml_node_ret( mxml_node_t * node, int iNew )
       hb_itemPutPtrGC( hb_stackReturnItem(), mxml_node_new( node, iNew ) );
 }
 
-#else
-
-static mxml_node_t * mxml_node_param( int iParam )
-{
-   return (mxml_node_t *) hb_parptr( iParam );
-}
-
-static void mxml_node_push( mxml_node_t * node, int iNew )
-{
-   if( iNew == 0 )
-      mxmlRetain( node );
-   hb_itemPutPtr( hb_stackAllocItem(), node );
-}
-
-static void mxml_node_ret( mxml_node_t * node, int iNew )
-{
-   if( node )
-   {
-      if( iNew == 0 )
-         mxmlRetain( node );
-      hb_itemPutPtr( hb_stackReturnItem(), node );
-   }
-}
-
-#endif
 /* ======================= mxml_index_t * support =========================== */
 
 static HB_GARBAGE_FUNC( hbmxml_indexDestructor )
@@ -223,7 +190,8 @@ static mxml_index_t * mxml_index_param( int iParam )
 static mxml_index_t ** mxml_index_new( mxml_index_t * index )
 {
    mxml_index_t ** ppMxml_index = ( mxml_index_t ** ) hb_gcAlloc( sizeof( mxml_index_t * ),
-                                                                     hbmxml_indexDestructor );
+                                                                  hbmxml_indexDestructor );
+
    *ppMxml_index = index;
 
    return ppMxml_index;
@@ -256,10 +224,10 @@ HB_FUNC( HB_MXMLVERSION )
 
 HB_FUNC( MXMLADD )
 {
-   mxml_node_t *  parent = mxml_node_param( 1 );
-   int            where  = hb_parnidef( 2, MXML_ADD_BEFORE );
-   mxml_node_t *  child  = mxml_node_param( 3 );
-   mxml_node_t *  node   = mxml_node_param( 4 );
+   mxml_node_t *  parent   = mxml_node_param( 1 );
+   int            where    = hb_parnidef( 2, MXML_ADD_BEFORE );
+   mxml_node_t *  child    = mxml_node_param( 3 );
+   mxml_node_t *  node     = mxml_node_param( 4 );
 
    if( parent && node )
    {
@@ -278,7 +246,13 @@ HB_FUNC( MXMLELEMENTDELETEATTR )
    mxml_node_t * node = mxml_node_param( 1 );
 
    if( node )
-      mxmlElementDeleteAttr( node, hb_parc( 2 ) );
+   {
+      void * hName;
+
+      mxmlElementDeleteAttr( node, hb_parstr_utf8( 2, &hName, NULL ) );
+
+      hb_strfree( hName );
+   }
    else
       MXML_ERR_ARGS;
 }
@@ -290,7 +264,13 @@ HB_FUNC( MXMLELEMENTGETATTR )
    mxml_node_t * node = mxml_node_param( 1 );
 
    if( node )
-      hb_retc( mxmlElementGetAttr( node, hb_parc( 2 ) ) );
+   {
+      void * hName;
+
+      hb_retstr_utf8( mxmlElementGetAttr( node, hb_parstr_utf8( 2, &hName, NULL ) ) );
+
+      hb_strfree( hName );
+   }
    else
       MXML_ERR_ARGS;
 }
@@ -303,7 +283,15 @@ HB_FUNC( MXMLELEMENTSETATTR )
    mxml_node_t * node = mxml_node_param( 1 );
 
    if( node )
-      mxmlElementSetAttr( node, hb_parc( 2 ), hb_parc( 3 ) );
+   {
+      void *   hName;
+      void *   hValue;
+
+      mxmlElementSetAttr( node, hb_parstr_utf8( 2, &hName, NULL ), hb_parstr_utf8( 3, &hValue, NULL ) );
+
+      hb_strfree( hName );
+      hb_strfree( hValue );
+   }
    else
       MXML_ERR_ARGS;
 }
@@ -312,14 +300,18 @@ HB_FUNC( MXMLELEMENTSETATTR )
 
 HB_FUNC( MXMLENTITYGETNAME )
 {
-   hb_retc( mxmlEntityGetName( hb_parni( 1 ) ) );
+   hb_retstr_utf8( mxmlEntityGetName( hb_parni( 1 ) ) );
 }
 
 /* int mxmlEntityGetValue( const char * name ) */
 
 HB_FUNC( MXMLENTITYGETVALUE )
 {
-   hb_retni( mxmlEntityGetValue( hb_parc( 1 ) ) );
+   void * hName;
+
+   hb_retni( mxmlEntityGetValue( hb_parstr_utf8( 1, &hName, NULL ) ) );
+
+   hb_strfree( hName );
 }
 
 /*
@@ -330,16 +322,23 @@ HB_FUNC( MXMLENTITYGETVALUE )
 
 HB_FUNC( MXMLFINDELEMENT )
 {
-   mxml_node_t *  node = mxml_node_param( 1 );
-   mxml_node_t *  top = mxml_node_param( 2 );
+   void *         hName;
+   void *         hAttr;
+   void *         hValue;
+   mxml_node_t *  node  = mxml_node_param( 1 );
+   mxml_node_t *  top   = mxml_node_param( 2 );
 
    if( node && top )
    {
       mxml_node_t * nodef = mxmlFindElement( node, top,
-                                             hb_parc( 3 ),
-                                             hb_parc( 4 ),
-                                             hb_parc( 5 ),
+                                             hb_parstr_utf8( 3, &hName, NULL ),
+                                             hb_parstr_utf8( 4, &hAttr, NULL ),
+                                             hb_parstr_utf8( 5, &hValue, NULL ),
                                              hb_parni( 6 ) );
+
+      hb_strfree( hName );
+      hb_strfree( hAttr );
+      hb_strfree( hValue );
 
       mxml_node_ret( nodef, 0 );
    }
@@ -351,10 +350,17 @@ HB_FUNC( MXMLFINDELEMENT )
 
 HB_FUNC( MXMLFINDPATH )
 {
+   void *         hPath;
    mxml_node_t *  node = mxml_node_param( 1 );
 
    if( node )
-      mxml_node_ret( mxmlFindPath( node, hb_parc( 2 ) ), 0 );
+   {
+      mxml_node_t * nodef = mxmlFindPath( node, hb_parstr_utf8( 2, &hPath, NULL ) );
+
+      mxml_node_ret( nodef, 0 );
+
+      hb_strfree( hPath );
+   }
    else
       MXML_ERR_ARGS;
 }
@@ -366,7 +372,7 @@ HB_FUNC( MXMLGETCDATA )
    mxml_node_t * node = mxml_node_param( 1 );
 
    if( node )
-      hb_retc( mxmlGetCDATA( node ) );
+      hb_retstr_utf8( mxmlGetCDATA( node ) );
    else
       MXML_ERR_ARGS;
 }
@@ -378,7 +384,7 @@ HB_FUNC( MXMLGETELEMENT )
    mxml_node_t * node = mxml_node_param( 1 );
 
    if( node )
-      hb_retc( mxmlGetElement( node ) );
+      hb_retstr_utf8( mxmlGetElement( node ) );
    else
       MXML_ERR_ARGS;
 }
@@ -438,7 +444,7 @@ HB_FUNC( MXMLGETOPAQUE )
    mxml_node_t * node = mxml_node_param( 1 );
 
    if( node )
-      hb_retc( mxmlGetOpaque( node ) );
+      hb_retstr_utf8( mxmlGetOpaque( node ) );
    else
       MXML_ERR_ARGS;
 }
@@ -501,7 +507,7 @@ HB_FUNC( MXMLGETTEXT )
    {
       int whitespace = hb_parni( 2 );
 
-      hb_retc( mxmlGetText( node, &whitespace ) );
+      hb_retstr_utf8( mxmlGetText( node, &whitespace ) );
       hb_storni( whitespace, 2 );
    }
    else
@@ -557,7 +563,18 @@ HB_FUNC( MXMLINDEXFIND )
    mxml_index_t * index = mxml_index_param( 1 );
 
    if( index )
-      mxml_node_ret( mxmlIndexFind( index, hb_parc( 2 ), hb_parc( 3 ) ), 0 );
+   {
+      void *         hElement;
+      void *         hValue;
+      mxml_node_t *  nodef = mxmlIndexFind( index,
+                                            hb_parstr_utf8( 2, &hElement, NULL ),
+                                            hb_parstr_utf8( 3, &hValue, NULL ) );
+
+      hb_strfree( hElement );
+      hb_strfree( hValue );
+
+      mxml_node_ret( nodef, 0 );
+   }
    else
       MXML_ERR_ARGS;
 }
@@ -599,9 +616,14 @@ HB_FUNC( MXMLINDEXNEW )
 
    if( node )
    {
+      void *         hElement;
+      void *         hAttribute;
       mxml_index_t * index = mxmlIndexNew( node,
-                                           hb_parc( 2 ),
-                                           hb_parc( 3 ) );
+                                           hb_parstr_utf8( 2, &hElement, NULL ),
+                                           hb_parstr_utf8( 3, &hAttribute, NULL ) );
+
+      hb_strfree( hElement );
+      hb_strfree( hAttribute );
 
       if( index )
          mxml_index_ret( index );
@@ -628,14 +650,12 @@ static mxml_type_t type_cb( mxml_node_t * node )
 {
    if( s_cbs_var != NULL )
    {
-      PHB_ITEM pCallback = s_cbs_var->type_cb;
-
-      if( pCallback && hb_vmRequestReenter() )
+      if( s_cbs_var->type_cb && hb_vmRequestReenter() )
       {
          int iResult;
 
          hb_vmPushEvalSym();
-         hb_vmPush( pCallback );
+         hb_vmPush( s_cbs_var->type_cb );
          mxml_node_push( node, 0 );
          hb_vmSend( 1 );
 
@@ -650,15 +670,14 @@ static mxml_type_t type_cb( mxml_node_t * node )
 
 HB_FUNC( MXMLLOADFILE )
 {
+   void *         hFree;
    mxml_node_t *  node_top;
    mxml_node_t *  node;
    mxml_load_cb_t cb = MXML_NO_CALLBACK;
    FILE *         file;
 
    if( HB_ISNIL( 1 ) || ( HB_ISNUM( 1 ) && hb_parni( 1 ) == MXML_NO_PARENT ) )
-   {
       node_top = MXML_NO_PARENT;
-   }
    else
    {
       node_top = mxml_node_param( 1 );
@@ -672,24 +691,24 @@ HB_FUNC( MXMLLOADFILE )
 
    if( HB_ISBLOCK( 3 ) )
    {
-      s_cbs_var->type_cb = hb_param( 3, HB_IT_BLOCK );
-      cb = type_cb;
+      s_cbs_var->type_cb   = hb_param( 3, HB_IT_BLOCK );
+      cb                   = type_cb;
    }
    else if( HB_ISNUM( 3 ) )
    {
       switch( hb_parni( 3 ) )
       {
-      case 0:  cb = MXML_NO_CALLBACK;       break;
-      case 1:  cb = MXML_INTEGER_CALLBACK;  break;
-      case 2:  cb = MXML_OPAQUE_CALLBACK;   break;
-      case 3:  cb = MXML_REAL_CALLBACK;     break;
-      case 4:  cb = MXML_TEXT_CALLBACK;     break;
-      case 5:  cb = MXML_IGNORE_CALLBACK;   break;
-      default: cb = MXML_NO_CALLBACK;
+         case 0:  cb = MXML_NO_CALLBACK;       break;
+         case 1:  cb = MXML_INTEGER_CALLBACK;  break;
+         case 2:  cb = MXML_OPAQUE_CALLBACK;   break;
+         case 3:  cb = MXML_REAL_CALLBACK;     break;
+         case 4:  cb = MXML_TEXT_CALLBACK;     break;
+         case 5:  cb = MXML_IGNORE_CALLBACK;   break;
+         default: cb = MXML_NO_CALLBACK;
       }
    }
 
-   file = hb_fopen( hb_parc( 2 ), "rb" );
+   file = hb_fopen( hb_parstr_utf8( 2, &hFree, NULL ), "rb" );
 
    if( file )
    {
@@ -700,6 +719,8 @@ HB_FUNC( MXMLLOADFILE )
    }
 
    s_cbs_var->type_cb = NULL;
+
+   hb_strfree( hFree );
 }
 
 /*
@@ -709,14 +730,13 @@ HB_FUNC( MXMLLOADFILE )
 
 HB_FUNC( MXMLLOADSTRING )
 {
+   void *         hFree;
    mxml_node_t *  node_top;
    mxml_node_t *  node;
    mxml_load_cb_t cb = MXML_NO_CALLBACK;
 
    if( HB_ISNIL( 1 ) || ( HB_ISNUM( 1 ) && hb_parni( 1 ) == MXML_NO_PARENT ) )
-   {
       node_top = MXML_NO_PARENT;
-   }
    else
    {
       node_top = mxml_node_param( 1 );
@@ -730,40 +750,58 @@ HB_FUNC( MXMLLOADSTRING )
 
    if( HB_ISBLOCK( 3 ) )
    {
-      s_cbs_var->type_cb = hb_param( 3, HB_IT_BLOCK );
-      cb = type_cb;
+      s_cbs_var->type_cb   = hb_param( 3, HB_IT_BLOCK );
+      cb                   = type_cb;
    }
    else if( HB_ISNUM( 3 ) )
    {
       switch( hb_parni( 3 ) )
       {
-      case 0:  cb = MXML_NO_CALLBACK;       break;
-      case 1:  cb = MXML_INTEGER_CALLBACK;  break;
-      case 2:  cb = MXML_OPAQUE_CALLBACK;   break;
-      case 3:  cb = MXML_REAL_CALLBACK;     break;
-      case 4:  cb = MXML_TEXT_CALLBACK;     break;
-      case 5:  cb = MXML_IGNORE_CALLBACK;   break;
-      default: cb = MXML_NO_CALLBACK;
+         case 0:  cb = MXML_NO_CALLBACK;       break;
+         case 1:  cb = MXML_INTEGER_CALLBACK;  break;
+         case 2:  cb = MXML_OPAQUE_CALLBACK;   break;
+         case 3:  cb = MXML_REAL_CALLBACK;     break;
+         case 4:  cb = MXML_TEXT_CALLBACK;     break;
+         case 5:  cb = MXML_IGNORE_CALLBACK;   break;
+         default: cb = MXML_NO_CALLBACK;
       }
    }
 
-   node = mxmlLoadString( node_top, hb_parc( 2 ), cb );
-   s_cbs_var->type_cb = NULL;
+   node                 = mxmlLoadString( node_top, hb_parstr_utf8( 2, &hFree, NULL ), cb );
+
+   s_cbs_var->type_cb   = NULL;
    mxml_node_ret( node, ( node_top == MXML_NO_PARENT ) ? 1 : 0 );
+
+   hb_strfree( hFree );
 }
 
 /* mxml_node_t * mxmlNewCDATA( mxml_node_t * parent, const char * string ) */
 
 HB_FUNC( MXMLNEWCDATA )
 {
+   void *         hString;
+   mxml_node_t *  node;
+
    if( HB_ISNIL( 1 ) || ( HB_ISNUM( 1 ) && hb_parni( 1 ) == MXML_NO_PARENT ) )
-      mxml_node_ret( mxmlNewCDATA( MXML_NO_PARENT, hb_parc( 2 ) ), 1 );
+   {
+      node = mxmlNewCDATA( MXML_NO_PARENT, hb_parstr_utf8( 2, &hString, NULL ) );
+
+      mxml_node_ret( node, 1 );
+
+      hb_strfree( hString );
+   }
    else
    {
       mxml_node_t * node_parent = mxml_node_param( 1 );
 
       if( node_parent )
-         mxml_node_ret( mxmlNewCDATA( node_parent, hb_parc( 2 ) ), 0 );
+      {
+         node = mxmlNewCDATA( node_parent, hb_parstr_utf8( 2, &hString, NULL ) );
+
+         mxml_node_ret( node, 0 );
+
+         hb_strfree( hString );
+      }
       else
          MXML_ERR_ARGS;
    }
@@ -773,17 +811,29 @@ HB_FUNC( MXMLNEWCDATA )
 
 HB_FUNC( MXMLNEWELEMENT )
 {
+   void *         hName;
+   mxml_node_t *  node;
+
    if( HB_ISNIL( 1 ) || ( HB_ISNUM( 1 ) && hb_parni( 1 ) == MXML_NO_PARENT ) )
    {
-      mxml_node_t * node = mxmlNewElement( MXML_NO_PARENT, hb_parc( 2 ) );
+      node = mxmlNewElement( MXML_NO_PARENT, hb_parstr_utf8( 2, &hName, NULL ) );
+
       mxml_node_ret( node, 1 );
+
+      hb_strfree( hName );
    }
    else
    {
       mxml_node_t * node_parent = mxml_node_param( 1 );
 
       if( node_parent )
-         mxml_node_ret( mxmlNewElement( node_parent, hb_parc( 2 ) ), 0 );
+      {
+         node = mxmlNewElement( node_parent, hb_parstr_utf8( 2, &hName, NULL ) );
+
+         mxml_node_ret( node, 0 );
+
+         hb_strfree( hName );
+      }
       else
          MXML_ERR_ARGS;
    }
@@ -810,14 +860,29 @@ HB_FUNC( MXMLNEWINTEGER )
 
 HB_FUNC( MXMLNEWOPAQUE )
 {
+   void *         hOpaque;
+   mxml_node_t *  node;
+
    if( HB_ISNIL( 1 ) || ( HB_ISNUM( 1 ) && hb_parni( 1 ) == MXML_NO_PARENT ) )
-      mxml_node_ret( mxmlNewOpaque( MXML_NO_PARENT, hb_parc( 2 ) ), 1 );
+   {
+      node = mxmlNewOpaque( MXML_NO_PARENT, hb_parstr_utf8( 2, &hOpaque, NULL ) );
+
+      mxml_node_ret( node, 1 );
+
+      hb_strfree( hOpaque );
+   }
    else
    {
       mxml_node_t * node_parent = mxml_node_param( 1 );
 
       if( node_parent )
-         mxml_node_ret( mxmlNewOpaque( node_parent, hb_parc( 2 ) ), 0 );
+      {
+         node = mxmlNewOpaque( node_parent, hb_parstr_utf8( 2, &hOpaque, NULL ) );
+
+         mxml_node_ret( node, 0 );
+
+         hb_strfree( hOpaque );
+      }
       else
          MXML_ERR_ARGS;
    }
@@ -845,14 +910,31 @@ HB_FUNC( MXMLNEWREAL )
 
 HB_FUNC( MXMLNEWTEXT )
 {
+   void *         hString;
+   mxml_node_t *  node;
+
    if( HB_ISNIL( 1 ) || ( HB_ISNUM( 1 ) && hb_parni( 1 ) == MXML_NO_PARENT ) )
-      mxml_node_ret( mxmlNewText( MXML_NO_PARENT, hb_parnidef( 2, 0 ), hb_parc( 3 ) ), 1 );
+   {
+      node = mxmlNewText( MXML_NO_PARENT, hb_parnidef( 2, 0 ),
+                          hb_parstr_utf8( 3, &hString, NULL ) );
+
+      mxml_node_ret( node, 1 );
+
+      hb_strfree( hString );
+   }
    else
    {
       mxml_node_t * node_parent = mxml_node_param( 1 );
 
       if( node_parent )
-         mxml_node_ret( mxmlNewText( node_parent, hb_parnidef( 2, 0 ), hb_parc( 3 ) ), 0 );
+      {
+         node = mxmlNewText( node_parent, hb_parnidef( 2, 0 ),
+                             hb_parstr_utf8( 3, &hString, NULL ) );
+
+         mxml_node_ret( node, 0 );
+
+         hb_strfree( hString );
+      }
       else
          MXML_ERR_ARGS;
    }
@@ -862,7 +944,20 @@ HB_FUNC( MXMLNEWTEXT )
 
 HB_FUNC( MXMLNEWXML )
 {
-   mxml_node_ret( HB_ISCHAR( 1 ) ? mxmlNewXML( hb_parc( 1 ) ) : mxmlNewXML( NULL ), 1 );
+   mxml_node_t * node;
+
+   if( HB_ISCHAR( 1 ) )
+   {
+      void * hVersion;
+
+      node = mxmlNewXML( hb_parstr_utf8( 1, &hVersion, NULL ) );
+
+      hb_strfree( hVersion );
+   }
+   else
+      node = mxmlNewXML( NULL );
+
+   mxml_node_ret( node, 1 );
 }
 
 /* void mxmlRemove( mxml_node_t * node ) */
@@ -885,7 +980,6 @@ HB_FUNC( MXMLREMOVE )
 /* void mxmlDelete( mxml_node_t * node ) */
 HB_FUNC( MXMLDELETE )
 {
-#if !defined( HBMXML_USE_RAW_POINTER )
    mxml_node_t ** pHbnode = ( mxml_node_t ** ) hb_parptrGC( hbmxml_nodeDestructor, 1 );
 
    if( pHbnode && *pHbnode )
@@ -894,20 +988,6 @@ HB_FUNC( MXMLDELETE )
       hbmxml_release( *pHbnode );
       *pHbnode = NULL;
    }
-#else
-   mxml_node_t * pHbnode = ( mxml_node_t * ) hb_parptr( 1 );
-
-   if( pHbnode )
-   {
-      mxmlRemoveRef( pHbnode );
-      #if 1
-      mxmlDelete( pHbnode );
-      #else
-      hbmxml_release( pHbnode );
-      #endif
-   }
-#endif
-
    else
       MXML_ERR_ARGS;
 }
@@ -944,14 +1024,12 @@ static void sax_cb( mxml_node_t * node, mxml_sax_event_t event, void * data )
 {
    if( node != NULL && s_cbs_var != NULL )
    {
-      PHB_ITEM pCallback = s_cbs_var->sax_cb;
-
-      if( pCallback && hb_vmRequestReenter() )
+      if( s_cbs_var->sax_cb && hb_vmRequestReenter() )
       {
          HB_USHORT uPCount = 2;
 
          hb_vmPushEvalSym();
-         hb_vmPush( pCallback );
+         hb_vmPush( s_cbs_var->sax_cb );
          mxml_node_push( node, 0 );
          hb_vmPushInteger( ( int ) ( event + 1 ) );
 
@@ -977,11 +1055,12 @@ static void sax_cb( mxml_node_t * node, mxml_sax_event_t event, void * data )
 
 HB_FUNC( MXMLSAXLOADFILE )
 {
+   void *         hFree;
    mxml_node_t *  node_top;
    mxml_node_t *  node;
-   mxml_load_cb_t cb     = MXML_NO_CALLBACK;
-   mxml_sax_cb_t  cb_sax = MXML_NO_CALLBACK;
-   PHB_ITEM       pData  = ( hb_pcount() > 4 ) ? hb_param( 5, HB_IT_ANY ) : NULL;
+   mxml_load_cb_t cb       = MXML_NO_CALLBACK;
+   mxml_sax_cb_t  cb_sax   = MXML_NO_CALLBACK;
+   PHB_ITEM       pData    = ( hb_pcount() > 4 ) ? hb_param( 5, HB_IT_ANY ) : NULL;
    FILE *         file;
 
    if( HB_ISNIL( 1 ) || ( HB_ISNUM( 1 ) && hb_parni( 1 ) == MXML_NO_PARENT ) )
@@ -1001,43 +1080,44 @@ HB_FUNC( MXMLSAXLOADFILE )
 
    if( HB_ISBLOCK( 3 ) )
    {
-      s_cbs_var->type_cb = hb_param( 3, HB_IT_BLOCK );
-      cb = type_cb;
+      s_cbs_var->type_cb   = hb_param( 3, HB_IT_BLOCK );
+      cb                   = type_cb;
    }
    else if( HB_ISNUM( 3 ) )
    {
       switch( hb_parni( 3 ) )
       {
-      case 0:  cb = MXML_NO_CALLBACK;       break;
-      case 1:  cb = MXML_INTEGER_CALLBACK;  break;
-      case 2:  cb = MXML_OPAQUE_CALLBACK;   break;
-      case 3:  cb = MXML_REAL_CALLBACK;     break;
-      case 4:  cb = MXML_TEXT_CALLBACK;     break;
-      case 5:  cb = MXML_IGNORE_CALLBACK;   break;
-      default: cb = MXML_NO_CALLBACK;
+         case 0:  cb = MXML_NO_CALLBACK;       break;
+         case 1:  cb = MXML_INTEGER_CALLBACK;  break;
+         case 2:  cb = MXML_OPAQUE_CALLBACK;   break;
+         case 3:  cb = MXML_REAL_CALLBACK;     break;
+         case 4:  cb = MXML_TEXT_CALLBACK;     break;
+         case 5:  cb = MXML_IGNORE_CALLBACK;   break;
+         default: cb = MXML_NO_CALLBACK;
       }
    }
 
    if( HB_ISBLOCK( 4 ) )
    {
       s_cbs_var->sax_cb = hb_param( 4, HB_IT_BLOCK );
-      cb_sax = sax_cb;
+      cb_sax            = sax_cb;
    }
 
-   file = hb_fopen( hb_parc( 2 ), "rb" );
+   file = hb_fopen( hb_parstr_utf8( 2, &hFree, NULL ), "rb" );
+
    if( file )
    {
       node = mxmlSAXLoadFile( node_top, file, cb, cb_sax, pData );
 
       mxml_node_ret( node, ( node_top == MXML_NO_PARENT ) ? 1 : 0 );
-#ifdef HBMXML_USE_RAW_POINTER
-      mxmlDelete( node );
-#endif
+
       fclose( file );
    }
 
-   s_cbs_var->type_cb = NULL;
-   s_cbs_var->sax_cb = NULL;
+   s_cbs_var->type_cb   = NULL;
+   s_cbs_var->sax_cb    = NULL;
+
+   hb_strfree( hFree );
 }
 
 /*
@@ -1050,17 +1130,16 @@ HB_FUNC( MXMLSAXLOADFILE )
 
 HB_FUNC( MXMLSAXLOADSTRING )
 {
+   void *         hFree;
    mxml_node_t *  node_top;
    mxml_node_t *  node;
-   mxml_load_cb_t cb     = MXML_NO_CALLBACK;
-   mxml_sax_cb_t  cb_sax = MXML_NO_CALLBACK;
-   PHB_ITEM       pData  = ( hb_pcount() > 4 ) ? hb_param( 5, HB_IT_ANY ) : NULL;
+   mxml_load_cb_t cb       = MXML_NO_CALLBACK;
+   mxml_sax_cb_t  cb_sax   = MXML_NO_CALLBACK;
+   PHB_ITEM       pData    = ( hb_pcount() > 4 ) ? hb_param( 5, HB_IT_ANY ) : NULL;
    const char *   s;
 
    if( HB_ISNIL( 1 ) || ( HB_ISNUM( 1 ) && hb_parni( 1 ) == MXML_NO_PARENT ) )
-   {
       node_top = MXML_NO_PARENT;
-   }
    else
    {
       node_top = mxml_node_param( 1 );
@@ -1074,30 +1153,31 @@ HB_FUNC( MXMLSAXLOADSTRING )
 
    if( HB_ISBLOCK( 3 ) )
    {
-      s_cbs_var->type_cb = hb_param( 3, HB_IT_BLOCK );
-      cb = type_cb;
+      s_cbs_var->type_cb   = hb_param( 3, HB_IT_BLOCK );
+      cb                   = type_cb;
    }
    else if( HB_ISNUM( 3 ) )
    {
       switch( hb_parni( 3 ) )
       {
-      case 0:  cb = MXML_NO_CALLBACK;       break;
-      case 1:  cb = MXML_INTEGER_CALLBACK;  break;
-      case 2:  cb = MXML_OPAQUE_CALLBACK;   break;
-      case 3:  cb = MXML_REAL_CALLBACK;     break;
-      case 4:  cb = MXML_TEXT_CALLBACK;     break;
-      case 5:  cb = MXML_IGNORE_CALLBACK;   break;
-      default: cb = MXML_NO_CALLBACK;
+         case 0:  cb = MXML_NO_CALLBACK;       break;
+         case 1:  cb = MXML_INTEGER_CALLBACK;  break;
+         case 2:  cb = MXML_OPAQUE_CALLBACK;   break;
+         case 3:  cb = MXML_REAL_CALLBACK;     break;
+         case 4:  cb = MXML_TEXT_CALLBACK;     break;
+         case 5:  cb = MXML_IGNORE_CALLBACK;   break;
+         default: cb = MXML_NO_CALLBACK;
       }
    }
 
    if( HB_ISBLOCK( 4 ) )
    {
       s_cbs_var->sax_cb = hb_param( 4, HB_IT_BLOCK );
-      cb_sax = sax_cb;
+      cb_sax            = sax_cb;
    }
 
-   s = hb_parc( 2 );
+   s = hb_parstr_utf8( 2, &hFree, NULL );
+
    if( s )
    {
       node = mxmlSAXLoadString( node_top, s, cb, cb_sax, pData );
@@ -1105,42 +1185,34 @@ HB_FUNC( MXMLSAXLOADSTRING )
       mxml_node_ret( node, ( node_top == MXML_NO_PARENT ) ? 1 : 0 );
    }
 
-   s_cbs_var->type_cb = NULL;
-   s_cbs_var->sax_cb = NULL;
+   s_cbs_var->type_cb   = NULL;
+   s_cbs_var->sax_cb    = NULL;
+
+   hb_strfree( hFree );
 }
 
 /* ======== const char *(*mxml_save_cb_t)(mxml_node_t *, int) =========== */
-
 static const char * save_cb( mxml_node_t * node, int where )
 {
    if( node != NULL && s_cbs_var != NULL )
    {
-      PHB_ITEM pCallback = s_cbs_var->save_cb;
-
-      if( pCallback && hb_vmRequestReenter() )
+      if( s_cbs_var->save_cb )
       {
-         char * pszResult;
-         static char pz[1024];
+         const char *   pszResult;
+         void *         hText;
 
          hb_vmPushEvalSym();
-         hb_vmPush( pCallback );
+         hb_vmPush( s_cbs_var->save_cb );
          mxml_node_push( node, 0 );
          hb_vmPushInteger( where );
          hb_vmSend( 2 );
 
-         pszResult = hb_itemGetC( hb_param( -1, HB_IT_ANY ) );
+         pszResult = hb_itemGetStrUTF8( hb_param( -1, HB_IT_ANY ), &hText, NULL );
 
-         hb_vmRequestRestore();
+         if( hText )
+            hb_strfree( hText );
 
-         if( pszResult )
-         {
-            HB_MEMCPY( pz, pszResult, strlen( pszResult ) );
-            pz[ strlen( pszResult ) ] = 0;
-            hb_xfree( pszResult );
-            return (const char*) pz;
-         }
-
-         return NULL;
+         return pszResult;
       }
    }
    return NULL;
@@ -1160,12 +1232,12 @@ HB_FUNC( MXMLSAVEALLOCSTRING )
 
       if( HB_ISBLOCK( 2 ) )
       {
-         s_cbs_var->save_cb = hb_param( 2, HB_IT_BLOCK );
-         cb = save_cb;
+         s_cbs_var->save_cb   = hb_param( 2, HB_IT_BLOCK );
+         cb                   = save_cb;
       }
 
-      bytes = mxmlSaveString( node, buffer, BUFFER_SIZE, cb );
-      s_cbs_var->save_cb = NULL;
+      bytes                = mxmlSaveString( node, buffer, BUFFER_SIZE, cb );
+      s_cbs_var->save_cb   = NULL;
 
       if( bytes <= 0 )
          hb_retc_null();
@@ -1192,6 +1264,7 @@ HB_FUNC( MXMLSAVEFILE )
 {
    mxml_node_t *  node = mxml_node_param( 1 );
    FILE *         file;
+   void *         hFree;
 
    if( node && HB_ISCHAR( 2 ) )
    {
@@ -1199,11 +1272,12 @@ HB_FUNC( MXMLSAVEFILE )
 
       if( HB_ISBLOCK( 3 ) )
       {
-         s_cbs_var->save_cb = hb_param( 3, HB_IT_BLOCK );
-         cb = save_cb;
+         s_cbs_var->save_cb   = hb_param( 3, HB_IT_BLOCK );
+         cb                   = save_cb;
       }
 
-      file = hb_fopen( hb_parc( 2 ), "wb" );
+      file = hb_fopen( hb_parstr_utf8( 2, &hFree, NULL ), "wb" );
+
       if( file )
       {
          hb_retni( mxmlSaveFile( node, file, cb ) );
@@ -1211,6 +1285,8 @@ HB_FUNC( MXMLSAVEFILE )
       }
 
       s_cbs_var->save_cb = NULL;
+
+      hb_strfree( hFree );
    }
    else
       MXML_ERR_ARGS;
@@ -1220,12 +1296,12 @@ HB_FUNC( MXMLSAVEFILE )
                        char * buffer,
                        int bufsize,
                        mxml_save_cb_t cb )
-*/
+ */
 
 HB_FUNC( MXMLSAVESTRING )
 {
-   mxml_node_t *  node    = mxml_node_param( 1 );
-   PHB_ITEM       pBuffer = hb_param( 2, HB_IT_STRING );
+   mxml_node_t *  node     = mxml_node_param( 1 );
+   PHB_ITEM       pBuffer  = hb_param( 2, HB_IT_STRING );
 
    if( node )
    {
@@ -1241,8 +1317,8 @@ HB_FUNC( MXMLSAVESTRING )
          {
             if( HB_ISBLOCK( 3 ) )
             {
-               s_cbs_var->save_cb = hb_param( 3, HB_IT_BLOCK );
-               cb = save_cb;
+               s_cbs_var->save_cb   = hb_param( 3, HB_IT_BLOCK );
+               cb                   = save_cb;
             }
 
             bytes = mxmlSaveString( node, buffer, ( int ) ( buffer_size + 1 ), cb );
@@ -1269,7 +1345,13 @@ HB_FUNC( MXMLSETCDATA )
    mxml_node_t * node = mxml_node_param( 1 );
 
    if( node )
-      hb_retni( mxmlSetCDATA( node, hb_parc( 2 ) ) );
+   {
+      void * hData;
+
+      hb_retni( mxmlSetCDATA( node, hb_parstr_utf8( 2, &hData, NULL ) ) );
+
+      hb_strfree( hData );
+   }
    else
       MXML_ERR_ARGS;
 }
@@ -1281,7 +1363,13 @@ HB_FUNC( MXMLSETELEMENT )
    mxml_node_t * node = mxml_node_param( 1 );
 
    if( node )
-      hb_retni( mxmlSetElement( node, hb_parc( 2 ) ) );
+   {
+      void * hFree;
+
+      hb_retni( mxmlSetElement( node, hb_parstr_utf8( 2, &hFree, NULL ) ) );
+
+      hb_strfree( hFree );
+   }
    else
       MXML_ERR_ARGS;
 }
@@ -1292,12 +1380,10 @@ static void error_cb( const char * pszErrorMsg )
 {
    if( s_error_cb_var != NULL )
    {
-      PHB_ITEM pCallback = s_error_cb_var->error_cb;
-
-      if( pCallback && hb_vmRequestReenter() )
+      if( s_error_cb_var->error_cb && hb_vmRequestReenter() )
       {
          hb_vmPushEvalSym();
-         hb_vmPush( pCallback );
+         hb_vmPush( s_error_cb_var->error_cb );
          hb_itemPutC( hb_stackAllocItem(), pszErrorMsg );
 
          hb_vmSend( 1 );
@@ -1314,6 +1400,7 @@ HB_FUNC( MXMLSETERRORCALLBACK )
    {
       if( s_error_cb_var->error_cb )
          hb_itemRelease( s_error_cb_var->error_cb );
+
       s_error_cb_var->error_cb = hb_itemNew( pError );
 
       mxmlSetErrorCallback( error_cb );
@@ -1349,7 +1436,13 @@ HB_FUNC( MXMLSETOPAQUE )
    mxml_node_t * node = mxml_node_param( 1 );
 
    if( node )
-      hb_retni( mxmlSetOpaque( node, hb_parc( 2 ) ) );
+   {
+      void * hOpaque;
+
+      hb_retni( mxmlSetOpaque( node, hb_parstr_utf8( 2, &hOpaque, NULL ) ) );
+
+      hb_strfree( hOpaque );
+   }
    else
       MXML_ERR_ARGS;
 }
@@ -1373,7 +1466,13 @@ HB_FUNC( MXMLSETTEXT )
    mxml_node_t * node = mxml_node_param( 1 );
 
    if( node )
-      hb_retni( mxmlSetText( node, hb_parnidef( 2, 1 ), hb_parc( 3 ) ) );
+   {
+      void * hString;
+
+      hb_retni( mxmlSetText( node, hb_parnidef( 2, 1 ), hb_parstr_utf8( 3, &hString, NULL ) ) );
+
+      hb_strfree( hString );
+   }
    else
       MXML_ERR_ARGS;
 }
@@ -1386,10 +1485,10 @@ HB_FUNC( MXMLSETUSERDATA )
 
    if( node )
    {
-      s_cbs_var->data_cb = hb_itemClone( hb_param( 2, HB_IT_ANY ) );
+      PHB_ITEM pItem = hb_itemClone( hb_param( 2, HB_IT_ANY ) );
 
-      if( s_cbs_var->data_cb )
-         hb_retni( mxmlSetUserData( node, s_cbs_var->data_cb ) );
+      if( pItem )
+         hb_retni( mxmlSetUserData( node, pItem ) );
    }
    else
       MXML_ERR_ARGS;
@@ -1407,8 +1506,8 @@ HB_FUNC( MXMLSETWRAPMARGIN )
 
 HB_FUNC( MXMLWALKNEXT )
 {
-   mxml_node_t *  node = mxml_node_param( 1 );
-   mxml_node_t *  top  = mxml_node_param( 2 );
+   mxml_node_t *  node  = mxml_node_param( 1 );
+   mxml_node_t *  top   = mxml_node_param( 2 );
 
    if( node && top )
    {
@@ -1425,8 +1524,8 @@ HB_FUNC( MXMLWALKNEXT )
 
 HB_FUNC( MXMLWALKPREV )
 {
-   mxml_node_t *  node = mxml_node_param( 1 );
-   mxml_node_t *  top  = mxml_node_param( 2 );
+   mxml_node_t *  node  = mxml_node_param( 1 );
+   mxml_node_t *  top   = mxml_node_param( 2 );
 
    if( node && top )
       mxml_node_ret( mxmlWalkPrev( node, top, hb_parnidef( 3, MXML_NO_DESCEND ) ), 0 );
@@ -1458,12 +1557,7 @@ static void custom_destroy_cb( void * Cargo )
    PHB_ITEM pItem = ( PHB_ITEM ) Cargo;
 
    if( pItem != NULL )
-   {
       hb_itemRelease( pItem );
-#ifdef HBMXML_USE_RAW_POINTER
-      s_custom_cbs_var->data_cb = NULL;
-#endif
-   }
 }
 
 /*
@@ -1475,9 +1569,9 @@ HB_FUNC( MXMLNEWCUSTOM )
 {
    if( hb_pcount() > 1 )
    {
-      PHB_ITEM       pItem  = hb_itemClone( hb_param( 2, HB_IT_ANY ) );
-      mxml_node_t *  parent = MXML_NO_PARENT;
-      mxml_node_t *  node   = NULL;
+      PHB_ITEM       pItem    = hb_itemClone( hb_param( 2, HB_IT_ANY ) );
+      mxml_node_t *  parent   = MXML_NO_PARENT;
+      mxml_node_t *  node     = NULL;
 
       if( HB_ISNIL( 1 ) || ( HB_ISNUM( 1 ) && hb_parni( 1 ) == MXML_NO_PARENT ) )
          node = mxmlNewCustom( MXML_NO_PARENT, pItem, custom_destroy_cb );
@@ -1511,16 +1605,16 @@ HB_FUNC( MXMLSETCUSTOM )
 
    if( node && hb_pcount() > 1 )
    {
-      int iResult;
+      int      iResult;
 
-      s_custom_cbs_var->data_cb = hb_itemClone( hb_param( 2, HB_IT_ANY ) );
+      PHB_ITEM pItem = hb_itemClone( hb_param( 2, HB_IT_ANY ) );
 
-      if( s_custom_cbs_var->data_cb )
+      if( pItem )
       {
-         iResult = mxmlSetCustom( node, s_custom_cbs_var->data_cb, custom_destroy_cb );
+         iResult = mxmlSetCustom( node, pItem, custom_destroy_cb );
 
          if( iResult < 0 )
-            hb_itemRelease( s_custom_cbs_var->data_cb );
+            hb_itemRelease( pItem );
 
          hb_retni( iResult );
       }
@@ -1535,14 +1629,12 @@ static int custom_load_cb( mxml_node_t * node, const char * data )
 {
    if( node != NULL && s_custom_cbs_var != NULL && data != NULL )
    {
-      PHB_ITEM pCallback = s_custom_cbs_var->load_cb;
-
-      if( pCallback && hb_vmRequestReenter() )
+      if( s_custom_cbs_var->load_cb && hb_vmRequestReenter() )
       {
          int iResult;
 
          hb_vmPushEvalSym();
-         hb_vmPush( pCallback );
+         hb_vmPush( s_custom_cbs_var->load_cb );
          mxml_node_push( node, 0 );
          hb_itemPutC( hb_stackAllocItem(), data );
 
@@ -1558,26 +1650,25 @@ static int custom_load_cb( mxml_node_t * node, const char * data )
 }
 
 /* ========== char * ( *mxml_custom_save_cb_t )( mxml_node_t  * ) =========== */
-
 static char * custom_save_cb( mxml_node_t * node )
 {
    if( node != NULL && s_custom_cbs_var != NULL )
    {
-      PHB_ITEM pCallback = s_custom_cbs_var->save_cb;
-
-      if( pCallback && hb_vmRequestReenter() )
+      if( s_custom_cbs_var->save_cb && hb_vmRequestReenter() )
       {
          char *         pszResult;
          const char *   pszText;
+         void *         hText;
 
          hb_vmPushEvalSym();
-         hb_vmPush( pCallback );
+         hb_vmPush( s_custom_cbs_var->save_cb );
          mxml_node_push( node, 0 );
 
          hb_vmSend( 1 );
 
-         pszText = hb_parc( -1 );
-         pszResult = pszText ? strdup( pszText ) : NULL;
+         pszText     = hb_parstr_utf8( -1, &hText, NULL );
+         pszResult   = pszText ? strdup( pszText ) : NULL;
+         hb_strfree( hText );
 
          hb_vmRequestRestore();
          return pszResult;
@@ -1598,10 +1689,12 @@ HB_FUNC( MXMLSETCUSTOMHANDLERS )
    {
       if( s_custom_cbs_var->load_cb )
          hb_itemRelease( s_custom_cbs_var->load_cb );
+
       s_custom_cbs_var->load_cb = hb_itemNew( pLoad );
 
       if( s_custom_cbs_var->save_cb )
          hb_itemRelease( s_custom_cbs_var->save_cb );
+
       s_custom_cbs_var->save_cb = hb_itemNew( pSave );
 
       mxmlSetCustomHandlers( custom_load_cb, custom_save_cb );
@@ -1644,8 +1737,8 @@ HB_FUNC( HB_MXMLGETATTRSARRAY )
 
    if( node && mxmlGetType( node ) == MXML_ELEMENT )
    {
-      PHB_ITEM       pAttrs = hb_itemArrayNew( 0 ),
-                     pAttr = hb_itemNew( NULL );
+      PHB_ITEM       pAttrs   = hb_itemArrayNew( 0 ),
+                     pAttr    = hb_itemNew( NULL );
       int            i;
       mxml_attr_t *  attr;
 
@@ -1655,8 +1748,8 @@ HB_FUNC( HB_MXMLGETATTRSARRAY )
       {
          hb_arrayNew( pAttr, 2 );
 
-         hb_arraySetC( pAttr, 1, attr->name );
-         hb_arraySetC( pAttr, 2, attr->value );
+         hb_arraySetStrUTF8( pAttr, 1, attr->name );
+         hb_arraySetStrUTF8( pAttr, 2, attr->value );
 
          hb_arrayAddForward( pAttrs, pAttr );
       }
@@ -1674,20 +1767,18 @@ HB_FUNC( HB_MXMLGETATTRS )
 
    if( node && mxmlGetType( node ) == MXML_ELEMENT )
    {
-      PHB_ITEM       pAttrs = hb_hashNew( hb_itemNew( NULL ) ),
-                     pKey   = NULL,
-                     pValue = NULL;
+      PHB_ITEM       pAttrs   = hb_hashNew( hb_itemNew( NULL ) ),
+                     pKey     = NULL,
+                     pValue   = NULL;
       int            i;
       mxml_attr_t *  attr;
-
-      // hb_hashSetFlags( pAttrs, HB_HASH_KEEPORDER );
 
       for( i = node->value.element.num_attrs, attr = node->value.element.attrs;
            i > 0;
            i--, attr++ )
       {
-         pKey = hb_itemPutC( pKey, attr->name );
-         pValue = hb_itemPutC( pValue, attr->value );
+         pKey     = hb_itemPutStrUTF8( pKey, attr->name );
+         pValue   = hb_itemPutStrUTF8( pValue, attr->value );
 
          hb_hashAdd( pAttrs, ULONG_MAX, pKey, pValue );
       }
@@ -1700,50 +1791,37 @@ HB_FUNC( HB_MXMLGETATTRS )
       MXML_ERR_ARGS;
 }
 
-static void hb_hbxmlInit ( void * cargo )
+static void hb_hbxmlInit( void * cargo )
 {
    HB_SYMBOL_UNUSED( cargo );
 
-   s_cbs_var        = (HB_CBS_VAR*) hb_xgrab(sizeof(HB_CBS_VAR));
-   s_custom_cbs_var = (HB_CUSTOM_CBS_VAR*) hb_xgrab(sizeof(HB_CUSTOM_CBS_VAR));
-   s_error_cb_var   = (HB_ERROR_CB_VAR*) hb_xgrab(sizeof(HB_ERROR_CB_VAR));
+   s_cbs_var                  = ( HB_CBS_VAR * ) hb_xgrab( sizeof( HB_CBS_VAR ) );
+   s_custom_cbs_var           = ( HB_CUSTOM_CBS_VAR * ) hb_xgrab( sizeof( HB_CUSTOM_CBS_VAR ) );
+   s_error_cb_var             = ( HB_ERROR_CB_VAR * ) hb_xgrab( sizeof( HB_ERROR_CB_VAR ) );
 
-   s_cbs_var->data_cb        = NULL;
-   s_cbs_var->type_cb        = NULL;
-   s_cbs_var->save_cb        = NULL;
-   s_cbs_var->sax_cb         = NULL;
+   s_cbs_var->type_cb         = NULL;
+   s_cbs_var->save_cb         = NULL;
+   s_cbs_var->sax_cb          = NULL;
 
-   s_custom_cbs_var->data_cb = NULL;
-   s_custom_cbs_var->load_cb = NULL;
-   s_custom_cbs_var->save_cb = NULL;
-   s_error_cb_var->error_cb  = NULL;
+   s_custom_cbs_var->load_cb  = NULL;
+   s_custom_cbs_var->save_cb  = NULL;
+   s_error_cb_var->error_cb   = NULL;
 }
 
-static void hb_hbxmlExit ( void * cargo )
+static void hb_hbxmlExit( void * cargo )
 {
    HB_SYMBOL_UNUSED( cargo );
 
-   if ( s_cbs_var )
-   {
-      if( s_cbs_var->data_cb )
-         hb_itemRelease( s_cbs_var->data_cb );
-
+   if( s_cbs_var )
       hb_xfree( s_cbs_var );
-   }
 
-   if ( s_custom_cbs_var )
+   if( s_custom_cbs_var )
    {
       if( s_custom_cbs_var->load_cb )
          hb_itemRelease( s_custom_cbs_var->load_cb );
 
       if( s_custom_cbs_var->save_cb )
          hb_itemRelease( s_custom_cbs_var->save_cb );
-
-#ifdef HBMXML_USE_RAW_POINTER
-      if( s_custom_cbs_var->data_cb )
-         hb_itemRelease( s_custom_cbs_var->data_cb );
-
-#endif
 
       hb_xfree( s_custom_cbs_var );
    }

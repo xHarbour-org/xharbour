@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-08 18:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbmxml/hbmxml.c
+    ! code clean-ups and applied unicode features
+
+  * utils/misc/hblib.c
+    + add functionality to "include" other list files
+
+  * winmake/dll.lst
+    ! remove RTL redundant object list, include rtl.lst instead
+      NOTE: we may perhaps consider to create a list for each lib project
+
 2012-11-07 22:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * utils/misc/hblib.c
     ! fixed: DMC command not receiving DEF file when passed
