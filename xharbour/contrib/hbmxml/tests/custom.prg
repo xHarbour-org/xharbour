@@ -13,14 +13,14 @@ PROCEDURE main()
    LOCAL tree, node
    LOCAL xData
 
-   mxmlSetErrorCallback( { | x | my_mxmlError( x ) } )
-   mxmlSetCustomHandlers( { | x, y | load_c( x, y ) }, { |x | save_c( x ) } )
+   mxmlSetErrorCallback( @my_mxmlError() )
+   mxmlSetCustomHandlers( @load_c(), @save_c() )
 
    IF ! hb_FileExists( "cust.xml" )
       create_cust()
    ENDIF
 
-   tree := mxmlLoadFile( tree, "cust.xml", { |x | type_cb( x ) } )
+   tree := mxmlLoadFile( tree, "cust.xml", @type_cb() )
 
    node := mxmlFindElement( tree, tree, "hash", NIL, NIL, MXML_DESCEND )
 
@@ -70,7 +70,7 @@ STATIC PROCEDURE create_cust()
    mxmlElementSetAttr( element, "type", "custom" )
    mxmlElementSetAttr( element, "checksum", hb_md5( _ENCODE( node ) ) )
 
-   mxmlSaveFile( tree, "cust.xml", { | x,y | whitespace_cb( x, y ) } )
+   mxmlSaveFile( tree, "cust.xml", @whitespace_cb() )
 
    RETURN
 

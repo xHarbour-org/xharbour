@@ -11,7 +11,7 @@ PROCEDURE main()
 
    LOCAL xml
 
-   mxmlSetErrorCallback( { | x | my_mxmlError( x ) } )
+   mxmlSetErrorCallback( @my_mxmlError() )
 
    IF hb_fileExists( "rem.xml" )
       xml := simplexml_load_file( "rem.xml" )
@@ -46,7 +46,7 @@ PROCEDURE my_mxmlError( cErrorMsg )
 
 STATIC FUNCTION simplexml_load_file( file )
 
-   RETURN mxmlLoadString( NIL, memoRead( file ), { |x| type_cb(x) } )
+   RETURN mxmlLoadString( NIL, memoRead( file ), @type_cb() )
 
 STATIC FUNCTION asXML( xml )
 

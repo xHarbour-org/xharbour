@@ -468,14 +468,14 @@ PROCEDURE _APPMain( cFileArg )
     */
 
    IF Left( cFileArg, 1 ) == "<"
-      hTree := mxmlLoadString( nil, cFileArg, { | x | type_cb( x ) } )
+      hTree := mxmlLoadString( nil, cFileArg, @type_cb() )
    ELSE
 
       /*
        * Read the file...
        */
 
-      hTree := mxmlLoadFile( nil, cFileArg, { | x | type_cb( x ) } )
+      hTree := mxmlLoadFile( nil, cFileArg, @type_cb() )
    ENDIF
 
    IF Empty( hTree )
@@ -511,14 +511,14 @@ PROCEDURE _APPMain( cFileArg )
     * Print the XML tree...
     */
    FErase( "out.xml" )
-   mxmlSaveFile( hTree, "out.xml", { | x, y | whitespace_cb( x, y ) } )
+   mxmlSaveFile( hTree, "out.xml", @whitespace_cb() )
 
    /* XXX: */
    /*
     * Save the XML tree to a string and print it...
     */
    cStr := Space( BUFFER_LEN )
-   nNum := mxmlSaveString( hTree, @cStr, { | x, y | whitespace_cb( x, y ) } )
+   nNum := mxmlSaveString( hTree, @cStr, @whitespace_cb() )
 
    IF ( nNum > 0 )
       OutStd( cStr + hb_osnewline() )
@@ -534,14 +534,14 @@ PROCEDURE _APPMain( cFileArg )
     */
 
    IF Left( cFileArg, 1 ) == "<"
-      mxmlSAXLoadString( nil, cFileArg, { | x | type_cb( x ) }, { | x, y, z | sax_cb( x, y, z ) }, nil )
+      mxmlSAXLoadString( nil, cFileArg, @type_cb(), @sax_cb(), nil )
    ELSE
 
       /*
        * Read the file...
        */
 
-      mxmlSAXLoadFile( nil, cFileArg, { | x | type_cb( x ) }, { | x, y, z | sax_cb( x, y, z ) }, nil )
+      mxmlSAXLoadFile( nil, cFileArg, @type_cb(), @sax_cb(), nil )
    ENDIF
 
    IF cFileArg == "test.xml"

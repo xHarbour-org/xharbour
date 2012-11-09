@@ -8,6 +8,21 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-10 02:55 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * utils/misc/hblib.c
+    ! upper -> lower, NULL -> 0
+
+  * include/hbcompat.h
+    + HB_ISPOINTER now defined
+
+  * contrib/hbmxml/hbmxml.c
+    ! callback functions now can be codeblock or pointer
+
+  * contrib/hbmxml/tests/reminder.prg
+  * contrib/hbmxml/tests/custom.prg
+  * contrib/hbmxml/tests/testmxml.prg
+    ! replaced callbacks: codeblock -> pointer
+
 2012-11-08 18:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbmxml/hbmxml.c
     ! code clean-ups and applied unicode features

@@ -61,6 +61,7 @@
 #include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <ctype.h>
 
 typedef enum
 {
@@ -116,12 +117,12 @@ static const char * file_ext( const char * filename )
    return dot + 1;
 }
 
-char * upper( char * pszText )
+static char * lower( char * pszText )
 {
    char * pszPos;
 
    for( pszPos = pszText; *pszPos; pszPos++ )
-      *pszPos = ( char ) toupper( ( char ) *pszPos );
+      *pszPos = ( char ) tolower( ( char ) *pszPos );
 
    return pszText;
 }
@@ -153,9 +154,9 @@ static void createfromlst( FILE * fList, FILE * h, char * szObjDir, int iComp, B
             char *   s;
 
             memset( inc, 0, 256 );
-            memcpy( inc, upper( string ), strlen( string ) );
+            memcpy( inc, lower( string ), strlen( string ) );
 
-            s = strstr( inc, "INCLUDE" );
+            s = strstr( inc, "include" );
 
             if( s && *s )
             {
@@ -239,19 +240,19 @@ int main( int argc, char * argv[] )
       int            iComp       = 0;
       BOOL           bDll        = FALSE;
       BOOL           bIsDef      = FALSE;
-      const char *   szFileExt   = upper( ( char * ) file_ext( ( const char * ) argv[ 5 ] ) );
+      const char *   szFileExt   = lower( ( char * ) file_ext( ( const char * ) argv[ 5 ] ) );
       char *         szLibs;
 
       if( argc >= 7 && argv[ 7 ] )
       {
-         const char * szDLL = upper( argv[ 7 ] );
-         bDll = ( strcmp( szDLL, "DLL" ) == NULL );
+         const char * szDLL = lower( argv[ 7 ] );
+         bDll = ( strcmp( szDLL, "dll" ) == 0 );
       }
 
       if( bDll && argc >= 8 && argv[ 8 ] )
       {
-         const char * szDef = upper( ( char * ) file_ext( ( const char * ) argv[ 8 ] ) );
-         bIsDef = ( strcmp( szDef, "DEF" ) == NULL );
+         const char * szDef = lower( ( char * ) file_ext( ( const char * ) argv[ 8 ] ) );
+         bIsDef = ( strcmp( szDef, "def" ) == 0 );
       }
 
       *szRsp = 0;
@@ -264,12 +265,12 @@ int main( int argc, char * argv[] )
          exit( EXIT_FAILURE );
       }
 
-      if( strcmp( argv[ 1 ], "__BORLANDC__" ) == NULL )
+      if( strcmp( argv[ 1 ], "__BORLANDC__" ) == 0 )
       {
          szLibs   = "cw32mt.lib import32.lib ws2_32.lib";
          iComp    = BORLANDC;
       }
-      else if( strcmp( argv[ 1 ], "__DMC__" ) == NULL )
+      else if( strcmp( argv[ 1 ], "__DMC__" ) == 0 )
       {
          szLibs   = "";
          iComp    = DMC;
@@ -294,12 +295,13 @@ int main( int argc, char * argv[] )
             fprintf( h, "%s", "c0d32.obj " );
       }
 
-      if( strcmp( szFileExt, "LST" ) == NULL )
+      if( strcmp( szFileExt, "lst" ) == 0 )
       {
          FILE * fList = fopen( argv[ 5 ], "r" );
 
          if( ! fList )
          {
+            printf( "Error: Unable to open %s\n", argv[ 5 ] );
             DeleteFile( szRsp );
             exit( EXIT_FAILURE );
          }

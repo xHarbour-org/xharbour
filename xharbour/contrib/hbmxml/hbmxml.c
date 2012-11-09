@@ -56,6 +56,7 @@
 #include "hbapistr.h"
 #include "hbstack.h"
 #include "hbvm.h"
+#include "hbvmpub.h"
 #include "hashapi.h"
 
 #include "mxml.h"
@@ -644,27 +645,40 @@ HB_FUNC( MXMLINDEXRESET )
       MXML_ERR_ARGS;
 }
 
+static void mxml_do( PHB_ITEM pItem, USHORT u )
+{
+   if( HB_IS_POINTER( pItem ) )
+      hb_vmDo( u );
+   else
+      hb_vmSend( u );
+}
+
 /* ============== mxml_type_t type_cb( mxml_node_t * node ) ================= */
 
 static mxml_type_t type_cb( mxml_node_t * node )
 {
-   if( s_cbs_var != NULL )
+   if( s_cbs_var->type_cb )
    {
-      if( s_cbs_var->type_cb && hb_vmRequestReenter() )
-      {
-         int iResult;
+      int iResult;
 
+      if( HB_IS_POINTER( s_cbs_var->type_cb ) )
+      {
+         hb_vmPushSymbol( ( PHB_SYMB ) s_cbs_var->type_cb->item.asPointer.value );
+         hb_vmPushNil();
+      }
+      else if( HB_IS_BLOCK( s_cbs_var->type_cb ) )
+      {
          hb_vmPushEvalSym();
          hb_vmPush( s_cbs_var->type_cb );
-         mxml_node_push( node, 0 );
-         hb_vmSend( 1 );
-
-         iResult = hb_parnidef( -1, MXML_TEXT );
-
-         hb_vmRequestRestore();
-         return ( mxml_type_t ) iResult;
       }
+
+      mxml_node_push( node, 0 );
+      mxml_do( s_cbs_var->type_cb, 1 );
+
+      iResult = hb_parnidef( -1, MXML_TEXT );
+      return ( mxml_type_t ) iResult;
    }
+
    return MXML_TEXT;
 }
 
@@ -689,9 +703,9 @@ HB_FUNC( MXMLLOADFILE )
       }
    }
 
-   if( HB_ISBLOCK( 3 ) )
+   if( HB_ISBLOCK( 3 ) || HB_ISPOINTER( 3 ) )
    {
-      s_cbs_var->type_cb   = hb_param( 3, HB_IT_BLOCK );
+      s_cbs_var->type_cb   = hb_param( 3, HB_IT_BLOCK | HB_IT_POINTER );
       cb                   = type_cb;
    }
    else if( HB_ISNUM( 3 ) )
@@ -748,9 +762,9 @@ HB_FUNC( MXMLLOADSTRING )
       }
    }
 
-   if( HB_ISBLOCK( 3 ) )
+   if( HB_ISBLOCK( 3 ) || HB_ISPOINTER( 3 ) )
    {
-      s_cbs_var->type_cb   = hb_param( 3, HB_IT_BLOCK );
+      s_cbs_var->type_cb   = hb_param( 3, HB_IT_BLOCK | HB_IT_POINTER );
       cb                   = type_cb;
    }
    else if( HB_ISNUM( 3 ) )
@@ -1022,26 +1036,31 @@ HB_FUNC( MXMLRETAIN )
 
 static void sax_cb( mxml_node_t * node, mxml_sax_event_t event, void * data )
 {
-   if( node != NULL && s_cbs_var != NULL )
+   if( node != NULL )
    {
-      if( s_cbs_var->sax_cb && hb_vmRequestReenter() )
-      {
-         HB_USHORT uPCount = 2;
+      HB_USHORT uPCount = 2;
 
+      if( HB_IS_POINTER( s_cbs_var->sax_cb ) )
+      {
+         hb_vmPushSymbol( ( PHB_SYMB ) s_cbs_var->sax_cb->item.asPointer.value );
+         hb_vmPushNil();
+      }
+      else if( HB_IS_BLOCK( s_cbs_var->sax_cb ) )
+      {
          hb_vmPushEvalSym();
          hb_vmPush( s_cbs_var->sax_cb );
-         mxml_node_push( node, 0 );
-         hb_vmPushInteger( ( int ) ( event + 1 ) );
-
-         if( data != NULL )
-         {
-            hb_vmPush( ( PHB_ITEM ) data );
-            uPCount++;
-         }
-         hb_vmSend( uPCount );
-
-         hb_vmRequestRestore();
       }
+
+      mxml_node_push( node, 0 );
+      hb_vmPushInteger( ( int ) ( event + 1 ) );
+
+      if( data != NULL )
+      {
+         hb_vmPush( ( PHB_ITEM ) data );
+         uPCount++;
+      }
+
+      mxml_do( s_cbs_var->sax_cb, uPCount );
    }
 }
 
@@ -1078,9 +1097,9 @@ HB_FUNC( MXMLSAXLOADFILE )
       }
    }
 
-   if( HB_ISBLOCK( 3 ) )
+   if( HB_ISBLOCK( 3 ) || HB_ISPOINTER( 3 ) )
    {
-      s_cbs_var->type_cb   = hb_param( 3, HB_IT_BLOCK );
+      s_cbs_var->type_cb   = hb_param( 3, HB_IT_BLOCK | HB_IT_POINTER );
       cb                   = type_cb;
    }
    else if( HB_ISNUM( 3 ) )
@@ -1097,9 +1116,9 @@ HB_FUNC( MXMLSAXLOADFILE )
       }
    }
 
-   if( HB_ISBLOCK( 4 ) )
+   if( HB_ISBLOCK( 4 ) || HB_ISPOINTER( 4 ) )
    {
-      s_cbs_var->sax_cb = hb_param( 4, HB_IT_BLOCK );
+      s_cbs_var->sax_cb = hb_param( 4, HB_IT_BLOCK | HB_IT_POINTER );
       cb_sax            = sax_cb;
    }
 
@@ -1151,9 +1170,9 @@ HB_FUNC( MXMLSAXLOADSTRING )
       }
    }
 
-   if( HB_ISBLOCK( 3 ) )
+   if( HB_ISBLOCK( 3 ) || HB_ISPOINTER( 3 ) )
    {
-      s_cbs_var->type_cb   = hb_param( 3, HB_IT_BLOCK );
+      s_cbs_var->type_cb   = hb_param( 3, HB_IT_BLOCK | HB_IT_POINTER );
       cb                   = type_cb;
    }
    else if( HB_ISNUM( 3 ) )
@@ -1170,9 +1189,9 @@ HB_FUNC( MXMLSAXLOADSTRING )
       }
    }
 
-   if( HB_ISBLOCK( 4 ) )
+   if( HB_ISBLOCK( 4 ) || HB_ISPOINTER( 4 ) )
    {
-      s_cbs_var->sax_cb = hb_param( 4, HB_IT_BLOCK );
+      s_cbs_var->sax_cb = hb_param( 4, HB_IT_BLOCK | HB_IT_POINTER );
       cb_sax            = sax_cb;
    }
 
@@ -1194,26 +1213,32 @@ HB_FUNC( MXMLSAXLOADSTRING )
 /* ======== const char *(*mxml_save_cb_t)(mxml_node_t *, int) =========== */
 static const char * save_cb( mxml_node_t * node, int where )
 {
-   if( node != NULL && s_cbs_var != NULL )
+   if( node != NULL )
    {
-      if( s_cbs_var->save_cb )
-      {
-         const char *   pszResult;
-         void *         hText;
+      const char *   pszResult;
+      void *         hText;
 
+      if( HB_IS_POINTER( s_cbs_var->save_cb ) )
+      {
+         hb_vmPushSymbol( ( PHB_SYMB ) s_cbs_var->save_cb->item.asPointer.value );
+         hb_vmPushNil();
+      }
+      else if( HB_IS_BLOCK( s_cbs_var->save_cb ) )
+      {
          hb_vmPushEvalSym();
          hb_vmPush( s_cbs_var->save_cb );
-         mxml_node_push( node, 0 );
-         hb_vmPushInteger( where );
-         hb_vmSend( 2 );
-
-         pszResult = hb_itemGetStrUTF8( hb_param( -1, HB_IT_ANY ), &hText, NULL );
-
-         if( hText )
-            hb_strfree( hText );
-
-         return pszResult;
       }
+
+      mxml_node_push( node, 0 );
+      hb_vmPushInteger( where );
+      mxml_do( s_cbs_var->save_cb, 2 );
+
+      pszResult = hb_itemGetStrUTF8( hb_param( -1, HB_IT_ANY ), &hText, NULL );
+
+      if( hText )
+         hb_strfree( hText );
+
+      return pszResult;
    }
    return NULL;
 }
@@ -1230,9 +1255,9 @@ HB_FUNC( MXMLSAVEALLOCSTRING )
       char           buffer[ BUFFER_SIZE ];
       int            bytes;
 
-      if( HB_ISBLOCK( 2 ) )
+      if( HB_ISBLOCK( 2 ) || HB_ISPOINTER( 2 ) )
       {
-         s_cbs_var->save_cb   = hb_param( 2, HB_IT_BLOCK );
+         s_cbs_var->save_cb   = hb_param( 2, HB_IT_BLOCK | HB_IT_POINTER );
          cb                   = save_cb;
       }
 
@@ -1270,9 +1295,9 @@ HB_FUNC( MXMLSAVEFILE )
    {
       mxml_save_cb_t cb = MXML_NO_CALLBACK;
 
-      if( HB_ISBLOCK( 3 ) )
+      if( HB_ISBLOCK( 3 ) || HB_ISPOINTER( 3 ) )
       {
-         s_cbs_var->save_cb   = hb_param( 3, HB_IT_BLOCK );
+         s_cbs_var->save_cb   = hb_param( 3, HB_IT_BLOCK | HB_IT_POINTER );
          cb                   = save_cb;
       }
 
@@ -1315,9 +1340,9 @@ HB_FUNC( MXMLSAVESTRING )
 
          if( hb_itemGetWriteCL( pBuffer, &buffer, &buffer_size ) )
          {
-            if( HB_ISBLOCK( 3 ) )
+            if( HB_ISBLOCK( 3 ) || HB_ISPOINTER( 3 ) )
             {
-               s_cbs_var->save_cb   = hb_param( 3, HB_IT_BLOCK );
+               s_cbs_var->save_cb   = hb_param( 3, HB_IT_BLOCK | HB_IT_POINTER );
                cb                   = save_cb;
             }
 
@@ -1380,21 +1405,26 @@ static void error_cb( const char * pszErrorMsg )
 {
    if( s_error_cb_var != NULL )
    {
-      if( s_error_cb_var->error_cb && hb_vmRequestReenter() )
+      if( HB_IS_POINTER( s_error_cb_var->error_cb ) )
+      {
+         hb_vmPushSymbol( ( PHB_SYMB ) s_error_cb_var->error_cb->item.asPointer.value );
+         hb_vmPushNil();
+      }
+      else if( HB_IS_BLOCK( s_error_cb_var->error_cb ) )
       {
          hb_vmPushEvalSym();
          hb_vmPush( s_error_cb_var->error_cb );
-         hb_itemPutC( hb_stackAllocItem(), pszErrorMsg );
-
-         hb_vmSend( 1 );
-         hb_vmRequestRestore();
       }
+
+      hb_itemPutC( hb_stackAllocItem(), pszErrorMsg );
+
+      mxml_do( s_error_cb_var->error_cb, 1 );
    }
 }
 
 HB_FUNC( MXMLSETERRORCALLBACK )
 {
-   PHB_ITEM pError = hb_param( 1, HB_IT_BLOCK );
+   PHB_ITEM pError = hb_param( 1, HB_IT_BLOCK | HB_IT_POINTER );
 
    if( pError )
    {
@@ -1629,22 +1659,27 @@ static int custom_load_cb( mxml_node_t * node, const char * data )
 {
    if( node != NULL && s_custom_cbs_var != NULL && data != NULL )
    {
-      if( s_custom_cbs_var->load_cb && hb_vmRequestReenter() )
-      {
-         int iResult;
+      int iResult;
 
+      if( HB_IS_POINTER( s_custom_cbs_var->load_cb ) )
+      {
+         hb_vmPushSymbol( ( PHB_SYMB ) s_custom_cbs_var->load_cb->item.asPointer.value );
+         hb_vmPushNil();
+      }
+      else if( HB_IS_BLOCK( s_custom_cbs_var->load_cb ) )
+      {
          hb_vmPushEvalSym();
          hb_vmPush( s_custom_cbs_var->load_cb );
-         mxml_node_push( node, 0 );
-         hb_itemPutC( hb_stackAllocItem(), data );
-
-         hb_vmSend( 2 );
-
-         iResult = hb_parnidef( -1, 1 );
-
-         hb_vmRequestRestore();
-         return iResult;
       }
+
+      mxml_node_push( node, 0 );
+      hb_itemPutC( hb_stackAllocItem(), data );
+      mxml_do( s_custom_cbs_var->load_cb, 2 );
+
+      iResult = hb_parnidef( -1, 1 );
+
+      return iResult;
+
    }
    return 1;
 }
@@ -1654,25 +1689,29 @@ static char * custom_save_cb( mxml_node_t * node )
 {
    if( node != NULL && s_custom_cbs_var != NULL )
    {
-      if( s_custom_cbs_var->save_cb && hb_vmRequestReenter() )
-      {
-         char *         pszResult;
-         const char *   pszText;
-         void *         hText;
+      char *         pszResult;
+      const char *   pszText;
+      void *         hText;
 
+      if( HB_IS_POINTER( s_custom_cbs_var->save_cb ) )
+      {
+         hb_vmPushSymbol( ( PHB_SYMB ) s_custom_cbs_var->save_cb->item.asPointer.value );
+         hb_vmPushNil();
+      }
+      else if( HB_IS_BLOCK( s_custom_cbs_var->save_cb ) )
+      {
          hb_vmPushEvalSym();
          hb_vmPush( s_custom_cbs_var->save_cb );
-         mxml_node_push( node, 0 );
-
-         hb_vmSend( 1 );
-
-         pszText     = hb_parstr_utf8( -1, &hText, NULL );
-         pszResult   = pszText ? strdup( pszText ) : NULL;
-         hb_strfree( hText );
-
-         hb_vmRequestRestore();
-         return pszResult;
       }
+
+      mxml_node_push( node, 0 );
+      mxml_do( s_custom_cbs_var->save_cb, 1 );
+
+      pszText     = hb_parstr_utf8( -1, &hText, NULL );
+      pszResult   = pszText ? strdup( pszText ) : NULL;
+      hb_strfree( hText );
+
+      return pszResult;
    }
    return NULL;
 }
@@ -1682,8 +1721,8 @@ static char * custom_save_cb( mxml_node_t * node )
 
 HB_FUNC( MXMLSETCUSTOMHANDLERS )
 {
-   PHB_ITEM pLoad = hb_param( 1, HB_IT_BLOCK ),
-            pSave = hb_param( 2, HB_IT_BLOCK );
+   PHB_ITEM pLoad = hb_param( 1, HB_IT_BLOCK | HB_IT_POINTER ),
+            pSave = hb_param( 2, HB_IT_BLOCK | HB_IT_POINTER );
 
    if( pLoad && pSave )
    {
