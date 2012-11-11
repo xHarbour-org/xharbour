@@ -58,21 +58,21 @@
 /*XXencode support*/
 
 /*
-HB_XXENCODE(string) -> string
+   HB_XXENCODE(string) -> string
       Encodes string to XXencode (some mail/news software used)
    Parameters:
       string  - source character string
    Returns:
       XXencoded string
 
-HB_XXDECODE(xx_string) -> string
+   HB_XXDECODE(xx_string) -> string
       Decodes string from XXencode
    Parameters:
       xx_string  - XXencode encoded string
    Returns:
       decoded string
 
-XXDECODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
+   XXDECODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
    Description:
       XXDecode a given
    Parameters:
@@ -82,35 +82,35 @@ XXDECODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
       cFileOutput = output filename
    Returns:
       Upon succesful decoding the function returns numnber of bytes written
-*/
+ */
 #include "hbcc.h"
-#define UU_STR_LEN 60
-#define UE_STR_LEN 45
+#define UU_STR_LEN   60
+#define UE_STR_LEN   45
 
-static BYTE *eolchars=(BYTE*) "\r\n";
-static BYTE *xxechars=(BYTE*) "+-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-static ULONG int_xxenc(BYTE *,ULONG,BYTE *);
-static ULONG int_xxdec(BYTE *,ULONG,BYTE *);
-static BYTE int_xxbyte(BYTE);
-static BYTE int_xxbval(BYTE);
+static BYTE *  eolchars = ( BYTE * ) "\r\n";
+static BYTE *  xxechars = ( BYTE * ) "+-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+static ULONG int_xxenc( BYTE *, ULONG, BYTE * );
+static ULONG int_xxdec( BYTE *, ULONG, BYTE * );
+static BYTE int_xxbyte( BYTE );
+static BYTE int_xxbval( BYTE );
 
 HB_FUNC( XXDECODE_FILE )
 {
-   PHB_ITEM pinFile = hb_param( 1, HB_IT_ANY );
+   PHB_ITEM pinFile  = hb_param( 1, HB_IT_ANY );
    PHB_ITEM poutFile = hb_param( 2, HB_IT_STRING );
-   FILE *inFile, *outFile=NULL;
-   char *string, *szFileName;
-   ULONG srclen, dstlen, nBytesWritten = 0;
-   BYTE *dststr;
-   HB_ITEM Struct, Item;
-   USHORT uiLen = 1, uiCount;
-   BOOL bOutFile = FALSE;
+   FILE *   inFile, * outFile = NULL;
+   char *   string, * szFileName;
+   ULONG    srclen, dstlen, nBytesWritten = 0;
+   BYTE *   dststr;
+   HB_ITEM  Struct, Item;
+   USHORT   uiLen    = 1, uiCount;
+   BOOL     bOutFile = FALSE;
 
    if( pinFile )
    {
-      if ( ISCHAR( 1 ) )
+      if( ISCHAR( 1 ) )
       {
-         if ( strlen( pinFile->item.asString.value ) == 0 )
+         if( strlen( pinFile->item.asString.value ) == 0 )
          {
             hb_retni( -1 );
             return;
@@ -118,19 +118,19 @@ HB_FUNC( XXDECODE_FILE )
          else
          {
             Struct.type = HB_IT_NIL;
-            Item.type = HB_IT_NIL;
+            Item.type   = HB_IT_NIL;
             hb_arrayNew( &Struct, 1 );
             hb_arraySet( &Struct, 1, hb_itemPutC( &Item, pinFile->item.asString.value ) );
             hb_itemClear( &Item );
          }
       }
-      else if ( ISARRAY( 1 ) )
+      else if( ISARRAY( 1 ) )
       {
          Struct.type = HB_IT_NIL;
-         hb_itemCopy( &Struct, hb_param( 1, HB_IT_ARRAY ));
-         uiLen = (USHORT) Struct.item.asArray.value->ulLen;
+         hb_itemCopy( &Struct, hb_param( 1, HB_IT_ARRAY ) );
+         uiLen       = ( USHORT ) Struct.item.asArray.value->ulLen;
 
-         if ( uiLen <= 0 )
+         if( uiLen <= 0 )
          {
             hb_itemClear( &Struct );
             hb_retni( -2 );
@@ -149,9 +149,9 @@ HB_FUNC( XXDECODE_FILE )
       return;
    }
 
-   if ( poutFile )
+   if( poutFile )
    {
-      if ( strlen(poutFile->item.asString.value) == 0 )
+      if( strlen( poutFile->item.asString.value ) == 0 )
       {
          hb_itemClear( &Struct );
          hb_retni( -5 );
@@ -159,13 +159,13 @@ HB_FUNC( XXDECODE_FILE )
       }
    }
 
-   string = (char*) hb_xgrab( SHRT_MAX );
+   string = ( char * ) hb_xgrab( SHRT_MAX );
 
-   for ( uiCount = 0; uiCount < uiLen; uiCount++ )
+   for( uiCount = 0; uiCount < uiLen; uiCount++ )
    {
       szFileName = hb_arrayGetC( &Struct, uiCount + 1 );
 
-      if ( !szFileName )
+      if( ! szFileName )
       {
          hb_itemClear( &Struct );
          hb_xfree( string );
@@ -173,7 +173,7 @@ HB_FUNC( XXDECODE_FILE )
          return;
       }
 
-      if ( strlen( szFileName ) == 0 )
+      if( strlen( szFileName ) == 0 )
       {
          hb_itemClear( &Struct );
          hb_xfree( szFileName );
@@ -184,7 +184,7 @@ HB_FUNC( XXDECODE_FILE )
 
       inFile = hb_fopen( szFileName, "rb" );
 
-      if ( !inFile )
+      if( ! inFile )
       {
          hb_itemClear( &Struct );
          hb_xfree( szFileName );
@@ -193,24 +193,24 @@ HB_FUNC( XXDECODE_FILE )
          return;
       }
 
-      while ( hbcc_file_read ( inFile, string ) )
+      while( hbcc_file_read( inFile, string ) )
       {
-         if ( string )
+         if( string )
          {
-            if ( strstr ( string ,"end" ) != NULL )
+            if( strstr( string, "end" ) != NULL )
             {
                continue;
             }
 
-            if ( !bOutFile )
+            if( ! bOutFile )
             {
-               if ( poutFile )
+               if( poutFile )
                {
-                  if ( strstr ( string ,"begin 6" ) != NULL )
+                  if( strstr( string, "begin 6" ) != NULL )
                   {
                      outFile = hb_fopen( poutFile->item.asString.value, "wb" );
 
-                     if ( !outFile )
+                     if( ! outFile )
                      {
                         break;
                      }
@@ -225,16 +225,16 @@ HB_FUNC( XXDECODE_FILE )
                }
                else
                {
-                  if ( strstr ( string ,"begin 6" ) != NULL )
+                  if( strstr( string, "begin 6" ) != NULL )
                   {
-                     char *szFile ;
+                     char * szFile;
                      szFile = string + 10;
 
                      if( szFile )
                      {
                         outFile = hb_fopen( szFile, "wb" );
 
-                        if ( outFile )
+                        if( outFile )
                         {
                            bOutFile = TRUE;
                            continue;
@@ -248,26 +248,26 @@ HB_FUNC( XXDECODE_FILE )
                }
             } // end if ( !bOutFile )
 
-            srclen = (ULONG)strlen( string );
-            dstlen = int_xxdec((BYTE*) string,srclen,NULL);
-            if ( dstlen )
+            srclen   = ( ULONG ) strlen( string );
+            dstlen   = int_xxdec( ( BYTE * ) string, srclen, NULL );
+            if( dstlen )
             {
-               dststr = (BYTE *) hb_xgrab(dstlen);
-               int_xxdec((BYTE*) string,srclen,dststr);
+               dststr = ( BYTE * ) hb_xgrab( dstlen );
+               int_xxdec( ( BYTE * ) string, srclen, dststr );
 
-               if ( bOutFile )
+               if( bOutFile )
                {
-                  nBytesWritten += (ULONG) fwrite( dststr, sizeof(BYTE), dstlen, outFile );
+                  nBytesWritten += ( ULONG ) fwrite( dststr, sizeof( BYTE ), dstlen, outFile );
                }
 
-               hb_xfree(dststr);
+               hb_xfree( dststr );
             }
          }
       }
 
       fclose( inFile );
 
-      if ( szFileName )
+      if( szFileName )
       {
          hb_xfree( szFileName );
       }
@@ -283,28 +283,28 @@ HB_FUNC( XXDECODE_FILE )
 
 }
 
-HB_FUNC ( XXENCODE_FILE_BY_CHUNK )
+HB_FUNC( XXENCODE_FILE_BY_CHUNK )
 {
-   PHB_ITEM pInFile  = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pLine = hb_param( 2, HB_IT_NUMERIC );
-   PHB_ITEM pOutFile = hb_param( 3, HB_IT_STRING );
-   PHB_FNAME pFileName = NULL;
-   ULONG nSize,i=0, ulLine, ulDecoded = 0;
-   FILE *infile, *OutFile;
-   int c1, c2, c3;
-   int iPart = 1;
-   const char *szFileName, *cMask;
-   char szDestFile[ HB_PATH_MAX ] ;
+   PHB_ITEM       pInFile     = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM       pLine       = hb_param( 2, HB_IT_NUMERIC );
+   PHB_ITEM       pOutFile    = hb_param( 3, HB_IT_STRING );
+   PHB_FNAME      pFileName   = NULL;
+   ULONG          nSize, i = 0, ulLine, ulDecoded = 0;
+   FILE *         infile, * OutFile;
+   int            c1, c2, c3;
+   int            iPart = 1;
+   const char *   szFileName, * cMask;
+   char           szDestFile[ HB_PATH_MAX ];
 
-   if ( !pInFile )
+   if( ! pInFile )
    {
       hb_retni( -1 );
       return;
    }
 
-   szFileName = (char*) hbcc_getfilename( (BYTE*) pInFile->item.asString.value );
+   szFileName = ( char * ) hbcc_getfilename( ( BYTE * ) pInFile->item.asString.value );
 
-   if ( strlen( pInFile->item.asString.value ) == 0 || strlen ( szFileName ) == 0 )
+   if( strlen( pInFile->item.asString.value ) == 0 || strlen( szFileName ) == 0 )
    {
       hb_retni( -1 );
       return;
@@ -312,7 +312,7 @@ HB_FUNC ( XXENCODE_FILE_BY_CHUNK )
 
    infile = hb_fopen( pInFile->item.asString.value, "rb" );
 
-   if ( !infile )
+   if( ! infile )
    {
       hb_retni( -1 );
       return;
@@ -327,7 +327,7 @@ HB_FUNC ( XXENCODE_FILE_BY_CHUNK )
    else
    {
       ulLine = hb_parnl( 2 );
-      if ( ulLine <= 0 )
+      if( ulLine <= 0 )
       {
          fclose( infile );
          hb_retni( -4 );
@@ -339,9 +339,9 @@ HB_FUNC ( XXENCODE_FILE_BY_CHUNK )
    nSize = ftell( infile );
    fseek( infile, 0L, SEEK_SET );
 
-   if ( pOutFile )
+   if( pOutFile )
    {
-      if ( strlen ( pOutFile->item.asString.value ) == 0 )
+      if( strlen( pOutFile->item.asString.value ) == 0 )
       {
          fclose( infile );
          hb_retni( -2 );
@@ -351,98 +351,98 @@ HB_FUNC ( XXENCODE_FILE_BY_CHUNK )
    }
    else
    {
-      pFileName = hb_fsFNameSplit(pInFile->item.asString.value);
-      cMask = pFileName->szName;
+      pFileName   = hb_fsFNameSplit( pInFile->item.asString.value );
+      cMask       = pFileName->szName;
    }
 
    hb_snprintf( szDestFile, sizeof( szDestFile ), "%s%02d%s", cMask, iPart, ".xxe" );
 
    OutFile = hb_fopen( szDestFile, "wb" );
 
-   if ( !OutFile )
+   if( ! OutFile )
    {
-      if ( pFileName != NULL )
+      if( pFileName != NULL )
       {
          hb_xfree( pFileName );
       }
       hb_retni( -3 );
       fclose( infile );
-      return ;
+      return;
    }
 
    fprintf( OutFile, "begin 644 %s\n", szFileName );
 
-   while ((c1 = getc(infile)) != EOF)
+   while( ( c1 = getc( infile ) ) != EOF )
    {
-      if ( i % UE_STR_LEN == 0 )
+      if( i % UE_STR_LEN == 0 )
       {
-         if ( i )
+         if( i )
          {
             putc( '\n', OutFile );
          }
 
-         if ( ++ ulDecoded == ulLine )
+         if( ++ulDecoded == ulLine )
          {
-            iPart ++;
-            ulDecoded = 0;
+            iPart++;
+            ulDecoded   = 0;
             fclose( OutFile );
             hb_snprintf( szDestFile, sizeof( szDestFile ), "%s%02d%s", cMask, iPart, ".xxe" );
-            OutFile = hb_fopen( szDestFile, "wb" );
-            if ( (nSize-i) > UE_STR_LEN )
+            OutFile     = hb_fopen( szDestFile, "wb" );
+            if( ( nSize - i ) > UE_STR_LEN )
             {
-               putc(int_xxbyte(UE_STR_LEN),OutFile);
+               putc( int_xxbyte( UE_STR_LEN ), OutFile );
             }
             else
             {
-               putc(int_xxbyte((BYTE)(nSize-i)),OutFile);
+               putc( int_xxbyte( ( BYTE ) ( nSize - i ) ), OutFile );
             }
          }
          else
          {
-            if ( (nSize-i) > UE_STR_LEN )
+            if( ( nSize - i ) > UE_STR_LEN )
             {
-               putc(int_xxbyte(UE_STR_LEN),OutFile);
+               putc( int_xxbyte( UE_STR_LEN ), OutFile );
             }
             else
             {
-               putc(int_xxbyte((BYTE)(nSize-i)),OutFile);
+               putc( int_xxbyte( ( BYTE ) ( nSize - i ) ), OutFile );
             }
          }
       }
 
-      putc( int_xxbyte((c1&0xFC)>>2), OutFile );
+      putc( int_xxbyte( ( c1 & 0xFC ) >> 2 ), OutFile );
 
-      ++ i;
+      ++i;
       c2 = getc( infile );
 
-      if ( c2 == EOF )
+      if( c2 == EOF )
       {
-         putc( int_xxbyte((c1&0x03)<<4),OutFile);
-         putc( int_xxbyte(0),OutFile);
-         putc( int_xxbyte(0),OutFile);
+         putc( int_xxbyte( ( c1 & 0x03 ) << 4 ), OutFile );
+         putc( int_xxbyte( 0 ), OutFile );
+         putc( int_xxbyte( 0 ), OutFile );
          break;
       }
 
-      putc( int_xxbyte(((c1&0x03)<<4)|((c2&0xF0)>>4)),OutFile);
+      putc( int_xxbyte( ( ( c1 & 0x03 ) << 4 ) | ( ( c2 & 0xF0 ) >> 4 ) ), OutFile );
 
-      ++ i;
+      ++i;
       c3 = getc( infile );
 
-      if ( c3 == EOF )
+      if( c3 == EOF )
       {
-         putc( int_xxbyte((c2&0x0F)<<2),OutFile);
-         putc( int_xxbyte(0),OutFile);
+         putc( int_xxbyte( ( c2 & 0x0F ) << 2 ), OutFile );
+         putc( int_xxbyte( 0 ), OutFile );
          break;
       }
 
-      putc(int_xxbyte(((c2&0x0F)<<2)|((c3&0xC0)>>6)),OutFile);
-      putc(int_xxbyte(c3&0x3F),OutFile);
+      putc( int_xxbyte( ( ( c2 & 0x0F ) << 2 ) | ( ( c3 & 0xC0 ) >> 6 ) ), OutFile );
+      putc( int_xxbyte( c3 & 0x3F ), OutFile );
 
-      ++ i;
+      ++i;
    }
 
    putc( '\n', OutFile );
-   putc(int_xxbyte('\0'),OutFile);
+   putc( int_xxbyte( '\0' ), OutFile );
    putc( '\n', OutFile );
 
    fprintf( OutFile, "end\n" );
@@ -450,34 +450,34 @@ HB_FUNC ( XXENCODE_FILE_BY_CHUNK )
    fclose( infile );
    fclose( OutFile );
 
-   hb_retni(0);
+   hb_retni( 0 );
 
-   if ( pFileName != NULL )
+   if( pFileName != NULL )
    {
       hb_xfree( pFileName );
    }
 }
 
-HB_FUNC ( XXENCODE_FILE )
+HB_FUNC( XXENCODE_FILE )
 {
-   PHB_ITEM pInFile  = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pOutFile = hb_param( 2, HB_IT_STRING );
-   PHB_FNAME pFileName ;
-   ULONG nSize,i=0;
-   FILE *infile, *OutFile;
-   int c1, c2, c3;
-   char *szFileName;
-   char szDestFile[ HB_PATH_MAX ] ;
+   PHB_ITEM    pInFile  = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM    pOutFile = hb_param( 2, HB_IT_STRING );
+   PHB_FNAME   pFileName;
+   ULONG       nSize, i = 0;
+   FILE *      infile, * OutFile;
+   int         c1, c2, c3;
+   char *      szFileName;
+   char        szDestFile[ HB_PATH_MAX ];
 
-   if ( !pInFile )
+   if( ! pInFile )
    {
       hb_retni( -1 );
       return;
    }
 
-   szFileName = (char*) hbcc_getfilename( (BYTE*) pInFile->item.asString.value );
+   szFileName = ( char * ) hbcc_getfilename( ( BYTE * ) pInFile->item.asString.value );
 
-   if ( strlen ( szFileName ) == 0 )
+   if( strlen( szFileName ) == 0 )
    {
       hb_retni( -1 );
       return;
@@ -485,7 +485,7 @@ HB_FUNC ( XXENCODE_FILE )
 
    infile = hb_fopen( pInFile->item.asString.value, "rb" );
 
-   if ( !infile )
+   if( ! infile )
    {
       hb_retni( -3 );
       return;
@@ -495,9 +495,9 @@ HB_FUNC ( XXENCODE_FILE )
    nSize = ftell( infile );
    fseek( infile, 0L, SEEK_SET );
 
-   if ( pOutFile )
+   if( pOutFile )
    {
-      if ( strlen ( pOutFile->item.asString.value ) == 0 )
+      if( strlen( pOutFile->item.asString.value ) == 0 )
       {
          hb_retni( -2 );
          return;
@@ -506,73 +506,73 @@ HB_FUNC ( XXENCODE_FILE )
    }
    else
    {
-      pFileName = hb_fsFNameSplit(pInFile->item.asString.value);
-      pFileName->szExtension = ".yye";
+      pFileName               = hb_fsFNameSplit( pInFile->item.asString.value );
+      pFileName->szExtension  = ".yye";
       hb_fsFNameMerge( szDestFile, pFileName );
-      OutFile = hb_fopen( szDestFile, "wb" );
+      OutFile                 = hb_fopen( szDestFile, "wb" );
    }
 
-   if ( !OutFile )
+   if( ! OutFile )
    {
       hb_retni( -4 );
       fclose( infile );
-      return ;
+      return;
    }
 
    fprintf( OutFile, "begin 644 %s\n", szFileName );
 
-   while ((c1 = getc(infile)) != EOF)
+   while( ( c1 = getc( infile ) ) != EOF )
    {
-      if ( i % UE_STR_LEN == 0 )
+      if( i % UE_STR_LEN == 0 )
       {
-         if ( i )
+         if( i )
          {
             putc( '\n', OutFile );
          }
 
-         if ( (nSize-i) > UE_STR_LEN )
+         if( ( nSize - i ) > UE_STR_LEN )
          {
-            putc(int_xxbyte(UE_STR_LEN),OutFile);
+            putc( int_xxbyte( UE_STR_LEN ), OutFile );
          }
          else
          {
-            putc(int_xxbyte((BYTE)(nSize-i)),OutFile);
+            putc( int_xxbyte( ( BYTE ) ( nSize - i ) ), OutFile );
          }
       }
 
-      putc( int_xxbyte((c1&0xFC)>>2), OutFile );
+      putc( int_xxbyte( ( c1 & 0xFC ) >> 2 ), OutFile );
 
-      ++ i;
+      ++i;
       c2 = getc( infile );
 
-      if ( c2 == EOF )
+      if( c2 == EOF )
       {
-         putc( int_xxbyte((c1&0x03)<<4),OutFile);
-         putc( int_xxbyte(0),OutFile);
-         putc( int_xxbyte(0),OutFile);
+         putc( int_xxbyte( ( c1 & 0x03 ) << 4 ), OutFile );
+         putc( int_xxbyte( 0 ), OutFile );
+         putc( int_xxbyte( 0 ), OutFile );
          break;
       }
 
-      putc( int_xxbyte(((c1&0x03)<<4)|((c2&0xF0)>>4)),OutFile);
+      putc( int_xxbyte( ( ( c1 & 0x03 ) << 4 ) | ( ( c2 & 0xF0 ) >> 4 ) ), OutFile );
 
-      ++ i;
+      ++i;
       c3 = getc( infile );
 
-      if ( c3 == EOF )
+      if( c3 == EOF )
       {
-         putc( int_xxbyte((c2&0x0F)<<2),OutFile);
-         putc( int_xxbyte(0),OutFile);
+         putc( int_xxbyte( ( c2 & 0x0F ) << 2 ), OutFile );
+         putc( int_xxbyte( 0 ), OutFile );
          break;
       }
 
-      putc(int_xxbyte(((c2&0x0F)<<2)|((c3&0xC0)>>6)),OutFile);
-      putc(int_xxbyte(c3&0x3F),OutFile);
+      putc( int_xxbyte( ( ( c2 & 0x0F ) << 2 ) | ( ( c3 & 0xC0 ) >> 6 ) ), OutFile );
+      putc( int_xxbyte( c3 & 0x3F ), OutFile );
 
-      ++ i;
+      ++i;
    }
 
    putc( '\n', OutFile );
-   putc(int_xxbyte('\0'),OutFile);
+   putc( int_xxbyte( '\0' ), OutFile );
    putc( '\n', OutFile );
 
    fprintf( OutFile, "end\n" );
@@ -580,56 +580,56 @@ HB_FUNC ( XXENCODE_FILE )
    fclose( infile );
    fclose( OutFile );
 
-   hb_retni(0);
+   hb_retni( 0 );
 }
 
-HB_FUNC(HB_XXENCODE)
+HB_FUNC( HB_XXENCODE )
 {
-   PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
-   ULONG srclen,dstlen;
-   BYTE *srcstr,*dststr;
+   PHB_ITEM phbstr = hb_param( 1, HB_IT_STRING );
+   ULONG    srclen, dstlen;
+   BYTE *   srcstr, * dststr;
 
-   if (phbstr)
+   if( phbstr )
    {
-      srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
-      srclen=(ULONG)hb_itemGetCLen(phbstr);
-      dstlen=int_xxenc(srcstr,srclen,NULL);
-      dststr=(BYTE *) hb_xgrab(dstlen);
-      int_xxenc(srcstr,srclen,dststr);
-      hb_retclenAdoptRaw((char *) dststr,dstlen);
+      srcstr   = ( BYTE * ) hb_itemGetCPtr( phbstr );
+      srclen   = ( ULONG ) hb_itemGetCLen( phbstr );
+      dstlen   = int_xxenc( srcstr, srclen, NULL );
+      dststr   = ( BYTE * ) hb_xgrab( dstlen );
+      int_xxenc( srcstr, srclen, dststr );
+      hb_retclenAdoptRaw( ( char * ) dststr, dstlen );
    }
    else
    {
-      hb_retc("");
+      hb_retc( "" );
    }
 }
 
-HB_FUNC(HB_XXDECODE)
+HB_FUNC( HB_XXDECODE )
 {
-   PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
-   ULONG srclen,dstlen;
-   BYTE *srcstr,*dststr;
+   PHB_ITEM phbstr = hb_param( 1, HB_IT_STRING );
+   ULONG    srclen, dstlen;
+   BYTE *   srcstr, * dststr;
 
-   if (phbstr)
+   if( phbstr )
    {
-      srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
-      srclen=(ULONG)hb_itemGetCLen(phbstr);
-      dstlen=int_xxdec(srcstr,srclen,NULL);
-      dststr=(BYTE *) hb_xgrab(dstlen);
-      int_xxdec(srcstr,srclen,dststr);
-      hb_retclenAdoptRaw((char*) dststr,dstlen);
+      srcstr   = ( BYTE * ) hb_itemGetCPtr( phbstr );
+      srclen   = ( ULONG ) hb_itemGetCLen( phbstr );
+      dstlen   = int_xxdec( srcstr, srclen, NULL );
+      dststr   = ( BYTE * ) hb_xgrab( dstlen );
+      int_xxdec( srcstr, srclen, dststr );
+      hb_retclenAdoptRaw( ( char * ) dststr, dstlen );
    }
    else
    {
-      hb_retc("");
+      hb_retc( "" );
    }
 }
 
-static BYTE int_xxbyte(BYTE c)
+static BYTE int_xxbyte( BYTE c )
 {
-   if (c<'\100')
+   if( c < '\100' )
    {
-      return xxechars[c];
+      return xxechars[ c ];
    }
    else
    {
@@ -637,249 +637,249 @@ static BYTE int_xxbyte(BYTE c)
    }
 }
 
-static BYTE int_xxbval(BYTE c)
+static BYTE int_xxbval( BYTE c )
 {
-   BYTE *x;
+   BYTE * x;
 
-   x=(BYTE *) strchr((char *) xxechars,c);
+   x = ( BYTE * ) strchr( ( char * ) xxechars, c );
 
-   if ((c=='\0') || (x==NULL))
+   if( ( c == '\0' ) || ( x == NULL ) )
    {
       return '\177';
    }
    else
    {
-      return (BYTE) (x-xxechars);
+      return ( BYTE ) ( x - xxechars );
    }
 }
 
-static ULONG int_xxenc(BYTE *srcstr,ULONG srclen,BYTE *dststr)
+static ULONG int_xxenc( BYTE * srcstr, ULONG srclen, BYTE * dststr )
 {
-   ULONG dstlen=0,i=0;
+   ULONG dstlen = 0, i = 0;
 
-   while (i<srclen)
+   while( i < srclen )
    {
-      if (i%UE_STR_LEN==0)
+      if( i % UE_STR_LEN == 0 )
       {
-         if (dststr)
+         if( dststr )
          {
-            if (i)
+            if( i )
             {
                //if (HB_OS_EOL_LEN-1)
                //{
                //   dststr[dstlen++]='\r';
                //}
 
-               dststr[dstlen++]='\n';
+               dststr[ dstlen++ ] = '\n';
             }
 
-            if ((srclen-i)>UE_STR_LEN)
+            if( ( srclen - i ) > UE_STR_LEN )
             {
-               dststr[dstlen++]=int_xxbyte(UE_STR_LEN);
+               dststr[ dstlen++ ] = int_xxbyte( UE_STR_LEN );
             }
             else
             {
-               dststr[dstlen++]=int_xxbyte((BYTE)(srclen-i));
+               dststr[ dstlen++ ] = int_xxbyte( ( BYTE ) ( srclen - i ) );
             }
          }
          else
          {
-            dstlen+=1+(i?HB_OS_EOL_LEN:0);
+            dstlen += 1 + ( i ? HB_OS_EOL_LEN : 0 );
          }
       }
 
-      if (dststr)
+      if( dststr )
       {
-         dststr[dstlen++]=int_xxbyte((srcstr[i]&0xFC)>>2);
+         dststr[ dstlen++ ] = int_xxbyte( ( srcstr[ i ] & 0xFC ) >> 2 );
       }
       else
       {
          dstlen++;
       }
 
-      if (++i==srclen)
+      if( ++i == srclen )
       {
-         if (dststr)
+         if( dststr )
          {
-            dststr[dstlen++]=int_xxbyte((srcstr[i-1]&0x03)<<4);
-            dststr[dstlen++]=int_xxbyte(0);
-            dststr[dstlen++]=int_xxbyte(0);
+            dststr[ dstlen++ ]   = int_xxbyte( ( srcstr[ i - 1 ] & 0x03 ) << 4 );
+            dststr[ dstlen++ ]   = int_xxbyte( 0 );
+            dststr[ dstlen++ ]   = int_xxbyte( 0 );
          }
          else
          {
-            dstlen+=3;
+            dstlen += 3;
          }
 
          break;
       }
 
-      if (dststr)
+      if( dststr )
       {
-         dststr[dstlen++]=int_xxbyte(((srcstr[i-1]&0x03)<<4)|((srcstr[i]&0xF0)>>4));
+         dststr[ dstlen++ ] = int_xxbyte( ( ( srcstr[ i - 1 ] & 0x03 ) << 4 ) | ( ( srcstr[ i ] & 0xF0 ) >> 4 ) );
       }
       else
       {
          dstlen++;
       }
 
-      if (++i==srclen)
+      if( ++i == srclen )
       {
-         if (dststr)
+         if( dststr )
          {
-            dststr[dstlen++]=int_xxbyte((srcstr[i-1]&0x0F)<<2);
-            dststr[dstlen++]=int_xxbyte(0);
+            dststr[ dstlen++ ]   = int_xxbyte( ( srcstr[ i - 1 ] & 0x0F ) << 2 );
+            dststr[ dstlen++ ]   = int_xxbyte( 0 );
          }
          else
          {
-            dstlen+=2;
+            dstlen += 2;
          }
 
          break;
       }
 
-      if (dststr)
+      if( dststr )
       {
-         dststr[dstlen++]=int_xxbyte(((srcstr[i-1]&0x0F)<<2)|((srcstr[i]&0xC0)>>6));
-         dststr[dstlen++]=int_xxbyte(srcstr[i]&0x3F);
+         dststr[ dstlen++ ]   = int_xxbyte( ( ( srcstr[ i - 1 ] & 0x0F ) << 2 ) | ( ( srcstr[ i ] & 0xC0 ) >> 6 ) );
+         dststr[ dstlen++ ]   = int_xxbyte( srcstr[ i ] & 0x3F );
       }
       else
       {
-         dstlen+=2;
+         dstlen += 2;
       }
 
-      if (++i==srclen)
+      if( ++i == srclen )
       {
          break;
       }
    }
 
-   if (dststr)
+   if( dststr )
    {
       //if (HB_OS_EOL_LEN-1)
       //{
       //   dststr[dstlen++]='\r';
       //}
 
-      dststr[dstlen++]='\n';
-      dststr[dstlen++]=int_xxbyte('\0');
+      dststr[ dstlen++ ]   = '\n';
+      dststr[ dstlen++ ]   = int_xxbyte( '\0' );
 
       //if (HB_OS_EOL_LEN-1)
       //{
       //   dststr[dstlen++]='\r';
       //}
 
-      dststr[dstlen++]='\n';
+      dststr[ dstlen++ ] = '\n';
    }
    else
    {
-      dstlen+=2*HB_OS_EOL_LEN+1;
+      dstlen += 2 * HB_OS_EOL_LEN + 1;
    }
 
    return dstlen;
 }
 
-static ULONG int_xxdec(BYTE *srcstr,ULONG srclen,BYTE *dststr)
+static ULONG int_xxdec( BYTE * srcstr, ULONG srclen, BYTE * dststr )
 {
-   ULONG dstlen=0,i=0;
-   BYTE j,l,tmp[4];
+   ULONG dstlen = 0, i = 0;
+   BYTE  j, l, tmp[ 4 ];
 
-   while (i<srclen)
+   while( i < srclen )
    {
-      l=int_xxbval(srcstr[i++]);
+      l = int_xxbval( srcstr[ i++ ] );
 
-      if (l=='\0')
+      if( l == '\0' )
       {
          break;
       }
 
-      j=0;
+      j = 0;
 
-      while (1)
+      while( 1 )
       {
-         tmp[0]=int_xxbval(srcstr[i++]);
+         tmp[ 0 ] = int_xxbval( srcstr[ i++ ] );
 
-         if (tmp[0]>'\077')
+         if( tmp[ 0 ] > '\077' )
          {
             break;
          }
 
-         tmp[1]=int_xxbval(srcstr[i++]);
+         tmp[ 1 ] = int_xxbval( srcstr[ i++ ] );
 
-         if (tmp[1]>'\077')
+         if( tmp[ 1 ] > '\077' )
          {
             break;
          }
 
-         if (dststr)
+         if( dststr )
          {
-            dststr[dstlen++]=(tmp[0]<<2)|((tmp[1]&'\060')>>4);
+            dststr[ dstlen++ ] = ( tmp[ 0 ] << 2 ) | ( ( tmp[ 1 ] & '\060' ) >> 4 );
          }
          else
          {
             dstlen++;
          }
 
-         if (++j==l)
+         if( ++j == l )
          {
             break;
          }
 
-         tmp[2]=int_xxbval(srcstr[i++]);
+         tmp[ 2 ] = int_xxbval( srcstr[ i++ ] );
 
-         if (tmp[2]>'\077')
+         if( tmp[ 2 ] > '\077' )
          {
             break;
          }
 
-         if (dststr)
+         if( dststr )
          {
-            dststr[dstlen++]=((tmp[1]&'\017')<<4)|((tmp[2]&'\074')>>2);
+            dststr[ dstlen++ ] = ( ( tmp[ 1 ] & '\017' ) << 4 ) | ( ( tmp[ 2 ] & '\074' ) >> 2 );
          }
          else
          {
             dstlen++;
          }
 
-         if (++j==l)
+         if( ++j == l )
          {
             break;
          }
 
-         tmp[3]=int_xxbval(srcstr[i++]);
+         tmp[ 3 ] = int_xxbval( srcstr[ i++ ] );
 
-         if (tmp[3]>'\077')
+         if( tmp[ 3 ] > '\077' )
          {
             break;
          }
 
-         if (dststr)
+         if( dststr )
          {
-            dststr[dstlen++]=((tmp[2]&'\003')<<6)|(tmp[3]);
+            dststr[ dstlen++ ] = ( ( tmp[ 2 ] & '\003' ) << 6 ) | ( tmp[ 3 ] );
          }
          else
          {
             dstlen++;
          }
 
-         if (++j==l)
+         if( ++j == l )
          {
             break;
          }
       }
 
-      if (j==l)
+      if( j == l )
       {
-         while ((i<srclen)&&(strchr((char*) eolchars,srcstr[i])==NULL))
+         while( ( i < srclen ) && ( strchr( ( char * ) eolchars, srcstr[ i ] ) == NULL ) )
          {
             i++;
          }
 
-         while ((i<srclen)&&(strchr((char*) eolchars,srcstr[i])!=NULL))
+         while( ( i < srclen ) && ( strchr( ( char * ) eolchars, srcstr[ i ] ) != NULL ) )
          {
             i++;
          }
 
-         if (i==srclen)
+         if( i == srclen )
          {
             break;
          }

@@ -5844,6 +5844,7 @@ static int hb_compCompile( char * szPrg )
    if( hb_comp_pFileName->szName )
    {
       char           szFileName[ HB_PATH_MAX ];
+      char           sz__File__[ HB_PATH_MAX + 2 ];
       char           szPpoName[ HB_PATH_MAX ];
       char           szPptName[ HB_PATH_MAX ];
       char           szHILName[ HB_PATH_MAX ];
@@ -5852,6 +5853,7 @@ static int hb_compCompile( char * szPrg )
 
       /* Clear and reinitialize preprocessor state */
       hb_pp_reset( hb_comp_PP );
+
       if( hb_comp_iLanguage == LANG_PORT_OBJ )
       {
          hb_pp_addDefine( hb_comp_PP, "__HRB__", "1" );
@@ -5866,6 +5868,7 @@ static int hb_compCompile( char * szPrg )
       hb_comp_PrgFileName  = ( char * ) hb_xgrab( HB_PATH_MAX );
       hb_snprintf( szTempName, HB_PATH_MAX, "%s%s%s", hb_comp_pFileName->szPath ? hb_comp_pFileName->szPath : "", hb_comp_pFileName->szName, hb_comp_pFileName->szExtension );
 
+
       for( i = 0; i < strlen( szTempName ); i++ )
       {
          if( szTempName[ i ] == '\\' )
@@ -5876,12 +5879,17 @@ static int hb_compCompile( char * szPrg )
          else
             hb_comp_PrgFileName[ u++ ] = szTempName[ i ];
       }
+
       hb_comp_PrgFileName[ u ]   = 0;
       hb_xfree( szTempName );
 
       szSourceExtension          = hb_comp_pFileName->szExtension;
 
       hb_fsFNameMerge( szFileName, hb_comp_pFileName );
+
+      /* defined __FILE__ */
+      hb_snprintf( sz__File__, sizeof( sz__File__ ), "\"%s\"", szFileName );
+      hb_pp_addDefine( hb_comp_PP, "__FILE__", sz__File__ );
 
       /* Local Variable List (.var) File
          hb_comp_iGenVarList is TRUE if /gcS is used

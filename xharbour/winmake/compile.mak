@@ -88,6 +88,54 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
 	$(MT_CMD)
 
 #===============================================================================
+# HBXDIFF.LIB
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)corexdiff$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)core.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xadler32$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)xadler32.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xalloc$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)xalloc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xbdiff$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)xbdiff.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xbpatchi$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)xbpatchi.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xdiffi$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)xdiffi.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xemit$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)xemit.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xmerge3$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)xmerge3.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xmissing$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)xmissing.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xpatchi$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)xpatchi.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xprepare$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)xprepare.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xrabdiff$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)xrabdiff.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xrabply$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)xrabply.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xutils$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)xutils.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)xversion$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)xversion.c
+	$(CC_CMD)
+
+#===============================================================================
 # ACE32.LIB
 #===============================================================================
 $(ACE32_LIB) : "$(HB_DIR_ADS)$(DIR_SEP)ace32.dll"

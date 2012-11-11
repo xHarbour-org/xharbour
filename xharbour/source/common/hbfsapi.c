@@ -147,16 +147,15 @@ PHB_FNAME hb_fsFNameSplit( const char * pszFileName )
 
    HB_TRACE( HB_TR_INFO, ( "hb_fsFNameSplit: Filename: |%s|\n", pszFileName ) );
 
-   iPos                                                                                                        = iSize = ( int ) hb_strnlen( pszFileName, HB_PATH_MAX - 1 );
-   cDirSep                                                                                                     = ( char ) hb_setGetDirSeparator();
+   iPos              = iSize = ( int ) hb_strnlen( pszFileName, HB_PATH_MAX - 1 );
+   cDirSep           = ( char ) hb_setGetDirSeparator();
 
    /* Grab memory, set defaults */
-   pFileName                                                                                                   = ( PHB_FNAME ) hb_xgrab( sizeof( HB_FNAME ) );
+   pFileName         = ( PHB_FNAME ) hb_xgrab( sizeof( HB_FNAME ) );
 
-   pszPos                                                                                                      = pFileName->szBuffer;
+   pszPos            = pFileName->szBuffer;
 
-   pFileName->szPath                                                                                           = pFileName->szName = pFileName->szExtension =
-                                                                                           pFileName->szDrive  = NULL;
+   pFileName->szPath = pFileName->szName = pFileName->szExtension = pFileName->szDrive  = NULL;
 
    /* Find the end of the path part, and find out where the
       name+ext starts */

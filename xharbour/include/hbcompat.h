@@ -70,6 +70,7 @@
 #define HB_ISNUM                  ISNUM
 #define hb_parldef( l1, l2 )      ( ISLOG( l1 ) ? hb_parl( l1 )    : l2 )
 #define hb_parnidef( n1, n2 )     ( ISNUM( n1 ) ? hb_parni( n1 )   : n2 )
+#define hb_parnldef( n1, n2 )     ( ISNUM( n1 ) ? hb_parnl( n1 )   : n2 )
 #define hb_parnintdef( n1, n2 )   ( ISNUM( n1 ) ? hb_parnint( n1 ) : n2 )
 #define HB_BYTE                   BYTE
 #define HB_USHORT                 USHORT

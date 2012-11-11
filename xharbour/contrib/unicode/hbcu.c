@@ -58,21 +58,21 @@
 /*UUencode support*/
 
 /*
-HB_UUENCODE(string) -> uu_string
+   HB_UUENCODE(string) -> uu_string
       Encodes string to UUencode (mail/news used)
    Parameters:
       string  - source character string
    Returns:
       UUencoded string
 
-HB_UUDECODE(uu_string) -> string
+   HB_UUDECODE(uu_string) -> string
       Decodes string from UUencode
    Parameters:
       uu_string  - UUencode encoded string
    Returns:
       decoded string
 
-UUDECODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
+   UUDECODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
    Description:
       UUDecode a given file
    Parameters:
@@ -82,36 +82,36 @@ UUDECODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
       cFileOutput = output filename
    Returns:
       Upon succesful decoding the function returns numnber of bytes written
-*/
+ */
 
 #include "hbcc.h"
-#define UU_STR_LEN 60
-#define UE_STR_LEN 45
+#define UU_STR_LEN   60
+#define UE_STR_LEN   45
 
-static BYTE *eolchars=(BYTE *) "\r\n";
+static BYTE * eolchars = ( BYTE * ) "\r\n";
 
-static ULONG int_uuenc(BYTE *,ULONG,BYTE *);
-static ULONG int_uudec(BYTE *,ULONG,BYTE *);
-static BYTE int_uubyte(BYTE);
-static BYTE int_uubval(BYTE);
+static ULONG int_uuenc( BYTE *, ULONG, BYTE * );
+static ULONG int_uudec( BYTE *, ULONG, BYTE * );
+static BYTE int_uubyte( BYTE );
+static BYTE int_uubval( BYTE );
 
 HB_FUNC( UUDECODE_FILE )
 {
-   PHB_ITEM pinFile = hb_param( 1, HB_IT_ANY );
+   PHB_ITEM pinFile  = hb_param( 1, HB_IT_ANY );
    PHB_ITEM poutFile = hb_param( 2, HB_IT_STRING );
-   FILE *inFile, *outFile=NULL;
-   char *string, *szFileName;
-   ULONG srclen, dstlen, nBytesWritten = 0;
-   BYTE *dststr;
-   HB_ITEM Struct, Item;
-   USHORT uiLen = 1, uiCount;
-   BOOL bOutFile = FALSE;
+   FILE *   inFile, * outFile = NULL;
+   char *   string, * szFileName;
+   ULONG    srclen, dstlen, nBytesWritten = 0;
+   BYTE *   dststr;
+   HB_ITEM  Struct, Item;
+   USHORT   uiLen    = 1, uiCount;
+   BOOL     bOutFile = FALSE;
 
    if( pinFile )
    {
-      if ( ISCHAR( 1 ) )
+      if( ISCHAR( 1 ) )
       {
-         if ( strlen( pinFile->item.asString.value ) == 0 )
+         if( strlen( pinFile->item.asString.value ) == 0 )
          {
             hb_retni( -1 );
             return;
@@ -119,19 +119,19 @@ HB_FUNC( UUDECODE_FILE )
          else
          {
             Struct.type = HB_IT_NIL;
-            Item.type = HB_IT_NIL;
+            Item.type   = HB_IT_NIL;
             hb_arrayNew( &Struct, 1 );
             hb_arraySet( &Struct, 1, hb_itemPutC( &Item, pinFile->item.asString.value ) );
             hb_itemClear( &Item );
          }
       }
-      else if ( ISARRAY( 1 ) )
+      else if( ISARRAY( 1 ) )
       {
          Struct.type = HB_IT_NIL;
-         hb_itemCopy( &Struct, hb_param( 1, HB_IT_ARRAY ));
-         uiLen = (USHORT) Struct.item.asArray.value->ulLen;
+         hb_itemCopy( &Struct, hb_param( 1, HB_IT_ARRAY ) );
+         uiLen       = ( USHORT ) Struct.item.asArray.value->ulLen;
 
-         if ( uiLen <= 0 )
+         if( uiLen <= 0 )
          {
             hb_itemClear( &Struct );
             hb_retni( -2 );
@@ -150,9 +150,9 @@ HB_FUNC( UUDECODE_FILE )
       return;
    }
 
-   if ( poutFile )
+   if( poutFile )
    {
-      if ( strlen(poutFile->item.asString.value) == 0 )
+      if( strlen( poutFile->item.asString.value ) == 0 )
       {
          hb_itemClear( &Struct );
          hb_retni( -5 );
@@ -160,13 +160,13 @@ HB_FUNC( UUDECODE_FILE )
       }
    }
 
-   string = (char*) hb_xgrab( SHRT_MAX );
+   string = ( char * ) hb_xgrab( SHRT_MAX );
 
-   for ( uiCount = 0; uiCount < uiLen; uiCount++ )
+   for( uiCount = 0; uiCount < uiLen; uiCount++ )
    {
       szFileName = hb_arrayGetC( &Struct, uiCount + 1 );
 
-      if ( !szFileName )
+      if( ! szFileName )
       {
          hb_itemClear( &Struct );
          hb_xfree( string );
@@ -174,7 +174,7 @@ HB_FUNC( UUDECODE_FILE )
          return;
       }
 
-      if ( strlen( szFileName ) == 0 )
+      if( strlen( szFileName ) == 0 )
       {
          hb_itemClear( &Struct );
          hb_xfree( szFileName );
@@ -185,7 +185,7 @@ HB_FUNC( UUDECODE_FILE )
 
       inFile = hb_fopen( szFileName, "rb" );
 
-      if ( !inFile )
+      if( ! inFile )
       {
          hb_itemClear( &Struct );
          hb_xfree( szFileName );
@@ -194,19 +194,19 @@ HB_FUNC( UUDECODE_FILE )
          return;
       }
 
-      while ( hbcc_file_read ( inFile, string ) )
+      while( hbcc_file_read( inFile, string ) )
       {
-         if ( string )
+         if( string )
          {
-            if ( !bOutFile )
+            if( ! bOutFile )
             {
-               if ( poutFile )
+               if( poutFile )
                {
-                  if ( strstr ( string ,"begin 6" ) != NULL )
+                  if( strstr( string, "begin 6" ) != NULL )
                   {
                      outFile = hb_fopen( poutFile->item.asString.value, "wb" );
 
-                     if ( !outFile )
+                     if( ! outFile )
                      {
                         break;
                      }
@@ -218,16 +218,16 @@ HB_FUNC( UUDECODE_FILE )
                else
                {
 
-                  if ( strstr ( string ,"begin 6" ) != NULL )
+                  if( strstr( string, "begin 6" ) != NULL )
                   {
-                     char *szFile ;
+                     char * szFile;
                      szFile = string + 10;
 
                      if( szFile )
                      {
                         outFile = hb_fopen( szFile, "wb" );
 
-                        if ( outFile )
+                        if( outFile )
                         {
                            bOutFile = TRUE;
                            continue;
@@ -237,26 +237,26 @@ HB_FUNC( UUDECODE_FILE )
                }
             } // end if ( !bOutFile )
 
-            srclen = (ULONG)strlen( string );
-            dstlen = int_uudec((BYTE*) string,srclen,NULL);
-            if ( dstlen )
+            srclen   = ( ULONG ) strlen( string );
+            dstlen   = int_uudec( ( BYTE * ) string, srclen, NULL );
+            if( dstlen )
             {
-               dststr = (BYTE *) hb_xgrab(dstlen);
-               int_uudec((BYTE*) string,srclen,dststr);
+               dststr = ( BYTE * ) hb_xgrab( dstlen );
+               int_uudec( ( BYTE * ) string, srclen, dststr );
 
-               if ( bOutFile )
+               if( bOutFile )
                {
-                  nBytesWritten += (ULONG)fwrite( dststr, sizeof(BYTE), dstlen, outFile );
+                  nBytesWritten += ( ULONG ) fwrite( dststr, sizeof( BYTE ), dstlen, outFile );
                }
 
-               hb_xfree(dststr);
+               hb_xfree( dststr );
             }
          }
       }
 
       fclose( inFile );
 
-      if ( szFileName )
+      if( szFileName )
       {
          hb_xfree( szFileName );
       }
@@ -271,59 +271,59 @@ HB_FUNC( UUDECODE_FILE )
    hb_itemClear( &Struct );
 }
 
-HB_FUNC(HB_UUENCODE)
+HB_FUNC( HB_UUENCODE )
 {
-   PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
-   ULONG srclen,dstlen;
-   BYTE *srcstr,*dststr;
+   PHB_ITEM phbstr = hb_param( 1, HB_IT_STRING );
+   ULONG    srclen, dstlen;
+   BYTE *   srcstr, * dststr;
 
-   if (phbstr)
+   if( phbstr )
    {
-      srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
-      srclen=(ULONG)hb_itemGetCLen(phbstr);
-      dstlen=int_uuenc(srcstr,srclen,NULL);
-      dststr=(BYTE *) hb_xgrab(dstlen);
-      int_uuenc(srcstr,srclen,dststr);
-      hb_retclenAdoptRaw((char *) dststr,dstlen);
+      srcstr   = ( BYTE * ) hb_itemGetCPtr( phbstr );
+      srclen   = ( ULONG ) hb_itemGetCLen( phbstr );
+      dstlen   = int_uuenc( srcstr, srclen, NULL );
+      dststr   = ( BYTE * ) hb_xgrab( dstlen );
+      int_uuenc( srcstr, srclen, dststr );
+      hb_retclenAdoptRaw( ( char * ) dststr, dstlen );
    }
    else
    {
-      hb_retc("");
+      hb_retc( "" );
    }
 }
 
-HB_FUNC(HB_UUDECODE)
+HB_FUNC( HB_UUDECODE )
 {
-   PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
-   ULONG srclen,dstlen;
-   BYTE *srcstr,*dststr;
+   PHB_ITEM phbstr = hb_param( 1, HB_IT_STRING );
+   ULONG    srclen, dstlen;
+   BYTE *   srcstr, * dststr;
 
-   if (phbstr)
+   if( phbstr )
    {
-      srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
-      srclen=(ULONG)hb_itemGetCLen(phbstr);
-      dstlen=int_uudec(srcstr,srclen,NULL);
-      dststr=(BYTE *) hb_xgrab(dstlen);
-      int_uudec(srcstr,srclen,dststr);
-      hb_retclenAdoptRaw((char*) dststr,dstlen);
+      srcstr   = ( BYTE * ) hb_itemGetCPtr( phbstr );
+      srclen   = ( ULONG ) hb_itemGetCLen( phbstr );
+      dstlen   = int_uudec( srcstr, srclen, NULL );
+      dststr   = ( BYTE * ) hb_xgrab( dstlen );
+      int_uudec( srcstr, srclen, dststr );
+      hb_retclenAdoptRaw( ( char * ) dststr, dstlen );
    }
    else
    {
-      hb_retc("");
+      hb_retc( "" );
    }
 }
 
-static BYTE int_uubyte(BYTE c)
+static BYTE int_uubyte( BYTE c )
 {
    BYTE x;
 
-   x=c+' ';
+   x = c + ' ';
 
-   if (x==' ')
+   if( x == ' ' )
    {
       return '\140';
    }
-   else if (x>'\140')
+   else if( x > '\140' )
    {
       return '\177';
    }
@@ -333,13 +333,13 @@ static BYTE int_uubyte(BYTE c)
    }
 }
 
-static BYTE int_uubval(BYTE c)
+static BYTE int_uubval( BYTE c )
 {
    BYTE x;
 
-   x=c-' ';
+   x = c - ' ';
 
-   if (x=='\100')
+   if( x == '\100' )
    {
       return '\0';
    }
@@ -349,233 +349,233 @@ static BYTE int_uubval(BYTE c)
    }
 }
 
-static ULONG int_uuenc(BYTE *srcstr,ULONG srclen,BYTE *dststr)
+static ULONG int_uuenc( BYTE * srcstr, ULONG srclen, BYTE * dststr )
 {
-   ULONG dstlen=0,i=0;
+   ULONG dstlen = 0, i = 0;
 
-   while (i<srclen)
+   while( i < srclen )
    {
-      if (i%UE_STR_LEN==0)
+      if( i % UE_STR_LEN == 0 )
       {
-         if (dststr)
+         if( dststr )
          {
-            if (i)
+            if( i )
             {
                //if (HB_OS_EOL_LEN-1)
                //{
                //   dststr[dstlen++]='\r';
                //}
 
-               dststr[dstlen++]='\n';
+               dststr[ dstlen++ ] = '\n';
             }
 
-            if ((srclen-i)>UE_STR_LEN)
+            if( ( srclen - i ) > UE_STR_LEN )
             {
-               dststr[dstlen++]=int_uubyte(UE_STR_LEN);
+               dststr[ dstlen++ ] = int_uubyte( UE_STR_LEN );
             }
             else
             {
-               dststr[dstlen++]=int_uubyte((BYTE)(srclen-i));
+               dststr[ dstlen++ ] = int_uubyte( ( BYTE ) ( srclen - i ) );
             }
          }
          else
          {
-            dstlen+=1+(i?HB_OS_EOL_LEN:0);
+            dstlen += 1 + ( i ? HB_OS_EOL_LEN : 0 );
          }
       }
 
-      if (dststr)
+      if( dststr )
       {
-         dststr[dstlen++]=int_uubyte((srcstr[i]&0xFC)>>2);
+         dststr[ dstlen++ ] = int_uubyte( ( srcstr[ i ] & 0xFC ) >> 2 );
       }
       else
       {
          dstlen++;
       }
 
-      if (++i==srclen)
+      if( ++i == srclen )
       {
-         if (dststr)
+         if( dststr )
          {
-            dststr[dstlen++]=int_uubyte((srcstr[i-1]&0x03)<<4);
-            dststr[dstlen++]=int_uubyte(0);
-            dststr[dstlen++]=int_uubyte(0);
+            dststr[ dstlen++ ]   = int_uubyte( ( srcstr[ i - 1 ] & 0x03 ) << 4 );
+            dststr[ dstlen++ ]   = int_uubyte( 0 );
+            dststr[ dstlen++ ]   = int_uubyte( 0 );
          }
          else
          {
-            dstlen+=3;
+            dstlen += 3;
          }
 
          break;
       }
 
-      if (dststr)
+      if( dststr )
       {
-         dststr[dstlen++]=int_uubyte(((srcstr[i-1]&0x03)<<4)|((srcstr[i]&0xF0)>>4));
+         dststr[ dstlen++ ] = int_uubyte( ( ( srcstr[ i - 1 ] & 0x03 ) << 4 ) | ( ( srcstr[ i ] & 0xF0 ) >> 4 ) );
       }
       else
       {
          dstlen++;
       }
 
-      if (++i==srclen)
+      if( ++i == srclen )
       {
-         if (dststr)
+         if( dststr )
          {
-            dststr[dstlen++]=int_uubyte((srcstr[i-1]&0x0F)<<2);
-            dststr[dstlen++]=int_uubyte(0);
+            dststr[ dstlen++ ]   = int_uubyte( ( srcstr[ i - 1 ] & 0x0F ) << 2 );
+            dststr[ dstlen++ ]   = int_uubyte( 0 );
          }
          else
          {
-            dstlen+=2;
+            dstlen += 2;
          }
 
          break;
       }
 
-      if (dststr)
+      if( dststr )
       {
-         dststr[dstlen++]=int_uubyte(((srcstr[i-1]&0x0F)<<2)|((srcstr[i]&0xC0)>>6));
-         dststr[dstlen++]=int_uubyte(srcstr[i]&0x3F);
+         dststr[ dstlen++ ]   = int_uubyte( ( ( srcstr[ i - 1 ] & 0x0F ) << 2 ) | ( ( srcstr[ i ] & 0xC0 ) >> 6 ) );
+         dststr[ dstlen++ ]   = int_uubyte( srcstr[ i ] & 0x3F );
       }
       else
       {
-         dstlen+=2;
+         dstlen += 2;
       }
 
-      if (++i==srclen)
+      if( ++i == srclen )
       {
          break;
       }
    }
 
-   if (dststr)
+   if( dststr )
    {
       //if (HB_OS_EOL_LEN-1)
       //{
       //   dststr[dstlen++]='\r';
       //}
 
-      dststr[dstlen++]='\n';
-      dststr[dstlen++]=int_uubyte('\0');
+      dststr[ dstlen++ ]   = '\n';
+      dststr[ dstlen++ ]   = int_uubyte( '\0' );
 
       //if (HB_OS_EOL_LEN-1)
       //{
       //   dststr[dstlen++]='\r';
       //}
 
-      dststr[dstlen++]='\n';
+      dststr[ dstlen++ ] = '\n';
    }
    else
    {
-      dstlen+=2*HB_OS_EOL_LEN+1;
+      dstlen += 2 * HB_OS_EOL_LEN + 1;
    }
 
    return dstlen;
 }
 
-static ULONG int_uudec(BYTE *srcstr,ULONG srclen,BYTE *dststr)
+static ULONG int_uudec( BYTE * srcstr, ULONG srclen, BYTE * dststr )
 {
-   ULONG dstlen=0,i=0;
-   BYTE j,l,tmp[4];
+   ULONG dstlen = 0, i = 0;
+   BYTE  j, l, tmp[ 4 ];
 
-   while (i<srclen)
+   while( i < srclen )
    {
-      l=int_uubval(srcstr[i++]);
+      l = int_uubval( srcstr[ i++ ] );
 
-      if (l=='\0')
+      if( l == '\0' )
       {
          break;
       }
 
-      j=0;
+      j = 0;
 
-      while (1)
+      while( 1 )
       {
-         tmp[0]=int_uubval(srcstr[i++]);
+         tmp[ 0 ] = int_uubval( srcstr[ i++ ] );
 
-         if (tmp[0]>'\077')
+         if( tmp[ 0 ] > '\077' )
          {
             break;
          }
 
-         tmp[1]=int_uubval(srcstr[i++]);
+         tmp[ 1 ] = int_uubval( srcstr[ i++ ] );
 
-         if (tmp[1]>'\077')
+         if( tmp[ 1 ] > '\077' )
          {
             break;
          }
 
-         if (dststr)
+         if( dststr )
          {
-            dststr[dstlen++]=(tmp[0]<<2)|((tmp[1]&'\060')>>4);
+            dststr[ dstlen++ ] = ( tmp[ 0 ] << 2 ) | ( ( tmp[ 1 ] & '\060' ) >> 4 );
          }
          else
          {
             dstlen++;
          }
 
-         if (++j==l)
+         if( ++j == l )
          {
             break;
          }
 
-         tmp[2]=int_uubval(srcstr[i++]);
+         tmp[ 2 ] = int_uubval( srcstr[ i++ ] );
 
-         if (tmp[2]>'\077')
+         if( tmp[ 2 ] > '\077' )
          {
             break;
          }
 
-         if (dststr)
+         if( dststr )
          {
-            dststr[dstlen++]=((tmp[1]&'\017')<<4)|((tmp[2]&'\074')>>2);
+            dststr[ dstlen++ ] = ( ( tmp[ 1 ] & '\017' ) << 4 ) | ( ( tmp[ 2 ] & '\074' ) >> 2 );
          }
          else
          {
             dstlen++;
          }
 
-         if (++j==l)
+         if( ++j == l )
          {
             break;
          }
 
-         tmp[3]=int_uubval(srcstr[i++]);
+         tmp[ 3 ] = int_uubval( srcstr[ i++ ] );
 
-         if (tmp[3]>'\077')
+         if( tmp[ 3 ] > '\077' )
          {
             break;
          }
 
-         if (dststr)
+         if( dststr )
          {
-            dststr[dstlen++]=((tmp[2]&'\003')<<6)|(tmp[3]);
+            dststr[ dstlen++ ] = ( ( tmp[ 2 ] & '\003' ) << 6 ) | ( tmp[ 3 ] );
          }
          else
          {
             dstlen++;
          }
 
-         if (++j==l)
+         if( ++j == l )
          {
             break;
          }
       }
 
-      if (j==l)
+      if( j == l )
       {
-         while ((i<srclen)&&(strchr((char*)eolchars,srcstr[i])==NULL))
+         while( ( i < srclen ) && ( strchr( ( char * ) eolchars, srcstr[ i ] ) == NULL ) )
          {
             i++;
          }
 
-         while ((i<srclen)&&(strchr((char*)eolchars,srcstr[i])!=NULL))
+         while( ( i < srclen ) && ( strchr( ( char * ) eolchars, srcstr[ i ] ) != NULL ) )
          {
             i++;
          }
 
-         if (i==srclen)
+         if( i == srclen )
          {
             break;
          }

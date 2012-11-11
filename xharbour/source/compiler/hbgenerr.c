@@ -147,6 +147,8 @@ const char * hb_comp_szWarnings[] =
    "1STATIC Function \'%s\' defined but never used"
 };
 
+extern void cleansPair( void );
+
 void hb_compGenError( const char * szErrors[], char cPrefix, int iError, const char * szError1, const char * szError2 )
 {
    int      iLine    = hb_comp_iLine - 1;
@@ -182,6 +184,36 @@ void hb_compGenError( const char * szErrors[], char cPrefix, int iError, const c
    /* fatal error - exit immediately */
    if( cPrefix == 'F' )
    {
+      hb_compIdentifierClose();
+
+      if( hb_comp_functions.pLast->pCode )
+         hb_xfree( hb_comp_functions.pLast->pCode );
+
+      if( hb_comp_functions.pLast )
+         hb_xfree( hb_comp_functions.pLast );
+
+      if( hb_comp_PP )
+         hb_pp_free( hb_comp_PP );
+
+      if ( hb_comp_pFileName )
+         hb_xfree( hb_comp_pFileName );
+
+      if( hb_Command_Line )
+         hb_xfree( hb_Command_Line );
+
+      if( hb_comp_pOutPath )
+         hb_xfree( hb_comp_pOutPath );
+
+      if( hb_comp_ppo_pOutPath )
+         hb_xfree( hb_comp_ppo_pOutPath );
+
+      if( hb_comp_PrgFileName )
+         hb_xfree( hb_comp_PrgFileName );
+
+      // void hb_compExprClear( HB_EXPR_PTR pExpr );
+
+      cleansPair();
+
       exit( EXIT_FAILURE );
    }
 }

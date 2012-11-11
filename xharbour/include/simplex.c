@@ -1817,3 +1817,9 @@ static int rulecmp( const void * pLeft, const void * pRight )
       return 1;
    }
 }
+
+void cleansPair( void )
+{
+   if( sPair )
+     free( sPair );
+}

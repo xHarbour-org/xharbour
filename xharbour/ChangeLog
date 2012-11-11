@@ -8,6 +8,49 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-12 01:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/simplex.c
+    + void cleansPair( void ) to clean variable upon failure
+
+  * source/common/hbfsapi.c
+    ! reformatted
+
+  * source/compiler/harbour.sly
+  * source/compiler/harbouryy.c
+  * source/compiler/hbgenerr.c
+    ! fix many memory leaks on failure
+
+  * source/compiler/harbour.c
+    + add __FILE__ define constant -> prg file name being compiled
+
+  * include/hbcompat.h
+    + xHarbour equivalent for hb_parnldef
+
+  * winmake/mdir.bat
+  * winmake/common.mak
+  * winmake/common2.mak
+  * winmake/compile.mak
+  * contrib/hbxdiff/*.*
+    ! xdiff library borrowed from Harbour
+
+  * contrib/hbmxml/hbmxml.c
+    ! avoid direct access to internals, use API instead.
+
+  * contrib/unicode/hbcc.c
+  * contrib/unicode/hbc7.c
+  * contrib/unicode/hbcu.c
+  * contrib/unicode/hbcx.c
+  * contrib/unicode/hbcy.c
+  * contrib/unicode/hbhex.c
+  * contrib/unicode/hbcrc16.c
+  * contrib/unicode/hbcrc32.c
+  * contrib/unicode/hbcrpt32.c
+  * contrib/unicode/hbcrpt128.c
+  * contrib/unicode/hbencode.c
+  * contrib/unicode/hbcctool.c
+  * contrib/unicode/unitool.c
+    ! reformatted
+
 2012-11-10 02:55 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * utils/misc/hblib.c
     ! upper -> lower, NULL -> 0

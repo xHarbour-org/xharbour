@@ -663,7 +663,7 @@ static mxml_type_t type_cb( mxml_node_t * node )
 
       if( HB_IS_POINTER( s_cbs_var->type_cb ) )
       {
-         hb_vmPushSymbol( ( PHB_SYMB ) s_cbs_var->type_cb->item.asPointer.value );
+         hb_vmPushSymbol( ( PHB_SYMB ) hb_itemGetPtr( s_cbs_var->type_cb ) );
          hb_vmPushNil();
       }
       else if( HB_IS_BLOCK( s_cbs_var->type_cb ) )
@@ -1042,7 +1042,7 @@ static void sax_cb( mxml_node_t * node, mxml_sax_event_t event, void * data )
 
       if( HB_IS_POINTER( s_cbs_var->sax_cb ) )
       {
-         hb_vmPushSymbol( ( PHB_SYMB ) s_cbs_var->sax_cb->item.asPointer.value );
+         hb_vmPushSymbol( ( PHB_SYMB ) hb_itemGetPtr( s_cbs_var->sax_cb ) );
          hb_vmPushNil();
       }
       else if( HB_IS_BLOCK( s_cbs_var->sax_cb ) )
@@ -1220,7 +1220,7 @@ static const char * save_cb( mxml_node_t * node, int where )
 
       if( HB_IS_POINTER( s_cbs_var->save_cb ) )
       {
-         hb_vmPushSymbol( ( PHB_SYMB ) s_cbs_var->save_cb->item.asPointer.value );
+         hb_vmPushSymbol( ( PHB_SYMB ) hb_itemGetPtr( s_cbs_var->save_cb ) );
          hb_vmPushNil();
       }
       else if( HB_IS_BLOCK( s_cbs_var->save_cb ) )
@@ -1403,23 +1403,20 @@ HB_FUNC( MXMLSETELEMENT )
 
 static void error_cb( const char * pszErrorMsg )
 {
-   if( s_error_cb_var != NULL )
+   if( HB_IS_POINTER( s_error_cb_var->error_cb ) )
    {
-      if( HB_IS_POINTER( s_error_cb_var->error_cb ) )
-      {
-         hb_vmPushSymbol( ( PHB_SYMB ) s_error_cb_var->error_cb->item.asPointer.value );
-         hb_vmPushNil();
-      }
-      else if( HB_IS_BLOCK( s_error_cb_var->error_cb ) )
-      {
-         hb_vmPushEvalSym();
-         hb_vmPush( s_error_cb_var->error_cb );
-      }
-
-      hb_itemPutC( hb_stackAllocItem(), pszErrorMsg );
-
-      mxml_do( s_error_cb_var->error_cb, 1 );
+      hb_vmPushSymbol( ( PHB_SYMB ) hb_itemGetPtr( s_error_cb_var->error_cb ) );
+      hb_vmPushNil();
    }
+   else if( HB_IS_BLOCK( s_error_cb_var->error_cb ) )
+   {
+      hb_vmPushEvalSym();
+      hb_vmPush( s_error_cb_var->error_cb );
+   }
+
+   hb_itemPutC( hb_stackAllocItem(), pszErrorMsg );
+
+   mxml_do( s_error_cb_var->error_cb, 1 );
 }
 
 HB_FUNC( MXMLSETERRORCALLBACK )
@@ -1657,13 +1654,13 @@ HB_FUNC( MXMLSETCUSTOM )
 
 static int custom_load_cb( mxml_node_t * node, const char * data )
 {
-   if( node != NULL && s_custom_cbs_var != NULL && data != NULL )
+   if( node != NULL && data != NULL )
    {
       int iResult;
 
       if( HB_IS_POINTER( s_custom_cbs_var->load_cb ) )
       {
-         hb_vmPushSymbol( ( PHB_SYMB ) s_custom_cbs_var->load_cb->item.asPointer.value );
+         hb_vmPushSymbol( ( PHB_SYMB ) hb_itemGetPtr( s_custom_cbs_var->load_cb ) );
          hb_vmPushNil();
       }
       else if( HB_IS_BLOCK( s_custom_cbs_var->load_cb ) )
@@ -1687,7 +1684,7 @@ static int custom_load_cb( mxml_node_t * node, const char * data )
 /* ========== char * ( *mxml_custom_save_cb_t )( mxml_node_t  * ) =========== */
 static char * custom_save_cb( mxml_node_t * node )
 {
-   if( node != NULL && s_custom_cbs_var != NULL )
+   if( node != NULL )
    {
       char *         pszResult;
       const char *   pszText;
@@ -1695,7 +1692,7 @@ static char * custom_save_cb( mxml_node_t * node )
 
       if( HB_IS_POINTER( s_custom_cbs_var->save_cb ) )
       {
-         hb_vmPushSymbol( ( PHB_SYMB ) s_custom_cbs_var->save_cb->item.asPointer.value );
+         hb_vmPushSymbol( ( PHB_SYMB ) hb_itemGetPtr( s_custom_cbs_var->save_cb ) );
          hb_vmPushNil();
       }
       else if( HB_IS_BLOCK( s_custom_cbs_var->save_cb ) )
@@ -1851,27 +1848,18 @@ static void hb_hbxmlExit( void * cargo )
 {
    HB_SYMBOL_UNUSED( cargo );
 
-   if( s_cbs_var )
-      hb_xfree( s_cbs_var );
+   if( s_custom_cbs_var->load_cb )
+      hb_itemRelease( s_custom_cbs_var->load_cb );
 
-   if( s_custom_cbs_var )
-   {
-      if( s_custom_cbs_var->load_cb )
-         hb_itemRelease( s_custom_cbs_var->load_cb );
+   if( s_custom_cbs_var->save_cb )
+      hb_itemRelease( s_custom_cbs_var->save_cb );
 
-      if( s_custom_cbs_var->save_cb )
-         hb_itemRelease( s_custom_cbs_var->save_cb );
+   if( s_error_cb_var->error_cb )
+      hb_itemRelease( s_error_cb_var->error_cb );
 
-      hb_xfree( s_custom_cbs_var );
-   }
-
-   if( s_error_cb_var )
-   {
-      if( s_error_cb_var->error_cb )
-         hb_itemRelease( s_error_cb_var->error_cb );
-
-      hb_xfree( s_error_cb_var );
-   }
+   hb_xfree( s_cbs_var );
+   hb_xfree( s_custom_cbs_var );
+   hb_xfree( s_error_cb_var );
 }
 
 //------------------------------------------------------------------------------

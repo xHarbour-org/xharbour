@@ -203,6 +203,8 @@ typedef struct _BLOCKSLIST
 
 PBLOCKSLIST hb_comp_BlocksList = NULL;
 
+static HB_EXPR_PTR asExpr = NULL;
+
 static void hb_compDebugStart( void ) { };
 
 %}
@@ -712,7 +714,7 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
                                   }
                                 }
              Crlf
-           | error  { if( hb_comp_bError == FALSE ) yyerror( NULL ); } Crlf  { yyclearin; yyerrok; }
+           | error  { if( hb_comp_bError == FALSE ) { yyerror( NULL ); }; } Crlf  { yyclearin; yyerrok; }
            | PARAMETERS { if( hb_comp_functions.pLast->bFlags & FUN_USES_LOCAL_PARAMS )
                           {
                              hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_PARAMETERS_NOT_ALLOWED, NULL, NULL );
@@ -1047,6 +1049,8 @@ ArrayAtAlias : ArrayAt ALIASOP      { $$ = $1; }
  */
 Variable    : IdentName         {
                                    $$ = hb_compExprNewVar( $1 );
+
+                                   asExpr = $$;
 
                                    if( hb_comp_BlocksList )
                                    {
@@ -3739,6 +3743,9 @@ void yyerror( char * s )
       else if( yychar == ENDIF && hb_comp_wIfCounter == 0 )
       {
          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_ENDIF, NULL, NULL );
+
+         if( hb_comp_pLoops )
+            hb_xfree( hb_comp_pLoops );
       }
 
       if( s_iControlLevel )
@@ -3777,6 +3784,8 @@ void yyerror( char * s )
       else
       {
          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_YACC, s, yytext );
+         if( asExpr )
+            hb_xfree( asExpr );
       }
    }
 }

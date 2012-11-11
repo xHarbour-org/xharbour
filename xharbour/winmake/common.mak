@@ -97,6 +97,7 @@ SIXAPI_DIR    =contrib$(DIR_SEP)sixapi
 HBCAB_DIR     =contrib$(DIR_SEP)hbcab
 HBCOMM_DIR    =contrib$(DIR_SEP)hbcomm
 HBMXML_DIR    =contrib$(DIR_SEP)hbmxml
+HBXDIFF_DIR   =contrib$(DIR_SEP)hbxdiff
 
 INCLUDE_DIR2  =include
 
@@ -150,6 +151,7 @@ HB_GT_LIBS  =$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTWVT_LIB) $(
 #===============================================================================
 # Contrib Library Names
 #===============================================================================
+HBXDIFF_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbxdiff$(LIBEXT)
 HBMXML_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbmxml$(LIBEXT)
 HBCOMM_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbcomm$(LIBEXT)
 HBCAB_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbcab$(LIBEXT)
@@ -264,6 +266,26 @@ HARBOUR_LIBS=\
 #===============================================================================
 # List Of Library and Executable Dependencies
 #===============================================================================
+
+#===============================================================================
+# HBXDIFF.LIB
+#===============================================================================
+HBXDIFF_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)corexdiff$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xadler32$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xalloc$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xbdiff$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xbpatchi$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xdiffi$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xemit$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xmerge3$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xmissing$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xpatchi$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xprepare$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xrabdiff$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xrabply$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xutils$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)xversion$(OBJEXT)
 
 #===============================================================================
 # HBMXML.LIB
@@ -2521,5 +2543,6 @@ CONTRIB_PROJECT=\
 	$(SIXAPI_LIB)\
 	$(HBCAB_LIB)\
 	$(HBCOMM_LIB)\
-	$(HBMXML_LIB)
+	$(HBMXML_LIB)\
+	$(HBXDIFF_LIB)
 

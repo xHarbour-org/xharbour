@@ -4,14 +4,10 @@
 
 /*
  * Harbour Project source code:
- * Harbour Unicode Support
+ *    LIBXDIFF functions wrapper
  *
- * Source codes for functions:
- *    HB_NLTOHX()
- *    HB_HXTONL()
- *
- * Copyright 2004 Dmitry V. Korzhov <dk@april26.spb.ru>
- * www - http://www.harbour-project.org
+ * Copyright 2010 Petr Chornyj <myorg63@mail.ru>
+ * www - http://harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,81 +50,25 @@
  *
  */
 
-/*
-   HB_NLTOHX(n) -> c
-      Converts integer variables to string
-   Parameters:
-      n - numeric value (0-4294967295)
-   Returns:
-      hexadecimal string ("0"-"FFFFFFFF") representation
+#ifndef HBXDIFF_CH_
+#define HBXDIFF_CH_
 
-   HB_HXTONL(c) -> n
-      Gets integer numeric variable from string
-   Parameters:
-      c - hexadecimal string ("0"-"FFFFFFFF") representation
-   Returns:
-      numeric value (0-4294967295)
- */
+#define XDLT_STD_BLKSIZE        ( 1024 * 8 )
+#define XDLT_MAX_LINE_SIZE      80
 
-#include "hbcc.h"
+#define XDF_NEED_MINIMAL        ( hb_bitShift( 1, 1 ) )
 
-HB_FUNC( HB_NLTOHX )
-{
-   BYTE * dststr;
+#define XDL_PATCH_NORMAL        ( Asc( "-" ) )
+#define XDL_PATCH_REVERSE       ( Asc( "+" ) )
+#define XDL_PATCH_MODEMASK      ( hb_bitShift( 1, 8 ) - 1 )
+#define XDL_PATCH_IGNOREBSPACE  ( hb_bitShift( 1, 8 ) )
 
-   if( hb_pcount() )
-   {
-      dststr = ( BYTE * ) hb_xgrab( 9 );
-      hb_snprintf( ( char * ) dststr, 9, "%lX", hb_parnl( 1 ) );
-      hb_retc( ( char * ) dststr );
-      hb_xfree( dststr );
-   }
-   else
-   {
-      hb_retc( "" );
-   }
-}
+#define XDL_MMB_READONLY        ( hb_bitShift( 1, 0 ) )
 
-HB_FUNC( HB_NLTOH8 )
-{
-   int      i;
-   BYTE *   dststr;
+#define XDL_MMF_ATOMIC          ( hb_bitShift( 1, 0 ) )
 
-   if( hb_pcount() )
-   {
-      dststr = ( BYTE * ) hb_xgrab( 9 );
-      hb_snprintf( ( char * ) dststr, 9, "%08lX", hb_parnl( 1 ) );
+#define XDL_BDOP_INS            1
+#define XDL_BDOP_CPY            2
+#define XDL_BDOP_INSB           3
 
-      for( i = 0; i < 8; i++ )
-      {
-         if( dststr[ i ] == ' ' )
-         {
-            dststr[ i ] = '0';
-         }
-      }
-
-      hb_retclenAdoptRaw( ( char * ) dststr, 8 );
-   }
-   else
-   {
-      hb_retc( "" );
-   }
-}
-
-HB_FUNC( HB_HXTONL )
-{
-   PHB_ITEM phbstr   = hb_param( 1, HB_IT_STRING );
-   ULONG    val      = 0l;
-   BYTE *   srcstr;
-
-   if( phbstr )
-   {
-      srcstr = ( BYTE * ) hb_itemGetCPtr( phbstr );
-      sscanf( ( char * ) srcstr, "%lX", &val );
-      hb_retnl( val );
-   }
-   else
-   {
-      hb_retnl( 0 );
-   }
-}
+#endif /* HBXDIFF_CH_ */

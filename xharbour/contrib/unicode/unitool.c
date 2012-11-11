@@ -61,9 +61,9 @@
 
 typedef struct
 {
-   char   szName[10];         /* Code page name */
-   char   szDescription[32];  /* Description */
-   USHORT uCode[256];         /* Unicode table */
+   char szName[ 10 ];         /* Code page name */
+   char szDescription[ 32 ];  /* Description */
+   USHORT uCode[ 256 ];       /* Unicode table */
 } HB_UNITABLE;
 
 static HB_UNITABLE s_Codepage[] = {
@@ -123,33 +123,34 @@ static HB_UNITABLE s_Codepage[] = {
    { "CP10081", "cp10000_MacTurkish"      , {0x0000,0x0001,0x0002,0x0003,0x0004,0x0005,0x0006,0x0007,0x0008,0x0009,0x000a,0x000b,0x000c,0x000d,0x000e,0x000f,0x0010,0x0011,0x0012,0x0013,0x0014,0x0015,0x0016,0x0017,0x0018,0x0019,0x001a,0x001b,0x001c,0x001d,0x001e,0x001f,0x0020,0x0021,0x0022,0x0023,0x0024,0x0025,0x0026,0x0027,0x0028,0x0029,0x002a,0x002b,0x002c,0x002d,0x002e,0x002f,0x0030,0x0031,0x0032,0x0033,0x0034,0x0035,0x0036,0x0037,0x0038,0x0039,0x003a,0x003b,0x003c,0x003d,0x003e,0x003f,0x0040,0x0041,0x0042,0x0043,0x0044,0x0045,0x0046,0x0047,0x0048,0x0049,0x004a,0x004b,0x004c,0x004d,0x004e,0x004f,0x0050,0x0051,0x0052,0x0053,0x0054,0x0055,0x0056,0x0057,0x0058,0x0059,0x005a,0x005b,0x005c,0x005d,0x005e,0x005f,0x0060,0x0061,0x0062,0x0063,0x0064,0x0065,0x0066,0x0067,0x0068,0x0069,0x006a,0x006b,0x006c,0x006d,0x006e,0x006f,0x0070,0x0071,0x0072,0x0073,0x0074,0x0075,0x0076,0x0077,0x0078,0x0079,0x007a,0x007b,0x007c,0x007d,0x007e,0x007f,0x00c4,0x00c5,0x00c7,0x00c9,0x00d1,0x00d6,0x00dc,0x00e1,0x00e0,0x00e2,0x00e4,0x00e3,0x00e5,0x00e7,0x00e9,0x00e8,0x00ea,0x00eb,0x00ed,0x00ec,0x00ee,0x00ef,0x00f1,0x00f3,0x00f2,0x00f4,0x00f6,0x00f5,0x00fa,0x00f9,0x00fb,0x00fc,0x2020,0x00b0,0x00a2,0x00a3,0x00a7,0x2022,0x00b6,0x00df,0x00ae,0x00a9,0x2122,0x00b4,0x00a8,0x2260,0x00c6,0x00d8,0x221e,0x00b1,0x2264,0x2265,0x00a5,0x00b5,0x2202,0x2211,0x220f,0x03c0,0x222b,0x00aa,0x00ba,0x2126,0x00e6,0x00f8,0x00bf,0x00a1,0x00ac,0x221a,0x0192,0x2248,0x2206,0x00ab,0x00bb,0x2026,0x00a0,0x00c0,0x00c3,0x00d5,0x0152,0x0153,0x2013,0x2014,0x201c,0x201d,0x2018,0x2019,0x00f7,0x25ca,0x00ff,0x0178,0x011e,0x011f,0x0130,0x0131,0x015e,0x015f,0x2021,0x00b7,0x201a,0x201e,0x2030,0x00c2,0x00ca,0x00c1,0x00cb,0x00c8,0x00cd,0x00ce,0x00cf,0x00cc,0x00d3,0x00d4,0x0000,0x00d2,0x00da,0x00db,0x00d9,0x0000,0x02c6,0x02dc,0x00af,0x02d8,0x02d9,0x02da,0x00b8,0x02dd,0x02db,0x02c7} }
    };
 
-static UINT iLen = sizeof( s_Codepage ) / ( sizeof( s_Codepage[0].szName ) + sizeof( s_Codepage[0].szDescription ) + sizeof( s_Codepage[0].uCode ) ) ;
+static UINT iLen = sizeof( s_Codepage ) / ( sizeof( s_Codepage[ 0 ].szName ) + sizeof( s_Codepage[ 0 ].szDescription ) + sizeof( s_Codepage[ 0 ].uCode ) );
 
 /*
    HB_UNISTRLEN( cUnicodeStr )
    Returns length of a Unicode string
-*/
+ */
 HB_FUNC( HB_UNISTRLEN )
 {
    ULONG uLen = 0;
 
-   if ( hb_param( 1, HB_IT_STRING ) )
+   if( hb_param( 1, HB_IT_STRING ) )
    {
-      ULONG uInLen = (ULONG) hb_parclen( 1 );
-      const char* szStr = hb_parc( 1 );
-      ULONG i = 0;
+      ULONG          uInLen   = ( ULONG ) hb_parclen( 1 );
+      const char *   szStr    = hb_parc( 1 );
+      ULONG          i        = 0;
 
       do
       {
-         if ( ( szStr [i] == '\\' ) && ( szStr[i + 1] == 'u' ) )
+         if( ( szStr[ i ] == '\\' ) && ( szStr[ i + 1 ] == 'u' ) )
          {
             i += 5;
-            uLen ++;
+            uLen++;
             continue;
          }
-         uLen ++;
+         uLen++;
 
-      } while ( i ++ < uInLen - 1 );
+      }
+      while( i++ < uInLen - 1 );
    }
 
    hb_retnl( uLen );
@@ -158,60 +159,63 @@ HB_FUNC( HB_UNISTRLEN )
 /*
    HB_UNIAVAILABLE()
    Returns Multi-dimension array containing code page ID and Description
-*/
+ */
 HB_FUNC( HB_UNIAVAILABLE )
 {
-   PHB_ITEM pReturn = hb_itemArrayNew( 0 );
-   UINT i = 0;
+   PHB_ITEM pReturn  = hb_itemArrayNew( 0 );
+   UINT     i        = 0;
 
    do
    {
-      PHB_ITEM pCodepage = hb_itemArrayNew( 2 );
-      PHB_ITEM temp = hb_itemNew( NULL );
+      PHB_ITEM pCodepage   = hb_itemArrayNew( 2 );
+      PHB_ITEM temp        = hb_itemNew( NULL );
 
-      hb_arraySet( pCodepage, 1, hb_itemPutC( temp, s_Codepage[i].szName           ) );
-      hb_arraySet( pCodepage, 2, hb_itemPutC( temp, s_Codepage[i].szDescription    ) );
+      hb_arraySet( pCodepage, 1, hb_itemPutC( temp, s_Codepage[ i ].szName           ) );
+      hb_arraySet( pCodepage, 2, hb_itemPutC( temp, s_Codepage[ i ].szDescription    ) );
 
       hb_arrayAdd( pReturn, pCodepage );
       hb_itemRelease( temp );
       hb_itemRelease( pCodepage );
-   } while( i ++ < iLen - 1 );
+   }
+   while( i++ < iLen - 1 );
 
    hb_itemRelease( hb_itemReturn( pReturn ) );
 }
 
-static USHORT *hb_getCP( const char* szCP )
+static USHORT * hb_getCP( const char * szCP )
 {
-   UINT t = 0;
-   ULONG lszCPLen = (ULONG) strlen( szCP );
+   UINT  t        = 0;
+   ULONG lszCPLen = ( ULONG ) strlen( szCP );
 
    do
    {
-      if (( lszCPLen == strlen( s_Codepage[t].szName ) ) &&
-          ( strncmp( szCP, s_Codepage[t].szName, lszCPLen ) == 0 ))
-         return s_Codepage[t].uCode;
-   } while( t ++ < iLen );
+      if( ( lszCPLen == strlen( s_Codepage[ t ].szName ) ) &&
+          ( strncmp( szCP, s_Codepage[ t ].szName, lszCPLen ) == 0 ) )
+         return s_Codepage[ t ].uCode;
+   }
+   while( t++ < iLen );
 
    return NULL;
 }
 
-static const char * hb_uni2str( USHORT u, USHORT* uCP )
+static const char * hb_uni2str( USHORT u, USHORT * uCP )
 {
-   static USHORT sRet[] = { ' ', 0 }; // space for unknown char
-   USHORT i = 0;
+   static USHORT  sRet[]   = { ' ', 0 }; // space for unknown char
+   USHORT         i        = 0;
 
-   sRet [0] = ' ';
+   sRet[ 0 ] = ' ';
 
    do
    {
-      if ( uCP[i] == u )
+      if( uCP[ i ] == u )
       {
-         ( ( USHORT* ) sRet ) [0] = i;
+         ( ( USHORT * ) sRet )[ 0 ] = i;
          break;
       }
-   } while( i ++ < 255 );
+   }
+   while( i++ < 255 );
 
-   return (const char*) sRet;
+   return ( const char * ) sRet;
 }
 
 /*
@@ -219,38 +223,39 @@ static const char * hb_uni2str( USHORT u, USHORT* uCP )
    Convert String To Unicode
    cString = string to be converted
    cCP = Code Page ID
-*/
+ */
 HB_FUNC( HB_STR2UNI )
 {
-   const char *szCP = hb_parc( 2 );
-   USHORT *uCP = hb_getCP( szCP );
+   const char *   szCP  = hb_parc( 2 );
+   USHORT *       uCP   = hb_getCP( szCP );
 
-   if( uCP && ISCHAR(1) )
+   if( uCP && ISCHAR( 1 ) )
    {
-      ULONG uLen = (ULONG) hb_parclen( 1 );
+      ULONG uLen = ( ULONG ) hb_parclen( 1 );
 
       if( uLen > 0 )
       {
-         const unsigned char *cString = (const unsigned char *) hb_parc( 1 );
-         char* szRet = (char*) hb_xgrab( uLen * 5 );
-         LONG uHex;
-         ULONG i = 0;
+         const unsigned char *   cString  = ( const unsigned char * ) hb_parc( 1 );
+         char *                  szRet    = ( char * ) hb_xgrab( uLen * 5 );
+         LONG                    uHex;
+         ULONG                   i        = 0;
 
          hb_xmemset( szRet, 0, uLen * 5 );
 
          do
          {
-             uHex = uCP[cString[i]];
+            uHex = uCP[ cString[ i ] ];
 
-             if ( uHex == cString[i] )
-                hb_xstrcat( szRet, hb_szAscii[(unsigned char) uHex], 0 );
-             else
-             {
-                char buf[7];
-                hb_snprintf( buf, sizeof( buf ), "\\u%04X", (unsigned int) uHex );
-                hb_xstrcat( szRet, buf, 0 );
-             }
-         } while( i ++ < uLen - 1 );
+            if( uHex == cString[ i ] )
+               hb_xstrcat( szRet, hb_szAscii[ ( unsigned char ) uHex ], 0 );
+            else
+            {
+               char buf[ 7 ];
+               hb_snprintf( buf, sizeof( buf ), "\\u%04X", ( unsigned int ) uHex );
+               hb_xstrcat( szRet, buf, 0 );
+            }
+         }
+         while( i++ < uLen - 1 );
 
          hb_retcAdopt( szRet );
          return;
@@ -265,42 +270,43 @@ HB_FUNC( HB_STR2UNI )
    Convert Unicode To ASCII
    cString = string to be converted
    cCP = Code Page ID
-*/
+ */
 HB_FUNC( HB_UNI2STR )
 {
-   const char *szCP = hb_parc( 2 );
-   USHORT *uCP = hb_getCP( szCP );
+   const char *   szCP  = hb_parc( 2 );
+   USHORT *       uCP   = hb_getCP( szCP );
 
-   if( uCP && ISCHAR(1) )
+   if( uCP && ISCHAR( 1 ) )
    {
-      ULONG uLen = (ULONG) hb_parclen( 1 );
+      ULONG uLen = ( ULONG ) hb_parclen( 1 );
 
       if( uLen > 0 )
       {
-         const unsigned char *cString = (const unsigned char *) hb_parc( 1 );
-         char* szRet = (char*) hb_xgrab( uLen + 1 );
-         ULONG u = 0;
+         const unsigned char *   cString  = ( const unsigned char * ) hb_parc( 1 );
+         char *                  szRet    = ( char * ) hb_xgrab( uLen + 1 );
+         ULONG                   u        = 0;
 
          hb_xmemset( szRet, 0, uLen + 1 );
 
          do
          {
-            if ( ( cString[u] == '\\' ) && (cString[u+1] == 'u') )
+            if( ( cString[ u ] == '\\' ) && ( cString[ u + 1 ] == 'u' ) )
             {
-               char s[5];
-               int i;
+               char  s[ 5 ];
+               int   i;
 
-               for ( i = 0; i < 4; i ++ )
-                  s[i] = cString[u+i+2];
+               for( i = 0; i < 4; i++ )
+                  s[ i ] = cString[ u + i + 2 ];
 
-               s[4] = 0;
-               hb_xstrcat( szRet, hb_uni2str( (USHORT) hb_hextonum( s ), uCP ), 0 );
-               u += 5;
+               s[ 4 ]   = 0;
+               hb_xstrcat( szRet, hb_uni2str( ( USHORT ) hb_hextonum( s ), uCP ), 0 );
+               u        += 5;
             }
             else
-               hb_xstrcat( szRet, hb_uni2str( cString[u], uCP ), 0 );
+               hb_xstrcat( szRet, hb_uni2str( cString[ u ], uCP ), 0 );
 
-         } while( u ++ < uLen - 1 );
+         }
+         while( u++ < uLen - 1 );
 
          hb_retcAdopt( szRet );
          return;

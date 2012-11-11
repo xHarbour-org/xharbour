@@ -59,9 +59,9 @@
  */
 
 /*
-This functions might be useful for file transfer via SMTP/NNTP as attachment.
+   This functions might be useful for file transfer via SMTP/NNTP as attachment.
 
-UUENCODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
+   UUENCODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
    Description:
       UUEncode a given file
    Parameters:
@@ -72,7 +72,7 @@ UUENCODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
       -1 = cannot open source file
       -2 = cannot create output file
 
-UUENCODE_FILE_BY_CHUNK( <cFileInput>, <nLinePerFile>, [<cFileMask>] ) -> int
+   UUENCODE_FILE_BY_CHUNK( <cFileInput>, <nLinePerFile>, [<cFileMask>] ) -> int
    Description:
       UUEncode a given file into file chunks whose size are determined
       ny nLinePerFile
@@ -86,7 +86,7 @@ UUENCODE_FILE_BY_CHUNK( <cFileInput>, <nLinePerFile>, [<cFileMask>] ) -> int
       -2 = cannot create output file
       -3 = invalid number of lines per file
 
-B64ENCODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
+   B64ENCODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
    Description:
       Base64-Encode a given file
    Parameters:
@@ -97,7 +97,7 @@ B64ENCODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
       -1 = cannot open source file
       -2 = cannot create output file
 
-B64ENCODE_FILE_BY_CHUNK( <cFileInput>, <nLinePerFile>, [<cFileMask>] ) -> int
+   B64ENCODE_FILE_BY_CHUNK( <cFileInput>, <nLinePerFile>, [<cFileMask>] ) -> int
    Description:
       Base64-Encode a given file into file chunks whose size are determined
       ny nLinePerFile
@@ -111,7 +111,7 @@ B64ENCODE_FILE_BY_CHUNK( <cFileInput>, <nLinePerFile>, [<cFileMask>] ) -> int
       -2 = cannot create output file
       -3 = invalid number of lines per file
 
-YYENCODE_FILE( <cFileInput>, [<cFileOutput>], [<nCharPerLine>] ) -> int
+   YYENCODE_FILE( <cFileInput>, [<cFileOutput>], [<nCharPerLine>] ) -> int
    Description:
       YYEncode a given file
    Parameters:
@@ -125,7 +125,7 @@ YYENCODE_FILE( <cFileInput>, [<cFileOutput>], [<nCharPerLine>] ) -> int
       -3 = Error in reading file for encoding
       -4 = Error in writing encoded file
 
-YYENCODE_FILE_BY_CHUNK( <cFileInput>, <nLinePerFile>, [<cFilemask>], [<nCharPerLine>] ) -> int
+   YYENCODE_FILE_BY_CHUNK( <cFileInput>, <nLinePerFile>, [<cFilemask>], [<nCharPerLine>] ) -> int
    Description:
       YYEncode a given file into file chunks whose size are determined
       ny nLinePerFile
@@ -140,19 +140,19 @@ YYENCODE_FILE_BY_CHUNK( <cFileInput>, <nLinePerFile>, [<cFilemask>], [<nCharPerL
       -2 = cannot create output file
       -3 = Error in reading file for encoding
       -4 = Error in writing encoded file
-*/
+ */
 
 /*
-  Note: New error codes 8001 up to 8006 are created here.
+   Note: New error codes 8001 up to 8006 are created here.
         Feel free to change them if so needed
-*/
+ */
 
 #include "hbcc.h"
 
-static char basis_64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-static int crc_val;
+static char basis_64[]     = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+static int  crc_val;
 static long crc_anz;
-static int crc_tab[256] =
+static int  crc_tab[ 256 ] =
 {
    0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3,
    0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988, 0x09b64c2b, 0x7eb17cbd, 0xe7b82d07, 0x90bf1d91,
@@ -191,92 +191,92 @@ static int crc_tab[256] =
 //----------------------------------------------------------------------------//
 static void CrcInit( void )
 {
-   crc_val = -1L ;
-   crc_anz = 0L;
+   crc_val  = -1L;
+   crc_anz  = 0L;
 }
 
 //----------------------------------------------------------------------------//
-static void CrcAdd(int c)
+static void CrcAdd( int c )
 {
-   unsigned long ch1,ch2,cc;
+   unsigned long ch1, ch2, cc;
 
-   cc= (c) & 0x000000ffL;
-   ch1=(crc_val ^ cc) & 0xffL;
-   ch1=crc_tab[ch1];
-   ch2=(crc_val>>8L) & 0xffffffL;  // Correct version
-   crc_val=ch1 ^ ch2;
+   cc       = ( c ) & 0x000000ffL;
+   ch1      = ( crc_val ^ cc ) & 0xffL;
+   ch1      = crc_tab[ ch1 ];
+   ch2      = ( crc_val >> 8L ) & 0xffffffL; // Correct version
+   crc_val  = ch1 ^ ch2;
    crc_anz++;
 }
 
 //----------------------------------------------------------------------------//
-static int yEncode(FILE * fDes, char * postname, FILE * fSrc, long filelen, int part, long fulllen, int linelength )
+static int yEncode( FILE * fDes, char * postname, FILE * fSrc, long filelen, int part, long fulllen, int linelength )
 {
-   long restlen;
-   long srclen;
-   long deslen;
-   unsigned char srcbuf[4100];
-   unsigned char desbuf[260];
-   unsigned char * srcp;
-   unsigned char * desp;
-   unsigned char c;
-   int id;
-   static long pbegin, pend;
+   long              restlen;
+   long              srclen;
+   long              deslen;
+   unsigned char     srcbuf[ 4100 ];
+   unsigned char     desbuf[ 260 ];
+   unsigned char *   srcp;
+   unsigned char *   desp;
+   unsigned char     c;
+   int               id;
+   static long       pbegin, pend;
 
-   if (part==0)  // SinglePart message
+   if( part == 0 )  // SinglePart message
    {
-      fprintf(fDes,"=ybegin line=%ld size=%ld name=%s\r\n",(ULONG)linelength,filelen,postname);
+      fprintf( fDes, "=ybegin line=%ld size=%ld name=%s\r\n", ( ULONG ) linelength, filelen, postname );
    }
    else          // Multipart message
    {
-      if (part==1)
+      if( part == 1 )
       {
-         pbegin=1;
-         pend=filelen;
+         pbegin   = 1;
+         pend     = filelen;
       }
       else
       {
-         pbegin=pend+1;
-         pend=pend+filelen;
+         pbegin   = pend + 1;
+         pend     = pend + filelen;
       }
 
-      fprintf(fDes,"=ybegin part=%d line=%ld size=%ld name=%s\r\n",part,(ULONG)linelength,fulllen,postname);
-      fprintf(fDes,"=ypart begin=%ld end=%ld\r\n",pbegin,pend);
+      fprintf( fDes, "=ybegin part=%d line=%ld size=%ld name=%s\r\n", part, ( ULONG ) linelength, fulllen, postname );
+      fprintf( fDes, "=ypart begin=%ld end=%ld\r\n", pbegin, pend );
    }
 
    CrcInit();
 
-   deslen=0;
-   desp=desbuf;
-   restlen=filelen;
+   deslen   = 0;
+   desp     = desbuf;
+   restlen  = filelen;
 
-   while (restlen>0)
+   while( restlen > 0 )
    {
-      srclen=restlen;
+      srclen = restlen;
 
-      if (srclen>4096)
+      if( srclen > 4096 )
       {
-         srclen=4096;
+         srclen = 4096;
       }
 
-      id=(int)fread(srcbuf,srclen,1,fSrc);
+      id = ( int ) fread( srcbuf, srclen, 1, fSrc );
 
-      if (id != 1)
+      if( id != 1 )
       {
-         return( -3);
+         return -3;
       }
 
-      restlen=restlen-srclen;
-      srcp=srcbuf;
+      restlen  = restlen - srclen;
+      srcp     = srcbuf;
 
-      while (srclen>0)
+      while( srclen > 0 )
       {
-         c=*srcp;                    // Get a source byte
-         CrcAdd(c);                  // Add it to the CRC
-         c=(unsigned char) (c+42);   // and add the secret number
+         c  = *srcp;                         // Get a source byte
+         CrcAdd( c );                        // Add it to the CRC
+         c  = ( unsigned char ) ( c + 42 );  // and add the secret number
          srcp++;
          srclen--;
 
-         switch (c)  // Solve special in NNTP 'forbidden' characters
+         switch( c )  // Solve special in NNTP 'forbidden' characters
          {
             case 0:
             case 9:
@@ -284,103 +284,103 @@ static int yEncode(FILE * fDes, char * postname, FILE * fSrc, long filelen, int 
             case 13:
             case '=':   // Including the escape character itself
             case '.':   // Some usual servers have problems with a dot in the first column
-              *desp='=';
-              desp++;
-              deslen++;
-              c=(unsigned char)(c+64);
+               *desp = '=';
+               desp++;
+               deslen++;
+               c     = ( unsigned char ) ( c + 64 );
          }
 
-         *desp=c;
+         *desp = c;
          desp++;
          deslen++;
 
-         if ((deslen>=linelength)|((srclen==0)&(restlen==0))) // Block full - or end of file
+         if( ( deslen >= linelength ) | ( ( srclen == 0 ) & ( restlen == 0 ) ) ) // Block full - or end of file
          {
-            *desp=13;
+            *desp = 13;
             desp++;
             deslen++;
-            *desp=10;
+            *desp = 10;
             deslen++;
-            id=(int)fwrite(desbuf,deslen,1,fDes);
+            id    = ( int ) fwrite( desbuf, deslen, 1, fDes );
 
-            if (id!=1)
+            if( id != 1 )
             {
-               return(-4);
+               return -4;
             }
-            deslen=0; desp=desbuf;
+            deslen = 0; desp = desbuf;
          }
       }
    }
 
-   if (part==0)   // Single part message
+   if( part == 0 )   // Single part message
    {
-      fprintf(fDes,"=yend size=%ld crc32=%08lx \r\n",filelen,(ULONG)crc_val ^ 0xFFFFFFFF);
+      fprintf( fDes, "=yend size=%ld crc32=%08lx \r\n", filelen, ( ULONG ) crc_val ^ 0xFFFFFFFF );
    }
    else           // Multipart message
    {
       // This does not yet support the full crc32 for the entire file
-      fprintf(fDes,"=yend size=%ld part=%d pcrc32=%08lx \r\n",filelen,(USHORT)part,(ULONG)crc_val ^ 0xFFFFFFFF);
+      fprintf( fDes, "=yend size=%ld part=%d pcrc32=%08lx \r\n", filelen, ( USHORT ) part, ( ULONG ) crc_val ^ 0xFFFFFFFF );
    }
 
-   return(0);
+   return 0;
 }
 
 //----------------------------------------------------------------------------//
-static void output64chunk( int c1, int c2, int c3, int pads, FILE *outfile)
+static void output64chunk( int c1, int c2, int c3, int pads, FILE * outfile )
 {
-    putc(basis_64[c1>>2], outfile);
-    putc(basis_64[((c1 & 0x3)<< 4) | ((c2 & 0xF0) >> 4)], outfile);
+   putc( basis_64[ c1 >> 2 ], outfile );
+   putc( basis_64[ ( ( c1 & 0x3 ) << 4 ) | ( ( c2 & 0xF0 ) >> 4 ) ], outfile );
 
-    if (pads == 2)
-    {
-       putc('=', outfile);
-       putc('=', outfile);
-    }
-    else if (pads)
-    {
-       putc(basis_64[((c2 & 0xF) << 2) | ((c3 & 0xC0) >>6)], outfile);
-       putc('=', outfile);
-    }
-    else
-    {
-       putc(basis_64[((c2 & 0xF) << 2) | ((c3 & 0xC0) >>6)], outfile);
-       putc(basis_64[c3 & 0x3F], outfile);
-    }
+   if( pads == 2 )
+   {
+      putc( '=', outfile );
+      putc( '=', outfile );
+   }
+   else if( pads )
+   {
+      putc( basis_64[ ( ( c2 & 0xF ) << 2 ) | ( ( c3 & 0xC0 ) >> 6 ) ], outfile );
+      putc( '=', outfile );
+   }
+   else
+   {
+      putc( basis_64[ ( ( c2 & 0xF ) << 2 ) | ( ( c3 & 0xC0 ) >> 6 ) ], outfile );
+      putc( basis_64[ c3 & 0x3F ], outfile );
+   }
 }
 
 //----------------------------------------------------------------------------//
-static void b64header( FILE * outfile, BYTE* strIn )
+static void b64header( FILE * outfile, BYTE * strIn )
 {
-   fprintf(outfile,"Content-Type: application/octet-stream; name=\"");
-   fprintf(outfile, (char*) hbcc_getfilename (strIn));
-   fprintf(outfile,"\"\n");
-   fprintf(outfile,"Content-Transfer-Encoding: base64\n\n");
+   fprintf( outfile, "Content-Type: application/octet-stream; name=\"" );
+   fprintf( outfile, ( char * ) hbcc_getfilename( strIn ) );
+   fprintf( outfile, "\"\n" );
+   fprintf( outfile, "Content-Transfer-Encoding: base64\n\n" );
 
    /*
-   Attachment attributes are intentionally ignored here. To use B64 encoded
-   file as an email or NNTP article attachment, some more lines have to be
-   added, like:
+      Attachment attributes are intentionally ignored here. To use B64 encoded
+      file as an email or NNTP article attachment, some more lines have to be
+      added, like:
 
-   "Content-Disposition: attachment; filename=myfile.zip"
-   */
+      "Content-Disposition: attachment; filename=myfile.zip"
+    */
 }
 
 //----------------------------------------------------------------------------//
-static int b64encode_file( BYTE *strIn, BYTE *strOut )
+static int b64encode_file( BYTE * strIn, BYTE * strOut )
 {
-   FILE *infile, *outfile;
-   int c1, c2, c3, ct = 0;
+   FILE *   infile, * outfile;
+   int      c1, c2, c3, ct = 0;
 
-   infile = hb_fopen( (const char*) strIn, "rb");
+   infile = hb_fopen( ( const char * ) strIn, "rb" );
 
-   if ( !infile )
+   if( ! infile )
    {
       return -1;
    }
 
-   outfile = hb_fopen ( (const char*) strOut, "wb");
+   outfile = hb_fopen( ( const char * ) strOut, "wb" );
 
-   if ( !outfile )
+   if( ! outfile )
    {
       fclose( infile );
       return -2;
@@ -388,74 +388,74 @@ static int b64encode_file( BYTE *strIn, BYTE *strOut )
 
    b64header( outfile, strIn );
 
-   while ((c1 = getc(infile)) != EOF)
+   while( ( c1 = getc( infile ) ) != EOF )
    {
-      c2 = getc(infile);
+      c2 = getc( infile );
 
-      if (c2 == EOF)
+      if( c2 == EOF )
       {
-         output64chunk(c1, 0, 0, 2, outfile);
+         output64chunk( c1, 0, 0, 2, outfile );
       }
       else
       {
-         c3 = getc(infile);
+         c3 = getc( infile );
 
-         if (c3 == EOF)
+         if( c3 == EOF )
          {
-            output64chunk(c1, c2, 0, 1, outfile);
+            output64chunk( c1, c2, 0, 1, outfile );
          }
          else
          {
-            output64chunk(c1, c2, c3, 0, outfile);
+            output64chunk( c1, c2, c3, 0, outfile );
          }
       }
 
       ct += 4;
 
-      if (ct > 71)
+      if( ct > 71 )
       {
-         putc('\n', outfile);
+         putc( '\n', outfile );
          ct = 0;
       }
    }
 
-   if (ct)
+   if( ct )
    {
-     putc('\n', outfile);
+      putc( '\n', outfile );
    }
 
-   fclose (infile);
-   fclose (outfile);
+   fclose( infile );
+   fclose( outfile );
 
    return 0;
 }
 
 //----------------------------------------------------------------------------//
-static int b64encode_file_by_chunk ( BYTE *strIn, BYTE *strOut, ULONG lines )
+static int b64encode_file_by_chunk( BYTE * strIn, BYTE * strOut, ULONG lines )
 {
-   FILE *infile, *outfile;
-   int c1, c2, c3, ct=0, filenumber=1;
-   LONG nlinesperfile=lines;
-   char cfile[256];
-   int nResult = 0;
+   FILE *   infile, * outfile;
+   int      c1, c2, c3, ct = 0, filenumber = 1;
+   LONG     nlinesperfile  = lines;
+   char     cfile[ 256 ];
+   int      nResult        = 0;
 
-   if ( lines < 4 )
+   if( lines < 4 )
    {
       return -3;
    }
 
    hb_snprintf( cfile, sizeof( cfile ), "%s%02d.b64", strOut, filenumber );
 
-   infile = hb_fopen( (const char*) strIn, "rb");
+   infile = hb_fopen( ( const char * ) strIn, "rb" );
 
-   if ( !infile )
+   if( ! infile )
    {
       return -1;
    }
 
-   outfile = hb_fopen ( (const char*) cfile, "wb");
+   outfile = hb_fopen( ( const char * ) cfile, "wb" );
 
-   if ( !outfile )
+   if( ! outfile )
    {
       fclose( infile );
       return -2;
@@ -465,46 +465,46 @@ static int b64encode_file_by_chunk ( BYTE *strIn, BYTE *strOut, ULONG lines )
 
    lines -= 3;
 
-   while ((c1 = getc(infile)) != EOF)
+   while( ( c1 = getc( infile ) ) != EOF )
    {
-      c2 = getc(infile);
+      c2 = getc( infile );
 
-      if (c2 == EOF)
+      if( c2 == EOF )
       {
-         output64chunk(c1, 0, 0, 2, outfile);
+         output64chunk( c1, 0, 0, 2, outfile );
       }
       else
       {
-         c3 = getc(infile);
+         c3 = getc( infile );
 
-         if (c3 == EOF)
+         if( c3 == EOF )
          {
-            output64chunk(c1, c2, 0, 1, outfile);
+            output64chunk( c1, c2, 0, 1, outfile );
          }
          else
          {
-            output64chunk(c1, c2, c3, 0, outfile);
+            output64chunk( c1, c2, c3, 0, outfile );
          }
       }
 
       ct += 4;
 
-      if (ct > 71)
+      if( ct > 71 )
       {
-         putc('\n',outfile);
+         putc( '\n', outfile );
 
-         lines --;
+         lines--;
 
-         if ( lines == 0 )
+         if( lines == 0 )
          {
-            lines = nlinesperfile;
+            lines    = nlinesperfile;
             fclose( outfile );
-            filenumber ++;
-            *cfile = '\0';
+            filenumber++;
+            *cfile   = '\0';
             hb_snprintf( cfile, sizeof( cfile ), "%s%02d.b64", strOut, filenumber );
-            outfile = hb_fopen ( (const char*) cfile, "wb");
+            outfile  = hb_fopen( ( const char * ) cfile, "wb" );
 
-            if ( !outfile )
+            if( ! outfile )
             {
                nResult = -2;
                break;
@@ -515,166 +515,166 @@ static int b64encode_file_by_chunk ( BYTE *strIn, BYTE *strOut, ULONG lines )
       }
    }
 
-   fclose (infile);
+   fclose( infile );
 
-   if ( outfile )
+   if( outfile )
    {
-      if ( ct )
+      if( ct )
       {
-         putc('\n',outfile);
+         putc( '\n', outfile );
       }
-      fclose (outfile);
+      fclose( outfile );
    }
 
    return nResult;
 }
 
 //----------------------------------------------------------------------------//
-static void putgroup ( char *strgroup, FILE *fp )
+static void putgroup( char * strgroup, FILE * fp )
 {
    USHORT ichr1, ichr2, ichr3, ichr4;
 
-   ichr1 =   strgroup [0] >> 2;
-   ichr2 = ((strgroup [0] << 4) & 0x030) | ((strgroup [1] >> 4) & 0x00f);
-   ichr3 = ((strgroup [1] << 2) & 0x03c) | ((strgroup [2] >> 6) & 0x003);
-   ichr4 =   strgroup [2] & 0x03f;
+   ichr1 = strgroup[ 0 ] >> 2;
+   ichr2 = ( ( strgroup[ 0 ] << 4 ) & 0x030 ) | ( ( strgroup[ 1 ] >> 4 ) & 0x00f );
+   ichr3 = ( ( strgroup[ 1 ] << 2 ) & 0x03c ) | ( ( strgroup[ 2 ] >> 6 ) & 0x003 );
+   ichr4 = strgroup[ 2 ] & 0x03f;
 
-   fputc( ((ichr1)?((ichr1)&077)+' ':'`'), fp);
-   fputc( ((ichr2)?((ichr2)&077)+' ':'`'), fp);
-   fputc( ((ichr3)?((ichr3)&077)+' ':'`'), fp);
-   fputc( ((ichr4)?((ichr4)&077)+' ':'`'), fp);
+   fputc( ( ( ichr1 ) ? ( ( ichr1 ) & 077 ) + ' ' : '`' ), fp );
+   fputc( ( ( ichr2 ) ? ( ( ichr2 ) & 077 ) + ' ' : '`' ), fp );
+   fputc( ( ( ichr3 ) ? ( ( ichr3 ) & 077 ) + ' ' : '`' ), fp );
+   fputc( ( ( ichr4 ) ? ( ( ichr4 ) & 077 ) + ' ' : '`' ), fp );
 }
 
 //----------------------------------------------------------------------------//
-static int uuencode_file ( BYTE *strIn, BYTE *strOut )
+static int uuencode_file( BYTE * strIn, BYTE * strOut )
 {
-   char strLine[46];
-   USHORT iCnt, iLineLen;
-   FILE *fpin, *fpOutFile;
+   char     strLine[ 46 ];
+   USHORT   iCnt, iLineLen;
+   FILE *   fpin, * fpOutFile;
 
-   fpin = hb_fopen( (const char*) strIn, "rb" );
+   fpin = hb_fopen( ( const char * ) strIn, "rb" );
 
-   if (!fpin)
+   if( ! fpin )
    {
       return -1;
    }
 
-   fpOutFile = hb_fopen ( (const char*) strOut, "wb" );
+   fpOutFile = hb_fopen( ( const char * ) strOut, "wb" );
 
-   if (!fpOutFile)
+   if( ! fpOutFile )
    {
-      fclose (fpin);
+      fclose( fpin );
       return -2;
    }
 
-   fprintf (fpOutFile, "begin 666 %s\n", hbcc_getfilename (strIn));
+   fprintf( fpOutFile, "begin 666 %s\n", hbcc_getfilename( strIn ) );
 
-   while ( TRUE )
+   while( TRUE )
    {
-      iLineLen = (USHORT)fread (strLine, sizeof (char), 45, fpin);
+      iLineLen = ( USHORT ) fread( strLine, sizeof( char ), 45, fpin );
 
-      if (iLineLen <= 0)
+      if( iLineLen <= 0 )
       {
          break;
       }
 
-      fputc (((iLineLen) ? ((iLineLen) & 077) + ' ': '`'), fpOutFile);
+      fputc( ( ( iLineLen ) ? ( ( iLineLen ) & 077 ) + ' ' : '`' ), fpOutFile );
 
-      for (iCnt = 0; iCnt < iLineLen; iCnt += 3)
+      for( iCnt = 0; iCnt < iLineLen; iCnt += 3 )
       {
-         putgroup (&strLine[iCnt], fpOutFile);
+         putgroup( &strLine[ iCnt ], fpOutFile );
       }
 
-      putc('\n',fpOutFile);
+      putc( '\n', fpOutFile );
    }
 
-   fprintf (fpOutFile, "end\n");
-   fclose (fpin);
-   fclose (fpOutFile);
+   fprintf( fpOutFile, "end\n" );
+   fclose( fpin );
+   fclose( fpOutFile );
 
    return 0;
 }
 
 //----------------------------------------------------------------------------//
-static int uuencode_file_by_chunk ( BYTE *strIn, BYTE *sMask, ULONG nlines )
+static int uuencode_file_by_chunk( BYTE * strIn, BYTE * sMask, ULONG nlines )
 {
-   char strLine[46];
-   USHORT iCnt, iLineLen, filenumber=1;
-   FILE *fpin, *fpOutFile;
-   ULONG nlinedone=0;
-   char cfile[256];
-   int nResult = 0;
+   char     strLine[ 46 ];
+   USHORT   iCnt, iLineLen, filenumber = 1;
+   FILE *   fpin, * fpOutFile;
+   ULONG    nlinedone   = 0;
+   char     cfile[ 256 ];
+   int      nResult     = 0;
 
-   if ( nlines < 4 )
+   if( nlines < 4 )
    {
       return -3;
    }
 
-   fpin = hb_fopen ( (const char*) strIn, "rb" );
+   fpin = hb_fopen( ( const char * ) strIn, "rb" );
 
-   if ( !fpin )
+   if( ! fpin )
    {
       return -1;
    }
 
    hb_snprintf( cfile, sizeof( cfile ), "%s%02d.uue", sMask, filenumber );
 
-   fpOutFile = hb_fopen ( (const char*) cfile, "wb" );
+   fpOutFile = hb_fopen( ( const char * ) cfile, "wb" );
 
-   if ( !fpOutFile )
+   if( ! fpOutFile )
    {
       fclose( fpin );
       return -2;
    }
 
-   fprintf (fpOutFile, "begin 666 %s\n", hbcc_getfilename (strIn));
+   fprintf( fpOutFile, "begin 666 %s\n", hbcc_getfilename( strIn ) );
 
-   while ( TRUE )
+   while( TRUE )
    {
-     iLineLen = (USHORT)fread (strLine, sizeof (char), 45, fpin);
+      iLineLen = ( USHORT ) fread( strLine, sizeof( char ), 45, fpin );
 
-     if (iLineLen <= 0)
-     {
-        break;
-     }
+      if( iLineLen <= 0 )
+      {
+         break;
+      }
 
-     fputc ( ((iLineLen) ? ((iLineLen) & 077) + ' ': '`'), fpOutFile);
+      fputc( ( ( iLineLen ) ? ( ( iLineLen ) & 077 ) + ' ' : '`' ), fpOutFile );
 
-     for (iCnt = 0; iCnt < iLineLen; iCnt += 3)
-     {
-       putgroup (&strLine[iCnt], fpOutFile);
-     }
+      for( iCnt = 0; iCnt < iLineLen; iCnt += 3 )
+      {
+         putgroup( &strLine[ iCnt ], fpOutFile );
+      }
 
-     if ( ++nlinedone >= (nlines-1) )
-     {
-        putc('\n', fpOutFile);
-        fclose( fpOutFile );
-        nlinedone = ( ULONG ) -1;
-        filenumber ++;
+      if( ++nlinedone >= ( nlines - 1 ) )
+      {
+         putc( '\n', fpOutFile );
+         fclose( fpOutFile );
+         nlinedone = ( ULONG ) -1;
+         filenumber++;
 
-        hb_snprintf( cfile, sizeof( cfile ), "%s%02d.uue", sMask, filenumber );
+         hb_snprintf( cfile, sizeof( cfile ), "%s%02d.uue", sMask, filenumber );
 
-        fpOutFile = hb_fopen ( (const char*) cfile, "wb");
+         fpOutFile = hb_fopen( ( const char * ) cfile, "wb" );
 
-        if ( !fpOutFile )
-        {
-           nResult = -2;
-           break;
-        }
-     }
-     else
-     {
-        putc('\n', fpOutFile);
-     }
+         if( ! fpOutFile )
+         {
+            nResult = -2;
+            break;
+         }
+      }
+      else
+      {
+         putc( '\n', fpOutFile );
+      }
 
    }
 
-   fclose (fpin);
+   fclose( fpin );
 
-   if ( fpOutFile )
+   if( fpOutFile )
    {
-      fprintf (fpOutFile, "end\n");
-      fclose (fpOutFile);
+      fprintf( fpOutFile, "end\n" );
+      fclose( fpOutFile );
    }
 
    return nResult;
@@ -683,20 +683,20 @@ static int uuencode_file_by_chunk ( BYTE *strIn, BYTE *sMask, ULONG nlines )
 //----------------------------------------------------------------------------//
 HB_FUNC( UUENCODE_FILE )
 {
-   PHB_ITEM pIn  = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pOut = hb_param( 2, HB_IT_STRING );
-   PHB_FNAME pFileName = NULL;
-   char szUUEFileName[ HB_PATH_MAX ];
+   PHB_ITEM    pIn         = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM    pOut        = hb_param( 2, HB_IT_STRING );
+   PHB_FNAME   pFileName   = NULL;
+   char        szUUEFileName[ HB_PATH_MAX ];
 
-   if ( !pIn )
+   if( ! pIn )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 8001, NULL, "UUENCODE_FILE", 1, hb_paramError( 1 ) );
    }
 
-   if ( !pOut )
+   if( ! pOut )
    {
-      pFileName = hb_fsFNameSplit(pIn->item.asString.value);
-      pFileName->szExtension = ".uue";
+      pFileName               = hb_fsFNameSplit( pIn->item.asString.value );
+      pFileName->szExtension  = ".uue";
       hb_fsFNameMerge( szUUEFileName, pFileName );
    }
    else
@@ -704,9 +704,9 @@ HB_FUNC( UUENCODE_FILE )
       hb_xstrcpy( szUUEFileName, pOut->item.asString.value, 0 );
    }
 
-   hb_retni( uuencode_file( (BYTE*) pIn->item.asString.value, (BYTE*) szUUEFileName ) );
+   hb_retni( uuencode_file( ( BYTE * ) pIn->item.asString.value, ( BYTE * ) szUUEFileName ) );
 
-   if ( pFileName )
+   if( pFileName )
    {
       hb_xfree( pFileName );
    }
@@ -715,34 +715,34 @@ HB_FUNC( UUENCODE_FILE )
 //----------------------------------------------------------------------------//
 HB_FUNC( UUENCODE_FILE_BY_CHUNK )
 {
-   PHB_ITEM pIn   = hb_param( 1, HB_IT_STRING  );
-   PHB_ITEM pLine = hb_param( 2, HB_IT_NUMERIC );
-   PHB_ITEM pOut  = hb_param( 3, HB_IT_STRING  );
-   PHB_FNAME pFileName = NULL;
-   char szUUEFileName[ HB_PATH_MAX ] ;
-   ULONG ulLine;
+   PHB_ITEM    pIn         = hb_param( 1, HB_IT_STRING  );
+   PHB_ITEM    pLine       = hb_param( 2, HB_IT_NUMERIC );
+   PHB_ITEM    pOut        = hb_param( 3, HB_IT_STRING  );
+   PHB_FNAME   pFileName   = NULL;
+   char        szUUEFileName[ HB_PATH_MAX ];
+   ULONG       ulLine;
 
-   if ( !pIn )
+   if( ! pIn )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 8003, NULL, "UUENCODE_FILE_BY_CHUNK", 1, hb_paramError( 1 ) );
    }
 
-   if ( !pLine )
+   if( ! pLine )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 8003, NULL, "UUENCODE_FILE_BY_CHUNK", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 
    ulLine = hb_parnl( 2 );
 
-   if ( ulLine <= 0 )
+   if( ulLine <= 0 )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 8003, NULL, "UUENCODE_FILE_BY_CHUNK", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 
-   if ( !pOut )
+   if( ! pOut )
    {
-      pFileName = hb_fsFNameSplit(pIn->item.asString.value);
-      pFileName->szExtension = "";
+      pFileName               = hb_fsFNameSplit( pIn->item.asString.value );
+      pFileName->szExtension  = "";
       hb_fsFNameMerge( szUUEFileName, pFileName );
    }
    else
@@ -750,9 +750,9 @@ HB_FUNC( UUENCODE_FILE_BY_CHUNK )
       hb_xstrcpy( szUUEFileName, pOut->item.asString.value, 0 );
    }
 
-   hb_retni( uuencode_file_by_chunk( (BYTE*) pIn->item.asString.value, (BYTE*) szUUEFileName , ulLine ) );
+   hb_retni( uuencode_file_by_chunk( ( BYTE * ) pIn->item.asString.value, ( BYTE * ) szUUEFileName, ulLine ) );
 
-   if ( pFileName )
+   if( pFileName )
    {
       hb_xfree( pFileName );
    }
@@ -761,20 +761,20 @@ HB_FUNC( UUENCODE_FILE_BY_CHUNK )
 //----------------------------------------------------------------------------//
 HB_FUNC( B64ENCODE_FILE )
 {
-   PHB_ITEM pIn  = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pOut = hb_param( 2, HB_IT_STRING );
-   PHB_FNAME pFileName = NULL;
-   char szUUEFileName[ HB_PATH_MAX ];
+   PHB_ITEM    pIn         = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM    pOut        = hb_param( 2, HB_IT_STRING );
+   PHB_FNAME   pFileName   = NULL;
+   char        szUUEFileName[ HB_PATH_MAX ];
 
-   if ( !pIn )
+   if( ! pIn )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 8002, NULL, "B64ENCODE_FILE", 1, hb_paramError( 1 ) );
    }
 
-   if ( !pOut )
+   if( ! pOut )
    {
-      pFileName = hb_fsFNameSplit(pIn->item.asString.value);
-      pFileName->szExtension = ".b64";
+      pFileName               = hb_fsFNameSplit( pIn->item.asString.value );
+      pFileName->szExtension  = ".b64";
       hb_fsFNameMerge( szUUEFileName, pFileName );
    }
    else
@@ -782,9 +782,9 @@ HB_FUNC( B64ENCODE_FILE )
       hb_xstrcpy( szUUEFileName, pOut->item.asString.value, 0 );
    }
 
-   hb_retni( b64encode_file( (BYTE*) pIn->item.asString.value, (BYTE*) szUUEFileName ) );
+   hb_retni( b64encode_file( ( BYTE * ) pIn->item.asString.value, ( BYTE * ) szUUEFileName ) );
 
-   if ( pFileName )
+   if( pFileName )
    {
       hb_xfree( pFileName );
    }
@@ -793,34 +793,34 @@ HB_FUNC( B64ENCODE_FILE )
 //----------------------------------------------------------------------------//
 HB_FUNC( B64ENCODE_FILE_BY_CHUNK )
 {
-   PHB_ITEM pIn   = hb_param( 1, HB_IT_STRING  );
-   PHB_ITEM pLine = hb_param( 2, HB_IT_NUMERIC );
-   PHB_ITEM pOut  = hb_param( 3, HB_IT_STRING  );
-   PHB_FNAME pFileName = NULL;
-   char szUUEFileName[ HB_PATH_MAX ];
-   ULONG ulLine;
+   PHB_ITEM    pIn         = hb_param( 1, HB_IT_STRING  );
+   PHB_ITEM    pLine       = hb_param( 2, HB_IT_NUMERIC );
+   PHB_ITEM    pOut        = hb_param( 3, HB_IT_STRING  );
+   PHB_FNAME   pFileName   = NULL;
+   char        szUUEFileName[ HB_PATH_MAX ];
+   ULONG       ulLine;
 
-   if ( !pIn )
+   if( ! pIn )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 8004, NULL, "B64ENCODE_FILE_BY_CHUNK", 1, hb_paramError( 1 ) );
    }
 
-   if ( !pLine )
+   if( ! pLine )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 8004, NULL, "B64ENCODE_FILE_BY_CHUNK", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 
    ulLine = hb_parnl( 2 );
 
-   if ( ulLine <= 0 )
+   if( ulLine <= 0 )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 8004, NULL, "B64ENCODE_FILE_BY_CHUNK", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 
-   if ( !pOut )
+   if( ! pOut )
    {
-      pFileName = hb_fsFNameSplit(pIn->item.asString.value);
-      pFileName->szExtension = "";
+      pFileName               = hb_fsFNameSplit( pIn->item.asString.value );
+      pFileName->szExtension  = "";
       hb_fsFNameMerge( szUUEFileName, pFileName );
    }
    else
@@ -828,9 +828,9 @@ HB_FUNC( B64ENCODE_FILE_BY_CHUNK )
       hb_xstrcpy( szUUEFileName, pOut->item.asString.value, 0 );
    }
 
-   hb_retni( b64encode_file_by_chunk ( (BYTE *) pIn->item.asString.value, (BYTE *) szUUEFileName, ulLine ) );
+   hb_retni( b64encode_file_by_chunk( ( BYTE * ) pIn->item.asString.value, ( BYTE * ) szUUEFileName, ulLine ) );
 
-   if ( pFileName )
+   if( pFileName )
    {
       hb_xfree( pFileName );
    }
@@ -839,27 +839,27 @@ HB_FUNC( B64ENCODE_FILE_BY_CHUNK )
 //----------------------------------------------------------------------------//
 HB_FUNC( YYENCODE_FILE )
 {
-   FILE * fDes;
-   FILE * fSrc;
-   ULONG filelen;
-   PHB_FNAME pFileName;
-   PHB_ITEM pIn  = hb_param(1,HB_IT_STRING);
-   PHB_ITEM pOut = hb_param(2,HB_IT_STRING);
-   PHB_ITEM pLineLength = hb_param(3,HB_IT_NUMERIC);
-   char szYYEFileName[ HB_PATH_MAX ] ;
-   char pszFileName[ HB_PATH_MAX ];
-   USHORT YYELineLength = 128;
+   FILE *      fDes;
+   FILE *      fSrc;
+   ULONG       filelen;
+   PHB_FNAME   pFileName;
+   PHB_ITEM    pIn            = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM    pOut           = hb_param( 2, HB_IT_STRING );
+   PHB_ITEM    pLineLength    = hb_param( 3, HB_IT_NUMERIC );
+   char        szYYEFileName[ HB_PATH_MAX ];
+   char        pszFileName[ HB_PATH_MAX ];
+   USHORT      YYELineLength  = 128;
 
-   if ( !pIn )
+   if( ! pIn )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 8005, NULL, "YYENCODE_FILE", 1, hb_paramError( 1 ) );
    }
 
-   pFileName = hb_fsFNameSplit(pIn->item.asString.value);
-   hb_snprintf( pszFileName, sizeof( pszFileName ), "%s%s",pFileName->szName,pFileName->szExtension);
-   filelen = (ULONG) hb_fsFSize( (const char *) pIn->item.asString.value, TRUE );
+   pFileName   = hb_fsFNameSplit( pIn->item.asString.value );
+   hb_snprintf( pszFileName, sizeof( pszFileName ), "%s%s", pFileName->szName, pFileName->szExtension );
+   filelen     = ( ULONG ) hb_fsFSize( ( const char * ) pIn->item.asString.value, TRUE );
 
-   if ( !pOut )
+   if( ! pOut )
    {
       pFileName->szExtension = ".yye";
       hb_fsFNameMerge( szYYEFileName, pFileName );
@@ -869,31 +869,31 @@ HB_FUNC( YYENCODE_FILE )
       hb_xstrcpy( szYYEFileName, pOut->item.asString.value, 0 );
    }
 
-   fSrc = hb_fopen( (const char*) pIn->item.asString.value, "rb" );
+   fSrc = hb_fopen( ( const char * ) pIn->item.asString.value, "rb" );
 
-   if ( !fSrc )
+   if( ! fSrc )
    {
       hb_retni( -1 );
       return;
    }
 
-   fDes = hb_fopen( (const char*) szYYEFileName, "wb" );
+   fDes = hb_fopen( ( const char * ) szYYEFileName, "wb" );
 
-   if ( !fDes )
+   if( ! fDes )
    {
       fclose( fSrc );
       hb_retni( -2 );
       return;
    }
 
-   if ( pLineLength )
+   if( pLineLength )
    {
-      if (( pLineLength->item.asInteger.value > 0 ) &&
-          ( pLineLength->item.asInteger.value <= 255 ))
+      if( ( pLineLength->item.asInteger.value > 0 ) &&
+          ( pLineLength->item.asInteger.value <= 255 ) )
       {
          YYELineLength = ( USHORT ) pLineLength->item.asInteger.value;
       }
-      else if ( pLineLength->item.asInteger.value > 255 )
+      else if( pLineLength->item.asInteger.value > 255 )
       {
          YYELineLength = 255;
       }
@@ -911,73 +911,73 @@ HB_FUNC( YYENCODE_FILE )
 //----------------------------------------------------------------------------//
 HB_FUNC( YYENCODE_FILE_BY_CHUNK )
 {
-   FILE * fDes;
-   FILE * fSrc;
-   ULONG filelen;
-   ULONG nBytes = 0;
-   ULONG nTotalEncoded = 0;
-   PHB_FNAME pFileName;
-   PHB_ITEM pIn   = hb_param(1,HB_IT_STRING);
-   PHB_ITEM pLine = hb_param(2,HB_IT_NUMERIC);
-   PHB_ITEM pOut  = hb_param(3,HB_IT_STRING);
-   PHB_ITEM pLineLength = hb_param(4,HB_IT_NUMERIC);
-   char szYYEFileName[ HB_PATH_MAX ] ;
-   char pszFileName[ HB_PATH_MAX ];
-   const char *cMask;
-   USHORT YYELineLength = 128;
-   USHORT iPart = 1;
-   int iResult = 0;
-   ULONG ulLine;
-   ULONG ulLineLength;
+   FILE *         fDes;
+   FILE *         fSrc;
+   ULONG          filelen;
+   ULONG          nBytes         = 0;
+   ULONG          nTotalEncoded  = 0;
+   PHB_FNAME      pFileName;
+   PHB_ITEM       pIn            = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM       pLine          = hb_param( 2, HB_IT_NUMERIC );
+   PHB_ITEM       pOut           = hb_param( 3, HB_IT_STRING );
+   PHB_ITEM       pLineLength    = hb_param( 4, HB_IT_NUMERIC );
+   char           szYYEFileName[ HB_PATH_MAX ];
+   char           pszFileName[ HB_PATH_MAX ];
+   const char *   cMask;
+   USHORT         YYELineLength  = 128;
+   USHORT         iPart          = 1;
+   int            iResult        = 0;
+   ULONG          ulLine;
+   ULONG          ulLineLength;
 
-   if ( !pIn )
+   if( ! pIn )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 8006, NULL, "YYENCODE_FILE_BY_CHUNK", 1, hb_paramError( 1 ) );
    }
 
-   if ( !pLine )
+   if( ! pLine )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 8006, NULL, "YYENCODE_FILE_BY_CHUNK", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 
    ulLine = hb_parnl( 2 );
 
-   if ( ulLine < 5 )
+   if( ulLine < 5 )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 8006, "Value too small", "YYENCODE_FILE_BY_CHUNK", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 
-   pFileName = hb_fsFNameSplit(pIn->item.asString.value);
-   hb_snprintf( pszFileName, sizeof( pszFileName ), "%s%s",pFileName->szName,pFileName->szExtension);
-   filelen = (ULONG) hb_fsFSize( (const char *) pIn->item.asString.value, TRUE );
+   pFileName   = hb_fsFNameSplit( pIn->item.asString.value );
+   hb_snprintf( pszFileName, sizeof( pszFileName ), "%s%s", pFileName->szName, pFileName->szExtension );
+   filelen     = ( ULONG ) hb_fsFSize( ( const char * ) pIn->item.asString.value, TRUE );
 
-   if ( !pOut )
+   if( ! pOut )
    {
-      cMask = pFileName->szName ;
+      cMask = pFileName->szName;
    }
    else
    {
       cMask = pOut->item.asString.value;
    }
 
-   fSrc = hb_fopen( (const char*) pIn->item.asString.value, "rb" );
+   fSrc = hb_fopen( ( const char * ) pIn->item.asString.value, "rb" );
 
-   if ( !fSrc )
+   if( ! fSrc )
    {
       hb_xfree( pFileName );
       hb_retni( -1 );
       return;
    }
 
-   if ( pLineLength )
+   if( pLineLength )
    {
       ulLineLength = hb_parnl( 4 );
-      if (( ulLineLength > 0 ) &&
-          ( ulLineLength <= 255 ))
+      if( ( ulLineLength > 0 ) &&
+          ( ulLineLength <= 255 ) )
       {
-         YYELineLength = (USHORT) ulLineLength;
+         YYELineLength = ( USHORT ) ulLineLength;
       }
-      else if ( ulLineLength > 255 )
+      else if( ulLineLength > 255 )
       {
          YYELineLength = 255;
       }
@@ -988,34 +988,34 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
       nTotalEncoded += nBytes;
 
       /*
-      This (nBytes) is a rough calculation of bytes to be written based on the
-      supplied line number per chunk. YYencoded line is determined by
-      YYELineLegth which is 128 bytes by default.
-      */
+         This (nBytes) is a rough calculation of bytes to be written based on the
+         supplied line number per chunk. YYencoded line is determined by
+         YYELineLegth which is 128 bytes by default.
+       */
 
       nBytes = ulLine * YYELineLength;
 
-      if (( nTotalEncoded + nBytes ) > filelen )
+      if( ( nTotalEncoded + nBytes ) > filelen )
       {
          nBytes = filelen - nTotalEncoded;
       }
 
-      if ( nBytes )
+      if( nBytes )
       {
          hb_snprintf( szYYEFileName, sizeof( szYYEFileName ), "%s%02d%s", cMask, iPart, ".yye" );
-         fDes = hb_fopen( (const char*) szYYEFileName, "wb");
+         fDes = hb_fopen( ( const char * ) szYYEFileName, "wb" );
 
-         if ( fDes )
+         if( fDes )
          {
             iResult = yEncode( fDes, pszFileName, fSrc, nBytes, iPart, filelen, YYELineLength );
             fclose( fDes );
 
-            if ( iResult != 0 )
+            if( iResult != 0 )
             {
                break;
             }
 
-            iPart ++;
+            iPart++;
          }
          else
          {
@@ -1023,11 +1023,12 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
             break;
          }
       }
-   } while ( nTotalEncoded < filelen );
+   }
+   while( nTotalEncoded < filelen );
 
    fclose( fSrc );
 
-   hb_retni( iResult ) ;
+   hb_retni( iResult );
 
    hb_xfree( pFileName );
 
