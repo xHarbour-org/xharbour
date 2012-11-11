@@ -4954,12 +4954,12 @@ yyreduce:
 
   case 35:
 
-    { hb_comp_iLine =  (yyvsp[(2) - (4)].iNumber); }
+    { ( void ) (yyvsp[(3) - (4)].valChar); hb_comp_iLine =  (yyvsp[(2) - (4)].iNumber); }
     break;
 
   case 36:
 
-    { hb_comp_iLine =  (yyvsp[(2) - (6)].iNumber); }
+    { ( void ) (yyvsp[(3) - (6)].valChar); ( void ) (yyvsp[(5) - (6)].valChar); hb_comp_iLine =  (yyvsp[(2) - (6)].iNumber); }
     break;
 
   case 37:

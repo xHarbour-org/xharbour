@@ -400,8 +400,8 @@ Source     : Crlf
            | Source WithNamespace
            ;
 
-Line       : LINE NUM_INTEGER LITERAL Crlf { hb_comp_iLine =  $<iNumber>2; }
-           | LINE NUM_INTEGER LITERAL '@' LITERAL Crlf { hb_comp_iLine =  $<iNumber>2; }  /* Xbase++ style */
+Line       : LINE NUM_INTEGER LITERAL Crlf { ( void ) $3; hb_comp_iLine =  $<iNumber>2; }
+           | LINE NUM_INTEGER LITERAL '@' LITERAL Crlf { ( void ) $3; ( void ) $5; hb_comp_iLine =  $<iNumber>2; }  /* Xbase++ style */
            ;
 
 ProcReq    : PROCREQ CompTimeStr ')' Crlf {}

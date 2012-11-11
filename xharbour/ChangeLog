@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-12 04:52 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/harbour.sly
+  * source/compiler/harbouryy.c
+    ! pacify Bison warning on unused variables
+
 2012-11-12 04:17 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/harbour.sly
   * source/compiler/harbouryy.c
