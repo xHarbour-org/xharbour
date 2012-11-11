@@ -11042,6 +11042,20 @@ void yyerror( char * s )
          else
          {
             hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_YACC, s, yytext );
+
+            if( asExpr )
+               hb_xfree( asExpr );
+
+            if( hb_comp_LocalParams )
+            {
+               while( hb_comp_LocalParams )
+               {
+                  PLOCALPARAM pDelete = hb_comp_LocalParams;
+
+                  hb_comp_LocalParams = hb_comp_LocalParams->pNext;
+                  hb_xfree( (void *) pDelete );
+               }
+            }
          }
 
          /*
@@ -11060,8 +11074,20 @@ void yyerror( char * s )
       else
       {
          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_YACC, s, yytext );
+
          if( asExpr )
             hb_xfree( asExpr );
+
+         if( hb_comp_LocalParams )
+         {
+            while( hb_comp_LocalParams )
+            {
+               PLOCALPARAM pDelete = hb_comp_LocalParams;
+
+               hb_comp_LocalParams = hb_comp_LocalParams->pNext;
+               hb_xfree( (void *) pDelete );
+            }
+         }
       }
    }
 }
