@@ -4,7 +4,7 @@
 
 //----------------------------------------------------------------------------------------------------//
 METHOD Button1_OnClick( Sender ) CLASS Form1
-   local nPos := ascan( ::MDIClient:Children, ::oOne )
+   local nPos := ascan( ::MDIClient:Children, { |x| x == ::oOne } )
    if nPos > 0
       ::oOne:Restore()
    else
@@ -13,7 +13,7 @@ METHOD Button1_OnClick( Sender ) CLASS Form1
 RETURN Self
 //----------------------------------------------------------------------------------------------------//
 METHOD Button2_OnClick( Sender ) CLASS Form1
-   local nPos := ascan( ::MDIClient:Children, ::oTwo )
+   local nPos := ascan( ::MDIClient:Children, { |x| x == ::oTwo } )
    if nPos > 0
       ::oTwo:Restore()
    else
