@@ -14,15 +14,15 @@ FUNCTION Build_xHB_Setup(cEdition, cOFw, cRevision)
       ? cRevision
    ENDIF
 
-   DO CASE 
-      CASE IsDirectory("C:\Program Files\Caphyon\Advanced Installer 9.4")
-                  cAI:="C:\Program Files\Caphyon\Advanced Installer 9.4\bin\x86\"
-      CASE IsDirectory("W:\Program Files\Caphyon\Advanced Installer 9.0.1")
-                  cAI:="W:\Program Files\Caphyon\Advanced Installer 9.0.1\bin\x86\"
-      CASE IsDirectory("C:\Program Files\Caphyon\Advanced Installer 8.7")
-                  cAI:="C:\Program Files\Caphyon\Advanced Installer 8.7\bin\x86\"
-
+   DO CASE
+      CASE IsDirectory("C:\Program Files\Caphyon\Advanced Installer 9.6")
+                  cAI:="C:\Program Files\Caphyon\Advanced Installer 9.6\bin\x86\"
+      OTHER
+          ?     "Geen Advanced installer gevonden"
+          Alert("Geen Advanced installer gevonden")
+          RETURN
    ENDCASE
+
 
    IF Empty(cEdition)
       cEdition:="ENT"
