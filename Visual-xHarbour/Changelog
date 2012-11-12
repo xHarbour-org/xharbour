@@ -8,6 +8,10 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-05 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed DataGrid bug activating header menu
+   ! Fixed bug dragging records.
+
 2012-10-31 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed GridColumn_OnHeaderClick event not working
    ! Fixed DataGrid Record Drag and Drop problem
