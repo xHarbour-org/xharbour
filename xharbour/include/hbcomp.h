@@ -580,7 +580,7 @@ extern void hb_compStrongType( int iSize );
 
 
 /* Codeblocks */
-extern void hb_compCodeBlockStart( void );        /* starts a codeblock creation */
+extern void        hb_compCodeBlockStart( void );        /* starts a codeblock creation */
 extern HB_EXPR_PTR hb_compCodeBlockEnd( BOOL );          /* end of codeblock creation */
 
 /* support for FIELD declaration */
@@ -819,7 +819,7 @@ extern BYTE *         hb_compHideString( int iType, char * szText, HB_SIZE ulStr
 extern void           hb_comp_datetimeEncode( long *plDate, long *plTime, int iYear, int iMonth, int iDay, int iHour, int iMinute, double dSeconds, int iAmPm, int * piOk );
 
 /* Free memory upon exit */
-extern void hb_compCleanUp( BOOL bCleanFunc );
+extern void hb_compCleanUp( void );
 
 HB_EXTERN_END
 

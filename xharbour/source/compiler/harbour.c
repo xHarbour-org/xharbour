@@ -305,14 +305,14 @@ int hb_compMain( int argc, char * argv[] )
       printf( "\n" );
       szBuildInfo = hb_verBuildInfo( TRUE );
       hb_xfree( szBuildInfo );
-      hb_compCleanUp( FALSE );
+      hb_compCleanUp();
       return iStatus;
    }
 
    if( hb_comp_bCredits )
    {
       hb_compPrintCredits();
-      hb_compCleanUp( FALSE );
+      hb_compCleanUp();
       return iStatus;
    }
 
@@ -360,7 +360,7 @@ int hb_compMain( int argc, char * argv[] )
       }
    }
 
-   hb_compCleanUp( FALSE );
+   hb_compCleanUp();
 
    if( ! bAnyFiles && ! hb_comp_bQuiet )
    {

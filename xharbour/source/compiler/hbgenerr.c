@@ -182,7 +182,7 @@ void hb_compGenError( const char * szErrors[], char cPrefix, int iError, const c
    /* fatal error - exit immediately */
    if( cPrefix == 'F' )
    {
-      hb_compCleanUp( TRUE );
+      hb_compCleanUp();
       exit( EXIT_FAILURE );
    }
 }

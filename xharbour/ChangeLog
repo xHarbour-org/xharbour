@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-13 19:39 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/comptool.c
+  * source/compiler/hbgenerr.c
+  * source/compiler/harbour.c
+  * include/hbcomp.h
+    ! hb_compCleanUp( BOOL ) -> hb_compCleanUp( void )
+    NOTE: yet there's memory leaks that have to be fixed, but not critical, IMO.
+
 2012-11-13 07:49 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbcompat.h
     + HB_ISOBJECT, required by some packages

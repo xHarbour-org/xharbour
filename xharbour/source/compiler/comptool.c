@@ -588,7 +588,7 @@ void hb_compSetCOutput( int iOutput )
    }
 }
 
-void hb_compCleanUp( BOOL bCleanFunc )
+void hb_compCleanUp( void )
 {
    if( hb_comp_PP )
    {
@@ -597,14 +597,6 @@ void hb_compCleanUp( BOOL bCleanFunc )
    }
 
    hb_compIdentifierClose();
-
-   if( bCleanFunc && hb_comp_functions.pLast )
-   {
-      if( hb_comp_functions.pLast->pCode )
-         hb_xfree( hb_comp_functions.pLast->pCode );
-
-      hb_xfree( hb_comp_functions.pLast );
-   }
 
    if ( hb_comp_pFileName )
    {
