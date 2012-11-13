@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-13 07:49 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbcompat.h
+    + HB_ISOBJECT, required by some packages
+
 2012-11-13 07:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbcompat.h
     + HB_ISARRAY and HB_ISLOG, which may be required by external packages
