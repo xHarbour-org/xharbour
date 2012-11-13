@@ -98,8 +98,6 @@ CLASS DataGrid INHERIT Control
    DATA GridSysColor            EXPORTED
    DATA ColPos                  EXPORTED INIT 1
    DATA RowPos                  EXPORTED INIT 1
-   DATA HitTop                  EXPORTED
-   DATA HitBottom               EXPORTED
    DATA RowCountVisible         EXPORTED
    DATA RowCountUsable          EXPORTED
    DATA RowHeight               EXPORTED
@@ -117,6 +115,9 @@ CLASS DataGrid INHERIT Control
    ASSIGN AutoUpdate(n)         INLINE ::__nUpdtTimer := n, IIF( n>0, ::SetTimer( 15, n*1000 ), ::KillTimer(15) )
    ACCESS Record                INLINE ::__GetPosition()
    ACCESS IsDelIndexOn          INLINE !EMPTY( ::DataSource ) .AND. ( "DELETED()" IN UPPER( ::DataSource:OrdKey() ) )
+
+   ACCESS HitTop                INLINE ::DataSource:Bof()
+   ACCESS HitBottom             INLINE ::DataSource:eof()
    
    DATA __HScrollUnits          PROTECTED INIT 15
    DATA __HorzScroll            PROTECTED INIT FALSE
@@ -130,7 +131,7 @@ CLASS DataGrid INHERIT Control
    DATA __DataWidth             PROTECTED INIT 0
    DATA __VertScrolled          PROTECTED INIT 1
    DATA __HorzScrolled          PROTECTED INIT 0
-   DATA __DisplayArray          PROTECTED AS ARRAY INIT {}
+   DATA __DisplayArray          PROTECTED INIT {}
    DATA __InactiveHighlight     PROTECTED
    DATA __InactiveHighlightText PROTECTED
    DATA __CurControl            PROTECTED
@@ -697,8 +698,6 @@ RETURN Self
 METHOD __GoToRec( nRec ) CLASS DataGrid
    IF nRec != NIL
       ::DataSource:Goto( nRec )
-      ::HitTop    := ::DataSource:Bof()
-      ::HitBottom := ::DataSource:eof()
    ENDIF
 RETURN Self
 
@@ -706,8 +705,6 @@ METHOD __SkipRecords( n ) CLASS DataGrid
    IF n <> 0
       ::DataSource:Skip( n )
    ENDIF
-   ::HitTop    := ::DataSource:Bof()
-   ::HitBottom := ::DataSource:eof()
 RETURN Self
 
 //----------------------------------------------------------------------------------
@@ -718,22 +715,16 @@ METHOD __SetBlocks() CLASS DataGrid
       RETURN NIL
    ENDIF
 
-   ::HitTop    := ::DataSource:Bof()
-   ::HitBottom := ::DataSource:eof()
    ::__VertScrolled := ::Record
    ::__bGoTop    := <|| 
                       IF ::DataSource != NIL
                          ::DataSource:Gotop()
-                         ::HitTop   := ::DataSource:Bof()
-                         ::HitBottom:= ::DataSource:eof()
                       ENDIF
                     >
 
    ::__bGoBottom := <|| 
                       IF ::DataSource != NIL
                          ::DataSource:GoBottom()
-                         ::HitTop    := ::DataSource:Bof()
-                         ::HitBottom := ::DataSource:eof()
                       ENDIF
                     >
 
@@ -2429,9 +2420,11 @@ METHOD __UpdateHeight() CLASS DataGrid
 RETURN {nVisible, nUsable}
 
 //----------------------------------------------------------------------------------
-METHOD __Update( lDisplay ) CLASS DataGrid
+METHOD __Update( lDisplay, lFillData ) CLASS DataGrid
    LOCAL n, nRec
    DEFAULT lDisplay TO TRUE
+   DEFAULT lFillData TO .T.
+   
    IF ::DataSource == NIL .OR. ( VALTYPE( ::DataSource )=="O" .AND. !::DataSource:IsOpen )
       RETURN Self
    ENDIF
@@ -2450,7 +2443,9 @@ METHOD __Update( lDisplay ) CLASS DataGrid
    IF !::HitTop .AND. !::HitBottom
       FOR n := 1 TO ::RowCountVisible
           AADD( ::__DisplayArray,{ ARRAY( ::ColCount ), ::DataSource:Recno() } )
-          ::__FillRow( n )
+          IF lFillData
+             ::__FillRow( n )
+          ENDIF
           ::__SkipRecords( 1 )
           IF ::HitBottom .AND. ::__bGoBottom != NIL
              EVAL( ::__bGoBottom )
@@ -2482,8 +2477,9 @@ METHOD Update() CLASS DataGrid
    ENDIF
 
    IF EMPTY( ::__DisplayArray )
-      ::__Update(.F.)
+      ::__Update( .F. )
    ENDIF
+
    IF EMPTY( ::__DisplayArray )
       RETURN Self
    ENDIF
@@ -2501,11 +2497,14 @@ METHOD Update() CLASS DataGrid
 
    nRec     := ::DataSource:Recno()
 
-   ::RowPos := ASCAN( ::__DisplayArray, {|a| a[2] == nRec } )
+   ::RowPos := MAX( 1, ASCAN( ::__DisplayArray, {|a| a[2] == nRec } ) )
    ::__VertScrolled := MAX( 1, ::Record - ::RowPos + 1 )
 
    IF ::RowPos > 0
       ::DataSource:Skip( -(::RowPos-1) )
+      IF ::HitTop
+         EVAL( ::__bGoTop )
+      ENDIF
    ENDIF
    ::__DisplayArray := {}
    
