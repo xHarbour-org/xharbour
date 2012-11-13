@@ -2099,6 +2099,7 @@ CodeBlock  : '{' CBMARKER
 
                {
                   $<asExpr>$ = hb_compExprNewCodeBlock();
+                  asExpr = $<asExpr>$;
 
                   if( hb_comp_BlocksList == NULL )
                   {
@@ -4361,4 +4362,7 @@ static void hb_compYYError( char cPrefix, int iError, const char * szError1, con
          hb_xfree( (void *) pDelete );
       }
    }
+
+   if( hb_comp_BlocksList )
+      hb_xfree( hb_comp_BlocksList );
 }

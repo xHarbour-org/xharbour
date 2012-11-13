@@ -6258,6 +6258,7 @@ static int hb_compCompile( char * szPrg )
 
                while( pFunc )
                {
+
                   bFunc = ( ( strlen( pFunc->szName ) != 0 ) && ( strcmp( pFunc->szName, "(_INITSTATICS)" ) > 0 ) );
 
                   /* Using function name as section name */
@@ -6289,15 +6290,50 @@ static int hb_compCompile( char * szPrg )
 
                      assert( pSym );
 
-                     if( strcmp( pFunc->szName, "MAIN" ) == 0 && strlen( pFunc->szName ) == 4 )
-                     {
-                        pSym->cScope   |= HB_FS_FIRST;
-                        bDoFirst       = FALSE;
-                     }
+                     pSym->cScope   |= HB_FS_FIRST;
+                     bDoFirst       = FALSE;
                   }
 
                   pFunc = pFunc->pNext;
+               }
 
+               {
+                  char *szFirst    = NULL;
+                  char *szMain     = NULL;
+                  PCOMSYMBOL pSymb = hb_comp_symbols.pFirst;
+
+                  while( pSymb )
+                  {
+                     if ( strlen( pSymb->szName ) > 0 && !szFirst )
+                        szFirst = pSymb->szName;
+
+                     if ( strcmp( pSymb->szName, "MAIN" ) == 0 && strlen( pSymb->szName ) == 4 && !szMain )
+                        szMain = pSymb->szName;
+
+                     pSymb = pSymb->pNext;
+                  }
+
+                  if( szMain )
+                  {
+                     BOOL bFirst   = TRUE;
+                     int iLenFirst = ( int ) strlen( szFirst );
+
+                     pSymb = hb_comp_symbols.pFirst;
+
+                     while( pSymb )
+                     {
+                        if ( strcmp( pSymb->szName, szFirst ) == 0 && ( int ) strlen( pSymb->szName ) == iLenFirst && bFirst )
+                        {
+                           pSymb->cScope  &= ~HB_FS_FIRST;
+                           bFirst = FALSE;
+                        }
+
+                        if ( strcmp( pSymb->szName, "MAIN" ) == 0 && strlen( pSymb->szName ) == 4  )
+                           pSymb->cScope  |= HB_FS_FIRST;
+
+                        pSymb = pSymb->pNext;
+                     }
+                  }
                }
 
                if( ! hb_comp_bQuiet )

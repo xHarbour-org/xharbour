@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-13 21:58 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/harbour.c
+    ! recent changes cause module without "MAIN" does not execute, fixed.
+
+  * source/compiler/harbour.sly
+  * source/compiler/harbouryy.c
+    ! fixed some other memory leaks on failure
+
 2012-11-13 19:39 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/comptool.c
   * source/compiler/hbgenerr.c
