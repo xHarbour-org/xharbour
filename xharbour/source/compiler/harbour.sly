@@ -204,6 +204,7 @@ typedef struct _BLOCKSLIST
 PBLOCKSLIST hb_comp_BlocksList = NULL;
 
 static HB_EXPR_PTR asExpr = NULL;
+static void hb_compYYError( char cPrefix, int iError, const char * szError1, const char * szError2 );
 
 static void hb_compDebugStart( void ) { };
 
@@ -594,7 +595,7 @@ ImplementsNamespace : /* Empty */                    { $$ = NULL; }
 
                                                        if( hb_comp_Namespaces.pCurrent )
                                                        {
-                                                          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_IMPLEMENTS_IN_NAMESPACE, hb_comp_Namespaces.pCurrent->szName, NULL );
+                                                          hb_compYYError( 'E', HB_COMP_ERR_IMPLEMENTS_IN_NAMESPACE, hb_comp_Namespaces.pCurrent->szName, NULL );
                                                        }
 
                                                        /* Might be IMPLEMENTS NAMESPACE in same compilation as namespace definition */
@@ -648,7 +649,7 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
            | RETURN CrlfStmnt {
                         if( hb_comp_wSeqCounter )
                         {
-                           hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "RETURN", NULL );
+                           hb_compYYError( 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "RETURN", NULL );
                         }
                         hb_compGenPCode1( HB_P_ENDPROC );
                         if( (hb_comp_functions.pLast->bFlags & FUN_PROCEDURE) == 0 )
@@ -667,7 +668,7 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
 
                         if( hb_comp_wSeqCounter )
                         {
-                           hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "RETURN", NULL );
+                           hb_compYYError( 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "RETURN", NULL );
                         }
 
                         hb_compExprDelete( hb_compExprGenPush( $3 ) );   /* TODO: check if return value agree with declared value */
@@ -703,7 +704,7 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
 
                                      if( szFunction )
                                      {
-                                        hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_FUNC_RESERVED, szFunction, $2 );
+                                        hb_compYYError( 'E', HB_COMP_ERR_FUNC_RESERVED, szFunction, $2 );
                                      }
 
                                      hb_comp_szAnnounce = $2;
@@ -717,7 +718,7 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
            | error  { if( hb_comp_bError == FALSE ) { yyerror( NULL ); }; } Crlf  { yyclearin; yyerrok; }
            | PARAMETERS { if( hb_comp_functions.pLast->bFlags & FUN_USES_LOCAL_PARAMS )
                           {
-                             hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_PARAMETERS_NOT_ALLOWED, NULL, NULL );
+                             hb_compYYError( 'E', HB_COMP_ERR_PARAMETERS_NOT_ALLOWED, NULL, NULL );
                           }
                           else
                           {
@@ -752,7 +753,7 @@ LineStat   : Crlf          { $<lNumber>$ = 0; }
            | Line          { $<lNumber>$ = 0; }
            | Statement     { $<lNumber>$ = 1; }
            | Declaration   { $<lNumber>$ = 1; }
-           | ControlError  { char LineAsString[32]; hb_snprintf( LineAsString, sizeof( LineAsString ), "at line %i", s_iLastControlLine - 1 ); hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL ); }
+           | ControlError  { char LineAsString[32]; hb_snprintf( LineAsString, sizeof( LineAsString ), "at line %i", s_iLastControlLine - 1 ); hb_compYYError( 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL ); }
            ;
 
 ControlError : FunScope2 FUNCTION  IdentName Params Crlf {}
@@ -1152,7 +1153,7 @@ MacroText   : MACROTEXT {
                               {
                                  if( ! bVar )
                                  {
-                                    hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_SYNTAX, pPosition, NULL );
+                                    hb_compYYError( 'E', HB_COMP_ERR_SYNTAX, pPosition, NULL );
                                  }
 
                                  *pPosition = '\0';
@@ -1201,7 +1202,7 @@ MacroText   : MACROTEXT {
                            else
                            {
                               pPlus = pDestExpr;
-                              hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_SYNTAX, sToken, NULL );
+                              hb_compYYError( 'E', HB_COMP_ERR_SYNTAX, sToken, NULL );
                            }
 
                            $$ = hb_compExprNewMacro( hb_compExprNewList( pPlus ), 0, NULL );
@@ -1316,7 +1317,7 @@ NamespacePath : NamespaceName '.'           { $$ = $1; }
               | NamespacePath IdentName '.' { /* IdentName not NamespaceName is intentional - we don't want Global -> except when 1st! */
                                               if( $1[0] == '*' )
                                               {
-                                                 hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_NONMEMBER_NAMESPACE, $2, "*" );
+                                                 hb_compYYError( 'E', HB_COMP_ERR_NONMEMBER_NAMESPACE, $2, "*" );
                                                  $$ = $1;
                                               }
                                               else
@@ -1403,7 +1404,7 @@ Argument   :  EmptyExpression          { $$ = $1; }
                                                break;
 
                                              default:
-                                               hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_REFER, hb_compExprDescription( $2 ), NULL );
+                                               hb_compYYError( 'E', HB_COMP_ERR_INVALID_REFER, hb_compExprDescription( $2 ), NULL );
                                                $$ = NULL;
                                           }
                                        }
@@ -1457,9 +1458,9 @@ WithData    : ':' SendId                 {
                                             if( hb_comp_wWithObjCounter == 0 )
                                             {
                                                if( $2->ExprType == HB_ET_FUNNAME )
-                                                  hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_WITHOBJECT, $2->value.asSymbol.szName, NULL );
+                                                  hb_compYYError( 'E', HB_COMP_ERR_UNMATCHED_WITHOBJECT, $2->value.asSymbol.szName, NULL );
                                                else
-                                                  hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_WITHOBJECT, "&", NULL );
+                                                  hb_compYYError( 'E', HB_COMP_ERR_UNMATCHED_WITHOBJECT, "&", NULL );
                                             }
                                             $$ = hb_compExprNewWithSendExp( $2 );
                                          }
@@ -1477,7 +1478,7 @@ ObjectMethod : ObjectData '(' ArgList ')'    { $$ = hb_compExprNewMethodCall( $1
 WithMethod   : WithData '(' ArgList ')'  {
                                            if( hb_comp_wWithObjCounter == 0 )
                                            {
-                                              hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_WITHOBJECT, $1->value.asMessage.szMessage, NULL );
+                                              hb_compYYError( 'E', HB_COMP_ERR_UNMATCHED_WITHOBJECT, $1->value.asMessage.szMessage, NULL );
                                            }
                                            $$ = hb_compExprNewWithMethodCall( $1, $3 );
                                          }
@@ -1991,7 +1992,7 @@ Get        : _Get_ LValue ','
                         {
                            /*
                               Clipper allways error, but we can handle simple macros or macros with no declared symbols!!!
-                              hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_GET_COMPLEX_MACRO, NULL, NULL );
+                              hb_compYYError( 'E', HB_COMP_ERR_GET_COMPLEX_MACRO, NULL, NULL );
                             */
                            pVarName = hb_compExprClone( $5 );
                         }
@@ -2136,7 +2137,7 @@ CodeBlock  : '{' CBMARKER
                      }
                      else if( s_bBlockDeclared )
                      {
-                        hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_BLOCK, NULL, NULL );
+                        hb_compYYError( 'E', HB_COMP_ERR_BLOCK, NULL, NULL );
                         $<asExpr>$ = $<asExpr>3;
                      }
                      else
@@ -2178,7 +2179,7 @@ BlockParams : BlockVarList {
                                 }
                                 else
                                 {
-                                   hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_NAMELESS_PARAM, NULL, NULL );
+                                   hb_compYYError( 'E', HB_COMP_ERR_NAMELESS_PARAM, NULL, NULL );
                                    hb_compExprDelete( $1 );
                                    $$ = NULL;
                                 }
@@ -2363,7 +2364,7 @@ VarDef     : IdentName AsType { hb_compVariableAdd( $1, hb_comp_cVarType ); }
                   }
                   else if( hb_comp_iVarScope == VS_EXTERNGLOBAL )
                   {
-                     hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXTERNGLOBAL_ASSIGN, $1, NULL );
+                     hb_compYYError( 'E', HB_COMP_ERR_EXTERNGLOBAL_ASSIGN, $1, NULL );
                   }
                   else if( hb_comp_iVarScope == VS_PUBLIC || hb_comp_iVarScope == VS_PRIVATE )
                   {
@@ -2666,7 +2667,7 @@ DoCaseBegin : DoCaseStart            { }
             | DoCaseStart Statements {
                         if( $<lNumber>2 > 0 )
                         {
-                           hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_MAYHEM_IN_CASE, NULL, NULL );
+                           hb_compYYError( 'E', HB_COMP_ERR_MAYHEM_IN_CASE, NULL, NULL );
                         }
                      }
            ;
@@ -2704,7 +2705,7 @@ Otherwise  : OTHERWISE { hb_compLinePushIfDebugger(); } Crlf
 
                 EmptyStats
 
-           | Otherwise OTHERWISE { hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_MAYHEM_IN_CASE, NULL, NULL ); } Crlf
+           | Otherwise OTHERWISE { hb_compYYError( 'E', HB_COMP_ERR_MAYHEM_IN_CASE, NULL, NULL ); } Crlf
                 EmptyStats
            ;
 
@@ -2769,7 +2770,7 @@ EndSwitch  : EndSwitchID
                           break;
 
                         default :
-                          hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_JUMP_NOT_FOUND, NULL, NULL );
+                          hb_compYYError( 'F', HB_COMP_ERR_JUMP_NOT_FOUND, NULL, NULL );
                      }
                   }
 
@@ -2886,7 +2887,7 @@ Constant   : NUM_INTEGER               { $$ = hb_compExprNewLong( $1.iNumber ); 
                                     }
                                     else
                                     {
-                                       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_CONSTANT, $1.string, NULL );
+                                       hb_compYYError( 'E', HB_COMP_ERR_INVALID_CONSTANT, $1.string, NULL );
                                        $$ = hb_compExprNewLong( 0 );
                                     }
                                  }
@@ -2931,7 +2932,7 @@ Default    : DEFAULT
                           break;
 
                         default :
-                          hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_JUMP_NOT_FOUND, NULL, NULL );
+                          hb_compYYError( 'F', HB_COMP_ERR_JUMP_NOT_FOUND, NULL, NULL );
                      }
                   }
 
@@ -3288,7 +3289,7 @@ Try          : TRY           /* 1 */
                      if( $<lNumber>3 != lLoopCount )
                      {
                         /* FINALLY statement after CATCH with EXIT/LOOP statments */
-                        hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "EXIT/LOOP", NULL );
+                        hb_compYYError( 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "EXIT/LOOP", NULL );
                      }
                      --hb_comp_wFinallyCounter;
                      if( $<lNumber>6 == 0 )
@@ -3317,7 +3318,7 @@ Try          : TRY           /* 1 */
                         /* Only if there is no CATCH clause */
                         --hb_comp_wSeqCounter;  /* CATCH is also considered as end of sequence */
 
-                        hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_MISSING_HANDLER, NULL, NULL );
+                        hb_compYYError( 'E', HB_COMP_ERR_MISSING_HANDLER, NULL, NULL );
                      }
                   }
 
@@ -3445,7 +3446,7 @@ WithNamespace : WITH_NAMESPACE NamespaceName Crlf
 
                                    if( pNamespace == NULL || ( ( pNamespace->type & NSTYPE_SPACE ) != NSTYPE_SPACE ) )
                                    {
-                                      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNKNOWN_NAMESPACE, $2, NULL );
+                                      hb_compYYError( 'E', HB_COMP_ERR_UNKNOWN_NAMESPACE, $2, NULL );
                                    }
                                    else
                                    {
@@ -3481,7 +3482,7 @@ Namespace  : NamespaceType IdentName Crlf
 
                                    if( ( ( $1 & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS ) && hb_comp_Namespaces.pCurrent )
                                    {
-                                      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_IMPLEMENTS_IN_NAMESPACE, hb_comp_Namespaces.pCurrent->szName, NULL );
+                                      hb_compYYError( 'E', HB_COMP_ERR_IMPLEMENTS_IN_NAMESPACE, hb_comp_Namespaces.pCurrent->szName, NULL );
                                    }
 
                                    hb_compNamespaceNew( $2, $1 );
@@ -3514,7 +3515,7 @@ ExtNamespace : EXTERNAL_NAMESPACE IdentName Crlf
                                    }
                                    else
                                    {
-                                      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_NAMESPACE, $2, NULL );
+                                      hb_compYYError( 'E', HB_COMP_ERR_UNMATCHED_NAMESPACE, $2, NULL );
                                    }
                                  }
              | EXTERNAL_NAMESPACE_MEMBER IdentName Crlf
@@ -3533,7 +3534,7 @@ ExtNamespace : EXTERNAL_NAMESPACE IdentName Crlf
                                    }
                                    else
                                    {
-                                      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_NAMESPACE, $2, NULL );
+                                      hb_compYYError( 'E', HB_COMP_ERR_UNMATCHED_NAMESPACE, $2, NULL );
                                    }
                                  }
              ;
@@ -3600,7 +3601,7 @@ UsedPath : IdentName
 
                        if( $$ == NULL )
                        {
-                          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNKNOWN_NAMESPACE, $1, NULL );
+                          hb_compYYError( 'E', HB_COMP_ERR_UNKNOWN_NAMESPACE, $1, NULL );
                           $$ = NULL;
                        }
                     }
@@ -3610,14 +3611,14 @@ UsedPath : IdentName
                                      {
                                         if( ( (PNAMESPACE) $1 )->pNext == NULL )
                                         {
-                                           hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EMPTY_NAMESPACE, ( (PNAMESPACE) $1 )->szName, NULL );
+                                           hb_compYYError( 'E', HB_COMP_ERR_EMPTY_NAMESPACE, ( (PNAMESPACE) $1 )->szName, NULL );
                                         }
 
                                         $$ = (void *) hb_compNamespaceFindMember( ( (PNAMESPACE) $1 )->pNext, $3, NSTYPE_SPACE );
 
                                         if( $$ == NULL )
                                         {
-                                           hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_NONMEMBER_NAMESPACE, $3, ( (PNAMESPACE) $1 )->szName );
+                                           hb_compYYError( 'E', HB_COMP_ERR_NONMEMBER_NAMESPACE, $3, ( (PNAMESPACE) $1 )->szName );
                                         }
                                      }
                                   }
@@ -3710,42 +3711,39 @@ void yyerror( char * s )
             char LineAsString[32];
 
             hb_snprintf( LineAsString, sizeof( LineAsString ), "at line %i", s_iLastControlLine - 1 );
-            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL );
+            hb_compYYError( 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL );
          }
          else
          {
-            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INCOMPLETE_STMT, NULL, NULL );
+            hb_compYYError( 'E', HB_COMP_ERR_INCOMPLETE_STMT, NULL, NULL );
          }
       }
       else
       {
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INCOMPLETE_STMT, NULL, NULL );
+         hb_compYYError( 'E', HB_COMP_ERR_INCOMPLETE_STMT, NULL, NULL );
       }
    }
    else
    {
       if( hb_comp_wForCounter == 0 && ( yychar == NEXT || yychar == LOOP ) )
       {
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_NEXTFOR, NULL, NULL );
+         hb_compYYError( 'E', HB_COMP_ERR_NEXTFOR, NULL, NULL );
       }
       else if( yychar == EXIT && hb_comp_wForCounter == 0 && hb_comp_wSwitchCounter == 0 )
       {
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_EXIT, yytext, NULL );
+         hb_compYYError( 'E', HB_COMP_ERR_UNMATCHED_EXIT, yytext, NULL );
       }
       else if( yychar == ENDDO && hb_comp_wWhileCounter == 0 )
       {
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_ENDDO, NULL, NULL );
+         hb_compYYError( 'E', HB_COMP_ERR_ENDDO, NULL, NULL );
       }
       else if( yychar == ENDCASE && hb_comp_wCaseCounter == 0 )
       {
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_ENDCASE, NULL, NULL );
+         hb_compYYError( 'E', HB_COMP_ERR_ENDCASE, NULL, NULL );
       }
       else if( yychar == ENDIF && hb_comp_wIfCounter == 0 )
       {
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_ENDIF, NULL, NULL );
-
-         if( hb_comp_pLoops )
-            hb_xfree( hb_comp_pLoops );
+         hb_compYYError( 'E', HB_COMP_ERR_ENDIF, NULL, NULL );
       }
 
       if( s_iControlLevel )
@@ -3754,32 +3752,18 @@ void yyerror( char * s )
          {
             if( hb_comp_wSeqCounter )
             {
-               hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, yytext, NULL );
+               hb_compYYError( 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, yytext, NULL );
             }
             else
             {
                char LineAsString[32];
                hb_snprintf( LineAsString, sizeof( LineAsString ), "at line %i", s_iLastControlLine - 1 );
-               hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL );
+               hb_compYYError( 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL );
             }
          }
          else
          {
-            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_YACC, s, yytext );
-
-            if( asExpr )
-               hb_xfree( asExpr );
-
-            if( hb_comp_LocalParams )
-            {
-               while( hb_comp_LocalParams )
-               {
-                  PLOCALPARAM pDelete = hb_comp_LocalParams;
-
-                  hb_comp_LocalParams = hb_comp_LocalParams->pNext;
-                  hb_xfree( (void *) pDelete );
-               }
-            }
+            hb_compYYError( 'E', HB_COMP_ERR_YACC, s, yytext );
          }
 
          /*
@@ -3797,21 +3781,7 @@ void yyerror( char * s )
       }
       else
       {
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_YACC, s, yytext );
-
-         if( asExpr )
-            hb_xfree( asExpr );
-
-         if( hb_comp_LocalParams )
-         {
-            while( hb_comp_LocalParams )
-            {
-               PLOCALPARAM pDelete = hb_comp_LocalParams;
-
-               hb_comp_LocalParams = hb_comp_LocalParams->pNext;
-               hb_xfree( (void *) pDelete );
-            }
-         }
+         hb_compYYError( 'E', HB_COMP_ERR_YACC, s, yytext );
       }
    }
 }
@@ -3970,7 +3940,7 @@ static void hb_compLoopLoop( void )
 
    if( ! pLast )
    {
-      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_EXIT, "LOOP", NULL );
+      hb_compYYError( 'E', HB_COMP_ERR_UNMATCHED_EXIT, "LOOP", NULL );
    }
    else
    {
@@ -3980,13 +3950,13 @@ static void hb_compLoopLoop( void )
          * Current SEQUENCE counter is different then at the beginning of loop
          * Notice that LOOP is allowed in RECOVER code.
          */
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "LOOP", NULL );
+         hb_compYYError( 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "LOOP", NULL );
       }
       else if( pLast->wFinallyCounter != hb_comp_wFinallyCounter )
       {
          /* Attempt to LOOP from FINALLY block of TRY/END sequence
           */
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "LOOP", NULL );
+         hb_compYYError( 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "LOOP", NULL );
       }
       else
       {
@@ -4021,7 +3991,7 @@ static void hb_compLoopExit( void )
 {
    if( ! hb_comp_pLoops )
    {
-      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_EXIT, "EXIT", NULL );
+      hb_compYYError( 'E', HB_COMP_ERR_UNMATCHED_EXIT, "EXIT", NULL );
    }
    else
    {
@@ -4037,13 +4007,13 @@ static void hb_compLoopExit( void )
          * Current SEQUENCE counter is different then at the beginning of loop
          * Notice that LOOP is allowed in RECOVER code.
          */
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "EXIT", NULL );
+         hb_compYYError( 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "EXIT", NULL );
       }
       else if( pLast->wFinallyCounter != hb_comp_wFinallyCounter )
       {
          /* Attempt to EXIT from FINALLY block of TRY/END sequence
           */
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "EXIT", NULL );
+         hb_compYYError( 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "EXIT", NULL );
       }
       else
       {
@@ -4348,7 +4318,7 @@ static void hb_compVariableDim( char * szName, HB_EXPR_PTR pInitValue )
   }
   else if( hb_comp_iVarScope == VS_EXTERNGLOBAL )
   {
-     hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXTERNGLOBAL_ASSIGN, szName, NULL );
+     hb_compYYError( 'E', HB_COMP_ERR_EXTERNGLOBAL_ASSIGN, szName, NULL );
   }
   else
   {
@@ -4371,5 +4341,24 @@ void hb_compReleaseRTVars( void )
       hb_compExprDelete( pVar->pVar );
       hb_comp_rtvars = pVar->pPrev;
       hb_xfree( pVar );
+   }
+}
+
+static void hb_compYYError( char cPrefix, int iError, const char * szError1, const char * szError2 )
+{
+   hb_compGenError( hb_comp_szErrors, cPrefix, iError, szError1, szError2 );
+
+   if ( asExpr )
+      hb_xfree( asExpr );
+
+   if( hb_comp_LocalParams )
+   {
+      while( hb_comp_LocalParams )
+      {
+         PLOCALPARAM pDelete = hb_comp_LocalParams;
+
+         hb_comp_LocalParams = hb_comp_LocalParams->pNext;
+         hb_xfree( (void *) pDelete );
+      }
    }
 }

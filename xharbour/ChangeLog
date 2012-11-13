@@ -8,6 +8,36 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-13 07:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbcompat.h
+    + HB_ISARRAY and HB_ISLOG, which may be required by external packages
+
+  * source/compiler/harbour.sly
+  * source/compiler/harbouryy.c
+    + hb_compYYError as common static function to release variables
+
+  * source/compiler/harbour.c
+    ! procedure/function MAIN not necessarily be the first/top function in
+      a module. MAIN will be executed first regardless functions order.
+
+  * source/compiler/hbident.c
+    * free s_comp_Identifiers if not NULL
+
+  * source/compiler/hbgenerr.c
+  * source/compiler/comptool.c
+    ! move clean-up functions to comptool.c
+
+  * include/hbcomp.h
+  * source/compiler/harbour.c
+  * source/compiler/hbusage.c
+  * source/compiler/genc.c
+  * source/compiler/cmdcheck.c
+    + -ex switch to produce *.xbx file, list of public functions in module
+
+  * source/compiler/cmdcheck.c
+  * source/compiler/comptool.c
+    ! append report of harbour.exe memory leak to fm.log
+
 2012-11-12 04:52 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/harbour.sly
   * source/compiler/harbouryy.c

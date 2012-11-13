@@ -65,6 +65,8 @@
 #define HB_ISCHAR                 ISCHAR
 #define HB_ISBLOCK                ISBLOCK
 #define HB_ISPOINTER              ISPOINTER
+#define HB_ISARRAY                ISARRAY
+#define HB_ISLOG                  ISLOG
 #define HB_ISNIL                  ISNIL
 #define HB_ISBYREF                ISBYREF
 #define HB_ISNUM                  ISNUM

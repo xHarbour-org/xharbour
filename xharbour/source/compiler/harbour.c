@@ -240,6 +240,9 @@ BOOL     hb_comp_bTracePP                 = FALSE;
 /* Auto declare external function as dynamic */
 BOOL     hb_comp_autoDeferred             = FALSE;
 
+/* procude list of public function in a module */
+BOOL     hb_comp_createExternList         = FALSE;
+
 BOOL     hb_comp_bWarnUnUsedLocals        = FALSE;
 BOOL     hb_comp_bWarnUnUsedStatics       = FALSE;
 BOOL     hb_comp_bWarnUnUsedGlobals       = FALSE;
@@ -302,18 +305,14 @@ int hb_compMain( int argc, char * argv[] )
       printf( "\n" );
       szBuildInfo = hb_verBuildInfo( TRUE );
       hb_xfree( szBuildInfo );
-      hb_xfree( hb_Command_Line );
-      if( hb_comp_PP )
-         hb_pp_free( hb_comp_PP );
+      hb_compCleanUp( FALSE );
       return iStatus;
    }
 
    if( hb_comp_bCredits )
    {
       hb_compPrintCredits();
-      hb_xfree( hb_Command_Line );
-      if( hb_comp_PP )
-         hb_pp_free( hb_comp_PP );
+      hb_compCleanUp( FALSE );
       return iStatus;
    }
 
@@ -361,28 +360,12 @@ int hb_compMain( int argc, char * argv[] )
       }
    }
 
-   hb_xfree( hb_Command_Line );
+   hb_compCleanUp( FALSE );
 
-   if( hb_comp_PP )
-   {
-      hb_pp_free( hb_comp_PP );
-   }
-   hb_compIdentifierClose();
-
-   if( ( ! bAnyFiles ) && ( ! hb_comp_bQuiet ) )
+   if( ! bAnyFiles && ! hb_comp_bQuiet )
    {
       hb_compPrintUsage( argv[ 0 ] );
       iStatus = EXIT_FAILURE;
-   }
-
-   if( hb_comp_pOutPath )
-   {
-      hb_xfree( hb_comp_pOutPath );
-   }
-
-   if( hb_comp_ppo_pOutPath )
-   {
-      hb_xfree( hb_comp_ppo_pOutPath );
    }
 
    if( hb_comp_iErrorCount > 0 )
@@ -6305,9 +6288,12 @@ static int hb_compCompile( char * szPrg )
                      }
 
                      assert( pSym );
-                     pSym->cScope   |= HB_FS_FIRST;
 
-                     bDoFirst       = FALSE;
+                     if( strcmp( pFunc->szName, "MAIN" ) == 0 && strlen( pFunc->szName ) == 4 )
+                     {
+                        pSym->cScope   |= HB_FS_FIRST;
+                        bDoFirst       = FALSE;
+                     }
                   }
 
                   pFunc = pFunc->pNext;
@@ -6339,6 +6325,7 @@ static int hb_compCompile( char * szPrg )
    }
 
    hb_xfree( hb_comp_PrgFileName );
+   hb_comp_PrgFileName = NULL;
 
    hb_compReleaseRTVars();
    hb_compReleaseLoops();
@@ -6503,6 +6490,7 @@ static int hb_compCompile( char * szPrg )
    }
 
    hb_xfree( hb_comp_pFileName );
+   hb_comp_pFileName = NULL;
 
    return iStatus;
 }

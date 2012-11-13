@@ -314,6 +314,7 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void ** pCargo )
 
 void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )      /* generates the C language output */
 {
+   char        szExternName[ HB_PATH_MAX ];
    char        szExtName[ HB_PATH_MAX ];
    char        szFileName[ HB_PATH_MAX ];
    char        szModuleName[ HB_PATH_MAX ];
@@ -322,6 +323,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
    PFUNCALL    pFunCall;
    PCOMSYMBOL  pSym           = hb_comp_symbols.pFirst;
    FILE *      yyc;                    /* file handle for C output */
+   FILE *      fExtern        = NULL;  /* file handle all public function */
    FILE *      fCodeExt       = NULL;  /* file handle for external function required by pCode.DLL */
    PINLINE     pInline        = hb_comp_inlines.pFirst;
    short       iLocalGlobals  = 0, iGlobals = 0;
@@ -351,6 +353,13 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
 
    hb_fsFNameMerge( szFileName, pFileName );
 
+   /*
+      Automatically generate filename.xbx - list of public functions useable
+      for generating extern.ch
+   */
+   pFileName->szExtension  = ".xbx";
+   hb_fsFNameMerge( szExternName, pFileName );
+
    pFileName->szExtension  = szSourceExtension;
    pFileName->szPath       = NULL;
    hb_fsFNameMerge( szSourceName, pFileName );
@@ -369,6 +378,13 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
       return;
    }
 
+   if( hb_comp_createExternList )
+   {
+      fExtern = hb_fopen( szExternName, "wb" );;
+      fprintf( fExtern, "; List of Public Functions\n" );
+      fprintf( fExtern, "; Module: %s\n\n", szSourceName );
+   }
+
    /*
       Create *.dyn when /vd is used
     */
@@ -378,6 +394,11 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
       hb_fsFNameMerge( szExtName, pFileName );
       fCodeExt                = hb_fopen( szExtName, "wb" );
    }
+
+   /*
+      Automatically generate filename.xbx - list of public functions useable
+      for generating extern.ch
+   */
 
    /*
       Create *.p when /gc4 is used
@@ -1139,6 +1160,8 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
             else
             {
                fprintf( yyc, "HB_FS_PUBLIC" );
+               if( ( pSym->cScope & HB_FS_FIRST ) != HB_FS_FIRST && ( pSym->cScope & HB_FS_LOCAL ) == HB_FS_LOCAL && hb_comp_createExternList )
+                  fprintf( fExtern, "EXTERNAL %s\n", pSym->szName );
             }
 
             if( ( pSym->cScope & HB_FS_LOCAL ) == HB_FS_LOCAL )
@@ -1456,6 +1479,11 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
    }
 
    fclose( yyc );
+
+   if( hb_comp_createExternList )
+   {
+      fclose( fExtern );
+   }
 
    if( fCodeExt )
    {

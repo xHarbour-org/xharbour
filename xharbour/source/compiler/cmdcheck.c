@@ -51,6 +51,9 @@
 #include "hbcomp.h"
 #include "hbexemem.h"
 
+static char *  argv     = "";
+static char ** s_argv   = &argv;
+
 /* TODO: Add support for this compiler switches
    -r -t || hb_getenv( "TMP" )
  */
@@ -126,12 +129,28 @@ static ULONG PackDateTime( void )
    return HB_MKLONG( szString[ 3 ], szString[ 2 ], szString[ 1 ], szString[ 0 ] );
 }
 
+char * hb_exeName( void )
+{
+   return s_argv[0];
+}
+
+static void cmdcheckerror( const char *  s )
+{
+   if( hb_comp_bLogo )
+   {
+      hb_compPrintLogo();
+   }
+   hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
+}
+
 void hb_compChkCompilerSwitch( int iArg, char * Args[] )
 {
    /* If iArg is passed check the command line options */
    if( iArg )
    {
       int i;
+
+      s_argv = Args;
 
       /* Check all switches in command line
          They start with an OS_OPT_DELIMITER char
@@ -232,7 +251,7 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
                         else
                         {
                            Switch[ 2 ] = '\0';
-                           hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, ( char * ) Switch, NULL );
+                           cmdcheckerror( ( const char* ) Switch );
                         }
 
                      case 'd':
@@ -246,7 +265,17 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
 
                      case 'e':
                      case 'E':
-                        if( Args[ i ][ j + 1 ] && HB_TOUPPER( ( BYTE ) Args[ i ][ j + 1 ] ) == 'S' && Args[ i ][ j + 2 ] && HB_ISDIGIT( ( BYTE ) Args[ i ][ j + 2 ] ) )
+                        if( Args[ i ][ j + 1 ] && HB_TOUPPER( ( BYTE ) Args[ i ][ j + 1 ] ) == 'X' )
+                        {
+                           Switch[ 2 ] = 'X';
+                           Switch[ 3 ] = '\0';
+
+                           hb_compChkEnvironVar( ( char * ) Switch );
+
+                           j += 2;
+                           continue;
+                        }
+                        else if( Args[ i ][ j + 1 ] && HB_TOUPPER( ( BYTE ) Args[ i ][ j + 1 ] ) == 'S' && Args[ i ][ j + 2 ] && HB_ISDIGIT( ( BYTE ) Args[ i ][ j + 2 ] ) )
                         {
                            Switch[ 2 ] = 'S';
                            Switch[ 3 ] = Args[ i ][ j + 2 ];
@@ -257,12 +286,13 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
                            j += 3;
                            continue;
                         }
+#if 0
                         else
                         {
                            Switch[ 2 ] = '\0';
-                           hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, ( char * ) Switch, NULL );
+                           cmdcheckerror( ( const char* ) Switch );
                         }
-
+#endif
                         break;
 
                      case 'g':
@@ -506,7 +536,7 @@ void hb_compChkEnvironVar( char * szSwitch )
 
       if( ! HB_ISOPTSEP( *s ) )
       {
-         hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
+         cmdcheckerror( ( const char* ) s );
       }
       else
       {
@@ -580,7 +610,10 @@ void hb_compChkEnvironVar( char * szSwitch )
                }
                else
                {
-                  hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, szOption, NULL );
+                  char _szOption[ 256 ];
+                  hb_snprintf( _szOption, sizeof( _szOption ), "%s", szOption );
+                  hb_xfree( szOption );
+                  cmdcheckerror( ( const char* ) _szOption );
                }
 
                hb_xfree( szOption );
@@ -594,7 +627,11 @@ void hb_compChkEnvironVar( char * szSwitch )
 
             case 'e':
             case 'E':
-               if( *( s + 1 ) == 's' || *( s + 1 ) == 'S' )
+               if( ( *( s + 1 ) == 'x' || *( s + 1 ) == 'X' ) && !( *( s + 2 ) ) )
+               {
+                  hb_comp_createExternList = TRUE;
+               }
+               else if( *( s + 1 ) == 's' || *( s + 1 ) == 'S' )
                {
                   switch( *( s + 2 ) )
                   {
@@ -612,12 +649,12 @@ void hb_compChkEnvironVar( char * szSwitch )
                         break;
 
                      default:
-                        hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
+                        cmdcheckerror( ( const char* ) s );
                   }
                }
                else
                {
-                  hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
+                  cmdcheckerror( ( const char* ) s );
                }
 
                break;
@@ -659,7 +696,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                            break;
 
                         default:
-                           hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
+                           cmdcheckerror( ( const char* ) s );
                      }
                      break;
 
@@ -696,7 +733,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                            break;
 
                         default:
-                           hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
+                           cmdcheckerror( ( const char* ) s );
                      }
                      break;
 
@@ -792,7 +829,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                         break;
 
                      default:
-                        hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
+                        cmdcheckerror( ( const char* ) s );
                         break;
                   }
                }
@@ -861,7 +898,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                 */
                else
                {
-                  hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
+                  cmdcheckerror( ( const char* ) s );
                }
                break;
 
@@ -1098,19 +1135,22 @@ void hb_compChkEnvironVar( char * szSwitch )
                   }
                   else
                   {
-                     hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, szOption, NULL );
+                     char _szOption[ 256 ];
+                     hb_snprintf( _szOption, sizeof( _szOption ), "%s", szOption );
+                     hb_xfree( szOption );
+                     cmdcheckerror( ( const char* ) _szOption );
                   }
 
                   hb_xfree( szOption );
                }
                else
                {
-                  hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
+                  cmdcheckerror( ( const char* ) s );
                }
 
                if( hb_comp_iWarnings < 0 || hb_comp_iWarnings > 4 )
                {
-                  hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
+                  cmdcheckerror( ( const char* ) s );
                }
                else
                {
@@ -1181,7 +1221,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                break;
 
             default:
-               hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
+               cmdcheckerror( ( const char* ) s );
                break;
          }
       }

@@ -271,6 +271,7 @@ typedef struct _BLOCKSLIST
 PBLOCKSLIST hb_comp_BlocksList = NULL;
 
 static HB_EXPR_PTR asExpr = NULL;
+static void hb_compYYError( char cPrefix, int iError, const char * szError1, const char * szError2 );
 
 static void hb_compDebugStart( void ) { };
 
@@ -1179,97 +1180,97 @@ static const yytype_int16 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   367,   367,   367,   368,   371,   372,   373,   374,   375,
-     376,   377,   378,   379,   380,   381,   382,   383,   384,   385,
-     386,   387,   388,   389,   390,   391,   392,   393,   394,   395,
-     396,   397,   398,   399,   400,   403,   404,   407,   410,   418,
-     436,   442,   435,   479,   485,   478,   523,   524,   525,   526,
-     527,   528,   529,   530,   533,   534,   535,   535,   536,   539,
-     540,   543,   544,   545,   546,   547,   548,   549,   550,   551,
-     552,   555,   556,   557,   558,   559,   560,   561,   562,   563,
-     564,   567,   575,   588,   589,   617,   617,   618,   619,   620,
-     621,   622,   623,   628,   633,   634,   635,   636,   637,   638,
-     639,   640,   642,   642,   646,   646,   647,   647,   648,   662,
-     662,   686,   688,   686,   689,   691,   689,   693,   694,   696,
-     695,   717,   717,   718,   718,   729,   735,   744,   745,   748,
-     748,   751,   752,   753,   754,   755,   758,   759,   762,   763,
-     764,   765,   766,   767,   770,   771,   774,   775,   776,   777,
-     780,   781,   782,   783,   786,   791,   792,   793,   796,   797,
-     798,   808,   811,   816,   835,   840,   845,   846,   849,   854,
-     857,   862,   870,   873,   887,   900,   914,   927,   941,   954,
-     965,   975,   986,   996,  1007,  1019,  1025,  1028,  1031,  1032,
-    1033,  1036,  1041,  1042,  1045,  1050,  1081,  1086,  1099,  1105,
-    1211,  1216,  1219,  1226,  1227,  1232,  1233,  1234,  1235,  1236,
-    1237,  1238,  1239,  1240,  1241,  1242,  1243,  1244,  1245,  1248,
-    1249,  1250,  1253,  1254,  1255,  1256,  1257,  1258,  1259,  1260,
-    1261,  1262,  1263,  1264,  1265,  1266,  1267,  1268,  1269,  1270,
-    1271,  1272,  1281,  1282,  1283,  1284,  1285,  1286,  1291,  1292,
-    1293,  1294,  1295,  1296,  1297,  1298,  1299,  1300,  1301,  1302,
-    1303,  1304,  1305,  1306,  1307,  1308,  1311,  1315,  1316,  1334,
-    1335,  1336,  1337,  1338,  1339,  1342,  1343,  1346,  1347,  1412,
-    1413,  1416,  1417,  1418,  1421,  1426,  1427,  1428,  1431,  1432,
-    1433,  1434,  1435,  1436,  1437,  1438,  1439,  1440,  1441,  1442,
-    1443,  1444,  1445,  1446,  1447,  1448,  1449,  1450,  1451,  1452,
-    1453,  1456,  1468,  1474,  1477,  1486,  1494,  1495,  1496,  1497,
-    1498,  1499,  1500,  1501,  1502,  1503,  1503,  1504,  1505,  1506,
-    1507,  1508,  1509,  1510,  1511,  1512,  1512,  1513,  1514,  1514,
-    1515,  1516,  1516,  1517,  1518,  1518,  1519,  1520,  1520,  1521,
-    1522,  1523,  1524,  1525,  1526,  1527,  1528,  1529,  1532,  1533,
-    1534,  1535,  1535,  1536,  1536,  1539,  1540,  1543,  1544,  1545,
-    1546,  1547,  1548,  1549,  1550,  1556,  1557,  1564,  1565,  1566,
-    1567,  1568,  1569,  1570,  1571,  1572,  1573,  1574,  1575,  1576,
-    1577,  1578,  1579,  1580,  1581,  1582,  1583,  1584,  1585,  1586,
-    1589,  1590,  1593,  1594,  1595,  1602,  1603,  1604,  1605,  1606,
-    1607,  1608,  1609,  1610,  1611,  1612,  1613,  1614,  1615,  1616,
-    1617,  1618,  1619,  1620,  1621,  1622,  1623,  1624,  1627,  1628,
-    1629,  1630,  1631,  1632,  1633,  1634,  1635,  1636,  1637,  1638,
-    1639,  1640,  1641,  1642,  1643,  1644,  1645,  1646,  1647,  1648,
-    1649,  1652,  1653,  1654,  1655,  1656,  1657,  1658,  1659,  1660,
-    1661,  1662,  1663,  1664,  1665,  1666,  1667,  1668,  1669,  1670,
-    1671,  1672,  1673,  1674,  1677,  1678,  1679,  1680,  1681,  1682,
-    1683,  1684,  1685,  1686,  1687,  1688,  1689,  1690,  1691,  1692,
-    1693,  1694,  1695,  1696,  1697,  1698,  1699,  1702,  1703,  1704,
-    1705,  1706,  1707,  1708,  1709,  1710,  1711,  1712,  1713,  1714,
-    1715,  1716,  1717,  1718,  1719,  1720,  1721,  1722,  1723,  1724,
-    1727,  1728,  1729,  1730,  1731,  1732,  1733,  1734,  1735,  1736,
-    1737,  1738,  1739,  1740,  1741,  1742,  1743,  1744,  1745,  1746,
-    1747,  1748,  1749,  1752,  1753,  1754,  1755,  1756,  1757,  1758,
-    1759,  1760,  1761,  1762,  1763,  1764,  1765,  1766,  1767,  1768,
-    1769,  1770,  1771,  1772,  1773,  1774,  1777,  1778,  1779,  1780,
-    1781,  1782,  1783,  1784,  1785,  1786,  1787,  1788,  1789,  1790,
-    1791,  1792,  1793,  1794,  1795,  1796,  1797,  1798,  1799,  1802,
-    1803,  1804,  1805,  1806,  1807,  1810,  1811,  1812,  1813,  1814,
-    1815,  1816,  1817,  1818,  1819,  1820,  1823,  1824,  1827,  1828,
-    1829,  1830,  1831,  1832,  1833,  1834,  1835,  1836,  1837,  1840,
-    1846,  1847,  1848,  1851,  1855,  1968,  2033,  2038,  2043,  1854,
-    2089,  2090,  2093,  2094,  2099,  2097,  2165,  2189,  2189,  2197,
-    2198,  2214,  2215,  2222,  2223,  2224,  2225,  2235,  2238,  2241,
-    2244,  2247,  2248,  2249,  2250,  2253,  2256,  2259,  2262,  2265,
-    2266,  2269,  2272,  2272,  2273,  2273,  2274,  2274,  2275,  2275,
-    2278,  2279,  2282,  2283,  2291,  2292,  2294,  2298,  2305,  2314,
-    2314,  2340,  2343,  2340,  2380,  2381,  2387,  2390,  2391,  2392,
-    2396,  2396,  2399,  2400,  2401,  2404,  2404,  2407,  2408,  2411,
-    2411,  2435,  2435,  2436,  2437,  2438,  2438,  2441,  2442,  2445,
-    2446,  2447,  2448,  2451,  2451,  2473,  2473,  2527,  2528,  2529,
-    2530,  2533,  2534,  2535,  2536,  2537,  2538,  2541,  2542,  2543,
-    2544,  2545,  2546,  2549,  2549,  2552,  2553,  2556,  2557,  2558,
-    2559,  2560,  2561,  2562,  2563,  2566,  2567,  2568,  2569,  2572,
-    2573,  2576,  2585,  2576,  2592,  2592,  2596,  2597,  2596,  2606,
-    2607,  2606,  2617,  2618,  2621,  2625,  2629,  2632,  2638,  2644,
-    2652,  2652,  2665,  2666,  2674,  2675,  2674,  2686,  2687,  2686,
-    2699,  2700,  2699,  2707,  2707,  2711,  2720,  2731,  2782,  2783,
-    2786,  2786,  2801,  2802,  2805,  2806,  2807,  2808,  2811,  2812,
-    2811,  2831,  2832,  2831,  2857,  2858,  2859,  2860,  2861,  2866,
-    2871,  2876,  2881,  2882,  2896,  2895,  2958,  2971,  2957,  2987,
-    3000,  3001,  3005,  3012,  3024,  3004,  3106,  3107,  3110,  3111,
-    3114,  3118,  3122,  3126,  3133,  3141,  3149,  3132,  3169,  3168,
-    3185,  3197,  3205,  3185,  3229,  3230,  3231,  3234,  3245,  3258,
-    3266,  3275,  3283,  3257,  3333,  3334,  3337,  3346,  3347,  3350,
-    3360,  3378,  3379,  3380,  3383,  3387,  3389,  3393,  3394,  3395,
-    3396,  3397,  3400,  3411,  3412,  3413,  3414,  3415,  3419,  3418,
-    3472,  3476,  3475,  3503,  3520,  3542,  3543,  3544,  3545,  3549,
-    3548,  3559,  3560,  3561,  3562,  3563,  3565,  3567,  3569,  3573,
-    3580,  3590,  3607,  3627,  3628
+       0,   368,   368,   368,   369,   372,   373,   374,   375,   376,
+     377,   378,   379,   380,   381,   382,   383,   384,   385,   386,
+     387,   388,   389,   390,   391,   392,   393,   394,   395,   396,
+     397,   398,   399,   400,   401,   404,   405,   408,   411,   419,
+     437,   443,   436,   480,   486,   479,   524,   525,   526,   527,
+     528,   529,   530,   531,   534,   535,   536,   536,   537,   540,
+     541,   544,   545,   546,   547,   548,   549,   550,   551,   552,
+     553,   556,   557,   558,   559,   560,   561,   562,   563,   564,
+     565,   568,   576,   589,   590,   618,   618,   619,   620,   621,
+     622,   623,   624,   629,   634,   635,   636,   637,   638,   639,
+     640,   641,   643,   643,   647,   647,   648,   648,   649,   663,
+     663,   687,   689,   687,   690,   692,   690,   694,   695,   697,
+     696,   718,   718,   719,   719,   730,   736,   745,   746,   749,
+     749,   752,   753,   754,   755,   756,   759,   760,   763,   764,
+     765,   766,   767,   768,   771,   772,   775,   776,   777,   778,
+     781,   782,   783,   784,   787,   792,   793,   794,   797,   798,
+     799,   809,   812,   817,   836,   841,   846,   847,   850,   855,
+     858,   863,   871,   874,   888,   901,   915,   928,   942,   955,
+     966,   976,   987,   997,  1008,  1020,  1026,  1029,  1032,  1033,
+    1034,  1037,  1042,  1043,  1046,  1051,  1082,  1087,  1100,  1106,
+    1212,  1217,  1220,  1227,  1228,  1233,  1234,  1235,  1236,  1237,
+    1238,  1239,  1240,  1241,  1242,  1243,  1244,  1245,  1246,  1249,
+    1250,  1251,  1254,  1255,  1256,  1257,  1258,  1259,  1260,  1261,
+    1262,  1263,  1264,  1265,  1266,  1267,  1268,  1269,  1270,  1271,
+    1272,  1273,  1282,  1283,  1284,  1285,  1286,  1287,  1292,  1293,
+    1294,  1295,  1296,  1297,  1298,  1299,  1300,  1301,  1302,  1303,
+    1304,  1305,  1306,  1307,  1308,  1309,  1312,  1316,  1317,  1335,
+    1336,  1337,  1338,  1339,  1340,  1343,  1344,  1347,  1348,  1413,
+    1414,  1417,  1418,  1419,  1422,  1427,  1428,  1429,  1432,  1433,
+    1434,  1435,  1436,  1437,  1438,  1439,  1440,  1441,  1442,  1443,
+    1444,  1445,  1446,  1447,  1448,  1449,  1450,  1451,  1452,  1453,
+    1454,  1457,  1469,  1475,  1478,  1487,  1495,  1496,  1497,  1498,
+    1499,  1500,  1501,  1502,  1503,  1504,  1504,  1505,  1506,  1507,
+    1508,  1509,  1510,  1511,  1512,  1513,  1513,  1514,  1515,  1515,
+    1516,  1517,  1517,  1518,  1519,  1519,  1520,  1521,  1521,  1522,
+    1523,  1524,  1525,  1526,  1527,  1528,  1529,  1530,  1533,  1534,
+    1535,  1536,  1536,  1537,  1537,  1540,  1541,  1544,  1545,  1546,
+    1547,  1548,  1549,  1550,  1551,  1557,  1558,  1565,  1566,  1567,
+    1568,  1569,  1570,  1571,  1572,  1573,  1574,  1575,  1576,  1577,
+    1578,  1579,  1580,  1581,  1582,  1583,  1584,  1585,  1586,  1587,
+    1590,  1591,  1594,  1595,  1596,  1603,  1604,  1605,  1606,  1607,
+    1608,  1609,  1610,  1611,  1612,  1613,  1614,  1615,  1616,  1617,
+    1618,  1619,  1620,  1621,  1622,  1623,  1624,  1625,  1628,  1629,
+    1630,  1631,  1632,  1633,  1634,  1635,  1636,  1637,  1638,  1639,
+    1640,  1641,  1642,  1643,  1644,  1645,  1646,  1647,  1648,  1649,
+    1650,  1653,  1654,  1655,  1656,  1657,  1658,  1659,  1660,  1661,
+    1662,  1663,  1664,  1665,  1666,  1667,  1668,  1669,  1670,  1671,
+    1672,  1673,  1674,  1675,  1678,  1679,  1680,  1681,  1682,  1683,
+    1684,  1685,  1686,  1687,  1688,  1689,  1690,  1691,  1692,  1693,
+    1694,  1695,  1696,  1697,  1698,  1699,  1700,  1703,  1704,  1705,
+    1706,  1707,  1708,  1709,  1710,  1711,  1712,  1713,  1714,  1715,
+    1716,  1717,  1718,  1719,  1720,  1721,  1722,  1723,  1724,  1725,
+    1728,  1729,  1730,  1731,  1732,  1733,  1734,  1735,  1736,  1737,
+    1738,  1739,  1740,  1741,  1742,  1743,  1744,  1745,  1746,  1747,
+    1748,  1749,  1750,  1753,  1754,  1755,  1756,  1757,  1758,  1759,
+    1760,  1761,  1762,  1763,  1764,  1765,  1766,  1767,  1768,  1769,
+    1770,  1771,  1772,  1773,  1774,  1775,  1778,  1779,  1780,  1781,
+    1782,  1783,  1784,  1785,  1786,  1787,  1788,  1789,  1790,  1791,
+    1792,  1793,  1794,  1795,  1796,  1797,  1798,  1799,  1800,  1803,
+    1804,  1805,  1806,  1807,  1808,  1811,  1812,  1813,  1814,  1815,
+    1816,  1817,  1818,  1819,  1820,  1821,  1824,  1825,  1828,  1829,
+    1830,  1831,  1832,  1833,  1834,  1835,  1836,  1837,  1838,  1841,
+    1847,  1848,  1849,  1852,  1856,  1969,  2034,  2039,  2044,  1855,
+    2090,  2091,  2094,  2095,  2100,  2098,  2166,  2190,  2190,  2198,
+    2199,  2215,  2216,  2223,  2224,  2225,  2226,  2236,  2239,  2242,
+    2245,  2248,  2249,  2250,  2251,  2254,  2257,  2260,  2263,  2266,
+    2267,  2270,  2273,  2273,  2274,  2274,  2275,  2275,  2276,  2276,
+    2279,  2280,  2283,  2284,  2292,  2293,  2295,  2299,  2306,  2315,
+    2315,  2341,  2344,  2341,  2381,  2382,  2388,  2391,  2392,  2393,
+    2397,  2397,  2400,  2401,  2402,  2405,  2405,  2408,  2409,  2412,
+    2412,  2436,  2436,  2437,  2438,  2439,  2439,  2442,  2443,  2446,
+    2447,  2448,  2449,  2452,  2452,  2474,  2474,  2528,  2529,  2530,
+    2531,  2534,  2535,  2536,  2537,  2538,  2539,  2542,  2543,  2544,
+    2545,  2546,  2547,  2550,  2550,  2553,  2554,  2557,  2558,  2559,
+    2560,  2561,  2562,  2563,  2564,  2567,  2568,  2569,  2570,  2573,
+    2574,  2577,  2586,  2577,  2593,  2593,  2597,  2598,  2597,  2607,
+    2608,  2607,  2618,  2619,  2622,  2626,  2630,  2633,  2639,  2645,
+    2653,  2653,  2666,  2667,  2675,  2676,  2675,  2687,  2688,  2687,
+    2700,  2701,  2700,  2708,  2708,  2712,  2721,  2732,  2783,  2784,
+    2787,  2787,  2802,  2803,  2806,  2807,  2808,  2809,  2812,  2813,
+    2812,  2832,  2833,  2832,  2858,  2859,  2860,  2861,  2862,  2867,
+    2872,  2877,  2882,  2883,  2897,  2896,  2959,  2972,  2958,  2988,
+    3001,  3002,  3006,  3013,  3025,  3005,  3107,  3108,  3111,  3112,
+    3115,  3119,  3123,  3127,  3134,  3142,  3150,  3133,  3170,  3169,
+    3186,  3198,  3206,  3186,  3230,  3231,  3232,  3235,  3246,  3259,
+    3267,  3276,  3284,  3258,  3334,  3335,  3338,  3347,  3348,  3351,
+    3361,  3379,  3380,  3381,  3384,  3388,  3390,  3394,  3395,  3396,
+    3397,  3398,  3401,  3412,  3413,  3414,  3415,  3416,  3420,  3419,
+    3473,  3477,  3476,  3504,  3521,  3543,  3544,  3545,  3546,  3550,
+    3549,  3560,  3561,  3562,  3563,  3564,  3566,  3568,  3570,  3574,
+    3581,  3591,  3608,  3628,  3629
 };
 #endif
 
@@ -5291,7 +5292,7 @@ yyreduce:
 
                                                        if( hb_comp_Namespaces.pCurrent )
                                                        {
-                                                          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_IMPLEMENTS_IN_NAMESPACE, hb_comp_Namespaces.pCurrent->szName, NULL );
+                                                          hb_compYYError( 'E', HB_COMP_ERR_IMPLEMENTS_IN_NAMESPACE, hb_comp_Namespaces.pCurrent->szName, NULL );
                                                        }
 
                                                        /* Might be IMPLEMENTS NAMESPACE in same compilation as namespace definition */
@@ -5438,7 +5439,7 @@ yyreduce:
     {
                         if( hb_comp_wSeqCounter )
                         {
-                           hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "RETURN", NULL );
+                           hb_compYYError( 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "RETURN", NULL );
                         }
                         hb_compGenPCode1( HB_P_ENDPROC );
                         if( (hb_comp_functions.pLast->bFlags & FUN_PROCEDURE) == 0 )
@@ -5464,7 +5465,7 @@ yyreduce:
 
                         if( hb_comp_wSeqCounter )
                         {
-                           hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "RETURN", NULL );
+                           hb_compYYError( 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "RETURN", NULL );
                         }
 
                         hb_compExprDelete( hb_compExprGenPush( (yyvsp[(3) - (4)].asExpr) ) );   /* TODO: check if return value agree with declared value */
@@ -5514,7 +5515,7 @@ yyreduce:
 
                                      if( szFunction )
                                      {
-                                        hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_FUNC_RESERVED, szFunction, (yyvsp[(2) - (2)].string) );
+                                        hb_compYYError( 'E', HB_COMP_ERR_FUNC_RESERVED, szFunction, (yyvsp[(2) - (2)].string) );
                                      }
 
                                      hb_comp_szAnnounce = (yyvsp[(2) - (2)].string);
@@ -5540,7 +5541,7 @@ yyreduce:
 
     { if( hb_comp_functions.pLast->bFlags & FUN_USES_LOCAL_PARAMS )
                           {
-                             hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_PARAMETERS_NOT_ALLOWED, NULL, NULL );
+                             hb_compYYError( 'E', HB_COMP_ERR_PARAMETERS_NOT_ALLOWED, NULL, NULL );
                           }
                           else
                           {
@@ -5610,7 +5611,7 @@ yyreduce:
 
   case 135:
 
-    { char LineAsString[32]; hb_snprintf( LineAsString, sizeof( LineAsString ), "at line %i", s_iLastControlLine - 1 ); hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL ); }
+    { char LineAsString[32]; hb_snprintf( LineAsString, sizeof( LineAsString ), "at line %i", s_iLastControlLine - 1 ); hb_compYYError( 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL ); }
     break;
 
   case 136:
@@ -6133,7 +6134,7 @@ yyreduce:
                               {
                                  if( ! bVar )
                                  {
-                                    hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_SYNTAX, pPosition, NULL );
+                                    hb_compYYError( 'E', HB_COMP_ERR_SYNTAX, pPosition, NULL );
                                  }
 
                                  *pPosition = '\0';
@@ -6182,7 +6183,7 @@ yyreduce:
                            else
                            {
                               pPlus = pDestExpr;
-                              hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_SYNTAX, sToken, NULL );
+                              hb_compYYError( 'E', HB_COMP_ERR_SYNTAX, sToken, NULL );
                            }
 
                            (yyval.asExpr) = hb_compExprNewMacro( hb_compExprNewList( pPlus ), 0, NULL );
@@ -6534,7 +6535,7 @@ yyreduce:
     { /* IdentName not NamespaceName is intentional - we don't want Global -> except when 1st! */
                                               if( (yyvsp[(1) - (3)].string)[0] == '*' )
                                               {
-                                                 hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_NONMEMBER_NAMESPACE, (yyvsp[(2) - (3)].string), "*" );
+                                                 hb_compYYError( 'E', HB_COMP_ERR_NONMEMBER_NAMESPACE, (yyvsp[(2) - (3)].string), "*" );
                                                  (yyval.string) = (yyvsp[(1) - (3)].string);
                                               }
                                               else
@@ -6653,7 +6654,7 @@ yyreduce:
                                                break;
 
                                              default:
-                                               hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_REFER, hb_compExprDescription( (yyvsp[(2) - (2)].asExpr) ), NULL );
+                                               hb_compYYError( 'E', HB_COMP_ERR_INVALID_REFER, hb_compExprDescription( (yyvsp[(2) - (2)].asExpr) ), NULL );
                                                (yyval.asExpr) = NULL;
                                           }
                                        }
@@ -6825,9 +6826,9 @@ yyreduce:
                                             if( hb_comp_wWithObjCounter == 0 )
                                             {
                                                if( (yyvsp[(2) - (2)].asExpr)->ExprType == HB_ET_FUNNAME )
-                                                  hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_WITHOBJECT, (yyvsp[(2) - (2)].asExpr)->value.asSymbol.szName, NULL );
+                                                  hb_compYYError( 'E', HB_COMP_ERR_UNMATCHED_WITHOBJECT, (yyvsp[(2) - (2)].asExpr)->value.asSymbol.szName, NULL );
                                                else
-                                                  hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_WITHOBJECT, "&", NULL );
+                                                  hb_compYYError( 'E', HB_COMP_ERR_UNMATCHED_WITHOBJECT, "&", NULL );
                                             }
                                             (yyval.asExpr) = hb_compExprNewWithSendExp( (yyvsp[(2) - (2)].asExpr) );
                                          }
@@ -6848,7 +6849,7 @@ yyreduce:
     {
                                            if( hb_comp_wWithObjCounter == 0 )
                                            {
-                                              hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_WITHOBJECT, (yyvsp[(1) - (4)].asExpr)->value.asMessage.szMessage, NULL );
+                                              hb_compYYError( 'E', HB_COMP_ERR_UNMATCHED_WITHOBJECT, (yyvsp[(1) - (4)].asExpr)->value.asMessage.szMessage, NULL );
                                            }
                                            (yyval.asExpr) = hb_compExprNewWithMethodCall( (yyvsp[(1) - (4)].asExpr), (yyvsp[(3) - (4)].asExpr) );
                                          }
@@ -8502,7 +8503,7 @@ yyreduce:
                         {
                            /*
                               Clipper allways error, but we can handle simple macros or macros with no declared symbols!!!
-                              hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_GET_COMPLEX_MACRO, NULL, NULL );
+                              hb_compYYError( 'E', HB_COMP_ERR_GET_COMPLEX_MACRO, NULL, NULL );
                             */
                            pVarName = hb_compExprClone( (yyvsp[(5) - (5)].asExpr) );
                         }
@@ -8663,7 +8664,7 @@ yyreduce:
                      }
                      else if( s_bBlockDeclared )
                      {
-                        hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_BLOCK, NULL, NULL );
+                        hb_compYYError( 'E', HB_COMP_ERR_BLOCK, NULL, NULL );
                         (yyval.asExpr) = (yyvsp[(3) - (7)].asExpr);
                      }
                      else
@@ -8707,7 +8708,7 @@ yyreduce:
                                 }
                                 else
                                 {
-                                   hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_NAMELESS_PARAM, NULL, NULL );
+                                   hb_compYYError( 'E', HB_COMP_ERR_NAMELESS_PARAM, NULL, NULL );
                                    hb_compExprDelete( (yyvsp[(1) - (1)].asExpr) );
                                    (yyval.asExpr) = NULL;
                                 }
@@ -9008,7 +9009,7 @@ yyreduce:
                   }
                   else if( hb_comp_iVarScope == VS_EXTERNGLOBAL )
                   {
-                     hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXTERNGLOBAL_ASSIGN, (yyvsp[(1) - (6)].string), NULL );
+                     hb_compYYError( 'E', HB_COMP_ERR_EXTERNGLOBAL_ASSIGN, (yyvsp[(1) - (6)].string), NULL );
                   }
                   else if( hb_comp_iVarScope == VS_PUBLIC || hb_comp_iVarScope == VS_PRIVATE )
                   {
@@ -9489,7 +9490,7 @@ yyreduce:
     {
                         if( (yyvsp[(2) - (2)].lNumber) > 0 )
                         {
-                           hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_MAYHEM_IN_CASE, NULL, NULL );
+                           hb_compYYError( 'E', HB_COMP_ERR_MAYHEM_IN_CASE, NULL, NULL );
                         }
                      }
     break;
@@ -9553,7 +9554,7 @@ yyreduce:
 
   case 783:
 
-    { hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_MAYHEM_IN_CASE, NULL, NULL ); }
+    { hb_compYYError( 'E', HB_COMP_ERR_MAYHEM_IN_CASE, NULL, NULL ); }
     break;
 
   case 785:
@@ -9616,7 +9617,7 @@ yyreduce:
                           break;
 
                         default :
-                          hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_JUMP_NOT_FOUND, NULL, NULL );
+                          hb_compYYError( 'F', HB_COMP_ERR_JUMP_NOT_FOUND, NULL, NULL );
                      }
                   }
 
@@ -9776,7 +9777,7 @@ yyreduce:
                                     }
                                     else
                                     {
-                                       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_CONSTANT, (yyvsp[(1) - (1)].valChar).string, NULL );
+                                       hb_compYYError( 'E', HB_COMP_ERR_INVALID_CONSTANT, (yyvsp[(1) - (1)].valChar).string, NULL );
                                        (yyval.asExpr) = hb_compExprNewLong( 0 );
                                     }
                                  }
@@ -9822,7 +9823,7 @@ yyreduce:
                           break;
 
                         default :
-                          hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_JUMP_NOT_FOUND, NULL, NULL );
+                          hb_compYYError( 'F', HB_COMP_ERR_JUMP_NOT_FOUND, NULL, NULL );
                      }
                   }
 
@@ -10256,7 +10257,7 @@ yyreduce:
                      if( (yyvsp[(3) - (8)].lNumber) != lLoopCount )
                      {
                         /* FINALLY statement after CATCH with EXIT/LOOP statments */
-                        hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "EXIT/LOOP", NULL );
+                        hb_compYYError( 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "EXIT/LOOP", NULL );
                      }
                      --hb_comp_wFinallyCounter;
                      if( (yyvsp[(6) - (8)].lNumber) == 0 )
@@ -10285,7 +10286,7 @@ yyreduce:
                         /* Only if there is no CATCH clause */
                         --hb_comp_wSeqCounter;  /* CATCH is also considered as end of sequence */
 
-                        hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_MISSING_HANDLER, NULL, NULL );
+                        hb_compYYError( 'E', HB_COMP_ERR_MISSING_HANDLER, NULL, NULL );
                      }
                   }
 
@@ -10470,7 +10471,7 @@ yyreduce:
 
                                    if( pNamespace == NULL || ( ( pNamespace->type & NSTYPE_SPACE ) != NSTYPE_SPACE ) )
                                    {
-                                      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNKNOWN_NAMESPACE, (yyvsp[(2) - (3)].string), NULL );
+                                      hb_compYYError( 'E', HB_COMP_ERR_UNKNOWN_NAMESPACE, (yyvsp[(2) - (3)].string), NULL );
                                    }
                                    else
                                    {
@@ -10511,7 +10512,7 @@ yyreduce:
 
                                    if( ( ( (yyvsp[(1) - (3)].iNumber) & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS ) && hb_comp_Namespaces.pCurrent )
                                    {
-                                      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_IMPLEMENTS_IN_NAMESPACE, hb_comp_Namespaces.pCurrent->szName, NULL );
+                                      hb_compYYError( 'E', HB_COMP_ERR_IMPLEMENTS_IN_NAMESPACE, hb_comp_Namespaces.pCurrent->szName, NULL );
                                    }
 
                                    hb_compNamespaceNew( (yyvsp[(2) - (3)].string), (yyvsp[(1) - (3)].iNumber) );
@@ -10545,7 +10546,7 @@ yyreduce:
                                    }
                                    else
                                    {
-                                      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_NAMESPACE, (yyvsp[(2) - (3)].string), NULL );
+                                      hb_compYYError( 'E', HB_COMP_ERR_UNMATCHED_NAMESPACE, (yyvsp[(2) - (3)].string), NULL );
                                    }
                                  }
     break;
@@ -10567,7 +10568,7 @@ yyreduce:
                                    }
                                    else
                                    {
-                                      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_NAMESPACE, (yyvsp[(2) - (3)].string), NULL );
+                                      hb_compYYError( 'E', HB_COMP_ERR_UNMATCHED_NAMESPACE, (yyvsp[(2) - (3)].string), NULL );
                                    }
                                  }
     break;
@@ -10637,7 +10638,7 @@ yyreduce:
 
                        if( (yyval.pVoid) == NULL )
                        {
-                          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNKNOWN_NAMESPACE, (yyvsp[(1) - (1)].string), NULL );
+                          hb_compYYError( 'E', HB_COMP_ERR_UNKNOWN_NAMESPACE, (yyvsp[(1) - (1)].string), NULL );
                           (yyval.pVoid) = NULL;
                        }
                     }
@@ -10650,14 +10651,14 @@ yyreduce:
                                      {
                                         if( ( (PNAMESPACE) (yyvsp[(1) - (3)].pVoid) )->pNext == NULL )
                                         {
-                                           hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EMPTY_NAMESPACE, ( (PNAMESPACE) (yyvsp[(1) - (3)].pVoid) )->szName, NULL );
+                                           hb_compYYError( 'E', HB_COMP_ERR_EMPTY_NAMESPACE, ( (PNAMESPACE) (yyvsp[(1) - (3)].pVoid) )->szName, NULL );
                                         }
 
                                         (yyval.pVoid) = (void *) hb_compNamespaceFindMember( ( (PNAMESPACE) (yyvsp[(1) - (3)].pVoid) )->pNext, (yyvsp[(3) - (3)].string), NSTYPE_SPACE );
 
                                         if( (yyval.pVoid) == NULL )
                                         {
-                                           hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_NONMEMBER_NAMESPACE, (yyvsp[(3) - (3)].string), ( (PNAMESPACE) (yyvsp[(1) - (3)].pVoid) )->szName );
+                                           hb_compYYError( 'E', HB_COMP_ERR_NONMEMBER_NAMESPACE, (yyvsp[(3) - (3)].string), ( (PNAMESPACE) (yyvsp[(1) - (3)].pVoid) )->szName );
                                         }
                                      }
                                   }
@@ -10986,42 +10987,39 @@ void yyerror( char * s )
             char LineAsString[32];
 
             hb_snprintf( LineAsString, sizeof( LineAsString ), "at line %i", s_iLastControlLine - 1 );
-            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL );
+            hb_compYYError( 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL );
          }
          else
          {
-            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INCOMPLETE_STMT, NULL, NULL );
+            hb_compYYError( 'E', HB_COMP_ERR_INCOMPLETE_STMT, NULL, NULL );
          }
       }
       else
       {
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INCOMPLETE_STMT, NULL, NULL );
+         hb_compYYError( 'E', HB_COMP_ERR_INCOMPLETE_STMT, NULL, NULL );
       }
    }
    else
    {
       if( hb_comp_wForCounter == 0 && ( yychar == NEXT || yychar == LOOP ) )
       {
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_NEXTFOR, NULL, NULL );
+         hb_compYYError( 'E', HB_COMP_ERR_NEXTFOR, NULL, NULL );
       }
       else if( yychar == EXIT && hb_comp_wForCounter == 0 && hb_comp_wSwitchCounter == 0 )
       {
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_EXIT, yytext, NULL );
+         hb_compYYError( 'E', HB_COMP_ERR_UNMATCHED_EXIT, yytext, NULL );
       }
       else if( yychar == ENDDO && hb_comp_wWhileCounter == 0 )
       {
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_ENDDO, NULL, NULL );
+         hb_compYYError( 'E', HB_COMP_ERR_ENDDO, NULL, NULL );
       }
       else if( yychar == ENDCASE && hb_comp_wCaseCounter == 0 )
       {
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_ENDCASE, NULL, NULL );
+         hb_compYYError( 'E', HB_COMP_ERR_ENDCASE, NULL, NULL );
       }
       else if( yychar == ENDIF && hb_comp_wIfCounter == 0 )
       {
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_ENDIF, NULL, NULL );
-
-         if( hb_comp_pLoops )
-            hb_xfree( hb_comp_pLoops );
+         hb_compYYError( 'E', HB_COMP_ERR_ENDIF, NULL, NULL );
       }
 
       if( s_iControlLevel )
@@ -11030,32 +11028,18 @@ void yyerror( char * s )
          {
             if( hb_comp_wSeqCounter )
             {
-               hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, yytext, NULL );
+               hb_compYYError( 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, yytext, NULL );
             }
             else
             {
                char LineAsString[32];
                hb_snprintf( LineAsString, sizeof( LineAsString ), "at line %i", s_iLastControlLine - 1 );
-               hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL );
+               hb_compYYError( 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL );
             }
          }
          else
          {
-            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_YACC, s, yytext );
-
-            if( asExpr )
-               hb_xfree( asExpr );
-
-            if( hb_comp_LocalParams )
-            {
-               while( hb_comp_LocalParams )
-               {
-                  PLOCALPARAM pDelete = hb_comp_LocalParams;
-
-                  hb_comp_LocalParams = hb_comp_LocalParams->pNext;
-                  hb_xfree( (void *) pDelete );
-               }
-            }
+            hb_compYYError( 'E', HB_COMP_ERR_YACC, s, yytext );
          }
 
          /*
@@ -11073,21 +11057,7 @@ void yyerror( char * s )
       }
       else
       {
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_YACC, s, yytext );
-
-         if( asExpr )
-            hb_xfree( asExpr );
-
-         if( hb_comp_LocalParams )
-         {
-            while( hb_comp_LocalParams )
-            {
-               PLOCALPARAM pDelete = hb_comp_LocalParams;
-
-               hb_comp_LocalParams = hb_comp_LocalParams->pNext;
-               hb_xfree( (void *) pDelete );
-            }
-         }
+         hb_compYYError( 'E', HB_COMP_ERR_YACC, s, yytext );
       }
    }
 }
@@ -11246,7 +11216,7 @@ static void hb_compLoopLoop( void )
 
    if( ! pLast )
    {
-      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_EXIT, "LOOP", NULL );
+      hb_compYYError( 'E', HB_COMP_ERR_UNMATCHED_EXIT, "LOOP", NULL );
    }
    else
    {
@@ -11256,13 +11226,13 @@ static void hb_compLoopLoop( void )
          * Current SEQUENCE counter is different then at the beginning of loop
          * Notice that LOOP is allowed in RECOVER code.
          */
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "LOOP", NULL );
+         hb_compYYError( 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "LOOP", NULL );
       }
       else if( pLast->wFinallyCounter != hb_comp_wFinallyCounter )
       {
          /* Attempt to LOOP from FINALLY block of TRY/END sequence
           */
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "LOOP", NULL );
+         hb_compYYError( 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "LOOP", NULL );
       }
       else
       {
@@ -11297,7 +11267,7 @@ static void hb_compLoopExit( void )
 {
    if( ! hb_comp_pLoops )
    {
-      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_EXIT, "EXIT", NULL );
+      hb_compYYError( 'E', HB_COMP_ERR_UNMATCHED_EXIT, "EXIT", NULL );
    }
    else
    {
@@ -11313,13 +11283,13 @@ static void hb_compLoopExit( void )
          * Current SEQUENCE counter is different then at the beginning of loop
          * Notice that LOOP is allowed in RECOVER code.
          */
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "EXIT", NULL );
+         hb_compYYError( 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "EXIT", NULL );
       }
       else if( pLast->wFinallyCounter != hb_comp_wFinallyCounter )
       {
          /* Attempt to EXIT from FINALLY block of TRY/END sequence
           */
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "EXIT", NULL );
+         hb_compYYError( 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "EXIT", NULL );
       }
       else
       {
@@ -11624,7 +11594,7 @@ static void hb_compVariableDim( char * szName, HB_EXPR_PTR pInitValue )
   }
   else if( hb_comp_iVarScope == VS_EXTERNGLOBAL )
   {
-     hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXTERNGLOBAL_ASSIGN, szName, NULL );
+     hb_compYYError( 'E', HB_COMP_ERR_EXTERNGLOBAL_ASSIGN, szName, NULL );
   }
   else
   {
@@ -11647,6 +11617,25 @@ void hb_compReleaseRTVars( void )
       hb_compExprDelete( pVar->pVar );
       hb_comp_rtvars = pVar->pPrev;
       hb_xfree( pVar );
+   }
+}
+
+static void hb_compYYError( char cPrefix, int iError, const char * szError1, const char * szError2 )
+{
+   hb_compGenError( hb_comp_szErrors, cPrefix, iError, szError1, szError2 );
+
+   if ( asExpr )
+      hb_xfree( asExpr );
+
+   if( hb_comp_LocalParams )
+   {
+      while( hb_comp_LocalParams )
+      {
+         PLOCALPARAM pDelete = hb_comp_LocalParams;
+
+         hb_comp_LocalParams = hb_comp_LocalParams->pNext;
+         hb_xfree( (void *) pDelete );
+      }
    }
 }
 

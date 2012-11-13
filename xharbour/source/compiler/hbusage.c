@@ -65,6 +65,7 @@ void hb_compPrintUsage( char * szSelf )
       "\n          %ccredits         display credits",
       "\n          %cd<id>[=<val>]   #define <id>",
       "\n          %ces[<level>]     set exit severity",
+      "\n          %cex              create public function list (.xbx)",
       "\n          %cg<type>         output type generated is <type> (see below)",
       "\n          %cgc[<type>]      output type: C source (.c) (default)",
       "\n                           <type>: 0=compact 1=normal 2=verbose (default)",

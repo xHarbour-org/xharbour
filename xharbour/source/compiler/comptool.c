@@ -31,12 +31,16 @@
 #include "hbset.h"
 #include "hbverbld.h"
 #include "hbapierr.h"
+#include "hbdate.h"
 #include "hbmemory.ch"
 
 static int  s_iFileCase = HB_SET_CASE_MIXED;
 static int  s_iDirCase  = HB_SET_CASE_MIXED;
 static BOOL s_fFnTrim   = FALSE;
 static char s_cDirSep   = HB_OS_PATH_DELIM_CHR;
+
+extern char* hb_exeName( void );
+extern void cleansPair( void );
 
 /* ------------------------------------------------------------------------- */
 /* FM statistic module */
@@ -310,6 +314,31 @@ void hb_xexit( void )
       char        szBuffer[ HB_MAX( 3 * HB_MEMSTR_BLOCK_MAX + 1, 100 ) ];
       PHB_MEMINFO pMemBlock;
       int         i;
+      FILE *      hLog = hb_fopen( "fm.log", "a+" );
+
+      if( hLog )
+      {
+         char *   szPlatform  = hb_verPlatform();
+         char *   szCompiler  = hb_verCompiler();
+         char *   szHarbour   = hb_verHarbour();
+         char *   szTime      = ( char * ) hb_xgrab( 9 );
+         int      iYear, iMonth, iDay;
+
+         hb_dateToday( &iYear, &iMonth, &iDay );
+         hb_dateTimeStr( szTime );
+
+         fprintf( hLog, "Memory Allocation Report\n" );
+         fprintf( hLog, "Application: %s\n", hb_exeName() );
+         fprintf( hLog, "xHarbour Version: %s\n", szHarbour );
+         fprintf( hLog, "Compiler: %s\n", szCompiler );
+         fprintf( hLog, "Platform: %s\n", szPlatform );
+         fprintf( hLog, "Time Occured: %04d.%02d.%02d %s\n", iYear, iMonth, iDay, szTime );
+
+         hb_xfree( szPlatform );
+         hb_xfree( szCompiler );
+         hb_xfree( szHarbour  );
+         hb_xfree( szTime );
+      }
 
       hb_conOutErr( hb_conNewLine(), 0 );
       hb_conOutErr( "----------------------------------------", 0 );
@@ -317,20 +346,30 @@ void hb_xexit( void )
       hb_snprintf( szBuffer, sizeof( szBuffer ), "Total memory allocated: %lu bytes (%lu blocks)", s_ulMemoryMaxConsumed, s_ulMemoryMaxBlocks );
       hb_conOutErr( szBuffer, 0 );
 
-      if( s_ulMemoryBlocks )
-      {
-         hb_conOutErr( hb_conNewLine(), 0 );
-         hb_snprintf( szBuffer, sizeof( szBuffer ), "WARNING! Memory allocated but not released: %lu bytes (%lu blocks)", s_ulMemoryConsumed, s_ulMemoryBlocks );
-         hb_conOutErr( szBuffer, 0 );
-      }
+      fprintf( hLog, "%s\n", szBuffer );
+
+      hb_conOutErr( hb_conNewLine(), 0 );
+      hb_snprintf( szBuffer, sizeof( szBuffer ), "WARNING! Memory allocated but not released: %lu bytes (%lu blocks)", s_ulMemoryConsumed, s_ulMemoryBlocks );
+      hb_conOutErr( szBuffer, 0 );
+
+      fprintf( hLog, "--------------------------------------------------------------------------------\n" );
+      fprintf( hLog, "%s\n\n", szBuffer );
 
       hb_conOutErr( hb_conNewLine(), 0 );
 
       for( i = 1, pMemBlock = s_pMemBlocks; pMemBlock; ++i, pMemBlock = pMemBlock->pNextBlock )
+      {
          HB_TRACE( HB_TR_ERROR, ( "Line %i Block %i %p (size %lu) \"%s\"", pMemBlock->iSourceLine - 1, i,
                                   ( char * ) pMemBlock + HB_MEMINFO_SIZE, pMemBlock->ulSize,
                                   hb_memToStr( szBuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
                                                pMemBlock->ulSize ) ) );
+         fprintf( hLog,"Block %i %p (size %lu) \"%s\"\n", i,
+                                  ( char * ) pMemBlock + HB_MEMINFO_SIZE, pMemBlock->ulSize,
+                                  hb_memToStr( szBuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
+                                               pMemBlock->ulSize ));
+      }
+      fprintf( hLog, "--------------------------------------------------------------------------------\n" );
+      fclose( hLog );
    }
 #endif
 }
@@ -547,4 +586,55 @@ void hb_compSetCOutput( int iOutput )
          hb_comp_iGenVarList = TRUE;
          break;
    }
+}
+
+void hb_compCleanUp( BOOL bCleanFunc )
+{
+   if( hb_comp_PP )
+   {
+      hb_pp_free( hb_comp_PP );
+      hb_comp_PP = NULL;
+   }
+
+   hb_compIdentifierClose();
+
+   if( bCleanFunc && hb_comp_functions.pLast )
+   {
+      if( hb_comp_functions.pLast->pCode )
+         hb_xfree( hb_comp_functions.pLast->pCode );
+
+      hb_xfree( hb_comp_functions.pLast );
+   }
+
+   if ( hb_comp_pFileName )
+   {
+      hb_xfree( hb_comp_pFileName );
+      hb_comp_pFileName = NULL;
+   }
+
+   if( hb_Command_Line )
+   {
+      hb_xfree( hb_Command_Line );
+      hb_Command_Line = NULL;
+   }
+
+   if( hb_comp_pOutPath )
+   {
+      hb_xfree( hb_comp_pOutPath );
+      hb_comp_pOutPath = NULL;
+   }
+
+   if( hb_comp_ppo_pOutPath )
+   {
+      hb_xfree( hb_comp_ppo_pOutPath );
+      hb_comp_ppo_pOutPath = NULL;
+   }
+
+   if( hb_comp_PrgFileName )
+   {
+      hb_xfree( hb_comp_PrgFileName );
+      hb_comp_PrgFileName = NULL;
+   }
+
+   cleansPair();
 }

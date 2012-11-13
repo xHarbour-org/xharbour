@@ -775,6 +775,9 @@ extern BOOL           hb_comp_autoDeferred;
 
 extern char *         hb_comp_szNamespace;
 
+/* procude list of public function in a module */
+extern BOOL           hb_comp_createExternList;
+
 extern BOOL hb_comp_bWarnUnUsedLocals     ;
 extern BOOL hb_comp_bWarnUnUsedStatics    ;
 extern BOOL hb_comp_bWarnUnUsedGlobals    ;
@@ -814,6 +817,9 @@ extern BYTE *         hb_compHideString( int iType, char * szText, HB_SIZE ulStr
 
 /* Date and DateTime support */
 extern void           hb_comp_datetimeEncode( long *plDate, long *plTime, int iYear, int iMonth, int iDay, int iHour, int iMinute, double dSeconds, int iAmPm, int * piOk );
+
+/* Free memory upon exit */
+extern void hb_compCleanUp( BOOL bCleanFunc );
 
 HB_EXTERN_END
 
