@@ -8761,7 +8761,7 @@ yyreduce:
 
   case 644:
 
-    { hb_comp_iVarScope = VS_LOCAL; (yyval.asExpr) = hb_compExprCBVarAdd( (yyvsp[(0) - (0)].asExpr), NULL , hb_comp_cVarType ); hb_comp_cVarType = ' '; }
+    { hb_comp_iVarScope = VS_LOCAL; (yyval.asExpr) = hb_compExprCBVarAdd( (yyvsp[(0) - (0)].asExpr), NULL , hb_comp_cVarType ); asExpr = (yyval.asExpr);hb_comp_cVarType = ' '; }
     break;
 
   case 645:
@@ -11625,8 +11625,19 @@ static void hb_compYYError( char cPrefix, int iError, const char * szError1, con
 {
    hb_compGenError( hb_comp_szErrors, cPrefix, iError, szError1, szError2 );
 
+#if 0
+
+   if ( asExpr && asExpr->value.asList.pIndex )
+   {
+      hb_xfree( asExpr->value.asList.pIndex );
+      asExpr->value.asList.pIndex = NULL;
+   }
+
    if ( asExpr )
+   {
       hb_xfree( asExpr );
+      asExpr = NULL;
+   }
 
    if( hb_comp_LocalParams )
    {
@@ -11637,9 +11648,15 @@ static void hb_compYYError( char cPrefix, int iError, const char * szError1, con
          hb_comp_LocalParams = hb_comp_LocalParams->pNext;
          hb_xfree( (void *) pDelete );
       }
+      hb_comp_LocalParams = NULL;
    }
 
    if( hb_comp_BlocksList )
+   {
       hb_xfree( hb_comp_BlocksList );
+      hb_comp_BlocksList = NULL;
+   }
+
+#endif
 }
 
