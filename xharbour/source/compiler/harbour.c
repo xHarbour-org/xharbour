@@ -622,7 +622,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
    if ( ! hb_comp_bUsePPReservedWord && szVarName && hb_compReservedPPName( szVarName ) )
    {
-       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_USE_RESERVED_NAME, szVarName, NULL );
+       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_USE_RESERVED_NAME, szVarName, NULL );
        return;
    }
 

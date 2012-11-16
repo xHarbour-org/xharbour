@@ -8,8 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-17 02:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * utils/misc/hblib.c
+    ! fix some memory lak traps
+
+  * source/pp/ppgen.c
+    + add reserved words contained in "hbclass.ch"
+
+  * source/compiler/harbour.c
+    ! change type of error message for use of reserved word to 'F'
+
 2012-11-16 14:37 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
-  * include/hbbomp.h
+  * include/hbcomp.h
   * source/pp/ppgen.c
     + create ppword.c, a list of supposedly reserved words, not to be used as
     variable names (overrideable with -vx flag)

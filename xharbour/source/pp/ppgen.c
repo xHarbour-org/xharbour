@@ -64,6 +64,23 @@ typedef struct _RESERVEDNAME
    struct _RESERVEDNAME * pNext;
 } RESERVEDNAME, *PRESERVEDNAME;
 
+static const char * s_otherReservedName[] = {
+   "HIDDEN",
+   "EXPORT",
+   "METHOD",
+   "ASSIGN",
+   "ACCESS",
+   "DESTRUCTOR",
+   "CLASSMETHOD",
+   "CONSTRUCTOR",
+   "CLASSDATA",
+   "DATA",
+   "CLASS",
+   "CLASSVAR",
+   "VAR",
+   "DECLSUPERN"
+};
+
 static PRESERVEDNAME s_PPReservedName = NULL;
 
 static BOOL hb_pp_NameFound( char * szName )
@@ -356,7 +373,8 @@ static void hb_pp_generateInitFunc( FILE * fout, int iRules,
 static void hb_pp_generateRules( FILE * fout, FILE * fword, PHB_PP_STATE pState )
 {
    PRESERVEDNAME pTemp;
-   int iDefs = 0, iTrans = 0, iCmds = 0;
+   int  iDefs = 0, iTrans = 0, iCmds = 0;
+   UINT wNum = 0;
 
    fprintf( fout, "/*\n * $Id$\n */\n\n/*\n"
             " * Harbour Project source code:\n"
@@ -365,7 +383,7 @@ static void hb_pp_generateRules( FILE * fout, FILE * fword, PHB_PP_STATE pState 
             " * Copyright 2006 Przemyslaw Czerpak <druzus / at / priv.onet.pl>\n"
             " * www - http://www.harbour-project.org\n"
             " *\n"
-            " * This file is generate automatically by Harbour preprocessor\n"
+            " * This file is generated automatically by Harbour preprocessor\n"
             " * and is covered by the same license as Harbour PP\n"
             " */\n\n#define _HB_PP_INTERNAL\n#include \"hbpp.h\"\n\n" );
 
@@ -376,7 +394,7 @@ static void hb_pp_generateRules( FILE * fout, FILE * fword, PHB_PP_STATE pState 
             " * Copyright 2012 Andi Jahja <andi.jahja@yahoo.co.id>\n"
             " * www - http://www.harbour-project.org\n"
             " *\n"
-            " * This file is generate automatically by Harbour preprocessor\n"
+            " * This file is generated automatically by Harbour preprocessor\n"
             " * and is covered by the same license as Harbour PP\n"
             "*/\n\n#include \"hbapi.h\"\n"
             "#include \"hbcomp.h\"\n"
@@ -395,9 +413,17 @@ static void hb_pp_generateRules( FILE * fout, FILE * fword, PHB_PP_STATE pState 
    hb_pp_generateInitFunc( fout, iCmds, "Commands", "cmd" );
    fprintf( fout, "}\n" );
 
+   do
+   {
+      if ( ! hb_pp_NameFound( ( char * ) s_otherReservedName[ wNum ] ) )
+         fprintf( fword, "   \"%s\",\n", ( char* ) s_otherReservedName[ wNum ] );
+
+      ++ wNum;
+   } while( wNum < sizeof( s_otherReservedName ) / sizeof( char * ) );
+
    pTemp = s_PPReservedName;
 
-   while( pTemp )
+   do
    {
       fprintf( fword, "   \"%s\"", pTemp->szName );
       hb_xfree( pTemp->szName );
@@ -405,7 +431,7 @@ static void hb_pp_generateRules( FILE * fout, FILE * fword, PHB_PP_STATE pState 
       hb_xfree( ( void * ) s_PPReservedName );
       s_PPReservedName = pTemp;
       fprintf( fword, s_PPReservedName ? ",\n" : "\n" );
-   }
+   } while( pTemp );
 
    fprintf( fword, "};\n\n"
             "#define RESERVED_NAMES sizeof( s_szReservedName ) / sizeof( char * )\n\n"

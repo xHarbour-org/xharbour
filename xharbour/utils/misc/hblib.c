@@ -165,6 +165,7 @@ static void createfromlst( FILE * fList, FILE * h, char * szObjDir, int iComp, B
                if( ! sz )
                {
                   printf( "Error: Invalid include directive\n" );
+                  free( string );
                   free( inc );
                   exit( EXIT_FAILURE );
                }
@@ -186,6 +187,7 @@ static void createfromlst( FILE * fList, FILE * h, char * szObjDir, int iComp, B
                   else
                   {
                      printf( "Error: %s not found\n", sz );
+                     free( string );
                      free( inc );
                      exit( EXIT_FAILURE );
                   }
