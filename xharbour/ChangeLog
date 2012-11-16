@@ -8,9 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-17 06:32 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/hbjson.c
+    ! bug fix numbers handling by Oscar Hernandez
+
 2012-11-17 02:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * utils/misc/hblib.c
-    ! fix some memory lak traps
+    ! fix some memory leak traps
 
   * source/pp/ppgen.c
     + add reserved words contained in "hbclass.ch"

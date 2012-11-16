@@ -480,6 +480,7 @@ static const char * _hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
       HB_LONG  nValue   = 0;
       double   dblValue = 0;
       BOOL     fNeg, fDbl = FALSE;
+      int iDec = 0;
 
       fNeg = *szSource == '-';
       if( fNeg )
@@ -502,6 +503,7 @@ static const char * _hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
             mult     /= 10;
             dblValue += ( ( double ) ( *szSource - '0' ) ) * mult;
             szSource++;
+            iDec++;
          }
       }
       if( *szSource == 'e' || *szSource == 'E' )
@@ -514,7 +516,6 @@ static const char * _hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
          if( fNegExp )
             szSource++;
 
-         szSource++;
          while( *szSource >= '0' && *szSource <= '9' )
          {
             iExp = iExp * 10 + *szSource - '0';
@@ -526,10 +527,12 @@ static const char * _hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
             fDbl     = TRUE;
          }
          dblValue *= pow( 10.0, ( double ) ( fNegExp ? -iExp : iExp ) );
+         if ( fNegExp )
+            iDec += iExp;
       }
 
       if( fDbl )
-         hb_itemPutND( pValue, fNeg ? -dblValue : dblValue );
+         hb_itemPutNDDec( pValue, fNeg ? -dblValue : dblValue, iDec );
       else
          hb_itemPutNInt( pValue, fNeg ? -nValue : nValue );
       return szSource;
