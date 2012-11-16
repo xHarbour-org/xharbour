@@ -57,6 +57,7 @@ C_SOURCES=\
 	hbfix.c \
 	hbident.c \
 	ppcomp.c   \
+	ppword.c   \
 	hbstripl.c \
 	hbdbginf.c \
 	hbpcstat.c \

@@ -1789,6 +1789,7 @@ COMPILER_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hbdbginf$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hblbl$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)ppcomp$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ppword$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)ppcore$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbslex$(OBJEXT)
 

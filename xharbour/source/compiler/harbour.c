@@ -243,6 +243,9 @@ BOOL     hb_comp_autoDeferred             = FALSE;
 /* procude list of public function in a module */
 BOOL     hb_comp_createExternList         = FALSE;
 
+/* force use of reserved PP words as variable name */
+BOOL     hb_comp_bUsePPReservedWord       = FALSE;
+
 BOOL     hb_comp_bWarnUnUsedLocals        = FALSE;
 BOOL     hb_comp_bWarnUnUsedStatics       = FALSE;
 BOOL     hb_comp_bWarnUnUsedGlobals       = FALSE;
@@ -617,7 +620,11 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
    PFUNCTION   pFunc = hb_comp_functions.pLast;
    BOOL        bUsed = FALSE;
 
-   //printf( "Variable: %s\n", szVarName );
+   if ( ! hb_comp_bUsePPReservedWord && szVarName && hb_compReservedPPName( szVarName ) )
+   {
+       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_USE_RESERVED_NAME, szVarName, NULL );
+       return;
+   }
 
    if( hb_comp_iVarScope == VS_GLOBAL || hb_comp_iVarScope == VS_EXTERNGLOBAL )
    {

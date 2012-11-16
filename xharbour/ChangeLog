@@ -8,6 +8,32 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-16 14:37 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbbomp.h
+  * source/pp/ppgen.c
+    + create ppword.c, a list of supposedly reserved words, not to be used as
+    variable names (overrideable with -vx flag)
+    NOTE: To be completed on the run
+
+  * source/pp/Makefile
+  * source/compiler/Makefile
+  * winmake/mdir.bat
+  * winmake/common.mak
+  * winmake/compile.mak
+    + ppword dependency
+
+  * source/compiler/hbusage.c
+  * source/compiler/cmdcheck.c
+    + -vx flag: force using reserved word as variable name
+
+  * source/compiler/harbour.c
+    + add routine to check variable name, reject if it is reserved by PP
+    NOTE: This is however, guarded by -vx compiler flag.
+
+  * source/compiler/hbgenerr.c
+  * include/hberrors.h
+    + add error message when reserved name is used as variable name
+
 2012-11-14 11:51 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/harbour.sly
   * source/compiler/harbouryy.c

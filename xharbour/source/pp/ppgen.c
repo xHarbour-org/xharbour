@@ -56,6 +56,64 @@
 
 #include "pragma.h"
 #include "hbset.h"
+#include <ctype.h>
+
+typedef struct _RESERVEDNAME
+{
+   char * szName;
+   struct _RESERVEDNAME * pNext;
+} RESERVEDNAME, *PRESERVEDNAME;
+
+static PRESERVEDNAME s_PPReservedName = NULL;
+
+static BOOL hb_pp_NameFound( char * szName )
+{
+   BOOL        bFound    = FALSE;
+   PRESERVEDNAME pTemp = s_PPReservedName;
+
+   while( pTemp )
+   {
+      if( strncmp( pTemp->szName, szName, strlen( szName ) ) == 0  )
+      {
+         bFound = TRUE;
+         break;
+      }
+
+      pTemp = pTemp->pNext;
+   }
+
+   return bFound;
+}
+
+static void hb_pp_CollectReservedName( char * szName )
+{
+   PRESERVEDNAME pTemp, pLast;
+
+   szName = hb_strupr( szName );
+
+   if( hb_pp_NameFound( szName ) )
+      return;
+
+   pTemp          = ( PRESERVEDNAME ) hb_xgrab( sizeof( RESERVEDNAME ) );
+   pTemp->szName  = ( char * ) hb_xgrab( strlen( szName ) + 1 );
+   hb_strncpy( pTemp->szName, szName, strlen( szName ) );
+
+   pTemp->pNext = NULL;
+
+   if( s_PPReservedName )
+   {
+      pLast = s_PPReservedName;
+
+      while( pLast->pNext )
+         pLast = pLast->pNext;
+
+      pLast->pNext = pTemp;
+   }
+   else
+   {
+      s_PPReservedName = pTemp;
+   }
+}
 
 /*
  * library functions used by PP core code
@@ -233,8 +291,12 @@ static int hb_pp_writeRules( FILE * fout, PHB_PP_RULE pFirst, char * szName )
    while( pRule )
    {
       ++iRule;
+
       if( pRule->pMatch )
       {
+         if( strlen( pRule->pMatch->value ) > 1 )
+            hb_pp_CollectReservedName( pRule->pMatch->value );
+
          hb_snprintf( szMatch, sizeof( szMatch ), "s_%cm%03d", szName[ 0 ], iRule );
          hb_pp_writeTokenList( fout, pRule->pMatch, szMatch );
       }
@@ -255,6 +317,7 @@ static int hb_pp_writeRules( FILE * fout, PHB_PP_RULE pFirst, char * szName )
    while( pRule )
    {
       ++iRule;
+
       if( pRule->pMatch )
          hb_snprintf( szMatch, sizeof( szMatch ), "s_%cm%03d", szName[ 0 ], iRule );
       else
@@ -290,8 +353,9 @@ static void hb_pp_generateInitFunc( FILE * fout, int iRules,
       fprintf( fout, "NULL, 0 );\n" );
 }
 
-static void hb_pp_generateRules( FILE * fout, PHB_PP_STATE pState )
+static void hb_pp_generateRules( FILE * fout, FILE * fword, PHB_PP_STATE pState )
 {
+   PRESERVEDNAME pTemp;
    int iDefs = 0, iTrans = 0, iCmds = 0;
 
    fprintf( fout, "/*\n * $Id$\n */\n\n/*\n"
@@ -305,6 +369,19 @@ static void hb_pp_generateRules( FILE * fout, PHB_PP_STATE pState )
             " * and is covered by the same license as Harbour PP\n"
             " */\n\n#define _HB_PP_INTERNAL\n#include \"hbpp.h\"\n\n" );
 
+   fprintf( fword, "/*\n * $Id$\n */\n\n/*\n"
+            " * Harbour Project source code:\n"
+            " *    Word list which should not be used as variable names.\n"
+            " *\n"
+            " * Copyright 2012 Andi Jahja <andi.jahja@yahoo.co.id>\n"
+            " * www - http://www.harbour-project.org\n"
+            " *\n"
+            " * This file is generate automatically by Harbour preprocessor\n"
+            " * and is covered by the same license as Harbour PP\n"
+            "*/\n\n#include \"hbapi.h\"\n"
+            "#include \"hbcomp.h\"\n"
+            "\nstatic const char * s_szReservedName[] = {\n" );
+
    if( pState->pDefinitions )
       iDefs = hb_pp_writeRules( fout, pState->pDefinitions, "def" );
    if( pState->pTranslations )
@@ -317,6 +394,46 @@ static void hb_pp_generateRules( FILE * fout, PHB_PP_STATE pState )
    hb_pp_generateInitFunc( fout, iTrans, "Translations", "trs" );
    hb_pp_generateInitFunc( fout, iCmds, "Commands", "cmd" );
    fprintf( fout, "}\n" );
+
+   pTemp = s_PPReservedName;
+
+   while( pTemp )
+   {
+      fprintf( fword, "   \"%s\"", pTemp->szName );
+      hb_xfree( pTemp->szName );
+      pTemp = pTemp->pNext;
+      hb_xfree( ( void * ) s_PPReservedName );
+      s_PPReservedName = pTemp;
+      fprintf( fword, s_PPReservedName ? ",\n" : "\n" );
+   }
+
+   fprintf( fword, "};\n\n"
+            "#define RESERVED_NAMES sizeof( s_szReservedName ) / sizeof( char * )\n\n"
+            "BOOL hb_compReservedPPName( char * szName )\n"
+            "{\n"
+            "   UINT  wNum   = 0;\n"
+            "   int   iFound = 1;\n"
+            "   int   iLen   = ( int ) strlen( szName );\n\n"
+            "   while( wNum < RESERVED_NAMES && iFound )\n"
+            "   {\n"
+            "      int u = ( int ) strlen( s_szReservedName[ wNum ] ) ;\n\n"
+            "      if ( iLen == u )\n"
+            "      {\n"
+            "         int i, j = 0;\n\n"
+            "         for ( i = 0; i < u; i ++ )\n"
+            "         {\n"
+            "            if ( szName[ i ] == s_szReservedName[ wNum ] [ i ] )\n"
+            "               j ++;\n"
+            "            else\n"
+            "               break;\n"
+            "         }\n\n"
+            "         if ( j == u )\n"
+            "            iFound = 0;\n"
+            "      }\n\n"
+            "      ++wNum;\n"
+            "   }\n\n"
+            "   return ( iFound == 0 );\n"
+            "}\n" );
 }
 
 static void hb_pp_undefCompilerRules( PHB_PP_STATE pState )
@@ -354,15 +471,27 @@ static void hb_pp_undefCompilerRules( PHB_PP_STATE pState )
    }
 }
 
-static int hb_pp_preprocesfile( PHB_PP_STATE pState, char * szRuleFile )
+static int hb_pp_preprocesfile( PHB_PP_STATE pState, char * szRuleFile, char* szWordFile )
 {
    int   iResult = 0;
    ULONG ulLen;
+   FILE * fWord = NULL;
 
    while( hb_pp_nextLine( pState, &ulLen ) != NULL && ulLen )
       ;
 
-   if( szRuleFile )
+   if( szWordFile )
+   {
+      fWord = hb_fopen( szWordFile, "w" );
+
+      if( ! fWord )
+      {
+         perror( szWordFile );
+         iResult = 1;
+      }
+   }
+
+   if( iResult == 0 && szRuleFile )
    {
       FILE * foutr;
 
@@ -375,8 +504,9 @@ static int hb_pp_preprocesfile( PHB_PP_STATE pState, char * szRuleFile )
       else
       {
          hb_pp_undefCompilerRules( pState );
-         hb_pp_generateRules( foutr, pState );
+         hb_pp_generateRules( foutr, fWord, pState );
          fclose( foutr );
+         fclose( fWord );
       }
    }
 
@@ -681,7 +811,7 @@ static void hb_pp_usage( char * szName )
 
 int main( int argc, char * argv[] )
 {
-   char *         szFile         = NULL, * szRuleFile = NULL, * szVerFile = NULL;
+   char *         szFile         = NULL, * szRuleFile = NULL, * szWordFile = NULL, * szVerFile = NULL;
    char *         szLogFile      = NULL;
    BOOL           fQuiet         = FALSE, fWrite = FALSE, fChgLog = FALSE;
    char *         szChangeLogID  = NULL, * szLastEntry = NULL;
@@ -740,6 +870,14 @@ int main( int argc, char * argv[] )
                      szFile = NULL;
                   break;
 
+               case 'x':
+               case 'X':
+                  if( argv[ i ][ 2 ] )
+                     szWordFile = argv[ i ] + 2;
+                  else
+                     szWordFile = NULL;
+                  break;
+
                case 'v':
                case 'V':
                   if( argv[ i ][ 2 ] )
@@ -781,7 +919,7 @@ int main( int argc, char * argv[] )
                                             szSVNID, szSVNDateID, &szChangeLogID, &szLastEntry );
 
          if( iResult == 0 )
-            iResult = hb_pp_preprocesfile( pState, szRuleFile );
+            iResult = hb_pp_preprocesfile( pState, szRuleFile, szWordFile );
 
          if( iResult == 0 && szVerFile )
             iResult = hb_pp_generateVerInfo( szVerFile, szSVNID, szSVNDateID,

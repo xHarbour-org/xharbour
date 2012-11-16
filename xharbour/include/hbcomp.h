@@ -778,12 +778,15 @@ extern char *         hb_comp_szNamespace;
 /* procude list of public function in a module */
 extern BOOL           hb_comp_createExternList;
 
-extern BOOL hb_comp_bWarnUnUsedLocals     ;
-extern BOOL hb_comp_bWarnUnUsedStatics    ;
-extern BOOL hb_comp_bWarnUnUsedGlobals    ;
-extern BOOL hb_comp_bWarnUnUsedMemvars    ;
-extern BOOL hb_comp_bWarnUnUsedFields     ;
-extern BOOL hb_comp_bWarnUnUsedBlockParams;
+/* force using PP reserved words */
+extern BOOL           hb_comp_bUsePPReservedWord;
+
+extern BOOL           hb_comp_bWarnUnUsedLocals     ;
+extern BOOL           hb_comp_bWarnUnUsedStatics    ;
+extern BOOL           hb_comp_bWarnUnUsedGlobals    ;
+extern BOOL           hb_comp_bWarnUnUsedMemvars    ;
+extern BOOL           hb_comp_bWarnUnUsedFields     ;
+extern BOOL           hb_comp_bWarnUnUsedBlockParams;
 
 /* /GC command line setting types */
 #define HB_COMPGENC_COMPACT     0
@@ -820,6 +823,9 @@ extern void           hb_comp_datetimeEncode( long *plDate, long *plTime, int iY
 
 /* Free memory upon exit */
 extern void hb_compCleanUp( void );
+
+/* Checking if variable name is reserved by PP */
+extern BOOL hb_compReservedPPName( char * szName );
 
 HB_EXTERN_END
 

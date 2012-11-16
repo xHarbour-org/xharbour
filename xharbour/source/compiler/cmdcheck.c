@@ -1043,18 +1043,25 @@ void hb_compChkEnvironVar( char * szSwitch )
 
             case 'v':
             case 'V':
-               if( *( s + 1 ) == '-' )
+               if( *( s + 1 ) == '-'  && *( s + 2 ) == 0 )
                {
                   hb_comp_bForceMemvars = FALSE;
                }
-               else if( HB_TOUPPER( *( s + 1 ) ) == 'D' )
+               else if( HB_TOUPPER( *( s + 1 ) ) == 'D' && *( s + 2 ) == 0 )
                {
                   hb_comp_autoDeferred = TRUE;
                }
-               else
+               else if( HB_TOUPPER( *( s + 1 ) ) == 'X'  && *( s + 2 ) == 0 )
+               {
+                  hb_comp_bUsePPReservedWord = TRUE;
+               }
+               else if( *( s + 1 ) == 0 )
                {
                   hb_comp_bForceMemvars = TRUE;
                }
+               else
+                  cmdcheckerror( ( const char* ) s );
+
                break;
 
             case 'w':

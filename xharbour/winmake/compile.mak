@@ -1366,7 +1366,7 @@ $(OBJ_DIR)$(DIR_SEP)pptable$(OBJEXT) : $(PP_DIR)$(DIR_SEP)pptable.c
 	$(CC_CMD)
 
 $(PP_DIR)$(DIR_SEP)pptable.c : $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch $(INCLUDE_DIR2)$(DIR_SEP)std.ch ChangeLog $(PP_DIR)$(DIR_SEP)ppcore.c $(PP_DIR)$(DIR_SEP)ppgen.c
-	$(PPGEN_EXE) $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch -o$(PP_DIR)$(DIR_SEP)pptable.c -cChangeLog -v$(INCLUDE_DIR2)$(DIR_SEP)hbverbld.h
+	$(PPGEN_EXE) $(INCLUDE_DIR2)$(DIR_SEP)hbstdgen.ch -o$(PP_DIR)$(DIR_SEP)pptable.c -cChangeLog -v$(INCLUDE_DIR2)$(DIR_SEP)hbverbld.h -x$(COMPILER_DIR)$(DIR_SEP)ppword.c
 
 #===============================================================================
 # HBEXTERN.EXE rules
@@ -1478,6 +1478,9 @@ $(OBJ_DIR)$(DIR_SEP)hblbl$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hblbl.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)ppcomp$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)ppcomp.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ppword$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)ppword.c
 	$(CC_CMD)
 
 #===============================================================================

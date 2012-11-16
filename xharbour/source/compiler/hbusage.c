@@ -93,6 +93,7 @@ void hb_compPrintUsage( char * szSelf )
       "\n          %cundef:<id>      #undef <id>",
       "\n          %cv               variables are assumed M->",
       "\n          %cvd              external functions are assumed as dynamic functions",
+      "\n          %cvx              force using reserved word as variable name",
       "\n          %cw[<level>]      set warning level number (0..3, default 1)",
       "\n          %cx[<prefix>]     set symbol init function name prefix (for .c only)",
 #ifdef YYDEBUG

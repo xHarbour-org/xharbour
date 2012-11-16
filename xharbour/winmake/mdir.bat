@@ -159,6 +159,7 @@ ECHO Removing System and Object Files ...
 
 if exist include\hbverbld.h          del include\hbverbld.h
 
+if exist source\compiler\ppword.c    del source\compiler\ppword.c
 if exist source\pp\pptable.c         del source\pp\pptable.c
 if exist obj\%SUB_DIR%\pptable.obj   del obj\%SUB_DIR%\pptable.obj
 

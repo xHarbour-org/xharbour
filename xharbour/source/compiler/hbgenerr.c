@@ -102,11 +102,12 @@ const char * hb_comp_szErrors[] =
    "TRY section requires a CATCH or FINALLY handler",
    "Invalid use of nameless parameter",
    "Too many arguments to function: \'%s\'",
-   "IMPLEMENTS NAMESPACE from within a NAMESPACE: %s",
+/* 70 */ "IMPLEMENTS NAMESPACE from within a NAMESPACE: %s",
    "NAMESPACE \'%s\' is empty",
    "Definitions not loaded for NAMESPACE: \'%s\'",
    "NAMESPACE: \'%s\' not found in: \'%s\'",
-   "EXTERNAL NAMESPACE [%s] with no NAMESPACE in sight."
+   "EXTERNAL NAMESPACE [%s] with no NAMESPACE in sight.",
+   "Cannot use reserved word: \'%s\'."
 };
 
 /* Table with parse warnings */
@@ -144,7 +145,8 @@ const char * hb_comp_szWarnings[] =
    "0Meaningless use of expression: \'%s\'",
    "2Unreachable code",
    "1Redundant \'ANNOUNCE %s\' statement ignored",
-   "1STATIC Function \'%s\' defined but never used"
+   "1STATIC Function \'%s\' defined but never used",
+   "1Variable \'%s\' is a reserved word"
 };
 
 void hb_compGenError( const char * szErrors[], char cPrefix, int iError, const char * szError1, const char * szError2 )
