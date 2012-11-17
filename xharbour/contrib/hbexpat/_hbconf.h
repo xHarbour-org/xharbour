@@ -28,6 +28,9 @@
 /* Define to make XML Namespaces functionality available. */
 #define XML_NS 1
 
+/* Build static library. */
+#define XML_STATIC 1
+
 #if defined( __BORLANDC__ )
    #pragma warn -csu
 #elif defined( __WATCOMC__ )

@@ -8,9 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-17 20:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbexpat/_hbconf.h
+  * contrib/hbexpat/expat_ex.h
+    + #define XML_STATIC 1
+    + #include "_hbconf.h"
+    to explicitely tell the make system to create standalone static library
+    (MSVC family hbexpat.lib _was_ created to be dependent on external dll)
+
 2012-11-17 06:32 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/hbjson.c
-    ! bug fix numbers handling by Oscar Hernandez
+    ! bug fix on numbers handling by Oscar Hernandez
 
 2012-11-17 02:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * utils/misc/hblib.c
