@@ -43,18 +43,13 @@ HB_FUNC( THROW )
    if( pError && HB_IS_OBJECT( pError ) )
    {
       pError   = hb_itemNew( pError );
-
       pResult  = hb_errLaunchSubst( pError );
 
       hb_itemRelease( pError );
 
       if( pResult )
-      {
          hb_itemRelease( hb_itemReturnForward( pResult ) );
-      }
    }
    else
-   {
       hb_errRT_BASE( EG_ARG, 9101, NULL, "THROW", 1, hb_paramError( 1 ) );
-   }
 }

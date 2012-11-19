@@ -73,7 +73,6 @@
 
 #include "hbcurl.ch"
 
-#define hb_parnldef( n1, n2 )      ( ISNUM( n1 ) ? hb_parnl( n1 ) : n2 )
 #define HB_CURL_OPT_BOOL( n )      ( ISLOG( n ) ? ( long ) hb_parl( n ) : hb_parnldef( n, 1 ) )
 #define HB_CURL_OPT_LARGENUM( n )  ( ( curl_off_t ) hb_parnint( n ) )
 

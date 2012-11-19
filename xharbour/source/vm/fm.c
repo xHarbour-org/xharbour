@@ -140,9 +140,6 @@
 #     pragma warn -8027
 #     pragma warn -8084
 #     pragma warn -8041
-#     pragma warn -8004
-#     pragma warn -8008
-#     pragma warn -8066
 #  elif defined( _MSC_VER ) || defined( __DMC__ ) || defined( __WATCOMC__ )
 #     if (( defined( __DMC__ ) || defined( _MSC_VER ) ) && ! defined( __POCC__ ) )
          HB_EXTERN_BEGIN
@@ -179,9 +176,6 @@
 #     pragma warn +8027
 #     pragma warn +8084
 #     pragma warn +8041
-#     pragma warn +8004
-#     pragma warn +8008
-#     pragma warn +8066
 #  endif
 #  if defined( USE_DL_PREFIX )
 #     define malloc( n )      dlmalloc( ( n ) )
@@ -208,7 +202,6 @@ static HANDLE hProcessHeap = 0;
 #if defined( HB_FM_STATISTICS ) && ! defined( HB_TR_LEVEL )
 #  define HB_TR_LEVEL         HB_TR_ERROR
 #endif
-
 
 #ifdef HB_FM_STATISTICS
 
@@ -404,7 +397,7 @@ void * hb_xalloc( HB_SIZE ulSize )         /* allocates fixed memory, returns NU
 #endif
 
 #ifdef hb_xgrab
-   #undef hb_xgrab
+#undef hb_xgrab
 void * hb_xgrab( HB_SIZE ulSize )
 {
    return malloc( ulSize );
@@ -501,7 +494,7 @@ void * hb_xgrab( HB_SIZE ulSize )         /* allocates fixed memory, exits on fa
 #endif
 
 #ifdef hb_xrealloc
-   #undef hb_xrealloc
+#undef hb_xrealloc
 void * hb_xrealloc( void * pMem, HB_SIZE ulSize )
 {
    return realloc( pMem, ulSize );
@@ -625,7 +618,7 @@ void * hb_xrealloc( void * pMem, HB_SIZE ulSize )       /* reallocates memory */
 #endif
 
 #ifdef hb_xfree
-   #undef hb_xfree
+#undef hb_xfree
 void hb_xfree( void * pMem )
 {
    free( pMem );
@@ -793,14 +786,10 @@ void hb_xautorelease( void * pMem )            /* set memory to autorelease */
       PHB_MEMINFO pMemBlock = ( PHB_MEMINFO ) ( ( char * ) pMem - HB_MEMINFO_SIZE );
 
       if( pMemBlock->ulSignature != HB_MEMINFO_SIGNATURE )
-      {
          hb_errInternal( HB_EI_XFREEINV, "hb_xautorelease() Invalid Pointer %p %s", ( char * ) pMem, ( char * ) pMem );
-      }
 
       if( HB_GET_LONG( ( ( BYTE * ) pMem ) + pMemBlock->ulSize ) != HB_MEMINFO_SIGNATURE )
-      {
          hb_errInternal( HB_EI_XMEMOVERFLOW, "hb_xautorelease(%p) Pointer Overflow '%s'", ( char * ) pMem, ( char * ) pMem );
-      }
 
       pMemBlock->uiAutoRelease = 1;
    }
@@ -808,7 +797,6 @@ void hb_xautorelease( void * pMem )            /* set memory to autorelease */
    HB_SYMBOL_UNUSED( pMem );
 #endif
 }
-
 
 /* NOTE: Debug function, it will always return 0 when HB_FM_STATISTICS is
          not defined, don't use it for final code [vszakats] */
@@ -830,9 +818,9 @@ int hb_xinit( void ) /* Initialize fixed memory subsystem */
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_xinit()" ) );
 
-   #if defined( HB_FM_WIN32_ALLOC ) && defined( HB_OS_WIN ) && ! defined( HB_FM_LOCALALLOC )
+#if defined( HB_FM_WIN32_ALLOC ) && defined( HB_OS_WIN ) && ! defined( HB_FM_LOCALALLOC )
    hProcessHeap = GetProcessHeap();
-   #endif
+#endif
 
    return 1;
 }
@@ -885,12 +873,12 @@ void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_xexit()" ) );
 
-//JC1: The problem with threads here is that the stack has already been
-// destroyed, but hb_conOut and other functions may allocate memory with xgrab, using the
-// stack... Notice that this can possibly leads to problem also in ST
-// apps in the future. We must de-tangle the initialization and closing
-// sequence
-
+/* JC1: The problem with threads here is that the stack has already been
+ * destroyed, but hb_conOut and other functions may allocate memory with xgrab, using the
+ * stack... Notice that this can possibly leads to problem also in ST
+ * apps in the future. We must de-tangle the initialization and closing
+ * sequence
+ */
    {
       register PHB_MEMINFO pMemBlock = s_pFirstBlock;
       register PHB_MEMINFO pMemTemp;
@@ -901,9 +889,7 @@ void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
          pMemBlock   = pMemBlock->pNextBlock;
 
          if( pMemTemp->uiAutoRelease )
-         {
             hb_xfree( ( void * ) ( ( char * ) pMemTemp + HB_MEMINFO_SIZE ) );
-         }
       }
    }
 
@@ -953,9 +939,7 @@ void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
       hb_snprintf( buffer, sizeof( buffer ), "Highest total allocated %li bytes in %li blocks.", s_lMemoryMaxConsumed, s_lMemoryMaxBlocks );
 
       if( hLog )
-      {
          fprintf( hLog, "%s\n", buffer );
-      }
 
       hb_conOutErr( buffer, 0 );
 
@@ -965,9 +949,7 @@ void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
          hb_snprintf( buffer, sizeof( buffer ), "WARNING! Memory allocated but not released: %li bytes (%li blocks)", s_lMemoryConsumed, s_lMemoryBlocks );
 
          if( hLog )
-         {
             fprintf( hLog, "%s\n", buffer );
-         }
 
          hb_conOutErr( buffer, 0 );
       }
@@ -983,13 +965,11 @@ void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
                                               HB_MIN( ( UINT ) pMemBlock->ulSize, HB_MAX_MEM2STR_BLOCK ) ) ) );
 
          if( hLog )
-         {
             fprintf( hLog, "Block %i %p (size %lu) %s(%i), \"%s\"\n", ui - 1,
                      ( char * ) pMemBlock + HB_MEMINFO_SIZE,
                      pMemBlock->ulSize, pMemBlock->szProcName, pMemBlock->uiProcLine,
                      hb_mem2str( membuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
                                  HB_MIN( ( UINT ) pMemBlock->ulSize, HB_MAX_MEM2STR_BLOCK ) ) );
-         }
       }
 
       if( hLog )
@@ -1128,13 +1108,13 @@ HB_SIZE hb_xquery( USHORT uiMode )
    switch( uiMode )
    {
       case HB_MEM_CHAR:    /*               (Free Variable Space [KB])          */
-      #if defined( HB_OS_WIN )
+#if defined( HB_OS_WIN )
          {
             MEMORYSTATUS memorystatus;
             GlobalMemoryStatus( &memorystatus );
             ulResult = memorystatus.dwAvailPhys / 1024;
          }
-      #elif defined( HB_OS_OS2 )
+#elif defined( HB_OS_OS2 )
          {
             ULONG ulSysInfo = 0;
 
@@ -1143,19 +1123,19 @@ HB_SIZE hb_xquery( USHORT uiMode )
             else
                ulResult = ulSysInfo / 1024;
          }
-      #else
+#else
          ulResult = 9999;
-      #endif
+#endif
          break;
 
-      case HB_MEM_BLOCK:   /*               (Largest String [KB])               */
-      #if defined( HB_OS_WIN )
+      case HB_MEM_BLOCK:   /*           (Largest String [KB])               */
+#if defined( HB_OS_WIN )
          {
             MEMORYSTATUS memorystatus;
             GlobalMemoryStatus( &memorystatus );
             ulResult = HB_MIN( memorystatus.dwAvailPhys, ULONG_MAX ) / 1024;
          }
-      #elif defined( HB_OS_OS2 )
+#elif defined( HB_OS_OS2 )
          {
             ULONG ulSysInfo = 0;
 
@@ -1164,19 +1144,19 @@ HB_SIZE hb_xquery( USHORT uiMode )
             else
                ulResult = HB_MIN( ulSysInfo, ULONG_MAX ) / 1024;
          }
-      #else
+#else
          ulResult = 9999;
-      #endif
+#endif
          break;
 
-      case HB_MEM_RUN:     /*               (RUN Memory [KB])                   */
-      #if defined( HB_OS_WIN )
+      case HB_MEM_RUN:     /*              (RUN Memory [KB])                  */
+#if defined( HB_OS_WIN )
          {
             MEMORYSTATUS memorystatus;
             GlobalMemoryStatus( &memorystatus );
             ulResult = memorystatus.dwAvailPhys / 1024;
          }
-      #elif defined( HB_OS_OS2 )
+#elif defined( HB_OS_OS2 )
          {
             ULONG ulSysInfo = 0;
 
@@ -1185,19 +1165,19 @@ HB_SIZE hb_xquery( USHORT uiMode )
             else
                ulResult = ulSysInfo / 1024;
          }
-      #else
+#else
          ulResult = 9999;
-      #endif
+#endif
          break;
 
-      case HB_MEM_VM:      /* UNDOCUMENTED! (Virtual Memory [KB])               */
-      #if defined( HB_OS_WIN )
+      case HB_MEM_VM:      /* UNDOCUMENTED! (Virtual Memory [KB])            */
+#if defined( HB_OS_WIN )
          {
             MEMORYSTATUS memorystatus;
             GlobalMemoryStatus( &memorystatus );
             ulResult = memorystatus.dwAvailVirtual / 1024;
          }
-      #elif defined( HB_OS_OS2 )
+#elif defined( HB_OS_OS2 )
          {
             ULONG ulSysInfo = 0;
 
@@ -1206,27 +1186,27 @@ HB_SIZE hb_xquery( USHORT uiMode )
             else
                ulResult = ulSysInfo / 1024;
          }
-      #else
+#else
          ulResult = 9999;
-      #endif
+#endif
          break;
 
-      case HB_MEM_EMS:     /* UNDOCUMENTED! (Free Expanded Memory [KB]) (?)     */
-      #if defined( HB_OS_WIN ) || defined( HB_OS_OS2 )
+      case HB_MEM_EMS:     /* UNDOCUMENTED! (Free Expanded Memory [KB]) (?)  */
+#if defined( HB_OS_WIN ) || defined( HB_OS_OS2 )
          ulResult = 0;
-      #else
+#else
          ulResult = 9999;
-      #endif
+#endif
          break;
 
-      case HB_MEM_FM:      /* UNDOCUMENTED! (Fixed Memory/Heap [KB]) (?)        */
-      #if defined( HB_OS_WIN )
+      case HB_MEM_FM:      /* UNDOCUMENTED! (Fixed Memory/Heap [KB]) (?)     */
+#if defined( HB_OS_WIN )
          {
             MEMORYSTATUS memorystatus;
             GlobalMemoryStatus( &memorystatus );
             ulResult = memorystatus.dwTotalPhys / 1024;
          }
-      #elif defined( HB_OS_OS2 )
+#elif defined( HB_OS_OS2 )
          {
             ULONG ulSysInfo = 0;
 
@@ -1235,44 +1215,44 @@ HB_SIZE hb_xquery( USHORT uiMode )
             else
                ulResult = ulSysInfo / 1024;
          }
-      #else
+#else
          ulResult = 9999;
-      #endif
+#endif
          break;
 
       case HB_MEM_FMSEGS:  /* UNDOCUMENTED! (Segments in Fixed Memory/Heap) (?) */
-      #if defined( HB_OS_WIN ) || defined( HB_OS_OS2 )
+#if defined( HB_OS_WIN ) || defined( HB_OS_OS2 )
          ulResult = 1;
-      #else
+#else
          ulResult = 9999;
-      #endif
+#endif
          break;
 
       case HB_MEM_SWAP:    /* UNDOCUMENTED! (Free Swap Memory [KB])             */
-      #if defined( HB_OS_WIN )
+#if defined( HB_OS_WIN )
          {
             MEMORYSTATUS memorystatus;
             GlobalMemoryStatus( &memorystatus );
             ulResult = memorystatus.dwAvailPageFile / 1024;
          }
-      #elif defined( HB_OS_OS2 )
+#elif defined( HB_OS_OS2 )
          {
             /* NOTE: There is no way to know how much a swap file can grow on an
                      OS/2 system. I think we should return free space on DASD
                      media which contains swap file [maurilio.longo] */
             ulResult = 9999;
          }
-      #else
+#else
          ulResult = 9999;
-      #endif
+#endif
          break;
 
       case HB_MEM_CONV:    /* UNDOCUMENTED! (Free Conventional [KB])            */
-      #if defined( HB_OS_WIN ) || defined( HB_OS_OS2 )
+#if defined( HB_OS_WIN ) || defined( HB_OS_OS2 )
          ulResult = 0;
-      #else
+#else
          ulResult = 9999;
-      #endif
+#endif
          break;
 
       case HB_MEM_EMSUSED: /* UNDOCUMENTED! (Used Expanded Memory [KB]) (?)     */
@@ -1316,7 +1296,7 @@ HB_SIZE hb_xquery( USHORT uiMode )
          break;
 
       case HB_MEM_LIST_BLOCKS: /* Harbour extension (List all allocated blocks)      */
-     #ifdef HB_FM_STATISTICS
+#ifdef HB_FM_STATISTICS
          {
             char        membuffer[ HB_MAX_MEM2STR_BLOCK * 2 + 1 ]; /* multiplied by 2 to allow hex format */
             USHORT      ui;
@@ -1335,9 +1315,9 @@ HB_SIZE hb_xquery( USHORT uiMode )
 
             ulResult = s_lMemoryConsumed;
          }
-    #else
+#else
          ulResult = 0;
-    #endif
+#endif
          break;
 
       default:

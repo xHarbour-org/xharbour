@@ -74,9 +74,9 @@
 #endif
 
 #if ( defined( __EXPORT__ ) && defined( HB_VM_ALL ) ) || defined( HB_THREAD_SUPPORT )
-HB_EXTERN_BEGIN
-extern HB_STACK *        _TlsGetValue( void );
-HB_EXTERN_END
+   HB_EXTERN_BEGIN
+   extern HB_STACK *        _TlsGetValue( void );
+   HB_EXTERN_END
    #define TlsGetValue( x ) _TlsGetValue()
 #endif
 
@@ -120,7 +120,7 @@ static void hb_inetLinuxSigusrHandle( int sig )
 }
 #endif
 
-// some compilers has missing this define
+/* some compilers has missing this define */
 #ifndef SOCKET_ERROR
 #define SOCKET_ERROR ( -1 )
 #endif
@@ -132,7 +132,7 @@ static void hb_inetLinuxSigusrHandle( int sig )
 #endif
 
 #ifndef HB_NO_DEFAULT_INET
-//JC1: we need it volatile to be minimally thread safe.
+/* JC1: we need it volatile to be minimally thread safe. */
 static volatile int s_iSessions = 0;
 
 /* Useful utility function to have a timeout; */
@@ -185,7 +185,6 @@ static int hb_selectWriteSocket( HB_SOCKET_STRUCT * Socket )
    return FD_ISSET( Socket->com, &set );
 }
 
-
 int hb_selectWriteExceptSocket( HB_SOCKET_STRUCT * Socket )
 {
    fd_set         set, eset;
@@ -210,17 +209,13 @@ int hb_selectWriteExceptSocket( HB_SOCKET_STRUCT * Socket )
    }
 
    if( FD_ISSET( Socket->com, &eset ) )
-   {
       return 2;
-   }
 
    if( FD_ISSET( Socket->com, &set ) )
-   {
       return 1;
-   }
+
    return 0;
 }
-
 
 /*** Utilty to access host DNS */
 static struct hostent * hb_getHosts( const char * name, HB_SOCKET_STRUCT * Socket )
@@ -235,20 +230,14 @@ static struct hostent * hb_getHosts( const char * name, HB_SOCKET_STRUCT * Socke
    if( ulAddr == INADDR_NONE )
    {
       if( strcmp( "255.255.255.255", name ) == 0 )
-      {
          Host = gethostbyaddr( ( const char * ) &ulAddr, sizeof( ulAddr ), AF_INET );
-      }
    }
    else
-   {
       Host = gethostbyaddr( ( const char * ) &ulAddr, sizeof( ulAddr ), AF_INET );
-   }
 #endif
 
    if( Host == NULL )
-   {
       Host = gethostbyname( name );
-   }
 
    if( Host == NULL && Socket != NULL )
    {
@@ -263,7 +252,6 @@ static struct hostent * hb_getHosts( const char * name, HB_SOCKET_STRUCT * Socke
    }
    return Host;
 }
-
 
 /*** Setup the non-blocking method **/
 
@@ -282,7 +270,6 @@ static void hb_socketSetNonBlocking( HB_SOCKET_STRUCT * Socket )
    }
 #endif
 }
-
 
 /*** Setup the blocking method **/
 
@@ -307,10 +294,10 @@ static int hb_socketConnect( HB_SOCKET_STRUCT * Socket )
 {
    int         iErr1;
 
-   #if ! defined( HB_OS_WIN )
+#if ! defined( HB_OS_WIN )
    int         iErrval;
    socklen_t   iErrvalLen;
-   #endif
+#endif
    int         iOpt = 1;
 
    setsockopt( Socket->com, SOL_SOCKET, SO_KEEPALIVE, ( const char * ) &iOpt, sizeof( iOpt ) );
@@ -332,9 +319,9 @@ static int hb_socketConnect( HB_SOCKET_STRUCT * Socket )
       else
       {
          /* Now we wait for socket connection or timeout */
-
 #if defined( HB_OS_WIN )
          iErr1 = hb_selectWriteExceptSocket( Socket );
+
          if( iErr1 == 2 )
          {
             HB_SOCKET_SET_ERROR2( Socket, 2, "Connection failed" );
@@ -356,13 +343,9 @@ static int hb_socketConnect( HB_SOCKET_STRUCT * Socket )
                                       );
 
             if( iErr1 )
-            {
                HB_SOCKET_SET_ERROR1( Socket, iErr1 );
-            }
             else if( iErrval )
-            {
                HB_SOCKET_SET_ERROR1( Socket, iErrval );
-            }
             /* Success! */
          }
 #endif
@@ -382,14 +365,11 @@ static int hb_socketConnect( HB_SOCKET_STRUCT * Socket )
             if( getsockopt( Socket->com, SOL_SOCKET, SO_SNDBUF, ( char * ) &value, &len ) != SOCKET_ERROR )
             {
                Socket->iSndBufSize = value;
+
                if( getsockopt( Socket->com, SOL_SOCKET, SO_RCVBUF, ( char * ) &value, &len ) != SOCKET_ERROR )
-               {
                   Socket->iRcvBufSize = value;
-               }
                else
-               {
                   Socket->iRcvBufSize = 1400;
-               }
             }
             else
             {
@@ -405,7 +385,6 @@ static int hb_socketConnect( HB_SOCKET_STRUCT * Socket )
    return Socket->errorCode == 0;
 }
 
-
 static HB_GARBAGE_FUNC( hb_inetSocketFinalize )
 {
    HB_SOCKET_STRUCT * Socket = ( HB_SOCKET_STRUCT * ) Cargo;
@@ -420,13 +399,13 @@ static HB_GARBAGE_FUNC( hb_inetSocketFinalize )
 
    if( Socket->com > 0 )
    {
-      #if defined( HB_OS_WIN )
+#if defined( HB_OS_WIN )
       shutdown( Socket->com, SD_BOTH );
-      #elif defined( HB_OS_OS2 )
+#elif defined( HB_OS_OS2 )
       shutdown( Socket->com, SO_RCV_SHUTDOWN + SO_SND_SHUTDOWN );
-      #elif ! defined( __WATCOMC__ )
+#elif ! defined( __WATCOMC__ )
       shutdown( Socket->com, SHUT_RDWR );
-      #endif
+#endif
 
       HB_INET_CLOSE( Socket->com );
    }
@@ -445,17 +424,15 @@ static HB_GARBAGE_FUNC( hb_inetSocketFinalize )
 HB_FUNC( INETINIT )
 {
    if( s_iSessions )
-   {
       s_iSessions++;
-   }
    else
    {
-      #if defined( HB_OS_WIN )
+#if defined( HB_OS_WIN )
       WSADATA wsadata;
       WSAStartup( MAKEWORD( 1,1 ), &wsadata );
-      #elif defined( HB_OS_LINUX )
+#elif defined( HB_OS_LINUX )
       signal( HB_INET_LINUX_INTERRUPT, hb_inetLinuxSigusrHandle );
-      #endif
+#endif
       s_iSessions = 1;
    }
 }
@@ -464,9 +441,9 @@ HB_FUNC( INETCLEANUP )
 {
    if( --s_iSessions == 0 )
    {
-      #if defined( HB_OS_WIN )
+#if defined( HB_OS_WIN )
       WSACleanup();
-      #endif
+#endif
    }
 }
 
@@ -482,9 +459,7 @@ HB_FUNC( INETCREATE )
    HB_SOCKET_INIT( Socket, pSocket );
 
    if( ISNUM( 1 ) )
-   {
       Socket->timeout = hb_parni( 1 );
-   }
 
    hb_itemReturnRelease( pSocket );
 }
@@ -494,32 +469,27 @@ HB_FUNC( INETCLOSE )
    HB_SOCKET_STRUCT * Socket = HB_PARSOCKET( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETCLOSE", 1, hb_paramError( 1 ) );
-   }
    else if( Socket->com )
    {
-      #if defined( HB_OS_WIN )
+#if defined( HB_OS_WIN )
       shutdown( Socket->com, SD_BOTH );
-      #elif defined( HB_OS_OS2 )
+#elif defined( HB_OS_OS2 )
       shutdown( Socket->com, SO_RCV_SHUTDOWN + SO_SND_SHUTDOWN );
-      #elif ! defined( __WATCOMC__ )
+#elif ! defined( __WATCOMC__ )
       shutdown( Socket->com, SHUT_RDWR );
-      #endif
+#endif
 
       hb_retni( HB_INET_CLOSE( Socket->com ) );
 
       Socket->com = 0;
-      #ifdef HB_OS_LINUX
+#ifdef HB_OS_LINUX
       kill( 0, HB_INET_LINUX_INTERRUPT );
-      #endif
+#endif
    }
    else
-   {
       hb_retni( -1 );
-   }
 }
-
 
 /* Kept for backward compatibility */
 
@@ -537,35 +507,33 @@ HB_FUNC( INETSTATUS )
    HB_SOCKET_STRUCT * Socket = HB_PARSOCKET( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSTATUS", 1,
                             hb_paramError( 1 ) );
-   }
    else
       /* TODO: hb_retni( Socket->status ); */
       hb_retni( Socket->com == 0 ? -1 : 1 );
 }
 
 /* Prepared, but still not used; being in wait for comments
-   HB_FUNC( INETSTATUSDESC )
-   {
-   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
-
-   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSTATUS", 1,
-          hb_paramError( 1 ) );
-      return;
-   }
-
-   switch( Socket->status )
-   {
-      case 0: hb_retc( "Connection not opened" ); return;
-      case 1: hb_retc( "Connection alive" ); return;
-      case 2: hb_retc( "Last operation error" ); return;
-      case 3: hb_retc( "Last operation timeout" ); return;
-   }
-   }
+ * HB_FUNC( INETSTATUSDESC )
+ * {
+ * HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
+ *
+ * if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
+ * {
+ *    hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSTATUS", 1,
+ *        hb_paramError( 1 ) );
+ *    return;
+ * }
+ *
+ * switch( Socket->status )
+ * {
+ *    case 0: hb_retc( "Connection not opened" ); return;
+ *    case 1: hb_retc( "Connection alive" ); return;
+ *    case 2: hb_retc( "Last operation error" ); return;
+ *    case 3: hb_retc( "Last operation timeout" ); return;
+ * }
+ * }
  */
 
 HB_FUNC( INETERRORCODE )
@@ -573,10 +541,8 @@ HB_FUNC( INETERRORCODE )
    HB_SOCKET_STRUCT * Socket = HB_PARSOCKET( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETERRORCODE", 1,
                             hb_paramError( 1 ) );
-   }
    else
       hb_retni( Socket->errorCode );
 }
@@ -600,23 +566,18 @@ HB_FUNC( INETCLEARERROR )
    HB_SOCKET_STRUCT * Socket = HB_PARSOCKET( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETCLEARERROR", 1, hb_paramError( 1 ) );
-   }
    else
       HB_SOCKET_ZERO_ERROR( Socket );
 }
-
 
 HB_FUNC( INETCOUNT )
 {
    HB_SOCKET_STRUCT * Socket = HB_PARSOCKET( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETCOUNT", 1,
                             hb_paramError( 1 ) );
-   }
    else
       hb_retni( Socket->count );
 }
@@ -627,10 +588,8 @@ HB_FUNC( INETADDRESS )
    char *               addr;
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETADDRESS", 1,
                             hb_paramError( 1 ) );
-   }
    else
    {
       addr = inet_ntoa( Socket->remote.sin_addr );
@@ -643,10 +602,8 @@ HB_FUNC( INETPORT )
    HB_SOCKET_STRUCT * Socket = HB_PARSOCKET( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETPORT", 1,
                             hb_paramError( 1 ) );
-   }
    else
       hb_retni( ntohs( Socket->remote.sin_port ) );
 }
@@ -657,14 +614,10 @@ HB_FUNC( INETSETTIMEOUT )
    HB_SOCKET_STRUCT * Socket = HB_PARSOCKET( 1 );
 
    if( Socket != NULL && Socket->sign == HB_SOCKET_SIGN && ISNUM( 2 ) )
-   {
       Socket->timeout = hb_parni( 2 );
-   }
    else
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSETTIMEOUT", 2,
                             hb_paramError( 1 ), hb_paramError( 2 ) );
-   }
 }
 
 HB_FUNC( INETGETTIMEOUT )
@@ -672,10 +625,8 @@ HB_FUNC( INETGETTIMEOUT )
    HB_SOCKET_STRUCT * Socket = HB_PARSOCKET( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETGETTIMEOUT", 1,
                             hb_paramError( 1 ) );
-   }
    else
       hb_retni( Socket->timeout );
 }
@@ -686,10 +637,8 @@ HB_FUNC( INETCLEARTIMEOUT )
    HB_SOCKET_STRUCT * Socket = HB_PARSOCKET( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETCLEARTIMEOUT", 1,
                             hb_paramError( 1 ) );
-   }
    else
       Socket->timeout = -1;
 }
@@ -699,10 +648,8 @@ HB_FUNC( INETSETTIMELIMIT )
    HB_SOCKET_STRUCT * Socket = HB_PARSOCKET( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN || ! ISNUM( 2 ) )
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSETTIMELIMIT", 2,
                             hb_paramError( 1 ), hb_paramError( 2 ) );
-   }
    else
       Socket->timelimit = hb_parnl( 2 );
 }
@@ -712,24 +659,19 @@ HB_FUNC( INETGETTIMELIMIT )
    HB_SOCKET_STRUCT * Socket = HB_PARSOCKET( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETGETTIMELIMIT", 1,
                             hb_paramError( 1 ) );
-   }
    else
       hb_retni( Socket->timelimit );
 }
-
 
 HB_FUNC( INETCLEARTIMELIMIT )
 {
    HB_SOCKET_STRUCT * Socket = HB_PARSOCKET( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETCLEARTIMELIMIT", 1,
                             hb_paramError( 1 ) );
-   }
    else
       Socket->timelimit = -1;
 }
@@ -740,10 +682,8 @@ HB_FUNC( INETSETPERIODCALLBACK )
    PHB_ITEM             pArray   = hb_param( 2, HB_IT_ARRAY );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSETPERIODCALLBACK", 2,
                             hb_paramError( 1 ), hb_paramError( 2 ) );
-   }
    else
    {
       if( Socket->caPeriodic )
@@ -758,20 +698,14 @@ HB_FUNC( INETGETPERIODCALLBACK )
    HB_SOCKET_STRUCT * Socket = HB_PARSOCKET( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETGETPERIODCALLBACK", 1,
                             hb_paramError( 1 ) );
-   }
    else
    {
       if( Socket->caPeriodic == NULL )
-      {
          hb_ret();
-      }
       else
-      {
          hb_itemReturn( Socket->caPeriodic );
-      }
    }
 }
 
@@ -780,10 +714,8 @@ HB_FUNC( INETCLEARPERIODCALLBACK )
    HB_SOCKET_STRUCT * Socket = HB_PARSOCKET( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETCLEARPERIODCALLBACK", 1,
                             hb_paramError( 1 ) );
-   }
    else if( Socket->caPeriodic )
    {
       hb_itemRelease( Socket->caPeriodic );
@@ -796,10 +728,8 @@ HB_FUNC( INETGETSNDBUFSIZE )
    HB_SOCKET_STRUCT * Socket = HB_PARSOCKET( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETGETSNDBUFSIZE", 1,
                             hb_paramError( 1 ) );
-   }
    else
    {
       int         value;
@@ -815,10 +745,8 @@ HB_FUNC( INETGETRCVBUFSIZE )
    HB_SOCKET_STRUCT * Socket = HB_PARSOCKET( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETGETRCVBUFSIZE", 1,
                             hb_paramError( 1 ) );
-   }
    else
    {
       int         value;
@@ -834,9 +762,7 @@ HB_FUNC( INETSETSNDBUFSIZE )
    HB_SOCKET_STRUCT * Socket = HB_PARSOCKET( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSETSNDBUFSIZE", 1, hb_paramError( 1 ) );
-   }
    else
    {
       int value = hb_parni( 2 );
@@ -851,9 +777,7 @@ HB_FUNC( INETSETRCVBUFSIZE )
    HB_SOCKET_STRUCT * Socket = HB_PARSOCKET( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSETRCVBUFSIZE", 1, hb_paramError( 1 ) );
-   }
    else
    {
       int value = hb_parni( 2 );
@@ -862,9 +786,6 @@ HB_FUNC( INETSETRCVBUFSIZE )
       hb_retni( value );
    }
 }
-
-
-
 
 /********************************************************************
  * TCP receive and send functions
@@ -889,16 +810,12 @@ static void s_inetRecvInternal( char * szFuncName, int iMode )
    iLen     = ( int ) hb_itemGetCLen( pBuffer );
 
    if( ISNIL( 3 ) )
-   {
       iMaxLen = iLen;
-   }
    else
    {
       iMaxLen = hb_parni( 3 );
       if( iLen < iMaxLen )
-      {
          iMaxLen = iLen;
-      }
    }
 
    iReceived      = 0;
@@ -908,13 +825,9 @@ static void s_inetRecvInternal( char * szFuncName, int iMode )
    do
    {
       if( iMode == 1 )
-      {
          iBufferLen = ( Socket->iRcvBufSize > iMaxLen - iReceived ) ? iMaxLen - iReceived : Socket->iRcvBufSize;
-      }
       else
-      {
          iBufferLen = iMaxLen;
-      }
 
       HB_STACK_UNLOCK;
       HB_TEST_CANCEL_ENABLE_ASYN;
@@ -927,16 +840,11 @@ static void s_inetRecvInternal( char * szFuncName, int iMode )
          HB_STACK_LOCK;
 
          if( iLen > 0 )
-         {
             iReceived += iLen;
-         }
 
          /* Called from InetRecv()? */
          if( iMode == 0 )
-         {
             break;
-         }
-
       }
       else
       {
@@ -987,10 +895,9 @@ static void s_inetRecvInternal( char * szFuncName, int iMode )
       hb_retni( iLen );
    }
    else
-   {
-      //TraceLog( NULL, "Received: %i Len: %i\n", iReceived, iBufferLen );
+      /* TraceLog( NULL, "Received: %i Len: %i\n", iReceived, iBufferLen );
+       */
       hb_retni( iReceived );
-   }
 }
 
 HB_FUNC( INETRECV )
@@ -1003,7 +910,6 @@ HB_FUNC( INETRECVALL )
 {
    s_inetRecvInternal( "INETRECVALL", 1 );
 }
-
 
 static void s_inetRecvPattern( char * szFuncName, char * szPattern )
 {
@@ -1027,22 +933,14 @@ static void s_inetRecvPattern( char * szFuncName, char * szPattern )
    }
 
    if( pBufferSize )
-   {
       iBufferSize = hb_itemGetNI( pBufferSize );
-   }
    else
-   {
       iBufferSize = 80;
-   }
 
    if( pMaxSize )
-   {
       iMax = hb_itemGetNI( pMaxSize );
-   }
    else
-   {
       iMax = 0;
-   }
 
    HB_SOCKET_ZERO_ERROR( Socket );
 
@@ -1082,9 +980,7 @@ static void s_inetRecvPattern( char * szFuncName, char * szPattern )
              */
             if( hb_itemGetL( hb_stackReturnItem() ) &&
                 ( Socket->timelimit == -1 || iTimeElapsed < Socket->timelimit ) )
-            {
                continue;
-            }
          }
 
          /* this signals timeout */
@@ -1098,30 +994,22 @@ static void s_inetRecvPattern( char * szFuncName, char * szPattern )
          {
             ulPatPos++;
             if( ! szPattern[ ulPatPos ] )
-            {
                break;
-            }
          }
          else
-         {
             ulPatPos = 0;
-         }
 
          Buffer[ iPos++ ] = cChar;
       }
       else
-      {
          break;
-      }
    }
    while( iMax == 0 || iPos < iMax );
 
    if( iLen <= 0 )
    {
       if( pResult )
-      {
          hb_itemPutNI( pResult, iLen );
-      }
 
       if( iLen == 0 )
       {
@@ -1132,9 +1020,7 @@ static void s_inetRecvPattern( char * szFuncName, char * szPattern )
          HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" );
       }
       else
-      {
          HB_SOCKET_SET_ERROR( Socket );
-      }
 
       hb_xfree( ( void * ) Buffer );
       hb_ret();
@@ -1147,9 +1033,7 @@ static void s_inetRecvPattern( char * szFuncName, char * szPattern )
          Socket->count = iPos;
 
          if( pResult )
-         {
             hb_itemPutNI( pResult, iPos );
-         }
 
          hb_retclenAdopt( Buffer, iPos );
       }
@@ -1158,9 +1042,7 @@ static void s_inetRecvPattern( char * szFuncName, char * szPattern )
          HB_SOCKET_SET_ERROR2( Socket, -3, "Buffer overrun" );
 
          if( pResult )
-         {
             hb_itemPutNI( pResult, -2 );
-         }
 
          hb_xfree( ( void * ) Buffer );
          hb_retc( NULL );
@@ -1172,7 +1054,6 @@ HB_FUNC( INETRECVLINE )
 {
    s_inetRecvPattern( "INETRECVLINE", "\r\n" );
 }
-
 
 HB_FUNC( INETRECVENDBLOCK )
 {
@@ -1285,9 +1166,7 @@ HB_FUNC( INETRECVENDBLOCK )
             /* if( hb_itemGetL( &HB_VM_STACK.Return ) && */
             if( hb_itemGetL( hb_stackReturnItem() ) &&
                 ( Socket->timelimit == -1 || iTimeElapsed < Socket->timelimit ) )
-            {
                continue;
-            }
          }
 
          iLen = -2;
@@ -1320,25 +1199,19 @@ HB_FUNC( INETRECVENDBLOCK )
          }
 
          if( bProtoFound )
-         {
             break;
-         }
 
          Buffer[ iPos++ ] = cChar;
       }
       else
-      {
          break;
-      }
    }
    while( iMax == 0 || iPos < iMax );
 
    if( iLen <= 0 )
    {
       if( pResult )
-      {
          hb_itemPutNI( pResult, iLen );
-      }
 
       if( iLen == 0 )
       {
@@ -1349,9 +1222,7 @@ HB_FUNC( INETRECVENDBLOCK )
          HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" );
       }
       else
-      {
          HB_SOCKET_SET_ERROR( Socket );
-      }
 
       hb_xfree( ( void * ) Buffer );
       hb_retc( NULL );
@@ -1363,9 +1234,7 @@ HB_FUNC( INETRECVENDBLOCK )
          Socket->count = iPos;
 
          if( pResult )
-         {
             hb_itemPutNI( pResult, iPos - ( iprotosize[ ifindproto ] - 1 ) );
-         }
 
          hb_retclenAdopt( Buffer, iPos - ( iprotosize[ ifindproto ] - 1 ) );
       }
@@ -1374,9 +1243,7 @@ HB_FUNC( INETRECVENDBLOCK )
          HB_SOCKET_SET_ERROR2( Socket, -1, "Buffer overrun" );
 
          if( pResult )
-         {
             hb_itemPutNI( pResult, -2 );
-         }
 
          hb_xfree( ( void * ) Buffer );
          hb_retc( NULL );
@@ -1423,13 +1290,10 @@ HB_FUNC( INETDATAREADY )
    /* Don't rely on the value of tv now! */
 
    if( iLen < 0 )
-   {
       HB_SOCKET_SET_ERROR( Socket );
-   }
 
    hb_retni( iLen );
 }
-
 
 static void s_inetSendInternal( char * szFuncName, int iMode )
 {
@@ -1463,24 +1327,17 @@ static void s_inetSendInternal( char * szFuncName, int iMode )
    while( iSent < iSend )
    {
       if( iMode == 1 )
-      {
          iBufferLen = Socket->iSndBufSize > iSend - iSent ? iSend - iSent : Socket->iSndBufSize;
-      }
       else
-      {
          iBufferLen = iSend;
-      }
 
       iLen = 0;
+
       if( hb_selectWriteSocket( Socket ) )
-      {
          iLen = send( Socket->com, Buffer + iSent, iBufferLen, MSG_NOSIGNAL );
-      }
 
       if( iLen > 0 )
-      {
          iSent += iLen;
-      }
       else if( iLen == 0 )
       {
          HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" );
@@ -1491,10 +1348,9 @@ static void s_inetSendInternal( char * szFuncName, int iMode )
          HB_SOCKET_SET_ERROR( Socket );
          break;
       }
+
       if( iMode == 0 )
-      {
          break;
-      }
    }
 
    HB_DISABLE_ASYN_CANC;
@@ -1503,13 +1359,9 @@ static void s_inetSendInternal( char * szFuncName, int iMode )
    Socket->count = iSent;
 
    if( iLen > 0 )
-   {
       hb_retni( iSent );
-   }
    else
-   {
       hb_retni( -1 );
-   }
 }
 
 HB_FUNC( INETSEND )
@@ -1521,7 +1373,6 @@ HB_FUNC( INETSENDALL )
 {
    s_inetSendInternal( "INETSENDALL", 1 );
 }
-
 
 /*******************************************
  * Name resolution interface functions
@@ -1575,7 +1426,6 @@ HB_FUNC( INETGETHOSTS )
    }
 }
 
-
 HB_FUNC( INETGETALIAS )
 {
    const char *      szHost   = hb_parc( 1 );
@@ -1624,7 +1474,6 @@ HB_FUNC( INETGETALIAS )
    }
 }
 
-
 /**********************************************
  * Server Specific functions
  ****/
@@ -1632,7 +1481,7 @@ HB_FUNC( INETGETALIAS )
 HB_FUNC( INETSERVER )
 {
    PHB_ITEM             pSocket  = hb_param( 2, HB_IT_POINTER );
-   HB_SOCKET_STRUCT *   Socket   = ( pSocket ? ( HB_SOCKET_STRUCT * ) hb_itemGetPtr( pSocket ) : NULL ); //hb_parptr(2);
+   HB_SOCKET_STRUCT *   Socket   = ( pSocket ? ( HB_SOCKET_STRUCT * ) hb_itemGetPtr( pSocket ) : NULL ); /* hb_parptr(2); */
    int                  iPort;
    int                  iOpt     = 1;
    int                  iListen;
@@ -1669,9 +1518,7 @@ HB_FUNC( INETSERVER )
       Socket->com = 0;
       hb_itemReturn( pSocket );
       if( bRelease )
-      {
          hb_itemRelease( pSocket );
-      }
       return;
    }
 
@@ -1687,13 +1534,9 @@ HB_FUNC( INETSERVER )
    Socket->remote.sin_port    = ( USHORT ) iPort;
 
    if( ! ISCHAR( 2 ) )
-   {
       Socket->remote.sin_addr.s_addr = INADDR_ANY;
-   }
    else
-   {
       Socket->remote.sin_addr.s_addr = inet_addr( hb_parcx( 2 ) );
-   }
 
    iListen = ISNUM( 3 ) ? hb_parni( 3 ) : 10;
 
@@ -1709,16 +1552,15 @@ HB_FUNC( INETSERVER )
    }
 
    hb_itemReturn( pSocket );
+
    if( bRelease )
-   {
       hb_itemRelease( pSocket );
-   }
 }
 
 HB_FUNC( INETACCEPT )
 {
 #if ! defined( EAGAIN )
-#define EAGAIN -1
+#  define EAGAIN -1
 #endif
    HB_SOCKET_STRUCT *   Socket   = HB_PARSOCKET( 1 );
    HB_SOCKET_STRUCT *   NewSocket;
@@ -1773,9 +1615,7 @@ HB_FUNC( INETACCEPT )
 #endif
          }
          else
-         {
             iError = 0;
-         }
       }
       /* Timeout expired */
       else
@@ -1809,7 +1649,6 @@ HB_FUNC( INETACCEPT )
    }
 }
 
-
 /**********************************************
  * Client specific (connection functions)
  ****/
@@ -1833,9 +1672,7 @@ HB_FUNC( INETCONNECT )
       HB_SOCKET_ZERO_ERROR( Socket );
    }
    else
-   {
       HB_SOCKET_INIT( Socket, pSocket );
-   }
 
    HB_STACK_UNLOCK;
    HB_TEST_CANCEL_ENABLE_ASYN;
@@ -1884,7 +1721,6 @@ HB_FUNC( INETCONNECT )
       hb_itemReturn( hb_param( 3, HB_IT_ANY ) );
 }
 
-
 HB_FUNC( INETCONNECTIP )
 {
    const char *         szHost   = hb_parc( 1 );
@@ -1903,9 +1739,7 @@ HB_FUNC( INETCONNECTIP )
       HB_SOCKET_ZERO_ERROR( Socket );
    }
    else
-   {
       HB_SOCKET_INIT( Socket, pSocket );
-   }
 
    /* Creates comm socket */
 #if defined( HB_OS_WIN )
@@ -1962,11 +1796,11 @@ HB_FUNC( INETDGRAMBIND )
    HB_SOCKET_INIT( Socket, pSocket );
 
    /* Creates comm socket */
-   #if defined( HB_OS_WIN )
+#if defined( HB_OS_WIN )
    Socket->com = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
-   #else
+#else
    Socket->com = socket( PF_INET, SOCK_DGRAM, 0 );
-   #endif
+#endif
 
    if( Socket->com == ( HB_SOCKET_T ) -1 )
    {
@@ -1993,14 +1827,9 @@ HB_FUNC( INETDGRAMBIND )
    Socket->remote.sin_port    = ( USHORT ) iPort;
 
    if( ! ISCHAR( 2 ) )
-   {
       Socket->remote.sin_addr.s_addr = INADDR_ANY;
-   }
    else
-   {
       Socket->remote.sin_addr.s_addr = inet_addr( hb_parcx( 2 ) );
-   }
-
 
    if( bind( Socket->com, ( struct sockaddr * ) &Socket->remote, sizeof( Socket->remote ) ) )
    {
@@ -2010,9 +1839,9 @@ HB_FUNC( INETDGRAMBIND )
 
    if( hb_pcount() == 4 )
    {
-      #ifndef IP_ADD_MEMBERSHIP
-         #define IP_ADD_MEMBERSHIP 5      /* which header should this be in? */
-      #endif
+#ifndef IP_ADD_MEMBERSHIP
+#     define IP_ADD_MEMBERSHIP 5      /* which header should this be in? */
+#endif
 
       /* this structure should be define in a header file.  The MS SDK indicates that */
       /* it is in Ws2tcpip.h but I'm not sure I know where it should go in xHb */
@@ -2057,11 +1886,11 @@ HB_FUNC( INETDGRAM )
    HB_SOCKET_INIT( Socket, pSocket );
 
    /* Creates comm socket */
-   #if defined( HB_OS_WIN )
+#if defined( HB_OS_WIN )
    Socket->com = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
-   #else
+#else
    Socket->com = socket( PF_INET, SOCK_DGRAM, 0 );
-   #endif
+#endif
 
    if( Socket->com == ( HB_SOCKET_T ) -1 )
    {
@@ -2107,13 +1936,9 @@ HB_FUNC( INETDGRAMSEND )
    szBuffer                         = hb_itemGetCPtr( pBuffer );
 
    if( ISNUM( 5 ) )
-   {
       iLen = hb_parni( 5 );
-   }
    else
-   {
       iLen = ( int ) hb_itemGetCLen( pBuffer );
-   }
 
    HB_SOCKET_ZERO_ERROR( Socket );
 
@@ -2141,9 +1966,7 @@ HB_FUNC( INETDGRAMSEND )
       Socket->count = 0;
       HB_SOCKET_SET_ERROR( Socket );
    }
-
 }
-
 
 HB_FUNC( INETDGRAMRECV )
 {
@@ -2172,13 +1995,9 @@ HB_FUNC( INETDGRAMRECV )
    Buffer   = hb_itemGetCPtr( pBuffer );
 
    if( ISNUM( 3 ) )
-   {
       iMaxLen = hb_parni( 3 );
-   }
    else
-   {
       iMaxLen = ( int ) hb_itemGetCLen( pBuffer );
-   }
 
    HB_SOCKET_ZERO_ERROR( Socket );
 
@@ -2189,10 +2008,8 @@ HB_FUNC( INETDGRAMRECV )
       HB_TEST_CANCEL_ENABLE_ASYN;
       iLen     = -2;
       if( hb_selectReadSocket( Socket ) )
-      {
          iLen = recvfrom( Socket->com, Buffer, iMaxLen, 0,
                           ( struct sockaddr * ) &Socket->remote, &iDtLen );
-      }
       HB_DISABLE_ASYN_CANC;
       HB_STACK_LOCK;
 
@@ -2224,12 +2041,10 @@ HB_FUNC( INETDGRAMRECV )
       Socket->count = 0;
    }
    else
-   {
       Socket->count = iLen;
-   }
+
    hb_retni( iLen );
 }
-
 
 /***********************************************************
  * Generic utility(?) functions

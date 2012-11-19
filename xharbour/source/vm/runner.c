@@ -59,9 +59,7 @@
  *  __HRBGETFU()
  *  __HRBDOFU()
  */
-#if 0
-#include "hbvmopt.h"
-#endif
+
 #include "hbapi.h"
 #include "hbstack.h"
 #include "hbapiitm.h"
@@ -97,7 +95,6 @@ typedef struct
 
 static const BYTE szHead[] = { 192, 'H', 'R', 'B' };
 
-
 #define SYM_NOLINK      0              /* symbol does not have to be linked */
 #define SYM_FUNC        1              /* function defined in this module   */
 #define SYM_EXTERN      2              /* function defined in other module  */
@@ -117,9 +114,7 @@ static int hb_hrbReadHead( const char * szBody, ULONG ulBodySize, ULONG * pulBod
    HB_TRACE( HB_TR_DEBUG, ( "hb_hrbReadHead(%p,%lu,%p)", szBody, ulBodySize, pulBodyOffset ) );
 
    if( ulBodySize < 6 || memcmp( szHead, szBody, 4 ) )
-   {
       return 0;
-   }
 
    pVersion       = szBody + 4;
    *pulBodyOffset += 6;
@@ -137,9 +132,7 @@ static BOOL hb_hrbReadValue( const char * szBody, ULONG ulBodySize, ULONG * pulB
       *pulBodyOffset += 4;
 
       if( *pulValue <= 0x00FFFFFFUL )
-      {
          return TRUE;
-      }
    }
 
    return FALSE;
@@ -257,7 +250,6 @@ static void hb_hrbInitStatic( PHRB_BODY pHrbBody )
             hb_vmPushSymbol( &( pHrbBody->pSymRead[ ul ] ) );
             hb_vmPushNil();
             hb_vmDo( 0 );
-
          }
       }
    }
@@ -316,19 +308,13 @@ void hb_hrbUnLoad( PHRB_BODY pHrbBody )
    hb_hrbExit( pHrbBody );
 
    if( pHrbBody->pModuleSymbols )
-   {
       hb_clsDeactiveClass( pHrbBody->pModuleSymbols );
-   }
 
    if( pHrbBody->pNamespaces )
-   {
       hb_xfree( pHrbBody->pNamespaces );
-   }
 
    if( pHrbBody->pModuleSymbols )
-   {
       hb_vmFreeSymbols( pHrbBody->pModuleSymbols );
-   }
 
    if( pHrbBody->pDynFunc )
    {
@@ -342,14 +328,15 @@ void hb_hrbUnLoad( PHRB_BODY pHrbBody )
             pDyn = hb_dynsymFind( pHrbBody->pDynFunc[ ul ].szName );
             if( pDyn && pDyn->pSymbol->value.pCodeFunc ==
                 pHrbBody->pDynFunc[ ul ].pCodeFunc )
-            {
                pDyn->pSymbol->value.pCodeFunc = NULL;
-            }
          }
+
          if( pHrbBody->pDynFunc[ ul ].pCodeFunc )
             hb_xfree( pHrbBody->pDynFunc[ ul ].pCodeFunc );
+
          if( pHrbBody->pDynFunc[ ul ].pCode )
             hb_xfree( pHrbBody->pDynFunc[ ul ].pCode );
+
          if( pHrbBody->pDynFunc[ ul ].szName )
             hb_xfree( pHrbBody->pDynFunc[ ul ].szName );
       }
@@ -397,6 +384,7 @@ PHRB_BODY hb_hrbLoad( const char * szHrbBody, ULONG ulBodySize, char * szHrb )
       pHrbBody->pDynFunc         = NULL;
       pHrbBody->pModuleSymbols   = NULL;
       pHrbBody->pNamespaces      = hb_hrbReadNamespaces( szHrbBody, ( ULONG ) ulBodySize, &ulBodyOffset );;
+
       if( ! hb_hrbReadValue( szHrbBody, ulBodySize, &ulBodyOffset, &pHrbBody->ulSymbols ) ||
           pHrbBody->ulSymbols == 0 )
       {
@@ -420,20 +408,14 @@ PHRB_BODY hb_hrbLoad( const char * szHrbBody, ULONG ulBodySize, char * szHrb )
          pSymRead[ ul ].value.pCodeFunc   = ( PHB_PCODEFUNC ) ( HB_PTRDIFF ) szHrbBody[ ulBodyOffset++ ];
 
          if( ( pSymRead[ ul ].scope.value & HB_FS_PUBLIC ) == 0 )
-         {
             pSymRead[ ul ].pDynSym = &( pHrbBody->ModuleFakeDyn );
-         }
          else
-         {
             pSymRead[ ul ].pDynSym = NULL;
-         }
 
          if( pHrbBody->lSymStart == -1 &&
              ( pSymRead[ ul ].scope.value & HB_FS_FIRST ) != 0 &&
              ( pSymRead[ ul ].scope.value & HB_FS_INITEXIT ) == 0 )
-         {
             pHrbBody->lSymStart = ul;
-         }
       }
 
       if( ul < pHrbBody->ulSymbols ||
@@ -524,10 +506,9 @@ PHRB_BODY hb_hrbLoad( const char * szHrbBody, ULONG ulBodySize, char * szHrb )
             if( pDynSym )
             {
                pSymRead[ ul ].value.pFunPtr = pDynSym->pSymbol->value.pFunPtr;
+
                if( pDynSym->pSymbol->scope.value & HB_FS_PCODEFUNC )
-               {
                   pSymRead[ ul ].scope.value |= HB_FS_PCODEFUNC;
-               }
             }
             else
             {
@@ -567,7 +548,8 @@ PHRB_BODY hb_hrbLoad( const char * szHrbBody, ULONG ulBodySize, char * szHrb )
          hb_hrbInitStatic( pHrbBody );
       }
 
-      //TraceLog( NULL, "Runner registered module: %s\n", pHrbBody->pModuleSymbols->szModuleName );
+      /* TraceLog( NULL, "Runner registered module: %s\n", pHrbBody->pModuleSymbols->szModuleName );
+       */
    }
 
    return pHrbBody;
@@ -583,10 +565,10 @@ PHRB_BODY hb_hrbLoadFromFile( const char * szHrb )
    /* Create full filename */
 
    pFileName = hb_fsFNameSplit( szHrb );
+
    if( hb_setGetDefExtension() && pFileName->szExtension == NULL )
-   {
       pFileName->szExtension = ".hrb";
-   }
+
    hb_fsFNameMerge( szFileName, pFileName );
    hb_xfree( pFileName );
 
@@ -637,9 +619,7 @@ void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] )
       hb_vmPushNil();
 
       for( i = 0; i < ( hb_pcount() - 1 ); i++ )
-      {
          hb_vmPush( hb_param( i + 2, HB_IT_ANY ) );  /* Push other cmdline params*/
-      }
 
       hb_vmDo( ( USHORT ) ( hb_pcount() - 1 ) );                    /* Run the thing !!!        */
 
@@ -650,20 +630,17 @@ void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] )
    hb_hrbExit( pHrbBody );
 
    if( pRetVal )
-   {
       hb_itemReturnRelease( pRetVal );
-   }
 }
 
-
 /*
-   __HRBRUN( <cFile> [, xParam1 [, xParamN ] ] ) -> return value.
-
-   This program will get the data from the .hrb file and run the p-code
-   contained in it.
-
-   In due time it should also be able to collect the data from the
-   binary/executable itself
+ * __HRBRUN( <cFile> [, xParam1 [, xParamN ] ] ) -> return value.
+ *
+ * This program will get the data from the .hrb file and run the p-code
+ * contained in it.
+ *
+ * In due time it should also be able to collect the data from the
+ * binary/executable itself
  */
 HB_FUNC( __HRBRUN )
 {
@@ -687,18 +664,15 @@ HB_FUNC( __HRBRUN )
          if( argc > 1 )
          {
             argv = ( char ** ) hb_xgrab( sizeof( char * ) * ( argc - 1 ) );
+
             for( i = 0; i < argc - 1; i++ )
-            {
                argv[ i ] = ( char * ) hb_parcx( i + 2 );
-            }
          }
 
          hb_hrbDo( pHrbBody, argc - 1, argv );
 
          if( argv )
-         {
             hb_xfree( argv );
-         }
 
          hb_hrbUnLoad( pHrbBody );
          hb_retl( TRUE );
@@ -707,9 +681,7 @@ HB_FUNC( __HRBRUN )
          hb_retl( FALSE );
    }
    else
-   {
       hb_errRT_BASE( EG_ARG, 9999, NULL, "__HRBRUN", 0 );
-   }
 }
 
 HB_FUNC( __HRBLOAD )
@@ -723,13 +695,9 @@ HB_FUNC( __HRBLOAD )
 
       /* If parameter string */
       if( ulLen > 4 && memcmp( szHead, fileOrBody, 4 ) == 0 )
-      {
          pHrbBody = hb_hrbLoad( fileOrBody, ulLen, NULL );
-      }
       else
-      {
          pHrbBody = hb_hrbLoadFromFile( fileOrBody );
-      }
 
       if( pHrbBody )
       {
@@ -748,16 +716,12 @@ HB_FUNC( __HRBLOAD )
          hb_hrbInit( pHrbBody, argc - 1, argv );
 
          if( argv )
-         {
             hb_xfree( argv );
-         }
       }
       hb_retptr( ( void * ) pHrbBody );
    }
    else
-   {
       hb_errRT_BASE( EG_ARG, 9998, NULL, "__HRBLOAD", 0 );
-   }
 }
 
 HB_FUNC( __HRBDO )
@@ -775,22 +739,16 @@ HB_FUNC( __HRBDO )
          argv = ( char ** ) hb_xgrab( sizeof( char * ) * ( argc - 1 ) );
 
          for( i = 0; i < argc - 1; i++ )
-         {
             argv[ i ] = ( char * ) hb_parcx( i + 2 );
-         }
       }
 
       hb_hrbDo( pHrbBody, argc - 1, argv );
 
       if( argv )
-      {
          hb_xfree( argv );
-      }
    }
    else
-   {
       hb_errRT_BASE( EG_ARG, 9999, NULL, "__HRBDO", 0 );
-   }
 }
 
 HB_FUNC( __HRBUNLOAD )
@@ -798,13 +756,9 @@ HB_FUNC( __HRBUNLOAD )
    PHRB_BODY pHrbBody = ( PHRB_BODY ) hb_parptr( 1 );
 
    if( pHrbBody )
-   {
       hb_hrbUnLoad( pHrbBody );
-   }
    else
-   {
       hb_errRT_BASE( EG_ARG, 9999, NULL, "__HRBUNLOAD", 0 );
-   }
 }
 
 HB_FUNC( __HRBGETFU )
@@ -819,26 +773,19 @@ HB_FUNC( __HRBGETFU )
       while( ulPos < pHrbBody->ulSymbols )
       {
          if( ! strcmp( szName, pHrbBody->pSymRead[ ulPos ].szName ) )
-         {
             break;
-         }
+
          ulPos++;
       }
       hb_xfree( szName );
 
       if( ulPos < pHrbBody->ulSymbols )
-      {
          hb_retptr( ( void * ) ( pHrbBody->pSymRead + ulPos ) );
-      }
       else
-      {
          hb_retptr( NULL );
-      }
    }
    else
-   {
       hb_errRT_BASE( EG_ARG, 9999, NULL, "__HRBGETFU", 0 );
-   }
 }
 
 HB_FUNC( __HRBDOFU )
@@ -859,7 +806,5 @@ HB_FUNC( __HRBDOFU )
       hb_vmDo( ( USHORT ) ( argc - 1 ) );          /* Run function        */
    }
    else
-   {
       hb_errRT_BASE( EG_ARG, 9999, NULL, "__HRBDOFU", 0 );
-   }
 }

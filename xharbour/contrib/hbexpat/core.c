@@ -680,6 +680,7 @@ static HB_GARBAGE_FUNC( PHB_EXPAT_release )
    if( hb_expat_ptr && * hb_expat_ptr )
    {
       PHB_EXPAT hb_expat = * hb_expat_ptr;
+#if 0
       HB_UINT tmp;
 
       for( tmp = 0; tmp < HB_SIZEOFARRAY( hb_expat->pVar ); ++tmp )
@@ -687,7 +688,7 @@ static HB_GARBAGE_FUNC( PHB_EXPAT_release )
          if( hb_expat->pVar[ tmp ] )
             hb_gcItemRef( hb_expat->pVar[ tmp ] );
       }
-
+#endif
       /* set pointer to NULL to avoid multiple freeing */
       * hb_expat_ptr = NULL;
 

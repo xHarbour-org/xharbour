@@ -66,14 +66,12 @@
 #include <dlfcn.h>
 #endif
 
-
-
 HB_FUNC( LIBLOAD )
 {
-   #if defined( HB_OS_OS2 )
+#if defined( HB_OS_OS2 )
    UCHAR    LoadError[ 256 ] = ""; /* Area for Load failure information */
    HMODULE  hDynModule;
-   #endif
+#endif
 
    void *   hDynLib = NULL;
 
@@ -87,39 +85,33 @@ HB_FUNC( LIBLOAD )
       if( argc > 0 )
       {
          argv = ( char ** ) hb_xgrab( sizeof( char * ) * argc );
+
          for( i = 0; i < argc; ++i )
-         {
             argv[ i ] = ( char * ) hb_parcx( i + 2 );
-         }
       }
 
       /* use stack address as first level marker */
       hb_vmBeginSymbolGroup( ( void * ) &HB_VM_STACK, TRUE );
 
-      #if defined( HB_OS_WIN )
+#if defined( HB_OS_WIN )
       hDynLib  = ( void * ) LoadLibrary( hb_parc( 1 ) );
-      #elif defined( HB_OS_LINUX ) && ! defined( __WATCOMC__ )
+#elif defined( HB_OS_LINUX ) && ! defined( __WATCOMC__ )
       hDynLib  = ( void * ) dlopen( hb_parc( 1 ), RTLD_LAZY | RTLD_GLOBAL );
-      #elif defined( HB_OS_OS2 )
+#elif defined( HB_OS_OS2 )
       if( DosLoadModule( LoadError, sizeof( LoadError ), hb_parc( 1 ), &hDynModule ) == NO_ERROR )
-      {
          hDynLib = ( void * ) hDynModule;
-      }
-      #endif
+#endif
 
       /* set real marker */
       hb_vmInitSymbolGroup( hDynLib, argc, argv );
+
       if( argv )
-      {
          hb_xfree( argv );
-      }
    }
 #endif
 
    hb_retptr( hDynLib );
 }
-
-
 
 HB_FUNC( LIBFREE )
 {
@@ -131,23 +123,19 @@ HB_FUNC( LIBFREE )
    {
       hb_vmExitSymbolGroup( hDynLib );
 
-      #if defined( HB_OS_WIN )
+#if defined( HB_OS_WIN )
       hb_retl( FreeLibrary( ( HMODULE ) hDynLib ) );
-      #elif defined( HB_OS_UNIX ) && ! defined( __WATCOMC__ )
+#elif defined( HB_OS_UNIX ) && ! defined( __WATCOMC__ )
       hb_retl( dlclose( hDynLib ) == 0 );
-      #elif defined( HB_OS_OS2 )
+#elif defined( HB_OS_OS2 )
       hb_retl( DosFreeModule( ( HMODULE ) hDynLib ) == NO_ERROR );
-      #endif
+#endif
 
    }
    else
 #endif
-   {
       hb_retl( FALSE );
-   }
 }
-
-
 
 HB_FUNC( LIBERROR )
 {
@@ -157,8 +145,6 @@ HB_FUNC( LIBERROR )
    hb_retc( NULL );
 #endif
 }
-
-
 
 /* Executes a Harbour pcode dynamically loaded DLL function or procedure
  * Syntax: HB_libDo( <cFuncName> [,<params...>] ) --> [<uResult>]
@@ -180,9 +166,7 @@ HB_FUNC( HB_LIBDO )
 
          /* same logic here as from HB_FUNC( EVAL ) */
          for( uiParam = 2; uiParam <= uiPCount; uiParam++ )
-         {
             hb_vmPush( hb_stackItemFromBase( uiParam ) );
-         }
 
          hb_vmDo( uiPCount - 1 );
       }
@@ -203,5 +187,3 @@ HB_FUNC( HB_LIBERROR )
 {
    HB_FUNC_EXEC( LIBERROR );
 }
-
-

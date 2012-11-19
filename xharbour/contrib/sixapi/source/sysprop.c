@@ -31,11 +31,13 @@ HB_FUNC( SX_SYSPROP )
    if( ISNIL( 2 ) )
       sx_SysProp( ( WORD ) hb_parni( 1 ), ( PVOID ) NULL );
    else
+#if defined( __MINGW32__ ) && defined( HB_OS_WIN_64 )
       hb_retni( sx_SysProp(
                    ( WORD ) hb_parni( 1 ), /* One of the predefined constant values. */
-#if defined( __MINGW32__ ) && defined( HB_OS_WIN_64 )
                    ( void * ) ( HB_LONG ) i ) );
 #else
+      hb_retni( sx_SysProp(
+                   ( WORD ) hb_parni( 1 ), /* One of the predefined constant values. */
                    ( void * ) i ) );
 #endif
 }

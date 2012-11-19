@@ -56,10 +56,6 @@
    #include <windows.h>
 #endif
 
-#if 0
-#include "hbvmopt.h"
-#endif
-
 #include "hbsetup.h"
 #include "hbapi.h"
 #include "hbapiitm.h"
@@ -69,7 +65,6 @@
 #if defined( HB_OS_UNIX )
    #include <unistd.h>
 #endif
-
 
 /** NOTICE: Language is an application wide item,
     little thread safety required */
@@ -88,63 +83,59 @@ static char       s_current_language_name[ HB_I18N_NAMELEN + 1 ];
 static char       s_base_language[ HB_I18N_CODELEN + 1 ];
 static char       s_base_language_name[ HB_I18N_NAMELEN ];
 
-HB_EXTERN_BEGIN
-
 /***********************************************
  * VM interface
- ************************************************/
+ ***********************************************/
 
 BOOL hb_i18nInit( char * i18n_dir, char * language )
 {
-   BOOL bOk=FALSE;
-   // Supposing that the user strings are compiled in English;
-   // this default can be changed later
+   BOOL bOk = FALSE;
+   /* Supposing that the user strings are compiled in English;
+    * this default can be changed later
+    */
    hb_strncpy( s_base_language, HB_INTERNATIONAL_CODE, HB_I18N_CODELEN );
    hb_strncpy( s_base_language_name, HB_INTERNATIONAL_NAME, HB_I18N_NAMELEN - 1 );
 
    if( language == NULL )
    {
       language = hb_getenv( "LANG" );
+
       if( language == NULL )
       {
          language = hb_getenv( "LC_ALL" );
-         if ( language ) 
+         if ( language )
             bOk = TRUE;
       }
       else
-      {
-	      bOk = TRUE;
-      }
+         bOk = TRUE;
    }
 
    if( i18n_dir == NULL )
-   {
       hb_strncpy( s_default_i18n_dir, HB_DEFAULT_I18N_PATH, HB_PATH_MAX - 1 );
-   }
    else
-   {
       hb_strncpy( s_default_i18n_dir, i18n_dir, HB_PATH_MAX - 1 );
-   }
 
    /* No automatic internationalization can be found */
    if( language == NULL || ! hb_i18n_load_language( language ) )
    {
       hb_strncpy( s_current_language, s_base_language, HB_I18N_CODELEN );
       hb_strncpy( s_current_language_name, s_base_language_name, HB_I18N_NAMELEN - 1 );
-      // but we know that we don't want internationalization
+
+      /* but we know that we don't want internationalization */
       if( language != NULL )
       {
-         if ( bOk ) 
+         if ( bOk )
             hb_xfree( language ) ;
-	      
+
          return FALSE;
       }
    }
-   if ( bOk ) 
+
+   if ( bOk )
       hb_xfree( language ) ;
+
    return TRUE;
 }
-
 
 void hb_i18nExit( void )
 {
@@ -155,12 +146,11 @@ void hb_i18nExit( void )
    }
 }
 
-
 /***************************************
         Low level API interface
- ****************************************/
+ ***************************************/
 
-/**
+/*
  * Find an I18N string in the current table,
  * or returns the parameter untraslated (lower level)
  */
@@ -174,7 +164,7 @@ PHB_ITEM hb_i18n_scan_table( PHB_ITEM pStr, PHB_ITEM pTable, ULONG * ulIndex )
 
    while( 1 )
    {
-      // get the table row
+      /* get the table row */
       PHB_ITEM pRow = hb_arrayGetItemPtr( pTable, ulPoint );
 
       iRes = strcmp( hb_arrayGetCPtr( pRow, 1 ), cInt );
@@ -187,14 +177,14 @@ PHB_ITEM hb_i18n_scan_table( PHB_ITEM pStr, PHB_ITEM pTable, ULONG * ulIndex )
       else
       {
          if( ulLower == ulHigher )
-         {
             break;
-         }
-         // last try. In pair distros, it can be also in the other node
+
+         /* last try. In pair distros, it can be also in the other node */
          else if( ulLower == ulHigher - 1 )
          {
-            // essendo matematica intera, ulPoint è per difetto, ed ha
-            // già esaminato il punto lower
+            /* essendo matematica intera, ulPoint è per difetto, ed ha
+             * già esaminato il punto lower
+             */
             pRow = hb_arrayGetItemPtr( pTable, ulHigher );
 
             if( strcmp( hb_arrayGetCPtr( pRow, 1 ), cInt ) == 0 )
@@ -206,18 +196,15 @@ PHB_ITEM hb_i18n_scan_table( PHB_ITEM pStr, PHB_ITEM pTable, ULONG * ulIndex )
          }
 
          if( iRes > 0 )
-         {
             ulHigher = ulPoint;
-         }
          else
-         {
             ulLower = ulPoint;
-         }
+
          ulPoint = ( ulLower + ulHigher ) / 2;
       }
    }
 
-   // entry not found
+   /* entry not found */
    return pStr;
 }
 
@@ -231,18 +218,16 @@ char * hb_i18n_build_table_filename( char * i18n_dir, char * language )
 {
    char * path;
 
-   // path? (if null, it is i18n/ subdir)
+   /* path? (if null, it is i18n/ subdir) */
    if( i18n_dir == NULL )
-   {
       i18n_dir = s_default_i18n_dir;
-   }
 
    if( strlen( i18n_dir ) > 0 )
    {
       HB_SIZE uiLen = (
          strlen( i18n_dir ) +
          strlen( language ) +
-         strlen( HB_I18N_TAB_EXT ) + 3 ); // '/', dot and '\0'
+         strlen( HB_I18N_TAB_EXT ) + 3 ); /* '/', dot and '\0' */
 
       path = ( char * ) hb_xgrab( uiLen );
       hb_snprintf( path, ( size_t ) uiLen, "%s%c%s.%s",
@@ -255,7 +240,7 @@ char * hb_i18n_build_table_filename( char * i18n_dir, char * language )
    {
       HB_SIZE uiLen = (
          strlen( language ) +
-         strlen( HB_I18N_TAB_EXT ) + 2 ); // dot and '\0'
+         strlen( HB_I18N_TAB_EXT ) + 2 ); /* dot and '\0' */
 
       path = ( char * ) hb_xgrab( uiLen );
 
@@ -275,20 +260,17 @@ PHB_ITEM hb_i18n_read_table_header( FHANDLE handle )
    USHORT               nRead;
 
    nRead = hb_fsRead( handle, ( BYTE * ) &header, sizeof( header ) );
-   if( nRead != sizeof( header ) )
-   {
-      return NULL;
-   }
 
-   // checking signature
+   if( nRead != sizeof( header ) )
+      return NULL;
+
+   /* checking signature */
    if( strcmp( header.signature, "\3HIL" ) != 0 &&
        strcmp( header.signature, "\3HIT" ) != 0 )
-   {
       return NULL;
-   }
 
    pRet = hb_itemNew( NULL );
-   hb_arrayNew( pRet, 6 ); // six fields.
+   hb_arrayNew( pRet, 6 ); /* six fields. */
    hb_arraySetC( pRet, 1, header.signature );
    hb_arraySetC( pRet, 2, header.author );
    hb_arraySetC( pRet, 3, header.language );
@@ -305,7 +287,7 @@ BOOL hb_i18n_write_table_header( FHANDLE handle, PHB_ITEM pHeader )
    HB_I18N_TAB_HEADER   header;
    USHORT               nWrite;
 
-   // strncopy prevents gpf
+   /* strncopy prevents gpf */
    hb_strncpy( header.signature, hb_arrayGetCPtr( pHeader, 1 ), sizeof( header.signature ) );
    hb_strncpy( header.author, hb_arrayGetCPtr( pHeader, 2 ), sizeof( header.author ) );
    hb_strncpy( header.language, hb_arrayGetCPtr( pHeader, 3 ), sizeof( header.language ) );
@@ -314,10 +296,10 @@ BOOL hb_i18n_write_table_header( FHANDLE handle, PHB_ITEM pHeader )
    header.entries = hb_arrayGetNI( pHeader, 6 );
 
    nWrite         = hb_fsWrite( handle, ( BYTE * ) &header, sizeof( header ) );
+
    if( nWrite != sizeof( header ) )
-   {
       return FALSE;
-   }
+
    return TRUE;
 }
 
@@ -339,14 +321,11 @@ PHB_ITEM hb_i18n_read_table( FHANDLE handle, int count )
 
    szStrLen[ 8 ]  = '\0';
    pTable         = hb_itemNew( NULL );
+
    if( count > 0 )
-   {
       hb_arrayNew( pTable, count );
-   }
    else
-   {
-      hb_arrayNew( pTable, 0 ); // we'll add them
-   }
+      hb_arrayNew( pTable, 0 ); /* we'll add them */
 
    for( i = 1; count == -1 || i <= count; i++ )
    {
@@ -358,17 +337,19 @@ PHB_ITEM hb_i18n_read_table( FHANDLE handle, int count )
       for( j = 1; j <= 2; j++ )
       {
          nRead = hb_fsRead( handle, ( BYTE * ) szStrLen, 8 );
+
          if( nRead == 8 )
          {
             nStrLen = atoi( szStrLen );
 
-            // zero is included
-            if( nStrLen > 0 )  // sanitizing unwritten strings
+            /* zero is included */
+            if( nStrLen > 0 )  /* sanitizing unwritten strings */
             {
                char * str = ( char * ) hb_xgrab( nStrLen );
                nRead = hb_fsRead( handle, ( BYTE * ) str, ( USHORT ) nStrLen );
-               // using trailing zero as file integrity check
-               // (zero is the last character read, so we check nStrLen-1)
+               /* using trailing zero as file integrity check
+                * (zero is the last character read, so we check nStrLen-1)
+                */
                if( nRead != nStrLen || str[ nStrLen - 1 ] != 0 )
                {
                   hb_xfree( str );
@@ -377,12 +358,10 @@ PHB_ITEM hb_i18n_read_table( FHANDLE handle, int count )
                   return NULL;
                }
                else
-               {
                   hb_itemPutCRaw( hb_arrayGetItemPtr( &ArrRow, j ), str, nStrLen - 1 );
-               }
             }
          }
-         // correct file termination upon unknown size request?
+         /* correct file termination upon unknown size request? */
          else if( nRead == 0 && count < 0 )
          {
             hb_itemClear( &ArrRow );
@@ -396,15 +375,11 @@ PHB_ITEM hb_i18n_read_table( FHANDLE handle, int count )
          }
       }
 
-      // saves our row here
+      /* saves our row here */
       if( count > 0 )
-      {
          hb_arraySetForward( pTable, i, &ArrRow );
-      }
       else
-      {
          hb_arrayAddForward( pTable, &ArrRow );
-      }
    }
 
    return pTable;
@@ -419,8 +394,9 @@ PHB_ITEM hb_i18n_read_memory_table( BYTE * pData, int count )
    PHB_ITEM pTable;
 
 
-// TODO: unknown size table not supported, since resource size is available only
-//       aligned to 16 bytes.
+/* TODO: unknown size table not supported, since resource size is available only
+ *       aligned to 16 bytes.
+ */
 
    if( count < 0 )
    {
@@ -430,14 +406,11 @@ PHB_ITEM hb_i18n_read_memory_table( BYTE * pData, int count )
 
    szStrLen[ 8 ]  = '\0';
    pTable         = hb_itemNew( NULL );
+
    if( count > 0 )
-   {
       hb_arrayNew( pTable, count );
-   }
    else
-   {
-      hb_arrayNew( pTable, 0 ); // we'll add them
-   }
+      hb_arrayNew( pTable, 0 ); /* we'll add them */
 
    for( i = 1; count == -1 || i <= count; i++ )
    {
@@ -452,14 +425,15 @@ PHB_ITEM hb_i18n_read_memory_table( BYTE * pData, int count )
          pData    += 8;
          nStrLen  = atoi( szStrLen );
 
-         // zero is included
-         if( nStrLen > 0 )  // sanitizing unwritten strings
+         /* zero is included */
+         if( nStrLen > 0 )  /* sanitizing unwritten strings */
          {
             char * str = ( char * ) hb_xgrab( nStrLen );
             HB_MEMCPY( str, pData, nStrLen );
             pData += nStrLen;
-            // using trailing zero as memory integrity check
-            // (zero is the last character read, so we check nStrLen-1)
+            /* using trailing zero as memory integrity check
+             * (zero is the last character read, so we check nStrLen-1)
+             */
             if( str[ nStrLen - 1 ] != 0 )
             {
                hb_xfree( str );
@@ -468,26 +442,19 @@ PHB_ITEM hb_i18n_read_memory_table( BYTE * pData, int count )
                return NULL;
             }
             else
-            {
                hb_itemPutCRaw( hb_arrayGetItemPtr( &ArrRow, j ), str, nStrLen - 1 );
-            }
          }
       }
 
-      // saves our row here
+      /* saves our row here */
       if( count > 0 )
-      {
          hb_arraySetForward( pTable, i, &ArrRow );
-      }
       else
-      {
          hb_arrayAddForward( pTable, &ArrRow );
-      }
    }
 
    return pTable;
 }
-
 
 /**
  * Saving table data to disk
@@ -505,15 +472,15 @@ BOOL hb_i18n_write_table( FHANDLE handle, PHB_ITEM pTable )
 
       for( j = 1; j <= 2; j++ )
       {
-         // including also trailing 0
+         /* including also trailing 0 */
          nStrLen = ( int ) hb_arrayGetCLen( pRow, j ) + 1;
+
          if( nStrLen == 1 )
          {
             hb_snprintf( szStrLen, sizeof( szStrLen ), "%8d", 0 );
+
             if( hb_fsWrite( handle, ( BYTE * ) szStrLen, 8 ) != 8 )
-            {
                return FALSE;
-            }
 
             continue;
          }
@@ -521,19 +488,14 @@ BOOL hb_i18n_write_table( FHANDLE handle, PHB_ITEM pTable )
          hb_snprintf( szStrLen, sizeof( szStrLen ), "%8d", nStrLen );
 
          if( hb_fsWrite( handle, ( BYTE * ) szStrLen, 8 ) != 8 )
-         {
             return FALSE;
-         }
 
          if( hb_fsWrite( handle, ( BYTE * ) hb_arrayGetCPtr( pRow, j ), ( USHORT ) nStrLen ) != nStrLen )
-         {
             return FALSE;
-         }
       }
    }
    return TRUE;
 }
-
 
 /**
  * load language is a shortcut to
@@ -551,7 +513,7 @@ BOOL hb_i18n_load_language( char * language )
    PHB_ITEM             pTable;
 
    path     = hb_i18n_build_table_filename( NULL, language );
-   handle   = hb_fsOpen( path, FO_READ ); // on error will fail on next op
+   handle   = hb_fsOpen( path, FO_READ ); /* on error will fail on next op */
    hb_xfree( path );
 
    if( handle == FS_ERROR )
@@ -562,26 +524,22 @@ BOOL hb_i18n_load_language( char * language )
       BYTE *   pRes;
 
       hRes = FindResource( NULL, language, "I18N" );
+
       if( ! hRes )
-      {
          return FALSE;
-      }
 
       hMem = LoadResource( NULL, hRes );
+
       if( ! hMem )
-      {
          return FALSE;
-      }
 
       pRes = ( BYTE * ) LockResource( hMem );
       HB_MEMCPY( &header, pRes, sizeof( header ) );
 
-      // checking signature
+      /* checking signature */
       if( strcmp( header.signature, "\3HIL" ) != 0 &&
           strcmp( header.signature, "\3HIT" ) != 0 )
-      {
          return FALSE;
-      }
 
       pTable = hb_i18n_read_memory_table( pRes + sizeof( header ), header.entries );
 
@@ -589,23 +547,24 @@ BOOL hb_i18n_load_language( char * language )
       {
          hb_strncpy( s_current_language, language, HB_I18N_CODELEN );
          hb_strncpy( s_current_language_name, header.language, HB_I18N_NAMELEN );
+
          if( s_i18n_table != NULL )
-         {
             hb_itemRelease( s_i18n_table );
-         }
+
          s_i18n_table = pTable;
          return TRUE;
       }
 #endif
       return FALSE;
    }
+
    if( hb_fsRead( handle, ( BYTE * ) &header, sizeof( header ) ) != sizeof( header ) )
    {
       hb_fsClose( handle );
       return FALSE;
    }
 
-   // checking signature
+   /* checking signature */
    if( strcmp( header.signature, "\3HIL" ) != 0 &&
        strcmp( header.signature, "\3HIT" ) != 0 )
    {
@@ -619,10 +578,10 @@ BOOL hb_i18n_load_language( char * language )
    {
       hb_strncpy( s_current_language, language, HB_I18N_CODELEN );
       hb_strncpy( s_current_language_name, header.language, HB_I18N_NAMELEN );
+
       if( s_i18n_table != NULL )
-      {
          hb_itemRelease( s_i18n_table );
-      }
+
       s_i18n_table = pTable;
       return TRUE;
    }
@@ -630,15 +589,12 @@ BOOL hb_i18n_load_language( char * language )
    return FALSE;
 }
 
-HB_EXTERN_END
-
-/***************************************
-   XHARBOUR MIDDLE LEVEL API
-
-   Theese functions are meant to be used
-   by utilities willing to build/manage
-   dictionary files.
-***************************************/
+/*
+ * XHARBOUR MIDDLE LEVEL API
+ * These functions are meant to be used
+ * by utilities willing to build/manage
+ * dictionary files.
+ */
 
 /**
  * Loads a table in an array
@@ -668,15 +624,12 @@ HB_FUNC( HB_I18NLOADTABLE )
    }
 
    if( HB_IS_STRING( pParam ) )
-   {
       handle = hb_fsOpen( pParam->item.asString.value, FO_READ );
-   }
    else
-   {
       handle = hb_itemGetNI( pParam );
-   }
 
    pHeader = hb_i18n_read_table_header( handle );
+
    if( pHeader != NULL )
    {
       pTable = hb_i18n_read_table( handle, hb_arrayGetNI( pHeader, 6 ) );
@@ -690,20 +643,15 @@ HB_FUNC( HB_I18NLOADTABLE )
          hb_itemRelease( pTable );
       }
       else
-      {
          hb_ret();
-      }
+
       hb_itemRelease( pHeader );
    }
    else
-   {
       hb_ret();
-   }
 
    if( HB_IS_STRING( pParam ) )
-   {
       hb_fsClose( handle );
-   }
 }
 
 /**
@@ -732,30 +680,30 @@ HB_FUNC( HB_I18NSORTTABLE )
       return;
    }
 
-   // Creating a table wide as the target
+   /* Creating a table wide as the target */
    ArrResult.type = HB_IT_NIL;
    hb_arrayNew( &ArrResult, hb_arrayLen( pTable ) );
-   // setting first element
+   /* setting first element */
    hb_arraySet( &ArrResult, 1, hb_arrayGetItemPtr( pTable, 1 ) );
-   //TODO: Use fixed len table and do quicksort algo.
+   /* TODO: Use fixed len table and do quicksort algo. */
 
    for( i = 2; i <= hb_arrayLen( pTable ); i++ )
    {
       pTemp = hb_arrayGetItemPtr( pTable, i );
       key   = pTemp->item.asString.value;
       pos   = 1;
+
       while( pos < i )
       {
          if( strcmp( hb_arrayGetCPtr( pTable, pos ), key ) >= 0 )
-         {
             break;
-         }
+
          pos++;
       }
+
       if( pos <= i )
-      {
          hb_arrayIns( &ArrResult, pos );
-      }
+
       hb_arraySet( &ArrResult, pos, pTemp );
    }
 
@@ -789,10 +737,9 @@ HB_FUNC( HB_I18NSAVETABLE )
 
    if( HB_IS_STRING( pParam ) )
    {
-
       handle = hb_fsCreate( pParam->item.asString.value, FC_NORMAL );
 
-      // an opening failure will cause following operations to fail
+      /* an opening failure will cause following operations to fail */
       if( handle == FS_ERROR )
       {
          hb_retl( FALSE );
@@ -800,24 +747,16 @@ HB_FUNC( HB_I18NSAVETABLE )
       }
    }
    else
-   {
       handle = hb_itemGetNL( pParam );
-   }
 
    if( hb_i18n_write_table_header( handle, pHeader ) &&
        hb_i18n_write_table( handle, pTable ) )
-   {
       hb_retl( TRUE );
-   }
    else
-   {
       hb_retl( FALSE );
-   }
 
    if( HB_IS_STRING( pParam ) )
-   {
       hb_fsClose( handle );
-   }
 }
 
 /***************************************
@@ -825,7 +764,7 @@ HB_FUNC( HB_I18NSAVETABLE )
 ***************************************/
 
 /* Translate an xharbour string if possible, or return it untraslated */
-HB_FUNC( I18N ) // we get a license over HB_ naming convention for this
+HB_FUNC( I18N ) /* we get a license over HB_ naming convention for this */
 {
    PHB_ITEM pStr = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pRet;
@@ -845,13 +784,9 @@ HB_FUNC( I18N ) // we get a license over HB_ naming convention for this
    }
 
    if( ( pRet = hb_i18n_scan_table( pStr, s_i18n_table, &ulIndex ) )->type == HB_IT_NIL )
-   {
       hb_itemReturn( pStr );
-   }
    else
-   {
       hb_itemReturn( pRet );
-   }
 }
 
 /* Sets default directory */
@@ -906,9 +841,7 @@ HB_FUNC( HB_I18NSETLANGUAGE )
       hb_retl( TRUE );
    }
    else
-   {
       hb_retl( hb_i18n_load_language( language ) );
-   }
 }
 
 HB_FUNC( HB_I18NGETLANGUAGE )
@@ -942,15 +875,11 @@ HB_FUNC( HB_I18NSETBASELANGUAGE )
    BOOL           bChange  = FALSE;
 
    if( szCode == NULL || szName == NULL )
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameter format", NULL,
                             2, hb_paramError( 1 ), hb_paramError( 2 ) );
-   }
 
    if( strcmp( s_base_language, s_current_language ) == 0 )
-   {
       bChange = TRUE;
-   }
 
    hb_strncpy( s_base_language, szCode, HB_I18N_CODELEN );
    hb_strncpy( s_base_language_name, szName, HB_I18N_NAMELEN );
@@ -981,10 +910,8 @@ HB_FUNC( HB_HFIND )
    ULONG    ulIndex  = 0;
 
    if( pHash == NULL || pKey == NULL )
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameter format", NULL,
                             2, hb_paramError( 1 ), hb_paramError( 2 ) );
-   }
 
    pRet = hb_i18n_scan_table( pKey, pHash, &ulIndex );
 
@@ -994,7 +921,7 @@ HB_FUNC( HB_HFIND )
       hb_itemPutNL( pIndex, ulIndex );
    }
 
-   // The key scan returns the same pKey if not found
+   /* The key scan returns the same pKey if not found */
    if( pRet != pKey )
       hb_itemReturn( pRet );
    else

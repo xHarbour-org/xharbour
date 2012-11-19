@@ -146,10 +146,9 @@ static HB_ISIZ hb_arraySortQuickPartition( PHB_ITEM pItems, HB_ISIZ lb, HB_ISIZ 
 
    /* select pivot and exchange with 1st element */
    p = lb + ( ( ub - lb ) >> 1 );
+
    if( p != lb )
-   {
       hb_itemSwap( pItems + lb, pItems + p );
-   }
 
    /* sort lb+1..ub based on pivot */
    i  = lb + 1;
@@ -158,19 +157,13 @@ static HB_ISIZ hb_arraySortQuickPartition( PHB_ITEM pItems, HB_ISIZ lb, HB_ISIZ 
    while( TRUE )
    {
       while( i < j && hb_itemIsLess( pItems + i, pItems + lb, pBlock ) )
-      {
          i++;
-      }
 
       while( j >= i && hb_itemIsLess( pItems + lb, pItems + j, pBlock ) )
-      {
          j--;
-      }
 
       if( i >= j )
-      {
          break;
-      }
 
       /* Swap the items */
       hb_itemSwap( pItems + i, pItems + j );
@@ -180,9 +173,7 @@ static HB_ISIZ hb_arraySortQuickPartition( PHB_ITEM pItems, HB_ISIZ lb, HB_ISIZ 
 
    /* pivot belongs in pItems[j] */
    if( j > lb )
-   {
       hb_itemSwap( pItems + lb, pItems + j );
-   }
 
    return j;
 }
@@ -214,7 +205,8 @@ BOOL hb_arraySort( PHB_ITEM pArray, HB_SIZE * pulStart, HB_SIZE * pulCount, PHB_
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_arraySort(%p, %p, %p, %p)", pArray, pulStart, pulCount, pBlock ) );
 
-   //TraceLog( NULL, "*** Sorting: %p ***\n", pArray );
+   /* TraceLog( NULL, "*** Sorting: %p ***\n", pArray );
+    */
 
    if( HB_IS_ARRAY( pArray ) )
    {
@@ -225,45 +217,31 @@ BOOL hb_arraySort( PHB_ITEM pArray, HB_SIZE * pulStart, HB_SIZE * pulCount, PHB_
       HB_SIZE        ulEnd;
 
       if( pulStart && ( *pulStart >= 1 ) )
-      {
          ulStart = *pulStart;
-      }
       else
-      {
          ulStart = 1;
-      }
 
       if( ulStart <= ulLen )
       {
          if( pulCount && *pulCount >= 1 && ( *pulCount <= ulLen - ulStart ) )
-         {
             ulCount = *pulCount;
-         }
          else
-         {
             ulCount = ulLen - ulStart + 1;
-         }
 
          if( ulStart + ulCount > ulLen )             /* check range */
-         {
             ulCount = ulLen - ulStart + 1;
-         }
 
          ulEnd = ulCount + ulStart - 2;
 
          /* Optimize when only one or no element is to be sorted */
          if( ulCount > 1 )
-         {
             hb_arraySortQuick( pBaseArray->pItems, ulStart - 1, ulEnd, pBlock );
-         }
       }
 
       return TRUE;
    }
    else
-   {
       return FALSE;
-   }
 }
 
 HB_FUNC( ASORT )

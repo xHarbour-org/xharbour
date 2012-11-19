@@ -68,7 +68,8 @@ HB_FUNC( __QUIT )
 
    if( ( HB_VM_STACK.uiVMFlags & HB_SUSPEND_QUIT ) == 0 )
    {
-      // Fake a new frame so that __QUIT frame will remain on stack - Clipper compatability ProcName(1).
+      /* Fake a new frame so that __QUIT frame will remain on stack - Clipper compatability ProcName(1).
+       */
       hb_vmPushSymbol( &hb_symEval );
       hb_vmPushNil();
       hb_stackNewFrame( &sStackState, 0 );

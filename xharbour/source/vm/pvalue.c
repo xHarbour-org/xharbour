@@ -68,25 +68,17 @@ HB_FUNC( PVALUE )
       PHB_ITEM pItem;
 
       if( ( *pBase )->item.asSymbol.pCargo->params == HB_VAR_PARAM_FLAG )
-      {
          uiOffset = ( *pBase )->item.asSymbol.pCargo->locals;
-      }
       else
-      {
          uiOffset = 0;
-      }
 
       pItem = *( pBase + 1 + uiParam + uiOffset );
 
       hb_itemReturn( pItem );
 
       if( hb_pcount() > 1 && HB_IS_BYREF( pItem ) )
-      {
          hb_itemCopy( pItem, hb_param( 2, HB_IT_ANY ) );
-      }
    }
    else
-   {
       hb_ret();    /* return NIL */
-   }
 }

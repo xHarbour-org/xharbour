@@ -58,7 +58,7 @@
 #include "hbapiitm.h"
 #include "hbstack.h"
 
-//JC1: the search of an intem could depend on the current thread stack
+/* JC1: the search of an intem could depend on the current thread stack */
 #ifndef HB_THREAD_SUPPORT
 
 static PDYNHB_ITEM   s_pDynItems    = NULL;  /* Pointer to dynamic items */
@@ -75,7 +75,8 @@ static UINT s_uiClosestDynSym = 0;
 
 /* JC1: temporarily turned off, relaying on the old system now
    #define s_pDynItems        HB_VM_STACK.pDynItems
- #define s_uiDynSymbols     HB_VM_STACK.uiDynSymbols*/
+   #define s_uiDynSymbols     HB_VM_STACK.uiDynSymbols
+ */
 
 static PDYNHB_ITEM   s_pDynItems    = NULL;  /* Pointer to dynamic items */
 static UINT          s_uiDynSymbols = 0;     /* Number of symbols present */
@@ -94,7 +95,7 @@ static PHB_SYM_HOLDER s_pAllocSyms = NULL;
 
 void hb_dynsymLog( void )
 {
-   // HB_THREAD_STUB
+   /* HB_THREAD_STUB */
    register UINT uiPos;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_dynsymLog()" ) );
@@ -102,9 +103,7 @@ void hb_dynsymLog( void )
    hb_dynsymLock();
 
    for( uiPos = 0; uiPos < s_uiDynSymbols; uiPos++ )   /* For all dynamic symbols */
-   {
       printf( "%i %s\n", uiPos + 1, s_pDynItems[ uiPos ].pDynSym->pSymbol->szName );
-   }
 
    hb_dynsymUnlock();
 }
@@ -147,18 +146,17 @@ PHB_DYNS hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    /* creates
 
       if( ( pSymbol->scope.value & HB_FS_LOCAL ) == HB_FS_LOCAL )
       {
-         #if 0
+#if 0
          assert( pModuleSymbols );
 
          if( pDynSym->pModuleSymbols )
-         {
             TraceLog( NULL, "Symbol: '%s' was previously defined at Module: '%s'\n", pSymbol->szName, pDynSym->pModuleSymbols->szModuleName );
-         }
-         #endif
+#endif
 
-         //if( pSymbol->value.pFunPtr && pDynSym->pSymbol->value.pFunPtr == NULL )
+         /* if( pSymbol->value.pFunPtr && pDynSym->pSymbol->value.pFunPtr == NULL )
+          */
          {
-            #if 0
+#if 0
             /* reenabled - it's still wrong, Druzus */
             /* see note below */
             /* register only non static functions */
@@ -168,16 +166,18 @@ PHB_DYNS hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    /* creates
                TraceLog( NULL, "Rejecting: %s in %s\n", pSymbol->szName, pModuleSymbols ? pModuleSymbols->szModuleName : "" );
             }
             else
-            #endif
+#endif
             {
-               // This is the symbol of the function definition module.
+               /* This is the symbol of the function definition module.
+                */
                assert( pSymbol->value.pFunPtr );
                pDynSym->pSymbol = pSymbol;
             }
          }
 
          pDynSym->pModuleSymbols = pModuleSymbols;
-         //TraceLog( NULL, "Symbol: '%s' DEFINED in Module: '%s'\n", pSymbol->szName, pModuleSymbols ? pModuleSymbols->szModuleName : "" );
+         /* TraceLog( NULL, "Symbol: '%s' DEFINED in Module: '%s'\n", pSymbol->szName, pModuleSymbols ? pModuleSymbols->szModuleName : "" );
+          */
       }
 
       pSymbol->pDynSym = pDynSym;    /* place a pointer to DynSym */
@@ -210,7 +210,7 @@ PHB_DYNS hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    /* creates
       s_pDynItems[ s_uiClosestDynSym ].pDynSym  = pDynSym;   /* Enter DynSym */
    }
 
-   s_uiDynSymbols++;                   /* Got one more symbol */
+   s_uiDynSymbols++;             /* Got one more symbol */
 
    pDynSym->hMemvar     = 0;
    pDynSym->hArea       = 0;
@@ -244,15 +244,18 @@ PHB_DYNS hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    /* creates
    }
 #endif
 
-   //TraceLog( NULL, "Symbol: '%s' IMPORTED in Module: '%s'\n", pSymbol->szName, pModuleSymbols ? pModuleSymbols->szModuleName : "" );
+   /* TraceLog( NULL, "Symbol: '%s' IMPORTED in Module: '%s'\n", pSymbol->szName, pModuleSymbols ? pModuleSymbols->szModuleName : "" );
+    */
 
    if( ( pSymbol->scope.value & HB_FS_LOCAL ) == HB_FS_LOCAL )
    {
-      // This is the true local symbol
+      /* This is the true local symbol
+       */
       assert( pSymbol->value.pFunPtr );
       assert( pModuleSymbols );
       pDynSym->pModuleSymbols = pModuleSymbols;
-      //TraceLog( NULL, "Symbol: '%s' DEFINED in Module: '%s'\n", pSymbol->szName, pModuleSymbols ? pModuleSymbols->szModuleName : "" );
+      /* TraceLog( NULL, "Symbol: '%s' DEFINED in Module: '%s'\n", pSymbol->szName, pModuleSymbols ? pModuleSymbols->szModuleName : "" );
+       */
    }
    else
    {
@@ -300,15 +303,16 @@ PHB_DYNS hb_dynsymGet( const char * szName )  /* finds and creates a symbol if n
       of them may find ! pDynSym, and both of them may proceed to hb_dynsymNew().
       Although this operation would suceed, one of the threas would get an
       invalid reference, and we would have a memory leak, as one of the
-      two dynsymNew() would be overriden */
+      two dynsymNew() would be overriden
+    */
    hb_dynsymLock();
 
    pDynSym = hb_dynsymFind( ( char * ) szUprName );
 
    if( ! pDynSym )       /* Does it exists ? */
    {
-      //TraceLog( NULL, "*** Did NOT find >%s< - CREATED New!\n", szUprName );
-
+      /* TraceLog( NULL, "*** Did NOT find >%s< - CREATED New!\n", szUprName );
+       */
       pDynSym                       = hb_dynsymNew( hb_symbolNew( ( char * ) szUprName ), HB_GETMODULESYM() ); /* Make new symbol */
       pDynSym->pSymbol->scope.value = HB_FS_PUBLIC;
    }
@@ -325,7 +329,8 @@ PHB_DYNS hb_dynsymGetCase( const char * szName )  /* finds and creates a symbol 
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_dynsymGetCase(%s)", szName ) );
 
-   //TraceLog( NULL, "Searching: %s\n", szName );
+   /* TraceLog( NULL, "Searching: %s\n", szName );
+    */
 
    /* JC1: read the notice for hb_dynsymGet() */
    hb_dynsymLock();
@@ -334,14 +339,16 @@ PHB_DYNS hb_dynsymGetCase( const char * szName )  /* finds and creates a symbol 
 
    if( ! pDynSym )       /* Does it exists ? */
    {
-      //TraceLog( NULL, "Creating: %s\n", szName );
+      /* TraceLog( NULL, "Creating: %s\n", szName );
+       */
       pDynSym                       = hb_dynsymNew( hb_symbolNew( szName ), HB_GETMODULESYM() ); /* Make new symbol */
       pDynSym->pSymbol->scope.value = HB_FS_PUBLIC;
    }
 
    hb_dynsymUnlock();
 
-   //TraceLog( NULL, "Returning: %p\n", pDynSym );
+   /* TraceLog( NULL, "Returning: %p\n", pDynSym );
+    */
 
    return pDynSym;
 }
@@ -353,7 +360,8 @@ PHB_DYNS hb_dynsymGetCaseWithNamespaces( const char * szName, const char * pName
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_dynsymGetCase(%s)", szName ) );
 
-   //TraceLog( NULL, "Searching: %s\n", szName );
+   /* TraceLog( NULL, "Searching: %s\n", szName );
+    */
 
    /* JC1: read the notice for hb_dynsymGet() */
    hb_dynsymLock();
@@ -362,14 +370,16 @@ PHB_DYNS hb_dynsymGetCaseWithNamespaces( const char * szName, const char * pName
 
    if( ! pDynSym )       /* Does it exists ? */
    {
-      //TraceLog( NULL, "Creating: %s\n", szName );
+      /* TraceLog( NULL, "Creating: %s\n", szName );
+       */
       pDynSym                       = hb_dynsymNew( hb_symbolNew( szName ), HB_GETMODULESYM() ); /* Make new symbol */
       pDynSym->pSymbol->scope.value = HB_FS_PUBLIC;
    }
 
    hb_dynsymUnlock();
 
-   //TraceLog( NULL, "Returning: %p\n", pDynSym );
+   /* TraceLog( NULL, "Returning: %p\n", pDynSym );
+    */
 
    return pDynSym;
 }
@@ -381,7 +391,8 @@ PHB_DYNS hb_dynsymGetWithNamespaces( const char * szName, const char * pNamespac
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_dynsymGetCase(%s)", szName ) );
 
-   //TraceLog( NULL, "Searching: %s\n", szName );
+   /* TraceLog( NULL, "Searching: %s\n", szName );
+    */
 
    /* JC1: read the notice for hb_dynsymGet() */
    hb_dynsymLock();
@@ -390,14 +401,16 @@ PHB_DYNS hb_dynsymGetWithNamespaces( const char * szName, const char * pNamespac
 
    if( ! pDynSym )       /* Does it exists ? */
    {
-      //TraceLog( NULL, "Creating: %s\n", szName );
+      /* TraceLog( NULL, "Creating: %s\n", szName );
+       */
       pDynSym                       = hb_dynsymNew( hb_symbolNew( szName ), HB_GETMODULESYM() ); /* Make new symbol */
       pDynSym->pSymbol->scope.value = HB_FS_PUBLIC;
    }
 
    hb_dynsymUnlock();
 
-   //TraceLog( NULL, "Returning: %p\n", pDynSym );
+   /* TraceLog( NULL, "Returning: %p\n", pDynSym );
+    */
 
    return pDynSym;
 }
@@ -500,7 +513,7 @@ PHB_DYNS hb_dynsymFind( const char * szName )
       }
    }
 
-   #ifdef HB_SYMLIMIT_10_WORKAROUND
+#ifdef HB_SYMLIMIT_10_WORKAROUND
 
    /*
     *  (c) 2002, Marcelo Lombardo <lombardo@uol.com.br>
@@ -545,9 +558,7 @@ PHB_DYNS hb_dynsymFind( const char * szName )
             }
          }
          else if( iLen1 == iLen2 )
-         {
             bOk = 0;
-         }
 
          if( bOk )
          {
@@ -688,7 +699,7 @@ PHB_DYNS hb_dynsymFind( const char * szName )
       }
    }
 
-   #endif
+#endif
 
    hb_dynsymUnlock();
 
@@ -711,9 +722,7 @@ PHB_DYNS hb_dynsymFindWithNamespaces( const char * szName, const char * pNamespa
          hb_xfree( szQualified );
 
          if( pDynSym )
-         {
             return pDynSym;
-         }
 
          szNamespace += strlen( szNamespace ) + 1;
       }
@@ -721,10 +730,7 @@ PHB_DYNS hb_dynsymFindWithNamespaces( const char * szName, const char * pNamespa
       return NULL;
    }
    else
-   {
       return hb_dynsymFind( szName );
-   }
-
 }
 
 PHB_DYNS hb_dynsymFindNameWithNamespaces( const char * szName, const char * pNamespaces )
@@ -762,9 +768,7 @@ PHB_DYNS hb_dynsymFindNameWithNamespaces( const char * szName, const char * pNam
          hb_xfree( szQualified );
 
          if( pDynSym )
-         {
             return pDynSym;
-         }
 
          szNamespace += strlen( szNamespace ) + 1;
       }
@@ -772,10 +776,7 @@ PHB_DYNS hb_dynsymFindNameWithNamespaces( const char * szName, const char * pNam
       return NULL;
    }
    else
-   {
       return hb_dynsymFindName( szName );
-   }
-
 }
 
 PHB_SYMB hb_dynsymGetSymbol( const char * szName )
@@ -792,10 +793,9 @@ PHB_SYMB hb_dynsymFindSymbol( const char * szName )
    HB_TRACE( HB_TR_DEBUG, ( "hb_dynsymFindSymbol(%s)", szName ) );
 
    pDynSym = hb_dynsymFind( szName );
+
    if( pDynSym->pSymbol )
-   {
       return pDynSym->pSymbol;
-   }
 
    return NULL;
 }
@@ -852,9 +852,7 @@ UINT hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo )
    hb_dynsymLock();
 
    for( uiPos = 0; uiPos < s_uiDynSymbols && bCont; uiPos++ )
-   {
       bCont = ( pFunction ) ( s_pDynItems[ uiPos ].pDynSym, Cargo );
-   }
 
    hb_dynsymUnlock();
 
@@ -870,10 +868,10 @@ void hb_dynsymRelease( void )
    HB_TRACE( HB_TR_DEBUG, ( "hb_dynsymRelease()" ) );
 
    for( uiPos = 0; uiPos < s_uiDynSymbols; uiPos++ )
-   {
       hb_xfree( ( s_pDynItems + uiPos )->pDynSym );
-   }
+
    hb_xfree( s_pDynItems );
+
    s_pDynItems    = NULL;
    s_uiDynSymbols = 0;
 
@@ -885,8 +883,8 @@ void hb_dynsymRelease( void )
    }
 }
 
-
-// NOT TESTED YET!!!
+/* NOT TESTED YET!!!
+ */
 PHB_DYNS hb_dynsymPos( USHORT uiPos )
 {
    PHB_DYNS ret = NULL;
@@ -894,9 +892,7 @@ PHB_DYNS hb_dynsymPos( USHORT uiPos )
    hb_dynsymLock();
 
    if( ( UINT ) uiPos < s_uiDynSymbols )
-   {
       ret = s_pDynItems[ uiPos ].pDynSym;
-   }
 
    hb_dynsymUnlock();
 
@@ -968,13 +964,9 @@ HB_FUNC( __DYNSISFUN ) /* returns .t. if a symbol has a function/procedure point
    hb_dynsymLock();
 
    if( lIndex >= 1 && lIndex <= ( LONG ) s_uiDynSymbols )
-   {
       hb_retl( hb_dynsymIsFunction( s_pDynItems[ lIndex - 1 ].pDynSym ) );
-   }
    else
-   {
       hb_retl( FALSE );
-   }
 
    hb_dynsymUnlock();
 }
@@ -1034,7 +1026,6 @@ PHB_DYNS hb_dynsymNew_r( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols, PHB_DYNS pDe
 
    return NULL;
 }
-
 
 PHB_DYNS hb_dynsymGet_r( const char * szName, PHB_DYNS pDest )
 {
@@ -1116,4 +1107,4 @@ PHB_DYNS hb_dynsymFindName_r( const char * szName, PHB_DYNS pDest )
    return NULL;
 }
 
-#endif //HB_THREAD_SUPPORT
+#endif /* HB_THREAD_SUPPORT */

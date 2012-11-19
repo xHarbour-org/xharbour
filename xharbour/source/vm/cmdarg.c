@@ -52,9 +52,6 @@
 
 #define HB_OS_WIN_USED
 
-#if 0
-#include "hbvmopt.h"
-#endif
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbinit.h"
@@ -77,8 +74,8 @@ BOOL     s_WinMainParam    = FALSE;
 
 #if defined( HB_VM_ALL )
    #if defined( _MSC_VER ) || defined( __DMC__ )
-extern HB_EXPORT void hb_winmainArgInit( HANDLE hInstance, HANDLE hPrevInstance, int iCmdShow );
-extern HB_EXPORT BOOL hb_winmainArgGet( HANDLE * phInstance, HANDLE * phPrevInstance, int * piCmdShow );
+      extern HB_EXPORT void hb_winmainArgInit( HANDLE hInstance, HANDLE hPrevInstance, int iCmdShow );
+      extern HB_EXPORT BOOL hb_winmainArgGet( HANDLE * phInstance, HANDLE * phPrevInstance, int * piCmdShow );
    #endif
 #endif
 
@@ -172,9 +169,7 @@ static char * hb_cmdargGet( const char * pszName, BOOL bRetValue )
    if( ! pszEnvVar || pszEnvVar[ 0 ] == '\0' )
    {
       if( pszEnvVar )
-      {
          hb_xfree( ( void * ) pszEnvVar );
-      }
 
       pszEnvVar = hb_getenv( "CLIPPER" );
    }
@@ -227,7 +222,6 @@ static char * hb_cmdargGet( const char * pszName, BOOL bRetValue )
                   pszPos++;
 
                ulLen                = pszEnd - pszPos;
-
                pszEnvVar            = ( char * ) hb_xgrab( ulLen + 1 );
                hb_strncpy( pszEnvVar, pszPos, ulLen );
                pszEnvVar[ ulLen ]   = '\0';
@@ -266,6 +260,7 @@ int hb_cmdargNum( const char * pszName )
    HB_TRACE( HB_TR_DEBUG, ( "hb_cmdargNum(%s)", pszName ) );
 
    pszValue = hb_cmdargGet( pszName, TRUE );
+
    if( pszValue )
    {
       int iValue = atoi( pszValue );
@@ -334,7 +329,6 @@ void hb_cmdargProcessVM( void )
 
    if( hb_cmdargCheck( "INFO" ) )
    {
-
       {
          char * pszVersion = hb_verHarbour();
          hb_conOutErr( pszVersion, 0 );
@@ -390,10 +384,10 @@ void hb_cmdargProcessVM( void )
 
    if( iHandles > 20 )
    {
-      #if defined( HB_OS_DOS ) && defined( __WATCOMC__ )
+#if defined( HB_OS_DOS ) && defined( __WATCOMC__ )
       _grow_handles( iHandles );
 
-      #elif defined( HB_OS_OS2 ) //&& defined(__INNOTEK_LIBC__)
+#elif defined( HB_OS_OS2 ) //&& defined(__INNOTEK_LIBC__)
       /* 28/04/2004 - <maurilio.longo@libero.it>
          A standard OS/2 program has 20 file handles available upon startup. If xHarbour is compiled with
          Innotek GCC we need to increase this number while using EMX/GCC this numeber is increased by EMX
@@ -404,7 +398,7 @@ void hb_cmdargProcessVM( void )
          to support //F: clipper envar switch
        */
       DosSetMaxFH( ( ULONG ) iHandles );
-      #endif
+#endif
    }
 
    hb_traceInit();
@@ -464,32 +458,8 @@ const char * hb_verFlagsPRG( void )
 #endif
 }
 
-
 HB_FUNC( HB_CMDARGARGV )
 {
    hb_retc( hb_cmdargARGV()[ 0 ] );
 }
 
-#if 0
-#define __PRG_SOURCE__     __FILE__
-
-HB_FUNC_EXTERN( HB_VMMODE );
-HB_FUNC_EXTERN( HB_MULTITHREAD );
-
-#undef HB_PRG_PCODE_VER
-#define HB_PRG_PCODE_VER   HB_PCODE_VER
-
-HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_CMDARG )
-{
-   "HB_VMMODE", { HB_FS_PUBLIC }, { HB_FUNCNAME( HB_VMMODE ) }, NULL
-},
-{ "HB_MULTITHREAD", { HB_FS_PUBLIC }, { HB_FUNCNAME( HB_MULTITHREAD ) }, NULL }
-HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_CMDARG )
-
-#if defined( HB_PRAGMA_STARTUP )
-   #pragma startup hb_vm_SymbolInit_CMDARG
-#elif defined( HB_DATASEG_STARTUP )
-   #define HB_DATASEG_BODY HB_DATASEG_FUNC( hb_vm_SymbolInit_CMDARG )
-   #include "hbiniseg.h"
-#endif
-#endif

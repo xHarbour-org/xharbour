@@ -84,10 +84,9 @@ HB_FUNC( DO )
          hb_vmPushNil();
 
          uiPCount = ( USHORT ) hb_pcount();
+
          for( uiParam = 2; uiParam <= uiPCount; uiParam++ )
-         {
             hb_vmPush( hb_stackItemFromBase( uiParam ) );
-         }
 
          hb_vmDo( uiPCount - 1 );
       }
@@ -103,8 +102,10 @@ HB_FUNC( DO )
 
       hb_vmPushSymbol( &hb_symEval );
       hb_vmPush( pItem );
+
       for( uiParam = 2; uiParam <= uiPCount; uiParam++ )
          hb_vmPush( hb_stackItemFromBase( uiParam ) );
+
       hb_vmSend( uiPCount - 1 );
    }
    else if( HB_IS_SYMBOL( pItem ) )
@@ -116,9 +117,7 @@ HB_FUNC( DO )
       hb_vmPushNil();
 
       for( uiParam = 2; uiParam <= uiPCount; uiParam++ )
-      {
          hb_vmPush( hb_stackItemFromBase( uiParam ) );
-      }
 
       hb_vmDo( uiPCount - 1 );
    }

@@ -145,13 +145,10 @@ PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
          const char * ptr = pEvalInfo->pItems[ 0 ]->item.asString.value;
 
          hb_vmPushSymbol( hb_dynsymFindName( ptr )->pSymbol );
-
          hb_vmPushNil();
 
          while( uiParam <= pEvalInfo->paramCount )
-         {
             hb_vmPush( pEvalInfo->pItems[ uiParam++ ] );
-         }
 
          hb_vmDo( pEvalInfo->paramCount );
 
@@ -164,9 +161,7 @@ PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
          hb_vmPush( pEvalInfo->pItems[ 0 ] );
 
          while( uiParam <= pEvalInfo->paramCount )
-         {
             hb_vmPush( pEvalInfo->pItems[ uiParam++ ] );
-         }
 
          hb_vmSend( pEvalInfo->paramCount );
 
@@ -179,8 +174,9 @@ PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
 }
 
 /* NOTE: CA-Clipper NG states that hb_evalLaunch() must be called at least
-         once and only once before calling hb_evalRelease(). Harbour doesn't
-         have these requirements. [vszakats] */
+ *       once and only once before calling hb_evalRelease(). Harbour doesn't
+ *       have these requirements. [vszakats]
+ */
 
 BOOL hb_evalRelease( PEVALINFO pEvalInfo )
 {
@@ -206,10 +202,10 @@ BOOL hb_evalRelease( PEVALINFO pEvalInfo )
 }
 
 /* NOTE: Same purpose as hb_evalLaunch(), but simpler, faster and more flexible.
-         It can be used to call symbols, functions names, or blocks, the items
-         don't need to be duplicated when passed as argument, one line is
-         enough to initiate a call, the number of parameters is not limited.
-         [vszakats]
+ *       It can be used to call symbols, functions names, or blocks, the items
+ *       don't need to be duplicated when passed as argument, one line is
+ *       enough to initiate a call, the number of parameters is not limited.
+ *       [vszakats]
  */
 
 PHB_ITEM hb_itemDo( PHB_ITEM pItem, HB_SIZE ulPCount, ... )
@@ -229,18 +225,12 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, HB_SIZE ulPCount, ... )
          PHB_DYNS pDynSym = hb_dynsymFindName( pItem->item.asString.value );
 
          if( pDynSym )
-         {
             pSymbol = pDynSym->pSymbol;
-         }
       }
       else if( HB_IS_POINTER( pItem ) )
-      {
          pSymbol = ( PHB_SYMB ) pItem->item.asPointer.value;
-      }
       else if( HB_IS_SYMBOL( pItem ) )
-      {
          pSymbol = pItem->item.asSymbol.value;
-      }
 
       if( pSymbol )
       {
@@ -256,9 +246,7 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, HB_SIZE ulPCount, ... )
 
             va_start( va, ulPCount );
             for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
-            {
                hb_vmPush( va_arg( va, PHB_ITEM ) );
-            }
             va_end( va );
          }
 
@@ -283,9 +271,7 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, HB_SIZE ulPCount, ... )
 
             va_start( va, ulPCount );
             for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
-            {
                hb_vmPush( va_arg( va, PHB_ITEM ) );
-            }
             va_end( va );
          }
 
@@ -342,9 +328,7 @@ PHB_ITEM hb_itemDoC( const char * szFunc, HB_SIZE ulPCount, ... )
 
             va_start( va, ulPCount );
             for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
-            {
                hb_vmPush( va_arg( va, PHB_ITEM ) );
-            }
             va_end( va );
          }
 
@@ -406,10 +390,11 @@ PHB_ITEM hb_itemDoCRef( char * szFunc, HB_SIZE ulRefMask, HB_SIZE ulPCount, ... 
                if( ulRefMask & ( 1L << ulParam ) )
                {
                   /* when item is passed by reference then we have to put
-                     the reference on the stack instead of the item itself */
+                   * the reference on the stack instead of the item itself
+                   */
                   pItemRefBuf[ ulRef++ ]     = pParam;
                   itmRef.item.asRefer.value  = ( LONG ) ulRef;
-//                hb_vmPush( &itmRef );
+                  /* hb_vmPush( &itmRef ); */
                   pParam                     = &itmRef;
                }
                hb_vmPush( pParam );
@@ -520,13 +505,9 @@ HB_FUNC( HB_EXECFROMARRAY )
       pString  = hb_param( 2, HB_IT_ANY );
 
       if( pString->type == HB_IT_STRING )
-      {
          pExecSym = hb_dynsymFindName( pString->item.asString.value );
-      }
       else if( pString->type == HB_IT_POINTER )
-      {
          pSymbol = ( PHB_SYMB ) hb_itemGetPtr( pString );
-      }
    }
    else if( HB_IS_OBJECT( pFirst ) && uiPcount == 3 ) /* hb_ExecFromArray( oObject, cMessage | pMessage, { params,... } )  */
    {
@@ -534,29 +515,21 @@ HB_FUNC( HB_EXECFROMARRAY )
       pString  = hb_param( 2, HB_IT_ANY );
 
       if( pString->type == HB_IT_STRING )
-      {
          pExecSym = hb_dynsymGet( pString->item.asString.value );
-      }
       else if( pString->type == HB_IT_POINTER )
-      {
          pSymbol = ( PHB_SYMB ) hb_itemGetPtr( pString );
-      }
 
       pArgs = hb_param( 3, HB_IT_ARRAY );
    }
    else if( pFirst->type == HB_IT_STRING && uiPcount == 1 ) /* hb_ExecFromArray( cFunc )  */
-   {
       pExecSym = hb_dynsymFindName( pFirst->item.asString.value );
-   }
    else if( pFirst->type == HB_IT_STRING && uiPcount == 2 ) /* hb_ExecFromArray( cFunc, { params,... } )  */
    {
       pExecSym = hb_dynsymFindName( pFirst->item.asString.value );
       pArgs    = hb_param( 2, HB_IT_ARRAY );
    }
    else if( pFirst->type == HB_IT_POINTER && uiPcount == 1 )  /* hb_ExecFromArray( pFunc )  */
-   {
       pSymbol = ( PHB_SYMB ) hb_itemGetPtr( pFirst );
-   }
    else if( pFirst->type == HB_IT_POINTER && uiPcount == 2 )  /* hb_ExecFromArray( pFunc, { params,... } )  */
    {
       pSymbol  = ( PHB_SYMB ) hb_itemGetPtr( pFirst );
@@ -584,13 +557,9 @@ HB_FUNC( HB_EXECFROMARRAY )
          pString  = hb_arrayGetItemPtr( pFirst, 2 );
 
          if( pString->type == HB_IT_STRING )
-         {
             pExecSym = hb_dynsymFindName( pString->item.asString.value );
-         }
          else if( pString->type == HB_IT_POINTER )
-         {
             pSymbol = ( PHB_SYMB ) hb_itemGetPtr( pString );
-         }
 
          ulStart = 3;
       }
@@ -613,9 +582,7 @@ HB_FUNC( HB_EXECFROMARRAY )
    }
 
    if( pExecSym )
-   {
       pSymbol = pExecSym->pSymbol;
-   }
 
    if( pSymbol == NULL )
    {
@@ -626,35 +593,23 @@ HB_FUNC( HB_EXECFROMARRAY )
    hb_vmPushSymbol( pSymbol );
 
    if( pSelf )
-   {
       hb_vmPush( pSelf );
-   }
    else
-   {
       hb_vmPushNil();
-   }
 
    if( pArgs )
-   {
       ulLen = hb_arrayLen( pArgs );
-   }
 
-   // pushing the contents of the array
+   /* pushing the contents of the array
+    */
    for( i = ulStart; i <= ulLen; i++ )
-   {
       hb_vmPush( hb_arrayGetItemPtr( pArgs, i ) );
-   }
 
    if( pSelf )
-   {
       hb_vmSend( ( USHORT ) ( ulLen - ulStart + 1 ) );
-   }
    else
-   {
       hb_vmDo( ( USHORT ) ( ulLen - ulStart + 1 ) );
-   }
 }
-
 
 /* JC1: To reduce OH of using the HB_FUN_ version of hb_execFromArray()
    as just a wrapper, here is a "reduced" version of hb_execFromArray
@@ -678,9 +633,7 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
    PHB_SYMB       pSymbol  = NULL;
 
    if( pFirst == NULL || pFirst->type != HB_IT_ARRAY )
-   {
       return FALSE;
-   }
 
    pString  = hb_arrayGetItemPtr( pFirst, 1 );
    pArgs    = pFirst;
@@ -691,13 +644,9 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
       pString  = hb_arrayGetItemPtr( pFirst, 2 );
 
       if( pString->type == HB_IT_STRING )
-      {
          pExecSym = hb_dynsymFindName( pString->item.asString.value );
-      }
       else if( pString->type == HB_IT_POINTER )
-      {
          pSymbol = ( PHB_SYMB ) hb_itemGetPtr( pString );
-      }
 
       ulStart = 3;
    }
@@ -718,42 +667,29 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
    }
 
    if( pExecSym )
-   {
       pSymbol = pExecSym->pSymbol;
-   }
 
    if( pSymbol == NULL )
-   {
       return FALSE;
-   }
 
    hb_vmPushSymbol( pSymbol );
 
    if( pSelf )
-   {
       hb_vmPush( pSelf );
-   }
    else
-   {
       hb_vmPushNil();
-   }
 
    ulLen = hb_arrayLen( pArgs );
 
-   // pushing the contents of the array
+   /* pushing the contents of the array
+    */
    for( i = ulStart; i <= ulLen; i++ )
-   {
       hb_vmPush( hb_arrayGetItemPtr( pArgs, i ) );
-   }
 
    if( pSelf )
-   {
       hb_vmSend( ( USHORT ) ( ulLen - ulStart + 1 ) );
-   }
    else
-   {
       hb_vmDo( ( USHORT ) ( ulLen - ulStart + 1 ) );
-   }
 
    return TRUE;
 }
@@ -780,16 +716,12 @@ HB_FUNC( HB_EXEC )
          if( iParams >= 1 )
          {
             if( hb_param( 2, HB_IT_ANY )->type )
-            {
                bSend = TRUE;
-            }
 
             iParams--;
          }
          else
-         {
             hb_vmPushNil();
-         }
       }
       else
       {
@@ -797,22 +729,20 @@ HB_FUNC( HB_EXEC )
          return;
       }
 
-      //printf( "Sym: '%s' Params: %i\n", pSymbol->szName, iParams );
+      /* printf( "Sym: '%s' Params: %i\n", pSymbol->szName, iParams );
+       */
 
-      // Changing the Pointer item to a Symbol Item, so that we don't have to re-push paramters.
+      /* Changing the Pointer item to a Symbol Item, so that we don't have to re-push paramters.
+       */
       hb_itemPutSymbol( pPointer, pSymbol );
       HB_MEMCPY( pPointer->item.asSymbol.pCargo, hb_stackBaseItem()->item.asSymbol.pCargo, sizeof( HB_SYMBCARGO ) );
       pPointer->item.asSymbol.pCargo->stackbase    = ( long ) ( HB_VM_STACK.pBase - HB_VM_STACK.pItems );
       pPointer->item.asSymbol.pCargo->uiSuperClass = 0;
 
       if( bSend )
-      {
          hb_vmSend( ( USHORT ) iParams );
-      }
       else
-      {
          hb_vmDo( ( USHORT ) iParams );
-      }
 
       return;
    }

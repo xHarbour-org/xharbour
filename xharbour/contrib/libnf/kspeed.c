@@ -143,7 +143,7 @@
 
 /* This is the New one Rewriten in C*/
 
-#include "extend.h"
+#include "hbapi.h"
 #if defined( HB_OS_DOS )
 #include "dos.h"
 #endif

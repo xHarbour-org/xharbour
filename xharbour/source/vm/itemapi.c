@@ -119,13 +119,12 @@
 #include "hashapi.h"
 
 #ifndef HB_CDP_SUPPORT_OFF
-#include "hbapicdp.h"
+#   include "hbapicdp.h"
 #endif
 
 #if defined( HB_OS_SUNOS )
-#  include <ieeefp.h>
+#   include <ieeefp.h>
 #endif
-
 
 #ifdef HB_THREAD_SUPPORT
 extern HB_CRITICAL_T hb_gcCollectionMutex;
@@ -1079,26 +1078,21 @@ void hb_itemGetNLen( PHB_ITEM pItem, int * piWidth, int * piDecimal )
    if( pItem )
    {
       if( piDecimal )
-      {
          *piDecimal = 0;
-      }
-      // Only piDecimal? shoud be HB_IT_DOUBLE
+
+      /* Only piDecimal? shoud be HB_IT_DOUBLE */
       if( ! piWidth && pItem->type != HB_IT_DOUBLE )
-      {
          return;
-      }
 
       switch( pItem->type )
       {
          case HB_IT_DOUBLE:
             if( piWidth )
-            {
                *piWidth = ( int ) pItem->item.asDouble.length;
-            }
+
             if( piDecimal )
-            {
                *piDecimal = ( int ) pItem->item.asDouble.decimal;
-            }
+
             break;
 
          case HB_IT_LONG:
@@ -1203,8 +1197,8 @@ char * hb_itemTypeStr( PHB_ITEM pItem )
 }
 
 /* Internal API, not standard Clipper */
-
 /* Defed out - using String Sharing Versions in source/vm/fastitem.c. */
+
 #if 0
 void hb_itemClear( PHB_ITEM pItem )
 {
@@ -1261,9 +1255,7 @@ PHB_ITEM hb_itemUnRef( PHB_ITEM pItem )
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemUnRef(%p)", pItem ) );
 
    while( HB_IS_BYREF( pItem ) )
-   {
       pItem = hb_itemUnRefOnce( pItem );
-   }
 
    return pItem;
 }
@@ -1285,9 +1277,7 @@ PHB_ITEM hb_itemUnRefOnce( PHB_ITEM pItem )
          pItem    = pValue->pVarItem;
       }
       else if( HB_IS_EXTREF( pItem ) )
-      {
          pItem = pItem->item.asExtRef.func->read( pItem );
-      }
       else
       {
          if( pItem->item.asRefer.value >= 0 )
@@ -1360,10 +1350,10 @@ PHB_ITEM hb_itemUnShareString( PHB_ITEM pItem )
             bRecycleHolders = TRUE;
          }
       }
+
       if( ! bRecycleHolders )
-      {
          pItem->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-      }
+
       *( pItem->item.asString.pulHolders )   = 1;
       pItem->item.asString.value             = szText;
       pItem->item.asString.allocated         = ulLen;
@@ -1381,14 +1371,11 @@ PHB_ITEM hb_itemUnShare( PHB_ITEM pItem )
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemUnShare(%p)", pItem ) );
 
    if( HB_IS_BYREF( pItem ) )
-   {
       pItem = hb_itemUnRef( pItem );
-   }
 
    if( HB_IS_STRING( pItem ) )
-   {
       return hb_itemUnShareString( pItem );
-   }
+
    return pItem;
 }
 
@@ -1417,13 +1404,9 @@ BOOL hb_itemGetWriteCL( PHB_ITEM pItem, char ** pszValue, HB_SIZE * pulLen )
 PHB_ITEM hb_itemClone( PHB_ITEM pItem )
 {
    if( HB_IS_ARRAY( pItem ) )
-   {
       return hb_arrayClone( pItem, NULL );
-   }
    else if( HB_IS_HASH( pItem ) )
-   {
       return hb_hashClone( pItem, NULL );
-   }
 
    return hb_itemNew( pItem );
 }
@@ -1479,10 +1462,10 @@ int hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact )
             if( *szFirst != *szSecond )
             {
                iRet = 1;
+
                if( ( BYTE ) *szFirst < ( BYTE ) *szSecond )
-               {
                   iRet = -1;
-               }
+
                break;
             }
             szFirst++;
@@ -1497,10 +1480,9 @@ int hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact )
             if( bForceExact || ulLenSecond > ulLenFirst )
             {
                iRet = 1;
+
                if( ulLenFirst < ulLenSecond )
-               {
                   iRet = -1;
-               }
             }
          }
       }
@@ -1513,17 +1495,14 @@ int hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact )
          if( bForceExact )
          {
             iRet = 1;
+
             if( ulLenFirst < ulLenSecond )
-            {
                iRet = -1;
-            }
          }
          else
          {
             if( ulLenSecond )
-            {
                iRet = -1;
-            }
          }
       }
       /* Both empty => Equal!, iRet = 0 */
@@ -1543,9 +1522,7 @@ BOOL hb_itemStrBuf( char * szResult, PHB_ITEM pNumber, int iSize, int iDec )
    BOOL           fNeg;
 
    if( iDec < 0 )
-   {
       iDec = 0;
-   }
    else if( iDec > 0 )
    {
       iDot  = iSize - iDec - 1;
@@ -1638,9 +1615,7 @@ BOOL hb_itemStrBuf( char * szResult, PHB_ITEM pNumber, int iSize, int iDec )
          }
 
          if( iPos > 0 )
-         {
             memset( szResult, ' ', iPos );
-         }
 
          if( iDec > 0 && iPos >= 0 )
          {
@@ -1651,14 +1626,10 @@ BOOL hb_itemStrBuf( char * szResult, PHB_ITEM pNumber, int iSize, int iDec )
                if( iFirst < 0 )
                {
                   if( szResult[ iPos ] != '0' )
-                  {
                      iFirst = iPos - 1;
-                  }
                }
                else if( iPos - iFirst >= iPrec )
-               {
                   break;
-               }
             }
          }
 
@@ -1673,9 +1644,7 @@ BOOL hb_itemStrBuf( char * szResult, PHB_ITEM pNumber, int iSize, int iDec )
             {
                iZer = iSize - iFirst - iPrec;
                if( iDec > 0 )
-               {
                   iZer--;
-               }
             }
             dFract   = modf( dFract * doBase, &dDig );
             iLast    = ( int ) ( dDig + 0.01 );
@@ -1702,18 +1671,15 @@ BOOL hb_itemStrBuf( char * szResult, PHB_ITEM pNumber, int iSize, int iDec )
                   if( iZer > 0 )
                   {
                      if( iDec == 0 || iPos <= iDot + 1 )
-                     {
                         iLast = szResult[ iPos ] >= '5' ? 1 : 0;
-                     }
+
                      szResult[ iPos ] = '0';
                      --iZer;
                   }
                   else if( iLast > 0 )
                   {
                      if( szResult[ iPos ] == '9' )
-                     {
                         szResult[ iPos ] = '0';
-                     }
                      else
                      {
                         if( szResult[ iPos ] < '0' ) /* '-' or ' ' */
@@ -1725,26 +1691,20 @@ BOOL hb_itemStrBuf( char * szResult, PHB_ITEM pNumber, int iSize, int iDec )
                         {
                            szResult[ iPos ]++;
                            if( iFirst < 0 )
-                           {
                               iFirst = iPos;
-                           }
                         }
                         break;
                      }
                   }
                   else
-                  {
                      break;
-                  }
                }
             }
             if( fNeg && iFirst >= 0 && iPos >= 0 )
             {
                iPos = ( iDot > 0 && iFirst >= iDot ) ? iDot - 2 : iFirst - 1;
                if( iPos >= 0 )
-               {
                   szResult[ iPos ] = '-';
-               }
             }
          }
       }
@@ -1804,9 +1764,8 @@ BOOL hb_itemStrBuf( char * szResult, PHB_ITEM pNumber, int iSize, int iDec )
       return FALSE;
    }
    else if( iDot > 0 )
-   {
       szResult[ iDot ] = '.';
-   }
+
    return TRUE;
 }
 
@@ -1876,9 +1835,7 @@ char * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
          int iSize = iWidth;
 
          if( iDec > 0 )
-         {
             iSize += iDec + 1;
-         }
 
          szResult = ( char * ) hb_xgrab( iSize + 1 );
          hb_itemStrBuf( szResult, pNumber, iSize, iDec );
@@ -2060,9 +2017,7 @@ PHB_ITEM hb_itemValToStr( PHB_ITEM pItem )
    pResult  = hb_itemPutCL( NULL, buffer, ulLen );
 
    if( bFreeReq )
-   {
       hb_xfree( buffer );
-   }
 
    return pResult;
 }
@@ -2111,14 +2066,10 @@ PHB_ITEM hb_itemPutNLL( PHB_ITEM pItem, LONGLONG llNumber )
    if( pItem )
    {
       if( HB_IS_COMPLEX( pItem ) )
-      {
          hb_itemClear( pItem );
-      }
    }
    else
-   {
       pItem = hb_itemNew( NULL );
-   }
 
 #if HB_LONG_MAX >= LONGLONG_MAX
    pItem->type                   = HB_IT_LONG;
@@ -2141,20 +2092,14 @@ PHB_ITEM hb_itemPutNLLLen( PHB_ITEM pItem, LONGLONG llNumber, int iWidth )
    if( pItem )
    {
       if( HB_IS_COMPLEX( pItem ) )
-      {
          hb_itemClear( pItem );
-      }
    }
    else
-   {
       pItem = hb_itemNew( NULL );
-   }
 
 #if HB_LONG_MAX >= LONGLONG_MAX
    if( iWidth <= 0 || iWidth > 99 )
-   {
       iWidth = HB_LONG_LENGTH( llNumber );
-   }
    pItem->type                   = HB_IT_LONG;
    pItem->item.asLong.value      = ( HB_LONG ) llNumber;
    pItem->item.asLong.length     = ( UINT ) iWidth;
@@ -2174,9 +2119,7 @@ PHB_ITEM hb_itemPutNLLLen( PHB_ITEM pItem, LONGLONG llNumber, int iWidth )
 PHB_ITEM hb_itemPutNInt( PHB_ITEM pItem, HB_LONG lNumber )
 {
    if( HB_LIM_INT( lNumber ) )
-   {
       return hb_itemPutNI( pItem, ( int ) lNumber );
-   }
 
 #ifdef HB_LONG_LONG_OFF
    return hb_itemPutNS( pItem, ( long ) lNumber );
@@ -2188,9 +2131,7 @@ PHB_ITEM hb_itemPutNInt( PHB_ITEM pItem, HB_LONG lNumber )
 PHB_ITEM hb_itemPutNIntLen( PHB_ITEM pItem, HB_LONG lNumber, int iWidth )
 {
    if( HB_LIM_INT( lNumber ) )
-   {
       return hb_itemPutNILen( pItem, ( int ) lNumber, iWidth );
-   }
 
 #ifdef HB_LONG_LONG_OFF
    return hb_itemPutNLLen( pItem, ( long ) lNumber, iWidth );
@@ -2242,14 +2183,10 @@ PHB_ITEM hb_itemPutHBLong( PHB_ITEM pItem, HB_LONG lNumber )
    if( pItem )
    {
       if( HB_IS_COMPLEX( pItem ) )
-      {
          hb_itemClear( pItem );
-      }
    }
    else
-   {
       pItem = hb_itemNew( NULL );
-   }
 
    pItem->type                = HB_IT_LONG;
    pItem->item.asLong.value   = lNumber;
@@ -2263,17 +2200,11 @@ PHB_ITEM hb_itemPutNumType( PHB_ITEM pItem, double dNumber, int iDec, int iType1
    HB_TRACE( HB_TR_DEBUG, ( "hb_itemPutNumType( %p, %lf, %d, %i, %i)", pItem, dNumber, iDec, iType1, iType2 ) );
 
    if( iDec || iType1 & HB_IT_DOUBLE || iType2 & HB_IT_DOUBLE )
-   {
       return hb_itemPutNDDec( pItem, dNumber, iDec );
-   }
    else if( HB_DBL_LIM_INT( dNumber ) )
-   {
       return hb_itemPutNI( pItem, ( int ) dNumber );
-   }
    else if( HB_DBL_LIM_LONG( dNumber ) )
-   {
       return hb_itemPutHBLong( pItem, ( HB_LONG ) dNumber );
-   }
 
    return hb_itemPutND( pItem, dNumber );
 }

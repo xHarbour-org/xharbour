@@ -162,7 +162,7 @@ static USHORT              s_uiErrorDOS   = 0; /* The value of DOSERROR() */
 
 #if ! defined( HB_OS_DOS ) && ! defined( HB_OS_DARWIN_5 )
    #include "hbserv.h"
-// extern BOOL hb_isService(void);
+/* extern BOOL hb_isService(void); */
 #endif
 
 extern int     hb_vm_iTry;
@@ -196,7 +196,6 @@ static BOOL hb_errGetNumCode( int * piValue, const char * szOperation )
    return TRUE;
 }
 
-
 HB_FUNC_STATIC( CARGO )
 {
    HB_THREAD_STUB
@@ -216,7 +215,6 @@ HB_FUNC_STATIC( _CARGO )
    hb_itemReturn( pItem );
 }
 
-
 HB_FUNC_STATIC( ARGS )
 {
    HB_THREAD_STUB
@@ -235,7 +233,6 @@ HB_FUNC_STATIC( _ARGS )
 
    hb_itemReturn( pItem );
 }
-
 
 HB_FUNC_STATIC( CANDEFAULT )
 {
@@ -262,7 +259,6 @@ HB_FUNC_STATIC( _CANDEFAULT )
    }
 }
 
-
 HB_FUNC_STATIC( CANRETRY )
 {
    HB_THREAD_STUB
@@ -287,7 +283,6 @@ HB_FUNC_STATIC( _CANRETRY )
       hb_retl( fCan );
    }
 }
-
 
 HB_FUNC_STATIC( CANSUBST )
 {
@@ -314,7 +309,6 @@ HB_FUNC_STATIC( _CANSUBST )
    }
 }
 
-
 HB_FUNC_STATIC( DESCRIPTION )
 {
    HB_THREAD_STUB
@@ -333,7 +327,6 @@ HB_FUNC_STATIC( _DESCRIPTION )
 
    hb_itemReturn( pItem );
 }
-
 
 HB_FUNC_STATIC( FILENAME )
 {
@@ -354,7 +347,6 @@ HB_FUNC_STATIC( _FILENAME )
    hb_itemReturn( pItem );
 }
 
-
 HB_FUNC_STATIC( OPERATION )
 {
    HB_THREAD_STUB
@@ -374,7 +366,6 @@ HB_FUNC_STATIC( _OPERATION )
    hb_itemReturn( pItem );
 }
 
-
 HB_FUNC_STATIC( SUBSYSTEM )
 {
    HB_THREAD_STUB
@@ -393,7 +384,6 @@ HB_FUNC_STATIC( _SUBSYSTEM )
 
    hb_itemReturn( pItem );
 }
-
 
 HB_FUNC_STATIC( GENCODE )
 {
@@ -418,7 +408,6 @@ HB_FUNC_STATIC( _GENCODE )
    hb_retni( iValue );
 }
 
-
 HB_FUNC_STATIC( OSCODE )
 {
    HB_THREAD_STUB
@@ -437,7 +426,6 @@ HB_FUNC_STATIC( _OSCODE )
 
    hb_retni( iValue );
 }
-
 
 HB_FUNC_STATIC( SUBCODE )
 {
@@ -458,7 +446,6 @@ HB_FUNC_STATIC( _SUBCODE )
    hb_retni( iValue );
 }
 
-
 HB_FUNC_STATIC( SEVERITY )
 {
    HB_THREAD_STUB
@@ -477,7 +464,6 @@ HB_FUNC_STATIC( _SEVERITY )
 
    hb_retni( iValue );
 }
-
 
 HB_FUNC_STATIC( TRIES )
 {
@@ -498,7 +484,6 @@ HB_FUNC_STATIC( _TRIES )
    hb_retni( iValue );
 }
 
-
 HB_FUNC_STATIC( _PROCNAME )
 {
    HB_THREAD_STUB
@@ -506,9 +491,8 @@ HB_FUNC_STATIC( _PROCNAME )
    PHB_ITEM pItem = hb_param( 1, HB_IT_ANY );
 
    if( pItem && HB_IS_STRING( pItem ) )
-   {
       hb_errPutProcName( hb_stackSelfItem(), hb_itemGetCPtr( pItem ) );
-   }
+
    hb_itemReturn( pItem );
 }
 
@@ -520,9 +504,8 @@ HB_FUNC_STATIC( _PROCLINE )
    int iValue;
 
    if( hb_errGetNumCode( &iValue, "PROCLINE" ) )
-   {
       hb_errPutProcLine( hb_stackSelfItem(), ( USHORT ) iValue );
-   }
+
    hb_retni( iValue );
 }
 
@@ -533,9 +516,8 @@ HB_FUNC_STATIC( _RUNNINGTHREADS )
    int iValue;
 
    if( hb_errGetNumCode( &iValue, "RUNNINGTHREADS" ) )
-   {
       hb_errPutRunningThreads( hb_stackSelfItem(), ( USHORT ) iValue );
-   }
+
    hb_retni( iValue );
 }
 
@@ -546,9 +528,8 @@ HB_FUNC_STATIC( _OSTHREADID )
    PHB_ITEM pItem = hb_param( 1, HB_IT_ANY );
 
    if( pItem && HB_IS_INTEGER( pItem ) )
-   {
       hb_errPutThreadId( hb_stackSelfItem(), ( HB_THREAD_T ) ( HB_PTRDIFF ) hb_itemGetNInt( pItem ) );
-   }
+
    hb_itemReturn( pItem );
 }
 
@@ -559,9 +540,8 @@ HB_FUNC_STATIC( _VMTHREADID )
    int iValue;
 
    if( hb_errGetNumCode( &iValue, "VMTHREADID" ) )
-   {
       hb_errPutVmThreadId( hb_stackSelfItem(), ( UINT ) iValue );
-   }
+
    hb_retni( iValue );
 }
 
@@ -572,9 +552,8 @@ HB_FUNC_STATIC( _MODULENAME )
    PHB_ITEM pItem = hb_param( 1, HB_IT_ANY );
 
    if( pItem && HB_IS_STRING( pItem ) )
-   {
       hb_errPutModuleName( hb_stackSelfItem(), hb_itemGetCPtr( pItem ) );
-   }
+
    hb_itemReturn( pItem );
 }
 
@@ -667,64 +646,55 @@ HB_FUNC( ERRORNEW )
    hb_arraySize( pCallStack, hb_arrayLen( pCallStack ) - 1 );
 
    if( ISCHAR( 1 ) )
-   {
       hb_errPutSubSystem( pError, hb_parc( 1 ) );
-   }
+
    if( ISNUM( 2 ) )
-   {
       hb_errPutGenCode( pError, ( HB_ERRCODE ) hb_parni( 2 ) );
-   }
+
    if( ISNUM( 3 ) )
-   {
       hb_errPutSubCode( pError, ( HB_ERRCODE ) hb_parni( 3 ) );
-   }
+
    if( ISCHAR( 4 ) )
-   {
       hb_errPutOperation( pError, hb_parc( 4 ) );
-   }
+
    if( ISCHAR( 5 ) )
-   {
       hb_errPutDescription( pError, hb_parc( 5 ) );
-   }
+
    if( ISARRAY( 6 ) )
-   {
       hb_errPutArgsArray( pError, hb_param( 6, HB_IT_ARRAY ) );
-   }
+
    if( ISCHAR( 7 ) )
-   {
       hb_errPutModuleName( pError, hb_parc( 7 ) );
-   }
    else
    {
-      // Must override default stack level 0, in hb_errNew()!
+      /* Must override default stack level 0, in hb_errNew()!
+       */
       hb_procinfo( 1, NULL, NULL, szModuleName );
       hb_errPutModuleName( pError, szModuleName );
    }
+
    if( ISCHAR( 8 ) )
-   {
       hb_errPutProcName( pError, hb_parc( 8 ) );
-   }
    else
-   {
-      // Must override default stack level 0, in hb_errNew()!
+      /* Must override default stack level 0, in hb_errNew()!
+       */
       hb_errPutProcName( pError, hb_procinfo( 1, szProcName, NULL, NULL ) );
-   }
+
    if( ISNUM( 9 ) )
-   {
       hb_errPutProcLine( pError, hb_parni( 9 ) );
-   }
    else
    {
-      // Must override default stack level 0, in hb_errNew()!
+      /* Must override default stack level 0, in hb_errNew()!
+       */
       hb_procinfo( 1, NULL, &uLine, NULL );
       hb_errPutProcLine( pError, uLine );
    }
 
-   #ifdef HB_THREAD_SUPPORT
+#ifdef HB_THREAD_SUPPORT
    hb_errPutRunningThreads( pError, hb_threadCountStacks() );
    hb_errPutThreadId( pError, HB_CURRENT_THREAD() );
    hb_errPutVmThreadId( pError, HB_VM_STACK.th_vm_id );
-   #endif
+#endif
 
    hb_itemReturnRelease( pError );
 }
@@ -745,10 +715,9 @@ HB_FUNC( ERRORBLOCK )
    PHB_ITEM pErrorBlock    = s_errorBlock;
 
    hb_itemReturn( pErrorBlock );
+
    if( pNewErrorBlock )
-   {
       hb_itemCopy( pErrorBlock, pNewErrorBlock );
-   }
 }
 
 PHB_ITEM hb_errorBlock( PHB_ITEM pNewErrorBlock )
@@ -758,9 +727,7 @@ PHB_ITEM hb_errorBlock( PHB_ITEM pNewErrorBlock )
    PHB_ITEM pReturn = hb_itemNew( s_errorBlock );
 
    if( pNewErrorBlock )
-   {
       hb_itemCopy( s_errorBlock, pNewErrorBlock );
-   }
 
    return pReturn;
 }
@@ -775,9 +742,7 @@ HB_ERROR_INFO_PTR hb_errorHandler( HB_ERROR_INFO_PTR pNewHandler )
    HB_ERROR_INFO_PTR pOld = s_errorHandler;
 
    if( pNewHandler )
-   {
       pNewHandler->Previous = s_errorHandler;
-   }
 
    s_errorHandler = pNewHandler;
 
@@ -814,9 +779,9 @@ void hb_errInit( void )
    hb_clsAssociate( hb_errClassCreate() );
    hb_itemMove( s_pError, hb_stackReturnItem() );
 
-   #ifndef HB_THREAD_SUPPORT
+#ifndef HB_THREAD_SUPPORT
    s_errorBlock = hb_itemNew( NULL );
-   #endif
+#endif
 }
 
 void hb_errExit( void )
@@ -826,12 +791,10 @@ void hb_errExit( void )
    hb_itemRelease( s_pError );
    s_pError = NULL;
 
-   #ifndef HB_THREAD_SUPPORT
+#ifndef HB_THREAD_SUPPORT
    if( s_errorBlock )
-   {
       hb_itemRelease( s_errorBlock );
-   }
-   #endif
+#endif
 }
 
 PHB_ITEM hb_errNew( void )
@@ -845,9 +808,7 @@ PHB_ITEM hb_errNew( void )
    HB_TRACE( HB_TR_DEBUG, ( "hb_errNew()" ) );
 
    if( ( ! s_pError ) || ( ! HB_IS_OBJECT( s_pError ) ) )
-   {
       hb_errInternal( HB_EI_ERRRECFAILURE, NULL, NULL, NULL );
-   }
 
    pError      = hb_arrayClone( s_pError, NULL );
 
@@ -881,9 +842,9 @@ USHORT hb_errLaunch( PHB_ITEM pError )
 {
    HB_THREAD_STUB
 
-   #ifdef HB_THREAD_SUPPORT
+#ifdef HB_THREAD_SUPPORT
    BOOL old_bIdleFence;
-   #endif
+#endif
 
    USHORT uiAction = hb_vmRequestQuery();
    USHORT usRequest;
@@ -891,21 +852,15 @@ USHORT hb_errLaunch( PHB_ITEM pError )
    HB_TRACE( HB_TR_DEBUG, ( "hb_errLaunch(%p)", pError ) );
 
    if( uiAction )
-   {
       return E_BREAK;
-   }
    else
-   {
       uiAction = E_DEFAULT;
-   }
 
    /* Act as an idle inspector */
-   #ifdef HB_THREAD_SUPPORT
+#ifdef HB_THREAD_SUPPORT
    /* Don't run on quit request */
    if( hb_vm_bQuitRequest )
-   {
       return 0;    /* Meaningless here */
-   }
 
    /* Force idle fencing (should be locked, but race conditions
       are not a problem in this case) */
@@ -916,7 +871,7 @@ USHORT hb_errLaunch( PHB_ITEM pError )
 
    hb_bIdleFence  = old_bIdleFence;
    usRequest      = 0;
-   #endif
+#endif
 
    if( pError )
    {
@@ -959,9 +914,9 @@ USHORT hb_errLaunch( PHB_ITEM pError )
          s_iLaunchCount--;
 
          /* Allow other threads to go */
-         #if defined( HB_THREAD_SUPPORT )
+#if defined( HB_THREAD_SUPPORT )
          hb_threadIdleEnd();
-         #endif
+#endif
          return E_BREAK;
       }
       else
@@ -980,28 +935,24 @@ USHORT hb_errLaunch( PHB_ITEM pError )
       if( usRequest == HB_QUIT_REQUESTED )
       {
          if( pResult )
-         {
             hb_itemRelease( pResult );
-         }
 
          uiAction = E_BREAK;
 
          /* Allow other threads to go */
-         #if defined( HB_THREAD_SUPPORT )
+#if defined( HB_THREAD_SUPPORT )
          hb_itemRelease( pError );
          /* We are going to quit now, so we don't want to have mutexes
             blocking our output */
          hb_stackSetStruct()->HB_SET_OUTPUTSAFETY = FALSE;
          hb_threadIdleEnd();
          exit( hb_vmQuit() );
-         #endif
+#endif
       }
       else if( usRequest == HB_BREAK_REQUESTED || usRequest == HB_ENDPROC_REQUESTED )
       {
          if( pResult )
-         {
             hb_itemRelease( pResult );
-         }
 
          uiAction = E_BREAK;
       }
@@ -1013,18 +964,14 @@ USHORT hb_errLaunch( PHB_ITEM pError )
          /* If the error block didn't return a logical value, */
          /* or the canSubstitute flag has been set, consider it as a failure */
          if( hb_itemType( pResult ) != HB_IT_LOGICAL || ( uiFlags & EF_CANSUBSTITUTE ) )
-         {
             bFailure = TRUE;
-         }
          else
          {
             uiAction = hb_itemGetL( pResult ) ? E_RETRY : E_DEFAULT;
 
             if( ( uiAction == E_DEFAULT && ! ( uiFlags & EF_CANDEFAULT ) ) ||
                 ( uiAction == E_RETRY && ! ( uiFlags & EF_CANRETRY ) ) )
-            {
                bFailure = TRUE;
-            }
          }
 
          hb_itemRelease( pResult );
@@ -1038,9 +985,7 @@ USHORT hb_errLaunch( PHB_ITEM pError )
          /* Add one try to the counter. */
 
          if( uiAction == E_RETRY )
-         {
             hb_errPutTries( pError, hb_errGetTries( pError ) + 1 );
-         }
       }
       else
       {
@@ -1049,17 +994,13 @@ USHORT hb_errLaunch( PHB_ITEM pError )
       }
    }
    else
-   {
       uiAction = E_RETRY; /* Clipper does this, undocumented */
-   }
 
    /* Allow other threads to go */
-   #if defined( HB_THREAD_SUPPORT )
+#if defined( HB_THREAD_SUPPORT )
    if( usRequest != HB_QUIT_REQUESTED )
-   {
       hb_threadIdleEnd();
-   }
-   #endif
+#endif
 
    return uiAction;
 }
@@ -1082,24 +1023,20 @@ PHB_ITEM hb_errLaunchSubst( PHB_ITEM pError )
    PHB_ITEM pResult;
    USHORT   usRequest;
 
-   #ifdef HB_THREAD_SUPPORT
+#ifdef HB_THREAD_SUPPORT
    BOOL     old_bIdleFence;
-   #endif
+#endif
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_errLaunchSubst(%p)", pError ) );
 
    if( hb_vmRequestQuery() )
-   {
       return NULL;
-   }
 
    /* Act as an idle inspector */
-   #ifdef HB_THREAD_SUPPORT
+#ifdef HB_THREAD_SUPPORT
    /* Don't run on quit request */
    if( hb_vm_bQuitRequest )
-   {
       return NULL;    /* Meaningless here */
-   }
 
    /* Force idle fencing */
    old_bIdleFence = hb_bIdleFence;
@@ -1107,7 +1044,7 @@ PHB_ITEM hb_errLaunchSubst( PHB_ITEM pError )
    hb_threadWaitForIdle();
    hb_bIdleFence  = old_bIdleFence;
    usRequest      = 0;
-   #endif
+#endif
 
    if( pError )
    {
@@ -1147,9 +1084,9 @@ PHB_ITEM hb_errLaunchSubst( PHB_ITEM pError )
          s_iLaunchCount--;
 
          /* Allow other threads to go */
-         #if defined( HB_THREAD_SUPPORT )
+#if defined( HB_THREAD_SUPPORT )
          hb_threadIdleEnd();
-         #endif
+#endif
          return NULL;
       }
       else
@@ -1178,21 +1115,19 @@ PHB_ITEM hb_errLaunchSubst( PHB_ITEM pError )
           *  If the error happened from an EXIT procedure (already called from hb_vmQuit() then
           *   hb_vmQuit() might immdeiately return here!
           */
-         #if defined( HB_THREAD_SUPPORT )
+#if defined( HB_THREAD_SUPPORT )
          /* We are going to quit now, so we don't want to have mutexes
             blocking our output */
          hb_stackSetStruct()->HB_SET_OUTPUTSAFETY = FALSE;
          hb_threadIdleEnd();
-         #endif
+#endif
 
          exit( hb_vmQuit() );
       }
       else if( usRequest == HB_BREAK_REQUESTED || usRequest == HB_ENDPROC_REQUESTED )
       {
          if( pResult )
-         {
             hb_itemRelease( pResult );
-         }
 
          pResult = NULL;
       }
@@ -1208,17 +1143,13 @@ PHB_ITEM hb_errLaunchSubst( PHB_ITEM pError )
       }
    }
    else
-   {
       pResult = hb_itemNew( NULL );
-   }
 
    /* Allow other threads to go */
-   #if defined( HB_THREAD_SUPPORT )
+#if defined( HB_THREAD_SUPPORT )
    if( usRequest != HB_QUIT_REQUESTED )
-   {
       hb_threadIdleEnd();
-   }
-   #endif
+#endif
 
    return pResult;
 }
@@ -1327,6 +1258,7 @@ PHB_ITEM hb_errPutOperation( PHB_ITEM pError, const char * szOperation )
    if( szOperation == HB_ERR_FUNCNAME )
    {
       PHB_SYMB pSym = hb_itemGetSymbol( hb_stackBaseItem() );
+
       if( pSym )
          szOperation = pSym->szName;
    }
@@ -1448,7 +1380,6 @@ PHB_ITEM hb_errPutThreadId( PHB_ITEM pError, HB_THREAD_T thId )
    return pError;
 }
 
-
 UINT hb_errGetRunningThreads( PHB_ITEM pError )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_errGetRunningThreads(%p)", pError ) );
@@ -1487,7 +1418,6 @@ char * hb_errGetModuleName( PHB_ITEM pError )
 
    return hb_arrayGetCPtr( pError, HB_TERROR_MODULENAME );
 }
-
 
 PHB_ITEM hb_errPutModuleName( PHB_ITEM pError, const char * szModuleName )
 {
@@ -1601,11 +1531,11 @@ PHB_ITEM hb_errRT_New(
    hb_errPutOsCode( pError, errOsCode );
    hb_errPutFlags( pError, uiFlags );
 
-   #ifdef HB_THREAD_SUPPORT
+#ifdef HB_THREAD_SUPPORT
    hb_errPutThreadId( pError, HB_CURRENT_THREAD() );
    hb_errPutVmThreadId( pError, HB_VM_STACK.th_vm_id );
    hb_errPutRunningThreads( pError, hb_threadCountStacks() );
-   #endif
+#endif
 
    return pError;
 }
@@ -1633,7 +1563,8 @@ PHB_ITEM hb_errRT_New_Subst(
 
       hb_procinfo( 1, szProcName, &uLine, szModuleName );
 
-      // Must override default stack level 0, in hb_errNew()!
+      /* Must override default stack level 0, in hb_errNew()!
+       */
       hb_errPutModuleName( pError, szModuleName );
       hb_errPutProcName( pError, szProcName );
       hb_errPutProcLine( pError, uLine );
@@ -1714,30 +1645,18 @@ USHORT hb_errRT_BASE( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, const char *
    HB_THREAD_STUB
 
    USHORT   uiAction;
-   PHB_ITEM pError;
-
    PHB_ITEM pArray;
    va_list  va;
    ULONG    ulArgPos;
-
-   pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_BASE, errGenCode, errSubCode, szDescription, szOperation, 0, EF_NONE );
+   PHB_ITEM pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_BASE, errGenCode, errSubCode, szDescription, szOperation, 0, EF_NONE );
 
    /* Build the array from the passed arguments. */
    if( ulArgCount == 0 )
-   {
       pArray = NULL;
-   }
    else if( ulArgCount == HB_ERR_ARGS_BASEPARAMS )
-   {
-      if( hb_pcount() == 0 )
-         pArray = NULL;
-      else
-         pArray = hb_arrayBaseParams();
-   }
+      pArray = ( hb_pcount() == 0 ) ? NULL : hb_arrayBaseParams();
    else if( ulArgCount == HB_ERR_ARGS_SELFPARAMS )
-   {
       pArray = hb_arraySelfParams();
-   }
    else
    {
       pArray = hb_itemArrayNew( ulArgCount );
@@ -1751,6 +1670,7 @@ USHORT hb_errRT_BASE( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, const char *
       }
       va_end( va );
    }
+
    if( pArray )
    {
       /* Assign the new array to the object data item. */
@@ -1774,30 +1694,18 @@ USHORT hb_errRT_BASE_Ext1( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, const c
    HB_THREAD_STUB
 
    USHORT   uiAction;
-   PHB_ITEM pError;
-
    PHB_ITEM pArray;
    va_list  va;
    ULONG    ulArgPos;
-
-   pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_BASE, errGenCode, errSubCode, szDescription, szOperation, errOsCode, uiFlags );
+   PHB_ITEM pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_BASE, errGenCode, errSubCode, szDescription, szOperation, errOsCode, uiFlags );
 
    /* Build the array from the passed arguments. */
    if( ulArgCount == 0 )
-   {
       pArray = NULL;
-   }
    else if( ulArgCount == HB_ERR_ARGS_BASEPARAMS )
-   {
-      if( hb_pcount() == 0 )
-         pArray = NULL;
-      else
-         pArray = hb_arrayBaseParams();
-   }
+      pArray = ( hb_pcount() == 0 ) ? NULL : hb_arrayBaseParams();
    else if( ulArgCount == HB_ERR_ARGS_SELFPARAMS )
-   {
       pArray = hb_arraySelfParams();
-   }
    else
    {
       pArray = hb_itemArrayNew( ulArgCount );
@@ -1834,7 +1742,6 @@ PHB_ITEM hb_errRT_BASE_Subst( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, cons
 
    PHB_ITEM pRetVal;
    PHB_ITEM pError;
-
    PHB_ITEM pArray;
    va_list  va;
    ULONG    ulArgPos;
@@ -1845,20 +1752,11 @@ PHB_ITEM hb_errRT_BASE_Subst( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, cons
 
    /* Build the array from the passed arguments. */
    if( ulArgCount == 0 )
-   {
       pArray = NULL;
-   }
    else if( ulArgCount == HB_ERR_ARGS_BASEPARAMS )
-   {
-      if( hb_pcount() == 0 )
-         pArray = NULL;
-      else
-         pArray = hb_arrayBaseParams();
-   }
+      pArray = ( hb_pcount() == 0 ) ? NULL : hb_arrayBaseParams();
    else if( ulArgCount == HB_ERR_ARGS_SELFPARAMS )
-   {
       pArray = hb_arraySelfParams();
-   }
    else
    {
       pArray = hb_itemArrayNew( ulArgCount );
@@ -1872,6 +1770,7 @@ PHB_ITEM hb_errRT_BASE_Subst( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, cons
       }
       va_end( va );
    }
+
    if( pArray )
    {
       /* Assign the new array to the object data item. */
@@ -1893,30 +1792,18 @@ void hb_errRT_BASE_SubstR( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, const c
 {
    HB_THREAD_STUB
 
-   PHB_ITEM pError;
-
+   PHB_ITEM pError = hb_errRT_New_Subst( ES_ERROR, HB_ERR_SS_BASE, errGenCode, errSubCode, szDescription, szOperation, 0, EF_NONE );
    PHB_ITEM pArray;
    va_list  va;
    ULONG    ulArgPos;
 
-   pError = hb_errRT_New_Subst( ES_ERROR, HB_ERR_SS_BASE, errGenCode, errSubCode, szDescription, szOperation, 0, EF_NONE );
-
    /* Build the array from the passed arguments. */
    if( ulArgCount == 0 )
-   {
       pArray = NULL;
-   }
    else if( ulArgCount == HB_ERR_ARGS_BASEPARAMS )
-   {
-      if( hb_pcount() == 0 )
-         pArray = NULL;
-      else
-         pArray = hb_arrayBaseParams();
-   }
+      pArray = ( hb_pcount() == 0 ) ? NULL : hb_arrayBaseParams();
    else if( ulArgCount == HB_ERR_ARGS_SELFPARAMS )
-   {
       pArray = hb_arraySelfParams();
-   }
    else
    {
       pArray = hb_itemArrayNew( ulArgCount );
@@ -1930,6 +1817,7 @@ void hb_errRT_BASE_SubstR( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, const c
       }
       va_end( va );
    }
+
    if( pArray )
    {
       /* Assign the new array to the object data item. */
@@ -1946,11 +1834,8 @@ void hb_errRT_BASE_SubstR( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, const c
 
 USHORT hb_errRT_TERM( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, const char * szDescription, const char * szOperation, HB_ERRCODE errOsCode, USHORT uiFlags )
 {
-   USHORT   uiAction;
-   PHB_ITEM pError =
-      hb_errRT_New( ES_ERROR, HB_ERR_SS_TERMINAL, errGenCode, errSubCode, szDescription, szOperation, errOsCode, uiFlags );
-
-   uiAction = hb_errLaunch( pError );
+   PHB_ITEM pError   = hb_errRT_New( ES_ERROR, HB_ERR_SS_TERMINAL, errGenCode, errSubCode, szDescription, szOperation, errOsCode, uiFlags );
+   USHORT   uiAction = hb_errLaunch( pError );
 
    hb_errRelease( pError );
 
@@ -1959,18 +1844,9 @@ USHORT hb_errRT_TERM( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, const char *
 
 USHORT hb_errRT_DBCMD( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, const char * szDescription, const char * szOperation )
 {
-   USHORT   uiAction;
-   USHORT   uiFlags;
-   PHB_ITEM pError;
-
-   if( errGenCode == EG_NOTABLE )
-      uiFlags = EF_CANDEFAULT;
-   else
-      uiFlags = EF_NONE;
-
-   pError   = hb_errRT_New( ES_ERROR, HB_ERR_SS_DBCMD, errGenCode, errSubCode, szDescription, szOperation, 0, uiFlags );
-
-   uiAction = hb_errLaunch( pError );
+   USHORT   uiFlags  = ( errGenCode == EG_NOTABLE ) ? EF_CANDEFAULT: EF_NONE;
+   PHB_ITEM pError   = hb_errRT_New( ES_ERROR, HB_ERR_SS_DBCMD, errGenCode, errSubCode, szDescription, szOperation, 0, uiFlags );
+   USHORT   uiAction = hb_errLaunch( pError );
 
    hb_errRelease( pError );
 
@@ -1979,12 +1855,8 @@ USHORT hb_errRT_DBCMD( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, const char 
 
 USHORT hb_errRT_DBCMD_Ext( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, const char * szDescription, const char * szOperation, USHORT uiFlags )
 {
-   USHORT   uiAction;
-   PHB_ITEM pError;
-
-   pError   = hb_errRT_New( ES_ERROR, HB_ERR_SS_DBCMD, errGenCode, errSubCode, szDescription, szOperation, 0, uiFlags );
-
-   uiAction = hb_errLaunch( pError );
+   PHB_ITEM pError   = hb_errRT_New( ES_ERROR, HB_ERR_SS_DBCMD, errGenCode, errSubCode, szDescription, szOperation, 0, uiFlags );
+   USHORT   uiAction = hb_errLaunch( pError );
 
    hb_itemRelease( pError );
 
@@ -1993,16 +1865,13 @@ USHORT hb_errRT_DBCMD_Ext( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, const c
 
 USHORT hb_errRT_TOOLS( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, const char * szDescription, const char * szOperation )
 {
-   USHORT   uiAction;
-   PHB_ITEM pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_BASE, errGenCode, errSubCode, szDescription, szOperation, 0, EF_NONE );
-
-   uiAction = hb_errLaunch( pError );
+   PHB_ITEM pError   = hb_errRT_New( ES_ERROR, HB_ERR_SS_BASE, errGenCode, errSubCode, szDescription, szOperation, 0, EF_NONE );
+   USHORT   uiAction = hb_errLaunch( pError );
 
    hb_itemRelease( pError );
 
    return uiAction;
 }
-
 
 /* NOTE: Use as minimal calls from here, as possible.
          Don't allocate memory from this function. [vszakats] */
@@ -2037,21 +1906,17 @@ void hb_errInternal( ULONG ulIntCode, const char * szText, const char * szPar1, 
    hb_conOutErr( title, 0 );
 
    if( szText != NULL )
-   {
       hb_snprintf( buffer, sizeof( buffer ), szText, szPar1, szPar2 );
-   }
    else if( bLang )
-   {
       hb_snprintf( buffer, sizeof( buffer ), ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ERRINTR + ulIntCode - 9000 ), szPar1, szPar2 );
-   }
 
    hb_conOutErr( buffer, 0 );
    hb_conOutErr( hb_conNewLine(), 0 );
    hb_stackDispCall();
 
-   #ifdef HB_OS_WIN
+#ifdef HB_OS_WIN
    MessageBox( NULL, buffer, title, MB_ICONSTOP );
-   #endif
+#endif
 
    /* release console settings */
    hb_conRelease();
@@ -2063,14 +1928,14 @@ void hb_errInternal( ULONG ulIntCode, const char * szText, const char * szPar1, 
       *( --pGPF ) = 0;
    }
 
-   #if defined( HB_THREAD_SUPPORT ) && defined( HB_OS_OS2 )
+#if defined( HB_THREAD_SUPPORT ) && defined( HB_OS_OS2 )
    /* Post all threads waiting on an indefinite wait */
    DosPostEventSem( hb_hevWakeUpAll );
    /* Let's give them some time to wake up */
    DosSleep( 5000 );
    /* Stop VM, I cannot call exit() here or I end up with a zombie process */
    hb_vmQuit();
-   #endif
+#endif
 
    exit( EXIT_FAILURE );
 }

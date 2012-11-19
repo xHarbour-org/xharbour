@@ -51,20 +51,18 @@
  */
 
 /*
-
    Used parts from Harbour for use with XHarbour SQLite3 lib
    November 18, 2011 by R.Visscher <richard@irvis.com>
  */
-
 
 #include "hbvmopt.h"
 #include "hbapistr.h"
 #include "hbapiitm.h"
 #include "hbstack.h"
 
-/*----------------------------------------------------------------------------------
+/*----------------------------------------------------------------------------
    String functions
-   ----------------------------------------------------------------------------------*/
+ ----------------------------------------------------------------------------*/
 static const wchar_t s_szConstStr[ 1 ] = { 0 };
 
 HB_SIZE hb_strcopy( PHB_ITEM pItem, char * pStr, HB_SIZE nLen )
@@ -77,13 +75,16 @@ HB_SIZE hb_strcopy( PHB_ITEM pItem, char * pStr, HB_SIZE nLen )
       {
          if( size > nLen )
             size = nLen;
+
          if( size )
             HB_MEMCPY( pStr, hb_itemGetCPtr( pItem ), ( size_t ) size );
+
          if( size < nLen )
             pStr[ size ] = '\0';
       }
       else if( nLen && size > nLen )
          size = nLen;
+
       return size;
    }
    else if( pStr && nLen )
@@ -100,6 +101,7 @@ const char * hb_strget( PHB_ITEM pItem, void ** phStr, HB_SIZE * pnLen )
    {
       *phStr   = ( void * ) s_szConstStr;
       pStr     = hb_itemGetCPtr( pItem );
+
       if( pnLen )
          *pnLen = hb_itemGetCLen( pItem );
    }
@@ -107,6 +109,7 @@ const char * hb_strget( PHB_ITEM pItem, void ** phStr, HB_SIZE * pnLen )
    {
       *phStr   = NULL;
       pStr     = NULL;
+
       if( pnLen )
          *pnLen = 0;
    }
@@ -145,6 +148,7 @@ const char * hb_parstr_utf8( int iParam, void ** phString, HB_SIZE * pnLen )
 
    if( pnLen )
       *pnLen = 0;
+
    *phString = NULL;
 
    return NULL;
@@ -182,6 +186,7 @@ PHB_ITEM hb_itemPutStrLenUTF8( PHB_ITEM pItem, const char * pStr, HB_SIZE nLen )
    cdp      = hb_cdppage();
    nDest    = hb_cdpStringInUTF8Length( cdp, FALSE, pStr, nLen );
    pszDest  = ( char * ) hb_xgrab( nDest + 1 );
+
    hb_cdpStrnToUTF8n( cdp, FALSE, pStr, nLen, pszDest, nDest + 1 );
 
    return hb_itemPutCLPtr( pItem, pszDest, nDest );
@@ -194,7 +199,6 @@ const char * hb_itemGetStrUTF8( PHB_ITEM pItem, void ** phString, HB_SIZE * pnLe
    if( pItem && HB_IS_STRING( pItem ) )
    {
       PHB_CODEPAGE   cdp   = hb_cdppage();
-
       HB_SIZE        nLen  = hb_cdpStringInUTF8Length( cdp, FALSE,
                                                        pItem->item.asString.value,
                                                        pItem->item.asString.length );
@@ -208,6 +212,7 @@ const char * hb_itemGetStrUTF8( PHB_ITEM pItem, void ** phString, HB_SIZE * pnLe
                             pItem->item.asString.value, pItem->item.asString.length,
                             pszUtf8, nLen + 1 );
          *phString = ( void * ) pszUtf8;
+
          return pszUtf8;
       }
 
@@ -218,11 +223,13 @@ const char * hb_itemGetStrUTF8( PHB_ITEM pItem, void ** phString, HB_SIZE * pnLe
       }
       else
          *phString = ( void * ) s_szConstStr;
+
       return pItem->item.asString.value;
    }
 
    if( pnLen )
       *pnLen = 0;
+
    *phString = NULL;
 
    return NULL;
@@ -243,6 +250,7 @@ PHB_ITEM hb_itemPutStrUTF8( PHB_ITEM pItem, const char * pStr )
    nLen     = strlen( pStr );
    nDest    = hb_cdpStringInUTF8Length( cdp, FALSE, pStr, nLen );
    pszDest  = ( char * ) hb_xgrab( nDest + 1 );
+
    hb_cdpStrnToUTF8n( cdp, FALSE, pStr, nLen, pszDest, nDest + 1 );
 
    return hb_itemPutCLPtr( pItem, pszDest, nDest );

@@ -161,9 +161,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer,
          }
       }
       else
-      {
          pCBlock->pLocals = NULL;
-      }
    }
 
    /*
@@ -171,15 +169,15 @@ HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer,
     * The only allowed operation on a codeblock is evaluating it then
     * there is no need to duplicate its pcode - just store the pointer to it
     */
-   pCBlock->pCode       = ( BYTE * ) pBuffer;
-
-   pCBlock->symbol      = pSymbol;
-   pCBlock->ulCounter   = 1;
-
-   //pCBlock->dynBuffer = FALSE;
-   //pCBlock->bPrivVars = FALSE;
-   //pCBlock->bDynamic = FALSE;
-   pCBlock->uiFlags = 0;
+   pCBlock->pCode        = ( BYTE * ) pBuffer;
+   pCBlock->symbol       = pSymbol;
+   pCBlock->ulCounter    = 1;
+   /*
+    * pCBlock->dynBuffer = FALSE;
+    * pCBlock->bPrivVars = FALSE;
+    * pCBlock->bDynami c = FALSE;
+    */
+   pCBlock->uiFlags      = 0;
 
    HB_TRACE( HB_TR_INFO, ( "codeblock created (%i) %lx", pCBlock->ulCounter, pCBlock ) );
 
@@ -206,13 +204,14 @@ HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
    pCBlock->pCode    = ( BYTE * ) hb_xgrab( usLen );
    HB_MEMCPY( pCBlock->pCode, pBuffer, usLen );
 
-   //pCBlock->dynBuffer = TRUE;
-   //pCBlock->bPrivVars = FALSE;
-   //pCBlock->bDynamic = TRUE;
-   pCBlock->uiFlags     = ( CBF_DYNAMIC_BUFFER | CBF_DYNAMIC );
-
-   pCBlock->symbol      = NULL; /* macro-compiled codeblock cannot acces a local symbol table */
-   pCBlock->ulCounter   = 1;
+   /*
+    * pCBlock->dynBuffer = TRUE;
+    * pCBlock->bPrivVars = FALSE;
+    * pCBlock->bDynamic  = TRUE;
+    */
+   pCBlock->uiFlags      = ( CBF_DYNAMIC_BUFFER | CBF_DYNAMIC );
+   pCBlock->symbol       = NULL; /* macro-compiled codeblock cannot acces a local symbol table */
+   pCBlock->ulCounter    = 1;
 
    HB_TRACE( HB_TR_INFO, ( "codeblock created (%li) %lx", pCBlock->ulCounter, pCBlock ) );
 
@@ -235,9 +234,11 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
 
          while( ui )
          {
-            //TraceLog( NULL, "Release Detached %i\n", ui );
+            /* TraceLog( NULL, "Release Detached %i\n", ui );
+             */
             hb_memvarValueDecRef( ( HB_HANDLE ) pCBlock->pLocals[ ui ].item.asMemvar.value );
-            //TraceLog( NULL, "DONE Release Detached %i\n", ui );
+            /* TraceLog( NULL, "DONE Release Detached %i\n", ui );
+             */
 
             ui--;
          }
@@ -247,7 +248,7 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
           */
          if( --pCBlock->pLocals[ 0 ].item.asLong.value == 0 )
          {
-            //TraceLog( NULL, "Free Locals\n" );
+            /* TraceLog( NULL, "Free Locals\n" ); */
             HB_TRACE( HB_TR_DEBUG, ( "Free,Locals %p", pCBlock->pLocals ) );
             hb_xfree( pCBlock->pLocals );
          }

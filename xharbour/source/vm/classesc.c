@@ -78,6 +78,7 @@
 HB_FUNC( __CLS_PARAM )
 {
    HB_THREAD_STUB_API
+
    HB_ITEM_NEW( Array );
    USHORT   uiParam = ( USHORT ) hb_pcount();
    USHORT   n;
@@ -100,12 +101,14 @@ HB_FUNC( __CLS_PARAM )
    hb_itemReturnForward( &Array );
 }
 
-/* This one is used when HB_NOTOBJECT is defined before HBCLASS.CH */
-/* it will avoid any default object to be inherited */
+/* This one is used when HB_NOTOBJECT is defined before HBCLASS.CH
+ * it will avoid any default object to be inherited
+ */
 
 HB_FUNC( __CLS_PAR00 )
 {
    HB_THREAD_STUB_API
+
    HB_ITEM  Array;
    USHORT   uiParam = ( USHORT ) hb_pcount();
    USHORT   n;
@@ -123,9 +126,6 @@ HB_FUNC( __CLS_PAR00 )
 
 USHORT hb_objGetClass( PHB_ITEM pItem )
 {
-   if( pItem && HB_IS_ARRAY( pItem ) )
-      return pItem->item.asArray.value->uiClass;
-   else
-      return 0;
+   return ( pItem && HB_IS_ARRAY( pItem ) ) ? pItem->item.asArray.value->uiClass : 0;
 }
 

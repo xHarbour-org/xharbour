@@ -7,6 +7,62 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2012-11-20 00:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/dynlibhb.c
+  * source/vm/thread.c
+  * source/vm/cmdarg.c
+  * source/vm/arrays.c
+  * source/vm/arrayshb.c
+  * source/vm/codebloc.c
+  * source/vm/classes.c
+  * source/vm/classesc.c
+  * source/vm/dbgentry.c
+  * source/vm/debug.c
+  * source/vm/asort.c
+  * source/vm/do.c
+  * source/vm/dynsym.c
+  * source/vm/errorapi.c
+  * source/vm/estack.c
+  * source/vm/eval.c
+  * source/vm/evalhb.c
+  * source/vm/extend.c
+  * source/vm/fastitem.c
+  * source/vm/fm.c
+  * source/vm/garbage.c
+  * source/vm/harbinit.prg
+  * source/vm/hash.c
+  * source/vm/hbi18n.c
+  * source/vm/strapi.c
+  * source/vm/throw.c
+  * source/vm/set.c
+  * source/vm/runner.c
+  * source/vm/pvalue.c
+  * source/vm/proc.c
+  * source/vm/memvars.c
+  * source/vm/itemapi.c
+  * source/vm/initexit.c
+  * source/vm/inet.c
+  * source/vm/hvm.c
+    ! minor to major reformat by hands
+
+  * contrib/hbexpat/core.c
+    - remove GC marking
+
+  * include/hbapi.h
+    ! hb_pcount() should not directly access internal
+
+  * contrib/libnf/kspeed.c
+  * contrib/libnf/mouse.c
+    ! extend.h -> hbapi.h
+
+  * contrib/hbcurl/hbcurl.c
+    - remove redefinition: hb_parnldef
+
+  * contrib/sixapi/source/sysprop.c
+  * source/odbc/odbc.c
+    ! minor
+
 2012-11-19 10:40 UTC-200 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/vm/hbi18n.c
     ! free language variable if was allocated via hb_getenv

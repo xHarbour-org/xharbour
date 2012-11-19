@@ -53,9 +53,9 @@
 #include "hbsetup.ch"
 #include "inkey.ch"
 
-   ANNOUNCE SysInit
+ANNOUNCE SysInit
 
-   /* NOTE: For complete compatibility */
+/* NOTE: For complete compatibility */
 
 PROCEDURE CLIPPER520()
 
@@ -63,7 +63,7 @@ PROCEDURE CLIPPER520()
 
 #ifdef HB_COMPAT_C53
 
-   /* NOTE: For complete compatibility */
+/* NOTE: For complete compatibility */
 
 PROCEDURE CLIPPER530()
 
@@ -106,15 +106,7 @@ FUNCTION __ErrorBlock( )
 
 PROCEDURE __MinimalErrorHandler( oError )
 
-#ifdef __PLATFORM__Windows
-
-#define EOL Chr(13) + Chr(10)
-
-#else
-
-#define EOL Chr(10)
-
-#endif
+   #define EOL hb_osnewline()
 
    LOCAL cError := "Error!" + EOL
 
@@ -145,14 +137,7 @@ PROCEDURE __MinimalErrorHandler( oError )
 
 HB_FUNC_STATIC( _EXISTHELP )
 {
-   PHB_DYNS pDynSym = hb_dynsymFind( "HELP" );
-   BOOL     bResult = FALSE;
-
-   if( pDynSym )
-   {
-     bResult = TRUE;
-   }
-   hb_retl( bResult );
+   hb_retl( !( hb_dynsymFind( "HELP" ) == NULL ) );
 }
 
 #pragma ENDDUMP

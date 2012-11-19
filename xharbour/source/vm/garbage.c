@@ -80,7 +80,7 @@ static HB_GARBAGE_PTR s_pCurrBlock = NULL;
 /* pointer to locked memory blocks */
 static HB_GARBAGE_PTR s_pLockedBlock = NULL;
 
-//#define GC_RECYCLE
+/* #define GC_RECYCLE */
 
 #ifdef GC_RECYCLE
 /* pointer to Cached Items memory blocks */
@@ -135,9 +135,7 @@ static void hb_gcLink( HB_GARBAGE_PTR * pList, HB_GARBAGE_PTR pAlloc )
       ( *pList )->pPrev    = pAlloc;
    }
    else
-   {
       *pList = pAlloc->pNext = pAlloc->pPrev = pAlloc;
-   }
 }
 
 static void hb_gcUnlink( HB_GARBAGE_PTR * pList, HB_GARBAGE_PTR pAlloc )
@@ -150,9 +148,7 @@ static void hb_gcUnlink( HB_GARBAGE_PTR * pList, HB_GARBAGE_PTR pAlloc )
       *pList = pAlloc->pNext;
 
       if( *pList == pAlloc )
-      {
          *pList = NULL;    /* this was the last block */
-      }
    }
 }
 
@@ -161,7 +157,7 @@ void * hb_gcAlloc( HB_SIZE ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
 {
    HB_GARBAGE_PTR pAlloc;
 
-   #ifdef GC_RECYCLE
+#ifdef GC_RECYCLE
    HB_CRITICAL_LOCK( hb_garbageAllocMutex );
    if( s_pAvailableBaseArrays && ulSize == sizeof( HB_BASEARRAY ) )
    {
@@ -174,9 +170,9 @@ void * hb_gcAlloc( HB_SIZE ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
       HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
       pAlloc = ( HB_GARBAGE_PTR ) hb_xgrab( ulSize + sizeof( HB_GARBAGE ) );
    }
-   #else
+#else
    pAlloc = HB_GARBAGE_NEW( ulSize + sizeof( HB_GARBAGE ) );
-   #endif
+#endif
 
    if( pAlloc )
    {
@@ -196,9 +192,7 @@ void * hb_gcAlloc( HB_SIZE ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
       return ( void * ) ( pAlloc + 1 );   /* hide the internal data */
    }
    else
-   {
       return NULL;
-   }
 }
 
 void hb_gcIncRef( void * pBlock )
@@ -217,28 +211,25 @@ HB_SIZE hb_gcDecRef( void * pBlock )
    --pAlloc;
 
    if( pAlloc->ulHolders == 0 )
-   {
       hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Pointer Release detected: '%p'", ( char * ) pBlock, NULL );
-   }
 
    if( HB_ATOMIC_DEC( pAlloc->ulHolders ) == 0 && ! pAlloc->locked )
    {
-      //OutputDebugString("Calling GC Cleanup function...");
+      /* OutputDebugString("Calling GC Cleanup function...");
+       */
       if( pAlloc->pFunc )
-      {
          ( pAlloc->pFunc )( ( void * ) ( pBlock ) );
-      }
 
-      //OutputDebugString("Attempting to free GC mem...");
+      /* OutputDebugString("Attempting to free GC mem...");
+       */
       hb_gcFree( pBlock );
-      //OutputDebugString("GC mem freed...");
+      /* OutputDebugString("GC mem freed...");
+       */
 
       return 0;
    }
    else
-   {
       return pAlloc->ulHolders;
-   }
 }
 
 /* release a memory block allocated with hb_gcAlloc() */
@@ -267,7 +258,8 @@ void hb_gcFree( void * pBlock )
       }
       else
       {
-         // Might already be marked for deletion.
+         /* Might already be marked for deletion.
+          */
          HB_CRITICAL_LOCK( hb_garbageAllocMutex );
          if( ! ( pAlloc->used & HB_GC_DELETE ) )
          {
@@ -280,9 +272,7 @@ void hb_gcFree( void * pBlock )
       }
    }
    else
-   {
       hb_errInternal( HB_EI_XFREENULL, NULL, NULL, NULL );
-   }
 }
 
 /* return cleanup function pointer */
@@ -309,7 +299,7 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
 {
    HB_GARBAGE_PTR pAlloc;
 
-   #ifdef GC_RECYCLE
+#ifdef GC_RECYCLE
    HB_CRITICAL_LOCK( hb_garbageAllocMutex );
    if( s_pAvailableItems )
    {
@@ -322,38 +312,32 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
       HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
       pAlloc = ( HB_GARBAGE_PTR ) hb_xgrab( sizeof( HB_ITEM ) + sizeof( HB_GARBAGE ) );
    }
-   #else
+#else
    pAlloc = HB_GARBAGE_NEW( sizeof( HB_ITEM ) + sizeof( HB_GARBAGE ) );
-   #endif
+#endif /* GC_RECYCLE */
 
    if( pAlloc )
    {
       HB_ITEM_PTR pItem = ( HB_ITEM_PTR ) ( pAlloc + 1 );
-
 
       pAlloc->pFunc  = hb_gcGripRelease;
       pAlloc->locked = 1;
       pAlloc->used   = s_uUsedFlag;
 
       pItem->type    = HB_IT_NIL;
+
       if( pOrigin )
-      {
          hb_itemCopy( pItem, pOrigin );
-      }
 
       HB_THREAD_GUARD( hb_garbageAllocMutex, hb_gcLink( &s_pLockedBlock, pAlloc ) );
       return pItem;
    }
    else
-   {
       return NULL;
-   }
 }
-
 
 void hb_gcGripDrop( HB_ITEM_PTR pItem )
 {
-
    HB_TRACE( HB_TR_DEBUG, ( "hb_gcGripDrop(%p)", pItem ) );
 
    if( hb_gc_bReleaseAll )
@@ -372,9 +356,7 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
       if( pAlloc->pFunc == hb_gcGripRelease )
       {
          if( HB_IS_COMPLEX( pItem ) )
-         {
             hb_itemClear( pItem );    /* clear value stored in this item */
-         }
       }
 
       HB_CRITICAL_LOCK( hb_garbageAllocMutex );
@@ -385,7 +367,6 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
 
       HB_GARBAGE_FREE( pAlloc );
    }
-
 }
 
 /* Lock a memory pointer so it will not be released if stored
@@ -402,7 +383,6 @@ void * hb_gcLock( void * pBlock )
       {
          HB_CRITICAL_LOCK( hb_garbageAllocMutex );
 
-         //hb_gcUnlink( pContextList, pAlloc );
          hb_gcUnlink( &s_pCurrBlock, pAlloc );
 
          hb_gcLink( &s_pLockedBlock, pAlloc );
@@ -422,7 +402,6 @@ void * hb_gcLock( void * pBlock )
  */
 void * hb_gcUnlock( void * pBlock )
 {
-
    if( pBlock )
    {
       HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pBlock;
@@ -461,39 +440,39 @@ typedef struct
 
    union
    {
-      // ResumePoint_1 does not require any data!
+      /* ResumePoint_1 does not require any data! */
 
       struct
       {
          PHB_ITEM pItem;
          HB_SIZE ulSize;
-      } ResumePoint_2;     //Resume: if( HB_IS_ARRAY( pItem ) )
+      } ResumePoint_2;     /* Resume: if( HB_IS_ARRAY( pItem ) ) */
 
       struct
       {
          PHB_ITEM pKey;
          PHB_ITEM pValue;
          HB_SIZE ulSize;
-      } ResumePoint_3;     //Resume (after pKey): if( HB_IS_HASH( pItem ) )
+      } ResumePoint_3;     /* Resume (after pKey): if( HB_IS_HASH( pItem ) ) */
 
       struct
       {
          PHB_ITEM pKey;
          PHB_ITEM pValue;
          HB_SIZE ulSize;
-      } ResumePoint_4;     //Resume (after pValue): if( HB_IS_HASH( pItem ) )
+      } ResumePoint_4;     /* Resume (after pValue): if( HB_IS_HASH( pItem ) ) */
 
       struct
       {
          HB_CODEBLOCK_PTR pCBlock;
          USHORT ui;
-      } ResumePoint_5;     //Resume: if( HB_IS_BLOCK( pItem ) )
+      } ResumePoint_5;     /* Resume: if( HB_IS_BLOCK( pItem ) ) */
 
    } data;
 
 } ITEMREF_RESUMEINFO, * PITEMREF_RESUMEINFO;
 
-    #define NESTED_ITEMREF( pNewItem, cNewResumePoint ) \
+   #define NESTED_ITEMREF( pNewItem, cNewResumePoint ) \
             \
    pResumeInfo[ iResumeCounter ].cResumePoint = ( cNewResumePoint ); \
             \
@@ -534,7 +513,7 @@ typedef struct
    pItem       = ( pNewItem ); \
    goto ItemRef_Top;
 
-    #define RETURN_OR_RESUME_ITEMREF() \
+   #define RETURN_OR_RESUME_ITEMREF() \
             \
    if( iResumeCounter == 0 ) \
    { \
@@ -594,15 +573,15 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
    HB_CODEBLOCK_PTR     pCBlock = NULL;
    USHORT               ui = 0;
 
-   #ifdef SIMULATE_ITEMREF_RECURSION
+#ifdef SIMULATE_ITEMREF_RECURSION
    PITEMREF_RESUMEINFO  pResumeInfo    = ( PITEMREF_RESUMEINFO ) hb_xgrab( sizeof( ITEMREF_RESUMEINFO ) );
    int                  iResumeCounter = 0;
-   #endif
+#endif
 
    FakedItem.type = HB_IT_ARRAY;
 
 #ifdef SIMULATE_ITEMREF_RECURSION
- ItemRef_Top:
+   ItemRef_Top:
 #endif
 
    while( HB_IS_BYREF( pItem ) )
@@ -621,12 +600,14 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
          {
             FakedItem.item.asArray.value = pItem->item.asRefer.BasePtr.pBaseArray;
 
-            //hb_gcItemRef( &FakedItem );
+            /* hb_gcItemRef( &FakedItem );
+             */
             NESTED_ITEMREF( &FakedItem, 1 );
 #ifdef SIMULATE_ITEMREF_RECURSION
- ItemRef_ResumePoint_1:
+            ItemRef_ResumePoint_1:
 #endif
-            // return;
+            /* return;
+             */
             RETURN_OR_RESUME_ITEMREF();
          }
       }
@@ -634,7 +615,8 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
       {
          if( HB_VM_STACK.pPos == HB_VM_STACK.pItems )
          {
-            //return;
+            /* return;
+             */
             RETURN_OR_RESUME_ITEMREF();
          }
       }
@@ -646,10 +628,12 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
    {
       HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pItem->item.asArray.value;
 
-      //printf( "Array %p\n", pItem->item.asArray.value );
+      /* printf( "Array %p\n", pItem->item.asArray.value );
+       */
       --pAlloc;
 
-      /* Check this array only if it was not checked yet */
+      /* Check this array only if it was not checked yet
+       */
       if( pAlloc->used == s_uUsedFlag )
       {
          ulSize         = pItem->item.asArray.value->ulLen;
@@ -658,18 +642,20 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
           */
          pAlloc->used   ^= HB_GC_USED_FLAG;
 
-         /* mark also all array elements */
+         /* mark also all array elements
+          */
          pItem          = pItem->item.asArray.value->pItems;
-         //printf( "Items %p\n", pItem );
+         /* printf( "Items %p\n", pItem );
+          */
 
          while( ulSize )
          {
-            //printf( "Item %p\n", pItem );
-
-            //hb_gcItemRef( pItem );
+            /* printf( "Item %p\n", pItem );
+             * hb_gcItemRef( pItem );
+             */
             NESTED_ITEMREF( pItem, 2 );
 #ifdef SIMULATE_ITEMREF_RECURSION
- ItemRef_ResumePoint_2:
+            ItemRef_ResumePoint_2:
 #endif
             ++pItem;
             --ulSize;
@@ -696,17 +682,18 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
          /* mark also all hash elements */
          while( ulSize )
          {
-            //printf( "Kry %p Value: %p\n", pKey, pValue );
-
-            //hb_gcItemRef( pKey );
+            /* printf( "Kry %p Value: %p\n", pKey, pValue );
+             * hb_gcItemRef( pKey );
+             */
             NESTED_ITEMREF( pKey, 3 );
 #ifdef SIMULATE_ITEMREF_RECURSION
- ItemRef_ResumePoint_3:
+            ItemRef_ResumePoint_3:
 #endif
-            //hb_gcItemRef( pValue );
+            /* hb_gcItemRef( pValue );
+             */
             NESTED_ITEMREF( pValue, 4 );
 #ifdef SIMULATE_ITEMREF_RECURSION
- ItemRef_ResumePoint_4:
+            ItemRef_ResumePoint_4:
 #endif
             ++pKey;
             ++pValue;
@@ -719,7 +706,8 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
       HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pItem->item.asBlock.value;
       --pAlloc;
 
-      /* Check this block only if it was not checked yet */
+      /* Check this block only if it was not checked yet
+       */
       if( pAlloc->used == s_uUsedFlag )
       {
          pCBlock        = pItem->item.asBlock.value;
@@ -727,13 +715,15 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
 
          pAlloc->used   ^= HB_GC_USED_FLAG; /* mark this codeblock as used */
 
-         /* mark as used all detached variables in a codeblock */
+         /* mark as used all detached variables in a codeblock
+          */
          while( ui <= pCBlock->uiLocals )
          {
-            //hb_gcItemRef( &pCBlock->pLocals[ ui ] );
+            /* hb_gcItemRef( &pCBlock->pLocals[ ui ] );
+             */
             NESTED_ITEMREF( &pCBlock->pLocals[ ui ], 5 );
 #ifdef SIMULATE_ITEMREF_RECURSION
- ItemRef_ResumePoint_5:
+            ItemRef_ResumePoint_5:
 #endif
             ++ui;
          }
@@ -741,13 +731,15 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
    }
    else if( HB_IS_POINTER( pItem ) )
    {
-      /* check if this memory was allocated by a hb_gcAlloc() */
+      /* check if this memory was allocated by a hb_gcAlloc()
+       */
       if( pItem->item.asPointer.collect )
       {
          HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pItem->item.asPointer.value;
          --pAlloc;
 
-         /* Check this memory only if it was not checked yet */
+         /* Check this memory only if it was not checked yet
+          */
          if( pAlloc->used == s_uUsedFlag )
          {
             /* mark this memory as used so it will be no re-checked from
@@ -758,14 +750,15 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
       }
    }
 
-   /* all other data types don't need the GC */
-
+   /* all other data types don't need the GC
+    */
    RETURN_OR_RESUME_ITEMREF();
 }
 
 void hb_gcCollect( void )
 {
-   /* TODO: decrease the amount of time spend collecting */
+   /* TODO: decrease the amount of time spend collecting
+    */
    hb_gcCollectAll( FALSE );
 }
 
@@ -778,7 +771,7 @@ void hb_gcCollectAll( BOOL bForce )
    HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(%i), %p, %i", bForce, s_pCurrBlock, s_bCollecting ) );
 
    /* is anoter garbage in action? */
-   #ifdef HB_THREAD_SUPPORT
+#ifdef HB_THREAD_SUPPORT
    HB_CRITICAL_LOCK( hb_garbageAllocMutex );
    if( s_pCurrBlock == NULL || ( bForce == FALSE && s_uAllocated < HB_GC_COLLECTION_JUSTIFIED ) )
    {
@@ -792,19 +785,22 @@ void hb_gcCollectAll( BOOL bForce )
       to regain control or just wait for a time where no thread is active. */
    hb_threadWaitForIdle();
 
-   #else
-   if( s_bCollecting )      // note: 1) is volatile and 2) not very important if fails 1 time
-   {
+#else
+   /* note: 1) is volatile and
+    *       2) not very important if fails 1 time
+    */
+   if( s_bCollecting )
       return;
-   }
+
    /* Even if not locked, a read only non-critical variable here
-      should not be a problem */
+    * should not be a problem
+    */
    if( s_pCurrBlock == NULL || ( bForce == FALSE && s_uAllocated < HB_GC_COLLECTION_JUSTIFIED ) )
    {
       s_bCollecting = FALSE;
       return;
    }
-   #endif
+#endif
 
    /* By hypotesis, only one thread will be granted the right to be here;
       so cheching for consistency of s_pCurrBlock further is useless.*/
@@ -827,52 +823,53 @@ void hb_gcCollectAll( BOOL bForce )
 
    HB_TRACE( HB_TR_INFO, ( "Sweep Scan" ) );
 
-   #ifdef TRACE_COLLECT
+#ifdef TRACE_COLLECT
    TraceLog( NULL, "Sweep Scan\n" );
-   #endif
+#endif
 
    /* Step 1 - MARK */
    /* check all known places for blocks they are referring */
-   #ifdef HB_THREAD_SUPPORT
+#ifdef HB_THREAD_SUPPORT
    hb_threadIsLocalRef();
-   #else
+#else
    hb_vmIsLocalRef();
-   #endif
+#endif
 
-   #ifdef TRACE_COLLECT
+#ifdef TRACE_COLLECT
    TraceLog( NULL, "After LocalRef\n" );
-   #endif
+#endif
 
    hb_vmIsStaticRef();
-   #ifdef TRACE_COLLECT
+#ifdef TRACE_COLLECT
    TraceLog( NULL, "After StaticRef\n" );
-   #endif
+#endif
 
    hb_vmIsGlobalRef();
-   #ifdef TRACE_COLLECT
+#ifdef TRACE_COLLECT
    TraceLog( NULL, "After Globals\n" );
-   #endif
+#endif
 
-   #ifndef HB_THREAD_SUPPORT
+#ifndef HB_THREAD_SUPPORT
    /* JC1: under MT, each threadIsLocalRef does its memvar reffing */
    hb_memvarsIsMemvarRef();
-   #endif
-   #ifdef TRACE_COLLECT
+#endif
+
+#ifdef TRACE_COLLECT
    TraceLog( NULL, "After MemvarRef\n" );
-   #endif
+#endif
 
    hb_clsIsClassRef();
-   #ifdef TRACE_COLLECT
+#ifdef TRACE_COLLECT
    TraceLog( NULL, "After ClassRef\n" );
-   #endif
+#endif
 
    if( HB_IS_GCITEM( &hb_vm_BreakBlock ) )
    {
       hb_gcItemRef( &hb_vm_BreakBlock );
    }
-   #ifdef TRACE_COLLECT
+#ifdef TRACE_COLLECT
    TraceLog( NULL, "After BreakBlock\n" );
-   #endif
+#endif
 
    HB_TRACE( HB_TR_INFO, ( "Locked Scan" ) );
 
@@ -886,11 +883,10 @@ void hb_gcCollectAll( BOOL bForce )
 
       do
       {
-         /* it is not very elegant method but it works well */
+         /* it is not very elegant method but it works well
+          */
          if( pAlloc->pFunc == hb_gcGripRelease )
-         {
             hb_gcItemRef( ( HB_ITEM_PTR ) ( pAlloc + 1 ) );
-         }
          else if( pAlloc->pFunc == hb_arrayReleaseGarbage )
          {
             HB_ITEM FakedItem;
@@ -923,9 +919,9 @@ void hb_gcCollectAll( BOOL bForce )
       }
       while( s_pLockedBlock != pAlloc );
    }
-   #ifdef TRACE_COLLECT
+#ifdef TRACE_COLLECT
    TraceLog( NULL, "After Lock scan\n" );
-   #endif
+#endif
 
    HB_TRACE( HB_TR_INFO, ( "Cleanup Scan" ) );
 
@@ -950,17 +946,18 @@ void hb_gcCollectAll( BOOL bForce )
       s_pCurrBlock = s_pCurrBlock->pNext;
    }
    while( s_pCurrBlock && ( s_pCurrBlock != pAlloc ) );
-   #ifdef TRACE_COLLECT
+#ifdef TRACE_COLLECT
    TraceLog( NULL, "After Cleanup scan\n" );
-   #endif
+#endif
 
    HB_TRACE( HB_TR_INFO, ( "Release Scan" ) );
 
    /* Step 4 - Release all blocks that are still marked as unused */
    pAlloc = s_pCurrBlock;
+
    do
    {
- NewTopBlock:
+      NewTopBlock:
 
       if( s_pCurrBlock->used & HB_GC_DELETE )
       {
@@ -970,10 +967,10 @@ void hb_gcCollectAll( BOOL bForce )
          hb_gcUnlink( &s_pCurrBlock, s_pCurrBlock );
 
          /*
-            Releasing the top block in the list, so we must mark the new top into pAlloc
-            but we still need to process this new top. Without this goto, the while
-            condition will immediatly fail. Using extra flags, and new conditions
-            will adversly effect performance.
+          * Releasing the top block in the list, so we must mark the new top into pAlloc
+          * but we still need to process this new top. Without this goto, the while
+          * condition will immediatly fail. Using extra flags, and new conditions
+          * will adversly effect performance.
           */
          if( pDelete == pAlloc )
          {
@@ -995,14 +992,12 @@ void hb_gcCollectAll( BOOL bForce )
          }
       }
       else
-      {
          s_pCurrBlock = s_pCurrBlock->pNext;
-      }
    }
    while( s_pCurrBlock && ( pAlloc != s_pCurrBlock ) );
-   #ifdef TRACE_COLLECT
+#ifdef TRACE_COLLECT
    TraceLog( NULL, "After Release scan\n" );
-   #endif
+#endif
 
    s_pCurrBlock = pAlloc;
 
@@ -1018,10 +1013,9 @@ void hb_gcCollectAll( BOOL bForce )
    /* Step 6: release all the locks on the scanned objects */
    /* Put itself back on machine execution count */
 
-   #if defined( HB_THREAD_SUPPORT )
+#if defined( HB_THREAD_SUPPORT )
    hb_threadIdleEnd();
-   #endif
-
+#endif
 }
 
 /* JC1: THREAD UNSAFE
@@ -1054,36 +1048,37 @@ void hb_gcReleaseAll( void )
 
       }
       while( s_pLockedBlock && ( s_pLockedBlock != pAlloc ) );
-      #ifdef TRACE_RELEASE
+#ifdef TRACE_RELEASE
       TraceLog( NULL, "After Cleanup scan\n" );
-      #endif
+#endif
 
       do
       {
          HB_TRACE( HB_TR_INFO, ( "Release Locked %p", s_pLockedBlock ) );
          pDelete = s_pLockedBlock;
          hb_gcUnlink( &s_pLockedBlock, s_pLockedBlock );
-         //HB_GARBAGE_FREE( pDelete );
+         /* HB_GARBAGE_FREE( pDelete );
+          */
          hb_xfree( ( void * ) ( pDelete ) );
       }
       while( s_pLockedBlock );
-      #ifdef TRACE_RELEASE
+#ifdef TRACE_RELEASE
       TraceLog( NULL, "After Release scan\n" );
-      #endif
+#endif
    }
 
    if( s_pCurrBlock )
    {
-      #ifdef TRACE_RELEASE
+#ifdef TRACE_RELEASE
       TraceLog( NULL, "Before 2. Cleanup scan %p\n", s_pCurrBlock );
-      #endif
+#endif
 
       pAlloc = s_pCurrBlock;
       do
       {
-         #ifdef TRACE_RELEASE
+#ifdef TRACE_RELEASE
          TraceLog( NULL, "Clean: %p %p %p %p %p %p\n", s_pCurrBlock, s_pCurrBlock->pFunc, hb_gcGripRelease, hb_arrayReleaseGarbage, hb_hashReleaseGarbage, hb_codeblockDeleteGarbage );
-         #endif
+#endif
 
          s_pCurrBlock->used |= HB_GC_DELETE;
 
@@ -1094,57 +1089,59 @@ void hb_gcReleaseAll( void )
             ( s_pCurrBlock->pFunc )( ( void * ) ( s_pCurrBlock + 1 ) );
             HB_TRACE( HB_TR_INFO, ( "DONE Cleanup, %p", s_pCurrBlock ) );
          }
-         #ifdef TRACE_RELEASE
+#ifdef TRACE_RELEASE
          TraceLog( NULL, "  Cleaned: %p, Next: %p\n", s_pCurrBlock, s_pCurrBlock->pNext );
-         #endif
-
+#endif
          s_pCurrBlock = s_pCurrBlock->pNext;
 
       }
       while( s_pCurrBlock && ( s_pCurrBlock != pAlloc ) );
-      #ifdef TRACE_RELEASE
+#ifdef TRACE_RELEASE
       TraceLog( NULL, "2. After Cleanup scan\n" );
-      #endif
+#endif
 
       do
       {
          HB_TRACE( HB_TR_INFO, ( "Release %p", s_pCurrBlock ) );
          pDelete = s_pCurrBlock;
          hb_gcUnlink( &s_pCurrBlock, s_pCurrBlock );
-         //HB_GARBAGE_FREE( pDelete );
+         /* HB_GARBAGE_FREE( pDelete );
+          */
          hb_xfree( ( void * ) ( pDelete ) );
       }
       while( s_pCurrBlock );
-      #ifdef TRACE_RELEASE
+#ifdef TRACE_RELEASE
       TraceLog( NULL, "2. After Release scan\n" );
-      #endif
+#endif
    }
 
-   #ifdef GC_RECYCLE
+#ifdef GC_RECYCLE
    while( s_pAvailableItems )
    {
       HB_TRACE( HB_TR_INFO, ( "Release %p", s_pAvailableItems ) );
       pDelete = s_pAvailableItems;
       hb_gcUnlink( &s_pAvailableItems, s_pAvailableItems );
-      //HB_GARBAGE_FREE( pDelete );
+      /* HB_GARBAGE_FREE( pDelete );
+       */
       hb_xfree( ( void * ) ( pDelete ) );
    }
-      #ifdef TRACE_RELEASE
+#ifdef TRACE_RELEASE
    TraceLog( NULL, "3. After Release scan\n" );
-      #endif
+#endif
 
    while( s_pAvailableBaseArrays )
    {
       HB_TRACE( HB_TR_INFO, ( "Release %p", s_pAvailableBaseArrays ) );
       pDelete = s_pAvailableBaseArrays;
       hb_gcUnlink( &s_pAvailableBaseArrays, s_pAvailableBaseArrays );
-      //HB_GARBAGE_FREE( pDelete );
+      /* HB_GARBAGE_FREE( pDelete );
+       */
       hb_xfree( ( void * ) ( pDelete ) );
    }
-      #ifdef TRACE_RELEASE
+#ifdef TRACE_RELEASE
    TraceLog( NULL, "4. After Release scan\n" );
-      #endif
-   #endif
+#endif
+#endif /* GC_RECYCLE */
 
    s_bCollecting     = FALSE;
    hb_gc_bReleaseAll = FALSE;

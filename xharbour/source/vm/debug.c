@@ -78,9 +78,9 @@ static void AddToArray( PHB_ITEM pItem, PHB_ITEM pReturn, ULONG ulPos )
       hb_itemPutCPtr( &Temp, sTemp, iLen );
 
       hb_arraySetForward( pReturn, ulPos, &Temp );
-      // hb_itemRelease( pTemp );               /* Get rid of temporary str.*/
+      /* hb_itemRelease( pTemp );                 Get rid of temporary str.*/
    }
-   else                                         /* Normal types             */
+   else                                        /* Normal types             */
    {
       hb_arraySet( pReturn, ulPos, pItem );
    }
@@ -118,7 +118,6 @@ HB_FUNC( HB_DBG_VMSTKGLIST )
 {
    HB_ITEM     Return;
    PHB_ITEM *  pItem;
-
    USHORT      uiLen = hb_stackLenGlobal();
    USHORT      uiPos = 1;
 
@@ -244,13 +243,11 @@ PHB_ITEM hb_dbg_vmVarLGet( int iLevel, int iLocal )
    }
 
    if( iLocal >= 0 )
-   {
       return hb_itemUnRef( *( pBase + 1 + iLocal ) );
-   }
+
    if( HB_IS_BLOCK( *( pBase + 1 ) ) )
-   {
       return hb_codeblockGetVar( *( pBase + 1 ), ( LONG ) iLocal );
-   }
+
    return NULL;
 }
 HB_EXTERN_END
@@ -262,13 +259,9 @@ HB_FUNC( HB_DBG_VMVARLGET )
    PHB_ITEM pLocal   = hb_dbg_vmVarLGet( iLevel, iLocal );
 
    if( pLocal )
-   {
       hb_itemReturn( pLocal );
-   }
    else
-   {
       hb_errRT_BASE( EG_ARG, 9999, NULL, "HB_DBG_VMVARLGET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-   }
 }
 
 HB_FUNC( HB_DBG_VMVARLSET )
@@ -288,10 +281,8 @@ HB_FUNC( HB_DBG_VMVARLSET )
       iLocal -= USHRT_MAX;
       iLocal--;
    }
-   if( iLocal >= 0 )
-      pLocal = *( pBase + 1 + iLocal );
-   else
-      pLocal = hb_codeblockGetVar( *( pBase + 1 ), ( LONG ) iLocal );
+
+   pLocal = ( iLocal >= 0 ) ? *( pBase + 1 + iLocal ) : hb_codeblockGetVar( *( pBase + 1 ), ( LONG ) iLocal );
 
    hb_itemCopy( hb_itemUnRef( pLocal ), *( HB_VM_STACK.pBase + 4 ) );
 }
