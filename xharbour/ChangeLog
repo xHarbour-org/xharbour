@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2012-11-19 10:40 UTC-200 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+  * source/vm/hbi18n.c
+    ! free language variable if was allocated via hb_getenv
 
 2012-11-17 20:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbexpat/_hbconf.h

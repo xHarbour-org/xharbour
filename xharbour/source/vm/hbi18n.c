@@ -96,7 +96,7 @@ HB_EXTERN_BEGIN
 
 BOOL hb_i18nInit( char * i18n_dir, char * language )
 {
-
+   BOOL bOk=FALSE;
    // Supposing that the user strings are compiled in English;
    // this default can be changed later
    hb_strncpy( s_base_language, HB_INTERNATIONAL_CODE, HB_I18N_CODELEN );
@@ -108,6 +108,12 @@ BOOL hb_i18nInit( char * i18n_dir, char * language )
       if( language == NULL )
       {
          language = hb_getenv( "LC_ALL" );
+         if ( language ) 
+            bOk = TRUE;
+      }
+      else
+      {
+	      bOk = TRUE;
       }
    }
 
@@ -128,10 +134,14 @@ BOOL hb_i18nInit( char * i18n_dir, char * language )
       // but we know that we don't want internationalization
       if( language != NULL )
       {
+         if ( bOk ) 
+            hb_xfree( language ) ;
+	      
          return FALSE;
       }
    }
-
+   if ( bOk ) 
+      hb_xfree( language ) ;
    return TRUE;
 }
 
