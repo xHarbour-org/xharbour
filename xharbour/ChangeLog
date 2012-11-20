@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-21 06:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/harbour.c
+    * only avoid uses of reserved words if HB_AVOID_RESERVED_WORDS is defined
+      when building xHarbour
+
 2012-11-20 10:06 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/macro.c
   * source/vm/mainstd.c
