@@ -8,6 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-20 10:06 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/macro.c
+  * source/vm/mainstd.c
+  * source/vm/mainwin.c
+  * source/vm/maindllp.c
+    ! reformatted (left over), mainly replaced '//' -> '/**/'
+
+  * include/hbtypes.h
+    ! updated function prototypes
+
+  * source/vm/export.def
+    ! typo: hb_stors -> hb_storns
+
 2012-11-20 00:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/dynlibhb.c
   * source/vm/thread.c

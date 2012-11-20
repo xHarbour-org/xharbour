@@ -91,41 +91,39 @@ int APIENTRY WinMain( HINSTANCE hInstance,      /* handle to current instance */
 
    while( *lpCmdLine && s_argc < MAX_ARGS )
    {
-      while( *lpCmdLine == ' ' )  // Skip over any white space
-      {
+      while( *lpCmdLine == ' ' )  /* Skip over any white space */
          lpCmdLine++;
-      }
+
       if( *lpCmdLine )
       {
          pStart         = NULL;
          bInQuotedParam = FALSE;
+
          while( *lpCmdLine )
          {
             if( *lpCmdLine == '"' )
             {
                lpCmdLine++;
+
                if( bInQuotedParam )
                {
                   if( pStart == NULL )
-                  {
                      pStart = pArg;
-                  }
+
                   break;
                }
                else
-               {
                   bInQuotedParam = TRUE;
-               }
             }
             else if( *lpCmdLine == ' ' )
             {
                if( bInQuotedParam )
                {
                   *pArg = *lpCmdLine++;
+
                   if( pStart == NULL )
-                  {
                      pStart = pArg;
-                  }
+
                   pArg++;
                }
                else
@@ -137,10 +135,10 @@ int APIENTRY WinMain( HINSTANCE hInstance,      /* handle to current instance */
             else
             {
                *pArg = *lpCmdLine++;
+
                if( pStart == NULL )
-               {
                   pStart = pArg;
-               }
+
                pArg++;
             }
          }
@@ -163,17 +161,8 @@ int APIENTRY WinMain( HINSTANCE hInstance,      /* handle to current instance */
 #else
    free( pArgs );
 #endif
+
    return iResult;
 }
 
-#if 0
-   #if ( /* defined( __DMC__ ) || */ defined( __WATCOMC__ ) /* || defined( __MINGW32__ ) */ ) && ! defined( __EXPORT__ )
-HB_EXTERN_BEGIN
-void hb_forceLinkMainWin( void )
-{
-}
-HB_EXTERN_END
-   #endif
-#endif
-
-#endif
+#endif /* HB_OS_WIN */

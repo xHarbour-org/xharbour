@@ -56,6 +56,11 @@
  */
 
 #define HB_OS_WIN_USED
+
+#ifndef _CRT_SECURE_NO_WARNINGS
+#   define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include "hbtypes.h"
 
 HB_EXTERN_BEGIN
@@ -111,7 +116,7 @@ static FARPROC hb_GetProcAddress( char * szFuncName )
       {
          /* Try #3: Watcom register calling flavor */
          char * szFuncName_ = ( char * ) malloc( strlen( szFuncName ) + 1 );
-         hb_snprintf( szFuncName_, strlen( szFuncName ) + 1, "%s_", szFuncName + 1 );
+         sprintf( szFuncName_, "%s_", szFuncName + 1 );
          pFunc = GetProcAddress( hModule, szFuncName_ );
          free( szFuncName_ );
 
@@ -122,7 +127,7 @@ static FARPROC hb_GetProcAddress( char * szFuncName )
                Application will exit here ...
              */
             char __szError[ 256 ];
-            hb_snprintf( __szError, sizeof( __szError ), "Cannot find function address: %s", szFuncName );
+            sprintf( __szError, "Cannot find function address: %s", szFuncName );
             MessageBox( NULL, __szError, szFuncName, MB_ICONSTOP );
             exit( 0 );
          }
@@ -233,7 +238,7 @@ int  hb_pcount( void )          /* returns the number of suplied parameters */
    return pCounts();
 }
 
-//----------------------------------------------------------------------------//
+/*---------------------------------------------------------------------------*/
 #undef hb_ret
 void hb_ret( void )
 {
@@ -1207,9 +1212,9 @@ HB_SIZE hb_xsize( void * pMem )                  /* returns the size of an alloc
    return pXsize( ( void * ) pMem );
 }
 
-//----------------------------------------------------------------------------//
+/*---------------------------------------------------------------------------*/
 #undef hb_fsDelete
-BOOL hb_fsDelete( BYTE * pszFileName )
+BOOL hb_fsDelete( const char * pszFileName )
 {
 #if defined( __cplusplus )
    static HB_FSDELETE
@@ -1222,9 +1227,9 @@ BOOL hb_fsDelete( BYTE * pszFileName )
    return pFunc( pszFileName );
 }
 
-//----------------------------------------------------------------------------//
+/*---------------------------------------------------------------------------*/
 #undef hb_fsWrite
-USHORT hb_fsWrite( HB_FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount )
+USHORT hb_fsWrite( HB_FHANDLE hFileHandle, const void * pBuff, USHORT ulCount )
 {
 #if defined( __cplusplus )
    static HB_FSWRITE pFunc = NULL;
@@ -1237,7 +1242,7 @@ USHORT hb_fsWrite( HB_FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount )
    return pFunc( hFileHandle, pBuff, ulCount );
 }
 
-//----------------------------------------------------------------------------//
+/*---------------------------------------------------------------------------*/
 #undef hb_fsSeek
 ULONG hb_fsSeek( HB_FHANDLE hFileHandle, LONG lOffset, USHORT uiMode )
 {
@@ -1252,9 +1257,10 @@ ULONG hb_fsSeek( HB_FHANDLE hFileHandle, LONG lOffset, USHORT uiMode )
    return pFunc( hFileHandle, lOffset, uiMode );
 }
 
-//----------------------------------------------------------------------------//
+/*---------------------------------------------------------------------------*/
 #undef hb_fsCreate
-HB_FHANDLE hb_fsCreate( BYTE * pszFileName, USHORT uiAttr )
+
+HB_FHANDLE hb_fsCreate( const char * pszFileName, ULONG uiAttr )
 {
 #if defined( __cplusplus )
    static HB_FSCREATE
@@ -1267,9 +1273,9 @@ HB_FHANDLE hb_fsCreate( BYTE * pszFileName, USHORT uiAttr )
    return pFunc( pszFileName, uiAttr );
 }
 
-//----------------------------------------------------------------------------//
+/*---------------------------------------------------------------------------*/
 #undef hb_fsRead
-USHORT hb_fsRead( HB_FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount )
+USHORT hb_fsRead( HB_FHANDLE hFileHandle, void * pBuff, USHORT ulCount )
 {
 #if defined( __cplusplus )
    static HB_FSREAD
@@ -1282,9 +1288,9 @@ USHORT hb_fsRead( HB_FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount )
    return pFunc( hFileHandle, pBuff, ulCount );
 }
 
-//----------------------------------------------------------------------------//
+/*---------------------------------------------------------------------------*/
 #undef hb_fsOpen
-HB_FHANDLE hb_fsOpen( BYTE * pszFileName, USHORT uiFlags )
+HB_FHANDLE hb_fsOpen( const char * pszFileName, USHORT uiFlags )
 {
 #if defined( __cplusplus )
    static HB_FSOPEN
@@ -1297,7 +1303,7 @@ HB_FHANDLE hb_fsOpen( BYTE * pszFileName, USHORT uiFlags )
    return pFunc( pszFileName, uiFlags );
 }
 
-//----------------------------------------------------------------------------//
+/*---------------------------------------------------------------------------*/
 #undef hb_fsClose
 void hb_fsClose( HB_FHANDLE hFileHandle  )
 {
@@ -1312,36 +1318,6 @@ void hb_fsClose( HB_FHANDLE hFileHandle  )
    pFunc( hFileHandle );
 }
 
-#undef _HB_SNPRINTF_ADD_EOS
-#undef hb_snprintf
-/* NOTE: The full size of the buffer is expected as nSize. [vszakats] */
-int hb_snprintf( char * buffer, size_t nSize, const char * format, ... )
-{
-   va_list  arglist;
-   ULONG    result;
-
-   va_start( arglist, format );
-
-#if defined( _MSC_VER ) && _MSC_VER >= 1400
-   result   = _vsnprintf_s( buffer, nSize, _TRUNCATE, format, arglist );
-#elif ( defined( _MSC_VER ) || defined( __DMC__ ) ) && ! defined( __XCC__ )
-   result   = _vsnprintf( buffer, nSize, format, arglist );
-   #define _HB_SNPRINTF_ADD_EOS
-#elif defined( __WATCOMC__ ) && __WATCOMC__ < 1200
-   result   = _vbprintf( buffer, nSize, format, arglist );
-#else
-   result   = vsnprintf( buffer, nSize, format, arglist );
-#endif
-
-   va_end( arglist );
-
-#ifdef _HB_SNPRINTF_ADD_EOS
-   if( buffer && nSize )
-      buffer[ nSize - 1 ] = '\0';
-#endif
-
-   return result;
-}
-
 HB_EXTERN_END
-#endif
+
+#endif /* HB_OS_WIN */

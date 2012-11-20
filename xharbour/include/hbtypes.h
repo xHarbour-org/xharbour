@@ -141,11 +141,11 @@ typedef void     ( * HB_XFREE)( void * pMem );                  /* frees memory 
 typedef void *   ( * HB_XREALLOC)( void * pMem, HB_SIZE ulSize ); /* reallocates memory */
 typedef HB_SIZE  ( * HB_XSIZE)( void * pMem );                  /* returns the size of an allocated memory block */
 typedef void     ( * HB_FSCLOSE  ) ( HB_FHANDLE hFileHandle );
-typedef BOOL     ( * HB_FSDELETE ) ( BYTE * pszFileName );
-typedef HB_FHANDLE  ( * HB_FSOPEN   ) ( BYTE * pszFileName, USHORT uiFlags );
-typedef USHORT   ( * HB_FSREAD   ) ( HB_FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount );
+typedef BOOL     ( * HB_FSDELETE ) ( const char * pszFileName );
+typedef HB_FHANDLE  ( * HB_FSOPEN   ) (  const char * pszFileName, USHORT uiFlags  );
+typedef USHORT   ( * HB_FSREAD   ) ( HB_FHANDLE hFileHandle, void * pBuff, USHORT ulCount );
 typedef ULONG    ( * HB_FSSEEK   ) ( HB_FHANDLE hFileHandle, LONG lOffset, USHORT uiMode );
-typedef USHORT   ( * HB_FSWRITE  ) ( HB_FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount );
-typedef HB_FHANDLE  ( * HB_FSCREATE ) ( BYTE * pszFileName, USHORT uiAttr );
+typedef USHORT   ( * HB_FSWRITE  ) ( HB_FHANDLE hFileHandle, const void * pBuff, USHORT ulCount );
+typedef HB_FHANDLE  ( * HB_FSCREATE ) (  const char * pszFileName, ULONG uiAttr  );
 
 #endif /* HB_TYPES_H_ */

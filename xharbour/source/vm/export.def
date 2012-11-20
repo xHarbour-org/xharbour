@@ -46,7 +46,7 @@ hb_storl
 hb_storni
 hb_stornl
 hb_stornd
-hb_stors
+hb_storns
 hb_arrayNew
 hb_arrayLen
 hb_arrayIsObject
