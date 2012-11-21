@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-21 07:47 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/makefile.gc
+    ! typo: if -> ifeq
+
 2012-11-21 07:12 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/harbour.c
     * bad typo: !defined -> defined
