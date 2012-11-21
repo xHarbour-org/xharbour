@@ -1051,10 +1051,12 @@ void hb_compChkEnvironVar( char * szSwitch )
                {
                   hb_comp_autoDeferred = TRUE;
                }
+#if defined( HB_AVOID_RESERVED_WORDS )
                else if( HB_TOUPPER( *( s + 1 ) ) == 'X'  && *( s + 2 ) == 0 )
                {
                   hb_comp_bUsePPReservedWord = TRUE;
                }
+#endif
                else if( *( s + 1 ) == 0 )
                {
                   hb_comp_bForceMemvars = TRUE;

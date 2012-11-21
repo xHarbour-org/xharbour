@@ -620,7 +620,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
    PFUNCTION   pFunc = hb_comp_functions.pLast;
    BOOL        bUsed = FALSE;
 
-#if !defined( HB_AVOID_RESERVED_WORDS )
+#if defined( HB_AVOID_RESERVED_WORDS )
    if ( ! hb_comp_bUsePPReservedWord && szVarName && hb_compReservedPPName( szVarName ) )
    {
        hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_USE_RESERVED_NAME, szVarName, NULL );

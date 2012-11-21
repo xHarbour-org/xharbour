@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-21 07:12 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/harbour.c
+    * bad typo: !defined -> defined
+
+  * source/compiler/cmdcheck.c
+  * source/compiler/hbusage.c
+  * winmake/common3.mak
+  * winmake/makefile.gc
+    ! add -DHB_AVOID_RESERVED_WORDS to compiler flag when: SET HB_AVOID_RESERVED_WORDS=1
+
 2012-11-21 06:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/harbour.c
     * only avoid uses of reserved words if HB_AVOID_RESERVED_WORDS is defined
