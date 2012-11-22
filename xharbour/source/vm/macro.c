@@ -70,6 +70,8 @@
   #include "hbpp.h"
 #endif
 
+#define MAX_MACRO_TEXT 4096
+
 /* .and. & .or. expressions shortcuts - the expression optimiser needs
  * a global variable
  */
@@ -524,7 +526,7 @@ void hb_macroGetValue( PHB_ITEM pItem, BYTE iContext, BYTE flags )
       HB_MACRO       struMacro;
       int            iStatus;
       const char *   szString;
-      char           szCopy[ 256 ];
+      char           szCopy[ MAX_MACRO_TEXT ];
       HB_SIZE        ulLength = pItem->item.asString.length;
 
 #ifdef HB_MACRO_STATEMENTS

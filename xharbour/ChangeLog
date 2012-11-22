@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-22 20:36 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/macro.c
+    ! increase macro string size to 4096 (this should be enough IMO)
+
 2012-11-22 08:25 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/item.api
   * include/hbapi.h
