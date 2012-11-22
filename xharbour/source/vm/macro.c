@@ -78,7 +78,7 @@ BOOL           hb_comp_bShortCuts   = TRUE;
 /* various flags for macro compiler */
 static ULONG   s_macroFlags         = HB_SM_HARBOUR | HB_SM_XBASE | HB_SM_SHORTCUTS;
 
-static void hb_macroUseAliased( HB_ITEM_PTR, HB_ITEM_PTR, int, BYTE );
+static void hb_macroUseAliased( PHB_ITEM, PHB_ITEM, int, BYTE );
 
 /* ************************************************************************* */
 
@@ -89,7 +89,7 @@ static void hb_macroUseAliased( HB_ITEM_PTR, HB_ITEM_PTR, int, BYTE );
  * 'szString' - a string to compile
  * 'iLen' - length of the string to compile
  */
-static int hb_macroParse( HB_MACRO_PTR pMacro, char * szString, HB_SIZE iLen )
+static int hb_macroParse( PHB_MACRO pMacro, char * szString, HB_SIZE iLen )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_macroParse(%p, %s, %i)", pMacro, szString, iLen ) );
 
@@ -104,7 +104,7 @@ static int hb_macroParse( HB_MACRO_PTR pMacro, char * szString, HB_SIZE iLen )
    pMacro->pError                = NULL;
 
    /* initialize the output (pcode) buffer - it will be filled by yacc */
-   pMacro->pCodeInfo             = ( HB_PCODE_INFO_PTR ) hb_xgrab( sizeof( HB_PCODE_INFO ) );
+   pMacro->pCodeInfo             = ( PHB_PCODE_INFO ) hb_xgrab( sizeof( HB_PCODE_INFO ) );
    pMacro->pCodeInfo->lPCodeSize = HB_PCODE_SIZE;
    pMacro->pCodeInfo->lPCodePos  = 0;
    pMacro->pCodeInfo->pLocals    = NULL;
@@ -126,7 +126,7 @@ static int hb_macroParse( HB_MACRO_PTR pMacro, char * szString, HB_SIZE iLen )
  *    the 'pMacro' pointer is not released - it can be a pointer
  *    to a memory allocated on the stack.
  */
-void hb_macroDelete( HB_MACRO_PTR pMacro )
+void hb_macroDelete( PHB_MACRO pMacro )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_macroDelete(%p)", pMacro ) );
 
@@ -142,7 +142,7 @@ void hb_macroDelete( HB_MACRO_PTR pMacro )
 
 /* checks if a correct ITEM was passed from the virtual machine eval stack
  */
-static BOOL hb_macroCheckParam( HB_ITEM_PTR pItem )
+static BOOL hb_macroCheckParam( PHB_ITEM pItem )
 {
    BOOL bValid = TRUE;
 
@@ -150,7 +150,7 @@ static BOOL hb_macroCheckParam( HB_ITEM_PTR pItem )
 
    if( ! HB_IS_STRING( pItem ) )
    {
-      HB_ITEM_PTR pResult = hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 1, pItem );
+      PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 1, pItem );
 
       bValid = FALSE;
 
@@ -170,14 +170,14 @@ static BOOL hb_macroCheckParam( HB_ITEM_PTR pItem )
  */
 static HB_ERROR_HANDLE( hb_macroErrorEvaluation )
 {
-   HB_ITEM_PTR pResult = hb_itemDo( ErrorInfo->ErrorBlock, 1, ErrorInfo->Error );
+   PHB_ITEM pResult = hb_itemDo( ErrorInfo->ErrorBlock, 1, ErrorInfo->Error );
 
    /* In a special case when QUIT is requested then there is no return
     * to code where macro evaluation was called. We have to
     * release all used memory here.
     */
    if( hb_vmRequestQuery() == HB_QUIT_REQUESTED )
-      hb_macroDelete( ( HB_MACRO_PTR ) ErrorInfo->Cargo );
+      hb_macroDelete( ( PHB_MACRO ) ErrorInfo->Cargo );
 
    return pResult;
 }
@@ -186,7 +186,7 @@ static HB_ERROR_HANDLE( hb_macroErrorEvaluation )
  */
 static HB_ERROR_HANDLE( hb_macroErrorType )
 {
-   HB_MACRO_PTR pMacro = ( HB_MACRO_PTR ) ErrorInfo->Cargo;
+   PHB_MACRO pMacro = ( PHB_MACRO ) ErrorInfo->Cargo;
 
    /* copy error object for later diagnostic usage */
    if( ! pMacro->pError )
@@ -206,7 +206,7 @@ static HB_ERROR_HANDLE( hb_macroErrorType )
  * pMacro is a pointer to HB_MACRO structure created by macro compiler
  *
  */
-void hb_macroRun( HB_MACRO_PTR pMacro )
+void hb_macroRun( PHB_MACRO pMacro )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_macroRun(%p)", pMacro ) );
 
@@ -215,10 +215,10 @@ void hb_macroRun( HB_MACRO_PTR pMacro )
 
 /* Evaluate a macro-compiled code and discard it
  */
-static void hb_macroEvaluate( HB_MACRO_PTR pMacro )
+static void hb_macroEvaluate( PHB_MACRO pMacro )
 {
    HB_ERROR_INFO     struErr;
-   HB_ERROR_INFO_PTR pOld;
+   PHB_ERROR_INFO pOld;
 
    struErr.Func   = hb_macroErrorEvaluation;
    struErr.Cargo  = ( void * ) pMacro;
@@ -229,9 +229,9 @@ static void hb_macroEvaluate( HB_MACRO_PTR pMacro )
 }
 
 
-static void hb_macroSyntaxError( HB_MACRO_PTR pMacro, const char * sSource )
+static void hb_macroSyntaxError( PHB_MACRO pMacro, const char * sSource )
 {
-   HB_ITEM_PTR pResult;
+   PHB_ITEM pResult;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_macroSyntaxError.(%p, %s)", pMacro, sSource ) );
 
@@ -276,15 +276,12 @@ BOOL hb_macroIsIdent( char * szString )
          if( *pTmp == '_' || ( *pTmp >= 'A' && *pTmp <= 'Z' ) || ( *pTmp >= 'a' && *pTmp <= 'z' ) )
          {
             ++pTmp;
+
             while( pTmp - szString < HB_SYMBOL_NAME_LEN && ( *pTmp == '_' || ( *pTmp >= 'A' && *pTmp <= 'Z' ) || ( *pTmp >= 'a' && *pTmp <= 'z' ) || ( *pTmp >= '0' && *pTmp <= '9' ) ) )
-            {
                ++pTmp;
-            }
 
             while( *pTmp == ' ' && pTmp - szString < HB_SYMBOL_NAME_LEN )
-            {
                ++pTmp;
-            }
 
             /* the name is valid if pTmp is at the end of a string
              */
@@ -518,7 +515,7 @@ char * hb_macroTextSubst( char * szString, HB_SIZE * pulStringLen )
  * EVAL( {|| &macro} )
  *
  */
-void hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
+void hb_macroGetValue( PHB_ITEM pItem, BYTE iContext, BYTE flags )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_macroGetValue(%p)", pItem ) );
 
@@ -647,7 +644,7 @@ void hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
  * placed on the left side of the assignment
  * POP operation
  */
-void hb_macroSetValue( HB_ITEM_PTR pItem, BYTE flags )
+void hb_macroSetValue( PHB_ITEM pItem, BYTE flags )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_macroSetValue(%p)", pItem ) );
 
@@ -689,7 +686,7 @@ void hb_macroSetValue( HB_ITEM_PTR pItem, BYTE flags )
  *    &alias->var := any
  *    alias->&var := any
  */
-void hb_macroPopAliasedValue( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, BYTE flags )
+void hb_macroPopAliasedValue( PHB_ITEM pAlias, PHB_ITEM pVar, BYTE flags )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_macroPopAliasedValue(%p, %p)", pAlias, pVar ) );
 
@@ -701,7 +698,7 @@ void hb_macroPopAliasedValue( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, BYTE flags )
  *    any := &alias->var
  *    any := alias->&var
  */
-void hb_macroPushAliasedValue( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, BYTE flags )
+void hb_macroPushAliasedValue( PHB_ITEM pAlias, PHB_ITEM pVar, BYTE flags )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_macroPushAliasedValue(%p, %p)", pAlias, pVar ) );
 
@@ -722,7 +719,7 @@ void hb_macroPushAliasedValue( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, BYTE flags 
  *    instead of
  *    &( "M + M" ) -> &( "M + M" )
  */
-static void hb_macroUseAliased( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, int iFlag, BYTE bSupported )
+static void hb_macroUseAliased( PHB_ITEM pAlias, PHB_ITEM pVar, int iFlag, BYTE bSupported )
 {
    if( HB_IS_STRING( pAlias ) && HB_IS_STRING( pVar ) )
    {
@@ -808,9 +805,9 @@ char * hb_macroExpandString( char * szString, HB_SIZE ulLength, BOOL * pbNewStri
  * NOTE: it can be called to implement an index key evaluation
  * use hb_macroRun() to evaluate a compiled pcode
  */
-HB_MACRO_PTR hb_macroCompile( const char * szString )
+PHB_MACRO hb_macroCompile( const char * szString )
 {
-   HB_MACRO_PTR   pMacro    = ( HB_MACRO_PTR ) hb_xgrab( sizeof( HB_MACRO ) );
+   PHB_MACRO   pMacro    = ( PHB_MACRO ) hb_xgrab( sizeof( HB_MACRO ) );
    int            iStatus;
    char *         pszString = ( char * ) szString;
 
@@ -842,7 +839,7 @@ HB_FUNC( HB_MACROCOMPILE )
       HB_SIZE        ulLen    = hb_parclen( 1 );
       int            iFlags   = hb_parni( 2 );
       char *         sMacro   = ( char * ) hb_xgrab( ulLen + 1 );
-      HB_MACRO_PTR   pMacro   = ( HB_MACRO_PTR ) hb_xgrab( sizeof( HB_MACRO ) );
+      PHB_MACRO   pMacro   = ( PHB_MACRO ) hb_xgrab( sizeof( HB_MACRO ) );
       int            iStatus;
 
       HB_MEMCPY( sMacro, sString, ( size_t ) ulLen + 1 );
@@ -875,7 +872,7 @@ HB_FUNC( HB_MACROCOMPILE )
    }
    else
    {
-      HB_ITEM_PTR pResult = hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 1, hb_paramError( 1 ) );
+      PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 1, hb_paramError( 1 ) );
 
       if( pResult )
       {
@@ -890,7 +887,7 @@ HB_FUNC( HB_MACROCOMPILE )
  * 'pItem' points to a ITEM that contains a string value which after
  *    text substitution will return a function name
  */
-void hb_macroPushSymbol( HB_ITEM_PTR pItem )
+void hb_macroPushSymbol( PHB_ITEM pItem )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_macroPushSymbol(%p)", pItem ) );
 
@@ -910,7 +907,7 @@ void hb_macroPushSymbol( HB_ITEM_PTR pItem )
 
       if( hb_macroIsIdent( szString ) )
       {
-         HB_DYNS_PTR pDynSym;
+         PHB_DYNS pDynSym;
 
          /* NOTE: checking for valid function name (valid pointer) is done
           * in hb_vmDo()
@@ -939,7 +936,7 @@ void hb_macroPushSymbol( HB_ITEM_PTR pItem )
  * 'pItem' points to a ITEM that contains a string value which after
  *    text substitution will be returned
  */
-void hb_macroTextValue( HB_ITEM_PTR pItem )
+void hb_macroTextValue( PHB_ITEM pItem )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_macroTextValue(%p)", pItem ) );
 
@@ -960,7 +957,7 @@ void hb_macroTextValue( HB_ITEM_PTR pItem )
    }
 }
 
-char * hb_macroGetType( HB_ITEM_PTR pItem, BYTE flags )
+char * hb_macroGetType( PHB_ITEM pItem, BYTE flags )
 {
    char * szType;
 
@@ -1009,7 +1006,7 @@ char * hb_macroGetType( HB_ITEM_PTR pItem, BYTE flags )
             /* OK - the pcode was generated and it can be evaluated
              */
             HB_ERROR_INFO     struErr;
-            HB_ERROR_INFO_PTR pOld;
+            PHB_ERROR_INFO pOld;
 
             /* Set our temporary error handler. We do not need any error
              * messages here - we need to know only if evaluation was
@@ -1089,7 +1086,7 @@ HB_FUNC( HB_SETMACRO )
    if( iPrmCnt > 0 )
    {
       ULONG    ulFlags = ( ULONG ) hb_parnl( 1 );
-      HB_ITEM_PTR pValue;
+      PHB_ITEM pValue;
 
       switch( ulFlags )
       {
@@ -1142,7 +1139,7 @@ HB_FUNC( HB_SETMACRO )
 int hb_compLocalVarGetPos( char * szVarName, HB_MACRO_DECL )
 {
    int            iVar  = 1;
-   HB_CBVAR_PTR   pVars = HB_PCODE_DATA->pLocals;
+   PHB_CBVAR   pVars = HB_PCODE_DATA->pLocals;
 
    while( pVars )
    {
@@ -1222,8 +1219,8 @@ HB_SIZE hb_compGenJumpTrue( LONG lOffset, HB_MACRO_DECL )
  */
 void hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, HB_MACRO_DECL )
 {
-   BYTE        byBuf[ sizeof( HB_DYNS_PTR ) + 1 ];
-   HB_DYNS_PTR pSym;
+   BYTE        byBuf[ sizeof( PHB_DYNS ) + 1 ];
+   PHB_DYNS pSym;
 
    if( HB_MACRO_DATA->Flags & HB_MACRO_GEN_TYPE )
    {
@@ -1250,8 +1247,8 @@ void hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, HB_MACRO_DECL )
 /* generates the pcode to push a symbol on the virtual machine stack */
 void hb_compGenPushSymbol( char * szSymbolName, char * szNamespace, BOOL bAlias, HB_MACRO_DECL )
 {
-   BYTE        byBuf[ sizeof( HB_DYNS_PTR ) + 1 ];
-   HB_DYNS_PTR pSym;
+   BYTE        byBuf[ sizeof( PHB_DYNS ) + 1 ];
+   PHB_DYNS pSym;
 
    HB_SYMBOL_UNUSED( bAlias );
 
@@ -1351,11 +1348,11 @@ void hb_compGenPushDate( LONG lDate, LONG lTime, USHORT uType, HB_MACRO_DECL )
 /* sends a message to an object */
 void hb_compGenMessage( char * szMsgName, HB_MACRO_DECL )
 {
-   BYTE byBuf[ sizeof( HB_DYNS_PTR ) + 1 ];
+   BYTE byBuf[ sizeof( PHB_DYNS ) + 1 ];
 
    /* Find the address of passed symbol - create the symbol if doesn't exist
     */
-   HB_DYNS_PTR pSym = hb_dynsymGetCase( szMsgName );
+   PHB_DYNS pSym = hb_dynsymGetCase( szMsgName );
 
    byBuf[ 0 ] = HB_P_MMESSAGE;
    HB_PUT_PTR( &byBuf[ 1 ], pSym );
@@ -1578,7 +1575,7 @@ void hb_compGenPushString( char * szText, HB_SIZE ulStrLen, HB_MACRO_DECL )
 
 void hb_compGenPCode1( BYTE byte, HB_MACRO_DECL )
 {
-   HB_PCODE_INFO_PTR pFunc = HB_PCODE_DATA;
+   PHB_PCODE_INFO pFunc = HB_PCODE_DATA;
 
    if( ( pFunc->lPCodeSize - pFunc->lPCodePos ) < 1 )
       pFunc->pCode = ( BYTE * ) hb_xrealloc( pFunc->pCode, pFunc->lPCodeSize += HB_PCODE_SIZE );
@@ -1588,7 +1585,7 @@ void hb_compGenPCode1( BYTE byte, HB_MACRO_DECL )
 
 void hb_compGenPCode2( BYTE byte1, BYTE byte2, HB_MACRO_DECL )
 {
-   HB_PCODE_INFO_PTR pFunc = HB_PCODE_DATA;
+   PHB_PCODE_INFO pFunc = HB_PCODE_DATA;
 
    if( ( pFunc->lPCodeSize - pFunc->lPCodePos ) < 2 )
       pFunc->pCode = ( BYTE * ) hb_xrealloc( pFunc->pCode, pFunc->lPCodeSize += HB_PCODE_SIZE );
@@ -1599,7 +1596,7 @@ void hb_compGenPCode2( BYTE byte1, BYTE byte2, HB_MACRO_DECL )
 
 void hb_compGenPCode3( BYTE byte1, BYTE byte2, BYTE byte3, HB_MACRO_DECL )
 {
-   HB_PCODE_INFO_PTR pFunc = HB_PCODE_DATA;
+   PHB_PCODE_INFO pFunc = HB_PCODE_DATA;
 
    if( ( pFunc->lPCodeSize - pFunc->lPCodePos ) < 3 )
       pFunc->pCode = ( BYTE * ) hb_xrealloc( pFunc->pCode, pFunc->lPCodeSize += HB_PCODE_SIZE );
@@ -1611,7 +1608,7 @@ void hb_compGenPCode3( BYTE byte1, BYTE byte2, BYTE byte3, HB_MACRO_DECL )
 
 void hb_compGenPCode4( BYTE byte1, BYTE byte2, BYTE byte3, BYTE byte4, HB_MACRO_DECL )
 {
-   HB_PCODE_INFO_PTR pFunc = HB_PCODE_DATA;
+   PHB_PCODE_INFO pFunc = HB_PCODE_DATA;
 
    if( ( pFunc->lPCodeSize - pFunc->lPCodePos ) < 4 )
       pFunc->pCode = ( BYTE * ) hb_xrealloc( pFunc->pCode, pFunc->lPCodeSize += HB_PCODE_SIZE );
@@ -1624,7 +1621,7 @@ void hb_compGenPCode4( BYTE byte1, BYTE byte2, BYTE byte3, BYTE byte4, HB_MACRO_
 
 void hb_compGenPCodeN( BYTE * pBuffer, HB_SIZE ulSize, HB_MACRO_DECL )
 {
-   HB_PCODE_INFO_PTR pFunc = HB_PCODE_DATA;
+   PHB_PCODE_INFO pFunc = HB_PCODE_DATA;
 
    if( pFunc->lPCodePos + ulSize > pFunc->lPCodeSize )
    {
@@ -1650,7 +1647,7 @@ void hb_macroError( int iError, HB_MACRO_DECL )
  */
 void hb_compCodeBlockStart( HB_MACRO_DECL )
 {
-   HB_PCODE_INFO_PTR pCB = ( HB_PCODE_INFO_PTR ) hb_xgrab( sizeof( HB_PCODE_INFO ) );
+   PHB_PCODE_INFO pCB = ( PHB_PCODE_INFO ) hb_xgrab( sizeof( HB_PCODE_INFO ) );
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_macroCodeBlockStart(%p)", HB_MACRO_PARAM ) );
 
@@ -1666,10 +1663,10 @@ void hb_compCodeBlockStart( HB_MACRO_DECL )
 
 void hb_compCodeBlockEnd( HB_MACRO_DECL )
 {
-   HB_PCODE_INFO_PTR pCodeblock; /* pointer to the current codeblock */
+   PHB_PCODE_INFO pCodeblock; /* pointer to the current codeblock */
    USHORT            wSize;
    USHORT            wParms = 0; /* number of codeblock parameters */
-   HB_CBVAR_PTR      pVar;
+   PHB_CBVAR      pVar;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_macroCodeBlockEnd(%p)", HB_MACRO_PARAM ) );
 

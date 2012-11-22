@@ -303,7 +303,7 @@
          struct hb_struSymbol  asSymbol;
          struct hb_struHash    asHash;
       } item;
-   } HB_ITEM, * PHB_ITEM, * HB_ITEM_PTR;
+   } HB_ITEM, * PHB_ITEM;
 
 #ifndef HB_ARRAY_USE_COUNTER
    typedef struct _HB_ARRAY_HOLDER
@@ -327,7 +327,7 @@
 #ifndef HB_ARRAY_USE_COUNTER
       PHB_ARRAY_HOLDER pOwners;
 #endif
-   } HB_BASEARRAY, * PHB_BASEARRAY, * HB_BASEARRAY_PTR;
+   } HB_BASEARRAY, * PHB_BASEARRAY;
 
    /* Hash utility functions */
    #define HB_HASH_ORDER_FUNC_( hbfunc )\
@@ -349,7 +349,7 @@
       HB_SIZE     ulPageSize;     /* Maximum size allowed per page */
       HB_SIZE*    pAccessAA;      /* Associative Array pointer */
       HB_COUNTER  ulHolders;      /* number of holders of this hash */
-   } HB_BASEHASH, * PHB_BASEHASH, * HB_BASEHASH_PTR;
+   } HB_BASEHASH, * PHB_BASEHASH;
 
    #define CBF_DYNAMIC        0x0001
    #define CBF_DYNAMIC_BUFFER 0x0002
@@ -367,7 +367,7 @@
       USHORT     uLen;
       USHORT     uiClass;
       USHORT     uiFlags;
-   } HB_CODEBLOCK, * PHB_CODEBLOCK, * HB_CODEBLOCK_PTR;
+   } HB_CODEBLOCK, * PHB_CODEBLOCK;
 
 #if defined( HB_LEGACY_LEVEL )
    /* dynamic symbol structure */
@@ -380,7 +380,7 @@
       HB_SIZE   ulCalls;      /* profiler support */
       HB_SIZE   ulTime;       /* profiler support */
       HB_SIZE   ulRecurse;    /* profiler support */
-   } HB_DYNS, * PHB_DYNS, * HB_DYNS_PTR;
+   } HB_DYNS, * PHB_DYNS;
 #else
    /* dynamic symbol structure */
    typedef struct _HB_DYNS
@@ -394,7 +394,7 @@
       HB_SIZE   ulTime;       /* profiler support */
       HB_SIZE   ulRecurse;    /* profiler support */
 #endif
-   } HB_DYNS, * PHB_DYNS, * HB_DYNS_PTR;
+   } HB_DYNS, * PHB_DYNS, * PHB_DYNS;
 #endif
 
    #define HB_DYNS_FUNC( hbfunc )   BOOL hbfunc( PHB_DYNS pDynSymbol, void * Cargo )
@@ -428,7 +428,7 @@
       HB_EXTREF_FUNC3 copy;
       HB_EXTREF_FUNC0 clear;
       HB_EXTREF_FUNC0 mark;
-   } HB_EXTREF, * PHB_EXTREF, * HB_EXTREF_PTR;
+   } HB_EXTREF, * PHB_EXTREF;
 
    /* Harbour Functions scope ( HB_SYMBOLSCOPE ) */
    #define HB_FS_PUBLIC    ( ( HB_SYMBOLSCOPE ) 0x0001 )

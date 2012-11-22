@@ -57,7 +57,7 @@
 
 #include "hbapiitm.h"
 
-typedef PEVALINFO EVALINFOP;
+typedef PHB_EVALINFO  EVALINFOP;
 
 #define _evalLaunch     hb_evalLaunch
 #define _evalNew        hb_evalNew

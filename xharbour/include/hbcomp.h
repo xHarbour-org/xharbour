@@ -521,7 +521,7 @@ extern void     hb_compEnumMemberAdd( char * szName );
 #define hb_compErrorDuplVar( c ) hb_macroError( EG_SYNTAX, HB_MACRO_PARAM )
 #define hb_compWarnMeaningless( p )
 
-extern void * hb_compFlexNew( HB_MACRO_PTR );
+extern void * hb_compFlexNew( PHB_MACRO );
 extern void hb_compFlexDelete( void * );
 
 #else /* HB_MACRO_SUPPORT */

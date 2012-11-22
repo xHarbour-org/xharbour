@@ -380,13 +380,11 @@ void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
          else if( pSource->type & HB_IT_EXTREF )
             pSource->item.asExtRef.func->copy( pDest );
          else if( pSource->item.asRefer.offset == 0 /* && pSource->item.asRefer.value >= 0 */ )
-         {
 #ifdef HB_ARRAY_USE_COUNTER
             HB_ATOMIC_INC( pSource->item.asRefer.BasePtr.pBaseArray->ulHolders );
 #else
             hb_arrayRegisterHolder( pSource->item.asRefer.BasePtr.pBaseArray, ( void * ) pSource->item.asRefer.BasePtr.pBaseArray );
 #endif
-         }
 
          if( hb_itemUnRef( pSource ) == pDest )
          {
@@ -478,15 +476,11 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, const char * szText )
  *       }
  *    }
  *    else
- *    {
  *       // No need to check buffer overlapping - string is will NOT be released!
  *       hb_itemReleaseString( pItem );
- *    }
  * }
  * else if( HB_IS_COMPLEX( pItem ) )
- * {
  *    hb_itemClear( pItem );
- * }
  *
  * pItem->type = HB_IT_STRING;
  * pItem->item.asString.value = hb_vm_sNull;
@@ -563,16 +557,12 @@ PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, const char * szText, HB_SIZE ulLen )
             }
          }
          else
-         {
             /* No need to check buffer overlapping - string is will NOT be released!
              */
             hb_itemReleaseString( pItem );
-         }
       }
       else if( HB_IS_COMPLEX( pItem ) )
-      {
          hb_itemClear( pItem );
-      }
    }
 
    pItem->type                      = HB_IT_STRING;
@@ -614,9 +604,7 @@ PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, HB_SIZE ulLen )
       pItem->item.asString.allocated++;
    }
    else
-   {
       pItem = hb_itemPutCRaw( pItem, szText, 0 );
-   }
 
    return pItem;
 
@@ -662,13 +650,7 @@ PHB_ITEM hb_itemPutCRaw( PHB_ITEM pItem, char * szText, HB_SIZE ulLen )
 {
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemPutCRaw(%p, %s, %lu)", pItem, szText, ulLen ) );
 
-   if( pItem )
-   {
-      if( HB_IS_COMPLEX( pItem ) )
-         hb_itemClear( pItem );
-   }
-   else
-      pItem = hb_itemNew( NULL );
+   pItem = hb_itemapiCheck( pItem );
 
    pItem->type = HB_IT_STRING;
    if( ulLen )
@@ -694,13 +676,7 @@ PHB_ITEM hb_itemPutCRawStatic( PHB_ITEM pItem, const char * szText, HB_SIZE ulLe
 {
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemPutCRawStatic(%p, %s, %lu)", pItem, szText, ulLen ) );
 
-   if( pItem )
-   {
-      if( HB_IS_COMPLEX( pItem ) )
-         hb_itemClear( pItem );
-   }
-   else
-      pItem = hb_itemNew( NULL );
+   pItem = hb_itemapiCheck( pItem );
 
    pItem->type                      = HB_IT_STRING;
    pItem->item.asString.allocated   = 0;
@@ -755,13 +731,7 @@ PHB_ITEM hb_itemPutCLStatic( PHB_ITEM pItem, const char * szText, HB_SIZE ulLen 
 {
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemPutCLStatic(%p, %s, %lu)", pItem, szText, ulLen ) );
 
-   if( pItem )
-   {
-      if( HB_IS_COMPLEX( pItem ) )
-         hb_itemClear( pItem );
-   }
-   else
-      pItem = hb_itemNew( NULL );
+   pItem = hb_itemapiCheck( pItem );
 
    pItem->type                      = HB_IT_STRING;
    pItem->item.asString.value       = hb_vm_sNull;
@@ -778,13 +748,7 @@ PHB_ITEM hb_itemPutPtr( PHB_ITEM pItem, void * pValue )
 {
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemPutPtr(%p, %p)", pItem, pValue ) );
 
-   if( pItem )
-   {
-      if( HB_IS_COMPLEX( pItem ) )
-         hb_itemClear( pItem );
-   }
-   else
-      pItem = hb_itemNew( NULL );
+   pItem = hb_itemapiCheck( pItem );
 
    pItem->type                   = HB_IT_POINTER;
    pItem->item.asPointer.value   = pValue;

@@ -3499,7 +3499,7 @@ static void hb___msgClsFullSel( void )
 {
    HB_THREAD_STUB_STACK
 
-   HB_ITEM_PTR pSelf    = hb_stackSelfItem();
+   PHB_ITEM pSelf    = hb_stackSelfItem();
    USHORT      uiClass  = hb_objClassH( pSelf );
    HB_ITEM     Return;
    USHORT      nParam   = ( USHORT ) hb_parni( 1 ), uiScope = ( USHORT ) hb_parni( 2 );
@@ -3576,7 +3576,7 @@ static void hb___msgClsFullSel( void )
 static void hb___msgClsSel( void )
 {
    HB_THREAD_STUB_STACK
-   HB_ITEM_PTR pSelf    = hb_stackSelfItem();
+   PHB_ITEM pSelf    = hb_stackSelfItem();
    USHORT      uiClass  = hb_objClassH( pSelf );
    HB_ITEM     Return;
    USHORT      nParam   = ( USHORT ) hb_parni( 1 ), uiScope = ( USHORT ) hb_parni( 2 );
@@ -3671,7 +3671,7 @@ static void hb___msgEval( void )
 {
    HB_THREAD_STUB_STACK
 
-   HB_ITEM_PTR pSelf = hb_stackSelfItem();
+   PHB_ITEM pSelf = hb_stackSelfItem();
 
    if( HB_IS_BLOCK( pSelf ) )
    {

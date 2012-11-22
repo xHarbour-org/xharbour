@@ -6028,7 +6028,7 @@ yyreduce:
 
                                    if( hb_comp_BlocksList )
                                    {
-                                      HB_CBVAR_PTR pVar = ( HB_CBVAR_PTR ) hb_comp_BlocksList->pBlock->value.asList.pIndex;
+                                      PHB_CBVAR pVar = ( PHB_CBVAR ) hb_comp_BlocksList->pBlock->value.asList.pIndex;
 
                                       while( pVar )
                                       {
@@ -8694,7 +8694,7 @@ yyreduce:
   case 636:
 
     {
-                             HB_CBVAR_PTR pVar = (HB_CBVAR_PTR) (yyvsp[(1) - (1)].asExpr)->value.asList.pIndex;
+                             PHB_CBVAR pVar = (PHB_CBVAR) (yyvsp[(1) - (1)].asExpr)->value.asList.pIndex;
 
                              while( pVar->pNext )
                              {
@@ -8703,7 +8703,7 @@ yyreduce:
 
                              if( pVar->szName == NULL )
                              {
-                                if( pVar == (HB_CBVAR_PTR) (yyvsp[(1) - (1)].asExpr)->value.asList.pIndex )
+                                if( pVar == (PHB_CBVAR) (yyvsp[(1) - (1)].asExpr)->value.asList.pIndex )
                                 {
                                    //{|| ...} not realy a nameless argument.
                                 }

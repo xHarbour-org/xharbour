@@ -589,7 +589,7 @@ static int hb_hsxCompile( const char * szExpr, PHB_ITEM * pExpr )
    }
    else
    {
-      HB_MACRO_PTR pMacro = hb_macroCompile( szExpr );
+      PHB_MACRO pMacro = hb_macroCompile( szExpr );
       if( ! pMacro )
          return HSX_BADPARMS;
       *pExpr = hb_itemPutPtr( NULL, ( void * ) pMacro );
@@ -1272,7 +1272,7 @@ static LPHSXINFO hb_hsxNew( void )
 static void hb_hsxExpDestroy( PHB_ITEM pItem )
 {
    if( hb_itemType( pItem ) == HB_IT_POINTER )
-      hb_macroDelete( ( HB_MACRO_PTR ) hb_itemGetPtr( pItem ) );
+      hb_macroDelete( ( PHB_MACRO ) hb_itemGetPtr( pItem ) );
    hb_itemRelease( pItem );
 }
 

@@ -103,7 +103,7 @@ HB_EXTERN_BEGIN
 /* Global functions
  */
 extern void hb_macroError( int iError, HB_BISON_PTR pMacro );
-extern int hb_macroYYParse( HB_MACRO_PTR pMacro );
+extern int hb_macroYYParse( PHB_MACRO pMacro );
 extern HB_SIZE hb_macroSetMacro( BOOL bSet, HB_SIZE ulFlag );
 extern HB_SIZE hb_macroAutoSetMacro( HB_SIZE ulFlag );
 
@@ -118,9 +118,9 @@ extern void hb_compGenPCodeN( BYTE * pBuffer, HB_SIZE ulSize, HB_BISON_PTR pMacr
  */
 #define HB_PCODE_SIZE  512
 
-/* Bison requires (void *) pointer  - some code needs HB_MACRO_PTR pointer
+/* Bison requires (void *) pointer  - some code needs PHB_MACRO pointer
  */
-#define HB_MACRO_DATA     ( (HB_MACRO_PTR) HB_MACRO_PARAM )
+#define HB_MACRO_DATA     ( (PHB_MACRO) HB_MACRO_PARAM )
 #define HB_PCODE_DATA     ( HB_MACRO_DATA->pCodeInfo )
 
 /* Declarations for functions macro.c */

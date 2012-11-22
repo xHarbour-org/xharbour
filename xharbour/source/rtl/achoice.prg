@@ -621,20 +621,19 @@ METHOD HitTest( nRow, nCol ) CLASS TAChoice
 #include "hbapiitm.h"
 #include "hbstack.h"
 
-// Determines if any element is selectable
+/* Determines if any element is selectable
+ */
 HB_FUNC_STATIC( ISITEMSELECTABLE )
 {
-   UINT     uiItem  = hb_parni( 1 );               // Item to verify
-   UINT     uiCount = hb_parni( 2 );               // Count of items
-   PHB_ITEM pSelect = hb_param( 3, HB_IT_ANY );    // xSelectable
-   PHB_ITEM pData   = hb_param( 4, HB_IT_ANY );    // Array of items
+   UINT     uiItem  = hb_parni( 1 );               /* Item to verify */
+   UINT     uiCount = hb_parni( 2 );               /* Count of items */
+   PHB_ITEM pSelect = hb_param( 3, HB_IT_ANY );    /* xSelectable    */
+   PHB_ITEM pData   = hb_param( 4, HB_IT_ANY );    /* Array of items */
    BOOL     bResult = TRUE;
    PHB_ITEM pSelectItem = NULL;
 
    if( uiItem > uiCount )
-   {
       bResult = FALSE;
-   }
    else if( pSelect )
    {
       if( HB_IS_ARRAY( pSelect ) )
@@ -647,12 +646,10 @@ HB_FUNC_STATIC( ISITEMSELECTABLE )
       }
 
       if( HB_IS_LOGICAL( pSelect ) )
-      {
          bResult = pSelect->item.asLogical.value;
-      }
       else if( HB_IS_STRING( pSelect ) )
       {
-         HB_MACRO_PTR pMacro;
+         PHB_MACRO pMacro;
 
          pMacro = hb_macroCompile( pSelect->item.asString.value );
 
@@ -663,9 +660,7 @@ HB_FUNC_STATIC( ISITEMSELECTABLE )
             pSelect = hb_stackItemFromTop( -1 );
 
             if( pSelect && HB_IS_LOGICAL( pSelect ) )
-            {
                bResult = pSelect->item.asLogical.value;
-            }
 
             hb_stackPop();
          }
@@ -681,15 +676,11 @@ HB_FUNC_STATIC( ISITEMSELECTABLE )
          hb_itemRelease( pIndex );
 
          if( pSelect && HB_IS_LOGICAL( pSelect ) )
-         {
             bResult = pSelect->item.asLogical.value;
-         }
       }
 
       if( pSelectItem )
-      {
          hb_itemRelease( pSelectItem );
-      }
    }
 
    hb_retl( bResult );

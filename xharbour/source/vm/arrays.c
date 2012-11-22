@@ -1388,8 +1388,8 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
    if( pBaseArray->pItems )
    {
       register HB_SIZE  ulLen    = pBaseArray->ulLen;
-      HB_ITEM_PTR       pItems   = pBaseArray->pItems;
-      HB_ITEM_PTR       pItem    = pItems; /* pValue; */
+      PHB_ITEM       pItems   = pBaseArray->pItems;
+      PHB_ITEM       pItem    = pItems; /* pValue; */
 
       /* TraceLog( NULL, "Releasing BaseArray %p\n", pBaseArray );
        */

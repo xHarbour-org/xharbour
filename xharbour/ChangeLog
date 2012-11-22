@@ -8,6 +8,116 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-22 08:25 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/item.api
+  * include/hbapi.h
+  * include/hbapierr.h
+  * include/hbapirdd.h
+  * include/hbstack.h
+  * include/hbvmpub.h
+  * source/ct/ctnet.c
+  * source/rdd/wafunc.c
+  * source/rdd/nulsys/nulsys.c
+  * source/rtl/bkgtsks.c
+  * source/rtl/idle.c
+  * source/vm/arrays.c
+  * source/vm/classes.c
+  * source/vm/codebloc.c
+  * source/vm/estack.c
+  * source/vm/garbage.c
+  * source/vm/hvm.c
+  * source/vm/itemapi.c
+  * source/vm/fastitem.c
+  * source/vm/macro.c
+  * source/vm/memvars.c
+  * source/vm/thread.c
+    ! HB_ITEM_PTR -> PHB_ITEM
+
+  * include/hbhash.h
+  * source/common/hbhash.c
+    ! HB_HASH_ITEM_PTR -> PHB_HASH_ITEM
+
+  * include/hbapi.h
+  * include/thread.h
+  * source/rtl/hbsrlraw.c
+  * source/vm/itemapi.c
+  * source/vm/memvars.c
+    ! HB_VALUE_PTR -> PHB_VALUE
+
+  * include/hbapi.h
+    - removed: DYNHB_ITEM_PTR
+
+  * include/hbapi.h
+  * source/vm/garbage.c
+    ! HB_GARBAGE_PTR -> PHB_GARBAGE
+
+  * include/hbapi.h
+  * include/hbvmpub.h
+  * source/vm/codebloc.c
+  * source/vm/garbage.c
+    ! HB_CODEBLOCK_PTR -> PHB_CODEBLOCK
+
+  * include/hbvmpub.h
+  * source/vm/hvm.c
+  * source/vm/macro.c
+  * source/vm/memvars.c
+    ! HB_DYNS_PTR -> PHB_DYNS
+
+  * include/hbvmpub.h
+    - removed: HB_BASEARRAY_PTR
+    - removed: HB_BASEHASH_PTR
+    - removed: HB_EXTREF_PTR
+
+  * include/hbapi.h
+  * include/hbexprop.h
+  * include/hbexpra.c
+  * include/hbexprb.c
+  * source/compiler/harbouryy.c
+  * source/compiler/harbour.sly
+  * source/vm/macro.c
+    ! HB_CBVAR_PTR -> PHB_CBVAR
+
+  * include/hbapi.h
+  * source/vm/macro.c
+    ! HB_PCODE_INFO_PTR -> PHB_PCODE_INFO
+
+  * include/hbapi.h
+  * include/hbcomp.h
+  * include/hbmacro.h
+  * source/macro/macroyy.c
+  * source/rdd/workarea.c
+  * source/rdd/hsx/hsx.c
+  * source/rtl/achoice.prg
+  * source/vm/hvm.c
+  * source/vm/macro.c
+  * source/macro/macro.slx
+    ! HB_MACRO_PTR -> PHB_MACRO
+
+  * include/hbapi.h
+  * source/rtl/bkgtsks.c
+    ! HB_BACKGROUNDTASK_PTR -> PHB_BACKGROUNDTASK
+
+  * include/hbapi.h
+  * include/hbapiitm.h
+  * source/vm/extend.c
+  * source/vm/garbage.c
+  * source/vm/itemapi.c
+    ! HB_GARBAGE_FUNC_PTR -> PHB_GARBAGE_FUNC
+
+  * include/hbapiitm.h
+  * include/hbapiitm.h
+  * source/vm/eval.c
+    - removed: EVALINFO_PTR
+    ! PEVALINFO -> PHB_EVALINFO
+
+  * include/hbapierr.h
+  * source/vm/errorapi.c
+  * source/vm/macro.c
+    ! HB_ERROR_INFO_PTR -> PHB_ERROR_INFO
+
+  * include/hbapifs.h
+   - removed: HB_FNAME_PTR
+
 2012-11-21 07:47 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/makefile.gc
     ! typo: if -> ifeq

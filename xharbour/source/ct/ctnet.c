@@ -98,7 +98,7 @@
 
 BOOL WINAPI WNetErrorHandler( DWORD dwErrorCode, LPSTR lpszFunction )
 {
-   HB_ITEM_PTR pError;
+   PHB_ITEM pError;
 
    if( dwErrorCode != ERROR_EXTENDED_ERROR )
    {
@@ -184,9 +184,7 @@ HB_FUNC( NETPRINTER )
     * so I need treat PRN as LPT1.
     */
    if( ! cPrn || ! *cPrn || hb_stricmp( cPrn, "PRN" ) == 0 )
-   {
       cPrn = "LPT1";
-   }
 
    hb_retl( hb_IsNetShared( cPrn ) );
 }
@@ -211,18 +209,12 @@ HB_FUNC( NETREDIR )
    BOOL     bShowError  = ( ISLOG( 4 ) ? hb_parl( 4 ) : FALSE );
 
    if( hb_pcount() >= 3 && ISCHAR( 3 ) )
-   {
       dwResult = WNetAddConnection( lpSharedRes, lpPassword, lpLocalDev );
-   }
    else
-   {
       dwResult = WNetAddConnection( lpSharedRes, NULL, lpLocalDev );
-   }
 
    if( dwResult == NO_ERROR )
-   {
       hb_retl( TRUE );
-   }
    else
    {
       if( bShowError )
@@ -266,9 +258,7 @@ HB_FUNC( NETWORK )
       dwResult = WNetGetProviderName( WNNC_NET_LANMAN, lpProviderName, &cchBuff );
 
       if( dwResult != NO_ERROR )
-      {
          dwResult = WNetGetProviderName( WNNC_NET_NETWARE, lpProviderName, &cchBuff );
-      }
    }
 
    hb_retl( dwResult == NO_ERROR );

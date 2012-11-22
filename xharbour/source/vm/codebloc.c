@@ -82,15 +82,15 @@
  *       is used can give faster codes), Druzus
  *
  */
-HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer,
+PHB_CODEBLOCK hb_codeblockNew( const BYTE * pBuffer,
                                   USHORT uiLocals, const BYTE * pLocalPosTable,
                                   PHB_SYMB pSymbol )
 {
-   HB_CODEBLOCK_PTR pCBlock;
+   PHB_CODEBLOCK pCBlock;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_codeblockNew(%p, %hu, %p, %p)", pBuffer, uiLocals, pLocalPosTable, pSymbol ) );
 
-   pCBlock           = ( HB_CODEBLOCK_PTR ) hb_gcAlloc( sizeof( HB_CODEBLOCK ), hb_codeblockDeleteGarbage );
+   pCBlock           = ( PHB_CODEBLOCK ) hb_gcAlloc( sizeof( HB_CODEBLOCK ), hb_codeblockDeleteGarbage );
 
    /* Store the number of referenced local variables
     */
@@ -143,7 +143,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer,
       pLocal = hb_stackSelfItem();
       if( HB_IS_BLOCK( pLocal ) )
       {
-         HB_CODEBLOCK_PTR pOwner = pLocal->item.asBlock.value;
+         PHB_CODEBLOCK pOwner = pLocal->item.asBlock.value;
 
          pCBlock->pLocals  = pOwner->pLocals;
          pCBlock->uiLocals = uiLocals = pOwner->uiLocals;
@@ -184,13 +184,13 @@ HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer,
    return pCBlock;
 }
 
-HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
+PHB_CODEBLOCK hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
 {
-   HB_CODEBLOCK_PTR pCBlock;
+   PHB_CODEBLOCK pCBlock;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_codeblockMacroNew(%p, %i)", pBuffer, usLen ) );
 
-   pCBlock           = ( HB_CODEBLOCK_PTR ) hb_gcAlloc( sizeof( HB_CODEBLOCK ), hb_codeblockDeleteGarbage );
+   pCBlock           = ( PHB_CODEBLOCK ) hb_gcAlloc( sizeof( HB_CODEBLOCK ), hb_codeblockDeleteGarbage );
 
    /* Store the number of referenced local variables
     */
@@ -220,9 +220,9 @@ HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
 
 /* Delete a codeblock
  */
-void  hb_codeblockDelete( HB_ITEM_PTR pItem )
+void  hb_codeblockDelete( PHB_ITEM pItem )
 {
-   HB_CODEBLOCK_PTR pCBlock = pItem->item.asBlock.value;
+   PHB_CODEBLOCK pCBlock = pItem->item.asBlock.value;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_codeblockDelete(%p)", pItem ) );
 
@@ -273,7 +273,7 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
  */
 HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage )
 {
-   HB_CODEBLOCK_PTR pCBlock = ( HB_CODEBLOCK_PTR ) Cargo;
+   PHB_CODEBLOCK pCBlock = ( PHB_CODEBLOCK ) Cargo;
 
    HB_TRACE( HB_TR_INFO, ( "hb_codeblockDeleteGarbage(%p)", Cargo ) );
 
@@ -313,7 +313,7 @@ HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage )
  */
 PHB_ITEM hb_codeblockGetVar( PHB_ITEM pItem, long iItemPos )
 {
-   HB_CODEBLOCK_PTR pCBlock = pItem->item.asBlock.value;
+   PHB_CODEBLOCK pCBlock = pItem->item.asBlock.value;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_codeblockGetVar(%p, %ld)", pItem, iItemPos ) );
 
@@ -334,7 +334,7 @@ PHB_ITEM hb_codeblockGetVar( PHB_ITEM pItem, long iItemPos )
 
 /* Get local variable passed by reference
  */
-PHB_ITEM  hb_codeblockGetRef( HB_CODEBLOCK_PTR pCBlock, PHB_ITEM pRefer )
+PHB_ITEM  hb_codeblockGetRef( PHB_CODEBLOCK pCBlock, PHB_ITEM pRefer )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_codeblockGetRef(%p, %p)", pCBlock, pRefer ) );
 

@@ -1055,7 +1055,7 @@ Variable    : IdentName         {
 
                                    if( hb_comp_BlocksList )
                                    {
-                                      HB_CBVAR_PTR pVar = ( HB_CBVAR_PTR ) hb_comp_BlocksList->pBlock->value.asList.pIndex;
+                                      PHB_CBVAR pVar = ( PHB_CBVAR ) hb_comp_BlocksList->pBlock->value.asList.pIndex;
 
                                       while( pVar )
                                       {
@@ -2165,7 +2165,7 @@ CodeBlock  : '{' CBMARKER
            ;
 
 BlockParams : BlockVarList {
-                             HB_CBVAR_PTR pVar = (HB_CBVAR_PTR) $1->value.asList.pIndex;
+                             PHB_CBVAR pVar = (PHB_CBVAR) $1->value.asList.pIndex;
 
                              while( pVar->pNext )
                              {
@@ -2174,7 +2174,7 @@ BlockParams : BlockVarList {
 
                              if( pVar->szName == NULL )
                              {
-                                if( pVar == (HB_CBVAR_PTR) $1->value.asList.pIndex )
+                                if( pVar == (PHB_CBVAR) $1->value.asList.pIndex )
                                 {
                                    //{|| ...} not realy a nameless argument.
                                 }

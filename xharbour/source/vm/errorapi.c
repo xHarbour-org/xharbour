@@ -144,7 +144,7 @@ static PHB_ITEM   s_pError       = NULL;
 
 /* In MT, this data is held in the stack */
 #ifndef HB_THREAD_SUPPORT
-static HB_ERROR_INFO_PTR   s_errorHandler = NULL;
+static PHB_ERROR_INFO   s_errorHandler = NULL;
 static PHB_ITEM            s_errorBlock;
 static int                 s_iLaunchCount = 0;
 static USHORT              s_uiErrorDOS   = 0; /* The value of DOSERROR() */
@@ -735,11 +735,11 @@ PHB_ITEM hb_errorBlock( PHB_ITEM pNewErrorBlock )
 /* set new low-level error launcher (C function) and return
  * handler currently active
  */
-HB_ERROR_INFO_PTR hb_errorHandler( HB_ERROR_INFO_PTR pNewHandler )
+PHB_ERROR_INFO hb_errorHandler( PHB_ERROR_INFO pNewHandler )
 {
    HB_THREAD_STUB
 
-   HB_ERROR_INFO_PTR pOld = s_errorHandler;
+   PHB_ERROR_INFO pOld = s_errorHandler;
 
    if( pNewHandler )
       pNewHandler->Previous = s_errorHandler;

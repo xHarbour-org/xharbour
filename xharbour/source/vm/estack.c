@@ -320,7 +320,7 @@ void hb_stackPush( void )
 }
 
 #undef hb_stackAllocItem
-HB_ITEM_PTR hb_stackAllocItem( void )
+PHB_ITEM hb_stackAllocItem( void )
 {
    HB_THREAD_STUB
 
@@ -407,13 +407,13 @@ void hb_stackIncrease( void )
 void hb_stackRemove( long lUntilPos )
 {
    HB_THREAD_STUB
-   HB_ITEM_PTR * pEnd = HB_VM_STACK.pItems + lUntilPos;
+   PHB_ITEM * pEnd = HB_VM_STACK.pItems + lUntilPos;
 
    while( HB_VM_STACK.pPos > pEnd )
       hb_stackPop();
 }
 
-HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams )
+PHB_ITEM hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams )
 {
    HB_THREAD_STUB
 
@@ -591,7 +591,7 @@ PHB_ITEM ** hb_stackItemBasePtr( void )
 }
 
 #undef hb_stackItem
-HB_ITEM_PTR hb_stackItem( long iItemPos )
+PHB_ITEM hb_stackItem( long iItemPos )
 {
    if( iItemPos < 0 )
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
@@ -600,7 +600,7 @@ HB_ITEM_PTR hb_stackItem( long iItemPos )
 }
 
 #undef hb_stackItemFromTop
-HB_ITEM_PTR hb_stackItemFromTop( int nFromTop )
+PHB_ITEM hb_stackItemFromTop( int nFromTop )
 {
    if( nFromTop > 0 )
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
@@ -609,7 +609,7 @@ HB_ITEM_PTR hb_stackItemFromTop( int nFromTop )
 }
 
 #undef hb_stackItemFromBase
-HB_ITEM_PTR hb_stackItemFromBase( int nFromBase )
+PHB_ITEM hb_stackItemFromBase( int nFromBase )
 {
    if( nFromBase <= 0 )
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
@@ -621,9 +621,9 @@ HB_ITEM_PTR hb_stackItemFromBase( int nFromBase )
 }
 
 #undef hb_stackLocalVariable
-HB_ITEM_PTR hb_stackLocalVariable( int * piFromBase )
+PHB_ITEM hb_stackLocalVariable( int * piFromBase )
 {
-   /* HB_ITEM_PTR pBase = *HB_VM_STACK.pBase;
+   /* PHB_ITEM pBase = *HB_VM_STACK.pBase;
     */
 
    if( *piFromBase <= 0 )
@@ -633,13 +633,13 @@ HB_ITEM_PTR hb_stackLocalVariable( int * piFromBase )
 }
 
 #undef hb_stackTopItem
-HB_ITEM_PTR hb_stackTopItem( void )
+PHB_ITEM hb_stackTopItem( void )
 {
    return *HB_VM_STACK.pPos;
 }
 
 #undef hb_stackBaseItem
-HB_ITEM_PTR hb_stackBaseItem( void )
+PHB_ITEM hb_stackBaseItem( void )
 {
    return *HB_VM_STACK.pBase;
 }
@@ -647,13 +647,13 @@ HB_ITEM_PTR hb_stackBaseItem( void )
 /* Returns SELF object, an evaluated codeblock or NIL for normal func/proc
  */
 #undef hb_stackSelfItem
-HB_ITEM_PTR hb_stackSelfItem( void )
+PHB_ITEM hb_stackSelfItem( void )
 {
    return *( HB_VM_STACK.pBase + 1 );
 }
 
 #undef hb_stackReturnItem
-HB_ITEM_PTR hb_stackReturnItem( void )
+PHB_ITEM hb_stackReturnItem( void )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_stackReturnItem()" ) );
 

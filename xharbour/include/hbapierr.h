@@ -196,21 +196,21 @@ extern HB_EXPORT USHORT    hb_errRT_TOOLS       ( HB_ERRCODE errGenCode, HB_ERRC
 
 /* Low-level error handling */
 struct HB_ERROR_INFO_;   /* forward declaration */
-#define HB_ERROR_HANDLE( hbfunc )   HB_ITEM_PTR hbfunc( struct HB_ERROR_INFO_ * ErrorInfo )
+#define HB_ERROR_HANDLE( hbfunc )   PHB_ITEM hbfunc( struct HB_ERROR_INFO_ * ErrorInfo )
 typedef HB_ERROR_HANDLE( HB_ERROR_HANDLER );
 typedef HB_ERROR_HANDLER * HB_ERROR_HANDLER_PTR;
 
 typedef struct HB_ERROR_INFO_
 {
    HB_ERROR_HANDLER_PTR Func;
-   HB_ITEM_PTR Error;
+   PHB_ITEM Error;
    void * Cargo;
    struct HB_ERROR_INFO_ * Previous;
-   HB_ITEM_PTR ErrorBlock;
-} HB_ERROR_INFO, * HB_ERROR_INFO_PTR;
+   PHB_ITEM ErrorBlock;
+} HB_ERROR_INFO, * PHB_ERROR_INFO;
 
 /* set/get current error handler */
-extern HB_EXPORT HB_ERROR_INFO_PTR  hb_errorHandler( HB_ERROR_INFO_PTR pNewHandler );
+extern HB_EXPORT PHB_ERROR_INFO  hb_errorHandler( PHB_ERROR_INFO pNewHandler );
 
 /* current errorblock item */
 extern HB_EXPORT PHB_ITEM hb_errorBlock( PHB_ITEM pNewErrorBlock );

@@ -507,14 +507,14 @@ static HB_EXPR_FUNC( hb_compExprUseCodeblock )
             /* Define requested local variables
              */
 #if defined( HB_MACRO_SUPPORT )
-            HB_PCODE_DATA->pLocals = ( HB_CBVAR_PTR ) pSelf->value.asList.pIndex;
+            HB_PCODE_DATA->pLocals = ( PHB_CBVAR ) pSelf->value.asList.pIndex;
 #else
             {
-               HB_CBVAR_PTR pVar;
+               PHB_CBVAR pVar;
 
                hb_comp_iVarScope = VS_PARAMETER;
 
-               pVar = ( HB_CBVAR_PTR ) pSelf->value.asList.pIndex;
+               pVar = ( PHB_CBVAR ) pSelf->value.asList.pIndex;
                while( pVar )
                {
                   hb_compVariableAdd( pVar->szName, pVar->bType );
@@ -588,7 +588,7 @@ static HB_EXPR_FUNC( hb_compExprUseCodeblock )
          HB_EXPR_PTR pExp = pSelf->value.asList.pExprList;
          HB_EXPR_PTR pNext;
 
-         hb_compExprCBVarDel( ( HB_CBVAR_PTR ) pSelf->value.asList.pIndex );
+         hb_compExprCBVarDel( ( PHB_CBVAR ) pSelf->value.asList.pIndex );
 
          /* Delete all expressions of the block. */
          while( pExp )

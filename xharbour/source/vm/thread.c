@@ -721,7 +721,7 @@ void hb_threadIsLocalRef( void )
 
       if( pStack->pPos > pStack->pItems )
       {
-         HB_ITEM_PTR * pItem = pStack->pPos - 1;
+         PHB_ITEM * pItem = pStack->pPos - 1;
 
          while( pItem != pStack->pItems )
          {

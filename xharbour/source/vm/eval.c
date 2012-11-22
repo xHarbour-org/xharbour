@@ -85,7 +85,7 @@
 #include "hbvm.h"
 #include "classes.h"
 
-BOOL hb_evalNew( PEVALINFO pEvalInfo, PHB_ITEM pItem )
+BOOL hb_evalNew( PHB_EVALINFO pEvalInfo, PHB_ITEM pItem )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_evalNew(%p, %p)", pEvalInfo, pItem ) );
 
@@ -114,7 +114,7 @@ BOOL hb_evalNew( PEVALINFO pEvalInfo, PHB_ITEM pItem )
          all, don't release the eval parameter Items explicitly to make both
          Harbour and CA-Clipper happy. [vszakats] */
 
-BOOL hb_evalPutParam( PEVALINFO pEvalInfo, PHB_ITEM pItem )
+BOOL hb_evalPutParam( PHB_EVALINFO pEvalInfo, PHB_ITEM pItem )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_evalPutParam(%p, %p)", pEvalInfo, pItem ) );
 
@@ -128,7 +128,7 @@ BOOL hb_evalPutParam( PEVALINFO pEvalInfo, PHB_ITEM pItem )
    return FALSE;
 }
 
-PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
+PHB_ITEM hb_evalLaunch( PHB_EVALINFO pEvalInfo )
 {
    HB_THREAD_STUB
 
@@ -178,7 +178,7 @@ PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
  *       have these requirements. [vszakats]
  */
 
-BOOL hb_evalRelease( PEVALINFO pEvalInfo )
+BOOL hb_evalRelease( PHB_EVALINFO pEvalInfo )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_evalRelease(%p)", pEvalInfo ) );
 

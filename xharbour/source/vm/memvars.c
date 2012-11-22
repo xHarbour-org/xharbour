@@ -107,7 +107,7 @@ static HB_SIZE       s_privateStackBase   = 0;
 static HB_SIZE       s_globalTableSize    = 0;
 static HB_SIZE       s_globalFirstFree    = 0;
 static HB_SIZE       s_globalLastFree     = 0;
-static HB_VALUE_PTR  s_globalTable        = NULL;
+static PHB_VALUE  s_globalTable        = NULL;
 
 #else
 
@@ -156,12 +156,12 @@ struct mv_PUBLIC_var_info
 {
    int iPos;
    BOOL bFound;
-   HB_DYNS_PTR pDynSym;
+   PHB_DYNS pDynSym;
 };
 
 static void hb_memvarCreateFromDynSymbol( PHB_DYNS, BYTE, PHB_ITEM );
 static void hb_memvarAddPrivate( PHB_DYNS );
-static HB_DYNS_PTR hb_memvarFindSymbol( HB_ITEM_PTR );
+static PHB_DYNS hb_memvarFindSymbol( PHB_ITEM );
 void hb_memvarReleasePublic( PHB_ITEM pMemVar );
 
 /* Fake Clear all variable - the value will be cleared by subsequent GC scan
@@ -194,7 +194,7 @@ void hb_memvarsInit( void )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_memvarsInit()" ) );
 
-   s_globalTable        = ( HB_VALUE_PTR ) hb_xgrab( sizeof( HB_VALUE ) * TABLE_INITHB_VALUE );
+   s_globalTable        = ( PHB_VALUE ) hb_xgrab( sizeof( HB_VALUE ) * TABLE_INITHB_VALUE );
    s_globalTableSize    = TABLE_INITHB_VALUE;
    s_globalFirstFree    = 0;
    s_globalLastFree     = 1;
@@ -243,7 +243,7 @@ void hb_memvarsInit( HB_STACK * pStack )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_memvarsInit(%p)", pStack ) );
 
-   pStack->globalTable        = ( HB_VALUE_PTR ) hb_xgrab( sizeof( HB_VALUE ) * TABLE_INITHB_VALUE );
+   pStack->globalTable        = ( PHB_VALUE ) hb_xgrab( sizeof( HB_VALUE ) * TABLE_INITHB_VALUE );
    pStack->privateStack       = ( PHB_DYNS * ) hb_xgrab( sizeof( PHB_DYNS ) * TABLE_INITHB_VALUE );
    pStack->globalTableSize    = TABLE_INITHB_VALUE;
    pStack->globalFirstFree    = 0;
@@ -293,7 +293,7 @@ void hb_memvarsRelease( HB_STACK * pStack )
  * This function base address of values table
  * JC1: I don't like this. Really.
  */
-HB_VALUE_PTR * hb_memvarValueBaseAddress( void )
+PHB_VALUE * hb_memvarValueBaseAddress( void )
 {
    HB_THREAD_STUB
 
@@ -316,11 +316,11 @@ HB_VALUE_PTR * hb_memvarValueBaseAddress( void )
  *  handle to variable memory or fails
  *
  */
-HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
+HB_HANDLE hb_memvarValueNew( PHB_ITEM pSource, BOOL bTrueMemvar )
 {
    HB_THREAD_STUB
 
-   HB_VALUE_PTR   pValue;
+   PHB_VALUE   pValue;
    HB_HANDLE      hValue; /* handle 0 is reserved */
 
    /* = 1 removed, since it's initialized in all branches. Caused a warning with Borland C++ */
@@ -347,12 +347,12 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
          hValue            = ( HB_HANDLE ) s_globalTableSize;
          s_globalLastFree  = s_globalTableSize + 1;
          s_globalTableSize += TABLE_EXPANDHB_VALUE;
-         s_globalTable     = ( HB_VALUE_PTR ) hb_xrealloc( s_globalTable, sizeof( HB_VALUE ) * s_globalTableSize );
+         s_globalTable     = ( PHB_VALUE ) hb_xrealloc( s_globalTable, sizeof( HB_VALUE ) * s_globalTableSize );
       }
    }
 
    pValue                  = s_globalTable + hValue;
-   pValue->pVarItem        = ( HB_ITEM_PTR ) hb_xgrab( sizeof( HB_ITEM ) );
+   pValue->pVarItem        = ( PHB_ITEM ) hb_xgrab( sizeof( HB_ITEM ) );
    pValue->pVarItem->type  = HB_IT_NIL;
    pValue->counter         = 1;
 
@@ -393,7 +393,7 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
 
 /* Detach local variable (swap current value with a memvar handle)
  */
-PHB_ITEM hb_memvarDetachLocal( HB_ITEM_PTR pLocal )
+PHB_ITEM hb_memvarDetachLocal( PHB_ITEM pLocal )
 {
    HB_THREAD_STUB
 
@@ -403,7 +403,7 @@ PHB_ITEM hb_memvarDetachLocal( HB_ITEM_PTR pLocal )
 #if 0
    if( HB_IS_BYREF( pLocal ) && ! HB_IS_MEMVAR( pLocal ) )
    {
-      HB_ITEM_PTR pItem = pLocal;
+      PHB_ITEM pItem = pLocal;
 
       do
       {
@@ -567,7 +567,7 @@ void hb_memvarValueDecRef( HB_HANDLE hValue )
 {
    HB_THREAD_STUB
 
-   HB_VALUE_PTR pValue;
+   PHB_VALUE pValue;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_memvarValueDecRef(%lu)", hValue ) );
 
@@ -607,7 +607,7 @@ void hb_memvarValueDecRef( HB_HANDLE hValue )
 #ifdef HB_THREAD_SUPPORT
 void hb_memvarValueDecRefMT( HB_HANDLE hValue, HB_STACK * pStack )
 {
-   HB_VALUE_PTR pValue;
+   PHB_VALUE pValue;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_memvarValueDecRef(%lu)", hValue ) );
 
@@ -643,7 +643,7 @@ void hb_memvarValueDecRefMT( HB_HANDLE hValue, HB_STACK * pStack )
 void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
 {
    HB_THREAD_STUB
-   HB_VALUE_PTR pValue;
+   PHB_VALUE pValue;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_memvarValueDecRef(%lu)", hValue ) );
 
@@ -697,7 +697,7 @@ void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
  * pItem   - value to store in memvar
  *
  */
-void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
+void hb_memvarSetValue( PHB_SYMB pMemvarSymb, PHB_ITEM pItem )
 {
    HB_THREAD_STUB
    PHB_DYNS pDyn;
@@ -720,7 +720,7 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
       if( pDyn->hMemvar )
       {
          /* value is already created */
-         HB_ITEM_PTR pSetItem = s_globalTable[ pDyn->hMemvar ].pVarItem;
+         PHB_ITEM pSetItem = s_globalTable[ pDyn->hMemvar ].pVarItem;
 
          /* JC1: the variable we have now can't be destroyed in the meanwhile.
           * It could be changed, but this is a race condition that must be
@@ -749,7 +749,7 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
       hb_errInternal( HB_EI_MVBADSYMBOL, NULL, pMemvarSymb->szName, NULL );
 }
 
-HB_ERRCODE hb_memvarGet( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
+HB_ERRCODE hb_memvarGet( PHB_ITEM pItem, PHB_SYMB pMemvarSymb )
 {
    HB_THREAD_STUB
    PHB_DYNS    pDyn;
@@ -772,7 +772,7 @@ HB_ERRCODE hb_memvarGet( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
       {
          /* value is already created
           */
-         HB_ITEM_PTR pGetItem = s_globalTable[ pDyn->hMemvar ].pVarItem;
+         PHB_ITEM pGetItem = s_globalTable[ pDyn->hMemvar ].pVarItem;
 
          if( HB_IS_BYREF( pGetItem ) )
             hb_itemCopy( pItem, hb_itemUnRef( pGetItem ) );
@@ -788,7 +788,7 @@ HB_ERRCODE hb_memvarGet( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
    return bSuccess;
 }
 
-void hb_memvarGetValue( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
+void hb_memvarGetValue( PHB_ITEM pItem, PHB_SYMB pMemvarSymb )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_memvarGetValue(%p, %p)", pItem, pMemvarSymb ) );
 
@@ -798,7 +798,7 @@ void hb_memvarGetValue( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
        * (user created error handler can create this variable)
        */
       USHORT      uiAction = E_RETRY;
-      HB_ITEM_PTR pError;
+      PHB_ITEM pError;
 
       pError = hb_errRT_New( ES_ERROR, NULL, EG_NOVAR, 1003, NULL, pMemvarSymb->szName, 0, EF_CANRETRY );
 
@@ -817,7 +817,7 @@ void hb_memvarGetValue( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
    }
 }
 
-void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
+void hb_memvarGetRefer( PHB_ITEM pItem, PHB_SYMB pMemvarSymb )
 {
    HB_THREAD_STUB
    PHB_DYNS pDyn;
@@ -868,7 +868,7 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
           * (user created error handler can make this variable accessible)
           */
          USHORT      uiAction = E_RETRY;
-         HB_ITEM_PTR pError;
+         PHB_ITEM pError;
 
          pError = hb_errRT_New( ES_ERROR, NULL, EG_NOVAR, 1003, NULL, pMemvarSymb->szName, 0, EF_CANRETRY );
 
@@ -924,7 +924,7 @@ char * hb_memvarGetStrValuePtr( char * szVarName, HB_SIZE * pulLen )
    HB_THREAD_STUB
 
    HB_ITEM_NEW( itName );
-   HB_DYNS_PTR pDynVar;
+   PHB_DYNS pDynVar;
    char *      szValue = NULL;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_memvarGetStrValuePtr(%s, %p)", szVarName, pulLen ) );
@@ -942,7 +942,7 @@ char * hb_memvarGetStrValuePtr( char * szVarName, HB_SIZE * pulLen )
       {
          /* variable contains some data
           */
-         HB_ITEM_PTR pItem = s_globalTable[ pDynVar->hMemvar ].pVarItem;
+         PHB_ITEM pItem = s_globalTable[ pDynVar->hMemvar ].pVarItem;
 
          if( HB_IS_BYREF( pItem ) )
             pItem = hb_itemUnRef( pItem );   /* it is a PARAMETER variable */
@@ -1053,7 +1053,7 @@ static void hb_memvarCreateFromDynSymbol( PHB_DYNS pDynVar, BYTE bScope, PHB_ITE
  * It also restores the value that was hidden if there is another
  * PRIVATE variable with the same name.
  */
-static void hb_memvarRelease( HB_ITEM_PTR pMemvar )
+static void hb_memvarRelease( PHB_ITEM pMemvar )
 {
    HB_THREAD_STUB
 
@@ -1177,12 +1177,8 @@ static int hb_memvarScopeGet( PHB_DYNS pDynVar )
 
          if( pDynVar == s_privateStack[ ulBase ] )
          {
-            if( ulBase >= s_privateStackBase )
-               iMemvar = HB_MV_PRIVATE_LOCAL;
-            else
-               iMemvar = HB_MV_PRIVATE_GLOBAL;
-
-            ulBase = 0;
+            iMemvar = ( ulBase >= s_privateStackBase ) ? HB_MV_PRIVATE_LOCAL: HB_MV_PRIVATE_GLOBAL;
+            ulBase  = 0;
          }
       }
 
@@ -1195,7 +1191,6 @@ static int hb_memvarScopeGet( PHB_DYNS pDynVar )
 int hb_memvarScope( char * szVarName )
 {
    HB_THREAD_STUB
-   int      iMemvar;
    PHB_DYNS pDynVar;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_memvarScope(%s)", szVarName ) );
@@ -1206,12 +1201,7 @@ int hb_memvarScope( char * szVarName )
    pDynVar  = hb_dynsymFindName( szVarName );
 #endif
 
-   if( pDynVar )
-      iMemvar = hb_memvarScopeGet( pDynVar );
-   else
-      iMemvar = HB_MV_NOT_FOUND;
-
-   return iMemvar;
+   return pDynVar ? hb_memvarScopeGet( pDynVar ): HB_MV_NOT_FOUND;
 }
 
 /* Releases memory occupied by a variable
@@ -1296,8 +1286,8 @@ static HB_ISIZ hb_memvarCount( int iScope )
 
       return iPublicCnt;
    }
-   else
-      return s_privateStackCnt;  /* number of PRIVATE variables */
+
+   return s_privateStackCnt;  /* number of PRIVATE variables */
 }
 
 /* Checks passed dynamic symbol if it is a PUBLIC variable and returns
@@ -1327,11 +1317,11 @@ static HB_DYNS_FUNC( hb_memvarFindPublicByPos )
  * Both pointers points to existing and used data - they shouldn't be
  * deallocated.
  */
-static HB_ITEM_PTR hb_memvarDebugVariable( int iScope, int iPos, const char ** pszName )
+static PHB_ITEM hb_memvarDebugVariable( int iScope, int iPos, const char ** pszName )
 {
    HB_THREAD_STUB
 
-   HB_ITEM_PTR pValue = NULL;
+   PHB_ITEM pValue = NULL;
 
    *pszName = NULL;
 
@@ -1362,7 +1352,7 @@ static HB_ITEM_PTR hb_memvarDebugVariable( int iScope, int iPos, const char ** p
       {
          if( ( HB_SIZE ) iPos < s_privateStackCnt )
          {
-            HB_DYNS_PTR pDynSym = s_privateStack[ iPos ];
+            PHB_DYNS pDynSym = s_privateStack[ iPos ];
             pValue   = s_globalTable[ pDynSym->hMemvar ].pVarItem;
             *pszName = pDynSym->pSymbol->szName;
          }
@@ -1373,12 +1363,11 @@ static HB_ITEM_PTR hb_memvarDebugVariable( int iScope, int iPos, const char ** p
 }
 
 /* JC1 NOTE: Not locking it because it is necessary to lock the caller. */
-static HB_DYNS_PTR hb_memvarFindSymbol( HB_ITEM_PTR pName )
+static PHB_DYNS hb_memvarFindSymbol( PHB_ITEM pName )
 {
-   HB_DYNS_PTR pDynSym = NULL;
+   PHB_DYNS pDynSym = NULL;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_memvarFindSymbol(%p)", pName ) );
-
 
    if( pName )
    {
@@ -1514,12 +1503,7 @@ HB_FUNC( __MVRELEASE )
 
       if( pMask )
       {
-         BOOL bIncludeVar;
-
-         if( iCount > 1 )
-            bIncludeVar = hb_parl( 2 );
-         else
-            bIncludeVar = TRUE;
+         BOOL bIncludeVar= ( iCount > 1 ) ? hb_parl( 2 ) : TRUE;
 
          if( pMask->item.asString.value[ 0 ] == '*' )
             bIncludeVar = TRUE;   /* delete all memvar variables */
@@ -1586,7 +1570,7 @@ HB_FUNC( __MVDBGINFO )
       hb_retns( hb_memvarCount( hb_parni( 1 ) ) );
    else if( iCount >= 2 )     /* request for a value of variable */
    {
-      HB_ITEM_PTR    pValue;
+      PHB_ITEM    pValue;
       const char *   szName;
 
       pValue = hb_memvarDebugVariable( hb_parni( 1 ), hb_parni( 2 ), &szName );
@@ -1599,7 +1583,7 @@ HB_FUNC( __MVDBGINFO )
          {
             /* we have to use this variable regardless of its current value
              */
-            HB_ITEM_PTR pName = hb_param( 3, HB_IT_ANY );
+            PHB_ITEM pName = hb_param( 3, HB_IT_ANY );
 
             hb_itemPutC( pName, szName ); /* clear an old value and copy a new one */
             /* szName points directly to a symbol name - it cannot be released
@@ -1618,7 +1602,7 @@ HB_FUNC( __MVDBGINFO )
          {
             /* we have to use this variable regardless of its current value
              */
-            HB_ITEM_PTR pName = hb_param( 3, HB_IT_ANY );
+            PHB_ITEM pName = hb_param( 3, HB_IT_ANY );
 
             hb_itemPutC( pName, "?" ); /* clear an old value and copy a new one */
          }
@@ -1630,7 +1614,7 @@ HB_FUNC( __MVEXIST )
 {
    HB_THREAD_STUB_API
 
-   HB_ITEM_PTR pName = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pName = hb_param( 1, HB_IT_STRING );
    PHB_DYNS    pDyn  = NULL;
 
    hb_retl( pName && ( ( pDyn = hb_memvarFindSymbol( pName ) ) != NULL ) && pDyn->hMemvar );
@@ -1640,11 +1624,11 @@ HB_FUNC( __MVGET )
 {
    HB_THREAD_STUB_ANY
 
-   HB_ITEM_PTR pName = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pName = hb_param( 1, HB_IT_STRING );
 
    if( pName )
    {
-      HB_DYNS_PTR pDynVar;
+      PHB_DYNS pDynVar;
 
       pDynVar = hb_memvarFindSymbol( pName );
 
@@ -1663,7 +1647,7 @@ HB_FUNC( __MVGET )
       else
       {
          USHORT      uiAction = E_RETRY;
-         HB_ITEM_PTR pError;
+         PHB_ITEM pError;
 
          /* Generate an error with retry possibility
           * (user created error handler can create this variable)
@@ -1711,9 +1695,9 @@ HB_FUNC( __MVPUT )
 {
    HB_THREAD_STUB
 
-   HB_ITEM_PTR pName    = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pName    = hb_param( 1, HB_IT_STRING );
    HB_ITEM     nil;
-   HB_ITEM_PTR pValue   = &nil;
+   PHB_ITEM pValue   = &nil;
 
    nil.type = HB_IT_NIL;
 
@@ -1724,7 +1708,7 @@ HB_FUNC( __MVPUT )
    {
       /* the first parameter is a string with not empty variable name
        */
-      HB_DYNS_PTR pDynVar;
+      PHB_DYNS pDynVar;
 
       pDynVar = hb_memvarFindSymbol( pName );
 
@@ -1765,7 +1749,7 @@ HB_FUNC( __MVPUT )
       /* TODO: This should be expanded a little to report a passed incorrect
        * value to the error handler
        */
-      HB_ITEM_PTR pRetValue = hb_errRT_BASE_Subst( EG_ARG, 3010, NULL, NULL, 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+      PHB_ITEM pRetValue = hb_errRT_BASE_Subst( EG_ARG, 3010, NULL, NULL, 2, hb_paramError( 1 ), hb_paramError( 2 ) );
 
       if( pRetValue )
          hb_itemRelease( pRetValue );
@@ -1819,10 +1803,7 @@ static HB_DYNS_FUNC( hb_memvarSave )
    if( pDynSymbol->hMemvar )
    {
       BOOL     bMatch = ( pszMask[ 0 ] == '*' || hb_regexMatch( &( ( ( MEMVARSAVE_CARGO * ) Cargo )->regEx ), pDynSymbol->pSymbol->szName, TRUE ) );
-
-      PHB_ITEM pItem;
-
-      pItem = s_globalTable[ pDynSymbol->hMemvar ].pVarItem;
+      PHB_ITEM pItem  = s_globalTable[ pDynSymbol->hMemvar ].pVarItem;
 
       /* Process it if it matches the passed mask */
       if( bIncludeMask ? bMatch : ! bMatch )
@@ -2165,9 +2146,7 @@ HB_FUNC( __MVRESTORE )
             if( bIncludeMask ? bMatch : ! bMatch )
             {
                /* the first parameter is a string with not empty variable name */
-               HB_DYNS_PTR pDynVar;
-
-               pDynVar = hb_memvarFindSymbol( &Name );
+               PHB_DYNS pDynVar = hb_memvarFindSymbol( &Name );
 
                if( pDynVar )
                {
@@ -2245,7 +2224,6 @@ void hb_memvarsIsMemvarRef( void * pData )
 #else
 void hb_memvarsIsMemvarRef( void )
 {
-
    HB_TRACE( HB_TR_DEBUG, ( "hb_memvarsIsMemvarRef()" ) );
 
    if( s_globalTable )
@@ -2290,8 +2268,8 @@ HB_HANDLE hb_memvarGetVarHandle( char * szName )
       HB_HANDLE hHand = pDyn->hMemvar;
       return hHand;
    }
-   else
-      return 0; /* invalid handle */
+
+   return 0; /* invalid handle */
 }
 
 PHB_ITEM hb_memvarGetValueByHandle( HB_HANDLE hMemvar )
@@ -2300,8 +2278,8 @@ PHB_ITEM hb_memvarGetValueByHandle( HB_HANDLE hMemvar )
 
    if( hMemvar && hMemvar < s_globalTableSize )
       return s_globalTable[ hMemvar ].pVarItem;
-   else
-      return NULL;
+
+   return NULL;
 }
 
 static HB_DYNS_FUNC( hb_GetSymbolInfo )

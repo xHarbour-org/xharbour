@@ -308,7 +308,7 @@ typedef struct _HB_VALUE
    PHB_ITEM    pVarItem;
    HB_COUNTER  counter;
    HB_HANDLE   hPrevMemvar;
-} HB_VALUE, * PHB_VALUE, * HB_VALUE_PTR;
+} HB_VALUE, * PHB_VALUE, * PHB_VALUE;
 
 typedef struct _HB_NESTED_CLONED
 {
@@ -320,7 +320,7 @@ typedef struct _HB_NESTED_CLONED
 typedef struct
 {
    PHB_DYNS pDynSym;             /* Pointer to dynamic symbol */
-} DYNHB_ITEM, *PDYNHB_ITEM, *DYNHB_ITEM_PTR;
+} DYNHB_ITEM, *PDYNHB_ITEM;
 
 /* RDD method return codes */
 typedef USHORT HB_ERRCODE;
@@ -350,22 +350,22 @@ extern void *     hb_xRefResize( void * pMem, HB_SIZE ulSave, HB_SIZE ulSize ); 
  */
 #define HB_GARBAGE_FUNC( hbfunc )   void hbfunc( void * Cargo ) /* callback function for cleaning garbage memory pointer */
 typedef HB_GARBAGE_FUNC( HB_GARBAGE_FUNC_ );
-typedef HB_GARBAGE_FUNC_ * HB_GARBAGE_FUNC_PTR;
+typedef HB_GARBAGE_FUNC_ * PHB_GARBAGE_FUNC;
 
 typedef struct HB_GARBAGE_
 {
    struct HB_GARBAGE_ *pNext;  /* next memory block */
    struct HB_GARBAGE_ *pPrev;  /* previous memory block */
-   HB_GARBAGE_FUNC_PTR pFunc;  /* cleanup function called before memory releasing */
+   PHB_GARBAGE_FUNC pFunc;  /* cleanup function called before memory releasing */
    HB_COUNTER ulHolders;       /* ulHolders counter */
    USHORT locked;              /* locking counter */
    USHORT used;                /* used/unused block */
-} HB_GARBAGE, *HB_GARBAGE_PTR;
+} HB_GARBAGE, *PHB_GARBAGE;
 
-extern HB_EXPORT HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pItem );
-extern HB_EXPORT void   hb_gcGripDrop( HB_ITEM_PTR pItem );
+extern HB_EXPORT PHB_ITEM hb_gcGripGet( PHB_ITEM pItem );
+extern HB_EXPORT void   hb_gcGripDrop( PHB_ITEM pItem );
 
-extern HB_EXPORT void *   hb_gcAlloc( HB_SIZE ulSize, HB_GARBAGE_FUNC_PTR pFunc ); /* allocates a memory controlled by the garbage collector */
+extern HB_EXPORT void *   hb_gcAlloc( HB_SIZE ulSize, PHB_GARBAGE_FUNC pFunc ); /* allocates a memory controlled by the garbage collector */
 extern HB_EXPORT void     hb_gcIncRef( void *pBlock );
 extern HB_EXPORT HB_SIZE  hb_gcDecRef( void *pBlock );
 extern HB_EXPORT void     hb_gcFree( void *pAlloc ); /* deallocates a memory allocated by the garbage collector */
@@ -373,10 +373,10 @@ extern HB_EXPORT void *   hb_gcLock( void *pAlloc ); /* do not release passed me
 extern HB_EXPORT void *   hb_gcUnlock( void *pAlloc ); /* passed block is allowed to be released */
 extern HB_EXPORT void     hb_gcCollect( void ); /* checks if a single memory block can be released */
 extern HB_EXPORT void     hb_gcCollectAll( BOOL bForce ); /* checks if all memory blocks can be released */
-extern HB_EXPORT HB_GARBAGE_FUNC_PTR hb_gcFunc( void *pBlock );
+extern HB_EXPORT PHB_GARBAGE_FUNC hb_gcFunc( void *pBlock );
 
 extern void       hb_gcReleaseAll( void ); /* release all memory blocks unconditionally */
-extern void       hb_gcItemRef( HB_ITEM_PTR pItem ); /* checks if passed item refers passed memory block pointer */
+extern void       hb_gcItemRef( PHB_ITEM pItem ); /* checks if passed item refers passed memory block pointer */
 extern void       hb_gcInit( void );
 extern BOOL       hb_gcSetCollecting( BOOL bCollecting );
 
@@ -423,7 +423,7 @@ extern HB_EXPORT int          hb_parni( int iParam, ... ); /* retrieve a numeric
 extern HB_EXPORT long         hb_parnl( int iParam, ... ); /* retrieve a numeric parameter as a LONG */
 extern HB_EXPORT HB_LONG      hb_parnint( int iParam, ... ); /* retrieve a numeric parameter as a HB_LONG */
 extern HB_EXPORT void *       hb_parptr( int iParam, ... ); /* retrieve a parameter as a pointer */
-extern HB_EXPORT void *       hb_parptrGC( HB_GARBAGE_FUNC_PTR pFunc, int iParam, ... ); /* retrieve a parameter as a pointer if it's a pointer to GC allocated block */
+extern HB_EXPORT void *       hb_parptrGC( PHB_GARBAGE_FUNC pFunc, int iParam, ... ); /* retrieve a parameter as a pointer if it's a pointer to GC allocated block */
 extern HB_EXPORT PHB_ITEM     hb_param( int iParam, long lMask ); /* retrieve a generic parameter */
 extern HB_EXPORT PHB_ITEM     hb_paramError( int iParam ); /* Returns either the generic parameter or a NIL item if param not provided */
 extern HB_EXPORT BOOL         hb_extIsArray( int iParam );
@@ -493,8 +493,8 @@ extern HB_EXPORT int     hb_storns( HB_ISIZ nValue, int iParam, ... );
          #include "hbstack.h"
       #endif
    #elif defined( __HB_API_MACROS__ )
-      extern HB_EXPORT HB_ITEM_PTR hb_stackReturnItem( void );
-      extern HB_EXPORT HB_ITEM_PTR hb_stackBaseItem( void );
+      extern HB_EXPORT PHB_ITEM hb_stackReturnItem( void );
+      extern HB_EXPORT PHB_ITEM hb_stackBaseItem( void );
    #endif
 
    #define hb_pcount()                          ( ( int ) ( hb_stackBaseItem() )->item.asSymbol.pCargo->arguments )
@@ -826,15 +826,15 @@ extern HB_EXPORT BOOL hb_winmainArgGet( HANDLE * phInstance, HANDLE * phPrevInst
 #endif
 
 /* Codeblock management */
-extern HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer, USHORT uiLocals, const BYTE * pLocalPosTable, PHB_SYMB pSymbol ); /* create a code-block */
-extern HB_EXPORT HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen );
-extern void             hb_codeblockDelete( HB_ITEM_PTR pItem ); /* delete a codeblock */
+extern PHB_CODEBLOCK hb_codeblockNew( const BYTE * pBuffer, USHORT uiLocals, const BYTE * pLocalPosTable, PHB_SYMB pSymbol ); /* create a code-block */
+extern HB_EXPORT PHB_CODEBLOCK hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen );
+extern void             hb_codeblockDelete( PHB_ITEM pItem ); /* delete a codeblock */
 extern PHB_ITEM         hb_codeblockGetVar( PHB_ITEM pItem, long iItemPos ); /* get local variable referenced in a codeblock */
-extern PHB_ITEM         hb_codeblockGetRef( HB_CODEBLOCK_PTR pCBlock, PHB_ITEM pRefer ); /* get local variable passed by reference */
+extern PHB_ITEM         hb_codeblockGetRef( PHB_CODEBLOCK pCBlock, PHB_ITEM pRefer ); /* get local variable passed by reference */
 
 /* memvars subsystem */
-extern HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar ); /* create a new global value */
-extern HB_VALUE_PTR * hb_memvarValueBaseAddress( void ); /* retrieve the base address of the values table */
+extern HB_HANDLE hb_memvarValueNew( PHB_ITEM pSource, BOOL bTrueMemvar ); /* create a new global value */
+extern PHB_VALUE * hb_memvarValueBaseAddress( void ); /* retrieve the base address of the values table */
 
 extern void       hb_memvarsClear( void ); /* clear all PUBLIC and PRIVATE variables */
 
@@ -847,10 +847,10 @@ extern void       hb_memvarsRelease( void ); /* Release all memory of Memvars su
 extern void       hb_memvarValueIncRef( HB_HANDLE hValue ); /* increase the reference count of a global value */
 extern void       hb_memvarValueDecRef( HB_HANDLE hValue ); /* decrease the reference count of a global value */
 extern void       hb_memvarValueDecGarbageRef( HB_HANDLE hValue ); /* decrease the reference count of a detached local variable */
-extern void       hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem ); /* copy an item into a symbol */
-extern HB_ERRCODE hb_memvarGet( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb ); /* copy an symbol value into an item */
-extern void       hb_memvarGetValue( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb ); /* copy an symbol value into an item, with error trapping */
-extern void       hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb ); /* copy a reference to a symbol value into an item, with error trapping */
+extern void       hb_memvarSetValue( PHB_SYMB pMemvarSymb, PHB_ITEM pItem ); /* copy an item into a symbol */
+extern HB_ERRCODE hb_memvarGet( PHB_ITEM pItem, PHB_SYMB pMemvarSymb ); /* copy an symbol value into an item */
+extern void       hb_memvarGetValue( PHB_ITEM pItem, PHB_SYMB pMemvarSymb ); /* copy an symbol value into an item, with error trapping */
+extern void       hb_memvarGetRefer( PHB_ITEM pItem, PHB_SYMB pMemvarSymb ); /* copy a reference to a symbol value into an item, with error trapping */
 extern HB_EXPORT HB_SIZE    hb_memvarGetPrivatesBase( void ); /* retrieve current PRIVATE variables stack base */
 extern void       hb_memvarSetPrivatesBase( HB_SIZE ulBase ); /* release PRIVATE variables created after specified base */
 extern void       hb_memvarNewParameter( PHB_SYMB pSymbol, PHB_ITEM pValue );
@@ -859,7 +859,7 @@ extern void       hb_memvarCreateFromItem( PHB_ITEM pMemvar, BYTE bScope, PHB_IT
 extern int        hb_memvarScope( char * szVarName ); /* retrieve scope of a dynamic variable symbol */
 extern HB_HANDLE  hb_memvarGetVarHandle( char *szName ); /* retrieve handle of a variable */
 extern HB_EXPORT PHB_ITEM hb_memvarGetValueByHandle( HB_HANDLE hMemvar );
-extern PHB_ITEM   hb_memvarDetachLocal( HB_ITEM_PTR pLocal ); /* Detach a local variable from the eval stack */
+extern PHB_ITEM   hb_memvarDetachLocal( PHB_ITEM pLocal ); /* Detach a local variable from the eval stack */
 extern PHB_ITEM   hb_memvarGetValueBySym( PHB_DYNS pDynSym );
 
 /* console I/O subsystem */
@@ -886,7 +886,7 @@ typedef struct HB_CBVAR_  /* This structure holds local variables declared in a 
    char * szName;
    BYTE bType;
    struct HB_CBVAR_ * pNext;
-} HB_CBVAR, * HB_CBVAR_PTR;
+} HB_CBVAR, * PHB_CBVAR;
 
 typedef struct HB_PCODE_INFO_   /* compiled pcode container */
 {
@@ -894,8 +894,8 @@ typedef struct HB_PCODE_INFO_   /* compiled pcode container */
    HB_SIZE lPCodeSize;    /* total memory size for pcode */
    HB_SIZE lPCodePos;     /* actual pcode offset */
    struct HB_PCODE_INFO_ * pPrev;
-   HB_CBVAR_PTR pLocals;
-} HB_PCODE_INFO, * HB_PCODE_INFO_PTR;
+   PHB_CBVAR pLocals;
+} HB_PCODE_INFO, * PHB_PCODE_INFO;
 
 typedef struct HB_MACRO_   /* a macro compiled pcode container */
 {
@@ -904,28 +904,28 @@ typedef struct HB_MACRO_   /* a macro compiled pcode container */
    HB_SIZE pos;            /* current position inside of compiled string */
    int     Flags;          /* some flags we may need */
    int     status;         /* status of compilation */
-   HB_ITEM_PTR pError;     /* error object returned from the parser */
+   PHB_ITEM pError;     /* error object returned from the parser */
    HB_SIZE supported;      /* various flags for supported capabilities */
    int     FlexState;      /* internal flex state during parsing */
-   HB_PCODE_INFO_PTR pCodeInfo;  /* pointer to pcode buffer and info */
+   PHB_PCODE_INFO pCodeInfo;  /* pointer to pcode buffer and info */
    void *  pParseInfo;     /* data needed by the parser - it should be 'void *' to allow different implementation of macr compiler */
    USHORT  uiNameLen;      /* the maximum symbol name length */
    BOOL    bShortCuts;     /* are we using logical shorcuts (in OR/AND)  */
    int     exprType;       /* type of successfully compiled expression */
    int     iListElements;
-} HB_MACRO, * HB_MACRO_PTR;
+} HB_MACRO, * PHB_MACRO;
 
-extern HB_EXPORT void         hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags ); /* retrieve results of a macro expansion */
-extern HB_EXPORT void         hb_macroSetValue( HB_ITEM_PTR pItem, BYTE flags ); /* assign a value to a macro-expression item */
-extern HB_EXPORT void         hb_macroTextValue( HB_ITEM_PTR pItem ); /* macro text substitution */
-extern HB_EXPORT void         hb_macroPushSymbol( HB_ITEM_PTR pItem ); /* handle a macro function calls, e.g. var := &macro() */
-extern HB_EXPORT void         hb_macroRun( HB_MACRO_PTR pMacro ); /* executes pcode compiled by macro compiler */
-extern HB_EXPORT HB_MACRO_PTR hb_macroCompile( const char * szString ); /* compile a string and return a pcode buffer */
-extern HB_EXPORT void         hb_macroDelete( HB_MACRO_PTR pMacro ); /* release all memory allocated for macro evaluation */
+extern HB_EXPORT void         hb_macroGetValue( PHB_ITEM pItem, BYTE iContext, BYTE flags ); /* retrieve results of a macro expansion */
+extern HB_EXPORT void         hb_macroSetValue( PHB_ITEM pItem, BYTE flags ); /* assign a value to a macro-expression item */
+extern HB_EXPORT void         hb_macroTextValue( PHB_ITEM pItem ); /* macro text substitution */
+extern HB_EXPORT void         hb_macroPushSymbol( PHB_ITEM pItem ); /* handle a macro function calls, e.g. var := &macro() */
+extern HB_EXPORT void         hb_macroRun( PHB_MACRO pMacro ); /* executes pcode compiled by macro compiler */
+extern HB_EXPORT PHB_MACRO hb_macroCompile( const char * szString ); /* compile a string and return a pcode buffer */
+extern HB_EXPORT void         hb_macroDelete( PHB_MACRO pMacro ); /* release all memory allocated for macro evaluation */
 extern HB_EXPORT char *       hb_macroTextSubst( char * szString, HB_SIZE *pulStringLen ); /* substitute macro variables occurences within a given string */
 extern HB_EXPORT BOOL         hb_macroIsIdent( char * szString ); /* determine if a string is a valid function or variable name */
-extern HB_EXPORT void         hb_macroPopAliasedValue( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, BYTE flags ); /* compiles and evaluates an aliased macro expression */
-extern HB_EXPORT void         hb_macroPushAliasedValue( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, BYTE flags ); /* compiles and evaluates an aliased macro expression */
+extern HB_EXPORT void         hb_macroPopAliasedValue( PHB_ITEM pAlias, PHB_ITEM pVar, BYTE flags ); /* compiles and evaluates an aliased macro expression */
+extern HB_EXPORT void         hb_macroPushAliasedValue( PHB_ITEM pAlias, PHB_ITEM pVar, BYTE flags ); /* compiles and evaluates an aliased macro expression */
 extern HB_EXPORT char *       hb_macroGetType( PHB_ITEM pItem, BYTE Flags ); /* determine the type of an expression */
 extern HB_EXPORT char *       hb_macroExpandString( char *szString, HB_SIZE ulLength, BOOL *pbNewString ); /* expands valid '&' operator */
 
@@ -948,7 +948,7 @@ typedef struct HB_BACKGROUNDTASK_
    double   dSeconds;     /* internal - last time this task has gone */
    int      millisec;     /* milliseconds after this task must run */
    BOOL     bActive;      /* task is active ? */
-} HB_BACKGROUNDTASK, * PHB_BACKGROUNDTASK, * HB_BACKGROUNDTASK_PTR;
+} HB_BACKGROUNDTASK, * PHB_BACKGROUNDTASK;
 
 extern void     hb_backgroundRunSingle( ULONG ulID ); /* run a single background routine */
 extern void     hb_backgroundRunForced( void ); /* run all background routines also if them are not active*/

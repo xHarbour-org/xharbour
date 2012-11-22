@@ -87,7 +87,7 @@
 /* list of background tasks
  * A pointer into an array of pointers to items with a codeblock
  */
-static HB_ITEM_PTR * s_pIdleTasks            = NULL;
+static PHB_ITEM * s_pIdleTasks            = NULL;
 
 /* flag to prevent recursive calls of hb_idleState() */
 static BOOL          s_bIamIdle              = FALSE;
@@ -186,9 +186,8 @@ void hb_idleSleep( double dSeconds )
       HB_ULONG end_timer = hb_dateMilliSeconds() + ( HB_ULONG ) ( dSeconds * 1000 );
 
       while( hb_dateMilliSeconds() < end_timer )
-      {
          hb_idleState( FALSE );
-      }
+
       hb_idleReset();
    }
 }
@@ -215,19 +214,13 @@ HB_FUNC( HB_IDLESLEEP )
 void * hb_idleAddFunc( PHB_ITEM pBlock )
 {
    if( ! HB_IS_BLOCK( pBlock ) && ! HB_IS_ARRAY( pBlock ) )
-   {
       return NULL;
-   }
 
    ++s_uiIdleMaxTask;
    if( ! s_pIdleTasks )
-   {
-      s_pIdleTasks = ( HB_ITEM_PTR * ) hb_xgrab( sizeof( HB_ITEM_PTR ) );
-   }
+      s_pIdleTasks = ( PHB_ITEM * ) hb_xgrab( sizeof( PHB_ITEM ) );
    else
-   {
-      s_pIdleTasks = ( HB_ITEM_PTR * ) hb_xrealloc( s_pIdleTasks, sizeof( HB_ITEM_PTR ) * s_uiIdleMaxTask );
-   }
+      s_pIdleTasks = ( PHB_ITEM * ) hb_xrealloc( s_pIdleTasks, sizeof( PHB_ITEM ) * s_uiIdleMaxTask );
    /* store a copy of passed codeblock
     */
    s_pIdleTasks[ s_uiIdleMaxTask - 1 ] = hb_itemNew( pBlock );
@@ -235,24 +228,18 @@ void * hb_idleAddFunc( PHB_ITEM pBlock )
    /* return a pointer as a handle to this idle task
     */
    if( HB_IS_ARRAY( pBlock ) )
-   {
       return ( void * ) pBlock->item.asArray.value;    /* TODO: access to pointers from harbour code */
-   }
    else
-   {
       return ( void * ) pBlock->item.asBlock.value;    /* TODO: access to pointers from harbour code */
-   }
 }
 
 /* add a new background task and return its handle */
 HB_FUNC( HB_IDLEADD )
 {
-   HB_ITEM_PTR pBlock = hb_param( 1, HB_IT_ANY );
+   PHB_ITEM pBlock = hb_param( 1, HB_IT_ANY );
 
    if( HB_IS_BLOCK( pBlock ) || HB_IS_ARRAY( pBlock ) )
-   {
       hb_retptr( hb_idleAddFunc( pBlock ) );
-   }
    else
       hb_retptr( NULL );    /* error - a codeblock is required */
 }
@@ -277,11 +264,10 @@ PHB_ITEM hb_idleDelFunc( void * pID )
          if( s_uiIdleMaxTask )
          {
             if( iTask != s_uiIdleMaxTask )
-            {
                HB_MEMCPY( &s_pIdleTasks[ iTask ], &s_pIdleTasks[ iTask + 1 ],
-                          sizeof( HB_ITEM_PTR ) * ( s_uiIdleMaxTask - iTask ) );
-            }
-            s_pIdleTasks = ( HB_ITEM_PTR * ) hb_xrealloc( s_pIdleTasks, sizeof( HB_ITEM_PTR ) * s_uiIdleMaxTask );
+                          sizeof( PHB_ITEM ) * ( s_uiIdleMaxTask - iTask ) );
+
+            s_pIdleTasks = ( PHB_ITEM * ) hb_xrealloc( s_pIdleTasks, sizeof( PHB_ITEM ) * s_uiIdleMaxTask );
          }
          else
          {
@@ -309,19 +295,13 @@ HB_FUNC( HB_IDLEDEL )
       void * pID = hb_parptr( 1 );   /* TODO: access to pointers from harbour code */
 
       if( pID )
-      {
          pItem = hb_idleDelFunc( pID );
-      }
    }
 
    if( pItem == NULL )
-   {
       hb_ret();    /* return NIL */
-   }
    else
-   {
       hb_itemReturnForward( pItem ); /* return a codeblock */
-   }
 }
 
 HB_FUNC( HB_IDLESLEEPMSEC )
@@ -330,17 +310,15 @@ HB_FUNC( HB_IDLESLEEPMSEC )
       s_uiIdleSleepMsec = ( USHORT ) hb_idle_msec_default();
 
    hb_retnl( s_uiIdleSleepMsec );
+
    if( hb_pcount() > 0 )
-   {
       s_uiIdleSleepMsec = ( USHORT ) hb_parnl( 1 );
-   }
 }
 
 HB_FUNC( HB_IDLEWAITNOCPU )
 {
    hb_retnl( ( LONG ) s_iIdleWaitNoCpu );
+
    if( hb_pcount() > 0 )
-   {
       s_iIdleWaitNoCpu = ( int ) hb_parnl( 1 );
-   }
 }

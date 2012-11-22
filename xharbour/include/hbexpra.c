@@ -229,13 +229,13 @@ void hb_compExprErrorType( HB_EXPR_PTR pExpr, HB_MACRO_DECL )
 
 /* Create a new declaration for codeblock local variable
  */
-static HB_CBVAR_PTR hb_compExprCBVarNew( char * szVarName, BYTE bType )
+static PHB_CBVAR hb_compExprCBVarNew( char * szVarName, BYTE bType )
 {
-   HB_CBVAR_PTR pVar;
+   PHB_CBVAR pVar;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprCBVarNew(%s)", szVarName));
 
-   pVar = ( HB_CBVAR_PTR ) HB_XGRAB( sizeof( HB_CBVAR ) );
+   pVar = ( PHB_CBVAR ) HB_XGRAB( sizeof( HB_CBVAR ) );
 
    pVar->szName = szVarName;
    pVar->bType  = bType;
@@ -252,7 +252,7 @@ HB_EXPR_PTR hb_compExprCBVarAdd( HB_EXPR_PTR pCB, char * szVarName, HB_MACRO_DEC
 HB_EXPR_PTR hb_compExprCBVarAdd( HB_EXPR_PTR pCB, char * szVarName, BYTE bType )
 #endif
 {
-   HB_CBVAR_PTR pVar;
+   PHB_CBVAR pVar;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprCBVarAdd(%s)", szVarName));
 
@@ -260,7 +260,7 @@ HB_EXPR_PTR hb_compExprCBVarAdd( HB_EXPR_PTR pCB, char * szVarName, BYTE bType )
    {
       /* add it to the end of the list
       */
-      pVar = ( HB_CBVAR_PTR ) pCB->value.asList.pIndex;
+      pVar = ( PHB_CBVAR ) pCB->value.asList.pIndex;
       while( pVar )
       {
          if( pVar->szName && szVarName && HB_EXPR_ISEQUAL_IDS( szVarName, pVar->szName ) )
@@ -732,9 +732,9 @@ HB_EXPR_PTR hb_compExprGenPop( HB_EXPR_PTR pExpr )
 
 /* NOTE: This deletes all linked variables
  */
-void hb_compExprCBVarDel( HB_CBVAR_PTR pVars )
+void hb_compExprCBVarDel( PHB_CBVAR pVars )
 {
-   HB_CBVAR_PTR pDel;
+   PHB_CBVAR pDel;
 
    while( pVars )
    {

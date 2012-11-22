@@ -63,12 +63,12 @@ typedef struct
 {
    USHORT   paramCount;
    PHB_ITEM pItems[ HB_EVAL_PARAM_MAX_ + 1 ];
-} EVALINFO, * PEVALINFO, * EVALINFO_PTR;
+} EVALINFO, * PHB_EVALINFO;
 
-extern HB_EXPORT PHB_ITEM   hb_evalLaunch   ( PEVALINFO pEvalInfo );
-extern HB_EXPORT BOOL       hb_evalNew      ( PEVALINFO pEvalInfo, PHB_ITEM pItem );
-extern HB_EXPORT BOOL       hb_evalPutParam ( PEVALINFO pEvalInfo, PHB_ITEM pItem );
-extern HB_EXPORT BOOL       hb_evalRelease  ( PEVALINFO pEvalInfo );
+extern HB_EXPORT PHB_ITEM   hb_evalLaunch   ( PHB_EVALINFO pEvalInfo );
+extern HB_EXPORT BOOL       hb_evalNew      ( PHB_EVALINFO pEvalInfo, PHB_ITEM pItem );
+extern HB_EXPORT BOOL       hb_evalPutParam ( PHB_EVALINFO pEvalInfo, PHB_ITEM pItem );
+extern HB_EXPORT BOOL       hb_evalRelease  ( PHB_EVALINFO pEvalInfo );
 
 extern HB_EXPORT PHB_ITEM   hb_itemDo       ( PHB_ITEM pItem, HB_SIZE ulPCount, ... );
 extern HB_EXPORT PHB_ITEM   hb_itemDoC      ( const char * szFunc, HB_SIZE ulPCount, ... );
@@ -105,7 +105,7 @@ extern HB_EXPORT long       hb_itemGetNL    ( PHB_ITEM pItem );
 extern HB_EXPORT HB_LONG    hb_itemGetNInt  ( PHB_ITEM pItem );
 extern HB_EXPORT void       hb_itemGetNLen  ( PHB_ITEM pItem, int * piWidth, int * piDec );
 extern HB_EXPORT void *     hb_itemGetPtr   ( PHB_ITEM pItem );
-extern HB_EXPORT void *     hb_itemGetPtrGC ( PHB_ITEM pItem, HB_GARBAGE_FUNC_PTR pFunc );
+extern HB_EXPORT void *     hb_itemGetPtrGC ( PHB_ITEM pItem, PHB_GARBAGE_FUNC pFunc );
 extern HB_EXPORT PHB_SYMB   hb_itemGetSymbol( PHB_ITEM pItem );
 
 extern HB_EXPORT PHB_ITEM   hb_itemNew      ( PHB_ITEM pNull );
@@ -191,6 +191,9 @@ extern HB_EXPORT PHB_ITEM   hb_itemClone    ( PHB_ITEM pItem );
 
 extern HB_EXPORT PHB_ITEM   hb_itemPutNS( PHB_ITEM pItem, HB_ISIZ nNumber );
 extern HB_EXPORT HB_ISIZ    hb_itemGetNS( PHB_ITEM pItem );
+
+/* helper function */
+extern HB_EXPORT PHB_ITEM   hb_itemapiCheck( PHB_ITEM pItem );
 
 #ifndef HB_LONG_LONG_OFF
    extern HB_EXPORT LONGLONG  hb_itemGetNLL   ( PHB_ITEM pItem );

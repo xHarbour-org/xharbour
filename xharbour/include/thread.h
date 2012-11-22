@@ -560,7 +560,7 @@ typedef struct tag_HB_STACK
    HB_SIZE globalTableSize;
    HB_SIZE globalFirstFree;
    HB_SIZE globalLastFree;
-   HB_VALUE_PTR globalTable;
+   PHB_VALUE globalTable;
 
    /* Pointers to hMemvar for thread aware dynsyms */
    HB_HANDLE *hMemvars;

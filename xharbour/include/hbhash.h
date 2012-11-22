@@ -66,11 +66,11 @@ typedef struct HB_HASH_ITEM_
    void *cargo;        /* value stored in the hash table */
    HB_SIZE key;
    struct HB_HASH_ITEM_ *next;
-} HB_HASH_ITEM, *HB_HASH_ITEM_PTR;
+} HB_HASH_ITEM, *PHB_HASH_ITEM;
 
 typedef struct HB_HASH_TABLE_
 {
-   HB_HASH_ITEM_PTR *pItems;    /* pointer to items */
+   PHB_HASH_ITEM *pItems;    /* pointer to items */
    HB_SIZE ulTableSize;           /* the table size - number of slots */
    HB_SIZE ulCount;               /* number of items stored in the table */
    HB_SIZE ulUsed;                /* number of used slots */

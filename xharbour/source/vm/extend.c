@@ -173,7 +173,6 @@ BOOL hb_extIsObject( int iParam )
 
    if( iParam == -1 )
       return HB_IS_OBJECT( hb_stackReturnItem() );
-
    else if( iParam >= 0 && iParam <= hb_pcount() )
       return HB_IS_OBJECT( hb_stackItemFromBase( iParam ) );
 
@@ -261,9 +260,7 @@ HB_SIZE hb_parclen( int iParam, ... )
       PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
 
       if( HB_IS_BYREF( pItem ) )
-      {
          pItem = hb_itemUnRef( pItem );
-      }
 
       if( HB_IS_STRING( pItem ) )
          return pItem->item.asString.length;
@@ -828,7 +825,7 @@ void * hb_parptr( int iParam, ... )
    return ( void * ) 0;
 }
 
-void * hb_parptrGC( HB_GARBAGE_FUNC_PTR pFunc, int iParam, ... )
+void * hb_parptrGC( PHB_GARBAGE_FUNC pFunc, int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 

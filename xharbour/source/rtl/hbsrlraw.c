@@ -98,12 +98,9 @@ HB_FUNC( HB_CREATELEN8 )
       HB_SIZE  ulLen;
 
       if( hb_itemGetWriteCL( hb_param( 1, HB_IT_STRING ), &buffer, &ulLen ) && ulLen >= 8 )
-      {
          hb_createlen8( ( BYTE * ) buffer, hb_parnint( 2 ) );
-      }
    }
 }
-
 
 /* Returns a numeric length using the first 4 bytes of the given string
  * HB_GetLen8( cStr ) --> nLength
@@ -114,25 +111,18 @@ static HB_LONG hb_getlen8( BYTE * cStr )
    HB_LONG  ulRet = 0;
 
    for( i = 7, iShift = 0; i >= 0; i--, iShift += 8 )
-   {
       ulRet += ( ( HB_LONG ) cStr[ i ] ) << iShift;
-   }
+
    return ulRet;
 }
-
 
 HB_FUNC( HB_GETLEN8 )
 {
    if( hb_parclen( 1 ) < 8 )
-   {
       hb_retni( -1 );
-   }
    else
-   {
       hb_retnint( hb_getlen8( ( BYTE * ) hb_parc( 1 ) ) );
-   }
 }
-
 
 /* Serializes a variable into a serialization stream, socket or string
  * HB_SERIALIZE( oVariuous )--> cData
@@ -146,19 +136,18 @@ HB_FUNC( HB_SERIALIZESIMPLE )
 
    if( pItem == NULL )
    {
-      // TODO: error code
+      /* TODO: error code
+       */
       hb_ret();
       return;
    }
 
    if( HB_IS_BYREF( pItem ) )
-   {
       hb_itemUnRef( pItem );
-   }
 
    if( HB_IS_MEMVAR( pItem ) )
    {
-      HB_VALUE_PTR pValue;
+      PHB_VALUE pValue;
 
       pValue   = *( pItem->item.asMemvar.itemsbase ) + pItem->item.asMemvar.offset +
                  pItem->item.asMemvar.value;
@@ -195,15 +184,7 @@ HB_FUNC( HB_SERIALIZESIMPLE )
          ulRet       = HB_LONG_LENGTH( pItem->item.asLong.value );
          cRet        = ( BYTE * ) hb_xgrab( ulRet + 1 );
          cRet[ 0 ]   = ( BYTE ) 'N';
-
-         if( ulRet == 20 )
-         {
-            cRet[ 1 ] = ( BYTE ) 'X';
-         }
-         else
-         {
-            cRet[ 1 ] = ( BYTE ) 'L';
-         }
+         cRet[ 1 ]   = ( ulRet == 20 ) ? ( BYTE ) 'X' : ( BYTE ) 'L';
 
          hb_createlen8( cRet + 2, pItem->item.asLong.value );
          break;
@@ -253,23 +234,15 @@ HB_FUNC( HB_SERIALIZESIMPLE )
  */
 HB_FUNC( HB_DESERIALIZESIMPLE )
 {
-   PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
-   LONG     ulMaxlen;
+   PHB_ITEM pItem    = hb_param( 1, HB_IT_STRING );
+   LONG     ulMaxlen = ISNUM( 2 )? hb_parnl( 2 ) : -1;
    ULONG    ulData;
    char *   cBuf;
 
-   if( ISNUM( 2 ) )
-   {
-      ulMaxlen = hb_parnl( 2 );
-   }
-   else
-   {
-      ulMaxlen = -1;
-   }
-
    if( pItem == NULL )
    {
-      // TODO: error code
+      /* TODO: error code
+       */
       hb_ret();
       return;
    }
@@ -281,13 +254,9 @@ HB_FUNC( HB_DESERIALIZESIMPLE )
       case 'C':
          ulData = ( ULONG ) hb_getlen8( ( BYTE * ) cBuf + 1 );
          if( ulMaxlen > 0 && ulData > ( ULONG ) ulMaxlen )
-         {
             hb_ret();
-         }
          else
-         {
             hb_retclen( cBuf + 9, ulData );
-         }
          break;
 
       case 'L':
@@ -306,13 +275,10 @@ HB_FUNC( HB_DESERIALIZESIMPLE )
             hb_retnl( ( LONG ) ulData );
          }
          else if( cBuf[ 1 ] == 'X' )
-         {
             hb_retnint( ( HB_LONG ) hb_getlen8( ( BYTE * ) cBuf + 2 ) );
-         }
          else
-         {
             hb_retnd( *( ( double * ) ( cBuf + 2 ) ) );
-         }
+
          break;
 
       case 'D':
@@ -325,13 +291,13 @@ HB_FUNC( HB_DESERIALIZESIMPLE )
          break;
 
       case 'Z':
-         // ulData = 1;
+         /* ulData = 1;
+          */
          hb_ret();
 
          break;
    }
 }
-
 
 ULONG hb_serialNextRaw( const char * cBuf )
 {
@@ -349,9 +315,8 @@ ULONG hb_serialNextRaw( const char * cBuf )
 
       case 'N':
          if( cBuf[ 1 ] == 'I' || cBuf[ 1 ] == 'X' || cBuf[ 1 ] == 'L' )
-         {
             return 10;
-         }
+
          return 2 + sizeof( double );
 
       case 'D':
@@ -392,17 +357,20 @@ ULONG hb_serialNextRaw( const char * cBuf )
       case 'O':
          ulNext   = 9;
          ulCount  = ( ULONG ) hb_getlen8( ( BYTE * ) ( cBuf + 1 ) );
-         // remove class name
+         /* remove class name
+          */
          ulNext   += hb_serialNextRaw( ( char * ) ( cBuf + 9 ) );
          ulData   = ulNext;
 
          while( ulCount > 0 )
          {
-            // remove property name
+            /* remove property name
+             */
             cBuf     += ulNext;
             ulNext   = hb_serialNextRaw( cBuf );
             ulData   += ulNext;
-            // remove property value
+            /* remove property value
+             */
             cBuf     += ulNext;
             ulNext   = hb_serialNextRaw( cBuf );
             ulData   += ulNext;
@@ -433,7 +401,8 @@ HB_FUNC( HB_SERIALNEXT )
 
    if( pItem == NULL )
    {
-      // TODO: error code
+      /* TODO: error code
+       */
       hb_ret();
       return;
    }
@@ -451,7 +420,8 @@ HB_FUNC( HB_DESERIALBEGIN )
 
    if( pItem == NULL )
    {
-      // TODO: error code
+      /* TODO: error code
+       */
       hb_ret();
       return;
    }
@@ -462,24 +432,18 @@ HB_FUNC( HB_DESERIALBEGIN )
    hb_retclenAdopt( ( char * ) cBuf, 8 + pItem->item.asString.length );
 }
 
-
 HB_FUNC( HB_DESERIALIZEARRAY )
 {
-   const char *   cBuf;
-   PHB_ITEM       pArray, pMaxLen, pRObj, pRHash, pRArray, pRBlock;
-   PHB_DYNS       pHB_Deserialize;
-   HB_SIZE        lLen, i, lArrayLen, lNext;
-
-   pArray            = hb_param( 1, HB_IT_ARRAY );
-   cBuf              = hb_parc( 2 );
-   lLen              = hb_parclen( 2 );
-   pMaxLen           = hb_param( 3, HB_IT_ANY );
-   pRObj             = hb_param( 4, HB_IT_ANY );
-   pRHash            = hb_param( 5, HB_IT_ANY );
-   pRArray           = hb_param( 6, HB_IT_ANY );
-   pRBlock           = hb_param( 7, HB_IT_ANY );
-
-   pHB_Deserialize   = hb_dynsymFind( "HB_DESERIALIZE" );
+   HB_SIZE      i, lArrayLen, lNext;
+   const char * cBuf      = hb_parc( 2 );
+   HB_SIZE      lLen      = hb_parclen( 2 );
+   PHB_ITEM     pArray    = hb_param( 1, HB_IT_ARRAY );
+   PHB_ITEM     pMaxLen   = hb_param( 3, HB_IT_ANY );
+   PHB_ITEM     pRObj     = hb_param( 4, HB_IT_ANY );
+   PHB_ITEM     pRHash    = hb_param( 5, HB_IT_ANY );
+   PHB_ITEM     pRArray   = hb_param( 6, HB_IT_ANY );
+   PHB_ITEM     pRBlock   = hb_param( 7, HB_IT_ANY );
+   PHB_DYNS     pHB_Deserialize   = hb_dynsymFind( "HB_DESERIALIZE" );
 
    if( pArray && cBuf && pHB_Deserialize )
    {
@@ -487,43 +451,42 @@ HB_FUNC( HB_DESERIALIZEARRAY )
 
       for( i = 1; i <= lArrayLen; i++ )
       {
-         hb_vmPushDynSym( pHB_Deserialize );    // HB_Deserialize(
+         hb_vmPushDynSym( pHB_Deserialize );    /* HB_Deserialize( */
          hb_vmPushNil();
-         hb_itemPushStaticString( cBuf, lLen ); //    cSerial,
-         hb_vmPush( pMaxLen );                  //    nMaxLen,
-         hb_vmPushLogical( TRUE );              //    .T.,
+         hb_itemPushStaticString( cBuf, lLen ); /*    cSerial, */
+         hb_vmPush( pMaxLen );                  /*    nMaxLen, */
+         hb_vmPushLogical( TRUE );              /*    .T., */
 
          if( pRObj )
-            hb_vmPush( pRObj );                 //    aObj,
+            hb_vmPush( pRObj );                 /*    aObj, */
          else
             hb_vmPushNil();
 
          if( pRHash )
-            hb_vmPush( pRHash );                //    aHash,
+            hb_vmPush( pRHash );                /*    aHash, */
          else
             hb_vmPushNil();
 
          if( pRArray )
-            hb_vmPush( pRArray );               //    aArray,
+            hb_vmPush( pRArray );               /*    aArray, */
          else
             hb_vmPushNil();
 
          if( pRBlock )
-            hb_vmPush( pRBlock );               //    aBlock
+            hb_vmPush( pRBlock );               /*    aBlock */
          else
             hb_vmPushNil();
 
-         hb_vmDo( 7 );                          //    )
+         hb_vmDo( 7 );                          /*    ) */
 
          hb_arraySetForward( pArray, i, hb_stackReturnItem() );
 
          lNext = hb_serialNextRaw( cBuf );
          cBuf  += lNext;
          lLen  -= lNext;
+
          if( lLen < 0 )
-         {
             lLen = 0;
-         }
       }
    }
    hb_retnl( ( LONG ) ( hb_parclen( 2 ) - lLen ) );
