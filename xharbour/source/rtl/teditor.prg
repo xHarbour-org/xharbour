@@ -253,7 +253,7 @@ CLASS HBEditor
 
 // 2012/11/24 - AJ - For Reformatting paragraph
    DATA  aTextEOL       INIT {}     // clone of array with lines of text being edited with EOL
-
+   DATA  nLineLength
    METHOD   BrowseText( nPassedKey, lHandleOneKey )
 
 // 2006/07/25 - E.F. - Internal use only.
@@ -318,6 +318,7 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
       ENDIF
    ENDIF
 
+   ::nLineLength  := nLineLength
    ::nWordWrapCol := nLineLength - 1  // please don't change it.
 
 
@@ -1990,7 +1991,14 @@ METHOD ReformParagraph() CLASS HBEditor
       NEXT
 
       IF lFound
-         AADD( aTemp, cText )
+         IF Len( cText ) <= ::nLineLength
+            AADD( aTemp, cText )
+         ELSE
+            WHILE !EMPTY( cText )
+               AADD( aTemp, LEFT( cText, ::nLineLength ) )
+               cText := SubStr( cText, ::nLineLength + 1 )
+            ENDDO
+         ENDIF
          j := IIF( lBegin, nRow - 1, nRow )
       ELSE
          j := ::nRow
@@ -2000,11 +2008,14 @@ METHOD ReformParagraph() CLASS HBEditor
          AADD( aTemp, ::aTextEOL[ i ] )
       NEXT
 
+      ASize( ::aText, Len( aTemp ) )
+
       FOR i := 1 TO LEN( aTemp )
+         IF ::aText[ i ] == NIL
+            ::aText[ i ] := HBTextLine():New()
+         ENDIF
          ::aText[ i ]:cText := StrTran( aTemp[ i ], cHardCR, "" )
       NEXT
-
-      ASize( ::aText, Len( aTemp ) )
 
       ::lChanged := .T.
 
