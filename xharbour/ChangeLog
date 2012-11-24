@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-24 13:43 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/teditor.prg
+    ! fixed routine for line-reformatting invoked by pressing CTRL-B
+
 2012-11-22 20:36 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/macro.c
     ! increase macro string size to 4096 (this should be enough IMO)

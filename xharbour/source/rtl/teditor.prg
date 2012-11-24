@@ -251,6 +251,9 @@ CLASS HBEditor
 
    PROTECTED:
 
+// 2012/11/24 - AJ - For Reformatting paragraph
+   DATA  aTextEOL       INIT {}     // clone of array with lines of text being edited with EOL
+
    METHOD   BrowseText( nPassedKey, lHandleOneKey )
 
 // 2006/07/25 - E.F. - Internal use only.
@@ -1937,30 +1940,103 @@ METHOD DelWordRight() CLASS HBEditor
 
 METHOD ReformParagraph() CLASS HBEditor
 
-   LOCAL nRow
+   LOCAL nRow, i, j
    LOCAL cHardCR := hb_osNewLine()
    LOCAL cSoftCR := Chr( 141 ) + Chr( 10 )
+   LOCAL lInit := .F.
+   LOCAL cText := "", aTemp := {}, lFound := .F., lBegin := .F.
 
    IF !::lEditAllow
       RETURN Self
    ENDIF
 
+// AJ: 2012/11/24 - Fixing reformatting routine which does not work per
+// remmed snippet below
+
    IF ::LastRow() > 0
 
-      ::lChanged := .T.
+      ::GetText(.T.)
 
-      FOR nRow := 1 TO ::LastRow()
+      FOR nRow := 1 TO ::nRow - 1
+         AADD( aTemp, ::aTextEOL[ nRow ] )
+      NEXT
 
-         ::aText[ nRow ]:cText := StrTran( ::aText[ nRow ]:cText, cSoftCR, "" )
-         ::aText[ nRow ]:lSoftCR := .F.
+      FOR nRow := ::nRow TO Len( ::aTextEOL )
 
-         IF At( cHardCR, ::aText[ nRow ]:cText ) != 0
+         IF !lFound
+            cText := ""
+         ENDIF
+
+         IF At( Chr( 141 ), ::aTextEOL[ nRow ] ) > 0
+            IF ::nRow == 1
+               lBegin := .T.
+            ENDIF
+            IF !lFound
+               cText := ""
+               lFound := .T.
+            ENDIF
+            cText += StrTran( ::aTextEOL[ nRow ], cSoftCR, "" )
+            // Don't know why a space was appended, so we trim it here
+            cText := Left( cText, Len( cText ) - 1 )
+            cText += ::aTextEOL[ nRow + 1 ]
+            nRow ++
+            LOOP
+         ENDIF
+
+         IF At( cHardCR, ::aTextEOL[ nRow ] ) > 0
             EXIT
          ENDIF
 
       NEXT
 
-   ENDIF
+      IF lFound
+         AADD( aTemp, cText )
+         j := IIF( lBegin, nRow - 1, nRow )
+      ELSE
+         j := ::nRow
+      ENDIF
+
+      FOR i := j TO LEN( ::aTextEOL )
+         AADD( aTemp, ::aTextEOL[ i ] )
+      NEXT
+
+      FOR i := 1 TO LEN( aTemp )
+         ::aText[ i ]:cText := StrTran( aTemp[ i ], cHardCR, "" )
+      NEXT
+
+      ASize( ::aText, Len( aTemp ) )
+
+      ::lChanged := .T.
+
+      ::RefreshWindow()
+  ENDIF
+
+/*
+*  AJ: This does not work
+*  IF ::LastRow() > 0
+*
+*     ::lChanged := .T.
+*
+*     FOR nRow := 1 TO ::LastRow()
+*
+*        IF At( Chr(141), ::aText[ nRow ]:cText ) != 0
+*           ALERT("chr(141) found!")
+*           IF !lInit
+*             lInit := .T.
+*           ENDIF
+*        ENDIF
+*
+*        ::aText[ nRow ]:cText := StrTran( ::aText[ nRow ]:cText, cSoftCR, "" )
+*        ::aText[ nRow ]:lSoftCR := .F.
+*
+*        IF At( cHardCR, ::aText[ nRow ]:cText ) != 0
+*           EXIT
+*        ENDIF
+*
+*     NEXT
+*
+*  ENDIF
+*/
 
    RETURN Self
 
@@ -2416,25 +2492,28 @@ METHOD DisplayInsert( lInsert ) CLASS HBEditor
 
 METHOD GetText( lSoftCr ) CLASS HBEditor
 
-   LOCAL cString := "", cSoft := ""
+   LOCAL cString := "", cSoft := "", cText := ""
    LOCAL cEOL := hb_osNewLine()
 
    DEFAULT lSoftCr TO .F.
 
    IF ::LastRow() > 0
 
+      ::aTextEOL := Array( Len( ::aText ) )
+
       IF lSoftCr
          cSoft := Chr( 141 ) + Chr( 10 )
       ENDIF
 
       if ::lWordWrap
-         AEval( ::aText, {| cItem | cString += cItem:cText + iif( cItem:lSoftCR, cSoft, cEOL ) }, , ::LastRow() - 1 )
+         AEval( ::aText, { | cItem, i | cText := cItem:cText + iif( cItem:lSoftCR, cSoft, cEOL ) , cString += cText, ::aTextEOL[ i ] := cText }, , ::LastRow() - 1 )
       ELSE
-         AEval( ::aText, {| cItem | cString += cItem:cText + cEOL }, , ::LastRow() - 1 )
+         AEval( ::aText, { | cItem, i | cText := cItem:cText + cEOL, cString += cText, ::aTextEOL[ i ] := cText }, , ::LastRow() - 1 )
       ENDIF
 
       // Last line does not need a cEOL delimiter
       cString += ::aText[ ::LastRow() ]:cText
+      ::aTextEOL[ ::LastRow() ] := ::aText[ ::LastRow() ]:cText
 
    ENDIF
 
