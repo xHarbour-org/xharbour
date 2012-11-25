@@ -2757,693 +2757,170 @@ HB_FUNC( ISVALIDTHREAD )
 
 HB_EXTERN_BEGIN
 
+#include "hbservmt.c"
+#include "rddmt.c"
+#include "consmt.c"
+
 #ifdef HB_THREAD_SUPPORT
-static HB_CRITICAL_T arc4_lock;
+static HB_CRITICAL_T s_arc4Mtx;
 static HB_CRITICAL_T s_sockMtx;
 static HB_CRITICAL_T s_hsxMtx;
 static HB_CRITICAL_T s_fileMtx;
 static HB_CRITICAL_T s_fileNetMtx;
-static HB_CRITICAL_T s_CriticalMutex;
+static HB_CRITICAL_T s_traceMtx;
 static HB_CRITICAL_T s_ServiceMutex;
-static void s_doNothing( void * nothing )
-{
-   HB_SYMBOL_UNUSED( nothing );
-}
 #endif
 
-/* source/rtl/arc4.c */
-void hb_arc4_LockInit( void )
+/* generalisation */
+void hb_threadLockInit( int iMtx )
 {
 #if defined( HB_THREAD_SUPPORT )
-   HB_CRITICAL_INIT( arc4_lock );
-#endif
-}
-
-void hb_arc4_Lock( void )
-{
-#if defined( HB_THREAD_SUPPORT )
-   HB_CRITICAL_LOCK( arc4_lock );
-#endif
-}
-
-void hb_arc4_UnLock( void )
-{
-#if defined( HB_THREAD_SUPPORT )
-   HB_CRITICAL_UNLOCK( arc4_lock );
-#endif
-}
-
-/* source/rtl/hbsocket.c */
-
-void hb_socket_LockInit( void )
-{
-#if defined( HB_THREAD_SUPPORT )
-   HB_CRITICAL_INIT( s_sockMtx );
-#endif
-}
-
-void hb_socket_Lock( void )
-{
-#if defined( HB_THREAD_SUPPORT )
-   HB_CRITICAL_LOCK( s_sockMtx );
-#endif
-}
-
-void hb_socket_UnLock( void )
-{
-#if defined( HB_THREAD_SUPPORT )
-   HB_CRITICAL_UNLOCK( s_sockMtx );
-#endif
-}
-
-/* source/rtl/hbserv.c */
-
-void hb_service_Lock( void )
-{
-#if defined( HB_THREAD_SUPPORT )
-   HB_CRITICAL_LOCK( s_ServiceMutex );
-#endif
-}
-
-void hb_service_UnLock( void )
-{
-#if defined( HB_THREAD_SUPPORT )
-   HB_CRITICAL_UNLOCK( s_ServiceMutex );
-#endif
-}
-
-void hb_service_LockInit( void )
-{
-#if defined( HB_THREAD_SUPPORT )
-   HB_CRITICAL_INIT( s_ServiceMutex );
-#endif
-}
-
-void hb_service_hbstartservice( PHB_ITEM p_hooks )
-{
-#ifdef HB_THREAD_SUPPORT
-   int iCount = hb_threadCountStacks();
-
-   if( iCount > 2 || ( p_hooks == NULL && iCount > 1 ) )
+   switch( iMtx )
    {
-      /* TODO: Right error code here
-       */
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Service must be started before starting threads", NULL, 0 );
-      return;
+      case S_ARC4MTX:
+         HB_CRITICAL_INIT( s_arc4Mtx );
+         break;
+      case S_SOCKMTX:
+         HB_CRITICAL_INIT( s_sockMtx );
+         break;
+      case S_HSXMTX:
+         HB_CRITICAL_INIT( s_hsxMtx );
+         break;
+      case S_FILEMTX:
+         HB_CRITICAL_INIT( s_fileMtx );
+         break;
+      case S_FILENETMTX:
+         HB_CRITICAL_INIT( s_fileNetMtx );
+         break;
+      case S_TRACEMTX:
+         HB_CRITICAL_INIT( s_traceMtx );
+         break;
+      case HB_MACROMUTEX:
+         HB_CRITICAL_INIT( hb_macroMutex );
+         break;
+      case HB_OUTPUTMUTEX:
+         HB_CRITICAL_INIT( hb_outputMutex );
+         break;
+      case S_SERVICEMUTEX:
+         HB_CRITICAL_INIT( s_ServiceMutex );
+         break;
    }
 #else
-   HB_SYMBOL_UNUSED( p_hooks );
+   HB_SYMBOL_UNUSED( iMtx );
 #endif
 }
 
-void hb_service_ConsoleHandlerRoutineDestroyStack( PHB_STACK pStack )
+void hb_threadLock( int iMtx )
 {
-#ifdef HB_THREAD_SUPPORT
-   if( pStack )
+#if defined( HB_THREAD_SUPPORT )
+   switch( iMtx )
    {
-      hb_threadDestroyStack( pStack );
+      case S_ARC4MTX:
+         HB_CRITICAL_LOCK( s_arc4Mtx );
+         break;
+      case S_SOCKMTX:
+         HB_CRITICAL_LOCK( s_sockMtx );
+         break;
+      case S_HSXMTX:
+         HB_CRITICAL_LOCK( s_hsxMtx );
+         break;
+      case S_FILEMTX:
+         HB_CRITICAL_LOCK( s_fileMtx );
+         break;
+      case S_FILENETMTX:
+         HB_CRITICAL_LOCK( s_fileNetMtx );
+         break;
+      case S_TRACEMTX:
+         HB_CRITICAL_LOCK( s_traceMtx );
+         break;
+      case HB_MACROMUTEX:
+         HB_CRITICAL_LOCK( hb_macroMutex );
+         break;
+      case HB_OUTPUTMUTEX:
+         HB_CRITICAL_LOCK( hb_outputMutex );
+         break;
+      case S_SERVICEMUTEX:
+         HB_CRITICAL_LOCK( s_ServiceMutex );
+         break;
    }
 #else
-   HB_SYMBOL_UNUSED( pStack );
+   HB_SYMBOL_UNUSED( iMtx );
 #endif
 }
 
-PHB_STACK hb_service_ConsoleHandlerRoutineInit( void )
+void hb_threadUnLock( int iMtx )
 {
-#ifdef HB_THREAD_SUPPORT
-   PHB_STACK pStack = NULL;
-
-   /* we need a new stack: this is NOT an hb thread. */
-#ifdef HB_OS_WIN
-   if( TlsGetValue( hb_dwCurrentStack ) == 0 )
+#if defined( HB_THREAD_SUPPORT )
+   switch( iMtx )
    {
-      pStack         = hb_threadCreateStack( GetCurrentThreadId() );
-      pStack->th_h   = GetCurrentThread();
-      TlsSetValue( hb_dwCurrentStack, ( void * ) pStack );
-   }
-   return pStack;
-#else
-   return NULL;
-#endif
-#else
-   return NULL;
-#endif
-}
-
-void hb_service_threadCancel( void )
-{
-#ifndef HB_THREAD_SUPPORT
-   hb_vmQuit();
-   exit( 0 );
-#else
-   hb_threadCancelInternal();
-#endif
-}
-
-void hb_service_signalHandlerQuit( PHB_FUNC pFunc )
-{
-#ifndef HB_THREAD_SUPPORT
-   HB_SYMBOL_UNUSED( pFunc );
-   hb_vmQuit();
-   exit( 0 );
-#else
-   /* Allow signals to go through pthreads */
-   /*  s_serviceSetDflSig(); */
-   pFunc();
-   /* NOTICE: should be pthread_exit(0), but a bug in linuxthread prevents it:
-      calling pthread exit from a signal handler will cause infinite wait for
-      restart signal.
-      This solution is rude, while the other would allow clean VM termination...
-      but it works.
-    */
-   exit( 0 );
-#endif
-}
-
-/* source/rdd/wacore.c */
-
-void hb_rdd_wacore_rddWaInit( PHB_STACKRDD pRddInfo )
-{
-#ifdef HB_THREAD_SUPPORT
-   pRddInfo->fMtLockInit   = FALSE;
-   pRddInfo->ulCounter     = 1;
-#else
-   HB_SYMBOL_UNUSED( pRddInfo );
-#endif
-}
-
-void hb_rdd_wacore_hb_atomic_inc( PHB_STACKRDD pRddInfo )
-{
-#ifdef HB_THREAD_SUPPORT
-   HB_ATOMIC_INC( pRddInfo->ulCounter );
-#else
-   HB_SYMBOL_UNUSED( pRddInfo );
-#endif
-}
-
-void hb_rdd_wacore_Lock( PHB_STACKRDD pRddInfo )
-{
-#if defined( HB_THREAD_SUPPORT )
-   if( pRddInfo->fMtLockInit )
-      HB_CRITICAL_LOCK( pRddInfo->mtxWorkArea );
-#else
-   HB_SYMBOL_UNUSED( pRddInfo );
-#endif
-}
-
-void hb_rdd_wacore_Unlock( PHB_STACKRDD pRddInfo )
-{
-#if defined( HB_THREAD_SUPPORT )
-   if( pRddInfo->fMtLockInit )
-      HB_CRITICAL_UNLOCK( pRddInfo->mtxWorkArea );
-#else
-   HB_SYMBOL_UNUSED( pRddInfo );
-#endif
-}
-
-void hb_rdd_wacore_LockInit( PHB_STACKRDD pRddInfo )
-{
-#if defined( HB_THREAD_SUPPORT )
-   if( ! pRddInfo->fMtLockInit )
-   {
-      HB_CRITICAL_INIT( pRddInfo->mtxWorkArea );
-      pRddInfo->fMtLockInit = TRUE;
+      case S_ARC4MTX:
+         HB_CRITICAL_UNLOCK( s_arc4Mtx );
+         break;
+      case S_SOCKMTX:
+         HB_CRITICAL_UNLOCK( s_sockMtx );
+         break;
+      case S_HSXMTX:
+         HB_CRITICAL_UNLOCK( s_hsxMtx );
+         break;
+      case S_FILEMTX:
+         HB_CRITICAL_UNLOCK( s_fileMtx );
+         break;
+      case S_FILENETMTX:
+         HB_CRITICAL_UNLOCK( s_fileNetMtx );
+         break;
+      case S_TRACEMTX:
+         HB_CRITICAL_UNLOCK( s_traceMtx );
+         break;
+      case HB_MACROMUTEX:
+         HB_CRITICAL_UNLOCK( hb_macroMutex );
+         break;
+      case HB_OUTPUTMUTEX:
+         HB_CRITICAL_UNLOCK( hb_outputMutex );
+         break;
+      case S_SERVICEMUTEX:
+         HB_CRITICAL_UNLOCK( s_ServiceMutex );
+         break;
    }
 #else
-   HB_SYMBOL_UNUSED( pRddInfo );
+   HB_SYMBOL_UNUSED( iMtx );
 #endif
 }
 
-void hb_rdd_wacore_LockDestroy( PHB_STACKRDD pRddInfo )
+void hb_threadLockDestroy( int iMtx )
 {
 #if defined( HB_THREAD_SUPPORT )
-   if( pRddInfo->fMtLockInit )
+   switch( iMtx )
    {
-      HB_CRITICAL_DESTROY( pRddInfo->mtxWorkArea );
-      pRddInfo->fMtLockInit = FALSE;
+      case S_ARC4MTX:
+         HB_CRITICAL_DESTROY( s_arc4Mtx );
+         break;
+      case S_SOCKMTX:
+         HB_CRITICAL_DESTROY( s_sockMtx );
+         break;
+      case S_HSXMTX:
+         HB_CRITICAL_DESTROY( s_hsxMtx );
+         break;
+      case S_FILEMTX:
+         HB_CRITICAL_DESTROY( s_fileMtx );
+         break;
+      case S_FILENETMTX:
+         HB_CRITICAL_DESTROY( s_fileNetMtx );
+         break;
+      case S_TRACEMTX:
+         HB_CRITICAL_DESTROY( s_traceMtx );
+         break;
+      case HB_MACROMUTEX:
+         HB_CRITICAL_DESTROY( hb_macroMutex );
+         break;
+      case HB_OUTPUTMUTEX:
+         HB_CRITICAL_DESTROY( hb_outputMutex );
+         break;
+      case S_SERVICEMUTEX:
+         HB_CRITICAL_DESTROY( s_ServiceMutex );
+         break;
    }
 #else
-   HB_SYMBOL_UNUSED( pRddInfo );
-#endif
-}
-
-
-void hb_rdd_wacore_rddWaShutDown( PHB_STACKRDD pRddInfo )
-{
-#ifdef HB_THREAD_SUPPORT
-   if( ! hb_setGetWorkareasShared() )
-      hb_rddCloseAll();
-
-   if( HB_ATOMIC_DEC( pRddInfo->ulCounter ) == 0 )
-   {
-      if( pRddInfo->fMtLockInit )
-         hb_rdd_wacore_LockDestroy( pRddInfo );
-
-      hb_xfree( pRddInfo );
-   }
-#else
-   hb_xfree( pRddInfo );
-#endif
-}
-
-BOOL hb_rdd_wacore_rddChangeSetWorkareasShared( BOOL bPrev, BOOL bSet, PHB_STACKRDD s_pRddInfo )
-{
-   BOOL bOk = TRUE;
-
-#ifdef HB_THREAD_SUPPORT
-   if( bPrev == bSet )
-      return TRUE;
-
-   hb_threadWaitForIdle();
-   if( ! bSet )
-   {
-      /* We must create HB_STACKRDD structures for each thread and save them in their respective stacks
-       * And we must destroy the LOCK_AREA and set fMtLockInit to FALSE */
-
-      PHB_STACK      p = hb_ht_stack->next; /* Start from the second thread */
-      PHB_STACKRDD   pRddInfo;
-
-      while( p )
-      {
-         pRddInfo                         = ( PHB_STACKRDD ) hb_xgrab( sizeof( HB_STACKRDD ) );
-
-         pRddInfo->szDefaultRDD           = NULL;
-         pRddInfo->waList                 = NULL;
-         pRddInfo->waNums                 = NULL;
-         pRddInfo->uiWaMax                = 0;
-         pRddInfo->uiWaSpace              = 0;
-         pRddInfo->uiWaNumMax             = 0;
-         pRddInfo->fMtLockInit            = FALSE;
-         pRddInfo->ulCounter              = 1;
-
-         p->rdd                           = pRddInfo;
-         p->set.HB_SET_WORKAREAS_SHARED   = bSet;
-
-         p                                = p->next;
-      }
-
-      pRddInfo             = s_pRddInfo;
-      pRddInfo->ulCounter  = 1;
-
-      if( pRddInfo->fMtLockInit )
-         hb_rdd_wacore_LockDestroy( pRddInfo );
-   }
-   else
-   {
-      /* We must verify that there are no open areas in any thread except the main one.
-       * We must destroy HB_STACKRDD structures of each thread except the main one and
-       * set each stack's HB_STACKRDD pointer to the main thread's HB_STACKRDD.
-       * In the main thread, if there are open areas, create the LOCK_AREA and set fMtLockInit to TRUE. */
-
-      HB_STACK *     p = hb_ht_stack->next; /* Start from the second thread */
-      PHB_STACKRDD   pRddInfo;
-
-      while( p )
-      {
-         if( p->rdd->uiWaMax > 0 )
-         {
-            bOk = FALSE;
-            break;
-         }
-
-         p = p->next;
-      }
-
-      if( bOk )
-      {
-         p        = hb_ht_stack; /* Start from the first thread */
-         pRddInfo = p->rdd;
-
-         if( pRddInfo->uiWaMax > 0 )
-            hb_rdd_wacore_LockInit( pRddInfo );
-
-         p = p->next;
-
-         while( p )
-         {
-            hb_xfree( p->rdd );
-            p->rdd                           = pRddInfo;
-            p->set.HB_SET_WORKAREAS_SHARED   = bSet;
-            p                                = p->next;
-         }
-      }
-   }
-   hb_threadIdleEnd();
-#else
-   HB_SYMBOL_UNUSED( s_pRddInfo );
-   HB_SYMBOL_UNUSED( bPrev );
-   HB_SYMBOL_UNUSED( bSet );
-#endif
-   return bOk;
-}
-
-/* source/rdd/wafunc.c */
-
-#define HB_GET_AREA_HANDLE( pDyn ) \
-   ( pDyn ) ? ( int ) hb_dynsymAreaHandle( ( pDyn ) ) : 0
-
-#if defined ( HB_THREAD_SUPPORT )
-static PHB_DYNS s_rddAliasThGet( const char * szName, HB_STACK * pstack )
-{
-   /* Can NOT use HB_VM_STACK here!!!
-    */
-   if( pstack == &hb_stackMT || strncmp( szName, ":TH:", 4 ) == 0 )
-      return hb_dynsymGet( szName );
-   else
-   {
-      char szNewName[ 270 ];
-      hb_snprintf( szNewName, sizeof( szNewName ), ":TH:%d:%s", pstack->th_vm_id, szName );
-      return hb_dynsymGet( szNewName );
-   }
-}
-
-static PHB_DYNS s_rddAliasThFind( const char * szName, HB_STACK * pstack )
-{
-   /* Can NOT use HB_VM_STACK here!!!
-    */
-   if( pstack == &hb_stackMT || strncmp( szName, ":TH:", 4 ) == 0 )
-      return hb_dynsymFindName( szName );
-   else
-   {
-      char szNewName[ 270 ];
-      hb_snprintf( szNewName, sizeof( szNewName ), ":TH:%d:%s", pstack->th_vm_id, szName );
-      return hb_dynsymFindName( szNewName );
-   }
-}
-
-#endif /* defined ( HB_THREAD_SUPPORT ) */
-
-const char * hb_rddGetAliasNameTH( PHB_DYNS pSymAlias )
-{
-   const char * szName = hb_dynsymName( pSymAlias );
-
-#ifdef HB_THREAD_SUPPORT
-   if( strncmp( szName, ":TH:", 4 ) == 0 )
-   {
-      szName += 4;
-      while( *szName++ != ':' )
-      {
-         ;
-      }
-   }
-#endif
-   return szName;
-}
-
-int hb_get_Area_Handle_From_Sym( PHB_SYMB pSymAlias )
-{
-#ifndef HB_THREAD_SUPPORT
-   int      iArea = HB_GET_AREA_HANDLE( pSymAlias->pDynSym );
-#else
-   HB_THREAD_STUB
-   PHB_DYNS pDyn  = hb_setGetWorkareasShared() ? pSymAlias->pDynSym : s_rddAliasThFind( ( pSymAlias )->szName, &HB_VM_STACK );
-   int      iArea = HB_GET_AREA_HANDLE( pDyn );
-#endif
-   return iArea;
-}
-
-void hb_get_Area_Handle_From_Name( int * iArea, const char * szAlias )
-{
-#ifndef HB_THREAD_SUPPORT
-   PHB_DYNS pDyn  = hb_dynsymFindName( szAlias );
-#else
-   HB_THREAD_STUB
-   PHB_DYNS pDyn  = hb_setGetWorkareasShared() ? hb_dynsymFindName( szAlias ) : s_rddAliasThFind( szAlias, &HB_VM_STACK );
-#endif
-   *iArea = HB_GET_AREA_HANDLE( pDyn );
-}
-
-PHB_DYNS hb_get_Area_Sym( const char * szAlias )
-{
-   PHB_DYNS pSymAlias;
-
-#ifdef HB_THREAD_SUPPORT
-   HB_THREAD_STUB
-   if( ! hb_setGetWorkareasShared() )
-      pSymAlias = s_rddAliasThGet( szAlias, &HB_VM_STACK );
-   else
-#endif
-   pSymAlias = hb_dynsymGet( szAlias );
-
-   return pSymAlias;
-}
-
-/* source/rtl/filenet.c */
-
-void hb_filenet_Init( void )
-{
-#if defined( HB_THREAD_SUPPORT )
-   HB_CRITICAL_INIT( s_fileNetMtx );
-#endif
-}
-
-void hb_filenet_Lock( void )
-{
-#if defined( HB_THREAD_SUPPORT )
-   HB_CRITICAL_LOCK( s_fileNetMtx );
-#endif
-}
-
-void hb_filenet_UnLock( void )
-{
-#if defined( HB_THREAD_SUPPORT )
-   HB_CRITICAL_UNLOCK( s_fileNetMtx );
-#endif
-}
-
-/* source/rtl/console.c */
-
-int hb_idle_msec_default( void )
-{
-#if defined( HB_THREAD_SUPPORT ) || defined( HB_OS_UNIX )
-   return 10;
-#else
-   #if defined( HB_OS_WIN ) || defined( __CYGWIN__ )
-   return 20;
-   #else
-   return 1;
-   #endif
-#endif
-}
-
-void hb_idle_releaseCPU( USHORT uiIdleSleepMsec, BOOL bIdleWaitNoCpu )
-{
-#if defined( HB_THREAD_SUPPORT )
-
-   hb_threadSleep( uiIdleSleepMsec, bIdleWaitNoCpu );
-
-#else
-
-#if defined( HB_OS_OS2 ) || defined( HB_OS_DOS ) || defined( HB_OS_DARWIN ) || defined( HB_OS_UNIX )
-   HB_SYMBOL_UNUSED( bIdleWaitNoCpu );
-#endif
-
-#if defined( HB_OS_WIN ) || defined( __CYGWIN__ )
-   /* Forfeit the remainder of the current time slice. */
-   if( bIdleWaitNoCpu )
-      WaitMessage();
-   else
-      Sleep( uiIdleSleepMsec );
-#elif defined( HB_OS_OS2 )
-   /* 23/nov/2000 - maurilio.longo@libero.it
-      Minimum time slice under OS/2 is 32 milliseconds, passed 1 will be rounded to 32 and
-      will give a chance to threads of lower priority to get executed.
-      Passing 0 causes current thread to give up its time slice only if there are threads of
-      equal priority waiting to be dispatched. Note: certain versions of OS/2 kernel have a
-      bug which causes DosSleep(0) not to work as expected.  */
-   DosSleep( uiIdleSleepMsec );    /* Duration is in milliseconds */
-
-#elif defined( HB_OS_DOS )
-
-   /* NOTE: there is a bug under NT 4 and 2000 -  if the app is running
-      in protected mode, time slices will _not_ be released - you must switch
-      to real mode first, execute the following, and switch back.
-
-      It just occurred to me that this is actually by design.  Since MS doesn't
-      want you to do this from a console app, their solution was to not allow
-      the call to work in protected mode - screw the rest of the planet <g>.
-
-      returns zero on failure. (means not supported)
-    */
-
-   {
-      union REGS regs;
-
-      regs.h.ah         = 2;
-      regs.HB_XREGS.ax  = 0x1680;
-
-      HB_DOS_INT86( 0x2F, &regs, &regs );
-   }
-
-#elif defined( HB_OS_DARWIN )
-   usleep( uiIdleSleepMsec );
-#elif defined( HB_OS_UNIX )
-   {
-      /* struct timeval tv;
-       * tv.tv_sec = 0;
-       * tv.tv_usec = 1000;
-       * select( 0, NULL, NULL, NULL, &tv );
-       */
-      struct timeval tv;
-      tv.tv_sec   = 0;
-      tv.tv_usec  = 20000;
-      select( 0, NULL, NULL, NULL, &tv );
-   }
-#else
-   /* Do nothing */
-#endif
-#endif
-}
-
-void hb_stack_lock( void )
-{
-#if defined( HB_THREAD_SUPPORT )
-   HB_THREAD_STUB
-   if( ! HB_VM_STACK.bInUse && HB_VM_STACK.uiIdleInspect == 0 )
-   {
-      HB_SHARED_LOCK( hb_runningStacks );
-      while( hb_runningStacks.aux )
-      {
-         HB_SHARED_WAIT( hb_runningStacks );
-      }
-      hb_runningStacks.content.asLong++;
-      HB_VM_STACK.bInUse = TRUE;
-      HB_SHARED_UNLOCK( hb_runningStacks );
-   }
-#endif
-}
-
-void hb_stack_unlock( void )
-{
-#if defined( HB_THREAD_SUPPORT )
-   HB_THREAD_STUB
-   if( HB_VM_STACK.bInUse && HB_VM_STACK.uiIdleInspect == 0 )
-   {
-      HB_SHARED_LOCK( hb_runningStacks );
-      hb_runningStacks.content.asLong--;
-      HB_VM_STACK.bInUse = FALSE;
-      HB_SHARED_SIGNAL( hb_runningStacks );
-      HB_SHARED_UNLOCK( hb_runningStacks );
-   }
-#endif
-}
-
-void hb_console_Lock( void )
-{
-#if defined( HB_THREAD_SUPPORT )
-   HB_CRITICAL_LOCK( hb_outputMutex );
-#endif
-}
-
-void hb_console_UnLock( void )
-{
-#if defined( HB_THREAD_SUPPORT )
-   HB_CRITICAL_UNLOCK( hb_outputMutex );
-#endif
-}
-
-void hb_console_safe_lock( void )
-{
-#if defined( HB_THREAD_SUPPORT )
-   HB_THREAD_STUB
-   HB_CLEANUP_PUSH( hb_setGetOutputSafety() ? s_doNothing : hb_rawMutexForceUnlock, hb_outputMutex );
-   if( hb_setGetOutputSafety() )
-      HB_CRITICAL_LOCK( hb_outputMutex );
-#endif
-}
-
-void hb_console_safe_unlock( void )
-{
-#if defined( HB_THREAD_SUPPORT )
-   HB_THREAD_STUB
-   if( hb_setGetOutputSafety() )
-      HB_CRITICAL_UNLOCK( hb_outputMutex );
-   HB_CLEANUP_POP;
-#endif
-}
-
-/* source/rtl/trace.c */
-
-void hb_trace_critical_Lock( void )
-{
-#ifdef HB_THREAD_SUPPORT
-   HB_CRITICAL_LOCK( s_CriticalMutex );
-#endif
-}
-
-void hb_trace_critical_UnLock( void )
-{
-#ifdef HB_THREAD_SUPPORT
-   HB_CRITICAL_UNLOCK( s_CriticalMutex );
-#endif
-}
-
-void hb_trace_critical_Init( void )
-{
-#ifdef HB_THREAD_SUPPORT
-   HB_CRITICAL_UNLOCK( s_CriticalMutex );
-#endif
-}
-
-void hb_trace_critical_Destroy( void )
-{
-#ifdef HB_THREAD_SUPPORT
-   HB_CRITICAL_DESTROY( s_CriticalMutex );
-#endif
-}
-
-/* source/rtl/filebuf.c */
-
-void hb_filebuf_critical_Init( void )
-{
-#ifdef HB_THREAD_SUPPORT
-   HB_CRITICAL_INIT( s_fileMtx );
-#endif
-}
-
-void hb_filebuf_critical_Lock( void )
-{
-#ifdef HB_THREAD_SUPPORT
-   HB_CRITICAL_LOCK( s_fileMtx );
-#endif
-}
-
-void hb_filebuf_critical_UnLock( void )
-{
-#ifdef HB_THREAD_SUPPORT
-   HB_CRITICAL_UNLOCK( s_fileMtx );
-#endif
-}
-
-/* source/rdd/hsx/hsx.c */
-
-void hb_hsx_critical_Lock( void )
-{
-#if defined( HB_THREAD_SUPPORT )
-   EnterCriticalSection( &s_hsxMtx );
-#endif
-}
-
-void hb_hsx_critical_UnLock( void )
-{
-#if defined( HB_THREAD_SUPPORT )
-   LeaveCriticalSection( &s_hsxMtx );
-#endif
-}
-
-/* source/macro/marcoyy.c */
-
-void hb_macro_critical_Lock( void )
-{
-#ifdef HB_THREAD_SUPPORT
-   HB_CRITICAL_LOCK( hb_macroMutex );
-#endif
-}
-
-void hb_macro_critical_UnLock( void )
-{
-#ifdef HB_THREAD_SUPPORT
-   HB_CRITICAL_UNLOCK( hb_macroMutex );
+   HB_SYMBOL_UNUSED( iMtx );
 #endif
 }
 

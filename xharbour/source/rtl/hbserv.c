@@ -68,7 +68,7 @@
 
 #include <stdio.h>
 
-#if ! defined( HB_OS_DOS ) && ! defined( HB_OS_DARWIN_5 ) // DOS and Darwin < 6.x can't compile this module
+#if ! defined( HB_OS_DOS ) && ! defined( HB_OS_DARWIN_5 ) /* DOS and Darwin < 6.x can't compile this module */
 
 #if defined( HB_OS_UNIX ) || defined ( HB_OS_OS2_GCC )
 #include <sys/types.h>
@@ -78,8 +78,9 @@
 #include "windows.h"
 #endif
 
-//TODO:
-//we'll use hb_fsPopen for popening once we put it multiplatform. For now:
+/* TODO:
+ * we'll use hb_fsPopen for popening once we put it multiplatform. For now:
+ */
 #ifdef HB_OS_WIN
    #define popen                       _popen
    #define pclose                      _pclose
@@ -92,14 +93,11 @@
 extern PHB_FUNC pHVMFuncService;
 
 HB_EXTERN_BEGIN
-extern void hb_service_signalHandlerQuit( HB_FUNC_PTR );
-extern void hb_service_Lock( void );
-extern void hb_service_UnLock( void );
-extern void hb_service_LockInit( void );
-extern void hb_service_threadCancel( void );
-extern void hb_service_ConsoleHandlerRoutineDestroyStack( PHB_STACK pStack );
+extern void      hb_service_signalHandlerQuit( HB_FUNC_PTR );
+extern void      hb_service_threadCancel( void );
+extern void      hb_service_ConsoleHandlerRoutineDestroyStack( PHB_STACK pStack );
 extern PHB_STACK hb_service_ConsoleHandlerRoutineInit( void );
-extern void hb_service_hbstartservice( PHB_ITEM p_hooks );
+extern void      hb_service_hbstartservice( PHB_ITEM p_hooks );
 HB_EXTERN_END
 
 /**************************************************
@@ -136,10 +134,12 @@ static int s_translateSignal( UINT sig, UINT subsig );
 
 #if defined( HB_OS_UNIX ) || defined ( HB_OS_OS2_GCC )
 
-//TODO: Register the old signal action to allow graceful fallback
-//static struct sigaction sa_oldAction[SIGUSR2+1];
+/* TODO: Register the old signal action to allow graceful fallback
+ * static struct sigaction sa_oldAction[SIGUSR2+1];
+ */
 
-// Implementation of the signal translation table
+/* Implementation of the signal translation table
+ */
 static S_TUPLE s_sigTable[] = {
    { SIGHUP,  0, HB_SIGNAL_REFRESH   },
    { SIGINT,  0, HB_SIGNAL_INTERRUPT },
@@ -166,23 +166,26 @@ static void s_signalHandler( int sig, siginfo_t * info, void * v )
    ULONG    ulPos;
    int      iRet;
 
-   #if ! ( defined( HB_OS_OS2_GCC ) || defined( __WATCOMC__ ) )
+#if ! ( defined( HB_OS_OS2_GCC ) || defined( __WATCOMC__ ) )
    HB_SYMBOL_UNUSED( v );
-   #endif
+#endif
 
-   // let's find the right signal handler.
-   hb_service_Lock();
+   /* let's find the right signal handler.
+    */
+   hb_threadLock( S_SERVICEMUTEX );
 
-   // avoid working if PRG signal handling has been disabled
+   /* avoid working if PRG signal handling has been disabled
+    */
    if( ! bSignalEnabled )
    {
-      hb_service_UnLock();
+      hb_threadUnLock( S_SERVICEMUTEX );
       return;
    }
 
    bSignalEnabled = FALSE;
    ulPos          = hb_arrayLen( sp_hooks );
-   // subsig not necessary
+   /* subsig not necessary
+    */
    uiSig          = ( UINT ) s_translateSignal( ( UINT ) sig, 0 );
 
    while( ulPos > 0 )
@@ -191,28 +194,30 @@ static void s_signalHandler( int sig, siginfo_t * info, void * v )
       uiMask      = ( UINT ) hb_arrayGetNI( pFunction, 1 );
       if( uiMask & uiSig )
       {
-         // we don't unlock the mutex now, even if it is
-         // a little dangerous. But we are in a signal hander...
-         // for now just 2 parameters
+         /* we don't unlock the mutex now, even if it is
+          * a little dangerous. But we are in a signal hander...
+          * for now just 2 parameters
+          */
          pExecArray = hb_itemArrayNew( 3 );
          hb_arraySet( pExecArray, 1, hb_arrayGetItemPtr( pFunction, 2 ) );
          hb_arraySetNI( pExecArray, 2, uiSig );
 
-         // the third parameter is an array:
+         /* the third parameter is an array:
+          */
 
          pRet = hb_arrayGetItemPtr( pExecArray, 3 );
-         #if defined( HB_OS_OS2_GCC ) || defined( __WATCOMC__ )
+#if defined( HB_OS_OS2_GCC ) || defined( __WATCOMC__ )
          hb_arrayNew( pRet, 1 );
-         #elif defined( HB_OS_BSD )
+#elif defined( HB_OS_BSD )
          hb_arrayNew( pRet, info ? 6 : 1 );
-         #else
+#else
          hb_arrayNew( pRet, 6 );
-         #endif
+#endif
          hb_arraySetNI( pRet, HB_SERVICE_OSSIGNAL, sig );
-         #if ! ( defined( HB_OS_OS2_GCC ) || defined( __WATCOMC__ ) )
-         #if defined( HB_OS_BSD )
+#if ! ( defined( HB_OS_OS2_GCC ) || defined( __WATCOMC__ ) )
+#if defined( HB_OS_BSD )
          if( info )
-         #endif
+#endif
          {
             hb_arraySetNI( pRet, HB_SERVICE_OSSUBSIG, info->si_code );
             hb_arraySetNI( pRet, HB_SERVICE_OSERROR, info->si_errno );
@@ -220,8 +225,7 @@ static void s_signalHandler( int sig, siginfo_t * info, void * v )
             hb_arraySetNI( pRet, HB_SERVICE_PROCESS, info->si_pid );
             hb_arraySetNI( pRet, HB_SERVICE_UID, info->si_uid );
          }
-         #endif
-
+#endif
          pRet  = hb_itemDo( pExecArray, 0 );
          iRet  = hb_itemGetNI( pRet );
          hb_itemRelease( pRet );
@@ -231,13 +235,14 @@ static void s_signalHandler( int sig, siginfo_t * info, void * v )
          {
             case HB_SERVICE_HANDLED:
                bSignalEnabled = TRUE;
-               hb_service_UnLock();
+               hb_threadUnLock( S_SERVICEMUTEX );
                return;
 
             case HB_SERVICE_QUIT:
                bSignalEnabled = FALSE;
-               hb_service_UnLock();
-               //TODO: A service cleanup routine
+               hb_threadUnLock( S_SERVICEMUTEX );
+               /* TODO: A service cleanup routine
+                */
                hb_vmRequestQuit();
                hb_service_signalHandlerQuit( s_serviceSetDflSig );
          }
@@ -249,17 +254,18 @@ static void s_signalHandler( int sig, siginfo_t * info, void * v )
    /*s_serviceSetHBSig();*/
 
    /* TODO
-      if ( uiSig != HB_SIGNAL_UNKNOWN )
-      {
-      if ( sa_oldAction[ sig ].sa_flags & SA_SIGINFO )
-      {
-         sa_oldAction[ sig ].sa_sigaction( sig, info, v );
-      }
-      else
-      {
-         sa_oldAction[ sig ].sa_handler( sig );
-      }
-      }*/
+    * if ( uiSig != HB_SIGNAL_UNKNOWN )
+    * {
+    * if ( sa_oldAction[ sig ].sa_flags & SA_SIGINFO )
+    * {
+    *    sa_oldAction[ sig ].sa_sigaction( sig, info, v );
+    * }
+    * else
+    * {
+    *    sa_oldAction[ sig ].sa_handler( sig );
+    * }
+    * }
+    */
 }
 
 /* 2003 - <maurilio.longo@libero.it>
@@ -312,21 +318,23 @@ static void * s_signalListener( void * my_stack )
       /* allow safe cancelation */
       HB_STACK_UNLOCK;
 
-      // reset signal handling; this is done here (so I don't
-      // mangle with pthread_ calls, and I don't hold mutexes),
-      // and just once (doing it twice would be useless).
+      /* reset signal handling; this is done here (so I don't
+       * mangle with pthread_ calls, and I don't hold mutexes),
+       * and just once (doing it twice would be useless).
+       */
       if( bFirst )
       {
          pthread_sigmask( SIG_SETMASK, &passall, NULL );
          bFirst = FALSE;
       }
 
-      // This is also a cancelation point. When the main thread
-      // is done, it will kill all the threads having a stack
-      // including this one.
-      // ATM we don't care very much about signal handling during
-      // termination: no handler is set for them, so the DFL
-      // action is taken (and that should be fine).
+      /* This is also a cancelation point. When the main thread
+       * is done, it will kill all the threads having a stack
+       * including this one.
+       * ATM we don't care very much about signal handling during
+       * termination: no handler is set for them, so the DFL
+       * action is taken (and that should be fine).
+       */
 #if defined( HB_OS_BSD )
       sigwait( &passall, &sig );
 #else
@@ -358,19 +366,22 @@ static void * s_signalListener( void * my_stack )
 #ifdef HB_OS_WIN
 static void s_serviceSetHBSig( void );
 
-//message filter hook for user generated signals
+/* message filter hook for user generated signals
+ */
 static HHOOK   s_hMsgHook     = NULL;
 
-// old error mode
+/* old error mode
+ */
 static UINT    s_uiErrorMode  = 0;
 
-//-------------------------------
-// implementation of the signal translation table
-// Under windows, 0 is a system exception, while 1 is a user message
-//
+/*
+ * implementation of the signal translation table
+ * Under windows, 0 is a system exception, while 1 is a user message
+ */
 static S_TUPLE s_sigTable[] = {
 
-   // memory/processor fault exception
+   /* memory/processor fault exception
+    */
    { 0, EXCEPTION_ACCESS_VIOLATION,      HB_SIGNAL_FAULT     },
    { 0, EXCEPTION_ILLEGAL_INSTRUCTION,   HB_SIGNAL_FAULT     },
    { 0, EXCEPTION_IN_PAGE_ERROR,         HB_SIGNAL_FAULT     },
@@ -379,7 +390,8 @@ static S_TUPLE s_sigTable[] = {
    { 0, EXCEPTION_ARRAY_BOUNDS_EXCEEDED, HB_SIGNAL_FAULT     },
    { 0, EXCEPTION_DATATYPE_MISALIGNMENT, HB_SIGNAL_FAULT     },
 
-   // Math exceptions
+   /* Math exceptions
+    */
    { 0, EXCEPTION_FLT_DENORMAL_OPERAND,  HB_SIGNAL_MATHERR   },
    { 0, EXCEPTION_FLT_INVALID_OPERATION, HB_SIGNAL_MATHERR   },
    { 0, EXCEPTION_FLT_INEXACT_RESULT,    HB_SIGNAL_MATHERR   },
@@ -390,14 +402,16 @@ static S_TUPLE s_sigTable[] = {
    { 0, EXCEPTION_INT_DIVIDE_BY_ZERO,    HB_SIGNAL_MATHERR   },
    { 0, EXCEPTION_INT_OVERFLOW,          HB_SIGNAL_MATHERR   },
 
-   // User requests
+   /* User requests
+    */
    { 1, WM_USER,                         HB_SIGNAL_USER1     },
    { 1, WM_USER + 1,                     HB_SIGNAL_USER2     },
    { 1, WM_USER + 2,                     HB_SIGNAL_REFRESH   },
    { 1, WM_USER + 3,                     HB_SIGNAL_INTERRUPT },
    { 1, WM_QUIT,                         HB_SIGNAL_QUIT      },
 
-   // Console handler
+   /* Console handler
+    */
    { 2, CTRL_C_EVENT,                    HB_SIGNAL_INTERRUPT },
    { 2, CTRL_BREAK_EVENT,                HB_SIGNAL_INTERRUPT },
    { 2, CTRL_CLOSE_EVENT,                HB_SIGNAL_QUIT      },
@@ -407,9 +421,9 @@ static S_TUPLE s_sigTable[] = {
    { 0, 0,                               0                   }
 };
 
-//-------------------------------
-// Manager of signals for windows
-//
+/*
+ * Manager of signals for windows
+ */
 static LONG s_signalHandler( int type, int sig, PEXCEPTION_RECORD exc )
 {
    PHB_ITEM pFunction, pExecArray, pRet;
@@ -417,19 +431,22 @@ static LONG s_signalHandler( int type, int sig, PEXCEPTION_RECORD exc )
    UINT     uiSig, uiMask;
    int      iRet;
 
-   // let's find the right signal handler.
-   hb_service_Lock();
+   /* let's find the right signal handler.
+    */
+   hb_threadLock( S_SERVICEMUTEX );
 
-   // avoid working if PRG signal handling has been disabled
+   /* avoid working if PRG signal handling has been disabled
+    */
    if( ! bSignalEnabled )
    {
-      hb_service_UnLock();
+      hb_threadUnLock( S_SERVICEMUTEX );
       return EXCEPTION_EXECUTE_HANDLER;
    }
 
    bSignalEnabled = FALSE;
    ulPos          = hb_arrayLen( sp_hooks );
-   // subsig not necessary
+   /* subsig not necessary
+    */
    uiSig          = ( UINT ) s_translateSignal( ( UINT ) type, ( UINT ) sig );
 
    while( ulPos > 0 )
@@ -438,9 +455,10 @@ static LONG s_signalHandler( int type, int sig, PEXCEPTION_RECORD exc )
       uiMask      = ( UINT ) hb_arrayGetNI( pFunction, 1 );
       if( ( uiMask & uiSig ) == uiSig )
       {
-         // we don't unlock the mutex now, even if it is
-         // a little dangerous. But we are in a signal hander...
-         // for now just 2 parameters
+         /* we don't unlock the mutex now, even if it is
+          * a little dangerous. But we are in a signal hander...
+          * for now just 2 parameters
+          */
          pExecArray = hb_itemArrayNew( 3 );
          hb_arraySetForward( pExecArray, 1, hb_arrayGetItemPtr( pFunction, 2 ) );
          hb_arraySetNI( pExecArray, 2, uiSig );
@@ -459,20 +477,20 @@ static LONG s_signalHandler( int type, int sig, PEXCEPTION_RECORD exc )
 
          hb_arraySetNI( pRet, HB_SERVICE_OSSIGNAL, type );
          hb_arraySetNI( pRet, HB_SERVICE_OSSUBSIG, sig );
-         //could be meaningless, but does not matter here
+         /* could be meaningless, but does not matter here
+          */
          hb_arraySetNI( pRet, HB_SERVICE_OSERROR, GetLastError() );
 
-         if( type == 0 ) //exception
-         {
+         if( type == 0 ) /* exception */
             hb_arraySetPtr( pRet, HB_SERVICE_ADDRESS, ( void * ) exc->ExceptionAddress );
-         }
          else
-         {
             hb_arraySetPtr( pRet, HB_SERVICE_ADDRESS, NULL );
-         }
-         //TODO:
+
+         /*TODO:
+          */
          hb_arraySetNI( pRet, HB_SERVICE_PROCESS, GetCurrentThreadId() );
-         //TODO:
+         /* TODO:
+          */
          hb_arraySetNI( pRet, HB_SERVICE_UID, 0 );
 
          pRet  = hb_itemDo( pExecArray, 0 );
@@ -484,12 +502,12 @@ static LONG s_signalHandler( int type, int sig, PEXCEPTION_RECORD exc )
          {
             case HB_SERVICE_HANDLED:
                bSignalEnabled = TRUE;
-               hb_service_UnLock();
+               hb_threadUnLock( S_SERVICEMUTEX );
                return EXCEPTION_CONTINUE_EXECUTION;
 
             case HB_SERVICE_QUIT:
                bSignalEnabled = FALSE;
-               hb_service_UnLock();
+               hb_threadUnLock( S_SERVICEMUTEX );
                hb_vmRequestQuit();
                hb_service_threadCancel();
          }
@@ -511,9 +529,7 @@ static LRESULT CALLBACK s_MsgFilterFunc( int nCode, WPARAM wParam, LPARAM lParam
    PMSG msg;
 
    if( nCode < 0 )
-   {
       return CallNextHookEx( s_hMsgHook, nCode, wParam, lParam );
-   }
 
    msg = ( PMSG ) lParam;
 
@@ -524,13 +540,15 @@ static LRESULT CALLBACK s_MsgFilterFunc( int nCode, WPARAM wParam, LPARAM lParam
       case WM_USER + 2:
       case WM_USER + 3:
       case WM_QUIT:
-         // we'll ignore the request here.
-         // the application must still receive the message
+         /* we'll ignore the request here.
+          * the application must still receive the message
+          */
          s_signalHandler( 1, msg->message, NULL );
 
    }
 
-   // return next hook anyway
+   /* return next hook anyway
+    */
    return CallNextHookEx( s_hMsgHook, nCode, wParam, lParam );
 }
 
@@ -556,7 +574,7 @@ BOOL WINAPI s_ConsoleHandlerRoutine( DWORD dwCtrlType )
 *****************************************************************************/
 
 /*-----------------------------------------------------
-   Set the signal handlers to our program interceptors.
+ * Set the signal handlers to our program interceptors.
  */
 
 static void s_serviceSetHBSig( void )
@@ -565,9 +583,10 @@ static void s_serviceSetHBSig( void )
 #if defined( HB_OS_UNIX ) || defined( HB_OS_OS2_GCC )
    struct sigaction  act;
 
-   #if defined( HB_THREAD_SUPPORT ) && ! defined( HB_OS_OS2 )
+#if defined( HB_THREAD_SUPPORT ) && ! defined( HB_OS_OS2 )
    sigset_t          blockall;
-   //set signal mask
+   /* set signal mask
+    */
    sigemptyset( &blockall );
    sigaddset( &blockall, SIGHUP );
    sigaddset( &blockall, SIGQUIT );
@@ -587,22 +606,23 @@ static void s_serviceSetHBSig( void )
       fields */
    memset( &act, 0, sizeof( struct sigaction ) );
 
-   #if defined( HB_OS_OS2_GCC ) || defined( __WATCOMC__ )
+#if defined( HB_OS_OS2_GCC ) || defined( __WATCOMC__ )
    act.sa_handler    = s_signalHandler;
-   #else
-   // using more descriptive sa_action instead of sa_handler
-   act.sa_handler    = NULL;              // if act.sa.. is a union, we just clean this
-   act.sa_sigaction  = s_signalHandler;   // this is what matters
-   // block al signals, we don't want to be interrupted.
-   //sigfillset( &act.sa_mask );
-   #endif
+#else
+   /* using more descriptive sa_action instead of sa_handler
+    */
+   act.sa_handler    = NULL;              /* if act.sa.. is a union, we just clean this */
+   act.sa_sigaction  = s_signalHandler;   /* this is what matters */
+   /* block al signals, we don't want to be interrupted.
+    * sigfillset( &act.sa_mask );
+    */
+#endif
 
-
-   #ifdef HB_OS_OS2_GCC
+#ifdef HB_OS_OS2_GCC
    act.sa_flags   = SA_NOCLDSTOP;
-   #else
+#else
    act.sa_flags   = SA_NOCLDSTOP | SA_SIGINFO;
-   #endif
+#endif
 
    sigaction( SIGHUP, &act, NULL );
    sigaction( SIGQUIT, &act, NULL );
@@ -614,12 +634,14 @@ static void s_serviceSetHBSig( void )
    sigaction( SIGUSR1, &act, NULL );
    sigaction( SIGUSR2, &act, NULL );
 
-   // IGNORE pipe
+   /* IGNORE pipe
+    */
    signal( SIGPIPE, SIG_IGN );
 #endif
 
 #ifdef HB_OS_WIN
-   //disable all os-level error boxes
+   /* disable all os-level error boxes
+    */
    s_uiErrorMode = SetErrorMode(
       SEM_FAILCRITICALERRORS | SEM_NOALIGNMENTFAULTEXCEPT | SEM_NOGPFAULTERRORBOX |
       SEM_NOOPENFILEERRORBOX );
@@ -630,10 +652,10 @@ static void s_serviceSetHBSig( void )
 
 #endif
 }
-//---------------------------------------------------
-// Reset the signal handlers to the default OS value
-//
 
+/*---------------------------------------------------
+ * Reset the signal handlers to the default OS value
+ */
 
 static void s_serviceSetDflSig( void )
 {
@@ -662,11 +684,10 @@ static void s_serviceSetDflSig( void )
 #endif
 }
 
-
-//---------------------------------------------------
-// This translates a signal into abstract HB_SIGNAL
-// from os specific representation
-//
+/*---------------------------------------------------
+ * This translates a signal into abstract HB_SIGNAL
+ * from os specific representation
+ */
 
 static int s_translateSignal( UINT sig, UINT subsig )
 {
@@ -676,9 +697,8 @@ static int s_translateSignal( UINT sig, UINT subsig )
    {
       if( s_sigTable[ i ].sig == sig &&
           ( s_sigTable[ i ].subsig == subsig || s_sigTable[ i ].subsig == 0 ) )
-      {
          return s_sigTable[ i ].translated;
-      }
+
       i++;
    }
    return HB_SIGNAL_UNKNOWN;
@@ -690,7 +710,7 @@ static int s_translateSignal( UINT sig, UINT subsig )
 
 static void s_signalHandlersInit( void )
 {
-   #if defined( HB_THREAD_SUPPORT ) && defined( HB_OS_UNIX )
+#if defined( HB_THREAD_SUPPORT ) && defined( HB_OS_UNIX )
    pthread_t   res;
    PHB_STACK   pStack;
 
@@ -698,11 +718,11 @@ static void s_signalHandlersInit( void )
 
    pStack = hb_threadCreateStack( 0 );
    pthread_create( &res, NULL, s_signalListener, pStack );
-   #else
+#else
    s_serviceSetHBSig();
-   #endif
+#endif
 
-   hb_service_LockInit();
+   hb_threadLockInit( S_SERVICEMUTEX );
 
    sp_hooks = hb_itemNew( NULL );
    hb_arrayNew( sp_hooks, 0 );
@@ -724,11 +744,11 @@ HB_FUNC( HB_STARTSERVICE )
 {
    hb_service_hbstartservice( sp_hooks );
 
-   #ifdef HB_OS_UNIX
+#ifdef HB_OS_UNIX
    {
       int pid;
 
-      // Iconic?
+      /* Iconic? */
       if( hb_parl( 1 ) )
       {
          pid = fork();
@@ -738,34 +758,33 @@ HB_FUNC( HB_STARTSERVICE )
             hb_vmRequestQuit();
             return;
          }
-         #ifdef HB_THREAD_SUPPORT
-            #ifdef HB_THREAD_TLS_KEYWORD
+#ifdef HB_THREAD_SUPPORT
+#ifdef HB_THREAD_TLS_KEYWORD
          hb_thread_stack = &hb_stackMT;
-            #else
+#else
          pthread_setspecific( hb_pkCurrentStack, ( void * ) &hb_stackMT );
-            #endif
-         #endif
+#endif
+#endif
       }
    }
-   #endif
+#endif
 
-   // let's begin
+   /* let's begin
+    */
    sb_isService      = TRUE;
    pHVMFuncService   = ( PHB_FUNC ) hb_isService;
 
-   // in windows, we just detach from console
-   #ifdef HB_OS_WIN
+   /* in windows, we just detach from console
+    */
+#ifdef HB_OS_WIN
    if( hb_parl( 1 ) )
-   {
       FreeConsole();
-   }
-   #endif
+#endif
 
-   // Initialize only if the service has not yet been initialized
+   /* Initialize only if the service has not yet been initialized
+    */
    if( sp_hooks == NULL )
-   {
       s_signalHandlersInit();
-   }
 }
 
 /**
@@ -793,7 +812,6 @@ void hb_serviceExit( void )
    }
 }
 
-
 /**
  * Returns true if the current program is a service, that is if HB_StartService() has
  * Been called.
@@ -820,9 +838,7 @@ HB_FUNC( HB_SERVICELOOP )
       final application does not any message handling.
     */
    if( ! PeekMessage( &msg, NULL, WM_QUIT, WM_QUIT, PM_REMOVE ) )
-   {
       PeekMessage( &msg, NULL, WM_USER, WM_USER + 3, PM_REMOVE );
-   }
 #endif
 
    hb_gcCollectAll( FALSE );
@@ -848,19 +864,16 @@ HB_FUNC( HB_PUSHSIGNALHANDLER )
 
    /* if the hook is not initialized, initialize it */
    if( sp_hooks == NULL )
-   {
       s_signalHandlersInit();
-   }
 
-   hb_service_Lock();
+   hb_threadLock( S_SERVICEMUTEX );
 
    hb_arrayAddForward( sp_hooks, pHandEntry );
 
-   hb_service_UnLock();
+   hb_threadUnLock( S_SERVICEMUTEX );
 
    hb_itemRelease( pHandEntry );
 }
-
 
 HB_FUNC( HB_POPSIGNALHANDLER )
 {
@@ -868,7 +881,7 @@ HB_FUNC( HB_POPSIGNALHANDLER )
 
    if( sp_hooks != NULL )
    {
-      hb_service_Lock();
+      hb_threadLock( S_SERVICEMUTEX );
 
       nLen = hb_arrayLen( sp_hooks );
       if( nLen > 0 )
@@ -884,15 +897,12 @@ HB_FUNC( HB_POPSIGNALHANDLER )
          }
       }
       else
-      {
          hb_retl( FALSE );
-      }
-      hb_service_UnLock();
+
+      hb_threadUnLock( S_SERVICEMUTEX );
    }
    else
-   {
       hb_retl( FALSE );
-   }
 }
 
 /**
@@ -905,23 +915,23 @@ HB_FUNC( HB_SIGNALDESC )
    int   iSig     = hb_parni( 1 );
    int   iSubSig  = hb_parni( 2 );
 
-   // UNIX MESSGES
-   #if defined ( HB_OS_UNIX ) || defined( HB_OS_OS2_GCC )
+   /* UNIX MESSGES */
+#if defined ( HB_OS_UNIX ) || defined( HB_OS_OS2_GCC )
 
    switch( iSig )
    {
       case SIGSEGV: switch( iSubSig )
          {
-         #if ! defined( HB_OS_BSD ) && ! defined( HB_OS_OS2_GCC ) && ! defined( __WATCOMC__ )
+#if ! defined( HB_OS_BSD ) && ! defined( HB_OS_OS2_GCC ) && ! defined( __WATCOMC__ )
             case SEGV_MAPERR: hb_retc( "Segmentation fault: address not mapped to object" ); return;
             case SEGV_ACCERR: hb_retc( "Segmentation fault: invalid permissions for mapped object" ); return;
-         #endif
+#endif
             default: hb_retc( "Segmentation fault" ); return;
          }
 
       case SIGILL: switch( iSubSig )
          {
-         #if ! defined( HB_OS_BSD ) && ! defined( HB_OS_OS2_GCC ) && ! defined( __WATCOMC__ )
+#if ! defined( HB_OS_BSD ) && ! defined( HB_OS_OS2_GCC ) && ! defined( __WATCOMC__ )
             case ILL_ILLOPC: hb_retc( "Illegal operation: illegal opcode" ); return;
             case ILL_ILLOPN: hb_retc( "Illegal operation: illegal operand" ); return;
             case ILL_ILLADR: hb_retc( "Illegal operation: illegal addressing mode" ); return;
@@ -930,26 +940,26 @@ HB_FUNC( HB_SIGNALDESC )
             case ILL_PRVREG: hb_retc( "Illegal operation: privileged register" ); return;
             case ILL_COPROC: hb_retc( "Illegal operation: coprocessor error" ); return;
             case ILL_BADSTK: hb_retc( "Illegal operation: internal stack error" ); return;
-         #endif
+#endif
             default: hb_retc( "Illegal operation" ); return;
          }
 
       case SIGFPE: switch( iSubSig )
          {
-         #if ! defined( HB_OS_OS2_GCC ) && ! defined( __WATCOMC__ )
-         #if ! defined( HB_OS_DARWIN )
+#if ! defined( HB_OS_OS2_GCC ) && ! defined( __WATCOMC__ )
+#if ! defined( HB_OS_DARWIN )
             case FPE_INTDIV: hb_retc( "Floating point: integer divide by zero" ); return;
             case FPE_INTOVF: hb_retc( "Floating point: integer overflow" ); return;
-         #endif
+#endif
             case FPE_FLTDIV: hb_retc( "Floating point: floating point divide by zero" ); return;
             case FPE_FLTOVF: hb_retc( "Floating point: floating point overflow" ); return;
             case FPE_FLTUND: hb_retc( "Floating point: floating point underflow" ); return;
             case FPE_FLTRES: hb_retc( "Floating point: floating point inexact result" ); return;
             case FPE_FLTINV: hb_retc( "Floating point: floating point invalid operation" ); return;
-         #if ! defined( HB_OS_DARWIN )
+#if ! defined( HB_OS_DARWIN )
             case FPE_FLTSUB: hb_retc( "Floating point: subscript out of range" ); return;
-         #endif
-         #endif
+#endif
+#endif
             default: hb_retc( "Floating point" ); return;
          }
 
@@ -984,10 +994,10 @@ HB_FUNC( HB_SIGNALDESC )
          hb_retc( "User defined (secondary)" );
          return;
    }
-   #endif
+#endif
 
-   #ifdef HB_OS_WIN
-   if( iSig == 0 ) // exception
+#ifdef HB_OS_WIN
+   if( iSig == 0 ) /* exception */
    {
       switch( iSubSig )
       {
@@ -1041,12 +1051,9 @@ HB_FUNC( HB_SIGNALDESC )
       }
    }
 
-   #endif
-
+#endif
    hb_retc( "Unrecognized signal" );
-
 }
-
 
 /*****************************************************************************
  * Debug help: generates a fault or a math error to see if signal catching

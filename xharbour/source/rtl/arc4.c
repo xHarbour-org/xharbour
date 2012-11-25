@@ -114,20 +114,13 @@ static HB_I32              arc4_count;
 
 static BOOL                s_arc4_lockInit = FALSE;
 
-HB_EXTERN_BEGIN
-void hb_arc4_LockInit( void );
-void hb_arc4_Lock( void );
-void hb_arc4_UnLock( void );
-HB_EXTERN_END
-
-#define _ARC4_LOCK()    hb_arc4_Lock()
-#define _ARC4_UNLOCK()  hb_arc4_UnLock()
+#define _ARC4_LOCK()       hb_threadLock( S_ARC4MTX )
+#define _ARC4_UNLOCK()     hb_threadUnLock( S_ARC4MTX )
 
 #if defined( __BORLANDC__ ) && defined( _HB_INLINE_ )
 #undef _HB_INLINE_
 #define _HB_INLINE_
 #endif
-
 
 static _HB_INLINE_ HB_U8 arc4_getbyte( void );
 
@@ -605,7 +598,7 @@ HB_U32 hb_arc4random( void )
    if( ! s_arc4_lockInit )
    {
       s_arc4_lockInit = TRUE;
-      hb_arc4_LockInit();
+      hb_threadLockInit( S_ARC4MTX );
    }
 
    _ARC4_LOCK();
@@ -626,7 +619,7 @@ void hb_arc4random_buf( void * _buf, ULONG n )
    if( ! s_arc4_lockInit )
    {
       s_arc4_lockInit = TRUE;
-      hb_arc4_LockInit();
+      hb_threadLockInit( S_ARC4MTX );
    }
 
    _ARC4_LOCK();

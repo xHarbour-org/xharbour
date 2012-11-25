@@ -821,16 +821,10 @@ typedef union
 
 static BOOL bSocketInit = FALSE;
 
-/* MT macros */
-HB_EXTERN_BEGIN
-extern void hb_socket_LockInit( void );
-extern void hb_socket_Lock( void );
-extern void hb_socket_UnLock( void );
-HB_EXTERN_END
+#define HB_SOCKET_INIT    hb_threadLockInit( S_SOCKMTX );
+#define HB_SOCKET_LOCK    hb_threadLock( S_SOCKMTX );
+#define HB_SOCKET_UNLOCK  hb_threadUnLock( S_SOCKMTX );
 
-#define HB_SOCKET_INIT     hb_socket_LockInit();
-#define HB_SOCKET_LOCK     hb_socket_Lock();
-#define HB_SOCKET_UNLOCK   hb_socket_UnLock();
 static int s_iSessions;
 
 #if defined( HB_HAS_INET6 ) && ! defined( HB_HAS_INET6_ADDR_CONST ) && \
@@ -860,7 +854,7 @@ int hb_socketInit( void )
    if( ! bSocketInit )
    {
       HB_SOCKET_INIT
-         bSocketInit = TRUE;
+      bSocketInit = TRUE;
    }
    HB_SOCKET_LOCK
    if( ++s_iSessions == 1 )

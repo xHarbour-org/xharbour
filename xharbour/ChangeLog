@@ -8,6 +8,28 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-26 06:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/fm.c
+    ! pacify BCC warnings when HB_NO_VM_ALL is defined
+
+  * include/thread.h
+  * source/rtl/arc4.c          
+  * source/rtl/console.c        
+  * source/rtl/hbsocket.c      
+  * source/rtl/hbserv.c        
+  * source/rtl/filenet.c       
+  * source/rtl/trace.c         
+  * source/rtl/filebuf.c       
+  * source/rdd/hsx/hsx.c       
+  * source/macro/macro.y       
+  * source/macro/macroyy.c     
+  * source/vm/thread.c         
+  + source/vm/consmt.c         
+  + source/vm/hbservmt.c       
+  + source/vm/rddmt.c          
+    ! reorganize MT lock and unlock functions by moving them to more appropriate
+    files.
+
 2012-11-25 07:43 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/macro/macro.y
     ! left over: HB_MACRO_PTR -> PHB_MACRO

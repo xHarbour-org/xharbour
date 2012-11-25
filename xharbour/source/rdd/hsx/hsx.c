@@ -226,6 +226,7 @@
 #include "hbapierr.h"
 #include "hbvm.h"
 #include "hbset.h"
+#include "thread.h"
 #ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"
 #endif
@@ -382,13 +383,9 @@ static HSXTABLE s_hsxTable;
 
 #endif /* HB_HSX_TSDSTORE */
 
-HB_EXTERN_BEGIN
-extern void hb_hsx_critical_Lock( void );
-extern void hb_hsx_critical_UnLock( void );
-HB_EXTERN_END
-
-#define HB_HSX_LOCK     hb_hsx_critical_Lock();
-#define HB_HSX_UNLOCK   hb_hsx_critical_UnLock();
+static  BOOL            s_bInitMtx = FALSE;
+#define HB_HSX_LOCK     hb_threadLock( S_HSXMTX );
+#define HB_HSX_UNLOCK   hb_threadUnLock( S_HSXMTX );
 
 /* the conversion table for ASCII alpha pairs */
 static const UCHAR hb_hsxHashArray[] = {
@@ -563,6 +560,12 @@ static int hb_hsxStrCmp( const char * pSub, ULONG ulSub, const char * pStr, ULON
 static LPHSXINFO hb_hsxGetPointer( int iHandle )
 {
    LPHSXINFO pHSX = NULL;
+
+   if ( ! s_bInitMtx )
+   {
+      hb_threadLockInit( S_HSXMTX );
+      s_bInitMtx = TRUE;
+   }
 
    HB_HSX_LOCK
    {
@@ -1232,9 +1235,15 @@ static LPHSXINFO hb_hsxNew( void )
    int         iHandle = 0;
    LPHSXTABLE  pTable;
 
+   if ( ! s_bInitMtx )
+   {
+      hb_threadLockInit( S_HSXMTX );
+      s_bInitMtx = TRUE;
+   }
+
    HB_HSX_LOCK
 
-      pTable = hb_hsxTable();
+   pTable = hb_hsxTable();
 
    if( pTable->iHandleSize == 0 )
    {
@@ -1328,10 +1337,10 @@ static int hb_hsxVerify( int iHandle, const char * szText, ULONG ulLen,
             for( ul = 0; ul < ulSub && iResult == HSX_SUCCESSFALSE; ul++ )
             {
                while( szSub[ ul ] == ' ' && ul < ulSub )
-   ++ul;
+                  ++ul;
                ull = ul;
                while( szSub[ ull ] != ' ' && ull < ulSub )
-   ++ull;
+                  ++ull;
                iResult = hb_hsxStrCmp( &szSub[ ul ], ull - ul, szText, ulLen,
                                        pHSX->fIgnoreCase, pHSX->iFilterType );
                ul = ull;
@@ -1349,12 +1358,17 @@ static int hb_hsxVerify( int iHandle, const char * szText, ULONG ulLen,
 
 static int hb_hsxDestroy( int iHandle )
 {
-   LPHSXINFO   pHSX = NULL;
-   int         iRetVal;
+   LPHSXINFO   pHSX    = NULL;
+   int         iRetVal = hb_hsxFlushAll( iHandle );
 
-   iRetVal = hb_hsxFlushAll( iHandle );
+   if ( ! s_bInitMtx )
+   {
+      hb_threadLockInit( S_HSXMTX );
+      s_bInitMtx = TRUE;
+   }
 
    HB_HSX_LOCK
+
    {
       LPHSXTABLE pTable = hb_hsxTable();
       if( iHandle >= 0 && iHandle < pTable->iHandleSize &&

@@ -942,6 +942,26 @@ HB_EXTERN_END
 
 #endif
 
+HB_EXTERN_BEGIN
+typedef enum
+{
+   UNKNOWN,
+   S_ARC4MTX,
+   S_SOCKMTX,
+   S_HSXMTX,
+   S_FILEMTX,
+   S_FILENETMTX,
+   S_TRACEMTX,
+   S_SERVICEMUTEX,
+   HB_MACROMUTEX,
+   HB_OUTPUTMUTEX
+} __MUTEX;
+extern void hb_threadLockInit( int iMtx );
+extern void hb_threadLock( int iMtx );
+extern void hb_threadUnLock( int iMtx );
+extern void hb_threadLockDestroy( int iMtx );
+HB_EXTERN_END
+
 #ifdef HB_API_MACROS
 #  define HB_THREAD_STUB_API        HB_THREAD_STUB
 #else

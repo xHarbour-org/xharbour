@@ -140,6 +140,9 @@
 #     pragma warn -8027
 #     pragma warn -8084
 #     pragma warn -8041
+#     pragma warn -8008
+#     pragma warn -8004
+#     pragma warn -8066
 #  elif defined( _MSC_VER ) || defined( __DMC__ ) || defined( __WATCOMC__ )
 #     if (( defined( __DMC__ ) || defined( _MSC_VER ) ) && ! defined( __POCC__ ) )
          HB_EXTERN_BEGIN
@@ -176,6 +179,9 @@
 #     pragma warn +8027
 #     pragma warn +8084
 #     pragma warn +8041
+#     pragma warn +8008
+#     pragma warn +8004
+#     pragma warn +8066
 #  endif
 #  if defined( USE_DL_PREFIX )
 #     define malloc( n )      dlmalloc( ( n ) )

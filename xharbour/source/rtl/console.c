@@ -83,8 +83,6 @@
 #include "thread.h"
 
 HB_EXTERN_BEGIN
-extern void hb_console_Lock( void );
-extern void hb_console_UnLock( void );
 extern void hb_console_safe_lock( void );
 extern void hb_console_safe_unlock( void );
 extern void hb_stack_lock( void );
@@ -721,11 +719,11 @@ HB_FUNC( HB_GETSTDERR ) /* Return Handel for STDERR */
 
 HB_FUNC( HBCONSOLELOCK )
 {
-   hb_console_Lock();
+   hb_threadLock( HB_OUTPUTMUTEX );
 }
 
 /****************************************************************************/
 HB_FUNC( HBCONSOLEUNLOCK )
 {
-   hb_console_UnLock();
+   hb_threadUnLock( HB_OUTPUTMUTEX );
 }

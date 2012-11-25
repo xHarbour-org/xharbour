@@ -91,13 +91,6 @@
    #pragma warn -rch
 #endif
 
-/* AJ: added functions to enter and leave critical section made common to ST
-   and MT mode
-*/
-HB_EXTERN_BEGIN
-extern void hb_macro_critical_Lock( void );
-extern void hb_macro_critical_UnLock( void );
-HB_EXTERN_END
 
 /* NOTE: these symbols are used internally in bison.simple
  */
@@ -1179,7 +1172,7 @@ int hb_macroYYParse( PHB_MACRO pMacro )
          HB_CRITICAL_LOCK( hb_macroMutex );
       #endif
    #else
-      hb_macro_critical_Lock();
+      hb_threadLock( HB_MACROMUTEX  );
    #endif
 
    // Reset
@@ -1202,7 +1195,7 @@ int hb_macroYYParse( PHB_MACRO pMacro )
          HB_CRITICAL_UNLOCK( hb_macroMutex );
       #endif
    #else
-      hb_macro_critical_UnLock();
+      hb_threadUnLock( HB_MACROMUTEX );
    #endif
 
    return iResult;

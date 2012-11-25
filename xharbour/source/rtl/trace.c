@@ -54,18 +54,12 @@
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbapierr.h"
+#include "thread.h"
 
 #ifdef HB_EXTENSION
 
 // It is Thread Safe - It's manipulated only once at primary thread startup.
 static BOOL s_bDoInit = TRUE;
-
-HB_EXTERN_BEGIN
-extern void hb_trace_critical_Lock( void );
-extern void hb_trace_critical_UnLock( void );
-extern void hb_trace_critical_Init( void );
-extern void hb_trace_critical_Destroy( void );
-HB_EXTERN_END
 
 void hb_traceInit( void )
 {
@@ -77,25 +71,19 @@ void hb_traceInit( void )
       s_bDoInit = FALSE;
 
       // Might have been initialized if TraceLog() was called before traceInit!
-      hb_trace_critical_Init();
+      hb_threadLockInit( S_TRACEMTX );
 
       /* Empty the file if it exists. */
       fpTrace = hb_fopen( "trace.log", "w" );
 
       if( fpTrace )
-      {
          fclose( fpTrace );
-      }
-      else
-      {
-         //hb_errInternal( HB_EI_ERRUNRECOV, "Unable to create trace.log file", NULL, NULL );
-      }
    }
 }
 
 void hb_traceExit( void )
 {
-   hb_trace_critical_Destroy();
+   hb_threadLockDestroy( S_TRACEMTX );
 }
 
 void TraceLog( const char * sFile, const char * sTraceMsg, ... )
@@ -104,36 +92,28 @@ void TraceLog( const char * sFile, const char * sTraceMsg, ... )
    BOOL     bEmpty = FALSE;
 
    if( ! sTraceMsg )
-   {
       return;
-   }
 
    if( s_bDoInit )
    {
       s_bDoInit   = FALSE;
       bEmpty      = TRUE;
 
-      hb_trace_critical_Init();
+      hb_threadLockInit( S_TRACEMTX );
    }
 
-   hb_trace_critical_Lock();
+   hb_threadLock( S_TRACEMTX );
 
    if( sFile == NULL )
    {
       if( bEmpty )
-      {
          /* Empty the file if it exists. */
          hFile = hb_fopen( "trace.log", "w" );
-      }
       else
-      {
          hFile = hb_fopen( "trace.log", "a" );
-      }
    }
    else
-   {
       hFile = hb_fopen( sFile, "a" );
-   }
 
    if( hFile )
    {
@@ -146,7 +126,7 @@ void TraceLog( const char * sFile, const char * sTraceMsg, ... )
       fclose( hFile );
    }
 
-   hb_trace_critical_UnLock();
+   hb_threadUnLock( S_TRACEMTX );
 }
 
 HB_FUNC( HB_TRACESTATE )
