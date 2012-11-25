@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-25 07:43 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/macro/macro.y
+    ! left over: HB_MACRO_PTR -> PHB_MACRO
+
 2012-11-24 20:09 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/teditor.prg
     ! wrapped words were cut off when formatting, fixed.

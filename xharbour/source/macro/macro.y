@@ -134,7 +134,7 @@ static int s_iPending;
 #undef YYPARSE_PARAM
 #define YYPARSE_PARAM HB_MACRO_PARAM    /* parameter passed to yyparse function - it have to be of 'void *' type */
 #undef YYLEX_PARAM
-#define YYLEX_PARAM   ( (HB_MACRO_PTR)YYPARSE_PARAM ) /* additional parameter passed to yylex */
+#define YYLEX_PARAM   ( (PHB_MACRO)YYPARSE_PARAM ) /* additional parameter passed to yylex */
 
 extern int yyparse( void * );   /* to make happy some purist compiler */
 
@@ -202,7 +202,7 @@ extern void yyerror( char * ); /* parsing error management function */
 /* This must be placed after the above union - the union is
  * typedef-ined to YYSTYPE
  */
-int yylex( YYSTYPE *, HB_MACRO_PTR );
+int yylex( YYSTYPE *, PHB_MACRO );
 %}
 
 %{
@@ -1166,7 +1166,7 @@ IfInline   : IIF '(' Expression ',' EmptyExpression ','
  ** ------------------------------------------------------------------------ **
  */
 
-int hb_macroYYParse( HB_MACRO_PTR pMacro )
+int hb_macroYYParse( PHB_MACRO pMacro )
 {
    int iResult;
    void * lexBuffer;
