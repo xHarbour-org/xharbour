@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-26 07:52 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/consmt.c
+    ! removed not-needed function protoypes/declarations
+
 2012-11-26 06:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/fm.c
     ! pacify BCC warnings when HB_NO_VM_ALL is defined

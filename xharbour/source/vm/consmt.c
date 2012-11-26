@@ -51,15 +51,6 @@
  *
  */
 
-HB_EXTERN_BEGIN
-extern int  hb_idle_msec_default( void );
-extern void hb_idle_releaseCPU( USHORT uiIdleSleepMsec, BOOL bIdleWaitNoCpu );
-extern void hb_stack_lock( void );
-extern void hb_stack_unlock( void );
-extern void hb_console_safe_lock( void );
-extern void hb_console_safe_unlock( void );
-HB_EXTERN_END
-
 #ifdef HB_THREAD_SUPPORT
 static void s_doNothing( void * nothing )
 {
