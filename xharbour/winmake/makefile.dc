@@ -86,10 +86,6 @@ ALL: $(DLL_PROJECT)
 !elif ("$(__BLD__)"=="CONTRIB_BLD")
 #*******************************************************************************
 
-WHAT32_LIB_OBJS=\
-	$(WHAT32_LIB_OBJS)\
-	$(OBJ_DIR)\_wincall$(OBJEXT)
-
 !if "$(HB_ADS_IMPLIB)"=="no"
 RDDADS_LIB_OBJS=\
 	$(RDDADS_LIB_OBJS)\

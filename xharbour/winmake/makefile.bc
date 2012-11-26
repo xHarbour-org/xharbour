@@ -138,21 +138,10 @@ CONTRIB_PROJECT=\
 	$(GTWVW_LIB)\
 	$(XWT_LIB)\
 	$(HBSQLIT3_LIB)\
-	$(WHAT32_LIB)\
 	$(GTWVG_LIB)\
 	$(HBZIP_LIB)\
 	\
 	$(OPTIONAL_PRJ)
-
-!if ("$(BCC_HAS_TASM)"=="1")
-WHAT32_LIB_OBJS=\
-	$(WHAT32_LIB_OBJS)\
-	$(OBJ_DIR)\_wincall$(OBJEXT)
-!else
-WHAT32_LIB_OBJS=\
-	$(WHAT32_LIB_OBJS)\
-        $(WHAT32_DIR)\source\_wincall.obj
-!endif
 
 ALL: $(CONTRIB_PROJECT)
 

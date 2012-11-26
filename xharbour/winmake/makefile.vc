@@ -164,10 +164,6 @@ RDDADS_LIB_OBJS=\
 	$(OBJ_DIR)\ace32$(OBJEXT)
 !endif
 
-WHAT32_LIB_OBJS=\
-	$(WHAT32_LIB_OBJS)\
-	$(OBJ_DIR)\_wincall$(OBJEXT)
-
 !include winmake\common1.mak
 
 CONTRIB_PROJECT=\
@@ -179,7 +175,6 @@ CONTRIB_PROJECT=\
 	$(CONTRIB_PROJECT)\
 	$(GTWVW_LIB)\
 	$(XWT_LIB)\
-	$(WHAT32_LIB)\
 	$(GTWVG_LIB)\
 	$(HBZIP_LIB)
 !endif

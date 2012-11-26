@@ -8,6 +8,21 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-26 17:43 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  - contrib/what32/*.*
+  * winmake/mdir.bat
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/makefile.bc
+  * winmake/makefile.dc
+  * winmake/makefile.gc
+  * winmake/makefile.pc
+  * winmake/makefile.vc
+  * winmake/makefile.wc
+  * winmake/common2.mak
+  * winmake/common3.mak
+    ! remove dubious contribs
+
 2012-11-26 07:52 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/consmt.c
     ! removed not-needed function protoypes/declarations

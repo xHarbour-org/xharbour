@@ -187,10 +187,6 @@ RDDADS_LIB_OBJS=\
 	$(OBJ_DIR)\ace32$(OBJEXT)
 !endif
 
-WHAT32_LIB_OBJS=\
-	$(WHAT32_LIB_OBJS)\
-	$(OBJ_DIR)\_wincall$(OBJEXT)
-
 !if ("$(HB_ZIP)"=="1")
 OPTIONAL_PRJ=$(OPTIONAL_PRJ) $(HBZIP_LIB)
 !endif
@@ -203,7 +199,6 @@ CONTRIB_PROJECT=\
 	$(XWT_LIB)\
 	$(HBSQLIT3_LIB)\
 	$(GTWVG_LIB)\
-	$(WHAT32_LIB)\
 	\
 	$(OPTIONAL_PRJ)
 

@@ -47,7 +47,7 @@ HB_OPTIMFLAGS     +=-l
 endif
 
 OPTFLAGS    =-Wall -fomit-frame-pointer $(HB_TARGET) -O3 -c -fno-strict-aliasing $(NOCYGWIN)
-HB_INCLUDE  =-i"include" -i"$(PDFLITE_DIR)/include" -i"$(SIXAPI_DIR)/include" -i"$(GDLIB_DIR)/include" -i"$(WHAT32_DIR)/include" -i"$(XWT_DIR)/include"
+HB_INCLUDE  =-i"include" -i"$(PDFLITE_DIR)/include" -i"$(SIXAPI_DIR)/include" -i"$(GDLIB_DIR)/include" -i"$(XWT_DIR)/include"
 CC_DEFINES  =-D__WIN32__ -DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
 INCLUDE_DIR =-I"include" -I"$(ZLIB_DIR)" -I"$(PNG_DIR)" -I"$(PDFLITE_DIR)/include" -I"$(OBJ_DIR)" -I"$(JPEG_DIR)" -I"$(TIFF_DIR)"
 INCLUDE_DIR +=-I"$(FREEIMAGE_DIR)/include" -I"$(GDLIB_DIR)/include" -I"$(XWT_DIR)/include" -I"$(XWT_DIR)/src/xwt_win" -I"$(SIXAPI_DIR)/include"
@@ -266,15 +266,11 @@ RDDADS_LIB_OBJS+=\
 	$(OBJ_DIR)/ace32$(OBJEXT)
 endif
 
-WHAT32_LIB_OBJS+=\
-	$(OBJ_DIR)/_wincall$(OBJEXT)
-
 CONTRIB_PROJECT+=\
 	$(HBSQLIT3_LIB)
 
 ifneq ($(HB_ARCH),64)
 CONTRIB_PROJECT+=\
-	$(WHAT32_LIB)\
 	$(GTWVG_LIB)\
 	$(HBZIP_LIB)
 endif

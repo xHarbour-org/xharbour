@@ -82,7 +82,6 @@ PGSQL_DIR     =contrib$(DIR_SEP)pgsql
 RDDADS_DIR    =contrib$(DIR_SEP)rdd_ads
 TELEPATH_DIR  =contrib$(DIR_SEP)tp_
 HBCC_DIR      =contrib$(DIR_SEP)unicode
-WHAT32_DIR    =contrib$(DIR_SEP)what32
 XWT_DIR       =contrib$(DIR_SEP)xwt
 XWT2_DIR      =contrib$(DIR_SEP)xwt2
 TIPSSL_DIR    =contrib$(DIR_SEP)tipssl
@@ -193,7 +192,6 @@ RDDADS_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)rddads$(LIBEXT)
 ACE32_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)ace32$(LIBEXT)
 TELEPATH_LIB =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)telepath$(LIBEXT)
 HBCC_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbcc$(LIBEXT)
-WHAT32_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)what32$(LIBEXT)
 XWT_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)xwt$(LIBEXT)
 XWT2_LIB     =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)xwt2$(LIBEXT)
 PNG_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)png$(LIBEXT)
@@ -2244,69 +2242,6 @@ HBCC_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)cp866$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)koi8r$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)koi8u$(OBJEXT)
-
-#===============================================================================
-# WHAT32.LIB dependencies
-#===============================================================================
-WHAT32_LIB_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)_winbmp$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winbrsh$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_wincdlg$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winclpb$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_wincomm$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_wincret$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_windate$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_windc$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_windir$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_windlg$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_windll$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_windraw$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winfont$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_wingdi$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winhead$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winicon$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winilst$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_wininet$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winini$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winkbrd$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winlv$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winmain$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winmapi$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winmem$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winmenu$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winmeta$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winmisc$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winmmcap$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winmous$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winmsg$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winpen$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winprn$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winrect$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winreg$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winrgn$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winscrlb$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winshell$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winsock$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winsys$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_wintab$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_wintbar$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_wintext$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_wintree$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winview$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winwnd$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)_winserial$(OBJEXT)\
-	\
-	$(OBJ_DIR)$(DIR_SEP)debugWHAT32$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)errorsysWHAT32$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)whatutil$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)wincdlg$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)wincomm$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)wincore$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)wincorec$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)winini$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)winrbar$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)wintbar$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)wintabs$(OBJEXT)
 
 #===============================================================================
 # TELEPATH.LIB dependencies

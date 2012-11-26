@@ -94,7 +94,7 @@ BISON_CMD1   =$(TYPE) $** > $@
 BISON_CMD2   =$(BISON_CMD1)
 !endif
 
-HB_INCLUDE   =-i"include" -i"$(PDFLITE_DIR)\include" -i"$(SIXAPI_DIR)\include" -i"$(GDLIB_DIR)\include" -i"$(WHAT32_DIR)\include" -i"$(XWT_DIR)\include"
+HB_INCLUDE   =-i"include" -i"$(PDFLITE_DIR)\include" -i"$(SIXAPI_DIR)\include" -i"$(GDLIB_DIR)\include" -i"$(XWT_DIR)\include"
 INCLUDE_DIR  =-I"include" -I"$(CC_DIR)\include" -I"$(OBJ_DIR)" -I"$(SIXAPI_DIR)\include" -I"$(FREEIMAGE_DIR)\include" -I"$(GDLIB_DIR)\include" -I"$(XWT_DIR)\include" -I"$(XWT_DIR)\src\xwt_win" $(INCLUDE_DIR)
 INCLUDE_DIR  =-I"$(ZLIB_DIR)" -I"$(PDFLITE_DIR)\include" -I"$(PNG_DIR)" -I"$(TIFF_DIR)" -I"$(JPEG_DIR)" $(INCLUDE_DIR)
 CC_DEFINES   =-D__WIN32__ -D_HAVE_SQLITE_CONFIG_H -DHAVE_CONFIG_H -DHARBOUR_CONF -DOPENSSL_NO_DEPRECATED $(CC_DEFINES)

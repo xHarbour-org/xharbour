@@ -114,7 +114,6 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%ace32%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%rddads%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%rddads%LIBEXT%   lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%telepath%LIBEXT% copy lib\%SUB_DIR%\%LIBPREFIX%telepath%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbcc%LIBEXT%     copy lib\%SUB_DIR%\%LIBPREFIX%hbcc%LIBEXT%     lib >NUL
-if exist lib\%SUB_DIR%\%LIBPREFIX%what32%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%what32%LIBEXT%   lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%png%LIBEXT%      copy lib\%SUB_DIR%\%LIBPREFIX%png%LIBEXT%      lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbhpdf%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%hbhpdf%LIBEXT%   lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%gtwvg%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%gtwvg%LIBEXT%    lib >NUL
@@ -524,7 +523,6 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%ace32%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%rddads%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%rddads%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%telepath%LIBEXT%  del lib\%SUB_DIR%\%LIBPREFIX%telepath%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbcc%LIBEXT%      del lib\%SUB_DIR%\%LIBPREFIX%hbcc%LIBEXT%
-if exist lib\%SUB_DIR%\%LIBPREFIX%what32%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%what32%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%xwt%LIBEXT%       del lib\%SUB_DIR%\%LIBPREFIX%xwt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbsqlit3%LIBEXT%  del lib\%SUB_DIR%\%LIBPREFIX%hbsqlit3%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%tipssl%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%tipssl%LIBEXT%
@@ -584,7 +582,6 @@ if exist lib\%LIBPREFIX%ace32%LIBEXT%               del lib\%LIBPREFIX%ace32%LIB
 if exist lib\%LIBPREFIX%rddads%LIBEXT%              del lib\%LIBPREFIX%rddads%LIBEXT%
 if exist lib\%LIBPREFIX%telepath%LIBEXT%            del lib\%LIBPREFIX%telepath%LIBEXT%
 if exist lib\%LIBPREFIX%hbcc%LIBEXT%                del lib\%LIBPREFIX%hbcc%LIBEXT%
-if exist lib\%LIBPREFIX%what32%LIBEXT%              del lib\%LIBPREFIX%what32%LIBEXT%
 if exist lib\%LIBPREFIX%xwt%LIBEXT%                 del lib\%LIBPREFIX%xwt%LIBEXT%
 if exist lib\%LIBPREFIX%hbsqlit3%LIBEXT%            del lib\%LIBPREFIX%hbsqlit3%LIBEXT%
 if exist lib\%LIBPREFIX%gtwvg%LIBEXT%               del lib\%LIBPREFIX%gtwvg%LIBEXT%
