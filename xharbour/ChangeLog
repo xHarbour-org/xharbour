@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-11-30 06:12 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbcomp.h
+  * source/compiler/harbour.c
+  * source/compiler/genc.c
+  * source/compiler/hbpcstat.c
+    + add poor-man's profiler, print message on how many opcode are used in module being compiled
+      (the lesser the total pcodes, the more optimized the module would be)
+
 2012-11-30 03:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/thread.c
     + added HB_GETCURRENTPROCESSID returns ID of current process

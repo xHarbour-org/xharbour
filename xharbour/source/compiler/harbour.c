@@ -253,6 +253,9 @@ BOOL     hb_comp_bWarnUnUsedMemvars       = FALSE;
 BOOL     hb_comp_bWarnUnUsedFields        = FALSE;
 BOOL     hb_comp_bWarnUnUsedBlockParams   = FALSE;
 
+/* how many pcode used in a module */
+ULONG    hb_comp_upCodeTotal              = 0;
+
 #define MAX_MEM_COMMAND_LINE 10240
 
 // Used in hb_compAutoOpen()
@@ -340,6 +343,8 @@ int hb_compMain( int argc, char * argv[] )
 
    for( i = 1; i < argc; i++ )
    {
+      hb_comp_upCodeTotal = 0;
+
       if( ! HB_ISOPTSEP( argv[ i ][ 0 ] ) )
       {
          if( argv[ i ][ 0 ] == '@' )
@@ -6345,12 +6350,10 @@ static int hb_compCompile( char * szPrg )
                   }
                }
 
-               if( ! hb_comp_bQuiet )
-               {
-                  printf( "\rLines %i, Functions/Procedures %i\n", hb_comp_iLine, hb_comp_iFunctionCnt );
-               }
-
                hb_compGenOutput( hb_comp_iLanguage, szSourceExtension );
+
+               if( ! hb_comp_bQuiet )
+                  printf( "\rLines %i, Functions/Procedures %i, pCodes %u\n", hb_comp_iLine, hb_comp_iFunctionCnt, ( unsigned int ) hb_comp_upCodeTotal );
 
             }
          }

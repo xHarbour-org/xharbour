@@ -241,20 +241,21 @@ static const char * hb_comp_pcode_names[] =
    "HB_P_LAST_PCODE"                /* 179 this defines the number of defined pcodes */
 };
 
-
 void hb_compPCodeStat( PHB_FNAME pFileName )
 {
    char           szOutFile[ HB_PATH_MAX ];
-   FILE *         outfile;
+   FILE *         outfile  = NULL;
    const char *   szExt;
 
-   szExt                   = pFileName->szExtension;
-   pFileName->szExtension  = ".p";
-   hb_fsFNameMerge( szOutFile, pFileName );
-   outfile                 = hb_fopen( szOutFile, "wb" );
-   pFileName->szExtension  = szExt;
+   if( hb_comp_iGenVarList )
+   {
+      szExt                   = pFileName->szExtension;
+      pFileName->szExtension  = ".p";
+      hb_fsFNameMerge( szOutFile, pFileName );
+      outfile                 = hb_fopen( szOutFile, "wb" );
+      pFileName->szExtension  = szExt;
+   }
 
-   if( outfile )
    {
       ULONG *     pCodeCount, ulUsed, ulCount;
       HB_SIZE     ulPos;
@@ -265,14 +266,13 @@ void hb_compPCodeStat( PHB_FNAME pFileName )
       memset( pCodeCount, 0, HB_P_LAST_PCODE * sizeof( ULONG ) );
 
       pFunc       = hb_comp_functions.pFirst;
+
       if( ! hb_comp_bStartProc )
-      {
          pFunc = pFunc->pNext; /* No implicit starting procedure */
-      }
 
       while( pFunc )
       {
-         if( ! hb_comp_bQuiet )
+         if( outfile && ! hb_comp_bQuiet )
             printf( "Generating pcode list for '%s'...\n", pFunc->szName );
 
          ulPos = 0;
@@ -280,34 +280,44 @@ void hb_compPCodeStat( PHB_FNAME pFileName )
          {
             opcode = pFunc->pCode[ ulPos ];
             if( opcode < HB_P_LAST_PCODE )
-            {
                pCodeCount[ opcode ]++;
-            }
             else
             {
-               fprintf( hb_comp_errFile, "--- Invalid (zero) opcode %i size in hb_compPCodeStat() ---\n", opcode );
+                if( outfile )
+                  fprintf( hb_comp_errFile, "--- Invalid (zero) opcode %i size in hb_compPCodeStat() ---\n", opcode );
             }
+
             ulPos += hb_compPCodeSize( pFunc, ulPos );
          }
 
-         fprintf( outfile, "[%s]\n", pFunc->szName );
+         if( outfile )
+            fprintf( outfile, "[%s]\n", pFunc->szName );
+
          ulUsed = ulCount = 0;
+
          for( opcode = 0; opcode < HB_P_LAST_PCODE; ++opcode )
          {
             if( pCodeCount[ opcode ] != 0 )
             {
                ulCount++;
                ulUsed               += pCodeCount[ opcode ];
-               fprintf( outfile, "%s=%lu\n", hb_comp_pcode_names[ opcode ], pCodeCount[ opcode ] );
+               if( outfile )
+                  fprintf( outfile, "%s=%lu\n", hb_comp_pcode_names[ opcode ], pCodeCount[ opcode ] );
                pCodeCount[ opcode ] = 0;
             }
          }
-         fprintf( outfile, "TYPES=%lu\nCALLS=%lu\n\n", ulCount, ulUsed );
+
+         if( outfile )
+            fprintf( outfile, "TYPES=%lu\nCALLS=%lu\n\n", ulCount, ulUsed );
 
          pFunc = pFunc->pNext;
+
+         hb_comp_upCodeTotal += ulUsed;
       }
 
       hb_xfree( pCodeCount );
-      fclose( outfile );
+
+      if( outfile )
+         fclose( outfile );
    }
 }

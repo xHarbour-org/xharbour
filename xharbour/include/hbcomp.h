@@ -770,6 +770,9 @@ extern const BYTE     hb_comp_pcode_len[];
 /* error messages output */
 extern FILE           *hb_comp_errFile;
 
+/* how many pcode used in a module */
+extern ULONG           hb_comp_upCodeTotal;
+
 /* auto convert external function to dynamic when -vd is turned-on */
 extern BOOL           hb_comp_autoDeferred;
 

@@ -403,10 +403,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
    /*
       Create *.p when /gc4 is used
     */
-   if( hb_comp_iGenVarList )
-   {
-      hb_compPCodeStat( pFileName );
-   }
+   hb_compPCodeStat( pFileName );
 
    if( ! hb_comp_bQuiet )
    {
