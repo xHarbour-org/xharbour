@@ -2925,3 +2925,13 @@ void hb_threadLockDestroy( int iMtx )
 }
 
 HB_EXTERN_END
+
+HB_FUNC( HB_GETCURRENTPROCESSID )
+{
+   HB_THREAD_STUB
+#if defined( HB_OS_WIN )
+   hb_retnl( (ULONG) GetCurrentProcessId() );
+#else
+   hb_retnl( (ULONG) getpid() );
+#endif
+}

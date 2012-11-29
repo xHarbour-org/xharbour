@@ -70,7 +70,7 @@
   #include "hbpp.h"
 #endif
 
-#define MAX_MACRO_TEXT 4096
+#define MAX_MACRO_TEXT 8192
 
 /* .and. & .or. expressions shortcuts - the expression optimiser needs
  * a global variable
