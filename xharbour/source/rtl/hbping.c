@@ -111,6 +111,7 @@ typedef struct tagICMP_HEADER
 static BOOL     sm_bAttemptedWinsock2Initialise = FALSE;
 static BOOL     sm_bWinsock2OK                  = FALSE;
 static __int64  sm_TimerFrequency               = 0;
+static char     szResponse[ 1024 ]              = { '\0' };
 
 static BOOL IsSocketReadible( SOCKET socket, DWORD dwTimeout, BOOL *bReadible )
 {
@@ -150,7 +151,7 @@ static BOOL DecodeResponse( char * pBuf, int nBytes, SOCKADDR_IN * from )
    /* Not enough data recieved */
    if( nBytes < nIpHdrlen + MIN_ICMP_PACKET_SIZE )
    {
-      printf( "Received too few bytes from %s\n", inet_ntoa( from->sin_addr ) );
+      hb_snprintf( szResponse, 1024, "Received too few bytes from %s", inet_ntoa( from->sin_addr ) );
       SetLastError( ERROR_UNEXP_NET_ERR );
       return FALSE;
    }
@@ -161,7 +162,7 @@ static BOOL DecodeResponse( char * pBuf, int nBytes, SOCKADDR_IN * from )
 
       if( pIcmpHdr->i_type != 0 )     //type ICMP_ECHOREPLY is 0
       {
-         printf( "non-echo type %d recvd\n", pIcmpHdr->i_type );
+         hb_snprintf( szResponse, 1024, "Non-echo type %d recvd", pIcmpHdr->i_type );
          SetLastError( ERROR_UNEXP_NET_ERR );
          return FALSE;
       }
@@ -169,7 +170,7 @@ static BOOL DecodeResponse( char * pBuf, int nBytes, SOCKADDR_IN * from )
       /* Check it is the same id as we sent */
       if( pIcmpHdr->i_id != ( USHORT ) GetCurrentProcessId() )
       {
-         printf( "Received someone else's packet!\n" );
+         hb_snprintf( szResponse, 1024, "Received someone else's packet!" );
          SetLastError( ERROR_UNEXP_NET_ERR );
          return FALSE;
       }
@@ -276,7 +277,7 @@ BOOL hbping_Ping( LPCTSTR pszHostName, CPINGREPLY *pr, DWORD dwTimeout, UINT nPa
          }
          else
          {
-            printf( "Could not resolve the host name %s\n", pszHostName );
+            hb_snprintf( szResponse, 1024, "Could not resolve the host name %s", pszHostName );
             return FALSE;
          }
       }
@@ -291,7 +292,7 @@ BOOL hbping_Ping( LPCTSTR pszHostName, CPINGREPLY *pr, DWORD dwTimeout, UINT nPa
 
       if( sockRaw == INVALID_SOCKET )
       {
-         printf( "Failed to create a raw socket\n" );
+         hb_snprintf( szResponse, 1024, "Failed to create a raw socket" );
          return FALSE;
       }
       else
@@ -317,7 +318,7 @@ BOOL hbping_Ping( LPCTSTR pszHostName, CPINGREPLY *pr, DWORD dwTimeout, UINT nPa
          {
             DWORD dwError = GetLastError();
 
-            printf( "sendto failed\n" );
+            hb_snprintf( szResponse, 1024, "sendto failed" );
 
             hb_xfree( pICMP );
 
@@ -342,7 +343,7 @@ BOOL hbping_Ping( LPCTSTR pszHostName, CPINGREPLY *pr, DWORD dwTimeout, UINT nPa
                   nRead = recvfrom( sockRaw, pRecvBuf, MAX_ICMP_PACKET_SIZE, 0, ( SOCKADDR * ) &from, &nFromlen );
                else
                {
-                  printf( "timeout occured while awaiting recvfrom\n" );
+                  hb_snprintf( szResponse, 1024, "Timeout occured while awaiting recvfrom" );
                   closesocket( sockRaw );
 
                   hb_xfree( pICMP );
@@ -358,7 +359,7 @@ BOOL hbping_Ping( LPCTSTR pszHostName, CPINGREPLY *pr, DWORD dwTimeout, UINT nPa
             {
                DWORD dwError = GetLastError();
 
-               printf( "IsReadible call failed\n" );
+               hb_snprintf( szResponse, 1024, "IsReadible call failed" );
                hb_xfree( pICMP );
                hb_xfree( pRecvBuf );
 
@@ -376,7 +377,7 @@ BOOL hbping_Ping( LPCTSTR pszHostName, CPINGREPLY *pr, DWORD dwTimeout, UINT nPa
             {
                DWORD dwError = GetLastError();
 
-               printf( "recvfrom call failed\n" );
+               hb_snprintf( szResponse, 1024, "recvfrom call failed" );
 
                hb_xfree( pICMP );
                hb_xfree( pRecvBuf );
@@ -428,19 +429,20 @@ HB_FUNC( HB_PING )
       BOOL       bSuccess;
       PHB_ITEM pRef  = hb_param( 2, HB_IT_BYREF );
 
-      bSuccess = hbping_Ping( pszHostName, &pr, dwTimeout, nPacketSize );
+      *szResponse = 0;
+      bSuccess    = hbping_Ping( pszHostName, &pr, dwTimeout, nPacketSize );
 
       if ( bSuccess )
       {
          HOSTENT* phostent = gethostbyaddr((char *)&pr.Address.S_un.S_addr, 4, PF_INET);
-         char     szResponse[ 1024 ];
-         hb_snprintf( szResponse, 1024,"%d.%d.%d.%d [%s], replied in RTT:%dms\n",
-            pr.Address.S_un.S_un_b.s_b1, pr.Address.S_un.S_un_b.s_b2, pr.Address.S_un.S_un_b.s_b3,
-            pr.Address.S_un.S_un_b.s_b4, phostent->h_name, ( int ) pr.RTT);
-
-         if( pRef )
-            hb_itemPutC( pRef, szResponse );
+         if( phostent )
+            hb_snprintf( szResponse, 1024,"%d.%d.%d.%d [%s], replied in RTT:%dms\n",
+               pr.Address.S_un.S_un_b.s_b1, pr.Address.S_un.S_un_b.s_b2, pr.Address.S_un.S_un_b.s_b3,
+               pr.Address.S_un.S_un_b.s_b4, phostent->h_name, ( int ) pr.RTT);
       }
+
+      if( pRef )
+         hb_itemPutC( pRef, szResponse );
 
       hb_retl( bSuccess );
       WSACleanup();

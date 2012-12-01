@@ -14,8 +14,7 @@ PROCEDURE MAIN( cHostName )
       cHostName := "yahoo.com"
    ENDIF
 
-   IF HB_PING( cHostName, @sz )
-      ? sz
-   ENDIF
+   HB_PING( cHostName, @sz )
+   ? sz
 
    RETURN
