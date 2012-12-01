@@ -109,6 +109,12 @@
           int iRcvBufSize;
       } HB_SOCKET_STRUCT;
 
+      typedef struct _CPINGREPLY
+      {
+          IN_ADDR  Address;           /* The IP address of the replier */
+          ULONG    RTT;               /* Round Trip time in Milliseconds */
+      } HB_PINGREPLY;
+
       #define HB_PARSOCKET( n )     ( ( HB_SOCKET_STRUCT * ) hb_parptrGC( hb_inetSocketFinalize, n ) )
 
       #define HB_SOCKET_ZERO_ERROR( s )  s->errorCode = 0; s->errorDesc = ""

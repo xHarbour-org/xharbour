@@ -63,9 +63,9 @@
 #if defined( HB_OS_WIN )
 
 /* add parens to avoid warning */
-#if defined(__BORLANDC__) && (__BORLANDC__<=0x620)
+#if defined( __BORLANDC__ ) && ( __BORLANDC__ <= 0x620 )
    #undef  MAKEWORD
-   #define MAKEWORD(a, b)      ((WORD)(((BYTE)(((DWORD_PTR)(a)) & 0xff)) | (((WORD)((BYTE)(((DWORD_PTR)(b)) & 0xff))) << 8)))
+   #define MAKEWORD( a, b ) ( ( WORD ) ( ( ( BYTE ) ( ( ( DWORD_PTR ) ( a ) ) & 0xff ) ) | ( ( ( WORD ) ( ( BYTE ) ( ( ( DWORD_PTR ) ( b ) ) & 0xff ) ) ) << 8 ) ) )
 #endif
 
 #define MIN_ICMP_PACKET_SIZE  8     /* minimum 8 byte icmp packet (just header) */
@@ -75,30 +75,24 @@
 #pragma pack(push, 1) /* The IP_HEADER and ICMP_HEADER should be alligned on 1 byte boundaries */
 typedef struct tagIP_HEADER
 {
-   unsigned int h_len:4;                 /* length of the header */
-   unsigned int version:4;               /* Version of IP */
-   unsigned char tos;                  /* Type of service */
-   unsigned short total_len;           /* total length of the packet */
-   unsigned short ident;               /* unique identifier */
-   unsigned short frag_and_flags;      /* flags */
-   unsigned char ttl;
-   unsigned char proto;                /* protocol (TCP, UDP etc) */
-   unsigned short checksum;            /* IP checksum */
-   unsigned int sourceIP;
-   unsigned int destIP;
+   UINT   h_len : 4;        /* length of the header */
+   UINT   version : 4;      /* Version of IP */
+   UCHAR  tos;              /* Type of service */
+   USHORT total_len;        /* total length of the packet */
+   USHORT ident;            /* unique identifier */
+   USHORT frag_and_flags;   /* flags */
+   UCHAR  ttl;
+   UCHAR  proto;            /* protocol (TCP, UDP etc) */
+   USHORT checksum;         /* IP checksum */
+   UINT   sourceIP;
+   UINT   destIP;
 } IP_HEADER, * LPIP_HEADER;
-
-typedef struct _CPINGREPLY
-{
-   IN_ADDR       Address;  /* The IP address of the replier */
-   unsigned long RTT;      /* Round Trip time in Milliseconds */
-} CPINGREPLY, *LPCPINGREPLY;
 
 /* ICMP header */
 typedef struct tagICMP_HEADER
 {
    BYTE   i_type;
-   BYTE   i_code; /* type sub code */
+   BYTE   i_code;   /* type sub code */
    USHORT i_cksum;
    USHORT i_id;
    USHORT i_seq;
@@ -108,24 +102,28 @@ typedef struct tagICMP_HEADER
 
 #pragma pack(pop)
 
-static BOOL     sm_bAttemptedWinsock2Initialise = FALSE;
-static BOOL     sm_bWinsock2OK                  = FALSE;
-static __int64  sm_TimerFrequency               = 0;
-static char     szResponse[ 1024 ]              = { '\0' };
+static BOOL    sm_bAttemptedWinsock2Initialise  = FALSE;
+static BOOL    sm_bWinsock2OK                   = FALSE;
+static __int64 sm_TimerFrequency                = 0;
+static char    szResponse[ 1024 ]               = { '\0' };
 
-static BOOL IsSocketReadible( SOCKET socket, DWORD dwTimeout, BOOL *bReadible )
+HB_EXTERN_BEGIN
+extern HB_EXPORT BOOL hb_ping( const char* pszHostName, HB_PINGREPLY * pr, DWORD dwTimeout, UINT nPacketSize );
+HB_EXTERN_END
+
+static BOOL IsSocketReadible( SOCKET socket, DWORD dwTimeout, BOOL * bReadible )
 {
    TIMEVAL  timeout; /* = { dwTimeout / 1000, dwTimeout % 1000 }; */
    fd_set   fds;
-   int nStatus ;
+   int      nStatus;
 
    FD_ZERO( &fds );
    FD_SET( socket, &fds );
 
-   timeout.tv_sec  = dwTimeout / 1000;
-   timeout.tv_usec = dwTimeout % 1000;
+   timeout.tv_sec    = dwTimeout / 1000;
+   timeout.tv_usec   = dwTimeout % 1000;
 
-   nStatus = select( 0, &fds, NULL, NULL, &timeout );
+   nStatus           = select( 0, &fds, NULL, NULL, &timeout );
 
    if( nStatus == SOCKET_ERROR )
       return FALSE;
@@ -139,11 +137,9 @@ static BOOL IsSocketReadible( SOCKET socket, DWORD dwTimeout, BOOL *bReadible )
 /* Decode the raw Ip packet we get back */
 static BOOL DecodeResponse( char * pBuf, int nBytes, SOCKADDR_IN * from )
 {
-   LARGE_INTEGER TimerTick;
-   LPIP_HEADER   pIpHdr      = ( LPIP_HEADER ) pBuf;
-   int           nIpHdrlen;
-
-   nIpHdrlen       = pIpHdr->h_len * 4; /* Number of 32-bit words*4 = bytes */
+   LARGE_INTEGER  TimerTick;
+   LPIP_HEADER    pIpHdr    = ( LPIP_HEADER ) pBuf;
+   int            nIpHdrlen = pIpHdr->h_len * 4;       /* Number of 32-bit words*4 = bytes */
 
    /* Get the current tick count */
    QueryPerformanceCounter( &TimerTick );
@@ -160,7 +156,7 @@ static BOOL DecodeResponse( char * pBuf, int nBytes, SOCKADDR_IN * from )
       /* Check it is an ICMP_ECHOREPLY packet */
       LPICMP_HEADER pIcmpHdr = ( LPICMP_HEADER ) ( pBuf + nIpHdrlen );
 
-      if( pIcmpHdr->i_type != 0 )     //type ICMP_ECHOREPLY is 0
+      if( pIcmpHdr->i_type != 0 )     /* type ICMP_ECHOREPLY is 0 */
       {
          hb_snprintf( szResponse, 1024, "Non-echo type %d recvd", pIcmpHdr->i_type );
          SetLastError( ERROR_UNEXP_NET_ERR );
@@ -182,7 +178,7 @@ static BOOL DecodeResponse( char * pBuf, int nBytes, SOCKADDR_IN * from )
 /* generate an IP checksum based on a given data buffer */
 static USHORT GenerateIPChecksum( USHORT * pBuffer, int nSize )
 {
-   unsigned long cksum = 0;
+   ULONG cksum = 0;
 
    while( nSize > 1 )
    {
@@ -201,8 +197,9 @@ static USHORT GenerateIPChecksum( USHORT * pBuffer, int nSize )
 /* Fill up the ICMP packet with defined values */
 static void FillIcmpData( LPICMP_HEADER pIcmp, int nData )
 {
-   int      nHdrSize;
-   char *   pData;
+   /* Set up the data which will be sent */
+   int      nHdrSize = sizeof( ICMP_HEADER );
+   char *   pData    = ( ( char * ) pIcmp ) + nHdrSize;
 
    pIcmp->i_type     = 8; /* ICMP_ECHO type */
    pIcmp->i_code     = 0;
@@ -211,31 +208,27 @@ static void FillIcmpData( LPICMP_HEADER pIcmp, int nData )
    pIcmp->i_cksum    = 0;
    pIcmp->timestamp  = GetTickCount();
 
-   /* Set up the data which will be sent */
-   nHdrSize = sizeof( ICMP_HEADER );
-   pData    = ( ( char * ) pIcmp ) + nHdrSize;
-
    memset( pData, 'E', nData - nHdrSize );
 
    /* Generate the checksum */
-   pIcmp->i_cksum = GenerateIPChecksum( ( USHORT * ) pIcmp, nData );
+   pIcmp->i_cksum    = GenerateIPChecksum( ( USHORT * ) pIcmp, nData );
 }
 
-static BOOL hbping_Initialise( void )
+static BOOL Initialise( void )
 {
    if( ! sm_bAttemptedWinsock2Initialise )
    {
-      WSADATA wsa;
-      LARGE_INTEGER Frequency;
+      WSADATA        wsa;
+      LARGE_INTEGER  Frequency;
 
-      sm_bAttemptedWinsock2Initialise = TRUE;
+      sm_bAttemptedWinsock2Initialise  = TRUE;
 
       /* Initialise the winsock 2 stack */
-      sm_bWinsock2OK = ( WSAStartup( MAKEWORD( 2, 1 ), &wsa ) == 0 );
+      sm_bWinsock2OK                   = ( WSAStartup( MAKEWORD( 2, 1 ), &wsa ) == 0 );
 
       /* Use the High performace counter to get an accurate RTT */
-      Frequency.QuadPart   = 0;
-      sm_bWinsock2OK       = sm_bWinsock2OK && QueryPerformanceFrequency( &Frequency );
+      Frequency.QuadPart               = 0;
+      sm_bWinsock2OK                   = sm_bWinsock2OK && QueryPerformanceFrequency( &Frequency );
 
       if( sm_bWinsock2OK )
          sm_TimerFrequency = Frequency.QuadPart;
@@ -244,7 +237,7 @@ static BOOL hbping_Initialise( void )
    return sm_bWinsock2OK;
 }
 
-BOOL hbping_Ping( LPCTSTR pszHostName, CPINGREPLY *pr, DWORD dwTimeout, UINT nPacketSize )
+BOOL hb_ping( const char* pszHostName, HB_PINGREPLY * pr, DWORD dwTimeout, UINT nPacketSize )
 {
    /* Parameter validation */
    if( nPacketSize > MAX_ICMP_PACKET_SIZE || nPacketSize < MIN_ICMP_PACKET_SIZE )
@@ -255,12 +248,12 @@ BOOL hbping_Ping( LPCTSTR pszHostName, CPINGREPLY *pr, DWORD dwTimeout, UINT nPa
    }
 
    /* Make sure everything is initialised */
-   if( hbping_Initialise() )
+   if( Initialise() )
    {
       /* Resolve the address of the host to connect to */
       SOCKADDR_IN    dest;
-      LPSTR          lpszAscii   = ( LPTSTR ) pszHostName;
-      unsigned long  addr        = inet_addr( lpszAscii );
+      char*          lpszAscii  = ( char* ) pszHostName;
+      ULONG          addr       = inet_addr( lpszAscii );
       SOCKET         sockRaw;
 
       memset( &dest, 0, sizeof( dest ) );
@@ -298,7 +291,7 @@ BOOL hbping_Ping( LPCTSTR pszHostName, CPINGREPLY *pr, DWORD dwTimeout, UINT nPa
       else
       {
          int            nBufSize = nPacketSize + sizeof( ICMP_HEADER );
-         char *         pICMP    = ( char* ) hb_xgrab( nBufSize );
+         char *         pICMP    = ( char * ) hb_xgrab( nBufSize );
          LARGE_INTEGER  TimerTick;
          __int64        nStartTick;
          int            nWrote;
@@ -393,12 +386,12 @@ BOOL hbping_Ping( LPCTSTR pszHostName, CPINGREPLY *pr, DWORD dwTimeout, UINT nPa
                BOOL bSuccess = DecodeResponse( pRecvBuf, nRead, &from );
 
                /* If we successfully decoded the response, then return the
-                * values in the CPINGREPLY instance
+                * values in the HB_PINGREPLY instance
                 */
                if( bSuccess )
                {
-                  pr->Address  = from.sin_addr;
-                  pr->RTT      = ( ULONG ) ( ( TimerTick.QuadPart - nStartTick ) * 1000 / sm_TimerFrequency );
+                  pr->Address = from.sin_addr;
+                  pr->RTT     = ( ULONG ) ( ( TimerTick.QuadPart - nStartTick ) * 1000 / sm_TimerFrequency );
                }
 
                /* Don't forget to release out socket */
@@ -410,35 +403,35 @@ BOOL hbping_Ping( LPCTSTR pszHostName, CPINGREPLY *pr, DWORD dwTimeout, UINT nPa
 
                /* return the status */
                return bSuccess;
-            } /* nRead == SOCKET_ERROR */
-         } /* nWrote == SOCKET_ERROR */
-      } /* sockRaw == INVALID_SOCKET */
-   } /* hbping_Initialise2() */
+            }  /* nRead == SOCKET_ERROR */
+         }     /* nWrote == SOCKET_ERROR */
+      }        /* sockRaw == INVALID_SOCKET */
+   }           /* Initialise() */
 
    return FALSE;
 }
 
 HB_FUNC( HB_PING )
 {
-   if ( ISCHAR( 1 ) )
+   if( ISCHAR( 1 ) )
    {
-      LPCTSTR    pszHostName = hb_parc( 1 );
-      CPINGREPLY pr;
-      DWORD      dwTimeout   = 5000;
-      UINT       nPacketSize = 32;
-      BOOL       bSuccess;
-      PHB_ITEM pRef  = hb_param( 2, HB_IT_BYREF );
+      const char*   pszHostName = hb_parc( 1 );
+      HB_PINGREPLY  pr;
+      DWORD         dwTimeout   = 5000;
+      UINT          nPacketSize = 32;
+      BOOL          bSuccess;
+      PHB_ITEM      pRef        = hb_param( 2, HB_IT_BYREF );
 
       *szResponse = 0;
-      bSuccess    = hbping_Ping( pszHostName, &pr, dwTimeout, nPacketSize );
+      bSuccess    = hb_ping( pszHostName, &pr, dwTimeout, nPacketSize );
 
-      if ( bSuccess )
+      if( bSuccess )
       {
-         HOSTENT* phostent = gethostbyaddr((char *)&pr.Address.S_un.S_addr, 4, PF_INET);
+         HOSTENT * phostent = gethostbyaddr( ( char * ) &pr.Address.S_un.S_addr, 4, PF_INET );
          if( phostent )
-            hb_snprintf( szResponse, 1024,"%d.%d.%d.%d [%s], replied in RTT:%dms\n",
-               pr.Address.S_un.S_un_b.s_b1, pr.Address.S_un.S_un_b.s_b2, pr.Address.S_un.S_un_b.s_b3,
-               pr.Address.S_un.S_un_b.s_b4, phostent->h_name, ( int ) pr.RTT);
+            hb_snprintf( szResponse, 1024, "%d.%d.%d.%d [%s], replied in RTT:%dms\n",
+                         pr.Address.S_un.S_un_b.s_b1, pr.Address.S_un.S_un_b.s_b2, pr.Address.S_un.S_un_b.s_b3,
+                         pr.Address.S_un.S_un_b.s_b4, phostent->h_name, ( int ) pr.RTT );
       }
 
       if( pRef )
@@ -453,7 +446,9 @@ HB_FUNC( HB_PING )
 }
 
 #else
-
+/*
+ * TODO: Non-Windows developers are expected to port this function
+ */
 HB_FUNC( HB_PING )
 {
    hb_retl( FALSE );

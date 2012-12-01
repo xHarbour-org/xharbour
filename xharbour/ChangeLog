@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-01 17:07 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/hbping.c
+  * include/inet.h
+    ! use xHarbour types to the maximum extent
+    ! hand-beautifying the codes
+
 2012-12-01 11:32 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/hbping.c
   * tests/testping.prg
