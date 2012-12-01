@@ -60,7 +60,7 @@ FUNCTION _APPMAIN( cHRBFile, cPar1, cPar2, cPar3, cPar4, cPar5, cPar6, cPar7, cP
 
    IF Empty( cHRBFile )
       OutStd( "xHarbour Runner" + HB_OSNewLine() +;
-              "Copyright 1999-2012, http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() +;
+              "Copyright 1999-2013, http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() +;
               HB_OSNewLine() +;
               "Syntax:  hbrun <hrbfile[.hrb]> [parameters]" + HB_OSNewLine() + ;
               HB_OSNewLine() +;

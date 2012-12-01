@@ -102,7 +102,7 @@ STATIC s_nEndTime
 PROCEDURE _AppMain( cPar1, cPar2 )
 
    OutStd( "xHarbour Regression Test Suite" + HB_OSNewLine() +;
-           "Copyright 1999-2012, http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() )
+           "Copyright 1999-2013, http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() )
 
    IF cPar1 == NIL
       cPar1 := ""

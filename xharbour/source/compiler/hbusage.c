@@ -163,6 +163,6 @@ void hb_compPrintLogo( void )
 {
    char *pszVersion = hb_verHarbour();
    printf( "%s\n", pszVersion );
-   printf( "Copyright 1999-2012, http://www.xharbour.org http://www.harbour-project.org/\n" );
+   printf( "Copyright 1999-2013, http://www.xharbour.org http://www.harbour-project.org/\n" );
    hb_xfree( pszVersion );
 }

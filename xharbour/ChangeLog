@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-01 10:27 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * utils/hbdoc/hbdoc.prg
+  * utils/hbpp/hbpp.c
+  * utils/hbmake/hbmake.prg
+  * utils/hbtest/hbtest.prg
+  * utils/hbrun/hbrun.prg
+  * source/compiler/hbusage.c
+    ! bump copyright years to 2013
+
 2012-12-01 09:57 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   + source/rtl/hbping.c
   + tests/testping.prg
