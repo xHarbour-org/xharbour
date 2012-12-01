@@ -227,6 +227,7 @@ txml
 typefile
 wait
 win32ole
+hbping
 hbwinole
 win32prn
 winos

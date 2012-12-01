@@ -986,6 +986,7 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)typefile$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)wait$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)win32ole$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hbping$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hbwinole$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)win32prn$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)winos$(OBJEXT)\

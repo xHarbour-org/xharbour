@@ -2749,6 +2749,9 @@ $(OBJ_DIR)$(DIR_SEP)win32ole$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)win32ole.c
 $(OBJ_DIR)$(DIR_SEP)hbwinole$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbwinole.c
 	$(CCC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)hbping$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)hbping.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)win32prn.c : $(RTL_DIR)$(DIR_SEP)win32prn.prg
 	$(HB_CMD)
 
