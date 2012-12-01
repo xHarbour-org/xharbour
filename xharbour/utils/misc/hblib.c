@@ -322,15 +322,15 @@ int main( int argc, char * argv[] )
 
       if( bDll )
       {
-         if( argc >= 9 && argv[ 9 ] )
+         if( argc >= 10 && argv[ 10 ] )
          {
             int u;
 
-            for( u = 9; u < argc; u++ )
+            for( u = 10; u < argc; u++ )
                fprintf( h, "%s ", argv[ u ] );
          }
 
-         fprintf( h, ",%s,%s.map,%s,%s\n", argv[ 4 ], argv[ 4 ], szLibs, bIsDef ? argv[ 8 ] : "" );
+         fprintf( h, ",%s,%s.map,%s,%s,%s\n", argv[ 4 ], argv[ 4 ], szLibs, bIsDef ? argv[ 8 ] : "", argv[ 9 ] );
       }
 
       fclose( h );

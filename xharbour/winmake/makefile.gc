@@ -10,6 +10,8 @@
 #===============================================================================
 include winmake/common.mak
 
+RESEXT=.o
+RC    =windres
 CC    =GCC
 CCP   =G++
 TYPE  =cat
@@ -285,11 +287,13 @@ ifneq ($(HB_DEBUG),d)
 ZIP_DEBUGFLAGS  =-DNDEBUG
 endif
 
+RC_CMD          =$(RC) --input=$^ --output=$@
 LIB_CMD         =RM -f $@ && AR cru $@ $^
 LIB_CMD_1       =$(LIB_CMD)
-DLL_LINK_CMD    =$(CC) $(CC_DEBUGFLAGS) -shared -W $(EXPORT_DEF) -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1)
+DLL_LINK_CMD    =$(CC) $(CC_DEBUGFLAGS) -shared -W $(EXPORT_DEF) -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1) $(HARBOUR_DLL_RES)
 DLLEXE_LINK_CMD =$(CC) $(CC_DEBUGFLAGS) -Wall $(NOCYGWIN) -o $@ $^ $(HARBOUR_DLL) -Wl,--start-group -lpdflite$(HB_ARCH)$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
 LINK_CMD        =$(CC) $(CC_DEBUGFLAGS) -mconsole -Wall -o $@ $^ $(NOCYGWIN)
+HRB_LINK_CMD    =$(CC) $(CC_DEBUGFLAGS) -mconsole -Wall -o $(HARBOUR_EXE) $(HARBOUR_EXE_OBJS) $(NOCYGWIN) $(HRB_LIBS) $(HARBOUR_EXE_RES)
 HB_CMD          =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) -o$@ $^
 HB_CMD_MAIN     =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) -d"_USE_APPMAIN_" -o$@ $^
 CC_CMD          =$(CC) $(CLIBFLAGS) -o $@ $^

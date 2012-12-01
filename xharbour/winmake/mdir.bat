@@ -224,6 +224,11 @@ if exist bin\hblib%HB_DEBUG%.tds      del bin\hblib%HB_DEBUG%.tds
 if exist bin\hblib%HB_DEBUG%.map      del bin\hblib%HB_DEBUG%.map
 if exist bin\hblib%HB_DEBUG%.cgl      del bin\hblib%HB_DEBUG%.cgl
 
+if exist bin\hbrc%HB_DEBUG%.exe       del bin\hbrc%HB_DEBUG%.exe
+if exist bin\hbrc%HB_DEBUG%.tds       del bin\hbrc%HB_DEBUG%.tds
+if exist bin\hbrc%HB_DEBUG%.map       del bin\hbrc%HB_DEBUG%.map
+if exist bin\hbrc%HB_DEBUG%.cgl       del bin\hbrc%HB_DEBUG%.cgl
+
 if exist bin\hbextern%HB_DEBUG%.exe   del bin\hbextern%HB_DEBUG%.exe
 if exist bin\hbextern%HB_DEBUG%.tds   del bin\hbextern%HB_DEBUG%.tds
 if exist bin\hbextern%HB_DEBUG%.map   del bin\hbextern%HB_DEBUG%.map
@@ -332,6 +337,7 @@ if exist bin\%SUB_DIR%\hbformat%HB_DEBUG%.exe       del bin\%SUB_DIR%\hbformat%H
 if exist bin\%SUB_DIR%\hbtestmt%HB_DEBUG%.exe       del bin\%SUB_DIR%\hbtestmt%HB_DEBUG%.exe
 if exist bin\%SUB_DIR%\ppgen%HB_DEBUG%.exe          del bin\%SUB_DIR%\ppgen%HB_DEBUG%.exe
 if exist bin\%SUB_DIR%\hblib%HB_DEBUG%.exe          del bin\%SUB_DIR%\hblib%HB_DEBUG%.exe
+if exist bin\%SUB_DIR%\hbrc%HB_DEBUG%.exe           del bin\%SUB_DIR%\hbrc%HB_DEBUG%.exe
 if exist bin\%SUB_DIR%\hbextern%HB_DEBUG%.exe       del bin\%SUB_DIR%\hbextern%HB_DEBUG%.exe
 if exist bin\%SUB_DIR%\hbdict%HB_DEBUG%.exe         del bin\%SUB_DIR%\hbdict%HB_DEBUG%.exe
 if exist bin\%SUB_DIR%\xbscript%HB_DEBUG%.exe       del bin\%SUB_DIR%\xbscript%HB_DEBUG%.exe
@@ -397,6 +403,8 @@ if exist obj\%SUB_DIR%\*.bak                         del obj\%SUB_DIR%\*.bak
 if exist obj\%SUB_DIR%\*%OBJEXT%                     del obj\%SUB_DIR%\*%OBJEXT%
 if exist obj\%SUB_DIR%\*.output                      del obj\%SUB_DIR%\*.output
 if exist obj\%SUB_DIR%\*.c                           del obj\%SUB_DIR%\*.c
+if exist obj\%SUB_DIR%\*.rc                          del obj\%SUB_DIR%\*.rc
+if exist obj\%SUB_DIR%\*.res                         del obj\%SUB_DIR%\*.res
 if exist obj\%SUB_DIR%\*.ppo                         del obj\%SUB_DIR%\*.ppo
 if exist obj\%SUB_DIR%\*.h                           del obj\%SUB_DIR%\*.h
 if exist obj\%SUB_DIR%\*.tmp                         del obj\%SUB_DIR%\*.tmp
@@ -418,6 +426,7 @@ if exist bin\%SUB_DIR%\hbtest.exp                    del bin\%SUB_DIR%\hbtest.ex
 if exist bin\%SUB_DIR%\hbtestMT.exp                  del bin\%SUB_DIR%\hbtestMT.exp
 if exist bin\%SUB_DIR%\ppgen.exp                     del bin\%SUB_DIR%\ppgen.exp
 if exist bin\%SUB_DIR%\hblib.exp                     del bin\%SUB_DIR%\hblib.exp
+if exist bin\%SUB_DIR%\hbrc.exp                      del bin\%SUB_DIR%\hbrc.exp
 if exist bin\%SUB_DIR%\xbscript.exp                  del bin\%SUB_DIR%\xbscript.exp
 
 if exist bin\%SUB_DIR%\harbour%LIBEXT%               del bin\%SUB_DIR%\harbour%LIBEXT%
@@ -435,6 +444,8 @@ if exist bin\%SUB_DIR%\xbscript%LIBEXT%              del bin\%SUB_DIR%\xbscript%
 ECHO Removing DLL and Object Files ...
 if exist obj\%SUB_DIR%\dll\*%OBJEXT%                 del obj\%SUB_DIR%\dll\*%OBJEXT%
 if exist obj\%SUB_DIR%\dll\*.c                       del obj\%SUB_DIR%\dll\*.c
+if exist obj\%SUB_DIR%\dll\*.rc                      del obj\%SUB_DIR%\dll\*.rc
+if exist obj\%SUB_DIR%\dll\*.res                     del obj\%SUB_DIR%\dll\*.res
 if exist obj\%SUB_DIR%\dll\*.ppo                     del obj\%SUB_DIR%\dll\*.ppo
 if exist obj\%SUB_DIR%\dll\*.h                       del obj\%SUB_DIR%\dll\*.h
 if exist obj\%SUB_DIR%\dll\*.output                  del obj\%SUB_DIR%\dll\*.output

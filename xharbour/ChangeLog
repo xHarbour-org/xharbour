@@ -8,6 +8,28 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-02 05:41 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  + resource
+  + resource/xhb.ico
+  + utils/misc/hbrc.c
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/mdir.bat
+    + utility to write version resource file
+
+  * utils/misc/hblib.c
+  * winmake/common.mak
+  * winmake/common2.mak
+  * winmake/common3.mak
+  * winmake/compile.mak
+  * winmake/makefile.bc
+  * winmake/makefile.dc
+  * winmake/makefile.vc
+  * winmake/makefile.pc
+  * winmake/makefile.wc
+  * winmake/makefile.gc
+    + bind version resource file to harbour.exe and xharbour.dll
+
 2012-12-01 17:07 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/hbping.c
   * include/inet.h

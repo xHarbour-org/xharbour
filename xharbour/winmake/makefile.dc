@@ -10,6 +10,7 @@
 #===============================================================================
 !include winmake\common.mak
 
+RC        =RCC
 CC        =SCPPN
 LINKEXE   =LINK
 LIBEXE    =LIB
@@ -31,8 +32,6 @@ INCLUDE_DIR    =-I"$(CC_DIR)\include\win32" $(INCLUDE_DIR)
 OPTFLAGS       =-o+s -mn -c -6 -WD
 HB_STARTUP_OBJ =$(OBJ_DIR)\mainstd$(OBJEXT)
 DMC_IMPORT_LIB =$(HARBOUR_DLL_LIB)
-IMPLIB_CMD     =$(IMPLIBEXE) $@ $** /system /noi /p:64
-
 !include winmake\common3.mak
 
 #*******************************************************************************
@@ -109,6 +108,7 @@ ALL: $(CONTRIB_PROJECT)
 !endif
 
 LINK_CMD       =$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) -exetype:nt -subsystem:console -noi $**,$@,,
+HRB_LINK_CMD   =$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) -exetype:nt -subsystem:console -noi $(HARBOUR_EXE_OBJS),$(HARBOUR_EXE),,$(HRB_LIBS),,$(HARBOUR_EXE_RES)
 HB_CMD         =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN    =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) -d_USE_APPMAIN_ $** -o$@
 DLLEXE_LINK_CMD=$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) -exetype:nt -subsystem:console -noi $**,$@,,$(PDFLITE_LIB) $(HARBOUR_DLL_LIB)
@@ -117,7 +117,9 @@ CCC_CMD        =$(CC) $(CLIBFLAGS) -o$@ $**
 CC_CMD_ZIP     =$(CC) -o+s -cpp -mn -I"include" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(HBZIP_DIR)\include" -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -o$@ $**
 LIB_CMD        =$(LIBEXE) $(ARFLAGS) $@ $**
 LIB_CMD_1      =$(HBLIB_EXE) __DMC__ $(LIBEXE) "$(ARFLAGS)" $@ "winmake\rtl.lst" $(OBJ_DIR)
-DLL_LINK_CMD   =$(HBLIB_EXE) __DMC__ $(LINKEXE) "-exetype:nt -su:console -noi" $@ "winmake\dll.lst" $(OBJ_DIR) DLL $(EXPORT_DEF) $(VM_LIB_OBJS)
+DLL_LINK_CMD   =$(HBLIB_EXE) __DMC__ $(LINKEXE) "-exetype:nt -su:console -noi" $@ "winmake\dll.lst" $(OBJ_DIR) DLL $(EXPORT_DEF) $(HARBOUR_DLL_RES) $(VM_LIB_OBJS)
+IMPLIB_CMD     =$(IMPLIBEXE) $@ $** /system /noi /p:64
+RC_CMD         =$(RC) $** -32 -r -o$@
 
 #===============================================================================
 # Building rules of Object files

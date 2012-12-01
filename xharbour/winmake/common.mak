@@ -215,6 +215,7 @@ HARBOUR_DLL_LIB =$(BIN_DIR)$(DIR_SEP)$(LIBPREFIX)xharbour$(LIBEXT)
 #===============================================================================
 # Macros For Standard Executable
 #===============================================================================
+HBRC_EXE    =$(BIN_DIR)$(DIR_SEP)hbrc$(HB_DEBUG).exe
 HBLIB_EXE   =$(BIN_DIR)$(DIR_SEP)hblib$(HB_DEBUG).exe
 HARBOUR_EXE =$(BIN_DIR)$(DIR_SEP)harbour$(HB_DEBUG).exe
 HBPP_EXE    =$(BIN_DIR)$(DIR_SEP)hbpp$(HB_DEBUG).exe
@@ -228,6 +229,36 @@ HBMAKE_EXE  =$(BIN_DIR)$(DIR_SEP)hbmake$(HB_DEBUG).exe
 HBEXTERN_EXE=$(BIN_DIR)$(DIR_SEP)hbextern$(HB_DEBUG).exe
 HBFORMAT_EXE=$(BIN_DIR)$(DIR_SEP)hbformat$(HB_DEBUG).exe
 XBSCRIPT_EXE=$(BIN_DIR)$(DIR_SEP)xbscript$(HB_DEBUG).exe
+
+#===============================================================================
+# Resource files
+#===============================================================================
+HARBOUR_EXE_RC  =$(OBJ_DIR)$(DIR_SEP)harbour$(HB_DEBUG).exe.rc
+HBPP_EXE_RC     =$(OBJ_DIR)$(DIR_SEP)hbpp$(HB_DEBUG).exe.rc
+PPGEN_EXE_RC    =$(OBJ_DIR)$(DIR_SEP)ppgen$(HB_DEBUG).exe.rc
+HBFILERE_EXE_RC =$(OBJ_DIR)$(DIR_SEP)hbfilere$(HB_DEBUG).exe.rc
+HBRUN_EXE_RC    =$(OBJ_DIR)$(DIR_SEP)hbrun$(HB_MT)$(HB_DEBUG).exe.rc
+HBTEST_EXE_RC   =$(OBJ_DIR)$(DIR_SEP)hbtest$(HB_MT)$(HB_DEBUG).exe.rc
+HBDOC_EXE_RC    =$(OBJ_DIR)$(DIR_SEP)hbdoc$(HB_DEBUG).exe.rc
+HBDICT_EXE_RC   =$(OBJ_DIR)$(DIR_SEP)hbdict$(HB_DEBUG).exe.rc
+HBMAKE_EXE_RC   =$(OBJ_DIR)$(DIR_SEP)hbmake$(HB_DEBUG).exe.rc
+HBEXTERN_EXE_RC =$(OBJ_DIR)$(DIR_SEP)hbextern$(HB_DEBUG).exe.rc
+HBFORMAT_EXE_RC =$(OBJ_DIR)$(DIR_SEP)hbformat$(HB_DEBUG).exe.rc
+XBSCRIPT_EXE_RC =$(OBJ_DIR)$(DIR_SEP)xbscript$(HB_DEBUG).exe.rc
+HARBOUR_EXE_RES =$(OBJ_DIR)$(DIR_SEP)harbour$(HB_DEBUG).exe$(RESEXT)
+HBPP_EXE_RES    =$(OBJ_DIR)$(DIR_SEP)hbpp$(HB_DEBUG).exe$(RESEXT)
+PPGEN_EXE_RES   =$(OBJ_DIR)$(DIR_SEP)ppgen$(HB_DEBUG).exe$(RESEXT)
+HBFILERE_EXE_RES=$(OBJ_DIR)$(DIR_SEP)hbfilere$(HB_DEBUG).exe$(RESEXT)
+HBRUN_EXE_RES   =$(OBJ_DIR)$(DIR_SEP)hbrun$(HB_MT)$(HB_DEBUG).exe$(RESEXT)
+HBTEST_EXE_RES  =$(OBJ_DIR)$(DIR_SEP)hbtest$(HB_MT)$(HB_DEBUG).exe$(RESEXT)
+HBDOC_EXE_RES   =$(OBJ_DIR)$(DIR_SEP)hbdoc$(HB_DEBUG).exe$(RESEXT)
+HBDICT_EXE_RES  =$(OBJ_DIR)$(DIR_SEP)hbdict$(HB_DEBUG).exe$(RESEXT)
+HBMAKE_EXE_RES  =$(OBJ_DIR)$(DIR_SEP)hbmake$(HB_DEBUG).exe$(RESEXT)
+HBEXTERN_EXE_RES=$(OBJ_DIR)$(DIR_SEP)hbextern$(HB_DEBUG).exe$(RESEXT)
+HBFORMAT_EXE_RES=$(OBJ_DIR)$(DIR_SEP)hbformat$(HB_DEBUG).exe$(RESEXT)
+XBSCRIPT_EXE_RES=$(OBJ_DIR)$(DIR_SEP)xbscript$(HB_DEBUG).exe$(RESEXT)
+HARBOUR_DLL_RC  =$(OBJ_DIR)$(DIR_SEP)xharbour$(HB_DEBUG).dll.rc
+HARBOUR_DLL_RES =$(OBJ_DIR)$(DIR_SEP)xharbour$(HB_DEBUG).dll$(RESEXT)
 
 #===============================================================================
 # xHarbour Libraries for building standard executables
@@ -2395,6 +2426,7 @@ ST_PROJECT=\
 	$(PPGEN_EXE)\
 	$(PP_LIB)\
 	$(COMPILER_LIB)\
+	$(HBRC_EXE)\
 	$(HARBOUR_EXE)\
 	$(VM_LIB)\
 	$(RTL_LIB)\

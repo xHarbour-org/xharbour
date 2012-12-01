@@ -10,6 +10,7 @@
 #===============================================================================
 !include winmake\common.mak
 
+RC        =BRC32
 CC        =BCC32
 LINKEXE   =ILINK32
 LIBEXE    =TLIB
@@ -52,7 +53,6 @@ ARFLAGS=/0 /C /P256
 WARNINGFLAGS =-w -w-8071 -w-8061 -w-8080
 !endif
 
-IMPLIB_CMD    =$(IMPLIBEXE) $@ $**
 
 !include winmake\common3.mak
 
@@ -120,6 +120,9 @@ HARBOUR_DLL_OBJS=\
 	$(GTWVG_LIB_OBJS)
 !endif
 
+DLL_PROJECT=\
+	$(DLL_PROJECT)
+
 !if ("$(HB_ADS_CREATEIMPLIB)"=="1")
 DLL_PROJECT=\
 	$(ACE32_LIB)\
@@ -155,10 +158,13 @@ CC_CMD         =$(CC) -c -tWM $(CLIBFLAGS) -o$@ $**
 CCC_CMD        =$(CC_CMD)
 CC_CMD_ZIP     =$(CC) -c -tWM $(CC_DEBUGFLAGS) -I"$(HBZIP_DIR)\include" -I"include" -Ve -R- -H- $(OPTFLAGS) -w- -X- -b -k- -o$@ $**
 LINK_CMD       =$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) -ap -Tpe -x -Gn -C -L$(LIB_DIR) $(LFLAGS) c0x32.obj $**,$@,,
+HRB_LINK_CMD   =$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) -ap -Tpe -x -Gn -C -L$(LIB_DIR) $(LFLAGS) c0x32.obj $(HARBOUR_EXE_OBJS),$(HARBOUR_EXE),,$(HRB_LIBS),,$(HARBOUR_EXE_RES)
 LIB_CMD        =$(HBLIB_EXE) __BORLANDC__ $(LIBEXE) "$(ARFLAGS)" $@ $**
 LIB_CMD_1      =$(HBLIB_EXE) __BORLANDC__ $(LIBEXE) "$(ARFLAGS)" $@ "winmake\rtl.lst" $(OBJ_DIR)
-DLL_LINK_CMD   =@$(HBLIB_EXE) __BORLANDC__ $(LINKEXE) "-C -aa -Tpd -Gn -Gi" $@ "winmake\dll.lst" $(OBJ_DIR) DLL $(RTL_DIR)\bcc.def $(VM_LIB_OBJS) $(TIFF_LIB_OBJS)
+DLL_LINK_CMD   =@$(HBLIB_EXE) __BORLANDC__ $(LINKEXE) "-C -aa -Tpd -Gn -Gi" $@ "winmake\dll.lst" $(OBJ_DIR) DLL $(RTL_DIR)\bcc.def $(HARBOUR_DLL_RES) $(VM_LIB_OBJS) $(TIFF_LIB_OBJS)
 DLLEXE_LINK_CMD=$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) $(LINKERFLAGS) c0x32.obj $**,$@,,$(PDFLITE_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+IMPLIB_CMD     =$(IMPLIBEXE) $@ $**
+RC_CMD         =$(RC) -r -i$(CC_DIR)\include $** -fo$@
 
 #===============================================================================
 # Building rules of Object files

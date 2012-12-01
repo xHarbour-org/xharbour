@@ -12,14 +12,13 @@
 #===============================================================================
 # LINK COMMANDS
 #===============================================================================
-HRB_LINK_CMD=$(LINK_CMD) $(HRB_LIBS)
 EXE_LINK_CMD=$(LINK_CMD) $(START_UP_OBJ) $(EXE_LIBS)
 CMN_LINK_CMD=$(LINK_CMD) $(CMN_LIBS)
 
 #===============================================================================
 # Executable dependencies and build rules
 #===============================================================================
-$(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
+$(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS) $(HARBOUR_EXE_RES)
 	$(HRB_LINK_CMD)
 	$(MT_CMD)
 
@@ -88,6 +87,21 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
 	$(MT_CMD)
 
 #===============================================================================
+# Resource Dependencies
+#===============================================================================
+$(HARBOUR_EXE_RES) : $(HARBOUR_EXE_RC)
+	$(RC_CMD)
+
+$(HARBOUR_EXE_RC) :
+	$(HBRC_EXE) $(HARBOUR_EXE_RC) "xHarbour Compiler" "harbour.exe" "1999-2013, http://www.xharbour.org/" "The xHarbour Team" "xHarbour Open Source" "resource/xhb.ico"
+
+$(HARBOUR_DLL_RES) : $(HARBOUR_DLL_RC)
+	$(RC_CMD)
+
+$(HARBOUR_DLL_RC) :
+	$(HBRC_EXE) $(HARBOUR_DLL_RC) "xHarbour Runtime" "xharbour.dll" "1999-2013, http://www.xharbour.org/" "The xHarbour Team" "xHarbour Open Source"
+
+#===============================================================================
 # HBXDIFF.LIB
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)corexdiff$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)core.c
@@ -148,6 +162,15 @@ $(HBLIB_EXE) : $(OBJ_DIR)$(DIR_SEP)hblib$(OBJEXT)
 	$(LINK_CMD) $(COMPILERLIBS)
 
 $(OBJ_DIR)$(DIR_SEP)hblib$(OBJEXT) : utils$(DIR_SEP)misc$(DIR_SEP)hblib.c
+	$(CC_CMD)
+
+#===============================================================================
+# HBRC.EXE
+#===============================================================================
+$(HBRC_EXE) : $(OBJ_DIR)$(DIR_SEP)hbrc$(OBJEXT)
+	$(LINK_CMD) $(COMPILERLIBS)
+
+$(OBJ_DIR)$(DIR_SEP)hbrc$(OBJEXT) : utils$(DIR_SEP)misc$(DIR_SEP)hbrc.c
 	$(CC_CMD)
 
 #===============================================================================
