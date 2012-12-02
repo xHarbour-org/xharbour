@@ -71,7 +71,7 @@ DATA  aCs            Init  {}
 DATA  aObjs          Init  {}
 DATA  aObjsc         Init  {}
 DATA  aRes           Init  {}
-DATA  nLinkHandle 
+DATA  nLinkHandle
 DATA  cLinkcomm      Init  ''
 DATA  lCompress      Init .F.
 DATA  lForce         Init .F.
@@ -83,7 +83,6 @@ DATA  lIgnoreErrors  Init .F.
 DATA  lExtended      Init .T.
 DATA  lOs2           Init .F.
 DATA  lRecurse       Init .F.
-DATA  aDir
 DATA  lEditMode      Init .F.
 DATA  aDir
 DATA  aLangMessages  init {}

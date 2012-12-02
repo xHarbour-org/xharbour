@@ -1520,7 +1520,6 @@ CLASS HBOrder
    METHOD Destroy() INLINE ( ::alias )->( ordDestroy( ::Tag, ::cOrderBag ) )
    METHOD ordDestroy() INLINE ( ::alias )->( ordDestroy( ::Tag, ::cOrderBag ) )
    METHOD ordBagExt() INLINE ( ::alias )->( ordBagExt() )
-   METHOD ordKeyCount() INLINE ( ::alias )->( ordKeyCount( ::Tag, ::cOrderBag ) )
    METHOD ordFor() INLINE ( ::alias )->( ordFor( ::Tag, ::cOrderBag ) )
    METHOD ordIsUnique() INLINE ( ::alias )->( ordIsUnique( ::Tag, ::cOrderBag ) )
    METHOD ordKey() INLINE ( ::alias )->( ordKey( ::Tag, ::cOrderBag ) )
