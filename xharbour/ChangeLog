@@ -8,6 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-02 11:40 UTC-200 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+  * source/rtl/fstemp.c 
+    ! Fixed compilation under *nix
+  * source/rtl/hbip.c     
+    ! Fixed compilation under linux by applying correct cast in place of SOCKET
+  * include/inet.h
+    ! protected stucture HB_PINGREPLY with !defined(HB_OS_UNIX)  
+  + contrib/hbhpdf/Makefile 
+    ! Added makefile to build hbhpdf under *nix
+  + contrib/hbmxml/Makefile 
+    ! Added makefile to build hbmxml under *nix
+    
 2012-12-02 08:33 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/ttable.prg
     * METHOD ordkeycount() was doubly defined, fixed.

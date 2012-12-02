@@ -260,7 +260,7 @@ PHB_ITEM hb_idleDelFunc( void * pID )
             pID == ( void * ) pItem->item.asArray.value ) )
       {
          --s_uiIdleMaxTask;
-         hb_itemRelease( pItem );   // 23/02/2004 1:58p.m. Peter Rees: added line to fix memory leak
+         //hb_itemRelease( pItem );   // 23/02/2004 1:58p.m. Peter Rees: added line to fix memory leak
          if( s_uiIdleMaxTask )
          {
             if( iTask != s_uiIdleMaxTask )
