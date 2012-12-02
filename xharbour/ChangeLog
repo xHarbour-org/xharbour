@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-02 12:40 UTC-200 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+  * contrib/Makefile
+    ! added hbhpdf and hbmxml folder
+    
 2012-12-02 11:40 UTC-200 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/rtl/fstemp.c 
     ! Fixed compilation under *nix

@@ -42,6 +42,9 @@ DIRS=\
 	hbcurl \
 	tipssl \
 	hblzf \
+	hbhpdf \
+	hbmxml \
+	
 	
 
 endif
