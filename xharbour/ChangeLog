@@ -8,10 +8,52 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-03 18:48 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbapi.h
+  * source/rtl/tprinter.c
+  * source/vm/set.c
+  * source/vm/hvm.c
+  * source/vm/garbage.c
+  * source/vm/arrays.c
+  * source/vm/fastitem.c
+  * source/vm/errorapi.c
+  * source/rtl/filebuf.c
+  * source/rtl/version.c
+  * source/rtl/fparse.c
+  * source/rtl/console.c
+  * source/rtl/hbserv.c
+  * source/rtl/isprint.c
+    ! some functions to be under extern "C"
+
+  * tests/regexall.prg
+    ! function not returning value, fixed
+
+  * winmake/compile.mak
+    ! do not compile pcre-related modules in C++
+
+  * source/rtl/regex.c
+    ! code clean-ups and formatting
+
+  * source/rtl/pcre/*.*
+    ! updated to version 8.32
+    ! folder refreshed
+
+  * source/rtl/hbping.c
+  * tests/testping.prg
+    ! allow to override default packet size and timeout.
+      Syntax: HB_PING( cHost, @cResult, iPacketSize, iTimeOut, @cAddress, @cHostName, @iRTT )
+        cHost       = string, hostname of IP address to query
+        cResult     = passed by ref string, string to hold ping response
+        iPacketSize = integer, size of data to send, default 32
+        iTimeOut    = integer, response waiting time, default 5000ms
+        cAddress    = passed by ref string, string to host address as replied
+        cHostName   = passed by ref string, string to host name as replied
+        iRTT        = passed by ref integer, is Round Trip Time
+
 2012-12-02 12:40 UTC-200 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * contrib/Makefile
     ! added hbhpdf and hbmxml folder
-    
+
 2012-12-02 11:40 UTC-200 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/rtl/fstemp.c 
     ! Fixed compilation under *nix

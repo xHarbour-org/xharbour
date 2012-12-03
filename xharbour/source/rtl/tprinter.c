@@ -64,9 +64,14 @@
 #include "hbapi.h"
 #include "hbapiitm.h"
 
-BOOL hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize );
-BOOL hb_SetDefaultPrinter( LPTSTR pPrinterName );
-BOOL hb_GetPrinterNameByPort( LPTSTR pPrinterName, LPDWORD pdwBufferSize, const char * pPortName, BOOL bSubStr );
+HB_EXTERN_BEGIN
+extern BOOL hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize );
+extern BOOL hb_SetDefaultPrinter( LPTSTR pPrinterName );
+extern BOOL hb_GetPrinterNameByPort( LPTSTR pPrinterName, LPDWORD pdwBufferSize, const char * pPortName, BOOL bSubStr );
+extern BOOL hb_isLegacyDevice( LPTSTR pPrinterName );
+extern BOOL hb_PrinterExists( LPTSTR pPrinterName );
+extern LONG hb_PrintFileRaw( const char * cPrinterName, const char * cFileName, const char * cDocName );
+HB_EXTERN_END
 
 #define MAXBUFFERSIZE 255
 
@@ -90,7 +95,6 @@ BOOL hb_isLegacyDevice( LPTSTR pPrinterName )
    }
    return bLegacyDev;
 }
-
 
 BOOL hb_PrinterExists( LPTSTR pPrinterName )
 {
@@ -116,9 +120,7 @@ BOOL hb_PrinterExists( LPTSTR pPrinterName )
                if( EnumPrinters( Flags, NULL, 4, ( LPBYTE ) pPrinterEnum4, needed, &needed, &returned ) )
                {
                   for( a = 0; ! Result && a < returned; a++, pPrinterEnum4++ )
-                  {
                      Result = ( strcmp( ( const char * ) pPrinterName, ( const char * ) pPrinterEnum4->pPrinterName ) == 0 );
-                  }
                }
                hb_xfree( buffer4 );
             }
@@ -138,9 +140,8 @@ HB_FUNC( PRINTEREXISTS )
    BOOL Result = FALSE;
 
    if( ISCHAR( 1 ) )
-   {
       Result = hb_PrinterExists( ( LPSTR ) hb_parcx( 1 ) );
-   }
+
    hb_retl( Result );
 }
 
@@ -157,14 +158,14 @@ BOOL hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize )
       typedef BOOL ( WINAPI * DEFPRINTER )( LPTSTR, LPDWORD );                   // stops warnings
       DEFPRINTER  fnGetDefaultPrinter;
       HMODULE     hWinSpool = LoadLibrary( "winspool.drv" );
+
       if( hWinSpool )
       {
          fnGetDefaultPrinter = ( DEFPRINTER ) GetProcAddress( hWinSpool, "GetDefaultPrinterA" );
 
          if( fnGetDefaultPrinter )
-         {
             Result = ( *fnGetDefaultPrinter )( pPrinterName, pdwBufferSize );
-         }
+
          FreeLibrary( hWinSpool );
       }
    }
@@ -184,25 +185,23 @@ BOOL hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize )
          Result                  = TRUE;
       }
       else
-      {
          *pdwBufferSize = dwSize + 1;
-      }
    }
 
    if( ! Result && osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
    {
 /*
-      This option should never be required but is included because of this article
-
-          http://support.microsoft.com/kb/246772/en-us
-
-      This option will not enumerate any network printers.
-
-      From the SDK technical reference for EnumPrinters();
-
-      If Level is 2 or 5, Name is a pointer to a null-terminated string that specifies
-      the name of a server whose printers are to be enumerated.
-      If this string is NULL, then the function enumerates the printers installed on the local machine.
+ *    This option should never be required but is included because of this article
+ *
+ *        http://support.microsoft.com/kb/246772/en-us
+ *
+ *    This option will not enumerate any network printers.
+ *
+ *    From the SDK technical reference for EnumPrinters();
+ *
+ *    If Level is 2 or 5, Name is a pointer to a null-terminated string that specifies
+ *    the name of a server whose printers are to be enumerated.
+ *    If this string is NULL, then the function enumerates the printers installed on the local machine.
  */
 
       DWORD             dwNeeded, dwReturned;
@@ -232,25 +231,21 @@ BOOL hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize )
    return Result;
 }
 
-
 HB_FUNC( GETDEFAULTPRINTER )
 {
    char  szDefaultPrinter[ MAXBUFFERSIZE ];
    DWORD pdwBufferSize = MAXBUFFERSIZE;
 
    if( hb_GetDefaultPrinter( ( LPTSTR ) &szDefaultPrinter, &pdwBufferSize ) )
-   {
       hb_retclen( szDefaultPrinter, pdwBufferSize - 1 );
-   }
    else
-   {
       hb_retc( "" );
-   }
 }
 
-// You are explicitly linking to SetDefaultPrinter because implicitly
-// linking on Windows 95/98 or NT4 results in a runtime error.
-// This block specifies which text version you explicitly link to.
+/* You are explicitly linking to SetDefaultPrinter because implicitly
+ * linking on Windows 95/98 or NT4 results in a runtime error.
+ * This block specifies which text version you explicitly link to.
+ */
 #ifdef UNICODE
   #define SETDEFAULTPRINTER   "SetDefaultPrinterW"
 #else
@@ -284,7 +279,6 @@ BOOL hb_SetDefaultPrinter( LPTSTR pPrinterName )
    /* If Windows 95 or 98, use SetPrinter. */
    if( osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
    {
-
       /* Open this printer so you can get information about it. */
       bFlag = OpenPrinter( pPrinterName, &hPrinter, NULL );
       if( ! bFlag || ! hPrinter )
@@ -323,7 +317,7 @@ BOOL hb_SetDefaultPrinter( LPTSTR pPrinterName )
          return FALSE;
       }
 
-      // Set default printer attribute for this printer.
+      /* Set default printer attribute for this printer. */
       ppi2->Attributes  |= PRINTER_ATTRIBUTE_DEFAULT;
       bFlag             = SetPrinter( hPrinter, 2, ( LPBYTE ) ppi2, 0 );
       if( ! bFlag )
@@ -437,11 +431,13 @@ BOOL hb_SetDefaultPrinter( LPTSTR pPrinterName )
 
    }
 
-   // Clean up.
+   /* Clean up. */
    if( hPrinter )
       ClosePrinter( hPrinter );
+
    if( ppi2 )
       GlobalFree( ppi2 );
+
    if( pBuffer )
       GlobalFree( pBuffer );
 
@@ -453,7 +449,6 @@ HB_FUNC( SETDEFAULTPRINTER )
 {
    hb_retl( hb_SetDefaultPrinter( ( LPSTR ) hb_parc( 1 ) ) );
 }
-
 
 BOOL hb_GetPrinterNameByPort( LPTSTR pPrinterName, LPDWORD pdwBufferSize, const char * pPortName, BOOL bSubStr )
 {
@@ -474,13 +469,10 @@ BOOL hb_GetPrinterNameByPort( LPTSTR pPrinterName, LPDWORD pdwBufferSize, const 
          {
 
             if( bSubStr )
-            {
                bFound = ( hb_strnicmp( pPrinterEnum->pPortName, pPortName, strlen( pPortName ) ) == 0 );
-            }
             else
-            {
                bFound = ( hb_stricmp( pPrinterEnum->pPortName, pPortName ) == 0 );
-            }
+
             if( bFound )
             {
                if( *pdwBufferSize >= strlen( pPrinterEnum->pPrinterName ) + 1 )
@@ -488,7 +480,7 @@ BOOL hb_GetPrinterNameByPort( LPTSTR pPrinterName, LPDWORD pdwBufferSize, const 
                   hb_xstrcpy( pPrinterName, pPrinterEnum->pPrinterName, 0 );
                   Result = TRUE;
                }
-               // Store name length + \0 char for return
+               /* Store name length + \0 char for return */
                *pdwBufferSize = ( DWORD ) strlen( pPrinterEnum->pPrinterName ) + 1;
             }
          }
@@ -504,14 +496,11 @@ HB_FUNC( PRINTERPORTTONAME )
    DWORD pdwBufferSize = MAXBUFFERSIZE;
 
    if( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 && hb_GetPrinterNameByPort( ( LPTSTR ) &szDefaultPrinter, &pdwBufferSize, hb_parcx( 1 ), ISLOG( 2 ) ? hb_parl( 2 ) : FALSE ) )
-   {
       hb_retc( szDefaultPrinter );
-   }
    else
-   {
       hb_retc( "" );
-   }
 }
+
 #define BIG_PRINT_BUFFER ( 1024 * 32 )
 
 LONG hb_PrintFileRaw( const char * cPrinterName, const char * cFileName, const char * cDocName )
@@ -536,36 +525,31 @@ LONG hb_PrintFileRaw( const char * cPrinterName, const char * cFileName, const c
                while( ReadFile( hFile, printBuffer, BIG_PRINT_BUFFER, &nRead, NULL ) && ( nRead > 0 ) )
                {
                   if( printBuffer[ nRead - 1 ] == 26 )
-                  {
-                     nRead--;  // Skip the EOF() character
-                  }
+                     nRead--;  /* Skip the EOF() character */
+
                   WritePrinter( hPrinter, printBuffer, nRead, &nWritten );
                }
                Result = 1;
                CloseHandle( hFile );
             }
             else
-            {
                Result = ( DWORD ) -6;
-            }
+
             EndPagePrinter( hPrinter );
          }
          else
-         {
             Result = ( DWORD ) -4;
-         }
+
          EndDocPrinter( hPrinter );
       }
       else
-      {
          Result = ( DWORD ) -3;
-      }
+
       ClosePrinter( hPrinter );
    }
    else
-   {
       Result = ( DWORD ) -2;
-   }
+
    return Result;
 }
 
@@ -596,16 +580,13 @@ HB_FUNC( GETPRINTERS )
    ULONG             needed = 0, returned = 0, a;
    PHB_ITEM          SubItems, File, Port, Net, Driver, Share, ArrayPrinter = hb_itemNew( NULL );
 
-
    hb_arrayNew( ArrayPrinter, 0 );
 
    buffer = NULL;
    HB_TRACE( HB_TR_DEBUG, ( "GETPRINTERS()" ) );
 
    if( ISLOG( 1 ) )
-   {
       bPrinterNamesOnly = ! hb_parl( 1 );
-   }
 
    bLocalPrintersOnly = ISLOG( 2 ) ? hb_parl( 2 ) : FALSE;
 
@@ -670,19 +651,13 @@ HB_FUNC( GETPRINTERS )
                                  }
 
                                  if( pPrinterEnum4->Attributes & PRINTER_ATTRIBUTE_LOCAL )
-                                 {
                                     hb_itemPutC( Net, "LOCAL" );
-                                 }
                                  else
                                  {
                                     if( pPrinterEnum4->Attributes & PRINTER_ATTRIBUTE_NETWORK )
-                                    {
                                        hb_itemPutC( Net, "NETWORK" );
-                                    }
                                     else
-                                    {
                                        hb_itemPutC( Net, "ERROR" );
-                                    }
                                  }
 
                                  hb_arrayAddForward( SubItems, File );
@@ -735,7 +710,7 @@ HB_FUNC( GETPRINTERS )
                      }
                      else
                      {
-                        // Tony (ABC)   11/1/2005        1:40PM.
+                        /* Tony (ABC)   11/1/2005        1:40PM. */
                         for( a = 0; a < returned; a++, pPrinterEnum++ )
                         {
                            if( ! bLocalPrintersOnly || pPrinterEnum->Attributes & PRINTER_ATTRIBUTE_LOCAL )
@@ -772,19 +747,13 @@ HB_FUNC( GETPRINTERS )
                                        }
 
                                        if( pPrinterEnum->Attributes & PRINTER_ATTRIBUTE_LOCAL )
-                                       {
                                           hb_itemPutC( Net, "LOCAL" );
-                                       }
                                        else
                                        {
                                           if( pPrinterEnum->Attributes & PRINTER_ATTRIBUTE_NETWORK )
-                                          {
                                              hb_itemPutC( Net, "NETWORK" );
-                                          }
                                           else
-                                          {
                                              hb_itemPutC( Net, "ERROR" );
-                                          }
                                        }
 
                                        hb_arrayAddForward( SubItems, File );
@@ -807,31 +776,33 @@ HB_FUNC( GETPRINTERS )
                               CloseHandle( hPrinter );
                            }
                         }
-                        // Tony (ABC)   11/1/2005        1:40PM. Old Code... Justo in case.
-//                        hb_arrayNew( &SubItems, 0 );
-//                        hb_itemPutC( &File, pPrinterEnum->pPrinterName );
-//                        hb_itemPutC( &Port, pPrinterEnum->pPortName );
+/*
+*                         // Tony (ABC)   11/1/2005        1:40PM. Old Code... Justo in case.
+*                         hb_arrayNew( &SubItems, 0 );
+*                         hb_itemPutC( &File, pPrinterEnum->pPrinterName );
+*                         hb_itemPutC( &Port, pPrinterEnum->pPortName );
 
-//                        if ( pPrinterEnum->Attributes & PRINTER_ATTRIBUTE_LOCAL)
-//                        {
-//                           hb_itemPutC( &Net,"LOCAL" );
-//                        }
-//                        else
-//                        {
-//                           if ( pPrinterEnum->Attributes & PRINTER_ATTRIBUTE_NETWORK)
-//                           {
-//                              hb_itemPutC( &Net,"NETWORK" );
-//                           }
-//                           else
-//                           {
-//                              hb_itemPutC( &Net, "ERROR" );
-//                           }
-//                        }
-
-//                        hb_arrayAddForward( &SubItems , &File ) ;
-//                        hb_arrayAddForward( &SubItems , &Port ) ;
-//                        hb_arrayAddForward( &SubItems, &Net ) ;
-//                        hb_arrayAddForward( &ArrayPrinter , &SubItems );
+*                         if ( pPrinterEnum->Attributes & PRINTER_ATTRIBUTE_LOCAL)
+*                         {
+*                            hb_itemPutC( &Net,"LOCAL" );
+*                         }
+*                         else
+*                         {
+*                            if ( pPrinterEnum->Attributes & PRINTER_ATTRIBUTE_NETWORK)
+*                            {
+*                               hb_itemPutC( &Net,"NETWORK" );
+*                            }
+*                            else
+*                            {
+*                               hb_itemPutC( &Net, "ERROR" );
+*                            }
+*                         }
+*
+*                         hb_arrayAddForward( &SubItems , &File ) ;
+*                         hb_arrayAddForward( &SubItems , &Port ) ;
+*                         hb_arrayAddForward( &SubItems, &Net ) ;
+*                         hb_arrayAddForward( &ArrayPrinter , &SubItems );
+*/
                      }
                   }
                }
@@ -845,5 +816,3 @@ HB_FUNC( GETPRINTERS )
 }
 
 #endif
-
-

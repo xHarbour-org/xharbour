@@ -73,4 +73,4 @@ FUNCTION Main()
    ?
    wait
 
-RETURN
+RETURN NIL

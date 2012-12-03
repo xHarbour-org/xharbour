@@ -144,31 +144,31 @@ static PHB_ITEM   s_pError       = NULL;
 
 /* In MT, this data is held in the stack */
 #ifndef HB_THREAD_SUPPORT
-static PHB_ERROR_INFO   s_errorHandler = NULL;
-static PHB_ITEM            s_errorBlock;
-static int                 s_iLaunchCount = 0;
-static USHORT              s_uiErrorDOS   = 0; /* The value of DOSERROR() */
+   static PHB_ERROR_INFO  s_errorHandler = NULL;
+   static PHB_ITEM        s_errorBlock;
+   static int             s_iLaunchCount = 0;
+   static USHORT          s_uiErrorDOS   = 0; /* The value of DOSERROR() */
 #else
-   #define s_errorHandler  ( HB_VM_STACK.errorHandler )
-   #define s_errorBlock    ( HB_VM_STACK.errorBlock )
-   #define s_iLaunchCount  ( HB_VM_STACK.iLaunchCount )
-   #define s_uiErrorDOS    ( HB_VM_STACK.uiErrorDOS )
+#  define s_errorHandler  ( HB_VM_STACK.errorHandler )
+#  define s_errorBlock    ( HB_VM_STACK.errorBlock )
+#  define s_iLaunchCount  ( HB_VM_STACK.iLaunchCount )
+#  define s_uiErrorDOS    ( HB_VM_STACK.uiErrorDOS )
 
-   #ifdef HB_OS_OS2
-      #include "thread.h"
-   #endif
+#  ifdef HB_OS_OS2
+#     include "thread.h"
+#  endif
 
 #endif
 
 #if ! defined( HB_OS_DOS ) && ! defined( HB_OS_DARWIN_5 )
-   #include "hbserv.h"
+#   include "hbserv.h"
 /* extern BOOL hb_isService(void); */
 #endif
 
+HB_EXTERN_BEGIN
 extern int     hb_vm_iTry;
 extern HB_ITEM hb_vm_BreakBlock;
-
-
+HB_EXTERN_END
 
 static BOOL hb_errGetNumCode( int * piValue, const char * szOperation )
 {

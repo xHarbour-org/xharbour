@@ -68,9 +68,11 @@
 #include "hbapilng.h"
 #include "hbver.h"
 
+HB_EXTERN_BEGIN
 extern char * hb_verPCode( void );
-extern void hb_ParseLine( PHB_ITEM pReturn, const char * szText, int iDelimiter, int * iWord );
-extern int hb_arrayMode( void );
+extern void   hb_ParseLine( PHB_ITEM pReturn, const char * szText, int iDelimiter, int * iWord );
+extern int    hb_arrayMode( void );
+HB_EXTERN_END
 
 HB_FUNC( OS )
 {
@@ -134,27 +136,21 @@ HB_FUNC( HB_BUILDINFO )
       HB_SIZE  iLen     = strlen( szInfo );
 
       if( hb_stricmp( szInfo, "yes" ) == 0 )
-      {
          hb_arraySetForward( &Return, ui + 1, hb_itemPutL( &Temp, TRUE ) );
-      }
       else if( hb_stricmp( szInfo, "no" ) == 0 )
-      {
          hb_arraySetForward( &Return, ui + 1, hb_itemPutL( &Temp, FALSE ) );
-      }
       else if( iLen > 5 && ( szInfo[ iLen - 1 ] == ')' && szInfo[ iLen - 2 ] == 'm' && szInfo[ iLen - 3 ] == 'u' && szInfo[ iLen - 4 ] == 'n' && szInfo[ iLen - 5 ] == '(' ) )
       {
          szInfo[ iLen - 5 ] = 0;
          hb_arraySetForward( &Return, ui + 1, hb_itemPutNI( &Temp, atoi( szInfo ) ) );
       }
       else
-      {
          hb_arraySetForward( &Return, ui + 1, hb_itemPutC( &Temp, szInfo ) );
-      }
 
       hb_xfree( szInfo );
    }
 
-   // add info on MT and VM Optimization
+   /* add info on MT and VM Optimization */
    {
       PHB_ITEM pMT   = hb_itemDoC( "HB_MULTITHREAD", 0, NULL, NULL );
       BOOL     lMT   = pMT->item.asLogical.value;
@@ -168,13 +164,13 @@ HB_FUNC( HB_BUILDINFO )
       hb_itemRelease( pOpt );
    }
 
-   // Default Language
+   /* Default Language */
    hb_arrayAddForward( &Return, hb_itemPutC( &Temp, hb_langID() ) );
 
-   // Array Mode, 0 = Counter, 1 = Owner
+   /* Array Mode, 0 = Counter, 1 = Owner */
    hb_arrayAddForward( &Return, hb_itemPutNI( &Temp, hb_arrayMode() ) );
 
-   // Contributors
+   /* Contributors */
    {
       HB_ITEM  Credits;
       char *   szCredits = hb_credits();
@@ -199,32 +195,8 @@ HB_FUNC( HB_BUILDINFO )
       hb_itemClear( &Return );
    }
    else
-   {
       hb_itemReturnForward( &Return );
-   }
 
    hb_itemClear( &hbInfo );
 
 }
-
-#define __PRG_SOURCE__     __FILE__
-
-HB_FUNC_EXTERN( HB_VMMODE );
-HB_FUNC_EXTERN( HB_MULTITHREAD );
-
-#undef HB_PRG_PCODE_VER
-#define HB_PRG_PCODE_VER   HB_PCODE_VER
-
-HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_HBVER )
-{
-   "HB_VMMODE", { HB_FS_PUBLIC }, { HB_FUNCNAME( HB_VMMODE ) }, NULL
-},
-{ "HB_MULTITHREAD", { HB_FS_PUBLIC }, { HB_FUNCNAME( HB_MULTITHREAD ) }, NULL }
-HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_HBVER )
-
-#if defined( HB_PRAGMA_STARTUP )
-   #pragma startup hb_vm_SymbolInit_HBVER
-#elif defined( HB_DATASEG_STARTUP )
-   #define HB_DATASEG_BODY HB_DATASEG_FUNC( hb_vm_SymbolInit_HBVER )
-   #include "hbiniseg.h"
-#endif

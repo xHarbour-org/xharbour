@@ -138,8 +138,6 @@
    static BOOL s_bUnInitOle   = FALSE;
 #endif
 
-PHB_FUNC    pHVMFuncService   = NULL;
-
 static void hb_vmClassError( UINT uiParams, const char * szClassName, const char * szMsg, PHB_ITEM pSelf );
 
 HB_FUNC_EXTERN( SYSINIT );
@@ -309,19 +307,20 @@ static int              s_iErrorLevel        = 0;                               
 static ULONG            s_ulProcLevel        = 0;
 #endif
 
-char *                  hb_vm_sNull          = "";
-
 #if 0
 /* init GUI Error Message */
 BOOL                    b_GUIErrorMessage    = FALSE;
 #endif
 
 /* static, for now */
+HB_EXTERN_BEGIN
+PHB_FUNC                pHVMFuncService      = NULL;
 BOOL                    hb_vm_bQuitRequest   = FALSE;
-
+char *                  hb_vm_sNull          = "";
 int                     hb_vm_iTry           = 0;
-
 HB_ITEM                 hb_vm_BreakBlock     = { 0 };
+extern void             hb_filebufInit( void );
+HB_EXTERN_END
 
 static int              s_iBaseLine = 0;
 
@@ -352,8 +351,6 @@ static HB_DYNS ModuleFakeDyn  = { 0 };
 #if ( !defined( __BORLANDC__ ) || defined( __EXPORT__ ) )
 static BOOL    s_Do_xinit = TRUE;
 #endif
-
-extern void hb_filebufInit( void );
 
 void hb_vmAtInit( HB_INIT_FUNC pFunc, void * cargo )
 {

@@ -18,6 +18,7 @@
       #pragma warn(disable:2154)
       #pragma warn(disable:2229)
    #elif defined( _MSC_VER )
+      #pragma warning( disable: 4146 )
       #pragma warning( disable: 4018 )
       #pragma warning( disable: 4065 )
       #pragma warning( disable: 4244 )

@@ -87,6 +87,8 @@ extern void hb_console_safe_lock( void );
 extern void hb_console_safe_unlock( void );
 extern void hb_stack_lock( void );
 extern void hb_stack_unlock( void );
+extern BOOL hb_set_SetPrinterStart( void );
+extern void hb_set_SetPrinterStop( void );
 HB_EXTERN_END
 
 /* NOTE: Some C compilers like BCC32 optimize the call of small static buffers
@@ -116,8 +118,6 @@ static FHANDLE    s_hFilenoStderr   = 2;
 
 static USHORT     s_uiPRow;
 static USHORT     s_uiPCol;
-extern BOOL hb_set_SetPrinterStart( void );
-extern void hb_set_SetPrinterStop( void );
 
 void hb_conInit( void )
 {
@@ -203,14 +203,10 @@ void hb_conOutStd( const char * pStr, HB_SIZE ulLen )
    HB_TRACE( HB_TR_DEBUG, ( "hb_conOutStd(%s, %lu)", pStr, ulLen ) );
 
    if( ulLen == 0 )
-   {
       ulLen = strlen( pStr );
-   }
 
    if( s_bInit )
-   {
       hb_gtPreExt();
-   }
 
    if( ulLen > 0 )
       hb_gtOutStd( ( BYTE * ) pStr, ulLen );
@@ -221,27 +217,21 @@ void hb_conOutErr( const char * pStr, HB_SIZE ulLen )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_conOutErr(%s, %lu)", pStr, ulLen ) );
 
-   #ifdef HB_OS_WIN
+#ifdef HB_OS_WIN
    OutputDebugString( pStr );
-   #endif
+#endif
 
    if( ulLen == 0 )
-   {
       ulLen = strlen( pStr );
-   }
 
    if( s_bInit )
-   {
       hb_gtPreExt();
-   }
 
    if( ulLen > 0 )
       hb_gtOutErr( ( BYTE * ) pStr, ulLen );
 
    if( s_bInit )
-   {
       hb_gtPostExt();
-   }
 }
 
 /* Output an item to the screen and/or printer and/or alternate */
@@ -250,9 +240,7 @@ void hb_conOutAlt( const char * pStr, HB_SIZE ulLen )
    HB_TRACE( HB_TR_DEBUG, ( "hb_conOutAlt(%s, %lu)", pStr, ulLen ) );
 
    if( hb_setGetConsole() )
-   {
       hb_gtWriteCon( ( BYTE * ) pStr, ulLen );
-   }
 
    if( hb_setGetAlternate() && hb_setGetAltHan() != FS_ERROR )
    {
@@ -296,10 +284,8 @@ static void hb_conOutDev( const char * pStr, HB_SIZE ulLen )
       s_uiPCol += ( USHORT ) ulLen;
    }
    else
-   {
       /* Otherwise, display to console */
       hb_gtWrite( ( BYTE * ) pStr, ulLen );
-   }
 }
 
 typedef void hb_out_func_typedef ( const char *, HB_SIZE );
@@ -332,20 +318,19 @@ static void hb_conOut( USHORT uiParam, hb_out_func_typedef * pOutFunc )
    if( pOutFunc == hb_conOutDev )
       pszString = hb_itemStringCon( pItem, &ulLen, &bFreeReq );
    else
-
-   if( HB_IS_LOGICAL( pItem ) )
    {
-      ulLen       = 3;
-      bFreeReq    = FALSE;
-      pszString   = ( char * ) ( hb_itemGetL( pItem ) ? ".T." : ".F." );
+      if( HB_IS_LOGICAL( pItem ) )
+      {
+         ulLen       = 3;
+         bFreeReq    = FALSE;
+         pszString   = ( char * ) ( hb_itemGetL( pItem ) ? ".T." : ".F." );
+      }
+      else
+         pszString = hb_itemString( pItem, &ulLen, &bFreeReq );
    }
-   else
-      pszString = hb_itemString( pItem, &ulLen, &bFreeReq );
 
    if( ulLen )
-   {
       pOutFunc( pszString, ulLen );
-   }
 
    if( bFreeReq )
    {
@@ -549,21 +534,23 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
 HB_FUNC( DEVPOS ) /* Sets the screen and/or printer position */
 {
    hb_console_safe_lock();
+
    if( ISNUM( 1 ) && ISNUM( 2 ) )
-   {
       hb_conDevPos( ( USHORT ) hb_parni( 1 ), ( USHORT ) hb_parni( 2 ) );
-   }
+
    hb_console_safe_unlock();
 }
 
 HB_FUNC( SETPRC ) /* Sets the current printer row and column positions */
 {
    hb_console_safe_lock();
+
    if( hb_pcount() == 2 && ISNUM( 1 ) && ISNUM( 2 ) )
    {
       s_uiPRow = ( USHORT ) hb_parni( 1 );
       s_uiPCol = ( USHORT ) hb_parni( 2 );
    }
+
    hb_console_safe_unlock();
 }
 
@@ -572,9 +559,7 @@ HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or prin
    hb_console_safe_lock();
 
    if( ISNUM( 3 ) && ISNUM( 4 ) )
-   {
       hb_conDevPos( ( SHORT ) hb_parnl( 3 ), ( SHORT ) hb_parnl( 4 ) );
-   }
 
    if( ISCHAR( 2 ) )
    {
@@ -588,9 +573,8 @@ HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or prin
       hb_gtSetColorStr( szOldColor );
    }
    else if( hb_pcount() >= 1 )
-   {
       hb_conOut( 1, hb_conOutDev );
-   }
+
    hb_console_safe_unlock();
 }
 
@@ -627,6 +611,7 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
       if( bFreeReq )
          hb_xfree( pszString );
    }
+
    hb_console_safe_unlock();
 }
 
@@ -661,12 +646,11 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
 
       hb_gtWriteAt( ( USHORT ) hb_parni( 1 ), ( USHORT ) hb_parni( 2 ), ( BYTE * ) pszString, ulLen );
    }
+
    hb_console_safe_unlock();
 
    if( bFreeReq )
-   {
       hb_xfree( pszString );
-   }
 }
 
 /* Harbour extension, works like DISPOUTAT but does not change cursor position */

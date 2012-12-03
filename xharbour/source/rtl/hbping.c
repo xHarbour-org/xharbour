@@ -411,16 +411,26 @@ BOOL hb_ping( const char* pszHostName, HB_PINGREPLY * pr, DWORD dwTimeout, UINT 
    return FALSE;
 }
 
+/*
+ Syntax: HB_PING( cHost, @cResult, iPacketSize, iTimeOut, @cAddress, @cHost, @iRTT )
+   cHost       = string, hostname of IP address
+   cResult     = passed by ref string, string to hold ping response
+   iPacketSize = integer, size of data to send, default 32
+   iTimeOut    = integer, response waiting time, default 5000ms
+   cAdress     = passed by ref string, string to host address
+   cHost       = passed by ref string, string to host name
+   iRTT        = passed by ref integer, is Round Trip Time
+ */
 HB_FUNC( HB_PING )
 {
    if( ISCHAR( 1 ) )
    {
       const char*   pszHostName = hb_parc( 1 );
       HB_PINGREPLY  pr;
-      DWORD         dwTimeout   = 5000;
-      UINT          nPacketSize = 32;
       BOOL          bSuccess;
       PHB_ITEM      pRef        = hb_param( 2, HB_IT_BYREF );
+      UINT          nPacketSize = ISNUM( 3 ) ? ( UINT )  hb_parni( 3 ) : 32;
+      DWORD         dwTimeout   = ISNUM( 4 ) ? ( DWORD ) hb_parni( 4 ) : 5000;
 
       *szResponse = 0;
       bSuccess    = hb_ping( pszHostName, &pr, dwTimeout, nPacketSize );
@@ -429,9 +439,29 @@ HB_FUNC( HB_PING )
       {
          HOSTENT * phostent = gethostbyaddr( ( char * ) &pr.Address.S_un.S_addr, 4, PF_INET );
          if( phostent )
+         {
+            char szHostAddress[ 32 ] = { '\0' };
+            char szHostName[ 256 ]   = { '\0' };
+            PHB_ITEM pHostAddress    = hb_param( 5, HB_IT_BYREF );
+            PHB_ITEM pHostName       = hb_param( 6, HB_IT_BYREF );
+            PHB_ITEM pRTT            = hb_param( 7, HB_IT_BYREF );
+
+            hb_snprintf( szHostAddress, 32 , "%d.%d.%d.%d", pr.Address.S_un.S_un_b.s_b1, pr.Address.S_un.S_un_b.s_b2, pr.Address.S_un.S_un_b.s_b3, pr.Address.S_un.S_un_b.s_b4 );
+            hb_snprintf( szHostName,    256, phostent->h_name );
+
+            if( pHostAddress )
+               hb_itemPutC( pHostAddress, szHostAddress );
+
+            if( pHostName )
+               hb_itemPutC( pHostName, szHostName ) ;
+
+            if( pRTT )
+               hb_itemPutNI( pRTT, ( int ) pr.RTT ) ;
+
             hb_snprintf( szResponse, 1024, "%d.%d.%d.%d [%s], replied in RTT:%dms\n",
                          pr.Address.S_un.S_un_b.s_b1, pr.Address.S_un.S_un_b.s_b2, pr.Address.S_un.S_un_b.s_b3,
                          pr.Address.S_un.S_un_b.s_b4, phostent->h_name, ( int ) pr.RTT );
+         }
       }
 
       if( pRef )
@@ -453,5 +483,6 @@ HB_FUNC( HB_PING )
 {
    hb_retl( FALSE );
 }
+
 
 #endif

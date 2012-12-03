@@ -968,6 +968,7 @@ extern HB_EXPORT double hb_dateSeconds( void );
 #define hb_seconds()    hb_dateSeconds()
 
 /* misc */
+extern char *           hb_verPCode( void );
 extern char *           hb_verPlatform( void ); /* retrieves a newly allocated buffer containing platform version */
 extern char *           hb_verCompiler( void ); /* retrieves a newly allocated buffer containing compiler version */
 extern char *           hb_verHarbour( void ); /* retrieves a newly allocated buffer containing harbour version */

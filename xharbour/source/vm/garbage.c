@@ -63,7 +63,9 @@
 #include "error.ch"
 #include "hashapi.h"
 
+HB_EXTERN_BEGIN
 extern HB_ITEM hb_vm_BreakBlock;
+HB_EXTERN_END
 
 #define HB_GC_COLLECTION_JUSTIFIED  64
 
@@ -94,7 +96,13 @@ static PHB_GARBAGE   s_pAvailableBaseArrays  = NULL;
 static volatile BOOL s_bCollecting     = FALSE;
 
 /* Signify ReleaseAll Processing is taking place. */
+HB_EXTERN_BEGIN
+#ifndef HB_ARRAY_USE_COUNTER
 BOOL                 hb_gc_bReleaseAll = FALSE;
+#else
+static BOOL          hb_gc_bReleaseAll = FALSE;
+#endif
+HB_EXTERN_END
 
 /* flag for used/unused blocks - the meaning of the HB_GC_USED_FLAG bit
  * is reversed on every collecting attempt

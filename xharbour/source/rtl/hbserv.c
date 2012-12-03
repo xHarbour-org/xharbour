@@ -90,9 +90,8 @@
 #define EXCEPTION_ILLEGAL_INSTRUCTION  STATUS_ILLEGAL_INSTRUCTION
 #endif
 
-extern PHB_FUNC pHVMFuncService;
-
 HB_EXTERN_BEGIN
+extern PHB_FUNC  pHVMFuncService;
 extern void      hb_service_signalHandlerQuit( HB_FUNC_PTR );
 extern void      hb_service_threadCancel( void );
 extern void      hb_service_ConsoleHandlerRoutineDestroyStack( PHB_STACK pStack );

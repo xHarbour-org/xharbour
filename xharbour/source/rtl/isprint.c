@@ -70,26 +70,28 @@
 
 #if defined( HB_OS_WIN ) && ( ! defined( __RSXNT__ ) ) && ( ! defined( __CYGWIN__ ) )
 
-   #include <stdio.h>
-   #include <winspool.h>
+#include <stdio.h>
+#include <winspool.h>
 
 static DWORD IsPrinterError( HANDLE hPrinter );
-
-static BOOL GetJobs( HANDLE hPrinter, JOB_INFO_2 ** ppJobInfo, int * pcJobs );
-DWORD hb_printerIsReadyn( const char * pszPrinterName );
+static BOOL  GetJobs( HANDLE hPrinter, JOB_INFO_2 ** ppJobInfo, int * pcJobs );
 static DWORD IsPrinterErrorn( HANDLE hPrinter );
-extern BOOL hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize );
+
+HB_EXTERN_BEGIN
+extern DWORD hb_printerIsReadyn( const char * pszPrinterName );
+extern BOOL  hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize );
+HB_EXTERN_END
+
 #endif
-#define MAXBUFFERSIZE 255    // 7/10/2003 12:51p.m.
+
+#define MAXBUFFERSIZE 255    /* 7/10/2003 12:51p.m. */
 
 BOOL hb_printerIsReady( const char * pszPrinterName )
 {
    BOOL bIsPrinter;
 
 #if defined( HB_OS_DOS )
-
    /* NOTE: DOS specific solution, using BIOS interrupt */
-
    {
       USHORT uiPort;
 
@@ -120,9 +122,7 @@ BOOL hb_printerIsReady( const char * pszPrinterName )
       else
          bIsPrinter = FALSE;
    }
-
 #elif defined( HB_OS_WIN ) && ! defined( __RSXNT__ )
-
    {
       HANDLE hPrinter;
 
@@ -138,9 +138,7 @@ BOOL hb_printerIsReady( const char * pszPrinterName )
       else
          bIsPrinter = FALSE;
    }
-
 #else
-
    /* NOTE: Platform independent method, at least it will compile and run
             on any platform, but the result may not be the expected one,
             since Unix/Linux doesn't support LPT/COM by nature, other OSs
@@ -159,22 +157,22 @@ BOOL hb_printerIsReady( const char * pszPrinterName )
    return bIsPrinter;
 }
 
-
 /* NOTE: The parameter is an extension over CA-Cl*pper, it's also supported
          by Xbase++. [vszakats] */
 
 HB_FUNC( ISPRINTER )
 {
-   #if defined( HB_OS_WIN ) && ! defined( __RSXNT__ )
+#if defined( HB_OS_WIN ) && ! defined( __RSXNT__ )
    {
       char  DefaultPrinter[ MAXBUFFERSIZE ];
       DWORD pdwBufferSize = MAXBUFFERSIZE;
+
       hb_GetDefaultPrinter( ( LPTSTR ) &DefaultPrinter, &pdwBufferSize );
       hb_retl( hb_printerIsReady( ISCHAR( 1 ) ? hb_parcx( 1 ) : ( char * ) DefaultPrinter ) );
    }
-   #else
+#else
    hb_retl( hb_printerIsReady( ISCHAR( 1 ) ? hb_parcx( 1 ) : ( char * ) "LPT1" ) );
-   #endif
+#endif
 }
 
 /* The code below does the check for the printer under Win32 */
@@ -189,6 +187,7 @@ static DWORD IsPrinterError( HANDLE hPrinter )
 
    HB_TRACE( HB_TR_DEBUG, ( "isprint.c IsPrinterError()" ) );
    GetPrinter( hPrinter, 2, NULL, 0, &cByteNeeded );
+
    if( cByteNeeded > 0 )
    {
       pPrinterInfo = ( PRINTER_INFO_2 * ) hb_xgrab( cByteNeeded );
@@ -202,7 +201,6 @@ static DWORD IsPrinterError( HANDLE hPrinter )
    return Result;
 }
 
-
 static DWORD IsPrinterErrorn( HANDLE hPrinter )
 {
    JOB_INFO_2 *   pJobs;
@@ -211,56 +209,55 @@ static DWORD IsPrinterErrorn( HANDLE hPrinter )
 
    dwError = IsPrinterError( hPrinter ); // Just return the PrinterStatus
 /*
-
-   // This original logic is flawed - it works if there is only one error on the printer
-   //   but the WinApi allows a combination of flags.
-   //   The caller to XISPRINTER() should take the return value and determine the error(s).
-   //   8/10/2003 12:46p.m. Peter Rees
-
-   if (dwError) {
-    switch (dwPrinterStatus &
-        (PRINTER_STATUS_ERROR |
-         PRINTER_STATUS_PAPER_JAM |
-         PRINTER_STATUS_PAPER_OUT |
-         PRINTER_STATUS_PAPER_PROBLEM |
-         PRINTER_STATUS_OUTPUT_BIN_FULL |
-         PRINTER_STATUS_NOT_AVAILABLE |
-         PRINTER_STATUS_NO_TONER |
-         PRINTER_STATUS_OUT_OF_MEMORY |
-         PRINTER_STATUS_OFFLINE |
-         PRINTER_STATUS_DOOR_OPEN) ) {
-
-    case PRINTER_STATUS_ERROR :
-      dwError = 10;
-      break;
-    case PRINTER_STATUS_PAPER_JAM :
-      dwError = 11;
-      break;
-    case PRINTER_STATUS_PAPER_OUT :
-      dwError = 12;
-      break;
-    case PRINTER_STATUS_PAPER_PROBLEM :
-      dwError = 13;
-      break;
-    case PRINTER_STATUS_OUTPUT_BIN_FULL :
-      dwError = 14;
-      break;
-    case PRINTER_STATUS_NOT_AVAILABLE :
-      dwError = 15;
-      break;
-    case PRINTER_STATUS_NO_TONER :
-      dwError = 16;
-      break;
-    case PRINTER_STATUS_OUT_OF_MEMORY :
-      dwError = 17;
-      break;
-    case PRINTER_STATUS_OFFLINE :
-      dwError = 18;
-      break;
-    case PRINTER_STATUS_DOOR_OPEN:
-      dwError = 19;
-      break;
-    }
+ * // This original logic is flawed - it works if there is only one error on the printer
+ * //   but the WinApi allows a combination of flags.
+ * //   The caller to XISPRINTER() should take the return value and determine the error(s).
+ * //   8/10/2003 12:46p.m. Peter Rees
+ *
+ * if (dwError) {
+ *  switch (dwPrinterStatus &
+ *      (PRINTER_STATUS_ERROR |
+ *       PRINTER_STATUS_PAPER_JAM |
+ *       PRINTER_STATUS_PAPER_OUT |
+ *       PRINTER_STATUS_PAPER_PROBLEM |
+ *       PRINTER_STATUS_OUTPUT_BIN_FULL |
+ *       PRINTER_STATUS_NOT_AVAILABLE |
+ *       PRINTER_STATUS_NO_TONER |
+ *       PRINTER_STATUS_OUT_OF_MEMORY |
+ *       PRINTER_STATUS_OFFLINE |
+ *       PRINTER_STATUS_DOOR_OPEN) ) {
+ *
+ *  case PRINTER_STATUS_ERROR :
+ *    dwError = 10;
+ *    break;
+ *  case PRINTER_STATUS_PAPER_JAM :
+ *    dwError = 11;
+ *    break;
+ *  case PRINTER_STATUS_PAPER_OUT :
+ *    dwError = 12;
+ *    break;
+ *  case PRINTER_STATUS_PAPER_PROBLEM :
+ *    dwError = 13;
+ *    break;
+ *  case PRINTER_STATUS_OUTPUT_BIN_FULL :
+ *    dwError = 14;
+ *    break;
+ *  case PRINTER_STATUS_NOT_AVAILABLE :
+ *    dwError = 15;
+ *    break;
+ *  case PRINTER_STATUS_NO_TONER :
+ *    dwError = 16;
+ *    break;
+ *  case PRINTER_STATUS_OUT_OF_MEMORY :
+ *    dwError = 17;
+ *    break;
+ *  case PRINTER_STATUS_OFFLINE :
+ *    dwError = 18;
+ *    break;
+ *  case PRINTER_STATUS_DOOR_OPEN:
+ *    dwError = 19;
+ *    break;
+ *  }
  */
    if( ! dwError )
    {
@@ -313,10 +310,7 @@ static BOOL GetJobs( HANDLE hPrinter, JOB_INFO_2 ** ppJobInfo, int * pcJobs )
                      *ppJobInfo  = pJobStorage;
                      Result      = TRUE;
                   }
-                  else
-                  {
-                     hb_xfree( pJobStorage );
-                  }
+                  hb_xfree( pJobStorage );
                }
             }
          }
@@ -349,4 +343,3 @@ HB_FUNC( XISPRINTER )
 }
 
 #endif
-

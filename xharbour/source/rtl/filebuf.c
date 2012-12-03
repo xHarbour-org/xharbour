@@ -62,6 +62,10 @@
 #include "hbvm.h"
 #include "thread.h"
 
+HB_EXTERN_BEGIN
+extern void hb_filebufInit( void );
+HB_EXTERN_END
+
 #if ! defined( HB_OS_WIN_CE )
 #  include <sys/types.h>
 #  include <sys/stat.h>

@@ -79,10 +79,6 @@
 #include "hbset.h"
 #include "hbstack.h"
 
-HB_EXTERN_BEGIN
-extern void * hb_stackId( void );
-HB_EXTERN_END
-
 typedef struct HB_SET_LISTENER_
 {
    int listener;
@@ -97,15 +93,20 @@ typedef struct
    int counter;
 } HB_SET_LISTENER_LST, * PHB_SET_LISTENER_LST;
 
+HB_EXTERN_BEGIN
 #if defined( HB_OS_WIN ) && ( ! defined( __RSXNT__ ) ) && ( ! defined( __CYGWIN__ ) )
-extern BOOL hb_PrinterExists( LPTSTR pPrinterName );
-extern LONG hb_PrintFileRaw( const char * cPrinterName, const char * cFileName, const char * cDocName );
-extern BOOL hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize );
-extern BOOL hb_isLegacyDevice( LPTSTR pPrinterName );
+   extern BOOL hb_PrinterExists( LPTSTR pPrinterName );
+   extern LONG hb_PrintFileRaw( const char * cPrinterName, const char * cFileName, const char * cDocName );
+   extern BOOL hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize );
+   extern BOOL hb_isLegacyDevice( LPTSTR pPrinterName );
+   extern BOOL hb_set_SetPrinterStart( void );
+   extern void hb_set_SetPrinterStop( void );
 #endif
+extern void * hb_stackId( void );
+HB_EXTERN_END
 
-char  s_PrintFileName[ HB_PATH_MAX ], s_PrinterName[ HB_PATH_MAX ];
-BOOL  s_isDefaultPrinterDevice;   /* Printer is the default device */
+static char s_PrintFileName[ HB_PATH_MAX ], s_PrinterName[ HB_PATH_MAX ];
+static BOOL s_isDefaultPrinterDevice;   /* Printer is the default device */
 
 static char set_char( PHB_ITEM pItem, char oldChar )
 {

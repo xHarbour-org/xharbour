@@ -87,11 +87,12 @@
 #include "hbdate.h"
 #include "hbset.h"
 
+HB_EXTERN_BEGIN
 #ifndef HB_ARRAY_USE_COUNTER
 extern BOOL hb_gc_bReleaseAll;
 #endif
-
-int hb_arrayMode( void );
+extern int hb_arrayMode( void );
+HB_EXTERN_END
 
 BOOL hb_arrayNew( PHB_ITEM pItem, HB_SIZE ulLen ) /* creates a new array */
 {

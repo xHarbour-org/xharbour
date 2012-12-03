@@ -68,7 +68,9 @@
 #include "classes.h"
 #include "hboo.ch"
 
+HB_EXTERN_BEGIN
 extern char * hb_vm_sNull;
+HB_EXTERN_END
 
 void hb_itemPushForward( PHB_ITEM pItem )
 {
