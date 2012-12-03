@@ -43,7 +43,7 @@ PROCEDURE MAIN( cHostName, nPacket, nTimeOut )
    ? "HB_PING() returns   :", bResponse
    ? "HB_PING() IP-Address:", cAddress
    ? "HB_PING() Host Name :", cName
-   ? "HB_PING() RTT       :", LTRIM(STR(iRTT)) + "ms"
+   ? "HB_PING() RTT       :", IF( iRTT!=NIL,LTRIM(STR(iRTT)) + "ms",NIL)
    ? "HB_PING() message:", sz
 
    RETURN

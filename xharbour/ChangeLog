@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-03 20:55 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * tests/testping.prg
+    ! fix runtime error when the pingee did not reply
+
 2012-12-03 20:33 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/pcre/pcre_dfa_exec.c
     ! minor modification in function internal_dfa_exec() to kill BCC warning
