@@ -1678,7 +1678,7 @@ $(OBJ_DIR)$(DIR_SEP)rddsys$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)rddsys.c
 # VM.LIB rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)hvmall$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)hvmall.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)arrays$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)arrays.c
 	$(CC_CMD)
@@ -1807,7 +1807,7 @@ $(OBJ_DIR)$(DIR_SEP)maindllh$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)maindllh.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)memvars$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)memvars.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)memvclip$(OBJEXT) : $(VM_DIR)$(DIR_SEP)memvclip.c
 	$(CC_CMD)
@@ -2044,7 +2044,7 @@ $(OBJ_DIR)$(DIR_SEP)dirdrive$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)dirdrive.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)direct$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)direct.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)diskspac$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)diskspac.c
 	$(CC_CMD)
@@ -2476,7 +2476,7 @@ $(OBJ_DIR)$(DIR_SEP)readvar$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)readvar.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)regex$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)regex.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)regexrpl.c : $(RTL_DIR)$(DIR_SEP)regexrpl.prg
 	$(HB_CMD)
@@ -2590,7 +2590,7 @@ $(OBJ_DIR)$(DIR_SEP)strings$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)strings.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)strmatch$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)strmatch.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)strpeek$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)strpeek.c
 	$(CC_CMD)
@@ -2866,64 +2866,64 @@ $(OBJ_DIR)$(DIR_SEP)zutil$(OBJEXT) : $(ZLIB_DIR)$(DIR_SEP)zutil.c
 # PCREPOS.LIB rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)pcre_byte_order$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_byte_order.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_chartables$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_chartables.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_ucd$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_ucd.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_compile$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_compile.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_config$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_config.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_dfa_exec$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_dfa_exec.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_exec$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_exec.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_fullinfo$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_fullinfo.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_get$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_get.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_globals$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_globals.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_maketables$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_maketables.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_newline$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_newline.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_ord2utf8$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_ord2utf8.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_refcount$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_refcount.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_study$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_study.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_tables$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_tables.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_valid_utf8$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_valid_utf8.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_version$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_version.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcre_xclass$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcre_xclass.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)pcreposix$(OBJEXT) : $(PCREPOS_DIR)$(DIR_SEP)pcreposix.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 #===============================================================================
 # LANG.LIB rules
@@ -3140,48 +3140,49 @@ $(OBJ_DIR)$(DIR_SEP)redbffpt1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbffpt$(DIR_SEP)red
 # DBFNTX.LIB rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)dbfntx1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbfntx$(DIR_SEP)dbfntx1.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 #===============================================================================
 # DBFNSX.LIB rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)dbfnsx1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbfnsx$(DIR_SEP)dbfnsx1.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 #===============================================================================
 # DBFCDX.LIB rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)dbfcdx1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbfcdx$(DIR_SEP)dbfcdx1.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 #===============================================================================
 # DBFMDX.LIB rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)dbfmdx1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbfmdx$(DIR_SEP)dbfmdx1.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 #===============================================================================
 # BMDBFCDX.LIB rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)bmdbfcdx1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)bmdbfcdx$(DIR_SEP)bmdbfcdx1.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 #===============================================================================
 # REDBFCDX.LIB rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)redbfcdx1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)bmdbfcdx$(DIR_SEP)redbfcdx1.c
-	$(CC_CMD)
+	$(CCC_CMD)
+
 #===============================================================================
 # SIXCDX.LIB rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)sixcdx1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)dbfcdx$(DIR_SEP)sixcdx1.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 #===============================================================================
 # BMSIXCDX.LIB rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)bmsixcdx1$(OBJEXT) : $(RDD_DIR)$(DIR_SEP)bmdbfcdx$(DIR_SEP)bmsixcdx1.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 #===============================================================================
 # HBSIX.LIB rules
