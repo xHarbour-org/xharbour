@@ -1702,14 +1702,20 @@ for (;;)
 
           ANYNL02:
           case CHAR_LF:
-          if (codevalue == OP_ANYNL_EXTRA + OP_TYPEPOSSTAR ||
-              codevalue == OP_ANYNL_EXTRA + OP_TYPEPOSQUERY)
-            {
-            active_count--;           /* Remove non-match possibility */
-            next_active_state--;
-            }
-          ADD_NEW_DATA(-(state_offset + count), 0, ncount);
-          break;
+          {
+             int inewcount = state_offset + count;
+
+             if (codevalue == OP_ANYNL_EXTRA + OP_TYPEPOSSTAR ||
+                 codevalue == OP_ANYNL_EXTRA + OP_TYPEPOSQUERY)
+               {
+               active_count--;           /* Remove non-match possibility */
+               next_active_state--;
+               }
+             /* Modified to avoid BCC Warning W8041: Negating unsigned value */
+             /* ADD_NEW_DATA(-(state_offset + count), 0, ncount); */
+             ADD_NEW_DATA(-inewcount, 0, ncount);
+             break;
+          }
 
           default:
           break;
@@ -1746,13 +1752,19 @@ for (;;)
           }
         if (OK == (d == OP_VSPACE))
           {
+
+          int inewcount = state_offset + count;
+
           if (codevalue == OP_VSPACE_EXTRA + OP_TYPEPOSSTAR ||
               codevalue == OP_VSPACE_EXTRA + OP_TYPEPOSQUERY)
             {
             active_count--;           /* Remove non-match possibility */
             next_active_state--;
             }
-          ADD_NEW_DATA(-(state_offset + count), 0, 0);
+
+          /* Modified to avoid BCC Warning W8041: Negating unsigned value */
+          ADD_NEW_DATA(-inewcount, 0, 0);
+          /* ADD_NEW_DATA(-(state_offset + count), 0, 0); */
           }
         }
       break;
@@ -1787,13 +1799,17 @@ for (;;)
 
         if (OK == (d == OP_HSPACE))
           {
+          int inewcount = state_offset + count;
+
           if (codevalue == OP_HSPACE_EXTRA + OP_TYPEPOSSTAR ||
               codevalue == OP_HSPACE_EXTRA + OP_TYPEPOSQUERY)
             {
             active_count--;           /* Remove non-match possibility */
             next_active_state--;
             }
-          ADD_NEW_DATA(-(state_offset + count), 0, 0);
+          /* Modified to avoid BCC Warning W8041: Negating unsigned value */
+          ADD_NEW_DATA(-inewcount, 0, 0);
+          /* ADD_NEW_DATA(-(state_offset + count), 0, 0); */
           }
         }
       break;
