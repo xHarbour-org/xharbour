@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-06 05:48 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * tests/regextest.prg
+    ! program was not compilable, fixed.
+
 2012-12-06 05:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/rat.c
     ! xHarbour extended RAT() not returning correct value when paramater 3

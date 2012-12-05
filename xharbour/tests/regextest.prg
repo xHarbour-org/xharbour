@@ -16,6 +16,7 @@ PROCEDURE Main()
    LOCAL aMatch, cMatch
    LOCAL GetList := {}
 
+   // SET GTMODE TO INLINE
    SET COLOR TO w+/b
    SET CONFIRM ON
    CLEAR SCREEN
