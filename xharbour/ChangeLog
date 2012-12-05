@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-06 05:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/rat.c
+    ! xHarbour extended RAT() not returning correct value when paramater 3
+    is passed, fixed.
+
 2012-12-03 20:55 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * tests/testping.prg
     ! fix runtime error when the pingee did not reply

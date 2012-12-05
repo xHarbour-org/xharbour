@@ -54,34 +54,91 @@
 
 HB_FUNC( RAT )
 {
-   HB_SIZE ulSubLen = hb_parclen( 1 );
+   PHB_ITEM pszSub = hb_param( 1, HB_IT_STRING );
 
-   if( ulSubLen )
+   if( pszSub && pszSub->item.asString.length )
    {
-      LONG lPos = ( LONG ) ( hb_parclen( 2 ) - ulSubLen );
+      PHB_ITEM pszText = hb_param( 2, HB_IT_STRING );
 
-      if( lPos >= 0 )
+      if( pszText && pszText->item.asString.length )
       {
-         const char *   pszSub   = hb_parcx( 1 );
-         const char *   pszText  = hb_parcx( 2 );
-         LONG           lEnd     = ISNUM( 4 ) ? hb_parnl( 4 ) - 1 : 0;
-         BOOL           bFound   = FALSE;
+         HB_ISIZ nTo = pszText->item.asString.length - pszSub->item.asString.length;
 
-         if( ISNUM( 3 ) )
-            lPos = hb_parnl( 3 ) - 1;
-
-         while( lPos >= lEnd && ! bFound )
+         if( nTo >= 0 )
          {
-            if( *( pszText + lPos ) == *pszSub )
-               bFound = ( memcmp( pszSub, pszText + lPos, ( size_t ) ulSubLen ) == 0 );
-            lPos--;
+            HB_ISIZ nStart = hb_parns( 3 );
+            HB_ISIZ nFrom  = ( nStart <= 1 ) ? 0 : --nStart ;
+
+            if( nTo >= nFrom )
+            {
+               HB_SIZE nPos = 0;
+
+               if( ISNUM( 4 ) )
+               {
+                  HB_ISIZ nEnd = hb_parns( 4 ) - 1;
+
+                  nEnd -= pszSub->item.asString.length - 1;
+
+                  if( nEnd < nTo )
+                     nTo = nEnd;
+               }
+
+               if( nTo >= nFrom )
+               {
+                  do
+                  {
+                     if( pszText->item.asString.value[ nTo ] == *pszSub->item.asString.value &&
+                         memcmp( pszSub->item.asString.value, pszText->item.asString.value + nTo, pszSub->item.asString.length ) == 0 )
+                     {
+                        nPos = nTo + 1;
+                        break;
+                     }
+                  }
+                  while( --nTo >= nFrom );
+               }
+
+               hb_retns( nPos );
+               return;
+            }
          }
-         hb_retnl( bFound ? lPos + 2 : 0 );
       }
-      else
-         hb_retni( 0 );
    }
-   else
-      /* This function never seems to raise an error */
-      hb_retni( 0 );
+
+   hb_retni( 0 );
 }
+
+/*
+* HB_FUNC( RAT )
+* {
+*   HB_SIZE ulSubLen = hb_parclen( 1 );
+*
+*   if( ulSubLen )
+*   {
+*      LONG lPos = ( LONG ) ( hb_parclen( 2 ) - ulSubLen );
+*
+*      if( lPos >= 0 )
+*      {
+*         const char *   pszSub   = hb_parcx( 1 );
+*         const char *   pszText  = hb_parcx( 2 );
+*         LONG           lEnd     = ISNUM( 4 ) ? hb_parnl( 4 ) - 1 : 0;
+*         BOOL           bFound   = FALSE;
+*
+*         if( ISNUM( 3 ) )
+*            lPos = hb_parnl( 3 ) - 1;
+*
+*         while( lPos >= lEnd && ! bFound )
+*         {
+*            if( *( pszText + lPos ) == *pszSub )
+*               bFound = ( memcmp( pszSub, pszText + lPos, ( size_t ) ulSubLen ) == 0 );
+*            lPos--;
+*         }
+*         hb_retnl( bFound ? lPos + 2 : 0 );
+*      }
+*      else
+*         hb_retni( 0 );
+*   }
+*   else
+*      // This function never seems to raise an error
+*      hb_retni( 0 );
+* }
+*/
