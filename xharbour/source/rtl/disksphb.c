@@ -330,9 +330,9 @@ HB_FUNC( HB_DISKSPACE )
 #elif defined( HB_OS_UNIX ) && ! ( defined( __WATCOMC__ ) || defined( __CEGCC__ ) )
    {
       struct statvfs sf;
-      BOOL           fFree = FALSE;
+      char * pszFree;
 
-      szPath = ( char * ) hb_fsNameConv( ( const char * ) szPath, &fFree );
+      szPath = hb_fsNameConv( szPath, &pszFree );
 
       if( statvfs( szPath, &sf ) == 0 )
       {
@@ -360,8 +360,8 @@ HB_FUNC( HB_DISKSPACE )
       else
          hb_fsSetIOError( FALSE, 0 );
 
-      if( fFree )
-         hb_xfree( szPath );
+      if( pszFree )
+         hb_xfree( pszFree );
    }
 #else
    {

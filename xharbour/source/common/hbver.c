@@ -218,10 +218,10 @@ char * hb_verPlatform( void )
 #elif defined( HB_OS_WIN )
 
    {
-      OSVERSIONINFOEX osVer;
+      HBOSVERSIONINFOEX osVer;
 
-      ZeroMemory( &osVer, sizeof( OSVERSIONINFOEX ) );
-      osVer.dwOSVersionInfoSize = sizeof( OSVERSIONINFOEX );
+      ZeroMemory(&osVer , sizeof( osVer ));
+      osVer.dwOSVersionInfoSize = sizeof( osVer );
 
       if( GetVersionEx( ( OSVERSIONINFO * ) &osVer ) )
       {

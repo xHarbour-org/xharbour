@@ -300,9 +300,8 @@ HB_USRLIBS=""
 HB_USRLPATH=""
 HB_GEN=""
 LN_OPT="${CC_L_USR}"
-CC_OPT="${CC_C_USR}"
+CC_OPT="-O3 ${CC_C_USR}"
 HB_OPT="${CC_PRG_USR}"
-[ "\${HB_GEN}" != "" ] || HB_OPT="\${HB_OPT} -gc0"
 
 [ -n "\$TMPDIR" ] || TMPDIR="\$TMP"
 [ -n "\$TMPDIR" ] || TMPDIR="\$TEMP"
@@ -339,6 +338,7 @@ while [ \$n -lt \${#P[@]} ]; do
         -nostrip)    HB_STRIP="no" ;;
         -l[^-]*)     HB_USRLIBS="\${HB_USRLIBS} \${v}" ;;
         -L[^-]*)     HB_USRLPATH="\${HB_USRLPATH} \${v}" ;;
+        -I*)         [ \${HB} = "cc" ] || CC_OPT="\${CC_OPT} \${v}"; p="\${v}" ;;
         -main=*)     HB_MAIN_FUNC="\${v#*=}" ;;
         -g[cohwij])  HB_GEN="\${v#-g}"; p="\${v}" ;;
         -gc[0-9])    HB_GEN="c"; p="\${v}" ;;
@@ -356,6 +356,8 @@ P=( "\${PP[@]}" )
 
 [ "\${P}" != "" ] && HB_EXIT="no"
 [ "\${HB_EXIT}" = "yes" ] && exit
+
+[ "\${HB_GEN}" != "" ] || HB_OPT="\${HB_OPT} -gc0"
 
 case "\${HB_MT}" in
     [Mm][Tt]|[Yy][Ee][Ss]|1)  HB_MT="MT";;

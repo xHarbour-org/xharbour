@@ -40,5 +40,9 @@ LIBS=\
 	common \
 	rtl \
 
+ifeq ($(HB_ARCHITECTURE)/$(HB_COMPILER),w32/mingw32)
+LIBS += mainstd
+endif
+
 include $(TOP)$(ROOT)config/bin.cf
 

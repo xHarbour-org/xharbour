@@ -318,7 +318,7 @@ PHB_FUNC                pHVMFuncService      = NULL;
 BOOL                    hb_vm_bQuitRequest   = FALSE;
 char *                  hb_vm_sNull          = "";
 int                     hb_vm_iTry           = 0;
-HB_ITEM                 hb_vm_BreakBlock     = { 0 };
+HB_ITEM                 hb_vm_BreakBlock     = HB_ITEM_NIL;
 extern void             hb_filebufInit( void );
 HB_EXTERN_END
 
@@ -346,7 +346,7 @@ ULONG _System OS2TermHandler( PEXCEPTIONREPORTRECORD p1,
 static int     s_iBackground  = 0;
 #endif
 
-static HB_DYNS ModuleFakeDyn  = { 0 };
+static HB_DYNS ModuleFakeDyn  = HB_DYNS_INIT;
 
 #if ( !defined( __BORLANDC__ ) || defined( __EXPORT__ ) )
 static BOOL    s_Do_xinit = TRUE;

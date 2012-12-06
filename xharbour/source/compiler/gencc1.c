@@ -1420,9 +1420,9 @@ static HB_GENC_FUNC( hb_p_pushdatetime )
 
    fprintf( cargo->yyc, "\tHB_P_PUSHDATETIME, " );
 
-   for( i = 0; i < ( int ) ( sizeof( UINT32 ) + sizeof( UINT32 ) ); ++i )
+   for( i = 1; i <= 9; ++i )
    {
-      fprintf( cargo->yyc, " %i,", ( ( BYTE * ) pFunc->pCode )[ lPCodePos + 1 + i ] );
+      fprintf( cargo->yyc, " %i,", ( ( BYTE * ) pFunc->pCode )[ lPCodePos + i ] );
    }
 
    if( cargo->bVerbose )
@@ -1435,7 +1435,7 @@ static HB_GENC_FUNC( hb_p_pushdatetime )
 
    fprintf( cargo->yyc, "\t/* HB_ET_DDATETIME */\n" );
 
-   return sizeof( double ) + 1;
+   return 9;
 }
 
 static HB_GENC_FUNC( hb_p_pushdate )

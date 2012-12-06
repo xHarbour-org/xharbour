@@ -462,7 +462,7 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, const char * szText )
  *       {
  *          char *sCopy = (char *) hb_xgrab( ulLen + 1 );
  *
- *          hb_itemRawCpy( (void *) sCopy, (void *) szText );
+ *          hb_xmemcpy( (void *) sCopy, (void *) szText, ulLen );
  *
  *          return hb_itemPutCPtr( pItem, sCopy, ulLen );
  *       }
@@ -472,7 +472,7 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, const char * szText )
  *          __HB_STRING_REALLOC( pItem, ulLen );
  *
  *          // Safe, no need to use memmove()
- *          hb_itemRawCpy( pItem->item.asString.value, szText );
+ *          hb_xmemcpy( pItem->item.asString.value, szText, ulLen );
  *
  *          return pItem;
  *       }
@@ -502,13 +502,13 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, const char * szText )
  *       pItem->item.asString.value[ ulLen ]  = '\0';
  *
  *       pItem->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
- * *( pItem->item.asString.pulHolders ) = 1;
+ *       *( pItem->item.asString.pulHolders ) = 1;
  *
  *       pItem->item.asString.length          = ulLen;
  *       pItem->item.asString.allocated       = ulLen + 1;
  *
  *       // Alocation above already set the 'length and the terminator!
- *       hb_itemRawCpy( (void *) pItem->item.asString.value, (void *) szText );
+ *       hb_xmemcpy( (void *) pItem->item.asString.value, (void *) szText, ulLen );
  *    }
  * }
  *

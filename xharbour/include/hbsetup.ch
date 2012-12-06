@@ -87,7 +87,9 @@
                                   /* when not called from a constructor     */
 
 #ifdef HB_EXTENSION
-   #define HB_EXT_INKEY           /* Enable Extended Inkey codes */
+   #ifndef HB_STD_INKEY
+      #define HB_EXT_INKEY        /* Enable Extended Inkey codes */
+   #endif
 #endif
 
 #endif /* HB_SETUP_CH_ */

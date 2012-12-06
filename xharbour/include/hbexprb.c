@@ -2059,7 +2059,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                      HB_EXPR_PTR pStart  = pSelf->value.asFunCall.pParms->value.asList.pExprList->pNext;
 
                      if( pString->ExprType == HB_ET_STRING && pStart->ExprType == HB_ET_NUMERIC &&
-                         pStart->value.asNum.NumType == HB_ET_LONG && pStart->value.asNum.lVal == 1 && pSelf->ulLength > 0 )
+                         pStart->value.asNum.NumType == HB_ET_LONG && pStart->value.asNum.lVal == 1 )
                      {
                         // Skipping the first 2 elements of the list, as they are used by the optimization.
                         pSelf->value.asFunCall.pParms->value.asList.pExprList = NULL;
@@ -2068,7 +2068,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
 
                         pSelf->ExprType = HB_ET_ARRAYAT;
                         pSelf->value.asList.pExprList = pString;
-                        pStart->value.asNum.lVal      =  1;
+                        pStart->value.asNum.lVal      = -1;
                         pSelf->value.asList.pIndex    = pStart;
                         pSelf->value.asList.bByRef    = FALSE;
                      }

@@ -1604,7 +1604,7 @@ static BOOL hb_compWriteExternEntries( FILE * yyc, BOOL bSymFIRST, BOOL bNewLine
 
    if( ul && ( bPrg || bStartFunc ) )
    {
-      fprintf( yyc, szEntries );
+      fprintf( yyc, "%s", szEntries );
    }
 
    hb_xfree( szEntries );

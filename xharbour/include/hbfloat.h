@@ -193,7 +193,8 @@
 
 #  if defined( __RSXNT__ ) || defined( __EMX__ ) || \
       defined( __XCC__ ) || defined( __POCC__ ) || \
-      defined( __MINGW32__ ) || defined( HB_OS_HPUX )
+      defined( __MINGW32__ ) || defined( __DMC__ ) || \
+      defined( HB_OS_HPUX )
 #     define hb_isfinite( d )       isfinite( d )
 #  elif defined( _MSC_VER )
 #     define hb_isfinite( d )       _finite( ( double ) d )

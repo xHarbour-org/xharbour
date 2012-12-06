@@ -73,6 +73,7 @@ C_SOURCES=\
 	hbsrlraw.c   \
 	hbsyslog.c   \
 	hbtoken.c    \
+	hbwinole.c   \
 	hbxml.c      \
 	idle.c       \
 	inkey.c      \

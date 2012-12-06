@@ -33,6 +33,10 @@ ifeq ($(HB_ARCHITECTURE),OS2)
 LIBS += socket 
 endif
 
+ifeq ($(HB_ARCHITECTURE)/$(HB_COMPILER),w32/mingw32)
+LIBS += mainstd
+endif
+
 ifeq ($(findstring _USE_APPMAIN_,$(PRG_USR)),)
 PRG_USR+= -D_USE_APPMAIN_
 endif

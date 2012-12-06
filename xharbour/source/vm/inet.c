@@ -343,9 +343,13 @@ static int hb_socketConnect( HB_SOCKET_STRUCT * Socket )
                                       );
 
             if( iErr1 )
+            {
                HB_SOCKET_SET_ERROR1( Socket, iErr1 );
+            }
             else if( iErrval )
+            {
                HB_SOCKET_SET_ERROR1( Socket, iErrval );
+            }
             /* Success! */
          }
 #endif

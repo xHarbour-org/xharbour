@@ -8,6 +8,139 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-06 02:38 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/config/w32/dm.cf
+    ! use names of tools with extensions - it allows to make cross
+      compilation on platforms where FN extension is significant.
+
+  * xharbour/config/w32/mingw32.cf
+    ! removed -mno-cygwin used by very old MinGW versions
+    ! updated link paths for mainstd lib
+
+  * xharbour/config/w32/bcc32.cf
+    ! fixed wrong library setting
+
+  * xharbour/bin/hb-func.sh
+    ! enable GCC optimisation in hb* scripts
+
+  * xharbour/include/Makefile
+    ! added few missing header files (some other ones are still missing)
+
+  * xharbour/include/hbapi.h
+    ! fixed HB_ITEM_NIL declaration for BCC
+
+  * xharbour/include/hbfloat.h
+    ! updated for DMC
+
+  * xharbour/include/inet.h
+    ! fixed critical bug in xHarbour inet code (uninitialized variables)
+      introduced many years ago by Miguel. It was many times reported on
+      xHarbour news without any feedback - one of few xHarbour killers in
+      last years.
+
+  * xharbour/include/hbexprb.c
+    ! fixed bug in compile time RIGHT() optimization
+
+  * xharbour/include/hbvmpub.h
+    ! added new macro HB_DYNS_INIT for HB_DYNS initialization which respects
+      modified for HB_PROFILER structure
+
+  * xharbour/include/hbsetup.ch
+    + added support for HB_STD_INKEY which forces standard inkey codes
+      when xHarbour is compiled
+
+  * xharbour/include/hbdefs.h
+    + added s_defaultGT macro for compatibility with some older or foreign
+      tools, i.e. hbmk2 used with -xhb switch.
+
+  * xharbour/include/set.ch
+    ! fixed additional set counter
+
+  * xharbour/utils/hbtest/Makefile
+  * xharbour/utils/hbdict/Makefile
+  * xharbour/utils/hbrun/Makefile
+  * xharbour/utils/xbscript/Makefile
+  * xharbour/utils/hbdoc/Makefile
+  * xharbour/utils/hbmake/Makefile
+    ! added mainstd to link list in MinGW builds - now it's necessary due
+      to broken bindings in HVM library.
+
+  * xharbour/utils/hbfilere/hbfilere.h
+    ! fixed included header to compile with pure BCC5.5
+
+  * xharbour/contrib/hblzf/lzfP.h
+    ! fixed EOLs to work on non MS-Win platforms
+
+  * xharbour/winmake/mdir.bat
+    ! use CRLF EOLs in all *.bat files
+
+  * xharbour/source/common/hbver.c
+    * use HBOSVERSIONINFOEX in all places not omnly chosen one.
+      (or removed it completly)
+
+  * xharbour/source/compiler/gencc1.c
+    ! cleaned wrong condition which was giving correct results only
+      on some platforms.
+
+  * xharbour/source/compiler/genc.c
+  * xharbour/source/compiler/hbusage.c
+    ! fixed critical bug in *printf() usage - any code which makes sth like
+         printf( data );
+      is extremely danger and much slower then:
+         printf( "%s", data );
+      If you do not understand potential security problem then please
+      optimize the code for speed.
+
+  * xharbour/source/compiler/gencc.c
+    ! added missing L suffix in printf formats - it's necessary on platforms
+      where LONG can be bigger then INT - in practice whole world except
+      DOS/Windows.
+
+  * xharbour/source/vm/inet.c
+    ! enclosed broken macros inside {}
+      It's workaround and in fact wrong macros should be fixed instead.
+
+  * xharbour/source/vm/fastitem.c
+    ! fixed some completely idiotic hb_itemRawCpy() usage in commented code.
+      I hope it will safe a lot of time for someone who will ever work on
+      xHarbour HVM analyzing existing code.
+
+  * xharbour/source/vm/hvm.c
+    ! use HB_ITEM_NIL and HB_DYNS_INIT to initialize static structures
+
+  * xharbour/source/vm/consmt.c
+    ! disabled HB_CLEANUP_PUSH/HB_CLEANUP_POP macros.
+      They can be used only together in the same function by definition.
+      Due to details in xHarbour Win32 MT code (workaround for missing
+      functionality) it was not generating error on this platform.
+
+  * xharbour/source/rtl/Makefile
+    ! added missing hbwinole.c
+
+  * xharbour/source/rtl/filesys.c
+  * xharbour/source/rtl/diskspac.c
+    ! fixed casting (missing const)
+
+  * xharbour/source/rtl/fstemp.c
+    ! fixed casting (wrongly used const)
+    ! fixed path delimiters in DJGPP builds
+
+  * xharbour/source/rtl/disksphb.c
+    ! fixed wrong used 'BOLL' instead of 'char *'
+
+  * xharbour/source/rdd/Makefile
+    ! added few missing header files
+
+  * xharbour/source/rdd/hbdbsort.c
+    * removed header files added as workaround for some other bug
+
+   ; above modification does not fix many other serious problems,
+     it's only set of basic fixes I have to apply in last years to
+     create xHarbour builds usable for some tests.
+     I'm committing them because I hope they can be useful for other
+     users so I decide to public them before I remove them cleaning
+     my HDD.
+
 2012-12-06 05:48 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * tests/regextest.prg
     ! program was not compilable, fixed.

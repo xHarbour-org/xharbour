@@ -69,6 +69,9 @@
    #define HB_MEMCPY  dv_memcpy
 #endif
 
+/* for backward compatibility */
+#define s_defaultGT     hb_gt_szNameDefault
+
 /* Compatibility. Do not use HB_OS_WIN_32_USED anymore. */
 #ifdef HB_LEGACY_LEVEL2
    #if defined( HB_OS_WIN_32_USED ) && ! defined( HB_OS_WIN_USED )

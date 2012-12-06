@@ -20,6 +20,9 @@ C_SOURCES=\
 	fieldhb.c \
 	dbcmdhb.c \
 	dbcmd53.c \
+	dbdrop.c \
+	dbexists.c \
+	dbrename.c \
 	rddinfo.c \
 
 PRG_SOURCES=\

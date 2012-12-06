@@ -210,7 +210,7 @@ HB_FUNC( DISKSPACE )
 #elif defined( HB_OS_UNIX )
 
    {
-      char *      szName = ISCHAR( 1 ) ? hb_parc( 1 ) : ( char * ) "/";
+      const char *szName = ISCHAR( 1 ) ? hb_parc( 1 ) : "/";
 
 #if defined( __WATCOMC__ )
       struct stat st;

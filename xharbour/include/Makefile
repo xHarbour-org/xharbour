@@ -17,8 +17,10 @@ C_HEADERS=\
 	hbapiitm.h   \
 	hbapilng.h   \
 	hbapirdd.h   \
+	hbapistr.h   \
 	hbatomic.h   \
 	hbcomp.h     \
+	hbcompat.h   \
 	hbdate.h     \
 	hbdbf.h      \
 	hbdbferr.h   \
@@ -32,6 +34,7 @@ C_HEADERS=\
 	hbhash.h     \
 	hbi18n.h     \
 	hbinit.h     \
+	hbipapi.h    \
 	hbmacro.h    \
 	hbmath.h     \
 	hbnxs.h      \

@@ -130,7 +130,7 @@
 #define _SET_OSCODEPAGE       113 /* Harbour extension */
 
 #define HB_SET_BASE           100
-#define HB_SET_COUNT          12
+#define HB_SET_COUNT          14
 
 #define _SET_BACKGROUNDTASKS  200 /* xHarbour extension */
 #define _SET_BACKGROUNDTICK   201 /* xHarbour extension */

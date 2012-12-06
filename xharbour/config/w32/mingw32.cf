@@ -12,7 +12,7 @@ LIB_EXT = .a
 CC = $(CCPREFIX)gcc
 CC_IN = -c
 CC_OUT = -o
-CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE) -mno-cygwin
+CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
 CFLAGS = -Wall -W
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS += -DSIMPLEX
@@ -80,6 +80,8 @@ LDLIBS += -lpcrepos
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/zlib/$(ARCH_DIR)
 LDLIBS += -lzlib
 
+LINKPATHS += -L$(TOP)$(ROOT)source/vm/mainstd/$(ARCH_DIR)
+
 endif
 
 # HB_SCREEN_LIB: empty, or one of ncurses, slang
@@ -137,7 +139,7 @@ $(foreach file, $(SYSLIBS), $(link_file))
 -$(LD) __link__.tmp
 endef
 
-LDFLAGS = -mno-cygwin
+LDFLAGS = 
 
 AR = $(CCPREFIX)ar
 ARFLAGS = $(A_USR)

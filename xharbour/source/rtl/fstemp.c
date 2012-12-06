@@ -66,27 +66,42 @@
 #endif
 
 #if ! defined( HB_WIN32_IO )
-static BOOL fsGetTempDirByCase( BYTE * pszName, const char * pszTempDir )
+static BOOL fsGetTempDirByCase( char * pszName, const char * pszTempDir, HB_BOOL fTrans )
 {
    BOOL fOK = FALSE;
 
    if( pszTempDir && *pszTempDir != '\0' )
    {
-      hb_strncpy( ( char * ) pszName, ( char * ) pszTempDir, HB_PATH_MAX - 1 );
+      HB_SYMBOL_UNUSED( fTrans );
+
+      hb_strncpy( pszName, pszTempDir, HB_PATH_MAX - 1 );
+
       switch( hb_setGetDirCase() )
       {
          case HB_SET_CASE_LOWER:
-            hb_strLower( ( char * ) pszName, strlen( ( char * ) pszName ) );
-            fOK = strcmp( ( char * ) pszName, pszTempDir ) == 0;
+            hb_strLower( pszName, strlen( pszName ) );
+            fOK = strcmp( pszName, pszTempDir ) == 0;
             break;
          case HB_SET_CASE_UPPER:
-            hb_strUpper( ( char * ) pszName, strlen( ( char * ) pszName ) );
-            fOK   = strcmp( ( char * ) pszName, pszTempDir ) == 0;
+            hb_strUpper( pszName, strlen( pszName ) );
+            fOK = strcmp( pszName, pszTempDir ) == 0;
             break;
          default:
             fOK   = TRUE;
             break;
       }
+   }
+
+   if( fOK )
+   {
+#  if defined( __DJGPP__ )
+      /* convert '/' to '\' */
+      char * pszDelim;
+      while( ( pszDelim = strchr( pszName, '/' ) ) != NULL )
+         *pszDelim = '\\';
+#  endif
+      if( ! hb_fsDirExists( pszTempDir ) )
+         fOK = HB_FALSE;
    }
 
    return fOK;
@@ -116,12 +131,12 @@ static HB_FHANDLE hb_fsCreateTempLow( const char * pszDir, const char * pszPrefi
             pszName[ 1 ]   = '\0';
          }
 #else
-         const char * pszTmpDir = hb_getenv( "TMPDIR" );
+         char * pszTmpDir = hb_getenv( "TMPDIR" );
 
-         if( ! fsGetTempDirByCase( pszName, pszTmpDir ) )
+         if( ! fsGetTempDirByCase( pszName, pszTmpDir, HB_FALSE ) )
          {
 #ifdef P_tmpdir
-            if( ! fsGetTempDirByCase( pszName, P_tmpdir ) )
+            if( ! fsGetTempDirByCase( pszName, P_tmpdir, HB_TRUE ) )
 #endif
             {
                pszName[ 0 ]   = '.';

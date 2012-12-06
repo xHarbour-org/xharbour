@@ -206,6 +206,8 @@ HB_EXTERN_BEGIN
 
 #if defined(__GNUC__)
 #  define HB_ITEM_NIL      { HB_IT_NIL, {} }
+#elif defined(__BORLANDC__)
+#  define HB_ITEM_NIL      { 0 }
 #else
 #  define HB_ITEM_NIL      { HB_IT_NIL, NULL }
 #endif

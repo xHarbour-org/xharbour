@@ -11,7 +11,7 @@ EXE_EXT = .exe
 LIB_PREF =
 LIB_EXT = .lib
 
-CC = dmc
+CC = dmc.exe
 CC_IN = -c
 CC_OUT = -o
 CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
@@ -74,7 +74,7 @@ echo $(subst /,\,$(LINKLIBS)) >> __link__.tmp
 $(LD) $(LDFLAGS) @__link__.tmp
 endef
 
-LD = link
+LD = link.exe
 LDFLAGS = /NOMAP /EXETYPE:NT /SUBSYSTEM:CONSOLE $(LINKPATHS) $(L_USR)
 LDOBJS = $(foreach file, $(^F), $(file))
 LD_RULE = $(LD) $(LDFLAGS) $(subst /,\,$(LDOBJS)), $@,, $(subst /,\,$(LINKLIBS))
@@ -85,7 +85,7 @@ echo $(^F) >> __lib__.tmp
 $(AR) $(ARFLAGS) @__lib__.tmp
 endef
 
-AR = lib
+AR = lib.exe
 ARFLAGS = -c $(A_USR)
 AROBJS = $(foreach file, $(^F), $(file))
 AR_RULE = $(AR) $(ARFLAGS) $@ $(AROBJS)

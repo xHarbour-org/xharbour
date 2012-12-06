@@ -43,7 +43,7 @@ endif
 
 # Add the specified GT driver library and other RTLs
 ifeq ($(findstring rtl,$(LIBS)),rtl)
-LINKLIBS += $(foreach gt, $(HB_GT_LIBS), -L$(TOP)$(ROOT)source/rtl/$(gt)/$(ARCH_DIR)/$(gt)$(LIB_EXT))
+LINKLIBS += $(foreach gt, $(HB_GT_LIBS), $(TOP)$(ROOT)source/rtl/$(gt)/$(ARCH_DIR)/$(gt)$(LIB_EXT))
 
 LINKLIBS += $(TOP)$(ROOT)source/rtl/pcre/$(ARCH_DIR)/pcrepos$(LIB_EXT)
 LINKLIBS += $(TOP)$(ROOT)source/rtl/zlib/$(ARCH_DIR)/zlib$(LIB_EXT)

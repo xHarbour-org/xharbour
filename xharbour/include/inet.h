@@ -144,6 +144,8 @@
          s->timeout = -1;\
          s->timelimit = -1;\
          s->caPeriodic = NULL;\
+         s->iSndBufSize = 1400; \
+         s->iRcvBufSize = 1400; \
       }
 
       #ifndef MSG_NOSIGNAL

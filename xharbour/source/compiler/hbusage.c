@@ -137,7 +137,7 @@ void hb_compPrintModes( void )
    printf( "\nCompatibility flags (lowercase/uppercase significant): -k[options]\n" );
 
    for( iLine = 0; iLine < ( int ) ( sizeof( szOptions ) / sizeof( char * ) ); iLine++ )
-      printf( szOptions[ iLine ] );
+      printf( "%s", szOptions[ iLine ] );
 }
 
 /*
@@ -152,7 +152,7 @@ void hb_compPrintCredits( void )
            "Credits: The xHarbour Team at www.xharbour.org\n"
            "         The Harbour Team at www.harbour-project.org\n"
            "\n" );
-   printf( szCredits );
+   printf( "%s", szCredits );
    printf( "\n" );
 }
 

@@ -52,7 +52,9 @@
 
 #if defined( HB_OS_WIN )
    #include "ws2spi.h"
-   #include "mswsock.h"
+   #if !defined( __BORLANDC__ )
+      #include "mswsock.h"
+   #endif
 #endif
 
 #include "hbapi.h"

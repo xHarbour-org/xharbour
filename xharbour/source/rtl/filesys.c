@@ -822,7 +822,7 @@ HB_FHANDLE hb_fsPOpen( const char * pFilename, const char * pMode )
 
 #ifndef HB_WIN32_IO
 
-int s_parametrize( char * out, char * in )
+int s_parametrize( char * out, const char * in )
 {
    int count = 0;  // we'll have at least one token
 
