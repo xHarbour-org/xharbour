@@ -51,11 +51,13 @@
  *
  */
 
+#if 0
 #ifdef HB_THREAD_SUPPORT
 static void s_doNothing( void * nothing )
 {
    HB_SYMBOL_UNUSED( nothing );
 }
+#endif
 #endif
 
 int hb_idle_msec_default( void )
