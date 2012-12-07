@@ -54,26 +54,25 @@
 #include "hbapiitm.h"
 #include "hbapierr.h"
 
-/* returns the numeric value of a character string representation of a number  */
+/* returns the numeric value of a character string representation of a number
+*/
 HB_FUNC( VAL )
 {
    PHB_ITEM pText = hb_param( 1, HB_IT_STRING );
 
    if( pText )
    {
-      char *   szText = hb_itemGetCPtr( pText );
-      int      iWidth, iDec, iLen = ( int ) hb_itemGetCLen( pText );
-      BOOL     fDbl;
+      int      iWidth, iDec;
       HB_LONG  lValue;
       double   dValue;
 
-      fDbl = hb_valStrnToNum( szText, iLen, &lValue, &dValue, &iDec, &iWidth );
-
-      if( ! fDbl )
+      if( ! hb_valStrnToNum( pText->item.asString.value, ( int ) pText->item.asString.length, &lValue, &dValue, &iDec, &iWidth ) )
          hb_retnintlen( lValue, iWidth );
       else
          hb_retndlen( dValue, iWidth, iDec );
+
+      return;
    }
-   else
-      hb_errRT_BASE_SubstR( EG_ARG, 1098, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1098, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }

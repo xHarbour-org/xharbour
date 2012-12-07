@@ -450,13 +450,22 @@ HB_FUNC( HB_PING )
             hb_snprintf( szHostName,    256, phostent->h_name );
 
             if( pHostAddress )
+            {
+               pHostAddress = hb_itemUnRef( pHostAddress );
                hb_itemPutC( pHostAddress, szHostAddress );
+            }
 
             if( pHostName )
+            {
+               pHostName = hb_itemUnRef( pHostName );
                hb_itemPutC( pHostName, szHostName ) ;
+            }
 
             if( pRTT )
+            {
+               pRTT = hb_itemUnRef( pRTT );
                hb_itemPutNI( pRTT, ( int ) pr.RTT ) ;
+            }
 
             hb_snprintf( szResponse, 1024, "%d.%d.%d.%d [%s], replied in RTT:%dms\n",
                          pr.Address.S_un.S_un_b.s_b1, pr.Address.S_un.S_un_b.s_b2, pr.Address.S_un.S_un_b.s_b3,
@@ -465,7 +474,10 @@ HB_FUNC( HB_PING )
       }
 
       if( pRef )
+      {
+         pRef = hb_itemUnRef( pRef );
          hb_itemPutC( pRef, szResponse );
+      }
 
       hb_retl( bSuccess );
       WSACleanup();

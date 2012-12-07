@@ -58,16 +58,18 @@
 HB_FUNC( LEFT )
 {
    PHB_ITEM pText = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pNum  = hb_param( 2, HB_IT_NUMERIC );
 
-   if( pText && hb_param( 2, HB_IT_NUMERIC ) )
+   if( pText && pNum )
    {
-      char *   sLeft, * sString = pText->item.asString.value;
-      LONG     lLeft = hb_parnl( 2 );
-      HB_SIZE  ulLen = pText->item.asString.length;
+      char * sLeft, * sString   = pText->item.asString.value;
+      LONG  lLeft               = hb_itemGetNL( pNum );
+      HB_SIZE ulLen             = pText->item.asString.length;
 
       HB_TRACE( HB_TR_DEBUG, ( "Left( '%s', %i ) %i", sString, lLeft, ulLen ) );
 
-      /* Must come first, because negative signed always greater than unsigned! */
+      /* Must come first, because negative signed always greater than unsigned!
+       */
       if( lLeft <= 0 )
       {
          hb_retclen( "", 0 );
@@ -75,7 +77,8 @@ HB_FUNC( LEFT )
       }
       else if( ( ULONG ) lLeft >= ulLen )
       {
-         /* No need to retain the 1st parameter - Recycle. */
+         /* No need to retain the 1st parameter - Recycle.
+          */
          hb_itemReturn( pText );
          return;
       }
@@ -85,9 +88,8 @@ HB_FUNC( LEFT )
       sLeft[ lLeft ] = '\0';
 
       hb_retclenAdopt( sLeft, lLeft );
+      return;
    }
-   else
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 1124, NULL, "LEFT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-   }
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1124, NULL, "LEFT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
 }

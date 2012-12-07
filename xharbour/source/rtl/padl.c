@@ -58,18 +58,15 @@
 /* left-pads a date, number, or string with spaces or supplied character */
 HB_FUNC( PADL )
 {
-   HB_SIZE  ulSize = 0;
+   HB_SIZE  ulSize   = 0;
    BOOL     bFreeReq = FALSE;
-   char *   szText;
-
-   if( ISNUM( 2 ) )
-      szText = hb_itemPadConv( hb_param( 1, HB_IT_ANY ), &ulSize, &bFreeReq );
-   else
-      szText = NULL;
+   PHB_ITEM pPad     = hb_param( 2, HB_IT_NUMERIC );
+   char *   szText   = pPad ? hb_itemPadConv( hb_param( 1, HB_IT_ANY ), &ulSize, &bFreeReq ) : NULL;
 
    if( szText )
    {
-      LONG lLen = hb_parnl( 2 );
+      LONG     lLen   = hb_itemGetNL( pPad );
+      PHB_ITEM pszPad = hb_param( 3, HB_IT_STRING );
 
       if( lLen > ( LONG ) ulSize )
       {
@@ -79,31 +76,24 @@ HB_FUNC( PADL )
 
          hb_xmemcpy( szResult + lPos, szText, ( LONG ) ulSize );
 
-         cPad = ( ISCHAR( 3 ) ? *( hb_parc( 3 ) ) : ' ' );
+         cPad = pszPad ? *( pszPad->item.asString.value ) : ' ';
 
          for(; lPos > 0; lPos-- )
-         {
             szResult[ lPos - 1 ] = cPad;
-         }
 
          hb_retclenAdopt( szResult, lLen );
       }
       else
       {
          if( lLen < 0 )
-         {
             lLen = 0;
-         }
 
          hb_retclen( szText, lLen );
       }
+
       if( bFreeReq )
-      {
          hb_xfree( szText );
-      }
    }
    else
-   {
       hb_retc( "" );
-   }
 }

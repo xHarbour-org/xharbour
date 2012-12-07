@@ -56,44 +56,41 @@
 #include "hbapierr.h"
 
 /* returns n copies of given string */
-
 HB_FUNC( REPLICATE )
 {
-   if( ISCHAR( 1 ) && hb_param( 2, HB_IT_NUMERIC ) )
+   PHB_ITEM pText = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pNum  = hb_param( 2, HB_IT_NUMERIC );
+
+   if( pText && pNum )
    {
-      LONG lTimes = hb_parnl( 2 );
+      LONG lTimes = hb_itemGetNL( pNum );
 
       if( lTimes > 0 )
       {
-         HB_SIZE ulLen = hb_parclen( 1 );
+         HB_SIZE ulLen = pText->item.asString.length;
 
          if( ( double ) ( ( double ) ulLen * ( double ) lTimes ) < ( double ) ULONG_MAX )
          {
-            const char *   szText   = hb_parcx( 1 );
-            char *         szResult = ( char * ) hb_xgrab( ( ulLen * lTimes ) + 1 );
-            char *         szPtr    = szResult;
-            LONG           i;
+            char *  szResult = ( char * ) hb_xgrab( ( ulLen * lTimes ) + 1 );
+            char *  szPtr    = szResult;
+            LONG    i;
 
             for( i = 0; i < lTimes; i++ )
             {
-               hb_xmemcpy( szPtr, szText, ( size_t ) ulLen );
+               hb_xmemcpy( szPtr, pText->item.asString.value, ( size_t ) ulLen );
                szPtr += ulLen;
             }
 
             hb_retclenAdopt( szResult, ulLen * lTimes );
          }
          else
-         {
             hb_errRT_BASE_SubstR( EG_STROVERFLOW, 1234, NULL, "REPLICATE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-         }
       }
       else
-      {
          hb_retc( "" );
-      }
+
+      return;
    }
-   else
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 1106, NULL, "REPLICATE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-   }
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1106, NULL, "REPLICATE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
 }

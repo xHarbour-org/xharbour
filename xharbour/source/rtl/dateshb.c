@@ -166,17 +166,11 @@ static int hb_datectod( char const * szDate, int * pd_value, int * pm_value, int
          {
             /* Process the digit for the current date field */
             if( d_pos == 1 )
-            {
                d_value = ( d_value * 10 ) + digit - '0';
-            }
             else if( m_pos == 1 )
-            {
                m_value = ( m_value * 10 ) + digit - '0';
-            }
             else if( y_pos == 1 )
-            {
                y_value = ( y_value * 10 ) + digit - '0';
-            }
 
             /* Treat the next non-digit as a date field separator */
             non_digit = 0;
@@ -212,13 +206,9 @@ static int hb_datectod( char const * szDate, int * pd_value, int * pm_value, int
          digit = hb_setGetEpoch() / 100;
 
          if( y_value >= count )
-         {
             y_value += ( digit * 100 );
-         }
          else
-         {
             y_value += ( ( digit * 100 ) + 100 );
-         }
       }
    }
    *pd_value   = d_value;
@@ -249,23 +239,17 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
             case 'H':
             case 'h':
                if( h_pos == 0 )
-               {
                   h_pos = digit++;
-               }
                break;
             case 'M':
             case 'm':
                if( m_pos == 0 )
-               {
                   m_pos = digit++;
-               }
                break;
             case 'S':
             case 's':
                if( s_pos == 0 )
-               {
                   s_pos = digit++;
-               }
             case 'C':
             case 'c':
                if( c_pos == 0 )
@@ -317,14 +301,7 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
          }
          else if( ( digit == 'A' || digit == 'P' ) && p_pos == 1 && szTime[ count + 1 ] == 'M' )
          {
-            if( digit == 'P' )
-            {
-               pm = 1;
-            }
-            else
-            {
-               pm = -1;
-            }
+            pm = ( digit == 'P' ) ? 1 : -1;
             count++;
             h_pos--;
             m_pos--;
@@ -369,9 +346,7 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
       {
          h_value %= 12;
          if( pm == 1 )
-         {
             h_value += 12;
-         }
       }
 
       if( h_value > 23 || m_value > 59 || s_value >= 60.0 )
@@ -390,64 +365,80 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
 
 HB_FUNC( CTOD )
 {
-   if( ISCHAR( 1 ) )
-   {
-      const char *   szDate   = hb_parcx( 1 );
-      int            d_value  = 0, m_value = 0, y_value = 0;
+   PHB_ITEM pszDate = hb_param( 1, HB_IT_STRING );
 
-      hb_datectod( szDate, &d_value, &m_value, &y_value );
+   if( pszDate )
+   {
+      int d_value  = 0, m_value = 0, y_value = 0;
+
+      hb_datectod( pszDate->item.asString.value, &d_value, &m_value, &y_value );
 
       hb_retd( y_value, m_value, d_value );
+
+      return;
    }
-   else
-      hb_errRT_BASE_SubstR( EG_ARG, 1119, NULL, "CTOD", 1, hb_paramError( 1 ) );
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1119, NULL, "CTOD", 1, hb_paramError( 1 ) );
 }
 
 HB_FUNC( DTOC )
 {
-   if( ISDATETIME( 1 ) )
+   PHB_ITEM pDTOC = hb_param( 1, HB_IT_DATETIME );
+
+   if( pDTOC )
    {
       char  szDate[ 9 ];
       char  szFormatted[ 11 ];
 
-      hb_retc( hb_dateFormat( hb_pardsbuff( szDate, 1 ), szFormatted, hb_setGetDateFormat() ) );
+      hb_retc( hb_dateFormat( hb_dateDecStr( szDate, pDTOC->item.asDate.value ), szFormatted, hb_setGetDateFormat() ) );
+      return;
    }
-   else
-      hb_errRT_BASE_SubstR( EG_ARG, 1118, NULL, "DTOC", 1, hb_paramError( 1 ) );
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1118, NULL, "DTOC", 1, hb_paramError( 1 ) );
 }
 
 HB_FUNC( DTOS )
 {
-   if( ISDATETIME( 1 ) )
+   PHB_ITEM pszDate = hb_param( 1, HB_IT_DATETIME );
+
+   if( pszDate )
    {
       char szDate[ 9 ];
 
-      hb_retc( hb_pardsbuff( szDate, 1 ) );
+      hb_retc( hb_dateDecStr( szDate, pszDate->item.asDate.value ) );
+      return;
    }
-   else
-      hb_errRT_BASE_SubstR( EG_ARG, 1120, NULL, "DTOS", 1, hb_paramError( 1 ) );
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1120, NULL, "DTOS", 1, hb_paramError( 1 ) );
 }
 
 HB_FUNC( STOD )
 {
-   HB_SIZE iLen = hb_parclen( 1 );
+   PHB_ITEM pDate = hb_param( 1, HB_IT_STRING );
 
-   if( iLen == 8 )
+   if( pDate )
    {
-      hb_retds( hb_parc( 1 ) );
+      BOOL bOk = FALSE;
+
+      if( pDate->item.asString.length == 8 )
+      {
+         hb_retds( pDate->item.asString.value );
+         bOk = TRUE;
+      }
+      else if( pDate->item.asString.length > 8 )
+      {
+         char szDate[ 9 ];
+         HB_MEMCPY( szDate, pDate->item.asString.value, 8 );
+         szDate[ 8 ] = '\0';
+         hb_retds( szDate );
+         bOk = TRUE;
+      }
+
+      if( bOk )
+         return;
    }
-   else if( iLen < 8 )
-   {
-      hb_retds( NULL );
-   }
-   else
-   {
-      char           szDate[ 9 ];
-      const char *   pDate = hb_parcx( 1 );
-      HB_MEMCPY( szDate, pDate, 8 );
-      szDate[ 8 ] = '\0';
-      hb_retds( szDate );
-   }
+
+   hb_retds( NULL );
 }
 
 HB_FUNC( YEAR )
@@ -461,11 +452,10 @@ HB_FUNC( YEAR )
       hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
 
       hb_retnllen( iYear, 5 );
+      return;
    }
-   else
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 1112, NULL, "YEAR", 1, hb_paramError( 1 ) );
-   }
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1112, NULL, "YEAR", 1, hb_paramError( 1 ) );
 }
 
 HB_FUNC( MONTH )
@@ -479,11 +469,10 @@ HB_FUNC( MONTH )
       hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
 
       hb_retnilen( iMonth, 3 );
+      return;
    }
-   else
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 1113, NULL, "MONTH", 1, hb_paramError( 1 ) );
-   }
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1113, NULL, "MONTH", 1, hb_paramError( 1 ) );
 }
 
 HB_FUNC( DAY )
@@ -497,9 +486,10 @@ HB_FUNC( DAY )
       hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
 
       hb_retnilen( iDay, 3 );
+      return;
    }
-   else
-      hb_errRT_BASE_SubstR( EG_ARG, 1114, NULL, "DAY", 1, hb_paramError( 1 ) );
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1114, NULL, "DAY", 1, hb_paramError( 1 ) );
 }
 
 HB_FUNC( TIME )
@@ -516,9 +506,7 @@ HB_FUNC( TIMEOFDAY )
    char szResult[ 9 ];
 
    if( hb_pcount() == 0 )
-   {
       hb_dateTimeStr( szResult );
-   }
    else
    {
       int iSeconds = hb_parni( 1 );
@@ -529,7 +517,6 @@ HB_FUNC( TIMEOFDAY )
    hb_retclen( szResult, 8 );
 }
 #endif
-
 
 HB_FUNC( DATE )
 {
@@ -544,9 +531,12 @@ HB_FUNC( DOW )
    PHB_ITEM pDate = hb_param( 1, HB_IT_DATETIME );
 
    if( pDate )
+   {
       hb_retnilen( hb_dateJulianDOW( pDate->item.asDate.value ), 3 );
-   else
-      hb_errRT_BASE_SubstR( EG_ARG, 1115, NULL, "DOW", 1, hb_paramError( 1 ) );
+      return;
+   }
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1115, NULL, "DOW", 1, hb_paramError( 1 ) );
 }
 
 HB_FUNC( DATETIME )
@@ -555,22 +545,27 @@ HB_FUNC( DATETIME )
    {
       int      iYear, iMonth, iDay, iHour, iMinute;
       double   dSeconds;
+
       hb_dateToday( &iYear, &iMonth, &iDay );
       hb_dateTime( &iHour, &iMinute, &dSeconds );
       hb_retdt( iYear, iMonth, iDay, iHour, iMinute, dSeconds, 0 );
+      return;
    }
-   else
-      hb_retdtl( hb_dateEncode( hb_parni( 1 ), hb_parni( 2 ), hb_parni( 3 ) ),
-                 hb_timeStampEncode( hb_parni( 4 ), hb_parni( 5 ), hb_parni( 6 ), hb_parni( 7 ) ) );
+
+   hb_retdtl( hb_dateEncode( hb_parni( 1 ), hb_parni( 2 ), hb_parni( 3 ) ),
+              hb_timeStampEncode( hb_parni( 4 ), hb_parni( 5 ), hb_parni( 6 ), hb_parni( 7 ) ) );
 
 }
 
 HB_FUNC( TTOD )
 {
    if( ISDATETIME( 1 ) )
+   {
       hb_retdl( hb_pardl( 1 ) );
-   else
-      hb_errRT_BASE_SubstR( EG_ARG, 1120, NULL, "TTOD", 1, hb_paramError( 1 ) );
+      return;
+   }
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1120, NULL, "TTOD", 1, hb_paramError( 1 ) );
 }
 
 HB_FUNC( TTOS )
@@ -580,29 +575,30 @@ HB_FUNC( TTOS )
       char szDateTime[ 19 ];
 
       hb_retc( hb_pardtsbuff( szDateTime, 1 ) );
+      return;
    }
-   else
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 1120, NULL, "TTOS", 1, hb_paramError( 1 ) );
-   }
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1120, NULL, "TTOS", 1, hb_paramError( 1 ) );
 }
 
 HB_FUNC( TTOC )
 {
    if( ISDATETIME( 1 ) )
    {
-      char     szDate[ 19 ];
-      char *   szFormatted = ( char * ) hb_xgrab( 26 );
+      char   szDate[ 19 ];
+      char * szFormatted = ( char * ) hb_xgrab( 26 );
 
       hb_pardtsbuff( szDate, 1 );
+      hb_retcAdopt( hb_datetimeFormat(
+                      szDate,
+                      szFormatted,
+                      ( ( ISNUM( 2 ) && hb_parni( 2 ) == 2 ) || ( ISLOG( 2 ) && ! hb_parl( 2 ) ) ) ? NULL: hb_setGetDateFormat(),
+                      hb_setGetTimeFormat() ) );
 
-      if( ( ISNUM( 2 ) && hb_parni( 2 ) == 2 ) || ( ISLOG( 2 ) && ! hb_parl( 2 ) ) )
-         hb_retcAdopt( hb_datetimeFormat( szDate, szFormatted, NULL, hb_setGetTimeFormat() ) );
-      else
-         hb_retcAdopt( hb_datetimeFormat( szDate, szFormatted, hb_setGetDateFormat(), hb_setGetTimeFormat() ) );
+      return;
    }
-   else
-      hb_errRT_BASE_SubstR( EG_ARG, 1118, NULL, "TTOC", 1, hb_paramError( 1 ) );
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1118, NULL, "TTOC", 1, hb_paramError( 1 ) );
 }
 
 HB_FUNC( HOUR )
@@ -616,9 +612,10 @@ HB_FUNC( HOUR )
       hb_timeDecode( pDateTime->item.asDate.time, &iHour, NULL, NULL );
 
       hb_retnilen( iHour, 2 );
+      return;
    }
-   else
-      hb_errRT_BASE_SubstR( EG_ARG, 1112, NULL, "HOUR", 1, hb_paramError( 1 ) );
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1112, NULL, "HOUR", 1, hb_paramError( 1 ) );
 }
 
 HB_FUNC( MINUTE )
@@ -632,36 +629,39 @@ HB_FUNC( MINUTE )
       hb_timeDecode( pDateTime->item.asDate.time, NULL, &iMinute, NULL );
 
       hb_retnilen( iMinute, 2 );
+      return;
    }
-   else
-      hb_errRT_BASE_SubstR( EG_ARG, 1112, NULL, "MINUTE", 1, hb_paramError( 1 ) );
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1112, NULL, "MINUTE", 1, hb_paramError( 1 ) );
 }
 
 HB_FUNC( SECS )
 {
-   if( ISDATETIME( 1 ) )
+   PHB_ITEM pDateTime = hb_param( 1, HB_IT_DATETIME );
+
+   if( pDateTime )
    {
       double dSeconds;
 
-      hb_timeDecode( hb_param( 1, HB_IT_DATETIME )->item.asDate.time, NULL, NULL, &dSeconds );
+      hb_timeDecode( pDateTime->item.asDate.time, NULL, NULL, &dSeconds );
 
       hb_retndlen( dSeconds, 3 + HB_DATETIMEDECIMALS, HB_DATETIMEDECIMALS );
+      return;
    }
-   else
-   {
-      HB_FUNCNAME( TSSECS ) ();
-   }
+
+   HB_FUNC_EXEC( TSSECS );
 }
 
 HB_FUNC( CTOT )
 {
-   if( ISCHAR( 1 ) )
+   PHB_ITEM pzCTOT = hb_param( 1, HB_IT_STRING );
+
+   if( pzCTOT )
    {
-      const char *   szDate   = hb_parcx( 1 );
-      int            len      = ( int ) hb_parclen( 1 );
-      int            d_value  = 0, m_value = 0, y_value = 0;
-      int            h_value  = 0, n_value = 0, fin;
-      double         s_value  = 0;
+      int     len      = ( int ) pzCTOT->item.asString.length;
+      int     d_value  = 0, m_value = 0, y_value = 0;
+      int     h_value  = 0, n_value = 0, fin;
+      double  s_value  = 0;
 
       if( ( ISNUM( 2 ) && hb_parni( 2 ) == 2 ) || ( ISLOG( 2 ) && ! hb_parl( 2 ) ) )
       {
@@ -671,9 +671,7 @@ HB_FUNC( CTOT )
          y_value  = 1899;
       }
       else
-      {
-         fin = hb_datectod( szDate, &d_value, &m_value, &y_value );
-      }
+         fin = hb_datectod( pzCTOT->item.asString.value, &d_value, &m_value, &y_value );
 
       if( fin < len )
       {
@@ -681,36 +679,38 @@ HB_FUNC( CTOT )
 
          len            -= fin;
          memset( szTime, ' ', 12 );
-         HB_MEMCPY( szTime, szDate + fin + 1, ( len > 12 ? 12 : len ) );
+         HB_MEMCPY( szTime, pzCTOT->item.asString.value + fin + 1, ( len > 12 ? 12 : len ) );
          szTime[ 12 ]   = '\0';
          hb_timectot( szTime, &h_value, &n_value, &s_value );
       }
 
       hb_retdt( y_value, m_value, d_value, h_value, n_value, s_value, 0 );
+
+      return;
    }
-   else
-      hb_errRT_BASE_SubstR( EG_ARG, 1119, NULL, "CTOT", 1, hb_paramError( 1 ) );
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1119, NULL, "CTOT", 1, hb_paramError( 1 ) );
 }
 
 HB_FUNC( STOT )
 {
-   int len = ( int ) hb_parclen( 1 );
+   PHB_ITEM pSTOT = hb_param( 1, HB_IT_STRING );
 
-   if( ISCHAR( 1 ) && len >= 8 )
+   if ( pSTOT && pSTOT->item.asString.length >= 8 )
    {
-      const char *   szDate   = hb_parcx( 1 );
-      long           lDate    = 0, lTime = 0;
-      char           szTime[ 19 ];
+      long lDate    = 0, lTime = 0;
+      char szTime[ 19 ];
 
       memset( szTime, ' ', 18 );
       szTime[ 18 ] = '\0';
-      HB_MEMCPY( szTime, szDate, ( len > 18 ? 18 : len ) );
+      HB_MEMCPY( szTime, pSTOT->item.asString.value, ( pSTOT->item.asString.length > 18 ? 18 : pSTOT->item.asString.length ) );
       hb_datetimeEncStr( szTime, &lDate, &lTime );
 
       hb_retdtl( lDate, lTime );
+      return;
    }
-   else
-      hb_errRT_BASE_SubstR( EG_ARG, 1119, NULL, "STOT", 1, hb_paramError( 1 ) );
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1119, NULL, "STOT", 1, hb_paramError( 1 ) );
 }
 
 HB_FUNC( HMS2D )

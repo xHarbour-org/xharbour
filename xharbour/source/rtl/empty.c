@@ -61,7 +61,9 @@ HB_FUNC( EMPTY )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_ANY );
 
-   switch( hb_itemType( pItem ) )
+   /* switch( hb_itemType( pItem ) )
+    */
+   switch( pItem->type )
    {
       case HB_IT_ARRAY:
          hb_retl( pItem->item.asArray.value->ulLen == 0 );

@@ -67,7 +67,6 @@
 #include "hbapiitm.h"
 #include "hbapierr.h"
 
-
 HB_FUNC( INT )
 {
    PHB_ITEM pNumber = hb_param( 1, HB_IT_NUMERIC );
@@ -75,9 +74,7 @@ HB_FUNC( INT )
    if( pNumber )
    {
       if( HB_IS_NUMBER_INT( pNumber ) )
-      {
          hb_itemReturn( pNumber );
-      }
       else
       {
          int iWidth;
@@ -85,32 +82,32 @@ HB_FUNC( INT )
          hb_itemGetNLen( pNumber, &iWidth, NULL );
          hb_retnlen( hb_numInt( hb_itemGetND( pNumber ) ), iWidth, 0 );
       }
+      return;
    }
-   else
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 1090, NULL, "INT", 1, hb_paramError( 1 ) );
-   }
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1090, NULL, "INT", 1, hb_paramError( 1 ) );
 }
 
 HB_FUNC( ROUND )
 {
    PHB_ITEM pNumber = hb_param( 1, HB_IT_NUMERIC );
 
-   if( pNumber && hb_param( 2, HB_IT_NUMERIC ) )
+   if( pNumber )
    {
-      int iDec = hb_parni( 2 );
+      PHB_ITEM pDec = hb_param( 2, HB_IT_NUMERIC );
 
-      if( HB_IS_NUMBER_INT( pNumber ) && iDec == 0 )
+      if( pDec )
       {
-         hb_itemReturn( pNumber );
-      }
-      else
-      {
-         hb_retnlen( hb_numRound( hb_itemGetND( pNumber ), iDec ), 0, HB_MAX( iDec, 0 ) );
+         int iDec = hb_itemGetNI( pDec );
+
+         if( HB_IS_NUMBER_INT( pNumber ) && iDec == 0 )
+            hb_itemReturn( pNumber );
+         else
+            hb_retnlen( hb_numRound( hb_itemGetND( pNumber ), iDec ), 0, HB_MAX( iDec, 0 ) );
+
+         return;
       }
    }
-   else
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 1094, NULL, "ROUND", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-   }
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1094, NULL, "ROUND", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
 }

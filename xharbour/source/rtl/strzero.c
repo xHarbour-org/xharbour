@@ -57,9 +57,11 @@
 
 HB_FUNC( STRZERO )
 {
-   if( hb_pcount() >= 1 && hb_pcount() <= 3 )
+   int iCount = hb_pcount();
+
+   if( iCount >= 1 && iCount <= 3 )
    {
-      BOOL     bValid;
+      BOOL     bValid   = FALSE;
       PHB_ITEM pNumber  = hb_param( 1, HB_IT_NUMERIC );
       PHB_ITEM pWidth   = NULL;
       PHB_ITEM pDec     = NULL;
@@ -68,22 +70,20 @@ HB_FUNC( STRZERO )
       {
          bValid = TRUE;
 
-         if( hb_pcount() >= 2 )
+         if( iCount >= 2 )
          {
             pWidth = hb_param( 2, HB_IT_NUMERIC );
             if( ! pWidth )
                bValid = FALSE;
          }
 
-         if( hb_pcount() >= 3 )
+         if( iCount >= 3 )
          {
             pDec = hb_param( 3, HB_IT_NUMERIC );
             if( ! pDec )
                bValid = FALSE;
          }
       }
-      else
-         bValid = FALSE;
 
       if( bValid )
       {
@@ -120,12 +120,9 @@ HB_FUNC( STRZERO )
             hb_retcAdopt( szResult );
          }
          else
-         {
             hb_retc( "" );
-         }
       }
       else
-      {
 #ifdef HB_C52_STRICT
          /* NOTE: In CA-Cl*pper STRZERO() is written in Clipper, and will call
                   STR() to do the job, the error (if any) will also be thrown
@@ -134,6 +131,5 @@ HB_FUNC( STRZERO )
 #else
          hb_errRT_BASE_SubstR( EG_ARG, 9999, NULL, "STRZERO", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
 #endif
-      }
    }
 }

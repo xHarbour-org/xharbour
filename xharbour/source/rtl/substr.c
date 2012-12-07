@@ -59,24 +59,21 @@
 HB_FUNC( SUBSTR )
 {
    PHB_ITEM pText = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pNum  = hb_param( 2, HB_IT_NUMERIC );
 
-   if( pText && hb_param( 2, HB_IT_NUMERIC ) )
+   if( pText && pNum )
    {
-      LONG lPos = hb_parnl( 2 );
+      LONG lPos = hb_itemGetNL( pNum );
 
       if( lPos < 0 )
       {
          lPos += ( LONG ) pText->item.asString.length;
 
          if( lPos < 0 )
-         {
             lPos = 0;
-         }
       }
       else if( lPos )
-      {
          lPos--;
-      }
 
       if( lPos < ( LONG ) pText->item.asString.length )
       {
@@ -84,14 +81,14 @@ HB_FUNC( SUBSTR )
 
          if( hb_pcount() >= 3 )
          {
-            if( hb_param( 3, HB_IT_NUMERIC ) )
+            PHB_ITEM pNum1 = hb_param( 3, HB_IT_NUMERIC );
+
+            if( pNum1 )
             {
-               lLen = hb_parnl( 3 );
+               lLen = hb_itemGetNL( pNum1 );
 
                if( lLen > ( LONG ) pText->item.asString.length - lPos )
-               {
                   lLen = ( LONG ) pText->item.asString.length - lPos;
-               }
             }
             else
             {
@@ -101,26 +98,18 @@ HB_FUNC( SUBSTR )
             }
          }
          else
-         {
             lLen = ( LONG ) pText->item.asString.length - lPos;
-         }
 
          if( lLen > 0 )
-         {
             hb_retclen( pText->item.asString.value + lPos, lLen );
-         }
          else
-         {
             hb_retc( "" );
-         }
       }
       else
-      {
          hb_retc( "" );
-      }
+
+      return;
    }
-   else
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 1110, NULL, "SUBSTR", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
-   }
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1110, NULL, "SUBSTR", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
 }

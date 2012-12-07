@@ -76,6 +76,7 @@ HB_FUNC( STR )
          if( ! pWidth && iParams < 4 )
             bValid = FALSE;
       }
+
       if( bValid && iParams >= 3 )
       {
          pDec = hb_param( 3, HB_IT_NUMERIC );
@@ -83,6 +84,7 @@ HB_FUNC( STR )
          if( ! pDec && iParams < 4 )
             bValid = FALSE;
       }
+
       if( bValid && iParams >= 4 )
       {
          PHB_ITEM pLtrim = hb_param( 4, HB_IT_LOGICAL );
@@ -96,47 +98,40 @@ HB_FUNC( STR )
    {
       char *   szResult;
       BOOL     bLogical = hb_setGetFixed();
-      PHB_ITEM pSet     = hb_itemPutL( NULL, FALSE );
 
-      hb_setSetItem( HB_SET_FIXED, pSet );
+      HB_ITEM_NEW( pSet );
+
+      hb_itemPutL( &pSet, FALSE );
+
+      hb_setSetItem( HB_SET_FIXED, &pSet );
 
       szResult = hb_itemStr( pNumber, pWidth, pDec );
-      hb_itemPutL( pSet, bLogical );
-      hb_setSetItem( HB_SET_FIXED, pSet );
-      hb_itemRelease( pSet );
+      hb_itemPutL( &pSet, bLogical );
+      hb_setSetItem( HB_SET_FIXED, &pSet );
 
-      if( szResult )
+      if( ( szResult ) && ( bLtrim ) )
       {
-         if( bLtrim )
-         {
-            int iLen = 0;
+         int iLen = 0;
 
-            while( szResult[ iLen ] == ' ' )
-            {
-               ++iLen;
-            }
-            if( iLen )
-            {
-               memmove( szResult, szResult + iLen, strlen( szResult + iLen ) + 1 );
-            }
-         }
+         while( szResult[ iLen ] == ' ' )
+            ++iLen;
+
+         if( iLen )
+            memmove( szResult, szResult + iLen, strlen( szResult + iLen ) + 1 );
 
          hb_retcAdopt( szResult );
       }
-      else if( ( pWidth ) && ( pDec ) && ( hb_itemGetNI( pWidth ) - ( hb_itemGetNI( pDec ) + 1 ) == 0 ) )
+      else if( ( pWidth ) && ( pDec ) && ( pWidth->item.asInteger.value - ( pDec->item.asInteger.value + 1 ) == 0 ) )
       {
-         int      iLen     = hb_itemGetNI( pWidth );
-         char *   szTemp   = ( char * ) hb_xgrab( iLen + 1  );
+         char *   szTemp   = ( char * ) hb_xgrab( pWidth->item.asInteger.value + 1  );
 
-         hb_xmemset( szTemp, '*', iLen );
-         szTemp[ iLen + 1 ] = '\0';
+         hb_xmemset( szTemp, '*', pWidth->item.asInteger.value );
+         szTemp[ pWidth->item.asInteger.value + 1 ] = '\0';
 
          hb_retcAdopt( szTemp );
       }
       else
-      {
          hb_retc( szResult );
-      }
    }
    else
       hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "STR", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );

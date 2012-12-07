@@ -57,29 +57,26 @@
 HB_FUNC( RIGHT )
 {
    PHB_ITEM pText = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pNum  = hb_param( 2, HB_IT_NUMERIC );
 
-   if( pText && ISNUM( 2 ) )
+   if( pText && pNum )
    {
-      LONG  lLen     = hb_parnl( 2 );
+      LONG  lLen     = hb_itemGetNL( pNum );
       LONG  lTextLen = ( LONG ) pText->item.asString.length;
 
       if( lLen > lTextLen )
-      {
          lLen = lTextLen;
-      }
       else if( lLen < 0 )
-      {
          lLen = 0;
-      }
 
       hb_retclen( pText->item.asString.value + lTextLen - lLen, lLen );
+      return;
    }
-   else
-   {
+
 #ifdef HB_C52_STRICT
-      hb_retc( "" ); /* Clipper doesn't error */
+   hb_retc( "" ); /* Clipper doesn't error */
 #else
-      hb_errRT_BASE_SubstR( EG_ARG, 1124, NULL, "RIGHT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   hb_errRT_BASE_SubstR( EG_ARG, 1124, NULL, "RIGHT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
 #endif
-   }
+
 }
