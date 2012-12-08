@@ -47,18 +47,13 @@ char * hb_compIdentifierNew( char * szName, BOOL bCopy )
    if( szIdent )
    {
       if( bCopy == FALSE )
-      {
-         // WARNING: We must never call hb_compIdentifierNew( "Static Text", FALSE )!!!
+         /* WARNING: We must never call hb_compIdentifierNew( "Static Text", FALSE )!!!
+          */
          hb_xfree( szName );
-      }
    }
    else
    {
-      if( bCopy )
-         szIdent = hb_strdup( szName );
-      else
-         szIdent = szName;
-
+      szIdent = bCopy ? hb_strdup( szName ) : szName;
       hb_hashTableAdd( s_comp_Identifiers, ( void * ) szIdent );
    }
 

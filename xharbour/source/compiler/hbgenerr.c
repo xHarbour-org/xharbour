@@ -151,32 +151,26 @@ const char * hb_comp_szWarnings[] =
 
 void hb_compGenError( const char * szErrors[], char cPrefix, int iError, const char * szError1, const char * szError2 )
 {
-   int      iLine    = hb_comp_iLine - 1;
-   char *   szFile   = hb_pp_fileName( hb_comp_PP );
+   int      iLine        = hb_comp_iLine - 1;
+   char *   szFile       = hb_pp_fileName( hb_comp_PP );
+   char     szTmp[ 256 ] = { '\0' };
 
    if( cPrefix != 'F' && hb_comp_bError )
-   {
       return;
-   }
 
    if( szFile )
-   {
-      fprintf( hb_comp_errFile, "\r%s(%i) ", szFile, iLine );
-   }
+      hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "\r%s(%i) ", szFile, iLine );
 
-   fprintf( hb_comp_errFile, "Error %c%04i  ", cPrefix, iError );
+   hb_snprintf( szTmp, sizeof( szTmp ), "Error %c%04i  ", cPrefix, iError );
+   hb_xstrcat ( hb_comp_szMsgBuf, szTmp, 0 );
 
    if( cPrefix == 'F' && iError == HB_PP_ERR_UNKNOWN_RESULTMARKER )
-   {
-      /* AJ: Some compilers performs [f]printf("<%s>",string) incorrecltly */
-      fprintf( hb_comp_errFile, "Unknown result marker %s%s%s in #directive", "<", szError1, ">" );
-   }
+      hb_snprintf( szTmp, sizeof( szTmp ), "Unknown result marker %s%s%s in #directive", "<", szError1, ">" );
    else
-   {
-      fprintf( hb_comp_errFile, szErrors[ iError - 1 ], szError1, szError2 );
-   }
+      hb_snprintf( szTmp, sizeof( szTmp ), szErrors[ iError - 1 ], szError1, szError2 );
 
-   fprintf( hb_comp_errFile, "\n" );
+   hb_xstrcat( hb_comp_szMsgBuf, szTmp, "\n", 0 );
+   hb_compOutErr( hb_comp_szMsgBuf );
 
    hb_comp_iErrorCount++;
    hb_comp_bError = TRUE;
@@ -197,14 +191,16 @@ void hb_compGenWarning( const char * szWarnings[], char cPrefix, int iWarning, c
 
    if( ( ( int ) ( szText[ 0 ] - '0' ) ) <= hb_comp_iWarnings )
    {
-      if( szFile )
-      {
-         fprintf( hb_comp_errFile, "\r%s(%i) ", szFile, iLine );
-      }
+      char szTmp[ 256 ];
 
-      fprintf( hb_comp_errFile, "Warning %c%04i  ", cPrefix, iWarning );
-      fprintf( hb_comp_errFile, szText + 1, szWarning1, szWarning2 );
-      fprintf( hb_comp_errFile, "\n" );
+      if( szFile )
+         hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "\r%s(%i) ", szFile, iLine );
+
+      hb_snprintf( szTmp, sizeof( szTmp ), "Warning %c%04i  ", cPrefix, iWarning );
+      hb_xstrcat ( hb_comp_szMsgBuf, szTmp, 0 );
+      hb_snprintf( szTmp, sizeof( szTmp ), szText + 1, szWarning1, szWarning2 );
+      hb_xstrcat ( hb_comp_szMsgBuf, szTmp, "\n", 0 );
+      hb_compOutErr( hb_comp_szMsgBuf );
 
       hb_comp_bAnyWarning = TRUE;    /* report warnings at exit */
    }

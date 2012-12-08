@@ -272,8 +272,11 @@ void hb_compPCodeStat( PHB_FNAME pFileName )
 
       while( pFunc )
       {
-         if( outfile && ! hb_comp_bQuiet )
-            printf( "Generating pcode list for '%s'...\n", pFunc->szName );
+         if( outfile )
+         {
+            hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "Generating pcode list for '%s'...\n", pFunc->szName );
+            hb_compOutStd( hb_comp_szMsgBuf );
+         }
 
          ulPos = 0;
          while( ulPos < pFunc->lPCodePos )
@@ -284,7 +287,10 @@ void hb_compPCodeStat( PHB_FNAME pFileName )
             else
             {
                 if( outfile )
-                  fprintf( hb_comp_errFile, "--- Invalid (zero) opcode %i size in hb_compPCodeStat() ---\n", opcode );
+                {
+                   hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "--- Invalid (zero) opcode %i size in hb_compPCodeStat() ---\n", opcode );
+                   hb_compOutErr( hb_comp_szMsgBuf );
+                }
             }
 
             ulPos += hb_compPCodeSize( pFunc, ulPos );

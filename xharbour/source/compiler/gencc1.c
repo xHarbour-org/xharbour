@@ -1430,7 +1430,8 @@ static HB_GENC_FUNC( hb_p_pushdatetime )
       char szDateTime[ 24 ];
       fprintf( cargo->yyc, "\t/* %s */",
                hb_datetimeDecStr( szDateTime, HB_PCODE_MKLONG( ( pFunc->pCode + lPCodePos + 1 ) ), HB_PCODE_MKLONG( ( pFunc->pCode + lPCodePos + 5 ) ) ) );
-//      printf("szDateTime=%s lDate=%d lTime=%d\n", szDateTime, HB_PCODE_MKLONG( ( pFunc->pCode + lPCodePos + 1 ) ), HB_PCODE_MKLONG( ( pFunc->pCode + lPCodePos + 5 ) ) );
+/*      printf("szDateTime=%s lDate=%d lTime=%d\n", szDateTime, HB_PCODE_MKLONG( ( pFunc->pCode + lPCodePos + 1 ) ), HB_PCODE_MKLONG( ( pFunc->pCode + lPCodePos + 5 ) ) );
+ */
    }
 
    fprintf( cargo->yyc, "\t/* HB_ET_DDATETIME */\n" );

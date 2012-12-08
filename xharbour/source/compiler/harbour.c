@@ -170,7 +170,8 @@ int            hb_comp_iJumpOptimize      = 1;
 char *         hb_comp_szDeclaredFun      = NULL;
 char *         hb_Command_Line;  /* Switches to be documented in generated C file */
 
-FILE *         hb_comp_errFile            = NULL;
+/* FILE *      hb_comp_errFile            = NULL;
+ */
 
 BOOL           hb_comp_bAutoOpen          = TRUE;
 BOOL           hb_comp_bError             = FALSE;
@@ -189,7 +190,7 @@ HB_SIZE        hb_comp_ulLastOffsetPos;
 PVAR           hb_comp_pGlobals;
 short          hb_comp_iGlobals;
 
-// Encode strings method (0 means "no encode")
+/* Encode strings method (0 means "no encode") */
 int            hb_comp_iHidden = 0;
 
 /* EXTERNAL statement can be placed into any place in a function - this flag is
@@ -202,7 +203,8 @@ int            hb_comp_iHidden = 0;
    static BOOL hb_comp_bExternal   = FALSE;
  */
 
-// Ron Pinkas 2009/02/12 WHY not respect es2 for any warning - as per Clipper docs?
+/* Ron Pinkas 2009/02/12 WHY not respect es2 for any warning - as per Clipper docs?
+ */
 #if 0
 /* Limit the warning that stop compilation into ambiguous reference only so
    that warnings on uninitialized locals would not stop compilation when
@@ -256,9 +258,18 @@ BOOL     hb_comp_bWarnUnUsedBlockParams   = FALSE;
 /* how many pcode used in a module */
 ULONG    hb_comp_upCodeTotal              = 0;
 
+/* AJ: 2012-12-08 Harbour compiler output handlers
+ * These replace the use of hb_comp_errFile
+ * Errors are now directed to stderr
+ */
+char           hb_comp_szMsgBuf[ HB_PATH_MAX * 2 + 80 ] = { '\0' };
+void*          hb_compHandle                            = NULL;
+HB_OUTSTDFUNC  hb_outStdFunc                            = NULL;
+HB_OUTERRFUNC  hb_outErrFunc                            = NULL;
+
 #define MAX_MEM_COMMAND_LINE 10240
 
-// Used in hb_compAutoOpen()
+/* Used in hb_compAutoOpen() */
 int                  ArgC = 0;
 char **              ArgV;
 
@@ -271,7 +282,7 @@ int hb_compMain( int argc, char * argv[] )
    BOOL     bAnyFiles;
    char *   szBuildInfo;
 
-   // Stored for later use in hb_compAutoOpen().
+   /* Stored for later use in hb_compAutoOpen(). */
    ArgC                 = argc;
    ArgV                 = ( char ** ) argv;
 
@@ -279,10 +290,14 @@ int hb_compMain( int argc, char * argv[] )
 
    hb_comp_pOutPath     = NULL;
    hb_comp_ppo_pOutPath = NULL;
+
+/* AJ: 2012-12-08, Revised, by using new output handlers */
+#if 0
 #if defined( HOST_OS_UNIX_COMPATIBLE )
    hb_comp_errFile      = stderr;
 #else
    hb_comp_errFile      = stdout;
+#endif
 #endif
 
    /* Activate Harbour extensions by default. */
@@ -302,13 +317,11 @@ int hb_compMain( int argc, char * argv[] )
    hb_compChkCompilerSwitch( argc, argv );
 
    if( hb_comp_bLogo )
-   {
       hb_compPrintLogo();
-   }
 
    if( hb_comp_bBuildInfo )
    {
-      printf( "\n" );
+      hb_compOutStd( "\n" );
       szBuildInfo = hb_verBuildInfo( TRUE );
       hb_xfree( szBuildInfo );
       hb_compCleanUp();
@@ -333,9 +346,7 @@ int hb_compMain( int argc, char * argv[] )
 
    /* Load standard Declarations. */
    if( hb_comp_iWarnings >= 3 )
-   {
       hb_compDeclaredInit();
-   }
 
    /* Process all files passed via the command line. */
 
@@ -348,23 +359,15 @@ int hb_compMain( int argc, char * argv[] )
       if( ! HB_ISOPTSEP( argv[ i ][ 0 ] ) )
       {
          if( argv[ i ][ 0 ] == '@' )
-         {
             iStatus = hb_compProcessRSPFile( argv[ i ] );
-         }
          else
-         {
             iStatus = hb_compCompile( argv[ i ] );
-         }
 
          if( ! bAnyFiles )
-         {
             bAnyFiles = TRUE;
-         }
 
          if( iStatus != EXIT_SUCCESS )
-         {
             break;
-         }
       }
    }
 
@@ -377,14 +380,10 @@ int hb_compMain( int argc, char * argv[] )
    }
 
    if( hb_comp_iErrorCount > 0 )
-   {
       iStatus = EXIT_FAILURE;
-   }
 
    if( hb_comp_VariableList != NULL )
-   {
       fclose( hb_comp_VariableList );
-   }
 
    /* hb_xexit(); */
 
@@ -434,9 +433,7 @@ PFUNCALL hb_compFunCallAdd( char * szName, void * Namespace, int iFlags )
          char *   pTmp        = strchr( szNamespace, '.' );
 
          if( pTmp )
-         {
             pTmp[ 0 ] = '\0';
-         }
 
          szNamespace = hb_compIdentifierNew( szNamespace, TRUE );
 
@@ -447,9 +444,7 @@ PFUNCALL hb_compFunCallAdd( char * szName, void * Namespace, int iFlags )
          }
 
          if( pTmp )
-         {
             pTmp[ 0 ] = '.';
-         }
       }
    }
 
@@ -481,17 +476,13 @@ void hb_compExternAdd( char * szExternName, char * szNamespace, HB_SYMBOLSCOPE c
    pExtern->pNext       = NULL;
 
    if( hb_comp_pExterns == NULL )
-   {
       hb_comp_pExterns = pExtern;
-   }
    else
    {
       pLast = hb_comp_pExterns;
 
       while( pLast->pNext )
-      {
          pLast = pLast->pNext;
-      }
 
       pLast->pNext = pExtern;
    }
@@ -507,23 +498,17 @@ void hb_compExternAdd( char * szExternName, char * szNamespace, HB_SYMBOLSCOPE c
 
       if( pNamespace )
       {
-         //TODO: Duplicate error!
+         /* TODO: Duplicate error! */
       }
       else
-      {
          hb_compUsedNamespaceNew( szNamespace, NSF_DEFER );
-      }
 
       pSym = hb_compSymbolAdd( pExtern->szName, NULL, ( void * ) pExtern->szNamespace, SYMF_NS_EXPLICITPATH | SYMF_PUBLIC );
 
       if( pExtern->cScope & HB_FS_DEFERRED )
-      {
          hb_compFunCallAdd( pExtern->szName, pExtern->szNamespace, NSF_DEFER );
-      }
       else
-      {
          hb_compFunCallAdd( pExtern->szName, pExtern->szNamespace, NSF_EXPLICITPATH );
-      }
 
    }
    else
@@ -534,9 +519,7 @@ void hb_compExternAdd( char * szExternName, char * szNamespace, HB_SYMBOLSCOPE c
    }
 
    if( ( cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED )
-   {
       pSym->cScope |= HB_FS_DEFERRED;
-   }
 
 /*
    hb_comp_bExternal = TRUE;
@@ -586,10 +569,9 @@ void hb_compDeclaredParameterAdd( char * szVarName, BYTE cValueType )
    }
    else /* Declared Method Parameter */
    {
-      /*
-         printf( "\nAdding parameter: %s Type: %c In Method: %s Class: %s FROM CLASS: %s\n", szVarName, cValueType, hb_comp_pLastMethod->szName, hb_comp_pLastClass->szName, hb_comp_szFromClass );
-       */
-
+#if defined( HB_COMP_DEBUG )
+      printf( "\n[hb_compDeclaredParameterAdd] Adding parameter: %s Type: %c In Method: %s Class: %s FROM CLASS: %s\n", szVarName, cValueType, hb_comp_pLastMethod->szName, hb_comp_pLastClass->szName, hb_comp_szFromClass );
+#endif
       hb_comp_pLastMethod->iParamCount++;
 
       if( hb_comp_pLastMethod->cParamTypes )
@@ -609,10 +591,9 @@ void hb_compDeclaredParameterAdd( char * szVarName, BYTE cValueType )
       {
          hb_comp_pLastMethod->pParamClasses[ hb_comp_pLastMethod->iParamCount - 1 ] = hb_compClassFind( hb_comp_szFromClass );
 
-         /*
-            printf( "\nParameter: %s FROM CLASS: %s\n", szVarName, hb_comp_pLastMethod->pParamClasses[ hb_comp_pLastMethod->iParamCount - 1 ]->szName );
-          */
-
+#if defined( HB_COMP_DEBUG )
+         printf( "\n[hb_compDeclaredParameterAdd] Parameter: %s FROM CLASS: %s\n", szVarName, hb_comp_pLastMethod->pParamClasses[ hb_comp_pLastMethod->iParamCount - 1 ]->szName );
+#endif
          /* Resetting */
          hb_comp_szFromClass = NULL;
       }
@@ -663,14 +644,14 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
     * Note: FIELD and MEMVAR are executable statements
     */
    if( ( hb_comp_functions.pLast->bFlags & FUN_STATEMENTS ) && ! ( hb_comp_iVarScope == VS_FIELD || ( hb_comp_iVarScope & VS_MEMVAR ) ) )
-   {
       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_FOLLOWS_EXEC, ( hb_comp_iVarScope == VS_LOCAL ? "LOCAL" : "STATIC" ), NULL );
-   }
 
-   // STATIC vars can not be declared in an Extebded Codeblock <|...| ...>.
+   /* STATIC vars can not be declared in an Extebded Codeblock <|...| ...>.
+    */
    if( hb_comp_functions.iCount > 1 && hb_comp_functions.pLast->szName == NULL && hb_comp_iVarScope == VS_STATIC )
    {
-      fprintf( hb_comp_errFile, "%i Proc: %s\n", hb_comp_functions.iCount, hb_comp_functions.pLast->szName );
+      hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "%i Proc: %s\n", hb_comp_functions.iCount, hb_comp_functions.pLast->szName );
+      hb_compOutErr( hb_comp_szMsgBuf );
       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_FOLLOWS_EXEC, "STATIC", NULL );
    }
 
@@ -687,14 +668,10 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
       if( hb_comp_iVarScope == VS_PRIVATE || hb_comp_iVarScope == VS_PUBLIC )
       {
          if( hb_comp_bAutoMemvarAssume )
-         {
             hb_compCheckDuplVars( pFunc->pMemvars, szVarName );
-         }
       }
       else
-      {
          hb_compCheckDuplVars( pFunc->pMemvars, szVarName );
-      }
    }
 
    hb_compCheckDuplVars( hb_comp_pGlobals, szVarName );
@@ -710,9 +687,9 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
    if( HB_TOUPPER( cValueType ) == 'S' )
    {
-      /*
-         printf( "\nVariable %s is of Class: %s\n", szVarName, hb_comp_szFromClass );
-       */
+#if defined( HB_COMP_DEBUG )
+      printf( "\n[hb_compVariableAdd] Variable %s is of Class: %s\n", szVarName, hb_comp_szFromClass );
+#endif
 
       pVar->Extended.pClass = hb_compClassFind( hb_comp_szFromClass );
 
@@ -727,41 +704,37 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
    }
 
    if( hb_comp_iVarScope & VS_PARAMETER )
-   {
       pVar->iUsed = VU_INITIALIZED;
-   }
 
    if( hb_comp_iVarScope & VS_MEMVAR )
    {
       USHORT wPos = 0;
 
-      /*printf( "\nAdding: %s in Function: %s\n", pVar->szName, pFunc->szName );*/
+#if defined( HB_COMP_DEBUG )
+      printf( "\n[hb_compVariableAdd] Adding: %s in Function: %s\n", pVar->szName, pFunc->szName );
+#endif
 
       if( hb_comp_bAutoMemvarAssume || hb_comp_iVarScope == VS_MEMVAR )
       {
          /* add this variable to the list of MEMVAR variables
           */
          if( ! pFunc->pMemvars )
-         {
             pFunc->pMemvars = pVar;
-         }
          else
          {
             pLastVar = pFunc->pMemvars;
 
             if( pLastVar->szName == szVarName )
-            {
-               // The duplicate var will never be marked as used - avoid redundant warning!
+               /* The duplicate var will never be marked as used - avoid redundant warning!
+                */
                pVar->iUsed |= VU_USED;
-            }
 
             while( pLastVar->pNext )
             {
                if( pLastVar->szName == szVarName )
-               {
-                  // The duplicate var will never be marked as used - avoid redundant warning!
+                  /* The duplicate var will never be marked as used - avoid redundant warning!
+                   */
                   pVar->iUsed |= VU_USED;
-               }
 
                pLastVar = pLastVar->pNext;
             }
@@ -781,14 +754,10 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
          case ( VS_PARAMETER | VS_PRIVATE ):
          {
             if( hb_comp_functions.pLast->wParamCount >= 254 )
-            {
                hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_TOOMANY_PARAMS, szVarName, NULL );
-            }
 
             if( ++hb_comp_functions.pLast->wParamNum > hb_comp_functions.pLast->wParamCount )
-            {
                hb_comp_functions.pLast->wParamCount = hb_comp_functions.pLast->wParamNum;
-            }
 
             hb_compSymbolAdd( szVarName, &wPos, NULL, SYMF_PUBLIC );
 
@@ -802,13 +771,9 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
                while( pMemVar )
                {
                   if( pMemVar->szName == pVar->szName )
-                  {
                      break;
-                  }
                   else
-                  {
                      pMemVar = pMemVar->pNext;
-                  }
                }
 
                /* Not declared as memvar. */
@@ -816,23 +781,21 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
                {
                   /* add this variable to the list of PRIVATE variables. */
                   if( ! pFunc->pPrivates )
-                  {
                      pFunc->pPrivates = pVar;
-                  }
                   else
                   {
                      pLastVar = pFunc->pPrivates;
 
                      while( pLastVar->pNext )
-                     {
                         pLastVar = pLastVar->pNext;
-                     }
 
                      pLastVar->pNext = pVar;
                   }
 
                   bUsed = TRUE;
-                  /*printf( "\nAdded Private: %s Type %c\n", pVar->szName, pVar->cType );*/
+#if defined( HB_COMP_DEBUG )
+                  printf( "\n[hb_compVariableAdd] Added Private: %s Type %c\n", pVar->szName, pVar->cType );
+#endif
                }
             }
 
@@ -848,13 +811,9 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
                while( pMemVar )
                {
                   if( pMemVar->szName == pVar->szName )
-                  {
                      break;
-                  }
                   else
-                  {
                      pMemVar = pMemVar->pNext;
-                  }
                }
 
                /* Not declared as memvar. */
@@ -862,23 +821,21 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
                {
                   /* add this variable to the list of PRIVATE variables. */
                   if( ! pFunc->pPrivates )
-                  {
                      pFunc->pPrivates = pVar;
-                  }
                   else
                   {
                      pLastVar = pFunc->pPrivates;
 
                      while( pLastVar->pNext )
-                     {
                         pLastVar = pLastVar->pNext;
-                     }
 
                      pLastVar->pNext = pVar;
                   }
 
                   bUsed = TRUE;
-                  /*printf( "\nAdded Private: %s Type %c\n", pVar->szName, pVar->cType );*/
+#if defined( HB_COMP_DEBUG )
+                  printf( "\n[hb_compVariableAdd]Added Private: %s Type %c\n", pVar->szName, pVar->cType );
+#endif
                }
             }
 
@@ -891,9 +848,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
       }
 
       if( ! bUsed )
-      {
          hb_xfree( pVar );
-      }
    }
    else
    {
@@ -905,9 +860,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
             USHORT wLocal = 1;
 
             if( ! pFunc->pLocals )
-            {
                pFunc->pLocals = pVar;
-            }
             else
             {
                pLastVar = pFunc->pLocals;
@@ -929,24 +882,19 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
             }
 
             if( hb_comp_bDebugInfo && szVarName )
-            {
                hb_compGenLocalName( wLocal, szVarName );
-            }
          }
          break;
 
          case VS_STATIC:
             if( ! pFunc->pStatics )
-            {
                pFunc->pStatics = pVar;
-            }
             else
             {
                pLastVar = pFunc->pStatics;
+
                while( pLastVar->pNext )
-               {
                   pLastVar = pLastVar->pNext;
-               }
 
                pLastVar->pNext = pVar;
             }
@@ -954,16 +902,14 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
          case VS_FIELD:
             if( ! pFunc->pFields )
-            {
                pFunc->pFields = pVar;
-            }
             else
             {
                pLastVar = pFunc->pFields;
+
                while( pLastVar->pNext )
-               {
                   pLastVar = pLastVar->pNext;
-               }
+
                pLastVar->pNext = pVar;
             }
 
@@ -972,23 +918,20 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
          case VS_GLOBAL:
          case VS_EXTERNGLOBAL:
             if( ! hb_comp_pGlobals )
-            {
                hb_comp_pGlobals = pVar;
-            }
             else
             {
                pLastVar = hb_comp_pGlobals;
+
                while( pLastVar->pNext )
-               {
                   pLastVar = pLastVar->pNext;
-               }
+
                pLastVar->pNext = pVar;
             }
 
             if( hb_comp_iVarScope == VS_EXTERNGLOBAL )
-            {
                pVar->szAlias = "";
-            }
+
             break;
       }
    }
@@ -1011,16 +954,16 @@ void hb_compGenGlobalName( char * szVarName )
 
       pBuffer  = ( BYTE * ) hb_xgrab( iVarLen + 5 );
       i        = 0;
+
       if( ! pVar->szAlias )
-      {
          /* GLOBAL defined in the current module */
          pBuffer[ i++ ] = HB_P_LOCALNAME;
-      }
       else
       {
          /* GLOBAL EXTERNAL */
          /* We don't set FUN_USES_STATICS here because HB_P_STATICNAME is
-          * used only as a convenience way to not create a new PCODE */
+          * used only as a convenience way to not create a new PCODE
+          */
          pBuffer[ i++ ] = HB_P_STATICNAME;
          pBuffer[ i++ ] = FALSE; /* currently unused in HVM */
       }
@@ -1085,9 +1028,7 @@ void hb_compGenStaticName( char * szVarName )
       hb_xfree( pBuffer );
 
       if( bGlobal )
-      {
          hb_compStaticDefEnd();
-      }
    }
 }
 
@@ -1100,17 +1041,11 @@ BOOL hb_compVariableMacroCheck( char * szVarName )
    BOOL bValid = FALSE;
 
    if( hb_compLocalGetPos( szVarName ) > 0 )
-   {
       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_BAD_MACRO, szVarName, NULL );
-   }
    else if( hb_compStaticGetPos( szVarName, hb_comp_functions.pLast ) > 0 )
-   {
       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_BAD_MACRO, szVarName, NULL );
-   }
    else if( hb_compFieldGetPos( szVarName, hb_comp_functions.pLast ) > 0 )
-   {
       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_BAD_MACRO, szVarName, NULL );
-   }
    else if( ! hb_comp_bStartProc )
    {
       if( hb_compMemvarGetPos( szVarName, hb_comp_functions.pLast ) == 0 )
@@ -1118,27 +1053,17 @@ BOOL hb_compVariableMacroCheck( char * szVarName )
          /* This is not a local MEMVAR
           */
          if( hb_compFieldGetPos( szVarName, hb_comp_functions.pFirst ) > 0 )
-         {
             hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_BAD_MACRO, szVarName, NULL );
-         }
          else if( hb_compStaticGetPos( szVarName, hb_comp_functions.pFirst ) > 0 )
-         {
             hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_BAD_MACRO, szVarName, NULL );
-         }
          else
-         {
             bValid = TRUE;    /* undeclared variable */
-         }
       }
       else
-      {
          bValid = TRUE;
-      }
    }
    else
-   {
       bValid = TRUE;    /* undeclared variable */
-   }
 
    return bValid;
 }
@@ -1148,12 +1073,12 @@ PCOMCLASS hb_compClassAdd( char * szClassName )
    PCOMCLASS      pClass;
    PCOMDECLARED   pDeclared;
 
-   /*printf( "Declaring Class: %s\n", szClassName );*/
+#if defined( HB_COMP_DEBUG )
+   printf( "[hb_compClassAdd] Declaring Class: %s\n", szClassName );
+#endif
 
    if( hb_comp_iWarnings < 3 )
-   {
       return NULL;
-   }
 
    if( ( pClass = hb_compClassFind( szClassName ) ) != NULL )
    {
@@ -1168,13 +1093,9 @@ PCOMCLASS hb_compClassAdd( char * szClassName )
    pClass->pNext     = NULL;
 
    if( hb_comp_pFirstClass == NULL )
-   {
       hb_comp_pFirstClass = pClass;
-   }
    else
-   {
       hb_comp_pLastClass->pNext = pClass;
-   }
 
    hb_comp_pLastClass         = pClass;
 
@@ -1191,26 +1112,18 @@ PCOMCLASS hb_compClassFind( char * szClassName )
    PCOMCLASS pClass = hb_comp_pFirstClass;
 
    if( hb_comp_iWarnings < 3 )
-   {
       return NULL;
-   }
 
    while( pClass )
    {
       if( pClass->szName == szClassName )
-      {
          return pClass;
-      }
       else
       {
          if( pClass->pNext )
-         {
             pClass = pClass->pNext;
-         }
          else
-         {
             return NULL;
-         }
       }
    }
    return NULL;
@@ -1220,12 +1133,12 @@ PCOMDECLARED hb_compMethodAdd( PCOMCLASS pClass, char * szMethodName )
 {
    PCOMDECLARED pMethod;
 
-   /*printf( "\nDeclaring Method: %s of Class: %s Pointer: %li\n", szMethodName, pClass->szName, pClass );*/
+#if defined( HB_COMP_DEBUG )
+   printf( "\n[hb_compMethodAdd] Declaring Method: %s of Class: %s Pointer: %li\n", szMethodName, pClass->szName, pClass );
+#endif
 
    if( hb_comp_iWarnings < 3 )
-   {
       return NULL;
-   }
 
    if( ( pMethod = hb_compMethodFind( pClass, szMethodName ) ) != NULL )
    {
@@ -1249,13 +1162,9 @@ PCOMDECLARED hb_compMethodAdd( PCOMCLASS pClass, char * szMethodName )
    pMethod->pNext          = NULL;
 
    if( pClass->pMethod == NULL )
-   {
       pClass->pMethod = pMethod;
-   }
    else
-   {
       pClass->pLastMethod->pNext = pMethod;
-   }
 
    pClass->pLastMethod  = pMethod;
 
@@ -1269,26 +1178,18 @@ PCOMDECLARED hb_compMethodFind( PCOMCLASS pClass, char * szMethodName )
    PCOMDECLARED pMethod = NULL;
 
    if( pClass )
-   {
       pMethod = pClass->pMethod;
-   }
 
    while( pMethod )
    {
       if( pMethod->szName == szMethodName )
-      {
          return pMethod;
-      }
       else
       {
          if( pMethod->pNext )
-         {
             pMethod = pMethod->pNext;
-         }
          else
-         {
             return NULL;
-         }
       }
    }
    return NULL;
@@ -1782,11 +1683,11 @@ PCOMDECLARED hb_compDeclaredAdd( char * szDeclaredName )
    PCOMDECLARED pDeclared;
 
    if( hb_comp_iWarnings < 3 )
-   {
       return NULL;
-   }
 
-   /*printf( "\nDeclaring Function: %s\n", szDeclaredName, NULL );*/
+#if defined( HB_COMP_DEBUG )
+   printf( "\n[hb_compDeclaredAdd] Declaring Function: %s\n", szDeclaredName );
+#endif
 
    if( ( pDeclared = hb_compDeclaredFind( szDeclaredName ) ) != NULL )
    {
@@ -1834,7 +1735,8 @@ PCOMSYMBOL hb_compSymbolAdd( char * szSymbolName, USHORT * pwPos, void * Namespa
          pSym->iFlags   |= iFlags;
          pSym->cScope   |= ( iFlags & ( HB_FS_PUBLIC | HB_FS_STATIC ) );
 
-         // Can never be both!
+         /* Can never be both!
+          */
          assert( ( pSym->cScope & ( HB_FS_PUBLIC | HB_FS_STATIC ) ) != ( HB_FS_PUBLIC | HB_FS_STATIC ) );
 
          return pSym;
@@ -1849,27 +1751,18 @@ PCOMSYMBOL hb_compSymbolAdd( char * szSymbolName, USHORT * pwPos, void * Namespa
       if( iFlags & SYMF_FUNCALL )
       {
          if( iFlags & SYMF_PUBLIC )
-         {
             pSym->cScope = HB_FS_PUBLIC;
-         }
          else if( iFlags & SYMF_STATIC )
-         {
             pSym->cScope = HB_FS_STATIC;
-         }
          else
-         {
-            // This symbol will have to be resolved to HB_FS_PUBLIC or HB_FS_STATIC
+            /* This symbol will have to be resolved to HB_FS_PUBLIC or HB_FS_STATIC
+             */
             pSym->cScope = ( HB_SYMBOLSCOPE ) 0;
-         }
       }
       else if( iFlags & SYMF_PUBLIC )
-      {
          pSym->cScope = HB_FS_PUBLIC;
-      }
       else
-      {
          assert( 0 );
-      }
 
       pSym->Namespace   = Namespace;
       pSym->pNext       = NULL;
@@ -1888,14 +1781,10 @@ PCOMSYMBOL hb_compSymbolAdd( char * szSymbolName, USHORT * pwPos, void * Namespa
       hb_comp_symbols.iCount++;
 
       if( pwPos )
-      {
          *pwPos = ( USHORT ) ( hb_comp_symbols.iCount - 1 ); /* position number starts form 0 */
-      }
    }
    else
-   {
       pSym = NULL;
-   }
 
    return pSym;
 }
@@ -1907,7 +1796,9 @@ static PFUNCTION hb_compFunctionNew( char * szName, HB_SYMBOLSCOPE cScope )
 {
    PFUNCTION pFunc;
 
-   //printf( "Function: %s\n", szName );
+#if defined( HB_COMP_DEBUG )
+   printf( "[hb_compFunctionNew] Function: %s\n", szName );
+#endif
 
    pFunc                   = ( PFUNCTION ) hb_xgrab( sizeof( _FUNC ) );
    pFunc->szName           = szName;
@@ -1992,10 +1883,8 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
    {
       /* The name of a function/procedure is already defined */
       if( ( pFunc != hb_comp_functions.pFirst ) || hb_comp_bStartProc )
-      {
          /* it is not a starting procedure that was automatically created */
          hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_FUNC_DUPL, szFunName, NULL );
-      }
    }
 
    if( hb_comp_Namespaces.pCurrent == NULL )
@@ -2004,18 +1893,14 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
       szFunction = hb_compReservedName( szFunName );
 
       if( szFunction && ! ( hb_comp_functions.iCount == 0 && ! hb_comp_bStartProc ) )
-      {
          /* We are ignoring it when it is the name of PRG file and we are
           * not creating implicit starting procedure
           */
          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_FUNC_RESERVED, szFunction, szFunName );
-      }
 #endif
    }
    else
-   {
       pNamespace = hb_compNamespaceNew( szFunName, NSTYPE_MEMBER | ( ( cScope & HB_FS_STATIC ) ?  NSTYPE_STATIC : 0 ) );
-   }
 
    hb_comp_iFunctionCnt++;
 
@@ -2027,13 +1912,9 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
             ( cScope & HB_FS_STATIC ) == 0 ) )
       {
          if( hb_comp_Namespaces.pCurrent )
-         {
             pSym = hb_compSymbolAdd( szFunName, NULL, ( void * ) hb_comp_Namespaces.pCurrent, SYMF_NS_EXPLICITPTR | ( cScope & ( HB_FS_PUBLIC | HB_FS_STATIC ) ) );
-         }
          else
-         {
             pSym = hb_compSymbolAdd( szFunName, NULL, ( void * ) hb_comp_Namespaces.pCurrent, SYMF_FUNCALL | ( cScope & ( HB_FS_PUBLIC | HB_FS_STATIC ) ) );
-         }
 
          pSym->cScope |= ( HB_FS_LOCAL | cScope );
       }
@@ -2043,9 +1924,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
    pFunc->bFlags  |= ( BYTE ) iType;
 
    if( pNamespace )
-   {
       pNamespace->pFunc = pFunc;
-   }
 
    if( hb_comp_functions.iCount == 0 )
    {
@@ -2126,9 +2005,7 @@ void hb_compAnnounce( char * szFunName )
        * have to be a public symbol - check if existing symbol is public
        */
       if( pFunc->cScope & HB_FS_STATIC )
-      {
          hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_FUNC_ANNOUNCE, szFunName, NULL );
-      }
    }
    else
    {
@@ -2221,20 +2098,14 @@ PFUNCTION hb_compFunctionKill( PFUNCTION pFunc )
 
    /* Release the NOOP array. */
    if( pFunc->pNOOPs )
-   {
       hb_xfree( ( void * ) pFunc->pNOOPs );
-   }
 
    /* Release the Jumps array. */
    if( pFunc->pJumps )
-   {
       hb_xfree( ( void * ) pFunc->pJumps );
-   }
 
    if( pFunc->pCode )
-   {
       hb_xfree( ( void * ) pFunc->pCode );
-   }
 
 /* hb_xfree( ( void * ) pFunc->szName ); The name will be released in hb_compSymbolKill() */
    hb_xfree( ( void * ) pFunc );
@@ -2281,9 +2152,7 @@ PFUNCALL hb_compFunCallFind( char * szFuncName, void * Namespace, int iFlags ) /
    while( pFunCall )
    {
       if( pFunCall->szName == szFuncName && pFunCall->Namespace == Namespace )
-      {
          return pFunCall;
-      }
 
       pFunCall = pFunCall->pNext;
    }
@@ -2302,34 +2171,24 @@ PFUNCTION hb_compFunctionFind( char * szFunctionName, void * Namespace, int iFla
          if( ( iFlags & NSF_EXPLICITPATH ) == NSF_EXPLICITPATH )
          {
             if( Namespace == NULL && pFunc->pNamespace == NULL )
-            {
                return pFunc;
-            }
             else if( pFunc->pNamespace && pFunc->pNamespace->szFullPath == ( char * ) Namespace )
-            {
                return pFunc;
-            }
          }
          else if( ( iFlags & NSF_EXPLICITPTR ) == NSF_EXPLICITPTR )
          {
             if( pFunc->pNamespace == ( PNAMESPACE ) Namespace )
-            {
                return pFunc;
-            }
          }
          else if( ( iFlags & NSF_MEMBER ) == NSF_MEMBER )
          {
             if( pFunc->pNamespace == ( PNAMESPACE ) Namespace )
-            {
                return pFunc;
-            }
          }
          else
          {
             if( pFunc->pNamespace == NULL )
-            {
                return pFunc;
-            }
          }
       }
 
@@ -2380,13 +2239,9 @@ PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pCallerNames
                if( ( pSymbol->cScope & ( HB_FS_PUBLIC | HB_FS_STATIC ) ) == 0 )
                {
                   if( ( pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_RUNTIME || ( pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
-                  {
                      pSymbol->cScope |= HB_FS_PUBLIC;
-                  }
                   else
-                  {
                      pSymbol->cScope |= HB_FS_STATIC;
-                  }
                }
             }
 
@@ -2405,14 +2260,10 @@ PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pCallerNames
       PCOMSYMBOL pGlobalSym = hb_compSymbolFind( szFunctionName, NULL, NULL, SYMF_FUNCALL );
 
       if( pGlobalSym )
-      {
          pSymbol->cScope |= ( pGlobalSym->cScope & ( HB_FS_DEFERRED | HB_FS_LOCAL | HB_FS_STATIC ) );
-      }
 
       if( ( pSymbol->cScope & HB_FS_STATIC ) == 0 )
-      {
          pSymbol->cScope |= HB_FS_PUBLIC;
-      }
 
       pSymbol->Namespace   = NULL;
       pSymbol->iFlags      &= ~SYMF_NS_RESOLVE;
@@ -2429,19 +2280,13 @@ PINLINE hb_compInlineFind( char * szFunctionName )
    while( pInline )
    {
       if( pInline->szName && strcmp( pInline->szName, szFunctionName ) == 0 )
-      {
          return pInline;
-      }
       else
       {
          if( pInline->pNext )
-         {
             pInline = pInline->pNext;
-         }
          else
-         {
             return NULL;
-         }
       }
    }
    return NULL;
@@ -2451,9 +2296,7 @@ PINLINE hb_compInlineFind( char * szFunctionName )
 PVAR hb_compLocalVariableFind( PFUNCTION pFunc, int wVar )
 {
    if( pFunc->wParamCount && ! ( pFunc->bFlags & FUN_USES_LOCAL_PARAMS ) )
-   {
       wVar -= pFunc->wParamCount;
-   }
 
    return hb_compVariableFind( pFunc->pLocals, wVar );
 }
@@ -2465,9 +2308,7 @@ PVAR hb_compVariableFind( PVAR pVars, int wOrder ) /* returns variable if define
    if( pVars )
    {
       while( pVars->pNext && w++ < wOrder )
-      {
          pVars = pVars->pNext;
-      }
    }
 
    return pVars;
@@ -2481,13 +2322,14 @@ USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName ) /* returns the orde
    {
       if( pVars->szName == szVarName )
       {
-         //if ( hb_comp_iWarnings < 3 )
+         /* if ( hb_comp_iWarnings < 3 )
+          */
          {
             pVars->iUsed |= VU_USED;
          }
          /*
-            else
-            Handled by hb_compStrongType()
+          *  else
+          *  Handled by hb_compStrongType()
           */
 
          return wVar;
@@ -2500,9 +2342,7 @@ USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName ) /* returns the orde
             wVar++;
          }
          else
-         {
             return 0;
-         }
       }
    }
    return 0;
@@ -2517,9 +2357,7 @@ int hb_compLocalGetPos( char * szVarName ) /* returns the order + 1 of a variabl
    {
       /* we are in a function/procedure -we don't need any tricks */
       if( pFunc->pOwner )
-      {
          pFunc = pFunc->pOwner;
-      }
 
       iVar = hb_compVariableGetPos( pFunc->pLocals, szVarName );
    }
@@ -2621,9 +2459,7 @@ int hb_compLocalGetPos( char * szVarName ) /* returns the order + 1 of a variabl
                      iVar              = -1; /* first variable */
 
                      if( ! pOutBlock->pStatics )
-                     {
                         pOutBlock->pStatics = pVar;
-                     }
                      else
                      {
                         PVAR pLastVar = pOutBlock->pStatics;
@@ -2664,32 +2500,24 @@ int hb_compStaticGetPos( char * szVarName, PFUNCTION pFunc )
    int iVar;
 
    while( pFunc->pOwner )     /* pOwner is not NULL if STATIC var := value is used */
-   {
       pFunc = pFunc->pOwner;
-   }
 
    if( pFunc->szName )
-   {
       /* we are in a function/procedure -we don't need any tricks */
       iVar = hb_compVariableGetPos( pFunc->pStatics, szVarName );
-   }
    else
    {
       /* we have to check the list of nested codeblock up to a function
        * where the codeblock is defined
        */
       while( pFunc->pOwner )
-      {
          pFunc = pFunc->pOwner;
-      }
 
       iVar = hb_compVariableGetPos( pFunc->pStatics, szVarName );
    }
 
    if( iVar )
-   {
       iVar += pFunc->iStaticsBase;
-   }
 
    return iVar;
 }
@@ -2702,19 +2530,15 @@ int hb_compFieldGetPos( char * szVarName, PFUNCTION pFunc )
    int iVar;
 
    if( pFunc->szName )
-   {
       /* we are in a function/procedure -we don't need any tricks */
       iVar = hb_compVariableGetPos( pFunc->pFields, szVarName );
-   }
    else
    {
       /* we have to check the list of nested codeblock up to a function
        * where the codeblock is defined
        */
       while( pFunc->pOwner )
-      {
          pFunc = pFunc->pOwner;
-      }
 
       iVar = hb_compVariableGetPos( pFunc->pFields, szVarName );
    }
@@ -2729,19 +2553,15 @@ int hb_compMemvarGetPos( char * szVarName, PFUNCTION pFunc )
    int iVar;
 
    if( pFunc->szName )
-   {
       /* we are in a function/procedure -we don't need any tricks */
       iVar = hb_compVariableGetPos( pFunc->pMemvars, szVarName );
-   }
    else
    {
       /* we have to check the list of nested codeblock up to a function
        * where the codeblock is defined
        */
       while( pFunc->pOwner )
-      {
          pFunc = pFunc->pOwner;
-      }
 
       iVar = hb_compVariableGetPos( pFunc->pMemvars, szVarName );
    }
@@ -2759,19 +2579,13 @@ PCOMDECLARED hb_compDeclaredFind( char * szDeclaredName )
    while( pSym )
    {
       if( pSym->szName == szDeclaredName )
-      {
          return pSym;
-      }
       else
       {
          if( pSym->pNext )
-         {
             pSym = pSym->pNext;
-         }
          else
-         {
             return NULL;
-         }
       }
    }
    return NULL;
@@ -2783,11 +2597,10 @@ PCOMSYMBOL hb_compSymbolFind( char * szSymbolName, USHORT * pwPos, void * Namesp
    USHORT      wCnt = 0;
 
    if( pwPos )
-   {
       *pwPos = 0;
-   }
 
-   // First we want a function [call] symbol if exists.
+   /* First we want a function [call] symbol if exists.
+    */
    if( ( iFlags & SYMF_FUNCALL ) )
    {
       pSym = hb_comp_symbols.pFirst;
@@ -2796,11 +2609,10 @@ PCOMSYMBOL hb_compSymbolFind( char * szSymbolName, USHORT * pwPos, void * Namesp
       {
          if( pSym->szName == szSymbolName && pSym->Namespace == Namespace )
          {
-            // Function symbol is always valid match for function call
+            /* Function symbol is always valid match for function call
+             */
             if( ( pSym->iFlags & SYMF_FUNCALL ) )
-            {
                break;
-            }
          }
 
          pSym = pSym->pNext;
@@ -2808,9 +2620,7 @@ PCOMSYMBOL hb_compSymbolFind( char * szSymbolName, USHORT * pwPos, void * Namesp
       }
    }
    else
-   {
       pSym = NULL;
-   }
 
    /*
       0 or SYMF_STATIC can only be a function [call] so already scanned above.
@@ -2825,14 +2635,12 @@ PCOMSYMBOL hb_compSymbolFind( char * szSymbolName, USHORT * pwPos, void * Namesp
          if( pSym->szName == szSymbolName && pSym->Namespace == Namespace )
          {
             if( ( pSym->iFlags & SYMF_PUBLIC ) )
-            {
                /*
-                  Public Function must be a *definition* thus it can adopt any
-                  Public symbol. Once a public symbol is used by a function
-                  definition all subsequent public usages are also acceptable.
+                * Public Function must be a *definition* thus it can adopt any
+                * Public symbol. Once a public symbol is used by a function
+                * definition all subsequent public usages are also acceptable.
                 */
                break;
-            }
          }
 
          pSym = pSym->pNext;
@@ -2843,9 +2651,7 @@ PCOMSYMBOL hb_compSymbolFind( char * szSymbolName, USHORT * pwPos, void * Namesp
    if( pSym )
    {
       if( pwPos )
-      {
          *pwPos = wCnt;
-      }
    }
 
    return pSym;
@@ -2860,9 +2666,7 @@ PCOMSYMBOL hb_compSymbolGetPos( USHORT wSymbol )
    USHORT      w     = 0;
 
    while( w++ < wSymbol && pSym->pNext )
-   {
       pSym = pSym->pNext;
-   }
 
    return pSym;
 }
@@ -2875,9 +2679,7 @@ USHORT hb_compFunctionGetPos( char * szFunctionName ) /* return 0 if not found o
    while( pFunc )
    {
       if( pFunc->szName == szFunctionName && pFunc != hb_comp_functions.pFirst )
-      {
          return wFunction;
-      }
       else
       {
          if( pFunc->pNext )
@@ -2886,9 +2688,7 @@ USHORT hb_compFunctionGetPos( char * szFunctionName ) /* return 0 if not found o
             wFunction++;
          }
          else
-         {
             return 0;
-         }
       }
    }
 
@@ -2933,13 +2733,9 @@ void hb_compPrepareOptimize( void )
 HB_SIZE hb_compGenJump( HB_LONG lOffset )
 {
    if( HB_LIM_INT24( lOffset ) )
-   {
       hb_compGenPCode4( HB_P_JUMPFAR, HB_LOBYTE( lOffset ), HB_HIBYTE( lOffset ), HB_LOBYTE( HB_HIWORD( lOffset ) ), ( BOOL ) 1 );
-   }
    else
-   {
       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_JUMP_TOO_LONG, NULL, NULL );
-   }
 
    hb_compPrepareOptimize();
 
@@ -2949,13 +2745,9 @@ HB_SIZE hb_compGenJump( HB_LONG lOffset )
 HB_SIZE hb_compGenJumpFalse( HB_LONG lOffset )
 {
    if( HB_LIM_INT24( lOffset ) )
-   {
       hb_compGenPCode4( HB_P_JUMPFALSEFAR, HB_LOBYTE( lOffset ), HB_HIBYTE( lOffset ), HB_LOBYTE( HB_HIWORD( lOffset ) ), ( BOOL ) 1 );
-   }
    else
-   {
       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_JUMP_TOO_LONG, NULL, NULL );
-   }
 
    hb_compPrepareOptimize();
 
@@ -2965,13 +2757,9 @@ HB_SIZE hb_compGenJumpFalse( HB_LONG lOffset )
 HB_SIZE hb_compGenJumpTrue( HB_LONG lOffset )
 {
    if( HB_LIM_INT24( lOffset ) )
-   {
       hb_compGenPCode4( HB_P_JUMPTRUEFAR, HB_LOBYTE( lOffset ), HB_HIBYTE( lOffset ), HB_LOBYTE( HB_HIWORD( lOffset ) ), ( BOOL ) 1 );
-   }
    else
-   {
       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_JUMP_TOO_LONG, NULL, NULL );
-   }
 
    hb_compPrepareOptimize();
 
@@ -2984,13 +2772,9 @@ void hb_compGenJumpThere( HB_ULONG ulFrom, HB_ULONG ulTo )
    LONG     lOffset  = ( LONG ) ( ulTo - ulFrom + 1 );
 
    if( HB_LIM_INT24( lOffset ) )
-   {
       HB_PUT_LE_UINT24( &pCode[ ( ULONG ) ulFrom ], lOffset );
-   }
    else
-   {
       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_JUMP_TOO_LONG, NULL, NULL );
-   }
 }
 
 void hb_compGenJumpHere( HB_ULONG ulOffset )
@@ -3011,9 +2795,7 @@ void hb_compGenModuleName( const char * szFile, const char * szFunc )
       char * szLast = ( char * ) hb_comp_functions.pLast->pCode + hb_comp_ulLastModuleNamePos + 1;
 
       if( ( ! strncmp( szFile, szLast, ( size_t ) iFileLen ) ) && ( szLast[ iFileLen ] == '\0' || szLast[ iFileLen ] == ':' ) )
-      {
          return;
-      }
    }
 
    iFuncLen       = szFunc ? strlen( szFunc ) + 1 : 0;
@@ -3028,9 +2810,7 @@ void hb_compGenModuleName( const char * szFile, const char * szFunc )
       HB_MEMCPY( ( BYTE * ) ( &( pBuffer[ 1 + iFileLen + 1 ] ) ), ( BYTE * ) szFunc, ( size_t ) iFuncLen );
    }
    else
-   {
       pBuffer[ 1 + iFileLen ] = '\0';
-   }
 
    hb_comp_ulLastModuleNamePos = hb_comp_functions.pLast->lPCodePos;
 
@@ -3041,9 +2821,7 @@ void hb_compGenModuleName( const char * szFile, const char * szFunc )
 void hb_compLinePush( void ) /* generates the pcode with the currently compiled source code line */
 {
    if( hb_comp_functions.pLast && ( hb_comp_functions.pLast->bFlags & FUN_SEALED ) )
-   {
       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_OUTSIDE, NULL, NULL );
-   }
 
    if( hb_comp_bLineNumbers && ! hb_comp_bDontGenLineNum )
    {
@@ -3051,12 +2829,12 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
       int   iOffset     = hb_comp_iLine - hb_comp_iBaseLine;
       BOOL  bCodeblock  = ( hb_comp_functions.pLast->pOwner != NULL );
 
-      //printf( "Line: %i, Offset %i LastPos %i, Pos %i\n", hb_comp_iLine, iOffset, hb_comp_ulLastOffsetPos, hb_comp_functions.pLast->lPCodePos );
+#if defined( HB_COMP_DEBUG )
+      printf( "[hb_compLinePush] Line: %i, Offset %i LastPos %i, Pos %i\n", hb_comp_iLine, iOffset, hb_comp_ulLastOffsetPos, hb_comp_functions.pLast->lPCodePos );
+#endif
 
       if( ! bCodeblock && hb_comp_bDebugInfo )
-      {
          hb_compGenModuleName( hb_pp_fileName( hb_comp_PP ), "" );
-      }
 
       if( ! bCodeblock && hb_comp_iBaseLine == 0 )
       {
@@ -3069,21 +2847,24 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
          if( ( hb_comp_functions.pLast->lPCodePos - hb_comp_ulLastLinePos ) == 3 )
          {
             if( hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos ] == HB_P_BASELINE )
-            {
                hb_comp_iBaseLine = hb_comp_iLine;
-            }
+
             hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos + 1 ] = HB_LOBYTE( iLine );
             hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos + 2 ] = HB_HIBYTE( iLine );
          }
          else if( ( ( hb_comp_functions.pLast->lPCodePos - hb_comp_ulLastOffsetPos ) > 2 ) || hb_comp_bDebugInfo )
          {
-            //printf( "Offset: %i Line: %i\n", iOffset, iLine );
+#if defined( HB_COMP_DEBUG )
+            printf( "[hb_compLinePush] Offset: %i Line: %i\n", iOffset, iLine );
+#endif
             hb_comp_ulLastOffsetPos = hb_comp_functions.pLast->lPCodePos;
             hb_compGenPCode2( HB_P_LINEOFFSET, ( BYTE ) iOffset, ( BOOL ) 0 );
          }
          else
          {
-            //printf( "Overwrite Offset: %i Line: %i\n", iOffset, iLine );
+#if defined( HB_COMP_DEBUG )
+            printf( "[hb_compLinePush] Overwrite Offset: %i Line: %i\n", iOffset, iLine );
+#endif
             hb_comp_functions.pLast->pCode[ hb_comp_ulLastOffsetPos + 1 ] = ( BYTE ) iOffset;
          }
       }
@@ -3092,9 +2873,8 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
                || hb_comp_bDebugInfo )
       {
          if( ! bCodeblock )
-         {
             hb_comp_ulLastLinePos = hb_comp_functions.pLast->lPCodePos;
-         }
+
          hb_compGenPCode3( HB_P_LINE, HB_LOBYTE( iLine ), HB_HIBYTE( iLine ), ( BOOL ) 0 );
       }
       else
@@ -3105,10 +2885,8 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
    }
 
    if( hb_comp_functions.pLast->bFlags & FUN_BREAK_CODE )
-   {
       /* previous line contained RETURN/BREAK/LOOP/EXIT statement */
       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_UNREACHABLE, NULL, NULL );
-   }
 
    hb_comp_bDontGenLineNum                   = FALSE;
 
@@ -3127,16 +2905,13 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
 void hb_compLinePushIfDebugger( void )
 {
    if( hb_comp_bDebugInfo )
-   {
       hb_compLinePush();
-   }
    else
    {
       if( hb_comp_functions.pLast->bFlags & FUN_BREAK_CODE )
-      {
          /* previous line contained RETURN/BREAK/LOOP/EXIT statement */
          hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_UNREACHABLE, NULL, NULL );
-      }
+
       hb_comp_functions.pLast->bFlags &= ~( FUN_WITH_RETURN | FUN_BREAK_CODE );   /* clear RETURN flag */
    }
 }
@@ -3151,9 +2926,7 @@ void hb_compLinePushIfInside( void ) /* generates the pcode with the currently c
    {
  */
    if( ( ! hb_comp_bStartProc && hb_comp_functions.iCount <= 1 ) || ( hb_comp_functions.pLast->bFlags & FUN_SEALED ) )
-   {
       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_OUTSIDE, NULL, NULL );
-   }
 /*
    }
  */
@@ -3176,13 +2949,9 @@ static void hb_compGenVariablePCode( BYTE bPCode, char * szVarName )
     */
 
    if( HB_COMP_ISSUPPORTED( HB_COMPFLAG_HARBOUR ) )
-   {
       bGenCode = hb_comp_bForceMemvars;    /* harbour compatibility */
-   }
    else
-   {
       bGenCode = ( hb_comp_bForceMemvars || bPCode == HB_P_POPVARIABLE );
-   }
 
    if( bGenCode )
    {
@@ -3190,36 +2959,28 @@ static void hb_compGenVariablePCode( BYTE bPCode, char * szVarName )
        */
       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_MEMVAR_ASSUMED, szVarName, NULL );
 
-      // Ron Pinkas 2009/02/12 - if es2 is used the compilation will be stopped without the need for this flag!
-      #if 0
+      /* Ron Pinkas 2009/02/12 - if es2 is used the compilation will be stopped without the need for this flag! */
+#if 0
       /* Clipper compatibility
          Should not compile with /es2 eventhough /v is used
        */
       if( hb_comp_iExitLevel == HB_EXITLEVEL_DELTARGET )
-      {
          hb_comp_AmbiguousVar = TRUE;
-      }
-      #endif
+#endif
 
       if( bPCode == HB_P_POPVARIABLE )
-      {
          bPCode = HB_P_POPMEMVAR;
-      }
       else if( bPCode == HB_P_PUSHVARIABLE )
-      {
          bPCode = HB_P_PUSHMEMVAR;
-      }
       else
-      {
          bPCode = HB_P_PUSHMEMVARREF;
-      }
    }
    else
    {
-      // Ron Pinkas 2009/02/12 - redundant flag
-      #if 0
+      /* Ron Pinkas 2009/02/12 - redundant flag */
+#if 0
       hb_comp_AmbiguousVar = TRUE;
-      #endif
+#endif
 
       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_AMBIGUOUS_VAR, szVarName, NULL );
    }
@@ -3239,9 +3000,7 @@ static void hb_compGenFieldPCode( BYTE bPCode, int wVar, char * szVarName, PFUNC
        * where the codeblock is defined
        */
       while( pFunc->pOwner )
-      {
          pFunc = pFunc->pOwner;
-      }
    }
 
    pField = hb_compVariableFind( pFunc->pFields, wVar );
@@ -3251,13 +3010,9 @@ static void hb_compGenFieldPCode( BYTE bPCode, int wVar, char * szVarName, PFUNC
                           */
    {
       if( bPCode == HB_P_POPFIELD )
-      {
          bPCode = HB_P_POPALIASEDFIELD;
-      }
       else if( bPCode == HB_P_PUSHFIELD )
-      {
          bPCode = HB_P_PUSHALIASEDFIELD;
-      }
 
       hb_compGenPushSymbol( pField->szAlias, NULL, SYMF_PUBLIC );
    }
@@ -3277,39 +3032,36 @@ static void hb_compGenVarPCode( BYTE bPCode, char * szVarName )
 
    if( bPCode == HB_P_PUSHALIASEDFIELD && wVar <= 255 )
    {
-      // Set VU_USED flag if declared MEMVAR
+      /* Set VU_USED flag if declared MEMVAR
+       */
       if( hb_compFieldGetPos( szVarName, hb_comp_functions.pLast ) == 0 )
       {
          if( ! hb_comp_bStartProc )
-         {
             hb_compFieldGetPos( szVarName, hb_comp_functions.pFirst );
-         }
       }
 
       hb_compGenPCode2( HB_P_PUSHALIASEDFIELDNEAR, ( BYTE ) wVar, ( BOOL ) 1 );
    }
    else if( bPCode == HB_P_POPALIASEDFIELD && wVar <= 255 )
    {
-      // Set VU_USED flag if declared MEMVAR
+      /* Set VU_USED flag if declared MEMVAR
+       */
       if( hb_compFieldGetPos( szVarName, hb_comp_functions.pLast ) == 0 )
       {
          if( ! hb_comp_bStartProc )
-         {
             hb_compFieldGetPos( szVarName, hb_comp_functions.pFirst );
-         }
       }
 
       hb_compGenPCode2( HB_P_POPALIASEDFIELDNEAR, ( BYTE ) wVar, ( BOOL ) 1 );
    }
    else
    {
-      // Set VU_USED flag if declared MEMVAR
+      /* Set VU_USED flag if declared MEMVAR
+       */
       if( hb_compMemvarGetPos( szVarName, hb_comp_functions.pLast ) == 0 )
       {
          if( ! hb_comp_bStartProc )
-         {
             hb_compMemvarGetPos( szVarName, hb_comp_functions.pFirst );
-         }
       }
 
       hb_compGenPCode3( bPCode, HB_LOBYTE( wVar ), HB_HIBYTE( wVar ), ( BOOL ) 1 );
@@ -3361,13 +3113,9 @@ void hb_compGenPopVar( char * szVarName ) /* generates the pcode to pop a value 
        * use 2 bytes for LOCALNEAR
        */
       if( HB_LIM_INT8( iVar ) && ! hb_comp_functions.pLast->szName )
-      {
          hb_compGenPCode2( HB_P_POPLOCALNEAR, ( BYTE ) iVar, ( BOOL ) 1 );
-      }
       else
-      {
          hb_compGenPCode3( HB_P_POPLOCAL, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), ( BOOL ) 1 );
-      }
 
       return;
    }
@@ -3377,13 +3125,9 @@ void hb_compGenPopVar( char * szVarName ) /* generates the pcode to pop a value 
     * where the static variable was declared
     */
    if( ( hb_comp_functions.pLast->cScope & HB_FS_INITEXIT ) == HB_FS_INITEXIT )
-   {
       pFunc = hb_comp_functions.pLast->pOwner;
-   }
    else
-   {
       pFunc = hb_comp_functions.pLast;
-   }
 
    iVar = hb_compStaticGetPos( szVarName, pFunc );
 
@@ -3484,33 +3228,25 @@ void hb_compGenPopAliasedVar( char * szVarName,
       if( szAlias )
       {
          if( szAlias[ 0 ] == 'M' && szAlias[ 1 ] == '\0' ) /* M->variable */
-         {
             hb_compGenVarPCode( HB_P_POPMEMVAR, szVarName );
-         }
          else
          {
             int iCmp = strncmp( szAlias, "MEMVAR", 4 );
 
             if( iCmp == 0 )
-            {
                iCmp = strncmp( szAlias, "MEMVAR", strlen( szAlias ) );
-            }
 
             if( iCmp == 0 ) /* MEMVAR-> or MEMVA-> or MEMV-> */
-            {
                hb_compGenVarPCode( HB_P_POPMEMVAR, szVarName );
-            }
             else /* field variable */
             {
                iCmp = strncmp( szAlias, "FIELD", 4 );
+
                if( iCmp == 0 )
-               {
                   iCmp = strncmp( szAlias, "FIELD", strlen( szAlias ) );
-               }
+
                if( iCmp == 0 ) /* FIELD-> */
-               {
                   hb_compGenVarPCode( HB_P_POPFIELD, szVarName );
-               }
                else /* database alias */
                {
                   hb_compGenPushSymbol( szAlias, NULL, SYMF_PUBLIC );
@@ -3551,13 +3287,9 @@ void hb_compGenPushVar( char * szVarName )
        * use 2 bytes for LOCALNEAR
        */
       if( HB_LIM_INT8( iVar ) && ! hb_comp_functions.pLast->szName )
-      {
          hb_compGenPCode2( HB_P_PUSHLOCALNEAR, ( BYTE ) iVar, ( BOOL ) 1 );
-      }
       else
-      {
          hb_compGenPCode3( HB_P_PUSHLOCAL, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), ( BOOL ) 1 );
-      }
 
       return;
    }
@@ -3606,9 +3338,7 @@ void hb_compGenPushVar( char * szVarName )
    }
 
    if( ! hb_comp_bStartProc )
-   {
       iVar = hb_compStaticGetPos( szVarName, hb_comp_functions.pFirst );
-   }
 
    if( iVar )
    {
@@ -3621,9 +3351,7 @@ void hb_compGenPushVar( char * szVarName )
    }
 
    if( ! hb_comp_bStartProc )
-   {
       iVar = hb_compFieldGetPos( szVarName, hb_comp_functions.pFirst );
-   }
 
    if( iVar )
    {
@@ -3635,21 +3363,15 @@ void hb_compGenPushVar( char * szVarName )
    }
 
    if( ! hb_comp_bStartProc )
-   {
       iVar = hb_compMemvarGetPos( szVarName, hb_comp_functions.pFirst );
-   }
 
    if( iVar )
-   {
       /* Global Memvar variable declaration */
       hb_compGenVarPCode( HB_P_PUSHMEMVAR, szVarName );
-   }
    else
-   {
       /* undeclared variable
        */
       hb_compGenVariablePCode( HB_P_PUSHVARIABLE, szVarName );
-   }
 }
 
 void hb_compGenPushVarRef( char * szVarName ) /* generates the pcode to push a variable by reference to the virtual machine stack */
@@ -3710,9 +3432,7 @@ void hb_compGenPushVarRef( char * szVarName ) /* generates the pcode to push a v
    }
 
    if( ! hb_comp_bStartProc )
-   {
       iVar = hb_compStaticGetPos( szVarName, hb_comp_functions.pFirst );
-   }
 
    if( iVar )
    {
@@ -3725,9 +3445,7 @@ void hb_compGenPushVarRef( char * szVarName ) /* generates the pcode to push a v
    }
 
    if( ! hb_comp_bStartProc )
-   {
       iVar = hb_compFieldGetPos( szVarName, hb_comp_functions.pFirst );
-   }
 
    if( iVar )
    {
@@ -3738,23 +3456,17 @@ void hb_compGenPushVarRef( char * szVarName ) /* generates the pcode to push a v
    }
 
    if( ! hb_comp_bStartProc )
-   {
       iVar = hb_compMemvarGetPos( szVarName, hb_comp_functions.pFirst );
-   }
 
    if( iVar )
-   {
       /* Global Memvar variable declaration
        */
       hb_compGenVarPCode( HB_P_PUSHMEMVARREF, szVarName );
-   }
    else
-   {
       /* undeclared variable - field cannot be passed by the
        * reference - assume the memvar
        */
       hb_compGenVariablePCode( HB_P_PUSHMEMVARREF, szVarName );
-   }
 }
 
 void hb_compGenPushMemVarRef( char * szVarName ) /* generates the pcode to push a variable by reference to the virtual machine stack */
@@ -3763,22 +3475,21 @@ void hb_compGenPushMemVarRef( char * szVarName ) /* generates the pcode to push 
 }
 
 /* commented out because it's not used currently
-
-   static BOOL hb_compVarFind( char * szVarName )
-   {
-   PFUNCTION pFunc = hb_comp_functions.pFirst;
-
-   while( pFunc )
-   {
-      if( hb_compMemvarGetPos( szVarName, pFunc ) > 0 )
-      {
-         return TRUE;
-      }
-      pFunc = pFunc->pNext;
-   }
-
-   return FALSE;
-   }
+ *
+ * static BOOL hb_compVarFind( char * szVarName )
+ * {
+ * PFUNCTION pFunc = hb_comp_functions.pFirst;
+ *
+ * while( pFunc )
+ * {
+ *    if( hb_compMemvarGetPos( szVarName, pFunc ) > 0 )
+ *       return TRUE;
+ *
+ *    pFunc = pFunc->pNext;
+ * }
+ *
+ * return FALSE;
+ * }
  */
 
 /* generates the pcode to push an aliased variable value to the virtual
@@ -3800,47 +3511,33 @@ void hb_compGenPushAliasedVar( char * szVarName,
          if( szAlias[ 0 ] == 'M' && szAlias[ 1 ] == '\0' ) /* M->variable */
          {
             if( lWorkarea == -1 )
-            {
                hb_compGenVarPCode( HB_P_PUSHMEMVARREF, szVarName );
-            }
             else
-            {
                hb_compGenVarPCode( HB_P_PUSHMEMVAR, szVarName );
-            }
          }
          else
          {
             int iCmp = strncmp( szAlias, "MEMVAR", 4 );
 
             if( iCmp == 0 )
-            {
                iCmp = strncmp( szAlias, "MEMVAR", strlen( szAlias ) );
-            }
 
             if( iCmp == 0 ) /* MEMVAR-> or MEMVA-> or MEMV-> */
             {
                if( lWorkarea == -1 )
-               {
                   hb_compGenVarPCode( HB_P_PUSHMEMVARREF, szVarName );
-               }
                else
-               {
                   hb_compGenVarPCode( HB_P_PUSHMEMVAR, szVarName );
-               }
             }
             else /* field variable */
             {
                iCmp = strncmp( szAlias, "FIELD", 4 );
 
                if( iCmp == 0 )
-               {
                   iCmp = strncmp( szAlias, "FIELD", strlen( szAlias ) );
-               }
 
                if( iCmp == 0 ) /* FIELD-> */
-               {
                   hb_compGenVarPCode( HB_P_PUSHFIELD, szVarName );
-               }
                else /* database alias */
                {
                   hb_compGenPushSymbol( szAlias, NULL, SYMF_PUBLIC );
@@ -3856,13 +3553,11 @@ void hb_compGenPushAliasedVar( char * szVarName,
       }
    }
    else
-   {
       /* Alias is already placed on stack
        * NOTE: An alias will be determined at runtime then we cannot decide
        * here if passed name is either a field or a memvar
        */
       hb_compGenVarPCode( HB_P_PUSHALIASEDVAR, szVarName );
-   }
 }
 
 void hb_compGenPushLogical( int iTrueFalse ) /* pushes a logical value on the virtual machine stack */
@@ -3904,9 +3599,7 @@ void hb_compGenPushFunCall( char * szFunName, char * szNamespace )
 #endif
    }
    else
-   {
       szFunction = NULL;
-   }
 
    if( szFunction )
    {
@@ -3922,23 +3615,17 @@ void hb_compGenPushFunCall( char * szFunName, char * szNamespace )
          if( hb_comp_UsedNamespaces.pCurrent )
          {
             if( hb_comp_UsedNamespaces.pCurrent->szName[ 0 ] == '*' )
-            {
                szNamespace = "*";
-            }
             else
             {
                PNAMESPACE pResolved = hb_compNamespaceFindMember( hb_comp_UsedNamespaces.pCurrent->pNext, szFunName, NSTYPE_MEMBER );
 
                if( pResolved )
-               {
                   szNamespace = hb_comp_UsedNamespaces.pCurrent->szFullPath;
-               }
             }
          }
          else
-         {
             szNamespace = hb_compFunctionResolveUsed( szFunName );
-         }
       }
 
       if( szNamespace )
@@ -3984,9 +3671,7 @@ char * hb_compFunctionResolveUsed( char * szFunName )
             pResolved = hb_compNamespaceFindMember( pNamespace->pNext, szFunName, NSTYPE_MEMBER );
 
             if( pResolved )
-            {
                return pNamespace->szFullPath;
-            }
          }
       }
 
@@ -4016,21 +3701,13 @@ void hb_compGenSwitchCase( long lValue )
 void hb_compGenPushLong( HB_LONG lNumber )
 {
    if( lNumber == 0 )
-   {
       hb_compGenPCode1( HB_P_ZERO );
-   }
    else if( lNumber == 1 )
-   {
       hb_compGenPCode1( HB_P_ONE );
-   }
    else if( HB_LIM_INT8( lNumber ) )
-   {
       hb_compGenPCode2( HB_P_PUSHBYTE, ( BYTE ) lNumber, TRUE );
-   }
    else if( HB_LIM_INT16( lNumber ) )
-   {
       hb_compGenPCode3( HB_P_PUSHINT, HB_LOBYTE( lNumber ), HB_HIBYTE( lNumber ), TRUE );
-   }
    else if( HB_LIM_INT32( lNumber ) )
    {
       BYTE  pBuffer[ 5 ];
@@ -4068,18 +3745,16 @@ BYTE * hb_compHideString( int iType, char * szText, HB_SIZE ulStrLen, HB_SIZE * 
 
    switch( iType )
    {
-      case 1:              // Simple XOR 0xf3 mask
+      case 1:              /* Simple XOR 0xf3 mask */
          pBuffer = ( BYTE * ) hb_xgrab( ulStrLen + 1 );
 
          for( ulCount = 0; ulCount < ulStrLen; ulCount++ )
-         {
             pBuffer[ ulCount ] = ( BYTE ) ( szText[ ulCount ] ^ 0xf3 );
-         }
 
          *ulBufferLen = ulStrLen;
          break;
 
-      default:             // No encode
+      default:             /* No encode */
          pBuffer        = ( BYTE * ) hb_xgrab( ulStrLen + 1 );
          HB_MEMCPY( pBuffer, ( BYTE * ) szText, ( size_t ) ulStrLen );
          *ulBufferLen   = ulStrLen;
@@ -4167,13 +3842,9 @@ void hb_compGenPushSymbol( char * szSymbolName, void * Namespace, int iFlags )
    hb_compSymbolAdd( szSymbolName, &wSym, Namespace, iFlags );
 
    if( wSym > 255 )
-   {
       hb_compGenPCode3( HB_P_PUSHSYM, HB_LOBYTE( wSym ), HB_HIBYTE( wSym ), ( BOOL ) 1 );
-   }
    else
-   {
       hb_compGenPCode2( HB_P_PUSHSYMNEAR, ( BYTE ) wSym, ( BOOL ) 1 );
-   }
 }
 
 static void hb_compCheckDuplVars( PVAR pVar, char * szVarName )
@@ -4186,9 +3857,7 @@ static void hb_compCheckDuplVars( PVAR pVar, char * szVarName )
          break;
       }
       else
-      {
          pVar = pVar->pNext;
-      }
    }
 }
 
@@ -4228,9 +3897,7 @@ void hb_compFinalizeFunction( void ) /* fixes all last defined function returns 
          pFunc->wParamCount = PCount;
       }
       else
-      {
          hb_compFixFuncPCode( pFunc );
-      }
 
       hb_compOptimizeJumps();
 
@@ -4321,15 +3988,11 @@ void hb_compFinalizeFunction( void ) /* fixes all last defined function returns 
          /* Check if the function returned some value
           */
          if( ( pFunc->bFlags & FUN_WITH_RETURN ) == 0 && ( pFunc->bFlags & FUN_PROCEDURE ) == 0 && ( hb_comp_functions.pLast->bFlags & FUN_BREAK_CODE ) == 0 )
-         {
             hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_FUN_WITH_NO_RETURN, pFunc->szName, NULL );
-         }
 
          /* Compile Time Strong Type Checking is not needed any more. */
          if( pFunc->pStack )
-         {
             hb_xfree( ( void * ) pFunc->pStack );
-         }
 
          pFunc->iStackSize       = 0;
          pFunc->iStackIndex      = 0;
@@ -4386,9 +4049,7 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
       while( pLocal )
       {
          if( hb_comp_VariableList != NULL )
-         {
             fprintf( hb_comp_VariableList, "%s=%i\n", pLocal->szName, pLocal->iUsed );
-         }
 
          pLocal = pLocal->pNext;
          iLocals++;
@@ -4397,22 +4058,16 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
       if( iLocals || pFunc->wParamCount )
       {
          if( pFunc->bFlags & FUN_USES_LOCAL_PARAMS )
-         {
             iLocals -= pFunc->wParamCount;
-         }
 
          if( iLocals < 256 )
-         {
             pFunc->pCode[ 1 ] = ( BYTE ) ( iLocals );
-         }
          else
          {
             iOffset = 1;
 
             if( ( pFunc->lPCodeSize - pFunc->lPCodePos ) < 1 )
-            {
                pFunc->pCode = ( BYTE * ) hb_xrealloc( pFunc->pCode, pFunc->lPCodeSize += 1 );
-            }
 
             memmove( pFunc->pCode + 3, pFunc->pCode + 2, ( size_t ) ( pFunc->lPCodePos - 2 ) );
             pFunc->lPCodePos++;
@@ -4422,18 +4077,14 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
             pFunc->pCode[ 2 ] = HB_HIBYTE( iLocals );
          }
 
-         // SomeFunc( ... ) - Variable number paramaters.
+         /* SomeFunc( ... ) - Variable number paramaters. */
          if( pFunc->pCode[ 2 + iOffset ] < HB_VAR_PARAM_FLAG )
-         {
             pFunc->pCode[ 2 + iOffset ] = ( BYTE ) ( pFunc->wParamCount );
-         }
 
          bSkipFRAME = FALSE;
       }
       else
-      {
          bSkipFRAME = TRUE;
-      }
 
       if( pFunc->bFlags & FUN_USES_STATICS )
       {
@@ -4445,9 +4096,7 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
          bSkipSFRAME                   = FALSE;
       }
       else
-      {
          bSkipSFRAME = TRUE;
-      }
 
       /* Remove the frame pcodes if they are not needed */
 
@@ -4467,7 +4116,7 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
          memmove( pFunc->pCode + 3 + iOffset, pFunc->pCode + 6 + iOffset, ( size_t ) ( pFunc->lPCodePos - 3 ) );
       }
 
-      // hb_xfree( szFunctionName );
+      /* hb_xfree( szFunctionName ); */
    }
 }
 
@@ -4477,17 +4126,11 @@ static int hb_compSort_ULONG( const void * pLeft, const void * pRight )
    ULONG ulRight  = *( ( ULONG * ) ( pRight ) );
 
    if( ulLeft == ulRight )
-   {
       return 0;
-   }
    else if( ulLeft < ulRight )
-   {
       return -1;
-   }
    else
-   {
       return 1;
-   }
 }
 
 void hb_compNOOPfill( PFUNCTION pFunc, HB_SIZE ulFrom, int iCount, BOOL fPop, BOOL fCheck )
@@ -4579,9 +4222,7 @@ static void hb_compOptimizeJumps( void )
       LONG lOffset;
 
       if( iPass == 2 && ! hb_comp_bDebugInfo && hb_comp_bLineNumbers )
-      {
          hb_compStripFuncLines( hb_comp_functions.pLast );
-      }
 
       if( hb_comp_functions.pLast->iJumps > 0 )
       {
@@ -4609,26 +4250,20 @@ static void hb_compOptimizeJumps( void )
             {
                case HB_P_JUMPNEAR:
                   if( ( signed char ) pCode[ ulJumpAddr + 1 ] == 2 )
-                  {
                      hb_compNOOPfill( hb_comp_functions.pLast, ulJumpAddr, 2, FALSE, FALSE );
-                  }
                   break;
 
                case HB_P_JUMPFALSENEAR:
                case HB_P_JUMPTRUENEAR:
                   if( ( signed char ) pCode[ ulJumpAddr + 1 ] == 2 )
-                  {
                      hb_compNOOPfill( hb_comp_functions.pLast, ulJumpAddr, 2, TRUE, FALSE );
-                  }
                   break;
 
                case HB_P_JUMP:
                   lOffset = HB_PCODE_MKSHORT( &pCode[ ulJumpAddr + 1 ] );
 
                   if( lOffset == 3 )
-                  {
                      hb_compNOOPfill( hb_comp_functions.pLast, ulJumpAddr, 3, FALSE, FALSE );
-                  }
                   else if( HB_LIM_INT8( lOffset ) )
                   {
                      pCode[ ulJumpAddr ] = HB_P_JUMPNEAR;
@@ -4640,9 +4275,7 @@ static void hb_compOptimizeJumps( void )
                   lOffset = HB_PCODE_MKSHORT( &pCode[ ulJumpAddr + 1 ] );
 
                   if( lOffset == 3 )
-                  {
                      hb_compNOOPfill( hb_comp_functions.pLast, ulJumpAddr, 3, TRUE, FALSE );
-                  }
                   else if( HB_LIM_INT8( lOffset ) )
                   {
                      pCode[ ulJumpAddr ] = HB_P_JUMPFALSENEAR;
@@ -4654,9 +4287,7 @@ static void hb_compOptimizeJumps( void )
                   lOffset = HB_PCODE_MKSHORT( &pCode[ ulJumpAddr + 1 ] );
 
                   if( lOffset == 3 )
-                  {
                      hb_compNOOPfill( hb_comp_functions.pLast, ulJumpAddr, 3, TRUE, FALSE );
-                  }
                   else if( HB_LIM_INT8( lOffset ) )
                   {
                      pCode[ ulJumpAddr ] = HB_P_JUMPTRUENEAR;
@@ -4668,9 +4299,7 @@ static void hb_compOptimizeJumps( void )
                   lOffset = HB_PCODE_MKINT24( &pCode[ ulJumpAddr + 1 ] );
 
                   if( lOffset == 4 )
-                  {
                      hb_compNOOPfill( hb_comp_functions.pLast, ulJumpAddr, 4, FALSE, FALSE );
-                  }
                   else if( HB_LIM_INT8( lOffset ) )
                   {
                      pCode[ ulJumpAddr ] = HB_P_JUMPNEAR;
@@ -4687,9 +4316,7 @@ static void hb_compOptimizeJumps( void )
                   lOffset = HB_PCODE_MKINT24( &pCode[ ulJumpAddr + 1 ] );
 
                   if( lOffset == 4 )
-                  {
                      hb_compNOOPfill( hb_comp_functions.pLast, ulJumpAddr, 4, TRUE, FALSE );
-                  }
                   else if( HB_LIM_INT8( lOffset ) )
                   {
                      pCode[ ulJumpAddr ] = HB_P_JUMPFALSENEAR;
@@ -4706,9 +4333,7 @@ static void hb_compOptimizeJumps( void )
                   lOffset = HB_PCODE_MKINT24( &pCode[ ulJumpAddr + 1 ] );
 
                   if( lOffset == 4 )
-                  {
                      hb_compNOOPfill( hb_comp_functions.pLast, ulJumpAddr, 4, TRUE, FALSE );
-                  }
                   else if( HB_LIM_INT8( lOffset ) )
                   {
                      pCode[ ulJumpAddr ] = HB_P_JUMPTRUENEAR;
@@ -4726,9 +4351,7 @@ static void hb_compOptimizeJumps( void )
             if( pCode[ ulJumpAddr ] == HB_P_NOOP || pCode[ ulJumpAddr ] == HB_P_POP )
             {
                if( hb_comp_functions.pLast->iJumps > iJump + 1 )
-               {
                   memmove( &pJumps[ iJump ], &pJumps[ iJump + 1 ], ( size_t ) ( hb_comp_functions.pLast->iJumps - iJump - 1 ) * sizeof( HB_SIZE ) );
-               }
 
                hb_comp_functions.pLast->iJumps--;
             }
@@ -4743,9 +4366,7 @@ static void hb_compOptimizeJumps( void )
       }
 
       if( hb_comp_functions.pLast->iNOOPs == 0 )
-      {
          return;
-      }
 
       pNOOPs = hb_comp_functions.pLast->pNOOPs;
 
@@ -4763,9 +4384,7 @@ static void hb_compOptimizeJumps( void )
          plShifts = ( LONG * ) hb_xgrab( ulSize );
 
          for( iJump = 0; iJump < hb_comp_functions.pLast->iJumps; iJump++ )
-         {
             plSizes[ iJump ] = plShifts[ iJump ] = 0;
-         }
 
          /* First Scan NOOPS - Adjust Jump addresses. */
          for( iNOOP = 0; iNOOP < hb_comp_functions.pLast->iNOOPs; iNOOP++ )
@@ -5000,9 +4619,7 @@ void hb_compFieldSetAlias( char * szAlias, int iField )
    pVar = hb_comp_functions.pLast->pFields;
 
    while( iField-- && pVar )
-   {
       pVar = pVar->pNext;
-   }
 
    while( pVar )
    {
@@ -5088,9 +4705,7 @@ void hb_compStaticDefEnd( void )
    ++hb_comp_iStaticCnt;
 
    if( hb_comp_bDebugInfo )
-   {
       hb_comp_ulLastModuleNamePos = hb_comp_ulSavedModuleNamePos;
-   }
 }
 
 void hb_compGlobalsDefStart( void )
@@ -5115,9 +4730,7 @@ void hb_compGlobalsDefStart( void )
       hb_comp_functions.pLast       = hb_comp_pGlobalsFunc;
 
       if( hb_comp_bDebugInfo )
-      {
          hb_comp_ulSavedModuleNamePos = hb_comp_ulLastModuleNamePos;
-      }
    }
 }
 
@@ -5131,9 +4744,7 @@ void hb_compGlobalsDefEnd( void )
    hb_comp_pGlobalsFunc->pOwner  = NULL;
 
    if( hb_comp_bDebugInfo )
-   {
       hb_comp_ulLastModuleNamePos = hb_comp_ulSavedModuleNamePos;
-   }
 }
 
 /*
@@ -5150,9 +4761,7 @@ static void hb_compLineNumberDefStart( void )
       hb_comp_functions.pLast          = hb_comp_pLineNumberFunc;
 
       if( hb_comp_bDebugInfo )
-      {
          hb_compGenModuleName( hb_comp_pFileName->szName, NULL );
-      }
    }
    else
    {
@@ -5178,7 +4787,9 @@ void hb_compCodeBlockStart( void )
 {
    PFUNCTION pBlock;
 
-   //printf( "Block start\n" );
+#if defined( HB_COMP_DEBUG )
+   printf( "[hb_compCodeBlockStart] Block start\n" );
+#endif
 
    pBlock                  = hb_compFunctionNew( NULL, HB_FS_STATIC );
 
@@ -5236,9 +4847,7 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
       pFunc = pFunc->pOwner;
 
       if( pFunc->szName && *pFunc->szName )
-      {
          pFuncName = pFunc->szName;
-      }
    }
 
    pFunc->bFlags |= ( BYTE ) ( pCodeblock->bFlags & FUN_USES_STATICS );
@@ -5257,9 +4866,7 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
    while( pVar )
    {
       if( hb_comp_bDebugInfo )
-      {
          wLocalsLen += ( USHORT ) ( 4 + strlen( pVar->szName ) );
-      }
 
       pVar = pVar->pNext;
       ++wLocals;
@@ -5277,14 +4884,10 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
    }
 
    if( bExt )
-   {
-      wSize += ( USHORT ) 3; // HB_P_FRAME l, p
-   }
+      wSize += ( USHORT ) 3; /* HB_P_FRAME l, p */
 
    if( wSize <= 255 && pCodeblock->wParamCount == 0 && wLocals == 0 )
-   {
       hb_compGenPCode2( HB_P_PUSHBLOCKSHORT, ( BYTE ) wSize, ( BOOL ) 0 );
-   }
    else
    {
       /* NOTE: 5 = BYTE( size ) + USHORT( wParams ) + USHORT( wLocals ) */
@@ -5317,9 +4920,7 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
       }
 
       if( wLocals )
-      {
          wLocals -= pCodeblock->wParamCount;
-      }
 
       hb_compGenPCode3( HB_P_FRAME, ( BYTE ) wLocals, ( BYTE ) pCodeblock->wParamCount, ( BOOL ) 0 );   /* frame for locals and parameters */
    }
@@ -5348,7 +4949,7 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
    {
       pExtBlock = hb_compExprNewExtBlock( pFunExtBlock->pCode, pFunExtBlock->lPCodePos );
 
-      //pFunExtBlock->pCode = NULL;
+      /* pFunExtBlock->pCode = NULL; */
       hb_xfree( ( void * ) pFunExtBlock );
 
       /* return to pcode buffer of function in which the extened
@@ -5357,20 +4958,16 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
       hb_comp_functions.pLast = pCodeblock->pOwner;
    }
    else
-   {
       pExtBlock = NULL;
-   }
 
-   // Cleanup the codeblock wrapper function.
+   /* Cleanup the codeblock wrapper function. */
 
    /* Release Locals. */
    pVar = pCodeblock->pLocals;
    while( pVar )
    {
       if( hb_comp_bWarnUnUsedBlockParams && pVar->szName && ( ( pVar->iUsed & VU_USED ) == 0 ) )
-      {
          hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_BLOCKVAR_NOT_USED, pVar->szName, pFunc->szName );
-      }
 
       /* free used variables */
       pFree = pVar;
@@ -5391,21 +4988,15 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
 
    /* Release the NOOP array. */
    if( pCodeblock->pNOOPs )
-   {
       hb_xfree( ( void * ) pCodeblock->pNOOPs );
-   }
 
    /* Release the Jumps array. */
    if( pCodeblock->pJumps )
-   {
       hb_xfree( ( void * ) pCodeblock->pJumps );
-   }
 
    /* Compile Time Strong Type Checking Stack is not needed any more. */
    if( pCodeblock->pStack )
-   {
       hb_xfree( ( void * ) pCodeblock->pStack );
-   }
 
    /*
       pCodeblock->iStackSize      = 0;
@@ -5479,15 +5070,11 @@ PNAMESPACE hb_compNamespaceEnumDeep( PNAMESPACE pStart, PHB_COMP_NS_ENUMFUN pEnu
    while( pNamespace )
    {
       if( pNamespace->type & NSTYPE_SPACE )
-      {
          pNamespace = hb_compNamespaceEnumDeep( pNamespace, pEnumFunc, pCargo );
-      }
       else
       {
          if( pNamespace && ( pNamespace->type & NSTYPE_END ) )
-         {
             break;
-         }
       }
 
       pNamespace = pNamespace->pNext;
@@ -5509,9 +5096,7 @@ PNAMESPACE hb_compNamespaceEnumDeep( PNAMESPACE pStart, PHB_COMP_NS_ENUMFUN pEnu
          pStart->type   &= ~NSENUM_SPACEEND;
 
          while( ( pNamespace->type & NSTYPE_END ) && pNamespace->pNext && ( pNamespace->pNext->type & NSTYPE_SPACE ) )
-         {
             pNamespace = hb_compNamespaceEnumDeep( pNamespace->pNext, pEnumFunc, pCargo );
-         }
 
          return pNamespace;
       }
@@ -5519,9 +5104,7 @@ PNAMESPACE hb_compNamespaceEnumDeep( PNAMESPACE pStart, PHB_COMP_NS_ENUMFUN pEnu
       if( ( pNamespace->type & NSTYPE_SPACE ) )
       {
          if( ( pNamespace->type & NSTYPE_END ) != NSTYPE_END )
-         {
             pNamespace = hb_compNamespaceEnumSkipMembers( pNamespace->pNext );
-         }
       }
 
       pNamespace = pNamespace->pNext;
@@ -5538,17 +5121,13 @@ PNAMESPACE hb_compNamespaceEnumSkipMembers( PNAMESPACE pNamespace )
    while( pNamespace )
    {
       if( pNamespace->type & NSTYPE_SPACE )
-      {
          iLevel++;
-      }
 
-      // Don't else, maybe both if empty!
+      /* Don't else, maybe both if empty! */
       if( pNamespace->type & NSTYPE_END )
       {
          if( --iLevel == 0 )
-         {
             return pNamespace;
-         }
       }
 
       pNamespace = pNamespace->pNext;
@@ -5575,7 +5154,6 @@ void hb_compNamespaceEnumSpaces( PNAMESPACE pStart, PHB_COMP_NS_ENUMFUN pEnumFun
 
       pNamespace = pNamespace->pNext;
    }
-
 }
 
 void hb_compNamespaceEnumerate( PHB_COMP_NS_ENUMFUN pEnumFunc, void ** pCargo )
@@ -5608,20 +5186,14 @@ PNAMESPACE hb_compNamespaceNew( char * szName, int iType )
       pNew->szFullPath = hb_compIdentifierNew( szFullPath, FALSE );
    }
    else
-   {
       pNew->szFullPath = szName;
-   }
 
    if( hb_comp_Namespaces.pFirst )
    {
       if( iType & NSTYPE_SPACE )
-      {
          pNew->iID = hb_comp_Namespaces.pLast->iID + 1;
-      }
       else
-      {
          pNew->iID = hb_comp_Namespaces.pLast->iID;
-      }
 
       hb_comp_Namespaces.pLast->pNext = pNew;
    }
@@ -5638,9 +5210,7 @@ PNAMESPACE hb_compNamespaceNew( char * szName, int iType )
    if( iType & NSTYPE_SPACE )
    {
       if( pNew->pOuter )
-      {
          pNew->type |= pNew->pOuter->type;
-      }
 
       hb_comp_Namespaces.pCurrent = pNew;
    }
@@ -5653,13 +5223,9 @@ PNAMESPACE hb_compNamespaceNew( char * szName, int iType )
 void hb_compNamespaceEnd( void )
 {
    if( ( hb_comp_Namespaces.pLast->type & NSTYPE_END ) )
-   {
       hb_compNamespaceNew( "", NSTYPE_TERMINATOR );
-   }
    else
-   {
       hb_comp_Namespaces.pLast->type |= NSTYPE_END;
-   }
 
    hb_comp_Namespaces.pCurrent = hb_comp_Namespaces.pCurrent->pOuter;
 }
@@ -5669,9 +5235,7 @@ PNAMESPACE hb_compNamespaceFind( PNAMESPACE pNamespace, char * szName, int type 
    while( pNamespace )
    {
       if( pNamespace->szName == szName && ( ( pNamespace->type & type ) == type ) )
-      {
          return pNamespace;
-      }
 
       pNamespace = pNamespace->pNext;
    }
@@ -5684,21 +5248,15 @@ PNAMESPACE hb_compNamespaceFindMember( PNAMESPACE pNamespace, char * szName, int
    while( pNamespace )
    {
       if( pNamespace->szName == szName && ( ( pNamespace->type & type ) == type ) )
-      {
          return pNamespace;
-      }
 
       if( ( pNamespace->type & NSTYPE_END ) )
       {
          if( ( pNamespace->type & NSTYPE_SPACE ) == 0 )
-         {
             return NULL;
-         }
       }
       else if( ( pNamespace->type & NSTYPE_SPACE ) )
-      {
          pNamespace = hb_compNamespaceEnumSkipMembers( pNamespace->pNext );
-      }
 
       pNamespace = pNamespace->pNext;
    }
@@ -5725,18 +5283,12 @@ PNAMESPACE hb_compUsedNamespaceNew( char * szName, int iType )
       pNew->szFullPath = hb_compIdentifierNew( szFullPath, FALSE );
    }
    else
-   {
       pNew->szFullPath = szName;
-   }
 
    if( hb_comp_UsedNamespaces.pFirst )
-   {
       hb_comp_UsedNamespaces.pLast->pNext = pNew;
-   }
    else
-   {
       hb_comp_UsedNamespaces.pFirst = pNew;
-   }
 
    pNew->pOuter   = hb_comp_UsedNamespaces.pCurrent;
    pNew->pFunc    = NULL;
@@ -5744,9 +5296,7 @@ PNAMESPACE hb_compUsedNamespaceNew( char * szName, int iType )
    if( iType & NSTYPE_SPACE )
    {
       if( pNew->pOuter )
-      {
          pNew->type |= pNew->pOuter->type;
-      }
 
       hb_comp_UsedNamespaces.pCurrent = pNew;
    }
@@ -5759,13 +5309,9 @@ PNAMESPACE hb_compUsedNamespaceNew( char * szName, int iType )
 void hb_compUsedNamespaceEnd( void )
 {
    if( ( hb_comp_UsedNamespaces.pLast->type & NSTYPE_END ) )
-   {
       hb_compUsedNamespaceNew( hb_comp_UsedNamespaces.pCurrent->szName, NSTYPE_TERMINATOR );
-   }
    else
-   {
       hb_comp_UsedNamespaces.pLast->type |= NSTYPE_END;
-   }
 
    hb_comp_UsedNamespaces.pCurrent = hb_comp_UsedNamespaces.pCurrent->pOuter;
 }
@@ -5798,18 +5344,14 @@ static void hb_compOutputFile( void )
    if( hb_comp_pOutPath )
    {
       if( hb_comp_pOutPath->szPath )
-      {
          hb_comp_pFileName->szPath = hb_comp_pOutPath->szPath;
-      }
 
       if( hb_comp_pOutPath->szName )
       {
          hb_comp_pFileName->szName = hb_comp_pOutPath->szName;
 
          if( hb_comp_pOutPath->szExtension )
-         {
             hb_comp_pFileName->szExtension = hb_comp_pOutPath->szExtension;
-         }
       }
    }
 }
@@ -5852,14 +5394,10 @@ static int hb_compCompile( char * szPrg )
       hb_pp_reset( hb_comp_PP );
 
       if( hb_comp_iLanguage == LANG_PORT_OBJ )
-      {
          hb_pp_addDefine( hb_comp_PP, "__HRB__", "1" );
-      }
 
       if( ! hb_comp_pFileName->szExtension )
-      {
          hb_comp_pFileName->szExtension = ".prg";
-      }
 
       szTempName           = ( char * ) hb_xgrab( HB_PATH_MAX );
       hb_comp_PrgFileName  = ( char * ) hb_xgrab( HB_PATH_MAX );
@@ -5901,24 +5439,26 @@ static int hb_compCompile( char * szPrg )
       if( hb_comp_bPPO )
       {
          hb_comp_pFileName->szExtension = ".ppo";
+
          if( hb_comp_ppo_pOutPath )
             hb_comp_pFileName->szPath = hb_comp_ppo_pOutPath->szPath;
+
          hb_fsFNameMerge( szPpoName, hb_comp_pFileName );
+
          if( ! hb_pp_outFile( hb_comp_PP, szPpoName, NULL ) )
-         {
             iStatus = EXIT_FAILURE;
-         }
 
          if( hb_comp_bTracePP && iStatus == EXIT_SUCCESS )
          {
             hb_comp_pFileName->szExtension = ".ppt";
+
             if( hb_comp_ppo_pOutPath )
                hb_comp_pFileName->szPath = hb_comp_ppo_pOutPath->szPath;
+
             hb_fsFNameMerge( szPptName, hb_comp_pFileName );
+
             if( ! hb_pp_traceFile( hb_comp_PP, szPptName, NULL ) )
-            {
                iStatus = EXIT_FAILURE;
-            }
          }
       }
 
@@ -5936,22 +5476,19 @@ static int hb_compCompile( char * szPrg )
             hb_comp_pFileName->szExtension   = szExt;
          }
          else
-         {
             hb_xstrcpy( szHILName, hb_comp_szHILout, 0 );
-         }
 
-         // if the file already exists...
+         /* if the file already exists... */
          hb_comp_HILfile = hb_fopen( szHILName, "r+b" );
+
          if( hb_comp_HILfile != NULL )
-         {
-            //... just go to the end
+            /* ... just go to the end */
             fseek( hb_comp_HILfile, 0, SEEK_END );
-         }
          else
          {
             HB_I18N_TAB_HEADER head;
 
-            // try to create it...
+            /* try to create it... */
             hb_comp_HILfile = hb_fopen( szHILName, "wb" );
             if( hb_comp_HILfile == NULL )
             {
@@ -5962,13 +5499,13 @@ static int hb_compCompile( char * szPrg )
             }
             else
             {
-               // and write header
+               /* and write header */
                hb_snprintf( head.signature, sizeof( head.signature ), "\3HIL" );
                hb_snprintf( head.author, sizeof( head.author ), "The xharbour group" );
                hb_snprintf( head.language, sizeof( head.language ), HB_INTERNATIONAL_NAME );
                hb_snprintf( head.language_int, sizeof( head.language_int ), HB_INTERNATIONAL_NAME );
                hb_snprintf( head.language_code, sizeof( head.language_code ), HB_INTERNATIONAL_CODE );
-               head.entries = -1; // unknown
+               head.entries = -1; /* unknown */
                fwrite( &head, sizeof( head ), 1, hb_comp_HILfile );
             }
          }
@@ -5985,36 +5522,28 @@ static int hb_compCompile( char * szPrg )
 
             hb_comp_szFile = szFileName;
 
-            if( ! hb_comp_bQuiet )
-            {
-               if( hb_comp_bPPO )
-               {
-                  printf( "Compiling '%s' and generating preprocessed output to '%s'...\n", szFileName, szPpoName );
-               }
-               else
-               {
-                  printf( "Compiling '%s'...\n", szFileName );
-               }
+            if( hb_comp_bPPO )
+               hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "Compiling '%s' and generating preprocessed output to '%s'...\n", szFileName, szPpoName );
+            else
+               hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "Compiling '%s'...\n", szFileName );
 
-               if( hb_comp_bI18n )
-               {
-                  printf( "Generating international list to '%s'...\n", szHILName );
-               }
+            hb_compOutStd( hb_comp_szMsgBuf );
+
+            if( hb_comp_bI18n )
+            {
+               hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "Generating international list to '%s'...\n", szHILName );
+               hb_compOutStd( hb_comp_szMsgBuf );
             }
 
             /* Generate the starting procedure frame */
             if( hb_comp_bStartProc )
-            {
                hb_compFunctionAdd( hb_compIdentifierNew( hb_strupr( hb_strdup( hb_comp_pFileName->szName ) ), FALSE ), HB_FS_PUBLIC, FUN_PROCEDURE );
-            }
             else
-            {
                /* Don't pass the name of module if the code for starting procedure
                 * will be not generated. The name cannot be placed as first symbol
                 * because this symbol can be used as function call or memvar's name.
                 */
                hb_compFunctionAdd( hb_compIdentifierNew( "", TRUE ), HB_FS_PUBLIC, FUN_PROCEDURE );
-            }
 
             hb_compExprINIT();
 
@@ -6046,9 +5575,7 @@ static int hb_compCompile( char * szPrg )
                hb_comp_pAutoOpen = hb_comp_pAutoOpen->pNext;
 
                if( ! hb_compFunctionFind( pAutoOpen->szName, NULL, NSF_NONE ) )
-               {
                   hb_compAutoOpen( pAutoOpen->szName, &bSkipGen );
-               }
 
                hb_xfree( pAutoOpen );
             }
@@ -6062,11 +5589,10 @@ static int hb_compCompile( char * szPrg )
             hb_compFinalizeFunction();
 
             if( hb_comp_bDebugInfo )
-            {
                hb_compExternAdd( hb_compIdentifierNew( "__DBGENTRY", TRUE ), NULL, ( HB_SYMBOLSCOPE ) 0 );
-               /*hb_compFunCallAdd( "__DBGENTRY", NULL, NSF_NONE );
-                  pSyn*/
-            }
+               /* hb_compFunCallAdd( "__DBGENTRY", NULL, NSF_NONE );
+                * pSyn
+                */
 
             if( hb_comp_pInitFunc )
             {
@@ -6127,26 +5653,20 @@ static int hb_compCompile( char * szPrg )
                PVAR pGlobal = hb_comp_pGlobals;
 
                if( hb_comp_pGlobalsFunc->pCode )
-               {
                   hb_compAddInitFunc( hb_comp_pGlobalsFunc );
-               }
                else
-               {
                   bKillGlobalsFunc = TRUE;
-               }
 
-               // Any NON EXTERN Globals?
+               /* Any NON EXTERN Globals? */
                while( pGlobal )
                {
                   if( pGlobal->szAlias == NULL )
-                  {
                      break;
-                  }
 
                   pGlobal = pGlobal->pNext;
                }
 
-               // Yes.
+               /* Yes. */
                if( pGlobal )
                {
                   PCOMSYMBOL pSym;
@@ -6157,25 +5677,24 @@ static int hb_compCompile( char * szPrg )
             }
 
             if( hb_comp_szAnnounce )
-            {
                hb_compAnnounce( hb_comp_szAnnounce );
-            }
 
             /* End of finalization phase. */
 
-            //if( hb_comp_iErrorCount || ( hb_comp_AmbiguousVar && hb_comp_bAnyWarning ) )
+            /* if( hb_comp_iErrorCount || ( hb_comp_AmbiguousVar && hb_comp_bAnyWarning ) )
+             */
             if( hb_comp_iErrorCount || hb_comp_bAnyWarning )
             {
+
                if( hb_comp_iErrorCount || ( hb_comp_iExitLevel == HB_EXITLEVEL_DELTARGET ) )
                {
                   iStatus  = EXIT_FAILURE;
                   bSkipGen = TRUE;
-                  printf( "\r%i error%s\n\nNo code generated\n", hb_comp_iErrorCount, ( hb_comp_iErrorCount > 1 ? "s" : "" ) );
+                  hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "\r%i error%s\n\nNo code generated\n", hb_comp_iErrorCount, ( hb_comp_iErrorCount > 1 ? "s" : "" ) );
+                  hb_compOutErr( hb_comp_szMsgBuf );
                }
                else if( hb_comp_iExitLevel == HB_EXITLEVEL_SETEXIT )
-               {
                   iStatus = EXIT_FAILURE;
-               }
             }
 
             if( ! hb_comp_bSyntaxCheckOnly && ! bSkipGen && ( hb_comp_iErrorCount == 0 ) )
@@ -6187,9 +5706,7 @@ static int hb_compCompile( char * szPrg )
                hb_compOutputFile();
 
                if( ! hb_comp_bStartProc )
-               {
                   --hb_comp_iFunctionCnt;
-               }
 
                pFunc = hb_comp_functions.pFirst;
 
@@ -6277,30 +5794,22 @@ static int hb_compCompile( char * szPrg )
 
                   /* Using function name as section name */
                   if( bFunc && hb_comp_iGenVarList )
-                  {
                      fprintf( hb_comp_VariableList, "[%s]\n", pFunc->szName );
-                  }
 
                   hb_compOptimizeFrames( pFunc );
 
                   /* Just a new line for readability */
                   if( bFunc && hb_comp_iGenVarList )
-                  {
                      fprintf( hb_comp_VariableList, "\n" );
-                  }
 
                   if( bDoFirst && pFunc->szName[ 0 ] && ( pFunc->cScope & HB_FS_INITEXIT & ~HB_FS_STATIC ) == 0 && ( pFunc->cScope & HB_FS_UTILITY ) != HB_FS_UTILITY )
                   {
                      PCOMSYMBOL pSym;
 
                      if( pFunc->pNamespace )
-                     {
                         pSym = hb_compSymbolAdd( pFunc->szName, NULL, pFunc->pNamespace, SYMF_NS_EXPLICITPTR );
-                     }
                      else
-                     {
                         pSym = hb_compSymbolFind( pFunc->szName, NULL, NULL, SYMF_FUNCALL );
-                     }
 
                      assert( pSym );
 
@@ -6352,16 +5861,18 @@ static int hb_compCompile( char * szPrg )
 
                hb_compGenOutput( hb_comp_iLanguage, szSourceExtension );
 
-               if( ! hb_comp_bQuiet )
-                  printf( "\rLines %i, Functions/Procedures %i, pCodes %u\n", hb_comp_iLine, hb_comp_iFunctionCnt, ( unsigned int ) hb_comp_upCodeTotal );
-
+               hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "\rLines %i, Functions/Procedures %i, pCodes %u\n", hb_comp_iLine, hb_comp_iFunctionCnt, ( unsigned int ) hb_comp_upCodeTotal );
+               hb_compOutStd( hb_comp_szMsgBuf );
             }
          }
          else
          {
-            fprintf( hb_comp_errFile, "Cannot open input file: %s\n", szFileName );
+            hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "Cannot open input file: %s\n", szFileName );
+            hb_compOutErr( hb_comp_szMsgBuf );
 
-            /* printf( "No code generated\n" ); */
+#if defined( HB_COMP_DEBUG )
+            printf( "[hb_compCompile] No code generated\n" );
+#endif
             iStatus = EXIT_FAILURE;
          }
       }
@@ -6391,9 +5902,7 @@ static int hb_compCompile( char * szPrg )
    }
 
    if( bKillGlobalsFunc )
-   {
       hb_compFunctionKill( hb_comp_pGlobalsFunc );
-   }
 
    if( hb_comp_funcalls.pFirst )
    {
@@ -6431,9 +5940,7 @@ static int hb_compCompile( char * szPrg )
          hb_comp_inlines.pFirst = pInline->pNext;
 
          if( pInline->pCode )
-         {
             hb_xfree( ( void * ) pInline->pCode );
-         }
 
          hb_xfree( ( void * ) pInline->szFileName );
          hb_xfree( ( void * ) pInline );  /* NOTE: szName will be released by hb_compSymbolKill() */
@@ -6553,16 +6060,13 @@ void hb_compAutoOpenAdd( char * szName )
       pAutoOpen->pNext  = NULL;
 
       if( hb_comp_pAutoOpen == NULL )
-      {
          hb_comp_pAutoOpen = pAutoOpen;
-      }
       else
       {
          pLast = hb_comp_pAutoOpen;
+
          while( pLast->pNext )
-         {
             pLast = pLast->pNext;
-         }
 
          pLast->pNext = pAutoOpen;
       }
@@ -6574,14 +6078,10 @@ static BOOL hb_compAutoOpenFind( char * szName )
    PAUTOOPEN pLast = hb_comp_pAutoOpen;
 
    if( pLast == NULL )
-   {
       return FALSE;
-   }
 
    if( pLast->szName == szName )
-   {
       return TRUE;
-   }
    else
    {
       while( pLast->pNext )
@@ -6589,9 +6089,7 @@ static BOOL hb_compAutoOpenFind( char * szName )
          pLast = pLast->pNext;
 
          if( pLast->szName == szName )
-         {
             return TRUE;
-         }
       }
    }
    return FALSE;
@@ -6612,9 +6110,7 @@ static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
       hb_pp_reset( hb_comp_PP );
 
       if( ! hb_comp_pFileName->szExtension )
-      {
          hb_comp_pFileName->szExtension = ".prg";
-      }
 
       hb_fsFNameMerge( szFileName, hb_comp_pFileName );
 
@@ -6622,10 +6118,9 @@ static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
       {
          hb_comp_pFileName->szExtension = ".ppo";
          hb_fsFNameMerge( szPpoName, hb_comp_pFileName );
+
          if( ! hb_pp_outFile( hb_comp_PP, szPpoName, NULL ) )
-         {
             iStatus = EXIT_FAILURE;
-         }
       }
 
       if( iStatus == EXIT_SUCCESS )
@@ -6635,23 +6130,16 @@ static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
 
          if( hb_pp_inFile( hb_comp_PP, szFileName, FALSE, NULL, FALSE ) )
          {
-            if( ! hb_comp_bQuiet )
-            {
-               if( hb_comp_bPPO )
-               {
-                  printf( "Compiling module '%s' and generating preprocessed output to '%s'...\n", szFileName, szPpoName );
-               }
-               else
-               {
-                  printf( "Compiling module '%s'...\n", szFileName );
-               }
-            }
+            if( hb_comp_bPPO )
+               hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "Compiling module '%s' and generating preprocessed output to '%s'...\n", szFileName, szPpoName );
+            else
+               hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "Compiling module '%s'...\n", szFileName );
+
+            hb_compOutStd( hb_comp_szMsgBuf );
 
             /* Generate the starting procedure frame */
             if( hb_comp_bStartProc )
-            {
                hb_compFunctionAdd( hb_compIdentifierNew( hb_strupr( hb_strdup( hb_comp_pFileName->szName ) ), FALSE ), HB_FS_PUBLIC, FUN_PROCEDURE );
-            }
 
             {
                int   i  = hb_comp_iExitLevel;
@@ -6666,20 +6154,20 @@ static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
             if( hb_comp_bAnyWarning )
             {
                if( hb_comp_iExitLevel == HB_EXITLEVEL_SETEXIT )
-               {
                   iStatus = EXIT_FAILURE;
-               }
                else if( hb_comp_iExitLevel == HB_EXITLEVEL_DELTARGET )
                {
                   iStatus     = EXIT_FAILURE;
                   *pbSkipGen  = TRUE;
-                  printf( "\nNo code generated.\n" );
+                  hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "\nNo code generated.\n" );
+                  hb_compOutErr( hb_comp_szMsgBuf );
                }
             }
          }
          else
          {
-            fprintf( hb_comp_errFile, "Cannot open %s, assumed external\n", szFileName );
+            hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "Cannot open %s, assumed external\n", szFileName );
+            hb_compOutErr( hb_comp_szMsgBuf );
          }
       }
 
@@ -6698,7 +6186,9 @@ void hb_compEnumAdd( char * szName )
 {
    PENUMDEF pEnum = ( PENUMDEF ) hb_xgrab( sizeof( ENUMDEF ) );
 
-   //printf( "New set: '%s'\n", szName );
+#if defined( HB_COMP_DEBUG )
+   printf( "[hb_compEnumAdd] New set: '%s'\n", szName );
+#endif
 
    pEnum->szName     = szName;
    pEnum->lMembers   = 0;
@@ -6706,29 +6196,23 @@ void hb_compEnumAdd( char * szName )
    pEnum->pNext      = NULL;
 
    if( hb_comp_functions.pLast->pEnums )
-   {
       hb_comp_functions.pLast->pEnums->pNext = pEnum;
-   }
    else
-   {
       hb_comp_functions.pLast->pEnums = pEnum;
-   }
 
    hb_comp_pEnum = pEnum;
 }
 
 void hb_compEnumMemberAdd( char * szName )
 {
-   //printf( "Member: '%s'\n", szName );
+#if defined( HB_COMP_DEBUG )
+   printf( "[hb_compEnumMemberAdd] Member: '%s'\n", szName );
+#endif
 
    if( hb_comp_pEnum->pMembers )
-   {
       hb_comp_pEnum->pMembers = ( char ** ) hb_xrealloc( hb_comp_pEnum->pMembers, ++hb_comp_pEnum->lMembers * sizeof( char * ) );
-   }
    else
-   {
       hb_comp_pEnum->pMembers = ( char ** ) hb_xgrab( sizeof( char * ) );
-   }
 
    hb_comp_pEnum->pMembers[ hb_comp_pEnum->lMembers - 1 ] = szName;
 }
@@ -6740,15 +6224,15 @@ void hb_compAddI18nString( char * szString )
 
    nLen = strlen( szString );
 
-   // include trailing 0
+   /* include trailing 0 */
    /* writing 8 characters in ASCII numeric format,
       so it can be read from xharbour without conversions, and is
       portable across architectures */
    fprintf( hb_comp_HILfile, "%8d", ( int ) nLen + 1 );
    fputs( szString, hb_comp_HILfile );
-   // I want the trailing 0 to be in the file as a validity marker
+   /* I want the trailing 0 to be in the file as a validity marker */
    fputc( 0, hb_comp_HILfile );
-   // hil file is an hit file without translations
+   /* hil file is an hit file without translations */
    fprintf( hb_comp_HILfile, "       0" );
 
    if( ferror( hb_comp_HILfile ) )
@@ -6763,7 +6247,7 @@ static int hb_compProcessRSPFile( char * szRspName )
    FILE *   inFile;
    int      ch;
    int      i;
-//   int iProcess = 1;
+/* int      iProcess = 1; */
    int      iStatus     = EXIT_SUCCESS;
    BOOL     bFirstChar  = FALSE;
 
@@ -6774,7 +6258,8 @@ static int hb_compProcessRSPFile( char * szRspName )
 
    if( ! inFile )
    {
-      fprintf( hb_comp_errFile, "Cannot open input file: %s\n", szRspName );
+      hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "Cannot open input file: %s\n", szRspName );
+      hb_compOutErr( hb_comp_szMsgBuf );
       iStatus = EXIT_FAILURE;
    }
    else
@@ -6788,18 +6273,14 @@ static int hb_compProcessRSPFile( char * szRspName )
          if( ch == '\n' || ch == ' ' )
          {
             if( ! ( *szFile ) )
-            {
                continue;
-            }
 
             iStatus = hb_compCompile( szFile );
 
             if( iStatus != EXIT_SUCCESS )
-            {
                break;
-            }
 
-//            iProcess ++;
+/*          iProcess ++; */
 
             i = 0;
             hb_xmemset( szFile, '\0', HB_PATH_MAX );
@@ -6812,9 +6293,7 @@ static int hb_compProcessRSPFile( char * szRspName )
             }
          }
          else if( ch == ',' )
-         {
             continue;
-         }
          else if( ch == '"' )
          {
             while( ( ch = fgetc( inFile ) ) != '"' && ch != '\n' && ch != EOF )
@@ -6829,19 +6308,15 @@ static int hb_compProcessRSPFile( char * szRspName )
             if( HB_ISSPACE( ch ) )
             {
                if( bFirstChar )
-               {
                   /* allow space in file name */
                   szFile[ i++ ] = ( char ) ch;
-               }
             }
             else
             {
                szFile[ i++ ] = ( char ) ch;
 
                if( ! bFirstChar )
-               {
                   bFirstChar = TRUE;
-               }
             }
          }
       }
@@ -6852,4 +6327,3 @@ static int hb_compProcessRSPFile( char * szRspName )
 
    return iStatus;
 }
-

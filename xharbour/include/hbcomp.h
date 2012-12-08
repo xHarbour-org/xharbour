@@ -664,6 +664,10 @@ extern char * hb_compIdentifierNew( char * szName, BOOL bCopy ); /* create the r
 extern void hb_compIdentifierOpen( void ); /* prepare the table of identifiers */
 extern void hb_compIdentifierClose( void ); /* release the table of identifiers */
 
+/* User defined function for Harbour compiler output */
+typedef void ( * HB_OUTSTDFUNC ) ( void *, const char* );
+typedef void ( * HB_OUTERRFUNC ) ( void *, const char* );
+
 /* variable used by compiler
  */
 extern PHB_PP_STATE   hb_comp_PP;
@@ -768,7 +772,7 @@ extern FILE           *hb_comp_PPTrace;
 extern const BYTE     hb_comp_pcode_len[];
 
 /* error messages output */
-extern FILE           *hb_comp_errFile;
+/* extern FILE        *hb_comp_errFile; */
 
 /* how many pcode used in a module */
 extern ULONG           hb_comp_upCodeTotal;
@@ -790,6 +794,13 @@ extern BOOL           hb_comp_bWarnUnUsedGlobals    ;
 extern BOOL           hb_comp_bWarnUnUsedMemvars    ;
 extern BOOL           hb_comp_bWarnUnUsedFields     ;
 extern BOOL           hb_comp_bWarnUnUsedBlockParams;
+
+extern char           hb_comp_szMsgBuf[ HB_PATH_MAX * 2 + 80 ];
+extern void*          hb_compHandle;
+extern HB_OUTSTDFUNC  hb_outStdFunc;
+extern HB_OUTERRFUNC  hb_outErrFunc;
+
+#define SIZE_OF_SZMSGBUF sizeof( hb_comp_szMsgBuf )
 
 /* /GC command line setting types */
 #define HB_COMPGENC_COMPACT     0
@@ -829,6 +840,10 @@ extern void hb_compCleanUp( void );
 
 /* Checking if variable name is reserved by PP */
 extern BOOL hb_compReservedPPName( char * szName );
+
+/* Writing Harbour compiler output */
+extern void hb_compOutStd( char * szMessage );
+extern void hb_compOutErr( char * szMessage );
 
 HB_EXTERN_END
 

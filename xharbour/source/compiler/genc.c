@@ -79,9 +79,7 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void ** pCargo )
    char *      szFileName;
 
    if( ( pNamespace->type & NSTYPE_STEALTH ) == NSTYPE_STEALTH )
-   {
       return pNamespace;
-   }
    else if( ( pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
    {
       szFileName  = hb_xstrcpy( NULL, pNamespace->szName, ".hxns", NULL );
@@ -94,9 +92,7 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void ** pCargo )
    }
 
    if( ! yyc )
-   {
       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_CREATE_OUTPUT, szFileName, NULL );
-   }
 
    hb_xfree( szFileName );
 
@@ -162,11 +158,11 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void ** pCargo )
       {
          if( ( pMember->type & NSTYPE_STATIC ) == NSTYPE_STATIC )
          {
-            // Don't publish
+            /* Don't publish */
          }
          else if( pMember->pFunc && ( pMember->pFunc->cScope & ( HB_FS_INIT | HB_FS_EXIT ) & ~HB_FS_STATIC ) )
          {
-            // Don't publish
+            /* Don't publish */
          }
          else
          {
@@ -181,14 +177,12 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void ** pCargo )
       if( pMember->type & NSTYPE_END )
       {
          if( --iLevel == 0 )
-         {
             break;
-         }
 
          fprintf( yyc, "   #if defined( __PRG__ )\n" );
          fprintf( yyc, "   END\n" );
          fprintf( yyc, "   #else\n" );
-         fprintf( yyc, "   } %s;\n\n", pOuter->szName );  // Don't remove DOUBLE \n!!!
+         fprintf( yyc, "   } %s;\n\n", pOuter->szName );  /* Don't remove DOUBLE \n!!! */
          fprintf( yyc, "   #endif\n" );
 
          pOuter = pOuter->pOuter;
@@ -202,7 +196,7 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void ** pCargo )
       fprintf( yyc, "#if defined( __PRG__ )\n" );
       fprintf( yyc, "END\n" );
       fprintf( yyc, "#else\n" );
-      fprintf( yyc, "} %s;\n\n", pNamespace->szName );  // Don't remove DOUBLE \n!!!
+      fprintf( yyc, "} %s;\n\n", pNamespace->szName );  /* Don't remove DOUBLE \n!!! */
       fprintf( yyc, "#endif\n" );
       fprintf( yyc, "#endif\n" );
       fprintf( yyc, "\n" );
@@ -213,7 +207,7 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void ** pCargo )
       fprintf( yyc, "#if defined( __PRG__ )\n" );
       fprintf( yyc, "END\n" );
       fprintf( yyc, "#else\n" );
-      fprintf( yyc, "} HB_NS_%s;\n\n", pNamespace->szName );  // Don't remove DOUBLE \n!!!
+      fprintf( yyc, "} HB_NS_%s;\n\n", pNamespace->szName );  /* Don't remove DOUBLE \n!!! */
       fprintf( yyc, "#endif\n" );
       fprintf( yyc, "#endif\n" );
 
@@ -255,39 +249,29 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void ** pCargo )
       {
          if( ( pMember->type & NSTYPE_STATIC ) == NSTYPE_STATIC )
          {
-            // Don't publish
+            /* Don't publish */
          }
          else if( pMember->pFunc && ( pMember->pFunc->cScope & ( HB_FS_INIT | HB_FS_EXIT ) & ~HB_FS_STATIC ) )
          {
-            // Don't publish
+            /* Don't publish */
          }
          else if( ( pMember->pOuter->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
-         {
             fprintf( yyc, "     /* %s = */ HB_OPTIONAL_NAMESPACE_FUNCNAME( %d, %s ),\n", pMember->szName, pMember->iID, pMember->szName );
-         }
          else if( ( pMember->type & NSTYPE_EXTERNAL ) == NSTYPE_EXTERNAL )
-         {
             fprintf( yyc, "     /* %s = */ HB_EXTERNAL_NAMESPACE_FUNCNAME( %d, %s ),\n", pMember->szName, pNamespace->iID, pMember->szName );
-         }
          else
          {
             if( ( pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
-            {
                fprintf( yyc, "     /* %s = */ HB_NAMESPACE_FUNCNAME( %d, %s ),\n", pMember->szName, pMember->iID, pMember->szName );
-            }
             else
-            {
                fprintf( yyc, "     /* %s = */ HB_NAMESPACE_FUNCNAME( %d, %s ),\n", pMember->szName, pOuter->iID, pMember->szName );
-            }
          }
       }
 
       if( pMember->type & NSTYPE_END )
       {
          if( --iLevel == 0 )
-         {
             break;
-         }
 
          pOuter = pOuter->pOuter;
 
@@ -305,9 +289,7 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void ** pCargo )
       fclose( yyc );
    }
    else
-   {
       fprintf( yyc, "   };\n" );
-   }
 
    return pNamespace;
 }
@@ -347,9 +329,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
    BOOL        bIsUsedNamespaces = FALSE;
 
    if( ! pFileName->szExtension )
-   {
       pFileName->szExtension = ".c";
-   }
 
    hb_fsFNameMerge( szFileName, pFileName );
 
@@ -366,9 +346,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
 
 
    while( ( pTmp = strchr( szSourceName, '\\' ) ) != NULL )
-   {
       *pTmp = '/';
-   }
 
    yyc = hb_fopen( szFileName, "wb" );
 
@@ -381,12 +359,18 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
    if( hb_comp_createExternList )
    {
       fExtern = hb_fopen( szExternName, "wb" );;
-      fprintf( fExtern, "; List of Public Functions\n" );
-      fprintf( fExtern, "; Module: %s\n\n", szSourceName );
+      if( ! fExtern )
+      {
+         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_CREATE_OUTPUT, szExternName, NULL );
+         return;
+      }
+      fprintf( fExtern,
+         "; List of Public Functions\n"
+         "; Module: %s\n\n", szSourceName );
    }
 
    /*
-      Create *.dyn when /vd is used
+    * Create *.dyn when /vd is used
     */
    if( hb_comp_autoDeferred )
    {
@@ -396,20 +380,17 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
    }
 
    /*
-      Automatically generate filename.xbx - list of public functions useable
-      for generating extern.ch
+    * Automatically generate filename.xbx - list of public functions useable
+    * for generating extern.ch
    */
 
    /*
-      Create *.p when /gc4 is used
+    * Create *.p when /gc4 is used
     */
    hb_compPCodeStat( pFileName );
 
-   if( ! hb_comp_bQuiet )
-   {
-      printf( "Generating C source output to \'%s\'...\n", szFileName );
-      fflush( stdout );
-   }
+   hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "Generating C source output to \'%s\'...\n", szFileName );
+   hb_compOutStd( hb_comp_szMsgBuf );
 
    hb_strncpyUpper( szModuleName, pFileName->szName, sizeof( szModuleName ) - 1 );
    /* replace non ID characters in name of local symbol table by '_' */
@@ -448,9 +429,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
       /* AJ: Some compilers performs [f]printf("<%s>",string) incorrecltly */
       fprintf( yyc, " * Generated C source code from %s%s%s\n", "<", hb_comp_PrgFileName, ">" );
       if( hb_Command_Line && *hb_Command_Line )
-      {
          fprintf( yyc, " * Command: %s\n", hb_Command_Line );
-      }
 #if defined( HB_OS_WIN )
       fprintf( yyc, " * Created: %04d.%02d.%02d %02d:%02d:%02d (%s)\n */\n\n", t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond, szComp );
 #else
@@ -462,9 +441,10 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
 
    if( hb_comp_autoDeferred )
    {
-      fprintf( yyc, "#if defined( __cplusplus ) && !defined( HB_STATIC_STARTUP )\n" );
-      fprintf( yyc, "   #define HB_STATIC_STARTUP\n" );
-      fprintf( yyc, "#endif\n\n" );
+      fprintf( yyc,
+         "#if defined( __cplusplus ) && !defined( HB_STATIC_STARTUP )\n"
+         "   #define HB_STATIC_STARTUP\n"
+         "#endif\n\n" );
    }
 
    if( hb_comp_iFunctionCnt || hb_comp_Namespaces.pFirst )
@@ -473,18 +453,16 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
 
       if( hb_comp_iGenCOutput == HB_COMPGENC_REALCODE )
       {
-         fprintf( yyc, "#include \"hbxvm.h\"\n" );
-         fprintf( yyc, "#include \"hbapierr.h\"\n" );
+         fprintf( yyc,
+            "#include \"hbxvm.h\"\n"
+            "#include \"hbapierr.h\"\n" );
       }
       else if( hb_comp_iGenCOutput != HB_COMPGENC_COMPACT )
-      {
          fprintf( yyc, "#include \"hbpcode.h\"\n" );
-      }
 
-      fprintf( yyc, "#include \"hbinit.h\"\n\n" );
-
-      fprintf( yyc, "#define __PRG_SOURCE__ \"%s\"\n\n", hb_comp_PrgFileName );
-
+      fprintf( yyc,
+         "#include \"hbinit.h\"\n\n"
+         "#define __PRG_SOURCE__ \"%s\"\n\n", hb_comp_PrgFileName );
 
       if( hb_comp_Namespaces.pFirst )
       {
@@ -495,9 +473,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
             if( pNamespace->type & NSTYPE_SPACE )
             {
                if( ( pNamespace->type & NSTYPE_STEALTH ) == NSTYPE_STEALTH )
-               {
                   fprintf( yyc, "#include \"%s.xns\"\n", pNamespace->szName );
-               }
             }
 
             pNamespace = pNamespace->pNext;
@@ -510,9 +486,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
       pFunc = hb_comp_functions.pFirst;
 
       if( ! hb_comp_bStartProc )
-      {
          pFunc = pFunc->pNext; /* No implicit starting procedure */
-      }
 
 #ifdef BROKEN_MODULE_SPACE_LOGIC
       fprintf( yyc, "HB_FUNC_STATIC( __begin__ );\n" );
@@ -531,71 +505,45 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
          bIsLineNumberInfo = ( pFunc == hb_comp_pLineNumberFunc );
 
          if( pFunc->cScope & HB_FS_CRITICAL )
-         {
             bCritical = TRUE;
-         }
 
          if( pFunc->pNamespace && ( HB_ISALPHA( pFunc->szName[ 0 ] ) || pFunc->szName[ 0 ] == '_' ) )
          {
             if( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
             {
                if( bIsStaticFunction )
-               {
                   fprintf( yyc, "HB_FUNC_STATIC( %s );\n", pFunc->szName );
-               }
                else
-               {
                   fprintf( yyc, "HB_FUNC_OPTIONAL_NAMESPACE( /* %s */ %d, %s );\n", pFunc->pNamespace->szFullPath, pFunc->pNamespace->iID, pFunc->szName );
-               }
             }
             else if( ( pFunc->pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
-            {
                fprintf( yyc, "HB_FUNC_EXTERNAL_NAMESPACE( /* %s */ %d, %s );\n", pFunc->pNamespace->szFullPath, pFunc->pNamespace->iID, pFunc->szName );
-            }
             else if( ( pFunc->pNamespace->type & NSTYPE_STEALTH ) == NSTYPE_STEALTH )
-            {
                fprintf( yyc, "HB_FUNC_EXTERNAL_NAMESPACE( /* %s */ NSID_%s, %s );\n", pFunc->pNamespace->szFullPath, pFunc->pNamespace->szName, pFunc->szName );
-            }
             else
-            {
                fprintf( yyc, "HB_FUNC_NAMESPACE( /* %s */ %d, %s );\n", pFunc->pNamespace->szFullPath, pFunc->pNamespace->iID, pFunc->szName );
-            }
          }
          /* Is it a PUBLIC FUNCTION/PROCEDURE */
          else if( bIsStaticFunction )
-         {
             fprintf( yyc, "HB_FUNC_STATIC( %s );\n", pFunc->szName );
-         }
          /* Is it a STATIC$ */
          else if( bIsStaticVariable )
-         {
             fprintf( yyc, "HB_FUNC_INITSTATICS();\n" ); /* NOTE: hb_ intentionally in lower case */
-         }
          /* Is it a GLOBAL$ */
          else if( bIsGlobalVariable )
-         {
             fprintf( yyc, "HB_FUNC_INITGLOBALS();\n" ); /* NOTE: hb_ intentionally in lower case */
-         }
          /* Is it an (_INITLINES) function */
          else if( bIsLineNumberInfo )
-         {
             fprintf( yyc, "HB_FUNC_INITLINES();\n" );
-         }
          /* Is it an INIT FUNCTION/PROCEDURE */
          else if( bIsInitFunction )
-         {
             fprintf( yyc, "HB_FUNC_INIT( %.*s );\n", ( int ) strlen( pFunc->szName ) - 1, pFunc->szName );
-         }
          /* Is it an EXIT FUNCTION/PROCEDURE */
          else if( bIsExitFunction )
-         {
             fprintf( yyc, "HB_FUNC_EXIT( %.*s );\n", ( int ) strlen( pFunc->szName ) - 1, pFunc->szName );
-         }
          /* Then it must be a STATIC FUNCTION/PROCEDURE */
          else
-         {
             fprintf( yyc, "HB_FUNC( %s );\n", pFunc->szName );
-         }
 
          pFunc = pFunc->pNext;
       }
@@ -615,9 +563,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
                yyc = hb_fopen( szFileName, "wb" );
 
                if( ! yyc )
-               {
                   hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_CREATE_OUTPUT, szFileName, NULL );
-               }
 
                hb_xfree( szFileName );
 
@@ -630,9 +576,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
                   if( pMember->type & NSTYPE_MEMBER )
                   {
                      if( ( pMember->pFunc->cScope & HB_FS_STATIC ) == 0 )
-                     {
                         fprintf( yyc, "   HB_FUNC_EXTERNAL_NAMESPACE( /* %s */ %d, %s );\n", pNamespace->szFullPath, pNamespace->iID, pMember->szName );
-                     }
                   }
 
                   if( pMember->type & NSTYPE_SPACE )
@@ -644,37 +588,26 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
                   if( pMember->type & NSTYPE_END )
                   {
                      if( --iLevel == 0 )
-                     {
                         break;
-                     }
                   }
 
                   pMember = pMember->pNext;
                }
 
-               fprintf( yyc, "\n#endif\n" );  // Dont remove prefix \n!
-               fprintf( yyc, "\n" );
+               fprintf( yyc, "\n#endif\n\n" );  /* Dont remove prefix \n! */
                fclose( yyc );
 
                if( pMember )
-               {
                   pNamespace = pMember;
-               }
                else
-               {
                   break;
-               }
             }
             else if( ( pNamespace->type & ( NSTYPE_EXTERNAL | NSTYPE_MEMBER ) ) == ( NSTYPE_EXTERNAL | NSTYPE_MEMBER ) )
             {
                if( ( pNamespace->pOuter->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
-               {
                   fprintf( yyc, "HB_FUNC_OPTIONAL_NAMESPACE( /* %s */ %d, %s );\n", pNamespace->pOuter->szFullPath, pNamespace->pOuter->iID, pNamespace->szName );
-               }
                else
-               {
                   fprintf( yyc, "HB_FUNC_EXTERNAL_NAMESPACE( /* %s */ %d, %s );\n", pNamespace->pOuter->szFullPath, pNamespace->pOuter->iID, pNamespace->szName );
-               }
             }
 
             pNamespace = pNamespace->pNext;
@@ -708,9 +641,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
          if( pInline->szName )
          {
             if( ! hb_compCStaticSymbolFound( pInline->szName, HB_PROTO_FUNC_STATIC ) )
-            {
                fprintf( yyc, "HB_FUNC_STATIC( %s );\n", pInline->szName );
-            }
          }
          pInline = pInline->pNext;
       }
@@ -719,9 +650,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
       pInline = hb_comp_inlines.pFirst;
 
       if( pInline && pInline->pCode )
-      {
          hb_compGenCInLineSymbol();
-      }
 
       fprintf( yyc, "\n" );
 
@@ -746,9 +675,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
       pFunCall = hb_comp_funcalls.pFirst;
 
       if( pFunCall )
-      {
          fprintf( yyc, "/* Forward declarations of all externally defined Functions. */\n" );
-      }
 
       while( pFunCall )
       {
@@ -759,7 +686,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
             if( ( pFunCall->iFlags & NSF_RESOLVE ) == NSF_RESOLVE )
             {
                pFunc = hb_compFunctionResolve( pFunCall->szName, ( PNAMESPACE ) pFunCall->Namespace, NULL );
-               //fprintf( yyc, "/* %s from %s resolved to %s */\n", pFunCall->szName, ( (PNAMESPACE) pFunCall->Namespace )->szName , pFunc && pFunc->pNamespace ? pFunc->pNamespace->szFullPath  : "global" );
+#if 0
+               fprintf( yyc, "/* %s from %s resolved to %s */\n", pFunCall->szName, ( (PNAMESPACE) pFunCall->Namespace )->szName , pFunc && pFunc->pNamespace ? pFunc->pNamespace->szFullPath  : "global" );
+#endif
             }
          }
 #if defined( __XCC__ )
@@ -767,58 +696,44 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
 #else
          if( pFunc == ( PFUNCTION ) (HB_LONG) 1 )
 #endif
-         {
             fprintf( yyc, "/* Skipped: call to '%s' resolved to external */\n", pFunCall->szName );
-         }
          else if( pFunCall->Namespace && ( ( ( pFunCall->iFlags & NSF_RESOLVE ) != NSF_RESOLVE ) || ( pFunc && pFunc->pNamespace ) ) )
          {
-            // No prototype for Namespace function calls!
+            /* No prototype for Namespace function calls! */
             if( pFunc && pFunc->pNamespace )
-            {
                fprintf( yyc, "/* Skipped: call to '%s' resolved to: '%s' */\n", pFunCall->szName, pFunc->pNamespace->szFullPath );
-            }
             else
-            {
                fprintf( yyc, "/* Skipped: call to: '%s' of: '%s' */\n", pFunCall->szName, ( char * ) pFunCall->Namespace );
-            }
          }
          else if( hb_compFunctionFind( pFunCall->szName, NULL, NSF_NONE ) == NULL && hb_compInlineFind( pFunCall->szName ) == NULL )
          {
             PCOMSYMBOL pSym = hb_compSymbolFind( pFunCall->szName, NULL, NULL, SYMF_FUNCALL );
 
-            // Skip!
+            /* Skip! */
             if( pSym && ( ( pSym->cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED ) )
             {
                if( pSym->Namespace )
                {
                   if( ( pSym->iFlags & SYMF_NS_EXPLICITPTR ) == SYMF_NS_EXPLICITPTR )
-                  {
                      fprintf( yyc, "/* Skipped DEFERRED call to: '%s' of: '%s' */\n", pSym->szName, ( ( PNAMESPACE ) pSym->Namespace )->szFullPath );
-                  }
                   else if( ( pSym->iFlags & SYMF_NS_EXPLICITPATH ) == SYMF_NS_EXPLICITPATH )
-                  {
                      fprintf( yyc, "/* Skipped DEFERRED call to: '%s' of: '%s' */\n", pSym->szName, ( char * ) pSym->Namespace );
-                  }
                   else
-                  {
                      assert( 0 );
-                  }
                }
                else
-               {
                   fprintf( yyc, "/* Skipped DEFERRED call to: '%s' */\n", pSym->szName );
-               }
             }
             else if( hb_compCStaticSymbolFound( pFunCall->szName, HB_PROTO_FUNC_PUBLIC ) )
             {
                /* Will be processed by hb_compGenCAddProtos()
-                  fprintf( yyc, "HB_FUNC_PUBLIC( %s );\n", pFunCall->szName );
+                * fprintf( yyc, "HB_FUNC_PUBLIC( %s );\n", pFunCall->szName );
                 */
             }
             else if( hb_compCStaticSymbolFound( pFunCall->szName, HB_PROTO_FUNC_STATIC ) )
             {
                /* Will be processed by hb_compGenCAddProtos()
-                  fprintf( yyc, "HB_FUNC_STATIC( %s );\n", pFunCall->szName );
+                * fprintf( yyc, "HB_FUNC_STATIC( %s );\n", pFunCall->szName );
                 */
             }
             else
@@ -831,11 +746,12 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
                   {
                      if( ! bBeginExt )
                      {
-                        fprintf( fCodeExt, "/*\n" );
-                        fprintf( fCodeExt, "   Dynamic functions required by module: \"%s\"\n", szSourceName );
-                        fprintf( fCodeExt, "   This file should be included on top of file when not\n" );
-                        fprintf( fCodeExt, "   compiled with -vd option\n" );
-                        fprintf( fCodeExt, "*/\n\n" );
+                        fprintf( fCodeExt,
+                           "/*\n"
+                           "   Dynamic functions required by module: \"%s\"\n"
+                           "   This file should be included on top of file when not\n"
+                           "   compiled with -vd option\n"
+                           "*/\n\n", szSourceName );
                         bBeginExt = TRUE;
                      }
 
@@ -843,9 +759,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
                   }
                }
                else
-               {
                   fprintf( yyc, "HB_FUNC_EXTERN( %s );\n", pFunCall->szName );
-               }
             }
          }
 
@@ -864,23 +778,19 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
          while( pFunc )
          {
             if( pFunc->cScope & HB_FS_CRITICAL )
-            {
                fprintf( yyc, "static HB_CRITICAL_T s_Critical%s;\n", pFunc->szName );
-            }
 
             pFunc = pFunc->pNext;
          }
 
-         // Write init function for CRITICAL Functions Mutex initialization.
+         /* Write init function for CRITICAL Functions Mutex initialization. */
          fprintf( yyc, "\nHB_CALL_ON_STARTUP_BEGIN( hb_InitCritical%s )\n", szModuleName );
 
          pFunc = hb_comp_functions.pFirst;
          while( pFunc )
          {
             if( pFunc->cScope & HB_FS_CRITICAL )
-            {
                fprintf( yyc, "   HB_CRITICAL_INIT( s_Critical%s );\n", pFunc->szName );
-            }
 
             pFunc = pFunc->pNext;
          }
@@ -901,8 +811,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
          yyc = ( FILE * ) pTemp;
       }
 
-      fprintf( yyc, "\n#undef HB_PRG_PCODE_VER\n" );
-      fprintf( yyc, "#define HB_PRG_PCODE_VER %i\n", ( int ) HB_PCODE_VER );
+      fprintf( yyc,
+         "\n#undef HB_PRG_PCODE_VER\n"
+         "#define HB_PRG_PCODE_VER %i\n", ( int ) HB_PCODE_VER );
 
       hb_compWriteDeclareGlobal( yyc, iLocalGlobals );
 
@@ -937,9 +848,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
             if( ( pNamespace->type & NSTYPE_SPACE ) )
             {
                if( ( pNamespace->type & NSTYPE_USED ) == NSTYPE_USED )
-               {
                   fprintf( yyc, "%s\\0", pNamespace->szFullPath );
-               }
             }
 
             pNamespace = pNamespace->pNext;
@@ -1000,13 +909,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
                if( ( ( pSym->iFlags & SYMF_NS_EXPLICITPATH ) == SYMF_NS_EXPLICITPATH ) || ( ( pSym->iFlags & SYMF_NS_EXPLICITPTR ) == SYMF_NS_EXPLICITPTR ) )
                {
                   if( ( pSym->iFlags & SYMF_NS_EXPLICITPATH ) == SYMF_NS_EXPLICITPATH )
-                  {
                      pFunc = hb_compFunctionFind( pSym->szName, pSym->Namespace, SYMF_NS_EXPLICITPATH );
-                  }
                   else
-                  {
                      pFunc = hb_compFunctionFind( pSym->szName, pSym->Namespace, SYMF_NS_EXPLICITPTR );
-                  }
 
                   if( pFunc )
                   {
@@ -1028,9 +933,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
                   else
                   {
                      if( ! ( ( pSym->cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED ) )
-                     {
                         pSym->cScope |= ( HB_FS_INDIRECT | HB_FS_PUBLIC );
-                     }
                   }
                }
                else if( ( pSym->iFlags & SYMF_NS_RESOLVE ) == SYMF_NS_RESOLVE )
@@ -1044,38 +947,28 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
 #else
                   if( pFunc == ( PFUNCTION ) ( HB_LONG ) 1 )
 #endif
-                  {
-                     // Resolved to external member.
+                     /* Resolved to external member. */
                      pFunc = NULL;
-                  }
                }
                else if( ( pSym->cScope & HB_FS_LOCAL ) != HB_FS_LOCAL )
                {
                   /* It's a function defined in this module */
                   if( ( pFunc = hb_compFunctionFind( pSym->szName, NULL, SYMF_FUNCALL ) ) != NULL )
-                  {
                      assert( 0 );
-                  }
                   else if( hb_compCStaticSymbolFound( pSym->szName, HB_PROTO_FUNC_PUBLIC ) )
                   {
                      if( ( pSym->cScope & HB_FS_STATIC ) == 0 )
-                     {
                         pSym->cScope |= ( HB_FS_LOCAL | HB_FS_PUBLIC );
-                     }
                   }
                   else if( hb_compCStaticSymbolFound( pSym->szName, HB_PROTO_FUNC_STATIC ) )
                   {
                      if( ( pSym->cScope & HB_FS_PUBLIC ) == 0 )
-                     {
                         pSym->cScope |= ( HB_FS_LOCAL | HB_FS_STATIC );
-                     }
                   }
                   else
                   {
                      if( ( pSym->cScope & HB_FS_STATIC ) == 0 )
-                     {
                         pSym->cScope |= HB_FS_PUBLIC;
-                     }
                   }
                }
 
@@ -1087,9 +980,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
                else
                {
                   if( ( pSym->cScope & HB_FS_PUBLIC ) == HB_FS_PUBLIC )
-                  {
                      assert( ( pSym->cScope & HB_FS_STATIC ) == 0 );
-                  }
                   else
                   {
                      assert( ( pSym->cScope & HB_FS_STATIC ) == HB_FS_STATIC );
@@ -1103,57 +994,36 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
                if( ( pSym->iFlags & SYMF_NS_EXPLICITPATH ) == SYMF_NS_EXPLICITPATH )
                {
                   if( ( pSym->cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED )
-                  {
                      fprintf( yyc, "{ \"%s.%s\", {", ( char * ) pSym->Namespace, pSym->szName );
-                  }
                   else
-                  {
                      fprintf( yyc, "{ \"%s\", {", pSym->szName );
-                  }
                }
                else if( ( pSym->iFlags & SYMF_NS_EXPLICITPTR ) == SYMF_NS_EXPLICITPTR )
                {
-                  //if( ( ( (PNAMESPACE) pSym->Namespace )->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
+                  /* if( ( ( (PNAMESPACE) pSym->Namespace )->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
+                   */
 
                   if( ( ( ( PNAMESPACE ) pSym->Namespace )->type & NSTYPE_RUNTIME ) == NSTYPE_RUNTIME )
-                  {
                      fprintf( yyc, "{ \"%s.%s\", {", ( ( PNAMESPACE ) pSym->Namespace )->szFullPath, pSym->szName );
-                  }
                   else if( ( pSym->cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED )
-                  {
                      fprintf( yyc, "{ \"%s.%s\", {", ( ( PNAMESPACE ) pSym->Namespace )->szFullPath, pSym->szName );
-                  }
                   else
-                  {
                      fprintf( yyc, "{ \"%s\", {", pSym->szName );
-                  }
                }
                else
-               {
                   assert( 0 );
-               }
             }
             else
-            {
                fprintf( yyc, "{ \"%s\", {", pSym->szName );
-            }
 
             if( pSym->cScope & HB_FS_INIT & ~HB_FS_STATIC )
-            {
                fprintf( yyc, "HB_FS_INIT" );
-            }
             else if( pSym->cScope & HB_FS_EXIT & ~HB_FS_STATIC )
-            {
                fprintf( yyc, "HB_FS_EXIT" );
-            }
             else if( pSym->cScope & HB_FS_STATIC )
-            {
                fprintf( yyc, "HB_FS_STATIC" );
-            }
             else if( ( pSym->cScope & HB_FS_INDIRECT ) == HB_FS_INDIRECT )
-            {
                fprintf( yyc, "HB_FS_INDIRECT" );
-            }
             else
             {
                fprintf( yyc, "HB_FS_PUBLIC" );
@@ -1169,14 +1039,10 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
                      ( pSym->cScope & HB_FS_EXIT ) == 0 &&
                      ( pSym->cScope & HB_FS_STATIC ) == HB_FS_STATIC ) &&
                    ! hb_compFunCallFind( pSym->szName, pSym->Namespace, pSym->iFlags ) )
-               {
                   hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_STATIC_UNUSED, pSym->szName, NULL );
-               }
             }
             else if( ( pSym->cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED ) // MUTUALLY EXCLUSIVE
-            {
                fprintf( yyc, " | HB_FS_DEFERRED" );
-            }
 
             if( ( pSym->cScope & HB_FS_FIRST ) && ( ! hb_comp_bNoStartUp ) )
             {
@@ -1191,13 +1057,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
             if( ( pSym->cScope & HB_FS_INDIRECT ) == HB_FS_INDIRECT )
             {
                if( ( pSym->iFlags & SYMF_NS_EXPLICITPATH ) == SYMF_NS_EXPLICITPATH )
-               {
                   fprintf( yyc, "}, {(PHB_FUNC) &%s.%s}, &ModuleFakeDyn }", ( char * ) pSym->Namespace, pSym->szName );
-               }
                else
-               {
                   fprintf( yyc, "}, {(PHB_FUNC) &%s.%s}, &ModuleFakeDyn }", ( ( PNAMESPACE ) pSym->Namespace )->szFullPath, pSym->szName );
-               }
             }
             else if( ( pSym->iFlags & SYMF_FUNCALL ) && ( ( pSym->cScope & HB_FS_LOCAL ) == HB_FS_LOCAL ) ) /* is it a function defined in this module */
             {
@@ -1205,57 +1067,37 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
                {
                   assert( pFunc );
 
-                  // pFunc is NOT a typo - resolved above!
+                  /* pFunc is NOT a typo - resolved above! */
                   if( ( pFunc->pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
-                  {
-                     // pFunc is NOT a typo - resolved above!
+                     /* pFunc is NOT a typo - resolved above! */
                      fprintf( yyc, "}, {HB_EXTERNAL_NAMESPACE_FUNCNAME( %d, %s )}, &ModuleFakeDyn }", pFunc->pNamespace->iID, pSym->szName );
-                  }
                   else if( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
-                  {
-                     // pFunc is NOT a typo - resolved above!
+                     /* pFunc is NOT a typo - resolved above! */
                      fprintf( yyc, "}, {HB_OPTIONAL_NAMESPACE_FUNCNAME( %d, %s )}, &ModuleFakeDyn }", pFunc->pNamespace->iID, pSym->szName );
-                  }
                   else
-                  {
-                     // pFunc is NOT a typo - resolved above!
+                     /* pFunc is NOT a typo - resolved above! */
                      fprintf( yyc, "}, {HB_NAMESPACE_FUNCNAME( %d, %s )}, &ModuleFakeDyn }", pFunc->pNamespace->iID, pSym->szName );
-                  }
                }
                else if( pSym->cScope & HB_FS_INIT & ~HB_FS_STATIC )
-               {
                   fprintf( yyc, "}, {HB_INIT_FUNCNAME( %.*s )}, &ModuleFakeDyn }", ( int ) strlen( pSym->szName ) - 1, pSym->szName );
-               }
                else if( pSym->cScope & HB_FS_EXIT & ~HB_FS_STATIC )
-               {
                   fprintf( yyc, "}, {HB_EXIT_FUNCNAME( %.*s )}, &ModuleFakeDyn }", ( int ) strlen( pSym->szName ) - 1, pSym->szName );
-               }
                else
-               {
                   fprintf( yyc, "}, {HB_FUNCNAME( %s )}, &ModuleFakeDyn }", pSym->szName );
-               }
             }
-            else if( pSym->iFlags & SYMF_FUNCALL ) //&& hb_compFunCallFind( pSym->szName, pSym->Namespace, pSym->iFlags ) ) /* is it a function called from this module */
+            else if( pSym->iFlags & SYMF_FUNCALL ) /* && hb_compFunCallFind( pSym->szName, pSym->Namespace, pSym->iFlags ) ) // is it a function called from this module */
             {
                if( ( pSym->cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED )
-               {
                   fprintf( yyc, "}, {NULL}, NULL }" );
-               }
                else
-               {
                   fprintf( yyc, "}, {HB_FUNCNAME( %s )}, NULL }", pSym->szName );
-               }
             }
             else
-            {
                fprintf( yyc, "}, {NULL}, NULL }" );   /* memvar */
-            }
          }
 
          if( pSym != hb_comp_symbols.pLast )
-         {
             fprintf( yyc, ",\n" );
-         }
 
          pSym = pSym->pNext;
          iSymOffset++;
@@ -1265,9 +1107,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
          Write entries for external functions
        */
       if( pStatSymb )
-      {
          hb_compWriteExternEntries( yyc, bSymFIRST, TRUE, TRUE, szModuleName );
-      }
 
       /*
          End of initializaton codes
@@ -1290,18 +1130,14 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
       }
 
       if( bCritical )
-      {
          hb_compWritePragma( yyc, "", szModuleName );
-      }
 
       /* Generate functions data
        */
       pFunc = hb_comp_functions.pFirst;
 
       if( ! hb_comp_bStartProc )
-      {
          pFunc = pFunc->pNext; /* No implicit starting procedure */
-      }
 
       while( pFunc )
       {
@@ -1317,68 +1153,42 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
             if( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
             {
                if( bIsStaticFunction )
-               {
                   fprintf( yyc, "HB_FUNC_STATIC( %s )", pFunc->szName );
-               }
                else
-               {
                   fprintf( yyc, "HB_FUNC_OPTIONAL_NAMESPACE( /* %s */ %d, %s )", pFunc->pNamespace->szFullPath, pFunc->pNamespace->iID, pFunc->szName );
-               }
             }
             else if( ( pFunc->pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
-            {
                fprintf( yyc, "HB_FUNC_EXTERNAL_NAMESPACE( /* %s */ %d, %s )", pFunc->pNamespace->szFullPath, pFunc->pNamespace->iID, pFunc->szName );
-            }
             else if( ( pFunc->pNamespace->type & NSTYPE_STEALTH ) == NSTYPE_STEALTH )
-            {
                fprintf( yyc, "HB_FUNC_EXTERNAL_NAMESPACE( /* %s */ NSID_%s, %s )", pFunc->pNamespace->szFullPath, pFunc->pNamespace->szName, pFunc->szName );
-            }
             else
-            {
                fprintf( yyc, "HB_FUNC_NAMESPACE( /* %s */ %d, %s )", pFunc->pNamespace->szFullPath, pFunc->pNamespace->iID, pFunc->szName );
-            }
          }
          /* Is it a PUBLIC FUNCTION/PROCEDURE */
          else if( bIsStaticFunction )
-         {
             fprintf( yyc, "HB_FUNC_STATIC( %s )", pFunc->szName );
-         }
          /* Is it STATICS$ */
          else if( bIsStaticVariable )
-         {
             fprintf( yyc, "HB_FUNC_INITSTATICS()" ); /* NOTE: hb_ intentionally in lower case */
-         }
          /* Is it GLOBALS$ */
          else if( bIsGlobalVariable )
-         {
             fprintf( yyc, "HB_FUNC_INITGLOBALS()" ); /* NOTE: hb_ intentionally in lower case */
-         }
          /* Is it (_INITLINES) */
          else if( bIsLineNumberInfo )
-         {
             fprintf( yyc, "HB_FUNC_INITLINES()" ); /* NOTE: hb_ intentionally in lower case */
-         }
          /* Is it an INIT FUNCTION/PROCEDURE */
          else if( bIsInitFunction )
-         {
             fprintf( yyc, "HB_FUNC_INIT( %.*s )", ( int ) strlen( pFunc->szName ) - 1, pFunc->szName );
-         }
          /* Is it an EXIT FUNCTION/PROCEDURE */
          else if( bIsExitFunction )
-         {
             fprintf( yyc, "HB_FUNC_EXIT( %.*s )", ( int ) strlen( pFunc->szName ) - 1, pFunc->szName );
-         }
          /* Then it must be a STATIC FUNCTION/PROCEDURE */
          else
-         {
             fprintf( yyc, "HB_FUNC( %s )", pFunc->szName );
-         }
 
          fprintf( yyc, "\n" );
          if( hb_comp_iGenCOutput == HB_COMPGENC_REALCODE )
-         {
             hb_compGenCRealCode( pFunc, yyc );
-         }
          else
          {
             if( hb_comp_iGenCOutput == HB_COMPGENC_COMPACT )
@@ -1393,34 +1203,30 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
 
       if( iLocalGlobals )
       {
-         fprintf( yyc, "HB_FUNC_REGISTERGLOBAL()\n"
-                  "{\n"
-                  "   hb_vmRegisterGlobals( &ppGlobals, %i );\n", iGlobals );
-         fprintf( yyc, "}\n\n" );
+         fprintf( yyc,
+            "HB_FUNC_REGISTERGLOBAL()\n"
+            "{\n"
+            "   hb_vmRegisterGlobals( &ppGlobals, %i );\n"
+            "}\n\n", iGlobals  );
       }
-
-      /*
-         Generate pCode Listing
-       */
 
       /* Generate codeblocks data
        */
       if( hb_comp_cInlineID )
       {
-         fprintf( yyc, "#include \"hbapi.h\"\n" );
-         fprintf( yyc, "#include \"hbstack.h\"\n" );
-         fprintf( yyc, "#include \"hbapierr.h\"\n" );
-         fprintf( yyc, "#include \"hbapiitm.h\"\n" );
-         fprintf( yyc, "#include \"hbvm.h\"\n" );
-         fprintf( yyc, "#include \"hboo.ch\"\n" );
+         fprintf( yyc,
+            "#include \"hbapi.h\"\n"
+            "#include \"hbstack.h\"\n"
+            "#include \"hbapierr.h\"\n"
+            "#include \"hbapiitm.h\"\n"
+            "#include \"hbvm.h\"\n"
+            "#include \"hboo.ch\"\n" );
       }
 
       pInline = hb_comp_inlines.pFirst;
 
       if( pInline && pInline->pCode )
-      {
          hb_compGenCInLine( yyc );
-      }
 
 #ifdef BROKEN_MODULE_SPACE_LOGIC
       fprintf( yyc, "\nHB_FUNC_STATIC( __end__ ){}\n" );
@@ -1429,18 +1235,16 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
    else
    {
       /*
-         We do not have an ordinary PRG code in file
+       * We do not have an ordinary PRG code in file
        */
 
       BOOL bInline = ( pInline && pInline->pCode );
 
       if( bInline )
-      {
          hb_compGenCInLineSymbol();
-      }
 
       /*
-         We have functions in dump areas
+       * We have functions in dump areas
        */
 
       if( pStatSymb )
@@ -1448,60 +1252,47 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
          fprintf( yyc, "#include \"hbvmpub.h\"\n" );
 
          if( hb_comp_iGenCOutput != HB_COMPGENC_COMPACT )
-         {
             fprintf( yyc, "#include \"hbpcode.h\"\n" );
-         }
 
          fprintf( yyc, "#include \"hbinit.h\"\n\n" );
 
          hb_compGenCAddProtos( yyc );
 
          if( hb_compWriteExternEntries( yyc, bSymFIRST, FALSE, FALSE, szModuleName ) )
-         {
             hb_writeEndInit( yyc, szModuleName );
-         }
       }
 
       if( bInline )
-      {
          hb_compGenCInLine( yyc );
-      }
       else
       {
          if( ! pStatSymb )
-         {
             fprintf( yyc, "/* Empty source file */\n\n" );
-         }
       }
    }
 
    fclose( yyc );
 
    if( hb_comp_createExternList )
-   {
       fclose( fExtern );
-   }
 
    if( fCodeExt )
-   {
       fclose( fCodeExt );
-   }
 
 #ifdef HB_BACK_END
    if( HB_BACK_END == 0 )
 #endif
    {
-      if( ! hb_comp_bQuiet )
-      {
-         printf( "Done.\n" );
-      }
+      hb_compOutStd( "Done.\n" );
    }
 
    pTemp = pStatSymb;
 
    while( pTemp )
    {
-      // printf( "RELEASING : >>%s<<\n", pTemp->szName );
+#if defined( HB_COMP_DEBUG )
+      printf( "RELEASING : >>%s<<\n", pTemp->szName );
+#endif
       hb_xfree( pTemp->szName );
       pTemp       = pTemp->pNext;
       hb_xfree( ( void * ) pStatSymb );
@@ -1541,13 +1332,9 @@ static BOOL hb_compWriteExternEntries( FILE * yyc, BOOL bSymFIRST, BOOL bNewLine
             continue;
          }
          else if( pTemp->Type == HB_PROTO_FUNC_EXIT )
-         {
             hb_xstrcat( szEntries, "{ \"", pTemp->szName, "$\", {HB_FS_EXIT | HB_FS_LOCAL}, {HB_EXIT_FUNCNAME( ", pTemp->szName, " )}, &ModuleFakeDyn },\n", NULL );
-         }
          else if( pTemp->Type == HB_PROTO_FUNC_INIT )
-         {
             hb_xstrcat( szEntries, "{ \"", pTemp->szName, "$\", {HB_FS_INIT | HB_FS_LOCAL}, {HB_INIT_FUNCNAME( ", pTemp->szName, " )}, &ModuleFakeDyn },\n", NULL );
-         }
          else
          {
             if( ( ! bNewLine ) && ( ! bBegin ) )
@@ -1567,7 +1354,8 @@ static BOOL hb_compWriteExternEntries( FILE * yyc, BOOL bSymFIRST, BOOL bNewLine
 
             if( bPrg )
             {
-               //if( hb_compFunCallFind( pTemp->szName, NULL, NSF_NONE ) )
+               /* if( hb_compFunCallFind( pTemp->szName, NULL, NSF_NONE ) )
+                */
                {
                   hb_xstrcat( szEntries, "{ \"", pTemp->szName, "\", {HB_FS_PUBLIC | HB_FS_LOCAL", NULL );
 
@@ -1598,14 +1386,10 @@ static BOOL hb_compWriteExternEntries( FILE * yyc, BOOL bSymFIRST, BOOL bNewLine
    ul = strlen( szEntries );
 
    if( ul && szEntries[ ul - 2 ] == ',' )
-   {
       szEntries[ ul - 2 ] = '\0';
-   }
 
    if( ul && ( bPrg || bStartFunc ) )
-   {
       fprintf( yyc, "%s", szEntries );
-   }
 
    hb_xfree( szEntries );
 
@@ -1634,28 +1418,20 @@ static void hb_compWriteDeclareGlobal( FILE * yyc, short iLocalGlobals )
          iGlobals++;
 
          if( pGlobal->szAlias == NULL )
-         {
             fprintf( yyc, "HB_EXPORT HB_ITEM_NEW( %s );\n", pGlobal->szName );
-         }
          else
-         {
             fprintf( yyc, "extern HB_IMPORT HB_ITEM %s;\n", pGlobal->szName );
-         }
 
          pGlobal = pGlobal->pNext;
       }
 
       if( bWriteExtern )
-      {
          fprintf( yyc, "HB_EXTERN_END\n" );
-      }
 
       fprintf( yyc, "\nstatic PHB_ITEM pGlobals[%i];\n", iGlobals );
 
       if( iLocalGlobals || ( hb_comp_iGenCOutput == HB_COMPGENC_REALCODE ) )
-      {
          fprintf( yyc, "static PHB_ITEM *ppGlobals = pGlobals;\n" );
-      }
 
       pGlobal = hb_comp_pGlobals;
 
@@ -1669,10 +1445,10 @@ static void hb_compWriteDeclareGlobal( FILE * yyc, short iLocalGlobals )
          iGlobals++;
       }
 
-      fprintf( yyc, "}\n\n" );
-
-      fprintf( yyc, "#undef HB_MODULE_GLOBALS\n"
-               "#define HB_MODULE_GLOBALS ( module_InitGlobalsArray(), (PHB_ITEM *) pGlobals )\n" );
+      fprintf( yyc,
+         "}\n\n"
+         "#undef HB_MODULE_GLOBALS\n"
+         "#define HB_MODULE_GLOBALS ( module_InitGlobalsArray(), (PHB_ITEM *) pGlobals )\n" );
    }
 }
 
@@ -1681,7 +1457,7 @@ static void hb_compWriteDeclareGlobal( FILE * yyc, short iLocalGlobals )
  */
 static void hb_compWriteGlobalFunc( FILE * yyc, short * iLocalGlobals, short * iGlobals, BOOL bWriteProto )
 {
-   // Any NON EXTERN Globals to Register?
+   /* Any NON EXTERN Globals to Register? */
    PVAR  pGlobal  = hb_comp_pGlobals;
    short uGlobals = 0, uLocalGlobals = 0;
 
@@ -1690,17 +1466,13 @@ static void hb_compWriteGlobalFunc( FILE * yyc, short * iLocalGlobals, short * i
       uGlobals++;
 
       if( pGlobal->szAlias == NULL )
-      {
          uLocalGlobals++;
-      }
 
       pGlobal = pGlobal->pNext;
    }
 
    if( uLocalGlobals && bWriteProto )
-   {
       fprintf( yyc, "HB_FUNC_REGISTERGLOBAL();\n" ); /* NOTE: hb_ intentionally in lower case */
-   }
 
    *iGlobals      = uGlobals;
    *iLocalGlobals = uLocalGlobals;
@@ -1714,9 +1486,7 @@ static void hb_compGenCAddProtos( FILE * yyc )
    PSSYMLIST pTemp;
 
    if( pStatSymb == NULL )
-   {
       return;
-   }
 
    pTemp = pStatSymb;
 
@@ -1727,21 +1497,13 @@ static void hb_compGenCAddProtos( FILE * yyc )
       if( ! hb_compFunctionFind( pTemp->szName, NULL, NSF_NONE ) )
       {
          if( pTemp->Type == HB_PROTO_FUNC_EXIT )
-         {
             fprintf( yyc, "HB_FUNC_EXIT( %s );\n", pTemp->szName );
-         }
          else if( pTemp->Type == HB_PROTO_FUNC_INIT )
-         {
             fprintf( yyc, "HB_FUNC_INIT( %s );\n", pTemp->szName );
-         }
          else if( pTemp->Type == HB_PROTO_FUNC_STATIC )
-         {
             fprintf( yyc, "HB_FUNC_STATIC( %s );\n", pTemp->szName );
-         }
          else if( pTemp->Type == HB_PROTO_FUNC_PUBLIC )
-         {
             fprintf( yyc, "HB_FUNC( %s );\n", pTemp->szName );
-         }
       }
       pTemp = pTemp->pNext;
    }
@@ -1812,9 +1574,7 @@ static void hb_compCStatSymList( const char * statSymName, int iOption )
    PSSYMLIST pTemp, pLast;
 
    if( hb_compCStaticSymbolFound( statSymName, iOption ) )
-   {
       return;
-   }
 
    pTemp          = ( PSSYMLIST ) hb_xgrab( sizeof( SSYMLIST ) );
    pTemp->szName  = ( char * ) hb_xgrab( strlen( statSymName ) + 1 );
@@ -1822,16 +1582,16 @@ static void hb_compCStatSymList( const char * statSymName, int iOption )
    pTemp->Type    = iOption;
    pTemp->pNext   = NULL;
 
-   //printf( "C Func: '%s' Type: %i\n", pTemp->szName, pTemp->Type );
+#if defined( HB_COMP_DEBUG )
+   printf( "C Func: '%s' Type: %i\n", pTemp->szName, pTemp->Type );
+#endif
 
    if( pStatSymb )
    {
       pLast = pStatSymb;
 
       while( pLast->pNext )
-      {
          pLast = pLast->pNext;
-      }
 
       pLast->pNext = pTemp;
       pStatSymb->uEntry++;
@@ -1854,8 +1614,9 @@ static void hb_compGenCCheckInLineStatic( const char * sInline )
 
    while( ( sInline = strstr( sInline, "HB_FUNC" ) ) != NULL )
    {
-      //printf( "Found: %s\n", sInline );
-
+#if defined( HB_COMP_DEBUG )
+      printf( "Found: %s\n", sInline );
+#endif
       sInline  += 7;
 
       bStatic  = FALSE;
@@ -1879,27 +1640,23 @@ static void hb_compGenCCheckInLineStatic( const char * sInline )
       }
 
       while( HB_ISSPACE( *sInline ) )
-      {
          sInline++;
-      }
 
       if( *sInline != '(' )
-      {
          continue;
-      }
 
       sInline++;
 
       while( HB_ISSPACE( *sInline ) )
-      {
          sInline++;
-      }
 
       szTmp = ( char * ) strchr( sInline, ')' );
 
       if( szTmp == NULL )
       {
-         //printf( "Invalid Syntax: %s\n", sInline );
+#if defined( HB_COMP_DEBUG )
+         printf( "Invalid Syntax: %s\n", sInline );
+#endif
          continue;
       }
 
@@ -1907,9 +1664,8 @@ static void hb_compGenCCheckInLineStatic( const char * sInline )
 
       szTmp--;
       while( HB_ISSPACE( *szTmp ) )
-      {
          szTmp--;
-      }
+
       szTmp[ 1 ] = '\0';
 
       hb_compCStatSymList( sInline, bStatic ? HB_PROTO_FUNC_STATIC :
@@ -1918,16 +1674,14 @@ static void hb_compGenCCheckInLineStatic( const char * sInline )
                            HB_PROTO_FUNC_PUBLIC );
 
       if( szContinue[ -1 ] == '\0' )
-      {
          *szTmp = ')';
-      }
       else
-      {
          *szTmp = ' ';
-      }
 
       sInline = szContinue;
-      //printf( "Continue at: %s\n", sInline );
+#if defined( HB_COMP_DEBUG )
+      printf( "Continue at: %s\n", sInline );
+#endif
    }
 }
 
@@ -1973,18 +1727,15 @@ static void hb_compGenCInLine( FILE * yyc )
       while( *pszFileName )
       {
          if( *pszFileName == '\\' )
-         {
             fprintf( yyc, "\\" );
-         }
+
          fprintf( yyc, "%c", *pszFileName++ );
       }
 
       fprintf( yyc, "\"\n" );
 
       if( pInline->szName )
-      {
          fprintf( yyc, "HB_FUNC_STATIC( %s )\n", pInline->szName );
-      }
 
       fprintf( yyc, "%s", pInline->pCode );
       pInline = pInline->pNext;

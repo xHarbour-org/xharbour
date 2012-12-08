@@ -83,11 +83,11 @@ static LONG          s_ulMemoryConsumed      = 0;  /* memory max size consumed *
 void * hb_xgrab( HB_SIZE ulSize )        /* allocates fixed memory, exits on failure */
 {
 #ifdef HB_FM_STATISTICS
-   #ifdef _MSC_VER
+#ifdef _MSC_VER
    void *   pMem  = HeapAlloc( GetProcessHeap(), 0, ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
-   #else
+#else
    void *   pMem  = malloc( ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
-   #endif
+#endif
 
    if( pMem )
    {
@@ -110,11 +110,11 @@ void * hb_xgrab( HB_SIZE ulSize )        /* allocates fixed memory, exits on fai
       pMem = ( BYTE * ) pMem + HB_MEMINFO_SIZE;
    }
 #else
-   #ifdef _MSC_VER
+#ifdef _MSC_VER
    void *   pMem  = HeapAlloc( GetProcessHeap(), 0, ( size_t ) ulSize );
-   #else
+#else
    void *   pMem  = malloc( ( size_t ) ulSize );
-   #endif
+#endif
 #endif
 
    if( ! pMem )
@@ -157,11 +157,11 @@ void * hb_xrealloc( void * pMem, HB_SIZE ulSize )       /* reallocates memory */
 
    HB_PUT_LE_UINT32( ( ( BYTE * ) pMem ) + ulMemSize, 0 );
 
-   #ifdef _MSC_VER
+#ifdef _MSC_VER
    pResult  = HeapReAlloc( GetProcessHeap(), 0, pMemBlock, ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
-   #else
+#else
    pResult  = realloc( pMemBlock, ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
-   #endif
+#endif
 
    if( pResult )
    {
@@ -182,11 +182,11 @@ void * hb_xrealloc( void * pMem, HB_SIZE ulSize )       /* reallocates memory */
       pResult                             = ( BYTE * ) pResult + HB_MEMINFO_SIZE;
    }
 #else
-   #ifdef _MSC_VER
+#ifdef _MSC_VER
    void *   pResult  = HeapReAlloc( GetProcessHeap(), 0, pMem, ( size_t ) ulSize );
-   #else
+#else
    void *   pResult  = realloc( pMem, ( size_t ) ulSize );
-   #endif
+#endif
 #endif
 
    if( ! pResult && ulSize )
@@ -229,11 +229,11 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
       HB_PUT_LE_UINT32( ( ( BYTE * ) pMem ) + pMemBlock->ulSize, 0 );
       pMem                 = ( BYTE * ) pMem - HB_MEMINFO_SIZE;
 #endif
-      #if defined( _MSC_VER )
+#if defined( _MSC_VER )
       HeapFree( GetProcessHeap(), 0, pMem );
-      #else
+#else
       free( pMem );
-      #endif
+#endif
    }
    else
    {
@@ -399,7 +399,8 @@ void hb_conOutErr( const char * pStr, HB_SIZE ulLen )
    if( ulLen == 0 )
       ulLen = strlen( pStr );
 
-   fprintf( hb_comp_errFile, "%.*s", ( int ) ulLen, pStr );
+   fprintf( stderr, "%.*s", ( int ) ulLen, pStr );
+   fflush( stderr );
 }
 
 char * hb_conNewLine( void )
@@ -629,4 +630,34 @@ void hb_compCleanUp( void )
    }
 
    cleansPair();
+}
+
+void hb_compOutStd( char * szMessage )
+{
+   if( ! hb_comp_bQuiet )
+   {
+      if( hb_outStdFunc )
+         hb_outStdFunc( hb_compHandle, szMessage );
+      else
+#if defined( HB_OS_DOS )
+         fprintf( stderr, "%s", szMessage ); fflush( stderr );
+#else
+         fprintf( stdout, "%s", szMessage ); fflush( stdout );
+#endif
+   }
+}
+
+void hb_compOutErr( char * szMessage )
+{
+   if( ! hb_comp_bQuiet )
+   {
+      if( hb_outErrFunc )
+         hb_outErrFunc( hb_compHandle, szMessage );
+      else
+#if defined( HB_OS_DOS )
+         fprintf( stdout, "%s", szMessage ); fflush( stdout );
+#else
+         fprintf( stderr, "%s", szMessage ); fflush( stderr );
+#endif
+   }
 }

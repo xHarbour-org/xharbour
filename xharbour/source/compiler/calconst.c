@@ -57,13 +57,9 @@ int main( char argc, char * argv[] )
    dExp = CalcConstant( ( char ** ) &sExp );
 
    if( sExp[ 0 ] )
-   {
       printf( "Parse Error: >%s<\n", sExp );
-   }
    else
-   {
       printf( "Result: %i\n", ( int ) dExp );
-   }
 
    return 0;
 }
@@ -83,9 +79,11 @@ double CalcConstant( char ** pExp )
    double   dExp;
    int      bNot  = 0;
 
-   //printf( "Process: >%s<\n", *pExp );
+#if defined( HB_COMP_DEBUG )
+   printf( "Process: >%s<\n", *pExp );
+#endif
 
- Top:
+   Top:
 
    sToken = NextTokenInConstant( pExp );
 
@@ -97,9 +95,7 @@ double CalcConstant( char ** pExp )
          Exp->Left   = ! CalcConstant( pExp );
       }
       else
-      {
          Exp->Left = CalcConstant( pExp );
-      }
 
       sToken = NextTokenInConstant( pExp );
 
@@ -122,9 +118,7 @@ double CalcConstant( char ** pExp )
          Exp->Left   = ! VALUE( sToken );
       }
       else
-      {
          Exp->Left = VALUE( sToken );
-      }
    }
 
    sToken = NextTokenInConstant( pExp );
@@ -144,7 +138,9 @@ double CalcConstant( char ** pExp )
 
    dExp  = Reduce( Root );
 
-   //printf( "Result: %i Next: >%s<\n", (int)dExp, *pExp );
+#if defined( HB_COMP_DEBUG )
+   printf( "Result: %i Next: >%s<\n", (int)dExp, *pExp );
+#endif
 
    return dExp;
 }
@@ -175,7 +171,9 @@ static double Reduce( PBIOP Exp )
       return Reduce( Right );
    }
 
-   //printf( "Operator: %s Left: %i Right: %i\n", Exp->Operator, (int) Exp->Left, (int) Reduce( Exp->Right ) );
+#if defined( HB_COMP_DEBUG )
+   printf( "Operator: %s Left: %i Right: %i\n", Exp->Operator, (int) Exp->Left, (int) Reduce( Exp->Right ) );
+#endif
 
    switch( Exp->Operator[ 0 ] )
    {
@@ -199,36 +197,24 @@ static double Reduce( PBIOP Exp )
          if( Exp->Operator[ 1 ] )
          {
             if( Exp->Left )
-            {
                dRet = Reduce( Exp->Right ) ? 1 : 0;
-            }
             else
-            {
                dRet = 0;
-            }
          }
          else
-         {
             dRet = ( long ) Exp->Left & ( long ) Reduce( Exp->Right );
-         }
          break;
 
       case '|':
          if( Exp->Operator[ 1 ] )
          {
             if( Exp->Left )
-            {
                dRet = 1;
-            }
             else
-            {
                dRet = Reduce( Exp->Right ) ? 1 : 0;
-            }
          }
          else
-         {
             dRet = ( long ) Exp->Left | ( long ) Reduce( Exp->Right );
-         }
          break;
 
       case '=':
@@ -241,24 +227,16 @@ static double Reduce( PBIOP Exp )
 
       case '<':
          if( Exp->Operator[ 1 ] )
-         {
             dRet = ( long ) Exp->Left <= ( long ) Reduce( Exp->Right );
-         }
          else
-         {
             dRet = ( long ) Exp->Left < ( long ) Reduce( Exp->Right );
-         }
          break;
 
       case '>':
          if( Exp->Operator[ 1 ] )
-         {
             dRet = ( long ) Exp->Left >= ( long ) Reduce( Exp->Right );
-         }
          else
-         {
             dRet = ( long ) Exp->Left > ( long ) Reduce( Exp->Right );
-         }
          break;
    }
 
@@ -271,21 +249,19 @@ char * NextTokenInConstant( char ** pExp )
 {
    static char sToken[ 32 ];
 
-   //printf( "Process: >%s<\n", *pExp );
+#if defined( HB_COMP_DEBUG )
+   printf( "Process: >%s<\n", *pExp );
+#endif
 
    sToken[ 0 ] = '\0';
 
    if( *pExp[ 0 ] == '\0' )
-   {
       return sToken;
-   }
 
    while( ( *pExp )[ 0 ] == ' ' )
-   {
       ( *pExp )++;
-   }
 
-   // Numbers
+   /* Numbers */
    if( HB_ISDIGIT( ( BYTE ) ( *pExp )[ 0 ] ) || ( *pExp )[ 0 ] == '-' || ( *pExp )[ 0 ] == '+' )
    {
       int i = 0;
@@ -298,7 +274,7 @@ char * NextTokenInConstant( char ** pExp )
 
          i           = 2;
 
-         // Hex
+         /* Hex */
          while( i < 31 && isxdigit( ( BYTE ) ( *pExp )[ 0 ] ) )
          {
             sToken[ i++ ] = ( *pExp )[ 0 ];
@@ -329,14 +305,14 @@ char * NextTokenInConstant( char ** pExp )
             }
             else
             {
-               // Postitive is already implied!
+               /* Postitive is already implied! */
             }
 
             ( *pExp )++;
          }
       }
 
-      // Number
+      /* Number */
       do
       {
          sToken[ i++ ] = ( *pExp )[ 0 ];
@@ -344,7 +320,7 @@ char * NextTokenInConstant( char ** pExp )
       }
       while( i < 31 && HB_ISDIGIT( ( BYTE ) ( *pExp )[ 0 ] ) );
 
-      // Decimals
+      /* Decimals */
       if( i < 31 && ( *pExp )[ 0 ] == '.' )
       {
          sToken[ i++ ] = ( *pExp )[ 0 ];
@@ -359,7 +335,7 @@ char * NextTokenInConstant( char ** pExp )
 
       sToken[ i ] = '\0';
    }
-   // Operators
+   /* Operators */
    else if( ( *pExp )[ 0 ] == '<' && ( *pExp )[ 1 ] == '>' )
    {
       sToken[ 0 ] = '!';
@@ -432,7 +408,7 @@ char * NextTokenInConstant( char ** pExp )
       while( HB_ISALNUM( ( BYTE ) ( *pExp )[ 0 ] ) || ( *pExp )[ 0 ] == '_' );
    }
 
-   // Might be a first char of a double char operator!
+   /* Might be a first char of a double char operator! */
    if( sToken[ 1 ] == '\0' &&
        ( ( sToken[ 0 ] == '&' && ( *pExp )[ 0 ] == '&' ) ||
          ( sToken[ 0 ] == '|' && ( *pExp )[ 0 ] == '|' ) ||
@@ -448,12 +424,12 @@ char * NextTokenInConstant( char ** pExp )
       ( *pExp )++;
    }
    else if( sToken[ 0 ] == '\0' && ( *pExp )[ 0 ] )
-   {
       hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_INVALID_CONSTANT_EXPRESSION, *pExp, NULL );
-   }
    else
    {
-      //printf( "Token: >%s< Rest: >%s<\n", sToken, *pExp );
+#if defined( HB_COMP_DEBUG )
+      printf( "Token: >%s< Rest: >%s<\n", sToken, *pExp );
+#endif
    }
 
    return sToken;
@@ -465,23 +441,15 @@ static int Precedence( PBIOP Exp )
    {
       case '|':
          if( Exp->Operator[ 1 ] )
-         {
             return 1;
-         }
          else
-         {
             return 3;
-         }
 
       case '&':
          if( Exp->Operator[ 1 ] )
-         {
             return 2;
-         }
          else
-         {
             return 4;
-         }
 
       case '=':
       case '!':

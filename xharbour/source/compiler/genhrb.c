@@ -45,9 +45,7 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
    char           cInt[ 2 ];
 
    if( ! pFileName->szExtension )
-   {
       pFileName->szExtension = ".hrb";
-   }
 
    hb_fsFNameMerge( szFileName, pFileName );
 
@@ -59,11 +57,8 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
       return;
    }
 
-   if( ! hb_comp_bQuiet )
-   {
-      printf( "Generating Harbour Portable Object output to \'%s\'... ", szFileName );
-      fflush( stdout );
-   }
+   hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "Generating Harbour Portable Object output to \'%s\'... ", szFileName  );
+   hb_compOutStd( hb_comp_szMsgBuf );
 
    /* writes the symbol table */
 
@@ -117,18 +112,15 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
 
       if( ( pSym->iFlags & SYMF_FUNCALL ) == SYMF_FUNCALL )
       {
-         //printf( "Sym: '%s' Namespace: '%s', Scope: %i\n", pSym->szName, pSym->szNamespace, pSym->cScope );
-
+#if defined( HB_COMP_DEBUG )
+         printf( "Sym: '%s' Namespace: '%s', Scope: %i\n", pSym->szName, pSym->szNamespace, pSym->cScope );
+#endif
          if( ( ( pSym->iFlags & SYMF_NS_EXPLICITPATH ) == SYMF_NS_EXPLICITPATH ) || ( ( pSym->iFlags & SYMF_NS_EXPLICITPTR ) == SYMF_NS_EXPLICITPTR ) )
          {
             if( ( pSym->iFlags & SYMF_NS_EXPLICITPATH ) == SYMF_NS_EXPLICITPATH )
-            {
                pFunc = hb_compFunctionFind( pSym->szName, pSym->Namespace, SYMF_NS_EXPLICITPATH );
-            }
             else
-            {
                pFunc = hb_compFunctionFind( pSym->szName, pSym->Namespace, SYMF_NS_EXPLICITPTR );
-            }
 
             if( pFunc )
             {
@@ -150,9 +142,7 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
             else
             {
                if( ! ( ( pSym->cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED ) )
-               {
                   pSym->cScope |= ( HB_FS_INDIRECT | HB_FS_PUBLIC );
-               }
             }
          }
          else if( ( pSym->iFlags & SYMF_NS_RESOLVE ) == SYMF_NS_RESOLVE )
@@ -164,19 +154,17 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
             if( pFunc == ( PFUNCTION ) ( HB_LONG ) 1 )
 #endif
             {
-               // Resolved to external member.
+               /* Resolved to external member. */
                pFunc = NULL;
 
-               //TODO: Error message
+               /* TODO: Error message */
             }
          }
          else if( ( pSym->cScope & HB_FS_LOCAL ) != HB_FS_LOCAL )
          {
             /* is it a function defined in this module */
             if( hb_compFunctionFind( pSym->szName, pSym->Namespace, pSym->iFlags ) )
-            {
                assert( 0 );
-            }
             else
             {
                assert( ( pSym->cScope & SYMF_STATIC ) == 0 );
@@ -204,19 +192,14 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
             }
          }
          else
-         {
             assert( 0 );
-         }
       }
 
       if( pSym->szName[ 0 ] == '<' )
-      {
          fputs( "(_INITLINES)", yyc );
-      }
       else
-      {
          fputs( pSym->szName, yyc );
-      }
+
       fputc( 0, yyc );
 
       hSymScope = pSym->cScope;
@@ -227,19 +210,13 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
       fputc( ( BYTE ) ( ( hSymScope >> 24 ) & 255 ), yyc );
 
       if( ( pSym->cScope & HB_FS_LOCAL ) == HB_FS_LOCAL || ( pSym->cScope & HB_FS_INITEXIT ) == HB_FS_INITEXIT )
-      {
          fputc( SYM_FUNC, yyc );
-      }
       else
       {
-         if( ( pSym->iFlags & SYMF_FUNCALL ) == SYMF_FUNCALL ) //hb_compFunCallFind( pSym->szName, pSym->Namespace, pSym->iFlags ) )
-         {
+         if( ( pSym->iFlags & SYMF_FUNCALL ) == SYMF_FUNCALL ) /* hb_compFunCallFind( pSym->szName, pSym->Namespace, pSym->iFlags ) ) */
             fputc( SYM_EXTERN, yyc );
-         }
          else
-         {
             fputc( SYM_NOLINK, yyc );
-         }
       }
 
       pSym = pSym->pNext;
@@ -248,9 +225,7 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
    pFunc = hb_comp_functions.pFirst;
 
    if( ! hb_comp_bStartProc )
-   {
       pFunc = pFunc->pNext;
-   }
 
    lSymbols = 0;                /* Count number of symbols */
 
@@ -270,9 +245,7 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
    pFunc = hb_comp_functions.pFirst;
 
    if( ! hb_comp_bStartProc )
-   {
       pFunc = pFunc->pNext; /* No implicit starting procedure */
-   }
 
    while( pFunc )
    {
@@ -286,13 +259,9 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
       }
 
       if( pFunc->szName[ 0 ] == '<' )
-      {
          fputs( "(_INITLINES)", yyc );
-      }
       else
-      {
          fputs( pFunc->szName, yyc );
-      }
 
       fputc( 0, yyc );
 
@@ -305,18 +274,13 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
       lPCodePos = 0;
 
       while( lPCodePos < pFunc->lPCodePos )
-      {
          fputc( pFunc->pCode[ lPCodePos++ ], yyc );
-      }
 
       pFunc = pFunc->pNext;
    }
 
    fclose( yyc );
 
-   if( ! hb_comp_bQuiet )
-   {
-      printf( "Done.\n" );
-   }
+   hb_compOutStd( "Done.\n" );
 }
 

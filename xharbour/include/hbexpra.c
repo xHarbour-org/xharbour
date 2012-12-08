@@ -264,10 +264,14 @@ HB_EXPR_PTR hb_compExprCBVarAdd( HB_EXPR_PTR pCB, char * szVarName, BYTE bType )
       while( pVar )
       {
          if( pVar->szName && szVarName && HB_EXPR_ISEQUAL_IDS( szVarName, pVar->szName ) )
+         {
             hb_compErrorDuplVar( szVarName );
+         }
 
          if( pVar->pNext )
+         {
             pVar = pVar->pNext;
+         }
          else
          {
 #ifdef HB_MACRO_SUPPORT
@@ -301,11 +305,12 @@ HB_EXPR_PTR hb_compExprNewIIF( HB_EXPR_PTR pExpr )
    pExpr->ExprType = HB_ET_IIF;
 
    pTmp = pExpr->value.asList.pExprList;  /* get first expression */
-
    if( pTmp->ExprType == HB_ET_NONE )
+   {
       /* there is no conditional expression e.g. IIF( , true, false )
        */
       hb_compErrorSyntax( pExpr );
+   }
 #else
    pExpr->ExprType = HB_ET_IIF;
 #endif
@@ -346,7 +351,7 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
       HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewFunCall(&)"));
    }
 
-#ifdef HB_MACRO_SUPPORT
+   #ifdef HB_MACRO_SUPPORT
       HB_SYMBOL_UNUSED( HB_MACRO_VARNAME );
 
       if( pName->ExprType == HB_ET_VARIABLE )
@@ -357,7 +362,7 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
           */
          pName->ExprType = HB_ET_FUNNAME;
       }
-#endif
+   #endif
 
    pExpr = hb_compExprNew( HB_ET_FUNCALL );
    pExpr->value.asFunCall.pParms = pParms;
@@ -365,17 +370,21 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
 
    if( hb_compExprListLen( pParms ) > HB_VAR_PARAM_FLAG )
    {
-#ifdef HB_MACRO_SUPPORT
+      #ifdef HB_MACRO_SUPPORT
         hb_compErrorSyntax( pExpr );
-#else
+      #else
         if( pName->ExprType == HB_ET_FUNNAME )
         {
            if( ! HB_EXPR_ISBUILTIN_ID( pName->value.asSymbol.szName, HASH ) )
+           {
               hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_TOOMANY_ARGS, pName->value.asSymbol.szName, NULL );
+           }
         }
         else
+        {
            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_TOOMANY_ARGS, "&", NULL );
-#endif
+        }
+      #endif
    }
 
    return pExpr;
@@ -438,21 +447,21 @@ HB_EXPR_PTR hb_compExprNewArrayAt( HB_EXPR_PTR pArray, HB_EXPR_PTR pIndex )
    pExpr = hb_compExprNew( HB_ET_ARRAYAT );
 
    /* Check if this expression can be indexed */
-#ifdef HB_C52_STRICT
-   HB_EXPR_USE( pArray, HB_EA_ARRAY_AT );
-#else
+   #ifdef HB_C52_STRICT
+      HB_EXPR_USE( pArray, HB_EA_ARRAY_AT );
+   #else
      /* xHarbour supports type overloading.*/
-#endif
+   #endif
 
    /* Check if this expression can be an index */
-#ifdef HB_C52_STRICT
-   HB_EXPR_USE( pIndex, HB_EA_ARRAY_INDEX );
-#else
-#ifdef HB_MACRO_SUPPORT
-   HB_SYMBOL_UNUSED( HB_MACRO_VARNAME );
-#endif
-  /* xHarbour supports type overloading.*/
-#endif
+   #ifdef HB_C52_STRICT
+      HB_EXPR_USE( pIndex, HB_EA_ARRAY_INDEX );
+   #else
+      #ifdef HB_MACRO_SUPPORT
+         HB_SYMBOL_UNUSED( HB_MACRO_VARNAME );
+      #endif
+     /* xHarbour supports type overloading.*/
+   #endif
 
    pExpr->value.asList.pExprList = pArray;
    pExpr->value.asList.pIndex = pIndex;
@@ -461,6 +470,7 @@ HB_EXPR_PTR hb_compExprNewArrayAt( HB_EXPR_PTR pArray, HB_EXPR_PTR pIndex )
 
    return pExpr;
 }
+
 
 /* ************************************************************************* */
 
@@ -475,7 +485,9 @@ static void hb_compExprCheckStaticInitializers( HB_EXPR_PTR pStaticVar, HB_EXPR_
    HB_EXPR_PTR * pPrev;
 
    if( pRightExpr == NULL )
+   {
       return;
+   }
 
    pElem = pRightExpr->value.asList.pExprList;
    pPrev = &pRightExpr->value.asList.pExprList;
@@ -492,7 +504,9 @@ static void hb_compExprCheckStaticInitializers( HB_EXPR_PTR pStaticVar, HB_EXPR_
       if( pElem->ExprType > HB_ET_FUNREF )
       {
          if( ! hb_compCanUseAsConstant( pElem, pStaticVar ) )
+         {
             hb_compErrorStatic( pStaticVar->value.asSymbol.szName, pElem );
+         }
       }
 
       *pPrev = pElem;   /* store a new expression into the previous one */
@@ -504,17 +518,20 @@ static void hb_compExprCheckStaticInitializers( HB_EXPR_PTR pStaticVar, HB_EXPR_
 
 /*
  TODO: There are other valid initializers that are currently disallowed, f.e.:
-       STATIC x := {1}[1]
+
+          STATIC x := {1}[1]
  */
 BOOL hb_compCanUseAsConstant( HB_EXPR_PTR pInit, HB_EXPR_PTR pStaticVar )
 {
    if( pInit->ExprType != HB_ET_FUNCALL )
+   {
       return FALSE;
+   }
 
    if( pInit->value.asFunCall.pFunName->value.asSymbol.szName == hb_compExpr_IDs.ARRAY ||
        pInit->value.asFunCall.pFunName->value.asSymbol.szName == hb_compExpr_IDs.HASH )
    {
-      /* We must validate the arguments! */
+      // We must validate the arguments!
       hb_compExprCheckStaticInitializers( pStaticVar, pInit->value.asFunCall.pParms );
       return TRUE;
    }
@@ -604,7 +621,9 @@ HB_EXPR_PTR hb_compExprSetOperand( HB_EXPR_PTR pExpr, HB_EXPR_PTR pItem )
       {
       }
       else
+      {
          hb_compErrorSyntax( pItem );
+      }
 
       pExpr->value.asOperator.pRight = pItem; /* set it anyway */
    }
@@ -618,7 +637,9 @@ HB_EXPR_PTR hb_compExprSetOperand( HB_EXPR_PTR pExpr, HB_EXPR_PTR pItem )
       BYTE ucLeft = s_PrecedTable[ pExpr->ExprType ];
 
       if( hb_comp_bShortCuts && ucLeft == ucRight && ( ucLeft == HB_EO_OR || ucLeft == HB_EO_AND ) )
+      {
          pExpr->value.asOperator.pRight = pItem;
+      }
       else if( ucLeft >= ucRight )
       {
          /* Left operator has the same or lower precedence then the right one

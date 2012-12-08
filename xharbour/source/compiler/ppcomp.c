@@ -51,7 +51,7 @@ static void hb_pp_PragmaDump( void * cargo, char * pBuffer, ULONG ulSize,
    PINLINE pInline;
 
    HB_SYMBOL_UNUSED( cargo );
-   //hb_comp_iLine = iLine + 1;
+   /* hb_comp_iLine = iLine + 1; */
    pInline                    = hb_compInlineAdd( NULL );
    pInline->pCode             = ( BYTE * ) hb_xgrab( ulSize + 1 );
    HB_MEMCPY( pInline->pCode, pBuffer, ulSize );
@@ -64,7 +64,7 @@ static void hb_pp_hb_inLine( void * cargo, char * szFunc,
                              char * pBuffer, ULONG ulSize, int iLine )
 {
    HB_SYMBOL_UNUSED( cargo );
-   //hb_comp_iLine = iLine + 1;
+   /* hb_comp_iLine = iLine + 1; */
    if( hb_comp_iLanguage != LANG_C && hb_comp_iLanguage != LANG_OBJ_MODULE )
    {
       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_REQUIRES_C, NULL, NULL );
@@ -119,17 +119,20 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
             break;
 
          case 'e':
-            // If adding such switch then MUST change hard coded cIndex[0] of "es" switch!!!
+            /* If adding such switch then MUST change hard coded cIndex[0] of "es" switch!!!
+             */
             fError = TRUE;
             break;
 
          case 'g':
-            // If adding such switch then MUST change hard coded cIndex[0] of "TRACEPRAGMAS" switch!!!
+            /* If adding such switch then MUST change hard coded cIndex[0] of "TRACEPRAGMAS" switch!!!
+             */
             fError = TRUE;
             break;
 
          case 'h':
-            // If adding such switch then MUST change hard coded cIndex[0] of "TEXHHIDDEN" switch!!!
+            /* If adding such switch then MUST change hard coded cIndex[0] of "TEXHHIDDEN" switch!!!
+             */
             fError = TRUE;
             break;
 
@@ -178,12 +181,14 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
             break;
 
          case 'r':
-            // If adding such switch then MUST change hard coded cIndex[0] of "RECURSELEVEL" switch!!!
+            /* If adding such switch then MUST change hard coded cIndex[0] of "RECURSELEVEL" switch!!!
+             */
             fError = TRUE;
             break;
 
          case 't':
-            // If adding such switch then MUST change hard coded cIndex[0] of "pt" switch!!!
+            /* If adding such switch then MUST change hard coded cIndex[0] of "pt" switch!!!
+             */
             fError = TRUE;
             break;
 
@@ -305,9 +310,7 @@ void hb_compInitPP( int argc, char * argv[] )
       }
       else if( ! hb_comp_bQuiet )
       {
-         printf( "Standard command definitions excluded.\n" );
-         fflush( stdout );
-
+         hb_compOutStd( "Standard command definitions excluded.\n" );
          hb_pp_initDynDefines( hb_comp_PP );
       }
 

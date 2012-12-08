@@ -121,19 +121,17 @@ void hb_compFunCallCheck( char * szFuncCall, int iArgs )
    while( f[ i ].cFuncName )
    {
       iCmp = strncmp( szFuncCall, f[ i ].cFuncName, 4 );
+
       if( iCmp == 0 )
-      {
          iCmp = strncmp( szFuncCall, f[ i ].cFuncName, strlen( szFuncCall ) );
-      }
+
       if( iCmp == 0 )
       {
          iPos = i;
          break;
       }
       else
-      {
          ++i;
-      }
    }
 
    if( iPos >= 0 && ( f[ iPos ].iMinParam != -1 ) )
@@ -147,23 +145,16 @@ void hb_compFunCallCheck( char * szFuncCall, int iArgs )
          if( HB_COMP_ISSUPPORTED( HB_COMPFLAG_HARBOUR ) )
          {
             if( pFunc->iMaxParam == -1 )
-            {
                hb_snprintf( szMsg, sizeof( szMsg ), "\nPassed: %i, expected: at least %i", iArgs, pFunc->iMinParam );
-            }
             else if( pFunc->iMinParam == pFunc->iMaxParam )
-            {
                hb_snprintf( szMsg, sizeof( szMsg ), "\nPassed: %i, expected: %i", iArgs, pFunc->iMinParam );
-            }
             else
-            {
                hb_snprintf( szMsg, sizeof( szMsg ), "\nPassed: %i, expected: %i - %i", iArgs, pFunc->iMinParam, pFunc->iMaxParam );
-            }
          }
          else
-         {
             /* Clipper way */
             szMsg[ 0 ] = '\0';
-         }
+
          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_CHECKING_ARGS, szFuncCall, szMsg );
       }
    }

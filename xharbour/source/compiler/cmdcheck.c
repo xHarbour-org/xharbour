@@ -935,7 +935,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                            hb_comp_bPPO      = 0;
                            hb_comp_bTracePP  = 0;
                         }
-                        else
+                        else if( *( s + 3 ) != '-' )
                         {
                            char * szPath = hb_strdup( s + 3 );
 
@@ -954,6 +954,8 @@ void hb_compChkEnvironVar( char * szSwitch )
                   hb_comp_ppo_pOutPath = hb_fsFNameSplit( szPath );
                   hb_xfree( szPath );
                }
+               else if( *( s + 1 ) != 0 )
+                 cmdcheckerror( ( const char* ) s );
 
                break;
 #if 0

@@ -117,7 +117,8 @@ void hb_compGenCObj( PHB_FNAME pFileName, const char * szSourceExtension )
 
    /* First pass: build the C output */
 
-   /* Force file extension to avoid collisions when called from a make utility */
+   /* Force file extension to avoid collisions when called from a make utility
+   */
    pFileName->szExtension = ".c";
    hb_fsFNameMerge( szFileName, pFileName );
    hb_compGenCCode( hb_comp_pFileName, szSourceExtension );
@@ -134,19 +135,17 @@ void hb_compGenCObj( PHB_FNAME pFileName, const char * szSourceExtension )
       if( pszEnv && pszEnv[ 0 ] != '\0' )
       {
          if( ! *hb_searchpath( HB_CFG_FILENAME, pszEnv, pszCfg ) )
-         {
             pszCfg = NULL;
-         }
       }
    }
 
    if( pszCfg )
    {
-
       yyc = hb_fopen( pszCfg, "rt" );
       if( ! yyc )
       {
-         fprintf( hb_comp_errFile, "\nError: Can't open %s file.\n", pszCfg );
+         hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "\nError: Can't open %s file.\n", pszCfg );
+         hb_compOutErr( hb_comp_szMsgBuf );
          return;
       }
 
@@ -179,14 +178,10 @@ void hb_compGenCObj( PHB_FNAME pFileName, const char * szSourceExtension )
                {
                   /* Checks compiler name */
                   if( ! hb_stricmp( szStr, "CC" ) )
-                  {
                      hb_snprintf( szCompiler, sizeof( szCompiler ), "%s", szToken );
-                  }
                   /* Checks optional switches */
                   else if( ! hb_stricmp( szStr, "CFLAGS" ) )
-                  {
                      hb_snprintf( szOptions, sizeof( szCompiler ), "%s", szToken );
-                  }
                   /* Wanna see C compiler output ? */
                   else if( ! hb_stricmp( szStr, "VERBOSE" ) )
                   {
@@ -209,32 +204,27 @@ void hb_compGenCObj( PHB_FNAME pFileName, const char * szSourceExtension )
    }
    else
    {
-
-      printf( "\nError: Can't find %s file in %s.\n", HB_CFG_FILENAME, szDefaultPath );
-      printf( "harbour.cfg is a text file that contains:\n" );
-      printf( "CC=C compiler binary name eg. CC=gcc\n" );
-      printf( "CFLAGS=C compiler options eg. -c -I<includes>\n" );
-      printf( "       ( 'compile only' and harbour include dir are mandatory )\n" );
-      printf( "VERBOSE=NO|YES to show steps messages default is NO\n" );
-      printf( "DELTMP=NO|YES to delete generated C source default is YES\n" );
-      printf( "remember also to properly set the C compiler env.\n" );
+      printf(
+         "\nError: Can't find %s file in %s.\n"
+         "harbour.cfg is a text file that contains:\n"
+         "CC=C compiler binary name eg. CC=gcc\n"
+         "CFLAGS=C compiler options eg. -c -I<includes>\n"
+         "       ( 'compile only' and harbour include dir are mandatory )\n"
+         "VERBOSE=NO|YES to show steps messages default is NO\n"
+         "DELTMP=NO|YES to delete generated C source default is YES\n"
+         "remember also to properly set the C compiler env.\n", HB_CFG_FILENAME, szDefaultPath );
       return;
-
    }
 
-   #if defined( HB_OS_DOS_COMPATIBLE )
+#if defined( HB_OS_DOS_COMPATIBLE )
    {
       if( pszEnv )
          hb_xfree( ( void * ) pszEnv );
    }
-   #endif
+#endif
 
-
-   if( ! hb_comp_bQuiet )
-   {
-      printf( "\nBuilding object module for \'%s\'\nusing C compiler \'%s\' as defined in \'%s\'...\n", szFileName, szCompiler, pszCfg );
-      fflush( stdout );
-   }
+   hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "\nBuilding object module for \'%s\'\nusing C compiler \'%s\' as defined in \'%s\'...\n", szFileName, szCompiler, pszCfg );
+   hb_compOutStd( hb_comp_szMsgBuf );
 
    /* Check if -o<path> was used */
    if( hb_comp_pOutPath )
@@ -271,26 +261,21 @@ void hb_compGenCObj( PHB_FNAME pFileName, const char * szSourceExtension )
 
       if( bVerbose )
       {
-         printf( "Exec: %s\n", szCommandLine );
+         hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "Exec: %s\n", szCommandLine );
+         hb_compOutStd( hb_comp_szMsgBuf );
       }
       else
-      {
          hb_xstrcat( szCommandLine, HB_NULL_STR, 0 );
-      }
 
       /* Compile it! */
       iSuccess = ( system( szCommandLine ) != -1 );
 
-      if( ! hb_comp_bQuiet )
+      if( iSuccess )
+         hb_compOutStd( "Done.\n" );
+      else
       {
-         if( iSuccess )
-         {
-            printf( "Done.\n" );
-         }
-         else
-         {
-            fprintf( hb_comp_errFile, "Failed to execute: \"%s\"\n", szCommandLine );
-         }
+         hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "Failed to execute: \"%s\"\n", szCommandLine );
+         hb_compOutErr( hb_comp_szMsgBuf );
       }
 
       /* Delete intermediate .c file */
@@ -299,20 +284,20 @@ void hb_compGenCObj( PHB_FNAME pFileName, const char * szSourceExtension )
       {
          if( bVerbose )
          {
-            printf( "Deleting: \"%s\"\n", szFileName );
+            hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "Deleting: \"%s\"\n", szFileName );
+            hb_compOutStd( hb_comp_szMsgBuf );
          }
 
          remove( ( char * ) szFileName );
 
          if( bVerbose )
-         {
-            printf( "Done.\n" );
-         }
+            hb_compOutStd( "Done.\n" );
       }
    }
    else
    {
-      fprintf( hb_comp_errFile, "Error: No compiler defined in %s\n", HB_CFG_FILENAME );
+      hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "Error: No compiler defined in %s\n", HB_CFG_FILENAME );
+      hb_compOutErr( hb_comp_szMsgBuf );
    }
 
    if( pszCfg )

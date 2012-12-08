@@ -8,6 +8,30 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-08 15:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/cmdcheck.c
+    ! padded -p switch with 0 to avoid: -pxxxx
+
+  * include/hbexpra.c
+  * include/hbexprb.c
+  * include/hbexprc.c
+  * include/simplex.c
+  * source/compiler/calconst.c
+  * source/compiler/comptool.c
+  * source/compiler/genc.c
+  * source/compiler/gencc1.c
+  * source/compiler/gencobj.c
+  * source/compiler/genhrb.c
+  * source/compiler/harbour.c
+  * source/compiler/hbfunchk.c
+  * source/compiler/hbgenerr.c
+  * source/compiler/hbident.c
+  * source/compiler/hbpcstat.c
+  * source/compiler/ppcomp.c
+  * include/hbcomp.h
+    + redirect Harbour Compiler warnings and errors to stderr
+    + allow user defined function to handle Harbour Compiler message
+
 2012-12-08 14:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbexpra.c
   * include/hbexprb.c

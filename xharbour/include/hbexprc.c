@@ -79,11 +79,16 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
 #endif
 {
    if( pExpr->value.asOperator.pLeft )
+   {
       HB_EXPR_PCODE1( hb_compExprDelete, pExpr->value.asOperator.pLeft );
+   }
 
    if( pExpr->value.asOperator.pRight )
+   {
       HB_EXPR_PCODE1( hb_compExprDelete, pExpr->value.asOperator.pRight );
+   }
 }
+
 
 /* Generates pcodes for compound operators    += -= *= /= %= ^=
  *
@@ -106,9 +111,13 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
 
       /* Push object */
       if( pObj->ExprType == HB_ET_SEND )
+      {
          HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
+      }
       else
+      {
          HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHWITH );
+      }
 
       /* Now push current value of variable */
       HB_EXPR_PCODE1( hb_compGenMessage, pObj->value.asMessage.szMessage );
@@ -162,17 +171,21 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
       HB_EXPR_GENPCODE1( hb_compGenPCode1, ( BYTE ) bOpEq );
 
       if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND )
+      {
          /* Now do the assignment - call pop message with one argument */
          HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 1, ( BOOL ) 1 );
+      }
       else
+      {
          HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDWITHSHORT, 1, ( BOOL ) 1 );
+      }
    }
 
    /* TODO: add a special code for arrays to correctly handle a[ i++ ]++
     */
    else if( bOpEq == HB_P_PLUS && pSelf->value.asOperator.pLeft->ExprType == HB_ET_ARRAYAT )
    {
-      /* printf( "Optimize ArrayAt\n" ); */
+      //printf( "Optimize ArrayAt\n" );
       pSelf->value.asOperator.pLeft->value.asList.PopOp = bOpEq;
 
       /* push argument value */
@@ -188,18 +201,25 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
    }
    else
    {
-#if defined( HB_MACRO_SUPPORT )
+    #if defined( HB_MACRO_SUPPORT )
+
        /* This optimization is not applicable in Macro Compiler. */
-#else
+
+    #else
+
       if( bOpEq == HB_P_PLUS || bOpEq == HB_P_MINUS )
       {
          int iIncrement = 0, iLocal;
          BOOL bShort;
 
          if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
+         {
             iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol.szName );
+         }
          else
+         {
             iLocal = 0;
+         }
 
          if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC &&
              pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
@@ -210,10 +230,14 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
             iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
 
             if( bOpEq == HB_P_MINUS )
+            {
                iIncrement = -iIncrement;
+            }
          }
          else
+         {
             bShort = FALSE;
+         }
 
          if( iLocal && HB_LIM_INT8( iLocal ) )
          {
@@ -221,17 +245,22 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
             {
                /* No need to generate ( X + 0 ) but *** Danger! *** of not being Error Compatible! */
                if( iIncrement == 0 )
+               {
                   hb_compGenPCode2( HB_P_PUSHLOCALNEAR, ( BYTE ) iLocal, ( BOOL ) 0 );
+               }
                else if( iIncrement == 1 )
+               {
                   hb_compGenPCode2( HB_P_PUSHLOCALNEARINC, ( BYTE ) iLocal, ( BOOL ) 0 );
+               }
                else if( iIncrement == -1 )
+               {
                   hb_compGenPCode2( HB_P_PUSHLOCALNEARDEC, ( BYTE ) iLocal, ( BOOL ) 0 );
+               }
                else
                {
                   hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
 
-                  /* HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
-                   */
+                  //HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
                   hb_compGenPCode2( HB_P_PUSHLOCALNEAR, ( BYTE ) iLocal, ( BOOL ) 0 );
                }
 
@@ -254,8 +283,7 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
 
                   HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_LOCALNEARADD, ( BYTE ) iLocal, ( BOOL ) 0 );
 
-                  /* HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
-                   */
+                  //HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
                   hb_compGenPCode2( HB_P_PUSHLOCALNEAR, ( BYTE ) iLocal, ( BOOL ) 0 );
 
                   return;
@@ -268,7 +296,9 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
 
             /* No need to generate ( X + 0 ) but *** Danger! *** of not being Error Compatible! */
             if( iIncrement )
+            {
                hb_compGenPCode3( HB_P_ADDINT, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
+            }
 
             HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_DUPLICATE );
 
@@ -279,7 +309,7 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
          }
       }
 
-#endif
+    #endif
 
       /* push old value */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
@@ -316,9 +346,13 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
 
       /* Push object */
       if( pObj->ExprType == HB_ET_SEND )
+      {
          HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
+      }
       else
+      {
          HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHWITH );
+      }
 
       /* Now push current value of variable */
       HB_EXPR_PCODE1( hb_compGenMessage, pObj->value.asMessage.szMessage );
@@ -348,16 +382,20 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
 
       /* Now do the assignment - call pop message with one argument */
       if( pObj->ExprType == HB_ET_SEND )
+      {
          HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 1, ( BOOL ) 1 );
+      }
       else
+      {
          HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDWITHSHORT, 1, ( BOOL ) 1 );
+      }
 
       /* pop the unneeded value from the stack */
       HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_POP );
    }
    else if( bOpEq == HB_P_PLUS && pSelf->value.asOperator.pLeft->ExprType == HB_ET_ARRAYAT )
    {
-      /* printf( "Optimize ArrayAt\n" ); */
+      //printf( "Optimize ArrayAt\n" );
       pSelf->value.asOperator.pLeft->value.asList.PopOp = bOpEq;
 
       /* push argument value */
@@ -370,18 +408,25 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
    }
    else
    {
-#if defined( HB_MACRO_SUPPORT )
+    #if defined( HB_MACRO_SUPPORT )
+
        /* This optimization is not applicable in Macro Compiler. */
-#else
+
+    #else
+
       if( bOpEq == HB_P_PLUS || bOpEq == HB_P_MINUS )
       {
          int iIncrement = 0, iLocal;
          BOOL bShort;
 
          if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
+         {
             iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol.szName );
+         }
          else
+         {
             iLocal = 0;
+         }
 
          if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC &&
              pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
@@ -392,26 +437,35 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
             iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
 
             if( bOpEq == HB_P_MINUS )
+            {
                iIncrement = -iIncrement;
+            }
          }
          else
+         {
             bShort = FALSE;
+         }
 
          if( iLocal && HB_LIM_INT8( iLocal ) )
          {
             if( bShort )
             {
-               /* No need to generate ( X + 0 ) but *** Danger! *** of not being Error Compatible!
-                */
+               /* No need to generate ( X + 0 ) but *** Danger! *** of not being Error Compatible! */
                if( iIncrement == 0 )
                {
                }
                else if( iIncrement == 1 )
+               {
                   hb_compGenPCode2( HB_P_LOCALNEARINC, ( BYTE ) iLocal, ( BOOL ) 0 );
+               }
                else if( iIncrement == -1 )
+               {
                   hb_compGenPCode2( HB_P_LOCALNEARDEC, ( BYTE ) iLocal, ( BOOL ) 0 );
+               }
                else
+               {
                   hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
+               }
 
                return;
             }
@@ -440,20 +494,20 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
          {
             HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
 
-            /* No need to generate ( X + 0 ) but *** Danger! *** of not being Error Compatible!
-             */
+            /* No need to generate ( X + 0 ) but *** Danger! *** of not being Error Compatible! */
             if( iIncrement )
+            {
                hb_compGenPCode3( HB_P_ADDINT, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
+            }
 
-            /* pop the new value into variable and leave the copy on the stack
-             */
+            /* pop the new value into variable and leave the copy on the stack */
             HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_POP_PCODE );
 
             return;
          }
       }
 
-#endif
+    #endif
 
       /* push old value */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
@@ -488,39 +542,58 @@ void hb_compExprPushPreOp( HB_EXPR_PTR pSelf, BYTE bOper )
 
       /* Push object */
       if( pObj->ExprType == HB_ET_SEND )
+      {
          HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
+      }
       else
+      {
          HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHWITH );
+      }
 
       /* Now push current value of variable */
       HB_EXPR_PCODE1( hb_compGenMessage, pObj->value.asMessage.szMessage );
 
       /* Push object */
       if( pObj->ExprType == HB_ET_SEND )
+      {
          HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
+      }
       else
+      {
          HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHWITH );
+      }
 
       /* Do it. */
       if( pObj->ExprType == HB_ET_SEND )
+      {
          HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 0, ( BOOL ) 1 );
+      }
       else
+      {
          HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDWITHSHORT, 0, ( BOOL ) 1 );
+      }
 
       /* increase/decrease operation */
       HB_EXPR_GENPCODE1( hb_compGenPCode1, bOper );
 
       /* Now, do the assignment - call pop message with one argument - it leaves the value on the stack */
       if( pObj->ExprType == HB_ET_SEND )
+      {
          HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 1, ( BOOL ) 1 );
+      }
       else
+      {
          HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDWITHSHORT, 1, ( BOOL ) 1 );
+      }
    }
    else
    {
-#if defined( HB_MACRO_SUPPORT )
+    #if defined( HB_MACRO_SUPPORT )
+
        /* This optimization is not applicable in Macro Compiler. */
-#else
+
+    #else
+
       if( bOper == HB_P_INC || bOper == HB_P_DEC )
       {
          int iLocal;
@@ -532,15 +605,19 @@ void hb_compExprPushPreOp( HB_EXPR_PTR pSelf, BYTE bOper )
             if( iLocal && HB_LIM_INT8( iLocal ) )
             {
                if( bOper == HB_P_INC )
+               {
                   hb_compGenPCode2( HB_P_PUSHLOCALNEARINC, ( BYTE ) iLocal, ( BOOL ) 0 );
+               }
                else
+               {
                   hb_compGenPCode2( HB_P_PUSHLOCALNEARDEC, ( BYTE ) iLocal, ( BOOL ) 0 );
+               }
 
                return;
             }
          }
       }
-#endif
+    #endif
       /* Push current value */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
 
@@ -578,9 +655,12 @@ void hb_compExprPushPostOp( HB_EXPR_PTR pSelf, BYTE bOper )
    }
    else
    {
-#if defined( HB_MACRO_SUPPORT )
+    #if defined( HB_MACRO_SUPPORT )
+
        /* This optimization is not applicable in Macro Compiler. */
-#else
+
+    #else
+
       if( bOper == HB_P_INC || bOper == HB_P_DEC )
       {
          int iLocal;
@@ -591,22 +671,25 @@ void hb_compExprPushPostOp( HB_EXPR_PTR pSelf, BYTE bOper )
 
             if( iLocal && HB_LIM_INT8( iLocal ) )
             {
-               /* First push the original value.
-                * HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
-                */
+               // First push the original value.
+               //HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
                hb_compGenPCode2( HB_P_PUSHLOCALNEAR, ( BYTE ) iLocal, ( BOOL ) 0 );
 
-               /* Inc/Dec without leaving value on stack. */
+               // Inc/Dec without leaving value on stack.
                if( bOper == HB_P_INC )
+               {
                   hb_compGenPCode2( HB_P_LOCALNEARINC, ( BYTE ) iLocal, ( BOOL ) 0 );
+               }
                else
+               {
                   hb_compGenPCode2( HB_P_LOCALNEARDEC, ( BYTE ) iLocal, ( BOOL ) 0 );
+               }
 
                return;
             }
          }
       }
-#endif
+    #endif
       /* Push current value */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
 
@@ -641,9 +724,12 @@ void hb_compExprUsePreOp( HB_EXPR_PTR pSelf, BYTE bOper )
    }
    else
    {
-#if defined( HB_MACRO_SUPPORT )
+    #if defined( HB_MACRO_SUPPORT )
+
        /* This optimization is not applicable in Macro Compiler. */
-#else
+
+    #else
+
       if( bOper == HB_P_INC || bOper == HB_P_DEC )
       {
          int iLocal;
@@ -655,15 +741,19 @@ void hb_compExprUsePreOp( HB_EXPR_PTR pSelf, BYTE bOper )
             if( iLocal && HB_LIM_INT8( iLocal ) )
             {
                if( bOper == HB_P_INC )
+               {
                   hb_compGenPCode2( HB_P_LOCALNEARINC, ( BYTE ) iLocal, ( BOOL ) 0 );
+               }
                else
+               {
                   hb_compGenPCode2( HB_P_LOCALNEARDEC, ( BYTE ) iLocal, ( BOOL ) 0 );
+               }
 
                return;
             }
          }
       }
-#endif
+    #endif
 
       /* Push current value */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
@@ -705,9 +795,13 @@ void hb_compExprUseAliasMacro( HB_EXPR_PTR pAliasedVar, BYTE bAction )
       HB_EXPR_USE( pVar, HB_EA_PUSH_PCODE );
 
       if( bAction == HB_EA_PUSH_PCODE )
+      {
          HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_MACROPUSHALIASED );
+      }
       else
+      {
          HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_MACROPOPALIASED );
+      }
    }
    else if( pVar->ExprType == HB_ET_VARIABLE )
    {
@@ -718,9 +812,13 @@ void hb_compExprUseAliasMacro( HB_EXPR_PTR pAliasedVar, BYTE bAction )
       HB_EXPR_PCODE2( hb_compGenPushString, pVar->value.asSymbol.szName, strlen( pVar->value.asSymbol.szName ) + 1 );
 
       if( bAction == HB_EA_PUSH_PCODE )
+      {
          HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_MACROPUSHALIASED );
+      }
       else
+      {
          HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_MACROPOPALIASED );
+      }
    }
    else
    {
@@ -733,19 +831,21 @@ void hb_compExprUseAliasMacro( HB_EXPR_PTR pAliasedVar, BYTE bAction )
    }
 
    /* Always add add byte to pcode indicating requested macro compiler flag. */
-#if defined( HB_MACRO_SUPPORT )
-   HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_COMPFLAG_RT_MACRO );
-#else
-   HB_EXPR_GENPCODE1( hb_compGenPData1,
-        (
-          ( hb_comp_Supported & HB_COMPFLAG_HARBOUR  ? HB_SM_HARBOUR   : 0 ) |
-          ( hb_comp_Supported & HB_COMPFLAG_XBASE    ? HB_SM_XBASE     : 0 ) |
-          ( hb_comp_bShortCuts                       ? HB_SM_SHORTCUTS : 0 ) |
-          ( hb_comp_Supported & HB_COMPFLAG_RT_MACRO ? HB_SM_RT_MACRO  : 0 )
-        )
-      );
-#endif
+   #if defined( HB_MACRO_SUPPORT )
+      HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_COMPFLAG_RT_MACRO );
+   #else
+      HB_EXPR_GENPCODE1( hb_compGenPData1,
+                         (
+                           ( hb_comp_Supported & HB_COMPFLAG_HARBOUR  ? HB_SM_HARBOUR   : 0 ) |
+                           ( hb_comp_Supported & HB_COMPFLAG_XBASE    ? HB_SM_XBASE     : 0 ) |
+                           ( hb_comp_bShortCuts                       ? HB_SM_SHORTCUTS : 0 ) |
+                           ( hb_comp_Supported & HB_COMPFLAG_RT_MACRO ? HB_SM_RT_MACRO  : 0 )
+                         )
+                       );
+   #endif
+
 }
+
 
 /* Reduces the list of expressions
  *
@@ -823,10 +923,8 @@ BOOL hb_compExprCheckMacroVar( char * szText )
 
          cSave = *pTmp;
          *pTmp = '\0';
-
          hb_compVariableMacroCheck( pStart );
-
-         *pTmp      = cSave;
+         *pTmp = cSave;
          bMacroText = TRUE;
 #endif
       }
@@ -840,7 +938,7 @@ BOOL hb_compExprCheckMacroVar( char * szText )
  */
 HB_EXPR_PTR hb_compExprReducePlusStrings( HB_EXPR_PTR pLeft, HB_EXPR_PTR pRight, HB_MACRO_DECL )
 {
-#if defined( HB_MACRO_SUPPORT )
+  #if defined( HB_MACRO_SUPPORT )
 
    pLeft->value.asString.string = (char *) hb_xrealloc( pLeft->value.asString.string, pLeft->ulLength + pRight->ulLength + 1 );
    pLeft->value.asString.dealloc = TRUE;
@@ -850,6 +948,7 @@ HB_EXPR_PTR hb_compExprReducePlusStrings( HB_EXPR_PTR pLeft, HB_EXPR_PTR pRight,
    hb_compExprFree( pRight, HB_MACRO_PARAM );
 
 #else
+
    /* NOTE: compiler uses the hash table for storing identifiers and literals
     * Strings passed for reduction can be referenced by other expressions
     * then we cannot resize them or deallocate
@@ -863,7 +962,9 @@ HB_EXPR_PTR hb_compExprReducePlusStrings( HB_EXPR_PTR pLeft, HB_EXPR_PTR pRight,
    szString[ pLeft->ulLength ] = '\0';
 
    if( pLeft->value.asString.dealloc )
+   {
       hb_xfree( pLeft->value.asString.string );
+   }
 
    pLeft->value.asString.string = szString;
    pLeft->value.asString.dealloc = TRUE;
