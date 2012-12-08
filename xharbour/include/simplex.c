@@ -103,12 +103,15 @@
 #ifndef STREAM_ALLOC_SIZE
    #define STREAM_ALLOC_SIZE 2048
 #endif
+
 #ifndef MAX_STREAM_STARTER
    #define MAX_STREAM_STARTER 2
 #endif
+
 #ifndef MAX_STREAM_TERMINATOR
    #define MAX_STREAM_TERMINATOR 2
 #endif
+
 #ifndef MAX_STREAM_EXCLUSIONS
    #define MAX_STREAM_EXCLUSIONS 2
 #endif
@@ -556,21 +559,15 @@ YY_DECL
     }
 
     if( YY_BUF_SIZE > 0 && szLexBuffer == NULL )
-    {
        szLexBuffer = (char *) malloc( YY_BUF_SIZE );
-    }
 
- Start :
+    Start :
 
     IF_TOKEN_READY()
-    {
        RETURN_READY_TOKEN();
-    }
 
     IF_TOKEN_ON_HOLD()
-    {
        RELEASE_TOKEN();
-    }
 
     if( iSize == 0 )
     {
@@ -611,9 +608,7 @@ int SimpLex_GetNextToken( void )
         if( iSize && *szBuffer )
         {
             if( iPairToken )
-            {
                goto ProcessStream;
-            }
 
             cPrev = chr;
 
@@ -627,9 +622,7 @@ int SimpLex_GetNextToken( void )
                iLastLen = 1;
 
                while( iSize && acOmmit[(int)(*szBuffer)] )
-               {
                   iSize--; szBuffer++; iLastLen++;
-               }
 
                if( iLen )
                {
@@ -642,9 +635,7 @@ int SimpLex_GetNextToken( void )
                   return SimpLex_CheckToken();
                }
                else
-               {
                   continue;
-               }
             }
 
             chr = ( char ) LEX_CASE(chr);
@@ -682,9 +673,7 @@ int SimpLex_GetNextToken( void )
 
                      /* Rollingback. */
                      while( --iStartLen )
-                     {
                         szBuffer--;
-                     }
 
                      s_szBuffer = szBuffer;
 
@@ -701,9 +690,7 @@ int SimpLex_GetNextToken( void )
                   while( *szBuffer )
                   {
                      if( iPairLen + 1 >= iPairAllocated )
-                     {
                         sPair = (char *) realloc( sPair, ( iPairAllocated += STREAM_ALLOC_SIZE ) );
-                     }
 
                      if( iSize <= 0 )
                      {
@@ -793,9 +780,7 @@ int SimpLex_GetNextToken( void )
                         return iRet;
                      }
                      else
-                     {
                         STREAM_APPEND( chrPair );
-                     }
                   }
 
                   /* EOF */
@@ -823,9 +808,8 @@ int SimpLex_GetNextToken( void )
                iLastLen = 1;
 
                while( iSize && acNewLine[(int)(*szBuffer)] )
-               {
                   iSize--; szBuffer++; iLastLen++;
-               }
+
                s_szBuffer = szBuffer;
 
                if( iLen )
@@ -880,7 +864,7 @@ int SimpLex_GetNextToken( void )
                     return acReturn[(int)chr];
                 }
             }
-         #ifdef USE_CONDITIONAL_DELIMITERS
+#ifdef USE_CONDITIONAL_DELIMITERS
             else if( acConditionalReturn[(int)chr] )
             {
                 IF_ACCEPT_AS_DELIMITER( chr )
@@ -915,13 +899,11 @@ int SimpLex_GetNextToken( void )
                     }
                 }
             }
-         #endif
+#endif
 
             /* Acumulate and scan next Charcter. */
             if( iLen < TOKEN_SIZE )
-            {
                sToken[ iLen++ ] = chr;
-            }
 
             continue;
         }
@@ -948,7 +930,6 @@ int SimpLex_GetNextToken( void )
                    sToken[ iLen ] = '\0';
 
                    s_szBuffer = szBuffer;
-
                    DEBUG_INFO( printf(  "Token: \"%s\" at: \'<EOF>\'\n", sToken ) );
                    return SimpLex_CheckToken();
                 }
@@ -971,13 +952,9 @@ int SimpLex_GetNextToken( void )
 int SimpLex_CheckToken( void )
 {
     if( bRecursive )
-    {
        return 0;
-    }
     else
-    {
        bRecursive = TRUE;
-    }
 
     if( bNewLine )
     {
@@ -985,7 +962,7 @@ int SimpLex_CheckToken( void )
 
        NEW_LINE_ACTION();
 
-       #ifdef USE_KEYWORDS
+#ifdef USE_KEYWORDS
           SimpLex_CheckWords();
           if( iRet )
           {
@@ -993,7 +970,7 @@ int SimpLex_CheckToken( void )
               /* bIgnoreWords and bNewLine were handled by SimpLex_CheckWords(). */
               return iRet;
           }
-       #endif
+#endif
     }
 
     if( bIgnoreWords )
@@ -1022,12 +999,10 @@ int SimpLex_CheckToken( void )
 
 static int Reduce( int iToken )
 {
-  BeginReduce :
+   BeginReduce :
 
    if( iToken < LEX_CUSTOM_ACTION )
-   {
       iToken = CUSTOM_ACTION( iToken );
-   }
 
    if( iToken > DONT_REDUCE )
    {
@@ -1051,16 +1026,16 @@ static int Reduce( int iToken )
    }
    else
    {
-      register unsigned int iMax = (unsigned int)(aRuleNodes[ iToken ].iMax);
+      register unsigned int iMax       = ( unsigned int ) (aRuleNodes[ iToken ].iMax);
       register unsigned int iTentative = 0;
 
-      iRule = (unsigned int)(aRuleNodes[ iToken ].iMin);
+      iRule    = (unsigned int)(aRuleNodes[ iToken ].iMin);
       iMatched = 1;
 
       DEBUG_INFO( printf(  "Scaning Prospects %i-%i at Pos: 0 for Token: %i\n", iRule, iMax -1, iToken ) );
 
       {
-        FoundProspect :
+         FoundProspect :
 
          DEBUG_INFO( printf( "Prospect of %i Tokens - Testing Token: %i\n", iMatched, iToken ) );
 
@@ -1078,20 +1053,15 @@ static int Reduce( int iToken )
                 iHold--;
                 iToken = aiHold[ iHold ];
                 bIgnoreWords = FALSE;
+
                 if( iToken < 256 )
-                {
                    if( acNewLine[iToken] ) bNewLine = TRUE;
-                }
             }
             else
-            {
                iToken = SimpLex_GetNextToken();
-            }
 
             if( iToken < LEX_CUSTOM_ACTION )
-            {
                iToken = CUSTOM_ACTION( iToken );
-            }
 
             if( iToken > DONT_REDUCE )
             {
@@ -1100,9 +1070,7 @@ static int Reduce( int iToken )
                goto AfterScanRules;
             }
             else
-            {
                iLastToken = iToken;
-            }
 
             if( aiRules[iRule][iMatched] == iToken )
             {
@@ -1133,15 +1101,13 @@ static int Reduce( int iToken )
             while( j < iMatched )
             {
                if( aiRules[iRule][j] != aiRules[iRule + 1][j] )
-               {
                   break;
-               }
+
                j++;
             }
+
             if( j < iMatched )
-            {
                DEBUG_INFO( printf( "Rejected Rule - Not an extension of previous - Giving up...\n" ) );
-            }
             else
             {
                DEBUG_INFO( printf( "Accepted Next Rule...\n" ) );
@@ -1150,12 +1116,10 @@ static int Reduce( int iToken )
             }
          }
          else
-         {
             DEBUG_INFO( printf( "No More prospects...\n" ) );
-         }
       }
 
-     AfterScanRules :
+      AfterScanRules :
 
       if( iTentative )
       {
@@ -1220,32 +1184,32 @@ void SimpLex_CheckWords( void )
    BOOL bOptionalSpacer;
    char sDelimiterString[2], *sWord2Check;
 
-  #ifdef DEBUG_LEX
+#ifdef DEBUG_LEX
    char sKeyDesc[] = "Key", sWordDesc[] = "Word", *sDesc;
-  #endif
-  #ifdef LEX_ABBREVIATE
+#endif
+#ifdef LEX_ABBREVIATE
    HB_SIZE iLen2Match;
-  #endif
+#endif
 
-  #ifdef USE_KEYWORDS
+#ifdef USE_KEYWORDS
    if( bNewLine )
    {
       i      = aKeyNodes[ (int)(sToken[0]) ].iMin;
       iMax   = aKeyNodes[ (int)(sToken[0]) ].iMax + 1;
       aCheck = (LEX_WORD*) ( &(aKeys[0]) );
-     #ifdef DEBUG_LEX
+#ifdef DEBUG_LEX
       sDesc  = (char*) sKeyDesc;
-     #endif
+#endif
    }
    else
-  #endif
+#endif
    {
       i      = aWordNodes[ (int)(sToken[0]) ].iMin;
       iMax   = aWordNodes[ (int)(sToken[0]) ].iMax + 1;
       aCheck = (LEX_WORD*) ( &( aWords[0] ) );
-     #ifdef DEBUG_LEX
+#ifdef DEBUG_LEX
       sDesc  = (char*) sWordDesc;
-     #endif
+#endif
    }
 
    bNewLine = FALSE;
@@ -1270,9 +1234,7 @@ void SimpLex_CheckWords( void )
          continue;
       }
       else
-      {
          break;
-      }
    }
 
    while( i < iMax )
@@ -1280,10 +1242,9 @@ void SimpLex_CheckWords( void )
       if( sKeys2Match )
       {
          pNextSpacer = strstr( sKeys2Match, "{WS}" );
+
          if( pNextSpacer )
-         {
             bOptionalSpacer = FALSE;
-         }
          else
          {
             pNextSpacer = strstr( sKeys2Match, "?WS?" );
@@ -1294,10 +1255,9 @@ void SimpLex_CheckWords( void )
       {
          sKeys2Match = aCheck[ i ].sWord;
          pNextSpacer = strstr( sKeys2Match, "{WS}" );
+
          if( pNextSpacer )
-         {
             bOptionalSpacer = FALSE;
-         }
          else
          {
             pNextSpacer = strstr( sKeys2Match, "?WS?" );
@@ -1369,11 +1329,9 @@ void SimpLex_CheckWords( void )
          iKeyLen = pNextSpacer - sKeys2Match;
       }
       else
-      {
          iKeyLen = strlen( sKeys2Match );
-      }
 
-     #ifdef LEX_ABBREVIATE
+#ifdef LEX_ABBREVIATE
       iLen2Match = iLen;
       DEBUG_INFO( printf( "iLenMatch %i\n", iLen2Match ) );
 
@@ -1413,9 +1371,9 @@ void SimpLex_CheckWords( void )
       DEBUG_INFO( printf( "iKeyLen: %i iLen2Match: %i comparing: [%s] with: [%s]\n", iKeyLen, iLen2Match, sWord2Check, sKeys2Match ) );
 
       iCompare = strncmp( (char*) sWord2Check, sKeys2Match, (int) iLen2Match );
-     #else
+#else
       iCompare = strcmp( (char*) sWord2Check, sKeys2Match );
-     #endif
+#endif
 
       if( iCompare == 0 ) /* Match found */
       {
@@ -1437,7 +1395,8 @@ void SimpLex_CheckWords( void )
                break;
             }
 
-         IsExtendedMatch :
+            IsExtendedMatch :
+
             i++;
 
             /* Is there a next potential Pattern, that is an extended version of the current Pattern. */
@@ -1446,12 +1405,12 @@ void SimpLex_CheckWords( void )
                pNextSpacer = strstr( aCheck[i].sWord + iLenMatched, "{WS}" );
                if( pNextSpacer )
                {
-                  //bOptionalSpacer = FALSE;
+                  /* bOptionalSpacer = FALSE; */
                }
                else
                {
                   pNextSpacer = strstr( sKeys2Match, "?WS?" );
-                  //bOptionalSpacer = TRUE;
+                  /* bOptionalSpacer = TRUE; */
                }
 
                if( strlen( aCheck[i].sWord ) > ( iLenMatched + 4 ) && pNextSpacer )
@@ -1480,7 +1439,8 @@ void SimpLex_CheckWords( void )
             /* Saving Token Length. */
             iSavedLen = iLen;
 
-            // Held Token at this point may only be EOF, acOmmit, acReturn, acNewLine, or sSelf.
+            /* Held Token at this point may only be EOF, acOmmit, acReturn, acNewLine, or sSelf.
+             */
             if( iHold || iPairToken )
             {
                if( iHold )
@@ -1496,9 +1456,7 @@ void SimpLex_CheckWords( void )
                   iLen = iLastLen;
                }
                else
-               {
                   iLen = (int) strlen( sStart );
-               }
 
                s_szBuffer -= iLen;
                iSize += iLen;
@@ -1506,13 +1464,15 @@ void SimpLex_CheckWords( void )
                DEBUG_INFO( printf( "Rewinded iLen:%i held: %i token [%s] to [%s]\n", iLen, iHold, sWord2Check, s_szBuffer ) );
             }
 
-            /* Saving this pointer of the input stream, we might have to get here again. */
+            /* Saving this pointer of the input stream, we might have to get here again.
+             */
             szBaseBuffer = s_szBuffer; iBaseSize = iSize;
 
             DEBUG_INFO( printf( "Saved Buffer Position: %i at: [%s] Len: %i\n", iBaseSize, szBaseBuffer, iSavedLen ) );
          }
 
-         /* i may have been increased above - don't want to read next token if it won't get used! */
+         /* i may have been increased above - don't want to read next token if it won't get used!
+          */
          if( i < iMax )
          {
             int iNextToken;
@@ -1525,9 +1485,7 @@ void SimpLex_CheckWords( void )
             iNextToken = SimpLex_GetNextToken();
 
             if( iNextToken == 0 )
-            {
                sWord2Check = (char *) sToken;
-            }
             else if( iLastLen == 1 )
             {
                sDelimiterString[0] = *( s_szBuffer - 1 );
@@ -1536,9 +1494,7 @@ void SimpLex_CheckWords( void )
                sWord2Check = (char *) sDelimiterString;
             }
             else
-            {
                sWord2Check = (char *) sSelf;
-            }
 
             DEBUG_INFO( printf( "sToken [%s] sWord2Check [%s] iRet: %i iHold: %i\n", (char *) sToken, (char *) sWord2Check, iRet, iLen ) );
             continue;
@@ -1591,15 +1547,12 @@ void SimpLex_CheckWords( void )
       bIgnoreWords = TRUE;
 
       iRet = aCheck[ iTentative ].iToken;
+
       if( iRet < LEX_CUSTOM_ACTION )
-      {
          iRet = CUSTOM_ACTION( iRet );
-      }
    }
    else
-   {
       iRet = 0;
-   }
 }
 
 #ifdef __cplusplus
@@ -1614,11 +1567,11 @@ void SimpLex_CheckWords( void )
 
    iSize = 0;
 
-   #ifdef __cplusplus
+#ifdef __cplusplus
       return (YY_BUFFER_STATE) szLexBuffer;
-   #else
+#else
       return (void*) szLexBuffer;
-   #endif
+#endif
 }
 
 #ifdef __cplusplus
@@ -1668,10 +1621,10 @@ static void GenTrees( void )
    i = 0;
    while( i < 256 )
    {
-      acOmmit[i]             = 0;
-      acNewLine[i]           = 0;
-      acReturn[i]            = 0;
-      acConditionalReturn[i] = 0;
+      acOmmit[i]             =  0;
+      acNewLine[i]           =  0;
+      acReturn[i]            =  0;
+      acConditionalReturn[i] =  0;
       aPairNodes[i].iMin     = -1;
       aPairNodes[i].iMax     = -1;
       aSelfNodes[i].iMin     = -1;
@@ -1706,14 +1659,14 @@ static void GenTrees( void )
       i++;
    }
 
-   #ifdef USE_CONDITIONAL_DELIMITERS
+#ifdef USE_CONDITIONAL_DELIMITERS
       i = 0;
       while ( i < iConditionalDelimiters )
       {
          acConditionalReturn[ (int)(aConditionalDelimiters[i].cDelimiter) ] = aConditionalDelimiters[i].iToken;
          i++;
       }
-   #endif
+#endif
 
    i = 0;
    while ( i < iDelimiters )
@@ -1726,10 +1679,10 @@ static void GenTrees( void )
    while ( i < iPairs )
    {
       iIndex = aPairs[i].sStart[0];
+
       if( aPairNodes[ iIndex ].iMin == -1 )
-      {
          aPairNodes[ iIndex ].iMin = i;
-      }
+
       aPairNodes[ iIndex ].iMax = i;
       i++;
    }
@@ -1738,36 +1691,36 @@ static void GenTrees( void )
    while ( i < iSelfs )
    {
       iIndex = aSelfs[i].sWord[0];
+
       if( aSelfNodes[ iIndex ].iMin == -1 )
-      {
          aSelfNodes[ iIndex ].iMin = i;
-      }
+
       aSelfNodes[ iIndex ].iMax = i;
       i++;
    }
 
-   #ifdef USE_KEYWORDS
+#ifdef USE_KEYWORDS
       i = 0;
       while ( i < iKeys )
       {
          iIndex = aKeys[i].sWord[0];
+
          if( aKeyNodes[ iIndex ].iMin == -1 )
-         {
             aKeyNodes[ iIndex ].iMin = i;
-         }
+
          aKeyNodes[ iIndex ].iMax = i;
          i++;
       }
-   #endif
+#endif
 
    i = 0;
    while ( i < iWords )
    {
       iIndex = aWords[i].sWord[0];
+
       if( aWordNodes[ iIndex ].iMin == -1 )
-      {
          aWordNodes[ iIndex ].iMin = i;
-      }
+
       aWordNodes[ iIndex ].iMax = i;
       i++;
    }
@@ -1784,10 +1737,10 @@ static void GenTrees( void )
          printf( "ERROR! Primary Token: %i out of range.\n", (int) iIndex );
          exit( EXIT_FAILURE );
       }
+
       if( aRuleNodes[ iIndex ].iMin == -1 )
-      {
          aRuleNodes[ iIndex ].iMin = i;
-      }
+
       aRuleNodes[ iIndex ].iMax = i;
       i++;
    }
@@ -1795,27 +1748,21 @@ static void GenTrees( void )
 
 static int rulecmp( const void * pLeft, const void * pRight )
 {
-   int *iLeftRule  = (int*)( pLeft );
-   int *iRightRule = (int*)( pRight );
-   register unsigned int i = 0;
+   int *                 iLeftRule  = ( int* ) ( pLeft );
+   int *                 iRightRule = ( int* ) ( pRight );
+   register unsigned int i          = 0;
 
    while( iLeftRule[i] == iRightRule[i] )
    {
       i++;
       if ( i >= LEX_RULE_SIZE )
-      {
          return 0;
-      }
    }
 
    if( iLeftRule[i] < iRightRule[i] )
-   {
       return -1;
-   }
    else
-   {
       return 1;
-   }
 }
 
 void cleansPair( void )
