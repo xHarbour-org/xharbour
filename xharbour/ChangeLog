@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-08 19:58 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbexpra.c
+  * include/hbexprb.c
+  * include/hbexprc.c
+  * include/simplex.c
+    ! reformatted files were overwritten by previous commits, re-uploaded.
+
 2012-12-08 17:29 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/dirdrive.c
     ! minor
