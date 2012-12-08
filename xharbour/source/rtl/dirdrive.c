@@ -57,6 +57,147 @@
 #include "hbapi.h"
 #include "hbapifs.h"
 
+#if defined( HB_OS_WIN )
+#include "windows.h"
+
+#define DRIVE_UNKNOWN     0
+#define DRIVE_NO_ROOT_DIR 1
+#define DRIVE_REMOVABLE   2
+#define DRIVE_FIXED       3
+#define DRIVE_REMOTE      4
+#define DRIVE_CDROM       5
+#define DRIVE_RAMDISK     6
+
+#if defined ( __POCC__ )
+   #define TEMPNAME()   tmpnam( NULL )
+#else
+   #define TEMPNAME()   _tempnam( "", "xx" )
+#endif
+
+static char* szGetRootName( PHB_ITEM pRootName )
+{
+   if( *pRootName->item.asString.value && pRootName->item.asString.length < 3 )
+   {
+      static char szRoot[ 4 ];
+
+      szRoot[ 0 ] = pRootName->item.asString.value[ 0 ];
+      szRoot[ 1 ] = ':';
+      szRoot[ 2 ] = '\\';
+      szRoot[ 3 ] = '\0';
+
+      return szRoot;
+   }
+
+   return pRootName->item.asString.value;
+}
+
+HB_FUNC( HB_ISREMOTEDISK )
+{
+   PHB_ITEM pRootName = hb_param( 1, HB_IT_STRING );
+
+   if( pRootName )
+   {
+      hb_retl( GetDriveType( szGetRootName( pRootName ) ) == DRIVE_REMOTE );
+      return;
+   }
+
+   hb_retl( GetDriveType( NULL ) == DRIVE_REMOTE );
+}
+
+HB_FUNC( HB_ISRAMDISK )
+{
+   PHB_ITEM pRootName = hb_param( 1, HB_IT_STRING );
+
+   if( pRootName )
+   {
+      hb_retl( GetDriveType( szGetRootName( pRootName ) ) == DRIVE_RAMDISK );
+      return;
+   }
+
+   hb_retl( GetDriveType( NULL ) == DRIVE_RAMDISK );
+}
+
+HB_FUNC( HB_ISHARDDISK )
+{
+   PHB_ITEM pRootName = hb_param( 1, HB_IT_STRING );
+
+   if( pRootName )
+   {
+      hb_retl( GetDriveType( szGetRootName( pRootName ) ) == DRIVE_FIXED );
+      return;
+   }
+
+   hb_retl( GetDriveType( NULL ) == DRIVE_FIXED );
+}
+
+HB_FUNC( HB_ISCDROM )
+{
+   PHB_ITEM pRootName = hb_param( 1, HB_IT_STRING );
+
+   if( pRootName )
+   {
+      hb_retl( GetDriveType( szGetRootName( pRootName ) ) == DRIVE_CDROM );
+      return;
+   }
+
+   hb_retl( GetDriveType( NULL ) == DRIVE_CDROM );
+}
+
+HB_FUNC( HB_ISDISKETTE )
+{
+   PHB_ITEM pRootName = hb_param( 1, HB_IT_STRING );
+
+   if( pRootName )
+   {
+      hb_retl( GetDriveType( szGetRootName( pRootName ) ) == DRIVE_REMOVABLE );
+      return;
+   }
+
+   hb_retl( GetDriveType( NULL ) == DRIVE_REMOVABLE );
+}
+
+HB_FUNC( HB_DISKREADY )
+{
+   PHB_ITEM pRootName = hb_param( 1, HB_IT_STRING );
+
+   if ( pRootName )
+   {
+      char *szRoot     = szGetRootName( pRootName );
+      BOOL bIsDiskette = ( GetDriveType( szRoot ) == DRIVE_REMOVABLE );
+
+      if ( ! bIsDiskette )
+      {
+         hb_retl( FALSE );
+         return;
+      }
+      else
+      {
+         char   szTmp[ 64 ];
+         FILE * fHandle;
+
+         hb_snprintf( szTmp, sizeof( szTmp ), "%s%s", szRoot, "___tmp.tmp" );
+
+         fHandle = hb_fopen( szTmp, "w" );
+
+         if( fHandle )
+         {
+            fclose( fHandle );
+            remove( szTmp );
+            hb_retl( TRUE );
+            return;
+         }
+      }
+   }
+
+   hb_retl( FALSE );
+}
+
+HB_FUNC( HB_DISKREADYW )
+{
+   HB_FUNC_EXEC( HB_DISKREADY );
+}
+#endif
+
 #ifdef HB_COMPAT_C53
 
 HB_FUNC( DIRCHANGE )
