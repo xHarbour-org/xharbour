@@ -165,6 +165,13 @@ char * hb_conNewLine( void )
 void hb_conOutErr( const char * pStr, HB_SIZE ulLen )
 {
    fprintf( stderr, "%.*s", ( int ) ( ulLen ? ulLen : strlen( pStr ) ), pStr );
+   fflush( stderr );
+}
+
+void hb_conOutStd( const char * pStr, HB_SIZE ulLen )
+{
+   fprintf( stdout, "%.*s", ( int ) ( ulLen ? ulLen : strlen( pStr ) ), pStr );
+   fflush( stdout );
 }
 
 HB_SIZE hb_xquery( USHORT uiMode )

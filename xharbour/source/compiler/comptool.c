@@ -403,6 +403,15 @@ void hb_conOutErr( const char * pStr, HB_SIZE ulLen )
    fflush( stderr );
 }
 
+void hb_conOutStd( const char * pStr, HB_SIZE ulLen )
+{
+   if( ulLen == 0 )
+      ulLen = strlen( pStr );
+
+   fprintf( stdout, "%.*s", ( int ) ulLen, pStr );
+   fflush( stdout );
+}
+
 char * hb_conNewLine( void )
 {
    return ( char * ) "\n";

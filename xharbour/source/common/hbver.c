@@ -825,11 +825,11 @@ char * hb_verPCode( void )
    return pszPCode;
 }
 
-static void hb_conOutErr_( const char * szText, ULONG ulLen, BOOL bOut )
+static void hb_conOutStd_( const char * szText, ULONG ulLen, BOOL bOut )
 {
    if( bOut )
    {
-      hb_conOutErr( szText, ulLen );
+      hb_conOutStd( szText, ulLen );
    }
 }
 
@@ -837,19 +837,19 @@ char * hb_verBuildInfo( BOOL bOut )
 {
    char * szBuildInfo = ( char * ) hb_xgrab( 1024 );  // Should be enough IMO
 
-   hb_conOutErr_( "Harbour Build Info", 0, bOut );
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
-   hb_conOutErr_( "---------------------------", 0, bOut );
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( "Harbour Build Info", 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( "---------------------------", 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
    hb_snprintf( szBuildInfo, 1024, "%d(num)\t%d(num)\t%d(num)\t%s\t",
                 HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
 
    {
       char * pszVersion = hb_verHarbour();
-      hb_conOutErr_( "Version: ", 0, bOut );
-      hb_conOutErr_( pszVersion, 0, bOut );
-      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+      hb_conOutStd_( "Version: ", 0, bOut );
+      hb_conOutStd_( pszVersion, 0, bOut );
+      hb_conOutStd_( hb_conNewLine(), 0, bOut );
       hb_xstrcat( szBuildInfo, pszVersion, "\t", NULL );
       hb_xfree( pszVersion );
    }
@@ -858,95 +858,95 @@ char * hb_verBuildInfo( BOOL bOut )
       char * pszVersion = hb_verPCode();
       char szPCode[ 3 ];
       hb_snprintf( szPCode, sizeof( szPCode ), "%d", HB_PCODE_VER );
-      hb_conOutErr_( pszVersion, 0, bOut );
-      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+      hb_conOutStd_( pszVersion, 0, bOut );
+      hb_conOutStd_( hb_conNewLine(), 0, bOut );
       hb_xstrcat( szBuildInfo, szPCode, "(num)", "\t", NULL );
       hb_xfree( pszVersion );
    }
 
    {
       char * pszVersion = hb_verCompiler();
-      hb_conOutErr_( "Compiler: ", 0, bOut );
-      hb_conOutErr_( pszVersion, 0, bOut );
-      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+      hb_conOutStd_( "Compiler: ", 0, bOut );
+      hb_conOutStd_( pszVersion, 0, bOut );
+      hb_conOutStd_( hb_conNewLine(), 0, bOut );
       hb_xstrcat( szBuildInfo, pszVersion, "\t", NULL );
       hb_xfree( pszVersion );
    }
 
    {
       char * pszVersion = hb_verPlatform();
-      hb_conOutErr_( "Platform: ", 0, bOut );
-      hb_conOutErr_( pszVersion, 0, bOut );
-      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+      hb_conOutStd_( "Platform: ", 0, bOut );
+      hb_conOutStd_( pszVersion, 0, bOut );
+      hb_conOutStd_( hb_conNewLine(), 0, bOut );
       hb_xstrcat( szBuildInfo, pszVersion, "\t", NULL );
       hb_xfree( pszVersion );
    }
 
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr_( "Built on: ", 0, bOut );
-   hb_conOutErr_( __DATE__, 0, bOut );
+   hb_conOutStd_( "Built on: ", 0, bOut );
+   hb_conOutStd_( __DATE__, 0, bOut );
    hb_xstrcat( szBuildInfo, __DATE__, "\t", NULL );
-   hb_conOutErr_( " ", 0, bOut );
-   hb_conOutErr_( __TIME__, 0, bOut );
+   hb_conOutStd_( " ", 0, bOut );
+   hb_conOutStd_( __TIME__, 0, bOut );
    hb_xstrcat( szBuildInfo, __TIME__, "\t", NULL );
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr_( "Last ChangeLog entry: ", 0, bOut );
-   hb_conOutErr_( hb_verCvsLastEntry(), 0, bOut );
+   hb_conOutStd_( "Last ChangeLog entry: ", 0, bOut );
+   hb_conOutStd_( hb_verCvsLastEntry(), 0, bOut );
    hb_xstrcat( szBuildInfo, hb_verCvsLastEntry(), "\t", NULL );
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr_( "ChangeLog SVN version: ", 0, bOut );
-   hb_conOutErr_( hb_verCvsChangeLogID(), 0, bOut );
+   hb_conOutStd_( "ChangeLog SVN version: ", 0, bOut );
+   hb_conOutStd_( hb_verCvsChangeLogID(), 0, bOut );
    hb_xstrcat( szBuildInfo, hb_verCvsChangeLogID(), "\t", NULL );
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
    #if defined( HB_FM_DL_ALLOC )
    {
       char szDLMallocVer[ 64 ];
       hb_snprintf( szDLMallocVer, sizeof( szDLMallocVer ), "DLMALLOC version: %i\t", DLMALLOC_VERSION );
-      hb_conOutErr_( szDLMallocVer, 0, bOut );
-      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+      hb_conOutStd_( szDLMallocVer, 0, bOut );
+      hb_conOutStd_( hb_conNewLine(), 0, bOut );
    }
    #endif
 
    {
       char szPCREVer[ 64 ];
       hb_snprintf( szPCREVer, sizeof( szPCREVer ), "PCRE version: %i.%i\t", PCRE_MAJOR, PCRE_MINOR );
-      hb_conOutErr_( szPCREVer, 0, bOut );
-      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+      hb_conOutStd_( szPCREVer, 0, bOut );
+      hb_conOutStd_( hb_conNewLine(), 0, bOut );
    }
 
    {
       char szZLIBVer[ 64 ];
       hb_snprintf( szZLIBVer, sizeof( szZLIBVer ), "ZLIB version: %i.%i.%i\t", ZLIB_VER_MAJOR, ZLIB_VER_MINOR, ZLIB_VER_REVISION );
-      hb_conOutErr_( szZLIBVer, 0, bOut );
-      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+      hb_conOutStd_( szZLIBVer, 0, bOut );
+      hb_conOutStd_( hb_conNewLine(), 0, bOut );
    }
 
    #if ! defined( HB_NO_DV_MEMCPY )
    {
       char szMEMCPYVer[ 64 ];
       hb_snprintf( szMEMCPYVer, sizeof( szMEMCPYVer ), "MEMCPY is: Daniel Vik's memcpy\t" );
-      hb_conOutErr_( szMEMCPYVer, 0, bOut );
-      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+      hb_conOutStd_( szMEMCPYVer, 0, bOut );
+      hb_conOutStd_( hb_conNewLine(), 0, bOut );
    }
    #endif
 
    {
       char szPNGVer[ 64 ];
       hb_snprintf( szPNGVer, sizeof( szPNGVer ), "PNG version: %i.%i.%i\t", PNG_LIBPNG_VER_MAJOR, PNG_LIBPNG_VER_MINOR, PNG_LIBPNG_VER_RELEASE );
-      hb_conOutErr_( szPNGVer, 0, bOut );
-      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+      hb_conOutStd_( szPNGVer, 0, bOut );
+      hb_conOutStd_( hb_conNewLine(), 0, bOut );
    }
 
    {
       char szJPEGVer[ 64 ];
       hb_snprintf( szJPEGVer, sizeof( szJPEGVer ), "JPEG version: %i.%i\t", JPEG_LIB_VERSION_MAJOR, JPEG_LIB_VERSION_MINOR );
-      hb_conOutErr_( szJPEGVer, 0, bOut );
-      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+      hb_conOutStd_( szJPEGVer, 0, bOut );
+      hb_conOutStd_( hb_conNewLine(), 0, bOut );
    }
 
    {
@@ -955,169 +955,169 @@ char * hb_verBuildInfo( BOOL bOut )
       hb_snprintf( szTIFFVer, sizeof( szTIFFVer ), "TIFF version: %s\t", TIFFLIB_VERSION_STR );
       if( ( pTmp = strchr( szTIFFVer, '\n' ) ) != NULL )
          *pTmp = '\0';
-      hb_conOutErr_( szTIFFVer, 0, bOut );
-      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+      hb_conOutStd_( szTIFFVer, 0, bOut );
+      hb_conOutStd_( hb_conNewLine(), 0, bOut );
    }
 
    if( strlen( hb_verFlagsC() ) )
    {
-      hb_conOutErr_( "Harbour compiler switches: ", 0, bOut );
-      hb_conOutErr_( hb_verFlagsC(), 0, bOut );
-      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+      hb_conOutStd_( "Harbour compiler switches: ", 0, bOut );
+      hb_conOutStd_( hb_verFlagsC(), 0, bOut );
+      hb_conOutStd_( hb_conNewLine(), 0, bOut );
    }
    hb_xstrcat( szBuildInfo, hb_verFlagsC(), "\t", NULL );
 
    if( strlen( hb_verFlagsL() ) )
    {
-      hb_conOutErr_( "C compiler switches: ", 0, bOut );
-      hb_conOutErr_( hb_verFlagsL(), 0, bOut );
-      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+      hb_conOutStd_( "C compiler switches: ", 0, bOut );
+      hb_conOutStd_( hb_verFlagsL(), 0, bOut );
+      hb_conOutStd_( hb_conNewLine(), 0, bOut );
    }
    hb_xstrcat( szBuildInfo, hb_verFlagsL(), "\t", NULL );
 
    if( strlen( hb_verFlagsPRG() ) )
    {
-      hb_conOutErr_( "Linker switches: ", 0, bOut );
-      hb_conOutErr_( hb_verFlagsPRG(), 0, bOut );
-      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+      hb_conOutStd_( "Linker switches: ", 0, bOut );
+      hb_conOutStd_( hb_verFlagsPRG(), 0, bOut );
+      hb_conOutStd_( hb_conNewLine(), 0, bOut );
    }
    hb_xstrcat( szBuildInfo, hb_verFlagsPRG(), "\t", NULL );
 
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr_( "Harbour extensions: ", 0, bOut );
+   hb_conOutStd_( "Harbour extensions: ", 0, bOut );
 #if defined( HB_EXTENSION )
    hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
-   hb_conOutErr_( "Yes", 0, bOut );
+   hb_conOutStd_( "Yes", 0, bOut );
 #else
-   hb_conOutErr_( "No", 0, bOut );
+   hb_conOutStd_( "No", 0, bOut );
    hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr_( "CA-Clipper 5.2e undocumented: ", 0, bOut );
+   hb_conOutStd_( "CA-Clipper 5.2e undocumented: ", 0, bOut );
 #if defined( HB_C52_UNDOC )
-   hb_conOutErr_( "Yes", 0, bOut );
+   hb_conOutStd_( "Yes", 0, bOut );
    hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr_( "No", 0, bOut );
+   hb_conOutStd_( "No", 0, bOut );
    hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr_( "CA-Clipper 5.2e strict compatibility: ", 0, bOut );
+   hb_conOutStd_( "CA-Clipper 5.2e strict compatibility: ", 0, bOut );
 #if defined( HB_C52_STRICT )
-   hb_conOutErr_( "Yes", 0, bOut );
+   hb_conOutStd_( "Yes", 0, bOut );
    hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr_( "No", 0, bOut );
+   hb_conOutStd_( "No", 0, bOut );
    hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr_( "CA-Clipper 5.3x compatible extensions: ", 0, bOut );
+   hb_conOutStd_( "CA-Clipper 5.3x compatible extensions: ", 0, bOut );
 #if defined( HB_COMPAT_C53 )
-   hb_conOutErr_( "Yes", 0, bOut );
+   hb_conOutStd_( "Yes", 0, bOut );
    hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr_( "No", 0, bOut );
+   hb_conOutStd_( "No", 0, bOut );
    hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr_( "Alaska Xbase++ compatible extensions: ", 0, bOut );
+   hb_conOutStd_( "Alaska Xbase++ compatible extensions: ", 0, bOut );
 #if defined( HB_COMPAT_XPP )
-   hb_conOutErr_( "Yes", 0, bOut );
+   hb_conOutStd_( "Yes", 0, bOut );
    hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr_( "No", 0, bOut );
+   hb_conOutStd_( "No", 0, bOut );
    hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr_( "CA-Visual Objects compatible extensions: ", 0, bOut );
+   hb_conOutStd_( "CA-Visual Objects compatible extensions: ", 0, bOut );
 #if defined( HB_COMPAT_VO )
-   hb_conOutErr_( "Yes", 0, bOut );
+   hb_conOutStd_( "Yes", 0, bOut );
    hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr_( "No", 0, bOut );
+   hb_conOutStd_( "No", 0, bOut );
    hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr_( "Multisoft Flagship compatible extensions: ", 0, bOut );
+   hb_conOutStd_( "Multisoft Flagship compatible extensions: ", 0, bOut );
 #if defined( HB_COMPAT_FLAGSHIP )
-   hb_conOutErr_( "Yes", 0, bOut );
+   hb_conOutStd_( "Yes", 0, bOut );
    hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr_( "No", 0, bOut );
+   hb_conOutStd_( "No", 0, bOut );
    hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr_( "Microsoft FoxPro compatible extensions: ", 0, bOut );
+   hb_conOutStd_( "Microsoft FoxPro compatible extensions: ", 0, bOut );
 #if defined( HB_COMPAT_FOXPRO )
-   hb_conOutErr_( "Yes", 0, bOut );
+   hb_conOutStd_( "Yes", 0, bOut );
    hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr_( "No", 0, bOut );
+   hb_conOutStd_( "No", 0, bOut );
    hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr_( "dBase compatible extensions: ", 0, bOut );
+   hb_conOutStd_( "dBase compatible extensions: ", 0, bOut );
 #if defined( HB_COMPAT_DBASE )
-   hb_conOutErr_( "Yes", 0, bOut );
+   hb_conOutStd_( "Yes", 0, bOut );
    hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr_( "No", 0, bOut );
+   hb_conOutStd_( "No", 0, bOut );
    hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr_( "Object file generation support: ", 0, bOut );
+   hb_conOutStd_( "Object file generation support: ", 0, bOut );
 #if defined( HARBOUR_OBJ_GENERATION ) || defined( HB_BACK_END )
-   hb_conOutErr_( "Yes", 0, bOut );
+   hb_conOutStd_( "Yes", 0, bOut );
    hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr_( "No", 0, bOut );
+   hb_conOutStd_( "No", 0, bOut );
    hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr_( "ANSI C usage: ", 0, bOut );
+   hb_conOutStd_( "ANSI C usage: ", 0, bOut );
 #if defined( HARBOUR_STRICT_ANSI_C )
-   hb_conOutErr_( "Strict", 0, bOut );
+   hb_conOutStd_( "Strict", 0, bOut );
    hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr_( "Non strict", 0, bOut );
+   hb_conOutStd_( "Non strict", 0, bOut );
    hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr_( "C++ mode: ", 0, bOut );
+   hb_conOutStd_( "C++ mode: ", 0, bOut );
 #if defined( __cplusplus )
-   hb_conOutErr_( "On", 0, bOut );
+   hb_conOutStd_( "On", 0, bOut );
    hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr_( "Off", 0, bOut );
+   hb_conOutStd_( "Off", 0, bOut );
    hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr_( "Compiler YACC debug mode: ", 0, bOut );
+   hb_conOutStd_( "Compiler YACC debug mode: ", 0, bOut );
 #if defined( HARBOUR_YYDEBUG )
-   hb_conOutErr_( "On", 0, bOut );
+   hb_conOutStd_( "On", 0, bOut );
    hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr_( "Off", 0, bOut );
+   hb_conOutStd_( "Off", 0, bOut );
    hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr_( "Memory tracing and statistics: ", 0, bOut );
-   hb_conOutErr_( hb_xquery( HB_MEM_USEDMAX ) != 0 ? "On" : "Off", 0, bOut );
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( "Memory tracing and statistics: ", 0, bOut );
+   hb_conOutStd_( hb_xquery( HB_MEM_USEDMAX ) != 0 ? "On" : "Off", 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
    {
       char buffer[ 64 ];
@@ -1125,12 +1125,12 @@ char * hb_verBuildInfo( BOOL bOut )
       hb_snprintf( szLen, sizeof( szLen ), "%d", HB_SYMBOL_NAME_LEN );
       hb_snprintf( buffer, sizeof( buffer ), "Maximum symbol name length: %i", HB_SYMBOL_NAME_LEN );
       hb_xstrcat( szBuildInfo, szLen, "(num)", NULL );
-      hb_conOutErr_( buffer, 0, bOut );
-      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+      hb_conOutStd_( buffer, 0, bOut );
+      hb_conOutStd_( hb_conNewLine(), 0, bOut );
    }
 
-   hb_conOutErr_( "---------------------------", 0, bOut );
-   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutStd_( "---------------------------", 0, bOut );
+   hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
    return szBuildInfo;
 
