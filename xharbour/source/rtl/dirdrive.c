@@ -68,12 +68,6 @@
 #define DRIVE_CDROM       5
 #define DRIVE_RAMDISK     6
 
-#if defined ( __POCC__ )
-   #define TEMPNAME()   tmpnam( NULL )
-#else
-   #define TEMPNAME()   _tempnam( "", "xx" )
-#endif
-
 static char* szGetRootName( PHB_ITEM pRootName )
 {
    if( *pRootName->item.asString.value && pRootName->item.asString.length < 3 )
