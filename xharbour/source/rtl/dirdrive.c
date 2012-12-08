@@ -156,15 +156,9 @@ HB_FUNC( HB_DISKREADY )
 
    if ( pRootName )
    {
-      char *szRoot     = szGetRootName( pRootName );
-      BOOL bIsDiskette = ( GetDriveType( szRoot ) == DRIVE_REMOVABLE );
+      char *szRoot = szGetRootName( pRootName );
 
-      if ( ! bIsDiskette )
-      {
-         hb_retl( FALSE );
-         return;
-      }
-      else
+      if ( GetDriveType( szRoot ) == DRIVE_REMOVABLE  )
       {
          char   szTmp[ 64 ];
          FILE * fHandle;
