@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-08 16:03 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/consmt.c
+    - remove not-needed HB_THREAD_STUB
+
 2012-12-08 15:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/cmdcheck.c
     ! padded -p switch with 0 to avoid: -pxxxx

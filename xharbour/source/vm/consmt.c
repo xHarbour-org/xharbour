@@ -176,8 +176,9 @@ void hb_stack_unlock( void )
 void hb_console_safe_lock( void )
 {
 #if defined( HB_THREAD_SUPPORT )
-   HB_THREAD_STUB
-//   HB_CLEANUP_PUSH( hb_setGetOutputSafety() ? s_doNothing : hb_rawMutexForceUnlock, hb_outputMutex );
+/*   HB_THREAD_STUB
+ *   HB_CLEANUP_PUSH( hb_setGetOutputSafety() ? s_doNothing : hb_rawMutexForceUnlock, hb_outputMutex );
+ */
    if( hb_setGetOutputSafety() )
       HB_CRITICAL_LOCK( hb_outputMutex );
 #endif
@@ -186,9 +187,11 @@ void hb_console_safe_lock( void )
 void hb_console_safe_unlock( void )
 {
 #if defined( HB_THREAD_SUPPORT )
-   HB_THREAD_STUB
+/* HB_THREAD_STUB
+ */
    if( hb_setGetOutputSafety() )
       HB_CRITICAL_UNLOCK( hb_outputMutex );
-//   HB_CLEANUP_POP;
+/* HB_CLEANUP_POP;
+ */
 #endif
 }
