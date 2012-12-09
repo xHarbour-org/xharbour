@@ -50,6 +50,111 @@ extern void cleansPair( void );
    reasonable size */
 //#undef HB_FM_STATISTICS
 
+#if ( defined( __BORLANDC__ ) && ( __BORLANDC__ == 1568 ) )
+/* Disabled: Borland C 6.2 internal error when compiling dlmalloc.c */
+   #if defined( HB_FM_DL_ALLOC )
+      #undef HB_FM_DL_ALLOC
+   #endif
+#endif
+
+#if defined( HB_FM_STATISTICS )
+/* Disable external memory manager when debugging */
+   #undef HB_FM_DL_ALLOC
+#endif
+
+#if defined( HB_FM_DL_ALLOC )
+   #undef HB_FM_STD_ALLOC
+   #undef HB_FM_WIN32_ALLOC
+#elif defined( __EXPORT__ ) && ! defined( HB_FM_WIN32_ALLOC )
+   #define HB_FM_WIN32_ALLOC
+   #undef HB_FM_DL_ALLOC
+   #undef HB_FM_STD_ALLOC
+#elif defined( HB_FM_WIN32_ALLOC )
+   #undef HB_FM_DL_ALLOC
+   #undef HB_FM_STD_ALLOC
+#elif defined( HB_FM_STD_ALLOC )
+   #undef HB_FM_DL_ALLOC
+   #undef HB_FM_WIN32_ALLOC
+#else
+   #define HB_FM_STD_ALLOC
+   #undef HB_FM_DL_ALLOC
+   #undef HB_FM_WIN32_ALLOC
+#endif
+
+#if defined( HB_FM_DL_ALLOC )
+#  define USE_LOCKS       0
+#  if defined( HB_DEBUG )
+#     if ! defined( DEBUG )
+#        define DEBUG     1
+#     endif
+#  endif
+#  undef FORCEINLINE
+#  if ! defined( FORCEINLINE )
+#     define FORCEINLINE   HB_FORCEINLINE
+#  endif
+#  define REALLOC_ZERO_BYTES_FREES
+#  if defined( __BORLANDC__ )
+#     pragma warn -8019
+#     pragma warn -8027
+#     pragma warn -8084
+#     pragma warn -8041
+#     pragma warn -8008
+#     pragma warn -8004
+#     pragma warn -8066
+#  elif defined( _MSC_VER ) || defined( __DMC__ ) || defined( __WATCOMC__ )
+#     if ( defined( _MSC_VER ) && ( _MSC_VER < 1400 ) && ! defined( __POCC__ ) )
+#        include "intsafe.h"
+#     endif
+#     if defined( __WATCOMC__ )
+#        pragma disable_message ( 201 )
+#        pragma disable_message ( 302 )
+#     endif
+#     define USE_DL_PREFIX
+#  endif
+#  include "errno.h"
+#  if defined( __POCC__ )
+#     pragma warn( push )
+#     pragma warn( disable:2154 )
+#     pragma warn( disable:2243 )
+#  endif
+#  if defined( __XCC__ )
+#     include "source/vm/dlmalloc.c"
+#  else
+#     include "../source/vm/dlmalloc.c"
+#  endif
+#  if defined( __WATCOMC__ )
+#     pragma enable_message ( 201 )
+#  endif
+#  if defined( __POCC__ )
+#     pragma warn( pop )
+#  endif
+#  if defined( __BORLANDC__ )
+#     pragma warn +8019
+#     pragma warn +8027
+#     pragma warn +8084
+#     pragma warn +8041
+#     pragma warn +8008
+#     pragma warn +8004
+#     pragma warn +8066
+#  endif
+#  if defined( USE_DL_PREFIX )
+#     define malloc( n )      dlmalloc( ( n ) )
+#     define realloc( p, n )  dlrealloc( ( p ), ( n ) )
+#     define free( p )        dlfree( ( p ) )
+#  endif
+#elif defined( HB_FM_WIN32_ALLOC ) && defined( HB_OS_WIN )
+#  if defined( HB_FM_LOCALALLOC )
+#     define malloc( n )      ( void * ) LocalAlloc( LMEM_FIXED, ( n ) )
+#     define realloc( p, n )  ( void * ) LocalReAlloc( ( HLOCAL ) ( p ), ( n ), LMEM_MOVEABLE )
+#     define free( p )        LocalFree( ( HLOCAL ) ( p ) )
+#  else
+static HANDLE hProcessHeap = 0;
+#     define malloc( n )      ( assert( hProcessHeap ), ( void * ) HeapAlloc( hProcessHeap, 0, ( n ) ) )
+#     define realloc( p, n )  ( void * ) HeapReAlloc( hProcessHeap, 0, ( void * ) ( p ), ( n ) )
+#     define free( p )        HeapFree( hProcessHeap, 0, ( void * ) ( p ) )
+#  endif
+#endif
+
 #ifdef HB_FM_STATISTICS
 
 #define HB_MEMINFO_SIGNATURE  0xDEADBEAF
@@ -83,11 +188,8 @@ static LONG          s_ulMemoryConsumed      = 0;  /* memory max size consumed *
 void * hb_xgrab( HB_SIZE ulSize )        /* allocates fixed memory, exits on failure */
 {
 #ifdef HB_FM_STATISTICS
-#ifdef _MSC_VER
-   void *   pMem  = HeapAlloc( GetProcessHeap(), 0, ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
-#else
+
    void *   pMem  = malloc( ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
-#endif
 
    if( pMem )
    {
@@ -110,11 +212,7 @@ void * hb_xgrab( HB_SIZE ulSize )        /* allocates fixed memory, exits on fai
       pMem = ( BYTE * ) pMem + HB_MEMINFO_SIZE;
    }
 #else
-#ifdef _MSC_VER
-   void *   pMem  = HeapAlloc( GetProcessHeap(), 0, ( size_t ) ulSize );
-#else
    void *   pMem  = malloc( ( size_t ) ulSize );
-#endif
 #endif
 
    if( ! pMem )
@@ -157,11 +255,7 @@ void * hb_xrealloc( void * pMem, HB_SIZE ulSize )       /* reallocates memory */
 
    HB_PUT_LE_UINT32( ( ( BYTE * ) pMem ) + ulMemSize, 0 );
 
-#ifdef _MSC_VER
-   pResult  = HeapReAlloc( GetProcessHeap(), 0, pMemBlock, ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
-#else
    pResult  = realloc( pMemBlock, ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
-#endif
 
    if( pResult )
    {
@@ -182,11 +276,7 @@ void * hb_xrealloc( void * pMem, HB_SIZE ulSize )       /* reallocates memory */
       pResult                             = ( BYTE * ) pResult + HB_MEMINFO_SIZE;
    }
 #else
-#ifdef _MSC_VER
-   void *   pResult  = HeapReAlloc( GetProcessHeap(), 0, pMem, ( size_t ) ulSize );
-#else
    void *   pResult  = realloc( pMem, ( size_t ) ulSize );
-#endif
 #endif
 
    if( ! pResult && ulSize )
@@ -229,16 +319,11 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
       HB_PUT_LE_UINT32( ( ( BYTE * ) pMem ) + pMemBlock->ulSize, 0 );
       pMem                 = ( BYTE * ) pMem - HB_MEMINFO_SIZE;
 #endif
-#if defined( _MSC_VER )
-      HeapFree( GetProcessHeap(), 0, pMem );
-#else
+
       free( pMem );
-#endif
    }
    else
-   {
       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMFREE, NULL, NULL );
-   }
 }
 #endif
 
