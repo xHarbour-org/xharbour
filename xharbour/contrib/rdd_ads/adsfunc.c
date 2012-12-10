@@ -1126,6 +1126,35 @@ HB_FUNC( ADSSTMTSETTABLELOCKTYPE )
                                      ( UNSIGNED16 ) hb_parni( 1 ) /* usLockType */ ) == AE_SUCCESS );
 }
 
+//---------------------------------------------------------------------------//
+//RCB  11/11/2010 1:48:28 PM
+//---------------------------------------------------------------------------//
+
+HB_FUNC( ADSCLOSESQLSTATEMENT )
+{
+	ADSAREAP pArea = hb_adsGetWorkAreaPointer();
+
+	if( pArea && pArea->hStatement )
+	{
+		UNSIGNED32 ulRetVal = AdsCloseSQLStatement( pArea->hStatement );
+
+		if( ulRetVal == AE_SUCCESS )
+		{
+
+			hb_retl( TRUE );
+		}
+		else
+		{
+			HB_TRACE(HB_TR_DEBUG, ("AdsCloseSQLStatement() error") );
+			hb_retl( FALSE );
+		}
+	}
+	else
+		hb_retl( FALSE );
+}
+
+
+//---------------------------------------------------------------------------//
 HB_FUNC( ADSCREATESQLSTATEMENT )
 {
    BOOL fResult = FALSE;
@@ -1211,9 +1240,9 @@ HB_FUNC( ADSEXECUTESQLDIRECT )
             SELF_OPEN( ( AREAP ) pArea, &pInfo );
          }
          else
-            hb_adsCloseCursor( pArea );
+         	ulRetVal = AdsCloseSQLStatement( pArea->hStatement );
 
-         hb_retl( TRUE );
+         hb_retl( ulRetVal == AE_SUCCESS );
       }
       else
       {
@@ -1282,8 +1311,8 @@ HB_FUNC( ADSEXECUTESQL )
             pArea->hTable = hCursor;
             SELF_OPEN( ( AREAP ) pArea, &pInfo );
          }
-         else
-            hb_adsCloseCursor( pArea );
+         /*else
+            hb_adsCloseCursor( pArea );*/
 
          hb_retl( TRUE );
       }
@@ -1667,6 +1696,19 @@ HB_FUNC( ADSGETNUMACTIVELINKS )         /* Only valid for a DataDict */
 #endif
 
 #if ADS_LIB_VERSION >= 600
+//RCB
+HB_FUNC( ADSDDCREATEREFINTEGRITY)
+{
+	hb_retl( AdsDDCreateRefIntegrity( HB_ADS_PARCONNECTION( 4 ) /*hConnect*/,
+							( UNSIGNED8 * ) hb_parcx( 1 ) /* pRIName */,
+							( UNSIGNED8 * ) hb_parcx( 2 ) /* pFailTable */, 
+							( UNSIGNED8 * ) hb_parcx( 3 ) /* pParentTable */, 
+							( UNSIGNED8 * ) hb_parcx( 4 ) /* pPaerntTagName */, 
+							( UNSIGNED8 * ) hb_parcx( 5 ) /* pChildTable */, 
+							( UNSIGNED8 * ) hb_parcx( 6 ) /* pChildTagName */, 
+							( UNSIGNED16 ) hb_parcx( 7 ) /* pUpdateRule */, 
+							( UNSIGNED16 ) hb_parcx( 8 ) /* pDeleteRule*/ ) == AE_SUCCESS ) ;
+}
 
 HB_FUNC( ADSDDADDTABLE )
 {
@@ -1933,6 +1975,48 @@ HB_FUNC( ADSDDSETDATABASEPROPERTY )
 
    hb_retl( ulRetVal == AE_SUCCESS );
 }
+//-------------------------------------------------------------------------------------------------
+//-------- RCB
+HB_FUNC( ADSDDSETTABLEPROPERTY )       /* cTableName, nProperty, xNewValue, [nConnection] */
+{
+   UNSIGNED32 ulRetVal;
+   UNSIGNED8 *pTableName   = (UNSIGNED8 *) hb_parcx( 1 );
+   UNSIGNED16 ulPropertyID = (UNSIGNED16 ) hb_parni( 2 );
+   PHB_ITEM pPropValue     = hb_param( 3, HB_IT_ANY ) ;
+   UNSIGNED16 usPropertyLen ;
+   UNSIGNED16 ulBuffer;
+   ADSHANDLE hConnect = HB_ADS_PARCONNECTION( 4 );
+
+   switch( ulPropertyID )
+   {
+      case ADS_DD_TABLE_AUTO_CREATE:
+            /* ADS_DD_TABLE_AUTO_CREATE       Changes whether or not the
+                  specified table and/or any associated indexes are automatically created.
+                  If the value is True and the table and/or associated indexes do not exist
+                  when the table is opened, the missing files will be automatically
+                  created. This property is a Boolean value and by default is set to False
+                  (turned off).
+            */
+      case ADS_DD_TABLE_ENCRYPTION:     // Encrypt/decrypt the database table.
+      {
+         ulBuffer = (UNSIGNED16) hb_itemGetL( pPropValue );
+         ulRetVal = AdsDDSetTableProperty( hConnect, pTableName,
+                           ulPropertyID, &ulBuffer, 2, NULL, NULL );
+         break;
+      }
+// for other types:
+//         ulRetVal = AdsDDSetTableProperty( hConnect, pTableName, ulProperty, hb_itemGetCPtr( pParam ), ( UNSIGNED16 ) hb_itemGetCLen( pParam ), NULL, NULL );
+//         ulBuffer = hb_itemGetNI( pParam );
+//         ulRetVal = AdsDDSetTableProperty( hConnect, pTableName, ulProperty, &ulBuffer, 2, NULL, NULL );
+      default:
+      {
+         ulRetVal = ~AE_SUCCESS;
+         break;
+      }
+   }
+   hb_retl( ulRetVal == AE_SUCCESS);
+}
+//-------------------------------------------------------------------------------------------------
 
 HB_FUNC( ADSDDGETUSERPROPERTY )
 {
@@ -2252,3 +2336,225 @@ HB_FUNC( ADSDDDROPLINK )
 }
 
 #endif /* ADS_LIB_VERSION >= 900 */
+
+
+//----------------------------------
+//RCB 4/25/2011 10:16:24 AM
+//need to test this one better.
+/*HB_FUNC( ADSOPENTABLE )
+{
+	hb_retl( AdsOpenTable( HB_ADS_PARCONNECTION( 1 ),
+									  ( UNSIGNED8 * ) hb_parcx( 2 ),
+									  ( UNSIGNED8 * ) hb_parcx( 3 ),
+                             ( UNSIGNED16 ) ( ISNUM( 4 ) ? hb_parni( 4 ) : ADS_ADT ),// usTableType,
+                             ( UNSIGNED16 ) ( ISNUM( 5 ) ? hb_parni( 5 ) : ADS_ANSI),
+                             ( UNSIGNED16 ) hb_parni( 6 ),
+                             ( UNSIGNED16 ) hb_parni( 7 ),
+                             ( UNSIGNED32 ) hb_parni( 8 ),
+									  ( ADSHANDLE * ) phTable  ) ); 
+}*/
+
+
+//----------------------------------
+//RCB 4/25/2011 10:16:24 AM
+
+HB_FUNC( ADSSETBINARY )
+{
+UNSIGNED32 ulRetVal;
+ADSAREAP pArea = hb_adsGetWorkAreaPointer();
+
+ulRetVal = AdsSetBinary( pArea->hStatement,
+	(char*) hb_parc( 1 ),
+	(hb_pcount() > 2 && hb_parni( 3 ) == 1) ? ADS_BINARY : ADS_IMAGE,
+	hb_parclen( 2 ), //ulTotalLength
+	0,//ulOffset
+	(char*) hb_parc( 2 ), 
+	hb_parclen( 2 ) );
+
+hb_retl( ulRetVal == AE_SUCCESS );
+}
+
+//----------------------------------
+//RCB 4/25/2011 10:16:24 AM
+HB_FUNC( ADSSETSTRING )
+{
+UNSIGNED32 ulRetVal;
+ADSAREAP pArea = hb_adsGetWorkAreaPointer();
+
+ulRetVal = AdsSetString( pArea->hStatement,
+	(char*) hb_parc(1),
+	(char*) hb_parc(2), 
+	hb_parclen(2) );
+	
+hb_retl( ulRetVal == AE_SUCCESS );
+}
+
+//----------------------------------
+//RCB 4/25/2011 10:16:24 AM
+HB_FUNC( ADSSETDATE )
+{
+UNSIGNED32 ulRetVal;
+ADSAREAP pArea = hb_adsGetWorkAreaPointer();
+ulRetVal = AdsSetDate( pArea->hStatement,
+	(char*) hb_parc(1),
+	(char*) hb_parc(2), 
+	hb_parclen(2) );
+hb_retl( ulRetVal == AE_SUCCESS );
+}
+
+//----------------------------------
+//RCB 4/25/2011 10:16:24 AM
+HB_FUNC( ADSSETLONG )
+{
+UNSIGNED32 ulRetVal;
+ADSAREAP pArea = hb_adsGetWorkAreaPointer();
+ulRetVal = AdsSetLong( pArea->hStatement,
+	(char*) hb_parc(1), 
+	hb_parnl(2));
+hb_retl( ulRetVal == AE_SUCCESS );
+}
+
+//----------------------------------
+//RCB 4/25/2011 10:16:24 AM
+HB_FUNC( ADSSETDOUBLE )
+{
+UNSIGNED32 ulRetVal;
+ADSAREAP pArea = hb_adsGetWorkAreaPointer();
+ulRetVal = AdsSetDouble( pArea->hStatement,
+	(char*) hb_parc(1), 
+	hb_parnd(2));
+hb_retl( ulRetVal == AE_SUCCESS );
+}
+
+//----------------------------------
+//RCB 4/25/2011 10:16:24 AM
+HB_FUNC( ADSSETLOGICAL )
+{
+UNSIGNED32 ulRetVal;
+ADSAREAP pArea = hb_adsGetWorkAreaPointer();
+ulRetVal = AdsSetLogical( pArea->hStatement,(char*) hb_parc(1), hb_parl(2));
+hb_retl( ulRetVal == AE_SUCCESS );
+}
+
+/*HB_FUNC( ADSSETNULL )
+{
+UNSIGNED32 ulRetVal;
+ADSAREAP pArea = hb_adsGetWorkAreaPointer();
+ulRetVal = AdsSetNull( (hb_parnl(1)==0) ? pArea->hOrdCurrent : hb_parnl(1),(char*) hb_parc(2));
+hb_retl( ulRetVal == AE_SUCCESS );
+}*/
+
+
+//RCB 12/4/2011 5:51:59 PM
+HB_FUNC( ADSSETFIELD )
+{
+   ADSAREAP pArea = hb_adsGetWorkAreaPointer();
+	UNSIGNED8 *pucValue = hb_parcx( 2 );
+	UNSIGNED32 usLen = hb_itemGetDL( pucValue );
+
+  AdsSetField( pArea->hTable,
+                  ( UNSIGNED8 * ) hb_parcx( 1 ) /* pucFldName */,
+						pucValue, usLen);
+}
+
+//RCB 12/4/2011 5:52:04 PM
+HB_FUNC( ADSGETFIELDTYPE )
+{
+   ADSAREAP pArea = hb_adsGetWorkAreaPointer();
+	UNSIGNED8 *pucFldName = hb_parcx( 1 );
+	UNSIGNED16 pusType;
+
+   if (AdsGetFieldType(pArea->hTable, pucFldName,  &pusType) == AE_SUCCESS)
+	  hb_retnl(pusType);
+	else
+	  hb_retnl(0);
+
+}
+
+//RCB 11/27/2012 9:54:06 PM
+//this function always returns 0.  Needs debug.
+//Can't see why.
+HB_FUNC( ADSGETRECORDCOUNT )
+{
+   ADSHANDLE pStatementHandle = hb_parnl( 1 );   //hb_adsGetWorkAreaPointer();
+   UNSIGNED32 pulKey = 0;
+   
+   if (AdsGetRecordCount( pStatementHandle, ADS_IGNOREFILTERS, &pulKey ) == AE_SUCCESS )
+      hb_retnl( pulKey ) ;
+   else
+      hb_retnl( 0 );
+
+}
+
+//RCB 11/27/2012 9:54:06 PM
+HB_FUNC( ADSGETSQLHANDLE )
+{
+   ADSAREAP pArea = hb_adsGetWorkAreaPointer();
+   hb_retnl ( pArea->hStatement );
+}
+
+
+//RCB 11/27/2012 9:54:06 PM
+/* needs work.
+HB_FUNC (ADSFIELD)
+{
+hb_retptr ((unsigned char*)(long)( hb_parni(1)));
+}
+*/
+
+HB_FUNC( ADSINITRAWKEY )
+{
+   UNSIGNED32 ulRetVal;
+   ADSAREAP pArea = hb_adsGetWorkAreaPointer();
+   ulRetVal = AdsInitRawKey( (hb_parnl(1)==0) ? pArea->hOrdCurrent : hb_parnl(1) );
+   hb_retl( ulRetVal == AE_SUCCESS );
+}
+
+HB_FUNC( ADSBUILDRAWKEY )
+{
+   UNSIGNED32 ulRetVal;
+   ADSAREAP pArea = hb_adsGetWorkAreaPointer();
+   UNSIGNED8 aucKey[ADS_MAX_KEY_LENGTH];
+   UNSIGNED16 auclen = sizeof( aucKey );
+   ulRetVal = AdsBuildRawKey( (hb_parnl(1)==0) ? pArea->hOrdCurrent : hb_parnl(1),  aucKey , &auclen  );
+   hb_storc( ulRetVal == AE_SUCCESS ? ( UNSIGNED8  * ) aucKey : NULL, 2 );
+   hb_storni(ulRetVal == AE_SUCCESS ? auclen : 0 , 3 );
+   hb_retl( ulRetVal == AE_SUCCESS );
+}
+
+HB_FUNC( ADSGOTOTOP )
+{
+   UNSIGNED32 ulRetVal;
+   ADSHANDLE  hIndex = 0;
+   ADSAREAP pArea = hb_adsGetWorkAreaPointer();
+
+   hIndex = pArea->hOrdCurrent;
+   if( hIndex == 0 ) /* no controlling index*/
+   {
+      AdsGotoTop( pArea->hTable ) ;
+   }
+   else
+   {
+      AdsGotoTop( hIndex );
+   }
+   hb_retl( AE_SUCCESS );
+
+}
+
+HB_FUNC( ADSGOTOBOTTOM )
+{
+   UNSIGNED32 ulRetVal;
+   ADSHANDLE  hIndex = 0;
+   ADSAREAP pArea = hb_adsGetWorkAreaPointer();
+
+   hIndex = pArea->hOrdCurrent;
+   if( hIndex == 0 ) /* no controlling index*/
+   {
+      AdsGotoBottom( pArea->hTable ) ;
+   }
+   else
+   {
+      AdsGotoBottom( hIndex );
+   }
+   hb_retl( AE_SUCCESS );
+}
