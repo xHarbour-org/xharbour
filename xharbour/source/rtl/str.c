@@ -120,6 +120,7 @@ HB_FUNC( STR )
             memmove( szResult, szResult + iLen, strlen( szResult + iLen ) + 1 );
 
          hb_retcAdopt( szResult );
+         return;
       }
       else if( ( pWidth ) && ( pDec ) && ( pWidth->item.asInteger.value - ( pDec->item.asInteger.value + 1 ) == 0 ) )
       {
@@ -128,10 +129,13 @@ HB_FUNC( STR )
          hb_xmemset( szTemp, '*', pWidth->item.asInteger.value );
          szTemp[ pWidth->item.asInteger.value + 1 ] = '\0';
 
+         if( szResult )
+            hb_xfree( szResult );
          hb_retcAdopt( szTemp );
+         return;
       }
       else
-         hb_retc( szResult );
+         hb_retcAdopt( szResult );
    }
    else
       hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "STR", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
