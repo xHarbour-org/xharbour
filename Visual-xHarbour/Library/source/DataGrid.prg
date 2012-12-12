@@ -4167,6 +4167,9 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
       SetTextColor( hDC, GetSysColor( COLOR_GRAYTEXT ) )
    ENDIF
    SetBkMode( hDC, TRANSPARENT )
+
+   SetTextColor( hDC, nTxColor )
+
    _ExtTextOut( hDC, x, y, ETO_CLIPPED, aRect, ::xText )
    SetTextColor( hDC, nPrevColor )
 
