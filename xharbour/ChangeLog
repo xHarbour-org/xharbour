@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-12 18:51 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/rtl/tone.c
+    + HB_TONE(), tone functionality for Windows OS via MMSYSTEM
+
+  + tests/testtone.prg
+    ! test program for HB_TONE()
+
 2012-12-12 18:29 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/rdd_ads/adsfunc.c
     ! yet, remmed bad codes to not to be compiled in Windows OS
