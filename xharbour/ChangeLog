@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-12 18:29 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/rdd_ads/adsfunc.c
+    ! yet, remmed bad codes to not to be compiled in Windows OS
+       XCC:
+       1702: warning: [ISO] Conversion from 'const char *' to 'unsigned short' is compiler dependent.
+       1702: warning: Conversion from 'const char *' to 'unsigned short' is undefined.
+
 2012-12-12 17:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/rdd_ads/adsfunc.c
     ! protect new additions to not to be compiled in Windows OS because they
