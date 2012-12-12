@@ -4026,7 +4026,7 @@ RETURN NIL
 METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    LOCAL aAlign, y, nColor, hOldPen, hOldBrush, hOldFont, n, aRect, nH := 5, nx := 0
    LOCAL nTop, nIcoLeft, nTxColor, nImage := ::xHeaderImageIndex
-   LOCAL hBorderPen, nColor1, nColor2, cOrd, nBackColor, nBorder, nShadow, hPenShadow, hPenLight, z, i
+   LOCAL hBorderPen, nColor1, nColor2, cOrd, nBackColor, nBorder, nShadow, hPenShadow, hPenLight, z, i, nPrevColor
    
    DEFAULT lHot   TO .F.
    DEFAULT nLeft  TO ::__HeaderLeft
@@ -4066,20 +4066,18 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
             cOrd := ::Parent:DataSource:OrdSetFocus()
          ENDIF
          IF ! Empty(cOrd) .AND. Upper( cOrd ) == Upper( ::Tag )
-            nColor1 := RGB(171,173,178) //::System:Color:Gray //::System:CurrentScheme:ButtonCheckedGradientBegin
-            nColor2 := RGB(230,233,239) //::System:Color:LtGray  //::System:CurrentScheme:ButtonCheckedGradientEnd
-            hBorderPen := ::System:CurrentScheme:Pen:ButtonPressedBorder
+            nColor1 := ::System:CurrentScheme:ButtonCheckedGradientBegin
+            nColor2 := ::System:CurrentScheme:ButtonCheckedGradientEnd
+            hBorderPen := ::System:CurrentScheme:Pen:ButtonSelectedBorder
           ELSE
-            nColor1 := ::System:Color:LtGray //::System:CurrentScheme:ButtonSelectedGradientBegin
-            nColor2 := ::System:Color:White  //::System:CurrentScheme:ButtonSelectedGradientEnd
+            nColor1 := ::System:CurrentScheme:ButtonSelectedGradientBegin
+            nColor2 := ::System:CurrentScheme:ButtonSelectedGradientEnd
             hBorderPen := ::System:CurrentScheme:Pen:ButtonSelectedBorder
          ENDIF
-         //nColor1 := ::System:Color:White
-         //nColor2 := ::System:Color:LtGray
        ELSE
-         nColor1 := ::System:Color:Gray //::System:CurrentScheme:ButtonPressedGradientBegin
-         nColor2 := ::System:Color:LtGray   //::System:CurrentScheme:ButtonPressedGradientEnd
-         hBorderPen := ::System:CurrentScheme:Pen:ButtonPressedBorder
+         nColor1 := ::System:CurrentScheme:ButtonPressedGradientBegin
+         nColor2 := ::System:CurrentScheme:ButtonPressedGradientEnd
+         hBorderPen := ::System:CurrentScheme:Pen:ButtonSelectedBorder
       ENDIF
 
       ::__aVertex[1]:Red   := GetRValue( nColor1 ) * 256
@@ -4124,7 +4122,8 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    ENDIF
    SelectObject( hDC, hOldBrush )
 
-   nColor := SetTextColor( hDC, nTxColor )
+   nPrevColor := SetTextColor( hDC, nTxColor )
+
    n := ::Alignment
    
    IF n == 2
@@ -4169,7 +4168,7 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    ENDIF
    SetBkMode( hDC, TRANSPARENT )
    _ExtTextOut( hDC, x, y, ETO_CLIPPED, aRect, ::xText )
-   SetTextColor( hDC, nColor )
+   SetTextColor( hDC, nPrevColor )
 
    SelectObject( hDC, hOldFont )
    SelectObject( hDC, hOldPen )
