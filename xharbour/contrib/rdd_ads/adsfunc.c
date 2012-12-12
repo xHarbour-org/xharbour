@@ -1975,6 +1975,9 @@ HB_FUNC( ADSDDSETDATABASEPROPERTY )
 
    hb_retl( ulRetVal == AE_SUCCESS );
 }
+
+#if ! defined ( HB_OS_WIN )
+
 //-------------------------------------------------------------------------------------------------
 //-------- RCB
 HB_FUNC( ADSDDSETTABLEPROPERTY )       /* cTableName, nProperty, xNewValue, [nConnection] */
@@ -2016,6 +2019,9 @@ HB_FUNC( ADSDDSETTABLEPROPERTY )       /* cTableName, nProperty, xNewValue, [nCo
    }
    hb_retl( ulRetVal == AE_SUCCESS);
 }
+
+#endif
+
 //-------------------------------------------------------------------------------------------------
 
 HB_FUNC( ADSDDGETUSERPROPERTY )
@@ -2337,6 +2343,7 @@ HB_FUNC( ADSDDDROPLINK )
 
 #endif /* ADS_LIB_VERSION >= 900 */
 
+#if ! defined( HB_OS_WIN )
 
 //----------------------------------
 //RCB 4/25/2011 10:16:24 AM
@@ -2383,7 +2390,7 @@ ADSAREAP pArea = hb_adsGetWorkAreaPointer();
 
 ulRetVal = AdsSetString( pArea->hStatement,
 	(char*) hb_parc(1),
-	(char*) hb_parc(2), 
+	(char*) hb_parc(2),
 	hb_parclen(2) );
 	
 hb_retl( ulRetVal == AE_SUCCESS );
@@ -2522,6 +2529,7 @@ HB_FUNC( ADSBUILDRAWKEY )
    hb_retl( ulRetVal == AE_SUCCESS );
 }
 
+
 HB_FUNC( ADSGOTOTOP )
 {
    UNSIGNED32 ulRetVal;
@@ -2558,3 +2566,5 @@ HB_FUNC( ADSGOTOBOTTOM )
    }
    hb_retl( AE_SUCCESS );
 }
+
+#endif
