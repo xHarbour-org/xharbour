@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-13 10:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbsqlit3/sqlite3.c
+  * contrib/hbsqlit3/sqlite3.h
+  * contrib/hbsqlit3/sqlite3ext.h
+    ! updated to version 3.7.15
+
 2012-12-12 18:53 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * tests/TESTTONE.PRG -> tests/testtone.prg
     ! lower-cased file name
