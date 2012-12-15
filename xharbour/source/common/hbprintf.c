@@ -1395,67 +1395,70 @@ int hb_snprintf( char * buffer, size_t bufsize, const char * format, ... )
 
 #include <math.h>
 
-#define	EXT_EXP_INFNAN	0x7fff
-#define	EXT_EXPBITS	15
-#define EXT_FRACHBITS	16
+#define EXT_EXP_INFNAN  0x7fff
+#define EXT_EXPBITS     15
+#define EXT_FRACHBITS   16
+#define SNG_EXP_INFNAN  255
+#define DBL_EXP_INFNAN  2047
 
-struct ieee_ext {
-	unsigned int	ext_sign:1;
-	unsigned int	ext_exp:EXT_EXPBITS;
-	unsigned int	ext_frach:EXT_FRACHBITS;
-	unsigned int	ext_frachm;
-	unsigned int	ext_fraclm;
-	unsigned int	ext_fracl;
+struct ieee_ext
+{
+   unsigned int      ext_sign:1;
+   unsigned int      ext_exp:EXT_EXPBITS;
+   unsigned int      ext_frach:EXT_FRACHBITS;
+   unsigned int      ext_frachm;
+   unsigned int      ext_fraclm;
+   unsigned int      ext_fracl;
 };
 
-/*
- * Convenience data structures.
- */
-union ieee_ext_u {
-	long double		extu_ld;
-	struct ieee_ext		extu_ext;
+union ieee_ext_u
+{
+   long double       extu_ld;
+   struct ieee_ext   extu_ext;
 };
 
-struct ieee_double {
-	unsigned int	dbl_sign:1;
-	unsigned int	dbl_exp:11;
-	unsigned int	dbl_frach:20;
-	unsigned int	dbl_fracl;
+struct ieee_double
+{
+   unsigned int      dbl_sign:1;
+   unsigned int      dbl_exp:11;
+   unsigned int      dbl_frach:20;
+   unsigned int      dbl_fracl;
 };
 
-#define	SNG_EXP_INFNAN	255
-#define	DBL_EXP_INFNAN	2047
+HB_EXTERN_BEGIN
+extern int _isnanl( long double x );
+extern int _finitel( long double d );
+extern int _finite( double d );
+HB_EXTERN_END
 
 /*
  * 7.12.3.4 isnan - test for a NaN
  *          IEEE 754 compatible 80-bit extended-precision Intel 386 version
  */
-int
-_isnanl(long double x)
+
+int _isnanl( long double x )
 {
-	union ieee_ext_u u;
+   union ieee_ext_u u;
 
-	u.extu_ld = x;
+   u.extu_ld = x;
 
-	return (u.extu_ext.ext_exp == EXT_EXP_INFNAN &&
-	    (u.extu_ext.ext_frach & 0x80000000) != 0 &&
-	    (u.extu_ext.ext_frach != 0x80000000 || u.extu_ext.ext_fracl != 0));
+   return u.extu_ext.ext_exp == EXT_EXP_INFNAN &&
+          ( u.extu_ext.ext_frach & 0x80000000 ) != 0 &&
+          ( u.extu_ext.ext_frach != 0x80000000 || u.extu_ext.ext_fracl != 0 );
 }
 
-int
-_finite(double d)
+int _finite( double d )
 {
-	struct ieee_double *p = (struct ieee_double *)&d;
+   struct ieee_double * p = ( struct ieee_double * ) &d;
 
-	return (p->dbl_exp != DBL_EXP_INFNAN);
+   return p->dbl_exp != DBL_EXP_INFNAN;
 }
 
-int
-_finitel(long double d)
+int _finitel( long double d )
 {
-	struct ieee_double *p = (struct ieee_double *)&d;
+   struct ieee_double * p = ( struct ieee_double * ) &d;
 
-	return (p->dbl_exp != DBL_EXP_INFNAN);
+   return p->dbl_exp != DBL_EXP_INFNAN;
 }
 
 #endif

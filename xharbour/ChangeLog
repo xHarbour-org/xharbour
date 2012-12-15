@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-15 21:19 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/common/hbprintf.c
+    ! minor reformatting and declare function prototypes
+
 2012-12-15 21:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/common/hbprintf.c
     + function _isnanl(), _finite() and _finitel() for BCC64
