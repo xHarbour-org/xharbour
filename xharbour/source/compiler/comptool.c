@@ -733,25 +733,14 @@ void hb_compOutStd( char * szMessage )
       if( hb_outStdFunc )
          hb_outStdFunc( hb_compHandle, szMessage );
       else
-#if defined( HB_OS_DOS )
-         fprintf( stderr, "%s", szMessage ); fflush( stderr );
-#else
          fprintf( stdout, "%s", szMessage ); fflush( stdout );
-#endif
    }
 }
 
 void hb_compOutErr( char * szMessage )
 {
-   if( ! hb_comp_bQuiet )
-   {
-      if( hb_outErrFunc )
-         hb_outErrFunc( hb_compHandle, szMessage );
-      else
-#if defined( HB_OS_DOS )
-         fprintf( stdout, "%s", szMessage ); fflush( stdout );
-#else
-         fprintf( stderr, "%s", szMessage ); fflush( stderr );
-#endif
-   }
+   if( hb_outErrFunc )
+      hb_outErrFunc( hb_compHandle, szMessage );
+   else
+      fprintf( stderr, "%s", szMessage ); fflush( stderr );
 }

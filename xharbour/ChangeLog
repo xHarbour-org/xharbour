@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-16 05:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/comptool.c
+    ! Harbour Compiler errors should be printed regardless -q flag
+
 2012-12-15 21:19 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/common/hbprintf.c
     ! minor reformatting and declare function prototypes
@@ -35,10 +39,10 @@
   * contrib/hbmagic/magic.h
     ! do not define size_t for BCC64
 
-  - winmake/make_b32.bat
-  + winmake/make_bc.bat
+  - make_b32.bat
+  + make_bc.bat
     ! batch file for BCC is renamed to avoid assumption that it is for 32-bit
-     while in fact, BCC now can produce 64-bit xHarbour
+      while in fact, BCC now can produce 64-bit xHarbour
 
   * winmake/makefile.bc
     ! enable 64bit compilation for BCC64
