@@ -18,6 +18,7 @@ LIBEXE    =LIB386
 IMPLIBEXE =WLIB
 
 !if !("$(HB_DIR_ADS)"=="")
+ACE_DLL=$(HB_DIR_ADS)\ace32.dll
 !if !("$(HB_ADS_IMPLIB)"=="no") && !("$(HB_ADS_IMPLIB)"=="0")
 HB_ADS_CREATEIMPLIB=1
 !else
@@ -58,6 +59,7 @@ HBDOC_EXE_OBJS=\
 !if ("$(HB_MT)"=="")
 PROJECT=$(ST_PROJECT)
 !if ("$(HB_ADS_CREATEIMPLIB)"=="1")
+ACE_LIB=$(ACE32_LIB)
 PROJECT=\
 	$(PROJECT)\
 	$(ACE32_LIB)

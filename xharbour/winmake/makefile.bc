@@ -11,21 +11,24 @@
 !include winmake\common.mak
 
 RC        =BRC32
-IMPLIBEXE =IMPLIB
 
 !if ("$(HB_ARCH)"=="64")
+ACE_LIB   =$(ACE64_LIB)
 CC        =BCC64
 LINKEXE   =ILINK64
 LIBEXE    =TLIB64
+IMPLIBEXE =MKEXP
 !else
+ACE_LIB   =$(ACE32_LIB)
 CC        =BCC32
 LINKEXE   =ILINK32
 LIBEXE    =TLIB
+IMPLIBEXE =IMPLIB
 !endif
 
 OPTFLAGS=-q -d -6 -a8
 
-!if ("$(HB_CG32)"=="1") || ("$(HB_DEBUG)"=="d")
+!if ( ( ("$(HB_CG32)"=="1") || ("$(HB_DEBUG)"=="d") ) && !defined( HB_OS_WIN_64 ) )
 COMPILERLIBS=\
 	cg32.lib\
 	$(COMPILERLIBS)
@@ -34,20 +37,32 @@ LINEFLAGS             =
 CC_DEBUGFLAGS         =-y -v -vG
 CC_LINKER_DEBUG_FLAGS =-v
 HB_CG32               =1
-!else
+!endif
+
+!if ( ( "$(HB_DEBUG)"=="d" ) && defined( HB_OS_WIN_64 ) )
+LINEFLAGS             =
+CC_DEBUGFLAGS         =-g
+CC_LINKER_DEBUG_FLAGS =-v
+!endif
+
 !if ("$(HB_ARCH)"=="64")
 OPTFLAGS              =-O2 $(OPTFLAGS)
 !else
 OPTFLAGS              =-O2 -OS -Ov -Oi -Oc $(OPTFLAGS)
 !endif
-!endif
 
 !if !("$(HB_DIR_ADS)"=="")
+!if ("$(HB_ARCH)"=="64")
+ACE_DLL=$(HB_DIR_ADS)\ace64.dll
+!else
+ACE_DLL=$(HB_DIR_ADS)\ace32.dll
+!endif
 !if !("$(HB_ADS_IMPLIB)"=="no") && !("$(HB_ADS_IMPLIB)"=="0")
 HB_ADS_CREATEIMPLIB=1
 !else
 HB_ADS_CREATEIMPLIB=0
 !endif
+
 !endif
 
 !if ("$(ARFLAGS)"=="")
@@ -101,7 +116,7 @@ PROJECT=\
 !if ("$(HB_ADS_CREATEIMPLIB)"=="1")
 PROJECT=\
 	$(PROJECT)\
-	$(ACE32_LIB)
+	$(ACE_LIB)
 !endif
 !else
 PROJECT=$(MT_PROJECT)
@@ -146,7 +161,7 @@ DLL_PROJECT=\
 
 !if ("$(HB_ADS_CREATEIMPLIB)"=="1")
 DLL_PROJECT=\
-	$(ACE32_LIB)\
+	$(ACE_LIB)\
 	$(DLL_PROJECT)
 !endif
 

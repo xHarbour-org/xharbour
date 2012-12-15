@@ -122,8 +122,13 @@ HARBOUR_DLL_OBJS=\
 INCLUDE_DIR=-I"$(HB_DIR_ADS)" $(INCLUDE_DIR)
 !if ("$(HB_ADS_IMPLIB)"=="no")
 !else
+!if ("$(HB_ARCH)"=="64")
+COMPILERLIBS=\
+    "$(HB_DIR_ADS)\ace64.lib"
+!else
 COMPILERLIBS=\
     "$(HB_DIR_ADS)\ace32.lib"
+!endif
 ACE_LIBPATH=\
     -LIBPATH:"$(HB_DIR_ADS)"
 !endif

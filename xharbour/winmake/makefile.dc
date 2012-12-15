@@ -53,9 +53,11 @@ PROJECT=$(MT_PROJECT)
 !endif
 
 !if !("$(HB_DIR_ADS)"=="")
+ACE_DLL=$(HB_DIR_ADS)\ace32.dll
+ACE_LIB=$(ACE32_LIB)
 PROJECT=\
 	$(PROJECT)\
-	$(ACE32_LIB)
+	$(ACE_LIB)
 !endif
 
 ALL: $(PROJECT)
