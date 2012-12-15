@@ -294,7 +294,11 @@ int main( int argc, char * argv[] )
       else
       {
          if( iComp == BORLANDC )
+#if defined( __BORLANDC__ ) && defined( HB_OS_WIN_64 )
+            fprintf( h, "%s", "c0d64w.obj " );
+#else
             fprintf( h, "%s", "c0d32.obj " );
+#endif
       }
 
       if( strcmp( szFileExt, "lst" ) == 0 )

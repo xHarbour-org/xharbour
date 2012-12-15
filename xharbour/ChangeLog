@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-15 21:04 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * utils/misc/hblib.c
+    ! use c0d64w.o instead of c0d32.obj in 64bit mode
+
 2012-12-15 20:48 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbcomp.h
     ! rename: in struct __PINLINE: _INLINE -> __INLINE for BCC64 because _INLINE
