@@ -84,7 +84,7 @@
 #define	MAGIC_NO_CHECK_FORTRAN	0x000000 /* Don't check ascii/fortran */
 #define	MAGIC_NO_CHECK_TROFF	0x000000 /* Don't check ascii/troff */
 
-#if defined( __DMC__ ) || defined( __BORLANDC__ ) || defined( __XCC__ )
+#if defined( __DMC__ ) || ( defined( __BORLANDC__ ) && ! defined( HB_OS_WIN_64 ) ) || defined( __XCC__ )
 typedef unsigned int size_t;
 #endif
 

@@ -820,7 +820,7 @@ HB_SIZE hb_xsize( void * pMem ) /* returns the size of an allocated memory block
 #endif
 }
 
-int hb_xinit( void ) /* Initialize fixed memory subsystem */
+void hb_xinit( void ) /* Initialize fixed memory subsystem */
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_xinit()" ) );
 
@@ -828,7 +828,7 @@ int hb_xinit( void ) /* Initialize fixed memory subsystem */
    hProcessHeap = GetProcessHeap();
 #endif
 
-   return 1;
+   return;
 }
 
 /* Returns pointer to string containing printable version

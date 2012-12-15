@@ -11,10 +11,17 @@
 !include winmake\common.mak
 
 RC        =BRC32
+IMPLIBEXE =IMPLIB
+
+!if ("$(HB_ARCH)"=="64")
+CC        =BCC64
+LINKEXE   =ILINK64
+LIBEXE    =TLIB64
+!else
 CC        =BCC32
 LINKEXE   =ILINK32
 LIBEXE    =TLIB
-IMPLIBEXE =IMPLIB
+!endif
 
 OPTFLAGS=-q -d -6 -a8
 
@@ -28,7 +35,11 @@ CC_DEBUGFLAGS         =-y -v -vG
 CC_LINKER_DEBUG_FLAGS =-v
 HB_CG32               =1
 !else
+!if ("$(HB_ARCH)"=="64")
+OPTFLAGS              =-O2 $(OPTFLAGS)
+!else
 OPTFLAGS              =-O2 -OS -Ov -Oi -Oc $(OPTFLAGS)
+!endif
 !endif
 
 !if !("$(HB_DIR_ADS)"=="")
@@ -39,20 +50,30 @@ HB_ADS_CREATEIMPLIB=0
 !endif
 !endif
 
-COMPILERLIBS=\
+!if ("$(ARFLAGS)"=="")
+ARFLAGS=/0 /C /P256
+!endif
+
+!if ("$(HB_ARCH)"=="64")
+ARFLAGS        =/A $(ARFLAGS)
+BCC_STARTUP_OBJ=c0x64.o
+COMPILERLIBS   =\
+	$(COMPILERLIBS)\
+	ws2_32.a\
+	cw64mt.a\
+	import64.a
+!else
+BCC_STARTUP_OBJ=c0x32.obj
+COMPILERLIBS   =\
 	$(COMPILERLIBS)\
 	ws2_32.lib\
 	cw32mt.lib\
 	import32.lib
-
-!if ("$(ARFLAGS)"=="")
-ARFLAGS=/0 /C /P256
 !endif
 
 !if ("$(WARNINGFLAGS)"=="")
 WARNINGFLAGS =-w -w-8071 -w-8061 -w-8080
 !endif
-
 
 !include winmake\common3.mak
 
@@ -136,6 +157,13 @@ ALL: $(DLL_PROJECT)
 #*******************************************************************************
 !include winmake\common1.mak
 
+!if ("$(HB_ARCH)"=="64")
+CONTRIB_PROJECT=\
+	$(CONTRIB_PROJECT)\
+	$(HBSQLIT3_LIB)\
+	\
+	$(OPTIONAL_PRJ)
+!else
 CONTRIB_PROJECT=\
 	$(CONTRIB_PROJECT)\
 	$(GTWVW_LIB)\
@@ -145,10 +173,14 @@ CONTRIB_PROJECT=\
 	$(HBZIP_LIB)\
 	\
 	$(OPTIONAL_PRJ)
+!endif
 
 ALL: $(CONTRIB_PROJECT)
 
 !endif
+
+## THIS SHOULD BE REMOVED AND BACK TO STANDARD MACRO
+## THIS IS FOR TESTING ONLY
 
 DLLFLAGS       =-C -aa -Tpd -Gn -Gi -L$(LIB_DIR) -L$(BIN_DIR) $(LFLAGS)
 LINKERFLAGS    =$(LINKERFLAGS) $(LFLAGS)
@@ -157,12 +189,12 @@ HB_CMD_MAIN    =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) -d_USE_APPMAIN_ $** -o$@
 CC_CMD         =$(CC) -c -tWM $(CLIBFLAGS) -o$@ $**
 CCC_CMD        =$(CC_CMD)
 CC_CMD_ZIP     =$(CC) -c $(CC_DEBUGFLAGS) -I"$(HBZIP_DIR)\include" -I"include" -vi -Ve -R- -H- $(OPTFLAGS) -w- -X- -b -k- -o$@ $**
-LINK_CMD       =$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) -ap -Tpe -x -Gn -C -L$(LIB_DIR) $(LFLAGS) c0x32.obj $**,$@,,
-HRB_LINK_CMD   =$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) -ap -Tpe -x -Gn -C -L$(LIB_DIR) $(LFLAGS) c0x32.obj $(HARBOUR_EXE_OBJS),$(HARBOUR_EXE),,$(HRB_LIBS),,$(HARBOUR_EXE_RES)
+LINK_CMD       =$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) -ap -Tpe -x -Gn -C -L$(LIB_DIR) $(LFLAGS) $(BCC_STARTUP_OBJ) $**,$@,,
+HRB_LINK_CMD   =$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) -ap -Tpe -x -Gn -C -L$(LIB_DIR) $(LFLAGS) $(BCC_STARTUP_OBJ) $(HARBOUR_EXE_OBJS),$(HARBOUR_EXE),,$(HRB_LIBS),,$(HARBOUR_EXE_RES)
 LIB_CMD        =$(HBLIB_EXE) __BORLANDC__ $(LIBEXE) "$(ARFLAGS)" $@ $**
 LIB_CMD_1      =$(HBLIB_EXE) __BORLANDC__ $(LIBEXE) "$(ARFLAGS)" $@ "winmake\rtl.lst" $(OBJ_DIR)
 DLL_LINK_CMD   =@$(HBLIB_EXE) __BORLANDC__ $(LINKEXE) "-C -aa -Tpd -Gn -Gi" $@ "winmake\dll.lst" $(OBJ_DIR) DLL $(RTL_DIR)\bcc.def $(HARBOUR_DLL_RES) $(VM_LIB_OBJS) $(TIFF_LIB_OBJS)
-DLLEXE_LINK_CMD=$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) $(LINKERFLAGS) c0x32.obj $**,$@,,$(PDFLITE_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+DLLEXE_LINK_CMD=$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) $(LINKERFLAGS) $(BCC_STARTUP_OBJ) $**,$@,,$(PDFLITE_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
 IMPLIB_CMD     =$(IMPLIBEXE) $@ $**
 RC_CMD         =$(RC) -r -i$(CC_DIR)\include $** -fo$@
 

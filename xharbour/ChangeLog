@@ -8,6 +8,29 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-15 20:48 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbcomp.h
+    ! rename: in struct __PINLINE: _INLINE -> __INLINE for BCC64 because _INLINE
+      was conflicting with BCC64 definition )
+
+  * source/compiler/harbour.c
+    ! rename: _INLINE -> __INLINE for BCC64
+
+  * include/hbapi.h
+  * source/vm/fm.c
+    ! function hb_xinit() should be of void type as required by BCC64 pragma startup
+
+  * contrib/hbmagic/magic.h
+    ! do not define size_t for BCC64
+
+  - winmake/make_b32.bat
+  + winmake/make_bc.bat
+    ! batch file for BCC is renamed to avoid assumption that it is for 32-bit
+     while in fact, BCC now can produce 64-bit xHarbour
+
+  * winmake/makefile.bc
+    ! enable 64bit compilation for BCC64
+
 2012-12-13 10:35 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/hbsqlit3/sqlite3.c
   * contrib/hbsqlit3/sqlite3.h

@@ -561,7 +561,7 @@ extern HB_EXPORT int     hb_stortdt( long lJulian, long lMilliSec, int iParam );
    extern HB_EXPORT void   hb_stornll( LONGLONG llValue, int iParam, ... ); /* stores a long long int on a variable by reference */
 #endif
 
-extern HB_EXPORT int     hb_xinit( void );                         /* Initialize fixed memory subsystem */
+extern HB_EXPORT void    hb_xinit( void );                         /* Initialize fixed memory subsystem */
 extern HB_EXPORT void    hb_xexit( void );                         /* Deinitialize fixed memory subsystem */
 
 #ifndef hb_xalloc
