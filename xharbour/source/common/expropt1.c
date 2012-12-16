@@ -75,6 +75,10 @@
 
 #include "hbexemem.h"
 
+#if defined( __HB_COMPILER__ )
+   #include "hbcomp.h"
+#endif
+
 static char * s_OperTable[] = {
    "",               /* HB_ET_NONE      */
    "ExtCodeblock",   /* HB_ET_EXTBLOCK  */

@@ -310,7 +310,7 @@ typedef struct _HB_VALUE
    PHB_ITEM    pVarItem;
    HB_COUNTER  counter;
    HB_HANDLE   hPrevMemvar;
-} HB_VALUE, * PHB_VALUE, * PHB_VALUE;
+} HB_VALUE, * PHB_VALUE;
 
 typedef struct _HB_NESTED_CLONED
 {

@@ -183,7 +183,7 @@ $(OBJ_DIR)$(DIR_SEP)macroy.c : $(MACRO_Y)
 	$(BISON_CMD2)
 
 $(OBJ_DIR)$(DIR_SEP)harboury$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)harboury.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)macroy$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)macroy.c
 	$(CC_CMD)
@@ -1413,10 +1413,10 @@ $(OBJ_DIR)$(DIR_SEP)hbdict.c : $(HBDICT_DIR)$(DIR_SEP)hbdict.prg
 # HARBOUR.EXE rules
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)hbmain$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbmain.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)harbour$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)harbour.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(COMPILER_DIR)$(DIR_SEP)expropta.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexpra.c
 	$(TYPE) $(COMPILER_DIR)$(DIR_SEP)expropta.c > $(OBJ_DIR)$(DIR_SEP)expropta.c.tmp
@@ -1435,76 +1435,127 @@ $(COMPILER_DIR)$(DIR_SEP)hbslex.c : $(COMPILER_DIR)$(DIR_SEP)harbour.slx
 	$(COPY) $(OBJ_DIR)$(DIR_SEP)hbslex.c.tmp $(COMPILER_DIR)$(DIR_SEP)hbslex.c
 
 $(OBJ_DIR)$(DIR_SEP)hbslex$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbslex.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)cmdcheck$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)cmdcheck.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)hbusage$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbusage.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)hbident$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbident.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)hbgenerr$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbgenerr.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)hbpcode$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbpcode.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)hbdead$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbdead.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)comptool$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)comptool.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)hbstripl$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbstripl.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)hbfix$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbfix.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)genc$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)genc.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)genhrb$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)genhrb.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)expropta$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)expropta.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)exproptb$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)exproptb.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)exproptc$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)exproptc.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)hbfunchk$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbfunchk.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)gencc$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)gencc.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)gencc1$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)gencc1.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)gencobj$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)gencobj.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)hbpcstat$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbpcstat.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)hbdbginf$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbdbginf.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)hblbl$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hblbl.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)ppcomp$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)ppcomp.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)ppword$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)ppword.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)harbour_expropt1$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)expropt1.c
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)harbour_expropt2$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)expropt2.c
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)harbour_hbstr$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbstr.c
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)harbour_hbfopen$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbfopen.c
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)harbour_hbfsapi$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbfsapi.c
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)harbour_hbdate$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbdate.c
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)harbour_hbhash$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbhash.c
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)harbour_hbgete$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbgete.c
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)harbour_hbmem$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbmem.c
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)harbour_hbprintf$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbprintf.c
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)harbour_hbver$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbver.c
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)harbour_reserved$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)reserved.c
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)harbour_pplib$(OBJEXT) : $(PP_DIR)$(DIR_SEP)pplib.c
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)harbour_pplib2$(OBJEXT) : $(PP_DIR)$(DIR_SEP)pplib2.c
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)harbour_pplib3$(OBJEXT) : $(PP_DIR)$(DIR_SEP)pplib3.c
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)harbour_ppcore$(OBJEXT) : $(PP_DIR)$(DIR_SEP)ppcore.c
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)harbour_pptable$(OBJEXT) : $(PP_DIR)$(DIR_SEP)pptable.c
+	$(CC_CMD_HARBOUR)
 
 #===============================================================================
 # RDDADS.LIB rules

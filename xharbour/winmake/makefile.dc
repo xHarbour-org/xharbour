@@ -52,9 +52,10 @@ PROJECT=$(HBLIB_EXE) $(ST_PROJECT)
 PROJECT=$(MT_PROJECT)
 !endif
 
-!if !("$(HB_DIR_ADS)"=="")
 ACE_DLL=$(HB_DIR_ADS)\ace32.dll
 ACE_LIB=$(ACE32_LIB)
+
+!if !("$(HB_DIR_ADS)"=="")
 PROJECT=\
 	$(PROJECT)\
 	$(ACE_LIB)
@@ -115,6 +116,7 @@ HB_CMD         =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN    =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) -d_USE_APPMAIN_ $** -o$@
 DLLEXE_LINK_CMD=$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) -exetype:nt -subsystem:console -noi $**,$@,,$(PDFLITE_LIB) $(HARBOUR_DLL_LIB)
 CC_CMD         =$(CC) $(CLIBFLAGS) $(CPPFLAGS) -o$@ $**
+CC_CMD_HARBOUR =$(CC) $(CLIBFLAGS) -D__HB_COMPILER__ $(CC_COMP_DEFINES) $(CPPFLAGS) -o$@ $**
 CCC_CMD        =$(CC) $(CLIBFLAGS) -o$@ $**
 CC_CMD_ZIP     =$(CC) -o+s -cpp -mn -I"include" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(HBZIP_DIR)\include" -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -o$@ $**
 LIB_CMD        =$(LIBEXE) $(ARFLAGS) $@ $**

@@ -8,6 +8,63 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-16 17:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbapi.h
+    ! remove redundant type: * PHB_VALUE
+
+  * include/hbcomp.h
+  * include/hbexprb.c
+  * include/hbexprc.c
+  * source/common/expropt1.c
+  * source/common/hbfopen.c
+  * source/common/hbfsapi.c
+  * source/common/hbgete.c
+  * source/common/hbhash.c
+  * source/common/hbprintf.c
+  * source/common/hbstr.c
+  * source/pp/ppcore.c
+  * winmake/makefile.bc
+  * winmake/makefile.vc
+  * winmake/makefile.dc
+  * winmake/makefile.pc
+  * winmake/makefile.gc
+  * winmake/makefile.wc
+    ! use hb_xgrabEx, hb_xreallocEx, hb_xfreeEx, hb_exitEx in stage of building
+      Harbour Compiler. These changes make the log on memory leaks be a bit more
+      readable, because now, the associated file name, function name and line #
+      from where the memory was booked are printed. Although the call-tree is not
+      displayed, this configuration should look better than the previous one.
+
+    ! pending the fixes on memory leaks, Harbour Compiler is by default will be
+      created with the above mentioned memory manager, unless a flag to disable
+      it is defined via: SET HB_COMP_NO_TRACE=1
+
+    ; TO CONSIDER: integrate dmalloc http://dmalloc.com to have more complete
+      tracings.
+
+  * winmake/makefile.bc
+  * winmake/makefile.vc
+  * winmake/makefile.dc
+  * winmake/makefile.pc
+  * winmake/makefile.gc
+  * winmake/makefile.wc
+  * winmake/common.mak
+  * winmake/common3.mak
+  * winmake/compile.mak
+    ! include all members of common.lib and pp.lib to compiler.lib, so that neither
+      common.lib nor pp.lib is now required to build harbour.exe
+
+    ; NOTE: Now nightmare may haunt us if we try to compile PRG with -w3 flag
+      particularly PRG contains classes and INLINE method such as source/rtl/tbcolumn.prg.
+      Pending fixes to the problems, I strongly suggest to avoid using -w3 flag.
+      -w2 flag will also throw memory leak notification, particularly when program
+      contains error, example:
+      //--------------
+      PROCEDURE MAIN()
+      x
+      //--------------
+      :-(
+
 2012-12-16 06:10 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/common.mak
     + macro for import lib of aceXX.DLL (ACE32_LIB and ACE64_LIB)

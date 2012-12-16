@@ -22,8 +22,10 @@ LNK_DEBUGFLAGS=-DEBUG
 !endif
 
 !if ("$(HB_ARCH)"=="64")
+ACE_LIB   =$(ACE64_LIB)
 HB_MACHINE=X64
 !else
+ACE_LIB   =$(ACE32_LIB)
 HB_MACHINE=X86
 CPLUSPLUS =1
 !endif
@@ -204,6 +206,7 @@ RC_CMD         =$(RC) -r -i$(CC_DIR)\include -fo $@ $**
 HB_CMD         =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN    =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) -d_USE_APPMAIN_ $** -o$@
 CC_CMD         =$(CC) $(CLIBFLAGS) $(CPPFLAGS) -Fo$@ $**
+CC_CMD_HARBOUR =$(CC) $(CLIBFLAGS) -D__HB_COMPILER__ $(CC_COMP_DEFINES) $(CPPFLAGS) -Fo$@ $**
 CCC_CMD        =$(CC) $(CLIBFLAGS) -Fo$@ $**
 LIB_CMD        =$(LIBEXE) -MACHINE:$(HB_MACHINE) -NOLOGO -OUT:$@ $**
 LIB_CMD_1      =$(LIB_CMD)

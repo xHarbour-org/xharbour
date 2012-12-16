@@ -1821,8 +1821,26 @@ COMPILER_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hblbl$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)ppcomp$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)ppword$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)ppcore$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)hbslex$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)hbslex$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)harbour_expropt1$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)harbour_expropt2$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)harbour_hbstr$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)harbour_hbfopen$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)harbour_hbfsapi$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)harbour_hbdate$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)harbour_hbhash$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)harbour_hbgete$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)harbour_hbmem$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)harbour_hbprintf$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)harbour_hbver$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)harbour_reserved$(OBJEXT)\
+	\
+	$(OBJ_DIR)$(DIR_SEP)harbour_pptable$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)harbour_ppcore$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)harbour_pplib$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)harbour_pplib2$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)harbour_pplib3$(OBJEXT)
 
 #===============================================================================
 # HBRUN.EXE rules

@@ -17,8 +17,10 @@ LINKEXE   =LINK386
 LIBEXE    =LIB386
 IMPLIBEXE =WLIB
 
+ACE_DLL   =$(HB_DIR_ADS)\ace32.dll
+ACE_LIB   =$(ACE32_LIB)
+
 !if !("$(HB_DIR_ADS)"=="")
-ACE_DLL=$(HB_DIR_ADS)\ace32.dll
 !if !("$(HB_ADS_IMPLIB)"=="no") && !("$(HB_ADS_IMPLIB)"=="0")
 HB_ADS_CREATEIMPLIB=1
 !else
@@ -59,7 +61,6 @@ HBDOC_EXE_OBJS=\
 !if ("$(HB_MT)"=="")
 PROJECT=$(ST_PROJECT)
 !if ("$(HB_ADS_CREATEIMPLIB)"=="1")
-ACE_LIB=$(ACE32_LIB)
 PROJECT=\
 	$(PROJECT)\
 	$(ACE32_LIB)
@@ -214,9 +215,10 @@ RC_CMD          =$(RC) -r -i$(CC_DIR)\include -fo $@ $**
 HB_CMD          =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN     =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) -d_USE_APPMAIN_ $** -o$@
 CC_CMD          =$(CC) $(CLIBFLAGS) -fo$@ $**
+CC_CMD_HARBOUR  =$(CC) $(CLIBFLAGS) -D__HB_COMPILER__ $(CC_COMP_DEFINES) -fo$@ $**
 CCC_CMD         =$(CC_CMD)
 CC_CMD_OW32     =$(CC) $(CLIBFLAGS_OW32) -fo$@ $**
-CC_CMD_ZIP      =$(CCP) $(CLIBFLAGS) -i=$(HBZIP_DIR)\include -fo$@ $**
+CC_CMD_ZIP      =$(CCP) $(CLIBFLAGS) -I$(HBZIP_DIR)\include -fo$@ $**
 LIB_CMD         =$(LIBEXE) -nologo -out:$@ $**
 LIB_CMD_1       =$(LIB_CMD)
 LINK_CMD        =$(LINKEXE) $(LNK_DEBUGFLAGS) -nologo -subsystem:console -out:$@ $**

@@ -62,6 +62,10 @@
 #include "hb_io.h"
 #include "hbset.h"
 
+#if defined( __HB_COMPILER__ )
+   #include "hbcomp.h"
+#endif
+
 #if defined( HB_OS_WIN )
    #if ! defined( INVALID_FILE_ATTRIBUTES )
       #define INVALID_FILE_ATTRIBUTES  ( ( DWORD ) -1 )

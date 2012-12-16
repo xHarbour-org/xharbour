@@ -97,6 +97,10 @@
 #include "hbfloat.h"
 #include <stddef.h>
 
+#if defined( __HB_COMPILER__ )
+   #include "hbcomp.h"
+#endif
+
 #if defined( HB_LONG_DOUBLE_OFF ) && ! defined( __NO_LONGDOUBLE__ )
 #  define __NO_LONGDOUBLE__
 #endif

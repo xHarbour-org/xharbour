@@ -836,14 +836,51 @@ extern BYTE *         hb_compHideString( int iType, char * szText, HB_SIZE ulStr
 extern void           hb_comp_datetimeEncode( long *plDate, long *plTime, int iYear, int iMonth, int iDay, int iHour, int iMinute, double dSeconds, int iAmPm, int * piOk );
 
 /* Free memory upon exit */
-extern void hb_compCleanUp( void );
+extern void           hb_compCleanUp( void );
 
 /* Checking if variable name is reserved by PP */
-extern BOOL hb_compReservedPPName( char * szName );
+extern BOOL           hb_compReservedPPName( char * szName );
 
 /* Writing Harbour compiler output */
-extern void hb_compOutStd( char * szMessage );
-extern void hb_compOutErr( char * szMessage );
+extern void           hb_compOutStd( char * szMessage );
+extern void           hb_compOutErr( char * szMessage );
+
+/* Alternate memory tracer */
+extern void *         hb_xgrabEx( HB_SIZE ulSize, const char* szSourceFile, int iLine, const char* szFuncName );
+extern void *         hb_xreallocEx( void * pMem, HB_SIZE ulSize, const char* szSourceFile, int iLine, const char* szFuncName );
+extern void           hb_xfreeEx( void * pMem, const char* szSourceFile, int iLine, const char* szFuncName );
+extern void           hb_xexitEx( void );
+
+#if defined( __HB_COMPILER__ )
+
+#if defined( __BORLANDC__ )
+#   define __HB_FUNC_NAME__     __FUNC__
+#elif defined( __POCC__ )
+#   define __HB_FUNC_NAME__     __func__
+#elif defined( _MSC_VER )
+#   if ( _MSC_VER >= 1300 )
+#      define __HB_FUNC_NAME__  __FUNCTION__
+#   else
+       /* MSVS 6.0 is not C99 compliance yet. TODO: create an alternative */
+#      define __HB_FUNC_NAME__  "N/A"
+#  endif
+#else
+#   define __HB_FUNC_NAME__     __func__
+#endif
+
+#undef  hb_xgrab
+#define hb_xgrab( p )       hb_xgrabEx( p, __FILE__, __LINE__, __HB_FUNC_NAME__ )
+
+#undef  hb_xrealloc
+#define hb_xrealloc( p, x ) hb_xreallocEx( p, x, __FILE__, __LINE__, __HB_FUNC_NAME__ )
+
+#undef  hb_xfree
+#define hb_xfree( p )       hb_xfreeEx( p, __FILE__, __LINE__, __HB_FUNC_NAME__ )
+
+#undef  hb_xexit
+#define hb_xexit            hb_xexitEx
+
+#endif /* __HB_COMPILER__ */
 
 HB_EXTERN_END
 

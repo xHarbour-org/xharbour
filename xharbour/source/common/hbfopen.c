@@ -53,6 +53,10 @@
 #include "hbapi.h"
 #include "hbapifs.h"
 
+#if defined( __HB_COMPILER__ )
+   #include "hbcomp.h"
+#endif
+
 FILE * hb_fopen( const char * path, const char * mode )
 {
    char *   pszFree = NULL;

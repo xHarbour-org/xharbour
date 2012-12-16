@@ -65,6 +65,10 @@
 #include "hbmacro.ch"
 #include "hbdate.h"
 
+#if defined( __HB_COMPILER__ )
+   #include "hbcomp.h"
+#endif
+
 extern int hb_compLocalGetPos( char * szVarName );
 extern int hb_compStaticGetPos( char *, PFUNCTION );
 extern USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName );

@@ -68,6 +68,10 @@
 
 #include "hbexemem.h"
 
+#if defined( __HB_COMPILER__ )
+   #include "hbcomp.h"
+#endif
+
 extern int hb_compLocalGetPos( char * szVarName );   /* returns the order + 1 of a local variable */
 
 /* ************************************************************************* */

@@ -29,6 +29,10 @@ else
 HB_TARGET =-mtune=pentium -march=i586
 endif
 
+ifneq ($(HB_COMP_NO_TRACE),1)
+CC_COMP_DEFINES   =-D__HB_COMP_TRACE__
+endif
+
 ifeq ($(HB_OPTIMFLAGS),)
 HB_OPTIMFLAGS     =-gc0
 endif
@@ -158,7 +162,7 @@ COMPILERLIBS=\
 	-lole32 -luuid -loleaut32 -lws2_32
 
 EXE_LIBS     =$(HARBOUR_LIBS) $(COMPILERLIBS)
-HRB_LIBS     =-L$(LIB_DIR) -Wl,--start-group -lpp$(HB_ARCH)$(HB_DEBUG) -lcommon$(HB_ARCH)$(HB_DEBUG) -lcompiler$(HB_ARCH)$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
+HRB_LIBS     =-L$(LIB_DIR) -Wl,--start-group -lcompiler$(HB_ARCH)$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
 CMN_LIBS     =-L$(LIB_DIR) -lcommon$(HB_ARCH)$(HB_DEBUG) $(COMPILERLIBS)
 
 ifeq ($(HB_MT),)
@@ -297,6 +301,7 @@ HRB_LINK_CMD    =$(CC) $(CC_DEBUGFLAGS) -mconsole -Wall -o $(HARBOUR_EXE) $(HARB
 HB_CMD          =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) -o$@ $^
 HB_CMD_MAIN     =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) -d"_USE_APPMAIN_" -o$@ $^
 CC_CMD          =$(CC) $(CLIBFLAGS) -o $@ $^
+CC_CMD_HARBOUR  =$(CC) -D__HB_COMPILER__ $(CC_COMP_DEFINES) $(CLIBFLAGS) -o $@ $^
 CCC_CMD         =$(CC_CMD)
 CC_CMD_ZIP      =$(CCP) $(CC_DEBUGFLAGS) -I"include" -I"$(HBZIP_DIR)/include" -D_WIN32 $(ZIP_DEBUGFLAGS) -fpermissive -c -o $@ $^
 

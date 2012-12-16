@@ -71,6 +71,17 @@
 #include "hbver.h"
 #include "hbdate.h"
 
+#if defined( __HB_COMPILER__ )
+   #include "hbcomp.h"
+   #undef HB_PP_WARN_OVERLOADED_REDEF
+   #undef HB_PP_ERR_EMPTY_OPTIONAL
+   #undef HB_PP_ERR_UNCLOSED_OPTIONAL
+   #undef HB_PP_ERR_DIRECTIVE_ENDIF
+   #undef HB_PP_ERR_DIRECTIVE_ELSE
+   #undef HB_PP_ERR_EXPLICIT
+   #undef HB_PP_ERR_CANNOT_OPEN_RULES
+#endif
+
 HB_EXTERN_BEGIN
 extern void hb_compSetDeferredFlagOn( void );
 extern void hb_compSetCOutput( int iOutput );

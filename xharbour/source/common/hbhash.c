@@ -53,6 +53,10 @@
 #include "hbhash.h"
 #include "hbexemem.h"
 
+#if defined( __HB_COMPILER__ )
+   #include "hbcomp.h"
+#endif
+
 static PHB_HASH_ITEM hb_hashItemNew( HB_SIZE ulKey, void * pValue )
 {
    PHB_HASH_ITEM pItem = ( PHB_HASH_ITEM ) hb_xgrab( sizeof( HB_HASH_ITEM ) );

@@ -61,6 +61,10 @@
 #include "hbapi.h"
 #include "hbexemem.h"
 
+#if defined( __HB_COMPILER__ )
+   #include "hbcomp.h"
+#endif
+
 /* NOTE: Warning, this function _may_ return NULL as a result if
          the environment variable reading fails form some reason.
          If the return value is not NULL, the caller must free

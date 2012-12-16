@@ -202,6 +202,7 @@ LINKERFLAGS    =$(LINKERFLAGS) $(LFLAGS)
 HB_CMD         =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN    =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) -d_USE_APPMAIN_ $** -o$@
 CC_CMD         =$(CC) -c -tWM $(CLIBFLAGS) -o$@ $**
+CC_CMD_HARBOUR =$(CC) -c -tWM -D__HB_COMPILER__ $(CC_COMP_DEFINES) $(CLIBFLAGS) -o$@ $**
 CCC_CMD        =$(CC_CMD)
 CC_CMD_ZIP     =$(CC) -c $(CC_DEBUGFLAGS) -I"$(HBZIP_DIR)\include" -I"include" -vi -Ve -R- -H- $(OPTFLAGS) -w- -X- -b -k- -o$@ $**
 LINK_CMD       =$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) -ap -Tpe -x -Gn -C -L$(LIB_DIR) $(LFLAGS) $(BCC_STARTUP_OBJ) $**,$@,,
