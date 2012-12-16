@@ -48,7 +48,6 @@ extern void cleansPair( void );
 
 /* remove this 'undef' when number of memory leaks will be reduced to
    reasonable size */
-//#undef HB_FM_STATISTICS
 
 #if ( defined( __BORLANDC__ ) && ( __BORLANDC__ == 1568 ) )
 /* Disabled: Borland C 6.2 internal error when compiling dlmalloc.c */
@@ -57,7 +56,7 @@ extern void cleansPair( void );
    #endif
 #endif
 
-#if defined( HB_FM_STATISTICS )
+#if defined( __HB_COMP_TRACE__ )
 /* Disable external memory manager when debugging */
    #undef HB_FM_DL_ALLOC
 #endif
@@ -155,7 +154,7 @@ static HANDLE hProcessHeap = 0;
 #  endif
 #endif
 
-#ifdef HB_FM_STATISTICS
+#if defined( __HB_COMP_TRACE__ )
 
 #define HB_MEMINFO_SIGNATURE  0xDEADBEAF
 #define HB_MEMSTR_BLOCK_MAX   32
@@ -164,9 +163,11 @@ typedef struct _HB_MEMINFO
 {
    struct _HB_MEMINFO * pPrevBlock;
    struct _HB_MEMINFO * pNextBlock;
-   ULONG ulSize;
-   int iSourceLine;
-   UINT32 Signature;
+   ULONG                ulSize;
+   const char *         szSourceFile;
+   const char *         szFuncName;
+   int                  iSourceLine;
+   UINT32               Signature;
 } HB_MEMINFO, * PHB_MEMINFO;
 
 #ifdef HB_ALLOC_ALIGNMENT
@@ -182,156 +183,14 @@ static LONG          s_ulMemoryMaxBlocks     = 0;  /* maximum number of used mem
 static LONG          s_ulMemoryMaxConsumed   = 0;  /* memory size consumed */
 static LONG          s_ulMemoryConsumed      = 0;  /* memory max size consumed */
 
-#endif /* HB_FM_STATISTICS */
+#endif /* __HB_COMP_TRACE__ */
 
-#ifndef hb_xgrab
-void * hb_xgrab( HB_SIZE ulSize )        /* allocates fixed memory, exits on failure */
-{
-#ifdef HB_FM_STATISTICS
-
-   void *   pMem  = malloc( ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
-
-   if( pMem )
-   {
-      if( s_pMemBlocks )
-         s_pMemBlocks->pPrevBlock = ( PHB_MEMINFO ) pMem;
-      ( ( PHB_MEMINFO ) pMem )->pNextBlock   = s_pMemBlocks;
-      ( ( PHB_MEMINFO ) pMem )->pPrevBlock   = NULL;
-      s_pMemBlocks                           = ( PHB_MEMINFO ) pMem;
-      ( ( PHB_MEMINFO ) pMem )->ulSize       = ulSize;
-      ( ( PHB_MEMINFO ) pMem )->iSourceLine  = hb_comp_iLine;
-      ( ( PHB_MEMINFO ) pMem )->Signature    = HB_MEMINFO_SIGNATURE;
-      HB_PUT_LE_UINT32( ( ( BYTE * ) pMem ) + HB_MEMINFO_SIZE + ulSize, HB_MEMINFO_SIGNATURE );
-
-      s_ulMemoryConsumed                     += ulSize;
-      if( s_ulMemoryMaxConsumed < s_ulMemoryConsumed )
-         s_ulMemoryMaxConsumed = s_ulMemoryConsumed;
-      s_ulMemoryBlocks++;
-      if( s_ulMemoryMaxBlocks < s_ulMemoryBlocks )
-         s_ulMemoryMaxBlocks = s_ulMemoryBlocks;
-      pMem = ( BYTE * ) pMem + HB_MEMINFO_SIZE;
-   }
-#else
-   void *   pMem  = malloc( ( size_t ) ulSize );
-#endif
-
-   if( ! pMem )
-   {
-      char szSize[ 32 ];
-
-      hb_snprintf( szSize, sizeof( szSize ), "%lu", (long unsigned int) ulSize );
-      hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMALLOC, szSize, NULL );
-   }
-
-   return pMem;
-}
-#endif
-
-#ifndef hb_xrealloc
-void * hb_xrealloc( void * pMem, HB_SIZE ulSize )       /* reallocates memory */
-{
-#ifdef HB_FM_STATISTICS
-   PHB_MEMINFO pMemBlock;
-   ULONG       ulMemSize;
-   void *      pResult;
-
-   if( ulSize == 0 )
-   {
-      if( pMem )
-         hb_xfree( pMem );
-      return NULL;
-   }
-   else if( ! pMem )
-      return hb_xgrab( ulSize );
-
-   pMemBlock   = ( PHB_MEMINFO ) ( ( BYTE * ) pMem - HB_MEMINFO_SIZE );
-   ulMemSize   = pMemBlock->ulSize;
-
-   if( pMemBlock->Signature != HB_MEMINFO_SIGNATURE )
-      hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMCORRUPT, NULL, NULL );
-
-   if( HB_GET_LE_UINT32( ( ( BYTE * ) pMem ) + ulMemSize ) != HB_MEMINFO_SIGNATURE )
-      hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMOVERFLOW, NULL, NULL );
-
-   HB_PUT_LE_UINT32( ( ( BYTE * ) pMem ) + ulMemSize, 0 );
-
-   pResult  = realloc( pMemBlock, ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
-
-   if( pResult )
-   {
-      if( s_pMemBlocks == pMemBlock )
-         s_pMemBlocks = ( PHB_MEMINFO ) pResult;
-      else
-         ( ( PHB_MEMINFO ) pResult )->pPrevBlock->pNextBlock = ( PHB_MEMINFO ) pResult;
-
-      if( ( ( PHB_MEMINFO ) pResult )->pNextBlock )
-         ( ( PHB_MEMINFO ) pResult )->pNextBlock->pPrevBlock = ( PHB_MEMINFO ) pResult;
-      s_ulMemoryConsumed += ( ulSize - ulMemSize );
-
-      if( s_ulMemoryMaxConsumed < s_ulMemoryConsumed )
-         s_ulMemoryMaxConsumed = s_ulMemoryConsumed;
-
-      ( ( PHB_MEMINFO ) pResult )->ulSize = ulSize;  /* size of the memory block */
-      HB_PUT_LE_UINT32( ( ( BYTE * ) pResult ) + ulSize + HB_MEMINFO_SIZE, HB_MEMINFO_SIGNATURE );
-      pResult                             = ( BYTE * ) pResult + HB_MEMINFO_SIZE;
-   }
-#else
-   void *   pResult  = realloc( pMem, ( size_t ) ulSize );
-#endif
-
-   if( ! pResult && ulSize )
-   {
-      char szSize[ 32 ];
-
-      hb_snprintf( szSize, sizeof( szSize ), "%lu", (long unsigned int) ulSize );
-      hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMREALLOC, szSize, NULL );
-   }
-
-   return pResult;
-}
-#endif
-
-#ifndef hb_xfree
-void hb_xfree( void * pMem )            /* frees fixed memory */
-{
-   if( pMem )
-   {
-#ifdef HB_FM_STATISTICS
-      PHB_MEMINFO pMemBlock = ( PHB_MEMINFO ) ( ( BYTE * ) pMem - HB_MEMINFO_SIZE );
-
-      if( pMemBlock->Signature != HB_MEMINFO_SIGNATURE )
-         hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMCORRUPT, NULL, NULL );
-
-      if( HB_GET_LE_UINT32( ( ( BYTE * ) pMem ) + pMemBlock->ulSize ) != HB_MEMINFO_SIGNATURE )
-         hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMOVERFLOW, NULL, NULL );
-
-      s_ulMemoryConsumed -= pMemBlock->ulSize;
-      s_ulMemoryBlocks--;
-      if( s_pMemBlocks == pMemBlock )
-         s_pMemBlocks = pMemBlock->pNextBlock;
-      else
-         pMemBlock->pPrevBlock->pNextBlock = pMemBlock->pNextBlock;
-
-      if( pMemBlock->pNextBlock )
-         pMemBlock->pNextBlock->pPrevBlock = pMemBlock->pPrevBlock;
-
-      pMemBlock->Signature = 0;
-      HB_PUT_LE_UINT32( ( ( BYTE * ) pMem ) + pMemBlock->ulSize, 0 );
-      pMem                 = ( BYTE * ) pMem - HB_MEMINFO_SIZE;
-#endif
-
-      free( pMem );
-   }
-   else
-      hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMFREE, NULL, NULL );
-}
-#endif
 
 HB_SIZE hb_xquery( USHORT uiMode )
 {
    ULONG ulResult = 0;
 
-#ifdef HB_FM_STATISTICS
+#if defined( __HB_COMP_TRACE__ )
    switch( uiMode )
    {
       case HB_MEM_USED:
@@ -348,7 +207,7 @@ HB_SIZE hb_xquery( USHORT uiMode )
    return ulResult;
 }
 
-#ifdef HB_FM_STATISTICS
+#if defined( __HB_COMP_TRACE__ )
 static char * hb_memToStr( char * szBuffer, void * pMem, ULONG ulSize )
 {
    unsigned char *   byMem = ( BYTE * ) pMem;
@@ -391,9 +250,170 @@ static char * hb_memToStr( char * szBuffer, void * pMem, ULONG ulSize )
 }
 #endif
 
-void hb_xexit( void )
+/* allocates fixed memory, exits on failure
+ */
+void * hb_xgrabEx( HB_SIZE ulSize, const char* szSourceFile, int iLine, const char*  szFuncName )
 {
-#ifdef HB_FM_STATISTICS
+#if defined( __HB_COMP_TRACE__ )
+
+   void *   pMem  = malloc( ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
+
+   if( pMem )
+   {
+      if( s_pMemBlocks )
+         s_pMemBlocks->pPrevBlock = ( PHB_MEMINFO ) pMem;
+      ( ( PHB_MEMINFO ) pMem )->pNextBlock   = s_pMemBlocks;
+      ( ( PHB_MEMINFO ) pMem )->pPrevBlock   = NULL;
+      s_pMemBlocks                           = ( PHB_MEMINFO ) pMem;
+      ( ( PHB_MEMINFO ) pMem )->ulSize       = ulSize;
+      ( ( PHB_MEMINFO ) pMem )->szSourceFile = szSourceFile;
+      ( ( PHB_MEMINFO ) pMem )->szFuncName   = szFuncName;
+      ( ( PHB_MEMINFO ) pMem )->iSourceLine  = iLine;
+      ( ( PHB_MEMINFO ) pMem )->Signature    = HB_MEMINFO_SIGNATURE;
+      HB_PUT_LE_UINT32( ( ( BYTE * ) pMem ) + HB_MEMINFO_SIZE + ulSize, HB_MEMINFO_SIGNATURE );
+
+      s_ulMemoryConsumed                     += ulSize;
+      if( s_ulMemoryMaxConsumed < s_ulMemoryConsumed )
+         s_ulMemoryMaxConsumed = s_ulMemoryConsumed;
+      s_ulMemoryBlocks++;
+      if( s_ulMemoryMaxBlocks < s_ulMemoryBlocks )
+         s_ulMemoryMaxBlocks = s_ulMemoryBlocks;
+      pMem = ( BYTE * ) pMem + HB_MEMINFO_SIZE;
+   }
+#else
+   void *   pMem  = malloc( ( size_t ) ulSize );
+   HB_SYMBOL_UNUSED( szSourceFile );
+   HB_SYMBOL_UNUSED( szFuncName );
+   HB_SYMBOL_UNUSED( iLine );
+#endif
+
+   if( ! pMem )
+   {
+      char szSize[ 32 ];
+
+      hb_snprintf( szSize, sizeof( szSize ), "%lu", (long unsigned int) ulSize );
+      hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMALLOC, szSize, NULL );
+   }
+
+   return pMem;
+}
+
+/* frees fixed memory
+ */
+void hb_xfreeEx( void * pMem, const char* szSourceFile, int iLine, const char*  szFuncName  )
+{
+   if( pMem )
+   {
+#if defined( __HB_COMP_TRACE__ )
+      PHB_MEMINFO pMemBlock = ( PHB_MEMINFO ) ( ( BYTE * ) pMem - HB_MEMINFO_SIZE );
+
+      if( pMemBlock->Signature != HB_MEMINFO_SIGNATURE )
+         hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMCORRUPT, NULL, NULL );
+
+      if( HB_GET_LE_UINT32( ( ( BYTE * ) pMem ) + pMemBlock->ulSize ) != HB_MEMINFO_SIGNATURE )
+         hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMOVERFLOW, NULL, NULL );
+
+      s_ulMemoryConsumed -= pMemBlock->ulSize;
+      s_ulMemoryBlocks--;
+      if( s_pMemBlocks == pMemBlock )
+         s_pMemBlocks = pMemBlock->pNextBlock;
+      else
+         pMemBlock->pPrevBlock->pNextBlock = pMemBlock->pNextBlock;
+
+      if( pMemBlock->pNextBlock )
+         pMemBlock->pNextBlock->pPrevBlock = pMemBlock->pPrevBlock;
+
+      pMemBlock->szSourceFile = szSourceFile;
+      pMemBlock->szFuncName   = szFuncName;
+      pMemBlock->iSourceLine  = iLine;
+      pMemBlock->Signature    = 0;
+      HB_PUT_LE_UINT32( ( ( BYTE * ) pMem ) + pMemBlock->ulSize, 0 );
+      pMem                 = ( BYTE * ) pMem - HB_MEMINFO_SIZE;
+#endif
+      HB_SYMBOL_UNUSED( szSourceFile );
+      HB_SYMBOL_UNUSED( szFuncName );
+      HB_SYMBOL_UNUSED( iLine );
+
+      free( pMem );
+   }
+   else
+      hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMFREE, NULL, NULL );
+}
+
+/* reallocates memory
+ */
+void * hb_xreallocEx( void * pMem, HB_SIZE ulSize, const char* szSourceFile, int iLine, const char*  szFuncName )
+{
+#if defined( __HB_COMP_TRACE__ )
+   PHB_MEMINFO pMemBlock;
+   ULONG       ulMemSize;
+   void *      pResult;
+
+   if( ulSize == 0 )
+   {
+      if( pMem )
+         hb_xfreeEx( pMem, szSourceFile, iLine, szFuncName );
+      return NULL;
+   }
+   else if( ! pMem )
+      return hb_xgrabEx( ulSize, szSourceFile, iLine, szFuncName );
+
+   pMemBlock   = ( PHB_MEMINFO ) ( ( BYTE * ) pMem - HB_MEMINFO_SIZE );
+   ulMemSize   = pMemBlock->ulSize;
+
+   if( pMemBlock->Signature != HB_MEMINFO_SIGNATURE )
+      hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMCORRUPT, NULL, NULL );
+
+   if( HB_GET_LE_UINT32( ( ( BYTE * ) pMem ) + ulMemSize ) != HB_MEMINFO_SIGNATURE )
+      hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMOVERFLOW, NULL, NULL );
+
+   HB_PUT_LE_UINT32( ( ( BYTE * ) pMem ) + ulMemSize, 0 );
+
+   pResult  = realloc( pMemBlock, ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
+
+   if( pResult )
+   {
+      if( s_pMemBlocks == pMemBlock )
+         s_pMemBlocks = ( PHB_MEMINFO ) pResult;
+      else
+         ( ( PHB_MEMINFO ) pResult )->pPrevBlock->pNextBlock = ( PHB_MEMINFO ) pResult;
+
+      if( ( ( PHB_MEMINFO ) pResult )->pNextBlock )
+         ( ( PHB_MEMINFO ) pResult )->pNextBlock->pPrevBlock = ( PHB_MEMINFO ) pResult;
+      s_ulMemoryConsumed += ( ulSize - ulMemSize );
+
+      if( s_ulMemoryMaxConsumed < s_ulMemoryConsumed )
+         s_ulMemoryMaxConsumed = s_ulMemoryConsumed;
+
+      ( ( PHB_MEMINFO ) pResult )->ulSize       = ulSize;  /* size of the memory block */
+      ( ( PHB_MEMINFO ) pResult )->szSourceFile = szSourceFile;
+      ( ( PHB_MEMINFO ) pResult )->szFuncName   = szFuncName;
+      ( ( PHB_MEMINFO ) pResult )->iSourceLine  = iLine;
+
+      HB_PUT_LE_UINT32( ( ( BYTE * ) pResult ) + ulSize + HB_MEMINFO_SIZE, HB_MEMINFO_SIGNATURE );
+      pResult                             = ( BYTE * ) pResult + HB_MEMINFO_SIZE;
+   }
+#else
+   void *   pResult  = realloc( pMem, ( size_t ) ulSize );
+   HB_SYMBOL_UNUSED( szSourceFile );
+   HB_SYMBOL_UNUSED( szFuncName );
+   HB_SYMBOL_UNUSED( iLine );
+#endif
+
+   if( ! pResult && ulSize )
+   {
+      char szSize[ 32 ];
+
+      hb_snprintf( szSize, sizeof( szSize ), "%lu", (long unsigned int) ulSize );
+      hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMREALLOC, szSize, NULL );
+   }
+
+   return pResult;
+}
+
+void hb_xexitEx( void )
+{
+#if defined( __HB_COMP_TRACE__ )
    if( s_ulMemoryBlocks /* || hb_cmdargCheck( "INFO" ) */ )
    {
       char        szBuffer[ HB_MAX( 3 * HB_MEMSTR_BLOCK_MAX + 1, 100 ) ];
@@ -444,11 +464,14 @@ void hb_xexit( void )
 
       for( i = 1, pMemBlock = s_pMemBlocks; pMemBlock; ++i, pMemBlock = pMemBlock->pNextBlock )
       {
-         HB_TRACE( HB_TR_ERROR, ( "Line %i Block %i %p (size %lu) \"%s\"", pMemBlock->iSourceLine - 1, i,
+         char _Error[ 256 ];
+         hb_snprintf ( _Error, sizeof(_Error), "%s(%i) %s() Block %i %p (size %lu) \"%s\"\n", pMemBlock->szSourceFile, pMemBlock->iSourceLine, pMemBlock->szFuncName, i,
                                   ( char * ) pMemBlock + HB_MEMINFO_SIZE, pMemBlock->ulSize,
                                   hb_memToStr( szBuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
-                                               pMemBlock->ulSize ) ) );
-         fprintf( hLog,"Block %i %p (size %lu) \"%s\"\n", i,
+                                               pMemBlock->ulSize ) ) ;
+
+         hb_conOutErr( _Error, 0 );
+         fprintf( hLog,"%s(%i) %s() Block %i %p (size %lu) \"%s\"\n", pMemBlock->szSourceFile, pMemBlock->iSourceLine, pMemBlock->szFuncName, i,
                                   ( char * ) pMemBlock + HB_MEMINFO_SIZE, pMemBlock->ulSize,
                                   hb_memToStr( szBuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
                                                pMemBlock->ulSize ));
@@ -458,6 +481,7 @@ void hb_xexit( void )
    }
 #endif
 }
+
 
 /* NOTE: Use as minimal calls from here, as possible.
          Don't allocate memory from this function. [vszakats] */
@@ -744,3 +768,217 @@ void hb_compOutErr( char * szMessage )
    else
       fprintf( stderr, "%s", szMessage ); fflush( stderr );
 }
+
+
+#if 0
+#ifndef hb_xgrab
+void * hb_xgrab( HB_SIZE ulSize )        /* allocates fixed memory, exits on failure */
+{
+#ifdef __HB_COMP_TRACE__
+
+   void *   pMem  = malloc( ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
+
+   if( pMem )
+   {
+      if( s_pMemBlocks )
+         s_pMemBlocks->pPrevBlock = ( PHB_MEMINFO ) pMem;
+      ( ( PHB_MEMINFO ) pMem )->pNextBlock   = s_pMemBlocks;
+      ( ( PHB_MEMINFO ) pMem )->pPrevBlock   = NULL;
+      s_pMemBlocks                           = ( PHB_MEMINFO ) pMem;
+      ( ( PHB_MEMINFO ) pMem )->ulSize       = ulSize;
+      ( ( PHB_MEMINFO ) pMem )->iSourceLine  = hb_comp_iLine;
+      ( ( PHB_MEMINFO ) pMem )->Signature    = HB_MEMINFO_SIGNATURE;
+      HB_PUT_LE_UINT32( ( ( BYTE * ) pMem ) + HB_MEMINFO_SIZE + ulSize, HB_MEMINFO_SIGNATURE );
+
+      s_ulMemoryConsumed                     += ulSize;
+      if( s_ulMemoryMaxConsumed < s_ulMemoryConsumed )
+         s_ulMemoryMaxConsumed = s_ulMemoryConsumed;
+      s_ulMemoryBlocks++;
+      if( s_ulMemoryMaxBlocks < s_ulMemoryBlocks )
+         s_ulMemoryMaxBlocks = s_ulMemoryBlocks;
+      pMem = ( BYTE * ) pMem + HB_MEMINFO_SIZE;
+   }
+#else
+   void *   pMem  = malloc( ( size_t ) ulSize );
+#endif
+
+   if( ! pMem )
+   {
+      char szSize[ 32 ];
+
+      hb_snprintf( szSize, sizeof( szSize ), "%lu", (long unsigned int) ulSize );
+      hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMALLOC, szSize, NULL );
+   }
+
+   return pMem;
+}
+#endif
+
+#ifndef hb_xrealloc
+void * hb_xrealloc( void * pMem, HB_SIZE ulSize )       /* reallocates memory */
+{
+#ifdef __HB_COMP_TRACE__
+   PHB_MEMINFO pMemBlock;
+   ULONG       ulMemSize;
+   void *      pResult;
+
+   if( ulSize == 0 )
+   {
+      if( pMem )
+         hb_xfree( pMem );
+      return NULL;
+   }
+   else if( ! pMem )
+      return hb_xgrab( ulSize );
+
+   pMemBlock   = ( PHB_MEMINFO ) ( ( BYTE * ) pMem - HB_MEMINFO_SIZE );
+   ulMemSize   = pMemBlock->ulSize;
+
+   if( pMemBlock->Signature != HB_MEMINFO_SIGNATURE )
+      hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMCORRUPT, NULL, NULL );
+
+   if( HB_GET_LE_UINT32( ( ( BYTE * ) pMem ) + ulMemSize ) != HB_MEMINFO_SIGNATURE )
+      hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMOVERFLOW, NULL, NULL );
+
+   HB_PUT_LE_UINT32( ( ( BYTE * ) pMem ) + ulMemSize, 0 );
+
+   pResult  = realloc( pMemBlock, ulSize + HB_MEMINFO_SIZE + sizeof( UINT32 ) );
+
+   if( pResult )
+   {
+      if( s_pMemBlocks == pMemBlock )
+         s_pMemBlocks = ( PHB_MEMINFO ) pResult;
+      else
+         ( ( PHB_MEMINFO ) pResult )->pPrevBlock->pNextBlock = ( PHB_MEMINFO ) pResult;
+
+      if( ( ( PHB_MEMINFO ) pResult )->pNextBlock )
+         ( ( PHB_MEMINFO ) pResult )->pNextBlock->pPrevBlock = ( PHB_MEMINFO ) pResult;
+      s_ulMemoryConsumed += ( ulSize - ulMemSize );
+
+      if( s_ulMemoryMaxConsumed < s_ulMemoryConsumed )
+         s_ulMemoryMaxConsumed = s_ulMemoryConsumed;
+
+      ( ( PHB_MEMINFO ) pResult )->ulSize = ulSize;  /* size of the memory block */
+      HB_PUT_LE_UINT32( ( ( BYTE * ) pResult ) + ulSize + HB_MEMINFO_SIZE, HB_MEMINFO_SIGNATURE );
+      pResult                             = ( BYTE * ) pResult + HB_MEMINFO_SIZE;
+   }
+#else
+   void *   pResult  = realloc( pMem, ( size_t ) ulSize );
+#endif
+
+   if( ! pResult && ulSize )
+   {
+      char szSize[ 32 ];
+
+      hb_snprintf( szSize, sizeof( szSize ), "%lu", (long unsigned int) ulSize );
+      hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMREALLOC, szSize, NULL );
+   }
+
+   return pResult;
+}
+#endif
+
+#ifndef hb_xfree
+void hb_xfree( void * pMem )            /* frees fixed memory */
+{
+   if( pMem )
+   {
+#ifdef __HB_COMP_TRACE__
+      PHB_MEMINFO pMemBlock = ( PHB_MEMINFO ) ( ( BYTE * ) pMem - HB_MEMINFO_SIZE );
+
+      if( pMemBlock->Signature != HB_MEMINFO_SIGNATURE )
+         hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMCORRUPT, NULL, NULL );
+
+      if( HB_GET_LE_UINT32( ( ( BYTE * ) pMem ) + pMemBlock->ulSize ) != HB_MEMINFO_SIGNATURE )
+         hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMOVERFLOW, NULL, NULL );
+
+      s_ulMemoryConsumed -= pMemBlock->ulSize;
+      s_ulMemoryBlocks--;
+      if( s_pMemBlocks == pMemBlock )
+         s_pMemBlocks = pMemBlock->pNextBlock;
+      else
+         pMemBlock->pPrevBlock->pNextBlock = pMemBlock->pNextBlock;
+
+      if( pMemBlock->pNextBlock )
+         pMemBlock->pNextBlock->pPrevBlock = pMemBlock->pPrevBlock;
+
+      pMemBlock->Signature = 0;
+      HB_PUT_LE_UINT32( ( ( BYTE * ) pMem ) + pMemBlock->ulSize, 0 );
+      pMem                 = ( BYTE * ) pMem - HB_MEMINFO_SIZE;
+#endif
+
+      free( pMem );
+   }
+   else
+      hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMFREE, NULL, NULL );
+}
+#endif
+
+void hb_xexit( void )
+{
+#ifdef __HB_COMP_TRACE__
+   if( s_ulMemoryBlocks /* || hb_cmdargCheck( "INFO" ) */ )
+   {
+      char        szBuffer[ HB_MAX( 3 * HB_MEMSTR_BLOCK_MAX + 1, 100 ) ];
+      PHB_MEMINFO pMemBlock;
+      int         i;
+      FILE *      hLog = hb_fopen( "fm.log", "a+" );
+
+      if( hLog )
+      {
+         char *   szPlatform  = hb_verPlatform();
+         char *   szCompiler  = hb_verCompiler();
+         char *   szHarbour   = hb_verHarbour();
+         char *   szTime      = ( char * ) hb_xgrab( 9 );
+         int      iYear, iMonth, iDay;
+
+         hb_dateToday( &iYear, &iMonth, &iDay );
+         hb_dateTimeStr( szTime );
+
+         fprintf( hLog, "Memory Allocation Report\n" );
+         fprintf( hLog, "Application: %s\n", hb_exeName() );
+         fprintf( hLog, "xHarbour Version: %s\n", szHarbour );
+         fprintf( hLog, "Compiler: %s\n", szCompiler );
+         fprintf( hLog, "Platform: %s\n", szPlatform );
+         fprintf( hLog, "Time Occured: %04d.%02d.%02d %s\n", iYear, iMonth, iDay, szTime );
+
+         hb_xfree( szPlatform );
+         hb_xfree( szCompiler );
+         hb_xfree( szHarbour  );
+         hb_xfree( szTime );
+      }
+
+      hb_conOutErr( hb_conNewLine(), 0 );
+      hb_conOutErr( "----------------------------------------", 0 );
+      hb_conOutErr( hb_conNewLine(), 0 );
+      hb_snprintf( szBuffer, sizeof( szBuffer ), "Total memory allocated: %lu bytes (%lu blocks)", s_ulMemoryMaxConsumed, s_ulMemoryMaxBlocks );
+      hb_conOutErr( szBuffer, 0 );
+
+      fprintf( hLog, "%s\n", szBuffer );
+
+      hb_conOutErr( hb_conNewLine(), 0 );
+      hb_snprintf( szBuffer, sizeof( szBuffer ), "WARNING! Memory allocated but not released: %lu bytes (%lu blocks)", s_ulMemoryConsumed, s_ulMemoryBlocks );
+      hb_conOutErr( szBuffer, 0 );
+
+      fprintf( hLog, "--------------------------------------------------------------------------------\n" );
+      fprintf( hLog, "%s\n\n", szBuffer );
+
+      hb_conOutErr( hb_conNewLine(), 0 );
+
+      for( i = 1, pMemBlock = s_pMemBlocks; pMemBlock; ++i, pMemBlock = pMemBlock->pNextBlock )
+      {
+         HB_TRACE( HB_TR_ERROR, ( "Line %i Block %i %p (size %lu) \"%s\"", pMemBlock->iSourceLine - 1, i,
+                                  ( char * ) pMemBlock + HB_MEMINFO_SIZE, pMemBlock->ulSize,
+                                  hb_memToStr( szBuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
+                                               pMemBlock->ulSize ) ) );
+         fprintf( hLog,"Block %i %p (size %lu) \"%s\"\n", i,
+                                  ( char * ) pMemBlock + HB_MEMINFO_SIZE, pMemBlock->ulSize,
+                                  hb_memToStr( szBuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
+                                               pMemBlock->ulSize ));
+      }
+      fprintf( hLog, "--------------------------------------------------------------------------------\n" );
+      fclose( hLog );
+   }
+#endif
+}
+#endif
