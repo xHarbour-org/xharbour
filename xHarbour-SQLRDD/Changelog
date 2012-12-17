@@ -7,6 +7,12 @@
    For example:
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2012-12-17 05:54 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/sqlact.c
+    ! fixed and small bug on SQLpCodeGenIntItem2 that was making sqlparser return error
+  * source/oraclip.prg
+    ! added new functions
+        
 
 2012-11-01 20:12 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
   * source/sqlrdd2.prg

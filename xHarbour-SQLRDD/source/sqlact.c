@@ -144,7 +144,7 @@ PHB_ITEM SQLpCodeGenIntItem2( int code, PHB_ITEM value, int code2, PHB_ITEM valu
    hb_itemPutNILen( hb_arrayGetItemPtr( pArray, 1 ), code, 6 );
    hb_arraySetForward( pArray, 2, value );
    hb_itemPutNILen( hb_arrayGetItemPtr( pArray, 3 ), code2, 6 );
-   hb_arraySetForward( pArray, 4, value );
+   hb_arraySetForward( pArray, 4, value2 );
 
    hb_itemRelease( value );
    hb_itemRelease( value2 );
