@@ -169,6 +169,7 @@ $(OBJ_DIR)$(DIR_SEP)hblib$(OBJEXT) : utils$(DIR_SEP)misc$(DIR_SEP)hblib.c
 #===============================================================================
 $(HBRC_EXE) : $(OBJ_DIR)$(DIR_SEP)hbrc$(OBJEXT)
 	$(LINK_CMD) $(COMPILERLIBS)
+	$(MT_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hbrc$(OBJEXT) : utils$(DIR_SEP)misc$(DIR_SEP)hbrc.c
 	$(CC_CMD)
