@@ -8,6 +8,48 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-21 09:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * utils/hbmake/hbmake.prg
+    ! harbour.exe errors not directed to file, fixed.
+
+  ; NOTES: having a quick review to the codes, there's a lot to clean up,
+    particularly MT related make variables
+
+  + utils/misc/hbrm.c
+  * winmake/common.mak
+  * winmake/common2.mak
+  * winmake/compile.mak
+  * winmake/mdir.mak
+    + small utility for deleting file, useful to remove file, particularly for
+      librarians which does not support deleting old library file when creating
+      a new one (OpenWatcom/BCC) which randomly causes corrupt file when doing
+      incremental builds.
+    ! force deleting old LIB file before creating a new one
+    ! full (hopefully) support for incremental builds, meaning, in most cases,
+      a clean build shall not be necessary. It will be enough to copy newer files
+      to working folder.
+
+  * winmake/makefile.vc
+    ! missing -MT or -MD flag when compiling hbzip.lib
+
+  * source/vm/maindllp.c
+    ! change hb_xinit()	type: int -> void
+
+  - tests/pdll55.bat
+    ! remove version specific batch file
+
+  * tests/pdllbc.bat
+  * tests/pdllvc.bat
+  * tests/pexec.prg
+  * tests/pcode.prg
+  * tests/pcode1.prg
+    ! modified per current SVN repository
+
+  ; NOTES: It looks like there's a trouble with BCC 6.50 -> pCode test program
+    per pdllbc.bat does not work. It does work with any BCC of lower versions,
+    so, until the problems resolved, I suggest that those working with pCode DLL
+    to not using BCC 6.50
+
 2012-12-17 18:56 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * winmake/compile.mak
     ! missing manifest binding to hbrc.exe when compiled with MSVS -MD mode

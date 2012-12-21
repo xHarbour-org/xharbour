@@ -1114,7 +1114,7 @@ BOOL hb_arrayGet( PHB_ITEM pArray, HB_SIZE ulIndex, PHB_ITEM pItem )  /* retriev
 }
 
 #undef hb_xinit
-int hb_xinit( void )                         /* Initialize fixed memory subsystem */
+void hb_xinit( void )                         /* Initialize fixed memory subsystem */
 {
 #if defined( __cplusplus )
    static HB_XINIT
@@ -1125,7 +1125,7 @@ int hb_xinit( void )                         /* Initialize fixed memory subsyste
    pXinit = ( HB_XINIT ) hb_GetProcAddress( "_hb_xinit" );
 
    pXinit();
-   return 1;
+   return;
 }
 
 #undef hb_xexit

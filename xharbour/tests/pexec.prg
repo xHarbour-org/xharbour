@@ -5,7 +5,6 @@
  */
 
 REQUEST HB_GT_WIN_DEFAULT
-DYNAMIC TEST_DUMP
 
 FUNCTION MAIN()
 
@@ -27,5 +26,5 @@ FUNCTION MAIN()
 
 FUNCTION CALLINGEXE( C )
 
-   ? C
-   RETURN "PROCNAME(0)=" + PROCNAME(0) + " -> " + C
+   ? __FILE__ + " " + C
+   RETURN __FILE__ + ": PROCNAME(0)=" + PROCNAME(0) + " -> " + C

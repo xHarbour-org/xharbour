@@ -9,21 +9,21 @@
 
 FUNCTION MYNUM_1( n )
 
-   ? "PROCNAME(0)=" + PROCNAME(0) +"()"
-   ? "PARAM FROM EXE=" + LTRIM(STR(N)) + " VALTYPE=" + VALTYPE( N )
+   ? __FILE__ + ": PROCNAME(0)=" + PROCNAME(0) +"()"
+   ? __FILE__ + ": PARAM FROM EXE=" + LTRIM(STR(N)) + " VALTYPE=" + VALTYPE( N )
 
    // CALLING FUNCTION IN OTHER DLL
    ? HB_LIBDO("MYTEST" ,"FROM PCODE1.DLL")
    ? HB_LIBDO("MYTEST", "HARBOUR POWER (FROM PCODE1.DLL)" )
    ? HB_LIBDO("MYNUM", 10 )
 
-   RETURN "RETURNED FROM " + PROCNAME(0) +"() -> " + LTRIM(STR(3 * n))
+   RETURN __FILE__ + ": RETURNED FROM " + PROCNAME(0) +"() -> " + LTRIM(STR(3 * n))
 
 FUNCTION MYTEST_1( c )
 
    IF !EMPTY( C )
-      ? "PROCNAME(0)=" + PROCNAME(0) +"()"
-      ? CALLINGEXE("EXECUTE CALLINGEXE() FROM DLL")
-      RETURN PROCNAME(0) + "() RETURNS: -> " + C
+      ? __FILE__ + ": PROCNAME(0)=" + PROCNAME(0) +"()"
+      ? __FILE__ + " " + CALLINGEXE( "EXECUTE CALLINGEXE() FROM DLL" )
+      RETURN __FILE__ + ": " + PROCNAME(0) + "() RETURNS: -> " + C
    ENDIF
-   RETURN PROCNAME(0) + "() RETURNS: -> " + "Hello"
+   RETURN __FILE__ + ": " + PROCNAME(0) + "() RETURNS: -> " + "Hello"

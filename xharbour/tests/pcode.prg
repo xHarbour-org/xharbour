@@ -9,15 +9,15 @@
 
 FUNCTION MYNUM( n )
 
-   ? "PROCNAME(0)=" + PROCNAME(0) +"()"
-   ? "PARAM FROM EXE=" + LTRIM(STR(N)) + " VALTYPE=" + VALTYPE( N )
-   RETURN "RETURNED FROM " + PROCNAME(0) + "() -> " + LTRIM(STR(3 * n))
+   ? __FILE__ + ": PROCNAME(0)=" + PROCNAME(0) +"()"
+   ? __FILE__ + ": PARAM FROM EXE=" + LTRIM(STR(N)) + " VALTYPE=" + VALTYPE( N )
+   RETURN __FILE__ + ": RETURNED FROM " + PROCNAME(0) + "() -> " + LTRIM(STR(3 * n))
 
 FUNCTION MYTEST( c )
 
    IF !EMPTY( C )
-      ? "PROCNAME(0)=" + PROCNAME(0) +"()"
-      ? CALLINGEXE("EXECUTE CALLINGEXE() FROM PCODE.DLL")
-      RETURN PROCNAME(0) + "() RETURNS: -> " + C
+      ? __FILE__ + ": PROCNAME(0)=" + PROCNAME(0) +"()"
+      ? __FILE__ + " " + CALLINGEXE(__FILE__ + ": EXECUTE CALLINGEXE() FROM PCODE.DLL")
+      RETURN __FILE__ + ": " + PROCNAME(0) + "() RETURNS: -> " + C
    ENDIF
-   RETURN PROCNAME(0) + "() RETURNS: -> " + "Hello"
+   RETURN __FILE__ + ": " + PROCNAME(0) + "() RETURNS: -> " + "Hello"

@@ -229,6 +229,11 @@ if exist bin\hbrc%HB_DEBUG%.tds       del bin\hbrc%HB_DEBUG%.tds
 if exist bin\hbrc%HB_DEBUG%.map       del bin\hbrc%HB_DEBUG%.map
 if exist bin\hbrc%HB_DEBUG%.cgl       del bin\hbrc%HB_DEBUG%.cgl
 
+if exist bin\hbrm%HB_DEBUG%.exe       del bin\hbrm%HB_DEBUG%.exe
+if exist bin\hbrm%HB_DEBUG%.tds       del bin\hbrm%HB_DEBUG%.tds
+if exist bin\hbrm%HB_DEBUG%.map       del bin\hbrm%HB_DEBUG%.map
+if exist bin\hbrm%HB_DEBUG%.cgl       del bin\hbrm%HB_DEBUG%.cgl
+
 if exist bin\hbextern%HB_DEBUG%.exe   del bin\hbextern%HB_DEBUG%.exe
 if exist bin\hbextern%HB_DEBUG%.tds   del bin\hbextern%HB_DEBUG%.tds
 if exist bin\hbextern%HB_DEBUG%.map   del bin\hbextern%HB_DEBUG%.map
@@ -338,6 +343,7 @@ if exist bin\%SUB_DIR%\hbtestmt%HB_DEBUG%.exe       del bin\%SUB_DIR%\hbtestmt%H
 if exist bin\%SUB_DIR%\ppgen%HB_DEBUG%.exe          del bin\%SUB_DIR%\ppgen%HB_DEBUG%.exe
 if exist bin\%SUB_DIR%\hblib%HB_DEBUG%.exe          del bin\%SUB_DIR%\hblib%HB_DEBUG%.exe
 if exist bin\%SUB_DIR%\hbrc%HB_DEBUG%.exe           del bin\%SUB_DIR%\hbrc%HB_DEBUG%.exe
+if exist bin\%SUB_DIR%\hbrm%HB_DEBUG%.exe           del bin\%SUB_DIR%\hbrm%HB_DEBUG%.exe
 if exist bin\%SUB_DIR%\hbextern%HB_DEBUG%.exe       del bin\%SUB_DIR%\hbextern%HB_DEBUG%.exe
 if exist bin\%SUB_DIR%\hbdict%HB_DEBUG%.exe         del bin\%SUB_DIR%\hbdict%HB_DEBUG%.exe
 if exist bin\%SUB_DIR%\xbscript%HB_DEBUG%.exe       del bin\%SUB_DIR%\xbscript%HB_DEBUG%.exe
@@ -427,6 +433,7 @@ if exist bin\%SUB_DIR%\hbtestMT.exp                  del bin\%SUB_DIR%\hbtestMT.
 if exist bin\%SUB_DIR%\ppgen.exp                     del bin\%SUB_DIR%\ppgen.exp
 if exist bin\%SUB_DIR%\hblib.exp                     del bin\%SUB_DIR%\hblib.exp
 if exist bin\%SUB_DIR%\hbrc.exp                      del bin\%SUB_DIR%\hbrc.exp
+if exist bin\%SUB_DIR%\hbrm.exp                      del bin\%SUB_DIR%\hbrm.exp
 if exist bin\%SUB_DIR%\xbscript.exp                  del bin\%SUB_DIR%\xbscript.exp
 
 if exist bin\%SUB_DIR%\harbour%LIBEXT%               del bin\%SUB_DIR%\harbour%LIBEXT%

@@ -18,7 +18,7 @@ CMN_LINK_CMD=$(LINK_CMD) $(CMN_LIBS)
 #===============================================================================
 # Executable dependencies and build rules
 #===============================================================================
-$(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS) $(HARBOUR_EXE_RES)
+$(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS) $(COMPILER_LIB) $(HARBOUR_EXE_RES)
 	$(HRB_LINK_CMD)
 	$(MT_CMD)
 
@@ -87,18 +87,98 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS)
 	$(MT_CMD)
 
 #===============================================================================
+# Support for Full Incremental Builds
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)hbver$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hbver.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbver.c : include$(DIR_SEP)hbver.h
+	$(TYPE) $(COMMON_DIR)$(DIR_SEP)hbver.c > $(OBJ_DIR)$(DIR_SEP)hbver.cxx
+	$(COPY) $(OBJ_DIR)$(DIR_SEP)hbver.cxx $(OBJ_DIR)$(DIR_SEP)hbver.c
+
+$(OBJ_DIR)$(DIR_SEP)cmdarg$(HB_MT)$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)cmdarg.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)cmdarg.c : ChangeLog
+	$(TYPE) $(VM_DIR)$(DIR_SEP)cmdarg.c > $(OBJ_DIR)$(DIR_SEP)cmdarg.cxx
+	$(COPY) $(OBJ_DIR)$(DIR_SEP)cmdarg.cxx $(OBJ_DIR)$(DIR_SEP)cmdarg.c
+
+$(OBJ_DIR)$(DIR_SEP)comptool$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)comptool.c
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)comptool.c : ChangeLog
+	$(TYPE) $(COMPILER_DIR)$(DIR_SEP)comptool.c > $(OBJ_DIR)$(DIR_SEP)comptool.cxx
+	$(COPY) $(OBJ_DIR)$(DIR_SEP)comptool.cxx $(OBJ_DIR)$(DIR_SEP)comptool.c
+
+$(OBJ_DIR)$(DIR_SEP)expropta$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)expropta.c
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)expropta.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexpra.c
+	$(TYPE) $(COMPILER_DIR)$(DIR_SEP)expropta.c > $(OBJ_DIR)$(DIR_SEP)expropta.cxx
+	$(COPY) $(OBJ_DIR)$(DIR_SEP)expropta.cxx $(OBJ_DIR)$(DIR_SEP)expropta.c
+
+$(OBJ_DIR)$(DIR_SEP)exproptb$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)exproptb.c
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)exproptb.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexprb.c
+	$(TYPE) $(COMPILER_DIR)$(DIR_SEP)exproptb.c > $(OBJ_DIR)$(DIR_SEP)exproptb.cxx
+	$(COPY) $(OBJ_DIR)$(DIR_SEP)exproptb.cxx $(OBJ_DIR)$(DIR_SEP)exproptb.c
+
+$(OBJ_DIR)$(DIR_SEP)exproptc$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)exproptc.c
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)exproptc.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexprc.c
+	$(TYPE) $(COMPILER_DIR)$(DIR_SEP)exproptc.c > $(OBJ_DIR)$(DIR_SEP)exproptc.cxx
+	$(COPY) $(OBJ_DIR)$(DIR_SEP)exproptc.cxx $(OBJ_DIR)$(DIR_SEP)exproptc.c
+
+$(OBJ_DIR)$(DIR_SEP)hbslex$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hbslex.c
+	$(CC_CMD_HARBOUR)
+
+$(OBJ_DIR)$(DIR_SEP)hbslex.c : $(INCLUDE_DIR2)$(DIR_SEP)simplex.c
+	$(TYPE) $(COMPILER_DIR)$(DIR_SEP)hbslex.c > $(OBJ_DIR)$(DIR_SEP)hbslex.cxx
+	$(COPY) $(OBJ_DIR)$(DIR_SEP)hbslex.cxx $(OBJ_DIR)$(DIR_SEP)hbslex.c
+
+$(OBJ_DIR)$(DIR_SEP)macroa$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)macroa.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)macroa.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexpra.c
+	$(TYPE) $(MACRO_DIR)$(DIR_SEP)macroa.c > $(OBJ_DIR)$(DIR_SEP)macroa.cxx
+	$(COPY) $(OBJ_DIR)$(DIR_SEP)macroa.cxx $(OBJ_DIR)$(DIR_SEP)macroa.c
+
+$(OBJ_DIR)$(DIR_SEP)macrob$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)macrob.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)macrob.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexprb.c
+	$(TYPE) $(MACRO_DIR)$(DIR_SEP)macrob.c > $(OBJ_DIR)$(DIR_SEP)macrob.cxx
+	$(COPY) $(OBJ_DIR)$(DIR_SEP)macrob.cxx $(OBJ_DIR)$(DIR_SEP)macrob.c
+
+$(OBJ_DIR)$(DIR_SEP)macroc$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)macroc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)macroc.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexprc.c
+	$(TYPE) $(MACRO_DIR)$(DIR_SEP)macroc.c > $(OBJ_DIR)$(DIR_SEP)macroc.cxx
+	$(COPY) $(OBJ_DIR)$(DIR_SEP)macroc.cxx $(OBJ_DIR)$(DIR_SEP)macroc.c
+
+$(OBJ_DIR)$(DIR_SEP)macroslx$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)macroslx.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)macroslx.c : $(INCLUDE_DIR2)$(DIR_SEP)simplex.c
+	$(TYPE) $(MACRO_DIR)$(DIR_SEP)macroslx.c > $(OBJ_DIR)$(DIR_SEP)macroslx.cxx
+	$(COPY) $(OBJ_DIR)$(DIR_SEP)macroslx.cxx $(OBJ_DIR)$(DIR_SEP)macroslx.c
+
+#===============================================================================
 # Resource Dependencies
 #===============================================================================
 $(HARBOUR_EXE_RES) : $(HARBOUR_EXE_RC)
 	$(RC_CMD)
 
-$(HARBOUR_EXE_RC) :
+$(HARBOUR_EXE_RC) : ChangeLog
 	$(HBRC_EXE) $(HARBOUR_EXE_RC) "xHarbour Compiler" "harbour.exe" "1999-2013, http://www.xharbour.org/" "The xHarbour Team" "xHarbour Open Source" "resource/xhb.ico"
 
 $(HARBOUR_DLL_RES) : $(HARBOUR_DLL_RC)
 	$(RC_CMD)
 
-$(HARBOUR_DLL_RC) :
+$(HARBOUR_DLL_RC) : ChangeLog
 	$(HBRC_EXE) $(HARBOUR_DLL_RC) "xHarbour Runtime" "xharbour.dll" "1999-2013, http://www.xharbour.org/" "The xHarbour Team" "xHarbour Open Source"
 
 #===============================================================================
@@ -167,11 +247,25 @@ $(OBJ_DIR)$(DIR_SEP)hblib$(OBJEXT) : utils$(DIR_SEP)misc$(DIR_SEP)hblib.c
 #===============================================================================
 # HBRC.EXE
 #===============================================================================
+$(OBJ_DIR)$(DIR_SEP)hbrc.c : ChangeLog
+	$(TYPE) utils$(DIR_SEP)misc$(DIR_SEP)hbrc.c > $(OBJ_DIR)$(DIR_SEP)hbrc.cxx
+	$(COPY) $(OBJ_DIR)$(DIR_SEP)hbrc.cxx $(OBJ_DIR)$(DIR_SEP)hbrc.c
+
+$(OBJ_DIR)$(DIR_SEP)hbrc$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hbrc.c
+	$(CC_CMD)
+
 $(HBRC_EXE) : $(OBJ_DIR)$(DIR_SEP)hbrc$(OBJEXT)
 	$(LINK_CMD) $(COMPILERLIBS)
 	$(MT_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)hbrc$(OBJEXT) : utils$(DIR_SEP)misc$(DIR_SEP)hbrc.c
+#===============================================================================
+# HBRM.EXE
+#===============================================================================
+$(HBRM_EXE) : $(OBJ_DIR)$(DIR_SEP)hbrm$(OBJEXT)
+	$(LINK_CMD) $(COMPILERLIBS)
+	$(MT_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hbrm$(OBJEXT) : utils$(DIR_SEP)misc$(DIR_SEP)hbrm.c
 	$(CC_CMD)
 
 #===============================================================================
@@ -1350,9 +1444,6 @@ $(OBJ_DIR)$(DIR_SEP)hbprintf$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbprintf.c
 $(OBJ_DIR)$(DIR_SEP)hbtrace$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbtrace.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)hbver$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbver.c
-	$(CC_CMD)
-
 $(OBJ_DIR)$(DIR_SEP)expropt1$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)expropt1.c
 	$(CC_CMD)
 
@@ -1419,25 +1510,6 @@ $(OBJ_DIR)$(DIR_SEP)hbmain$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbmain.c
 $(OBJ_DIR)$(DIR_SEP)harbour$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)harbour.c
 	$(CC_CMD_HARBOUR)
 
-$(COMPILER_DIR)$(DIR_SEP)expropta.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexpra.c
-	$(TYPE) $(COMPILER_DIR)$(DIR_SEP)expropta.c > $(OBJ_DIR)$(DIR_SEP)expropta.c.tmp
-	$(COPY) $(OBJ_DIR)$(DIR_SEP)expropta.c.tmp $(COMPILER_DIR)$(DIR_SEP)expropta.c
-
-$(COMPILER_DIR)$(DIR_SEP)exproptb.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexprb.c
-	$(TYPE) $(COMPILER_DIR)$(DIR_SEP)exproptb.c > $(OBJ_DIR)$(DIR_SEP)exproptb.c.tmp
-	$(COPY) $(OBJ_DIR)$(DIR_SEP)exproptb.c.tmp $(COMPILER_DIR)$(DIR_SEP)exproptb.c
-
-$(COMPILER_DIR)$(DIR_SEP)exproptc.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexprc.c
-	$(TYPE) $(COMPILER_DIR)$(DIR_SEP)exproptc.c > $(OBJ_DIR)$(DIR_SEP)exproptc.c.tmp
-	$(COPY) $(OBJ_DIR)$(DIR_SEP)exproptc.c.tmp $(COMPILER_DIR)$(DIR_SEP)exproptc.c
-
-$(COMPILER_DIR)$(DIR_SEP)hbslex.c : $(COMPILER_DIR)$(DIR_SEP)harbour.slx
-	$(TYPE) $(COMPILER_DIR)$(DIR_SEP)hbslex.c > $(OBJ_DIR)$(DIR_SEP)hbslex.c.tmp
-	$(COPY) $(OBJ_DIR)$(DIR_SEP)hbslex.c.tmp $(COMPILER_DIR)$(DIR_SEP)hbslex.c
-
-$(OBJ_DIR)$(DIR_SEP)hbslex$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbslex.c
-	$(CC_CMD_HARBOUR)
-
 $(OBJ_DIR)$(DIR_SEP)cmdcheck$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)cmdcheck.c
 	$(CC_CMD_HARBOUR)
 
@@ -1456,9 +1528,6 @@ $(OBJ_DIR)$(DIR_SEP)hbpcode$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbpcode.c
 $(OBJ_DIR)$(DIR_SEP)hbdead$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbdead.c
 	$(CC_CMD_HARBOUR)
 
-$(OBJ_DIR)$(DIR_SEP)comptool$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)comptool.c
-	$(CC_CMD_HARBOUR)
-
 $(OBJ_DIR)$(DIR_SEP)hbstripl$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbstripl.c
 	$(CC_CMD_HARBOUR)
 
@@ -1469,15 +1538,6 @@ $(OBJ_DIR)$(DIR_SEP)genc$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)genc.c
 	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)genhrb$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)genhrb.c
-	$(CC_CMD_HARBOUR)
-
-$(OBJ_DIR)$(DIR_SEP)expropta$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)expropta.c
-	$(CC_CMD_HARBOUR)
-
-$(OBJ_DIR)$(DIR_SEP)exproptb$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)exproptb.c
-	$(CC_CMD_HARBOUR)
-
-$(OBJ_DIR)$(DIR_SEP)exproptc$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)exproptc.c
 	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)hbfunchk$(OBJEXT) : $(COMPILER_DIR)$(DIR_SEP)hbfunchk.c
@@ -1748,9 +1808,6 @@ $(OBJ_DIR)$(DIR_SEP)classes$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)classes.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)classesc$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)classesc.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)cmdarg$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)cmdarg.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)codebloc$(HB_MT)$(OBJEXT) : $(VM_DIR)$(DIR_SEP)codebloc.c
@@ -3149,25 +3206,6 @@ $(OBJ_DIR)$(DIR_SEP)msgzhb5$(OBJEXT) : $(LANG_DIR)$(DIR_SEP)msgzhb5.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)msgzhgb$(OBJEXT) : $(LANG_DIR)$(DIR_SEP)msgzhgb.c
-	$(CC_CMD)
-
-#===============================================================================
-# MACRO.LIB rules
-#===============================================================================
-$(MACRO_DIR)$(DIR_SEP)macroslx.c : $(MACRO_DIR)$(DIR_SEP)macro.slx
-	$(TYPE) $(MACRO_DIR)$(DIR_SEP)macroslx.c > $(OBJ_DIR)$(DIR_SEP)macroslx.c.tmp
-	$(COPY) $(OBJ_DIR)$(DIR_SEP)macroslx.c.tmp $(MACRO_DIR)$(DIR_SEP)macroslx.c
-
-$(OBJ_DIR)$(DIR_SEP)macroslx$(OBJEXT) : $(MACRO_DIR)$(DIR_SEP)macroslx.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)macroa$(OBJEXT) : $(MACRO_DIR)$(DIR_SEP)macroa.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)macrob$(OBJEXT) : $(MACRO_DIR)$(DIR_SEP)macrob.c
-	$(CC_CMD)
-
-$(OBJ_DIR)$(DIR_SEP)macroc$(OBJEXT) : $(MACRO_DIR)$(DIR_SEP)macroc.c
 	$(CC_CMD)
 
 #===============================================================================

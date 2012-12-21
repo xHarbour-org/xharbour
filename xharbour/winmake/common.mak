@@ -218,6 +218,7 @@ HARBOUR_DLL_LIB =$(BIN_DIR)$(DIR_SEP)$(LIBPREFIX)xharbour$(LIBEXT)
 #===============================================================================
 HBRC_EXE    =$(BIN_DIR)$(DIR_SEP)hbrc$(HB_DEBUG).exe
 HBLIB_EXE   =$(BIN_DIR)$(DIR_SEP)hblib$(HB_DEBUG).exe
+HBRM_EXE    =$(BIN_DIR)$(DIR_SEP)hbrm$(HB_DEBUG).exe
 HARBOUR_EXE =$(BIN_DIR)$(DIR_SEP)harbour$(HB_DEBUG).exe
 HBPP_EXE    =$(BIN_DIR)$(DIR_SEP)hbpp$(HB_DEBUG).exe
 PPGEN_EXE   =$(BIN_DIR)$(DIR_SEP)ppgen$(HB_DEBUG).exe
@@ -2441,6 +2442,7 @@ TIPSSL_LIB_OBJS=\
 # Build Target
 #===============================================================================
 ST_PROJECT=\
+	$(HBRM_EXE)\
 	$(COMMON_LIB)\
 	$(PPGEN_EXE)\
 	$(PP_LIB)\
