@@ -56,6 +56,10 @@
    Syntax : HBRM <file> -> delete <file> -> always return 0
  */
 
+#if ( defined( _MSC_FULL_VER ) && ( _MSC_FULL_VER == 13104035 ) )
+#   pragma comment( lib, "bufferoverflowU" )
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 

@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-23 04:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * utils/misc/hbrm.c
+    ! include bufferoverflowU.lib when linking with MSVC7-DDK
+
+  * contrib/hbsqlit3/sqlite3.c
+  * contrib/hbsqlit3/sqlite3.h
+    ! update to version 3.7.15.1
+
 2012-12-21 23:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * tests/pexec.prg
   * tests/pcode.prg
