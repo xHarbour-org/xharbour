@@ -8,6 +8,22 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-25 03:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/vm/inet.c
+    + prg level INETFD( iSocket ) -> returns iSocket's file descriptor (fd)
+
+  * include/hbapi.h
+  * source/vm/extend.c
+    + Added API hb_stor() to store a NIL into a parameter passed by reference,
+      copied from Harbour
+
+  * contrib/hbssl/*.*
+  * winmake/common.mak
+  * winmake/common1.mak
+  * winmake/common2.mak
+  * winmake/compile.mak
+    + hbssl.lib borrowed from Harbour
+
 2012-12-23 04:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * utils/misc/hbrm.c
     ! include bufferoverflowU.lib when linking with MSVC7-DDK

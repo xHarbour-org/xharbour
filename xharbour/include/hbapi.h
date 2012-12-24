@@ -539,6 +539,7 @@ extern HB_EXPORT int     hb_storns( HB_ISIZ nValue, int iParam, ... );
    #define hb_retns( nNumber )                  hb_itemPutNS( hb_stackReturnItem(), nNumber )
 #endif
 
+extern HB_EXPORT int     hb_stor( int iParam );
 extern HB_EXPORT void    hb_storc( const char * szText, int iParam, ... ); /* stores a szString on a variable by reference */
 extern HB_EXPORT void    hb_storclen( const char * szText, HB_SIZE ulLength, int iParam, ... ); /* stores a fixed length string on a variable by reference */
 extern HB_EXPORT void    hb_stords( const char * szDate, int iParam, ... );   /* szDate must have yyyymmdd format */

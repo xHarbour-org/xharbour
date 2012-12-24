@@ -97,6 +97,7 @@ HBCAB_DIR     =contrib$(DIR_SEP)hbcab
 HBCOMM_DIR    =contrib$(DIR_SEP)hbcomm
 HBMXML_DIR    =contrib$(DIR_SEP)hbmxml
 HBXDIFF_DIR   =contrib$(DIR_SEP)hbxdiff
+HBSSL_DIR     =contrib$(DIR_SEP)hbssl
 
 INCLUDE_DIR2  =include
 
@@ -150,6 +151,7 @@ HB_GT_LIBS  =$(GTCGI_LIB) $(GTPCA_LIB) $(GTSTD_LIB) $(GTWIN_LIB) $(GTWVT_LIB) $(
 #===============================================================================
 # Contrib Library Names
 #===============================================================================
+HBSSL_LIB    =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbssl$(LIBEXT)
 HBXDIFF_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbxdiff$(LIBEXT)
 HBMXML_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbmxml$(LIBEXT)
 HBCOMM_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbcomm$(LIBEXT)
@@ -297,6 +299,26 @@ HARBOUR_LIBS=\
 #===============================================================================
 # List Of Library and Executable Dependencies
 #===============================================================================
+
+#===============================================================================
+# HBSSL.LIB
+#===============================================================================
+HBSSL_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)bio$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)err$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)evp$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)evpciph$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)evpenc$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)evpmd$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)evppkey$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pem$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)rand$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ssl$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)sslciph$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)sslctx$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)sslsess$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)ssl_hb$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)x509$(OBJEXT)
 
 #===============================================================================
 # HBXDIFF.LIB

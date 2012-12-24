@@ -182,6 +182,54 @@ $(HARBOUR_DLL_RC) : ChangeLog
 	$(HBRC_EXE) $(HARBOUR_DLL_RC) "xHarbour Runtime" "xharbour.dll" "1999-2013, http://www.xharbour.org/" "The xHarbour Team" "xHarbour Open Source"
 
 #===============================================================================
+# HBSSL.LIB
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)bio$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)bio.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)err$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)err.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)evp$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)evp.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)evpciph$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)evpciph.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)evpenc$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)evpenc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)evpmd$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)evpmd.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)evppkey$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)evppkey.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)pem$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)pem.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)rand$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)rand.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ssl$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)ssl.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)sslciph$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)sslciph.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)sslctx$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)sslctx.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)sslsess$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)sslsess.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)ssl_hb$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)ssl_hb.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)x509$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)x509.c
+	$(CC_CMD)
+
+#===============================================================================
 # HBXDIFF.LIB
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)corexdiff$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)core.c
