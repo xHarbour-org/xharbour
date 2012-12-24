@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-25 04:07 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/mdir.bat
+    + hbssl.lib related commands
+
 2012-12-25 03:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/vm/inet.c
     + prg level INETFD( iSocket ) -> returns iSocket's file descriptor (fd)

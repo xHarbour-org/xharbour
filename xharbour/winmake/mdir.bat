@@ -136,6 +136,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%hbmxml%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbxdiff%LIBEXT%  copy lib\%SUB_DIR%\%LIBPREFIX%hbxdiff%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbcairo%LIBEXT%  copy lib\%SUB_DIR%\%LIBPREFIX%hbcairo%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbmagic%LIBEXT%  copy lib\%SUB_DIR%\%LIBPREFIX%hbmagic%LIBEXT% lib >NUL
+if exist lib\%SUB_DIR%\%LIBPREFIX%hbssl%LIBEXT%    copy lib\%SUB_DIR%\%LIBPREFIX%hbssl%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbtinymt%LIBEXT% copy lib\%SUB_DIR%\%LIBPREFIX%hbtinymt%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbzebra%LIBEXT%  copy lib\%SUB_DIR%\%LIBPREFIX%hbzebra%LIBEXT% lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%rddsql%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%rddsql%LIBEXT% lib >NUL
@@ -308,6 +309,7 @@ if exist lib\%LIBPREFIX%hbbz2%LIBEXT%                del lib\%LIBPREFIX%hbbz2%LI
 if exist lib\%LIBPREFIX%hbcairo%LIBEXT%              del lib\%LIBPREFIX%hbcairo%LIBEXT%
 if exist lib\%LIBPREFIX%hbtinymt%LIBEXT%             del lib\%LIBPREFIX%hbtinymt%LIBEXT%
 if exist lib\%LIBPREFIX%hbmagic%LIBEXT%              del lib\%LIBPREFIX%hbmagic%LIBEXT%
+if exist lib\%LIBPREFIX%hbssl%LIBEXT%                del lib\%LIBPREFIX%hbssl%LIBEXT%
 if exist lib\%LIBPREFIX%hbzebra%LIBEXT%              del lib\%LIBPREFIX%hbzebra%LIBEXT%
 if exist lib\%LIBPREFIX%use_dll%LIBEXT%              del lib\%LIBPREFIX%use_dll%LIBEXT%
 if exist lib\%LIBPREFIX%usrrdd%LIBEXT%               del lib\%LIBPREFIX%usrrdd%LIBEXT%
@@ -556,6 +558,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%hbmxml%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbxdiff%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%hbxdiff%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbcairo%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%hbcairo%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbmagic%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%hbmagic%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%hbssl%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%hbssl%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbtinymt%LIBEXT%  del lib\%SUB_DIR%\%LIBPREFIX%hbtinymt%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%hbzebra%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%hbzebra%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%gtwvg%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFIX%gtwvg%LIBEXT%
