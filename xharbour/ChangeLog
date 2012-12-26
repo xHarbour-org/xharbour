@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-27 01:16 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/makefile.vc
+  * winmake/makefile.pc
+  * winmake/makefile.bc
+  * winmake/makefile.wc
+    ! covered include path macro within parentheses
+
 2012-12-25 06:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/harbouryy.c
   * source/macro/macroyy.c

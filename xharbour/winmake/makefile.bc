@@ -212,7 +212,7 @@ LIB_CMD_1      =$(HBLIB_EXE) __BORLANDC__ $(LIBEXE) "$(ARFLAGS)" $@ "winmake\rtl
 DLL_LINK_CMD   =@$(HBLIB_EXE) __BORLANDC__ $(LINKEXE) "-C -aa -Tpd -Gn -Gi" $@ "winmake\dll.lst" $(OBJ_DIR) DLL $(RTL_DIR)\bcc.def $(HARBOUR_DLL_RES) $(VM_LIB_OBJS) $(TIFF_LIB_OBJS)
 DLLEXE_LINK_CMD=$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) $(LINKERFLAGS) $(BCC_STARTUP_OBJ) $**,$@,,$(PDFLITE_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
 IMPLIB_CMD     =$(IMPLIBEXE) $@ $**
-RC_CMD         =$(RC) -r -i$(CC_DIR)\include $** -fo$@
+RC_CMD         =$(RC) -r -i"$(CC_DIR)\include" $** -fo$@
 
 #===============================================================================
 # Building rules of Object files

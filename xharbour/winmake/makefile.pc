@@ -168,7 +168,7 @@ ALL: $(CONTRIB_PROJECT)
 
 !endif
 
-RC_CMD         =$(RC) -r -i$(CC_DIR)\include -fo $@ $**
+RC_CMD         =$(RC) -r -i"$(CC_DIR)\include" -fo $@ $**
 HB_CMD         =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN    =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) -d_USE_APPMAIN_ $** -o$@
 CC_CMD         =$(CC) $(CLIBFLAGS) -Fo$@ $**
