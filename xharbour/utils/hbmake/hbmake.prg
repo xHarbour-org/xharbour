@@ -122,8 +122,7 @@ STATIC s_aDir
 STATIC s_aLangMessages   := {}
 STATIC s_cAppName        := ""
 STATIC s_cDefLang
-STATIC s_cLog            := ""   // log file name (stderr).
-STATIC s_cLog1           := ""   // log file name (stdout).
+STATIC s_cLog            := ""   // log file name.
 STATIC s_cMap            := ""   // map file name. For borland c
 STATIC s_cTds            := ""   // state file name. For borland c
 STATIC s_lGenPpo         := .F.
@@ -338,14 +337,12 @@ FUNCTION _APPMAIN( cScriptfile, p1, p2, p3, p4, p5, p6 )
 
    s_cAppName := Substr( cScriptfile,1 , AT(".",cScriptfile) -1)
    s_cLog    := s_cAppName + ".log"
-   s_cLog1   := s_cAppName + "OK.log"
 
    cExp := s_cAppName + ".exp"
    cLib := s_cAppName + ".lib"
 
    FErase( (s_cAppName+".out") ) // erase old *.out log filename
-   FErase( s_cLog  )
-   FErase( s_cLog1 )
+   FErase( s_cLog )
 
    if s_lBcc
       /* if you need of these files, comment the lines below. */
@@ -1245,7 +1242,7 @@ FUNCTION CompileFiles()
                      cComm := Strtran( cComm, "o$*", "o" + s_aCFiles[ nPos ] )
                   ENDIF
                   cComm := Strtran( cComm, "$**", cPrg )
-                  cComm += IIF( s_lLinux ,  " > "+ (s_cLog)," 1>>" + (s_cLog1) + " 2>>" + (s_cLog) )
+                  cComm += IIF( s_lLinux ,  " > "+ (s_cLog)," >>"+ (s_cLog))
 
                   Outstd( cComm )
                   Outstd( CRLF )
@@ -1323,7 +1320,7 @@ FUNCTION CompileFiles()
                   ENDIF
 
                   cComm := Strtran( cComm, "$**", s_aCFiles[ nFiles ] )
-                  cComm += IIF( s_lLinux ,  " > "+ (s_cLog)," 1>>"+ (s_cLog) + " 2>>"+ (s_cLog))
+                  cComm += IIF( s_lLinux ,  " > "+ (s_cLog)," >>"+ (s_cLog))
                   Outstd( " " )
                   Outstd( cComm )
                   Outstd( CRLF )
@@ -1385,7 +1382,7 @@ FUNCTION CompileFiles()
 
                      cComm := Strtran( cComm, "$**", s_aCFiles[ nFiles ] )
 
-                     cComm += IIF( s_lLinux ,  " "," 1>>"+ (s_cLog1) + " 2>>"+ (s_cLog) )
+                     cComm += IIF( s_lLinux ,  " "," >>"+ (s_cLog))
 
                      @4,16 SAY s_aCFiles[ nFiles ]
                      GaugeUpdate( aGauge, nFile / Len( s_aCFiles ) )   // Changed s_aPrgs to s_aCFiles, Ath 2004-06-08
@@ -1463,7 +1460,7 @@ FUNCTION CompileFiles()
                   ENDIF
 
                   cComm := Strtran( cComm, "$**", cPrg )
-                  cComm += IIF( s_lLinux ,  " > "+ (s_cLog)," 1>>"+ (s_cLog) + " 2>>"+ (s_cLog))
+                  cComm += IIF( s_lLinux ,  " > "+ (s_cLog)," >>"+ (s_cLog))
 
 
                   @4,16 SAY cPrg
@@ -3508,7 +3505,7 @@ FUNCTION CompileUpdatedFiles()
                         cComm := Strtran( cComm, "o$*", "o" + s_aCFiles[ nPos ] )
                      ENDIF
                      cComm := Strtran( cComm, "$**", s_aPrgs[ nFiles ] )
-                     cComm += IIF( s_lLinux , " > "+ (s_cLog)," 1>>"+ (s_cLog1) + " 2>>"+ (s_cLog))
+                     cComm += IIF( s_lLinux , " > "+ (s_cLog)," >>"+ (s_cLog))
 
                      //Outstd( cComm )
                      //Outstd( CRLF )
@@ -3572,7 +3569,7 @@ FUNCTION CompileUpdatedFiles()
                      cComm := Strtran( cComm, "o$*", "o" + s_aObjs[ nPos ] )
                   ENDIF
                   cComm := Strtran( cComm, "$**", aCtocompile[ nFiles ] )
-                  cComm += IIF( s_lLinux ,  " > "+ (s_cLog)," 1>>"+ (s_cLog1) + " 2>>"+ (s_cLog))
+                  cComm += IIF( s_lLinux ,  " > "+ (s_cLog)," >>"+ (s_cLog))
                   Outstd( " " )
 
                   Outstd( cComm )
@@ -3629,7 +3626,7 @@ FUNCTION CompileUpdatedFiles()
                         cComm := Strtran( cComm, "o$*", "o" + s_aObjsC[ nPos ] )
                      ENDIF
                      cComm := Strtran( cComm, "$**", s_aCFiles[ nFiles ] )
-                     cComm += IIF( s_lLinux ,  " > "+ (s_cLog)," 1>>"+ (s_cLog1) + " 2>>"+ (s_cLog))
+                     cComm += IIF( s_lLinux ,  " > "+ (s_cLog)," >>"+ (s_cLog))
                      @4,16 SAY s_aCFiles[ nFiles ]
                      GaugeUpdate( aGauge, nFile / Len( s_aCFiles ) )  // changed s_aPrgs to s_aCFiles Ath 2004-06-08
                      nFile ++
@@ -3706,7 +3703,7 @@ FUNCTION CompileUpdatedFiles()
                         cComm := Strtran( cComm, "o$*", "o" + s_aObjs[ nPos ] )
                      ENDIF
                      cComm := Strtran( cComm, "$**", cPrg )
-                     cComm += IIF( s_lLinux ,  " > "+ (s_cLog)," 1>>"+ (s_cLog) + " 2>>"+ (s_cLog))
+                     cComm += IIF( s_lLinux ,  " > "+ (s_cLog)," >>"+ (s_cLog))
                      @4,16 SAY cPrg
                      GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
                      nFile ++     // moved from outside 'FOR EACH', Ath 2004-06-08
