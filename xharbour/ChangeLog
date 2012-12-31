@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2012-12-31 09:18 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/comptool.c
+    ! fixed stupid typo on hb_compSetCOutput() on switch arguments
+
 2012-12-30 07:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * utils/hbmake/hbmake.prg
     ! restore the version prior some of my changes because there are reports

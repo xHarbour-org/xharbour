@@ -685,23 +685,23 @@ void hb_compSetCOutput( int iOutput )
 {
    switch( iOutput )
    {
-      case '0':
+      case 0:
          hb_comp_iGenCOutput = HB_COMPGENC_COMPACT;
          break;
 
-      case '1':
+      case 1:
          hb_comp_iGenCOutput = HB_COMPGENC_NORMAL;
          break;
 
-      case '2':
+      case 2:
          hb_comp_iGenCOutput = HB_COMPGENC_VERBOSE;
          break;
 
-      case '3':
+      case 3:
          hb_comp_iGenCOutput = HB_COMPGENC_REALCODE;
          break;
 
-      case '4':
+      case 4:
          hb_comp_iGenVarList = TRUE;
          break;
    }
