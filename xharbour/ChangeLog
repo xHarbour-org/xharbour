@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-01-11 06:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * contrib/hbsqlit3/sqlite3.c
+  * contrib/hbsqlit3/sqlite3.h
+    ! updated to version 3.7.15.2
+
 2013-01-10 19:06 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   + doc/howtosvn.txt, copied from Harbour
 
