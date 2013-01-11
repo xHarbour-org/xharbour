@@ -294,8 +294,8 @@ static void hb_compDebugStart( void ) { };
 
 /* In a future release of Bison, this section will be replaced
    by #include "harboury.h".  */
-#ifndef YY_YY_OBJ_55_HARBOURY_H_INCLUDED
-# define YY_YY_OBJ_55_HARBOURY_H_INCLUDED
+#ifndef YY_YY_OBJ_B32_HARBOURY_H_INCLUDED
+# define YY_YY_OBJ_B32_HARBOURY_H_INCLUDED
 /* Enabling traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -511,7 +511,7 @@ int yyparse ();
 #endif
 #endif /* ! YYPARSE_PARAM */
 
-#endif /* !YY_YY_OBJ_55_HARBOURY_H_INCLUDED  */
+#endif /* !YY_YY_OBJ_B32_HARBOURY_H_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
 
