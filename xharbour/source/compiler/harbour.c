@@ -1092,12 +1092,11 @@ PCOMCLASS hb_compClassAdd( char * szClassName )
    pClass->pMethod   = NULL;
    pClass->pNext     = NULL;
 
-   if( hb_comp_pFirstClass == NULL )
-      hb_comp_pFirstClass = pClass;
-   else
-      hb_comp_pLastClass->pNext = pClass;
+   if( hb_comp_pReleaseClass == NULL )
+      hb_comp_pReleaseClass = pClass;
 
-   hb_comp_pLastClass         = pClass;
+   hb_comp_pLastClass->pNext = pClass;
+   hb_comp_pLastClass        = pClass;
 
    /* Auto declaration for the Class Function. */
    pDeclared                  = hb_compDeclaredAdd( szClassName );
@@ -1145,9 +1144,17 @@ PCOMDECLARED hb_compMethodAdd( PCOMCLASS pClass, char * szMethodName )
       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_DUP_DECLARATION, "Method", szMethodName );
 
       /* Last Declaration override previous declarations */
-      pMethod->cParamTypes    = NULL;
-      pMethod->iParamCount    = 0;
-      pMethod->pParamClasses  = NULL;
+      if( pMethod->cParamTypes )
+      {
+         hb_xfree( pMethod->cParamTypes );
+         pMethod->cParamTypes = NULL;
+      }
+      pMethod->iParamCount = 0;
+      if( pMethod->pParamClasses )
+      {
+         hb_xfree( pMethod->pParamClasses );
+         pMethod->pParamClasses = NULL;
+      }
 
       return pMethod;
    }
@@ -1710,6 +1717,9 @@ PCOMDECLARED hb_compDeclaredAdd( char * szDeclaredName )
    pDeclared->iParamCount        = 0;
    pDeclared->pParamClasses      = NULL;
    pDeclared->pNext              = NULL;
+
+   if( hb_comp_pReleaseDeclared == NULL )
+      hb_comp_pReleaseDeclared = pDeclared;
 
    hb_comp_pLastDeclared->pNext  = pDeclared;
    hb_comp_pLastDeclared         = pDeclared;
@@ -5958,6 +5968,10 @@ static int hb_compCompile( char * szPrg )
       do
       {
          hb_comp_pReleaseDeclared   = pDeclared->pNext;
+         if( pDeclared->cParamTypes )
+            hb_xfree( pDeclared->cParamTypes );
+         if( pDeclared->pParamClasses )
+            hb_xfree( pDeclared->pParamClasses );
          hb_xfree( ( void * ) pDeclared );
          pDeclared                  = hb_comp_pReleaseDeclared;
       }
@@ -5972,6 +5986,10 @@ static int hb_compCompile( char * szPrg )
          while( pDeclared )
          {
             hb_comp_pReleaseDeclared   = pDeclared->pNext;
+            if( pDeclared->cParamTypes )
+               hb_xfree( pDeclared->cParamTypes );
+            if( pDeclared->pParamClasses )
+               hb_xfree( pDeclared->pParamClasses );
             hb_xfree( ( void * ) pDeclared );
             pDeclared                  = hb_comp_pReleaseDeclared;
          }
