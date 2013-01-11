@@ -1216,6 +1216,7 @@ char * hb_credits( void )
       "Rodrigo Moreno <rodrigo_moreno@users.sourceforge.net>\n"
       "Ron Pinkas <ron@profit-master.com>\n"
       "Ryszard Glab <rglab@imid.med.pl>\n"
+      "Saulius Zrelskis <labitas@gmail.com>\n"
       "Sylvain Robert <s.robert@videotron.ca>\n"
       "Tim Stone <timstone@mstrlink.com>\n"
       "Tommi Rouvali <tommi@rouvali.com>\n"

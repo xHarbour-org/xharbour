@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-01-11 22:13 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/common/hbver.c
+    + added to credit list -> Saulius Zrelskis <labitas/AT/gmail/com>
+
 2013-01-11 17:00 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * ChangeLog
     ! fixed file that got corrupted due to my first commit :(
