@@ -777,6 +777,9 @@ extern const BYTE     hb_comp_pcode_len[];
 /* how many pcode used in a module */
 extern ULONG           hb_comp_upCodeTotal;
 
+/* Force cpp output (default is c )*/
+extern BOOL            hb_comp_OutputIsCpp;
+
 /* auto convert external function to dynamic when -vd is turned-on */
 extern BOOL           hb_comp_autoDeferred;
 

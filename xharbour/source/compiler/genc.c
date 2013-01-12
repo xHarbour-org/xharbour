@@ -331,6 +331,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
    if( ! pFileName->szExtension )
       pFileName->szExtension = ".c";
 
+   if ( hb_comp_OutputIsCpp )
+      pFileName->szExtension = ".cpp";
+
    hb_fsFNameMerge( szFileName, pFileName );
 
    /*

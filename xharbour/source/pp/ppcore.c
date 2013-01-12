@@ -2658,6 +2658,10 @@ static void hb_pp_pragmaNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
       {
          hb_compSetCOutput( 4 );
       }
+      else if( hb_pp_tokenValueCmp( pToken, "CPP", HB_PP_CMP_DBASE ) )
+      {
+         hb_compSetCOutput( 5 );
+      }
       else if( hb_pp_tokenValueCmp( pToken, "RECURSELEVEL", HB_PP_CMP_DBASE ) )
       {
          pValue   = hb_pp_pragmaGetInt( pState, pToken->pNext, &pState->iMaxCycles, "r" );
@@ -5334,7 +5338,14 @@ static void hb_pp_preprocessToken( PHB_PP_STATE pState )
          {
             pToken = pToken->pNext;
             if( pToken && HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_STRING )
+            {
+#if defined( __HB_COMPILER__ )
+               hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "%s\n", pToken->value );
+               hb_compOutStd( hb_comp_szMsgBuf );
+#else
                printf( "%s\n", pToken->value );
+#endif
+            }
          }
 #endif
          else

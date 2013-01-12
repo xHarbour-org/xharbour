@@ -704,6 +704,10 @@ void hb_compSetCOutput( int iOutput )
       case 4:
          hb_comp_iGenVarList = TRUE;
          break;
+
+      case 5:
+         hb_comp_OutputIsCpp = TRUE;
+         break;
    }
 }
 

@@ -242,6 +242,9 @@ BOOL     hb_comp_bTracePP                 = FALSE;
 /* Auto declare external function as dynamic */
 BOOL     hb_comp_autoDeferred             = FALSE;
 
+/* Force cpp output (default is c )*/
+BOOL     hb_comp_OutputIsCpp              = FALSE;
+
 /* procude list of public function in a module */
 BOOL     hb_comp_createExternList         = FALSE;
 

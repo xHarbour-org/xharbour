@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-01-12 17:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * source/compiler/harbour.c
+  * source/compiler/genc.c
+  * source/compiler/comptool.c
+  * source/pp/ppcore.c
+  * include/hbcomp.h
+    + pragma: #pragma CPP, to be put on top of PRG file, to force output file
+    name extension to be "cpp" instead of the default "c". This is particularly
+    useful when dealing with clever compiler such as BCC or MSVC which will invoke
+    C++ mode when compiling a cpp-extension file without forcing -P or -TP switch.
+
 2013-01-14 04:33 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/harbouryy.c
     ! looked like previous commit did not go, re-uploaded.
