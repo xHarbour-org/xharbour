@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-01-12 17:32 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * ChangeLog
+    ! fixed log entries which were unintentionally bad dated (forward)
+
 2013-01-12 17:05 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/harbour.c
   * source/compiler/genc.c
@@ -19,11 +23,11 @@
     useful when dealing with clever compiler such as BCC or MSVC which will invoke
     C++ mode when compiling a cpp-extension file without forcing -P or -TP switch.
 
-2013-01-14 04:33 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+2013-01-12 04:33 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/harbouryy.c
     ! looked like previous commit did not go, re-uploaded.
 
-2013-01-14 04:16 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+2013-01-12 04:16 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/harbour.sly
   * source/compiler/harbouryy.c
     ! fix one memory leak, work of, thus credits to Saulius. Thanks!
