@@ -115,6 +115,7 @@ typedef struct _COMDECLARED
    } Extended;
    struct _COMCLASS    * ( * pParamClasses );
    struct _COMDECLARED * pNext;               /* pointer to the next declared function */
+   BOOL bFree;
 } COMDECLARED, * PCOMDECLARED;
 
 /* Declared Class support structure */
@@ -490,7 +491,7 @@ extern PCOMDECLARED hb_compDeclaredFind( char * );
 
 extern PCOMCLASS hb_compClassAdd( char * );
 extern PCOMCLASS hb_compClassFind( char * );
-extern PCOMDECLARED hb_compMethodAdd( PCOMCLASS pClass, char * );
+extern PCOMDECLARED hb_compMethodAdd( PCOMCLASS pClass, char *, BOOL );
 extern PCOMDECLARED hb_compMethodFind( PCOMCLASS pClass, char * );
 extern void hb_compDeclaredParameterAdd( char * szVarName, BYTE cValueType );
 

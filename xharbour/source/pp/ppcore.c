@@ -2662,6 +2662,22 @@ static void hb_pp_pragmaNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
       {
          hb_compSetCOutput( 5 );
       }
+      else if( hb_pp_tokenValueCmp( pToken, "W0", HB_PP_CMP_DBASE ) )
+      {
+         hb_compSetCOutput( 6 );
+      }
+      else if( hb_pp_tokenValueCmp( pToken, "W1", HB_PP_CMP_DBASE ) )
+      {
+         hb_compSetCOutput( 7 );
+      }
+      else if( hb_pp_tokenValueCmp( pToken, "W2", HB_PP_CMP_DBASE ) )
+      {
+         hb_compSetCOutput( 8 );
+      }
+      else if( hb_pp_tokenValueCmp( pToken, "W3", HB_PP_CMP_DBASE ) )
+      {
+         hb_compSetCOutput( 9 );
+      }
       else if( hb_pp_tokenValueCmp( pToken, "RECURSELEVEL", HB_PP_CMP_DBASE ) )
       {
          pValue   = hb_pp_pragmaGetInt( pState, pToken->pNext, &pState->iMaxCycles, "r" );

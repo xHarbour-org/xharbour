@@ -2451,7 +2451,7 @@ ClassInfo  : DecMethod
            | ClassInfo DecData
            ;
 
-DecMethod  : IdentName '(' { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastClass, $1 ); } DecList ')' AsType
+DecMethod  : IdentName '(' { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastClass, $1, FALSE ); } DecList ')' AsType
              {
                if( hb_comp_pLastMethod )
                {
@@ -2473,7 +2473,7 @@ DecMethod  : IdentName '(' { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLa
              }
            ;
 
-DecData    : IdentName { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastClass, $1 ); } AsType
+DecData    : IdentName { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastClass, $1, FALSE ); } AsType
              {
                if( hb_comp_pLastMethod )
                {
@@ -2505,7 +2505,7 @@ DecData    : IdentName { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastCl
 
                  hb_snprintf( szSetData, strlen( $1 ) + 2, "_%s", $1 );
 
-                 hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastClass, szSetData );
+                 hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastClass, szSetData, TRUE );
                  hb_comp_pLastMethod->cType = hb_comp_cVarType;
                  hb_comp_pLastMethod->iParamCount = 1;
 
@@ -2520,7 +2520,7 @@ DecData    : IdentName { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastCl
                    hb_comp_pLastMethod->Extended.pClass = pClass;
                    hb_comp_szFromClass = NULL;
                  }
-                 hb_xfree( szSetData );
+                 // hb_xfree( szSetData );
                }
 
                hb_comp_pLastMethod = NULL;

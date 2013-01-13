@@ -8,6 +8,32 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-01-13 12:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * include/hbcomp.h
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+  * source/compiler/harbouryy.c
+    ! further fix to memory leaks
+
+  * source/compiler/harbour.c
+  * source/compiler/comptool.c
+  * source/pp/ppcore.c
+    + pragma: #pragma W<n> to override Warning Level invoked by command line
+    switch, where n = 1 to 3 (to be put on top of PRG file)
+
+  * winmake/common3.mak
+  * winmake/makefile.gc
+    ! set harbour warning to the highest level, -w3
+
+  * source/rtl/tbcolumn.prg
+    ! downgrade warning level to -W2
+
+  * contrib/gd/source/gdimage.prg
+    - duplicate declaration of Method GetTrueColor()
+
+  * contrib/xwt/src/browse.prg
+    - duplicate declaration of Method CountColumns()
+
 2013-01-12 17:32 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * ChangeLog
     ! fixed log entries which were unintentionally bad dated (forward)

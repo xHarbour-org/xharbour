@@ -39,6 +39,7 @@ static int  s_iDirCase  = HB_SET_CASE_MIXED;
 static BOOL s_fFnTrim   = FALSE;
 static char s_cDirSep   = HB_OS_PATH_DELIM_CHR;
 
+extern void _hb_compDeclaredInit( void );
 extern char* hb_exeName( void );
 extern void cleansPair( void );
 
@@ -681,6 +682,16 @@ void hb_compSetDeferredFlagOn( void )
    hb_comp_autoDeferred = TRUE;
 }
 
+static void hb_setWarnVars( void )
+{
+   hb_comp_bWarnUnUsedLocals        = TRUE;
+   hb_comp_bWarnUnUsedStatics       = TRUE;
+   hb_comp_bWarnUnUsedGlobals       = TRUE;
+   hb_comp_bWarnUnUsedMemvars       = TRUE;
+   hb_comp_bWarnUnUsedFields        = TRUE;
+   hb_comp_bWarnUnUsedBlockParams   = TRUE;
+}
+
 void hb_compSetCOutput( int iOutput )
 {
    switch( iOutput )
@@ -707,6 +718,25 @@ void hb_compSetCOutput( int iOutput )
 
       case 5:
          hb_comp_OutputIsCpp = TRUE;
+         break;
+
+      case 6:
+         hb_comp_iWarnings = 0;
+         break;
+
+      case 7:
+         hb_comp_iWarnings = 1;
+         break;
+
+      case 8:
+         hb_comp_iWarnings = 2;
+         hb_setWarnVars();
+         break;
+
+      case 9:
+         hb_comp_iWarnings = 3;
+         hb_setWarnVars();
+         _hb_compDeclaredInit();
          break;
    }
 }

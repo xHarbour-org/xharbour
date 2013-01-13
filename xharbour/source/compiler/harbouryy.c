@@ -9155,7 +9155,7 @@ yyreduce:
 
   case 713:
 
-    { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastClass, (yyvsp[(1) - (2)].string) ); }
+    { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastClass, (yyvsp[(1) - (2)].string), FALSE ); }
     break;
 
   case 714:
@@ -9183,7 +9183,7 @@ yyreduce:
 
   case 715:
 
-    { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastClass, (yyvsp[(1) - (1)].string) ); }
+    { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastClass, (yyvsp[(1) - (1)].string), FALSE ); }
     break;
 
   case 716:
@@ -9219,7 +9219,7 @@ yyreduce:
 
                  hb_snprintf( szSetData, strlen( (yyvsp[(1) - (3)].string) ) + 2, "_%s", (yyvsp[(1) - (3)].string) );
 
-                 hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastClass, szSetData );
+                 hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastClass, szSetData, TRUE );
                  hb_comp_pLastMethod->cType = hb_comp_cVarType;
                  hb_comp_pLastMethod->iParamCount = 1;
 
@@ -9234,7 +9234,7 @@ yyreduce:
                    hb_comp_pLastMethod->Extended.pClass = pClass;
                    hb_comp_szFromClass = NULL;
                  }
-                 hb_xfree( szSetData );
+                 // hb_xfree( szSetData );
                }
 
                hb_comp_pLastMethod = NULL;

@@ -278,12 +278,16 @@ char **              ArgV;
 
 extern HB_COMP_IDS   hb_compExpr_IDs;
 
+static BOOL hb_bcompDeclaredInit = FALSE;
+
 int hb_compMain( int argc, char * argv[] )
 {
    int      iStatus = EXIT_SUCCESS;
    int      i;
    BOOL     bAnyFiles;
    char *   szBuildInfo;
+
+   hb_bcompDeclaredInit = FALSE;
 
    /* Stored for later use in hb_compAutoOpen(). */
    ArgC                 = argc;
@@ -348,7 +352,7 @@ int hb_compMain( int argc, char * argv[] )
    hb_compIdentifierOpen();
 
    /* Load standard Declarations. */
-   if( hb_comp_iWarnings >= 3 )
+   if( hb_comp_iWarnings >= 3 && ! hb_bcompDeclaredInit )
       hb_compDeclaredInit();
 
    /* Process all files passed via the command line. */
@@ -1131,7 +1135,7 @@ PCOMCLASS hb_compClassFind( char * szClassName )
    return NULL;
 }
 
-PCOMDECLARED hb_compMethodAdd( PCOMCLASS pClass, char * szMethodName )
+PCOMDECLARED hb_compMethodAdd( PCOMCLASS pClass, char * szMethodName, BOOL bFree )
 {
    PCOMDECLARED pMethod;
 
@@ -1148,16 +1152,12 @@ PCOMDECLARED hb_compMethodAdd( PCOMCLASS pClass, char * szMethodName )
 
       /* Last Declaration override previous declarations */
       if( pMethod->cParamTypes )
-      {
          hb_xfree( pMethod->cParamTypes );
-         pMethod->cParamTypes = NULL;
-      }
+      pMethod->cParamTypes = NULL;
       pMethod->iParamCount = 0;
       if( pMethod->pParamClasses )
-      {
          hb_xfree( pMethod->pParamClasses );
-         pMethod->pParamClasses = NULL;
-      }
+      pMethod->pParamClasses = NULL;
 
       return pMethod;
    }
@@ -1169,6 +1169,7 @@ PCOMDECLARED hb_compMethodAdd( PCOMCLASS pClass, char * szMethodName )
    pMethod->cParamTypes    = NULL;
    pMethod->iParamCount    = 0;
    pMethod->pParamClasses  = NULL;
+   pMethod->bFree          = bFree;
    pMethod->pNext          = NULL;
 
    if( pClass->pMethod == NULL )
@@ -1185,30 +1186,24 @@ PCOMDECLARED hb_compMethodAdd( PCOMCLASS pClass, char * szMethodName )
 
 PCOMDECLARED hb_compMethodFind( PCOMCLASS pClass, char * szMethodName )
 {
-   PCOMDECLARED pMethod = NULL;
-
    if( pClass )
-      pMethod = pClass->pMethod;
-
-   while( pMethod )
    {
-      if( pMethod->szName == szMethodName )
-         return pMethod;
-      else
+      PCOMDECLARED pMethod = pClass->pMethod;
+
+      while( pMethod )
       {
-         if( pMethod->pNext )
-            pMethod = pMethod->pNext;
-         else
-            return NULL;
+         if( ! strcmp( pMethod->szName, szMethodName ) )
+            return pMethod;
+         pMethod = pMethod->pNext;
       }
    }
+
    return NULL;
 }
 
 static void hb_compDeclaredInit( void )
 {
   #define _DECL static COMDECLARED
-
    /*
       \x5c -> ByRef    (+60)             '-'  -> NIL
       \x7a -> Optional (+90)             'U'  -> Undefined
@@ -1686,6 +1681,15 @@ static void hb_compDeclaredInit( void )
    hb_comp_pFirstClass        = &s_TBROWSE;
    hb_comp_pLastClass         = &s_ERROR;
    hb_comp_pReleaseClass      = s_ERROR.pNext;
+}
+
+void _hb_compDeclaredInit( void )
+{
+   if (!hb_bcompDeclaredInit )
+   {
+      hb_bcompDeclaredInit = TRUE;
+      hb_compDeclaredInit();
+   }
 }
 
 PCOMDECLARED hb_compDeclaredAdd( char * szDeclaredName )
@@ -5391,6 +5395,7 @@ static int hb_compCompile( char * szPrg )
    char *      szTempName;
    ULONG       i, u = 0;
 
+
    hb_comp_pFileName = hb_fsFNameSplit( szPrg );
 
    if( hb_comp_pFileName->szName )
@@ -5965,6 +5970,7 @@ static int hb_compCompile( char * szPrg )
 
    if( hb_comp_iWarnings >= 3 && hb_comp_pReleaseDeclared )
    {
+
       PCOMDECLARED   pDeclared   = hb_comp_pReleaseDeclared;
       PCOMCLASS      pClass      = hb_comp_pReleaseClass;
 
@@ -5993,6 +5999,8 @@ static int hb_compCompile( char * szPrg )
                hb_xfree( pDeclared->cParamTypes );
             if( pDeclared->pParamClasses )
                hb_xfree( pDeclared->pParamClasses );
+            if( pDeclared->bFree )
+                  hb_xfree( pDeclared->szName );
             hb_xfree( ( void * ) pDeclared );
             pDeclared                  = hb_comp_pReleaseDeclared;
          }

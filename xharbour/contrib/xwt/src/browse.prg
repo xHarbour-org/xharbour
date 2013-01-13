@@ -17,7 +17,7 @@ CLASS XWTBrowse FROM XWTWidget
    DATA nRows     INIT 0
 
    METHOD New()
-   METHOD CountColumns()   INLINE   Len( ::aColumns )
+   // METHOD CountColumns()   INLINE   Len( ::aColumns )
 
    METHOD AddColumn( oCol ) INLINE AAdd( ::aColumns, oCol )
    METHOD RemoveColumn( iPos ) INLINE ADel( ::aColumns, iPos ), aSize( ::aColumns, Len(::aColumns) -1 )
