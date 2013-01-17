@@ -1,10 +1,14 @@
 REM @ECHO OFF
 
-SET _PRESET_PATH=%PATH%
-SET _PRESET_INCLUDE=%INCLUDE%
-SET _PRESET_LIB=%LIB%
-SET _PRESET_CFLAGS=%CFLAGS%
-SET _PRESET_LFLAGS=%LFLAGS%
+:SAVE
+   SET _PRESET_PATH=%PATH%
+   SET _PRESET_INCLUDE=%INCLUDE%
+   SET _PRESET_LIB=%LIB%
+   SET _PRESET_CFLAGS=%CFLAGS%
+   SET _PRESET_LFLAGS=%LFLAGS%
+   SET _PRESET_MSVCDIR=%MSVCDIR%
+   SET _PRESET_PSDKDIR=%PSDKDIR%
+   SET _PRESET_PELLESCDIR=%PELLESCDIR%
 
 :FIND_VC
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 9.0\vc"  GOTO SET_VC2008
@@ -38,39 +42,55 @@ SET _PRESET_LFLAGS=%LFLAGS%
    GOTO READY
 
 :NONE
+   ECHO Could not locate any MSVC installation!
+   RESTORE
 
 :READY
-SET PELLESCDIR=%ProgramFiles%\PellesC
-SET PATH=%PATH%;"%PELLESCDIR%\bin"
+   SET PELLESCDIR=%ProgramFiles%\PellesC
+   SET PATH=%PATH%;"%PELLESCDIR%\bin"
 
-SET CFLAGS=/Od /EHsc /RTC1 /MTd /Gs /GS /Gy /GR /Zi /D_CRT_SECURE_NO_DEPRECATE /D_CRT_NONSTDC_NO_DEPRECATE
+   SET CFLAGS=/Od /EHsc /RTC1 /MTd /Gs /GS /Gy /GR /Zi /D_CRT_SECURE_NO_DEPRECATE /D_CRT_NONSTDC_NO_DEPRECATE
+   SET LFLAGS=-DEBUG -DEBUGTYPE:CV
 
-SET LFLAGS=-DEBUG -DEBUGTYPE:CV
+   IF NOT EXIST lburg MD lburg
+   IF NOT EXIST lburg\obj MD lburg\obj
+   IF NOT EXIST cc\MSObj MD cc\MSObj
+   IF NOT EXIST cc\Obj MD cc\Obj
+   IF NOT EXIST cc\xObj MD cc\xObj
+   IF NOT EXIST cc\xdllObj MD cc\xdllObj
+   IF NOT EXIST bprint\obj MD bprint\obj
+   IF NOT EXIST ccl\obj MD ccl\obj
 
-IF NOT EXIST lburg MD lburg
-IF NOT EXIST lburg\obj MD lburg\obj
-IF NOT EXIST cc\MSObj MD cc\MSObj
-IF NOT EXIST cc\Obj MD cc\Obj
-IF NOT EXIST cc\xObj MD cc\xObj
-IF NOT EXIST cc\xdllObj MD cc\xdllObj
-IF NOT EXIST bprint\obj MD bprint\obj
-IF NOT EXIST ccl\obj MD ccl\obj
+   "%MSVCDIR%\bin\NMAKE.exe" > Log
 
-"%MSVCDIR%\bin\NMAKE.exe" -S > Log
+   IF ERRORLEVEL 0 GOTO SUCCESS
 
-IF ERRORLEVEL 0 xcopy xcc.exe \xhb\bin /d /r /y
-IF ERRORLEVEL 0 xcopy xcc.dll \xhb\bin /d /r /y
-IF ERRORLEVEL 0 xcopy crt\include \xhb\c_include /s /d /r /y
-IF ERRORLEVEL 0 xcopy "%PELLESCDIR%\include\win" \xhb\c_include\win /s /d /r /y
+:FAILURE
+   TYPE Log.
+   GOTO RESTORE
 
-SET PATH=%_PRESET_PATH%
-SET INCLUDE=%_PRESET_INCLUDE%
-SET LIB=%_PRESET_LIB%
-SET CFLAGS=%_PRESET_CFLAGS%
-SET LFLAGS=%_PRESET_LFLAGS%
+:SUCCESS
+   xcopy xcc.exe \xhb\bin /d /r /y
+   xcopy xcc.dll \xhb\bin /d /r /y
+   xcopy crt\include \xhb\c_include /s /d /r /y
+   xcopy "%PELLESCDIR%\include\win" \xhb\c_include\win /s /d /r /y
 
-SET _PRESET_PATH=
-SET _PRESET_INCLUDE=
-SET _PRESET_LIB=
-SET _PRESET_CFLAGS=
-SET _PRESET_LFLAGS=
+:RESTORE
+   SET PATH=%_PRESET_PATH%
+   SET INCLUDE=%_PRESET_INCLUDE%
+   SET LIB=%_PRESET_LIB%
+   SET CFLAGS=%_PRESET_CFLAGS%
+   SET LFLAGS=%_PRESET_LFLAGS%
+   SET MSVCDIR=%_PRESET_MSVCDIR%
+   SET PSDKDIR=%_PRESET_PSDKDIR%
+   SET PELLESCDIR=%_PRESET_PELLESCDIR%
+
+   :CLEANUP
+      SET _PRESET_PATH=
+      SET _PRESET_INCLUDE=
+      SET _PRESET_LIB=
+      SET _PRESET_CFLAGS=
+      SET _PRESET_LFLAGS=
+      SET _PRESET_MSVCDIR=
+      SET _PRESET_PSDKDIR=
+      SET _PRESET_PELLESCDIR=
