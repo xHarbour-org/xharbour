@@ -16,6 +16,7 @@ CLASS ResourceManager INHERIT Dialog
    DATA ItemManager      EXPORTED
    DATA ItemEventManager EXPORTED
    DATA lChanged         EXPORTED INIT .F.
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD OnInitDialog()
@@ -33,6 +34,8 @@ METHOD Init() CLASS ResourceManager
    ::Super:Init( ::Application:MainForm )
    ::Create()
 RETURN Self
+
+//------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS ResourceManager
    ::Caption := "Resource Manager"

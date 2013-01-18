@@ -101,7 +101,6 @@ CLASS ComboBox FROM Control
    DATA hEdit             EXPORTED
 
    DATA __nWidth        PROTECTED INIT 0
-   DATA __aCustom       PROTECTED
    DATA __tipWnd        PROTECTED
    DATA __isEnter       PROTECTED INIT .F.
    DATA __pCallBackEdit PROTECTED
@@ -760,8 +759,7 @@ METHOD OnParentCommand( nId, nCode ) CLASS ColorPicker
 
               CASE cSel == "Custom..."
                    nColor := ::ColorSelected //::Colors[ ::GetCurSel()+1 ][1]
-                   DEFAULT ::__aCustom TO ARRAY(16)
-                   IF _ChooseColor( ::Parent:hWnd, @nColor, ::__aCustom, CC_ANYCOLOR | CC_RGBINIT | CC_SOLIDCOLOR | CC_FULLOPEN )
+                   IF _ChooseColor( ::Parent:hWnd, @nColor, ::Application:CustomColors, CC_ANYCOLOR | CC_RGBINIT | CC_SOLIDCOLOR | CC_FULLOPEN )
                       TRY
                         ::Colors[ ::GetCurSel() ][1] := nColor
                       CATCH

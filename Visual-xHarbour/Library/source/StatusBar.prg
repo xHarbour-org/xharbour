@@ -26,7 +26,7 @@ CLASS StatusBar INHERIT Control
    DATA nCurPanelTip     PROTECTED
 
    DATA xBackColor       EXPORTED INIT GetSysColor( COLOR_BTNFACE )
-   ACCESS BackColor      INLINE    ::xBackColor
+   ACCESS BackColor      INLINE    ::xBackColor PERSISTENT
    ASSIGN BackColor( n ) INLINE    IIF( n==NIL, n:=CLR_DEFAULT , NIL ),;
                                    ::xBackColor := n,;
                                    ::SendMessage( SB_SETBKCOLOR, 0, n ),;
@@ -118,6 +118,7 @@ METHOD Create() CLASS StatusBar
       ::Parent:Children[n]:Dock:Bottom := Self
       ::Parent:Children[n]:DockIt()
    ENDIF
+   ::SendMessage( SB_SETBKCOLOR, 0, ::xBackColor )
 RETURN Self
 
 METHOD SetImageIndex( n ) CLASS StatusBar

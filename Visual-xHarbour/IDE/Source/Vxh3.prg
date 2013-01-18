@@ -59,7 +59,11 @@ CLASS FormEditor INHERIT Control
    METHOD OnNCPaint()
    METHOD OnNCRButtonDown()
    METHOD OnNCHitTest()
-   METHOD OnVertScroll() INLINE IIF( ::CtrlMask:CurForm != NIL, ::CtrlMask:CurForm:UpdateSelection(),),NIL
+   METHOD OnSize()       INLINE ::UpdateScroll()
+   METHOD OnVertScroll() INLINE ::CtrlMask:Top := 0, IIF( ::CtrlMask:CurForm != NIL, ::CtrlMask:CurForm:UpdateSelection(),),NIL
+   METHOD OnHorzScroll() INLINE IIF( ::CtrlMask:CurForm != NIL, ::CtrlMask:CurForm:UpdateSelection(),),NIL
+   METHOD ResetScroll()
+   METHOD UpdateScroll()
 ENDCLASS
 
 //---------------------------------------------------------------------------------------------------
@@ -78,10 +82,10 @@ METHOD Init( oParent ) CLASS FormEditor
    ::VertScroll    := .T.
    ::HorzScroll    := .T.
    ::Dock:Margin   := 0
-   ::Left          := 0
-   ::Top           := 0
-   ::Width         := GetSystemMetrics( SM_CXSCREEN ) * 2
-   ::Height        := GetSystemMetrics( SM_CYSCREEN ) * 2
+   ::xLeft         := 10
+   ::xTop          := 10
+   //::Width         := GetSystemMetrics( SM_CXSCREEN ) * 2
+   //::Height        := GetSystemMetrics( SM_CYSCREEN ) * 2
    ::RulerFont     := __FontCreate( "Tahoma", 8 )
    ::RulerVertFont := __FontCreate( "Tahoma", 8,,, .T. )
    ::RulerBrush    := ::System:CurrentScheme:Brush:ToolStripPanelGradientEnd
@@ -91,9 +95,37 @@ RETURN Self
 
 METHOD Create() CLASS FormEditor
    Super:Create()
+   ::OriginalRect[3] := ::Width
+   ::OriginalRect[4] := ::Height
    ::DockIt()
    ::CtrlMask := ControlMask( Self )
    ::CtrlMask:Create()
+RETURN Self
+
+METHOD UpdateScroll() CLASS FormEditor
+   LOCAL pt := (struct POINT)
+   IF ::CtrlMask:CurForm != NIL
+      GetWindowRect( ::CtrlMask:CurForm:hWnd, @pt )
+      ScreenToClient( ::CtrlMask:CurForm:Parent:hWnd, @pt )
+      ::OriginalRect[3] := MAX( ::ClientWidth,  pt:x+::CtrlMask:CurForm:Width+20 )
+      ::OriginalRect[4] := MAX( ::ClientHeight, pt:y+::CtrlMask:CurForm:Height+20 )
+
+      ::CtrlMask:Width  := ::OriginalRect[3]
+      ::CtrlMask:Height := ::OriginalRect[4]
+
+      ::__SetScrollBars()
+   ENDIF
+RETURN NIL
+
+//---------------------------------------------------------------------------------------------------
+
+METHOD ResetScroll() CLASS FormEditor
+//   ::OnVScroll( SB_THUMBTRACK, -(::Application:MainForm:FormEditor1:VertScrollPos), 0 )
+//   ::OnHScroll( SB_THUMBTRACK, -(::Application:MainForm:FormEditor1:HorzScrollPos), 0 )
+//   ::VertScrollPos := 0
+//   ::HorzScrollPos := 0
+//   ::CtrlMask:Top  := 0
+//   ::CtrlMask:Left := 0
 RETURN Self
 
 //---------------------------------------------------------------------------------------------------
@@ -226,7 +258,7 @@ CLASS ControlMask INHERIT Window
    METHOD OnGetDlgCode()    INLINE DLGC_WANTMESSAGE | DLGC_WANTALLKEYS
    METHOD OnKeyDown(nKey)   INLINE IIF( ::lTimer, ( ::lTimer := .F., ::KillTimer(1) ), ), IIF( ::CurForm != NIL, ::CurForm:MaskKeyDown( Self, nKey ),)
    METHOD OnKeyUp()
-   METHOD OnWindowPaint()
+   METHOD OnPaint()
    METHOD OnUserMsg()
    METHOD OnTimer()
    METHOD OnNCDestroy()     INLINE  DeleteObject( ::RubberBrush ),;
@@ -473,6 +505,7 @@ RETURN NIL
 METHOD OnLButtonDown(n,x,y) CLASS ControlMask
    ( n )
    ::SetFocus()
+   
    IF !::lOrderMode .AND. ::CurForm != NIL .AND. ::CurForm:ControlSelect( x, y ) == -2
       ::PostMessage( WM_USER + 2222 )
 
@@ -518,10 +551,9 @@ METHOD OnEraseBkGnd() CLASS ControlMask
    ENDIF
 RETURN 1
 
-METHOD OnWindowPaint() CLASS ControlMask
+METHOD OnPaint( hDC ) CLASS ControlMask
    LOCAL x, nLeft, nTop, nRight, nBottom, lDC := .T.
    LOCAL aControl, aPoints, aPoint, aRect
-   LOCAL hDC, cPaint
    LOCAL i := 0
    LOCAL j := 0
 
@@ -533,7 +565,6 @@ METHOD OnWindowPaint() CLASS ControlMask
       ::aPrevRect := NIL
       RETURN NIL
    ENDIF
-   hDC := _BeginPaint( ::hWnd, @cPaint )
 
    aRect := ::CurForm:GetSelRect()
 
@@ -574,7 +605,6 @@ METHOD OnWindowPaint() CLASS ControlMask
     ELSEIF ::Application:CurCursor == NIL
       ::DrawOrder( ::CurForm, "" )
    ENDIF
-   _EndPaint( ::hWnd, cPaint )
 RETURN 0
 
 METHOD DrawSelRect( lClear ) CLASS ControlMask

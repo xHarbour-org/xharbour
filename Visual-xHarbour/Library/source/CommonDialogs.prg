@@ -51,8 +51,6 @@ CLASS ColorDialog INHERIT CommonDialogs
 
    DATA Colors          EXPORTED INIT {}
    DATA SysDefault      EXPORTED
-   DATA Custom          EXPORTED
-   DATA aCustom         EXPORTED
 
    METHOD Init() CONSTRUCTOR
    METHOD Show()
@@ -67,8 +65,9 @@ METHOD Init( oParent ) CLASS ColorDialog
 RETURN Self
 
 METHOD Show() CLASS ColorDialog
-   DEFAULT ::aCustom TO ARRAY(16)
-RETURN _ChooseColor( ::Owner:hWnd, @::Color, ::aCustom, ::Style )
+   LOCAL lRet
+   lRet := _ChooseColor( ::Owner:hWnd, @::Color, ::Application:CustomColors, ::Style )
+RETURN lRet
 
 //------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------

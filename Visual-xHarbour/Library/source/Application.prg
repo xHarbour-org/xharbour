@@ -98,8 +98,13 @@ RETURN
 
 FUNCTION GPFCatch( oExceptionInfo )
    LOCAL err := errorNew()
-   LOCAL __cGpfError := " " + Substr( GetModuleFileName(Application:DllInstance), Rat( "\", GetModuleFileName(Application:DllInstance) ) + 1 ) + ;
-         " has encountered a technical problem, and needs to close." + CRLF + CRLF
+   LOCAL __cGpfError := ""
+   TRY
+      __cGpfError := " " + Substr( GetModuleFileName(Application:DllInstance), Rat( "\", GetModuleFileName(Application:DllInstance) ) + 1 )
+   CATCH
+      __cGpfError := " " + Substr( GetModuleFileName(), Rat( "\", GetModuleFileName() ) + 1 )
+   END
+   __cGpfError += " has encountered a technical problem, and needs to close." + CRLF + CRLF
 
    SWITCH oExceptionInfo:ExceptionRecord:ExceptionCode
       CASE EXCEPTION_ACCESS_VIOLATION
@@ -283,6 +288,7 @@ CLASS Application
    PROPERTY SetEol             INDEX _SET_EOL             READ xSetEol             WRITE Set PROTECTED DEFAULT SET( _SET_EOL             )
    PROPERTY SetErrorlog        INDEX _SET_ERRORLOG        READ xSetErrorlog        WRITE Set PROTECTED DEFAULT SET( _SET_ERRORLOG        )
 
+   DATA CustomColors                   EXPORTED INIT Array(16)
    DATA AccelEnabled                   EXPORTED INIT .T.
    DATA Caption                        EXPORTED INIT ""
    DATA DllInstance                    EXPORTED
@@ -414,6 +420,8 @@ CLASS Application
    METHOD __SetAsProperty()
    METHOD __InvalidMember()
    METHOD Quit()
+   METHOD SaveCustomColors()
+   METHOD LoadCustomColors()
    error HANDLER OnError()
 ENDCLASS
 
@@ -739,6 +747,36 @@ METHOD DelAccelerators( hWnd, hAccelTable ) CLASS Application
       ENDIF
    ENDIF
 RETURN .F.
+
+//------------------------------------------------------------------------------------------------
+
+METHOD SaveCustomColors( nKey, cNode, cValue ) CLASS Application
+   LOCAL cCust, hKey, n
+   IF RegCreateKey( nKey, cNode, @hKey ) == 0
+      cCust := ""
+      FOR n := 1 TO LEN( ::CustomColors )-1
+         cCust += IIF( ::CustomColors[n] != NIL, xStr( ::CustomColors[n] ), "" ) + ","
+      NEXT
+      cCust += IIF( ::CustomColors[-1] != NIL, xStr( ::CustomColors[-1] ),"" )
+      RegSetValueEx( hKey, cValue,, 1, cCust )
+      RegCloseKey( hKey )
+   ENDIF
+RETURN NIL
+
+//------------------------------------------------------------------------------------------------
+
+METHOD LoadCustomColors( nKey, cNode, cValue ) CLASS Application
+   LOCAL cCust, hKey
+   IF RegCreateKey( nKey, cNode, @hKey ) == 0
+      RegQueryValueEx( hKey, cValue,,,@cCust )
+      DEFAULT cCust TO ""
+      ::CustomColors := hb_aTokens( cCust, "," )
+      ASIZE( ::CustomColors, 16 )
+      aEval( ::CustomColors, {|c,i| IIF( c != NIL, ::CustomColors[i] := VAL(c),) } )
+      RegCloseKey( hKey )
+   ENDIF
+RETURN NIL
+   
 
 //------------------------------------------------------------------------------------------------
 

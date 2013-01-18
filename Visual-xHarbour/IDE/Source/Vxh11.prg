@@ -587,7 +587,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                     aProperties := __GetMembers( oObj,,HB_OO_CLSTP_EXPORTED | HB_OO_CLSTP_PUBLISHED, HB_OO_MSG_DATA )
                     FOR n := 1 TO LEN( aProperties )
                         IF ! aProperties[n][1][1] $ "_X"
-                           aProp := GetProperCase( __Proper( aProperties[n] ) )
+                           aProp := __GetProperCase( __Proper( aProperties[n] ) )
                            AADD( aList, aProp[1]+"?8" )
                         ENDIF
                     NEXT

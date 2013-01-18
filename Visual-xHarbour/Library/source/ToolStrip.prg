@@ -1355,7 +1355,7 @@ METHOD __UpdateWidth() CLASS ToolStrip
    LOCAL nWidth
    IF LEN( ::Children ) > 0
       AEVAL( ::Children, {|o| nWidth := o:Left + o:Width } )
-      ::xWidth := nWidth + IIF( ::xShowChevron, ::__ChevronWidth, 2 ) + 3
+      ::xWidth := nWidth + IIF( ::xShowChevron, ::__ChevronWidth, 2 ) + 4
       //::xWidth := ATAIL( ::Children ):Left + ATAIL( ::Children ):Width + IIF( ::xShowChevron, ::__ChevronWidth, 2 )
     ELSE
       ::xWidth := 20

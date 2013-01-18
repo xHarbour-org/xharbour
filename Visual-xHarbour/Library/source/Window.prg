@@ -171,6 +171,7 @@ CLASS Window INHERIT Object
    
    DATA VertScroll             EXPORTED INIT .F.
    DATA HorzScroll             EXPORTED INIT .F.
+   DATA ScrollOnChildFocus     EXPORTED INIT .F.
 
    DATA OriginalRect           EXPORTED
    DATA Msg                    EXPORTED
@@ -444,8 +445,8 @@ CLASS Window INHERIT Object
    METHOD BringWindowToTop()      INLINE BringWindowToTop( ::hWnd )
    METHOD ScreenToClient( pt )    INLINE ScreenToClient( ::hWnd, @pt )
    METHOD ClientToScreen( pt )    INLINE ClientToScreen( ::hWnd, @pt )
-   METHOD SetWindowPos( hAfter, x, y, w, h , n)             INLINE SetWindowPos( ::hWnd, hAfter, x, y, w, h , n )
-   METHOD DeferWindowPos( hDef, hAfter, x, y, w, h , n)     INLINE DeferWindowPos( hDef, ::hWnd, hAfter, x, y, w, h , n )
+   METHOD SetWindowPos( hAfter, x, y, w, h , n)             INLINE IIF( ::ClsName == "VXH_FORM_IDE", (x:=10-::Parent:HorzScrollPos,y:=10-::Parent:VertScrollPos),), SetWindowPos( ::hWnd, hAfter, x, y, w, h , n )
+   METHOD DeferWindowPos( hDef, hAfter, x, y, w, h , n)     INLINE IIF( ::ClsName == "VXH_FORM_IDE", (x:=10-::Parent:HorzScrollPos,y:=10-::Parent:VertScrollPos),), DeferWindowPos( hDef, ::hWnd, hAfter, x, y, w, h , n )
    METHOD SendMessage( nMsg, nwParam, nlParam )             INLINE SendMessage( ::hWnd, nMsg, nwParam, nlParam )
    METHOD SendDlgItemMessage( nId, nMsg, nwParam, nlParam ) INLINE SendDlgItemMessage( ::hWnd, nId, nMsg, nwParam, nlParam )
    METHOD PostMessage( nMsg, nwParam, nlParam )             INLINE _PostMessage( ::hWnd, nMsg, nwParam, nlParam )
@@ -843,6 +844,9 @@ RETURN Self
 
 METHOD __SetSizePos( nPos, nVal ) CLASS Window
    DEFAULT nVal TO 0
+   IF ::ClsName == "VXH_FORM_IDE" .AND. nPos <= 2
+      RETURN NIL
+   ENDIF
    IF nPos > 2 .AND. nVal < 0
       nVal := 0
    ENDIF
@@ -1007,7 +1011,14 @@ METHOD Create( oParent ) CLASS Window
             ::xText := EVAL(cText)
          ENDIF
       ENDIF
-      ::hWnd := CreateWindowEx( ::ExStyle, ::ClsName, ::Caption, ::Style, ::Left, ::Top, ::Width, ::Height, hParent, ::Id, ::AppInstance, ::__ClientStruct )
+
+      nLeft := ::xLeft
+      nTop  := ::xTop
+      IF ::ClsName == "VXH_FORM_IDE"
+         nLeft := 10-::Parent:HorzScrollPos
+         nTop  := 10-::Parent:VertScrollPos
+      ENDIF
+      ::hWnd := CreateWindowEx( ::ExStyle, ::ClsName, ::Caption, ::Style, nLeft, nTop, ::Width, ::Height, hParent, ::Id, ::AppInstance, ::__ClientStruct )
     ELSE
       ::hWnd := capCreateCaptureWindow( "CaptureWindow", WS_CHILD | WS_VISIBLE, ::Left, ::Top, ::Width, ::Height, hParent, 0 )
    ENDIF
@@ -2530,7 +2541,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               IF ::__PaintBakgndImage( nwParam ) == NIL
                  _FillRect( nwParam, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, ::BkBrush )
               ENDIF
-              IF ! Empty( ::Children ) .AND. ( n := aScan( ::Children, {|o|o:hWnd==GetFocus() .AND. o:ClsName == "Edit" } ) ) > 0
+              IF ::Application:EditBoxFocusBorder .AND. ! Empty( ::Children ) .AND. ( n := aScan( ::Children, {|o|o:hWnd==GetFocus() .AND. o:ClsName == "Edit" } ) ) > 0
                  ::Children[n]:PaintFocusRect( nwParam )
               ENDIF
               RETURN 1
@@ -2611,34 +2622,37 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
 
       CASE WM_SETFOCUS
            IF ::Parent != NIL .AND. ::Parent:VertScroll
-              aRect    := _GetWindowRect( ::hWnd )
 
-              aPt := { aRect[1], aRect[2] }
-              _ScreenToClient( ::Parent:hWnd, @aPt )
-              aRect[1] := aPt[1]
-              aRect[2] := aPt[2]
+              IF ::Parent:ScrollOnChildFocus
+                 aRect    := _GetWindowRect( ::hWnd )
 
-              aPt := { aRect[3], aRect[4] }
-              _ScreenToClient( ::Parent:hWnd, @aPt )
-              aRect[3] := aPt[1]
-              aRect[4] := aPt[2]
+                 aPt := { aRect[1], aRect[2] }
+                 _ScreenToClient( ::Parent:hWnd, @aPt )
+                 aRect[1] := aPt[1]
+                 aRect[2] := aPt[2]
 
-              aParent  := _GetClientRect( ::Parent:hWnd )
+                 aPt := { aRect[3], aRect[4] }
+                 _ScreenToClient( ::Parent:hWnd, @aPt )
+                 aRect[3] := aPt[1]
+                 aRect[4] := aPt[2]
 
-              // Set Vertical Position
-              IF aRect[4] > aParent[4]
-                 n := aParent[2]+( aRect[4]-aParent[4] ) - aRect[2]
-                 ::Parent:OnVScroll( SB_THUMBTRACK, ::Parent:VertScrollPos + ( aRect[4]-aParent[4] )- MAX(n,0), 0 )
-               ELSEIF aRect[2] < 0
-                 ::Parent:OnVScroll( SB_THUMBTRACK, ::Parent:VertScrollPos + ( aRect[2] ), 0 )
-              ENDIF
+                 aParent  := _GetClientRect( ::Parent:hWnd )
 
-              // Set Horizontal Position
-              IF aRect[3] > aParent[3]
-                 n := aParent[1]+( aRect[3]-aParent[3] ) - aRect[1]
-                 ::Parent:OnHScroll( SB_THUMBTRACK, ::Parent:HorzScrollPos + ( aRect[3]-aParent[3] ) - MAX(n,0), 0 )
-               ELSEIF aRect[1] < 0
-                 ::Parent:OnHScroll( SB_THUMBTRACK, ::Parent:HorzScrollPos + ( aRect[1] ), 0 )
+                 // Set Vertical Position
+                 IF aRect[4] > aParent[4]
+                    n := aParent[2]+( aRect[4]-aParent[4] ) - aRect[2]
+                    ::Parent:OnVScroll( SB_THUMBTRACK, ::Parent:VertScrollPos + ( aRect[4]-aParent[4] )- MAX(n,0), 0 )
+                  ELSEIF aRect[2] < 0
+                    ::Parent:OnVScroll( SB_THUMBTRACK, ::Parent:VertScrollPos + ( aRect[2] ), 0 )
+                 ENDIF
+
+                 // Set Horizontal Position
+                 IF aRect[3] > aParent[3]
+                    n := aParent[1]+( aRect[3]-aParent[3] ) - aRect[1]
+                    ::Parent:OnHScroll( SB_THUMBTRACK, ::Parent:HorzScrollPos + ( aRect[3]-aParent[3] ) - MAX(n,0), 0 )
+                  ELSEIF aRect[1] < 0
+                    ::Parent:OnHScroll( SB_THUMBTRACK, ::Parent:HorzScrollPos + ( aRect[1] ), 0 )
+                 ENDIF
               ENDIF
            ENDIF
 
@@ -2955,8 +2969,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
            ::hdr:idFrom   := idFrom
            ::hdr:code     := code
 
-           //::hdr := (struct NMHDR)
-           //::hdr:Pointer( nlParam )
+           //::hdr := (struct NMHDR* nlParam)
 
            nRet := ExecuteEvent( "OnNotify", Self )
            nRet := ::OnNotify( nwParam, nlParam, code )
@@ -3008,8 +3021,11 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
            ::WindowPos:cy              := aParams[6]
            ::WindowPos:flags           := aParams[7]
 
-           ::xLeft   := ::WindowPos:x
-           ::xTop    := ::WindowPos:y
+           IF ::ClsName != "VXH_FORM_IDE"
+              ::xLeft   := ::WindowPos:x
+              ::xTop    := ::WindowPos:y
+           ENDIF
+
            ::xWidth  := ::WindowPos:cx
            IF ::ClsName != "ComboBox"
               ::xHeight := ::WindowPos:cy
@@ -3625,30 +3641,6 @@ RETURN {aRect[3],aRect[4]}
 //-----------------------------------------------------------------------------------------------
 
 METHOD GetWindowRect() CLASS Window
-/*
-   static rc, pt
-
-   DEFAULT rc TO (struct RECT)
-   GetWindowRect( ::hWnd, @rc )
-
-   IF ::Parent != NIL
-
-      DEFAULT pt TO (struct POINT)
-      pt:x := rc:left
-      pt:y := rc:top
-      ScreenToClient( ::Parent:hWnd, @pt )
-
-      ::xLeft   := pt:x
-      ::xTop    := pt:y
-    ELSE
-     ::xLeft   := rc:left //aRect[1]
-     ::xTop    := rc:top //aRect[2]
-   ENDIF
-   ::xWidth  := rc:right - rc:left
-   ::xHeight := rc:bottom - rc:top
-
-RETURN { rc:left, rc:top, rc:right, rc:bottom }
-*/
    LOCAL aPt, aRect
 
    aRect := _GetWindowRect( ::hWnd )
@@ -3658,8 +3650,8 @@ RETURN { rc:left, rc:top, rc:right, rc:bottom }
       aPt := { aRect[1], aRect[2] }
       _ScreenToClient( ::Parent:hWnd, @aPt )
 
-      ::xLeft   := aPt[1]// + ::Parent:HorzScrollPos
-      ::xTop    := aPt[2]// + ::Parent:VertScrollPos
+      ::xLeft   := aPt[1]
+      ::xTop    := aPt[2]
     ELSE
       ::xLeft   := aRect[1]
       ::xTop    := aRect[2]
@@ -4214,7 +4206,13 @@ METHOD MoveWindow( x, y, w, h, lRep ) CLASS Window
    ::xTop   := y
    ::xWidth := w
    ::xHeight:= h
-   MoveWindow( ::hWnd, ::xLeft, ::xTop, ::xWidth, ::xHeight, lRep )
+
+   IF ::ClsName == "VXH_FORM_IDE"
+      x := 10-::Parent:HorzScrollPos
+      y := 10-::Parent:VertScrollPos
+   ENDIF
+
+   MoveWindow( ::hWnd, x, y, ::xWidth, ::xHeight, lRep )
 RETURN Self
 //---------------------------------------------------------------------------------------------
 
@@ -4272,6 +4270,12 @@ METHOD OnVScroll( nSBCode, nPos ) CLASS Window
 
    nDelta := Int(nDelta)
    ::VertScrollPos += nDelta
+
+   IF ::siv == NIL
+      ::siv := (struct SCROLLINFO)
+      ::siv:cbSize := ::siv:sizeof()
+      ::siv:nMin   := 0
+   ENDIF
 
    ::siv:nPos   := ::VertScrollPos
    ::siv:fMask  := SIF_POS
@@ -5066,6 +5070,11 @@ CLASS WinForm INHERIT Window
    DATA MaxHeight               PUBLISHED INIT 0
    DATA ShowInTaskBar           PUBLISHED INIT .T.
 
+   DATA ScrollOnChildFocus      PUBLISHED INIT .F.
+
+   DATA __lResizeable            EXPORTED  INIT {.F.,.F.,.F.,.T.,.T.,.T.,.F.,.F.}
+   DATA __lMoveable              EXPORTED  INIT .F.
+
    PROPERTY VertScrollSize READ xVertScrollSize WRITE __SetVertScrollSize DEFAULT 0
    PROPERTY HorzScrollSize READ xHorzScrollSize WRITE __SetHorzScrollSize DEFAULT 0
 
@@ -5757,8 +5766,8 @@ METHOD SetOpacity( n ) CLASS WinForm
    ENDIF
 RETURN Self
 
-
 //-----------------------------------------------------------------------------------------------
+
 METHOD SetImageList() CLASS WinForm
    ::xImageList := __ChkComponent( Self, ::xImageList )
    __BrowseChildren( Self )
@@ -6167,7 +6176,7 @@ RETURN { ;
                                   { "UserMethod17"       , "", "" },;
                                   { "UserMethod18"       , "", "" },;
                                   { "UserMethod19"       , "", "" } } } }
-function dview( cView )
-   VIEW cView
+function dview( ... )
+   VIEW HB_AParams()
 RETURN NIL
 

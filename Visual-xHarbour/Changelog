@@ -8,6 +8,59 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-01-16 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Application:CustomColors so the ColorDialog and the PickColor combobox control
+     can share them all over the app.
+   + Added Application:SaveCustomColors and LoadCustomColors( nKey, cNode, cValue )
+     nKey = HKEY_LOCALMACHINE
+     cNode = "Software\YourAppName"
+     cValue = "CustomColors"
+   * Changed form designer scroll area to grow and shrink based on the form size
+   ! Fixed designer to allow sizing the form being edited beyond boundaries.
+   * Renamed internal function GetProperCase to __GetProperCase to not to clash with local names.
+   * Disabled moving forms, instead, the Left and Top values will be saved but the position in the 
+     designer will always be 10, 10 to optimize the editing area.
+   * Changed object manager to display and activate a checkbox for logical properties instead of a 
+     Yes/no combobox.
+   ! Fixed GPF handler to prevent a RTE when showing GPF information.
+   * Changed Object Manager Color properties handling to use a simpler aproach.
+   + Added DataGrid:HighlightBorderColor
+   ! Fixed DataGrid RTE changing the index Tag and re-sorting the grid.
+   ! Fixed DataGrid display problem when changing the index Tag.
+   + Added GridColumn MinWidth and MaxWidth so users don't try to resize them beyond the boundaries.
+   * Changed DataGrid selection border to display a rectangle instead of the dotted one when 
+     HighlightBorderColor is defined.
+   + Added ScrollOnChildFocus for Panels and Forms to Auto-Scroll when a control gains focus so controls
+     hiding inside the scrolled area can show automatically.
+   ! Fixed GPF calling ChangeServiceDescription in ServiceManager under Windows 8 (no solution available 
+     from MS yet)
+   ! Fixed StatusBar:BackColor to show in Object Manager. Changes do not show yet a new StatusBar class is
+     being developed and it will be compatible with latest tecnologies.
+   ! Fixed ToolStrip button border being hidden by its parent border when ShowChevron is off.
+   + Added TreeViewItem:Text to comply with the rest of the controls.
+   ! Fixed containers to paint EditBox blue border ONLY when EditBoxFocusBorder is true.
+   ! Fixed container Auto-Scroll to ONLY do it when ScrollOnChildFocus is specified.
+   ! Fixed RTE when closing scrolled windows.
+   
+   
+   IDE\Source\Vxh1.prg
+   IDE\Source\Vxh10.prg
+   IDE\Source\Vxh11.prg
+   IDE\Source\Vxh2.prg
+   IDE\Source\Vxh3.prg
+   IDE\Source\Vxh4.prg
+   Library\source\Application.prg
+   Library\source\ComboBox.prg
+   Library\source\CommonDialogs.prg
+   Library\source\DataGrid.prg
+   Library\source\Panel.prg
+   Library\source\ProfessionalColorTable.prg
+   Library\source\Service.prg
+   Library\source\StatusBar.prg
+   Library\source\ToolStrip.prg
+   Library\source\TreeViewItem.prg
+   Library\source\Window.prg
+
 2012-11-12 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    ! Fixed bug in DataGrid updating on DataSources with less records
      than visible rows.

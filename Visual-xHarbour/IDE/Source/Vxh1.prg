@@ -32,8 +32,8 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 #define XFM_EOL Chr(13) + Chr(10)
 #define HKEY_LOCAL_MACHINE           (0x80000002)
 
-#define VXH_Version      "4"
-#define VXH_BuildVersion "4.0.0"
+#define VXH_Version      "5"
+#define VXH_BuildVersion "5.0.0"
 
 #define MCS_ARROW    10
 #define MCS_PASTE    11
@@ -252,6 +252,7 @@ METHOD Init( ... ) CLASS IDE
    ::RulerType  := ::IniFile:ReadInteger( "General", "RulerType", 1 )
    ::DisableWhenRunning := ::IniFile:ReadLogical( "General", "DisableWhenRunning", .F. )
 
+   ::Application:LoadCustomColors( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour", "CustomColors" )
 
    IF( n := ::IniFile:ReadInteger( "General", "ShowTip", 1 ) ) == 0
       ::ShowTip := .F.
@@ -441,6 +442,8 @@ METHOD OnClose() CLASS IDE_MainForm
       RegSetValueEx( hKey, "Running",, 1, "0" )
       RegCloseKey( hKey )
    ENDIF
+
+   ::Application:SaveCustomColors( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour", "CustomColors" )
 
    IF RegCreateKey( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\ComObjects", @hKey ) == 0
       aVal := {}
@@ -2101,6 +2104,8 @@ METHOD Init() CLASS IDE_MainForm
 
       WITH OBJECT ::Application:EditorPage := TabPage( :this )
          :Caption          := "Source Code Editor"
+         :BackColor        := ::System:Color:White
+
          :OnWMShowWindow   := {|| OnShowEditors() }
          :OnWMSetFocus     := {|| ::Application:SourceEditor:SetFocus() }
 
@@ -2138,6 +2143,7 @@ METHOD Init() CLASS IDE_MainForm
 
       WITH OBJECT ::Application:DesignPage := TabPage( :this )
          :Caption   := "Form Designer"
+         :BackColor := ::System:Color:White 
          :Enabled   := .F.
          :Create()
          :OnWMShowWindow := {|o| OnShowDesigner(o) }
@@ -3434,11 +3440,11 @@ METHOD SelectWindow( oWin, hTree, lFromTab ) CLASS Project
    LOCAL n, oWnd := ::CurrentForm
    DEFAULT hTree TO 0
    DEFAULT lFromTab TO .F.
-   
+
    IF oWin:Cargo != NIL
       ::LoadForm( oWin:Cargo,,, .T., oWin )
       oWin:Cargo := NIL
-      oWin:MoveWindow()
+      //oWin:MoveWindow()
    ENDIF
    ::CurrentForm := oWin
    IF !lFromTab
@@ -3453,6 +3459,7 @@ METHOD SelectWindow( oWin, hTree, lFromTab ) CLASS Project
    ENDIF
    ::CurrentForm:Show()
    ::CurrentForm:InvalidateRect(,.F.)
+   ::CurrentForm:Parent:UpdateScroll()
 RETURN 0
 
 //-------------------------------------------------------------------------------------------------------
@@ -3558,6 +3565,8 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    ENDIF
 
    lRem := .F.
+
+   ::Application:MainForm:FormEditor1:ResetScroll()
 
    FOR n := 1 TO ::Application:SourceEditor:DocCount
        IF lCloseErrors
@@ -4951,6 +4960,9 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    #ifdef VXH_PROFESSIONAL
       lPro := .T.
    #endif
+
+   ::Application:MainForm:FormEditor1:ResetScroll()
+
    FOR n := 1 TO LEN( ::Forms )
       
        // Unloaded forms need to report resources to be generated in RC file!!!
@@ -5321,7 +5333,7 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
 
           IF cProperty == NIL
              IF hOleVars == NIL
-                cProp := GetProperCase( __Proper( aProperty[1] ) )[1]
+                cProp := __GetProperCase( __Proper( aProperty[1] ) )[1]
                ELSE
                 cProp := aProperty
              ENDIF
@@ -5447,13 +5459,13 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
                          ENDIF
                        ELSEIF VALTYPE( xValue1 ) != "A"
 
-                         IF oCtrl:ClsName == "VXH_FORM_IDE"
-                            IF UPPER( cProp ) == "TOP"
-                               xValue1 += oCtrl:Parent:VertScrollPos
-                             ELSEIF UPPER( cProp ) == "LEFT"
-                               xValue1 += oCtrl:Parent:HorzScrollPos
-                            ENDIF
-                         ENDIF
+                         //IF oCtrl:ClsName == "VXH_FORM_IDE"
+                         //   IF UPPER( cProp ) == "TOP"
+                         //      xValue1 += oCtrl:Parent:VertScrollPos
+                         //    ELSEIF UPPER( cProp ) == "LEFT"
+                         //      xValue1 += oCtrl:Parent:HorzScrollPos
+                         //   ENDIF
+                         //ENDIF
                          cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := " + IIF( cProp == "FaceName", '"' + STRTRAN( xValue1, CHR(0) ) + '"', ValToPrgExp( xValue1 ) ) + CRLF
 
                        ELSEIF oCtrl:__xCtrlName == "MemoryTable" .OR. cProp == "Resources" .OR. ( cProp == "Structure" .AND. oCtrl:__xCtrlName == "MemoryDataTable" )
@@ -6332,8 +6344,8 @@ METHOD SetAction( aActions, aReverse ) CLASS Project
 
            ::CurrentForm:UpdateSelection()
 
-           ::Application:ObjectManager:CheckValue( "Left",   "Position", ::CurrentForm:Selected[1][1]:Left + IIF( __ObjHasMsg( ::CurrentForm:Selected[1][1]:Parent, "HorzScrollPos" ), ::CurrentForm:Selected[1][1]:Parent:HorzScrollPos, 0 ) )
-           ::Application:ObjectManager:CheckValue( "Top",    "Position", ::CurrentForm:Selected[1][1]:Top  + IIF( __ObjHasMsg( ::CurrentForm:Selected[1][1]:Parent, "VertScrollPos" ), ::CurrentForm:Selected[1][1]:Parent:VertScrollPos, 0 ) )
+           ::Application:ObjectManager:CheckValue( "Left",   "Position", ::CurrentForm:Selected[1][1]:Left )//+ IIF( __ObjHasMsg( ::CurrentForm:Selected[1][1]:Parent, "HorzScrollPos" ), ::CurrentForm:Selected[1][1]:Parent:HorzScrollPos, 0 ) )
+           ::Application:ObjectManager:CheckValue( "Top",    "Position", ::CurrentForm:Selected[1][1]:Top  )//+ IIF( __ObjHasMsg( ::CurrentForm:Selected[1][1]:Parent, "VertScrollPos" ), ::CurrentForm:Selected[1][1]:Parent:VertScrollPos, 0 ) )
            ::Application:ObjectManager:CheckValue( "Width",  "Size",     ::CurrentForm:Selected[1][1]:Width )
            ::Application:ObjectManager:CheckValue( "Height", "Size",     ::CurrentForm:Selected[1][1]:Height )
            RETURN Self
@@ -6965,7 +6977,7 @@ RETURN Self
 METHOD OnInitDialog() CLASS AboutVXH
    LOCAL oBtn, oLabel, n, aDev := { "Augusto R. Infante", "Phil Krylov", "Ron Pinkas", "Patrick Mast" }
 
-   ::BackColor   := ::System:Color:White
+   //::BackColor   := ::System:Color:White
    WITH OBJECT ( ::Picture := PictureBox( Self ) )
       :Dock:Margin := 0
       :Dock:Left   := Self
@@ -6976,7 +6988,7 @@ METHOD OnInitDialog() CLASS AboutVXH
       :Create()
       :Height      := :PictureHeight
       WITH OBJECT ( ::BetaLabel := LABEL( :this ) )
-         :Left           := 330
+         :Left           := 210
          :Top            := 0
          :Width          := 300
          :Height         := 62
@@ -7017,7 +7029,7 @@ METHOD OnInitDialog() CLASS AboutVXH
       :Dock:Top    := ::Picture
       :Dock:Right  := Self
       :Dock:Bottom := oBtn
-      :BackColor   := ::System:Color:LightGray
+//      :BackColor   := ::System:Color:LightGray
       :Create()
       WITH OBJECT ( LINKLABEL( :this ) )
          :Left           := 2
@@ -7039,7 +7051,7 @@ METHOD OnInitDialog() CLASS AboutVXH
          :Width          := 61
          :Height         := 16
          :Caption        := "Architect:"
-         :Font:Bold      := .T.
+         :Font:Underline := .T.
          :Create()
       END
 
@@ -7049,8 +7061,8 @@ METHOD OnInitDialog() CLASS AboutVXH
          :Width          := 119
          :Height         := 16
          :Caption        := "Augusto R. Infante"
-         :Font:Bold      := .T.
-         :ForeColor   := ::System:Color:Gray
+         //:Font:Bold      := .T.
+         //:ForeColor   := ::System:Color:Gray
          :Create()
       END
 
@@ -7060,7 +7072,7 @@ METHOD OnInitDialog() CLASS AboutVXH
          :Width          := 69
          :Height         := 16
          :Caption        := "Developers:"
-         :Font:Bold      := .T.
+         :Font:Underline := .T.
          :Create()
       END
 
@@ -7071,8 +7083,8 @@ METHOD OnInitDialog() CLASS AboutVXH
             :Width       := 120
             :Height      := 22
             :Caption     := aDev[n]
-            :Font:Bold   := .T.
-            :ForeColor   := ::System:Color:Gray
+            //:Font:Bold   := .T.
+            //:ForeColor   := ::System:Color:Gray
             :Create()
          END
       NEXT

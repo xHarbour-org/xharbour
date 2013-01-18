@@ -29,10 +29,15 @@ CLASS TreeViewItem INHERIT Object
    DATA PointerItem    EXPORTED
    DATA InsertAfter    EXPORTED INIT TVI_LAST
 
-   PROPERTY Bold    INDEX TVIS_BOLD READ xBold    WRITE SetItemState PROTECTED
-   PROPERTY Caption                 READ xCaption WRITE SetItemText
+   PROPERTY Bold    INDEX TVIS_BOLD READ xBold       WRITE SetItemState PROTECTED
+   PROPERTY Text                    READ xText       WRITE SetItemText
    PROPERTY ImageIndex              READ xImageIndex WRITE SetImageIndex DEFAULT 0
-   
+
+   ACCESS xCaption         INLINE ::xText
+   ASSIGN xCaption(c)      INLINE ::xText := c
+   ACCESS Caption          INLINE ::Text
+   ASSIGN Caption(c)       INLINE ::Text := c
+
    ACCESS Expanded INLINE ::Parent:SendMessage( TVM_GETITEMSTATE, ::hItem, TVIF_STATE ) & TVIS_EXPANDED == TVIS_EXPANDED
    METHOD Init() CONSTRUCTOR
    METHOD Create()

@@ -30,6 +30,20 @@ static __aProps := {=>}
 #define MAPVK_VK_TO_CHAR   2
 #define MAPVK_VSC_TO_VK_EX 3
 
+#define BP_CHECKBOX        3
+#define CBS_UNCHECKEDNORMAL      1
+#define CBS_UNCHECKEDHOT         2
+#define CBS_UNCHECKEDPRESSED     3
+#define CBS_UNCHECKEDDISABLED    4
+#define CBS_CHECKEDNORMAL        5
+#define CBS_CHECKEDHOT           6
+#define CBS_CHECKEDPRESSED       7
+#define CBS_CHECKEDDISABLED      8
+#define CBS_MIXEDNORMAL          9
+#define CBS_MIXEDHOT            10
+#define CBS_MIXEDPRESSED        11
+#define CBS_MIXEDDISABLED       12
+
 //------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------
@@ -46,11 +60,13 @@ CLASS ObjManager INHERIT TreeView
    DATA lPaint        EXPORTED INIT .T.
    DATA cSubPropList  EXPORTED INIT ""
    DATA cEventList    EXPORTED INIT ""
+   DATA hChkTheme     EXPORTED
+
    METHOD Init() CONSTRUCTOR
    METHOD ResetProperties()
    METHOD Create()
    METHOD OnHScroll( n)        INLINE ::nScroll := n
-   METHOD OnDestroy()          INLINE ::LevelFont:Delete(), NIL
+   METHOD OnDestroy()          INLINE ::LevelFont:Delete(), CloseThemeData( ::hChkTheme ), NIL
    METHOD OnKeyDown()
    METHOD OnUserMsg()
    METHOD OnLButtonDown()
@@ -64,7 +80,7 @@ CLASS ObjManager INHERIT TreeView
    
    METHOD OnParentNotify()
    METHOD DrawItem()
-   
+
    METHOD GetEditBuffer()
    METHOD OnGetDlgCode()
    METHOD OnSize()
@@ -77,6 +93,7 @@ CLASS ObjManager INHERIT TreeView
    METHOD SetPropDesc()
    METHOD GetPropertiesAndValues( oObj ) INLINE __ClsGetPropertiesAndValues( oObj )
    METHOD EditText()
+   METHOD GetColorValues()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------
@@ -117,6 +134,7 @@ METHOD Create() CLASS ObjManager
    ::SetIndent( 15 )
    ::SetItemHeight( ABS( ::Font:Height ) + 6 )
    ::Action := {|o| ::SetPropDesc(o) }
+   ::hChkTheme := OpenThemeData(,"button")
 RETURN Self
 
 //---------------------------------------------------------------------------------------------------
@@ -166,7 +184,7 @@ RETURN 0
 METHOD DrawItem( tvcd ) CLASS ObjManager
    LOCAL n, nState, nBack, nFore, lExpanded, rc, nWidth, nLeft, nRight, nBottom, aAlign, x, y, lHasChildren
    LOCAL aRow, aCol, hOldPen, nAlign, cType, nColor, hOld, hBrush, aRest, cText, nfHeight := ABS( ::Font:Height )+3
-   LOCAL nPos, cCap, cProp, nLevel, hDC, oItem
+   LOCAL nPos, cCap, cProp, nLevel, hDC, oItem, aRect, lVal
    LOCAL hIcon, lDisabled := .F.
    LOCAL lEnabled, hBoldFont
 
@@ -396,19 +414,7 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
              END
           ENDIF
 
-          IF oItem:ColItems[n]:ColType == "SERVERTYPE"
-             cText := cText[ oItem:ColItems[n]:SetValue ]
-          ENDIF
-
-          IF oItem:ColItems[n]:ColType == "TARGETTYPE"
-             cText := cText[ oItem:ColItems[n]:SetValue ]
-          ENDIF
-
-          IF oItem:ColItems[n]:ColType == "REPRESENTATION"
-             cText := cText[ oItem:ColItems[n]:SetValue ]
-          ENDIF
-
-          IF oItem:ColItems[n]:ColType == "ALIGNMENT"
+          IF oItem:ColItems[n]:ColType IN {"SERVERTYPE","TARGETTYPE","REPRESENTATION","ALIGNMENT"}
              cText := cText[ oItem:ColItems[n]:SetValue ]
           ENDIF
 
@@ -424,17 +430,9 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
              cText := cText[ ::ActiveObject:ImageType ]
           ENDIF
 
-          //IF oItem:ColItems[n]:ColType == "STATES"
-          //   cText := cText[ ::ActiveObject:InitialState+1 ]
-          //ENDIF
-
           IF oItem:ColItems[n]:ColType == "PAGE_POSITIONS"
              cText := cText[ ::ActiveObject:Position+1 ]
           ENDIF
-
-          //IF oItem:ColItems[n]:ColType == "VIEWSTYLES"
-          //   cText := cText[ ::ActiveObject:ViewStyle+1 ]
-          //ENDIF
 
           IF oItem:ColItems[n]:ColType == "CHECKSTYLES"
              cText := cText[ ::ActiveObject:CheckStyle ]
@@ -486,8 +484,9 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
                   nAlign := TA_LEFT
                   EXIT
              CASE "L"
-                  cText  := IIF( cText, "True", "False" )
-                  EXIT
+                  lVal := cText
+                  //_DrawFrameControl( hDC, {nLeft,rc:top,70,20}, DFC_BUTTON, DFCS_BUTTONCHECK|DFCS_CHECKED )
+                  cText  := ""
           END
           DEFAULT cText TO ""
 
@@ -537,6 +536,12 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
           ENDIF
 
           _ExtTextOut( hDC, x, y, ETO_CLIPPED+ETO_OPAQUE, { nLeft, rc:top, nRight, rc:bottom }, cText  )
+
+          IF cType == "L"
+             aRect := { nLeft, rc:top, nLeft+20, rc:top+20 }
+             DrawThemeBackground( ::hChkTheme, hDC, BP_CHECKBOX, IIF( lVal, CBS_CHECKEDNORMAL, CBS_UNCHECKEDNORMAL ), aRect, aRect )
+             RETURN NIL
+          ENDIF
 
           SelectObject( hDC, ::Font:Handle )
 
@@ -597,11 +602,6 @@ METHOD CheckValue( cProp, cRoot, xValue ) CLASS ObjManager
          xVal := oItem:ColItems[1]:SetValue
       ENDIF
       IF ! ( xValue == xVal ) .AND. VALTYPE( xVal ) == VALTYPE( xValue )
-         IF UPPER( cProp ) == "LEFT" .AND. __ObjHasMsg( ::ActiveObject:Parent, "HorzScrollPos" )
-            xValue := ::ActiveObject:Left + ::ActiveObject:Parent:HorzScrollPos
-          ELSEIF UPPER( cProp ) == "TOP" .AND. __ObjHasMsg( ::ActiveObject:Parent, "VertScrollPos" )
-            xValue := ::ActiveObject:Top + ::ActiveObject:Parent:VertScrollPos
-         ENDIF
 
          IF ( VALTYPE( oItem:ColItems[1]:Value ) == VALTYPE( xValue ) )
             oItem:ColItems[1]:Value := xValue
@@ -811,7 +811,7 @@ RETURN Self
 METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
    STATIC s_bSetting := .F.
 
-   LOCAL n, cProp, cProp2, oObj, nColor, Topic, Event, nCurr, nHost, cVal
+   LOCAL n, cProp, cProp2, oObj, Topic, Event, nCurr, nHost, cVal
    LOCAL oError
    
    DEFAULT oItem TO FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
@@ -934,73 +934,17 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
       ENDIF
       
       IF cProp IN {"Left","Top","Width","Height"}
-         oActiveObject:MoveWindow()
-         oActiveObject:Parent:InvalidateRect()
+         IF oActiveObject:ClsName != "VXH_FORM_IDE" .OR. cProp IN {"Width","Height"}
+            oActiveObject:MoveWindow()
+            oActiveObject:Parent:InvalidateRect()
+         ENDIF
       ENDIF
       IF cProp == "Caption" .AND. __ObjHasMsg( oActiveObject, "SmallCaption" ) .AND. oActiveObject:SmallCaption
          oActiveObject:SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
       ENDIF
 
-      IF cProp != "ColorScheme" .AND. AT( "Color", cProp ) > 0 .AND. VALTYPE( xValue ) != "L"
-         nColor := xValue
-         IF ( n := ASCAN( ::Colors, {|a|a[1]==xValue} ) ) > 0
-            IF nColor == NIL .AND. UPPER( cProp ) == "MASKCOLOR"
-               xValue := "None"
-             ELSE
-               xValue := ::Colors[n][2]
-            ENDIF
-            TRY
-               IF xValue == "System Default..." .AND. nColor == NIL
-                  nColor := oObj:&( STRTRAN( cProp, "Color", "SysColor" ) )
-               ENDIF
-             catch
-            END
-          ELSE
-            IF cProp == "BackColor" .AND. ( xValue == oObj:BackSysColor .OR. xValue == NIL )
-               xValue := "System Default..."
-               nColor := oObj:BackSysColor
-            ENDIF
-            IF cProp == "ForeColor" .AND. ( xValue == oObj:ForeSysColor .OR. xValue == NIL )
-               xValue := "System Default..."
-               nColor := oObj:ForeSysColor
-            ENDIF
-            IF cProp == "SelBackColor" .AND. ( xValue == oObj:BackSysColor .OR. xValue == NIL )
-               xValue := "System Default..."
-               nColor := oObj:BackSysColor
-            ENDIF
-            IF cProp == "SelForeColor" .AND. ( xValue == oObj:ForeSysColor .OR. xValue == NIL )
-               xValue := "System Default..."
-               nColor := oObj:ForeSysColor
-            ENDIF
-            IF cProp == "HighlightColor" .AND. ( xValue == oObj:HighlightSysColor .OR. xValue == NIL )
-               xValue := "System Default..."
-               nColor := oObj:HighlightSysColor
-            ENDIF
-            IF cProp == "HighlightTextColor" .AND. ( xValue == oObj:HighlightTextSysColor .OR. xValue == NIL )
-               xValue := "System Default..."
-               nColor := oObj:HighlightTextSysColor
-            ENDIF
-            IF cProp == "HeaderBackColor" .AND. ( xValue == oObj:HeaderBackSysColor .OR. xValue == NIL )
-               xValue := "System Default..."
-               nColor := oObj:HeaderBackSysColor
-            ENDIF
-            IF cProp == "TransparentColor" .AND. ( xValue == NIL )
-               xValue := "System Default..."
-               nColor := -1
-            ENDIF
-         ENDIF
-         IF VALTYPE( xValue ) != "C"
-            xValue := "Custom..."
-         ENDIF
-         TRY
-            IF nColor == NIL
-               nColor := oObj:&( STRTRAN( RIGHT(cProp,9), "Color", "SysColor" ))
-               xValue := "System Default..."
-            ENDIF
-          catch
-         END
-            
-         oItem:ColItems[1]:Color := nColor
+      IF oItem:Owner:Caption == "Colors"
+         oItem:ColItems[1]:Color := ::GetColorValues( oObj, cProp, @xValue )
          ::InvalidateRect(,.F.)
       ENDIF
 
@@ -1147,7 +1091,7 @@ RETURN Self
 //---------------------------------------------------------------------------------------------------
 
 METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS ObjManager
-   LOCAL cProp, cProp2, aProp, xValue, n, oItem, nColor, aSub, aCol, oSub, oObj, xValue2, lReadOnly
+   LOCAL cProp, cProp2, aProp, xValue, n, oItem, nColor, aSub, aCol, oSub, xValue2, lReadOnly//, oObj
    LOCAL aProperties, aProperty, aSubProp, cType, Child, xProp
 
    IF ::ActiveControl != NIL .AND. ::ActiveControl:IsWindow()
@@ -1241,6 +1185,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
        //hb_gcAll()
        cProp  := aProperty[1]
 
+       //------------------------------------------------------------------------------------------------------------------------------------------------------
        IF cProp == "RESOURCES" .AND. ::ActiveObject:ClsName == "Application"
           LOOP
        ENDIF
@@ -1269,7 +1214,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
        IF cProp == "POSITION" .AND. ::ActiveObject:ClsName == "ToolButton"
           LOOP
        ENDIF
-       IF ( cProp == "DOCK" .OR. cProp == "ANCHOR" ).AND. ::ActiveObject:Parent:ClsName == "StatusBarPanel"
+       IF cProp IN {"DOCK","ANCHOR"} .AND. ::ActiveObject:Parent:ClsName == "StatusBarPanel"
           LOOP
        ENDIF
 
@@ -1285,6 +1230,8 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
        IF cProp == "MDICONTAINER" .AND. LEN( ::Application:Project:Forms ) > 0 .AND. !( ::ActiveObject:hWnd == ::Application:Project:Forms[1]:hWnd )
           LOOP
        ENDIF
+       //------------------------------------------------------------------------------------------------------------------------------------------------------
+
        hb_gcStep()
 
        TRY
@@ -1295,69 +1242,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
        cType  := VALTYPE( xValue )
        nColor := NIL
 
-       IF cProp != "COLORSCHEME" .AND. AT( "COLOR", cProp ) > 0 .AND. VALTYPE( xValue ) != "L"
-          cType  := "COLORREF"
-          nColor := xValue
-
-          IF ( n := ASCAN( ::Colors, {|a|a[1]==xValue} ) ) > 0
-             IF nColor == NIL .AND. UPPER( cProp ) == "MASKCOLOR"
-                xValue := "None"
-              ELSE
-                xValue := ::Colors[n][2]
-             ENDIF
-             TRY
-                IF xValue == "System Default..." .AND. nColor == NIL
-                   nColor := oObj:&( STRTRAN( cProp, "Color", "SysColor" ) )
-                ENDIF
-              catch
-             END
-           ELSE
-             IF cProp == "LINKCOLOR" .AND. ( xValue == ::ActiveObject:LinkSysColor .OR. xValue == NIL )
-                xValue := "System Default..."
-                nColor := ::ActiveObject:LinkSysColor
-             ENDIF
-             IF cProp == "BACKCOLOR" .AND. ( xValue == ::ActiveObject:BackSysColor .OR. xValue == NIL )
-                xValue := "System Default..."
-                nColor := ::ActiveObject:BackSysColor
-             ENDIF
-             IF cProp == "FORECOLOR" .AND. ( xValue == ::ActiveObject:ForeSysColor .OR. xValue == NIL )
-                xValue := "System Default..."
-                nColor := ::ActiveObject:ForeSysColor
-             ENDIF
-             IF cProp == "SELBACKCOLOR" .AND. ( xValue == ::ActiveObject:BackSysColor .OR. xValue == NIL )
-                xValue := "System Default..."
-                nColor := ::ActiveObject:BackSysColor
-             ENDIF
-             IF cProp == "SELFORECOLOR" .AND. ( xValue == ::ActiveObject:ForeSysColor .OR. xValue == NIL )
-                xValue := "System Default..."
-                nColor := ::ActiveObject:ForeSysColor
-             ENDIF
-             IF cProp == "HIGHLIGHTCOLOR" .AND. ( xValue == ::ActiveObject:HighlightSysColor .OR. xValue == NIL )
-                xValue := "System Default..."
-                nColor := ::ActiveObject:HighlightSysColor
-             ENDIF
-             IF cProp == "HIGHLIGHTTEXTCOLOR" .AND. ( xValue == ::ActiveObject:HighlightTextSysColor .OR. xValue == NIL )
-                xValue := "System Default..."
-                nColor := ::ActiveObject:HighlightTextSysColor
-             ENDIF
-             IF cProp == "TRANSPARENTCOLOR" .AND. ( xValue == NIL )
-                xValue := "System Default..."
-                nColor := -1
-             ENDIF
-          ENDIF
-          IF VALTYPE( xValue ) != "C"
-             xValue := "Custom..."
-          ENDIF
-          TRY
-             IF nColor == NIL
-                nColor := ::ActiveObject:&( STRTRAN( RIGHT(cProp,9), "Color", "SysColor" ))
-                xValue := "System Default..."
-             ENDIF
-           CATCH
-          END
-       ENDIF
-
-       aProp := GetProperCase( cProp )
+       aProp := __GetProperCase( cProp )
        cProp := aProp[1]
 
        IF Empty( aProp[2] )
@@ -1370,6 +1255,11 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
           oItem:Caption    := aProp[2]
           oItem:InsertAfter:= TVI_SORT
           oItem:Create()
+       ENDIF
+
+       IF GetProperPar( cProp ) == "Colors" .AND. VALTYPE(xValue) != "L" //oItem:Caption == "Colors"
+          cType  := "COLORREF"
+          nColor := ::GetColorValues( ::ActiveObject, cProp, @xValue )
        ENDIF
 
        aCol := { TreeColItem( IIF( VALTYPE(xValue)=="O", "", xValue ), cType, , nColor, cProp, , ,/*aProp[3]*/ ) }
@@ -1387,6 +1277,12 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
           xValue := NIL
         ELSE
           DO CASE
+//             CASE cProp == "Left" .AND. ::ActiveObject:Parent != NIL .AND. __ObjHasMsg( ::ActiveObject:Parent, "HorzScrollPos" )
+//                  aCol[1]:Value += ::ActiveObject:Parent:HorzScrollPos
+
+//             CASE cProp == "Top" .AND. ::ActiveObject:Parent != NIL .AND. __ObjHasMsg( ::ActiveObject:Parent, "VertScrollPos" )
+//                  aCol[1]:Value += ::ActiveObject:Parent:VertScrollPos
+
              CASE cProp == "TargetType"
                   aCol[1]:Value    := ::ActiveObject:__TargetTypes
                   aCol[1]:ColType  := "TARGETTYPE"
@@ -1759,28 +1655,13 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
 
               cType   := VALTYPE( xValue2 )
               nColor  := NIL
-              IF cProp2 != "COLORSCHEME" .AND. AT( "COLOR", cProp2 ) > 0 .AND. VALTYPE( xValue2 ) != "L"
+
+              IF GetProperPar( cProp2 ) == "Colors" .AND. VALTYPE(xValue2) != "L"
+                 nColor := ::GetColorValues( xValue, cProp2, @xValue2 )
                  cType  := "COLORREF"
-                 nColor := xValue2
-                 IF ( n := ASCAN( ::Colors, {|a|a[1]==xValue2} ) ) > 0
-                    xValue2 := ::Colors[n][2]
-                 ENDIF
-                 IF cProp2 == "BACKCOLOR" .AND. ( nColor == NIL .OR. n == 0 .OR. xValue:xBackColor == NIL )
-                    xValue2 := "System Default..."
-                 ENDIF
-                 IF cProp2 == "FORECOLOR" .AND. ( nColor == NIL .OR. n == 0 .OR. xValue:xForeColor == NIL )
-                    xValue2 := "System Default..."
-                 ENDIF
-                 IF VALTYPE( xValue2 ) != "C"
-                    xValue2 := "Custom..."
-                 ENDIF
-                 IF nColor == NIL
-                    nColor := xValue:&( STRTRAN( RIGHT(cProp2,9), "Color", "SysColor" ))
-                    xValue := "System Default..."
-                 ENDIF
               ENDIF
 
-              cProp2  := GetProperCase( cProp2 )[1]
+              cProp2  := __GetProperCase( cProp2 )[1]
               aCol    := { TreeColItem( IIF( VALTYPE(xValue2)=="O", "", xValue2 ), cType, , nColor, cProp2, cProp ) }
 
               IF cProp == "Dock"
@@ -1903,6 +1784,34 @@ RETURN NIL
 
 //--------------------------------------------------------------------------------------------------------------------------------
 
+METHOD GetColorValues( oObj, cProp, xValue ) CLASS ObjManager
+   LOCAL nDefault, n, nColor := xValue
+
+   IF nColor == NIL .AND. UPPER( cProp ) == "MASKCOLOR"
+      xValue := "None"
+    ELSE
+      IF ( n := ASCAN( ::Colors, {|a|a[1]==xValue} ) ) > 0
+        xValue := ::Colors[n][2]
+      ENDIF
+
+      TRY
+         nDefault := oObj:&( STRTRAN( cProp, "Color", "SysColor" ) )
+      CATCH
+         nDefault := NIL
+      END
+
+      DEFAULT nColor TO nDefault
+      IF nColor == nDefault
+         xValue := "System Default..." 
+      ENDIF
+      IF VALTYPE( xValue ) != "C"
+         xValue := "Custom..."
+      ENDIF
+   ENDIF
+RETURN nColor
+
+//--------------------------------------------------------------------------------------------------------------------------------
+
 METHOD GetEditBuffer( oItem, nCol ) CLASS ObjManager
    LOCAL cProp, cText := oItem:ColItems[nCol-1]:Value
    cProp := oItem:ColItems[1]:Prop
@@ -2010,31 +1919,9 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                     END
 
                CASE cType == "L"
-                    ::ActiveControl := ObjCombo( Self )
-                    WITH OBJECT ::ActiveControl
-                       :Left   := nLeft-1
-                       :Top    := rc:top
-                       :Width  := ::Columns[ nCol ][ 1 ]+4
-                       :Height := 70
-                       :Border := .F.
-                       :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
-                       :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ) }
-                       :Create()
-                       :Action := {|o, c, oPar| c := o:GetSelString(),;
-                                                               oPar := o:Parent,;
-                                                               o:Destroy(),;
-                                                               oPar:SetValue( IIF( c == "True", .T., .F. ), o ) }
-                       :AddItem( "True" )
-                       :AddItem( "False" )
-                       IF oItem:ColItems[nCol-1]:Value
-                          :SetCurSel(1)
-                        ELSE
-                          :SetCurSel(2)
-                       ENDIF
-                       :SetItemHeight( -1, ::GetItemHeight()-5 )
-                       :SetFocus()
-                       :ShowDropDown()
-                    END
+                    ::SetValue( ! oItem:ColItems[nCol-1]:Value )
+                    ::InvalidateRect(,.F.)
+
                CASE cType == "MASKTYPE"
                     ::ActiveControl := ObjCombo( Self )
                     WITH OBJECT ::ActiveControl
@@ -2611,7 +2498,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :ColorSelected := oItem:ColItems[nCol-1]:Color
 
                        :Create( UPPER( oItem:Caption ) == "MASKCOLOR" )
-                       :Action := {|o, c, oPar| c := o:ColorSelected, oPar := o:Parent, o:Destroy(), oPar:SetValue( c ) }
+                       :Action := {|o, c, oPar| c := o:ColorSelected, oPar := o:Parent, o:Destroy(), oPar:SetValue( c ), ::ActiveObject:InvalidateRect(,.F.) }
                        :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ) }
                        :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
 
@@ -2913,6 +2800,9 @@ METHOD OnKeyDown( nKey ) CLASS ObjManager
               RETURN 0
            ENDIF
 
+      CASE nKey == VK_SPACE
+           ::PostMessage( WM_USER+4768 )
+      
    ENDCASE
 RETURN NIL
 
@@ -3399,7 +3289,14 @@ ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------------------------------
 
-FUNCTION GetProperCase( cProp )
+STATIC FUNCTION GetProperPar( cProp )
+   LOCAL cPar, n := ASCAN( __aProps[ UPPER( cProp[1] ) ], {|a| UPPER( a[1] ) == UPPER( cProp ) } )
+   IF n > 0
+      cPar := __aProps[ UPPER( cProp[1] ) ][n][2]
+   ENDIF
+RETURN cPar
+
+FUNCTION __GetProperCase( cProp )
    LOCAL n := ASCAN( __aProps[ UPPER( cProp[1] ) ], {|a| UPPER( a[1] ) == UPPER( cProp ) } )
    IF n > 0
       RETURN __aProps[ UPPER( cProp[1] ) ][n]
@@ -3583,6 +3480,7 @@ __aProps["H"] := { { "HasStrings",              "Style" },;
                    { "HorzScrollSize",          "Behavior" },;
                    { "HorzScroll",              "Behavior" },;
                    { "HighlightColor",          "Colors" },;
+                   { "HighlightBorderColor",         "Colors" },;
                    { "HighlightTextColor",      "Colors" },;
                    { "Height",                  "Size" },;
                    { "HeaderBackColor",         "Header" },;
@@ -3706,7 +3604,8 @@ __aProps["R"] := { { "RadioCheck",              "Style" },;
                    { "Resource",                "Target Folder" },;
                    { "Resizable",               "Size" } }
 
-__aProps["S"] := { { "SetAlternate",            "Set" },;
+__aProps["S"] := { { "ScrollOnChildFocus",      "Behavior" },;
+                   { "SetAlternate",            "Set" },;
                    { "SetCentury",              "Set" },;
                    { "SetCancel",               "Set" },;
                    { "SetDeleted",              "Set" },;

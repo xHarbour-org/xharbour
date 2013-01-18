@@ -96,9 +96,8 @@ METHOD Load( cScheme ) CLASS ProfessionalColorTable
    IF ::AutoScheme .AND. cScheme == NIL
       ::GetCurrentStyle()
    ENDIF
-   
    DEFAULT cScheme TO ::ColorScheme
-   
+
    DO CASE
       CASE cScheme == "Classic"
            ::ButtonCheckedGradientBegin             := GetSysColor( COLOR_INACTIVECAPTION )
@@ -463,7 +462,6 @@ RETURN Self
 METHOD GetCurrentStyle() CLASS ProfessionalColorTable
    LOCAL cTheme, cColor, cSize 
    GetCurrentThemeName( @cTheme, @cColor, @cSize )
-   
    DEFAULT cTheme TO ""
    ::Theme := cTheme
    ::ColorScheme := cColor

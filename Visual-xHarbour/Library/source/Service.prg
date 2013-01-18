@@ -73,7 +73,7 @@ CLASS Service
 ENDCLASS
 
 METHOD Install() CLASS Service
-   LOCAL aProcs := {}
+   LOCAL osv, aProcs := {}
    IF EMPTY( ::hServiceManager )
       ::hServiceManager := OpenSCManager( NIL, NIL, SC_MANAGER_ALL_ACCESS )
    ENDIF
@@ -89,7 +89,12 @@ METHOD Install() CLASS Service
                                    SERVICE_AUTO_START,;
                                    SERVICE_ERROR_NORMAL,;
                                    ::File )
-      ChangeServiceDescription( ::hService, ::Description )
+
+      osv := (struct OSVERSIONINFOEX)
+      GetVersionEx( @osv )
+      IF osv:dwMajorVersion < 6 .OR. osv:dwMinorVersion < 2
+         ChangeServiceDescription( ::hService, ::Description )
+      ENDIF
       StartService( ::hService, 0 )
    ENDIF
 RETURN Self

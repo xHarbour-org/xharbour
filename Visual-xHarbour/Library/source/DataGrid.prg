@@ -77,6 +77,7 @@ CLASS DataGrid INHERIT Control
    DATA ShowSelectionBorder     PUBLISHED INIT .T.
    DATA AnchorColumn            PUBLISHED INIT 0
    DATA ConvertOem              PUBLISHED INIT .F.
+   DATA HighlightBorderColor    PUBLISHED
    DATA HighlightColor          PUBLISHED
    DATA HighlightTextColor      PUBLISHED
    DATA Columns                 PUBLISHED
@@ -127,6 +128,7 @@ CLASS DataGrid INHERIT Control
    DATA __bGoBottom             PROTECTED
    DATA __bRecNo                PROTECTED
    DATA __LinePen               PROTECTED
+   DATA __SelBorderPen          PROTECTED
    DATA __DataHeight            PROTECTED
    DATA __DataWidth             PROTECTED INIT 0
    DATA __VertScrolled          PROTECTED INIT 1
@@ -326,8 +328,12 @@ METHOD Create() CLASS DataGrid
    LOCAL oColumn
 
    ::__SetBlocks()
-   ::__LinePen := CreatePen( PS_SOLID, 0, ::GridColor )
-   ::__hDragBrush := CreateSolidBrush( DarkenColor( ::BackColor, 10 ) )
+   ::__LinePen      := CreatePen( PS_SOLID, 0, ::GridColor )
+   IF ::HighlightBorderColor != NIL
+      ::__SelBorderPen := CreatePen( PS_SOLID, 0, ::HighlightBorderColor )
+   ENDIF
+   
+   ::__hDragBrush   := CreateSolidBrush( DarkenColor( ::BackColor, 10 ) )
 
    ::xWidth  := MIN( ::xWidth,  ::Parent:ClientWidth  - ::Left - 5 )
    ::xHeight := MIN( ::xHeight, ::Parent:ClientHeight - ::Top - 5 )
@@ -426,7 +432,7 @@ METHOD OnMouseWheel( nwParam, nlParam ) CLASS DataGrid
       si := (struct SCROLLINFO)
       cBuffer := _GetScrollInfo( ::hWnd, SB_VERT )
       si:Buffer( cBuffer, .T. )
-      IF si:nPage < si:nMax 
+      IF si:nPage != NIL .AND. si:nMax != NIL .AND. si:nPage < si:nMax 
          IF nLines == WHEEL_PAGESCROLL
             IF nDelta > 0
                ::SendMessage( nScroll, SB_PAGEUP, 0 )
@@ -846,6 +852,13 @@ METHOD __SetColWidth( nCol, nWidth ) CLASS DataGrid
       IF ::Children[ nCol ]:xWidth == 0 .AND. nCol > 1
          lPrev := .T.
       ENDIF
+      IF ::Children[ nCol ]:MaxWidth > 0
+         nWidth := MIN( nWidth, ::Children[ nCol ]:MaxWidth )
+      ENDIF
+      IF ::Children[ nCol ]:MinWidth > 0
+         nWidth := MAX( nWidth, ::Children[ nCol ]:MinWidth )
+      ENDIF
+      
       nDiff := nWidth - ::Children[ nCol ]:xWidth
       ::Children[ nCol ]:xWidth += nDiff
       ::__DataWidth += nDiff
@@ -1140,7 +1153,9 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
          ::__nDragPos := -1
          ::__DisplayData()
       ENDIF
-      ::UpdateRow()
+      IF nPos > 1
+         ::UpdateRow()
+      ENDIF
       IF lMouse .AND. nPos == ::RowPos .AND. ::Children[ ::ColPos ]:Representation == CREP_BUTTON
          ExecuteEvent( "ButtonClicked", ::Children[ ::ColPos ] )
       ENDIF
@@ -2136,7 +2151,15 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                     ENDIF
                     SelectObject( hMemDC, hPen )
                     IF lBorder
-                       _DrawFocusRect( hMemDC, {aText[1]+1, aText[2]+1, aText[3], aText[4]-1} )
+                       IF ::__SelBorderPen != NIL
+                          hPen := SelectObject( hMemDC, ::__SelBorderPen )
+                          hBrush  := SelectObject( hMemDC, GetStockObject( NULL_BRUSH ) )
+                          Rectangle( hMemDC, aText[1]+1, aText[2]+1, aText[3], aText[4]-1 )
+                          SelectObject( hMemDC, hBrush )
+                          SelectObject( hMemDC, hPen )
+                        ELSE
+                          _DrawFocusRect( hMemDC, {aText[1]+1, aText[2]+1, aText[3], aText[4]-1} )
+                       ENDIF
                        lBorder := .F.
                     ENDIF
                   ELSE
@@ -2146,9 +2169,16 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                     lBorder := ::ShowSelectionBorder .AND. ( lHighLight .OR. ( !::ShowSelection .AND. nRec == nRecno .AND. ( i == ::ColPos .OR. ::FullRowSelect ) ) )
                  ENDIF
 
-
                  IF !::FullRowSelect .AND. lBorder .AND. nRep <> 4
-                    _DrawFocusRect( hMemDC, aText )
+                    IF ::__SelBorderPen != NIL
+                       hPen := SelectObject( hMemDC, ::__SelBorderPen )
+                       hBrush  := SelectObject( hMemDC, GetStockObject( NULL_BRUSH ) )
+                       Rectangle( hMemDC, aText[1], aText[2], aText[3], aText[4] )
+                       SelectObject( hMemDC, hBrush )
+                       SelectObject( hMemDC, hPen )
+                     ELSE
+                       _DrawFocusRect( hMemDC, aText )
+                    ENDIF
                  ENDIF
 
                  nLeft  += ::Children[i]:Width
@@ -2245,7 +2275,15 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
              nBottom := nTop + ::ItemHeight - 1
 
              IF ::ShowSelectionBorder
-                 _DrawFocusRect( hMemDC, { nLeft, nTop-IIF(::xShowGrid,0,1), nRight-IIF( ::xShowGrid, 1, 0 ), nBottom } )
+                IF ::__SelBorderPen != NIL
+                   hPen := SelectObject( hMemDC, ::__SelBorderPen )
+                   hBrush  := SelectObject( hMemDC, GetStockObject( NULL_BRUSH ) )
+                   Rectangle( hMemDC, nLeft, nTop-IIF(::xShowGrid,0,1), nRight-IIF( ::xShowGrid, 1, 0 ), nBottom )
+                   SelectObject( hMemDC, hBrush )
+                   SelectObject( hMemDC, hPen )
+                 ELSE
+                   _DrawFocusRect( hMemDC, { nLeft, nTop-IIF(::xShowGrid,0,1), nRight-IIF( ::xShowGrid, 1, 0 ), nBottom } )
+                ENDIF
              ENDIF
            CATCH
           END
@@ -3333,8 +3371,12 @@ RETURN NIL
 METHOD OnNCDestroy() CLASS DataGrid
    Super:OnNCDestroy()
    IF ::__LinePen != NIL
-      DeleteObject(::__LinePen)
+      DeleteObject( ::__LinePen )
    ENDIF
+   IF ::__SelBorderPen != NIL
+      DeleteObject( ::__SelBorderPen )
+   ENDIF
+   
    DeleteObject( ::__hDragBrush )
 RETURN NIL
 
@@ -3866,12 +3908,14 @@ CLASS GridColumn INHERIT Object
    ASSIGN Caption(c)  INLINE ::xText := c
 
    DATA IsContainer EXPORTED INIT .F.
-   DATA AllowSize                    PUBLISHED INIT .F.
-   DATA AllowDrag                    PUBLISHED INIT .F.
-   DATA Locked                       PUBLISHED INIT FALSE
-   DATA Picture                      PUBLISHED
-   DATA Visible                      PUBLISHED INIT .T.
-   DATA Data                         PUBLISHED
+   DATA AllowSize             PUBLISHED INIT .F.
+   DATA AllowDrag             PUBLISHED INIT .F.
+   DATA Locked                PUBLISHED INIT FALSE
+   DATA Picture               PUBLISHED
+   DATA Visible               PUBLISHED INIT .T.
+   DATA Data                  PUBLISHED
+   DATA MinWidth              PUBLISHED INIT 0
+   DATA MaxWidth              PUBLISHED INIT 0
    
    DATA EnumImageAlignment    EXPORTED INIT { {"Left", "Center", "Right"}, {1,2,3} }
 

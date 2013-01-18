@@ -29,6 +29,8 @@ CLASS Panel FROM Control
    DATA VertScroll              INIT .F. PUBLISHED
    DATA HorzScroll              INIT .F. PUBLISHED
 
+   DATA ScrollOnChildFocus      PUBLISHED INIT .F.
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD OnLButtonUp() INLINE IIF( HGetPos( ::EventHandler, "OnClick" ) != 0, ::Form:&( ::EventHandler[ "OnClick" ] )( Self ), )

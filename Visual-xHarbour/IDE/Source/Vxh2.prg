@@ -103,6 +103,7 @@ CLASS WindowEdit INHERIT WinForm
    METHOD StickRight()
    METHOD StickBottom()
    METHOD DrawStickyLines()
+   METHOD Refresh()     INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
    METHOD SetWindowText( cText ) INLINE ::Super:SetWindowText(cText), ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW + RDW_NOCHILDREN + RDW_NOERASE )
    METHOD SetFormIcon( cIcon )   INLINE ::Super:SetFormIcon( cIcon ), ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW + RDW_NOCHILDREN + RDW_NOERASE )
 ENDCLASS
@@ -145,6 +146,8 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
       ::ClsName := "VXH_FORM_IDE"
       ::Style   := WS_CHILD | WS_CAPTION | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_THICKFRAME | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
       ::xName   := "Form" + XSTR( LEN( ::Application:Project:Forms )+1 )
+      ::xLeft   := 10
+      ::xTop    := 10
     ELSE
       ::ClsName := "CCTL"
       ::Style   := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
@@ -215,14 +218,10 @@ METHOD Create() CLASS WindowEdit
    IF IsWindow( ::hWnd )
       RETURN Self
    ENDIF
-   ::Style := ::Style & NOT( WS_OVERLAPPED )
-   ::Style := ::Style & NOT( WS_POPUP )
-   ::Style := ::Style | WS_CHILD
+   //::xTop  -= ::Parent:VertScrollPos
+   //::xleft -= ::Parent:HorzScrollPos
 
    ::Super:Create()
-   IF !::__lModified
-      ::Hide()
-   ENDIF
    IF ::Cargo == NIL
       ::Application:FormsTabs:InsertTab( ::Name,,, .F. )
       ::Application:FormsTabs:SetCurSel( ::Application:FormsTabs:GetItemCount() )
@@ -434,11 +433,6 @@ METHOD MaskKeyDown( o, nKey ) CLASS WindowEdit
               WITH OBJECT ::Application:ObjectManager:ActiveObject
                  ::Application:Project:SetAction( { { DG_DELCONTROL, NIL, 0, 0, .F., :Owner, :__xCtrlName, hb_qWith(), , 1, , ::Application:Components:Current } }, ::Application:Project:aUndo )
               END
-/*
-              IF ::Application:Components:Current != NIL
-                 RETURN ::Application:Components:Current:OnKeyDown( VK_DELETE )
-              ENDIF
-*/
               RETURN 0
            ENDIF
 
@@ -567,9 +561,7 @@ METHOD ControlSelect( x, y ) CLASS WindowEdit
 
    
    IF ::Application:CurCursor != NIL .OR. ::Application:Project:PasteOn
-      //IF ::CtrlParent == NIL
-         ::CheckMouse( x, y )
-      //ENDIF
+      ::CheckMouse( x, y )
       RETURN NIL
    ENDIF
 
@@ -581,6 +573,7 @@ METHOD ControlSelect( x, y ) CLASS WindowEdit
    ClientToScreen( ::CtrlMask:hWnd, @pt )
    oControl := ::GetChildFromPoint( pt )
    DEFAULT oControl TO Self
+
    IF oControl:ClsName == "ToolBarWindow32"
       ScreenToClient( oControl:hWnd, @pt )
 
@@ -638,7 +631,7 @@ METHOD ControlSelect( x, y ) CLASS WindowEdit
       ENDIF
 
       nCursor := MCS_SIZEALL
-      IF oControl:ClsName == WC_TABCONTROL //__xCtrlName == "TabControl"
+      IF oControl:ClsName == WC_TABCONTROL
          pt:x := x
          pt:y := y
          ClientToScreen( ::CtrlMask:hWnd, @pt )
@@ -769,6 +762,7 @@ METHOD ControlSelect( x, y ) CLASS WindowEdit
                RETURN -2
             ENDIF
           ELSEIF LEN( ::Selected ) == 1
+
             IF !(::Selected[1][1]:Name == oControl:Name) .OR. !(oControl:hWnd == ::Selected[1][1]:hWnd )
                ::Selected    := { { oControl, aRect, NIL } }
                lChild := .T.
@@ -887,9 +881,10 @@ RETURN aRect
 
 METHOD GetPoints( oControl, lPure, lMask, lConvert ) CLASS WindowEdit
    LOCAL aRect, rc, aPoints, n := ::SelPointSize, pt := (struct POINT)
-   DEFAULT lPure TO .F.
-   DEFAULT lMask TO .T.
-   DEFAULT lConvert TO .T.
+   DEFAULT lPure      TO .F.
+   DEFAULT lMask      TO .T.
+   DEFAULT lConvert   TO .T.
+
    IF lPure
       n := 0
    ENDIF
@@ -906,7 +901,6 @@ METHOD GetPoints( oControl, lPure, lMask, lConvert ) CLASS WindowEdit
       CATCH   
       END
    ENDIF
-   DEFAULT aRect TO ACLONE( oControl:GetRectangle() )
 
    IF __ObjHasMsg( oControl, "Owner" ) .AND. oControl:Owner != NIL .AND. oControl:__xCtrlName != "Splitter"
       rc := oControl:Owner:GetRectangle()
@@ -914,21 +908,27 @@ METHOD GetPoints( oControl, lPure, lMask, lConvert ) CLASS WindowEdit
       aRect[2] := rc[2]
    ENDIF
 
-   pt:x := aRect[1]
-   pt:y := aRect[2]
-   
+   IF oControl:hWnd == ::hWnd
+      GetWindowRect( oControl:hWnd, @pt )
+      ScreenToClient( oControl:Parent:hWnd, @pt )
+      aRect := Array(4)
+    ELSE
+      DEFAULT aRect TO ACLONE( oControl:GetRectangle() )
+      pt:x := aRect[1]
+      pt:y := aRect[2]
+   ENDIF
+
    IF lConvert
+      ClientToScreen( oControl:Parent:hWnd, @Pt )
       IF !lMask
-         ClientToScreen( oControl:Parent:hWnd, @Pt )
          ScreenToClient( ::hWnd, @Pt )
        ELSE
-         ClientToScreen( oControl:Parent:hWnd, @Pt )
          ScreenToClient( ::CtrlMask:hWnd, @Pt )
       ENDIF
    ENDIF
 
-   aRect[1] := pt:x - IIF( oControl:hWnd != ::hWnd, oControl:Parent:HorzScrollPos, ::Parent:HorzScrollPos )
-   aRect[2] := pt:y - IIF( oControl:hWnd != ::hWnd, oControl:Parent:VertScrollPos, ::Parent:VertScrollPos )
+   aRect[1] := pt:x - IIF( oControl:hWnd != ::hWnd, oControl:Parent:HorzScrollPos, 0 )
+   aRect[2] := pt:y - IIF( oControl:hWnd != ::hWnd, oControl:Parent:VertScrollPos, 0 )
    aRect[3] := aRect[1] + oControl:Width
    aRect[4] := aRect[2] + oControl:Height
 
@@ -980,7 +980,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
                ::CtrlParent := oControl
 
                ::UpdateSelection()
-               ::Selected    := { { oControl, , NIL } }
+               ::Selected  := { { oControl, , NIL } }
                ::CtrlOldPt := NIL
                ::InvalidateRect()
                ::InRect    := -1
@@ -1081,7 +1081,9 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
             ::Application:ObjectManager:CheckValue( "Top",    "Position", ::Selected[1][1]:Top ) //+ IIF( __ObjHasMsg( ::Selected[1][1]:Parent, "VertScrollPos" ), ::Selected[1][1]:Parent:VertScrollPos, 0 ) )
             ::Application:ObjectManager:CheckValue( "Width",  "Size",     ::Selected[1][1]:Width )
             ::Application:ObjectManager:CheckValue( "Height", "Size",     ::Selected[1][1]:Height )
+
           ELSEIF ::OldParent != NIL
+
             hDef := BeginDeferWindowPos( LEN( ::Selected ) )
             FOR n := 1 TO LEN( ::Selected )
                 IF ::Selected[n][1]:__TempRect != NIL
@@ -1275,11 +1277,14 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
          IF EMPTY( ::Selected )
             ::Selected := { { Self } }
          ENDIF
+         ::Refresh()
+         ReleaseCapture( ::CtrlMask:hWnd )
       ENDIF
 
     ELSEIF ::MouseDown
 
       IF LEN( ::Selected ) > 0
+       
          aSelected := ACLONE( ::Selected )
          IF aSelected[1][1]:__CustomOwner
             aSelected := { { aSelected[1][1]:GetCCTL() } }
@@ -1347,8 +1352,8 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
          
          // move/size the control, selected controls ???
          aPt := { x, y }
-         _ClientToScreen( ::CtrlMask:hWnd, aPt )
-         _ScreenToClient( aSelected[1][1]:Parent:hWnd, aPt )
+         _ClientToScreen( ::CtrlMask:hWnd, @aPt )
+         _ScreenToClient( aSelected[1][1]:Parent:hWnd, @aPt )
          x := aPt[1]
          y := aPt[2]
 
@@ -1383,7 +1388,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
                x  := Snap( x, ::CtrlMask:xGrid )
                y  := Snap( y, ::CtrlMask:yGrid )
             ENDIF
-            
+
             IF ::CtrlMask:DrawBand
                ::CtrlMask:DrawBand := .F.
                ::UpdateSelection()
@@ -1393,6 +1398,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
                IF aSel[3] >= ::ClientWidth .OR. aSel[1] <= 0 .OR. aSel[4] >= ::ClientHeight .OR. aSel[2] <= 0
                   ::RedrawWindow( aSel, , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
                ENDIF
+
             ENDIF
 
             nPlus := 1
@@ -1401,11 +1407,11 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
             ENDIF
             DO CASE
                CASE ::InRect == -2
-                    ::Left += ( x - ::CtrlOldPt[1] )
-                    ::Top  += ( y - ::CtrlOldPt[2] )
-                    ::MoveWindow()
-                    ::UpdateWindow()
-                    ::CtrlOldPt := { x, y }
+                    //::Left += ( x - ::CtrlOldPt[1] )
+                    //::Top  += ( y - ::CtrlOldPt[2] )
+                    //::MoveWindow()
+                    //::UpdateWindow()
+                    //::CtrlOldPt := { x, y }
                     RETURN 0
 
                CASE ::InRect == -1 .AND. aSelected[1][1]:hWnd != ::hWnd
@@ -1596,11 +1602,15 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
             IF ::InRect >= 1
                ::Application:MainForm:StatusBarPanel7:Caption := XSTR(aSelected[1][1]:Left)+", "+XSTR(aSelected[1][1]:Top)+", "+XSTR(aSelected[1][1]:Width)+", "+XSTR(aSelected[1][1]:Height)
                aSelected[1][1]:SetWindowPos(, aSelected[1][1]:xLeft,;
-                                               aSelected[1][1]:xTop,;
-                                               aSelected[1][1]:xWidth,;
-                                               aSelected[1][1]:xHeight, SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_DEFERERASE )
+                                              aSelected[1][1]:xTop,;
+                                              aSelected[1][1]:xWidth,;
+                                              aSelected[1][1]:xHeight, SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_DEFERERASE )
               
                ::CtrlOldPt := { x, y }
+               IF aSelected[1][1]:hWnd == ::hWnd
+                  SetCapture( ::CtrlMask:hWnd )
+                  ::Parent:UpdateScroll()
+               ENDIF
             ENDIF
             ::UpdateWindow()
             IF ::Application:ShowRulers
