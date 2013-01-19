@@ -60,8 +60,8 @@ CLASS FormEditor INHERIT Control
    METHOD OnNCRButtonDown()
    METHOD OnNCHitTest()
    METHOD OnSize()       INLINE ::UpdateScroll()
-   METHOD OnVertScroll() INLINE ::CtrlMask:Top := 0, IIF( ::CtrlMask:CurForm != NIL, ::CtrlMask:CurForm:UpdateSelection(),),NIL
-   METHOD OnHorzScroll() INLINE IIF( ::CtrlMask:CurForm != NIL, ::CtrlMask:CurForm:UpdateSelection(),),NIL
+   METHOD OnVertScroll()
+   METHOD OnHorzScroll(n) INLINE IIF( n == SB_THUMBPOSITION, IIF( ::CtrlMask:CurForm != NIL, ::CtrlMask:CurForm:UpdateSelection(),),),NIL
    METHOD ResetScroll()
    METHOD UpdateScroll()
 ENDCLASS
@@ -114,6 +114,17 @@ METHOD UpdateScroll() CLASS FormEditor
       ::CtrlMask:Height := ::OriginalRect[4]
 
       ::__SetScrollBars()
+   ENDIF
+RETURN NIL
+
+//---------------------------------------------------------------------------------------------------
+METHOD OnVertScroll(n) CLASS FormEditor
+   IF n == SB_THUMBPOSITION
+      ::CtrlMask:Top := 0
+      ::Redraw()
+      IF ::CtrlMask:CurForm != NIL
+         ::CtrlMask:CurForm:UpdateSelection()
+      ENDIF
    ENDIF
 RETURN NIL
 

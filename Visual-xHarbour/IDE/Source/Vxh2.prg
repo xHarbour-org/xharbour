@@ -82,7 +82,7 @@ CLASS WindowEdit INHERIT WinForm
 
    METHOD Show()
 
-   METHOD OnWindowPaint()
+   METHOD OnPaint()
    METHOD OnEraseBkGnd()
    METHOD OnUserMsg()
    METHOD OnSize()
@@ -106,6 +106,7 @@ CLASS WindowEdit INHERIT WinForm
    METHOD Refresh()     INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
    METHOD SetWindowText( cText ) INLINE ::Super:SetWindowText(cText), ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW + RDW_NOCHILDREN + RDW_NOERASE )
    METHOD SetFormIcon( cIcon )   INLINE ::Super:SetFormIcon( cIcon ), ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW + RDW_NOCHILDREN + RDW_NOERASE )
+   METHOD OnDestroy()            INLINE ::CloseThemeData()
 ENDCLASS
 
 METHOD OnSize() CLASS WindowEdit
@@ -140,7 +141,8 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
    #ifndef VXH_PROFESSIONAL 
       lCustom := .F.
    #endif
-   
+   ::OpenThemeData()
+
    ::lCustom     := lCustom
    IF !lCustom
       ::ClsName := "VXH_FORM_IDE"
@@ -218,10 +220,14 @@ METHOD Create() CLASS WindowEdit
    IF IsWindow( ::hWnd )
       RETURN Self
    ENDIF
-   //::xTop  -= ::Parent:VertScrollPos
-   //::xleft -= ::Parent:HorzScrollPos
+   ::Style := ::Style & NOT( WS_OVERLAPPED )
+   ::Style := ::Style & NOT( WS_POPUP )
+   ::Style := ::Style | WS_CHILD
 
    ::Super:Create()
+   IF !::__lModified
+      ::Hide()
+   ENDIF
    IF ::Cargo == NIL
       ::Application:FormsTabs:InsertTab( ::Name,,, .F. )
       ::Application:FormsTabs:SetCurSel( ::Application:FormsTabs:GetItemCount() )
@@ -352,14 +358,10 @@ RETURN NIL
 
 //----------------------------------------------------------------------------
 
-METHOD OnWindowPaint() CLASS WindowEdit
+METHOD OnPaint( hDC ) CLASS WindowEdit
    LOCAL nFColor, nBColor
-   LOCAL cPaint
-   LOCAL hDC
    LOCAL i       := 0
    LOCAL j       := 0
-
-   hDC := _BeginPaint( ::hWnd, @cPaint )
 
    IF ::Application:ShowGrid == 1
 
@@ -379,7 +381,6 @@ METHOD OnWindowPaint() CLASS WindowEdit
 
    ENDIF
    ::__PaintBakgndImage( hDC )
-   _EndPaint( ::hWnd, cPaint )
    ValidateRect( ::hWnd )
 RETURN 0
 
@@ -1963,7 +1964,7 @@ RETURN Self
 //----------------------------------------------------------------------------
 
 METHOD OnNCPaint() CLASS WindowEdit
-   LOCAL hRegion, hdc, nState, hIcon, nCaption, cx, cy, x, y, nBorder, nColor, hFont, hOldFont, aStyle, aRect[4], aBttn, aSize[2]
+   LOCAL hdc, nState, hIcon, nCaption, cx, cy, x, y, nBorder, nColor, hFont, hOldFont, aStyle, aRect[4], aBttn, aSize[2]
    IF ::Application:ThemeActive .AND. ::Theming
       IF ( !::CaptionBar .AND. ::FrameStyle == 2 ) .OR. ::lCustom
          RETURN NIL
@@ -1978,12 +1979,9 @@ METHOD OnNCPaint() CLASS WindowEdit
          aStyle   := { WP_CAPTION, WP_FRAMELEFT, WP_FRAMERIGHT, WP_FRAMEBOTTOM, TMT_CAPTIONFONT, WP_CLOSEBUTTON }
          nCaption := GetSystemMetrics(SM_CYCAPTION) + nBorder
       ENDIF
-      hRegion  := CreateRectRgn( 0, 0, ::Width, ::Height )
-      hdc      := GetDCEx( ::hWnd, hRegion, DCX_WINDOW | DCX_PARENTCLIP | DCX_CLIPSIBLINGS | DCX_CLIPCHILDREN | DCX_VALIDATE )
+      hdc      := GetWindowDC(::hWnd)
       nState   := IIF( ::InActive, CS_INACTIVE, CS_ACTIVE )
       
-      ::OpenThemeData()
-
       _FillRect( hdc, { 0, 0, 5, 5 }, GetStockObject( WHITE_BRUSH ) )
       _FillRect( hdc, { ::Width-5, 0, ::Width, 5 }, GetStockObject( WHITE_BRUSH ) )
 
@@ -2049,17 +2047,6 @@ METHOD OnNCPaint() CLASS WindowEdit
          ENDIF
       ENDIF
       
-      /*
-      IF ::Application:OsVersion:dwMajorVersion > 5
-         pOpt := (struct DTTOPTS)
-         pOpt:dwSize  := pOpt:sizeof()
-         pOpt:crText  := RGB( 255,0,0 )
-         pOpt:dwFlags := DTT_TEXTCOLOR
-
-         DrawThemeTextEx( ::hTheme, hdc, aStyle[1], nState, ::Caption, DT_END_ELLIPSIS | DT_VCENTER | DT_SINGLELINE, { x+cx+4, IIF( !::ToolWindow, 1, 0 )+3, ::Width, nCaption }, pOpt:Value )
-      ENDIF
-      */
-
       SetTextColor( hdc, GetThemeSysColor( ::hTheme, COLOR_CAPTIONTEXT ) )
       _DrawText( hdc, ::Caption, { x+cx+4, 3, ::Width, nCaption }, DT_END_ELLIPSIS | DT_VCENTER | DT_SINGLELINE )
       SetTextColor( hdc, nColor )
@@ -2070,9 +2057,7 @@ METHOD OnNCPaint() CLASS WindowEdit
       ENDIF
 
       ReleaseDC( ::hWnd, hDC )
-      DeleteObject( hRegion )
 
-      ::CloseThemeData()
       RETURN 0
    ENDIF
 RETURN NIL

@@ -3444,7 +3444,7 @@ METHOD SelectWindow( oWin, hTree, lFromTab ) CLASS Project
    IF oWin:Cargo != NIL
       ::LoadForm( oWin:Cargo,,, .T., oWin )
       oWin:Cargo := NIL
-      //oWin:MoveWindow()
+      oWin:MoveWindow()
    ENDIF
    ::CurrentForm := oWin
    IF !lFromTab
