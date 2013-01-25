@@ -8,6 +8,13 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-01-24 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   + Optimized window processing speed.
+   + Optimized window sizing speed
+   + Optimized designer form switching.
+   + Added progress while opening a project.
+   ! Fixed RTE closing project while resetting scrollbars.
+
 2013-01-16 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    + Added Application:CustomColors so the ColorDialog and the PickColor combobox control
      can share them all over the app.

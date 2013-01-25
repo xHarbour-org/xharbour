@@ -10447,3 +10447,51 @@ HB_FUNC( ROUNDRECT )
    hb_retl( RoundRect( (HDC) hb_parnl(1), hb_parni(2), hb_parni(3), hb_parni(4), hb_parni(5), hb_parni(6), hb_parni(7) ) );
 }
 
+//static PHB_DYNS pMainDynSym;
+
+LRESULT CALLBACK MainProcFunction( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
+{
+   long int lReturn = 0;
+   HB_SYMB *pMainDynSym = (HB_SYMB *) GetProp( hWnd, TEXT("DYNSYM") );
+   if ( pMainDynSym )
+   {
+      hb_vmPushSymbol( pMainDynSym );
+      hb_vmPushNil();
+      hb_vmPushLong( (long) hWnd );
+      hb_vmPushLong( (long) uMsg );
+      hb_vmPushLong( (long) wParam );
+      hb_vmPushLong( (long) lParam );
+      hb_vmDo( 4 );
+      lReturn = hb_parnl( -1 );
+   }
+   return lReturn;
+}
+
+HB_FUNC( VXH_SUBCLASS )
+{
+   //PHB_ITEM pSelf = hb_param( 2, HB_IT_ANY );
+   SetProp( hb_parnl(1), TEXT("DYNSYM"), (LONG) hb_parnl(2) );
+   hb_retnl( SetWindowLong( hb_parnl(1), GWL_WNDPROC, MainProcFunction ) );
+}
+
+/*
+HB_FUNC( VXH_CREATEDIALOGINDIRECT )
+{
+   PHB_ITEM pStructure = hb_pureparam( 2, HB_IT_ANY );
+
+   if( pStructure && HB_IS_OBJECT( pStructure ) )
+   {
+      hb_vmPushSymbol( pVALUE->pSymbol );
+      hb_itemPushForward( pStructure );
+      hb_vmSend(0);
+
+      if( !pMainDynSym )
+         pMainDynSym = (PHB_DYNS) hb_parptr(4);
+      hb_retnl( (LONG) CreateDialogIndirect( (HINSTANCE) hb_parnl(1), (LPCDLGTEMPLATE) hb_parc(-1), (HWND) hb_parnl(3), MainProcFunction ) );
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 6001, NULL, "CREATEDIALOGINDIRECT", 1, hb_paramError(1) );
+   }
+}
+*/

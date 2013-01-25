@@ -1517,7 +1517,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
                         ENDIF
                     NEXT
                     EndDeferWindowPos( hDef )
-
+                    ::InvalidateRect(,.F.)
                     ::CtrlOldPt := { x, y }
 
                     aRect := ::GetSelRect(.T.)

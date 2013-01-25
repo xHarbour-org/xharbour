@@ -75,6 +75,8 @@ METHOD Init( oParent ) CLASS LinkLabel
    ::Super:Init( oParent )
 RETURN Self
 
+//-----------------------------------------------------------------------------------------------
+
 METHOD Create() CLASS LinkLabel
    LOCAL aSize, hDC
 
@@ -126,6 +128,8 @@ METHOD SetWindowText( cText ) CLASS LinkLabel
       ENDIF
    ENDIF
 RETURN Self
+
+//-----------------------------------------------------------------------------------------------
 
 METHOD OnEraseBkGnd( hDC ) CLASS LinkLabel
    LOCAL rc := (struct RECT)

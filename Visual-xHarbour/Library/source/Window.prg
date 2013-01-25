@@ -1221,6 +1221,17 @@ METHOD SetTabOrder( nTabOrder ) CLASS Window
    ENDIF
 RETURN Self
 
+
+FUNCTION __MainCallBack( hWnd, nMsg, nwParam, nlParam )
+   LOCAL oWnd, pPtr := GetProp( hWnd, "PROP_CLASSOBJECT" )
+   IF pPtr != NIL .AND. pPtr != 0
+      oWnd := ArrayFromPointer( pPtr )
+      IF oWnd != NIL
+         RETURN oWnd:__ControlProc( hWnd, nMsg, nwParam, nlParam )
+      ENDIF
+   ENDIF
+RETURN DefWindowProc( hWnd, nMsg, nwParam, nlParam )
+
 //-------------------------------------------------------------------------------------------------
 METHOD __SubClass() CLASS Window
    IF ::__lSubClass
@@ -1229,6 +1240,8 @@ METHOD __SubClass() CLASS Window
       ENDIF
       ::__pCallBackPtr := WinCallBackPointer( HB_ObjMsgPtr( Self, ::__WndProc ), Self )
       ::__nProc := SetWindowLong( ::hWnd, GWL_WNDPROC, ::__pCallBackPtr )
+
+      //::__nProc := VXH_SubClass( ::hWnd, HB_FuncPtr( ::ClassName+"_"+::__WndProc ) )
    ENDIF
 RETURN Self
 
@@ -1511,7 +1524,7 @@ RETURN NIL
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    LOCAL nRet, nCode, nId, n, cBuffer, oObj
    LOCAL oChild, oItem, x, y, hDef, nLeft, nTop, nWidth, nHeight, nLines, nDelta, nScroll, nPage
-   LOCAL lShow, lHide, hParent, pPtr, oCtrl, aRect, aPt, mii, cProp
+   LOCAL lShow, hParent, pPtr, oCtrl, aRect, aPt, mii, cProp
    LOCAL Band, msg, lHandled, aComp, oMenu, mmi, nFiles, oForm, aChildren
    LOCAL rc, pt, cFile, hwndFrom, idFrom, code, aParams
    LOCAL nAnimation
@@ -1756,7 +1769,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
            EXIT
 
       CASE WM_SIZE
-           aChildren := IIF( ::__DockChildren != NIL, ::__DockChildren, ::Children )
            ::__lReqBrush := .T.
            IF EMPTY( ::__ClientRect )
               RETURN 0
@@ -1773,17 +1785,19 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
            ENDIF
 
            IF ::ClsName != "DataGrid"
-              hDef := BeginDeferWindowPos( LEN( aChildren ) )
-              FOR EACH oChild IN aChildren
-                  IF VALTYPE( oChild ) == "O"
-                     oChild:__OnParentSize( x, y, @hDef, ,, ::__aCltRect[3], ::__aCltRect[4] )
-                     IF oChild:__IsControl .AND. oChild:Anchor:Center
-                        oChild:CenterWindow()
+              aChildren := IIF( ::__DockChildren != NIL, ::__DockChildren, ::Children )
+              IF ! Empty( aChildren )
+                 hDef := BeginDeferWindowPos( LEN( aChildren ) )
+                 FOR EACH oChild IN aChildren
+                     IF VALTYPE( oChild ) == "O"
+                        oChild:__OnParentSize( x, y, @hDef, ,, ::__aCltRect[3], ::__aCltRect[4] )
+                        IF oChild:__IsControl .AND. oChild:Anchor:Center
+                           oChild:CenterWindow()
+                        ENDIF
                      ENDIF
-                  ENDIF
-              NEXT
-              EndDeferWindowPos( hDef )
-
+                 NEXT
+                 EndDeferWindowPos( hDef )
+              ENDIF
               ::__ClientRect[3] := ::ClientWidth
               ::__ClientRect[4] := ::ClientHeight
               ::__aCltRect[3] := x
@@ -1842,7 +1856,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               ENDIF
             CATCH
            END
-           IF ( nwParam == SIZE_MAXIMIZED .OR. nwParam == SIZE_RESTORED ) //.AND. ::IsWindowVisible()
+           IF ( nwParam == SIZE_MAXIMIZED .OR. nwParam == SIZE_RESTORED ) .AND. ( ::HorzScroll .OR. ::VertScroll )
               ::__SetScrollBars()
            ENDIF
            EXIT
@@ -2928,9 +2942,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               IF pPtr != NIL .AND. pPtr != 0
                  oCtrl := ArrayFromPointer( pPtr )
                  nRet := oCtrl:OnCtlColorStatic( nwParam, nlParam )
-
-                 //IF ( n := ASCAN( ::Children, {|o|o:hWnd == nlParam} ) ) > 0
-                 //   nRet := ::Children[n]:OnCtlColorStatic( nwParam, nlParam )
               ENDIF
            ENDIF
            EXIT
@@ -3031,88 +3042,40 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               ::xHeight := ::WindowPos:cy
            ENDIF
 
-           IF ::Parent != NIL
+           IF ::Parent != NIL .AND. ::ClassName == "WINDOWEDIT"
               aRect := _GetWindowRect( ::hWnd )
-
-              // Temporary workaround with Fast API
               aPt := { aRect[1], aRect[2] }
-
               IF ::__ClassInst != NIL .AND. ::Parent:hWnd != GetParent( ::hWnd )
                  _ScreenToClient( GetParent( ::hWnd ), @aPt )
                  ::__TempRect := { aPt[1], aPt[2], aPt[1]+::WindowPos:cx, aPt[2]+::WindowPos:cy }
                  RETURN NIL
               ENDIF
-
               _ScreenToClient( ::Parent:hWnd, @aPt )
               ::__TempRect := { aPt[1], aPt[2], aPt[1]+::WindowPos:cx, aPt[2]+::WindowPos:cy }
-
-              IF ::ClsName == "ListBox"
-                 IF ::WindowPos:cy != ::xHeight
-                    RETURN 0
-                 ENDIF
-              ENDIF
-              //-----------------------------------
-
            ENDIF
-
 
            nRet := ExecuteEvent( "OnWindowPosChanged", Self )
            ODEFAULT nRet TO ::OnWindowPosChanged( nwParam, nlParam )
-
-           IF ::__xCtrlName != "Splitter"
-              lShow := ::WindowPos:flags & SWP_SHOWWINDOW == SWP_SHOWWINDOW
-              lHide := ::WindowPos:flags & SWP_HIDEWINDOW == SWP_HIDEWINDOW
-
-              IF lHide
-                 ::Hidden := .T.
-               ELSEIF lShow
-                 ::Hidden := .F.
-              ENDIF
-
-              IF lShow .OR. lHide
-                 IF ::IsChild .AND. ::Parent != NIL .AND. ::Parent:ClsName != "DataGrid"
-                    hDef := BeginDeferWindowPos( LEN( ::Parent:Children ) )
-                    FOR EACH oChild IN ::Parent:Children
-                        IF oChild != NIL .AND. oChild:hWnd != ::hWnd
-                           oChild:__OnParentSize( ::Parent:ClientWidth, ::Parent:ClientHeight, @hDef )
-                           oChild:InvalidateRect(, .F. )
-                        ENDIF
-                    NEXT
-                    EndDeferWindowPos( hDef )
-                    IF ::LeftSplitter != NIL
-                       ::LeftSplitter:__OnParentSize( x, y, @hDef )
-                    ENDIF
-                    IF ::TopSplitter != NIL
-                       ::TopSplitter:__OnParentSize( x, y, @hDef )
-                    ENDIF
-                    IF ::RightSplitter != NIL
-                       ::RightSplitter:__OnParentSize( x, y, @hDef )
-                    ENDIF
-                    IF ::BottomSplitter != NIL
-                       ::BottomSplitter:__OnParentSize( x, y, @hDef )
-                    ENDIF
-                    RETURN 0
-                 ENDIF
-              ENDIF
-           ENDIF
            EXIT
 
       CASE WM_WINDOWPOSCHANGING
-           aParams := __GetWINDOWPOS( nlParam )
-           ::WindowPos:hwnd            := aParams[1]
-           ::WindowPos:hwndInsertAfter := aParams[2]
-           ::WindowPos:x               := aParams[3]
-           ::WindowPos:y               := aParams[4]
-           ::WindowPos:cx              := aParams[5]
-           ::WindowPos:cy              := aParams[6]
-           ::WindowPos:flags           := aParams[7]
-
            nRet := ExecuteEvent( "OnWindowPosChanging", Self )
            ODEFAULT nRet TO ::OnWindowPosChanging( nwParam, nlParam )
-           IF ::Parent != NIL .AND. ::ClsName == "MDIChild" .AND. ::WindowPos:flags != 20
-              IF ( n := ASCAN( ::Parent:Parent:Children, {|o|o:__xCtrlName == "CoolMenu"} ) ) > 0
-                 PostMessage( ::Parent:hWnd, WM_MDICHILDSIZED, n )
-                 RETURN 0
+           IF ::Parent != NIL .AND. ::ClsName == "MDIChild"
+              aParams := __GetWINDOWPOS( nlParam )
+              ::WindowPos:hwnd            := aParams[1]
+              ::WindowPos:hwndInsertAfter := aParams[2]
+              ::WindowPos:x               := aParams[3]
+              ::WindowPos:y               := aParams[4]
+              ::WindowPos:cx              := aParams[5]
+              ::WindowPos:cy              := aParams[6]
+              ::WindowPos:flags           := aParams[7]
+           
+              IF ::WindowPos:flags != 20
+                 IF ( n := ASCAN( ::Parent:Parent:Children, {|o|o:__xCtrlName == "CoolMenu"} ) ) > 0
+                    PostMessage( ::Parent:hWnd, WM_MDICHILDSIZED, n )
+                    RETURN 0
+                 ENDIF
               ENDIF
            ENDIF
            RETURN NIL

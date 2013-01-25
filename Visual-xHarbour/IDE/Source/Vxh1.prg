@@ -2016,6 +2016,9 @@ METHOD Init() CLASS IDE_MainForm
                         (n,x)
                         ::Application:Project:EditReset( IIF( y > 3, 1, 0 ) )
                         ::Application:MainForm:ToolBox1:Enabled       := y > 3
+                        IF y > 3
+                           ::Application:Project:CurrentForm:Redraw()
+                        ENDIF
                         ::Application:ObjectTree:Enabled              := y > 3
                         ::EnableSearchMenu( y == 3 )
                        >
@@ -3447,6 +3450,7 @@ METHOD SelectWindow( oWin, hTree, lFromTab ) CLASS Project
       oWin:MoveWindow()
    ENDIF
    ::CurrentForm := oWin
+
    IF !lFromTab
       n := ASCAN( ::Application:Project:Forms, ::CurrentForm,,, .T. )
       ::Application:FormsTabs:SetCurSel( n )
@@ -3457,8 +3461,13 @@ METHOD SelectWindow( oWin, hTree, lFromTab ) CLASS Project
       oWnd:Hide()
       ::Application:MainForm:PostMessage( WM_USER + 3001, hTree )
    ENDIF
+
    ::CurrentForm:Show()
-   ::CurrentForm:InvalidateRect(,.F.)
+   ::CurrentForm:Validaterect()
+   ::CurrentForm:UpdateWindow()
+   ::CurrentForm:Redraw()
+   ::Application:DoEvents()
+
    ::CurrentForm:Parent:UpdateScroll()
 RETURN 0
 
@@ -3969,7 +3978,7 @@ METHOD Open( cProject ) CLASS Project
    EXTERN MDIChildWindow
 
    LOCAL n, Xfm, aChildren
-   LOCAL hFile, cLine, oEditor, cSource, oProject, cFile, nLine, aErrors, aEditors, cProp, cSourcePath
+   LOCAL hFile, cLine, oEditor, cSource, oProject, cFile, nLine, aErrors, aEditors, cProp, cSourcePath, oWait
 
    IF cProject != NIL .AND. !FILE( cProject )
       MessageBox( GetActiveWindow(), "File Not Found", "Open Project", MB_ICONEXCLAMATION )
@@ -4020,6 +4029,8 @@ METHOD Open( cProject ) CLASS Project
 
    ENDIF
    
+   oWait := ::Application:MainForm:MessageWait( ::ProjectFile:Path + "\" + ::ProjectFile:Name, "Loading project", .T. )
+   
    ::Application:Cursor := ::System:Cursor:Busy
    SetCursor( ::Application:Cursor )
 
@@ -4037,7 +4048,7 @@ METHOD Open( cProject ) CLASS Project
          CASE n == IDYES
               FRENAME( cSourcePath +"\" + ::Properties:Name +".prg", cSourcePath +"\" + ::Properties:Name +"_Main.prg" )
       ENDCASE
-
+      oWait:Position := 10
    ENDIF
    IF FILE( cSourcePath +"\" + ::Properties:Name +"_Main.prg" )
       ::Application:ProjectPrgEditor := Source( ::Application:SourceEditor )
@@ -4049,9 +4060,11 @@ METHOD Open( cProject ) CLASS Project
       n := ::Application:MainForm:MessageBox( "Mising main file " + cSourcePath +"\" + ::Properties:Name +"_Main.prg", "Open Project", MB_ICONQUESTION | MB_OKCANCEL )
       IF n == IDCANCEL
          ::Close()
+         oWait:Close()
          RETURN .F.
       ENDIF
    ENDIF
+   oWait:Position := 20
 
    ::OpenDesigner()
    ::Application:MainForm:ToolBox1:Enabled := .T.
@@ -4084,6 +4097,7 @@ METHOD Open( cProject ) CLASS Project
    ::Application:ObjectTree:InitProject()
 
    ::Modified := .F.
+   oWait:Position := 30
 
    IF FILE( cSourcePath +"\" + ::Properties:Name +"_XFM.prg" )
       Xfm         := cSourcePath +"\" + ::Properties:Name +"_XFM.prg"
@@ -4095,6 +4109,7 @@ METHOD Open( cProject ) CLASS Project
          hb_gcall()
          nLine++
       END
+      oWait:Position := 40
       FClose( hFile )
    ENDIF
 
@@ -4104,9 +4119,11 @@ METHOD Open( cProject ) CLASS Project
        IF ! ::LoadForm( Xfm, @aErrors, @aEditors, HB_EnumIndex()==1 )
           MessageBox( GetActiveWindow(), "The File " + Xfm + " is missing, the project will now close", "Visual xHarbour - Open Project", MB_ICONERROR )
           ::Application:Cursor := NIL
+          oWait:Close()
           RETURN ::Close()
        ENDIF
    NEXT
+   oWait:Position := 50
 
    ::Application:SourceTabs:Visible := .T.
    FOR EACH cSource IN ::Properties:Sources
@@ -4122,6 +4139,7 @@ METHOD Open( cProject ) CLASS Project
           AADD( aErrors, { ::Properties:Name, "0", "Open error: " + cSource, "I/O Error"} )
        ENDIF
    NEXT
+   oWait:Position := 50
 
    IF !EMPTY( aErrors )
       ::Application:DebugWindow:Show()
@@ -4131,6 +4149,7 @@ METHOD Open( cProject ) CLASS Project
       ::Application:Yield()
       ::Application:Cursor := NIL
       //::Application:MainForm:MessageBox( "Error(s) loading " + cProject + CHR(13) + "See errors log", "Project closed", MB_ICONSTOP )
+      oWait:Close()
       RETURN ::Close(.F.)
    ENDIF
 
@@ -4212,6 +4231,8 @@ METHOD Open( cProject ) CLASS Project
 
       ::Application:EditorPage:Select()
    ENDIF
+   oWait:Position := 80
+
    ::Application:FileTree:UpdateView()
    ::ResetQuickOpen( ::ProjectFile:Path + "\" + ::ProjectFile:Name )
    IF LEN( ::Forms ) > 0 .AND. !FILE( cSourcePath +"\" + ::Properties:Name +"_XFM.prg" )
@@ -4228,10 +4249,12 @@ METHOD Open( cProject ) CLASS Project
               ::Close()
       ENDCASE
    ENDIF
+   oWait:Position := 100
    EVAL( ::Application:MainTab:OnSelChanged, NIL, NIL, IIF( LEN( ::Forms ) > 0, 4, 3 ) )
    ::Application:Cursor := NIL
    SetCursor( ::System:Cursor:Arrow )
    ::Built := .F.
+   oWait:Close()
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -5705,13 +5728,13 @@ METHOD Build( lForce ) CLASS Project
       oProject := TMakeProject():New( cProject, ::Properties:TargetType + 9 )
 
       WITH OBJECT oProject
-         :lMT              := ::Properties:MultiThread
-         :lGUI             := ::Properties:GUI
-         :lINI             := .F.
-         :OutputFolder     := cObjPath
-         :TargetFolder     := cBinPath
-         :RunArguments     := ::Properties:Parameters
-         :lNoAutoFWH       := .T.
+         :lMT          := ::Properties:MultiThread
+         :lGUI         := ::Properties:GUI
+         :lINI         := .F.
+         :OutputFolder := cObjPath
+         :TargetFolder := cBinPath
+         :RunArguments := ::Properties:Parameters
+         :lNoAutoFWH   := .T.
 
          IF !EMPTY( ::Properties:Definitions )
             ::Properties:Definitions := "; " + ::Properties:Definitions
@@ -5860,8 +5883,8 @@ METHOD Build( lForce ) CLASS Project
       OutputDebugString(ValToPrg(oErr))
       ::Application:MainForm:StatusBarPanel2:Caption := "ERRORS!"
       ::Application:MainForm:DebugBuild1:AddItem( "ERRORS!", .T. )
-    ::Application:MainForm:DebugBuild1:AddItem( oErr:Description+" "+oErr:Operation, .T. )
-    ::Application:MainForm:DebugBuild1:AddItem( oErr:Modulename+ " ("+LTrim(Str(oErr:ProcLine))+")", .T. )
+      ::Application:MainForm:DebugBuild1:AddItem( oErr:Description+" "+oErr:Operation, .T. )
+      ::Application:MainForm:DebugBuild1:AddItem( oErr:Modulename+ " ("+LTrim(Str(oErr:ProcLine))+")", .T. )
       RETURN .F.
    END
 

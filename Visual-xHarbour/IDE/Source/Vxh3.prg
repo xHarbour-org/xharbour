@@ -104,7 +104,7 @@ RETURN Self
 
 METHOD UpdateScroll() CLASS FormEditor
    LOCAL pt := (struct POINT)
-   IF ::CtrlMask:CurForm != NIL
+   IF ::CtrlMask:CurForm != NIL .AND. IsWindow( ::CtrlMask:CurForm:hWnd )
       GetWindowRect( ::CtrlMask:CurForm:hWnd, @pt )
       ScreenToClient( ::CtrlMask:CurForm:Parent:hWnd, @pt )
       ::OriginalRect[3] := MAX( ::ClientWidth,  pt:x+::CtrlMask:CurForm:Width+20 )

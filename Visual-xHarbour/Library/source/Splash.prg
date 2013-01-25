@@ -123,6 +123,7 @@ CLASS MessageWait
    METHOD SetText()
    METHOD Init() CONSTRUCTOR
    METHOD SetPosition()
+   METHOD Close()    INLINE DestroyWindow( ::hWnd )
    METHOD Destroy()  INLINE DestroyWindow( ::hWnd )
 ENDCLASS
 
