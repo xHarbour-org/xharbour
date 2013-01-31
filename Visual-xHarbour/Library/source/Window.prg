@@ -1876,80 +1876,24 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               ::Parent:GetClientRect()
            ENDIF
 
-           IF ::ClsName != "DataGrid"
-              TRY
-              FOR EACH oChild IN ::Children
-                  IF __ObjHasMsg( oChild, "Anchor" )
-                     oChild:OnParentMove()
-                     IF oChild:Anchor != NIL .AND. oChild:Anchor:Center
-                        oChild:CenterWindow()
-                     ENDIF
-                  ENDIF
-              NEXT
-              CATCH
-              END
-           ENDIF
+//           IF ::ClsName != "DataGrid"
+//              TRY
+//              FOR EACH oChild IN ::Children
+//                  IF __ObjHasMsg( oChild, "Anchor" )
+//                     oChild:OnParentMove()
+//                     IF oChild:Anchor != NIL .AND. oChild:Anchor:Center
+//                        oChild:CenterWindow()
+//                     ENDIF
+//                  ENDIF
+//              NEXT
+//              CATCH
+//              END
+//           ENDIF
            EXIT
 
-//--------------------------------------------------------------------------------------------------------------------------------------
-
       CASE WM_TIMER
-           /*
-           IF ::Application:RemoteSocket != NIL
-              WITH OBJECT ::Application:RemoteSocket
-                 IF nwParam == :nRecId
-                    :RecData := NIL
-                    :SockControlProc()
-
-                    KillTimer( ::hWnd, :nRecId )
-
-                    IF !EMPTY( :RecData )
-                       aCommand := hb_aTokens( :RecData, "|" )
-                       IF aCommand[1] == "WFCS"
-                          DO CASE
-                             CASE aCommand[2] == "MAINFORM"
-                                  :Send( "VXHS|CREATE|"+::Name+"|"+xstr(::Left)+","+xstr(::Top)+","+xstr(::Width)+","+xstr(::Height) )
-
-                             CASE aCommand[2] == "BITMAP"
-                                  IF ::Name == aCommand[3]
-                                     hDC := GetDC( ::hWnd )
-                                     hMemDC     := CreateCompatibleDC( hDC )
-                                     hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
-                                     hOldBitmap := SelectObject( hMemDC, hMemBitmap)
-
-                                     SendMessage( ::hWnd, WM_PRINT, hMemDC, PRF_CLIENT | PRF_ERASEBKGND | PRF_CHILDREN )
-
-                                     GetBmpString( hMemBitmap, @cBmpHeader, @cBmpInfo, @cBmpBits )
-
-                                     :Send( "VXHS|BITMAP|"+::Name+"|" + cBmpHeader + cBmpInfo + cBmpBits )
-                                     
-                                     SelectObject( hMemDC,  hOldBitmap )
-                                     DeleteObject( hMemBitmap )
-                                     DeleteDC( hMemDC )
-                                     ReleaseDC( ::hWnd, hDC )
-                                  ENDIF
-                                  
-                             CASE aCommand[2] == "DESTROY"
-                                  IF ::Name == aCommand[3]
-                                     ::Destroy()
-                                  ENDIF
-                          ENDCASE
-                       ENDIF
-                    ENDIF
-
-                    SetTimer( ::hWnd, :nRecId, 250 )
-                    RETURN 0
-
-                 ENDIF
-              END
-           ENDIF
-           */
-
            nRet := ExecuteEvent( "OnTimer", Self )
            ODEFAULT nRet TO ::OnTimer( nwParam, nlParam )
-           //IF ::ClsName == "Vxh_Form"
-           //   KillTimer( hWnd, nwParam )
-           //endif
            IF ( !::ClsName == TOOLTIPS_CLASS .AND. !::ClsName == ANIMATE_CLASS .AND. ( !::ClsName == PROGRESS_CLASS .OR. (::__ClassInst != NIL .AND. ::Application:OsVersion:dwMajorVersion > 5) ) )
               RETURN 0
            ENDIF
@@ -1987,24 +1931,9 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
            ::Active := nwParam != 0
 
            IF nRet == NIL .AND. nwParam == 0 .AND. ::ClsName != "DataGrid"
-              FOR EACH oChild IN ::Children
-                 IF oChild:Active
-                    oChild:Active := FALSE
-                    oChild:InvalidateRect( {0,0, oChild:ClientWidth,14}, FALSE )
-                 ENDIF
-              NEXT
               IF ::KeepActive .OR. ( n := ASCAN( ::Children, {|o|o:KeepParentActive .AND. o:hWnd == nlParam } ) ) > 0
                  RETURN 1
               ENDIF
-           ENDIF
-
-           IF ::ClsName != "DataGrid"
-              FOR EACH oChild IN ::Children
-                 IF oChild:__xCtrlName == "CoolMenu" .AND. ::__ClassInst == NIL
-                    oChild:ForeColor  := IIF( nwParam == 0, GetSysColor( COLOR_GRAYTEXT ), oChild:hBackupColor )
-                    oChild:InvalidateRect(,FALSE)
-                 ENDIF
-              NEXT
            ENDIF
            EXIT
 
@@ -5385,7 +5314,7 @@ METHOD __PaintBakgndImage( hDC ) CLASS WinForm
       BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
 
       FOR EACH oChild IN ::Children
-          IF oChild:IsChild
+          IF oChild:IsChild .AND. oChild:Transparent
              IF oChild:__hBrush != NIL
                 DeleteObject( oChild:__hBrush )
              ENDIF
@@ -5854,42 +5783,7 @@ FUNCTION MakePath( cPath )
    NEXT
 RETURN NIL
 */
-/*
-FUNCTION __ResetClassInst( oObj )
-   LOCAL aProperties, aProperty, cProperty, aObjProperties, cObjProperty, xObjValue, xValue, xObjInst, xInst
 
-   aProperties := __ClsGetPropertiesAndValues( oObj )
-   FOR EACH cProperty IN aProperties
-       cProperty := cProperty[1]
-
-       xValue := __objSendMsg( oObj, UPPER( cProperty ) )
-       xInst  := __objSendMsg( oObj:__ClassInst, UPPER( cProperty ) )
-
-       IF VALTYPE( xValue ) != "O"
-
-          IF !xValue == xInst .AND. __objHasMsg( oObj, "X" + cProperty )
-             __objSendMsg( oObj:__ClassInst, "_X" + cProperty, xValue )
-          END
-
-        ELSE
-          //__ResetClassInst( xValue )
-
-          aObjProperties := __ClsGetPropertiesAndValues( xValue )
-          FOR EACH cObjProperty IN aObjProperties
-              cObjProperty := cObjProperty[1]
-
-              xObjValue := __objSendMsg( xValue, UPPER( cObjProperty ) )
-              xObjInst  := __objSendMsg( xValue:__ClassInst, UPPER( cObjProperty ) )
-              IF !xObjValue == xObjInst
-                 __objSendMsg( xValue:__ClassInst, "_" + cObjProperty, xObjValue )
-              ENDIF
-          NEXT
-
-       ENDIF
-   NEXT
-
-RETURN NIL
-*/
 FUNCTION __ResetClassInst( oObj )
    LOCAL aProperties, cProperty, xValue, xInst
    LOCAL cPre

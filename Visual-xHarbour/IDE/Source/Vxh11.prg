@@ -1554,7 +1554,7 @@ METHOD OnInitDialog() CLASS Settings
             END //LABEL
 
             WITH OBJECT ( BUTTON( :this ) )
-               :Name                 := "Preprocessors"
+               :Name                 := "Preprocessor"
                :Left                 := 345
                :Top                  := 175
                :Width                := 77

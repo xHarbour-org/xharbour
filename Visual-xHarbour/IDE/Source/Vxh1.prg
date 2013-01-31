@@ -4123,7 +4123,7 @@ METHOD Open( cProject ) CLASS Project
           RETURN ::Close()
        ENDIF
    NEXT
-   oWait:Position := 50
+   oWait:Position := 60
 
    ::Application:SourceTabs:Visible := .T.
    FOR EACH cSource IN ::Properties:Sources
@@ -4139,7 +4139,7 @@ METHOD Open( cProject ) CLASS Project
           AADD( aErrors, { ::Properties:Name, "0", "Open error: " + cSource, "I/O Error"} )
        ENDIF
    NEXT
-   oWait:Position := 50
+   oWait:Position := 80
 
    IF !EMPTY( aErrors )
       ::Application:DebugWindow:Show()
@@ -4161,6 +4161,8 @@ METHOD Open( cProject ) CLASS Project
       IF ::CurrentForm != NIL
          ::CheckValidProgram()
          ::Application:DesignPage:Select()
+
+         oWait:Position := 90
 
          IF ::CurrentForm:MDIContainer
             cProp := ::CurrentForm:MDIClient:AlignLeft
@@ -4231,7 +4233,7 @@ METHOD Open( cProject ) CLASS Project
 
       ::Application:EditorPage:Select()
    ENDIF
-   oWait:Position := 80
+   oWait:Position := 100
 
    ::Application:FileTree:UpdateView()
    ::ResetQuickOpen( ::ProjectFile:Path + "\" + ::ProjectFile:Name )
@@ -4249,7 +4251,6 @@ METHOD Open( cProject ) CLASS Project
               ::Close()
       ENDCASE
    ENDIF
-   oWait:Position := 100
    EVAL( ::Application:MainTab:OnSelChanged, NIL, NIL, IIF( LEN( ::Forms ) > 0, 4, 3 ) )
    ::Application:Cursor := NIL
    SetCursor( ::System:Cursor:Arrow )

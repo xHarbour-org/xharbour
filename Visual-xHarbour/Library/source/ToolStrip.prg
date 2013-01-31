@@ -2932,20 +2932,23 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS MenuStripItem
       SelectObject( dis:hDC, hOldPen )
       SelectObject( dis:hDC, hOldBrush )
     ELSE
-      
-      ::__DrawStripe( dis:hDC, 0, dis:rcItem:top - IIF( ::BeginGroup, 3, 0 ), 24, dis:rcItem:bottom )
-      dis:rcItem:left := xIcon - 8
+
+      IF ! ( ::Application:OsVersion:dwMajorVersion >= 6 .AND. ::Application:OsVersion:dwMajorVersion >= 2 )
+         ::__DrawStripe( dis:hDC, 0, dis:rcItem:top - IIF( ::BeginGroup, 3, 0 ), 24, dis:rcItem:bottom )
+         dis:rcItem:left := xIcon - 8
+      ENDIF
       FillRect( dis:hDC, dis:rcItem, ::System:CurrentScheme:Brush:ToolStripDropDownBackground )
       dis:rcItem:left := 0
    ENDIF
 
    IF ::Checked
-      hOldPen   := SelectObject( dis:hDC, IIF( lSelected, ::System:CurrentScheme:Pen:ButtonPressedBorder, ::System:CurrentScheme:Pen:ButtonSelectedBorder ) )
-      hOldBrush := SelectObject( dis:hDC, IIF( lSelected, ::System:CurrentScheme:Brush:ButtonPressedGradientBegin, ::System:CurrentScheme:Brush:ButtonCheckedGradientEnd ) )
-      Rectangle( dis:hDC, 2, dis:rcItem:Top+1, xIcon-10, dis:rcItem:Bottom-1 )
-      SelectObject( dis:hDC, hOldBrush )
-      SelectObject( dis:hDC, hOldPen )
-
+      IF ! ( ::Application:OsVersion:dwMajorVersion >= 6 .AND. ::Application:OsVersion:dwMajorVersion >= 2 )
+         hOldPen   := SelectObject( dis:hDC, IIF( lSelected, ::System:CurrentScheme:Pen:ButtonPressedBorder, ::System:CurrentScheme:Pen:ButtonSelectedBorder ) )
+         hOldBrush := SelectObject( dis:hDC, IIF( lSelected, ::System:CurrentScheme:Brush:ButtonPressedGradientBegin, ::System:CurrentScheme:Brush:ButtonCheckedGradientEnd ) )
+         Rectangle( dis:hDC, 2, dis:rcItem:Top+1, xIcon-10, dis:rcItem:Bottom-1 )
+         SelectObject( dis:hDC, hOldBrush )
+         SelectObject( dis:hDC, hOldPen )
+      ENDIF
       FOR n := 0 TO 1
           MoveTo( dis:hDC,  8, dis:rcItem:Top + 10 + n )
           LineTo( dis:hDC, 10, dis:rcItem:Top + 12 + n )
