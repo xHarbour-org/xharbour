@@ -232,7 +232,7 @@ HB_FUNC( PGSROLLBACK )     /* PGSRollBack( ConnHandle ) => nError */
 HB_FUNC( PGSQUERYATTR )     /* PGSQueryAttr( ResultSet ) => aStruct */
 {
    int row, rows, type;
-   long nullable;
+   
    PHB_ITEM ret, atemp, temp;
    LONG typmod;
    PPSQL_SESSION session  = ( PPSQL_SESSION ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
@@ -255,6 +255,7 @@ HB_FUNC( PGSQUERYATTR )     /* PGSQueryAttr( ResultSet ) => aStruct */
 
    for ( row = 0; row < rows; row++ )
    {
+// 	  long nullable;
       /* Column name */
       hb_arrayNew( atemp, 11 );
       hb_itemPutC( temp, hb_strupr( PQfname( session->stmt, row ) ) );
@@ -265,10 +266,8 @@ HB_FUNC( PGSQUERYATTR )     /* PGSQueryAttr( ResultSet ) => aStruct */
       type   = (int) PQftype( session->stmt, row );
       typmod = PQfmod( session->stmt, row );
 
-     // if ( strcmp( PQgetvalue( session->stmt, row, 3 ), "f")  == 0 ) 
-         nullable = PQgetisnull( session->stmt, row,PQfnumber( session->stmt,PQfname( session->stmt, row ) ) ) ;
-      //else
-      //   nullable = 0;
+
+//       nullable = PQgetisnull( session->stmt, row,PQfnumber( session->stmt,PQfname( session->stmt, row ) ) ) ;
       
       if (typmod < 0L)
       {
@@ -419,10 +418,8 @@ HB_FUNC( PGSQUERYATTR )     /* PGSQueryAttr( ResultSet ) => aStruct */
 HB_FUNC( PGSTABLEATTR )     /* PGSTableAttr( ConnHandle, cTableName ) => aStruct */
 {
    char attcmm[512];
-   int row, rows, type;
+   int row, rows;
    PHB_ITEM ret, atemp, temp;
-   long typmod;
-   long nullable;
    PGresult * stmtTemp;
    PPSQL_SESSION session  = ( PPSQL_SESSION ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
 
@@ -453,6 +450,10 @@ HB_FUNC( PGSTABLEATTR )     /* PGSTableAttr( ConnHandle, cTableName ) => aStruct
 
    for (row=0; row < rows; row++ )
    {
+      long typmod;
+      long nullable;
+      int type;
+	   
       /* Column name */
       hb_arrayNew( atemp, 11 );
       hb_itemPutC( temp, hb_strupr( PQgetvalue( stmtTemp, row, 0 ) ) );

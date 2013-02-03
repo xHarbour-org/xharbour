@@ -7,6 +7,31 @@
    For example:
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2013-02-02 19:45 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/utils.prg
+    ! change in SR_ChangeStruct for better check for postgresql with version 8.4 or newer
+  * source/firebird.c
+    ! minor change to FBEXECUTE to declare ISC_STATUS r; only when used
+  * source/pgs.c 
+    ! changed PGSQUERYATTR() 
+    ! changed PGSTABLEATTR() to declare the typmod,nullable,type variable on the for loop where their are used
+  * source/sqlconnection.prg
+    ! added lPostgresql83 data variable ( used to determine postgresql newer then 8.4
+    ! added SR_SetTraceLog() to set the path and filename used for SR_LogFile() function    
+  * source/sqlpgs.prg
+    ! Added test for postgresql 8.3 version
+  * source/oraclip.prg
+    ! some fixes
+  * source/sqlrdd2.prg
+    ! added nMininumVarchar2Size  data , this determine  whe minimum size for varchar2,default still to create varchar2 only fields with size >30
+    ! added lOracleSyntheticVirtual data, determine if will be create function based index or indkey based indexes, for oracle version 10 or newer 
+    + added FUNCTION SR_SetMininumVarchar2Size( n )  set the minimum size to create varchar
+    + added FUNCTION SR_SetOracleSyntheticVirtual( l ) set .f. to disable create of function based index on oracle 10 or newer
+    + added FUNCTION SR_GetOracleSyntheticVirtual( l )
+    
+  
+      
 2012-12-17 05:54 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
   * source/sqlact.c
     ! fixed and small bug on SQLpCodeGenIntItem2 that was making sqlparser return error

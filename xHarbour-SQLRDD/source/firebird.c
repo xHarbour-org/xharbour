@@ -350,7 +350,7 @@ HB_FUNC( FBEXECUTE ) // FBExecute( hEnv, cCmd, nDialect )
    const char * command = hb_parcx(2);
    int i, dtype;
    XSQLVAR * var;
-   ISC_STATUS r;
+
 
    if (session->stmt)
    {
@@ -448,6 +448,7 @@ HB_FUNC( FBEXECUTE ) // FBExecute( hEnv, cCmd, nDialect )
 
    if ( !session->sqlda->sqld )
    {
+	       ISC_STATUS r;
 //      if ( isc_dsql_execute( session->status, &(session->transac), &(session->stmt), hb_parni(3), NULL ) )
       r=isc_dsql_execute( session->status, &(session->transac), &(session->stmt), hb_parni(3), NULL );
       if ( CHECK_ERROR(session) )
@@ -459,6 +460,7 @@ HB_FUNC( FBEXECUTE ) // FBExecute( hEnv, cCmd, nDialect )
    else
    {
       //if ( isc_dsql_execute( session->status, &(session->transac), &(session->stmt), hb_parni(3), session->sqlda ) )
+         ISC_STATUS r;
       r= isc_dsql_execute( session->status, &(session->transac), &(session->stmt), hb_parni(3), session->sqlda ) ;
       if ( CHECK_ERROR(session) )
       {

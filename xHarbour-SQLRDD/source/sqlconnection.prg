@@ -41,6 +41,7 @@ CLASS SR_CONNECTION
    //culik 30/12/2011 adicionado para indicar se e  sqlserver versao 2008 ou superior
    DATA lSqlServer2008 AS LOGICAL INIT .F. 
    DATA lPostgresql8   AS LOGICAL INIT .F.  // do we have postgressql >= 8.3
+   DATA lPostgresql83  AS LOGICAL INIT .F.  // do we have postgressql >= 8.3
    DATA oHashActiveWAs
 
    DATA aTableInfo      INIT { => }
@@ -1206,4 +1207,17 @@ Return lOld
 
 /*------------------------------------------------------------------------*/
 
+
+function SR_SetTraceLog(cLog) 
+   Local cOld, oSql
+
+   oSql := SR_GetConnection()
+
+   cOld := oSql:cLowLevLogFile
+
+   If valtype( cLog ) == "C"
+      oSql:cLowLevLogFile := cLog
+   EndIf
+
+Return cOld
 

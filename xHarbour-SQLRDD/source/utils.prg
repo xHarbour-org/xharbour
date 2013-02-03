@@ -221,7 +221,8 @@ Function SR_ChangeStruct( cTableName, aNewStruct )
             ElseIf aNewStruct[i, 2] != oWA:aFields[n, 2]
                IF aNewStruct[i, 2] $"CN" .and. oWA:aFields[n, 2] $"CN" .and. oWA:oSql:nSystemID == SYSTEMID_POSTGR               
 
-                  IF "8.4" $ oWA:oSql:cSystemVers .or. "9.0" $ oWA:oSql:cSystemVers
+*                   IF "8.4" $ oWA:oSql:cSystemVers .or. "9.0" $ oWA:oSql:cSystemVers
+                  IF oWA:oSql:lPostgresql8 .and. !oWA:oSql:lPostgresql83
                      aadd( aDirect, aClone( aNewStruct[i] ) )
                   else
                      aadd( aToFix, aClone( aNewStruct[i] ) )

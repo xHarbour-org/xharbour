@@ -252,6 +252,7 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
       SR_MsgLogFile( "Unsupported Postgres version: " + cSystemVers )
    else
       ::lPostgresql8 := (( Val( aversion[ 1 ] ) == 8 .and. Val( aversion[ 2 ] ) >= 3) .or. ( Val( aversion[ 1 ] ) >= 9 ))
+      ::lPostgresql83 := ( Val( aversion[ 1 ] ) == 8 .and. Val( aversion[ 2 ] ) == 3) 
    EndIf
    
    

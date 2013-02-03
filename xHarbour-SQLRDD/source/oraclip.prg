@@ -124,7 +124,13 @@ function OraRollBack()
  sr_rollbacktransaction()
 return  0
 function OraErrMsg()
-return SQLO_GETERRORDESCR( sr_getconnection():hDBC )
+Local c,e
+try
+c:=SQLO_GETERRORDESCR( sr_getconnection():hDBC )
+catch e
+c:= "usuario nao conectado"
+end
+return c
 
 function OraUpdate( nCursor,cTabAutos,aCols,aDadosAlt,cWhere,aChave ) 
 Local csql := "update " +  cTabAutos + " set "
@@ -184,7 +190,7 @@ cString := "UID="+cUSer+";PWD="+cPwd
 if !empty(cAlias ) 
 cString += ";TNS="+cAlias
 endif
-nRet := sr_addconnection(CONNECT_ORACLE_QUERY_ONLY,cstring)
+nRet := sr_addconnection(CONNECT_ORACLE,cstring)
 
 if nRet >0
    aOraclipHash[cCnxName] := hash()
@@ -194,7 +200,7 @@ if nRet >0
    aOraclipHash[cCnxName]["user"] := cUSer
    aOraclipHash[cCnxName]["pwd"] :=  cPwd
 endif
-return nRet
+return if(nRet>0,0,nret)
 
 function cslogoff(cCnxName) 
 return  OraLogoff(cCnxName) 

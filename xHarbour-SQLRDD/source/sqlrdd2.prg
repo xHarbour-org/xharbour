@@ -39,6 +39,8 @@ Static cMySqlNumericDataType := "REAL"
 Static lUseDBCatalogs        := .F.
 Static lAllowRelationsInIndx := .F.
 Static ____lOld
+static nMininumVarchar2Size  := 31
+Static lOracleSyntheticVirtual  := .T.
 
 /*------------------------------------------------------------------------*/
 
@@ -3594,6 +3596,44 @@ METHOD sqlSeek( uKey, lSoft, lLast ) CLASS SR_WORKAREA
 
    If lSoft .and. ::lISAM .and. ::oSql:nSystemID == SYSTEMID_ORACLE .and. ::aIndex[ ::aInfo[ AINFO_INDEXORD ],VIRTUAL_INDEX_NAME ] != NIL .and. valtype(uKey) == "C"
 
+         nLen      := Max( len( ::aIndex[ ::aInfo[ AINFO_INDEXORD ],INDEX_FIELDS ] ) - 1, 1 )      && Esse -1 é para remover o NRECNO que SEMPRE faz parte do indice !
+         nCons     := 0
+         nLenKey   := Len(uKey)
+         cPart     := ""
+
+         For i = 1 to nLen
+
+            nThis := ::aFields[ ::aIndex[ ::aInfo[ AINFO_INDEXORD ],INDEX_FIELDS,i,2 ], FIELD_LEN ]
+            cPart := SubStr( uKey, nCons+1, nThis )
+
+            AADD( ::aPosition, ::aIndex[ ::aInfo[ AINFO_INDEXORD ],INDEX_FIELDS,i,2 ] )
+
+            cType := ::aFields[::aIndex[ ::aInfo[ AINFO_INDEXORD ],INDEX_FIELDS,i,2 ],2]
+            lNull := ::aFields[::aIndex[ ::aInfo[ AINFO_INDEXORD ],INDEX_FIELDS,i,2 ],5]
+            nFDec := ::aFields[::aIndex[ ::aInfo[ AINFO_INDEXORD ],INDEX_FIELDS,i,2 ],4]
+            nFLen := ::aFields[::aIndex[ ::aInfo[ AINFO_INDEXORD ],INDEX_FIELDS,i,2 ],3]
+
+            If i == 1 .and. nThis >= len( uKey )
+               If uKey == ""
+                  Exit
+               EndIf
+            Else
+               If len( cPart ) = 0
+                  Exit
+               EndIf
+            EndIf
+
+            AADD( ::aQuoted, ::QuotedNull(::ConvType( cPart, cType, @lPartialSeek, nThis, ::aInfo[ AINFO_REVERSE_INDEX ] ),!lSoft,,,,lNull  )) // Reverse Index should add % to end of string or seek will never find current record if partial
+            AADD( ::aDat,    ::ConvType( if( lSoft, cPart, rtrim(cPart) ), cType, , nThis ) )
+
+            nCons += nThis
+
+            If nLenKey < nCons
+               Exit
+            endif
+
+         Next
+
       cJoin1 := " " + ::cQualifiedTableName + " A "
       cJoin3 := ::GetSelectList()
 
@@ -4988,7 +5028,11 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
          If (aCreate[i,FIELD_LEN] > 30)
                cSql := cSql + "VARCHAR2(" + ltrim(str(min(aCreate[i,FIELD_LEN],4000),9,0)) + ")" + IF(lNotNull, " NOT NULL", "")
          Else
+               if aCreate[i,FIELD_LEN] > nMininumVarchar2Size .and.  nMininumVarchar2Size < 30               
+                  cSql := cSql + "VARCHAR(" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ")" + IF(lNotNull, " NOT NULL", "")
+               else
                cSql := cSql + "CHAR(" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ")" + IF(lNotNull, " NOT NULL", "")
+         EndIf
          EndIf
 
       Case (aCreate[i,FIELD_TYPE] == "C" .or. aCreate[i,FIELD_TYPE] == "M") .and. ::oSql:nSystemID == SYSTEMID_SQLBAS
@@ -5009,7 +5053,7 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
                ELSE      
                   cSql := cSql + "CHAR (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") " + if(!Empty(SR_SetCollation()), "COLLATE " + SR_SetCollation() + " " , "")  + IF(lNotNull, " NOT NULL", "")
                ENDIF
-         ElseIf ::oSql:nSystemID == SYSTEMID_POSTGR .and. aCreate[i,FIELD_LEN] > 10
+         ElseIf ::oSql:nSystemID == SYSTEMID_POSTGR .and. aCreate[i,FIELD_LEN] > nMininumVarchar2Size -1 //10
             cSql := cSql + "VARCHAR (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") " + IF(lNotNull, " NOT NULL", "")
          Else
             cSql := cSql + "CHAR (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") " + IF(lNotNull, " NOT NULL", "")
@@ -6463,6 +6507,7 @@ METHOD sqlOrderCreate( cIndexName, cColumns, cTag, cConstraintName, cTargetTable
    Local lInParams := .F., aInf, nLenTag, nOldOrd, aRet, lDesc := .F.
    Local lSyntheticVirtual := .F., cPhysicalVIndexName, cPrevPhysicalVIndexName, nVI, lOK, cVInd
    Local aOldPhisNames := {}, cName
+   Local nKeySize :=0
 
    (lEnable)
 
@@ -6597,6 +6642,11 @@ METHOD sqlOrderCreate( cIndexName, cColumns, cTag, cConstraintName, cTargetTable
          lSyntheticIndex   := .T.
          lSyntheticVirtual := .F.
       Else     // Oracle can workaround with SinthetycVirtualIndex
+         
+         IF !SR_GetOracleSyntheticVirtual() // if set to false, use normal index, dont created the function based indexes
+            lSyntheticIndex   := .T.
+            lSyntheticVirtual := .F.
+         ELSE
          lSyntheticVirtual   := .T.
          ::LoadRegisteredTags()
 
@@ -6617,6 +6667,7 @@ METHOD sqlOrderCreate( cIndexName, cColumns, cTag, cConstraintName, cTargetTable
             EndIf
          EndDo
       EndIf
+   EndIf
    EndIf
 
    aRet := eval( SR_GetIndexInfoBlock(), cIndexName )
@@ -6736,14 +6787,6 @@ METHOD sqlOrderCreate( cIndexName, cColumns, cTag, cConstraintName, cTargetTable
 
       aCols := { cColIndx }
 
-      /* Create the index column in the table and add it to aCols */
-      If ::oSql:nSystemID == SYSTEMID_FIREBR
-         ::AlterColumns( {{ cColIndx, "C", 180, 0, , SQL_CHAR }}, .F., .F. )
-      Else
-         ::AlterColumns( {{ cColIndx, "C", 254, 0, , SQL_CHAR }}, .F., .F. )
-      EndIf
-
-      ::Refresh()
       bIndexKey := &( "{|| " + alltrim( cColumns ) + " }" )
 
       /* Update all records with the index key */
@@ -6752,6 +6795,25 @@ METHOD sqlOrderCreate( cIndexName, cColumns, cTag, cConstraintName, cTargetTable
 
       (::cAlias)->( dbSetOrder(0) )
       (::cAlias)->( dbGoTop() )
+
+      nKeySize := len(SR_Val2Char( eval( bIndexKey ) )) +15
+      
+      /* Create the index column in the table and add it to aCols */
+      If ::oSql:nSystemID == SYSTEMID_FIREBR
+         ::AlterColumns( {{ cColIndx, "C", min(nKeySize,180), 0, , SQL_CHAR }}, .F., .F. )
+      Else
+         ::AlterColumns( {{ cColIndx, "C", min(nKeysize,254), 0, , SQL_CHAR }}, .F., .F. )
+      EndIf
+
+      ::Refresh()
+*       bIndexKey := &( "{|| " + alltrim( cColumns ) + " }" )
+* 
+*       /* Update all records with the index key */
+* 
+*       nOldOrd := (::cAlias)->( indexOrd() )
+* 
+*       (::cAlias)->( dbSetOrder(0) )
+*       (::cAlias)->( dbGoTop() )
 
       If cColFor == NIL
          While !(::cAlias)->( eof() )
@@ -7023,11 +7085,11 @@ METHOD sqlOrderCreate( cIndexName, cColumns, cTag, cConstraintName, cTargetTable
          If lSyntheticVirtual    // Should we create the Virtual Index too ?
             Switch ::oSql:nSystemID
             Case SYSTEMID_ORACLE
-               cSql := "CREATE INDEX " + ::cOwner + "A$" + cPhysicalVIndexName + " ON " + ::cQualifiedTableName + " (" + ::GetSyntheticVirtualExpr( aCols ) + ")"
+               cSql := "CREATE INDEX " + ::cOwner + "A$" + cPhysicalVIndexName + " ON " + ::cQualifiedTableName + " (" + ::GetSyntheticVirtualExpr( aCols ) + ")" +IF(Empty(SR_SetTblSpaceIndx()), "", " TABLESPACE " + SR_SetTblSpaceIndx() )
                lRet := ::oSql:exec( cSql, .T. ) == SQL_SUCCESS .or. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
                ::oSql:Commit()
                If lRet
-                  cSql := "CREATE INDEX " + ::cOwner + "D$" + cPhysicalVIndexName + " ON " + ::cQualifiedTableName + " (" + ::GetSyntheticVirtualExpr( aCols ) + " DESC )"
+                  cSql := "CREATE INDEX " + ::cOwner + "D$" + cPhysicalVIndexName + " ON " + ::cQualifiedTableName + " (" + ::GetSyntheticVirtualExpr( aCols ) + " DESC )" +IF(Empty(SR_SetTblSpaceIndx()), "", " TABLESPACE " + SR_SetTblSpaceIndx() )
                   lRet := ::oSql:exec( cSql, .T. ) == SQL_SUCCESS .or. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
                   ::oSql:Commit()
                EndIf
@@ -7404,11 +7466,12 @@ METHOD sqlSetScope( nType, uValue ) CLASS SR_WORKAREA
                         EndIf
                      Else
                      
-                        IF ::oSql:nSystemID == SYSTEMID_POSTGR
-                           IF 'INDKEY_' IN UPPER( cNam )
-                              cnam := "substr( " + cNam + ",1,"+str(len(cQot)-3) +")"
-                          ENDIF   
-                        ENDIF                             
+*                         IF ::oSql:nSystemID == SYSTEMID_POSTGR
+*                            IF 'INDKEY_' IN UPPER( cNam )
+*                            altd()
+*                               cnam := "substr( " + cNam + ",1,"+str(len(cQot)-3) +")" 
+*                           ENDIF   
+*                         ENDIF                             
                         
                         cExpr += if(nFeitos>1," AND ","") + cNam + cSep + cQot + " "
                      EndIf
@@ -8135,9 +8198,10 @@ METHOD WherePgsMinor( aQuotedCols ) CLASS SR_WORKAREA
                cSep := " IS "
             Case j == nLen
                cSep := " <= "
-               if 'INDKEY_' IN UPPER(CNAM)
-                  cnam := "substr( " + cnam + ",1,"+str(len(cQot)-3) +")"
-               ENDIF   
+*                if 'INDKEY_' IN UPPER(CNAM)
+*                altd()
+*                   cnam := "substr( " + cnam + ",1,"+str(len(cQot)-3) +")"
+*                ENDIF   
 
             Case i = j
                cSep := " < "
@@ -8148,9 +8212,10 @@ METHOD WherePgsMinor( aQuotedCols ) CLASS SR_WORKAREA
                   cSep := " IS "
                Else
                   cSep := " <= "
-                  if 'INDKEY_' IN UPPER(CNAM)
-                     cnam := "substr( " + cnam + ",1,"+str(len(cQot)-3) +")"
-                  ENDIF   
+*                   if 'INDKEY_' IN UPPER(CNAM)
+*                   altd()
+*                      cnam := "substr( " + cnam + ",1,"+str(len(cQot)-3) +")"
+*                   ENDIF   
                EndIf
             EndCase
 
@@ -8411,7 +8476,11 @@ METHOD AlterColumns( aCreate, lDisplayErrorMessage, lBakcup ) CLASS SR_WORKAREA
             If (aCreate[i,FIELD_LEN] > 30)
                cSql := cSql + "VARCHAR2(" + ltrim(str(min(aCreate[i,FIELD_LEN],4000),9,0)) + ")" + IF(lNotNull, " NOT NULL", "")
             Else
+               if aCreate[i,FIELD_LEN] > nMininumVarchar2Size .and.  nMininumVarchar2Size < 30
+                  cSql := cSql + "VARCHAR2(" + ltrim(str(min(aCreate[i,FIELD_LEN],4000),9,0)) + ")" + IF(lNotNull, " NOT NULL", "")
+               else
                cSql := cSql + "CHAR(" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ")" + IF(lNotNull, " NOT NULL", "")
+            EndIf
             EndIf
 
          Case (aCreate[i,FIELD_TYPE] == "C" .or. aCreate[i,FIELD_TYPE] == "M") .and. ::oSql:nSystemID == SYSTEMID_SQLBAS
@@ -8803,7 +8872,11 @@ METHOD AlterColumnsDirect( aCreate, lDisplayErrorMessage, lBakcup,aRemove ) CLAS
             If (aCreate[i,FIELD_LEN] > 30)
                cSql := cSql + "VARCHAR2(" + ltrim(str(min(aCreate[i,FIELD_LEN],4000),9,0)) + ")" + IF(lNotNull, " NOT NULL )", ") ")
             Else
+               if aCreate[i,FIELD_LEN] > nMininumVarchar2Size .and.  nMininumVarchar2Size < 30            
+                  cSql := cSql + "VARCHAR2(" + ltrim(str(min(aCreate[i,FIELD_LEN],4000),9,0)) + ")" + IF(lNotNull, " NOT NULL )", ") ")
+               ELSE
                cSql := cSql + "CHAR(" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ")" + IF(lNotNull, " NOT NULL )", ")")
+            EndIf
             EndIf
 
          Case (aCreate[i,FIELD_TYPE] == "C" .or. aCreate[i,FIELD_TYPE] == "M") .and. ::oSql:nSystemID == SYSTEMID_SQLBAS
@@ -10001,3 +10074,14 @@ RETURN lUseJSONField
 FUNCTION SR_SetUseJSON( l )
    lUseJSONField := l
 RETURN NIL
+
+FUNCTION SR_SetMininumVarchar2Size( n ) 
+   nMininumVarchar2Size := n
+RETURN NIL   
+FUNCTION SR_SetOracleSyntheticVirtual( l )
+   lOracleSyntheticVirtual := l
+RETURN NIL   
+
+FUNCTION SR_GetOracleSyntheticVirtual( l )
+   
+RETURN lOracleSyntheticVirtual
