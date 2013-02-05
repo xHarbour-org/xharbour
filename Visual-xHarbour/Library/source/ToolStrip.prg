@@ -708,24 +708,27 @@ METHOD __OnParentSize(x,y,hDef) CLASS ToolStrip
 RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
-METHOD OnMouseMove( n, x, y ) CLASS ToolStrip
-   LOCAL pt, nLeft, nWidth, i, nPos, oStrip, nCur
-   
-   //::__SetChevronVertex()
-   
+METHOD OnMouseMove( nwParam, nlParam ) CLASS ToolStrip
+   LOCAL pt, nLeft, nWidth, i, nPos, oStrip, nCur, x, y
+
+   ::Super:OnMouseMove( nwParam, nlParam )
+
+   x := LOWORD( nlParam )
+   y := HIWORD( nlParam )
+
    IF ::Row > 0 .AND. ::xShowGrip .AND. ::Parent:ClsName == "ToolStripContainer"
       IF x < ::__GripperPos + 4 .AND. !::__OnGripper
          ::__OnGripper := .T.
          ::Cursor := ::System:Cursor:SizeAll
          ::__PrevPos := NIL
 
-       ELSEIF x >= ::__GripperPos + 4 .AND. ::__OnGripper .AND. n != MK_LBUTTON
+       ELSEIF x >= ::__GripperPos + 4 .AND. ::__OnGripper .AND. nwParam != MK_LBUTTON
          ::__OnGripper := .F.
          ::Cursor := ::System:Cursor:Arrow
          ::__PrevPos := NIL
       ENDIF
 
-      IF n == MK_LBUTTON .AND. ::__OnGripper .AND. !EMPTY( ::Parent:__aStrips )
+      IF nwParam == MK_LBUTTON .AND. ::__OnGripper .AND. !EMPTY( ::Parent:__aStrips )
          pt := (struct POINT)
          GetCursorPos( @pt )
          ::Parent:ScreenToClient( @pt )
@@ -1657,7 +1660,13 @@ METHOD OnMouseHover( nwParam ) CLASS ToolStripItem
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD OnMouseMove( nwParam, x, y ) CLASS ToolStripItem
+METHOD OnMouseMove( nwParam, nlParam ) CLASS ToolStripItem
+   LOCAL x, y
+   ::Super:OnMouseMove( nwParam, nlParam )
+
+   x := LOWORD( nlParam )
+   y := HIWORD( nlParam )
+
    IF nwParam == MK_LBUTTON
       ::__lSelected := _PtInRect( { 0, 0, ::Width, ::Height }, { x, y } )
       ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
@@ -2788,7 +2797,7 @@ CLASS ToolStripComboBox INHERIT ToolStripItem, ComboBox
 
    METHOD OnMouseHover()  INLINE NIL
    METHOD OnMouseLeave()  INLINE NIL
-   METHOD OnMouseMove()   INLINE NIL
+   //METHOD OnMouseMove()   INLINE NIL
    METHOD OnLButtonDown() INLINE NIL
    METHOD OnLButtonUp()   INLINE NIL
 ENDCLASS
@@ -2823,7 +2832,7 @@ CLASS ToolStripLabel INHERIT ToolStripButton
 
    METHOD OnMouseHover()  INLINE NIL
    METHOD OnMouseLeave()  INLINE NIL
-   METHOD OnMouseMove()   INLINE NIL
+   //METHOD OnMouseMove()   INLINE NIL
    METHOD OnLButtonDown() INLINE NIL
    METHOD OnLButtonUp()   INLINE NIL
 ENDCLASS

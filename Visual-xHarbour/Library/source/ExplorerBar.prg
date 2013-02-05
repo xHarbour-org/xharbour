@@ -428,9 +428,13 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Expando
    lFocus    := dis:itemState & ODS_FOCUS != 0
 RETURN 0
 
-METHOD OnMouseMove( nwParam, x, y ) CLASS Expando
-   LOCAL nHeight := IIF( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 .AND. ::Parent:ImageList:IconHeight > ::HeaderHeight, ::Parent:ImageList:IconHeight, ::HeaderHeight )
-   (nwParam, x)
+METHOD OnMouseMove( nwParam, nlParam ) CLASS Expando
+   LOCAL y, nHeight := IIF( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 .AND. ::Parent:ImageList:IconHeight > ::HeaderHeight, ::Parent:ImageList:IconHeight, ::HeaderHeight )
+
+   ::Super:OnMouseMove( nwParam, nlParam )
+
+   y := HIWORD( nlParam )
+
    IF !::__MouseIn .AND. y <= nHeight
       ::Cursor := ::System:Cursor:LinkSelect
       ::__MouseIn := .T.

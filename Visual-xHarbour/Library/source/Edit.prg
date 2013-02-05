@@ -568,7 +568,8 @@ METHOD __SetContextMenu() CLASS EditBox
 RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
-METHOD OnMouseMove() CLASS EditBox
+METHOD OnMouseMove( nwParam, nlParam ) CLASS EditBox
+   ::Super:OnMouseMove( nwParam, nlParam )
    IF ::xLayout > 1 .AND. ::__BkCursor != NIL
       ::__hCursor := IIF( ::__BkCursor == 0, NIL, ::__BkCursor )
       ::__BkCursor := NIL

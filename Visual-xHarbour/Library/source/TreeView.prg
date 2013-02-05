@@ -477,17 +477,19 @@ METHOD HitTest( x, y ) CLASS TreeView
 RETURN oItem
 
 //----------------------------------------------------------------------------------------------------------
-METHOD OnMouseMove(n,x,y) CLASS TreeView
+METHOD OnMouseMove( nwParam, nlParam ) CLASS TreeView
    LOCAL oItem, pt
-   (n)
+
+   ::Super:OnMouseMove( nwParam, nlParam )
+
    IF ::AutoDragDrop .AND. ::DragImage != NIL .AND. ::__oDragItem != NIL
       pt := (struct POINT)
-      pt:x := x
-      pt:y := y
+      pt:x := LOWORD( nlParam )
+      pt:y := LOWORD( nlParam )
 
       ImageListDragShowNolock(.F.)
       
-      IF ( oItem := ::HitTest( x, y ) ) != NIL .AND. ::__oDragItem != NIL .AND. oItem:Level <= ::__oDragItem:Level
+      IF ( oItem := ::HitTest( pt:x, pt:y ) ) != NIL .AND. ::__oDragItem != NIL .AND. oItem:Level <= ::__oDragItem:Level
          oItem:Select()
          ::__oTargetItem := oItem
       ENDIF

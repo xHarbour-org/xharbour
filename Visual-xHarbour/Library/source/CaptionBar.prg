@@ -145,7 +145,8 @@ RETURN 0
 
 //-----------------------------------------------------------------------------------------------------
 
-METHOD OnMouseMove(nwParam,x) CLASS CaptionBar
+METHOD OnMouseMove( nwParam, nlParam) CLASS CaptionBar
+   LOCAL x := LOWORD( nlParam )
    (nwParam)
    IF x <= ::LeftMargin+::TextWidth+20
       IF !::Pushed

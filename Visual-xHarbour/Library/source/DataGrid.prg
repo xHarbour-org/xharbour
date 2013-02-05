@@ -464,9 +464,14 @@ METHOD CreateDragImage(y) CLASS DataGrid
    ::__nDragTop := y-nTop
 RETURN hImageList
 
-METHOD OnMouseMove(wParam,x,y) CLASS DataGrid
-   LOCAL n, nWidth, nDrag, nTop, nDragPos, nDragRec
-   ::Super:OnMouseMove(wParam,x,y)
+METHOD OnMouseMove( wParam, lParam ) CLASS DataGrid
+   LOCAL n, nWidth, nDrag, nTop, nDragPos, nDragRec, x, y
+
+   ::Super:OnMouseMove( wParam, lParam )
+
+   x := LOWORD( lParam )
+   y := HIWORD( lParam )
+
    IF ::__CurControl != NIL .AND. ::__CurControl:ClsName == "Edit" .AND. ::__CurControl:Button
       ::__CurControl:RedrawWindow(,, RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW )
    ENDIF
@@ -1772,7 +1777,7 @@ RETURN 0
 METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
    LOCAL n, i, cData, x, y, nY, nRec, nRecno, lHide, aText, lSelected, nHScroll, iRight, iLeft, zLeft
    LOCAL nLeft, nTop, nRight, nBottom, hOldFont, hOldPen, nWImg, nHImg, nInd, nAlign, aAlign, aGrid, lFreeze, nHeaderRight
-   LOCAL nBkCol, nTxCol, xLeft, nStatus, lDeleted, nPos
+   LOCAL nBkCol, nTxCol, xLeft, nStatus, lDeleted, nPos, iAlign
    LOCAL nDif, nAve, aTextExt, nFocRow, aData, z, lDrawControl, nCtrl, nRep, aRect, lDis := !::IsWindowEnabled()
    LOCAL iLen, lHighLight, lBorder, hBrush, nLine, nRecPos := 0, hPen, nImgX
    IF LEN( ::Children ) == 0 .OR. ::hWnd == NIL .OR. !IsWindow( ::hWnd ) .OR. ::hWnd == 0 
@@ -2004,9 +2009,15 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                  ENDIF
                  IF nLine == 1 .AND. ::ShowHeaders
                     aAlign := _GetTextExtentPoint32( hMemDC, ::Children[i]:Caption )
+
+                    iAlign := ::Children[i]:HeaderAlignment
+                    IF iAlign == 0
+                       iAlign := nAlign
+                    ENDIF
+
                     x := zLeft + 3
 
-                    SWITCH nAlign
+                    SWITCH iAlign
                        CASE 2
                             x := nRight - aAlign[1]-3
                             EXIT
@@ -2244,7 +2255,12 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
 
                  IF nLine == 1 .AND. ::ShowHeaders
                     aAlign := _GetTextExtentPoint32( hMemDC, ::Children[i]:Caption )
-                    nAlign := ::Children[i]:xAlignment
+
+                    nAlign := ::Children[i]:HeaderAlignment
+                    IF nAlign == 0
+                       nAlign := ::Children[i]:xAlignment
+                    ENDIF
+
                     x := zLeft + 3
 
                     SWITCH nAlign
@@ -3918,6 +3934,7 @@ CLASS GridColumn INHERIT Object
    DATA MaxWidth              PUBLISHED INIT 0
    
    DATA EnumImageAlignment    EXPORTED INIT { {"Left", "Center", "Right"}, {1,2,3} }
+   DATA EnumHeaderAlignment   EXPORTED INIT { {"Column Default", "Left", "Right", "Center"}, {0,1,2,3} }
 
    DATA ButtonText                   PUBLISHED
 
@@ -3941,6 +3958,7 @@ CLASS GridColumn INHERIT Object
    DATA SelOnlyRep                   PUBLISHED INIT .T.
    DATA HeaderTooltip                PUBLISHED
    DATA HeaderFont                   PUBLISHED
+   DATA HeaderAlignment              PUBLISHED INIT 0
    DATA Font                         PUBLISHED
    DATA Type                         PUBLISHED INIT "C"
 
@@ -4029,6 +4047,7 @@ CLASS GridColumn INHERIT Object
    METHOD GetEditValue()      INLINE ::Parent:__CurControl:oGet:VarGet()
    METHOD SetWindowPos(h, x, y, cx ) INLINE (h), (x), (y), ::Width := cx, ::Parent:Update()
    METHOD SetHeaderImageIndex()
+
    METHOD DrawHeader()
    METHOD CreateDragImage()
    METHOD Destroy()
@@ -4168,8 +4187,10 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
 
    nPrevColor := SetTextColor( hDC, nTxColor )
 
-   n := ::Alignment
-   
+   n := ::HeaderAlignment
+   IF n == 0
+      n := ::Alignment
+   ENDIF
    IF n == 2
       x -= nx
     ELSEIF n == 3

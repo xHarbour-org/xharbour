@@ -139,11 +139,14 @@ RETURN( NIL )
 
 //----------------------------------------------------------------------------------------------------
 
-METHOD OnMouseMove( nwParam, x, y ) CLASS StatusBar
+METHOD OnMouseMove( nwParam, nlParam ) CLASS StatusBar
    LOCAL n, rc, pt := (struct POINT)
-   (nwParam)
-   pt:x := x
-   pt:y := y
+
+   ::Super:OnMouseMove( nwParam, nlParam )
+
+   pt:x := LOWORD( nlParam )
+   pt:y := HIWORD( nlParam )
+
    FOR n := 1 TO LEN( ::Children )
        rc := ::GetPanelRect( n-1 )
        IF PtInRect( rc, pt ) .AND. n != ::nCurPanelTip

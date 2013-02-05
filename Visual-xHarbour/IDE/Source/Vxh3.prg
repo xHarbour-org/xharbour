@@ -549,10 +549,11 @@ METHOD OnLButtonDown(n,x,y) CLASS ControlMask
    ENDIF   
 RETURN 0
 
-METHOD OnMouseMove(n,x,y) CLASS ControlMask
+METHOD OnMouseMove( nwParam, nlParam ) CLASS ControlMask
+   ::Super:OnMouseMove( nwParam, nlParam )
    IF ::CurForm != NIL
-      ::CurForm:MouseDown := ( n == MK_LBUTTON )
-      ::CurForm:CheckMouse( x, y,, n, ::lOrderMode )
+      ::CurForm:MouseDown := ( nwParam == MK_LBUTTON )
+      ::CurForm:CheckMouse( LOWORD(nlParam), HIWORD(nLParam),, nwParam, ::lOrderMode )
    ENDIF   
 RETURN 0
 

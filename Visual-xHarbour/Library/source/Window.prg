@@ -109,6 +109,11 @@
        => IF <v> == nil .OR. VALTYPE( <v> ) == "O"; <v> := <x> ; END            ;
           [; IF <vN> == nil ; <vN> := <xN> ; END]
 
+static aMessages := {;
+                    { WM_DROPFILES, "OnDropFiles" },;
+                    { WM_MOUSEMOVE, "OnMouseMove" };
+                    }
+
 //-----------------------------------------------------------------------------------------------
 
 CLASS Window INHERIT Object
@@ -526,7 +531,6 @@ CLASS Window INHERIT Object
    METHOD OnMButtonDown()       VIRTUAL
    METHOD OnMButtonUp()         VIRTUAL
    METHOD OnMenuSelect()        VIRTUAL
-   METHOD OnMouseMove()         VIRTUAL
    METHOD OnMove()              VIRTUAL
    METHOD OnMoving()            VIRTUAL
    METHOD OnNcMouseMove()       VIRTUAL
@@ -565,7 +569,6 @@ CLASS Window INHERIT Object
    METHOD OnSetCursor()         VIRTUAL
    METHOD OnEnable()            VIRTUAL
    METHOD OnContextMenu()       VIRTUAL
-   METHOD OnDropFiles()         VIRTUAL
    METHOD OnThemeChanged()      VIRTUAL
    METHOD OnSetText()           VIRTUAL
    METHOD OnNCCalcSize()        VIRTUAL
@@ -638,6 +641,10 @@ CLASS Window INHERIT Object
    METHOD __FixDocking()
    METHOD SaveLayout()
    METHOD RestoreLayout()
+
+   METHOD OnDropFiles()
+   METHOD OnMouseMove()
+
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -1521,13 +1528,42 @@ RETURN NIL
 
 #define WM_IDLE WM_USER + 1
 
+//-----------------------------------------------------------------------------------------------
+METHOD OnDropFiles( nwParam, nlParam ) CLASS Window
+   LOCAL nFiles, n, cFile
+   (nlParam)
+   ::FilesDroped := {}
+   nFiles := DragQueryFile( nwParam, 0xFFFFFFFF ) - 1
+   FOR n := 0 TO nFiles
+       DragQueryFile( nwParam, n, @cFile, MAX_PATH )
+       AADD( ::FilesDroped, cFile )
+   NEXT
+RETURN ExecuteEvent( "OnDropFiles", Self )
+
+//-----------------------------------------------------------------------------------------------
+METHOD OnMouseMove( nwParam, nlParam ) CLASS Window
+   LOCAL nRet
+   IF !::__lMouseHover
+      IF ::ToolTip != NIL .AND. ::__lPopTip
+         ::__lPopTip := .F.
+         ::ToolTip:SetTimer( 25, 1000 )
+      ENDIF
+      ::__lMouseHover := .T.
+      nRet := ExecuteEvent( "OnMouseHover", Self )
+      ODEFAULT nRet TO ::OnMouseHover( nwParam, nlParam )
+      ::TrackMouseEvent( TME_LEAVE )
+   ENDIF
+   nRet := ExecuteEvent( "OnMouseMove", Self )
+RETURN nRet
+
+//-----------------------------------------------------------------------------------------------
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    LOCAL nRet, nCode, nId, n, cBuffer, oObj
    LOCAL oChild, oItem, x, y, hDef, nLeft, nTop, nWidth, nHeight, nLines, nDelta, nScroll, nPage
    LOCAL lShow, hParent, pPtr, oCtrl, aRect, aPt, mii, cProp
-   LOCAL Band, msg, lHandled, aComp, oMenu, mmi, nFiles, oForm, aChildren
-   LOCAL rc, pt, cFile, hwndFrom, idFrom, code, aParams
-   LOCAL nAnimation
+   LOCAL Band, msg, lHandled, aComp, oMenu, mmi, oForm, aChildren
+   LOCAL rc, pt, hwndFrom, idFrom, code, aParams
+   LOCAL nAnimation, nMess
    local aParent
    
    ::Msg    := nMsg
@@ -1544,1453 +1580,1381 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
       ENDIF
       RETURN 0
    ENDIF
-   SWITCH nMsg
-      CASE WM_UPDATEUISTATE
-           EXIT
+   
+   IF ( nMess := aScan( aMessages, {|a| a[1] == nMsg} ) ) > 0
+      nRet := hb_ExecFromArray( Self, aMessages[ nMess ][2], {nwParam, nlParam} )
+   ELSE
+      SWITCH nMsg
+         CASE WM_UPDATEUISTATE
+              EXIT
 
-      //CASE WM_IDLE
-      //     HIWORD( GetQueueStatus( QS_INPUT ) )
-      //     EXIT
-
-      //CASE WM_PARENTNOTIFY
-      //     nRet := ExecuteEvent( "OnParentNotify", Self )
-      //     nRet := ::OnParentNotify( Self )
-      //     EXIT
-
-      CASE WM_DROPFILES
-           ::FilesDroped := {}
-
-           nFiles := DragQueryFile( nwParam, 0xFFFFFFFF ) - 1
-           FOR n := 0 TO nFiles
-               DragQueryFile( nwParam, n, @cFile, MAX_PATH )
-               AADD( ::FilesDroped, cFile )
-           NEXT
-
-           nRet := ExecuteEvent( "OnDropFiles", Self )
-           ODEFAULT nRet TO ::OnDropFiles( Self )
-           EXIT
-
-      CASE WM_NCMOUSEMOVE
-           IF !::__lNCMouseHover
-              ::__lNCMouseHover := .T.
-              ::TrackMouseEvent( TME_NONCLIENT | TME_LEAVE | TME_HOVER )
-           ENDIF
-           nRet := ExecuteEvent( "OnNcMouseMove", Self )
-           ODEFAULT nRet TO ::OnNcMouseMove( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
-           EXIT
-
-      CASE WM_NCMOUSELEAVE
-           ::TrackMouseEvent( TME_NONCLIENT | TME_HOVER )
-           ::__lNCMouseHover := .F.
-           nRet := ExecuteEvent( "OnNCMouseLeave", Self )
-           ODEFAULT nRet TO ::OnNCMouseleave( nwParam, LoWord(nlParam), Hiword(nlparam) )
-           EXIT
-
-      CASE WM_NCMOUSEHOVER
-           ::TrackMouseEvent( TME_NONCLIENT | TME_LEAVE )
-           ::__lNCMouseHover := .T.
-           nRet := ExecuteEvent( "OnNCMouseHover", Self )
-           ODEFAULT nRet TO ::OnNCMouseHover( nwParam, LoWord(nlParam), Hiword(nlparam) )
-           EXIT
-
-      CASE WM_SETCURSOR
-           nRet := ExecuteEvent( "OnSetCursor", Self )
-           ODEFAULT nRet TO ::OnSetCursor( nwParam, nlParam )
-           IF ::Application != NIL .AND. ::Application:Cursor != NIL
-              WinSetCursor( ::Application:Cursor )
-              RETURN .T.
-           ENDIF
-           IF ::__hCursor != NIL
-              WinSetCursor( ::__hCursor )
-              RETURN .T.
-           ENDIF
-           EXIT
-
-      CASE WM_MOUSEMOVE
-           IF !::__lMouseHover
-              IF ::ToolTip != NIL .AND. ::__lPopTip
-                 ::__lPopTip := .F.
-                 ::ToolTip:SetTimer( 25, 1000 )
+         CASE WM_NCMOUSEMOVE
+              IF !::__lNCMouseHover
+                 ::__lNCMouseHover := .T.
+                 ::TrackMouseEvent( TME_NONCLIENT | TME_LEAVE | TME_HOVER )
               ENDIF
+              nRet := ExecuteEvent( "OnNcMouseMove", Self )
+              ODEFAULT nRet TO ::OnNcMouseMove( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
+              EXIT
+
+         CASE WM_NCMOUSELEAVE
+              ::TrackMouseEvent( TME_NONCLIENT | TME_HOVER )
+              ::__lNCMouseHover := .F.
+              nRet := ExecuteEvent( "OnNCMouseLeave", Self )
+              ODEFAULT nRet TO ::OnNCMouseleave( nwParam, LoWord(nlParam), Hiword(nlparam) )
+              EXIT
+
+         CASE WM_NCMOUSEHOVER
+              ::TrackMouseEvent( TME_NONCLIENT | TME_LEAVE )
+              ::__lNCMouseHover := .T.
+              nRet := ExecuteEvent( "OnNCMouseHover", Self )
+              ODEFAULT nRet TO ::OnNCMouseHover( nwParam, LoWord(nlParam), Hiword(nlparam) )
+              EXIT
+
+         CASE WM_SETCURSOR
+              nRet := ExecuteEvent( "OnSetCursor", Self )
+              ODEFAULT nRet TO ::OnSetCursor( nwParam, nlParam )
+              IF ::Application != NIL .AND. ::Application:Cursor != NIL
+                 WinSetCursor( ::Application:Cursor )
+                 RETURN .T.
+              ENDIF
+              IF ::__hCursor != NIL
+                 WinSetCursor( ::__hCursor )
+                 RETURN .T.
+              ENDIF
+              EXIT
+
+         CASE WM_MOUSELEAVE
+              nRet := ExecuteEvent( "OnMouseLeave", Self )
+              ODEFAULT nRet TO ::OnMouseleave( nwParam, LoWord(nlParam), Hiword(nlparam) )
+              ::__lMouseHover := .F.
+              EXIT
+   /*
+         CASE WM_MOUSEHOVER
               ::__lMouseHover := .T.
               nRet := ExecuteEvent( "OnMouseHover", Self )
               ODEFAULT nRet TO ::OnMouseHover( nwParam, LoWord(nlParam), Hiword(nlparam) )
+              IF ::ToolTip != NIL .AND. ::ToolTip:hWnd != NIL
+                 ::ToolTip:Popup()
+              ENDIF
               ::TrackMouseEvent( TME_LEAVE )
-           ENDIF
-           nRet := ExecuteEvent( "OnMouseMove", Self )
-           ODEFAULT nRet TO ::OnMouseMove( nwParam, LOWORD(nlParam), HIWORD(nlparam) )
-           EXIT
+              EXIT
+   */
+         CASE WM_MOUSEACTIVATE
+              nRet := ExecuteEvent( "OnMouseActivate", Self )
+              ODEFAULT nRet TO ::OnMouseActivate( nwParam, LoWord(nlParam), HiWord(nlParam) )
+              EXIT
 
-      CASE WM_MOUSELEAVE
-           nRet := ExecuteEvent( "OnMouseLeave", Self )
-           ODEFAULT nRet TO ::OnMouseleave( nwParam, LoWord(nlParam), Hiword(nlparam) )
-           ::__lMouseHover := .F.
-           EXIT
-/*
-      CASE WM_MOUSEHOVER
-           ::__lMouseHover := .T.
-           nRet := ExecuteEvent( "OnMouseHover", Self )
-           ODEFAULT nRet TO ::OnMouseHover( nwParam, LoWord(nlParam), Hiword(nlparam) )
-           IF ::ToolTip != NIL .AND. ::ToolTip:hWnd != NIL
-              ::ToolTip:Popup()
-           ENDIF
-           ::TrackMouseEvent( TME_LEAVE )
-           EXIT
-*/
-      CASE WM_MOUSEACTIVATE
-           nRet := ExecuteEvent( "OnMouseActivate", Self )
-           ODEFAULT nRet TO ::OnMouseActivate( nwParam, LoWord(nlParam), HiWord(nlParam) )
-           EXIT
+         CASE WM_NCLBUTTONUP
+              nRet := ExecuteEvent( "OnNCLButtonUp", Self )
+              ODEFAULT nRet TO ::OnNCLButtonUp( nwParam, LoWord(nlParam), HiWord(nlParam) )
+              EXIT
 
-      CASE WM_NCLBUTTONUP
-           nRet := ExecuteEvent( "OnNCLButtonUp", Self )
-           ODEFAULT nRet TO ::OnNCLButtonUp( nwParam, LoWord(nlParam), HiWord(nlParam) )
-           EXIT
+         CASE WM_NCLBUTTONDOWN
+              nRet := ExecuteEvent( "OnNCLButtonDown", Self )
+              ODEFAULT nRet TO ::OnNCLButtonDown( nwParam, LoWord(nlParam), HiWord(nlParam) )
+              EXIT
 
-      CASE WM_NCLBUTTONDOWN
-           nRet := ExecuteEvent( "OnNCLButtonDown", Self )
-           ODEFAULT nRet TO ::OnNCLButtonDown( nwParam, LoWord(nlParam), HiWord(nlParam) )
-           EXIT
-
-      CASE WM_NCLBUTTONDBLCLK
-           nRet := ExecuteEvent( "OnNCLButtonDblClk", Self )
-           ODEFAULT nRet TO ::OnNCLButtonDblClk( nwParam, LoWord( nlParam ), HiWord( nlParam ), hWnd )
-           EXIT
+         CASE WM_NCLBUTTONDBLCLK
+              nRet := ExecuteEvent( "OnNCLButtonDblClk", Self )
+              ODEFAULT nRet TO ::OnNCLButtonDblClk( nwParam, LoWord( nlParam ), HiWord( nlParam ), hWnd )
+              EXIT
 
 
 
-      CASE WM_NCRBUTTONUP
-           nRet := ExecuteEvent( "OnNCRButtonUp", Self )
-           ODEFAULT nRet TO ::OnNCRButtonUp( nwParam, LoWord(nlParam), HiWord(nlParam) )
-           EXIT
+         CASE WM_NCRBUTTONUP
+              nRet := ExecuteEvent( "OnNCRButtonUp", Self )
+              ODEFAULT nRet TO ::OnNCRButtonUp( nwParam, LoWord(nlParam), HiWord(nlParam) )
+              EXIT
 
-      CASE WM_NCRBUTTONDOWN
-           nRet := ExecuteEvent( "OnNCRButtonDown", Self )
-           ODEFAULT nRet TO ::OnNCRButtonDown( nwParam, LoWord(nlParam), HiWord(nlParam) )
-           EXIT
+         CASE WM_NCRBUTTONDOWN
+              nRet := ExecuteEvent( "OnNCRButtonDown", Self )
+              ODEFAULT nRet TO ::OnNCRButtonDown( nwParam, LoWord(nlParam), HiWord(nlParam) )
+              EXIT
 
-      CASE WM_NCRBUTTONDBLCLK
-           nRet := ExecuteEvent( "OnNCRButtonDblClk", Self )
-           ODEFAULT nRet TO ::OnNCRButtonDblClk( nwParam, LoWord( nlParam ), HiWord( nlParam ), hWnd )
-           EXIT
-
-
-
-      CASE WM_NCMBUTTONUP
-           nRet := ExecuteEvent( "OnNCMButtonUp", Self )
-           ODEFAULT nRet TO ::OnNCMButtonUp( nwParam, LoWord(nlParam), HiWord(nlParam) )
-           EXIT
-
-      CASE WM_NCMBUTTONDOWN
-           nRet := ExecuteEvent( "OnNCMButtonDown", Self )
-           ODEFAULT nRet TO ::OnNCMButtonDown( nwParam, LoWord(nlParam), HiWord(nlParam) )
-           EXIT
-
-      CASE WM_NCMBUTTONDBLCLK
-           nRet := ExecuteEvent( "OnNCMButtonDblClk", Self )
-           ODEFAULT nRet TO ::OnNCMButtonDblClk( nwParam, LoWord( nlParam ), HiWord( nlParam ), hWnd )
-           EXIT
+         CASE WM_NCRBUTTONDBLCLK
+              nRet := ExecuteEvent( "OnNCRButtonDblClk", Self )
+              ODEFAULT nRet TO ::OnNCRButtonDblClk( nwParam, LoWord( nlParam ), HiWord( nlParam ), hWnd )
+              EXIT
 
 
 
-      CASE WM_NCXBUTTONUP
-           nRet := ExecuteEvent( "OnNCXButtonUp", Self )
-           ODEFAULT nRet TO ::OnNCXButtonUp( nwParam, LoWord(nlParam), HiWord(nlParam) )
-           EXIT
+         CASE WM_NCMBUTTONUP
+              nRet := ExecuteEvent( "OnNCMButtonUp", Self )
+              ODEFAULT nRet TO ::OnNCMButtonUp( nwParam, LoWord(nlParam), HiWord(nlParam) )
+              EXIT
 
-      CASE WM_NCXBUTTONDOWN
-           nRet := ExecuteEvent( "OnNCXButtonDown", Self )
-           ODEFAULT nRet TO ::OnNCXButtonDown( nwParam, LoWord(nlParam), HiWord(nlParam) )
-           EXIT
+         CASE WM_NCMBUTTONDOWN
+              nRet := ExecuteEvent( "OnNCMButtonDown", Self )
+              ODEFAULT nRet TO ::OnNCMButtonDown( nwParam, LoWord(nlParam), HiWord(nlParam) )
+              EXIT
 
-      CASE WM_NCXBUTTONDBLCLK
-           nRet := ExecuteEvent( "OnNCXButtonDblClk", Self )
-           ODEFAULT nRet TO ::OnNCXButtonDblClk( nwParam, LoWord( nlParam ), HiWord( nlParam ), hWnd )
-           EXIT
+         CASE WM_NCMBUTTONDBLCLK
+              nRet := ExecuteEvent( "OnNCMButtonDblClk", Self )
+              ODEFAULT nRet TO ::OnNCMButtonDblClk( nwParam, LoWord( nlParam ), HiWord( nlParam ), hWnd )
+              EXIT
 
 
 
-      CASE WM_NCHITTEST
-           nRet := ExecuteEvent( "OnNCHitTest", Self )
-           IF nRet == NIL
-              nRet := ::OnNCHitTest( loword(nlParam), hiword(nlParam), nwParam )
-              //IF nRet == NIL .AND. ::__ClassInst == NIL .AND. !EMPTY( ::BitmapMask )
-              //   RETURN HTCAPTION
-              //ENDIF
-           ENDIF
-           EXIT
+         CASE WM_NCXBUTTONUP
+              nRet := ExecuteEvent( "OnNCXButtonUp", Self )
+              ODEFAULT nRet TO ::OnNCXButtonUp( nwParam, LoWord(nlParam), HiWord(nlParam) )
+              EXIT
 
-      CASE WM_INITMENUPOPUP
-           nRet := ExecuteEvent( "OnInitMenuPopup", Self )
-           ODEFAULT nRet TO ::OnInitMenuPopup( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
-           EXIT
+         CASE WM_NCXBUTTONDOWN
+              nRet := ExecuteEvent( "OnNCXButtonDown", Self )
+              ODEFAULT nRet TO ::OnNCXButtonDown( nwParam, LoWord(nlParam), HiWord(nlParam) )
+              EXIT
 
-      CASE WM_LBUTTONDOWN
-           nRet := ExecuteEvent( "OnLButtonDown", Self )
-           ODEFAULT nRet TO ::OnLButtonDown( nwParam, LoWord( nlParam ), HiWord( nlParam ), hWnd )
-           ODEFAULT nRet TO __Evaluate( ::OnWMLButtonDown, Self, LoWord( nlParam ), HiWord( nlParam ), nRet )
-           EXIT
+         CASE WM_NCXBUTTONDBLCLK
+              nRet := ExecuteEvent( "OnNCXButtonDblClk", Self )
+              ODEFAULT nRet TO ::OnNCXButtonDblClk( nwParam, LoWord( nlParam ), HiWord( nlParam ), hWnd )
+              EXIT
 
-      CASE WM_LBUTTONUP
-           nRet := ExecuteEvent( "OnLButtonUp", Self )
-           ODEFAULT nRet TO ::OnLButtonUp( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
-           ODEFAULT nRet TO __Evaluate( ::OnWMLButtonUp, Self, LoWord( nlParam ), HiWord( nlParam ), nRet )
-           EXIT
 
-      CASE WM_LBUTTONDBLCLK
-           nRet := ExecuteEvent( "OnLButtonDblClk", Self )
-           ODEFAULT nRet TO ::OnLButtonDblClk( nwParam, LoWord( nlParam ), HiWord( nlParam ), hWnd )
-           ODEFAULT nRet TO __Evaluate( ::OnWMLButtonDblClk, Self, nwParam, nlParam )
-           EXIT
 
-      CASE WM_MBUTTONDOWN
-           nRet := ExecuteEvent( "OnMButtonDown", Self )
-           ODEFAULT nRet TO ::OnMButtonDown( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
-           EXIT
-
-      CASE WM_MBUTTONUP
-           nRet := ExecuteEvent( "OnMButtonUp", Self )
-           ODEFAULT nRet TO ::OnMButtonUp( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
-           EXIT
-
-      CASE WM_MENUSELECT
-           nRet := ExecuteEvent( "OnMenuSelect", Self )
-           ODEFAULT nRet TO ::OnMenuSelect( LoWord(nwParam), Hiword(nwparam), nlParam )
-           EXIT
-
-      CASE WM_RBUTTONDOWN
-           nRet := ExecuteEvent( "OnRButtonDown", Self )
-           ODEFAULT nRet TO ::OnRButtonDown( nwParam, LoWord(nlParam), Hiword(nlparam) )
-           EXIT
-
-      CASE WM_RBUTTONUP
-           nRet := ExecuteEvent( "OnRButtonUp", Self )
-           ODEFAULT nRet TO ::OnRButtonUp( nwParam, LoWord(nlParam), Hiword(nlparam) )
-           EXIT
-
-      CASE WM_SIZE
-           ::__lReqBrush := .T.
-           IF EMPTY( ::__ClientRect )
-              RETURN 0
-           ENDIF
-           ::ClientWidth  := GETXPARAM( nlParam )
-           ::ClientHeight := GETYPARAM( nlParam )
-
-           x := MAX( ::xWidth,  ::OriginalRect[3] )
-           y := MAX( ::xHeight, ::OriginalRect[4] )
-
-           IF ::__hMemBitmap != NIL
-              DeleteObject( ::__hMemBitmap )
-              ::__hMemBitmap := CreateCompatibleBitmap( ::Drawing:hDC, ::ClientWidth, ::ClientHeight )
-           ENDIF
-
-           IF ::ClsName != "DataGrid"
-              aChildren := IIF( ::__DockChildren != NIL, ::__DockChildren, ::Children )
-              IF ! Empty( aChildren )
-                 hDef := BeginDeferWindowPos( LEN( aChildren ) )
-                 FOR EACH oChild IN aChildren
-                     IF VALTYPE( oChild ) == "O"
-                        oChild:__OnParentSize( x, y, @hDef, ,, ::__aCltRect[3], ::__aCltRect[4] )
-                        IF oChild:__IsControl .AND. oChild:Anchor:Center
-                           oChild:CenterWindow()
-                        ENDIF
-                     ENDIF
-                 NEXT
-                 EndDeferWindowPos( hDef )
+         CASE WM_NCHITTEST
+              nRet := ExecuteEvent( "OnNCHitTest", Self )
+              IF nRet == NIL
+                 nRet := ::OnNCHitTest( loword(nlParam), hiword(nlParam), nwParam )
+                 //IF nRet == NIL .AND. ::__ClassInst == NIL .AND. !EMPTY( ::BitmapMask )
+                 //   RETURN HTCAPTION
+                 //ENDIF
               ENDIF
-              ::__ClientRect[3] := ::ClientWidth
-              ::__ClientRect[4] := ::ClientHeight
-              ::__aCltRect[3] := x
-              ::__aCltRect[4] := y
-           ENDIF
+              EXIT
 
-           nRet := ExecuteEvent( "OnSize", Self )
-           ODEFAULT nRet TO ::OnSize( nwParam, ::ClientWidth, ::ClientHeight )
-           ODEFAULT nRet TO __Evaluate( ::OnWMSize, Self, nwParam, nlParam, nRet )
+         CASE WM_INITMENUPOPUP
+              nRet := ExecuteEvent( "OnInitMenuPopup", Self )
+              ODEFAULT nRet TO ::OnInitMenuPopup( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
+              EXIT
 
-           TRY
-              IF (nwParam == 0 .or. nwParam == 2) .AND. ::MDIContainer .AND. ::MDIClient != NIL .AND. ::MDIClient:hWnd != NIL
-                 ::LeftMargin   := 0
-                 ::TopMargin    := 0
-                 ::RightMargin  := ::ClientWidth
-                 ::BottomMargin := ::ClientHeight
+         CASE WM_LBUTTONDOWN
+              nRet := ExecuteEvent( "OnLButtonDown", Self )
+              ODEFAULT nRet TO ::OnLButtonDown( nwParam, LoWord( nlParam ), HiWord( nlParam ), hWnd )
+              ODEFAULT nRet TO __Evaluate( ::OnWMLButtonDown, Self, LoWord( nlParam ), HiWord( nlParam ), nRet )
+              EXIT
 
-                 IF ::__ClassInst == NIL
-                    cProp := ::MDIClient:AlignLeft
-                    IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( aChildren, {|o| o:Name == cProp } ) ) > 0
-                       ::MDIClient:AlignLeft := aChildren[n]
-                    ENDIF
+         CASE WM_LBUTTONUP
+              nRet := ExecuteEvent( "OnLButtonUp", Self )
+              ODEFAULT nRet TO ::OnLButtonUp( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
+              ODEFAULT nRet TO __Evaluate( ::OnWMLButtonUp, Self, LoWord( nlParam ), HiWord( nlParam ), nRet )
+              EXIT
 
-                    cProp := ::MDIClient:AlignTop
-                    IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( aChildren, {|o| o:Name == cProp } ) ) > 0
-                       ::MDIClient:AlignTop := aChildren[n]
-                    ENDIF
+         CASE WM_LBUTTONDBLCLK
+              nRet := ExecuteEvent( "OnLButtonDblClk", Self )
+              ODEFAULT nRet TO ::OnLButtonDblClk( nwParam, LoWord( nlParam ), HiWord( nlParam ), hWnd )
+              ODEFAULT nRet TO __Evaluate( ::OnWMLButtonDblClk, Self, nwParam, nlParam )
+              EXIT
 
-                    cProp := ::MDIClient:AlignRight
-                    IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( aChildren, {|o| o:Name == cProp } ) ) > 0
-                       ::MDIClient:AlignRight := aChildren[n]
-                    ENDIF
+         CASE WM_MBUTTONDOWN
+              nRet := ExecuteEvent( "OnMButtonDown", Self )
+              ODEFAULT nRet TO ::OnMButtonDown( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
+              EXIT
 
-                    cProp := ::MDIClient:AlignBottom
-                    IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( aChildren, {|o| o:Name == cProp } ) ) > 0
-                       ::MDIClient:AlignBottom := aChildren[n]
-                    ENDIF
-                 ENDIF
+         CASE WM_MBUTTONUP
+              nRet := ExecuteEvent( "OnMButtonUp", Self )
+              ODEFAULT nRet TO ::OnMButtonUp( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
+              EXIT
 
-                 IF VALTYPE( ::MDIClient:AlignLeft ) == "O"
-                    ::LeftMargin := ::MDIClient:AlignLeft:Left + ::MDIClient:AlignLeft:Width + IIF( ::MDIClient:AlignLeft:RightSplitter != NIL, ::MDIClient:AlignLeft:RightSplitter:Weight, 0 )
-                 ENDIF
-                 IF VALTYPE( ::MDIClient:AlignTop ) == "O"
-                    ::TopMargin := ::MDIClient:AlignTop:Top + ::MDIClient:AlignTop:Height + IIF( ::MDIClient:AlignTop:BottomSplitter != NIL, ::MDIClient:AlignTop:BottomSplitter:Weight, 0 )
-                 ENDIF
-                 IF VALTYPE( ::MDIClient:AlignRight ) == "O"
-                    ::RightMargin := ::MDIClient:AlignRight:Left - IIF( ::MDIClient:AlignRight:LeftSplitter != NIL, ::MDIClient:AlignRight:LeftSplitter:Weight, 0 )
-                 ENDIF
-                 IF VALTYPE( ::MDIClient:AlignBottom ) == "O"
-                    ::BottomMargin := ::MDIClient:AlignBottom:Top - IIF( ::MDIClient:AlignBottom:TopSplitter != NIL, ::MDIClient:AlignBottom:TopSplitter:Weight, 0 )
-                 ENDIF
-                 MoveWindow( ::MDIClient:hWnd, ::LeftMargin,;
-                                               ::TopMargin,;
-                                               ::RightMargin - ::LeftMargin,;
-                                               ::BottomMargin - ::TopMargin, .T.)
+         CASE WM_MENUSELECT
+              nRet := ExecuteEvent( "OnMenuSelect", Self )
+              ODEFAULT nRet TO ::OnMenuSelect( LoWord(nwParam), Hiword(nwparam), nlParam )
+              EXIT
+
+         CASE WM_RBUTTONDOWN
+              nRet := ExecuteEvent( "OnRButtonDown", Self )
+              ODEFAULT nRet TO ::OnRButtonDown( nwParam, LoWord(nlParam), Hiword(nlparam) )
+              EXIT
+
+         CASE WM_RBUTTONUP
+              nRet := ExecuteEvent( "OnRButtonUp", Self )
+              ODEFAULT nRet TO ::OnRButtonUp( nwParam, LoWord(nlParam), Hiword(nlparam) )
+              EXIT
+
+         CASE WM_SIZE
+              ::__lReqBrush := .T.
+              IF EMPTY( ::__ClientRect )
+                 RETURN 0
               ENDIF
-            CATCH
-           END
-           IF ( nwParam == SIZE_MAXIMIZED .OR. nwParam == SIZE_RESTORED ) .AND. ( ::HorzScroll .OR. ::VertScroll )
-              ::__SetScrollBars()
-           ENDIF
-           EXIT
+              ::ClientWidth  := GETXPARAM( nlParam )
+              ::ClientHeight := GETYPARAM( nlParam )
 
-      CASE WM_MOVING
-           nRet := ExecuteEvent( "OnMoving", Self )
-           ODEFAULT nRet TO ::OnMoving( LoWord( nlParam ), HiWord( nlParam ) )
-           EXIT
+              x := MAX( ::xWidth,  ::OriginalRect[3] )
+              y := MAX( ::xHeight, ::OriginalRect[4] )
 
-      CASE WM_MOVE
-           ::__lReqBrush := .T.
-
-           nRet := ExecuteEvent( "OnMove", Self )
-           ODEFAULT nRet TO ::OnMove( x, y )
-
-           IF ::Parent != NIL .AND. ::Parent:ClsName == "DeskTop"
-              ::Parent:GetClientRect()
-           ENDIF
-
-//           IF ::ClsName != "DataGrid"
-//              TRY
-//              FOR EACH oChild IN ::Children
-//                  IF __ObjHasMsg( oChild, "Anchor" )
-//                     oChild:OnParentMove()
-//                     IF oChild:Anchor != NIL .AND. oChild:Anchor:Center
-//                        oChild:CenterWindow()
-//                     ENDIF
-//                  ENDIF
-//              NEXT
-//              CATCH
-//              END
-//           ENDIF
-           EXIT
-
-      CASE WM_TIMER
-           nRet := ExecuteEvent( "OnTimer", Self )
-           ODEFAULT nRet TO ::OnTimer( nwParam, nlParam )
-           IF ( !::ClsName == TOOLTIPS_CLASS .AND. !::ClsName == ANIMATE_CLASS .AND. ( !::ClsName == PROGRESS_CLASS .OR. (::__ClassInst != NIL .AND. ::Application:OsVersion:dwMajorVersion > 5) ) )
-              RETURN 0
-           ENDIF
-           EXIT
-
-      CASE WM_CHILDACTIVATE
-           nRet := ExecuteEvent( "OnChildActivate", Self )
-           EXIT
-
-      CASE WM_ACTIVATE
-           nRet := ExecuteEvent( "OnActivate", Self )
-           ODEFAULT nRet TO ::OnActivate( nwParam, nlParam )
-           EXIT
-
-      CASE WM_SETFONT
-           nRet := ExecuteEvent( "OnSetFont", Self )
-           ODEFAULT nRet TO ::OnSetFont( nwParam, nlParam )
-           EXIT
-
-      CASE WM_APPCOMMAND
-           EXIT
-
-      CASE WM_NCXBUTTONUP
-           EXIT
-
-      CASE WM_NCCREATE
-           nRet := ExecuteEvent( "OnNcCreate", Self )
-           ODEFAULT nRet TO ::OnNcCreate( nwParam, nlParam )
-           EXIT
-
-      CASE WM_NCACTIVATE
-           nRet := ExecuteEvent( "OnNcActivate", Self )
-           ODEFAULT nRet TO ::OnNcActivate( nwParam,nlParam )
-
-           ::Active := nwParam != 0
-
-           IF nRet == NIL .AND. nwParam == 0 .AND. ::ClsName != "DataGrid"
-              IF ::KeepActive .OR. ( n := ASCAN( ::Children, {|o|o:KeepParentActive .AND. o:hWnd == nlParam } ) ) > 0
-                 RETURN 1
+              IF ::__hMemBitmap != NIL
+                 DeleteObject( ::__hMemBitmap )
+                 ::__hMemBitmap := CreateCompatibleBitmap( ::Drawing:hDC, ::ClientWidth, ::ClientHeight )
               ENDIF
-           ENDIF
-           EXIT
 
-      CASE WM_NCCALCSIZE
-           nRet := ExecuteEvent( "OnNcCalcSize", Self )
-           ODEFAULT nRet TO ::OnNcCalcSize( nwParam, nlParam )
-           EXIT
-
-      CASE WM_DESTROY
-           IF ::__ClassInst != NIL
-              IF ::LeftSplitter != NIL
-                 ::LeftSplitter:Destroy()
-                 ::LeftSplitter := NIL
-              ENDIF
-              IF ::TopSplitter != NIL
-                 ::TopSplitter:Destroy()
-                 ::TopSplitter := NIL
-              ENDIF
-              IF ::RightSplitter != NIL
-                 ::RightSplitter:Destroy()
-                 ::RightSplitter := NIL
-              ENDIF
-              IF ::BottomSplitter != NIL
-                 ::BottomSplitter:Destroy()
-                 ::BottomSplitter := NIL
-              ENDIF
-           ENDIF
-           ::HorzScroll := .F.
-           ::VertScroll := .F.
-
-           aComp := {}
-           FOR n := 1 TO LEN( ::Components )
-               IF ::Components[n]:Exists
-                  AADD( aComp, ::Components[n] )
-               ENDIF
-           NEXT
-           AEVAL( aComp, {|o| o:Destroy(.F.) } )
-
-           ::Components := {}
-
-           IF ::Parent != NIL .AND. ::__ClassInst == NIL .AND. ::Parent:Children != NIL
-              FOR EACH oChild IN ::Parent:Children
-                 IF oChild:__xCtrlName == "CoolBar"
-                    FOR EACH Band IN oChild:Bands
-                        IF Band:BandChild != NIL .AND. Band:BandChild:hWnd == ::hWnd
-                           Band:BandChild := NIL
+              IF ::ClsName != "DataGrid"
+                 aChildren := IIF( ::__DockChildren != NIL, ::__DockChildren, ::Children )
+                 IF ! Empty( aChildren )
+                    hDef := BeginDeferWindowPos( LEN( aChildren ) )
+                    FOR EACH oChild IN aChildren
+                        IF VALTYPE( oChild ) == "O"
+                           oChild:__OnParentSize( x, y, @hDef, ,, ::__aCltRect[3], ::__aCltRect[4] )
+                           IF oChild:__IsControl .AND. oChild:Anchor:Center
+                              oChild:CenterWindow()
+                           ENDIF
                         ENDIF
                     NEXT
+                    EndDeferWindowPos( hDef )
                  ENDIF
-              NEXT
-           ENDIF
-
-           nRet := ExecuteEvent( "OnDestroy", Self )
-           ODEFAULT nRet TO ::OnDestroy( nwParam, nlParam )
-           ODEFAULT nRet TO __Evaluate( ::OnWMDestroy, Self, nwParam, nlParam, nRet )
-           IF ::Parent != NIL .AND. ( ::Parent:__xCtrlName == "ObjManager" .OR. ::Parent:__xCtrlName == "EvtManager" )
-              ::Parent:KeepActiveCaption := .F.
-              ::Parent:Redraw()
-           ENDIF
-//            aProperties := __ClsGetPropertiesAndValues( Self )
-//            FOR EACH aProperty IN aProperties
-//                oObj := __objSendMsg( Self, UPPER( aProperty[1] ) )
-//                IF VALTYPE( oObj ) == "O"
-//                   TRY
-//                      __objSendMsg( Self, "_" + aProperty[1], NIL )
-//                   CATCH
-//                   END
-//                ENDIF
-//            NEXT
-           EXIT
-
-      CASE WM_NCDESTROY
-           ::__WindowDestroy()
-
-           nRet := ExecuteEvent( "OnNcDestroy", Self )
-           ODEFAULT nRet TO ::OnNcDestroy( nwParam, nlParam )
-           ::__lInitialized := .F.
-           IF ::DisableParent .AND. ::__ClassInst == NIL
-              ::Parent:Enable()
-              ::Parent:BringWindowToTop()
-           ENDIF
-
-           IF ::__nProc != NIL
-              SetWindowLong( ::hWnd, GWL_WNDPROC, ::__nProc )
-              ::__nProc := NIL
-           ENDIF
-
-           RemoveProp( ::hWnd, "PROP_CLASSOBJECT" )
-           ReleaseArrayPointer( ::__ArrayPointer )
-           ::__ArrayPointer := NIL
-
-           IF ::__pCallBackPtr != NIL
-              FreeCallBackPointer( ::__pCallBackPtr )
-              ::__pCallBackPtr := NIL
-           ENDIF
-           
-           IF ::Application != NIL
-              IF ::Application:MainForm != NIL .AND. ::Application:MainForm:hWnd == ::hWnd .AND. ::Application:__hMutex != NIL
-                 CloseHandle( ::Application:__hMutex )
+                 ::__ClientRect[3] := ::ClientWidth
+                 ::__ClientRect[4] := ::ClientHeight
+                 ::__aCltRect[3] := x
+                 ::__aCltRect[4] := y
               ENDIF
 
-              IF !::IsChild .AND.;
-                 ::Application:MainForm != NIL .AND.;
-                 ::Application:MainForm:hWnd == ::hWnd .AND.;
-                 ::__InstMsg != NIL .AND.;
-                 ( ::__WindowStyle != 0 .OR. ::Parent == NIL .OR. ::Parent:ClsName == "DeskTop" )
-                 PostQuitMessage(0)
-              ENDIF
-           ENDIF
-           IF ::__TaskBarParent != NIL
-              DestroyWindow( ::__TaskBarParent )
-           ENDIF
-           ::hWnd := NIL
-           EXIT
+              nRet := ExecuteEvent( "OnSize", Self )
+              ODEFAULT nRet TO ::OnSize( nwParam, ::ClientWidth, ::ClientHeight )
+              ODEFAULT nRet TO __Evaluate( ::OnWMSize, Self, nwParam, nlParam, nRet )
 
-/*
-      CASE WM_MDIACTIVATE
-           IF nlParam == hWnd
-              SendMessage( ::Parent:hWnd, WM_MDISETMENU, ::Menu:hMenu )
-           ENDIF
-*/
-      CASE WM_INITDIALOG
-           nRet := ExecuteEvent( "OnCreate", Self )
-           ODEFAULT nRet TO ::OnCreate()
-           ::hWnd := hWnd
-           ::siv := (struct SCROLLINFO)
-           ::siv:cbSize := ::siv:sizeof()
-           ::siv:nMin   := 0
+              TRY
+                 IF (nwParam == 0 .or. nwParam == 2) .AND. ::MDIContainer .AND. ::MDIClient != NIL .AND. ::MDIClient:hWnd != NIL
+                    ::LeftMargin   := 0
+                    ::TopMargin    := 0
+                    ::RightMargin  := ::ClientWidth
+                    ::BottomMargin := ::ClientHeight
 
-           ::sih := (struct SCROLLINFO)
-           ::sih:cbSize := ::sih:sizeof()
-           ::sih:nMin   := 0
+                    IF ::__ClassInst == NIL
+                       cProp := ::MDIClient:AlignLeft
+                       IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( aChildren, {|o| o:Name == cProp } ) ) > 0
+                          ::MDIClient:AlignLeft := aChildren[n]
+                       ENDIF
 
-           IF ::Parent != NIL .AND. !::Parent:Flat .AND. ::OsVer:dwMajorVersion >= 5 .AND. ::Parent:ClsName == "SysTabControl32" .AND. ::Application != NIL .AND. ::Application:IsThemedXP .AND. ::Theming
-              ::EnableThemeDialogTexture( ETDT_ENABLETAB )
-           ENDIF
+                       cProp := ::MDIClient:AlignTop
+                       IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( aChildren, {|o| o:Name == cProp } ) ) > 0
+                          ::MDIClient:AlignTop := aChildren[n]
+                       ENDIF
 
-           nLeft   := ::Left
-           nTop    := ::Top
-           nWidth  := ::Width
-           nHeight := ::Height
+                       cProp := ::MDIClient:AlignRight
+                       IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( aChildren, {|o| o:Name == cProp } ) ) > 0
+                          ::MDIClient:AlignRight := aChildren[n]
+                       ENDIF
 
-           ::GetClientRect()
-           ::GetWindowRect()
-
-           ::xLeft  := nLeft
-           ::xTop   := nTop
-
-           DEFAULT nWidth TO ::xWidth
-           DEFAULT nHeight TO ::xHeight
-
-           ::xWidth := nWidth
-           ::xHeight:= nHeight
-
-           ::__ClientRect   := { nLeft, nTop, ::xWidth, ::xHeight }
-           ::__aCltRect  := { nLeft, nTop, ::xWidth, ::xHeight }
-           ::OriginalRect := { nLeft, nTop, ::xWidth, ::xHeight }
-
-           ::InitDialogBox()
-           ::__SetScrollBars()
-
-           nRet := ExecuteEvent( "OnInitDialog", Self )
-           ODEFAULT nRet TO ::OnInitDialog( nwParam, nlParam )
-           ODEFAULT nRet TO __Evaluate( ::OnWMInitDialog, Self, nwParam, nlParam, nRet )
-
-           ODEFAULT nRet TO 0
-           IF ::Parent != NIL .AND. ::SetChildren
-              AADD( ::Parent:Children, Self )
-           ENDIF
-
-           IF ::__ArrayPointer == NIL
-              ::__ArrayPointer := ARRAYPOINTER( Self )
-              SetProp( ::hWnd, "PROP_CLASSOBJECT", ::__ArrayPointer )
-           ENDIF
-
-           IF ::__xCtrlName == "TabPage"
-              RETURN 0
-           ENDIF
-
-           IF ::Center
-              ::CenterWindow()
-           ENDIF
-
-           FOR EACH oObj IN ::Components
-               IF oObj:__xCtrlName == "Timer" .AND. oObj:AutoRun
-                  oObj:Start()
-               ENDIF
-               IF oObj:__xCtrlName == "NotifyIcon"
-                  oObj:Visible := oObj:Visible
-               ENDIF
-           NEXT
-           IF EMPTY( ::__hIcon )
-              SWITCH VALTYPE( ::Icon )
-                 CASE "A"
-                      IF ::__ClassInst == NIL .OR. EMPTY( ::Icon[1] )
-                         ::__hIcon := LoadIcon( ::AppInstance, ::Icon[2] )
-                         ::xIcon := ::Icon[2]
-                       ELSE
-                         ::__hIcon := LoadImage( ::AppInstance, ::Icon[1], IMAGE_ICON,,, LR_LOADFROMFILE )
-                         ::xIcon := ::Icon[1]
-                      ENDIF
-                      EXIT
-
-                 CASE "C"
-                      ::__hIcon := LoadIcon( ::AppInstance, ::Icon )
-                      EXIT
-
-                 CASE "N"
-                      ::__hIcon := ::Icon
-                      EXIT
-              END
-           ENDIF
-           ::SetIcon( ICON_SMALL, IIF( !EMPTY( ::__hIcon ), ::__hIcon, 0 ) )
-           ::SetIcon( ICON_BIG, IIF( !EMPTY( ::__hIcon ), ::__hIcon, 0 ) )
-
-           ::SetOpacity( ::xOpacity )
-
-           IF ::BackgroundImage != NIL
-              ::BackgroundImage:Create()
-           ENDIF
-
-           IF !::__lShown
-              ::__lShown := .T.
-              ::__FixDocking()
-
-              nRet := ExecuteEvent( "OnLoad", Self )
-              ODEFAULT nRet TO ::OnLoad( Self )
-
-              IF ::Property != NIL .AND. ::__ClassInst == NIL
-
-                 FOR n := 1 TO LEN( ::Property:Keys )
-                     oObj := HGetValueAt( ::Property, n )
-                     IF oObj:__xCtrlName == "TabPage" .AND. !oObj:Visible
-                        oObj:__SetVisible( .F., .T. )
-                     ENDIF
-                 NEXT
-
-              ENDIF
-              IF ::AnimationStyle != 0 .AND. ::__ClassInst == NIL
-                 RETURN ::Animate( 1000, ::AnimationStyle )
-              ENDIF
-           ENDIF
-           ::Show( ::ShowMode )
-           EXIT
-
-      CASE WM_CHAR
-           IF ::Parent != NIL
-              nRet := ::Parent:OnChildChar( hWnd, nMsg, nwParam, nlParam )
-              IF nRet != NIL
-                 RETURN nRet
-              ENDIF
-           ENDIF
-           nRet := ExecuteEvent( "OnChar", Self, nwParam, nlParam )
-           ODEFAULT nRet TO ::OnChar( nwParam, nlParam )
-           ODEFAULT nRet TO __Evaluate( ::OnWMChar, Self, nwParam, nlParam, nRet )
-           EXIT
-
-      CASE WM_CLOSE
-           IF !::Modal
-              nRet := ExecuteEvent( "OnClose", Self )
-              ODEFAULT nRet TO ::OnClose( nwParam )
-              ODEFAULT nRet TO __Evaluate( ::OnWMClose, Self, nwParam, nlParam )
-           ENDIF
-
-           IF nRet == NIL .AND. ::AnimationStyle != 0 .AND. ::__ClassInst == NIL
-              nAnimation := ::AnimationStyle
-              DO CASE
-                 CASE nAnimation == ::System:WindowAnimation:SlideHorzPositive
-                      nAnimation := ::System:WindowAnimation:SlideHorzNegative
-
-                 CASE nAnimation == ::System:WindowAnimation:SlideHorzNegative
-                      nAnimation := ::System:WindowAnimation:SlideHorzPositive
-
-                 CASE nAnimation == ::System:WindowAnimation:SlideVertPositive
-                      nAnimation := ::System:WindowAnimation:SlideVertNegative
-
-                 CASE nAnimation == ::System:WindowAnimation:SlideVertNegative
-                      nAnimation := ::System:WindowAnimation:SlideVertPositive
-              ENDCASE
-              ::Animate( 1000, AW_HIDE | nAnimation )
-           ENDIF
-           EXIT
-
-      CASE WM_INITMENU
-           EXIT
-
-      CASE WM_COMMAND
-           nCode := HIWORD( nwParam )
-           nId   := ABS(LOWORD( nwParam ))
-           nRet  := ExecuteEvent( "OnCommand", Self )
-
-           IF nCode == 0
-              nId := nwParam
-           ENDIF
-           IF nId == IDOK
-              IF ( n := HSCAN( ::Form:Property, {|,o| o:__xCtrlName == "Button" .AND. o:DefaultButton } ) ) > 0
-                 nId := HGetValueAt( ::Form:Property, n ):Id
-                 nlParam := HGetValueAt( ::Form:Property, n ):hWnd
-              ENDIF
-           ENDIF
-
-           nRet  := ::OnCommand( nId, nCode, nlParam )
-           //IF nRet == NIL .AND. ::Style & WS_CHILD == 0 .AND. ( ( ::Modal .OR. ::Parent != NIL ) .OR. ::AutoClose )
-           IF nRet == NIL .AND. ::AutoClose .AND. ::Style & WS_CHILD == 0 .AND. ( ::Modal .OR. ::Parent != NIL )
-              IF nwParam == IDCANCEL
-
-                 nRet := ExecuteEvent( "OnCancel", Self )
-                 ODEFAULT nRet TO ::OnCancel()
-                 ODEFAULT nRet TO 1
-                 IF VALTYPE( nRet ) == "L"
-                    nRet := IIF( nRet, 1, 0 )
-                  ELSEIF VALTYPE( nRet ) == "O"
-                    nRet := 1
-                 ENDIF
-                 IF nRet == 1
-                    ::Close( IDCANCEL )
-                    IF ! ::Modal
-                       ::Parent:SetActiveWindow()
+                       cProp := ::MDIClient:AlignBottom
+                       IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( aChildren, {|o| o:Name == cProp } ) ) > 0
+                          ::MDIClient:AlignBottom := aChildren[n]
+                       ENDIF
                     ENDIF
+
+                    IF VALTYPE( ::MDIClient:AlignLeft ) == "O"
+                       ::LeftMargin := ::MDIClient:AlignLeft:Left + ::MDIClient:AlignLeft:Width + IIF( ::MDIClient:AlignLeft:RightSplitter != NIL, ::MDIClient:AlignLeft:RightSplitter:Weight, 0 )
+                    ENDIF
+                    IF VALTYPE( ::MDIClient:AlignTop ) == "O"
+                       ::TopMargin := ::MDIClient:AlignTop:Top + ::MDIClient:AlignTop:Height + IIF( ::MDIClient:AlignTop:BottomSplitter != NIL, ::MDIClient:AlignTop:BottomSplitter:Weight, 0 )
+                    ENDIF
+                    IF VALTYPE( ::MDIClient:AlignRight ) == "O"
+                       ::RightMargin := ::MDIClient:AlignRight:Left - IIF( ::MDIClient:AlignRight:LeftSplitter != NIL, ::MDIClient:AlignRight:LeftSplitter:Weight, 0 )
+                    ENDIF
+                    IF VALTYPE( ::MDIClient:AlignBottom ) == "O"
+                       ::BottomMargin := ::MDIClient:AlignBottom:Top - IIF( ::MDIClient:AlignBottom:TopSplitter != NIL, ::MDIClient:AlignBottom:TopSplitter:Weight, 0 )
+                    ENDIF
+                    MoveWindow( ::MDIClient:hWnd, ::LeftMargin,;
+                                                  ::TopMargin,;
+                                                  ::RightMargin - ::LeftMargin,;
+                                                  ::BottomMargin - ::TopMargin, .T.)
+                 ENDIF
+               CATCH
+              END
+              IF ( nwParam == SIZE_MAXIMIZED .OR. nwParam == SIZE_RESTORED ) .AND. ( ::HorzScroll .OR. ::VertScroll )
+                 ::__SetScrollBars()
+              ENDIF
+              EXIT
+
+         CASE WM_MOVING
+              nRet := ExecuteEvent( "OnMoving", Self )
+              ODEFAULT nRet TO ::OnMoving( LoWord( nlParam ), HiWord( nlParam ) )
+              EXIT
+
+         CASE WM_MOVE
+              ::__lReqBrush := .T.
+
+              nRet := ExecuteEvent( "OnMove", Self )
+              ODEFAULT nRet TO ::OnMove( x, y )
+
+              IF ::Parent != NIL .AND. ::Parent:ClsName == "DeskTop"
+                 ::Parent:GetClientRect()
+              ENDIF
+
+   //           IF ::ClsName != "DataGrid"
+   //              TRY
+   //              FOR EACH oChild IN ::Children
+   //                  IF __ObjHasMsg( oChild, "Anchor" )
+   //                     oChild:OnParentMove()
+   //                     IF oChild:Anchor != NIL .AND. oChild:Anchor:Center
+   //                        oChild:CenterWindow()
+   //                     ENDIF
+   //                  ENDIF
+   //              NEXT
+   //              CATCH
+   //              END
+   //           ENDIF
+              EXIT
+
+         CASE WM_TIMER
+              nRet := ExecuteEvent( "OnTimer", Self )
+              ODEFAULT nRet TO ::OnTimer( nwParam, nlParam )
+              IF ( !::ClsName == TOOLTIPS_CLASS .AND. !::ClsName == ANIMATE_CLASS .AND. ( !::ClsName == PROGRESS_CLASS .OR. (::__ClassInst != NIL .AND. ::Application:OsVersion:dwMajorVersion > 5) ) )
+                 RETURN 0
+              ENDIF
+              EXIT
+
+         CASE WM_CHILDACTIVATE
+              nRet := ExecuteEvent( "OnChildActivate", Self )
+              EXIT
+
+         CASE WM_ACTIVATE
+              nRet := ExecuteEvent( "OnActivate", Self )
+              ODEFAULT nRet TO ::OnActivate( nwParam, nlParam )
+              EXIT
+
+         CASE WM_SETFONT
+              nRet := ExecuteEvent( "OnSetFont", Self )
+              ODEFAULT nRet TO ::OnSetFont( nwParam, nlParam )
+              EXIT
+
+         CASE WM_APPCOMMAND
+              EXIT
+
+         CASE WM_NCXBUTTONUP
+              EXIT
+
+         CASE WM_NCCREATE
+              nRet := ExecuteEvent( "OnNcCreate", Self )
+              ODEFAULT nRet TO ::OnNcCreate( nwParam, nlParam )
+              EXIT
+
+         CASE WM_NCACTIVATE
+              nRet := ExecuteEvent( "OnNcActivate", Self )
+              ODEFAULT nRet TO ::OnNcActivate( nwParam,nlParam )
+
+              ::Active := nwParam != 0
+
+              IF nRet == NIL .AND. nwParam == 0 .AND. ::ClsName != "DataGrid"
+                 IF ::KeepActive .OR. ( n := ASCAN( ::Children, {|o|o:KeepParentActive .AND. o:hWnd == nlParam } ) ) > 0
                     RETURN 1
                  ENDIF
-                ELSEIF nwParam == IDOK
-
-                 nRet := ExecuteEvent( "OnOk", Self )
-                 ODEFAULT nRet TO ::OnOk()
               ENDIF
-           ENDIF
-           //------------------------- Search for Controls Actions ----------------------------
-           IF nlParam != 0
-              pPtr := GetProp( nlParam, "PROP_CLASSOBJECT" )
-           ENDIF
+              EXIT
 
-           IF nCode == 0 .AND. pPtr != NIL .AND. pPtr != 0
-              oCtrl := ArrayFromPointer( pPtr )
+         CASE WM_NCCALCSIZE
+              nRet := ExecuteEvent( "OnNcCalcSize", Self )
+              ODEFAULT nRet TO ::OnNcCalcSize( nwParam, nlParam )
+              EXIT
 
-              IF oCtrl:__xCtrlName == "LinkLabel"
-                 oCtrl:LinkVisited := .T.
+         CASE WM_DESTROY
+              IF ::__ClassInst != NIL
+                 IF ::LeftSplitter != NIL
+                    ::LeftSplitter:Destroy()
+                    ::LeftSplitter := NIL
+                 ENDIF
+                 IF ::TopSplitter != NIL
+                    ::TopSplitter:Destroy()
+                    ::TopSplitter := NIL
+                 ENDIF
+                 IF ::RightSplitter != NIL
+                    ::RightSplitter:Destroy()
+                    ::RightSplitter := NIL
+                 ENDIF
+                 IF ::BottomSplitter != NIL
+                    ::BottomSplitter:Destroy()
+                    ::BottomSplitter := NIL
+                 ENDIF
               ENDIF
-              lHandled := .F.
+              ::HorzScroll := .F.
+              ::VertScroll := .F.
 
-              IF __ObjHasMsg( oCtrl, "DropDown" ) .AND. oCtrl:DropDown == 3
+              aComp := {}
+              FOR n := 1 TO LEN( ::Components )
+                  IF ::Components[n]:Exists
+                     AADD( aComp, ::Components[n] )
+                  ENDIF
+              NEXT
+              AEVAL( aComp, {|o| o:Destroy(.F.) } )
+
+              ::Components := {}
+
+              IF ::Parent != NIL .AND. ::__ClassInst == NIL .AND. ::Parent:Children != NIL
+                 FOR EACH oChild IN ::Parent:Children
+                    IF oChild:__xCtrlName == "CoolBar"
+                       FOR EACH Band IN oChild:Bands
+                           IF Band:BandChild != NIL .AND. Band:BandChild:hWnd == ::hWnd
+                              Band:BandChild := NIL
+                           ENDIF
+                       NEXT
+                    ENDIF
+                 NEXT
+              ENDIF
+
+              nRet := ExecuteEvent( "OnDestroy", Self )
+              ODEFAULT nRet TO ::OnDestroy( nwParam, nlParam )
+              ODEFAULT nRet TO __Evaluate( ::OnWMDestroy, Self, nwParam, nlParam, nRet )
+              IF ::Parent != NIL .AND. ( ::Parent:__xCtrlName == "ObjManager" .OR. ::Parent:__xCtrlName == "EvtManager" )
+                 ::Parent:KeepActiveCaption := .F.
+                 ::Parent:Redraw()
+              ENDIF
+   //            aProperties := __ClsGetPropertiesAndValues( Self )
+   //            FOR EACH aProperty IN aProperties
+   //                oObj := __objSendMsg( Self, UPPER( aProperty[1] ) )
+   //                IF VALTYPE( oObj ) == "O"
+   //                   TRY
+   //                      __objSendMsg( Self, "_" + aProperty[1], NIL )
+   //                   CATCH
+   //                   END
+   //                ENDIF
+   //            NEXT
+              EXIT
+
+         CASE WM_NCDESTROY
+              ::__WindowDestroy()
+
+              nRet := ExecuteEvent( "OnNcDestroy", Self )
+              ODEFAULT nRet TO ::OnNcDestroy( nwParam, nlParam )
+              ::__lInitialized := .F.
+              IF ::DisableParent .AND. ::__ClassInst == NIL
+                 ::Parent:Enable()
+                 ::Parent:BringWindowToTop()
+              ENDIF
+
+              IF ::__nProc != NIL
+                 SetWindowLong( ::hWnd, GWL_WNDPROC, ::__nProc )
+                 ::__nProc := NIL
+              ENDIF
+
+              RemoveProp( ::hWnd, "PROP_CLASSOBJECT" )
+              ReleaseArrayPointer( ::__ArrayPointer )
+              ::__ArrayPointer := NIL
+
+              IF ::__pCallBackPtr != NIL
+                 FreeCallBackPointer( ::__pCallBackPtr )
+                 ::__pCallBackPtr := NIL
+              ENDIF
+
+              IF ::Application != NIL
+                 IF ::Application:MainForm != NIL .AND. ::Application:MainForm:hWnd == ::hWnd .AND. ::Application:__hMutex != NIL
+                    CloseHandle( ::Application:__hMutex )
+                 ENDIF
+
+                 IF !::IsChild .AND.;
+                    ::Application:MainForm != NIL .AND.;
+                    ::Application:MainForm:hWnd == ::hWnd .AND.;
+                    ::__InstMsg != NIL .AND.;
+                    ( ::__WindowStyle != 0 .OR. ::Parent == NIL .OR. ::Parent:ClsName == "DeskTop" )
+                    PostQuitMessage(0)
+                 ENDIF
+              ENDIF
+              IF ::__TaskBarParent != NIL
+                 DestroyWindow( ::__TaskBarParent )
+              ENDIF
+              ::hWnd := NIL
+              EXIT
+
+   /*
+         CASE WM_MDIACTIVATE
+              IF nlParam == hWnd
+                 SendMessage( ::Parent:hWnd, WM_MDISETMENU, ::Menu:hMenu )
+              ENDIF
+   */
+         CASE WM_INITDIALOG
+              nRet := ExecuteEvent( "OnCreate", Self )
+              ODEFAULT nRet TO ::OnCreate()
+              ::hWnd := hWnd
+              ::siv := (struct SCROLLINFO)
+              ::siv:cbSize := ::siv:sizeof()
+              ::siv:nMin   := 0
+
+              ::sih := (struct SCROLLINFO)
+              ::sih:cbSize := ::sih:sizeof()
+              ::sih:nMin   := 0
+
+              IF ::Parent != NIL .AND. !::Parent:Flat .AND. ::OsVer:dwMajorVersion >= 5 .AND. ::Parent:ClsName == "SysTabControl32" .AND. ::Application != NIL .AND. ::Application:IsThemedXP .AND. ::Theming
+                 ::EnableThemeDialogTexture( ETDT_ENABLETAB )
+              ENDIF
+
+              nLeft   := ::Left
+              nTop    := ::Top
+              nWidth  := ::Width
+              nHeight := ::Height
+
+              ::GetClientRect()
+              ::GetWindowRect()
+
+              ::xLeft  := nLeft
+              ::xTop   := nTop
+
+              DEFAULT nWidth TO ::xWidth
+              DEFAULT nHeight TO ::xHeight
+
+              ::xWidth := nWidth
+              ::xHeight:= nHeight
+
+              ::__ClientRect   := { nLeft, nTop, ::xWidth, ::xHeight }
+              ::__aCltRect  := { nLeft, nTop, ::xWidth, ::xHeight }
+              ::OriginalRect := { nLeft, nTop, ::xWidth, ::xHeight }
+
+              ::InitDialogBox()
+              ::__SetScrollBars()
+
+              nRet := ExecuteEvent( "OnInitDialog", Self )
+              ODEFAULT nRet TO ::OnInitDialog( nwParam, nlParam )
+              ODEFAULT nRet TO __Evaluate( ::OnWMInitDialog, Self, nwParam, nlParam, nRet )
+
+              ODEFAULT nRet TO 0
+              IF ::Parent != NIL .AND. ::SetChildren
+                 AADD( ::Parent:Children, Self )
+              ENDIF
+
+              IF ::__ArrayPointer == NIL
+                 ::__ArrayPointer := ARRAYPOINTER( Self )
+                 SetProp( ::hWnd, "PROP_CLASSOBJECT", ::__ArrayPointer )
+              ENDIF
+
+              IF ::__xCtrlName == "TabPage"
                  RETURN 0
               ENDIF
 
-              IF HGetPos( oCtrl:EventHandler, "OnClick" ) != 0
-                 IF ::ClsName == "CCTL"
-                    TRY
-                       oForm := oCtrl:Form
-                       nRet := oForm:&( oCtrl:EventHandler[ "OnClick" ] )( oCtrl )
-                     CATCH
-                       oForm := Self
-                       nRet := oForm:&( oCtrl:EventHandler[ "OnClick" ] )( oCtrl )
-                    END
-                  ELSE
-                    oForm := oCtrl:Form
-                    nRet := oForm:&( oCtrl:EventHandler[ "OnClick" ] )( oCtrl )
-                 ENDIF
-                 lHandled := .T.
-              END
+              IF ::Center
+                 ::CenterWindow()
+              ENDIF
 
-              IF lHandled
+              FOR EACH oObj IN ::Components
+                  IF oObj:__xCtrlName == "Timer" .AND. oObj:AutoRun
+                     oObj:Start()
+                  ENDIF
+                  IF oObj:__xCtrlName == "NotifyIcon"
+                     oObj:Visible := oObj:Visible
+                  ENDIF
+              NEXT
+              IF EMPTY( ::__hIcon )
+                 SWITCH VALTYPE( ::Icon )
+                    CASE "A"
+                         IF ::__ClassInst == NIL .OR. EMPTY( ::Icon[1] )
+                            ::__hIcon := LoadIcon( ::AppInstance, ::Icon[2] )
+                            ::xIcon := ::Icon[2]
+                          ELSE
+                            ::__hIcon := LoadImage( ::AppInstance, ::Icon[1], IMAGE_ICON,,, LR_LOADFROMFILE )
+                            ::xIcon := ::Icon[1]
+                         ENDIF
+                         EXIT
+
+                    CASE "C"
+                         ::__hIcon := LoadIcon( ::AppInstance, ::Icon )
+                         EXIT
+
+                    CASE "N"
+                         ::__hIcon := ::Icon
+                         EXIT
+                 END
+              ENDIF
+              ::SetIcon( ICON_SMALL, IIF( !EMPTY( ::__hIcon ), ::__hIcon, 0 ) )
+              ::SetIcon( ICON_BIG, IIF( !EMPTY( ::__hIcon ), ::__hIcon, 0 ) )
+
+              ::SetOpacity( ::xOpacity )
+
+              IF ::BackgroundImage != NIL
+                 ::BackgroundImage:Create()
+              ENDIF
+
+              IF !::__lShown
+                 ::__lShown := .T.
+                 ::__FixDocking()
+
+                 nRet := ExecuteEvent( "OnLoad", Self )
+                 ODEFAULT nRet TO ::OnLoad( Self )
+
+                 IF ::Property != NIL .AND. ::__ClassInst == NIL
+
+                    FOR n := 1 TO LEN( ::Property:Keys )
+                        oObj := HGetValueAt( ::Property, n )
+                        IF oObj:__xCtrlName == "TabPage" .AND. !oObj:Visible
+                           oObj:__SetVisible( .F., .T. )
+                        ENDIF
+                    NEXT
+
+                 ENDIF
+                 IF ::AnimationStyle != 0 .AND. ::__ClassInst == NIL
+                    RETURN ::Animate( 1000, ::AnimationStyle )
+                 ENDIF
+              ENDIF
+              ::Show( ::ShowMode )
+              EXIT
+
+         CASE WM_CHAR
+              IF ::Parent != NIL
+                 nRet := ::Parent:OnChildChar( hWnd, nMsg, nwParam, nlParam )
                  IF nRet != NIL
                     RETURN nRet
                  ENDIF
-                 RETURN CallWindowProc( ::__nProc, hWnd, nMsg, nwParam, nlParam )
+              ENDIF
+              nRet := ExecuteEvent( "OnChar", Self, nwParam, nlParam )
+              ODEFAULT nRet TO ::OnChar( nwParam, nlParam )
+              ODEFAULT nRet TO __Evaluate( ::OnWMChar, Self, nwParam, nlParam, nRet )
+              EXIT
+
+         CASE WM_CLOSE
+              IF !::Modal
+                 nRet := ExecuteEvent( "OnClose", Self )
+                 ODEFAULT nRet TO ::OnClose( nwParam )
+                 ODEFAULT nRet TO __Evaluate( ::OnWMClose, Self, nwParam, nlParam )
               ENDIF
 
-              IF nRet == NIL
-                 nRet := oCtrl:OnClick( oCtrl )
+              IF nRet == NIL .AND. ::AnimationStyle != 0 .AND. ::__ClassInst == NIL
+                 nAnimation := ::AnimationStyle
+                 DO CASE
+                    CASE nAnimation == ::System:WindowAnimation:SlideHorzPositive
+                         nAnimation := ::System:WindowAnimation:SlideHorzNegative
+
+                    CASE nAnimation == ::System:WindowAnimation:SlideHorzNegative
+                         nAnimation := ::System:WindowAnimation:SlideHorzPositive
+
+                    CASE nAnimation == ::System:WindowAnimation:SlideVertPositive
+                         nAnimation := ::System:WindowAnimation:SlideVertNegative
+
+                    CASE nAnimation == ::System:WindowAnimation:SlideVertNegative
+                         nAnimation := ::System:WindowAnimation:SlideVertPositive
+                 ENDCASE
+                 ::Animate( 1000, AW_HIDE | nAnimation )
               ENDIF
+              EXIT
 
-              IF nRet == NIL .AND. oCtrl:Action != NIL
-                 nRet := __Evaluate( oCtrl:Action, oCtrl,,, nRet )
+         CASE WM_INITMENU
+              EXIT
+
+         CASE WM_COMMAND
+              nCode := HIWORD( nwParam )
+              nId   := ABS(LOWORD( nwParam ))
+              nRet  := ExecuteEvent( "OnCommand", Self )
+
+              IF nCode == 0
+                 nId := nwParam
               ENDIF
-
-              IF nRet == NIL
-                 nRet := oCtrl:OnParentCommand( nId, nCode, nlParam )
-              ENDIF
-            ELSEIF pPtr != NIL .AND. pPtr != 0
-
-              oCtrl := ArrayFromPointer( pPtr )
-              nRet := oCtrl:OnParentCommand( nId, nCode, nlParam )
-              IF nCode == CBN_SELENDOK .AND. oCtrl:__xCtrlName == "ToolStripComboBox"
-                 ExecuteEvent( "OnCBNSelEndOk", oCtrl )
-              ENDIF
-           ENDIF
-           ODEFAULT nRet TO ::OnParentCommand( nId, nCode, nlParam )
-
-           IF nRet == NIL
-              //--- notify children ----------------------------
-              IF nCode == 1
-                 FOR EACH oChild IN ::Children
-                     IF oChild:Id == nId
-                        IF HGetPos( oChild:EventHandler, "OnClick" ) != 0
-                           oForm := oChild:Form
-                           IF ::ClsName == "CCTL"
-                              oForm := Self
-                           ENDIF
-                           nRet := oForm:&( oChild:EventHandler[ "OnClick" ] )( oChild )
-                        ENDIF
-                        IF nRet == NIL
-                           nRet := oChild:OnClick( oChild )
-                        ENDIF
-                        IF nRet == NIL .AND. oChild:Action != NIL
-                           IF nCode == CBN_SELENDOK .OR. oCtrl:ClsName != "ComboBox"
-                              nRet := __Evaluate( oChild:Action, oChild,,, nRet )
-                           ENDIF
-                        ENDIF
-                        EXIT
-                     ENDIF
-
-                     IF __ObjHasMsg( oChild, "OnParentCommand" )
-                        nRet := oChild:OnParentCommand( nId, nCode, nlParam )
-                        IF nRet != NIL
-                           EXIT
-                        ENDIF
-                     ENDIF
-                 NEXT
-                 IF ::ContextMenu != NIL .AND. nlParam == 0 .AND. nId > 0
-                    // Situation never contemplated: Accelerator from ContextMenu
-
-                    IF ( oItem := ::ContextMenu:Menu:GetMenuById( nId ) ) != NIL
-                       IF HGetPos( oItem:EventHandler, "OnClick" ) != 0
-                          oForm := oItem:Form
-                          IF ::ClsName == "CCTL"
-                             oForm := Self
-                          ENDIF
-                          nRet := oForm:&( oItem:EventHandler[ "OnClick" ] )( oItem )
-                        ELSEIF oItem:ClsName == "MenuStripItem" .AND. VALTYPE( oItem:Action ) == "B"
-                          EVAL( oItem:Action, oItem )
-                        ELSE
-                          ODEFAULT nRet TO __Evaluate( oItem:Action, oItem,,, nRet )
-                          oItem:OnClick( oItem )
-                       ENDIF
-                       oItem:Cancel()
-                    ENDIF
+              IF nId == IDOK
+                 IF ( n := HSCAN( ::Form:Property, {|,o| o:__xCtrlName == "Button" .AND. o:DefaultButton } ) ) > 0
+                    nId := HGetValueAt( ::Form:Property, n ):Id
+                    nlParam := HGetValueAt( ::Form:Property, n ):hWnd
                  ENDIF
               ENDIF
-              IF nRet != NIL
-                 RETURN nRet
+
+              nRet  := ::OnCommand( nId, nCode, nlParam )
+              //IF nRet == NIL .AND. ::Style & WS_CHILD == 0 .AND. ( ( ::Modal .OR. ::Parent != NIL ) .OR. ::AutoClose )
+              IF nRet == NIL .AND. ::AutoClose .AND. ::Style & WS_CHILD == 0 .AND. ( ::Modal .OR. ::Parent != NIL )
+                 IF nwParam == IDCANCEL
+
+                    nRet := ExecuteEvent( "OnCancel", Self )
+                    ODEFAULT nRet TO ::OnCancel()
+                    ODEFAULT nRet TO 1
+                    IF VALTYPE( nRet ) == "L"
+                       nRet := IIF( nRet, 1, 0 )
+                     ELSEIF VALTYPE( nRet ) == "O"
+                       nRet := 1
+                    ENDIF
+                    IF nRet == 1
+                       ::Close( IDCANCEL )
+                       IF ! ::Modal
+                          ::Parent:SetActiveWindow()
+                       ENDIF
+                       RETURN 1
+                    ENDIF
+                   ELSEIF nwParam == IDOK
+
+                    nRet := ExecuteEvent( "OnOk", Self )
+                    ODEFAULT nRet TO ::OnOk()
+                 ENDIF
               ENDIF
-           ENDIF
-           //---------------------------- Search for Menu Actions ------------------------------
-           IF nRet == NIL
-              IF ::ClsName == "ToolBarWindow32"
-                 nRet := ExecuteEvent( "OnParentCommand", Self )
-                 ODEFAULT nRet TO ::OnParentCommand( nId, nCode, nlParam )
-              ENDIF
-           ENDIF
-           EXIT
-
-      CASE WM_HELP
-           ::HelpInfo  := (struct HELPINFO *) nlParam
-           nRet := ExecuteEvent( "OnHelp", Self )
-           EXIT
-
-      CASE WM_HOTKEY
-           IF ( n := ASCAN( ::__aHotKey, {|a| a[2]==LOWORD( nlParam ) .AND. a[3]==HIWORD( nlParam ) } ) ) > 0
-              ::PostMessage( WM_COMMAND, MAKELONG(::__aHotKey[n][1],1) )
-           ENDIF
-           nRet := ExecuteEvent( "OnHotKey", Self )
-           ODEFAULT nRet TO ::OnHotKey( nwParam, nlParam )
-           EXIT
-
-      CASE WM_GETMINMAXINFO
-           mmi  := (struct MINMAXINFO *) nlParam
-           nRet := ExecuteEvent( "OnGetMinMaxInfo", Self )
-
-           IF nRet == NIL
-              IF ::MinWidth > 0
-                 mmi:ptMinTrackSize:x := ::MinWidth
-                 nRet := 0
-              ENDIF
-              IF ::MinHeight > 0
-                 mmi:ptMinTrackSize:y := ::MinHeight
-                 nRet := 0
+              //------------------------- Search for Controls Actions ----------------------------
+              IF nlParam != 0
+                 pPtr := GetProp( nlParam, "PROP_CLASSOBJECT" )
               ENDIF
 
-              IF ::MaxWidth > 0
-                 mmi:ptMaxTrackSize:x := ::MaxWidth
-                 nRet := 0
-              ENDIF
-              IF ::MaxHeight > 0
-                 mmi:ptMaxTrackSize:y := ::MaxHeight
-                 nRet := 0
-              ENDIF
-              IF nRet == 0
-                 mmi:CopyTo( nlParam )
-              ENDIF
-           ENDIF
-           EXIT
+              IF nCode == 0 .AND. pPtr != NIL .AND. pPtr != 0
+                 oCtrl := ArrayFromPointer( pPtr )
 
-      CASE WM_PRINTCLIENT
-           //DefWindowProc( hWnd, WM_PAINT, nwParam, nlParam )
-           SendMessage( hWnd, WM_PAINT, nwParam, nlParam )
-           nRet := ExecuteEvent( "OnPrintClient", Self )
-           ODEFAULT nRet TO ::OnPrintClient( nwParam, nlParam )
-           EXIT
+                 IF oCtrl:__xCtrlName == "LinkLabel"
+                    oCtrl:LinkVisited := .T.
+                 ENDIF
+                 lHandled := .F.
 
-      CASE WM_PRINT
-           nRet := ExecuteEvent( "OnPrint", Self )
-           ODEFAULT nRet TO ::OnPrint( nwParam, nlParam )
-           EXIT
+                 IF __ObjHasMsg( oCtrl, "DropDown" ) .AND. oCtrl:DropDown == 3
+                    RETURN 0
+                 ENDIF
 
-      CASE WM_PAINT
-           IF nwParam != 0
-              ::lParam := -1
-              nRet := ExecuteEvent( "OnPaint", Self )
-              ODEFAULT nRet TO ::OnPaint( , nwParam )
-              IF nRet == NIL .AND. !::__lOnPaint .AND. !::__lOnWindowPaint .AND. ::__WindowStyle != WT_DIALOG
-                 _FillRect( nwParam, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, IIF( ::BkBrush != NIL, ::BkBrush, ::ClassBrush ) )
+                 IF HGetPos( oCtrl:EventHandler, "OnClick" ) != 0
+                    IF ::ClsName == "CCTL"
+                       TRY
+                          oForm := oCtrl:Form
+                          nRet := oForm:&( oCtrl:EventHandler[ "OnClick" ] )( oCtrl )
+                        CATCH
+                          oForm := Self
+                          nRet := oForm:&( oCtrl:EventHandler[ "OnClick" ] )( oCtrl )
+                       END
+                     ELSE
+                       oForm := oCtrl:Form
+                       nRet := oForm:&( oCtrl:EventHandler[ "OnClick" ] )( oCtrl )
+                    ENDIF
+                    lHandled := .T.
+                 END
+
+                 IF lHandled
+                    IF nRet != NIL
+                       RETURN nRet
+                    ENDIF
+                    RETURN CallWindowProc( ::__nProc, hWnd, nMsg, nwParam, nlParam )
+                 ENDIF
+
+                 IF nRet == NIL
+                    nRet := oCtrl:OnClick( oCtrl )
+                 ENDIF
+
+                 IF nRet == NIL .AND. oCtrl:Action != NIL
+                    nRet := __Evaluate( oCtrl:Action, oCtrl,,, nRet )
+                 ENDIF
+
+                 IF nRet == NIL
+                    nRet := oCtrl:OnParentCommand( nId, nCode, nlParam )
+                 ENDIF
+               ELSEIF pPtr != NIL .AND. pPtr != 0
+
+                 oCtrl := ArrayFromPointer( pPtr )
+                 nRet := oCtrl:OnParentCommand( nId, nCode, nlParam )
+                 IF nCode == CBN_SELENDOK .AND. oCtrl:__xCtrlName == "ToolStripComboBox"
+                    ExecuteEvent( "OnCBNSelEndOk", oCtrl )
+                 ENDIF
               ENDIF
-              RETURN 0
-           ENDIF
-           IF ::__lOnWindowPaint
-              nRet := ExecuteEvent( "OnWindowPaint", Self )
-              ODEFAULT nRet TO ::OnWindowPaint( nwParam )
-              IF nRet != NIL
-                 RETURN nRet
+              ODEFAULT nRet TO ::OnParentCommand( nId, nCode, nlParam )
+
+              IF nRet == NIL
+                 //--- notify children ----------------------------
+                 IF nCode == 1
+                    FOR EACH oChild IN ::Children
+                        IF oChild:Id == nId
+                           IF HGetPos( oChild:EventHandler, "OnClick" ) != 0
+                              oForm := oChild:Form
+                              IF ::ClsName == "CCTL"
+                                 oForm := Self
+                              ENDIF
+                              nRet := oForm:&( oChild:EventHandler[ "OnClick" ] )( oChild )
+                           ENDIF
+                           IF nRet == NIL
+                              nRet := oChild:OnClick( oChild )
+                           ENDIF
+                           IF nRet == NIL .AND. oChild:Action != NIL
+                              IF nCode == CBN_SELENDOK .OR. oCtrl:ClsName != "ComboBox"
+                                 nRet := __Evaluate( oChild:Action, oChild,,, nRet )
+                              ENDIF
+                           ENDIF
+                           EXIT
+                        ENDIF
+
+                        IF __ObjHasMsg( oChild, "OnParentCommand" )
+                           nRet := oChild:OnParentCommand( nId, nCode, nlParam )
+                           IF nRet != NIL
+                              EXIT
+                           ENDIF
+                        ENDIF
+                    NEXT
+                    IF ::ContextMenu != NIL .AND. nlParam == 0 .AND. nId > 0
+                       // Situation never contemplated: Accelerator from ContextMenu
+
+                       IF ( oItem := ::ContextMenu:Menu:GetMenuById( nId ) ) != NIL
+                          IF HGetPos( oItem:EventHandler, "OnClick" ) != 0
+                             oForm := oItem:Form
+                             IF ::ClsName == "CCTL"
+                                oForm := Self
+                             ENDIF
+                             nRet := oForm:&( oItem:EventHandler[ "OnClick" ] )( oItem )
+                           ELSEIF oItem:ClsName == "MenuStripItem" .AND. VALTYPE( oItem:Action ) == "B"
+                             EVAL( oItem:Action, oItem )
+                           ELSE
+                             ODEFAULT nRet TO __Evaluate( oItem:Action, oItem,,, nRet )
+                             oItem:OnClick( oItem )
+                          ENDIF
+                          oItem:Cancel()
+                       ENDIF
+                    ENDIF
+                 ENDIF
+                 IF nRet != NIL
+                    RETURN nRet
+                 ENDIF
               ENDIF
-           ENDIF
-           IF ::__lOnPaint
-              ::Drawing:BeginPaint()
-              nRet := ExecuteEvent( "OnPaint", Self )
-              ODEFAULT nRet TO ::OnPaint( ::Drawing:hDC )
-              ::Drawing:EndPaint()
-           ENDIF
-
-           IF ::__ClassInst != NIL .AND. ::Application != NIL
-              TRY
-                 ::Application:Project:CurrentForm:CtrlMask:InValidateRect( ::Application:Project:CurrentForm:GetSelRect() ,.f.)
-               CATCH
-              END
-           ENDIF
-           EXIT
-
-      CASE WM_MENUGETOBJECT
-           EXIT
-
-      CASE WM_ERASEBKGND
-           IF ::__WindowStyle != WT_DIALOG .AND. ::BkBrush != NIL .AND. ::ClsName != "Button" .AND. VALTYPE( ::BackColor ) == "N" .AND. ( ::BackSysColor != ::BackColor .OR. ::__ForceSysColor )
-              SetBkColor( nwParam, ::BackColor )
-           ENDIF
-           nRet := ExecuteEvent( "OnEraseBkGnd", Self )
-           ODEFAULT nRet TO ::OnEraseBkGnd( nwParam )
-           IF nRet == NIL .AND. ::__WindowStyle != WT_DIALOG .AND. ::BkBrush != NIL .AND. ::ClsName != "Button" //Style & WS_CHILD == 0
-              ::GetClientRect()
-              IF ::__PaintBakgndImage( nwParam ) == NIL
-                 _FillRect( nwParam, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, ::BkBrush )
+              //---------------------------- Search for Menu Actions ------------------------------
+              IF nRet == NIL
+                 IF ::ClsName == "ToolBarWindow32"
+                    nRet := ExecuteEvent( "OnParentCommand", Self )
+                    ODEFAULT nRet TO ::OnParentCommand( nId, nCode, nlParam )
+                 ENDIF
               ENDIF
+              EXIT
+
+         CASE WM_HELP
+              ::HelpInfo  := (struct HELPINFO *) nlParam
+              nRet := ExecuteEvent( "OnHelp", Self )
+              EXIT
+
+         CASE WM_HOTKEY
+              IF ( n := ASCAN( ::__aHotKey, {|a| a[2]==LOWORD( nlParam ) .AND. a[3]==HIWORD( nlParam ) } ) ) > 0
+                 ::PostMessage( WM_COMMAND, MAKELONG(::__aHotKey[n][1],1) )
+              ENDIF
+              nRet := ExecuteEvent( "OnHotKey", Self )
+              ODEFAULT nRet TO ::OnHotKey( nwParam, nlParam )
+              EXIT
+
+         CASE WM_GETMINMAXINFO
+              mmi  := (struct MINMAXINFO *) nlParam
+              nRet := ExecuteEvent( "OnGetMinMaxInfo", Self )
+
+              IF nRet == NIL
+                 IF ::MinWidth > 0
+                    mmi:ptMinTrackSize:x := ::MinWidth
+                    nRet := 0
+                 ENDIF
+                 IF ::MinHeight > 0
+                    mmi:ptMinTrackSize:y := ::MinHeight
+                    nRet := 0
+                 ENDIF
+
+                 IF ::MaxWidth > 0
+                    mmi:ptMaxTrackSize:x := ::MaxWidth
+                    nRet := 0
+                 ENDIF
+                 IF ::MaxHeight > 0
+                    mmi:ptMaxTrackSize:y := ::MaxHeight
+                    nRet := 0
+                 ENDIF
+                 IF nRet == 0
+                    mmi:CopyTo( nlParam )
+                 ENDIF
+              ENDIF
+              EXIT
+
+         CASE WM_PRINTCLIENT
+              //DefWindowProc( hWnd, WM_PAINT, nwParam, nlParam )
+              SendMessage( hWnd, WM_PAINT, nwParam, nlParam )
+              nRet := ExecuteEvent( "OnPrintClient", Self )
+              ODEFAULT nRet TO ::OnPrintClient( nwParam, nlParam )
+              EXIT
+
+         CASE WM_PRINT
+              nRet := ExecuteEvent( "OnPrint", Self )
+              ODEFAULT nRet TO ::OnPrint( nwParam, nlParam )
+              EXIT
+
+         CASE WM_PAINT
+              IF nwParam != 0
+                 ::lParam := -1
+                 nRet := ExecuteEvent( "OnPaint", Self )
+                 ODEFAULT nRet TO ::OnPaint( , nwParam )
+                 IF nRet == NIL .AND. !::__lOnPaint .AND. !::__lOnWindowPaint .AND. ::__WindowStyle != WT_DIALOG
+                    _FillRect( nwParam, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, IIF( ::BkBrush != NIL, ::BkBrush, ::ClassBrush ) )
+                 ENDIF
+                 RETURN 0
+              ENDIF
+              IF ::__lOnWindowPaint
+                 nRet := ExecuteEvent( "OnWindowPaint", Self )
+                 ODEFAULT nRet TO ::OnWindowPaint( nwParam )
+                 IF nRet != NIL
+                    RETURN nRet
+                 ENDIF
+              ENDIF
+              IF ::__lOnPaint
+                 ::Drawing:BeginPaint()
+                 nRet := ExecuteEvent( "OnPaint", Self )
+                 ODEFAULT nRet TO ::OnPaint( ::Drawing:hDC )
+                 ::Drawing:EndPaint()
+              ENDIF
+
+              IF ::__ClassInst != NIL .AND. ::Application != NIL
+                 TRY
+                    ::Application:Project:CurrentForm:CtrlMask:InValidateRect( ::Application:Project:CurrentForm:GetSelRect() ,.f.)
+                  CATCH
+                 END
+              ENDIF
+              EXIT
+
+         CASE WM_MENUGETOBJECT
+              EXIT
+
+         CASE WM_ERASEBKGND
+              IF ::__WindowStyle != WT_DIALOG .AND. ::BkBrush != NIL .AND. ::ClsName != "Button" .AND. VALTYPE( ::BackColor ) == "N" .AND. ( ::BackSysColor != ::BackColor .OR. ::__ForceSysColor )
+                 SetBkColor( nwParam, ::BackColor )
+              ENDIF
+              nRet := ExecuteEvent( "OnEraseBkGnd", Self )
+              ODEFAULT nRet TO ::OnEraseBkGnd( nwParam )
+              IF nRet == NIL .AND. ::__WindowStyle != WT_DIALOG .AND. ::BkBrush != NIL .AND. ::ClsName != "Button" //Style & WS_CHILD == 0
+                 ::GetClientRect()
+                 IF ::__PaintBakgndImage( nwParam ) == NIL
+                    _FillRect( nwParam, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, ::BkBrush )
+                 ENDIF
+                 IF ::Application:EditBoxFocusBorder .AND. ! Empty( ::Children ) .AND. ( n := aScan( ::Children, {|o|o:hWnd==GetFocus() .AND. o:ClsName == "Edit" } ) ) > 0
+                    ::Children[n]:PaintFocusRect( nwParam )
+                 ENDIF
+                 RETURN 1
+              ENDIF
+              DEFAULT nRet TO ::__PaintBakgndImage( nwParam )
               IF ::Application:EditBoxFocusBorder .AND. ! Empty( ::Children ) .AND. ( n := aScan( ::Children, {|o|o:hWnd==GetFocus() .AND. o:ClsName == "Edit" } ) ) > 0
                  ::Children[n]:PaintFocusRect( nwParam )
               ENDIF
-              RETURN 1
-           ENDIF
-           DEFAULT nRet TO ::__PaintBakgndImage( nwParam )
-           IF ::Application:EditBoxFocusBorder .AND. ! Empty( ::Children ) .AND. ( n := aScan( ::Children, {|o|o:hWnd==GetFocus() .AND. o:ClsName == "Edit" } ) ) > 0
-              ::Children[n]:PaintFocusRect( nwParam )
-           ENDIF
-           EXIT
+              EXIT
 
-      CASE WM_GETDLGCODE
-           IF ! ( nlParam == 0 )
-              //msg := (struct MSG*) nlParam
-              aParams    := __GetMSG( nlParam )
-              msg := {=>}
-              msg:hwnd    := aParams[1]
-              msg:message := aParams[2]
-              msg:wParam  := aParams[3]
-              msg:lParam  := aParams[4]
-           ENDIF
-           IF ::Parent != NIL
-              nRet := ::Parent:OnChildGetDlgCode( msg )
-              IF nRet != NIL
-                 RETURN nRet
+         CASE WM_GETDLGCODE
+              IF ! ( nlParam == 0 )
+                 //msg := (struct MSG*) nlParam
+                 aParams    := __GetMSG( nlParam )
+                 msg := {=>}
+                 msg:hwnd    := aParams[1]
+                 msg:message := aParams[2]
+                 msg:wParam  := aParams[3]
+                 msg:lParam  := aParams[4]
               ENDIF
-           ENDIF
-           nRet := ExecuteEvent( "OnGetDlgCode", Self )
-           ODEFAULT nRet TO ::OnGetDlgCode( msg )
-           ODEFAULT nRet TO __Evaluate( ::OnWMGetDlgCode, Self, msg, , nRet )
-           EXIT
-
-      CASE WM_VKEYTOITEM
-           nRet := ExecuteEvent( "OnChar", Self )
-           IF nRet == NIL
-              pPtr := GetProp( nlParam, "PROP_CLASSOBJECT" )
-              IF pPtr != NIL .AND. pPtr != 0
-                 oCtrl := ArrayFromPointer( pPtr )
-                 IF HGetPos( oCtrl:EventHandler, "OnChar" ) != 0
-                    nRet := ::&( oCtrl:EventHandler[ "OnChar" ] )( Self )
+              IF ::Parent != NIL
+                 nRet := ::Parent:OnChildGetDlgCode( msg )
+                 IF nRet != NIL
+                    RETURN nRet
                  ENDIF
               ENDIF
-           ENDIF
-           EXIT
+              nRet := ExecuteEvent( "OnGetDlgCode", Self )
+              ODEFAULT nRet TO ::OnGetDlgCode( msg )
+              ODEFAULT nRet TO __Evaluate( ::OnWMGetDlgCode, Self, msg, , nRet )
+              EXIT
 
-      CASE WM_KEYDOWN
-           IF ::Parent != NIL
-              nRet := ::Parent:OnChildKeyDown( hWnd, nMsg, nwParam, nlParam )
-              IF nRet != NIL
-                 RETURN nRet
-              ENDIF
-           ENDIF
-           ODEFAULT nRet TO ::OnKeyDown( nwParam, nlParam )
-           ODEFAULT nRet TO ExecuteEvent( "OnKeyDown", Self, nwParam, nlParam )
-           ODEFAULT nRet TO __Evaluate( ::OnWMKeyDown, Self, nwParam, nlParam, nRet )
-           EXIT
-
-      CASE WM_NEXTDLGCTL
-           EXIT
-
-      CASE WM_KEYUP
-           IF ::hWnd == hWnd
-              nRet := ExecuteEvent( "OnKeyUp", Self, nwParam, nlParam )
-              ODEFAULT nRet TO ::OnKeyUp( nwParam, nlParam )
-              ODEFAULT nRet TO __Evaluate( ::OnWMKeyUp, Self, nwParam, nlParam, nRet )
-           ENDIF
-           EXIT
-
-      CASE WM_KILLFOCUS
-           nRet := ::OnKillFocus( nwParam )
-           ODEFAULT nRet TO __Evaluate( ::OnWMKillFocus, Self, nwParam, nlParam, nRet )
-           ODEFAULT nRet TO nRet := ExecuteEvent( "OnKillFocus", Self )
-
-           IF ::Parent != NIL .AND. ::Parent:ClsName == "PanelBox" .AND. ASCAN( ::Parent:Children, {|o| o:hWnd == nwParam } ) == 0
-              ::Parent:oLastFocus := Self
-              ::Parent:SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
-           ENDIF
-           EXIT
-
-      CASE WM_SETFOCUS
-           IF ::Parent != NIL .AND. ::Parent:VertScroll
-
-              IF ::Parent:ScrollOnChildFocus
-                 aRect    := _GetWindowRect( ::hWnd )
-
-                 aPt := { aRect[1], aRect[2] }
-                 _ScreenToClient( ::Parent:hWnd, @aPt )
-                 aRect[1] := aPt[1]
-                 aRect[2] := aPt[2]
-
-                 aPt := { aRect[3], aRect[4] }
-                 _ScreenToClient( ::Parent:hWnd, @aPt )
-                 aRect[3] := aPt[1]
-                 aRect[4] := aPt[2]
-
-                 aParent  := _GetClientRect( ::Parent:hWnd )
-
-                 // Set Vertical Position
-                 IF aRect[4] > aParent[4]
-                    n := aParent[2]+( aRect[4]-aParent[4] ) - aRect[2]
-                    ::Parent:OnVScroll( SB_THUMBTRACK, ::Parent:VertScrollPos + ( aRect[4]-aParent[4] )- MAX(n,0), 0 )
-                  ELSEIF aRect[2] < 0
-                    ::Parent:OnVScroll( SB_THUMBTRACK, ::Parent:VertScrollPos + ( aRect[2] ), 0 )
-                 ENDIF
-
-                 // Set Horizontal Position
-                 IF aRect[3] > aParent[3]
-                    n := aParent[1]+( aRect[3]-aParent[3] ) - aRect[1]
-                    ::Parent:OnHScroll( SB_THUMBTRACK, ::Parent:HorzScrollPos + ( aRect[3]-aParent[3] ) - MAX(n,0), 0 )
-                  ELSEIF aRect[1] < 0
-                    ::Parent:OnHScroll( SB_THUMBTRACK, ::Parent:HorzScrollPos + ( aRect[1] ), 0 )
-                 ENDIF
-              ENDIF
-           ENDIF
-
-           nRet := ExecuteEvent( "OnSetFocus", Self )
-           ODEFAULT nRet TO ::OnSetFocus( nwParam )
-           ODEFAULT nRet TO __Evaluate( ::OnWMSetFocus, Self, nwParam, nlParam, nRet )
-           IF ::Parent != NIL .AND. ::Parent:ClsName == "PanelBox"
-              ::Parent:SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
-           ENDIF
-
-           IF ::Application:EditBoxFocusBorder .AND. ::ClsName == "Edit"
-              aRect := ::GetRectangle()
-              aRect[1] -= 3 + ::Parent:HorzScrollPos
-              aRect[2] -= 3 + ::Parent:VertScrollPos
-              aRect[3] += 3 + ::Parent:HorzScrollPos
-              aRect[4] += 3 + ::Parent:VertScrollPos
-              _InvalidateRect( ::Parent:hWnd, aRect )
-           ENDIF
-           EXIT
-
-      CASE WM_MEASUREITEM
-           ::MeasureItemStruct := (struct MEASUREITEMSTRUCT*) nlParam
-           //aParams := __GetMEASUREITEMSTRUCT( nlParam )
-           //::MeasureItemStruct:CtlType    := aParams[1]
-           //::MeasureItemStruct:CtlID      := aParams[2]
-           //::MeasureItemStruct:itemID     := aParams[3]
-           //::MeasureItemStruct:itemWidth  := aParams[4]
-           //::MeasureItemStruct:itemHeight := aParams[5]
-           //::MeasureItemStruct:itemData   := aParams[6]
-
-           IF ::MeasureItemStruct:CtlType == ODT_MENU .AND. ::MeasureItemStruct:itemData != NIL .AND. ::MeasureItemStruct:itemData <> 0
-              IF ( oCtrl := ArrayFromPointer( ::MeasureItemStruct:itemData ) ) != NIL
-                 nRet := oCtrl:OnMeasureItem( nwParam, nlParam, ::MeasureItemStruct )
-              ENDIF
-            ELSE
-              nRet := ExecuteEvent( "OnMeasureItem", Self )
-              ODEFAULT nRet TO ::OnMeasureItem( nwParam, nlParam )
-
-              IF nRet == NIL .AND. ( n := ASCAN( ::Children, {|o| o:Id == ::MeasureItemStruct:itemID} ) ) > 0
-                 oCtrl := ::Children[n]
-                 IF HGetPos( oCtrl:EventHandler, "OnParentMeasureItem" ) != 0
-                    nRet := ::&( oCtrl:EventHandler[ "OnParentMeasureItem" ] )( Self )
-                 ENDIF
-                 ODEFAULT nRet TO oCtrl:OnParentMeasureItem(nwParam,nlParam, ::MeasureItemStruct)
-              ENDIF
-
-           ENDIF
-           EXIT
-
-      CASE WM_DRAWITEM
-           ::DrawItemStruct := (struct DRAWITEMSTRUCT*) nlParam
-           /*
-           aDraw := __DRAWITEMSTRUCT( nlParam )
-           ::DrawItemStruct := {=>}
-           HSetCaseMatch( ::DrawItemStruct, .F. )
-           ::DrawItemStruct:rcItem := {=>}
-           HSetCaseMatch( ::DrawItemStruct:rcItem, .F. )
-
-           ::DrawItemStruct:CtlType       := aDraw[1]
-           ::DrawItemStruct:CtlID         := aDraw[2]
-           ::DrawItemStruct:itemID        := aDraw[3]
-           ::DrawItemStruct:itemAction    := aDraw[4]
-           ::DrawItemStruct:itemState     := aDraw[5]
-           ::DrawItemStruct:hWndItem      := aDraw[6]
-           ::DrawItemStruct:hDC           := aDraw[7]
-           ::DrawItemStruct:itemData      := aDraw[8]
-
-           ::DrawItemStruct:rcItem:Left   := aDraw[9][1]
-           ::DrawItemStruct:rcItem:Top    := aDraw[9][2]
-           ::DrawItemStruct:rcItem:Right  := aDraw[9][3]
-           ::DrawItemStruct:rcItem:Bottom := aDraw[9][4]
-           ::DrawItemStruct:rcItem:Array  := ACOPY(aDraw)
-           */
-           IF ::DrawItemStruct:CtlType == ODT_MENU .AND. ::DrawItemStruct:itemData != NIL .AND. ::DrawItemStruct:itemData <> 0
-              IF ( oCtrl := ArrayFromPointer( ::DrawItemStruct:itemData ) ) != NIL .AND. VALTYPE( oCtrl ) == "O"
-                 nRet := oCtrl:OnDrawItem( nwParam, nlParam, ::DrawItemStruct )
-              ENDIF
-            ELSE
-
-              nRet := ExecuteEvent( "OnDrawItem", Self )
-              ODEFAULT nRet TO ::OnDrawItem( nwParam, nlParam )
+         CASE WM_VKEYTOITEM
+              nRet := ExecuteEvent( "OnChar", Self )
               IF nRet == NIL
-                 pPtr := GetProp( ::DrawItemStruct:hwndItem, "PROP_CLASSOBJECT" )
+                 pPtr := GetProp( nlParam, "PROP_CLASSOBJECT" )
                  IF pPtr != NIL .AND. pPtr != 0
                     oCtrl := ArrayFromPointer( pPtr )
-
-                    IF HGetPos( oCtrl:EventHandler, "OnParentDrawItem" ) != 0
-                       nRet := ::&( oCtrl:EventHandler[ "OnParentDrawItem" ] )( Self )
+                    IF HGetPos( oCtrl:EventHandler, "OnChar" ) != 0
+                       nRet := ::&( oCtrl:EventHandler[ "OnChar" ] )( Self )
                     ENDIF
-                    ODEFAULT nRet TO oCtrl:OnParentDrawItem(nwParam,nlParam, ::DrawItemStruct)
+                 ENDIF
+              ENDIF
+              EXIT
+
+         CASE WM_KEYDOWN
+              IF ::Parent != NIL
+                 nRet := ::Parent:OnChildKeyDown( hWnd, nMsg, nwParam, nlParam )
+                 IF nRet != NIL
+                    RETURN nRet
+                 ENDIF
+              ENDIF
+              ODEFAULT nRet TO ::OnKeyDown( nwParam, nlParam )
+              ODEFAULT nRet TO ExecuteEvent( "OnKeyDown", Self, nwParam, nlParam )
+              ODEFAULT nRet TO __Evaluate( ::OnWMKeyDown, Self, nwParam, nlParam, nRet )
+              EXIT
+
+         CASE WM_NEXTDLGCTL
+              EXIT
+
+         CASE WM_KEYUP
+              IF ::hWnd == hWnd
+                 nRet := ExecuteEvent( "OnKeyUp", Self, nwParam, nlParam )
+                 ODEFAULT nRet TO ::OnKeyUp( nwParam, nlParam )
+                 ODEFAULT nRet TO __Evaluate( ::OnWMKeyUp, Self, nwParam, nlParam, nRet )
+              ENDIF
+              EXIT
+
+         CASE WM_KILLFOCUS
+              nRet := ::OnKillFocus( nwParam )
+              ODEFAULT nRet TO __Evaluate( ::OnWMKillFocus, Self, nwParam, nlParam, nRet )
+              ODEFAULT nRet TO nRet := ExecuteEvent( "OnKillFocus", Self )
+
+              IF ::Parent != NIL .AND. ::Parent:ClsName == "PanelBox" .AND. ASCAN( ::Parent:Children, {|o| o:hWnd == nwParam } ) == 0
+                 ::Parent:oLastFocus := Self
+                 ::Parent:SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
+              ENDIF
+              EXIT
+
+         CASE WM_SETFOCUS
+              IF ::Parent != NIL .AND. ::Parent:VertScroll
+
+                 IF ::Parent:ScrollOnChildFocus
+                    aRect    := _GetWindowRect( ::hWnd )
+
+                    aPt := { aRect[1], aRect[2] }
+                    _ScreenToClient( ::Parent:hWnd, @aPt )
+                    aRect[1] := aPt[1]
+                    aRect[2] := aPt[2]
+
+                    aPt := { aRect[3], aRect[4] }
+                    _ScreenToClient( ::Parent:hWnd, @aPt )
+                    aRect[3] := aPt[1]
+                    aRect[4] := aPt[2]
+
+                    aParent  := _GetClientRect( ::Parent:hWnd )
+
+                    // Set Vertical Position
+                    IF aRect[4] > aParent[4]
+                       n := aParent[2]+( aRect[4]-aParent[4] ) - aRect[2]
+                       ::Parent:OnVScroll( SB_THUMBTRACK, ::Parent:VertScrollPos + ( aRect[4]-aParent[4] )- MAX(n,0), 0 )
+                     ELSEIF aRect[2] < 0
+                       ::Parent:OnVScroll( SB_THUMBTRACK, ::Parent:VertScrollPos + ( aRect[2] ), 0 )
+                    ENDIF
+
+                    // Set Horizontal Position
+                    IF aRect[3] > aParent[3]
+                       n := aParent[1]+( aRect[3]-aParent[3] ) - aRect[1]
+                       ::Parent:OnHScroll( SB_THUMBTRACK, ::Parent:HorzScrollPos + ( aRect[3]-aParent[3] ) - MAX(n,0), 0 )
+                     ELSEIF aRect[1] < 0
+                       ::Parent:OnHScroll( SB_THUMBTRACK, ::Parent:HorzScrollPos + ( aRect[1] ), 0 )
+                    ENDIF
                  ENDIF
               ENDIF
 
-           ENDIF
-           EXIT
+              nRet := ExecuteEvent( "OnSetFocus", Self )
+              ODEFAULT nRet TO ::OnSetFocus( nwParam )
+              ODEFAULT nRet TO __Evaluate( ::OnWMSetFocus, Self, nwParam, nlParam, nRet )
+              IF ::Parent != NIL .AND. ::Parent:ClsName == "PanelBox"
+                 ::Parent:SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
+              ENDIF
 
-      CASE WM_ENTERSIZEMOVE
-           nRet := ExecuteEvent( "OnEnterSizeMove", Self )
-           ODEFAULT nRet TO ::OnEnterSizeMove()
-           EXIT
+              IF ::Application:EditBoxFocusBorder .AND. ::ClsName == "Edit"
+                 aRect := ::GetRectangle()
+                 aRect[1] -= 3 + ::Parent:HorzScrollPos
+                 aRect[2] -= 3 + ::Parent:VertScrollPos
+                 aRect[3] += 3 + ::Parent:HorzScrollPos
+                 aRect[4] += 3 + ::Parent:VertScrollPos
+                 _InvalidateRect( ::Parent:hWnd, aRect )
+              ENDIF
+              EXIT
 
-      CASE WM_EXITSIZEMOVE
-           nRet := ExecuteEvent( "OnExitSizeMove", Self )
-           ODEFAULT nRet TO ::OnExitSizeMove()
-           EXIT
+         CASE WM_MEASUREITEM
+              ::MeasureItemStruct := (struct MEASUREITEMSTRUCT*) nlParam
+              //aParams := __GetMEASUREITEMSTRUCT( nlParam )
+              //::MeasureItemStruct:CtlType    := aParams[1]
+              //::MeasureItemStruct:CtlID      := aParams[2]
+              //::MeasureItemStruct:itemID     := aParams[3]
+              //::MeasureItemStruct:itemWidth  := aParams[4]
+              //::MeasureItemStruct:itemHeight := aParams[5]
+              //::MeasureItemStruct:itemData   := aParams[6]
 
-      CASE WM_DRAWCLIPBOARD
-           nRet := ExecuteEvent( "OnDrawClipboard", Self )
-           ODEFAULT nRet TO ::OnDrawClipboard( nwParam, nlParam )
-           EXIT
+              IF ::MeasureItemStruct:CtlType == ODT_MENU .AND. ::MeasureItemStruct:itemData != NIL .AND. ::MeasureItemStruct:itemData <> 0
+                 IF ( oCtrl := ArrayFromPointer( ::MeasureItemStruct:itemData ) ) != NIL
+                    nRet := oCtrl:OnMeasureItem( nwParam, nlParam, ::MeasureItemStruct )
+                 ENDIF
+               ELSE
+                 nRet := ExecuteEvent( "OnMeasureItem", Self )
+                 ODEFAULT nRet TO ::OnMeasureItem( nwParam, nlParam )
 
-      CASE WM_CHANGECBCHAIN
-           nRet := ExecuteEvent( "OnChangeCbChain", Self )
-           ODEFAULT nRet TO ::OnChangeCbChain( nwParam, nlParam )
-           EXIT
-
-      CASE WM_MOUSEWHEEL
-           nRet := ::OnMouseWheel( nwParam, nlParam )
-           IF nRet == NIL .AND. ::sih != NIL .OR. ::siv != NIL
-              pt := (struct POINT)
-              pt:x := LOWORD( nlParam )
-              pt:y := HIWORD( nlParam )
-
-              nRet := ExecuteEvent( "OnMouseWheel", Self )
-
-              IF ( !::__IsControl .OR. ::__xCtrlName == "DataGrid" .OR. !::__IsStandard )
-                 IF nRet == NIL .AND. ::HasMessage( "VertScroll" ) .AND. ::VertScroll .OR. ( ::HasMessage( "AutoVertScroll" ) .AND. ::AutoVertScroll .AND. ::siv != NIL .AND. ::siv:nMax > 0 )
-                    pt := (struct POINT)
-                    pt:x := LOWORD(nlParam)
-                    pt:y := HIWORD(nlParam)
-                    ScreenToClient( ::hWnd, @pt )
-
-                    rc := (struct RECT)
-                    rc:left   := 0
-                    rc:top    := ::ClientHeight
-                    rc:right  := ::ClientWidth
-                    rc:bottom := ::Height
-
-                    SystemParametersInfo( SPI_GETWHEELSCROLLLINES, 0, @nLines, 0)
-                    IF nLines == 0 .AND. ::__xCtrlName == "DataGrid"
-                       nLines := 3
+                 IF nRet == NIL .AND. ( n := ASCAN( ::Children, {|o| o:Id == ::MeasureItemStruct:itemID} ) ) > 0
+                    oCtrl := ::Children[n]
+                    IF HGetPos( oCtrl:EventHandler, "OnParentMeasureItem" ) != 0
+                       nRet := ::&( oCtrl:EventHandler[ "OnParentMeasureItem" ] )( Self )
                     ENDIF
-                    
-                    IF nLines > 0
-                       nDelta  := GETWHEELDELTA( nwParam )
-                       nScroll := WM_VSCROLL
-                       nPage   := IIF( ::siv != NIL, ::siv:nPage, ::ClientHeight )
-                       IF ::sih != NIL .AND. PtInRect( rc, pt )
-                          nScroll := WM_HSCROLL
-                          nPage   := ::sih:nPage
+                    ODEFAULT nRet TO oCtrl:OnParentMeasureItem(nwParam,nlParam, ::MeasureItemStruct)
+                 ENDIF
+
+              ENDIF
+              EXIT
+
+         CASE WM_DRAWITEM
+              ::DrawItemStruct := (struct DRAWITEMSTRUCT*) nlParam
+              /*
+              aDraw := __DRAWITEMSTRUCT( nlParam )
+              ::DrawItemStruct := {=>}
+              HSetCaseMatch( ::DrawItemStruct, .F. )
+              ::DrawItemStruct:rcItem := {=>}
+              HSetCaseMatch( ::DrawItemStruct:rcItem, .F. )
+
+              ::DrawItemStruct:CtlType       := aDraw[1]
+              ::DrawItemStruct:CtlID         := aDraw[2]
+              ::DrawItemStruct:itemID        := aDraw[3]
+              ::DrawItemStruct:itemAction    := aDraw[4]
+              ::DrawItemStruct:itemState     := aDraw[5]
+              ::DrawItemStruct:hWndItem      := aDraw[6]
+              ::DrawItemStruct:hDC           := aDraw[7]
+              ::DrawItemStruct:itemData      := aDraw[8]
+
+              ::DrawItemStruct:rcItem:Left   := aDraw[9][1]
+              ::DrawItemStruct:rcItem:Top    := aDraw[9][2]
+              ::DrawItemStruct:rcItem:Right  := aDraw[9][3]
+              ::DrawItemStruct:rcItem:Bottom := aDraw[9][4]
+              ::DrawItemStruct:rcItem:Array  := ACOPY(aDraw)
+              */
+              IF ::DrawItemStruct:CtlType == ODT_MENU .AND. ::DrawItemStruct:itemData != NIL .AND. ::DrawItemStruct:itemData <> 0
+                 IF ( oCtrl := ArrayFromPointer( ::DrawItemStruct:itemData ) ) != NIL .AND. VALTYPE( oCtrl ) == "O"
+                    nRet := oCtrl:OnDrawItem( nwParam, nlParam, ::DrawItemStruct )
+                 ENDIF
+               ELSE
+
+                 nRet := ExecuteEvent( "OnDrawItem", Self )
+                 ODEFAULT nRet TO ::OnDrawItem( nwParam, nlParam )
+                 IF nRet == NIL
+                    pPtr := GetProp( ::DrawItemStruct:hwndItem, "PROP_CLASSOBJECT" )
+                    IF pPtr != NIL .AND. pPtr != 0
+                       oCtrl := ArrayFromPointer( pPtr )
+
+                       IF HGetPos( oCtrl:EventHandler, "OnParentDrawItem" ) != 0
+                          nRet := ::&( oCtrl:EventHandler[ "OnParentDrawItem" ] )( Self )
+                       ENDIF
+                       ODEFAULT nRet TO oCtrl:OnParentDrawItem(nwParam,nlParam, ::DrawItemStruct)
+                    ENDIF
+                 ENDIF
+
+              ENDIF
+              EXIT
+
+         CASE WM_ENTERSIZEMOVE
+              nRet := ExecuteEvent( "OnEnterSizeMove", Self )
+              ODEFAULT nRet TO ::OnEnterSizeMove()
+              EXIT
+
+         CASE WM_EXITSIZEMOVE
+              nRet := ExecuteEvent( "OnExitSizeMove", Self )
+              ODEFAULT nRet TO ::OnExitSizeMove()
+              EXIT
+
+         CASE WM_DRAWCLIPBOARD
+              nRet := ExecuteEvent( "OnDrawClipboard", Self )
+              ODEFAULT nRet TO ::OnDrawClipboard( nwParam, nlParam )
+              EXIT
+
+         CASE WM_CHANGECBCHAIN
+              nRet := ExecuteEvent( "OnChangeCbChain", Self )
+              ODEFAULT nRet TO ::OnChangeCbChain( nwParam, nlParam )
+              EXIT
+
+         CASE WM_MOUSEWHEEL
+              nRet := ::OnMouseWheel( nwParam, nlParam )
+              IF nRet == NIL .AND. ::sih != NIL .OR. ::siv != NIL
+                 pt := (struct POINT)
+                 pt:x := LOWORD( nlParam )
+                 pt:y := HIWORD( nlParam )
+
+                 nRet := ExecuteEvent( "OnMouseWheel", Self )
+
+                 IF ( !::__IsControl .OR. ::__xCtrlName == "DataGrid" .OR. !::__IsStandard )
+                    IF nRet == NIL .AND. ::HasMessage( "VertScroll" ) .AND. ::VertScroll .OR. ( ::HasMessage( "AutoVertScroll" ) .AND. ::AutoVertScroll .AND. ::siv != NIL .AND. ::siv:nMax > 0 )
+                       pt := (struct POINT)
+                       pt:x := LOWORD(nlParam)
+                       pt:y := HIWORD(nlParam)
+                       ScreenToClient( ::hWnd, @pt )
+
+                       rc := (struct RECT)
+                       rc:left   := 0
+                       rc:top    := ::ClientHeight
+                       rc:right  := ::ClientWidth
+                       rc:bottom := ::Height
+
+                       SystemParametersInfo( SPI_GETWHEELSCROLLLINES, 0, @nLines, 0)
+                       IF nLines == 0 .AND. ::__xCtrlName == "DataGrid"
+                          nLines := 3
                        ENDIF
 
-                       IF nLines == WHEEL_PAGESCROLL
-                          IF nDelta > 0
-                             ::SendMessage( nScroll, SB_PAGEUP, 0 )
-                           ELSEIF nDelta < 0
-                             ::SendMessage( nScroll, SB_PAGEDOWN, 0 )
+                       IF nLines > 0
+                          nDelta  := GETWHEELDELTA( nwParam )
+                          nScroll := WM_VSCROLL
+                          nPage   := IIF( ::siv != NIL, ::siv:nPage, ::ClientHeight )
+                          IF ::sih != NIL .AND. PtInRect( rc, pt )
+                             nScroll := WM_HSCROLL
+                             nPage   := ::sih:nPage
                           ENDIF
-                        ELSE
-                          IF nDelta > 0
-                             FOR n := 1 TO nLines * ABS( nDelta )
-                                 ::SendMessage( nScroll, SB_LINEUP, 0 )
-                             NEXT
+
+                          IF nLines == WHEEL_PAGESCROLL
+                             IF nDelta > 0
+                                ::SendMessage( nScroll, SB_PAGEUP, 0 )
+                              ELSEIF nDelta < 0
+                                ::SendMessage( nScroll, SB_PAGEDOWN, 0 )
+                             ENDIF
                            ELSE
-                             FOR n := 1 TO nLines * ABS( nDelta )
-                                 ::SendMessage( nScroll, SB_LINEDOWN, 0 )
-                             NEXT
+                             IF nDelta > 0
+                                FOR n := 1 TO nLines * ABS( nDelta )
+                                    ::SendMessage( nScroll, SB_LINEUP, 0 )
+                                NEXT
+                              ELSE
+                                FOR n := 1 TO nLines * ABS( nDelta )
+                                    ::SendMessage( nScroll, SB_LINEDOWN, 0 )
+                                NEXT
+                             ENDIF
                           ENDIF
-                       ENDIF
 
+                       ENDIF
+                       RETURN 0
                     ENDIF
-                    RETURN 0
                  ENDIF
               ENDIF
-           ENDIF
-           EXIT
+              EXIT
 
-      CASE WM_HSCROLL
-           nRet := ExecuteEvent( "OnHorzScroll", Self )
-           ODEFAULT nRet TO ::OnHorzScroll( LoWord( nwParam ), HiWord( nwParam ), nlParam )
+         CASE WM_HSCROLL
+              nRet := ExecuteEvent( "OnHorzScroll", Self )
+              ODEFAULT nRet TO ::OnHorzScroll( LoWord( nwParam ), HiWord( nwParam ), nlParam )
 
-           IF nRet == NIL .AND. ( ::HorzScroll .OR. ::AutoHorzScroll ) .AND. ( !::__IsControl .OR. ::__xCtrlName == "DataGrid" .OR. !::__IsStandard )
-              nRet := ExecuteEvent( "OnHScroll", Self )
-              nRet := ::OnHScroll( LoWord( nwParam ), HiWord( nwParam ), nlParam )
-           ENDIF
-           EXIT
+              IF nRet == NIL .AND. ( ::HorzScroll .OR. ::AutoHorzScroll ) .AND. ( !::__IsControl .OR. ::__xCtrlName == "DataGrid" .OR. !::__IsStandard )
+                 nRet := ExecuteEvent( "OnHScroll", Self )
+                 nRet := ::OnHScroll( LoWord( nwParam ), HiWord( nwParam ), nlParam )
+              ENDIF
+              EXIT
 
-      CASE WM_VSCROLL
+         CASE WM_VSCROLL
 
-           IF ( ::VertScroll .OR. ::AutoVertScroll ) .AND. ( !::__IsControl .OR. ::__xCtrlName == "DataGrid" .OR. !::__IsStandard )
+              IF ( ::VertScroll .OR. ::AutoVertScroll ) .AND. ( !::__IsControl .OR. ::__xCtrlName == "DataGrid" .OR. !::__IsStandard )
 
-              IF LOWORD( nwParam ) == SB_THUMBTRACK
-                 // workaround to beat the 16 bits thumb position
-                 ::ScrollInfo := (struct SCROLLINFO)
-                 cBuffer := _GetScrollInfo( hWnd, SB_VERT )
-                 ::ScrollInfo:Buffer( cBuffer, .T. )
-                 nRet := ExecuteEvent( "OnVertScroll", Self )
-                 IF nRet == NIL
-                    nRet := ::OnVertScroll( LoWord( nwParam ), ::ScrollInfo:nTrackPos, nlParam )
-                 ENDIF
-                 IF nRet == NIL
-                    nRet := ::OnVScroll( LoWord( nwParam ), ::ScrollInfo:nTrackPos, nlParam )
+                 IF LOWORD( nwParam ) == SB_THUMBTRACK
+                    // workaround to beat the 16 bits thumb position
+                    ::ScrollInfo := (struct SCROLLINFO)
+                    cBuffer := _GetScrollInfo( hWnd, SB_VERT )
+                    ::ScrollInfo:Buffer( cBuffer, .T. )
+                    nRet := ExecuteEvent( "OnVertScroll", Self )
+                    IF nRet == NIL
+                       nRet := ::OnVertScroll( LoWord( nwParam ), ::ScrollInfo:nTrackPos, nlParam )
+                    ENDIF
+                    IF nRet == NIL
+                       nRet := ::OnVScroll( LoWord( nwParam ), ::ScrollInfo:nTrackPos, nlParam )
+                    ENDIF
+                  ELSE
+                    nRet := ExecuteEvent( "OnVertScroll", Self )
+                    IF nRet == NIL
+                       nRet := ::OnVertScroll( LoWord( nwParam ), HiWord( nwParam ), nlParam )
+                    ENDIF
+                    IF nRet == NIL
+                       nRet := ::OnVScroll( LoWord( nwParam ), HiWord( nwParam ), nlParam )
+                    ENDIF
                  ENDIF
                ELSE
                  nRet := ExecuteEvent( "OnVertScroll", Self )
-                 IF nRet == NIL
-                    nRet := ::OnVertScroll( LoWord( nwParam ), HiWord( nwParam ), nlParam )
-                 ENDIF
-                 IF nRet == NIL
-                    nRet := ::OnVScroll( LoWord( nwParam ), HiWord( nwParam ), nlParam )
-                 ENDIF
+                 ODEFAULT nRet TO ::OnVertScroll( LoWord( nwParam ), HiWord( nwParam ), nlParam )
               ENDIF
-            ELSE
-              nRet := ExecuteEvent( "OnVertScroll", Self )
-              ODEFAULT nRet TO ::OnVertScroll( LoWord( nwParam ), HiWord( nwParam ), nlParam )
-           ENDIF
 
-           EXIT
+              EXIT
 
-      CASE WM_SYSCOMMAND
-           IF ::ClsName != "DataGrid"
-              FOR EACH oChild IN ::Children
+         CASE WM_SYSCOMMAND
+              IF ::ClsName != "DataGrid"
+                 FOR EACH oChild IN ::Children
 
-                  nRet := ExecuteEvent( "OnParentSysCommand", oChild )
-                  TRY
-                     ODEFAULT nRet TO oChild:OnParentSysCommand( nwParam, nlParam )
-                   catch
-                  END
-                  IF nRet != NIL
-                     RETURN nRet
-                  ENDIF
-              NEXT
-           ENDIF
-           nRet := ExecuteEvent( "OnSysCommand", Self )
-           ODEFAULT nRet TO ::OnSysCommand( nwParam, nlParam )
-           ODEFAULT nRet TO __Evaluate( ::OnWMSysCommand,  Self, nwParam, nlParam, nRet )
-
-           IF nwParam != SC_CLOSE
-              IF nwParam == SC_MINIMIZE
-                 ::__aMinRect := {::xLeft,::xTop,::xWidth,::xHeight}
+                     nRet := ExecuteEvent( "OnParentSysCommand", oChild )
+                     TRY
+                        ODEFAULT nRet TO oChild:OnParentSysCommand( nwParam, nlParam )
+                      catch
+                     END
+                     IF nRet != NIL
+                        RETURN nRet
+                     ENDIF
+                 NEXT
               ENDIF
-              ::PostMessage( WM_USER + 3025 )
-           ENDIF
-           EXIT
+              nRet := ExecuteEvent( "OnSysCommand", Self )
+              ODEFAULT nRet TO ::OnSysCommand( nwParam, nlParam )
+              ODEFAULT nRet TO __Evaluate( ::OnWMSysCommand,  Self, nwParam, nlParam, nRet )
 
-      CASE WM_SYSDEADCHAR
-           EXIT
+              IF nwParam != SC_CLOSE
+                 IF nwParam == SC_MINIMIZE
+                    ::__aMinRect := {::xLeft,::xTop,::xWidth,::xHeight}
+                 ENDIF
+                 ::PostMessage( WM_USER + 3025 )
+              ENDIF
+              EXIT
 
-      CASE WM_CTLCOLORSCROLLBAR
-           nRet := ExecuteEvent( "OnCtlColorScrollBar", Self )
-           ODEFAULT nRet TO ::OnCtlColorScrollBar( nwParam, nlParam )
-           IF ( n := ASCAN( ::Children, {|o|o:hWnd == nlParam} ) ) > 0
-              nRet := ::Children[n]:OnCtlColorScrollBar( nwParam, nlParam )
-           ENDIF
-           EXIT
+         CASE WM_SYSDEADCHAR
+              EXIT
 
-      CASE WM_CTLCOLORBTN
-           nRet := ExecuteEvent( "OnCtlColorBtn", Self )
-           ODEFAULT nRet TO ::OnCtlColorBtn( nwParam, nlParam )
+         CASE WM_CTLCOLORSCROLLBAR
+              nRet := ExecuteEvent( "OnCtlColorScrollBar", Self )
+              ODEFAULT nRet TO ::OnCtlColorScrollBar( nwParam, nlParam )
+              IF ( n := ASCAN( ::Children, {|o|o:hWnd == nlParam} ) ) > 0
+                 nRet := ::Children[n]:OnCtlColorScrollBar( nwParam, nlParam )
+              ENDIF
+              EXIT
 
-           pPtr := GetProp( nlParam, "PROP_CLASSOBJECT" )
-           IF pPtr != NIL .AND. pPtr != 0
-              oCtrl := ArrayFromPointer( pPtr )
-              nRet := oCtrl:OnCtlColorBtn( nwParam, nlParam )
-           ENDIF
-           EXIT
+         CASE WM_CTLCOLORBTN
+              nRet := ExecuteEvent( "OnCtlColorBtn", Self )
+              ODEFAULT nRet TO ::OnCtlColorBtn( nwParam, nlParam )
 
-      CASE WM_CTLCOLORSTATIC
-           nRet := ExecuteEvent( "OnCtlColorStatic", Self )
-           ODEFAULT nRet TO ::OnCtlColorStatic( nwParam, nlParam )
-           IF nRet == NIL
               pPtr := GetProp( nlParam, "PROP_CLASSOBJECT" )
               IF pPtr != NIL .AND. pPtr != 0
                  oCtrl := ArrayFromPointer( pPtr )
-                 nRet := oCtrl:OnCtlColorStatic( nwParam, nlParam )
+                 nRet := oCtrl:OnCtlColorBtn( nwParam, nlParam )
               ENDIF
-           ENDIF
-           EXIT
+              EXIT
 
-      CASE WM_CTLCOLOREDIT
-           nRet := ExecuteEvent( "OnCtlColorEdit", Self )
-           ODEFAULT nRet TO ::OnCtlColorEdit( nwParam, nlParam )
-           IF nRet == NIL
-              IF ( n := ASCAN( ::Children, {|o|o:hWnd == nlParam} ) ) > 0
-                 nRet := ::Children[n]:OnCtlColorEdit( nwParam, nlParam )
-              ENDIF
-           ENDIF
-           EXIT
-
-      CASE WM_CTLCOLORDLG
-           nRet := ExecuteEvent( "OnCtlColorDlg", Self )
-           ODEFAULT nRet TO ::OnCtlColorDlg( nwParam, nlParam )
-           IF nRet == NIL .AND. ::BkBrush != NIL
-              RETURN( ::BkBrush )
-           ENDIF
-           EXIT
-
-      CASE WM_CTLCOLORLISTBOX
-           nRet := ExecuteEvent( "OnCtlColorListBox", Self )
-           ODEFAULT nRet TO ::OnCtlColorListBox( nwParam, nlParam )
-           IF nRet == NIL
-              IF ( n := ASCAN( ::Children, {|o|o:hWnd == nlParam} ) ) > 0
-                 nRet := ::Children[n]:OnCtlColorListBox( nwParam, nlParam )
-              ENDIF
-           ENDIF
-           EXIT
-
-      CASE WM_NOTIFY
-           __GetNMHDR( nlParam, @hwndFrom, @idFrom, @code )
-           ::hdr:hwndFrom := hwndFrom
-           ::hdr:idFrom   := idFrom
-           ::hdr:code     := code
-
-           //::hdr := (struct NMHDR* nlParam)
-
-           nRet := ExecuteEvent( "OnNotify", Self )
-           nRet := ::OnNotify( nwParam, nlParam, code )
-
-           IF nRet == NIL
-              pPtr := GetProp( ::hdr:hwndFrom, "PROP_CLASSOBJECT" )
-              IF pPtr != NIL .AND. pPtr != 0
-                 oCtrl := ArrayFromPointer( pPtr )
-                 IF HGetPos( oCtrl:EventHandler, "OnParentNotify" ) != 0
-                    nRet := ::&( oCtrl:EventHandler[ "OnParentNotify" ] )( oCtrl )
-                 END
-                 ODEFAULT nRet TO oCtrl:OnParentNotify( nwParam, nlParam, ::hdr )
-                 IF VALTYPE( nRet ) == "O"
-                    nRet := NIL
+         CASE WM_CTLCOLORSTATIC
+              nRet := ExecuteEvent( "OnCtlColorStatic", Self )
+              ODEFAULT nRet TO ::OnCtlColorStatic( nwParam, nlParam )
+              IF nRet == NIL
+                 pPtr := GetProp( nlParam, "PROP_CLASSOBJECT" )
+                 IF pPtr != NIL .AND. pPtr != 0
+                    oCtrl := ArrayFromPointer( pPtr )
+                    nRet := oCtrl:OnCtlColorStatic( nwParam, nlParam )
                  ENDIF
               ENDIF
+              EXIT
 
-              IF nRet == NIL .AND. ::hdr:code == TTN_NEEDTEXT
-                 IF ::ClsName != "DataGrid"
-                    FOR EACH oChild IN ::Children
-                        IF HGetPos( oChild:EventHandler, "OnToolTipNotify" ) != 0
-                           nRet := ::&( oChild:EventHandler[ "OnToolTipNotify" ] )( oChild )
-                        END
-                        IF __objHasMsg( oChild, "OnToolTipNotify" )
-                           ODEFAULT nRet TO oChild:OnToolTipNotify( nwParam, nlParam, ::hdr )
-                        ENDIF
-                    NEXT
+         CASE WM_CTLCOLOREDIT
+              nRet := ExecuteEvent( "OnCtlColorEdit", Self )
+              ODEFAULT nRet TO ::OnCtlColorEdit( nwParam, nlParam )
+              IF nRet == NIL
+                 IF ( n := ASCAN( ::Children, {|o|o:hWnd == nlParam} ) ) > 0
+                    nRet := ::Children[n]:OnCtlColorEdit( nwParam, nlParam )
+                 ENDIF
+              ENDIF
+              EXIT
+
+         CASE WM_CTLCOLORDLG
+              nRet := ExecuteEvent( "OnCtlColorDlg", Self )
+              ODEFAULT nRet TO ::OnCtlColorDlg( nwParam, nlParam )
+              IF nRet == NIL .AND. ::BkBrush != NIL
+                 RETURN( ::BkBrush )
+              ENDIF
+              EXIT
+
+         CASE WM_CTLCOLORLISTBOX
+              nRet := ExecuteEvent( "OnCtlColorListBox", Self )
+              ODEFAULT nRet TO ::OnCtlColorListBox( nwParam, nlParam )
+              IF nRet == NIL
+                 IF ( n := ASCAN( ::Children, {|o|o:hWnd == nlParam} ) ) > 0
+                    nRet := ::Children[n]:OnCtlColorListBox( nwParam, nlParam )
+                 ENDIF
+              ENDIF
+              EXIT
+
+         CASE WM_NOTIFY
+              __GetNMHDR( nlParam, @hwndFrom, @idFrom, @code )
+              ::hdr:hwndFrom := hwndFrom
+              ::hdr:idFrom   := idFrom
+              ::hdr:code     := code
+
+              //::hdr := (struct NMHDR* nlParam)
+
+              nRet := ExecuteEvent( "OnNotify", Self )
+              nRet := ::OnNotify( nwParam, nlParam, code )
+
+              IF nRet == NIL
+                 pPtr := GetProp( ::hdr:hwndFrom, "PROP_CLASSOBJECT" )
+                 IF pPtr != NIL .AND. pPtr != 0
+                    oCtrl := ArrayFromPointer( pPtr )
+                    IF HGetPos( oCtrl:EventHandler, "OnParentNotify" ) != 0
+                       nRet := ::&( oCtrl:EventHandler[ "OnParentNotify" ] )( oCtrl )
+                    END
+                    ODEFAULT nRet TO oCtrl:OnParentNotify( nwParam, nlParam, ::hdr )
                     IF VALTYPE( nRet ) == "O"
                        nRet := NIL
                     ENDIF
                  ENDIF
+
+                 IF nRet == NIL .AND. ::hdr:code == TTN_NEEDTEXT
+                    IF ::ClsName != "DataGrid"
+                       FOR EACH oChild IN ::Children
+                           IF HGetPos( oChild:EventHandler, "OnToolTipNotify" ) != 0
+                              nRet := ::&( oChild:EventHandler[ "OnToolTipNotify" ] )( oChild )
+                           END
+                           IF __objHasMsg( oChild, "OnToolTipNotify" )
+                              ODEFAULT nRet TO oChild:OnToolTipNotify( nwParam, nlParam, ::hdr )
+                           ENDIF
+                       NEXT
+                       IF VALTYPE( nRet ) == "O"
+                          nRet := NIL
+                       ENDIF
+                    ENDIF
+                 ENDIF
+
               ENDIF
+              EXIT
 
-           ENDIF
-           EXIT
+         CASE WM_NCPAINT
+              nRet := ExecuteEvent( "OnNCPaint", Self )
+              ODEFAULT nRet TO ::OnNCPaint( nwParam, nlParam )
+              EXIT
 
-      CASE WM_NCPAINT
-           nRet := ExecuteEvent( "OnNCPaint", Self )
-           ODEFAULT nRet TO ::OnNCPaint( nwParam, nlParam )
-           EXIT
-
-      CASE WM_WINDOWPOSCHANGED
-           aParams := __GetWINDOWPOS( nlParam )
-           ::WindowPos:hwnd            := aParams[1]
-           ::WindowPos:hwndInsertAfter := aParams[2]
-           ::WindowPos:x               := aParams[3]
-           ::WindowPos:y               := aParams[4]
-           ::WindowPos:cx              := aParams[5]
-           ::WindowPos:cy              := aParams[6]
-           ::WindowPos:flags           := aParams[7]
-
-           IF ::ClsName != "VXH_FORM_IDE"
-              ::xLeft   := ::WindowPos:x
-              ::xTop    := ::WindowPos:y
-           ENDIF
-
-           ::xWidth  := ::WindowPos:cx
-           IF ::ClsName != "ComboBox"
-              ::xHeight := ::WindowPos:cy
-           ENDIF
-
-           IF ::Parent != NIL .AND. ::ClassName == "WINDOWEDIT"
-              aRect := _GetWindowRect( ::hWnd )
-              aPt := { aRect[1], aRect[2] }
-              IF ::__ClassInst != NIL .AND. ::Parent:hWnd != GetParent( ::hWnd )
-                 _ScreenToClient( GetParent( ::hWnd ), @aPt )
-                 ::__TempRect := { aPt[1], aPt[2], aPt[1]+::WindowPos:cx, aPt[2]+::WindowPos:cy }
-                 RETURN NIL
-              ENDIF
-              _ScreenToClient( ::Parent:hWnd, @aPt )
-              ::__TempRect := { aPt[1], aPt[2], aPt[1]+::WindowPos:cx, aPt[2]+::WindowPos:cy }
-           ENDIF
-
-           nRet := ExecuteEvent( "OnWindowPosChanged", Self )
-           ODEFAULT nRet TO ::OnWindowPosChanged( nwParam, nlParam )
-           EXIT
-
-      CASE WM_WINDOWPOSCHANGING
-           nRet := ExecuteEvent( "OnWindowPosChanging", Self )
-           ODEFAULT nRet TO ::OnWindowPosChanging( nwParam, nlParam )
-           IF ::Parent != NIL .AND. ::ClsName == "MDIChild"
+         CASE WM_WINDOWPOSCHANGED
               aParams := __GetWINDOWPOS( nlParam )
               ::WindowPos:hwnd            := aParams[1]
               ::WindowPos:hwndInsertAfter := aParams[2]
@@ -2999,305 +2963,345 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               ::WindowPos:cx              := aParams[5]
               ::WindowPos:cy              := aParams[6]
               ::WindowPos:flags           := aParams[7]
-           
-              IF ::WindowPos:flags != 20
-                 IF ( n := ASCAN( ::Parent:Parent:Children, {|o|o:__xCtrlName == "CoolMenu"} ) ) > 0
-                    PostMessage( ::Parent:hWnd, WM_MDICHILDSIZED, n )
+
+              IF ::ClsName != "VXH_FORM_IDE"
+                 ::xLeft   := ::WindowPos:x
+                 ::xTop    := ::WindowPos:y
+              ENDIF
+
+              ::xWidth  := ::WindowPos:cx
+              IF ::ClsName != "ComboBox"
+                 ::xHeight := ::WindowPos:cy
+              ENDIF
+
+              IF ::Parent != NIL .AND. ::ClassName == "WINDOWEDIT"
+                 aRect := _GetWindowRect( ::hWnd )
+                 aPt := { aRect[1], aRect[2] }
+                 IF ::__ClassInst != NIL .AND. ::Parent:hWnd != GetParent( ::hWnd )
+                    _ScreenToClient( GetParent( ::hWnd ), @aPt )
+                    ::__TempRect := { aPt[1], aPt[2], aPt[1]+::WindowPos:cx, aPt[2]+::WindowPos:cy }
+                    RETURN NIL
+                 ENDIF
+                 _ScreenToClient( ::Parent:hWnd, @aPt )
+                 ::__TempRect := { aPt[1], aPt[2], aPt[1]+::WindowPos:cx, aPt[2]+::WindowPos:cy }
+              ENDIF
+
+              nRet := ExecuteEvent( "OnWindowPosChanged", Self )
+              ODEFAULT nRet TO ::OnWindowPosChanged( nwParam, nlParam )
+              EXIT
+
+         CASE WM_WINDOWPOSCHANGING
+              nRet := ExecuteEvent( "OnWindowPosChanging", Self )
+              ODEFAULT nRet TO ::OnWindowPosChanging( nwParam, nlParam )
+              IF ::Parent != NIL .AND. ::ClsName == "MDIChild"
+                 aParams := __GetWINDOWPOS( nlParam )
+                 ::WindowPos:hwnd            := aParams[1]
+                 ::WindowPos:hwndInsertAfter := aParams[2]
+                 ::WindowPos:x               := aParams[3]
+                 ::WindowPos:y               := aParams[4]
+                 ::WindowPos:cx              := aParams[5]
+                 ::WindowPos:cy              := aParams[6]
+                 ::WindowPos:flags           := aParams[7]
+
+                 IF ::WindowPos:flags != 20
+                    IF ( n := ASCAN( ::Parent:Parent:Children, {|o|o:__xCtrlName == "CoolMenu"} ) ) > 0
+                       PostMessage( ::Parent:hWnd, WM_MDICHILDSIZED, n )
+                       RETURN 0
+                    ENDIF
+                 ENDIF
+              ENDIF
+              RETURN NIL
+
+         CASE WM_THEMECHANGED
+              IF ! ( ::ClsName == TOOLTIPS_CLASS )
+                 IF ::Application != NIL .AND. ::Application:MainForm:hWnd == hWnd
+                    ::Application:ThemeActive := IsThemeActive()
+                    ::System:UpdateColorSchemes()
+                    ::System:Update()
+                 ENDIF
+                 IF ::hTheme != NIL
+                    ::CloseThemeData()
+                    ::OpenThemeData()
+                 ENDIF
+                 nRet := ExecuteEvent( "OnThemeChanged", Self )
+                 ODEFAULT nRet TO ::OnThemeChanged( Self )
+                 ODEFAULT nRet TO __Evaluate( ::OnWMThemeChanged,  Self, nwParam, nlParam, nRet )
+              ENDIF
+              EXIT
+
+         CASE WM_SYSCOLORCHANGE
+              IF ! ( ::ClsName == TOOLTIPS_CLASS )
+                 nRet := ExecuteEvent( "OnSysColorChange", Self )
+                 ODEFAULT nRet TO ::OnSysColorChange( nwParam, nlParam )
+                 ODEFAULT nRet TO __Evaluate( ::OnWMSysColorChange,  Self, nwParam, nlParam, nRet )
+              ENDIF
+              EXIT
+
+         CASE WM_SYSCHAR
+              nRet := ExecuteEvent( "OnSysChar", Self )
+              ODEFAULT nRet TO ::OnSysChar( nwParam, nlParam )
+
+              IF nRet == NIL
+                 hParent := GetParent( hWnd )
+                 IF hParent != NIL
+                    PostMessage( hParent, nMsg, nwParam, nlParam )
+                 ENDIF
+                 RETURN 0
+              ENDIF
+              EXIT
+
+         CASE WM_SYSDEADCHAR
+              EXIT
+
+         CASE WM_SYSKEYDOWN
+              nRet := ExecuteEvent( "OnSysKeyDown", Self )
+              ODEFAULT nRet TO ::OnSysKeyDown( nwParam, nlParam )
+              IF nRet == NIL .AND. ::Form != NIL
+                 FOR EACH oChild IN ::Form:Children
+                     IF oChild:__xCtrlName IN {"CoolMenu","MenuStrip","ToolStripContainer"}
+                        nRet := oChild:OnSysKeyDown( nwParam, nlParam )
+                        IF nRet != NIL
+                           RETURN nRet
+                        ENDIF
+                     ENDIF
+                 NEXT
+              ENDIF
+              EXIT
+
+         CASE WM_SYSKEYUP
+              nRet := ExecuteEvent( "OnSysKeyUp", Self )
+              ODEFAULT nRet TO ::OnSysKeyUp( nwParam, nlParam )
+              EXIT
+
+         CASE WM_SIZING
+              nRet := ExecuteEvent( "OnSizing", Self )
+              ODEFAULT nRet TO ::OnSizing( nwParam, nlParam )
+              RETURN 0
+
+         CASE WM_SHOWWINDOW
+              DO CASE
+                 CASE nwParam == 0 // Hide
+                      nRet := ExecuteEvent( "OnHideWindow", Self )
+                      ODEFAULT nRet TO ::OnHideWindow( nlParam )
+                      ::Hidden := .T.
+                 CASE nwParam == 1 // Show
+                      nRet := ExecuteEvent( "OnShowWindow", Self )
+                      ODEFAULT nRet TO ::OnShowWindow( nlParam )
+                      ODEFAULT nRet TO __Evaluate( ::OnWMShowWindow,  Self, nwParam, nlParam, nRet )
+                      ::Hidden := .F.
+                 OTHER
+                     RETURN 0
+              ENDCASE
+              IF nRet == NIL .AND. ::IsChild .AND. ::Parent != NIL .AND. ::AutoDock .AND. ::__xCtrlName != "MDIClient"
+                 ::Parent:SendMessage( 4, 0, MAKELONG( ::Parent:ClientWidth, ::Parent:ClientHeight ) )
+              ENDIF
+              EXIT
+
+         CASE WM_ENABLE
+              nRet := ExecuteEvent( "OnEnable", Self )
+              ODEFAULT nRet TO ::OnEnable( nwParam, nlParam )
+              EXIT
+
+         CASE WM_CONTEXTMENU
+              nRet := ExecuteEvent( "OnContextMenu", Self )
+              ODEFAULT nRet TO ::OnContextMenu( LOWORD(nlparam) , HIWORD(nlparam) )
+              oObj := ObjFromHandle( nwParam )
+
+              IF oObj != NIL .AND. VALTYPE( nRet ) $ "UO"
+                 IF oObj:__xCtrlName == "DataGrid"
+                    pt := (struct POINT)
+                    pt:x := LOWORD(nlparam)
+                    pt:y := 0
+                    ScreenToClient( nwParam, @pt )
+
+                    IF ( n := oObj:ColFromPos( pt:x ) ) > 0
+                       nRet := ExecuteEvent( "OnContextMenu", oObj:Children[ n ] )
+
+                       IF VALTYPE( nRet ) $ "UO" .AND. oObj:Children[ n ]:ContextMenu != NIL
+                          oObj := oObj:Children[ n ]
+                       ENDIF
+
+                    ENDIF
+                 ENDIF
+                 IF oObj:ContextMenu != NIL .AND. VALTYPE( nRet ) $ "UO"
+                    oObj:ContextMenu:Show( LOWORD(nlparam) , HIWORD(nlparam) )
                     RETURN 0
                  ENDIF
               ENDIF
-           ENDIF
-           RETURN NIL
+              EXIT
 
-      CASE WM_THEMECHANGED
-           IF ! ( ::ClsName == TOOLTIPS_CLASS )
-              IF ::Application != NIL .AND. ::Application:MainForm:hWnd == hWnd
-                 ::Application:ThemeActive := IsThemeActive()
-                 ::System:UpdateColorSchemes()
-                 ::System:Update()
-              ENDIF
-              IF ::hTheme != NIL
-                 ::CloseThemeData()
-                 ::OpenThemeData()
-              ENDIF
-              nRet := ExecuteEvent( "OnThemeChanged", Self )
-              ODEFAULT nRet TO ::OnThemeChanged( Self )
-              ODEFAULT nRet TO __Evaluate( ::OnWMThemeChanged,  Self, nwParam, nlParam, nRet )
-           ENDIF
-           EXIT
+         CASE WM_SETTEXT
+              nRet := ExecuteEvent( "OnSetText", Self )
+              ODEFAULT nRet TO ::OnSetText( nwParam, nlParam )
+              EXIT
 
-      CASE WM_SYSCOLORCHANGE
-           IF ! ( ::ClsName == TOOLTIPS_CLASS )
-              nRet := ExecuteEvent( "OnSysColorChange", Self )
-              ODEFAULT nRet TO ::OnSysColorChange( nwParam, nlParam )
-              ODEFAULT nRet TO __Evaluate( ::OnWMSysColorChange,  Self, nwParam, nlParam, nRet )
-           ENDIF
-           EXIT
+         CASE WM_GETTEXT
+              nRet := ExecuteEvent( "OnGetText", Self )
+              ODEFAULT nRet TO ::OnGetText( nwParam, nlParam )
+              EXIT
 
-      CASE WM_SYSCHAR
-           nRet := ExecuteEvent( "OnSysChar", Self )
-           ODEFAULT nRet TO ::OnSysChar( nwParam, nlParam )
+         CASE WM_CANCELMODE
+              nRet := ExecuteEvent( "OnCancelMode", Self )
+              ODEFAULT nRet TO ::OnCancelMode( nwParam, nlParam )
+              EXIT
 
-           IF nRet == NIL
-              hParent := GetParent( hWnd )
-              IF hParent != NIL
-                 PostMessage( hParent, nMsg, nwParam, nlParam )
-              ENDIF
-              RETURN 0
-           ENDIF
-           EXIT
+         CASE WM_MENUCOMMAND
+              nRet := ExecuteEvent( "OnMenuCommand", Self )
+              ODEFAULT nRet TO ::OnMenuCommand( nwParam, nlParam )
+              IF ::Application != NIL .AND. ::Application:OsVersion:dwMajorVersion < 5
+                 oItem := ::Application:oCurMenu:GetMenuById( LOWORD( nwParam ) )
+               ELSEIF ::Application != NIL
 
-      CASE WM_SYSDEADCHAR
-           EXIT
-
-      CASE WM_SYSKEYDOWN
-           nRet := ExecuteEvent( "OnSysKeyDown", Self )
-           ODEFAULT nRet TO ::OnSysKeyDown( nwParam, nlParam )
-           IF nRet == NIL .AND. ::Form != NIL
-              FOR EACH oChild IN ::Form:Children
-                  IF oChild:__xCtrlName IN {"CoolMenu","MenuStrip","ToolStripContainer"}
-                     nRet := oChild:OnSysKeyDown( nwParam, nlParam )
-                     IF nRet != NIL
-                        RETURN nRet
-                     ENDIF
-                  ENDIF
-              NEXT
-           ENDIF
-           EXIT
-
-      CASE WM_SYSKEYUP
-           nRet := ExecuteEvent( "OnSysKeyUp", Self )
-           ODEFAULT nRet TO ::OnSysKeyUp( nwParam, nlParam )
-           EXIT
-
-      CASE WM_SIZING
-           nRet := ExecuteEvent( "OnSizing", Self )
-           ODEFAULT nRet TO ::OnSizing( nwParam, nlParam )
-           RETURN 0
-
-      CASE WM_SHOWWINDOW
-           DO CASE
-              CASE nwParam == 0 // Hide
-                   nRet := ExecuteEvent( "OnHideWindow", Self )
-                   ODEFAULT nRet TO ::OnHideWindow( nlParam )
-                   ::Hidden := .T.
-              CASE nwParam == 1 // Show
-                   nRet := ExecuteEvent( "OnShowWindow", Self )
-                   ODEFAULT nRet TO ::OnShowWindow( nlParam )
-                   ODEFAULT nRet TO __Evaluate( ::OnWMShowWindow,  Self, nwParam, nlParam, nRet )
-                   ::Hidden := .F.
-              OTHER
-                  RETURN 0
-           ENDCASE
-           IF nRet == NIL .AND. ::IsChild .AND. ::Parent != NIL .AND. ::AutoDock .AND. ::__xCtrlName != "MDIClient"
-              ::Parent:SendMessage( 4, 0, MAKELONG( ::Parent:ClientWidth, ::Parent:ClientHeight ) )
-           ENDIF
-           EXIT
-
-      CASE WM_ENABLE
-           nRet := ExecuteEvent( "OnEnable", Self )
-           ODEFAULT nRet TO ::OnEnable( nwParam, nlParam )
-           EXIT
-
-      CASE WM_CONTEXTMENU
-           nRet := ExecuteEvent( "OnContextMenu", Self )
-           ODEFAULT nRet TO ::OnContextMenu( LOWORD(nlparam) , HIWORD(nlparam) )
-           oObj := ObjFromHandle( nwParam )
-
-           IF oObj != NIL .AND. VALTYPE( nRet ) $ "UO"
-              IF oObj:__xCtrlName == "DataGrid"
-                 pt := (struct POINT)
-                 pt:x := LOWORD(nlparam)
-                 pt:y := 0
-                 ScreenToClient( nwParam, @pt )
-                 
-                 IF ( n := oObj:ColFromPos( pt:x ) ) > 0
-                    nRet := ExecuteEvent( "OnContextMenu", oObj:Children[ n ] )
-
-                    IF VALTYPE( nRet ) $ "UO" .AND. oObj:Children[ n ]:ContextMenu != NIL
-                       oObj := oObj:Children[ n ]
-                    ENDIF
-
-                 ENDIF
-              ENDIF
-              IF oObj:ContextMenu != NIL .AND. VALTYPE( nRet ) $ "UO"
-                 oObj:ContextMenu:Show( LOWORD(nlparam) , HIWORD(nlparam) )
-                 RETURN 0
-              ENDIF
-           ENDIF
-           EXIT
-
-      CASE WM_SETTEXT
-           nRet := ExecuteEvent( "OnSetText", Self )
-           ODEFAULT nRet TO ::OnSetText( nwParam, nlParam )
-           EXIT
-
-      CASE WM_GETTEXT
-           nRet := ExecuteEvent( "OnGetText", Self )
-           ODEFAULT nRet TO ::OnGetText( nwParam, nlParam )
-           EXIT
-
-      CASE WM_CANCELMODE
-           nRet := ExecuteEvent( "OnCancelMode", Self )
-           ODEFAULT nRet TO ::OnCancelMode( nwParam, nlParam )
-           EXIT
-
-      CASE WM_MENUCOMMAND
-           nRet := ExecuteEvent( "OnMenuCommand", Self )
-           ODEFAULT nRet TO ::OnMenuCommand( nwParam, nlParam )
-           IF ::Application != NIL .AND. ::Application:OsVersion:dwMajorVersion < 5
-              oItem := ::Application:oCurMenu:GetMenuById( LOWORD( nwParam ) )
-            ELSEIF ::Application != NIL
-
-              TRY
-                 mii := (struct MENUITEMINFO)
-                 mii:cbSize := mii:SizeOf()
-                 mii:fMask  := MIIM_DATA
-                 _GetMenuItemInfo( nlParam, nwParam, .T., mii:Value )
-                 mii:Devalue()
-                 IF mii:dwItemData != NIL .AND. mii:dwItemData <> 0
-                    oItem := ArrayFromPointer( mii:dwItemData )
-                 ENDIF
-               CATCH
-              END
-              IF oItem == NIL
                  TRY
-                    IF ( oMenu := ::Application:oCurMenu:GetMenuByHandle( nlParam ) ) != NIL
-                       oItem := oMenu:aItems[ nwParam + 1 ]
+                    mii := (struct MENUITEMINFO)
+                    mii:cbSize := mii:SizeOf()
+                    mii:fMask  := MIIM_DATA
+                    _GetMenuItemInfo( nlParam, nwParam, .T., mii:Value )
+                    mii:Devalue()
+                    IF mii:dwItemData != NIL .AND. mii:dwItemData <> 0
+                       oItem := ArrayFromPointer( mii:dwItemData )
                     ENDIF
                   CATCH
                  END
-              ENDIF
-           ENDIF
-           IF oItem != NIL
-              TRY
-                 oItem:Menu:ItemID := oItem:id
-              CATCH
-              END
-              IF HGetPos( oItem:EventHandler, "OnClick" ) != 0
-                 IF oItem:ClsName == "MenuStripItem" .AND. oItem:Role == 2
-                    oItem:Checked := ! oItem:Checked
+                 IF oItem == NIL
+                    TRY
+                       IF ( oMenu := ::Application:oCurMenu:GetMenuByHandle( nlParam ) ) != NIL
+                          oItem := oMenu:aItems[ nwParam + 1 ]
+                       ENDIF
+                     CATCH
+                    END
                  ENDIF
-
-                 oForm := oItem:Form
-                 IF ::ClsName == "CCTL"
-                    oForm := Self
-                 ENDIF
-                 nRet := oForm:&( oItem:EventHandler[ "OnClick" ] )( oItem )
-               ELSEIF oItem:ClsName == "MenuStripItem" .AND. VALTYPE( oItem:Action ) == "B"
-                 EVAL( oItem:Action, oItem )
-               ELSE
-                 ODEFAULT nRet TO __Evaluate( oItem:Action, oItem,,, nRet )
-                 oItem:OnClick( oItem )
               ENDIF
-              oItem:Cancel()
-           ENDIF
-           oItem := NIL
-           EXIT
+              IF oItem != NIL
+                 TRY
+                    oItem:Menu:ItemID := oItem:id
+                 CATCH
+                 END
+                 IF HGetPos( oItem:EventHandler, "OnClick" ) != 0
+                    IF oItem:ClsName == "MenuStripItem" .AND. oItem:Role == 2
+                       oItem:Checked := ! oItem:Checked
+                    ENDIF
 
-      CASE WM_NEXTMENU
-           nRet := ExecuteEvent( "OnNextMenu", Self )
-           //nm := (struct MDINEXTMENU*) nlParam
-           //nRet := ::OnNextMenu( nwParam, nlParam, nm )
-           EXIT
+                    oForm := oItem:Form
+                    IF ::ClsName == "CCTL"
+                       oForm := Self
+                    ENDIF
+                    nRet := oForm:&( oItem:EventHandler[ "OnClick" ] )( oItem )
+                  ELSEIF oItem:ClsName == "MenuStripItem" .AND. VALTYPE( oItem:Action ) == "B"
+                    EVAL( oItem:Action, oItem )
+                  ELSE
+                    ODEFAULT nRet TO __Evaluate( oItem:Action, oItem,,, nRet )
+                    oItem:OnClick( oItem )
+                 ENDIF
+                 oItem:Cancel()
+              ENDIF
+              oItem := NIL
+              EXIT
 
-      CASE WM_ENTERMENULOOP
-           nRet := ExecuteEvent( "OnEnterMenuLoop", Self )
-           ODEFAULT nRet TO ::OnEnterMenuLoop( nwParam, nlParam )
-           EXIT
+         CASE WM_NEXTMENU
+              nRet := ExecuteEvent( "OnNextMenu", Self )
+              //nm := (struct MDINEXTMENU*) nlParam
+              //nRet := ::OnNextMenu( nwParam, nlParam, nm )
+              EXIT
 
-      CASE WM_EXITMENULOOP
-           nRet := ExecuteEvent( "OnExitMenuLoop", Self )
-           ODEFAULT nRet TO ::OnExitMenuLoop( nwParam, nlParam )
-           EXIT
+         CASE WM_ENTERMENULOOP
+              nRet := ExecuteEvent( "OnEnterMenuLoop", Self )
+              ODEFAULT nRet TO ::OnEnterMenuLoop( nwParam, nlParam )
+              EXIT
 
-      CASE WM_UNINITMENUPOPUP
-           nRet := ExecuteEvent( "OnUnInitMenuPopup", Self )
-           EXIT
+         CASE WM_EXITMENULOOP
+              nRet := ExecuteEvent( "OnExitMenuLoop", Self )
+              ODEFAULT nRet TO ::OnExitMenuLoop( nwParam, nlParam )
+              EXIT
 
-      CASE WM_MENUCHAR
-           nRet := ExecuteEvent( "OnMenuChar", Self )
-           ODEFAULT nRet TO ::OnMenuChar( nwParam, nlParam )
-           EXIT
+         CASE WM_UNINITMENUPOPUP
+              nRet := ExecuteEvent( "OnUnInitMenuPopup", Self )
+              EXIT
 
-      CASE WM_PASTE
-           nRet := ExecuteEvent( "OnPaste", Self )
-           ODEFAULT nRet TO ::OnPaste( nwParam, nlParam )
-           ODEFAULT nRet TO __Evaluate( ::OnWMPaste, Self, nwParam, nlParam, nRet )
-           EXIT
+         CASE WM_MENUCHAR
+              nRet := ExecuteEvent( "OnMenuChar", Self )
+              ODEFAULT nRet TO ::OnMenuChar( nwParam, nlParam )
+              EXIT
 
-      CASE WM_COPY
-           nRet := ExecuteEvent( "OnCopy", Self )
-           ODEFAULT nRet TO ::OnCopy( nwParam, nlParam )
-           EXIT
+         CASE WM_PASTE
+              nRet := ExecuteEvent( "OnPaste", Self )
+              ODEFAULT nRet TO ::OnPaste( nwParam, nlParam )
+              ODEFAULT nRet TO __Evaluate( ::OnWMPaste, Self, nwParam, nlParam, nRet )
+              EXIT
 
-      CASE WM_CUT
-           nRet := ExecuteEvent( "OnCut", Self )
-           ODEFAULT nRet TO ::OnCut( nwParam, nlParam )
-           EXIT
+         CASE WM_COPY
+              nRet := ExecuteEvent( "OnCopy", Self )
+              ODEFAULT nRet TO ::OnCopy( nwParam, nlParam )
+              EXIT
 
-      CASE WM_CLEAR
-           nRet := ExecuteEvent( "OnClear", Self )
-           ODEFAULT nRet TO ::OnClear( nwParam, nlParam )
-           EXIT
+         CASE WM_CUT
+              nRet := ExecuteEvent( "OnCut", Self )
+              ODEFAULT nRet TO ::OnCut( nwParam, nlParam )
+              EXIT
 
-      CASE WM_UNDO
-           nRet := ExecuteEvent( "OnUndo", Self )
-           ODEFAULT nRet TO ::OnUndo( nwParam, nlParam )
-           EXIT
+         CASE WM_CLEAR
+              nRet := ExecuteEvent( "OnClear", Self )
+              ODEFAULT nRet TO ::OnClear( nwParam, nlParam )
+              EXIT
 
-      CASE WM_MDICHILDSIZED
-           lShow := ::GetWindowLong( GWL_STYLE ) & WS_MAXIMIZE != 0
-           ::Parent:Children[nwParam]:UpdateMenu( lShow )
-           RETURN 1
+         CASE WM_UNDO
+              nRet := ExecuteEvent( "OnUndo", Self )
+              ODEFAULT nRet TO ::OnUndo( nwParam, nlParam )
+              EXIT
 
-      DEFAULT
-           IF nMsg >= WM_USER
-              IF nMsg == WM_USER + 3025
-                 ::ShowMode := ::__GetShowMode()
-               ELSEIF LOWORD( nlParam ) == WM_RBUTTONDOWN
-                 FOR EACH oObj IN ::Components
-                     IF oObj:__xCtrlName == "NotifyIcon"
-                        IF oObj:ContextMenu != NIL
-                           pt := (struct POINT)
-                           GetCursorPos( @pt )
-                           oObj:ContextMenu:Show( pt:x , pt:y )
+         CASE WM_MDICHILDSIZED
+              lShow := ::GetWindowLong( GWL_STYLE ) & WS_MAXIMIZE != 0
+              ::Parent:Children[nwParam]:UpdateMenu( lShow )
+              RETURN 1
+
+         DEFAULT
+              IF nMsg >= WM_USER
+                 IF nMsg == WM_USER + 3025
+                    ::ShowMode := ::__GetShowMode()
+                  ELSEIF LOWORD( nlParam ) == WM_RBUTTONDOWN
+                    FOR EACH oObj IN ::Components
+                        IF oObj:__xCtrlName == "NotifyIcon"
+                           IF oObj:ContextMenu != NIL
+                              pt := (struct POINT)
+                              GetCursorPos( @pt )
+                              oObj:ContextMenu:Show( pt:x , pt:y )
+                           ENDIF
+                           nRet := ExecuteEvent( "OnRButtonDown", oObj )
+                           EXIT
                         ENDIF
-                        nRet := ExecuteEvent( "OnRButtonDown", oObj )
-                        EXIT
-                     ENDIF
-                 NEXT
-               ELSEIF LOWORD( nlParam ) == WM_LBUTTONDOWN
-                 FOR EACH oObj IN ::Components
-                     IF oObj:__xCtrlName == "NotifyIcon"
-                        nRet := ExecuteEvent( "OnLButtonDown", oObj )
-                        EXIT
-                     ENDIF
-                 NEXT
-               ELSEIF LOWORD( nlParam ) == WM_LBUTTONUP
-                 FOR EACH oObj IN ::Components
-                     IF oObj:__xCtrlName == "NotifyIcon"
-                        nRet := ExecuteEvent( "OnLButtonUp", oObj )
-                        EXIT
-                     ENDIF
-                 NEXT
-               ELSEIF LOWORD( nlParam ) == WM_RBUTTONUP
-                 FOR EACH oObj IN ::Components
-                     IF oObj:__xCtrlName == "NotifyIcon"
-                        nRet := ExecuteEvent( "OnRButtonUp", oObj )
-                        EXIT
-                     ENDIF
-                 NEXT
+                    NEXT
+                  ELSEIF LOWORD( nlParam ) == WM_LBUTTONDOWN
+                    FOR EACH oObj IN ::Components
+                        IF oObj:__xCtrlName == "NotifyIcon"
+                           nRet := ExecuteEvent( "OnLButtonDown", oObj )
+                           EXIT
+                        ENDIF
+                    NEXT
+                  ELSEIF LOWORD( nlParam ) == WM_LBUTTONUP
+                    FOR EACH oObj IN ::Components
+                        IF oObj:__xCtrlName == "NotifyIcon"
+                           nRet := ExecuteEvent( "OnLButtonUp", oObj )
+                           EXIT
+                        ENDIF
+                    NEXT
+                  ELSEIF LOWORD( nlParam ) == WM_RBUTTONUP
+                    FOR EACH oObj IN ::Components
+                        IF oObj:__xCtrlName == "NotifyIcon"
+                           nRet := ExecuteEvent( "OnRButtonUp", oObj )
+                           EXIT
+                        ENDIF
+                    NEXT
+                  ELSE
+                    nRet := ExecuteEvent( "OnUserMsg", Self )
+                    ODEFAULT nRet TO  ::OnUserMsg( hWnd, nMsg, nwParam, nlParam)
+                 ENDIF
                ELSE
-                 nRet := ExecuteEvent( "OnUserMsg", Self )
-                 ODEFAULT nRet TO  ::OnUserMsg( hWnd, nMsg, nwParam, nlParam)
+                 nRet := ExecuteEvent( "OnMessage", Self )
+                 ODEFAULT nRet TO ::OnMessage( nMsg, nwParam, nlParam)
               ENDIF
-            ELSE
-              nRet := ExecuteEvent( "OnMessage", Self )
-              ODEFAULT nRet TO ::OnMessage( nMsg, nwParam, nlParam)
-           ENDIF
-           EXIT
-   END
+              EXIT
+      END
+   ENDIF
    IF VALTYPE( nRet ) == "O"
       nRet := NIL
    ENDIF

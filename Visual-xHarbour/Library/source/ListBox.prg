@@ -476,8 +476,14 @@ METHOD OnParentCommand( nId, nCode, nlParam ) CLASS ListBox
 RETURN nRet
 
 //----------------------------------------------------------------------------------------------------------------
-METHOD OnMouseMove( nwParam, x, y ) CLASS ListBox
-   LOCAL aRect := _GetClientRect( ::hWnd )
+METHOD OnMouseMove( nwParam, nlParam ) CLASS ListBox
+   LOCAL x, y, aRect := _GetClientRect( ::hWnd )
+
+   ::Super:OnMouseMove( nwParam, nlParam )
+
+   x := LOWORD( nlParam )
+   y := HIWORD( nlParam )
+
    IF _PtInRect( aRect, {x,y} )
       ::__ListboxMouseMove( nwParam, {x,y} )
    ENDIF

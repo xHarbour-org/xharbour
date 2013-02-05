@@ -137,11 +137,13 @@ RETURN SELF
 
 //----------------------------------------------------------------------------------------------------
 
-METHOD OnMouseMove() CLASS CoolBar
+METHOD OnMouseMove( nwParam, nlParam ) CLASS CoolBar
    LOCAL rc, oTool, nBand, pt
    IF ::hWnd != GetCapture() .OR. ::hwndBand == NIL
       RETURN NIL
    ENDIF
+
+   ::Super:OnMouseMove( nwParam, nlParam )
 
    GetWindowRect( ::hWnd, @rc )
    GetCursorPos( @pt )

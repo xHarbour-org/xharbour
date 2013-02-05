@@ -465,12 +465,13 @@ METHOD __OnParentSize( x, y, hDef ) CLASS TabControl
 RETURN hDef
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnMouseMove(nwParam,x,y) CLASS TabControl
+METHOD OnMouseMove( nwParam, nlParam ) CLASS TabControl
    LOCAL aItem
    static nHot := 0
-   (nwParam)
-   
-   IF ( ::__nHot := ::HitTest( x, y ) ) > 0
+
+   ::Super:OnMouseMove( nwParam, nlParam )
+
+   IF ( ::__nHot := ::HitTest( LOWORD( nlParam ), HIWORD( nlParam ) ) ) > 0
       IF ::__lMouseDown .AND. ::CurSel <> ::__nHot
          ::aTabs[ ::CurSel ]:Position := ::__nHot
          ::CurSel := ::__nHot
@@ -1720,8 +1721,8 @@ CLASS TabCloseButton INHERIT Button
    METHOD SetImageIndex()       INLINE Self
    METHOD DrawClose()
    METHOD OnEraseBkGnd()        INLINE 1
-   METHOD OnMouseMove(n,x,y)    INLINE ::Super:OnMouseHover(n,x,y),;
-                                       ::ClosePushed:= n == MK_LBUTTON,;
+   METHOD OnMouseMove(w,l)      INLINE ::Super:OnMouseHover(w,l),;
+                                       ::ClosePushed:= w == MK_LBUTTON,;
                                        ::CloseHover := .T.,;
                                        ::InvalidateRect(, .F. ),;
                                        NIL
@@ -1797,8 +1798,8 @@ CLASS TabPinButton INHERIT Button
    METHOD SetImageIndex()       INLINE Self
    METHOD DrawPin()
    METHOD OnEraseBkGnd()        INLINE 1
-   METHOD OnMouseMove(n,x,y)    INLINE ::Super:OnMouseHover(n,x,y),;
-                                       ::ClosePushed:= n == MK_LBUTTON,;
+   METHOD OnMouseMove(w,l)      INLINE ::Super:OnMouseHover(w,l),;
+                                       ::ClosePushed:= w == MK_LBUTTON,;
                                        ::CloseHover := .T.,;
                                        ::InvalidateRect(, .F. ),;
                                        NIL

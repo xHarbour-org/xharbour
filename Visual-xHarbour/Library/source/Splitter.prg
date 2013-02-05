@@ -173,12 +173,11 @@ RETURN NIL
 
 //----------------------------------------------------------------------------------------------------------------
 
-METHOD SplitOn( x, y, lDirect )
+METHOD SplitOn( x, y )
    LOCAL pt, nOwnerTop, nOwnerHeight, n
    (x,y)
-   DEFAULT lDirect TO .F.
 
-   IF ::lDown .OR. lDirect
+   IF ::lDown
       pt := (struct POINT)
 
       GetCursorPos( @pt )
@@ -246,11 +245,16 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------------------
 
-METHOD OnMouseMove( nwParam, x, y, lDirect ) CLASS Splitter
-   LOCAL pt, nPos, pt2, rc
-   (nwParam)
+METHOD OnMouseMove( nwParam, nlParam ) CLASS Splitter
+   LOCAL pt, nPos, pt2, rc, x, y
+
+   ::Super:OnMouseMove( nwParam, nlParam )
+
+   x := LOWORD( nlParam )
+   y := HIWORD( nlParam )
+
    IF ::ShowDragging
-      ::SplitOn( x, y, lDirect )
+      ::SplitOn( x, y )
       RETURN 0
     ELSEIF ::lDown
 
