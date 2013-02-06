@@ -110,8 +110,11 @@
           [; IF <vN> == nil ; <vN> := <xN> ; END]
 
 static aMessages := {;
-                    { WM_DROPFILES, "OnDropFiles" },;
-                    { WM_MOUSEMOVE, "OnMouseMove" };
+                    { WM_DROPFILES,    "OnDropFiles"    },;
+                    { WM_MOUSEMOVE,    "OnMouseMove"    },;
+                    { WM_NCMOUSEMOVE,  "OnNCMouseMove"  },;
+                    { WM_NCMOUSELEAVE, "OnNCMouseLeave" },;
+                    { WM_NCMOUSEHOVER, "OnNCMouseHover" };
                     }
 
 //-----------------------------------------------------------------------------------------------
@@ -533,7 +536,6 @@ CLASS Window INHERIT Object
    METHOD OnMenuSelect()        VIRTUAL
    METHOD OnMove()              VIRTUAL
    METHOD OnMoving()            VIRTUAL
-   METHOD OnNcMouseMove()       VIRTUAL
    METHOD OnRButtonDown()       VIRTUAL
    METHOD OnRButtonUp()         VIRTUAL
    METHOD OnSetFocus()          VIRTUAL
@@ -575,8 +577,6 @@ CLASS Window INHERIT Object
    METHOD OnCancelMode()        VIRTUAL
    METHOD OnMouseHover()        VIRTUAL
    METHOD OnMouseleave()        VIRTUAL
-   METHOD OnNCMouseHover()      VIRTUAL
-   METHOD OnNCMouseleave()      VIRTUAL
    METHOD OnNCLButtonUp()       VIRTUAL
    METHOD OnNCLButtonDown()     VIRTUAL
    METHOD OnNCLButtonDblClk()   VIRTUAL
@@ -644,6 +644,9 @@ CLASS Window INHERIT Object
 
    METHOD OnDropFiles()
    METHOD OnMouseMove()
+   METHOD OnNcMouseMove()
+   METHOD OnNCMouseHover()
+   METHOD OnNCMouseLeave()
 
 ENDCLASS
 
@@ -1538,7 +1541,7 @@ METHOD OnDropFiles( nwParam, nlParam ) CLASS Window
        DragQueryFile( nwParam, n, @cFile, MAX_PATH )
        AADD( ::FilesDroped, cFile )
    NEXT
-RETURN ExecuteEvent( "OnDropFiles", Self )
+RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnMouseMove( nwParam, nlParam ) CLASS Window
@@ -1553,8 +1556,28 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS Window
       ODEFAULT nRet TO ::OnMouseHover( nwParam, nlParam )
       ::TrackMouseEvent( TME_LEAVE )
    ENDIF
-   nRet := ExecuteEvent( "OnMouseMove", Self )
 RETURN nRet
+
+//-----------------------------------------------------------------------------------------------
+METHOD OnNCMouseMove() CLASS Window
+   IF !::__lNCMouseHover
+      ::__lNCMouseHover := .T.
+      ::TrackMouseEvent( TME_NONCLIENT | TME_LEAVE | TME_HOVER )
+   ENDIF
+RETURN NIL
+
+//-----------------------------------------------------------------------------------------------
+METHOD OnNCMouseHover() CLASS Window
+   ::TrackMouseEvent( TME_NONCLIENT | TME_LEAVE )
+   ::__lNCMouseHover := .T.
+RETURN NIL
+
+//-----------------------------------------------------------------------------------------------
+METHOD OnNCMouseLeave() CLASS Window
+   ::TrackMouseEvent( TME_NONCLIENT | TME_HOVER )
+   ::__lNCMouseHover := .F.
+RETURN NIL
+
 
 //-----------------------------------------------------------------------------------------------
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
@@ -1583,32 +1606,10 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    
    IF ( nMess := aScan( aMessages, {|a| a[1] == nMsg} ) ) > 0
       nRet := hb_ExecFromArray( Self, aMessages[ nMess ][2], {nwParam, nlParam} )
+      ExecuteEvent( aMessages[ nMess ][2], Self )
    ELSE
       SWITCH nMsg
          CASE WM_UPDATEUISTATE
-              EXIT
-
-         CASE WM_NCMOUSEMOVE
-              IF !::__lNCMouseHover
-                 ::__lNCMouseHover := .T.
-                 ::TrackMouseEvent( TME_NONCLIENT | TME_LEAVE | TME_HOVER )
-              ENDIF
-              nRet := ExecuteEvent( "OnNcMouseMove", Self )
-              ODEFAULT nRet TO ::OnNcMouseMove( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
-              EXIT
-
-         CASE WM_NCMOUSELEAVE
-              ::TrackMouseEvent( TME_NONCLIENT | TME_HOVER )
-              ::__lNCMouseHover := .F.
-              nRet := ExecuteEvent( "OnNCMouseLeave", Self )
-              ODEFAULT nRet TO ::OnNCMouseleave( nwParam, LoWord(nlParam), Hiword(nlparam) )
-              EXIT
-
-         CASE WM_NCMOUSEHOVER
-              ::TrackMouseEvent( TME_NONCLIENT | TME_LEAVE )
-              ::__lNCMouseHover := .T.
-              nRet := ExecuteEvent( "OnNCMouseHover", Self )
-              ODEFAULT nRet TO ::OnNCMouseHover( nwParam, LoWord(nlParam), Hiword(nlparam) )
               EXIT
 
          CASE WM_SETCURSOR

@@ -323,7 +323,8 @@ RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 
-METHOD OnNCMouseleave() CLASS Control
+METHOD OnNCMouseLeave() CLASS Control
+   ::Super:OnNCMouseLeave()
    IF !EMPTY( ::xText ) .AND. ::xSmallCaption .AND. ::AllowClose
       ::CloseHover  := .F.
       ::PinHover    := .F.
@@ -340,8 +341,8 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS Control
    IF ::Super:OnNCPaint( nwParam, nlParam ) == NIL .AND. !EMPTY( ::xText ) .AND. ::xSmallCaption
       ::CaptionWidth := ::xWidth
 
-      hRegion := CreateRectRgn( 0, 0, ::Width, ::Height )
-      hdc := GetDCEx( ::hWnd, hRegion, DCX_WINDOW + DCX_PARENTCLIP + DCX_CLIPSIBLINGS + DCX_VALIDATE )
+      //hRegion := CreateRectRgn( 0, 0, ::Width, ::Height )
+      hdc := GetWindowDC( ::hWnd ) //GetDCEx( ::hWnd, hRegion, DCX_WINDOW | DCX_PARENTCLIP | DCX_CLIPSIBLINGS | DCX_VALIDATE )
 
       IF ::ExStyle & WS_EX_CLIENTEDGE == WS_EX_CLIENTEDGE
          n += 2
@@ -387,7 +388,7 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS Control
       ENDIF
       SelectObject( hDC, hOldFont )
       ReleaseDC(::hWnd, hdc)
-      DeleteObject( hRegion )
+      //DeleteObject( hRegion )
    ENDIF
 
    IF ::FlatBorder

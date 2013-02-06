@@ -253,10 +253,13 @@ METHOD OnLButtonUp() CLASS ColManager
    ::nMove := -1
 RETURN NIL
 
-METHOD OnMouseMove( nwParam, x, y ) CLASS ColManager
-   LOCAL nSel, cText
-   ( nwParam )
-   ( x )
+METHOD OnMouseMove( nwParam, nlParam ) CLASS ColManager
+   LOCAL nSel, cText, y
+
+   ::Super:OnMouseMove( nwParam, nlParam )
+
+   y := HIWORD(nlParam)
+
    IF ::nMove != -1
 
       IF ::Cursor == NIL .OR. ::Cursor == ::System:Cursor:Arrow

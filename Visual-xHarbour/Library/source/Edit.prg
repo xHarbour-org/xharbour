@@ -578,6 +578,7 @@ RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 METHOD OnNCMouseMove() CLASS EditBox
+   ::Super:OnNCMouseMove()
    IF ::xLayout > 1 .AND. ::__BkCursor == NIL
       IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
          ::__BkCursor := ::__hCursor

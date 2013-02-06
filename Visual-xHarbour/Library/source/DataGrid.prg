@@ -79,7 +79,10 @@ CLASS DataGrid INHERIT Control
    DATA ConvertOem              PUBLISHED INIT .F.
    DATA HighlightBorderColor    PUBLISHED
    DATA HighlightColor          PUBLISHED
+   DATA HoverBorderColor        PUBLISHED
    DATA HighlightTextColor      PUBLISHED
+   DATA HoverBackColor          PUBLISHED
+   DATA HoverForeColor          PUBLISHED
    DATA Columns                 PUBLISHED
    DATA AllowDragRecords        PUBLISHED INIT .F.
    DATA ExtVertScrollBar        PUBLISHED INIT .F.
@@ -129,6 +132,7 @@ CLASS DataGrid INHERIT Control
    DATA __bRecNo                PROTECTED
    DATA __LinePen               PROTECTED
    DATA __SelBorderPen          PROTECTED
+   DATA __HoverBorderPen        PROTECTED
    DATA __DataHeight            PROTECTED
    DATA __DataWidth             PROTECTED INIT 0
    DATA __VertScrolled          PROTECTED INIT 1
@@ -173,6 +177,7 @@ CLASS DataGrid INHERIT Control
    DATA __aPixels               PROTECTED
    DATA __aRect                 PROTECTED
    DATA __cSearch               PROTECTED INIT ""
+   DATA __aLastHover            PROTECTED INIT {0,0}
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -258,6 +263,8 @@ CLASS DataGrid INHERIT Control
    METHOD OnItemChanged()
    METHOD OnEraseBkGnd()
    METHOD OnHeaderClick()
+   METHOD OnMouseLeave()   INLINE ::Super:OnMouseLeave(), IIF( ::HoverBackColor != NIL .AND. ::__aLastHover[1] > 0, (::__DisplayData( ::__aLastHover[1], , ::__aLastHover[1] ),::__aLastHover[1] := 0 ), )
+
    METHOD __DrawRepresentation()
    METHOD OnMouseMove()
    METHOD GetPosition()
@@ -331,6 +338,9 @@ METHOD Create() CLASS DataGrid
    ::__LinePen      := CreatePen( PS_SOLID, 0, ::GridColor )
    IF ::HighlightBorderColor != NIL
       ::__SelBorderPen := CreatePen( PS_SOLID, 0, ::HighlightBorderColor )
+   ENDIF
+   IF ::HoverBorderColor != NIL
+      ::__HoverBorderPen := CreatePen( PS_SOLID, 0, ::HoverBorderColor )
    ENDIF
    
    ::__hDragBrush   := CreateSolidBrush( DarkenColor( ::BackColor, 10 ) )
@@ -422,6 +432,11 @@ METHOD OnMouseWheel( nwParam, nlParam ) CLASS DataGrid
    ENDIF
    
    IF nLines > 0
+      IF ::__aLastHover[1] > 0
+         ::__DisplayData( ::__aLastHover[1], , ::__aLastHover[1] )
+         ::__aLastHover := {0,0}
+      ENDIF
+
       nDelta  := GETWHEELDELTA( nwParam )
       nScroll := WM_VSCROLL
       nPage   := IIF( ::__nVPage != NIL, ::__nVPage, ::ClientHeight )
@@ -451,6 +466,7 @@ METHOD OnMouseWheel( nwParam, nlParam ) CLASS DataGrid
             ENDIF
          ENDIF
       ENDIF
+      ::OnMouseMove( 0, MAKELPARAM(pt:x,pt:y) )
    ENDIF
 RETURN 0
 
@@ -465,7 +481,7 @@ METHOD CreateDragImage(y) CLASS DataGrid
 RETURN hImageList
 
 METHOD OnMouseMove( wParam, lParam ) CLASS DataGrid
-   LOCAL n, nWidth, nDrag, nTop, nDragPos, nDragRec, x, y
+   LOCAL n, nRow, nCol, nWidth, nDrag, nTop, nDragPos, nDragRec, x, y
 
    ::Super:OnMouseMove( wParam, lParam )
 
@@ -478,7 +494,12 @@ METHOD OnMouseMove( wParam, lParam ) CLASS DataGrid
 
    IF ::ShowHeaders 
       IF !::__lSizeMouseDown .AND. !::__lMoveMouseDown
-         IF ( n := Ceiling( (y-::__GetHeaderHeight() ) / ::ItemHeight ) ) <= 0
+         IF ( nRow := Int( Ceiling( (y-::__GetHeaderHeight() ) / ::ItemHeight ) ) ) <= 0
+            IF ::HoverBackColor != NIL .AND. ::__aLastHover[1] > 0
+               ::__DisplayData( ::__aLastHover[1], , ::__aLastHover[1] )
+               ::__aLastHover[1] := 0
+            ENDIF
+            
             nWidth := 0
             FOR n := 1 TO LEN( ::Children )
                 nWidth += ::Children[n]:Width
@@ -545,6 +566,18 @@ METHOD OnMouseMove( wParam, lParam ) CLASS DataGrid
                ENDIF
 
                ImageListDragMove( 0, nTop )
+
+            ELSEIF wParam != MK_LBUTTON .AND. ::HoverBackColor != NIL
+
+               nCol := ::ColFromPos(x)
+               IF ::__aLastHover[1] <> nRow .OR. ( ! ::FullRowSelect .AND. ::__aLastHover[2] <> nCol )
+                  IF ::__aLastHover[1] > 0
+                     ::__DisplayData( ::__aLastHover[1], IIF( ! ::FullRowSelect, ::__aLastHover[2],), ::__aLastHover[1], IIF( ! ::FullRowSelect, ::__aLastHover[2],) )
+                  ENDIF
+                  ::__DisplayData( nRow, IIF( ! ::FullRowSelect, nCol,), nRow, IIF( ! ::FullRowSelect, nCol,),, .T. )
+                  ::__aLastHover[1] := nRow
+                  ::__aLastHover[2] := nCol
+               ENDIF
             ENDIF
             ::Cursor := ::__hPrevCursor
          ENDIF
@@ -1774,7 +1807,7 @@ METHOD OnPaint( hDC, hMemDC ) CLASS DataGrid
 RETURN 0
 
 //----------------------------------------------------------------------------------
-METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
+METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataGrid
    LOCAL n, i, cData, x, y, nY, nRec, nRecno, lHide, aText, lSelected, nHScroll, iRight, iLeft, zLeft
    LOCAL nLeft, nTop, nRight, nBottom, hOldFont, hOldPen, nWImg, nHImg, nInd, nAlign, aAlign, aGrid, lFreeze, nHeaderRight
    LOCAL nBkCol, nTxCol, xLeft, nStatus, lDeleted, nPos, iAlign
@@ -1794,6 +1827,8 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
       nRecno := 0
    ENDIF
    DEFAULT hMemDC TO ::Drawing:hDC
+   DEFAULT lHover TO .F.
+
    hOldFont := SelectObject( hMemDC, ::Font:Handle )
    hOldPen  := SelectObject( hMemDC, ::__LinePen )
 
@@ -1894,13 +1929,13 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                  nAlign := ::__DisplayArray[nPos][1][i][ 4]
                  nHImg  := ::__DisplayArray[nPos][1][i][ 5]
 
-                 nBkCol := ::__DisplayArray[nPos][1][i][ 7]
+                 nBkCol := IIF( lHover, ::HoverBackColor, ::__DisplayArray[nPos][1][i][ 7] )
 
                  IF ::Striping .AND. ( nRecPos / 2 ) > Int( nRecPos / 2 )
                     nBkCol := DarkenColor( nBkCol, 25 )
                  ENDIF
+                 nTxCol   := IIF( lHover .AND. ::HoverForeColor != NIL, ::HoverForeColor, ::__DisplayArray[nPos][1][i][ 8] )
 
-                 nTxCol   := ::__DisplayArray[nPos][1][i][ 8]
                  nStatus  := ::__DisplayArray[nPos][1][i][10]
                  nRep     := ::__DisplayArray[nPos][1][i][11]
                  hOldFont := SelectObject( hMemDC, ::__DisplayArray[nPos][1][i][12] )
@@ -2180,19 +2215,20 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
                     lBorder := ::ShowSelectionBorder .AND. ( lHighLight .OR. ( !::ShowSelection .AND. nRec == nRecno .AND. ( i == ::ColPos .OR. ::FullRowSelect ) ) )
                  ENDIF
 
-                 IF !::FullRowSelect .AND. lBorder .AND. nRep <> 4
-                    IF ::__SelBorderPen != NIL
-                       hPen := SelectObject( hMemDC, ::__SelBorderPen )
+                 IF !::FullRowSelect .AND. ( lBorder .OR. ( lHover .AND. ::__HoverBorderPen != NIL ) ) .AND. nRep <> 4
+                    IF lHover .OR. ::__SelBorderPen != NIL
+                       hPen := SelectObject( hMemDC, IIF( lHover .AND. ! lBorder, ::__HoverBorderPen, ::__SelBorderPen ) )
                        hBrush  := SelectObject( hMemDC, GetStockObject( NULL_BRUSH ) )
                        Rectangle( hMemDC, aText[1], aText[2], aText[3], aText[4] )
                        SelectObject( hMemDC, hBrush )
                        SelectObject( hMemDC, hPen )
+
                      ELSE
                        _DrawFocusRect( hMemDC, aText )
                     ENDIF
                  ENDIF
 
-                 nLeft  += ::Children[i]:Width
+                 nLeft += ::Children[i]:Width
                  IF lFreeze .AND. i <= ::FreezeColumn
                     iLeft  += ::Children[i]:Width
                  ENDIF
@@ -2284,16 +2320,16 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC ) CLASS DataGrid
 
        ENDIF
 
-       IF ::FullRowSelect .AND. nLine == nFocRow
+       IF ::FullRowSelect .AND. ( nLine == nFocRow .OR. lHover )
           TRY
              nLeft   := nHScroll + ::__DisplayArray[::RowPos][1][nCol][6]
-             nTop    := ::__GetHeaderHeight() + ( ( nFocRow-1 ) * ::ItemHeight ) + IIF( ::xShowGrid, 0, 1 )
+             nTop    := ::__GetHeaderHeight() + ( ( nLine-1 ) * ::ItemHeight ) + IIF( ::xShowGrid, 0, 1 )
              nBottom := nTop + ::ItemHeight - 1
 
-             IF ::ShowSelectionBorder
-                IF ::__SelBorderPen != NIL
-                   hPen := SelectObject( hMemDC, ::__SelBorderPen )
-                   hBrush  := SelectObject( hMemDC, GetStockObject( NULL_BRUSH ) )
+             IF ::ShowSelectionBorder .OR. lHover
+                IF ::__SelBorderPen != NIL .OR. ( lHover .AND. ::__HoverBorderPen != NIL )
+                   hPen := SelectObject( hMemDC, IIF( lHover .AND. nLine <> nFocRow, ::__HoverBorderPen, ::__SelBorderPen ) )
+                   hBrush := SelectObject( hMemDC, GetStockObject( NULL_BRUSH ) )
                    Rectangle( hMemDC, nLeft, nTop-IIF(::xShowGrid,0,1), nRight-IIF( ::xShowGrid, 1, 0 ), nBottom )
                    SelectObject( hMemDC, hBrush )
                    SelectObject( hMemDC, hPen )
@@ -3391,6 +3427,9 @@ METHOD OnNCDestroy() CLASS DataGrid
    ENDIF
    IF ::__SelBorderPen != NIL
       DeleteObject( ::__SelBorderPen )
+   ENDIF
+   IF ::__HoverBorderPen != NIL
+      DeleteObject( ::__HoverBorderPen )
    ENDIF
    
    DeleteObject( ::__hDragBrush )

@@ -1341,6 +1341,7 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OnNCMouseMove() CLASS ToolStrip
+   ::Super:OnNCMouseMove()
    IF ::Row == 0 .AND. ::__lOnCaption
       ::SendMessage( WM_SYSCOMMAND, SC_MOVE + 2 )
    ENDIF

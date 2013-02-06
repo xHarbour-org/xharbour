@@ -2675,10 +2675,15 @@ STATIC FUNCTION CheckChar( o, n, oItem )
 RETURN NIL
 //------------------------------------------------------------------------------------------
 
-METHOD OnMouseMove( nwParam, x, y ) CLASS ObjManager
-   LOCAL oItem, rc, pt, aAlign, nfHeight, nPlus := 0
+METHOD OnMouseMove( nwParam, nlParam ) CLASS ObjManager
+   LOCAL x, y, oItem, rc, pt, aAlign, nfHeight, nPlus := 0
    static cText
-   ( nwParam )
+
+   ::Super:OnMouseMove( nwParam, nlParam )
+
+   x := LOWORD(nlParam)
+   y := HIWORD(nlParam)
+
    IF ( oItem := ::HitTest( x, y ) ) != NIL
       TRY
          nfHeight := ABS( ::Font:Height )
@@ -3480,7 +3485,10 @@ __aProps["H"] := { { "HasStrings",              "Style" },;
                    { "HorzScrollSize",          "Behavior" },;
                    { "HorzScroll",              "Behavior" },;
                    { "HighlightColor",          "Colors" },;
-                   { "HighlightBorderColor",         "Colors" },;
+                   { "HighlightBorderColor",    "Colors" },;
+                   { "HoverBorderColor",        "Colors" },;
+                   { "HoverBackColor",          "Colors" },;
+                   { "HoverForeColor",          "Colors" },;
                    { "HighlightTextColor",      "Colors" },;
                    { "Height",                  "Size" },;
                    { "HeaderBackColor",         "Header" },;
