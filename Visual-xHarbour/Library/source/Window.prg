@@ -18,7 +18,7 @@
 #include "uxTheme.ch"
 #include "dbinfo.ch"
 
-#define __PARENTDOCKING__
+//#define __PARENTDOCKING__
 
 #define CTYPE_BOOL                 9
 #define PP_MOVEOVERLAY 8
@@ -1413,6 +1413,11 @@ METHOD SetParent( oParent ) CLASS Window
       IF ( n := ASCAN( ::Parent:Children, {|o|o:hWnd==::hWnd} ) ) > 0
          ADEL( ::Parent:Children, n, .T. )
       ENDIF
+   ENDIF
+   n := ASCAN( ::Parent:__aDock, {|o| o == Self} )
+   IF n > 0
+      ADEL( ::Parent:__aDock, n, .T. )
+      AADD( oParent:__aDock, Self )
    ENDIF
    ::Parent := oParent
    AADD( oParent:Children, Self )
