@@ -541,14 +541,15 @@ METHOD Redock() CLASS Control
 
       ::BackInfo := NIL
 
-      hDef := BeginDeferWindowPos( LEN( ::Parent:Children ) )
-      FOR EACH oControl IN ::Parent:Children
-          IF oControl:hWnd != ::hWnd
+      IF ! Empty( ::Parent:__aDock )
+         hDef := BeginDeferWindowPos( LEN( ::Parent:__aDock ) )
+         FOR EACH oControl IN ::Parent:__aDock
              oControl:__OnParentSize( ::Parent:ClientWidth, ::Parent:ClientHeight, @hDef )
              oControl:InvalidateRect()//, .F. )
-          ENDIF
-      NEXT
-      EndDeferWindowPos( hDef )
+         NEXT
+         EndDeferWindowPos( hDef )
+      ENDIF
+
       ::__DockParent := NIL
 
       TRY
@@ -632,16 +633,18 @@ METHOD Undock() CLASS Control
       ::__DockParent:Show()
       ::__DockParent:OnWMClose   := {|| IIF( ::IsDocked, 0, ::Redock() ) }
 
-      hDef := BeginDeferWindowPos( LEN( ::Parent:Children ) )
-      FOR EACH oChild IN ::Parent:Children
-          IF oChild:hWnd != ::hWnd .AND. oChild:Dock != NIL .AND. ( oChild:Dock:Left   != NIL .OR.;
-                                                                    oChild:Dock:Top    != NIL .OR.;
-                                                                    oChild:Dock:Right  != NIL .OR.;
-                                                                    oChild:Dock:Bottom != NIL )
-             oChild:__OnParentSize( ::Parent:Width, ::Parent:Height,hDef )
-          ENDIF
-      NEXT
-      EndDeferWindowPos( hDef )
+      IF ! Empty( ::Parent:__aDock )
+         hDef := BeginDeferWindowPos( LEN( ::Parent:__aDock ) )
+         FOR EACH oChild IN ::Parent:__aDock
+             IF oChild:hWnd != ::hWnd .AND. oChild:Dock != NIL .AND. ( oChild:Dock:Left   != NIL .OR.;
+                                                                       oChild:Dock:Top    != NIL .OR.;
+                                                                       oChild:Dock:Right  != NIL .OR.;
+                                                                       oChild:Dock:Bottom != NIL )
+                oChild:__OnParentSize( ::Parent:Width, ::Parent:Height,hDef )
+             ENDIF
+         NEXT
+         EndDeferWindowPos( hDef )
+      ENDIF
       ExecuteEvent( "OnUndock", Self )
    ENDIF
   

@@ -18,6 +18,8 @@
 #include "uxTheme.ch"
 #include "dbinfo.ch"
 
+#define __PARENTDOCKING__
+
 #define CTYPE_BOOL                 9
 #define PP_MOVEOVERLAY 8
 #define HKEY_CLASSES_ROOT            (0x80000000)
@@ -385,6 +387,8 @@ CLASS Window INHERIT Object
    DATA __ArrayPointer         PROTECTED
    DATA __lSubClass            EXPORTED  INIT .T.
    DATA __aHotKey              PROTECTED INIT {}
+   DATA __aDock                EXPORTED  INIT {}
+
    ACCESS AppInstance          INLINE IIF( ::Form:DllInstance != NIL, ::Form:DllInstance, ::Application:Instance )
 
 
@@ -505,6 +509,8 @@ CLASS Window INHERIT Object
                                          ::DockIt()
 
    METHOD HandleEvent( cEvent )   INLINE ExecuteEvent( cEvent, Self )
+
+   METHOD RegisterDocking()
 
    METHOD OnParentSize()        VIRTUAL
    METHOD OnNCDestroy()         VIRTUAL
@@ -936,6 +942,8 @@ METHOD Create( oParent ) CLASS Window
       RETURN NIL
    ENDIF
 
+   ::RegisterDocking()
+
    ::__lOnPaint   := __ClsMsgAssigned( Self, "OnPaint" ) .OR. HGetPos( ::EventHandler, "OnPaint" ) != 0
    ::__lOnWindowPaint := __ClsMsgAssigned( Self, "OnWindowPaint" ) .OR. HGetPos( ::EventHandler, "OnWindowPaint" ) != 0
    IF VALTYPE( oParent ) == "N"
@@ -1200,6 +1208,40 @@ METHOD Destroy() CLASS Window
    ENDIF
 RETURN Self
 
+METHOD RegisterDocking() CLASS Window
+#ifdef __PARENTDOCKING__
+   LOCAL lDock := VALTYPE( ::Dock ) == "O" .AND. ( ::Dock:Left != NIL .OR.;
+                                                   ::Dock:Top != NIL .OR.;
+                                                   ::Dock:Right != NIL .OR.;
+                                                   ::Dock:Bottom != NIL )
+
+   IF ::Parent != NIL .AND. ( lDock .OR. __ClsMsgAssigned( Self, "__OnParentSize" ) )
+      IF ASCAN( ::Parent:__aDock, {|o| o == Self} ) == 0
+         AADD( ::Parent:__aDock, Self )
+      ENDIF
+   ENDIF
+#else
+   IF ::Parent != NIL .AND. __ClsMsgAssigned( Self, "__OnParentSize" )
+      IF ASCAN( ::Parent:__aDock, {|o| o == Self} ) == 0
+         AADD( ::Parent:__aDock, Self )
+      ENDIF
+    ELSEIF ::Dock != NIL
+      IF ::Dock:Left != NIL .AND. ASCAN( ::Dock:Left:__aDock, {|o| o == Self} ) == 0
+         AADD( ::Dock:Left:__aDock, Self )
+      ENDIF
+      IF ::Dock:Top != NIL .AND. ASCAN( ::Dock:Top:__aDock, {|o| o == Self} ) == 0
+         AADD( ::Dock:Top:__aDock, Self )
+      ENDIF
+      IF ::Dock:Right != NIL .AND. ASCAN( ::Dock:Right:__aDock, {|o| o == Self} ) == 0
+         AADD( ::Dock:Right:__aDock, Self )
+      ENDIF
+      IF ::Dock:Bottom != NIL .AND. ASCAN( ::Dock:Bottom:__aDock, {|o| o == Self} ) == 0
+         AADD( ::Dock:Bottom:__aDock, Self )
+      ENDIF
+   ENDIF
+#endif
+RETURN Self
+
 METHOD SetTabOrder( nTabOrder ) CLASS Window
    LOCAL n, hAfter
    IF nTabOrder > 0 .AND. nTabOrder != ::xTabOrder
@@ -1251,7 +1293,7 @@ METHOD __SubClass() CLASS Window
       ::__pCallBackPtr := WinCallBackPointer( HB_ObjMsgPtr( Self, ::__WndProc ), Self )
       ::__nProc := SetWindowLong( ::hWnd, GWL_WNDPROC, ::__pCallBackPtr )
 
-      //::__nProc := VXH_SubClass( ::hWnd, HB_FuncPtr( ::ClassName+"_"+::__WndProc ) )
+      //::__nProc := VXH_SubClass( ::hWnd, HB_ObjMsgPtr( Self, ::__WndProc ) )
    ENDIF
 RETURN Self
 
@@ -1789,13 +1831,13 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               ENDIF
 
               IF ::ClsName != "DataGrid"
-                 aChildren := IIF( ::__DockChildren != NIL, ::__DockChildren, ::Children )
+                 aChildren := IIF( ::__DockChildren != NIL, ::__DockChildren, ::__aDock )
                  IF ! Empty( aChildren )
                     hDef := BeginDeferWindowPos( LEN( aChildren ) )
                     FOR EACH oChild IN aChildren
                         IF VALTYPE( oChild ) == "O"
                            oChild:__OnParentSize( x, y, @hDef, ,, ::__aCltRect[3], ::__aCltRect[4] )
-                           IF oChild:__IsControl .AND. oChild:Anchor:Center
+                           IF oChild:__IsControl .AND. oChild:Anchor != NIL .AND. oChild:Anchor:Center
                               oChild:CenterWindow()
                            ENDIF
                         ENDIF
@@ -5170,8 +5212,8 @@ METHOD OnSize() CLASS WinForm
    IF ::BackgroundImage != NIL .AND. !EMPTY( ::BackgroundImage:ImageName )
       ::CallWindowProc()
       ::InvalidateRect()
-      ::RedrawWindow( , , RDW_UPDATENOW )
-      AEVAL( ::Children, {|o| o:InvalidateRect()} )
+      ::RedrawWindow( , , RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
+      //AEVAL( ::Children, {|o| o:InvalidateRect()} )
       RETURN 0
    ENDIF
 RETURN Self
@@ -5181,9 +5223,9 @@ METHOD OnSysCommand( nwParam ) CLASS WinForm
    IF nwParam IN {SC_MAXIMIZE,SC_MAXIMIZE2,SC_RESTORE,SC_RESTORE2}
       ::CallWindowProc()
 
-      hDef := BeginDeferWindowPos( LEN( ::Children ) )
-      FOR EACH oChild IN ::Children
-          IF oChild != NIL .AND. oChild:hWnd != ::hWnd
+      hDef := BeginDeferWindowPos( LEN( ::__aDock ) )
+      FOR EACH oChild IN ::__aDock
+          IF oChild != NIL //.AND. oChild:hWnd != ::hWnd
              oChild:__OnParentSize( ::ClientWidth, ::ClientHeight, @hDef )
              oChild:InvalidateRect(, .F. )
           ENDIF

@@ -145,8 +145,8 @@ METHOD Create() CLASS Splitter
    Super:Create()
    ::Dock := NIL
 
-   FOR n := 1 TO LEN( ::Parent:Children )
-       ::Parent:Children[n]:__OnParentSize( ::Parent:ClientWidth, ::Parent:ClientHeight,, .T. )
+   FOR n := 1 TO LEN( ::Parent:__aDock )
+       ::Parent:__aDock[n]:__OnParentSize( ::Parent:ClientWidth, ::Parent:ClientHeight,, .T. )
    NEXT
 RETURN Self
 
@@ -173,11 +173,12 @@ RETURN NIL
 
 //----------------------------------------------------------------------------------------------------------------
 
-METHOD SplitOn( x, y )
+METHOD SplitOn( x, y, lDirect )
    LOCAL pt, nOwnerTop, nOwnerHeight, n
    (x,y)
+   DEFAULT lDirect TO .F.
 
-   IF ::lDown
+   IF ::lDown .OR. lDirect
       pt := (struct POINT)
 
       GetCursorPos( @pt )

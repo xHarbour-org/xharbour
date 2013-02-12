@@ -310,8 +310,8 @@ METHOD UpdateSize() CLASS CoolBar
    IF ::Repaint
       ::xHeight:= ::GetHeight()
 
-      hDef := BeginDeferWindowPos( LEN( ::Parent:Children )-1 )
-      FOR EACH oChild IN ::Parent:Children
+      hDef := BeginDeferWindowPos( LEN( ::Parent:__aDock ) )
+      FOR EACH oChild IN ::Parent:__aDock //:Children
          IF oChild:hWnd != ::hWnd
             oChild:__OnParentSize( ::Parent:ClientWidth, ::Parent:ClientHeight, @hDef )
             oChild:InvalidateRect()

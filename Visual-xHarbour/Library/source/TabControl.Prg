@@ -1404,6 +1404,8 @@ METHOD Create() CLASS TabPage
       ::Super:Create()
       AADD( ::Parent:aTabs, Self )
 
+      ::RegisterDocking()
+
       IF ::__ClassInst == NIL
          SetParent( ::hWnd, ::Parent:Parent:hWnd )
          IF !EMPTY( cText ) .AND. ( n := AT( "&", cText ) ) > 0

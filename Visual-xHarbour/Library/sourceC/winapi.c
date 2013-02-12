@@ -10451,7 +10451,6 @@ HB_FUNC( ROUNDRECT )
 
 LRESULT CALLBACK MainProcFunction( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-   long int lReturn = 0;
    HB_SYMB *pMainDynSym = (HB_SYMB *) GetProp( hWnd, TEXT("DYNSYM") );
    if ( pMainDynSym )
    {
@@ -10462,14 +10461,18 @@ LRESULT CALLBACK MainProcFunction( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
       hb_vmPushLong( (long) wParam );
       hb_vmPushLong( (long) lParam );
       hb_vmDo( 4 );
-      lReturn = hb_parnl( -1 );
+      return hb_parnl( -1 );
    }
-   return lReturn;
+   return DefWindowProc( hWnd, uMsg, wParam, lParam );
+}
+
+HB_FUNC( VXH_CALLBACK )
+{
+   hb_retnl( (long) MainProcFunction );
 }
 
 HB_FUNC( VXH_SUBCLASS )
 {
-   //PHB_ITEM pSelf = hb_param( 2, HB_IT_ANY );
    SetProp( hb_parnl(1), TEXT("DYNSYM"), (LONG) hb_parnl(2) );
    hb_retnl( SetWindowLong( hb_parnl(1), GWL_WNDPROC, MainProcFunction ) );
 }
