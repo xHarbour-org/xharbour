@@ -365,7 +365,7 @@ METHOD Create() CLASS DataGrid
 
    ::AutoUpdate := ::__nUpdtTimer
    ::__lCreated := .T.
-   IF !EMPTY( ::Caption )
+   IF !EMPTY( ::xText )
       ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
    ENDIF
    ::__UpdateHScrollBar()
@@ -633,7 +633,7 @@ METHOD OnMouseMove( wParam, lParam ) CLASS DataGrid
          ENDIF
          IF ::__SelCol > 0
             n := x - ::__SelLeft - ::Children[::__SelCol]:Width + 1
-            ImageListDragMove( n, IIF( !EMPTY( ::Caption ) .AND. ::SmallCaption, ::CaptionHeight, 0 )+1 )
+            ImageListDragMove( n, IIF( !EMPTY( ::xText ) .AND. ::SmallCaption, ::CaptionHeight, 0 )+1 )
          ENDIF
       ENDIF
    ENDIF
@@ -1341,7 +1341,7 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
                ::__lMoveMouseDown := .T.
                ::__hDragImageList := ::Children[ nClickCol ]:CreateDragImage( ::__SelWidth - ::Children[nClickCol]:Width )
                ImageListBeginDrag( ::__hDragImageList, 0, 0, 0 )
-               ImageListDragEnter( ::hWnd, ::__SelWidth-::Children[nClickCol]:Width+1, IIF( !EMPTY( ::Caption ) .AND. ::SmallCaption, ::CaptionHeight, 0 )+1 )
+               ImageListDragEnter( ::hWnd, ::__SelWidth-::Children[nClickCol]:Width+1, IIF( !EMPTY( ::xText ) .AND. ::SmallCaption, ::CaptionHeight, 0 )+1 )
             ENDIF
 
          ENDIF
@@ -2043,8 +2043,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
                     aText[3] += iRight - zLeft
                  ENDIF
                  IF nLine == 1 .AND. ::ShowHeaders
-                    aAlign := _GetTextExtentPoint32( hMemDC, ::Children[i]:Caption )
-
+                    aAlign := _GetTextExtentPoint32( hMemDC, IIF( Empty( ::Children[i]:xText ), "X", ::Children[i]:xText ) )
                     iAlign := ::Children[i]:HeaderAlignment
                     IF iAlign == 0
                        iAlign := nAlign
@@ -2290,7 +2289,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
                  ENDIF
 
                  IF nLine == 1 .AND. ::ShowHeaders
-                    aAlign := _GetTextExtentPoint32( hMemDC, ::Children[i]:Caption )
+                    aAlign := _GetTextExtentPoint32( hMemDC, ::Children[i]:xText )
 
                     nAlign := ::Children[i]:HeaderAlignment
                     IF nAlign == 0
@@ -3734,14 +3733,14 @@ METHOD AutoAddColumns( lEdit ) CLASS DataGrid
       FOR EACH aField IN ::DataSource:Structure
 
           oCol := GridColumn( Self )
-          oCol:xCaption  := __Proper( aField[1] )
+          oCol:xText  := __Proper( aField[1] )
 
           oCol:Data      := "hb_QSelf():DataSource:Fields:" + aField[1]
 
           oCol:AllowSize := .T.
           oCol:AllowDrag := .T.
           oCol:Create()
-          oCol:Width    := MAX( aField[3], LEN(oCol:Caption)+2 )*7
+          oCol:Width    := MAX( aField[3], LEN(oCol:xText)+2 )*7
 
           DO CASE
              CASE aField[2]=="C"
@@ -3755,7 +3754,7 @@ METHOD AutoAddColumns( lEdit ) CLASS DataGrid
                   ENDIF
                   oCol:Alignment := 3
              CASE aField[2]=="L"
-                  oCol:Width := MAX( 6, LEN(oCol:Caption)+2 )*7
+                  oCol:Width := MAX( 6, LEN(oCol:xText)+2 )*7
                   oCol:Alignment := 3
              CASE aField[2]=="N"
                   IF lEdit
@@ -3852,7 +3851,7 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
             CASE nAlign == 3
                  ::__CurControl:SetStyle( ES_CENTER )
          ENDCASE
-         ::__CurControl:Caption := XSTR( xValue )
+         ::__CurControl:xText := XSTR( xValue )
          ::__CurControl:Create()
 
          DEFAULT ::__CurControl:OnWMKeyDown   TO {|o,n| IIF( n==27, (o:Destroy(),o:Parent:DataSource:UnLock(),0), IIF( n IN {13,9}, (o:Parent:__ControlSaveData(,n),o:Destroy(),o:Parent:DataSource:UnLock()), NIL ) )}
@@ -3907,11 +3906,11 @@ METHOD __ControlSaveData( lFocus, nKey ) CLASS DataGrid
     ELSEIF ::__CurControl:__xCtrlName == "Edit" .OR. ::__CurControl:__xCtrlName == "EditBox"
       IF ::Children[::ColPos]:ControlValid == NIL
          IF ::Children[::ColPos]:OnSave != NIL
-            lRefresh := EVAL( ::Children[::ColPos]:OnSave, ::Children[::ColPos], Self, ::__CurControl:Caption, lFocus, nKey )
+            lRefresh := EVAL( ::Children[::ColPos]:OnSave, ::Children[::ColPos], Self, ::__CurControl:Text, lFocus, nKey )
          ENDIF
          IF HGetPos( ::Children[::ColPos]:EventHandler, "OnSave" ) != 0
             oCtrl := ::Children[::ColPos]
-            lRefresh := oCtrl:Form:&( oCtrl:EventHandler[ "OnSave" ] )( ::__CurControl, Self, ::__CurControl:Caption, lFocus, nKey )
+            lRefresh := oCtrl:Form:&( oCtrl:EventHandler[ "OnSave" ] )( ::__CurControl, Self, ::__CurControl:Text, lFocus, nKey )
          ENDIF
       ENDIF
    ENDIF
@@ -4155,7 +4154,7 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    IF ::Parent:GradientHeader
       hOldFont := SelectObject( hDC, ::HeaderFont:Handle )
 
-      aAlign := _GetTextExtentPoint32( hDC, ::xText )
+      aAlign := _GetTextExtentPoint32( hDC, IIF( Empty( ::xText ), "X", ::xText ) )
       y := (::Parent:__GetHeaderHeight() - aAlign[2] ) / 2
 
       ::__aVertex[1]:x := aRect[1]-1
@@ -4209,7 +4208,7 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
 
       hOldFont := SelectObject( hDC, ::HeaderFont:Handle )
 
-      aAlign := _GetTextExtentPoint32( hDC, ::Caption )
+      aAlign := _GetTextExtentPoint32( hDC, IIF( Empty( ::xText ), "X", ::xText ) )
       y := (::Parent:__GetHeaderHeight() - aAlign[2] ) / 2
 
       hOldBrush := SelectObject( hDC, CreateSolidBrush( nBackColor ) )
@@ -4457,7 +4456,7 @@ METHOD Create() CLASS GridColumn
 
    ::xPosition := LEN( ::Parent:Children )
    ::hWnd := Seconds()
-   DEFAULT ::xWidth TO 10 * LEN( ::Caption )
+   DEFAULT ::xWidth TO 10 * LEN( ::xText )
    ::Parent:__UpdateHScrollBar()
 
    TRY
