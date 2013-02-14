@@ -121,10 +121,10 @@ METHOD Create() CLASS HeaderStrip
 RETURN Self
 
 //---------------------------------------------------------------------------------------------------
-METHOD OnSize( x, y ) CLASS HeaderStrip
-   Super:OnSize( x, y )
-   IF LEN( ::Children ) > 0 .AND. ::Children[1]:Height != y
-      AEVAL( ::Children, {|o| o:Height := y} )
+METHOD OnSize( nwParam, nlParam ) CLASS HeaderStrip
+   Super:OnSize( nwParam, nlParam )
+   IF LEN( ::Children ) > 0 .AND. ::Children[1]:Height != HIWORD(nlParam)
+      AEVAL( ::Children, {|o| o:Height := HIWORD(nlParam)} )
    ENDIF
 RETURN NIL
 

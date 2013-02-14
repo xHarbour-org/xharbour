@@ -2265,8 +2265,8 @@ RETURN NIL
 CLASS StartTabPage INHERIT TabPage
    METHOD OnEraseBkGnd()
    METHOD OnPaint()
-   METHOD OnSize()  INLINE ::InvalidateRect(), NIL
-   METHOD Create()  INLINE ::Super:Create(), ::__lOnPaint := .F., Self
+   METHOD OnSize(w,l)  INLINE ::Super:OnSize( w, l ), ::InvalidateRect(), NIL
+   METHOD Create()  INLINE    ::Super:Create(), ::__lOnPaint := .F., Self
    //METHOD __OnParentSize( x, y, hDef ) INLINE ::Super:__OnParentSize( x, y, @hDef ), ::InvalidateRect(), NIL
 ENDCLASS
 
@@ -2312,7 +2312,7 @@ CLASS StartPagePanel INHERIT Panel
    DATA nPanel INIT 0
    METHOD OnEraseBkGnd()
    METHOD OnPaint()
-   METHOD OnSize()  INLINE ::InvalidateRect(,.F.), NIL
+   METHOD OnSize(w,l)  INLINE Super:OnSize( w, l ), ::InvalidateRect(,.F.), NIL
    METHOD Create()  INLINE ::Super:Create(), ::__lOnPaint := .F., Self
 ENDCLASS
 
@@ -2513,7 +2513,7 @@ RETURN oApp:Project:CurrentForm
 
 CLASS XHDN_Page INHERIT TabPage
    DATA ActiveX
-   METHOD OnSize() INLINE IIF( ::ActiveX != NIL, (::ActiveX:Left   := 2,;
+   METHOD OnSize(w,l) INLINE Super:OnSize( w, l ), IIF( ::ActiveX != NIL, (::ActiveX:Left   := 2,;
                                                   ::ActiveX:Top    := 2,;
                                                   ::ActiveX:Width  := ::ClientWidth - 4,;
                                                   ::ActiveX:Height := ::ClientHeight - 4 ),), 0

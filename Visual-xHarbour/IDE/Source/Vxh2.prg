@@ -109,9 +109,9 @@ CLASS WindowEdit INHERIT WinForm
    METHOD OnDestroy()            INLINE ::CloseThemeData()
 ENDCLASS
 
-METHOD OnSize() CLASS WindowEdit
+METHOD OnSize( nwParam, nlParam ) CLASS WindowEdit
   ::Parent:RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW + RDW_NOCHILDREN + RDW_NOERASE )
-  Super:OnSize()
+  Super:OnSize( nwParam, nlParam )
 RETURN 0
 
 METHOD OnMove() CLASS WindowEdit

@@ -114,7 +114,7 @@ CLASS ListView INHERIT Control
    //METHOD OnLVNGetDispInfo() VIRTUAL
    METHOD SetDataSource()
    METHOD GetVirtualValue()
-   METHOD OnSize() INLINE ::InvalidateRect(), NIL
+   METHOD OnSize(w,l)      INLINE Super:OnSize( w, l ), ::InvalidateRect(), NIL
    METHOD AutoAddColumns() INLINE Self
    METHOD SortItems()
    METHOD SetBackColor()

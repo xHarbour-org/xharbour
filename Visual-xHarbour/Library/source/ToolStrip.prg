@@ -113,8 +113,8 @@ METHOD Create() CLASS ToolStripContainer
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD OnSize( n, x, y ) CLASS ToolStripContainer
-   Super:OnSize( n, x, y )
+METHOD OnSize( nwParam, nlParam ) CLASS ToolStripContainer
+   Super:OnSize( nwParam, nlParam )
    ::__SetVertex()
    ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
    AEVAL( ::Children, {|o| o:InvalidateRect(, .F. ) } )
@@ -1154,9 +1154,9 @@ RETURN NIL
 
 
 //-------------------------------------------------------------------------------------------------------
-METHOD OnSize( n, x, y ) CLASS ToolStrip
-   (n, y)
-   ::__PrevSize := x
+METHOD OnSize( nwParam, nlParam ) CLASS ToolStrip
+   Super:OnSize( nwParam, nlParam )
+   ::__PrevSize := LOWORD(nlParam)
    IF ::Row > 0 .AND. ::__PrevRow == 0 
       ::__SetVertex()
       ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )

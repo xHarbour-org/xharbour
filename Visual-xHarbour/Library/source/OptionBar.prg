@@ -162,9 +162,8 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------------
 
-METHOD OnSize( n, x, y ) CLASS OptionBar
-   ::Super:OnSize( n, x, y )
-
+METHOD OnSize( nwParam, nlParam ) CLASS OptionBar
+   ::Super:OnSize( nwParam, nlParam )
    IF ::__ToolBar != NIL
       ::__ToolBar:SendMessage( TB_SETBUTTONWIDTH, 0, MAKELONG( ::ClientWidth, ::ClientWidth ) )
       TRY

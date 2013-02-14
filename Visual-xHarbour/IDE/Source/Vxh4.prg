@@ -138,7 +138,8 @@ METHOD Create() CLASS ObjManager
 RETURN Self
 
 //---------------------------------------------------------------------------------------------------
-METHOD OnSize() CLASS ObjManager
+METHOD OnSize( nwParam, nlParam ) CLASS ObjManager
+   Super:OnSize( nwParam, nlParam )
    ::Columns[1][1] := Int(::ClientWidth/2)-11
    ::Columns[2][1] := Int(::ClientWidth/2)-7
    ::InvalidateRect(,.f.)

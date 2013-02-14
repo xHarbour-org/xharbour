@@ -134,7 +134,7 @@ CLASS ExplorerBar INHERIT Control
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD OnPaint()
-   METHOD OnSize(n,x,y)    INLINE Super:OnSize(n,x,y), ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT ), NIL
+   METHOD OnSize(n,l)      INLINE Super:OnSize(n,l), ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT ), NIL
    METHOD OnVertScroll()   INLINE ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT ), AEVAL( ::Children, {|o| o:Redraw() } ), NIL
    METHOD OnEraseBkGnd()   INLINE 1
    METHOD OnThemeChanged()
@@ -398,8 +398,9 @@ METHOD Expand( lExpand, lForce ) CLASS Expando
    ENDIF
 RETURN 0
 
-METHOD OnSize() CLASS Expando
+METHOD OnSize( nwParam, nlParam ) CLASS Expando
    LOCAL n
+   Super:OnSize( nwParam, nlParam )
    ::InvalidateRect()
    IF ::__ClassInst != NIL .AND. ::__lSave
       ::__nHeight := ::Height

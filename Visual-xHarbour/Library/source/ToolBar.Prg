@@ -10,7 +10,7 @@
 //  This source file is an intellectual property of xHarbour.com Inc.                                   *
 //  You may NOT forward or share this file under any conditions!                                        *
 //------------------------------------------------------------------------------------------------------*
-static aMonitors
+//static aMonitors
 static s_oItem
 static s_nMenu
 
@@ -1485,8 +1485,9 @@ RETURN hDef
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD OnSize() CLASS ToolBar
+METHOD OnSize( nwParam, nlParam ) CLASS ToolBar
    LOCAL n, tbbi
+   Super:OnSize( nwParam, nlParam )
 
    IF ::Parent:MdiContainer
       n := ::GetGapWidth()

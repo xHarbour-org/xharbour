@@ -43,7 +43,7 @@ CLASS Image INHERIT Label
                               { "Icon Files (*.ico)", "*.ico" };
                               }
 
-   METHOD OnSize()   INLINE ::InvalidateRect(,.F.), NIL
+   METHOD OnSize(w,l)   INLINE Super:OnSize(w,l), ::InvalidateRect(,.F.), NIL
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------

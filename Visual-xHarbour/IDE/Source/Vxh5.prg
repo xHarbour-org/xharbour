@@ -145,7 +145,7 @@ CLASS ComponentPanel INHERIT Panel
    METHOD Reset()
    METHOD Close()
    METHOD Refresh()
-   METHOD OnSize()        INLINE ::InvalidateRect(,.T.), NIL
+   METHOD OnSize( nwParam, nlParam ) INLINE Super:OnSize( nwParam, nlParam ), ::InvalidateRect(,.T.), NIL
    METHOD OnEraseBkGnd(h) INLINE _FillRect( h, {0,0,::ClientWidth,::ClientHeight}, ::System:CurrentScheme:Brush:ToolStripGradientBegin ), 1
 ENDCLASS
 

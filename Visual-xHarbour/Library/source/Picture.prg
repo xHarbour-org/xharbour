@@ -65,10 +65,10 @@ CLASS PictureBox INHERIT Panel
    METHOD OnPaint()
    METHOD SetImageName()
    METHOD SetBitmap( hBmp ) INLINE ::pPicture := PictureLoadBitmap( hBmp )
-   METHOD OnGetDlgCode() INLINE DLGC_WANTMESSAGE
-   METHOD OnEraseBkGnd() INLINE 1
-   METHOD OnSize() INLINE ::InvalidateRect(), 0
-   METHOD Update() INLINE IIF( ::hWnd != NIL, ::InvalidateRect(), )
+   METHOD OnGetDlgCode()    INLINE DLGC_WANTMESSAGE
+   METHOD OnEraseBkGnd()    INLINE 1
+   METHOD OnSize(w,l)       INLINE Super:OnSize( w, l ), ::InvalidateRect(), 0
+   METHOD Update()          INLINE IIF( ::hWnd != NIL, ::InvalidateRect(), )
    METHOD Destroy()
 ENDCLASS
 

@@ -211,8 +211,11 @@ RETURN Self
 
 //---------------------------------------------------------------------------------------------------
 
-METHOD OnSize( nwParam, x, y ) CLASS Control
-   IF ::Super:OnSize( nwParam, x, y ) == NIL
+METHOD OnSize( nwParam, nlParam ) CLASS Control
+   LOCAL x, y
+   IF ::Super:OnSize( nwParam, nlParam ) == NIL
+      x := LOWORD( nlParam )
+      y := HIWORD( nlParam )
       IF !EMPTY( ::xText ) .AND. ::Style & WS_CHILD == 0 .AND. ::xSmallCaption
          ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW )
       ENDIF

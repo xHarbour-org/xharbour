@@ -59,7 +59,7 @@ CLASS FormEditor INHERIT Control
    METHOD OnNCPaint()
    METHOD OnNCRButtonDown()
    METHOD OnNCHitTest()
-   METHOD OnSize()       INLINE ::UpdateScroll()
+   METHOD OnSize( nwParam, nlParam ) INLINE Super:OnSize( nwParam, nlParam ), ::UpdateScroll()
    METHOD OnVertScroll()
    METHOD OnHorzScroll(n) INLINE IIF( n == SB_THUMBPOSITION, IIF( ::CtrlMask:CurForm != NIL, ::CtrlMask:CurForm:UpdateSelection(),),),NIL
    METHOD ResetScroll()

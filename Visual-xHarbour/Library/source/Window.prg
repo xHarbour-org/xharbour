@@ -112,6 +112,7 @@
           [; IF <vN> == nil ; <vN> := <xN> ; END]
 
 static aMessages := {;
+                    { WM_SIZE,         "OnSize"         },;
                     { WM_DROPFILES,    "OnDropFiles"    },;
                     { WM_MOUSEMOVE,    "OnMouseMove"    },;
                     { WM_NCMOUSEMOVE,  "OnNCMouseMove"  },;
@@ -545,7 +546,6 @@ CLASS Window INHERIT Object
    METHOD OnRButtonDown()       VIRTUAL
    METHOD OnRButtonUp()         VIRTUAL
    METHOD OnSetFocus()          VIRTUAL
-   METHOD OnSize()              VIRTUAL
    METHOD OnSysCommand()        VIRTUAL
    METHOD OnTimer()             VIRTUAL
    METHOD OnCtlColorListBox()   VIRTUAL
@@ -653,6 +653,7 @@ CLASS Window INHERIT Object
    METHOD OnNcMouseMove()
    METHOD OnNCMouseHover()
    METHOD OnNCMouseLeave()
+   METHOD OnSize()
 
 ENDCLASS
 
@@ -1625,15 +1626,103 @@ METHOD OnNCMouseLeave() CLASS Window
    ::__lNCMouseHover := .F.
 RETURN NIL
 
+//-----------------------------------------------------------------------------------------------
+METHOD OnSize( nwParam, nlParam ) CLASS Window
+   LOCAL x, y, aChildren, hDef, oChild, cProp, n
+   ::__lReqBrush := .T.
+   IF EMPTY( ::__ClientRect )
+      RETURN 0
+   ENDIF
+   ::ClientWidth  := GETXPARAM( nlParam )
+   ::ClientHeight := GETYPARAM( nlParam )
+
+   x := MAX( ::xWidth,  ::OriginalRect[3] )
+   y := MAX( ::xHeight, ::OriginalRect[4] )
+
+   IF ::__hMemBitmap != NIL
+      DeleteObject( ::__hMemBitmap )
+      ::__hMemBitmap := CreateCompatibleBitmap( ::Drawing:hDC, ::ClientWidth, ::ClientHeight )
+   ENDIF
+
+   IF ::ClsName != "DataGrid"
+      aChildren := IIF( ::__DockChildren != NIL, ::__DockChildren, ::__aDock )
+      IF ! Empty( aChildren )
+         hDef := BeginDeferWindowPos( LEN( aChildren ) )
+         FOR EACH oChild IN aChildren
+             IF VALTYPE( oChild ) == "O"
+                oChild:__OnParentSize( x, y, @hDef, ,, ::__aCltRect[3], ::__aCltRect[4] )
+                IF oChild:__IsControl .AND. oChild:Anchor != NIL .AND. oChild:Anchor:Center
+                   oChild:CenterWindow()
+                ENDIF
+             ENDIF
+         NEXT
+         EndDeferWindowPos( hDef )
+      ENDIF
+      ::__ClientRect[3] := ::ClientWidth
+      ::__ClientRect[4] := ::ClientHeight
+      ::__aCltRect[3] := x
+      ::__aCltRect[4] := y
+   ENDIF
+
+   TRY
+      IF (nwParam == 0 .or. nwParam == 2) .AND. ::MDIContainer .AND. ::MDIClient != NIL .AND. ::MDIClient:hWnd != NIL
+         ::LeftMargin   := 0
+         ::TopMargin    := 0
+         ::RightMargin  := ::ClientWidth
+         ::BottomMargin := ::ClientHeight
+
+         IF ::__ClassInst == NIL
+            cProp := ::MDIClient:AlignLeft
+            IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( aChildren, {|o| o:Name == cProp } ) ) > 0
+               ::MDIClient:AlignLeft := aChildren[n]
+            ENDIF
+
+            cProp := ::MDIClient:AlignTop
+            IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( aChildren, {|o| o:Name == cProp } ) ) > 0
+               ::MDIClient:AlignTop := aChildren[n]
+            ENDIF
+
+            cProp := ::MDIClient:AlignRight
+            IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( aChildren, {|o| o:Name == cProp } ) ) > 0
+               ::MDIClient:AlignRight := aChildren[n]
+            ENDIF
+
+            cProp := ::MDIClient:AlignBottom
+            IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( aChildren, {|o| o:Name == cProp } ) ) > 0
+               ::MDIClient:AlignBottom := aChildren[n]
+            ENDIF
+         ENDIF
+
+         IF VALTYPE( ::MDIClient:AlignLeft ) == "O"
+            ::LeftMargin := ::MDIClient:AlignLeft:Left + ::MDIClient:AlignLeft:Width + IIF( ::MDIClient:AlignLeft:RightSplitter != NIL, ::MDIClient:AlignLeft:RightSplitter:Weight, 0 )
+         ENDIF
+         IF VALTYPE( ::MDIClient:AlignTop ) == "O"
+            ::TopMargin := ::MDIClient:AlignTop:Top + ::MDIClient:AlignTop:Height + IIF( ::MDIClient:AlignTop:BottomSplitter != NIL, ::MDIClient:AlignTop:BottomSplitter:Weight, 0 )
+         ENDIF
+         IF VALTYPE( ::MDIClient:AlignRight ) == "O"
+            ::RightMargin := ::MDIClient:AlignRight:Left - IIF( ::MDIClient:AlignRight:LeftSplitter != NIL, ::MDIClient:AlignRight:LeftSplitter:Weight, 0 )
+         ENDIF
+         IF VALTYPE( ::MDIClient:AlignBottom ) == "O"
+            ::BottomMargin := ::MDIClient:AlignBottom:Top - IIF( ::MDIClient:AlignBottom:TopSplitter != NIL, ::MDIClient:AlignBottom:TopSplitter:Weight, 0 )
+         ENDIF
+         MoveWindow( ::MDIClient:hWnd, ::LeftMargin,;
+                                       ::TopMargin,;
+                                       ::RightMargin - ::LeftMargin,;
+                                       ::BottomMargin - ::TopMargin, .T.)
+      ENDIF
+    CATCH
+   END
+   IF ( nwParam == SIZE_MAXIMIZED .OR. nwParam == SIZE_RESTORED ) .AND. ( ::HorzScroll .OR. ::VertScroll )
+      ::__SetScrollBars()
+   ENDIF
+RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    LOCAL nRet, nCode, nId, n, cBuffer, oObj
-   LOCAL oChild, oItem, x, y, hDef, nLeft, nTop, nWidth, nHeight, nLines, nDelta, nScroll, nPage
-   LOCAL lShow, hParent, pPtr, oCtrl, aRect, aPt, mii, cProp
-   LOCAL Band, msg, lHandled, aComp, oMenu, mmi, oForm, aChildren
-   LOCAL rc, pt, hwndFrom, idFrom, code, aParams
-   LOCAL nAnimation, nMess
+   LOCAL oChild, oItem, x, y, nLeft, nTop, nWidth, nHeight, nLines, nDelta, nScroll, nPage
+   LOCAL lShow, hParent, pPtr, oCtrl, aRect, aPt, mii, Band, msg, lHandled, aComp, oMenu, mmi, oForm
+   LOCAL rc, pt, hwndFrom, idFrom, code, aParams, nAnimation, nMess
    local aParent
    
    ::Msg    := nMsg
@@ -1817,99 +1906,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
          CASE WM_RBUTTONUP
               nRet := ExecuteEvent( "OnRButtonUp", Self )
               ODEFAULT nRet TO ::OnRButtonUp( nwParam, LoWord(nlParam), Hiword(nlparam) )
-              EXIT
-
-         CASE WM_SIZE
-              ::__lReqBrush := .T.
-              IF EMPTY( ::__ClientRect )
-                 RETURN 0
-              ENDIF
-              ::ClientWidth  := GETXPARAM( nlParam )
-              ::ClientHeight := GETYPARAM( nlParam )
-
-              x := MAX( ::xWidth,  ::OriginalRect[3] )
-              y := MAX( ::xHeight, ::OriginalRect[4] )
-
-              IF ::__hMemBitmap != NIL
-                 DeleteObject( ::__hMemBitmap )
-                 ::__hMemBitmap := CreateCompatibleBitmap( ::Drawing:hDC, ::ClientWidth, ::ClientHeight )
-              ENDIF
-
-              IF ::ClsName != "DataGrid"
-                 aChildren := IIF( ::__DockChildren != NIL, ::__DockChildren, ::__aDock )
-                 IF ! Empty( aChildren )
-                    hDef := BeginDeferWindowPos( LEN( aChildren ) )
-                    FOR EACH oChild IN aChildren
-                        IF VALTYPE( oChild ) == "O"
-                           oChild:__OnParentSize( x, y, @hDef, ,, ::__aCltRect[3], ::__aCltRect[4] )
-                           IF oChild:__IsControl .AND. oChild:Anchor != NIL .AND. oChild:Anchor:Center
-                              oChild:CenterWindow()
-                           ENDIF
-                        ENDIF
-                    NEXT
-                    EndDeferWindowPos( hDef )
-                 ENDIF
-                 ::__ClientRect[3] := ::ClientWidth
-                 ::__ClientRect[4] := ::ClientHeight
-                 ::__aCltRect[3] := x
-                 ::__aCltRect[4] := y
-              ENDIF
-
-              nRet := ExecuteEvent( "OnSize", Self )
-              ODEFAULT nRet TO ::OnSize( nwParam, ::ClientWidth, ::ClientHeight )
-              ODEFAULT nRet TO __Evaluate( ::OnWMSize, Self, nwParam, nlParam, nRet )
-
-              TRY
-                 IF (nwParam == 0 .or. nwParam == 2) .AND. ::MDIContainer .AND. ::MDIClient != NIL .AND. ::MDIClient:hWnd != NIL
-                    ::LeftMargin   := 0
-                    ::TopMargin    := 0
-                    ::RightMargin  := ::ClientWidth
-                    ::BottomMargin := ::ClientHeight
-
-                    IF ::__ClassInst == NIL
-                       cProp := ::MDIClient:AlignLeft
-                       IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( aChildren, {|o| o:Name == cProp } ) ) > 0
-                          ::MDIClient:AlignLeft := aChildren[n]
-                       ENDIF
-
-                       cProp := ::MDIClient:AlignTop
-                       IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( aChildren, {|o| o:Name == cProp } ) ) > 0
-                          ::MDIClient:AlignTop := aChildren[n]
-                       ENDIF
-
-                       cProp := ::MDIClient:AlignRight
-                       IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( aChildren, {|o| o:Name == cProp } ) ) > 0
-                          ::MDIClient:AlignRight := aChildren[n]
-                       ENDIF
-
-                       cProp := ::MDIClient:AlignBottom
-                       IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( aChildren, {|o| o:Name == cProp } ) ) > 0
-                          ::MDIClient:AlignBottom := aChildren[n]
-                       ENDIF
-                    ENDIF
-
-                    IF VALTYPE( ::MDIClient:AlignLeft ) == "O"
-                       ::LeftMargin := ::MDIClient:AlignLeft:Left + ::MDIClient:AlignLeft:Width + IIF( ::MDIClient:AlignLeft:RightSplitter != NIL, ::MDIClient:AlignLeft:RightSplitter:Weight, 0 )
-                    ENDIF
-                    IF VALTYPE( ::MDIClient:AlignTop ) == "O"
-                       ::TopMargin := ::MDIClient:AlignTop:Top + ::MDIClient:AlignTop:Height + IIF( ::MDIClient:AlignTop:BottomSplitter != NIL, ::MDIClient:AlignTop:BottomSplitter:Weight, 0 )
-                    ENDIF
-                    IF VALTYPE( ::MDIClient:AlignRight ) == "O"
-                       ::RightMargin := ::MDIClient:AlignRight:Left - IIF( ::MDIClient:AlignRight:LeftSplitter != NIL, ::MDIClient:AlignRight:LeftSplitter:Weight, 0 )
-                    ENDIF
-                    IF VALTYPE( ::MDIClient:AlignBottom ) == "O"
-                       ::BottomMargin := ::MDIClient:AlignBottom:Top - IIF( ::MDIClient:AlignBottom:TopSplitter != NIL, ::MDIClient:AlignBottom:TopSplitter:Weight, 0 )
-                    ENDIF
-                    MoveWindow( ::MDIClient:hWnd, ::LeftMargin,;
-                                                  ::TopMargin,;
-                                                  ::RightMargin - ::LeftMargin,;
-                                                  ::BottomMargin - ::TopMargin, .T.)
-                 ENDIF
-               CATCH
-              END
-              IF ( nwParam == SIZE_MAXIMIZED .OR. nwParam == SIZE_RESTORED ) .AND. ( ::HorzScroll .OR. ::VertScroll )
-                 ::__SetScrollBars()
-              ENDIF
               EXIT
 
          CASE WM_MOVING
@@ -5213,7 +5209,8 @@ METHOD Create( hoParent ) CLASS WinForm
    #endif
 RETURN Self
 
-METHOD OnSize() CLASS WinForm
+METHOD OnSize( nwParam, nlParam ) CLASS WinForm
+   Super:OnSize( nwParam, nlParam )
    IF ::BackgroundImage != NIL .AND. !EMPTY( ::BackgroundImage:ImageName )
       ::CallWindowProc()
       ::InvalidateRect()
