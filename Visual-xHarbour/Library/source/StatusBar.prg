@@ -133,7 +133,7 @@ METHOD __OnParentSize() CLASS StatusBar
    ::Left   := 0
    ::Top    := ::Parent:ClientHeight-::Height
    ::Width  := ::Parent:ClientWidth
-   ::SetWindowPos( , ::Left, ::Top, ::Width, ::Height, SWP_NOACTIVATE+SWP_NOOWNERZORDER+SWP_NOZORDER+SWP_DEFERERASE)
+   ::SetWindowPos( , ::Left, ::Top, ::Width, ::Height, SWP_NOACTIVATE|SWP_NOOWNERZORDER|SWP_NOZORDER|SWP_DEFERERASE)
    ::SetPanels( ::Parent:ClientWidth )
 RETURN( NIL )
 
@@ -214,6 +214,7 @@ METHOD SetPanels( nWidth ) CLASS StatusBar
    NEXT
 
    ::SendMessage( SB_SETPARTS, nLen, cSizes )
+   ::UpdateWindow()
 RETURN Self
 
 

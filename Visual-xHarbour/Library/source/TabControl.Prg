@@ -1538,7 +1538,7 @@ RETURN ::Super:OnCtlColorDlg( nwParam, nlParam )
 METHOD __OnParentSize( x, y, hDef ) CLASS TabPage
    LOCAL rc
    ::OnParentSize( x, y, hDef )
-   IF ::Index == NIL
+   IF ::Index == NIL .OR. ( ! ::IsWindowVisible() .AND. ::Index <> ::Parent:CurSel )
       RETURN NIL
    ENDIF
 

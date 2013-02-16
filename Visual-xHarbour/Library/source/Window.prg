@@ -1654,6 +1654,7 @@ METHOD OnSize( nwParam, nlParam ) CLASS Window
                 IF oChild:__IsControl .AND. oChild:Anchor != NIL .AND. oChild:Anchor:Center
                    oChild:CenterWindow()
                 ENDIF
+                oChild:UpdateWindow()
              ENDIF
          NEXT
          EndDeferWindowPos( hDef )
