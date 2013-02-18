@@ -8,6 +8,11 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-02-18 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed editor sync problem showing the highlighted row at the bottom
+     of the editor when switching between sources.
+   ! Fixed editor bug going to top of file when saving project.
+
 2013-01-24 00:00 UTC-0800 Augusto Infante <augusto.infante@xHarbour.com>
    + Optimized window processing speed.
    + Optimized window sizing speed

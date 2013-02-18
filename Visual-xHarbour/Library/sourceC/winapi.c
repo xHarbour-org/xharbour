@@ -10498,3 +10498,13 @@ HB_FUNC( VXH_CREATEDIALOGINDIRECT )
    }
 }
 */
+
+HB_FUNC( GETSCROLLPOS )
+{
+   hb_retni( GetScrollPos( (HWND) hb_parnl(1), hb_parni(2) ) );
+}
+
+HB_FUNC( SETSCROLLPOS )
+{
+   hb_retni( SetScrollPos( (HWND) hb_parnl(1), hb_parni(2), hb_parni(3), hb_parl(4) ) );
+}

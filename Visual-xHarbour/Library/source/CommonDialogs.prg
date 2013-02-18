@@ -689,6 +689,7 @@ CLASS ReplaceTextDialog INHERIT CommonDialogs
    METHOD __WndProc()
    METHOD ExecuteEvent()
    METHOD Close()    INLINE IIF( IsWindow( ::hDlg ), DestroyWindow( ::hDlg ), )
+   METHOD SetFocus() INLINE SetFocus( GetDlgItem( ::hDlg, 1152 ) )
 ENDCLASS
 
 METHOD Init( oOwner ) CLASS ReplaceTextDialog

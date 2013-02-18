@@ -731,7 +731,10 @@ METHOD OnFindNext( oFind ) CLASS SourceEditor
    ::nDirection := oFind:Direction
 
    ::Source:SetSearchFlags( ::GetSearchFlags( oFind ) )
-   ::FindNext( oFind:FindWhat, oFind:Direction == 0 )
+   IF ! ::FindNext( oFind:FindWhat, oFind:Direction == 0 )
+      ::MessageBox( "Cannot find literal text: " + oFind:FindWhat, "Visual xHarbour", MB_ICONEXCLAMATION )
+      oFind:SetFocus()
+   ENDIF
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -846,6 +849,7 @@ CLASS Source
    DATA Modified  EXPORTED INIT .F.
    DATA FirstOpen EXPORTED INIT .T.
    DATA SavedPos  EXPORTED INIT 0
+   DATA nVisLine  EXPORTED INIT 0
    DATA Extension EXPORTED INIT "prg"
    DATA lStyled   EXPORTED INIT .T.
    DATA cObj      EXPORTED INIT ""
@@ -873,9 +877,9 @@ CLASS Source
    METHOD Save()
    METHOD GetText()
 
-   METHOD SavePos()                           INLINE ::SavedPos := ::GetCurrentPos()
+   METHOD SavePos()                           INLINE ::SavedPos := ::GetCurrentPos(), ::nVisLine := ::Owner:SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
    METHOD ReleaseDocument()                   INLINE ::Owner:SendMessage( SCI_RELEASEDOCUMENT, 0, ::pSource )
-   METHOD Select()                            INLINE ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource ), ::Owner:xSource := Self, ::GotoPosition( ::SavedPos )
+   METHOD Select()                            INLINE ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource ), ::Owner:xSource := Self, ::GotoPosition( ::SavedPos ), ::Owner:SendMessage( SCI_SETFIRSTVISIBLELINE, ::nVisLine, 0 )
    METHOD CreateDocument()                    INLINE ::Owner:SendMessage( SCI_CREATEDOCUMENT, 0, 0 )
 
    METHOD GotoPosition( nPos )                INLINE ::SendEditor( SCI_GOTOPOS, nPos, 0 )
@@ -996,16 +1000,13 @@ RETURN xReturn
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Init( oOwner, cFile ) CLASS Source
-   LOCAL n
    ::Owner   := oOwner
    ::pSource := ::CreateDocument()
    
-   IF cFile != NIL
-      n := RAT( "\", cFile )
-      ::FileName := SUBSTR( cFile, n+1 )
-      ::Path     := SUBSTR( cFile, 1, n-1 )
-      ::File     := cFile
+   IF cFile != NIL .AND. File( cFile )
+      ::Open( cFile )
    ENDIF
+
    AADD( ::Owner:aDocs, Self )
    ::Select()
    ::SetUseTabs(0)
@@ -1079,7 +1080,8 @@ METHOD Save( cFile ) CLASS Source
    ENDIF
    IF !EMPTY( ::File )
       pPrev := ::Owner:GetCurDoc()
-      nPos := ::GetCurrentPos()
+      nPos  := ::Owner:Source:GetCurrentPos()
+      ::Owner:Source:nVisLine := ::Owner:SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
 
       ::Owner:SelectDocument( ::pSource )
       IF ( hFile := fCreate( ::File ) ) <> -1
@@ -1090,7 +1092,8 @@ METHOD Save( cFile ) CLASS Source
       ENDIF
       ::Owner:SelectDocument( pPrev )
 
-      ::GoToPosition( nPos )
+      ::Owner:Source:GoToPosition( nPos )
+      ::Owner:SendMessage( SCI_SETFIRSTVISIBLELINE, ::Owner:Source:nVisLine, 0 )
 
       n := RAT( "\", ::File )
       ::FileName := SUBSTR( ::File, n+1 )
