@@ -162,6 +162,7 @@ CLASS TabControl INHERIT Control
                                             NIL
    METHOD OnWindowPaint()
    METHOD OnMove(x,y)                INLINE IIF( ::Cursel > 0 .AND. LEN( ::aTabs ) >= ::Cursel .AND. VALTYPE(::aTabs[::Cursel])=="O", ::aTabs[::Cursel]:__OnParentSize(x,y), ), NIL
+   METHOD OnSize(w,l)                INLINE Super:OnSize(w,l), IIF( ::Cursel > 0 .AND. LEN( ::aTabs ) >= ::Cursel .AND. VALTYPE(::aTabs[::Cursel])=="O", ::aTabs[::Cursel]:__OnParentSize(LOWORD(W),HIWORD(W)), ), NIL
 
    METHOD OnHScroll(x,y,n)           INLINE ::Super:OnHScroll(x,y,n)
    METHOD UnDock()
@@ -1537,8 +1538,8 @@ RETURN ::Super:OnCtlColorDlg( nwParam, nlParam )
 //-----------------------------------------------------------------------------------------------
 METHOD __OnParentSize( x, y, hDef ) CLASS TabPage
    LOCAL rc
-   ::OnParentSize( x, y, hDef )
-   IF ::Index == NIL .OR. ( ! ::IsWindowVisible() .AND. ::Index <> ::Parent:CurSel )
+   (x, y)
+   IF ::Index == NIL 
       RETURN NIL
    ENDIF
 

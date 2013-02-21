@@ -3827,8 +3827,6 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
    DEFAULT nParX TO ::Parent:__aCltRect[3]
    DEFAULT nParY TO ::Parent:__aCltRect[4]
 
-   ::OnParentSize( x, y, hDef, lMoveNow, lNoMove )
-
    IF ::__HideResized .OR. !::IsChild .OR. !IsWindow( ::hWnd ) .OR. ::hWnd == NIL .OR. !::__Docked
       RETURN Self
    ENDIF
