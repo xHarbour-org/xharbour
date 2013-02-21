@@ -8,6 +8,11 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-02-21 05:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/sqlrdd2.prg
+    ! minor fix in SolveRestrictors() method related to deleted status ( users that dont use sr_deleted field is not affected)
+    
+    
 2013-02-02 19:45 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
   * source/utils.prg
     ! change in SR_ChangeStruct for better check for postgresql with version 8.4 or newer

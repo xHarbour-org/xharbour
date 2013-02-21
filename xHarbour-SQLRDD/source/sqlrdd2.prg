@@ -534,13 +534,14 @@ METHOD SolveRestrictors()  CLASS SR_WORKAREA
          cRet += ::RecnoExpr()
      endif
    EndIf
+   /*
    if  SR_UseDeleteds() .and. set( _SET_DELETED )
       if !empty( cRet ) 
          cRet += " AND "
       ENDIF
       cRet += " (" + SR_DBQUALIFY( ::cDeletedName, ::oSql:nSystemID ) + " IS NULL  OR "  + SR_DBQUALIFY( ::cDeletedName, ::oSql:nSystemID )  + " != " + if(::nTCCompat > 0, "'*'", "'T'") +" ) "
    endif
-
+   */
 Return cRet
 
 /*------------------------------------------------------------------------*/
