@@ -1638,7 +1638,7 @@ METHOD OnSetCursor() CLASS Window
       WinSetCursor( ::__hCursor )
       RETURN .T.
    ENDIF
-RETURN .F.
+RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnSize( nwParam, nlParam ) CLASS Window
