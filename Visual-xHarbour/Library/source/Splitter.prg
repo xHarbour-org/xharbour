@@ -152,9 +152,8 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------------------
 
-METHOD __OnParentSize(nW, nH, hDef ) CLASS Splitter
+METHOD __OnParentSize() CLASS Splitter
    LOCAL aRect
-   ::OnParentSize(nW, nH, hDef )
    IF !::lSizing
       ::GetSizes()
       SetWindowPos( ::hWnd, , ::xLeft, ::xTop, ::xWidth, ::xHeight, SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_DEFERERASE )
@@ -190,7 +189,6 @@ METHOD SplitOn( x, y, lDirect )
 
       SWITCH ::Position
          CASE 1
-              //aPos[1] :=  Max( ::Parent:LeftMargin, Min( ::Parent:ClientWidth - ::Parent:RightMargin - ::Weight, aPos[1] ) )
               IF pt:x + ::Weight <> ::Owner:xLeft
                  ::MoveWindow( pt:x, ::xTop, ::xWidth, ::xHeight, .f. )
                  ::SetSizes()

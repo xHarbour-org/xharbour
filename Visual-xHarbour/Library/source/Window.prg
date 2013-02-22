@@ -117,7 +117,9 @@ static aMessages := {;
                     { WM_MOUSEMOVE,    "OnMouseMove"    },;
                     { WM_NCMOUSEMOVE,  "OnNCMouseMove"  },;
                     { WM_NCMOUSELEAVE, "OnNCMouseLeave" },;
-                    { WM_NCMOUSEHOVER, "OnNCMouseHover" };
+                    { WM_NCMOUSEHOVER, "OnNCMouseHover" },;
+                    { WM_MOUSEWHEEL,   "OnMouseWheel"   },;
+                    { WM_SETCURSOR,    "OnSetCursor"    };
                     }
 
 //-----------------------------------------------------------------------------------------------
@@ -513,7 +515,6 @@ CLASS Window INHERIT Object
 
    METHOD RegisterDocking()
 
-   METHOD OnParentSize()        VIRTUAL
    METHOD OnNCDestroy()         VIRTUAL
    METHOD OnChildChar()         VIRTUAL
    METHOD OnChildGetDlgCode()   VIRTUAL
@@ -574,7 +575,6 @@ CLASS Window INHERIT Object
    METHOD OnShowWindow()        VIRTUAL
    METHOD OnLoad()              VIRTUAL
    METHOD OnHideWindow()        VIRTUAL
-   METHOD OnSetCursor()         VIRTUAL
    METHOD OnEnable()            VIRTUAL
    METHOD OnContextMenu()       VIRTUAL
    METHOD OnThemeChanged()      VIRTUAL
@@ -623,7 +623,8 @@ CLASS Window INHERIT Object
    METHOD OnEnterSizeMove()     VIRTUAL
    METHOD OnExitSizeMove()      VIRTUAL
    METHOD OnGetText()           VIRTUAL
-   METHOD OnMouseWheel()        VIRTUAL
+
+   METHOD OnMouseWheel()
 
    METHOD OnHScroll()
    METHOD OnVScroll()
@@ -654,6 +655,7 @@ CLASS Window INHERIT Object
    METHOD OnNCMouseHover()
    METHOD OnNCMouseLeave()
    METHOD OnSize()
+   METHOD OnSetCursor()
 
 ENDCLASS
 
@@ -1627,6 +1629,18 @@ METHOD OnNCMouseLeave() CLASS Window
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
+METHOD OnSetCursor() CLASS Window
+   IF ::Application != NIL .AND. ::Application:Cursor != NIL
+      WinSetCursor( ::Application:Cursor )
+      RETURN .T.
+   ENDIF
+   IF ::__hCursor != NIL
+      WinSetCursor( ::__hCursor )
+      RETURN .T.
+   ENDIF
+RETURN .F.
+
+//-----------------------------------------------------------------------------------------------
 METHOD OnSize( nwParam, nlParam ) CLASS Window
    LOCAL x, y, aChildren, hDef, oChild, cProp, n
    ::__lReqBrush := .T.
@@ -1719,11 +1733,72 @@ METHOD OnSize( nwParam, nlParam ) CLASS Window
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
+METHOD OnMouseWheel( nwParam, nlParam ) CLASS Window
+   LOCAL pt, rc, n, nLines, nPage, nDelta, nScroll
+   IF ::sih != NIL .OR. ::siv != NIL
+      pt := (struct POINT)
+      pt:x := LOWORD( nlParam )
+      pt:y := HIWORD( nlParam )
+
+      IF ( !::__IsControl .OR. ::__xCtrlName == "DataGrid" .OR. !::__IsStandard )
+         IF ::HasMessage( "VertScroll" ) .AND. ::VertScroll .OR. ( ::HasMessage( "AutoVertScroll" ) .AND. ::AutoVertScroll .AND. ::siv != NIL .AND. ::siv:nMax > 0 )
+            pt := (struct POINT)
+            pt:x := LOWORD(nlParam)
+            pt:y := HIWORD(nlParam)
+            ScreenToClient( ::hWnd, @pt )
+
+            rc := (struct RECT)
+            rc:left   := 0
+            rc:top    := ::ClientHeight
+            rc:right  := ::ClientWidth
+            rc:bottom := ::Height
+
+            SystemParametersInfo( SPI_GETWHEELSCROLLLINES, 0, @nLines, 0)
+            IF nLines == 0 .AND. ::__xCtrlName == "DataGrid"
+               nLines := 3
+            ENDIF
+
+            IF nLines > 0
+               nDelta  := GETWHEELDELTA( nwParam )
+               nScroll := WM_VSCROLL
+               nPage   := IIF( ::siv != NIL, ::siv:nPage, ::ClientHeight )
+               IF ::sih != NIL .AND. PtInRect( rc, pt )
+                  nScroll := WM_HSCROLL
+                  nPage   := ::sih:nPage
+               ENDIF
+
+               IF nLines == WHEEL_PAGESCROLL
+                  IF nDelta > 0
+                     ::SendMessage( nScroll, SB_PAGEUP, 0 )
+                   ELSEIF nDelta < 0
+                     ::SendMessage( nScroll, SB_PAGEDOWN, 0 )
+                  ENDIF
+                ELSE
+                  IF nDelta > 0
+                     FOR n := 1 TO nLines * ABS( nDelta )
+                         ::SendMessage( nScroll, SB_LINEUP, 0 )
+                     NEXT
+                   ELSE
+                     FOR n := 1 TO nLines * ABS( nDelta )
+                         ::SendMessage( nScroll, SB_LINEDOWN, 0 )
+                     NEXT
+                  ENDIF
+               ENDIF
+
+            ENDIF
+            RETURN 0
+         ENDIF
+      ENDIF
+   ENDIF
+RETURN NIL
+
+
+//-----------------------------------------------------------------------------------------------
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    LOCAL nRet, nCode, nId, n, cBuffer, oObj
-   LOCAL oChild, oItem, x, y, nLeft, nTop, nWidth, nHeight, nLines, nDelta, nScroll, nPage
+   LOCAL oChild, oItem, x, y, nLeft, nTop, nWidth, nHeight
    LOCAL lShow, hParent, pPtr, oCtrl, aRect, aPt, mii, Band, msg, lHandled, aComp, oMenu, mmi, oForm
-   LOCAL rc, pt, hwndFrom, idFrom, code, aParams, nAnimation, nMess
+   LOCAL pt, hwndFrom, idFrom, code, aParams, nAnimation, nMess
    local aParent
    
    ::Msg    := nMsg
@@ -1749,35 +1824,12 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
          CASE WM_UPDATEUISTATE
               EXIT
 
-         CASE WM_SETCURSOR
-              nRet := ExecuteEvent( "OnSetCursor", Self )
-              ODEFAULT nRet TO ::OnSetCursor( nwParam, nlParam )
-              IF ::Application != NIL .AND. ::Application:Cursor != NIL
-                 WinSetCursor( ::Application:Cursor )
-                 RETURN .T.
-              ENDIF
-              IF ::__hCursor != NIL
-                 WinSetCursor( ::__hCursor )
-                 RETURN .T.
-              ENDIF
-              EXIT
-
          CASE WM_MOUSELEAVE
               nRet := ExecuteEvent( "OnMouseLeave", Self )
               ODEFAULT nRet TO ::OnMouseleave( nwParam, LoWord(nlParam), Hiword(nlparam) )
               ::__lMouseHover := .F.
               EXIT
-   /*
-         CASE WM_MOUSEHOVER
-              ::__lMouseHover := .T.
-              nRet := ExecuteEvent( "OnMouseHover", Self )
-              ODEFAULT nRet TO ::OnMouseHover( nwParam, LoWord(nlParam), Hiword(nlparam) )
-              IF ::ToolTip != NIL .AND. ::ToolTip:hWnd != NIL
-                 ::ToolTip:Popup()
-              ENDIF
-              ::TrackMouseEvent( TME_LEAVE )
-              EXIT
-   */
+
          CASE WM_MOUSEACTIVATE
               nRet := ExecuteEvent( "OnMouseActivate", Self )
               ODEFAULT nRet TO ::OnMouseActivate( nwParam, LoWord(nlParam), HiWord(nlParam) )
@@ -1850,14 +1902,10 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               EXIT
 
 
-
          CASE WM_NCHITTEST
               nRet := ExecuteEvent( "OnNCHitTest", Self )
               IF nRet == NIL
                  nRet := ::OnNCHitTest( loword(nlParam), hiword(nlParam), nwParam )
-                 //IF nRet == NIL .AND. ::__ClassInst == NIL .AND. !EMPTY( ::BitmapMask )
-                 //   RETURN HTCAPTION
-                 //ENDIF
               ENDIF
               EXIT
 
@@ -1915,28 +1963,8 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               EXIT
 
          CASE WM_MOVE
-              ::__lReqBrush := .T.
-
               nRet := ExecuteEvent( "OnMove", Self )
               ODEFAULT nRet TO ::OnMove( x, y )
-
-              IF ::Parent != NIL .AND. ::Parent:ClsName == "DeskTop"
-                 ::Parent:GetClientRect()
-              ENDIF
-
-   //           IF ::ClsName != "DataGrid"
-   //              TRY
-   //              FOR EACH oChild IN ::Children
-   //                  IF __ObjHasMsg( oChild, "Anchor" )
-   //                     oChild:OnParentMove()
-   //                     IF oChild:Anchor != NIL .AND. oChild:Anchor:Center
-   //                        oChild:CenterWindow()
-   //                     ENDIF
-   //                  ENDIF
-   //              NEXT
-   //              CATCH
-   //              END
-   //           ENDIF
               EXIT
 
          CASE WM_TIMER
@@ -2097,12 +2125,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               ::hWnd := NIL
               EXIT
 
-   /*
-         CASE WM_MDIACTIVATE
-              IF nlParam == hWnd
-                 SendMessage( ::Parent:hWnd, WM_MDISETMENU, ::Menu:hMenu )
-              ENDIF
-   */
+
          CASE WM_INITDIALOG
               nRet := ExecuteEvent( "OnCreate", Self )
               ODEFAULT nRet TO ::OnCreate()
@@ -2758,67 +2781,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
          CASE WM_CHANGECBCHAIN
               nRet := ExecuteEvent( "OnChangeCbChain", Self )
               ODEFAULT nRet TO ::OnChangeCbChain( nwParam, nlParam )
-              EXIT
-
-         CASE WM_MOUSEWHEEL
-              nRet := ::OnMouseWheel( nwParam, nlParam )
-              IF nRet == NIL .AND. ::sih != NIL .OR. ::siv != NIL
-                 pt := (struct POINT)
-                 pt:x := LOWORD( nlParam )
-                 pt:y := HIWORD( nlParam )
-
-                 nRet := ExecuteEvent( "OnMouseWheel", Self )
-
-                 IF ( !::__IsControl .OR. ::__xCtrlName == "DataGrid" .OR. !::__IsStandard )
-                    IF nRet == NIL .AND. ::HasMessage( "VertScroll" ) .AND. ::VertScroll .OR. ( ::HasMessage( "AutoVertScroll" ) .AND. ::AutoVertScroll .AND. ::siv != NIL .AND. ::siv:nMax > 0 )
-                       pt := (struct POINT)
-                       pt:x := LOWORD(nlParam)
-                       pt:y := HIWORD(nlParam)
-                       ScreenToClient( ::hWnd, @pt )
-
-                       rc := (struct RECT)
-                       rc:left   := 0
-                       rc:top    := ::ClientHeight
-                       rc:right  := ::ClientWidth
-                       rc:bottom := ::Height
-
-                       SystemParametersInfo( SPI_GETWHEELSCROLLLINES, 0, @nLines, 0)
-                       IF nLines == 0 .AND. ::__xCtrlName == "DataGrid"
-                          nLines := 3
-                       ENDIF
-
-                       IF nLines > 0
-                          nDelta  := GETWHEELDELTA( nwParam )
-                          nScroll := WM_VSCROLL
-                          nPage   := IIF( ::siv != NIL, ::siv:nPage, ::ClientHeight )
-                          IF ::sih != NIL .AND. PtInRect( rc, pt )
-                             nScroll := WM_HSCROLL
-                             nPage   := ::sih:nPage
-                          ENDIF
-
-                          IF nLines == WHEEL_PAGESCROLL
-                             IF nDelta > 0
-                                ::SendMessage( nScroll, SB_PAGEUP, 0 )
-                              ELSEIF nDelta < 0
-                                ::SendMessage( nScroll, SB_PAGEDOWN, 0 )
-                             ENDIF
-                           ELSE
-                             IF nDelta > 0
-                                FOR n := 1 TO nLines * ABS( nDelta )
-                                    ::SendMessage( nScroll, SB_LINEUP, 0 )
-                                NEXT
-                              ELSE
-                                FOR n := 1 TO nLines * ABS( nDelta )
-                                    ::SendMessage( nScroll, SB_LINEDOWN, 0 )
-                                NEXT
-                             ENDIF
-                          ENDIF
-
-                       ENDIF
-                       RETURN 0
-                    ENDIF
-                 ENDIF
-              ENDIF
               EXIT
 
          CASE WM_HSCROLL

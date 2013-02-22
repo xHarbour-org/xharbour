@@ -67,7 +67,6 @@ CLASS CoolBar FROM Control
    METHOD UpdateSize()
    METHOD __SetTheming()
    METHOD FindRemoveBand()
-   //METHOD OnParentSize()
 ENDCLASS
 
 //----------------------------------------------------------------------------------------------------
