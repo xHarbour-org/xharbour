@@ -247,6 +247,7 @@ METHOD Init( ... ) CLASS IDE
    ENDIF
 
    ::EditorProps[ "WrapSearch" ] := ::IniFile:ReadInteger( "Settings", "WrapSearch", 0 )
+   ::EditorProps[ "SaveBAK" ]    := ::IniFile:ReadInteger( "Settings", "SaveBAK", 1 )
 
    ::ShowGrid   := ::IniFile:ReadInteger( "General", "ShowGrid", 0 )
    ::RulerType  := ::IniFile:ReadInteger( "General", "RulerType", 1 )

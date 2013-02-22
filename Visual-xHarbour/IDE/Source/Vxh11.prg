@@ -1074,7 +1074,7 @@ RETURN cText
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Save( cFile ) CLASS Source
-   LOCAL pPrev, hFile, cText, n, nPos
+   LOCAL pPrev, hFile, cText, n, nPos, cBak
    IF cFile != NIL
       ::File := cFile
    ENDIF
@@ -1082,6 +1082,18 @@ METHOD Save( cFile ) CLASS Source
       pPrev := ::Owner:GetCurDoc()
       nPos  := ::Owner:Source:GetCurrentPos()
       ::Owner:Source:nVisLine := ::Owner:SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
+
+      IF ::Application:EditorProps:SaveBAK == 1 .AND. FILE( ::File )
+         cBak := ::File
+         IF ( n := RAT( ".", cBak ) ) > 0
+            cBak := SUBSTR( cBak, 1, n-1 )
+         ENDIF
+         cBak += ".bak"
+         IF FILE( cBak )
+            FERASE( cBak )
+         ENDIF
+         FRENAME( ::File, cBak )
+      ENDIF
 
       ::Owner:SelectDocument( ::pSource )
       IF ( hFile := fCreate( ::File ) ) <> -1
