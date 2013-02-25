@@ -5944,7 +5944,6 @@ RETURN { ;
                                   { "OnMove"             , "", "" },;
                                   { "OnMoving"           , "", "" },;
                                   { "OnParentMove"       , "", "" },;
-                                  { "OnParentSize"       , "", "" },;
                                   { "OnSize"             , "", "" },;
                                   { "OnSizing"           , "", "" },;
                                   { "OnWindowPaint"      , "", "" },;

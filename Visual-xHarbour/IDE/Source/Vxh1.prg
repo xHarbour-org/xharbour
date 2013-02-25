@@ -3524,7 +3524,7 @@ METHOD AddWindow( lReset, cFileName, lCustom, nPos ) CLASS Project
          :Width       := 300
          :Height      := 300
          :Create()
-         :Parent:Parent:OnParentSize()
+
          ::CurrentForm := oWin
 
          :Parent:InvalidateRect()

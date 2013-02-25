@@ -223,7 +223,6 @@ METHOD Init( oParent ) CLASS TabControl
                             { "OnMove"             , "", "" },;
                             { "OnMoving"           , "", "" },;
                             { "OnParentMove"       , "", "" },;
-                            { "OnParentSize"       , "", "" },;
                             { "OnSize"             , "", "" },;
                             { "OnSizing"           , "", "" },;
                             { "OnWindowPaint"      , "", "" },;
@@ -1300,7 +1299,6 @@ METHOD Init( oParent, acResource ) CLASS TabPage
                                { "OnMove"             , "", "" },;
                                { "OnMoving"           , "", "" },;
                                { "OnParentMove"       , "", "" },;
-                               { "OnParentSize"       , "", "" },;
                                { "OnSize"             , "", "" },;
                                { "OnSizing"           , "", "" },;
                                { "OnWindowPosChanged" , "", "" },;
