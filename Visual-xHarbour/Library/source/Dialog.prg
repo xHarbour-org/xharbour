@@ -66,11 +66,6 @@ METHOD OnInitDialog() CLASS Dialog
       AADD( ::Parent:Children, Self )
    ENDIF
 
-   IF ::__ArrayPointer == NIL
-      ::__ArrayPointer := ARRAYPOINTER( Self )
-      SetProp( ::hWnd, "PROP_CLASSOBJECT", ::__ArrayPointer )
-   ENDIF
-
    IF ::__xCtrlName == "TabPage"
       RETURN 0
    ENDIF
@@ -178,6 +173,12 @@ METHOD InitDialogBox() CLASS Dialog
    ::__ClientRect   := { nLeft, nTop, ::xWidth, ::xHeight }
    ::__aCltRect  := { nLeft, nTop, ::xWidth, ::xHeight }
    ::OriginalRect := { nLeft, nTop, ::xWidth, ::xHeight }
+
+   IF ::__ArrayPointer == NIL
+      ::__ArrayPointer := ARRAYPOINTER( Self )
+      SetProp( ::hWnd, "PROP_CLASSOBJECT", ::__ArrayPointer )
+   ENDIF
+
 
    hWnd := GetWindow( ::hWnd, GW_CHILD | GW_HWNDFIRST )
    WHILE hWnd != 0

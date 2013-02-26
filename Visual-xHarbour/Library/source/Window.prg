@@ -619,7 +619,7 @@ CLASS Window INHERIT Object
    METHOD OnEnterSizeMove()     VIRTUAL
    METHOD OnExitSizeMove()      VIRTUAL
    METHOD OnGetText()           VIRTUAL
-
+   METHOD InitDialogBox()       VIRTUAL
    METHOD OnMouseWheel()
 
    METHOD OnHScroll()
@@ -1813,8 +1813,12 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    ENDIF
    
    IF ( nMess := aScan( aMessages, {|a| a[1] == nMsg} ) ) > 0
-      nRet := hb_ExecFromArray( Self, aMessages[ nMess ][2], {nwParam, nlParam} )
-      ExecuteEvent( aMessages[ nMess ][2], Self )
+      IF nMsg == WM_INITDIALOG
+         ::hWnd := hWnd
+         ::InitDialogBox()
+      ENDIF
+      nRet := hb_ExecFromArray( Self, aMessages[nMess][2], {nwParam, nlParam} )
+      ExecuteEvent( aMessages[nMess][2], Self )
    ELSE
       SWITCH nMsg
          CASE WM_UPDATEUISTATE
