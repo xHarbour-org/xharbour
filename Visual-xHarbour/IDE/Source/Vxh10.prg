@@ -53,6 +53,8 @@ RETURN Self
 
 METHOD OnInitDialog() CLASS ResourceManager
    LOCAL n, cResName, cType, aFile
+   ::Super:OnInitDialog()
+
    ::CenterWindow( .T. )
    ::RestoreLayout(, "WindowPosition")
    WITH OBJECT ToolStrip( Self )

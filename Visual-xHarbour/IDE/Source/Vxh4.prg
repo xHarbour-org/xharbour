@@ -3240,6 +3240,8 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD OnInitDialog() CLASS ObjectManager
+   ::Super:OnInitDialog()
+
    ::Caption    := "Object Manager"
    
    Image( Self )

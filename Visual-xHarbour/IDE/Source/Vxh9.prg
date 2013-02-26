@@ -41,6 +41,7 @@ RETURN Self
 
 METHOD OnInitDialog() CLASS ImageManager
    LOCAL n
+   ::Super:OnInitDialog()
    ToolBar( Self )
    WITH OBJECT ::ToolBar1
       :Create()

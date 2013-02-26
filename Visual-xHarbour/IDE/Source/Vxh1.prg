@@ -138,6 +138,7 @@ CLASS IDE INHERIT Application
    DATA CloseMenu        EXPORTED
    DATA SaveMenu         EXPORTED
    DATA SaveAsMenu       EXPORTED
+   DATA SaveAllMenu      EXPORTED
 
    DATA AddToProjectMenu EXPORTED
    DATA AddSourceMenu    EXPORTED
@@ -512,7 +513,7 @@ RETURN NIL
 
 
 METHOD Init() CLASS IDE_MainForm
-   LOCAL cVersion, rc//, aFonts, n
+   LOCAL cVersion, rc, oForm
 
    ::Super:Init()
    #ifdef VXH_DEMO
@@ -726,6 +727,23 @@ METHOD Init() CLASS IDE_MainForm
          WITH OBJECT ::Application:SaveAsMenu := MenuStripItem( :this )
             :Caption    := "Save Project &As ... "
             :ImageIndex := 0
+            :Enabled    := .F.
+            :Create()
+         END
+
+         WITH OBJECT ::Application:SaveAllMenu := MenuStripItem( :this )
+            :Caption    := "Save &All"
+            :ImageIndex := 0
+            :Action := <||
+                           FOR EACH oForm IN ::Application:Project:Forms
+                               IF oForm:Cargo != NIL
+                                  ::Application:Project:LoadForm( oForm:Cargo,,, .T., oForm )
+                                  oForm:Cargo := NIL
+                               ENDIF
+                           NEXT
+                           ::Application:Project:Save(,.T.)
+                       >
+
             :Enabled    := .F.
             :Create()
          END
@@ -2394,6 +2412,8 @@ FUNCTION OnShowDesigner()
    oApp:SaveAsMenu:Action  := {||oApp:Project:SaveAs() }
    oApp:SaveAsMenu:Caption := "Save Project &As ..."
    oApp:SaveAsMenu:Enable()
+   
+   oApp:SaveAllMenu:Enable()
 RETURN NIL
 
 FUNCTION OnShowEditors()
@@ -2779,6 +2799,7 @@ RETURN Self
 METHOD CheckValidProgram() CLASS Project
    //::Application:SaveMenu:Enable()
    ::Application:SaveAsMenu:Enable()
+   ::Application:SaveAllMenu:Enable()
    ::cFileRemove := NIL
    IF EMPTY( ::Application:SourceEditor:Source:File )
       ::Application:AddSourceMenu:Disable()
@@ -3673,6 +3694,7 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    ::Application:AddToProjectMenu:Disable()
    ::Application:SaveMenu:Disable()
    ::Application:SaveAsMenu:Disable()
+   ::Application:SaveAllMenu:Disable()
    ::Application:CloseMenu:Disable()
 
    #ifdef VXH_DEMO
@@ -3822,6 +3844,8 @@ METHOD CloseSource() CLASS Project
 
       ::Application:SaveAsMenu:Caption := "Save Project &As ..."
       ::Application:SaveAsMenu:Disable()
+      
+      ::Application:SaveAllMenu:Disable()
    ENDIF
 RETURN Self
 
@@ -6155,6 +6179,7 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
 
    IF oWnd:Modal
       cText += CRLF + "METHOD OnInitDialog() CLASS "+STRTRAN( oWnd:Name, " ", "_" ) + CRLF
+      cText += "   ::Super:OnInitDialog()" + CRLF
 
       cText += "   // Properties declaration" + CRLF
       cText += ::GenerateProperties( oWnd, 3, "::", , "Opacity",,, "Self" )
@@ -6712,7 +6737,7 @@ METHOD Init( oParent ) CLASS ListOle
 RETURN Self
 
 METHOD OnInitDialog() CLASS ListOle
-   Super:OnInitDialog()
+   ::Super:OnInitDialog()
 
    WITH OBJECT PictureBox( Self )
       :Height          := 77
@@ -6904,6 +6929,7 @@ METHOD Init( oParent, cText, cCaption, nIcon ) CLASS MsgBoxEx
 RETURN Self
 
 METHOD OnInitDialog() CLASS MsgBoxEx
+   ::Super:OnInitDialog()
    ::Label1:SetStyle( SS_ICON, .T. )
    ::Label1:SendMessage( STM_SETICON, LoadIcon(, IDI_QUESTION ) )
    ::Label2:Caption := ::BodyText
@@ -7001,6 +7027,8 @@ RETURN Self
 
 METHOD OnInitDialog() CLASS AboutVXH
    LOCAL oBtn, oLabel, n, aDev := { "Augusto R. Infante", "Phil Krylov", "Ron Pinkas", "Patrick Mast" }
+
+   ::Super:OnInitDialog()
 
    //::BackColor   := ::System:Color:White
    WITH OBJECT ( ::Picture := PictureBox( Self ) )

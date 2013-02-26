@@ -38,6 +38,8 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD OnInitDialog() CLASS MenuEditor
+   ::Super:OnInitDialog()
+
    ::ThickFrame := .T.
    ::CenterWindow()
    CoolBar( Self )

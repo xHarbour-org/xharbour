@@ -58,44 +58,8 @@ METHOD Init( oParent, aParameters, cProjectName ) CLASS Dialog
 RETURN Self
 
 METHOD OnInitDialog() CLASS Dialog
-   LOCAL nLeft, nTop, nWidth, nHeight, nRet, oObj, n
+   LOCAL nRet, oObj, n
    nRet := ExecuteEvent( "OnCreate", Self )
-
-   ::siv := (struct SCROLLINFO)
-   ::siv:cbSize := ::siv:sizeof()
-   ::siv:nMin   := 0
-
-   ::sih := (struct SCROLLINFO)
-   ::sih:cbSize := ::sih:sizeof()
-   ::sih:nMin   := 0
-
-   IF ::Parent != NIL .AND. !::Parent:Flat .AND. ::OsVer:dwMajorVersion >= 5 .AND. ::Parent:ClsName == "SysTabControl32" .AND. ::Application != NIL .AND. ::Application:IsThemedXP .AND. ::Theming
-      ::EnableThemeDialogTexture( ETDT_ENABLETAB )
-   ENDIF
-
-   nLeft   := ::Left
-   nTop    := ::Top
-   nWidth  := ::Width
-   nHeight := ::Height
-
-   ::GetClientRect()
-   ::GetWindowRect()
-
-   ::xLeft  := nLeft
-   ::xTop   := nTop
-
-   DEFAULT nWidth TO ::xWidth
-   DEFAULT nHeight TO ::xHeight
-
-   ::xWidth := nWidth
-   ::xHeight:= nHeight
-
-   ::__ClientRect   := { nLeft, nTop, ::xWidth, ::xHeight }
-   ::__aCltRect  := { nLeft, nTop, ::xWidth, ::xHeight }
-   ::OriginalRect := { nLeft, nTop, ::xWidth, ::xHeight }
-
-   ::InitDialogBox()
-   ::__SetScrollBars()
 
    ODEFAULT nRet TO 0
    IF ::Parent != NIL .AND. ::SetChildren
@@ -180,7 +144,40 @@ RETURN nRet
 //------------------------------------------------------------------------------------------------
 
 METHOD InitDialogBox() CLASS Dialog
-   LOCAL oCtrl, cClass, hWnd, nStyle
+   LOCAL oCtrl, cClass, hWnd, nStyle, nLeft, nTop, nWidth, nHeight
+
+   ::siv := (struct SCROLLINFO)
+   ::siv:cbSize := ::siv:sizeof()
+   ::siv:nMin   := 0
+
+   ::sih := (struct SCROLLINFO)
+   ::sih:cbSize := ::sih:sizeof()
+   ::sih:nMin   := 0
+
+   IF ::Parent != NIL .AND. !::Parent:Flat .AND. ::OsVer:dwMajorVersion >= 5 .AND. ::Parent:ClsName == "SysTabControl32" .AND. ::Application != NIL .AND. ::Application:IsThemedXP .AND. ::Theming
+      ::EnableThemeDialogTexture( ETDT_ENABLETAB )
+   ENDIF
+
+   nLeft   := ::Left
+   nTop    := ::Top
+   nWidth  := ::Width
+   nHeight := ::Height
+
+   ::GetClientRect()
+   ::GetWindowRect()
+
+   ::xLeft  := nLeft
+   ::xTop   := nTop
+
+   DEFAULT nWidth TO ::xWidth
+   DEFAULT nHeight TO ::xHeight
+
+   ::xWidth := nWidth
+   ::xHeight:= nHeight
+
+   ::__ClientRect   := { nLeft, nTop, ::xWidth, ::xHeight }
+   ::__aCltRect  := { nLeft, nTop, ::xWidth, ::xHeight }
+   ::OriginalRect := { nLeft, nTop, ::xWidth, ::xHeight }
 
    hWnd := GetWindow( ::hWnd, GW_CHILD | GW_HWNDFIRST )
    WHILE hWnd != 0
@@ -227,6 +224,7 @@ METHOD InitDialogBox() CLASS Dialog
    IF ::lEmpty //.AND. ::Modal
       ::SetDialogRect()
    ENDIF
+   ::__SetScrollBars()
 RETURN Self
 
 //------------------------------------------------------------------------------------------------

@@ -1319,6 +1319,7 @@ RETURN Self
 
 METHOD OnInitDialog() CLASS Settings
    LOCAL aFonts, n
+   ::Super:OnInitDialog()
    WITH OBJECT ( TABSTRIP( Self ) )
       :Name                 := "TabStrip1"
       WITH OBJECT :Dock
@@ -2196,6 +2197,7 @@ METHOD Init( oParent, aParameters ) CLASS GotoDialog
 RETURN Self
 
 METHOD OnInitDialog() CLASS GotoDialog
+   ::Super:OnInitDialog()
    WITH OBJECT ( LABEL( Self ) )
       :Name                 := "Label1"
       :Left                 := 10

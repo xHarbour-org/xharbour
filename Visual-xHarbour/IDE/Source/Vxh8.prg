@@ -43,6 +43,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD OnInitDialog() CLASS ColumnManager
+   ::Super:OnInitDialog()
    ::Caption    := "DataGrid Column Manager"
    
    WITH OBJECT Image( Self )
@@ -412,6 +413,8 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------
 METHOD OnInitDialog() CLASS StructEditor
+   ::Super:OnInitDialog()
+
    ::Caption    := "DataSource Structure Editor"
    
    PictureBox( Self )
@@ -946,6 +949,8 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------
 METHOD OnInitDialog() CLASS TableEditor
+   ::Super:OnInitDialog()
+
    ::Caption    := "DataSource Editor"
    
    WITH OBJECT PictureBox( Self )
