@@ -734,14 +734,17 @@ METHOD Init() CLASS IDE_MainForm
          WITH OBJECT ::Application:SaveAllMenu := MenuStripItem( :this )
             :Caption    := "Save &All"
             :ImageIndex := 0
-            :Action := <||
+            :Action := <|oWait|
+                           oWait := ::Application:MainForm:MessageWait( "Loading unloaded forms" )
                            FOR EACH oForm IN ::Application:Project:Forms
                                IF oForm:Cargo != NIL
                                   ::Application:Project:LoadForm( oForm:Cargo,,, .T., oForm )
                                   oForm:Cargo := NIL
                                ENDIF
                            NEXT
+                           oWait:Text := "Saving..."
                            ::Application:Project:Save(,.T.)
+                           oWait:Close()
                        >
 
             :Enabled    := .F.

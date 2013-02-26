@@ -117,6 +117,9 @@ CLASS MessageWait
    DATA pCallBackPtr    PROTECTED
    DATA __nListProc     PROTECTED
 
+   ACCESS Text          INLINE GetWindowText( __hText )
+   ASSIGN Text(cText)   INLINE SetWindowText( __hText, cText ), UpdateWindow( ::hWnd )
+
    ACCESS Position      INLINE ::xPosition PERSISTENT
    ASSIGN Position( n ) INLINE ::xPosition := n, ::SetPosition()
 
