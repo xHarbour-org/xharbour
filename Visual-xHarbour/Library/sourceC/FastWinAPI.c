@@ -373,7 +373,7 @@ HB_FUNC( _SETSCROLLINFO )
 //-----------------------------------------------------------------------------
 HB_FUNC ( _GETTEXTEXTENTPOINT32 )
 {
-   const char * pstr = hb_parcx(2);
+   const char * pstr = hb_parc(2);
    SIZE sz;
    PHB_ITEM aMetr ;
    if ( GetTextExtentPoint32( (HDC) hb_parnl(1), pstr, strlen(pstr), &sz ) )
@@ -531,7 +531,7 @@ HB_FUNC( _EXTTEXTOUT )
    BOOL rcOk   ;
    UINT iCount ;
    UINT i      ;
-   const char * cText = hb_parcx( 6 );
+   const char * cText = hb_parc( 6 );
 
    rcOk = ( ISARRAY(5) && Array2Rect(hb_param(5, HB_IT_ARRAY), &rc) ) ;
 
@@ -711,11 +711,11 @@ HB_FUNC( _SENDMESSAGE )
    {
       cText = (char*) hb_xgrab( hb_parcsiz(4) );
 
-      hb_xmemcpy( cText, hb_parcx(4), hb_parcsiz(4) );
+      hb_xmemcpy( cText, hb_parc(4), hb_parcsiz(4) );
    }
 
    hb_retnl( (ULONG) SendMessage( (HWND) hb_parnl(1), (UINT) hb_parni(2), (ISNIL(3) ? 0 : (WPARAM) hb_parnl(3)),
-                                  (ISNIL(4) ? 0 : ( ISBYREF(4)? (LPARAM) (LPSTR) cText : ( ISCHAR(4) ? (LPARAM)(LPSTR) hb_parcx(4) : (LPARAM) hb_parnl(4) ) ) ) ) );
+                                  (ISNIL(4) ? 0 : ( ISBYREF(4)? (LPARAM) (LPSTR) cText : ( ISCHAR(4) ? (LPARAM)(LPSTR) hb_parc(4) : (LPARAM) hb_parnl(4) ) ) ) ) );
 
    if( ISBYREF( 4 ) )
    {
@@ -731,10 +731,10 @@ HB_FUNC( _POSTMESSAGE )
    if (ISBYREF(4))
    {
       cText = (char*) hb_xgrab( hb_parcsiz(4) );
-      hb_xmemcpy( cText, hb_parcx(4), hb_parcsiz(4) );
+      hb_xmemcpy( cText, hb_parc(4), hb_parcsiz(4) );
    }
    hb_retnl( (ULONG) PostMessage( (HWND) hb_parnl(1), (UINT) hb_parni(2), (ISNIL(3) ? 0 : (WPARAM) hb_parnl(3)),
-                                  (ISNIL(4) ? 0 : ( ISBYREF(4)? (LPARAM) (LPSTR) cText : ( ISCHAR(4) ? (LPARAM)(LPSTR) hb_parcx(4) : (LPARAM) hb_parnl(4) ) ) ) ) );
+                                  (ISNIL(4) ? 0 : ( ISBYREF(4)? (LPARAM) (LPSTR) cText : ( ISCHAR(4) ? (LPARAM)(LPSTR) hb_parc(4) : (LPARAM) hb_parnl(4) ) ) ) ) );
 
    if( ISBYREF( 4 ) )
    {
@@ -774,7 +774,7 @@ HB_FUNC( _DRAWEDGE )
 //-----------------------------------------------------------------------------
 HB_FUNC( _DRAWTEXT )
 {
-   const char *cText = hb_parcx( 2 );
+   const char *cText = hb_parc( 2 );
    RECT rc;
 
    if ( ISARRAY( 3 ) && Array2Rect( hb_param( 3, HB_IT_ARRAY ), &rc ) ) {
@@ -812,14 +812,14 @@ HB_FUNC( _CREATEFONT )
       hb_retnl( (LONG) CreateFont( hb_parni(1,1), hb_parni(1,2), hb_parni(1,3), hb_parni(1,4), hb_parni(1,5),
                                   (DWORD) hb_parnl(1,6), (DWORD) hb_parnl(1,7), (DWORD) hb_parnl(1,8),
                                   (DWORD) hb_parnl(1,9), (DWORD) hb_parnl(1,10), (DWORD) hb_parnl(1,11),
-                                  (DWORD) hb_parnl(1,12), (DWORD) hb_parnl(1,13), (LPCSTR) hb_parcx(1,14) ) );
+                                  (DWORD) hb_parnl(1,12), (DWORD) hb_parnl(1,13), (LPCSTR) hb_parc(1,14) ) );
    }
    else
    {
       hb_retnl( (LONG) CreateFont( ISNIL(1) ? 0 : hb_parni(1), ISNIL(2) ? 0 : hb_parni(2), ISNIL(3) ? 0 : hb_parni(3),
                                     ISNIL(4) ? 0 : hb_parni(4), ISNIL(5) ? 0 : hb_parni(5), (DWORD) hb_parnl(6),
                                     (DWORD) hb_parnl(7), (DWORD) hb_parnl(8), (DWORD) hb_parnl(9), (DWORD) hb_parnl(10),
-                                    (DWORD) hb_parnl(11), (DWORD) hb_parnl(12), (DWORD) hb_parnl(13), (LPCSTR) hb_parcx(14) ) );
+                                    (DWORD) hb_parnl(11), (DWORD) hb_parnl(12), (DWORD) hb_parnl(13), (LPCSTR) hb_parc(14) ) );
    }
 }
 
