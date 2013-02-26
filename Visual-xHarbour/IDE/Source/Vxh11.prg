@@ -1319,7 +1319,6 @@ RETURN Self
 
 METHOD OnInitDialog() CLASS Settings
    LOCAL aFonts, n
-   ::Super:OnInitDialog()
    WITH OBJECT ( TABSTRIP( Self ) )
       :Name                 := "TabStrip1"
       WITH OBJECT :Dock
@@ -2049,6 +2048,7 @@ METHOD OnInitDialog() CLASS Settings
       :EventHandler[ "OnClick" ] := "Apply"
       :Create()
    END //BUTTON
+   ::Super:OnInitDialog()
 
 RETURN Self
 
