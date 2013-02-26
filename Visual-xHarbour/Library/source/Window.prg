@@ -83,11 +83,6 @@
 #define WM_MDICHILDSIZED      4500
 #define WM_CHILDDESTROYED     5501
 
-#define ETDT_DISABLE        0x00000001
-#define ETDT_ENABLE         0x00000002
-#define ETDT_USETABTEXTURE  0x00000004
-#define ETDT_ENABLETAB      (ETDT_ENABLE | ETDT_USETABTEXTURE)
-
 #define ATL_IDM_FIRST_MDICHILD 50000
 #define IDM_MDI_BASE      (ATL_IDM_FIRST_MDICHILD - 5)
 #define IDM_MDI_ICON      (IDM_MDI_BASE + 0)
@@ -119,7 +114,8 @@ static aMessages := {;
                     { WM_NCMOUSELEAVE, "OnNCMouseLeave" },;
                     { WM_NCMOUSEHOVER, "OnNCMouseHover" },;
                     { WM_MOUSEWHEEL,   "OnMouseWheel"   },;
-                    { WM_SETCURSOR,    "OnSetCursor"    };
+                    { WM_SETCURSOR,    "OnSetCursor"    },;
+                    { WM_INITDIALOG,   "OnInitDialog"   };
                     }
 
 //-----------------------------------------------------------------------------------------------
@@ -1796,7 +1792,7 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    LOCAL nRet, nCode, nId, n, cBuffer, oObj
-   LOCAL oChild, oItem, x, y, nLeft, nTop, nWidth, nHeight
+   LOCAL oChild, oItem, x, y
    LOCAL lShow, hParent, pPtr, oCtrl, aRect, aPt, mii, Band, msg, lHandled, aComp, oMenu, mmi, oForm
    LOCAL pt, hwndFrom, idFrom, code, aParams, nAnimation, nMess
    local aParent
@@ -2069,16 +2065,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                  ::Parent:KeepActiveCaption := .F.
                  ::Parent:Redraw()
               ENDIF
-   //            aProperties := __ClsGetPropertiesAndValues( Self )
-   //            FOR EACH aProperty IN aProperties
-   //                oObj := __objSendMsg( Self, UPPER( aProperty[1] ) )
-   //                IF VALTYPE( oObj ) == "O"
-   //                   TRY
-   //                      __objSendMsg( Self, "_" + aProperty[1], NIL )
-   //                   CATCH
-   //                   END
-   //                ENDIF
-   //            NEXT
               EXIT
 
          CASE WM_NCDESTROY
@@ -2125,130 +2111,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               ::hWnd := NIL
               EXIT
 
-
-         CASE WM_INITDIALOG
-              nRet := ExecuteEvent( "OnCreate", Self )
-              ODEFAULT nRet TO ::OnCreate()
-              ::hWnd := hWnd
-              ::siv := (struct SCROLLINFO)
-              ::siv:cbSize := ::siv:sizeof()
-              ::siv:nMin   := 0
-
-              ::sih := (struct SCROLLINFO)
-              ::sih:cbSize := ::sih:sizeof()
-              ::sih:nMin   := 0
-
-              IF ::Parent != NIL .AND. !::Parent:Flat .AND. ::OsVer:dwMajorVersion >= 5 .AND. ::Parent:ClsName == "SysTabControl32" .AND. ::Application != NIL .AND. ::Application:IsThemedXP .AND. ::Theming
-                 ::EnableThemeDialogTexture( ETDT_ENABLETAB )
-              ENDIF
-
-              nLeft   := ::Left
-              nTop    := ::Top
-              nWidth  := ::Width
-              nHeight := ::Height
-
-              ::GetClientRect()
-              ::GetWindowRect()
-
-              ::xLeft  := nLeft
-              ::xTop   := nTop
-
-              DEFAULT nWidth TO ::xWidth
-              DEFAULT nHeight TO ::xHeight
-
-              ::xWidth := nWidth
-              ::xHeight:= nHeight
-
-              ::__ClientRect   := { nLeft, nTop, ::xWidth, ::xHeight }
-              ::__aCltRect  := { nLeft, nTop, ::xWidth, ::xHeight }
-              ::OriginalRect := { nLeft, nTop, ::xWidth, ::xHeight }
-
-              ::InitDialogBox()
-              ::__SetScrollBars()
-
-              nRet := ExecuteEvent( "OnInitDialog", Self )
-              ODEFAULT nRet TO ::OnInitDialog( nwParam, nlParam )
-              ODEFAULT nRet TO __Evaluate( ::OnWMInitDialog, Self, nwParam, nlParam, nRet )
-
-              ODEFAULT nRet TO 0
-              IF ::Parent != NIL .AND. ::SetChildren
-                 AADD( ::Parent:Children, Self )
-              ENDIF
-
-              IF ::__ArrayPointer == NIL
-                 ::__ArrayPointer := ARRAYPOINTER( Self )
-                 SetProp( ::hWnd, "PROP_CLASSOBJECT", ::__ArrayPointer )
-              ENDIF
-
-              IF ::__xCtrlName == "TabPage"
-                 RETURN 0
-              ENDIF
-
-              IF ::Center
-                 ::CenterWindow()
-              ENDIF
-
-              FOR EACH oObj IN ::Components
-                  IF oObj:__xCtrlName == "Timer" .AND. oObj:AutoRun
-                     oObj:Start()
-                  ENDIF
-                  IF oObj:__xCtrlName == "NotifyIcon"
-                     oObj:Visible := oObj:Visible
-                  ENDIF
-              NEXT
-              IF EMPTY( ::__hIcon )
-                 SWITCH VALTYPE( ::Icon )
-                    CASE "A"
-                         IF ::__ClassInst == NIL .OR. EMPTY( ::Icon[1] )
-                            ::__hIcon := LoadIcon( ::AppInstance, ::Icon[2] )
-                            ::xIcon := ::Icon[2]
-                          ELSE
-                            ::__hIcon := LoadImage( ::AppInstance, ::Icon[1], IMAGE_ICON,,, LR_LOADFROMFILE )
-                            ::xIcon := ::Icon[1]
-                         ENDIF
-                         EXIT
-
-                    CASE "C"
-                         ::__hIcon := LoadIcon( ::AppInstance, ::Icon )
-                         EXIT
-
-                    CASE "N"
-                         ::__hIcon := ::Icon
-                         EXIT
-                 END
-              ENDIF
-              ::SetIcon( ICON_SMALL, IIF( !EMPTY( ::__hIcon ), ::__hIcon, 0 ) )
-              ::SetIcon( ICON_BIG, IIF( !EMPTY( ::__hIcon ), ::__hIcon, 0 ) )
-
-              ::SetOpacity( ::xOpacity )
-
-              IF ::BackgroundImage != NIL
-                 ::BackgroundImage:Create()
-              ENDIF
-
-              IF !::__lShown
-                 ::__lShown := .T.
-                 ::__FixDocking()
-
-                 nRet := ExecuteEvent( "OnLoad", Self )
-                 ODEFAULT nRet TO ::OnLoad( Self )
-
-                 IF ::Property != NIL .AND. ::__ClassInst == NIL
-
-                    FOR n := 1 TO LEN( ::Property:Keys )
-                        oObj := HGetValueAt( ::Property, n )
-                        IF oObj:__xCtrlName == "TabPage" .AND. !oObj:Visible
-                           oObj:__SetVisible( .F., .T. )
-                        ENDIF
-                    NEXT
-
-                 ENDIF
-                 IF ::AnimationStyle != 0 .AND. ::__ClassInst == NIL
-                    RETURN ::Animate( 1000, ::AnimationStyle )
-                 ENDIF
-              ENDIF
-              ::Show( ::ShowMode )
-              EXIT
 
          CASE WM_CHAR
               IF ::Parent != NIL

@@ -15,6 +15,15 @@
 #include "debug.ch"
 #include "commdlg.ch"
 
+#xcommand ODEFAULT <v> TO <x> [, <vN> TO <xN>]         ;
+       => IF <v> == nil .OR. VALTYPE( <v> ) == "O"; <v> := <x> ; END            ;
+          [; IF <vN> == nil ; <vN> := <xN> ; END]
+
+#define ETDT_DISABLE        0x00000001
+#define ETDT_ENABLE         0x00000002
+#define ETDT_USETABTEXTURE  0x00000004
+#define ETDT_ENABLETAB      (ETDT_ENABLE | ETDT_USETABTEXTURE)
+
 //------------------------------------------------------------------------------------------------
 
 CLASS Dialog INHERIT WinForm
@@ -34,6 +43,7 @@ CLASS Dialog INHERIT WinForm
    METHOD InitDialogBox()
    METHOD SetDialogRect()
    METHOD ReCreate()
+   METHOD OnInitDialog()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------------
@@ -47,9 +57,129 @@ METHOD Init( oParent, aParameters, cProjectName ) CLASS Dialog
    ::Height  := 700
 RETURN Self
 
+METHOD OnInitDialog() CLASS Dialog
+   LOCAL nLeft, nTop, nWidth, nHeight, nRet, oObj, n
+   nRet := ExecuteEvent( "OnCreate", Self )
+
+   ::siv := (struct SCROLLINFO)
+   ::siv:cbSize := ::siv:sizeof()
+   ::siv:nMin   := 0
+
+   ::sih := (struct SCROLLINFO)
+   ::sih:cbSize := ::sih:sizeof()
+   ::sih:nMin   := 0
+
+   IF ::Parent != NIL .AND. !::Parent:Flat .AND. ::OsVer:dwMajorVersion >= 5 .AND. ::Parent:ClsName == "SysTabControl32" .AND. ::Application != NIL .AND. ::Application:IsThemedXP .AND. ::Theming
+      ::EnableThemeDialogTexture( ETDT_ENABLETAB )
+   ENDIF
+
+   nLeft   := ::Left
+   nTop    := ::Top
+   nWidth  := ::Width
+   nHeight := ::Height
+
+   ::GetClientRect()
+   ::GetWindowRect()
+
+   ::xLeft  := nLeft
+   ::xTop   := nTop
+
+   DEFAULT nWidth TO ::xWidth
+   DEFAULT nHeight TO ::xHeight
+
+   ::xWidth := nWidth
+   ::xHeight:= nHeight
+
+   ::__ClientRect   := { nLeft, nTop, ::xWidth, ::xHeight }
+   ::__aCltRect  := { nLeft, nTop, ::xWidth, ::xHeight }
+   ::OriginalRect := { nLeft, nTop, ::xWidth, ::xHeight }
+
+   ::InitDialogBox()
+   ::__SetScrollBars()
+
+   ODEFAULT nRet TO 0
+   IF ::Parent != NIL .AND. ::SetChildren
+      AADD( ::Parent:Children, Self )
+   ENDIF
+
+   IF ::__ArrayPointer == NIL
+      ::__ArrayPointer := ARRAYPOINTER( Self )
+      SetProp( ::hWnd, "PROP_CLASSOBJECT", ::__ArrayPointer )
+   ENDIF
+
+   IF ::__xCtrlName == "TabPage"
+      RETURN 0
+   ENDIF
+
+   IF ::Center
+      ::CenterWindow()
+   ENDIF
+
+   FOR EACH oObj IN ::Components
+       IF oObj:__xCtrlName == "Timer" .AND. oObj:AutoRun
+          oObj:Start()
+       ENDIF
+       IF oObj:__xCtrlName == "NotifyIcon"
+          oObj:Visible := oObj:Visible
+       ENDIF
+   NEXT
+   IF EMPTY( ::__hIcon )
+      SWITCH VALTYPE( ::Icon )
+         CASE "A"
+              IF ::__ClassInst == NIL .OR. EMPTY( ::Icon[1] )
+                 ::__hIcon := LoadIcon( ::AppInstance, ::Icon[2] )
+                 ::xIcon := ::Icon[2]
+               ELSE
+                 ::__hIcon := LoadImage( ::AppInstance, ::Icon[1], IMAGE_ICON,,, LR_LOADFROMFILE )
+                 ::xIcon := ::Icon[1]
+              ENDIF
+              EXIT
+
+         CASE "C"
+              ::__hIcon := LoadIcon( ::AppInstance, ::Icon )
+              EXIT
+
+         CASE "N"
+              ::__hIcon := ::Icon
+              EXIT
+      END
+   ENDIF
+   ::SetIcon( ICON_SMALL, IIF( !EMPTY( ::__hIcon ), ::__hIcon, 0 ) )
+   ::SetIcon( ICON_BIG, IIF( !EMPTY( ::__hIcon ), ::__hIcon, 0 ) )
+
+   ::SetOpacity( ::xOpacity )
+
+   IF ::BackgroundImage != NIL
+      ::BackgroundImage:Create()
+   ENDIF
+
+   IF !::__lShown
+      ::__lShown := .T.
+      ::__FixDocking()
+
+      nRet := ExecuteEvent( "OnLoad", Self )
+      ODEFAULT nRet TO ::OnLoad( Self )
+
+      IF ::Property != NIL .AND. ::__ClassInst == NIL
+
+         FOR n := 1 TO LEN( ::Property:Keys )
+             oObj := HGetValueAt( ::Property, n )
+             IF oObj:__xCtrlName == "TabPage" .AND. !oObj:Visible
+                oObj:__SetVisible( .F., .T. )
+             ENDIF
+         NEXT
+
+      ENDIF
+      IF ::AnimationStyle != 0 .AND. ::__ClassInst == NIL
+         RETURN ::Animate( 1000, ::AnimationStyle )
+      ENDIF
+   ENDIF
+   ::Show( ::ShowMode )
+RETURN nRet
+
 //------------------------------------------------------------------------------------------------
 
-METHOD InitDialogBox()
+METHOD InitDialogBox() CLASS Dialog
    LOCAL oCtrl, cClass, hWnd, nStyle
 
    hWnd := GetWindow( ::hWnd, GW_CHILD | GW_HWNDFIRST )
