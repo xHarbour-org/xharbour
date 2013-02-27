@@ -25,7 +25,7 @@ CLASS ListBox FROM Control
    ACCESS CurSel       INLINE    ::GetCurSel()
 
    DATA ImageList      EXPORTED
-   DATA OnChange       EXPORTED
+   DATA OnSelChanged   EXPORTED
 
    DATA ImageIndex     PROTECTED
    DATA __nWidth       PROTECTED INIT 0
@@ -455,6 +455,9 @@ METHOD OnParentCommand( nId, nCode, nlParam ) CLASS ListBox
       CASE nCode == LBN_SELCHANGE
            nRet := ExecuteEvent( "OnSelChange", Self )
            DEFAULT nRet TO ::OnSelChange( nId, nCode, nlParam )
+           IF ::OnSelChanged != NIL
+              EVAL( ::OnSelChanged, Self, nCode )
+           ENDIF
 
       CASE nCode == LBN_DBLCLK
            nRet := ExecuteEvent( "OnDblClk", Self )

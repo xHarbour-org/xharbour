@@ -172,9 +172,11 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
    ::Editor:Form := Self // Will be needed in IntelliSense
 
    IF cFileName != NIL
-      ::Application:SourceTabs:InsertTab( cFileName )
+      //::Application:SourceTabs:InsertTab( cFileName )
+      ::Application:SourceSelect:AddItem( cFileName )
     ELSE
-      ::Application:SourceTabs:InsertTab( "  " + ::Name+".prg * ",,, .T. )
+      //::Application:SourceTabs:InsertTab( "  " + ::Name+".prg * ",,, .T. )
+      ::Application:SourceSelect:AddItem( ::Name+".prg *" )
    ENDIF
    
    cInitialBuffer := ""

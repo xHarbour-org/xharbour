@@ -131,6 +131,7 @@ CLASS IDE INHERIT Application
    DATA HelpMenu         EXPORTED
 
    DATA SourceTabs       EXPORTED
+   DATA SourceSelect     EXPORTED
    DATA FormsTabs        EXPORTED
    DATA ProjectPrgEditor EXPORTED
 
@@ -2136,12 +2137,38 @@ METHOD Init() CLASS IDE_MainForm
 
          :Create()
 
+         WITH OBJECT ::Application:SourceSelect := ListBox( :this )
+            :Cargo            := 1
+            :Width            := 150
+            :Dock:Top         := :Parent
+            :Dock:Bottom      := :Parent
+            :Dock:Right       := :Parent
+            :Dock:Margin      := -1
+            :OnSelChanged     := <|o|
+                                  IF o:Cargo != o:GetCurSel()
+                                     ::Application:Project:SourceTabChanged( o:GetCurSel() )
+                                     IF ! CheckBit( GetKeyState( VK_UP ) ) .AND. ! CheckBit( GetKeyState( VK_DOWN ) )
+                                        ::Application:SourceEditor:SetFocus()
+                                     ENDIF
+                                     o:Cargo := o:GetCurSel()
+                                  ENDIF
+                                 >
+            :Visible          := .F.
+            :Create()
+         END
+
+         WITH OBJECT Splitter( :this )
+            :Owner := ::Application:SourceSelect
+            :Create()
+         END
+
+/*
          WITH OBJECT ::Application:SourceTabs := TabStrip( :this )
             :Height           := :ItemHeight + 3
             :Dock:Left        := :Parent
             :Dock:Bottom      := :Parent
             :Dock:Right       := :Parent
-            :OnSelChanged     := {|,x,y| ::Application:Project:SourceTabChanged( x,y ) }
+            :OnSelChanged     := {|,x,y| ::Application:Project:SourceTabChanged( y ) }
             :OnWMSetFocus     := {|| ::Application:SourceEditor:SetFocus() }
             :TabStop          := .F.
             :TabPosition      := 4
@@ -2150,15 +2177,15 @@ METHOD Init() CLASS IDE_MainForm
             :OnWMThemeChanged := {|o| o:BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd }
             :Create()
          END
-
+*/
          WITH OBJECT ::Application:SourceEditor := SourceEditor( :this )
             :Left             := 400
             :Top              := 100
             :Width            := 200
             :Height           := 250
             :Dock:Left        := :Parent
-            :Dock:Bottom      := ::Application:SourceTabs
-            :Dock:Right       := :Parent
+            :Dock:Bottom      := :Parent
+            :Dock:Right       := ::Application:SourceSelect
             :Dock:Top         := :Parent
             :Create()
             :Disable()
@@ -2759,8 +2786,11 @@ METHOD NewProject() CLASS Project
    ::Application:ProjectPrgEditor:EmptyUndoBuffer()
    ::Application:ProjectPrgEditor:Modified := .T.
 
-   ::Application:SourceTabs:Visible := .T.
-   ::Application:SourceTabs:InsertTab( "  " + ::Properties:Name +"_Main.prg * ",,, .T. )
+   ::Application:SourceSelect:Visible := .T.
+   ::Application:SourceSelect:AddItem( ::Properties:Name +"_Main.prg *" )
+
+   //::Application:SourceTabs:Visible := .T.
+   //::Application:SourceTabs:InsertTab( "  " + ::Properties:Name +"_Main.prg * ",,, .T. )
 
 
    ::Application:Props[ "NewFormProjItem"   ]:Enabled := .T.
@@ -2790,8 +2820,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 
-METHOD SourceTabChanged( nPrev, nCur ) CLASS Project
-   ( nPrev )
+METHOD SourceTabChanged( nCur ) CLASS Project
    IF nCur <= ::Application:SourceEditor:DocCount
       ::Application:SourceEditor:Source := ::Application:SourceEditor:aDocs[ nCur ]
       ::Application:Project:EditReset()
@@ -3502,7 +3531,8 @@ METHOD SelectBuffer() CLASS Project
    LOCAL n
    ::CurrentForm:Editor:Select()
    IF ( n := aScan( ::Application:SourceEditor:aDocs, {|o| o==::CurrentForm:Editor} ) ) > 0
-      ::Application:SourceTabs:SetCurSel( n )
+      //::Application:SourceTabs:SetCurSel( n )
+      ::Application:SourceSelect:SetCurSel( n )
    ENDIF
 RETURN Self
 
@@ -3638,10 +3668,12 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
           ENDIF
        ENDIF
        ::Application:SourceEditor:aDocs[n]:Close()
-       ::Application:SourceTabs:DeleteTab(n)
+       //::Application:SourceTabs:DeleteTab(n)
+       ::Application:SourceSelect:DeleteItem( n )
        n--
    NEXT
-   ::Application:SourceTabs:Visible := .F.
+   //::Application:SourceTabs:Visible := .F.
+   ::Application:SourceSelect:Visible := .F.
 
    FOR n := 1 TO LEN( ::Forms )
        IF ::Forms[n]:Editor != NIL
@@ -3809,7 +3841,8 @@ METHOD SaveSourceAs( oEditor, lSetTabName ) CLASS Project
          ENDIF
          oEditor:Save( cFile )
          IF lSetTabName
-            ::Application:SourceTabs:SetItem( n, oEditor:FileName )
+            //::Application:SourceTabs:SetItem( n, oEditor:FileName )
+            ::Application:SourceSelect:SetItemData( n, oEditor:FileName )
          ENDIF
       ENDIF
       EXIT
@@ -3818,7 +3851,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD CloseSource() CLASS Project
-   LOCAL nRes, n := ::Application:SourceTabs:GetCurSel()
+   LOCAL nRes, n := ::Application:SourceSelect:GetCurSel() //::Application:SourceTabs:GetCurSel()
    nRes := IDNO
    IF ::Application:SourceEditor:Source:Modified
       nRes := MessageBox( 0, "Save changes before closing?", ::Application:SourceEditor:Source:FileName, MB_YESNOCANCEL | MB_ICONQUESTION )
@@ -3826,14 +3859,18 @@ METHOD CloseSource() CLASS Project
          RETURN Self
       ENDIF
    ENDIF
-   ::Application:SourceTabs:DeleteTab( n )
+   //::Application:SourceTabs:DeleteTab( n )
+   ::Application:SourceSelect:DeleteItem( n )
+
    IF nRes == IDYES
       ::SaveSource()
    ENDIF
    ::Application:SourceEditor:Source:Close()
    n := MIN( n, ::Application:SourceEditor:DocCount )
    IF n > 0
-      ::Application:SourceTabs:SetCurSel( n )
+      //::Application:SourceTabs:SetCurSel( n )
+      ::Application:SourceSelect:SetCurSel( n )
+
       ::SourceTabChanged(, n )
     ELSE
       ::Application:SourceEditor:Caption := ""
@@ -3863,7 +3900,7 @@ METHOD NewSource() CLASS Project
    ::Application:SourceTabs:Visible := .T.
    ::Application:SourceTabs:InsertTab( "  Untitled Source * ",,,.T. )
    ::Application:SourceTabs:SetCurSel( ::Application:SourceEditor:DocCount )
-   ::SourceTabChanged(, ::Application:SourceEditor:DocCount )
+   ::SourceTabChanged( ::Application:SourceEditor:DocCount )
    IF !::Application:SourceEditor:IsWindowVisible()
       ::Application:EditorPage:Select()
    ENDIF
@@ -3908,7 +3945,7 @@ METHOD OpenSource( cSource ) CLASS Project
       // File is open, just re-show
 
       ::Application:SourceTabs:SetCurSel( n )
-      ::SourceTabChanged(, n )
+      ::SourceTabChanged( n )
 
       IF !::Application:SourceEditor:IsWindowVisible()
          ::Application:EditorPage:Select()
@@ -3923,7 +3960,7 @@ METHOD OpenSource( cSource ) CLASS Project
    ::Application:SourceTabs:Visible := .T.
    ::Application:SourceTabs:InsertTab( oFile:Name )
    ::Application:SourceTabs:SetCurSel( ::Application:SourceEditor:DocCount )
-   ::SourceTabChanged(, ::Application:SourceEditor:DocCount )
+   ::SourceTabChanged( ::Application:SourceEditor:DocCount )
    IF !::Application:SourceEditor:IsWindowVisible()
       ::Application:EditorPage:Select()
    ENDIF
@@ -4082,7 +4119,8 @@ METHOD Open( cProject ) CLASS Project
       ::Application:ProjectPrgEditor := Source( ::Application:SourceEditor )
       ::Application:ProjectPrgEditor:Open( cSourcePath +"\" + ::Properties:Name +"_Main.prg" )
 
-      ::Application:SourceTabs:InsertTab( ::Properties:Name +"_Main.prg" )
+      ::Application:SourceSelect:AddItem( ::Properties:Name +"_Main.prg" )
+      //::Application:SourceTabs:InsertTab( ::Properties:Name +"_Main.prg" )
 
     ELSEIF ::Properties:TargetType == 1
       n := ::Application:MainForm:MessageBox( "Mising main file " + cSourcePath +"\" + ::Properties:Name +"_Main.prg", "Open Project", MB_ICONQUESTION | MB_OKCANCEL )
@@ -4097,7 +4135,8 @@ METHOD Open( cProject ) CLASS Project
    ::OpenDesigner()
    ::Application:MainForm:ToolBox1:Enabled := .T.
 
-   ::Application:SourceTabs:Visible := .T.
+   ::Application:SourceSelect:Visible := .T.
+   //::Application:SourceTabs:Visible := .T.
 
    ::Application:AddToProjectMenu:Enabled := .T.
    ::Application:QuickForm:Enable()
@@ -4153,16 +4192,20 @@ METHOD Open( cProject ) CLASS Project
    NEXT
    oWait:Position := 60
 
-   ::Application:SourceTabs:Visible := .T.
+   //::Application:SourceTabs:Visible := .T.
+   ::Application:SourceSelect:Visible := .T.
+   
    FOR EACH cSource IN ::Properties:Sources
        n := RAT( "\", cSource )
        IF FILE( cSource )
           oEditor := Source( ::Application:SourceEditor )
           oEditor:Open( cSource )
 
-          ::Application:SourceTabs:InsertTab( SUBSTR( cSource, n+1 ) )
-          ::Application:SourceTabs:SetCurSel( ::Application:SourceEditor:DocCount )
-          ::SourceTabChanged(, ::Application:SourceEditor:DocCount )
+          //::Application:SourceTabs:InsertTab( SUBSTR( cSource, n+1 ) )
+          //::Application:SourceTabs:SetCurSel( ::Application:SourceEditor:DocCount )
+          ::Application:SourceSelect:AddItem( SUBSTR( cSource, n+1 ) )
+          ::Application:SourceSelect:SetCurSel( ::Application:SourceEditor:DocCount )
+          ::SourceTabChanged( ::Application:SourceEditor:DocCount )
         ELSE
           AADD( aErrors, { ::Properties:Name, "0", "Open error: " + cSource, "I/O Error"} )
        ENDIF
@@ -4828,7 +4871,8 @@ METHOD SaveAs( cName ) CLASS Project
 
       ::Save( .T., .T., cPrevPath )
 
-      ::Application:SourceTabs:SetItemText( 1, cCurr +".prg", .F. )
+      //::Application:SourceTabs:SetItemText( 1, cCurr +".prg", .F. )
+      ::Application:SourceSelect:SetItemData( 1, cCurr +".prg", .F. )
    ENDIF
 RETURN Self
 
@@ -6182,7 +6226,6 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
 
    IF oWnd:Modal
       cText += CRLF + "METHOD OnInitDialog() CLASS "+STRTRAN( oWnd:Name, " ", "_" ) + CRLF
-      cText += "   ::Super:OnInitDialog()" + CRLF
 
       cText += "   // Properties declaration" + CRLF
       cText += ::GenerateProperties( oWnd, 3, "::", , "Opacity",,, "Self" )
@@ -6194,6 +6237,7 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
           cText += ::GenerateChild( oChild, 3, @aChildEvents, "::", "Self", nPos )
           nPos++
       NEXT
+      cText += "   ::Super:OnInitDialog()" + CRLF
       cText += "RETURN Self" + CRLF + CRLF
    ENDIF
 RETURN cText
