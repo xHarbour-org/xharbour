@@ -118,6 +118,7 @@ static aMessages := {;
                     { WM_INITDIALOG,   "OnInitDialog"   };
                     }
 
+static __aObjects := {}
 //-----------------------------------------------------------------------------------------------
 
 CLASS Window INHERIT Object
@@ -383,7 +384,6 @@ CLASS Window INHERIT Object
    DATA __hBmpRgn              PROTECTED
    DATA __lNCMouseHover        PROTECTED INIT .F.
    DATA __IsForm               PROTECTED INIT .F.
-   DATA __ArrayPointer         PROTECTED
    DATA __lSubClass            EXPORTED  INIT .T.
    DATA __aHotKey              PROTECTED INIT {}
    DATA __aDock                EXPORTED  INIT {}
@@ -1063,8 +1063,7 @@ METHOD Create( oParent ) CLASS Window
       ::CenterWindow()
    ENDIF
 
-   ::__ArrayPointer := ARRAYPOINTER( Self )
-   SetProp( ::hWnd, "PROP_CLASSOBJECT", ::__ArrayPointer )
+   __SetObjPtr( Self )
 
    ::__SubClass()
 
@@ -1274,12 +1273,10 @@ RETURN Self
 
 
 FUNCTION __MainCallBack( hWnd, nMsg, nwParam, nlParam )
-   LOCAL oWnd, pPtr := GetProp( hWnd, "PROP_CLASSOBJECT" )
-   IF pPtr != NIL .AND. pPtr != 0
-      oWnd := ArrayFromPointer( pPtr )
-      IF oWnd != NIL
-         RETURN oWnd:__ControlProc( hWnd, nMsg, nwParam, nlParam )
-      ENDIF
+   LOCAL oWnd
+   oWnd := ObjFromHandle( hWnd )
+   IF oWnd != NIL
+      RETURN oWnd:__ControlProc( hWnd, nMsg, nwParam, nlParam )
    ENDIF
 RETURN DefWindowProc( hWnd, nMsg, nwParam, nlParam )
 
@@ -1503,10 +1500,23 @@ RETURN self
 
 //-----------------------------------------------------------------------------------------------
 
-FUNCTION ObjFromHandle( hWnd )
-   LOCAL pPtr := GetProp( hWnd, "PROP_CLASSOBJECT" )
-   IF pPtr != NIL .AND. pPtr != 0
-      RETURN ArrayFromPointer( pPtr )
+FUNCTION __SetObjPtr( oObj )
+   LOCAL n := ASCAN( __aObjects, {|o|o:hWnd==oObj:hWnd} )
+   IF n == 0
+      AADD( __aObjects, oObj )
+   ENDIF
+RETURN NIL
+
+FUNCTION ObjFromHandle( hWnd, lRemove )
+   LOCAL n := ASCAN( __aObjects, {|o|o:hWnd==hWnd} )
+   DEFAULT lRemove TO .F.
+   IF n > 0
+      IF lRemove
+         ADEL( __aObjects, n, .T. )
+         view len(__aObjects)
+       ELSE
+         RETURN __aObjects[n]
+      ENDIF
    ENDIF
 RETURN NIL
 
@@ -2087,9 +2097,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                  ::__nProc := NIL
               ENDIF
 
-              RemoveProp( ::hWnd, "PROP_CLASSOBJECT" )
-              ReleaseArrayPointer( ::__ArrayPointer )
-              ::__ArrayPointer := NIL
+              ObjFromHandle( ::hWnd, .T. )
 
               IF ::__pCallBackPtr != NIL
                  FreeCallBackPointer( ::__pCallBackPtr )
@@ -2199,13 +2207,10 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                  ENDIF
               ENDIF
               //------------------------- Search for Controls Actions ----------------------------
-              IF nlParam != 0
-                 pPtr := GetProp( nlParam, "PROP_CLASSOBJECT" )
-              ENDIF
 
-              IF nCode == 0 .AND. pPtr != NIL .AND. pPtr != 0
-                 oCtrl := ArrayFromPointer( pPtr )
+              oCtrl := ObjFromHandle( nlParam )
 
+              IF oCtrl != NIL
                  IF oCtrl:__xCtrlName == "LinkLabel"
                     oCtrl:LinkVisited := .T.
                  ENDIF
@@ -2456,9 +2461,8 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
          CASE WM_VKEYTOITEM
               nRet := ExecuteEvent( "OnChar", Self )
               IF nRet == NIL
-                 pPtr := GetProp( nlParam, "PROP_CLASSOBJECT" )
-                 IF pPtr != NIL .AND. pPtr != 0
-                    oCtrl := ArrayFromPointer( pPtr )
+                 oCtrl := ObjFromHandle( nlParam )
+                 IF oCtrl != NIL
                     IF HGetPos( oCtrl:EventHandler, "OnChar" ) != 0
                        nRet := ::&( oCtrl:EventHandler[ "OnChar" ] )( Self )
                     ENDIF
@@ -2615,10 +2619,8 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                  nRet := ExecuteEvent( "OnDrawItem", Self )
                  ODEFAULT nRet TO ::OnDrawItem( nwParam, nlParam )
                  IF nRet == NIL
-                    pPtr := GetProp( ::DrawItemStruct:hwndItem, "PROP_CLASSOBJECT" )
-                    IF pPtr != NIL .AND. pPtr != 0
-                       oCtrl := ArrayFromPointer( pPtr )
-
+                    oCtrl := ObjFromHandle( ::DrawItemStruct:hwndItem )
+                    IF oCtrl != NIL
                        IF HGetPos( oCtrl:EventHandler, "OnParentDrawItem" ) != 0
                           nRet := ::&( oCtrl:EventHandler[ "OnParentDrawItem" ] )( Self )
                        ENDIF
@@ -2731,10 +2733,8 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
          CASE WM_CTLCOLORBTN
               nRet := ExecuteEvent( "OnCtlColorBtn", Self )
               ODEFAULT nRet TO ::OnCtlColorBtn( nwParam, nlParam )
-
-              pPtr := GetProp( nlParam, "PROP_CLASSOBJECT" )
-              IF pPtr != NIL .AND. pPtr != 0
-                 oCtrl := ArrayFromPointer( pPtr )
+              oCtrl := ObjFromHandle( nlParam )
+              IF oCtrl != NIL
                  nRet := oCtrl:OnCtlColorBtn( nwParam, nlParam )
               ENDIF
               EXIT
@@ -2743,9 +2743,8 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               nRet := ExecuteEvent( "OnCtlColorStatic", Self )
               ODEFAULT nRet TO ::OnCtlColorStatic( nwParam, nlParam )
               IF nRet == NIL
-                 pPtr := GetProp( nlParam, "PROP_CLASSOBJECT" )
-                 IF pPtr != NIL .AND. pPtr != 0
-                    oCtrl := ArrayFromPointer( pPtr )
+                 oCtrl := ObjFromHandle( nlParam )
+                 IF oCtrl != NIL
                     nRet := oCtrl:OnCtlColorStatic( nwParam, nlParam )
                  ENDIF
               ENDIF
@@ -2791,9 +2790,8 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               nRet := ::OnNotify( nwParam, nlParam, code )
 
               IF nRet == NIL
-                 pPtr := GetProp( ::hdr:hwndFrom, "PROP_CLASSOBJECT" )
-                 IF pPtr != NIL .AND. pPtr != 0
-                    oCtrl := ArrayFromPointer( pPtr )
+                 oCtrl := ObjFromHandle( ::hdr:hwndFrom )
+                 IF oCtrl != NIL
                     IF HGetPos( oCtrl:EventHandler, "OnParentNotify" ) != 0
                        nRet := ::&( oCtrl:EventHandler[ "OnParentNotify" ] )( oCtrl )
                     END

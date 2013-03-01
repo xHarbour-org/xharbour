@@ -174,11 +174,7 @@ METHOD InitDialogBox() CLASS Dialog
    ::__aCltRect  := { nLeft, nTop, ::xWidth, ::xHeight }
    ::OriginalRect := { nLeft, nTop, ::xWidth, ::xHeight }
 
-   IF ::__ArrayPointer == NIL
-      ::__ArrayPointer := ARRAYPOINTER( Self )
-      SetProp( ::hWnd, "PROP_CLASSOBJECT", ::__ArrayPointer )
-   ENDIF
-
+   __SetObjPtr( Self )
 
    hWnd := GetWindow( ::hWnd, GW_CHILD | GW_HWNDFIRST )
    WHILE hWnd != 0
@@ -208,11 +204,7 @@ METHOD InitDialogBox() CLASS Dialog
          oCtrl:GetClientRect()
          oCtrl:GetWindowRect()
 
-         IF oCtrl:__ArrayPointer != NIL
-            ReleaseArrayPointer( oCtrl:__ArrayPointer )
-         ENDIF
-         oCtrl:__ArrayPointer := ARRAYPOINTER( oCtrl )
-         SetProp( hWnd, "PROP_CLASSOBJECT", oCtrl:__ArrayPointer )
+         __SetObjPtr( oCtrl )
 
          AADD( ::Children, oCtrl )
       ENDIF

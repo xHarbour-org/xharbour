@@ -6784,8 +6784,6 @@ METHOD Init( oParent ) CLASS ListOle
 RETURN Self
 
 METHOD OnInitDialog() CLASS ListOle
-   ::Super:OnInitDialog()
-
    WITH OBJECT PictureBox( Self )
       :Height          := 77
       :BackColor       := C_WHITE
@@ -6826,6 +6824,7 @@ METHOD OnInitDialog() CLASS ListOle
       END
       :MoveWindow()
    END
+   ::Super:OnInitDialog()
 RETURN 0
 
 METHOD OnOk() CLASS ListOle
@@ -6976,10 +6975,10 @@ METHOD Init( oParent, cText, cCaption, nIcon ) CLASS MsgBoxEx
 RETURN Self
 
 METHOD OnInitDialog() CLASS MsgBoxEx
-   ::Super:OnInitDialog()
    ::Label1:SetStyle( SS_ICON, .T. )
    ::Label1:SendMessage( STM_SETICON, LoadIcon(, IDI_QUESTION ) )
    ::Label2:Caption := ::BodyText
+   ::Super:OnInitDialog()
 RETURN 0
 
 METHOD OnCommand() CLASS MsgBoxEx
@@ -7074,8 +7073,6 @@ RETURN Self
 
 METHOD OnInitDialog() CLASS AboutVXH
    LOCAL oBtn, oLabel, n, aDev := { "Augusto R. Infante", "Phil Krylov", "Ron Pinkas", "Patrick Mast" }
-
-   ::Super:OnInitDialog()
 
    //::BackColor   := ::System:Color:White
    WITH OBJECT ( ::Picture := PictureBox( Self ) )
@@ -7189,6 +7186,7 @@ METHOD OnInitDialog() CLASS AboutVXH
          END
       NEXT
    END
+   ::Super:OnInitDialog()
 
    ::SetFocus()
 RETURN 1

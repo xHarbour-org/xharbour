@@ -522,13 +522,14 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                     n := aScan( ::aDocs, ::Source,,, .T. )
 
                     //cText := ::Application:SourceTabs:GetItemText(n)
-                    cText := ::Application:SourceSelect:GetString(n)
-                    view cText
-                    cText := ALLTRIM( STRTRAN( cText, "*" ) )
-
                     //::Application:SourceTabs:SetItemText( n, " " + cText + " * ", .T. )
-                    ::Application:SourceSelect:SetItemText( n, cText + " *" )
-                    ::Application:Project:Modified := .T.
+
+                    cText := ::Application:SourceSelect:GetString(n)
+                    IF cText != NIL
+                       cText := ALLTRIM( STRTRAN( cText, "*" ) )
+                       ::Application:SourceSelect:SetItemText( n, cText + " *" )
+                       ::Application:Project:Modified := .T.
+                    ENDIF
                  ENDIF
               ENDIF
               ::Application:Project:SetEditMenuItems()
@@ -2225,7 +2226,6 @@ METHOD Init( oParent, aParameters ) CLASS GotoDialog
 RETURN Self
 
 METHOD OnInitDialog() CLASS GotoDialog
-   ::Super:OnInitDialog()
    WITH OBJECT ( LABEL( Self ) )
       :Name                 := "Label1"
       :Left                 := 10
@@ -2289,6 +2289,7 @@ METHOD OnInitDialog() CLASS GotoDialog
       :Dock:Margin          := 3
       :Create()
    END //BUTTON
+   ::Super:OnInitDialog()
 RETURN Self
 
 METHOD Go_OnClick() CLASS GotoDialog

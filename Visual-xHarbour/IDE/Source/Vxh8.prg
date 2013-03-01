@@ -43,7 +43,6 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD OnInitDialog() CLASS ColumnManager
-   ::Super:OnInitDialog()
    ::Caption    := "DataGrid Column Manager"
    
    WITH OBJECT Image( Self )
@@ -192,7 +191,7 @@ METHOD OnInitDialog() CLASS ColumnManager
       :SetFocus()
    END
    ::CenterWindow( .T. )
-
+   ::Super:OnInitDialog()
 RETURN NIL
 
 
@@ -413,8 +412,6 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------
 METHOD OnInitDialog() CLASS StructEditor
-   ::Super:OnInitDialog()
-
    ::Caption    := "DataSource Structure Editor"
    
    PictureBox( Self )
@@ -474,6 +471,7 @@ METHOD OnInitDialog() CLASS StructEditor
 
    StrEditor( Self )
    ::CenterWindow( .T. )
+   ::Super:OnInitDialog()
 RETURN 0
 
 METHOD Save() CLASS StructEditor
@@ -949,8 +947,6 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------
 METHOD OnInitDialog() CLASS TableEditor
-   ::Super:OnInitDialog()
-
    ::Caption    := "DataSource Editor"
    
    WITH OBJECT PictureBox( Self )
@@ -1004,6 +1000,7 @@ METHOD OnInitDialog() CLASS TableEditor
 
    TblEditor( Self )
    ::CenterWindow( .T. )
+   ::Super:OnInitDialog()
 RETURN 0
 
 METHOD Save() CLASS TableEditor

@@ -83,12 +83,11 @@ CLASS System
    
    METHOD GetPathFromFolder()
    METHOD GetLocalTime()
-   METHOD GetFocus()
    METHOD GetRunningProcs()
    METHOD IsProcRunning()
    METHOD UpdateColorSchemes() INLINE ::CurrentScheme:Load()
    ACCESS Services             INLINE __ENUMSERVICES()
-
+   METHOD GetFocus()           INLINE ObjFromHandle( GetFocus() )
 ENDCLASS
 
 METHOD GetPathFromFolder( nId, lCreate ) CLASS System
@@ -113,16 +112,6 @@ METHOD GetLocalTime() CLASS System
    ::xLocalTime[ "Second"       ] := st:wSecond
    ::xLocalTime[ "Milliseconds" ] := st:wMilliseconds
 RETURN ::xLocalTime
-
-METHOD GetFocus() CLASS System
-   LOCAL pPtr, hWnd := GetFocus()
-   IF IsWindow( hWnd )
-      pPtr := GetProp( hWnd, "PROP_CLASSOBJECT" )
-      IF pPtr != NIL .AND. pPtr != 0
-         RETURN ArrayFromPointer( pPtr )
-      ENDIF
-   ENDIF
-RETURN NIL
 
 METHOD Init() CLASS System
    LOCAL cRdd, aList, hSmall, hLarge, cBuffer := ""

@@ -3240,7 +3240,6 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD OnInitDialog() CLASS ObjectManager
-   ::Super:OnInitDialog()
 
    ::Caption    := "Object Manager"
    
@@ -3288,6 +3287,7 @@ METHOD OnInitDialog() CLASS ObjectManager
    END
 
    ::CenterWindow( .T. )
+   ::Super:OnInitDialog()
 RETURN NIL
 
 

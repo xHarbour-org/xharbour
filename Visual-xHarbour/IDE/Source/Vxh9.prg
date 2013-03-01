@@ -41,7 +41,6 @@ RETURN Self
 
 METHOD OnInitDialog() CLASS ImageManager
    LOCAL n
-   ::Super:OnInitDialog()
    ToolBar( Self )
    WITH OBJECT ::ToolBar1
       :Create()
@@ -188,16 +187,7 @@ METHOD OnInitDialog() CLASS ImageManager
    ENDIF
 
    ::CenterWindow( .T. )
-   /*
-   ::Button1:Anchor:Right := .T.
-   ::Button1:Anchor:Bottom := .T.
-   ::Button2:Anchor:Right := .T.
-   ::Button2:Anchor:Bottom := .T.
-   ::Button1:Anchor:Left := .T.
-   ::Button1:Anchor:Top := .T.
-   ::Button2:Anchor:Left := .T.
-   ::Button2:Anchor:Top := .T.
-*/
+   ::Super:OnInitDialog()
 RETURN NIL
 
 METHOD AddImage() CLASS ImageManager

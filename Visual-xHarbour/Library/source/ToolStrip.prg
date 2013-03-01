@@ -2398,7 +2398,7 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
-   LOCAL pt, hWnd, oObj, pPtr, n, ms_hwnd, ms_message, ms_wParam, ms_lParam, mii_dwItemData
+   LOCAL pt, hWnd, oObj, n, ms_hwnd, ms_message, ms_wParam, ms_lParam, mii_dwItemData
    LOCAL aParams, oMenu, nItem, hMenu, oItem, i, nCurr
 
    aParams    := __GetMSG( nlParam )
@@ -2429,27 +2429,21 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
                  hWnd := _WindowFromPoint( pt )
                  IF hWnd != 0 .AND. s_CurrentObject:Parent != NIL
                     IF !( hWnd == s_CurrentObject:hWnd ) .AND. GetParent( hWnd ) == s_CurrentObject:Parent:hWnd
+                       oObj := ObjFromHandle( hWnd )
 
-                       pPtr := GetProp( hWnd, "PROP_CLASSOBJECT" )
-
-                       IF pPtr != NIL .AND. pPtr != 0
-                          oObj := ArrayFromPointer( pPtr )
-                          IF VALTYPE( oObj ) == "O" .AND. oObj:Parent:HasMessage("__lIsMenu")
-
-                             IF s_PrevFocus != NIL
-                                s_PrevFocus:__lSelected := .F.
-                                s_PrevFocus:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
-                                s_PrevFocus := NIL
-                             ENDIF
-
-                             SendMessage( ms_hWnd, WM_CANCELMODE, 0, 0 )
-                             s_lKey := .F.
-                             IF !EMPTY( oObj:Children ) .AND. ( oObj:DropDown > 1 .OR. oObj:Parent:__lIsMenu )
-                                oObj:PostMessage( WM_USER + 1028 )
-                             ENDIF
-                             oObj := NIL
-                             RETURN 1
+                       IF VALTYPE( oObj ) == "O" .AND. oObj:Parent:HasMessage("__lIsMenu")
+                          IF s_PrevFocus != NIL
+                             s_PrevFocus:__lSelected := .F.
+                             s_PrevFocus:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+                             s_PrevFocus := NIL
                           ENDIF
+                          SendMessage( ms_hWnd, WM_CANCELMODE, 0, 0 )
+                          s_lKey := .F.
+                          IF !EMPTY( oObj:Children ) .AND. ( oObj:DropDown > 1 .OR. oObj:Parent:__lIsMenu )
+                             oObj:PostMessage( WM_USER + 1028 )
+                          ENDIF
+                          oObj := NIL
+                          RETURN 1
                        ENDIF
 
                     ENDIF

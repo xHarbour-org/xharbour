@@ -969,7 +969,7 @@ RETURN 0
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TabControl
-   LOCAL nSel, lAllow, nOldSel, pPtr
+   LOCAL nSel, lAllow, nOldSel
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == NM_CLICK
@@ -1001,13 +1001,9 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TabControl
                     RETURN 0
                  ENDIF
                  IF VALTYPE( ::aTabs[::CurSel] ) == "O"
-
-                    pPtr := GetProp( GetFocus(), "PROP_CLASSOBJECT" )
-                    IF pPtr != NIL .AND. pPtr != 0
-                       ::aTabs[::CurSel]:LastFocus := ArrayFromPointer( pPtr )
+                    ::aTabs[::CurSel]:LastFocus := ::System:GetFocus()
+                    IF ::aTabs[::CurSel]:LastFocus != NIL
                        ::aTabs[::CurSel]:LastFocus:TabValidate := .F.
-                     ELSE
-                       ::aTabs[::CurSel]:LastFocus := NIL
                     ENDIF
                     ::aTabs[::CurSel]:HideTab()
                  ENDIF

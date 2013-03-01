@@ -38,7 +38,6 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD OnInitDialog() CLASS MenuEditor
-   ::Super:OnInitDialog()
 
    ::ThickFrame := .T.
    ::CenterWindow()
@@ -184,6 +183,7 @@ METHOD OnInitDialog() CLASS MenuEditor
       :Parent:ItemManager:ResetContent()
 
    END
+   ::Super:OnInitDialog()
    ::MoveWindow()
    
 RETURN NIL
