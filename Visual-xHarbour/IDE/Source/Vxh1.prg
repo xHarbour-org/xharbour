@@ -2138,7 +2138,7 @@ METHOD Init() CLASS IDE_MainForm
          :Create()
 
          WITH OBJECT ::Application:SourceSelect := ListBox( :this )
-            :Cargo            := 1
+            :Cargo            := -1
             :Width            := 150
             :Dock:Top         := :Parent
             :Dock:Bottom      := :Parent
@@ -3842,7 +3842,7 @@ METHOD SaveSourceAs( oEditor, lSetTabName ) CLASS Project
          oEditor:Save( cFile )
          IF lSetTabName
             //::Application:SourceTabs:SetItem( n, oEditor:FileName )
-            ::Application:SourceSelect:SetItemData( n, oEditor:FileName )
+            ::Application:SourceSelect:SetItemText( n, oEditor:FileName )
          ENDIF
       ENDIF
       EXIT
@@ -3871,7 +3871,7 @@ METHOD CloseSource() CLASS Project
       //::Application:SourceTabs:SetCurSel( n )
       ::Application:SourceSelect:SetCurSel( n )
 
-      ::SourceTabChanged(, n )
+      ::SourceTabChanged( n )
     ELSE
       ::Application:SourceEditor:Caption := ""
       ::Application:SourceEditor:Hide()
@@ -4872,7 +4872,7 @@ METHOD SaveAs( cName ) CLASS Project
       ::Save( .T., .T., cPrevPath )
 
       //::Application:SourceTabs:SetItemText( 1, cCurr +".prg", .F. )
-      ::Application:SourceSelect:SetItemData( 1, cCurr +".prg", .F. )
+      ::Application:SourceSelect:SetItemText( 1, cCurr +".prg", .F. )
    ENDIF
 RETURN Self
 

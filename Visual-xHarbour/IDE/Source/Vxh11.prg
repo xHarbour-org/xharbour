@@ -33,7 +33,9 @@ RETURN
 //------------------------------------------------------------------------------------------------------------------------------------
 
 CLASS SourceEditor INHERIT Control
-   DATA xTabWidth  PROTECTED INIT 3
+   DATA nLastTabTime  PROTECTED
+   DATA nLastTabPos   PROTECTED
+   DATA xTabWidth     PROTECTED INIT 3
    ASSIGN TabWidth(n) INLINE ::xTabWidth := n, AEVAL( ::aDocs, {|o| o:SetTabWidth(o:Owner:TabWidth)} ), IIF( ::Source != NIL, ::Source:Select(),)
    ACCESS TabWidth    INLINE ::xTabWidth
    
@@ -439,7 +441,7 @@ RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnKeyDown( nKey ) CLASS SourceEditor
-   LOCAL nPos
+   LOCAL nPos, nSecs
    IF nKey == VK_F3
       IF ::Source:GetSelLen() > 0
          ::cFindWhat := ::Source:GetSelText()
@@ -447,20 +449,41 @@ METHOD OnKeyDown( nKey ) CLASS SourceEditor
       ::FindNext( ::cFindWhat, CheckBit( GetKeyState( VK_SHIFT ), 32768 ) )
 
     ELSEIF nKey == VK_TAB .AND. CheckBit( GetKeyState( VK_CONTROL ), 32768 )
+/*
       IF CheckBit( GetKeyState( VK_SHIFT ), 32768 )
-         nPos := ::Application:SourceTabs:Cursel-1
+         nPos := ::Application:SourceSelect:GetCursel()-1
          IF nPos < 0
-            nPos := ::Application:SourceTabs:GetItemCount()
+            nPos := ::Application:SourceSelect:GetCount()
          ENDIF
        ELSE
-         nPos := ::Application:SourceTabs:Cursel+1
-         IF nPos > ::Application:SourceTabs:GetItemCount()
+         nPos := ::Application:SourceSelect:GetCursel()+1
+         IF nPos > ::Application:SourceSelect:GetCount()
             nPos := 1
          ENDIF
       ENDIF
-      ::Application:SourceTabs:SetCurSel( nPos )
-      ::Application:Project:SourceTabChanged(, nPos )
-      ::Application:SourceTabs:InvalidateRect(,.F.)
+*/
+      DEFAULT ::nLastTabTime TO SECONDS()
+
+      nSecs := SECONDS() - ::nLastTabTime
+
+      IF nSecs < 1 .OR. ::nLastTabPos == NIL
+         nPos := ::Application:SourceSelect:GetCursel()+ IIF( CheckBit( GetKeyState( VK_SHIFT ), 32768 ), -1, 1 )
+       ELSE
+         nPos := ::nLastTabPos 
+      ENDIF
+      IF nPos > ::Application:SourceSelect:GetCount()
+         nPos := 1
+      ENDIF
+      IF nPos < 0
+         nPos := ::Application:SourceSelect:GetCount()
+      ENDIF
+
+      ::nLastTabPos  := ::Application:SourceSelect:GetCursel()
+      ::nLastTabTime := SECONDS()
+
+      ::Application:SourceSelect:SetCurSel( nPos )
+      ::Application:Project:SourceTabChanged( nPos )
+
    ENDIF
 RETURN NIL
 
@@ -498,10 +521,13 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                     ::Source:Modified := .T.
                     n := aScan( ::aDocs, ::Source,,, .T. )
 
-                    cText := ::Application:SourceTabs:GetItemText(n)
+                    //cText := ::Application:SourceTabs:GetItemText(n)
+                    cText := ::Application:SourceSelect:GetString(n)
+                    view cText
                     cText := ALLTRIM( STRTRAN( cText, "*" ) )
 
-                    ::Application:SourceTabs:SetItemText( n, " " + cText + " * ", .T. )
+                    //::Application:SourceTabs:SetItemText( n, " " + cText + " * ", .T. )
+                    ::Application:SourceSelect:SetItemText( n, cText + " *" )
                     ::Application:Project:Modified := .T.
                  ENDIF
               ENDIF
@@ -1113,9 +1139,11 @@ METHOD Save( cFile ) CLASS Source
 
       n := aScan( ::Owner:aDocs, Self,,, .T. )
 
-      cText := ::Application:SourceTabs:GetItemText(n)
+      //cText := ::Application:SourceTabs:GetItemText(n)
+      cText := ::Application:SourceSelect:GetString(n)
       cText := ALLTRIM( STRTRAN( cText, "*" ) )
-      ::Application:SourceTabs:SetItemText( n, cText, .F. )
+      //::Application:SourceTabs:SetItemText( n, cText, .F. )
+      ::Application:SourceSelect:SetItemText( n, cText )
       ::FirstOpen := .F.
    ENDIF
 RETURN Self

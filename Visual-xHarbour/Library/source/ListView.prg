@@ -62,7 +62,8 @@ CLASS ListView INHERIT Control
    DATA Columns INIT {}
    DATA Groups  INIT {=>}
    DATA __pSortProc PROTECTED
-   
+   DATA OnSelChanged          EXPORTED
+
    PROPERTY ImageList      GET __ChkComponent( Self, ::xImageList )      SET SetImageList
    PROPERTY ImageListSmall GET __ChkComponent( Self, ::xImageListSmall ) SET SetImageListSmall
 
@@ -107,6 +108,7 @@ CLASS ListView INHERIT Control
    METHOD SetImageListSmall()
    METHOD SetCurSel()
    METHOD ResetContent()                INLINE ::SendMessage( LVM_DELETEALLITEMS, 0, 0 )
+   METHOD DeleteItem( nItem )           INLINE ::SendMessage( LVM_DELETEITEM, nItem+1 )
    METHOD GetHotItem()                  INLINE ::SendMessage( LVM_GETHOTITEM, 0, 0 )
    METHOD EnsureVisible( nItem, lPart ) INLINE ::SendMessage( LVM_ENSUREVISIBLE, nItem, lPart )
    METHOD OnParentNotify()
@@ -288,12 +290,12 @@ RETURN Self
 
 METHOD SetItemText( nRow, nCol, cText ) CLASS ListView
    LOCAL lvi := (struct LVWITEM)
-   DEFAULT nRow TO ::SendMessage( LVM_GETITEMCOUNT, 0, 0 )
+   DEFAULT nRow TO ::SendMessage( LVM_GETITEMCOUNT, 0, 0 )+1
    DEFAULT nCol TO 0
    lvi:mask       := LVIF_TEXT
    lvi:iSubItem   := nCol
    lvi:pszText    := cText
-   SendMessage( ::hWnd, LVM_SETITEMTEXT, nRow, lvi )
+   SendMessage( ::hWnd, LVM_SETITEMTEXT, nRow-1, lvi )
 RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
@@ -402,9 +404,13 @@ METHOD OnParentNotify( nwParam, nlParam ) CLASS ListView
 
       CASE LVN_ITEMCHANGED
            pnmv := (struct NMLISTVIEW*) nlParam
+           IF ::OnSelChanged != NIL
+              EVAL( ::OnSelChanged, Self, ::CurPos, pnmv:iItem + 1 )
+           ENDIF
            ::CurPos := pnmv:iItem + 1
            ExecuteEvent( "OnItemChanged", Self )
            EXIT
+
       CASE LVN_ITEMACTIVATE
 
       CASE LVN_GETDISPINFO

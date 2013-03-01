@@ -90,7 +90,7 @@ CLASS ListBox FROM Control
    METHOD SetTopIndex( nLine )             INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SETTOPINDEX, nLine, 0 ), NIL )
    //METHOD GetItemRect( nLine, bRect )   INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETITEMRECT, nLine, bRect ) , NIL )
    METHOD GetItemData( nLine )             INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETITEMDATA, nLine, 0 ) , NIL )
-   METHOD SetItemData( nLine, cData )      INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SETITEMDATA, nLine, cData ) , NIL )
+   METHOD SetItemData( nLine, cData )      INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SETITEMDATA, nLine+1, cData ) , NIL )
    METHOD SelItemRange( nFrom, nTo, lSel ) INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SELITEMRANGE, IIF( lSel, 1, 0 ), MAKELONG( nFrom, nTo ) ) , NIL )
    METHOD SetAnchorIndex( nLine )          INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SETANCHORINDEX, nLine, 0 ), NIL )
    METHOD GetAnchorIndex()                 INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETANCHORINDEX, 0, 0 ) , NIL )
@@ -103,6 +103,7 @@ CLASS ListBox FROM Control
    METHOD SetCount(nCount)                 INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SETCOUNT, nCount, 0 ) , NIL )
    METHOD InitStorage( nItems, nBytes )    INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_INITSTORAGE, nItems, nBytes ) , NIL )
    METHOD ItemFromPoint( x,y )             INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_ITEMFROMPOINT, 0, MAKELONG( x, y ) ) , NIL )
+   METHOD SetItemText( n, cText, l )       INLINE l := ::GetCurSel() == n, ::DeleteString( n ), ::InsertString( n, cText ), IIF( l, ::SetCurSel(n), )
    METHOD OnDestroy()                      INLINE ::__SetItemToolTips(.F.), NIL
 
    METHOD __SetScrollBars()                INLINE Self
