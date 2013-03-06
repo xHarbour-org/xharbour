@@ -238,7 +238,6 @@ CLASS DataGrid INHERIT Control
    METHOD Refresh() INLINE ::InvalidateRect()
    METHOD ColFromPos()
    
-   MESSAGE OnSize             METHOD __OnSize()
    MESSAGE OnParentSysCommand METHOD __OnParentSysCommand()
    MESSAGE OnTimer            METHOD __OnTimer()
    
@@ -255,6 +254,7 @@ CLASS DataGrid INHERIT Control
    METHOD OnLButtonDown()
    METHOD OnLButtonUp()
    METHOD OnChar()
+   METHOD OnSize()
    METHOD OnKillFocus()
    METHOD OnSetFocus()
    //METHOD OnGetDlgCode() INLINE DLGC_WANTMESSAGE
@@ -939,8 +939,9 @@ RETURN FALSE
 
 //---------------------------------------------------------------------------------
 
-METHOD __OnSize() CLASS DataGrid
+METHOD OnSize( nwParam, nlParam ) CLASS DataGrid
    LOCAL lRefresh := .T.
+   ::Super:OnSize( nwParam, nlParam )
    IF ::DataSource != NIL .AND. !::DataSource:IsOpen
       RETURN 0
    ENDIF
@@ -2572,10 +2573,11 @@ METHOD Update() CLASS DataGrid
    IF EMPTY( ::__DisplayArray )
       RETURN Self
    ENDIF
+   ::__DataHeight   := ::ClientHeight - ::__GetHeaderHeight()
+
    ::RowCountVisible := Ceil( ::__DataHeight/::ItemHeight )
    ::RowCountUsable  := MIN( Int(  ::__DataHeight/::ItemHeight ), ::RowCount )
    nUse := Int(  ::__DataHeight/::ItemHeight )
-
    IF ::DataSource:Eof()
       ::DataSource:GoBottom()
       IF ::DataSource:Eof()

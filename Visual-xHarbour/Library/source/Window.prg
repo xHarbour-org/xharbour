@@ -1513,7 +1513,6 @@ FUNCTION ObjFromHandle( hWnd, lRemove )
    IF n > 0
       IF lRemove
          ADEL( __aObjects, n, .T. )
-         view len(__aObjects)
        ELSE
          RETURN __aObjects[n]
       ENDIF
