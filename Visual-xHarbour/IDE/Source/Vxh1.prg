@@ -1662,15 +1662,17 @@ METHOD Init() CLASS IDE_MainForm
       :Caption          := "ToolBox"
 
       :StaticEdge       := .F.
+      :Border           := .T.
       :Flat             := .T.
       :AllowUndock      := .T.
       :AllowClose       := .T.
-      :OnWMClose        := {|o| o:Redock() }
       :OnWMClose        := {|o| IIF( o:IsDocked, (o:Hide(), ::Application:Props[ "ViewToolBoxItem" ]:Checked := .F. ), o:Redock() ) }
 
       :Width            := Round( ( :Parent:ClientWidth*::Application:Sizes["ToolBoxWidth"])/100,0)
       :Left             := 149
       :Dock:Margin      := 2
+      :Dock:BottomMargin:= 3
+
       :Dock:Left        := :Parent
       :Dock:Top         := ::Application:Props[ "MainToolBar" ]
       :Dock:Bottom      := ::StatusBar1
@@ -2029,7 +2031,7 @@ METHOD Init() CLASS IDE_MainForm
       :Height    := 300
       :Multiline := .F.
       
-      :Dock:Margin := 0
+      :Dock:BottomMargin := 3
       :Dock:Left   := ::ToolBox1
       :Dock:Top    := ::Application:Props[ "MainToolBar" ]
       :Dock:Right  := ::Panel1
