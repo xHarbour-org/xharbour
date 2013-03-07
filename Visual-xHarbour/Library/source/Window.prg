@@ -115,6 +115,7 @@ static aMessages := {;
                     { WM_NCMOUSEHOVER, "OnNCMouseHover" },;
                     { WM_MOUSEWHEEL,   "OnMouseWheel"   },;
                     { WM_SETCURSOR,    "OnSetCursor"    },;
+                    { WM_COMMAND,      "OnCommand"      },;
                     { WM_INITDIALOG,   "OnInitDialog"   };
                     }
 
@@ -518,7 +519,7 @@ CLASS Window INHERIT Object
    METHOD OnChar()              VIRTUAL
    METHOD OnSysChar()           VIRTUAL
    METHOD OnClose()             VIRTUAL
-   METHOD OnCommand()           VIRTUAL
+   METHOD OnCommand()
    METHOD OnGetMinMaxInfo()     VIRTUAL
    METHOD OnHotKey()            VIRTUAL
    METHOD OnWindowPaint()       VIRTUAL
@@ -1797,12 +1798,173 @@ METHOD OnMouseWheel( nwParam, nlParam ) CLASS Window
    ENDIF
 RETURN NIL
 
+METHOD OnCommand( nwParam, nlParam ) CLASS Window
+   LOCAL nCode, nId, nRet, n, oCtrl, lHandled, oForm
+   nCode := HIWORD( nwParam )
+   nId   := ABS(LOWORD( nwParam ))
+
+   IF nCode == 0
+      nId := nwParam
+   ENDIF
+   IF nId == IDOK
+      IF ( n := HSCAN( ::Form:Property, {|,o| o:__xCtrlName == "Button" .AND. o:DefaultButton } ) ) > 0
+         nId := HGetValueAt( ::Form:Property, n ):Id
+         nlParam := HGetValueAt( ::Form:Property, n ):hWnd
+      ENDIF
+   ENDIF
+
+   IF ::AutoClose .AND. ::Style & WS_CHILD == 0 .AND. ( ::Modal .OR. ::Parent != NIL )
+      IF nwParam == IDCANCEL
+
+         nRet := ExecuteEvent( "OnCancel", Self )
+         ODEFAULT nRet TO ::OnCancel()
+         ODEFAULT nRet TO 1
+         IF VALTYPE( nRet ) == "L"
+            nRet := IIF( nRet, 1, 0 )
+          ELSEIF VALTYPE( nRet ) == "O"
+            nRet := 1
+         ENDIF
+         IF nRet == 1
+            ::Close( IDCANCEL )
+            IF ! ::Modal
+               ::Parent:SetActiveWindow()
+            ENDIF
+            RETURN 1
+         ENDIF
+        ELSEIF nwParam == IDOK
+
+         nRet := ExecuteEvent( "OnOk", Self )
+         ODEFAULT nRet TO ::OnOk()
+      ENDIF
+   ENDIF
+   //------------------------- Search for Controls Actions ----------------------------
+
+   oCtrl := ObjFromHandle( nlParam )
+
+   IF oCtrl != NIL
+      IF oCtrl:__xCtrlName == "LinkLabel"
+         oCtrl:LinkVisited := .T.
+      ENDIF
+      lHandled := .F.
+
+      IF __ObjHasMsg( oCtrl, "DropDown" ) .AND. oCtrl:DropDown == 3
+         RETURN 0
+      ENDIF
+
+      IF HGetPos( oCtrl:EventHandler, "OnClick" ) != 0
+         IF ::ClsName == "CCTL"
+            TRY
+               oForm := oCtrl:Form
+               nRet := oForm:&( oCtrl:EventHandler[ "OnClick" ] )( oCtrl )
+             CATCH
+               oForm := Self
+               nRet := oForm:&( oCtrl:EventHandler[ "OnClick" ] )( oCtrl )
+            END
+          ELSE
+            oForm := oCtrl:Form
+            nRet := oForm:&( oCtrl:EventHandler[ "OnClick" ] )( oCtrl )
+         ENDIF
+         lHandled := .T.
+      END
+
+      IF lHandled
+         IF nRet != NIL
+            RETURN nRet
+         ENDIF
+         RETURN CallWindowProc( ::__nProc, ::hWnd, ::Msg, ::wParam, ::lParam )
+      ENDIF
+
+      IF nRet == NIL
+         nRet := oCtrl:OnClick( oCtrl )
+      ENDIF
+
+      IF nRet == NIL .AND. oCtrl:Action != NIL
+         nRet := __Evaluate( oCtrl:Action, oCtrl,,, nRet )
+      ENDIF
+
+      IF nRet == NIL
+         nRet := oCtrl:OnParentCommand( nId, nCode, nlParam )
+      ENDIF
+    ELSEIF pPtr != NIL .AND. pPtr != 0
+
+      oCtrl := ArrayFromPointer( pPtr )
+      nRet := oCtrl:OnParentCommand( nId, nCode, nlParam )
+      IF nCode == CBN_SELENDOK .AND. oCtrl:__xCtrlName == "ToolStripComboBox"
+         ExecuteEvent( "OnCBNSelEndOk", oCtrl )
+      ENDIF
+   ENDIF
+   ODEFAULT nRet TO ::OnParentCommand( nId, nCode, nlParam )
+
+   IF nRet == NIL
+      //--- notify children ----------------------------
+      IF nCode == 1
+         FOR EACH oChild IN ::Children
+             IF oChild:Id == nId
+                IF HGetPos( oChild:EventHandler, "OnClick" ) != 0
+                   oForm := oChild:Form
+                   IF ::ClsName == "CCTL"
+                      oForm := Self
+                   ENDIF
+                   nRet := oForm:&( oChild:EventHandler[ "OnClick" ] )( oChild )
+                ENDIF
+                IF nRet == NIL
+                   nRet := oChild:OnClick( oChild )
+                ENDIF
+                IF nRet == NIL .AND. oChild:Action != NIL
+                   IF nCode == CBN_SELENDOK .OR. oCtrl:ClsName != "ComboBox"
+                      nRet := __Evaluate( oChild:Action, oChild,,, nRet )
+                   ENDIF
+                ENDIF
+                EXIT
+             ENDIF
+
+             IF __ObjHasMsg( oChild, "OnParentCommand" )
+                nRet := oChild:OnParentCommand( nId, nCode, nlParam )
+                IF nRet != NIL
+                   EXIT
+                ENDIF
+             ENDIF
+         NEXT
+         IF ::ContextMenu != NIL .AND. nlParam == 0 .AND. nId > 0
+            // Situation never contemplated: Accelerator from ContextMenu
+
+            IF ( oItem := ::ContextMenu:Menu:GetMenuById( nId ) ) != NIL
+               IF HGetPos( oItem:EventHandler, "OnClick" ) != 0
+                  oForm := oItem:Form
+                  IF ::ClsName == "CCTL"
+                     oForm := Self
+                  ENDIF
+                  nRet := oForm:&( oItem:EventHandler[ "OnClick" ] )( oItem )
+                ELSEIF oItem:ClsName == "MenuStripItem" .AND. VALTYPE( oItem:Action ) == "B"
+                  EVAL( oItem:Action, oItem )
+                ELSE
+                  ODEFAULT nRet TO __Evaluate( oItem:Action, oItem,,, nRet )
+                  oItem:OnClick( oItem )
+               ENDIF
+               oItem:Cancel()
+            ENDIF
+         ENDIF
+      ENDIF
+      IF nRet != NIL
+         RETURN nRet
+      ENDIF
+   ENDIF
+   //---------------------------- Search for Menu Actions ------------------------------
+   IF nRet == NIL
+      IF ::ClsName == "ToolBarWindow32"
+         nRet := ExecuteEvent( "OnParentCommand", Self )
+         ODEFAULT nRet TO ::OnParentCommand( nId, nCode, nlParam )
+      ENDIF
+   ENDIF
+RETURN NIL
+
+
 
 //-----------------------------------------------------------------------------------------------
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    LOCAL nRet, nCode, nId, n, cBuffer, oObj
    LOCAL oChild, oItem, x, y
-   LOCAL lShow, hParent, pPtr, oCtrl, aRect, aPt, mii, Band, msg, lHandled, aComp, oMenu, mmi, oForm
+   LOCAL lShow, hParent, pPtr, oCtrl, aRect, aPt, mii, Band, msg, aComp, oMenu, mmi, oForm
    LOCAL pt, hwndFrom, idFrom, code, aParams, nAnimation, nMess
    local aParent
    
@@ -2165,166 +2327,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               EXIT
 
          CASE WM_COMMAND
-              nCode := HIWORD( nwParam )
-              nId   := ABS(LOWORD( nwParam ))
-              nRet  := ExecuteEvent( "OnCommand", Self )
-
-              IF nCode == 0
-                 nId := nwParam
-              ENDIF
-              IF nId == IDOK
-                 IF ( n := HSCAN( ::Form:Property, {|,o| o:__xCtrlName == "Button" .AND. o:DefaultButton } ) ) > 0
-                    nId := HGetValueAt( ::Form:Property, n ):Id
-                    nlParam := HGetValueAt( ::Form:Property, n ):hWnd
-                 ENDIF
-              ENDIF
-
-              nRet  := ::OnCommand( nId, nCode, nlParam )
-              //IF nRet == NIL .AND. ::Style & WS_CHILD == 0 .AND. ( ( ::Modal .OR. ::Parent != NIL ) .OR. ::AutoClose )
-              IF nRet == NIL .AND. ::AutoClose .AND. ::Style & WS_CHILD == 0 .AND. ( ::Modal .OR. ::Parent != NIL )
-                 IF nwParam == IDCANCEL
-
-                    nRet := ExecuteEvent( "OnCancel", Self )
-                    ODEFAULT nRet TO ::OnCancel()
-                    ODEFAULT nRet TO 1
-                    IF VALTYPE( nRet ) == "L"
-                       nRet := IIF( nRet, 1, 0 )
-                     ELSEIF VALTYPE( nRet ) == "O"
-                       nRet := 1
-                    ENDIF
-                    IF nRet == 1
-                       ::Close( IDCANCEL )
-                       IF ! ::Modal
-                          ::Parent:SetActiveWindow()
-                       ENDIF
-                       RETURN 1
-                    ENDIF
-                   ELSEIF nwParam == IDOK
-
-                    nRet := ExecuteEvent( "OnOk", Self )
-                    ODEFAULT nRet TO ::OnOk()
-                 ENDIF
-              ENDIF
-              //------------------------- Search for Controls Actions ----------------------------
-
-              oCtrl := ObjFromHandle( nlParam )
-
-              IF oCtrl != NIL
-                 IF oCtrl:__xCtrlName == "LinkLabel"
-                    oCtrl:LinkVisited := .T.
-                 ENDIF
-                 lHandled := .F.
-
-                 IF __ObjHasMsg( oCtrl, "DropDown" ) .AND. oCtrl:DropDown == 3
-                    RETURN 0
-                 ENDIF
-
-                 IF HGetPos( oCtrl:EventHandler, "OnClick" ) != 0
-                    IF ::ClsName == "CCTL"
-                       TRY
-                          oForm := oCtrl:Form
-                          nRet := oForm:&( oCtrl:EventHandler[ "OnClick" ] )( oCtrl )
-                        CATCH
-                          oForm := Self
-                          nRet := oForm:&( oCtrl:EventHandler[ "OnClick" ] )( oCtrl )
-                       END
-                     ELSE
-                       oForm := oCtrl:Form
-                       nRet := oForm:&( oCtrl:EventHandler[ "OnClick" ] )( oCtrl )
-                    ENDIF
-                    lHandled := .T.
-                 END
-
-                 IF lHandled
-                    IF nRet != NIL
-                       RETURN nRet
-                    ENDIF
-                    RETURN CallWindowProc( ::__nProc, hWnd, nMsg, nwParam, nlParam )
-                 ENDIF
-
-                 IF nRet == NIL
-                    nRet := oCtrl:OnClick( oCtrl )
-                 ENDIF
-
-                 IF nRet == NIL .AND. oCtrl:Action != NIL
-                    nRet := __Evaluate( oCtrl:Action, oCtrl,,, nRet )
-                 ENDIF
-
-                 IF nRet == NIL
-                    nRet := oCtrl:OnParentCommand( nId, nCode, nlParam )
-                 ENDIF
-               ELSEIF pPtr != NIL .AND. pPtr != 0
-
-                 oCtrl := ArrayFromPointer( pPtr )
-                 nRet := oCtrl:OnParentCommand( nId, nCode, nlParam )
-                 IF nCode == CBN_SELENDOK .AND. oCtrl:__xCtrlName == "ToolStripComboBox"
-                    ExecuteEvent( "OnCBNSelEndOk", oCtrl )
-                 ENDIF
-              ENDIF
-              ODEFAULT nRet TO ::OnParentCommand( nId, nCode, nlParam )
-
-              IF nRet == NIL
-                 //--- notify children ----------------------------
-                 IF nCode == 1
-                    FOR EACH oChild IN ::Children
-                        IF oChild:Id == nId
-                           IF HGetPos( oChild:EventHandler, "OnClick" ) != 0
-                              oForm := oChild:Form
-                              IF ::ClsName == "CCTL"
-                                 oForm := Self
-                              ENDIF
-                              nRet := oForm:&( oChild:EventHandler[ "OnClick" ] )( oChild )
-                           ENDIF
-                           IF nRet == NIL
-                              nRet := oChild:OnClick( oChild )
-                           ENDIF
-                           IF nRet == NIL .AND. oChild:Action != NIL
-                              IF nCode == CBN_SELENDOK .OR. oCtrl:ClsName != "ComboBox"
-                                 nRet := __Evaluate( oChild:Action, oChild,,, nRet )
-                              ENDIF
-                           ENDIF
-                           EXIT
-                        ENDIF
-
-                        IF __ObjHasMsg( oChild, "OnParentCommand" )
-                           nRet := oChild:OnParentCommand( nId, nCode, nlParam )
-                           IF nRet != NIL
-                              EXIT
-                           ENDIF
-                        ENDIF
-                    NEXT
-                    IF ::ContextMenu != NIL .AND. nlParam == 0 .AND. nId > 0
-                       // Situation never contemplated: Accelerator from ContextMenu
-
-                       IF ( oItem := ::ContextMenu:Menu:GetMenuById( nId ) ) != NIL
-                          IF HGetPos( oItem:EventHandler, "OnClick" ) != 0
-                             oForm := oItem:Form
-                             IF ::ClsName == "CCTL"
-                                oForm := Self
-                             ENDIF
-                             nRet := oForm:&( oItem:EventHandler[ "OnClick" ] )( oItem )
-                           ELSEIF oItem:ClsName == "MenuStripItem" .AND. VALTYPE( oItem:Action ) == "B"
-                             EVAL( oItem:Action, oItem )
-                           ELSE
-                             ODEFAULT nRet TO __Evaluate( oItem:Action, oItem,,, nRet )
-                             oItem:OnClick( oItem )
-                          ENDIF
-                          oItem:Cancel()
-                       ENDIF
-                    ENDIF
-                 ENDIF
-                 IF nRet != NIL
-                    RETURN nRet
-                 ENDIF
-              ENDIF
-              //---------------------------- Search for Menu Actions ------------------------------
-              IF nRet == NIL
-                 IF ::ClsName == "ToolBarWindow32"
-                    nRet := ExecuteEvent( "OnParentCommand", Self )
-                    ODEFAULT nRet TO ::OnParentCommand( nId, nCode, nlParam )
-                 ENDIF
-              ENDIF
-              EXIT
 
          CASE WM_HELP
               ::HelpInfo  := (struct HELPINFO *) nlParam
