@@ -17,12 +17,12 @@
 //------------------------------------------------------------------------------------------------
 
 CLASS Drawing
-   DATA Parent      EXPORTED
+   DATA Owner       EXPORTED
    DATA xhDC        EXPORTED
    DATA cPaint      EXPORTED
    DATA __aFonts     PROTECTED   
    
-   ACCESS hDC       INLINE IIF( ::xhDC == NIL, ::RefreshDC(),), ::xhDC
+   ACCESS hDC       INLINE ::RefreshDC(), ::xhDC
 
    METHOD Init() CONSTRUCTOR
    
@@ -36,9 +36,9 @@ CLASS Drawing
    METHOD EnumFonts()
    METHOD EnumProc()
    METHOD BeginPaint()
-   METHOD GetDC()                                        INLINE ::xhDC := GetDC( ::Parent:hWnd ), Self
-   METHOD ReleaseDC()                                    INLINE ReleaseDC( ::Parent:hWnd, ::xhDC ),  ::xhDC := NIL, Self
-   METHOD EndPaint()                                     INLINE _EndPaint( ::Parent:hWnd, ::cPaint), ::xhDC := NIL, ::cPaint := NIL, Self
+   METHOD GetDC()                                        INLINE ::xhDC := GetDC( ::Owner:hWnd ), Self
+   METHOD ReleaseDC()                                    INLINE ReleaseDC( ::Owner:hWnd, ::xhDC ),  ::xhDC := NIL, Self
+   METHOD EndPaint()                                     INLINE _EndPaint( ::Owner:hWnd, ::cPaint), ::xhDC := NIL, ::cPaint := NIL, Self
    METHOD SelectObject( hObj )                           INLINE SelectObject( ::hDC, hObj )
    METHOD SetPixel( x, y, nColor )                       INLINE SetPixel( ::hDC, x, y, nColor )
    METHOD GetPixel( x, y )                               INLINE GetPixel( ::hDC, x, y )
@@ -54,7 +54,7 @@ CLASS Drawing
    METHOD DrawText( cText, aRect, nFlags )               INLINE _DrawText( ::hDC, cText, aRect, nFlags )
    METHOD GetTextMetrics()
    METHOD DrawEdge( aRect, nFlags, nState )              INLINE _DrawEdge( ::hDC, aRect, nFlags, nState )
-   METHOD DrawThemeParentBackground( aRect )             INLINE DrawThemeParentBackground( ::Parent:hWnd, ::hDC, aRect )
+   METHOD DrawThemeParentBackground( aRect )             INLINE DrawThemeParentBackground( ::Owner:hWnd, ::hDC, aRect )
    METHOD DrawIcon( nLeft, nTop, hIcon )                 INLINE DrawIcon( ::hDC, nLeft, nTop, hIcon )
    METHOD DrawSpecialChar( aRect, nSign, lBold, nPoint ) INLINE __DrawSpecialChar( ::hDC, aRect, nSign, lBold, nPoint )
 
@@ -64,8 +64,8 @@ ENDCLASS
 
 //------------------------------------------------------------------------------------------------
 
-METHOD Init( oParent ) CLASS Drawing
-   ::Parent := oParent
+METHOD Init( oOwner ) CLASS Drawing
+   ::Owner := oOwner
 RETURN Self
 
 //------------------------------------------------------------------------------------------------
@@ -80,8 +80,8 @@ RETURN Self
 
 METHOD GetTextExtentPoint32( cText ) CLASS Drawing
    LOCAL hFont, aExt
-   DEFAULT cText TO ::Parent:Caption
-   hFont := SelectObject( ::hDC, ::Parent:Font:Handle )
+   DEFAULT cText TO ::Owner:Caption
+   hFont := SelectObject( ::hDC, ::Owner:Font:Handle )
    aExt := _GetTextExtentPoint32( ::hDC, cText )
    ::SelectObject( hFont )
 RETURN aExt
@@ -90,7 +90,7 @@ RETURN aExt
 
 METHOD GetTextExtentExPoint( cText, nMaxWidth, nFit ) CLASS Drawing
    LOCAL hFont, aExt
-   hFont := SelectObject( ::hDC, ::Parent:Font:Handle )
+   hFont := SelectObject( ::hDC, ::Owner:Font:Handle )
    aExt := _GetTextExtentExPoint( ::hDC, cText, nMaxWidth, @nFit )
    ::SelectObject( hFont )
 RETURN aExt
@@ -124,22 +124,22 @@ RETURN Self
 METHOD BeginPaint() CLASS Drawing
    LOCAL cPaint
    ::Destroy()
-   ::xhDC := _BeginPaint( ::Parent:hWnd, @cPaint )
+   ::xhDC := _BeginPaint( ::Owner:hWnd, @cPaint )
    ::cPaint := cPaint
 RETURN Self
 
 //------------------------------------------------------------------------------------------------
 
 METHOD FillRect( aRect, hBrush ) CLASS Drawing
-   DEFAULT aRect  TO { 0, 0, ::Parent:Width, ::Parent:Height }
-   DEFAULT hBrush TO IIF( ::Parent:BkBrush != NIL, ::Parent:BkBrush, ::Parent:ClassBrush )
+   DEFAULT aRect  TO { 0, 0, ::Owner:Width, ::Owner:Height }
+   DEFAULT hBrush TO IIF( ::Owner:BkBrush != NIL, ::Owner:BkBrush, ::Owner:ClassBrush )
    _FillRect( ::hDC, aRect, hBrush )
 RETURN Self
 
 //------------------------------------------------------------------------------------------------
 
 METHOD Rectangle( nLeft, nTop, nRight, nBottom, nColor, hBrush, nPen ) CLASS Drawing
-   LOCAL hOldBrush, hOldPen, hPen, aRect := ::Parent:GetRectangle()
+   LOCAL hOldBrush, hOldPen, hPen, aRect := ::Owner:GetRectangle()
 
    DEFAULT nLeft     TO aRect[1]
    DEFAULT nTop      TO aRect[2]
@@ -170,7 +170,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------------
 
 METHOD DrawFrameControl( aRect, nStyle, nFlags ) CLASS Drawing
-   DEFAULT aRect  TO { 0, 0, ::Parent:Width, ::Parent:Height }
+   DEFAULT aRect  TO { 0, 0, ::Owner:Width, ::Owner:Height }
    _DrawFrameControl( ::hDC, aRect, nStyle, nFlags )
 RETURN Self
 

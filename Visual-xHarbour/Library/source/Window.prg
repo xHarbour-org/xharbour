@@ -1799,7 +1799,7 @@ METHOD OnMouseWheel( nwParam, nlParam ) CLASS Window
 RETURN NIL
 
 METHOD OnCommand( nwParam, nlParam ) CLASS Window
-   LOCAL nCode, nId, nRet, n, oCtrl, lHandled, oForm
+   LOCAL nCode, nId, nRet, n, oCtrl, lHandled, oForm, oChild, oItem
    nCode := HIWORD( nwParam )
    nId   := ABS(LOWORD( nwParam ))
 
@@ -1839,9 +1839,11 @@ METHOD OnCommand( nwParam, nlParam ) CLASS Window
    ENDIF
    //------------------------- Search for Controls Actions ----------------------------
 
-   oCtrl := ObjFromHandle( nlParam )
+   IF nlParam != 0
+      oCtrl := ObjFromHandle( nlParam )
+   ENDIF
 
-   IF oCtrl != NIL
+   IF nCode == 0 .AND. oCtrl != NIL
       IF oCtrl:__xCtrlName == "LinkLabel"
          oCtrl:LinkVisited := .T.
       ENDIF
@@ -1885,9 +1887,9 @@ METHOD OnCommand( nwParam, nlParam ) CLASS Window
       IF nRet == NIL
          nRet := oCtrl:OnParentCommand( nId, nCode, nlParam )
       ENDIF
-    ELSEIF pPtr != NIL .AND. pPtr != 0
 
-      oCtrl := ArrayFromPointer( pPtr )
+    ELSEIF oCtrl != NIL
+
       nRet := oCtrl:OnParentCommand( nId, nCode, nlParam )
       IF nCode == CBN_SELENDOK .AND. oCtrl:__xCtrlName == "ToolStripComboBox"
          ExecuteEvent( "OnCBNSelEndOk", oCtrl )
@@ -1962,9 +1964,9 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
-   LOCAL nRet, nCode, nId, n, cBuffer, oObj
+   LOCAL nRet, n, cBuffer, oObj
    LOCAL oChild, oItem, x, y
-   LOCAL lShow, hParent, pPtr, oCtrl, aRect, aPt, mii, Band, msg, aComp, oMenu, mmi, oForm
+   LOCAL lShow, hParent, oCtrl, aRect, aPt, mii, Band, msg, aComp, oMenu, mmi, oForm
    LOCAL pt, hwndFrom, idFrom, code, aParams, nAnimation, nMess
    local aParent
    
@@ -2325,8 +2327,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
 
          CASE WM_INITMENU
               EXIT
-
-         CASE WM_COMMAND
 
          CASE WM_HELP
               ::HelpInfo  := (struct HELPINFO *) nlParam
