@@ -185,7 +185,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
    ENDCASE
 RETURN NIL
 
-METHOD DrawFrame( oDrawing, aRect, nAlign, nWidth, nHeight, nStatus, lDraw ) CLASS CheckBox
+METHOD DrawFrame( hDC, aRect, nAlign, nWidth, nHeight, nStatus, lDraw ) CLASS CheckBox
    LOCAL nFlags := DFCS_BUTTONCHECK
    DEFAULT lDraw TO TRUE
    IF nStatus != NIL
@@ -225,9 +225,9 @@ METHOD DrawFrame( oDrawing, aRect, nAlign, nWidth, nHeight, nStatus, lDraw ) CLA
    aRect[4] := aRect[2] + nHeight -1
    IF lDraw
       IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
-         oDrawing:DrawThemeBackground( ::hTheme, BP_CHECKBOX, nStatus, aRect, aRect )
+         DrawThemeBackground( ::hTheme, hDC, BP_CHECKBOX, nStatus, aRect, aRect )
        ELSE
-         oDrawing:DrawFrameControl( aRect, DFC_BUTTON, nFlags )
+         DrawFrameControl( hDC, aRect, DFC_BUTTON, nFlags )
       ENDIF
    ENDIF
 RETURN aRect

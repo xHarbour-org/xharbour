@@ -116,6 +116,7 @@ static aMessages := {;
                     { WM_MOUSEWHEEL,   "OnMouseWheel"   },;
                     { WM_SETCURSOR,    "OnSetCursor"    },;
                     { WM_COMMAND,      "OnCommand"      },;
+                    { WM_PAINT,        "OnPaint"        },;
                     { WM_INITDIALOG,   "OnInitDialog"   };
                     }
 
@@ -244,6 +245,7 @@ CLASS Window INHERIT Object
    DATA MDIClient                PROTECTED
    DATA __Docked                 PROTECTED INIT .T.
    DATA __aCltRect               PROTECTED
+   DATA __cPaint                 PROTECTED
    DATA __hCursor                EXPORTED
 
    DATA __MenuBar                EXPORTED  INIT .F.
@@ -376,7 +378,6 @@ CLASS Window INHERIT Object
    DATA __WndProc              PROTECTED INIT "__ControlProc"
    DATA __HideResized          PROTECTED INIT .F.
    DATA __WindowStyle          PROTECTED INIT WT_WINDOW
-   DATA __lOnWindowPaint       PROTECTED INIT .F.
    DATA __ClientRect           PROTECTED
    DATA __WidthPerc            PROTECTED
    DATA __HeightPerc           PROTECTED
@@ -519,11 +520,8 @@ CLASS Window INHERIT Object
    METHOD OnChar()              VIRTUAL
    METHOD OnSysChar()           VIRTUAL
    METHOD OnClose()             VIRTUAL
-   METHOD OnCommand()
    METHOD OnGetMinMaxInfo()     VIRTUAL
    METHOD OnHotKey()            VIRTUAL
-   METHOD OnWindowPaint()       VIRTUAL
-   METHOD OnPaint()             VIRTUAL
    METHOD OnDestroy()           VIRTUAL
    METHOD OnParentDrawItem()    VIRTUAL
    METHOD OnParentMeasureItem() VIRTUAL
@@ -653,7 +651,10 @@ CLASS Window INHERIT Object
    METHOD OnNCMouseLeave()
    METHOD OnSize()
    METHOD OnSetCursor()
-
+   METHOD OnPaint()
+   METHOD OnCommand()
+   METHOD BeginPaint()
+   METHOD EndPaint()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -944,8 +945,7 @@ METHOD Create( oParent ) CLASS Window
 
    ::RegisterDocking()
 
-   ::__lOnPaint   := __ClsMsgAssigned( Self, "OnPaint" ) .OR. HGetPos( ::EventHandler, "OnPaint" ) != 0
-   ::__lOnWindowPaint := __ClsMsgAssigned( Self, "OnWindowPaint" ) .OR. HGetPos( ::EventHandler, "OnWindowPaint" ) != 0
+   ::__lOnPaint   := HGetPos( ::EventHandler, "OnPaint" ) != 0
    IF VALTYPE( oParent ) == "N"
       hParent := oParent
 
@@ -1648,7 +1648,7 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnSize( nwParam, nlParam ) CLASS Window
-   LOCAL x, y, aChildren, hDef, oChild, cProp, n
+   LOCAL x, y, aChildren, hDef, oChild, cProp, n, hDC
    ::__lReqBrush := .T.
    IF EMPTY( ::__ClientRect )
       RETURN 0
@@ -1661,7 +1661,9 @@ METHOD OnSize( nwParam, nlParam ) CLASS Window
 
    IF ::__hMemBitmap != NIL
       DeleteObject( ::__hMemBitmap )
-      ::__hMemBitmap := CreateCompatibleBitmap( ::Drawing:hDC, ::ClientWidth, ::ClientHeight )
+      hDC := GetDC( ::hWnd )
+      ::__hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
+      ReleaseDC( ::hWnd, hDC )
    ENDIF
 
    IF ::ClsName != "DataGrid"
@@ -1960,7 +1962,31 @@ METHOD OnCommand( nwParam, nlParam ) CLASS Window
    ENDIF
 RETURN NIL
 
+METHOD OnPaint( nwParam ) CLASS Window
+   IF nwParam != 0
+      ::lParam := -1
+      IF ! ::__lOnPaint .AND. ::__WindowStyle != WT_DIALOG
+         _FillRect( nwParam, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, IIF( ::BkBrush != NIL, ::BkBrush, ::ClassBrush ) )
+      ENDIF
+      RETURN 0
+   ENDIF
+RETURN NIL
 
+METHOD BeginPaint( hDC ) CLASS Window
+   LOCAL cPaint
+   ::__cPaint := NIL
+   IF hDC == NIL
+      hDC := _BeginPaint( ::hWnd, @cPaint )
+      ::__cPaint := cPaint
+   ENDIF
+RETURN hDC
+
+METHOD EndPaint() CLASS Window
+   IF ::__cPaint != NIL
+      _EndPaint( ::hWnd, ::__cPaint )
+      ::__cPaint := NIL
+   ENDIF
+RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
@@ -2379,38 +2405,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
          CASE WM_PRINT
               nRet := ExecuteEvent( "OnPrint", Self )
               ODEFAULT nRet TO ::OnPrint( nwParam, nlParam )
-              EXIT
-
-         CASE WM_PAINT
-              IF nwParam != 0
-                 ::lParam := -1
-                 nRet := ExecuteEvent( "OnPaint", Self )
-                 ODEFAULT nRet TO ::OnPaint( , nwParam )
-                 IF nRet == NIL .AND. !::__lOnPaint .AND. !::__lOnWindowPaint .AND. ::__WindowStyle != WT_DIALOG
-                    _FillRect( nwParam, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, IIF( ::BkBrush != NIL, ::BkBrush, ::ClassBrush ) )
-                 ENDIF
-                 RETURN 0
-              ENDIF
-              IF ::__lOnWindowPaint
-                 nRet := ExecuteEvent( "OnWindowPaint", Self )
-                 ODEFAULT nRet TO ::OnWindowPaint( nwParam )
-                 IF nRet != NIL
-                    RETURN nRet
-                 ENDIF
-              ENDIF
-              IF ::__lOnPaint
-                 ::Drawing:BeginPaint()
-                 nRet := ExecuteEvent( "OnPaint", Self )
-                 ODEFAULT nRet TO ::OnPaint( ::Drawing:hDC )
-                 ::Drawing:EndPaint()
-              ENDIF
-
-              IF ::__ClassInst != NIL .AND. ::Application != NIL
-                 TRY
-                    ::Application:Project:CurrentForm:CtrlMask:InValidateRect( ::Application:Project:CurrentForm:GetSelRect() ,.f.)
-                  CATCH
-                 END
-              ENDIF
               EXIT
 
          CASE WM_MENUGETOBJECT
@@ -5811,7 +5805,6 @@ RETURN { ;
                                   { "OnParentMove"       , "", "" },;
                                   { "OnSize"             , "", "" },;
                                   { "OnSizing"           , "", "" },;
-                                  { "OnWindowPaint"      , "", "" },;
                                   { "OnWindowPosChanged" , "", "" },;
                                   { "OnWindowPosChanging", "", "" } } },;
                   {"Menu",        {;

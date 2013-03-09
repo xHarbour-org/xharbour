@@ -205,16 +205,16 @@ METHOD OnMove( x, y ) CLASS MenuStrip
 RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
-METHOD OnPaint( hDC, hMemDC ) CLASS MenuStrip
+METHOD OnPaint() CLASS MenuStrip
    LOCAL aRect := Array(4)
    LOCAL y, n, nDots := ( ::Height - 6 ) / 4
-   LOCAL hMemBitmap, hOldBitmap, oChild, hOldBitmap1, hMemDC1
+   LOCAL hMemDC, hMemBitmap, hOldBitmap, oChild, hOldBitmap1, hMemDC1, hDC
 
-   IF hDC != NIL
-      hMemDC     := CreateCompatibleDC( hDC )
-      hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
-      hOldBitmap := SelectObject( hMemDC, hMemBitmap)
-   ENDIF
+   hDC := ::BeginPaint()
+
+   hMemDC     := CreateCompatibleDC( hDC )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
+   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
    
    _FillRect( hMemDC, {0,0,::ClientWidth,::ClientHeight}, ::__hBrush )
    
@@ -255,11 +255,11 @@ METHOD OnPaint( hDC, hMemDC ) CLASS MenuStrip
       NEXT
    ENDIF
 
-   IF hDC != NIL
-      BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
-      SelectObject( hMemDC,  hOldBitmap )
-      DeleteObject( hMemBitmap )
-      DeleteDC( hMemDC )
-   ENDIF
+   BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
+   SelectObject( hMemDC,  hOldBitmap )
+   DeleteObject( hMemBitmap )
+   DeleteDC( hMemDC )
+
+   ::EndPaint()
 RETURN 0
 

@@ -216,7 +216,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD DrawFrame( oDrawing, aRect, nAlign, nWidth, nStatus ) CLASS Button
+METHOD DrawFrame( hDC, aRect, nAlign, nWidth, nStatus ) CLASS Button
 
    LOCAL nFlags := DFCS_BUTTONPUSH
 
@@ -230,7 +230,7 @@ METHOD DrawFrame( oDrawing, aRect, nAlign, nWidth, nStatus ) CLASS Button
       CASE nAlign == DT_RIGHT
            aRect[1] := aRect[3]-nWidth
    ENDCASE
-   oDrawing:DrawFrameControl( aRect, DFC_BUTTON, nFlags )
+   DrawFrameControl( hDC, aRect, DFC_BUTTON, nFlags )
 RETURN nWidth
 
 //-----------------------------------------------------------------------------------------------

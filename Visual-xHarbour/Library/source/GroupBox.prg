@@ -112,6 +112,8 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
    rc:right  := ::Width
    rc:bottom := ::Height
 
+   hDC := ::BeginPaint( hDC )
+
    IF hDC != NIL
       hMemDC     := CreateCompatibleDC( hDC )
       IF hBrush == NIL .AND. ::Parent:__xCtrlName == "TabPage" .AND. GetParent( ::hWnd ) == ::Parent:hWnd
@@ -199,6 +201,7 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
       DeleteObject( hMemBitmap )
       DeleteDC( hMemDC )
    ENDIF
+   ::EndPaint()
 RETURN 0
 
 

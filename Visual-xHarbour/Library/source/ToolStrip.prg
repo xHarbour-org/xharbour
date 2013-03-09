@@ -194,8 +194,10 @@ METHOD __AddToolStrip( cStrip ) CLASS ToolStripContainer
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD OnPaint( hDC, hMemDC ) CLASS ToolStripContainer
-   LOCAL hMemBitmap, hOldBitmap, oChild, hOldBitmap1, hMemDC1
+METHOD OnPaint() CLASS ToolStripContainer
+   LOCAL hMemBitmap, hOldBitmap, oChild, hOldBitmap1, hMemDC1, hMemDC
+   LOCAL hDC := ::BeginPaint()
+
    IF hDC != NIL
       hMemDC     := CreateCompatibleDC( hDC )
       hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
@@ -231,6 +233,7 @@ METHOD OnPaint( hDC, hMemDC ) CLASS ToolStripContainer
       DeleteObject( hMemBitmap )
       DeleteDC( hMemDC )
    ENDIF
+   ::EndPaint()
 RETURN 0
 
 //-------------------------------------------------------------------------------------------------------
@@ -840,11 +843,12 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS ToolStrip
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD OnPaint( hDC, hMemDC ) CLASS ToolStrip
+METHOD OnPaint() CLASS ToolStrip
    LOCAL hOldPen, aRect := Array(4)
    LOCAL y, n, nDots := ( ::Height - 6 ) / 4
-   LOCAL hMemBitmap, hOldBitmap, oChild, hOldBitmap1, hMemDC1, hSepLight, hSepDark, nLeft, nTop, nBottom
+   LOCAL hMemBitmap, hOldBitmap, oChild, hOldBitmap1, hMemDC1, hSepLight, hSepDark, nLeft, nTop, nBottom, hDC, hMemDC
 
+   hDC := ::BeginPaint()
    IF hDC != NIL
       hMemDC     := CreateCompatibleDC( hDC )
       hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
@@ -957,7 +961,7 @@ METHOD OnPaint( hDC, hMemDC ) CLASS ToolStrip
       DeleteObject( hMemBitmap )
       DeleteDC( hMemDC )
    ENDIF
-
+   ::EndPaint()
 RETURN 0
 
 //-------------------------------------------------------------------------------------------------------
@@ -1870,6 +1874,8 @@ METHOD OnPaint( hDC, hMemDC ) CLASS ToolStripButton
    
    lEnabled := ::Enabled .AND. ::Parent:Enabled
 
+   hDC := ::BeginPaint()
+
    IF hDC != NIL
       hMemDC     := CreateCompatibleDC( hDC )
       hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
@@ -2000,7 +2006,7 @@ METHOD OnPaint( hDC, hMemDC ) CLASS ToolStripButton
       DeleteObject( hMemBitmap )
       DeleteDC( hMemDC )
    ENDIF
-
+   ::EndPaint()
 RETURN 0
 
 //-------------------------------------------------------------------------------------------------------

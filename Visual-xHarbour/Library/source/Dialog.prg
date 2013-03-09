@@ -233,8 +233,7 @@ METHOD Create( hParent ) CLASS Dialog
    DEFAULT hParent TO GetDesktopWindow()
    DEFAULT ::EventHandler TO Hash()
   
-   ::__lOnPaint   := __ClsMsgAssigned( Self, "OnPaint" ) .OR. HGetPos( ::EventHandler, "OnPaint" ) != 0
-   ::__lOnWindowPaint := __ClsMsgAssigned( Self, "OnWindowPaint" ) .OR. HGetPos( ::EventHandler, "OnWindowPaint" ) != 0
+   ::__lOnPaint   := HGetPos( ::EventHandler, "OnPaint" ) != 0
 
    ::ClsName  := "Dialog"
    ::lEmpty   := ::Template == NIL

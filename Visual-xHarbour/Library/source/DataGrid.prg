@@ -619,13 +619,13 @@ METHOD OnMouseMove( wParam, lParam ) CLASS DataGrid
          IF nDrag > 0 .AND. ::__DragColumn != nDrag .AND. nDrag != ::__prevDrag
             ImageListDragShowNolock( .F. )
             IF ::__DragColumn > 0
-               ::Children[ ::__DragColumn ]:DrawHeader( ::Drawing:hDC )
+               ::Children[ ::__DragColumn ]:DrawHeader()
             ENDIF
             
             ::__DragColumn := nDrag
             
             IF ::Children[ nDrag ]:AllowDrag
-               ::Children[ nDrag ]:DrawHeader( ::Drawing:hDC,,,, .T. )
+               ::Children[ nDrag ]:DrawHeader(,,,, .T. )
             ENDIF
             
             ImageListDragShowNolock( .T. )
@@ -1204,7 +1204,7 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
       IF ::__DragColumn <> ::__SelCol .AND. ::Children[ ::__DragColumn ]:AllowDrag
          ::Children[ ::__SelCol ]:Position := ::__DragColumn
       ENDIF
-      ::Children[ ::__DragColumn ]:DrawHeader( ::Drawing:hDC )
+      ::Children[ ::__DragColumn ]:DrawHeader()
    ENDIF
 
    IF !::__lSizeMouseDown .AND. (::__DragColumn == 0 .OR. ::__DragColumn == ::__SelCol) .AND. ::__SelCol > 0 .AND. Len( ::Children ) >= ::__SelCol
@@ -1319,7 +1319,7 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
 
                IF ! Empty( ::Children[ nClickCol ]:Tag )
                   ::DataSource:OrdSetFocus( ::Children[ nClickCol ]:Tag )
-                  ::Children[ nClickCol ]:DrawHeader( ::Drawing:hDC,,,, .T. )
+                  ::Children[ nClickCol ]:DrawHeader( ,,,, .T. )
                   ::CurTag := ::Children[ nClickCol ]:Tag
                   ::Update()
                ENDIF
@@ -1336,7 +1336,7 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
 
                IF ::Children[ ::__SelCol ]:HeaderMenu == NIL
                   ::__DragColumn := nClickCol
-                  ::Children[ nClickCol ]:DrawHeader( ::Drawing:hDC,,,, .T. )
+                  ::Children[ nClickCol ]:DrawHeader( ,,,, .T. )
                ENDIF
 
                ::__lMoveMouseDown := .T.
@@ -1789,29 +1789,31 @@ RETURN NIL
 METHOD OnEraseBkGnd() CLASS DataGrid
 RETURN IIF( LEN( ::Children ) > 0, 1, NIL )
 
-METHOD OnPaint( hDC, hMemDC ) CLASS DataGrid
-   LOCAL hMemBitmap, hOldBitmap, lPaint
-   IF hDC != NIL
-      hMemDC     := CreateCompatibleDC( hDC )
-      hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
-      hOldBitmap := SelectObject( hMemDC, hMemBitmap)
-   ENDIF
+METHOD OnPaint() CLASS DataGrid
+   LOCAL hMemBitmap, hOldBitmap, lPaint, hMemDC
+   LOCAL hDC := ::BeginPaint()
+
+   hMemDC     := CreateCompatibleDC( hDC )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
+   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+
    lPaint := ::__DisplayData(,,,, hMemDC )
-   IF hDC != NIL
-      IF lPaint
-         BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
-      ENDIF
-      SelectObject( hMemDC,  hOldBitmap )
-      DeleteObject( hMemBitmap )
-      DeleteDC( hMemDC )
+
+   IF lPaint
+      BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
    ENDIF
+   SelectObject( hMemDC,  hOldBitmap )
+   DeleteObject( hMemBitmap )
+   DeleteDC( hMemDC )
+
+   ::EndPaint()
 RETURN 0
 
 //----------------------------------------------------------------------------------
 METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataGrid
    LOCAL n, i, cData, x, y, nY, nRec, nRecno, lHide, aText, lSelected, nHScroll, iRight, iLeft, zLeft
    LOCAL nLeft, nTop, nRight, nBottom, hOldFont, hOldPen, nWImg, nHImg, nInd, nAlign, aAlign, aGrid, lFreeze, nHeaderRight
-   LOCAL nBkCol, nTxCol, xLeft, nStatus, lDeleted, nPos, iAlign
+   LOCAL nBkCol, nTxCol, xLeft, nStatus, lDeleted, nPos, iAlign, lDC
    LOCAL nDif, nAve, aTextExt, nFocRow, aData, z, lDrawControl, nCtrl, nRep, aRect, lDis := !::IsWindowEnabled()
    LOCAL iLen, lHighLight, lBorder, hBrush, nLine, nRecPos := 0, hPen, nImgX
    IF LEN( ::Children ) == 0 .OR. ::hWnd == NIL .OR. !IsWindow( ::hWnd ) .OR. ::hWnd == 0 
@@ -1827,7 +1829,8 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
     ELSE
       nRecno := 0
    ENDIF
-   DEFAULT hMemDC TO ::Drawing:hDC
+   lDC := hMemDC != NIL
+   DEFAULT hMemDC TO GetDC( ::hWnd )
    DEFAULT lHover TO .F.
 
    hOldFont := SelectObject( hMemDC, ::Font:Handle )
@@ -1861,6 +1864,10 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
    DEFAULT nRowEnd TO 0
 
    aTextExt := _GetTextExtentPoint32( hMemDC, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' )
+   
+   IF nRowEnd == 0 .AND. ::ShowHeaders
+      nRowEnd := 1
+   ENDIF
    FOR nLine := nRow TO nRowEnd
        IF nLine <= LEN( ::__DisplayArray ) .AND. ::__DisplayArray[nLine] == NIL
           LOOP
@@ -2164,7 +2171,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
                     ENDIF
 
                     IF lDrawControl
-                       aRect := ::Children[i]:ControlObject:DrawFrame( ::Drawing, {zLeft+IIF(::Children[i]:ControlAlign==DT_LEFT,1,0),nTop+1,nRight-2,MAX(nBottom-1,nTop+::ItemHeight)}, ::Children[i]:ControlAlign, ::Children[i]:ControlWidth, ::Children[i]:ControlHeight, nStatus )
+                       aRect := ::Children[i]:ControlObject:DrawFrame( hMemDC, {zLeft+IIF(::Children[i]:ControlAlign==DT_LEFT,1,0),nTop+1,nRight-2,MAX(nBottom-1,nTop+::ItemHeight)}, ::Children[i]:ControlAlign, ::Children[i]:ControlWidth, ::Children[i]:ControlHeight, nStatus )
                        IF lSelected
                           ::__CheckPos := aRect
                        ENDIF
@@ -4119,24 +4126,26 @@ METHOD __SetSortArrow(n) CLASS GridColumn
    IF ::Parent:IsWindow()
       FOR i := 1 TO LEN( ::Parent:Children )
           ::Parent:Children[i]:xSortArrow :=0
-          ::Parent:Children[i]:DrawHeader( ::Parent:Children[i]:Parent:Drawing:hDC )
+          ::Parent:Children[i]:DrawHeader()
       NEXT
       ::xSortArrow := n
-      ::DrawHeader( ::Parent:Drawing:hDC )
+      ::DrawHeader()
    ENDIF
 RETURN NIL
 
 METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    LOCAL aAlign, y, nColor, hOldPen, hOldBrush, hOldFont, n, aRect, nH := 5, nx := 0
    LOCAL nTop, nIcoLeft, nTxColor, nImage := ::xHeaderImageIndex
-   LOCAL hBorderPen, nColor1, nColor2, cOrd, nBackColor, nBorder, nShadow, hPenShadow, hPenLight, z, i, nPrevColor
+   LOCAL hBorderPen, nColor1, nColor2, cOrd, nBackColor, nBorder, nShadow, hPenShadow, hPenLight, z, i, nPrevColor, lDC
    
    DEFAULT lHot   TO .F.
    DEFAULT nLeft  TO ::__HeaderLeft
    DEFAULT nRight TO ::__HeaderRight
    DEFAULT x      TO ::__HeaderX
    DEFAULT nImage TO 0
-   DEFAULT hDC    TO ::Parent:Drawing:hDC
+
+   lDC := hDC == NIL
+   DEFAULT hDC    TO GetDC( ::Parent:hWnd )
    
    aRect := {nLeft, 0, nRight+1, ::Parent:__GetHeaderHeight()}
 
@@ -4315,6 +4324,9 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
          DeleteObject( hPenShadow )
          DeleteObject( hPenLight )
       ENDIF
+   ENDIF
+   IF lDC
+      ReleaseDC( ::Parent:hWnd, hDC )
    ENDIF
 RETURN NIL
 

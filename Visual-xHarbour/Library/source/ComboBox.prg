@@ -353,7 +353,7 @@ METHOD GetComboBoxInfo() CLASS ComboBox
 RETURN cbi
 
 //----------------------------------------------------------------------------------------------------------------
-METHOD DrawFrame( oDrawing, aRect, nAlign, nWidth, nStatus ) CLASS ComboBox
+METHOD DrawFrame( hDC, aRect, nAlign, nWidth, nStatus ) CLASS ComboBox
    LOCAL hTheme, nFlags := DFCS_SCROLLCOMBOBOX
    (nAlign)
    (nWidth)
@@ -367,10 +367,10 @@ METHOD DrawFrame( oDrawing, aRect, nAlign, nWidth, nStatus ) CLASS ComboBox
    IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
       hTheme := OpenThemeData(,"combobox")
       aRect[4]-=2
-      oDrawing:DrawThemeBackground( hTheme, CP_DROPDOWNBUTTON, nStatus, aRect, aRect )
+      DrawThemeBackground( hTheme, hDC, CP_DROPDOWNBUTTON, nStatus, aRect, aRect )
       CloseThemeData( hTheme )
     ELSE
-      oDrawing:DrawFrameControl( aRect, DFC_SCROLL, nFlags )
+      DrawFrameControl( hDC, aRect, DFC_SCROLL, nFlags )
    ENDIF
 RETURN GetSystemMetrics( SM_CXVSCROLL )
 

@@ -215,6 +215,7 @@ RETURN Self
 
 METHOD OnPaint( hDC, hMemDC ) CLASS ExplorerBar
    LOCAL hMemBitmap, hOldBitmap, rc := (struct RECT)
+   hDC := ::BeginPaint()
    IF hDC != NIL
       hMemDC     := CreateCompatibleDC( hDC )
       hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
@@ -238,6 +239,7 @@ METHOD OnPaint( hDC, hMemDC ) CLASS ExplorerBar
       DeleteObject( hMemBitmap )
       DeleteDC( hMemDC )
    ENDIF
+   ::EndPaint()
 RETURN 0
 
 
@@ -462,6 +464,8 @@ METHOD OnPaint( hDC, hMemDC ) CLASS Expando
    IF !::IsWindow()
       RETURN 0
    ENDIF
+   hDC := ::BeginPaint()
+
    IF ::Special
       oTask   := ::System:ExplorerBar:taskspecial
       oHeader := ::System:ExplorerBar:headerspecial
@@ -610,6 +614,7 @@ METHOD OnPaint( hDC, hMemDC ) CLASS Expando
       DeleteObject( hMemBitmap )
       DeleteDC( hMemDC )
    ENDIF
+   ::EndPaint()
 RETURN 0
 
 METHOD __SetSizePos( nPos, nVal ) CLASS Expando
