@@ -55,10 +55,13 @@ RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
 METHOD OnPaint( hDC, hMemDC ) CLASS FreeImage
-   LOCAL hMemBitmap, hOldBitmap, hBrush
+   LOCAL hMemBitmap, hOldBitmap, hBrush, lDC
    LOCAL oChild, hOldBitmap1, hMemDC1, pPt := (struct POINT)
-
-   hDC := ::BeginPaint()
+   
+   lDC := ( hDC == NIL .OR. hDC == 0 )
+   IF lDC
+      hDC := ::BeginPaint()
+   ENDIF
 
    IF !::Transparent
       hBrush := ::BkBrush
@@ -100,7 +103,9 @@ METHOD OnPaint( hDC, hMemDC ) CLASS FreeImage
       DeleteObject( hMemBitmap )
       DeleteDC( hMemDC )
    ENDIF
-   ::EndPaint()
+   IF lDC
+      ::EndPaint()
+   ENDIF
 RETURN 0
 #endif
 

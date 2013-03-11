@@ -843,12 +843,15 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS ToolStrip
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD OnPaint() CLASS ToolStrip
+METHOD OnPaint( hDC, hMemDC ) CLASS ToolStrip
    LOCAL hOldPen, aRect := Array(4)
    LOCAL y, n, nDots := ( ::Height - 6 ) / 4
-   LOCAL hMemBitmap, hOldBitmap, oChild, hOldBitmap1, hMemDC1, hSepLight, hSepDark, nLeft, nTop, nBottom, hDC, hMemDC
+   LOCAL hMemBitmap, hOldBitmap, oChild, hOldBitmap1, hMemDC1, hSepLight, hSepDark, nLeft, nTop, nBottom
 
-   hDC := ::BeginPaint()
+   IF hDC == 0
+      hDC := ::BeginPaint()
+   ENDIF
+
    IF hDC != NIL
       hMemDC     := CreateCompatibleDC( hDC )
       hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
@@ -1866,10 +1869,10 @@ METHOD __SetDropDown( n ) CLASS ToolStripButton
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD OnPaint( hDC, hMemDC ) CLASS ToolStripButton
+METHOD OnPaint() CLASS ToolStripButton
    LOCAL hOldBrush, hOldPen, aRect := Array(4)
    LOCAL x, n, nDots := ( ::Height - 6 ) / 4
-   LOCAL hMemBitmap, hOldBitmap, hPrevFont, nLeft, nTop, nTextFlags, aTextRect, hBorderPen, lEnabled
+   LOCAL hMemBitmap, hOldBitmap, hPrevFont, nLeft, nTop, nTextFlags, aTextRect, hBorderPen, lEnabled, hDC, hMemDC
    static lPaint := .F.
    
    lEnabled := ::Enabled .AND. ::Parent:Enabled

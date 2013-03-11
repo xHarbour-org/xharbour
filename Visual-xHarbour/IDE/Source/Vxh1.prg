@@ -2322,8 +2322,11 @@ CLASS StartTabPage INHERIT TabPage
 ENDCLASS
 
 METHOD OnPaint( hDC, hMemDC ) CLASS StartTabPage
-   ( hDC )
-   ::OnEraseBkGnd(, hMemDC )
+   hDC := IIF( hMemDC == NIL, ::BeginPaint(), NIL )
+   ::OnEraseBkGnd( hDC, hMemDC )
+   IF hMemDC == NIL
+      ::EndPaint()
+   ENDIF
 RETURN 0
 
 METHOD OnEraseBkGnd( hDC, hMemDC ) CLASS StartTabPage
@@ -2367,9 +2370,10 @@ CLASS StartPagePanel INHERIT Panel
    METHOD Create()  INLINE ::Super:Create(), ::__lOnPaint := .F., Self
 ENDCLASS
 
-METHOD OnPaint( hDC, hMemDC ) CLASS StartPagePanel
-   ( hDC )
-   ::OnEraseBkGnd(, hMemDC )
+METHOD OnPaint() CLASS StartPagePanel
+   LOCAL hDC := ::BeginPaint()
+   ::OnEraseBkGnd( hDC )
+   ::EndPaint()
 RETURN 0
 
 METHOD OnEraseBkGnd( hDC, hMemDC ) CLASS StartPagePanel
@@ -2724,10 +2728,11 @@ METHOD EditReset(n) CLASS Project
 
    lEnabled := n == 1 .AND. ::CurrentForm != NIL .AND. LEN( ::CurrentForm:Selected ) > 1
 
-   FOR i := 1 TO LEN( ::Application:Props[ "AlignBar" ]:Children )-2
-      ::Application:Props[ "AlignBar" ]:Children[i]:Enabled := lEnabled
-   NEXT
-
+   IF ::Application:Props[ "AlignBar" ]:Children != NIL
+      FOR i := 1 TO LEN( ::Application:Props[ "AlignBar" ]:Children )-2
+         ::Application:Props[ "AlignBar" ]:Children[i]:Enabled := lEnabled
+      NEXT
+   ENDIF
    ::Application:Props[ "TabOrderBttn"  ]:Enabled := n == 1 .AND. ::CurrentForm != NIL .AND. CntChildren( ::CurrentForm ) > 1 .AND. LEN( ::CurrentForm:Selected ) == 1
    ::Application:Props[ "CenterHorBttn" ]:Enabled := lSelected .AND. n == 1
    ::Application:Props[ "CenterVerBttn" ]:Enabled := ::Application:Props[ "CenterHorBttn" ]:Enabled
@@ -5629,7 +5634,7 @@ METHOD ResetQuickOpen( cFile ) CLASS Project
        ::Application:IniFile:WriteString( "Recent", aEntries[n], "" )
 
        WITH OBJECT ::Application:Props[ "OpenBttn" ]   // Open Button
-          IF LEN( :Children ) < n
+          IF :Children == NIL .OR. LEN( :Children ) < n
              oItem := MenuStripItem( :this )
              oItem:Create()
            ELSE

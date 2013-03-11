@@ -1878,15 +1878,17 @@ METHOD OnEraseBkGnd( /*hDC*/ ) CLASS TabStrip
 RETURN 1
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnPaint( hDC ) CLASS TabStrip
+METHOD OnPaint() CLASS TabStrip
    LOCAL hOldPen, aRect, nSel, aItem, nItems, n, nColor
-   LOCAL hMemDC, hMemBitmap, hOldBitmap, hBrush//, hMemDC1, hOldBitmap1
+   LOCAL hDC, hMemDC, hMemBitmap, hOldBitmap, hBrush//, hMemDC1, hOldBitmap1
 
    aRect := _GetClientRect( ::hWnd )
    nSel  := TabCtrl_GetCurSel( ::hWnd )+1
    IF nSel == 0
       ::SetCurSel(1)
    ENDIF
+
+   hDC := ::BeginPaint()
 
    hMemDC     := CreateCompatibleDC( hDC )
    hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
@@ -1948,6 +1950,7 @@ METHOD OnPaint( hDC ) CLASS TabStrip
    SelectObject( hMemDC, hOldBitmap )
    DeleteDC( hMemDC )
    DeleteObject( hMemBitmap )
+   ::EndPaint()
 RETURN 0
 
 //-----------------------------------------------------------------------------------------------

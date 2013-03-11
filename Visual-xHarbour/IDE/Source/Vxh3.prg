@@ -563,9 +563,9 @@ METHOD OnEraseBkGnd() CLASS ControlMask
    ENDIF
 RETURN 1
 
-METHOD OnPaint( hDC ) CLASS ControlMask
+METHOD OnPaint() CLASS ControlMask
    LOCAL x, nLeft, nTop, nRight, nBottom, lDC := .T.
-   LOCAL aControl, aPoints, aPoint, aRect
+   LOCAL aControl, aPoints, aPoint, aRect, hDC
    LOCAL i := 0
    LOCAL j := 0
 
@@ -579,6 +579,8 @@ METHOD OnPaint( hDC ) CLASS ControlMask
    ENDIF
 
    aRect := ::CurForm:GetSelRect()
+
+   hDC := ::BeginPaint()
 
    IF aRect != NIL
       nLeft   := aRect[1]
@@ -617,6 +619,7 @@ METHOD OnPaint( hDC ) CLASS ControlMask
     ELSEIF ::Application:CurCursor == NIL
       ::DrawOrder( ::CurForm, "" )
    ENDIF
+   ::EndPaint()
 RETURN 0
 
 METHOD DrawSelRect( lClear ) CLASS ControlMask

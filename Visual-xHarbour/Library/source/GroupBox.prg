@@ -97,7 +97,7 @@ METHOD Create() CLASS GroupBox
 RETURN Self
 
 METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
-   LOCAL oChild, hFont, hMemDC1, hOldBitmap1, hBrush, hMemBitmap, hOldBitmap, rc := (struct RECT), rcalc := (struct RECT), sz := (struct SIZE)
+   LOCAL lDC, oChild, hFont, hMemDC1, hOldBitmap1, hBrush, hMemBitmap, hOldBitmap, rc := (struct RECT), rcalc := (struct RECT), sz := (struct SIZE)
    LOCAL hParBrush := ::Parent:BkBrush
    IF !::IsWindow()
       RETURN 0
@@ -112,7 +112,10 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
    rc:right  := ::Width
    rc:bottom := ::Height
 
-   hDC := ::BeginPaint( hDC )
+   lDC := ( hDC == NIL .OR. hDC == 0 )
+   IF lDC
+      hDC := ::BeginPaint()
+   ENDIF
 
    IF hDC != NIL
       hMemDC     := CreateCompatibleDC( hDC )
@@ -201,7 +204,9 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
       DeleteObject( hMemBitmap )
       DeleteDC( hMemDC )
    ENDIF
-   ::EndPaint()
+   IF lDC
+      ::EndPaint()
+   ENDIF
 RETURN 0
 
 

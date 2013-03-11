@@ -360,10 +360,12 @@ RETURN NIL
 
 //----------------------------------------------------------------------------
 
-METHOD OnPaint( hDC ) CLASS WindowEdit
-   LOCAL nFColor, nBColor
+METHOD OnPaint() CLASS WindowEdit
+   LOCAL nFColor, nBColor, hDC
    LOCAL i       := 0
    LOCAL j       := 0
+
+   hDC := ::BeginPaint()
 
    IF ::Application:ShowGrid == 1
 
@@ -384,6 +386,7 @@ METHOD OnPaint( hDC ) CLASS WindowEdit
    ENDIF
    ::__PaintBakgndImage( hDC )
    ValidateRect( ::hWnd )
+   ::EndPaint()
 RETURN 0
 
 //----------------------------------------------------------------------------
