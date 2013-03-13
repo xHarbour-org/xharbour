@@ -3000,7 +3000,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               ENDIF
 
               ::xWidth  := ::WindowPos:cx
-              IF ::ClsName != "ComboBox" .OR. (::Style & CBS_SIMPLE) == CBS_SIMPLE
+              IF ::ClsName != "ComboBox" //.OR. (::Style & CBS_SIMPLE) == CBS_SIMPLE
                  ::xHeight := ::WindowPos:cy
               ENDIF
 
@@ -3584,7 +3584,7 @@ METHOD GetWindowRect() CLASS Window
 
    ENDIF
    ::xWidth  := aRect[3] - aRect[1]
-   IF ::ClsName != "ComboBox" .OR. (::Style & CBS_SIMPLE) == CBS_SIMPLE
+   IF ::ClsName != "ComboBox" //.OR. (::Style & CBS_SIMPLE) == CBS_SIMPLE
       ::xHeight := aRect[4] - aRect[2]
    ENDIF
 RETURN aRect
@@ -3964,7 +3964,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
             ::xTop  := IIF( ::Anchor:Top .AND. ::Parent:__aCltRect != NIL .AND. y != NIL, y - (::Parent:__aCltRect[4] - ::xTop), ::xTop )
          ENDIF
          ::xWidth  := ::xWidth  + IIF( ::Anchor:Right .AND. ::Parent:__aCltRect != NIL .AND. x != NIL, x - ::Parent:__aCltRect[3], 0 )
-         IF ::ClsName != "ComboBox" .OR. (::Style & CBS_SIMPLE) == CBS_SIMPLE
+         IF ::ClsName != "ComboBox" //.OR. (::Style & CBS_SIMPLE) == CBS_SIMPLE
             ::xHeight := ::xHeight + IIF( ::Anchor:Bottom .AND. ::Parent:__aCltRect != NIL .AND. y != NIL, y - ::Parent:__aCltRect[4], 0 )
          ENDIF
       ENDIF
@@ -3986,7 +3986,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
          IF oTop:hWnd == ::Parent:hWnd
             ::xTop  := ::Dock:TopMargin
           ELSEIF oTop:IsChild
-            IF oTop:ClsName == "ComboBox" .AND. (oTop:Style & CBS_SIMPLE) == 0
+            IF oTop:ClsName == "ComboBox" //.AND. (oTop:Style & CBS_SIMPLE) == 0
                rc := (struct RECT)
                GetClientRect( oTop:hWnd, @rc )
                n := rc:bottom
@@ -4022,7 +4022,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
              ELSEIF oBottom:IsChild
                ::xTop := oBottom:Top - ::xHeight - ::Dock:BottomMargin - IIF( oBottom:TopSplitter != NIL, oBottom:TopSplitter:Weight, 0 )
             ENDIF
-          ELSEIF ::ClsName != "ComboBox" .OR. (::Style & CBS_SIMPLE) == CBS_SIMPLE
+          ELSEIF ::ClsName != "ComboBox" //.OR. (::Style & CBS_SIMPLE) == CBS_SIMPLE
             IF oBottom:hWnd == ::Parent:hWnd
                ::xHeight := oBottom:ClientHeight - ::xTop - ::Dock:BottomMargin
              ELSEIF oBottom:IsChild
@@ -4058,11 +4058,11 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
       ENDIF
       IF ::Anchor:ProportionalTop
          ::xTop    := IIF( oTop  == NIL, ::OriginalRect[2] * y / ::Parent:__aCltRect[4], ::xTop )
-         IF ::ClsName != "ComboBox" .OR. (::Style & CBS_SIMPLE) == CBS_SIMPLE
+         IF ::ClsName != "ComboBox" //.OR. (::Style & CBS_SIMPLE) == CBS_SIMPLE
             ::xHeight := Int( ( ::Parent:Height - ::xTop ) * ::__HeightPerc )
          ENDIF
        ELSEIF ::Parent:__Splitting
-         IF oBottom == NIL .AND. ::Anchor:Bottom .AND. ( ::ClsName != "ComboBox"  .OR. (::Style & CBS_SIMPLE) == CBS_SIMPLE )
+         IF oBottom == NIL .AND. ::Anchor:Bottom .AND. ( ::ClsName != "ComboBox" /* .OR. (::Style & CBS_SIMPLE) == CBS_SIMPLE*/ )
             IF ::TopSplitter != NIL .AND. ::TopSplitter:lSizing
                ::xHeight := ::aPrevSize[4] + ( ::aPrevSize[2]-::xTop )
              ELSE
@@ -4070,7 +4070,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
             ENDIF
          ENDIF
          IF oTop == NIL .AND. ::Anchor:Top
-            IF ::ClsName != "ComboBox" .OR. (::Style & CBS_SIMPLE) == CBS_SIMPLE
+            IF ::ClsName != "ComboBox" //.OR. (::Style & CBS_SIMPLE) == CBS_SIMPLE
                ::xHeight += ( ::xTop-nCurTop )
             ENDIF
             ::xTop    -= ( ::xTop-nCurTop )
@@ -4078,7 +4078,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
       ENDIF
       IF !lNoMove
 
-         IF ::ClsName == "ComboBox" .AND. (::Style & CBS_SIMPLE) <> CBS_SIMPLE
+         IF ::ClsName == "ComboBox" //.AND. (::Style & CBS_SIMPLE) <> CBS_SIMPLE
             rc := (struct RECT)
             GetClientRect( ::hWnd, @rc )
             nHeight := rc:bottom
