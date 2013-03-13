@@ -116,7 +116,8 @@ static aMessages := {;
                     { WM_MOUSEWHEEL,   "OnMouseWheel"   },;
                     { WM_SETCURSOR,    "OnSetCursor"    },;
                     { WM_COMMAND,      "OnCommand"      },;
-                    { WM_PAINT,        "OnPaint"      },;
+                    { WM_PAINT,        "OnPaint"        },;
+                    { WM_NCPAINT,      "OnNCPaint"      },;
                     { WM_INITDIALOG,   "OnInitDialog"   };
                     }
 
@@ -2977,11 +2978,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                  ENDIF
 
               ENDIF
-              EXIT
-
-         CASE WM_NCPAINT
-              nRet := ExecuteEvent( "OnNCPaint", Self )
-              ODEFAULT nRet TO ::OnNCPaint( nwParam, nlParam )
               EXIT
 
          CASE WM_WINDOWPOSCHANGED
