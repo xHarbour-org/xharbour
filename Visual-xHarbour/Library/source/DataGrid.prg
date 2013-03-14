@@ -2051,7 +2051,9 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
                     aText[3] += iRight - zLeft
                  ENDIF
                  IF nLine == 1 .AND. ::ShowHeaders
-                    aAlign := _GetTextExtentPoint32( hMemDC, IIF( Empty( ::Children[i]:xText ), "X", ::Children[i]:xText ) )
+                    aAlign := _GetTextExtentPoint32( hMemDC, IIF( Empty( ::Children[i]:xText ), 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', ::Children[i]:xText ) )
+                    DEFAULT aAlign TO {1,1}
+
                     iAlign := ::Children[i]:HeaderAlignment
                     IF iAlign == 0
                        iAlign := nAlign
@@ -2072,6 +2074,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
                  ENDIF
 
                  aAlign := _GetTextExtentPoint32( hMemDC, ALLTRIM( aData[1] ) )
+                 DEFAULT aAlign TO {1,1}
 
                  x := zLeft + IIF( ::Children[i]:ImageAlignment == 1, nWImg, 2 )
 
@@ -4134,8 +4137,8 @@ METHOD __SetSortArrow(n) CLASS GridColumn
 RETURN NIL
 
 METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
-   LOCAL aAlign, y, nColor, hOldPen, hOldBrush, hOldFont, n, aRect, nH := 5, nx := 0
-   LOCAL nTop, nIcoLeft, nTxColor, nImage := ::xHeaderImageIndex
+   LOCAL aAlign, nColor, hOldPen, hOldBrush, hOldFont, n, aRect, nH := 5, nx := 0
+   LOCAL nTop, nIcoLeft, nTxColor, nImage := ::xHeaderImageIndex, y := 0
    LOCAL hBorderPen, nColor1, nColor2, cOrd, nBackColor, nBorder, nShadow, hPenShadow, hPenLight, z, i, nPrevColor, lDC
    
    DEFAULT lHot   TO .F.
@@ -4143,6 +4146,10 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    DEFAULT nRight TO ::__HeaderRight
    DEFAULT x      TO ::__HeaderX
    DEFAULT nImage TO 0
+
+   IF hDC == 0
+      hDC := NIL
+   ENDIF
 
    lDC := hDC == NIL
    DEFAULT hDC    TO GetDC( ::Parent:hWnd )
@@ -4162,12 +4169,19 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    ::__HeaderRight := nRight
    ::__HeaderX     := x
 
-   IF ::Parent:GradientHeader
-      hOldFont := SelectObject( hDC, ::HeaderFont:Handle )
+   hOldFont := SelectObject( hDC, ::HeaderFont:Handle )
+   aAlign := _GetTextExtentPoint32( hDC, IIF( Empty( ::xText ), "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", ::xText ) )
+   OutputDebugString( "hDC: " + ::xText )
+   OutputDebugString( "hDC: " + ValType( hDC ) )
+   OutputDebugString( "aAlign: " + ValType( aAlign ) )
+   OutputDebugString( "-------------------------------------------------------------------------------------------------------" )
 
-      aAlign := _GetTextExtentPoint32( hDC, IIF( Empty( ::xText ), "X", ::xText ) )
+   IF aAlign != NIL
       y := (::Parent:__GetHeaderHeight() - aAlign[2] ) / 2
-
+    ELSE
+      y := (::Parent:__GetHeaderHeight() ) / 2
+   ENDIF
+   IF ::Parent:GradientHeader
       ::__aVertex[1]:x := aRect[1]-1
       ::__aVertex[1]:y := aRect[2]
       ::__aVertex[2]:x := aRect[3]
@@ -4218,9 +4232,7 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
       ::__HeaderX     := x
 
       hOldFont := SelectObject( hDC, ::HeaderFont:Handle )
-
-      aAlign := _GetTextExtentPoint32( hDC, IIF( Empty( ::xText ), "X", ::xText ) )
-      y := (::Parent:__GetHeaderHeight() - aAlign[2] ) / 2
+      //aAlign := _GetTextExtentPoint32( hDC, IIF( Empty( ::xText ), "X", ::xText ) )
 
       hOldBrush := SelectObject( hDC, CreateSolidBrush( nBackColor ) )
 
@@ -4256,7 +4268,7 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
           ELSEIF ::ImageAlignment == 3
             nIcoLeft := nRight - ::Parent:ImageList:IconWidth - 2
          ENDIF
-         
+
        ELSEIF n == 2 // Right
          nIcoLeft := nLeft + 1
          IF ::ImageAlignment == 2
