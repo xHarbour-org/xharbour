@@ -426,7 +426,7 @@ METHOD OnClose() CLASS IDE_MainForm
 
       ::Application:IniFile:WriteNumber( "ObjectTab",     "Height", Round( ( ::Application:ObjectTab:Height / aSize[4] ) * 100, 0 ) )
       ::Application:IniFile:WriteNumber( "ObjectManager", "Width",  Round( ( ::Panel1:Width / aSize[5] ) * 100, 0 ) )
-      ::Application:IniFile:WriteNumber( "ToolBox",       "Width",  Round( ( ::ToolBox1:Width / aSize[5] ) * 100, 0 ) )
+      ::Application:IniFile:WriteNumber( "ToolBox",       "Width",  Round( ( ::Application:ToolBox:Width / aSize[5] ) * 100, 0 ) )
 
       ::Application:IniFile:WriteNumber( "General", "RunMode", ::Application:RunMode )
 
@@ -457,10 +457,10 @@ METHOD OnClose() CLASS IDE_MainForm
       ENDDO
       AEVAL( aVal, {|c| RegDeleteKey( hKey, c )} )
 
-      FOR n := 1 TO LEN( ::ToolBox1:ComObjects )
-          IF RegCreateKey( hKey, ::ToolBox1:ComObjects[n][2], @hSub ) == 0
-             RegSetValueEx( hSub, "ProgID",, 1, ::ToolBox1:ComObjects[n][3] )
-             RegSetValueEx( hSub, "ClsID",, 1, ::ToolBox1:ComObjects[n][4] )
+      FOR n := 1 TO LEN( ::Application:ToolBox:ComObjects )
+          IF RegCreateKey( hKey, ::Application:ToolBox:ComObjects[n][2], @hSub ) == 0
+             RegSetValueEx( hSub, "ProgID",, 1, ::Application:ToolBox:ComObjects[n][3] )
+             RegSetValueEx( hSub, "ClsID",, 1, ::Application:ToolBox:ComObjects[n][4] )
              RegCloseKey( hSub )
           ENDIF
       NEXT
@@ -1087,8 +1087,8 @@ METHOD Init() CLASS IDE_MainForm
             :BeginGroup := .T.
             :Checked    := .T.
             :Action     := {|o| IIF( o:Checked,;
-                                   ( o:Checked := .F., ::Application:MainForm:ToolBox1:Hide() ),;
-                                   ( o:Checked := .T., ::Application:MainForm:ToolBox1:Show() ) ) }
+                                   ( o:Checked := .F., ::Application:ToolBox:Hide() ),;
+                                   ( o:Checked := .T., ::Application:ToolBox:Show() ) ) }
             :Create()
          END
 
@@ -1690,7 +1690,7 @@ METHOD Init() CLASS IDE_MainForm
    END
 
    WITH OBJECT Splitter( Self )
-      :Owner := ::ToolBox1
+      :Owner := ::Application:ToolBox
       :Create()
    END
 
@@ -1923,7 +1923,7 @@ METHOD Init() CLASS IDE_MainForm
       :Multiline     := .T.
       :TabPosition   := 4
       :AllowUndock   := .T.
-      :Dock:Left     := ::ToolBox1
+      :Dock:Left     := ::Application:ToolBox
       :Dock:Bottom   := ::StatusBar1
       :Dock:Right    := ::Panel1
       :TabStop       := .F.
@@ -2008,7 +2008,7 @@ METHOD Init() CLASS IDE_MainForm
       :Width          := 680
       :Height         := 200
       :StaticEdge     := .T.
-      :Dock:Left      := ::ToolBox1
+      :Dock:Left      := ::Application:ToolBox
       :Dock:Bottom    := ::Application:DebugWindow //::TabControl1
       :Dock:Right     := ::Panel1
       :AllowClose     := .T.
@@ -2032,7 +2032,7 @@ METHOD Init() CLASS IDE_MainForm
       :Multiline := .F.
       
       :Dock:BottomMargin := 3
-      :Dock:Left   := ::ToolBox1
+      :Dock:Left   := ::Application:ToolBox
       :Dock:Top    := ::Application:Props[ "MainToolBar" ]
       :Dock:Right  := ::Panel1
       :Dock:Bottom := ::Application:DebuggerPanel//::Panel2
@@ -2040,7 +2040,7 @@ METHOD Init() CLASS IDE_MainForm
       :OnSelChanged := <|n,x,y|
                         (n,x)
                         ::Application:Project:EditReset( IIF( y > 3, 1, 0 ) )
-                        ::Application:MainForm:ToolBox1:Enabled       := y > 3
+                        ::Application:ToolBox:Enabled       := y > 3
                         IF y > 3
                            ::Application:Project:CurrentForm:Redraw()
                         ENDIF
@@ -2481,7 +2481,7 @@ FUNCTION SetControlCursor( oItem )
    LOCAL cClass, n
    LOCAL oApp := __GetApplication()
 
-   oApp:MainForm:ToolBox1:ActiveItem := oItem
+   oApp:ToolBox:ActiveItem := oItem
    oApp:MainForm:SelImgList  := oItem:Parent:ImageList
    oApp:MainForm:SelImgIndex := oItem:ImageIndex
 
@@ -2489,8 +2489,8 @@ FUNCTION SetControlCursor( oItem )
    oApp:CurCursor := IIF( cClass != "Pointer", cClass, NIL )
 
    IF oItem:Owner:Caption == "COM Objects"
-      IF ( n := ASCAN( oApp:MainForm:ToolBox1:ComObjects, {|a| a[2] == cClass } ) ) > 0
-         oApp:CurCursor := oApp:MainForm:ToolBox1:ComObjects[n]
+      IF ( n := ASCAN( oApp:ToolBox:ComObjects, {|a| a[2] == cClass } ) ) > 0
+         oApp:CurCursor := oApp:ToolBox:ComObjects[n]
       ENDIF
 
     ELSEIF oItem:Owner:Caption == "Custom Controls"
@@ -3132,7 +3132,7 @@ RETURN Self
 
 METHOD TabOrder( oBtn ) CLASS Project
    ::CurrentForm:CtrlMask:lOrderMode       := oBtn:Checked
-   ::Application:MainForm:ToolBox1:Enabled := !oBtn:Checked
+   ::Application:ToolBox:Enabled := !oBtn:Checked
    ::Application:ObjectTab:Enabled         := !oBtn:Checked
    ::Application:EventManager:Enabled      := !oBtn:Checked
    ::Application:ObjectTree:Enabled        := !oBtn:Checked
@@ -3231,7 +3231,7 @@ METHOD ParseRC( cLine, aUnits ) CLASS Project
     ELSEIF ( n := AT( "EDITTEXT", cLine ) ) > 0
       aRect := __str2a( cLine, "," )
 
-      ::Application:MainForm:ToolBox1:SetControl( "Edit", , ( VAL(aRect[2])* aUnits[1] ) / 4,;
+      ::Application:ToolBox:SetControl( "Edit", , ( VAL(aRect[2])* aUnits[1] ) / 4,;
                                                           ( VAL(aRect[3])* aUnits[2] ) / 8,;
                                                           ::CurrentForm,;
                                                           ( VAL(aRect[4])* aUnits[1] ) / 4,;
@@ -3696,7 +3696,7 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
       RETURN .T.
    ENDIF
 
-   ::Application:MainForm:ToolBox1:Disable()
+   ::Application:ToolBox:Disable()
 
    ::Application:ObjectManager:SetRedraw( .F. )
    ::Application:ObjectManager:ResetContent()
@@ -4140,7 +4140,7 @@ METHOD Open( cProject ) CLASS Project
    oWait:Position := 20
 
    ::OpenDesigner()
-   ::Application:MainForm:ToolBox1:Enabled := .T.
+   ::Application:ToolBox:Enabled := .T.
 
    ::Application:SourceSelect:Visible := .T.
    //::Application:SourceTabs:Visible := .T.
@@ -6290,7 +6290,7 @@ METHOD SetAction( aActions, aReverse ) CLASS Project
                   ::Application:MainForm:FormEditor1:CtrlMask:nSplitterPos := aAction[9][x][2]
                ENDIF
 
-               o := ::Application:MainForm:ToolBox1:SetControl( aAction[7], aAction[2], aAction[3], aAction[4], aAction[6], nWidth, nHeight, aAction[5], @aAction[12], aAction[9], @oCtrl )
+               o := ::Application:ToolBox:SetControl( aAction[7], aAction[2], aAction[3], aAction[4], aAction[6], nWidth, nHeight, aAction[5], @aAction[12], aAction[9], @oCtrl )
 
                IF o != NIL
                   ReCreateChildren( o, aAction[11] )
@@ -6515,7 +6515,7 @@ STATIC FUNCTION ReCreateChildren( oParent, aChildren )
           n := ASCAN( aChild[6], {|a| a[1] == "POSITION"} )
           oApp:MainForm:FormEditor1:CtrlMask:nSplitterPos := aChild[6][n][2]
        ENDIF
-       oChild := oApp:MainForm:ToolBox1:SetControl( aChild[1], NIL, aChild[2], aChild[3], oParent, aChild[4], aChild[5], .F.,, aChild[6] )
+       oChild := oApp:ToolBox:SetControl( aChild[1], NIL, aChild[2], aChild[3], oParent, aChild[4], aChild[5], .F.,, aChild[6] )
 
        FOR EACH aProperty IN aChild[6]
            cProp := aProperty[1]
@@ -6837,7 +6837,7 @@ RETURN 0
 METHOD OnOk() CLASS ListOle
    LOCAL oTypeLib, cId
 
-   ::Application:MainForm:ToolBox1:ComObjects := {}
+   ::Application:ToolBox:ComObjects := {}
 
    ::MemoryTable1:GoTop()
    WHILE !::MemoryTable1:Eof()
@@ -6848,12 +6848,12 @@ METHOD OnOk() CLASS ListOle
           CATCH
             cId := STRTRAN( ::MemoryTable1:Fields:ProgID, "." )
          END
-         AADD( ::Application:MainForm:ToolBox1:ComObjects, { cId, ::MemoryTable1:Fields:Control, ::MemoryTable1:Fields:ProgID, ::MemoryTable1:Fields:ClsID } )
+         AADD( ::Application:ToolBox:ComObjects, { cId, ::MemoryTable1:Fields:Control, ::MemoryTable1:Fields:ProgID, ::MemoryTable1:Fields:ClsID } )
       ENDIF
       ::MemoryTable1:Skip()
    ENDDO
 
-   ::Application:MainForm:ToolBox1:UpdateComObjects()
+   ::Application:ToolBox:UpdateComObjects()
    ::Close()
 RETURN 0
 
@@ -6888,7 +6888,7 @@ METHOD Init( oParent ) CLASS RegOle
       :Table     := ACLONE( ::Form:aOle )
       FOR n := 1 TO LEN( :Table )
           cClass := :Table[n][2]
-          IF ( x := ASCAN( ::Application:MainForm:ToolBox1:ComObjects, {|a| a[3] == cClass } ) ) > 0
+          IF ( x := ASCAN( ::Application:ToolBox:ComObjects, {|a| a[3] == cClass } ) ) > 0
              x := 1
           ENDIF
           AINS( :Table[n], 1, x, .T. )

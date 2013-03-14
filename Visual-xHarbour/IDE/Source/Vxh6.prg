@@ -446,7 +446,14 @@ RETURN NIL
 METHOD DrawItem( tvcd ) CLASS ToolBox
    LOCAL oItem, nState, nBack, nFore, lExpanded, rc, nLeft, nRight, nBottom, aAlign, x, y
    LOCAL hBrush, aRest, cText, hPen, nFlags, hBackBrush, nBackColor, hItemBrush
-   LOCAL hBorderPen, hSelBrush, hDC
+   LOCAL hBorderPen, hSelBrush, hDC, hOldFont
+
+   rc         := tvcd:nmcd:rc
+   oItem      := FindTreeItem( ::Items, tvcd:nmcd:dwItemSpec )
+
+   IF oItem == NIL .OR. rc:Right == 0 .OR. !IsWindowVisible( ::hWnd )
+      RETURN NIL
+   ENDIF
 
    hDC        := tvcd:nmcd:hdc
    nBackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd
@@ -455,20 +462,15 @@ METHOD DrawItem( tvcd ) CLASS ToolBox
    hBackBrush := ::System:CurrentScheme:Brush:ToolStripPanelGradientEnd
    hBorderPen := ::System:CurrentScheme:Pen:MenuItemBorder
 
-   rc         := tvcd:nmcd:rc
-   oItem      := FindTreeItem( ::Items, tvcd:nmcd:dwItemSpec )
-   IF oItem == NIL .OR. rc:Right == 0 .OR. !IsWindowVisible( ::hWnd )
-      RETURN NIL
-   ENDIF
    nBack      := nBackColor
    nFore      := GetSysColor( COLOR_BTNTEXT )
    nState     := ::GetItemState( tvcd:nmcd:dwItemSpec, TVIF_STATE )
    lExpanded  := nState & TVIS_EXPANDED != 0
 
-   SelectObject( hDC, ::Font:Handle )
+   hOldFont := SelectObject( hDC, ::Font:Handle )
    IF oItem:Level == 0
       nBack := GetSysColor( COLOR_BTNSHADOW )
-      SelectObject( hDC, ::LevelFont:Handle )
+      hOldFont := SelectObject( hDC, ::LevelFont:Handle )
     ELSEIF nState & TVIS_SELECTED != 0 .AND. ::IsWindowEnabled() .AND. oItem:Cargo
       nBack := ::System:CurrentScheme:MenuItemSelected
    ENDIF
@@ -553,6 +555,7 @@ METHOD DrawItem( tvcd ) CLASS ToolBox
       y := rc:top + ( ( rc:bottom - rc:top ) / 2 ) - ( 9/2 )
       DrawMinusPlus( hDC, 5, y, lExpanded, .T., C_BLACK, 9, 9/2 )
    ENDIF
+   SelectObject( hDC, hOldFont )
 RETURN 0
 
 METHOD OnSelChanged( oItem ) CLASS ToolBox
