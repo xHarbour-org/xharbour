@@ -4171,10 +4171,10 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
 
    hOldFont := SelectObject( hDC, ::HeaderFont:Handle )
    aAlign := _GetTextExtentPoint32( hDC, IIF( Empty( ::xText ), "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", ::xText ) )
-   OutputDebugString( "hDC: " + ::xText )
-   OutputDebugString( "hDC: " + ValType( hDC ) )
-   OutputDebugString( "aAlign: " + ValType( aAlign ) )
-   OutputDebugString( "-------------------------------------------------------------------------------------------------------" )
+   //OutputDebugString( "hDC: " + ::xText )
+   //OutputDebugString( "hDC: " + ValType( hDC ) )
+   //OutputDebugString( "aAlign: " + ValType( aAlign ) )
+   //OutputDebugString( "-------------------------------------------------------------------------------------------------------" )
 
    IF aAlign != NIL
       y := (::Parent:__GetHeaderHeight() - aAlign[2] ) / 2

@@ -373,14 +373,13 @@ HB_FUNC( _SETSCROLLINFO )
 //-----------------------------------------------------------------------------
 HB_FUNC ( _GETTEXTEXTENTPOINT32 )
 {
-   const char * pstr = hb_parc(2);
+   LPCTSTR pstr = (LPCTSTR) hb_parc(2);
    SIZE sz;
-   PHB_ITEM aMetr ;
-   if ( GetTextExtentPoint32( (HDC) hb_parnl(1), pstr, strlen(pstr), &sz ) )
+   if ( GetTextExtentPoint32( (HDC) hb_parnl(1), pstr, hb_parclen(2), &sz ) )
    {
-      aMetr = Size2Array( &sz ) ;
-      hb_itemReturn( aMetr );
-      hb_itemRelease( aMetr );
+      hb_reta( 2 );
+      hb_storni( sz.cx, -1, 1 );
+      hb_storni( sz.cy, -1, 2 );
    }
 }
 
