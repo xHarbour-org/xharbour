@@ -995,7 +995,7 @@ static HRESULT STDMETHODCALLTYPE DispatchObjectInvoke( IDispatch *This, DISPID D
             if( pResult != NULL )
             {
                 PHB_ITEM pValue = hb_itemNew( NULL );
-                HB_ITEM_PTR pMemvar = hb_memvarGetValueByHandle( pDynSym->hMemvar );
+                PHB_ITEM pMemvar = hb_memvarGetValueByHandle( pDynSym->hMemvar );
 
                 OutputDebugValues( "GET Memvar\n" );
 
@@ -1032,7 +1032,7 @@ static HRESULT STDMETHODCALLTYPE DispatchObjectInvoke( IDispatch *This, DISPID D
             if( pDispParams->cArgs == 1 )
             {
                 PHB_ITEM pValue = hb_itemNew( NULL );
-                HB_ITEM_PTR pMemvar = hb_memvarGetValueByHandle( pDynSym->hMemvar );
+                PHB_ITEM pMemvar = hb_memvarGetValueByHandle( pDynSym->hMemvar );
 
                 VTObjectToItem( pValue, &pDispParams->rgvarg[0], "" );
 
