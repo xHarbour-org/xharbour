@@ -3132,7 +3132,7 @@ static EXPBARINFO p_EBI;
 HB_FUNC( GETEXPLORERBARINFO )
 {
    g_hInstDLL = GetModuleHandle(NULL);
-   hUxTheme = LoadLibraryEx( "uxtheme.dll",NULL,NULL);
+   hUxTheme = LoadLibraryEx( "uxtheme.dll",NULL,0);
    p_EBI.cbSize = sizeof(EXPBARINFO);
    GetExplorerBarInfo( &p_EBI, FALSE );
 }
@@ -3145,7 +3145,8 @@ HB_FUNC( EXPLORERBARINFO )
 HB_FUNC( FREEEXPLORERBARINFO )
 {
    FreeExplorerBarInfo( &p_EBI);
-   if( !hUxTheme == NULL ){
+   if( hUxTheme )
+   {
       FreeLibrary( hUxTheme );
    }
 }

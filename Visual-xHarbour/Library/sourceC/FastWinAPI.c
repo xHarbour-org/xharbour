@@ -1,12 +1,7 @@
 /*
  * $Id$
  */
-#define HB_OS_WIN_32_USED
-
-#include <windows.h>
-#include <commdlg.h>
-#include <shlobj.h>
-#include <wininet.h>
+#define WIN32_LEAN_AND_MEAN
 
 #include "item.api"
 #include "hbdefs.h"
@@ -17,7 +12,15 @@
 #include "hbvm.h"
 #include "hbapierr.h"
 #include "hbpcode.h"
-#include "winreg.h"
+#include "hbstack.h"
+
+//#include "winreg.h"
+
+#include <windows.h>
+#include <unknwn.h>
+#include <commdlg.h>
+#include <shlobj.h>
+#include <wininet.h>
 
 //-----------------------------------------------------------------------------
 //---------------------------- INTERNAL API -----------------------------------
@@ -280,18 +283,21 @@ HB_FUNC( _EQUALRECT )
 //-----------------------------------------------------------------------------
 HB_FUNC( _PTINRECT )
 {
-   RECT  lprc ;
-   POINT pt   ;
-   PHB_ITEM pSrc1=hb_param( 1, HB_IT_ARRAY ),pSrc2=hb_param( 2, HB_IT_ARRAY );
+   RECT  lprc;
+   POINT pt;
+   PHB_ITEM pSrc1 = hb_param( 1, HB_IT_ARRAY ), pSrc2 = hb_param( 2, HB_IT_ARRAY );
 
-   if (Array2Rect( pSrc1, &lprc) && Array2Point( pSrc2, &pt))
+   // Workaround Pelles C BUG - internal error: best_spillee
+   POINT *ppt = &pt;
+
+   if( Array2Rect( pSrc1, &lprc ) && Array2Point( pSrc2, &pt ) )
    {
-      hb_retl( (BOOL) PtInRect( &lprc, pt ) ) ;
-
+      hb_retl( (BOOL) PtInRect( &lprc, *ppt ) );
    }
    else
+   {
       hb_retl( FALSE) ;
-
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -1152,7 +1158,7 @@ HB_FUNC( _INTERNETFINDNEXTFILE )
    BOOL bRet;
 
    bRet = InternetFindNextFile( (HINTERNET) hb_parnl(1), &FindFileData );
-   
+
    if( bRet )
    {
       hb_storclen( (char *) &FindFileData, sizeof( WIN32_FIND_DATA ), 2 );
@@ -1165,9 +1171,9 @@ HB_FUNC( _FILETIMETOSYSTEMTIME )
    FILETIME *FileTime  = (FILETIME *) hb_param( 1, HB_IT_STRING )->item.asString.value ;
    SYSTEMTIME SystemTime ;
    BOOL bRet;
-   
+
    bRet = FileTimeToSystemTime( FileTime, &SystemTime );
-   
+
    if( bRet )
    {
       hb_storclen( (char *) &SystemTime , sizeof(SYSTEMTIME), 2 );
