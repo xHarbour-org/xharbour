@@ -2742,7 +2742,7 @@ static HB_ERRCODE sqlOrderInfo( SQLAREAP thiswa, USHORT uiIndex, LPDBORDERINFO p
 {
    LONG lIndexes, lorder = 0;
    PHB_ITEM pTag, pTemp;
-   HB_MACRO_PTR pMacro;
+   PHB_MACRO pMacro;
 
    // TraceLog( NULL, "sqlOrderInfo, order: %i\n", uiIndex );
 

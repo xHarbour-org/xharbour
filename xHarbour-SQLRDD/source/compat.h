@@ -32,7 +32,7 @@
 //    #define HB_FALSE           0
 //    #define HB_TRUE            (!0)
 
-   #define HB_ISLOG(x)        ISLOG(x)
+//   #define HB_ISLOG(x)        ISLOG(x)
 //    #define HB_ISNUM(x)        ISNUM(x)
 
    typedef ULONG              HB_SIZE;
