@@ -8,6 +8,34 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-03-16 12:20 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * Visual-xHarbour\Library\sourceC\ExplorBar.c
+    * Minor corrections
+
+  * Visual-xHarbour\Library\sourceC\FastWinAPI.c
+    * Workaround Pelles C BUG, Internal Error: best_spillee
+
+  * Visual-xHarbour\Library\sourceC\winapi.c
+    * Type cast
+
+  * xHarbour-Builder\stxhb.files.inc
+    * Synch with .ORG
+
+  * xHarbour-OLEServer\source\oleserver.c
+    * HB_ITEM_PTR -> PHB_ITEM
+
+  * xHarbour-SQLRDD\source\compat.h
+    - Commented no longer needed #define HB_IS_LOG
+
+  * xHarbour-SQLRDD\source\sqlrdd1.c
+    * HB_MACRO_PTR -> PHB_MACRO
+
+  * xHarbour-XCC\xcc\cc\cpp.h
+    * Reverted #define INS to 32768
+
+  * xHarbour-xBuild\tproject.prg
+    * xHarbour Import Lib: harbour.lib -> xharbour.lib as per .ORG
+
 2012-08-14 13:27 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * stdlib.files.inc
   * stxhb.files.inc
