@@ -66,8 +66,11 @@
 #include <wincrypt.h>
 #include <winsock2.h>
 #include <winspool.h>
+#include <sddl.h>
 
 #include "TaskDialog.h"
+
+#define KEY_WOW64_64KEY 0x0100
 
 typedef struct _DWM_BLURBEHIND {
     DWORD dwFlags;
@@ -243,6 +246,7 @@ static HRESULT (WINAPI *pDwmGetColorizationColor)(DWORD*,BOOL*)                 
 static HRESULT (WINAPI *pDwmIsCompositionEnabled)(BOOL*)                                                       = NULL;
 
 static HRESULT (WINAPI *pTaskDialogIndirect)(const TASKDIALOGCONFIG*,int*,int*,BOOL*)                          = NULL;
+static BOOL    (WINAPI *pCSSD2SD)(LPCSTR, DWORD, PSECURITY_DESCRIPTOR *, PULONG)                               = NULL;
 
 
 
@@ -504,6 +508,7 @@ HB_FUNC_INIT( _INITSYMBOLS_ )
       pQueryServiceConfig2   = (BOOL (WINAPI *)(SC_HANDLE,DWORD,LPBYTE,DWORD,LPDWORD)) GetProcAddress( hAdvApi32, "QueryServiceConfig2" );
       pChangeServiceConfig2  = (BOOL (WINAPI *)(SC_HANDLE,DWORD,LPVOID)) GetProcAddress( hAdvApi32, "ChangeServiceConfig2" );
       pChangeServiceConfig   = (BOOL (WINAPI *)(SC_HANDLE,DWORD,DWORD,DWORD,LPCTSTR,LPCTSTR,LPDWORD,LPCTSTR,LPCTSTR,LPCTSTR,LPCTSTR)) GetProcAddress( hAdvApi32, "ChangeServiceConfigA" );
+      pCSSD2SD               = (BOOL (WINAPI *)(LPCSTR, DWORD, PSECURITY_DESCRIPTOR *, PULONG)) GetProcAddress( hAdvApi32, "ConvertStringSecurityDescriptorToSecurityDescriptorA") ;
    }
 
    if( hHtmlHelp )
@@ -10507,4 +10512,101 @@ HB_FUNC( GETSCROLLPOS )
 HB_FUNC( SETSCROLLPOS )
 {
    hb_retni( SetScrollPos( (HWND) hb_parnl(1), hb_parni(2), hb_parni(3), hb_parl(4) ) );
+}
+
+
+typedef LONG (WINAPI *fnRegDisableReflectionKey)( HKEY );
+typedef LONG (WINAPI *fnRegEnableReflectionKey)( HKEY );
+typedef LONG (WINAPI *fnRegQueryReflectionKey)( HKEY, BOOL* );
+typedef LONG (WINAPI *fnRegDeleteKeyEx)( HKEY, LPCTSTR, REGSAM, DWORD );
+
+
+HB_FUNC( REGDISABLEREFLECTIONKEY )
+{
+   if( hAdvApi32 )
+   {
+      fnRegDisableReflectionKey pRegDisableReflectionKey = (fnRegDisableReflectionKey) GetProcAddress( hAdvApi32, "RegDisableReflectionKey");
+      if( pRegDisableReflectionKey )
+      {
+         hb_retl( pRegDisableReflectionKey( (HKEY) hb_parnl(1) ) ==  ERROR_SUCCESS );
+      }
+   }
+}
+
+HB_FUNC( REGENABLEREFLECTIONKEY )
+{
+   if( hAdvApi32 )
+   {
+      fnRegEnableReflectionKey pRegEnableReflectionKey = (fnRegEnableReflectionKey) GetProcAddress( hAdvApi32, "RegEnableReflectionKey");
+      if( pRegEnableReflectionKey )
+      {
+         hb_retl( pRegEnableReflectionKey( (HKEY) hb_parnl(1) ) == ERROR_SUCCESS );
+      }
+   }
+}
+
+HB_FUNC( REGQUERYREFLECTIONKEY )
+{
+   if( hAdvApi32 )
+   {
+      fnRegQueryReflectionKey pRegQueryReflectionKey = (fnRegQueryReflectionKey) GetProcAddress( hAdvApi32, "RegQueryReflectionKey");
+      if( pRegQueryReflectionKey )
+      {
+         BOOL bIsReflectionDisabled;
+         pRegQueryReflectionKey( (HKEY) hb_parnl(1), &bIsReflectionDisabled );
+         hb_retl( bIsReflectionDisabled );
+      }
+   }
+}
+
+HB_FUNC( REGDELETEKEYEX )
+{
+   if( hAdvApi32 )
+   {
+      fnRegDeleteKeyEx pRegDeleteKeyEx = (fnRegDeleteKeyEx) GetProcAddress( hAdvApi32, "RegDeleteKeyExA");
+      if( pRegDeleteKeyEx )
+      {
+         hb_retnl( pRegDeleteKeyEx( (HKEY) hb_parnl(1), (LPCTSTR) hb_parc(2), (REGSAM) hb_parnl(3), 0 ) );
+      }
+   }
+}
+
+HB_FUNC( _REGCREATEKEYEX )
+{
+  HKEY hkResult ;
+  DWORD dwDisposition ;
+  LONG nErr = -1 ;
+  SECURITY_ATTRIBUTES sa;
+
+  char *szSD = "D:P"                      // DACL
+               "(D;OICI;GA;;;BG)"         // Deny Guests
+               "(A;OICI;GA;;;SY)"         // Allow SYSTEM Full Control
+               "(A;OICI;GA;;;BA)"         // Allow Admins Full Control
+               "(A;OICI;GRGWGX;;;IU)";    // Allow Interactive Users RWX
+
+  if( hAdvApi32 )
+  {
+     if( pCSSD2SD )
+     {
+         sa.nLength = sizeof( SECURITY_ATTRIBUTES );
+         sa.bInheritHandle = FALSE ;
+         if ( pCSSD2SD( szSD, SDDL_REVISION_1, &(sa.lpSecurityDescriptor), NULL ) )
+         {
+             nErr = RegCreateKeyEx( (HKEY) hb_parnl(1), (LPCSTR) hb_parc(2), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS | KEY_WOW64_64KEY, &sa, &hkResult, &dwDisposition );
+             LocalFree(sa.lpSecurityDescriptor);
+         }
+     }
+  }
+
+  if( nErr == -1 )
+  {
+      nErr = RegCreateKeyEx( (HKEY) hb_parnl(1), (LPCSTR) hb_parc(2), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS | KEY_WOW64_64KEY, &sa, &hkResult, &dwDisposition );
+  }
+
+  if ( nErr == ERROR_SUCCESS )
+  {
+     hb_stornl( (LONG) hkResult, 3 ) ;
+     hb_stornl( (LONG) dwDisposition, 9 ) ;
+  }
+  hb_retnl( nErr ) ;
 }

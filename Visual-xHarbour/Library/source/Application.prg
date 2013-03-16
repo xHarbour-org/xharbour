@@ -752,7 +752,8 @@ RETURN .F.
 
 METHOD SaveCustomColors( nKey, cNode, cValue ) CLASS Application
    LOCAL cCust, hKey, n
-   IF RegCreateKey( nKey, cNode, @hKey ) == 0
+   IF _RegCreateKeyEx( nKey, cNode, @hKey ) == 0
+      RegDisableReflectionKey( hKey ) 
       cCust := ""
       FOR n := 1 TO LEN( ::CustomColors )-1
          cCust += IIF( ::CustomColors[n] != NIL, xStr( ::CustomColors[n] ), "" ) + ","
@@ -767,7 +768,8 @@ RETURN NIL
 
 METHOD LoadCustomColors( nKey, cNode, cValue ) CLASS Application
    LOCAL cCust, hKey
-   IF RegCreateKey( nKey, cNode, @hKey ) == 0
+   IF _RegCreateKeyEx( nKey, cNode, @hKey ) == 0
+      RegDisableReflectionKey( hKey ) 
       RegQueryValueEx( hKey, cValue,,,@cCust )
       DEFAULT cCust TO ""
       ::CustomColors := hb_aTokens( cCust, "," )
@@ -1561,7 +1563,8 @@ FUNCTION __ErrorDlgProc( hWnd, nMsg, nwParam, nlParam )
               aRect   := _GetClientRect( hWnd )
               MoveWindow( hStk, 2, aRect[4]-17, nWidth, 17 )
 
-              IF RegCreateKey( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\Settings", @hKey ) == 0
+              IF _RegCreateKeyEx( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\Settings", @hKey ) == 0
+                 RegDisableReflectionKey( hKey ) 
                  RegSetValueEx( hKey, "ErrorShowStack",, 1, "1" )
                  RegCloseKey( hKey )
               ENDIF
@@ -1582,7 +1585,8 @@ FUNCTION __ErrorDlgProc( hWnd, nMsg, nwParam, nlParam )
               aRect   := _GetClientRect( hWnd )
               MoveWindow( hStk, 2, aRect[4]-17, nWidth, 17 )
 
-              IF RegCreateKey( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\Settings", @hKey ) == 0
+              IF _RegCreateKeyEx( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\Settings", @hKey ) == 0
+                 RegDisableReflectionKey( hKey )
                  RegSetValueEx( hKey, "ErrorShowStack",, 1, "0" )
                  RegCloseKey( hKey )
               ENDIF

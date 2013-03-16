@@ -55,7 +55,8 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 INIT PROCEDURE __VXH_Start
    LOCAL hKey, cRunning, cIni, aRect
 
-   IF RegCreateKey( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour", @hKey ) == 0
+   IF _RegCreateKeyEx( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour", @hKey ) == 0
+      RegDisableReflectionKey( hKey )
       RegQueryValueEx( hKey, "Running",,,@cRunning )
       DEFAULT cRunning TO "0"
       IF cRunning == "0"
@@ -441,14 +442,16 @@ METHOD OnClose() CLASS IDE_MainForm
 
    UnhookWindowsHookEx( ::hHook )
 
-   IF RegCreateKey( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour", @hKey ) == 0
+   IF _RegCreateKeyEx( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour", @hKey ) == 0
+      RegDisableReflectionKey( hKey )
       RegSetValueEx( hKey, "Running",, 1, "0" )
       RegCloseKey( hKey )
    ENDIF
 
    ::Application:SaveCustomColors( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour", "CustomColors" )
 
-   IF RegCreateKey( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\ComObjects", @hKey ) == 0
+   IF _RegCreateKeyEx( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\ComObjects", @hKey ) == 0
+      RegDisableReflectionKey( hKey )
       aVal := {}
       n := 0
       WHILE RegEnumKey( hKey, n, @cName, @cType, @xData ) == 0
@@ -458,7 +461,8 @@ METHOD OnClose() CLASS IDE_MainForm
       AEVAL( aVal, {|c| RegDeleteKey( hKey, c )} )
 
       FOR n := 1 TO LEN( ::Application:ToolBox:ComObjects )
-          IF RegCreateKey( hKey, ::Application:ToolBox:ComObjects[n][2], @hSub ) == 0
+          IF _RegCreateKeyEx( hKey, ::Application:ToolBox:ComObjects[n][2], @hSub ) == 0
+             RegDisableReflectionKey( hSub )
              RegSetValueEx( hSub, "ProgID",, 1, ::Application:ToolBox:ComObjects[n][3] )
              RegSetValueEx( hSub, "ClsID",, 1, ::Application:ToolBox:ComObjects[n][4] )
              RegCloseKey( hSub )

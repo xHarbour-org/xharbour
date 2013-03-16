@@ -4735,3 +4735,4 @@ HB_FUNC( AWE_WEBCORE_CREATE_WEBVIEW )
 
 #pragma comment( lib, "Awesomium.lib" )
 */
+
