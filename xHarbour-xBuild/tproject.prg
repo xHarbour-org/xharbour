@@ -2135,12 +2135,12 @@ METHOD PRG_Libs CLASS TMakeProject
          IF ::lMT
             IF ::Project:nType == TYPE_EXE
                IF ::Project:lUseDLL
-                  RETURN /* use_dll.lib see EXE_Command */ "harbour.lib "
+                  RETURN /* use_dll.lib see EXE_Command */ "xharbour.lib "
                ELSE
                   RETURN IIF( "gcc" IN ::C_Executable, ::MTG_Libs, ::MT_Libs )
                ENDIF
             ELSEIF ::Project:nType == TYPE_DLL
-               RETURN "harbour.lib "
+               RETURN "xharbour.lib "
             ELSE
                Alert( "Un-Expected case, ", ProcName() )
             ENDIF
@@ -2149,12 +2149,12 @@ METHOD PRG_Libs CLASS TMakeProject
          ELSE
             IF ::Project:nType == TYPE_EXE
                IF ::Project:lUseDLL
-                  RETURN /* use_dll.lib see EXE_Command */"harbour.lib "
+                  RETURN /* use_dll.lib see EXE_Command */"xharbour.lib "
                ELSE
                   RETURN IIF( "gcc" IN ::C_Executable,::STG_Libs,::ST_Libs )
                ENDIF
             ELSEIF ::Project:nType == TYPE_DLL
-               RETURN "harbour.lib "
+               RETURN "xharbour.lib "
             ELSE
                Alert( "Un-Expected case, ", ProcName() )
             ENDIF
