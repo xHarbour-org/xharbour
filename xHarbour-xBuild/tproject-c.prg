@@ -472,7 +472,7 @@ HB_FUNC( FINDINCLUDES )
 #ifdef NO_MACRO_RT
   #pragma BEGINDUMP
 
-  void hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
+  void hb_macroGetValue( PHB_ITEM pItem, BYTE iContext, BYTE flags )
   {
      HB_SYMBOL_UNUSED( pItem );
      HB_SYMBOL_UNUSED( iContext );
@@ -482,7 +482,7 @@ HB_FUNC( FINDINCLUDES )
      exit(1);
   }
 
-  void hb_macroSetValue( HB_ITEM_PTR pItem, BYTE flags )
+  void hb_macroSetValue( PHB_ITEM pItem, BYTE flags )
   {
      HB_SYMBOL_UNUSED( pItem );
      HB_SYMBOL_UNUSED( flags );
@@ -491,7 +491,7 @@ HB_FUNC( FINDINCLUDES )
      exit(1);
   }
 
-  HB_MACRO_PTR hb_macroCompile( const char * szString )
+  PHB_MACRO hb_macroCompile( const char * szString )
   {
      HB_SYMBOL_UNUSED( szString );
 
@@ -500,7 +500,7 @@ HB_FUNC( FINDINCLUDES )
      return NULL;
   }
 
-  char * hb_macroGetType( HB_ITEM_PTR pItem, BYTE flags )
+  char * hb_macroGetType( PHB_ITEM pItem, BYTE flags )
   {
      HB_SYMBOL_UNUSED( pItem );
      HB_SYMBOL_UNUSED( flags );
@@ -508,7 +508,7 @@ HB_FUNC( FINDINCLUDES )
      return "U";
   }
 
-  void hb_macroDelete( HB_MACRO_PTR pMacro )
+  void hb_macroDelete( PHB_MACRO pMacro )
   {
      HB_SYMBOL_UNUSED( pMacro );
 
@@ -516,7 +516,7 @@ HB_FUNC( FINDINCLUDES )
      exit(1);
   }
 
-  void hb_macroRun( HB_MACRO_PTR pMacro )
+  void hb_macroRun( PHB_MACRO pMacro )
   {
      HB_SYMBOL_UNUSED( pMacro );
 
@@ -539,7 +539,7 @@ HB_FUNC( FINDINCLUDES )
      return szString;
   }
 
-  void hb_macroPopAliasedValue( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, BYTE flags )
+  void hb_macroPopAliasedValue( PHB_ITEM pAlias, PHB_ITEM pVar, BYTE flags )
   {
      HB_SYMBOL_UNUSED( pAlias );
      HB_SYMBOL_UNUSED( pVar );
@@ -549,7 +549,7 @@ HB_FUNC( FINDINCLUDES )
      exit(1);
   }
 
-  void hb_macroPushAliasedValue( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, BYTE flags )
+  void hb_macroPushAliasedValue( PHB_ITEM pAlias, PHB_ITEM pVar, BYTE flags )
   {
      HB_SYMBOL_UNUSED( pAlias );
      HB_SYMBOL_UNUSED( pVar );
@@ -568,7 +568,7 @@ HB_FUNC( FINDINCLUDES )
      return szString;
   }
 
-  void hb_macroPushSymbol( HB_ITEM_PTR pItem )
+  void hb_macroPushSymbol( PHB_ITEM pItem )
   {
      HB_SYMBOL_UNUSED( pItem );
 
@@ -576,7 +576,7 @@ HB_FUNC( FINDINCLUDES )
      exit(1);
   }
 
-  void hb_macroTextValue( HB_ITEM_PTR pItem )
+  void hb_macroTextValue( PHB_ITEM pItem )
   {
      HB_SYMBOL_UNUSED( pItem );
   }

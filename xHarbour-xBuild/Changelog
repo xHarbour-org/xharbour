@@ -8,6 +8,10 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-03-17 21:02 UTC-0700 Ron Pinkas <Ron in xHarbour.com>
+  * tproject-c.c
+    * HB_ITEM_PTR and HB_MACRO_PTR -> PHB_ITEM and PHB_MACRO
+
 2012-09-17 19:11 UTC-0700 Ron Pinkas <Ron in xHarbour.com>
   * tproject.prg
     + Added HACK support for IMP LIB generation to follow DLL generation.
