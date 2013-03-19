@@ -83,7 +83,7 @@ METHOD OnPaint( hDC, hMemDC ) CLASS FreeImage
 
    IF hMemBitmap != NIL
       hMemDC1 := CreateCompatibleDC( hDC )
-      FOR EACH oChild IN ::Children
+      FOR EACH oChild IN ::__aTransparent
           IF oChild:__hBrush != NIL
              DeleteObject( oChild:__hBrush )
           ENDIF

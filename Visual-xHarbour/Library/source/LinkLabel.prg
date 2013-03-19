@@ -87,6 +87,8 @@ METHOD Create() CLASS LinkLabel
    ENDIF
    DEFAULT ::Parent:__hMemBitmap TO CreateCompatibleBitmap( hDC, ::Parent:ClientWidth, ::Parent:ClientHeight )
 
+   ::Parent:__SetTransparent( Self )
+
    ::__lReqBrush := .T.
 
    Super:Create()

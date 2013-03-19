@@ -40,10 +40,12 @@ CLASS Dialog INHERIT WinForm
    METHOD Close()
    METHOD __WinProc() INLINE 0
    METHOD SetObject()
-   METHOD InitDialogBox()
    METHOD SetDialogRect()
    METHOD ReCreate()
-   METHOD OnInitDialog()
+
+   METHOD OnInitDialog()        VIRTUAL
+   METHOD PreInitDialog()
+   METHOD PostInitDialog()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------------
@@ -57,7 +59,7 @@ METHOD Init( oParent, aParameters, cProjectName ) CLASS Dialog
    ::Height  := 700
 RETURN Self
 
-METHOD OnInitDialog() CLASS Dialog
+METHOD PostInitDialog() CLASS Dialog
    LOCAL nRet, oObj, n
    nRet := ExecuteEvent( "OnCreate", Self )
 
@@ -138,7 +140,7 @@ RETURN nRet
 
 //------------------------------------------------------------------------------------------------
 
-METHOD InitDialogBox() CLASS Dialog
+METHOD PreInitDialog() CLASS Dialog
    LOCAL oCtrl, cClass, hWnd, nStyle, nLeft, nTop, nWidth, nHeight
 
    ::siv := (struct SCROLLINFO)

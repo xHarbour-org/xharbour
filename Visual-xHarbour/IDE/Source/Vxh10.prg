@@ -171,7 +171,6 @@ METHOD OnInitDialog() CLASS ResourceManager
    END
 
    ::ToolStripButton2:Enabled := ::DataGrid1:DataSource:RecCount() > 0
-   ::Super:OnInitDialog()
 RETURN NIL
 
 METHOD AddResource() CLASS ResourceManager

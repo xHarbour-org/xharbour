@@ -936,7 +936,6 @@ METHOD OnInitDialog() CLASS __AlertDlg
       ::height := oButton:Top + oButton:Height + 25
    ENDIF
    oButton:SetFocus()
-   ::Super:OnInitDialog()
 RETURN .T.
 
 

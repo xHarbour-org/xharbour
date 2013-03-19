@@ -2400,7 +2400,7 @@ METHOD OnEraseBkGnd( hDC, hMemDC ) CLASS StartPagePanel
 
    IF hMemBitmap != NIL
 
-      FOR EACH oChild IN ::Children
+      FOR EACH oChild IN ::__aTransparent
           IF oChild:__lReqBrush
              oChild:__lReqBrush :=.F.
 
@@ -6248,7 +6248,6 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
           cText += ::GenerateChild( oChild, 3, @aChildEvents, "::", "Self", nPos )
           nPos++
       NEXT
-      cText += "   ::Super:OnInitDialog()" + CRLF
       cText += "RETURN Self" + CRLF + CRLF
    ENDIF
 RETURN cText
@@ -6835,7 +6834,6 @@ METHOD OnInitDialog() CLASS ListOle
       END
       :MoveWindow()
    END
-   ::Super:OnInitDialog()
 RETURN 0
 
 METHOD OnOk() CLASS ListOle
@@ -6989,7 +6987,6 @@ METHOD OnInitDialog() CLASS MsgBoxEx
    ::Label1:SetStyle( SS_ICON, .T. )
    ::Label1:SendMessage( STM_SETICON, LoadIcon(, IDI_QUESTION ) )
    ::Label2:Caption := ::BodyText
-   ::Super:OnInitDialog()
 RETURN 0
 
 METHOD OnCommand() CLASS MsgBoxEx
@@ -7056,7 +7053,6 @@ RETURN Self
 //---------------------------------------------------------------------------------------------------------------------------------
 
 CLASS AboutVXH INHERIT Dialog
-   DATA Picture    EXPORTED
    DATA Panel      EXPORTED
    DATA LinkLabel1 EXPORTED
    DATA BetaLabel  EXPORTED
@@ -7066,7 +7062,6 @@ CLASS AboutVXH INHERIT Dialog
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
    METHOD LinkLabel1_OnClick()
-   METHOD OnTimer()
 ENDCLASS
 
 METHOD Init() CLASS AboutVXH
@@ -7086,7 +7081,7 @@ METHOD OnInitDialog() CLASS AboutVXH
    LOCAL oBtn, oLabel, n, aDev := { "Augusto R. Infante", "Phil Krylov", "Ron Pinkas", "Patrick Mast" }
 
    //::BackColor   := ::System:Color:White
-   WITH OBJECT ( ::Picture := PictureBox( Self ) )
+   WITH OBJECT PictureBox( Self )
       :Dock:Margin := 0
       :Dock:Left   := Self
       :Dock:Top    := Self
@@ -7134,7 +7129,7 @@ METHOD OnInitDialog() CLASS AboutVXH
    WITH OBJECT ( ::Panel := PANEL( Self ) )
       :Dock:Margin := 0
       :Dock:Left   := Self
-      :Dock:Top    := ::Picture
+      :Dock:Top    := ::PictureBox1
       :Dock:Right  := Self
       :Dock:Bottom := oBtn
 //      :BackColor   := ::System:Color:LightGray
@@ -7198,54 +7193,12 @@ METHOD OnInitDialog() CLASS AboutVXH
       NEXT
    END
    ::Super:OnInitDialog()
-
-   ::SetFocus()
 RETURN 1
 
 METHOD LinkLabel1_OnClick() CLASS AboutVXH
    ShellExecute( ::hWnd, 'open', "http://www.xharbour.com", , , SW_SHOW )
 RETURN Self
 
-METHOD OnTimer( n ) CLASS AboutVXH
-   ::BetaLabel:ForeColor := RGB( ::Red, ::Green, ::Blue )
-   IF n == 1
-      ::KillTimer( 1 )
-      IF ::Red > 0
-         ::Red -= 5
-         ::Red := MAX( ::Red, 0 )
-         ::SetTimer( 1, 250 )
-       ELSEIF ::Green > 0
-         ::Green -= 5
-         ::Green := MAX( ::Green, 0 )
-         ::SetTimer( 1, 250 )
-       ELSEIF ::Blue > 0
-         ::Blue -= 5
-         ::Blue := MAX( ::Blue, 0 )
-         ::SetTimer( 1, 250 )
-       ELSE
-         ::Red := ::Green := ::Blue := 0
-         ::SetTimer( 2, 250 )
-      ENDIF
-    ELSE
-      ::KillTimer( 2 )
-      IF ::Red < 255
-         ::Red += 5
-         ::Red := MIN( ::Red, 255 )
-         ::SetTimer( 2, 250 )
-       ELSEIF ::Green < 255
-         ::Green += 5
-         ::Green := MIN( ::Green, 255 )
-         ::SetTimer( 2, 250 )
-       ELSEIF ::Blue < 255
-         ::Blue += 5
-         ::Blue := MIN( ::Blue, 255 )
-         ::SetTimer( 2, 250 )
-       ELSE
-         ::Red := ::Green := ::Blue := 255
-         ::SetTimer( 1, 250 )
-      ENDIF
-   ENDIF
-RETURN NIL
 
 #ifndef VXH_PROFESSIONAL
 

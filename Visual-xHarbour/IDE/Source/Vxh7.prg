@@ -183,7 +183,6 @@ METHOD OnInitDialog() CLASS MenuEditor
       :Parent:ItemManager:ResetContent()
 
    END
-   ::Super:OnInitDialog()
    ::MoveWindow()
    
 RETURN NIL

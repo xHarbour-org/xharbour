@@ -114,8 +114,6 @@ RETURN Self
 METHOD OnInitDialog() CLASS AlertDialog
    LOCAL n, i, o, nLeft, nWidth, nTop, aMsg, aSize, oButton
 
-   Super:OnInitDialog()
-
    o := Label( Self )
    o:Font:Bold := .T.
    o:Style   := SS_CENTER | WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS

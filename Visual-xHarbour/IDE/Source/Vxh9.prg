@@ -187,7 +187,6 @@ METHOD OnInitDialog() CLASS ImageManager
    ENDIF
 
    ::CenterWindow( .T. )
-   ::Super:OnInitDialog()
 RETURN NIL
 
 METHOD AddImage() CLASS ImageManager

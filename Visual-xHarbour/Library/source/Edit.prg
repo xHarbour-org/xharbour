@@ -285,6 +285,9 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD Create() CLASS EditBox
    LOCAL pWi, n
+   IF ::Transparent
+      ::Parent:__SetTransparent( Self )
+   ENDIF
    ::Super:Create()
    pWi := ::GetWindowInfo()
    ::__BackMargin += pWi:cxWindowBorders

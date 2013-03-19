@@ -581,7 +581,7 @@ METHOD OnPaint( hDC, hMemDC ) CLASS Expando
    ENDIF
 
    IF hMemBitmap != NIL
-      FOR EACH oChild IN ::Children
+      FOR EACH oChild IN ::__aTransparent
           IF oChild:__hBrush != NIL
              DeleteObject( oChild:__hBrush )
           ENDIF

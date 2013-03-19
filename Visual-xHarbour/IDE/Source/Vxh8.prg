@@ -191,7 +191,6 @@ METHOD OnInitDialog() CLASS ColumnManager
       :SetFocus()
    END
    ::CenterWindow( .T. )
-   ::Super:OnInitDialog()
 RETURN NIL
 
 
@@ -471,7 +470,6 @@ METHOD OnInitDialog() CLASS StructEditor
 
    StrEditor( Self )
    ::CenterWindow( .T. )
-   ::Super:OnInitDialog()
 RETURN 0
 
 METHOD Save() CLASS StructEditor
@@ -1000,7 +998,6 @@ METHOD OnInitDialog() CLASS TableEditor
 
    TblEditor( Self )
    ::CenterWindow( .T. )
-   ::Super:OnInitDialog()
 RETURN 0
 
 METHOD Save() CLASS TableEditor

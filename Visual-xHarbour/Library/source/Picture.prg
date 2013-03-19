@@ -233,6 +233,8 @@ METHOD OnPaint( hDC, hMemDC ) CLASS PictureBox
       RETURN 0
    ENDIF
 
+   hDC := ::BeginPaint()
+
    lTransparent := ::Transparent
    
    hBrush := ::BkBrush
@@ -268,7 +270,7 @@ METHOD OnPaint( hDC, hMemDC ) CLASS PictureBox
 
    IF hMemBitmap != NIL
       hMemDC1      := CreateCompatibleDC( hDC )
-      FOR EACH oChild IN ::Children
+      FOR EACH oChild IN ::__aTransparent
           IF oChild:__hBrush != NIL
              DeleteObject( oChild:__hBrush )
           ENDIF
@@ -291,6 +293,7 @@ METHOD OnPaint( hDC, hMemDC ) CLASS PictureBox
       DeleteDC( hMemDC )
 
    ENDIF
+   ::EndPaint()
 RETURN 0
 
 //-----------------------------------------------------------------------------------------------

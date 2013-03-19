@@ -2077,8 +2077,6 @@ METHOD OnInitDialog() CLASS Settings
       :EventHandler[ "OnClick" ] := "Apply"
       :Create()
    END //BUTTON
-   ::Super:OnInitDialog()
-
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------
@@ -2289,7 +2287,6 @@ METHOD OnInitDialog() CLASS GotoDialog
       :Dock:Margin          := 3
       :Create()
    END //BUTTON
-   ::Super:OnInitDialog()
 RETURN Self
 
 METHOD Go_OnClick() CLASS GotoDialog

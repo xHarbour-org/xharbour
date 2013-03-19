@@ -3287,7 +3287,6 @@ METHOD OnInitDialog() CLASS ObjectManager
    END
 
    ::CenterWindow( .T. )
-   ::Super:OnInitDialog()
 RETURN NIL
 
 
