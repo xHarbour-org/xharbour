@@ -2083,8 +2083,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               ODEFAULT nRet TO ::OnNCLButtonDblClk( nwParam, LoWord( nlParam ), HiWord( nlParam ), hWnd )
               EXIT
 
-
-
          CASE WM_NCRBUTTONUP
               nRet := ExecuteEvent( "OnNCRButtonUp", Self )
               ODEFAULT nRet TO ::OnNCRButtonUp( nwParam, LoWord(nlParam), HiWord(nlParam) )
@@ -2100,8 +2098,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               ODEFAULT nRet TO ::OnNCRButtonDblClk( nwParam, LoWord( nlParam ), HiWord( nlParam ), hWnd )
               EXIT
 
-
-
          CASE WM_NCMBUTTONUP
               nRet := ExecuteEvent( "OnNCMButtonUp", Self )
               ODEFAULT nRet TO ::OnNCMButtonUp( nwParam, LoWord(nlParam), HiWord(nlParam) )
@@ -2116,8 +2112,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               nRet := ExecuteEvent( "OnNCMButtonDblClk", Self )
               ODEFAULT nRet TO ::OnNCMButtonDblClk( nwParam, LoWord( nlParam ), HiWord( nlParam ), hWnd )
               EXIT
-
-
 
          CASE WM_NCXBUTTONUP
               nRet := ExecuteEvent( "OnNCXButtonUp", Self )
