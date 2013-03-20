@@ -55,8 +55,8 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 INIT PROCEDURE __VXH_Start
    LOCAL hKey, cRunning, cIni, aRect
 
-   IF _RegCreateKeyEx( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour", @hKey ) == 0
-      RegDisableReflectionKey( hKey )
+   IF RegCreateKey( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour", @hKey ) == 0
+      //RegDisableReflectionKey( hKey )
       RegQueryValueEx( hKey, "Running",,,@cRunning )
       DEFAULT cRunning TO "0"
       IF cRunning == "0"
@@ -240,6 +240,7 @@ METHOD Init( ... ) CLASS IDE
    ::Sizes       := Hash()
    ::Sizes["ObjectManagerWidth"] := 23
    ::Sizes["ToolBoxWidth"]       := 18
+   ::Sizes["SourceSelectWidth"]  := 150
 
    IF( n := ::IniFile:ReadInteger( "General", "ShowRulers", 1 ) ) == 0
       ::ShowRulers := .F.
@@ -428,6 +429,7 @@ METHOD OnClose() CLASS IDE_MainForm
       ::Application:IniFile:WriteNumber( "ObjectTab",     "Height", Round( ( ::Application:ObjectTab:Height / aSize[4] ) * 100, 0 ) )
       ::Application:IniFile:WriteNumber( "ObjectManager", "Width",  Round( ( ::Panel1:Width / aSize[5] ) * 100, 0 ) )
       ::Application:IniFile:WriteNumber( "ToolBox",       "Width",  Round( ( ::Application:ToolBox:Width / aSize[5] ) * 100, 0 ) )
+      ::Application:IniFile:WriteNumber( "SourceSelect",  "Width",  ::Application:SourceSelect:Width )
 
       ::Application:IniFile:WriteNumber( "General", "RunMode", ::Application:RunMode )
 
@@ -442,16 +444,16 @@ METHOD OnClose() CLASS IDE_MainForm
 
    UnhookWindowsHookEx( ::hHook )
 
-   IF _RegCreateKeyEx( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour", @hKey ) == 0
-      RegDisableReflectionKey( hKey )
+   IF RegCreateKey( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour", @hKey ) == 0
+      //RegDisableReflectionKey( hKey )
       RegSetValueEx( hKey, "Running",, 1, "0" )
       RegCloseKey( hKey )
    ENDIF
 
    ::Application:SaveCustomColors( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour", "CustomColors" )
 
-   IF _RegCreateKeyEx( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\ComObjects", @hKey ) == 0
-      RegDisableReflectionKey( hKey )
+   IF RegCreateKey( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\ComObjects", @hKey ) == 0
+      //RegDisableReflectionKey( hKey )
       aVal := {}
       n := 0
       WHILE RegEnumKey( hKey, n, @cName, @cType, @xData ) == 0
@@ -461,8 +463,8 @@ METHOD OnClose() CLASS IDE_MainForm
       AEVAL( aVal, {|c| RegDeleteKey( hKey, c )} )
 
       FOR n := 1 TO LEN( ::Application:ToolBox:ComObjects )
-          IF _RegCreateKeyEx( hKey, ::Application:ToolBox:ComObjects[n][2], @hSub ) == 0
-             RegDisableReflectionKey( hSub )
+          IF RegCreateKey( hKey, ::Application:ToolBox:ComObjects[n][2], @hSub ) == 0
+             //RegDisableReflectionKey( hSub )
              RegSetValueEx( hSub, "ProgID",, 1, ::Application:ToolBox:ComObjects[n][3] )
              RegSetValueEx( hSub, "ClsID",, 1, ::Application:ToolBox:ComObjects[n][4] )
              RegCloseKey( hSub )
@@ -550,8 +552,9 @@ METHOD Init() CLASS IDE_MainForm
    ::Create()
 
    WITH OBJECT ::Application
-      :Sizes["ObjectManagerWidth"] := MAX( MIN( :IniFile:ReadInteger( "ObjectManager",   "Width",  :Sizes["ObjectManagerWidth"] ), 90 ), 10 )
-      :Sizes["ToolBoxWidth"]       := MAX( MIN( :IniFile:ReadInteger( "ToolBox",         "Width",  :Sizes["ToolBoxWidth"] ),       90 ), 10 )
+      :Sizes["ObjectManagerWidth"] := MAX( MIN( :IniFile:ReadInteger( "ObjectManager", "Width",  :Sizes["ObjectManagerWidth"] ), 90 ), 10 )
+      :Sizes["ToolBoxWidth"]       := MAX( MIN( :IniFile:ReadInteger( "ToolBox",       "Width",  :Sizes["ToolBoxWidth"] ),       90 ), 10 )
+      :Sizes["SourceSelectWidth"]  := MAX( MIN( :IniFile:ReadInteger( "SourceSelect",  "Width",  :Sizes["SourceSelectWidth"] ), 150 ), 10 )
    END
 
    // StatusBar section ----------------------
@@ -2145,7 +2148,7 @@ METHOD Init() CLASS IDE_MainForm
 
          WITH OBJECT ::Application:SourceSelect := ListBox( :this )
             :Cargo            := -1
-            :Width            := 150
+            :Width            := ::Application:Sizes["SourceSelectWidth"]
             :Dock:Top         := :Parent
             :Dock:Bottom      := :Parent
             :Dock:Right       := :Parent
