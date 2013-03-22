@@ -570,19 +570,23 @@ METHOD UpdateView() CLASS FileTreeView
 
    MainItem := ::AddItem( cFile+".vxh", 6 )
    MainItem:Bold := .T.
-   MainItem:AddItem( cFile+"_Main.prg", 16 )
+   
+   Item := MainItem:AddItem( cFile+"_Main.prg", 16 )
+   Item:Cargo := ::Application:ProjectPrgEditor
+   ::Application:ProjectPrgEditor:TreeItem := Item
+
    FOR EACH Form IN ::Application:Project:Forms
        SubItem := MainItem:AddItem( Form:Name + ".prg", 16 )
        SubItem:Cargo := Form:Editor
-       //SubItem:Action := {|o| o:Parent:SelectControl( o:Cargo ) }
+       SubItem:Cargo:TreeItem := SubItem
    NEXT
    IF !EMPTY( ::Application:Project:Properties:Sources )
       Item := MainItem:AddItem( "External Source Files", 20 )
       Item:Bold := .T.
       FOR EACH cFile IN ::Application:Project:Properties:Sources
           SubItem := Item:AddItem( cFile, 20 )
-          //SubItem:Cargo := Form:Editor
-          //Item:Action := {|o| o:Parent:SelectControl( o:Cargo ) }
+          SubItem:Cargo := ::Application:SourceEditor:GetEditor( cFile )
+          SubItem:Cargo:TreeItem := SubItem
       NEXT
    ENDIF
    IF !EMPTY( ::Application:Project:Properties:Binaries )
@@ -590,11 +594,9 @@ METHOD UpdateView() CLASS FileTreeView
       Item:Bold := .T.
       FOR EACH cFile IN ::Application:Project:Properties:Binaries
           SubItem := Item:AddItem( cFile, 19 )
-          //SubItem:Cargo := Form:Editor
-          //Item:Action := {|o| o:Parent:SelectControl( o:Cargo ) }
       NEXT
    ENDIF
-//   ::ExpandAll()
+   ::ExpandAll()
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -611,4 +613,8 @@ METHOD OnSelChanged( oItem ) CLASS FileTreeView
          ::Application:RemoveSourceMenu:Enable()
       ENDIF
    ENDIF   
+   IF oItem:Cargo != NIL
+      ::Application:SourceEditor:Source := oItem:Cargo
+      ::Application:Project:EditReset()
+   ENDIF
 RETURN Self

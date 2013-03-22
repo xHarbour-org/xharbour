@@ -1814,7 +1814,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
    LOCAL n, i, cData, x, y, nY, nRec, nRecno, lHide, aText, lSelected, nHScroll, iRight, iLeft, zLeft
    LOCAL nLeft, nTop, nRight, nBottom, hOldFont, hOldPen, nWImg, nHImg, nInd, nAlign, aAlign, aGrid, lFreeze, nHeaderRight
    LOCAL nBkCol, nTxCol, xLeft, nStatus, lDeleted, nPos, iAlign, lDC
-   LOCAL nDif, nAve, aTextExt, nFocRow, aData, z, lDrawControl, nCtrl, nRep, aRect, lDis := !::IsWindowEnabled()
+   LOCAL nDif, nFocRow, aData, z, lDrawControl, nCtrl, nRep, aRect, lDis := !::IsWindowEnabled()
    LOCAL iLen, lHighLight, lBorder, hBrush, nLine, nRecPos := 0, hPen, nImgX
    IF LEN( ::Children ) == 0 .OR. ::hWnd == NIL .OR. !IsWindow( ::hWnd ) .OR. ::hWnd == 0 
       RETURN .F.
@@ -1863,8 +1863,6 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
    SetBkMode( hMemDC, TRANSPARENT )
    DEFAULT nRowEnd TO 0
 
-   aTextExt := _GetTextExtentPoint32( hMemDC, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' )
-   
    IF nRowEnd == 0 .AND. ::ShowHeaders
       nRowEnd := 1
    ENDIF
@@ -2095,13 +2093,10 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
                          EXIT
                  END
 
-                 nAve := Int( ( Int( aTextExt[ 1 ] / 26 ) + 1 ) / 2 )
-
                  lHide := ::Children[i]:ControlHide
                  IF VALTYPE( lHide ) == "B"
                     lHide := EVAL( ::Children[i]:ControlHide, Self, nRec )
                  ENDIF
-
 
                  nCtrl := 0
                  lDrawControl := .F.
@@ -2371,6 +2366,11 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
    
    SelectObject( hMemDC, hOldFont )
    SelectObject( hMemDC, hOldPen )
+
+   IF ! lDC
+      ReleaseDC( ::hWnd, hMemDC )
+   ENDIF
+
 RETURN .T.
 
 METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, x, y, aMetrics, xVal, i ) CLASS DataGrid
@@ -4139,7 +4139,7 @@ RETURN NIL
 METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    LOCAL aAlign, nColor, hOldPen, hOldBrush, hOldFont, n, aRect, nH := 5, nx := 0
    LOCAL nTop, nIcoLeft, nTxColor, nImage := ::xHeaderImageIndex, y := 0
-   LOCAL hBorderPen, nColor1, nColor2, cOrd, nBackColor, nBorder, nShadow, hPenShadow, hPenLight, z, i, nPrevColor, lDC
+   LOCAL hBorderPen, nColor1, nColor2, cOrd, nBackColor, nBorder, nShadow, hPenShadow, hPenLight, z, i, nPrevColor, lDC, hBrush
    
    DEFAULT lHot   TO .F.
    DEFAULT nLeft  TO ::__HeaderLeft
@@ -4151,8 +4151,8 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
       hDC := NIL
    ENDIF
 
-   lDC := hDC == NIL
-   DEFAULT hDC    TO GetDC( ::Parent:hWnd )
+   lDC := hDC != NIL
+   DEFAULT hDC TO GetDC( ::Parent:hWnd )
    
    aRect := {nLeft, 0, nRight+1, ::Parent:__GetHeaderHeight()}
 
@@ -4232,9 +4232,8 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
       ::__HeaderX     := x
 
       hOldFont := SelectObject( hDC, ::HeaderFont:Handle )
-      //aAlign := _GetTextExtentPoint32( hDC, IIF( Empty( ::xText ), "X", ::xText ) )
-
-      hOldBrush := SelectObject( hDC, CreateSolidBrush( nBackColor ) )
+      hBrush   := CreateSolidBrush( nBackColor )
+      hOldBrush := SelectObject( hDC, hBrush )
 
       Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
 
@@ -4245,7 +4244,9 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
       
    ENDIF
    SelectObject( hDC, hOldBrush )
-
+   IF hBrush != NIL
+      DeleteObject( hBrush )
+   ENDIF
    nPrevColor := SetTextColor( hDC, nTxColor )
 
    n := ::HeaderAlignment
@@ -4337,7 +4338,7 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
          DeleteObject( hPenLight )
       ENDIF
    ENDIF
-   IF lDC
+   IF ! lDC
       ReleaseDC( ::Parent:hWnd, hDC )
    ENDIF
 RETURN NIL

@@ -60,7 +60,7 @@ METHOD Init( oParent, aParameters, cProjectName ) CLASS Dialog
 RETURN Self
 
 METHOD PostInitDialog() CLASS Dialog
-   LOCAL nRet, oObj, n
+   LOCAL nRet, oObj
    nRet := ExecuteEvent( "OnCreate", Self )
 
    ODEFAULT nRet TO 0
@@ -120,17 +120,16 @@ METHOD PostInitDialog() CLASS Dialog
 
       nRet := ExecuteEvent( "OnLoad", Self )
       ODEFAULT nRet TO ::OnLoad( Self )
-
+/*
       IF ::Property != NIL .AND. ::__ClassInst == NIL
-
          FOR n := 1 TO LEN( ::Property:Keys )
              oObj := HGetValueAt( ::Property, n )
              IF oObj:__xCtrlName == "TabPage" .AND. !oObj:Visible
                 oObj:__SetVisible( .F., .T. )
              ENDIF
          NEXT
-
       ENDIF
+*/
       IF ::AnimationStyle != 0 .AND. ::__ClassInst == NIL
          RETURN ::Animate( 1000, ::AnimationStyle )
       ENDIF

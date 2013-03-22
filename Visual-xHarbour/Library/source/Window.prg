@@ -4838,32 +4838,32 @@ FUNCTION __DrawSpecialChar( hDC, aRect, nSign, lBold, nPoint )
    DeleteObject( hFont )
 RETURN NIL
 
-FUNCTION __Draw3DRect( hdc, rcItem, oTopLeftColor, oBottomRightColor, lPen )
+FUNCTION __Draw3DRect( hdc, aRect, nColor, nShadow, lPen )
    LOCAL hPen
    LOCAL hPenOld
    DEFAULT lPen TO .F.
    IF !lPen
-      hPen := CreatePen( PS_SOLID, 1, oTopLeftColor )
+      hPen := CreatePen( PS_SOLID, 1, nColor )
     ELSE
-      hPen := oTopLeftColor
+      hPen := nColor
    ENDIF
    hPenOld := SelectObject( hdc, hPen )
-   MoveToEx( hdc, rcItem[1], rcItem[4] - 1 )
-   LineTo( hdc, rcItem[1], rcItem[2] )
-   LineTo( hdc, rcItem[3] - 1, rcItem[2] )
+   MoveToEx( hdc, aRect[1], aRect[4] - 1 )
+   LineTo( hdc, aRect[1], aRect[2] )
+   LineTo( hdc, aRect[3] - 1, aRect[2] )
    SelectObject( hdc, hPenOld )
    IF !lPen
       DeleteObject( hPen )
    ENDIF
-   IF rcItem[1] <> rcItem[3]
+   IF aRect[1] <> aRect[3]
       IF !lPen
-         hPen := CreatePen(PS_SOLID, 1, oBottomRightColor )
+         hPen := CreatePen(PS_SOLID, 1, nShadow )
        ELSE
-         hPen := oBottomRightColor
+         hPen := nShadow
       ENDIF
       hPenOld := SelectObject(hdc, hPen)
-      LineTo( hdc, rcItem[3] - 1, rcItem[4] - 1 )
-      LineTo( hdc, rcItem[1], rcItem[4] - 1 )
+      LineTo( hdc, aRect[3] - 1, aRect[4] - 1 )
+      LineTo( hdc, aRect[1], aRect[4] - 1 )
       SelectObject( hdc, hPenOld )
       IF !lPen
          DeleteObject( hPen )
@@ -5379,7 +5379,7 @@ METHOD __PaintBakgndImage( hDC ) CLASS WinForm
 RETURN NIL
 
 METHOD Show( nShow ) CLASS WinForm
-   LOCAL oChild, nRet, hDC, hMemDC, hMemDC1, hOldBitmap1, hOldBitmap, hMemBitmap, hBrush, o, n
+   LOCAL oChild, nRet, hDC, hMemDC, hMemDC1, hOldBitmap1, hOldBitmap, hMemBitmap, hBrush
    DEFAULT nShow TO ::ShowMode
    IF ::__OnInitCanceled
       RETURN NIL
@@ -5427,21 +5427,10 @@ METHOD Show( nShow ) CLASS WinForm
             DeleteDC( hMemDC )
          ENDIF
 
-         ::__FixDocking()
+         //::__FixDocking()
          
          nRet := ExecuteEvent( "OnLoad", Self )
 
-         IF ::Property != NIL .AND. ::__ClassInst == NIL
-
-            FOR n := 1 TO LEN( ::Property:Keys )
-                o := HGetValueAt( ::Property, n )
-                IF o:__xCtrlName == "TabPage" .AND. !o:Visible
-                   o:__SetVisible( .F., .T. )
-                ENDIF
-            NEXT
-
-         ENDIF
-         
          ODEFAULT nRet TO ::OnLoad( Self )
          nShow := ::ShowMode
       ENDIF
@@ -5887,29 +5876,18 @@ RETURN ocCompo
 
 FUNCTION __ChkComponent( oObj, ocCompo )
    LOCAL oForm
-
    IF VALTYPE( ocCompo ) == "C" 
-
-      IF oObj:__ClassInst == NIL 
-      
-         oForm := oObj:Form
-         IF oForm:Property != NIL .AND. ASCAN( oForm:Property:Keys, {|c| UPPER(c) == UPPER( ocCompo ) } ) == 0
-            oForm := oObj:Application:MainForm
-         ENDIF
-         IF oForm:Property != NIL .AND. ASCAN( oForm:Property:Keys, {|c| UPPER(c) == UPPER( ocCompo ) } ) > 0
+      oForm := oObj:Form
+      IF oForm:Property != NIL 
+         IF ASCAN( oForm:Property:Keys, {|c| UPPER(c) == UPPER( ocCompo ) } ) == 0
+            IF oObj:__ClassInst == NIL 
+               oForm := oObj:Application:MainForm
+             ELSE
+               oForm := oObj:Application:Project:Forms[1]
+            ENDIF
+          ELSE
             ocCompo := oForm:Property[ ocCompo ]
          ENDIF
-        
-      ELSE
-
-         oForm := oObj:Form
-         IF oForm:Property != NIL .AND. ASCAN( oForm:Property:Keys, {|c| UPPER(c) == UPPER( ocCompo ) } ) == 0
-            oForm := oObj:Application:Project:Forms[1]
-         ENDIF
-         IF oForm:Property != NIL .AND. ASCAN( oForm:Property:Keys, {|c| UPPER(c) == UPPER( ocCompo ) } ) > 0
-            ocCompo := oForm:Property[ ocCompo ]
-         ENDIF
-         
       ENDIF
    ENDIF
 RETURN ocCompo

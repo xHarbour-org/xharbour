@@ -173,10 +173,10 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
 
    IF cFileName != NIL
       //::Application:SourceTabs:InsertTab( cFileName )
-      ::Application:SourceSelect:AddItem( cFileName )
+      //::Application:SourceSelect:AddItem( cFileName )
     ELSE
       //::Application:SourceTabs:InsertTab( "  " + ::Name+".prg * ",,, .T. )
-      ::Application:SourceSelect:AddItem( ::Name+".prg *" )
+      //::Application:SourceSelect:AddItem( ::Name+".prg *" )
    ENDIF
    
    cInitialBuffer := ""

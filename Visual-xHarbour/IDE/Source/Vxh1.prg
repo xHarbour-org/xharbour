@@ -240,7 +240,7 @@ METHOD Init( ... ) CLASS IDE
    ::Sizes       := Hash()
    ::Sizes["ObjectManagerWidth"] := 23
    ::Sizes["ToolBoxWidth"]       := 18
-   ::Sizes["SourceSelectWidth"]  := 150
+   //::Sizes["SourceSelectWidth"]  := 150
 
    IF( n := ::IniFile:ReadInteger( "General", "ShowRulers", 1 ) ) == 0
       ::ShowRulers := .F.
@@ -429,7 +429,7 @@ METHOD OnClose() CLASS IDE_MainForm
       ::Application:IniFile:WriteNumber( "ObjectTab",     "Height", Round( ( ::Application:ObjectTab:Height / aSize[4] ) * 100, 0 ) )
       ::Application:IniFile:WriteNumber( "ObjectManager", "Width",  Round( ( ::Panel1:Width / aSize[5] ) * 100, 0 ) )
       ::Application:IniFile:WriteNumber( "ToolBox",       "Width",  Round( ( ::Application:ToolBox:Width / aSize[5] ) * 100, 0 ) )
-      ::Application:IniFile:WriteNumber( "SourceSelect",  "Width",  ::Application:SourceSelect:Width )
+      //::Application:IniFile:WriteNumber( "SourceSelect",  "Width",  ::Application:SourceSelect:Width )
 
       ::Application:IniFile:WriteNumber( "General", "RunMode", ::Application:RunMode )
 
@@ -554,7 +554,7 @@ METHOD Init() CLASS IDE_MainForm
    WITH OBJECT ::Application
       :Sizes["ObjectManagerWidth"] := MAX( MIN( :IniFile:ReadInteger( "ObjectManager", "Width",  :Sizes["ObjectManagerWidth"] ), 90 ), 10 )
       :Sizes["ToolBoxWidth"]       := MAX( MIN( :IniFile:ReadInteger( "ToolBox",       "Width",  :Sizes["ToolBoxWidth"] ),       90 ), 10 )
-      :Sizes["SourceSelectWidth"]  := MAX( MIN( :IniFile:ReadInteger( "SourceSelect",  "Width",  :Sizes["SourceSelectWidth"] ), 150 ), 10 )
+      //:Sizes["SourceSelectWidth"]  := MAX( MIN( :IniFile:ReadInteger( "SourceSelect",  "Width",  :Sizes["SourceSelectWidth"] ), 150 ), 10 )
    END
 
    // StatusBar section ----------------------
@@ -1895,18 +1895,19 @@ METHOD Init() CLASS IDE_MainForm
             :Caption   := "File View"
             :Create()
             WITH OBJECT ::Application:FileTree := FileTreeView( :this )
-               :ExStyle     := 0
-               :AcceptFiles := .T.
-               :Left        := 500
-               :Width       := 200
-               :Height      := 300
-               :Dock:Top    := :Parent
-               :Dock:Left   := :Parent
-               :Dock:Bottom := :Parent
-               :Dock:Right  := :Parent
-               :Dock:Margin := 0
-               :HasButtons  := .T.
-               :ImageList   := ImageList( :this, 16, 16 ):Create()
+               :ExStyle       := 0
+               :AcceptFiles   := .T.
+               :ShowSelAlways := .T.
+               :Left          := 500
+               :Width         := 200
+               :Height        := 300
+               :Dock:Top      := :Parent
+               :Dock:Left     := :Parent
+               :Dock:Bottom   := :Parent
+               :Dock:Right    := :Parent
+               :Dock:Margin   := 0
+               :HasButtons    := .T.
+               :ImageList     := ImageList( :this, 16, 16 ):Create()
                :ImageList:MaskColor := C_LIGHTCYAN
                :ImageList:AddBitmap( "TREE" )
                :ImageList:AddBitmap( "TBEXTRA" )
@@ -2045,13 +2046,18 @@ METHOD Init() CLASS IDE_MainForm
       :Dock:Bottom := ::Application:DebuggerPanel//::Panel2
 
       :OnSelChanged := <|n,x,y|
-                        (n,x)
+                        (n)
                         ::Application:Project:EditReset( IIF( y > 3, 1, 0 ) )
-                        ::Application:ToolBox:Enabled       := y > 3
+                        ::Application:ToolBox:Enabled    := y > 3
+                        ::Application:ObjectTree:Enabled := y > 3
                         IF y > 3
                            ::Application:Project:CurrentForm:Redraw()
+                           IF x == 3 .AND. y == 4
+                              ::Application:ObjectManager:Parent:Select()
+                           ENDIF
+                         ELSEIF y == 3
+                           ::Application:FileTree:Parent:Select()
                         ENDIF
-                        ::Application:ObjectTree:Enabled              := y > 3
                         ::EnableSearchMenu( y == 3 )
                        >
       :Create()
@@ -2145,7 +2151,7 @@ METHOD Init() CLASS IDE_MainForm
          :OnWMSetFocus     := {|| ::Application:SourceEditor:SetFocus() }
 
          :Create()
-
+/*
          WITH OBJECT ::Application:SourceSelect := ListBox( :this )
             :Cargo            := -1
             :Width            := ::Application:Sizes["SourceSelectWidth"]
@@ -2171,7 +2177,7 @@ METHOD Init() CLASS IDE_MainForm
             :Create()
          END
 
-/*
+
          WITH OBJECT ::Application:SourceTabs := TabStrip( :this )
             :Height           := :ItemHeight + 3
             :Dock:Left        := :Parent
@@ -2194,7 +2200,7 @@ METHOD Init() CLASS IDE_MainForm
             :Height           := 250
             :Dock:Left        := :Parent
             :Dock:Bottom      := :Parent
-            :Dock:Right       := ::Application:SourceSelect
+            :Dock:Right       := :Parent //::Application:SourceSelect
             :Dock:Top         := :Parent
             :Create()
             :Disable()
@@ -2800,8 +2806,8 @@ METHOD NewProject() CLASS Project
    ::Application:ProjectPrgEditor:EmptyUndoBuffer()
    ::Application:ProjectPrgEditor:Modified := .T.
 
-   ::Application:SourceSelect:Visible := .T.
-   ::Application:SourceSelect:AddItem( ::Properties:Name +"_Main.prg *" )
+   //::Application:SourceSelect:Visible := .T.
+   //::Application:SourceSelect:AddItem( ::Properties:Name +"_Main.prg *" )
 
    //::Application:SourceTabs:Visible := .T.
    //::Application:SourceTabs:InsertTab( "  " + ::Properties:Name +"_Main.prg * ",,, .T. )
@@ -2837,6 +2843,9 @@ RETURN Self
 METHOD SourceTabChanged( nCur ) CLASS Project
    IF nCur <= ::Application:SourceEditor:DocCount
       ::Application:SourceEditor:Source := ::Application:SourceEditor:aDocs[ nCur ]
+      IF ::Application:SourceEditor:Source:TreeItem != NIL
+         ::Application:SourceEditor:Source:TreeItem:Select()
+      ENDIF
       ::Application:Project:EditReset()
    ENDIF
    OnShowEditors()
@@ -3541,12 +3550,17 @@ RETURN 0
 
 //-------------------------------------------------------------------------------------------------------
 
-METHOD SelectBuffer() CLASS Project
+METHOD SelectBuffer(lSel) CLASS Project
    LOCAL n
    ::CurrentForm:Editor:Select()
    IF ( n := aScan( ::Application:SourceEditor:aDocs, {|o| o==::CurrentForm:Editor} ) ) > 0
+      DEFAULT lSel TO .T.
       //::Application:SourceTabs:SetCurSel( n )
-      ::Application:SourceSelect:SetCurSel( n )
+      //::Application:SourceSelect:SetCurSel( n )
+      IF lSel
+         ::Application:FileTree:Parent:Select()
+      ENDIF
+      ::Application:SourceEditor:aDocs[n]:TreeItem:EnsureVisible():Select()
    ENDIF
 RETURN Self
 
@@ -3683,11 +3697,11 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
        ENDIF
        ::Application:SourceEditor:aDocs[n]:Close()
        //::Application:SourceTabs:DeleteTab(n)
-       ::Application:SourceSelect:DeleteItem( n )
+       //::Application:SourceSelect:DeleteItem( n )
        n--
    NEXT
    //::Application:SourceTabs:Visible := .F.
-   ::Application:SourceSelect:Visible := .F.
+   //::Application:SourceSelect:Visible := .F.
 
    FOR n := 1 TO LEN( ::Forms )
        IF ::Forms[n]:Editor != NIL
@@ -3856,7 +3870,7 @@ METHOD SaveSourceAs( oEditor, lSetTabName ) CLASS Project
          oEditor:Save( cFile )
          IF lSetTabName
             //::Application:SourceTabs:SetItem( n, oEditor:FileName )
-            ::Application:SourceSelect:SetItemText( n, oEditor:FileName )
+            //::Application:SourceSelect:SetItemText( n, oEditor:FileName )
          ENDIF
       ENDIF
       EXIT
@@ -3865,7 +3879,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD CloseSource() CLASS Project
-   LOCAL nRes, n := ::Application:SourceSelect:GetCurSel() //::Application:SourceTabs:GetCurSel()
+   LOCAL nRes, n := 0 //::Application:SourceSelect:GetCurSel() //::Application:SourceTabs:GetCurSel()
    nRes := IDNO
    IF ::Application:SourceEditor:Source:Modified
       nRes := MessageBox( 0, "Save changes before closing?", ::Application:SourceEditor:Source:FileName, MB_YESNOCANCEL | MB_ICONQUESTION )
@@ -3874,7 +3888,7 @@ METHOD CloseSource() CLASS Project
       ENDIF
    ENDIF
    //::Application:SourceTabs:DeleteTab( n )
-   ::Application:SourceSelect:DeleteItem( n )
+   //::Application:SourceSelect:DeleteItem( n )
 
    IF nRes == IDYES
       ::SaveSource()
@@ -3883,7 +3897,7 @@ METHOD CloseSource() CLASS Project
    n := MIN( n, ::Application:SourceEditor:DocCount )
    IF n > 0
       //::Application:SourceTabs:SetCurSel( n )
-      ::Application:SourceSelect:SetCurSel( n )
+      //::Application:SourceSelect:SetCurSel( n )
 
       ::SourceTabChanged( n )
     ELSE
@@ -4133,7 +4147,7 @@ METHOD Open( cProject ) CLASS Project
       ::Application:ProjectPrgEditor := Source( ::Application:SourceEditor )
       ::Application:ProjectPrgEditor:Open( cSourcePath +"\" + ::Properties:Name +"_Main.prg" )
 
-      ::Application:SourceSelect:AddItem( ::Properties:Name +"_Main.prg" )
+      //::Application:SourceSelect:AddItem( ::Properties:Name +"_Main.prg" )
       //::Application:SourceTabs:InsertTab( ::Properties:Name +"_Main.prg" )
 
     ELSEIF ::Properties:TargetType == 1
@@ -4149,7 +4163,7 @@ METHOD Open( cProject ) CLASS Project
    ::OpenDesigner()
    ::Application:ToolBox:Enabled := .T.
 
-   ::Application:SourceSelect:Visible := .T.
+   //::Application:SourceSelect:Visible := .T.
    //::Application:SourceTabs:Visible := .T.
 
    ::Application:AddToProjectMenu:Enabled := .T.
@@ -4207,7 +4221,7 @@ METHOD Open( cProject ) CLASS Project
    oWait:Position := 60
 
    //::Application:SourceTabs:Visible := .T.
-   ::Application:SourceSelect:Visible := .T.
+   //::Application:SourceSelect:Visible := .T.
    
    FOR EACH cSource IN ::Properties:Sources
        n := RAT( "\", cSource )
@@ -4217,8 +4231,9 @@ METHOD Open( cProject ) CLASS Project
 
           //::Application:SourceTabs:InsertTab( SUBSTR( cSource, n+1 ) )
           //::Application:SourceTabs:SetCurSel( ::Application:SourceEditor:DocCount )
-          ::Application:SourceSelect:AddItem( SUBSTR( cSource, n+1 ) )
-          ::Application:SourceSelect:SetCurSel( ::Application:SourceEditor:DocCount )
+          //::Application:SourceSelect:AddItem( SUBSTR( cSource, n+1 ) )
+          //::Application:SourceSelect:SetCurSel( ::Application:SourceEditor:DocCount )
+
           ::SourceTabChanged( ::Application:SourceEditor:DocCount )
         ELSE
           AADD( aErrors, { ::Properties:Name, "0", "Open error: " + cSource, "I/O Error"} )
@@ -4238,11 +4253,13 @@ METHOD Open( cProject ) CLASS Project
       RETURN ::Close(.F.)
    ENDIF
 
+   ::Application:FileTree:UpdateView()
+
    // Initialize everything !!!!!
    IF LEN( ::Forms ) > 0
       ::CurrentForm := ::Forms[1]
 
-      ::SelectBuffer()
+      ::SelectBuffer(.F.)
       IF ::CurrentForm != NIL
          ::CheckValidProgram()
          ::Application:DesignPage:Select()
@@ -4320,7 +4337,6 @@ METHOD Open( cProject ) CLASS Project
    ENDIF
    oWait:Position := 100
 
-   ::Application:FileTree:UpdateView()
    ::ResetQuickOpen( ::ProjectFile:Path + "\" + ::ProjectFile:Name )
    IF LEN( ::Forms ) > 0 .AND. !FILE( cSourcePath +"\" + ::Properties:Name +"_XFM.prg" )
       n := ::Application:MainForm:MessageBox( ::Properties:Name + " was created with a previous version of Visual xHarbour, would you like to convert it to current version", "Open Project", MB_ICONQUESTION | MB_YESNOCANCEL )
@@ -4886,7 +4902,7 @@ METHOD SaveAs( cName ) CLASS Project
       ::Save( .T., .T., cPrevPath )
 
       //::Application:SourceTabs:SetItemText( 1, cCurr +".prg", .F. )
-      ::Application:SourceSelect:SetItemText( 1, cCurr +".prg", .F. )
+      //::Application:SourceSelect:SetItemText( 1, cCurr +".prg", .F. )
    ENDIF
 RETURN Self
 

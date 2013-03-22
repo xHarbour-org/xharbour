@@ -90,7 +90,7 @@ CLASS SourceEditor INHERIT Control
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
-   
+   METHOD GetEditor()
    METHOD StyleClearAll()                 INLINE ::SendMessage( SCI_STYLECLEARALL, 0, 0 ), Self
 
    METHOD StyleSetFont( cFont )           INLINE ::FontFaceName := cFont, SendEditorString( ::hWnd, SCI_STYLESETFONT, STYLE_DEFAULT, cFont ), Self
@@ -149,6 +149,13 @@ CLASS SourceEditor INHERIT Control
    METHOD SetColors()
    METHOD OnSetFocus()                    INLINE ::Application:MainForm:EnableSearchMenu( .T. ), NIL
 ENDCLASS
+
+METHOD GetEditor( cFile ) CLASS SourceEditor
+   LOCAL n := ASCAN( ::aDocs, {|o| o:File == cFile} )
+   IF n > 0
+      RETURN ::aDocs[n]
+   ENDIF
+RETURN NIL
 
 METHOD ToggleBookmark() CLASS SourceEditor
    LOCAL nLineStart, nLineEnd, n
@@ -441,7 +448,7 @@ RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnKeyDown( nKey ) CLASS SourceEditor
-   LOCAL nPos, nSecs
+   LOCAL nPos, nSecs, nSel
    IF nKey == VK_F3
       IF ::Source:GetSelLen() > 0
          ::cFindWhat := ::Source:GetSelText()
@@ -462,26 +469,28 @@ METHOD OnKeyDown( nKey ) CLASS SourceEditor
          ENDIF
       ENDIF
 */
+      nSel := ASCAN( ::aDocs, ::xSource,,, .T. )
+      
       DEFAULT ::nLastTabTime TO SECONDS()
 
       nSecs := SECONDS() - ::nLastTabTime
 
       IF nSecs < 1 .OR. ::nLastTabPos == NIL
-         nPos := ::Application:SourceSelect:GetCursel()+ IIF( CheckBit( GetKeyState( VK_SHIFT ), 32768 ), -1, 1 )
+         nPos := nSel /*::Application:SourceSelect:GetCursel()*/+ IIF( CheckBit( GetKeyState( VK_SHIFT ), 32768 ), -1, 1 )
        ELSE
          nPos := ::nLastTabPos 
       ENDIF
-      IF nPos > ::Application:SourceSelect:GetCount()
+      IF nPos > LEN( ::aDocs ) //::Application:SourceSelect:GetCount()
          nPos := 1
       ENDIF
       IF nPos < 0
-         nPos := ::Application:SourceSelect:GetCount()
+         nPos := LEN( ::aDocs ) //::Application:SourceSelect:GetCount()
       ENDIF
 
-      ::nLastTabPos  := ::Application:SourceSelect:GetCursel()
+      ::nLastTabPos  := nSel //::Application:SourceSelect:GetCursel()
       ::nLastTabTime := SECONDS()
 
-      ::Application:SourceSelect:SetCurSel( nPos )
+      //::Application:SourceSelect:SetCurSel( nPos )
       ::Application:Project:SourceTabChanged( nPos )
 
    ENDIF
@@ -520,16 +529,21 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                  IF ! ::Source:Modified
                     ::Source:Modified := .T.
                     n := aScan( ::aDocs, ::Source,,, .T. )
+                    cText := ::Source:TreeItem:Text
+                    IF cText != NIL
+                       cText := ALLTRIM( STRTRAN( cText, "*" ) )
+                       ::Source:TreeItem:Text := cText + " *"
+                    ENDIF
 
                     //cText := ::Application:SourceTabs:GetItemText(n)
                     //::Application:SourceTabs:SetItemText( n, " " + cText + " * ", .T. )
 
-                    cText := ::Application:SourceSelect:GetString(n)
-                    IF cText != NIL
-                       cText := ALLTRIM( STRTRAN( cText, "*" ) )
-                       ::Application:SourceSelect:SetItemText( n, cText + " *" )
-                       ::Application:Project:Modified := .T.
-                    ENDIF
+                    //cText := ::Application:SourceSelect:GetString(n)
+                    //IF cText != NIL
+                    //   cText := ALLTRIM( STRTRAN( cText, "*" ) )
+                    //   ::Application:SourceSelect:SetItemText( n, cText + " *" )
+                    //ENDIF
+                    ::Application:Project:Modified := .T.
                  ENDIF
               ENDIF
               ::Application:Project:SetEditMenuItems()
@@ -883,6 +897,7 @@ CLASS Source
    DATA Form      EXPORTED
    DATA nPrevLine EXPORTED
    DATA PrevFile  EXPORTED
+   DATA TreeItem  EXPORTED
    // Compatibility with xedit for debugger ------------------------------------------------
    ACCESS cFile             INLINE ::FileName
    ACCESS cPath             INLINE IIF( ! EMPTY(::Path), ::Path + "\", "" )
@@ -1141,10 +1156,17 @@ METHOD Save( cFile ) CLASS Source
       n := aScan( ::Owner:aDocs, Self,,, .T. )
 
       //cText := ::Application:SourceTabs:GetItemText(n)
-      cText := ::Application:SourceSelect:GetString(n)
-      cText := ALLTRIM( STRTRAN( cText, "*" ) )
+      //cText := ::Application:SourceSelect:GetString(n)
+      //cText := ALLTRIM( STRTRAN( cText, "*" ) )
       //::Application:SourceTabs:SetItemText( n, cText, .F. )
-      ::Application:SourceSelect:SetItemText( n, cText )
+      //::Application:SourceSelect:SetItemText( n, cText )
+
+      cText := ::TreeItem:Text
+      IF cText != NIL
+         cText := ALLTRIM( STRTRAN( cText, "*" ) )
+         ::TreeItem:Text := cText
+      ENDIF
+
       ::FirstOpen := .F.
    ENDIF
 RETURN Self

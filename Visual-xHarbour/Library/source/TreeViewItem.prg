@@ -48,8 +48,8 @@ CLASS TreeViewItem INHERIT Object
    METHOD ExpandAll()
    METHOD SortChildren( lRec )  INLINE IIF( ::Parent != NIL, ::Parent:SendMessage( TVM_SORTCHILDREN, IFNIL( lRec, .F., lRec ), ::hItem ),)
 
-   METHOD Select(nFlag)         INLINE IIF( ::Parent != NIL, ::Parent:SelectItem( ::hItem, nFlag ),)
-   METHOD EnsureVisible()       INLINE IIF( ::Parent != NIL, ::Parent:EnsureVisible( ::hItem ),)
+   METHOD Select(nFlag)         INLINE IIF( ::Parent != NIL, ::Parent:SelectItem( ::hItem, nFlag ),), Self
+   METHOD EnsureVisible()       INLINE IIF( ::Parent != NIL, ::Parent:EnsureVisible( ::hItem ),), Self
    METHOD EditLabel()           INLINE IIF( ::Parent != NIL, ::Parent:Editlabel( ::hItem ),)
 
    METHOD SetFont( hFont )      INLINE SendMessage( ::hItem, WM_SETFONT, hFont, 0 )
