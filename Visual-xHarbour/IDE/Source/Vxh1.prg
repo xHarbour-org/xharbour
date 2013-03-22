@@ -3591,6 +3591,9 @@ METHOD AddWindow( lReset, cFileName, lCustom, nPos ) CLASS Project
     ELSE
       AADD( ::Forms, oWin )
    ENDIF
+   IF lReset // New Window button
+      ::Application:FileTree:UpdateView()
+   ENDIF
 
    WITH OBJECT oWin
       :__ClassInst:Caption := ""
@@ -3628,9 +3631,6 @@ METHOD AddWindow( lReset, cFileName, lCustom, nPos ) CLASS Project
          ::Application:EventManager:ResetEvents( IIF( EMPTY( :Selected ), {{:this}}, :Selected ) )
       ENDIF
    END
-   IF lReset // New Window button
-      ::Application:FileTree:UpdateView()
-   ENDIF
 RETURN oWin
 
 //-------------------------------------------------------------------------------------------------------

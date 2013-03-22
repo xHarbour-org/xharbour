@@ -2924,6 +2924,9 @@ RETURN .T.
 METHOD GenerateEvent( cEvent, cFuncName, Event ) CLASS EventManager
    LOCAL nPos, aEvents
 
+   ::Application:Project:CurrentForm:Editor:Select()
+   ::Application:Project:CurrentForm:Editor:TreeItem:Select()
+
    WITH OBJECT ::Application:Project:CurrentForm:Editor
 
       :SetSearchFlags( SCFIND_WHOLEWORD )
