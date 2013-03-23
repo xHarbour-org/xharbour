@@ -2896,10 +2896,10 @@ METHOD SetValue( xValue ) CLASS EventManager
            IF ::ActiveObject:Events[n][2][i][1] == cProp
               oItem:ColItems[1]:Value := xValue
 
-              ::Application:Project:Modified := .T.
-              ::Application:Project:CurrentForm:__lModified := .T.
               IF Empty( xValue )
                  ::ActiveObject:Events[n][2][i][2] := ""
+                 ::Application:Project:Modified := .T.
+                 ::Application:Project:CurrentForm:__lModified := .T.
                ELSE
                  IF Empty( ::ActiveObject:Events[n][2][i][2] )
                     ::ActiveObject:Events[n][2][i][2] := xValue
@@ -2946,12 +2946,15 @@ METHOD GenerateEvent( cEvent, cFuncName, Event ) CLASS EventManager
 
          nPos := :GetTextLen()-2
          :AppendText( "RETURN Self" + CRLF )
-         :Modified := .T.
+
+         //:Modified := .T.
+         //::Application:Project:Modified := .T.
+         ::Application:Project:CurrentForm:__lModified := .T.
+
       ENDIF
       :GotoPosition( nPos )
+      :Owner:SendMessage( SCI_SETFIRSTVISIBLELINE, :SendEditor( SCI_LINEFROMPOSITION, nPos, 0 )-1, 0 )
    END
-   ::Application:Project:Modified := .T.
-   ::Application:Project:CurrentForm:__lModified := .T.
 
    IF !::Application:SourceEditor:IsWindowVisible()
       ::Application:EditorPage:Select()
@@ -2966,19 +2969,28 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD RenameEvent( cEvent, cFuncName, cNewFuncName, lSwitch ) CLASS EventManager
+   LOCAL nPos
    (cEvent)
    DEFAULT lSwitch TO .T.
 
-   IF !( cFuncName == cNewFuncName )
-      IF ::ActiveObject:Form:Editor:ReplaceAll( cFuncName, cNewFuncName, SCFIND_WHOLEWORD ) > 0
-         ::ActiveObject:Form:Editor:Modified := .T.
+   ::Application:Project:CurrentForm:Editor:Select()
+   ::Application:Project:CurrentForm:Editor:TreeItem:Select()
 
-         ::Application:Project:Modified := .T.
-         IF lSwitch
-            ::Application:EditorPage:Select()
-            ::Application:SourceEditor:SetFocus()
+   IF !( cFuncName == cNewFuncName )
+      WITH OBJECT ::Application:Project:CurrentForm
+         nPos := :Editor:FindInPos( "METHOD "+cFuncName, 1 )
+         IF nPos >= 0
+            IF :Editor:ReplaceAll( cFuncName, cNewFuncName, SCFIND_WHOLEWORD ) > 0
+               :__lModified := .T.
+               IF lSwitch
+                  ::Application:EditorPage:Select()
+                  ::Application:SourceEditor:SetFocus()
+               ENDIF
+               :Editor:GotoPosition( nPos )
+               :Editor:Owner:SendMessage( SCI_SETFIRSTVISIBLELINE, :Editor:SendEditor( SCI_LINEFROMPOSITION, nPos, 0 )-1, 0 )
+            ENDIF
          ENDIF
-      ENDIF
+      END
    ENDIF
 RETURN Self
 
@@ -3107,7 +3119,11 @@ METHOD EditEvent( cEvent ) CLASS EventManager
                  IF Empty( cName )
                     lReset := .T.
                     cName := ::ActiveObject:Name + "_"+ cEvent
+                 ENDIF
+                 IF UPPER( ::ActiveObject:Events[n][2][i][2] ) != UPPER( cName )
                     ::ActiveObject:Events[n][2][i][2] := cName
+                    ::Application:Project:Modified := .T.
+                    ::Application:Project:CurrentForm:__lModified := .T.
                  ENDIF
 
                  ::GenerateEvent( cEvent, cName, ::ActiveObject:Events[n][2][i] )

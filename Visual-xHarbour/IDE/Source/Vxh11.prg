@@ -543,7 +543,9 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                     //   cText := ALLTRIM( STRTRAN( cText, "*" ) )
                     //   ::Application:SourceSelect:SetItemText( n, cText + " *" )
                     //ENDIF
-                    ::Application:Project:Modified := .T.
+                    IF ! ::Application:Project:Modified
+                       ::Application:Project:Modified := .T.
+                    ENDIF
                  ENDIF
               ENDIF
               ::Application:Project:SetEditMenuItems()

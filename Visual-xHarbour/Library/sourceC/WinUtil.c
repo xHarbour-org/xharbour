@@ -39,6 +39,7 @@
 
 #include <stdio.h>
 #include <olectl.h>
+#include <pshpack8.h>
 //#include <Awesomium\awesomium_capi.h>
 
 #define __strcpy            _tcscpy
@@ -4736,3 +4737,83 @@ HB_FUNC( AWE_WEBCORE_CREATE_WEBVIEW )
 #pragma comment( lib, "Awesomium.lib" )
 */
 
+#ifndef __ITaskbarList3_FWD_DEFINED__
+#define __ITaskbarList3_FWD_DEFINED__
+typedef interface ITaskbarList3 ITaskbarList3;
+#endif /* __ITaskbarList2_FWD_DEFINED__ */
+
+#ifndef __ITaskbarList3_INTERFACE_DEFINED__
+#define __ITaskbarList3_INTERFACE_DEFINED__
+
+typedef enum TBPFLAG { 
+   TBPF_NOPROGRESS    = 0x00,
+   TBPF_INDETERMINATE = 0x01,
+   TBPF_NORMAL        = 0x02,
+   TBPF_ERROR         = 0x04,
+   TBPF_PAUSED        = 0x08
+}  TBPFLAG;
+
+DEFINE_GUID(CLSID_TaskbarList, 0x56fdf344,0xfd6d,0x11d0,0x95,0x8a,0x00,0x60,0x97,0xc9,0xa0,0x90);
+static const GUID IID_ITaskbarList3 = { 0xea1afb91, 0x9e28, 0x4b86, { 0x90, 0xE9, 0x9e, 0x9f, 0x8a, 0x5e, 0xef, 0xaf } };
+GUID_EXT const GUID MTX_CLSID_TaskbarList GUID_SECT = { 0x56fdf344, 0xfd6d, 0x11d0, { 0x95, 0x8a, 0x0, 0x60, 0x97, 0xc9, 0xa0, 0x90 } };
+
+struct ITaskbarList3Vtbl
+{
+   BEGIN_INTERFACE
+      HRESULT ( STDMETHODCALLTYPE *QueryInterface )(ITaskbarList3 * This, REFIID riid, void **ppvObject);
+      ULONG ( STDMETHODCALLTYPE *AddRef )(ITaskbarList3 * This);
+      ULONG ( STDMETHODCALLTYPE *Release )(ITaskbarList3 * This);
+      HRESULT ( STDMETHODCALLTYPE *HrInit )(ITaskbarList3 * This);
+      HRESULT ( STDMETHODCALLTYPE *AddTab )(ITaskbarList3 * This, HWND hwnd);
+      HRESULT ( STDMETHODCALLTYPE *DeleteTab )(ITaskbarList3 * This, HWND hwnd);
+      HRESULT ( STDMETHODCALLTYPE *ActivateTab )(ITaskbarList3 * This, HWND hwnd);
+      HRESULT ( STDMETHODCALLTYPE *SetActiveAlt )(ITaskbarList3 * This, HWND hwnd);
+      HRESULT ( STDMETHODCALLTYPE *MarkFullscreenWindow )(ITaskbarList3 * This, HWND hwnd, BOOL fFullscreen);
+      HRESULT ( STDMETHODCALLTYPE *SetProgressValue )(ITaskbarList3 * This, HWND hwnd, ULONGLONG ullCompleted, ULONGLONG ullTotal);
+      HRESULT ( STDMETHODCALLTYPE *SetProgressState )(ITaskbarList3 * This, HWND hwnd, TBPFLAG tbpFlags);
+      HRESULT ( STDMETHODCALLTYPE *RegisterTab )(ITaskbarList3 * This, HWND hwndTab, HWND hwndMDI);
+      HRESULT ( STDMETHODCALLTYPE *UnregisterTab )(ITaskbarList3 * This, HWND hwndTab);
+      HRESULT ( STDMETHODCALLTYPE *SetTabOrder )(ITaskbarList3 * This, HWND hwndTab, HWND hwndInsertBefore);
+      HRESULT ( STDMETHODCALLTYPE *SetTabActive )(ITaskbarList3 * This, HWND hwndTab, HWND hwndMDI, DWORD dwReserved);
+      HRESULT ( STDMETHODCALLTYPE *ThumbBarAddButtons )(ITaskbarList3 * This, HWND hwnd, UINT cButtons, void * pButton);
+      HRESULT ( STDMETHODCALLTYPE *ThumbBarUpdateButtons )(ITaskbarList3 * This, HWND hwnd, UINT cButtons, void * pButton);
+      HRESULT ( STDMETHODCALLTYPE *ThumbBarSetImageList )(ITaskbarList3 * This, HWND hwnd, void * himl);
+      HRESULT ( STDMETHODCALLTYPE *SetOverlayIcon )(ITaskbarList3 * This, HWND hwnd, HICON hIcon, LPCWSTR pszDescription);
+      HRESULT ( STDMETHODCALLTYPE *SetThumbnailTooltip )(ITaskbarList3 * This, HWND hwnd, LPCWSTR pszTip);
+      HRESULT ( STDMETHODCALLTYPE *SetThumbnailClip )(ITaskbarList3 * This, HWND hwnd, RECT *prcClip);
+   END_INTERFACE
+};
+
+interface ITaskbarList3 {
+    CONST_VTBL struct ITaskbarList3Vtbl *lpVtbl;
+};
+#endif   /* __ITaskbarList3_INTERFACE_DEFINED__ */
+
+
+HB_FUNC( SHOWPROGRESSINTASKBAR )
+{
+   ITaskbarList3 *pTL;
+   int iPerc;
+   HRESULT hr;
+   HWND hwnd = (HWND) hb_parnl(1);
+
+   CoCreateInstance( &MTX_CLSID_TaskbarList, NULL, CLSCTX_ALL, &IID_ITaskbarList3, (void**)&pTL);
+
+   // Set the progress state of the button to indeterminate while you calculate
+   // the number of operations to be performed.
+   hr = pTL->lpVtbl->SetProgressState(pTL, hwnd, TBPF_NORMAL);
+   if( hr == S_OK )
+   {
+      // Calculate the number of operations to perform.
+      iPerc = hb_parni(2);
+
+      // Update the progress. This call to SetProgressValue cancels the
+      // indeterminate state and puts the button into normal progress mode.
+      hb_retl( pTL->lpVtbl->SetProgressValue(pTL, hwnd, (ULONGLONG) iPerc, (ULONGLONG) hb_parni(3) ) == S_OK );
+
+      // Tell the button that progress no longer needs to be displayed.
+      if( iPerc > 100 )
+         pTL->lpVtbl->SetProgressState(pTL, hwnd, TBPF_NOPROGRESS);
+   }
+   pTL->lpVtbl->Release( pTL );
+}

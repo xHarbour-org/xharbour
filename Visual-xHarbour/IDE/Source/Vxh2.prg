@@ -1939,8 +1939,6 @@ RETURN nSnap
 METHOD EditClickEvent() CLASS WindowEdit
    IF LEN( ::Selected ) > 0 .AND. !::CtrlMask:lOrderMode
       ::Application:EventManager:EditEvent( IIF( ::Selected[1][1]:hWnd==::hWnd, "OnLoad", "OnClick" ) )
-      ::Application:Project:Modified := .T.
-      ::__lModified := .T.
    ENDIF
 RETURN Self
 

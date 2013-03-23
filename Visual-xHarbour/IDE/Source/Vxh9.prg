@@ -543,12 +543,23 @@ METHOD OnSelChanged( oItem ) CLASS ObjectTreeView
 RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------
 CLASS FileTreeView INHERIT TreeView
    DATA Changing  EXPORTED INIT .F.
    METHOD UpdateView()
    METHOD OnSelChanged()
    METHOD OnDropFiles()
+   METHOD OnUserMsg()
 ENDCLASS
+
+//-------------------------------------------------------------------------------------------------------
+METHOD OnUserMsg( hWnd, nMsg ) CLASS FileTreeView
+   (hWnd)
+   IF nMsg == WM_USER + 555
+      ::Application:SourceEditor:SetFocus()
+   ENDIF
+RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OnDropFiles() CLASS FileTreeView
@@ -616,5 +627,8 @@ METHOD OnSelChanged( oItem ) CLASS FileTreeView
    IF oItem:Cargo != NIL
       ::Application:SourceEditor:Source := oItem:Cargo
       ::Application:Project:EditReset()
+      IF ! CheckBit( GetKeyState( VK_UP ) ) .AND. ! CheckBit( GetKeyState( VK_DOWN ) )
+         ::PostMessage( WM_USER + 555 )
+      ENDIF
    ENDIF
 RETURN Self

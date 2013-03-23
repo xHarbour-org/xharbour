@@ -520,9 +520,54 @@ RETURN NIL
 
 
 METHOD Init() CLASS IDE_MainForm
-   LOCAL cVersion, rc, oForm
+   LOCAL cVersion, rc, oForm, nFormBack, nToolBack
+   LOCAL nOptionSelectBegin, nOptionSelectEnd, nOptionSelectBorder, nOptionPressBegin, nOptionPressEnd, nOptionPressBorder
 
    ::Super:Init()
+
+   nFormBack           := RGB( 255, 255, 255 )
+   nToolBack           := RGB( 255, 255, 255 )
+
+   nOptionSelectBegin  := RGB( 232, 242, 252 )
+   nOptionSelectEnd    := RGB( 232, 242, 252 )
+   nOptionSelectBorder := RGB( 126, 180, 234 )
+
+   nOptionPressBegin   := RGB( 201, 224, 247 )
+   nOptionPressEnd     := RGB( 201, 224, 247 )
+   nOptionPressBorder  := RGB(  86, 157, 229 )
+
+   IF ::Application:Osversion:Dwmajorversion == 6 .AND. ::Application:Osversion:Dwminorversion == 2
+      ::BackColor           := nFormBack
+
+      ::System:CurrentScheme:ToolStripPanelGradientBegin  := nToolBack
+      ::System:CurrentScheme:ToolStripPanelGradientEnd    := nToolBack
+
+      ::System:CurrentScheme:ToolStripGradientBegin       := nToolBack
+      ::System:CurrentScheme:ToolStripGradientMiddle      := nToolBack
+      ::System:CurrentScheme:ToolStripGradientEnd         := nToolBack
+      ::System:CurrentScheme:ToolStripBorder              := nToolBack
+
+      ::System:CurrentScheme:ButtonSelectedGradientBegin  := nOptionSelectBegin
+      ::System:CurrentScheme:ButtonSelectedGradientEnd    := nOptionSelectEnd
+      ::System:CurrentScheme:ButtonSelectedBorder         := nOptionSelectBorder
+
+      ::System:CurrentScheme:ButtonPressedGradientBegin   := nOptionPressBegin
+      ::System:CurrentScheme:ButtonPressedGradientEnd     := nOptionPressEnd
+      ::System:CurrentScheme:ButtonPressedBorder          := nOptionPressBorder
+      
+      ::System:CurrentScheme:ButtonCheckedGradientBegin   := RGB( 197, 222, 245 )
+      ::System:CurrentScheme:ButtonCheckedGradientEnd     := RGB( 197, 222, 245 )
+
+      ::System:CurrentScheme:MenuItemPressedGradientBegin := RGB( 201, 224, 247 )
+      ::System:CurrentScheme:MenuItemPressedGradientEnd   := RGB( 201, 224, 247 )
+
+      ::System:CurrentScheme:MenuItemSelected             := RGB( 209, 226, 242 )
+      ::System:CurrentScheme:MenuItemBorder               := RGB( 120, 174, 229 )
+
+      ::System:CurrentScheme:Brush:Clean()
+      ::System:CurrentScheme:Pen:Clean()
+   ENDIF
+ 
    #ifdef VXH_DEMO
     ::Caption := "Visual xHarbour Demo " + VXH_Version
    #else
@@ -618,6 +663,9 @@ METHOD Init() CLASS IDE_MainForm
 
    //--------------------------------------
    WITH OBJECT MenuStrip( ::ToolStripContainer1 )
+      IF ::Application:Osversion:Dwmajorversion == 6 .AND. ::Application:Osversion:Dwminorversion == 2
+         :Showgrip := .F.
+      ENDIF
 
       :Row := 1
       :ImageList := ImageList( :this, 16, 16 ):Create()
@@ -1236,6 +1284,10 @@ METHOD Init() CLASS IDE_MainForm
 
    WITH OBJECT ToolStrip( ::ToolStripContainer1 )
       //:ShowChevron := .F.
+       IF ::Application:Osversion:Dwmajorversion == 6 .AND. ::Application:Osversion:Dwminorversion == 2
+         :Showgrip := .F.
+         :ShowChevron := .F.
+       ENDIF
       :Caption := "Standard"
       :Row     := 2
       :ImageList := ImageList( :this, 16, 16 ):Create()
@@ -1331,6 +1383,10 @@ METHOD Init() CLASS IDE_MainForm
    END
 
    WITH OBJECT ToolStrip( ::ToolStripContainer1 )
+      IF ::Application:Osversion:Dwmajorversion == 6 .AND. ::Application:Osversion:Dwminorversion == 2
+         :Showgrip := .F.
+         :ShowChevron := .F.
+      ENDIF
       //:ShowChevron := .F.
       :Caption := "Edit"
       :Row     := 2
@@ -1390,6 +1446,10 @@ METHOD Init() CLASS IDE_MainForm
 
    WITH OBJECT ToolStrip( ::ToolStripContainer1 )
       //:ShowChevron := .F.
+      IF ::Application:Osversion:Dwmajorversion == 6 .AND. ::Application:Osversion:Dwminorversion == 2
+         :Showgrip := .F.
+         :ShowChevron := .F.
+      ENDIF
       :Row := 2
       :Caption := "Build"
       :ImageList := ImageList( :this, 16, 16 ):Create()
@@ -1443,6 +1503,10 @@ METHOD Init() CLASS IDE_MainForm
 
    WITH OBJECT ::Application:ToolBoxBar := ToolStrip( ::ToolStripContainer1 )
       //:ShowChevron := .F.
+      IF ::Application:Osversion:Dwmajorversion == 6 .AND. ::Application:Osversion:Dwminorversion == 2
+         :Showgrip := .F.
+         :ShowChevron := .F.
+      ENDIF
       :Row       := 3
       :Caption   := ""
       :ImageList := ImageList( :this, 16, 16 ):Create()
@@ -1471,6 +1535,10 @@ METHOD Init() CLASS IDE_MainForm
 
    WITH OBJECT ::Application:Props[ "AlignBar" ] := ToolStrip( ::ToolStripContainer1 )
       //:ShowChevron := .F.
+      IF ::Application:Osversion:Dwmajorversion == 6 .AND. ::Application:Osversion:Dwminorversion == 2
+         :Showgrip := .F.
+         :ShowChevron := .F.
+      ENDIF
       :Row       := 3
       :Caption   := "Alignment"
       :ImageList := ImageList( :this, 16, 16 ):Create()
@@ -3466,7 +3534,7 @@ RETURN 0
 //-------------------------------------------------------------------------------------------------------
 
 METHOD SetCaption( lMod ) CLASS Project
-   LOCAL cCaption
+   LOCAL cCaption, i := 2
    ::lModified := lMod
 
    IF lMod .AND. ::CurrentForm != NIL .AND. procname(3) IN {"PROJECT:SETACTION", "EVENTMANAGER:SETVALUE", "EVENTMANAGER:GENERATEEVENT" }
