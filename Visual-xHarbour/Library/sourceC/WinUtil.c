@@ -88,8 +88,6 @@ extern char * hb_oleWideToAnsi( LPWSTR wString );
 HB_EXTERN_END
 
 static IDispatch *pDispPtr;
-static int (*fSci)(void*,int,int,int);
-static void *pSci;
 
 HB_FUNC( BITMAPTOREGION )
 {
@@ -820,19 +818,19 @@ HB_FUNC( SHGETSPECIALFOLDERLOCATION )
 
 LPITEMIDLIST ConvertPathToLpItemIdList(const char *pszPath)
 {
-    LPITEMIDLIST  pidl;
-    LPSHELLFOLDER pDesktopFolder;
+    LPITEMIDLIST  pidl = NULL;
+    LPSHELLFOLDER pDesktopFolder = NULL;
     OLECHAR       olePath[MAX_PATH];
     ULONG         chEaten;
     ULONG         dwAttributes;
-    HRESULT       hr;
 
-    if (SUCCEEDED(SHGetDesktopFolder(&pDesktopFolder)))
+    if( SUCCEEDED( SHGetDesktopFolder( &pDesktopFolder ) ) )
     {
-        MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszPath, -1, olePath, MAX_PATH);
-        hr = pDesktopFolder->lpVtbl->ParseDisplayName(pDesktopFolder,NULL,NULL,olePath,&chEaten,&pidl,&dwAttributes);
+        MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, pszPath, -1, olePath, MAX_PATH );
+        pDesktopFolder->lpVtbl->ParseDisplayName(pDesktopFolder,NULL,NULL,olePath,&chEaten,&pidl,&dwAttributes);
         pDesktopFolder->lpVtbl->Release( pDesktopFolder );
     }
+
     return pidl;
 }
 
@@ -1606,7 +1604,6 @@ LPCSTR GetMacAddress( char* szBuffer )
 {
    // Ensure buffer size is big enough to hold the address
 
-   DWORD dwSize = 18;
    UCHAR uRet;
    NCB ncb;
    LANA_ENUM lenum;
@@ -2231,7 +2228,6 @@ HB_FUNC( __ENUMSERVICES )
    BOOL success;
    LPENUM_SERVICE_STATUS status;
    DWORD numServices=0, sizeNeeded=0, resume=0;
-   const char *svc = "W3SVC";
 
    scm = OpenSCManager(szServer, 0, SC_MANAGER_ALL_ACCESS);
    if( scm )
@@ -3056,7 +3052,6 @@ HB_FUNC( GETOSDISPLAYSTRING )
    SYSTEM_INFO si;
    PGNSI pGNSI;
    PGPI pGPI;
-   BOOL bOsVersionInfoEx;
    DWORD dwType;
    char pszOS[256];
    char cExtra[80];
@@ -3069,7 +3064,7 @@ HB_FUNC( GETOSDISPLAYSTRING )
 
    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
-   if( !(bOsVersionInfoEx = GetVersionEx ((OSVERSIONINFO *) &osvi)) )
+   if( !( GetVersionEx ((OSVERSIONINFO *) &osvi)) )
    {
       return;
    }
@@ -4045,7 +4040,6 @@ HB_FUNC( GETBMPSTRING )
    HBITMAP hb = (HBITMAP) hb_parnl(1);
 
    HDC hdc=NULL;
-   FILE *file=NULL;
    LPVOID buf=NULL;
    BITMAPINFO bmpInfo;
    BITMAPFILEHEADER bmpFileHeader;
@@ -4097,7 +4091,6 @@ HB_FUNC( __SETSCROLLINFO )
 
 HB_FUNC( ENUMREGDLL )
 {
-   HRESULT hr;
    CLSID clsid;
    ICatInformation *pCatInfo;
    IEnumGUID *pEnumGUID=NULL;
@@ -4109,13 +4102,13 @@ HB_FUNC( ENUMREGDLL )
    hb_arrayNew( &Array, 0 );
 
    CoInitialize (NULL);
-   hr=CoCreateInstance ( &CLSID_StdComponentCategoriesMgr, NULL, CLSCTX_INPROC_SERVER, &IID_ICatInformation, (void **)&pCatInfo);
+   CoCreateInstance ( &CLSID_StdComponentCategoriesMgr, NULL, CLSCTX_INPROC_SERVER, &IID_ICatInformation, (void **)&pCatInfo);
    pCatInfo->lpVtbl->AddRef( pCatInfo );
 
    pcatidImpl[0]=CATID_Control;
    pCatInfo->lpVtbl->EnumClassesOfCategories( pCatInfo, 1, pcatidImpl, 0, pcatidReqd, &pEnumGUID );
 
-   while( (hr= pEnumGUID->lpVtbl->Next( pEnumGUID, 1, &clsid, NULL ))==S_OK )
+   while( ( pEnumGUID->lpVtbl->Next( pEnumGUID, 1, &clsid, NULL ))==S_OK )
    {
       char *cClass;
       BSTR bstrClassName;
@@ -4745,7 +4738,7 @@ typedef interface ITaskbarList3 ITaskbarList3;
 #ifndef __ITaskbarList3_INTERFACE_DEFINED__
 #define __ITaskbarList3_INTERFACE_DEFINED__
 
-typedef enum TBPFLAG { 
+typedef enum TBPFLAG {
    TBPF_NOPROGRESS    = 0x00,
    TBPF_INDETERMINATE = 0x01,
    TBPF_NORMAL        = 0x02,
@@ -4755,7 +4748,7 @@ typedef enum TBPFLAG {
 
 DEFINE_GUID(CLSID_TaskbarList, 0x56fdf344,0xfd6d,0x11d0,0x95,0x8a,0x00,0x60,0x97,0xc9,0xa0,0x90);
 static const GUID IID_ITaskbarList3 = { 0xea1afb91, 0x9e28, 0x4b86, { 0x90, 0xE9, 0x9e, 0x9f, 0x8a, 0x5e, 0xef, 0xaf } };
-GUID_EXT const GUID MTX_CLSID_TaskbarList GUID_SECT = { 0x56fdf344, 0xfd6d, 0x11d0, { 0x95, 0x8a, 0x0, 0x60, 0x97, 0xc9, 0xa0, 0x90 } };
+const GUID MTX_CLSID_TaskbarList, GUID_SECT = { 0x56fdf344, 0xfd6d, 0x11d0, { 0x95, 0x8a, 0x0, 0x60, 0x97, 0xc9, 0xa0, 0x90 } };
 
 struct ITaskbarList3Vtbl
 {
