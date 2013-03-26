@@ -104,7 +104,7 @@ CLASS ListBox FROM Control
    METHOD InitStorage( nItems, nBytes )    INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_INITSTORAGE, nItems, nBytes ) , NIL )
    METHOD ItemFromPoint( x,y )             INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_ITEMFROMPOINT, 0, MAKELONG( x, y ) ) , NIL )
    METHOD SetItemText( n, cText, l )       INLINE l := ::GetCurSel() == n, ::DeleteString( n ), ::InsertString( n, cText ), IIF( l, ::SetCurSel(n), )
-   METHOD OnDestroy()                      INLINE ::__SetItemToolTips(.F.), NIL
+   METHOD OnDestroy()                      INLINE Super:OnDestroy(), ::__SetItemToolTips(.F.), NIL
 
    METHOD __SetScrollBars()                INLINE Self
 

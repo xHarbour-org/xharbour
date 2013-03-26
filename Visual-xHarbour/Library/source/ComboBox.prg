@@ -154,7 +154,7 @@ CLASS ComboBox FROM Control
    METHOD SetItemHeight()
    METHOD __SetScrollBars()                INLINE Self
    METHOD SetDropDownStyle()
-   METHOD OnDestroy()                      INLINE ::__SetItemToolTips(.F.), ::__ResetEdit(), NIL
+   METHOD OnDestroy()                      INLINE Super:OnDestroy(), ::__SetItemToolTips(.F.), ::__ResetEdit()
    METHOD OnWindowPosChanged()             INLINE ::CallWindowProc(), ::SetItemHeight( -1, ::xSelectionHeight ), ::SetItemHeight( 2, ::xItemHeight ), 0
    METHOD OnKillFocus()                    INLINE IIF( ::DropDownStyle <> CBS_DROPDOWNLIST, 0, NIL )
    METHOD __ListCallBack()

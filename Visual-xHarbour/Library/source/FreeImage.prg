@@ -20,7 +20,7 @@ CLASS FreeImage INHERIT FreeImageRenderer, Panel
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
-   METHOD OnDestroy()          INLINE ::FreeImageRenderer:Destroy(), NIL
+   METHOD OnDestroy()          INLINE Super:OnDestroy(), ::FreeImageRenderer:Destroy(), NIL
    METHOD OnGetDlgCode()       INLINE DLGC_WANTMESSAGE
    METHOD OnPaint()
    METHOD OnEraseBkGnd()       INLINE 1

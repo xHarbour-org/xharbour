@@ -170,7 +170,7 @@ CLASS TabControl INHERIT Control
    METHOD Hide()
    METHOD Show()
    
-   METHOD OnDestroy()                INLINE ::CloseThemeData(), NIL
+   METHOD OnDestroy()                INLINE Super:OnDestroy(), ::CloseThemeData()
    METHOD OnMouseMove()
    METHOD OnMouseLeave()             INLINE ::OnMouseMove(0,0,0), NIL
    METHOD OnUserMsg(n)

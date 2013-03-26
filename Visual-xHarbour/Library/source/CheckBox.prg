@@ -63,8 +63,7 @@ CLASS CheckBox INHERIT Control
    METHOD SetParent( oParent ) INLINE IIF( ::__hBrush != NIL, ( DeleteObject( ::__hBrush ), ::__hBrush := NIL ), ), ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
    METHOD Create()             INLINE IIF( ::Transparent, ::Parent:__SetTransparent( Self ), ), ::Super:Create(), ::SetState( ::xState )
 
-   METHOD OnDestroy()          INLINE IIF( ::__hBrush != NIL, DeleteObject( ::__hBrush ), ), NIL
-   METHOD __WindowDestroy()    INLINE ::Super:__WindowDestroy(), ::CloseThemeData(), Self
+   METHOD OnDestroy()          INLINE ::Super:OnDestroy(), ::CloseThemeData(), IIF( ::__hBrush != NIL, DeleteObject( ::__hBrush ), )
    METHOD DrawFrame()
    METHOD SetCheckStyle()
    METHOD OnCtlColorStatic()

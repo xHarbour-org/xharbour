@@ -4738,17 +4738,18 @@ typedef interface ITaskbarList3 ITaskbarList3;
 #ifndef __ITaskbarList3_INTERFACE_DEFINED__
 #define __ITaskbarList3_INTERFACE_DEFINED__
 
-typedef enum TBPFLAG {
-   TBPF_NOPROGRESS    = 0x00,
-   TBPF_INDETERMINATE = 0x01,
-   TBPF_NORMAL        = 0x02,
-   TBPF_ERROR         = 0x04,
-   TBPF_PAUSED        = 0x08
+
+typedef enum TBPFLAG
+{ 
+   TBPF_NOPROGRESS    = 0x00000000,
+   TBPF_INDETERMINATE = 0x00000001,
+   TBPF_NORMAL        = 0x00000002,
+   TBPF_ERROR         = 0x00000004,
+   TBPF_PAUSED        = 0x00000008
 }  TBPFLAG;
 
 DEFINE_GUID(CLSID_TaskbarList, 0x56fdf344,0xfd6d,0x11d0,0x95,0x8a,0x00,0x60,0x97,0xc9,0xa0,0x90);
 static const GUID IID_ITaskbarList3 = { 0xea1afb91, 0x9e28, 0x4b86, { 0x90, 0xE9, 0x9e, 0x9f, 0x8a, 0x5e, 0xef, 0xaf } };
-const GUID MTX_CLSID_TaskbarList, GUID_SECT = { 0x56fdf344, 0xfd6d, 0x11d0, { 0x95, 0x8a, 0x0, 0x60, 0x97, 0xc9, 0xa0, 0x90 } };
 
 struct ITaskbarList3Vtbl
 {
@@ -4783,30 +4784,30 @@ interface ITaskbarList3 {
 #endif   /* __ITaskbarList3_INTERFACE_DEFINED__ */
 
 
-HB_FUNC( SHOWPROGRESSINTASKBAR )
+HB_FUNC( TASKBARPROGRESSVALUE )
 {
    ITaskbarList3 *pTL;
-   int iPerc;
-   HRESULT hr;
-   HWND hwnd = (HWND) hb_parnl(1);
-
-   CoCreateInstance( &MTX_CLSID_TaskbarList, NULL, CLSCTX_ALL, &IID_ITaskbarList3, (void**)&pTL);
-
-   // Set the progress state of the button to indeterminate while you calculate
-   // the number of operations to be performed.
-   hr = pTL->lpVtbl->SetProgressState(pTL, hwnd, TBPF_NORMAL);
-   if( hr == S_OK )
+   BOOL bRet = FALSE;
+   CoInitialize( NULL );
+   if( SUCCEEDED( CoCreateInstance( &CLSID_TaskbarList, NULL, CLSCTX_ALL, &IID_ITaskbarList3, (void**)&pTL) ) )
    {
-      // Calculate the number of operations to perform.
-      iPerc = hb_parni(2);
-
-      // Update the progress. This call to SetProgressValue cancels the
-      // indeterminate state and puts the button into normal progress mode.
-      hb_retl( pTL->lpVtbl->SetProgressValue(pTL, hwnd, (ULONGLONG) iPerc, (ULONGLONG) hb_parni(3) ) == S_OK );
-
-      // Tell the button that progress no longer needs to be displayed.
-      if( iPerc > 100 )
-         pTL->lpVtbl->SetProgressState(pTL, hwnd, TBPF_NOPROGRESS);
+      bRet = SUCCEEDED( pTL->lpVtbl->SetProgressValue(pTL, (HWND) hb_parnl(1), hb_parni(2), hb_parni(3) ) );
+      pTL->lpVtbl->Release( pTL );
    }
-   pTL->lpVtbl->Release( pTL );
+   CoUninitialize();
+   hb_retl( bRet );
+}
+
+HB_FUNC( TASKBARPROGRESSSTATE )
+{
+   ITaskbarList3 *pTL;
+   BOOL bRet = FALSE;
+   CoInitialize( NULL );
+   if( SUCCEEDED( CoCreateInstance( &CLSID_TaskbarList, NULL, CLSCTX_ALL, &IID_ITaskbarList3, (void**)&pTL) ) )
+   {
+      bRet = SUCCEEDED( pTL->lpVtbl->SetProgressState(pTL, (HWND) hb_parnl(1), hb_parni(2) ) );
+      pTL->lpVtbl->Release( pTL );
+   }
+   CoUninitialize();
+   hb_retl( bRet );
 }

@@ -121,7 +121,7 @@ CLASS EditBox INHERIT Control
    METHOD OnCtlColorEdit()
    METHOD OnCtlColorStatic()
 
-   METHOD OnDestroy()                  INLINE IIF( ::__hBrush != NIL, DeleteObject( ::__hBrush ), ), NIL
+   METHOD OnDestroy()                  INLINE Super:OnDestroy(), IIF( ::__hBrush != NIL, DeleteObject( ::__hBrush ), ), NIL
    METHOD CanUndo()                    INLINE ::SendMessage( EM_CANUNDO, 0, 0 )
    METHOD CharFromPos(x,y)             INLINE ::SendMessage( EM_CHARFROMPOS, L2Bin(x)+L2Bin(y) )
    METHOD EmptyUndoBuffer()            INLINE ::SendMessage( EM_EMPTYUNDOBUFFER, 0, 0 )

@@ -118,7 +118,8 @@ static aMessages := {;
                     { WM_COMMAND,      "OnCommand"      },;
                     { WM_PAINT,        "OnPaint"        },;
                     { WM_NCPAINT,      "OnNCPaint"      },;
-                    { WM_INITDIALOG,   "OnInitDialog"   };
+                    { WM_INITDIALOG,   "OnInitDialog"   },;
+                    { WM_DESTROY,      "OnDestroy"      };
                     }
 
 static __aObjects := {}
@@ -367,7 +368,6 @@ CLASS Window INHERIT Object
    DATA OnWMInitDialog         EXPORTED
    DATA OnWMPaste              EXPORTED
    DATA OnWMGetDlgCode         EXPORTED
-   DATA OnWMDestroy            EXPORTED
    DATA OnWMClose              EXPORTED
    DATA OnWMLButtonDblClk      EXPORTED
 
@@ -523,7 +523,6 @@ CLASS Window INHERIT Object
    METHOD OnClose()             VIRTUAL
    METHOD OnGetMinMaxInfo()     VIRTUAL
    METHOD OnHotKey()            VIRTUAL
-   METHOD OnDestroy()           VIRTUAL
    METHOD OnParentDrawItem()    VIRTUAL
    METHOD OnParentMeasureItem() VIRTUAL
    METHOD OnEraseBkGnd()        VIRTUAL
@@ -658,6 +657,7 @@ CLASS Window INHERIT Object
    METHOD OnSetCursor()
    METHOD OnPaint()
    METHOD OnCommand()
+   METHOD OnDestroy()
    METHOD BeginPaint()
    METHOD EndPaint()
 ENDCLASS
@@ -2017,11 +2017,50 @@ METHOD EndPaint() CLASS Window
    ENDIF
 RETURN NIL
 
+METHOD OnDestroy() CLASS Window
+   LOCAL n, aComp
+   IF ::__ClassInst != NIL
+      IF ::LeftSplitter != NIL
+         ::LeftSplitter:Destroy()
+         ::LeftSplitter := NIL
+      ENDIF
+      IF ::TopSplitter != NIL
+         ::TopSplitter:Destroy()
+         ::TopSplitter := NIL
+      ENDIF
+      IF ::RightSplitter != NIL
+         ::RightSplitter:Destroy()
+         ::RightSplitter := NIL
+      ENDIF
+      IF ::BottomSplitter != NIL
+         ::BottomSplitter:Destroy()
+         ::BottomSplitter := NIL
+      ENDIF
+   ENDIF
+   ::HorzScroll := .F.
+   ::VertScroll := .F.
+
+   aComp := {}
+   FOR n := 1 TO LEN( ::Components )
+       IF ::Components[n]:Exists
+          AADD( aComp, ::Components[n] )
+       ENDIF
+   NEXT
+   AEVAL( aComp, {|o| o:Destroy(.F.) } )
+
+   ::Components := {}
+
+   IF ::Parent != NIL .AND. ( ::Parent:__xCtrlName == "ObjManager" .OR. ::Parent:__xCtrlName == "EvtManager" )
+      ::Parent:KeepActiveCaption := .F.
+      ::Parent:Redraw()
+   ENDIF
+RETURN NIL
+
 //-----------------------------------------------------------------------------------------------
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    LOCAL nRet, nCode, nId, n, cBuffer, oObj
    LOCAL oChild, oItem, x, y
-   LOCAL lShow, hParent, pPtr, oCtrl, aRect, aPt, mii, msg, lHandled, aComp, oMenu, mmi, oForm
+   LOCAL lShow, hParent, pPtr, oCtrl, aRect, aPt, mii, msg, lHandled, oMenu, mmi, oForm
    LOCAL pt, hwndFrom, idFrom, code, aParams, nAnimation, nMess
    local aParent
    
@@ -2243,47 +2282,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
          CASE WM_NCCALCSIZE
               nRet := ExecuteEvent( "OnNcCalcSize", Self )
               ODEFAULT nRet TO ::OnNcCalcSize( nwParam, nlParam )
-              EXIT
-
-         CASE WM_DESTROY
-              IF ::__ClassInst != NIL
-                 IF ::LeftSplitter != NIL
-                    ::LeftSplitter:Destroy()
-                    ::LeftSplitter := NIL
-                 ENDIF
-                 IF ::TopSplitter != NIL
-                    ::TopSplitter:Destroy()
-                    ::TopSplitter := NIL
-                 ENDIF
-                 IF ::RightSplitter != NIL
-                    ::RightSplitter:Destroy()
-                    ::RightSplitter := NIL
-                 ENDIF
-                 IF ::BottomSplitter != NIL
-                    ::BottomSplitter:Destroy()
-                    ::BottomSplitter := NIL
-                 ENDIF
-              ENDIF
-              ::HorzScroll := .F.
-              ::VertScroll := .F.
-
-              aComp := {}
-              FOR n := 1 TO LEN( ::Components )
-                  IF ::Components[n]:Exists
-                     AADD( aComp, ::Components[n] )
-                  ENDIF
-              NEXT
-              AEVAL( aComp, {|o| o:Destroy(.F.) } )
-
-              ::Components := {}
-
-              nRet := ExecuteEvent( "OnDestroy", Self )
-              ODEFAULT nRet TO ::OnDestroy( nwParam, nlParam )
-              ODEFAULT nRet TO __Evaluate( ::OnWMDestroy, Self, nwParam, nlParam, nRet )
-              IF ::Parent != NIL .AND. ( ::Parent:__xCtrlName == "ObjManager" .OR. ::Parent:__xCtrlName == "EvtManager" )
-                 ::Parent:KeepActiveCaption := .F.
-                 ::Parent:Redraw()
-              ENDIF
               EXIT
 
          CASE WM_NCDESTROY

@@ -237,7 +237,7 @@ return( len( ::Items) )
 
 METHOD SetItemText( cText ) CLASS TreeViewItem
    LOCAL tvi
-   IF ::Parent:hWnd != NIL
+   IF ::Parent != NIL .AND. ::Parent:hWnd != NIL
       tvi := (struct TVITEM)
       tvi:mask    := TVIF_TEXT
       tvi:hItem   := ::hItem

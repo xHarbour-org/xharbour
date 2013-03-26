@@ -527,6 +527,7 @@ RETURN nRet
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OnDestroy() CLASS ToolStrip
+   Super:OnDestroy()
    IF s_CurrentObject != NIL
       __ReleaseMenu( s_CurrentObject, s_CurrentObject:__hMenu )
       s_CurrentObject := NIL
@@ -1770,7 +1771,7 @@ CLASS ToolStripButton INHERIT ToolStripItem
    METHOD __SetImageList()    INLINE IIF( ::hWnd != NIL, AEVAL( ::Children, {|o| o:InvalidateRect() } ),)
    METHOD __UpdateWidth()     INLINE NIL // Dummy
    METHOD __GetObjById()
-   METHOD OnDestroy() INLINE DestroyMenu( ::__hMenu ), NIL
+   METHOD OnDestroy() INLINE Super:OnDestroy(), DestroyMenu( ::__hMenu ), NIL
    METHOD __Enable()
 ENDCLASS
 

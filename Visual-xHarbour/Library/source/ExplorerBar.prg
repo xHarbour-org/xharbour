@@ -138,7 +138,7 @@ CLASS ExplorerBar INHERIT Control
    METHOD OnVertScroll()   INLINE ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT ), AEVAL( ::Children, {|o| o:Redraw() } ), NIL
    METHOD OnEraseBkGnd()   INLINE 1
    METHOD OnThemeChanged()
-   METHOD OnDestroy()      INLINE ImageListDestroy( ::__hImageListTitle ), ImageListDestroy( ::__hImageListButton ), ::CloseThemeData(), NIL
+   METHOD OnDestroy()      INLINE Super:OnDestroy(), ImageListDestroy( ::__hImageListTitle ), ImageListDestroy( ::__hImageListButton ), ::CloseThemeData(), NIL
    METHOD __AddTaskPanel()
 ENDCLASS
 

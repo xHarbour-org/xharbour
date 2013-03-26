@@ -268,6 +268,7 @@ METHOD Create() CLASS ActiveX
 RETURN Self
 
 METHOD OnDestroy() CLASS ActiveX
+   ::UserControl:OnDestroy()
    IF ::oServer != NIL
       ::oServer:DisconnectEvents()
    ENDIF

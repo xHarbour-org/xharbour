@@ -3622,7 +3622,7 @@ METHOD SelectBuffer(lSel) CLASS Project
    LOCAL n
    ::CurrentForm:Editor:Select()
    IF ( n := aScan( ::Application:SourceEditor:aDocs, {|o| o==::CurrentForm:Editor} ) ) > 0
-      DEFAULT lSel TO .T.
+      DEFAULT lSel TO ::Application:SourceEditor:IsWindowVisible()
       //::Application:SourceTabs:SetCurSel( n )
       //::Application:SourceSelect:SetCurSel( n )
       IF lSel
@@ -6445,14 +6445,17 @@ METHOD SetAction( aActions, aReverse ) CLASS Project
 
                IF VALTYPE( aAction[7] ) == "C" .AND. UPPER( aAction[7] ) == "FORM"
                   IF ( x := ASCAN( ::Application:Project:Forms, {|o| o:hWnd == aAction[8]:hWnd } ) ) > 0
+                     ::Application:Project:Forms[x]:Editor:Close()
+
                      ::Application:FormsTabs:SendMessage( TCM_DELETEITEM, x - 1 )
                      ADEL( ::Application:Project:Forms, x, .T. )
-                     ::Application:MainForm:PostMessage( WM_USER + 3000, x - 1 )
-                  ENDIF
+                     IF x > LEN( ::Application:Project:Forms )
+                        x--
+                     ENDIF
+                     ::Application:FormsTabs:SetCurSel( x )
+                     ::Application:Project:SelectWindow( ::Application:Project:Forms[x],, .T. )
+                     //::Application:MainForm:PostMessage( WM_USER + 3000, x - 1 )
 
-                  IF ( x := ASCAN( ::Application:SourceEditor:aDocs, {|o| o == aAction[8]:Editor } ) ) > 0
-                     ::Application:SourceTabs:DeleteTab( x )
-                     ::Application:SourceEditor:aDocs[x]:Close()
                   ENDIF
 
                ENDIF

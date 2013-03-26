@@ -14,12 +14,24 @@
 #include "debug.ch"
 #include "vxh.ch"
 
+#define TBPF_NOPROGRESS    0x00000000
+#define TBPF_INDETERMINATE 0x00000001
+#define TBPF_NORMAL        0x00000002
+#define TBPF_ERROR         0x00000004
+#define TBPF_PAUSED        0x00000008
+
+#define PBS_MARQUEE        0x08
+#define PBM_SETMARQUEE WM_USER + 10
+
 CLASS ProgressBar FROM Control
-   DATA AllowUnDock          EXPORTED INIT FALSE
-   DATA AllowClose           EXPORTED INIT FALSE
-   DATA ImageList  EXPORTED
-   DATA ImageIndex PROTECTED
-   DATA xRange      PROTECTED INIT { 0, 100 }
+   PROPERTY Marquee INDEX PBS_MARQUEE READ xMarquee        WRITE SetStyle            DEFAULT .F.
+   PROPERTY MarqueeSeconds            READ xMarqueeSeconds WRITE __SetMarqueeSeconds DEFAULT 0
+   DATA TaskBarProgress PUBLISHED INIT .F.
+   DATA AllowUnDock     EXPORTED INIT FALSE
+   DATA AllowClose      EXPORTED INIT FALSE
+   DATA ImageList       EXPORTED
+   DATA ImageIndex      PROTECTED
+   DATA xRange          PROTECTED INIT { 0, 100 }
 
    ACCESS Range         INLINE ::xRange
    ASSIGN Range( a )    INLINE ::SetRange( a )
@@ -71,6 +83,9 @@ CLASS ProgressBar FROM Control
 
    METHOD SetBkColor( n )  INLINE ::xBackColor := n, IIF( ::IsWindow(), ::SendMessage( PBM_SETBKCOLOR, 0, IIF(n==NIL,GetSysColor( COLOR_BTNFACE ),n) ), NIL )
    METHOD SetStep( n )     INLINE ::xStep      := n, IIF( ::IsWindow(), ::SendMessage( PBM_SETSTEP, n, 0 ), NIL )
+   METHOD OnDestroy()
+   METHOD __SetMarqueeSeconds()
+   METHOD OnUserMsg()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -101,11 +116,23 @@ METHOD Create() CLASS ProgressBar
    ::SetRange( ::Range )
    ::SetPosition( ::Position )
    ::SetBarColor( ::ForeColor )
+   ::__SetMarqueeSeconds( ::xMarqueeSeconds )
    IF ::Step != NIL
       ::SetStep( ::Step )
    ENDIF
    IF ::BackColor != NIL
       ::SetBkColor( ::BackColor )
+   ENDIF
+   IF ::__ClassInst == NIL .AND. ::TaskBarProgress
+      ::PostMessage( WM_USER + 555 )
+   ENDIF
+RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+
+METHOD __SetMarqueeSeconds( nSecs ) CLASS ProgressBar
+   IF ::__ClassInst == NIL .AND. ::IsWindow()
+      ::SendMessage( PBM_SETMARQUEE, ::xMarquee, nSecs )
    ENDIF
 RETURN Self
 
@@ -119,6 +146,33 @@ METHOD SetPosition( n ) CLASS ProgressBar
          sleep(500)
          ::SendMessage( PBM_SETPOS, n+1, 0 )
          ::SendMessage( PBM_SETPOS, n, 0 )
+      ENDIF
+      IF ::__ClassInst == NIL .AND. ::TaskBarProgress
+         IF ! ::xMarquee
+            TaskBarProgressValue( IIF( ::Form:Parent != NIL, ::Form:Parent:hWnd, ::Form:hWnd ), n, ::xRange[2] )
+          ELSE
+            TaskBarProgressState( IIF( ::Form:Parent != NIL, ::Form:Parent:hWnd, ::Form:hWnd ), TBPF_INDETERMINATE )
+         ENDIF
+      ENDIF
+   ENDIF
+RETURN NIL
+
+//-----------------------------------------------------------------------------------------------
+
+METHOD OnDestroy() CLASS ProgressBar
+   Super:OnDestroy()
+   IF ::__ClassInst == NIL .AND. ::TaskBarProgress
+      TaskBarProgressState( IIF( ::Form:Parent != NIL, ::Form:Parent:hWnd, ::Form:hWnd ), TBPF_NOPROGRESS )
+   ENDIF
+RETURN NIL
+
+METHOD OnUserMsg( hWnd, nMsg ) CLASS ProgressBar
+   (hWnd)
+   IF nMsg == WM_USER + 555
+      IF ::xMarquee
+         TaskBarProgressState( IIF( ::Form:Parent != NIL, ::Form:Parent:hWnd, ::Form:hWnd ), TBPF_INDETERMINATE )
+       ELSE
+         TaskBarProgressValue( IIF( ::Form:Parent != NIL, ::Form:Parent:hWnd, ::Form:hWnd ), ::Position, ::xRange[2] )
       ENDIF
    ENDIF
 RETURN NIL
