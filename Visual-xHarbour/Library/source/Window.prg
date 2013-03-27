@@ -248,6 +248,7 @@ CLASS Window INHERIT Object
    DATA __Docked                 PROTECTED INIT .T.
    DATA __aCltRect               PROTECTED
    DATA __cPaint                 PROTECTED
+   DATA __cValues                EXPORTED  INIT ""
    DATA __hCursor                EXPORTED
    DATA __aTransparent           EXPORTED  INIT {}
    DATA __MenuBar                EXPORTED  INIT .F.
@@ -512,6 +513,9 @@ CLASS Window INHERIT Object
 
    METHOD HandleEvent( cEvent )   INLINE ExecuteEvent( cEvent, Self )
 
+   METHOD SaveValues()
+   METHOD RestoreValues()
+
    METHOD RegisterDocking()
 
    METHOD OnNCDestroy()         VIRTUAL
@@ -660,7 +664,39 @@ CLASS Window INHERIT Object
    METHOD OnDestroy()
    METHOD BeginPaint()
    METHOD EndPaint()
+   METHOD GetControl()
 ENDCLASS
+
+//-----------------------------------------------------------------------------------------------
+METHOD GetControl( cName ) CLASS Window
+   LOCAL n := ASCAN( ::Children, {|o| o:Name == cName } )
+RETURN IIF( n > 0, ::Children[n], NIL )
+
+//-----------------------------------------------------------------------------------------------
+METHOD SaveValues() CLASS Window
+   LOCAL n
+   ::__cValues := ""
+   FOR n := 1 TO LEN( ::Children )
+       IF __objHasMsg( ::Children[n], "Text" )
+          ::__cValues += ::Children[n]:Name + "~" + xStr(::Children[n]:Text) + "~" + VALTYPE(::Children[n]:Text) + IIF( n < LEN( ::Children ), "^", "" )
+       ENDIF
+   NEXT
+   VIEW ::__cValues
+RETURN ::__cValues
+
+//-----------------------------------------------------------------------------------------------
+METHOD RestoreValues( cValues ) CLASS Window
+   LOCAL aVal, oCtrl, n, aValues
+   DEFAULT cValues TO ::__cValues
+   aValues := hb_aTokens( cValues, "^" )
+   FOR n := 1 TO LEN( aValues )
+       aVal  := hb_aTokens( aValues[n], "~" )
+       oCtrl := ::GetControl( aVal[1] )
+       IF oCtrl != NIL
+          oCtrl:Text := xStr( aVal[2], aVal[3] )
+       ENDIF
+   NEXT
+RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD SaveLayout( cIniFile, cSection ) CLASS Window
@@ -5712,9 +5748,28 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 
-FUNCTION XStr( xValue )
+FUNCTION xStr( xValue, xType )
    LOCAL cType := VALTYPE( xValue )
    SWITCH cType
+      CASE "C"
+           IF xType != NIL
+              SWITCH xType
+                 CASE "N"
+                      xValue := VAL( xValue )
+                      EXIT
+                 CASE "D"
+                      xValue := CTOD( xValue )
+                      EXIT
+                 CASE "L"
+                 CASE "B"
+                      xValue := &xValue
+                      EXIT
+                 CASE "U"
+                      xValue := NIL
+                      EXIT
+              END
+           ENDIF
+           EXIT
       CASE "P"
            xValue := ALLTRIM( STR( xValue ) )
            EXIT
