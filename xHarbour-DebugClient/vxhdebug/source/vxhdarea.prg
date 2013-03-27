@@ -21,7 +21,7 @@ CLASS XHDebugWorkArea FROM TabPage
   DATA aStruct INIT {}
   DATA nArea INIT 0
   DATA lDirty INIT .T.
-  METHOD Init( oParent, oDebugger ) CONSTRUCTOR
+  METHOD Init() CONSTRUCTOR
   METHOD Create()
   METHOD ChangeArea() INLINE If( ::oAreaList:HasFocus, ::UpdateInfo(), )
   METHOD ShowUp()

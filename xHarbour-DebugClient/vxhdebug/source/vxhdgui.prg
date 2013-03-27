@@ -178,12 +178,18 @@ METHOD GetUnavailableEditor( cFile ) CLASS XHDebuggerGUI
   LOCAL n := AScan( xEdit_GetEditors(), {|o| Empty( o:cFile ) } )
   IF n == 0
     ::oEditor := Editor():New( , , , , /*cFile*/, ::oApp:SourceEditor:oEditor:oDisplay )
-    ::oApp:SourceTabs:InsertTab( "Unavailable code" )
-    n := Len( xEdit_GetEditors() )
+    
+    ::oEditor:TreeItem := ::oApp:FileTree:AddItem( "Unavailable code" )
+    ::oEditor:TreeItem:Select()
+
+    //::oApp:SourceTabs:InsertTab( "Unavailable code" )
+    //n := Len( xEdit_GetEditors() )
   ENDIF
   ::oEditor := xEdit_GetEditors()[ n ]
-  ::oApp:SourceTabs:SetCurSel( n )
-  ::oApp:Project:SourceTabChanged( , n )
+  ::oEditor:TreeItem:Select()
+
+  //::oApp:SourceTabs:SetCurSel( n )
+  //::oApp:Project:SourceTabChanged( , n )
   
   ::oEditor:Load( , "CODE NOT AVAILABLE FOR " + cFile, .T. )
   ::oEditor:lReadOnly := .T.
@@ -450,8 +456,9 @@ METHOD Sync() CLASS XHDebuggerGUI
                         == Lower( cFile ) } ) ) > 0
     ::oEditor := xEdit_GetEditors()[ n ]
 
-    ::oApp:SourceTabs:SetCurSel( n )
-    ::oApp:Project:SourceTabChanged( , n )
+    //::oApp:SourceTabs:SetCurSel( n )
+    ::oEditor:TreeItem:Select()
+    //::oApp:Project:SourceTabChanged( , n )
 
     IF !::oApp:SourceEditor:IsWindowVisible()
       ::oApp:EditorPage:Select()
@@ -470,10 +477,11 @@ METHOD Sync() CLASS XHDebuggerGUI
       IF RIGHT( UPPER( cFile ), 4 ) == ".XFM"
          ::oEditor:lReadOnly := .T.
       ENDIF
-
-      ::oApp:SourceTabs:InsertTab( ::cModule )
-      ::oApp:SourceTabs:SetCurSel( nDocs )
-      ::oApp:Project:SourceTabChanged( , nDocs )
+      ::oEditor:TreeItem := ::oApp:FileTree:AddItem( ::cModule )
+      ::oEditor:TreeItem:Select()
+      //::oApp:SourceTabs:InsertTab( ::cModule )
+      //::oApp:SourceTabs:SetCurSel( nDocs )
+      //::oApp:Project:SourceTabChanged( , nDocs )
 
       IF !::oApp:SourceEditor:IsWindowVisible()
         ::oApp:EditorPage:Select()
