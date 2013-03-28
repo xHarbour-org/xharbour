@@ -267,9 +267,11 @@ METHOD OnLButtonUp( nwParam, x, y ) CLASS RepEdit
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------------------------------------------
-METHOD OnPaint( hDC ) CLASS RepEdit
-   LOCAL hOldBrush, hOldPen, aRect, oCtrl, cx, cy, nX, nY
+METHOD OnPaint() CLASS RepEdit
+   LOCAL hOldBrush, hOldPen, aRect, oCtrl, cx, cy, nX, nY, hDC
    LOCAL hMemDC, hMemBitmap, hOldBitmap, nBColor, nFColor, lMarkers := .F.
+
+   hDC        := ::BeginPaint()
 
    hMemDC     := CreateCompatibleDC( hDC )
    hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
@@ -311,6 +313,7 @@ METHOD OnPaint( hDC ) CLASS RepEdit
       ::oLast:InvalidateRect()
       ::oLast := NIL
    ENDIF
+   ::EndPaint()
 RETURN 0
 
 //--------------------------------------------------------------------------------------------------------------------------------------

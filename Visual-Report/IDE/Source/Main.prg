@@ -16,7 +16,6 @@
 static oApp
 
 #ifdef VRDLL
-   static oWait
    #include "vxh.ch"
    #include "debug.ch"
 
@@ -33,6 +32,7 @@ static oApp
       DATA oDoc EXPORTED
       DATA oRep EXPORTED
       DATA oApp EXPORTED
+      DATA oWait
       METHOD Load()
       METHOD Run( cReport )
       METHOD Preview()       INLINE ::oRep:Preview( ::oApp )
@@ -42,7 +42,7 @@ static oApp
    ENDCLASS
 
    METHOD Run( cReport, lShowProgress, cText, cTitle ) CLASS VR
-      LOCAL oWait, oForm
+      LOCAL oForm
       DEFAULT lShowProgress TO .F.
       IF cReport != NIL
          ::Load( cReport )
@@ -51,11 +51,11 @@ static oApp
          IF lShowProgress
             DEFAULT cText  TO "Generating Report. Please wait..."
             DEFAULT cTitle TO "Visual Report"
-            oWait := MessageWait( cText, cTitle, .T. )
+            ::oWait := MessageWait( cText, cTitle, .T. )
          ENDIF
-         ::oRep:Run( ::oDoc, oWait )
-         IF lShowProgress .AND. oWait != NIL
-            ShowWindow( oWait:hWnd, SW_HIDE )
+         ::oRep:Run( ::oDoc, ::oWait )
+         IF lShowProgress .AND. ::oWait != NIL
+            ShowWindow( ::oWait:hWnd, SW_HIDE )
          ENDIF
       ENDIF
    RETURN Self
@@ -63,14 +63,14 @@ static oApp
    METHOD Close() CLASS VR
       ::oRep := NIL
       ::oDoc := NIL
-      IF oWait != NIL
-         oWait:Destroy()
+      IF ::oWait != NIL
+         ::oWait:Destroy()
       ENDIF
    RETURN Self
 
    METHOD Load( cReport ) CLASS VR
-      IF oWait != NIL
-         oWait:Destroy()
+      IF ::oWait != NIL
+         ::oWait:Destroy()
       ENDIF
       ::oRep := VrReport()
       ::oDoc := NIL

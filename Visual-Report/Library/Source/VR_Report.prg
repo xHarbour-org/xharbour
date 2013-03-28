@@ -681,11 +681,11 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    LOCAL xValue1, xValue2, xValue3, cFilter, cData, oIni, cEntry, aRelation, aRelations, cRelation, e
 
    ::Create()
-
+view 1
    IF oDoc != NIL .AND. ::hProps == NIL
       ::PrepareArrays( oDoc )
    ENDIF
-
+view 2
    ::PrintHeader    := ::hProps:PrintHeader    == "1"
    ::PrintRepHeader := ::hProps:PrintRepHeader == "1"
    ::PrintFooter    := ::hProps:PrintFooter    == "1"
@@ -693,7 +693,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    ::GroupBy1       := ::hProps:GroupBy1
    ::GroupBy2       := ::hProps:GroupBy2
    ::GroupBy3       := ::hProps:GroupBy3
-
+view 3
    FOR EACH hCtrl IN ::aComponents
        IF hCtrl:ClsName IN {"VRDATATABLE","VRADSDATATABLE"}
           oData := &(SubStr(hCtrl:ClsName,3))( NIL )
@@ -768,7 +768,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
 
        ENDIF
    NEXT
-
+view 4
    FOR EACH hCtrl IN ::aComponents
        IF hCtrl:ClsName $ { "VRDATATABLE", "VRADSDATATABLE" }
           cData := hCtrl:Name
@@ -783,7 +783,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
           ENDIF
        ENDIF
    NEXT
-
+view 5
    IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
       TRY
          ::DataSource:Select()
@@ -796,7 +796,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
          RETURN .F.
       END
    ENDIF
-
+view 6
    ::StartPage()
    hDC := GetDC(0)
 #ifndef VRDLL
@@ -815,7 +815,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
 
    ::CreateRepHeader( hDC )
    ::CreateHeader( hDC )
-
+view 7
    IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
       ::DataSource:Select()
       ::DataSource:GoTop()
@@ -870,16 +870,17 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
          ENDIF
       ENDDO
    ENDIF
-
+view 8
    ::CreateRepFooter( hDC )
    ::CreateFooter( hDC )
 
    ReleaseDC(0, hDC)
-
+view 9
    ::EndPage()
    ::End()
    hb_gcall(.t.)
    HEVAL( hData, {|cKey,o| IIF( o:IsOpen, o:Close(),)} )
+view 10
 RETURN .T.
 
 METHOD ChangePage( hDC, nHeight )
@@ -987,6 +988,7 @@ METHOD OnInitDialog() CLASS VrPreview
          :Dock:Right  := Self
          :Dock:Bottom := ::StatusBar1
          :DockIt()
+
          :Width       := 300
          :Height      := 300
          :RulerSize   := 0
