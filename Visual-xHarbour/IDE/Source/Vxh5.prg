@@ -81,9 +81,11 @@ METHOD ProcessErrors( oError, aErrors ) CLASS ErrorListView
    
    FOR n := 1 TO LEN( aErrors )
        ::InsertItem( aErrors[n][1],, n )
-       ::SetItemText( n-1, 1, aErrors[n][2] )
-       ::SetItemText( n-1, 2, aErrors[n][3] )
-       ::SetItemText( n-1, 3, aErrors[n][4] )
+       ::SetItemText( n, 1, aErrors[n][2] )
+       ::SetItemText( n, 2, aErrors[n][3] )
+       ::SetItemText( n, 3, aErrors[n][4] )
+
+       view aErrors[n][2], aErrors[n][3], aErrors[n][4]
    NEXT
    ::EnsureVisible( 0, .F. )
    ::EnsureVisible( 1, .F. )
@@ -121,8 +123,8 @@ METHOD OnParentNotify() CLASS ErrorListView
             FOR EACH oEditor IN ::Application:SourceEditor:aDocs
                IF Upper( oEditor:File ) == cFile
                   ::Application:EditorPage:Select()
-                  ::Application:SourceTabs:SetCurSel( nFor )
-                  ::Application:SourceEditor:Source := oEditor
+                  oEditor:Select()
+                  oEditor:TreeItem:Select()
                   oEditor:GoToLine( nLine-1 )
                   ::Application:SourceEditor:SetFocus()
                   EXIT
