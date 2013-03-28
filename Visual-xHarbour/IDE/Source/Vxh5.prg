@@ -84,8 +84,6 @@ METHOD ProcessErrors( oError, aErrors ) CLASS ErrorListView
        ::SetItemText( n, 1, aErrors[n][2] )
        ::SetItemText( n, 2, aErrors[n][3] )
        ::SetItemText( n, 3, aErrors[n][4] )
-
-       view aErrors[n][2], aErrors[n][3], aErrors[n][4]
    NEXT
    ::EnsureVisible( 0, .F. )
    ::EnsureVisible( 1, .F. )

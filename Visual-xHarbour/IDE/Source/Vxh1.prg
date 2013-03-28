@@ -6096,7 +6096,6 @@ FUNCTION GUI_ErrorGrid( oError, cLog )
    LOCAL cFile, cDesc, aErrors := GetLogErrors( cLog ), oApp := __GetApplication()
 
    oApp:BuildLog:Caption := cLog
-view aErrors
    IF EMPTY( aErrors )
       cDesc := oError:Description
       cFile := ""
