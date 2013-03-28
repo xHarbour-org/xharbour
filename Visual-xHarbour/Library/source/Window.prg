@@ -248,7 +248,7 @@ CLASS Window INHERIT Object
    DATA __Docked                 PROTECTED INIT .T.
    DATA __aCltRect               PROTECTED
    DATA __cPaint                 PROTECTED
-   DATA __cValues                EXPORTED  INIT ""
+   DATA __aValues                EXPORTED  INIT {}
    DATA __hCursor                EXPORTED
    DATA __aTransparent           EXPORTED  INIT {}
    DATA __MenuBar                EXPORTED  INIT .F.
@@ -675,25 +675,22 @@ RETURN IIF( n > 0, ::Children[n], NIL )
 //-----------------------------------------------------------------------------------------------
 METHOD SaveValues() CLASS Window
    LOCAL n
-   ::__cValues := ""
+   ::__aValues := {}
    FOR n := 1 TO LEN( ::Children )
        IF __objHasMsg( ::Children[n], "Text" )
-          ::__cValues += ::Children[n]:Name + "~" + xStr(::Children[n]:Text) + "~" + VALTYPE(::Children[n]:Text) + IIF( n < LEN( ::Children ), "^", "" )
+          AADD( ::__aValues, { ::Children[n]:Name, ::Children[n]:Text } )
        ENDIF
    NEXT
-   VIEW ::__cValues
-RETURN ::__cValues
+RETURN ::__aValues
 
 //-----------------------------------------------------------------------------------------------
-METHOD RestoreValues( cValues ) CLASS Window
-   LOCAL aVal, oCtrl, n, aValues
-   DEFAULT cValues TO ::__cValues
-   aValues := hb_aTokens( cValues, "^" )
+METHOD RestoreValues( aValues ) CLASS Window
+   LOCAL oCtrl, n
+   DEFAULT aValues TO ::__aValues
    FOR n := 1 TO LEN( aValues )
-       aVal  := hb_aTokens( aValues[n], "~" )
-       oCtrl := ::GetControl( aVal[1] )
+       oCtrl := ::GetControl( aValues[n][1] )
        IF oCtrl != NIL
-          oCtrl:Text := xStr( aVal[2], aVal[3] )
+          oCtrl:Text := aValues[n][2]
        ENDIF
    NEXT
 RETURN Self
