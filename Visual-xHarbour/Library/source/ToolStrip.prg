@@ -157,7 +157,7 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 METHOD OnParentSysCommand( nwParam, nlParam ) CLASS ToolStripContainer
    LOCAL n, i, nRet
-   IF nwParam == SC_KEYMENU
+   IF nwParam == SC_KEYMENU .AND. ! CheckBit( GetKeyState( VK_BACK ) , 32768 )
       FOR n := 1 TO LEN( ::Children )
           IF ( nRet := ::Children[n]:OnParentSysCommand( nwParam, nlParam ) ) == NIL
              FOR i := 1 TO LEN( ::Children[n]:Children )
@@ -2947,7 +2947,7 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS MenuStripItem
       SelectObject( dis:hDC, hOldBrush )
     ELSE
 
-      IF ! ( ::Application:OsVersion:dwMajorVersion >= 6 .AND. ::Application:OsVersion:dwMajorVersion >= 2 )
+      IF ! ( ::Application:OsVersion:dwMajorVersion >= 6 .AND. ::Application:OsVersion:dwMinorVersion >= 2 )
          ::__DrawStripe( dis:hDC, 0, dis:rcItem:top - IIF( ::BeginGroup, 3, 0 ), 24, dis:rcItem:bottom )
          dis:rcItem:left := xIcon - 8
       ENDIF
@@ -2956,7 +2956,7 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS MenuStripItem
    ENDIF
 
    IF ::Checked
-      IF ! ( ::Application:OsVersion:dwMajorVersion >= 6 .AND. ::Application:OsVersion:dwMajorVersion >= 2 )
+      IF ! ( ::Application:OsVersion:dwMajorVersion >= 6 .AND. ::Application:OsVersion:dwMinorVersion >= 2 )
          hOldPen   := SelectObject( dis:hDC, IIF( lSelected, ::System:CurrentScheme:Pen:ButtonPressedBorder, ::System:CurrentScheme:Pen:ButtonSelectedBorder ) )
          hOldBrush := SelectObject( dis:hDC, IIF( lSelected, ::System:CurrentScheme:Brush:ButtonPressedGradientBegin, ::System:CurrentScheme:Brush:ButtonCheckedGradientEnd ) )
          Rectangle( dis:hDC, 2, dis:rcItem:Top+1, xIcon-10, dis:rcItem:Bottom-1 )

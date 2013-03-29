@@ -61,7 +61,6 @@
 #define HEADERSIZEGAP  5
 
 #xtranslate CEIL( <x> ) => ( if( <x> - Int( <x> ) > 0 , Int( <x> )+1, Int( <x> ) ) )
-#xtranslate nArrayElement => HB_EnumIndex()
 
 CLASS DataGrid INHERIT Control
    DATA ItemHeight              PUBLISHED INIT 19

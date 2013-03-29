@@ -2,6 +2,8 @@
  * $Id$
  */
 
+GLOBAL EXTERNAL s_CurrentObject
+
 #include "vxh.ch"
 #include "cstruct.ch"
 #include "colors.ch"
@@ -561,6 +563,10 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
            ENDIF
 
       CASE hdr:code == SCN_CHARADDED
+           IF s_CurrentObject != NIL
+              ::Application:MainForm:MenuStrip1:OnSysKeyDown( VK_MENU )
+           ENDIF
+
            scn := (struct SCNOTIFICATION*) nlParam
            IF scn:ch == 13 // indent
               IF ::AutoIndent == 1

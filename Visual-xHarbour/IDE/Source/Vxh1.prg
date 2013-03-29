@@ -33,7 +33,7 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 #define HKEY_LOCAL_MACHINE           (0x80000002)
 
 #define VXH_Version      "5"
-#define VXH_BuildVersion "5.0.0"
+#define VXH_BuildVersion "5.1.0"
 
 #define MCS_ARROW    10
 #define MCS_PASTE    11
@@ -3511,6 +3511,10 @@ METHOD Find() CLASS Project
       IF ::ReplaceDialog != NIL
          ::ReplaceDialog:Close()
       ENDIF
+      ::Application:SourceEditor:SetFocus()
+
+      ::Application:MainForm:MenuStrip1:OnSysKeyDown( VK_MENU )
+
       ::FindDialog := FindTextDialog( ::Application:SourceEditor )
       ::FindDialog:Owner := ::Application:SourceEditor
       ::FindDialog:Show(, ::Application:SourceEditor:Source:GetSelText() )
