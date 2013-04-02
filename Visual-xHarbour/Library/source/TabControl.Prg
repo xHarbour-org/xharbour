@@ -59,11 +59,11 @@ CLASS TabControl INHERIT Control
    DATA BoldFont         EXPORTED
    DATA VertFocusFont    EXPORTED
    DATA FocusFont        EXPORTED
-   DATA Frame            EXPORTED    INIT .T.
+   DATA Frame            EXPORTED  INIT .T.
 
    DATA OnSelChanged     EXPORTED
    DATA TabBrush         EXPORTED
-   DATA __Tabs           EXPORTED
+   DATA __Tabs           EXPORTED  INIT {}
 
    DATA CloseBtn         PROTECTED
    DATA PinBtn           PROTECTED
@@ -77,7 +77,6 @@ CLASS TabControl INHERIT Control
    DATA __aDel           PROTECTED INIT {}
    DATA __UpDn           PROTECTED
 
-   DATA aTabs            EXPORTED  INIT {}
    PROPERTY TabPosition  READ xTabPosition WRITE __SetTabPosition DEFAULT 2 INVERT
    DATA EnumTabPosition  EXPORTED INIT { { "Left", "Top", "Right", "Bottom" }, {1,2,3,4} }
 
@@ -116,6 +115,7 @@ CLASS TabControl INHERIT Control
    METHOD GetExtendedStyle()         INLINE TabCtrl_GetExtendedStyle(::hWnd)
    METHOD GetItem(nItem,ptrItem)     INLINE TabCtrl_GetItem(::hWnd,nItem-1,@ptrItem)
    METHOD GetItemText()
+   METHOD GetItemObject()
    METHOD SetItemText()
 
    METHOD GetItemCount()             INLINE TabCtrl_GetItemCount(::hWnd)
@@ -140,14 +140,14 @@ CLASS TabControl INHERIT Control
    METHOD SetToolTips( hToolTips )   INLINE TabCtrl_SetToolTips( ::hWnd, hToolTips )
    METHOD SetUnicodeFormat(lUnicode) INLINE TabCtrl_SetUnicodeFormat( ::hWnd, lUnicode )
    METHOD DeselectAll(lExcludeFocus) INLINE TabCtrl_DeselectAll(::hWnd,lExcludeFocus)
-   METHOD GetObj()
+   METHOD GetObj( cName )            INLINE __ObjFromName( cName )
 
    METHOD OnTabChanging()            VIRTUAL
    METHOD OnTabChanged()             VIRTUAL
    METHOD OnTabInsert()              VIRTUAL
 
    METHOD OnParentNotify()
-   METHOD OnEraseBkGnd()
+   //METHOD OnEraseBkGnd()
 
    METHOD SetPos(n,l)                INLINE ::SetStyle(n,l),; 
                                             IIF( ::IsWindow(),;
@@ -161,27 +161,28 @@ CLASS TabControl INHERIT Control
                                             IIF( ::VertFocusFont != NIL, ::VertFocusFont:Delete(), NIL ),;
                                             NIL
    METHOD OnPaint()
-   METHOD OnMove(x,y)                INLINE IIF( ::Cursel > 0 .AND. LEN( ::aTabs ) >= ::Cursel .AND. VALTYPE(::aTabs[::Cursel])=="O", ::aTabs[::Cursel]:__OnParentSize(x,y), ), NIL
-   METHOD OnSize(w,l)                INLINE Super:OnSize(w,l), IIF( ::Cursel > 0 .AND. LEN( ::aTabs ) >= ::Cursel .AND. VALTYPE(::aTabs[::Cursel])=="O", ::aTabs[::Cursel]:__OnParentSize(LOWORD(W),HIWORD(W)), ), NIL
+   METHOD OnMove(x,y)                INLINE IIF( ::Cursel > 0 .AND. ::GetItemCount() >= ::Cursel .AND. VALTYPE(::GetItemObject())=="O", ::GetItemObject():__OnParentSize(x,y), ), NIL
+   METHOD OnSize()
 
    METHOD OnHScroll(x,y,n)           INLINE ::Super:OnHScroll(x,y,n)
-   METHOD UnDock()
-   METHOD ReDock()
-   METHOD Hide()
-   METHOD Show()
+   //METHOD UnDock()
+   //METHOD ReDock()
+   //METHOD Hide()
+   //METHOD Show()
    
    METHOD OnDestroy()                INLINE Super:OnDestroy(), ::CloseThemeData()
    METHOD OnMouseMove()
    METHOD OnMouseLeave()             INLINE ::OnMouseMove(0,0,0), NIL
    METHOD OnUserMsg(n)
    
-   METHOD RestoreTabPos()
+   //METHOD RestoreTabPos()
    
    METHOD OnLButtonDown()
    
    METHOD __OnParentSize()
-   METHOD __SetTheming()
+   //METHOD __SetTheming()
    METHOD __SetTabPosition()
+   METHOD SelectPage()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -189,7 +190,7 @@ METHOD Init( oParent ) CLASS TabControl
 
    ::ClsName      := WC_TABCONTROL
    DEFAULT ::__xCtrlName TO "TabControl"
-   ::Style        := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | TCS_OWNERDRAWFIXED
+   ::Style        := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS //| TCS_OWNERDRAWFIXED
    ::Super:Init( oParent )
    ::Width        := 200
    ::Height       := 200
@@ -334,6 +335,18 @@ METHOD Create() CLASS TabControl
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
+METHOD OnSize(w,l) CLASS TabControl
+   LOCAL oPage
+   Super:OnSize(w,l)
+   IF ::Cursel > 0 .AND. ::GetItemCount() >= ::Cursel 
+      oPage := ::GetItemObject()
+      IF oPage != NIL
+         oPage:__OnParentSize(LOWORD(w),HIWORD(w))
+      ENDIF
+   ENDIF
+RETURN 0
+
+//-----------------------------------------------------------------------------------------------
 METHOD OnUserMsg( hWnd, nMsg ) CLASS TabControl
    (hWnd)
    IF nMsg == WM_USER + 1111
@@ -344,7 +357,17 @@ METHOD OnUserMsg( hWnd, nMsg ) CLASS TabControl
    ENDIF
 RETURN NIL
 
+METHOD SelectPage( n ) CLASS TabControl
+   LOCAL oPage := ::GetItemObject(n)
+   IF oPage != NIL
+      oPage:Select()
+      RETURN oPage
+    ELSE
+      ::SetCurSel( n )
+   ENDIF
+RETURN NIL
 
+/*
 //-----------------------------------------------------------------------------------------------
 METHOD RestoreTabPos() CLASS TabControl
    LOCAL tci, n, aTabs := ARRAY( LEN( ::aTabs ) )
@@ -368,11 +391,11 @@ METHOD RestoreTabPos() CLASS TabControl
 
    NEXT   
 RETURN Self
-
+*/
 //-----------------------------------------------------------------------------------------------
-METHOD __SetTheming( lSet ) CLASS TabControl
-   AEVAL( ::aTabs, {|o| o:Theming := lSet, o:__OnParentSize( ::ClientWidth, ::ClientHeight ) } )
-RETURN Self
+//METHOD __SetTheming( lSet ) CLASS TabControl
+//   AEVAL( ::aTabs, {|o| o:Theming := lSet, o:__OnParentSize( ::ClientWidth, ::ClientHeight ) } )
+//RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD GetItemText( n ) CLASS TabControl
@@ -383,6 +406,14 @@ METHOD GetItemText( n ) CLASS TabControl
    DEFAULT n TO ::CurSel
    SendMessage( ::hWnd, TCM_GETITEM, n-1, @tci )
 RETURN ALLTRIM( STRTRAN( tci:pszText, CHR(0) ) )
+
+//-----------------------------------------------------------------------------------------------
+METHOD GetItemObject( n ) CLASS TabControl
+   LOCAL tci := (struct TCITEM)
+   tci:mask  := TCIF_PARAM
+   DEFAULT n TO ::CurSel
+   SendMessage( ::hWnd, TCM_GETITEM, n-1, @tci )
+RETURN ObjFromHandle( tci:lParam )
 
 //-----------------------------------------------------------------------------------------------
 METHOD SetItemText( n, cText, lBold ) CLASS TabControl
@@ -398,7 +429,6 @@ METHOD SetItemText( n, cText, lBold ) CLASS TabControl
          IF !lBold
             lBold := NIL
          ENDIF
-         ::aTabs[n] := lBold
          tci:mask := TCIF_TEXT
          tci:pszText := cText
          tci:cchTextMax := LEN( cText )
@@ -409,7 +439,7 @@ METHOD SetItemText( n, cText, lBold ) CLASS TabControl
     catch
    END
 RETURN Self
-
+/*
 //-----------------------------------------------------------------------------------------------
 METHOD Hide() CLASS TabControl
    LOCAL Tab
@@ -448,7 +478,7 @@ METHOD OnEraseBkGnd( hDC ) CLASS TabControl
       RETURN .T.
    ENDIF
 RETURN NIL
-
+*/
 //-----------------------------------------------------------------------------------------------
 METHOD HitTest( x, y, nFlags ) CLASS TabControl
    LOCAL tch := (struct TCHITTESTINFO)
@@ -472,7 +502,7 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS TabControl
 
    IF ( ::__nHot := ::HitTest( LOWORD( nlParam ), HIWORD( nlParam ) ) ) > 0
       IF ::__lMouseDown .AND. ::CurSel <> ::__nHot
-         ::aTabs[ ::CurSel ]:Position := ::__nHot
+         ::GetItemObject():Position := ::__nHot
          ::CurSel := ::__nHot
          RETURN 0
       ENDIF
@@ -505,7 +535,7 @@ RETURN Self
 METHOD OnPaint() CLASS TabControl
    LOCAL aRect, n, nSel, hBrush, lTop, nItems
    LOCAL lVert, x, y, nTextHeight, nTop, nState, nPart
-   LOCAL nLeft, nRight, nBottom, aCover, aItem
+   LOCAL nLeft, nRight, nBottom, aCover, aItem, oPage
    LOCAL aBackRect, aFramRect, hWnd
    LOCAL rc, tci, hDC
    LOCAL hMemDC, hMemBitmap, hOldBitmap, hOldFont, aText, sz := (struct SIZE)
@@ -544,6 +574,7 @@ METHOD OnPaint() CLASS TabControl
    SendMessage( ::hWnd, TCM_ADJUSTRECT, 0, @rc )
 
    IF !::Flat
+      IF .F.
       aItem := ::GetItemRect( 1 )
       IF ::Style & TCS_BOTTOM == 0
          aRect[2] := aItem[4]
@@ -558,16 +589,18 @@ METHOD OnPaint() CLASS TabControl
          _DrawFrameControl( hDC, aRect, DFC_BUTTON, DFCS_BUTTONPUSH )
       ENDIF
       
-      IF LEN( ::aTabs ) == 0 .OR. !::ShowTabs
+      nItems := ::GetItemCount()
+      IF nItems == 0 .OR. !::ShowTabs
          ::EndPaint()
          RETURN 0
       ENDIF
-      IF ( nItems := ::GetItemCount() ) > 0
+      IF nItems > 0
          FOR n := nItems TO 1 STEP -1
 
              IF n != nSel
+                oPage := ::GetItemObject(n)
 
-                tci:mask := TCIF_TEXT //+ TCIF_IMAGE + TCIF_STATE + TCIF_PARAM
+                tci:mask := TCIF_TEXT
                 tci:pszText := SPACE(255)
                 tci:cchTextMax := 255
 
@@ -575,17 +608,16 @@ METHOD OnPaint() CLASS TabControl
 
                 aItem  := ::GetItemRect( n )
 
-                IF LEN( ::aTabs ) >= n .AND. VALTYPE( ::aTabs[n] ) == "O"
-                   SetTextColor( hDC, ::aTabs[n]:ForeColor )
-                ENDIF
+                SetTextColor( hDC, oPage:ForeColor )
+
                 nState := TIS_NORMAL
                 aItem[2]+=1
                 IF ::__nHot == n
                    nState := TIS_HOT
                 ENDIF
                 DrawThemeBackground( ::hTheme, hDC, TABP_TABITEM, nState, aItem )
-                IF ::ImageList != NIL .AND. LEN( ::aTabs ) >= n .AND. ::aTabs[n]:ImageIndex > 0
-                   ::ImageList:DrawImage( hDC, ::aTabs[n]:ImageIndex, aItem[1]+6, aItem[2]+3, ILD_TRANSPARENT )
+                IF ::ImageList != NIL .AND. oPage:ImageIndex > 0
+                   ::ImageList:DrawImage( hDC, oPage:ImageIndex, aItem[1]+6, aItem[2]+3, ILD_TRANSPARENT )
                    aItem[1]+=::ImageList:IconWidth + 6
                 ENDIF
                 IF !EMPTY( tci:pszText )
@@ -616,21 +648,20 @@ METHOD OnPaint() CLASS TabControl
          DrawThemeBackground( ::hTheme, hDC, nPart, nState, aItem, aItem )
          aItem[4]-=2
          n := nSel
+         oPage := ::GetItemObject(n)
 
-         IF ::ImageList != NIL .AND. LEN( ::aTabs ) >= n .AND. ::aTabs[n]:ImageIndex > 0
-            ::ImageList:DrawImage( hDC, ::aTabs[n]:ImageIndex, aItem[1]+6, aItem[2]+3, ILD_TRANSPARENT )
+         IF ::ImageList != NIL .AND. oPage:ImageIndex > 0
+            ::ImageList:DrawImage( hDC, oPage:ImageIndex, aItem[1]+6, aItem[2]+3, ILD_TRANSPARENT )
             aItem[1]+=::ImageList:IconWidth + 3
          ENDIF
 
-         tci:mask := TCIF_TEXT //+ TCIF_IMAGE + TCIF_STATE + TCIF_PARAM
+         tci:mask := TCIF_TEXT
          tci:pszText := SPACE(255)
          tci:cchTextMax := 255
          SendMessage( ::hWnd, TCM_GETITEM, n-1, @tci )
 
-         IF LEN( ::aTabs ) >= n .AND. !EMPTY( tci:pszText )
-            IF VALTYPE( ::aTabs[n] ) == "O"
-               SetTextColor( hDC, ::aTabs[n]:ForeColor )
-            ENDIF
+         IF !EMPTY( tci:pszText )
+            SetTextColor( hDC, oPage:ForeColor )
             SetBkMode( hDC, TRANSPARENT )
             hOldFont := SelectObject( hDC, ::Font:Handle )
             _DrawText( hDC, tci:pszText, aItem, DT_CENTER|DT_VCENTER|DT_SINGLELINE  )
@@ -641,6 +672,7 @@ METHOD OnPaint() CLASS TabControl
             _DrawFocusRect( hDC, { aRect[1],aRect[2]+2,aRect[3],aRect[4]} )
          ENDIF
 
+      ENDIF
       ENDIF
       ::EndPaint()
       RETURN 0
@@ -712,7 +744,7 @@ METHOD OnPaint() CLASS TabControl
 
       __Draw3dRect( hMemDC, aBackRect, GetSysColor(COLOR_3DDKSHADOW), GetSysColor( COLOR_3DHIGHLIGHT ) )
 
-      IF ::Frame .AND. LEN( ::aTabs ) > 0 .AND. aFramRect[4]>aFramRect[2]
+      IF ::Frame .AND. aFramRect[4]>aFramRect[2]
          _FillRect( hMemDC, aFramRect, IIF( ::BkBrush != NIL, ::BkBrush, GetSysColorBrush( COLOR_BTNFACE ) ) )
          __Draw3dRect( hMemDC, aFramRect, GetSysColor( COLOR_3DHIGHLIGHT ), GetSysColor(COLOR_3DDKSHADOW) )
       ENDIF
@@ -729,11 +761,9 @@ METHOD OnPaint() CLASS TabControl
       nItems := 0
    ENDIF
    FOR n := 1 TO nItems
-       IF VALTYPE( ::aTabs[n] ) == "L" .AND. ::aTabs[n]
-          SelectObject( hMemDC, ::BoldFont:Handle )
-        ELSE
-          SelectObject( hMemDC, IIF( lVert, ::VertFont:Handle, IIF( VALTYPE( ::aTabs[n] ) == "O", ::aTabs[n]:Font:Handle, ::Font:Handle ) ) )
-       ENDIF
+       oPage := ::GetItemObject(n)
+       SelectObject( hMemDC, IIF( lVert, ::VertFont:Handle, oPage:Font:Handle ) )
+
        aRect := ::GetItemRect( n )
 
        aRect[1] += nLeft
@@ -741,9 +771,7 @@ METHOD OnPaint() CLASS TabControl
        aRect[3] += nRight+1
        aRect[4] += nBottom
 
-       IF LEN( ::aTabs ) >= n .AND. VALTYPE( ::aTabs[n] ) == "O"
-          hBrush := ::aTabs[n]:BkBrush
-       ENDIF
+       hBrush := oPage:BkBrush
 
        DEFAULT hBrush TO ::TabBrush
        DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
@@ -805,9 +833,8 @@ METHOD OnPaint() CLASS TabControl
                    aRect[1]+=::ImageList:IconWidth + 2
                 ENDIF
              ENDIF
-             IF LEN( ::aTabs ) >= n .AND. VALTYPE( ::aTabs[n] ) == "O"
-                SetTextColor( hMemDC, ::aTabs[n]:ForeColor )
-             ENDIF
+             SetTextColor( hMemDC, oPage:ForeColor )
+
              IF n==nSel
                 IF ::BoldSelection
                    IF ::FocusFont == NIL
@@ -828,7 +855,7 @@ METHOD OnPaint() CLASS TabControl
                 _DrawText( hMemDC, tci:pszText, aRect, DT_CENTER + DT_VCENTER + DT_SINGLELINE  )
              ENDIF
              IF n==nSel .AND. ::BoldSelection
-                SelectObject( hMemDC, IIF( VALTYPE( ::aTabs[n] ) == "O", ::aTabs[n]:Font:Handle, ::Font:Handle )  )
+                SelectObject( hMemDC, oPage:Font:Handle  )
              ENDIF
              IF n != nSel .AND. !::ColorInactiveHeader
                 SetTextColor( hMemDC, GetSysColor( COLOR_BTNSHADOW ) )
@@ -842,9 +869,7 @@ METHOD OnPaint() CLASS TabControl
 
              SetTextAlign( hMemDC, TA_CENTER )
              IF n==nSel
-                IF LEN( ::aTabs ) >= n .AND. VALTYPE( ::aTabs[n] ) == "O"
-                   SetTextColor( hMemDC, ::aTabs[n]:ForeColor )
-                ENDIF
+                SetTextColor( hMemDC, oPage:ForeColor )
                 IF ::BoldSelection
                    SelectObject( hMemDC, ::FocusFont:Handle )
                 ENDIF
@@ -869,7 +894,7 @@ METHOD OnPaint() CLASS TabControl
    DeleteDC( hMemDC )
    ::EndPaint()
 RETURN 0
-
+/*
 //-----------------------------------------------------------------------------------------------
 METHOD UnDock() CLASS TabControl
    LOCAL Tab, oParent := ::Parent
@@ -909,13 +934,14 @@ METHOD ReDock() CLASS TabControl
       ::aTabs[::CurSel]:ShowTab()
    ENDIF
 RETURN Self
-
+*/
 //-----------------------------------------------------------------------------------------------
-METHOD SetItemValues( nItem, cText, nImgIndex ) CLASS TabControl
+METHOD SetItemValues( nItem, cText, nImgIndex, hWnd ) CLASS TabControl
    LOCAL tci := (struct TCITEM)
-   tci:mask    := TCIF_IMAGE | TCIF_TEXT
+   tci:mask    := TCIF_IMAGE | TCIF_TEXT | TCIF_PARAM
    tci:pszText := cText
    tci:iImage  := nImgIndex-1
+   tci:lParam  := hWnd
    DEFAULT cText TO ""
    tci:cchTextMax := LEN( cText )
    SendMessage( ::hWnd, TCM_SETITEM,  nItem, tci )
@@ -923,9 +949,11 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnLButtonDown() CLASS TabControl
+   LOCAL oPage
    ::CallWindowProc()
-   IF !::__lMouseDown .AND. ::aTabs != NIL
-      IF VALTYPE( ::aTabs[ ::CurSel ] ) == "O" .AND. ::aTabs[ ::CurSel ]:AllowDrag
+   IF !::__lMouseDown
+      oPage := ::GetItemObject()
+      IF oPage != NIL .AND. ::GetItemObject():AllowDrag
          ::__lMouseDown := .T.
          ::Cursor := ::System:Cursor:SizeWE
       ENDIF
@@ -934,7 +962,7 @@ RETURN 0
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TabControl
-   LOCAL nSel, lAllow, nOldSel
+   LOCAL nSel, lAllow, nOldSel, oCurPage, oSelPage
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == NM_CLICK
@@ -959,45 +987,47 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TabControl
 
       CASE hdr:code == TCN_SELCHANGE
            nSel := TabCtrl_GetCurSel( ::hWnd ) + 1
+           oSelPage := ::GetItemObject( nSel )
            IF ::Cursel != nSel
-              IF !Empty(::aTabs) .AND. VALTYPE( ::aTabs[nSel] ) == "O"
-                 IF !::aTabs[nSel]:IsWindowEnabled()
-                    ::SetCurSel( ::Cursel )
-                    RETURN 0
-                 ENDIF
-                 IF VALTYPE( ::aTabs[::CurSel] ) == "O"
-                    ::aTabs[::CurSel]:LastFocus := ::System:GetFocus()
-                    IF ::aTabs[::CurSel]:LastFocus != NIL
-                       ::aTabs[::CurSel]:LastFocus:TabValidate := .F.
-                    ENDIF
-                    ::aTabs[::CurSel]:HideTab()
-                 ENDIF
+              IF oSelPage != NIL .AND. ! oSelPage:IsWindowEnabled()
+                 ::SetCurSel( ::Cursel )
+                 RETURN 0
               ENDIF
-
+              oCurPage := ::GetItemObject()
+              IF oCurPage != NIL
+                 oCurPage:LastFocus := ::System:GetFocus()
+                 IF oCurPage:LastFocus != NIL
+                    oCurPage:LastFocus:TabValidate := .F.
+                 ENDIF
+                 oCurPage:HideTab()
+              ENDIF
               nOldSel := ::CurSel
               ::CurSel := nSel
-              IF !Empty( ::aTabs) .AND. VALTYPE( ::aTabs[::CurSel] ) == "O"
-                 ::aTabs[::CurSel]:__OnParentSize( ::ClientWidth, ::ClientHeight )
-                 ::aTabs[::CurSel]:ShowTab()
 
-                 IF ::aTabs[::CurSel]:Action != NIL
-                    Eval( ::aTabs[::CurSel]:Action, ::aTabs[::CurSel] )
+              oCurPage := ::GetItemObject()
+              IF oCurPage != NIL
+                 oCurPage:__OnParentSize( ::ClientWidth, ::ClientHeight )
+                 oCurPage:ShowTab()
+                 IF oCurPage:Action != NIL
+                    Eval( oCurPage:Action, oCurPage )
                  ENDIF
-
                  IF GetFocus() != ::hWnd
 
-                    IF ::aTabs[::CurSel]:LastFocus != NIL
-                       ::aTabs[::CurSel]:LastFocus:SetFocus(.T.)
-                       IF ::aTabs[::CurSel]:LastFocus:ClsName == "DataGrid"
-                          ::aTabs[::CurSel]:LastFocus:InvalidateRect(, .F.)
+                    IF oCurPage:LastFocus != NIL
+                       oCurPage:LastFocus:SetFocus(.T.)
+                       IF oCurPage:LastFocus:ClsName == "DataGrid"
+                          oCurPage:LastFocus:InvalidateRect(, .F.)
                        ENDIF
-                     ELSEIF !EMPTY( ::aTabs[::CurSel]:Children )
-                       ::aTabs[::CurSel]:Children[1]:SetFocus( .T. )
+                     ELSEIF !EMPTY( oCurPage:Children )
+                       oCurPage:Children[1]:SetFocus( .T. )
                     ENDIF
 
                  ENDIF
-                 IF ::aTabs[nOldSel]:LastFocus != NIL
-                    ::aTabs[nOldSel]:LastFocus:TabValidate := .T.
+              ENDIF
+              oSelPage := ::GetItemObject( nOldSel )
+              IF oSelPage != NIL
+                 IF oSelPage:LastFocus != NIL
+                    oSelPage:LastFocus:TabValidate := .T.
                  ENDIF
               ENDIF
               ::OnTabChanged( nOldSel, nSel )
@@ -1027,9 +1057,7 @@ METHOD InsertTab(cText, nPos, nImg, lBold) CLASS TabControl
       IF nImg != NIL
          tci:iImage  := nImg-1
       ENDIF
-      DEFAULT nPos TO Len( ::aTabs )
       IF SendMessage( ::hWnd, TCM_INSERTITEM,  nPos, tci ) > -1
-         AADD( ::aTabs, lBold )
          IF lBold != NIL
             SetWindowPos( ::hWnd,, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
             ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
@@ -1041,19 +1069,23 @@ RETURN .F.
 
 //-----------------------------------------------------------------------------------------------
 METHOD DeleteTab(nPos) CLASS TabControl
-   ADEL( ::aTabs, nPos, .T. )
-RETURN TabCtrl_DeleteItem(::hWnd, nPos-1)
+   LOCAL oPage
+   oPage := ::GetItemObject( nPos )
+   IF oPage != NIL
+      oPage:Delete()
+    ELSE
+       TabCtrl_DeleteItem(::hWnd, nPos-1)
+   ENDIF
+RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD DeleteAllTabs() CLASS TabControl
-   LOCAL lRet := .F.
-   lRet := TabCtrl_DeleteAllItems(::hWnd)
-   IF ! Empty( ::aTabs)
-      AEVAL( ::aTabs, {|o| IF( valtype(o)=="O" .and. o:isWindow(), o:DestroyWindow(), ) } )
-      ::aTabs :={}
-   ENDIF
-   ::CurSel   :=0
-RETURN lRet
+   LOCAL n
+   FOR n := 1 TO ::GetItemCount()
+       ::DeleteTab(n)
+   NEXT
+   ::CurSel := 0
+RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD GetTabPosByName( cName ) CLASS TabControl
@@ -1072,15 +1104,6 @@ METHOD GetTabPosByName( cName ) CLASS TabControl
    NEXT
 RETURN nRet
 
-//-----------------------------------------------------------------------------------------------
-METHOD GetObj( cName ) CLASS TabControl
-   LOCAL n
-   IF ! Empty(::aTabs)
-      IF( n := ASCAN( ::aTabs, {|o|o:ClsName == cName } ) ) > 0
-         RETURN ::aTabs[n]
-      ENDIF
-   ENDIF
-RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
@@ -1180,35 +1203,12 @@ CLASS TabPage INHERIT Dialog
    METHOD __Hide()
    METHOD __Show()
    METHOD __SetPosition()
+   METHOD __GetPosition()
    METHOD __OnParentSize()
    METHOD __SetVisible()
-   //METHOD OnPaint()
    METHOD __ResetHandle()  INLINE ::hWnd := NIL, ::__nProc := NIL, ::Template := NIL
 ENDCLASS
-/*
-//-----------------------------------------------------------------------------------------------
-METHOD OnPaint( hDC, hMemDC ) CLASS TabPage
-   LOCAL oChild, hOldBitmap1, hMemDC1
-   (hMemDC)
-   IF hDC != NIL
-      FOR EACH oChild IN ::aTabs
-          TRY
-             IF oChild:__hBrush != NIL
-                DeleteObject( oChild:__hBrush )
-             ENDIF
-             hMemDC1 := CreateCompatibleDC( hDC )
-             DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
-             hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
-             BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin+oChild:CaptionHeight, SRCCOPY )
-             oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
-             SelectObject( hMemDC1,  hOldBitmap1 )
-             DeleteDC( hMemDC1 )
-          CATCH
-          END
-      NEXT
-   ENDIF
-RETURN 0
-*/
+
 //-----------------------------------------------------------------------------------------------
 METHOD Init( oParent, acResource ) CLASS TabPage
    DEFAULT ::__xCtrlName TO "TabPage"
@@ -1310,7 +1310,7 @@ METHOD Create() CLASS TabPage
    ENDIF
 
    tci := (struct TCITEM)
-   tci:mask    := TCIF_IMAGE | TCIF_TEXT
+   tci:mask    := TCIF_IMAGE | TCIF_TEXT | TCIF_PARAM
    
    cText := ::Caption
 
@@ -1328,7 +1328,11 @@ METHOD Create() CLASS TabPage
    IF ::Parent:hWnd == NIL
       ::Parent:Create()
    ENDIF
-   IF SendMessage( ::Parent:hWnd, TCM_INSERTITEM, Len( ::Parent:aTabs ), tci ) > -1
+
+   ::Super:Create()
+   tci:lParam := ::hWnd
+
+   IF SendMessage( ::Parent:hWnd, TCM_INSERTITEM, SendMessage( ::Parent:hWnd, TCM_GETITEMCOUNT ), tci ) > -1
 
       rc := (struct RECT)
       rc:Left  := 0
@@ -1361,9 +1365,6 @@ METHOD Create() CLASS TabPage
          ENDIF
       ENDIF
 
-      ::Super:Create()
-      AADD( ::Parent:aTabs, Self )
-
       ::RegisterDocking()
 
       IF ::__ClassInst == NIL
@@ -1373,14 +1374,9 @@ METHOD Create() CLASS TabPage
          ENDIF
       ENDIF
 
-      ::Index := LEN( ::Parent:aTabs )
-
-      ::xPosition := ::Index
-      IF ::__ClassInst != NIL
-         ::__ClassInst:xPosition := ::Index
-      ENDIF
-      
-      IF ::Index != ::Parent:Cursel .OR. ( ::__ClassInst == NIL .AND. !::Parent:Visible )
+      AADD( ::Parent:__Tabs, NIL )
+     
+      IF ::Parent:GetItemCount() != ::Parent:Cursel .OR. ( ::__ClassInst == NIL .AND. !::Parent:Visible )
          ::HideTab()
        ELSE
          ::ShowTab()
@@ -1411,55 +1407,40 @@ METHOD __SetVisible( lVisible, lForce ) CLASS TabPage
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
+METHOD __GetPosition() CLASS TabPage
+   LOCAL n, nRet := 0
+   FOR n := 1 TO ::Parent:GetItemCount()
+       IF ::Parent:GetItemObject( n ):hWnd == ::hWnd
+          nRet := n
+          EXIT
+       ENDIF
+   NEXT
+RETURN nRet
+
+//-----------------------------------------------------------------------------------------------
 METHOD __SetPosition(n) CLASS TabPage
-   LOCAL tci, nIndex, o
-   n := MIN( n, LEN( ::Parent:aTabs ) )
+   LOCAL tci
    
-   IF ::xPosition != n .AND. ::Index != NIL
-      ADEL( ::Parent:aTabs, ::Index, .T. )
-      ::Parent:SendMessage( TCM_DELETEITEM, ::Index - 1 )
+   ::Parent:SendMessage( TCM_DELETEITEM, ::__GetPosition() - 1 )
 
-      AINS( ::Parent:aTabs, n, Self, .T. )
-      tci := (struct TCITEM)
-      tci:mask    := TCIF_IMAGE | TCIF_TEXT
-      tci:pszText := ::Caption
-      tci:iImage  := IIF( ::ImageIndex > 0, ::ImageIndex-1, -1 )
-      SendMessage( ::Parent:hWnd, TCM_INSERTITEM, n-1, tci )
+   tci := (struct TCITEM)
+   tci:mask    := TCIF_IMAGE | TCIF_TEXT | TCIF_PARAM
+   tci:pszText := ::Caption
+   tci:iImage  := IIF( ::ImageIndex > 0, ::ImageIndex-1, -1 )
+   tci:lParam  := ::hWnd
+   SendMessage( ::Parent:hWnd, TCM_INSERTITEM, n-1, tci )
 
-      IF ::__ClassInst != NIL
-         ::__ClassInst:xPosition := n
-      ENDIF
-      ::xPosition := n
-      ::Index := n
-
-      FOR nIndex := 1 TO LEN( ::Parent:aTabs )
-          o := ::Parent:aTabs[nIndex]
-          o:Index := nIndex
-          o:xPosition := nIndex
-          IF ::__ClassInst != NIL
-             ::__ClassInst:xPosition := nIndex
-          ENDIF
-      NEXT
-      ::Parent:Cursel := TabCtrl_GetCurSel( ::Parent:hWnd ) + 1
-   ENDIF
+   ::Parent:Cursel := TabCtrl_GetCurSel( ::Parent:hWnd ) + 1
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Delete() CLASS TabPage
-   LOCAL o, nIndex
+   ::Parent:SendMessage( TCM_DELETEITEM, ::__GetPosition() - 1 )
    Super:Destroy()
-   ::Parent:SendMessage( TCM_DELETEITEM, ::Index - 1 )
-   FOR nIndex := 1 TO LEN( ::Parent:aTabs )
-       o := ::Parent:aTabs[nIndex]
-       o:Index := nIndex
-       o:xPosition := nIndex
-       IF ::__ClassInst != NIL
-          ::__ClassInst:xPosition := nIndex
-       ENDIF
-   NEXT
-   ::Parent:SetCurSel( MIN( ::Parent:CurSel, LEN( ::Parent:aTabs ) ) )
-   IF ::Parent:CurSel > 0 .AND. LEN( ::Parent:aTabs ) >= ::Parent:CurSel
-      ::Parent:aTabs[ ::Parent:CurSel ]:ShowTab()
+
+   ::Parent:SetCurSel( MIN( ::Parent:CurSel, ::Parent:GetItemCount() ) )
+   IF ::Parent:CurSel > 0 .AND. ::Parent:GetItemCount() >= ::Parent:CurSel
+      ::Parent:GetItemObject():ShowTab()
    ENDIF
 RETURN Self
 
@@ -1468,7 +1449,7 @@ METHOD SetCaption( c ) CLASS TabPage
    LOCAL n
    ::xCaption := c
    IF ::IsWindow()
-      ::Parent:SetItemValues( ::Index-1, c, ::xImageIndex )
+      ::Parent:SetItemValues( ::Index-1, c, ::xImageIndex, ::hWnd )
    ENDIF
    IF !EMPTY( c ) .AND. ( n := AT( "&", c ) ) > 0
       RegisterHotKey( ::hWnd, ::Id, MOD_ALT, ASC( ::Caption[n+1] ) )
@@ -1498,10 +1479,6 @@ RETURN ::Super:OnCtlColorDlg( nwParam, nlParam )
 METHOD __OnParentSize( x, y, hDef ) CLASS TabPage
    LOCAL rc
    (x, y)
-   IF ::Index == NIL 
-      RETURN NIL
-   ENDIF
-
    rc := (struct RECT)
 
    IF GetClassName( GetParent( ::hWnd ) ) == WC_TABCONTROL
@@ -1611,35 +1588,31 @@ RETURN hDef
 
 //-----------------------------------------------------------------------------------------------
 METHOD Select() CLASS TabPage
-   ::Parent:aTabs[ ::Parent:CurSel ]:HideTab()
+   ::Parent:GetItemObject():HideTab()
    IF ::Parent:Visible
       ::ShowTab()
    ENDIF
-   ::Parent:SetCurSel( ::Index )
+   ::Parent:SetCurSel( ::__GetPosition() )
    ::Parent:Redraw()
-   //::Application:DoEvents()
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD __Hide() CLASS TabPage
-   LOCAL n, nCur := ::Index
-   DEFAULT ::Parent:__Tabs TO ARRAY( LEN( ::Parent:aTabs ) )
-   IF ::Parent:__Tabs[ ::Index ] == NIL
+   LOCAL nPos := ::__GetPosition()
+   DEFAULT ::Parent:__Tabs TO ARRAY( ::Parent:GetItemCount()  )
+   IF ::Parent:__Tabs[ nPos ] == NIL
       
-      IF ( n := ASCAN( ::Parent:aTabs, Self,,, .T. ) ) > 0
-         ADEL( ::Parent:aTabs, n, .T. )
-         ::Parent:SendMessage( TCM_DELETEITEM, n - 1, 0 )
-         ::Parent:__Tabs[ ::Index ] := n
+      ::Parent:SendMessage( TCM_DELETEITEM, nPos - 1, 0 )
+      ::Parent:__Tabs[ nPos ] := ::hWnd
 
-         IF ::Parent:CurSel == n
-            Super:Hide()
-            IF LEN( ::Parent:aTabs ) > 0
-               ::Parent:SetCurSel( MIN( ::Parent:CurSel, LEN( ::Parent:aTabs ) ) )
-               ::Parent:aTabs[ ::Parent:CurSel ]:ShowTab()
-            ENDIF
-          ELSEIF ::Parent:CurSel > n
-            ::Parent:CurSel--
+      IF ::Parent:CurSel == nPos
+         Super:Hide()
+         IF ::Parent:GetItemCount() > 0
+            ::Parent:SetCurSel( MIN( ::Parent:CurSel, ::Parent:GetItemCount() ) )
+            ::Parent:GetItemObject():ShowTab()
          ENDIF
+       ELSEIF ::Parent:CurSel > nPos
+         ::Parent:CurSel--
       ENDIF
    ENDIF
 RETURN Self
@@ -1647,30 +1620,21 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD __Show() CLASS TabPage
    LOCAL tci, nPos, n := 0
-   IF ::Parent:__Tabs[ ::Index ] != NIL
-
-      nPos := ::Index
-      FOR n := 1 TO ::Index - 1
-          IF ::Parent:__Tabs[n] != NIL
-             nPos--
-          ENDIF
-      NEXT
-
-      AINS( ::Parent:aTabs, nPos, Self, .T. )
-      
+   nPos := ASCAN( ::Parent:__Tabs, ::hWnd,,, .T. )
+   
+   IF nPos > 0
       tci := (struct TCITEM)
-      tci:mask    := TCIF_IMAGE | TCIF_TEXT
-      tci:pszText := ::Caption
+      tci:mask    := TCIF_IMAGE | TCIF_TEXT | TCIF_PARAM
+      tci:pszText := ::Text
+      tci:lParam  := ::hWnd
       tci:iImage  := IIF( ::ImageIndex > 0, ::ImageIndex-1, -1 )
-
       SendMessage( ::Parent:hWnd, TCM_INSERTITEM, nPos-1, tci )
-      
-      IF ::Parent:CurSel >= nPos
-         ::Parent:CurSel := MIN( LEN( ::Parent:aTabs ), ::Parent:CurSel+1 )
-      ENDIF
-      ::Parent:aTabs[ ::Parent:CurSel ]:ShowTab()
-      ::Parent:__Tabs[ ::Index ] := NIL
 
+      IF ::Parent:CurSel >= nPos
+         ::Parent:CurSel := MIN( ::Parent:GetItemCount(), ::Parent:CurSel+1 )
+      ENDIF
+      ::Parent:GetItemObject():ShowTab()
+      ::Parent:__Tabs[ nPos ] := NIL
    ENDIF
 RETURN Self
 
@@ -1934,7 +1898,7 @@ METHOD OnPaint() CLASS TabStrip
    Rectangle( hMemDC, aRect[1], aRect[2], aRect[3], aRect[4] )
    DeleteObject( SelectObject( hMemDC, hOldPen ) )
    
-   IF LEN( ::aTabs ) > 0 .AND. ::ShowTabs
+   IF ::ShowTabs
       IF ( nItems := ::GetItemCount() ) > 0
          FOR n := nItems TO 1 STEP -1
              IF n != nSel
@@ -1962,6 +1926,7 @@ RETURN Self
 METHOD DrawTabStripItem( hDC, lCurSel, nSel ) CLASS TabStrip
    LOCAL d, hRgn, aRect, n := 0, aItem := ::GetItemRect( nSel )
    LOCAL x, y, hOldFont, hBrush, hOldPen, tci, lGrad := .F., lVert := .F.
+   LOCAL oPage
    IF lCurSel
       n := 1
    ENDIF
@@ -2001,12 +1966,12 @@ METHOD DrawTabStripItem( hDC, lCurSel, nSel ) CLASS TabStrip
                       { aItem[3]- 6,   aItem[4]-3 },;
                       { aItem[3]+ d+n, aItem[2]-n } }
    ENDCASE
-   
+   oPage := ::GetItemObject( nSel )
    hRgn := _CreatePolygonRgn( aRect, ALTERNATE )
    IF hRgn != NIL
       
-      IF nSel > 0 .AND. LEN( ::aTabs ) >= nSel .AND. VALTYPE( ::aTabs[ nSel ] ) == "O" .AND. ::aTabs[ nSel ]:BkBrush != NIL
-         hBrush := ::aTabs[ nSel ]:BkBrush
+      IF nSel > 0 .AND. oPage != NIL .AND. ::GetItemCount() >= nSel .AND. oPage:BkBrush != NIL
+         hBrush := oPage:BkBrush
       ENDIF
 
       IF !lCurSel .AND. ( !::ColorInactiveHeader .OR. hBrush == NIL )
@@ -2029,12 +1994,12 @@ METHOD DrawTabStripItem( hDC, lCurSel, nSel ) CLASS TabStrip
    _PolyLine( hDC, aRect )
    DeleteObject( SelectObject( hDC, hOldPen ) )
 
-   IF nSel > 0 .AND. LEN( ::aTabs ) >= nSel .AND. ::ImageList != NIL .AND. ::aTabs[nSel]:ImageIndex > 0
+   IF nSel > 0 .AND. ::GetItemCount() >= nSel .AND. ::ImageList != NIL .AND. oPage:ImageIndex > 0
       IF !lVert
-         ::ImageList:DrawImage( hDC, ::aTabs[nSel]:ImageIndex, aItem[1]+6, aItem[2]+3, ILD_TRANSPARENT )
+         ::ImageList:DrawImage( hDC, oPage:ImageIndex, aItem[1]+6, aItem[2]+3, ILD_TRANSPARENT )
          aItem[1]+=::ImageList:IconWidth + 3
        ELSE
-         ::ImageList:DrawImage( hDC, ::aTabs[nSel]:ImageIndex, aItem[1]+3, aItem[2]+4, ILD_TRANSPARENT )
+         ::ImageList:DrawImage( hDC, oPage:ImageIndex, aItem[1]+3, aItem[2]+4, ILD_TRANSPARENT )
          aItem[2]+=::ImageList:IconWidth + 1
       ENDIF
    ENDIF
@@ -2048,16 +2013,14 @@ METHOD DrawTabStripItem( hDC, lCurSel, nSel ) CLASS TabStrip
 
    IF !EMPTY( tci:pszText )
 
-      IF VALTYPE( ::aTabs[nSel] ) == "O"
-         SetTextColor( hDC, ::aTabs[nSel]:ForeColor )
+      IF oPage != NIL 
+         SetTextColor( hDC, oPage:ForeColor )
       ENDIF
       IF lGrad
          SetTextColor( hDC, RGB(0,0,0) )
       ENDIF
 
       SetBkMode( hDC, TRANSPARENT )
-      
-//      hOldFont := SelectObject( hDC, IIF( lVert, ::VertFont:Handle, ::Font:Handle ) )
       
       IF !lVert
          hOldFont := SelectObject( hDC, ::Font:Handle )

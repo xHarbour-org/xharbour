@@ -107,19 +107,21 @@
           [; IF <vN> == nil ; <vN> := <xN> ; END]
 
 static aMessages := {;
-                    { WM_SIZE,         "OnSize"         },;
-                    { WM_DROPFILES,    "OnDropFiles"    },;
-                    { WM_MOUSEMOVE,    "OnMouseMove"    },;
-                    { WM_NCMOUSEMOVE,  "OnNCMouseMove"  },;
-                    { WM_NCMOUSELEAVE, "OnNCMouseLeave" },;
-                    { WM_NCMOUSEHOVER, "OnNCMouseHover" },;
-                    { WM_MOUSEWHEEL,   "OnMouseWheel"   },;
-                    { WM_SETCURSOR,    "OnSetCursor"    },;
-                    { WM_COMMAND,      "OnCommand"      },;
-                    { WM_PAINT,        "OnPaint"        },;
-                    { WM_NCPAINT,      "OnNCPaint"      },;
-                    { WM_INITDIALOG,   "OnInitDialog"   },;
-                    { WM_DESTROY,      "OnDestroy"      };
+                    { WM_SIZE,          "OnSize"          },;
+                    { WM_DROPFILES,     "OnDropFiles"     },;
+                    { WM_MOUSEMOVE,     "OnMouseMove"     },;
+                    { WM_NCMOUSEMOVE,   "OnNCMouseMove"   },;
+                    { WM_NCMOUSELEAVE,  "OnNCMouseLeave"  },;
+                    { WM_NCMOUSEHOVER,  "OnNCMouseHover"  },;
+                    { WM_MOUSEWHEEL,    "OnMouseWheel"    },;
+                    { WM_SETCURSOR,     "OnSetCursor"     },;
+                    { WM_COMMAND,       "OnCommand"       },;
+                    { WM_PAINT,         "OnPaint"         },;
+                    { WM_NCPAINT,       "OnNCPaint"       },;
+                    { WM_INITDIALOG,    "OnInitDialog"    },;
+                    { WM_DESTROY,       "OnDestroy"       },;
+                    { WM_ENTERSIZEMOVE, "OnEnterSizeMove" },;
+                    { WM_EXITSIZEMOVE,  "OnExitSizeMove"  };
                     }
 
 static __aObjects := {}
@@ -1570,6 +1572,13 @@ FUNCTION __SetObjPtr( oObj )
    ENDIF
 RETURN NIL
 
+FUNCTION __ObjFromName( cName )
+   LOCAL n := ASCAN( __aObjects, {|o|o:ClsName == cName } )
+   IF n > 0
+      RETURN __aObjects[n]
+   ENDIF
+RETURN NIL
+
 FUNCTION ObjFromHandle( hWnd, lRemove )
    LOCAL n := ASCAN( __aObjects, {|o|o:hWnd==hWnd} )
    DEFAULT lRemove TO .F.
@@ -2833,16 +2842,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                  ENDIF
 
               ENDIF
-              EXIT
-
-         CASE WM_ENTERSIZEMOVE
-              nRet := ExecuteEvent( "OnEnterSizeMove", Self )
-              ODEFAULT nRet TO ::OnEnterSizeMove()
-              EXIT
-
-         CASE WM_EXITSIZEMOVE
-              nRet := ExecuteEvent( "OnExitSizeMove", Self )
-              ODEFAULT nRet TO ::OnExitSizeMove()
               EXIT
 
          CASE WM_DRAWCLIPBOARD

@@ -599,8 +599,7 @@ METHOD ControlSelect( x, y ) CLASS WindowEdit
          ClientToScreen( ::CtrlMask:hWnd, @pt )
          ScreenToClient( oControl:hWnd, @pt )
          IF ( n := oControl:HitTest( pt:x, pt:y ) ) > 0
-            oControl:aTabs[n]:Select()
-            oControl := oControl:aTabs[n]
+            oControl := oControl:SelectPage(n)
             nCursor := MCS_ARROW
          ENDIF
        ELSE
@@ -643,8 +642,7 @@ METHOD ControlSelect( x, y ) CLASS WindowEdit
          ClientToScreen( ::CtrlMask:hWnd, @pt )
          ScreenToClient( oControl:hWnd, @pt )
          IF ( n := oControl:HitTest( pt:x, pt:y ) ) > 0
-            oControl:aTabs[n]:Select()
-            oControl := oControl:aTabs[n]
+            oControl := oControl:SelectPage(n)
             nCursor := MCS_ARROW
          ENDIF
       ENDIF
