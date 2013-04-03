@@ -147,7 +147,7 @@ CLASS TabControl INHERIT Control
    METHOD OnTabInsert()              VIRTUAL
 
    METHOD OnParentNotify()
-   //METHOD OnEraseBkGnd()
+   METHOD OnEraseBkGnd()
 
    METHOD SetPos(n,l)                INLINE ::SetStyle(n,l),; 
                                             IIF( ::IsWindow(),;
@@ -190,7 +190,7 @@ METHOD Init( oParent ) CLASS TabControl
 
    ::ClsName      := WC_TABCONTROL
    DEFAULT ::__xCtrlName TO "TabControl"
-   ::Style        := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS //| TCS_OWNERDRAWFIXED
+   ::Style        := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | TCS_OWNERDRAWFIXED
    ::Super:Init( oParent )
    ::Width        := 200
    ::Height       := 200
@@ -461,9 +461,10 @@ METHOD Show(n) CLASS TabControl
       END
    ENDIF
 RETURN Self
-
+*/
 //-----------------------------------------------------------------------------------------------
-METHOD OnEraseBkGnd( hDC ) CLASS TabControl
+METHOD OnEraseBkGnd() CLASS TabControl
+/*
    LOCAL hBrush
    IF !::Flat
       IF ( ::Theming .AND. IsThemeActive() ) .OR. !::ShowTabs
@@ -477,8 +478,9 @@ METHOD OnEraseBkGnd( hDC ) CLASS TabControl
     ELSEIF ::Flat
       RETURN .T.
    ENDIF
-RETURN NIL
 */
+RETURN 1 //NIL
+
 //-----------------------------------------------------------------------------------------------
 METHOD HitTest( x, y, nFlags ) CLASS TabControl
    LOCAL tch := (struct TCHITTESTINFO)
@@ -536,10 +538,9 @@ METHOD OnPaint() CLASS TabControl
    LOCAL aRect, n, nSel, hBrush, lTop, nItems
    LOCAL lVert, x, y, nTextHeight, nTop, nState, nPart
    LOCAL nLeft, nRight, nBottom, aCover, aItem, oPage
-   LOCAL aBackRect, aFramRect, hWnd
+   LOCAL aBackRect, aFramRect, hWnd, hTmpBrush, hParDC
    LOCAL rc, tci, hDC
    LOCAL hMemDC, hMemBitmap, hOldBitmap, hOldFont, aText, sz := (struct SIZE)
-   hDC := ::BeginPaint()
    IF !::Flat
       IF ( !::Theming .OR. !IsThemeActive() ) .AND. ::ShowTabs
          RETURN NIL
@@ -557,6 +558,7 @@ METHOD OnPaint() CLASS TabControl
          hWnd := GetWindow( hWnd, GW_HWNDNEXT )
       ENDDO
    ENDIF
+   hDC := ::BeginPaint()
    
 
    rc  := (struct RECT)
@@ -573,8 +575,11 @@ METHOD OnPaint() CLASS TabControl
 
    SendMessage( ::hWnd, TCM_ADJUSTRECT, 0, @rc )
 
+   hMemDC     := CreateCompatibleDC( hDC )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
+   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+
    IF !::Flat
-      IF .F.
       aItem := ::GetItemRect( 1 )
       IF ::Style & TCS_BOTTOM == 0
          aRect[2] := aItem[4]
@@ -582,11 +587,24 @@ METHOD OnPaint() CLASS TabControl
          aRect[2] += 2
          aRect[4] -= ( aRect[4]-aItem[2]-2 )
       ENDIF
+      hBrush := ::bkBrush
+      DEFAULT hBrush TO ::Parent:bkBrush
+      IF hBrush == NIL
+         hParDC := GetDC( ::Parent:hWnd )
+         hTmpBrush := CreateSolidBrush( GetPixel( hParDC, 1, 1 ) )
+         ReleaseDC( ::Parent:hWnd, hParDC )
+         hBrush := hTmpBrush
+      ENDIF
+      _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
       
+      IF hTmpBrush != NIL
+         DeleteObject( hTmpBrush )
+      ENDIF
+
       IF IsThemeActive()
-         DrawThemeBackground( ::hTheme, hDC, TABP_PANE, , aRect  )
+         DrawThemeBackground( ::hTheme, hMemDC, TABP_PANE, , aRect  )
        ELSE
-         _DrawFrameControl( hDC, aRect, DFC_BUTTON, DFCS_BUTTONPUSH )
+         _DrawFrameControl( hMemDC, aRect, DFC_BUTTON, DFCS_BUTTONPUSH )
       ENDIF
       
       nItems := ::GetItemCount()
@@ -608,25 +626,25 @@ METHOD OnPaint() CLASS TabControl
 
                 aItem  := ::GetItemRect( n )
 
-                SetTextColor( hDC, oPage:ForeColor )
+                SetTextColor( hMemDC, oPage:ForeColor )
 
                 nState := TIS_NORMAL
                 aItem[2]+=1
                 IF ::__nHot == n
                    nState := TIS_HOT
                 ENDIF
-                DrawThemeBackground( ::hTheme, hDC, TABP_TABITEM, nState, aItem )
+                DrawThemeBackground( ::hTheme, hMemDC, TABP_TABITEM, nState, aItem )
                 IF ::ImageList != NIL .AND. oPage:ImageIndex > 0
-                   ::ImageList:DrawImage( hDC, oPage:ImageIndex, aItem[1]+6, aItem[2]+3, ILD_TRANSPARENT )
+                   ::ImageList:DrawImage( hMemDC, oPage:ImageIndex, aItem[1]+6, aItem[2]+3, ILD_TRANSPARENT )
                    aItem[1]+=::ImageList:IconWidth + 6
                 ENDIF
                 IF !EMPTY( tci:pszText )
-                   SetBkMode( hDC, TRANSPARENT )
-                   hOldFont := SelectObject( hDC, ::Font:Handle )
+                   SetBkMode( hMemDC, TRANSPARENT )
+                   hOldFont := SelectObject( hMemDC, ::Font:Handle )
 
-                   //aSize    := _GetTextExtentPoint32( hDC, tci:pszText  )
-                   _DrawText( hDC, tci:pszText, aItem, DT_CENTER|DT_VCENTER|DT_SINGLELINE  )
-                   SelectObject( hDC, hOldFont )
+                   //aSize    := _GetTextExtentPoint32( hMemDC, tci:pszText  )
+                   _DrawText( hMemDC, tci:pszText, aItem, DT_CENTER|DT_VCENTER|DT_SINGLELINE  )
+                   SelectObject( hMemDC, hOldFont )
                 ENDIF
              ENDIF
          NEXT
@@ -645,13 +663,13 @@ METHOD OnPaint() CLASS TabControl
             nPart  := TABP_TOPTABITEMRIGHTEDGE
          ENDIF
 
-         DrawThemeBackground( ::hTheme, hDC, nPart, nState, aItem, aItem )
+         DrawThemeBackground( ::hTheme, hMemDC, nPart, nState, aItem, aItem )
          aItem[4]-=2
          n := nSel
          oPage := ::GetItemObject(n)
 
          IF ::ImageList != NIL .AND. oPage:ImageIndex > 0
-            ::ImageList:DrawImage( hDC, oPage:ImageIndex, aItem[1]+6, aItem[2]+3, ILD_TRANSPARENT )
+            ::ImageList:DrawImage( hMemDC, oPage:ImageIndex, aItem[1]+6, aItem[2]+3, ILD_TRANSPARENT )
             aItem[1]+=::ImageList:IconWidth + 3
          ENDIF
 
@@ -661,27 +679,25 @@ METHOD OnPaint() CLASS TabControl
          SendMessage( ::hWnd, TCM_GETITEM, n-1, @tci )
 
          IF !EMPTY( tci:pszText )
-            SetTextColor( hDC, oPage:ForeColor )
-            SetBkMode( hDC, TRANSPARENT )
-            hOldFont := SelectObject( hDC, ::Font:Handle )
-            _DrawText( hDC, tci:pszText, aItem, DT_CENTER|DT_VCENTER|DT_SINGLELINE  )
-            SelectObject( hDC, hOldFont )
+            SetTextColor( hMemDC, oPage:ForeColor )
+            SetBkMode( hMemDC, TRANSPARENT )
+            hOldFont := SelectObject( hMemDC, ::Font:Handle )
+            _DrawText( hMemDC, tci:pszText, aItem, DT_CENTER|DT_VCENTER|DT_SINGLELINE  )
+            SelectObject( hMemDC, hOldFont )
          ENDIF
          IF !::FocusNever .AND. ::HasFocus
             aRect := ::GetItemRect( nSel )
-            _DrawFocusRect( hDC, { aRect[1],aRect[2]+2,aRect[3],aRect[4]} )
+            _DrawFocusRect( hMemDC, { aRect[1],aRect[2]+2,aRect[3],aRect[4]} )
          ENDIF
 
       ENDIF
-      ENDIF
+      BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
+      SelectObject( hMemDC,  hOldBitmap )
+      DeleteObject( hMemBitmap )
+      DeleteDC( hMemDC )
       ::EndPaint()
       RETURN 0
    ENDIF 
-
-   hMemDC     := CreateCompatibleDC( hDC )
-   hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
-   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
-
 
    lTop  := ::Style & TCS_BOTTOM == 0
    lVert := ::Style & TCS_VERTICAL == TCS_VERTICAL
@@ -1449,7 +1465,7 @@ METHOD SetCaption( c ) CLASS TabPage
    LOCAL n
    ::xCaption := c
    IF ::IsWindow()
-      ::Parent:SetItemValues( ::Index-1, c, ::xImageIndex, ::hWnd )
+      ::Parent:SetItemValues( ::__GetPosition()-1, c, ::xImageIndex, ::hWnd )
    ENDIF
    IF !EMPTY( c ) .AND. ( n := AT( "&", c ) ) > 0
       RegisterHotKey( ::hWnd, ::Id, MOD_ALT, ASC( ::Caption[n+1] ) )
@@ -1464,7 +1480,7 @@ METHOD __SetImageIndex( nImgIndex ) CLASS TabPage
       tci:mask    := TCIF_IMAGE | TCIF_TEXT
       tci:pszText := ::Caption
       tci:iImage  := nImgIndex-1
-      SendMessage( ::Parent:hWnd, TCM_SETITEM,  ::Index-1, tci )
+      SendMessage( ::Parent:hWnd, TCM_SETITEM,  ::__GetPosition()-1, tci )
    ENDIF
 RETURN Self
 

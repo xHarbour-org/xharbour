@@ -30,7 +30,7 @@ METHOD Init( oList ) CLASS ImageManager
    ::ImageList  := oList
    DEFAULT ::__xCtrlName  TO "ImageManager"
 
-   ::Super:Init( ::Application:MainForm )
+   ::Super:Init( /*::Application:MainForm*/NIL )
 
    ::Template   := "IMGMAN"
    ::Modal      := .T.
@@ -89,7 +89,7 @@ METHOD OnInitDialog() CLASS ImageManager
       :Left                 := 5
       :Top                  := 5
       :Width                := 250
-      :Height               := 300
+      :Height               := 250
 
       WITH OBJECT :ImageList := ImageList( :this )
          :IconWidth  := ::ImageList:IconWidth

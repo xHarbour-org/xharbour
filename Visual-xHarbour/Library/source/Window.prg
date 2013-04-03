@@ -3726,7 +3726,7 @@ RETURN NIL
 //------------------------------------------------------------------------------------------------------
 
 METHOD DockIt() CLASS Window
-   IF ::IsWindow()
+   IF ::IsWindow() .AND. ::Parent != NIL
       ::Parent:UpdateWindow()
       ::__OnParentSize( ::Parent:ClientWidth, ::Parent:ClientHeight, NIL, .T. )
    ENDIF
@@ -3818,9 +3818,7 @@ RETURN Self
 
 METHOD __FixDocking() CLASS Window
    LOCAL oObj, cObj
-   IF ::Property != NIL
-      FOR EACH cObj IN ::Property:Keys
-          oObj := ::Property[ cObj ]
+      FOR EACH cObj IN __aObjects
           IF oObj:HasMessage( "Dock" ) .AND. oObj:Dock != NIL
              IF VALTYPE( oObj:Dock:Left ) == "C"
                 oObj:Dock:Left   := IIF( oObj:Dock:Left == oObj:Parent:Name, oObj:Parent, ::Property[ oObj:Dock:Left ] )
@@ -3839,7 +3837,6 @@ METHOD __FixDocking() CLASS Window
              ENDIF
           ENDIF
       NEXT
-   ENDIF
 RETURN Self
 
 METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Window
@@ -5457,7 +5454,7 @@ METHOD Show( nShow ) CLASS WinForm
             DeleteDC( hMemDC )
          ENDIF
 
-         //::__FixDocking()
+         ::__FixDocking()
          
          nRet := ExecuteEvent( "OnLoad", Self )
 

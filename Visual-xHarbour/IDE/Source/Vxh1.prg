@@ -2776,7 +2776,7 @@ METHOD AddControl( cCtrl, oParent ) CLASS Project
    LOCAL oCtrl := &cCtrl( oParent ):Create()
    IF cCtrl == "TabPage"
       oCtrl:BackgroundImage := FreeImageRenderer( oCtrl ):Create()
-      oCtrl:Caption := "Page &"+LTRIM( STR( oCtrl:Index ) )
+      oCtrl:Text := "Page &"+LTRIM( STR( oCtrl:__GetPosition() ) )
       oParent:Left ++
       ::CurrentForm:__lModified := .T.
    ENDIF
