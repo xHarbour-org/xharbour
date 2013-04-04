@@ -52,7 +52,6 @@ CLASS TabControl INHERIT Control
 
    DATA BoldSelection    PUBLISHED INIT .F.
    DATA ShowTabs         PUBLISHED INIT .T.
-   DATA Flat             PUBLISHED INIT .F.
    
    DATA CurSel           EXPORTED  INIT 1
    DATA VertFont         EXPORTED
@@ -147,7 +146,7 @@ CLASS TabControl INHERIT Control
    METHOD OnTabInsert()              VIRTUAL
 
    METHOD OnParentNotify()
-   METHOD OnEraseBkGnd()
+   METHOD OnEraseBkGnd()             INLINE 1
 
    METHOD SetPos(n,l)                INLINE ::SetStyle(n,l),; 
                                             IIF( ::IsWindow(),;
@@ -165,10 +164,8 @@ CLASS TabControl INHERIT Control
    METHOD OnSize()
 
    METHOD OnHScroll(x,y,n)           INLINE ::Super:OnHScroll(x,y,n)
-   //METHOD UnDock()
-   //METHOD ReDock()
-   //METHOD Hide()
-   //METHOD Show()
+   METHOD Hide()
+   METHOD Show()
    
    METHOD OnDestroy()                INLINE Super:OnDestroy(), ::CloseThemeData()
    METHOD OnMouseMove()
@@ -191,6 +188,7 @@ METHOD Init( oParent ) CLASS TabControl
    ::ClsName      := WC_TABCONTROL
    DEFAULT ::__xCtrlName TO "TabControl"
    ::Style        := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | TCS_OWNERDRAWFIXED
+   ::ExStyle      := WS_EX_CONTROLPARENT
    ::Super:Init( oParent )
    ::Width        := 200
    ::Height       := 200
@@ -292,7 +290,7 @@ METHOD Create() CLASS TabControl
    ENDIF
    ::Super:Create()
 
-   IF !::ShowTabs
+   IF ! ::ShowTabs
       ::SendMessage( TCM_SETITEMSIZE, 0, MAKELPARAM(0,0) )
    ENDIF
    IF ::__ClassInst != NIL
@@ -318,15 +316,6 @@ METHOD Create() CLASS TabControl
    ::BoldFont := Font()
    ::BoldFont:Bold := .T.
    ::BoldFont:Create()
-
-   IF ::Flat
-      IF ::AllowUndock
-         ::PinBtn   := TabPinButton( Self )
-      ENDIF
-      IF ::AllowClose
-         ::CloseBtn := TabCloseButton( Self )
-      ENDIF
-   ENDIF
 
    IF ::__ClassInst != NIL
       ::SetWindowPos(, ::Left, ::Top, ::Width, ::Height, SWP_FRAMECHANGED | SWP_NOZORDER )
@@ -439,13 +428,14 @@ METHOD SetItemText( n, cText, lBold ) CLASS TabControl
     catch
    END
 RETURN Self
-/*
+
 //-----------------------------------------------------------------------------------------------
 METHOD Hide() CLASS TabControl
-   LOCAL Tab
-   FOR EACH Tab IN ::aTabs
-       IF VALTYPE(Tab) == "O"
-          Tab:HideTab()
+   LOCAL n, oTab
+   FOR n := 1 TO ::GetItemCount()
+       oTab := ::GetItemObject(n)
+       IF oTab != NIL
+          oTab:HideTab()
        ENDIF
    NEXT
    Super:Hide()
@@ -453,33 +443,14 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Show(n) CLASS TabControl
+   LOCAL oTab
    Super:Show(n)
-   IF LEN( ::aTabs ) >= ::Cursel
-      TRY
-         ::aTabs[::Cursel]:ShowTab()
-       CATCH
-      END
+   IF ::GetItemCount() >= ::Cursel
+      IF ( oTab := ::GetItemObject() ) != NIL
+         oTab:ShowTab()
+      ENDIF
    ENDIF
 RETURN Self
-*/
-//-----------------------------------------------------------------------------------------------
-METHOD OnEraseBkGnd() CLASS TabControl
-/*
-   LOCAL hBrush
-   IF !::Flat
-      IF ( ::Theming .AND. IsThemeActive() ) .OR. !::ShowTabs
-         hBrush := ::bkBrush
-         DEFAULT hBrush TO ::Parent:bkBrush
-         IF hBrush != NIL
-            _FillRect( hDC, _GetClientRect( ::hWnd ), hBrush )
-            RETURN .T.
-         ENDIF
-      ENDIF
-    ELSEIF ::Flat
-      RETURN .T.
-   ENDIF
-*/
-RETURN 1 //NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD HitTest( x, y, nFlags ) CLASS TabControl
@@ -535,16 +506,12 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnPaint() CLASS TabControl
-   LOCAL aRect, n, nSel, hBrush, lTop, nItems
-   LOCAL lVert, x, y, nTextHeight, nTop, nState, nPart
-   LOCAL nLeft, nRight, nBottom, aCover, aItem, oPage
-   LOCAL aBackRect, aFramRect, hWnd, hTmpBrush, hParDC
-   LOCAL rc, tci, hDC
-   LOCAL hMemDC, hMemBitmap, hOldBitmap, hOldFont, aText, sz := (struct SIZE)
-   IF !::Flat
-      IF ( !::Theming .OR. !IsThemeActive() ) .AND. ::ShowTabs
-         RETURN NIL
-      ENDIF
+   LOCAL aRect, n, nSel, hBrush, nItems, nState, nPart
+   LOCAL aItem, oPage, hWnd, hTmpBrush, hParDC, rc, tci, hDC
+   LOCAL hMemDC, hMemBitmap, hOldBitmap, hOldFont, sz := (struct SIZE)
+
+   IF ( !::Theming .OR. !IsThemeActive() ) .AND. ::ShowTabs
+      RETURN NIL
    ENDIF
 
    IF !::ShowTabs .AND. ::__UpDn == NIL
@@ -579,378 +546,120 @@ METHOD OnPaint() CLASS TabControl
    hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
    hOldBitmap := SelectObject( hMemDC, hMemBitmap)
 
-   IF !::Flat
-      aItem := ::GetItemRect( 1 )
-      IF ::Style & TCS_BOTTOM == 0
-         aRect[2] := aItem[4]
-       ELSE
-         aRect[2] += 2
-         aRect[4] -= ( aRect[4]-aItem[2]-2 )
-      ENDIF
-      hBrush := ::bkBrush
-      DEFAULT hBrush TO ::Parent:bkBrush
-      IF hBrush == NIL
-         hParDC := GetDC( ::Parent:hWnd )
-         hTmpBrush := CreateSolidBrush( GetPixel( hParDC, 1, 1 ) )
-         ReleaseDC( ::Parent:hWnd, hParDC )
-         hBrush := hTmpBrush
-      ENDIF
-      _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
-      
-      IF hTmpBrush != NIL
-         DeleteObject( hTmpBrush )
-      ENDIF
-
-      IF IsThemeActive()
-         DrawThemeBackground( ::hTheme, hMemDC, TABP_PANE, , aRect  )
-       ELSE
-         _DrawFrameControl( hMemDC, aRect, DFC_BUTTON, DFCS_BUTTONPUSH )
-      ENDIF
-      
-      nItems := ::GetItemCount()
-      IF nItems == 0 .OR. !::ShowTabs
-         ::EndPaint()
-         RETURN 0
-      ENDIF
-      IF nItems > 0
-         FOR n := nItems TO 1 STEP -1
-
-             IF n != nSel
-                oPage := ::GetItemObject(n)
-
-                tci:mask := TCIF_TEXT
-                tci:pszText := SPACE(255)
-                tci:cchTextMax := 255
-
-                SendMessage( ::hWnd, TCM_GETITEM, n-1, @tci )
-
-                aItem  := ::GetItemRect( n )
-
-                SetTextColor( hMemDC, oPage:ForeColor )
-
-                nState := TIS_NORMAL
-                aItem[2]+=1
-                IF ::__nHot == n
-                   nState := TIS_HOT
-                ENDIF
-                DrawThemeBackground( ::hTheme, hMemDC, TABP_TABITEM, nState, aItem )
-                IF ::ImageList != NIL .AND. oPage:ImageIndex > 0
-                   ::ImageList:DrawImage( hMemDC, oPage:ImageIndex, aItem[1]+6, aItem[2]+3, ILD_TRANSPARENT )
-                   aItem[1]+=::ImageList:IconWidth + 6
-                ENDIF
-                IF !EMPTY( tci:pszText )
-                   SetBkMode( hMemDC, TRANSPARENT )
-                   hOldFont := SelectObject( hMemDC, ::Font:Handle )
-
-                   //aSize    := _GetTextExtentPoint32( hMemDC, tci:pszText  )
-                   _DrawText( hMemDC, tci:pszText, aItem, DT_CENTER|DT_VCENTER|DT_SINGLELINE  )
-                   SelectObject( hMemDC, hOldFont )
-                ENDIF
-             ENDIF
-         NEXT
-
-         aItem := ::GetItemRect( nSel )
-
-         aItem[1]-= 2
-         aItem[3]+= 2
-         aItem[2]-=1
-         aItem[4]+=2
-         nPart  := TABP_TABITEM
-         nState := TIS_SELECTED
-         IF nSel == 1
-            nPart  := TABP_TOPTABITEMLEFTEDGE
-          ELSEIF aItem[3] == aRect[3]
-            nPart  := TABP_TOPTABITEMRIGHTEDGE
-         ENDIF
-
-         DrawThemeBackground( ::hTheme, hMemDC, nPart, nState, aItem, aItem )
-         aItem[4]-=2
-         n := nSel
-         oPage := ::GetItemObject(n)
-
-         IF ::ImageList != NIL .AND. oPage:ImageIndex > 0
-            ::ImageList:DrawImage( hMemDC, oPage:ImageIndex, aItem[1]+6, aItem[2]+3, ILD_TRANSPARENT )
-            aItem[1]+=::ImageList:IconWidth + 3
-         ENDIF
-
-         tci:mask := TCIF_TEXT
-         tci:pszText := SPACE(255)
-         tci:cchTextMax := 255
-         SendMessage( ::hWnd, TCM_GETITEM, n-1, @tci )
-
-         IF !EMPTY( tci:pszText )
-            SetTextColor( hMemDC, oPage:ForeColor )
-            SetBkMode( hMemDC, TRANSPARENT )
-            hOldFont := SelectObject( hMemDC, ::Font:Handle )
-            _DrawText( hMemDC, tci:pszText, aItem, DT_CENTER|DT_VCENTER|DT_SINGLELINE  )
-            SelectObject( hMemDC, hOldFont )
-         ENDIF
-         IF !::FocusNever .AND. ::HasFocus
-            aRect := ::GetItemRect( nSel )
-            _DrawFocusRect( hMemDC, { aRect[1],aRect[2]+2,aRect[3],aRect[4]} )
-         ENDIF
-
-      ENDIF
-      BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
-      SelectObject( hMemDC,  hOldBitmap )
-      DeleteObject( hMemBitmap )
-      DeleteDC( hMemDC )
-      ::EndPaint()
-      RETURN 0
-   ENDIF 
-
-   lTop  := ::Style & TCS_BOTTOM == 0
-   lVert := ::Style & TCS_VERTICAL == TCS_VERTICAL
-   aText := _GetTextExtentPoint32( hMemDC,"X")
-   IF aText == NIL .AND. GetTextExtentPoint32( hMemDC, "X", @sz )
-      aText := sz:Array
-   ENDIF
-   IF aText == NIL
-      aText := {0,0}
-   ENDIF
-
-   IF aText != NIL
-      nTextHeight := aText[2]
+   aItem := ::GetItemRect( 1 )
+   IF ::Style & TCS_BOTTOM == 0
+      aRect[2] := aItem[4]
     ELSE
-      nTextHeight := 10
+      aRect[2] += 2
+      aRect[4] -= ( aRect[4]-aItem[2]-2 )
    ENDIF
-   IF ::AllowUndock
-      ::PinBtn:MoveWindow( ::Width-20-IIF(::AllowClose,18,0), (rc:Top-16)/2, 17, 16, .T. )
+   hBrush := ::bkBrush
+   DEFAULT hBrush TO ::Parent:bkBrush
+   IF hBrush == NIL
+      hParDC := GetDC( ::Parent:hWnd )
+      hTmpBrush := CreateSolidBrush( GetPixel( hParDC, 1, 1 ) )
+      ReleaseDC( ::Parent:hWnd, hParDC )
+      hBrush := hTmpBrush
    ENDIF
-   IF ::AllowClose
-      ::CloseBtn:MoveWindow( ::Width-20, (rc:Top-16)/2, 17, 16, .T. )
+   _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
+   
+   IF hTmpBrush != NIL
+      DeleteObject( hTmpBrush )
    ENDIF
 
-   nLeft   := 0
-   nTop    := 0
-   nRight  := 0
-   nBottom := 0
-
-   IF lTop
-      IF !lVert
-         aCover    := { 0, 0, 0, 2 }
-         nBottom   :=  IIF( ::Frame, 2, 1 )
-         aBackRect := { aRect[1], aRect[2], aRect[3], rc:Top }
-         aFramRect := { aRect[1], rc:Top-1, aRect[3], aRect[4] }
-       ELSE
-         aCover    := { 0, 0, 1, 0 }
-         nRight    :=  3
-         nBottom   :=  1
-         aBackRect := { aRect[1], aRect[2], rc:Left, aRect[4] }
-         aFramRect := { rc:Left-1, aRect[2], aRect[3], aRect[4] }
-      ENDIF
+   IF IsThemeActive()
+      DrawThemeBackground( ::hTheme, hMemDC, TABP_PANE, , aRect  )
     ELSE
-      IF !lVert
-         aCover    := { 0, IIF( ::Frame,-2,-3 ), 0, 0 }
-         nTop      := IIF( ::Frame, -1, -1)
-         aBackRect := { aRect[1], rc:Bottom, aRect[3], aRect[4] }
-         aFramRect := { aRect[1], aRect[2], aRect[3], rc:Bottom+1 }
-      ELSE
-         aCover    := { -1, 0, 0, 0 }
-         nLeft     := -3
-         nBottom   :=  1
-         aBackRect := { rc:Right, aRect[2], aRect[3], aRect[4] }
-         aFramRect := { aRect[1], aRect[2], aBackRect[1]+1, aRect[4] }
-      ENDIF
+      _DrawFrameControl( hMemDC, aRect, DFC_BUTTON, DFCS_BUTTONPUSH )
    ENDIF
-
-   IF ::ShowTabs
-      _FillRect( hMemDC, aFramRect, IIF( ::BkBrush != NIL, ::BkBrush, GetSysColorBrush( COLOR_BTNFACE ) ) )
-      _FillRect( hMemDC, aBackRect, IIF( ::BkBrush != NIL, ::BkBrush, GetSysColorbrush( COLOR_3DHIGHLIGHT ) ) )
-
-      __Draw3dRect( hMemDC, aBackRect, GetSysColor(COLOR_3DDKSHADOW), GetSysColor( COLOR_3DHIGHLIGHT ) )
-
-      IF ::Frame .AND. aFramRect[4]>aFramRect[2]
-         _FillRect( hMemDC, aFramRect, IIF( ::BkBrush != NIL, ::BkBrush, GetSysColorBrush( COLOR_BTNFACE ) ) )
-         __Draw3dRect( hMemDC, aFramRect, GetSysColor( COLOR_3DHIGHLIGHT ), GetSysColor(COLOR_3DDKSHADOW) )
-      ENDIF
-    ELSE
-      hBrush := ::bkBrush
-      DEFAULT hBrush TO ::Parent:bkBrush
-      _FillRect( hMemDC, aBackRect, IIF( hBrush != NIL, hBrush, GetSysColorbrush( COLOR_BTNFACE ) ) )
-     __Draw3dRect( hMemDC, aFramRect, GetSysColor( COLOR_3DHIGHLIGHT ), GetSysColor(COLOR_3DDKSHADOW) )
-   ENDIF
-
+   
    nItems := ::GetItemCount()
+   IF ::ShowTabs .AND. nItems > 0
+      FOR n := nItems TO 1 STEP -1
 
-   IF !::ShowTabs
-      nItems := 0
-   ENDIF
-   FOR n := 1 TO nItems
-       oPage := ::GetItemObject(n)
-       SelectObject( hMemDC, IIF( lVert, ::VertFont:Handle, oPage:Font:Handle ) )
+          IF n != nSel .AND. ::ShowTabs
+             oPage := ::GetItemObject(n)
 
-       aRect := ::GetItemRect( n )
+             tci:mask := TCIF_TEXT
+             tci:pszText := SPACE(255)
+             tci:cchTextMax := 255
 
-       aRect[1] += nLeft
-       aRect[2] += nTop
-       aRect[3] += nRight+1
-       aRect[4] += nBottom
+             SendMessage( ::hWnd, TCM_GETITEM, n-1, @tci )
 
-       hBrush := oPage:BkBrush
+             aItem  := ::GetItemRect( n )
 
-       DEFAULT hBrush TO ::TabBrush
-       DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
-       SetTextColor( hMemDC, GetSysColor( COLOR_BTNTEXT ) )
-
-       IF n == nSel .OR. ( ::ColorInactiveHeader .AND. !(hBrush == GetSysColorBrush( COLOR_BTNFACE )) )
-          IF n == nSel
-             __Draw3dRect( hMemDC, aRect, GetSysColor( COLOR_3DHIGHLIGHT ), GetSysColor(COLOR_3DDKSHADOW) )
-          ENDIF
-          aRect[1] += aCover[1]
-          aRect[2] += aCover[2]
-          aRect[3] += aCover[3]
-          aRect[4] += aCover[4]
-
-          IF !(n == nSel) .AND. ::ColorInactiveHeader
-             IF lVert
-                IF lTop
-                   aRect[3]-=3
-                 ELSE
-                   aRect[1]+=2
-                ENDIF
-              ELSE
-                IF lTop
-                   aRect[4]-=2
-                 ELSE
-                   aRect[2]+=1
-                ENDIF
-             ENDIF
-          ENDIF
-          IF ::Frame
-             _FillRect( hMemDC, aFramRect, hBrush )
-             __Draw3dRect( hMemDC, aFramRect, GetSysColor( COLOR_3DHIGHLIGHT ), GetSysColor(COLOR_3DDKSHADOW) )
-          ENDIF
-          _FillRect( hMemDC, { aRect[1]+1,aRect[2]+1,aRect[3]-1,aRect[4]-1}, hBrush )
-
-          IF n == nSel .AND. ::HasFocus
-             IF lVert .AND. lTop
-                aRect[3]--
-             ENDIF
-             _DrawFocusRect( hMemDC, { aRect[1]+2,aRect[2]+2,aRect[3]-2,aRect[4]-2} )
-          ENDIF
-
-       ENDIF
-       SetBkMode( hMemDC, TRANSPARENT )
-       aRect := ::GetItemRect( n )
-
-       tci:mask := TCIF_TEXT + TCIF_IMAGE + TCIF_STATE + TCIF_PARAM
-       tci:pszText := SPACE(255)
-       tci:cchTextMax := 255
-
-       SendMessage( ::hWnd, TCM_GETITEM, n-1, @tci )
-
-       IF !EMPTY( aRect ) .AND. ( !EMPTY( tci:pszText ) .OR. tci:iImage >= 0 )
-          IF !lVert
-             IF tci:iImage >= 0
-                IF ::ImageList != NIL
-                   y := aRect[2] + ( ( (aRect[4]-aRect[2]) - ::ImageList:IconHeight ) / 2 )
-                   ::ImageList:DrawImage( hMemDC, tci:iImage+1, aRect[1]+6, y+3, ILD_TRANSPARENT )
-                   aRect[1]+=::ImageList:IconWidth + 2
-                ENDIF
-             ENDIF
              SetTextColor( hMemDC, oPage:ForeColor )
 
-             IF n==nSel
-                IF ::BoldSelection
-                   IF ::FocusFont == NIL
-                      ::FocusFont := Font()
-                      ::FocusFont:Bold := .T.
-                      ::FocusFont:Create()
-                      IF ::VertFocusFont == NIL
-                         ::VertFocusFont := Font()
-                         ::VertFocusFont:Bold := .T.
-                         ::VertFocusFont:Escapement := 900
-                         ::VertFocusFont:Create()
-                      ENDIF
-                   ENDIF
-                   SelectObject( hMemDC, ::FocusFont:Handle )
-                ENDIF
+             nState := TIS_NORMAL
+             aItem[2]+=1
+             IF ::__nHot == n
+                nState := TIS_HOT
+             ENDIF
+             DrawThemeBackground( ::hTheme, hMemDC, TABP_TABITEM, nState, aItem )
+             IF ::ImageList != NIL .AND. oPage:ImageIndex > 0
+                ::ImageList:DrawImage( hMemDC, oPage:ImageIndex, aItem[1]+6, aItem[2]+3, ILD_TRANSPARENT )
+                aItem[1]+=::ImageList:IconWidth + 6
              ENDIF
              IF !EMPTY( tci:pszText )
-                _DrawText( hMemDC, tci:pszText, aRect, DT_CENTER + DT_VCENTER + DT_SINGLELINE  )
-             ENDIF
-             IF n==nSel .AND. ::BoldSelection
-                SelectObject( hMemDC, oPage:Font:Handle  )
-             ENDIF
-             IF n != nSel .AND. !::ColorInactiveHeader
-                SetTextColor( hMemDC, GetSysColor( COLOR_BTNSHADOW ) )
-                MoveTo( hMemDC, aRect[3], aRect[2]+3 )
-                LineTo( hMemDC, aRect[3], aRect[4]-3 )
-                SetTextColor( hMemDC, GetSysColor( COLOR_BTNTEXT ) )
-             ENDIF
-           ELSE
-             x := ( (aRect[1]+aRect[3])/2 ) - ( nTextHeight/2 )
-             y := (aRect[2]+aRect[4])/2
+                SetBkMode( hMemDC, TRANSPARENT )
+                hOldFont := SelectObject( hMemDC, ::Font:Handle )
 
-             SetTextAlign( hMemDC, TA_CENTER )
-             IF n==nSel
-                SetTextColor( hMemDC, oPage:ForeColor )
-                IF ::BoldSelection
-                   SelectObject( hMemDC, ::FocusFont:Handle )
-                ENDIF
+                //aSize    := _GetTextExtentPoint32( hMemDC, tci:pszText  )
+                _DrawText( hMemDC, tci:pszText, aItem, DT_CENTER|DT_VCENTER|DT_SINGLELINE  )
+                SelectObject( hMemDC, hOldFont )
              ENDIF
-             _ExtTextOut( hMemDC, x, y, ETO_CLIPPED, aRect, STRTRAN( tci:pszText, "&" ) )
-
-             IF n != nSel .AND. !::ColorInactiveHeader
-                SetTextColor( hMemDC, GetSysColor( COLOR_BTNSHADOW ) )
-                MoveTo( hMemDC, aRect[1]+3, aRect[4] )
-                LineTo( hMemDC, aRect[3]-3, aRect[4] )
-                SetTextColor( hMemDC, GetSysColor( COLOR_BTNTEXT ) )
-             ENDIF
-
           ENDIF
-       ENDIF
-   NEXT
+      NEXT
 
+      aItem := ::GetItemRect( nSel )
+ 
+      aItem[1]-= 2
+      aItem[3]+= 2
+      aItem[2]-=1
+      aItem[4]+=2
+      nPart  := TABP_TABITEM
+      nState := TIS_SELECTED
+      IF nSel == 1
+         nPart  := TABP_TOPTABITEMLEFTEDGE
+       ELSEIF aItem[3] == aRect[3]
+         nPart  := TABP_TOPTABITEMRIGHTEDGE
+      ENDIF
+
+      DrawThemeBackground( ::hTheme, hMemDC, nPart, nState, aItem, aItem )
+      aItem[4]-=2
+      n := nSel
+      oPage := ::GetItemObject(n)
+
+      IF ::ImageList != NIL .AND. oPage:ImageIndex > 0
+         ::ImageList:DrawImage( hMemDC, oPage:ImageIndex, aItem[1]+6, aItem[2]+3, ILD_TRANSPARENT )
+         aItem[1]+=::ImageList:IconWidth + 3
+      ENDIF
+
+      tci:mask := TCIF_TEXT
+      tci:pszText := SPACE(255)
+      tci:cchTextMax := 255
+      SendMessage( ::hWnd, TCM_GETITEM, n-1, @tci )
+
+      IF !EMPTY( tci:pszText )
+         SetTextColor( hMemDC, oPage:ForeColor )
+         SetBkMode( hMemDC, TRANSPARENT )
+         hOldFont := SelectObject( hMemDC, ::Font:Handle )
+         _DrawText( hMemDC, tci:pszText, aItem, DT_CENTER|DT_VCENTER|DT_SINGLELINE  )
+         SelectObject( hMemDC, hOldFont )
+      ENDIF
+      IF !::FocusNever .AND. ::HasFocus
+         aRect := ::GetItemRect( nSel )
+         _DrawFocusRect( hMemDC, { aRect[1],aRect[2]+2,aRect[3],aRect[4]} )
+      ENDIF
+
+   ENDIF
    BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
-
    SelectObject( hMemDC,  hOldBitmap )
    DeleteObject( hMemBitmap )
    DeleteDC( hMemDC )
    ::EndPaint()
 RETURN 0
-/*
-//-----------------------------------------------------------------------------------------------
-METHOD UnDock() CLASS TabControl
-   LOCAL Tab, oParent := ::Parent
 
-   IF __Evaluate( ::OnWMUnDock, Self ) == NIL
-      ::Super:Undock()
-      IF ::CloseBtn != NIL
-         ::CloseBtn:Hide()
-      ENDIF
-      IF ::PinBtn != NIL
-         ::PinBtn:Hide()
-      ENDIF
-
-      FOR EACH Tab IN ::aTabs
-          SetParent( Tab:hWnd, ::hWnd )
-      NEXT
-      ::aTabs[::CurSel]:ShowTab()
-   ENDIF
-RETURN Self
-
-//-----------------------------------------------------------------------------------------------
-METHOD ReDock() CLASS TabControl
-   LOCAL Tab, oParent := ::Parent
-
-   IF __Evaluate( ::OnWMReDock, Self ) == NIL
-      ::Super:Redock()
-      IF ::CloseBtn != NIL
-         ::CloseBtn:Show()
-      ENDIF
-      IF ::PinBtn != NIL
-         ::PinBtn:Show()
-      ENDIF
-
-      FOR EACH Tab IN ::aTabs
-          SetParent( Tab:hWnd, ::Parent:hWnd )
-      NEXT
-      ::aTabs[::CurSel]:ShowTab()
-   ENDIF
-RETURN Self
-*/
 //-----------------------------------------------------------------------------------------------
 METHOD SetItemValues( nItem, cText, nImgIndex, hWnd ) CLASS TabControl
    LOCAL tci := (struct TCITEM)
@@ -1232,9 +941,9 @@ METHOD Init( oParent, acResource ) CLASS TabPage
    ::Super:Init( oParent, acResource )
    ::Property      := NIL
    ::Style         := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::ExStyle       := WS_EX_CONTROLPARENT
    ::ClsName       := "TabPage"
    ::ThemeName     := "TAB"
-   ::ControlParent := .T.
    ::ClipChildren  := .T.
    ::ClipSiblings  := .T.
    ::modal         := .F.
@@ -1384,7 +1093,7 @@ METHOD Create() CLASS TabPage
       ::RegisterDocking()
 
       IF ::__ClassInst == NIL
-         SetParent( ::hWnd, ::Parent:Parent:hWnd )
+         //SetParent( ::hWnd, ::Parent:Parent:hWnd )
          IF !EMPTY( cText ) .AND. ( n := AT( "&", cText ) ) > 0
             RegisterHotKey( ::hWnd, ::Id, MOD_ALT, ASC( cText[n+1] ) )
          ENDIF
@@ -1511,7 +1220,7 @@ METHOD __OnParentSize( x, y, hDef ) CLASS TabPage
 
    SendMessage( ::Parent:hWnd, TCM_ADJUSTRECT, 0, @rc )
 
-   IF ::Application:ThemeActive .AND. !::Parent:Flat .AND. ::Theming
+   IF ::Application:ThemeActive .AND. ::Theming
       rc:Top    -= 1
       rc:Left   -= 3
       rc:Right  += 1
@@ -1519,29 +1228,6 @@ METHOD __OnParentSize( x, y, hDef ) CLASS TabPage
       IF ::Application:OsVersion:dwMajorVersion > 5
          rc:Bottom += 1
       ENDIF      
-    ELSEIF ::Parent:Flat
-      IF ::Parent:Style & TCS_VERTICAL == 0
-         rc:Left   -= 1
-      ENDIF
-      rc:Right  += 2
-      IF ::Parent:Style & TCS_BOTTOM == 0
-         rc:Bottom += 3
-         rc:Left   -= 2
-         rc:Right  += 1
-         IF ::Parent:Style & TCS_VERTICAL == TCS_VERTICAL
-            rc:Top    -= 3
-            rc:Left   += 2
-         ENDIF
-       ELSE
-         rc:Left   -= 1
-         rc:Right  += 1
-         rc:Top    -= 3
-         IF ::Parent:Style & TCS_VERTICAL != 0
-            rc:Left   -= 2
-            rc:Right  -= 3
-            rc:Bottom += 3
-         ENDIF
-      ENDIF
     ELSEIF ::Application:ThemeActive .AND. ::Theming
       rc:Left   -= 1
       rc:Right  += 1
@@ -1823,7 +1509,7 @@ CLASS TabStrip INHERIT TabControl
       
    DATA Border, AllowMaximize, HighlightCaption, SmallCaption, Theming, ClientEdge, StaticEdge, ClipChildren, ClipSiblings, NoActivate PROTECTED INIT .F.
    DATA Caption, AnimationStyle
-   DATA BoldSelection, Flat INIT .F.
+   DATA BoldSelection    EXPORTED INIT .F.
    DATA ItemHeight       EXPORTED INIT 19
    METHOD Init()  CONSTRUCTOR
    METHOD Create() 

@@ -3818,7 +3818,9 @@ RETURN Self
 
 METHOD __FixDocking() CLASS Window
    LOCAL oObj, cObj
-      FOR EACH cObj IN __aObjects
+   IF ::Property != NIL
+      FOR EACH cObj IN ::Property:Keys
+          oObj := ::Property[ cObj ]
           IF oObj:HasMessage( "Dock" ) .AND. oObj:Dock != NIL
              IF VALTYPE( oObj:Dock:Left ) == "C"
                 oObj:Dock:Left   := IIF( oObj:Dock:Left == oObj:Parent:Name, oObj:Parent, ::Property[ oObj:Dock:Left ] )
@@ -3837,7 +3839,9 @@ METHOD __FixDocking() CLASS Window
              ENDIF
           ENDIF
       NEXT
+   ENDIF
 RETURN Self
+
 
 METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Window
    LOCAL n, nCurLeft, nCurTop, oLeft, oTop, oRight, oBottom, lAnchor, lDock, nHeight, rc
@@ -5453,7 +5457,7 @@ METHOD Show( nShow ) CLASS WinForm
             DeleteObject( hMemBitmap )
             DeleteDC( hMemDC )
          ENDIF
-
+         ::Application:DoEvents()
          ::__FixDocking()
          
          nRet := ExecuteEvent( "OnLoad", Self )
