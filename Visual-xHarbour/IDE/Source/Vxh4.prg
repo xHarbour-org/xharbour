@@ -1245,7 +1245,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
        nColor := NIL
 
        aProp := __GetProperCase( cProp )
-       cProp := aProp[1]
+       //cProp := aProp[1]
 
        IF Empty( aProp[2] )
           aProp[2] := "General"
@@ -3566,7 +3566,6 @@ __aProps["M"] := { { "MaximizeBox",             "Style" },;
                    { "Message",                 "Appearance" },;
                    { "MultiColumn",             "Appearance" },;
                    { "MultiSelect",             "Behavior" },;
-                   { "MarqueeSeconds",          "Behavior" },;
                    { "MaskColor",               "Colors" },;
                    { "MaxRange",                "Position" },;
                    { "MinRange",                "Position" },;

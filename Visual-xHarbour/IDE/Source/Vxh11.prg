@@ -531,12 +531,13 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                  IF ! ::Source:Modified
                     ::Source:Modified := .T.
                     n := aScan( ::aDocs, ::Source,,, .T. )
-                    cText := ::Source:TreeItem:Text
-                    IF cText != NIL
-                       cText := ALLTRIM( STRTRAN( cText, "*" ) )
-                       ::Source:TreeItem:Text := cText + " *"
+                    IF ::Source:TreeItem != NIL
+                       cText := ::Source:TreeItem:Text
+                       IF cText != NIL
+                          cText := ALLTRIM( STRTRAN( cText, "*" ) )
+                          ::Source:TreeItem:Text := cText + " *"
+                       ENDIF
                     ENDIF
-
                     //cText := ::Application:SourceTabs:GetItemText(n)
                     //::Application:SourceTabs:SetItemText( n, " " + cText + " * ", .T. )
 
@@ -1069,7 +1070,9 @@ METHOD Close() CLASS Source
    LOCAL n
    IF ( n := ASCAN( ::Owner:aDocs, {|o| o:pSource==::pSource} ) ) > 0
       ::ReleaseDocument()
-      ::TreeItem:Delete()
+      IF ::TreeItem != NIL
+         ::TreeItem:Delete()
+      ENDIF
       ADEL( ::Owner:aDocs, n, .T. )
       IF ( n := ASCAN( ::Owner:aDocs, {|o| o:pSource==::Owner:GetCurDoc() } ) ) > 0
          ::Owner:aDocs[n]:Select()
