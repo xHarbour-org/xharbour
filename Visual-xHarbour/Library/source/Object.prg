@@ -15,6 +15,8 @@
 #include "debug.ch"
 #include "error.ch"
 
+static __aObjects := {}
+
 CLASS Object
    ACCESS Instance             INLINE   IIF( __GetApplication() != NIL, __GetApplication():Instance, GetModuleHandle() )
 
@@ -95,6 +97,7 @@ METHOD OnError( ... ) CLASS Object
    IF PCount() == 0 .AND. ::Property != NIL
       IF hGetPos( ::Property, cMsg ) > 0
          uRet := ::Property[ cMsg ]
+         //uRet := __aObjects[ ::Property[ cMsg ] ]
        ELSE
          uRet := ::__InvalidMember( cMsg )
       ENDIF
@@ -197,6 +200,12 @@ METHOD __SetAsProperty( cName, oObj ) CLASS Object
          HDelAt( ::Property, n )
       ENDIF
       ::Property[ cName ] := oObj
+
+      //::Property[ cName ] := ASCAN( __aObjects, oObj,,,.T. )
+      //IF ::Property[ cName ] == 0
+      //   AADD( __aObjects, oObj )
+      //   ::Property[ cName ] := LEN( __aObjects )
+      //ENDIF
    ENDIF
    oObj:xName := cName
 RETURN Self
@@ -221,5 +230,45 @@ METHOD RemoveProperty() CLASS Object
    LOCAL n
    IF !EMPTY( ::xName ) .AND. ( n := hGetPos( ::Form:Property, ::xName ) ) > 0
       RETURN HDelAt( ::Form:Property, n )
+   ENDIF
+RETURN NIL
+
+//-----------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------
+
+FUNCTION __GetObj( nPos )
+RETURN __aObjects[nPos]
+
+FUNCTION __SetObjPtr( oObj )
+   LOCAL n := ASCAN( __aObjects, {|o|o==oObj} )
+   IF n == 0
+      AADD( __aObjects, oObj )
+   ENDIF
+RETURN NIL
+
+FUNCTION __ObjFromClassH( hClass )
+   LOCAL n := ASCAN( __aObjects, {|o|o:ClassH == hClass } )
+   IF n > 0
+      RETURN __aObjects[n]
+   ENDIF
+RETURN NIL
+
+FUNCTION __ObjFromName( cName, oForm )
+   LOCAL n := ASCAN( __aObjects, {|o|o:ClsName == cName .AND. o:Form == oForm } )
+   IF n > 0
+      RETURN __aObjects[n]
+   ENDIF
+RETURN NIL
+
+FUNCTION ObjFromHandle( hWnd, lRemove )
+   LOCAL n := ASCAN( __aObjects, {|o|o:hWnd==hWnd} )
+   DEFAULT lRemove TO .F.
+   IF n > 0
+      IF lRemove
+         ADEL( __aObjects, n, .T. )
+       ELSE
+         RETURN __aObjects[n]
+      ENDIF
    ENDIF
 RETURN NIL

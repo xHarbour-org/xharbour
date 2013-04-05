@@ -139,7 +139,7 @@ CLASS TabControl INHERIT Control
    METHOD SetToolTips( hToolTips )   INLINE TabCtrl_SetToolTips( ::hWnd, hToolTips )
    METHOD SetUnicodeFormat(lUnicode) INLINE TabCtrl_SetUnicodeFormat( ::hWnd, lUnicode )
    METHOD DeselectAll(lExcludeFocus) INLINE TabCtrl_DeselectAll(::hWnd,lExcludeFocus)
-   METHOD GetObj( cName )            INLINE __ObjFromName( cName )
+   METHOD GetObj( cName )            INLINE __ObjFromName( cName, ::Form )
 
    METHOD OnTabChanging()            VIRTUAL
    METHOD OnTabChanged()             VIRTUAL

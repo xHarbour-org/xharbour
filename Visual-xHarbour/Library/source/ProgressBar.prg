@@ -86,6 +86,7 @@ CLASS ProgressBar FROM Control
    METHOD OnDestroy()
    METHOD __SetMarqueeSeconds()
    METHOD OnUserMsg()
+
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------

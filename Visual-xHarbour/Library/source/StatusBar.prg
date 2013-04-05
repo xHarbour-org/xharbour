@@ -308,6 +308,9 @@ METHOD Init( oParent ) CLASS StatusBarPanel
    ::Width         := 30
    ::__lMoveable   := .F.
    ::__lCopyCut    := .F.
+
+   __SetObjPtr( Self )
+
    ::ClsName       := "StatusBarPanel"
    ::__lResizeable := {.F.,.F.,.F.,.F.,.F.,.T.,.F.,.F.}
    ::IsContainer   := .T.

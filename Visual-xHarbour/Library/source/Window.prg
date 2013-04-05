@@ -124,7 +124,6 @@ static aMessages := {;
                     { WM_EXITSIZEMOVE,  "OnExitSizeMove"  };
                     }
 
-static __aObjects := {}
 //-----------------------------------------------------------------------------------------------
 
 CLASS Window INHERIT Object
@@ -791,6 +790,8 @@ METHOD Init( oParent ) CLASS Window
    ::WindowPos         := {=>}
    //::MeasureItemStruct := {=>}
 
+   __SetObjPtr( Self )
+
    DEFAULT ::ThemeName    TO "window"
    DEFAULT ::Style        TO WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    DEFAULT ::xLeft        TO 0
@@ -1122,8 +1123,6 @@ METHOD Create( oParent ) CLASS Window
    IF ::Center
       ::CenterWindow()
    ENDIF
-
-   __SetObjPtr( Self )
 
    ::__SubClass()
 
@@ -1562,34 +1561,6 @@ METHOD SetStyle( nStyle, lAdd ) CLASS Window
       ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
    ENDIF
 RETURN self
-
-//-----------------------------------------------------------------------------------------------
-
-FUNCTION __SetObjPtr( oObj )
-   LOCAL n := ASCAN( __aObjects, {|o|o:hWnd==oObj:hWnd} )
-   IF n == 0
-      AADD( __aObjects, oObj )
-   ENDIF
-RETURN NIL
-
-FUNCTION __ObjFromName( cName )
-   LOCAL n := ASCAN( __aObjects, {|o|o:ClsName == cName } )
-   IF n > 0
-      RETURN __aObjects[n]
-   ENDIF
-RETURN NIL
-
-FUNCTION ObjFromHandle( hWnd, lRemove )
-   LOCAL n := ASCAN( __aObjects, {|o|o:hWnd==hWnd} )
-   DEFAULT lRemove TO .F.
-   IF n > 0
-      IF lRemove
-         ADEL( __aObjects, n, .T. )
-       ELSE
-         RETURN __aObjects[n]
-      ENDIF
-   ENDIF
-RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 
