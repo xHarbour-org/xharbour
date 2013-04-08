@@ -97,7 +97,7 @@ METHOD Create() CLASS GroupBox
 RETURN Self
 
 METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
-   LOCAL lDC, oChild, hFont, hMemDC1, hOldBitmap1, hBrush, hMemBitmap, hOldBitmap, rc := (struct RECT), rcalc := (struct RECT), sz := (struct SIZE)
+   LOCAL lDC, oChild, hFont, hMemDC1, __hBrush, hOldBitmap1, hBrush, hMemBitmap, hOldBitmap, rc := (struct RECT), rcalc := (struct RECT), sz := (struct SIZE)
    LOCAL hParBrush := ::Parent:BkBrush
    IF !::IsWindow()
       RETURN 0
@@ -106,6 +106,7 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
    DEFAULT hBrush TO ::Parent:BkBrush
    DEFAULT hBrush TO ::__hBrush
    DEFAULT hParBrush TO ::__hBrush
+   
    DEFAULT hParBrush TO GetSysColorBrush( COLOR_BTNFACE )
    rc:left   := 0
    rc:top    := 0
@@ -119,11 +120,14 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
 
    IF hDC != NIL
       hMemDC     := CreateCompatibleDC( hDC )
-      IF hBrush == NIL .AND. ::Parent:__xCtrlName == "TabPage" .AND. GetParent( ::hWnd ) == ::Parent:hWnd
+      IF hBrush == NIL .AND. ::Parent:__xCtrlName == "TabPage" //.AND. GetParent( ::hWnd ) == ::Parent:hWnd
          hMemBitmap := CreateCompatibleBitmap( hDC, ::Parent:ClientWidth, ::Parent:ClientHeight )
          hOldBitmap := SelectObject( hMemDC, hMemBitmap)
          SendMessage( ::Parent:hWnd, WM_PRINT, hMemDC, PRF_CLIENT | PRF_ERASEBKGND )
          BitBlt( hDC, ::Left, ::Top, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
+
+         __hBrush := CreatePatternBrush( hMemBitmap )
+
        ELSE
          hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
          hOldBitmap := SelectObject( hMemDC, hMemBitmap)
@@ -162,8 +166,9 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
       rcalc:top    := 9
       rcalc:right  := sz:cx + 12
       rcalc:bottom := sz:cy
+
       FillRect( hMemDC, rcalc, hBrush )
-      _FillRect( hMemDC, {rcalc:left,rcalc:top-9,rcalc:right,rcalc:top}, hParBrush )
+      _FillRect( hMemDC, {rcalc:left,rcalc:top-9,rcalc:right,rcalc:top}, __hBrush )
 
       IF ::ForeColor != NIL
          SetTextColor( hMemDC, ::ForeColor )
@@ -193,7 +198,6 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
 
           SelectObject( hMemDC1,  hOldBitmap1 )
           DeleteDC( hMemDC1 )
-
       NEXT
    ENDIF
 

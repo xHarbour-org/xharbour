@@ -510,11 +510,7 @@ METHOD OnPaint() CLASS TabControl
    LOCAL aItem, oPage, hWnd, hTmpBrush, hParDC, rc, tci, hDC
    LOCAL hMemDC, hMemBitmap, hOldBitmap, hOldFont, sz := (struct SIZE)
 
-   IF ( !::Theming .OR. !IsThemeActive() ) .AND. ::ShowTabs
-      RETURN NIL
-   ENDIF
-
-   IF !::ShowTabs .AND. ::__UpDn == NIL
+   IF !::ShowTabs .AND. ::__UpDn == NIL .AND. ::__ClassInst == NIL
       hWnd := GetWindow( ::hWnd, GW_CHILD | GW_HWNDFIRST )
       WHILE hWnd <> 0
          IF GetClassName( hWnd ) == "msctls_updown32" 
@@ -526,7 +522,6 @@ METHOD OnPaint() CLASS TabControl
       ENDDO
    ENDIF
    hDC := ::BeginPaint()
-   
 
    rc  := (struct RECT)
    tci := (struct TCITEM)
@@ -574,10 +569,10 @@ METHOD OnPaint() CLASS TabControl
    ENDIF
    
    nItems := ::GetItemCount()
-   IF ::ShowTabs .AND. nItems > 0
+   IF ( ::ShowTabs .OR. ::__ClassInst != NIL ) .AND. nItems > 0
       FOR n := nItems TO 1 STEP -1
 
-          IF n != nSel .AND. ::ShowTabs
+          IF n != nSel
              oPage := ::GetItemObject(n)
 
              tci:mask := TCIF_TEXT
@@ -595,10 +590,13 @@ METHOD OnPaint() CLASS TabControl
              IF ::__nHot == n
                 nState := TIS_HOT
              ENDIF
-             DrawThemeBackground( ::hTheme, hMemDC, TABP_TABITEM, nState, aItem )
-             IF ::ImageList != NIL .AND. oPage:ImageIndex > 0
-                ::ImageList:DrawImage( hMemDC, oPage:ImageIndex, aItem[1]+6, aItem[2]+3, ILD_TRANSPARENT )
-                aItem[1]+=::ImageList:IconWidth + 6
+
+             IF ::ShowTabs
+                DrawThemeBackground( ::hTheme, hMemDC, TABP_TABITEM, nState, aItem )
+                IF ::ImageList != NIL .AND. oPage:ImageIndex > 0
+                   ::ImageList:DrawImage( hMemDC, oPage:ImageIndex, aItem[1]+6, aItem[2]+3, ILD_TRANSPARENT )
+                   aItem[1]+=::ImageList:IconWidth + 6
+                ENDIF
              ENDIF
              IF !EMPTY( tci:pszText )
                 SetBkMode( hMemDC, TRANSPARENT )
@@ -625,12 +623,14 @@ METHOD OnPaint() CLASS TabControl
          nPart  := TABP_TOPTABITEMRIGHTEDGE
       ENDIF
 
-      DrawThemeBackground( ::hTheme, hMemDC, nPart, nState, aItem, aItem )
+      IF ::ShowTabs
+         DrawThemeBackground( ::hTheme, hMemDC, nPart, nState, aItem, aItem )
+      ENDIF
       aItem[4]-=2
       n := nSel
       oPage := ::GetItemObject(n)
 
-      IF ::ImageList != NIL .AND. oPage:ImageIndex > 0
+      IF ::ShowTabs .AND. ::ImageList != NIL .AND. oPage:ImageIndex > 0
          ::ImageList:DrawImage( hMemDC, oPage:ImageIndex, aItem[1]+6, aItem[2]+3, ILD_TRANSPARENT )
          aItem[1]+=::ImageList:IconWidth + 3
       ENDIF
@@ -799,14 +799,14 @@ METHOD DeleteTab(nPos) CLASS TabControl
    IF oPage != NIL
       oPage:Delete()
     ELSE
-       TabCtrl_DeleteItem(::hWnd, nPos-1)
+      TabCtrl_DeleteItem(::hWnd, nPos-1)
    ENDIF
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD DeleteAllTabs() CLASS TabControl
-   LOCAL n
-   FOR n := 1 TO ::GetItemCount()
+   LOCAL n, nTabs := ::GetItemCount()
+   FOR n := nTabs TO 1 STEP -1
        ::DeleteTab(n)
    NEXT
    ::CurSel := 0

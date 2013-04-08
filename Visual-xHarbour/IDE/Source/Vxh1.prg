@@ -2290,7 +2290,10 @@ METHOD Init() CLASS IDE_MainForm
             :Dock:Right       := :Parent
             :TabStop          := .F.
             :Visible          := .T.
-            :OnSelChanged     := {|,,y| ::Application:Project:SelectWindow( ::Application:Project:Forms[y],, .T. ) }
+            :OnSelChanged     := <|o,x,y|
+                                    (o,x)
+                                    ::Application:Project:SelectWindow( ::Application:Project:Forms[y],, .T. )
+                                 >
             :TabPosition      := 4
             :BackColor        := ::System:CurrentScheme:ToolStripPanelGradientEnd
             :OnWMThemeChanged := {|o| o:BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd }
@@ -3997,9 +4000,9 @@ METHOD NewSource() CLASS Project
    ::Application:SourceEditor:Enable()
    oEditor := Source( ::Application:SourceEditor )
 
-   ::Application:SourceTabs:Visible := .T.
-   ::Application:SourceTabs:InsertTab( "  Untitled Source * ",,,.T. )
-   ::Application:SourceTabs:SetCurSel( ::Application:SourceEditor:DocCount )
+   //::Application:SourceTabs:Visible := .T.
+   //::Application:SourceTabs:InsertTab( "  Untitled Source * ",,,.T. )
+   //::Application:SourceTabs:SetCurSel( ::Application:SourceEditor:DocCount )
    ::SourceTabChanged( ::Application:SourceEditor:DocCount )
    IF !::Application:SourceEditor:IsWindowVisible()
       ::Application:EditorPage:Select()
