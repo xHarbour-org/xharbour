@@ -790,8 +790,6 @@ METHOD Init( oParent ) CLASS Window
    ::WindowPos         := {=>}
    //::MeasureItemStruct := {=>}
 
-   __SetObjPtr( Self )
-
    DEFAULT ::ThemeName    TO "window"
    DEFAULT ::Style        TO WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    DEFAULT ::xLeft        TO 0
@@ -818,8 +816,8 @@ METHOD Init( oParent ) CLASS Window
    ::Font:Create()
 
    IF ! ( ::ClsName == TOOLTIPS_CLASS )
-      ::Drawing := Drawing( Self )
       ::ToolTip := ToolTip( Self )
+      ::Drawing := Drawing( Self )
       IF VALTYPE( oParent ) == "O"
          ::__CreateProperty()
          DEFAULT ::Dock   TO __WindowDock( Self )
@@ -1107,6 +1105,8 @@ METHOD Create( oParent ) CLASS Window
       Throw( ErrorNew( "Window.prg", EG_CREATE, hParent, ProcName(), cError, ;
                        { ::ExStyle, ::ClsName, ::Caption, ::Style, ::Left, ::Top, ::Width, ::Height, hParent, ::Id, ::AppInstance, ::__ClientStruct } ) )
    ENDIF
+
+   __SetObjPtr( Self )
 
    IF ::xCursor != IDC_ARROW
       ::__SetWindowCursor( ::xCursor )

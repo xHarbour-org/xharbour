@@ -44,9 +44,10 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS CheckBox INHERIT Control
+   DATA Transparent PUBLISHED INIT .F.
+
    DATA ImageList  EXPORTED
    DATA ImageIndex PROTECTED
-   DATA Transparent PUBLISHED INIT .T.
 
    PROPERTY Group      INDEX WS_GROUP  READ xGroup      WRITE SetStyle      PROTECTED DEFAULT .F.
    PROPERTY CheckStyle                 READ xCheckStyle WRITE SetCheckStyle PROTECTED DEFAULT 1
@@ -250,9 +251,17 @@ METHOD SetCheckStyle( nStyle ) CLASS CheckBox
 RETURN Self
 
 METHOD OnCtlColorStatic( nwParam ) CLASS CheckBox
-   LOCAL nBack, hBkGnd := ::BkBrush
+   LOCAL hDC, nBack, hBkGnd := ::BkBrush
    DEFAULT hBkGnd TO ::__hBrush
    DEFAULT hBkGnd TO ::Parent:BkBrush
+
+   IF ! ::Transparent .AND. hBkGnd == NIL
+      hDC := GetDC( ::Parent:hWnd )
+      ::BkBrush := CreateSolidBrush( GetPixel( hDC, ::xLeft-1, ::xTop-1 ) )
+      SetBkMode( nwParam, TRANSPARENT )
+      ReleaseDC( ::Parent:hWnd, hDC )
+      RETURN ::BkBrush
+   ENDIF
 
    IF ::ForeColor != NIL
       SetTextColor( nwParam, ::ForeColor )

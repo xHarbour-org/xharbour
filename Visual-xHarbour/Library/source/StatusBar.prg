@@ -68,6 +68,7 @@ CLASS StatusBar INHERIT Control
    METHOD __OnParentSize()
    METHOD OnMouseMove()
    METHOD SetImageIndex()
+   METHOD OnDestroy()      INLINE ::Super:OnDestroy(),  AEVAL( ::Children, {|o| ObjFromHandle( o:hWnd, .T. ) } )
 ENDCLASS
 
 //----------------------------------------------------------------------------------------------------
@@ -308,9 +309,6 @@ METHOD Init( oParent ) CLASS StatusBarPanel
    ::Width         := 30
    ::__lMoveable   := .F.
    ::__lCopyCut    := .F.
-
-   __SetObjPtr( Self )
-
    ::ClsName       := "StatusBarPanel"
    ::__lResizeable := {.F.,.F.,.F.,.F.,.F.,.T.,.F.,.F.}
    ::IsContainer   := .T.
@@ -323,6 +321,8 @@ METHOD Init( oParent ) CLASS StatusBarPanel
    ::Style    := WS_VISIBLE
    ::Events   := {}
    ::Index := LEN( ::Parent:Children )
+
+   __SetObjPtr( Self )
 RETURN Self
 
 METHOD Create() CLASS StatusBarPanel

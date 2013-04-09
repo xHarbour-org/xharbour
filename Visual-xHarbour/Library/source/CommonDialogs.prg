@@ -625,16 +625,16 @@ METHOD Show() CLASS TaskDialog
           ::Buttons[n][1] := VAL(::Buttons[n][1])
       NEXT
    ENDIF
-   nRet := TaskDialogProc( ::Form:hWnd,;
-                           ::Form:AppInstance,;
-                           ::Buttons,;
-                           ::MainInstruction,;
-                           ::Content,;
-                           ::__Flags,;
-                           ::__ComBttns,;
-                           ::WindowTitle,;
-                           ::Footer,;
-                           @nButton, @nRadio, @lChecked )
+   nRet := TaskDialogIndirect( ::Form:hWnd,;
+                               ::Form:AppInstance,;
+                               ::Buttons,;
+                               ::MainInstruction,;
+                               ::Content,;
+                               ::__Flags,;
+                               ::__ComBttns,;
+                               ::WindowTitle,;
+                               ::Footer,;
+                               @nButton, @nRadio, @lChecked )
    ::ButtonPressed := nButton
    ::RadioButton   := nRadio
    ::VerificationFlagChecked := lChecked

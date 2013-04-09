@@ -10302,7 +10302,7 @@ BOOL Array2Button(PHB_ITEM aButton, TASKDIALOG_BUTTON *tdb )
 }
 
 //-------------------------------------------------------------------------------------------------
-HB_FUNC( TASKDIALOGPROC )
+HB_FUNC( TASKDIALOGINDIRECT )
 {
    if( pTaskDialogIndirect )
    {

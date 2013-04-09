@@ -86,8 +86,16 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 
 METHOD OnCtlColorStatic( nwParam ) CLASS Label
-   LOCAL hBkGnd := ::BkBrush
+   LOCAL hDC, hBkGnd := ::BkBrush
    DEFAULT hBkGnd TO ::Parent:BkBrush
+
+   IF ! ::Transparent .AND. hBkGnd == NIL
+      hDC := GetDC( ::Parent:hWnd )
+      ::BkBrush := CreateSolidBrush( GetPixel( hDC, ::xLeft-1, ::xTop-1 ) )
+      SetBkMode( nwParam, TRANSPARENT )
+      ReleaseDC( ::Parent:hWnd, hDC )
+      RETURN ::BkBrush
+   ENDIF
 
    IF ::ForeColor != NIL
       SetTextColor( nwParam, ::ForeColor )

@@ -85,6 +85,7 @@ CLASS Object
    METHOD Create()
    METHOD __InvalidMember()
    METHOD RemoveProperty()
+   METHOD ObjFromHandle()
    error HANDLER OnError()
 
 ENDCLASS
@@ -272,3 +273,25 @@ FUNCTION ObjFromHandle( hWnd, lRemove )
       ENDIF
    ENDIF
 RETURN NIL
+
+FUNCTION TraceObj()
+   LOCAL n
+   FOR n := 1 TO LEN( __aObjects )
+       VIEW __aObjects[n]:Name, __aObjects[n]:ClsName
+   NEXT
+RETURN NIL
+
+METHOD ObjFromHandle( hWnd ) CLASS Object
+   LOCAL n, oObj
+   IF ::hWnd == hWnd
+      RETURN Self
+   ENDIF
+   FOR n := 1 TO LEN( ::Children )
+       IF ::Children[n]:hWnd == hWnd
+          oObj := ::Children[n]
+          EXIT
+       ELSE
+          oObj := ::Children[n]:ObjFromHandle( hWnd )
+       ENDIF
+   NEXT
+RETURN oObj

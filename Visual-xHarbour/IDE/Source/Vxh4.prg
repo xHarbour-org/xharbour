@@ -1352,7 +1352,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                      xProp := cProp
                      cProp := "ContextMenu"
                   ENDIF
-                  IF ::ActiveObject:Form:hWnd != ::Application:Project:Forms[1]:hWnd
+                  IF ! EMPTY( ::Application:Project:Forms ) .AND. ::ActiveObject:Form:hWnd != ::Application:Project:Forms[1]:hWnd
                      FOR EACH Child IN ::Application:Project:Forms[1]:Components
                          IF Child:ComponentType IN cProp .AND. ( Child:lCreated .OR. Child:ComponentType == "DataSource" .OR. Child:ClsName == "ImageList"  )
                             AADD( aCol[1]:Value[2], Child )

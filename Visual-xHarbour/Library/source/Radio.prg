@@ -41,6 +41,8 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS RadioButton INHERIT Control
+   DATA Transparent  PUBLISHED INIT .F.
+
    DATA DefaultButton INIT .F.
    DATA States       INIT { "Unchecked", "Checked" }
    DATA State     EXPORTED
@@ -56,7 +58,7 @@ CLASS RadioButton INHERIT Control
    DATA ImageIndex EXPORTED
 
    METHOD Init()  CONSTRUCTOR
-   METHOD Create() INLINE ::Super:Create(), ::SendMessage( BM_SETCHECK, ::xInitialState, 0 )
+   METHOD Create() INLINE IIF( ::Transparent, ::Parent:__SetTransparent( Self ), ), ::Super:Create(), ::SendMessage( BM_SETCHECK, ::xInitialState, 0 )
    
    METHOD __WindowDestroy()    INLINE ::Super:__WindowDestroy(), ::CloseThemeData(), Self
    METHOD OnEraseBkGnd()       INLINE 1
@@ -197,9 +199,17 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS RadioButton
 RETURN NIL
 
 METHOD OnCtlColorStatic( nwParam ) CLASS RadioButton
-   LOCAL nBack, hBkGnd := ::BkBrush
+   LOCAL hDC, nBack, hBkGnd := ::BkBrush
    DEFAULT hBkGnd TO ::__hBrush
    DEFAULT hBkGnd TO ::Parent:BkBrush
+
+   IF ! ::Transparent .AND. hBkGnd == NIL
+      hDC := GetDC( ::Parent:hWnd )
+      ::BkBrush := CreateSolidBrush( GetPixel( hDC, ::xLeft-1, ::xTop-1 ) )
+      SetBkMode( nwParam, TRANSPARENT )
+      ReleaseDC( ::Parent:hWnd, hDC )
+      RETURN ::BkBrush
+   ENDIF
 
    IF ::ForeColor != NIL
       SetTextColor( nwParam, ::ForeColor )
