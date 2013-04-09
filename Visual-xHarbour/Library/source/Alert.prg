@@ -38,10 +38,8 @@ CLASS AlertDialog INHERIT Dialog
 ENDCLASS
 
 METHOD Init( cMsg, aChoices, lModal, nBackColor, nForeColor, lVert, cFace, nPointSize, nDefault ) CLASS AlertDialog
-   Local n, aMsg, hFont, hOldFont, i
-   Local hWnd, hDC
-   Local nWidth, nMsgHeight
-   LOCAL aSize, oParent
+   LOCAL n, aMsg, hFont, hOldFont, i
+   LOCAL hDC, nWidth, nMsgHeight, aSize, oParent
    
    nButWidth := 0
    
@@ -94,21 +92,27 @@ METHOD Init( cMsg, aChoices, lModal, nBackColor, nForeColor, lVert, cFace, nPoin
       nWidth  := Max( nWidth, (nButWidth*n)+5  )
    ENDIF
 
-   hWnd := GetFocus()
-   oParent := NIL //ObjFromHandle( GetActiveWindow() )
+   //hWnd := GetFocus()
+   
+   IF lModal
+      ::ExStyle := WS_EX_TOOLWINDOW
+      oParent := ObjFromHandle( GetActiveWindow() )
+    ELSE
+      ::ExStyle := WS_EX_TOOLWINDOW | WS_EX_TOPMOST
+      oParent := NIL 
+   ENDIF
 
    Super:Init( oParent )
    ::Modal    := lModal
    ::Style    := DS_MODALFRAME | WS_VISIBLE | WS_POPUP | DS_SETFONT | WS_CAPTION
-   ::ExStyle  := WS_EX_TOOLWINDOW
    ::Message  := cMsg
    ::MsgHeight:= nMsgHeight
    ::aChoices := aChoices
    ::Width    := nWidth + 40
-   ::Height   := nMsgHeight + 55 + IIF( !lVert, 0, 24 * (Len( aChoices )-1) )
+   ::Height   := nMsgHeight + 61 + IIF( !lVert, 0, 24 * (Len( aChoices )-1) )
    ::Create() 
  
-   SetFocus( hWnd )
+   //SetFocus( hWnd )
 RETURN Self
 
 METHOD OnInitDialog() CLASS AlertDialog
@@ -133,7 +137,7 @@ METHOD OnInitDialog() CLASS AlertDialog
       aSize := o:Drawing:GetTextExtentPoint32( "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" )
       aMsg := __str2a( ::Message, CHR(13) )
       ::MsgHeight := Len( aMsg ) * aSize[2]
-      ::Height    := ::MsgHeight + 55 + IIF( !::_Vert, 0, 24 * (Len( ::aChoices )-1) )
+      ::Height    := ::MsgHeight + 61 + IIF( !::_Vert, 0, 24 * (Len( ::aChoices )-1) )
       nWidth      := 0
       AEVAL( aMsg, {|x| nWidth := Max( nWidth, o:Drawing:GetTextExtentPoint32( AllTrim(x) )[1] ) } )
       IF !::_Vert
