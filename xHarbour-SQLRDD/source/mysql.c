@@ -31,7 +31,7 @@
 
 static PHB_DYNS s_pSym_SR_DESERIALIZE = NULL;
 static PHB_DYNS s_pSym_SR_FROMJSON = NULL;
-
+static int iConnectionCount = 0;
 typedef struct _MYSQL_SESSION
 {
    int status;                   // Execution return value
@@ -52,7 +52,7 @@ HB_FUNC( MYSCONNECT )
    const char *szPass=hb_parc(3);
    const char *szDb = hb_parc(4);
    UINT uiPort    = ISNUM(5) ? hb_parnl(5) : MYSQL_PORT ;
-   UINT uiTimeout = ISNUM(6) ? hb_parnl(6) : 30 ;
+   UINT uiTimeout = ISNUM(7) ? hb_parnl(7) : 3600 ;
    mysql_library_init(0,NULL,NULL);
    memset( session, 0, sizeof( MYSQL_SESSION ) );
 
@@ -61,6 +61,7 @@ HB_FUNC( MYSCONNECT )
 
    if (  session->dbh != NULL )
    {
+	  iConnectionCount ++ ; 
       mysql_options( session->dbh, MYSQL_OPT_CONNECT_TIMEOUT, (const char *) &uiTimeout );
       mysql_real_connect( session->dbh, szHost, szUser, szPass, szDb, uiPort, NULL, 0 );
       hb_retptr( (void *) session );
@@ -69,7 +70,9 @@ HB_FUNC( MYSCONNECT )
    {
       
       mysql_close( NULL );
-      mysql_library_end();
+      if ( iConnectionCount == 0 ) 
+         mysql_library_end();
+
       hb_retptr( NULL );
    }
 }
@@ -80,8 +83,12 @@ HB_FUNC( MYSFINISH )
    assert( session != NULL );
    assert( session->dbh != NULL );
    mysql_close( session->dbh );
+
    hb_xfree( session );
-   mysql_library_end();
+   if (iConnectionCount >  0)
+      iConnectionCount -- ;    
+   if ( iConnectionCount == 0 ) 
+      mysql_library_end();
    hb_ret();
 }
 

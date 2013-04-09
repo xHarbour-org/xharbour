@@ -8,6 +8,10 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-04-07 18:35 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/mysql.c
+    ! fix to mysql_library_end() only when connection counter come to 0, otherwise in multiple connections, close one, close all other
+    
 2013-02-21 05:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
   * source/sqlrdd2.prg
     ! minor fix in SolveRestrictors() method related to deleted status ( users that dont use sr_deleted field is not affected)
