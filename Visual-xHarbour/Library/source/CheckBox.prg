@@ -46,8 +46,8 @@
 CLASS CheckBox INHERIT Control
    DATA Transparent PUBLISHED INIT .F.
 
-   DATA ImageList  EXPORTED
-   DATA ImageIndex PROTECTED
+   DATA ImageList   EXPORTED
+   DATA ImageIndex  PROTECTED
 
    PROPERTY Group      INDEX WS_GROUP  READ xGroup      WRITE SetStyle      PROTECTED DEFAULT .F.
    PROPERTY CheckStyle                 READ xCheckStyle WRITE SetCheckStyle PROTECTED DEFAULT 1
@@ -64,7 +64,8 @@ CLASS CheckBox INHERIT Control
    METHOD SetParent( oParent ) INLINE IIF( ::__hBrush != NIL, ( DeleteObject( ::__hBrush ), ::__hBrush := NIL ), ), ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
    METHOD Create()             INLINE IIF( ::Transparent, ::Parent:__SetTransparent( Self ), ), ::Super:Create(), ::SetState( ::xState )
 
-   METHOD OnDestroy()          INLINE ::Super:OnDestroy(), ::CloseThemeData(), IIF( ::__hBrush != NIL, DeleteObject( ::__hBrush ), )
+   METHOD OnDestroy()          INLINE ::CloseThemeData(), Super:OnDestroy()
+
    METHOD DrawFrame()
    METHOD SetCheckStyle()
    METHOD OnCtlColorStatic()
@@ -251,26 +252,9 @@ METHOD SetCheckStyle( nStyle ) CLASS CheckBox
 RETURN Self
 
 METHOD OnCtlColorStatic( nwParam ) CLASS CheckBox
-   LOCAL hDC, nBack, hBkGnd := ::BkBrush
-   DEFAULT hBkGnd TO ::__hBrush
-   DEFAULT hBkGnd TO ::Parent:BkBrush
-
-   IF ! ::Transparent .AND. hBkGnd == NIL
-      hDC := GetDC( ::Parent:hWnd )
-      ::BkBrush := CreateSolidBrush( GetPixel( hDC, ::xLeft-1, ::xTop-1 ) )
-      SetBkMode( nwParam, TRANSPARENT )
-      ReleaseDC( ::Parent:hWnd, hDC )
-      RETURN ::BkBrush
-   ENDIF
-
+   LOCAL hBkGnd := ::GetBkBrush()
    IF ::ForeColor != NIL
       SetTextColor( nwParam, ::ForeColor )
-   ENDIF
-   
-   nBack := ::BackColor
-   DEFAULT nBack TO ::Parent:BackColor
-   IF nBack != NIL
-      SetBkColor( nwParam, nBack )
    ENDIF
    SetBkMode( nwParam, TRANSPARENT )
 RETURN hBkGnd

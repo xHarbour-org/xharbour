@@ -86,29 +86,10 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 
 METHOD OnCtlColorStatic( nwParam ) CLASS Label
-   LOCAL hDC, hBkGnd := ::BkBrush
-   DEFAULT hBkGnd TO ::Parent:BkBrush
-
-   IF ! ::Transparent .AND. hBkGnd == NIL
-      hDC := GetDC( ::Parent:hWnd )
-      ::BkBrush := CreateSolidBrush( GetPixel( hDC, ::xLeft-1, ::xTop-1 ) )
-      SetBkMode( nwParam, TRANSPARENT )
-      ReleaseDC( ::Parent:hWnd, hDC )
-      RETURN ::BkBrush
-   ENDIF
+   LOCAL hBkGnd := ::GetBkBrush()
 
    IF ::ForeColor != NIL
       SetTextColor( nwParam, ::ForeColor )
-   ENDIF
-
-   IF ::__hBrush != NIL .AND. ::BkBrush == NIL
-      SetBkMode( nwParam, TRANSPARENT )
-      RETURN ::__hBrush
-   ENDIF
-
-   IF ::Parent:ClsName == "ToolBarWindow32" .OR. ::Transparent
-      SetBkMode( nwParam, TRANSPARENT )
-      RETURN GetStockObject( NULL_BRUSH )
    ENDIF
 
    IF hBkGnd != NIL
@@ -120,6 +101,11 @@ METHOD OnCtlColorStatic( nwParam ) CLASS Label
       IF ::BackColor == ::BackSysColor
          RETURN GetSysColorBrush( COLOR_BTNFACE )
       ENDIF
+      RETURN GetStockObject( NULL_BRUSH )
+   ENDIF
+
+   IF ::Parent:ClsName == "ToolBarWindow32" .OR. ::Transparent
+      SetBkMode( nwParam, TRANSPARENT )
       RETURN GetStockObject( NULL_BRUSH )
    ENDIF
 RETURN NIL

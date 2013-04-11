@@ -48,20 +48,22 @@
 
 CLASS GroupBox INHERIT Control
    DATA ImageIndex PROTECTED
-   DATA Transparent PUBLISHED INIT .F.
-   
+
+   PROPERTY Transparent READ xTransparent WRITE __SetTransp DEFAULT .F.
+
    ACCESS ForeSysColor INLINE ::GetSysColor()
 
    PROPERTY ImageList  GET __ChkComponent( Self, ::xImageList )
    
    METHOD Init()  CONSTRUCTOR
-   METHOD Create()
-   METHOD __WindowDestroy()    INLINE ::Super:__WindowDestroy(), ::CloseThemeData(), Self
+   METHOD Create()             INLINE IIF( ::Transparent, ::Parent:__SetTransparent( Self ), ), Super:Create()
+   METHOD OnDestroy()          INLINE Super:OnDestroy(), ::CloseThemeData(), NIL
    METHOD OnEraseBkGnd()       INLINE IIF( LEN( ::Children ) == 0, ::SetWindowPos( HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE ), ), 1
    METHOD OnPaint()
    METHOD OnSize(w,l)          INLINE Super:OnSize(w,l),::InvalidateRect(), NIL
    METHOD GetSysColor()
    METHOD SetWindowText(cText) INLINE Super:SetWindowText(cText), ::InvalidateRect()
+   METHOD __SetTransp(lSet)    INLINE ::Parent:__SetTransparent( Self, lSet )
 ENDCLASS
 
 METHOD Init( oParent ) CLASS GroupBox
@@ -92,19 +94,15 @@ METHOD GetSysColor() CLASS GroupBox
    ENDIF
 RETURN nColor
 
-METHOD Create() CLASS GroupBox
-   ::Super:Create()
-RETURN Self
-
 METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
-   LOCAL lDC, oChild, hFont, hMemDC1, __hBrush, hOldBitmap1, hBrush, hMemBitmap, hOldBitmap, rc := (struct RECT), rcalc := (struct RECT), sz := (struct SIZE)
+   LOCAL lDC, oChild, hFont, hMemDC1, hOldBitmap1, hBrush, hMemBitmap, hOldBitmap, rc := (struct RECT), rcalc := (struct RECT), sz := (struct SIZE)
    LOCAL hParBrush := ::Parent:BkBrush
    IF !::IsWindow()
       RETURN 0
    ENDIF
    hBrush := ::BkBrush
-   DEFAULT hBrush TO ::Parent:BkBrush
    DEFAULT hBrush TO ::__hBrush
+   DEFAULT hBrush TO ::Parent:BkBrush
    DEFAULT hParBrush TO ::__hBrush
    
    DEFAULT hParBrush TO GetSysColorBrush( COLOR_BTNFACE )
@@ -125,9 +123,6 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
          hOldBitmap := SelectObject( hMemDC, hMemBitmap)
          SendMessage( ::Parent:hWnd, WM_PRINT, hMemDC, PRF_CLIENT | PRF_ERASEBKGND )
          BitBlt( hDC, ::Left, ::Top, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
-
-         __hBrush := CreatePatternBrush( hMemBitmap )
-
        ELSE
          hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
          hOldBitmap := SelectObject( hMemDC, hMemBitmap)
@@ -163,12 +158,12 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
 
    IF ! Empty( ::Text )
       rcalc:left   := 7
-      rcalc:top    := 9
+      rcalc:top    := 0
       rcalc:right  := sz:cx + 12
       rcalc:bottom := sz:cy
 
       FillRect( hMemDC, rcalc, hBrush )
-      _FillRect( hMemDC, {rcalc:left,rcalc:top-9,rcalc:right,rcalc:top}, __hBrush )
+      //_FillRect( hMemDC, {rcalc:left,rcalc:top-9,rcalc:right,rcalc:top}, __hBrush )
 
       IF ::ForeColor != NIL
          SetTextColor( hMemDC, ::ForeColor )

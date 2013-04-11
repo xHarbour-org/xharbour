@@ -70,6 +70,7 @@ CLASS Control INHERIT Window
    DATA OnWMUnDock        EXPORTED
    DATA OnWMReDock        EXPORTED
 
+   DATA __hParBrush       PROTECTED
    DATA CaptionRect       PROTECTED
    DATA PinPushed         PROTECTED INIT .F.
    DATA PinHover          PROTECTED INIT .F.
@@ -123,6 +124,8 @@ CLASS Control INHERIT Window
    METHOD Show() INLINE IIF( ::__DockParent != NIL, ::__DockParent:Show(), ::Super:Show( SW_SHOW ) )
    METHOD __Enable( lEnable )
    METHOD __SetSmallCaption()
+   METHOD GetBkBrush()
+   METHOD OnDestroy()          INLINE IIF( ::__hParBrush != NIL, DeleteObject( ::__hParBrush ),), Super:OnDestroy()
 ENDCLASS
 
 METHOD __Enable( lEnable ) CLASS Control
@@ -853,6 +856,25 @@ METHOD DrawPin( hDC, n ) CLASS Control
 
 RETURN Self
 
+METHOD GetBkBrush() CLASS Control
+   LOCAL hDC, nColor, hBkGnd := ::__hBrush
+   DEFAULT hBkGnd TO ::BkBrush
+   DEFAULT hBkGnd TO ::Parent:BkBrush
+
+   IF hBkGnd == NIL
+      hDC := GetDC( ::Parent:hWnd )
+      nColor := GetPixel( hDC, ::xLeft-1, ::xTop-1 )
+      IF nColor > 0
+         IF ::__hParBrush != NIL
+            DeleteObject( ::__hParBrush )
+         ENDIF
+         ::__hParBrush := CreateSolidBrush( nColor )
+         hBkGnd := ::__hParBrush
+      ENDIF
+      ReleaseDC( ::Parent:hWnd, hDC )
+   ENDIF
+RETURN hBkGnd
+
 CLASS CommonControls INHERIT Control
    PROPERTY CCS_Adjustable    INDEX CCS_ADJUSTABLE    READ xCCS_Adjustable    WRITE SetProperty DEFAULT .F. PROTECTED
    PROPERTY CCS_NoDevider     INDEX CCS_NODIVIDER     READ xCCS_NoDevider     WRITE SetProperty DEFAULT .F. PROTECTED
@@ -888,3 +910,4 @@ METHOD Init( oParent ) CLASS UserControl
    ::Super:Init( oParent )
    ::__IsStandard := .F.
 RETURN Self
+
