@@ -96,16 +96,13 @@ RETURN nColor
 
 METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
    LOCAL lDC, oChild, hFont, hMemDC1, hOldBitmap1, hBrush, hMemBitmap, hOldBitmap, rc := (struct RECT), rcalc := (struct RECT), sz := (struct SIZE)
-   LOCAL hParBrush := ::Parent:BkBrush
    IF !::IsWindow()
       RETURN 0
    ENDIF
    hBrush := ::BkBrush
    DEFAULT hBrush TO ::__hBrush
    DEFAULT hBrush TO ::Parent:BkBrush
-   DEFAULT hParBrush TO ::__hBrush
-   
-   DEFAULT hParBrush TO GetSysColorBrush( COLOR_BTNFACE )
+
    rc:left   := 0
    rc:top    := 0
    rc:right  := ::Width
@@ -118,32 +115,11 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
 
    IF hDC != NIL
       hMemDC     := CreateCompatibleDC( hDC )
-      IF hBrush == NIL .AND. ::Parent:__xCtrlName == "TabPage" //.AND. GetParent( ::hWnd ) == ::Parent:hWnd
-         hMemBitmap := CreateCompatibleBitmap( hDC, ::Parent:ClientWidth, ::Parent:ClientHeight )
-         hOldBitmap := SelectObject( hMemDC, hMemBitmap)
-         SendMessage( ::Parent:hWnd, WM_PRINT, hMemDC, PRF_CLIENT | PRF_ERASEBKGND )
-         BitBlt( hDC, ::Left, ::Top, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
-       ELSE
-         hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
-         hOldBitmap := SelectObject( hMemDC, hMemBitmap)
-         DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
-         FillRect( hMemDC, rc, hParBrush )
+      hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
+      hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+      DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
 
-         rc:top    ++
-         IF ! Empty( ::Text )
-            rc:top    := 9
-         ENDIF
-         rc:left   ++
-         rc:right  --
-         rc:bottom --
-         
-         FillRect( hMemDC, rc, hBrush )
-   
-         rc:left   := 0
-         rc:top    := 0
-         rc:right  := ::Width
-         rc:bottom := ::Height
-      ENDIF
+      FillRect( hMemDC, rc, hBrush )
    ENDIF
 
    hFont := SelectObject( hMemDC, ::Font:Handle )
@@ -163,7 +139,6 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
       rcalc:bottom := sz:cy
 
       FillRect( hMemDC, rcalc, hBrush )
-      //_FillRect( hMemDC, {rcalc:left,rcalc:top-9,rcalc:right,rcalc:top}, __hBrush )
 
       IF ::ForeColor != NIL
          SetTextColor( hMemDC, ::ForeColor )
