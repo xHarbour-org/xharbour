@@ -168,8 +168,9 @@ METHOD OnMouseLeave() CLASS ToolBox
    ::InvalidateRect(,.F.)
 RETURN NIL
 
-METHOD OnMouseMove( x, y ) CLASS ToolBox
+METHOD OnMouseMove( w, l ) CLASS ToolBox
    LOCAL oItem, pt := (struct POINT)
+   Super:OnMouseMove( w, l )
    GetCursorPos( @pt )
    ScreenToClient( ::hWnd, @pt )
    IF ( oItem := ::HitTest( pt:x, pt:y ) ) != NIL .AND. !(oItem == ::HoverItem)

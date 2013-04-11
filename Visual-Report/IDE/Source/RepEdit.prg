@@ -69,8 +69,13 @@ METHOD Create() CLASS RepEdit
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------------------------------------------
-METHOD OnMouseMove( nwParam, x, y ) CLASS RepEdit
-   LOCAL aPoint, aPoints, oCtrl, n, hDC, aPt, aRect[4], nx, ny
+METHOD OnMouseMove( nwParam, nlParam ) CLASS RepEdit
+   LOCAL aPoint, aPoints, oCtrl, n, hDC, aPt, aRect[4], nx, ny, x, y
+   Super:OnMouseMove( nwParam, nlParam )
+
+   x := LOWORD( nlParam )
+   y := HIWORD( nlParam )
+
    oCtrl := ::Application:Props:PropEditor:ActiveObject
    IF nwParam == MK_LBUTTON 
       IF ::aSelect != NIL
@@ -439,14 +444,14 @@ METHOD OnLButtonDown(n,x,y) CLASS __VrGroup
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------------------------------------------
-METHOD OnMouseMove(n,x,y) CLASS __VrGroup 
+METHOD OnMouseMove(w,l) CLASS __VrGroup 
    LOCAL oCtrl
-   IF n == MK_LBUTTON
+   IF w == MK_LBUTTON
       oCtrl := ::Application:Props:PropEditor:ActiveObject
       IF !(oCtrl == Self)
-         Super:OnMouseMove(n,x,y)
+         Super:OnMouseMove(w,l)
       ENDIF
     ELSE
-      MouseMove( Self, n, x, y )
+      MouseMove( Self, w, LOWORD(l), HIWORD(l) )
    ENDIF
 RETURN NIL
