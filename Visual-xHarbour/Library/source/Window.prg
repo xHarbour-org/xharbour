@@ -249,6 +249,7 @@ CLASS Window INHERIT Object
    DATA __Docked                 PROTECTED INIT .T.
    DATA __aCltRect               PROTECTED
    DATA __cPaint                 PROTECTED
+   DATA __lRegTrans              EXPORTED  INIT .F.
    DATA __aValues                EXPORTED  INIT {}
    DATA __hCursor                EXPORTED
    DATA __aTransparent           EXPORTED  INIT {}
@@ -267,7 +268,8 @@ CLASS Window INHERIT Object
    DATA __lOnPaint               EXPORTED  INIT .F.
    DATA __hAccelTable            EXPORTED
    DATA __lMouseHover            EXPORTED  INIT .F.
-   DATA __hMemBitmap             EXPORTED
+   DATA __hMemBitmap             PROTECTED
+   DATA __hBrush                 PROTECTED
    DATA __IsInstance             EXPORTED  INIT .F.
    DATA __pCallBackPtr           EXPORTED
    DATA __lCreateAfterChildren   EXPORTED  INIT .F.
@@ -400,7 +402,8 @@ CLASS Window INHERIT Object
    METHOD Create()
 
    //DESTRUCTOR __WinDestruct
-   METHOD __SetTransparent()
+   METHOD __RegisterTransparentControl()
+   METHOD __UnregisterTransparentControl()
    METHOD __Register()
    METHOD __ControlProc()
    METHOD __CreateMDI()
@@ -755,24 +758,29 @@ METHOD RestoreLayout( cIniFile, cSection, lAllowOut ) CLASS Window
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD __SetTransparent( oCtrl, lSet ) CLASS Window
+METHOD __UnregisterTransparentControl( oCtrl ) CLASS Window
    LOCAL n
-   DEFAULT lSet TO .T.
-   n := ASCAN( ::__aTransparent, {|o| o == oCtrl} )
-   IF lSet
-      IF n == 0
-         AADD( ::__aTransparent, oCtrl )
+   IF ( n := ASCAN( ::__aTransparent, oCtrl,,, .T. ) ) > 0
+      ADEL( ::__aTransparent, n, .T. )
+      IF oCtrl:__hMemBitmap != NIL
+         DeleteObject( oCtrl:__hMemBitmap )
       ENDIF
-    ELSE
-      IF n > 0
-         ADEL( ::__aTransparent, n, .T. )
-         IF oCtrl:__hMemBitmap != NIL
-            DeleteObject( oCtrl:__hMemBitmap )
-            oCtrl:__hMemBitmap := NIL
-         ENDIF
+      IF oCtrl:__hBrush != NIL
+         DeleteObject( oCtrl:__hBrush )
       ENDIF
+      oCtrl:__hMemBitmap := NIL
+      oCtrl:__hBrush := NIL
+      RETURN .T.
    ENDIF
-RETURN NIL
+RETURN .F.
+
+//-----------------------------------------------------------------------------------------------
+METHOD __RegisterTransparentControl( oCtrl ) CLASS Window
+   IF ASCAN( ::__aTransparent, oCtrl,,, .T. ) == 0
+      AADD( ::__aTransparent, oCtrl )
+      RETURN .T.
+   ENDIF
+RETURN .F.
 
 //-----------------------------------------------------------------------------------------------
 
@@ -1476,8 +1484,8 @@ METHOD SetParent( oParent ) CLASS Window
    ENDIF
    n := ASCAN( ::Parent:__aTransparent, {|o| o == Self} )
    IF n > 0
-      ::Parent:__SetTransparent( Self, .F. )
-      oParent:__SetTransparent( Self )
+      ::Parent:__UnregisterTransparentControl( Self )
+      oParent:__RegisterTransparentControl( Self )
    ENDIF
    ::Parent := oParent
    AADD( oParent:Children, Self )
@@ -3377,7 +3385,7 @@ METHOD __WindowDestroy() CLASS Window
       IF ( n := ASCAN( ::Parent:Children, {|o|o:hWnd == ::hWnd} ) ) > 0
          ADEL( ::Parent:Children, n, .T. )
       ENDIF
-      ::Parent:__SetTransparent( Self, .F. )
+      ::Parent:__UnregisterTransparentControl( Self )
    ENDIF
 
    IF ::Drawing != NIL
@@ -5358,19 +5366,21 @@ METHOD __PaintBakgndImage( hDC ) CLASS WinForm
 
       BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
 
+      hMemDC1 := CreateCompatibleDC( hDC )
       FOR EACH oChild IN ::__aTransparent
-          IF oChild:__hBrush != NIL
-             DeleteObject( oChild:__hBrush )
+          IF GetParent( oChild:hWnd ) == ::hWnd
+             IF oChild:__hBrush != NIL
+                DeleteObject( oChild:__hBrush )
+             ENDIF
+             DEFAULT oChild:__BackMargin TO 0
+             DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
+             hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
+             BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin+oChild:CaptionHeight, SRCCOPY )
+             oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
+             SelectObject( hMemDC1,  hOldBitmap1 )
           ENDIF
-          DEFAULT oChild:__BackMargin TO 0
-          DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
-          hMemDC1      := CreateCompatibleDC( hDC )
-          hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
-          BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin+oChild:CaptionHeight, SRCCOPY )
-          oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
-          SelectObject( hMemDC1,  hOldBitmap1 )
-          DeleteDC( hMemDC1 )
       NEXT
+      DeleteDC( hMemDC1 )
 
       SelectObject( hMemDC,  hOldBitmap )
       DeleteObject( hMemBitmap )
@@ -5410,19 +5420,21 @@ METHOD Show( nShow ) CLASS WinForm
 
             BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
 
+            hMemDC1      := CreateCompatibleDC( hDC )
             FOR EACH oChild IN ::__aTransparent
-                IF oChild:__hBrush != NIL
-                   DeleteObject( oChild:__hBrush )
+                IF GetParent( oChild:hWnd ) == ::hWnd
+                   IF oChild:__hBrush != NIL
+                      DeleteObject( oChild:__hBrush )
+                   ENDIF
+                   DEFAULT oChild:__BackMargin TO 0
+                   DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
+                   hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
+                   BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin, SRCCOPY )
+                   oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
+                   SelectObject( hMemDC1,  hOldBitmap1 )
                 ENDIF
-                DEFAULT oChild:__BackMargin TO 0
-                DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
-                hMemDC1      := CreateCompatibleDC( hDC )
-                hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
-                BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin, SRCCOPY )
-                oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
-                SelectObject( hMemDC1,  hOldBitmap1 )
-                DeleteDC( hMemDC1 )
             NEXT
+            DeleteDC( hMemDC1 )
 
             SelectObject( hMemDC,  hOldBitmap )
             DeleteObject( hMemBitmap )

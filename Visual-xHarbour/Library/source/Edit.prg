@@ -286,7 +286,7 @@ RETURN Self
 METHOD Create() CLASS EditBox
    LOCAL pWi, n
    IF ::Transparent
-      ::Parent:__SetTransparent( Self )
+      ::Parent:__RegisterTransparentControl( Self )
    ENDIF
    ::Super:Create()
    pWi := ::GetWindowInfo()
@@ -539,18 +539,9 @@ METHOD SetSelColor( nFore, nColor, lRepaint ) CLASS EditBox
 RETURN SELF
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnCtlColorStatic( nwParam )
-   LOCAL hBkGnd, nBkColor
+METHOD OnCtlColorStatic( nwParam ) CLASS EditBox
+   LOCAL hBkGnd := ::GetBkBrush()
 
-   hBkGnd   := ::BkBrush
-   DEFAULT hBkGnd TO ::Parent:BkBrush
-
-   nBkColor := ::BackColor
-   DEFAULT nBkColor TO ::Parent:BackColor
-
-   IF nBkColor != NIL
-      SetBkColor( nwParam, nBkColor )
-   ENDIF
    IF ::ForeColor != NIL .AND. ::ForeColor != ::ForeSysColor
       SetTextColor( nwParam, ::ForeColor )
    ENDIF

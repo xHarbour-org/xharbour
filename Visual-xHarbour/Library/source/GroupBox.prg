@@ -56,14 +56,14 @@ CLASS GroupBox INHERIT Control
    PROPERTY ImageList  GET __ChkComponent( Self, ::xImageList )
    
    METHOD Init()  CONSTRUCTOR
-   METHOD Create()             INLINE IIF( ::Transparent, ::Parent:__SetTransparent( Self ), ), Super:Create()
+   METHOD Create()             INLINE IIF( ::Transparent, ::Parent:__RegisterTransparentControl( Self ), ), Super:Create()
    METHOD OnDestroy()          INLINE Super:OnDestroy(), ::CloseThemeData(), NIL
    METHOD OnEraseBkGnd()       INLINE IIF( LEN( ::Children ) == 0, ::SetWindowPos( HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE ), ), 1
    METHOD OnPaint()
    METHOD OnSize(w,l)          INLINE Super:OnSize(w,l),::InvalidateRect(), NIL
    METHOD GetSysColor()
    METHOD SetWindowText(cText) INLINE Super:SetWindowText(cText), ::InvalidateRect()
-   METHOD __SetTransp(lSet)    INLINE ::Parent:__SetTransparent( Self, lSet )
+   METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
 ENDCLASS
 
 METHOD Init( oParent ) CLASS GroupBox
@@ -99,9 +99,8 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
    IF !::IsWindow()
       RETURN 0
    ENDIF
-   hBrush := ::BkBrush
-   DEFAULT hBrush TO ::__hBrush
-   DEFAULT hBrush TO ::Parent:BkBrush
+
+   hBrush := ::GetBkBrush()
 
    rc:left   := 0
    rc:top    := 0
@@ -113,14 +112,10 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
       hDC := ::BeginPaint()
    ENDIF
 
-   IF hDC != NIL
-      hMemDC     := CreateCompatibleDC( hDC )
-      hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
-      hOldBitmap := SelectObject( hMemDC, hMemBitmap)
-      DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
-
-      FillRect( hMemDC, rc, hBrush )
-   ENDIF
+   hMemDC     := CreateCompatibleDC( hDC )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
+   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+   FillRect( hMemDC, rc, hBrush )
 
    hFont := SelectObject( hMemDC, ::Font:Handle )
    GetTextExtentPoint32( hMemDC, ::Text, @sz )
@@ -152,32 +147,28 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
    SelectObject( hMemDC, hFont )
 
    IF hMemBitmap != NIL
+      hMemDC1 := CreateCompatibleDC( hDC )
       FOR EACH oChild IN ::__aTransparent
-          IF oChild:__hBrush != NIL
-             DeleteObject( oChild:__hBrush )
+          IF GetParent( oChild:hWnd ) == ::hWnd
+             IF oChild:__hBrush != NIL
+                DeleteObject( oChild:__hBrush )
+             ENDIF
+             DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
+             hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
+             BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin, SRCCOPY )
+             oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
+             SelectObject( hMemDC1,  hOldBitmap1 )
           ENDIF
-
-          DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
-
-          hMemDC1      := CreateCompatibleDC( hDC )
-          hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
-
-          BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin, SRCCOPY )
-
-          oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
-
-          SelectObject( hMemDC1,  hOldBitmap1 )
-          DeleteDC( hMemDC1 )
       NEXT
+      DeleteDC( hMemDC1 )
    ENDIF
 
-   IF hDC != NIL
-      BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
+   BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
 
-      SelectObject( hMemDC,  hOldBitmap )
-      DeleteObject( hMemBitmap )
-      DeleteDC( hMemDC )
-   ENDIF
+   SelectObject( hMemDC,  hOldBitmap )
+   DeleteObject( hMemBitmap )
+   DeleteDC( hMemDC )
+
    IF lDC
       ::EndPaint()
    ENDIF

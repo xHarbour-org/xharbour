@@ -769,8 +769,10 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TabControl
 RETURN 0
 
 //-----------------------------------------------------------------------------------------------
-METHOD InsertTab(cText, nPos, nImg, lBold) CLASS TabControl
-   LOCAL tci, lAllow := ::OnTabInsert( nPos)
+METHOD InsertTab(cText, nPos, nImg) CLASS TabControl
+   LOCAL tci, lAllow
+   DEFAULT nPos TO ::GetItemCount()+1
+   lAllow := ::OnTabInsert( nPos)
    IF VALTYPE( lAllow := ExecuteEvent( "OnTabInsert", Self ) ) != "L"
       lAllow := NIL
    ENDIF
@@ -782,13 +784,7 @@ METHOD InsertTab(cText, nPos, nImg, lBold) CLASS TabControl
       IF nImg != NIL
          tci:iImage  := nImg-1
       ENDIF
-      IF SendMessage( ::hWnd, TCM_INSERTITEM,  nPos, tci ) > -1
-         IF lBold != NIL
-            SetWindowPos( ::hWnd,, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
-            ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
-         ENDIF
-         RETURN(.T.)
-      ENDIF
+      RETURN SendMessage( ::hWnd, TCM_INSERTITEM, nPos, tci ) > -1
    ENDIF
 RETURN .F.
 

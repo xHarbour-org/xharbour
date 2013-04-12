@@ -66,7 +66,6 @@ CLASS Control INHERIT Window
    DATA Modal             EXPORTED INIT .F.
    DATA __IdeImageIndex   EXPORTED INIT 3
    DATA __BackMargin      EXPORTED INIT 0
-   DATA __hBrush          EXPORTED
    DATA OnWMUnDock        EXPORTED
    DATA OnWMReDock        EXPORTED
 

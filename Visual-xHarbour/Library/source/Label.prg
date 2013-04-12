@@ -35,7 +35,7 @@ CLASS Label INHERIT Control
    METHOD OnCtlColorStatic()
    METHOD SetParent( oParent ) INLINE IIF( ::__hBrush != NIL, ( DeleteObject( ::__hBrush ), ::__hBrush := NIL ), ), ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
    METHOD OnSize(w,l)  INLINE Super:OnSize( w, l ), ::InvalidateRect(, .F. ), NIL
-   METHOD Create()     INLINE IIF( ::Transparent, ::Parent:__SetTransparent( Self ), ), Super:Create()
+   METHOD Create()     INLINE IIF( ::Transparent, ::Parent:__RegisterTransparentControl( Self ), ), Super:Create()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
