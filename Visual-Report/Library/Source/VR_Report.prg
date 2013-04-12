@@ -168,6 +168,7 @@ METHOD InitPDF() CLASS VrReport
       #else
          ::oForm := ::Application:MainForm
       #endif
+
       ::oPDF := ActiveX( ::oForm )
       ::oPDF:SetChildren := .F.
 
@@ -681,11 +682,11 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
    LOCAL xValue1, xValue2, xValue3, cFilter, cData, oIni, cEntry, aRelation, aRelations, cRelation, e
 
    ::Create()
-view 1
+
    IF oDoc != NIL .AND. ::hProps == NIL
       ::PrepareArrays( oDoc )
    ENDIF
-view 2
+
    ::PrintHeader    := ::hProps:PrintHeader    == "1"
    ::PrintRepHeader := ::hProps:PrintRepHeader == "1"
    ::PrintFooter    := ::hProps:PrintFooter    == "1"
@@ -693,7 +694,7 @@ view 2
    ::GroupBy1       := ::hProps:GroupBy1
    ::GroupBy2       := ::hProps:GroupBy2
    ::GroupBy3       := ::hProps:GroupBy3
-view 3
+
    FOR EACH hCtrl IN ::aComponents
        IF hCtrl:ClsName IN {"VRDATATABLE","VRADSDATATABLE"}
           oData := &(SubStr(hCtrl:ClsName,3))( NIL )
@@ -768,7 +769,7 @@ view 3
 
        ENDIF
    NEXT
-view 4
+
    FOR EACH hCtrl IN ::aComponents
        IF hCtrl:ClsName $ { "VRDATATABLE", "VRADSDATATABLE" }
           cData := hCtrl:Name
@@ -783,7 +784,7 @@ view 4
           ENDIF
        ENDIF
    NEXT
-view 5
+
    IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
       TRY
          ::DataSource:Select()
@@ -796,7 +797,7 @@ view 5
          RETURN .F.
       END
    ENDIF
-view 6
+
    ::StartPage()
    hDC := GetDC(0)
 #ifndef VRDLL
@@ -815,7 +816,7 @@ view 6
 
    ::CreateRepHeader( hDC )
    ::CreateHeader( hDC )
-view 7
+
    IF ::DataSource != NIL .AND. ! EMPTY( ::DataSource:FileName )
       ::DataSource:Select()
       ::DataSource:GoTop()
@@ -870,17 +871,17 @@ view 7
          ENDIF
       ENDDO
    ENDIF
-view 8
+
    ::CreateRepFooter( hDC )
    ::CreateFooter( hDC )
 
    ReleaseDC(0, hDC)
-view 9
+
    ::EndPage()
    ::End()
    hb_gcall(.t.)
    HEVAL( hData, {|cKey,o| IIF( o:IsOpen, o:Close(),)} )
-view 10
+
 RETURN .T.
 
 METHOD ChangePage( hDC, nHeight )
